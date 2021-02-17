@@ -268,51 +268,49 @@ static pwr_tStatus IoAgentWrite(io_tCtx ctx, io_sAgent* ap)
           }
         }
       }
-
-      if (slave_list != NULL) {
-        /* Check if there is a write request pending ?? */
-
-        if (sp->WriteReq.SendReq) {
-          if ((sp->WriteReq.Length > 0)
-              && (sp->WriteReq.Length <= sizeof(sp->WriteReq.Data))) {
-            for (jj = 0; jj < local->device_data[ii]->module_data.size();
-                 jj++) {
-              if (local->device_data[ii]->module_data[jj]->slot_number
-                  == sp->WriteReq.SlotNumber) {
-                for (kk = 0; kk < local->device_data[ii]
-                                      ->module_data[jj]
-                                      ->submodule_data.size();
-                     kk++) {
+      
+      /* Check if there is a write request pending ?? */
+      if (sp->WriteReq.SendReq) {
+        if ((sp->WriteReq.Length > 0)
+            && (sp->WriteReq.Length <= sizeof(sp->WriteReq.Data))) {
+          for (jj = 0; jj < local->device_data[ii]->module_data.size();
+               jj++) {
+            if (local->device_data[ii]->module_data[jj]->slot_number
+                == sp->WriteReq.SlotNumber) {
+              for (kk = 0; kk < local->device_data[ii]
+                                    ->module_data[jj]
+                                    ->submodule_data.size();
+                   kk++) {
+                if (local->device_data[ii]
+                        ->module_data[jj]
+                        ->submodule_data[kk]
+                        ->subslot_number
+                    == sp->WriteReq.SubslotNumber) {
                   if (local->device_data[ii]
                           ->module_data[jj]
                           ->submodule_data[kk]
-                          ->subslot_number
-                      == sp->WriteReq.SubslotNumber) {
-                    if (local->device_data[ii]
-                            ->module_data[jj]
-                            ->submodule_data[kk]
-                            ->api
-                        > 0) {
-                      sp->WriteReq.Api = local->device_data[ii]
-                                             ->module_data[jj]
-                                             ->submodule_data[kk]
-                                             ->api;
-                    }
-                    pack_write_req(&local->service_req_res,
-                        local->device_data[ii]->device_ref, &sp->WriteReq);
-                    sts = pnak_send_service_req_res(0, &local->service_req_res);
-                    errh_Info("PROFINET: Async write, dev: %d",
-                              local->device_data[ii]->device_ref);
-                    break;
+                          ->api
+                      > 0) {
+                    sp->WriteReq.Api = local->device_data[ii]
+                                           ->module_data[jj]
+                                           ->submodule_data[kk]
+                                           ->api;
                   }
+                  pack_write_req(&local->service_req_res,
+                      local->device_data[ii]->device_ref, &sp->WriteReq);
+                  sts = pnak_send_service_req_res(0, &local->service_req_res);
+                  errh_Info("PROFINET: Async write, dev: %d",
+                            local->device_data[ii]->device_ref);
+                  break;
                 }
-                break;
               }
+              break;
             }
           }
-          sp->WriteReq.SendReq = 0;
         }
+        sp->WriteReq.SendReq = 0;
       }
+      
     }
   }
 
