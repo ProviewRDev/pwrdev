@@ -27,3 +27,5 @@ project/pwrtest03/src/login/initvol.pwr_com
 *.db.lock
 *.gjl
 *.wb_dmp.*
+
+.env

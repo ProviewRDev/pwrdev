@@ -63,6 +63,8 @@ class PnApiData
 {
 public:
   PnApiData() : api(0) {}
+  PnApiData(unsigned int api) : api(api) {}
+
 
   unsigned int api;
   std::vector<unsigned int> module_index;

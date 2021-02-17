@@ -45,6 +45,24 @@
 
 #include "rt_io_pn_locals.h"
 
+#define _PN_U32_HIGH_WORD(U32) ((PN_U16)((U32) >> 16))
+#define _PN_U32_LOW_WORD(U32) ((PN_U16)(U32))
+
+#define _PN_U32_HIGH_HIGH_BYTE(U32) ((PN_U8)((U32) >> 24))
+#define _PN_U32_HIGH_LOW_BYTE(U32) ((PN_U8)((U32) >> 16))
+#define _PN_U32_LOW_HIGH_BYTE(U32) ((PN_U8)((U32) >> 8))
+#define _PN_U32_LOW_LOW_BYTE(U32) ((PN_U8)(U32))
+
+#define _PN_U16_HIGH_BYTE(U16) ((PN_U8)((U16) >> 8))
+#define _PN_U16_LOW_BYTE(U16) ((PN_U8)(U16))
+
+#define _HIGH_LOW_BYTES_TO_PN_U16(High, Low)                                   \
+  ((PN_U16)((((PN_U16)(High)) << 8) + (Low)))
+#define _HIGH_LOW_BYTES_TO_PN_U32(hwhb, hwlb, lwhb, lwlb)                      \
+  ((PN_U32)((((PN_U32)(hwhb)) << 24) + (((PN_U32)(hwlb)) << 16) +              \
+            (((PN_U32)(lwhb)) << 8) + (lwlb)))
+
+
 #define PN_MAX_MANU_SPEC_DIAGS 200
 
 void pack_set_ip_settings_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes,
