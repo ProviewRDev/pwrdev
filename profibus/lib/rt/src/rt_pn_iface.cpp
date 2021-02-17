@@ -637,15 +637,9 @@ void pack_download_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes,
     if (xml_dev_data->iocr_data[ii]->reduction_ratio == 0)
       xml_dev_data->iocr_data[ii]->reduction_ratio = 1;
     
-    /*    if (old_red_ratio == dev_data->iocr_data[ii]->reduction_ratio) {
-      phase = (phase + 1) % old_red_ratio + 1;
-    } else {
-      phase = 1;
-      old_red_ratio = dev_data->iocr_data[ii]->reduction_ratio;
-      }*/
-    phase = 1;
-    //    pIOCR->ReductionRatioHighByte = 0;
-    //    pIOCR->ReductionRatioLowByte  = 128;
+    // The configurator only allows to specify one value for phase so the same phase is used for all IOCR's on this device
+    // But we keep the ability to specify a unique phase value for each IOCR.
+    phase = xml_dev_data->iocr_data.at(ii)->phase;
     pIOCR->PhaseHighByte = _PN_U16_HIGH_BYTE(phase);
     pIOCR->PhaseLowByte = _PN_U16_LOW_BYTE(phase);
     
