@@ -547,8 +547,8 @@ void pack_download_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes,
                   PROFINET_AR_PROPERTY_PARAMETER_SERVER_CM |    
                   PROFINET_AR_PROPERTY_STARTUP_MODE_ADVANCED;
     
-    // pSDR->AdditionalFlag =
-    // PN_SERVICE_DOWNLOAD_ADD_FLAG_ENABLE_MULTIPLE_WRITE;
+    pSDR->AdditionalFlag = 0;
+    if (xml_dev_data->skip_ip_assignment) pSDR->AdditionalFlag |= PN_SERVICE_DOWNLOAD_ADD_FLAG_SKIP_IP_ASSIGNMENT; 
 
     pSDR->InstanceHighByte = _PN_U16_HIGH_BYTE(xml_dev_data->instance);
     pSDR->InstanceLowByte = _PN_U16_LOW_BYTE(xml_dev_data->instance);

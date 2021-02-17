@@ -50,6 +50,7 @@ typedef enum {
   attrnav_eItemType_PnEnumValue,
   attrnav_eItemType_PnDevice,
   attrnav_eItemType_PnNetwork,
+  attrnav_eItemType_PnNetworkSettingYesNo,
   attrnav_eItemType_PnDeviceInfo,
   attrnav_eItemType_PnDAP,
   attrnav_eItemType_PnInterfaceSubmodule,
@@ -74,7 +75,7 @@ typedef enum {
   attrnav_eItemType_PnEnumByteOrder,
   attrnav_eItemType_PnEnumTimeRatio,
   attrnav_eItemType_PnEnumSendClock,
-  attrnav_eItemType_PnEnumValueMType,
+  attrnav_eItemType_PnEnumValueMType
 } attrnav_eItemType;
 
 typedef enum {
@@ -735,6 +736,23 @@ public:
   int old_value;
 
   int open_children(GsdmlAttrNav* attrnav, double x, double y);
+  int scan(GsdmlAttrNav* attrnav, void* p);
+};
+
+class ItemPnParYesNo : public ItemPn
+{
+public:
+  ItemPnParYesNo(GsdmlAttrNav* attrnav, const char* item_name,                      
+                      int* attr_value_p, brow_tNode dest,
+                      flow_eDest dest_code);
+  virtual ~ItemPnParYesNo() {}
+
+  int* value_p;
+  int old_value;
+  int first_scan;
+  int noedit;
+
+  virtual int open_children(GsdmlAttrNav* attrnav, double x, double y);
   int scan(GsdmlAttrNav* attrnav, void* p);
 };
 

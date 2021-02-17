@@ -189,7 +189,8 @@ int GsdmlDeviceData::print(const char* filename)
      << "    DeviceName=\"" << device_name << "\"\n"
      << "    IP_Address=\"" << ip_address << "\"\n"
      << "    SubnetMask=\"" << subnet_mask << "\"\n"
-     << "    MAC_Address=\"" << mac_address << "\" />\n";
+     << "    MAC_Address=\"" << mac_address << "\"\n"
+     << "    Skip_IP_Assignment=\"" << skip_ip_assignment << "\" />\n";
 
 // Save in accordance to the chosen endianess
 #if (pwr_dHost_byteOrder == pwr_dLittleEndian)
@@ -564,6 +565,8 @@ int GsdmlDataReader::tag_attribute(const char* name, const char* value)
       strncpy(data->subnet_mask, value, sizeof(data->subnet_mask));
     else if (streq(name, "MAC_Address"))
       strncpy(data->mac_address, value, sizeof(data->mac_address));
+    else if (streq(name, "Skip_IP_Assignment"))
+      sscanf(value, "%d", &data->skip_ip_assignment);
     break;
   case gsdmldata_eTag_Slot: {
     GsdmlSlotData* sd = (GsdmlSlotData*)get_object_stack(current_tag);

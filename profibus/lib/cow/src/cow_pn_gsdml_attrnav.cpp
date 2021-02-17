@@ -1066,6 +1066,9 @@ int GsdmlAttrNav::trace_connect_bc(brow_tObject object, char* name, char* attr,
   case attrnav_eItemType_PnParValue:
     *p = (void*)1;
     break;
+  case attrnav_eItemType_PnNetworkSettingYesNo:
+    *p = ((ItemPnParYesNo*)base_item)->value_p;
+    break;
   default:;
   }
   return 1;
@@ -1987,6 +1990,7 @@ int ItemPn::close(GsdmlAttrNav* attrnav, double x, double y)
       case attrnav_eItemType_PnModuleType:
       case attrnav_eItemType_PnSubmoduleType:
       case attrnav_eItemType_PnModuleClass:
+      case attrnav_eItemType_PnNetworkSettingYesNo:
         brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_attrenum);
         break;
       case attrnav_eItemType_PnSlot:
@@ -3142,6 +3146,9 @@ int ItemPnNetwork::open_children(GsdmlAttrNav* attrnav, double x, double y)
     new ItemPnBase(attrnav, "MAC Address", "LocalGsdmlAttr", pwr_eType_String,
                    sizeof(attrnav->dev_data.mac_address), 0, 0, p, 0, node,
                    flow_eDest_IntoLast);
+
+    p = (void*)&attrnav->dev_data.skip_ip_assignment;
+    new ItemPnParYesNo(attrnav, "Skip IP Assignment", (int*)p, node, flow_eDest_IntoLast);
 
     if (attrnav->device_item &&
         attrnav->device_item->SystemDefinedSubmoduleList &&
@@ -5416,6 +5423,83 @@ int ItemPnEnumTimeRatio::scan(GsdmlAttrNav* attrnav, void* p)
 
   return 1;
 }
+
+ItemPnParYesNo::ItemPnParYesNo(GsdmlAttrNav* attrnav, const char* item_name,                      
+                      int* attr_value_p, brow_tNode dest,
+                      flow_eDest dest_code)
+    : value_p(attr_value_p), old_value(0), first_scan(1)
+{
+  type = attrnav_eItemType_PnNetworkSettingYesNo;
+  strcpy(name, item_name);
+
+  brow_CreateNode(attrnav->brow->ctx, item_name, attrnav->brow->nc_attr, dest,
+                  dest_code, (void*)this, 1, &node);
+
+  brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_attrenum);
+  brow_SetAnnotation(node, 0, name, strlen(name));
+  brow_SetTraceAttr(node, name, "", flow_eTraceType_User);
+}
+
+int ItemPnParYesNo::scan(GsdmlAttrNav* attrnav, void* p)
+{
+  if (!first_scan)
+  {
+    if (old_value == *(int*)p)
+      // No change since last time
+      return 1;
+  }
+  else
+    first_scan = 0;
+
+  int value = *(int*)p;
+  
+  if (value == 0)
+  {
+    brow_SetAnnotation(node, 1, "No", 2);
+  } 
+  else
+  {
+    brow_SetAnnotation(node, 1, "Yes", 3);
+  }
+
+  old_value = *(int*)p;
+  return 1;
+}
+
+int ItemPnParYesNo::open_children(GsdmlAttrNav* attrnav, double x, double y)
+{
+  double node_x, node_y;
+
+  brow_GetNodePosition(node, &node_x, &node_y);
+
+  if (brow_IsOpen(node))
+  {
+    // Close
+    brow_SetNodraw(attrnav->brow->ctx);
+    brow_CloseNode(attrnav->brow->ctx, node);
+    if (brow_IsOpen(node) & attrnav_mOpen_Attributes)
+      brow_RemoveAnnotPixmap(node, 1);
+    if (brow_IsOpen(node) & attrnav_mOpen_Children)
+      brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_attrenum);
+    brow_ResetOpen(node, attrnav_mOpen_All);
+    brow_ResetNodraw(attrnav->brow->ctx);
+    brow_Redraw(attrnav->brow->ctx, node_y);
+  }
+  else
+  {
+    brow_SetNodraw(attrnav->brow->ctx);
+    
+    new ItemPnEnumValue(attrnav, "No", 0, pwr_eType_UInt32, this->value_p, node, flow_eDest_IntoLast);    
+    new ItemPnEnumValue(attrnav, "Yes", 1, pwr_eType_UInt32, this->value_p, node, flow_eDest_IntoLast);    
+
+    brow_SetOpen(node, attrnav_mOpen_Children);
+    brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_openmap);
+    brow_ResetNodraw(attrnav->brow->ctx);
+    brow_Redraw(attrnav->brow->ctx, node_y);
+  }
+  return 1;
+}
+
 
 ItemPnEnumSendClock::ItemPnEnumSendClock(
     GsdmlAttrNav* attrnav, const char* item_name,

@@ -185,7 +185,7 @@ class GsdmlDeviceData
 {
 public:
   GsdmlDeviceData()
-      : device_num(0), vendor_id(0), device_id(0), byte_order(0),
+      : device_num(0), skip_ip_assignment(0), vendor_id(0), device_id(0), byte_order(0),
         read_data_is_native_ordered(1), instance(0)
   {
     device_name[0] = 0;
@@ -201,6 +201,7 @@ public:
   char subnet_mask[20];
   char mac_address[20];
   int device_num;
+  int skip_ip_assignment;
   char device_text[160];
   unsigned short vendor_id;
   unsigned short device_id;
