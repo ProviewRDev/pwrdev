@@ -136,21 +136,22 @@ static pwr_tStatus IoAgentRead(io_tCtx ctx, io_sAgent* ap)
   unsigned char* clean_io_datap;
   unsigned char status_data = 0;
   PnSubmoduleData* submodule;
+  PnDeviceData* pn_device;
   unsigned char ioxs;
 
   unsigned short data_length, ii, jj, kk, ll;
 
   local = (io_sAgentLocal*)ap->Local;
 
-  //  handle_events(&local->args);
   /* Read i/o for all devices and move it to clean io data area */
 
   //  pthread_mutex_lock(&local->mutex);
 
   for (ii = 1; ii < local->device_data.size(); ii++) {
-    if (local->device_data[ii]->device_state == PNAK_DEVICE_STATE_CONNECTED) {
-      for (jj = 0; jj < local->device_data[ii]->iocr_data.size(); jj++) {
-        pn_iocr_data = local->device_data[ii]->iocr_data[jj];
+    pn_device = local->device_data[ii];
+    if (pn_device->device_state == PNAK_DEVICE_STATE_CONNECTED) {
+      for (jj = 0; jj < pn_device->iocr_data.size(); jj++) {
+        pn_iocr_data = pn_device->iocr_data[jj];
 
         if (pn_iocr_data->type == PROFINET_IO_CR_TYPE_INPUT) {
           data_length = pn_iocr_data->io_data_length;
@@ -159,13 +160,13 @@ static pwr_tStatus IoAgentRead(io_tCtx ctx, io_sAgent* ap)
               pn_iocr_data->io_data, &data_length, &ioxs, &status_data);
 
           if (sts == PNAK_OK) {
-            for (kk = 0; kk < local->device_data[ii]->module_data.size();
+            for (kk = 0; kk < pn_device->module_data.size();
                  kk++) {
-              for (ll = 0; ll < local->device_data[ii]
+              for (ll = 0; ll < pn_device
                                     ->module_data[kk]
                                     ->submodule_data.size();
                    ll++) {
-                submodule = local->device_data[ii]
+                submodule = pn_device
                                 ->module_data[kk]
                                 ->submodule_data[ll];
                 if ((submodule->type == PROFINET_IO_SUBMODULE_TYPE_INPUT)
@@ -203,6 +204,7 @@ static pwr_tStatus IoAgentWrite(io_tCtx ctx, io_sAgent* ap)
   unsigned char* io_datap;
   unsigned char* clean_io_datap;
   PnSubmoduleData* submodule;
+  PnDeviceData* pn_device;
   io_sRack* slave_list;
   pwr_sClass_PnDevice* sp = NULL;
 
@@ -223,10 +225,11 @@ static pwr_tStatus IoAgentWrite(io_tCtx ctx, io_sAgent* ap)
       sp = (pwr_sClass_PnDevice*)slave_list->op;
       slave_list = slave_list->next;
     }
+    pn_device = local->device_data[ii];
 
-    if (local->device_data[ii]->device_state == PNAK_DEVICE_STATE_CONNECTED) {
-      for (jj = 0; jj < local->device_data[ii]->iocr_data.size(); jj++) {
-        pn_iocr_data = local->device_data[ii]->iocr_data[jj];
+    if (pn_device->device_state == PNAK_DEVICE_STATE_CONNECTED) {
+      for (jj = 0; jj < pn_device->iocr_data.size(); jj++) {
+        pn_iocr_data = pn_device->iocr_data[jj];
 
         if (pn_iocr_data->type == PROFINET_IO_CR_TYPE_OUTPUT) {
           data_length = pn_iocr_data->io_data_length;
@@ -236,13 +239,13 @@ static pwr_tStatus IoAgentWrite(io_tCtx ctx, io_sAgent* ap)
           memset(pn_iocr_data->io_data, 0x80,
               data_length); // 0x80 is PNAK_IOXS_STATUS_DATA_GOOD
 
-          for (kk = 0; kk < local->device_data[ii]->module_data.size(); kk++) {
-            for (ll = 0; ll < local->device_data[ii]
+          for (kk = 0; kk < pn_device->module_data.size(); kk++) {
+            for (ll = 0; ll < pn_device
                                   ->module_data[kk]
                                   ->submodule_data.size();
                  ll++) {
               submodule
-                  = local->device_data[ii]->module_data[kk]->submodule_data[ll];
+                  = pn_device->module_data[kk]->submodule_data[ll];
               if ((submodule->type == PROFINET_IO_SUBMODULE_TYPE_OUTPUT)
                   || (submodule->type
                          == PROFINET_IO_SUBMODULE_TYPE_INPUT_AND_OUTPUT)) {
@@ -269,48 +272,47 @@ static pwr_tStatus IoAgentWrite(io_tCtx ctx, io_sAgent* ap)
         }
       }
       
-      /* Check if there is a write request pending ?? */
-      if (sp->WriteReq.SendReq) {
-        if ((sp->WriteReq.Length > 0)
-            && (sp->WriteReq.Length <= sizeof(sp->WriteReq.Data))) {
-          for (jj = 0; jj < local->device_data[ii]->module_data.size();
-               jj++) {
-            if (local->device_data[ii]->module_data[jj]->slot_number
-                == sp->WriteReq.SlotNumber) {
-              for (kk = 0; kk < local->device_data[ii]
-                                    ->module_data[jj]
-                                    ->submodule_data.size();
-                   kk++) {
-                if (local->device_data[ii]
-                        ->module_data[jj]
-                        ->submodule_data[kk]
-                        ->subslot_number
-                    == sp->WriteReq.SubslotNumber) {
-                  if (local->device_data[ii]
-                          ->module_data[jj]
-                          ->submodule_data[kk]
-                          ->api
-                      > 0) {
-                    sp->WriteReq.Api = local->device_data[ii]
-                                           ->module_data[jj]
-                                           ->submodule_data[kk]
-                                           ->api;
-                  }
-                  pack_write_req(&local->service_req_res,
-                      local->device_data[ii]->device_ref, &sp->WriteReq);
-                  sts = pnak_send_service_req_res(0, &local->service_req_res);
-                  errh_Info("PROFINET: Async write, dev: %d",
-                            local->device_data[ii]->device_ref);
-                  break;
-                }
-              }
-              break;
-            }
-          }
+      // Check if we have a read request, if so pack it and send it. We only allow for one active "Read session" per device...
+      if (sp->ReadReq.SendReq && sp->ReadReq.status == pwr_ePnDeviceReadWriteState_Ready) 
+      {  
+        // Check length, and alert if we are trying to read more than we can carry...
+        if (sp->ReadReq.Length <= sizeof(sp->ReadReq.response.Data))
+        {
+          pack_read_req(&local->service_req_res, pn_device->device_ref, &sp->ReadReq);
+          sp->ReadReq.status = pwr_ePnDeviceReadWriteState_Busy; // Reset later in response
+          T_PNAK_RESULT pnak_result = pnak_send_service_req_res(0, &local->service_req_res);
+          if (pnak_result == PNAK_OK)
+            errh_Info("PROFINET: Async read request sent, dev: %d", pn_device->device_ref);
+          else
+            errh_Warning("PROFINET: Async read request, send failed, dev: %d", pn_device->device_ref);          
+        }
+        else
+        {
+          errh_Warning("PROFINET: Async read request not sent, data too large for receiving buffer on device %d", pn_device->device_ref);
+        }
+        sp->ReadReq.SendReq = 0;
+      }
+
+      // Check if we have a write request, if so pack it and send it. We only allow for one active "Write session" per device...
+      if (sp->WriteReq.SendReq && sp->WriteReq.status == pwr_ePnDeviceReadWriteState_Ready) 
+      {  
+        // Check length, and alert if we are trying to read more than we can carry...
+        if (sp->WriteReq.Length <= sizeof(sp->WriteReq.Data))
+        {
+          pack_write_req(&local->service_req_res, pn_device->device_ref, &sp->WriteReq);
+          sp->WriteReq.status = pwr_ePnDeviceReadWriteState_Busy; // Reset later in response
+          T_PNAK_RESULT pnak_result = pnak_send_service_req_res(0, &local->service_req_res);
+          if (pnak_result == PNAK_OK)
+            errh_Info("PROFINET: Async write request sent, dev: %d", pn_device->device_ref);
+          else
+            errh_Warning("PROFINET: Async write request, send failed, dev: %d", pn_device->device_ref);          
+        }
+        else
+        {
+          errh_Warning("PROFINET: Async write request not sent, data too large for buffer on device %d", pn_device->device_ref);
         }
         sp->WriteReq.SendReq = 0;
       }
-      
     }
   }
 
