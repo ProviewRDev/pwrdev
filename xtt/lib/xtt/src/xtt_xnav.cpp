@@ -93,6 +93,12 @@ int XNav::get_trace_attr(pwr_sAttrRef* arp, char* attr)
   case pwr_cClass_Sv:
   case pwr_cClass_ATv:
   case pwr_cClass_DTv:
+  case pwr_cClass_LightDv:
+  case pwr_cClass_LightAv:
+  case pwr_cClass_LightIv:
+  case pwr_cClass_LightSv:
+  case pwr_cClass_LightDTv:
+  case pwr_cClass_LightATv:
     strcpy(attr, "ActualValue");
     break;
   case pwr_cClass_ChanDi:
