@@ -134,6 +134,7 @@ obsolete	<Object is obsolete>					/error
 ccwarning	<Warning from c compiler or linker> 			/warning
 ccsucc		<Window compiled> 					/info
 dataalinesize	<DataArithm maximum line size exceeded>			/error
+plcempty	<Empty PlcPgm object>					/warning
 
         .facility       FOE,280 /prefix = FOE__ ! Function object editor
 

@@ -4300,6 +4300,7 @@ static int gcg_get_child_plc(gcg_ctx gcgctx, pwr_tObjid objdid,
   int sts, size;
   gcg_t_plclist* plclist_pointer;
   pwr_tObjid* threadobject_ptr;
+  pwr_tObjid wind;
   pwr_tInt32* executeorder_ptr;
 
   /* Get all the children of this  node */
@@ -4308,6 +4309,14 @@ static int gcg_get_child_plc(gcg_ctx gcgctx, pwr_tObjid objdid,
     /* Check if plc */
     sts = ldh_GetObjectClass(gcgctx->ldhses, objdid, &cid);
     if (cid == pwr_cClass_plc) {
+      /* If no child, ignore */
+      sts = ldh_GetChild(gcgctx->ldhses, objdid, &wind);
+      if (EVEN(sts)) {
+	gcg_plc_msg(gcgctx, GSX__PLCEMPTY, objdid);
+	sts = ldh_GetNextSibling(gcgctx->ldhses, objdid, &objdid);
+	continue;
+      }
+
       /* Get the thread */
       sts = ldh_GetObjectPar(gcgctx->ldhses, objdid, "RtBody", "ThreadObject",
           (char**)&threadobject_ptr, &size);
