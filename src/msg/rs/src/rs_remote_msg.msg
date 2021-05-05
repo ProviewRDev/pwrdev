@@ -83,3 +83,25 @@ disorder	<Message disorder>				/error
 disabled	<Transport disabled>				/error
 udpnocon	<No UDP connection>				/error
 exception	<Exception from connection>			/error
+tt_connected	<Connected to mqtt>				/info
+tt_conn_pending	<Connection pending>				/error
+tt_nomem	<Out of memory>					/error
+tt_protocol	<A network protocol error occurred when communicating with the broker> /error
+tt_inval	<Invalid function arguments provided>		/error
+tt_no_conn	<The client is not currently connected>		/error
+tt_conn_refused	<The connection was refused>			/error
+tt_not_found	<Message not found (internal error)>		/error
+tt_conn_lost	<The connection was lost>			/error
+tt_tls		<A TLS error occurred>				/error
+tt_payload_size	<Payload too large>				/error
+tt_not_supported <This feature is not supported>		/error
+tt_auth		<Authorisation failed>				/error
+tt_acl_denied	<Access denied by ACL>				/error
+tt_unknown	<Unknown error>					/error
+tt_errno	<Success>					/error
+tt_eai		<Lookup error>					/error
+tt_proxy	<Proxy error>					/error
+tt_plugin_defer	<Unknown error>					/error
+tt_malformed_utf8 <Malformed UTF-8>				/error
+tt_keepalive	<Unknown error>					/error
+tt_lookup	<Unknown error>					/error

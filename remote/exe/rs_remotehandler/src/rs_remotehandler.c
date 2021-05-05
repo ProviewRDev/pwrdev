@@ -194,10 +194,35 @@ static void AddTransports()
     tp[tpcount].restart_limit
         = &((pwr_sClass_RemnodeRabbitMQ*)objref)->RestartLimit;
     tp[tpcount].restarts = &((pwr_sClass_RemnodeRabbitMQ*)objref)->RestartCount;
-    ((pwr_sClass_RemnodeMQ*)objref)->RestartCount = 0;
+    ((pwr_sClass_RemnodeRabbitMQ*)objref)->RestartCount = 0;
     tp[tpcount].objid = objid;
     tp[tpcount].objref = objref;
     tp[tpcount].classid = pwr_cClass_RemnodeRabbitMQ;
+    tp[tpcount].cpid = -1;
+    tp[tpcount].first = true;
+
+    if ( tpcount < sizeof(remcfgp->RemNodeObjects)/sizeof(remcfgp->RemNodeObjects[0]))
+      remcfgp->RemNodeObjects[tpcount] = objid;
+
+    tpcount++;
+    sts = gdh_GetNextObject(objid, &objid);
+  }
+
+  /* Get and configure all MQTT remnodes, one process for each remnode */
+
+  sts = gdh_GetClassList(pwr_cClass_RemnodeMQTT, &objid);
+  while (ODD(sts)) {
+    sts = gdh_ObjidToPointer(objid, &objref);
+    sprintf(tp[tpcount].path, "rs_remote_mqtt");
+    tp[tpcount].id = id++;
+    tp[tpcount].disable = &((pwr_sClass_RemnodeMQTT*)objref)->Disable;
+    tp[tpcount].restart_limit
+        = &((pwr_sClass_RemnodeMQTT*)objref)->RestartLimit;
+    tp[tpcount].restarts = &((pwr_sClass_RemnodeMQTT*)objref)->RestartCount;
+    ((pwr_sClass_RemnodeMQTT*)objref)->RestartCount = 0;
+    tp[tpcount].objid = objid;
+    tp[tpcount].objref = objref;
+    tp[tpcount].classid = pwr_cClass_RemnodeMQTT;
     tp[tpcount].cpid = -1;
     tp[tpcount].first = true;
 

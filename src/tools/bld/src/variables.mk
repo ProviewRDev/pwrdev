@@ -80,12 +80,12 @@ tdir	= $(dir $@)/
 libobj	= $(bld_dir)/$*$(obj_ext)
 cobj	= -c -o $(target)
 clibobj	= -c -o $(libobj)
-rt_msg_objs 	:= $(obj_dir)/pwr_msg_co.o $(obj_dir)/pwr_msg_rt.o
-rs_msg_objs 	:= $(obj_dir)/pwr_msg_rs.o
+rt_msg_objs 	:= $(obj_dir)/pwr_msg_co.o $(obj_dir)/pwr_msg_rt.o $(obj_dir)/pwr_msg_rs.o
+#rs_msg_objs 	:= $(obj_dir)/pwr_msg_rs.o
 xtt_msg_objs	:= $(obj_dir)/pwr_msg_ge.o $(obj_dir)/pwr_msg_flow.o $(obj_dir)/pwr_msg_glow.o
 wb_msg_objs 	:= $(obj_dir)/pwr_msg_wb.o $(obj_dir)/pwr_msg_ge.o $(obj_dir)/pwr_msg_flow.o
-rt_msg_eobjs 	:= $(eobj_dir)/pwr_msg_co.o $(eobj_dir)/pwr_msg_rt.o
-rs_msg_eobjs 	:= $(eobj_dir)/pwr_msg_rs.o
+rt_msg_eobjs 	:= $(eobj_dir)/pwr_msg_co.o $(eobj_dir)/pwr_msg_rt.o $(eobj_dir)/pwr_msg_rs.o
+#rs_msg_eobjs 	:= $(eobj_dir)/pwr_msg_rs.o
 xtt_msg_eobjs	:= $(eobj_dir)/pwr_msg_ge.o $(eobj_dir)/pwr_msg_flow.o $(eobj_dir)/pwr_msg_glow.o
 wb_msg_eobjs 	:= $(eobj_dir)/pwr_msg_wb.o $(eobj_dir)/pwr_msg_ge.o $(eobj_dir)/pwr_msg_flow.o
 

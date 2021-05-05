@@ -55,10 +55,11 @@ extern msg_sHead geMsgHead;
 extern msg_sHead flowMsgHead;
 extern msg_sHead glowMsgHead;
 extern msg_sHead pwrpMsgHead;
+extern msg_sHead rsMsgHead;
 
 static const msg_sHead* heads[]
     = { &rtMsgHead, &pwrpMsgHead, &qcomMsgHead, &coMsgHead, &opMsgHead,
-        &wbMsgHead, &geMsgHead, &flowMsgHead, &glowMsgHead, NULL };
+        &wbMsgHead, &geMsgHead, &flowMsgHead, &glowMsgHead, &rsMsgHead, NULL };
 
 static msg_sFacility* facility(int facNum, int idx);
 

@@ -192,7 +192,7 @@ CompileRtNode()
     $pwrp_obj/${FileName}.o \
     $Libs \
     $ld_opt \
-    $pwr_obj/pwr_msg_rt.o $pwr_obj/pwr_msg_co.o \
+    $pwr_obj/pwr_msg_rt.o $pwr_obj/pwr_msg_co.o $pwr_obj/pwr_msg_rs.o \
     -lrt -lpwr_remote -lpwr_nmps -lpwr_rt -lpwr_co -lrpcsvc -lpwr_msg_dummy -lpthread -lm
   then
     echo "-- Plc program linked for $OsStr $say_linkdebug $OutFile"
