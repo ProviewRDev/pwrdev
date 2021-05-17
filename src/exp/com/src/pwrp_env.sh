@@ -957,6 +957,12 @@ pwrc_set_func()
     # Command is "set baseroot"
     baseroot=$2
     baseroot=${baseroot%/}
+
+    platform=$os/$hw
+    if [ "$3" != "" ]; then
+      platform=$3
+    fi
+
     if [ ! -e "$baseroot" ]; then
       echo "Base $baseroot doesn't exist"
       pwrc_status=$pwrc__baseexist
@@ -971,15 +977,15 @@ pwrc_set_func()
 
 
       export pwrb_root=$baseroot
-      export pwr_src=$baseroot/$os/$hw/exp/src
-      export pwr_db=$baseroot/$os/$hw/exp/db
-      export pwr_doc=$baseroot/$os/$hw/exp/doc
-      export pwr_exe=$baseroot/$os/$hw/exp/exe
-      export pwr_inc=$baseroot/$os/$hw/exp/inc
-      export pwr_lib=$baseroot/$os/$hw/exp/lib
-      export pwr_lis=$baseroot/$os/$hw/exp/lis
-      export pwr_obj=$baseroot/$os/$hw/exp/obj
-      export pwr_load=$baseroot/$os/$hw/exp/load
+      export pwr_src=$baseroot/$platform/exp/src
+      export pwr_db=$baseroot/$platform/exp/db
+      export pwr_doc=$baseroot/$platform/exp/doc
+      export pwr_exe=$baseroot/$platform/exp/exe
+      export pwr_inc=$baseroot/$platform/exp/inc
+      export pwr_lib=$baseroot/$platform/exp/lib
+      export pwr_lis=$baseroot/$platform/exp/lis
+      export pwr_obj=$baseroot/$platform/exp/obj
+      export pwr_load=$baseroot/$platform/exp/load
       
       export PATH=$PATH:$pwr_exe
     fi

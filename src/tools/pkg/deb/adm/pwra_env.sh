@@ -17,9 +17,11 @@ pwra_set_func()
   cmd="base"
   if [ $1 = $cmd ] || [ ${cmd#$1} != $cmd ]; then
     # Command is "set base"
+
     basename=$2
     basename=${basename//\./\\.}
     baseroot=`eval cat $pwra_db/pwr_projectlist.dat | grep -a "\s"$basename"\s" | grep -a "^"%base"\s" | awk '{print $3}'`
+
     if [ -z $baseroot ]; then
       echo "Unable to find base '$2'"
       return
@@ -33,7 +35,7 @@ pwra_set_func()
         echo "Not a base directory: $baseroot"
         return
       fi
-      source $baseroot/$3/exp/exe/pwrp_env.sh set baseroot $baseroot
+      source $baseroot/$3/exp/exe/pwrp_env.sh set baseroot $baseroot $3
     else
       if [ ! -e $baseroot/$os/$hw/exp/exe/pwrp_env.sh ]; then
         echo "Not a base directory: $baseroot"
