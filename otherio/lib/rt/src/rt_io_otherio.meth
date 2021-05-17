@@ -34,4 +34,6 @@ Epl_CNServer
 Epl_CNServerModule
 PiFace_Digital
 Gertboard
+MQTT_Client
+MQTT_Device
 #endif
