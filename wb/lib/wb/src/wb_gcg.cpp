@@ -12795,6 +12795,7 @@ int gcg_comp_m58(gcg_ctx gcgctx, vldh_t_node node)
   pwr_tClassId cid;
   pwr_tTime* instance_time = NULL;
   pwr_tTime* template_time;
+  pwr_tUInt32 *template_version;
   pwr_tObjid template_plc;
   pwr_tObjid template_window;
   pwr_sAttrRef* connect_aref;
@@ -12910,6 +12911,11 @@ int gcg_comp_m58(gcg_ctx gcgctx, vldh_t_node node)
   if (EVEN(sts))
     return sts;
 
+  sts = ldh_GetObjectPar(ldhses, template_window, "RtBody", "Version",
+      (char**)&template_version, &size);
+  if (EVEN(sts))
+    return sts;
+
   if (!found || template_time->tv_sec != instance_time->tv_sec) {
     // Replace the code
     if (found) {
@@ -12983,6 +12989,11 @@ int gcg_comp_m58(gcg_ctx gcgctx, vldh_t_node node)
     if (EVEN(sts))
       return sts;
 
+    sts = ldh_SetObjectPar(ldhses, window_objid, "RtBody", "Version",
+			   (char*)template_version, sizeof(template_version));
+    if (EVEN(sts))
+      return sts;
+
     /* Save the session */
     sts = ldh_SaveSession( ldhses);
     if ( EVEN(sts)) return sts;
@@ -13027,6 +13038,7 @@ int gcg_comp_m58(gcg_ctx gcgctx, vldh_t_node node)
   if (found)
     free((char*)instance_time);
   free((char*)template_time);
+  free((char*)template_version);
 
   /* Print the code */
   sts = gcg_ref_insert(gcgctx, node->ln.oid, GCG_PREFIX_REF, node);
