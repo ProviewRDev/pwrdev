@@ -154,6 +154,14 @@ SObject pwrb:Class
           Attr TypeRef = "pwrb:Type-DataRepEnum"
         EndBody
       EndObject
+      !/**
+      !  Raw value type, absolute or delta value.
+      !*/
+      Object RawValueType $Attribute 9
+        Body SysBody
+          Attr TypeRef = "pwrb:Type-RawValueTypeEnum"
+        EndBody
+      EndObject
     EndObject
     Object PostCreate $DbCallBack
       Body SysBody

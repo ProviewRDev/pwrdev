@@ -36,6 +36,10 @@
 
 /* rt_io_m_mqtt_client.c -- I/O methods for class MQTT_Client. */
 
+#include <unistd.h>
+#include <pthread.h>
+#include <math.h>
+
 #include "co_cdh.h"
 #include "co_string.h"
 #include "pwr_basecomponentclasses.h"
@@ -49,14 +53,13 @@
 
 #define debug 1
 
-#include <pthread.h>
 #include <mosquitto.h>
 #include "rt_io_mqtt_client.h"
 #include "rs_remote_msg.h"
 
 /* Callback from mosquitto when message is received */
 
-pwr_tStatus mqtt_error_to_sts(int err)
+static pwr_tStatus mqtt_error_to_sts(int err)
 {
   pwr_tStatus sts = 0;
 
@@ -131,7 +134,7 @@ pwr_tStatus mqtt_error_to_sts(int err)
   return sts;
 }
 
-int json_match(pwr_tCid chan_cid, const char *id, const char *msg, void *ovalue)
+static int json_match(pwr_tCid chan_cid, const char *id, const char *msg, void *ovalue)
 {
   char iname[80];
   char ivalue[80];
@@ -275,7 +278,7 @@ int json_match(pwr_tCid chan_cid, const char *id, const char *msg, void *ovalue)
   }
 }
 
-int json_msg(char *id, pwr_tBoolean sigval, char *msg)
+static int json_msg(char *id, pwr_tBoolean sigval, char *msg)
 {
   char iname[80];
   char ivalue[80];
@@ -309,7 +312,18 @@ int json_msg(char *id, pwr_tBoolean sigval, char *msg)
   return 1;
 }
 
-void message_cb(struct mosquitto *mosq, void *obj, 
+static int json_amsg(char *id, pwr_tInt32 sigval, char *msg)
+{
+  char iname[80];
+
+  strcpy(iname, id);
+  str_trim(iname, iname);
+
+  sprintf(msg, "{%s%d}", iname, sigval);
+  return 1;
+}
+
+static void message_cb(struct mosquitto *mosq, void *obj, 
     const struct mosquitto_message *msg)
 {
   io_sRack* rp = (io_sRack *)obj;
@@ -325,7 +339,7 @@ void message_cb(struct mosquitto *mosq, void *obj,
       mosquitto_topic_matches_sub(cop->SubscribeTopic, msg->topic, &match);
       
       if (match) {
-	printf("Match %s\n", msg->topic);
+	cop->SubscribeCount++;
 
 	for (i = 0; i < cp->ChanListSize; i++) {
 	  io_sChannel *chanp = &cp->chanlist[i];
@@ -347,7 +361,6 @@ void message_cb(struct mosquitto *mosq, void *obj,
 	    sts = json_match(chanp->ChanClass, ((pwr_sClass_ChanDo *)chanp->cop)->Identity, (char*)msg->payload, &value);
 	    if (ODD(sts)) {
 	      if (*(pwr_tBoolean *)chanp->vbp != value) {
-		printf("Do change of value\n");
 		*(pwr_tBoolean *)chanp->vbp = value;
 	      }
 	    }
@@ -380,7 +393,7 @@ void message_cb(struct mosquitto *mosq, void *obj,
   }
 }
 
-void connect_cb(struct mosquitto *mosq, void *obj, int result)
+static void connect_cb(struct mosquitto *mosq, void *obj, int result)
 {
   io_sRack* rp = (io_sRack *)obj;
   io_sRackLocal* local = (io_sRackLocal *)rp->Local;
@@ -388,8 +401,6 @@ void connect_cb(struct mosquitto *mosq, void *obj, int result)
 
   if(result){
     op->Status = mqtt_error_to_sts(result);
-    if (debug)
-      printf("%s\n", mosquitto_connack_string(result));
     local->connected = mqtt_eCon_NotConnected;
     if (result == MOSQ_ERR_CONN_REFUSED) {
       errh_Fatal("Remote mqtt terminated, %s", mosquitto_connack_string(result));
@@ -405,7 +416,7 @@ void connect_cb(struct mosquitto *mosq, void *obj, int result)
   }
 }
 
-int mqtt_connect(io_sRack* rp)
+static int mqtt_connect(io_sRack* rp)
 {
   io_sRackLocal* local = (io_sRackLocal *)rp->Local;
   pwr_sClass_MQTT_Client *op = (pwr_sClass_MQTT_Client*)rp->op;
@@ -442,39 +453,21 @@ int mqtt_connect(io_sRack* rp)
   return 1;
 }
 
-void reconnect(io_sRack* rp)
-{
-  io_sRackLocal* local = (io_sRackLocal *)rp->Local;
-  pwr_sClass_MQTT_Client *op = (pwr_sClass_MQTT_Client*)rp->op;
-  int rc;
-  struct timespec rqtp, rmtp;
-
-  if (local->connected == mqtt_eCon_Connected)
-    return;
-
-  rqtp.tv_sec = 2;
-  rqtp.tv_nsec = 0;
-  nanosleep(&rqtp, &rmtp);
-  
-  rc = mosquitto_connect(local->mosq, op->Server, op->Port, 60);
-  if (debug)
-    printf("reconnect: %s\n", mosquitto_connack_string(rc));
-  if (!rc) {
-    op->Status = mqtt_error_to_sts(rc);
-    local->connected = mqtt_eCon_Connected;
-    return;
-  }
-  rc = mosquitto_loop(local->mosq, -1, 1);
-}
-
 static void* mqtt_loop(void* arg)
 {
   io_sRack *rp = (io_sRack *)arg;
+  pwr_sClass_MQTT_Client* op = (pwr_sClass_MQTT_Client *)rp->op;
   io_sRackLocal* local = (io_sRackLocal *)rp->Local;
   int rc;
 
-  while(1)
+  while(1) {
     rc = mosquitto_loop(local->mosq, -1, 1);
+    if (rc) {
+      op->Status = mqtt_error_to_sts(rc);
+      sleep(10);
+      mosquitto_reconnect(local->mosq);
+    }
+  }
 
   return NULL;
 }
@@ -514,6 +507,9 @@ static pwr_tStatus IoRackInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
       switch (chanp->ChanClass) {
       case pwr_cClass_ChanAi:
 	io_AiRangeToCoef(&cp->chanlist[i]);
+	break;
+      case pwr_cClass_ChanAo:
+	io_AoRangeToCoef(&cp->chanlist[i]);
 	break;
       default: ;
       }
@@ -558,6 +554,11 @@ static pwr_tStatus IoRackRead(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
 	  // Request to calculate new coefficients
 	  io_AiRangeToCoef(chanp);
 	break;
+      case pwr_cClass_ChanAo:
+	if (((pwr_sClass_ChanAo *)chanp->cop)->CalculateNewCoef)
+	  // Request to calculate new coefficients
+	  io_AoRangeToCoef(chanp);
+	break;
       default: ;
       }
     }
@@ -594,7 +595,7 @@ static pwr_tStatus IoRackWrite(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
 
 	  rc = mosquitto_publish(local->mosq, NULL, cop->PublishTopic, strlen(msg), 
 				 msg, 1, 0);
-	  printf("Publish %s\n", msg);
+	  cop->PublishCount++;
 	}
 	else if (!(*(pwr_tBoolean *)chanp->vbp) && chanp->udata) {
 	  /* Publish reset */
@@ -606,9 +607,59 @@ static pwr_tStatus IoRackWrite(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
 
 	  rc = mosquitto_publish(local->mosq, NULL, cop->PublishTopic, strlen(msg), 
 				 msg, 1, 0);
-	  printf("Publish %s\n", msg);
+	  cop->PublishCount++;
 	}
 	break;
+      case pwr_cClass_ChanIo:
+	if (*(pwr_tInt32 *)chanp->vbp != chanp->udata) {
+	  /* Publish set */
+	  pwr_tInt32 value;
+	  char msg[200];
+
+	  switch(((pwr_sClass_ChanIo *)chanp->cop)->RawValueType) {
+	  case pwr_eRawValueTypeEnum_DeltaValue:
+	    value = *(pwr_tInt32 *)chanp->vbp - chanp->udata;
+	    break;
+	  default:
+	    value = *(pwr_tInt32 *)chanp->vbp;
+	  }
+	  chanp->udata = *(pwr_tInt32 *)chanp->vbp;
+	  sts = json_amsg(((pwr_sClass_ChanIo *)chanp->cop)->Identity, 
+			  value, msg);
+
+	  rc = mosquitto_publish(local->mosq, NULL, cop->PublishTopic, strlen(msg), 
+				 msg, 1, 0);
+	  cop->PublishCount++;
+	}
+	break;
+      case pwr_cClass_ChanAo: {
+	pwr_tInt32 rawvalue, value;
+
+	rawvalue = round(*(pwr_tFloat32*)chanp->vbp * 
+		      ((pwr_sClass_ChanAo *)chanp->cop)->OutPolyCoef1
+		      + ((pwr_sClass_ChanAo *)chanp->cop)->OutPolyCoef0);
+
+	if (rawvalue != chanp->udata) {
+	  /* Publish set */
+	  char msg[200];
+
+	  switch(((pwr_sClass_ChanIo *)chanp->cop)->RawValueType) {
+	  case pwr_eRawValueTypeEnum_DeltaValue:
+	    value = rawvalue - chanp->udata;
+	    break;
+	  default:
+	    value = rawvalue;
+	  }
+	  chanp->udata = rawvalue;
+	  sts = json_amsg(((pwr_sClass_ChanAo *)chanp->cop)->Identity, 
+			 value, msg);
+
+	  rc = mosquitto_publish(local->mosq, NULL, cop->PublishTopic, strlen(msg), 
+				 msg, 1, 0);
+	  cop->PublishCount++;
+	}
+	break;
+      }
       default: ;
       }
     }

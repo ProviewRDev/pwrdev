@@ -43,6 +43,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <string.h>
+#include <math.h>
 
 #include <termios.h>
 
@@ -928,11 +929,10 @@ static pwr_tStatus IoCardWrite(
               io_AoRangeToCoef(chanp);
 
             if (cop->TestOn)
-              value = cop->TestValue * cop->OutPolyCoef1 + cop->OutPolyCoef0
-                  + 0.49;
+              value = round(cop->TestValue * cop->OutPolyCoef1 + cop->OutPolyCoef0);
             else
-              value = *(pwr_tFloat32*)chanp->vbp * cop->OutPolyCoef1
-                  + cop->OutPolyCoef0 + 0.49;
+              value = round(*(pwr_tFloat32*)chanp->vbp * cop->OutPolyCoef1
+			    + cop->OutPolyCoef0);
 
             if (op->Options & pwr_mArduino_OptionsMask_Ao16Bit) {
               if (value < 0)
@@ -1014,10 +1014,10 @@ static pwr_tStatus IoCardWrite(
 
           if (cop->TestOn)
             value
-                = cop->TestValue * cop->OutPolyCoef1 + cop->OutPolyCoef0 + 0.49;
+	      = round(cop->TestValue * cop->OutPolyCoef1 + cop->OutPolyCoef0);
           else
-            value = *(pwr_tFloat32*)chanp->vbp * cop->OutPolyCoef1
-                + cop->OutPolyCoef0 + 0.49;
+            value = round(*(pwr_tFloat32*)chanp->vbp * cop->OutPolyCoef1
+			  + cop->OutPolyCoef0);
 
           if (op->Options & pwr_mArduino_OptionsMask_Ao16Bit) {
             if (value < 0)
