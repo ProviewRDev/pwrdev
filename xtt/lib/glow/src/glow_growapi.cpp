@@ -3669,7 +3669,6 @@ void grow_UpdateObject(grow_tCtx ctx, grow_tObject object, grow_sAttrInfo* info)
 
   switch (((GrowRect*)object)->type()) {
   case glow_eObjectType_GrowRect:
-  case glow_eObjectType_GrowRectRounded:
     // Set changed dynamic
     info_p = info;
     while (info_p->info_type != grow_eInfoType_End) {
@@ -3701,6 +3700,39 @@ void grow_UpdateObject(grow_tCtx ctx, grow_tObject object, grow_sAttrInfo* info)
     ((GrowRect*)object)->nav_zoom();
     ((GrowRect*)object)->get_node_borders();
     ((GrowRect*)object)->draw(&ctx->mw, INT_MIN, INT_MIN, INT_MAX, INT_MAX);
+    break;
+  case glow_eObjectType_GrowRectRounded:
+    // Set changed dynamic
+    info_p = info;
+    while (info_p->info_type != grow_eInfoType_End) {
+      switch (info_p->info_type) {
+      case grow_eInfoType_Dynamic: {
+        char* dynamic;
+        int dynsize;
+
+        ((GrowRectRounded*)object)->get_dynamic(&dynamic, &dynsize);
+        if (streq((char*)info_p->value_p, "") && !dynsize)
+          break;
+
+        if (dynsize && !streq(dynamic, (char*)info_p->value_p))
+          ((GrowRectRounded*)object)
+              ->set_dynamic(
+                  (char*)info_p->value_p, strlen((char*)info_p->value_p));
+        else if (!dynsize)
+          ((GrowRectRounded*)object)
+              ->set_dynamic(
+                  (char*)info_p->value_p, strlen((char*)info_p->value_p));
+        break;
+      }
+      default:;
+      }
+      info_p++;
+    }
+
+    ((GrowRectRounded*)object)->zoom();
+    ((GrowRectRounded*)object)->nav_zoom();
+    ((GrowRectRounded*)object)->get_node_borders();
+    ((GrowRectRounded*)object)->draw(&ctx->mw, INT_MIN, INT_MIN, INT_MAX, INT_MAX);
     break;
   case glow_eObjectType_GrowPolyLine:
     // Set changed dynamic
