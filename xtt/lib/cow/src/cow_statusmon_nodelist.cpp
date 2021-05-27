@@ -82,27 +82,28 @@ void Nodelist::find_node_cb(void* ctx, pwr_tOid oid)
 }
 
 void Nodelist::add_node_ok(
-    Nodelist* nodelist, char* node_name, char* description, char* opplace)
+    Nodelist* nodelist, char* node_name, char* address, char* description, char* opplace)
 {
-  nodelist->nodelistnav->add_node(node_name, description, opplace);
+  nodelist->nodelistnav->add_node(node_name, address, description, opplace);
 }
 
 void Nodelist::activate_add_node()
 {
   open_add_input_dialog(
-      "Node name", "Description", "Operatorplace", "Add Node", "", add_node_ok);
+      "Node name", "Address", "Description", "Operatorplace", "Add Node", "", add_node_ok);
 }
 
 void Nodelist::mod_node_ok(
-    Nodelist* nodelist, char* node_name, char* description, char* opplace)
+    Nodelist* nodelist, char* node_name, char *address, char* description, char* opplace)
 {
-  nodelist->nodelistnav->set_node_data(node_name, opplace, description);
+  nodelist->nodelistnav->set_node_data(node_name, address, opplace, description);
 }
 
 void Nodelist::activate_modify_node()
 {
   static char node_name[80];
   char title[100];
+  char address[40];
   int sts;
   pwr_tOName opplace;
   char descr[80];
@@ -113,14 +114,14 @@ void Nodelist::activate_modify_node()
     return;
   }
 
-  sts = nodelistnav->get_selected_opplace(opplace, descr);
+  sts = nodelistnav->get_selected_opplace(address, opplace, descr);
   if (EVEN(sts))
     return;
 
   sprintf(title, "Modify node %s", node_name);
 
-  open_mod_input_dialog("Node", "Description", "Operatorplace", title,
-      node_name, descr, opplace, mod_node_ok);
+  open_mod_input_dialog("Node", "Address", "Description", "Operatorplace", title,
+      node_name, address, descr, opplace, mod_node_ok);
 }
 
 void remove_node_ok(void* ctx, void* data)
@@ -205,7 +206,7 @@ void Nodelist::activate_open_opplace()
     nodelistnav->wow->DisplayError("Open Xtt", "Select a node");
     return;
   }
-  sts = nodelistnav->get_selected_opplace(opplace, 0);
+  sts = nodelistnav->get_selected_opplace(0, opplace, 0);
 
   get_display(display);
   statussrv_XttStart(node_name, opplace, "", display, remote_gui);
@@ -230,4 +231,9 @@ void Nodelist::activate_open_rtmon()
 void Nodelist::activate_save()
 {
   nodelistnav->save();
+}
+
+void Nodelist::activate_reconnect()
+{
+  nodelistnav->reconnect();
 }

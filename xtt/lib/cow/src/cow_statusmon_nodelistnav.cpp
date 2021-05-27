@@ -199,7 +199,7 @@ int NodelistNav::init_brow_cb(FlowCtx* fctx, void* client_data)
   nodelistnav->brow->create_nodeclasses();
 
   if (!streq(nodelistnav->nodename, "")) {
-    nodelistnav->add_node(nodelistnav->nodename, "", "");
+    nodelistnav->add_node(nodelistnav->nodename, "", "", "");
     nodelistnav->node_list[0].item->open_children(nodelistnav, 0, 0);
   } else
     nodelistnav->read();
@@ -243,7 +243,7 @@ NodelistNavBrow::~NodelistNavBrow()
 void NodelistNav::read()
 {
   char line[400];
-  char line_part[3][256];
+  char line_part[4][256];
   int sts;
   FILE* fp;
   pwr_tFileName fname;
@@ -270,9 +270,11 @@ void NodelistNav::read()
 
     NodelistNode node(line_part[0]);
     if (num >= 2)
-      strncpy(node.opplace, line_part[1], sizeof(node.opplace));
+      strncpy(node.address, line_part[1], sizeof(node.address));
     if (num >= 3)
-      strncpy(node.description, line_part[2], sizeof(node.description));
+      strncpy(node.opplace, line_part[2], sizeof(node.opplace));
+    if (num >= 4)
+      strncpy(node.description, line_part[3], sizeof(node.description));
 
     node_list.push_back(node);
   }
@@ -782,9 +784,29 @@ int NodelistNav::update_nodes()
   int nodraw = 0;
   pwr_tStatus current_status = 0;
   char current_status_str[120];
+  pwr_tTime time1, time2;
 
   for (int i = 0; i < (int)node_list.size(); i++) {
-    sts = statussrv_GetStatus(node_list[i].node_name, &response);
+
+    if (!connect && !first_scan && EVEN(node_list[i].connection_sts)
+	&& node_list[i].network_timeout)
+      continue;
+
+    time_GetTime(&time1);
+    if (!streq(node_list[i].address, ""))
+      sts = statussrv_GetStatus(node_list[i].address, &response);
+    else
+      sts = statussrv_GetStatus(node_list[i].node_name, &response);
+    time_GetTime(&time2);
+    pwr_tFloat32 df = time_AdiffToFloat(&time2, &time1);
+      
+    if (df > 2.9) {
+      // Timeout, disable until next reconnect
+      node_list[i].network_timeout = 1;
+      strcpy(response.SystemStatusStr, "Network timeout");    
+    }
+    else
+      node_list[i].network_timeout = 0;
 
     if (!first_scan && ODD(sts) && EVEN(node_list[i].connection_sts))
       message(sts, node_list[i].node_name, i, "Connection up to server");
@@ -900,6 +922,9 @@ int NodelistNav::update_nodes()
       }
     }
   }
+  if (connect)
+    connect = 0;
+
   if (nodraw) {
     brow_ResetNodraw(brow->ctx);
     brow_Redraw(brow->ctx, 0);
@@ -919,8 +944,9 @@ void NodelistNav::save()
     return;
 
   for (int i = 0; i < (int)node_list.size(); i++) {
-    fprintf(fp, "%s \"%s\" \"%s\"\n", node_list[i].node_name,
-        node_list[i].opplace, node_list[i].description);
+    fprintf(fp, "%s \"%s\" \"%s\" \"%s\"\n", node_list[i].node_name, 
+	node_list[i].address, node_list[i].opplace,
+	node_list[i].description);
   }
 
   fclose(fp);
@@ -946,7 +972,7 @@ int NodelistNav::get_selected_node(char* name)
   return 1;
 }
 
-int NodelistNav::get_selected_opplace(char* opplace, char* descr)
+int NodelistNav::get_selected_opplace(char* address, char* opplace, char* descr)
 {
   brow_tNode* nodelist;
   int node_count;
@@ -964,6 +990,8 @@ int NodelistNav::get_selected_opplace(char* opplace, char* descr)
 
   for (int i = 0; i < (int)node_list.size(); i++) {
     if (node_list[i].item == item) {
+      if (address)
+        strcpy(address, node_list[i].address);
       if (opplace)
         strcpy(opplace, node_list[i].opplace);
       if (descr)
@@ -974,10 +1002,13 @@ int NodelistNav::get_selected_opplace(char* opplace, char* descr)
   return 0;
 }
 
-int NodelistNav::set_node_data(char* node_name, char* opplace, char* descr)
+int NodelistNav::set_node_data(char* node_name, char* address, 
+    char* opplace, char* descr)
 {
   for (int i = 0; i < (int)node_list.size(); i++) {
     if (streq(node_list[i].node_name, node_name)) {
+      if (address)
+        strncpy(node_list[i].address, address, sizeof(node_list[i].address));
       if (opplace)
         strncpy(node_list[i].opplace, opplace, sizeof(node_list[i].opplace));
       if (descr)
@@ -1004,7 +1035,7 @@ void NodelistNav::remove_node(char* name)
 }
 
 void NodelistNav::add_node(
-    const char* name, const char* description, const char* opplace)
+    const char* name, const char* address, const char* description, const char* opplace)
 {
   brow_tNode* nodelist;
   int node_count;
@@ -1031,6 +1062,7 @@ void NodelistNav::add_node(
       return;
 
     NodelistNode node(name);
+    strncpy(node.address, address, sizeof(node.address));
     strncpy(node.opplace, opplace, sizeof(node.opplace));
     strncpy(node.description, description, sizeof(node.description));
 

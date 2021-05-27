@@ -58,11 +58,14 @@ public:
   GtkWidget* form_widget;
   GtkWidget* toplevel;
   gint trace_timerid;
+  GdkCursor* clock_cursor;
 
   void start_trace(pwr_tObjid Objid, char* object_str);
   void set_input_focus();
   void trace_start();
   void beep();
+  void set_clock_cursor();
+  void reset_cursor();
   static void trace_scan(NodelistNav* nodelistnav);
 };
 

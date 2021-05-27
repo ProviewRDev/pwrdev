@@ -118,18 +118,22 @@ class CoWow;
 
 class NodelistNode {
 public:
-  NodelistNode(const char* name) : item(0), connection_sts(0), init_done(0)
+  NodelistNode(const char* name) : item(0), connection_sts(0), init_done(0),
+    network_timeout(0)
   {
     strncpy(node_name, name, sizeof(node_name));
+    strcpy(address, "");
     strcpy(opplace, "");
     strcpy(description, "");
   }
   char node_name[80];
+  char address[40];
   char description[80];
   pwr_tOName opplace;
   ItemNode* item;
   pwr_tStatus connection_sts;
   int init_done;
+  int network_timeout;
 };
 
 class NodelistNav {
@@ -154,6 +158,7 @@ public:
   int msgw_pop;
   int mode;
   int view_node_descr;
+  int connect;
 
   virtual void set_input_focus()
   {
@@ -167,6 +172,7 @@ public:
 
   void zoom(double zoom_factor);
   void unzoom();
+  void reconnect() {connect = 1;}
   void set_mode(int nodelist_mode);
   void set_nodraw();
   void reset_nodraw();
@@ -178,10 +184,10 @@ public:
   int select_node(int idx);
   void remove_node(char* name);
   int get_selected_node(char* name);
-  int get_selected_opplace(char* opplace, char* descr);
-  int set_node_data(char* node_name, char* opplace, char* descr);
+  int get_selected_opplace(char* address, char* opplace, char* descr);
+  int set_node_data(char* node_name, char *addess, char* opplace, char* descr);
   void save();
-  void add_node(const char* name, const char* description, const char* opplace);
+  void add_node(const char* name, const char* address, const char* description, const char* opplace);
   void set_msgw_pop(int pop)
   {
     msgw_pop = pop;

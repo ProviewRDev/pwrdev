@@ -58,8 +58,8 @@ public:
   int nodelist_displayed;
   void (*help_cb)(void*, const char*);
   void (*close_cb)(void*);
-  void (*add_india_ok_cb)(Nodelist*, char*, char*, char*);
-  void (*mod_india_ok_cb)(Nodelist*, char*, char*, char*);
+  void (*add_india_ok_cb)(Nodelist*, char*, char*, char*, char*);
+  void (*mod_india_ok_cb)(Nodelist*, char*, char*, char*, char*);
   CoWow* wow;
   MsgWindow* msg_window;
   char remote_gui[20];
@@ -79,14 +79,14 @@ public:
   {
   }
   virtual void open_add_input_dialog(const char* text, const char* text2,
-      const char* text3, const char* title, const char* init_text,
-      void (*ok_cb)(Nodelist*, char*, char*, char*))
+      const char* text3, const char* text4, const char* title, const char* init_text,
+      void (*ok_cb)(Nodelist*, char*, char*, char*, char*))
   {
   }
   virtual void open_mod_input_dialog(const char* text, const char* text2,
-      const char* text3, const char* title, const char* init_text,
-      const char* init_text2, const char* init_text3,
-      void (*ok_cb)(Nodelist*, char*, char*, char*))
+      const char* text3, const char* text4, const char* title, const char* init_text,
+      const char* init_text2, const char* init_text3, const char* init_text4,
+      void (*ok_cb)(Nodelist*, char*, char*, char*, char*))
   {
   }
 
@@ -102,11 +102,12 @@ public:
   void activate_open_opplace();
   void activate_open_rtmon();
   void activate_save();
+  void activate_reconnect();
   static void find_node_cb(void* ctx, pwr_tOid oid);
   static void add_node_ok(
-      Nodelist* nodelist, char* node_name, char* description, char* opplace);
+      Nodelist* nodelist, char* node_name, char *address, char* description, char* opplace);
   static void mod_node_ok(
-      Nodelist* nodelist, char* node_name, char* description, char* opplace);
+      Nodelist* nodelist, char* node_name, char *address, char* description, char* opplace);
 };
 
 #endif
