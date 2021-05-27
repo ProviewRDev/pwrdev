@@ -200,6 +200,7 @@ void time_NextPeriod(time_ePeriod period, pwr_tTime* prev_from,
 int time_PeriodZoomIn(time_ePeriod* period);
 int time_PeriodZoomOut(time_ePeriod* period);
 int time_PrintA(const char* format, pwr_tTime* ts);
+pwr_tFloat32 time_AdiffToFloat(pwr_tTime* t, pwr_tTime* s);
 
 /*@}*/
 

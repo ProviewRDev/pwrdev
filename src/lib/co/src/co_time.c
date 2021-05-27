@@ -2208,3 +2208,19 @@ int time_PrintA(const char* format, pwr_tTime* ts)
   time_AtoAscii(ts, time_eFormat_DateAndTime, timstr, sizeof(timstr));
   return printf(format, timstr);
 }
+
+//! Subtract a time from a time and return the differens
+/*! as a float value.
+  Input arguments containing invalid times will
+  cause an exception.
+*/
+
+pwr_tFloat32 time_AdiffToFloat(pwr_tTime* t, pwr_tTime* s)
+{
+  pwr_tDeltaTime r;
+  pwr_tFloat32 f;
+
+  time_Adiff(&r, t, s);
+  time_DToFloat(&f, &r);
+  return f;
+}
