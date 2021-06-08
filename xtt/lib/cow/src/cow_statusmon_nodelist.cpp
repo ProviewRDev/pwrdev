@@ -146,52 +146,23 @@ void Nodelist::activate_remove_node()
       this, "Remove Node", msg, remove_node_ok, NULL, node_name);
 }
 
-static void get_display(char* disp)
-{
-  char display[80] = "";
-  char name[80];
-  pwr_tStatus sts;
-
-  char* val = getenv("DISPLAY");
-  if (val)
-    strcpy(display, val);
-
-  if (streq(display, "")) {
-    syi_NodeName(&sts, name, sizeof(name));
-    strcpy(display, name);
-    strcat(display, ":0");
-  } else if (display[0] == ':') {
-    char tmp[80];
-
-    syi_NodeName(&sts, name, sizeof(name));
-    strcpy(tmp, display);
-    strcpy(display, name);
-    strcat(display, tmp);
-  } else if (display[0] == '0' && display[1] == ':') {
-    char tmp[80];
-
-    syi_NodeName(&sts, name, sizeof(name));
-    strcpy(tmp, display);
-    strcpy(display, name);
-    strcat(display, &tmp[1]);
-  }
-  strcpy(disp, display);
-}
-
 void Nodelist::activate_open_xtt()
 {
   char node_name[80];
   int sts;
-  char display[80];
+  char address[40];
 
   sts = nodelistnav->get_selected_node(node_name);
   if (EVEN(sts)) {
     nodelistnav->wow->DisplayError("Open Xtt", "Select a node");
     return;
   }
+  sts = nodelistnav->get_selected_opplace(address, 0, 0);
 
-  get_display(display);
-  statussrv_XttStart(node_name, "", "", display, remote_gui);
+  pwr_tCmd cmd;
+  sprintf(cmd, "ssh pwrp@%s -X rt_xtt&", address);
+  printf("cmd %s\n", cmd);
+  system(cmd);
 }
 
 void Nodelist::activate_open_opplace()
@@ -199,33 +170,41 @@ void Nodelist::activate_open_opplace()
   int sts;
   char node_name[80];
   pwr_tOName opplace;
-  char display[80];
+  char address[40];
 
   sts = nodelistnav->get_selected_node(node_name);
   if (EVEN(sts)) {
     nodelistnav->wow->DisplayError("Open Xtt", "Select a node");
     return;
   }
-  sts = nodelistnav->get_selected_opplace(0, opplace, 0);
+  sts = nodelistnav->get_selected_opplace(address, opplace, 0);
 
-  get_display(display);
-  statussrv_XttStart(node_name, opplace, "", display, remote_gui);
+  pwr_tCmd cmd;
+  sprintf(cmd, "ssh pwrp@%s -X rt_xtt %s&", address, opplace);
+  printf("cmd %s\n", cmd);
+  system(cmd);
+
 }
 
 void Nodelist::activate_open_rtmon()
 {
   char node_name[80];
   int sts;
-  char display[80];
+  char address[40];
 
   sts = nodelistnav->get_selected_node(node_name);
   if (EVEN(sts)) {
-    nodelistnav->wow->DisplayError("Open Xtt", "Select a node");
+    nodelistnav->wow->DisplayError("Open Runtime Monitor", "Select a node");
     return;
   }
 
-  get_display(display);
-  statussrv_RtMonStart(node_name, "", display, remote_gui);
+  sts = nodelistnav->get_selected_opplace(address, 0, 0);
+
+  pwr_tCmd cmd;
+  sprintf(cmd, "ssh pwrp@%s -X pwr_rtmon&", address);
+  printf("cmd %s\n", cmd);
+  system(cmd);
+
 }
 
 void Nodelist::activate_save()
