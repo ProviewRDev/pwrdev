@@ -63,6 +63,6 @@ applterm	<Application terminated>				/fatal
 ptimeout	<Process timeout>					/fatal
 srvconnection	<No connection to server>				/fatal
 srvnotconf	<Server not configured, terminated>			/info
-
+nyi		<Not yet implemented>					/error
 .end
 

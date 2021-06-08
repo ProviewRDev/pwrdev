@@ -73,6 +73,7 @@
 #define cPrio_websocketserver (cPrio_base + 15)
 #define cPrio_elog (cPrio_base + 15)
 #define cPrio_sysmon (cPrio_base + 16)
+#define cPrio_mqtt_server (cPrio_base + 16)
 #define cPrio_opc_server (cPrio_base + 15)
 #define cPrio_statussrv (cPrio_base + 15)
 #define cPrio_post (cPrio_base + 5)
@@ -161,6 +162,10 @@ void ini_ProcTable(pwr_tStatus* status, ini_sContext* cp)
 
   pp = ini_ProcInsert(sts, cp, "pwr_sysmon", "pwr_sysmon_%d", 0, 1, "rt_sysmon",
       cPrio_sysmon, 0, pwr_cClass_SysMonConfig, "", 0);
+  pp->proc.flags.b.system = 1;
+
+  pp = ini_ProcInsert(sts, cp, "pwr_mqtt_server", "pwr_mqtt_server_%d", 0, 1, "rt_mqtt_server",
+      cPrio_mqtt_server, 0, pwr_cClass_MqttServer, "", 0);
   pp->proc.flags.b.system = 1;
 
   pp = ini_ProcInsert(sts, cp, "pwr_webmon", "pwr_webmon_%d", 0, 1,
