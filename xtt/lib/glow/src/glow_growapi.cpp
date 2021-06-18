@@ -6120,5 +6120,9 @@ void grow_SetGraphBorders(grow_tCtx ctx, double x0, double y0, double x1, double
   ((GrowCtx*)ctx)->y1 = y1;
 }
 
+void grow_DisableSubwindowEvents(grow_tCtx ctx, int disable)
+{
+  ((GrowCtx*)ctx)->disable_subw_events = disable;
+}
 
 /*@}*/

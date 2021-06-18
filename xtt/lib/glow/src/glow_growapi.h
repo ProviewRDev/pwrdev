@@ -3395,6 +3395,7 @@ int grow_GetDashboardNextFree(grow_tCtx ctx, int start_row, int start_col,
     int rows, int columns, double *x, double *y);
 void grow_GetDashCellInfo(grow_tObject o, int *rows, int *columns);
 void grow_SetGraphBorders(grow_tCtx ctx, double x0, double y0, double x1, double y1);
+void grow_DisableSubwindowEvents(grow_tCtx ctx, int disable);
 
 /*@}*/
 #if defined __cplusplus

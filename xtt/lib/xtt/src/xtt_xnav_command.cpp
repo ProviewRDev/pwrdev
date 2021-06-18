@@ -886,6 +886,32 @@ static int xnav_set_func(void* client_data, void* client_flag)
         return XNAV__HOLDCOMMAND;
       }
     }
+  } else if (str_NoCaseStrncmp(arg1_str, "SUBEVENTS", strlen(arg1_str)) == 0) {
+    // Command is "SET SUBEVENTS"
+    XttGe* gectx;
+    pwr_tOName graph_str;
+    int disable;
+
+    if ( ODD(dcli_get_qualifier("/OFF", 0, 0)))
+      disable = 1;
+    else if (ODD(dcli_get_qualifier("/ON", 0, 0)))
+      disable = 0;
+    else {
+      xnav->message('E', "On or off is missing");
+      return XNAV__HOLDCOMMAND;
+    }
+
+    if (EVEN(dcli_get_qualifier("dcli_arg2", graph_str, sizeof(graph_str)))) {
+      xnav->message('E', "Graph name is missing");
+      return XNAV__HOLDCOMMAND;
+    }
+
+    if (str_NoCaseStrcmp(graph_str, "$current") == 0 && xnav->current_cmd_ctx) {
+      gectx = (XttGe*)xnav->current_cmd_ctx;
+      gectx->disable_subwindow_events(disable);
+    } else if (xnav->appl.find_graph(graph_str, 0, (void**)&gectx)) {
+      gectx->disable_subwindow_events(disable);
+    } 
   } else if (str_NoCaseStrncmp(arg1_str, "LANGUAGE", strlen(arg1_str)) == 0) {
     char language_str[80];
     ApplListElem* elem;

@@ -1148,6 +1148,7 @@ public:
   GrowDashboard *dash;
   double dash_cell_width; //!< Width of dashboard cell
   double dash_cell_height; //!< Height of dashboard cell
+  int disable_subw_events; //!< Disable eventhandling in subwindows and tables
 };
 
 void grow_auto_scrolling(GrowCtx* ctx);

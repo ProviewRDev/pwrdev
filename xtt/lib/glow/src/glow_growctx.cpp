@@ -102,7 +102,7 @@ GrowCtx::GrowCtx(const char* ctx_name, double zoom_fact)
       bitmap_fonts(0), environment(glow_eEnv_Runtime),
       text_coding(glow_eTextCoding_ISO8859_1), recursive_trace(0),
       edit_set_mode(glow_eEditSetMode_None), dashboard(0), dash(0), 
-      dash_cell_width(8), dash_cell_height(6)
+      dash_cell_width(8), dash_cell_height(6), disable_subw_events(0)
 {
   ctx_type = glow_eCtxType_Grow;
   strcpy(name, "");
@@ -355,7 +355,7 @@ int GrowCtx::event_handler(glow_eEvent event, int x, int y, int w, int h)
   }
 
   // Dispach to event to subwindows
-  if (trace_started && has_subwindows) {
+  if (trace_started && has_subwindows && !disable_subw_events) {
     sts = subw_event_handler(event, x, y, w, h);
     if (sts)
       return sts;

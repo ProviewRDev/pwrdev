@@ -126,6 +126,7 @@ public:
   int set_object_focus(const char* name, int empty);
   int set_folder_index(const char* name, int idx);
   int set_subwindow_source(const char* name, char* source, char* object);
+  void disable_subwindow_events(int disable);
   void swap(int mode);
   void update_color_theme(int color_theme);
   void event_exec(int type, void* event, unsigned int size);

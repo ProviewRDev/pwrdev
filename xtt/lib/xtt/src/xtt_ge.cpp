@@ -236,6 +236,11 @@ int XttGe::set_subwindow_source(const char* name, char* source, char* object)
   return graph->set_subwindow_source(name, source, object);
 }
 
+void XttGe::disable_subwindow_events(int disable)
+{
+  return graph->disable_subwindow_events(disable);
+}
+
 XttGe::~XttGe()
 {
 }
