@@ -42,12 +42,17 @@
   @aref remtranssend RemTransSend
 */
 #define RemTransSend_exec(object, subwindow)                                   \
+  if (((pwr_sClass_RemTrans*)(*object->RemTransP))->DataValid > 0)             \
+    object->Occupied = 1;                                                      \
+  else                                                                         \
+    object->Occupied = 0;                                                      \
   if (*object->SendP && !object->Send) {                                       \
     if (((pwr_sClass_RemTrans*)(*object->RemTransP))->DataValid > 0)           \
       object->Error = 1;                                                       \
     else {                                                                     \
       subwindow;                                                               \
       ((pwr_sClass_RemTrans*)(*object->RemTransP))->DataValid = 1;             \
+      object->Occupied = 1;						       \
       object->Error = 0;                                                       \
     }                                                                          \
   } else                                                                       \
@@ -55,11 +60,6 @@
         = EVEN(((pwr_sClass_RemTrans*)(*object->RemTransP))->LastSts);         \
                                                                                \
   object->Send = *object->SendP;                                               \
-                                                                               \
-  if (((pwr_sClass_RemTrans*)(*object->RemTransP))->DataValid > 0)             \
-    object->Occupied = 1;                                                      \
-  else                                                                         \
-    object->Occupied = 0;                                                      \
                                                                                \
   if (((pwr_sClass_RemTrans*)(*object->RemTransP))->Buffers > 0) {             \
     object->Buffer = 1;                                                        \
