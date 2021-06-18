@@ -29,6 +29,15 @@ typedef enum {
   mqtt_eCon_WaitConnect = 2
 } mqtt_eCon;
 
+typedef enum {
+  mEventOpt_Time = 1,
+  mEventOpt_Type = 2,
+  mEventOpt_Prio = 4,
+  mEventOpt_Text = 8,
+  mEventOpt_Name = 16,
+  mEventOpt_Id = 32
+} mEventOpt;
+
 class Sub {
 public:
   pwr_tStatus sts;
@@ -785,6 +794,313 @@ static void message_cb(struct mosquitto *mosq, void *obj,
 	    rmsg, 1, 0);
 	if (debug)
 	  printf("history %d %s\n", rc, rmsg);	
+	free(rmsg);
+      }
+    }
+    else if (streq(action, "eventhist")) {
+      pwr_tOName object;
+      char server[80];
+      char optionsstr[20];
+      unsigned int options;
+      char fromstr[30];
+      char tostr[30];
+      char eventtypestr[20];
+      pwr_tUInt32 eventtypemask;
+      char eventpriostr[20];
+      pwr_tUInt32 eventpriomask;
+      char eventtext[80];
+      pwr_tOName eventname;
+      char maxrowsstr[20];
+      int maxrows;
+      pwr_tTime to, from;
+      pwr_tDeltaTime fromdelta;
+      sevcli_sEvents *list;
+      unsigned int listcnt;
+      char *rmsg;
+      int msize;
+      int rc;
+      int n;
+      char timstr[30];
+      pwr_tOid oid;
+
+      while (1) {
+	sts = json_find((char *)msg->payload, "\"server\"", server, 1);
+	if (EVEN(sts))
+	  break;
+
+	sts = json_find((char *)msg->payload, "\"object\"", object, 1);
+	if (EVEN(sts))
+	  break;
+
+	sts = json_find((char *)msg->payload, "\"options\"", optionsstr, 1);
+	if (EVEN(sts)) {
+	  options = mEventOpt_Time | mEventOpt_Type | mEventOpt_Text;
+	  sts = 1;
+	}
+	else {
+	  n = sscanf(optionsstr, "%u", &options);
+	  if (n != 1) {
+	    sts = 0;
+	    break;
+	  }
+	}
+	if (EVEN(sts))
+	  break;
+
+	sts = json_find((char *)msg->payload, "\"eventtype\"", eventtypestr, 1);
+	if (EVEN(sts)) {
+	  eventtypemask = 0;
+	  sts = 1;
+	}
+	else {
+	  n = sscanf(eventtypestr, "%u", &eventtypemask);
+	  if (n != 1) {
+	    sts = 0;
+	    break;
+	  }
+	}
+	if (EVEN(sts))
+	  break;
+
+	sts = json_find((char *)msg->payload, "\"eventprio\"", eventpriostr, 1);
+	if (EVEN(sts)) {
+	  eventpriomask = 0;
+	  sts = 1;
+	}
+	else {
+	  n = sscanf(eventpriostr, "%u", &eventpriomask);
+	  if (n != 1) {
+	    sts = 0;
+	    break;
+	  }
+	}
+	if (EVEN(sts))
+	  break;
+
+	sts = json_find((char *)msg->payload, "\"eventtext\"", eventtext, 1);
+	if (EVEN(sts))
+	  strcpy(eventtext, "");
+
+	sts = json_find((char *)msg->payload, "\"eventname\"", eventname, 1);
+	if (EVEN(sts))
+	  strcpy(eventname, "");
+
+	sts = json_find((char *)msg->payload, "\"reply\"", reply, 1);
+	if (EVEN(sts))
+	  break;
+
+	sts = json_find((char *)msg->payload, "\"from\"", fromstr, 1);
+	if (EVEN(sts))
+	  break;
+
+	sts = json_find((char *)msg->payload, "\"to\"", tostr, 1);
+	if (EVEN(sts))
+	  break;
+
+	sts = json_find((char *)msg->payload, "\"maxrows\"", maxrowsstr, 1);
+	if (EVEN(sts)) {
+	  maxrows = 1000;
+	  sts = 1;
+	}
+	else {
+	  n = sscanf(maxrowsstr, "%d", &maxrows);
+	  if (n != 1) {
+	    sts = 0;
+	    break;
+	  }
+	}
+	
+	if ( strncmp("_O", object, 2) == 0) 
+	  sts = cdh_StringToObjid(object, &oid);
+	else
+	  sts = gdh_NameToObjid(object, &oid);
+	if (EVEN(sts))
+	  break;
+      
+
+	if ( strcmp(tostr, "now") == 0) {
+	  /* fromstr is a deltatime */
+	  sts = time_AsciiToD(fromstr, &fromdelta);
+	  if ( EVEN(sts))
+	    break;
+
+	  time_GetTime(&to);
+	  time_Asub(&from, &to, &fromdelta);
+	}
+	else {
+	  sts = time_AsciiToA(fromstr, &from);
+	  if ( EVEN(sts))
+	    break;
+
+	  sts = time_AsciiToA(tostr, &to);
+	  if ( EVEN(sts))
+	    break;
+	}
+
+	if (!srv->sevclictx) {
+	  sevcli_init( &sts, &srv->sevclictx);
+	  if ( EVEN(sts))
+	    break;
+	}
+
+	sevcli_set_servernode( &sts, srv->sevclictx, server);
+	if ( EVEN(sts))
+	  break;
+
+	sevcli_get_events( &sts, srv->sevclictx, oid, from, to, eventtypemask, eventpriomask,
+			   eventtext, eventname, maxrows, &list, &listcnt);
+	if (EVEN(sts))
+	  break;
+
+	msize = 100;
+	msize += 20 + 10 + 10 + 10 + 10 + 10 + 1;
+	for (int i = 0; i < listcnt; i++) {
+	  if (options & mEventOpt_Time)
+	    msize += 23 + 3;
+	  if (options & mEventOpt_Type)
+	    msize += 11;
+	  if (options & mEventOpt_Prio)
+	    msize += 3;
+	  if (options & mEventOpt_Text)
+	    msize += strlen(list[i].EventText) + 3;
+	  if (options & mEventOpt_Name)
+	    msize += strlen(list[i].EventName) + 3;  
+	  if (options & mEventOpt_Id)
+	    msize += 11;
+	}
+	rmsg = (char *)calloc(1, msize);
+
+	n = 0;
+	n += sprintf(rmsg, "{\"status\":%u", sts);
+	if (options & mEventOpt_Time) {
+	  n += sprintf(&rmsg[strlen(rmsg)], ",\"time\":[");
+	  for (int i = 0; i < listcnt; i++) {
+	    time_AtoAscii( &list[i].Time, time_eFormat_DateAndTime, timstr, sizeof(timstr));
+	    strcat(rmsg, "\"");
+	    strcat(rmsg, timstr);
+	    strcat(rmsg, "\"");
+	    n += strlen(timstr) + 2;
+	    if (i == listcnt - 1)
+	      strcat(rmsg, "]");
+	    else
+	      strcat(rmsg, ",");
+	    n += 1;
+	  }
+	}
+	if (options & mEventOpt_Type) {
+	  strcat(rmsg, ",\"type\":[");
+	  n += 9;
+	  for (int i = 0; i < listcnt; i++) {
+	    n += sprintf(&rmsg[strlen(rmsg)], "%u", list[i].EventType);
+	    if (i == listcnt - 1)
+	      strcat(rmsg, "]");
+	    else
+	      strcat(rmsg, ",");
+	    n += 1;
+	  }
+	}
+	if (options & mEventOpt_Prio) {
+	  strcat(rmsg, ",\"prio\":[");
+	  n += 8;
+	  for (int i = 0; i < listcnt; i++) {
+	    n += sprintf(&rmsg[strlen(rmsg)], "%u", list[i].EventPrio);
+	    if (i == listcnt - 1)
+	      strcat(rmsg, "]");
+	    else
+	      strcat(rmsg, ",");
+	    n += 1;
+	  }
+	}
+	if (options & mEventOpt_Prio) {
+	  strcat(rmsg, ",\"prio\":[");
+	  n += 8;
+	  for (int i = 0; i < listcnt; i++) {
+	    n += sprintf(&rmsg[strlen(rmsg)], "%u", list[i].EventPrio);
+	    if (i == listcnt - 1)
+	      strcat(rmsg, "]");
+	    else
+	      strcat(rmsg, ",");
+	    n += 1;
+	  }
+	}
+	if (options & mEventOpt_Text) {
+	  strcat(rmsg, ",\"text\":[");
+	  n += 9;
+	  for (int i = 0; i < listcnt; i++) {
+	    strcat(rmsg, "\"");
+	    strcat(rmsg, list[i].EventText);
+	    strcat(rmsg, "\"");
+	    n += strlen(list[i].EventText) + 2;
+	    if (i == listcnt - 1)
+	      strcat(rmsg, "]");
+	    else
+	      strcat(rmsg, ",");
+	    n += 1;
+	  }
+	}
+	if (options & mEventOpt_Name) {
+	  strcat(rmsg, ",\"name\":[");
+	  n += 9;
+	  for (int i = 0; i < listcnt; i++) {
+	    strcat(rmsg, "\"");
+	    strcat(rmsg, list[i].EventName);
+	    strcat(rmsg, "\"");
+	    n += strlen(list[i].EventName) + 2;
+	    if (i == listcnt - 1)
+	      strcat(rmsg, "]");
+	    else
+	      strcat(rmsg, ",");
+	    n += 1;
+	  }
+	}
+	if (options & mEventOpt_Id) {
+	  strcat(rmsg, ",\"id_nix\":[");
+	  n += 8;
+	  for (int i = 0; i < listcnt; i++) {
+	    n += sprintf(&rmsg[strlen(rmsg)], "%u", list[i].EventId.Nix);
+	    if (i == listcnt - 1)
+	      strcat(rmsg, "]");
+	    else
+	      strcat(rmsg, ",");
+	    n += 1;
+	  }
+	  strcat(rmsg, ",\"id_idx\":[");
+	  n += 8;
+	  for (int i = 0; i < listcnt; i++) {
+	    n += sprintf(&rmsg[strlen(rmsg)], "%u", list[i].EventId.Idx);
+	    if (i == listcnt - 1)
+	      strcat(rmsg, "]");
+	    else
+	      strcat(rmsg, ",");
+	    n += 1;
+	  }
+	}
+	strcat(rmsg, "}");
+	n += 1;
+
+	if (debug)
+	  printf("size %d %d %d\n", msize, n, (int)strlen(rmsg));
+
+	rc = mosquitto_publish(srv->mosq, NULL, reply, strlen(rmsg), 
+	    rmsg, 1, 0);
+
+	if (debug) {
+	  char txt[100];
+	  strncat(txt, rmsg, 100);
+	  txt[99] = 0;
+	  printf("eventhist %d %s...\n", rc, txt);
+	}
+	free(rmsg);
+
+	break;
+      }
+      if (EVEN(sts)) {
+	rmsg = (char *)calloc(1, 40);
+	sprintf(rmsg, "{\"status\":%u}", sts);
+	rc = mosquitto_publish(srv->mosq, NULL, reply, strlen(rmsg), 
+	    rmsg, 1, 0);
+	if (debug)
+	  printf("eventhist %d %s\n", rc, rmsg);	
 	free(rmsg);
       }
     }
