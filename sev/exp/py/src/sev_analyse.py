@@ -997,6 +997,7 @@ class WdWindow:
         self.mshiftentry = None
         self.mshiftnumentry = None
         self.curveentry = None
+        self.filterentry = None
         self.datasel = None
 
         self.window = Toplevel(window, bg=bgcolor)
@@ -1323,6 +1324,7 @@ class WdWindow:
         self.sel_shift = IntVar()
         self.sel_mshift = IntVar()
         self.sel_scale = IntVar()
+        self.sel_filter = IntVar()
 
         checkbox = Checkbutton(self.add_dia, text='Norm', variable=self.sel_norm,
                                highlightthickness=0, bg=bgcolor)
@@ -1370,6 +1372,12 @@ class WdWindow:
         self.shiftentry = Entry(self.add_dia, bg=bgcolor)
         self.shiftentry.grid(column=1, row=9, padx=20, pady=5, sticky=W)
 
+        checkbox = Checkbutton(self.add_dia, text='Filter', variable=self.sel_filter,
+                               highlightthickness=0, bg=bgcolor)
+        checkbox.grid(column=0, row=9, padx=20, pady=5, sticky=W)
+        self.filterentry = Entry(self.add_dia, bg=bgcolor)
+        self.filterentry.grid(column=1, row=9, padx=20, pady=5, sticky=W)
+
         button = Button(self.add_dia, text="Apply", command=self.addcol_action_ok_cb, bg=buttoncolor);
         button.grid(column=0, row=10, padx=60, pady=20, sticky=W)
 
@@ -1405,6 +1413,7 @@ class WdWindow:
         self.sel_shift = IntVar()
         self.sel_mshift = IntVar()
         self.sel_scale = IntVar()
+        self.sel_filter = IntVar()
         checkbox = Checkbutton(self.add_dia, text='Copy', variable=self.sel_copy,
                                highlightthickness=0, bg=bgcolor)
         checkbox.grid(column=0, row=0, padx=20, pady=5, sticky=W)
@@ -1484,6 +1493,12 @@ class WdWindow:
         self.mshiftentry.grid(column=1, row=16, padx=20, pady=5, sticky=W)
         self.mshiftnumentry = Entry(self.add_dia, bg=bgcolor)
         self.mshiftnumentry.grid(column=2, row=16, padx=20, pady=5, sticky=W)
+        
+        checkbox = Checkbutton(self.add_dia, text='Filter', variable=self.sel_filter,
+                               highlightthickness=0, bg=bgcolor)
+        checkbox.grid(column=0, row=15, padx=20, pady=5, sticky=W)
+        self.filterentry = Entry(self.add_dia, bg=bgcolor)
+        self.filterentry.grid(column=1, row=15, padx=20, pady=5, sticky=W)
         
         button = Button(self.add_dia, text="Apply", command=self.addcol_action_ok_cb, bg=buttoncolor);
         button.grid(column=0, row=17, padx=60, pady=20, sticky=W)
@@ -1572,6 +1587,9 @@ class WdWindow:
             arg2 = self.mshiftnumentry.get()
         elif self.sel_scale.get():
             op = self.wdata.OP_SCALE
+        elif self.sel_filter.get():
+            op = self.wdata.OP_FILTER
+            arg1 = self.filterentry.get()
         else:
             tkinter.messagebox.showerror("Error", "No action is selected")
             return

@@ -144,6 +144,7 @@ class WData:
     OP_SHIFT = 15
     OP_SCALE = 16
     OP_MSHIFT = 17
+    OP_FILTER = 18
         
     operations = ((OP_NO, 'No'),
                   (OP_COPY, 'Copy'),
@@ -162,7 +163,8 @@ class WData:
                   (OP_CONSTANT, 'Const'),
                   (OP_SHIFT, 'Shift'),
                   (OP_SCALE, 'Scale'),
-                  (OP_MSHIFT, 'MShift'))
+                  (OP_MSHIFT, 'MShift'),
+                  (OP_FILTER, 'Filter'))
 
     def __init__(self):
         self.set = False
@@ -705,6 +707,8 @@ class WData:
             arg2 = par3
         elif op == self.OP_CURVE:
             arg1 = par2
+        elif op == self.OP_FILTER:
+            arg1 = par2
         elif op == self.OP_CONSTANT:
             arg1 = par1
             i1 = -1
@@ -901,6 +905,26 @@ class WData:
                 j += 1
             ser = ser_shift
             
+        elif op == self.OP_FILTER:
+            try:
+                filterconst = float(arg1) 
+            except:
+                raise co.SyntaxError(0, 'Missing value or syntax error')
+
+            filter = []
+            i = 0
+            for val in ser.values:
+                if i == 0 :
+                    val = ser.values[0];
+                else:
+                    dt = self.wdtime[i]-self.wdtime[i-1]
+                    dtsec = dt.seconds + dt.microseconds/1000000.0
+                    a = 1 - 1 / (1 + dtsec / filterconst)
+                    val = ser.values[i] * a + filter[i-1] * (1 - a);
+                filter.append(val)
+                i += 1
+            ser = pd.Series(filter)
+            colname = "Filter(" + self.wdname[cix1] + "," + str(filterconst) + ")"            
         elif op == self.OP_SCALE:
             ser, coeff0, coeff1 = minmax_scale(ser)
             colname = "Scale(" + self.wdname[cix1] + ")"
