@@ -1189,6 +1189,9 @@ void wb_build::xttgraph(pwr_tOid oid)
       }
     }
   }
+  else
+    m_sts = PWRB__NOBUILT;
+
 }
 
 void wb_build::webgraph(pwr_tOid oid)

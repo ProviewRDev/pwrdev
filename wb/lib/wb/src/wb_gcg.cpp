@@ -15903,9 +15903,17 @@ int gcg_comp_plcembed_all(ldh_tSession ldhses, int force)
   }
 
   if (write_set) {
-    sts = ldh_SaveSession(ldhses);
+    ldh_sSessInfo info;
+
+    sts = ldh_GetSessionInfo(ldhses, &info);
     if (EVEN(sts))
       return sts;
+
+    if (!info.Empty) {
+      sts = ldh_SaveSession(ldhses);
+      if (EVEN(sts))
+	return sts;
+    }
     sts = ldh_SetSession(ldhses, ldh_eAccess_ReadOnly);
     if (EVEN(sts))
       return sts;
