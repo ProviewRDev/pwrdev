@@ -148,7 +148,7 @@ int rmq_connect()
   if (!ctx->socket) {
     ctx->socket = (amqp_socket_t*)amqp_tcp_socket_new(ctx->conn);
     if (!ctx->socket) {
-      printf("Socket error\n");
+      errh_Error("Socket error");
       return 0;
     }
 
@@ -168,10 +168,12 @@ int rmq_connect()
   rep = amqp_login(ctx->conn, "/", 0, 131072, 0, AMQP_SASL_METHOD_PLAIN,
       ctx->op->User, ctx->op->Password);
   if (rep.reply_type != AMQP_RESPONSE_NORMAL) {
-    if (rep.reply_type == AMQP_RESPONSE_LIBRARY_EXCEPTION)
-      printf("Login failure, not authorized? %d\n", rep.reply_type);
+    if (rep.reply_type == AMQP_RESPONSE_LIBRARY_EXCEPTION) {
+      errh_Error("Login failure, not authorized? %d library_error %d %s", rep.reply_type, 
+		 rep.library_error, amqp_error_string2(rep.library_error));
+    }
     else
-      printf("Login failure: %d\n", rep.reply_type);
+      errh_Error("Login failure: %d", rep.reply_type);
     return 0;
   }
 
@@ -186,7 +188,8 @@ int rmq_connect()
       printf("Channel not open\n");
       ctx->channel = 0;
     } else {
-      printf("Channel open %s\n", (char*)co->channel_id.bytes);
+      if (debug)
+	printf("Channel open %s\n", (char*)co->channel_id.bytes);
     }
   }
 
@@ -197,10 +200,12 @@ int rmq_connect()
         amqp_cstring_bytes(ctx->op->SendQueue), 0, ctx->op->Durable, 0, 0,
         amqp_empty_table);
     if (!qd) {
-      printf("SendQueue not declared\n");
+      if (debug)
+	printf("SendQueue not declared\n");
     } else {
-      printf("SendQueue %s message cnt %d, consumer cnt %d\n",
-          (char*)qd->queue.bytes, qd->message_count, qd->consumer_count);
+      if (debug)
+	printf("SendQueue %s message cnt %d, consumer cnt %d\n",
+            (char*)qd->queue.bytes, qd->message_count, qd->consumer_count);
     }
   }
 
@@ -211,10 +216,12 @@ int rmq_connect()
         amqp_cstring_bytes(ctx->op->ReceiveQueue), 0, ctx->op->Durable, 0, 0,
         amqp_empty_table);
     if (!qd) {
-      printf("ReceiveQueue not declared\n");
+      if (debug)
+	printf("ReceiveQueue not declared\n");
     } else {
-      printf("ReceiveQueue %s message cnt %d, consumer cnt %d\n",
-          (char*)qd->queue.bytes, qd->message_count, qd->consumer_count);
+      if (debug)
+	printf("ReceiveQueue %s message cnt %d, consumer cnt %d\n",
+            (char*)qd->queue.bytes, qd->message_count, qd->consumer_count);
     }
   }
 
@@ -242,9 +249,11 @@ int rmq_connect()
         amqp_cstring_bytes(ctx->op->ReceiveQueue), amqp_empty_bytes, 0,
         !ctx->op->Acknowledge, 0, amqp_empty_table);
     if (!bc)
-      printf("Consumer error\n");
-    else
-      printf("Consumer tag: %s\n", (char*)bc->consumer_tag.bytes);
+      errh_Error("Consumer error");
+    else {
+      if (debug)
+	printf("Consumer tag: %s\n", (char*)bc->consumer_tag.bytes);
+    }
   }
 
   return 1;
