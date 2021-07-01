@@ -2529,39 +2529,63 @@ static int xnav_show_func(void* client_data, void* client_flag)
       return XNAV__HOLDCOMMAND;
     }
   } else if (str_NoCaseStrncmp(arg1_str, "HISTORY", strlen(arg1_str)) == 0) {
-    int sts;
-    pwr_tOid root;
-    pwr_tOid child;
-    Item* item;
-    int cnt;
+    char arg2_str[80];
+    int arg2_sts;
 
-    // Get the toplevel objects
-    sts = gdh_NameToObjid("pwrNode-sev", &root);
-    if (EVEN(sts)) {
-      xnav->message('E', "No storage server on this node");
-      return XNAV__SUCCESS;
-    }
+    arg2_sts = dcli_get_qualifier("dcli_arg2", arg2_str, sizeof(arg2_str));
+    if (ODD(arg2_sts)) {
+      if (str_NoCaseStrncmp(arg2_str, "ITEMS", strlen(arg2_str)) == 0) {
+	int sts;
+	pwr_tOid root;
+	pwr_tOid child;
+	Item* item;
+	int cnt;
 
-    //  Loop through all root objects and see if they are valid at toplevel
-    cnt = 0;
-    for (sts = gdh_GetChild(root, &child); ODD(sts);
-         sts = gdh_GetNextSibling(child, &child)) {
-      if (cnt == 0) {
-        xnav->brow_pop();
-        brow_SetNodraw(xnav->brow->ctx);
+	// Get the toplevel objects
+	sts = gdh_NameToObjid("pwrNode-sev", &root);
+	if (EVEN(sts)) {
+	  xnav->message('E', "No storage server on this node");
+	  return XNAV__SUCCESS;
+	}
+
+	//  Loop through all root objects and see if they are valid at toplevel
+	cnt = 0;
+	for (sts = gdh_GetChild(root, &child); ODD(sts);
+	     sts = gdh_GetNextSibling(child, &child)) {
+	  if (cnt == 0) {
+	    xnav->brow_pop();
+	    brow_SetNodraw(xnav->brow->ctx);
+	  }
+	  sts = xnav->create_object_item(
+	      child, NULL, flow_eDest_IntoLast, (void**)&item, 0);
+
+	  cnt++;
+	}
+
+	if (!cnt) {
+	  xnav->message('E', "No history objects found");
+	  return XNAV__SUCCESS;
+	}
+	brow_ResetNodraw(xnav->brow->ctx);
+	brow_Redraw(xnav->brow->ctx, 0);
       }
-      sts = xnav->create_object_item(
-          child, NULL, flow_eDest_IntoLast, (void**)&item, 0);
-
-      cnt++;
+      else if (str_NoCaseStrncmp(arg2_str, "ANALYSER", strlen(arg2_str)) == 0) {
+	pwr_tCmd cmd = "sev_analyse.py&";
+	system(cmd);
+      }
+      else if (str_NoCaseStrncmp(arg2_str, "EVENTS", strlen(arg2_str)) == 0) {
+	pwr_tCmd cmd = "sev_eva.py&";
+	system(cmd);
+      }
+      else {
+	xnav->message('E', "Syntax error");
+	return XNAV__HOLDCOMMAND;
+      }
     }
-
-    if (!cnt) {
-      xnav->message('E', "No history objects found");
-      return XNAV__SUCCESS;
+    else {
+      xnav->message('E', "Syntax error");
+      return XNAV__HOLDCOMMAND;
     }
-    brow_ResetNodraw(xnav->brow->ctx);
-    brow_Redraw(xnav->brow->ctx, 0);
   } else {
     /* This might be a system picture */
     sts = 0; // rttsys_start_system_picture( ctx, arg1_str);

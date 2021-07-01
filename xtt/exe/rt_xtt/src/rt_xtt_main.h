@@ -118,6 +118,7 @@ public:
   static xnav_sStartMenu nethandler_menu[];
   static xnav_sStartMenu communication_menu[];
   static xnav_sStartMenu logging_menu[];
+  static xnav_sStartMenu history_menu[];
   static xnav_sStartMenu system_menu[];
   static xnav_sStartMenu root_menu[];
 };

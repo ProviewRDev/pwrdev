@@ -112,6 +112,14 @@ xnav_sStartMenu Xtt::logging_menu[]
         { "Logging entry 10", xnav_eItemType_Command, menu_ePixmap_Map,
             (void*)"show logging/entry=10" },
         { "", 0, 0, NULL } };
+xnav_sStartMenu Xtt::history_menu[] = {
+  { "Items", xnav_eItemType_Command, menu_ePixmap_Map, (void*)"show history items" },
+  { "Analyser", xnav_eItemType_Command, menu_ePixmap_Map,
+      (void*)"show history analyser" },
+  { "Events", xnav_eItemType_Command, menu_ePixmap_Map,
+      (void*)"show history events" },
+  { "", 0, 0, NULL }
+};
 xnav_sStartMenu Xtt::system_menu[] = { { "Nethandler", xnav_eItemType_Menu,
                                            menu_ePixmap_Map,
                                            (void*)&Xtt::nethandler_menu },
@@ -131,8 +139,8 @@ xnav_sStartMenu Xtt::system_menu[] = { { "Nethandler", xnav_eItemType_Menu,
       (void*)"show nodeobjects" },
   { "Volumes", xnav_eItemType_Command, menu_ePixmap_Map,
       (void*)"show volumes" },
-  { "History", xnav_eItemType_Command, menu_ePixmap_Map,
-      (void*)"show history" },
+  { "History", xnav_eItemType_Menu, menu_ePixmap_Map,
+      (void*)&Xtt::history_menu },
   { "", 0, 0, NULL } };
 xnav_sStartMenu Xtt::root_menu[] = { { "Database", xnav_eItemType_Command,
                                          menu_ePixmap_Map,
