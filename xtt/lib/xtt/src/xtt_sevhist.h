@@ -97,6 +97,9 @@ public:
   time_ePeriod initial_period;
   int color_theme;
   XttOTree* otree;
+  time_ePeriod time_range;
+  pwr_tTime from;
+  pwr_tTime to;
 
   //! Constructor
   XttSevHist(void* xn_parent_ctx, const char* xn_name, pwr_tOid* xn_oidv,

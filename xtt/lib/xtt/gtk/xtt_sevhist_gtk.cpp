@@ -82,9 +82,10 @@ XttSevHistGtk::XttSevHistGtk(void* parent_ctx, GtkWidget* parent_wid,
       | curve_mEnable_ExportTime | curve_mEnable_CurveType
       | curve_mEnable_CurveTypeSquare | curve_mEnable_FillCurve
       | curve_mEnable_DigitalSplit);
-  if (initial_period != time_ePeriod_)
+  if (initial_period != time_ePeriod_) {
     curve->set_period(initial_period, 1);
-
+    curve->set_times(&from, &to);
+  }
   if (w)
     *w = (GtkWidget*)curve->get_widget();
 

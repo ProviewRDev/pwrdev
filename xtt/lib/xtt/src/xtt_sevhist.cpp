@@ -50,14 +50,13 @@
 
 XttSevHist::XttSevHist(void* parent_ctx, const char* name, pwr_tOid* xn_oidv,
     pwr_tOName* xn_anamev, pwr_tOName* xn_onamev, bool* xn_sevhistobjectv,
-    sevcli_tCtx xn_scctx, int xn_color_theme, time_ePeriod time_range, int* sts)
+    sevcli_tCtx xn_scctx, int xn_color_theme, time_ePeriod xn_time_range, int* sts)
     : xnav(parent_ctx), gcd(0), curve(0), rows(0), vsize(0), timerid(0),
       close_cb(0), help_cb(0), get_select_cb(0), first_scan(1), scctx(xn_scctx),
       wow(0), time_low_old(0), time_high_old(0), initial_period(time_ePeriod_),
-      color_theme(xn_color_theme), otree(0)
+      color_theme(xn_color_theme), otree(0), time_range(xn_time_range),
+      from(pwr_cNTime), to(pwr_cNTime)
 {
-  pwr_tTime from, to;
-
   if (xn_oidv == 0 || xn_oidv[0].vid == 0) {
     oid_cnt = 0;
     gcd = new GeCurveData(curve_eDataType_DsTrend);
@@ -123,7 +122,8 @@ XttSevHist::XttSevHist(void* parent_ctx, const char* name, char* filename,
     : xnav(parent_ctx), gcd(0), curve(0), rows(0), vsize(0), timerid(0),
       close_cb(0), help_cb(0), get_select_cb(0), first_scan(1), scctx(0),
       wow(0), time_low_old(0), time_high_old(0), initial_period(time_ePeriod_),
-      color_theme(xn_color_theme)
+      color_theme(xn_color_theme), time_range(time_ePeriod_), from(pwr_cNTime),
+      to(pwr_cNTime)
 {
   strncpy(title, filename, sizeof(title));
 
@@ -681,6 +681,14 @@ void XttSevHist::curve_add(
   if (oid_cnt == XTT_SEVHIST_MAX)
     return;
 
+  for (int i = 0; i < oid_cnt; i++) {
+    if (str_NoCaseStrcmp(aname, anamev[i]) == 0 &&
+	str_NoCaseStrcmp(oname, onamev[i]) == 0) {
+      wow->DisplayError("Add", "Attribute is already displayed");
+      return;
+    }
+  }
+
   if (gcd->type != curve_eDataType_MultiTrend) {
     // Convert to multidata
 
@@ -780,20 +788,32 @@ void XttSevHist::sevhist_reload_cb(void* ctx)
   pwr_tTime t_low, t_high;
   pwr_tStatus sts;
 
-  sts = sevhist->curve->get_times(&t_low, &t_high);
-  if (EVEN(sts)) {
-    sevhist->wow->DisplayError("Time", "Time syntax error");
-    return;
+  sevhist->curve->get_period(&sevhist->time_range);
+
+  switch(sevhist->time_range) {
+  case time_ePeriod_LastMinute:
+  case time_ePeriod_Last10Minutes:
+  case time_ePeriod_LastHour:
+  case time_ePeriod_ThisWeek:
+  case time_ePeriod_ThisMonth:
+    time_Period(sevhist->time_range, &t_low, &t_high, 0, 0);
+    sevhist->curve->set_times(&t_low, &t_high);
+    break;
+  default:
+    sts = sevhist->curve->get_times(&t_low, &t_high);
+    if (EVEN(sts)) {
+      sevhist->wow->DisplayError("Time", "Time syntax error");
+      return;
+    }
+
+    if (time_Acomp(&t_high, &t_low) != 1) {
+      sevhist->wow->DisplayError("Time", "Start time later than end time");
+      return;
+    }
+
+    if (t_low.tv_sec < 0)
+      t_low.tv_sec = 0;
   }
-
-  if (time_Acomp(&t_high, &t_low) != 1) {
-    sevhist->wow->DisplayError("Time", "Start time later than end time");
-    return;
-  }
-
-  if (t_low.tv_sec < 0)
-    t_low.tv_sec = 0;
-
   if (sevhist->oid_cnt == 1)
     sevhist->get_data(&sts, t_low, t_high);
   else
@@ -803,6 +823,8 @@ void XttSevHist::sevhist_reload_cb(void* ctx)
     sevhist->wow->DisplayError("Data error", XNav::get_message(sts));
     return;
   }
+  sevhist->to = t_high;
+  sevhist->from = t_low;
 
   sevhist->time_low_old = 0;
   sevhist->time_high_old = 0;
