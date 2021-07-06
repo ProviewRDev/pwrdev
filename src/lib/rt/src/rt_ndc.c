@@ -507,7 +507,7 @@ pwr_tBoolean ndc_ConvertData(pwr_tStatus* sts, const gdb_sNode* np,
              && np->fm.b.bo == gdbroot->my_node->fm.b.bo)) {
     if (tp != sp)
       memcpy(tp, sp, *size);
-    return TRUE;
+    pwr_Return(YES, sts, NDC__SUCCESS);
   }
 
   /* Find attribute.  */
