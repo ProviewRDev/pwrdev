@@ -3059,6 +3059,7 @@ Det supportade protokollen är:
 TCP/IP
 UDP/IP
 RabbitMQ
+MQTT
 MQ (BEA Message Queue)
 ALCM (ett Digital protokoll, modell äldre, supportas av historiska skäl)
 Serial
@@ -3107,6 +3108,7 @@ ligger som barn till RemNode-objektet.
 UDP <link> udp_ip
 TCP <link> tcp_ip
 RabbitMQ <link> rabbit_mq
+MQTT <link> mqtt
 BEA Message Queue <link> bea_mq
 Serial <link> serial
 3964-R <link> 3964r
@@ -3197,6 +3199,37 @@ Om meddelanden ska kunna överleva nätverksavbrott är en lämplig metod att skicka
 en lokal rabbitmq-server och ta emot meddelanden från en server på sändande node. I det här fallet
 behövs olika RemnodeRabbitMQ-objekt för sändning och mottagning, och rabbitmq severn måste startas 
 i båda noderna.
+</topic>
+
+<topic> mqtt
+MQTT
+RemnodeRabbitMQ konfigurerar meddelanden med MQTT.
+Subscript och Publish konfigureras i remnode-objektet.
+
+Username och password anges för att få tillgång till MQTT servern. Användaren måste vara 
+definerad i servern med lämplig åtkomst. För Mosquitto kan en password fil genereras med
+mosquitto_passwd. Filen ska sedan kopieras till /etc/mosquitto.
+
+I RemTrans-objektet används Address[0] och Address[1] för att addressera ett sänt meddelande
+till en viss RemTrans på mottagarnoden.
+
+Specificationen av Topic skiljer sig åt om remoteheader är aktiverad eller inte.
+
+Om header är aktiverad
+
+  - Sändning: publisering görs med topic i PublishTopic i RemnodeMQTT.
+    Address[0] och Address[1] i remtrans-objektet används för att matcha remtrans-objekt.
+
+  - Mottagning: Prenumerationer görs med topic i SubscribeTopic i RemnodeMQTT-objektet.
+    Meddelandet levereras till RemTrans-objektet med matchande Address[0] och Address[1].
+
+Om header är inaktiverad
+
+  - Sending: publisering görs med topic i RemTrans.TransName.
+
+  - Mottagning: En generisk topic anges i SubscribeTopic i RemnodeMQTT-objektet, t ex 'lab57/rcv/#'.
+    En mer avgränsande topic anges i RemTrans.TransName, t ex 'lab57/rcv/msg1'.
+
 </topic>
 
 <topic> bea_mq
@@ -8936,6 +8969,7 @@ Kommandon
 <b>set showobjref<t>Visa objekt referenser 	<LINK> set showobjref
 <b>set showobjxref<t>Visa objekt x-referenser <LINK> set showobjxref
 <b>set subwindow <t>Öppna en graph i ett window objekt <LINK>set subwindow
+<b>set subevents <t>Inaktivera händelser for  window och tabellobjekt <LINK>set subevents
 <b>set template<t>Sätt templatevärden på objekt <LINK> set template
 <b>set verify  <t>Verifiera script	 	<LINK> set verify
 <b>set window  <t>Sätt fönsterstorlek	 	<LINK> set window
@@ -9735,11 +9769,30 @@ skifta graf i en multiwindow cell.
 <B>wtt> set subwindow 'graph' /name= /source=
 <B>wtt> set subwindow 'multiview-object' /name= /source= [/continue]
 
+'graph' <t>Graf där windowobjektet finns. '$current' anger nuvarande graf.
 /name	<t>Namn på window objektet.
 /source	<t>Namn på grafen som ska öppnas i window objektet.
+/object	<t>Anger objekt om grafen är en objektsgraf.
+/x0	<t>Övre vänstra x-koordinat för grafens gräns. Om x0, y0, x1, y1 anges,
+        <t>kommer en annan del än den som är angiven i Graph attributes  x0, y0, 
+        <t>x1, y1 att visas. Implementerad för grafer i multiview celler, inte
+        <t>för window objekt.
+/y0	<t>Övre vänstra y-koordinat för grafen gräns.
+/x1	<t>Undre högra x-koordinat för grafen gräns.
+/y1	<t>Undre högra y-koordinat för grafen gräns.
 /continue <t>Kan användas om kommandot exekveras från en Ge knapp
           <t>med annan dynamik som ska exekveras. Ska inte användas
           <t>om grafen med knappen själv skiftas.
+
+Om 'set subwindow' kommandot används i ett script som ersätter nuvarande graf, måste
+scriptet avslutas med ett anrop till exit(GLOW__SUBTERMINATED).
+
+<c>main()
+<c>  set subwindow motor1 /name=subw1 /source=motor1.pwg
+<c>  ...
+<c>  exit( GLOW__SUBTERMINATED);
+<c>endmain
+
 </TOPIC>
 
 <TOPIC> set template <style> function

@@ -2866,6 +2866,41 @@ FastCurve.CurveColor2   <t><t>Color for curve 2.
 FastCurve.CurveFillColor2 <t><t>Fill color for curve 2.
 </topic>
 
+<topic>geref_dstren <style>function
+DsTrend
+<image> geref_fig21.png
+
+The DsTrend displays one or two curves configured with DsTrend objects.
+
+<h2>Attributes
+<b>Attribute            <t><t>Description
+DsTrend.Object1         <t><t>Database object of class DsTrend for curve 1.
+DsTrend.Object2         <t><t>Database object of class DsTrend for curve 2. Optional.
+DsTrend.MinValueAttr1	<t><t>Attribute for minimum value of curve 1. Optional.
+DsTrend.MaxValueAttr1	<t><t>Attribute for maximum value of curve 1. Optional.
+DsTrend.MinValueAttr2	<t><t>Attribute for minimum value of curve 2. Optional.
+DsTrend.MaxValueAttr2	<t><t>Attribute for maximum value of curve 2. Optional.
+DsTrend.HoldAttr	<t><t>Attribute to hold updating of the curve. Optional.
+DsTrend.Mark1Attr	<t><t>Attribute for marker 1. Optional.
+DsTrend.Mark2Attr	<t><t>Attribute for marker 2. Optional.
+DsTrend.Mark1Color	<t><t>Marker 1 color.
+DsTrend.Mark2Color	<t><t>Marker 2 color.
+DsTrend.NoOfPoints    <t><t>Number of points in the curve.
+DsTrend.CurveLineWidth <t><t>Line width.
+DsTrend.FillCurve     <t><t>Fill the area between the curve and the x-axis.
+DsTrend.HorizontalLines <t><t>Number of horizontal lines in the diagram.
+DsTrend.VerticalLines <t><t>Number of vertical lines.
+DsTrend.MaxValue1     <t><t>Maximum value in range for curve 1.
+DsTrend.MinValue1     <t><t>Minimum value in range for curve 1.
+DsTrend.CurveColor1   <t><t>Color for curve 1.
+DsTrend.CurveFillColor1 <t><t>Fill color for curve 1.
+DsTrend.MaxValue2     <t><t>Maximum value in range for curve 2.
+DsTrend.MinValue2     <t><t>Minimum value in range for curve 2.
+DsTrend.CurveColor2   <t><t>Color for curve 2.
+DsTrend.CurveFillColor2 <t><t>Fill color for curve 2.
+DsTrend.Direction <t><t>Direction of curve movement, Right or Left.
+</topic>
+
 <topic>geref_axis <style>function
 Axis
 <image> geref_fig12.png
@@ -2943,6 +2978,10 @@ with or without scrollbars.
 <h2>Limitations
 Connections within the window object are not scaled properly.
 
+A window object grapbs all events inside the window area, and click sensitive objects can 
+not be placed on top of the window. If the window temporary should be covered by sensitive
+objects, the xtt command 'set subevents' can be used to disable the window event handling.
+
 <h2>Attributes
 <b>Attribute    <t><t>Description
 Window.FileName <t><t>Name of the graph to be displayed in the window.
@@ -3008,6 +3047,11 @@ The table object consists of the following components:
 - A header column. The left most column can be configured as a header column, i.e. it is not
   comprised by the horizontal scrollbar.
 
+<h2>Limitations
+A table object grapbs all events inside the table area, and click sensitive objects can 
+not be placed on top of the table. If the table temporary should be covered by sensitive
+objects, the xtt command 'set subevents' can be used to disable the table event handling.
+
 <h2>Attributes
 <b>Attribute     <t><t>Description
 Table.Rows   <t><t>Number of rows in the table (header row excluded).
@@ -3037,6 +3081,7 @@ Column1.SelectAttribute <t><t>Array attribute of type Boolean, When a cell in th
                   <t><t>and size, see above.
 Column1.Width      <t><t>Width of the column.
 Column1.HeaderText <t><t>Column title. The title is written in the header row.
+
 </topic>
 
 <topic>geref_xycurve <style>function

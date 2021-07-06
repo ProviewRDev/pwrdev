@@ -3088,6 +3088,7 @@ The supported protocols are:
 TCP/IP
 UDP/IP
 RabbitMQ
+MQTT
 MQ (BEA Message Queue)
 ALCM (an old Digital protocol, supported for historical reasons)
 Serial
@@ -3135,6 +3136,7 @@ to the Remnode-object.
 UDP <link> udp_ip
 TCP <link> tcp_ip
 RabbitMQ <link> rabbit_mq
+MQTT <link> mqtt
 BEA Message Queue <link> bea_mq
 Serial <link> serial
 3964-R <link> 3964r
@@ -3226,6 +3228,37 @@ object, and delivery mode in RemTrans.Address[3] should be set to 2 (persistent)
 If messages should be able to survive network failures, a suitable method is to send messages to a 
 local broker and receive messages from a broker on the sending node. In this case you need separate
 RemnodeRabbitMQ objects for sending and receiving, and you also need to start the broker in both nodes.
+</topic>
+
+<topic> mqtt
+MQTT
+RemnodeMQTT configures messages with MQTT.
+Topics for subscribing and publishing are configured in the remnode object.
+
+Username and password are specified to gain access to the MQTT server. The user has to 
+be define on the server and given appropriate permissions. For Mosquitto, a password file can be created
+with the mosquitto_passwd utility, and the file should be copied to the /etc/mosquitto directory.
+
+In the RemTrans object, Address[0] and Address[1] is used to address a sent message to the corresponding 
+RemTrans in the target node.
+
+The specification of topics differs if the remote header is disabled or not.
+
+If the header is present
+
+  - Sending: publishing is made with the  topic in PubishTopic in the RemnodeMQTT. 
+    Address[0] and Address[1] in the RemTrans object is used to match RemTrans objects.
+
+  - Receiving: Subscriptions are med with the topic in SubscribeTopic in the RemnodeMQTT object. 
+    The message is directed to the RemTrans with matching Address[0] and Address[1].
+
+If header is disabled
+
+  - Sending: publishing is made with the topic in RemTrans.TransName.
+
+  - Receiving: A generic topic is set in SubscribeTopic in the RemnodeMQTT object, eg 'lab57/rcv/#'. 
+    A more narrow topic is set in RemTrans.TransName, eg 'lab57/rcv/msg1'.
+
 </topic>
 
 <topic> bea_mq

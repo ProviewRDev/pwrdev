@@ -1683,6 +1683,7 @@ set folder  <t>Set a folder in a tabbed window. <LINK> set folder
 set parameter<t>Set the value of an attribute  	<LINK> set parameter
 set signal  <t>Set invert, conversion and test for signals.  <LINK> set signal
 set subwindow<t>View a graph in a Ge window object.  <LINK> set subwindow
+set subevents<t>Disable events in a Ge window or table object.  <LINK> set subevents
 set graph   <t>Handling of a graph		<LINK> set graph
 setup       <t>Xtt setup			<LINK> setup
 show version<t>Show xtt version			<LINK> show version
@@ -1847,11 +1848,11 @@ supplying the object with the /object qualifier.
 
 <B>xtt> set subwindow 'graphname' /name= /source= [/object=]
 
-'graphname' <t>the graph where the window object resides. '$current'
+'graphname' <t>The graph where the window object resides. '$current'
         <t> denotes the current graph.
-/name	<t>the name of the window object.
-/source	<t>name of the Ge graph to view in the window object.
-/object	<t>specifies the object when the graph is an object graph.
+/name	<t>The name of the window object.
+/source	<t>Name of the Ge graph to view in the window object.
+/object	<t>Specifies the object when the graph is an object graph.
 /x0	<t>Upper left x Ge coordinate for graph border. If x0, y0, x1, y1 are
         <t>supplied, another part of the graph than the one specified in the Graph 
         <t>attributes x0, y0, x1, y1 will be displayed. Implemented for graphs
@@ -1871,6 +1872,26 @@ graph, the script should be terminated with a call to exit( GLOW__SUBTERMINATED)
 <c>  ...
 <c>  exit( GLOW__SUBTERMINATED);
 <c>endmain
+
+</TOPIC>
+
+<TOPIC> set subevents <style> function
+Command   set subevents
+
+Disable events in a Ge window or table object. 
+Window and table objects grab all events inside their area, and click sensitive
+objects can not be placed on top of them. If they temporarily should be covered by
+a sensitive object though, the eventhandling can be turned off for window and 
+table objects in the graph.
+
+Events will be disabled for all window, tabbed window and table objects in the graph.
+
+<B>xtt> set subevents 'graphname' [/on] [/off]
+
+'graphname' <t>the graph where the window object resides. '$current'
+        <t> denotes the current graph.
+/off	<t>Disable events in window and table objects.
+/on	<t>Enable events in window and table objects.
 
 </TOPIC>
 
