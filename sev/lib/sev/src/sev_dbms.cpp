@@ -34,6 +34,7 @@
  * General Public License plus this exception.
  */
 
+#define PTEST 0
 #if defined PWRE_CONF_MYSQL
 
 #include <errno.h>
@@ -2419,6 +2420,12 @@ int sev_dbms::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
           column_part, item.tablename, where_part, orderby_part, div);
     }
 
+#if PTEST
+    pwr_tTime before, after;
+    float dt;
+    time_GetTime(&before);
+#endif
+
     rc = mysql_query(con, query);
     if (rc) {
       printf("In %s row %d:\n", __FILE__, __LINE__);
@@ -2434,6 +2441,11 @@ int sev_dbms::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
       *sts = SEV__DBERROR;
       return 0;
     }
+#if PTEST
+    time_GetTime(&after);
+    dt = time_AdiffToFloat(&after, &before);
+    printf("Time: %5.3f\n", dt);
+#endif
     rows = mysql_num_rows(result);
 
     if (k == 0 && options & pwr_mSevOptionsMask_UseDeadBand
