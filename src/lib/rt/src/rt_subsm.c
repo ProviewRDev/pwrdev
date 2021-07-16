@@ -367,7 +367,8 @@ pwr_tBoolean subsm_SendBuffer(sub_sBuffer* bp)
         if (classp != NULL) {
           ndc_ConvertData(&lsts, np, classp, &sp->aref, dp->data, data,
               (pwr_tUInt32*)&asize, ndc_eOp_encode, sp->aref.Offset, 0);
-	  dp->sts = lsts;
+	  if (EVEN(lsts))
+	    dp->sts = lsts;
 	}
         sp->count++;
       }
