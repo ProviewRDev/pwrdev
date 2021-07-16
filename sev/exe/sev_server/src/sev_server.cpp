@@ -1172,10 +1172,10 @@ void* sev_server::send_histdata_thread(void* arg)
     free(vbuf);
   }
 
-  if (sev->m_read_threads)
+  if (sev->m_read_threads) {
     sev->m_db->delete_thread(thread);
-
-  pthread_exit( (void *) 1);
+    pthread_exit( (void *) 1);
+  }
   return (void*)1;
 }
 
