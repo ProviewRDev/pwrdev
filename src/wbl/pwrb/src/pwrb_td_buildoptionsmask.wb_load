@@ -171,5 +171,15 @@ SObject pwrb:Type
        Attr Value = 2097152
      EndBody
     EndObject
+    !/**
+    !  MQTT I/O.
+    !*/
+    Object MqttIo $Bit
+     Body SysBody
+       Attr PgmName = "MqttIo"
+       Attr Text = "MqttIo"
+       Attr Value = 4194304
+     EndBody
+    EndObject
   EndObject
 EndSObject
