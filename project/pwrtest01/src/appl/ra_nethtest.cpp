@@ -389,14 +389,14 @@ typedef struct {
 void ra_nethtest::ArefDisabled(void)
 {
   sArefDisabled d[] = {
-    {"Test01b-Neth-P1.CircuitBreaker", 1, HASH__SUCCESS},
-    {"Test01b-Neth-P1.CircuitBreaker.NotTripped", 1, HASH__SUCCESS},
-    {"Test01b-Neth-P1.Motor.TempSwitch", 1, HASH__SUCCESS},
-    {"Test01b-Neth-P1.Motor.TempSwitch.Switch", 1, HASH__SUCCESS},
-    {"Test01b-Neth-P1.Motor.TempSensor", 1, HASH__SUCCESS},
-    {"Test01b-Neth-P1.Motor.TempSensor.Value", 1, HASH__SUCCESS},
-    {"Test01b-Neth-P1.Contactor", 0, HASH__SUCCESS},
-    {"Test01b-Neth-P1.Contactor.Order", 0, HASH__SUCCESS},
+    {"Test01b-Neth-P1.CircuitBreaker", 1, NDC__SUCCESS},
+    {"Test01b-Neth-P1.CircuitBreaker.NotTripped", 1, NDC__SUCCESS},
+    {"Test01b-Neth-P1.Motor.TempSwitch", 1, NDC__SUCCESS},
+    {"Test01b-Neth-P1.Motor.TempSwitch.Switch", 1, NDC__SUCCESS},
+    {"Test01b-Neth-P1.Motor.TempSensor", 1, NDC__SUCCESS},
+    {"Test01b-Neth-P1.Motor.TempSensor.Value", 1, NDC__SUCCESS},
+    {"Test01b-Neth-P1.Contactor", 0, NDC__SUCCESS},
+    {"Test01b-Neth-P1.Contactor.Order", 0, NDC__SUCCESS},
     {"Test01b-Neth-P1", 0, GDH__NOATTR}
   };
   pwr_tAttrRef aref;
