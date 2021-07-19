@@ -64,7 +64,7 @@ class Ctx:
             ser = pd.Series(result[1])
             mean = ser.mean()
             std = ser.std()
-            if len(ser) < 40 or len(ser) > 60:
+            if len(ser) < 6 or len(ser) > 10:
                 self.logger.vlog('E', "getSevItemData, number of rows error, %s",
                                  str(len(ser)))
             if mean < 45 or mean > 55:
@@ -109,7 +109,8 @@ class Ctx:
             for i in range(2):
                 mean.append(data[columns[i+1]].mean())
                 std.append(data[columns[i+1]].std())
-            if len(result) < 239 or len(result) > 241:
+
+            if len(result) < 230 or len(result) > 250:
                 self.logger.vlog('E', "getSevItemsDataFrame, number of rows error, %s",
                                  str(len(result)))
             if mean[0] < 45 or mean[0] > 55:
@@ -163,10 +164,10 @@ class Ctx:
                 mean.append(data[columns[i+1]].mean())
                 std.append(data[columns[i+1]].std())
             print(data[columns[1]].mean())
-            if len(result) < 40 or len(result) > 60:
+            if len(result) < 6 or len(result) > 10:
                 self.logger.vlog('E', "getSevItemsDataFrameD, number of rows error, %s",
                                  str(len(result)))
-            if mean[0] < 47 or mean[0] > 53:
+            if mean[0] < 45 or mean[0] > 55:
                 self.logger.vlog('E', "getSevItemsDataFrameD, mean error, %s, idx %s",
                                  str(mean[0]), str(0))
                 print(data[columns[1]])
@@ -175,7 +176,7 @@ class Ctx:
 #                self.logger.vlog('E', "getSevItemsDataFrameD, std error, %s, idx %s",
 #                                 str(std[0]), str(0))
 #                return
-            if mean[1] < 47 or mean[1] > 53:
+            if mean[1] < 45 or mean[1] > 55:
                 print(data[columns[2]])
                 self.logger.vlog('E', "getSevItemsDataFrameD, mean error, %s, idx %s",
                                  str(mean[1]), str(1))
@@ -202,10 +203,6 @@ class Ctx:
                     found = 1
                     break
                 i += 1
-
-            if found == 0:
-                self.logger.log('E', 'getSevEvents, Events table not found')
-                return
 
             result = pwrrt.getSevEvents( 'localhost', self.itemlist[i][1],
                                          '20:00:00', 'now',  8001, 15, '', '', 1000)
@@ -241,10 +238,6 @@ class Ctx:
                     found = 1
                     break
                 i += 1
-
-            if found == 0:
-                self.logger.log('E', 'getSevEventsDataFrame, Events table not found')
-                return
 
             result = pwrrt.getSevEventsDataFrame( 'localhost', self.itemlist[i][1],
                                             '20:00:00', 'now',  8001, 15, '', '', 1000)
@@ -329,6 +322,12 @@ class Ctx:
     def Aref(self):
         d = (
             ('MDyn-H1-Av3.ActualValue', 22.22, ''),
+            ('MDyn-H1-Av3.ActualValue.__ObjectName', 'VolPwrTest01d:Test01d-H1-Av3', ''),
+            ('MDyn-H1-Av3.ActualValue.__Attr', 'ActualValue', ''),
+            ('MDyn-H1-Av3.ActualValue.__TableName', 'O000_254_254_204_000000c5__7', ''),
+            ('MDyn-H1-Av3.ActualValue.__ScanTime', 10.0, ''),
+            ('MDyn-H1-Av3.ActualValue.__Deadband', 1.0, ''),
+            ('MDyn-H1-Av3.ActualValue.__MeanValue', 22.22, ''),
             ('MDyn-H1-Av4.ActualValue', 33.33, ''),
             ('MDyn-H1-Iv3.ActualValue', 44, ''),
             ('MDyn-H1-Dv7.ActualValue', 1, ''),
