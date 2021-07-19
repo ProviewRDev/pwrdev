@@ -166,5 +166,15 @@ SObject pwrb:Type
        Attr Value = 512
      EndBody
     EndObject
+    !/**
+    !  No time index.
+    !*/
+    Object NoTimeIndex $Bit
+     Body SysBody
+       Attr PgmName = "NoTimeIndex"
+       Attr Text = "NoTimeIndex"
+       Attr Value = 1024
+     EndBody
+    EndObject
   EndObject
 EndSObject

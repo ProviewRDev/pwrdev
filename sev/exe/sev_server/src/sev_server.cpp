@@ -1096,6 +1096,7 @@ void* sev_server::send_histdata_thread(void* arg)
   pwr_tTime starttime, endtime;
   unsigned int item_idx;
   void* thread = 0;
+  pwr_tTime before, after;
 
   sev_server* sev = ((sev_sHistDataThread*)arg)->sev;
   qcom_sQid tgt = ((sev_sHistDataThread*)arg)->tgt;
@@ -1115,6 +1116,7 @@ void* sev_server::send_histdata_thread(void* arg)
     if (sev->m_read_threads)
       thread = sev->m_db->new_thread();
 
+    time_GetTime(&before);
     sev->m_db->get_values(&sts, thread,
         sev->m_db->m_items[item_idx].oid,
         sev->m_db->m_items[item_idx].options,
@@ -1131,6 +1133,9 @@ void* sev_server::send_histdata_thread(void* arg)
           + sizeof(*msg) - sizeof(msg->Data);
     else
       msize = sizeof(*msg);
+
+    time_GetTime(&after);
+    sev->m_config->Stat.LastGetMsgTime = time_AdiffToFloat(&after, &before);
   }
   else 
     msize = sizeof(*msg);
