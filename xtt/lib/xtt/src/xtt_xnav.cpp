@@ -4344,8 +4344,10 @@ int ApplList::find_dashboard_first(void** ctx)
   ApplListElem* elem;
 
   for (elem = root; elem; elem = elem->next) {
-    *ctx = elem->ctx;
-    return 1;
+    if (elem->type == applist_eType_Dashboard) {
+      *ctx = elem->ctx;
+      return 1;
+    }
   }
   return 0;
 }
