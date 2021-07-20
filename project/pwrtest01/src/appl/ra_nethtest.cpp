@@ -10,6 +10,7 @@
 #include "rt_gdh_msg.h"
 #include "rt_hash_msg.h"
 #include "rt_mvol_msg.h"
+#include "rt_ndc_msg.h"
 #include "co_cdh_msg.h"
 #include "pwr_baseclasses.h"
 #include "pwr_basecomponentclasses.h"
@@ -405,17 +406,17 @@ void ra_nethtest::ArefDisabled(void)
   for (unsigned int i = 0; i < sizeof(d)/sizeof(d[0]); i++) {
     m_sts = gdh_NameToAttrref(pwr_cNOid, d[i].aname, &aref);
     if (EVEN(m_sts)) {
-      m_log->log('E', "ArefDisabled", d[i].aname, m_sts);
+      m_log->log('E', "ArefDisabled gdh_NameToAttrref", d[i].aname, m_sts);
       return;
     }
     m_sts = gdh_ArefDisabled(&aref, &dis);
     if (m_sts != d[i].sts) {
-      m_log->log('E', "ArefDisabled", d[i].aname, m_sts);
+      m_log->log('E', "ArefDisabled, sts mismatch", d[i].aname, m_sts);
       return;
     }
     if (ODD(m_sts)) {
       if (dis != d[i].dis) {
-	m_log->log('E', "ArefDisabled", d[i].aname, m_sts);
+	m_log->log('E', "ArefDisabled, disable mismatch", d[i].aname, m_sts);
 	return;
       }
     }
