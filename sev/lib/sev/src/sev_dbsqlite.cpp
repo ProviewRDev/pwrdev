@@ -53,6 +53,11 @@
 
 #include "sev_dbsqlite.h"
 
+sev_dbsqlite::sev_dbsqlite() : m_con(0)
+{
+  strcpy(m_systemName, "");
+}
+
 int sev_dbsqlite::get_systemname()
 {
   FILE* file;
@@ -66,10 +71,12 @@ int sev_dbsqlite::get_systemname()
   if (!streq(m_systemName, ""))
     return 1;
 
-  syi_NodeName(&sts, nodename, sizeof(nodename));
-  if (EVEN(sts))
-    return 0;
-
+  sev_db::get_orignode(nodename);
+  if (streq(nodename, "")) {
+    syi_NodeName(&sts, nodename, sizeof(nodename));
+    if (EVEN(sts))
+      return 0;
+  }
   bus_str = getenv("PWR_BUS_ID");
   if (!bus_str)
     return 0;

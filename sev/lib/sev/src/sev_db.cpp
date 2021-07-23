@@ -151,7 +151,7 @@ sev_item::~sev_item()
 
 sev_db::sev_db() : m_meanvalue_interval1(0), m_meanvalue_interval2(0)
 {
-  strcpy(m_orignode, "");
+  // strcpy(m_orignode, "");
 }
 
 sev_db::~sev_db()

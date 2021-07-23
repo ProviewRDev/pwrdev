@@ -50,10 +50,7 @@ public:
   sqlite3* m_con;
   char m_systemName[80];
 
-  sev_dbsqlite()
-  {
-    strcpy(m_systemName, "");
-  }
+  sev_dbsqlite();
   ~sev_dbsqlite();
 
   int checkAndUpdateVersion(unsigned int version);
