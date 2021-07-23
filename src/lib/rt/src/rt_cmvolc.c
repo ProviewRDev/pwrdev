@@ -654,8 +654,6 @@ static gdb_sCclass* linkCclass(pwr_tStatus* sts, /**< Status */
 
   gdb_AssumeLocked;
 
-  errh_Info("linkClass");
-
   ccp2 = hash_Insert(sts, gdbroot->cclass_ht, ccp);
   if (ccp2 == NULL) {
     if (*sts == HASH__DUPLICATE) {
@@ -683,7 +681,7 @@ static gdb_sCclass* linkCclass(pwr_tStatus* sts, /**< Status */
   if (tqp->lc > tqp->lc_max)
     trimQ(tqp);
 
-  errh_Info("linkClass, success\n");
+  errh_Info("Class cached, %d %d", ccp->key.cid, (int)ccp->key.ccvoltime.tv_sec);
 
   return ccp;
 }

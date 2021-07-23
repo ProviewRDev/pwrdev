@@ -403,8 +403,8 @@ typedef struct {
  */
 
 typedef struct {
-  pwr_tNodeId nid; /**< Node id */
-  pwr_tVolumeId vid; /**< Volume id */
+  pwr_tNodeId nid pwr_dPacked; /**< Node id */
+  pwr_tVolumeId vid pwr_dPacked; /**< Volume id */
 } gdb_sCcVolKey;
 
 typedef struct {
@@ -449,8 +449,8 @@ typedef union {
  */
 
 typedef struct {
-  pwr_tClassId cid; /**< Class Id */
-  pwr_tTime ccvoltime; /**< Cached class volume modification time */
+  pwr_tClassId cid pwr_dPacked; /**< Class Id */
+  pwr_tTime ccvoltime pwr_dPacked; /**< Cached class volume modification time */
 } gdb_sCclassKey;
 
 typedef struct {
@@ -472,9 +472,9 @@ typedef struct {
  */
 
 typedef struct {
-  pwr_tCid subCid; /**< Class Id for class attribute */
-  pwr_tCid hostCid; /**< Class Id for owner class */
-  pwr_tUInt32 idx; /**< Index of offset data */
+  pwr_tCid subCid pwr_dPacked; /**< Class Id for class attribute */
+  pwr_tCid hostCid pwr_dPacked; /**< Class Id for owner class */
+  pwr_tUInt32 idx pwr_dPacked; /**< Index of offset data */
 } gdb_sClassAttrKey;
 
 #define gdb_cCattOffsetSize 20
