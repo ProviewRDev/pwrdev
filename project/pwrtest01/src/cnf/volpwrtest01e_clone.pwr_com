@@ -1,0 +1,6 @@
+main()
+  RenameObject("Test01d", "Test01e");
+  RenameObject("Nodes-PwrTest01d", "PwrTest01e");
+  SetAttribute("MDyn.Object", "pwrNode-sev-Test01e");
+  SetAttribute("Nodes-PwrTest01e-Servers-SevServer.Database", 1);
+endmain

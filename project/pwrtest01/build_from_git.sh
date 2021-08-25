@@ -110,6 +110,9 @@ fi
 if [ "`eval grep VolPwrTest01d $pwra_db/pwr_volumelist.dat`" == "" ]; then
   echo "VolPwrTest01d	0.254.254.204	pwrtest01" >> $pwra_db/pwr_volumelist.dat
 fi
+if [ "`eval grep VolPwrTest01e $pwra_db/pwr_volumelist.dat`" == "" ]; then
+  echo "VolPwrTest01e	0.254.254.205	pwrtest01" >> $pwra_db/pwr_volumelist.dat
+fi
 if [ ! -e $pwra_db/pwr_projectlist.dat ] || [ "`eval grep base $pwra_db/pwr_projectlist.dat`" == "" ]; then
   echo "%base V0.0.0 $pwre_broot" > $pwra_db/pwr_projectlist.dat
 fi
@@ -127,6 +130,7 @@ cat > initdir.pwr_com <<EOF
   set attr/name=Bus999-PwrTest01b/attr=OperatingSystem/value="$opsys"/noconf
   set attr/name=Bus999-PwrTest01c/attr=OperatingSystem/value="$opsys"/noconf
   set attr/name=Bus999-PwrTest01d/attr=OperatingSystem/value="$opsys"/noconf
+  set attr/name=Bus999-PwrTest01e/attr=OperatingSystem/value="$opsys"/noconf
   save
   exit
 EOF
@@ -209,6 +213,21 @@ wb_cmd -v volpwrtest01d build node pwrtest01d /force
 
 echo "* Build package"
 wb_cmd distr/node=pwrtest01d/package
+
+echo "* Clone volpwrtest01e"
+
+cat > clonevol.pwr_com <<EOF 
+  noedit
+  login pwrp pwrp
+  clone volume/name=volpwrtest01e
+EOF
+
+wb_cmd -v volpwrtest01d @clonevol
+
+wb_cmd build node pwrtest01e /force
+
+echo "* Build package"
+wb_cmd distr/node=pwrtest01e/package
 
 exit
 

@@ -26,6 +26,8 @@ demo_modules = $(pwrp_inc)/ra_plc_user.h \
 	       $(pwrp_exe)/ra_testall_c.sh \
 	       $(pwrp_exe)/ra_sevtest.py \
 	       $(pwrp_exe)/ra_testall_d.sh \
+	       $(pwrp_exe)/ra_sevtest_e.py \
+	       $(pwrp_exe)/ra_testall_e.sh \
 	       $(pwrp_obj)/ra_plc_user.o
 
 
@@ -124,6 +126,14 @@ $(pwrp_exe)/ra_sevtest.py : $(pwrp_appl)/ra_sevtest.py
 
 $(pwrp_exe)/ra_testall_d.sh : $(pwrp_appl)/ra_testall_d.sh
 	@ echo "Building ra_testall_d"
+	@ cp -p $(source) $(target)
+
+$(pwrp_exe)/ra_sevtest_e.py : $(pwrp_appl)/ra_sevtest_e.py
+	@ echo "Building ra_sevtest_e"
+	@ cp -p $(source) $(target)
+
+$(pwrp_exe)/ra_testall_e.sh : $(pwrp_appl)/ra_testall_e.sh
+	@ echo "Building ra_testall_e"
 	@ cp -p $(source) $(target)
 
 $(pwrp_obj)/ra_plc_user.o : $(pwrp_appl)/ra_plc_user.c
