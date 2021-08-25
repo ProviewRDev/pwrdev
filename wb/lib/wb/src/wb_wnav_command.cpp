@@ -582,11 +582,31 @@ static int wnav_edit_func(void* client_data, void* client_flag)
 static int wnav_noedit_func(void* client_data, void* client_flag)
 {
   WNav* wnav = (WNav*)client_data;
+  pwr_tStatus sts;
 
-  if (wnav->window_type == wnav_eWindowType_No)
-    return WNAV__CMDMODE;
+  if (wnav->window_type == wnav_eWindowType_No) {
+    ldh_sSessInfo info;
 
-  if (wnav->set_configure_cb)
+    sts = wnav_wccm_get_ldhsession_cb(wnav, &wnav->ldhses);
+    if (EVEN(sts))
+      return sts;
+
+    sts = ldh_GetSessionInfo(wnav->ldhses, &info);
+    if (EVEN(sts))
+      return sts;
+
+    if (!info.Empty) {
+      wnav->message('E', "Session is not empty");
+      return WNAV__CMDMODE;
+    }
+    if (info.Access == ldh_eAccess_ReadOnly) {
+      wnav->message('E', "Session is already readonly");
+      return WNAV__CMDMODE;
+    }
+    ldh_SetSession(wnav->ldhses, ldh_eAccess_ReadOnly);
+    wnav->editmode = 0;
+  }
+  else if (wnav->set_configure_cb)
     wnav->set_configure_cb(wnav->parent_ctx, 0);
   return WNAV__SUCCESS;
 }
