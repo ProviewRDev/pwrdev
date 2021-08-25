@@ -234,7 +234,7 @@ public:
 			 pwr_tMask options, pwr_tMask eventtypemask, 
 			 pwr_tMask eventpriomask, char *eventtext, char *eventname,
 			 pwr_tTime *starttime, pwr_tTime *endtime, unsigned int numpoints, 
-			 std::vector<sev_event> &list) {return 0;}
+			 std::vector<sev_event> &list);
   virtual int repair_table(pwr_tStatus* sts, char* tablename);
   virtual int alter_engine(pwr_tStatus* sts, char* tablename);
   virtual int optimize(pwr_tStatus* sts, char* tablename);

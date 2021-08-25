@@ -2262,6 +2262,20 @@ pwr_tUInt64 sev_dbsqlite::get_nextAutoIncrement(char* tablename)
   return ++retVal;
 }
 
+static void real_escape_string(char *out, char *in, int size)
+{
+  char *t, *s;
+
+  for (s = in, t = out; *s; s++, t++) {
+    if (*s == '\'') {
+      *t = '\'';
+      t++;
+    }
+    *t = *s;
+  }
+  *t = 0;
+}
+
 int sev_dbsqlite::store_objectvalue(pwr_tStatus* sts, int item_idx,
     int attr_idx, pwr_tTime time, void* buf, void* oldbuf, unsigned int size)
 {
@@ -2276,6 +2290,7 @@ int sev_dbsqlite::store_objectvalue(pwr_tStatus* sts, int item_idx,
   char query[constQueryLength];
   char* errmsg;
   char bufstr[512];
+  char bufInclEscCharstr[1025];
   char timstr[40];
 
   *sts = time_AtoAscii(
@@ -2337,8 +2352,11 @@ int sev_dbsqlite::store_objectvalue(pwr_tStatus* sts, int item_idx,
         return 0;
       if (m_items[item_idx].attr[i].type == pwr_eType_String
           || m_items[item_idx].attr[i].type == pwr_eType_Text) {
+	
+        real_escape_string(
+            bufInclEscCharstr, bufstr, strlen(bufstr));
         valuesStr.append("'");
-        valuesStr.append(bufstr);
+        valuesStr.append(bufInclEscCharstr);
         valuesStr.append("',");
       } else {
         valuesStr.append("'");

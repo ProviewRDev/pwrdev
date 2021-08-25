@@ -453,3 +453,14 @@ void sev_db::get_item_idx_by_name(
   }
   *sts = SEV__NOSUCHITEM;
 }
+
+int sev_db::get_events(pwr_tStatus *sts, void *thread, pwr_tOid oid,
+    pwr_tMask options, pwr_tMask eventtypemask,
+    pwr_tMask eventpriomask, char *eventtext, char *eventname,
+    pwr_tTime *starttime, pwr_tTime *endtime, unsigned int numevents,
+    std::vector<sev_event> &list)
+{
+  *sts = SEV__NYI;
+  return 0;
+}
+
