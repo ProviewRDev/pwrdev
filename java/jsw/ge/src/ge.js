@@ -2877,7 +2877,7 @@ function DynValue( dyn) {
     this.a = new DynReference( this.dyn, this.attribute);
     this.a.connect(this.dyn);
     if ( !this.a.sts) {
-      console.log("Value: " + attribute);
+      console.log("Value: " + this.attribute);
       return 1;
     }
     return 1;
