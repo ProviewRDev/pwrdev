@@ -1396,10 +1396,10 @@ void* sev_server::send_events_thread(void* arg)
     qcom_Free(&sts, put.data);
   }
 
-  if (sev->m_read_threads)
+  if (sev->m_read_threads) {
     sev->m_db->delete_thread(thread);
-
-  pthread_exit( (void *) 1);
+    pthread_exit( (void *) 1);
+  }
   return (void*)1;
 }
 
