@@ -963,6 +963,8 @@ static int xnav_set_func(void* client_data, void* client_flag)
       conv = xnav_eConv_Binary;
     else if (str_NoCaseStrncmp(arg2_str, "FLOAT", strlen(arg2_str)) == 0)
       conv = xnav_eConv_Float;
+    else if (str_NoCaseStrncmp(arg2_str, "FLOATF", strlen(arg2_str)) == 0)
+      conv = xnav_eConv_FloatF;
     else if (str_NoCaseStrncmp(arg2_str, "INTEGER", strlen(arg2_str)) == 0)
       conv = xnav_eConv_Integer;
     else if (str_NoCaseStrncmp(arg2_str, "IDENTITY", strlen(arg2_str)) == 0)

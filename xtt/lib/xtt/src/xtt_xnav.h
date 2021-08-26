@@ -134,7 +134,8 @@ typedef enum {
   xnav_eConv_Octal,
   xnav_eConv_Integer,
   xnav_eConv_Float,
-  xnav_eConv_Identity
+  xnav_eConv_Identity,
+  xnav_eConv_FloatF
 } xnav_eConv;
 
 typedef struct {

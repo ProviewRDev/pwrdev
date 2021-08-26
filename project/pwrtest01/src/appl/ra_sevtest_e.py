@@ -406,9 +406,9 @@ class Ctx:
 
 ctx = Ctx()
 if len(sys.argv) and sys.argv[1] == 'hdf5':    
-    ctx.logger = pwrtest.logger('rt-sev_hdf5', '$pwrp_log/sev_hdf5.tlog')
+    ctx.logger = pwrtest.logger('sev-hdf5', '$pwrp_log/sev_hdf5.tlog')
 else:
-    ctx.logger = pwrtest.logger('rt-sev_sqlite', '$pwrp_log/sev_sqlite.tlog')
+    ctx.logger = pwrtest.logger('sev-sqlite', '$pwrp_log/sev_sqlite.tlog')
     
 try:
     ctx.init()

@@ -64,7 +64,7 @@ class Ctx:
             ser = pd.Series(result[1])
             mean = ser.mean()
             std = ser.std()
-            if len(ser) < 6 or len(ser) > 10:
+            if len(ser) < 6 or len(ser) > 200:
                 self.logger.vlog('E', "getSevItemData, number of rows error, %s",
                                  str(len(ser)))
             if mean < 45 or mean > 55:
@@ -110,7 +110,7 @@ class Ctx:
                 mean.append(data[columns[i+1]].mean())
                 std.append(data[columns[i+1]].std())
 
-            if len(result) < 230 or len(result) > 250:
+            if len(result) < 6 or len(result) > 250:
                 self.logger.vlog('E', "getSevItemsDataFrame, number of rows error, %s",
                                  str(len(result)))
             if mean[0] < 45 or mean[0] > 55:
@@ -164,7 +164,7 @@ class Ctx:
                 mean.append(data[columns[i+1]].mean())
                 std.append(data[columns[i+1]].std())
             print(data[columns[1]].mean())
-            if len(result) < 6 or len(result) > 10:
+            if len(result) < 6 or len(result) > 200:
                 self.logger.vlog('E', "getSevItemsDataFrameD, number of rows error, %s",
                                  str(len(result)))
             if mean[0] < 45 or mean[0] > 55:
@@ -204,8 +204,16 @@ class Ctx:
                     break
                 i += 1
 
+            if found == 0:
+                self.logger.vlog('E', 'getSevEvents, Event table not found')
+                return
+                
             result = pwrrt.getSevEvents( 'localhost', self.itemlist[i][1],
                                          '20:00:00', 'now',  8001, 15, '', '', 1000)
+            #if not 'row' in vars():
+            #    self.logger.vlog('E', 'getSevEvents, No events found')
+            #    return                
+            
             type = [row[1] for row in result]
             print(type)
             count = type.count(64)  # Number of A alarms
@@ -324,8 +332,8 @@ class Ctx:
             ('MDyn-H1-Av3.ActualValue', 22.22, ''),
             ('MDyn-H1-Av3.ActualValue.__ObjectName', 'VolPwrTest01d:Test01d-H1-Av3', ''),
             ('MDyn-H1-Av3.ActualValue.__Attr', 'ActualValue', ''),
-            ('MDyn-H1-Av3.ActualValue.__TableName', 'O000_254_254_204_000000c5__7', ''),
-            ('MDyn-H1-Av3.ActualValue.__ScanTime', 10.0, ''),
+#            ('MDyn-H1-Av3.ActualValue.__TableName', 'O000_254_254_204_000000c5__7', ''),
+            ('MDyn-H1-Av3.ActualValue.__ScanTime', 1.0, ''),
             ('MDyn-H1-Av3.ActualValue.__Deadband', 1.0, ''),
             ('MDyn-H1-Av3.ActualValue.__MeanValue', 22.22, ''),
             ('MDyn-H1-Av4.ActualValue', 33.33, ''),
@@ -397,12 +405,19 @@ class Ctx:
     
 
 ctx = Ctx()
-ctx.logger = pwrtest.logger('rt-sev', '$pwrp_log/sev.tlog')
+ctx.logger = pwrtest.logger('sev-mariadb', '$pwrp_log/sev_mariadb.tlog')
 try:
     ctx.init()
 except:
     quit()
 pwrrt.login('pwrp', 'pwrp')
+
+if int(pwrrt.object().oidStr()[12:15]) == 205:
+    isPwrtest01e = 1
+else:
+    isPwrtest01e = 0
+print("isPwrtest01e", isPwrtest01e)
+
 ctx.getSevItemList()
 ctx.getSevItemData()
 ctx.getSevItemsDataFrame()

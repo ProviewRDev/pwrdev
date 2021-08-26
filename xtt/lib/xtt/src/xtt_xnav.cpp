@@ -548,6 +548,9 @@ void XNav::attrvalue_to_string(int type_id, pwr_tTid tid, void* value_ptr,
         case xnav_eConv_Integer:
           *len = snprintf(str, size, "%u", *(unsigned int*)value_ptr);
           break;
+        case xnav_eConv_FloatF:
+          *len = snprintf(str, size, "%f", *(float*)value_ptr);
+	  break;
         default:
           *len = snprintf(str, size, "%g", *(float*)value_ptr);
         }
@@ -575,8 +578,11 @@ void XNav::attrvalue_to_string(int type_id, pwr_tTid tid, void* value_ptr,
       case xnav_eConv_Integer:
         *len = snprintf(str, size, pwr_dFormatUInt64, *(pwr_tUInt64*)value_ptr);
         break;
+      case xnav_eConv_FloatF:
+	*len = snprintf(str, size, "%F", *(double*)value_ptr);
+	break;
       default:
-        *len = snprintf(str, size, "%g", *(double*)value_ptr);
+        *len = snprintf(str, size, "%G", *(double*)value_ptr);
       }
     } else
       *len = snprintf(str, size, format, *(double*)value_ptr);
