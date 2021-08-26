@@ -168,6 +168,7 @@ public:
   float m_meanvalue_interval2;
   sev_sDbConfig m_cnf;
   static char m_orignode[80];
+  static char m_systemName[40];
 
   sev_db();
   virtual ~sev_db();
@@ -246,6 +247,6 @@ public:
   virtual void delete_thread(void* thread);
 
   static sev_db* open_database(sev_eDbType type, sev_sDbConfig* cnf);
-  static int get_systemname(char* name);
+  static int get_systemname();
 };
 #endif

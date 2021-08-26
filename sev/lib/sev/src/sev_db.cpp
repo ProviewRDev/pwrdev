@@ -48,6 +48,7 @@
 #include "sev_dbhdf5.h"
 
 char sev_db::m_orignode[80] = "";
+char sev_db::m_systemName[40] = "";
 
 sev_attr::sev_attr() : type(pwr_eType_), size(0), elem(0), ip(0), refid(pwr_cNRefId)
 {
@@ -372,45 +373,46 @@ sev_db* sev_db::open_database(sev_eDbType type, sev_sDbConfig* cnf)
   return db;
 }
 
-int sev_db::get_systemname(char* name)
+int sev_db::get_systemname()
 {
   FILE* file;
   pwr_tFileName fname;
-  char nodename[40];
+  char nodename[80];
   char* bus_str;
   int bus;
   char line[200];
   pwr_tStatus sts;
-  static char system_name[80] = "";
 
-  if (streq(system_name, "")) {
+  if (!streq(m_systemName, ""))
+    return 1;
+
+  sev_db::get_orignode(nodename);
+  if (streq(nodename, "")) {
     syi_NodeName(&sts, nodename, sizeof(nodename));
     if (EVEN(sts))
       return 0;
-
-    bus_str = getenv("PWR_BUS_ID");
-    if (!bus_str)
-      return 0;
-    if (sscanf(bus_str, "%d", &bus) != 1)
-      return 0;
-
-    sprintf(fname, pwr_cNameBoot, load_cDirectory, cdh_Low(nodename), bus);
-    dcli_translate_filename(fname, fname);
-    file = fopen(fname, "r");
-    if (file == 0) {
-      printf("In %s row %d:\n", __FILE__, __LINE__);
-      printf("** Warning, systemname not found\n");
-      return 0;
-    }
-
-    if (!dcli_read_line(line, sizeof(line), file))
-      return 0;
-    if (!dcli_read_line(line, sizeof(line), file))
-      return 0;
-
-    strcpy(system_name, line);
   }
-  strcpy(name, system_name);
+  bus_str = getenv("PWR_BUS_ID");
+  if (!bus_str)
+    return 0;
+  if (sscanf(bus_str, "%d", &bus) != 1)
+    return 0;
+
+  sprintf(fname, pwr_cNameBoot, load_cDirectory, cdh_Low(nodename), bus);
+  dcli_translate_filename(fname, fname);
+  file = fopen(fname, "r");
+  if (file == 0) {
+    printf("In %s row %d:\n", __FILE__, __LINE__);
+    printf("** Warning, systemname not found\n");
+    return 0;
+  }
+
+  if (!dcli_read_line(line, sizeof(line), file))
+    return 0;
+  if (!dcli_read_line(line, sizeof(line), file))
+    return 0;
+
+  strcpy(m_systemName, line);
   return 1;
 }
 

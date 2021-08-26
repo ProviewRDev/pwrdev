@@ -55,9 +55,9 @@
 
 sev_dbsqlite::sev_dbsqlite() : m_con(0)
 {
-  strcpy(m_systemName, "");
 }
 
+#if 0
 int sev_dbsqlite::get_systemname()
 {
   FILE* file;
@@ -100,6 +100,7 @@ int sev_dbsqlite::get_systemname()
   strcpy(m_systemName, line);
   return 1;
 }
+#endif
 
 char* sev_dbsqlite::dbName(void)
 {

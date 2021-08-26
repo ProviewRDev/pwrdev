@@ -48,7 +48,6 @@ public:
   static const unsigned int constMaxColNameLength = 64;
 
   sqlite3* m_con;
-  char m_systemName[80];
 
   sev_dbsqlite();
   ~sev_dbsqlite();
@@ -57,7 +56,7 @@ public:
   int updateDBToSevVersion2(void);
   int createSevVersion2Tables(void);
   int createSevVersion3Tables(void);
-  int get_systemname();
+  //int get_systemname();
 
   int open_db();
   int check_item(pwr_tStatus* sts, pwr_tOid oid, char* oname, char* aname,

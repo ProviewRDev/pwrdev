@@ -54,6 +54,7 @@
 #include "sev_dbhdf5.h"
 
 using namespace std;
+static int debug = 0;
 
 #define ITER_MAX 50
 #define cName_Dir "/Dir"
@@ -391,12 +392,11 @@ int sev_dbhdf5::create_db(char* dbname)
 int sev_dbhdf5::open_db()
 {
   char dbname[350];
-  char system_name[80];
   int sts;
   pwr_tTime time;
   pwr_tFileName dir;
 
-  sts = get_systemname(system_name);
+  sts = get_systemname();
   if (EVEN(sts))
     return sts;
 
@@ -407,7 +407,7 @@ int sev_dbhdf5::open_db()
   if (dir[strlen(dir) - 1] != '/')
     strcat(dir, "/");
 
-  sprintf(dbname, "%spwrp__%s.h5", dir, system_name);
+  sprintf(dbname, "%spwrp__%s.h5", dir, m_systemName);
   dcli_translate_filename(dbname, dbname);
 
   sts = dcli_file_time(dbname, &time);
@@ -527,6 +527,7 @@ sev_eDataType sev_dbhdf5::get_datatype(
     default:
       return sev_eDataType_Unknown;
     }
+    break;
   default:
     return sev_eDataType_Unknown;
   }
@@ -4026,7 +4027,7 @@ int sev_dbhdf5::create_objecttable(pwr_tStatus* sts, char* tablename,
     offs += 4;
   }
   for (unsigned int i = 0; i < attrnum; i++) {
-    int atype;
+    hid_t atype;
     switch (attr[i].type) {
     case pwr_eType_Boolean:
       atype = H5T_STD_U32LE;
@@ -4062,6 +4063,8 @@ int sev_dbhdf5::create_objecttable(pwr_tStatus* sts, char* tablename,
       atype = H5T_IEEE_F64LE;
       break;
     case pwr_eType_String:
+    case pwr_eType_Time:
+    case pwr_eType_DeltaTime:
       atype = H5Tcopy(H5T_C_S1);
       hsts = H5Tset_size(atype, attr[i].size);
       break;
@@ -4073,6 +4076,8 @@ int sev_dbhdf5::create_objecttable(pwr_tStatus* sts, char* tablename,
 
     switch (attr[i].type) {
     case pwr_eType_String:
+    case pwr_eType_Time:
+    case pwr_eType_DeltaTime:
       hsts = H5Tclose(atype);
       break;
     default:;
@@ -4204,7 +4209,7 @@ int sev_dbhdf5::get_objectitem_datatype(
   }
   *value_offset = offs;
   for (size_t i = 0; i < m_items[item_idx].attr.size(); i++) {
-    int atype;
+    hid_t atype;
     switch (m_items[item_idx].attr[i].type) {
     case pwr_eType_Boolean:
       atype = H5T_STD_U32LE;
@@ -4240,6 +4245,8 @@ int sev_dbhdf5::get_objectitem_datatype(
       atype = H5T_IEEE_F64LE;
       break;
     case pwr_eType_String:
+    case pwr_eType_Time:
+    case pwr_eType_DeltaTime:
       atype = H5Tcopy(H5T_C_S1);
       hsts = H5Tset_size(atype, m_items[item_idx].attr[i].size);
       break;
@@ -4251,6 +4258,8 @@ int sev_dbhdf5::get_objectitem_datatype(
 
     switch (m_items[item_idx].attr[i].type) {
     case pwr_eType_String:
+    case pwr_eType_Time:
+    case pwr_eType_DeltaTime:
       hsts = H5Tclose(atype);
       break;
     default:;
@@ -4621,6 +4630,8 @@ int sev_dbhdf5::check_deadband(pwr_eType type, unsigned int size,
     break;
   case pwr_eType_String:
   case pwr_eType_Text:
+  case pwr_eType_Time:
+  case pwr_eType_DeltaTime:
     if (!memcmp(value, oldvalue, size)) {
       deadband_active = 1;
     }
@@ -4831,7 +4842,8 @@ int sev_dbhdf5::time_to_idx(hid_t dataset_id, hid_t memspace_id,
   if (idx >= size)
     idx = size - 1;
   get_time(dataset_id, memspace_id, dataspace_id, mtype, idx, &time);
-  printf("%d Search time : %d %d\n", idx, stime, time);
+  if (debug)
+    printf("%d Search time : %d %d\n", idx, stime, time);
   if (ABS((int)time - (int)stime) <= resolution) {
     *ridx = idx;
     return 1;
@@ -4847,6 +4859,10 @@ int sev_dbhdf5::time_to_idx(hid_t dataset_id, hid_t memspace_id,
       *ridx = idx;
       return 1;
     }
+  }
+  if (abs(high_idx - low_idx) <= 1) {
+    *ridx = idx;
+    return 1;
   }
 
   if (time < stime) {
