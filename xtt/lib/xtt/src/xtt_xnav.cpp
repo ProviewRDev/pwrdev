@@ -280,9 +280,9 @@ int XNav::attr_string_to_value(int type_id, char* value_str, void* buffer_ptr,
     break;
   }
   case pwr_eType_Float64: {
-    pwr_tFloat32 f;
-    pwr_tFloat64 d;
-    if (sscanf(value_str, "%f%s", &f, s) != 1) {
+    //pwr_tFloat32 f;
+    //pwr_tFloat64 d;
+    if (sscanf(value_str, "%lf%s", (double *)buffer_ptr, s) != 1) {
       char val[40];
       char* sp;
       strncpy(val, value_str, sizeof(val));
@@ -290,11 +290,11 @@ int XNav::attr_string_to_value(int type_id, char* value_str, void* buffer_ptr,
         return XNAV__INPUT_SYNTAX;
 
       *sp = '.';
-      if (sscanf(val, "%f%s", (float*)buffer_ptr, s) != 1)
+      if (sscanf(val, "%lf%s", (double*)buffer_ptr, s) != 1)
         return XNAV__INPUT_SYNTAX;
     }
-    d = f;
-    memcpy(buffer_ptr, (char*)&d, sizeof(d));
+    //d = f;
+    //memcpy(buffer_ptr, (char*)&d, sizeof(d));
 
     break;
   }
@@ -552,7 +552,7 @@ void XNav::attrvalue_to_string(int type_id, pwr_tTid tid, void* value_ptr,
           *len = snprintf(str, size, "%f", *(float*)value_ptr);
 	  break;
         default:
-          *len = snprintf(str, size, "%g", *(float*)value_ptr);
+          *len = snprintf(str, size, "%.7g", *(float*)value_ptr);
         }
       } else
         *len = snprintf(str, size, format, *(float*)value_ptr);
@@ -582,7 +582,7 @@ void XNav::attrvalue_to_string(int type_id, pwr_tTid tid, void* value_ptr,
 	*len = snprintf(str, size, "%F", *(double*)value_ptr);
 	break;
       default:
-        *len = snprintf(str, size, "%G", *(double*)value_ptr);
+        *len = snprintf(str, size, "%.17g", *(double*)value_ptr);
       }
     } else
       *len = snprintf(str, size, format, *(double*)value_ptr);
