@@ -988,10 +988,10 @@ int sev_dbms::create_table(pwr_tStatus* sts, char* tablename, pwr_eType type,
     }
   }
 
-  if (options & pwr_mSevOptionsMask_NoTimeIndex)
-    strcpy(timeindexstr, "");
-  else
-    strcpy(timeindexstr, ", index (time)");
+  //if (options & pwr_mSevOptionsMask_NoTimeIndex)
+  //  strcpy(timeindexstr, "");
+  //else
+  strcpy(timeindexstr, ", index (time)");
 
   if (options & pwr_mSevOptionsMask_ReadOptimized)
     sprintf(readoptstr, "id %s unsigned not null primary key auto_increment,",
@@ -1071,10 +1071,10 @@ int sev_dbms::create_event_table(
   else
     strcpy(readoptstr, "");
 
-  if (options & pwr_mSevOptionsMask_NoTimeIndex)
-    strcpy(timeindexstr, "");
-  else
-    strcpy(timeindexstr, ", index (time)");
+  //if (options & pwr_mSevOptionsMask_NoTimeIndex)
+  //  strcpy(timeindexstr, "");
+  //else
+  strcpy(timeindexstr, ", index (time)");
 
   sprintf(query,
       "create table %s ( %s"
@@ -2313,10 +2313,18 @@ int sev_dbms::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
   }
 
   // Column part
-  if (options & pwr_mSevOptionsMask_HighTimeResolution)
-    strcpy(column_part, "time,ntime,value");
-  else
-    strcpy(column_part, "time,value");
+  if (options & pwr_mSevOptionsMask_HighTimeResolution) {
+    if (options & pwr_mSevOptionsMask_FloatIdentity)
+      strcpy(column_part, "time,ntime,cast(value as decimal)");
+    else
+      strcpy(column_part, "time,ntime,value");
+  }
+  else {
+    if (options & pwr_mSevOptionsMask_FloatIdentity)
+      strcpy(column_part, "time,cast(value as decimal)");
+    else
+      strcpy(column_part, "time,value");
+  }
 
   // 'order by' part
   if (options & pwr_mSevOptionsMask_ReadOptimized)
@@ -3093,7 +3101,7 @@ char* sev_dbms::pwrtype_to_type(pwr_eType type, unsigned int size)
     strcpy(stype, "double");
     break;
   case pwr_eType_Float32:
-    strcpy(stype, "float");
+    strcpy(stype, "float(8)");
     break;
   case pwr_eType_Char:
     strcpy(stype, "char(1)");

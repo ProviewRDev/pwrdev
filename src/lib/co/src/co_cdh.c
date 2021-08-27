@@ -377,10 +377,10 @@ pwr_tStatus cdh_AttrValueToString(
       strcpy(String, "0");
     break;
   case pwr_eType_Float32:
-    snprintf(String, MaxSize, "%g", *(pwr_tFloat32*)Value);
+    snprintf(String, MaxSize, "%.7g", *(pwr_tFloat32*)Value);
     break;
   case pwr_eType_Float64:
-    snprintf(String, MaxSize, "%g", *(pwr_tFloat64*)Value);
+    snprintf(String, MaxSize, "%.17g", *(pwr_tFloat64*)Value);
     break;
   case pwr_eType_Char:
     if (*(pwr_tChar*)Value == 0)
