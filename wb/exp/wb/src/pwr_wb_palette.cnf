@@ -530,6 +530,7 @@ palette NavigatorPalette
     classvolume Remote Remote
     classvolume Opc Opc
     classvolume BaseComponent BaseComponent
+    classvolume Sev Sev
     classvolume Simul Simul
     classvolume Inor Inor
     classvolume OtherManufacturer OtherManufacturer
