@@ -2706,10 +2706,11 @@ pwr_tStatus lfu_SaveDirectoryVolume(
                   char tmp[240];
                   sprintf(tmp, "Error, Unable to open file \"%s\"\n", fname);
                   MsgWindow::message('E', tmp, msgw_ePop_Default);
-                  return LFU__NOFILE;
-                }
-                fprintf(optfile, "%s", str);
-                fclose(optfile);
+		  syntax_error = 1;
+                } else {
+		  fprintf(optfile, "%s", str);
+		  fclose(optfile);
+		}
 
                 if (secondary_nodename_ptr != null_nodename) {
                   if (os == pwr_mOpSys_CustomBuild)
@@ -2727,10 +2728,12 @@ pwr_tStatus lfu_SaveDirectoryVolume(
                     char tmp[240];
                     sprintf(tmp, "Error, Unable to open file \"%s\"\n", fname);
                     MsgWindow::message('E', tmp, msgw_ePop_Default);
-                    return LFU__NOFILE;
+		    syntax_error = 1;
                   }
-                  fprintf(optfile, "%s", str);
-                  fclose(optfile);
+		  else {
+		    fprintf(optfile, "%s", str);
+		    fclose(optfile);
+		  }
                 }
               }
               break;
