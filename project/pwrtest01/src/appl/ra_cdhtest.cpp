@@ -419,9 +419,19 @@ void ra_cdhtest::AttrValueToString(void)
       m_log->log('E', "AttrValueToString", d[i].str, m_sts);
       return;
     }
-    if (strcmp(str, d[i].str) != 0) {
-      m_log->log('E', "AttrValueToString", str);
-      return;
+    switch (d[i].type) {
+    case pwr_eType_Float32:
+    case pwr_eType_Float64:
+      if (strncmp(str, d[i].str, strlen(d[i].str) - 1) != 0) {
+	m_log->log('E', "AttrValueToString", str);
+	return;	
+      }
+      break;
+    default:
+      if (strcmp(str, d[i].str) != 0) {
+	m_log->log('E', "AttrValueToString", str);
+	return;	
+      }
     }
   }
 
@@ -1293,8 +1303,8 @@ int main()
   ra_cdhtest cdh;
   pwr_tStatus sts;
 
-  // setenv("TZ", "Europe/Stockholm", 1);
-  // tzset();
+  setenv("TZ", "Europe/Stockholm", 1);
+  tzset();
 
   sts = gdh_Init("ra_cdhtest");
   if (EVEN(sts)) {
