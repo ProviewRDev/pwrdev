@@ -376,12 +376,18 @@ pwr_tStatus cdh_AttrValueToString(
     else
       strcpy(String, "0");
     break;
-  case pwr_eType_Float32:
-    snprintf(String, MaxSize, "%.7g", *(pwr_tFloat32*)Value);
+  case pwr_eType_Float32: {
+    pwr_tFloat32 f;
+    memcpy(&f, Value, sizeof(f));
+    snprintf(String, MaxSize, "%.7g", f);
     break;
-  case pwr_eType_Float64:
-    snprintf(String, MaxSize, "%.17g", *(pwr_tFloat64*)Value);
+  }
+  case pwr_eType_Float64: {
+    pwr_tFloat64 f;
+    memcpy(&f, Value, sizeof(f));
+    snprintf(String, MaxSize, "%.17g", f);
     break;
+  }
   case pwr_eType_Char:
     if (*(pwr_tChar*)Value == 0)
       *String = '\0';
