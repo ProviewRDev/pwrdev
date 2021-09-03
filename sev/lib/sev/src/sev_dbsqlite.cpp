@@ -628,32 +628,38 @@ int sev_dbsqlite::store_value(pwr_tStatus* sts, void* thread, int item_idx,
       if (m_items[item_idx].deadband_active) {
         // Compare current value to old value
         switch (m_items[item_idx].attr[attr_idx].type) {
-        case pwr_eType_Float32:
+        case pwr_eType_Float32: {
+	  pwr_tFloat32 f;
+	  memcpy(&f, buf, sizeof(f));
           if ((feqf(m_items[item_idx].deadband, 0.0f)
-                  && !memcmp(buf, m_items[item_idx].old_value,
+                  && !memcmp(&buf, m_items[item_idx].old_value,
                          sizeof(pwr_tFloat32)))
-              || (ABS(*(pwr_tFloat32*)buf
+              || (ABS(f
                       - *(pwr_tFloat32*)m_items[item_idx].old_value)
                      < m_items[item_idx].deadband)) {
             update_time_only = 1;
           } else {
             m_items[item_idx].deadband_active = 0;
-            *(pwr_tFloat32*)m_items[item_idx].old_value = *(pwr_tFloat32*)buf;
+            *(pwr_tFloat32*)m_items[item_idx].old_value = f;
           }
           break;
-        case pwr_eType_Float64:
+	}
+	case pwr_eType_Float64: {
+	  pwr_tFloat64 f;
+	  memcpy(&f, buf, sizeof(f));
           if ((feqf(m_items[item_idx].deadband, 0.0f)
-                  && !memcmp(buf, m_items[item_idx].old_value,
+                  && !memcmp(&f, m_items[item_idx].old_value,
                          sizeof(pwr_tFloat64)))
-              || (ABS(*(pwr_tFloat64*)buf
+              || (ABS(f
                       - *(pwr_tFloat64*)m_items[item_idx].old_value)
                      < m_items[item_idx].deadband)) {
             update_time_only = 1;
           } else {
             m_items[item_idx].deadband_active = 0;
-            *(pwr_tFloat64*)m_items[item_idx].old_value = *(pwr_tFloat64*)buf;
+            *(pwr_tFloat64*)m_items[item_idx].old_value = f;
           }
           break;
+	}
         case pwr_eType_Int64:
           if ((feqf(m_items[item_idx].deadband, 0.0f)
                   && !memcmp(
@@ -775,30 +781,36 @@ int sev_dbsqlite::store_value(pwr_tStatus* sts, void* thread, int item_idx,
       } else {
         // Compare current value to old value
         switch (m_items[item_idx].attr[attr_idx].type) {
-        case pwr_eType_Float32:
+        case pwr_eType_Float32: {
+	  pwr_tFloat32 f;
+	  memcpy(&f, buf, sizeof(f));
           if ((feqf(m_items[item_idx].deadband, 0.0f)
-                  && !memcmp(buf, m_items[item_idx].old_value,
+                  && !memcmp(&f, m_items[item_idx].old_value,
                          sizeof(pwr_tFloat32)))
-              || (ABS(*(pwr_tFloat32*)buf
+              || (ABS(f
                       - *(pwr_tFloat32*)m_items[item_idx].old_value)
                      < m_items[item_idx].deadband)) {
             m_items[item_idx].deadband_active = 1;
             set_jump = 1;
           }
-          *(pwr_tFloat32*)m_items[item_idx].old_value = *(pwr_tFloat32*)buf;
+          *(pwr_tFloat32*)m_items[item_idx].old_value = f;
           break;
-        case pwr_eType_Float64:
+	}
+	case pwr_eType_Float64: {
+	  pwr_tFloat64 f;
+	  memcpy(&f, buf, sizeof(f));
           if ((feqf(m_items[item_idx].deadband, 0.0f)
-                  && !memcmp(buf, m_items[item_idx].old_value,
+                  && !memcmp(&f, m_items[item_idx].old_value,
                          sizeof(pwr_tFloat64)))
-              || (ABS(*(pwr_tFloat64*)buf
+              || (ABS(f
                       - *(pwr_tFloat64*)m_items[item_idx].old_value)
                      < m_items[item_idx].deadband)) {
             m_items[item_idx].deadband_active = 1;
             set_jump = 1;
           }
-          *(pwr_tFloat64*)m_items[item_idx].old_value = *(pwr_tFloat64*)buf;
+          *(pwr_tFloat64*)m_items[item_idx].old_value = f;
           break;
+	}
         case pwr_eType_Int64:
           if ((feqf(m_items[item_idx].deadband, 0.0f)
                   && !memcmp(
