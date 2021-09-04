@@ -1273,14 +1273,20 @@ int sev_dbms::store_value(pwr_tStatus* sts, void* thread, int item_idx,
     double dval;
     pwr_tBoolean bval;
     switch (m_items[item_idx].attr[0].type) {
-    case pwr_eType_Float32:
-      dval = *(pwr_tFloat32*)buf;
+    case pwr_eType_Float32: {
+      pwr_tFloat32 f;
+      memcpy(&f, buf, sizeof(f));
+      dval = f;
       value = &dval;
       break;
-    case pwr_eType_Float64:
-      dval = *(pwr_tFloat64*)buf;
+    }
+    case pwr_eType_Float64: {
+      pwr_tFloat64 f;
+      memcpy(&f, buf, sizeof(f));
+      dval = f;
       value = &dval;
       break;
+    }
     case pwr_eType_Int32:
       dval = *(pwr_tInt32*)buf;
       value = &dval;
