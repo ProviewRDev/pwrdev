@@ -21,9 +21,10 @@ echo "Common" >> $pwrp_load/ld_boot_"$nname"_0999.dat
 echo "plc_"$nname"_0999_plc" >> $pwrp_load/ld_boot_"$nname"_0999.dat
 echo "VolPwrDemo 0.254.254.200" >> $pwrp_load/ld_boot_"$nname"_0999.dat
 echo "$nname 0.254.254.200 127.0.0.1 0 0 0 0 600000 0.002000 0 0 - -" > $pwrp_load/ld_node_"$nname"_0999.dat
-echo "old plcfile $plcfile"
-echo "new plcfile $pwrp_exe/plc_"$nname"_0999_plc"
+#echo "old plcfile $plcfile"
+#echo "new plcfile $pwrp_exe/plc_"$nname"_0999_plc"
 mv $plcfile $pwrp_exe/"plc_"$nname"_0999_plc"
+echo "pwr_websocketserver, , noload, norun, , 5, debug, \"\"" > $pwrp_load/ld_appl_"$nname"_999.txt
 
 # Start project
 rt_ini&

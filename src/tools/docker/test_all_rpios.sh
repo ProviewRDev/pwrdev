@@ -5,25 +5,25 @@ release_name="rpi"
 buildversion="19-APR-2021 12:00:00"
 tz="Europe/Stockholm"
 build_rpi=0
-gitrepo="-b develp http://192.168.0.144/git/x5-7-2/pwr/.git"
+gitrepo="-b develop http://192.168.0.167/git/x5-7-2/pwr/.git"
 install_update="apt-get update"
 install_git="apt-get install -y git make"
 install_videodummy="apt-get install -y xserver-xorg-video-dummy"
 install_build="apt-get install -y libgtk2.0-dev doxygen gcc g++ make libasound2-dev \
 	libdb5.3-dev libdb5.3++-dev openjdk-11-jdk default-libmysqlclient-dev \
-	libsqlite3-dev libhdf5-openmpi-dev librabbitmq-dev libusb-1.0.0-dev librsvg2-dev \
-	libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev libpython3-dev python3 libcap-dev \
-	xfonts-100dpi"
+	libsqlite3-dev libhdf5-openmpi-dev librabbitmq-dev libmosquitto-dev libusb-1.0.0-dev \
+        librsvg2-dev libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev libpython3-dev \
+        python3 libcap-dev xfonts-100dpi"
 install_rpi=""
 install_sev="apt-get install -y default-mysql-server"
 install_pwr="apt-get install -y libgtk2.0-0 libasound2 \
 	libdb5.3 libdb5.3++ libsqlite3-0 librsvg2-2 g++  xterm libmariadb3 \
-	librabbitmq4 libusb-1.0-0 libhdf5-openmpi-103 librabbitmq4 \
+	librabbitmq4 libusb-1.0-0 libhdf5-openmpi-103 librabbitmq4 libmosquitto1 \
 	libgstreamer1.0-0 libgstreamer-plugins-base1.0-0 openjdk-11-jdk \
 	xterm xfonts-100dpi sudo procps libpython3-dev python3"
 install_pwrrt="apt-get install -y libgtk2.0-0 libasound2 \
 	libdb5.3 libdb5.3++ libsqlite3-0 librsvg2-2 g++ xterm libmariadb3 \
-	librabbitmq4 libusb-1.0-0 libhdf5-openmpi-103 \
+	librabbitmq4 libmosquitto1 libusb-1.0-0 libhdf5-openmpi-103 \
 	libgstreamer1.0-0 libgstreamer-plugins-base1.0-0 \
 	xterm xfonts-100dpi sudo procps python3 python3-pandas python3-seaborn \
 	python3-statsmodels python3-sklearn"
@@ -47,6 +47,24 @@ caps="--security-opt seccomp=unconfined \
       --cap-add SYS_BOOT \
       --cap-add NET_BIND_SERVICE \
       --cap-add SYS_NICE"
+
+if [ "$1" == "-h" ] || [ "$1" == "--help" ]; then
+  echo ""
+  echo "Build from repo: $gitrepo"
+  echo "Version:         $ver"
+  echo ""
+  echo "1:  Create build image"
+  echo "2:  Build ProviewR" 
+  echo "3:  Create pwrdev image" 
+  echo "4:  Create pwrrt image" 
+  echo "5:  Demo test"
+  echo "6:  pwrtest01c runtime test" 
+  echo "7:  pwrtest02 development test" 
+  echo "8:  pwrtest01a and pwrtest01b communication test" 
+  echo "9:  pwrtest01d sev mariadb test" 
+  echo "10: pwrtest01e volume clone and sqlite test" 
+  exit
+fi
 
 if [ "$1" == "" ]; then
   start=1
@@ -105,6 +123,7 @@ if [ $start -le 2 ] && [ $end -ge 2 ]; then
   docker container cp tmp:/pwr/rls/os_linux/hw_arm/bld/project/pwrtest01/bld/common/load/pwrp_pkg_pwrtest01b_0001.tgz ./data/
   docker container cp tmp:/pwr/rls/os_linux/hw_arm/bld/project/pwrtest01/bld/common/load/pwrp_pkg_pwrtest01c_0001.tgz ./data/
   docker container cp tmp:/pwr/rls/os_linux/hw_arm/bld/project/pwrtest01/bld/common/load/pwrp_pkg_pwrtest01d_0001.tgz ./data/
+  docker container cp tmp:/pwr/rls/os_linux/hw_arm/bld/project/pwrtest01/bld/common/load/pwrp_pkg_pwrtest01e_0001.tgz ./data/
   docker container cp tmp:/pwr/rls/os_linux/hw_arm/bld/project/pwrtest02/bld/common/load/pwrtest02.tar.gz ./data/
   docker container rm tmp
   docker image rm pwr:v1
@@ -227,8 +246,22 @@ if [ $start -le 9 ] && [ $end -ge 9 ]; then
     --build-arg INSTALL_SEV="$install_sev" \
     ./
   docker run $caps --name pwrtd pwrtest01d:v1
-  docker container cp pwrtd:/pwrp/common/log/sev.tlog ./log/
+  docker container cp pwrtd:/pwrp/common/log/sev_mariadb.tlog ./log/
 
   docker container rm pwrtd
 #  docker image rm pwrtest01d:v1
+fi
+
+# Runtime container pwrtest01e
+if [ $start -le 10 ] && [ $end -ge 10 ]; then
+  docker image build -t pwrtest01e:v1 -f pwrtest01/Dockerfile.pwrtest01e \
+    --build-arg RELEASE=$img_pwrrt \
+    --build-arg INSTALL_SEV="$install_sev" \
+    ./
+  docker run $caps --name pwrte pwrtest01e:v1
+  docker container cp pwrte:/pwrp/common/log/sev_sqlite.tlog ./log/
+  docker container cp pwrte:/pwrp/common/log/sev_hdf5.tlog ./log/
+
+  docker container rm pwrte
+  docker image rm pwrtest01e:v1
 fi

@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+export DISPLAY=:99
+
 cd pwr
 root=`eval pwd`
 

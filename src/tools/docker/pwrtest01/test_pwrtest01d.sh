@@ -7,6 +7,8 @@ Xorg -noreset +extension GLX +extension RANDR +extension RENDER -config ./dummy_
 ps aux
 p=`pidof mysql`
 if [ "$p" == "" ]; then
+  mkdir /run/mysqld
+  chmod a+w /run/mysqld
   chown mysql:mysql /usr/sbin/mysqld
   chmod u+s /usr/sbin/mysqld
   ls -l /usr/sbin/mysqld
