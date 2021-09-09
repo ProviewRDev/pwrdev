@@ -269,6 +269,12 @@ void mode_exec(plc_sThread* tp, pwr_sClass_mode* object)
     /* Test if Force in manual mode */
     if (object->Forc1)
       object->ForcVal = object->XForcVal;
+    else {
+      if (object->ForcVal < object->MinOut)
+	object->ForcVal = object->MinOut;
+      else if (object->ForcVal > object->MaxOut)
+	object->ForcVal = object->MaxOut;
+    }
   } else
   /* Not Manual Mode */
   {

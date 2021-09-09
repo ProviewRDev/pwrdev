@@ -168,6 +168,12 @@ void CompModePID_Fo_exec(plc_sThread* tp, pwr_sClass_CompModePID_Fo* o)
     /* Test if Force in manual mode */
     if (co->Forc1)
       co->ForcVal = co->XForcVal;
+    else {
+      if (co->ForcVal < co->MinOut)
+	co->ForcVal = co->MinOut;
+      else if (co->ForcVal > co->MaxOut)
+	co->ForcVal = co->MaxOut;
+    }
   } else {
     /* Not Manual Mode */
     if (co->OpMod == 2) {
