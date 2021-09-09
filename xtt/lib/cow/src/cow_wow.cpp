@@ -45,6 +45,7 @@ bool CoWow::m_autoremove = false;
 bool CoWow::m_printdialog_disable = false;
 char CoWow::m_default_printer[80] = "";
 void* CoWow::m_transient_wid = 0;
+wow_eIconType CoWow::m_icon_type = wow_eIconType_Rt;
 
 CoWowTimer::CoWowTimer()
 {
@@ -323,4 +324,9 @@ void CoWow::SetAutoRemove(bool on)
 void CoWow::SetTransient(void* transient_wid)
 {
   m_transient_wid = transient_wid;
+}
+
+void CoWow::SetIconType(wow_eIconType type)
+{
+  m_icon_type = type;
 }

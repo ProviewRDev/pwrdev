@@ -943,6 +943,8 @@ Xtt::Xtt(int* argc, char** argv[], int* return_sts)
       CoWow::SetDefaultPrinter(opp->Printer);
   }
 
+  CoWow::SetIconType(wow_eIconType_Rt);
+
   if (quiet)
     CoWow::HideWarranty();
 

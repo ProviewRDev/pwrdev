@@ -72,6 +72,10 @@ typedef enum {
 } wow_eMotalDialogReturn;
 
 typedef enum { wow_ePixmap_No, wow_ePixmap_Graph, wow_ePixmap__ } wow_ePixmap;
+typedef enum {
+  wow_eIconType_Rt,
+  wow_eIconType_Wb
+} wow_eIconType;
 
 typedef struct {
   char input_str[200];
@@ -116,6 +120,7 @@ protected:
   static bool m_printdialog_disable;
   static char m_default_printer[80];
   static void* m_transient_wid;
+  static wow_eIconType m_icon_type;
 
 public:
   CoWow();
@@ -168,6 +173,7 @@ public:
   static bool PrintDialogIsDisabled();
   static void SetAutoRemove(bool on);
   static void SetTransient(void* transient_wid);
+  static void SetIconType(wow_eIconType type);
 };
 
 #endif

@@ -85,6 +85,7 @@ Usage: wb [-a][-q][-s][-c][-p] [-l language] [username] [password] [volume]\n\
 
 Wb::Wb() : announce(0), appl_count(0)
 {
+  CoWow::SetIconType(wow_eIconType_Wb);
 }
 
 Wb::~Wb()

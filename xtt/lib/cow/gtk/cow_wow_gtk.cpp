@@ -1168,7 +1168,13 @@ void CoWowGtk::SetWindowIcon(GtkWidget* w)
   static GdkPixbuf* icon = 0;
 
   if (!icon) {
-    dcli_translate_filename(fname, "$pwr_exe/pwr_icon16.png");
+    switch (m_icon_type) {
+    case wow_eIconType_Rt:
+      dcli_translate_filename(fname, "$pwr_exe/pwr_icon16y.png");
+      break;
+    default:
+      dcli_translate_filename(fname, "$pwr_exe/pwr_icon16.png");
+    }
     icon = gdk_pixbuf_new_from_file(fname, 0);
   }
   gtk_window_set_icon(GTK_WINDOW(w), icon);
