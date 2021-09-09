@@ -1,0 +1,995 @@
+
+<topic> __DocumentTitlePage
+
+<image> pwr_logga_doc.png
+<h1> Processhistorik
+
+
+
+
+
+<hr>
+Version 5.8.0	
+<hr>
+</topic>
+
+<topic> __DocumentInfoPage
+
+
+Copyright (C) 2005-2021 SSAB EMEA AB
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, no Front-Cover Texts, and no Back-Cover
+Texts.
+
+
+
+</topic>
+
+<option> printdisable
+<topic> index
+Processhistorik
+
+<image> pwr_logga.gif
+
+Process data <link> sev_processdata
+Konfigurering <link> sev_configuration
+Intern datastruktur <link> sev_internal
+Databaser <link>sev_databases
+Utvinna data <link> sev_extractdata
+Multivariat analysator <link> sev_ma
+Larm och händelseanalysator <link> sev_eva
+</topic>
+<option> printenable 
+
+<chapter>
+<topic> sev_introduction
+Inleding
+
+En allt viktigare del av automationssystemens uppgift är att lagra processdata. Möjligheten
+att lagra stora mängder data har gett upphov till en rad ny funktionalitet gällande
+utveckling och optimering av processer, prediktivt underhåll, framtagning av modeller för
+simulering etc.
+
+Det här dokumentet beskriver lagring av process-historik i ProviewR och hur denna
+ konfigureras.
+</topic>
+</chapter>
+
+<chapter>
+<topic> sev_processdata
+Process data
+
+Historik lagring av processdata innebär att signaler och andra data cykliskt lagras i en 
+databas, och därifrån kan hämtas upp för att visas i kurvor eller analyseras i andra 
+sammanhang, t ex för prediktivt underhåll eller processutveckling.
+
+Lagringen konfigureras med objekten SevHist och SevHistObject. SevHist konfigurerar lagring
+av ett attribut, och SevHistObject av ett helt objekt. I SevHist-objekten ställer man in 
+hur ofta värdet ska lagras och hur länge det ska sparas i databasen. 
+
+Lagringen hanteras av två processer, en klient-process, rt_sevhistmon, som samlar ihop data
+och  skickar iväg till en server-process, sev_server, som tar emot data och lagrar det i 
+databasen. Klient-processen kan skicka data till flera olika server-processer, och 
+server-processen kan ta emot data från flera olika klient-processer. Klient och server-
+processen kan gå på samma nod eller i olika noder. För test och felsökning kan man starta
+en server-process på en process station som lagrar data från den egna noden. För större
+datamängder med lagring över flera år, skapar man lämpligen en dedikerad lagringsstation
+som lagrar data från flera noder.
+
+<option> printdisable
+Klient <link> sev_client
+Server <link> sev_server
+<option> printenable
+</topic>
+
+<topic> sev_client
+Klient
+rt_sevhistmon är klient-processen som samlar ihop process-värden i en node och skickar till
+servern. Den konfigureras med ett SevHistMonitor objekt i nodhierarkin. Under SevHistMonitor-
+objektet lägger man SevHistThread-objekt, som innehåller cykeltid och server nod. Varje
+SevHist och SevHistObject-objekt kopplas till ett tråd-objekt och kommer därmed
+att lagras på den nod, och med den cykeltid, som anges i tråd-objektet.  
+
+Tråd-objektet innehåller även ett ServerThread attribut, med vilket man kan rikta lagringen
+till en specifik tråd i server-processen. Detta kan användas för att fördela lasten mellan
+olika trådar i server-processen.
+</topic>
+
+<topic> sev_server
+Server
+
+Server-processen, sev_server, tar emot data från klient-processer och lagrar dem i databasen. 
+Finns inte databasen skapar den databasen med de tabeller som behövs. Sedan sker det en 
+handskadning med klient-processerna som skickar över data på de attribut och objekt som
+ska lagras. Sedan startar den cykliska överföringen av process data från klient-processerna
+som lagras i databasen.
+
+Server-processen kan även svara på förfrågan om data för ett attribut i ett specifikt 
+tidsintervall. 
+
+Data kan lagras i olika typer av databaser, MariaDB (ellerMySQL), Sqlite och HDF5.
+
+<h2>MariaDB/MySQL
+MariaDB är en klon av MySQL som skapades när MySQL övertogs av Oracle. De ska var kompatibla
+och kan bytas ut mot varandra. I senare Linux releaser är ofta MariaDB installerat. Många
+konfigureringsalternativ i ProivewR är fortfarande namnade MySQL men ska även användas för
+MariaDB.
+
+MariaDB bör användas för större databaser och för databaser för permanent lagring. 
+
+<h2>Sqlite
+Sqlite är en liten, snabb databas som inte kräver installation av en server. Kan användas
+för mindre databaser för test och felsökning.
+
+<h2>HDF5
+HDF5 är ett filformat för att lagra stora mängder data. Avsaknad av journalering gör att
+det inte bör användas för permanent lagring.
+
+<h2>Larm och händelser
+Lagring av larm och händelser görs med ett SevHistEvent-objekt. Objektet innehåller en
+SelectList där man anger hierarkier för larm som ska lagras. 
+</topic>
+</chapter>
+
+<chapter>
+<topic> sev_configuration
+Konfigurering
+Lagringen konfigureras av SevHist och SevHistObject objekt för varje attribut eller objekt
+som ska lagras. Vidare konfigureras klient-processen med SevHistMonitor och SevHistThread
+objekt och server-processen med ett SevServer objekt.
+
+<option> printdisable
+SevHist <link> sev_sevhist
+SevHistObject <link> sev_sevhistobject
+Servertrådar <link> sev_serverthreads
+Dödband <link> sev_deadband
+Dödband med linjär regression <link> sev_linreg
+Händelsestyrd loggning <link> sev_event
+Medelvärdesberäkning <link> sev_meanvalue
+Item-träd <link> sev_itemtree
+Montering av item-trädet <link> sev_mount
+Referera data i item-trädet <link> sev_ref
+Plcprogrammering <link> sev_plc
+Export <link> sev_export
+<option> printenable
+</topic>
+
+<headerlevel>
+<topic> sev_sevhist
+SevHist
+Attribut som ska lagras i den historiska databasen konfigureras med SevHist objekt. 
+SevHist objekten placeras i en rot eller sub volym, och attributet anges i Attribute i 
+SevHist objektet. SevHist objektet läggs normalt under det objekt som ska lagras. Om 
+objektet har ett ActualValue attribut, läggs detta automatiskt in i SevHist objektet.
+
+<image> dg_fig111.png
+<b>Fig Konfigurering i en rootvolym med SevHist, DsHistMonitor och SevHistThread objekt
+</topic>
+
+<topic> sev_sevhistobject
+SevHistObject
+Till skillnad från SevHist, som lagar ett enskilt attribut, lagrar SevHistObject samtliga
+attribut i ett objekt i en tabell. Det rekommenderas att man skapar en specifik klass för
+ändamålet, eftersom existerande klasser ofta innehåller attribut som ej behöver lagras.
+</topic>
+
+<topic> sev_serverthreads
+Server-trådar
+Genom att konfiguera trådning av serverprocessen kan man avsevärt öka prestanda då
+lasten fördelas på flera olika trådar. 
+
+Trådning är implementerat förMariaDB/mySQL.
+
+Trådarna konfigureras i klienten genom att ange trådnummer i SevHistThread-objekten. 
+En tråd kan numreras med ett godtyckligt positivt nummer, och alla SevHistThread-objekt 
+med samma trådnummer kommer att hanteras av samma tråd. I SevServer objektsbild 
+kan man se belastningen för de olika servertrådarna, och genom att ändra trådnummer i 
+SevHistThread-objekten se till att ingen servertråd blir överbelastad.
+
+Servertrådar måste även konfigureras för server-processen genom att sätta attributet 
+UseServerThreads i SevServer-objektet till 1.
+
+<image> mansev_fig1.png
+<b>Fig Konfigurering av trådnummer i SevHistThread-objektet.
+
+<image> mansev_fig2.png
+<b>Fig Objektsbild för SevServer objektet som visar servertrådar.
+</topic>
+
+<topic> sev_deadband
+Dödband
+Dödband kan konfigureras på analoga, digitala och heltals-signaler och innebär att det 
+krävs en viss ändring av värdet för att ett nytt värde ska lagras i databasen. Genom att 
+sätta ett dödband kan diskutrymmet som krävs för att lagra en signal reduceras avsevärt.
+
+Dödband konfigureras genom att sätta Deadband och ReadOptimized i Options för SevHist 
+objektet, och ange storleken på dödbandet i Deadband.
+
+<image> mansev_fig5.png
+<b>Fig Konfiguration av dödband
+
+För dödband på digital signal, sätt Deadband till 0.5.
+
+<image>mansev_fig7.png
+<b>Fig Konfiguration av dödband på digital signal
+</topic>
+
+<topic> sev_linreg
+Dödband med linjär regression
+Det här är ett tvådimensionellt dödband som även fungerar på ramper. 
+Med linjär regression beräknas en rät linje från senast lagrade värde, och så länge inget
+nytt värde avviker mer än dödbandet från linjen lagras inget nytt värde. Det här reducerar
+ytterligare det diskutrymme som krävs.
+
+<image> mansev_fig3.png
+<b>Fig Dödband med linjär regression
+
+Dödband med linjär regression konfigureras genom att Deadband, DeadbandLinearRegr och 
+ReadOptimised sätts i Options i SevHist objektet, och storleken på dödbandet anges i 
+Deadband.
+
+<image> mansev_fig4.png
+<b>Fig Konfiguration av dödband med linjär regression
+</topic>
+
+<topic> sev_event
+Händelsestyrd logging
+Genom att sätta Event i Option i SevHist objektet, kan man styra när lagringen sker. När
+Trigger i SevHist objektet sätts till 1 skickas aktuellt värde till server processen, 
+Trigger tas ned när värdet är skickat.
+
+<image> mansev_fig6.png
+<b>Fig Konfigurering av händelsestyrd lagring
+</topic>
+
+<topic>sev_meanvalue
+Medelvärdesberäkning av lagrade signaler
+Man kan ange att server-processen ska utföra en medelvärdesberäkning en lagrad signal genom
+att sätta MeanValue1 eller MeanValue2 i Options i SevHist-objektet.
+
+Servern gör medelvärdesberäkning med två olika tider som anges i SevServer-objektet, 
+attributen MeanValueInterval1 och MeanValueInterval2, och i Options väljer man med  vilken 
+av de här tiderna beräkningen ska utföras.
+
+Medelvärdet visas i item-trädet, och kan därifrån refereras från Ge grafer och applikationer
+med suffixet '.__MeanValue', t ex 'pwrNode-sev-H1-Av1.ActualValue.__MeanValue'.
+</topic>
+
+<topic> sev_itemtree
+Item-träd
+Varje lagrad signal i serverns representeras av ett item. Alla item visas i ett item-träd
+som läggs under pwrNode-sev i realtidsdatabasen. I item-trädet visas signalerna i dess
+ursprungliga hierarki, och här visas även det sista mottagna värdet. Man kan visa mer
+information om ett item med Shift+Klick på värdet, eller Shift+Pil höger på tangenbordet.
+
+<image> mansev_fig8.png
+<b>Fig Ett item i item-trädet
+</topic>
+
+<topic> sev_mount
+Montering av item-trädet
+Itemträdet byggs upp av objekt av typen $Block och $BlockAttribute för att i någon mån
+återskapa den ursprungliga hierarkin och objektsstrukturen. Genom att montera hierakierna
+under pwrNode-sev på top-nivån kan man återskapa den ursprungliga objekt- och attributnamnen
+och använda dessa vid referenser i grafer och applikationer.
+
+Monteringen görs med monteringsobjekt av typen $MountDynObject eftersom det är dynamiska
+objekt som monteras.
+
+När monteringen är gjord, kan signaler refereras med sitt ursprungliga namn. Det gör det
+enklare att referera till signalerna i grafer och applikationer.
+
+<image> mansev_fig15.png
+<b>Fig Montering av hierarki i itemträdet
+</topic>
+
+<topic> sev_ref
+Referera data i item-trädet
+Data i ett item kan refereras med suffixet '.__'dataname'', dvs medelvärdet för Av1 ovan
+kan refereras med
+
+pwrNode-sev-H1-Av1.ActualValue.__MeanValue
+
+Om det finns en montering på H1 kan pwrNode-sev strykas och referensen görs med
+
+H1-Av1.ActualValue.__MeanValue
+
+Man kan hämta värdet och lägga upp prenumerationer från c++ och Python kod. I Ge grafer
+lägger men på typen som suffix
+
+H1-Av1.ActualValue.__MeanValue##Float32
+
+Exempel på andra värden som kan refereras
+
+H1-Av1.ActualValue <t><t>Senast mottagna värde.
+H1-Av1.ActualValue.__TableName <t><t>Namn på tabell där historiken lagras.
+H1-Av1.ActualValue.__StandardDeviation <t><t>Standardavvikelse vid medelvärdesberäkningen.
+H1-Av1.ActualValue.__LastTime <t><t>Tid för senast mottagna värde.
+</topic>
+
+<topic> sev_plc
+Plcprogrammering
+Itemdata kan även hämtas upp i plc-programmet. Eftersom data ligger i dynamiska
+objekt måste man använda GetExt-objekt, t ex GetExtFloat32, GetExtBoolean etc.
+
+I exemplet nedan adderas momentanvärdet för  H1-Av1.ActualValue och medelvärdet för
+H1-Av2.ActualValue och läggs i H3-Av3 som är ett lokalt objekt i server-noden.
+
+<image> mansev_fig13.png
+<b>Fig Plc kod med item data
+</topic>
+
+<topic> sev_export
+Sev export
+Sev export gör det möjligt att exportera data till sev servern som inte behöver lagras i
+historik-databasen, men som ändå ska vara tillgängliga för att presenteras i bilder och 
+rapporter.
+
+Exporten konfigureras med SevExport objekt. Ett SevExport objekt exporterar ett attribut.
+Liksom för SevHist objekten är det rt_sevhistmon som samlar ihop attributen och
+skickar dem vidare till server noden. I det här fallet är mottagarprocessen sev_import
+som konfigureras med ett SevImportServer objekt i sev server noden. sev_import lägger in 
+värdet i item-trädet varifrån det kan visas upp i bilder eller användas i plc-programmet.
+
+<image> mansev_fig14.png
+<b>Fig Konfigurering av export med SevExport
+
+<h2>Medelvärdesberäkning
+Även för exporterade attribut kan man konfigurera en medelvärdesberäkning genom att sätta
+MeanValue1 eller MeanValue2 i Options i SevExport-objektet.
+
+Servern gör medelvärdesberäkning med två olika tider som anges i SevImportServer-objektet,
+attributen MeanValueInterval1 och MeanValueInterval2, och i Options väljer man med 
+vilken av de här tiderna beräkningen ska utföras.
+
+Medelvärdet visas i item-trädet, och kan därifrån refereras från Ge grafer och 
+applikationer med suffixet '.__MeanValue', t ex
+'pwrNode-sev-H2-Av2.ActualValue.__MeanValue'.
+
+<h2>Händelsestyrd export
+Genom att sätta Event i Options SevExport objektet kan man styra när exporten av värdet 
+sker. Överföringen görs när Trigger i SevExport objektet sätts till 1. Trigger tas ner
+automatiskt när överföringen har utförts.
+</topic>
+</chapter>
+
+<chapter>
+<topic> sev_internal
+Databasens interna struktur
+Databasen namnges 'pwrp__'systemnamn'', och innehåller tabellerna 'items', 'objectitems',
+'objectitemattributes', 'sev_stat' och 'sev_version'. Dessutom finns en tabell för varje
+attribut eller objekt som lagras.
+
+<h2>items
+Items tabellen innehåller information från alla SevHist och SevHistEvent som lagras.  
+
+<b>Namn <t>Typ <t>Beskrivning
+id <t>integer <t>Identitet.
+tablename <t>varchar <t>Namn på tabell med historisk data.
+vid <t>integer <t>Volymsidentitet för lagrat objekt.
+oix <t>integer <t>Objektindex för lagrat objekt.
+oname <t>string <t>Objektsnamn.
+aname <t>string <t>Attributnamn. Om ett SevHistEvent item 'Events'.
+uptime <t>datetime <t>Starttid.
+cretime <t>datetime <t>Skapande tid för item.
+storagetime <t>integer <t>Tid efter vilken data kan raderas i sekunder.
+deadband <t>float <t>Dödband.
+options <t>integer <t>Options.
+scantime <t>float <t>Scantid.
+description <t>string <t>Beskrivning av lagrat objekt.
+vtype <t>integer <t>Attributtyp.
+vsize <t>integer <t>Attributets storlek i bytes.
+unit <t>string <t>Attributets enhet
+
+<h2>objectitems
+Objectitems-tabellen innehåller information från alla SevHistObject som lagras.
+
+<b>Namn <t>Typ <t>Beskrivning
+id <t>integer <t>Identitet.
+tablename <t>varchar <t>Namn på tabell med historisk data.
+vid <t>integer <t>Volymsidentitet för lagrat objekt.
+oix <t>integer <t>Objektindex för lagrat objekt.
+oname <t>string <t>Objektsnamn.
+aname <t>string <t>Används ej.
+uptime <t>datetime <t>Starttid.
+cretime <t>datetime <t>Skapande tid för item.
+storagetime <t>integer <t>Tid efter vilken data kan raderas i sekunder.
+deadband <t>float <t>Dödband.
+options <t>integer <t>Options.
+scantime <t>float <t>Scantid.
+description <t>string <t>Beskrivning av lagrat objekt.
+
+<h2>objectitemattributes
+För att få en fullständig beskrivning av SevHistObject, krävs förutom innehållet i
+objectitems, information om de attribut som varje objekt innehåller. Infomationen
+lagras i objectitemattributes tabellen med en rad för varje attribut.
+
+<b>Namn <t>Typ <t>Beskrivning
+tablename <t>varchar <t>Namn på tabell med historisk data.
+attributename <t>string <t>Attributnamn.
+attributeidx <t>integer <t>Attributindex.
+attributetype <t>integer <t>Attributtyp.
+attributesize <t>integer <t>Attributets storlek i bytes.
+
+<h2>Historiktabeller för enskilda attribut
+Tabeller för lagring av processvärden konfigurerade med SevHist-objekt.
+
+<b>Namn <t>Typ <t>Beskrivning
+id <t>integer <t>Identitet.
+time <t>datetime or integer <t>Tidpunkt.
+ntime <t>integer <t>Nanosekunder om hög tidsupplösning är konfigurerad.
+value <t>godtycklig typ <t>Processvärde.
+
+<h2>Historiktabeller för hela objekt
+Tabeller för lagring av processvärden för hela objekt konfigurerade med 
+SevHistObject-objekt.
+
+<b>Namn <t>Typ <t>Beskrivning
+sev__id <t>integer <t>Identitet.
+sev__time <t>datetime or integer <t>Tidpunkt.
+sev__ntime <t>integer <t>Nanosekunder om hög tidsupplösning är konfigurerad.
+'attributenamn1' <t>godtycklig typ <t>Processvärde för första attributet i objektet.
+'attributenamn2' <t>godtycklig typ <t>Processvärde för andra attributet i objektet.
+...
+
+<h2>Historiktabeller för larm och händelser
+Tabeller för lagring av händelser konfigureras med ett SevHistEvent-objekt.
+
+<b>Namn <t>Typ <t>Beskrivning
+time <t>integer <t>Tid.
+ntime <t>integer <t>Nanosekundder.
+eventtype <t>integer <t>Eventtyp.
+eventprio <t>integer <t>Eventprioritet.
+eventid_nix <t>integer <t>Event identitet, nix.
+eventid_birthtime <t>integer <t>Event identitet, birthtime.
+eventid_idx <t>integer <t>Event identitet, idx.
+supobject_vid <t>integer <t>Attrref för övervakningsobjektet, vid.
+supobject_oix <t>integer <t>Attrref för övervakningsobjektet, oix.
+supobject_offset <t>integer <t>Attrref för övervakningsobjektet, offset.
+supobject_size <t>integer <t>Attrref för övervakningsobjeketet, size.
+eventtext <t>varchar <t>Eventtext.
+eventname <t>varchar <t>Eventnamn.
+eventstatus <t>integer <t>Eventstatus.
+
+<h2>sev_stat
+sev_stat innehåller statistik. Numera finns denna information även i SevServer-objektet.
+
+<b>Namn <t>Typ <t>Beskrivning
+current_load <t> float<t> Momentanvärde av belastingen i procent.
+medium_load <t> float<t> Medelvärde av belastningen i procent.
+storage_rate <t> float<t> Antal lagrade item per sekund.
+medium_storage_rate <t> float<t>Medelvärde för antal lagrade item.
+datastorage_msg_cnt <t> integer<t>Antal lagrings-meddelanden sedan startup.
+dataget_msg_cnt <t> integer<t>Antal förfrågningar om historisk data sedan startup.
+items_msg_cnt <t> integer<t>Antal meddelanden för items.
+eventstore_msg_cnt <t> integer<t>Antal lagrings-meddelanden för larm och händelser.
+
+<h2>sev_version
+Innehåller aktuell version av sev-databasen. Sev versionen räknas upp när databas-strukturen
+ändras och följer inte versionen för ProviewR utgåvor.
+
+version <t>integer <t>Aktuell version.
+</topic>
+</chapter>
+
+<chapter>
+<topic> sev_databases
+Databaser
+Den mest använda databasen är MariaDb, men det finns även stöd för Sqlite och HDF5.
+
+<option> printdisable
+MariaDB <link> sev_mariadb
+Sqlite <link> sev_sqlite
+HDF5 <link> sev_hdf5
+<option> printenable
+</topic>
+
+<headerlevel>
+<topic> sev_mariadb
+MariaDB/MySQL
+MariaDB är det databas som är mest använd i ProviewR. Den har också full funktionalitet
+när det gäller dödband och server-trådar.
+
+Konfigureringen sker genom att sätta Database till MySQL i SevServer-objektet. Dessutom
+krävs att man installerar och startar mariadb-server i server-noden. Man måste också
+skapa användaren pwrp
+
+För MariaDB
+
+<c>mysql
+<c>MariaDB> create user pwrp@localhost;
+<c>MariaDB> grant all privileges on *.* to pwrp@localhost;
+
+För MySQL
+
+<c>mysql
+mysql> grant all privileges on *.* to pwrp@localhost;
+
+Den rekommenderade databas-motorn InnoDB är default i senare versioner och ska
+användas.
+
+För små databaser kan man använda standard-konfigurationen av MariaDB, men för dedicerade 
+databas-noder finns det några inställningar som bör göras i filen /etc/mysql/my.cnf
+
+<b>innodb_file_per_table
+Ur underhållssynpunkt är det en fördel att ha varje tabell i en separat fil. Man kan då 
+återfå diskutrymme för borttagna signaler.
+
+<b>innodb_log_file_size
+Transaktioner skrivs först i log-filer, innan de förs in i data-filerna. Med större 
+log-filer kan skrivningen i data-filerna optimeras genom att göras sekventiellt, å andra
+sidan tar en recovery av databasen längre tid. Storleken på log-filerna behöver normalt
+utökas från default-värdet.
+
+<b>innodb_buffer_pool_size
+Minne som inte används av operativsystemet, applikationer eller MariaDB bör allokeras
+till buffer poolen. Säg att vi har 16 Gb minne, 2 Gb används av operativsystemet, 
+innodb_log_file_size är 0.5 Gb som det bör finnas utrymme för i cachen, ProviewR tar
+0.5 Gb, lämna 1 Gb till övrigt så återstår 12 Gb som kan konfigureras för 
+innodb_buffer_pool_size.
+
+<b>query_cache_type och query_cache_size
+Tabellerna förändras kontinuerligt så det finns ingen anledning att cache resultatet av
+förfrågningar. Sätt dessa till 0.
+
+<h2>Exempel på konfigurationsfil
+
+<c>[mysqld]
+<c>innodb_log_file_size    = 512M
+<c>innodb_buffer_pool_size = 12G
+<c>innodb_file_per_table   = 1
+<c>innodb_flush_method     = O_DIRECT
+<c>query_cache_type        = 0
+<c>query_cacne_size        = 0
+
+<h1>Underhåll och felsökning
+Med 'mysql' kan databasen inspekteras och modifieras. Namnet på databasen är
+'pwrp__'systemname'', t ex 'pwrp__test57'. Här är ett exempel på hur man kan titta på
+items-tabellen och på data för ett enskilt item.
+
+<c>> mysql
+<c>MariaDB> use pwrp__test57;
+
+<c>MariaDB> select oname,tablename from items;
+<c>+-----------------------------+-------------------------------+
+<c>| oname                       | tablename                     |
+<c>+-----------------------------+-------------------------------+
+<c>| VolTest57:H5-Av1            | O000_100_100_001_000000ab__1  |
+<c>| VolTest57:H5-Dv1            | O000_100_100_001_000000b7__2  |
+<c>| VolTest57:H5-Dv2            | O000_100_100_001_000000be__3  |
+<c>| VolTest57:H1-Av1            | O000_100_100_001_00000018__4  |
+<c>| VolTest57:H1-Av2            | O000_100_100_001_0000002e__5  |
+<c>| VolTest57:H1-Av3ÅÄÖ         | O000_100_100_001_0000009f__6  |
+<c>| VolTest57:H1-Dv1            | O000_100_100_001_00000056__7  |
+<c>| VolTest57:H1-Iv1            | O000_100_100_001_0000005d__8  |
+<c>| VolTest57:H1-Iv2            | O000_100_100_001_0000005e__9  |
+<c>| VolTest57:H1-Av4            | O000_100_100_001_0000013d__10 |
+<c>| VolTest57:H18-SevHistEvents | O000_100_100_001_00000ef3__11 |
+<c>| VolTest57:H1-Av5            | O000_100_100_001_00000f96__12 |
+<c>+-----------------------------+-------------------------------+
+
+<c>MariaDB> select time,value from O000_100_100_001_00000018__4 order by id desc limit 10;
+<c>+---------------------+----------+
+<c>| time                | value    |
+<c>+---------------------+----------+
+<c>| 2021-07-14 14:21:32 |  83.7721 |
+<c>| 2021-07-14 14:21:26 |  97.9997 |
+<c>| 2021-07-14 14:21:22 |  99.8689 |
+<c>| 2021-07-14 14:21:18 |  95.4521 |
+<c>| 2021-07-14 14:21:13 |   81.552 |
+<c>| 2021-07-14 14:21:07 |  54.4918 |
+<c>| 2021-07-14 14:20:50 | -47.3081 |
+<c>| 2021-07-14 14:20:42 | -83.9247 |
+<c>| 2021-07-14 14:20:36 | -98.0545 |
+<c>| 2021-07-14 14:20:32 | -99.8544 |
+<c>| 2021-07-14 14:20:28 | -95.3687 |
+<c>| 2021-07-14 14:20:23 | -81.3886 |
+<c>| 2021-07-14 14:20:17 | -54.2567 |
+<c>| 2021-07-14 14:20:02 |  36.1479 |
+<c>| 2021-07-14 14:19:53 |  80.5102 |
+<c>| 2021-07-14 14:19:47 |  96.7008 |
+<c>| 2021-07-14 14:19:43 |  99.9982 |
+<c>| 2021-07-14 14:19:42 |  99.8383 |
+<c>| 2021-07-14 14:19:38 |  95.2808 |
+<c>| 2021-07-14 14:19:33 |  81.2193 |
+<c>+---------------------+----------+
+</topic>
+
+<topic> sev_sqlite
+Sqlite
+Sqlite kräver inte installation av någon ytterligare serverprocess. Däremot är funktionen
+begränsad. Stöd för server trådar och dödband med linjär regression saknas.
+
+Sqlite konfigureras genom att sätta Database i SevServer-objektet till Sqlite.
+
+Databas-filen läggs på $pwrp_db med namnet pwrp__'systemname'.dbsqlite, t ex 
+pwrp__test57.dbsqlite.
+
+<b>Underhåll och felsökning
+Databasen kan undersökas med 'sqlite3'.
+
+<c>> sqlite3 $pwrp_db/pwrp___test57.dbsqlite
+<c>sqlite> select oname,tablename from items;
+<c>VolTest57:H1-Av1|O000_001_001_002_0000004a__0
+<c>VolTest57:H1-Av2|O000_001_001_002_0000004c__2
+<c>VolTest57:H1-Av3|O000_001_001_002_0000004e__3
+<c>VolTest57:H1-Av4|O000_001_001_002_00000050__4
+<c>VolTest57:H1-Dv1|O000_001_001_002_00000052__5
+<c>VolTest57:H1-Iv1|O000_001_001_002_00000054__6
+<c>VolTest57:H1-Iv2|O000_001_001_002_00000056__7
+
+<c>sqlite> select time,value from O000_001_001_002_0000004a__0 order by id desc limit 20;
+<c>2021-07-09 16:25:10|-26.695
+<c>2021-07-09 16:25:09|-20.593
+<c>2021-07-09 16:25:08|-14.409
+<c>2021-07-09 16:25:07|-8.16822
+<c>2021-07-09 16:25:06|-1.89594
+<c>2021-07-09 16:25:05|4.38459
+<c>2021-07-09 16:25:04|10.6471
+<c>2021-07-09 16:25:03|16.8675
+<c>2021-07-09 16:25:02|23.0222
+<c>2021-07-09 16:25:01|29.0861
+<c>2021-07-09 16:25:00|35.0345
+<c>2021-07-09 16:24:59|40.8447
+<c>2021-07-09 16:24:58|46.4945
+<c>2021-07-09 16:24:57|51.9609
+<c>2021-07-09 16:24:56|57.2216
+<c>2021-07-09 16:24:55|62.2567
+<c>2021-07-09 16:24:54|67.0468
+<c>2021-07-09 16:24:53|71.5718
+<c>2021-07-09 16:24:52|75.815
+<c>2021-07-09 16:24:51|79.7587
+<c>sqlite> .quit
+</topic>
+
+<topic> sev_hdf5
+HDF5
+HDF5 kräver inte installation av någon ytterligare serverprocess. Däremot är funktionen
+begränsad. Stöd för server trådar och dödband med linjär regression saknas.
+
+HDF5 konfigureras genom att sätta Database i SevServer-objektet till HDF5.
+
+Databas-filen läggs på $pwrp_db med namnet pwrp__'systemname'.hdf5, t ex pwrp__test57.hdf5.
+Filen innehåller grupperna 'Dir' och 'Tables', där 'Dir' innehåller dataseten 'Cmn', 
+'Items', 'ObjectItems', 'ObjectItemAttributes' och 'Stat'. Under 'Tables' finns ett dataset
+för varje attribut eller objekt som lagras, t ex 'O000_001_001_003_0000004a__0', 
+'O000_001_001_003_0000004c__1' etc.
+
+<b>Underhåll och felsökning
+Det är möjligt att inspektera data-filen med Python genom att installera python3-h5py.
+
+<c>> python3
+<c>>>> import h5py
+<c>>>> f = h5py.File('/usr/pwrp/test57/src/db/pwrp__test57.h5','r')
+<c>>>> list(f.keys())
+<c>['Dir', 'Tables']
+<c>>>> list(f['Dir']['Items'])
+<c>[(0, b'O000_001_001_003_0000004a__0', 65795, 74, b'VolHdf5:H1-Av1', b'ActualValue', 
+<c>0, 1625831988, 3600, 1., 76, 1., b'', 98306, 4, b'', 0), 
+<c>(1, b'O000_001_001_003_0000004c__1', 65795, 76, b'VolHdf5:H1-Av2', b'ActualValue', 
+<c>0, 1625831988, 3600, 1., 76, 1., b'', 98306, 4, b'', 0)
+<c>...
+<c>>>> list(f['Tables']['O000_001_001_003_0000004a__0']['Data'])
+<c>[(1625835966, 0, -93.87609), (1625835967, 0, -91.52528), (1625835968, 0, -88.812), 
+<c>(1625835969, 0, -85.74749), (1625835970, 0, -82.343864), (1625835971, 0, -78.61555), 
+<c>(1625835972, 0, -74.57546), (1625835973, 0, -70.24045), (1625835974, 0, -65.627655), 
+<c>...
+</topic>
+</headerlevel>
+</chapter>
+
+<chapter>
+<topic> sev_extractdata
+Utvinna historisk data
+Här visas några exempel på hur man kan utvinna och visa historisk data.
+
+<option> printdisable
+Xtt <link> sev_xtt
+Ge <link> sev_ge
+Multivariat analysator <link> sev_ma
+Larm och händelseanalysator <link> sev_eva
+Python <link> sev_python
+MQTT <link> sev_mqtt
+<option> printenable
+</topic>
+
+<headerlevel>
+<topic> sev_xtt
+Xtt
+Genom att aktivera Historik-metoden i popupmenyn eller från verktygspanel eller meny i
+objektbilden för en signal, öppnas ett kurvfönster. Det kan även öppnas med Open Graph-
+metoden för ett SevHist objekt.
+
+<image> dg_fig114.png
+
+Kurvfönstret kan även öppnas med kommandot 'open history'.
+</topic>
+
+<topic> sev_ge
+Ge graph
+Från Analog/SevHist i Ge editorn, kan man lägga in ett diagram för historik. Diagrammet
+kan visa två kurvor. 
+
+<image> mansev_fig10.png
+</topic>
+
+<topic> sev_analyser
+Sev Analyser
+Sev Analyser kan läsa in historik för ett antal items, och visa upp kurvor, 
+scatterplots, skapa modeller med linjär regression och neurala nätverk mm.
+
+Se kapitlet Multivariat analysator nedan.
+</topic>
+
+<topic> sev_eventanalyser
+Larm och händelseanalysator
+Larm och händelseanalysatorn kan läsa in historik för larm och händelser, antal items 
+och visa  tabeller och statistik.
+
+Se kapitlet Larm och händelseanalysatorn nedan.
+</topic>
+
+<topic> sev_python
+Python
+pwrrt modulen i Python innehåller funktioner för att hämta data från historik-servern.
+</topic>
+
+<topic> sev_mqtt
+Mqtt server
+Mqtt server i ProviewR kan svara på förfrågningar om historikdata.
+</topic>
+</headerlevel>
+</chapter>
+
+<chapter>
+<topic> sev_ma
+Multivariat analysator
+Med den multivariata analysatorn är det möjligt att visa och analysera histoikdata och
+loggad data. Det är också möjlit att linarisera och transformera data och applicera
+verktyg för maskininlärning som linjär regression och neurala nätverk, som kan användas
+i modeller och MPC-regulatorer.
+
+<option> printdisable
+Dataset <link> sev_ma_dataset
+Diagram <link> sev_ma_plots
+Editering <link> sev_ma_edit
+Transformering <link> sev_ma_transform
+Linjär regression <link> sev_ma_linreg
+MLP <link> sev_ma_mlp
+<option> printenable
+</topic>
+
+<headerlevel>
+<topic> sev_ma_dataset
+Dataset
+Ett dataset innehåller data ordnad i kolumner och rader. Den första kolumnen är 
+mättidpunken, och följande kolumner innehåller uppmätt data för processvariabler.
+Data kan hämtas från en sev server, genereras av loggnings-funktionen i Xtt eller läsas
+från en csv-fil.
+
+<image> mansev_fig16.png
+<b>Fig Dataset
+
+<h2>Sev server
+Data hämtas från en sev server från 'File/Import from server' i menyn. Serverns namn
+och ett valfritt filter anges. De item som matchar filtret visas och de som ska bli en
+del av datasetet kan väljas ut. Slutligen matas start och slut-tid in och data hämtas
+och läggs in i datasetet.
+
+<image> mansev_fig17.png
+<b>Fig Hämta data från en sev server
+
+<h2>Xtt loggning
+Parametrar samlas in och läggs in i ett loggnings-entry, och för att få rätt tidsformat,
+sätts 'Format' till 1. När loggningen är klar, kan analysatorn öppnas från 'Analyze'-
+knappen i loggnings-entryt.
+
+<image> mansev_fig18.png
+<b>Fig Xtt loggning
+
+<h2>csv file
+Data kan läsas från en csv-fil i formatet som visas nedan. Den första raden är en 
+rubrik-rad med 'Time' och namnet på varje parameter. Följande rader innehåller
+tid och parametervärden vid denna tid. Filen öppnas från File/Open i menyn.
+
+<c>Time,H78-TemperatureControl3-ZonTemp1.Value.ActualValue, H78-TemperatureControl3-
+<c>Power.ActualValue, H78-TemperatureControl3-ZonTemp0.Value.ActualValue, H78-Tempera
+<c>tureControl3-ZonTemp2.Value.ActualValue, H78-TemperatureControl3-EnvTemp.Value.Ac
+<c>tualValue
+<c>2019-05-13 09:25:16.11, 130.500320, 0.000032, 190.000000, 180.000000, 21.500000
+<c>2019-05-13 09:25:16.62, 130.500320, 0.000032, 190.000000, 180.000000, 21.500000
+<c>2019-05-13 09:25:17.12, 130.500320, 0.000032, 190.000000, 180.000000, 21.500000
+<c>2019-05-13 09:25:17.62, 130.500320, 0.000032, 190.000000, 180.000000, 21.500000
+<c>2019-05-13 09:25:18.12, 130.500320, 0.000032, 190.000000, 180.000000, 21.500000
+<c>... 
+</topic>
+
+<topic> sev_ma_plots
+Diagram
+Ett antal olika diagram kan visas, t ex sambandsdiagram (scatter plots) som visar
+sambandet mellan två kolumner, eller correlation heatmap som visar korrelationen
+mellan kolumner med färger. Mörkröd är hög korrelation och mörkblå hög negativ
+korrelation medan ljusa toner är låg korrelation.
+
+<image> mansev_fig19.png
+<b>Fig Diagram
+
+<image> mansev_fig20.png
+<b>Fig Sambandsdiagram
+
+<image> mansev_fig21.png
+<b>Fig Correlation heatmap
+</topic>
+
+<topic> sev_ma_edit
+Editering av data
+Datasetet kan editeras med ett antal funktioner
+
+Split <t>Delat upp datasetet i två dataset.
+Clip <t>Ta ut en del av datasetet.
+Join <t>Sätt i hop två dataset.
+Multiply <t>Skapa ett dataset där det nuvarande setet upprepas ett antal gånger.
+Move up och down <t>Ändra ordning på kolumnerna.
+
+</topic>
+
+<topic> sev_ma_transform
+Transformera data
+När man skapar modeller med linjär regression krävs det att kolumnerna i datasetet har
+linjära beroenden. Ofta är inte det fallet. Nivån i en cylindrisk tank har t ex inte
+ett linjärt förhållande till in och ut-flödet, utan till integralen av in och ut-flödet.
+Efter en integration av flödes-kolumnerna kommer det att vara ett linjärt samband och
+linjär regression kan tillämpas.
+
+<h2>Konvertera kolumner
+Det finns ett antal funktioner för att transformera data i en kolumn
+
+Norm <t>Normalisera data.
+Square <t>Beräkna kvadraten för varje rad.
+Squareroot <t>Beräkna kvadratroten för varje rad.
+Exp <t>Exponentialfunktion.
+Log <t>Logaritmisk funktion.
+Integral <t>Tidsintegral.
+Curve <t>Linjär interpolation från en tabell specificerad i en csv-fil med datapunkter,
+
+<c>	0,0
+<c>	30,10
+<c>	70,90
+<c>	100,100
+
+Shift <t>Värdena i kolumnen kommer att skiftas framåt eller bakåt. Antal positioner
+      <t>som värdena ska skiftas anges. Positivt värde skiftar framåt och negativt
+      <t>bakåt.
+
+<image> mansev_fig22.png
+<b>Fig Konvertera kolumn alternativ
+
+<h2>Addera kolumn
+Addera kolumn kommer i de flesta fall att transformera data i en eller två kolumner
+och lägga det transformerade datat i en ny kolumn.
+
+Copy <t>Skapa en kopia av utvald kolumn.
+Norm <t>Normalisera värdena i kolumnen.
+Square <t>Beräkna kvadraten för varje rad.
+Squareroot <t>Beräkna kvadratroten för varje rad.
+Exp <t>Exponentialfunktion.
+Log <t>Logaritmisk funktion.
+Integral <t>Tidsintegral.
+Derivate <t>Tidsderivata.
+Add <t>Addera de två utvalda kolumnerna.
+Sub <t>Subtraktion mellan två utvalda kolumner. Ordningen på kolumnerna in datasetet
+    <t>är av betydelse. Kolumnen med lägre position kommer att subtraheras från den
+    <t>med högre position.
+Multiply <t>Multiplicera de två utvalda kolumnerna.
+Divide <t>Division mellan de två utvalda kolumnerna. Kolumnen ned högre position kommer 
+       <t>att delas med den med lägre position.
+Curve <t>Linjär interpolation från en tabell specificerad i en csv-fil.
+Constant <t>Skapar en kolumn där varje rad har samma värde.
+Shift <t>Värdena i en kolumn skiftas framåt eller bakåt.
+
+<image> mansev_fig23.png
+<b>Fig Alternativen för addera kolumn
+
+<h2>Formel
+Transformationen av ett dataset kan innehålla flera steg. När transformationen är 
+slutförd kan sekvensen lagras som en formel, och senare appliceras på andra mätserier
+på samma parametrar. Formeln sparas med 'File/Save Formula' i menyn, och appliceras med
+'File/Apply Formula'.
+</topic>
+
+<topic> sev_ma_linreg
+Linjär regression
+Linjär regression skapar en modell där en parameter, y, kan beräknas från ett antal
+ingångs-värden x1 - xn. y antas ha ett linjärt beroende av ingångs-värdena, och 
+formeln är
+
+y = a0 + a1 * x1 + a2 * x2 + ... + an * xn  
+
+där a0, a1, ..., an kommer att beräknas vid den linjära regressionen.
+
+Om beroendena inte är linjär måste de först liniariseras med tranformations-verktygen
+beskrivna ovan. När modellen används i runtime, måste process-värdena genomgå samma
+transformation innan de används i regressions-modellen.
+
+Lasso och Ridge regression är varianter av linjär regression som också är implementerade.
+
+<image> mansev_fig24.png
+<b>Fig Linear regression
+</topic>
+
+<topic> sev_ma_mlp
+MLP regressor
+MLP (Multi Level Perceptron) är ett neuralt nätverk med ett igångslager, ett antal
+dolda lager och ett utgångslager. Varje nod i de dolda och utgångs-lagren är neuroner
+som använder en ickelinjär aktiveringsfunktion. MLP använder en upplärningsteknik som
+kallas backpropagation.
+
+Innan träningen kan starta, måste ett antal inställningar göras, som antal dolda lager 
+och lagerstorlekar, aktiveringsfunktion etc.
+
+<image> mansev_fig25.png
+<b>Fig Inställningar för MLP regressor
+
+Från 'File/Create Model' i menyn startas upplärningen och när den är avslutad visas
+i 'Score' hur väl modellen stämmer överens med uppmätta data. En kurva med beräknade
+värden plottas också tillsammans med uppmätta värden. Modellen kan sparas på fil från
+File/Export Model i menyn och sedan användas av MPC regulatorn eller modellobjekt.
+
+<image> mansev_fig26.png
+<b>Fig Träningsresultat
+</topic>
+</headerlevel>
+</chapter>
+
+<chapter>
+<topic> sev_eva
+Larm och händelse analysator
+Larm och händelse analysatorn kan hämta larm från sev servern, händelseloggen eller
+händelselistan, och visa statistik och diagram över larmsituationen. Ett antal 
+filtreringsfunktioner kan användas för att välja ut larm av en speciell typ eller
+prioritet, eller visa händelser för ett specifikt övervakningsobjekt.
+
+<image> mansev_fig27.png
+<b>Fig Larm och händelse analysator
+
+Exempel på diagram är 'Event frequency histogram' som visar de mest frekventa larmen, och
+'Not returned alarms' som visar antalet samtidiga larm som funktion av tiden.
+
+<image> mansev_fig28.png
+<b>Fig Event frequency histogram
+
+<image> mansev_fig29.png
+<b>Fig Not returned alarms
+</topic>
+</chapter>
+
+<chapter>
+<topic> sev_storagestation
+Konfigurering av en Storage station
+En storage station genereras som en process eller operatörs-station genom att installera 
+pwrrt-paketet. Den konfigureras i directoryvolymen med ett NodeConfig objekt och en 
+rotvolym på samma sätt som en process eller operatörsstation.
+
+<h2>Kommunikation med processtationer
+Tanken är att en storage station betjänar ett avsnitt med flera processtationer som 
+tillhör olika projekt med olika versioner. Därför har normalt inte en storage station 
+någon näthanterar-kontakt, utan enbart med QCom-kontakt.
+
+Det konfigureras genom att man lägger in FriendNodeConfig objekt för alla noder
+som storage stationen ska ha kontakt med, och sätter QComOnly i Connection. Om storage
+stationen ligger i ett projekt med processtationer, sätter man QComAutoConnectDisable
+i BusConfig-objektet för att sedan konfigurera även länkarna inom projektet med 
+FriendNodeConfig objekt.
+
+<h2>Uppgradering
+Att notera vid uppgradering av storage stationer från före V5.8.
+- pwrsev-paketet har utgått sedan V5.8.0 och pwrrt-paketet ska användas istället.
+- Noden ska konfigureras med ett NodeConfig objekt istället för SevNodeConfig.
+- Rootvolumen ska konfigureras med ett RootVolumeConfig objekt, och editeras.
+</topic>
+</chapter>
+
+

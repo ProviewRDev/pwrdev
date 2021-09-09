@@ -1,0 +1,1024 @@
+
+<topic> __DocumentTitlePage
+
+<image> pwr_logga_doc.png
+<h1> Process history
+
+
+
+
+
+<hr>
+Version 5.8.0	
+<hr>
+</topic>
+
+<topic> __DocumentInfoPage
+
+
+Copyright (C) 2005-2021 SSAB EMEA AB
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, no Front-Cover Texts, and no Back-Cover
+Texts.
+
+
+
+</topic>
+
+<option> printdisable
+<topic> index
+Process history
+
+<image> pwr_logga.gif
+
+Process data <link> sev_processdata
+Configuration <link> sev_configuration
+Internal data struktur <link> sev_internal
+Databases <link>sev_databases
+Extract data <link> sev_extractdata
+Multivariate analyser <link> sev_ma
+Alarm and event analyser <link> sev_eva
+</topic>
+<option> printenable 
+
+<chapter>
+<topic> sev_introduction
+Introduction
+
+A task of increasing importance for the automation systems are to store process data. The
+possibility to store large amounts of data has given rise to new functionallity in terms
+of development and optimization of processes, predictive maintenance, calculation of 
+models for simulation etc.
+
+This document describes storage of process history in ProviewR and how this is configured.
+</topic>
+</chapter>
+
+<chapter>
+<topic> sev_processdata
+Process data
+
+Storing of process history data means that signals and other data is stored cyclically
+in a database, and from there can be fetched to displayed in curves or analyzed in 
+other contexts, eg for predictive maintenance or process development.
+
+The storage is configured with the object SevHist and SevHistObject. SevHist configures
+storage of one attribute, and SevHistObject of a whole object. In the SevHist object
+you state how often the value should be stored, and for how long.
+
+The storage is handled by two processes, a client process, rt_sevhistmon, that collects
+data and sends it to a server process, sev_server, that stores the data in the database.
+The client process can send data to several different server processes, and the server
+process can receive data from several different client processes, The client and server
+process can run in the same node, or in different nodes. For test and troubleshooting
+you can start a server process on a process station that stores data from its own node.
+For larger amounts of data with storage over several years, you appropriately create
+a dedicated storage station, that stores data from several nodes.
+
+<option> printdisable
+Client <link> sev_client
+Server <link> sev_server
+<option> printenable
+</topic>
+
+<topic> sev_client
+Client
+rt_sevhistmon is the client process that collects the process values in one node and
+sends it to the server. It's configured with a SevHistMonitor object in the node 
+hierarchy. Below the SevHistMonitor object you place a SevHistThread object, that 
+contains cycle time and server node. Each SevHist and SevHistObject object is connected 
+to a thread object and thus will stored on the node, and with the cycle time specified in 
+the thread object.
+
+The thread object also contains a ServerThread attribute, by which the storage can be 
+directed to a specific thread in the server process. This can be used to spread the load
+over different threads in the server process.
+</topic>
+
+<topic> sev_server
+Server
+
+The server process, sev_server, receives data from the client processes an stores it
+in the database. If the database doesn't exist, it will be created with the required 
+tables. Then a handshake with the client processes is performed, where client processes
+sends information about all the attributes and objects that should be stored. The cyclic
+transfer of process data from the client process to the server process then starts.
+
+The server process also can answer requests of history date for an attribute in a 
+specific time interval. 
+
+Data can be stored in different types of databases, MariaDB (MySQl), Sqlite and HDF5.
+
+<h2>MariaDB/MySQL
+MariaDB is a clone of MySql that was created when MySQL was taken over by Oracle. They
+should be compatible and exchangeable with each other. In recent Linux releases often
+MariaDB is installed. Many configuration alternatives in ProviewR is still named MySQL
+but should also be used for MariaDB.
+
+MariaDB should be used for larger databases and for databases for permanent storage.
+
+<h2>Sqlite
+Sqlite is a small, fast database that doesn't require installation of a server. It can
+be used for smaller databases for test and troubleshooting.
+
+<h2>HDF5
+HDF5 is a file format to store large amounts of data. The absence of journaling doesn't
+make it suitable for permanent storage.
+
+<h2>Alarms and events
+Storage of alarms and events can be achieved with the SevHistEvent object. The object 
+contains an EventSelectList where hierarchies for alarms that should be stored are 
+specified.
+</topic>
+</chapter>
+
+<chapter>
+<topic> sev_configuration
+Configuration
+The storage process history for a single attribute is configured with a SevHist object, 
+and storage for a whole object with a SevHistObject object. Furthermore the client process
+is configured with SevHistMonitor and SevHistThread objects, and the server process with a
+SevServer object.
+
+<option> printdisable
+SevHist <link> sev_sevhist
+SevHistObject <link> sev_sevhistobject
+Server threads <link> sev_serverthreads
+Deadband <link> sev_deadband
+Deadband with regression <link> sev_linreg
+Event triggered storage <link> sev_event
+Mean value calcutation <link> sev_meanvalue
+Item tree <link> sev_itemtree
+Mounting of item tree <link> sev_mount
+Refere data in the item tree <link> sev_ref
+Plc programming <link> sev_plc
+Export <link> sev_export
+<option> printenable
+</topic>
+
+<headerlevel>
+<topic> sev_sevhist
+SevHist
+Attributes that should be stored in the history database is configured with the
+SevHist object. The attribute to store is specified in Attribute in the SevHist object.
+The SevHist object is normally positioned below the object that is stored. If the
+object contains an ActualValue attribute. this will automatically be inserted into
+the SevHist object.
+
+<image> dg_fig111.png
+<b>Fig Configuration with SevHist, SevHistMonitor och SevHistThread objekt
+</topic>
+
+<topic> sev_sevhistobject
+SevHistObject
+SevHistObject stores all the attributes in an object into a single table.
+It is recommended to create a specific class for this purpose, as existing classes often
+contains attributes that shouldn't be stored.
+</topic>
+
+<topic> sev_serverthreads
+Server threads
+By configuring threading of the server process, the performance can be substantially 
+increased as the load is spread on several different threads. 
+
+Threading is implemented for MariaDB/MySSQL.
+
+The threads are configured in the client by stating a thread number in SevHistThread
+object. A thread can be numbered with an arbitrary positive number, and all 
+SevHistThread objects with the same thread number will be handled by the same server 
+thread. 
+
+In the object graph of the SevServer object, the load of each thread is displayed, and
+by altering the thread number in the SevHistThread objects, one can make sure that
+no server thread is overloaded.
+
+Server threads also have to be configured in the server process by setting the attribute
+UseServerThreads in the SevServer object to 1.
+
+<image> mansev_fig1.png
+<b>Fig Configuration of thread number in the SevHistThread object.
+
+<image> mansev_fig2.png
+<b>Fig Object graph for SevServer object displaying the server threads.
+</topic>
+
+<topic> sev_deadband
+Deadband
+Deadband can be configured on analog, digital and integer signals, and means the a certain
+change of the value is required before a new value is stored into the database. By
+setting a deadband the disk space used to store a signal can be substantially reduced.
+
+The deadband is configured by setting Deadband and ReadOptimized in Options in the SevHist
+object, and state the size of the deadband in the Deadband attribute.
+
+<image> mansev_fig5.png
+<b>Fig Deadband configuration.
+
+For deadband on digital signals, set Deadband to 0.5.
+
+<image>mansev_fig7.png
+<b>Fig Deadband configuration for a digital signal
+</topic>
+
+<topic> sev_linreg
+Deadband with linear regression
+This is a two dimensional deadband that also works on ramps.
+With linear regression a straight line is calculated from the latest store value, and
+as long as no value deviates more than the deadband from the line, no new value is stored.
+This will even more reduce the required disk space.
+
+<image> mansev_fig3.png
+<b>Fig Deadband with linear regression
+
+Deadband with linear regression is configured by setting Deadband, DeadbandLinearRegr
+and ReadOptimized in Options in the SevHist object, and supplying the size of the 
+deadband in Deadband.
+
+<image> mansev_fig4.png
+<b>Fig Configuration of deadband with linear regression
+</topic>
+
+<topic> sev_event
+Event triggered storage
+By setting Event in Options in the SevHist object, it is possible to control when the
+storage is performed. When Trigger in the SevHist object is set to 1, the current value
+is sent to the server process. Trigger is reset when the value is sent.
+
+<image> mansev_fig6.png
+<b>Fig Configuration of event triggered storage
+</topic>
+
+<topic>sev_meanvalue
+Meanvalue calculation of stored signals
+The server process can perform a meanvalue calculation of a stored signal, and this is
+configured by activating MeanValue1 or MeanValue2 in Options in the SevHist object.
+
+The server can make a calculation with two different times, and these are set in 
+MeanValueInterval1 and MeanValueInterval2 in the SevServer object. In SevHist.Options you
+select which of these times the calculation should be executed with.
+
+The meanvalue is stored in the item tree, and from there is can be referred from Ge graphs
+and applications with the suffix '.__MeanValue', eg 
+'pwrNode-sev-H1-Av1.ActualValue.__MeanValue'.
+</topic>
+
+<topic> sev_itemtree
+Item tree
+Each stored signal is represented of an item. All items are displayed in an item tree
+that is placed under pwrNode-sev in the realtime database. In the items tree, the signals
+are ordered in their original hierarchy, and the last received value is displayed. More
+information about the items is displayed by clicking with Shift+Click on the value, or
+with Shift+Arrow left on the keyboard. 
+
+<image> mansev_fig8.png
+<b>Fig An item in the item tree
+</topic>
+
+<topic> sev_mount
+Mounting of the item tree
+The item tree is built of objects of type $Block and $BlockAttribute to recreate the 
+original hierarchy and object structure to some extent. By mounting the hierarchies under
+pwrNode-sev on the top level you can also recreate the original object and attribute
+names and use them for references in graphs and applications.
+
+The mount is made with mount objects of type $MountDynObjects as the objects in the item
+tree are dynamic objects. 
+
+When the mount is done, signals can be referenced with their original names. This makes
+it easier to refer to the signals in graphs and applications.
+
+<image> mansev_fig15.png
+<b>Fig Mount of hierarchy in the item tree
+</topic>
+
+<topic> sev_ref
+Refer to data in the item tree
+Data in the item tree can be referred to with the suffix '.__'dataname''. For example the
+mean value for H1-Av1 is referred to by
+
+<c>pwrNode-sev-H1-Av1.ActualValue.__MeanValue
+
+If there is a mount of H1, pwrNode-sev is superfluous and the reference can be made with
+
+<c>H1-Av1.ActualValue.__MeanValue
+
+It's possible to fetch the value and subscribe to it from c++ and Python code. In Ge 
+graphs the value type should be added
+
+<c>H1-Av1.ActualValue.__MeanValue##Float32
+
+Here are some examples of other values that can be referenced
+
+H1-Av1.ActualValue <t><t>Last received value.
+H1-Av1.ActualValue.__TableName <t><t>Name to table where the value is stored.
+H1-Av1.ActualValue.__StandardDeviation <t><t>Standard deviation for the mean value.
+H1-Av1.ActualValue.__LastTime <t><t>Time for last received value.
+</topic>
+
+<topic> sev_plc
+Plc programming
+Item data can also be fetched in the plc program. As the data reside in dynamic objects
+the GetExt objects has to be used, eg GetExtFloat32, GetExtBoolean etc.
+
+In the example below, the momentary value for H1-Av1.ActualValue and the mean value
+for H1-Av2.ActualValue are added and put into H3-Av3 that is a local object in the server
+node.
+
+<image> mansev_fig13.png
+<b>Fig Plc code with item data
+</topic>
+
+<topic> sev_export
+Sev export
+Sev export gör makes it possible to export data to the sev server that doesn't need to
+be stored in the history database, but nevertheless should be available to be displayed
+in graphs and reports.
+
+The export is configured with SevExport objects. A SevExport object exports one attribute.
+As for the SevHists objects, it is the rt_sevhistmon process that collects the attributes
+and sends them to the server node. In this case the receiver process is sev_import, that
+is configured with a SevImportServer object in the sev server node. sev_import inserts
+the value into the item tree from where it can be displayed in graphs or used in the 
+plc program.
+
+<image> mansev_fig14.png
+<b>Fig Configuration of export with SevExport
+
+<h2>Mean value calculation
+Also for exported attributes, a mean value calculations can be configured by setting
+MeanValue1 or MeanValue2 in Options in the SevExport object.
+
+The server makes the mean value calculation with two different times that are stated in
+the SevImportServer object, attributes MeanValueInterval1 and MeanValueInterval2.
+In SevExport.Options is stated which on of these times the mean value calculation should
+be made with.
+
+The mean vaue is displayed in the item tree, and can be referred to from Ge graphs and
+applicaions with the suffix '.__MeanValue', eg 
+'pwrNode-sev-H2-Av2.ActualValue.__MeanValue'.
+
+<h2>Event triggered export
+By setting Event in Options in the SevHist object, it is possible to control when the
+storage is performed. When Trigger in the SevHist object is set to 1, the current value
+is sent to the server process. Trigger is reset automatically when the value is sent.
+</topic>
+</chapter>
+
+<chapter>
+<topic> sev_internal
+Internal database structure.
+MariaDB/MySQL and sqlite are SQL databases where data is stored in tables. In HDF5 an
+hierarchy of groups are created where data is stored in datasets. The notation
+with tables below applies to SQL but the structure of the datasets in HDF5 is similar.
+
+The database is named 'pwrp__'systemname'' and contains the tables 'items', 'objectitems',
+'objectitemattributes', 'sev_stat' and 'sev_version'. Furthermore there is one table for
+each atttribute or object that is stored.
+
+<h2>items
+The items table contains information from all SevHist and SevHistEvents that it stored.
+
+<b>Name <t>Type <t>Description
+id <t>integer <t>Identity.
+tablename <t>varchar <t>Name of table with history data.
+vid <t>integer <t>Volume identity of stored object.
+oix <t>integer <t>Object index of stored object.
+oname <t>string <t>Object name.
+aname <t>string <t>Attribute name. If it's a SevHistEvent item, 'Events'.
+uptime <t>datetime <t>Start time
+cretime <t>datetime <t>Creation time for item.
+storagetime <t>integer <t>Storage time in seconds. After this time the data will be 
+                       <t><t>deleted.
+deadband <t>float <t>Deadband.
+options <t>integer <t>Options.
+scantime <t>float <t>Scan time.
+description <t>string <t>Description of stored object.
+vtype <t>integer <t>Attribute type.
+vsize <t>integer <t>Attribute size in bytes.
+unit <t>string <t>Attribute unit.
+
+<h2>objectitems
+The Objectitem table contains information about all SevHistObject that is stored.
+
+<b>Name <t>Type <t>Description
+id <t>integer <t>Identity.
+tablename <t>varchar <t>Name of table with history data.
+vid <t>integer <t>Volume identity for stored object.
+oix <t>integer <t>Object index for stored object.
+oname <t>string <t>Object name.
+aname <t>string <t>Not used.
+uptime <t>datetime <t>Start time.
+cretime <t>datetime <t>Creation time for item.
+storagetime <t>integer <t>Storage time in seconds. After this tim the data will be
+                       <t><t>deleted.
+deadband <t>float <t>Deadband.
+options <t>integer <t>Options.
+scantime <t>float <t>Scan time.
+description <t>string <t>Description of stored object.
+
+<h2>objectitemattributes
+To get a complete description of a SevHistObject, information of the attributes each
+object contains is needed in addition to the content of objectitems. This is stored
+in the objectitemattributes table with one row for each attribute.
+
+<b>Name <t>Type <t>Description
+tablename <t>varchar <t>Name of table with history data
+attributename <t>string <t>Attribute name.
+attributeidx <t>integer <t>Attribute index.
+attributetype <t>integer <t>Attribute type.
+attributesize <t>integer <t>Attribute size in bytes.
+
+<h2>History tables for individual attributes
+Tables for storage of process values configured with SevHist objects.
+
+<b>Name <t>Type <t>Description
+id <t>integer <t>Identity.
+time <t>datetime or integer <t>Time.
+ntime <t>integer <t>Nano seconds if high time resolution is configured.
+value <t>arbitrary type <t>Process value.
+
+<h2>History tables for whole objects
+Tables for storage of process values for whole objects configured with SevHistObject
+objects.
+
+<b>Name <t>Type <t>Description
+sev__id <t>integer <t>Identity.
+sev__time <t>datetime or integer <t>Time.
+sev__ntime <t>integer <t>Nano seconds if high time resolution is configured.
+'attributename1' <t>arbitrary type <t>Process value for first attribute in the object.
+'attributename2' <t>arbitrary type <t>Process value for second attribute in the object.
+...
+
+<h2>History tables for alarm and events
+Tables for storage of events configured with a SevHistEvent object.
+
+<b>Name <t>Type <t>Description
+time <t>integer <t>Time.
+ntime <t>integer <t>Nano seconds.
+eventtype <t>integer <t>Event type.
+eventprio <t>integer <t>Event priority.
+eventid_nix <t>integer <t>Event identity, nix part.
+eventid_birthtime <t>integer <t>Event identity, birthtime part.
+eventid_idx <t>integer <t>Event identity, idx part.
+supobject_vid <t>integer <t>Supervision object attrref, vid part.
+supobject_oix <t>integer <t>Supervision object attrref, oix part.
+supobject_offset <t>integer <t>Supervision object attrref, offset part.
+supobject_size <t>integer <t>Supervision object attrref, size part.
+eventtext <t>varchar <t>Event text.
+eventname <t>varchar <t>Event name.
+eventstatus <t>integer <t>Event status.
+
+<h2>sev_stat
+sev_stat contains statistics. Nowadays this information is also available in the 
+SevServer object.
+
+<b>Name <t>Type <t>Description
+current_load <t> float<t> Current storage load in percentage.
+medium_load <t> float<t> Medium storage load in percentage.
+storage_rate <t> float<t> Number of stored items per second.
+medium_storage_rate <t> float<t>Medium value of number of stored items.
+datastorage_msg_cnt <t> integer<t>Number of storage transactions since startup.
+dataget_msg_cnt <t> integer<t>Number of history data requests since startup.
+items_msg_cnt <t> integer<t>Number of item messages.
+eventstore_msg_cnt <t> integer<t>Number of storage messages for alarms and events.
+
+<h2>sev_version
+Contains the current version of the sev databse. the Sev version is incremented when
+the database structure is modified and does not follow the version of ProviewR
+releases.
+
+<b>Name <t>Type <t>Description
+version <t>integer <t>Current version.
+</topic>
+</chapter>
+
+<chapter>
+<topic> sev_databases
+Databases
+The most used database is MariaDb, but there is also support for Sqlite and HDF5 with
+limited functionality.
+
+<option> printdisable
+MariaDB <link> sev_mariadb
+Sqlite <link> sev_sqlite
+HDF5 <link> sev_hdf5
+<option> printenable
+</topic>
+
+<headerlevel>
+<topic> sev_mariadb
+MariaDB/MySQL
+MariaDB is the most used storage database in ProviewR. It also has full functionality
+for deadband and server threads.
+
+The configuration is made by setting Database to MySQL in the SevServer object. 
+Furthermore installation and start of mariadb-server is required on the server node.
+The pwrp user alos has to be created
+
+For MariaDB
+
+<c>mysql
+<c>MariaDB> create user pwrp@localhost;
+<c>MariaDB> grant all privileges on *.* to pwrp@localhost;
+
+For MySQL
+
+<c>mysql
+mysql> grant all privileges on *.* to pwrp@localhost;
+
+The recommended database engine is InnoDB thas is default in later version.
+
+For small databases the standard configuration of MariaDB can be used, but for dedicated
+server nodes there are som settings that should be made in the file /etc/mysql/my.cnf.
+
+<b>innodb_file_per_table
+From maintenance view it is an advanage to have each table in a separate file. Then
+disk space can be retrieved for deleted signals.
+
+<b>innodb_log_file_size
+Transactions are first written into log files before they are inserted into the data
+files. With larger log files the writing to the database files can be optimized and done
+sequentially. On the other hand a recovery of the database will take longer time. The
+size of the log files normally should be increased from the default value.
+
+<b>innodb_buffer_pool_size
+Memory that is not used by the operating system, applications or MariaDB should be
+allocated to the buffer pool. A calculation of the buffer pool size can look like this.
+Let's say we have 16 Gb memory, 2 Gb is used by the operating system, the 
+innodb_log_file_size is 0.5 Gb and there should be space in the cache for this, ProviewR 
+needs 0.5 Gb, leave 1 Gb to other and the remaining 12 Gb can be configured for the 
+innodb_buffer_pool_size.
+
+<b>query_cache_type och query_cache_size
+Tables are continuously modified so there is no reason to cache the result of requests.
+Set these to 0.
+
+<h2>Example of configuration
+
+<c>[mysqld]
+<c>innodb_log_file_size    = 512M
+<c>innodb_buffer_pool_size = 12G
+<c>innodb_file_per_table   = 1
+<c>innodb_flush_method     = O_DIRECT
+<c>query_cache_type        = 0
+<c>query_cacne_size        = 0
+
+<h1>Maintenance and troubleshooting
+With the MariaDB client 'mysql', the database can be inspected and modified. The name of
+the database is 'pwrp__'systemname'', eg 'pwrp__test57'. Below is an example of how to
+look at the items table and data for an individual item.
+
+<c>> mysql
+<c>MariaDB> use pwrp__test57;
+
+<c>MariaDB> select oname,tablename from items;
+<c>+-----------------------------+-------------------------------+
+<c>| oname                       | tablename                     |
+<c>+-----------------------------+-------------------------------+
+<c>| VolTest57:H5-Av1            | O000_100_100_001_000000ab__1  |
+<c>| VolTest57:H5-Dv1            | O000_100_100_001_000000b7__2  |
+<c>| VolTest57:H5-Dv2            | O000_100_100_001_000000be__3  |
+<c>| VolTest57:H1-Av1            | O000_100_100_001_00000018__4  |
+<c>| VolTest57:H1-Av2            | O000_100_100_001_0000002e__5  |
+<c>| VolTest57:H1-Av3ÅÄÖ         | O000_100_100_001_0000009f__6  |
+<c>| VolTest57:H1-Dv1            | O000_100_100_001_00000056__7  |
+<c>| VolTest57:H1-Iv1            | O000_100_100_001_0000005d__8  |
+<c>| VolTest57:H1-Iv2            | O000_100_100_001_0000005e__9  |
+<c>| VolTest57:H1-Av4            | O000_100_100_001_0000013d__10 |
+<c>| VolTest57:H18-SevHistEvents | O000_100_100_001_00000ef3__11 |
+<c>| VolTest57:H1-Av5            | O000_100_100_001_00000f96__12 |
+<c>+-----------------------------+-------------------------------+
+
+<c>MariaDB> select time,value from O000_100_100_001_00000018__4 order by id desc limit 10;
+<c>+---------------------+----------+
+<c>| time                | value    |
+<c>+---------------------+----------+
+<c>| 2021-07-14 14:21:32 |  83.7721 |
+<c>| 2021-07-14 14:21:26 |  97.9997 |
+<c>| 2021-07-14 14:21:22 |  99.8689 |
+<c>| 2021-07-14 14:21:18 |  95.4521 |
+<c>| 2021-07-14 14:21:13 |   81.552 |
+<c>| 2021-07-14 14:21:07 |  54.4918 |
+<c>| 2021-07-14 14:20:50 | -47.3081 |
+<c>| 2021-07-14 14:20:42 | -83.9247 |
+<c>| 2021-07-14 14:20:36 | -98.0545 |
+<c>| 2021-07-14 14:20:32 | -99.8544 |
+<c>| 2021-07-14 14:20:28 | -95.3687 |
+<c>| 2021-07-14 14:20:23 | -81.3886 |
+<c>| 2021-07-14 14:20:17 | -54.2567 |
+<c>| 2021-07-14 14:20:02 |  36.1479 |
+<c>| 2021-07-14 14:19:53 |  80.5102 |
+<c>| 2021-07-14 14:19:47 |  96.7008 |
+<c>| 2021-07-14 14:19:43 |  99.9982 |
+<c>| 2021-07-14 14:19:42 |  99.8383 |
+<c>| 2021-07-14 14:19:38 |  95.2808 |
+<c>| 2021-07-14 14:19:33 |  81.2193 |
+<c>+---------------------+----------+
+</topic>
+
+<topic> sev_sqlite
+Sqlite
+Sqlite doesn't require installation of any further server process, however the 
+functionality is limited. Support for server threads and deadband with  linear 
+regression is missing.
+
+Sqlite is configured by setting Database in the SevServer object to Sqlite.
+
+The database file is created in $pwrp_db with the name pwrp__'systemname'.dbsqlite, eg
+pwrp__test57.sqlite.
+
+<b>Maintenance and troubleshooting
+The database can be examined with 'sqlite3'.
+
+<c>> sqlite3 $pwrp_db/pwrp___test57.dbsqlite
+<c>sqlite> select oname,tablename from items;
+<c>VolTest57:H1-Av1|O000_001_001_002_0000004a__0
+<c>VolTest57:H1-Av2|O000_001_001_002_0000004c__2
+<c>VolTest57:H1-Av3|O000_001_001_002_0000004e__3
+<c>VolTest57:H1-Av4|O000_001_001_002_00000050__4
+<c>VolTest57:H1-Dv1|O000_001_001_002_00000052__5
+<c>VolTest57:H1-Iv1|O000_001_001_002_00000054__6
+<c>VolTest57:H1-Iv2|O000_001_001_002_00000056__7
+
+<c>sqlite> select time,value from O000_001_001_002_0000004a__0 order by id desc limit 20;
+<c>2021-07-09 16:25:10|-26.695
+<c>2021-07-09 16:25:09|-20.593
+<c>2021-07-09 16:25:08|-14.409
+<c>2021-07-09 16:25:07|-8.16822
+<c>2021-07-09 16:25:06|-1.89594
+<c>2021-07-09 16:25:05|4.38459
+<c>2021-07-09 16:25:04|10.6471
+<c>2021-07-09 16:25:03|16.8675
+<c>2021-07-09 16:25:02|23.0222
+<c>2021-07-09 16:25:01|29.0861
+<c>2021-07-09 16:25:00|35.0345
+<c>2021-07-09 16:24:59|40.8447
+<c>2021-07-09 16:24:58|46.4945
+<c>2021-07-09 16:24:57|51.9609
+<c>2021-07-09 16:24:56|57.2216
+<c>2021-07-09 16:24:55|62.2567
+<c>2021-07-09 16:24:54|67.0468
+<c>2021-07-09 16:24:53|71.5718
+<c>2021-07-09 16:24:52|75.815
+<c>2021-07-09 16:24:51|79.7587
+<c>sqlite> .quit
+</topic>
+
+<topic> sev_hdf5
+HDF5
+HDF5 doesn't require installation of any further server process, however the 
+functionality is limited. Support for server threads and deadband with  linear 
+regression is missing.
+
+HDF5 is configured by setting Database in the SevServer object to HDF5.
+
+The database file is created on $pwrp_db with the name 'pwrp__'systemname'', eg
+pwrp__test57.hdf5.
+
+The file contains the groups 'Dir' and 'Tables', where 'Dir' contains the datasets 'Cmn',
+'Items', 'ObjectItems', 'ObjectItemAttributes' and 'Stat'. Under 'Tables' there is one
+dataset for each stored attribute or object, eg 'O000_001_001_003_0000004a__0', 
+'O000_001_001_003_0000004c__1' etc.
+
+<b>Maintenance and troubleshooting
+It is possible to inspect the data file with Python by installing python3-h5py.
+
+<c>> python3
+<c>>>> import h5py
+<c>>>> f = h5py.File('/usr/pwrp/test57/src/db/pwrp__test57.h5','r')
+<c>>>> list(f.keys())
+<c>['Dir', 'Tables']
+<c>>>> list(f['Dir']['Items'])
+<c>[(0, b'O000_001_001_003_0000004a__0', 65795, 74, b'VolHdf5:H1-Av1', b'ActualValue', 
+<c>0, 1625831988, 3600, 1., 76, 1., b'', 98306, 4, b'', 0), 
+<c>(1, b'O000_001_001_003_0000004c__1', 65795, 76, b'VolHdf5:H1-Av2', b'ActualValue', 
+<c>0, 1625831988, 3600, 1., 76, 1., b'', 98306, 4, b'', 0)
+<c>...
+<c>>>> list(f['Tables']['O000_001_001_003_0000004a__0']['Data'])
+<c>[(1625835966, 0, -93.87609), (1625835967, 0, -91.52528), (1625835968, 0, -88.812), 
+<c>(1625835969, 0, -85.74749), (1625835970, 0, -82.343864), (1625835971, 0, -78.61555), 
+<c>(1625835972, 0, -74.57546), (1625835973, 0, -70.24045), (1625835974, 0, -65.627655), 
+<c>...
+</topic>
+/headerlevel>
+</chapter>
+
+<chapter>
+<topic> sev_extractdata
+Extract history data
+Here some examples are shown on how to extract an display history data.
+
+<option> printdisable
+Xtt <link> sev_xtt
+Ge <link> sev_ge
+Multivariate analyser <link> sev_ma
+Alarm and event analyser <link> sev_eva
+Python <link> sev_python
+MQTT <link> sev_mqtt
+<option> printenable
+</topic>
+
+<headerlevel>
+<topic> sev_xtt
+Xtt
+The History method in Xtt for an object will display a curve window with the process
+history. The History method is activated from 
+
+- the popup menu for the object.
+- the tool panel in the object graph.
+- the menu in the object graph.
+- the Xtt command 'open history'.
+
+The curve window can also be opened with the 'Open Graph' method for a SevHist object,
+or the 'Open Graph' method in the item tree.
+
+<image> dg_fig114.png
+
+</topic>
+
+<topic> sev_ge
+Ge graph
+The SevHist component in the Ge editor is found under Analog/SevHist in the palette.
+The component can display two history curves. It can be configured i two ways, either
+it's connected to SevHist objects or the object identity for the history is suppled.
+If the graph should be opened from a sev server node the second alternative has to be
+used. If it's only going to be viewed on operator and process stations, the first
+alternative can be used.
+
+<image> mansev_fig10.png
+</topic>
+
+<topic> sev_analyser
+Multivariate Analyser
+The Multivariate Analyser can read history for a number of items and display curves,
+scatterplots, create models with linear regression and neural networks etc.
+
+See the Multivariate Analyser chapter below.
+</topic>
+
+<topic> sev_eventanalyser
+Event Analyser
+The Event Analyser read the history for alarms and events and display statistics and 
+curves.
+
+See the Alarm and Event Analyser chapter below.
+</topic>
+
+<topic> sev_python
+Python
+pwrrt modulen i Python innehåller funktioner för att hämta data från historik-servern.
+</topic>
+
+<topic> sev_mqtt
+Mqtt server
+Mqtt server i ProviewR kan svara på förfrågningar om historikdata.
+</topic>
+</headerlevel>
+</chapter>
+
+<chapter>
+<topic> sev_ma
+Multivariate analyzer
+With multivariate analyzer it is possible to view and analyze process history data and 
+logged data. It is also possible to linearize and transform the data and apply machine 
+learning tools as linear regression and neural networks that can be used in models and 
+MPC controllers.
+
+<option> printdisable
+Dataset <link> sev_ma_dataset
+Plots <link> sev_ma_plots
+Edit <link> sev_ma_edit
+Transform <link> sev_ma_transform
+Linear regression <link> sev_ma_linreg
+MLP <link> sev_ma_mlp
+<option> printenable
+</topic>
+
+<headerlevel>
+<topic> sev_ma_dataset
+Dataset
+A dataset contains data ordered in columns and rows. The first column is the sample time,
+and the next columns contains measured data for process variables. The data can be fetch 
+from a sev server, generated by the Xtt logging function or read from a csv-file. 
+
+<image> mansev_fig16.png
+<b>Fig Dataset
+
+<h2>Sev server
+Data is fetch from a sev sever from File/Import from server in the menu. The server host 
+name and an optional item filter is supplied. The items that matches the filter are then 
+displayed and items that should be part of the dataset can be selected. Finally start 
+and end time is entered and the data is fetched and inserted into the dataset.
+
+<image> mansev_fig17.png
+<b>Fig Fetch data from sev server
+
+<h2>Xtt logging
+Parameters are collected and inserted into a logging entry, and to get the correct time 
+format, 'Format' is set to 1. When the logging is executed, the analyzer can be opened 
+from the 'Analyze' button in the logging entry. 
+
+<image> mansev_fig18.png
+<b>Fig Xtt logging
+
+<h2>csv file
+Data can be read from csv files with format displayed below. The first row is a header 
+row with 'Time' and the name of each parameter. The next rows contains the time and the 
+parameter values at this time. The file is opened from File/Open in the menu.
+
+<c>Time,H78-TemperatureControl3-ZonTemp1.Value.ActualValue, H78-TemperatureControl3-
+<c>Power.ActualValue, H78-TemperatureControl3-ZonTemp0.Value.ActualValue, H78-Tempera
+<c>tureControl3-ZonTemp2.Value.ActualValue, H78-TemperatureControl3-EnvTemp.Value.Ac
+<c>tualValue
+<c>2019-05-13 09:25:16.11, 130.500320, 0.000032, 190.000000, 180.000000, 21.500000
+<c>2019-05-13 09:25:16.62, 130.500320, 0.000032, 190.000000, 180.000000, 21.500000
+<c>2019-05-13 09:25:17.12, 130.500320, 0.000032, 190.000000, 180.000000, 21.500000
+<c>2019-05-13 09:25:17.62, 130.500320, 0.000032, 190.000000, 180.000000, 21.500000
+<c>2019-05-13 09:25:18.12, 130.500320, 0.000032, 190.000000, 180.000000, 21.500000
+<c>... 
+</topic>
+
+<topic> sev_ma_plots
+Plots
+A number of different plots can be made, for example scatterplot that shows the 
+relationship between two columns, or correlation heatmap that displays the correlation 
+between columns with colors. Dark red is high correlation and dark blue high negative 
+correlation while light tones are low correlation.
+
+<image> mansev_fig19.png
+<b>Fig Plot
+
+<image> mansev_fig20.png
+<b>Fig Scatterplot
+
+<image> mansev_fig21.png
+<b>Fig Correlation heatmap
+</topic>
+
+<topic> sev_ma_edit
+Edit data
+The dataset can be edited with a number of functions
+- Split will split the dataset into two datasets.
+- Clip will pick out a portion of the dataset.
+- Join will concatenate two datasets.
+- Multiply will create a dataset where the current set is repeated a number of times.
+- Move up and down will change the order of the columns.
+</topic>
+
+<topic> sev_ma_transform
+Transform data
+Creating models with Linear regression requires that the columns in the dataset have 
+linear dependencies. Often this is not the case. The level in a cylinder tank for example
+has not a linear relationship to the in and out flow, but to the integral of the in and
+out flow. After an integration of the flow columns there will be a linear relationship 
+and the linear regression can be performed.
+
+<h2>Convert column
+There are a number of functions to transform the data of a column
+- Norm. Not yet implemented.
+- Square. Calculate the square of each row.
+- Squareroot. Take the square root of each value.
+- Exp. Exponential function.
+- Log. Logarithmic function.
+- Integral. Time integral.
+- Derivate. Time derivate.
+- Curve. Linear interpolation from a table specified in a csv file with data points, eg
+	0,0
+	30,10
+	70,90
+	100,100
+
+- Shift. Values in the column will be shifted forward or backward. The number of positions the values will be shifted are specified. Positive value will shift forwards and negative backwards.
+
+<image> mansev_fig22.png
+<b>Fig Convert column alternatives
+
+<h2>Add column
+Add column will in most cases transform the data of one or two columns and put the
+transformed data in a new column.
+
+- Copy. Make a copy of the selected column.
+- Norm. Not yet implemented.
+- Square. Calculate the square of each row.
+- Squareroot. Take the square root of each value.
+- Exp. Exponential function.
+- Log. Logarithmic function.
+- Integral. Time integral.
+- Derivate. Time derivate.
+- Add. Add the two selected columns.
+- Sub. Subtract between two selected columns. The order of the columns in the dataset 
+    is of importance here. The lower positioned column will be subtracted from the higher
+    positioned column.
+- Multiply. Multiply the two selected columns.
+- Divide. Division of the two selected columns. The higher positioned columns will be
+     divided by the lower positioned.
+- Curve. Linear interpolation from a table specified in a csv file.
+- Constant. Will create a column where all rows has the specified value.
+- Shift. Values in the column will be shifted forward or backward.
+
+<image> mansev_fig23.png
+<b>Fig Add column alternatives
+
+<h2>Formula
+The transformation of a dataset can contain several steps, and when the transformation is
+finished, the sequence can be stored as a formula and then be applied on other samplings 
+of the same parameters. The formula is saved from 'File/Save Formula' in the menu, and 
+applied from 'File/Apply Formula'.
+</topic>
+
+<topic> sev_ma_linreg
+Linear regression
+Linear regression will create a model where one parameter, y, can be calculated from a 
+number of input values x1 - xn. y is supposed to have linear dependencies of the input 
+values, and the formula is
+
+y = a0 + a1 * x1 + a2 * x2 + ... + an * xn  
+
+where a0, a1, ..., an will be calculated.
+
+If the dependencies are not linear they first have to be linearized with the 
+transformation tools described above. When the model is used in runtime, the process 
+values have to go through the same transformation before they are used in the regression 
+model.
+
+Lasso and Rigde regression are variants of linear regression that are also implemented.
+
+<image> mansev_fig24.png
+<b>Fig Linear regression
+</topic>
+
+<topic> sev_ma_mlp
+MLP regressor
+MLP (Multi Level Perceptron) is a neural network with an input layer, a number of hidden 
+layers and an output layer. Each node in the hidden and output layers is a neuron that 
+uses a nonlinear activation function. The MLP uses a learning technique called 
+backpropagation. 
+
+Before the the training can start, setting for the MLP like number of hidden layers and 
+layer sizes, activation function etc has to be set.
+
+<image> mansev_fig25.png
+<b>Fig MLP regressor settings
+
+From File/Create Model in the menu, the training is started. When it's finished, the 
+score is displayed and the model values are plotted with the process values. The model 
+can be written to file with File/Export Model and then used by a MPC controller or model 
+object. 
+
+<image> mansev_fig26.png
+<b>Fig Training result
+</topic>
+</headerlevel>
+</chapter>
+
+<chapter>
+<topic> sev_eva
+Alarm and event analyser
+The alarm and event analyzer can fetch alarm from the sev server, the eventlog or 
+eventlist, and display statistics and plots over the alarm situation. A number of filter 
+functions are available to pick out event of a specific type or priority, or show event 
+from a specific sup object.
+
+<image> mansev_fig27.png
+<b>Fig Alarm and event analyser
+
+Example of plots are the 'Event frequency histogram' that show the most frequent alarms,
+and 'Not returned alarms' that shows the number for concurrent alarms as a function time. 
+
+<image> mansev_fig28.png
+<b>Fig Event frequency histogram
+
+<image> mansev_fig29.png
+<b>Fig Not return alarms
+</topic>
+</chapter>
+
+<chapter>
+<topic> sev_storagestation
+Konfigurering av en Storage station
+En storage station genereras som en process eller operatörs-station genom att installera 
+pwrrt-paketet.
+
+<h2>Kommunikation med processtationer
+Tanken är att en storage station betjänar ett avsnitt med flera processtationer som 
+tillhör olika projekt med olika versioner. Därför har normalt inte en storage station 
+någon näthanterar-kontakt, utan enbart med QCom-kontakt.
+
+Det konfigureras genom att man lägger in FriendNodeConfig objekt för alla noder
+som storage stationen ska ha kontakt med, och sätter QComOnly i Connection. Om storage
+stationen ligger i ett projekt med processtationer, sätter man QComAutoConnectDisable
+i BusConfig-objektet för att sedan konfigurera även länkarna inom projektet med 
+FriendNodeConfig objekt.
+
+<h2>Uppgradering
+Att notera vid uppgradering av sev stationer från före V5.8.
+- pwrsev-paketet har utgått sedan V5.8.0 och pwrrt-paketet ska användas istället.
+- Noden ska konfigureras med ett NodeConfig objekt istället för SevNodeConfig.
+- Rootvolumen ska konfigureras med ett RootVolumeConfig objekt, och editeras.
+</topic>
+</chapter>
+
+

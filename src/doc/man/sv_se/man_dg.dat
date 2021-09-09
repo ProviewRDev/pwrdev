@@ -3604,40 +3604,69 @@ Se även DsFastCurve i Object Reference Manual.
 
 <topic> dg_sev
 Historisk datalagring
-Sev är lagrings miljön, där historisk data lagras i en databas. Det är ett komplement 
-till de andra miljöerna i ProviewR, runtime och operatörsmiljön. Sev innehåller server
-processer som hanterar hämtning och lagring av historisk data. Sev kan installeras separat
-i en lagringsstation, men är även inkluderad i runtime-paketet och kan startas i
-runtime miljön.
 
-<h1>Lagringstation
-En lagringsstation är en server nod med sev-paketet (pwrsev) installerat. Den här noden
-kommunicerar via Qcom med klient-noder och tar emot historisk data som lagras i en 
-MySQL eller SQLite databas. Lagrade kurvor kan visas på lagringsstationen med programmet 
-sev_xtt. Det kan ocksä skickas till klient-noder för att visas av rt_xtt i operatörsmiljön.
+Historik lagring av processdata innebär att signaler och andra data cykliskt lagras i en 
+databas, och därifrån kan hämtas upp för att visas i kurvor eller analyseras i andra 
+sammanhang, t ex för prediktivt underhåll eller processutveckling.
 
-<h2>Konfigurering
-Konfigureringen av en lagringsstation görs i Directoryvolymen genom att skapa ett
-SevNodeConfig objekt under ett BusConfig objekt. Noden kan placeras i ett projekt med
-process och operatörsstationer, eller den kan placeras i ett projekt med endast 
-lagringsstationen. Om lagringsstationen ska kommunicera med klient-noder i andra projekt 
-ska dessa konfigureras som friend nodes, med FriendNodeConfig objekt. Lagringsstationen ska 
-också konfigureras som en friend node till klient noderna. Attributet Connection i 
-FriendNodeConfig objektet ska sättas till QcomOnly. Det ska göras i FriendNodeConfig 
-objekten på båda sidor.
+Lagringen konfigureras med objekten SevHist och SevHistObject. SevHist konfigurerar lagring
+av ett attribut, och SevHistObject av ett helt objekt. I SevHist-objekten ställer man in 
+hur ofta värdet ska lagras och hur länge det ska sparas i databasen. 
 
-<image> dg_fig110.png
-<b>Fig Konfigurering av en lagringsstation
+Lagringen hanteras av två processer, en klient-process, rt_sevhistmon, som samlar ihop data
+och  skickar iväg till en server-process, sev_server, som tar emot data och lagrar det i 
+databasen. Klient-processen kan skicka data till flera olika server-processer, och 
+server-processen kan ta emot data från flera olika klient-processer. Klient och server-
+processen kan gå på samma nod eller i olika noder. För test och felsökning kan man starta
+en server-process på en process station som lagrar data från den egna noden. För större
+datamängder med lagring över flera år, skapar man lämpligen en dedikerad lagringsstation
+som lagrar data från flera noder. 
 
-<h1>Historisk datalagring
-Den historiska datalagringen är uppdelad i en server process, sev_server, som hanterar
-lagring av historisk data, och en klient process, rt_sevhistmon, som samlar ihop data
-på klient-noden och skickar till servern. Server processen är en del av lagringsmiljön
-och klient processen är en del av runtimemiljön. Server processen är även inkluderad i
-runtimemiljön, vilket gör det möjligt att skapa en kombinerad process och lagringsstation.
+<h2>rt_sevhistmon
+rt_sevhistmon är klient-processen som samlar ihop process-värden i en node och skickar till
+servern. Den konfigueras med ett SevHistMonitor objekt i nodhierarkin. Under SevHistMonitor-
+objektet lägger man SevHistThread-objekt, som innehåller cykeltid och server nod. Varje
+SevHist och SevHistObject-objekt kopplas till ett tråd-objekt och kommer därmed
+att lagras på den nod, och med den cykeltid, som anges i tråd-objektet.  
 
-<h2>Konfigurering
-<b>SevHist
+Tråd-objektet innehåller även ett ServerThread attribut, med vilket man kan rikta lagringen
+till en specifik tråd i server-processen. Detta kan användas för att fördela lasten mellan
+olika trådar i server-processen.
+
+<h2>sev_server
+Server-processen tar emot data från klient-processer och lagrar dem i databasen. Finns
+inte databasen skapar den databasen med de tabeller som behövs. Sedan sker det en 
+handskadning med klient-processerna som skickar över data på de attribut och objekt som
+ska lagras. Sedan startar den cykliska överföringen av process data från klient-processerna
+som lagras i databasen.
+Server-processen kan även svara på förfrågan om data för ett attribut i ett specifikt 
+tidsintervall. Data kan lagras i olika typer av databaser, MariaDB (ellerMySQL), Sqlite 
+coh HDF5.
+
+<b>MariaDB/MySQL
+MariaDB är en klon av MySQL som skapades när MySQL övertogs av Oracle. De ska var kompatibla
+och kan bytas ut mot varandra. I senare Linux releaser är ofta MariaDB installerat. Många
+konfigureringsalternativ i ProivewR är fortfarande namnade MySQL men ska även användas för
+MariaDB.
+
+MariaDB bör användas för större databaser och för databaser för permanent lagring. 
+
+<b>Sqlite
+Sqlite är en liten, snabb databas som inte kräver installation av en server. Kan användas
+för mindre databaser för test och felsökning.
+
+<b>HDF5
+HDF5 är ett filformat för att lagra stora mängder data. Avsaknad av journalering gör att
+det inte bör användas för permanent lagring.
+
+<h2>Larm och händelser
+Lagring av larm och händelser görs med ett SevHistEvent-objekt. Objektet innehåller en
+SelectList där man anger hierarkier för larm som ska lagras. 
+
+<h1>Konfigurering
+Lagringen konfigureras av SevHist och SevHistObject objekt för varje attribut eller objekt
+som ska lagras. Vidare konfigureras klient-processen med SevHistMonitor och SevHistThread
+objekt och server-processen med ett SevServer objekt.
 
 Attribut som ska lagras i den historiska databasen konfigureras med SevHist objekt. 
 SevHist objekten placeras i en rot eller sub volym, och attributet anges i Attribute i 
@@ -3647,148 +3676,498 @@ objektet har ett ActualValue attribut, läggs detta automatiskt in i SevHist obje
 <image> dg_fig111.png
 <b>Fig Konfigurering i en rootvolyme med SevHist, DsHistMonitor och SevHistThread objekt
 
-<b>SevHistObject
+<h2>SevHistObject
+Till skillnad från SevHist, som lagar ett enskilt attribut, lagrar SevHistObject samtliga
+attribut i ett objekt i en tabell. Det rekommenderas att man skapar en specifik klass för
+ändamålet, eftersom existerande klasser ofta innehåller attribut som ej behöver lagras.
 
-SevHistObject liknar SevHist men lagrar alla attribut i ett objekt i databasen. Alla
-attributen lagras i en tabell med samma tid.
+<h1>Databasens interna struktur
+Databasen namnges 'pwrp__'systemnamn'', och innehåller tabellerna 'items', 'objectitems',
+'objectitemattributes', 'sev_stat' och 'sev_version'. Dessutom finns en tabell för varje
+attribut eller objekt som lagras.
 
-<b>SevHistMonitor
+<h2>items
+Items tabellen innehåller information från alla SevHist och SevHistEvent som lagras.  
 
-Klient processen, rt_sevhistmon, konfigureras med ett SevHistMonitor objekt i nod
-hierarkin. rt_sevhistmon skannar av SevHist och SevHistObject objekt och sänder historisk
-data till sev servern.
+<b>Namn <t>Typ <t>Beskrivning
+id <t>integer <t>Identitet.
+tablename <t>varchar <t>Namn på tabell med historisk data.
+vid <t>integer <t>Volymsidentitet för lagrat objekt.
+oix <t>integer <t>Objektindex för lagrat objekt.
+oname <t>string <t>Objektsnamn.
+aname <t>string <t>Attributnamn. Om ett SevHistEvent item 'Events'.
+uptime <t>datetime <t>Starttid.
+cretime <t>datetime <t>Skapande tid för item.
+storagetime <t>integer <t>Tid efter vilken data kan raderas i sekunder.
+deadband <t>float <t>Dödband.
+options <t>integer <t>Options.
+scantime <t>float <t>Scantid.
+description <t>string <t>Beskrivning av lagrat objekt.
+vtype <t>integer <t>Attributtyp.
+vsize <t>integer <t>Attributets storlek i bytes.
+unit <t>string <t>Attributets enhet
 
-<b>SevHistThread
+<h2>objectitems
+Objectitems-tabellen innehåller information från alla SevHistObject som lagras.
 
-SevHistThread objekt placeras under SevHistMonitor objektet för att konfigurera tidbaser
-och server noder i klienten. Varje SevHist och SevHistObject objekt är kopplat till ett
-SevHistThread objekt som bestämmer till vilken servernod och hur ofta data sänds.
+<b>Namn <t>Typ <t>Beskrivning
+id <t>integer <t>Identitet.
+tablename <t>varchar <t>Namn på tabell med historisk data.
+vid <t>integer <t>Volymsidentitet för lagrat objekt.
+oix <t>integer <t>Objektindex för lagrat objekt.
+oname <t>string <t>Objektsnamn.
+aname <t>string <t>Används ej.
+uptime <t>datetime <t>Starttid.
+cretime <t>datetime <t>Skapande tid för item.
+storagetime <t>integer <t>Tid efter vilken data kan raderas i sekunder.
+deadband <t>float <t>Dödband.
+options <t>integer <t>Options.
+scantime <t>float <t>Scantid.
+description <t>string <t>Beskrivning av lagrat objekt.
 
-<image> dg_fig111.png
-<b>Fig Konfigurering i en rotvolym med SevHist, SevHistMonitor och SevHistThread objekt
+<h2>objectitemattributes
+För att få en fullständig beskrivning av SevHistObject, krävs förutom innehållet i
+objectitems, information om de attribut som varje objekt innehåller. Infomationen
+lagras i objectitemattributes tabellen med en rad för varje attribut.
 
-<h1>Server process
-Server processen, sev_server, hanterar databasen som lagrar historisk data, och kommunicerar
-med klienter som tillhandahåller data, eller efterfrågar data för att till exempel visa 
-upp i ett kurvfönster. Server processen kan startas i runtime miljön, och konfigureras
-med ett SevServer objekt i nod hierarkin. I storage miljön startas server processen
-automatiskt vid ProviewR start
+<b>Namn <t>Typ <t>Beskrivning
+tablename <t>varchar <t>Namn på tabell med historisk data.
+attributename <t>string <t>Används ej.
+attributeidx <t>integer <t>Attributetindex.
+attributetype <t>integer <t>Attributtyp.
+attributesize <t>integer <t>Attributets storlek i bytes.
 
+<h2>sev_stat
+sev_stat innehåller statistik. Numera finns denna information även i SevServer-objektet.
 
-<h1>Databas
-MySQL och SQLite kan väljas som databas i sev servern. Valet görs i SevServer objektet
-om ProviewR runtime är startat, eller i filen /etc/proview.cnf med parametern
-'sevDatabaseType', som kan vara 'sqlite' eller 'mysql'.
+<b>Namn <t>Typ <t>Beskrivning
+current_load <t> float<t> Current storage load in percentage.
+medium_load <t> float<t> Medium storage load in percentage.
+storage_rate <t> float<t> Number of stored items per second.
+medium_storage_rate <t> float<t>Medium value of number of stored items.
+datastorage_msg_cnt <t> integer<t>Antal lagrings-meddelanden sedan startup.
+dataget_msg_cnt <t> integer<t>Antal förfrågningar om historisk data sedan startup.
+items_msg_cnt <t> integer<t>Antal meddelanden för items.
+eventstore_msg_cnt <t> integer<t>Antal lagrings-meddelanden för larm och händelser.
 
-<c>sevDatabaseType sqlite
+<h2>sev_version
+Innehåller aktuell version av sev-databasen. Sev versionen räknas upp när databas-strukturen
+ändras och följer inte versionen för ProviewR utgåvor.
 
-MySQL är mer uttestad och ska användas för större databaser.
+version <t>integer <t>Aktuell version.
 
-<h1>sev_xtt
-Sev_xtt är ett vertyg för att navigera och visa data i den historiska databasen. Det 
-startas på server noden och kan enbart visa data från denna nod. Vid start, hämtas en
-lista på posterna för alla lagrade attribut och visas i en trädstruktur. Genom att öppna 
-en post, visas egenskaperna för posten.
+<h2>Historik tabeller 
+Varje tabell innehåller lagrade processvärden antingen för ett enskilt attribut konfigurerat
+med ett SevHist-objekt, eller för alla attributen i ett objekt konfigurerat med ett 
+SevHistObject-objekt.
 
-<image> dg_fig112.png
-<b>Fig En post visas i Sev_xtt
+<b>Enskilt attribut
 
-Om man väljer ut en post och aktiverar kurv-knappen, hämtas lagrade värden och visas i ett
-kurvfönster. När posten öppnas hämtas ca 500 värden från senast sparade data. Det är 
-sedan möjligt att zooma in eller ut med högre eller lägre upplösning, och och gä längre
-tillbaka i tiden.
+<b>Namn <t>Typ <t>Beskrivning
+id <t>integer <t>Identitet.
+time <t>datetime or integer <t>Tidpunkt.
+ntime <t>integer <t>Nanosekuner om hög tidsupplösning är konfigurerad.
+value <t>arbitrary type <t>Processvärde.
 
-<image> dg_fig113.png
-<b>Fig Kurvfönster i sev_xtt
+<b>Helt objekt
 
-Gamla poster kan tas bort ur databasen från sev_xtt genom att välja ut posten och aktivera
-'Function/Delete Item' i menyn. Endast användare med SevAdmin privilegier är auktoriserade
-att göra detta.
+<b>Namn <t>Typ <t>Beskrivning
+sev__id <t>integer <t>Identitet.
+sev__time <t>datetime or integer <t>Tidpunkt.
+sev__ntime <t>integer <t>Nanosekuner om hög tidsupplösning är konfigurerad.
+'attributenamn1' <t>Godtycklig type <t>Första attributet i objektet.
+'attributenamn2' <t>Godtycklig type <t>Andra attributet i objektet.
+...
 
-<h2>Behörighet
-Det är två privilegier som avgör behörigheten i sev_xtt: SevRead krävs för att visa 
-innehållet i databasen. och SevAdmin krävs för att påverka databasen (att ta bort poster).
-Det finns två sätt att erhålla dessa privilegier:
+<h2>Server-trådar
+Genom att konfiguera trådning av serverprocessen kan man avsevärt öka prestanda då
+lasten fördelas på flera olika trådar och processorer. Trådning är implementerat för
+MariaDB/mySQL.
 
-1. Att logga med en användare som har privilegiet SevRead eller SevAdmin.
+Trådarna konfigureras i klienten genom att man en trådar i SevHistThread-objekten. Trådarna
+numreras från 0 och uppåt, och alla SevHistThread-objekt med samma trådnummer kommer att
+hanteras av samma tråd. I SevServer objekts objektsbild kan man se belastningen för de
+olika trådarna, och genom att ändra trådnummer i SevHistThread-objekten se till att ingen
+tråd blir överbelastad.
 
-2. Att sätta default privilegier för sev_xtt i /etc/proview.cnf. Parametern
-   SevXttDefaultPriv kan ha värdena Read, Admin eller None. Om värdet är Read kommer
-   sev_xtt att ha SevRead privilegiet som default, om det är Admin, kommer sev_xtt att
-   ha SevAdmin som default, och om det är None krävs en inlogging med användare och 
-   passerord i sev_xtt.
+Servertrådar måste även konfigureras för server-processen genom att sätta attributet 
+UseServerThreads i SevServer-objektet till 1.
 
-<h1>rt_xtt
-Historisk data kan även visas i rt_xtt i operatörsmiljön. För objekt med ett SevHist objekt
-som barn, adderas ett 'Historik' alternativ i popupmenyn. Historik metoden visar samma
-kurvfönster som sev_xtt.
+<image> mansev_fig1.png
+<b>Fig Konfigurerng av trådnummer i SevHistThread-objektet.
 
-<image> dg_fig114.png
-<b>Fig Historik metoden in operatörsmiljön
+<image> mansev_fig2.png
+<b>Fig Objektsbild för SevServer objektet som visar servertrådar.
 
-<h1>Installation av en lagringsstation
-<h2>MySQL
-Det rekommenderas att databasmotorn innodb andvänds för mysql. Sepcificera i /etc/proview.cnf 
-att mysql ska användas, och att tabeller ska skapas med motor innodb
+<h2>Dödband
+Dödband kan konfigureras på analoga och digitala signaler och innebär att det krävs en
+viss ändring av värdet för att ett nytt värde ska lagras i databasen. Genom att sätta
+ett dödband kan diskutrymmet som krävs för att lagra en signal reduceras avsevärt.
 
-<c>sevDatabaseType mysql
-<c>sevMysqlEngine innodb
+Dödband konfigureras genom att sätta Deadband och ReadOptimized i Options för SevHist 
+objektet, och ange storleken på dödbandet i Deadband.
 
-Installera mysql-server på lagringstationen och addera användaren pwrp i mysql
+<image> mansev_fig5.png
+<b>Fig Konfiguration av dödband
 
-För MariaDb:
-<c>> mysql
+För dödband på digital signal, sätt Deadband till 0.5.
+
+<image>mansev_fig7.png
+<b>Fig Konfiguration av dödband på digital signal
+
+<h2>Dödband med linjär regression
+Det här är ett tvådimensionellt dödband som även fungerar på ramper. 
+Med linjär regression beräknas en rät linje från senast lagrade värde, och så länge inget
+nytt värde aviker mer än dödbandet från linjen lagras inget nytt värde. Det här reducerar
+ytterligare det diskutrymme som krävs.
+
+<image> mansev_fig3.png
+<b>Fig Dödband med linjär regression
+
+Dödband med linjär regression konfigureras genom att Deadband, DeadbandLinearRegr och 
+ReadOptimised sätts i Options i SevHist objektet, och storleken på dödbandet anges i 
+Deadband.
+
+<image> mansev_fig4.png
+<b>Fig Konfiguration av dödband med linjär regression
+
+<h2>Händelsestyrd logging
+Genom att sätta Event i Option i SevHist objektet, kan man styra när lagringen sker. När
+Trigger i SevHist objektet sätts till 1 skickas aktuellt värde till server processen, 
+Trigger tas ned när värdet är skickat.
+
+<image> mansev_fig6.png
+<b>Fig Konfigurering av händelsestyrd lagring
+
+<h2>Medelvärdesberäkning av lagrade signaler
+Man kan ange att server-processen ska utföra en medelvärdesberäkning en lagrad signal genom
+att sätta MeanValue1 eller MeanValue2 i Options i SevHist-objektet.
+
+Servern gör medelvärdesberäkning med två olika tider som anges i SevServer-objektet, 
+attributen MeanValueInterval1 och MeanValueInterval2, och i Options väljer man med  vilken 
+av de här tiderna beräkningen ska utföras.
+
+Medelvärdet visas i item-trädet, och kan därifrån refereras från Ge grafer och applikationer
+med suffixet '.__MeanValue', t ex 'pwrNode-sev-H1-Av1.ActualValue.__MeanValue'.
+
+<h2>Item-träd
+Varje lagrad signal i serverns representeras av ett item. Alla item visas i ett item-träd
+som läggs under pwrNode-sev i realtidsdatabasen. I item-trädet visas signalerna i dess
+ursprungliga hierarki, och här visas även det sista mottagna värdet. Man kan visa mer
+information om ett item med Shift+Klick på värdet, eller Shift+Pil höger på tangenbordet.
+
+<image> mansev_fig8.png
+<b>Fig Ett item i item-trädet
+
+<h2>Montering av item-trädet
+Itemträdet byggs upp av objekt av typen $Block och $BlockAttribute för att i någon mån
+återskapa den ursprungliga hierarkin och objektsstrukturen. Genom att montera hierakierna
+under pwrNode-sev på top-nivån kan man återskapa den ursprungliga objekt- och attributnamnen
+och använda dessa vid referenser i grafer och applikationer.
+
+Monteringen görs med monteringsobjekt av typen $MountDynObject eftersom det är dynamiska
+objekt som monteras.
+
+När monteringen är gjord, kan signaler refereras med sitt ursprungliga namn. Det gör det
+enklare att referera till signalerna i grafer och applikationer.
+
+<h2>Referera data i item-trädet
+Data i ett item kan refereras med suffixet '.__'dataname'', dvs medelvärdet för Av1 ovan
+kan refereras med
+
+pwrNode-sev-H1-Av1.ActualValue.__MeanValue
+
+Om det finns en montering på H1 kan pwrNode-sev strykas och referensen görs med
+
+H1-Av1.ActualValue.__MeanValue
+
+Man kan hämta värdet och lägga upp prenumerationer från c++ och Python kod. I Ge grafer
+lägger men på typen som suffix
+
+H1-Av1.ActualValue.__MeanValue##Float32
+
+Exempel på andra värden som kan refereras
+
+H1-Av1.ActualValue <t><t>Senast mottagna värde.
+H1-Av1.ActualValue.__TableName <t><t>Namn på tabell där historiken lagras.
+H1-Av1.ActualValue.__StandardDeviation <t><t>Standardavvikelse vid medelvärdesberäkningen.
+H1-Av1.ActualValue.__LastTime <t><t>Tid för senast mottagna värde.
+
+<h2>Plc programmering
+Itemdata kan även hämtas upp i plc-programmet. Eftersom data ligger i dynamiska
+objekt måste man använda GetExt-objekt, t ex GetExtFloat32, GetExtBoolean etc.
+
+I exemplet nedan adderas momentanvärdet för  H1-Av1.ActualValue och medelväardet för
+H1-Av2.ActualValue och läggs i H3-Av3 som är ett lokalt objekt i server-noden.
+
+<image> mansev_fig13.png
+<b>Fig Plc kod med item data
+
+<h1>MariaDB/MySQL
+MariaDB är det databas som är mest använd i ProviewR. Den har också full funktionalitet
+när det gäller dödband och server-trådar.
+
+Konfigureringen sker genom att sätta Database till MySQL i SevServer-objektet. Dessutom
+krävs att man installerar och startar mariadb-server i server-noden. Man måste också
+skapa användaren pwrp
+
+För MariaDB
+
+<c>mysql
 <c>MariaDB> create user pwrp@localhost;
 <c>MariaDB> grant all privileges on *.* to pwrp@localhost;
 
-För mysql:
+För MySQL
+
+<c>mysql
+mysql> grant all privileges on *.* to pwrp@localhost;
+
+Den rekommenderade database-motorn InnoDB är default i senare versioner och ska
+användas.
+
+För små databaser kan man använda standard-konfigurationen av MariaDB, men för dedicerade 
+databas-noder finns det några inställningar som bör göras i filen /etc/mysql/my.cnf
+
+<b>innodb_file_per_table
+Ur underhållssynpunkt är det en fördel att ha varje tabell i en separat fil. Man kan då 
+återfå diskutrymme för borttagna signaler.
+
+<b>innodb_log_file_size
+Transaktioner skrivs först i log-filer, innan de förs in i data-filerna. Med större 
+log-filer kan skrivningen i data-filerna optimeras genom att göras sekvensiellt, å andra
+sidan tar en recovery av databasen längre tid. Storleken på log-filerna behöver normalt
+utökas från default-värdet.
+
+<b>innodb_buffer_pool_size
+Minne som inte används av operativsystemet, applikationer eller MariaDB bör allokeras
+till buffer poolen. Säg att vi har 16 Gb minne, 2 Gb används av operativsystemet, 
+innodb_log_file_size är 0.5 Gb som det bör finnas utrymme för i cachen, ProviewR tar
+0.5 Gb, lämna 1 Gb till övrigt så återstår 12 Gb som kan konfigureras för 
+innodb_buffer_pool_size.
+
+<b>query_cache_type och query_cache_size
+Tabellerna förändras kontinuerligt så det finns ingen anledning att cache resultatet av
+förfrågningar. Sätt dessa till 0.
+
+<b>Exempel på konfigurationsfil
+
+<c>[mysqld]
+<c>innodb_log_file_size    = 512M
+<c>innodb_buffer_pool_size = 12G
+<c>innodb_file_per_table   = 1
+<c>innodb_flush_method     = O_DIRECT
+<c>query_cache_type        = 0
+<c>query_cacne_size        = 0
+
+<b>Underhåll och felsökning
+Med 'mysql' kan databasen inspekteras och modifieras. Namnet på databasen är
+'pwrp__'systemname'', t ex 'pwrp__test57'. Här är ett exempel på hur man kan titta på
+items-tabellen och på data för ett enskilt item.
+
 <c>> mysql
-<c>mysql> grant all privileges on *.* to pwrp@localhost;
+<c>MariaDB> use pwrp__test57;
 
-Det finns många parametrar för att trimma mysql. Ett tips är att öka storlekarna på 
-innodb poolen genom att addera följande rader i /etc/mysql/my.cnf
+<c>MariaDB> select oname,tablename from items;
+<c>+-----------------------------+-------------------------------+
+<c>| oname                       | tablename                     |
+<c>+-----------------------------+-------------------------------+
+<c>| VolTest57:H5-Av1            | O000_100_100_001_000000ab__1  |
+<c>| VolTest57:H5-Dv1            | O000_100_100_001_000000b7__2  |
+<c>| VolTest57:H5-Dv2            | O000_100_100_001_000000be__3  |
+<c>| VolTest57:H1-Av1            | O000_100_100_001_00000018__4  |
+<c>| VolTest57:H1-Av2            | O000_100_100_001_0000002e__5  |
+<c>| VolTest57:H1-Av3ÅÄÖ         | O000_100_100_001_0000009f__6  |
+<c>| VolTest57:H1-Dv1            | O000_100_100_001_00000056__7  |
+<c>| VolTest57:H1-Iv1            | O000_100_100_001_0000005d__8  |
+<c>| VolTest57:H1-Iv2            | O000_100_100_001_0000005e__9  |
+<c>| VolTest57:H1-Av4            | O000_100_100_001_0000013d__10 |
+<c>| VolTest57:H18-SevHistEvents | O000_100_100_001_00000ef3__11 |
+<c>| VolTest57:H1-Av5            | O000_100_100_001_00000f96__12 |
+<c>+-----------------------------+-------------------------------+
 
-<c>innodb_buffer_pool_size=1G
-<c>innodb_additional_mem_pool_size=20M
+<c>MariaDB> select time,value from O000_100_100_001_00000018__4 order by id desc limit 10;
+<c>+---------------------+----------+
+<c>| time                | value    |
+<c>+---------------------+----------+
+<c>| 2021-07-14 14:21:32 |  83.7721 |
+<c>| 2021-07-14 14:21:26 |  97.9997 |
+<c>| 2021-07-14 14:21:22 |  99.8689 |
+<c>| 2021-07-14 14:21:18 |  95.4521 |
+<c>| 2021-07-14 14:21:13 |   81.552 |
+<c>| 2021-07-14 14:21:07 |  54.4918 |
+<c>| 2021-07-14 14:20:50 | -47.3081 |
+<c>| 2021-07-14 14:20:42 | -83.9247 |
+<c>| 2021-07-14 14:20:36 | -98.0545 |
+<c>| 2021-07-14 14:20:32 | -99.8544 |
+<c>| 2021-07-14 14:20:28 | -95.3687 |
+<c>| 2021-07-14 14:20:23 | -81.3886 |
+<c>| 2021-07-14 14:20:17 | -54.2567 |
+<c>| 2021-07-14 14:20:02 |  36.1479 |
+<c>| 2021-07-14 14:19:53 |  80.5102 |
+<c>| 2021-07-14 14:19:47 |  96.7008 |
+<c>| 2021-07-14 14:19:43 |  99.9982 |
+<c>| 2021-07-14 14:19:42 |  99.8383 |
+<c>| 2021-07-14 14:19:38 |  95.2808 |
+<c>| 2021-07-14 14:19:33 |  81.2193 |
+<c>+---------------------+----------+
 
-För stora databaser måste storleken på log-filen ökas, och genom att konfigurera
-en fil per tabell får man mer information och kontroll över disk-utrymmet.
+<h2>Sqlite
+Sqlite kräver inte installation av någon ytterligare serverprocess. Däremot är funktionen
+begränsad. Stöd för server trådar och dödband med linjär regression saknas.
 
-<c>innodb_log_file_size=128M
-<c>innodb_log_buffer_size=16M
-<c>innodb_file_per_table
+Sqlite konfigureras genom att sätta Database i SevServer-objektet till Sqlite.
 
-För beräkning av diskutrymme för innodb krävs ca 47 bytes per värde. Lagringen av
-en signal med 10 s cykeltid under ett år använder ca 6 * 60 * 24 * 365 * 47 byte =
-148 Mb. SevHist objektets UseDeadBand option kommer att minska den siffran.
+Databas-filen läggs på $pwrp_db med namnet pwrp__'systemname'.dbsqlite, t ex 
+pwrp__test57.dbsqlite.
 
-<h2>SQLite
-Installera libsqlite3-0 på lagringsstationen.
+<b>Underhåll och felsökning
+Databasen kan undersökas med 'sqlite3'.
 
-<h2>pwrsev
-Installera pwrsev paketet, distribuera och starta lagringsmiljön med
+<c>> sqlite3 $pwrp_db/pwrp___test57.dbsqlite
+<c>sqlite> select oname,tablename from items;
+<c>VolTest57:H1-Av1|O000_001_001_002_0000004a__0
+<c>VolTest57:H1-Av2|O000_001_001_002_0000004c__2
+<c>VolTest57:H1-Av3|O000_001_001_002_0000004e__3
+<c>VolTest57:H1-Av4|O000_001_001_002_00000050__4
+<c>VolTest57:H1-Dv1|O000_001_001_002_00000052__5
+<c>VolTest57:H1-Iv1|O000_001_001_002_00000054__6
+<c>VolTest57:H1-Iv2|O000_001_001_002_00000056__7
 
-<c>> pwrsev start 
+<c>sqlite> select time,value from O000_001_001_002_0000004a__0 order by id desc limit 20;
+<c>2021-07-09 16:25:10|-26.695
+<c>2021-07-09 16:25:09|-20.593
+<c>2021-07-09 16:25:08|-14.409
+<c>2021-07-09 16:25:07|-8.16822
+<c>2021-07-09 16:25:06|-1.89594
+<c>2021-07-09 16:25:05|4.38459
+<c>2021-07-09 16:25:04|10.6471
+<c>2021-07-09 16:25:03|16.8675
+<c>2021-07-09 16:25:02|23.0222
+<c>2021-07-09 16:25:01|29.0861
+<c>2021-07-09 16:25:00|35.0345
+<c>2021-07-09 16:24:59|40.8447
+<c>2021-07-09 16:24:58|46.4945
+<c>2021-07-09 16:24:57|51.9609
+<c>2021-07-09 16:24:56|57.2216
+<c>2021-07-09 16:24:55|62.2567
+<c>2021-07-09 16:24:54|67.0468
+<c>2021-07-09 16:24:53|71.5718
+<c>2021-07-09 16:24:52|75.815
+<c>2021-07-09 16:24:51|79.7587
+<c>sqlite> .quit
 
-Belastningen på lagringsstationen beror huvudsakligen på antalet lagrade poster, deras
-skantider och diskarnas prestanda. Belastingen beräknas kontinuerligt av sev servern
-och lagras i databasen in tabellen sev_stat. Nedan visas ett exempel på hur man kan
-läsa statitiktabellen i en mysql databas, där pojektnamnet är opg7.
+<h2>HDF5
+HDF5 kräver inte installation av någon ytterligare serverprocess. Däremot är funktionen
+begränsad. Stöd för server trådar och dödband med linjär regression saknas.
 
-<c>>mysql -u pwrp
-<c>mysql> use pwrp__opg7;
-<c>mysql> select * from sev_stat;
-<c>| 7.24149 | 7.90368 | 907.713 | 908.8 | 32321 | 0 | 1 | 0 | 
-<c>1 row in set (0.00 sec)
+HDF5 konfigureras genom att sätta Database i SevServer-objektet till HDF5.
 
-De första fyra värdena visar
+Databas-filen läggs på $pwrp_db med namnet pwrp__'systemname'.hdf5, t ex pwrp__test57.hdf5.
+Filen innehåller grupperna 'Dir' och 'Tables', där 'Dir' innehåller dataseten 'Cmn', 
+'Items', 'ObjectItems', 'ObjectItemAttributes' och 'Stat'. Under 'Tables' finns ett dataset
+för varje attribut eller objekt som lagras, t ex 'O000_001_001_003_0000004a__0', 
+'O000_001_001_003_0000004c__1' etc.
 
-1. Nuvarand belastning, dvs exekvering av databasen in procent.
-2. Medel belastning.
-3. Antal lagrade poster per sekund, momentant värde.
-4. Antal lagrade poster per sekund, medelvärde.
+<b>Underhåll och felsökning
+Det är möjligt att inspektera data-filen med Python genom att installera python3-h5py.
 
-Medelvärdet på belastningen bör ligga en bra bit under 100 %.
+<c>> python3
+<c>>>> import h5py
+<c>>>> f = h5py.File('/usr/pwrp/test57/src/db/pwrp__test57.h5','r')
+<c>>>> list(f.keys())
+<c>['Dir', 'Tables']
+<c>>>> list(f['Dir']['Items'])
+<c>[(0, b'O000_001_001_003_0000004a__0', 65795, 74, b'VolHdf5:H1-Av1', b'ActualValue', 
+<c>0, 1625831988, 3600, 1., 76, 1., b'', 98306, 4, b'', 0), 
+<c>(1, b'O000_001_001_003_0000004c__1', 65795, 76, b'VolHdf5:H1-Av2', b'ActualValue', 
+<c>0, 1625831988, 3600, 1., 76, 1., b'', 98306, 4, b'', 0)
+<c>...
+<c>>>> list(f['Tables']['O000_001_001_003_0000004a__0']['Data'])
+<c>[(1625835966, 0, -93.87609), (1625835967, 0, -91.52528), (1625835968, 0, -88.812), 
+<c>(1625835969, 0, -85.74749), (1625835970, 0, -82.343864), (1625835971, 0, -78.61555), 
+<c>(1625835972, 0, -74.57546), (1625835973, 0, -70.24045), (1625835974, 0, -65.627655), 
+<c>...
+
+<h1>Utvinna historik data
+Här visas några exempel på hur man kan utvinna och visa historisk data.
+
+<h2>Xtt
+Genom att aktivera Historik-metoden i popupmenyn eller från verktygspanel eller meny i
+objektbilden för en signal, öppnas ett kurvfönster. Det kan även öppnas med Open Graph-
+medtoden för ett SevHist objekt.
+
+<image> dg_fig114.png
+
+Kurvfönstret kan även öppnas med kommandot 'open history'.
+
+<h2>Ge graph
+Från Anlog/SevHist i Ge editorn, kan man lägga in ett diagram för historik. Diagrammet
+kan visa två kurvor. 
+
+<image> mansev_fig10.png
+
+<h2>Sev Analyser
+Sev Analyser kan läsa in historik för ett antal items, och visa upp kurvor, scatterplots,
+skapa modeller med linjär regression och neurala nätverk mm.
+
+<image> mansev_fig11.png
+
+Sev Analysern kan köras på noder som har QCom kontakt med sev servern.
+
+<h2>Event Analyser
+Event Analyser kan läsa in historik för larm och händelser, antal items och visa tabeller
+och statistik.
+
+<image> mansev_fig12.png
+
+Event Analysern kan köras på noder som har QCom kontakt med sev servern.
+
+<h2>Python
+pwrrt modulen i Python innehåller funktioner för att hämta data från historik-servern.
+
+<h2>Mqtt server
+Mqtt server i ProviewR kan svara på förfrågningar om historikdata.
+
+<h2>Konfigurering av en Storage station
+En storage station genereras som en process eller operatörs-station genom att installera 
+pwrrt-paketet.
+
+Obs! Att notera vid uppgradering av sev stationer från före V5.8.
+- pwrsev-paketet har utgått sedan V5.8.0 och pwrrt-paketet ska användas istället.
+- Noden ska konfigureras med ett NodeConfig objekt istället för SevNodeConfig.
+- Rootvolumen ska konfigureras med ett RootVolumeConfig objekt, och editeras.
+
+<h1>Sev export
+Sev export gör det möjligt att exportera data till sev servern som inte behöver lagras i
+historik-databasen, men som ändå ska vara tillgängliga för att presenteras i bilder och 
+rapporter.
+
+Exporten konfigureras med SevExport objekt. Ett SevExport objekt exporterar ett attribut.
+Liksom för SevHist objekten är det rt_sevhistmonitorn som samlar ihop attributen och
+skickar dem vidare till server noden. I det här fallet är mottagarprocessen sev_import
+som konfigureras med ett SevImportServer objekt i sev server noden. sev_import lägger in 
+värdet i item-trädet varifrån det kan visas upp i bilder eller användas i plc-programmet.
+
+<image> mansev_fig14.png
+<b>Fig Konfigurering av export med SevExport
+
+<h2>Medelvärdesberäkning
+Även för exporterade attribut kan man konfigurera en medelvärdesberäkning genom att sätta
+MeanValue1 eller MeanValue2 i Options i SevHist-objektet.
+
+Servern gör medelvärdesberäkning med två olika tider som anges i SevImportServer-objektet, 
+attributen MeanValueInterval1 och MeanValueInterval2, och i Options väljer man med 
+vilken av de här tiderna beräkningen ska utföras.
+
+Medelvärdet visas i item-trädet, och kan därifrån refereras från Ge grafer och 
+applikationer med suffixet '.__MeanValue', t ex
+'pwrNode-sev-H2-Av2.ActualValue.__MeanValue'.
+
+<h2>Händelsestyrd export
+Genom att sätta Event i Options SevExport objektet kan man styra när exporten av värdet 
+sker. Överföringen görs när Trigger i SevExport objektet sätts till 1. Trigger tas ner
+automatiskt när överföringen har utförts.
+
 </topic>
 
 </chapter>
