@@ -2,7 +2,7 @@
 <topic> __DocumentTitlePage
 
 <image> pwr_logga_doc.png
-<h1> Processhistorik
+<h1> Handbok i Processhistorik
 
 
 
@@ -18,7 +18,7 @@ Version 5.8.0
 
 Copyright (C) 2005-2021 SSAB EMEA AB
 
-Permission is granted to copy, distribute and/or modify this document
+gPermission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.2
 or any later version published by the Free Software Foundation;
 with no Invariant Sections, no Front-Cover Texts, and no Back-Cover
@@ -39,7 +39,7 @@ Konfigurering <link> sev_configuration
 Intern datastruktur <link> sev_internal
 Databaser <link>sev_databases
 Utvinna data <link> sev_extractdata
-Multivariat analysator <link> sev_ma
+Multivariat analysator <link> sev_mva
 Larm och händelseanalysator <link> sev_eva
 </topic>
 <option> printenable 
@@ -689,7 +689,7 @@ Här visas några exempel på hur man kan utvinna och visa historisk data.
 <option> printdisable
 Xtt <link> sev_xtt
 Ge <link> sev_ge
-Multivariat analysator <link> sev_ma
+Multivariat analysator <link> sev_mva
 Larm och händelseanalysator <link> sev_eva
 Python <link> sev_python
 MQTT <link> sev_mqtt
@@ -734,18 +734,122 @@ Se kapitlet Larm och händelseanalysatorn nedan.
 
 <topic> sev_python
 Python
-pwrrt modulen i Python innehåller funktioner för att hämta data från historik-servern.
+ProviewR Python runtime-modulen, pwrrt, innehåller funktioner för att hämta 
+historisk data från en sev server.
+
+pwrrt kan exekveras på en nod som har QCom-kontakt med historikservern.
+
+<b>Exempel
+pwrrt.getSevItemData() hämtar historik för att attribut. Den returneran en
+tuple med tre element: antal mätpunkter, en tuple med värden och en med tider.
+
+<c>import pandas as pd
+<c>from datetime import datetime
+<c>import pwrrt
+
+<c>pwrrt.init("appl")
+
+<c>result = pwrrt.getSevItemData( 'localhost', '_O0.254.254.204:68', 
+<c>	'ActualValue', '00:02:00', 'now', 1000)
+<c>for i in range(result[0]):
+<c>  print(i, str(result[2][i])[:22], result[1][i])
+
+<b>Exempel
+pwrrt.getSevItemsDataFrame() kan hämta historik för flera attribut, och
+returnerar historiken i en struktur som kan läggas in i en pandas frame.
+Den första kolumnen innehåller tiden och övriga kolumner de olika attributens
+värden.
+
+<c>import pandas as pd
+<c>import pwrrt
+
+<c>pwrrt.init("appl")
+
+<c>oidlist = []
+<c>attrlist = []
+<c>isobjectlist = []
+
+<c># Append first attribute
+<c>oidlist.append('_O0.254.254.204:68')
+<c>attrlist.append('ActualValue')
+<c>isobjectlist.append(0)
+
+<c># Append second attribute
+<c>oidlist.append('_O0.254.254.204:69')
+<c>attrlist.append('ActualValue')
+<c>isobjectlist.append(0)
+
+<c>result = pwrrt.getSevItemsDataFrame( 'localhost', oidlist, attrlist, 
+<c>	isobjectlist, '00:02:00', 'now', 0.5, 1000)
+<c>columns = ('time', 'A1', 'A2')
+<c>data = pd.DataFrame(data=result)
+<c>data.columns = columns
+<c>print(data)
 </topic>
 
 <topic> sev_mqtt
 Mqtt server
 Mqtt server i ProviewR kan svara på förfrågningar om historikdata.
+
+Action "history" hämtar historik för ett attribut och med action "eventhist"
+hämtas larmhistorik.
+
+<b>Exempel
+Nedan följer ett kod-exempel i Python med MQTT modulen python3-paho-mqtt.
+Historiken hämtas från den lokala MQTT servern, topic 'proviewr/server'.
+Svaret anmodas att skickas till topic 'repl/history', och förfrågan gäller
+att hämta historik för attributet H1-Av1.ActualValue för de senaste 15 
+minuterna.
+
+<c>#!/usr/bin/python3
+<c>#
+<c>import paho.mqtt.client as mqtt
+<c>import sys
+<c>import time
+<c>from datetime import datetime
+<c>import json
+<c>import matplotlib.pyplot as plt
+<c>from datetime import datetime
+
+<c>def on_message(client, userdata, message):
+<c>    data = json.loads(str(message.payload.decode("utf-8")))
+
+<c>    # Convert time strings to datetime objects
+<c>    t = []
+<c>    for dt in data['time']:
+<c>        t.append(datetime.strptime(dt+'0000', '%d-%b-%Y %H:%M:%S.%f'))
+
+<c>    # Plot the curve, use drawstyle='steps-pre' for digital signals
+<c>    plt.plot(t, data['values'], label='Diff')
+<c>    plt.show()
+    
+
+<c># Connect to MQTT server
+<c>client = mqtt.Client('Aristotle')
+<c>client.username_pw_set('pwrp','pwrp')
+<c>client.on_message = on_message
+<c>client.connect('localhost')
+
+<c># Subscribe to reply
+<c>client.subscribe("repl/history", 1)
+
+<c># Send history request
+<c>client.publish('proviewr/server', '{"action":"history",'  \\
+<c>'"reply":"repl/history","server":"localhost","object":"H1-Av1",'  \\
+<c>'"attribute":"ActualValue","from":"0:15:0","to":"now","maxrows":2000}')
+
+<c>for i in range (0, 3):
+<c>  print("Loop");
+<c>  client.loop_start()
+<c>  time.sleep(1)
+<c>  client.loop_stop()
+
 </topic>
 </headerlevel>
 </chapter>
 
 <chapter>
-<topic> sev_ma
+<topic> sev_mva
 Multivariat analysator
 Med den multivariata analysatorn är det möjligt att visa och analysera histoikdata och
 loggad data. Det är också möjlit att linarisera och transformera data och applicera
@@ -753,17 +857,17 @@ verktyg för maskininlärning som linjär regression och neurala nätverk, som kan a
 i modeller och MPC-regulatorer.
 
 <option> printdisable
-Dataset <link> sev_ma_dataset
-Diagram <link> sev_ma_plots
-Editering <link> sev_ma_edit
-Transformering <link> sev_ma_transform
-Linjär regression <link> sev_ma_linreg
-MLP <link> sev_ma_mlp
+Dataset <link> sev_mva_dataset
+Diagram <link> sev_mva_plots
+Editering <link> sev_mva_edit
+Transformering <link> sev_mva_transform
+Linjär regression <link> sev_mva_linreg
+MLP <link> sev_mva_mlp
 <option> printenable
 </topic>
 
 <headerlevel>
-<topic> sev_ma_dataset
+<topic> sev_mva_dataset
 Dataset
 Ett dataset innehåller data ordnad i kolumner och rader. Den första kolumnen är 
 mättidpunken, och följande kolumner innehåller uppmätt data för processvariabler.
@@ -807,7 +911,7 @@ tid och parametervärden vid denna tid. Filen öppnas från File/Open i menyn.
 <c>... 
 </topic>
 
-<topic> sev_ma_plots
+<topic> sev_mva_plots
 Diagram
 Ett antal olika diagram kan visas, t ex sambandsdiagram (scatter plots) som visar
 sambandet mellan två kolumner, eller correlation heatmap som visar korrelationen
@@ -824,7 +928,7 @@ korrelation medan ljusa toner är låg korrelation.
 <b>Fig Correlation heatmap
 </topic>
 
-<topic> sev_ma_edit
+<topic> sev_mva_edit
 Editering av data
 Datasetet kan editeras med ett antal funktioner
 
@@ -836,7 +940,7 @@ Move up och down <t>Ändra ordning på kolumnerna.
 
 </topic>
 
-<topic> sev_ma_transform
+<topic> sev_mva_transform
 Transformera data
 När man skapar modeller med linjär regression krävs det att kolumnerna i datasetet har
 linjära beroenden. Ofta är inte det fallet. Nivån i en cylindrisk tank har t ex inte
@@ -900,7 +1004,7 @@ på samma parametrar. Formeln sparas med 'File/Save Formula' i menyn, och applice
 'File/Apply Formula'.
 </topic>
 
-<topic> sev_ma_linreg
+<topic> sev_mva_linreg
 Linjär regression
 Linjär regression skapar en modell där en parameter, y, kan beräknas från ett antal
 ingångs-värden x1 - xn. y antas ha ett linjärt beroende av ingångs-värdena, och 
@@ -920,7 +1024,7 @@ Lasso och Ridge regression är varianter av linjär regression som också är implem
 <b>Fig Linear regression
 </topic>
 
-<topic> sev_ma_mlp
+<topic> sev_mva_mlp
 MLP regressor
 MLP (Multi Level Perceptron) är ett neuralt nätverk med ett igångslager, ett antal
 dolda lager och ett utgångslager. Varje nod i de dolda och utgångs-lagren är neuroner

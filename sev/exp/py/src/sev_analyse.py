@@ -462,7 +462,7 @@ class LinRegModel:
 
     # Help callback
     def help_action_cb(self):
-        os.system('co_help -s ' + pwr_exe + '/en_us/man_mva.dat -t mva_linreg_model &')
+        os.system('co_help -s ' + pwr_exe + '/en_us/man_sev.dat -t sev_mva_linreg &')
         pass
 
 #
@@ -970,7 +970,7 @@ class MLPModel:
 
     # Help callback
     def help_action_cb(self):
-        os.system('co_help -s ' + pwr_exe + '/en_us/man_mva.dat -t mva_linreg_model &')
+        os.system('co_help -s ' + pwr_exe + '/en_us/man_sev.dat -t sev_mva_mlp &')
         pass
 
 #
@@ -1748,7 +1748,7 @@ class WdWindow:
 
     # Help callback
     def help_action_cb(self):
-        os.system('co_help -s ' + pwr_exe + '/en_us/man_mva.dat &')
+        os.system('co_help -s ' + pwr_exe + '/en_us/man_sev.dat -t sev_mva &')
 
     def new_data(self, data, col, name):
         self.wdata.set_data(data, col, name)

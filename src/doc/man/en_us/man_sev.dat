@@ -2,7 +2,7 @@
 <topic> __DocumentTitlePage
 
 <image> pwr_logga_doc.png
-<h1> Process history
+<h1> Guide to Storage Environment
 
 
 
@@ -39,7 +39,7 @@ Configuration <link> sev_configuration
 Internal data struktur <link> sev_internal
 Databases <link>sev_databases
 Extract data <link> sev_extractdata
-Multivariate analyser <link> sev_ma
+Multivariate analyser <link> sev_mva
 Alarm and event analyser <link> sev_eva
 </topic>
 <option> printenable 
@@ -48,7 +48,7 @@ Alarm and event analyser <link> sev_eva
 <topic> sev_introduction
 Introduction
 
-A task of increasing importance for the automation systems are to store process data. The
+A task of increasing importance for the automation systems is to store process data. The
 possibility to store large amounts of data has given rise to new functionallity in terms
 of development and optimization of processes, predictive maintenance, calculation of 
 models for simulation etc.
@@ -714,7 +714,7 @@ Here some examples are shown on how to extract an display history data.
 <option> printdisable
 Xtt <link> sev_xtt
 Ge <link> sev_ge
-Multivariate analyser <link> sev_ma
+Multivariate analyser <link> sev_mva
 Alarm and event analyser <link> sev_eva
 Python <link> sev_python
 MQTT <link> sev_mqtt
@@ -769,18 +769,123 @@ See the Alarm and Event Analyser chapter below.
 
 <topic> sev_python
 Python
-pwrrt modulen i Python innehåller funktioner för att hämta data från historik-servern.
+The ProviewR Python runtime module, pwrrt, contains functions to fetch history
+data from a sev server.
+
+pwrrt can be execute on a node that has QCom contact to the history server.
+
+<b>Example
+pwrrt.getSevItemData() fetches history for one attribute. It returns a tuple
+with three elements, number of samples, a tuple with values and a tuple with times.
+
+<c>import pandas as pd
+<c>from datetime import datetime
+<c>import pwrrt
+
+<c>pwrrt.init("appl")
+
+<c>result = pwrrt.getSevItemData( 'localhost', '_O0.254.254.204:68', 
+<c>	'ActualValue', '00:02:00', 'now', 1000)
+<c>for i in range(result[0]):
+<c>  print(i, str(result[2][i])[:22], result[1][i])
+
+<b>Example
+pwrrt.getSevItemsDataFrame() can request history for several attributes, and
+returns the history in a structure that can be inserted into a pandas frame.
+The first column contains the time, and the other columns the attribute values.
+
+<c>import pandas as pd
+<c>import pwrrt
+
+<c>pwrrt.init("appl")
+
+<c>oidlist = []
+<c>attrlist = []
+<c>isobjectlist = []
+
+<c># Append first attribute
+<c>oidlist.append('_O0.254.254.204:68')
+<c>attrlist.append('ActualValue')
+<c>isobjectlist.append(0)
+
+<c># Append second attribute
+<c>oidlist.append('_O0.254.254.204:69')
+<c>attrlist.append('ActualValue')
+<c>isobjectlist.append(0)
+
+<c>result = pwrrt.getSevItemsDataFrame( 'localhost', oidlist, attrlist, 
+<c>	isobjectlist, '00:02:00', 'now', 0.5, 1000)
+<c>columns = ('time', 'A1', 'A2')
+<c>data = pd.DataFrame(data=result)
+<c>data.columns = columns
+<c>print(data)
+
 </topic>
 
 <topic> sev_mqtt
 Mqtt server
-Mqtt server i ProviewR kan svara på förfrågningar om historikdata.
+Mqtt server in ProviewR makes is possible to retrieve history data on any 
+platform that has implemented the MQTT client.
+
+The server replies to reqests with diffent actions. The "history" action
+requests history data for an attribute, and the "eventhist" action request
+alarm and event history.
+
+<b>Example
+This is a code example in Python with the MQTT client module python3-paho-mqtt.
+History is fetched from the local MQTT server, topic 'proviewr/server'.
+The reply is requested to be sent to topic 'repl/history', and the request
+is to fetch history data for the attribuite H1-Av1.ActualValue for the 
+last 15 minutes.
+
+<c>#!/usr/bin/python3
+<c>#
+<c>import paho.mqtt.client as mqtt
+<c>import sys
+<c>import time
+<c>from datetime import datetime
+<c>import json
+<c>import matplotlib.pyplot as plt
+<c>from datetime import datetime
+
+<c>def on_message(client, userdata, message):
+<c>    data = json.loads(str(message.payload.decode("utf-8")))
+
+<c>    # Convert time strings to datetime objects
+<c>    t = []
+<c>    for dt in data['time']:
+<c>        t.append(datetime.strptime(dt+'0000', '%d-%b-%Y %H:%M:%S.%f'))
+
+<c>    # Plot the curve, use drawstyle='steps-pre' for digital signals
+<c>    plt.plot(t, data['values'], label='Diff')
+<c>    plt.show()
+    
+
+<c># Connect to MQTT server
+<c>client = mqtt.Client('Aristotle')
+<c>client.username_pw_set('pwrp','pwrp')
+<c>client.on_message = on_message
+<c>client.connect('localhost')
+
+<c># Subscribe to reply
+<c>client.subscribe("repl/history", 1)
+
+<c># Send history request
+<c>client.publish('proviewr/server', '{"action":"history",'  \\
+<c>'"reply":"repl/history","server":"localhost","object":"H1-Av1",'  \\
+<c>'"attribute":"ActualValue","from":"0:15:0","to":"now","maxrows":2000}')
+
+<c>for i in range (0, 3):
+<c>  print("Loop");
+<c>  client.loop_start()
+<c>  time.sleep(1)
+<c>  client.loop_stop()
 </topic>
 </headerlevel>
 </chapter>
 
 <chapter>
-<topic> sev_ma
+<topic> sev_mva
 Multivariate analyzer
 With multivariate analyzer it is possible to view and analyze process history data and 
 logged data. It is also possible to linearize and transform the data and apply machine 
@@ -788,17 +893,17 @@ learning tools as linear regression and neural networks that can be used in mode
 MPC controllers.
 
 <option> printdisable
-Dataset <link> sev_ma_dataset
-Plots <link> sev_ma_plots
-Edit <link> sev_ma_edit
-Transform <link> sev_ma_transform
-Linear regression <link> sev_ma_linreg
-MLP <link> sev_ma_mlp
+Dataset <link> sev_mva_dataset
+Plots <link> sev_mva_plots
+Edit <link> sev_mva_edit
+Transform <link> sev_mva_transform
+Linear regression <link> sev_mva_linreg
+MLP <link> sev_mva_mlp
 <option> printenable
 </topic>
 
 <headerlevel>
-<topic> sev_ma_dataset
+<topic> sev_mva_dataset
 Dataset
 A dataset contains data ordered in columns and rows. The first column is the sample time,
 and the next columns contains measured data for process variables. The data can be fetch 
@@ -841,7 +946,7 @@ parameter values at this time. The file is opened from File/Open in the menu.
 <c>... 
 </topic>
 
-<topic> sev_ma_plots
+<topic> sev_mva_plots
 Plots
 A number of different plots can be made, for example scatterplot that shows the 
 relationship between two columns, or correlation heatmap that displays the correlation 
@@ -858,7 +963,7 @@ correlation while light tones are low correlation.
 <b>Fig Correlation heatmap
 </topic>
 
-<topic> sev_ma_edit
+<topic> sev_mva_edit
 Edit data
 The dataset can be edited with a number of functions
 - Split will split the dataset into two datasets.
@@ -868,7 +973,7 @@ The dataset can be edited with a number of functions
 - Move up and down will change the order of the columns.
 </topic>
 
-<topic> sev_ma_transform
+<topic> sev_mva_transform
 Transform data
 Creating models with Linear regression requires that the columns in the dataset have 
 linear dependencies. Often this is not the case. The level in a cylinder tank for example
@@ -929,7 +1034,7 @@ of the same parameters. The formula is saved from 'File/Save Formula' in the men
 applied from 'File/Apply Formula'.
 </topic>
 
-<topic> sev_ma_linreg
+<topic> sev_mva_linreg
 Linear regression
 Linear regression will create a model where one parameter, y, can be calculated from a 
 number of input values x1 - xn. y is supposed to have linear dependencies of the input 
@@ -950,7 +1055,7 @@ Lasso and Rigde regression are variants of linear regression that are also imple
 <b>Fig Linear regression
 </topic>
 
-<topic> sev_ma_mlp
+<topic> sev_mva_mlp
 MLP regressor
 MLP (Multi Level Perceptron) is a neural network with an input layer, a number of hidden 
 layers and an output layer. Each node in the hidden and output layers is a neuron that 

@@ -1500,7 +1500,7 @@ class WdWindow:
 
     # Help callback
     def help_action_cb(self):
-        os.system('co_help -s ' + pwr_exe + '/en_us/man_eva.dat &')
+        os.system('co_help -s ' + pwr_exe + '/en_us/man_sev.dat -t sev_eva &')
 
     def new_data(self, data):
         self.wdata.set_data(data)
