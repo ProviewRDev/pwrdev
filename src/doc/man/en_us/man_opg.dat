@@ -2257,6 +2257,7 @@ Open various windows.
 open attribute <t>Open a value change dialog for an attribute <LINK> open attribute
 open consolelog <t>Display system messages	<LINK> open consolelog
 open fast   <t>Open fast curve			<LINK> open fast
+open file   <t>Open a file or URL		<LINK> open file
 open fileview <t>Open a fileview		<LINK> open fileview
 open graph  <t>Open a graph			<LINK> open graph
 open history <t>Open process history curve      <LINK> open history
@@ -2422,6 +2423,18 @@ navigator object tree.
 <B>xtt> open navigator [/object=]
 
 /object <t>Name of an object or attribute that is viewed and selected. Optional.
+</TOPIC>
+
+<TOPIC> open file <style> function
+Command   open file
+
+Opens a file or URL in the user's preferred application.
+If the filename contains a slash it has to be surrounded by quotes.
+
+<B>xtt> open file 'filename'
+
+<b>Example
+xtt> open file "$pwrp_doc/manual.pdf"
 </TOPIC>
 
 <TOPIC> open fileview <style> function

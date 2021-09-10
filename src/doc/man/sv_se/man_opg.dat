@@ -1683,6 +1683,7 @@ logout      <t>Utloggning av änvändare		<LINK> logout
 logging     <t>Logga attribut till fil		<LINK> logging
 open graph  <t>Öppna en graf			<LINK> open graph
 open jgraph <t>Öppna en java graf		<LINK> open jgraph
+open file   <t>Öppna en fil eller URL		<LINK> open file
 open fileview <t>Öppna en fileview		<LINK> open fileview
 open navigator <t>Öppna navigatorn		<LINK> open navigator
 open trace  <t>Öppna trace för ett plc-fönster  <LINK> open trace
@@ -2274,6 +2275,18 @@ och väljas ut i objektsträdet.
 <B>xtt> open navigator [/object=]
 
 /object <t>Namn på ett objekt eller attribut som visas och väljs ut.
+</TOPIC>
+
+<TOPIC> open file <style> function
+Command   open file
+
+Öppnar en fil eller URL.
+Om filnamnet innehåller ett snedstreck ska det omges av citationstecken.
+
+<B>xtt> open file 'filename'
+
+<b>Exempel
+xtt> open file "$pwrp_doc/manual.pdf"
 </TOPIC>
 
 <TOPIC> open fileview <style> function

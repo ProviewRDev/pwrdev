@@ -5112,6 +5112,23 @@ static int xnav_open_func(void* client_data, void* client_flag)
       xnav->clog->help_cb = xnav_ev_help_cb;
       xnav->clog->close_cb = xnav_clog_close_cb;
     }
+  } else if (str_NoCaseStrncmp(arg1_str, "FILE", strlen(arg1_str)) == 0) {
+    char arg2_str[200];
+    pwr_tCmd cmd;
+    int sts;
+    char msg[80];
+
+    if (EVEN(dcli_get_qualifier("dcli_arg2", arg2_str, sizeof(arg2_str)))) {
+      xnav->message('E', "Syntax error");
+      return 1;
+    }
+    strcpy(cmd, "xdg-open ");
+    strcat(cmd, arg2_str);
+    sts = system(cmd);
+    if (sts != 0) {
+      sprintf(msg, "Error from xdg-open %d", sts >> 8);
+      xnav->message('E', msg);
+    }
   } else if (str_NoCaseStrncmp(arg1_str, "FILEVIEW", strlen(arg1_str)) == 0) {
     XttFileview* fileview;
     pwr_tFileName file_str;
