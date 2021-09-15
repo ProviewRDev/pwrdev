@@ -4579,7 +4579,7 @@ pwr_tStatus gdh_AttrValueToString(pwr_eType type_id, /**< Attribute type */
       *len = strlen(str);
     } else {
       if (!format)
-        *len = sprintf(str, "%g", *(float*)value_ptr);
+        *len = sprintf(str, "%.7g", *(float*)value_ptr);
       else
         *len = sprintf(str, format, *(float*)value_ptr);
     }
@@ -4587,7 +4587,7 @@ pwr_tStatus gdh_AttrValueToString(pwr_eType type_id, /**< Attribute type */
   }
   case pwr_eType_Float64: {
     if (!format)
-      *len = sprintf(str, "%g", *(double*)value_ptr);
+      *len = sprintf(str, "%.17g", *(double*)value_ptr);
     else
       *len = sprintf(str, format, *(double*)value_ptr);
     break;
@@ -4903,11 +4903,9 @@ pwr_tStatus gdh_AttrStringToValue(int type_id, /**< Attribute type */
     break;
   }
   case pwr_eType_Float64: {
-    pwr_tFloat32 f;
     pwr_tFloat64 d;
-    if (sscanf(value_str, "%f", &f) != 1)
+    if (sscanf(value_str, "%lf", &d) != 1)
       return GDH__CONVERT;
-    d = f;
     memcpy(buffer_ptr, (char*)&d, sizeof(d));
 
     break;

@@ -83,11 +83,9 @@ int wnav_attr_string_to_value(ldh_tSesContext ldhses, int type_id,
     break;
   }
   case pwr_eType_Float64: {
-    pwr_tFloat32 f;
     pwr_tFloat64 d;
-    if (sscanf(value_str, "%f%s", &f, s) != 1)
+    if (sscanf(value_str, "%lf%s", &d, s) != 1)
       return WNAV__INPUT_SYNTAX;
-    d = f;
     memcpy(buffer_ptr, (char*)&d, sizeof(d));
 
     break;
@@ -332,12 +330,12 @@ void wnav_attrvalue_to_string(
       strcpy(str, "FltNMax");
       *len = strlen(str);
     } else
-      *len = sprintf(str, "%f", *(pwr_tFloat32*)value_ptr);
+      *len = sprintf(str, "%.7g", *(pwr_tFloat32*)value_ptr);
     *buff = str;
     break;
   }
   case pwr_eType_Float64: {
-    *len = sprintf(str, "%f", *(pwr_tFloat64*)value_ptr);
+    *len = sprintf(str, "%.17g", *(pwr_tFloat64*)value_ptr);
     *buff = str;
     break;
   }
