@@ -242,8 +242,6 @@ copy : \
        $(doc_dir)/en_us/man_exlib.pdf \
        $(doc_dir)/en_us/man_exlib.ps \
        $(web_dir)/pwr_logga.png \
-       $(exe_dir)/en_us/man_mva.dat \
-       $(exe_dir)/en_us/man_eva.dat \
        $(mediatargets) $(csstargets) \
        $(export_html) $(export_html_en_us) $(export_html_sv_se) \
        $(doc_dir)/en_us/changelog.html | silent
@@ -454,14 +452,6 @@ $(doc_dir)/en_us/man_exlib_index.html : $(pwre_sroot)/doc/man/en_us/man_exlib.da
 $(doc_dir)/en_us/man_exlib.pdf : $(pwre_sroot)/doc/man/en_us/man_exlib.dat
 	@ $(log_pdf)
 	@ $(co_convert) -f -d $(doc_dir)/en_us $(source)
-
-$(exe_dir)/en_us/man_mva.dat : $(pwre_sroot)/doc/man/en_us/man_mva.dat
-	@ $(log_h_h)
-	@ $(cp) $(cpflags) $(source) $(target)
-
-$(exe_dir)/en_us/man_eva.dat : $(pwre_sroot)/doc/man/en_us/man_eva.dat
-	@ $(log_h_h)
-	@ $(cp) $(cpflags) $(source) $(target)
 
 $(doc_dir)/en_us/changelog.html : $(pwre_croot)/src/changelog.txt \
                                   $(pwre_croot)/xtt/changelog.txt \
