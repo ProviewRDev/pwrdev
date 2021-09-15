@@ -23,6 +23,7 @@ demo_modules = $(pwrp_inc)/ra_plc_user.h \
 	       $(pwrp_exe)/ra_pwrrttest.py \
 	       $(pwrp_exe)/ra_ccmtest.rtt_com \
 	       $(pwrp_exe)/ra_xttscripttest.rtt_com \
+	       $(pwrp_exe)/ra_mqtttest.py \
 	       $(pwrp_exe)/ra_testall_c.sh \
 	       $(pwrp_exe)/ra_sevtest.py \
 	       $(pwrp_exe)/ra_testall_d.sh \
@@ -114,6 +115,10 @@ $(pwrp_exe)/ra_ccmtest.rtt_com : $(pwrp_appl)/ra_ccmtest.rtt_com
 
 $(pwrp_exe)/ra_xttscripttest.rtt_com : $(pwrp_appl)/ra_xttscripttest.rtt_com
 	@ echo "Building ra_xttscripttest"
+	@ cp -p $(source) $(target)
+
+$(pwrp_exe)/ra_mqtttest.py : $(pwrp_appl)/ra_mqtttest.py
+	@ echo "Building ra_mqtttest"
 	@ cp -p $(source) $(target)
 
 $(pwrp_exe)/ra_testall_c.sh : $(pwrp_appl)/ra_testall_c.sh

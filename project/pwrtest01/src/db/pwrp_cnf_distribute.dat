@@ -85,6 +85,7 @@ appl pwrtest01c E $pwrp_exe/ra_qmontest
 appl pwrtest01c E $pwrp_exe/ra_timetest
 appl pwrtest01c E $pwrp_exe/ra_ccmtest.rtt_com
 appl pwrtest01c E $pwrp_exe/ra_xttscripttest.rtt_com
+appl pwrtest01c E $pwrp_exe/ra_mqtttest.py
 appl pwrtest01c E $pwrp_exe/ra_testall_c.sh
 node pwrtest01d 128 999 0 - -
 load pwrtest01d
