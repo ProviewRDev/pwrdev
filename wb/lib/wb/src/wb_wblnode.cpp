@@ -2025,11 +2025,9 @@ int wb_wblnode::attrStringToValue(int type_id, char* value_str,
     break;
   }
   case pwr_eType_Float64: {
-    pwr_tFloat32 f;
     pwr_tFloat64 d;
-    if (sscanf(value_str, "%f", &f) != 1)
+    if (sscanf(value_str, "%lf", &d) != 1)
       return 0;
-    d = f;
     memcpy(buffer_ptr, (char*)&d, sizeof(d));
 
     break;
