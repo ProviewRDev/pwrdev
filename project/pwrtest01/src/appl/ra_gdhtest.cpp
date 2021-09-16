@@ -1640,9 +1640,19 @@ void ra_gdhtest::AttrValueToString(void)
       m_log->log('E', "AttrValueToString", d[i].str, m_sts);
       return;
     }
-    if (strcmp(str, d[i].str) != 0) {
-      m_log->log('E', "AttrValueToString", str);
-      return;
+    switch (d[i].type) {
+    case pwr_eType_Float64:
+    case pwr_eType_Float32:
+      if (strncmp(str, d[i].str, strlen(d[i].str)-1) != 0) {
+	m_log->log('E', "AttrValueToString", str);
+	return;
+      }
+      break;
+    default:
+      if (strcmp(str, d[i].str) != 0) {
+	m_log->log('E', "AttrValueToString", str);
+	return;
+      }
     }
   }
 
