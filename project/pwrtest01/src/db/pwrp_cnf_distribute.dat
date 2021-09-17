@@ -92,6 +92,7 @@ load pwrtest01d
 appl pwrtest01d W $pwrp_cnf/pwrtest01d/pwr_user2.dat:$pwra_db/pwr_user2.dat $pwra_db/pwr_user2.dat
 appl pwrtest01d W $pwrp_cnf/pwrtest01d/authorized_keys:$pwra_db/authorized_keys /home/pwrp/.ssh/authorized_keys
 appl pwrtest01d E $pwrp_exe/ra_sevtest.py
+appl pwrtest01d E $pwrp_exe/ra_sev_mqtttest.py
 appl pwrtest01d E $pwrp_exe/ra_testall_d.sh
 node pwrtest01e 128 999 0 - -
 load pwrtest01e

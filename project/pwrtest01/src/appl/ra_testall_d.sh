@@ -17,6 +17,7 @@ dexec()
 let i=0
 
 exec "ra_sevtest.py"
+exec "ra_sev_mqtttest.py"
 
 # Wait for spawned processes
 for p in ${pid[*]}; do

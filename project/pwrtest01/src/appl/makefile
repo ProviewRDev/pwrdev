@@ -26,6 +26,7 @@ demo_modules = $(pwrp_inc)/ra_plc_user.h \
 	       $(pwrp_exe)/ra_mqtttest.py \
 	       $(pwrp_exe)/ra_testall_c.sh \
 	       $(pwrp_exe)/ra_sevtest.py \
+	       $(pwrp_exe)/ra_sev_mqtttest.py \
 	       $(pwrp_exe)/ra_testall_d.sh \
 	       $(pwrp_exe)/ra_sevtest_e.py \
 	       $(pwrp_exe)/ra_testall_e.sh \
@@ -127,6 +128,10 @@ $(pwrp_exe)/ra_testall_c.sh : $(pwrp_appl)/ra_testall_c.sh
 
 $(pwrp_exe)/ra_sevtest.py : $(pwrp_appl)/ra_sevtest.py
 	@ echo "Building ra_sevtest"
+	@ cp -p $(source) $(target)
+
+$(pwrp_exe)/ra_sev_mqtttest.py : $(pwrp_appl)/ra_sev_mqtttest.py
+	@ echo "Building ra_sev_mqtttest"
 	@ cp -p $(source) $(target)
 
 $(pwrp_exe)/ra_testall_d.sh : $(pwrp_appl)/ra_testall_d.sh
