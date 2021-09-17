@@ -73,20 +73,20 @@ class Ctx:
     #              useralarm1-4 4096, 8192, 16384, 32768, info 65536
     # Object, eventprio, options, eventtype, minlen, maxlen, status
     d = (
-      ('VolPwrTest01d:Test01d-H2-HistEvents', 0, 0, 0, 20, 20, SEV__SUCCESS),
-      ('VolPwrTest01d:Test01d-H2-HistEvents', 0, 1, 0, 20, 20, SEV__SUCCESS),
-      ('VolPwrTest01d:Test01d-H2-HistEvents', 0, 2, 0, 20, 20, SEV__SUCCESS),
-      ('VolPwrTest01d:Test01d-H2-HistEvents', 0, 4, 0, 20, 20, SEV__SUCCESS),
-      ('VolPwrTest01d:Test01d-H2-HistEvents', 0, 8, 0, 20, 20, SEV__SUCCESS),
-      ('VolPwrTest01d:Test01d-H2-HistEvents', 0, 16, 0, 20, 20, SEV__SUCCESS),
-      ('VolPwrTest01d:Test01d-H2-HistEvents', 0, 32, 0, 20, 20, SEV__SUCCESS),
-      ('VolPwrTest01d:Test01d-H2-HistEvents', 0, 1 | 8 | 16, 0, 20, 20, SEV__SUCCESS),
-      ('VolPwrTest01d:Test01d-H2-HistEvents', 0, 63, 0, 20, 20, SEV__SUCCESS),
-      ('VolPwrTest01d:Test01d-H2-HistEvents', 0, 0, 512, 20, 20, SEV__SUCCESS),
-      ('VolPwrTest01d:Test01d-H2-HistEvents', 0, 0, 64, 20, 20, SEV__SUCCESS),
-      ('VolPwrTest01d:Test01d-H2-HistEvents', 0, 0, 512 | 64, 20, 20, SEV__SUCCESS),
-      ('VolPwrTest01d:Test01d-H2-HistEvents', 1, 0, 0, 20, 20, SEV__SUCCESS),
-      ('VolPwrTest01d:Test01d-H2-HistEvents', 8, 0, 0, 20, 20, SEV__NOPOINTS),
+      ('VolPwrTest01d:Test01d-H2-HistEvents', 0, 0, 0, 5, 20, SEV__SUCCESS),
+      ('VolPwrTest01d:Test01d-H2-HistEvents', 0, 1, 0, 5, 20, SEV__SUCCESS),
+      ('VolPwrTest01d:Test01d-H2-HistEvents', 0, 2, 0, 5, 20, SEV__SUCCESS),
+      ('VolPwrTest01d:Test01d-H2-HistEvents', 0, 4, 0, 5, 20, SEV__SUCCESS),
+      ('VolPwrTest01d:Test01d-H2-HistEvents', 0, 8, 0, 5, 20, SEV__SUCCESS),
+      ('VolPwrTest01d:Test01d-H2-HistEvents', 0, 16, 0, 5, 20, SEV__SUCCESS),
+      ('VolPwrTest01d:Test01d-H2-HistEvents', 0, 32, 0, 5, 20, SEV__SUCCESS),
+      ('VolPwrTest01d:Test01d-H2-HistEvents', 0, 1 | 8 | 16, 0, 5, 20, SEV__SUCCESS),
+      ('VolPwrTest01d:Test01d-H2-HistEvents', 0, 63, 0, 5, 20, SEV__SUCCESS),
+      ('VolPwrTest01d:Test01d-H2-HistEvents', 0, 0, 512, 5, 20, SEV__SUCCESS),
+      ('VolPwrTest01d:Test01d-H2-HistEvents', 0, 0, 64, 5, 20, SEV__SUCCESS),
+      ('VolPwrTest01d:Test01d-H2-HistEvents', 0, 0, 512 | 64, 5, 20, SEV__SUCCESS),
+      ('VolPwrTest01d:Test01d-H2-HistEvents', 1, 0, 0, 5, 20, SEV__SUCCESS),
+      ('VolPwrTest01d:Test01d-H2-HistEvents', 8, 0, 0, 5, 20, SEV__NOPOINTS),
       ('VolPwrTest01d:Test01d-H2-No', 8, 0, 0, 20, 20, HASH__NOTFOUND)
         )
     client.subscribe("repl/histevent", 1);
@@ -128,32 +128,38 @@ class Ctx:
             length = len(ctx.reply['time'])
             #print("time len", length)
             if length < d[i][4] or length > d[i][5]:
-                self.logger.vlog('E', 'eventhist, Unexpected time length %s', str(length))
+                self.logger.vlog('E', 'eventhist %s, Unexpected time length %s', str(i), str(length))
+                return
         if d[i][2] & 2 or d[i][2] == 0:
             length = len(ctx.reply['type'])
             #print("type len", length)
             if length < d[i][4] or length > d[i][5]:
-                self.logger.vlog('E', 'eventhist, Unexpected type length %s', str(length))
+                self.logger.vlog('E', 'eventhist %s, Unexpected type length %s', str(i), str(length))
+                return
         if d[i][2] & 4:
             length = len(ctx.reply['prio'])
             #print("prio len", length)
             if length < d[i][4] or length > d[i][5]:
-                self.logger.vlog('E', 'eventhist, Unexpected prio length %s', str(length))
+                self.logger.vlog('E', 'eventhist %s, Unexpected prio length %s', str(i), str(length))
+                return
         if d[i][2] & 8 or d[i][2] == 0:
             length = len(ctx.reply['text'])
             #print("text len", length)
             if length < d[i][4] or length > d[i][5]:
-                self.logger.vlog('E', 'eventhist, Unexpected text length %s', str(length))
+                self.logger.vlog('E', 'eventhist %s, Unexpected text length %s', str(i), str(length))
+                return
         if d[i][2] & 16:
             length = len(ctx.reply['name'])
             #print("name len", length)
             if length < d[i][4] or length > d[i][5]:
-                self.logger.vlog('E', 'eventhist, Unexpected name length %s', str(length))
+                self.logger.vlog('E', 'eventhist %s, Unexpected name length %s', str(i), str(length))
+                return
         if d[i][2] & 32:
             length = len(ctx.reply['id_idx'])
             #print("idx  len", length)
             if length < d[i][4] or length > d[i][5]:
-                self.logger.vlog('E', 'eventhist, Unexpected id length %s', str(length))
+                self.logger.vlog('E', 'eventhist %s, Unexpected id length %s', str(i), str(length))
+                return
 
             
     self.logger.log('S', 'eventhist, successfull completion')
