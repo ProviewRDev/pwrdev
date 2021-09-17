@@ -15,6 +15,13 @@ if [ "$p" == "" ]; then
   mysqld --basedir=/usr --datadir=/var/lib/mysql --plugin-dir=/usr/lib/mysql/plugin &
 fi
 
+# mosquitto, create user and start
+echo "pwrp:pwrp" > /etc/mosquitto/passwd
+mosquitto_passwd -U /etc/mosquitto/passwd
+echo "allow_anonymous false" >> /etc/mosquitto/mosquitto.conf
+echo "password_file /etc/mosquitto/passwd" >> /etc/mosquitto/mosquitto.conf
+/usr/sbin/mosquitto -c /etc/mosquitto/mosquitto.conf &
+
 set -o xtrace
 sleep 10
 mysql -e 'CREATE USER pwrp@localhost;'
@@ -50,3 +57,4 @@ ps ax
 export PYTHONPATH=$pwr_exe
 
 ra_sevtest.py
+ra_sev_mqtttest.py

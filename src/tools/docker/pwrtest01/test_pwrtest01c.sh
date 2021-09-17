@@ -5,6 +5,13 @@ echo "Version 1.0"
 
 Xorg -noreset +extension GLX +extension RANDR +extension RENDER -config ./dummy_display_xorg.conf :99 &
 
+# mosquitto, create user and start
+echo "pwrp:pwrp" > /etc/mosquitto/passwd
+mosquitto_passwd -U /etc/mosquitto/passwd
+echo "allow_anonymous false" >> /etc/mosquitto/mosquitto.conf
+echo "password_file /etc/mosquitto/passwd" >> /etc/mosquitto/mosquitto.conf
+/usr/sbin/mosquitto -c /etc/mosquitto/mosquitto.conf &
+
 sleep 20
 su - pwrp
 cd /home/pwrp

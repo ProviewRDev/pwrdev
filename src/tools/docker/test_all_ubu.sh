@@ -5,7 +5,7 @@ release_name="ubu"
 buildversion="19-APR-2021 12:00:00"
 tz="Europe/Stockholm"
 build_rpi=1
-gitrepo="-b develop http://192.168.0.162/git/x5-7-2/pwr/.git"
+gitrepo="-b develop http://192.168.0.172/git/x5-7-2/pwr/.git"
 install_update="apt-get update"
 install_git="apt-get install -y git make"
 install_videodummy="apt-get install -y xserver-xorg-video-dummy"
@@ -26,7 +26,7 @@ install_pwrrt="apt-get install -y libgtk2.0-0 libasound2 \
 	librabbitmq4 libmosquitto1 libusb-1.0-0 libhdf5-openmpi-103 \
 	libgstreamer1.0-0 libgstreamer-plugins-base1.0-0 \
 	xterm xfonts-100dpi sudo procps python3 python3-pandas python3-seaborn \
-	python3-statsmodels python3-sklearn"
+	python3-statsmodels python3-sklearn python3-paho-mqtt mosquitto mosquitto-clients"
 install_pkg="dpkg -i"
 jdk_dir=/usr/lib/jvm/java-11-openjdk-amd64
 ver="5.8.0-1"
@@ -193,6 +193,7 @@ if [ $start -le 6 ] && [ $end -ge 6 ]; then
   docker container cp pwrtc:/pwrp/common/log/ccm.tlog ./log/
   docker container cp pwrtc:/pwrp/common/log/xttscript.tlog ./log/
   docker container cp pwrtc:/pwrp/common/log/pwrrt.tlog ./log/
+  docker container cp pwrtc:/pwrp/common/log/mqtt_server.tlog ./log/
 
   docker container rm pwrtc
   docker image rm pwrtest01c:v1
@@ -249,6 +250,7 @@ if [ $start -le 9 ] && [ $end -ge 9 ]; then
     ./
   docker run $caps --name pwrtd pwrtest01d:v1
   docker container cp pwrtd:/pwrp/common/log/sev_mariadb.tlog ./log/
+  docker container cp pwrtd:/pwrp/common/log/sev_mqtt_server.tlog ./log/
 
   docker container rm pwrtd
   docker image rm pwrtest01d:v1
