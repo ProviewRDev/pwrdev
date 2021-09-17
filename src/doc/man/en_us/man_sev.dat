@@ -365,6 +365,7 @@ By setting Event in Options in the SevHist object, it is possible to control whe
 storage is performed. When Trigger in the SevHist object is set to 1, the current value
 is sent to the server process. Trigger is reset automatically when the value is sent.
 </topic>
+</headerlevel>
 </chapter>
 
 <chapter>
@@ -1125,5 +1126,3 @@ Att notera vid uppgradering av sev stationer från före V5.8.
 - Rootvolumen ska konfigureras med ett RootVolumeConfig objekt, och editeras.
 </topic>
 </chapter>
-
-

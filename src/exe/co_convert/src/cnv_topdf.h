@@ -81,7 +81,7 @@ class CnvPdfObj {
   CnvToPdf* topdf;
   pdf_eObjType type;
   int number;
-  int length;
+  unsigned int length;
   int offset;
   int start;
   char fontname[80];

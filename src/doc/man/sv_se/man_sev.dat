@@ -354,6 +354,7 @@ Genom att sätta Event i Options SevExport objektet kan man styra när exporten av
 sker. Överföringen görs när Trigger i SevExport objektet sätts till 1. Trigger tas ner
 automatiskt när överföringen har utförts.
 </topic>
+</headerlevel>
 </chapter>
 
 <chapter>
@@ -1092,8 +1093,7 @@ FriendNodeConfig objekt.
 Att notera vid uppgradering av storage stationer från före V5.8.
 - pwrsev-paketet har utgått sedan V5.8.0 och pwrrt-paketet ska användas istället.
 - Noden ska konfigureras med ett NodeConfig objekt istället för SevNodeConfig.
-- Rootvolumen ska konfigureras med ett RootVolumeConfig objekt, och editeras.
+- Rootvolymen ska konfigureras med ett RootVolumeConfig objekt, och editeras.
 </topic>
+
 </chapter>
-
-
