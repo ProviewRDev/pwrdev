@@ -3434,14 +3434,20 @@ int XNav::show_logging(int index)
 int XNavGbl::setupscript_exec(XNav* xnav)
 {
   char cmd[80];
+  pwr_tFileName fname;
+  pwr_tStatus sts;
+  pwr_tTime t;
 
   if (streq(setupscript, ""))
-    strcpy(setupscript, "$HOME/xtt_setup");
+    strcpy(setupscript, "$HOME/xtt_setup.rtt_com");
 
-  strcpy(cmd, "@");
-  strcat(cmd, setupscript);
-  xnav->command(cmd);
-
+  dcli_translate_filename(fname, setupscript);
+  sts = dcli_file_time(fname, &t);
+  if (ODD(sts)) {
+    strcpy(cmd, "@");
+    strcat(cmd, setupscript);
+    xnav->command(cmd);
+  }
   return XNAV__SUCCESS;
 }
 
