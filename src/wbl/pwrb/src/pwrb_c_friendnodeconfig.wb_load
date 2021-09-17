@@ -90,7 +90,7 @@ SObject pwrb:Class
       !*/
       Object Address $Attribute 4 
         Body SysBody
-          Attr TypeRef = "pwrs:Type-$String16"
+          Attr TypeRef = "pwrs:Type-$String80"
         EndBody
       EndObject
       !/**
