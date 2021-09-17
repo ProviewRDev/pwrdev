@@ -354,6 +354,7 @@ void GeCurve::activate_minmax_ok(double min_value, double max_value)
 
   configure_curves();
   configure_axes();
+  grow_NavRedraw(growcurve_ctx);
 }
 
 void GeCurve::activate_minmax_save(double min_value, double max_value)
