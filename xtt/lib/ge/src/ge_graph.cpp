@@ -6901,8 +6901,10 @@ void GraphRecallBuff::insert(
   else
     strcpy(new_key, data_key);
 
-  if (cnt == size)
+  if (cnt == size) {
     delete buff[size - 1];
+    cnt = size - 1;
+  }
   for (i = cnt; i > 0; i--) {
     buff[i] = buff[i - 1];
     strcpy(key[i], key[i - 1]);
@@ -6911,8 +6913,6 @@ void GraphRecallBuff::insert(
   buff[0]->unset_inherit(object);
   strcpy(key[0], new_key);
   cnt++;
-  if (cnt > size)
-    cnt = size;
 }
 
 int GraphRecallBuff::get(GeDyn** data, int idx)
