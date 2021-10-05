@@ -1104,7 +1104,7 @@ void AS_enQMessage(AS_messageQ** objectmQp, int nlimit, const char* newMessage)
 
   AS_messageQ *last, *enqueued; // copy of pointer to last item in queue.
 
-  if (mQSize(*objectmQp) > nlimit)
+  if (mQSize(*objectmQp) >= nlimit)
     return;
 
   enqueued = (AS_messageQ*)malloc(sizeof(AS_messageQ));
