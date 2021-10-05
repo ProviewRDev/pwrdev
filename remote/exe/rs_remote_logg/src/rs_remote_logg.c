@@ -547,7 +547,7 @@ int main()
   /* Initialize qcom que attributes */
 
   remlogg_qattr.type = qcom_eQtype_private;
-  remlogg_qattr.quota = 100;
+  remlogg_qattr.quota = 300;
 
   /* Delete the queue if it exists */
 
