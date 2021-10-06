@@ -377,6 +377,7 @@ mvol_sAttribute* mvol_ArefToAttribute(
     ap->offs = 0;
     ap->tid = cdh_TypeObjidToId(ap->bop->g.oid);
     ap->elem = 1;
+    ap->aop = NULL;
 
     pwr_Return(ap, sts, GDH__SUCCESS);
   }
