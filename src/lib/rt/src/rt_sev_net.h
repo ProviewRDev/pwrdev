@@ -129,6 +129,21 @@ typedef struct {
 } sev_sEvent;
 
 typedef struct {
+  unsigned int type;
+  unsigned int eventprio;
+  unsigned int eventid_nix;
+  unsigned int eventid_birthtime;
+  unsigned int eventid_idx;
+  net_sTime time;
+  char eventtext[80];
+  char eventname[80];
+  unsigned int sup_aref_vid;
+  unsigned int sup_aref_oix;
+  unsigned int sup_aref_offset;
+  unsigned int sup_aref_size;
+} sev_sEventV1;
+
+typedef struct {
   sev_eEventType type;
   unsigned int eventprio;
   unsigned int eventid_nix;

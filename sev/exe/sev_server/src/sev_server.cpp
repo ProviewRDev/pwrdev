@@ -1453,9 +1453,17 @@ int sev_server::receive_events(
       ev.supobject.Objid.oix = ep->sup_aref_oix;
       ev.supobject.Offset = ep->sup_aref_offset;
       ev.supobject.Size = ep->sup_aref_size;
-      ev.eventstatus = ep->eventstatus;
+      if (msg->Version < 2)
+	ev.eventstatus = 0;
+      else 
+	ev.eventstatus = ep->eventstatus;
       m_db->store_event(&m_sts, 0, idx, &ev);
-      ep++;
+      if (msg->Version == 0)
+	ep = (sev_sEvent *)((char *)ep + sizeof(sev_sEventV0)); 
+      else if (msg->Version == 1)
+	ep = (sev_sEvent *)((char *)ep + sizeof(sev_sEventV1));
+      else
+	ep++;
     }
   } else {
     sev_sThread* th;
