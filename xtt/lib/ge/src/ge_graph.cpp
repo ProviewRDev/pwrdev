@@ -2384,7 +2384,7 @@ static int graph_grow_cb(GlowCtx* ctx, glow_tEvent event)
   if (!graph || graph->closing_down)
     return 1;
 
-  if (event->event != glow_eEvent_CursorMotion)
+  if (event->event != glow_eEvent_CursorMotion && event->event != glow_eEvent_GrowDynamics)
     graph->message(' ', null_str);
 
   if (graph->trace_started) {
@@ -3929,7 +3929,8 @@ static int graph_trace_grow_cb(GlowCtx* ctx, glow_tEvent event)
   int ctx_popped = 0;
 
   grow_GetCtxUserData((GrowCtx*)ctx, (void**)&graph);
-  graph->message(' ', null_str);
+  if (event->event != glow_eEvent_CursorMotion && event->event != glow_eEvent_GrowDynamics)
+    graph->message(' ', null_str);
 
   if (ctx != graph->grow->ctx) {
     graph->grow->pop((GrowCtx*)ctx);

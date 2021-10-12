@@ -153,6 +153,11 @@ static int graph_save_func(void* client_data, void* client_flag)
   char file_str[80];
   char name[40];
 
+  if (graph->trace_started) {
+    graph->message('E', "Stop Preview before saving");
+    return GE__SUCCESS;
+  }
+
   if (ODD(dcli_get_qualifier("/FILE", file_str, sizeof(file_str)))) {
     if (strlen(file_str) > 39) {
       graph->message('E', "Filename to long");
