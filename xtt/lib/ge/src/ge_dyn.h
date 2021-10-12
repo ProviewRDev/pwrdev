@@ -622,6 +622,7 @@ typedef enum {
   ge_eSave_DigScript_script = 4601,
   ge_eSave_DigScript_script_len = 4602,
   ge_eSave_DigScript_level = 4603,
+  ge_eSave_DigScript_arguments = 4604,
   ge_eSave_RefUpdate_attribute = 4700,
   ge_eSave_RefUpdate_whole_graph = 4701,
   ge_eSave_DsTrend_dstrend_object1 = 4800,
@@ -831,6 +832,7 @@ typedef enum {
   ge_eSave_MethodPulldownMenu_menu_type = 7201,
   ge_eSave_Script_script_len = 7300,
   ge_eSave_Script_script = 7301,
+  ge_eSave_Script_arguments = 7302,
   ge_eSave_CatchSignal_signal_name = 7400,
   ge_eSave_EmitSignal_signal_name = 7500,
   ge_eSave_EmitSignal_global = 7501,
@@ -2224,6 +2226,7 @@ class GeScript : public GeDynElem {
 public:
   char script[2048];
   int script_len;
+  char arguments[80];
 
   GeScript(GeDyn* e_dyn);
   GeScript(const GeScript& x);
@@ -2902,6 +2905,7 @@ public:
   char script[2048];
   int script_len;
   int level;
+  char arguments[80];
 
   pwr_tBoolean* p;
   pwr_tSubid subid;
@@ -2912,6 +2916,7 @@ public:
   pwr_tBoolean old_value;
   int a_typeid;
   unsigned int bitmask;
+  pwr_tCmd argstr;
 
   GeDigScript(GeDyn* e_dyn, ge_mInstance e_instance = ge_mInstance_1);
   GeDigScript(const GeDigScript& x);

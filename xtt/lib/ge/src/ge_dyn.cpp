@@ -4044,7 +4044,7 @@ int GeInvisible::connect(
 
     dyn->graph->get_command(command, cmd, dyn);
 
-    sts = (dyn->graph->command_cb)(dyn->graph->parent_ctx, cmd, 0);
+    sts = (dyn->graph->command_cb)(dyn->graph->parent_ctx, cmd, 0, 0);
     if (ODD(sts))
       p = &val_false;
     else
@@ -15542,7 +15542,7 @@ int GeDigCommand::scan(grow_tObject object)
       char cmd[400];
 
       dyn->graph->get_command(command, cmd, dyn);
-      sts = (dyn->graph->command_cb)(dyn->graph->parent_ctx, cmd, 0);
+      sts = (dyn->graph->command_cb)(dyn->graph->parent_ctx, cmd, 0, 0);
       return sts;
     }
   }
@@ -15582,6 +15582,7 @@ GeDigScript::GeDigScript(GeDyn* e_dyn, ge_mInstance e_instance)
 {
   strcpy(attribute, "");
   strcpy(script, "");
+  strcpy(arguments, "");
   instance = e_instance;
 }
 
@@ -15592,6 +15593,7 @@ GeDigScript::GeDigScript(const GeDigScript& x)
 {
   strcpy(attribute, x.attribute);
   strcpy(script, x.script);
+  strcpy(arguments, x.arguments);
   instance = x.instance;
   instance_mask = x.instance_mask;
 }
@@ -15609,6 +15611,11 @@ void GeDigScript::get_attributes(attr_sItem* attrinfo, int* item_count)
   attrinfo[i].value = &level;
   attrinfo[i].type = glow_eType_Boolean;
   attrinfo[i++].size = sizeof(level);
+
+  strcpy(attrinfo[i].name, "DigScript.Arguments");
+  attrinfo[i].value = arguments;
+  attrinfo[i].type = glow_eType_String;
+  attrinfo[i++].size = sizeof(arguments);
 
   strcpy(attrinfo[i].name, "DigScript.Script");
   attrinfo[i].value = script;
@@ -15644,6 +15651,7 @@ void GeDigScript::save(std::ofstream& fp)
   fp << int(ge_eSave_DigScript_attribute) << FSPACE << attribute << '\n';
   fp << int(ge_eSave_DigScript_level) << FSPACE << level << '\n';
   fp << int(ge_eSave_DigScript_script_len) << FSPACE << script_len << '\n';
+  fp << int(ge_eSave_DigScript_arguments) << FSPACE << arguments << '\n';
   fp << int(ge_eSave_DigScript_script) << '\n';
   fp << "\"";
   for (char* s = script; *s; s++) {
@@ -15683,6 +15691,10 @@ void GeDigScript::open(std::ifstream& fp)
       break;
     case ge_eSave_DigScript_script_len:
       fp >> script_len;
+      break;
+    case ge_eSave_DigScript_arguments:
+      fp.get();
+      fp.getline(arguments, sizeof(arguments));
       break;
     case ge_eSave_DigScript_script: {
       fp.getline(dummy, sizeof(dummy));
@@ -15749,6 +15761,9 @@ int GeDigScript::connect(
 
   trace_data->p = &pdummy;
   first_scan = true;
+
+  dyn->graph->get_command(arguments, argstr, dyn);
+
   return 1;
 }
 
@@ -15783,7 +15798,7 @@ int GeDigScript::scan(grow_tObject object)
 
   if ((!level && val && !old_value) || (level && val)) {
     if (dyn->graph->command_cb) {
-      sts = (dyn->graph->command_cb)(dyn->graph->parent_ctx, 0, script);
+      sts = (dyn->graph->command_cb)(dyn->graph->parent_ctx, 0, script, argstr);
     }
   }
   old_value = val;
@@ -17483,7 +17498,7 @@ int GeCommand::action(grow_tObject object, glow_tEvent event)
       int sts;
 
       dyn->graph->get_command(command, cmd, dyn);
-      sts = (dyn->graph->command_cb)(dyn->graph->parent_ctx, cmd, 0);
+      sts = (dyn->graph->command_cb)(dyn->graph->parent_ctx, cmd, 0, 0);
       return sts;
     }
     break;
@@ -17617,7 +17632,7 @@ int GeCommandDoubleClick::action(grow_tObject object, glow_tEvent event)
       char cmd[400];
 
       dyn->graph->get_command(command, cmd, dyn);
-      (dyn->graph->command_cb)(dyn->graph->parent_ctx, cmd, 0);
+      (dyn->graph->command_cb)(dyn->graph->parent_ctx, cmd, 0, 0);
     }
     break;
   default:;
@@ -17641,6 +17656,7 @@ GeScript::GeScript(GeDyn* e_dyn)
           ge_mActionType2_No, ge_eDynPrio_Script)
 {
   strcpy(script, "");
+  strcpy(arguments, "");
 }
 
 GeScript::GeScript(const GeScript& x)
@@ -17649,11 +17665,17 @@ GeScript::GeScript(const GeScript& x)
       script_len(x.script_len)
 {
   strncpy(script, x.script, sizeof(script));
+  strncpy(arguments, x.arguments, sizeof(arguments));
 }
 
 void GeScript::get_attributes(attr_sItem* attrinfo, int* item_count)
 {
   int i = *item_count;
+
+  strcpy(attrinfo[i].name, "Script.Arguments");
+  attrinfo[i].value = arguments;
+  attrinfo[i].type = glow_eType_String;
+  attrinfo[i++].size = sizeof(arguments);
 
   strcpy(attrinfo[i].name, "Script.Script");
   attrinfo[i].value = script;
@@ -17682,6 +17704,7 @@ void GeScript::replace_attribute(char* from, char* to, int* cnt, int strict)
 void GeScript::save(std::ofstream& fp)
 {
   fp << int(ge_eSave_Script) << '\n';
+  fp << int(ge_eSave_Script_arguments) << FSPACE << arguments << '\n';
   fp << int(ge_eSave_Script_script_len) << FSPACE << script_len << '\n';
   fp << int(ge_eSave_Script_script) << '\n';
   fp << "\"";
@@ -17712,6 +17735,10 @@ void GeScript::open(std::ifstream& fp)
 
     switch (type) {
     case ge_eSave_Script:
+      break;
+    case ge_eSave_Script_arguments:
+      fp.get();
+      fp.getline(arguments, sizeof(arguments));
       break;
     case ge_eSave_Script_script_len:
       fp >> script_len;
@@ -17768,9 +17795,10 @@ int GeScript::action(grow_tObject object, glow_tEvent event)
 
     if (dyn->graph->command_cb) {
       int sts;
+      pwr_tCmd argstr;
 
-      // dyn->graph->get_command( command, cmd, dyn);
-      sts = (dyn->graph->command_cb)(dyn->graph->parent_ctx, 0, script);
+      dyn->graph->get_command(arguments, argstr, dyn);
+      sts = (dyn->graph->command_cb)(dyn->graph->parent_ctx, 0, script, argstr);
       return sts;
     }
     break;
@@ -18724,7 +18752,7 @@ int GeHelp::action(grow_tObject object, glow_tEvent event)
       else
         sprintf(command, "help %s", topic);
       dyn->graph->get_command(command, cmd, dyn);
-      (dyn->graph->command_cb)(dyn->graph->parent_ctx, cmd, 0);
+      (dyn->graph->command_cb)(dyn->graph->parent_ctx, cmd, 0, 0);
     }
     break;
   default:;
@@ -18906,7 +18934,7 @@ int GeOpenGraph::action(grow_tObject object, glow_tEvent event)
       }
       if (!streq(command, "")) {
         dyn->graph->get_command(command, cmd, dyn);
-        (dyn->graph->command_cb)(dyn->graph->parent_ctx, cmd, 0);
+        (dyn->graph->command_cb)(dyn->graph->parent_ctx, cmd, 0, 0);
       }
     }
     break;
@@ -19070,7 +19098,7 @@ int GeOpenURL::action(grow_tObject object, glow_tEvent event)
 
       sprintf(command, "open url \"%s\"", url);
       dyn->graph->get_command(command, cmd, dyn);
-      (dyn->graph->command_cb)(dyn->graph->parent_ctx, cmd, 0);
+      (dyn->graph->command_cb)(dyn->graph->parent_ctx, cmd, 0, 0);
     }
     break;
   default:;
@@ -23553,7 +23581,7 @@ int GePulldownMenu::action(grow_tObject object, glow_tEvent event)
                     dyn->graph->get_command(command, cmd, dyn);
 
                     sts = (dyn->graph->command_cb)(
-                        dyn->graph->parent_ctx, cmd, 0);
+			dyn->graph->parent_ctx, cmd, 0, 0);
                     if (EVEN(sts))
                       info.item[i].type = glow_eMenuItem_ButtonDisabled;
                   } else {
@@ -25210,7 +25238,7 @@ static int methods_command_cb(char* command, void* udata)
   pwr_tCmd cmd;
 
   dyn->graph->get_command(command, cmd, dyn);
-  return (dyn->graph->command_cb)(dyn->graph->parent_ctx, cmd, 0);
+  return (dyn->graph->command_cb)(dyn->graph->parent_ctx, cmd, 0, 0);
 }
 
 int GeMethodToolbar::connect(
@@ -25313,7 +25341,7 @@ int GeMethodToolbar::action(grow_tObject object, glow_tEvent event)
     }
 
     dyn->graph->get_command(command, cmd, dyn);
-    sts = (dyn->graph->command_cb)(dyn->graph->parent_ctx, cmd, 0);
+    sts = (dyn->graph->command_cb)(dyn->graph->parent_ctx, cmd, 0, 0);
 
     break;
   }
@@ -25685,7 +25713,7 @@ int GeMethodPulldownMenu::action(grow_tObject object, glow_tEvent event)
         sprintf(command, "call method/function=\"%s\"/object=%s",
             GeMethods::op_method[i], method_object);
         dyn->graph->get_command(command, cmd, dyn);
-        sts = (dyn->graph->command_cb)(dyn->graph->parent_ctx, cmd, 0);
+        sts = (dyn->graph->command_cb)(dyn->graph->parent_ctx, cmd, 0, 0);
         found = 1;
         break;
       }
@@ -25703,7 +25731,7 @@ int GeMethodPulldownMenu::action(grow_tObject object, glow_tEvent event)
           sprintf(command, "call method/function=\"%s\"/object=%s",
               GeMethods::mnt_method[i], method_object);
           dyn->graph->get_command(command, cmd, dyn);
-          sts = (dyn->graph->command_cb)(dyn->graph->parent_ctx, cmd, 0);
+          sts = (dyn->graph->command_cb)(dyn->graph->parent_ctx, cmd, 0, 0);
           found = 1;
           break;
         }
@@ -25985,7 +26013,7 @@ int GeEmitSignal::action(grow_tObject object, glow_tEvent event)
 
       sprintf(command, "emit signal/signalname=%s", signal_name);
       dyn->graph->get_command(command, cmd, dyn);
-      sts = (dyn->graph->command_cb)(dyn->graph->parent_ctx, cmd, 0);
+      sts = (dyn->graph->command_cb)(dyn->graph->parent_ctx, cmd, 0, 0);
     } else {
       dyn->graph->signal_send(signal_name);
     }

@@ -84,7 +84,7 @@ public:
 
   static void graph_init_cb(void* client_data);
   static int graph_close_cb(void* client_data);
-  static int wge_command_cb(void* ge_ctx, char* command, char* script);
+  static int wge_command_cb(void* ge_ctx, char* command, char* script, char *scriptargs);
   static int wge_is_authorized_cb(void* ge_ctx, unsigned int access);
   static void message(void* ctx, char severity, const char* message);
 };

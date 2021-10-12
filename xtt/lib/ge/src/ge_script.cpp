@@ -4952,7 +4952,7 @@ int Graph::script_buffer_exec(char *script)
   script_store_graph();
 
   // Read and execute the command file
-  sts = ccm_buffer_exec(script, ccm_externcmd_func,
+  sts = ccm_buffer_exec(script, 0, ccm_externcmd_func,
       ccm_deffilename_func, ccm_errormessage_func, &appl_sts, verify,
       0, NULL, 0, NULL, (void *)this);
   if (EVEN(sts))

@@ -144,9 +144,9 @@ static int xnav_ge_get_select_cb(void* ctx, char* oname, pwr_tTypeId* type);
 static int xnav_attribute_func(char* name, int* return_decl,
     ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string);
 static int xnav_multiview_command_cb(
-    void* gectx, char* command, char* script, void* caller);
+    void* gectx, char* command, char* script, char *scriptargs, void* caller);
 static int xnav_ge_command_cb(
-    void* gectx, char* command, char* script, void* caller);
+    void* gectx, char* command, char* script, char *scriptargs, void* caller);
 static void xnav_ge_close_cb(void* xnav, void* gectx);
 static void xnav_multiview_close_cb(void* xnav, void* mvctx);
 static void xnav_stream_close_cb(void* xnav, XttStream* strmctx);
@@ -5783,25 +5783,25 @@ static void xnav_ge_help_cb(void* ctx, const char* key)
 }
 
 static int xnav_multiview_command_cb(
-    void* ctx, char* command, char* script, void* caller)
+    void* ctx, char* command, char* script, char *scriptargs, void* caller)
 {
   ((XNav*)ctx)->current_cmd_ctx = caller;
   if (command)
     ((XNav*)ctx)->command(command);
   else if (script)
-    ((XNav*)ctx)->script(command);
+    ((XNav*)ctx)->script(command, scriptargs);
   ((XNav*)ctx)->current_cmd_ctx = 0;
   return ((XNav*)ctx)->get_command_sts();
 }
 
 static int xnav_ge_command_cb(
-    void* ctx, char* command, char* script, void* caller)
+    void* ctx, char* command, char* script, char *scriptargs, void* caller)
 {
   ((XNav*)ctx)->current_cmd_ctx = caller;
   if (command)
     ((XNav*)ctx)->command(command);
   else if (script) {
-    ((XNav*)ctx)->script(script);
+    ((XNav*)ctx)->script(script, scriptargs);
   }
   ((XNav*)ctx)->current_cmd_ctx = 0;
   return ((XNav*)ctx)->get_command_sts();
@@ -7990,11 +7990,11 @@ pwr_tStatus XNav::get_command_sts()
   return command_sts;
 }
 
-int XNav::script(char* buffer)
+int XNav::script(char* buffer, char *bufargs)
 {
   int sts;
 
-  sts = readcmdfile(0, buffer);
+  sts = readcmdfile(0, buffer, bufargs);
   if (EVEN(sts))
     return sts;
 
@@ -8014,7 +8014,7 @@ int XNav::command(char* input_str)
       return sts;
 
     /* Read command file */
-    sts = readcmdfile(&command[1], 0);
+    sts = readcmdfile(&command[1], 0, 0);
     if (sts == DCLI__NOFILE) {
       char tmp[1030];
       snprintf(tmp, sizeof(tmp), "Unable to open file \"%s\"", &command[1]);
@@ -8040,7 +8040,7 @@ int XNav::command(char* input_str)
     if (ODD(sym_sts)) {
       if (symbol_value[0] == '@') {
         /* Read command file */
-        sts = readcmdfile(&symbol_value[1], 0);
+        sts = readcmdfile(&symbol_value[1], 0, 0);
         if (sts == DCLI__NOFILE) {
           char tmp[230];
           snprintf(tmp, sizeof(tmp), "Unable to open file \"%s\"", &symbol_value[1]);
@@ -8992,7 +8992,7 @@ int xnav_externcmd_func(char* cmd, void* client_data)
 *
 **************************************************************************/
 
-int XNav::readcmdfile(char* incommand, char* buffer)
+int XNav::readcmdfile(char* incommand, char* buffer, char *bufargs)
 {
   char input_str[160];
   int sts = 0;
@@ -9100,7 +9100,7 @@ int XNav::readcmdfile(char* incommand, char* buffer)
       return sts;
   } else if (buffer) {
     /* Execute the buffer */
-    sts = ccm_buffer_exec(buffer, xnav_externcmd_func,
+    sts = ccm_buffer_exec(buffer, bufargs, xnav_externcmd_func,
         xnav_ccm_deffilename_func, xnav_ccm_errormessage_func, &appl_sts, 
 	verify, 0, NULL, 0, NULL, (void*)this);
     if (EVEN(sts))

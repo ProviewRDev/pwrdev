@@ -6642,7 +6642,7 @@ file_exec_exit:
   return sts;
 }
 
-int ccm_buffer_exec(char* buffer, int (*externcmd_func)(char*, void*),
+int ccm_buffer_exec(char* buffer, const char *args, int (*externcmd_func)(char*, void*),
     int (*deffilename_func)(char*, char*, void*),
     int (*errormessage_func)(char*, int, void*), int* appl_sts, int verify,
     int break_before, void** ctx, int extfunc_return_mode, char* extfunc_line,
@@ -6654,6 +6654,35 @@ int ccm_buffer_exec(char* buffer, int (*externcmd_func)(char*, void*),
   ccm_tString string_val;
   int sts;
   ccm_tFileCtx filectx;
+  int i;
+  char elm_str[10][K_LINE_SIZE];
+  int nr;
+  ccm_sArg *arg_list = NULL, *arg_p, *a_p, *next_arg;
+  int arg_count = 0;
+
+  if (args) {
+    /* Create an argumentlist */
+    nr = rtt_parse((char*)args, " 	", "", (char*)elm_str,
+        sizeof(elm_str) / sizeof(elm_str[0]), sizeof(elm_str[0]), 0);
+    if (nr < 1)
+      return CCM__SYNTAX;
+
+    arg_count = 0;
+    arg_list = 0;
+    for (i = 0; i < nr; i++) {
+      arg_p = calloc(1, sizeof(ccm_sArg));
+      strcpy(arg_p->value_string, elm_str[i]);
+      arg_p->value_decl = K_DECL_STRING;
+      if (arg_list == 0)
+        arg_list = arg_p;
+      else {
+        for (a_p = arg_list; a_p->next; a_p = a_p->next)
+          ;
+        a_p->next = arg_p;
+      }
+      arg_count++;
+    }
+  }
 
   filectx = calloc(1, sizeof(*filectx));
   filectx->deffilename_func = deffilename_func;
@@ -6662,6 +6691,8 @@ int ccm_buffer_exec(char* buffer, int (*externcmd_func)(char*, void*),
   filectx->verify = verify;
   filectx->break_before = break_before;
   filectx->extfunc_return_mode = extfunc_return_mode;
+  filectx->main_arg_list = arg_list;
+  filectx->main_arg_count = arg_count;
   filectx->client_data = client_data;
   if (ctx)
     *ctx = filectx;
@@ -6675,7 +6706,7 @@ int ccm_buffer_exec(char* buffer, int (*externcmd_func)(char*, void*),
     goto buffer_exec_exit;
 
   sts = ccm_function_exec(
-      filectx, "main", 0, 0, 0, &decl, &float_val, &int_val, string_val, 0);
+      filectx, "main", 0, arg_list, arg_count, &decl, &float_val, &int_val, string_val, 0);
   if (sts == CCM__EXTERNFUNC) {
     strcpy(extfunc_line, filectx->extfunc_line);
     return sts;
@@ -6689,6 +6720,10 @@ buffer_exec_exit:
   if (EVEN(sts))
     ccm_print_error(filectx, sts);
 
+  for (arg_p = filectx->main_arg_list; arg_p; arg_p = next_arg) {
+    next_arg = arg_p->next;
+    free((char*)arg_p);
+  }
   ccm_free_filectx(filectx);
 
   return sts;

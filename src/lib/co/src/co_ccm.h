@@ -220,7 +220,7 @@ int ccm_file_exec(char* cmd, int (*externcmd_func)(char*, void*),
     int break_before, void** ctx, int extfunc_return_mode, int resume,
     char* extfunc_line, void* client_data);
 
-int ccm_buffer_exec(char* buffer, int (*externcmd_func)(char*, void*),
+int ccm_buffer_exec(char* buffer, const char *args, int (*externcmd_func)(char*, void*),
     int (*deffilename_func)(char*, char*, void*),
     int (*errormessage_func)(char*, int, void*), int* appl_sts, int verify,
     int break_before, void** ctx, int extfunc_return_mode, char* extfunc_line,

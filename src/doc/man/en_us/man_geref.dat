@@ -4035,6 +4035,9 @@ on positive edge of the signal, or cyclically when the signal is high.
 <b>Attribute <t><t>Description
 DigScript.Attribute <t><t>Signal in the database of type boolean that should 
                    <t><t>influence the component.
+DigScript.Arguments <t><t>Arguments that can be used as p1-p9 in the script. The arguments
+                   <t><t>will be translated as a commmand (see action Command), for example
+                   <t><t>$object is replace by the current instance for an object graph.
 DigScript.Level    <t><t>If level is 0, the script is executed when the signal changes
                    <t><t>from 0 to 1. If level is 1, the script is executed cyclically 
                    <t><t>when the signal is high.
@@ -4228,6 +4231,9 @@ Script
 Execute an xtt script by clicking MB1 on the object.
 
 <b>Attribute <t><t>Description
+Script.Arguments <t><t>Arguments that can be used as p1-p9 in the script. The arguments
+              <t><t>will be translated as a commmand (see action Command), for example
+              <t><t>$object is replace by the current instance for an object graph.
 Script.Script <t><t>Xtt script that is executed when the 
               <t><t>object is activated.
 

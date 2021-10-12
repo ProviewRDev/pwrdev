@@ -2885,7 +2885,7 @@ int Graph::readcmdfile(char* incommand, char *script)
 	verify, 0, NULL, 0, 0, NULL, (void*)this);
   }
   else if (script) {
-    sts = ccm_buffer_exec(script, graph_externcmd_func,
+    sts = ccm_buffer_exec(script, 0, graph_externcmd_func,
 	graph_ccm_deffilename_func, graph_ccm_errormessage_func, &appl_sts, verify,
 	0, NULL, 0, NULL, (void *)this);
   }

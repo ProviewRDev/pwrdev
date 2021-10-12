@@ -59,7 +59,7 @@ public:
   void* current_confirm_object;
   int value_input_open;
   int confirm_open;
-  int (*command_cb)(void*, char*, char*, void*);
+  int (*command_cb)(void*, char*, char*, char*, void*);
   void (*close_cb)(void*, void*);
   void (*help_cb)(void*, const char* key);
   void (*display_in_xnav_cb)(void*, pwr_sAttrRef*);
@@ -84,7 +84,7 @@ public:
       int menu, int navigator, int width, int height, int x, int y,
       double scan_time, const char* object_name, int use_default_access,
       unsigned int access, unsigned int options, int color_theme,
-      int (*xg_command_cb)(void*, char*, char*, void*),
+      int (*xg_command_cb)(void*, char*, char*, char *, void*),
       int (*xg_get_current_objects_cb)(void*, pwr_sAttrRef**, int**),
       int (*xg_is_authorized_cb)(void*, unsigned int),
       void (*xg_keyboard_cb)(void*, void*, int, int));
@@ -156,7 +156,7 @@ public:
 
   static void graph_init_cb(void* client_data);
   static int graph_close_cb(void* client_data);
-  static int ge_command_cb(void* ge_ctx, char* command, char* script);
+  static int ge_command_cb(void* ge_ctx, char* command, char* script, char* scriptargs);
   static int ge_sound_cb(void* ge_ctx, pwr_tAttrRef* aref);
   static void ge_display_in_xnav_cb(void* ge_ctx, pwr_sAttrRef* arp);
   static void ge_popup_menu_cb(void* ge_ctx, pwr_sAttrRef attrref,

@@ -3940,7 +3940,10 @@ signalvärdet ändras från 0 till 1, eller cykliskt när signalvärdet är högt.
 <b>Attribute <t><t>Description
 DigScript.Attribute <t><t>Signal i databasen av typ boolean som ska påverka komponenten.
 DigScript.Level  <t><t>Om Level är 0, exekveras scriptet när signalen ändras från 0 till 1.
-                  <t><t>Om level är 1, exekveras scriptet cykliskt när signalen är hög.
+                 <t><t>Om level är 1, exekveras scriptet cykliskt när signalen är hög.
+DigScript.Arguments <t><t>Argument som kan användas som p1-p9 i scriptet. Argumenten
+                 <t><t>kommer att översättas om ett kommando (se action Command), till exempel
+                 <t><t>ersätts $object med aktuell instans for en objektbild.
 DigScript.Script <t><t>Xtt script som exekveras när signalen går från 0 till 1.
 </topic>
 </headerlevel>
@@ -4126,9 +4129,12 @@ Script
 
 Exekverar ett xtt-script vid Klick MB1 på objektet.
 
-<b>Attribut <t><t>Beskrivning
+<b>Attribut   <t><t>Beskrivning
+Script.Arguments <t><t>Argument som kan användas som p1-p9 i scriptet. Argumenten
+              <t><t>kommer att översättas om ett kommando (se action Command), till exempel
+              <t><t>ersätts $object med aktuell instans for en objektbild.
 Script.Script <t><t>Xtt-script som exekveras vid mus-klick 
-                <t><t>på objektet.
+              <t><t>på objektet.
 
 </topic>
 

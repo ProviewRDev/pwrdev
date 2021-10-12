@@ -477,7 +477,7 @@ public:
   void (*change_name_cb)(void*, void*, char*);
   void (*change_value_cb)(void*, void*, char*);
   void (*confirm_cb)(void*, void*, char*);
-  int (*command_cb)(void*, char*, char*);
+  int (*command_cb)(void*, char*, char*, char*);
   void (*load_graph_cb)(void*, char*);
   int (*get_plant_select_cb)(void*, char* attr_name, int size);
   void (*display_in_xnav_cb)(void*, pwr_sAttrRef* arp);

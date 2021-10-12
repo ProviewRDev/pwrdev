@@ -73,7 +73,7 @@ public:
   XttMultiViewGtk(GtkWidget* parent_wid, void* parent_ctx, const char* name,
       pwr_tAttrRef* aref, int width, int height, int x, int y,
       unsigned int options, void* basewidget, int color_theme, pwr_tStatus* sts,
-      int (*mv_command_cb)(void*, char*, char*, void*),
+      int (*mv_command_cb)(void*, char*, char*, char *, void*),
       int (*mv_get_current_objects_cb)(void*, pwr_sAttrRef**, int**),
       int (*mv_is_authorized_cb)(void*, unsigned int),
       void (*mv_keyboard_cb)(void*, void*, int, int));

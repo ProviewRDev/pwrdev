@@ -82,7 +82,7 @@ int WGe::graph_close_cb(void* client_data)
   return 1;
 }
 
-int WGe::wge_command_cb(void* ge_ctx, char* command, char* script)
+int WGe::wge_command_cb(void* ge_ctx, char* command, char* script, char *scriptargs)
 {
   WGe* ge = (WGe*)ge_ctx;
   int sts;

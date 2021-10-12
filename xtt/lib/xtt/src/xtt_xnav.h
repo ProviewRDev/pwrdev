@@ -388,7 +388,7 @@ public:
       int y, double scan_time, const char* object_name, int use_default_access,
       unsigned int access, unsigned int options, void* basewidget,
       double* borders, int color_theme, int dashboard,
-      int (*xg_command_cb)(void*, char*, char*, void*),
+      int (*xg_command_cb)(void*, char*, char*, char *, void*),
       int (*xg_get_current_objects_cb)(void*, pwr_sAttrRef**, int**),
       int (*xg_is_authorized_cb)(void*, unsigned int),
       void (*xg_keyboard_cb)(void*, void*, int, int))
@@ -398,7 +398,7 @@ public:
   virtual XttMultiView* multiview_new(const char* name, pwr_tAttrRef* aref,
       int width, int height, int x, int y, unsigned int options,
       void* basewidget, int color_theme, pwr_tStatus* sts,
-      int (*command_cb)(void*, char*, char*, void*),
+      int (*command_cb)(void*, char*, char*, char *, void*),
       int (*get_current_objects_cb)(void*, pwr_sAttrRef**, int**),
       int (*is_authorized_cb)(void*, unsigned int),
       void (*keyboard_cb)(void*, void*, int, int))
@@ -550,9 +550,9 @@ public:
 
   // Command module member functions
   int command(char* cmd);
-  int script(char* buffer);
+  int script(char* buffer, char *scriptargs);
   pwr_tStatus get_command_sts();
-  int readcmdfile(char* incommand, char* buffer);
+  int readcmdfile(char* incommand, char* buffer, char *bufargs);
   int show_database(int nopop = 0);
   int get_current_object(
       pwr_tObjid* objid, char* objectname, int size, pwr_tBitMask nametype);

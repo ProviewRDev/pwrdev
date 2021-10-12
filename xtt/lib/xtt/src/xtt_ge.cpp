@@ -101,13 +101,13 @@ int XttGe::graph_close_cb(void* client_data)
   return 1;
 }
 
-int XttGe::ge_command_cb(void* ge_ctx, char* cmd, char* script)
+int XttGe::ge_command_cb(void* ge_ctx, char* cmd, char* script, char* scriptargs)
 {
   XttGe* ge = (XttGe*)ge_ctx;
   int sts;
 
   if (ge->command_cb) {
-    sts = (ge->command_cb)(ge->parent_ctx, cmd, script, ge_ctx);
+    sts = (ge->command_cb)(ge->parent_ctx, cmd, script, scriptargs, ge_ctx);
     return sts;
   }
   return 0;
@@ -340,7 +340,7 @@ void XttGe::activate_open()
 {
   pwr_tCmd cmd = "open dash";
   if (command_cb)
-    (command_cb)(parent_ctx, cmd, 0, this);
+    (command_cb)(parent_ctx, cmd, 0, 0, this);
 }
 
 void XttGe::activate_add()
@@ -572,7 +572,7 @@ XttGe::XttGe(void* xg_parent_ctx, const char* xg_name, const char* xg_filename,
     int xg_scrollbar, int xg_menu, int xg_navigator, int xg_width,
     int xg_height, int x, int y, double scan_time, const char* object_name,
     int use_default_access, unsigned int access, unsigned int xg_options,
-    int xg_color_theme, int (*xg_command_cb)(void*, char*, char*, void*),
+    int xg_color_theme, int (*xg_command_cb)(void*, char*, char*, char *, void*),
     int (*xg_get_current_objects_cb)(void*, pwr_sAttrRef**, int**),
     int (*xg_is_authorized_cb)(void*, unsigned int),
     void (*xg_keyboard_cb)(void*, void*, int, int))

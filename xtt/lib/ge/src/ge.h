@@ -347,7 +347,7 @@ public:
   static void update_colorpalette(void* gectx);
   static void subgraphs_close_cb(SubGraphs* subgraphs);
   static void status_msg(void* ge_ctx, double x, double y);
-  static int command_cb(void* ge_ctx, char* command, char* script);
+  static int command_cb(void* ge_ctx, char* command, char* script, char *scriptargs);
   static void open_list_cb(void* ctx, char* text, int ok_pressed);
   static void open_cancel_cb(void* ctx);
   static int sort_files(const void* file1, const void* file2);
