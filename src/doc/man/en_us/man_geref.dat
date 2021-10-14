@@ -439,7 +439,7 @@ avoid you can use Shift/Drag MB1 that adds objects to the select list.
 
 Note that when you change the color of a selected object the red marking is removed, as
 you then want to se the new color instead. The object is though still selected.
-
+ 
 By right clicking in the work area the select list is emptied.
 
 <h1>Delete an object
@@ -4064,7 +4064,7 @@ StoDig    <t>Boolean    <t>Set the value of a signal as long as the button is pr
 SetValue  <t>Int, Float, String  <t>Set the value of a signal to a specified value. <link>GeDynSetValue
 Command   <t>-          <t>Execute an xtt command with Click MB1. <link>GeDynCommand
 CommandDoubleClick <t>- <t>Execute an xtt command with Doubleclick MB1. <link>GeDynCommandDoubleClick
-Script    <t>-          <t>Execute an xtt script with Click MB1. <link>GeDynScript
+Script    <t>-          <t>Execute an xtt script with Click MB1, or when graph is opened or closed. <link>GeDynScript
 Confirm   <t>-          <t>Confirm before the action is executed. <link>GeDynConfirm
 IncrAnalog <t>Float32   <t>Increase or decrease an analog value. <link>GeDynIncrAnalog
 RadioButton <t>Boolean  <t>Action for radio buttons. <link>GeDynRadioButton
@@ -4228,15 +4228,28 @@ CommandDoubleClick.Command <t><t>Xtt command that is executed when the object
 <topic>GeDynScript <style>function
 Script
 
-Execute an xtt script by clicking MB1 on the object.
+Execute an xtt script by clicking MB1 on the objectj, or when the graph is opened or
+closed.
 
 <b>Attribute <t><t>Description
+Script.TriggerEvent <t><t>Event that trigger execution of the script.
+              <t><t>ClickMB1, when MB1 is clicked.
+              <t><t>Open, when the graph is opened.
+              <t><t>Close, when the graph is closed.
 Script.Arguments <t><t>Arguments that can be used as p1-p9 in the script. The arguments
               <t><t>will be translated as a commmand (see action Command), for example
               <t><t>$object is replace by the current instance for an object graph.
 Script.Script <t><t>Xtt script that is executed when the 
               <t><t>object is activated.
 
+Scripts can use extern variables to store status values and for interaction between 
+scripts. The extern variables can be declared in a script triggered by the Open event,
+and deleted in a script triggered by the Close event.
+
+Extern variables can also be used in object graphs, where several object graphs can be 
+opened concurrently. Mix-up of the variables is avoided by setting the namespace for
+extern variables to the instance object name. Supply the instance object as argument and
+set the namespace with set_namespace(p1). 
 </topic>
 
 <topic>GeDynHelp <style>function

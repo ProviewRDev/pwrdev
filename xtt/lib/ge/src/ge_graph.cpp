@@ -2381,13 +2381,13 @@ static int graph_grow_cb(GlowCtx* ctx, glow_tEvent event)
   if (event->event == glow_eEvent_ObjectDeleted)
     graph_free_dyn(event->object.object);
 
-  if (!graph || graph->closing_down)
+  if (!graph || (graph->closing_down && event->event != glow_eEvent_Close))
     return 1;
 
   if (event->event != glow_eEvent_CursorMotion && event->event != glow_eEvent_GrowDynamics)
     graph->message(' ', null_str);
 
-  if (graph->trace_started) {
+  if (graph->trace_started || event->event == glow_eEvent_Open) {
     return graph_trace_grow_cb(ctx, event);
   }
 
@@ -3553,6 +3553,10 @@ void GraphGrow::grow_trace_setup()
       ctx, glow_eEvent_MenuDelete, glow_eEventType_CallBack, graph_grow_cb);
   grow_EnableEvent(
       ctx, glow_eEvent_Signal, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(
+      ctx, glow_eEvent_Open, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(
+      ctx, glow_eEvent_Close, glow_eEventType_CallBack, graph_grow_cb);
 
   grow_RegisterEventLogCallback(ctx, graph_eventlog_cb);
 }
@@ -4462,6 +4466,28 @@ static int graph_trace_grow_cb(GlowCtx* ctx, glow_tEvent event)
         if (ctx_popped)
           graph->grow->push();
         return GLOW__NO_PROPAGATE;
+      }
+    }
+    break;
+  }
+  case glow_eEvent_Open:
+  case glow_eEvent_Close: {
+    grow_tObject* objectlist;
+    int object_cnt;
+    int i;
+    GeDyn* dyn;
+    int sts;
+
+    grow_GetObjectList(graph->grow->ctx, &objectlist, &object_cnt);
+    for (i = 0; i < object_cnt; i++) {
+      if (grow_GetObjectType(objectlist[i]) == glow_eObjectType_GrowNode
+          || grow_GetObjectType(objectlist[i]) == glow_eObjectType_GrowGroup
+          || grow_GetObjectType(objectlist[i]) == glow_eObjectType_GrowToolbar
+          || grow_GetObjectType(objectlist[i]) == glow_eObjectType_GrowDashCell) {
+	grow_GetUserData(objectlist[i], (void**)&dyn);
+	sts = dyn->action(objectlist[i], event);
+	if (sts == GLOW__TERMINATED)
+	  return sts;
       }
     }
     break;

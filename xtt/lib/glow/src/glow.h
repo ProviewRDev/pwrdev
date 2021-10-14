@@ -1231,6 +1231,8 @@ typedef enum {
   glow_eEvent_AnteUndo, //!< Before undo.
   glow_eEvent_PostUndo, //!< Store undo.
   glow_eEvent_Signal, //!< Signal event.
+  glow_eEvent_Open, //!< Open event.
+  glow_eEvent_Close, //!< Close event.
   glow_eEvent__
 } glow_eEvent;
 

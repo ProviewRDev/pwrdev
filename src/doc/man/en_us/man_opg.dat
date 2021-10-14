@@ -2955,6 +2955,8 @@ GetRootList()		<LINK> getrootlist()
 
 <h2>System functions
 exit()			<LINK> exit()
+get_namespace()		<LINK> get_namespace()
+set_namespace()		<LINK> set_namespace()
 system()		<LINK> system()
 time()			<LINK> time()
 tzset()			<LINK> tzset()
@@ -3078,6 +3080,13 @@ Global variables can also be deletet with the deletegbl statement.
 <c>...
 <c>delete jakob[];
 <c>deletegbl ferdinand;
+
+<h2>Namespace
+Extern variables can be declared in different namespaces by setting the namespace with
+set_namespace(). This can be used for running sets of scripts concurrently in the same
+process. A set of script can handle common extern variables, and by using different 
+namespaces, the same set can be run in several instances without mix-up of the extern 
+variables.
 </TOPIC>
 
 <TOPIC> operators
@@ -3857,6 +3866,8 @@ System functions
 
 <b>Function <t>Description
 exit <t>Exit script. <link> exit()
+get_namespace <t>Get current namespace. <link> get_namespace()
+set_namespace <t>Set namespace for extern variables. <link> set_namespace()
 system <t>Execute shell command. <link> system()
 time <t>Get system time. <link> time()
 tzset <t>Set time zone. <link> tzset()
@@ -3876,6 +3887,44 @@ Terminates executions of the file.
 <b>Example
 
 <c>  exit();
+</TOPIC>
+
+<TOPIC> get_namespace() <style> function
+get_namespace()
+
+string get_namespace()
+
+<b>Description
+
+Returns the current namespace.
+
+<b>Returns
+string				<t><t>Current namespace.
+
+<b>Example
+
+<c>  string current_namespace;
+<c>  current_namespace = get_namespace();
+</TOPIC>
+
+<TOPIC> set_namespace() <style> function
+set_namespace()
+
+set_namespace( string namespace)
+
+<b>Description
+
+Set namespace for extern variables.
+The maximum size of the namespace is 31 characters. If the length of the input string
+exceeds the maximum size, the last 31 characters of the string is used.
+
+<b>Arguments
+
+string		<t>namespace		<t>New namespace.
+
+<b>Example
+
+<c>  set_namespace(p1);
 </TOPIC>
 
 <TOPIC> system() <style> function

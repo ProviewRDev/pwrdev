@@ -97,6 +97,13 @@ typedef enum {
   ge_eOptionMenuType_Dynamic //!< Dynamic optionmenu.
 } ge_eOptionMenuType;
 
+//! Types of script trigger event.
+typedef enum {
+  ge_eScriptTriggerEvent_ClickMB1, //!< On ClickMB1.
+  ge_eScriptTriggerEvent_Open, //!< When graph is opened.
+  ge_eScriptTriggerEvent_Close //!< When graph is closed.
+} ge_eScriptTriggerEvent;
+
 //! Dyn attributes displayed in attribute editor
 typedef enum { ge_eDynAttr_All, ge_eDynAttr_Menu } ge_eDynAttr;
 
@@ -833,6 +840,7 @@ typedef enum {
   ge_eSave_Script_script_len = 7300,
   ge_eSave_Script_script = 7301,
   ge_eSave_Script_arguments = 7302,
+  ge_eSave_Script_trigger_event = 7303,
   ge_eSave_CatchSignal_signal_name = 7400,
   ge_eSave_EmitSignal_signal_name = 7500,
   ge_eSave_EmitSignal_global = 7501,
@@ -2227,6 +2235,7 @@ public:
   char script[2048];
   int script_len;
   char arguments[80];
+  ge_eScriptTriggerEvent trigger_event;
 
   GeScript(GeDyn* e_dyn);
   GeScript(const GeScript& x);

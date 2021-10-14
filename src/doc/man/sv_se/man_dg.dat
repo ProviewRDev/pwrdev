@@ -10480,6 +10480,8 @@ PlcConnect()		<LINK> plcconnect()
 
 <h2>System funktioner
 exit()			<LINK> exit()
+get_namespace()		<LINK> get_namespace()
+set_namespace()		<LINK> set_namespace()
 system()		<LINK> system()
 time()			<LINK> time()
 tzset()			<LINK> tzset()
@@ -10580,6 +10582,8 @@ En deklaration består av
 - semikolon.
 
 En extern variabel bör tas bort (med delete) när den inte längre används.
+Även globala variabler kan tas bort med deletegbl.
+
 <b>Exempel
 
 <c>int             i;
@@ -10589,6 +10593,14 @@ En extern variabel bör tas bort (med delete) när den inte längre används.
 <c>global float    ferdinand = 1234;
 <c>...
 <c>delete jakob[20];
+<c>detetegbl ferdinand;
+
+<h2>Namnrymd
+Externa variabler kan deklareras i olika namnrymd genom att sätta namnrymd med
+set_namespace(). Det kan användas för att exekvera uppsättningar av script samtidigt
+i samma process. En uppsättning script kan hantera gemensamma externa variabler, och
+genom att använda olika namnrymder kan samma uppsättning exekveras i flera versioner 
+utan sammanblandning av de externa variablerna.
 </TOPIC>
 
 <TOPIC> operators
@@ -11363,6 +11375,8 @@ System funktioner
 
 <b>Funktion <t>Beskrivning
 exit <t>Avsluta scriptet. <link> exit()
+get_namespace <t>Hämta aktuell namespace. <link> get_namespace()
+set_namespace <t>Sätt namespace för externa variabler. <link> set_namespace()
 system <t>Exekvera ett shell kommando. <link> system()
 time <t>Hämta systemtiden. <link> time()
 tzset <t>Sätt tidszon. <link> tzset()
@@ -11382,6 +11396,41 @@ Avslutar exekveringen av en fil.
 <b>Exempel
 
 <c>  exit();
+</TOPIC>
+
+<TOPIC> get_namespace() <style> function
+get_namespace()
+
+string get_namespace()
+
+<b>Beskrivning
+
+Returnerar aktuell namespace.
+
+<b>Exempel
+
+<c>  string current_namespace;
+<c>  current_namespace = get_namespace();
+</TOPIC>
+
+<TOPIC> set_namespace() <style> function
+set_namespace()
+
+set_namespace( string namespace)
+
+<b>Beskrivning
+
+Sätt namespace för externa variabler.
+Maxstorleken på namespace är 31 tecken. Om längden på argumentet överstiger maxlängden
+används de 31 sista tecknen i strängen.
+
+<b>Argument
+
+string		<t>namespace		<t>Ny namespace.
+
+<b>Exempel
+
+<c>  set_namespace(p1);
 </TOPIC>
 
 <TOPIC> system() <style> function

@@ -86,6 +86,7 @@ typedef struct ccm_sLine_ {
 
 typedef struct ccm_sIntvar_ {
   char name[32];
+  char namespc[32];
   ccm_tInt* value;
   int elements;
   int array;
@@ -94,6 +95,7 @@ typedef struct ccm_sIntvar_ {
 
 typedef struct ccm_sFloatvar_ {
   char name[32];
+  char namespc[32];
   ccm_tFloat* value;
   int elements;
   int array;
@@ -102,6 +104,7 @@ typedef struct ccm_sFloatvar_ {
 
 typedef struct ccm_sStringvar_ {
   char name[32];
+  char namespc[32];
   char* value;
   int elements;
   int array;
@@ -148,6 +151,7 @@ typedef struct ccm_sFileCtx_ {
   int error_row;
   char error_line[160];
   int break_before;
+  char namespc[32];
   int (*externcmd_func)(char*, void*);
   int (*deffilename_func)(char*, char*, void*);
   int (*errormessage_func)(char*, int, void*);

@@ -3967,7 +3967,7 @@ StoDig    <t>Boolean    <t>Sätter värdet på en signal så länge knappen är intryc
 SetValue    <t>Float, Int, String  <t>Sätter vardet på en signal till ett angivet värde. <link>GeDynSetValue
 Command   <t>-          <t>Exekverar ett xtt-kommando vid Klick MB1. <link>GeDynCommand
 CommandDoubleClick <t>- <t>Exekverar ett xtt-kommando vid Dubbelklick MB1. <link>GeDynCommandDoubleClick
-Command   <t>-          <t>Exekverar ett xtt-script vid Klick MB1. <link>GeDynScript
+Script    <t>-          <t>Exekverar ett xtt-script vid Klick MB1, eller när grafen öppnas eller stängs. <link>GeDynScript
 Confirm   <t>-          <t>Verifiering innan aktionen utförs. <link>GeDynConfirm
 IncrAnalog <t>Float32   <t>Öka eller minska ett analogt värde. <link>GeDynIncrAnalog
 RadioButton <t>Boolean  <t>Radio-knapps uppförande hos komponenten. <link>GeDynRadioButton
@@ -4127,15 +4127,27 @@ CommandDoubleClick.Command <t><t>Xtt-kommando som exekveras vid mus-klick
 <topic>GeDynScript <style>function
 Script
 
-Exekverar ett xtt-script vid Klick MB1 på objektet.
+Exekverar ett xtt-script vid Klick MB1 på objektet, eller när grafen öppnas eller stängs.
 
 <b>Attribut   <t><t>Beskrivning
+Script.TriggerEvent <t><t>Händelse som startar scriptet.
+              <t><t>ClickMB1, vid Klick MB1.
+              <t><t>Open, när grafen öppnas.
+              <t><t>Close, när grafen stängs.
 Script.Arguments <t><t>Argument som kan användas som p1-p9 i scriptet. Argumenten
               <t><t>kommer att översättas om ett kommando (se action Command), till exempel
               <t><t>ersätts $object med aktuell instans for en objektbild.
 Script.Script <t><t>Xtt-script som exekveras vid mus-klick 
               <t><t>på objektet.
 
+Script kan använda externa variabler för att lagra statusvärden och för interaktion mellan
+script. De externa variablerna kan deklareras i ett script som triggas av Open, och tas bort
+i ett script triggat av Close.
+
+Externa variabler kan även användas i objektsbilder, där flera objektsbilder kan vara
+öppna samtidigt. Sammanblandning av variablerna unviks genom att sätta namnrymden för de
+externa variablerna till objektnamnet. Ange instans-objektet som argument och sätt namnrymd
+med set_namespace(p1).
 </topic>
 
 <topic>GeDynHelp <style>function

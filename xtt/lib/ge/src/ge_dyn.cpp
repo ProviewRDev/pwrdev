@@ -17653,7 +17653,9 @@ int GeCommandDoubleClick::syntax_check(
 
 GeScript::GeScript(GeDyn* e_dyn)
     : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_No, ge_mActionType1_Script,
-          ge_mActionType2_No, ge_eDynPrio_Script)
+      ge_mActionType2_No, ge_eDynPrio_Script), script_len(0),
+      trigger_event(ge_eScriptTriggerEvent_ClickMB1)
+      
 {
   strcpy(script, "");
   strcpy(arguments, "");
@@ -17662,7 +17664,7 @@ GeScript::GeScript(GeDyn* e_dyn)
 GeScript::GeScript(const GeScript& x)
     : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
           x.prio),
-      script_len(x.script_len)
+      script_len(x.script_len), trigger_event(x.trigger_event)
 {
   strncpy(script, x.script, sizeof(script));
   strncpy(arguments, x.arguments, sizeof(arguments));
@@ -17671,6 +17673,11 @@ GeScript::GeScript(const GeScript& x)
 void GeScript::get_attributes(attr_sItem* attrinfo, int* item_count)
 {
   int i = *item_count;
+
+  strcpy(attrinfo[i].name, "Script.TriggerEvent");
+  attrinfo[i].value = &trigger_event;
+  attrinfo[i].type = ge_eAttrType_ScriptTriggerEvent;
+  attrinfo[i++].size = sizeof(trigger_event);
 
   strcpy(attrinfo[i].name, "Script.Arguments");
   attrinfo[i].value = arguments;
@@ -17704,6 +17711,7 @@ void GeScript::replace_attribute(char* from, char* to, int* cnt, int strict)
 void GeScript::save(std::ofstream& fp)
 {
   fp << int(ge_eSave_Script) << '\n';
+  fp << int(ge_eSave_Script_trigger_event) << FSPACE << trigger_event << '\n';
   fp << int(ge_eSave_Script_arguments) << FSPACE << arguments << '\n';
   fp << int(ge_eSave_Script_script_len) << FSPACE << script_len << '\n';
   fp << int(ge_eSave_Script_script) << '\n';
@@ -17723,7 +17731,8 @@ void GeScript::open(std::ifstream& fp)
   int end_found = 0;
   char dummy[200];
   char c;
-
+  int tmp;
+  
   for (;;) {
     if (!fp.good()) {
       fp.clear();
@@ -17735,6 +17744,10 @@ void GeScript::open(std::ifstream& fp)
 
     switch (type) {
     case ge_eSave_Script:
+      break;
+    case ge_eSave_Script_trigger_event:
+      fp >> tmp;
+      trigger_event = (ge_eScriptTriggerEvent)tmp;
       break;
     case ge_eSave_Script_arguments:
       fp.get();
@@ -17777,32 +17790,66 @@ void GeScript::open(std::ifstream& fp)
 
 int GeScript::action(grow_tObject object, glow_tEvent event)
 {
-  if (!dyn->graph->is_authorized(dyn->access))
-    return 1;
+  switch (trigger_event) {
+  case ge_eScriptTriggerEvent_ClickMB1:
+    if (!dyn->graph->is_authorized(dyn->access))
+      return 1;
 
-  switch (event->event) {
-  case glow_eEvent_MB1Down:
-    grow_SetClickSensitivity(dyn->graph->grow->ctx, glow_mSensitivity_MB1Click);
-    grow_SetObjectColorInverse(object, 1);
-    break;
-  case glow_eEvent_MB1Up:
-    grow_SetObjectColorInverse(object, 0);
-    break;
-  case glow_eEvent_Key_Return:
-  case glow_eEvent_MB1Click:
-    if (dyn->total_action_type1 & ge_mActionType1_Confirm)
+    switch (event->event) {
+    case glow_eEvent_MB1Down:
+      grow_SetClickSensitivity(dyn->graph->grow->ctx, glow_mSensitivity_MB1Click);
+      grow_SetObjectColorInverse(object, 1);
       break;
-
-    if (dyn->graph->command_cb) {
-      int sts;
-      pwr_tCmd argstr;
-
-      dyn->graph->get_command(arguments, argstr, dyn);
-      sts = (dyn->graph->command_cb)(dyn->graph->parent_ctx, 0, script, argstr);
-      return sts;
+    case glow_eEvent_MB1Up:
+      grow_SetObjectColorInverse(object, 0);
+      break;
+    case glow_eEvent_Key_Return:
+    case glow_eEvent_MB1Click:
+      if (dyn->total_action_type1 & ge_mActionType1_Confirm)
+	break;
+      
+      if (dyn->graph->command_cb) {
+	int sts;
+	pwr_tCmd argstr;
+	
+	dyn->graph->get_command(arguments, argstr, dyn);
+	sts = (dyn->graph->command_cb)(dyn->graph->parent_ctx, 0, script, argstr);
+	return sts;
+      }
+      break;
+    default:;
     }
     break;
-  default:;
+  case ge_eScriptTriggerEvent_Open:
+    switch (event->event) {
+    case glow_eEvent_Open:
+      if (dyn->graph->command_cb) {
+	int sts;
+	pwr_tCmd argstr;
+
+	dyn->graph->get_command(arguments, argstr, dyn);
+	sts = (dyn->graph->command_cb)(dyn->graph->parent_ctx, 0, script, argstr);
+	return sts;
+      }
+      break;
+    default:;
+    }
+    break;
+  case ge_eScriptTriggerEvent_Close:
+    switch (event->event) {
+    case glow_eEvent_Close:
+      if (dyn->graph->command_cb) {
+	int sts;
+	pwr_tCmd argstr;
+
+	dyn->graph->get_command(arguments, argstr, dyn);
+	sts = (dyn->graph->command_cb)(dyn->graph->parent_ctx, 0, script, argstr);
+	return sts;
+      }
+      break;
+    default:;
+    }
+    break;
   }
   return 1;
 }

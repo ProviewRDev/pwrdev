@@ -1184,6 +1184,12 @@ static attrnav_sEnumElement elem_indicator_color[]
 	{ glow_eDrawType_CustomColor86, "Magenta" },
 	{ 0, "" } };
 
+static attrnav_sEnumElement elem_script_trigger_event[]
+    = { { ge_eScriptTriggerEvent_ClickMB1, "ClickMB1" },
+	{ ge_eScriptTriggerEvent_Open, "Open" },
+	{ ge_eScriptTriggerEvent_Close, "Close" },
+	{ 0, "" } };
+
 static attrnav_sEnum enum_types[] = {
   { (unsigned int)glow_eType_Direction,
       (attrnav_sEnumElement*)&elem_direction },
@@ -1232,6 +1238,8 @@ static attrnav_sEnum enum_types[] = {
       (attrnav_sEnumElement*)&elem_dash_elements },
   { (unsigned int)ge_eAttrType_IndicatorColor,
       (attrnav_sEnumElement*)&elem_indicator_color },
+  { (unsigned int)ge_eAttrType_ScriptTriggerEvent,
+      (attrnav_sEnumElement*)&elem_script_trigger_event },
   { 0, NULL }
 };
 
@@ -1411,7 +1419,8 @@ int attrnav_attr_string_to_value(int type_id, char* value_str, void* buffer_ptr,
   case ge_eAttrType_KeyboardType:
   case ge_eAttrType_DashType:
   case ge_eAttrType_DashElements:
-  case ge_eAttrType_IndicatorColor: {
+  case ge_eAttrType_IndicatorColor:
+  case ge_eAttrType_ScriptTriggerEvent: {
     if (sscanf(value_str, "%u", (int*)buffer_ptr) != 1)
       return ATTRNAV__INPUT_SYNTAX;
     break;
@@ -1498,7 +1507,8 @@ void attrnav_attrvalue_to_string(
   case ge_eAttrType_KeyboardType:
   case ge_eAttrType_DashType:
   case ge_eAttrType_DashElements:
-  case ge_eAttrType_IndicatorColor: {
+  case ge_eAttrType_IndicatorColor:
+  case ge_eAttrType_ScriptTriggerEvent: {
     attrnav_sEnumElement* elem_p = NULL;
     attrnav_sEnum* enum_p;
     int found;
@@ -3369,6 +3379,7 @@ AItemLocal::AItemLocal(AttrNav* attrnav, const char* item_name,
   case ge_eAttrType_DashType:
   case ge_eAttrType_DashElements:
   case ge_eAttrType_IndicatorColor:
+  case ge_eAttrType_ScriptTriggerEvent:
     if (!noedit) {
       brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_attrarray);
       parent = 1;

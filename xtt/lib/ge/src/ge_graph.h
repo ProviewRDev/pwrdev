@@ -81,6 +81,7 @@ typedef enum {
   ge_eAttrType_DashType = 1014, //!< Dash cell type.
   ge_eAttrType_DashElements = 1015, //!< Dash elements type.
   ge_eAttrType_IndicatorColor = 1016, //!< Indicator color type.
+  ge_eAttrType_ScriptTriggerEvent = 1017, //!< Script trigger event.
   ge_eAttrType_DynType2 = glow_eType_DynType2, //!< DynType mask 2.
   ge_eAttrType_ActionType2 = glow_eType_ActionType2, //!< ActionType mask 2.
 } ge_eAttrType;

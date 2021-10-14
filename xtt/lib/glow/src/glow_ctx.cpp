@@ -1730,12 +1730,32 @@ int GlowCtx::trace_init(int (*connect_func)(void*, GlowTraceData*),
 
   sts = trace_connect_func(this, 0);
 
+  if (event_callback[glow_eEvent_Open]) {
+    glow_sEvent e;
+    e.event = glow_eEvent_Open;
+    e.any.type = glow_eEventType_CallBack;
+    e.any.x_pixel = 0;
+    e.any.y_pixel = 0;
+    e.any.x = 0;
+    e.any.y = 0;
+    event_callback[glow_eEvent_Open](this, &e);
+  }
   trace_started = 1;
   return sts;
 }
 
 void GlowCtx::trace_close()
 {
+  if (event_callback[glow_eEvent_Close]) {
+    glow_sEvent e;
+    e.event = glow_eEvent_Close;
+    e.any.type = glow_eEventType_CallBack;
+    e.any.x_pixel = 0;
+    e.any.y_pixel = 0;
+    e.any.x = 0;
+    e.any.y = 0;
+    event_callback[glow_eEvent_Close](this, &e);
+  }
   a.trace_close();
   trace_started = 0;
 }
