@@ -59,9 +59,9 @@ pwr_tStatus ev_mh_info_bc( mh_sMessage *MsgP);
 pwr_tStatus ev_mh_clear_alarmlist_bc( pwr_tNodeIndex nix);
 pwr_tStatus ev_mh_clear_blocklist_bc( pwr_tNodeIndex nix);
 
-jclass Mh_id;
-jmethodID Mh_messReceived_id;
-JavaVM *jvm;
+static jclass Mh_id;
+static jmethodID Mh_messReceived_id;
+static JavaVM *jvm;
 
 JNIEXPORT void JNICALL Java_jpwr_rt_Mh_initIDs
   (JNIEnv *env, jclass cls)

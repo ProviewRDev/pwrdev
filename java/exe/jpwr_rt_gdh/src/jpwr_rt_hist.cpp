@@ -109,7 +109,7 @@ typedef struct HistQueryStruct
 int check_conditions(sEvent *evp, HistQuery *query);
 
 
-JavaVM *jvm;
+static JavaVM *jvm;
 
 JNIEXPORT void JNICALL Java_jpwr_rt_Hist_initHistIDs
   (JNIEnv *env, jclass cls)

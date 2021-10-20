@@ -411,6 +411,7 @@ if [ $pwre_hw == "hw_arm" ] && [ $ebuild -eq 1 ]; then
     echo "export pwre_conf_incdir=\"$conf_incdir\"" >> $cfile
     echo "export pwre_conf_incdirgtk=\"$conf_incdirgtk\"" >> $cfile
     echo "export pwre_conf_incdirqt=\"$conf_incdirqt\"" >> $cfile
+    echo "export pwre_conf_incdirgst=\"$conf_incdirgst\"" >> $cfile
     echo "export pwre_conf_dtt_platform=\"arm_linux\"" >> $cfile
 else
 
@@ -486,7 +487,7 @@ else
     pwre_config_check_include powerlink EPL 1 "$epl/Include/Epl.h"
     pwre_config_check_include powerlinkuser EPLU 0 "$epl/Examples/X86/Generic/powerlink_user_lib/EplCfg.h"
     pwre_config_check_include rsvg  RSVG  1 "/usr/include/librsvg-2/librsvg/rsvg.h:/usr/include/librsvg-2.0/librsvg/rsvg.h"
-    pwre_config_check_include pydev   PYDEV   0 "/usr/include/python3.6m/pymath.h:/usr/include/python3.7m/pymath.h:/usr/include/python3.8/pymath.h"
+    pwre_config_check_include pydev   PYDEV   0 "/usr/include/python3.6m/pymath.h:/usr/include/python3.7m/pymath.h:/usr/include/python3.8/pymath.h:/usr/include/python3.9/pymath.h"
     pwre_config_check_tool android ANDROID "/usr/local/android-sdk-linux/tools/android"
 
 
