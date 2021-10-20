@@ -231,6 +231,8 @@ copy : \
        $(doc_dir)/en_us/man_geref.ps $(doc_dir)/sv_se/man_geref.ps \
        $(exe_dir)/en_us/man_sev.dat $(exe_dir)/sv_se/man_sev.dat \
        $(doc_dir)/en_us/man_sev.pdf $(doc_dir)/sv_se/man_sev.pdf \
+       $(exe_dir)/en_us/man_install.dat \
+       $(doc_dir)/en_us/man_install.pdf \
        $(exe_dir)/en_us/man_pb.dat $(exe_dir)/sv_se/man_pb.dat \
        $(exe_dir)/man_subgraph.dat \
        $(doc_dir)/en_us/man_subgraph_index.html \
@@ -404,6 +406,14 @@ $(doc_dir)/en_us/man_sev.pdf : $(pwre_sroot)/doc/man/en_us/man_sev.dat
 $(doc_dir)/sv_se/man_sev.pdf : $(pwre_sroot)/doc/man/sv_se/man_sev.dat
 	@ $(log_pdf)
 	@ $(co_convert) -f -l sv_se -d $(doc_dir)/sv_se $(source)
+
+$(exe_dir)/en_us/man_install.dat : $(pwre_sroot)/doc/man/en_us/man_install.dat
+	@ $(log_h_h)
+	@ $(cp) $(cpflags) $(source) $(target)
+
+$(doc_dir)/en_us/man_install.pdf : $(pwre_sroot)/doc/man/en_us/man_install.dat
+	@ $(log_pdf)
+	@ $(co_convert) -f -d $(doc_dir)/en_us $(source)
 
 $(exe_dir)/en_us/man_pb.dat : $(pwre_sroot)/doc/man/en_us/man_pb.dat
 	@ $(log_h_h)

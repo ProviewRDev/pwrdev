@@ -39,13 +39,25 @@ SObject pwrb:Class
 !/**
 !  @Version 1.0
 !  @Group ProjectConfiguration
-!  @Summary Configures a ProviewR node that belongs to another project.
-!  The FriendNodeConfig object configures a ProviewR node that belong to
-!  another project, that is the owner of a volume mounted by some node in 
-!  the current project.
-!
+!  @Summary Configures a link to another ProviewR node.
+!  The FriendNodeConfig object configures a link to another ProviewR node.
+!  
 !  The FriendNodeConfig object is created in the project volume as a child to
-!  a BusConfig-object in the node-hierachy.
+!  a BusConfig object in the node hierachy. In this case, all the nodes on 
+!  the buss will connect to the friend node. It can also be positioned as a 
+!  child to a NodeConfig object, configuring a link from this node to the 
+!  friend node.
+!
+!  By default all nodes in the same project and bus will create links to each 
+!  other, but by setting QComAutoConnectDisable in the BusConfig object the links
+!  can be individually configured with FriendNodeConfig objects.
+!
+!  The friend node configuration has to be mutual, otherwise connect requests
+!  are not accepted.
+!
+!  The connection can configured to be Full or QCom only. Full connections is
+!  needed between process and operator stations, while QComOnly is sufficient
+!  between storage servers and process/operator stations.
 !
 ! @b See also
 !  @classlink NodeConfig pwrb_nodeconfig.html
