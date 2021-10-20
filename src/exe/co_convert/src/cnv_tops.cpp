@@ -148,6 +148,7 @@ void CnvToPs::cnv_text(char* to, const char* from)
     case '\\':
       *t++ = '\\';
       *t++ = '\\';
+      break;
     default:
       *t++ = *s;
     }
