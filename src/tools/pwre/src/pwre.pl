@@ -383,6 +383,7 @@ sub ebuild # args: pass flavour
     _build("lib","nodave_dummy","src","init lib");
     _build("lib","epl_dummy","src","init lib");
     _build("lib","piface_dummy","src","init lib");
+    _build("lib","mqtt_dummy","src","init lib");
     merge();
     _module("sev");
     merge();
