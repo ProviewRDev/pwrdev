@@ -503,6 +503,7 @@ var DynC = {
   eSave_DigScript_script  		: 4601,
   eSave_DigScript_script_len         	: 4602,
   eSave_DigScript_level  		: 4603,
+  eSave_DigScript_arguments  		: 4604,
   eSave_RefUpdate_attribute 		: 4700,
   eSave_RefUpdate_whole_graph 		: 4701,
   eSave_DsTrend_dstrend_object1 	: 4800,
@@ -712,6 +713,8 @@ var DynC = {
   eSave_MethodPulldownMenu_menu_type  : 7201,
   eSave_Script_script_len		: 7300,
   eSave_Script_script			: 7301,
+  eSave_Script_arguments       		: 7302,
+  eSave_Script_trigger_event	       	: 7303,
   eSave_CatchSignal_signal_name   	: 7400,
   eSave_EmitSignal_signal_name   	: 7500,
   eSave_EmitSignal_global   		: 7501,
@@ -9640,6 +9643,8 @@ function DynScript( dyn) {
 
   this.script;
   this.script_len;
+  this.arguments;
+  this.trigger_event;
 
   this.connect = function( o) {
     return 1;
@@ -9724,6 +9729,13 @@ function DynScript( dyn) {
 	  
 	  line = lines[i];
 	}			
+	break;
+      case DynC.eSave_Script_arguments: 
+	if ( tokens.length > 1)
+	  this.arguments = lines[i].substring(5);
+	break;
+      case DynC.eSave_Script_trigger_event: 
+	this.trigger_event = parseInt(tokens[1], 10);
 	break;
       case DynC.eSave_End:
 	end = true;
