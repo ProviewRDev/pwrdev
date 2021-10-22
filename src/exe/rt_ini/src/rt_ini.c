@@ -41,7 +41,9 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/prctl.h>
-#include <sys/capability.h>
+#if defined PWRE_CONF_PCAP
+# include <sys/capability.h>
+#endif
 
 #include "co_dcli.h"
 #include "co_string.h"
@@ -106,6 +108,7 @@ int main(int argc, char** argv)
 
   ver_WriteVersionInfo("ProviewR Runtime Environment");
 
+#if defined PWRE_CONF_PCAP
   // If we are running from an unprivileged shell we won't have an inheritable flag set which is needed to set ambient capabilites
   // TODO Later we should pinpoint the exact needed privileges for each process we spawn.
 
@@ -127,6 +130,7 @@ int main(int argc, char** argv)
   prctl(PR_CAP_AMBIENT, PR_CAP_AMBIENT_RAISE, CAP_SYS_BOOT, 0, 0);
   prctl(PR_CAP_AMBIENT, PR_CAP_AMBIENT_RAISE, CAP_NET_BIND_SERVICE, 0, 0);
   prctl(PR_CAP_AMBIENT, PR_CAP_AMBIENT_RAISE, CAP_SYS_NICE, 0, 0);
+#endif
 
   if (cp->flags.b.restart) {
     sts = interactive(argc, argv, cp);
