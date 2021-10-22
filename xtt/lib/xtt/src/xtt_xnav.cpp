@@ -1523,8 +1523,8 @@ XNav::XNav(void* xn_parent_ctx, const char* xn_name, xnav_sStartMenu* root_menu,
 //
 XNav::~XNav()
 {
-  //if (opplace_p)
-  //  free(opplace_p);
+  if (opplace_p && streq(opplace_p->Description, "__local__"))
+    free(opplace_p);
 }
 
 //
@@ -3458,6 +3458,7 @@ int XNavGbl::load_config(XNav* xnav)
   if (streq(xnav->opplace_name, "")) {
     xnav->opplace_p
         = (pwr_sClass_OpPlace*)calloc(1, sizeof(pwr_sClass_OpPlace));
+    strcpy(xnav->opplace_p->Description, "__local__");
     return 0;
   }
 
