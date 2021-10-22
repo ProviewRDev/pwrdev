@@ -1,5 +1,5 @@
 Package: pwrrt
-Version: 5.8.0-1
+Version: 5.9.0-1
 Section: base
 Priority: optional
 Architecture: armhf
@@ -8,7 +8,7 @@ Depends: libc6 (>= 2.28-10+rpi1),
  libasound2 (>= 1.1.8-1+rpt1),
  libdb5.3 (>= 5.3.28+dfsg1-0.5),
  libsqlite3-0 (>= 3.27.2-3)
-Replaces: pwr34,pwr39,pwr40,pwr41,pwr42,pwr43,pwr44,pwr45,pwr46,pwr47,pwr48,pwr50,pwr51,pwr52,pwr53,pwr54,pwr55,pwr56
+Replaces: pwr34,pwr39,pwr40,pwr41,pwr42,pwr43,pwr44,pwr45,pwr46,pwr47,pwr48,pwr50,pwr51,pwr52,pwr53,pwr54,pwr55,pwr56,pwr57,pwr58
 Maintainer: Proview <postmaster@proview.se>
 Description:
- 5.8.0-1 Base release
+ 5.9.0-1 Base release

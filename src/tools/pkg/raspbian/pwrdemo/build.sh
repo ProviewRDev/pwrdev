@@ -69,7 +69,7 @@ mv pwrdemo$ver pwrdemo
 cd $pkgroot/usr/pwrp
 tar -xf $tarfile
 rm $tarfile
-rm -r pwrdemo$ver/.git
+#rm -r pwrdemo$ver/.git
 cd $currentdir
 
 # Generate desktop file

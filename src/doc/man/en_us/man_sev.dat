@@ -2,14 +2,12 @@
 <topic> __DocumentTitlePage
 
 <image> pwr_logga_doc.png
+
 <h1> Guide to Storage Environment
 
 
-
-
-
 <hr>
-Version 5.8.0	
+Version 5.9.0	
 <hr>
 </topic>
 
@@ -1104,25 +1102,24 @@ and 'Not returned alarms' that shows the number for concurrent alarms as a funct
 
 <chapter>
 <topic> sev_storagestation
-Konfigurering av en Storage station
-En storage station genereras som en process eller operatörs-station genom att installera 
-pwrrt-paketet.
+Storage station configuration
+A storage station is generated as a process or operator station by installing the pwrrt
+package.
 
-<h2>Kommunikation med processtationer
-Tanken är att en storage station betjänar ett avsnitt med flera processtationer som 
-tillhör olika projekt med olika versioner. Därför har normalt inte en storage station 
-någon näthanterar-kontakt, utan enbart med QCom-kontakt.
+<h2>Communicaton with process stations
+A storage station can serve a plant with serveral process stations that belongs to different
+projects with different version. For this reason the storage station normally doesn't have
+nethandler connections but QCom only connections.
 
-Det konfigureras genom att man lägger in FriendNodeConfig objekt för alla noder
-som storage stationen ska ha kontakt med, och sätter QComOnly i Connection. Om storage
-stationen ligger i ett projekt med processtationer, sätter man QComAutoConnectDisable
-i BusConfig-objektet för att sedan konfigurera även länkarna inom projektet med 
-FriendNodeConfig objekt.
+This is configured by creating FriendNodeConfig objects for all nodes that the storage
+station should have contact with, and set QComOnly in Connection. If the storage station
+is placed in a project with process stations, you set QComAutoConnectDisable in the BusConfig
+object. Then the links between nodes in the projects are configured with FriendNodeConfig objects.
 
-<h2>Uppgradering
-Att notera vid uppgradering av sev stationer från före V5.8.
-- pwrsev-paketet har utgått sedan V5.8.0 och pwrrt-paketet ska användas istället.
-- Noden ska konfigureras med ett NodeConfig objekt istället för SevNodeConfig.
-- Rootvolumen ska konfigureras med ett RootVolumeConfig objekt, och editeras.
+<h2>Upgrading
+Note when upgrading sev station from versions before 5.8
+- The pwrsev package is discontinued since V5.8.0 and the pwrrt package should be used instead.
+- The node should be configured with a NodeConfig object instead of SevNodeConfig.
+- The root volume should be configured with a RootVolumeConfig object and edited.
 </topic>
 </chapter>
