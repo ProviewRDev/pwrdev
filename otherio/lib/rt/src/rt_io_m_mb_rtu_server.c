@@ -65,7 +65,6 @@
 
 #include "rt_io_mb_rtu.h"
 
-static char rcv_buffer[512];
 static pwr_tStatus mb_init_channels(io_tCtx ctx, io_sAgent* ap, io_sRack* rp);
 static void mb_shift_write(
     unsigned char* in, unsigned char* out, int sh, int quant);

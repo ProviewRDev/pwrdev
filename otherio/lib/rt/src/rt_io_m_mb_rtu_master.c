@@ -65,8 +65,6 @@
 #include "rt_io_mb_rtu.h"
 #include "rt_io_agent_init.h"
 
-static char rcv_buffer[65536];
-
 static pwr_tStatus IoAgentInit(io_tCtx ctx, io_sAgent* ap);
 static pwr_tStatus IoAgentRead(io_tCtx ctx, io_sAgent* ap);
 static pwr_tStatus IoAgentWrite(io_tCtx ctx, io_sAgent* ap);
