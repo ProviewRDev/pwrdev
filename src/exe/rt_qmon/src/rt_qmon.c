@@ -1912,7 +1912,7 @@ action_thread()
         case qmon_eMsgTypeAction_NodePassive:
           for (lp = tree_Minimum(&sts, l.links.table); lp != NULL;
                lp = tree_Successor(&sts, l.links.table, lp))
-            send_action(lp, get.type.s);
+            send_action(lp, (qmon_eMsgTypeAction)get.type.s);
 
           break;
         case qmon_eMsgTypeAction_Connect: {

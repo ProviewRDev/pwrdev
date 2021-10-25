@@ -3167,7 +3167,7 @@ Appl_mainloop(ApplObject *self, PyObject *args)
   else
     arglist = Py_BuildValue("(O)", self->ctx);
 
-  PyEval_CallObject(self->open, arglist);
+  PyObject_CallObject(self->open, arglist);
 
   aproc_TimeStamp( self->scantime, self->maxdelay);
   if (self->anix < errh_eAnix_plc1)
@@ -3187,7 +3187,7 @@ Appl_mainloop(ApplObject *self, PyObject *args)
     if (sts == QCOM__TMO || sts == QCOM__QEMPTY) {
       if ( !swap) {
 	aproc_TimeStamp( self->scantime, self->maxdelay);
-	PyEval_CallObject(self->scan, arglist);
+	PyObject_CallObject(self->scan, arglist);
       }
     } 
     else {
@@ -3201,10 +3201,10 @@ Appl_mainloop(ApplObject *self, PyObject *args)
 	else
 	  errh_SetStatus( PWR__APPLRESTART);
         swap = 1;
-	PyEval_CallObject(self->close, arglist);
+	PyObject_CallObject(self->close, arglist);
       } else if (new_event.b.swapDone && swap) {
         swap = 0;
-	PyEval_CallObject(self->open, arglist);
+	PyObject_CallObject(self->open, arglist);
 	if (self->anix < errh_eAnix_plc1)
 	  errh_SetStatus( PWR__SRUN);
 	else

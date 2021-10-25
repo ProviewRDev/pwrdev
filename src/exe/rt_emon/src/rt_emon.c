@@ -924,7 +924,7 @@ static void applMessage(mh_sHead* hp, sAppl* ap, mh_uApplReply* reply)
   strncpy(aap->link.eventMoreText, ip->EventMoreText,
       sizeof(aap->link.eventMoreText));
   aap->link.event = ip->EventType;
-  aap->link.eventType = ip->EventType;
+  aap->link.eventType = (pwr_eEventTypeEnum)ip->EventType;
 
   aap->message = *ip;
 
@@ -979,7 +979,7 @@ static pwr_tStatus applReply(qcom_sGet* get, void* msg, pwr_tUInt32 msgSize)
   memcpy(hp + 1, msg, msgSize);
 
   put.type.b = mh_cMsgClass;
-  put.type.s = mh_eMsg_ApplReply;
+  put.type.s = (qcom_eStype)mh_eMsg_ApplReply;
   put.reply = l.head.qid;
   put.size = size;
   put.allocate = 0;
@@ -2320,7 +2320,7 @@ static void handleInfo(sSupActive* sp)
     sp->link.eventFlags |= mh_mEventFlags_Return;
   }
 
-  ep = eventListInsert(sp->link.eventType, NULL, (sActive*)sp);
+  ep = eventListInsert((mh_eEvent)sp->link.eventType, NULL, (sActive*)sp);
   if (sp->link.eventFlags & mh_mEventFlags_InfoWindow) {
     activeListInsert((sActive*)sp, ep, mh_eSource_Scanner);
     updateAlarm((sActive*)sp, ep);
@@ -2897,7 +2897,7 @@ static pwr_tStatus initSupActiveCB(pwr_tAttrRef* SupObject, pwr_tClassId cid,
   }
 
   sp->link.eventFlags = sp->sup->EventFlags;
-  sp->link.eventType = sp->sup->EventType;
+  sp->link.eventType = (pwr_eEventTypeEnum)sp->sup->EventType;
   sp->link.event = sp->sup->EventType;
 
   if (sp->agent == mh_eAgent_MH) {
@@ -3361,7 +3361,7 @@ static void outunitBlock(mh_sHead* hp, sOutunit* op)
     }
 
     bp->link.event = mh_eEvent_Block;
-    bp->link.eventType = bp->link.event;
+    bp->link.eventType = (pwr_eEventTypeEnum)bp->link.event;
     bp->link.eventFlags = mh_mEventFlags_Force;
     bp->link.source = mh_eSource_Outunit;
     bp->link.object = cdh_ObjidToAref(ip->object);

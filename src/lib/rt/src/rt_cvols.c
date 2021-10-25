@@ -116,7 +116,7 @@ void cvols_Notify(cvol_sNotify* nmp)
   /* Submit to the NETH ACP to check if any subscriptions are affected.  */
 
   put.type.b = net_cMsgClass;
-  put.type.s = nmp->subtype;
+  put.type.s = (qcom_eStype)nmp->subtype;
   put.reply = qcom_cNQid;
   put.data = (char*)&nmp->msg;
   put.size = nmp->size;

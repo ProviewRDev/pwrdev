@@ -54,7 +54,8 @@ pwr_tStatus hd_NetSendMessage(qcom_sQid* qid, co_sPlatform* recPlatform,
   }
 
   msg.type.b = hd_cMsgClass;
-  msg.type.s = hp->type = subtype;
+  msg.type.s = (qcom_eStype)subtype;
+  hp->type = (hd_eMsg)subtype;
   msg.reply = hp->qid;
   msg.size = size;
 

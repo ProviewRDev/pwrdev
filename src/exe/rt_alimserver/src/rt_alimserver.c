@@ -321,7 +321,7 @@ int main(int argc, char** argv)
         errh_Error("XDR Encode failed");
       } else {
         put.type.b = alimsrv_cMsgType;
-        put.type.s = alimsrv_eSubType_Answer;
+        put.type.s = (qcom_eStype)alimsrv_eSubType_Answer;
         put.reply = myQId;
         put.data = (char*)bp;
         put.allocate = 1;

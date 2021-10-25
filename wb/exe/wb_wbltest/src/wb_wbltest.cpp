@@ -46,9 +46,11 @@
 #include "wb_session.h"
 #include "wb_vrepdb.h"
 
+#if 0
 static pwr_tStatus iterFunc(void* udata, pwr_tOid oid, pwr_tCid cid,
     pwr_tOid poid, pwr_tOid fwsoid, pwr_tOid bswoid, pwr_tOid fchoid,
     pwr_tOid lchoid, char* name, pwr_tTime time, int rsize, int dsize);
+#endif
 
 int main(int argc, char* argv[])
 {
@@ -130,6 +132,7 @@ int main(int argc, char* argv[])
   }
 }
 
+#if 0
 static pwr_tStatus iterFunc(void* udata, pwr_tOid oid, pwr_tCid cid,
     pwr_tOid poid, pwr_tOid fwsoid, pwr_tOid bswoid, pwr_tOid fchoid,
     pwr_tOid lchoid, char* name, pwr_tTime time, int rsize, int dsize)
@@ -142,3 +145,4 @@ static pwr_tStatus iterFunc(void* udata, pwr_tOid oid, pwr_tCid cid,
   }
   return 1;
 }
+#endif

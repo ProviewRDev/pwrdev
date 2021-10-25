@@ -173,7 +173,7 @@ static pwr_tBoolean ConvertPut(
    * then a generic solution must be implemented.
    */
   if (put->type.s == (qcom_eStype)net_eMsg_volumes7) {
-    put->type.s = net_eMsg_volumes;
+    put->type.s = (qcom_eStype)net_eMsg_volumes;
     fXdr = (tFuncXdr)xdr_net_sVolumes7;
   } else {
     if ((int)put->type.s <= (int)net_eMsg__
@@ -227,7 +227,7 @@ static pwr_tBoolean ConvertGet(pwr_tStatus* sts, qcom_sGet* get, void* data)
     gdb_ScopeUnlock;
 
     if (netver == 7) {
-      get->type.s = net_eMsg_volumes7;
+      get->type.s = (qcom_eStype)net_eMsg_volumes7;
       fXdr = (tFuncXdr)xdr_net_sVolumes7;
     }
   }
@@ -323,7 +323,7 @@ static pwr_tBoolean Put(pwr_tStatus* sts, qcom_sQid* tgt, void* mp,
 
   put.reply = gdbroot->my_qid;
   put.type.b = net_cMsgClass;
-  put.type.s = subtype;
+  put.type.s = (qcom_eStype)subtype;
   put.msg_id = id;
   put.size = size;
   put.allocate = 0;
@@ -424,7 +424,7 @@ void* net_Alloc(pwr_tStatus* status, qcom_sPut* put, int size, net_eMsg subtype)
 
   put->reply = gdbroot->my_qid;
   put->type.b = net_cMsgClass;
-  put->type.s = subtype;
+  put->type.s = (qcom_eStype)subtype;
   put->size = size;
   put->data = mp;
 

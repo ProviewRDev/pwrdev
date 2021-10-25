@@ -730,7 +730,7 @@ static void nodeUp(gdb_sNode* np)
   nu.nid = np->nid;
 
   put.type.b = net_cMsgClass;
-  put.type.s = net_eMsg_nodeUp;
+  put.type.s = (qcom_eStype)net_eMsg_nodeUp;
   put.reply = qcom_cNQid;
   put.data = (char*)&nu;
   put.allocate = 1;
