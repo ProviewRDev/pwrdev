@@ -87,7 +87,7 @@ static PyMethodDef Log_methods[] = {
 
 static PyTypeObject LogType = {
     PyVarObject_HEAD_INIT(NULL, 0)
-    "Log",         	       /* tp_name */
+    "pwrtest.Log",             /* tp_name */
     sizeof(LogObject),         /* tp_basicsize */
     0,                         /* tp_itemsize */
     0,                         /* tp_dealloc */

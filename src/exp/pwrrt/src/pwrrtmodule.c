@@ -43,7 +43,8 @@ Aref      attribute in the runtime database.\n\
 Sub       subscription.\n\
 Cid       class.\n\
 Tid       type.\n\
-ADef      attribute definition\n\n\
+ADef      attribute definition\n\
+Appl      application class\n\n\
 Type help(pwrrt.Oid), help(pwrrt.Aref) etc to get more information about\n\
 these classes.");
 
@@ -853,7 +854,7 @@ static PyMethodDef Oid_methods[] = {
 
 static PyTypeObject OidType = {
     PyVarObject_HEAD_INIT(NULL, 0)
-    "Oid",         	       /* tp_name */
+    "pwrrt.Oid",       	       /* tp_name */
     sizeof(OidObject),         /* tp_basicsize */
     0,                         /* tp_itemsize */
     0,                         /* tp_dealloc */
@@ -923,7 +924,7 @@ static PyMethodDef Aref_methods[] = {
 
 static PyTypeObject ArefType = {
     PyVarObject_HEAD_INIT(NULL, 0)
-    "Aref",                    /* tp_name */
+    "pwrrt.Aref",              /* tp_name */
     sizeof(ArefObject),        /* tp_basicsize */
     0,                         /* tp_itemsize */
     0,                         /* tp_dealloc */
@@ -997,7 +998,7 @@ static PyMethodDef Cid_methods[] = {
 
 static PyTypeObject CidType = {
     PyVarObject_HEAD_INIT(NULL, 0)
-    "Cid",         	       /* tp_name */
+    "pwrrt.Cid",               /* tp_name */
     sizeof(CidObject),         /* tp_basicsize */
     0,                         /* tp_itemsize */
     0,                         /* tp_dealloc */
@@ -1056,7 +1057,7 @@ static PyMethodDef Tid_methods[] = {
 
 static PyTypeObject TidType = {
     PyVarObject_HEAD_INIT(NULL, 0)
-    "Tid",         	       /* tp_name */
+    "pwrrt.Tid",               /* tp_name */
     sizeof(TidObject),         /* tp_basicsize */
     0,                         /* tp_itemsize */
     0,                         /* tp_dealloc */
@@ -1131,8 +1132,8 @@ static PyMethodDef ADef_methods[] = {
 
 static PyTypeObject ADefType = {
     PyVarObject_HEAD_INIT(NULL, 0)
-    "ADef",         	       /* tp_name */
-    sizeof(ADefObject),         /* tp_basicsize */
+    "pwrrt.ADef",              /* tp_name */
+    sizeof(ADefObject),        /* tp_basicsize */
     0,                         /* tp_itemsize */
     0,                         /* tp_dealloc */
     0,                         /* tp_print */
@@ -1195,7 +1196,7 @@ static PyMethodDef Sub_methods[] = {
 
 static PyTypeObject SubType = {
     PyVarObject_HEAD_INIT(NULL, 0)
-    "Sub",                     /* tp_name */
+    "pwrrt.Sub",               /* tp_name */
     sizeof(SubObject),         /* tp_basicsize */
     0,                         /* tp_itemsize */
     0,                         /* tp_dealloc */
@@ -1264,8 +1265,8 @@ static PyMethodDef Appl_methods[] = {
 
 static PyTypeObject ApplType = {
     PyVarObject_HEAD_INIT(NULL, 0)
-    "Appl",                     /* tp_name */
-    sizeof(ApplObject),         /* tp_basicsize */
+    "pwrrt.Appl",              /* tp_name */
+    sizeof(ApplObject),        /* tp_basicsize */
     0,                         /* tp_itemsize */
     0,                         /* tp_dealloc */
     0,                         /* tp_print */

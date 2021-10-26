@@ -21,7 +21,7 @@ copy :
 
 lib :
 
-exe : $(doc_dir)/prm/index.html | silent
+exe : $(doc_dir)/prm/index.html $(doc_dir)/pwrrt.html $(doc_dir)/pwrwb.html $(doc_dir)/pwrtest.html | silent
 
 clean : $(clean_dox)
 
@@ -48,3 +48,21 @@ $(doc_dir)/prm/index.html : doxygen.c
 #	    rm -f repl.tmp; \
 #	  fi; \
 #	  rm -r -f latex;
+
+$(doc_dir)/pwrrt.html : $(pwre_croot)/src/exp/pwrrt/src/pwrrtmodule.c
+	@ $(log_doxy)
+	@ cd $(doc_dir); \
+	  export PYTHONPATH=$(pwr_eexe); \
+	  $(python) -m pydoc -w pwrrt
+
+$(doc_dir)/pwrwb.html : $(pwre_croot)/wb/exp/pwrwb/src/pwrwbmodule.cpp
+	@ $(log_doxy)
+	@ cd $(doc_dir); \
+	  export PYTHONPATH=$(pwr_eexe); \
+	  $(python) -m pydoc -w pwrwb
+
+$(doc_dir)/pwrtest.html : $(pwre_croot)/test/exp/pwrtest/src/pwrtestmodule.cpp
+	@ $(log_doxy)
+	@ cd $(doc_dir); \
+	  export PYTHONPATH=$(pwr_eexe); \
+	  $(python) -m pydoc -w pwrtest

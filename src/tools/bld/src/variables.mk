@@ -111,6 +111,7 @@ cpflags		:=
 arflags		:= r
 obj             := -c -o $(target)
 javac		:= javac
+python 		:= python3
 ifdef pwre_ar
   ar            := $(pwre_ar)
 else

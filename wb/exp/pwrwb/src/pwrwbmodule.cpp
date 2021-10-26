@@ -897,7 +897,7 @@ static PyMethodDef Vid_methods[] = {
 
 static PyTypeObject VidType = {
     PyVarObject_HEAD_INIT(NULL, 0)
-    "Vid",         	       /* tp_name */
+    "pwrwb.Vid",      	       /* tp_name */
     sizeof(VidObject),         /* tp_basicsize */
     0,                         /* tp_itemsize */
     0,                         /* tp_dealloc */
@@ -973,7 +973,7 @@ static PyMethodDef Oid_methods[] = {
 
 static PyTypeObject OidType = {
     PyVarObject_HEAD_INIT(NULL, 0)
-    "Oid",         	       /* tp_name */
+    "pwrwb.Oid",               /* tp_name */
     sizeof(OidObject),         /* tp_basicsize */
     0,                         /* tp_itemsize */
     Oid_dealloc,               /* tp_dealloc */
@@ -1042,7 +1042,7 @@ static PyMethodDef Aref_methods[] = {
 
 static PyTypeObject ArefType = {
     PyVarObject_HEAD_INIT(NULL, 0)
-    "Aref",                    /* tp_name */
+    "pwrwb.Aref",              /* tp_name */
     sizeof(ArefObject),        /* tp_basicsize */
     0,                         /* tp_itemsize */
     Aref_dealloc,              /* tp_dealloc */
@@ -1116,7 +1116,7 @@ static PyMethodDef Cid_methods[] = {
 
 static PyTypeObject CidType = {
     PyVarObject_HEAD_INIT(NULL, 0)
-    "Cid",         	       /* tp_name */
+    "pwrwb.Cid",     	       /* tp_name */
     sizeof(CidObject),         /* tp_basicsize */
     0,                         /* tp_itemsize */
     0,                         /* tp_dealloc */
@@ -1177,7 +1177,7 @@ static PyMethodDef Tid_methods[] = {
 
 static PyTypeObject TidType = {
     PyVarObject_HEAD_INIT(NULL, 0)
-    "Tid",         	       /* tp_name */
+    "pwrwb.Tid",               /* tp_name */
     sizeof(TidObject),         /* tp_basicsize */
     0,                         /* tp_itemsize */
     0,                         /* tp_dealloc */
@@ -1255,8 +1255,8 @@ static PyMethodDef ADef_methods[] = {
 
 static PyTypeObject ADefType = {
     PyVarObject_HEAD_INIT(NULL, 0)
-    "ADef",         	       /* tp_name */
-    sizeof(ADefObject),         /* tp_basicsize */
+    "pwrwb.ADef",              /* tp_name */
+    sizeof(ADefObject),        /* tp_basicsize */
     0,                         /* tp_itemsize */
     0,                         /* tp_dealloc */
     0,                         /* tp_print */
