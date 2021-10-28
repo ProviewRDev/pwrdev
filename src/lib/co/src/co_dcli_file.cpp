@@ -174,9 +174,8 @@ int dcli_replace_env(const char* str, char* newstr)
         str_ToLower(lower_symbol, symbol);
       if ((value = getenv(lower_symbol)) == NULL) {
         /* It was no symbol */
-        if (str_StartsWith(str, "$pwr")) {
-          log_debug("Warning! Could not resolve environment variable $%s\n", lower_symbol);
-        }
+        //if (str_StartsWith(str, "$pwr_"))
+        //  log_debug("Warning! Could not resolve environment variable $%s\n", lower_symbol);
         *t = *s;
         t++;
       } else {
@@ -206,9 +205,8 @@ int dcli_replace_env(const char* str, char* newstr)
       str_ToLower(lower_symbol, symbol);
     if ((value = getenv(lower_symbol)) == NULL) {
       /* It was no symbol */
-      if (str_StartsWith(str, "$pwr")) {
-        log_debug("Warning! Could not resolve environment variable $%s\n", lower_symbol);
-      }
+      //if (str_StartsWith(str, "$pwr"))
+      //  log_debug("Warning! Could not resolve environment variable $%s\n", lower_symbol);
       *t = 0;
     } else {
       /* Symbol found */
