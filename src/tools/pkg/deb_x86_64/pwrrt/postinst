@@ -12,6 +12,7 @@ if [ "$1" = "configure" ]; then
 fi
 # End automatically added section
 
+platform="x86_64_linux"
 proot="/pwrp"
 aroot="/usr/pwrp/adm"
 
@@ -190,11 +191,11 @@ if [ ! -e $proot ]; then
   mkdir $proot/common/loghist
   mkdir $proot/common/db
   mkdir $proot/common/web
-  mkdir $proot/x86_64_linux
-  mkdir $proot/x86_64_linux/exe
-  mkdir $proot/x86_64_linux/lib
-  mkdir $proot/x86_64_linux/obj
-  mkdir $proot/x86_64_linux/lis
+  mkdir $proot/$platform
+  mkdir $proot/$platform/exe
+  mkdir $proot/$platform/lib
+  mkdir $proot/$platform/obj
+  mkdir $proot/$platform/lis
 
   chown -R pwrp $proot
   chgrp -R pwrp $proot

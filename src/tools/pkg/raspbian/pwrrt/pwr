@@ -31,10 +31,11 @@ case $1 in
 			exit 1
 		fi
 		(
-			flock -w 180 10
+#			flock -w 180 10
 			start-stop-daemon --start --oknodo --pidfile $PIDFILE --startas $DAEMON -- -D
 			sleep 5
-		) 10>$LOCKFILE
+		)
+#		) 10>$LOCKFILE
 		log_end_msg $?
   		;;
 	stop)
