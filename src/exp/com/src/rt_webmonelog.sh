@@ -37,5 +37,4 @@
 #
 export LD_LIBRARY_PATH=$pwr_exe
 export CLASSPATH=$pwr_lib/pwr_rt.jar:$pwr_lib/pwr_jop.jar
-#$jdk_home/java jpwr.rt.HistServer
-$jdk_home/java -Djava.library.path=$jdk/lib/i386/client:$jdk/lib/i386:$jdk/../lib/i386:$pwr_exe jpwr.rt.HistServer
+java jpwr.rt.HistServer
