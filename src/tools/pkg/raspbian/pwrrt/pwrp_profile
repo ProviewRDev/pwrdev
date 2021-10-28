@@ -30,8 +30,11 @@ export pwrp_inc=$pwrp_root/common/inc
 export pwrp_load=$pwrp_root/common/load
 export pwrp_log=$pwrp_root/common/log
 export pwrp_db=$pwrp_root/common/db
-
-export pwrp_web=$web_dir
+if [ "$web_dir" != "" ]; then
+  export pwrp_web=$web_dir
+else
+  export pwrp_web=$pwrp_root/common/web
+fi
 
  # Check /usr/local first since it ought to have priority
 jdk=`eval ls -1 /usr/local | sort -r | grep ^jdk | head -1`

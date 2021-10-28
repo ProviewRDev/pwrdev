@@ -208,25 +208,22 @@ if [ ! -e $aroot/db ]; then
   chown -R pwrp $aroot
 fi
 
-# Copy jar-files to web directory
+# Copy web-files to web directory
 if [ -e /etc/proview.cnf ]; then
   set +e
   web_dir=`eval cat /etc/proview.cnf | grep "\\bwebDirectory\\b" | awk '{print $2}'`
   set -e
 
+  if [ "$web_dir" == "" ]; then
+     web_dir="$proot/common/web"
+  fi
+
   if [ -e "$web_dir" ]; then
-    if [ -e /usr/pwrrt/lib/pwr_rt_client.jar ]; then
-      cp /usr/pwrrt/lib/pwr_rt_client.jar $web_dir
-      chown pwrp $web_dir/pwr_rt_client.jar
+    cp /usr/pwrrt/web/* $web_dir
+    if [ ! -e $webdir/index.html ]; then
+      cp $web_dir/opwind.html $web_dir/index.html
     fi
-    if [ -e /usr/pwrrt/lib/pwr_jop.jar ]; then
-      cp /usr/pwrrt/lib/pwr_jop.jar $web_dir
-      chown pwrp $web_dir/pwr_jop.jar
-    fi
-    if [ -e /usr/pwrrt/lib/pwr_jopg.jar ]; then
-      cp /usr/pwrrt/lib/pwr_jopg.jar $web_dir
-      chown pwrp $web_dir/pwr_jopg.jar
-    fi
+    chown pwrp $web_dir/*
   fi
 fi
 
