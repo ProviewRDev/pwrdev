@@ -162,3 +162,22 @@ char* syi_ProcessId()
   sprintf(pidstr, "%u", getpid());
   return pidstr;
 }
+
+pwr_tStatus syi_GetSysctlInt(const char *var, int *val)
+{
+  FILE *fp;
+  int num;
+  char fname[200] = "/proc/sys/";
+  strcat(fname, var);
+
+  fp = fopen(fname, "r");
+  if (!fp)
+    return SYI__NOVAR;
+
+  num = fscanf(fp, "%d", val);
+  fclose(fp);
+
+  if (num != 1)
+    return SYI__TYPE;
+  return SYI__SUCCESS;
+}

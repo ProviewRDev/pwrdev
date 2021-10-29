@@ -50,9 +50,10 @@
 #include <unistd.h>
 
 #include "rt_errh.h"
+#include "co_syi.h"
 
-#define MAX_NO_MSG 100;
-#define DEF_MAX_NO_MSG 10;
+#define MAX_NO_MSG 100
+#define DEF_MAX_NO_MSG 10
 
 static pthread_mutex_t fileMutex;
 static pthread_mutex_t termMutex;
@@ -119,8 +120,15 @@ void errl_Init(const char* termName,
   pthread_mutexattr_destroy(&mutexattr);
 
 #if !defined(OS_MACOS) && !defined(OS_FREEBSD) && !defined(OS_OPENBSD) 
+  int msg_max;
+  pwr_tStatus sts;
+  sts = syi_GetSysctlInt("fs/mqueue/msg_max", &msg_max);
+  if (ODD(sts) && msg_max < MAX_NO_MSG)
+    mqattr.mq_maxmsg = msg_max; /* max no of msg in this queue */
+  else
+    mqattr.mq_maxmsg = MAX_NO_MSG; /* max no of msg in this queue */
+    
   mqattr.mq_msgsize = LOG_MAX_MSG_SIZE; /* max mess size */
-  mqattr.mq_maxmsg = MAX_NO_MSG; /* max no of msg in this queue */
   mqattr.mq_flags = 0; // O_NONBLOCK;
   oflags = O_CREAT | O_RDWR;
   mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH;

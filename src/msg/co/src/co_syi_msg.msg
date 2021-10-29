@@ -42,5 +42,6 @@
 success		<successful completion>					/succ
 nyi		<not yet implemented>					/error
 truncated	<buffer to small, information was truncated>		/error
-
+novar		<no such variable>					/error
+type		<type error>						/error
 .end

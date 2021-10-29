@@ -58,6 +58,7 @@ pwr_tStatus syi_UserName(char* user, int len);
 const char* syi_Hardware();
 const char* syi_OpSys();
 char* syi_ProcessId();
+pwr_tStatus syi_GetSysctlInt(const char *var, int *val);
 
 #if defined __cplusplus
 }
