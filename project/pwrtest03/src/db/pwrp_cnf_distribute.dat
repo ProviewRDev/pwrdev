@@ -1,0 +1,33 @@
+project pwrtest03
+node pwrtest03a 128 999 0 pwrtest03a -
+load pwrtest03a
+appl pwrtest03a W $pwrp_cnf/pwrtest03a/pwr_user2.dat:$pwra_db/pwr_user2.dat $pwra_db/pwr_user2.dat
+appl pwrtest03a W $pwrp_load/ld_appl_pwrtest03a_999.txt $pwrp_load/
+appl pwrtest03a W $pwrp_load/pwrp_alias.dat $pwrp_load/pwrp_alias.dat
+appl pwrtest03a W $pwrp_inc/*.h
+appl pwrtest03a W $pwrp_exe/*.pwg
+appl pwrtest03a W $pwrp_load/pwrtest03a/xtt_help.dat:$pwrp_load/xtt_help.dat $pwrp_load/xtt_help.dat
+appl pwrtest03a W $pwrp_load/pwrtest03a/b55/Rt_xtt:$pwrp_load/pwrtest03a/Rt_xtt:$pwrp_load/Rt_xtt /home/b55/Rt_xtt
+appl pwrtest03a S $pwrp_load/pwrtest03a/pwrp/Rt_xtt /home/pwrp/Rt_xtt
+appl pwrtest03a W $pwrp_load/pwrtest03a/b55/xtt_setup.rtt_com:$pwrp_load/pwrtest03a/xtt_setup.rtt_com:$pwrp_load/xtt_setup.rtt_com /home/b55/xtt_setup.rtt_com
+appl pwrtest03a S $pwrp_load/pwrtest03a/pwrp/xtt_setup.rtt_com /home/pwrp/xtt_setup.rtt_com
+appl pwrtest03a W $pwrp_load/*.flw
+appl pwrtest03a W $pwrp_cnf/pwrtest03a/.rhosts:$pwra_db/.rhosts /home/pwrp/.rhosts
+appl pwrtest03a W $pwrp_web/*.html
+appl pwrtest03a S $pwrp_web/*.jar
+appl pwrtest03a S $pwrp_web/*.gif
+appl pwrtest03a S $pwrp_web/*.png
+appl pwrtest03a S $pwrp_web/*.jpg
+appl pwrtest03a S $pwrp_web/*.pdf
+appl pwrtest03a S $pwrp_web/*.pwg
+builddir pop 1 ""
+buildcopy pop $pwrp_pop/*.pwg $pwrp_exe/
+buildcopy pop $pwrp_pop/*.pwg $pwrp_web/
+buildcopy pop $pwrp_pop/*.pwsg $pwrp_exe/
+buildcopy pop $pwrp_pop/*.png $pwrp_exe/
+builddir appl 1 ""
+buildcopy appl $pwrp_appl/ra_plc_user.h $pwrp_inc/
+buildcopy appl $pwrp_appl/*.ge_com $pwrp_exe/
+builddir load 2 ""
+buildcopy load $pwrp_load/*.flw $pwrp_web
+buildcopy load $pwrp_load/rtt_crr*.dat $pwrp_web

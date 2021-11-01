@@ -134,11 +134,12 @@ echo "* Set opsys $opsys"
 cat > initvol.pwr_com <<EOF 
   set attr/name=VolPwrtest03a:/attr=OperatingSystem/value="$opsys"/noconf
   save
+  create flow/all
+  create crossref
   exit
 EOF
 
 wb_cmd -v volpwrtest03a @initvol
-
 wb_cmd -v volpwrtest03a build node pwrtest03a /force
 
 echo "* Build package"
