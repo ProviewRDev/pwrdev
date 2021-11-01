@@ -20,6 +20,9 @@ project/pwrtest01/src/login/initvol.pwr_com
 project/pwrtest02/bld
 project/pwrtest02/src/login/initdir.pwr_com
 project/pwrtest02/src/login/initvol.pwr_com
+project/pwrtest03/bld
+project/pwrtest03/src/login/initdir.pwr_com
+project/pwrtest03/src/login/initvol.pwr_com
 *.db
 *.db.lock
 *.gjl
