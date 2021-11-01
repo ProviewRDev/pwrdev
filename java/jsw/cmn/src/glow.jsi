@@ -120,6 +120,7 @@ var Glow = {
   eObjectType_GrowBarChart   	: 44,
   eObjectType_GrowToolbar   	: 45,
   eObjectType_GrowBarArc   	: 46,
+  eObjectType_GrowDashCell   	: 47,
 
   eDirection_Center		: 0,
   eDirection_Right		: 1,
@@ -801,6 +802,8 @@ var Glow = {
   eSave_GrowToolbar		        : 47,
   eSave_CustomColors		        : 48,
   eSave_GrowBarArc		        : 49,
+  eSave_GrowDashCell		        : 50,
+  eSave_GrowDashboard		        : 51,
   eSave_End				: 99,
   eSave_Ctx_zoom_factor_x		: 100,
   eSave_Ctx_base_zoom_factor		: 101,
@@ -1090,6 +1093,8 @@ var Glow = {
   eSave_GrowCtx_dyn_action_type2    	: 2247,
   eSave_GrowCtx_recursive_trace    	: 2248,
   eSave_GrowCtx_customcolors    	: 2249,
+  eSave_GrowCtx_dashboard	    	: 2250,
+  eSave_GrowCtx_dash		    	: 2251,
   eSave_GrowSubAnnot_x_right		: 2300,
   eSave_GrowSubAnnot_x_left		: 2301,
   eSave_GrowSubAnnot_y_high		: 2302,
@@ -1125,6 +1130,8 @@ var Glow = {
   eSave_GrowArc_fixposition      	: 2422,
   eSave_GrowArc_background_drawtype   : 2423,
   eSave_GrowArc_fill_eq_background    : 2424,
+  eSave_GrowArc_fill_eq_light 		: 2425,
+  eSave_GrowArc_fill_eq_shadow		: 2426,
   eSave_PolyLine_draw_type		: 2500,
   eSave_PolyLine_line_width		: 2501,
   eSave_PolyLine_a_points		: 2502,
@@ -1572,6 +1579,12 @@ var Glow = {
   eSave_GrowBarArc_bar_borderwidth 	: 4908,
   eSave_GrowBarArc_userdata_cb 		: 4909,
   eSave_GrowBarArc_bar_direction 	: 4910,
+  eSave_GrowDashCell_group_part 	: 5000,
+  eSave_GrowDashCell_frame	 	: 5001,
+  eSave_GrowDashCell_cell_rows	 	: 5002,
+  eSave_GrowDashCell_cell_columns 	: 5003,
+  eSave_GrowDashboard_dash_columns 	: 5100,
+  eSave_GrowDashboard_dash_rows	 	: 5101,
 
   ePosition_Absolute			: 0,
   ePosition_Relative			: 1,
@@ -1737,6 +1750,47 @@ function GlowPoint( ctx) {
       }
 	if ( end)
 	  break;
+    }
+    return i;
+  };
+
+  this.posit = function( x, y) {
+    this.x = x;
+    this.y = y;
+  };
+}
+
+function GrowDashboard( ctx) {
+  this.ctx = ctx;
+  this.dash_columns;
+  this.dash_rows;
+  
+  this.open = function( lines, row) {
+    var end = false;
+    for ( var i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(' ');
+      var key = parseInt(tokens[0], 10);
+      
+      if ( this.ctx.debug) console.log( "dashboard : " + lines[i]);
+      
+      switch ( key) {
+      case Glow.eSave_GrowDashboard:
+        break;
+      case Glow.eSave_GrowDashboard_dash_columns:
+	this.dash_columns = parseInt(tokens[1]);
+        break;
+      case Glow.eSave_GrowDashboard_dash_rows:
+	this.dash_rows = parseInt(tokens[1]);
+        break;
+      case Glow.eSave_End:
+	end = true;
+	break;
+      default:
+	console.log("Syntax error in GrowDashboard");
+	break;
+      }
+      if ( end)
+	break;
     }
     return i;
   };
@@ -2264,6 +2318,12 @@ function GlowArray( ctx) {
 	this.add( o);
 	break;
       }
+      case Glow.eSave_GrowDashCell: {
+	o = new GrowDashCell( this.ctx);
+	i = o.open( lines, i+1);
+	this.add( o);
+	break;
+      }
       case Glow.eSave_GrowConGlue: {
 	o = new GrowConGlue( this.ctx);
 	i = o.open( lines, i+1);
@@ -2434,6 +2494,18 @@ function GlowArray( ctx) {
       }
       case Glow.eSave_Point: {
 	o = new GlowPoint( this.ctx);
+	i = o.open( lines, i+1);
+	this.add( o);
+	break;
+      }
+      case Glow.eSave_GrowDashboard: {
+	o = new GrowDashboard( this.ctx);
+	i = o.open( lines, i+1);
+	this.add( o);
+	break;
+      }
+      case Glow.eSave_GrowDashCell: {
+	o = new GrowDashCell( this.ctx);
 	i = o.open( lines, i+1);
 	this.add( o);
 	break;
@@ -4925,6 +4997,57 @@ function GrowGroup( ctx) {
 
 GrowGroup.prototype = Object.create(GrowNode.prototype);
 
+function GrowDashCell( ctx) {
+  GrowGroup.call( this, ctx);
+  this.growgroup_open = this.open;
+  this.cell_rows = 1;
+  this.cell_columns = 1;
+
+  this.type = function() {
+    return Glow.eObjectType_GrowDashCell;
+  };
+
+  this.open = function( lines, row) {
+    var end = false;
+    var i;
+
+    for ( i = row; i < lines.length; i++) {
+
+      var tokens = lines[i].split(' ');
+      var key = parseInt(tokens[0], 10);
+
+      if ( this.ctx.debug) console.log( "GrowGroup : " + lines[i]);
+
+      switch ( key) {
+      case Glow.eSave_GrowDashCell: 
+	break;
+      case Glow.eSave_GrowGroup_growgroup_part: 
+	i = this.growgroup_open( lines, i+1); 
+	break;
+      case Glow.eSave_GrowDashCell_cell_rows: 
+	this.cell_rows = parseInt(tokens[1]);
+	break;
+      case Glow.eSave_GrowDashCell_cell_columns: 
+	this.cell_columns = parseInt(tokens[1]);
+	break;
+      case Glow.eSave_End:
+	end = true;
+	break;
+      default:
+	console.log( "Syntax error in GrowDashCell");
+	break;
+      }
+      if ( end)
+	break;
+    }
+		
+    return i;
+  };
+
+}
+
+GrowDashCell.prototype = Object.create(GrowGroup.prototype);
+
 function GrowSlider( ctx) {
   GrowNode.call( this, ctx);
   this.grownode_open = this.open;
@@ -6426,6 +6549,8 @@ function GrowArc( ctx) {
   this.gradient_contrast;
   this.disable_gradient;
   this.fill_eq_background;
+  this.fill_eq_light;
+  this.fill_eq_shadow;
   this.dynamicsize;
   this.trf = new GlowTransform();
 
@@ -6518,6 +6643,12 @@ function GrowArc( ctx) {
 	break;
       case Glow.eSave_GrowArc_fill_eq_background:
 	this.fill_eq_background = parseInt(tokens[1], 10);
+	break;
+      case Glow.eSave_GrowArc_fill_eq_light:
+	this.fill_eq_light = parseInt(tokens[1], 10);
+	break;
+      case Glow.eSave_GrowArc_fill_eq_shadow:
+	this.fill_eq_shadow = parseInt(tokens[1], 10);
 	break;
       case Glow.eSave_GrowArc_dynamicsize:
 	this.dynamicsize = parseInt(tokens[1], 10);
@@ -6701,6 +6832,12 @@ function GrowArc( ctx) {
       else
 	fillcolor = GlowColor.get_drawtype( this.fill_drawtype, Glow.eDrawType_FillHighlight,
 						    highlight, colornode, 1, 0);
+      if ( this.fill_eq_light !== 0 && this.fixcolor !== 0)
+	fillcolor = GlowColor.shift_drawtype( fillcolor, -this.shadow_contrast + chot, 
+					     colornode);
+      else if ( this.fill_eq_shadow !== 0 && this.fixcolor !== 0)
+	fillcolor = GlowColor.shift_drawtype( fillcolor, this.shadow_contrast + chot, 
+					     colornode);
 
       var grad = this.gradient;
       if ( this.gradient == Glow.eGradient_No && 
@@ -6863,7 +7000,7 @@ function GrowText( ctx) {
       var tokens = lines[i].split(' ');
       var key = parseInt(tokens[0], 10);
       
-      if ( this.ctx.debug) console.log( "GrowArc : " + lines[i]);
+      if ( this.ctx.debug) console.log( "GrowText : " + lines[i]);
       
       switch ( key) {
       case Glow.eSave_GrowText: 
@@ -6928,7 +7065,7 @@ function GrowText( ctx) {
       var tokens = lines[i].split(' ');
       var key = parseInt(tokens[0], 10);
       
-      if ( this.ctx.debug) console.log( "GrowArc : " + lines[i]);
+      if ( this.ctx.debug) console.log( "GrowText : " + lines[i]);
       
       switch ( key) {
       case Glow.eSave_Text: 
@@ -7117,7 +7254,7 @@ function GrowAnnot( ctx) {
       var tokens = lines[i].split(' ');
       var key = parseInt(tokens[0], 10);
       
-      if ( this.ctx.debug) console.log( "GrowArc : " + lines[i]);
+      if ( this.ctx.debug) console.log( "GrowAnnot : " + lines[i]);
       
       switch ( key) {
       case Glow.eSave_GrowAnnot: 
@@ -7153,7 +7290,7 @@ function GrowAnnot( ctx) {
       var tokens = lines[i].split(' ');
       var key = parseInt(tokens[0], 10);
       
-      if ( this.ctx.debug) console.log( "GrowArc : " + lines[i]);
+      if ( this.ctx.debug) console.log( "GrowAnnot : " + lines[i]);
       
       switch ( key) {
       case Glow.eSave_Annot: 
@@ -15596,8 +15733,9 @@ function GrowCtx( ctx) {
   this.recursive_trace = 0;
   this.nodraw = 0;
   this.owner = "";
+  this.dashboard = 0;
   this.customcolors = new GlowCustomColors();
-    
+  this.dash = new GrowDashboard(this);    
   this.a = new GlowArray( this);
   this.a_nc = new GlowArray( this);
   this.a_cc = new GlowArray( this);
@@ -15920,6 +16058,12 @@ function GrowCtx( ctx) {
 	break;
       case Glow.eSave_GrowCtx_customcolors:
 	i = this.customcolors.open( lines, i+1);
+	break;
+      case Glow.eSave_GrowCtx_dashboard:
+	this.dashboard = parseInt(tokens[1], 10);
+	break;
+      case Glow.eSave_GrowCtx_dash:
+	i = this.dash.open(lines, i+1);
 	break;
       default:
 	console.log( "Syntax error in GrowCtx open_growctx", key);
