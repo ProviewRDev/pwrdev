@@ -16,3 +16,16 @@
  2 01-NOV-2021 16:26:27.80 8550    NodeBuild    claes       pwrtest03a
  2 01-NOV-2021 16:26:27.80 8550    DirectoryBuild  claes       load
 1  01-NOV-2021 16:26:28.40 8820    CreatePackage  claes       pwrtest03a "pwrp_pkg_pwrtest03a_0001.tgz"
+ 2 02-NOV-2021 14:28:20.56 5436    DirectoryBuild  claes       pop
+ 2 02-NOV-2021 14:28:20.69 5436    DirectoryBuild  claes       appl
+ 3 02-NOV-2021 14:28:22.16 5436    PlcBuild     claes       VolPwrtest03a:Test03a-Ge-Dyn-Plc-W
+ 3 02-NOV-2021 14:28:22.27 5436    GeBuild      claes       pwr_logowithclose
+ 3 02-NOV-2021 14:28:22.29 5436    GeBuild      claes       wtest1
+ 2 02-NOV-2021 14:28:22.35 5436    VolumeBuild  claes       VolPwrtest03a
+ 2 02-NOV-2021 14:28:22.96 5436    NodeBuild    claes       pwrtest03a
+ 2 02-NOV-2021 14:28:22.96 5436    DirectoryBuild  claes       load
+1  02-NOV-2021 14:28:23.82 5709    CreatePackage  claes       pwrtest03a "pwrp_pkg_pwrtest03a_0001.tgz"
+1  02-NOV-2021 14:28:41.23 5888    WbLogin      claes       pwrp
+1  02-NOV-2021 14:30:36.09 6019    WbLogin      claes       pwrp
+1  02-NOV-2021 14:31:53.78 6019    ConfigSave   claes       directory
+1  02-NOV-2021 14:32:39.77 6019    ConfigSave   claes       directory
