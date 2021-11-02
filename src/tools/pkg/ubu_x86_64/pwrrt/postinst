@@ -322,6 +322,9 @@ BEGIN {
 
     cp /etc/nginx/sites-available/default /etc/nginx/sites-available/default.old
     mv /etc/nginx/sites-available/default.new /etc/nginx/sites-available/default
+    if [ -e /etc/nginx/sites-enabled/default ]; then
+      mv /etc/nginx/sites-enabled/default /etc/nginx/sites-enabled/default.old
+    fi
     ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
   fi
 fi
