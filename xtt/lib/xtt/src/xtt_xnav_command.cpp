@@ -9100,6 +9100,7 @@ int XNav::readcmdfile(char* incommand, char* buffer, char *bufargs)
       return sts;
   } else if (buffer) {
     /* Execute the buffer */
+    xnav_store_xnav(this);
     sts = ccm_buffer_exec(buffer, bufargs, xnav_externcmd_func,
         xnav_ccm_deffilename_func, xnav_ccm_errormessage_func, &appl_sts, 
 	verify, 0, NULL, 0, NULL, (void*)this);
