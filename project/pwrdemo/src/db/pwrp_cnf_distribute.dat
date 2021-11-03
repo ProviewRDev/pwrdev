@@ -20,6 +20,7 @@ appl copper-arrow S $pwrp_web/*.png
 appl copper-arrow S $pwrp_web/*.jpg
 appl copper-arrow S $pwrp_web/*.pdf
 appl copper-arrow S $pwrp_web/*.pwg
+appl copper-arrow S $pwrp_web/*.flw
 builddir pop 2 ""
 buildcopy pop $pwrp_pop/*.pwg $pwrp_exe/
 buildcopy pop $pwrp_pop/*.pwg $pwrp_web/
