@@ -40,6 +40,9 @@ SObject pwrb:Class
 !  @Version 1.0
 !  @Group Servers,NodeConfiguration,Operator
 !  @Summary Defines a website on a ProviewR node.
+!
+!  <b>WebHandler is obsolete. Use WebSocketServer instead.
+!
 !  The WebHandler object defines a website on a ProviewR node.
 !
 !  The existence of a WebHandler object in a node will cause a 

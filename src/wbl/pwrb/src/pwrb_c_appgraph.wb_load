@@ -39,7 +39,11 @@ SObject pwrb:Class
 !/**
 !  @Version 1.0
 !  @Summary Defines a graph in an android application.
+!
+!  <b>AppGraph is obsolete.
+!
 !  Defines a graph in an android application.
+!
 !  AppGraph objects should be positioned as children to a OpPlaceApp object.
 !  
 !

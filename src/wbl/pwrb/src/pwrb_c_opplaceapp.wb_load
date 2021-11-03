@@ -40,6 +40,9 @@ SObject pwrb:Class
 !  @Version 1.0
 !  @Group NodeConfiguration,Operator
 !  @Summary Configures the App interface on a ProviewR node.
+!
+!  <b> OpPlaceApp is obsolete.
+!
 !  The OpPlaceApp object defines a Android applications interface on 
 !  a ProviewR node.
 !

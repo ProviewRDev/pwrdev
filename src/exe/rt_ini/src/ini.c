@@ -168,18 +168,6 @@ void ini_ProcTable(pwr_tStatus* status, ini_sContext* cp)
       cPrio_mqtt_server, 0, pwr_cClass_MqttServer, "", 0);
   pp->proc.flags.b.system = 1;
 
-  pp = ini_ProcInsert(sts, cp, "pwr_webmon", "pwr_webmon_%d", 0, 1,
-      "rt_webmon.sh", cPrio_webmon, 0, pwr_cClass_WebHandler, "", 0);
-  pp->proc.flags.b.system = 1;
-
-  pp = ini_ProcInsert(sts, cp, "pwr_webmonmh", "pwr_webmonmh_%d", 0, 1,
-      "rt_webmonmh.sh", cPrio_webmonmh, 0, pwr_cClass_WebHandler, "", 0);
-  pp->proc.flags.b.system = 1;
-
-  pp = ini_ProcInsert(sts, cp, "pwr_webmonelog", "pwr_webmonelog_%d", 0, 1,
-      "rt_webmonelog.sh", cPrio_webmonelog, 0, pwr_cClass_WebHandler, "", 0);
-  pp->proc.flags.b.system = 1;
-
   pp = ini_ProcInsert(sts, cp, "pwr_websocketserver", "pwr_websocketserver_%d", 0, 1,
       "rt_websocketserver.sh", cPrio_websocketserver, 0, pwr_cClass_WebSocketServer, "", 0);
   pp->proc.flags.b.system = 1;

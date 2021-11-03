@@ -287,7 +287,6 @@ palette NavigatorPalette
       class SevServer
       class StatusServerConfig
       class SysMonConfig
-      class WebHandler
       class WebBrowserConfig
       class WebSocketServer
     }
@@ -511,9 +510,6 @@ palette NavigatorPalette
       class OpPlaceWeb
       class WebGraph
       class WebLink
-      class OpPlaceApp
-      class AppGraph
-      class AppLink
     }
     class Application
     class PlotGroup
