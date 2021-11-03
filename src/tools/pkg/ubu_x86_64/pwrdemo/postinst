@@ -71,12 +71,80 @@ sudo -u pwrp $initsh
 rm $initsh
 rm $initpwrc
 
+cp /usr/pwr$ver/$pwre_target/exp/web/* /usr/pwrp/pwrdemo$ver/bld/common/web/
+
 if [ -e /home/pwrp/Desktop ]; then
   cp /usr/pwrp/pwrdemo$ver/cnf/proviewdemo$ver.desktop /home/pwrp/Desktop/
   chown pwrp:pwrp /home/pwrp/Desktop/proviewdemo$ver.desktop
   chmod a+x /home/pwrp/Desktop/proviewdemo$ver.desktop
 fi
 
+#
+# Add pwrdemo web directories to Apache
+#
+if [ -e /etc/apache2/apache2.conf ]; then
+  if ! egrep -q "Alias[ ]+/pwrdemo/" /etc/apache2/apache2.conf; then
+    cat >> /etc/apache2/apache2.conf <<-EOF
+
+	#
+	# Proview alias pwrdemo, added by ProviewR installation
+	#
+	Alias /pwrdemo/ /usr/pwrp/pwrdemo$ver/bld/common/web/
+
+	<Directory /usr/pwrp/pwrdemo$ver/bld/common/web>
+	    AllowOverride None
+	    Require all granted
+	</Directory>
+EOF
+  fi
+fi
+
+# Add directories to nginx
+if [ -e /etc/nginx/sites-available/default ]; then
+  if ! egrep -q "location /pwrpdemo/" /etc/nginx/sites-available/default; then
+    awk -v ver=$ver '
+BEGIN {
+  inserver = 0;
+  done = 0;
+}
+{
+  if ( !done) {
+    if ( substr( $0, 1, 1) != "#") {
+      if ( $0 == "server {") {
+        inserver = 1;
+      }
+      if ( inserver) {
+        if ( $0 == "}") {
+          printf("        # Pwrdemo directory\n");
+          printf("        location /pwrdemo/ {\n");
+          printf("          alias /usr/pwrp/pwrdemo%s/bld/common/web/;\n", ver);
+          printf("        }\n");
+          printf("}\n");
+
+          inserver = 0;
+          done = 1;
+        }
+        else
+          printf( "%s\n", $0);
+      }
+      else
+        printf( "%s\n", $0);
+    }
+    else
+      printf( "%s\n", $0);
+  }
+  else
+    printf( "%s\n", $0);
+}' /etc/nginx/sites-available/default > /etc/nginx/sites-available/default.new
+
+    cp /etc/nginx/sites-available/default /etc/nginx/sites-available/default.old
+    mv /etc/nginx/sites-available/default.new /etc/nginx/sites-available/default
+    if [ -e /etc/nginx/sites-enabled/default ]; then
+      rm -f /etc/nginx/sites-enabled/default
+    fi
+    ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
+  fi
+fi
 
 
 
