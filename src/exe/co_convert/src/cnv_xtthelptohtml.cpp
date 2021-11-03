@@ -183,7 +183,7 @@ void* CnvXtthelpToHtml::insert(navh_eItemType item_type, const char* text1,
           if (s)
             *s = 0;
           strcat(fname, "_");
-          strcat(fname, link);
+          strcat(fname, CnvCtx::low(link));
           strcat(fname, ".html");
         }
         if (!streq(link_bookmark, "")) {
@@ -270,7 +270,7 @@ void* CnvXtthelpToHtml::insert(navh_eItemType item_type, const char* text1,
           if (s)
             *s = 0;
           strcat(fname, "_");
-          strcat(fname, link);
+          strcat(fname, CnvCtx::low(link));
           strcat(fname, ".html");
         }
         if (!streq(link_bookmark, "")) {
