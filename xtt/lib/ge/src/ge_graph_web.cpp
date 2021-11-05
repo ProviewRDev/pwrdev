@@ -69,6 +69,7 @@ static int graph_get_applet_size(char* graphname, int* width, int* height);
 
 int Graph::generate_web(ldh_tSesContext ldhses, pwr_tOid opplaceweb_oid)
 {
+#if 0
   pwr_tFileName fname = "$pwrp_web/index.html";
   std::ofstream fp_index;
 
@@ -86,51 +87,19 @@ int Graph::generate_web(ldh_tSesContext ldhses, pwr_tOid opplaceweb_oid)
            << "  </body>\n"
            << "</html>\n";
   fp_index.close();
-
-#if 0
+#endif
+#if LDH
   int sts;
   int size;
-  pwr_tClassId classid;
-  pwr_tObjid webgraph_objid;
-  pwr_tObjid weblink_objid;
   char* value_p;
   pwr_tString80 title;
   pwr_tString80 text;
   pwr_tString80 file_name;
-  pwr_tString80 pwrhost;
-  pwr_tBoolean enable_login;
-  pwr_tBoolean enable_alarmlist;
-  pwr_tBoolean enable_eventlog;
-  pwr_tBoolean enable_navigator;
-  pwr_tString256 load_archives;
   char style_sheet[80];
   char start_URL[80];
-  char name[80];
-  char graph_name[80];
-  char graph_text[80];
-  char link_URL[80];
-  char link_text[80];
-  char* s;
-  std::ofstream fp_login;
-  std::ofstream fp_start;
-  std::ofstream fp_menu;
-  std::ofstream fp_ow;
   std::ofstream fp_ows;
-  char fname[120];
-  char menu_file_name[80];
-  char codebase[200];
-  pwr_tEnum web_target;
-  char target_str[80];
-  char sname[80];
-  char arlist[400];
+  pwr_tFileName fname;
   pwr_tOName opplaceweb_name;
-  pwr_tOid nodeobject_oid;
-  pwr_tAName nodeobject_name;
-
-  ge_get_systemname(sname);
-
-  // Get codebase for applets from global config file
-  cnf_get_value("appletCodebase", codebase, sizeof(codebase));
 
   // Get OpPlaceWeb data
   sts = ldh_ObjidToName(ldhses, opplaceweb_oid, ldh_eName_Hierarchy,
@@ -165,47 +134,6 @@ int Graph::generate_web(ldh_tSesContext ldhses, pwr_tOid opplaceweb_oid)
   strcpy(text, value_p);
   free(value_p);
 
-  // Attribute PwrHost
-  sts = ldh_GetObjectPar(
-      ldhses, opplaceweb_oid, "RtBody", "PwrHost", &value_p, &size);
-  if (EVEN(sts))
-    return sts;
-  strcpy(pwrhost, value_p);
-  free(value_p);
-  str_trim(pwrhost, pwrhost);
-
-  // Attribute EnableLogin
-  sts = ldh_GetObjectPar(
-      ldhses, opplaceweb_oid, "RtBody", "EnableLogin", &value_p, &size);
-  if (EVEN(sts))
-    return sts;
-  enable_login = *(pwr_tBoolean*)value_p;
-  free(value_p);
-
-  // Attribute EnableAlarmList
-  sts = ldh_GetObjectPar(
-      ldhses, opplaceweb_oid, "RtBody", "EnableAlarmList", &value_p, &size);
-  if (EVEN(sts))
-    return sts;
-  enable_alarmlist = *(pwr_tBoolean*)value_p;
-  free(value_p);
-
-  // Attribute EnableEventLog
-  sts = ldh_GetObjectPar(
-      ldhses, opplaceweb_oid, "RtBody", "EnableEventLog", &value_p, &size);
-  if (EVEN(sts))
-    return sts;
-  enable_eventlog = *(pwr_tBoolean*)value_p;
-  free(value_p);
-
-  // Attribute EnableNavigator
-  sts = ldh_GetObjectPar(
-      ldhses, opplaceweb_oid, "RtBody", "EnableNavigator", &value_p, &size);
-  if (EVEN(sts))
-    return sts;
-  enable_navigator = *(pwr_tBoolean*)value_p;
-  free(value_p);
-
   // Attribute StyleSheet
   sts = ldh_GetObjectPar(
       ldhses, opplaceweb_oid, "RtBody", "StyleSheet", &value_p, &size);
@@ -222,374 +150,44 @@ int Graph::generate_web(ldh_tSesContext ldhses, pwr_tOid opplaceweb_oid)
   strcpy(start_URL, value_p);
   free(value_p);
 
-  // Attribute LoadArchives
-  sts = ldh_GetObjectPar(
-      ldhses, opplaceweb_oid, "RtBody", "LoadArchives", &value_p, &size);
-  if (EVEN(sts))
-    return sts;
-  strcpy(load_archives, (char*)value_p);
-  free(value_p);
-
-  strcpy(arlist, "pwr_rt_client.jar,pwr_jop.jar,pwr_jopg.jar");
-  // strcat( arlist ",pwr_bcomp.jar,pwr_bcompfc.jar,pwr_abb.jar");
-  str_trim(load_archives, load_archives);
-  if (!streq(load_archives, "")) {
-    strcat(arlist, ",");
-    strcat(arlist, load_archives);
-  }
-
-  // Login applet as default start URL
-  if (streq(start_URL, "") && enable_login)
-    strcpy(start_URL, "pwr_login.html");
-
-  // pwr_css as default css
-  if (streq(style_sheet, ""))
-    strcpy(style_sheet, "pwr_css.css");
-
-  // Parse the name of the start page
-  if ((s = strrchr(file_name, '/')) || (s = strrchr(file_name, '<'))
-      || (s = strrchr(file_name, ':')))
-    strcpy(name, s + 1);
-  else
-    strcpy(name, file_name);
-
-  if ((s = strrchr(name, '.')))
-    *s = 0;
-
-  strcpy(menu_file_name, name);
-  strcat(menu_file_name, "_menu_as.html");
-
-  // Generate html-file for login applet
-  strcpy(fname, "$pwrp_web/pwr_login.html");
-  dcli_translate_filename(fname, fname);
-
-  // If OpPlaceWeb is positioned under the node object, use $node syntax
-  sts = ldh_GetClassList(ldhses, pwr_eClass_Node, &nodeobject_oid);
-  if (EVEN(sts))
-    return sts;
-
-  sts = ldh_ObjidToName(ldhses, nodeobject_oid, ldh_eName_Hierarchy,
-      nodeobject_name, sizeof(nodeobject_name), &size);
-  if (EVEN(sts))
-    return sts;
-
-  if (str_StartsWith(opplaceweb_name, nodeobject_name)) {
-    pwr_tAName tmp;
-    strcpy(tmp, &opplaceweb_name[strlen(nodeobject_name)]);
-    strcpy(opplaceweb_name, "$node");
-    strcat(opplaceweb_name, tmp);
-  }
-
-  fp_login.open(fname);
-
-  fp_login
-      << "<!--     Generated by Ge         -->\n"
-      << "<!--     Do not edit this file   -->\n"
-      << "</html>\n"
-      << "  <head>\n"
-      << "    <title>Login</title>\n"
-      << "  </head>\n"
-      << "  <body>\n"
-      << "\n"
-      << "    <object classid=\"clsid:8AD9C840-044E-11D1-B3E9-00805F499D93\""
-      << '\n'
-      << "      width=300 height=120  codebase=\"" << codebase << "\">\n"
-      << "      <param name = code value=jpwr.jop.JopLoginApplet.class >"
-      << '\n'
-      << "      <param name =\"archive\" "
-         "value=\"pwr_rt_client.jar,pwr_jop.jar,pwr_jopg.jar\">"
-      << '\n'
-      << "      <param name=\"type\" "
-         "value=\"application/x-java-applet;version=1.3\">"
-      << '\n'
-      << "      <param name=\"scriptable\" value=\"false\">\n"
-      << "  </body>\n"
-      << "</html>\n";
-  fp_login.close();
-
-  // Generate html-file for start page applet style
-  sprintf(fname, "$pwrp_web/%s_as.html", name);
-  dcli_translate_filename(fname, fname);
-
-  fp_start.open(fname);
-
-  fp_start << "<! Generated by Ge >\n"
-           << "<html>\n"
-           << "  <head>\n"
-           << "    <title>" << title << "</title>\n"
-           << "  </head>\n"
-           << "\n"
-           << "  <frameset cols=\"20%,80%\">\n"
-           << "    <frame name=\"left\" src=\"" << menu_file_name << "\">"
-           << '\n';
-  if (!streq(start_URL, ""))
-    fp_start << "    <frame name=\"right\" src=\"" << start_URL << "\">"
-             << '\n';
-  else
-    fp_start << "    <frame NAME=\"right\">\n";
-  fp_start << "  </frameset>\n"
-           << "\n"
-           << "</html>\n";
-  fp_start.close();
-
-  // Generate menu file
-
-  sprintf(fname, "$pwrp_web/%s", menu_file_name);
-  dcli_translate_filename(fname, fname);
-
-  fp_menu.open(fname);
-
-  fp_menu << "<html>\n"
-          << "  <head>\n"
-          << "    <link rel=\"stylesheet\" type=\"text/css\" href=\""
-          << style_sheet << "\">\n"
-          << "    <title>Menu</title>\n"
-          << "  </head>\n"
-          << "  <body>\n"
-          << "    <h1>" << title << "</h1><br>\n"
-          << "    <h2>" << text << "</h2>\n"
-          << "    <hr>\n"
-          << "\n";
-
-  if (enable_login) {
-    fp_menu << "    <a href=\"pwr_login.html\" target=\"right\">Login</a><br>"
-            << '\n';
-  }
-
-  if (enable_navigator) {
-    fp_menu << "    <a "
-               "href=\"javascript:open_applet('pwr_navigator.html','Navigator',"
-               "1,400,600)\">Navigator</a><br>"
-            << '\n';
-  }
-
-  if (enable_alarmlist) {
-    fp_menu << "    <a "
-               "href=\"javascript:open_applet('pwr_events.html','"
-               "AlarmandEventlist',1,600,600)\">Alarm and Event list</a><br>"
-            << '\n';
-  }
-
-  if (enable_login || enable_navigator) {
-    fp_menu << "    <hr>\n";
-  }
-
-  // Get all WebGraph objects
-  sts = ldh_GetChild(ldhses, opplaceweb_oid, &webgraph_objid);
-  while (ODD(sts)) {
-    sts = ldh_GetObjectClass(ldhses, webgraph_objid, &classid);
-    if (EVEN(sts))
-      return sts;
-
-    if (classid == pwr_cClass_WebGraph) {
-      // Attribute Name
-      sts = ldh_GetObjectPar(
-          ldhses, webgraph_objid, "RtBody", "Name", &value_p, &size);
-      if (EVEN(sts))
-        return sts;
-      str_ToLower(graph_name, value_p);
-      free(value_p);
-
-      // Attribute WebTarget
-      sts = ldh_GetObjectPar(
-          ldhses, webgraph_objid, "RtBody", "WebTarget", &value_p, &size);
-      if (EVEN(sts))
-        return sts;
-      web_target = *(pwr_tEnum*)value_p;
-      free(value_p);
-
-      if ((s = strrchr(graph_name, '.')))
-        *s = 0;
-
-      // Attribute Text
-      sts = ldh_GetObjectPar(
-          ldhses, webgraph_objid, "RtBody", "Text", &value_p, &size);
-      if (EVEN(sts))
-        return sts;
-      strcpy(graph_text, value_p);
-      free(value_p);
-
-      switch (web_target) {
-      case graph_eWebTarget_ParentWindow:
-        strcpy(target_str, "_parent");
-        fp_menu << "    <a href=\"" << graph_name << ".html\" target=\""
-                << target_str << "\">" << graph_text << "</a><br>\n";
-        break;
-      case graph_eWebTarget_SeparateWindow: {
-        int width, height;
-        int resize = 0;
-
-        strcpy(target_str, "_blank");
-        sts = graph_get_applet_size(graph_name, &width, &height);
-        if (EVEN(sts)) {
-          width = height = 700;
-          resize = 1;
-        }
-
-        fp_menu << "    <a href=\"javascript:open_applet('" << graph_name
-                << ".html','" << graph_text << "'," << resize << ","
-                << width + 20 << "," << height + 20 << ")\">" << graph_text
-                << "</a><br>\n";
-        break;
-      }
-      default:
-        strcpy(target_str, "right");
-        fp_menu << "    <a href=\"" << graph_name << ".html\" target=\""
-                << target_str << "\">" << graph_text << "</a><br>\n";
-      }
-    }
-    sts = ldh_GetNextSibling(ldhses, webgraph_objid, &webgraph_objid);
-  }
-
-  fp_menu << "    <hr>\n"
-          << "\n";
-
-  // Get all WebLink objects
-  sts = ldh_GetChild(ldhses, opplaceweb_oid, &weblink_objid);
-  while (ODD(sts)) {
-    sts = ldh_GetObjectClass(ldhses, weblink_objid, &classid);
-    if (EVEN(sts))
-      return sts;
-
-    if (classid == pwr_cClass_WebLink) {
-      // Attribute URL
-      sts = ldh_GetObjectPar(
-          ldhses, weblink_objid, "RtBody", "URL", &value_p, &size);
-      if (EVEN(sts))
-        return sts;
-      strcpy(link_URL, value_p);
-      free(value_p);
-
-      // Attribute Text
-      sts = ldh_GetObjectPar(
-          ldhses, weblink_objid, "RtBody", "Text", &value_p, &size);
-      if (EVEN(sts))
-        return sts;
-      strcpy(link_text, value_p);
-      free(value_p);
-
-      // Attribute WebTarget
-      sts = ldh_GetObjectPar(
-          ldhses, weblink_objid, "RtBody", "WebTarget", &value_p, &size);
-      if (EVEN(sts))
-        return sts;
-      web_target = *(pwr_tEnum*)value_p;
-      free(value_p);
-
-      switch (web_target) {
-      case graph_eWebTarget_ParentWindow:
-        strcpy(target_str, "_parent");
-        break;
-      case graph_eWebTarget_SeparateWindow:
-        strcpy(target_str, "_blank");
-        break;
-      default:
-        strcpy(target_str, "right");
-      }
-
-      fp_menu << "    <a href=\"" << link_URL << "\" target=\"" << target_str
-              << "\">" << link_text << "</a><br>\n";
-    }
-    sts = ldh_GetNextSibling(ldhses, weblink_objid, &weblink_objid);
-  }
-
-  fp_menu << "  </body>\n"
-          << "</html>\n";
-
-  // Function for opening a window without menues and toolbar
-  fp_menu << "<script language=\"JavaScript\">\n"
-          << "function open_applet(url,name,resizable,width,height)\n"
-          << "{\n"
-          << "  var win = window.open(url, name, "
-             "'resizable='+resizable+',menubar=no,scrollbars=no,location=no,"
-             "toolbar=no,width='+width+',height='+height+',directories=no');"
-          << '\n'
-          << "}\n"
-          << "</script>\n";
-  fp_menu.close();
-
-  // Generate html-file for opwindow applet
-
-  sprintf(fname, "$pwrp_web/%s_opwin_menu.html", name);
-  dcli_translate_filename(fname, fname);
-
-  fp_ow.open(fname);
-
-  fp_ow << "<!--     Generated by Ge         -->\n"
-        << "<!--     Do not edit this file   -->\n"
-        << "</html>\n"
-        << "  <head>\n"
-        << "    <title>" << title << "</title>\n"
-        << "  </head>\n"
-        << "  <body>\n"
-        << "<!--[if !IE]> -->\n"
-        << "    <object classid=\"java:jpwr.jop.JopOpWindowApplet.class\""
-        << '\n'
-        << "      type=\"application/x-java-applet\"\n"
-        << "      archive=\"" << arlist << ",pwrp_" << sname << "_web.jar\""
-        << '\n'
-        << "      width=100% height=100% >\n"
-        << "      <param name = \"code\" "
-           "value=\"jpwr.jop.JopOpWindowApplet.class\" >"
-        << '\n'
-        << "      <param name =\"archive\" value=\"" << arlist << ",pwrp_"
-        << sname << "_web.jar\">\n"
-        << "      <param name=\"persistState\" value=\"false\" />\n"
-        << "      <param name=\"scriptable\" value=\"false\">\n"
-        << "      <param name=\"pwrplace\" value=\"" << opplaceweb_name << "\">"
-        << '\n';
-  if (!streq(pwrhost, ""))
-    fp_ow << "      <param name=\"pwrhost\" value=\"" << pwrhost << "\">"
-          << '\n';
-  fp_ow << "     </object>\n"
-        << "<!--<![endif]--> \n"
-        << "<!--[if IE]>\n"
-        << "    <object classid=\"clsid:8AD9C840-044E-11D1-B3E9-00805F499D93\""
-        << '\n'
-        << "      width=100% height=100%  codebase=\"" << codebase << "\">"
-        << '\n'
-        << "      <param name = code value=jpwr.jop.JopOpWindowApplet.class >"
-        << '\n'
-        << "      <param name =\"archive\" value=\"" << arlist << ",pwrp_"
-        << sname << "_web.jar\">\n"
-        << "      <param name=\"type\" "
-           "value=\"application/x-java-applet;version=1.3\">"
-        << '\n'
-        << "      <param name=\"scriptable\" value=\"false\">\n"
-        << "      <param name=\"pwrplace\" value=\"" << opplaceweb_name << "\">"
-        << '\n';
-  if (!streq(pwrhost, ""))
-    fp_ow << "      <param name=\"pwrhost\" value=\"" << pwrhost << "\">"
-          << '\n';
-  fp_ow << "     </object>\n"
-        << "<![endif]-->\n"
-        << "  </body>\n"
-        << "</html>\n";
-  fp_ow.close();
-
+  if (streq(start_URL, ""))
+    strcpy(start_URL, "xtt_help_index.html");
   // Generate html-file for start page for opwindow applet
 
-  sprintf(fname, "$pwrp_web/%s.html", name);
+  sprintf(fname, "$pwrp_web/%s", file_name);
   dcli_translate_filename(fname, fname);
 
   fp_ows.open(fname);
 
-  fp_ows << "<!--     Generated by Ge         -->\n"
+  fp_ows << "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n"
+         << "<!--     Generated by Ge         -->\n"
          << "<!--     Do not edit this file   -->\n"
          << "<html>\n"
          << "  <head>\n"
          << "    <title>" << title << "</title>\n"
+         << "    <link rel=\"stylesheet\" type=\"text/css\" href=\"toolbar.css\">\n"
+         << "    <style>\n"
+         << "      .menu {\n"
+         << "        float:left;\n"
+         << "        width:20%;\n"
+         << "        height:100%;\n"
+         << "      }\n"
+         << "      .main {\n"
+         << "        float:left;\n"
+         << "        width:79%;\n"
+         << "        height:100%;\n"
+         << "      }\n"
+         << "    </style>\n"
          << "  </head>\n"
-         << "  <frameset cols=\"242,*\">\n"
-         << "    <frame name=\"left\" src=\"" << name << "_opwin_menu.html\">"
-         << '\n'
-         << "    <frame name=\"right\" src=\"xtt_help_index.html\">\n"
-         << "  </frameset>\n"
+         << "  <body>\n"
+         << "    <iframe class=\"menu\" src=\"opwind_menu.html?opplace=" << opplaceweb_name << "\"></iframe>\n"
+         << "    <iframe class=\"main\" src=\"" << start_URL << "\"></iframe>\n"
+         << "  </body>\n"
          << "</html>\n";
 
   fp_ows.close();
 
-  printf("-- Web startpage generated $pwrp_web/%s.html\n", name);
+  printf("-- Web startpage generated $pwrp_web/%s\n", file_name);
 #endif
   return 1;
 }
