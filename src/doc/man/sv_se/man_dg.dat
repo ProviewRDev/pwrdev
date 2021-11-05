@@ -6,7 +6,7 @@
 <h1> Handbok för konstruktörer
 
 <hr>
-2021-10-22
+2021-11-05
 Version 5.9.0	
 <hr>
 </topic>
@@ -85,7 +85,7 @@ Kommunikation <link> communication
 Datalagring <link> dg_datastorage
 Applikations-programmering <link>dg_application
 Skapa processbilder <link> ge_man
-Java operatörsmiljö <link> dg_web_iterface
+Web operatörsmiljö <link> dg_web_interface
 Starta och testa systemet <link> conf_test
 
 <b>Referens manualer
@@ -4513,417 +4513,153 @@ Se XttGraph i Objektshandboken <classlink>xttgraph,"",$pwr_lang/pwrb_xtthelp.dat
 
 <chapter>
 <topic> dg_web_interface
-Java operatörsmiljö
+Web operatörsmiljö
 
-ProviewR innehåller förutom den ordinarie operatörsmiljön i X windows, även en operatörsmiljö 
-skriven i java. Fördelen med java är att det går att köra i en web-läsare och på många olika 
-plattformar. Nackdelen är att det är långsammare och har en begränsad funktionalitet.
+Utöver den vanliga operatörsmiljön i X windows, innehåller ProivewR också en operatörsmiljö
+skriven i HTML5 och javascript. Miljön är körbar på de flesta webläsare på telefoner, 
+surfplattor och persondatorer.
 
-<h1>Installation av java
-<h2>Utvecklingsstation
-För att exportera grafer till java måste Java Development Kit, jdk, vara installerat.
-Ladda hem lämplig jdk från java.sun.com. Definera omgivningsvariabeln jdk till katalogen där 
-paketet är uppackat, t ex /usr/local och lägg in $jdk/bin i PATH. Definera även jdk_home till
-$jdk/bin
+Gränssnittet består av tre delar
+- ett operatörsfönster som öppnas i webläsaren.
+- en server process som förser operatörsfönstret med information via en websocket.
+- en katalog där filer är tillgängliga för webläsaren.
 
-<c>export jdk=/usr/local/jdk1.6.0_10
-<c>export PATH=$PATH:$jdk/bin
-<c>export jdk_home=$jdk/bin
+<h1> Operatörsfönster
 
-<h2>Process och operatörsstation
-På process och operatörsstationerna måste Java Runtime Environment, jre, vara installerat.
-Ladda hem från java.sun.com och packa upp under /usr/local. Även här måste jdk och jdk_home 
-definieras (detta görs av /etc/pwrp_profile)
+<image> dg_fig127.png
+<b>Fig Operatörsfönstret
 
-<c>export jdk=/usr/local/jre1.6.0_10
-<c>export PATH=$PATH:$jdk/bin
-<c>export jdk_home=$jdk/bin
+Operatörsfönstret konfigureras med ett OpPlaceWeb-objekt i nodhierarkin. Förstret innehåller
+en meny till vänster och ett startsida till höger.
 
-<h1>Översikt
-<h2>Webläsare (remote)
-Java miljön kan startas i en webläsare, genom att man surfar in på projektets 
-hemsida. Information om objekt, larm mm, hämtas från tre serverprocesser som
-måste vara startade på den nod man läser in hemsidan ifrån, rt_webmon, rt_webmonmh och
-rt_webmonelog. För att server-processerna ska starta krävs att ett WebHandler objekt
-är konfigurerat i nodhierakin.
+Menyn är indelad i tre sektioner. Den första innehåller att antal standardfunktioner
+- val av språk.
+- in och utloggning.
+- öppna larm och händelselistor.
+- öppna händlseloggen.
+- öppna runtime-navigatorn.
+- länk till projektets hjälptext.
+- länk till dokumentationen för ProviewR.
 
-<image> dg_fig100.png
-<b>Fig Hemsida för ett projekt
+Om de här knapparna ska visas eller inte kan konfigureras med Enable/Disable attributen
+i OpPlaceWeb-objektet.
 
-<h2>Lokalt
-Java miljön kan även köras lokalt på en nod där ProviewR's runtime har startats.
-Server-processerna för web-gränssnittet behöver inte startas, informationen hämtas
-direkt ur realtidsdatabasen. 
+Den andra sektionen innehåller knappar för att öppna Ge grafer konfigurerade med 
+WebGraph-objekt. WebGraph-objekten är placerade som barn till OpPlace-objektet och innehåller
+namnet på Ge grafens pwg-fil.
 
-Den lokala java miljön innehåller en meny, men inte någon höger ram, som websidan. Den
-kan endast visa Ge grafer som java frame, inte som applets. Funktionerna larm fönster och 
-händelselogg är inte implementerade för lokal körning.
+Den tredje sektionen innehåller länkar definierade med WebLink-objekt. WebLink-objekten
+innehåller en URL och är placerade under OpPlaceWeb-objektet.
 
-För att köra lokalt krävs att man installerar lämplig jre från java.sun.com och definierar
-omgivningsvariabeln jdk till att peka på jre installationen, t ex
+Den högra sidan innehåller hjältexten för projektet, skriven i filen $pwrp_cnf/xtt_help.dat. 
+Om någon annan sida ska visas, kan den anges i StartURL attributet i OpPlaceWeb objektet.
+  
+Det kan finnas flera OpPlaceWeb-objekt på en nod, som konfigurerar websidor med olika layout.
+OpPlaceWeb-objeken ska ha olika filnamn angivna i FileName-attributet, och kan öppnas med
+en URL till den specificerade filen. Default-filen är index.html för det första 
+OpPlaceWeb-objektet och index2.html etc för de nästkommande OpPlaceWeb objekten.
 
-<c>> export jdk=/usr/local/jre1.6.0.19
+Opertörsplatsen med FileName index.html kan öppnas med URL'en
 
-Operatörsmiljön startas sedan med kommandot
+<c>http://'hostname'/pwrp_web/index.html
 
-<c>> jpwr_opwind.sh
+<image> dg_fig128.png
+<b>Fig Konfigurering av weboperatör
 
-<image> dg_fig103.png
-<b>Operatörsmeny vid lokal start
-
-<h1>Konfigurering
-
-<h2>Konfigurering av server processer
-Om det finns ett WebHandler objekt startas server-processerna för webgränssnittet.
-
-<h2>Konfigurering av menyn
-Konfigureringen av menyn i operatörsfönstret gör i nodhierakin med attribut i ett OpPlaceWeb 
-objektet, och ett antal WebGraph och WebLink objekt som läggs under detta objekt.
-
-<b>OpPlaceWeb
-
-I OpPlaceWeb objektet konfigureras vilka standardfunktioner som ska finnas med
-i operatörsfönstrets meny.
-
-<b>EnableLanguage
-Visar en knapp för språk-val i menyn. Språkvalet måster göras innan man öppnar olika
-fönster, eftersom språket inte ändras på de fönster som redan är skapade.
-
-<b>EnableLogin
-Visar kappar för inlogging och utloggning i menyn. Inlogging innebär att man loggar in
-som en ProviewR användare med specificerade privileger som avgör vilken access man har till
-systemet.
-
-<b>EnableAlarmList
-Visar en knapp i menyn för att öppna fönster med larm och händelselista.
-
-<b>EnableEventLog
-Visar en knapp i menyn för att söka efter händelser i eventloggen.
-
-<b>EnableNavigator
-Visar en knapp i menyn för att öppna navigatorn.
-
-<b>WebGraph
-WebGraph objekt konfigurererar knappar i menyn för att visa process grafik. WebGraph
-objekt läggs under OpPlaceWeb objektet.
-
-WebGraph objektet gör att grafen öppnas som en Java Frame, dvs i ett eget fönster. I Ge
-editorn måste man ange att grafen ska exporteras som en Java Frame genom att markera
-IsJavaFrame i Graph Attributes. Vill man öppna grafen som applet används WebLink objektet, 
-se nedan.
-
-I Name attributet fylls namnet in på den java-klass som genereras när grafen exporteras
-som java. Normalt är detta namn detsamma som grafens namn, men med stor bokstav på första
-bokstaven. Man kan dock välja att spara en graph under ett annat namn, genom att välja
-export as, t ex om namnet innehåller lokala tecken, eller börjar på en siffra, eller andra
-namn som inte bildar tillåtna java-klass namn.
-
-I Text attributet anges knapp-texten.
-
-<b>WebLink
-Ett WebLink objekt konfigurerar en knapp i menyn för att öppna en godtycklig URL. I 
-WebTarget kan man ange var den nya sidan ska läggas, i ett separat fönster, i den
-högra ramen, eller i både meny och högra ramen (parent).
-
-<b>Öppna en Ge graf som en applet
-Ett WebLink objekt kan även användas för att öppna en Ge graph som en applet, t ex för
-att lägga den i den högra ramen. I Ge editorn anger man att grafen ska exporteras som
-en Java Applet genom att markera IsJavaApplet i GraphAttributes. Det gör att det skapas
-en html fil på $pwrp_web med samma namn som grafen, t ex mygraph.html. Genom att ange
-detta namn i WebLink objektets URL-attribut och sätta WebTarget till RightFrame, visas
-grafen i högra ramen när man klickar på knappen. Observera att en graf som öppnas som en
-applet får sin behörighet från Security-objektets DefaultWebPriv, och inte påverkas av 
-eventuell inlogging.
-
-<h2>Konfigurering av högra ramen
-Hemsidan för ett projekt består av en meny och en höger ram. I höger ramen visas som 
-default innehållet i xtt-hjälptexten för projektet. Denna konverteras till html när 
-noden byggs. Om man vill ha en annan startsida i högra ramen kan man lägga in en URL
-till denna i OpPlaceWeb objektets attribute StartURL. Om man t ex vill visa en Ge graf,
-exporterar man grafen som en Java Applet och lägger man in html-filen för grafen på samma 
-sätt som i WebLink objektet ovan.
-
-<h2>LoadArchives
-Om man vill kunna visa Ge grafer från flera olika projekt, måste java arkiven för dessa
-projekt vara tillgängliga för web-läsaren. Java klasserna som genereras när graferna 
-exporteras i Ge editorn, läggas i ett arkiv men namnet pwrp_'systemname'_web.jar. 
-Arkivet för det egna projektet laddas alltid, men om även andra arkiv ska laddas, ska de
-läggas in i OpPlaceWeb objektets LoadArchive attribut, och kopieras till $pwrp_web.
-
-<h2>Behörighet
-<b>Default behörighet
-Default behörighet är den behörighet som en användare får som inte loggar in. Den anges
-i Security objektets DefaultWebPriv attribut. 0 innebär att man inte har access till
-något annat än att logga in. Normal sätter man RtRead vilket gör att ej inloggade användare
-kan titta, men inte ändra värden.
-
-<b>Inloggning
-För att kunna logga in måste inloggingfunktionen vara aktiverad i OpPlaceWeb objektet.
-Genom att klicka på Login knappen in operatörsfönstret, kan användaren logga in med
-användarnamn och passerord. Användarnamnet måste vara registrerat i den systemgrupp
-som har angivits i Security objektets WebSystemGroup. Vid registreringen tilldelas 
-användaren priviligier som avgör behörigheten.
-
-Lösenordet krypteras av klienten, dvs okrypterade lösenord skickas inte över nätverket.
-
-<h1>Server processer
-Tre server processer startas start av ProviewR runtime, rt_webmon, rt_webmonmh och
-rt_webmonelog.
-
-<b>rt_webmon
-rt_webmon öppnar en port från vilken web-klienter kan hämta information om objekt
-i databasen och lägga upp prenumerationer.
-
-<b>rt_webmonmh
-rt_webmonmh förser web-klienter med larm och händelser. Webgränssnittet innehåller ett
-fönster med larm och händelselista som hämtar information här ifrån. Urvalet av larm 
-händelser bestäms av attributet EventSelectList i WebHandler objektet.
-
-<b>rt_webmonelog
-rt_webmonelog gör sökningar av händelser i eventlog databasen.
-
-
-<h1>Funktioner
-I det här avsnittet beskrivs med ingående olika funktioner i web och java miljön och 
-hur de genereras och konfigureras.
-
-<h2>Hemsida
-Hemsidan konfigureras med OpPlaceWeb objektet, och genereras av OpPlaceWeb objektets 
-bygg-metod. Den består av ett antal html-filer och jar-filer som läggs på katalogen
-$pwrp_web.
-
-Startsidan, index.html, består av två ramar. Den vänstra ramen öppnar html-filen för menyn, 
-index_opwin_menu.html, som i sin tur öppnar en applet som knyter upp sig mot ProviewR 
-servern och bygger upp menyn. Den högra ramen visar den URL som angivits i OpPlaceWeb 
-objektets StartURL attribut, eller om detta attribut är tomt, startsidan för xtt-hälpen.
-
-<h2>Ge grafer
-Ge grafer som visas måste vara exporterade som java frames eller java applets. Normalt
-använder man idag java frames. 
-
-En java frame innebär att grafen visas i ett eget fönster. Den är skalbar, och anpassar
-sig efter fönstrets storlek. Möjligheterna att påverka inmatningsfält, knappar mm i bilden
-bestäms av privilegierna för den användare man är inloggad som. För att kunna exportera en
-graf som java frame måste IsJavaFrame markeras Ge editorns GraphAttributes.
-
-<image> dg_fig101.png
-<b>Fig Graf öppnad som en Frame
-
-En java applet öppnas från en html-fil. Den är inte skalbar, och behörigheten hämtas
-från Security objektets DefaultWebPriv attribut, och påverkas inte av vem som är inloggad.
-Java applets kan inte visas i den lokala java miljön. För att kunna exportera en graf som
-java applet måste IsJavaApplet markeras i Ge editorns GraphAttributes.
-
-<image> dg_fig102.png
-<b>Fig Graf öppnad som en Applet
-
-Man bör även ange en storlek på den genererade java grafen genom att sätta bredden i pixel
-i JavaWidth i GraphAttributes.
-
-Exportering sker genom att aktivera File/Export/Java i Ge editorns meny. Även byggmetoden
-för WebGraph objekt exporterar en graf, om denna har sparats sedan senaste exporteringen.
-Vid exporteringen skapas en java fil på $pwrp_pop, som kompileras och läggs i två arkiv,
-$pwrp_web/pwrp_'systemname'_web.jar, och $pwrp_lib/pwrp_'systemname'.jar. Arkivet på 
-$pwrp_web används av web-gränssnittet, och arkivet på $pwrp_load av den lokala java miljön.
-För en java frame exporteras grafen som en java klass med samma namn som graf-namnet, men 
-med stor bokstav på första bokstaven. my_graph exporteras t ex som My_graph. Notera att 
-lokala bokstäver inte får ingå i ett java klassnamn, och det får inte heller börja på en 
-siffra. I de har fallen kan man exportera med Export/Java As och ange ett tillåtet 
-javaklassnamn. Genom att spara ge grafen efter exporteringen sparas java namnet, annars måste 
-namnet anges vid varje exportering.
-
-För java applets läggs suffixet _A på java klassnamnet, t ex My_graph_A. Dessutom genereras
-en html fil, $pwrp_web/my_graph.html, som används för att starta appleten. Appleten kan 
-naturligvis även startas från andra html-filer och kombineras med andra applet'ar och 
-grafiska element.
-
-Exporteringen till java innehåller vissa begränsningar. Text objekt kan i Ge läggas ovanpå
-subgrafer, men kommer i java att hamna under subgrafen. Vissa xtt-kommandon som kan användas
-i command knappar finns inte tillgängliga i web-miljön. Det finns även en begränsing för hur
-många tecken en java funktion för innehålla. I stora, innehållsrika grafer kan man stöta på
-den här begränsningen.
+<h1> Serverprocess
+Serverprocessen konfigureras med ett WebSocketServer-objekt i nodhierarkin. Servern är en
+java process och kräver att java är installerat. Servern lyssnar efter förfrågningar från
+operatörsfönster att öppna en websocket, och tillhandahåller information om realtidsdatabasen
+till operatörsfönstret.
 
 <h2>Larm och händelselista
-För larm och händelselistan måste EventSelectList i WebHandler objektet fyllas i med 
-hierarkier från vilka larm och händelser ska visas.
+För larm och händelselistorna måste EventSelectList-attributet i WebSockerServer-objektet
+fyllas i med hierarkier från vilka larm och händelser ska visas.
+
+<h1> Web katalogen
+Operatörsfönstret omfattar ett antal filer, och dessa samlas på web-katalogen, pwrp_web.
+Katalogen registreras i webservern och görs tillgänglig från webben.
+
+Här listas några filer som ska finnas på katalogen
+
+- pwg-filer for Ge grafer som används i WebGraph-objekt. Ska kopieras från $pwrp_pop.
+- pwg-filer för objektsbilder, kan kopieras från $pwr_exe.
+- flw-filer för plc trace, ska kopieras från $pwrp_load.
+- korsreferensfiler, rtt_crr*.dat ska kopieras från $pwrp_load.
+- html-filer för xtt hjälptexter. Genereras när noden byggs.
+- dokumentation av lokala klasser genereras när klassvolymen byggs.
+- Alla filer på $pwr_web kopieras till $pwrp_web vid installation av pwrrt-paketet.
+
+Vissa filer genereras eller kopieras vid installationen, men andra måste kopieras manuellt
+eller med automatik genom att skapa Build-objekt i direktory-volymen. I exemplet nedan
+visas BuildCopy objekt för att kopiera
+
+- pwg-filer från $pwrp_pop.
+- flw-filer från $pwrp_load.
+- korsreferensfiler från $pwrp_load.
+
+<image> dg_fig129.png
+<b>Fig Build konfigurering för pwrp_web-katalogen
 
 <h2>Hjälptexter
-Hjälptexterna för projektet, filen xtt_help.dat, exporteras till html-filer på $pwrp_web
-av OpPlaceWeb objektets byggmetod. Startsidan för hjälptexterna är 
-$pwrp_web/xtt_help_index.html. Denna vissas som default i hemsidans högra ram, om ingen
-annan URL är angiven i OpPlaceWeb objektets StartURL attribut.
+Hjälptexterna för projektet i filen xtt_help.dat konverteras till html-filer på $pwrp_web
+av bygg-metoden för OpPlaceWeb objektet. Startsidan för hjälptexterna är
+$pwrp_web/xtt_help_index.html. Denna visas som default till höger i operatörsfönstret om inte
+någon annan URL är angiven in StartURL-attributet i OpPlaceWeb-objektet.
 
-Om hjälptexten innehåller image taggar måste dessa png eller gif filer kopieras till
+Om hjälptexen innehåller image taggar, måste png eller gif-filerna för dessa kopieras till
 $pwrp_web.
 
-<h2>Plc 
-För att kunna öppna plc program i web miljön måste .flw filer på $pwrp_load kopieras till
-$pwrp_web.
+<h2> Distribution
+Filerna på $pwrp_web ska ingå i distributionspaketet, och distribueras till $pwrp_web på
+process eller operatörsstationen. Det görs genom att sätta WebFiles i Distributions-objektet
+under NodeConfig-objektet i directoryvolymen.
 
-<h2>Språk
-Default är språket engelska. Andra språk kan anges i OpPlaceWeb objektets Language attribut
-eller väljas i språkvalsfönstret om detta är konfigurerat. Om ett annat språk än 
-engelska ska kunna väljas, måste språkfiler för detta språk, och för engelska, kopieras
-från $pwr_exe till $pwrp_web. För t ex svenska skapas katalogerna $pwrp_web/en_us och
-$pwrp_web/sv_se och filerna $pwr_exe/en_us/xtt_lng.dat kopieras till $pwrp_web/en_us/ och
-$pwr_exe/sv_se/xtt_lng.dat kopieras till $pwrp_web/sv_se/.
+<h2> Konfigurering av webservern
+$pwrp_web katalogen ska vara tillgänglig från webben, och läggas in i webserverns konfigurering.
+För nginx och apache gör detta vid installeringen av pwrrt-paketet, men om projektet t ex
+ska visas från utvecklingsstationen måste det göras manuellt. Här följer några exempel.
 
-<h2>Arkiv
-Följande arkiv ska vara tillgängliga på $pwrp_web: pwr_rt_client.jar, pwr_jop.jar,
-pwr_jopc.jar, pwr_bcomp.jar, pwr_bcompfc.jar och pwr_abb.jar. I utvecklingsmiljön måste man
-kopiera dessa från $pwr_lib, i runtime-miljön görs detta vid installationen av pwrrt paketet.
+<b> nginx
+Lägg till de här raderna i /etc/nginx/sites-enabled/default (byt /pwrp/common/web/ mot den
+verkliga katalogen för $pwrp_web)
 
-<h1>Webserver
-För att kunna öppna projektets hemsida i en webläsare måste en webserver vara startad på
-noden, t ex apache.
+<c>location /pwrp_web/ {
+<c>  alias /pwrp/common/web/;
+<c>}
 
-Webservern tillåter endast att vissa utvalda kataloger öppnas, t ex /var/www. Antingen kan man
-flytta innehållet i $pwrp_web till en öppen katalog, eller så kan man öppna $pwrp_web. I 
-apache görs detta i filen /etc/apache2/apache2.conf genom att lägga till
-
-<c>Alias /pwrp_web/ /usr/pwrp/myproj/bld/common/web/
-
-<c><Directory /usr/pwrp/myproj/bld/common/web>
-<c>    Options Indexes MultiViews
-<c>    AllowOverride None
-<c>    Order allow,deny
-<c>    Allow from all
-<c></Directory>
-
-Här öppnas ett project, myproj, med rot-katalogen /usr/pwrp/myproj, med alias namnet pwrp_web.
-Om noden är mynode, blir URL'en för att öppna web-miljön
-
-<c>http://mynode/pwrp_web/index.html
-
-På en process eller operatörsstation blir motsvarande tillägg i apache2.conf vilket
-läggs in vid installationen av pwrrt paketet
+<b> apache
+Lägg till de här raderna i /etc/apache2/apache2.conf (byt /pwrp/common/web/ mot den verkliga
+katalogen för $pwrp_web)
 
 <c>Alias /pwrp_web/ /pwrp/common/web/
 
 <c><Directory /pwrp/common/web>
-<c>    Options Indexes MultiViews
 <c>    AllowOverride None
-<c>    Order allow,deny
-<c>    Allow from all
+<c>    Require all granted
 <c></Directory>
+
+
+<h1> Auktorisering
+Om inloggnings-funktionen är aktiverad, kan en användare logga in med ett giltigt namn och 
+passerord, och erhålla de privilegier som tillhör den inloggade användaren. Auktoriserade
+användare är medlemmar av den systemgrupp som är angiven i WebSystemGroup i Security-objektet.
+
+I exemplet nedan, används systemgruppen 'Common' som innehåller de ordinare användaren pwrp,
+system etc, men rekommandationen är att skapa en specifik systemgrupp med särskilda användare
+för webben.
+
+För ej inloggade användare bestäms privilegierna av DefaultWebPriv i Security-objektet. Det
+rekommenderas att DefaultWebPriv är RtRead eller noll (inga privilegier). Användare utan
+privilegier kan endast aktivera login-funktionen.
+	
+<image> dg_fig130.png
+<b>Fig Konfiguration av auktorisering
 
 </topic>
 </chapter>
 
-<chapter>
-<topic>android_app
-Android application
 
-<image>dg_fig119.png
-<b>Android application
-
-Android applikationen kan köras på mobiltelefoner och surfplattor med operativsystemet 
-Android. Applikationen kopplar upp sig mot en process- eller operatörsstation och kan bl a 
-visa
-
-- Runtima navigatorn.
-- Operatörsbilder.
-- Plc trace.
-- Larm och händelselista.
-- Korsreferenser.
- 
-För att installera applikationen, ladda ner PwrXtt.apk från ProviewR's nedladdings-sida på 
-Source Forge och installera på plattan eller mobilen.
-
-Applikationen använder samma server processer som web-gränssninttet, rt_webmon och 
-rt_webmonmh, som konfigureras med ett WebHandler objekt. Se Kapitlet Java Operatörsmiljö för 
-mer info. 
-
-<h1>Start meny
-När man startar applikationen visas först en startmeny, eller om denna inte är konfigurerad 
-runtime navigatorn.
-
-Start menyn konfigureras med ett OpPlaceApp objekt, och under detta med AppGraph och AppLink 
-objekt. AppGraph används för att öppna Ge grafer, och AppLink är en länk till en hemsida eller 
-ett dokument. 
-
-I AppGraph objeket anges namnet på pwg-filen, en bild-fil för ikonen och en text som skrivs 
-under ikonen. I AppLink objektet anges en URL, samt bild-fil och text.
-
-<image>dg_fig117.png
-<b>Konfigurering av startmeny
-
-<image>dg_fig118.png
-<b>Fig Start meny
-
-<h1>Distribution
-Attributet AppUseWebDir i OpPlaceApp-objektet anger om alla filer ska hämtas från pwrp_web 
-katalogen, eller om vissa filer ska hämtas från $pwrp_exe och $pwrp_load. Om AppUseWebDir 
-är satt fungerar appen analogt med webgränssnittet och pwg och flw filer måste kopieras till 
-$pwrp_web. 
-
-Tabell över filer som används av applikationen. Om AppUseWebDir är satt, ska dessa
-distribueras till $pwrp_web.
-
-<b>Funktion <t>filtyp <t>katalog 
-Ge grafer   <t>pwg    <t>$pwrp_exe
-Plc trace   <t>flw    <t>$pwrp_load
-Korsreferenser <t>rtt_crr*.dat <t>$pwrp_load
-Hjälpfiler  <t>html   <t>$pwrp_web
-Ikoner      <t>png, gif etc <t>$pwrp_exe
-
-<h2>Web server
-Appen läser filer via en webserver, t ex apache, som måste vara startad. Liksom för 
-Web-gränssnittet ska det finnas en alias pwrp_web definerad, som pekar på $pwrp_web. För 
-apache specificeras det i filen /etc/apache2/apache2.conf.
-
-<c>Alias /pwrp_web/ /pwrp/common/web/
-
-<c><Directory /pwrp/common/web>
-<c>    Options Indexes MultiViews
-<c>    AllowOverride None
-<c>    Order allow,deny
-<c>    Allow from all
-<c></Directory>
-
-Om AppUseWebDir inte är satt, måste det dessutom finnas alias för pwrp_exe och pwrp_load. I 
-det här fallet behöver man inte kopiera filer till $pwrp_web utan de läses på pwrp_load eller
-pwrp_exe där de normalt förekommmer. flw-filer och korsreferensfiler läses från $pwrp_load 
-och övriga filer, pwg, png etc, från $pwrp_exe.
-
-Notera att pwrp_exe katalogen olika beroende på plattform.
-
-<c>Alias /pwrp_load/ /pwrp/common/load/
-
-<c><Directory /pwrp/common/load>
-<c>    Options Indexes MultiViews
-<c>    AllowOverride None
-<c>    Order allow,deny
-<c>    Allow from all
-<c></Directory>
-
-<c>Alias /pwrp_exe/ /pwrp/x86_linux/exe/
-
-<c><Directory /pwrp/x86_linux/exe>
-<c>    Options Indexes MultiViews
-<c>    AllowOverride None
-<c>    Order allow,deny
-<c>    Allow from all
-<c></Directory>
-
-För att kunna visa ProviewR hjälp texter ska det även finnas ett alias för pwr_doc som pekar
-på $pwr_doc. Den adderas normalt vid installationen av pwrrt paketet.
-
-<c>Alias /pwr_doc/ /usr/pwrrt/doc/
-
-<c><Directory /usr/pwrrt/doc>
-<c>    Options Indexes MultiViews
-<c>    AllowOverride None
-<c>    Order allow,deny
-<c>    Allow from all
-<c></Directory>
-
-<image>dg_fig120.png
-<b>Fig Plc trace läser flw-filer från $pwrp_load
-
-
-</topic>
-</chapter>
 <chapter>
 <topic>conf_test
 Starta och testa ett ProviewR system

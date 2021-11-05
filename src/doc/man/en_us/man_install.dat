@@ -101,6 +101,8 @@ desktop icon, or from a terminal window with
 <c>...
 <c>> source pwr_stop.sh
 
+6. Open in web browser with http://'hostname'/pwrdemo/index.html
+
 <h1> Runtime environment pwrrt
 
 1. Download pwrrt_5.9.0-1_amd64.deb from the ProviewR download page.
@@ -125,15 +127,21 @@ desktop icon, or from a terminal window with
 
 5. Configure, build and distribute a node from the development environment.
 
-6. Start ProviewR runtime
+6. Enter the configured qcomBusId in /etc/proview.cnf
+
+7. Login as user pwrp and start ProviewR runtime
 
 <c>> pwr start
+
+8. Enable autostart of ProviewR at boot with
+
+<c>> systemctl enable pwr
 
 <h1> Rpi crosscompilation package pwrrpi
 
 1. Install the pwr59 package.
 
-2. Download pwrdemo59_5.9.0-1_amd64.deb from the ProviewR download page.
+2. Download pwrrpi59_5.9.0-1_amd64.deb from the ProviewR download page.
 
 3. Go to the download directory.
 
@@ -205,6 +213,8 @@ desktop icon, or from a terminal window with
 <c>...
 <c>> source pwr_stop.sh
 
+6. Open in web browser with http://'hostname'/pwrdemo/index.html
+
 <h1> Runtime environment pwrrt
 
 1. Download pwrrt_5.9.0-1_amd64.deb from the ProviewR download page.
@@ -237,7 +247,7 @@ desktop icon, or from a terminal window with
 
 1. Install the pwr59 package.
 
-2. Download pwrdemo59_5.9.0-1_amd64.deb from the ProviewR download page.
+2. Download pwrrpi59_5.9.0-1_amd64.deb from the ProviewR download page.
 
 3. Go to the download directory.
 
@@ -289,21 +299,25 @@ desktop icon, or from a terminal window with
 
 1. Install the pwr59 package.
 
-2. Go to the download directory.
+2. Download pwrdemo59_5.9.0-1_armhf.deb from the ProviewR download page.
+
+3. Go to the download directory.
 
 <c>> cd Downloads
 
-3. Install the ProviewR demo package
+4. Install the ProviewR demo package
 
 <c>> sudo dpkg -i pwrdemo59_5.9.0-1_armhf.deb
 
-4. Attach the project from the desktop icon, or from a terminal window with
+5. Attach the project from the desktop icon, or from a terminal window with
 
 <c>> sdf pwrdemo59
 <c>> rt_ini &
 <c>> rt_xtt op
 <c>...
 <c>> source pwr_stop.sh
+
+6. Open in web browser with http://'hostname'/pwrdemo/index.html
 
 <h1> Runtime environment pwrrt
 
@@ -329,7 +343,13 @@ desktop icon, or from a terminal window with
 
 5. Configure, build and distribute a node from the development environment.
 
-6. Start ProviewR runtime
+6. Increase the Message Queue max size by adding this line to /etc/sysctl.conf
+
+<c>fs.mqueue.msg_max = 20
+
+and reboot.
+
+7. Start ProviewR runtime
 
 <c>> pwr start
 
