@@ -40,7 +40,9 @@ if [ ! "$1" = "upgrade" ]; then
 fi
 
 #systemctl disable pwr 2>/dev/null
+set +e
 systemctl disable pwr
+set -e
 if [ -e /etc/systemd/system/pwr.service ]; then
   rm /etc/systemd/system/pwr.service
   # Some symlinks are left in sysv after disabling pwr with systemd
