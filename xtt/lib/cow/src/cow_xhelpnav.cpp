@@ -1191,12 +1191,12 @@ int CoXHelpNav::next_topic()
   }
 
   sts = navhelp->get_next_key(current_key, current_filetype,
-      current_filename[0] == 0 ? 0 : current_filename, 0, next_key);
+      current_filename[0] == 0 ? 0 : current_filename, 1, next_key);
   delete navhelp;
   if (ODD(sts)) {
     brow_push();
     sts = help(next_key, 0, current_filetype,
-        current_filename[0] == 0 ? 0 : current_filename, 1, 0);
+        current_filename[0] == 0 ? 0 : current_filename, 1, 1);
   }
   return sts;
 }
@@ -1230,12 +1230,12 @@ int CoXHelpNav::previous_topic()
   }
 
   sts = navhelp->get_previous_key(current_key, current_filetype,
-      current_filename[0] == 0 ? 0 : current_filename, 0, prev_key);
+      current_filename[0] == 0 ? 0 : current_filename, 1, prev_key);
   delete navhelp;
   if (ODD(sts)) {
     brow_push();
     sts = help(prev_key, 0, current_filetype,
-        current_filename[0] == 0 ? 0 : current_filename, 1, 0);
+        current_filename[0] == 0 ? 0 : current_filename, 1, 1);
   }
   return sts;
 }
