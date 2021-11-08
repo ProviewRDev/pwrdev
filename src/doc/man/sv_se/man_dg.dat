@@ -205,8 +205,6 @@ bilder och komponenter kan skalas obegränsat. Komponenter har en förprogrammerad
 att ändra färg och form beroende på signaler i realtidsdatasen, eller reagera på musklick och
 sätta värden i databasen. På varje komponent som är känslig för musklick eller inmatning kan
 man ange behörighet, och selektivt tillåta, eller hindra, användare att påverka systemet.
-Processbilderna kan, förutom att användas i den ordinare operatörsmiljön, exporteras som i
-java-kod för att visas på webben med full dynamik.
 
 <h1>Övervakning
 Om något fel uppstår i processen, måste operatören uppmärksammas på detta. Det sker med 
@@ -1552,8 +1550,8 @@ klasserna, kommera även en hjälp-fil att skapas. Filerna namnges:
 
 <topic> project_web
 $pwrp_web
-Katalogen innehåller alla filer för web-gränssnittet. Till exempel xtt-hjälpfiler konverterade
-till html-filer. Också när man skapar en java-bild från en ge-graf läggs java-klassen här.
+Katalogen innehåller alla filer för web-gränssnittet. Till exempel pwg-filer för Ge grapfer,
+flw-filer för plc trace coh xtt-hjälpfiler konverterade till html-filer.
 </topic>
 
 </headerlevel>
@@ -1672,7 +1670,7 @@ egna appikationer, men även stänga av en eller flera av ProviewR's system-proces
 
 En typisk ld_appl-fil kan se ut så här:
 
-<c># Startup file for PROVIEW/R
+<c># Startup file for ProviewR
 <c>#
 <c># id,   name,   load/noload run/norun,  file,   prio,   debug/nodebug,  "arg" 
 <c>#pwr_neth,      , noload, norun, , 5, debug, ""
@@ -3629,6 +3627,7 @@ Skicka meddelanden och larm. <link> dg_appl_mh
 Kommunicera med andra processer via Qcom. <link> dg_appl_qcom
 Hämta data from lagrings stationer. <link> dg_appl_sev
 Läsning och skrivning mot I/O systemet. <link> dg_appl_io
+Trådsäkra tider och strängar. <link>dg_appl_threadsafety
 Bygga en applikation med make. <link> dg_appl_build
 Java applikationer. <link> dg_appl_java
 <option> printenable
@@ -4315,6 +4314,60 @@ och även mot signalerna för utenheterna som skrivs med funktionen  io_write().
 
 </topic>
 
+<topic> dg_appl_threadsafety
+Trådsäkra tider och strängar
+Tid- och strängattribut i realtidsdatabasen kan inte läsas eller skrivas i en atomisk
+operation, och behöver därför speciell hänsyn vid använding om attributet används i flera 
+olika trådar eller processer. Problemet är att medan en tråd skriver ett tids eller 
+strängattribut, kan en annan tråd läsa attributet innan skrivninget är avslutat, och därmed 
+läsa ett värde som innehåller delar av både det gamla och det nya värdet. För att unvika 
+detta ska läs och skrivoperationer skyddas av ett lås. Det finns två lås, ett för 
+tidsattribut och ett för strängattribut.
+
+<h1>Tidslås
+Tidslåset används för attribut av typerna pwr_tTime och pwr_tDeltaTime. Varje gång ett 
+tidsattribut läses eller skrivs ska låset sättas. Följande plc funktionsobjekt använder 
+låset för att skydda läsning och skrivning av tidsvärden.
+StoATv, StoDTv, CStoATv, CStoDTv, StoDTp, StoATp, CStoDTp, CStoATp, GetATp, GetDTp, GetATv, 
+GetDTv, CurrentTime.
+
+Notera att andra funktionsobjekt inte är skyddade av låset, Det är inte trådsäkert att
+använda utgången från t ex en AtAdd i en annan plctråd eller applikationsprogram. I det här
+fallet ska tiden först lagras i ett ATv-objekt.
+
+Applikationer ska använda följande gdh-funktioner för att läsa och skriva tider
+<c>void gdh_GetTimeDL( pwr_tTime *atp, pwr_tTime *time);
+<c>void gdh_SetTimeDL( pwr_tTime *atp, pwr_tTime *time);
+<c>void gdh_GetDeltaTimeDL( pwr_tDeltaTime *dtp, pwr_tDeltaTime *time);
+<c>void gdh_SetDeltaTimeDL( pwr_tDeltaTime *dtp, pwr_tDeltaTime *time);
+<c>pwr_tStatus gdh_GetObjectInfoTime( char *name, pwr_tTime *time);
+<c>pwr_tStatus gdh_SetObjectInfoTime( char *name, pwr_tTime *time);
+<c>pwr_tStatus gdh_GetObjectInfoDeltaTime( char *name, pwr_tDeltaTime *time);
+<c>pwr_tStatus gdh_SetObjectInfoDeltaTime( char *name, pwr_tDeltaTime *time);
+
+Innan någan av dessa funktioner används, ska tidslåset initieras av applikationen med ett
+anrop till lck_Create(), t ex
+<c>lck_Create(&sts, lck_eLock_Time);
+
+<h1>Stränglås
+Stränglåset används för strängattribut. Följande plc-funktionsobjekt använder låset. 
+StoSv, CStoSv, StoSp, CStoSp, StoNumSp, CStoNumSp, GetSp, GetSv.
+
+Andra funktionsobjekt är inte skyddade av låset och strängvärden från dessa objekt ska
+inte läsas eller skrivas från andra plc-trådar eller i applikationsprogram.
+
+Applikationer ska använda dessa gdh-funktioner för att läsa och skriva strängattribut
+
+<c>void gdh_GetStrDL( char *sp, char *str, int size);
+<c>void gdh_SetStrDL( char *sp, char *str, int size);
+<c>pwr_tStatus gdh_GetObjectInfoStr( char *name, char *str, int size);
+<c>pwr_tStatus gdh_SetObjectInfoStr( char *name, char *str, int size);
+
+Innan någon av dessa funktioner används, ska stränglåset initieras av applikationen med ett
+anrop till lck_Create(), t ex
+<c>lck_Create(&sts, lck_eLock_Str);
+</topic>
+
 <topic> dg_appl_build
 Bygga en applikation
 
@@ -4709,8 +4762,8 @@ aktivera 'Functions/Build Object' i menyn, och byggmetoden för aktuell volym gen
 
 Här följer en beskrivning på några byggmetoder.
 
-XttGraph <t>Kopierar .pwg filen för grafen från $pwrp_pop till $pwrp_exe.
-WebGraph <t>Exporterar grafen till java, kompilerar och lägger in i arkiv.
+XttGraph <t>Kopierar pwg-filen för grafen från $pwrp_pop till $pwrp_exe.
+WebGraph <t>Kopierar pwg-filen från $pwrp_pop till $pwrp_web.
 OpPlaceWeb <t>Genererar html-filer för nodens hemsida och konverterar xtt-hjälp filen till
            <t>web format (html).
 PlcPgm   <t>Genererar c-kod som kompileras av c-kompilatorn.

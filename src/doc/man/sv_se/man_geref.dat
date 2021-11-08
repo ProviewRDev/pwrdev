@@ -57,18 +57,14 @@ Script och kommandon <link>gecmd
 <topic>geref_intro
 Inledning
 
-Ge är en editor för att bygga bilder för underhåll och enklare operatörskommunikation i 
-ProviewR. Editorn är integrerad med ProviewR's utvecklingsmiljö och startas från navigatören.
+Ge är en editor för att bygga bilder för underhåll och operatörskommunikation i ProviewR. 
+Editorn är integrerad med ProviewR's utvecklingsmiljö och startas från konfiguratören.
 Bilderna byggs upp av bas-objekt i form av rektanglar, cirklar, linjer och texter, och av 
 subgrafer, som är en slags sammansatta objekt. Ge innehåller en uppsättning subgrafer för 
 några vanliga komponenter: ventiler, motorer, pumpar mm. Andra symboler kan konstruktören 
 rita själv i Ge. Formen på objekten lagras som vektorer vilket, tillsammans med 
 transformationsmatriser gör att de kan zoomas, skalas och roteras obegränsat.
-I runtime finns en rad olika möjligheter att använda ge-bilderna. De kan startas från xtt 
-som motif-applikationer ( på VMS, Lynx eller Linux), eller som java-applikationer (på Linux).
-Bilderna kan även exporteras som Java-applets vilka kan exekveras av webläsare som Internet
-Explorer eller Netscape. Vidare kan man exportera subgrafer som java-bönor vilka kan 
-användas i en java-IDE som t ex JBuilder.
+I runtime öppnas Ge-bilderna från operatörsmiljön i Xtt, eller från webgränssnittet.
 </topic>
 </chapter>
 
@@ -4999,43 +4995,78 @@ Script
 Scripthanteringen i ge finns beskriven i Ge script Användarhandledning. Här ges några enkla 
 exempel på vad script kan användas till.
 
-<h2>Att använda script
+
+<option> printdisable
+Rita en graf med script i Xtt <link>geref_scriptgraph
+Modifiera graferi editorn <link>geref_editscript
+<option> printenable
+</topic>
+
+
+<topic> geref_scriptgraph
+Rita en graf med script i Xtt
+Draw a graph with script in Xtt
+
+Förutom att rita en graf i Ge editorn, är det också möjligt att skriva ett script som ritar 
+grafen. Scriptet kan anropa script-funktionerna i Ge för att rita grafiska element in grafen,
+men kan även anropa script-funktionerna i Xtt. Det gör det möjligt att få information från
+databasen och anpassa bilden efter det aktuella tillståndet.
+
+Script-grafen öppnas som en ordinare graf, men graf-namnet ersätts av script-namnet med ett
+'@' tecken framför, t ex 'open graph @myscript'. Scripten hämtas från $pwr_exe eller $pwrp_exe
+om inte någon annan katalog anges i namnet, t ex 'open graph @"$pwrp_login/myscript"'.
+
+<b>Exampel
+Ett enkelt script som ritar en rektangel och en trycknapp.
+
+<c>main()
+<c>  int id;
+<c>  float x1;
+<c>  float y1;
+<c>  float x2;
+<c>  float y2;
+<c>  float width;
+<c>  float height;
+
+<c>  SetDraw(0);
+<c>  SetBackgroundColor(eDrawType_Color66);
+
+<c>  # Draw rectangle
+<c>  x1 = 1;
+<c>  y1 = 1;
+<c>  width = 18;
+<c>  height = 5;
+<c>  id = CreateRectangle(x1, y1, width, height);
+<c>  SetObjectFillColor(id, eDrawType_Color74);
+<c>  SetObjectFill(id, 1);
+<c>  SetObjectBorder(id, 0);
+
+<c>  # Draw pushbutton
+<c>  x1 = 7.5;
+<c>  y1 = 2;
+<c>  x2 = 10.5;
+<c>  y2 = 3.5;
+<c>  id = CreateObject("pwr_buttontogglecenter", x1, y1, x2, y2);
+<c>  SetObjectAttribute(id, "Text", "Toggle");
+<c>  SetObjectAttribute(id, "ToggleDig.Attribute", "H1-Dv1.ActualValue##Boolean");
+
+<c>  # Set graph size
+<c>  SetGraphAttribute("x1", 20.0);
+<c>  SetGraphAttribute("y1", 7.0);
+
+<c>  SetDraw(1);
+<c>endmain
+</topic>
+
+<topic> geref_editscript
+Modifiera grafer i editorn
 Ett script exekveras från kommando-raden i Ge genom att sätta ett '@' före filnamnet, t ex
 
 <c>ge> @my_script
 
 Kommandoraden öppnas med Functions/Command (Ctrl+B).
 
-<b>Exempel 1
-Första exemplet är ett script som exporterar några grafer till java. Ofta har men gjort en 
-rad ändringar i olika bilder, och när det är klart ska allt exporteras till java. Det här 
-scriptet läser successivt in de olika graferna och exporterar dem.
-
-<c>!
-<c>! Export java
-<c>!
-<c>function int process( string graph)
-<c>  open 'graph'
-<c>  printf( "Exporting %s...\n", graph);
-<c>  export java
-<c>endfunction
-
-<c>main()
-<c>  process( "nu4_alla_platar");
-<c>  process( "nu4_status_trp");
-<c>  process( "nu4_trp_hy1");
-<c>  process( "nu4_trp_rb_ut");
-<c>  process( "nu4_buffhog");
-<c>  process( "nu4_status_ugn");
-<c>  process( "nu4_trp_lu1");
-<c>  process( "nu4_trp_start");
-<c>  process( "nu4_inlagg");
-<c>  process( "nu4_trend");
-<c>  process( "nu4_trp_rb1");
-<c>  process( "nu4_ugn_start");
-<c>endmain
-
-<b>Exempel 2
+<b>Exempel
 Nästa exempel visar hur man kan byta ut en subgraf i flera bilder. En subgraf är ju normalt 
 intern, och en ändring i subgrafet slår inte igenom förrän man har genomfört proceduren att
 
@@ -5162,36 +5193,23 @@ En ge-bild kan exporteras som en java-applikation. Denna kan tas upp i xtt med k
 'open jgraph'.
 
 <h1>Web-bilder
-För att lägga ut process-bilder på intranätet krävs att man installerar in webserver i någon 
-operatörsstation. Vi använder Tomcat från Apache på Linux.
+Ge grafer kan även visas i en webläsare med weboperatörsmiljön. Hur denna konfigureras beskrivs
+i Konstruktörshanboken, kapitel Web operatörsmilö. Webgränssnittet har dock begränsad 
+funktionalitet för Ge grafer
 
-I ProviewR ska man skapa ett WebHandler-objekt i NodeHierarkin så att en server-process 
-startas av näthanteraren som förser web-bilderna med data från rtdb.
+- Dynamiktyperna DigScript, Script, EmitSignal, CatchSignal och PopupMenu är inte 
+  implementerade.
+- Endast ett fåtal Xtt kommandon, använda i Command och DigCommand, är implementerade. Här är
+  en lista på implementerade kommandon
+	<t>open graph
+	<t>open url
+	<t>open trend
+	<t>open fast
+	<t>set subwindow
+	<t>help
+	<t>check
+	<t>call
 
-En web-sida ska skapas i html för inloggning och länkar till olika bilder. Web-sidan 
-innehåller in login-applet som gör det möjligt att logga in med användar-namn och password, 
-och erhålla de privilegier hör till användaren. Vill eller kan man inte logga in tilldelas 
-man privilegiet RtRead och har ändå möjlighet att titta på bilderna.
-
-<h1>Distribution
-<h2>xtt
-För att kunna öppna en graf i xtt måste .pwg-filen för grafen kopieras från pwrp_pop i 
-utvecklings-miljön till pwrp_exe i runtime-miljön. Även lokala subgrafer som är definierade 
-som externa måste kopieras. Här kopierar man .pwsg-filen för subgrafen på motsvarande sätt. 
-Lokala Image-filer måste också kopieras.
-
-<h2>Web
-Bilder som exporteras som java-applet's, kompileras och läggs i java-arkivet
-$pwrp_lib/pwrp_'systemnamn'_web.jar. Här hamnar också GIF- och JPEG-filer som ligger på 
-pwrp_pop. Det här biblioteket måste kopieras till webserverns applikations-katalog tillsammans
-med de .html-filer som genereras av 'export java'. Till webserverns applikations-katalog ska
-dessutom kopieras $pwr_lib/pwr_rt_client.jar och $pwr_lib/pwr_jop.jar.
-
-<h2>Java-applikationer
-Bilder som exporteras som en java-frame, komplieras och läggs i arkivet 
-$pwr_lib/pwrp_'systemnamn'.jar. Även GIF- och JPEG-filer på $pwrp_pop läggs i detta 
-bibliotek. Arkivet ska kopieras till $pwrp_lib på målnoden. Tillsammans med arkiven 
-$pwr_lib/pwr_rt.jar och $pwr_lib/pwr_jop.jar ska de läggas in i CLASSPATH'en på målnoden.
 </topic>
 </chapter>
 
@@ -5621,7 +5639,7 @@ Avsluta utan att spara.
 <topic>gecmd_replace
 replace attribute
 
-Sträng utbyte i dynamic och actino för utvalda object.
+Utbyte av sträng i Dynamic och Action för utvalda object.
 
 <b>Syntax
 

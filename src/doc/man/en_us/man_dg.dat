@@ -199,9 +199,7 @@ Process graphics are built in a graphical editor. The graphics are vector based,
 graphs and components unlimitedly scalable. Components have a preprogrammed dynamic to change
 color and shape, depending of signals in the realtime database, or to respond to mouse clicks
 and set values in the database. In each component that is sensible to mouse click or input,
-you can state access, and selectively allow or hinder users to influence the system. Process
-graphs can also, besides being displayed in the ordinary operator environment, be exported to 
-java, which makes them viewable on the web with all dynamics.
+you can state access, and selectively allow or hinder users to influence the system.
 
 <h1>Supervision
 If any malfunction arise in the system, the operator has to be noticed. This is done with
@@ -1079,7 +1077,7 @@ The MountObject mounts an object in another volume. The attribute Object specifi
 object.
 
 <h1>Node Configuration
-The Node Configuration defines the nodes of your PROVIEW/R system. The nodes are named and 
+The Node Configuration defines the nodes of your ProviewR system. The nodes are named and 
 their contents specified. 
 
 <image> dg_fig44.gif
@@ -1555,9 +1553,8 @@ documented your classes, a help-file will also be created. The files are named:
 
 <topic> project_web
 $pwrp_web
-This directory contains all files for the web-interface. For example xtt-helpfiles that you 
-generate as html-files. Also if you create java-pictures from your ge-graphs they will be created
-here.
+This directory contains all files for the web-interface, for example pwg files for Ge graph, 
+flw files for plc trace and xtt helpfiles converted to html.
 </topic>
 
 </headerlevel>
@@ -1676,7 +1673,7 @@ own applications as well as turn off one or more of the ProviewR kernel applicat
 
 A typical ld_appl-file can look like this:
 
-<c># Startup file for PROVIEW/R
+<c># Startup file for ProviewR
 <c>#
 <c># id,   name,   load/noload run/norun,  file,   prio,   debug/nodebug,  "arg" 
 <c>#pwr_neth,      , noload, norun, , 5, debug, ""
@@ -3667,6 +3664,7 @@ Send messages and alarms. <link> dg_appl_mh
 Communicate with other processes via Qcom. <link> dg_appl_qcom
 Fetch data from storage stations. <link> dg_appl_sev
 Read and write to the I/O System. <link> dg_appl_io
+Threadsafe strings and times <link>dg_appl_threadsafety
 Build an application with make. <link> dg_appl_build
 Java applications. <link> dg_appl_java
 <option> printenable
@@ -4357,6 +4355,60 @@ to with the function io_write().
 
 </topic>
 
+<topic> dg_appl_threadsafety
+Thread safe strings and times
+Times and string attributes in the realtime database can not be accessed in an atomic 
+operation and thus needs special consideration when handled in two different threads or 
+processes. The problem is that when one thread is writing a time or string attribute, another
+thread can read the attribute before the write is finished, and thus read a value that 
+contains parts of both the previous and the new value. To avoid this the read and write
+operations should be protected by a lock. There are two locks, one for time attributes and one
+for string attributes.
+
+<h1>Time lock
+The time lock is used for attributes of type pwr_tTime and pwr_tDeltaTime. When a time 
+attribute is read or written, the lock should be set. The following plc function objects will 
+use the lock to protect the reading or writing of the time value. 
+StoATv, StoDTv, CStoATv, CStoDTv, StoDTp, StoATp, CStoDTp, CStoATp, GetATp, GetDTp, GetATv, 
+GetDTv, CurrentTime.
+
+Note that other time objects are not protected by the lock. It's not safe to use the output 
+from for example a AtAdd in another Plc thread or an application program. In this case the 
+time should first be stored in an ATv object.
+
+To read and write times, applications should use these gdh functions
+<c>void gdh_GetTimeDL( pwr_tTime *atp, pwr_tTime *time);
+<c>void gdh_SetTimeDL( pwr_tTime *atp, pwr_tTime *time);
+<c>void gdh_GetDeltaTimeDL( pwr_tDeltaTime *dtp, pwr_tDeltaTime *time);
+<c>void gdh_SetDeltaTimeDL( pwr_tDeltaTime *dtp, pwr_tDeltaTime *time);
+<c>pwr_tStatus gdh_GetObjectInfoTime( char *name, pwr_tTime *time);
+<c>pwr_tStatus gdh_SetObjectInfoTime( char *name, pwr_tTime *time);
+<c>pwr_tStatus gdh_GetObjectInfoDeltaTime( char *name, pwr_tDeltaTime *time);
+<c>pwr_tStatus gdh_SetObjectInfoDeltaTime( char *name, pwr_tDeltaTime *time);
+
+Before using any of these functions, the time lock has to be initialized by the application 
+with a call to lck_Create(), eg
+<c>lck_Create(&sts, lck_eLock_Time);
+
+<h1>String lock
+The string lock is used for string attributes. The following plc function objects will use 
+the lock. StoSv, CStoSv, StoSp, CStoSp, StoNumSp, CStoNumSp, GetSp, GetSv.
+
+Other string objects are not protected by the lock and the string values in these objects 
+should not be read or written in other Plc threads or in application  programs.
+
+To read and write string, applications should use these gdh functions
+
+<c>void gdh_GetStrDL( char *sp, char *str, int size);
+<c>void gdh_SetStrDL( char *sp, char *str, int size);
+<c>pwr_tStatus gdh_GetObjectInfoStr( char *name, char *str, int size);
+<c>pwr_tStatus gdh_SetObjectInfoStr( char *name, char *str, int size);
+
+Before using any of these functions, the string lock has to be initialized by the application 
+with a call to lck_Create(), eg
+<c>lck_Create(&sts, lck_eLock_Str);
+</topic>
+
 <topic> dg_appl_build
 Build an application
 
@@ -4712,7 +4764,7 @@ have no privileges can only open the login frame.
 <topic>conf_test
 Starting and testing a ProviewR system
 
-In preceding chapters we have described how to configure a PROVIEW/R system, how to create 
+In preceding chapters we have described how to configure a ProviewR system, how to create 
 PLC programs and how to create plant graphics. Now it is time to run and test the system. 
 
 This chapter shows how to: 
@@ -4757,8 +4809,8 @@ the build method for the current volume by activating 'Functions/Build Volume'.
 
 Below follows a description of some build methods.
 
-XttGraph <t>Copies the .pwg file for the graph from $pwrp_pop to $pwrp_exe.
-WebGraph <t>Exports the graph to java, compiles and inserts into an archive.
+XttGraph <t>Copies the pwg file for the graph from $pwrp_pop to $pwrp_exe.
+WebGraph <t>Copies the pwg file from $pwrp_pop to $pwrp_web.
 OpPlaceWeb <t>Generates html-files for the homepage of the node, and converts xtt helpfiles
            <t>to web format.
 PlcPgm   <t>Generates c-code that is compiled by the c compiler.

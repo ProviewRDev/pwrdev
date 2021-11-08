@@ -64,9 +64,8 @@ base objects in shapes of rectangles, circles, lines and texts, and of subgraphs
 kind of composed object. Ge contains a collection of subgraphs for some common components: 
 valves, motors, pumps etc. Other components, the constructor can easily draw himself. The 
 shapes are stored as vectors, which makes it possible to scale and rotate the objects. In 
-runtime, there is a number of possibilities to use the graphs. They can be displayed in the 
-operator environment, or exported as Java frames or applets, and displayed on the web. You 
-can also export a subgraph as a javabean, and use it in a java-IDE.
+runtime, a graph is opened from the Xtt operator environment or from the web operator
+environment.
 </topic>
 </chapter>
 
@@ -5083,7 +5082,68 @@ Script
 The script handling in Ge is described in the chapter Ge script and commands. Here some examples
 are viewed to get an idea of what scripts can do.
 
-<h2>To use a script
+<option> printdisable
+Draw a graph with script in Xtt <link>geref_scriptgraph
+Modify graphs in the editor <link>geref_editscript
+<option> printenable
+</topic>
+
+<topic> geref_scriptgraph
+Draw a graph with script in Xtt
+In addition to drawing a graph in the Ge editor, it is also possible to to write a ge script 
+that draws the graph. The script can call Ge script functions to draw graphical elements in the 
+graph, but it also call also xtt script functions. This makes it possible to get information 
+from the database and adapt the graph to the current state.
+
+The script graph is opened as an ordinary graph but the graph name is replaced by the script 
+name preceded by a '@', eg 'open graph @myscript'. Scripts are by default read from $pwr_exe 
+or $pwrp_exe, and for any other location the path should be added, eg 'open graph 
+@"$pwrp_login/myscript"'.
+
+<b>Example
+A simple script that draws a rectangle and a push button
+
+<c>main()
+<c>  int id;
+<c>  float x1;
+<c>  float y1;
+<c>  float x2;
+<c>  float y2;
+<c>  float width;
+<c>  float height;
+
+<c>  SetDraw(0);
+<c>  SetBackgroundColor(eDrawType_Color66);
+
+<c>  # Draw rectangle
+<c>  x1 = 1;
+<c>  y1 = 1;
+<c>  width = 18;
+<c>  height = 5;
+<c>  id = CreateRectangle(x1, y1, width, height);
+<c>  SetObjectFillColor(id, eDrawType_Color74);
+<c>  SetObjectFill(id, 1);
+<c>  SetObjectBorder(id, 0);
+
+<c>  # Draw pushbutton
+<c>  x1 = 7.5;
+<c>  y1 = 2;
+<c>  x2 = 10.5;
+<c>  y2 = 3.5;
+<c>  id = CreateObject("pwr_buttontogglecenter", x1, y1, x2, y2);
+<c>  SetObjectAttribute(id, "Text", "Toggle");
+<c>  SetObjectAttribute(id, "ToggleDig.Attribute", "H1-Dv1.ActualValue##Boolean");
+
+<c>  # Set graph size
+<c>  SetGraphAttribute("x1", 20.0);
+<c>  SetGraphAttribute("y1", 7.0);
+
+<c>  SetDraw(1);
+<c>endmain
+</topic>
+
+<topic> geref_editscript
+Modify graphs in the editor
 A script is executed from the command line in Ge by setting a '@' before the filename, for 
 example
 
@@ -5091,37 +5151,8 @@ example
 
 The command line is opened from Functions/Command (Ctrl+B).
 
-<b>Example 1
-The first example is a script that exports some subgraphs to java. Often you have made a lot
-of modifications in different graphs, and when you are ready, everything is to be exported to
-java. This script reads the different graphs and export them.
-
-<c>!
-<c>! Export java
-<c>!
-<c>function int process( string graph)
-<c>  open 'graph'
-<c>  printf( "Exporting %s...\n", graph);
-<c>  export java
-<c>endfunction
-
-<c>main()
-<c>  process( "nu4_alla_platar");
-<c>  process( "nu4_status_trp");
-<c>  process( "nu4_trp_hy1");
-<c>  process( "nu4_trp_rb_ut");
-<c>  process( "nu4_buffhog");
-<c>  process( "nu4_status_ugn");
-<c>  process( "nu4_trp_lu1");
-<c>  process( "nu4_trp_start");
-<c>  process( "nu4_inlagg");
-<c>  process( "nu4_trend");
-<c>  process( "nu4_trp_rb1");
-<c>  process( "nu4_ugn_start");
-<c>endmain
-
-<b>Example 2
-Next example shows how to change a subgraph in several graphs. A subgraph is normally intern,
+<b>Example 
+This example shows how to change a subgraph in several graphs. A subgraph is normally intern,
 and a modification does not take effect until you have performed the procedure to
 
 - set the subgraph extern
@@ -5170,27 +5201,6 @@ in all graphs of the project.
 <chapter>
 <topic>geref_web
 Web graphs
-
-<h1>Export as a java applet
-If a graph should be viewed in a web browser, you can export it as a java applet. First you set
-the attribute IsJavaApplet in 'File/Graph attributes'. Thereafter you activate 
-'File/Export Java', that exports the graph to java applet format and compiles the java file. 
-Furthremore a html file is created to open the applet. The html file together with a java 
-archive with the applet class are put in the direction $pwrp_web. By copying the files on 
-$pwrp_web to a corresponding directory on the web server, you can open them in a web browser.
-
-<b>Limitations
-The java version lf a Ge graph differs in appearance and function compared to Ge and Xtt in
-some points.
-- The format statements to view floating point, integers and string should be of type %n.mf, 
-  %-n.mf, %d, %nd, %s where n and m are digits.
-- The width of the borderlines in a subgraph is scaled in the subgraph as a whole.
-- When a dynamic object is changed the background or possible covering objects are not redrawn,
-  i.e. dynamic object should not be covered by other objects, and texts that are changed has
-  to have a background in the subgraph.
-- Subgraphs can not contain groups. This implies compilation errors.
-- Base objects are always drawn under components. If you for example place a text on top of a
-  component, the text will be hidden.
 
 <h1>Configure a web site
 To be able to open the varoius process graphs in a system it is suitable to have web page
@@ -5242,38 +5252,23 @@ If the graphs is to be operator graphics you build an operator place with an OpP
 an User object and XttGraph objects. Xtt is started with the name of the OpPlace object as 
 argument.
 
-<h1>Java applications in xtt
-A ge graph can be exported as a java frame. This is opened in xtt with the command 
-'open jgraph'.
-
 <h1>Web graphs
-To view process graphs on the intranet, you have to install a web server in an operator station.
-We recommend Apache on Linux.
+Ge grahps can also be viewed in a web browser with the web operator environment. How this is
+configured is described in Designer's Guide, chapter Web operator evironment. The web 
+enviroment though has limited functionality for Ge graphs,
 
-In ProviewR you create a WebHandler object in the noder hierarchy, to start a server process
-in runtime that supplies the web graphs with database data.
+- Dynamics DigScript, Script, EmitSignal, CatchSignal and PopupMenu are not implemented.
+- Only a few Xtt commands, used in dynamics Command and DigCommand, are implemented. Here is a
+  list of implemented commands
+	<t>open graph
+	<t>open url
+	<t>open trend
+	<t>open fast
+	<t>set subwindow
+	<t>help
+	<t>check
+	<t>call
 
-<h1>Distribution
-<h2>xtt
-To be able to open a graph in xtt, the .pwg-file for the graph has to be copied from $pwrp_pop
-in the development environment to $pwrp_exe in the runtime environment. Also local subgraphs
-that are defined as extern has to be copied. In this case you copy the .pwsg file.
-Local image files also has to be copied.
-
-<h2>Web
-Graphs exported as java applets, are compiled and inserted into the java archive
-$pwrp_lib/pwrp_'systemname'_web.jar. Also GIF and JPEG images that reside on $pwrp_pop are
-inserted into the archive. This archive has to be copied to the application directory of the 
-web server together with the .html files that is generated by 'export java'. To the application
-directory of the web server should also be copied $pwr_lib/pwr_rt_client.jar and 
-$pwr_lib/pwr_jop.jar.
-
-<h2>Java-applications
-Graphs exported as java frames, are compiled and inserted in the archive
-$pwr_lib/pwrp_'systemname'.jar. Also GIF and JPEG images that reside on $pwrp_pop are inserted
-into the archive. The archive should be copied to $pwrp_lib on the target node. Together with
-the archives $pwr_lib/pwr_rt.jar and $pwr_lib/pwr_jop.jar they shall be inserted in the
-CLASSPATH in the target node.
 </topic>
 </chapter>
 
