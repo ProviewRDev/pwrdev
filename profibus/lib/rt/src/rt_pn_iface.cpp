@@ -658,10 +658,9 @@ void pack_download_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes,
     pIOCR->PropertiesHighWordLowByte =
         _PN_U32_HIGH_LOW_BYTE(xml_dev_data->iocr_data[ii]->properties);
     pIOCR->PropertiesLowWordHighByte =
-        _PN_U32_LOW_HIGH_BYTE(xml_dev_data->iocr_data[ii]->properties);    
-        _PN_U32_LOW_HIGH_BYTE(dev_data->iocr_data[ii]->properties);
+        _PN_U32_LOW_HIGH_BYTE(xml_dev_data->iocr_data[ii]->properties);            
     pIOCR->PropertiesLowWordLowByte =
-        _PN_U32_LOW_LOW_BYTE(dev_data->iocr_data[ii]->properties);
+        _PN_U32_LOW_LOW_BYTE(xml_dev_data->iocr_data[ii]->properties);
     pIOCR->SendClockFactorHighByte =
         _PN_U16_HIGH_BYTE(xml_dev_data->iocr_data[ii]->send_clock_factor);
     pIOCR->SendClockFactorLowByte =
@@ -1318,8 +1317,8 @@ int unpack_get_alarm_con(T_PNAK_SERVICE_DESCRIPTION* pSdb,
            "      module_id      %d\r\n"
            "      submodule_id   %d\r\n"
            "      spec           %d\r\n",
-           alarm_prio, rem_alarms, alarm_type, slot_number, sub_slot_number,
-           module_ident_number, submodule_ident_number, alarm_spec);
+           alarm_prio, remaining_alarms, alarm_type, slot_number, subslot_number,
+           module_ident_number, submodule_ident_number, alarm_specifier);
     return PNAK_OK;
   }
   else if (pSdb->Result == PNAK_RESULT_NEG)
