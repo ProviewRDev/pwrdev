@@ -94,7 +94,6 @@ int main()
   pwr_tUInt32 nrOfKeys = 0;
 
   errh_Init("pwr_elog", errh_eAnix_elog);
-  aproc_TimeStamp(1.0, 5.0);
   errh_SetStatus(PWR__SRVSTARTUP);
 
   memset(&lHelCB, 0, sizeof(lHelCB));
@@ -102,6 +101,8 @@ int main()
   /* Declare process */
   sts = gdh_Init("pwr_elog");
   If_Error_Log_Exit(sts, "gdh_Init");
+
+  aproc_TimeStamp(1.0, 5.0);
 
   Init();
 
