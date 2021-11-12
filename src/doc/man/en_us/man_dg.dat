@@ -80,6 +80,7 @@ Configure the directoryvolume <link> configure_directoryvolume
 Configure the rootvolume <link> configure_rootvolume
 Plc programming <link>plc_programming
 Components and Aggregates <link>dg_components
+Alarms and events<link> dg_events
 Call functions from the plc program <link>dg_plc_functions
 Communication <link> communication
 Data storage <link> dg_datastorage
@@ -190,13 +191,13 @@ malfunctions, process engineers requesting various process data. All have their 
 system interface. Furthermore the limits between the various groups of professionals might be
 fluid, operators that are both operators and maintainers, and perhaps even process engineers.
 This puts high demands on the functionality and flexibility of the operator interface. You
-can rapidly and easyly trough so called methods that are activated from popupmenues fetch all the
+can rapidly and easily trough so called methods that are activated from popup menues fetch all the
 information of various objects that are stored in the realtime database, or in different server
 systems.
 
 <h1>Process graphics
 Process graphics are built in a graphical editor. The graphics are vector based, which makes all
-graphs and components unlimitedly scalable. Components have a preprogrammed dynamic to change
+graphs and components freely scalable. Components have a preprogrammed dynamic to change
 color and shape, depending of signals in the realtime database, or to respond to mouse clicks
 and set values in the database. In each component that is sensible to mouse click or input,
 you can state access, and selectively allow or hinder users to influence the system.
@@ -205,7 +206,7 @@ you can state access, and selectively allow or hinder users to influence the sys
 If any malfunction arise in the system, the operator has to be noticed. This is done with
 special supervisory objects that are configured in the plant hierarchy or in the PLC program,
 and that originate alarms and events. The alarms have four priority levels: A, B, C and D,
-and are diplayed to the operator in the alarm list, the event list and the historical event list.
+and are displayed to the operator in the alarm list, the event list and the historical event list.
 
 The alarmlist contains unacknowledged alarms and alarms in alarm state. An alarm normally has
 to be acknowledged before it disappears from the list. If the alarm state is active, the alarm
@@ -231,7 +232,7 @@ signal of about 8 minutes.
 SevHist stores signals in a similar way in a database on disk, which makes it possible to store
 values a longer period of time than DsTrend.
 
-DsFast stores more rapid sequences, where the storage is started on a trigg condition, and 
+DsFast stores more rapid sequences, where the storage is started on a trigger condition, and 
 continues a specified time. When the sequence is finished, it is displayed as a curve.
 </topic>
 </chapter>
@@ -308,8 +309,8 @@ the volume in educational purposes. Though, you have to consider that the nodes 
 in different communication buses.
 
 <h2>SubVolume
-Some of the objects in a node can be placed in a sub volume. The reason to divide the objects
-of a node in a root volume, and in one or several sub volumes could be that a number of persons
+Some of the objects in a node can be placed in a subvolume. The reason to divide the objects
+of a node in a root volume, and in one or several subvolumes could be that a number of persons
 have to configure the node simultaneously, or that you plan to move parts of the control of
 some plant parts to another node later.
 
@@ -332,7 +333,7 @@ The system volume is a dynamic volume that resides in every node, and that keeps
 system objects.
 
 <h2>DirectoryVolume
-The Directoy volume only exists in the development environment. Here the volumes and nodes of
+The Directory volume only exists in the development environment. Here the volumes and nodes of
 the system are configured.
 
 <h1>Volume Identity
@@ -378,7 +379,7 @@ Enum is a basic type and ParityEnum is a derived type.
 Mask is used when choosing one, or several, of a number of alternatives. The alternatives
 are represented by the bits in a 32-bit integer.
 
-An attribute can also consist of a more complex datastructure. It can be an array with a 
+An attribute can also consist of a more complex data structure. It can be an array with a 
 specified number of elements, and it may also be another object, a so called attribute object.
 </topic>
 
@@ -393,7 +394,7 @@ in the PLCeditor or in the operator environment.
 Each class has a template object, i.e. an instance of the class that contains default values
 for the attributes of the class.
 
-ProviewR's basesystem contains about 1000 classes. See Object Reference Manual for detailed
+ProviewR's base system contains about 1000 classes. See Object Reference Manual for detailed
 description. The designer can also create his own classes within a project.
 </topic>
 
@@ -409,7 +410,7 @@ child, ancestor and descendants.
 Object Name
 
 Each object has a name that is unique within its sibling family. The object also has a path name
-that is unique within the world. The pathname includes, besides the object name, the volume
+that is unique within the world. The path name includes, besides the object name, the volume
 name and the name of all the ancestors, e.g 
 
 <c>VolTrafficCross1:TrafficCross1-ControlSignals-Reset
@@ -431,13 +432,13 @@ Mounting
 An operator station has to display values of signals and attributes that reside in the volumes
 of process stations. This is achieved by a mechanism where an operator station mounts the 
 volumes of the process stations in its own object tree. A mounting means that you hang an
-object tree of another volume in the own rootvolume. Where in the tree the volumes are hung,
+object tree of another volume in the own root volume. Where in the tree the volumes are hung,
 is configured with a MountObject object. The MountObject states which object in the other
 volumes that is mounted. The result is, that the MountObject is displayed as the mounted object,
-with the objecttree beneath it. It apparently looks as if the objects belong to the own root
+with the object tree beneath it. It apparently looks as if the objects belong to the own root
 volume, while they in reality reside in another node.
 
-If you use subvolumes, they also have to be mounted in a root volume to make the objects
+If you use sub volumes, they also have to be mounted in a root volume to make the objects
 available.
 
 When you choose mounting points and names of mounting points, it is suitable to do this in such a
@@ -1555,6 +1556,7 @@ documented your classes, a help-file will also be created. The files are named:
 $pwrp_web
 This directory contains all files for the web-interface, for example pwg files for Ge graph, 
 flw files for plc trace and xtt helpfiles converted to html.
+here.
 </topic>
 
 </headerlevel>
@@ -2958,7 +2960,280 @@ From the simulate graph various events can be simulated.
 </chapter>
 
 <chapter>
-<topic>communication
+<topic> dg_events
+Alarms and events
+
+The event handling in ProviewR displays alarms, information messages and events in two lists, 
+the alarm list and the event list. The alarm list contains active or unacknowledged alarms and
+info messages, and supplies operators and maintainers with information about the current state
+of the process. The event list contains events, for example when an alarm is activated, 
+and gives a picture of what has happened in the system.
+
+Alarms and events are generated by supervision objects. The most common are DSup and ASup
+objects that supervises digital and analog signals. The supervision objects are scanned by the
+event monitor that sends messages about alarms and events to different outunits, eg the 
+alarm and event list Xtt.
+
+<option> printdisable
+Alarms <link> alarms
+Info messages <link> infomessages
+Events <link> events
+Supervision objects <link> supervision objects
+Event monitor <link> eventmonitor
+Outunits <link> outunits
+<option> printenable
+</topic>
+
+<headerlevel>
+<topic> alarms
+Alarms
+An alarm is a state changed in the process or control system that requires attention from 
+operators. The alarm is presented in an alarm list, often with a audible signal, and the 
+operator has to acknowledge the alarm before the audible signal disappears and the alarm is
+removed from the list. Also the alarm state has to return before the alarm is removed.
+
+An alarm consists of three events
+- the alarm enters active state.
+- the alarm state is returned from active to normal state.
+- the alarm is acknowledged by an operator.
+
+<b>Priority
+The priority of an alarm can be A, B, C or D, where A has the highest priority. The priorities
+have different color marking. A alarm are indicated with red, B alarms with yellow, C alarms
+with blue and D alarms with violet.
+
+<b>Type
+There are seven different types of alarms the can be used to address alarms to different
+categories of receivers.
+
+Alarm 	    <t><t>Ordinary alarm for plant operators.
+MaintenanceAlarm <t><t>Alarm for maintenance personell.
+SystemAlarm <t><t>Alarms for system manager.
+UserAlarm1-4 <t><t>User defined alarm types.
+
+The alarm type is matched with the EventSelectType in the OpPlace object, and the alarm list
+will only display the selected alarm types.
+</topic>
+
+<topic> infomessages
+Info messages
+The info messages are similar to alarms but doesn't have any priority. It can also be configured
+to only be displayed in the event list, not in the alarm list.
+
+<b>Type
+There are two types of Info messages, Info that is indicated with white color, and InfoSuccess
+that is indicated with green.
+</topic>
+
+<topic> events
+Events
+An event is a change in the process or control system that is logged in an event list. They
+are used to see the history of process and for example draw conclusions about the chain of
+events if something has gone wrong.
+
+One type of events are alarms that becomes active, returns and are acknowledged, but also other
+events can be logged in the event list.
+</topic>
+
+<topic> supervision objects
+Supervision objects
+Alarms and events are configured with supervision objects, primarily DSup and ASup objects.
+A DSup object supervises a digital object, and generates an alarm or event when the digital
+signal indicates alarm state. An ASup object supervises an analog signal, and generates alarms
+or events when the analog value exceeds an alarm limit. Other supervision objects are CycleSup
+the supervises cyclic processes, NodeLinkSup that supervises network links to other nodes, and
+SystemSup the supervises functions in the control system.
+
+<h1>DSup and ASup
+DSup and ASup are the most common supervision objects and supervises digital and analog
+signals. They also exists in the form CompDSup and CompASup used in components and aggregates.
+
+The DSup and ASup objects can either be placed in the plc code, and connected to the digital 
+or analog value that is to be supervised, or placed in the plant hierarchy, for example under
+a signal. If the Sup object is positioned below a signal, ActualValue will be supervised as
+this is automatically inserted into Attribute in the Sup object. If the Sup object is placed
+under another object Attribute has to be filled in manually to indicate which attribute in the
+object should be supervised.
+
+The DSup and ASup object can generate alarms, info messages and events. The configuration of
+the attributes EventType, EventPriority and EventFlags will decide which types of alarms
+and events are generated.
+
+<h2> EventType
+EventType configures which type of alarm or info messages are generated. The different alarm
+types are Alarm, MaintenanceAlarm, SystemAlarm and UserLarm1-4. Info messages can be Info
+or InfoSuccess.
+
+<h2> EventPriority
+EventPriority configures the priority for an alarm. The priority can be A, B, C or D. For info
+messages priority has no significance.
+
+<h2> EventFlags
+EventFlags is a bitmask with several options that decides which events will be generated and
+where they will be distributed. See Object Reference Manual for more info.
+
+<h2>Various types of alarms and events
+
+<b>A alarm with beep
+EventType <t>Alarm
+EventPriority <t>A
+EventFlags <t>Return, Ack, Bell
+
+<b>B alarm with beep
+EventType <t>Alarm
+EventPriority <t>B
+EventFlags <t>Return, Ack, Bell
+
+<b>Info message displayed in the alarm list
+EventType <t>Info
+EventPriority <t>-
+EventFlags <t>Ack, Bell, InfoWindow, Returned
+
+<b>InfoSuccess message displayed in the alarm list
+EventType <t>InfoSuccess
+EventPriority <t>-
+EventFlags <t>Ack, Bell, InfoWindow, Returned
+
+<b>Info message displayed only in the event list
+EventType <t>Info
+EventPriority <t>-
+EventFlags <t>Returned
+
+<h1> NodeLinkSup
+A NodeLinkSup object supervises the network link to another node. If link is disconnected
+an alarm is generated.
+
+<h1>CycleSup
+A CycleSup object supervises a cyclic process or thread. If the scan of the process is delayed
+an alarm is generated or the emergency break is set. CycleSup are used to supervise plc
+threads but can also be used for other processes.
+
+<h1> SystemSup
+In the MessageHandler object there is an array of SystemSup objects supervising functions in 
+the control system. An alarm or info message is generated at the following events
+
+- A network link is disconnected.
+- At system start.
+- At restart.
+- At restart of an outunit for the message handling.
+- System emergency break.
+- When system status indicates warning or error.
+- When the errorcount of an IO device has exceeded soft or hard limit.
+- When alarm quota is exceeded.
+
+The SystemSup object can be edited to change alarm texts, priorities etc, or to disable unwanted
+alarms.
+</topic>
+
+<topic> eventmonitor
+Event monitor
+The server process handling alarms and events are called the event monitor and has the name
+rt_emon. It's configured with a MessageHandler object in the node hierarchy.
+
+Configurations in the MessageHandler objects are for example EventListSize, that is the number
+of internally stored events, and EventLogSize that states the size of the event log, i e the
+number ov events stored on disk.
+
+The event monitor scans all sup objects and send information about alarm and events to different
+outunits, for example the alarm and event list. When an outunit is started, all events in the
+internal list is sent to the outunit, and the new events are sent when when they occur. Also
+a status message is sent whit all active or unacknowledged alarms to ensure that the alarm
+list is correctly updated.
+
+</topic>
+
+<topic> outunits
+Outunits
+
+<option> printdisable
+
+Xtt alarm and event list <link> outunit_xtt
+Web alarm and event list <link> outunit_web
+Event log <link> outunit_eventlog
+Historical storage of events <link> outunit_sev
+<option> printenable
+</topic>
+
+<headerlevel>
+<topic> outunit_xtt
+Alarm and event list in Xtt
+
+The alarm and event list in the operator environment can be opened from buttons in the
+operator window, and also with the xtt commands
+
+<c>xtt> show alarmlist
+<c>xtt> show eventlist
+
+In the EventSelectList attribute of the OpPlace object you state hierarchies from where alarm
+and events should be displayed.
+
+<h1>Alarm and event list in an XttMultiView
+There is a function that creates copies, so called satellites, of the alarm and event lists.
+These can be usee to display the alarm or event list in a XttMultiView. In the XttMultiView
+configuration, Action.Type is set to AlarmList or EventList.
+
+<h1>AlarmView
+An alarm list satellite can also be combined with an AlarmView, that will categorize the alarms
+and display them under different maps in the list. The maps are configured by creating
+AlarmCategory objects under the AlarmView object, one for each map. In the AlarmCategory object
+the hierarchies, priorities or event types for the alarms in the map. A map containing active
+or unacknowledged alarms are marked with a color that shows the priority of the alarms in the
+map. Also the number of unacknowledged alarms under the map is displayed.
+
+An AlarmView object has to be stated in the AlarmView array of the OpPlace object.
+
+An alarm list with an AlarmView can be opened with the command
+
+<c>xtt> show alarmlist satellite /alarmview=
+
+<image> dg_fig131.png
+<b>Fig Alarm list with an AlarmView
+
+It can also be displayed in an XttMultiView by stating the AlarmView object in 
+Action[].Object[0] in the XttMultView object.
+
+<h1>AlarmTable
+The AlarmTable object makes it possible to display the latest alarms in a process graph.
+The AlarmTable object i placed under the OpPlace object and the alarm list for the OpPlace
+is copied to arrays in the AlarmTable object. There are arrays for EventText, EventName, Time,
+EventPrio etc, that can be displayed in a table in the process graph. With the Member attribut
+a selection of alarm from specific hierarchies can be made, but the selection is limited by
+the EventSelectList of the OpPlace object.
+
+<image> dg_fig132.png
+<b>Fig An AlarmTable object displayed in a process graph.
+
+</topic>
+
+<topic> outunit_web
+Alarm and event list in the web interface
+In the menu of the web operator window there are buttons to open the alarm and event lists.
+The hierarchy selection of alarms is stated in EventSelectList in the WebSocketServer object.
+</topic>
+
+<topic> outunit_eventlog
+Event log
+In the event log all events are stored in a database. This is configured by setting the size
+of the event log in EventLogSize in the MessageHandler object. From the operator window, a 
+dialog for viewing and searching for events, can be opened.
+
+The event log is handled by the server process rt_elog and is placed in $pwrp_db/rt_eventlog.db.
+</topic>
+
+<topic> outunit_sev
+History storage of events
+Events can also be stored in the history database. The configuration is made with a SevHistEvent
+object where you state which event to store and for how long.
+
+Store event is viewed by the Alarm and Event Analyser.
+Read more in Guide to storage enviroment <link> sev_eva,,$pwr_lang/man_sev.dat
+</topic>
+</headerlevel>
+</headerlevel>
+</chapter>
+
+<chapter>
+<topic> communication
 Communication
 
 <option> printdisable

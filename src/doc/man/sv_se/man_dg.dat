@@ -81,6 +81,7 @@ Konfigurera direktoryvolymen <link> configure_directoryvolume
 Konfigurera rotvolymen <link> configure_rootvolume
 Plc programmering <link>plc_programming
 Komponenter och aggregat <link>dg_components
+Larm och händelser <link> dg_events
 Kommunikation <link> communication
 Datalagring <link> dg_datastorage
 Applikations-programmering <link>dg_application
@@ -1670,7 +1671,7 @@ egna appikationer, men även stänga av en eller flera av ProviewR's system-proces
 
 En typisk ld_appl-fil kan se ut så här:
 
-<c># Startup file for ProviewR
+<c># Startup file for Proview/R
 <c>#
 <c># id,   name,   load/noload run/norun,  file,   prio,   debug/nodebug,  "arg" 
 <c>#pwr_neth,      , noload, norun, , 5, debug, ""
@@ -2931,7 +2932,273 @@ I simuleringsbilden kan olika händelser man simuleras.
 </chapter>
 
 <chapter>
-<topic>communication
+<topic> dg_events
+Larm och händelser
+
+Larmhanteringen i ProviewR presenterar larm, informationsmedelanden och händelser i två
+listor, larmlistan och händelselistan. Larmlistan innehåller rådande eller okvitterade
+larm och info-meddelanden, och ger operatörer och underhållspersonal information om det 
+nuvarande läget i processen. I händelselistan loggas händelser som t ex larm som aktiveras,
+återgår och kvitteras, så att man kan få en bild av vad som har hänt i systemet.
+
+Larm och händelser genereras av övervakningsobjekt. De vanligaste är DSup- och ASup-objekt
+som övervakar digitala respektive analoga signaler. Övervakningsobjekten skannas av 
+eventmonitorn som skickar ut meddelanden om larm och händelser till olika utenheter, t ex
+larm och händelselistan i xtt.
+
+<option> printdisable
+Larm <link> alarms
+Info-meddelanden <link> infomessages
+Händelser <link> events
+Övervakningsobjekt <link> supervision objects
+Eventmonitorn <link> eventmonitor
+Utenheter <link> outunits
+<option> printenable
+</topic>
+
+<headerlevel>
+<topic> alarms
+Larm
+Ett larm är en tillståndsförändring i processen eller styrsystemet som kräver operatörens 
+uppmärksamhet. Larmet presenteras på en larmlista, ofta med en ljudsignal, och operatören
+måste kvittera larmet innan ljudsignalen upphör och larmet tas bort från larmlistan. Även 
+larmtillståndet måste återgå innan larmet tas bort.
+
+Ett larm består av tre händelser
+- larmet går till.
+- larmet återgår från larmtillstånd till normalt tillstånd.
+- larmet kvitteras av en operatör.
+
+<b>Prioritet
+Ett larms prioritet kan vara A, B, C eller D, där A har högst prioritet. Olika prioriteter
+har olika färgmarkering. A-larm markeras med rött, B-larm med gult, C-larm med blått och 
+D-larm med violett.
+
+<b>Typ
+Det finns 7 olika typer av larm som kan användas för att addressera larm till olika 
+kategorier av mottagare
+
+Alarm 	    <t><t>Vanligt larm för driftsoperatörer.
+MaintenanceAlarm <t><t>Larm för underhållspersonal.
+SystemAlarm <t><t>Larm för systemansvarig.
+UserAlarm1-4 <t><t>Användardefinierade larmtyper.
+
+Larmtypen matchas mot EventSelectType i OpPlace-objektet, och i larmlistan visas endast de
+valda larmtyperna.
+</topic>
+
+<topic> infomessages
+Info-meddelanden
+Info-meddelanden liknar larm men har inte någon prioritet. Man kan även konfigurera dem så
+att de inte visas i larmlistan, utan enbart i händelselistan. 
+
+<b>Typ
+Det finns två typer av Info-meddelande, Info som markeras med vitt, och InfoSuccess som 
+markeras med grönt.
+</topic>
+
+<topic> events
+Händelser
+Händelser är en förändring i processen eller styrsystemet som loggas i en händelselista. De
+används för att se vad som har hänt i processen, t ex för att kunna dra slutsatser om 
+händelseförloppet om något har gått fel. 
+
+En typ av händelser är larm som går till, återgår och kvitteras, men även andra händelser kan
+loggas i händelselistan.
+</topic>
+
+<topic> supervision objects
+Övervakningsobjekt
+Larm och händelser konfigureras med övervakningsobjekt, främst DSup- och ASup-objekt. Ett
+DSup-objekt övervakar en digital signal, och genererar ett larm eller en händelse när den
+digitala signalen indikerar larmtillstånd. Ett ASup-objekt övervakar en analog signal, och
+generar larm eller händelser om det analoga värde passerar en larmgräns. Andra 
+övervakningsobjekt är CycleSup som övervakar cykliska processer, NodeLinkSup som övervakar
+länkar till andra noder och SystemSup som övervakar funktioner i styrsystemet.
+
+<h1>DSup och ASup
+DSup och ASup är de vanligaste övervakningsobjekten och övervakar digitala resp analoga
+signaler. De finns även i varianterna CompDSup och CompASup som används i komponenter
+och aggregat. 
+
+DSup och ASup objekten kan antingen läggas i plc koden, och kopplas till det digitala
+resp analoga värde som ska övervakas, eller läggas i planthierakin, t ex under en signal.
+Om Sup-objektet läggs under en signal kommer ActualValue att övervakas genom att detta
+automatiskt läggs in i Attribute i Sup-objektet. Om Sup-objeket läggs under något annat
+objekt måste Attribute fyllas i manuellt för att markera vilket attribut i objektet som
+ska övervakas.
+
+DSup och ASup kan generera larm, info-meddelanden och händelser. Konfigureringen av 
+attributen EventType, EventPriority och EventFlags avgör vilken typ larm och händelser
+som genereras.
+
+<h2> EventType
+EventType konfigurerar vilken typ av larm eller info-meddelanden som genereras. De olika
+larmtyperna är Alarm, MaintenanceAlarm, SystemAlarm och UserAlarm1-4. Info-meddelanden kan
+vara Info eller InfoSuccess.
+
+<h2> EventPriority
+EventPriority konfigurerar prioriteten för larm. Prioriteten kan vara A, B, C eller D.
+För info-meddelanden har prioriteten ingen betydelse.
+
+<h2> EventFlags
+EventFlags är en bitmask med flera val som avgör vilka händelser som genereras och vart
+de skickas. Se Objekthandboken för mer info.
+
+<h2>Olika typer av larm och händelser
+
+<b>A larm med beep
+EventType <t>Alarm
+EventPriority <t>A
+EventFlags <t>Return, Ack, Bell
+
+<b>B larm med beep
+EventType <t>Alarm
+EventPriority <t>B
+EventFlags <t>Return, Ack, Bell
+
+<b>Info-meddelande som visas i larmlistan
+EventType <t>Info
+EventPriority <t>-
+EventFlags <t>Ack, Bell, InfoWindow, Returned
+
+<b>InfoSuccess-meddelande som visas i larmlistan
+EventType <t>InfoSuccess
+EventPriority <t>-
+EventFlags <t>Ack, Bell, InfoWindow, Returned
+
+<b>Info-meddelande som enbart visas händelselistan
+EventType <t>Info
+EventPriority <t>-
+EventFlags <t>Returned
+
+<h1> NodeLinkSup
+Ett NodeLinkSup objekt övervakar nätverkslänken till en annan nod, och om länken går ner
+generaras ett larm.
+
+<h1> SystemSup
+I MessageHandler-objektet ligger en vektor med SystemSup-objekt som övervakar funktioner i 
+styrsystemet. Ett larm eller info-meddelande skickas vid följande tillfällen
+
+- Någon nätverkslänk går ner.
+- Vid systemstart.
+- Vid omstart.
+- Vid omstart av en utenhet för larmhanteringen.
+- Systemet nödstoppar.
+- När systemstatus indikerar varning eller fel.
+- När felräknaren på en IO-enhet når soft eller hard limit.
+- När kvota för larm har överskridits.
+</topic>
+
+<topic> eventmonitor
+Eventmonitorn
+Serverprocessen som hanterar larm och händelser kallas för event monitorn och har namnet
+rt_emon. Det konfigureras med ett MessageHandler objekt som läggs i nodhierakin. 
+
+I MessageHandler-objektet konfigureras bl a EventListSize som är antalet händelser som 
+lagras internt i event monitorn, och EventLogSize anger storleken på event loggen, dvs 
+händelser som lagras på disk.
+
+Event monitorn skannar av alla sup-objekt och skickar ut information om larm och händelser 
+till olika utenheter, t ex larm och händelselista. När en utenhet startas skickas alla
+händelser i den interna listan, och sedan skickas nya händelser allteftersom de inträffar.
+Det skickas även en status-trans med aktiva eller okvitterade larm så att larmlistan alltid
+ska vara korrekt uppdaterad.
+
+</topic>
+
+<topic> outunits
+Utenheter
+
+<option> printdisable
+Xtt larm och händelselista <link> outunit_xtt
+Web larm och händelselista <link> outunit_web
+Event loggen <link> outunit_eventlog
+Historisk lagring av händelser <link> outunit_sev
+<option> printenable
+</topic>
+
+<headerlevel>
+<topic> outunit_xtt
+Larm och händelselista i xtt
+
+Larm och händelselistan i operatörsmiljön kan öppnas från knappar i operatörsfönstret, och
+även med xtt-kommandona
+
+<c>xtt> show alarmlist
+<c>xtt> show eventlist
+
+I OpPlace-objektets EventSelectList anger man hierakier som larm och händelser ska visas
+ifrån. 
+
+<h1>Larm och händelselista i en XttMultiView
+Det finns en funktion som skapar kopior, s k satelliter, av larm och händelselistorna. Dessa
+används för att visa larm eller händelselistan i en XttMultiView. Action.Type för den 
+aktuella cellen sätts till AlarmList resp EventList.
+
+<h1>AlarmView
+En satellit av larmlistan kan även kombineras med en AlarmView, som kategoriserar larmen och
+lägger in dem under olika mappar. Under AlarmView-objektet läggs AlarmCategory-objekt, ett
+för varje mapp i listan. I AlarmCategory-objektet anges hierarkier, prioritet eller larmtyp
+för de larm som ska finnas under mappen. En mapp som innehåller aktiva eller okvitterade 
+larm markeras med färg som visar prioriteten på larmen i mappen, och även antalet 
+okvitterade larm under mappen visas.
+
+Ett AlarmView-objekt ska anges i OpPlace-objektets AlarmView vektor.
+
+En larmlist med AlarmView kan öppnas med xtt-kommandot
+
+<c>xtt> show alarmlist satellite /alarmview=
+
+<image> dg_fig131.png
+<b>Fig Larmlista med AlarmView
+
+Det kan även öppnas i en XttMultiView genom att ange AlarmView-objeket i Action[].Object[0]
+i XttMultiView objektet.
+
+<h1>AlarmTable
+Med AlarmTable-objektet kan man visa de senaste larmen in en operatörsbild. AlarmTable-
+objektet läggs under OpPlace-objektet och larmlistan för OpPlace-objektet kopieras till
+vektorer i AlarmTable-objektet. Det finns vektorer för EventText, EventName, Time, 
+EventPrio mm, som kan visas upp i en tabell i operatörsbilden. Genom Member-attribute kan 
+man göra ett urval av larm från specifika hierarkier, men är begränsad av OpPlace-objektets
+EventSelectList.
+
+<image> dg_fig132.png
+<b>Fig Ett AlarmTable-objekt som visas i en Ge graf.
+
+</topic>
+
+<topic> outunit_web
+Larm och händelselista i web-gränssnittet
+I operatörsplatsens meny finns knappar för att öppna larm och händelselista. Vilka larm
+som ska visas anges i WebSockerServer-objektets EventSelectList.
+</topic>
+
+<topic> outunit_eventlog
+Eventloggen
+I eventloggen lagras alla händelser i en databas. Det konfigureras genom att man anger 
+storleken på händelseloggen i EventLogSize i MessageHandler-objektet. Från operatörsfönstret
+kan man öppna en dialog för att söka i eventloggen efter händelser.
+
+Händelseloggen hanteras av serverprocessen rt_elog och ligger på $pwrp_db/rt_eventlog.db.
+</topic>
+
+<topic> outunit_sev
+Historisk lagring av händelser
+Händelser kan även lagras i historik-databasen. Konfigureringen sker med ett
+SevHistEvent-objekt där man anger bl a vilka larm som ska lagras och hur länge de ska lagras
+på servern. 
+
+Lagrade händelser kan visas av en Larm och Händelseanalysatorn.
+Läs mer i Handbok i ProcessHistorik <link> sev_eva,,$pwr_lang/man_sev.dat
+</topic>
+</headerlevel>
+</headerlevel>
+</chapter>
+
+<chapter>
+<topic> communication
 Kommunikation
 
 <option> printdisable

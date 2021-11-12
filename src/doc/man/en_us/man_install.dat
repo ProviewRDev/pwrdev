@@ -48,7 +48,7 @@ Debian
 
 <h1>System requirements
 
-Debian version: 10 (Buster)
+Debian version: 11 (Bullseye)
 Architecture: amd64
 
 <h1> Development environment pwr59
@@ -60,7 +60,7 @@ Architecture: amd64
 <c>> sudo apt-get update
 <c>> sudo apt-get install -y libgtk2.0-0 libasound2 \
 <c>	libdb5.3 libdb5.3++ libsqlite3-0 librsvg2-2 g++  xterm libmariadb3 \
-<c>	librabbitmq4 libusb-1.0-0 libhdf5-openmpi-103 librabbitmq4 \
+<c>	librabbitmq4 libusb-1.0-0 libhdf5-openmpi-103 librabbitmq4 libmosquitto1 \
 <c>	libgstreamer1.0-0 libgstreamer-plugins-base1.0-0 openjdk-11-jdk \
 <c>	xterm xfonts-100dpi sudo procps libpython3-dev python3
 
@@ -172,7 +172,7 @@ Architecture: amd64
 <c>> sudo apt-get update
 <c>> sudo apt-get install -y libgtk2.0-0 libasound2 \
 <c>	libdb5.3 libdb5.3++ libsqlite3-0 librsvg2-2 g++  xterm libmariadb3 \
-<c>	librabbitmq4 libusb-1.0-0 libhdf5-openmpi-103 librabbitmq4 \
+<c>	librabbitmq4 libusb-1.0-0 libhdf5-openmpi-103 librabbitmq4 libmosquitto1\
 <c>	libgstreamer1.0-0 libgstreamer-plugins-base1.0-0 openjdk-11-jdk \
 <c>	xterm xfonts-100dpi sudo procps libpython3-dev python3
 
@@ -276,7 +276,7 @@ Architecture: armhf
 <c>> sudo apt-get update
 <c>> sudo apt-get install -y libgtk2.0-0 libasound2 \
 <c>	libdb5.3 libdb5.3++ libsqlite3-0 librsvg2-2 g++  xterm libmariadb3 \
-<c>	librabbitmq4 libusb-1.0-0 libhdf5-openmpi-103 librabbitmq4 \
+<c>	libusb-1.0-0 libhdf5-openmpi-103 librabbitmq4 libmosquitto1 \
 <c>	libgstreamer1.0-0 libgstreamer-plugins-base1.0-0 openjdk-11-jdk \
 <c>	xterm xfonts-100dpi sudo procps libpython3-dev python3
 
@@ -328,7 +328,7 @@ desktop icon, or from a terminal window with
 <c>> sudo apt-get update
 <c>> sudo apt-get install -y libgtk2.0-0 libasound2 \
 <c>	libdb5.3 libdb5.3++ libsqlite3-0 librsvg2-2 g++ xterm libmariadb3 \
-<c>	librabbitmq4 libusb-1.0-0 libhdf5-openmpi-103 \
+<c>	libusb-1.0-0 libhdf5-openmpi-103 librabbitmq4 libmosquitto1 \
 <c>	libgstreamer1.0-0 libgstreamer-plugins-base1.0-0 \
 <c>	xterm xfonts-100dpi sudo procps python3 python3-pandas python3-seaborn \
 <c>	python3-statsmodels python3-sklearn
