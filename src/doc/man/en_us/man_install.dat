@@ -79,6 +79,8 @@ desktop icon, or from a terminal window with
 
 6. Follow the Getting Started Guide to create and configure a project.
 
+7. If you enable MqttIo in BuildOptions, install libmosquitto-dev.
+
 <h1> Demo project pwrdemo
 
 1. Install the pwr59 package.
@@ -191,6 +193,8 @@ desktop icon, or from a terminal window with
 
 6. Follow the Getting Started Guide to create and configure a project.
 
+7. If you enable MqttIo in BuildOptions, install libmosquitto-dev.
+
 <h1> Demo project pwrdemo
 
 1. Install the pwr59 package.
@@ -295,6 +299,8 @@ desktop icon, or from a terminal window with
 
 6. Follow the Getting Started Guide to create and configure a project.
 
+7. If you enable MqttIo in BuildOptions, install libmosquitto-dev.
+
 <h1> Demo project pwrdemo
 
 1. Install the pwr59 package.
@@ -376,7 +382,7 @@ In this example the development environment and demo project is installed.
 
 1. Run docker
 
-<c>> docker run -it --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" debian:10 /bin/bash
+<c>> docker run -it --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" debian:11 /bin/bash
 
 2. Install dependency packages
 
@@ -392,9 +398,9 @@ In this example the development environment and demo project is installed.
 3. Dowload the development environment and demo project
 
 <c>> wget http://downloads.sourceforge.net/project/proview/proview/proviewr_5.9.0-1/\
-debian10/pwr59_5.9.0-1_amd64.deb
+debian11/pwr59_5.9.0-1_amd64.deb
 <c>> wget http://downloads.sourceforge.net/project/proview/proview/proviewr_5.9.0-1/\
-debian10/pwrdemo59_5.9.0-1_amd64.deb
+debian11/pwrdemo59_5.9.0-1_amd64.deb
 
 4. Install pwr59 and pwrdemo59
 
@@ -434,7 +440,7 @@ In the XQuartz terminal, allow access from local host
 
 2. Run docker in a docker terminal
 
-<c>> docker run -it debian:10 /bin/bash
+<c>> docker run -it debian:11 /bin/bash
 
 3. Install dependency packages
 
@@ -449,10 +455,10 @@ In the XQuartz terminal, allow access from local host
 4. Download pwr59 and pwrdemo59 packages
 
 <c>> wget http://downloads.sourceforge.net/project/proview/proview/proviewr_5.9.0-1/\
-<c>debian10/pwr59_5.9.0-1_amd64.deb
+<c>debian11/pwr59_5.9.0-1_amd64.deb
 
 <c>> wget http://downloads.sourceforge.net/project/proview/proview/proviewr_5.9.0-1/\
-<c>debian10/pwrdemo59_5.9.0-1_amd64.deb
+<c>debian11/pwrdemo59_5.9.0-1_amd64.deb
 
 5. Install pwr59 and pwrdemo59
 

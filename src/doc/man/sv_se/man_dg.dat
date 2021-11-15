@@ -2952,6 +2952,8 @@ Info-meddelanden <link> infomessages
 Händelser <link> events
 Övervakningsobjekt <link> supervision objects
 Eventmonitorn <link> eventmonitor
+Blockering av larm <link> ev_block
+Undertryckning av larm <link> ev_suppress
 Utenheter <link> outunits
 <option> printenable
 </topic>
@@ -3105,6 +3107,28 @@ händelser i den interna listan, och sedan skickas nya händelser allteftersom de 
 Det skickas även en status-trans med aktiva eller okvitterade larm så att larmlistan alltid
 ska vara korrekt uppdaterad.
 
+</topic>
+<topic> ev_block
+Blockering av larm
+Om en del av anläggningen är avstängd kan man blockera larmen ifrån den. Det görs från 
+navigatorn genom att öppna popupmenyn för en hierarki och välja 'Blockera händelser'. 
+Blockeringen görs med prioritet så att larm med den valda prioriteten och lägre prioritet 
+blockeras. En lista på aktiva blockeringar kan öppnas från en knapp i operatörsfönstret,
+och härifrån kan även blockeringar tas bort.
+</topic>
+
+<topic> ev_suppress
+Undertryckning av larm
+Ett vanligt fel i larmsystem är att ett fel ger upphov till en kaskad av larm som gör det
+omöjlig för operatören att hitta grundorsaken. Det kan undvikas genom att man undertrycker 
+larm som inte är releventa i en viss situation. 
+
+Undertryckning gör med funktionsobjektet SuppressSup. I objektet anges ett övervaknings-
+objekt, och när ingången blir hög blockeras larmet från objektet. Ingången kan t ex 
+kopplas till Active-utgången på ett DSup-objekt som i exemplet nedan.
+
+<image> dg_fig133.png
+<b>Fig Undertryckning av larm
 </topic>
 
 <topic> outunits

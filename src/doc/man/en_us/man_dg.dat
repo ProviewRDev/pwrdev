@@ -2980,6 +2980,8 @@ Info messages <link> infomessages
 Events <link> events
 Supervision objects <link> supervision objects
 Event monitor <link> eventmonitor
+Alarm blocking <link> ev_block
+Alarm suppression <link> ev_suppress
 Outunits <link> outunits
 <option> printenable
 </topic>
@@ -3139,7 +3141,30 @@ outunits, for example the alarm and event list. When an outunit is started, all 
 internal list is sent to the outunit, and the new events are sent when when they occur. Also
 a status message is sent whit all active or unacknowledged alarms to ensure that the alarm
 list is correctly updated.
+</topic>
 
+<topic> ev_block
+Alarm blocking
+If a part of the plant is closed, the alarms from that part can be blocked. This is done
+from the navigator by opening the popup menu for an hierarchy and activate 'Block events'.
+A priority is selected for the blocking, and alarms with this priority and lower priority 
+will be blocked. A list of active blockings can be opened from a button in the operator 
+window, and from here blockings also can be removed.
+</topic>
+
+<topic> ev_suppress
+Suppression of alarms
+A common alarm system problem is that one fault give raise to a cascade of alarms, that makes
+is impossible for the operator to find the root cause. This can be avoided by suppression
+of alarms that are not relevant in a specific situation.
+
+Suppression is made with the function object SuppressSup. A supervision object is stated in
+the object, and when the input is high, the alarm from the supervision object is blocked.
+The input can for example be connected to the Active output of a DSup object as in the 
+example below.
+
+<image> dg_fig133.png
+<b>Fig Alarm suppression
 </topic>
 
 <topic> outunits
