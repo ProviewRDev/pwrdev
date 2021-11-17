@@ -800,6 +800,8 @@ int WNav::check_attr_value(
 
     if (!(item->flags & PWR_MASK_DEVHIDEVALUE)) {
       sts = item->get_value((char**)&p);
+      if (EVEN(sts))
+	return sts;
       wnav_attrvalue_to_string(ldhses, item->type_id, p, init_value, &len);
       free(p);
     }
