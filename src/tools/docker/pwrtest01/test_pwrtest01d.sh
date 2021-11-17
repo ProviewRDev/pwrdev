@@ -4,9 +4,15 @@ echo "Starting test_pwrtest01d.sh"
 
 Xorg -noreset +extension GLX +extension RANDR +extension RENDER -config ./dummy_display_xorg.conf :99 &
 
+# Install mysql, install command in $1
+echo "arg: $1"
+$1
+
 ps aux
-p=`pidof mysql`
-if [ "$p" == "" ]; then
+p1=`pidof mariadbd`
+p2=`pidof mysqld`
+echo "mysql pid p1: $p1 p2: $p2"
+if [ "$p1" == "" ] && [ "$p2" == "" ]; then
   mkdir /run/mysqld
   chmod a+w /run/mysqld
   chown mysql:mysql /usr/sbin/mysqld
@@ -15,14 +21,18 @@ if [ "$p" == "" ]; then
   mysqld --basedir=/usr --datadir=/var/lib/mysql --plugin-dir=/usr/lib/mysql/plugin &
 fi
 
+set -o xtrace
 # mosquitto, create user and start
 echo "pwrp:pwrp" > /etc/mosquitto/passwd
 mosquitto_passwd -U /etc/mosquitto/passwd
 echo "allow_anonymous false" >> /etc/mosquitto/mosquitto.conf
 echo "password_file /etc/mosquitto/passwd" >> /etc/mosquitto/mosquitto.conf
+if [ ! -e /run/mosquitto ]; then
+  mkdir /run/mosquitto
+  chown mosquitto:mosquitto /run/mosquitto
+fi
 /usr/sbin/mosquitto -c /etc/mosquitto/mosquitto.conf &
 
-set -o xtrace
 sleep 10
 mysql -e 'CREATE USER pwrp@localhost;'
 mysql -e 'grant all privileges on *.* to pwrp@localhost;'

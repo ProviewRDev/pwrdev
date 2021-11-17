@@ -1,12 +1,14 @@
 #!/bin/bash
 
 echo "Here in test_pwrdemo.sh"
+echo $1 > /home/pwrp/sver
 
 su - pwrp
 cd /home/pwrp
+sver=$(cat /home/pwrp/sver)
 #source .bashrc
 source /etc/pwrp_profile
-source $pwra_db/pwra_env.sh set project pwrdemo58
+source $pwra_db/pwra_env.sh set project pwrdemo$sver
 export PWR_BUS_ID=999
 
 # Rename boot, node and plcfiles

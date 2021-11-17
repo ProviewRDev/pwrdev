@@ -46,3 +46,4 @@ pwre init $ename
 pwre module project
 pwre build pwrtest01 build src
 pwre build pwrtest02 build src
+pwre build pwrtest03 build src

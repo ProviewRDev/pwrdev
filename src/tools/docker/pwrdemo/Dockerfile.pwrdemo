@@ -2,7 +2,8 @@ ARG RELEASE=debian:10
 FROM $RELEASE
 ARG INSTALL_PKG
 ARG PKG_PWRDEMO
+ARG SVER
 
 COPY ./pwrdemo/test_pwrdemo.sh ./pkg/$PKG_PWRDEMO ./
 RUN $INSTALL_PKG $PKG_PWRDEMO
-RUN ./test_pwrdemo.sh
+RUN ./test_pwrdemo.sh $SVER

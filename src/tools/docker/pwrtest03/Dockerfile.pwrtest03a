@@ -1,0 +1,14 @@
+ARG RELEASE=debian:10
+FROM $RELEASE
+ARG INSTALL_WEB
+ARG INSTALL_PKG
+ARG PKG_PWRRT
+ENV DISPLAY :1
+ENV DEBIAN_FRONTEND none_interactive
+
+COPY ./data/pwrp_pkg_pwrtest03a_0001.tgz ./pwrtest03/build_pwrtest03a.sh ./pkg/$PWRRT_PACKAGE ./
+RUN mv ./pwrp_pkg_pwrtest03a_0001.tgz /home/pwrp/
+RUN printf 'n\n' | dpkg -r pwrrt
+RUN $INSTALL_WEB
+RUN $INSTALL_PKG $PKG_PWRRT
+RUN ./build_pwrtest03a.sh

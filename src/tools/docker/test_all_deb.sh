@@ -1,11 +1,11 @@
 #!/bin/bash
 
-release="debian:10"
+release="debian:11"
 release_name="deb"
-buildversion="19-APR-2021 12:00:00"
+buildversion="01-NOV-2021 12:00:00"
 tz="Europe/Stockholm"
 build_rpi=1
-gitrepo="-b develop http://192.168.0.172/git/x5-7-2/pwr/.git"
+gitrepo="-b develop http://192.168.0.175/git/x5-7-2/pwr/.git"
 install_update="apt-get update"
 install_git="apt-get install -y git make"
 install_videodummy="apt-get install -y xserver-xorg-video-dummy"
@@ -16,6 +16,7 @@ install_build="apt-get install -y libgtk2.0-dev doxygen gcc g++ make libasound2-
         python3 libcap-dev xfonts-100dpi"
 install_rpi="apt-get install -y gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf"
 install_sev="apt-get install -y default-mysql-server"
+install_web="apt-get install -y nginx"
 install_pwr="apt-get install -y libgtk2.0-0 libasound2 \
 	libdb5.3 libdb5.3++ libsqlite3-0 librsvg2-2 g++  xterm libmariadb3 \
 	librabbitmq4 libusb-1.0-0 libhdf5-openmpi-103 librabbitmq4 libmosquitto1 \
@@ -26,20 +27,22 @@ install_pwrrt="apt-get install -y libgtk2.0-0 libasound2 \
 	librabbitmq4 libmosquitto1 libusb-1.0-0 libhdf5-openmpi-103 \
 	libgstreamer1.0-0 libgstreamer-plugins-base1.0-0 \
 	xterm xfonts-100dpi sudo procps python3 python3-pandas python3-seaborn \
-	python3-statsmodels python3-sklearn python3-paho-mqtt mosquitto mosquitto-clients"
+	python3-statsmodels python3-sklearn python3-paho-mqtt mosquitto mosquitto-clients \
+        openjdk-11-jre"
 install_pkg="dpkg -i"
 jdk_dir=/usr/lib/jvm/java-11-openjdk-amd64
-ver="5.8.0-1"
-sver="58"
+ver="5.9.0-1"
+sver="59"
 arch="amd64"
 pkg_pwr="pwr"$sver"_"$ver"_"$arch".deb"
 pkg_pwrdemo="pwrdemo"$sver"_"$ver"_"$arch".deb"
 pkg_pwrrt="pwrrt_"$ver"_"$arch".deb"
-pkg_pwrsev="pwrsev_"$ver"_"$arch".deb"
 pkg_pwrrpi="pwrrpi"$sver"_"$ver"_"$arch".deb"
 img_pwrbuild="pwrbuild_"$release_name":v1"
 img_pwrdev="pwrdev_"$release_name":v1"
 img_pwrrt="pwrrt_"$release_name":v1"
+img_pwrtest03a="pwrtest03a_"$release_name":v1"
+img_pwrdemoi="pwrdemoi_"$release_name":v1"
 caps="--security-opt seccomp=unconfined \
       --cap-add NET_ADMIN \
       --cap-add NET_BROADCAST \
@@ -63,6 +66,8 @@ if [ "$1" == "-h" ] || [ "$1" == "--help" ]; then
   echo "8:  pwrtest01a and pwrtest01b communication test" 
   echo "9:  pwrtest01d sev mariadb test" 
   echo "10: pwrtest01e volume clone and sqlite test" 
+  echo "11: pwrtest03a interactive operator test image" 
+  echo "12: Demo interactive test image" 
   exit
 fi
 
@@ -72,7 +77,7 @@ else
   start=$1
 fi
 if [ "$2" == "" ]; then
-  end=9
+  end=12
 else
   end=$2
 fi
@@ -119,7 +124,6 @@ if [ $start -le 2 ] && [ $end -ge 2 ]; then
   docker container cp tmp:/pwr/rls/os_linux/hw_x86_64/bld/pkg/$pkg_pwr ./pkg/
   docker container cp tmp:/pwr/rls/os_linux/hw_x86_64/bld/pkg/$pkg_pwrdemo ./pkg/
   docker container cp tmp:/pwr/rls/os_linux/hw_x86_64/bld/pkg/$pkg_pwrrt ./pkg/
-  docker container cp tmp:/pwr/rls/os_linux/hw_x86_64/bld/pkg/$pkg_pwrsev ./pkg/
   docker container cp tmp:/pwr/rls/os_linux/hw_x86_64/bld/pkg/$pkg_pwrrpi ./pkg/
   docker container cp tmp:/pwr/rls/os_linux/hw_x86_64/bld/project/pwrtest01/bld/common/load/pwrp_pkg_pwrtest01a_0001.tgz ./data/
   docker container cp tmp:/pwr/rls/os_linux/hw_x86_64/bld/project/pwrtest01/bld/common/load/pwrp_pkg_pwrtest01b_0001.tgz ./data/
@@ -127,6 +131,7 @@ if [ $start -le 2 ] && [ $end -ge 2 ]; then
   docker container cp tmp:/pwr/rls/os_linux/hw_x86_64/bld/project/pwrtest01/bld/common/load/pwrp_pkg_pwrtest01d_0001.tgz ./data/
   docker container cp tmp:/pwr/rls/os_linux/hw_x86_64/bld/project/pwrtest01/bld/common/load/pwrp_pkg_pwrtest01e_0001.tgz ./data/
   docker container cp tmp:/pwr/rls/os_linux/hw_x86_64/bld/project/pwrtest02/bld/common/load/pwrtest02.tar.gz ./data/
+  docker container cp tmp:/pwr/rls/os_linux/hw_x86_64/bld/project/pwrtest03/bld/common/load/pwrp_pkg_pwrtest03a_0001.tgz ./data/
   docker container rm tmp
   docker image rm pwr:v1
 fi
@@ -164,6 +169,7 @@ if [ $start -le 5 ] && [ $end -ge 5 ]; then
     --build-arg RELEASE=$img_pwrdev \
     --build-arg INSTALL_PKG="$install_pkg" \
     --build-arg PKG_PWRDEMO=$pkg_pwrdemo \
+    --build-arg SVER=$sver \
     ./
   docker run $caps --name pwrdm pwrdemo:v1
   docker container cp pwrdm:/usr/pwrp/pwrdemo$sver/bld/common/tmp/pwrdemo_status.tlog ./log/
@@ -268,4 +274,24 @@ if [ $start -le 10 ] && [ $end -ge 10 ]; then
 
   docker container rm pwrte
   docker image rm pwrtest01e:v1
+fi
+
+# Image pwrtest03a
+if [ $start -le 11 ] && [ $end -ge 11 ]; then
+  docker image build -t $img_pwrtest03a -f pwrtest03/Dockerfile.pwrtest03a \
+    --build-arg RELEASE=$img_pwrrt \
+    --build-arg INSTALL_WEB="$install_web" \
+    --build-arg INSTALL_PKG="$install_pkg" \
+    --build-arg PKG_PWRRT=$pkg_pwrrt \
+    ./
+fi
+
+# Image pwrdemoi
+if [ $start -le 12 ] && [ $end -ge 12 ]; then
+  docker image build -t $img_pwrdemoi -f pwrdemo/Dockerfile.pwrdemoi \
+    --build-arg RELEASE=$img_pwrdev \
+    --build-arg INSTALL_WEB="$install_web" \
+    --build-arg INSTALL_PKG="$install_pkg" \
+    --build-arg PKG_PWRDEMO=$pkg_pwrdemo \
+    ./
 fi

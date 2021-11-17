@@ -1,5 +1,5 @@
 #!/bin/bash
-ver="V5.8"
+ver="V0.0"
 pname="pwrtest02"
 proot="/usr/pwrp/$pname"
 
@@ -12,6 +12,7 @@ sleep 20
 export DISPLAY=:99
 export pwra_db=/usr/pwrp/adm/db
 cat $pwra_db/pwr_projectlist.dat
+ver=$(cut -f 2 -d " " /usr/pwrp/adm/db/pwr_projectlist.dat)
 source $pwra_db/pwr_setup.sh
 pwrp set base $ver
 
