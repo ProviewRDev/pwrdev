@@ -767,7 +767,7 @@ void GeQt::graph_file_selected_cb(
     void* ctx, char* filename, wow_eFileSelType file_type)
 {
   Ge* ge = (Ge*)ctx;
-  ge->open_graph(filename);
+  ge->open_graph(filename, 0);
 }
 
 void GeQt::image_file_selected_cb(
@@ -853,7 +853,12 @@ void GeQtWidget::activate_graph_attr()
 
 void GeQtWidget::activate_open()
 {
-  ge->activate_open();
+  ge->activate_open(0);
+}
+
+void GeQtWidget::activate_opendashboard()
+{
+  ge->activate_open(1);
 }
 
 void GeQtWidget::activate_subgraphs()
@@ -1338,7 +1343,9 @@ GeQt::GeQt(void* x_parent_ctx, ldh_tSesContext x_ldhses, int x_exit_when_close,
   QMenu* file = menu_bar->addMenu(translate_utf8("&File"));
   addMenuItem(toplevel, file, "&New", SLOT(activate_new()), "", "document-new");
   addMenuItem(
-      toplevel, file, "&Open...", SLOT(activate_open()), "", "document-open");
+      toplevel, file, "&Open Graph...", SLOT(activate_open()), "", "document-open");
+  addMenuItem(
+      toplevel, file, "&Open Dashboard...", SLOT(activate_opendashboard()), "", "document-open");
   addMenuItem(
       toplevel, file, "Save", SLOT(activate_save()), "CTRL+S", "$pwr_exe/wb_save.png");
   addMenuItem(toplevel, file, "Save As", SLOT(activate_save_as()),
@@ -2016,7 +2023,10 @@ GeQt::GeQt(void* x_parent_ctx, ldh_tSesContext x_ldhses, int x_exit_when_close,
   wow = new CoWowQt(toplevel);
 
   if (graph_name) {
-    open_graph(graph_name);
+    if (strstr(graph_name, ".pwd") == 0)
+      open_graph(graph_name, 0);
+    else
+      open_graph(graph_name, 1);
   } else {
     graph->set_default_background_color();
   }

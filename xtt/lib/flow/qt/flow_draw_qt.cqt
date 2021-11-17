@@ -52,6 +52,7 @@
 #include <QBitmap>
 #include <QKeyEvent>
 #include <QTimer>
+#include <QPainterPath>
 
 #define DRAW_PRESS_PIX 9
 

@@ -77,7 +77,17 @@ void XttGeQt::set_below(int val)
 
 void XttGeQt::set_size(int width, int height)
 {
-  toplevel->resize(width + 20, height + 20);
+  int default_width;
+  int default_height;
+
+  default_width = width + 20;
+  default_height = height + 20;
+
+  // Add menu size
+  if (graph->is_dashboard())
+    default_height += 10;
+
+  toplevel->resize(default_width, default_height);
 }
 
 void XttGeQt::ge_change_value_cb(void* ge_ctx, void* value_object, char* text)
@@ -197,6 +207,10 @@ void XttGeQtWidget::action_resize(QResizeEvent* event)
 
 XttGeQt::~XttGeQt()
 {
+  if (graph->is_dashboard() && graph->is_modified()) {
+    activate_exit_modified();
+    return;
+  }
   if (close_cb) {
     (close_cb)(parent_ctx, this);
   }
@@ -234,7 +248,8 @@ XttGeQt::XttGeQt(void* xg_parent_ctx, const char* xg_name,
     int xg_width, int xg_height, int x, int y, double scan_time,
     const char* object_name, int use_default_access, unsigned int access,
     unsigned int options, void* basewidget, double* borders, int color_theme,
-    int (*xg_command_cb)(void*, char*, char*, void*),
+    int dashboard,	
+    int (*xg_command_cb)(void*, char*, char*, char*, void*),
     int (*xg_get_current_objects_cb)(void*, pwr_sAttrRef**, int**),
     int (*xg_is_authorized_cb)(void*, unsigned int),
     void (*xg_keyboard_cb)(void*, void*, int, int))
@@ -247,15 +262,18 @@ XttGeQt::XttGeQt(void* xg_parent_ctx, const char* xg_name,
   int window_width;
   int window_height;
   pwr_tStatus sts;
+  int dashboard_reconfigure = 0;
+
   if (xg_width != 0 && xg_height != 0) {
     window_width = xg_width;
     window_height = xg_height;
   } else {
     sts = Graph::get_dimension(
-        filename, "pwrp_exe:", &window_width, &window_height);
+        filename, "pwrp_exe:", dashboard, &window_width, &window_height);
     if (EVEN(sts)) {
       window_width = 600;
       window_height = 500;
+      dashboard_reconfigure = 1;
     }
   }
 
@@ -283,7 +301,7 @@ XttGeQt::XttGeQt(void* xg_parent_ctx, const char* xg_name,
   this->graph_form = layout_to_widget(graph_form);
   graph = new GraphQt(this, "Plant", &grow_widget, &sts, "pwrp_exe:",
       graph_eMode_Runtime, scrollbar, 1, object_name, use_default_access,
-      access, 0, color_theme, ge_keyboard_cb);
+      access, 0, color_theme, dashboard, ge_keyboard_cb);
   // graph->set_scantime( scan_time);
   graph->message_cb = &message_cb;
   graph->close_cb = &graph_close_cb;
@@ -304,7 +322,7 @@ XttGeQt::XttGeQt(void* xg_parent_ctx, const char* xg_name,
       SIGNAL(resize_signal(QResizeEvent*)), toplevel,
       SLOT(action_resize(QResizeEvent*)));
 
-  if (xg_menu) {
+  if (xg_menu || dashboard) {
     QMenuBar* menu_bar = new QMenuBar();
 
     // File Entry
@@ -312,14 +330,20 @@ XttGeQt::XttGeQt(void* xg_parent_ctx, const char* xg_name,
     addMenuItem(
         toplevel, file, "&Close", SLOT(close()), "CTRL+W", "$pwr_exe/xtt_close.png");
 
+    if (dashboard) {
+      // TODO
+    }
+
     // View menu
-    QMenu* view = menu_bar->addMenu(translate_utf8("&View"));
-    addMenuItem(toplevel, view, "Zoom &In", SLOT(activate_zoom_in()), "CTRL+I",
-        "$pwr_exe/xtt_zoom_in.png");
-    addMenuItem(toplevel, view, "Zoom &Out", SLOT(activate_zoom_out()),
-        "CTRL+O", "$pwr_exe/xtt_zoom_out.png");
-    addMenuItem(toplevel, view, "Zoom &Reset", SLOT(activate_zoom_reset()), "",
-        "$pwr_exe/xtt_zoom_reset.png");
+    if (!dashboard) {
+      QMenu* view = menu_bar->addMenu(translate_utf8("&View"));
+      addMenuItem(toplevel, view, "Zoom &In", SLOT(activate_zoom_in()), "CTRL+I",
+          "$pwr_exe/xtt_zoom_in.png");
+      addMenuItem(toplevel, view, "Zoom &Out", SLOT(activate_zoom_out()),
+          "CTRL+O", "$pwr_exe/xtt_zoom_out.png");
+      addMenuItem(toplevel, view, "Zoom &Reset", SLOT(activate_zoom_reset()), "",
+          "$pwr_exe/xtt_zoom_reset.png");
+    }
 
     // Menu Help
     QMenu* help = menu_bar->addMenu(translate_utf8("&Help"));
@@ -380,6 +404,11 @@ XttGeQt::XttGeQt(void* xg_parent_ctx, const char* xg_name,
     window_height = zoom * (y1 - y0);
 
     toplevel->setMinimumSize(window_width, window_height);
+  }
+
+  if (dashboard) {
+    if (dashboard_reconfigure)
+      graph->dashboard_reconfigure();
   }
 }
 

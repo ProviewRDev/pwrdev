@@ -192,8 +192,8 @@ pwre_config_check_lib()
                 conf_libgtk=$conf_libgtk" \\\`pkg-config --libs gtk+-2.0\\\`"
                 conf_incdirgtk=$conf_incdirgtk" \\\`pkg-config --cflags gtk+-2.0\\\`"
 	    elif test $3 == "qt"; then
-                conf_libqt=$conf_libqt" \\\`pkg-config --libs QtCore QtGui QtNetwork phonon\\\`"
-                conf_incdirqt=$conf_incdirqt" \\\`pkg-config --cflags QtCore QtGui QtNetwork phonon\\\`"
+                conf_libqt=$conf_libqt" \\\`pkg-config --libs Qt5Core Qt5Widgets Qt5PrintSupport Qt5Network phonon4qt5\\\`"
+                conf_incdirqt=$conf_incdirqt" \\\`pkg-config --cflags Qt5Core Qt5Widgets Qt5PrintSupport Qt5Network phonon4qt5\\\`"
 	    elif test $3 == "gst"; then
                 conf_libgst=$conf_libgst" \\\`pkg-config --libs gstreamer-video-1.0 gstreamer-1.0\\\`"
                 conf_incdirgst=$conf_incdirgst" \\\`pkg-config --cflags gstreamer-video-1.0 gstreamer-1.0\\\`"
@@ -355,10 +355,10 @@ if [ $pwre_hw == "hw_arm" ] && [ $ebuild -eq 1 ]; then
 
 #    if [ $pwre_conf_qt -eq 1 ]; then
         pwre_config_check_lib qt        QT      qt qt 0 "/usr/lib/libQtGui.so:/usr/lib/$hwpl-linux-$gnu/libQtGui.so"
-        pwre_config_check_include qt    QT   0 "/usr/include/qt4/QtGui"
-        pwre_config_check_include qt    QT   0 "/usr/include/qt4/QtCore/QtCore"
-        pwre_config_check_include qt    QT   0 "/usr/include/qt4/QtGui/QtGui"
-        pwre_config_check_include qt    QT   0 "/usr/include/qt4/QtNetwork/QtNetwork"
+        pwre_config_check_include qt    QT   0 "/usr/include/$hwpl-linux-$gnu/qt5/QtGui"
+        pwre_config_check_include qt    QT   0 "/usr/include/$hwpl-linux-$gnu/qt5/QtCore/QtCore"
+        pwre_config_check_include qt    QT   0 "/usr/include/$hwpl-linux-$gnu/qt5/QtGui/QtGui"
+        pwre_config_check_include qt    QT   0 "/usr/include/$hwpl-linux-$gnu/qt5/QtNetwork/QtNetwork"
 #    fi
 #    if [ $pwre_conf_gtk -eq 1 ]; then
         pwre_config_check_lib gtk       GTK      gtk gtk 0 "/usr/lib/libgtk-x11-2.0.so:/usr/lib/$hwpl-linux-$gnu/libgtk-x11-2.0.so"
@@ -440,11 +440,11 @@ else
     echo ""
     echo "Gui either Qt or Gtk :"
 #   if [ ! -z $pwre_conf_qt ]; then
-        pwre_config_check_lib qt        QT      qt qt 0 "/usr/lib/libQtGui.so:/usr/lib/$hwpl-linux-$gnu/libQtGui.so"
-        pwre_config_check_include qt    QT   0 "/usr/include/qt4/QtGui"
-        pwre_config_check_include qt    QT   0 "/usr/include/qt4/QtCore/QtCore"
-        pwre_config_check_include qt    QT   0 "/usr/include/qt4/QtGui/QtGui"
-        pwre_config_check_include qt    QT   0 "/usr/include/qt4/QtNetwork/QtNetwork"
+        pwre_config_check_lib qt        QT      qt qt 0 "/usr/lib/libQtGui.so:/usr/lib/$hwpl-linux-$gnu/libQt5Gui.so"
+        pwre_config_check_include qt    QT   0 "/usr/include/$hwpl-linux-$gnu/qt5/QtGui"
+        pwre_config_check_include qt    QT   0 "/usr/include/$hwpl-linux-$gnu/qt5/QtCore/QtCore"
+        pwre_config_check_include qt    QT   0 "/usr/include/$hwpl-linux-$gnu/qt5/QtGui/QtGui"
+        pwre_config_check_include qt    QT   0 "/usr/include/$hwpl-linux-$gnu/qt5/QtNetwork/QtNetwork"
 #   else
         pwre_config_check_lib gtk       GTK      gtk gtk 0 "/usr/lib/libgtk-x11-2.0.so:/usr/lib/$hwpl-linux-$gnu/libgtk-x11-2.0.so:/usr/lib64/libgtk-x11-2.0.so"
         pwre_config_check_include gtk   GTK   0 "/usr/local/include/gtk-2.0/gtk.h:/usr/local/include/gtk-2.0/gtk/gtk.h:/usr/include/gtk-2.0/gtk/gtk.h"

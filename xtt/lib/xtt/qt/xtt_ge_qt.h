@@ -61,8 +61,8 @@ public:
       int scrollbar, int menu, int navigator, int width, int height, int x,
       int y, double scan_time, const char* object_name, int use_default_access,
       unsigned int access, unsigned int options, void* basewidget,
-      double* borders, int color_theme,
-      int (*xg_command_cb)(void*, char*, char*, void*),
+      double* borders, int color_theme, int dashboard,
+      int (*xg_command_cb)(void*, char*, char*, char*, void*),
       int (*xg_get_current_objects_cb)(void*, pwr_sAttrRef**, int**),
       int (*xg_is_authorized_cb)(void*, unsigned int),
       void (*xg_keyboard_cb)(void*, void*, int, int));

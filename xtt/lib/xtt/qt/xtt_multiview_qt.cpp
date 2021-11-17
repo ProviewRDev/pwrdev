@@ -122,7 +122,7 @@ void XttMultiViewQtWidget::closeEvent(QCloseEvent* event)
 XttMultiViewQt::XttMultiViewQt(void* mv_parent_ctx, const char* mv_name,
     pwr_tAttrRef* mv_aref, int mv_width, int mv_height, int mv_x, int mv_y,
     unsigned int mv_options, void* basewidget, int mv_color_theme,
-    pwr_tStatus* sts, int (*mv_command_cb)(void*, char*, char*, void*),
+    pwr_tStatus* sts, int (*mv_command_cb)(void*, char*, char*, char*, void*),
     int (*mv_get_current_objects_cb)(void*, pwr_sAttrRef**, int**),
     int (*mv_is_authorized_cb)(void*, unsigned int),
     void (*mv_keyboard_cb)(void*, void*, int, int))
@@ -273,7 +273,7 @@ XttMultiViewQt::XttMultiViewQt(void* mv_parent_ctx, const char* mv_name,
 
           XttGeQt* ge = new XttGeQt(this, "No title", graph_name, scrollbar,
               menu, 0, w, h, mv_x, mv_y, 1.0, objectname_p, 0, 0,
-              ge_mOptions_Embedded, 0, bordersp, color_theme,
+	      ge_mOptions_Embedded, 0, bordersp, color_theme, 0,
               multiview_ge_command_cb, multiview_ge_get_current_objects_cb,
               multiview_ge_is_authorized_cb, multiview_keyboard_cb);
           setDataAndTag(idx, type, ge);
@@ -865,7 +865,7 @@ int XttMultiViewQt::set_subwindow_source(const char* name, char* source,
           case pwr_eMultiViewContentEnum_ObjectGraph: {
             XttGeQt* ge = new XttGeQt(this, "No title", source, scrollbar, menu,
                 0, w, h, 0, 0, 1.0, object, 0, 0, ge_mOptions_Embedded, 0,
-                borders, color_theme, multiview_ge_command_cb,
+		borders, color_theme, 0, multiview_ge_command_cb,
                 multiview_ge_get_current_objects_cb,
                 multiview_ge_is_authorized_cb, multiview_keyboard_cb);
 

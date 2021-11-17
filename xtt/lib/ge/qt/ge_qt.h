@@ -198,6 +198,7 @@ public slots:
   void activate_prevpage();
   void activate_graph_attr();
   void activate_open();
+  void activate_opendashboard();
   void activate_subgraphs();
   void activate_rect();
   void activate_rectrounded();

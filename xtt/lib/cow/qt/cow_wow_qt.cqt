@@ -166,11 +166,11 @@ void CoWowQt::DisplayError(
 
   QMessageBox msgBox(QMessageBox::Critical, fl(title), ctext,
       QMessageBox::NoButton, object->parent_wid->window());
-  QDialogButtonBox* buttonBox = qFindChild<QDialogButtonBox*>(&msgBox);
-  Q_ASSERT(buttonBox != 0);
+  //QDialogButtonBox* buttonBox = qFindChild<QDialogButtonBox*>(&msgBox);
+  //Q_ASSERT(buttonBox != 0);
 
   QPushButton* button = msgBox.addButton(QMessageBox::Ok);
-  if ((buttonBox->buttonRole(button) == QDialogButtonBox::AcceptRole)) {
+  if ((msgBox.buttonRole(button) == QMessageBox::AcceptRole)) {
     msgBox.setDefaultButton(button);
   }
 

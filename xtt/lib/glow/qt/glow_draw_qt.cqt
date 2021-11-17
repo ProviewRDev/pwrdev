@@ -58,6 +58,7 @@
 #include <QKeyEvent>
 #include <QMouseEvent>
 #include <QTimer>
+#include <QPainterPath>
 
 #define DRAW_PRESS_PIX 9
 
@@ -343,7 +344,7 @@ int GlowDrawQt::event_handler(QEvent* event, QWidget* target)
 
       keysym = keyEvent->key();
       if (keysym >= Qt::Key_Space && keysym <= Qt::Key_AsciiTilde) {
-        char buff = QChar(keysym).toAscii();
+        char buff = QChar(keysym).toLatin1();
 
         if (keyEvent->modifiers() & Qt::ControlModifier) {
           sts = ctx->event_handler(glow_eEvent_Key_CtrlAscii, 0, 0, buff, 0);

@@ -76,7 +76,7 @@ endif
 $(bld_dir)/%.o : %.cpp
 ifeq ($(nodep),)
 	@ $(log_c_d)
-	@ $(SHELL) -ec '$(cxx) -MM $(csetos) $(cinc) $(source) \
+	@ $(SHELL) -ec '$(cxx) -MM -fPIC $(csetos) $(cinc) $(source) \
 	  | sed '\''s|$*\.o[ ]*|$(bld_dir)/&|g'\'' > $(bld_dir)/$(sname).d'
 endif
 	@ $(log_c_obj)
@@ -91,7 +91,7 @@ $(bld_dir)/%_moc.o : %.cqt
 $(bld_dir)/%.o : %.cqt
 ifeq ($(nodep),)
 	@ $(log_c_d)
-	@ $(SHELL) -ec '$(cxx) -x c++ -MM $(csetos) $(cinc) $(source) \
+	@ $(SHELL) -ec '$(cxx) -x c++ -MM -fPIC $(csetos) $(cinc) $(source) \
 	  | sed '\''s|$*\.o[ ]*|$(bld_dir)/&|g'\'' > $(bld_dir)/$(sname).d'
 endif
 	@ $(cp) $(cpflags) $(source) $(bld_dir)/$(sname).cpp

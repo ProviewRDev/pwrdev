@@ -45,7 +45,7 @@
 #include "cow_login_qt.h"
 #include "cow_msgwindow_qt.h"
 #include "cow_qt_helpers.h"
-#include "cow_style_qt.h"
+//#include "cow_style_qt.h"
 #include "cow_xhelp_qt.h"
 
 #include "wb_erep.h"
@@ -85,7 +85,7 @@ int main(int argc, char* argv[])
   }
 
   QApplication app(argc, argv);
-  QApplication::setStyle(new PwrStyle());
+  //QApplication::setStyle(new PwrStyle());
   Wb::main_wb = new WbQt(argc, argv);
   return app.exec();
 }

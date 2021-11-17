@@ -320,7 +320,7 @@ void GeItemViewQt::activate_tree_widget(QTreeWidgetItem* item, int idx)
 
   QString sel_text = selected_text(tree_widget);
   if (!sel_text.isNull()) {
-    ge_ctx->open_graph(qPrintable(sel_text));
+    ge_ctx->open_graph(qPrintable(sel_text), 0);
   }
 }
 
