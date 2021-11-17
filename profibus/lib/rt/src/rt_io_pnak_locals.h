@@ -40,6 +40,7 @@
 #include <fstream>
 #include <vector>
 
+#include "rt_pn_gsdml_data.h"
 #include "rt_profinet.h"
 #include "rt_pnak.h"
 
@@ -220,6 +221,7 @@ public:
 
   std::vector<PnDeviceData*> device_data;
   std::vector<PnDeviceInfo*> dev_info;
+  std::vector<GsdmlDeviceData*> xml_device_data;
 
   pthread_t handle_events;
   agent_args args;

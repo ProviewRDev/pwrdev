@@ -61,6 +61,7 @@
 //#include "rt_pn_gsdml_data.h"
 #include "rt_profinet.h"
 #include "rt_pn_iface.h"
+#include "rt_mh_appl.h" // For sending alarms
 
 char file_vect[2][80] = {
     "pwr_pn_000_001_099_020_000000a2.xml",
@@ -533,18 +534,6 @@ void pack_download_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes,
   }
 
   no_items =
-      sscanf(xml_dev_data->ip_address, "%hhi.%hhi.%hhi.%hhi", &high_high_byte,
-             &high_low_byte, &low_high_byte, &low_low_byte);
-
-  if (no_items == 4)
-  {
-    pSDR->IpAddressHighWordHighByte = high_high_byte;
-    pSDR->IpAddressHighWordLowByte = high_low_byte;
-    pSDR->IpAddressLowWordHighByte = low_high_byte;
-    pSDR->IpAddressLowWordLowByte = low_low_byte;
-  }
-
-  no_items =
       sscanf(xml_dev_data->subnet_mask, "%hhi.%hhi.%hhi.%hhi", &high_high_byte,
              &high_low_byte, &low_high_byte, &low_low_byte);
 
@@ -554,6 +543,18 @@ void pack_download_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes,
     pSDR->SubnetMaskHighWordLowByte = high_low_byte;
     pSDR->SubnetMaskLowWordHighByte = low_high_byte;
     pSDR->SubnetMaskLowWordLowByte = low_low_byte;
+  }
+  
+  no_items =
+      sscanf(xml_dev_data->ip_address, "%hhi.%hhi.%hhi.%hhi", &high_high_byte,
+             &high_low_byte, &low_high_byte, &low_low_byte);
+
+  if (no_items == 4)
+  {
+    pSDR->IpAddressHighWordHighByte = high_high_byte;
+    pSDR->IpAddressHighWordLowByte = high_low_byte;
+    pSDR->IpAddressLowWordHighByte = low_high_byte;
+    pSDR->IpAddressLowWordLowByte = low_low_byte;
   }
 
 #pragma GCC diagnostic push
@@ -578,6 +579,12 @@ void pack_download_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes,
   }
   else
   {
+    pSDR->DefaultRouterHighWordHighByte = high_high_byte;
+    pSDR->DefaultRouterHighWordLowByte = high_low_byte;
+    pSDR->DefaultRouterLowWordHighByte = low_high_byte;
+    pSDR->DefaultRouterLowWordLowByte = low_low_byte;
+
+    printf("Test run: 3\n");    
     pSDR->Flag = PN_SERVICE_DOWNLOAD_FLAG_ACTIVATE;
     
     // ar_property = PROFINET_AR_PROPERTY_STATE_PRIMARY |
@@ -585,10 +592,15 @@ void pack_download_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes,
     //               PROFINET_AR_PROPERTY_DATA_RATE_100MBIT |
     //               PROFINET_AR_PROPERTY_STARTUP_MODE_LEGACY;
 
+    // ar_property = PROFINET_AR_PROPERTY_STATE_PRIMARY |    
+    //               PROFINET_AR_PROPERTY_PARAMETER_SERVER_CM |    
+    //               PROFINET_AR_PROPERTY_STARTUP_MODE_ADVANCED;
+    
     ar_property = PROFINET_AR_PROPERTY_STATE_PRIMARY |    
                   PROFINET_AR_PROPERTY_PARAMETER_SERVER_CM |    
-                  PROFINET_AR_PROPERTY_STARTUP_MODE_ADVANCED;
+                  PROFINET_AR_PROPERTY_STARTUP_MODE_LEGACY;
     
+
     pSDR->AdditionalFlag = 0;
     if (xml_dev_data->skip_ip_assignment) pSDR->AdditionalFlag |= PN_SERVICE_DOWNLOAD_ADD_FLAG_SKIP_IP_ASSIGNMENT; 
 
@@ -658,9 +670,9 @@ void pack_download_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes,
     pIOCR->PropertiesHighWordLowByte =
         _PN_U32_HIGH_LOW_BYTE(xml_dev_data->iocr_data[ii]->properties);
     pIOCR->PropertiesLowWordHighByte =
-        _PN_U32_LOW_HIGH_BYTE(xml_dev_data->iocr_data[ii]->properties);            
-    pIOCR->PropertiesLowWordLowByte =
-        _PN_U32_LOW_LOW_BYTE(xml_dev_data->iocr_data[ii]->properties);
+        _PN_U32_LOW_HIGH_BYTE(xml_dev_data->iocr_data[ii]->properties);    
+    //pIOCR->PropertiesLowWordLowByte = 0x02; // Meaning? TODO check header...
+    pIOCR->PropertiesLowWordLowByte = _PN_U32_LOW_LOW_BYTE(xml_dev_data->iocr_data[ii]->properties);
     pIOCR->SendClockFactorHighByte =
         _PN_U16_HIGH_BYTE(xml_dev_data->iocr_data[ii]->send_clock_factor);
     pIOCR->SendClockFactorLowByte =
@@ -1038,6 +1050,7 @@ int unpack_read_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local)
   io_sRack* slave_list;
   pwr_sClass_PnDevice* sp = NULL;
   PnDeviceData* pn_dev;
+  pwr_tUInt32 saved_counter;
   unsigned short device_ref = pSdb->DeviceRef;
   
   if (ap)
@@ -1050,7 +1063,9 @@ int unpack_read_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local)
       {
         sp = (pwr_sClass_PnDevice*)slave_list->op;
         pn_dev = local->device_data[i];
+        saved_counter = sp->ReadReq.response.counter;
         memset(&sp->ReadReq.response, 0, sizeof(pwr_sClass_PnReadCon));
+        sp->ReadReq.response.counter = saved_counter;
         break;
       }      
     }
@@ -1068,8 +1083,9 @@ int unpack_read_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local)
     return PNAK_OK; // If we have no valid agent pointer just....return....
   }
 
-  // Regardless of result, reset the read session
+  // Regardless of result, reset the read session and increase counter
   sp->ReadReq.status = pwr_ePnDeviceReadWriteState_Ready;
+  sp->ReadReq.response.counter++;
 
   pwr_sClass_PnReadCon* read_con = &sp->ReadReq.response;
 
@@ -1123,6 +1139,7 @@ int unpack_write_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local)
   io_sRack* slave_list;
   pwr_sClass_PnDevice* sp;
   PnDeviceData* pn_dev;
+  pwr_tUInt32 saved_counter;
   unsigned short device_ref = pSdb->DeviceRef;
 
   if (ap)
@@ -1135,7 +1152,9 @@ int unpack_write_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local)
       {
         sp = (pwr_sClass_PnDevice*)slave_list->op;
         pn_dev = local->device_data[i];
+        saved_counter = sp->WriteReq.response.counter;
         memset(&sp->WriteReq.response, 0, sizeof(pwr_sClass_PnWriteCon));
+        sp->WriteReq.response.counter = saved_counter;
         break;
       }
     }
@@ -1153,8 +1172,9 @@ int unpack_write_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local)
     return PNAK_OK; // If we have no valid agent pointer just....return....
   }
 
-  // Regardless of result, reset the read session
+  // Regardless of result, reset the read session and increase counter
   sp->WriteReq.status = pwr_ePnDeviceReadWriteState_Ready;
+  sp->WriteReq.response.counter++;
 
   pwr_sClass_PnWriteCon* write_con = &sp->WriteReq.response;
 
@@ -1213,6 +1233,7 @@ int unpack_get_alarm_con(T_PNAK_SERVICE_DESCRIPTION* pSdb,
     unsigned short ii, jj;
     
     PnDeviceData* device;
+    std::vector<GsdmlChannelDiag*> channel_diag_vector;
 
     pGAC = (T_PN_SERVICE_GET_ALARM_CON*)(pSdb + 1);
 
@@ -1253,7 +1274,9 @@ int unpack_get_alarm_con(T_PNAK_SERVICE_DESCRIPTION* pSdb,
       if (local->device_data[ii]->alarm_ref == alarm_reference)
       {
         device = local->device_data[ii];
-
+        
+        channel_diag_vector = local->xml_device_data[ii]->channel_diag;
+        
         device->alarm_data.alarm_type = alarm_type;
         device->alarm_data.alarm_prio = alarm_prio;
         device->alarm_data.rem_alarms = remaining_alarms;
@@ -1284,12 +1307,13 @@ int unpack_get_alarm_con(T_PNAK_SERVICE_DESCRIPTION* pSdb,
         pwr_sClass_PnAlarm* alarm;
         dev = (pwr_sClass_PnDevice*)slave_list->op;
         
-
-        if (dev->AlarmBuffer.IndexCurrent++ >= dev->AlarmBuffer.BufferSize)
-          dev->AlarmBuffer.IndexCurrent = 0;
+        int index = dev->AlarmBuffer.IndexNext++;
+        if (dev->AlarmBuffer.IndexNext >= dev->AlarmBuffer.BufferSize)
+          dev->AlarmBuffer.IndexNext = 0;
         
-        alarm = &dev->AlarmBuffer.Alarms[dev->AlarmBuffer.IndexCurrent];
+        alarm = &dev->AlarmBuffer.Alarms[index];
 
+        gdh_SetTimeDL(&alarm->Timestamp, (pwr_tTime*)0);
         alarm->AlarmReference = alarm_reference;
         alarm->Prio = alarm_prio;
         alarm->RemainingAlarms = remaining_alarms;
@@ -1306,6 +1330,79 @@ int unpack_get_alarm_con(T_PNAK_SERVICE_DESCRIPTION* pSdb,
           memcpy(alarm->Data, data,
                  MIN(data_length, sizeof(alarm->Data)));
         }
+
+        // Check if we should log or generate an alaram.
+        // Low priority alarms goes as INFO
+        // High priority alarms goes as WARNINGS
+
+        // Loop through the modules
+        io_sCard* card_list;
+        pwr_sClass_PnModule* module;
+        int selected_actions = 0;
+        for (card_list = slave_list->cardlist; card_list != NULL; card_list = card_list->next)
+        {
+          module = (pwr_sClass_PnModule*)card_list->op;
+
+          if (module->Slot != alarm->SlotNumber)
+            continue;
+
+          printf("MATCH!\n");
+          printf("%d\n", module->AlarmActionSelect);
+          printf("%d\n", dev->AlarmActionSelect);
+          // Check what actions to take
+          if (module->AlarmActionSelect)
+          {
+            if (module->AlarmActionSelect & pwr_mPnModuleAlarmActionMask_INHERIT)
+            {
+              if (dev->AlarmActionSelect & pwr_mPnDeviceAlarmActionMask_ALARM)
+                selected_actions |= pwr_mPnDeviceAlarmActionMask_ALARM;
+              if (dev->AlarmActionSelect & pwr_mPnDeviceAlarmActionMask_PROVIEW_LOG)
+                selected_actions |= pwr_mPnDeviceAlarmActionMask_PROVIEW_LOG;
+            }
+            if (module->AlarmActionSelect & pwr_mPnModuleAlarmActionMask_ALARM)
+              selected_actions |= pwr_mPnDeviceAlarmActionMask_ALARM; // Use parents bitmask here for consistency
+            if (module->AlarmActionSelect & pwr_mPnModuleAlarmActionMask_PROVIEW_LOG)
+              selected_actions |= pwr_mPnDeviceAlarmActionMask_PROVIEW_LOG;
+          }
+
+          printf("actions: %d\n", selected_actions);
+          // Take actions
+          if (selected_actions & pwr_mPnDeviceAlarmActionMask_ALARM)
+          {
+            printf("SENDING ALARM!");
+            mh_sApplMessage msg;
+            pwr_tUInt32 msgid;
+            pwr_tStatus sts;
+            memset( &msg, 0, sizeof(msg));
+            msg.EventFlags = mh_mEventFlags(mh_mEventFlags_Returned |
+            				 mh_mEventFlags_NoObject |
+            				 mh_mEventFlags_Bell);
+            gdh_SetTimeDL( &msg.EventTime, (pwr_tTime*)0);
+            strcpy( msg.EventName, "PROFINET Alarm");
+            strcpy( msg.EventText, "Slot lkalksg");
+            msg.EventType = mh_eEvent_Alarm;
+            msg.EventPrio = mh_eEventPrio_B;
+            sts = mh_ApplMessage( &msgid, &msg);
+          }
+          if (selected_actions & pwr_mPnDeviceAlarmActionMask_PROVIEW_LOG)
+          {
+            char data_str[256];
+            for (int dlength = 0; dlength < data_length; dlength++)
+              sprintf(&data_str[dlength * 2], "%02X", *(data + dlength)); 
+            if (alarm->Prio == PN_SERVICE_ALARM_PRIO_LOW)
+            {              
+              //printf("PROFINET: Low priority alarm from device %s slot %d: 0x%s\n", dev->Description, alarm->SlotNumber, data_str);
+              errh_Info("PROFINET: Low priority alarm from device %s slot %d: 0x%s", dev->Description, alarm->SlotNumber, data_str);
+            }
+            else
+            {
+              //printf("PROFINET: High priority alarm from device %s slot %d: 0x%s\n", dev->Description, alarm->SlotNumber, data_str);
+              errh_Warning("PROFINET: High priority alarm from device %s slot %d: 0x%s", dev->Description, alarm->SlotNumber, data_str);
+            }              
+          }
+        }
+
+        
       }
     }
 
@@ -1316,9 +1413,25 @@ int unpack_get_alarm_con(T_PNAK_SERVICE_DESCRIPTION* pSdb,
            "      subslot        %d\r\n"
            "      module_id      %d\r\n"
            "      submodule_id   %d\r\n"
-           "      spec           %d\r\n",
+           "      specifier      %d\r\n"
+           "      data_length    %d\r\n",
            alarm_prio, remaining_alarms, alarm_type, slot_number, subslot_number,
-           module_ident_number, submodule_ident_number, alarm_specifier);
+           module_ident_number, submodule_ident_number, alarm_specifier, data_length);
+    for (int dlength = 0; dlength < data_length; dlength++)
+      printf("%02X", *(data + dlength));
+    printf("\r\n");
+    //for (auto diag: channel_diag_vector)
+   //{
+      //unsigned short type = _HIGH_LOW_BYTES_TO_PN_U16(data[6], data[7]);      
+      //printf("typen: %d\n", type);
+      //printf("diagtypen: %d\n", diag->error_type);
+      //if (diag->error_type == type)
+      //{
+      //  printf("Kanske %d: %s\n", diag->error_type, diag->name);
+      //}
+    //}
+    
+
     return PNAK_OK;
   }
   else if (pSdb->Result == PNAK_RESULT_NEG)
@@ -1809,6 +1922,7 @@ int handle_service_con(io_sAgentLocal* local, io_sAgent* ap)
         }
         case PN_SERVICE_READ:
         {
+          printf("Read response!\n");
           sts = unpack_read_con(pSdb, local);
           break;
         }
@@ -1817,7 +1931,7 @@ int handle_service_con(io_sAgentLocal* local, io_sAgent* ap)
         // printf("WRITE MULTIPLE!\n");
         case PN_SERVICE_WRITE:
         {
-          // printf("unpack_write_con\n");
+          printf("unpack_write_con\n");
           sts = unpack_write_con(pSdb, local);
           break;
         }
@@ -2197,8 +2311,10 @@ void* handle_events(void* ptr)
       }
       mod_it++;
     }
-    local->device_data.push_back(pn_dev_data);
+    local->device_data.push_back(pn_dev_data);    
   }
+
+  local->xml_device_data = xml_dev_data_vect;
 
   /* Start profistack */
 
@@ -2472,6 +2588,7 @@ void* handle_events(void* ptr)
 
       else if (wait_object & PNAK_WAIT_OBJECT_SERVICE_CON)
       {
+        printf("service_con!\n");
         sts = handle_service_con(local, ap);
       }
     }

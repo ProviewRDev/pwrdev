@@ -282,9 +282,14 @@ static pwr_tStatus IoAgentWrite(io_tCtx ctx, io_sAgent* ap)
           sp->ReadReq.status = pwr_ePnDeviceReadWriteState_Busy; // Reset later in response
           T_PNAK_RESULT pnak_result = pnak_send_service_req_res(0, &local->service_req_res);
           if (pnak_result == PNAK_OK)
+          {
+            sp->ReadReq.counter++;
             errh_Info("PROFINET: Async read request sent, dev: %d", pn_device->device_ref);
+          }            
           else
+          {
             errh_Warning("PROFINET: Async read request, send failed, dev: %d", pn_device->device_ref);          
+          }
         }
         else
         {
@@ -303,9 +308,14 @@ static pwr_tStatus IoAgentWrite(io_tCtx ctx, io_sAgent* ap)
           sp->WriteReq.status = pwr_ePnDeviceReadWriteState_Busy; // Reset later in response
           T_PNAK_RESULT pnak_result = pnak_send_service_req_res(0, &local->service_req_res);
           if (pnak_result == PNAK_OK)
+          {
+            sp->WriteReq.counter++;
             errh_Info("PROFINET: Async write request sent, dev: %d", pn_device->device_ref);
+          }            
           else
+          {
             errh_Warning("PROFINET: Async write request, send failed, dev: %d", pn_device->device_ref);          
+          }            
         }
         else
         {
