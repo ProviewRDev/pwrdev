@@ -4482,8 +4482,7 @@ static int graph_trace_grow_cb(GlowCtx* ctx, glow_tEvent event)
     for (i = 0; i < object_cnt; i++) {
       if (grow_GetObjectType(objectlist[i]) == glow_eObjectType_GrowNode
           || grow_GetObjectType(objectlist[i]) == glow_eObjectType_GrowGroup
-          || grow_GetObjectType(objectlist[i]) == glow_eObjectType_GrowToolbar
-          || grow_GetObjectType(objectlist[i]) == glow_eObjectType_GrowDashCell) {
+          || grow_GetObjectType(objectlist[i]) == glow_eObjectType_GrowToolbar) {
 	grow_GetUserData(objectlist[i], (void**)&dyn);
 	sts = dyn->action(objectlist[i], event);
 	if (sts == GLOW__TERMINATED)
