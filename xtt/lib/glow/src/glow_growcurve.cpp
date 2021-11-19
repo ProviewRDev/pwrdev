@@ -564,7 +564,7 @@ void GrowCurve::configure_curves(glow_sCurveData* data)
                 - (data->y_data[idx][i] - y_min_value[idx])
                     / (y_max_value[idx] - y_min_value[idx]) * (ur.y - ll.y);
 
-            y_value = MAX(ll.y, MIN(y_value, ur.y));
+            //y_value = MAX(ll.y, MIN(y_value, ur.y));
 
             if (i == 0) {
               pointarray[pix].y = y_value;
@@ -600,7 +600,7 @@ void GrowCurve::configure_curves(glow_sCurveData* data)
                 - (data->y_data[idx][i] - y_min_value[idx])
                     / (y_max_value[idx] - y_min_value[idx]) * (ur.y - ll.y);
 
-            y_value = MAX(ll.y, MIN(y_value, ur.y));
+            //y_value = MAX(ll.y, MIN(y_value, ur.y));
 
             if (i == 0) {
               pointarray[pix].y = ur.y;
@@ -782,7 +782,7 @@ void GrowCurve::add_points(glow_sCurveData* data, unsigned int* no_of_points)
               - (data->y_data[idx][0] - y_min_value[idx])
                   / (y_max_value[idx] - y_min_value[idx]) * (ur.y - ll.y);
 
-          y_value = MAX(ll.y, MIN(y_value, ur.y));
+          //y_value = MAX(ll.y, MIN(y_value, ur.y));
         }
         if (!fill)
           erase(&ctx->mw);
@@ -804,7 +804,7 @@ void GrowCurve::add_points(glow_sCurveData* data, unsigned int* no_of_points)
                 - (data->y_data[idx][i] - y_min_value[idx])
                     / (y_max_value[idx] - y_min_value[idx]) * (ur.y - ll.y);
 
-            y_values[i] = MAX(ll.y, MIN(y_values[i], ur.y));
+            //y_values[i] = MAX(ll.y, MIN(y_values[i], ur.y));
           }
         } else {
           for (i = 0; i < (int)no_of_points[0]; i++) {
@@ -815,7 +815,7 @@ void GrowCurve::add_points(glow_sCurveData* data, unsigned int* no_of_points)
                 - (data->y_data[idx][k] - y_min_value[idx])
                     / (y_max_value[idx] - y_min_value[idx]) * (ur.y - ll.y);
 
-            y_values[i] = MAX(ll.y, MIN(y_values[i], ur.y));
+            //y_values[i] = MAX(ll.y, MIN(y_values[i], ur.y));
           }
         }
         if (!fill)

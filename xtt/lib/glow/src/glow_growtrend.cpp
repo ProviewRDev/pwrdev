@@ -874,7 +874,7 @@ void GrowTrend::add_value(double value, int idx)
         - (value - y_min_value[idx]) / (y_max_value[idx] - y_min_value[idx])
             * (ur.y - ll.y);
 
-  curve_value = MAX(ll.y, MIN(curve_value, ur.y));
+  //curve_value = MAX(ll.y, MIN(curve_value, ur.y));
   ctx->set_draw_buffer_only();
   if (!parent) {
     if (!fill)
@@ -1151,7 +1151,7 @@ void GrowTrend::set_data(double* data[3], int data_curves, int data_points)
               - (data[j + 1][idx] - y_min_value[j])
                   / (y_max_value[j] - y_min_value[j]) * (ur.y - ll.y);
 
-        point_p->y = MAX(ll.y, MIN(point_p->y, ur.y));
+        //point_p->y = MAX(ll.y, MIN(point_p->y, ur.y));
 	if (direction == glow_eHorizDirection_Right)
 	  point_p->x = ll.x
             + (data[0][idx] - data[0][0]) / (data[0][points - 1] - data[0][0])
@@ -1180,7 +1180,7 @@ void GrowTrend::set_data(double* data[3], int data_curves, int data_points)
                 - (data[j + 1][idx] - y_min_value[j])
                     / (y_max_value[j] - y_min_value[j]) * (ur.y - ll.y);
 
-          point_p->y = MAX(ll.y, MIN(point_p->y, ur.y));
+          //point_p->y = MAX(ll.y, MIN(point_p->y, ur.y));
 	  if (direction == glow_eHorizDirection_Right)
 	    point_p->x = ll.x
               + (data[0][idx] - data[0][0]) / (data[0][points - 1] - data[0][0])
