@@ -364,7 +364,7 @@ void GrowAxis::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
           if (i == lines - 1)
             y_text = y;
           else if (i == 0)
-            y_text = y + z_height - z_descent - 3;
+            y_text = y + z_height - z_descent;
           else
             y_text = y + (z_height - z_descent) / 2;
           ctx->gdraw->text(w, ll_x, y_text, text, strlen(text), text_drawtype,
@@ -455,7 +455,7 @@ void GrowAxis::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
       if (draw_text && text_idx >= 0 && max_z_width < ur_x - ll_x
           && i % valuequotient == 0) {
         if (i == lines - 1)
-          y_text = y + z_height - z_descent - 3;
+          y_text = y + z_height - z_descent;
         else if (i == 0)
           y_text = y;
         else
