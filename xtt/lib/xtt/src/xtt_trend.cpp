@@ -280,13 +280,15 @@ XttTrend::XttTrend(void* parent_ctx, char* name, pwr_sAttrRef* trend_list,
     if (!trend_list) {
       // Use axis values from plotgroup object
       for (i = 0; i < trend_cnt; i++) {
-        if (plot.YMinValue[i] != plot.YMaxValue[i])
+        if (plot.YMinValue[i] != plot.YMaxValue[i]) {
           gcd->scale(gcd->y_axis_type[i], gcd->y_value_type[i],
               plot.YMinValue[i], plot.YMaxValue[i], &gcd->y_min_value_axis[i],
               &gcd->y_max_value_axis[i], &gcd->y_trend_lines[i],
               &gcd->y_axis_lines[i], &gcd->y_axis_linelongq[i],
               &gcd->y_axis_valueq[i], gcd->y_format[i], &gcd->y_axis_width[i],
-              1, 1);
+	      1, 1, 1);
+	  gcd->y_axis_fix_scale[i] = 1;
+	}
       }
     }
   } else if (trend_tid == pwr_cClass_DsTrendCurve) {
@@ -477,13 +479,15 @@ XttTrend::XttTrend(void* parent_ctx, char* name, pwr_sAttrRef* trend_list,
     if (!trend_list) {
       // Use axis values from plotgroup object
       for (i = 0; i < trend_cnt; i++) {
-        if (plot.YMinValue[i] != plot.YMaxValue[i])
+        if (plot.YMinValue[i] != plot.YMaxValue[i]) {
           gcd->scale(gcd->y_axis_type[i], gcd->y_value_type[i],
               plot.YMinValue[i], plot.YMaxValue[i], &gcd->y_min_value_axis[i],
               &gcd->y_max_value_axis[i], &gcd->y_trend_lines[i],
               &gcd->y_axis_lines[i], &gcd->y_axis_linelongq[i],
               &gcd->y_axis_valueq[i], gcd->y_format[i], &gcd->y_axis_width[i],
-              1, 1);
+	      1, 1, 1);
+	  gcd->y_axis_fix_scale[i] = 1;
+	}
       }
     }
   }

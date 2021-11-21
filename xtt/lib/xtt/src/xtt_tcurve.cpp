@@ -213,9 +213,8 @@ int XttTCurve::get_data(pwr_tStatus* sts, pwr_tTime from, pwr_tTime to)
         return 0;
       }
     }
+    gcd->y_axis_type[j] = curve_eAxis_y;
   }
-
-  gcd->y_axis_type[0] = curve_eAxis_y;
 
   gcd->cols = tc.bufcnt;
 

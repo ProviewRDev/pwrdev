@@ -329,18 +329,20 @@ void GeCurve::activate_minmax_ok(double min_value, double max_value)
   }
 
   int i = minmax_idx;
-  if (minmax_idx < cd->cols)
+  if (minmax_idx < cd->cols) {
     cd->scale(cd->y_axis_type[i], cd->y_value_type[i], min_value, max_value,
         &cd->y_min_value_axis[i], &cd->y_max_value_axis[i],
         &cd->y_trend_lines[i], &cd->y_axis_lines[i], &cd->y_axis_linelongq[i],
-        &cd->y_axis_valueq[i], cd->y_format[i], &cd->y_axis_width[i], 1, 1);
+	&cd->y_axis_valueq[i], cd->y_format[i], &cd->y_axis_width[i], 1, 1, 1);
+    cd->y_axis_fix_scale[i] = 1;
+  }
   else {
     double axis_width;
     i = 0;
     cd->scale(cd->x_axis_type[i], cd->x_value_type[i], min_value, max_value,
         &cd->x_min_value_axis[i], &cd->x_max_value_axis[i],
         &cd->x_trend_lines[i], &cd->x_axis_lines[i], &cd->x_axis_linelongq[i],
-        &cd->x_axis_valueq[i], cd->x_format[i], &axis_width, 1, 1);
+	&cd->x_axis_valueq[i], cd->x_format[i], &axis_width, 1, 1, 0);
     if (cd->type == curve_eDataType_MultiTrend) {
       for (i = 1; i < cd->cols; i++) {
         cd->x_min_value_axis[i] = cd->x_min_value_axis[0];
@@ -1333,7 +1335,7 @@ int GeCurve::configure_axes()
   x = 0;
   for (i = 0; i < cd->cols; i++) {
     if (cd->y_value_type[i] != pwr_eType_Boolean && !hide[i]) {
-      grow_CreateGrowAxis(growaxis_ctx, "", x, 0, x + cd->y_axis_width[i], 30,
+      grow_CreateGrowAxis(growaxis_ctx, "", x+0.2, 0, x + cd->y_axis_width[i], 30,
           glow_eDrawType_Line, 1, 6, glow_eDrawType_TextHelvetica, NULL,
           &axis_object[i]);
 
@@ -1765,8 +1767,23 @@ void GeCurve::measure_window(
 
 void GeCurve::set_curvedata(GeCurveData* curve_data)
 {
-  if (cd)
+  if (cd) {
+    // Transfer scale data
+    for (int i = 0; i < cd->cols; i++) {
+      if (cd->y_axis_fix_scale[i]) {
+	for (int j = 0; j < curve_data->cols; j++) {
+	  if (str_NoCaseStrcmp(curve_data->y_name[i], cd->y_name[j]) == 0) {
+	    curve_data->y_axis_fix_scale[j] = cd->y_axis_fix_scale[i];
+	    curve_data->y_max_value[j] = cd->y_max_value[i];
+	    curve_data->y_min_value[j] = cd->y_min_value[i];
+	    break;
+	  }
+	}   
+      }
+    }
+    
     delete cd;
+  }
   cd = curve_data;
 }
 
@@ -1846,9 +1863,8 @@ GeCurveData::GeCurveData(curve_eDataType datatype)
     y_axis_lines[i] = 0;
     y_axis_linelongq[i] = 0;
     y_axis_valueq[i] = 0;
-
     y_axis_width[i] = 0;
-
+    y_axis_fix_scale[i] = 0;
     strcpy(x_unit[i], "");
     strcpy(x_format[i], "");
     x_max_value[i] = 0;
@@ -1929,16 +1945,18 @@ void GeCurveData::get_default_axis()
   double min_value, max_value;
 
   for (int i = 0; i < cols; i++) {
-    if (GeCurve::get_saved_minmax(y_name[i], &min_value, &max_value))
+    if (GeCurve::get_saved_minmax(y_name[i], &min_value, &max_value)) {
       scale(y_axis_type[i], y_value_type[i], min_value, max_value,
           &y_min_value_axis[i], &y_max_value_axis[i], &y_trend_lines[i],
           &y_axis_lines[i], &y_axis_linelongq[i], &y_axis_valueq[i],
-          y_format[i], &y_axis_width[i], 0, 0);
+	  y_format[i], &y_axis_width[i], 0, 0, 1);
+      y_axis_fix_scale[i] = 1;
+    }
     else
       scale(y_axis_type[i], y_value_type[i], y_min_value[i], y_max_value[i],
           &y_min_value_axis[i], &y_max_value_axis[i], &y_trend_lines[i],
           &y_axis_lines[i], &y_axis_linelongq[i], &y_axis_valueq[i],
-          y_format[i], &y_axis_width[i], 0, 0);
+	  y_format[i], &y_axis_width[i], 0, 0, 0);
   }
   int i = 0;
   double axis_width;
@@ -1947,7 +1965,7 @@ void GeCurveData::get_default_axis()
     scale(x_axis_type[i], x_value_type[i], x_min_value[i], x_max_value[i],
         &x_min_value_axis[i], &x_max_value_axis[i], &x_trend_lines[i],
         &x_axis_lines[i], &x_axis_linelongq[i], &x_axis_valueq[i], x_format[i],
-        &axis_width, 0, 0);
+	&axis_width, 0, 0, 0);
   } else {
     double min_value = 1e37;
     double max_value = -1e37;
@@ -1961,7 +1979,7 @@ void GeCurveData::get_default_axis()
     scale(x_axis_type[0], x_value_type[0], min_value, max_value,
         &x_min_value_axis[0], &x_max_value_axis[0], &x_trend_lines[0],
         &x_axis_lines[0], &x_axis_linelongq[0], &x_axis_valueq[0], x_format[0],
-        &axis_width, 0, 0);
+	&axis_width, 0, 0, 0);
     for (i = 1; i < cols; i++) {
       x_min_value_axis[i] = x_min_value_axis[0];
       x_max_value_axis[i] = x_max_value_axis[0];
@@ -2070,13 +2088,34 @@ void GeCurveData::select_color(bool dark_bg)
   }
 }
 
+static int get_exp(double *value)
+{
+  int n = 0;
+  if (fabs(*value) < FLT_EPSILON)
+    return n;
+
+  if (*value >= 1 - FLT_EPSILON) {
+    while (*value / 10 >= 1) {
+      *value = *value / 10;
+      n++;
+    }
+  } else {
+    while (*value * 10 < 10) {
+      *value = *value * 10;
+      n++;
+    }
+    n = -n;
+  }
+  return n;
+}
+
 #define T1 0.99999
 #define T0 0.00001
 
 void GeCurveData::scale(int axis_type, int value_type, double min_value,
     double max_value, double* min_value_axis, double* max_value_axis,
     int* trend_lines, int* axis_lines, int* axis_linelongq, int* axis_valueq,
-    char* format, double* axis_width, int not_zero, int allow_odd)
+    char* format, double* axis_width, int not_zero, int allow_odd, int exact)
 {
   double value, maxval = 0.0, minval = 0.0;
   int i_value;
@@ -2207,116 +2246,162 @@ void GeCurveData::scale(int axis_type, int value_type, double min_value,
         time_format = curve_eTimeFormat_DayHour;
       }
     } else {
-      min_zero = 0;
-      max_zero = 0;
+      if (exact) {
+	minval = min_value;
+        maxval = max_value;
+	value = fabs(minval - maxval);
+	if (value < FLT_EPSILON)
+	  return;
+	double tvalue = value;
+	n = get_exp(&value);
+	int ival = 0;
+	if (fabs(value - round(value)) < FLT_EPSILON) 
+	  ival = round(value);
+	else if (fabs(2*value - round(2*value)) < FLT_EPSILON &&
+		 round(value * 2) <= 10)
+	  ival = round(value * 2);
+	else if (fabs(5*value - round(5*value)) < FLT_EPSILON &&
+		 round(value * 5) <= 10)
+	  ival = round(value * 5);
 
-      if (fabs(max_value - min_value)
-          < MAX(fabs(max_value), fabs(min_value)) / 2) {
-        value = fabs(max_value - min_value);
-        n = 0;
-        if (value >= 1) {
-          while (value / 10 > 1) {
-            value = value / 10;
-            n++;
-          }
-          max_n = min_n = n;
-        } else if (fabs(value) < DBL_EPSILON) {
-          max_n = min_n = 0;
-        } else {
-          while (value * 10 < 10) {
-            value = value * 10;
-            n++;
-          }
-          max_n = min_n = -n;
-        }
+	value = fabs(maxval);
+	max_n = get_exp(&value);
+	value = fabs(minval);
+	min_n = get_exp(&value);
+	if (abs(min_n) > abs(max_n))
+	  n = min_n;
+	else
+	  n = max_n;
+
+	if (ival == 0)
+	  ival = 1;
+	else if (ival <= 2)
+	  ival = 10;
+	max_lines = ival;
+	min_lines = 0;
+	axlinequot = 2;
+	axvaluequot = 2;
+	printf("value: %d %f %f %d\n", ival, value, tvalue, n);
+
       } else {
-        // Power for max_value
-        if ((max_value < DBL_EPSILON && !not_zero)
-            || fabs(max_value) < DBL_EPSILON) {
-          maxval = 0;
-          max_lines = 0;
-          max_n = 0;
-          max_zero = 1;
-        } else {
-          value = fabs(max_value);
-          n = 0;
-          if (value >= 1) {
-            while (value / 10 > 1) {
-              value = value / 10;
-              n++;
-            }
-            max_n = n;
-          } else {
-            while (value * 10 < 10) {
-              value = value * 10;
-              n++;
-            }
-            max_n = -n;
-          }
-        }
+	min_zero = 0;
+	max_zero = 0;
 
-        // Power for min_value
-        if ((min_value > -DBL_EPSILON && !not_zero)
-            || fabs(min_value) < DBL_EPSILON) {
-          minval = 0;
-          min_lines = 0;
-          min_n = 0;
-          min_zero = 1;
-        } else {
-          value = fabs(min_value);
-          n = 0;
-          if (value >= 1) {
-            while (value / 10 > 1) {
-              value = value / 10;
-              n++;
-            }
-            min_n = n;
-          } else {
-            while (value * 10 < 10) {
-              value = value * 10;
-              n++;
-            }
-            min_n = -n;
-          }
-        }
-      }
+	if (fabs(max_value - min_value)
+            < MAX(fabs(max_value), fabs(min_value)) / 2) {
+	  value = fabs(max_value - min_value);
+	  n = 0;
+	  if (value >= 1) {
+	    while (value / 10 >= 1 - FLT_EPSILON) {
+	      value = value / 10;
+	      n++;
+	    } 
+	    max_n = min_n = n;
+	  } else if (fabs(value) < FLT_EPSILON) {
+	    max_n = min_n = 0;
+	  } else  {
+	    while (value * 10 < 10) {
+	      value = value * 10;
+	      n++;
+	    }
+	    max_n = min_n = -n;
+	  }
+	} else {
+	  // Power for max_value
+	  if ((max_value < DBL_EPSILON && !not_zero)
+               || fabs(max_value) < DBL_EPSILON) {
+	    maxval = 0;
+	    max_lines = 0;
+	    max_n = 0;
+	    max_zero = 1;
+	  } else {
+	    value = fabs(max_value);
+	    n = 0;
+	    if (value >= 1) {
+	      while (value / 10 >= 1 - FLT_EPSILON) {
+		value = value / 10;
+		n++;
+	      }
+	      max_n = n;
+	    } else {
+	      while (value * 10 < 10) {
+		value = value * 10;
+		n++;
+	      }
+	      max_n = -n;
+	    }
+	  }
 
-      if (min_zero) {
-        // Use power for max_value
+	  // Power for min_value
+	  if ((min_value > -FLT_EPSILON && !not_zero)
+               || fabs(min_value) < FLT_EPSILON) {
+	    minval = 0;
+	    min_lines = 0;
+	    min_n = 0;
+	    min_zero = 1;
+	  } else {
+	    value = fabs(min_value);
+	    n = 0;
+	    if (value >= 1) {
+	      while (value / 10 >= 1 - FLT_EPSILON) {
+		value = value / 10;
+		n++;
+	      }
+	      min_n = n;
+	    } else {
+	      while (value * 10 < 10) {
+		value = value * 10;
+		n++;
+	      }
+	      min_n = -n;
+	    }
+	  }
+	}
 
-        i_value = int(max_value * pow(10, -max_n) + (max_value > 0 ? T1 : -T0));
-        if (ODD(i_value) && i_value != 5 && !allow_odd)
-          i_value += 1;
-        maxval = double(i_value) * pow(10, max_n);
-        max_lines = i_value;
-        n = max_n;
-      } else if (max_zero) {
-        // Use power for min_value
+	if (min_zero) {
+	  // Use power for max_value
 
-        i_value = int(min_value * pow(10, -min_n) + (min_value > 0 ? T0 : -T1));
-        if (ODD(i_value) && i_value != 5 && !allow_odd)
-          i_value += 1;
-        minval = double(i_value) * pow(10, min_n);
-        min_lines = i_value;
-        n = min_n;
-      } else {
-        // Use largest power of min and max
-        if (max_n > min_n)
-          n = max_n;
-        else
-          n = min_n;
+	  i_value = int(max_value * pow(10, -max_n) + (max_value > 0 ? T1 : -T0));
+	  if (ODD(i_value) && i_value != 5 && !allow_odd)
+	    i_value += 1;
+	  maxval = double(i_value) * pow(10, max_n);
+	  max_lines = i_value;
+	  value = maxval;
+	  n = 0;
+	  if (value >= 1) {
+	    while (value / 10 >= 1 - FLT_EPSILON) {
+	      value = value / 10;
+	      n++;
+	    }
+	  }
+	} else if (max_zero) {
+	  // Use power for min_value
 
-        i_value = int(max_value * pow(10, -n) + (max_value > 0 ? T1 : -T0));
-        if (ODD(i_value) && i_value != 5 && !allow_odd)
-          i_value += 1;
-        maxval = double(i_value) * pow(10, n);
-        max_lines = i_value;
+	  i_value = int(min_value * pow(10, -min_n) + (min_value > 0 ? T0 : -T1));
+	  if (ODD(i_value) && i_value != 5 && !allow_odd)
+	    i_value += 1;
+	  minval = double(i_value) * pow(10, min_n);
+	  min_lines = i_value;
+	  n = min_n;
+	} else {
+	  // Use largest power of min and max
+	  if (max_n > min_n)
+	    n = max_n;
+	  else
+	    n = min_n;
+	  
+	  i_value = int(max_value * pow(10, -n) + (max_value > 0 ? T1 : -T0));
+	  if (ODD(i_value) && i_value != 5 && !allow_odd)
+	    i_value += 1;
+	  maxval = double(i_value) * pow(10, n);
+	  max_lines = i_value;
 
-        i_value = int(min_value * pow(10, -n) + (min_value > 0 ? T0 : -T1));
-        if (ODD(i_value) && i_value != 5 && !allow_odd)
-          i_value -= 1;
-        minval = double(i_value) * pow(10, n);
-        min_lines = i_value;
+	  i_value = int(min_value * pow(10, -n) + (min_value > 0 ? T0 : -T1));
+	  if (ODD(i_value) && i_value != 5 && !allow_odd)
+	    i_value -= 1;
+	  minval = double(i_value) * pow(10, n);
+	  min_lines = i_value;
+	}
       }
     }
   }
@@ -2334,26 +2419,26 @@ void GeCurveData::scale(int axis_type, int value_type, double min_value,
     if (n > 0)
       format_dec = 0;
     else {
-      format_dec = ABS(n);
+      format_dec = ABS(n) + 1;
       format_int++;
     }
     if (minval < 0)
       format_int++;
 
     sprintf(format, "%%%d.%df", format_int, format_dec);
-    *axis_width = 0.65 * format_int + 0.4;
+    *axis_width = 0.45 * format_int + 1.2;
     break;
   case curve_eTimeFormat_HourMinute:
     // Hour and minute format
     format_int = ABS(n) + 1;
     strcpy(format, "%2t");
-    *axis_width = 0.65 * format_int + 0.4;
+    *axis_width = 0.45 * format_int + 1.2;
     break;
   case curve_eTimeFormat_DayHour:
     // Days and hour format
     format_int = ABS(n) + 1;
     strcpy(format, "%3t");
-    *axis_width = 0.65 * format_int + 0.4;
+    *axis_width = 0.45 * format_int + 1.2;
     break;
   }
   // printf( "%f	%f	%f	%f	%3d %5s %4.1f\n",

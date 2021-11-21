@@ -173,13 +173,15 @@ XttFast::XttFast(void* parent_ctx, char* name, pwr_sAttrRef* fast_arp,
   for (i = 0; i < FAST_CURVES; i++) {
     if (fp.CurveValid[i]) {
       j = fast_idx[i];
-      if (!feqf(fp.YMinValue[i], fp.YMaxValue[i]))
+      if (!feqf(fp.YMinValue[i], fp.YMaxValue[i])) {
         gcd->scale(gcd->y_axis_type[j], gcd->y_value_type[j], fp.YMinValue[i],
             fp.YMaxValue[i], &gcd->y_min_value_axis[j],
             &gcd->y_max_value_axis[j], &gcd->y_trend_lines[j],
             &gcd->y_axis_lines[j], &gcd->y_axis_linelongq[j],
             &gcd->y_axis_valueq[j], gcd->y_format[j], &gcd->y_axis_width[j], 1,
-            1);
+	    1, 1);
+	gcd->y_axis_fix_scale[i] = 1;
+      }
       else
         axis_configured = false;
     }
@@ -466,7 +468,7 @@ void XttFast::fast_scan(void* data)
           &fast->gcd->x_min_value_axis[0], &fast->gcd->x_max_value_axis[0],
           &fast->gcd->x_trend_lines[0], &fast->gcd->x_axis_lines[0],
           &fast->gcd->x_axis_linelongq[0], &fast->gcd->x_axis_valueq[0],
-          fast->gcd->x_format[0], &axis_width, 1, 1);
+	  fast->gcd->x_format[0], &axis_width, 1, 1, 0);
       if (!fast->first_scan) {
         fast->curve->configure_curves();
         // fast->curve->configure_axes();

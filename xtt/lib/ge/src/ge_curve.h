@@ -145,6 +145,7 @@ public:
   curve_eAxis y_axis_type[CURVE_MAX_COLS];
   curve_eAxis x_axis_type[CURVE_MAX_COLS];
   double y_axis_width[CURVE_MAX_COLS];
+  int y_axis_fix_scale[CURVE_MAX_COLS];
   char y_format[CURVE_MAX_COLS][20];
   char x_format[CURVE_MAX_COLS][20];
   pwr_eType y_orig_type[CURVE_MAX_COLS];
@@ -157,7 +158,7 @@ public:
   void scale(int axis_type, int value_type, double min_value, double max_value,
       double* min_value_axis, double* max_value_axis, int* trend_lines,
       int* axis_lines, int* axis_linelongq, int* axis_valueq, char* format,
-      double* axis_width, int not_zero, int allow_odd);
+      double* axis_width, int not_zero, int allow_odd, int exact);
   ~GeCurveData();
 };
 
