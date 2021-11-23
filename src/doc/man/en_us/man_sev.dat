@@ -47,7 +47,7 @@ Alarm and event analyser <link> sev_eva
 Introduction
 
 A task of increasing importance for the automation systems is to store process data. The
-possibility to store large amounts of data has given rise to new functionallity in terms
+possibility to store large amounts of data has given rise to new functionality in terms
 of development and optimization of processes, predictive maintenance, calculation of 
 models for simulation etc.
 
@@ -148,7 +148,7 @@ Server threads <link> sev_serverthreads
 Deadband <link> sev_deadband
 Deadband with regression <link> sev_linreg
 Event triggered storage <link> sev_event
-Mean value calcutation <link> sev_meanvalue
+Mean value calculation <link> sev_meanvalue
 Item tree <link> sev_itemtree
 Mounting of item tree <link> sev_mount
 Refere data in the item tree <link> sev_ref
@@ -331,7 +331,7 @@ node.
 
 <topic> sev_export
 Sev export
-Sev export gör makes it possible to export data to the sev server that doesn't need to
+Sev export makes it possible to export data to the sev server that doesn't need to
 be stored in the history database, but nevertheless should be available to be displayed
 in graphs and reports.
 
@@ -515,7 +515,7 @@ for deadband and server threads.
 
 The configuration is made by setting Database to MySQL in the SevServer object. 
 Furthermore installation and start of mariadb-server is required on the server node.
-The pwrp user alos has to be created
+The pwrp user also has to be created
 
 For MariaDB
 
@@ -528,13 +528,13 @@ For MySQL
 <c>mysql
 mysql> grant all privileges on *.* to pwrp@localhost;
 
-The recommended database engine is InnoDB thas is default in later version.
+The recommended database engine is InnoDB that is default in later versions.
 
 For small databases the standard configuration of MariaDB can be used, but for dedicated
 server nodes there are som settings that should be made in the file /etc/mysql/my.cnf.
 
 <b>innodb_file_per_table
-From maintenance view it is an advanage to have each table in a separate file. Then
+From maintenance view it is an advantage to have each table in a separate file. Then
 disk space can be retrieved for deleted signals.
 
 <b>innodb_log_file_size
@@ -826,7 +826,7 @@ Mqtt server
 Mqtt server in ProviewR makes is possible to retrieve history data on any 
 platform that has implemented the MQTT client.
 
-The server replies to reqests with diffent actions. The "history" action
+The server replies to requests with different actions. The "history" action
 requests history data for an attribute, and the "eventhist" action request
 alarm and event history.
 
@@ -834,7 +834,7 @@ alarm and event history.
 This is a code example in Python with the MQTT client module python3-paho-mqtt.
 History is fetched from the local MQTT server, topic 'proviewr/server'.
 The reply is requested to be sent to topic 'repl/history', and the request
-is to fetch history data for the attribuite H1-Av1.ActualValue for the 
+is to fetch history data for the attribute H1-Av1.ActualValue for the 
 last 15 minutes.
 
 <c>#!/usr/bin/python3
@@ -1107,7 +1107,7 @@ A storage station is generated as a process or operator station by installing th
 package.
 
 <h2>Communicaton with process stations
-A storage station can serve a plant with serveral process stations that belongs to different
+A storage station can serve a plant with several process stations that belongs to different
 projects with different version. For this reason the storage station normally doesn't have
 nethandler connections but QCom only connections.
 
