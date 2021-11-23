@@ -1891,7 +1891,7 @@ GeCurveData::~GeCurveData()
 void GeCurveData::get_borders()
 {
   for (int i = 0; i < cols; i++) {
-    y_max_value[i] = 1e-37;
+    y_max_value[i] = -1e37;
     y_min_value[i] = 1e37;
 
     y_value_type[i] = pwr_eType_Boolean;
@@ -2121,7 +2121,7 @@ void GeCurveData::scale(int axis_type, int value_type, double min_value,
   int i_value;
   int n, max_n, min_n;
   int min_lines = 0, max_lines = 0;
-  int min_zero, max_zero;
+  int min_zero = 0, max_zero = 0;
   int format_int, format_dec;
   int trendlinequot = 2;
   int axlinequot = 2;
@@ -2246,150 +2246,13 @@ void GeCurveData::scale(int axis_type, int value_type, double min_value,
         time_format = curve_eTimeFormat_DayHour;
       }
     } else {
-      if (exact) {
-	minval = min_value;
-        maxval = max_value;
-	value = fabs(minval - maxval);
-	if (value < FLT_EPSILON)
-	  return;
-	double tvalue = value;
-	n = get_exp(&value);
-	int ival = 0;
-	if (fabs(value - round(value)) < FLT_EPSILON) 
-	  ival = round(value);
-	else if (fabs(2*value - round(2*value)) < FLT_EPSILON &&
-		 round(value * 2) <= 10)
-	  ival = round(value * 2);
-	else if (fabs(5*value - round(5*value)) < FLT_EPSILON &&
-		 round(value * 5) <= 10)
-	  ival = round(value * 5);
-
-	value = fabs(maxval);
-	max_n = get_exp(&value);
-	value = fabs(minval);
-	min_n = get_exp(&value);
-	if (abs(min_n) > abs(max_n))
-	  n = min_n;
-	else
-	  n = max_n;
-
-	if (ival == 0)
-	  ival = 1;
-	else if (ival <= 2)
-	  ival = 10;
-	max_lines = ival;
-	min_lines = 0;
-	axlinequot = 2;
-	axvaluequot = 2;
-	printf("value: %d %f %f %d\n", ival, value, tvalue, n);
-
-      } else {
-	min_zero = 0;
-	max_zero = 0;
-
+      if (!exact) {
 	if (fabs(max_value - min_value)
             < MAX(fabs(max_value), fabs(min_value)) / 2) {
 	  value = fabs(max_value - min_value);
-	  n = 0;
-	  if (value >= 1) {
-	    while (value / 10 >= 1 - FLT_EPSILON) {
-	      value = value / 10;
-	      n++;
-	    } 
-	    max_n = min_n = n;
-	  } else if (fabs(value) < FLT_EPSILON) {
-	    max_n = min_n = 0;
-	  } else  {
-	    while (value * 10 < 10) {
-	      value = value * 10;
-	      n++;
-	    }
-	    max_n = min_n = -n;
-	  }
-	} else {
-	  // Power for max_value
-	  if ((max_value < DBL_EPSILON && !not_zero)
-               || fabs(max_value) < DBL_EPSILON) {
-	    maxval = 0;
-	    max_lines = 0;
-	    max_n = 0;
-	    max_zero = 1;
-	  } else {
-	    value = fabs(max_value);
-	    n = 0;
-	    if (value >= 1) {
-	      while (value / 10 >= 1 - FLT_EPSILON) {
-		value = value / 10;
-		n++;
-	      }
-	      max_n = n;
-	    } else {
-	      while (value * 10 < 10) {
-		value = value * 10;
-		n++;
-	      }
-	      max_n = -n;
-	    }
-	  }
+	  n = get_exp(&value);
+	  max_n = min_n = n;
 
-	  // Power for min_value
-	  if ((min_value > -FLT_EPSILON && !not_zero)
-               || fabs(min_value) < FLT_EPSILON) {
-	    minval = 0;
-	    min_lines = 0;
-	    min_n = 0;
-	    min_zero = 1;
-	  } else {
-	    value = fabs(min_value);
-	    n = 0;
-	    if (value >= 1) {
-	      while (value / 10 >= 1 - FLT_EPSILON) {
-		value = value / 10;
-		n++;
-	      }
-	      min_n = n;
-	    } else {
-	      while (value * 10 < 10) {
-		value = value * 10;
-		n++;
-	      }
-	      min_n = -n;
-	    }
-	  }
-	}
-
-	if (min_zero) {
-	  // Use power for max_value
-
-	  i_value = int(max_value * pow(10, -max_n) + (max_value > 0 ? T1 : -T0));
-	  if (ODD(i_value) && i_value != 5 && !allow_odd)
-	    i_value += 1;
-	  maxval = double(i_value) * pow(10, max_n);
-	  max_lines = i_value;
-	  value = maxval;
-	  n = 0;
-	  if (value >= 1) {
-	    while (value / 10 >= 1 - FLT_EPSILON) {
-	      value = value / 10;
-	      n++;
-	    }
-	  }
-	} else if (max_zero) {
-	  // Use power for min_value
-
-	  i_value = int(min_value * pow(10, -min_n) + (min_value > 0 ? T0 : -T1));
-	  if (ODD(i_value) && i_value != 5 && !allow_odd)
-	    i_value += 1;
-	  minval = double(i_value) * pow(10, min_n);
-	  min_lines = i_value;
-	  n = min_n;
-	} else {
-	  // Use largest power of min and max
-	  if (max_n > min_n)
-	    n = max_n;
-	  else
-	    n = min_n;
-	  
 	  i_value = int(max_value * pow(10, -n) + (max_value > 0 ? T1 : -T0));
 	  if (ODD(i_value) && i_value != 5 && !allow_odd)
 	    i_value += 1;
@@ -2402,7 +2265,112 @@ void GeCurveData::scale(int axis_type, int value_type, double min_value,
 	  minval = double(i_value) * pow(10, n);
 	  min_lines = i_value;
 	}
+	else {
+	  // Power for max_value
+	  if ((max_value < DBL_EPSILON && !not_zero)
+               || fabs(max_value) < DBL_EPSILON) {
+	    maxval = 0;
+	    max_lines = 0;
+	    max_n = 0;
+	    max_zero = 1;
+	  } else {
+	    value = fabs(max_value);
+	    n = get_exp(&value);
+	    max_n = n;
+	  }
+
+	  // Power for min_value
+	  if ((min_value > -FLT_EPSILON && !not_zero)
+               || fabs(min_value) < FLT_EPSILON) {
+	    minval = 0;
+	    min_lines = 0;
+	    min_n = 0;
+	    min_zero = 1;
+	  } else {
+	    value = fabs(min_value);
+	    n = get_exp(&value);
+	    min_n = n;
+	  }
+
+	  if (min_zero) {
+	    // Use power for max_value
+
+	    i_value = int(max_value * pow(10, -max_n) + (max_value > 0 ? T1 : -T0));
+	    if (ODD(i_value) && i_value != 5 && !allow_odd)
+	      i_value += 1;
+	    maxval = double(i_value) * pow(10, max_n);
+	    max_lines = i_value;
+	    value = fabs(maxval);
+	    n = get_exp(&value);
+	  } else if (max_zero) {
+	    // Use power for min_value
+	    
+	    i_value = int(min_value * pow(10, -min_n) + (min_value > 0 ? T0 : -T1));
+	    if (ODD(i_value) && i_value != 5 && !allow_odd) {
+	      if (i_value >= 0)
+		i_value += 1;
+	      else
+		i_value -= 1;
+	    }
+	    minval = double(i_value) * pow(10, min_n);
+	    min_lines = i_value;
+	    n = min_n;
+	  } else {
+	    // Use largest power of min and max
+	    if (max_n > min_n)
+	      n = max_n;
+	    else
+	      n = min_n;
+	  
+	    i_value = int(max_value * pow(10, -n) + (max_value > 0 ? T1 : -T0));
+	    if (ODD(i_value) && i_value != 5 && !allow_odd)
+	      i_value += 1;
+	    maxval = double(i_value) * pow(10, n);
+	    max_lines = i_value;
+
+	    i_value = int(min_value * pow(10, -n) + (min_value > 0 ? T0 : -T1));
+	    if (ODD(i_value) && i_value != 5 && !allow_odd)
+	      i_value -= 1;
+	    minval = double(i_value) * pow(10, n);
+	    min_lines = i_value;
+	  }
+	}
+	min_value = minval;
+	max_value = maxval;
       }
+      minval = min_value;
+      maxval = max_value;
+      value = fabs(minval - maxval);
+      if (value < FLT_EPSILON)
+	return;
+      n = get_exp(&value);
+      int ival = 0;
+      if (fabs(value - round(value)) < FLT_EPSILON) 
+	ival = round(value);
+      else if (fabs(2*value - round(2*value)) < FLT_EPSILON &&
+	       round(value * 2) <= 10)
+	ival = round(value * 2);
+      else if (fabs(5*value - round(5*value)) < FLT_EPSILON &&
+	       round(value * 5) <= 10)
+	ival = round(value * 5);
+      
+      value = fabs(maxval);
+      max_n = get_exp(&value);
+      value = fabs(minval);
+      min_n = get_exp(&value);
+      if (abs(min_n) > abs(max_n))
+	n = min_n;
+      else
+	n = max_n;
+
+      if (ival == 0)
+	ival = 1;
+      else if (ival <= 2)
+	ival = 10;
+      max_lines = ival;
+      min_lines = 0;
+      axlinequot = 2;
+      axvaluequot = 2;
     }
   }
   *max_value_axis = maxval;
@@ -2420,7 +2388,7 @@ void GeCurveData::scale(int axis_type, int value_type, double min_value,
       format_dec = 0;
     else {
       format_dec = ABS(n) + 1;
-      format_int++;
+      format_int += 2;
     }
     if (minval < 0)
       format_int++;
