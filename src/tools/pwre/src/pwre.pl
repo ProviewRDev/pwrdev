@@ -253,10 +253,10 @@ sub build_kernel # args: flavour
 {
   my $flavour = $_[0];
 
-  _module("xtt");
+  _module("rt");
   build_module("copy", $flavour);
   merge();
-  _module("rt");
+  _module("xtt");
   build_module("copy", $flavour);
   merge();
   _module("wb");
