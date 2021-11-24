@@ -4,3 +4,4 @@ VolPwrTest01b 0.254.254.202 RootVolume cnf 0
 VolPwrTest01c 0.254.254.203 RootVolume cnf 0
 VolPwrTest01d 0.254.254.204 RootVolume cnf 0
 VolPwrTest01e 0.254.254.205 RootVolume clone VolPwrTest01d
+VolPwrTest01f 0.254.254.206 RootVolume cnf 0

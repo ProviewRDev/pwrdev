@@ -13,4 +13,6 @@
 #include "pwr_cvolpwrtest01classes.h"
 
 void Pwrt01_NotEqual_exec(plc_sThread *tp, pwr_sClass_Pwrt01_NotEqual *o);
+void pwrt01_random_string(char *str, int size);
+void pwrt01_random_buf(void *buf, int size);
 
