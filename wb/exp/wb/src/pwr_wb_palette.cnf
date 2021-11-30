@@ -272,6 +272,7 @@ palette NavigatorPalette
       class IOHandler
       class EplHandler
       class MessageHandler
+      class MqttServer
       class Opc_ServerConfig
       class PlcProcess
       class PlcThread
@@ -345,6 +346,11 @@ palette NavigatorPalette
       {
         class Nodave_PLC
 	class Nodave_Transaction
+      }
+      menu MQTT
+      {
+        class MQTT_Client
+	class MQTT_Device
       }
       menu OneWire
       {
@@ -484,6 +490,7 @@ palette NavigatorPalette
       class RemnodeALCM
       class RemnodeModbus
       class RemnodeMQ
+      class RemnodeMQTT
       class RemnodeRabbitMQ
       class RemnodeRK512
       class RemnodeSerial
