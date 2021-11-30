@@ -759,7 +759,7 @@ static pwr_tStatus IoRackInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
 
   local->fd = open(op->Device, O_RDWR | O_NDELAY | O_NOCTTY);
   if (local->fd == -1) {
-    errh_Error("Modbus RTU Master, open device error, %s", ap->Name);
+    errh_Error("Modbus RTU Server, open device error, %s", ap->Name);
     return IO__ERRINIDEVICE;
   }
 
@@ -806,7 +806,7 @@ static pwr_tStatus IoRackInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
     tty_attributes.c_cflag |= B115200;
     break;
   default:
-    errh_Error("Modbus RTU Master, unsupported speed, %s", ap->Name);
+    errh_Error("Modbus RTU Server, unsupported speed, %s", ap->Name);
     tty_attributes.c_cflag |= B9600;
     break;
   }
@@ -827,7 +827,7 @@ static pwr_tStatus IoRackInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
     tty_attributes.c_cflag |= CS8;
     break;
   default:
-    errh_Error("Modbus RTU Master, unsupported DataBits, %s", ap->Name);
+    errh_Error("Modbus RTU Server, unsupported DataBits, %s", ap->Name);
     tty_attributes.c_cflag |= CS8;
   }
   // tty_attributes.c_iflag |=ISTRIP;
@@ -857,7 +857,7 @@ static pwr_tStatus IoRackInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
     tty_attributes.c_cflag &= ~CSTOPB;
     break;
   case pwr_eStopBitsEnum_0:
-    errh_Error("Modbus RTU Master, unsupported StopBits, %s", ap->Name);
+    errh_Error("Modbus RTU Server, unsupported StopBits, %s", ap->Name);
     tty_attributes.c_cflag &= ~CSTOPB;
     break;
   }
@@ -873,7 +873,7 @@ static pwr_tStatus IoRackInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
   sts = tcsetattr(local->fd, TCSANOW, &tty_attributes);
 
   if (sts < 0) {
-    errh_Error("Modbus RTU Master, set device attributes error, %s", ap->Name);
+    errh_Error("Modbus RTU Server, set device attributes error, %s", ap->Name);
     return IO__ERRINIDEVICE;
   }
 

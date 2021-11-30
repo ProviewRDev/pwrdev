@@ -2538,7 +2538,7 @@ Volume Remote $ClassVolume 0.0.1.4
     !  Configures communication through a message queue using MQTT.
     ! 
     !  To direct a message from a sending RemTrans to a recieving RemTrans set 
-    !  same value (0 - 255) in Address[0] in both sending and receiving RemTrans.
+    !  the same value (0 - 255) in Address[0] in both sending and receiving RemTrans.
     ! 
     ! @b Object graph
     !  @image orm_remnodemqtt_og.png
