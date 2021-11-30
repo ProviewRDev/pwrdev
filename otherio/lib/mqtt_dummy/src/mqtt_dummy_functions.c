@@ -3,6 +3,7 @@
  */
 #if defined PWRE_CONF_MQTT
 
+#include <errno.h>
 #include <mosquitto.h>
 
 int mosquitto_topic_matches_sub(const char *sub, const char *topic, bool *result) 
@@ -20,6 +21,7 @@ int mosquitto_subscribe(struct mosquitto *mosq, int *mid, const char *sub, int q
 }
 struct mosquitto *mosquitto_new(const char *id, bool clean_session, void *obj)
 {
+  errno = ENXIO;
   return NULL;
 }
 void mosquitto_connect_callback_set(struct mosquitto *mosq, void (*on_connect)(struct mosquitto *, void *, int))

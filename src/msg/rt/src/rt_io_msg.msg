@@ -121,6 +121,7 @@ nodevice	<Device not found>					/error
 releasebuild    <I/O system is not built with this release>             /error
 dummybuild      <Archive for I/O system is not linked with this executable> /error
 searchstring    <Search string not found> 				/error
+nomqtt		<Not built with mqtt>					/error
 .end
 
 

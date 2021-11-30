@@ -61,7 +61,7 @@ static pwr_tStatus IoCardInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard
 
 static pwr_tStatus IoCardClose(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard *cp)
 {
-  return IO__RELEASEBUILD;
+  return IO__SUCCESS;
 }
 
 #else

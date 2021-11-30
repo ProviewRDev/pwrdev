@@ -39,6 +39,7 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <math.h>
+#include <errno.h>
 
 #include "co_cdh.h"
 #include "co_string.h"
@@ -380,7 +381,8 @@ static void message_cb(struct mosquitto *mosq, void *obj,
 
 	    sts = json_match(chanp->ChanClass, ((pwr_sClass_ChanAi *)chanp->cop)->Identity, (char*)msg->payload, &ivalue);
 	    if (ODD(sts)) {
-	      io_ConvertAi((pwr_sClass_ChanAi *)chanp->cop, ivalue, &fvalue);
+	      ((pwr_sClass_Ai *)chanp->sop)->RawValue = ivalue;
+	      io_ConvertAi32((pwr_sClass_ChanAi *)chanp->cop, ivalue, &fvalue);
 	      *(pwr_tFloat32 *)chanp->vbp = fvalue;
 	    }
 	    break;
@@ -427,6 +429,12 @@ static int mqtt_connect(io_sRack* rp)
   if (!local->mosq) {
     sprintf(id, "%u", rp->Objid.oix);
     local->mosq = mosquitto_new(id, true, rp);
+    if (local->mosq == NULL) {
+      if (errno == ENXIO) {
+	op->Status = IO__NOMQTT;
+	return op->Status;
+      }
+    }
   
     mosquitto_connect_callback_set(local->mosq, connect_cb);
     if (local->is_subscriber)
@@ -518,6 +526,8 @@ static pwr_tStatus IoRackInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
 
   /* Connect to mqtt server */
   sts = mqtt_connect(rp);
+  if (sts == IO__NOMQTT)
+    return sts;
 
   /* Create mosquitto loop thread */
   sts = pthread_create(&local->loop_thread, NULL, mqtt_loop, rp);
@@ -643,7 +653,7 @@ static pwr_tStatus IoRackWrite(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
 	  /* Publish set */
 	  char msg[200];
 
-	  switch(((pwr_sClass_ChanIo *)chanp->cop)->RawValueType) {
+	  switch(((pwr_sClass_ChanAo *)chanp->cop)->RawValueType) {
 	  case pwr_eRawValueTypeEnum_DeltaValue:
 	    value = rawvalue - chanp->udata;
 	    break;
@@ -656,6 +666,7 @@ static pwr_tStatus IoRackWrite(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
 
 	  rc = mosquitto_publish(local->mosq, NULL, cop->PublishTopic, strlen(msg), 
 				 msg, 1, 0);
+	  ((pwr_sClass_Ao *)chanp->sop)->RawValue = rawvalue;
 	  cop->PublishCount++;
 	}
 	break;
