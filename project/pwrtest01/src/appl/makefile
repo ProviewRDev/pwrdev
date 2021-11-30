@@ -21,6 +21,7 @@ demo_modules = $(pwrp_inc)/ra_plc_user.h \
 	       $(pwrp_exe)/ra_qmontest \
 	       $(pwrp_exe)/ra_modbustcptest \
 	       $(pwrp_exe)/ra_remotetest \
+	       $(pwrp_exe)/ra_iotest \
 	       $(pwrp_exe)/ra_pwrrttest.py \
 	       $(pwrp_exe)/ra_ccmtest.rtt_com \
 	       $(pwrp_exe)/ra_xttscripttest.rtt_com \
@@ -110,6 +111,10 @@ $(pwrp_exe)/ra_modbustcptest : $(pwrp_appl)/ra_modbustcptest.cpp
 
 $(pwrp_exe)/ra_remotetest : $(pwrp_appl)/ra_remotetest.cpp
 	@ echo "Building ra_remotetest"
+	@ g++ -g -o $(target) $(source) $(pwr_obj)/pwr_msg_co.o $(pwr_obj)/pwr_msg_rt.o $(pwr_obj)/pwr_msg_rs.o -I$(pwrp_inc) -I$(pwr_inc) -L$(pwr_lib) -lpwr_rt -lpwr_co -lpwr_msg_dummy -lrpcsvc -lpthread -lm -lrt -Wall
+
+$(pwrp_exe)/ra_iotest : $(pwrp_appl)/ra_iotest.cpp
+	@ echo "Building ra_iotest"
 	@ g++ -g -o $(target) $(source) $(pwr_obj)/pwr_msg_co.o $(pwr_obj)/pwr_msg_rt.o $(pwr_obj)/pwr_msg_rs.o -I$(pwrp_inc) -I$(pwr_inc) -L$(pwr_lib) -lpwr_rt -lpwr_co -lpwr_msg_dummy -lrpcsvc -lpthread -lm -lrt -Wall
 
 $(pwrp_exe)/ra_pwrrttest.py : $(pwrp_appl)/ra_pwrrttest.py

@@ -17,6 +17,7 @@ dexec()
 let i=0
 
 exec "ra_remotetest"
+exec "ra_iotest"
 
 # Wait for spawned processes
 for p in ${pid[*]}; do

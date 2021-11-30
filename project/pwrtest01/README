@@ -1,0 +1,11 @@
+pwrtest01, Runtime test project
+
+To start pwrtest01f
+
+ - Start mosquitto. Mosquitto user pwrp should be added.
+
+ - Create serial ports for remote serial and Modbus RTU
+
+     > socat -d -d pty,link=/tmp/socat1,raw,echo=0 pty,link=/tmp/socat2,raw,echo=0
+     > socat -d -d pty,link=/tmp/socat3,raw,echo=0 pty,link=/tmp/socat4,raw,echo=0
+

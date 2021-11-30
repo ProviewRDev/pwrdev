@@ -41,3 +41,19 @@ void pwrt01_random_buf(void *buf, int size)
   for (i = 0; i < size; i++)
     ((unsigned char *)buf)[i] = (unsigned char)(((float)rand()/RAND_MAX) * 256);
 }
+
+void pwrt01_random_uint32(pwr_tUInt32 *value)
+{
+  *value = rand();
+  *value += rand();
+}
+
+void pwrt01_random_float(float *value, float min, float max)
+{
+  *value = min + (float)rand()/RAND_MAX * (max - min);
+}
+
+void pwrt01_random_boolean(pwr_tBoolean *value)
+{
+  *value = (float)rand()/RAND_MAX < 0.5 ? 0 : 1;
+}

@@ -11,7 +11,8 @@
 static char item[][80] = {
   "Test01f-Remote-RemSerial",
   "Test01f-Remote-RemUDP",
-  "Test01f-Remote-RemTCP"
+  "Test01f-Remote-RemTCP",
+  "Test01f-Remote-RemMQTT"
 };
 
 int main()
