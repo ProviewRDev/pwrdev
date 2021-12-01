@@ -96,6 +96,9 @@ static pwr_tStatus IoAgentInit(io_tCtx ctx, io_sAgent* ap)
   ap->Local = calloc(1, sizeof(io_sAgentLocal));
   local = ap->Local;
 
+  if (op->Disable)
+    return IO__SUCCESS;
+
   local->fd = open(op->Device, O_RDWR | O_NDELAY | O_NOCTTY);
   if (local->fd == -1) {
     errh_Error("Modbus RTU Master, open device error, %s", ap->Name);
