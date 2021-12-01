@@ -349,10 +349,34 @@ static void message_cb(struct mosquitto *mosq, void *obj,
 	  switch (chanp->ChanClass) {
 	  case pwr_cClass_ChanDi: {
 	    pwr_tBoolean value;
+	    char *s1, *s2, *id;
 
-	    sts = json_match(chanp->ChanClass, ((pwr_sClass_ChanDi *)chanp->cop)->Identity, (char*)msg->payload, &value);
-	    if (ODD(sts) && value) {
-	      *(pwr_tBoolean *)chanp->vbp = 1;
+	    id = ((pwr_sClass_ChanDi *)chanp->cop)->Identity;
+	    if ((s1 = strstr(id, ",\"")) != 0 &&
+		(s2 = strstr(id, ":\"")) != 0) {    
+	      char ident1[40];
+	      char ident2[40];
+	      int idx1 = s1 - id;
+	      int idx2 = s2 - id;
+    
+	      chanp->udata = 2;
+	      strncpy(ident1, id, idx1);
+	      ident1[idx1] = 0;
+	      strncpy(ident2, id, idx2 + 1);
+	      strcpy(&ident2[idx2+1], &id[idx1+1]);
+	      sts = json_match(chanp->ChanClass, ident1, (char*)msg->payload, &value);
+	      if (ODD(sts)) 
+		*(pwr_tBoolean *)chanp->vbp = 1;
+	      else {
+		sts = json_match(chanp->ChanClass, ident2, (char*)msg->payload, &value);
+		if (ODD(sts)) 
+		  *(pwr_tBoolean *)chanp->vbp = 0;
+	      }
+	    } else {
+	      sts = json_match(chanp->ChanClass, ((pwr_sClass_ChanDi *)chanp->cop)->Identity, (char*)msg->payload, &value);
+	      if (ODD(sts) && value) {
+		*(pwr_tBoolean *)chanp->vbp = 1;
+	      }
 	    }
 	    break;
 	  }
@@ -550,13 +574,15 @@ static pwr_tStatus IoRackRead(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
 	continue;
       switch (chanp->ChanClass) {
       case pwr_cClass_ChanDi:
+	if (chanp->udata == 2)
+	  break;
 	if (*(pwr_tBoolean *)chanp->vbp) {
 	  if (chanp->udata) {
 	    *(pwr_tBoolean *)chanp->vbp = 0;
 	    chanp->udata = 0;
 	  }
 	  else
-	    chanp->udata = 1;;
+	    chanp->udata = 1;
 	}
 	break;
       case pwr_cClass_ChanAi:
