@@ -3221,7 +3221,7 @@ Action[].Object[0] in the XttMultView object.
 The AlarmTable object makes it possible to display the latest alarms in a process graph.
 The AlarmTable object i placed under the OpPlace object and the alarm list for the OpPlace
 is copied to arrays in the AlarmTable object. There are arrays for EventText, EventName, Time,
-EventPrio etc, that can be displayed in a table in the process graph. With the Member attribut
+EventPrio etc, that can be displayed in a table in the process graph. With the Member attribute
 a selection of alarm from specific hierarchies can be made, but the selection is limited by
 the EventSelectList of the OpPlace object.
 

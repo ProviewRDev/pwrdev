@@ -41,6 +41,21 @@ SObject pwrb:Class
 !  @Summary Table to display alarmlist.
 !  Table to display alarmlist.
 !
+!  The AlarmTable object makes it possible to display the latest alarms in 
+!  a process graph. The AlarmTable object i placed under the OpPlace object 
+!  and the alarm list for the OpPlace is copied to arrays in the AlarmTable 
+!  object. There are arrays for EventText, EventName, Time, EventPrio etc, 
+!  that can be displayed in a table in the process graph. With the Member 
+!  attribute a selection of alarm from specific hierarchies can be made, but 
+!  the selection is limited by the EventSelectList of the OpPlace object.
+!
+! @b Object graph
+!  @image orm_alarmtable_og.png
+!
+! @b Hint
+!  To display an alarmtable in a process graph, create a window object in the 
+!  graph, set Window.FileName to $pwr_exe/pwr_c_alarmtable_sub.pwg and 
+!  Window.Object to the name of the AlarmTable object.
 !*/
   Object AlarmTable $ClassDef 617
     Body SysBody
