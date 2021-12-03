@@ -11,7 +11,7 @@
 static char item[][80] = {
   "Test01f-IO-UDP",
   "Test01f-IO-ModbusTCP",
-//  "Test01f-IO-ModbusRTU",
+  "Test01f-IO-ModbusRTU",
   "Test01f-IO-MQTT"
 };
 
