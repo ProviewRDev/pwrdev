@@ -41,7 +41,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/prctl.h>
-#if defined PWRE_CONF_PCAP
+#if defined PWRE_CONF_LIBCAP
 # include <sys/capability.h>
 #endif
 
@@ -108,7 +108,7 @@ int main(int argc, char** argv)
 
   ver_WriteVersionInfo("ProviewR Runtime Environment");
 
-#if defined PWRE_CONF_PCAP
+#if defined PWRE_CONF_LIBCAP
   // If we are running from an unprivileged shell we won't have an inheritable flag set which is needed to set ambient capabilites
   // TODO Later we should pinpoint the exact needed privileges for each process we spawn.
 
