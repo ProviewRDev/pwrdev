@@ -40,6 +40,15 @@
 #include <fstream>
 #include <vector>
 
+#include "pwr_baseclasses.h"
+
+#include "cow_pn_gsdml_classes.h"
+namespace pugi
+{
+class xml_document;
+class xml_node;
+class xpath_node_set;
+}
 class pn_gsdml;
 class gsdml_Valuelist;
 
@@ -73,7 +82,7 @@ typedef struct
 } gsdml_tRefIdT;
 typedef struct
 {
-  char ref[80];
+  char ref[160];
   void* p;
 } gsdml_tRefId;
 typedef int gsdml_tInteger;
@@ -88,7 +97,8 @@ typedef char gsdml_tSignedOrFloatValueList[4096]; // Allowed values can be
                                                   // characters is not
                                                   // uncommon...
 
-typedef enum {
+typedef enum
+{
   gsdml_eType_,
   gsdml_eType_Boolean,
   gsdml_eType_Integer,
@@ -112,13 +122,15 @@ typedef enum {
   gsdml_eType__
 } gsdml_eType;
 
-typedef enum {
+typedef enum
+{
   gsdml_eSubmoduleType_,
   gsdml_eSubmoduleType_PortSubmoduleItem,
   gsdml_eSubmoduleType_SubmoduleItem,
 } gsdml_eSubmoduleType;
 
-typedef enum {
+typedef enum
+{
   gsdml_eValueDataType_,
   gsdml_eValueDataType_Bit,
   gsdml_eValueDataType_BitArea,
@@ -144,7 +156,8 @@ typedef enum {
   gsdml_eValueDataType__
 } gsdml_eValueDataType;
 
-typedef enum {
+typedef enum
+{
   gsdml_eTag_,
   gsdml_eTag_xml,
   gsdml_eTag_ISO15745Profile,
@@ -199,6 +212,7 @@ typedef enum {
   gsdml_eTag_F_WD_Time,
   gsdml_eTag_F_Par_CRC,
   gsdml_eTag_F_iPar_CRC,
+  gsdml_eTag_F_iParamDescCRC,
   gsdml_eTag_Graphics,
   gsdml_eTag_GraphicItemRef,
   gsdml_eTag_IsochroneMode,
@@ -1544,6 +1558,7 @@ public:
   std::vector<gsdml_ExtChannelAddValue*> ExtChannelAddValue;
   pn_gsdml* gsdml;
   ~gsdml_ExtChannelDiagItem();
+  void build();
   void print(int ind);
 };
 
@@ -1554,6 +1569,7 @@ public:
   std::vector<gsdml_ExtChannelDiagItem*> ExtChannelDiagItem;
   pn_gsdml* gsdml;
   ~gsdml_ExtChannelDiagList();
+  void build();
   void print(int ind);
 };
 
@@ -1748,10 +1764,15 @@ public:
   void print(int ind);
 };
 
+typedef struct {
+  gsdml_sModuleInfo ModuleInfo;
+  std::vector<gsdml_SubslotItem> SubslotList;  
+} gsdml_sDAP;
+
 class pn_gsdml
-{
+{  
 public:
-  pn_gsdml();
+  pn_gsdml(); 
   ~pn_gsdml();
 
   std::ifstream fp;
@@ -1808,8 +1829,7 @@ public:
   static int ostring_to_data(unsigned char** data, const char* str, int size,
                              int* rsize);
   static int data_to_ostring(unsigned char* data, int size, char* str,
-                             int strsize);
-  static int string_to_value_datatype(char* str, gsdml_eValueDataType* type);
+                             int strsize);  
   int datavalue_to_string(gsdml_eValueDataType datatype, void* value,
                           unsigned int size, char* str, unsigned int strsize);
   int string_to_datavalue(gsdml_eValueDataType datatype, void* value,
@@ -1853,6 +1873,58 @@ public:
   find_menuitem_ref(char* ref, gsdml_ParameterRecordDataItem* search_domain);
   void gsdml_print();
   void build();
+
+  // Utility
+  static int string_to_value_datatype(char const* str, gsdml_eValueDataType* type);
+
+  // Our compiled lists
+  std::unordered_map<ushort, GSDML::ChannelDiagItem>& getChannelDiagList();
+  std::unordered_map<std::string, std::shared_ptr<GSDML::ModuleItem>>& getModuleList();
+  std::unordered_map<std::string, std::shared_ptr<GSDML::ValueItem>>& getValueList();
+  std::unordered_map<std::string, std::shared_ptr<std::string>>& getTextIdList();
+  std::map<std::string, std::shared_ptr<GSDML::DeviceAccessPointItem>>& getDeviceAccessPointList();
+
+  /*
+    Utility functions for finding references
+  */
+  std::shared_ptr<std::string> _get_TextId(std::string&&);
+  std::shared_ptr<std::string> _get_CategoryTextRef(std::string&&);
+  std::shared_ptr<std::string> _get_CategoryInfoTextRef(std::string&&);
+
+private:  
+  /*
+    Builders that generates "dereferenced" xml object structure
+  */
+  void _build_diagnostics();
+  void _build_DAPs();
+  void _build_moduleList();
+  void _build_moduleList(pugi::xml_node&&);
+  void _build_valueList();
+  void _build_textIdList();
+
+  pwr_tFileName _filename;
+
+  std::shared_ptr<pugi::xml_document> _doc;
+  
+  // Pointers for faster reference to all the lists
+  std::shared_ptr<pugi::xml_node> _xmlTextIds;
+  std::shared_ptr<pugi::xml_node> _xmlDeviceAccessPointList;
+  std::shared_ptr<pugi::xml_node> _xmlCategoryList;
+  /*
+    ModuleList - List of ModuleItem
+    Uses attribute ModuleItemTarget to point out what ID attribute of ModuleItem to use 
+  */
+  std::shared_ptr<pugi::xml_node> _xmlModuleList;
+  std::shared_ptr<pugi::xml_node> _xmlSubmoduleList;
+  std::shared_ptr<pugi::xml_node> _xmlValueList;
+  std::shared_ptr<pugi::xml_node> _xmlChannelDiagList;
+
+  // "Dereferenced" data structures
+  std::unordered_map<ushort, GSDML::ChannelDiagItem> _channelDiagList;
+  std::unordered_map<std::string, std::shared_ptr<GSDML::ModuleItem>> _moduleList;
+  std::unordered_map<std::string, std::shared_ptr<GSDML::ValueItem>> _valueList;
+  std::unordered_map<std::string, std::shared_ptr<std::string>> _textIdList;
+  std::map<std::string, std::shared_ptr<GSDML::DeviceAccessPointItem>> _deviceAccessPointList;
 };
 
 #endif
