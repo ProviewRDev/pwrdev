@@ -1,5 +1,5 @@
 Package: pwr59
-Version: 5.9.0-1
+Version: 5.9.0-2
 Section: base
 Priority: optional
 Architecture: amd64
@@ -20,3 +20,9 @@ Replaces: pwrrt,pwr34,pwr39,pwr40,pwr41,pwr42,pwr43,pwr44,pwr45,pwr46,pwr47,pwr4
 Maintainer: ProviewR <postmaster@proview.se>
 Description: ProviewR development and runtime environment package
  5.9.0-1 Base release
+ 5.9.0-2
+  - rt_elog, timestamp bugfix.
+  - Dashboard open/close event bugfix.
+  - Ge curve scale fix.
+  - IO MQTT, added match for both true and false for Di channels.
+  - AlarmTable object, object graph modified
