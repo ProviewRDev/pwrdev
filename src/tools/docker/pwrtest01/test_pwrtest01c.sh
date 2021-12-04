@@ -10,6 +10,9 @@ echo "pwrp:pwrp" > /etc/mosquitto/passwd
 mosquitto_passwd -U /etc/mosquitto/passwd
 echo "allow_anonymous false" >> /etc/mosquitto/mosquitto.conf
 echo "password_file /etc/mosquitto/passwd" >> /etc/mosquitto/mosquitto.conf
+# mosquitto bug
+mkdir /run/mosquitto
+chmod a+w /run/mosquitto
 /usr/sbin/mosquitto -c /etc/mosquitto/mosquitto.conf &
 
 sleep 20

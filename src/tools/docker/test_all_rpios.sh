@@ -17,6 +17,7 @@ install_build="apt-get install -y libgtk2.0-dev doxygen gcc g++ make libasound2-
 install_rpi=""
 install_sev="apt-get install -y default-mysql-server"
 install_web="apt-get install -y nginx"
+install_remote="apt-get install -y socat"
 install_pwr="apt-get install -y libgtk2.0-0 libasound2 \
 	libdb5.3 libdb5.3++ libsqlite3-0 librsvg2-2 g++  xterm libmariadb3 \
 	librabbitmq4 libusb-1.0-0 libhdf5-openmpi-103 librabbitmq4 libmosquitto1 \
@@ -31,7 +32,7 @@ install_pwrrt="apt-get install -y libgtk2.0-0 libasound2 \
 	openjdk-11-jre"
 install_pkg="dpkg -i"
 jdk_dir=/usr/lib/jvm/java-11-openjdk-armhf
-ver="5.9.0-1"
+ver="5.9.0-2"
 sver="59"
 arch="armhf"
 pkg_pwr="pwr"$sver"_"$ver"_"$arch".deb"
@@ -66,8 +67,9 @@ if [ "$1" == "-h" ] || [ "$1" == "--help" ]; then
   echo "8:  pwrtest01a and pwrtest01b communication test" 
   echo "9:  pwrtest01d sev mariadb test" 
   echo "10: pwrtest01e volume clone and sqlite test" 
-  echo "11: pwrtest03a interactive operator test image" 
-  echo "12: Demo interactive test image" 
+  echo "11: pwrtest01f remote and IO tests"
+  echo "12: pwrtest03a interactive operator test image" 
+  echo "13: Demo interactive test image" 
   exit
 fi
 
@@ -77,7 +79,7 @@ else
   start=$1
 fi
 if [ "$2" == "" ]; then
-  end=12
+  end=13
 else
   end=$2
 fi
@@ -129,6 +131,7 @@ if [ $start -le 2 ] && [ $end -ge 2 ]; then
   docker container cp tmp:/pwr/rls/os_linux/hw_arm/bld/project/pwrtest01/bld/common/load/pwrp_pkg_pwrtest01c_0001.tgz ./data/
   docker container cp tmp:/pwr/rls/os_linux/hw_arm/bld/project/pwrtest01/bld/common/load/pwrp_pkg_pwrtest01d_0001.tgz ./data/
   docker container cp tmp:/pwr/rls/os_linux/hw_arm/bld/project/pwrtest01/bld/common/load/pwrp_pkg_pwrtest01e_0001.tgz ./data/
+  docker container cp tmp:/pwr/rls/os_linux/hw_arm/bld/project/pwrtest01/bld/common/load/pwrp_pkg_pwrtest01f_0001.tgz ./data/
   docker container cp tmp:/pwr/rls/os_linux/hw_arm/bld/project/pwrtest02/bld/common/load/pwrtest02.tar.gz ./data/
   docker container cp tmp:/pwr/rls/os_linux/hw_arm/bld/project/pwrtest03/bld/common/load/pwrp_pkg_pwrtest03a_0001.tgz ./data/
   docker container rm tmp
@@ -275,8 +278,22 @@ if [ $start -le 10 ] && [ $end -ge 10 ]; then
   docker image rm pwrtest01e:v1
 fi
 
-# Image pwrtest03a
+# Runtime container pwrtest01f
 if [ $start -le 11 ] && [ $end -ge 11 ]; then
+  docker image build -t pwrtest01f:v1 -f pwrtest01/Dockerfile.pwrtest01f \
+    --build-arg RELEASE=$img_pwrrt \
+    --build-arg INSTALL_REMOTE="$install_remote" \
+    ./
+  docker run $caps --name pwrtf pwrtest01f:v1
+  docker container cp pwrtf:/pwrp/common/log/remote.tlog ./log/
+  docker container cp pwrtf:/pwrp/common/log/io.tlog ./log/
+
+  docker container rm pwrtf
+  docker image rm pwrtest01f:v1
+fi
+
+# Image pwrtest03a
+if [ $start -le 12 ] && [ $end -ge 11 ]; then
   docker image build -t $img_pwrtest03a -f pwrtest03/Dockerfile.pwrtest03a \
     --build-arg RELEASE=$img_pwrrt \
     --build-arg INSTALL_WEB="$install_web" \
@@ -286,7 +303,7 @@ if [ $start -le 11 ] && [ $end -ge 11 ]; then
 fi
 
 # Image pwrdemoi
-if [ $start -le 12 ] && [ $end -ge 12 ]; then
+if [ $start -le 13 ] && [ $end -ge 12 ]; then
   docker image build -t $img_pwrdemoi -f pwrdemo/Dockerfile.pwrdemoi \
     --build-arg RELEASE=$img_pwrdev \
     --build-arg INSTALL_WEB="$install_web" \
