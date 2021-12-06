@@ -7,18 +7,23 @@ Xorg -noreset +extension GLX +extension RANDR +extension RENDER -config ./dummy_
 
 usermod -a -G tty pwrp
 
+# Create serial ports with socat
+ofile="/tmp/pwrtest01pts.txt"
+echo "" > $ofile
+
 # Serial ports for remote serial
-socat -d -d pty,link=/tmp/socat1,raw,echo=0 pty,link=/tmp/socat2,raw,echo=0 &
+socat -d -d pty,link=/tmp/socat1,raw,echo=0 pty,link=/tmp/socat2,raw,echo=0 2>> $ofile&
 
 # Serial ports for Modbus RTU
-socat -d -d pty,link=/tmp/socat3,raw,echo=0 pty,link=/tmp/socat4,raw,echo=0 &
+socat -d -d pty,link=/tmp/socat3,raw,echo=0 pty,link=/tmp/socat4,raw,echo=0 2>> $ofile &
 
-sleep 5
-
-chmod a+rw /dev/pts/0
-chmod a+rw /dev/pts/1
-chmod a+rw /dev/pts/2
-chmod a+rw /dev/pts/3
+sleep 2
+devs=`grep /dev/pts $ofile | cut -d " " -f7`
+for dev in $devs
+do
+  echo "Serial device $dev"
+  chmod a+rw $dev
+done
 
 # mosquitto, create user and start
 echo "pwrp:pwrp" > /etc/mosquitto/passwd
