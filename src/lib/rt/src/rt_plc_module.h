@@ -34,9 +34,26 @@
  * General Public License plus this exception.
  */
 
-#include <math.h>
-#include <float.h>
-
-#include "pwr.h"
-#include "pwr_modules.h"
-#include "ra_plc_user.h"
+#include "pwr_systemclasses.h"
+#include "pwr_baseclasses.h"
+#include "co_time.h"
+#include "co_math.h"
+#include "rt_lck.h"
+#include "rt_plc.h"
+#include "rt_plc_rt.h"
+#include "rt_plc_dirlink.h"
+#include "rt_plc_ioarea.h"
+#include "rt_plc_timer.h"
+#include "rt_plc_arithm.h"
+#include "rt_plc_io.h"
+#include "rt_plc_pid.h"
+#include "rt_plc_data.h"
+#include "rt_plc_drive.h"
+#include "rt_plc_macro_logic.h"
+#include "rt_plc_macro_io.h"
+#include "rt_plc_macro_grafcet.h"
+#include "rt_plc_macro_sup.h"
+#include "rt_plc_macro_div.h"
+#include "rt_plc_macro_mps.h"
+#include "rt_plc_macro_string.h"
+#include "rt_plc_macro_time.h"

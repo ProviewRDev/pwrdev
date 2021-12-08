@@ -15380,14 +15380,7 @@ static int gcg_check_ra_plc_user(char* filename)
     fprintf(checkfile, " *\n");
     fprintf(checkfile, " */\n\n");
     fprintf(checkfile, "#ifndef ra_plc_user_h\n");
-    fprintf(checkfile, "#define ra_plc_user_h\n\n");
-    fprintf(checkfile, "#include \"pwr_nmpsclasses.h\"\n");
-    fprintf(checkfile, "#include \"pwr_remoteclasses.h\"\n");
-    fprintf(checkfile, "#include \"pwr_profibusclasses.h\"\n");
-    fprintf(checkfile, "#include \"pwr_basecomponentclasses.h\"\n");
-    fprintf(checkfile, "#include \"pwr_otherioclasses.h\"\n");
-    fprintf(checkfile, "#include \"pwr_siemensclasses.h\"\n");
-    fprintf(checkfile, "#include \"pwr_abbclasses.h\"\n\n\n\n\n");
+    fprintf(checkfile, "#define ra_plc_user_h\n\n\n\n\n");
     fprintf(checkfile, "#endif\n\n");
     fclose(checkfile);
     return GSX__FILECREATED;
