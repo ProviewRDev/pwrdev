@@ -1129,6 +1129,7 @@ int GeCurve::config_names()
         2, 0, NULL, &hide_l1[i]);
     grow_CreateGrowLine(grownames_ctx, "", 1.50, y + 0.75, 1.77, y + 0.35,
         color, 2, 0, NULL, &hide_l2[i]);
+    color = glow_eCtColor_BackgroundTextAndLines;
     grow_CreateGrowRect(grownames_ctx, "", 1.3, y + 0.3, 0.5, 0.5, color, 1, 0,
         glow_mDisplayLevel_1, 0, 1, 0, glow_eCtColor_Background, NULL,
         &hide_rect[i]);
