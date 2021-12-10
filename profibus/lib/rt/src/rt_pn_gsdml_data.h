@@ -128,8 +128,8 @@ class GsdmlSlotData
 {
 public:
   GsdmlSlotData()
-      : module_enum_number(0), dap_fixed_slot(0), module_class(0), module_oid(pwr_cNOid),
-        slot_number(0), slot_idx(0)
+      : module_enum_number(0), dap_fixed_slot(0), module_class(0),
+        module_oid(pwr_cNOid), slot_number(0), slot_idx(0)
   {
     module_text[0] = 0;
   }
@@ -169,6 +169,29 @@ public:
   int print(std::ofstream& fp, bool reverse_endianess);
 };
 
+// class GsdmlExtChannelAddValueDataItem
+// {
+// public:
+//   GsdmlExtChannelAddValueDataItem();
+//   unsigned char id;
+//   char data_type[80];
+//   unsigned short length;
+
+//   int print(std::ofstream& fp);
+// };
+
+class GsdmlExtChannelDiag
+{
+public:
+  GsdmlExtChannelDiag();
+  unsigned short error_type;
+  char name[200];
+  char help[4096];
+  // std::vector<GsdmlExtChannelAddValueDataItem*> data_item;
+
+  int print(std::ofstream& fp);
+};
+
 class GsdmlChannelDiag
 {
 public:
@@ -177,6 +200,7 @@ public:
   char name[200];
   char help[4096]; // We need a large buffer for most of the help text in the
                    // diagnostics...
+  std::vector<GsdmlExtChannelDiag*> ext_channel_diag;
 
   int print(std::ofstream& fp);
 };
@@ -185,8 +209,8 @@ class GsdmlDeviceData
 {
 public:
   GsdmlDeviceData()
-      : device_num(0), skip_ip_assignment(0), vendor_id(0), device_id(0), byte_order(0),
-        read_data_is_native_ordered(1), instance(0)
+      : device_num(0), skip_ip_assignment(0), vendor_id(0), device_id(0),
+        byte_order(0), read_data_is_native_ordered(1), instance(0)
   {
     device_name[0] = 0;
     ip_address[0] = 0;

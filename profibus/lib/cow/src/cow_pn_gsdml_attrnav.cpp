@@ -1267,9 +1267,10 @@ int GsdmlAttrNav::object_attr()
             ->DeviceAccessPointItem[device_num - 1]
             ->Body.FixedInSlots.list);
 
-    // Check to see if this DAP is supposed to be fixed in a specific slot (We assume the first one).
-    // We also assume the DAP is never placed in more than one slot.
-    // FixedInSlots attribute may apply to modules and submodules aswell but is not implemented (yet)
+    // Check to see if this DAP is supposed to be fixed in a specific slot (We
+    // assume the first one). We also assume the DAP is never placed in more
+    // than one slot. FixedInSlots attribute may apply to modules and submodules
+    // aswell but is not implemented (yet)
     unsigned int fixed_position = fixed_in_slots_iter.begin();
     if (fixed_position > 0 && sd->dap_fixed_slot != 1)
     {
@@ -1284,9 +1285,11 @@ int GsdmlAttrNav::object_attr()
 
     // Add all the slots, the DAP goes to the first physical slot
     int first_slot = iter.begin();
-    for (unsigned int physical_slot = first_slot; physical_slot != iter.end(); physical_slot = iter.next()) {
+    for (unsigned int physical_slot = first_slot; physical_slot != iter.end();
+         physical_slot = iter.next())
+    {
 
-      //Skip the DAP
+      // Skip the DAP
       if (first_slot == physical_slot)
         physical_slot = iter.next();
 
@@ -1304,7 +1307,8 @@ int GsdmlAttrNav::object_attr()
       {
         sd = dev_data.slot_data[slot_cnt];
         sd->slot_idx = slot_cnt;
-        if (physical_slot != sd->slot_number) {
+        if (physical_slot != sd->slot_number)
+        {
           printf("GSML-Error, datafile corrupt, unexpected slot number\n");
         }
       }
@@ -1491,7 +1495,8 @@ int GsdmlAttrNav::save(const char* filename)
           (char*)gsdml->ApplicationProcess->ChannelDiagList->ChannelDiagItem[i]
               ->Body.Name.p,
           sizeof(cd->name));
-      //Make sure we null terminate these in case our buffer is too small to accomodate the entire diag name string.
+      // Make sure we null terminate these in case our buffer is too small to
+      // accomodate the entire diag name string.
       cd->name[sizeof(cd->name) - 1] = '\0';
 
       if (gsdml->ApplicationProcess->ChannelDiagList->ChannelDiagItem[i]
@@ -1515,9 +1520,6 @@ int GsdmlAttrNav::save(const char* filename)
                 ->ExtChannelDiagList;
         for (auto& ext_diag_item : list->ExtChannelDiagItem)
         {
-          if (ext_diag_item->Body.Name.p == (void*)0)
-            continue;
-
           GsdmlExtChannelDiag* ecd = new GsdmlExtChannelDiag;
           ecd->error_type = ext_diag_item->Body.ErrorType;
           strncpy(ecd->name, (char*)ext_diag_item->Body.Name.p,
@@ -2186,7 +2188,8 @@ int ItemPnDevice::open_children(GsdmlAttrNav* attrnav, double x, double y)
       gsdml_DeviceAccessPointItem* item =
           attrnav->gsdml->ApplicationProcess->DeviceAccessPointList
               ->DeviceAccessPointItem[i];
-      char name[sizeof((char*)item->ModuleInfo->Body.Name.p) + 2 + sizeof(item->ModuleInfo->Body.OrderNumber) + 1 + 1];
+      char name[sizeof((char*)item->ModuleInfo->Body.Name.p) + 2 +
+                sizeof(item->ModuleInfo->Body.OrderNumber) + 1 + 1];
       snprintf(name, sizeof(name), "%s (%s)",
                (char*)item->ModuleInfo->Body.Name.p,
                item->ModuleInfo->Body.OrderNumber);
@@ -3054,7 +3057,7 @@ int ItemPnDAP::open_children(GsdmlAttrNav* attrnav, double x, double y)
             {
               ssd->subslot_number = ii->Body.SubslotNumber;
               printf(
-                  "GSML-Error, datafile corrupt, unexpected subslot number\n");
+                  "GSDML-Error, datafile corrupt, unexpected subslot number\n");
             }
           }
 
@@ -3208,7 +3211,8 @@ int ItemPnNetwork::open_children(GsdmlAttrNav* attrnav, double x, double y)
                    flow_eDest_IntoLast);
 
     p = (void*)&attrnav->dev_data.skip_ip_assignment;
-    new ItemPnParYesNo(attrnav, "Skip IP Assignment", (int*)p, node, flow_eDest_IntoLast);
+    new ItemPnParYesNo(attrnav, "Skip IP Assignment", (int*)p, node,
+                       flow_eDest_IntoLast);
 
     if (attrnav->device_item &&
         attrnav->device_item->SystemDefinedSubmoduleList &&
@@ -4747,7 +4751,8 @@ void ItemPnParEnumValue::update(GsdmlAttrNav* attrnav)
   case gsdml_eValueDataType_Unsigned16:
   case gsdml_eValueDataType_Integer16:
   {
-    union {
+    union
+    {
       char b[2];
       short data;
     } val;
@@ -4763,7 +4768,8 @@ void ItemPnParEnumValue::update(GsdmlAttrNav* attrnav)
   case gsdml_eValueDataType_Unsigned32:
   case gsdml_eValueDataType_Integer32:
   {
-    union {
+    union
+    {
       char b[4];
       int data;
     } val;
@@ -5487,9 +5493,9 @@ int ItemPnEnumTimeRatio::scan(GsdmlAttrNav* attrnav, void* p)
   return 1;
 }
 
-ItemPnParYesNo::ItemPnParYesNo(GsdmlAttrNav* attrnav, const char* item_name,                      
-                      int* attr_value_p, brow_tNode dest,
-                      flow_eDest dest_code)
+ItemPnParYesNo::ItemPnParYesNo(GsdmlAttrNav* attrnav, const char* item_name,
+                               int* attr_value_p, brow_tNode dest,
+                               flow_eDest dest_code)
     : value_p(attr_value_p), old_value(0), first_scan(1)
 {
   type = attrnav_eItemType_PnNetworkSettingYesNo;
@@ -5515,11 +5521,11 @@ int ItemPnParYesNo::scan(GsdmlAttrNav* attrnav, void* p)
     first_scan = 0;
 
   int value = *(int*)p;
-  
+
   if (value == 0)
   {
     brow_SetAnnotation(node, 1, "No", 2);
-  } 
+  }
   else
   {
     brow_SetAnnotation(node, 1, "Yes", 3);
@@ -5551,9 +5557,11 @@ int ItemPnParYesNo::open_children(GsdmlAttrNav* attrnav, double x, double y)
   else
   {
     brow_SetNodraw(attrnav->brow->ctx);
-    
-    new ItemPnEnumValue(attrnav, "No", 0, pwr_eType_UInt32, this->value_p, node, flow_eDest_IntoLast);    
-    new ItemPnEnumValue(attrnav, "Yes", 1, pwr_eType_UInt32, this->value_p, node, flow_eDest_IntoLast);    
+
+    new ItemPnEnumValue(attrnav, "No", 0, pwr_eType_UInt32, this->value_p, node,
+                        flow_eDest_IntoLast);
+    new ItemPnEnumValue(attrnav, "Yes", 1, pwr_eType_UInt32, this->value_p,
+                        node, flow_eDest_IntoLast);
 
     brow_SetOpen(node, attrnav_mOpen_Children);
     brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_openmap);
@@ -5562,7 +5570,6 @@ int ItemPnParYesNo::open_children(GsdmlAttrNav* attrnav, double x, double y)
   }
   return 1;
 }
-
 
 ItemPnEnumSendClock::ItemPnEnumSendClock(
     GsdmlAttrNav* attrnav, const char* item_name,

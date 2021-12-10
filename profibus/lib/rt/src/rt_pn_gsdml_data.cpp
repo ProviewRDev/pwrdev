@@ -46,7 +46,8 @@
 
 #include "pwr_baseclasses.h"
 
-typedef enum {
+typedef enum
+{
   gsdmldata_eTag_,
   gsdmldata_eTag_PnDevice,
   gsdmldata_eTag_NetworkSettings,
@@ -55,35 +56,51 @@ typedef enum {
   gsdmldata_eTag_DataRecord,
   gsdmldata_eTag_IOCR,
   gsdmldata_eTag_ChannelDiag,
+  gsdmldata_eTag_ExtChannelDiag,
   gsdmldata_eTag__
 } gsdmldata_eTag;
 
 GsdmlSlotData* GsdmlDeviceData::paste_slotdata = 0;
 
-GsdmlChannelDiag::GsdmlChannelDiag()
-    : error_type(0)
+GsdmlExtChannelDiag::GsdmlExtChannelDiag() : error_type(0)
 {
   memset(name, 0, sizeof(name));
   memset(help, 0, sizeof(help));
+}
+
+GsdmlChannelDiag::GsdmlChannelDiag() : error_type(0)
+{
+  memset(name, 0, sizeof(name));
+  memset(help, 0, sizeof(help));
+}
+
+int GsdmlExtChannelDiag::print(std::ofstream& fp) {
+  fp << "           <ExtChannelDiag ErrorType=\"" << error_type << "\"\n"
+     << "             Name=\"" << name << "\"\n"
+     << "             Help=\"" << help << "\" />\n";
+
+  return 1;
 }
 
 int GsdmlChannelDiag::print(std::ofstream& fp)
 {
   fp << "      <ChannelDiag ErrorType=\"" << error_type << "\"\n"
      << "         Name=\"" << name << "\"\n"
-     << "         Help=\"" << help << "\" />\n";
+     << "         Help=\"" << help << "\">\n";
 
+  for (auto& ecd : ext_channel_diag)
+    ecd->print(fp);
+
+  fp << "      </ChannelDiag>\n";
   return 1;
 }
 
 GsdmlDataRecord::GsdmlDataRecord(const GsdmlDataRecord& x)
-    : record_idx(x.record_idx)
-    , data(x.data)
-    , data_length(x.data_length)
-    , index(x.index)
-    , transfer_sequence(x.transfer_sequence)
+    : record_idx(x.record_idx), data(x.data), data_length(x.data_length),
+      index(x.index), transfer_sequence(x.transfer_sequence)
 {
-  if (data) {
+  if (data)
+  {
     data = (unsigned char*)malloc(data_length);
     memcpy(data, x.data, data_length);
   }
@@ -98,9 +115,12 @@ int GsdmlDataRecord::print(std::ofstream& fp, bool reverse_endianess)
   // configurator otherwise we use the data as is. The method SetIoDeviceData
   // for instance reads the raw data and then recreates the pn configuration
   // file.
-  if (data_reversed_endianess) {
+  if (data_reversed_endianess)
+  {
     data = (reverse_endianess ? this->data_reversed_endianess : this->data);
-  } else {
+  }
+  else
+  {
     data = this->data;
   }
 
@@ -123,7 +143,8 @@ int GsdmlSubslotData::print(std::ofstream& fp, bool reverse_endianess)
      << "       IOInputLength=\"" << io_input_length << "\"\n"
      << "       IOOutputLength=\"" << io_output_length << "\" >\n";
 
-  for (unsigned int i = 0; i < data_record.size(); i++) {
+  for (unsigned int i = 0; i < data_record.size(); i++)
+  {
     data_record[i]->print(fp, reverse_endianess);
   }
 
@@ -140,7 +161,8 @@ int GsdmlSlotData::print(std::ofstream& fp, bool reverse_endianess)
      << "        SlotNumber=\"" << slot_number << "\"\n"
      << "        DapFixedInSlot=\"" << dap_fixed_slot << "\" >\n";
 
-  for (unsigned int i = 0; i < subslot_data.size(); i++) {
+  for (unsigned int i = 0; i < subslot_data.size(); i++)
+  {
     subslot_data[i]->print(fp, reverse_endianess);
   }
 
@@ -194,27 +216,36 @@ int GsdmlDeviceData::print(const char* filename)
 
 // Save in accordance to the chosen endianess
 #if (pwr_dHost_byteOrder == pwr_dLittleEndian)
-  if (byte_order == pwr_eByteOrderingEnum_LittleEndian) {
+  if (byte_order == pwr_eByteOrderingEnum_LittleEndian)
+  {
     reverse_endianess = false;
-  } else {
+  }
+  else
+  {
     // We use the data saved as the reversed endianess
     reverse_endianess = true;
   }
 #elif (pwr_dHost_byteOrder == pwr_dBigEndian)
-  if (byte_order == pwr_eByteOrderingEnum_LittleEndian) {
+  if (byte_order == pwr_eByteOrderingEnum_LittleEndian)
+  {
     reverse_endianess = true;
-  } else {
+  }
+  else
+  {
     reverse_endianess = false;
   }
 #endif
 
-  for (unsigned int i = 0; i < slot_data.size(); i++) {
+  for (unsigned int i = 0; i < slot_data.size(); i++)
+  {
     slot_data[i]->print(fp, reverse_endianess);
   }
-  for (unsigned int i = 0; i < iocr_data.size(); i++) {
+  for (unsigned int i = 0; i < iocr_data.size(); i++)
+  {
     iocr_data[i]->print(fp);
   }
-  for (unsigned int i = 0; i < channel_diag.size(); i++) {
+  for (unsigned int i = 0; i < channel_diag.size(); i++)
+  {
     channel_diag[i]->print(fp);
   }
 
@@ -263,7 +294,8 @@ int GsdmlDeviceData::cut_slot(unsigned int slot_idx)
 
   delete slot_data[slot_idx];
 
-  for (unsigned int i = slot_idx; i < slot_data.size() - 1; i++) {
+  for (unsigned int i = slot_idx; i < slot_data.size() - 1; i++)
+  {
     tmp_slot_idx = slot_data[i + 1]->slot_idx;
     tmp_slot_number = slot_data[i + 1]->slot_number;
 
@@ -295,7 +327,8 @@ int GsdmlDeviceData::paste_slot(unsigned int slot_idx)
 
   delete slot_data[slot_data.size() - 1];
 
-  for (unsigned int i = slot_data.size() - 1; i > slot_idx; i--) {
+  for (unsigned int i = slot_data.size() - 1; i > slot_idx; i--)
+  {
     tmp_slot_idx = slot_data[i - 1]->slot_idx;
     tmp_slot_number = slot_data[i - 1]->slot_number;
 
@@ -319,9 +352,11 @@ int GsdmlDeviceData::modify_value(const char* attr, const char* value)
   int ival, num2;
 
   num = dcli_parse(attr, "-", "", (char*)attrvect,
-      sizeof(attrvect) / sizeof(attrvect[0]), sizeof(attrvect[0]), 0);
+                   sizeof(attrvect) / sizeof(attrvect[0]), sizeof(attrvect[0]),
+                   0);
 
-  if (streq(attrvect[0], "NetworkSettings")) {
+  if (streq(attrvect[0], "NetworkSettings"))
+  {
     if (num < 2)
       return 0;
     if (streq(attrvect[1], "DeviceName"))
@@ -332,33 +367,42 @@ int GsdmlDeviceData::modify_value(const char* attr, const char* value)
       strncpy(subnet_mask, value, sizeof(subnet_mask));
     else if (streq(attrvect[1], "MAC Address"))
       strncpy(mac_address, value, sizeof(mac_address));
-    else if (streq(attrvect[1], "SendClock")) {
+    else if (streq(attrvect[1], "SendClock"))
+    {
       num2 = sscanf(value, "%d", &ival);
       if (num2 != 1)
         return 0;
       for (unsigned int i = 0; i < iocr_data.size(); i++)
         iocr_data[i]->send_clock_factor = ival;
-    } else if (streq(attrvect[1], "ReductionRatio")) {
+    }
+    else if (streq(attrvect[1], "ReductionRatio"))
+    {
       num2 = sscanf(value, "%d", &ival);
       if (num2 != 1)
         return 0;
       for (unsigned int i = 0; i < iocr_data.size(); i++)
         iocr_data[i]->reduction_ratio = ival;
-    } else if (streq(attrvect[1], "Phase")) {
+    }
+    else if (streq(attrvect[1], "Phase"))
+    {
       num2 = sscanf(value, "%d", &ival);
       if (num2 != 1)
         return 0;
       for (unsigned int i = 0; i < iocr_data.size(); i++)
         iocr_data[i]->phase = ival;
-    } else if (streq(attrvect[1], "API")) {
+    }
+    else if (streq(attrvect[1], "API"))
+    {
       num2 = sscanf(value, "%d", &ival);
       if (num2 != 1)
         return 0;
       for (unsigned int i = 0; i < iocr_data.size(); i++)
         iocr_data[i]->api = ival;
-    } else
+    }
+    else
       return 0;
-  } else
+  }
+  else
     return 0;
   return 1;
 }
@@ -369,9 +413,11 @@ int GsdmlDeviceData::get_value(const char* attr, char* buf, int bufsize)
   int num;
 
   num = dcli_parse(attr, "-", "", (char*)attrvect,
-      sizeof(attrvect) / sizeof(attrvect[0]), sizeof(attrvect[0]), 0);
+                   sizeof(attrvect) / sizeof(attrvect[0]), sizeof(attrvect[0]),
+                   0);
 
-  if (streq(attrvect[0], "NetworkSettings")) {
+  if (streq(attrvect[0], "NetworkSettings"))
+  {
     if (num < 2)
       return 0;
     if (streq(attrvect[1], "DeviceName"))
@@ -392,7 +438,8 @@ int GsdmlDeviceData::get_value(const char* attr, char* buf, int bufsize)
       snprintf(buf, bufsize, "%d", iocr_data[0]->api);
     else
       return 0;
-  } else
+  }
+  else
     return 0;
   return 1;
 }
@@ -413,6 +460,8 @@ int GsdmlDataReader::tag_name_to_id(const char* name, unsigned int* id)
     *id = gsdmldata_eTag_IOCR;
   else if (streq(name, "ChannelDiag"))
     *id = gsdmldata_eTag_ChannelDiag;
+  else if (streq(name, "ExtChannelDiag"))
+    *id = gsdmldata_eTag_ExtChannelDiag;
   else
     return 0;
 
@@ -423,22 +472,27 @@ int GsdmlDataReader::tag(const char* name)
 {
   if (tag_name_to_id(name, &current_tag))
     tag_stack_push(current_tag);
-  else {
+  else
+  {
     printf("XML-Parser: Unknown tag: %s\n", name);
     return 0;
   }
 
-  switch (current_tag) {
-  case gsdmldata_eTag_Slot: {
+  switch (current_tag)
+  {
+  case gsdmldata_eTag_Slot:
+  {
     GsdmlSlotData* sd = new GsdmlSlotData();
 
     data->slot_data.push_back(sd);
     object_stack_push(sd, current_tag);
     break;
   }
-  case gsdmldata_eTag_Subslot: {
+  case gsdmldata_eTag_Subslot:
+  {
     GsdmlSlotData* sd = (GsdmlSlotData*)get_object_stack(gsdmldata_eTag_Slot);
-    if (!sd) {
+    if (!sd)
+    {
       printf("XML-Parser: Subslot outside slot");
       break;
     }
@@ -449,11 +503,13 @@ int GsdmlDataReader::tag(const char* name)
     object_stack_push(ssd, current_tag);
     break;
   }
-  case gsdmldata_eTag_DataRecord: {
-    GsdmlSubslotData* ssd
-        = (GsdmlSubslotData*)get_object_stack(gsdmldata_eTag_Subslot);
-    if (!ssd) {
-      printf("XML-Parser: RecordData outside subslot");
+  case gsdmldata_eTag_DataRecord:
+  {
+    GsdmlSubslotData* ssd =
+        (GsdmlSubslotData*)get_object_stack(gsdmldata_eTag_Subslot);
+    if (!ssd)
+    {
+      printf("XML-Parser: RecordData outside subslot\n");
       break;
     }
 
@@ -463,18 +519,34 @@ int GsdmlDataReader::tag(const char* name)
     object_stack_push(dr, current_tag);
     break;
   }
-  case gsdmldata_eTag_IOCR: {
+  case gsdmldata_eTag_IOCR:
+  {
     GsdmlIOCRData* iod = new GsdmlIOCRData();
 
     data->iocr_data.push_back(iod);
     object_stack_push(iod, current_tag);
     break;
   }
-  case gsdmldata_eTag_ChannelDiag: {
+  case gsdmldata_eTag_ChannelDiag:
+  {
     GsdmlChannelDiag* cd = new GsdmlChannelDiag();
 
     data->channel_diag.push_back(cd);
     object_stack_push(cd, current_tag);
+    break;
+  }
+  case gsdmldata_eTag_ExtChannelDiag:
+  {
+    GsdmlChannelDiag* cd = (GsdmlChannelDiag*)get_object_stack(gsdmldata_eTag_ChannelDiag);
+    if (!cd)
+    {
+      printf("XML-Parser: ExtChannelDiag outside ChannelDiag\n");
+      break;
+    }
+    GsdmlExtChannelDiag* ecd = new GsdmlExtChannelDiag();
+
+    cd->ext_channel_diag.push_back(ecd);    
+    object_stack_push(ecd, current_tag);
     break;
   }
   default:;
@@ -482,22 +554,21 @@ int GsdmlDataReader::tag(const char* name)
 
   return 1;
 }
-int GsdmlDataReader::metatag(const char* name)
-{
-  return 1;
-}
+int GsdmlDataReader::metatag(const char* name) { return 1; }
 int GsdmlDataReader::tag_end(const char* name)
 {
   unsigned int id;
 
   if (tag_name_to_id(name, &id))
     tag_stack_pull(id);
-  else {
+  else
+  {
     printf("XML-Parser: Tag/EndTag mismach: %s\n", name);
     return 0;
   }
 
-  switch (id) {
+  switch (id)
+  {
   case gsdmldata_eTag_Slot:
     object_stack_pull(id);
     break;
@@ -510,24 +581,24 @@ int GsdmlDataReader::tag_end(const char* name)
   case gsdmldata_eTag_IOCR:
     object_stack_pull(id);
     break;
+  case gsdmldata_eTag_ExtChannelDiag:
+    object_stack_pull(id);
+    break;
   default:;
   }
   return 1;
 }
-int GsdmlDataReader::metatag_end(const char* name)
-{
-  return 1;
-}
-int GsdmlDataReader::tag_value(const char* name)
-{
-  return 1;
-}
+int GsdmlDataReader::metatag_end(const char* name) { return 1; }
+int GsdmlDataReader::tag_value(const char* name) { return 1; }
 int GsdmlDataReader::tag_attribute(const char* name, const char* value)
 {
-  switch (current_tag) {
+  switch (current_tag)
+  {
   case gsdmldata_eTag_PnDevice:
-    if (streq(name, "GsdmlFile")) {
-      if (!streq(data->gsdmlfile, "")) {
+    if (streq(name, "GsdmlFile"))
+    {
+      if (!streq(data->gsdmlfile, ""))
+      {
         // Check that the GSDML file is not changed
         char* gsdmlfile_p;
 
@@ -539,9 +610,11 @@ int GsdmlDataReader::tag_attribute(const char* name, const char* value)
 
         if (!streq(value, gsdmlfile_p) && !new_filename)
           return PB__GSDMLFILEMISMATCH;
-      } else
+      }
+      else
         strncpy(data->gsdmlfile, value, sizeof(data->gsdmlfile));
-    } else if (streq(name, "DeviceText"))
+    }
+    else if (streq(name, "DeviceText"))
       strncpy(data->device_text, value, sizeof(data->device_text));
     else if (streq(name, "DeviceNumber"))
       sscanf(value, "%d", &data->device_num);
@@ -568,7 +641,8 @@ int GsdmlDataReader::tag_attribute(const char* name, const char* value)
     else if (streq(name, "Skip_IP_Assignment"))
       sscanf(value, "%d", &data->skip_ip_assignment);
     break;
-  case gsdmldata_eTag_Slot: {
+  case gsdmldata_eTag_Slot:
+  {
     GsdmlSlotData* sd = (GsdmlSlotData*)get_object_stack(current_tag);
 
     if (streq(name, "ModuleEnumNumber"))
@@ -585,7 +659,8 @@ int GsdmlDataReader::tag_attribute(const char* name, const char* value)
       sscanf(value, "%u", &sd->dap_fixed_slot);
     break;
   }
-  case gsdmldata_eTag_Subslot: {
+  case gsdmldata_eTag_Subslot:
+  {
     GsdmlSubslotData* sd = (GsdmlSubslotData*)get_object_stack(current_tag);
 
     if (streq(name, "SubslotNumber"))
@@ -602,7 +677,8 @@ int GsdmlDataReader::tag_attribute(const char* name, const char* value)
       sscanf(value, "%u", &sd->io_output_length);
     break;
   }
-  case gsdmldata_eTag_DataRecord: {
+  case gsdmldata_eTag_DataRecord:
+  {
     GsdmlDataRecord* dr = (GsdmlDataRecord*)get_object_stack(current_tag);
 
     if (streq(name, "DataLength"))
@@ -611,13 +687,15 @@ int GsdmlDataReader::tag_attribute(const char* name, const char* value)
       sscanf(value, "%hu", &dr->index);
     else if (streq(name, "TransferSequence"))
       sscanf(value, "%hu", &dr->transfer_sequence);
-    else if (streq(name, "Data")) {
+    else if (streq(name, "Data"))
+    {
       int len;
       co_xml_parser::ostring_to_data(&dr->data, value, dr->data_length, &len);
     }
     break;
   }
-  case gsdmldata_eTag_IOCR: {
+  case gsdmldata_eTag_IOCR:
+  {
     GsdmlIOCRData* iod = (GsdmlIOCRData*)get_object_stack(current_tag);
 
     if (streq(name, "Type"))
@@ -634,7 +712,8 @@ int GsdmlDataReader::tag_attribute(const char* name, const char* value)
       sscanf(value, "%u", &iod->api);
     break;
   }
-  case gsdmldata_eTag_ChannelDiag: {
+  case gsdmldata_eTag_ChannelDiag:
+  {
     GsdmlChannelDiag* cd = (GsdmlChannelDiag*)get_object_stack(current_tag);
 
     if (streq(name, "ErrorType"))
@@ -643,6 +722,18 @@ int GsdmlDataReader::tag_attribute(const char* name, const char* value)
       strncpy(cd->name, value, sizeof(cd->name));
     else if (streq(name, "Help"))
       strncpy(cd->help, value, sizeof(cd->help));
+    break;
+  }
+  case gsdmldata_eTag_ExtChannelDiag:
+  {
+    GsdmlExtChannelDiag* ecd = (GsdmlExtChannelDiag*)get_object_stack(current_tag);
+
+    if (streq(name, "ErrorType"))
+      sscanf(value, "%hu", &ecd->error_type);
+    else if (streq(name, "Name"))
+      strncpy(ecd->name, value, sizeof(ecd->name));
+    else if (streq(name, "Help"))
+      strncpy(ecd->help, value, sizeof(ecd->help));
     break;
   }
   default:;
