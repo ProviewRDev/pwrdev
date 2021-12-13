@@ -1329,7 +1329,8 @@ int unpack_get_alarm_con(T_PNAK_SERVICE_DESCRIPTION* pSdb,
         pwr_sClass_PnDevice* dev;
         pwr_sClass_PnAlarm* alarm;
         dev = (pwr_sClass_PnDevice*)slave_list->op;
-        
+        pwr_tObjid dev_objid = slave_list->Objid;        
+
         int index = dev->AlarmBuffer.IndexNext++;
         if (dev->AlarmBuffer.IndexNext >= dev->AlarmBuffer.BufferSize)
           dev->AlarmBuffer.IndexNext = 0;
@@ -1360,7 +1361,7 @@ int unpack_get_alarm_con(T_PNAK_SERVICE_DESCRIPTION* pSdb,
 
         // Loop through the modules
         io_sCard* card_list;
-        pwr_sClass_PnModule* module;
+        pwr_sClass_PnModule* module = NULL;
         int selected_actions = 0;
         for (card_list = slave_list->cardlist; card_list != NULL; card_list = card_list->next)
         {
@@ -1382,10 +1383,72 @@ int unpack_get_alarm_con(T_PNAK_SERVICE_DESCRIPTION* pSdb,
               if (dev->AlarmActionSelect & pwr_mPnDeviceAlarmActionMask_PROVIEW_LOG)
                 selected_actions |= pwr_mPnDeviceAlarmActionMask_PROVIEW_LOG;
             }
-            if (module->AlarmActionSelect & pwr_mPnModuleAlarmActionMask_ALARM)
-              selected_actions |= pwr_mPnDeviceAlarmActionMask_ALARM; // Use parents bitmask here for consistency
-            if (module->AlarmActionSelect & pwr_mPnModuleAlarmActionMask_PROVIEW_LOG)
-              selected_actions |= pwr_mPnDeviceAlarmActionMask_PROVIEW_LOG;
+          }
+        }
+
+        // Do we need to take action at all?
+        if (selected_actions)
+        {
+          pwr_tOName dev_name; // The name/path of the device that generated
+                               // the alarm
+          char data_str[250];  // If we have a data payload available we store it in hex format as a string
+          pwr_tString80 event_text = "\0";
+          pwr_tString256 event_more_text = "\0";
+          
+          gdh_ObjidToName(dev_objid, dev_name, sizeof(dev_name),
+                            cdh_mName_pathStrict);
+          
+          // Pretty print the data in hex          
+          for (int dlength = 0; dlength < data_length; dlength++)
+            sprintf(&data_str[dlength * 2], "%02X", *(data.raw_data + dlength));
+
+          // Generate the messages
+          if ((alarm->Type & PROFINET_ALARM_DIAGNOSIS_APPEARS) && data_length > 0)
+          {
+            // Generate null terminated messages (snprintf will always add '\0' even if strings are truncated)
+            // Default is just an informal text and the data
+            snprintf(event_more_text, sizeof(event_more_text), "Data: %s", data_str);
+            snprintf(event_text, sizeof(event_text), "PROFINET: Diagnostics from Slot: %d, Subslot: %d",
+                      alarm->SlotNumber, alarm->SubslotNumber);
+
+            for (GsdmlChannelDiag *channel_error_type : channel_diag_vector)
+            {
+              // TODO check host endianess
+              if (channel_error_type->error_type == bswap_16(data.pn_data->ChannelErrorType))
+              {
+                // We found a diagnostic string for this error type. Replace the generic alarm text.
+                snprintf(event_text, sizeof(event_text), "PROFINET: %s", channel_error_type->name);
+                snprintf(event_more_text, sizeof(event_more_text), "%s", channel_error_type->help);
+                
+                // Do we have any extended error types?
+                for (GsdmlExtChannelDiag *ext_channel_error_type : channel_error_type->ext_channel_diag)
+                {                  
+                  if (ext_channel_error_type->error_type == bswap_16(data.pn_data->ExtChannelErrorType))
+                  {
+                    // Replace the alarm with the extended information instead
+                    snprintf(event_text, sizeof(event_text), "PROFINET: %s", ext_channel_error_type->name);
+                    snprintf(event_more_text, sizeof(event_more_text), "%s", ext_channel_error_type->help);
+                  }
+                }
+              }                
+            }            
+          }
+          else if (alarm->Prio == pwr_ePnAlarmPrioEnum_High)
+          {
+            // Default high prio
+            snprintf(event_text, sizeof(event_text),
+                      "PROFINET High Priority Alarm. Slot: %d, Subslot: %d, "
+                      "type: %d",
+                      alarm->SlotNumber, alarm->SubslotNumber, alarm->Type);
+          }
+          else if (alarm->Prio == pwr_ePnAlarmPrioEnum_Low)
+          {
+            // Default low prio
+            snprintf(event_text, sizeof(event_text),
+                      "PROFINET Low Priority Alarm. Slot: %d, Subslot: %d, "
+                      "type: %d",
+                      alarm->SlotNumber, alarm->SubslotNumber, alarm->Type);
+
           }
 
           printf("actions: %d\n", selected_actions);
@@ -1415,20 +1478,13 @@ int unpack_get_alarm_con(T_PNAK_SERVICE_DESCRIPTION* pSdb,
             if (alarm->Prio == PN_SERVICE_ALARM_PRIO_LOW)
             {              
               //printf("PROFINET: Low priority alarm from device %s slot %d: 0x%s\n", dev->Description, alarm->SlotNumber, data_str);
-              errh_Info("PROFINET: Low priority alarm from device %s slot %d: 0x%s", dev->Description, alarm->SlotNumber, data_str);
             }
-            else
-            {
-              //printf("PROFINET: High priority alarm from device %s slot %d: 0x%s\n", dev->Description, alarm->SlotNumber, data_str);
-              errh_Warning("PROFINET: High priority alarm from device %s slot %d: 0x%s", dev->Description, alarm->SlotNumber, data_str);
-            }              
           }
         }
 
         
       }
     }
-
     printf("Alarm prio           %d\r\n"
            "      remaining      %d\r\n"
            "      type           %d\r\n"
