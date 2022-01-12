@@ -470,6 +470,7 @@ void pack_download_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes,
       unsigned int api = (*sub_it)->api;
       if (api_map.find(api) == api_map.end())
       {
+        printf("Found new API\n");
         api_map.emplace(api, api);
         num_apis++;
       }      
@@ -488,14 +489,21 @@ void pack_download_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes,
 
   // printf("Number of submodules for this slave: %d\n", num_submodules);
   // printf("Data record size for slave: %d\n", data_record_length);
+  // printf("num_iocrs: %d\n", num_iocrs);
+  // printf("num_apis: %d\n", num_apis);
+  // printf("num_modules: %d\n", num_modules);
+  // printf("num_submodules: %d\n", num_submodules);
+  // printf("num_datarecords: %d\n", num_datarecords);
+  // printf("num_data_record_length: %d\n", data_record_length);
 
-  length = sizeof(T_PN_SERVICE_DOWNLOAD_REQ) + num_iocrs * sizeof(T_PN_IOCR) +
-           num_apis * sizeof(T_PN_API) + num_modules * sizeof(T_PN_MODULE) +
-           num_submodules * sizeof(T_PN_SUBMODULE) +
-           num_datarecords * sizeof(T_PN_DATA_RECORD) +
-           (num_iocrs * num_apis + num_modules + num_datarecords) *
-               sizeof(T_PN_REFERENCE) +
-           data_record_length;
+
+  // printf("sizeof DOWNLOAD_REQ: %d\n", sizeof(T_PN_SERVICE_DOWNLOAD_REQ));
+  // printf("sizeof PN_IOCR: %d\n", sizeof(T_PN_IOCR));
+  // printf("sizeof T_PN_API: %d\n", sizeof(T_PN_API));
+  // printf("sizeof T_PN_MODULE: %d\n", sizeof(T_PN_MODULE));
+  // printf("sizeof T_PN_SUBMODULE: %d\n", sizeof(T_PN_SUBMODULE));
+  // printf("sizeof T_PN_DATA_RECORD: %d\n", sizeof(T_PN_DATA_RECORD));
+  // printf("sizeof T_PN_REFERENCE: %d\n", sizeof(T_PN_REFERENCE));
 
   pData = (char*)(service_desc + 1);
 
@@ -559,15 +567,17 @@ void pack_download_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes,
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat-security"
-  sprintf(pSDR->DeviceName, dev_data->device_name);
+snprintf(pSDR->DeviceName, PN_MAX_DEVICE_NAME_LENGTH, xml_dev_data->device_name);
 #pragma GCC diagnostic pop
+  
 
   if (device_ref == PN_DEVICE_REFERENCE_THIS_STATION)
   {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat-security"
-    sprintf(pSDR->InterfaceName, dev_data->device_text);
+    snprintf(pSDR->InterfaceName, PN_MAX_INTERFACE_NAME_LENGTH, xml_dev_data->device_text);
 #pragma GCC diagnostic pop
+    
     // pSDR->Flag = PN_SERVICE_DOWNLOAD_FLAG_ACTIVATE;
     // PN_SERVICE_DOWNLOAD_FLAG_FULL_APPLICATION_IDENT_SUPPORT
     // PN_SERVICE_DOWNLOAD_FLAG_DISABLE_DCP_HELLO
@@ -589,17 +599,11 @@ void pack_download_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes,
     
     // ar_property = PROFINET_AR_PROPERTY_STATE_PRIMARY |
     //               PROFINET_AR_PROPERTY_PARAMETER_SERVER_CM |
-    //               PROFINET_AR_PROPERTY_DATA_RATE_100MBIT |
-    //               PROFINET_AR_PROPERTY_STARTUP_MODE_LEGACY;
-
-    // ar_property = PROFINET_AR_PROPERTY_STATE_PRIMARY |    
-    //               PROFINET_AR_PROPERTY_PARAMETER_SERVER_CM |    
     //               PROFINET_AR_PROPERTY_STARTUP_MODE_ADVANCED;
-    
-    ar_property = PROFINET_AR_PROPERTY_STATE_PRIMARY |    
-                  PROFINET_AR_PROPERTY_PARAMETER_SERVER_CM |    
+
+    ar_property = PROFINET_AR_PROPERTY_STATE_PRIMARY |
+                  PROFINET_AR_PROPERTY_PARAMETER_SERVER_CM |
                   PROFINET_AR_PROPERTY_STARTUP_MODE_LEGACY;
-    
 
     pSDR->AdditionalFlag = 0;
     if (xml_dev_data->skip_ip_assignment) pSDR->AdditionalFlag |= PN_SERVICE_DOWNLOAD_ADD_FLAG_SKIP_IP_ASSIGNMENT; 
@@ -629,9 +633,9 @@ void pack_download_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes,
   pSDR->NumberOfIOCRHighByte = _PN_U16_HIGH_BYTE(num_iocrs);
   pSDR->NumberOfIOCRLowByte = _PN_U16_LOW_BYTE(num_iocrs);
   pSDR->NumberOfAPIsHighByte = _PN_U16_HIGH_BYTE(num_apis);
-  pSDR->NumberOfAPIsLowByte = _PN_U16_LOW_BYTE(num_apis);
+  pSDR->NumberOfAPIsLowByte = _PN_U16_LOW_BYTE(num_apis);  
   pSDR->NumberOfModulesHighByte = _PN_U16_HIGH_BYTE(num_modules);
-  pSDR->NumberOfModulesLowByte = _PN_U16_LOW_BYTE(num_modules);
+  pSDR->NumberOfModulesLowByte = _PN_U16_LOW_BYTE(num_modules);  
   pSDR->NumberOfDataRecordsHighByte = _PN_U16_HIGH_BYTE(num_datarecords);
   pSDR->NumberOfDataRecordsLowByte = _PN_U16_LOW_BYTE(num_datarecords);
 
@@ -653,14 +657,17 @@ void pack_download_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes,
   pSDR->AlarmCRBlock.TagHeaderLowHighByte = 0xA0;
   pSDR->AlarmCRBlock.TagHeaderLowLowByte = 0;
 
+  length = sizeof(T_PN_SERVICE_DOWNLOAD_REQ);
+
   /* Fill the IOCRS's */
 
   pIOCR = (T_PN_IOCR*)(pSDR + 1);
 
   for (ii = 0; ii < num_iocrs; ii++)
   {
+    length += sizeof(T_PN_IOCR);
+    
     /* Fill data for IOCR */
-
     pIOCR->VersionHighByte = pSDR->VersionHighByte;
     pIOCR->VersionLowByte = pSDR->VersionLowByte;
     pIOCR->TypeHighByte = _PN_U16_HIGH_BYTE(xml_dev_data->iocr_data[ii]->type);
@@ -720,9 +727,12 @@ void pack_download_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes,
     /* Fill references to API */
 
     pAPIReference = (T_PN_REFERENCE*)(pIOCR + 1);
+    printf("api_map.size(): %d\n", api_map.size());
 
     for (const auto& cApi : api_map)        
     {
+      printf("Adding reference to API %d for this IOCR %d\n", cApi.second.api, ii);
+      length += sizeof(T_PN_REFERENCE);
       pAPIReference->ReferenceHighByte = _PN_U16_HIGH_BYTE(cApi.second.api);
       pAPIReference->ReferenceLowByte = _PN_U16_LOW_BYTE(cApi.second.api);
       pAPIReference++;
@@ -737,16 +747,21 @@ void pack_download_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes,
   
   for (const auto& cApi : api_map)
   {
+    length += sizeof(T_PN_API);
     /* Fill data for API */
+    printf("cApi.second.api: %d\n", cApi.second.api);
+    printf("cApi.second.module_index.size(): %d\n", cApi.second.module_index.size());    
     pAPI->APIHighWordHighByte = _PN_U32_HIGH_HIGH_BYTE(cApi.second.api);
     pAPI->APIHighWordLowByte = _PN_U32_HIGH_LOW_BYTE(cApi.second.api);
     pAPI->APILowWordHighByte = _PN_U32_LOW_HIGH_BYTE(cApi.second.api);
     pAPI->APILowWordLowByte = _PN_U32_LOW_LOW_BYTE(cApi.second.api);
 
     pAPI->NumberOfModulesHighByte =
-        _PN_U16_HIGH_BYTE(cApi.second.module_index.size());
+        _PN_U16_HIGH_BYTE(cApi.second.module_index.size()); // Blir 5 ska vara 2...
     pAPI->NumberOfModulesLowByte =
         _PN_U16_LOW_BYTE(cApi.second.module_index.size());
+    
+    //printf("number of modules (%d) for api %d\n", pAPI->NumberOfModulesLowByte, cApi.second.api);
 
     /* Fill references to Modules */
 
@@ -754,6 +769,8 @@ void pack_download_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes,
 
     for (unsigned int index : cApi.second.module_index)
     {
+      printf("Adding reference to module %d for API %d\n", index, cApi.second.api);
+      length += sizeof(T_PN_REFERENCE);
       pModuleReference->ReferenceHighByte = _PN_U16_HIGH_BYTE(index);
       pModuleReference->ReferenceLowByte = _PN_U16_LOW_BYTE(index);
       pModuleReference++;
@@ -768,8 +785,8 @@ void pack_download_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes,
 
   for (ii = 0; ii < num_modules; ii++)
   {
-    /* Fill data for MODULE */
-
+    length += sizeof(T_PN_MODULE);
+    /* Fill data for MODULE */    
     pModule->VersionHighByte = pSDR->VersionHighByte;
     pModule->VersionLowByte = pSDR->VersionLowByte;
     pModule->SlotNumberHighByte =
@@ -789,15 +806,15 @@ void pack_download_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes,
     pModule->NumberOfSubmodulesHighByte =
         _PN_U16_HIGH_BYTE(xml_dev_data->slot_data[ii]->subslot_data.size());
     pModule->NumberOfSubmodulesLowByte =
-        _PN_U16_LOW_BYTE(xml_dev_data->slot_data[ii]->subslot_data.size());
-
+        _PN_U16_LOW_BYTE(xml_dev_data->slot_data[ii]->subslot_data.size());     
     /* Fill the SUBMODULE's */
 
     pSubModule = (T_PN_SUBMODULE*)(pModule + 1);
 
     for (jj = 0; jj < xml_dev_data->slot_data[ii]->subslot_data.size(); jj++)
     {
-      /* Fill data for the submodule */      
+      length += sizeof(T_PN_SUBMODULE);
+      /* Fill data for the submodule */
 
       pSubModule->SubSlotNumberHighByte = _PN_U16_HIGH_BYTE(
           xml_dev_data->slot_data[ii]->subslot_data[jj]->subslot_number);
@@ -828,7 +845,7 @@ void pack_download_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes,
       else
       {
         sub_prop = PROFINET_IO_SUBMODULE_TYPE_NO_INPUT_NO_OUTPUT;
-      }
+      }      
 
       pSubModule->PropertiesHighByte = _PN_U16_HIGH_BYTE(sub_prop);
       pSubModule->PropertiesLowByte = _PN_U16_LOW_BYTE(sub_prop);
@@ -855,6 +872,7 @@ void pack_download_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes,
            kk < xml_dev_data->slot_data[ii]->subslot_data[jj]->data_record.size();
            kk++)
       {
+        length += sizeof(T_PN_REFERENCE);        
         pDataRecordReference->ReferenceHighByte =
             _PN_U16_HIGH_BYTE(datarecord_ind);
         pDataRecordReference->ReferenceLowByte =
@@ -881,6 +899,12 @@ void pack_download_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes,
            kk < xml_dev_data->slot_data[ii]->subslot_data[jj]->data_record.size();
            kk++)
       {
+        uint user_data_length = xml_dev_data->slot_data[ii]
+                                 ->subslot_data[jj]
+                                 ->data_record[kk]
+                                 ->data_length;
+        length += sizeof(T_PN_DATA_RECORD) + user_data_length;
+        // printf("Fill data records slot (%d), subslot(%d): %d \n", ii, jj, kk);
         pDataRecord->VersionHighByte = pSDR->VersionHighByte;
         pDataRecord->VersionLowByte = pSDR->VersionLowByte;
         pDataRecord->SequenceHighByte =
@@ -909,18 +933,17 @@ void pack_download_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes,
         //_PN_U32_LOW_HIGH_BYTE(PROFINET_DEFAULT_API);
         //	pDataRecord->APILowWordLowByte   =
         //_PN_U32_LOW_LOW_BYTE(PROFINET_DEFAULT_API);
-        pDataRecord->IndexHighByte = _PN_U16_HIGH_BYTE(
-            xml_dev_data->slot_data[ii]->subslot_data[jj]->data_record[kk]->index);
-        pDataRecord->IndexLowByte = _PN_U16_LOW_BYTE(
-            xml_dev_data->slot_data[ii]->subslot_data[jj]->data_record[kk]->index);
-        pDataRecord->LengthHighByte = _PN_U16_HIGH_BYTE(xml_dev_data->slot_data[ii]
-                                                            ->subslot_data[jj]
-                                                            ->data_record[kk]
-                                                            ->data_length);
-        pDataRecord->LengthLowByte = _PN_U16_LOW_BYTE(xml_dev_data->slot_data[ii]
-                                                          ->subslot_data[jj]
-                                                          ->data_record[kk]
-                                                          ->data_length);
+        pDataRecord->IndexHighByte =
+            _PN_U16_HIGH_BYTE(xml_dev_data->slot_data[ii]
+                                  ->subslot_data[jj]
+                                  ->data_record[kk]
+                                  ->index);
+        pDataRecord->IndexLowByte = _PN_U16_LOW_BYTE(xml_dev_data->slot_data[ii]
+                                                         ->subslot_data[jj]
+                                                         ->data_record[kk]
+                                                         ->index);
+        pDataRecord->LengthHighByte = _PN_U16_HIGH_BYTE(user_data_length);
+        pDataRecord->LengthLowByte = _PN_U16_LOW_BYTE(user_data_length);
 
         pData = (char*)(pDataRecord + 1);
         memcpy(pData,
@@ -941,7 +964,7 @@ void pack_download_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes,
 
   service_desc->DataLength = length;
 
-  /*  if (device_ref != 0) {
+  if (device_ref != 0) {
 
     pData = (char *) (pSDR);
     printf("Download of device: %s\n", xml_dev_data->device_name);
@@ -952,7 +975,7 @@ void pack_download_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes,
     }
     printf("\n");
     printf("\n");
-    }*/
+    }
 }
 
 int unpack_get_los_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local)
@@ -1680,7 +1703,11 @@ int unpack_download_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local)
     }
 
     if (ii == local->device_data.size())
+    {
+      printf("No dev found!\n");
       return -1; // ERR_NODEV_FOUND;
+    }
+      
 
     pDownloadCon = (T_PN_SERVICE_DOWNLOAD_CON*)(pSdb + 1);
     pIOCRInfo = (T_PN_IOCR_INFO*)(pDownloadCon + 1);
@@ -1868,6 +1895,7 @@ int unpack_download_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local)
   }
   else if (pSdb->Result == PNAK_RESULT_NEG)
   {
+    
     T_PN_SERVICE_ERROR_CON* pErrorCon = (T_PN_SERVICE_ERROR_CON*)(pSdb + 1);
 
     printf("channel %d: download.con [-] (%d)\r\n"
@@ -1881,6 +1909,8 @@ int unpack_download_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local)
            pErrorCon->AreaCode);
   }
 
+
+
   return -1;
 }
 
@@ -1890,7 +1920,7 @@ int handle_service_con(io_sAgentLocal* local, io_sAgent* ap)
   unsigned short ii;
 
   memset(&local->service_con, 0, sizeof(T_PNAK_SERVICE_CON));
-  sts = pnak_get_service_con(0, &local->service_con);
+  sts = pnak_get_service_con(0, &local->service_con); 
 
   if (sts == PNAK_NOTIFICATION_RECEIVED)
   {
@@ -1911,8 +1941,8 @@ int handle_service_con(io_sAgentLocal* local, io_sAgent* ap)
         // printf("EXTENDED DOWNLOAD!\n");
         case PN_SERVICE_DOWNLOAD:
         {
-          // printf("unpack_download_con\n");
-          sts = unpack_download_con(pSdb, local);
+          //printf("unpack_download_con\n");
+          sts = unpack_download_con(pSdb, local);          
           break;
         }
 
@@ -2015,10 +2045,10 @@ int wait_service_con(io_sAgentLocal* local, io_sAgent* ap)
   sts = pnak_wait_for_multiple_objects(0, &wait_object, PNAK_INFINITE_TIMEOUT);
 
   if (sts == PNAK_OK)
-  {
+  {    
     sts = handle_service_con(local, ap);
   }
-
+  
   return sts;
 }
 
@@ -2148,7 +2178,7 @@ void* handle_events(void* ptr)
   io_sAgentLocal* local;
   io_sAgent* ap;
   T_PNAK_WAIT_OBJECT wait_object;
-  int sts;
+  int sts;  
 
   pwr_sClass_PnControllerSoftingPNAK* op;
   //  pwr_tUInt16 sts;
@@ -2386,6 +2416,7 @@ void* handle_events(void* ptr)
       }
       else
       {
+        printf("Failed to download conf (sts: %d)\n", sts);
         errh_Error("PROFINET: Download of device configuration failed for: %s",
                    xml_dev_data_vect[ii]->device_name);
         /* Setup a dummy i/o area. Depending on exisiting channels this area

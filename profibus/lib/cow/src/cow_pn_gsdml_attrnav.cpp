@@ -1497,13 +1497,48 @@ int GsdmlAttrNav::save(const char* filename)
       if (gsdml->ApplicationProcess->ChannelDiagList->ChannelDiagItem[i]
               ->Body.Help.p)
       {
-          strncpy(cd->help,
-            (char*)gsdml->ApplicationProcess->ChannelDiagList
-              ->ChannelDiagItem[i]
-              ->Body.Help.p,
-              sizeof(cd->help));
-          //Make sure we null terminate these in case our buffer is too small to accomodate the entire help string.
-          cd->help[sizeof(cd->help) - 1] = '\0';
+        strncpy(cd->help,
+                (char*)gsdml->ApplicationProcess->ChannelDiagList
+                    ->ChannelDiagItem[i]
+                    ->Body.Help.p,
+                sizeof(cd->help));
+        // Make sure we null terminate these in case our buffer is too small to
+        // accomodate the entire help string.
+        cd->help[sizeof(cd->help) - 1] = '\0';
+      }
+
+      if (gsdml->ApplicationProcess->ChannelDiagList->ChannelDiagItem[i]
+              ->ExtChannelDiagList)
+      {
+        gsdml_ExtChannelDiagList* list =
+            gsdml->ApplicationProcess->ChannelDiagList->ChannelDiagItem[i]
+                ->ExtChannelDiagList;
+        for (auto& ext_diag_item : list->ExtChannelDiagItem)
+        {
+          if (ext_diag_item->Body.Name.p == (void*)0)
+            continue;
+
+          GsdmlExtChannelDiag* ecd = new GsdmlExtChannelDiag;
+          ecd->error_type = ext_diag_item->Body.ErrorType;
+          strncpy(ecd->name, (char*)ext_diag_item->Body.Name.p,
+                  sizeof(ecd->name));
+          // Make sure we null terminate these in case our buffer is too small
+          // to accomodate the entire diag name string.
+          ecd->name[sizeof(ecd->name) - 1] = '\0';
+
+          // Copy help part
+          if (ext_diag_item->Body.Help.p)
+          {
+            strncpy(ecd->help, (char*)ext_diag_item->Body.Help.p,
+                    sizeof(ecd->help));
+          }
+
+          // Make sure we null terminate these in case our buffer is too small
+          // to accomodate the entire help string.
+          ecd->help[sizeof(ecd->help) - 1] = '\0';
+
+          cd->ext_channel_diag.push_back(ecd);
+        }
       }
 
       dev_data.channel_diag.push_back(cd);
@@ -3080,6 +3115,31 @@ int ItemPnDAP::open_children(GsdmlAttrNav* attrnav, double x, double y)
           subslot_index++;
         }
       }
+      // Do we have a list of usable submodules? For instance PortSubmoduleItems such as FibreChannel modules or Copper Modules for the interfaces...
+      if (attrnav->device_item->UseableSubmodules)
+      {       
+        new ItemPnSubmoduleType(attrnav, "SubmoduleType",  32769, 0, 2, attrnav->device_item->UseableSubmodules, node, flow_eDest_IntoLast);
+        //new ItemPnSubmoduleType(attrnav, "SubmoduleType",  32770, 2, 3, attrnav->device_item->UseableSubmodules, node, flow_eDest_IntoLast); 
+        // for (auto const& submodule_item_ref : attrnav->device_item->UseableSubmodules->SubmoduleItemRef)
+        // {
+        //   for (auto const& subslot : attrnav->device_item->SubslotList->SubslotItem)
+        //   {            
+        //     if (subslot->Body.SubslotNumber > 0x8000)
+        //     {
+              
+          //   }
+          // }
+          // Loopa genom subslotlist igen...
+           char name[200];
+           char order_number[200];
+          //new ItemPnSubmoduleType(attrnav, "hej", )
+          //gsdml_PortSubmoduleItem* psmi =  (gsdml_PortSubmoduleItem*)submodule_item_ref->Body.SubmoduleItemTarget.p;
+          //strncat(name, (char*)psmi->ModuleInfo->Body.Name.p, sizeof(name));
+          //strncat(order_number, (char*)psmi->ModuleInfo->Body.OrderNumber, sizeof(order_number));
+                    
+          
+        
+      }
     }
 
     brow_SetOpen(node, attrnav_mOpen_Children);
@@ -3904,8 +3964,11 @@ int ItemPnSubmoduleType::open_children(GsdmlAttrNav* attrnav, double x,
           continue;
         }
         char mname[160] = "ModuleName";
-        gsdml_VirtualSubmoduleItem* mi =
-            (gsdml_VirtualSubmoduleItem*)us->SubmoduleItemRef[i]
+        // gsdml_VirtualSubmoduleItem* mi =
+        //     (gsdml_VirtualSubmoduleItem*)us->SubmoduleItemRef[i]
+        //         ->Body.SubmoduleItemTarget.p;
+        gsdml_PortSubmoduleItem* mi =
+            (gsdml_PortSubmoduleItem*)us->SubmoduleItemRef[i]
                 ->Body.SubmoduleItemTarget.p;
         if (!mi || !mi->ModuleInfo || !mi->ModuleInfo->Body.Name.p)
           continue;
@@ -3914,12 +3977,12 @@ int ItemPnSubmoduleType::open_children(GsdmlAttrNav* attrnav, double x,
         // Find index in submodule list
         int idx = 0;
         for (unsigned int j = 0; j < attrnav->gsdml->ApplicationProcess
-                                         ->SubmoduleList->SubmoduleItem.size();
+                                         ->SubmoduleList->PortSubmoduleItem.size();
              j++)
         {
-          gsdml_VirtualSubmoduleItem* si =
-              (gsdml_VirtualSubmoduleItem*)attrnav->gsdml->ApplicationProcess
-                  ->SubmoduleList->SubmoduleItem[j];
+          gsdml_PortSubmoduleItem* si =
+              (gsdml_PortSubmoduleItem*)attrnav->gsdml->ApplicationProcess
+                  ->SubmoduleList->PortSubmoduleItem[j];
           if (si->ModuleInfo == mi->ModuleInfo)
           {
             idx = j + 1;
