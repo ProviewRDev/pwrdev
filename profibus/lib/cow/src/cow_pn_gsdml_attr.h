@@ -69,7 +69,7 @@ class GsdmlAttr
 public:
   void* parent_ctx;
   char name[80];
-  pn_gsdml* gsdml;
+  //pn_gsdml* gsdml;
   int edit_mode;
   GsdmlAttrNav* attrnav;
   int input_open;
@@ -84,8 +84,7 @@ public:
   pwr_tFileName data_filename;
   CoWow* wow;
 
-  GsdmlAttr(void* a_parent_ctx, void* a_object, pn_gsdml* a_gsdml,
-            int a_edit_mode, const char* a_data_filename);
+  GsdmlAttr(void* a_parent_ctx, void* a_object, int a_edit_mode);
   virtual ~GsdmlAttr();
 
   virtual void message(char severity, const char* message) {}

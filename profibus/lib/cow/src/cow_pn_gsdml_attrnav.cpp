@@ -37,13 +37,20 @@
 /* cow_pn_gsdml_attrnav.cpp -- Display gsd attributes */
 
 #include <stdlib.h>
+#include <sstream>
+#include <string>
+#include <memory>
+#include <arpa/inet.h>
+#include <typeinfo>
 
 #include "co_cdh.h"
 #include "co_dcli.h"
 #include "co_string.h"
 #include "co_time.h"
+#include "co_fs_util.h"
 
 #include "rt_pb_msg.h"
+#include "rt_profinet.h"
 
 #include "cow_wow.h"
 
@@ -52,6 +59,7 @@
 #include "glow_growapi.h"
 
 #include "cow_pn_gsdml_attrnav.h"
+#include "cow_pn_gsdml_util.h"
 
 #include "pwr_baseclasses.h"
 
@@ -65,142 +73,51 @@ static char null_str[] = "";
 //
 // Convert attribute string to value
 //
-int GsdmlAttrNav::attr_string_to_value(int type_id, const char* value_str,
-                                       void* buffer_ptr, int buff_size,
-                                       int attr_size)
-{
-  switch (type_id)
-  {
-  case pwr_eType_Boolean:
-  {
-    if (sscanf(value_str, "%d", (pwr_tBoolean*)buffer_ptr) != 1)
-      return ATTRNAV__INPUT_SYNTAX;
-    if (*(pwr_tBoolean*)buffer_ptr > 1)
-      return ATTRNAV__INPUT_SYNTAX;
-    break;
-  }
-  case pwr_eType_Float32:
-  {
-    pwr_tFloat32 f;
-    if (sscanf(value_str, "%f", &f) != 1)
-      return ATTRNAV__INPUT_SYNTAX;
-    memcpy(buffer_ptr, (char*)&f, sizeof(f));
+// int GsdmlAttrNav::attr_string_to_value(int type_id, const char* value_str,
+//                                        void* buffer_ptr, int buff_size,
+//                                        int attr_size)
+// {
+//   switch (type_id)
+//   {
+//   case pwr_eType_Boolean:
+//   {
+//     if (sscanf(value_str, "%d", (pwr_tBoolean*)buffer_ptr) != 1)
+//       return ATTRNAV__INPUT_SYNTAX;
+//     if (*(pwr_tBoolean*)buffer_ptr > 1)
+//       return ATTRNAV__INPUT_SYNTAX;
+//     break;
+//   }
+//   case pwr_eType_Float32:
+//   {
+//     pwr_tFloat32 f;
+//     if (sscanf(value_str, "%f", &f) != 1)
+//       return ATTRNAV__INPUT_SYNTAX;
+//     memcpy(buffer_ptr, (char*)&f, sizeof(f));
 
-    break;
-  }
-  case pwr_eType_Int32:
-  {
-    if (sscanf(value_str, "%d", (int*)buffer_ptr) != 1)
-      return ATTRNAV__INPUT_SYNTAX;
-    break;
-  }
-  case pwr_eType_UInt32:
-  {
-    if (sscanf(value_str, "%u", (int*)buffer_ptr) != 1)
-      return ATTRNAV__INPUT_SYNTAX;
-    break;
-  }
-  case pwr_eType_String:
-  {
-    if ((int)strlen(value_str) >= attr_size)
-      return ATTRNAV__STRINGTOLONG;
-    strncpy((char*)buffer_ptr, value_str, MIN(attr_size, buff_size));
-    break;
-  }
-  }
-  return 1;
-}
-
-//
-// Convert attribute value to string
-//
-void GsdmlAttrNav::attrvalue_to_string(int type_id, void* value_ptr, char* str,
-                                       int size, int* len, char* format)
-{
-  if (value_ptr == 0)
-  {
-    strcpy(str, "UNDEFINED");
-    return;
-  }
-
-  switch (type_id)
-  {
-  case pwr_eType_Boolean:
-  {
-    if (!format)
-      *len = sprintf(str, "%d", *(pwr_tBoolean*)value_ptr);
-    else
-      *len = sprintf(str, format, *(pwr_tBoolean*)value_ptr);
-    break;
-  }
-  case pwr_eType_Float32:
-  {
-    if (!format)
-      *len = sprintf(str, "%f", *(float*)value_ptr);
-    else
-      *len = sprintf(str, format, *(float*)value_ptr);
-    break;
-  }
-  case pwr_eType_UInt8:
-  {
-    if (!format)
-      *len = sprintf(str, "%hhu", *(pwr_tUInt8*)value_ptr);
-    else
-      *len = sprintf(str, format, *(pwr_tUInt8*)value_ptr);
-    break;
-  }
-  case pwr_eType_UInt16:
-  {
-    if (!format)
-      *len = sprintf(str, "%hu", *(pwr_tUInt16*)value_ptr);
-    else
-      *len = sprintf(str, format, *(pwr_tUInt16*)value_ptr);
-    break;
-  }
-  case pwr_eType_UInt32:
-  {
-    if (!format)
-      *len = sprintf(str, "%u", *(int*)value_ptr);
-    else
-      *len = sprintf(str, format, *(int*)value_ptr);
-    break;
-  }
-  case pwr_eType_Int8:
-  {
-    if (!format)
-      *len = sprintf(str, "%hhd", *(pwr_tInt8*)value_ptr);
-    else
-      *len = sprintf(str, format, *(pwr_tInt8*)value_ptr);
-    break;
-  }
-  case pwr_eType_Int16:
-  {
-    if (!format)
-      *len = sprintf(str, "%hd", *(pwr_tInt16*)value_ptr);
-    else
-      *len = sprintf(str, format, *(pwr_tInt16*)value_ptr);
-    break;
-  }
-  case pwr_eType_Int32:
-  {
-    if (!format)
-      *len = sprintf(str, "%d", *(int*)value_ptr);
-    else
-      *len = sprintf(str, format, *(int*)value_ptr);
-    break;
-  }
-  case pwr_eType_String:
-  {
-    strncpy(str, (char*)value_ptr, size);
-    str[size - 1] = 0;
-    *len = strlen(str);
-    break;
-  }
-  default:
-    *len = 0;
-    str[0] = 0;
-  }
-}
+//     break;
+//   }
+//   case pwr_eType_Int32:
+//   {
+//     if (sscanf(value_str, "%d", (int*)buffer_ptr) != 1)
+//       return ATTRNAV__INPUT_SYNTAX;
+//     break;
+//   }
+//   case pwr_eType_UInt32:
+//   {
+//     if (sscanf(value_str, "%u", (int*)buffer_ptr) != 1)
+//       return ATTRNAV__INPUT_SYNTAX;
+//     break;
+//   }
+//   case pwr_eType_String:
+//   {
+//     if ((int)strlen(value_str) >= attr_size)
+//       return ATTRNAV__STRINGTOLONG;
+//     strncpy((char*)buffer_ptr, value_str, MIN(attr_size, buff_size));
+//     break;
+//   }
+//   }
+//   return 1;
+// }
 
 void GsdmlAttrNav::message(char sev, const char* text)
 {
@@ -238,14 +155,15 @@ void GsdmlAttrNavBrow::allocate_pixmaps()
 //
 GsdmlAttrNav::GsdmlAttrNav(void* xn_parent_ctx, const char* xn_name,
                            pn_gsdml* xn_gsdml, int xn_edit_mode,
+                           std::shared_ptr<ProfinetRuntimeData> pwr_pn_data,
                            pwr_tStatus* status)
     : parent_ctx(xn_parent_ctx), gsdml(xn_gsdml), edit_mode(xn_edit_mode),
-      trace_started(0), message_cb(0), change_value_cb(0), device_num(0),
-      device_item(0), device_confirm_active(0), device_read(0), viewio(0),
-      time_ratio(1), send_clock(32), phase(1),
+      trace_started(0), message_cb(0), change_value_cb(0),
+      device_confirm_active(0), device_read(0), viewio(0),
       order_moduletype(attr_eOrderModuleType_Default)
 {
-  strcpy(name, xn_name);
+  strcpy(m_name, xn_name);
+  pn_runtime_data = pwr_pn_data;
 
   *status = 1;
 }
@@ -253,7 +171,7 @@ GsdmlAttrNav::GsdmlAttrNav(void* xn_parent_ctx, const char* xn_name,
 //
 //  Delete a nav context
 //
-GsdmlAttrNav::~GsdmlAttrNav() {}
+GsdmlAttrNav::~GsdmlAttrNav() { delete m_wow; }
 
 GsdmlAttrNavBrow::~GsdmlAttrNavBrow() { free_pixmaps(); }
 
@@ -324,15 +242,16 @@ void GsdmlAttrNav::expand_all()
   {
     brow_GetUserData(olist[i], (void**)&item);
 
-    if (!(item->type == attrnav_eItemType_PnParEnum ||
-          item->type == attrnav_eItemType_PnDevice ||
-          item->type == attrnav_eItemType_PnModuleType ||
-          item->type == attrnav_eItemType_PnSubmoduleType ||
-          item->type == attrnav_eItemType_PnDataItem ||
-          item->type == attrnav_eItemType_PnModuleClass ||
-          item->type == attrnav_eItemType_PnEnumByteOrder ||
-          item->type == attrnav_eItemType_PnEnumTimeRatio ||
-          item->type == attrnav_eItemType_PnEnumSendClock))
+    if (!(item->m_type == attrnav_eItemType_PnParEnum ||
+          item->m_type == attrnav_eItemType_PnDevice ||
+          item->m_type == attrnav_eItemType_PnModuleSelect ||
+          item->m_type == attrnav_eItemType_PnSubmoduleType ||
+          item->m_type == attrnav_eItemType_PnDataItem ||
+          item->m_type == attrnav_eItemType_PnModuleClass ||
+          item->m_type == attrnav_eItemType_PnEnumByteOrder ||
+          item->m_type == attrnav_eItemType_PnEnumTimeRatio ||
+          item->m_type == attrnav_eItemType_PnSubmoduleSelection ||
+          item->m_type == attrnav_eItemType_PnEnumSendClock))
       item->open_children(this, 0, 0);
     brow_GetObjectList(brow->ctx, &olist, &ocnt);
   }
@@ -383,13 +302,14 @@ int GsdmlAttrNav::set_attr_value(const char* value_str)
 //
 // Check that the current selected item is valid for change
 //
-int GsdmlAttrNav::check_attr_value(char** value)
+int GsdmlAttrNav::check_attr_value(std::string& p_value)
 {
   brow_tNode* node_list;
   int node_count;
   ItemPn* base_item;
-  static char buf[200];
-  int len;
+  //static char buf[200];
+  //std::string value;
+  //int len;
 
   brow_GetSelectedNodes(brow->ctx, &node_list, &node_count);
   if (!node_count)
@@ -398,36 +318,42 @@ int GsdmlAttrNav::check_attr_value(char** value)
   brow_GetUserData(node_list[0], (void**)&base_item);
   free(node_list);
 
-  switch (base_item->type)
+  switch (base_item->m_type)
   {
-  case attrnav_eItemType_PnBase:
+  case attrnav_eItemType_PnValueInput:
+    // Call into the base item to fetch the string instead..
+    p_value = base_item->to_string();
+    break;
+  case attrnav_eItemType_PnBase:  
   {
     ItemPnBase* item = (ItemPnBase*)base_item;
 
-    if (item->noedit)
+    if (item->m_noedit)
     {
-      *value = 0;
+      p_value = "";
       return PB__ATTRNOEDIT;
     }
-    attrvalue_to_string(item->type_id, item->value_p, buf, sizeof(buf), &len,
-                        NULL);
-    *value = buf;
+    p_value = GSDML::attr_value_to_string(item->m_value_type, item->m_value_p);
+    //GSDML::attr_value_to_string(item->m_type_id, item->m_value_p, &len, NULL);
+    //*p_value_p = buf;
     return PB__SUCCESS;
   }
   case attrnav_eItemType_PnParValue:
   {
     ItemPnParValue* item = (ItemPnParValue*)base_item;
-    int sts;
+    //int sts;
 
-    if (item->noedit)
+    if (item->m_noedit)
       return PB__ATTRNOEDIT;
 
-    sts = gsdml->datavalue_to_string(item->datatype,
-                                     &item->data[item->byte_offset], item->size,
-                                     buf, sizeof(buf));
-    if (EVEN(sts))
-      strcpy(buf, "");
-    *value = buf;
+    p_value = GSDML::datavalue_to_string(item->m_gsdml_datatype, &item->m_data[item->m_byte_offset]);
+    // sts = GSDML::datavalue_to_string(item->m_gsdml_datatype,
+    //                                  &item->m_data[item->m_byte_offset],
+    //                                  item->m_size, buf, sizeof(buf));
+    // if (EVEN(sts))
+    //   strcpy(buf, "");
+    //*p_value_p = buf;
+    //p_value_p = value.c_str();
     return PB__SUCCESS;
   }
   default:
@@ -617,13 +543,13 @@ int GsdmlAttrNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
       brow_GetUserData(node_list[0], (void**)&item_src);
       brow_GetUserData(event->object.object, (void**)&item_dest);
 
-      if (item_src->type != attrnav_eItemType_PnSlot)
+      if (item_src->m_type != attrnav_eItemType_PnSlot)
       {
         attrnav->message('E', "Unable to move this object");
         free(node_list);
         break;
       }
-      if (item_dest->type != attrnav_eItemType_PnSlot)
+      if (item_dest->m_type != attrnav_eItemType_PnSlot)
       {
         attrnav->message('E', "Invalid destination");
         free(node_list);
@@ -684,18 +610,38 @@ int GsdmlAttrNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
       return 1;
 
     brow_GetUserData(node_list[0], (void**)&item);
-    switch (item->type)
+    switch (item->m_type)
     {
+    case attrnav_eItemType_PnValueSelectItem:
+      item->selected(attrnav);
+      // Here we need to downcast our base item since all RTTI is lost when fiddling with void pointers...
+      // if (item->m_value_type == pwr_eType_String)
+      // {
+      //   auto selection_item = static_cast<ItemPnValueSelectItem<std::string>*>(item);
+      //   selection_item->select();
+      // }
+      // else if (item->m_value_type == pwr_eType_Boolean)
+      // {
+      //   auto selection_item = static_cast<ItemPnValueSelectItem<bool>*>(item);
+      //   selection_item->select();  
+      // }
+      break;
     case attrnav_eItemType_PnBase:
+    case attrnav_eItemType_PnValueInput:
     case attrnav_eItemType_PnParValue:
-      if (((ItemPnBase*)item)->parent)
+      if (((ItemPnBase*)item)->m_is_parent)
         item->open_children(attrnav, 0, 0);
-      else if (!((ItemPnBase*)item)->parent && attrnav->change_value_cb)
+      else if (!((ItemPnBase*)item)->m_is_parent && attrnav->change_value_cb)
         (attrnav->change_value_cb)(attrnav->parent_ctx);
       break;
     case attrnav_eItemType_PnEnumByteOrder:
       item->open_children(attrnav, 0, 0);
       break;
+    case attrnav_eItemType_PnIDSelectValue:
+    {
+      item->selected(attrnav);
+      break;
+    }
     case attrnav_eItemType_PnEnumValue:
     {
       int value;
@@ -709,31 +655,31 @@ int GsdmlAttrNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
       if (!value)
       {
         brow_SetRadiobutton(node_list[0], 0, 1);
-        *(int*)((ItemPnEnumValue*)item)->value_p =
-            ((ItemPnEnumValue*)item)->num;
+        *(int*)((ItemPnEnumValue*)item)->m_value_p =
+            ((ItemPnEnumValue*)item)->m_enum_value;
         attrnav->set_modified(1);
       }
       break;
     }
-    case attrnav_eItemType_PnEnumValueMType:
-    {
-      int value;
-      if (!attrnav->edit_mode)
-      {
-        attrnav->message('E', "Not in edit mode");
-        break;
-      }
+    // case attrnav_eItemType_PnEnumValueMType:
+    // {
+    //   int value;
+    //   if (!attrnav->edit_mode)
+    //   {
+    //     attrnav->message('E', "Not in edit mode");
+    //     break;
+    //   }
 
-      brow_GetRadiobutton(node_list[0], 0, &value);
-      if (!value)
-      {
-        brow_SetRadiobutton(node_list[0], 0, 1);
-        *(int*)((ItemPnEnumValueMType*)item)->value_p =
-            ((ItemPnEnumValueMType*)item)->num;
-        attrnav->set_modified(1);
-      }
-      break;
-    }
+    //   brow_GetRadiobutton(node_list[0], 0, &value);
+    //   if (!value)
+    //   {
+    //     brow_SetRadiobutton(node_list[0], 0, 1);
+    //     *(int*)((ItemPnEnumValueMType*)item)->value_p =
+    //         ((ItemPnEnumValueMType*)item)->num;
+    //     attrnav->set_modified(1);
+    //   }
+    //   break;
+    // }
     case attrnav_eItemType_PnParEnumBit:
     case attrnav_eItemType_PnParEnumValue:
       if (!attrnav->edit_mode)
@@ -771,7 +717,7 @@ int GsdmlAttrNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
     {
     case flow_eObjectType_Node:
       brow_GetUserData(event->object.object, (void**)&item);
-      switch (item->type)
+      switch (item->m_type)
       {
       case attrnav_eItemType_PnEnumValue:
         if (!event->radiobutton.value)
@@ -779,22 +725,22 @@ int GsdmlAttrNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
           brow_SetRadiobutton(event->radiobutton.object,
                               event->radiobutton.number,
                               !event->radiobutton.value);
-          *(int*)((ItemPnEnumValue*)item)->value_p =
-              ((ItemPnEnumValue*)item)->num;
+          *(int*)((ItemPnEnumValue*)item)->m_value_p =
+              ((ItemPnEnumValue*)item)->m_enum_value;
           attrnav->set_modified(1);
         }
         break;
-      case attrnav_eItemType_PnEnumValueMType:
-        if (!event->radiobutton.value)
-        {
-          brow_SetRadiobutton(event->radiobutton.object,
-                              event->radiobutton.number,
-                              !event->radiobutton.value);
-          *(int*)((ItemPnEnumValueMType*)item)->value_p =
-              ((ItemPnEnumValueMType*)item)->num;
-          attrnav->set_modified(1);
-        }
-        break;
+      // case attrnav_eItemType_PnEnumValueMType:
+      //   if (!event->radiobutton.value)
+      //   {
+      //     brow_SetRadiobutton(event->radiobutton.object,
+      //                         event->radiobutton.number,
+      //                         !event->radiobutton.value);
+      //     *(int*)((ItemPnEnumValueMType*)item)->value_p =
+      //         ((ItemPnEnumValueMType*)item)->num;
+      //     attrnav->set_modified(1);
+      //   }
+      //   break;
       case attrnav_eItemType_PnParEnumBit:
       case attrnav_eItemType_PnParEnumValue:
         item->update(attrnav);
@@ -851,120 +797,132 @@ void GsdmlAttrNav::force_trace_scan()
     brow_TraceScan(brow->ctx);
 }
 
+/*
+  When the device changes and everything is OK, i.e. the modules are directly
+  compatible with the old DAP/Device or the user has accepted that they are not
+  and that all settings will be lost. This is called to recreate everything.
+*/
 void GsdmlAttrNav::device_changed_ok(void* ctx, void* data)
 {
   GsdmlAttrNav* attrnav = (GsdmlAttrNav*)ctx;
 
+  // Do an update of underlying data structures
+  GsdmlAttrNav::device_update_change(attrnav);
+
+  // Delete all nodes, we will start all over
   brow_DeleteAll(attrnav->brow->ctx);
-  if (!attrnav->device_read)
-    attrnav->dev_data.device_reset();
+
+  // TODO Should we really reset the slots and all?
+
+  // if (!attrnav->device_read)
+  //   attrnav->dev_data.device_reset();
+
+  // Recreate everything
   attrnav->object_attr();
   attrnav->device_confirm_active = 0;
-  if (attrnav->device_read)
-    attrnav->device_read = 0;
-  else
-    attrnav->set_modified(1);
+
+  // if (attrnav->device_read)
+  //   attrnav->device_read = 0;
+  // else
+  //   attrnav->set_modified(1);
+
+  attrnav->set_modified(true);
 }
 
+/*
+  Update the device data upon a change of DAP
+*/
 void GsdmlAttrNav::device_update_change(void* ctx)
 {
   GsdmlAttrNav* attrnav = (GsdmlAttrNav*)ctx;
+  size_t slot_index = 0;
 
-  // Get new item
-  attrnav->device_item =
-      attrnav->gsdml->ApplicationProcess->DeviceAccessPointList
-          ->DeviceAccessPointItem[attrnav->device_num - 1];
+  // Our new DAP_ID is already updated, let's grab it...
+  std::string const& new_dap_id =
+      attrnav->pn_runtime_data->m_PnDevice->m_DAP_ID;
 
-  gsdml_UseableModules* um = attrnav->device_item->UseableModules;
+  // Update selected DAP
+  attrnav->m_selected_device_item =
+      attrnav->gsdml->getDeviceAccessPointMap()[new_dap_id];
 
-  // Save the enum numbers for the slots
-  for (unsigned int ii = 0; ii < attrnav->dev_data.slot_data.size(); ii++)
+  // The number of physical slots are not always the same in each DAP so we need
+  // to adjust the slot count If the new size is smaller the slots will be
+  // removed from the end. If it's bigger they will be default constructed. The
+  // PhysicalSlots starts at zero, hence the max() + 1.
+  attrnav->pn_runtime_data->m_PnDevice->m_slot_list.resize(
+      attrnav->m_selected_device_item->_PhysicalSlots.max() + 1);
+
+  for (auto& slot : attrnav->pn_runtime_data->m_PnDevice->m_slot_list)
   {
-    if (ii == 0)
+    // Since we might come from a resize (they might be default constructed with
+    // slot number of 0) of the slot list we give them all their respective slot
+    // number again :)
+    slot.m_slot_number = slot_index++;
+
+    // The DAP
+    if (slot.m_slot_number == 0)
     {
-      attrnav->dev_data.slot_data[ii]->slot_reset();
-      attrnav->dev_data.slot_data[ii]->module_ident_number =
-          attrnav->device_item->Body.ModuleIdentNumber;
+      slot.m_subslot_map.clear();
+      // slot.m_subslot_list.clear();
+      slot.m_module_ident_number =
+          attrnav->m_selected_device_item->_ModuleIdentNumber;
+      slot.m_module_ID = new_dap_id;
       continue;
-    }
-
-    if (attrnav->dev_data.slot_data[ii]->module_enum_number == 0)
-    {
-      break;
-    }
-
-    for (unsigned int jj = 0; jj < um->ModuleItemRef.size(); jj++)
-    {
-      gsdml_ModuleItem* mi =
-          (gsdml_ModuleItem*)um->ModuleItemRef[jj]->Body.ModuleItemTarget.p;
-
-      if (attrnav->dev_data.slot_data[ii]->module_ident_number ==
-          mi->Body.ModuleIdentNumber)
-      {
-        attrnav->dev_data.slot_data[ii]->module_enum_number = jj + 1;
-        break;
-      }
     }
   }
 }
 
+// Check to see if the new DAP is compatible with the already selected modules
+// in the configurator. If not we need to scrap the data and reconfigure the DAP
+// completely since they are not compatible...
 pwr_tBoolean GsdmlAttrNav::device_check_change_ok(void* ctx)
 {
   GsdmlAttrNav* attrnav = (GsdmlAttrNav*)ctx;
-  pwr_tBoolean found, check_ok;
 
-  gsdml_UseableModules* um =
-      attrnav->gsdml->ApplicationProcess->DeviceAccessPointList
-          ->DeviceAccessPointItem[attrnav->device_num - 1]
-          ->UseableModules;
+  // This is the newly selected DAP
+  // int device_num = attrnav->pn_runtime_data->m_PnDevice->m_device_num;
+  std::string const& new_dap_id =
+      attrnav->pn_runtime_data->m_PnDevice->m_DAP_ID;
 
-  check_ok = true;
+  // Get a reference to the new selected device
+  auto const new_dap = attrnav->gsdml->getDeviceAccessPointMap()[new_dap_id];
 
-  for (unsigned int ii = 0; ii < attrnav->dev_data.slot_data.size(); ii++)
+  // So we are to check if the modules already selected are valid on this new
+  // DAP We will check if the module ID is allowed to be in the respective slot.
+  // Start looping through all slots of the previously selected DAP (since these
+  // slots aren't updated yet)
+  for (auto const& slot : attrnav->pn_runtime_data->m_PnDevice->m_slot_list)
   {
-    if (ii == 0)
-    {
+    // Skip the DAP itself and any "unconfigured" slots i.e. module ident number
+    // is 0
+    if (slot.m_slot_number == 0 || slot.m_module_ident_number == 0)
       continue;
-    }
 
-    if (attrnav->dev_data.slot_data[ii]->module_enum_number == 0)
-    {
-      break;
-    }
+    // If we have no ID the slot is unused...
+    if (slot.m_module_ID == "")
+      continue;
 
-    found = FALSE;
-    for (unsigned int jj = 0; jj < um->ModuleItemRef.size(); jj++)
-    {
-      if (um->ModuleItemRef[jj]->Body.AllowedInSlots.list &&
-          um->ModuleItemRef[jj]->Body.AllowedInSlots.list->in_list(ii))
-      {
-        gsdml_ModuleItem* mi =
-            (gsdml_ModuleItem*)um->ModuleItemRef[jj]->Body.ModuleItemTarget.p;
-
-        if (attrnav->dev_data.slot_data[ii]->module_ident_number ==
-            mi->Body.ModuleIdentNumber)
-        {
-          found = TRUE;
-          break;
-        }
-      }
-    }
-
-    if (!found)
-    {
-      check_ok = FALSE;
-      break;
-    }
+    // Check if the module is allowed. This also makes sure that we notify of
+    // data loss in case we have populated more slots with data than are
+    // available in the new DAP
+    auto module_item_ref = new_dap->_UseableModules[slot.m_module_ID];
+    if (!module_item_ref->_AllowedInSlots.inList(slot.m_slot_number))
+      return false;
   }
-
-  return check_ok;
+  // We made it this far :) This DAP seems to work with the already selected
+  // modules
+  return true;
 }
 
 void GsdmlAttrNav::device_changed_cancel(void* ctx, void* data)
 {
-  long int old_device = (long int)data;
+  std::string const& old_dap_id = *((std::string*)data);
   GsdmlAttrNav* attrnav = (GsdmlAttrNav*)ctx;
-  attrnav->device_num = old_device;
+
+  attrnav->pn_runtime_data->m_PnDevice->m_DAP_ID = old_dap_id;
+  // attrnav->pn_runtime_data->m_PnDevice->m_device_num = old_device;
+  // attrnav->device_num = old_device;
+
   attrnav->device_confirm_active = 0;
 }
 
@@ -988,12 +946,12 @@ int GsdmlAttrNav::trace_scan_bc(brow_tObject object, void* p)
 }
 
 int GsdmlAttrNav::trace_connect_bc(brow_tObject object, char* name, char* attr,
-                                   flow_eTraceType type, void** p)
+                                   flow_eTraceType m_type, void** p)
 {
   ItemPn* base_item;
   GsdmlAttrNav* attrnav;
 
-  /*  printf( "Connecting %s.%s\n", name, attr);  */
+  // printf( "Connecting %s.%s\n", name, attr);
 
   if (streq(name, ""))
     return 1;
@@ -1001,73 +959,101 @@ int GsdmlAttrNav::trace_connect_bc(brow_tObject object, char* name, char* attr,
   brow_GetCtxUserData(brow_GetCtx(object), (void**)&attrnav);
 
   brow_GetUserData(object, (void**)&base_item);
-  switch (base_item->type)
+  switch (base_item->m_type)
   {
-  case attrnav_eItemType_PnBase:
-  case attrnav_eItemType_PnEnumByteOrder:
-  {
-    ItemPnBase* item = (ItemPnBase*)base_item;
-    if (item->size == 0)
-      break;
-
-    *p = item->value_p;
+  case attrnav_eItemType_PnValueSelectItem:
+    // We won't be passing any pointer we're just interested in the scan() call.
+    *p = (void*)1;
     break;
-  }
+  case attrnav_eItemType_PnBase:
+    // case attrnav_eItemType_PnEnumByteOrder:
+    {
+      ItemPnBase* item = (ItemPnBase*)base_item;
+      if (item->m_size == 0)
+        break;
+
+      *p = item->m_value_p;
+      break;
+    }
   case attrnav_eItemType_PnDevice:
   {
-    *p = &attrnav->device_num;
+    //*p = &attrnav->device_num; NEW PARSER
+    // pn_runtime_data->m_PnDevice->m_device_num
+    *p = &(attrnav->pn_runtime_data->m_PnDevice->m_DAP_ID);
+    break;
+  }
+  case attrnav_eItemType_PnSubslot:
+    *p = (void*)1;
+    break;
+  case attrnav_eItemType_PnSubmoduleSelection:
+  {
+    //*p = &attrnav->device_num; NEW PARSER
+    // pn_runtime_data->m_PnDevice->m_device_num
+    ItemPnSubmoduleSelection* item = (ItemPnSubmoduleSelection*)base_item;
+    *p = &(item->m_subslot_data->m_submodule_ID);
+    //*p = &(attrnav->pn_runtime_data->m_PnDevice->m_DAP_ID);
+    break;
+  }
+  case attrnav_eItemType_PnIDSelectValue:
+  {
+    //*p = &attrnav->device_num; NEW PARSER
+    // pn_runtime_data->m_PnDevice->m_device_num
+    ItemPnIDSelectValue* item = (ItemPnIDSelectValue*)base_item;
+    *p = item->m_id;
+    //*p = &(attrnav->pn_runtime_data->m_PnDevice->m_DAP_ID);
     break;
   }
   case attrnav_eItemType_PnSlot:
   {
     ItemPnSlot* item = (ItemPnSlot*)base_item;
 
-    *p = &item->slotdata->module_enum_number;
+    *p = &item->m_slotdata->m_module_ID;
     break;
   }
-  case attrnav_eItemType_PnModuleType:
-  {
-    ItemPnModuleType* item = (ItemPnModuleType*)base_item;
+  // case attrnav_eItemType_PnModuleSelect:
+  // {
+  //   ItemPnModuleSelect* item = (ItemPnModuleSelect*)base_item;
 
-    *p = &attrnav->dev_data.slot_data[item->slot_idx]->module_enum_number;
-    break;
-  }
-  case attrnav_eItemType_PnSubmoduleType:
-  {
-    ItemPnSubmoduleType* item = (ItemPnSubmoduleType*)base_item;
+  //   *p = &attrnav->pn_runtime_data->m_PnDevice->m_slot_list[item->m_slot_idx]
+  //             .m_module_ID;
+  //   break;
+  // }
+  // case attrnav_eItemType_PnSubmoduleType:
+  // {
+  //   ItemPnSubmoduleType* item = (ItemPnSubmoduleType*)base_item;
 
-    *p = &attrnav->dev_data.slot_data[item->slot_idx]
-              ->subslot_data[item->subslot_idx]
-              ->submodule_enum_number;
-    break;
-  }
-  case attrnav_eItemType_PnModuleClass:
-  {
-    ItemPnModuleClass* item = (ItemPnModuleClass*)base_item;
+  //   *p = &attrnav->dev_data.slot_data[item->slot_idx]
+  //             ->subslot_data[item->subslot_idx]
+  //             ->submodule_enum_number;
+  //   break;
+  // }
+  // case attrnav_eItemType_PnModuleClass:
+  // {
+  //   ItemPnModuleClass* item = (ItemPnModuleClass*)base_item;
 
-    *p = &item->slotdata->module_class;
-    break;
-  }
+  //   *p = &item->slotdata->module_class;
+  //   break;
+  // }
   case attrnav_eItemType_PnEnumValue:
-    *p = ((ItemPnEnumValue*)base_item)->value_p;
+    *p = ((ItemPnEnumValue*)base_item)->m_value_p;
     break;
-  case attrnav_eItemType_PnEnumValueMType:
-    *p = ((ItemPnEnumValueMType*)base_item)->value_p;
-    break;
-  case attrnav_eItemType_PnEnumTimeRatio:
-    *p = ((ItemPnEnumTimeRatio*)base_item)->value_p;
-    break;
-  case attrnav_eItemType_PnEnumSendClock:
-    *p = ((ItemPnEnumSendClock*)base_item)->value_p;
-    break;
+  // case attrnav_eItemType_PnEnumValueMType:
+  //   *p = ((ItemPnEnumValueMType*)base_item)->value_p;
+  //   break;
+  // case attrnav_eItemType_PnEnumTimeRatio:
+  //   *p = ((ItemPnEnumTimeRatio*)base_item)->value_p;
+  //   break;
+  // case attrnav_eItemType_PnEnumSendClock:
+  //   *p = ((ItemPnEnumSendClock*)base_item)->value_p;
+  //   break;
   case attrnav_eItemType_PnParEnum:
   case attrnav_eItemType_PnParEnumBit:
   case attrnav_eItemType_PnParEnumValue:
   case attrnav_eItemType_PnParValue:
     *p = (void*)1;
     break;
-  case attrnav_eItemType_PnNetworkSettingYesNo:
-    *p = ((ItemPnParYesNo*)base_item)->value_p;
+  case attrnav_eItemType_PnEnumYesNo:
+    *p = ((ItemPnEnumYesNo*)base_item)->m_value_p;
     break;
   default:;
   }
@@ -1079,7 +1065,7 @@ int GsdmlAttrNav::trace_disconnect_bc(brow_tObject object)
   ItemPn* base_item;
 
   brow_GetUserData(object, (void**)&base_item);
-  switch (base_item->type)
+  switch (base_item->m_type)
   {
   default:;
   }
@@ -1224,99 +1210,149 @@ void GsdmlAttrNav::print(char* filename) { brow_Print(brow->ctx, filename); }
 
 int GsdmlAttrNav::object_attr()
 {
-  if (device_num == 0)
-    device_item = 0;
-  else
-    device_item = gsdml->ApplicationProcess->DeviceAccessPointList
-                      ->DeviceAccessPointItem[device_num - 1];
+  // if (pn_runtime_data->m_PnDevice && pn_runtime_data->m_PnDevice->)
+  // int device_num = (pn_runtime_data->m_PnDevice ?
+  // pn_runtime_data->m_PnDevice->m_device_num : 0);
+
+  // std::string selected_device_id = pn_runtime_data->m_PnDevice->m_DAP_ID;
+
+  // if (selected_device_id != "")
+  // {
+  //   m_selected_device_item =
+  //   gsdml->getDeviceAccessPointMap()[selected_device_id];
+  // }
 
   brow_SetNodraw(brow->ctx);
 
-  new ItemPnNetwork(this, "NetworkSettings", NULL, flow_eDest_IntoLast);
+  // Test here
+  static std::string test_string("Hejsan");
+  new ItemPnIPv4Input(this, "IPv4 Input", "", &test_string, "Information goes here", NULL, flow_eDest_IntoLast);
 
-  new ItemPnEnumByteOrder(this, "ByteOrdering", "LocalGsdAttr", pwr_eType_Int32,
-                          sizeof(pwr_tInt32), (void*)&gsdml->byte_order, 0,
-                          NULL, flow_eDest_IntoLast);
+  // static uint32_t test_uint32 = 1234;
+  // new ItemPnParameterInput<uint32_t>(this, "Unsigned 32", "", &test_uint32, "Information goes here", NULL, flow_eDest_IntoLast, this->gsdml->getDeviceAccessPointMap()["IM 155-6 MF HF V5.0"]->_VirtualSubmoduleList["IM 155-6 MF HF V5.0"]->_RecordDataList[3]._Ref["Modbus hold time [ms]"]);
 
-  new ItemPnDeviceInfo(this, "DeviceInfo", NULL, flow_eDest_IntoLast);
-  new ItemPnDevice(this, "Device", NULL, flow_eDest_IntoLast);
+  // static double test_double = 12.3456789;
+  // new ItemPnParameterInput<double>(this, "Double", "", &test_double, "Information goes here", NULL, flow_eDest_IntoLast);
 
-  if (device_num)
+  // Add a network folder that contains the network settings used for the device
+  new ItemPnNetwork(this, "NetworkSettings", NULL, flow_eDest_IntoLast, "General network settings.");
+
+  // new ItemPnEnumByteOrder(this, "ByteOrdering", "LocalGsdAttr",
+  // pwr_eType_Int32,
+  //                         sizeof(pwr_tInt32), (void*)&gsdml->byte_order, 0,
+  //                         NULL, flow_eDest_IntoLast);
+
+  // Just some general device information from the GSDML file
+  new ItemPnDeviceInfo(this, "DeviceInfo", NULL, flow_eDest_IntoLast, "Information about this device family.");
+
+  // Add an item to select DAP
+  // TODO note to self, continue from here
+  new ItemPnDevice(this, "DAP Selection", NULL, flow_eDest_IntoLast, "Choose DAP (Device Access Point)");
+
+  // Have we chosen a DAP?
+  if (m_selected_device_item)
   {
-    unsigned int slot_cnt = 0;
-
-    GsdmlSlotData* sd;
-    if (dev_data.slot_data.size() <= slot_cnt)
+    // Loop through all physical slots
+    // for (auto it = m_selected_device_item->_PhysicalSlots.begin(); it !=
+    // m_selected_device_item->_PhysicalSlots.end(); ++it)
+    for (auto& slot : pn_runtime_data->m_PnDevice->m_slot_list)
     {
-      sd = new GsdmlSlotData();
-      sd->slot_number = 0;
-      sd->slot_idx = slot_cnt;
-      dev_data.slot_data.push_back(sd);
-    }
-    else
-    {
-      sd = dev_data.slot_data[slot_cnt];
-      sd->slot_idx = slot_cnt;
-    }
-
-    new ItemPnDAP(this, "DAP", sd, NULL, flow_eDest_IntoLast);
-    slot_cnt++;
-
-    gsdml_ValuelistIterator fixed_in_slots_iter(
-        gsdml->ApplicationProcess->DeviceAccessPointList
-            ->DeviceAccessPointItem[device_num - 1]
-            ->Body.FixedInSlots.list);
-
-    // Check to see if this DAP is supposed to be fixed in a specific slot (We
-    // assume the first one). We also assume the DAP is never placed in more
-    // than one slot. FixedInSlots attribute may apply to modules and submodules
-    // aswell but is not implemented (yet)
-    unsigned int fixed_position = fixed_in_slots_iter.begin();
-    if (fixed_position > 0 && sd->dap_fixed_slot != 1)
-    {
-      sd->dap_fixed_slot = 1;
-      sd->slot_number = slot_cnt;
-    }
-
-    gsdml_ValuelistIterator iter(
-        gsdml->ApplicationProcess->DeviceAccessPointList
-            ->DeviceAccessPointItem[device_num - 1]
-            ->Body.PhysicalSlots.list);
-
-    // Add all the slots, the DAP goes to the first physical slot
-    int first_slot = iter.begin();
-    for (unsigned int physical_slot = first_slot; physical_slot != iter.end();
-         physical_slot = iter.next())
-    {
-
-      // Skip the DAP
-      if (first_slot == physical_slot)
-        physical_slot = iter.next();
-
-      char name[80];
-      sprintf(name, "Slot %u", physical_slot);
-
-      if (dev_data.slot_data.size() <= slot_cnt)
+      // The DAP is always in slot 0. It has an attribute "FixedInSlots" but is
+      // nevertheless always in slot 0...
+      if (slot.m_slot_number == DAP_SLOT)
       {
-        sd = new GsdmlSlotData();
-        sd->slot_number = physical_slot;
-        sd->slot_idx = slot_cnt;
-        dev_data.slot_data.push_back(sd);
-      }
-      else
-      {
-        sd = dev_data.slot_data[slot_cnt];
-        sd->slot_idx = slot_cnt;
-        if (physical_slot != sd->slot_number)
-        {
-          printf("GSML-Error, datafile corrupt, unexpected slot number\n");
-        }
+        new ItemPnDAP(this, "DAP", &slot, NULL, flow_eDest_IntoLast, "Configure the DAP here. Some DAPs may let you select what submodules goes where. Be sure to select according to your hardware specification.");
+        continue;
       }
 
-      new ItemPnSlot(this, name, sd, NULL, flow_eDest_IntoLast);
-      slot_cnt++;
+      // Create a super awesome name for the slot.
+      std::ostringstream slot_string("Slot ", std::ios_base::ate);
+      slot_string << slot.m_slot_number;
+
+      new ItemPnSlot(this, slot_string.str().c_str(), &slot, NULL,
+                     flow_eDest_IntoLast, "Select a module for this slot. Remember that some modules can only go in specific slots. It all depends on the hardware device and how the manufacturer have planned the device.");
     }
   }
+
+  // if (device_num) // m_selected_device instead??
+  // {
+  //   unsigned int slot_cnt = 0;
+
+  //   GsdmlSlotData* sd;
+  //   if (dev_data.slot_data.size() <= slot_cnt)
+  //   {
+  //     sd = new GsdmlSlotData();
+  //     sd->slot_number = 0;
+  //     sd->slot_idx = slot_cnt;
+  //     dev_data.slot_data.push_back(sd);
+  //   }
+  //   else
+  //   {
+  //     sd = dev_data.slot_data[slot_cnt];
+  //     sd->slot_idx = slot_cnt;
+  //   }
+
+  //   new ItemPnDAP(this, "DAP", sd, NULL, flow_eDest_IntoLast);
+  //   slot_cnt++;
+
+  //   gsdml_ValuelistIterator fixed_in_slots_iter(
+  //       gsdml->ApplicationProcess->DeviceAccessPointList
+  //           ->DeviceAccessPointItem[device_num - 1]
+  //           ->Body.FixedInSlots.list);
+
+  //   // Check to see if this DAP is supposed to be fixed in a specific slot
+  //   (We
+  //   // assume the first one). We also assume the DAP is never placed in more
+  //   // than one slot. FixedInSlots attribute may apply to modules and
+  //   submodules
+  //   // aswell but is not implemented (yet)
+  //   unsigned int fixed_position = fixed_in_slots_iter.begin();
+  //   if (fixed_position > 0 && sd->dap_fixed_slot != 1)
+  //   {
+  //     sd->dap_fixed_slot = 1;
+  //     sd->slot_number = slot_cnt;
+  //   }
+
+  //   gsdml_ValuelistIterator iter(
+  //       gsdml->ApplicationProcess->DeviceAccessPointList
+  //           ->DeviceAccessPointItem[device_num - 1]
+  //           ->Body.PhysicalSlots.list);
+
+  //   // Add all the slots, the DAP goes to the first physical slot
+  //   int first_slot = iter.begin();
+  //   for (unsigned int physical_slot = first_slot; physical_slot !=
+  //   iter.end();
+  //        physical_slot = iter.next())
+  //   {
+
+  //     // Skip the DAP
+  //     if (first_slot == physical_slot)
+  //       physical_slot = iter.next();
+
+  //     char name[80];
+  //     sprintf(name, "Slot %u", physical_slot);
+
+  //     if (dev_data.slot_data.size() <= slot_cnt)
+  //     {
+  //       sd = new GsdmlSlotData();
+  //       sd->slot_number = physical_slot;
+  //       sd->slot_idx = slot_cnt;
+  //       dev_data.slot_data.push_back(sd);
+  //     }
+  //     else
+  //     {
+  //       sd = dev_data.slot_data[slot_cnt];
+  //       sd->slot_idx = slot_cnt;
+  //       if (physical_slot != sd->slot_number)
+  //       {
+  //         printf("GSML-Error, datafile corrupt, unexpected slot number\n");
+  //       }
+  //     }
+
+  //     new ItemPnSlot(this, name, sd, NULL, flow_eDest_IntoLast);
+  //     slot_cnt++;
+  //   }
+  // }
 
   brow_ResetNodraw(brow->ctx);
   brow_Redraw(brow->ctx, 0);
@@ -1386,6 +1422,34 @@ int GsdmlAttrNav::init_brow_cb(FlowCtx* fctx, void* client_data)
   attrnav->brow->brow_setup();
   attrnav->brow->create_nodeclasses();
 
+  // char msg[300];
+  //   printf("GSDML-Error, Gsdmlfile doesn't match original filename\n");
+
+  //   sprintf(msg, "Gsdmlfile doesn't match original filename.\n\nIf the new "
+  //                "file is not compatible with the old, configuration data "
+  //                "might be corrupt,\nand you should clear the data. The "
+  //                "configuration will then be lost.\n\nIf the files are "
+  //                "compatible, you should keep the data.");
+  //   int res = attrnav->m_wow->CreateModalDialog("New gsdml filename
+  //   detected", msg,
+  //                                    "Clear Data", "Keep Data", "Cancel", 0);
+  //   switch (res)
+  //   {
+  //   case wow_eModalDialogReturn_Button1:
+  //     return sts;
+  //   case wow_eModalDialogReturn_Button2:
+  //     // Keep data
+  //     //sts = dev_data.read(filename, 1);
+  //     //sts = pn_runtime_data.read_pwr_pn_xml(filename, name_of_gsdml_file,
+  //     true); if (EVEN(sts))
+  //       return sts;
+  //     break;
+  //   case wow_eModalDialogReturn_Deleted:
+  //   case wow_eModalDialogReturn_Button3:
+  //   case wow_eModalDialogReturn_NYI:
+  //     return PB__CONFIGABORTED;
+  //   }
+
   // Create the root item
   attrnav->object_attr();
 
@@ -1400,442 +1464,471 @@ int GsdmlAttrNav::init_brow_cb(FlowCtx* fctx, void* client_data)
 
 int GsdmlAttrNav::save(const char* filename)
 {
-  int sts;
+  int sts = PB__SUCCESS;
 
-  dev_data.device_num = device_num;
-
-  if (device_num == 0)
+  if (pn_runtime_data->m_PnDevice->m_DAP_ID == "")
     return PB__NODEVICE;
 
   // Be sure all items are initialized, expand all
   brow_SetNodraw(brow->ctx);
   expand_all();
 
-  strncpy(dev_data.device_text, (char*)device_item->ModuleInfo->Body.Name.p,
-          sizeof(dev_data.device_text));
-  dev_data.vendor_id = gsdml->DeviceIdentity->Body.VendorID;
-  dev_data.device_id = gsdml->DeviceIdentity->Body.DeviceID;
-  strncpy(dev_data.version, gsdml->ProfileHeader->Body.ProfileRevision,
-          sizeof(dev_data.version));
-  dev_data.byte_order = gsdml->byte_order;
-  dev_data.instance = device_item->Body.ObjectUUID_LocalIndex;
+  // strncpy(dev_data.device_text, (char*)device_item->ModuleInfo->Body.Name.p,
+  //         sizeof(dev_data.device_text));
+  // dev_data.vendor_id = gsdml->DeviceIdentity->Body.VendorID;
+  // dev_data.device_id = gsdml->DeviceIdentity->Body.DeviceID;
+  // strncpy(dev_data.version, gsdml->ProfileHeader->Body.ProfileRevision,
+  //         sizeof(dev_data.version));
+  // //dev_data.byte_order = gsdml->byte_order;
+  // dev_data.instance = device_item->Body.ObjectUUID_LocalIndex;
 
-  // Store ModuleIdentNumber
-  gsdml_UseableModules* um = device_item->UseableModules;
+  // // Store ModuleIdentNumber
+  // gsdml_UseableModules* um = device_item->UseableModules;
 
-  for (unsigned int i = 0; i < dev_data.slot_data.size(); i++)
-  {
-    if (i == 0)
-    {
-      dev_data.slot_data[i]->module_ident_number =
-          device_item->Body.ModuleIdentNumber;
-    }
-    else
-    {
-      if (dev_data.slot_data[i]->module_enum_number != 0)
-      {
-        gsdml_ModuleItem* mi =
-            (gsdml_ModuleItem*)um
-                ->ModuleItemRef[dev_data.slot_data[i]->module_enum_number - 1]
-                ->Body.ModuleItemTarget.p;
-        dev_data.slot_data[i]->module_ident_number = mi->Body.ModuleIdentNumber;
-      }
-      else
-      {
-        dev_data.slot_data[i]->module_ident_number = 0;
-        dev_data.slot_data[i]->module_class = 0;
-      }
-    }
-  }
+  // for (unsigned int i = 0; i < dev_data.slot_data.size(); i++)
+  // {
+  //   if (i == 0)
+  //   {
+  //     dev_data.slot_data[i]->module_ident_number =
+  //         device_item->Body.ModuleIdentNumber;
+  //   }
+  //   else
+  //   {
+  //     if (dev_data.slot_data[i]->module_enum_number != 0)
+  //     {
+  //       gsdml_ModuleItem* mi =
+  //           (gsdml_ModuleItem*)um
+  //               ->ModuleItemRef[dev_data.slot_data[i]->module_enum_number -
+  //               1]
+  //               ->Body.ModuleItemTarget.p;
+  //       dev_data.slot_data[i]->module_ident_number =
+  //       mi->Body.ModuleIdentNumber;
+  //     }
+  //     else
+  //     {
+  //       dev_data.slot_data[i]->module_ident_number = 0;
+  //       dev_data.slot_data[i]->module_class = 0;
+  //     }
+  //   }
+  // }
 
-  // Create IOCR data
-  if (dev_data.iocr_data.size() < 1)
-  {
-    GsdmlIOCRData* iod = new GsdmlIOCRData();
-    dev_data.iocr_data.push_back(iod);
-  }
-  if (dev_data.iocr_data.size() < 2)
-  {
-    GsdmlIOCRData* iod = new GsdmlIOCRData();
-    dev_data.iocr_data.push_back(iod);
-  }
+  // // Create IOCR data
+  // if (dev_data.iocr_data.size() < 1)
+  // {
+  //   GsdmlIOCRData* iod = new GsdmlIOCRData();
+  //   dev_data.iocr_data.push_back(iod);
+  // }
+  // if (dev_data.iocr_data.size() < 2)
+  // {
+  //   GsdmlIOCRData* iod = new GsdmlIOCRData();
+  //   dev_data.iocr_data.push_back(iod);
+  // }
 
-  dev_data.iocr_data[0]->type = 1;       // Input ?
-  dev_data.iocr_data[0]->properties = 1; // Class 1
-  dev_data.iocr_data[0]->send_clock_factor = send_clock;
-  dev_data.iocr_data[0]->reduction_ratio =
-      time_ratio; // send_time = 8 * 31.2 us * send_clock
-  dev_data.iocr_data[0]->phase = phase;
-  dev_data.iocr_data[0]->api = 0;
+  // dev_data.iocr_data[0]->type = 1;       // Input ?
+  // dev_data.iocr_data[0]->properties = 1; // Class 1
+  // // dev_data.iocr_data[0]->send_clock_factor = send_clock;
+  // // dev_data.iocr_data[0]->reduction_ratio =
+  // //     time_ratio; // send_time = 8 * 31.2 us * send_clock
+  // //dev_data.iocr_data[0]->phase = phase;
+  // dev_data.iocr_data[0]->api = 0;
 
-  dev_data.iocr_data[1]->type = 2; // Output ?
-  dev_data.iocr_data[1]->properties = dev_data.iocr_data[0]->properties;
-  dev_data.iocr_data[1]->send_clock_factor =
-      dev_data.iocr_data[0]->send_clock_factor;
-  dev_data.iocr_data[1]->reduction_ratio =
-      dev_data.iocr_data[0]->reduction_ratio;
-  dev_data.iocr_data[1]->phase = dev_data.iocr_data[0]->phase;
-  dev_data.iocr_data[1]->api = dev_data.iocr_data[0]->api;
+  // dev_data.iocr_data[1]->type = 2; // Output ?
+  // dev_data.iocr_data[1]->properties = dev_data.iocr_data[0]->properties;
+  // dev_data.iocr_data[1]->send_clock_factor =
+  //     dev_data.iocr_data[0]->send_clock_factor;
+  // dev_data.iocr_data[1]->reduction_ratio =
+  //     dev_data.iocr_data[0]->reduction_ratio;
+  // dev_data.iocr_data[1]->phase = dev_data.iocr_data[0]->phase;
+  // dev_data.iocr_data[1]->api = dev_data.iocr_data[0]->api;
 
-  // Load channel diag
-  dev_data.channel_diag_reset();
-  if (gsdml->ApplicationProcess->ChannelDiagList)
-  {
-    for (unsigned int i = 0;
-         i < gsdml->ApplicationProcess->ChannelDiagList->ChannelDiagItem.size();
-         i++)
-    {
-      GsdmlChannelDiag* cd = new GsdmlChannelDiag();
+  // // Load channel diag
+  // dev_data.channel_diag_reset();
+  // if (gsdml->ApplicationProcess->ChannelDiagList)
+  // {
+  //   for (unsigned int i = 0;
+  //        i <
+  //        gsdml->ApplicationProcess->ChannelDiagList->ChannelDiagItem.size();
+  //        i++)
+  //   {
+  //     GsdmlChannelDiag* cd = new GsdmlChannelDiag();
 
-      cd->error_type =
-          gsdml->ApplicationProcess->ChannelDiagList->ChannelDiagItem[i]
-              ->Body.ErrorType;
-      strncpy(
-          cd->name,
-          (char*)gsdml->ApplicationProcess->ChannelDiagList->ChannelDiagItem[i]
-              ->Body.Name.p,
-          sizeof(cd->name));
-      // Make sure we null terminate these in case our buffer is too small to
-      // accomodate the entire diag name string.
-      cd->name[sizeof(cd->name) - 1] = '\0';
+  //     cd->error_type =
+  //         gsdml->ApplicationProcess->ChannelDiagList->ChannelDiagItem[i]
+  //             ->Body.ErrorType;
+  //     strncpy(
+  //         cd->name,
+  //         (char*)gsdml->ApplicationProcess->ChannelDiagList->ChannelDiagItem[i]
+  //             ->Body.Name.p,
+  //         sizeof(cd->name));
+  //     // Make sure we null terminate these in case our buffer is too small to
+  //     // accomodate the entire diag name string.
+  //     cd->name[sizeof(cd->name) - 1] = '\0';
 
-      if (gsdml->ApplicationProcess->ChannelDiagList->ChannelDiagItem[i]
-              ->Body.Help.p)
-      {
-        strncpy(cd->help,
-                (char*)gsdml->ApplicationProcess->ChannelDiagList
-                    ->ChannelDiagItem[i]
-                    ->Body.Help.p,
-                sizeof(cd->help));
-        // Make sure we null terminate these in case our buffer is too small to
-        // accomodate the entire help string.
-        cd->help[sizeof(cd->help) - 1] = '\0';
-      }
+  //     if (gsdml->ApplicationProcess->ChannelDiagList->ChannelDiagItem[i]
+  //             ->Body.Help.p)
+  //     {
+  //       strncpy(cd->help,
+  //               (char*)gsdml->ApplicationProcess->ChannelDiagList
+  //                   ->ChannelDiagItem[i]
+  //                   ->Body.Help.p,
+  //               sizeof(cd->help));
+  //       // Make sure we null terminate these in case our buffer is too small
+  //       to
+  //       // accomodate the entire help string.
+  //       cd->help[sizeof(cd->help) - 1] = '\0';
+  //     }
 
-      if (gsdml->ApplicationProcess->ChannelDiagList->ChannelDiagItem[i]
-              ->ExtChannelDiagList)
-      {
-        gsdml_ExtChannelDiagList* list =
-            gsdml->ApplicationProcess->ChannelDiagList->ChannelDiagItem[i]
-                ->ExtChannelDiagList;
-        for (auto& ext_diag_item : list->ExtChannelDiagItem)
-        {
-          GsdmlExtChannelDiag* ecd = new GsdmlExtChannelDiag;
-          ecd->error_type = ext_diag_item->Body.ErrorType;
-          strncpy(ecd->name, (char*)ext_diag_item->Body.Name.p,
-                  sizeof(ecd->name));
-          // Make sure we null terminate these in case our buffer is too small
-          // to accomodate the entire diag name string.
-          ecd->name[sizeof(ecd->name) - 1] = '\0';
+  //     if (gsdml->ApplicationProcess->ChannelDiagList->ChannelDiagItem[i]
+  //             ->ExtChannelDiagList)
+  //     {
+  //       gsdml_ExtChannelDiagList* list =
+  //           gsdml->ApplicationProcess->ChannelDiagList->ChannelDiagItem[i]
+  //               ->ExtChannelDiagList;
+  //       for (auto& ext_diag_item : list->ExtChannelDiagItem)
+  //       {
+  //         GsdmlExtChannelDiag* ecd = new GsdmlExtChannelDiag;
+  //         ecd->error_type = ext_diag_item->Body.ErrorType;
+  //         strncpy(ecd->name, (char*)ext_diag_item->Body.Name.p,
+  //                 sizeof(ecd->name));
+  //         // Make sure we null terminate these in case our buffer is too
+  //         small
+  //         // to accomodate the entire diag name string.
+  //         ecd->name[sizeof(ecd->name) - 1] = '\0';
 
-          // Copy help part
-          if (ext_diag_item->Body.Help.p)
-          {
-            strncpy(ecd->help, (char*)ext_diag_item->Body.Help.p,
-                    sizeof(ecd->help));
-          }
+  //         // Copy help part
+  //         if (ext_diag_item->Body.Help.p)
+  //         {
+  //           strncpy(ecd->help, (char*)ext_diag_item->Body.Help.p,
+  //                   sizeof(ecd->help));
+  //         }
 
-          // Make sure we null terminate these in case our buffer is too small
-          // to accomodate the entire help string.
-          ecd->help[sizeof(ecd->help) - 1] = '\0';
+  //         // Make sure we null terminate these in case our buffer is too
+  //         small
+  //         // to accomodate the entire help string.
+  //         ecd->help[sizeof(ecd->help) - 1] = '\0';
 
-          cd->ext_channel_diag.push_back(ecd);
-        }
-      }
+  //         cd->ext_channel_diag.push_back(ecd);
+  //       }
+  //     }
 
-      dev_data.channel_diag.push_back(cd);
-    }
-  }
+  //     dev_data.channel_diag.push_back(cd);
+  //   }
+  // }
 
-  // Calculate subslot IO length
-  for (unsigned int i = 0; i < dev_data.slot_data.size(); i++)
-  {
-    if (i == 0)
-    {
-      // Device access point
-      gsdml_DeviceAccessPointItem* mi = device_item;
+  // // Calculate subslot IO length
+  // for (unsigned int i = 0; i < dev_data.slot_data.size(); i++)
+  // {
+  //   if (i == 0)
+  //   {
+  //     // Device access point
+  //     gsdml_DeviceAccessPointItem* mi = device_item;
 
-      for (unsigned int j = 0; j < dev_data.slot_data[i]->subslot_data.size();
-           j++)
-      {
-        GsdmlSubslotData* ssd = dev_data.slot_data[i]->subslot_data[j];
+  //     for (unsigned int j = 0; j <
+  //     dev_data.slot_data[i]->subslot_data.size();
+  //          j++)
+  //     {
+  //       GsdmlSubslotData* ssd = dev_data.slot_data[i]->subslot_data[j];
 
-        ssd->io_input_length = 0;
-        ssd->io_output_length = 0;
+  //       ssd->io_input_length = 0;
+  //       ssd->io_output_length = 0;
 
-        if (mi->VirtualSubmoduleList->VirtualSubmoduleItem.size() == 0)
-          continue;
+  //       if (mi->VirtualSubmoduleList->VirtualSubmoduleItem.size() == 0)
+  //         continue;
 
-        gsdml_VirtualSubmoduleItem* vsd = 0;
-        if (mi->VirtualSubmoduleList->VirtualSubmoduleItem.size() == 1)
-          vsd = mi->VirtualSubmoduleList->VirtualSubmoduleItem[0];
-        else
-        {
-          for (unsigned int k = 0;
-               k < mi->VirtualSubmoduleList->VirtualSubmoduleItem.size(); k++)
-          {
-            if (mi->VirtualSubmoduleList->VirtualSubmoduleItem[k]
-                    ->Body.SubmoduleIdentNumber == ssd->submodule_ident_number)
-            {
-              vsd = mi->VirtualSubmoduleList->VirtualSubmoduleItem[k];
-              break;
-            }
-          }
-        }
-        if (!vsd)
-        {
-          continue;
-        }
+  //       gsdml_VirtualSubmoduleItem* vsd = 0;
+  //       if (mi->VirtualSubmoduleList->VirtualSubmoduleItem.size() == 1)
+  //         vsd = mi->VirtualSubmoduleList->VirtualSubmoduleItem[0];
+  //       else
+  //       {
+  //         for (unsigned int k = 0;
+  //              k < mi->VirtualSubmoduleList->VirtualSubmoduleItem.size();
+  //              k++)
+  //         {
+  //           if (mi->VirtualSubmoduleList->VirtualSubmoduleItem[k]
+  //                   ->Body.SubmoduleIdentNumber ==
+  //                   ssd->submodule_ident_number)
+  //           {
+  //             vsd = mi->VirtualSubmoduleList->VirtualSubmoduleItem[k];
+  //             break;
+  //           }
+  //         }
+  //       }
+  //       if (!vsd)
+  //       {
+  //         continue;
+  //       }
 
-        ssd->api = vsd->Body.API;
+  //       ssd->api = vsd->Body.API;
 
-        if (!vsd->IOData)
-          continue;
+  //       if (!vsd->IOData)
+  //         continue;
 
-        if (vsd->IOData->Input)
-        {
-          for (unsigned k = 0; k < vsd->IOData->Input->DataItem.size(); k++)
-          {
-            gsdml_DataItem* di = vsd->IOData->Input->DataItem[k];
-            gsdml_eValueDataType datatype;
+  //       if (vsd->IOData->Input)
+  //       {
+  //         for (unsigned k = 0; k < vsd->IOData->Input->DataItem.size(); k++)
+  //         {
+  //           gsdml_DataItem* di = vsd->IOData->Input->DataItem[k];
+  //           gsdml_eValueDataType datatype;
 
-            gsdml->string_to_value_datatype(di->Body.DataType, &datatype);
-            unsigned int len;
+  //           gsdml->string_to_value_datatype(di->Body.DataType, &datatype);
+  //           unsigned int len;
 
-            sts = gsdml->get_datavalue_length(datatype, di->Body.Length, &len);
-            if (EVEN(sts))
-              printf("GSDML-Error, Datatype %s not yet implemented\n",
-                     di->Body.DataType);
+  //           sts = gsdml->get_datavalue_length(datatype, di->Body.Length,
+  //           &len); if (EVEN(sts))
+  //             printf("GSDML-Error, Datatype %s not yet implemented\n",
+  //                    di->Body.DataType);
 
-            ssd->io_input_length += len;
-          }
-        }
-        if (vsd->IOData->Output)
-        {
-          for (unsigned k = 0; k < vsd->IOData->Output->DataItem.size(); k++)
-          {
-            gsdml_DataItem* di = vsd->IOData->Output->DataItem[k];
-            gsdml_eValueDataType datatype;
+  //           ssd->io_input_length += len;
+  //         }
+  //       }
+  //       if (vsd->IOData->Output)
+  //       {
+  //         for (unsigned k = 0; k < vsd->IOData->Output->DataItem.size(); k++)
+  //         {
+  //           gsdml_DataItem* di = vsd->IOData->Output->DataItem[k];
+  //           gsdml_eValueDataType datatype;
 
-            gsdml->string_to_value_datatype(di->Body.DataType, &datatype);
-            unsigned int len;
+  //           gsdml->string_to_value_datatype(di->Body.DataType, &datatype);
+  //           unsigned int len;
 
-            sts = gsdml->get_datavalue_length(datatype, di->Body.Length, &len);
-            if (EVEN(sts))
-              printf("GSDML-Error, Datatype %s not yet implemented\n",
-                     di->Body.DataType);
+  //           sts = gsdml->get_datavalue_length(datatype, di->Body.Length,
+  //           &len); if (EVEN(sts))
+  //             printf("GSDML-Error, Datatype %s not yet implemented\n",
+  //                    di->Body.DataType);
 
-            ssd->io_output_length += len;
-          }
-        }
-      }
-    }
-    else
-    {
-      if (dev_data.slot_data[i]->module_enum_number == 0)
-        continue;
+  //           ssd->io_output_length += len;
+  //         }
+  //       }
+  //     }
+  //   }
+  //   else
+  //   {
+  //     if (dev_data.slot_data[i]->module_enum_number == 0)
+  //       continue;
 
-      gsdml_UseableModules* um = device_item->UseableModules;
-      if (!um)
-        continue;
+  //     gsdml_UseableModules* um = device_item->UseableModules;
+  //     if (!um)
+  //       continue;
 
-      gsdml_ModuleItem* mi =
-          (gsdml_ModuleItem*)um
-              ->ModuleItemRef[dev_data.slot_data[i]->module_enum_number - 1]
-              ->Body.ModuleItemTarget.p;
+  //     gsdml_ModuleItem* mi =
+  //         (gsdml_ModuleItem*)um
+  //             ->ModuleItemRef[dev_data.slot_data[i]->module_enum_number - 1]
+  //             ->Body.ModuleItemTarget.p;
 
-      for (unsigned int j = 0; j < dev_data.slot_data[i]->subslot_data.size();
-           j++)
-      {
-        GsdmlSubslotData* ssd = dev_data.slot_data[i]->subslot_data[j];
-        unsigned int io_input_length = 0;
-        unsigned int io_output_length = 0;
+  //     for (unsigned int j = 0; j <
+  //     dev_data.slot_data[i]->subslot_data.size();
+  //          j++)
+  //     {
+  //       GsdmlSubslotData* ssd = dev_data.slot_data[i]->subslot_data[j];
+  //       unsigned int io_input_length = 0;
+  //       unsigned int io_output_length = 0;
 
-        gsdml_VirtualSubmoduleItem* vsd = 0;
-        if (ssd->submodule_enum_number)
-        {
-          // Physical subslot
-          vsd = gsdml->ApplicationProcess->SubmoduleList
-                    ->SubmoduleItem[ssd->submodule_enum_number - 1];
-        }
-        else
-        {
-          if (mi->VirtualSubmoduleList->VirtualSubmoduleItem.size() == 0)
-            continue;
+  //       gsdml_VirtualSubmoduleItem* vsd = 0;
+  //       if (ssd->submodule_enum_number)
+  //       {
+  //         // Physical subslot
+  //         vsd = gsdml->ApplicationProcess->SubmoduleList
+  //                   ->SubmoduleItem[ssd->submodule_enum_number - 1];
+  //       }
+  //       else
+  //       {
+  //         if (mi->VirtualSubmoduleList->VirtualSubmoduleItem.size() == 0)
+  //           continue;
 
-          if (mi->VirtualSubmoduleList->VirtualSubmoduleItem.size() == 1)
-            vsd = mi->VirtualSubmoduleList->VirtualSubmoduleItem[0];
-          else
-          {
-            for (unsigned int k = 0;
-                 k < mi->VirtualSubmoduleList->VirtualSubmoduleItem.size(); k++)
-            {
-              if (mi->VirtualSubmoduleList->VirtualSubmoduleItem[k]
-                      ->Body.SubmoduleIdentNumber ==
-                  ssd->submodule_ident_number)
-              {
-                vsd = mi->VirtualSubmoduleList->VirtualSubmoduleItem[k];
-                break;
-              }
-            }
-          }
-        }
-        if (!vsd)
-        {
-          printf("GSDML-Error, subslot number not found\n");
-          continue;
-        }
+  //         if (mi->VirtualSubmoduleList->VirtualSubmoduleItem.size() == 1)
+  //           vsd = mi->VirtualSubmoduleList->VirtualSubmoduleItem[0];
+  //         else
+  //         {
+  //           for (unsigned int k = 0;
+  //                k < mi->VirtualSubmoduleList->VirtualSubmoduleItem.size();
+  //                k++)
+  //           {
+  //             if (mi->VirtualSubmoduleList->VirtualSubmoduleItem[k]
+  //                     ->Body.SubmoduleIdentNumber ==
+  //                 ssd->submodule_ident_number)
+  //             {
+  //               vsd = mi->VirtualSubmoduleList->VirtualSubmoduleItem[k];
+  //               break;
+  //             }
+  //           }
+  //         }
+  //       }
+  //       if (!vsd)
+  //       {
+  //         printf("GSDML-Error, subslot number not found\n");
+  //         continue;
+  //       }
 
-        ssd->api = vsd->Body.API;
-        ssd->submodule_ident_number = vsd->Body.SubmoduleIdentNumber;
+  //       ssd->api = vsd->Body.API;
+  //       ssd->submodule_ident_number = vsd->Body.SubmoduleIdentNumber;
 
-        if (!vsd->IOData)
-          continue;
+  //       if (!vsd->IOData)
+  //         continue;
 
-        if (vsd->IOData->Input)
-        {
-          for (unsigned k = 0; k < vsd->IOData->Input->DataItem.size(); k++)
-          {
-            gsdml_DataItem* di = vsd->IOData->Input->DataItem[k];
-            gsdml_eValueDataType datatype;
+  //       if (vsd->IOData->Input)
+  //       {
+  //         for (unsigned k = 0; k < vsd->IOData->Input->DataItem.size(); k++)
+  //         {
+  //           gsdml_DataItem* di = vsd->IOData->Input->DataItem[k];
+  //           gsdml_eValueDataType datatype;
 
-            gsdml->string_to_value_datatype(di->Body.DataType, &datatype);
-            unsigned int len;
+  //           gsdml->string_to_value_datatype(di->Body.DataType, &datatype);
+  //           unsigned int len;
 
-            sts = gsdml->get_datavalue_length(datatype, di->Body.Length, &len);
-            if (EVEN(sts))
-              printf("GSDML-Error, Datatype %s not yet implemented\n",
-                     di->Body.DataType);
+  //           sts = gsdml->get_datavalue_length(datatype, di->Body.Length,
+  //           &len); if (EVEN(sts))
+  //             printf("GSDML-Error, Datatype %s not yet implemented\n",
+  //                    di->Body.DataType);
 
-            io_input_length += len;
-          }
-          if (ssd->io_input_length == 0)
-            ssd->io_input_length = io_input_length;
-          else if (ssd->io_input_length > io_input_length)
-            ssd->io_input_length = io_input_length;
-        }
-        if (vsd->IOData->Output)
-        {
-          for (unsigned k = 0; k < vsd->IOData->Output->DataItem.size(); k++)
-          {
-            gsdml_DataItem* di = vsd->IOData->Output->DataItem[k];
-            gsdml_eValueDataType datatype;
+  //           io_input_length += len;
+  //         }
+  //         if (ssd->io_input_length == 0)
+  //           ssd->io_input_length = io_input_length;
+  //         else if (ssd->io_input_length > io_input_length)
+  //           ssd->io_input_length = io_input_length;
+  //       }
+  //       if (vsd->IOData->Output)
+  //       {
+  //         for (unsigned k = 0; k < vsd->IOData->Output->DataItem.size(); k++)
+  //         {
+  //           gsdml_DataItem* di = vsd->IOData->Output->DataItem[k];
+  //           gsdml_eValueDataType datatype;
 
-            gsdml->string_to_value_datatype(di->Body.DataType, &datatype);
-            unsigned int len;
+  //           gsdml->string_to_value_datatype(di->Body.DataType, &datatype);
+  //           unsigned int len;
 
-            sts = gsdml->get_datavalue_length(datatype, di->Body.Length, &len);
-            if (EVEN(sts))
-              printf("GSDML-Error, Datatype %s not yet implemented\n",
-                     di->Body.DataType);
+  //           sts = gsdml->get_datavalue_length(datatype, di->Body.Length,
+  //           &len); if (EVEN(sts))
+  //             printf("GSDML-Error, Datatype %s not yet implemented\n",
+  //                    di->Body.DataType);
 
-            io_output_length += len;
-          }
-          if (ssd->io_output_length == 0)
-            ssd->io_output_length = io_output_length;
-          else if (ssd->io_output_length > io_output_length)
-            ssd->io_output_length = io_output_length;
-        }
-      }
-    }
-  }
+  //           io_output_length += len;
+  //         }
+  //         if (ssd->io_output_length == 0)
+  //           ssd->io_output_length = io_output_length;
+  //         else if (ssd->io_output_length > io_output_length)
+  //           ssd->io_output_length = io_output_length;
+  //       }
+  //     }
+  //   }
+  // }
 
-  collapse();
-  brow_ResetNodraw(brow->ctx);
-  brow_Redraw(brow->ctx, 0);
+  // collapse();
+  // brow_ResetNodraw(brow->ctx);
+  // brow_Redraw(brow->ctx, 0);
 
-  sts = dev_data.print(filename);
+  // sts = dev_data.print(filename);
 
-  // Unload channel diag
-  dev_data.channel_diag_reset();
+  // // Unload channel diag
+  // dev_data.channel_diag_reset();
 
   return sts;
 }
 
 int GsdmlAttrNav::open(const char* filename)
 {
-  int sts;
+  // int sts;
 
-  strncpy(dev_data.gsdmlfile, gsdml->gsdmlfile, sizeof(dev_data.gsdmlfile));
+  // //strncpy(dev_data.gsdmlfile, gsdml->m_gsdml_file,
+  // sizeof(dev_data.gsdmlfile));
 
-  sts = dev_data.read(filename);
-  if (sts == PB__GSDMLFILEMISMATCH)
-  {
-    char msg[300];
-    printf("GSDML-Error, Gsdmlfile doesn't match original filename\n");
+  // //char* name_of_gsdml_file;
+  // //basename(gsdml->m_gsdml_file, &name_of_gsdml_file);
+  // //sts = pn_runtime_data.read_pwr_pn_xml(filename, name_of_gsdml_file);
 
-    sprintf(msg, "Gsdmlfile doesn't match original filename.\n\nIf the new "
-                 "file is not compatible with the old, configuration data "
-                 "might be corrupt,\nand you should clear the data. The "
-                 "configuration will then be lost.\n\nIf the files are "
-                 "compatible, you should keep the data.");
-    int res = wow->CreateModalDialog("New gsdml filename detected", msg,
-                                     "Clear Data", "Keep Data", "Cancel", 0);
-    switch (res)
-    {
-    case wow_eModalDialogReturn_Button1:
-      return sts;
-    case wow_eModalDialogReturn_Button2:
-      // Keep data
-      sts = dev_data.read(filename, 1);
-      if (EVEN(sts))
-        return sts;
-      break;
-    case wow_eModalDialogReturn_Deleted:
-    case wow_eModalDialogReturn_Button3:
-    case wow_eModalDialogReturn_NYI:
-      return PB__CONFIGABORTED;
-    }
-  }
-  else if (EVEN(sts))
-    return sts;
+  // //sts = dev_data.read(filename);
+  // if (sts == PB__GSDMLFILEMISMATCH)
+  // {
+  //   // TODO this idiom should be refactored into one function. Seems like a
+  //   common thing to do... char msg[300]; printf("GSDML-Error, Gsdmlfile
+  //   doesn't match original filename\n");
 
-  device_num = dev_data.device_num;
-  gsdml->byte_order = dev_data.byte_order;
-  time_ratio = dev_data.iocr_data[0]->reduction_ratio;
-  send_clock = dev_data.iocr_data[0]->send_clock_factor;
-  phase = dev_data.iocr_data[0]->phase;
+  //   sprintf(msg, "Gsdmlfile doesn't match original filename.\n\nIf the new "
+  //                "file is not compatible with the old, configuration data "
+  //                "might be corrupt,\nand you should clear the data. The "
+  //                "configuration will then be lost.\n\nIf the files are "
+  //                "compatible, you should keep the data.");
+  //   int res = m_wow->CreateModalDialog("New gsdml filename detected", msg,
+  //                                    "Clear Data", "Keep Data", "Cancel", 0);
+  //   switch (res)
+  //   {
+  //   case wow_eModalDialogReturn_Button1:
+  //     return sts;
+  //   case wow_eModalDialogReturn_Button2:
+  //     // Keep data
+  //     //sts = dev_data.read(filename, 1);
+  //     //sts = pn_runtime_data.read_pwr_pn_xml(filename, name_of_gsdml_file,
+  //     true); if (EVEN(sts))
+  //       return sts;
+  //     break;
+  //   case wow_eModalDialogReturn_Deleted:
+  //   case wow_eModalDialogReturn_Button3:
+  //   case wow_eModalDialogReturn_NYI:
+  //     return PB__CONFIGABORTED;
+  //   }
+  // }
+  // else if (EVEN(sts))
+  //   return sts;
 
-// Check if the data read uses native byte ordering or not
-#if (pwr_dHost_byteOrder == pwr_dLittleEndian)
-  if (gsdml->byte_order == pwr_eByteOrderingEnum_LittleEndian)
-  {
-    dev_data.read_data_is_native_ordered = 1;
-  }
-  else
-  {
-    dev_data.read_data_is_native_ordered = 0;
-  }
-#elif (pwr_dHost_byteOrder == pwr_dBigEndian)
-  if (gsdml->byte_order == pwr_eByteOrderingEnum_LittleEndian)
-  {
-    dev_data.read_data_is_native_ordered = 0;
-  }
-  else
-  {
-    dev_data.read_data_is_native_ordered = 1;
-  }
-#endif
+  // device_num = dev_data.device_num;
+  // gsdml->byte_order = dev_data.byte_order;
+  // time_ratio = dev_data.iocr_data[0]->reduction_ratio;
+  // send_clock = dev_data.iocr_data[0]->send_clock_factor;
+  // phase = dev_data.iocr_data[0]->phase;
 
-  if (device_num > 0)
-  {
-    if (device_num > gsdml->ApplicationProcess->DeviceAccessPointList
-                         ->DeviceAccessPointItem.size())
-    {
-      printf("GSDML-Read Error: Device number out of range: %d\n",
-             dev_data.device_num);
-      return 0;
-    }
-    device_item = gsdml->ApplicationProcess->DeviceAccessPointList
-                      ->DeviceAccessPointItem[device_num - 1];
+  // Check if the data read uses native byte ordering or not
+  // #if (pwr_dHost_byteOrder == pwr_dLittleEndian)
+  //   if (gsdml->byte_order == pwr_eByteOrderingEnum_LittleEndian)
+  //   {
+  //     dev_data.read_data_is_native_ordered = 1;
+  //   }
+  //   else
+  //   {
+  //     dev_data.read_data_is_native_ordered = 0;
+  //   }
+  // #elif (pwr_dHost_byteOrder == pwr_dBigEndian)
+  //   if (gsdml->byte_order == pwr_eByteOrderingEnum_LittleEndian)
+  //   {
+  //     dev_data.read_data_is_native_ordered = 0;
+  //   }
+  //   else
+  //   {
+  //     dev_data.read_data_is_native_ordered = 1;
+  //   }
+  // #endif
 
-    // Check text
-    if (strcmp(dev_data.device_text,
-               (char*)device_item->ModuleInfo->Body.Name.p) != 0)
-      printf("GSDML-Read Error: Device name differs \"%s\" \"%s\"\n",
-             dev_data.device_text, (char*)device_item->ModuleInfo->Body.Name.p);
-    device_read = 1;
-  }
+  // std::string dap_id(pn_runtime_data->m_PnDevice->m_DAP_ID);
+
+  // if (dap_id != "")
+  // {
+  //   std::cout << "WE have an ID use it..." << std::endl;
+  //   m_selected_device_item = gsdml->getDeviceAccessPointMap()[dap_id];
+  // }
+  // else if (device_num > 0)
+  // {
+  // if (device_num > gsdml->ApplicationProcess->DeviceAccessPointList
+  //                      ->DeviceAccessPointItem.size())
+  // if (device_num > gsdml->getDeviceAccessPointList().size())
+  // {
+  //   printf("GSDML-Read Error: Device number out of range: %d\n", device_num);
+  //   //return 0;
+  //   return PB__CONFIGERR;
+  // }
+  // TODO Change to new data
+  // m_selected_device_item = gsdml->getDeviceAccessPointList().at(device_num -
+  // 1); device_item = gsdml->ApplicationProcess->DeviceAccessPointList
+  //                   ->DeviceAccessPointItem[device_num - 1];
+
+  // Check text TODO should we care? We have never done so?
+  // auto device = gsdml->getDeviceAccessPointList().at(device_num - 1);
+  // if (strcmp(pn_runtime_data->m_PnDevice->m_device_text,
+  // device->_ModuleInfo._Name->c_str()) != 0)
+  //   printf("GSDML-Read Error: Device name differs \"%s\" \"%s\"\n",
+  //   pn_runtime_data->m_PnDevice->m_device_text,
+  //   device->_ModuleInfo._Name->c_str());
+
+  //   device_read = 1;
+  // }
   return 1;
 }
 
@@ -1917,80 +2010,97 @@ int GsdmlAttrNav::search_class(const char* filename, const char* model,
   return 0;
 }
 
-ItemPnBase::ItemPnBase(GsdmlAttrNav* attrnav, const char* item_name,
-                       const char* attr, int attr_type, int attr_size,
-                       double attr_min_limit, double attr_max_limit,
-                       void* attr_value_p, int attr_noedit, brow_tNode dest,
-                       flow_eDest dest_code)
-    : value_p(attr_value_p), first_scan(1), type_id(attr_type), size(attr_size),
-      min_limit(attr_min_limit), max_limit(attr_max_limit), noedit(attr_noedit),
-      subgraph(0)
+ItemPnInfo::ItemPnInfo(GsdmlAttrNav* attrnav, const char* name,
+                       const char* trace_attr_name, pwr_eType pwr_type_id,
+                       size_t attr_size, void const* value_p, brow_tNode dest,
+                       flow_eDest dest_code, const char* infotext)
+    : ItemPn(attrnav, attrnav_eItemType_, name, infotext), m_pwr_type_id(pwr_type_id)
 {
-  type = attrnav_eItemType_PnBase;
 
-  strcpy(name, item_name);
-  memset(old_value, 0, sizeof(old_value));
+  brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_attr, dest,
+                  dest_code, (void*)this, 1, &m_node);
+  brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_attr);
+  brow_SetAnnotation(m_node, 0, m_name.c_str(), m_name.length());
 
-  brow_CreateNode(attrnav->brow->ctx, item_name, attrnav->brow->nc_attr, dest,
-                  dest_code, (void*)this, 1, &node);
+  std::string value = GSDML::attr_value_to_string(m_pwr_type_id, value_p);
 
-  if (parent)
-    brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_attrenum);
-  else
-    brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_attr);
-
-  brow_SetAnnotation(node, 0, item_name, strlen(item_name));
-  brow_SetTraceAttr(node, attr, "", flow_eTraceType_User);
+  brow_SetAnnotation(m_node, 1, value.c_str(), value.length());
 }
 
-int ItemPnBase::scan(GsdmlAttrNav* attrnav, void* p)
+ItemPnBase::ItemPnBase(GsdmlAttrNav* attrnav, const char* name,
+                       const char* trace_attr_name, pwr_eType attr_type,
+                       size_t attr_size, double attr_min_limit,
+                       double attr_max_limit, void* attr_value_p,
+                       int attr_noedit, brow_tNode dest, flow_eDest dest_code, const char* infotext)
+    : ItemPn(attrnav, attrnav_eItemType_PnBase, name, infotext), m_value_p(attr_value_p), m_const_value_p(0),
+      m_size(attr_size), m_min_limit(attr_min_limit),
+      m_max_limit(attr_max_limit)//, m_subgraph(0)
 {
-  char buf[200];
-  int len;
+  memset(m_old_value, 0, sizeof(m_old_value));
+  m_noedit = attr_noedit;
+  m_value_type = attr_type;
 
-  if (size == 0)
+  brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_attr, dest,
+                  dest_code, (void*)this, 1, &m_node);
+
+  if (m_is_parent)
+    brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_attrenum);
+  else
+    brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_attr);
+
+  brow_SetAnnotation(m_node, 0, m_name.c_str(), m_name.length());
+  brow_SetTraceAttr(m_node, trace_attr_name, "", flow_eTraceType_User);
+}
+
+int ItemPnBase::scan(GsdmlAttrNav* attrnav, void* value_p)
+{
+  //pwr_tString256 buf;
+  //int length;
+
+  if (m_size == 0)
     return 1;
 
-  if (!first_scan)
+  if (!m_first_scan)
   {
-    if (size > (int)sizeof(old_value) && type_id == glow_eType_String &&
-        strlen((char*)p) < sizeof(old_value) && streq((char*)p, old_value))
-      // No change since last time
+    if (memcmp(m_old_value, value_p, m_size) == 0)
+    {
       return 1;
-    else if (memcmp(old_value, p, size) == 0)
-      // No change since last time
-      return 1;
+    }
   }
   else
-    first_scan = 0;
+    m_first_scan = 0;
 
-  attrnav->attrvalue_to_string(type_id, p, buf, sizeof(buf), &len, NULL);
-  brow_SetAnnotation(node, 1, buf, len);
-  memcpy(old_value, p, MIN(size, (int)sizeof(old_value)));
+  std::string value = GSDML::attr_value_to_string(m_value_type, value_p);
+  // attrnav->attr_value_to_string(m_type_id, value_p, buf, sizeof(buf), &length,
+  //                               NULL);
+  brow_SetAnnotation(m_node, 1, value.c_str(), value.length());
+  memcpy(m_old_value, value_p, MIN(m_size, sizeof(m_old_value)));
 
   return 1;
 }
 
 void ItemPnBase::value_changed(GsdmlAttrNav* attrnav, const char* value_str)
 {
-  char buffer[1024];
+  //pwr_tString256 buf;
   int sts;
 
-  sts = attrnav->attr_string_to_value(type_id, value_str, buffer,
-                                      sizeof(buffer), size);
+  
+  sts = GSDML::attr_string_to_value(m_value_type, m_value_p, value_str);
+  // sts = attrnav->attr_string_to_value(m_type_id, value_str, buf, sizeof(buf),
+  //                                     m_size);
   if (EVEN(sts))
   {
     attrnav->message('E', "Syntax error");
     return;
   }
 
-  if (!feq(max_limit, 0.0) || !feq(min_limit, 0.0))
+  if (!feq(m_max_limit, 0.0) || !feq(m_min_limit, 0.0))
   {
-    switch (type_id)
+    switch (m_value_type)
     {
     case pwr_eType_Int32:
     case pwr_eType_UInt32:
-      if (*(int*)&buffer < min_limit || *(int*)&buffer > max_limit)
+      if (*(int*)&m_value_p < m_min_limit || *(int*)&m_value_p > m_max_limit)
       {
         attrnav->message('E', "Min or maxvalue exceeded");
         return;
@@ -1999,221 +2109,312 @@ void ItemPnBase::value_changed(GsdmlAttrNav* attrnav, const char* value_str)
     default:;
     }
   }
-  memcpy(value_p, buffer, size);
+  
+  //memcpy(m_value_p, buf, m_size);
   attrnav->set_modified(1);
 }
-int ItemPn::close(GsdmlAttrNav* attrnav, double x, double y)
+
+int ItemPn::open_children(GsdmlAttrNav* attrnav, double x, double y)
 {
   double node_x, node_y;
 
-  brow_GetNodePosition(node, &node_x, &node_y);
+  brow_GetNodePosition(m_node, &node_x, &node_y);
 
-  if (brow_IsOpen(node))
+  if (brow_IsOpen(m_node))
+  {
+    close(attrnav, node_x, node_y);
+  }
+  else
+  {
+    brow_SetNodraw(attrnav->brow->ctx);
+
+    open_children_impl(); // Specific implementation goes here
+
+    brow_SetOpen(m_node, attrnav_mOpen_Children);
+    brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_openmap);
+    brow_ResetNodraw(attrnav->brow->ctx);
+    brow_Redraw(attrnav->brow->ctx, node_y);
+  }
+  return 1;
+}
+
+int ItemPn::close(GsdmlAttrNav* attrnav, double x, double y) const
+{
+  double node_x, node_y;
+
+  brow_GetNodePosition(m_node, &node_x, &node_y);
+
+  if (brow_IsOpen(m_node))
   {
     // Close
     brow_SetNodraw(attrnav->brow->ctx);
-    brow_CloseNode(attrnav->brow->ctx, node);
-    if (brow_IsOpen(node) & attrnav_mOpen_Attributes)
-      brow_RemoveAnnotPixmap(node, 1);
-    if (brow_IsOpen(node) & attrnav_mOpen_Children)
+    brow_CloseNode(attrnav->brow->ctx, m_node);
+    if (brow_IsOpen(m_node) & attrnav_mOpen_Attributes)
+      brow_RemoveAnnotPixmap(m_node, 1);
+    if (brow_IsOpen(m_node) & attrnav_mOpen_Children)
     {
-      switch (type)
+      switch (m_type)
       {
       case attrnav_eItemType_PnDevice:
       case attrnav_eItemType_PnParEnum:
       case attrnav_eItemType_PnEnumByteOrder:
       case attrnav_eItemType_PnEnumTimeRatio:
       case attrnav_eItemType_PnEnumSendClock:
-      case attrnav_eItemType_PnModuleType:
-      case attrnav_eItemType_PnSubmoduleType:
+      case attrnav_eItemType_PnModuleSelect:
+      // case attrnav_eItemType_PnSubmoduleType:
+      case attrnav_eItemType_PnSubmoduleSelection:
       case attrnav_eItemType_PnModuleClass:
-      case attrnav_eItemType_PnNetworkSettingYesNo:
-        brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_attrenum);
+      case attrnav_eItemType_PnEnumYesNo:
+      case attrnav_eItemType_PnEnumRTClass:
+      case attrnav_eItemType_PnSkipIPAssignment:
+        brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_attrenum);
         break;
       case attrnav_eItemType_PnSlot:
-        brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_map);
+        brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_map);
+        break;
+      case attrnav_eItemType_PnSubslot:
+        if (m_has_settings)
+          brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_attrenum);
+        else
+          brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_map);
         break;
       default:
-        if (parent)
-          brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_map);
+        if (m_is_parent)
+          brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_map);
         else
-          brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_leaf);
+          brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_leaf);
       }
     }
-    brow_ResetOpen(node, attrnav_mOpen_All);
+    brow_ResetOpen(m_node, attrnav_mOpen_All);
+    brow_SelectClear(attrnav->brow->ctx);
+    brow_SetInverse(m_node, 1);
+    brow_SelectInsert(attrnav->brow->ctx, m_node);
     brow_ResetNodraw(attrnav->brow->ctx);
     brow_Redraw(attrnav->brow->ctx, node_y);
   }
   return 1;
 }
 
-ItemPnEnumValue::ItemPnEnumValue(GsdmlAttrNav* attrnav, const char* item_name,
-                                 int item_num, int item_type_id,
+ItemPnIDSelectValue::ItemPnIDSelectValue(GsdmlAttrNav* attrnav,
+                                         const char* name,
+                                         std::string id_enum_value,
+                                         std::string* id_p, brow_tNode dest,
+                                         flow_eDest dest_code,
+                                         const char* infotext)
+    : ItemPn(attrnav, attrnav_eItemType_PnIDSelectValue, name, infotext), m_id_enum_value(id_enum_value), m_id(id_p)
+{
+  brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_enum,
+                  dest, dest_code, (void*)this, 1, &m_node);
+
+  brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_attr);
+  brow_SetAnnotation(m_node, 0, m_name.c_str(), m_name.length());
+
+  // Set if this is selected or not
+  if (*m_id == m_id_enum_value)
+    brow_SetRadiobutton(m_node, 0, 1);
+  else
+    brow_SetRadiobutton(m_node, 0, 0);
+
+  brow_SetTraceAttr(m_node, m_name.c_str(), "", flow_eTraceType_User);
+}
+
+void ItemPnIDSelectValue::selected(GsdmlAttrNav* attrnav)
+{
+  int value;
+  if (!attrnav->edit_mode)
+  {
+    attrnav->message('E', "Not in edit mode");
+    return;
+  }
+
+  brow_GetRadiobutton(m_node, 0, &value);
+
+  if (!value)
+  {
+    brow_SetRadiobutton(m_node, 0, 1);
+
+    *m_id = m_id_enum_value;
+    attrnav->set_modified(1);
+  }
+}
+
+int ItemPnIDSelectValue::scan(GsdmlAttrNav* attrnav, void* id_p)
+{
+  if (!m_first_scan)
+  {
+    if (m_old_value == *(std::string*)id_p)
+      // No change since last time
+      return 1;
+  }
+  else
+    m_first_scan = 0;
+
+  if (*(std::string*)id_p == m_id_enum_value)
+    brow_SetRadiobutton(m_node, 0, 1);
+  else
+    brow_SetRadiobutton(m_node, 0, 0);
+
+  m_old_value = *(std::string*)id_p;
+  return 1;
+}
+
+ItemPnEnumValue::ItemPnEnumValue(GsdmlAttrNav* attrnav, const char* name,
+                                 int item_enum_value, pwr_eType item_type_id,
                                  void* attr_value_p, brow_tNode dest,
-                                 flow_eDest dest_code, const char* info_text)
-    : ItemPn(info_text), num(item_num), type_id(item_type_id),
-      value_p(attr_value_p), first_scan(1)
+                                 flow_eDest dest_code, const char* infotext)
+    : ItemPn(attrnav, attrnav_eItemType_PnEnumValue, name, infotext), m_enum_value(item_enum_value), m_type_id(item_type_id),
+      m_value_p(attr_value_p)
 {
-  type = attrnav_eItemType_PnEnumValue;
+  brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_enum,
+                  dest, dest_code, (void*)this, 1, &m_node);
 
-  strcpy(name, item_name);
+  brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_attr);
+  brow_SetAnnotation(m_node, 0, m_name.c_str(), m_name.length());
 
-  brow_CreateNode(attrnav->brow->ctx, item_name, attrnav->brow->nc_enum, dest,
-                  dest_code, (void*)this, 1, &node);
-
-  brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_attr);
-  brow_SetAnnotation(node, 0, item_name, strlen(item_name));
-  if (*(int*)value_p == num)
-    brow_SetRadiobutton(node, 0, 1);
+  // Set if this is selected or not
+  if (*(int*)m_value_p == m_enum_value)
+    brow_SetRadiobutton(m_node, 0, 1);
   else
-    brow_SetRadiobutton(node, 0, 0);
-  brow_SetTraceAttr(node, name, "", flow_eTraceType_User);
+    brow_SetRadiobutton(m_node, 0, 0);
+
+  brow_SetTraceAttr(m_node, m_name.c_str(), "", flow_eTraceType_User);
 }
 
-int ItemPnEnumValue::scan(GsdmlAttrNav* attrnav, void* p)
+int ItemPnEnumValue::scan(GsdmlAttrNav* attrnav, void* value_p)
 {
-  if (!first_scan)
+  if (!m_first_scan)
   {
-    if (old_value == *(int*)p)
+    if (m_old_value == *(int*)value_p)
       // No change since last time
       return 1;
   }
   else
-    first_scan = 0;
+    m_first_scan = 0;
 
-  if (*(int*)p == num)
-    brow_SetRadiobutton(node, 0, 1);
+  if (*(int*)value_p == m_enum_value)
+    brow_SetRadiobutton(m_node, 0, 1);
   else
-    brow_SetRadiobutton(node, 0, 0);
+    brow_SetRadiobutton(m_node, 0, 0);
 
-  old_value = *(int*)p;
+  m_old_value = *(int*)value_p;
   return 1;
 }
 
-ItemPnEnumValueMType::ItemPnEnumValueMType(
-    GsdmlAttrNav* attrnav, const char* item_name, const char* item_number,
-    int item_num, int item_type_id, void* attr_value_p, brow_tNode dest,
-    flow_eDest dest_code, const char* info_text)
-    : ItemPn(info_text), num(item_num), type_id(item_type_id),
-      value_p(attr_value_p), first_scan(1)
+// ItemPnEnumValueMType::ItemPnEnumValueMType(
+//     GsdmlAttrNav* attrnav, const char* item_name, const char* item_number,
+//     int item_num, int item_type_id, void* attr_value_p, brow_tNode dest,
+//     flow_eDest dest_code, const char* info_text)
+//     : ItemPn(info_text), num(item_num), type_id(item_type_id),
+//       value_p(attr_value_p), first_scan(1)
+// {
+//   m_type = attrnav_eItemType_PnEnumValueMType;
+
+//   m_name = std::string(item_name);
+//   strcpy(number, item_number);
+
+//   brow_CreateNode(attrnav->brow->ctx, item_name,
+//   attrnav->brow->nc_enum_mtype,
+//                   dest, dest_code, (void*)this, 1, &m_node);
+
+//   brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_attr);
+//   brow_SetAnnotation(m_node, 0, item_name, strlen(item_name));
+//   brow_SetAnnotation(m_node, 1, item_number, strlen(item_number));
+//   if (*(int*)value_p == num)
+//     brow_SetRadiobutton(m_node, 0, 1);
+//   else
+//     brow_SetRadiobutton(m_node, 0, 0);
+//   brow_SetTraceAttr(m_node, m_name.c_str(), "", flow_eTraceType_User);
+// }
+
+// int ItemPnEnumValueMType::scan(GsdmlAttrNav* attrnav, void* p)
+// {
+//   if (!first_scan)
+//   {
+//     if (old_value == *(int*)p)
+//       // No change since last time
+//       return 1;
+//   }
+//   else
+//     first_scan = 0;
+
+//   if (*(int*)p == num)
+//     brow_SetRadiobutton(m_node, 0, 1);
+//   else
+//     brow_SetRadiobutton(m_node, 0, 0);
+
+//   old_value = *(int*)p;
+//   return 1;
+// }
+
+ItemPnDevice::ItemPnDevice(GsdmlAttrNav* attrnav, const char* name,
+                           brow_tNode dest, flow_eDest dest_code, const char* infotext)
+    : ItemPn(attrnav, attrnav_eItemType_PnDevice, name, "Choose DAP"), m_old_value("")
 {
-  type = attrnav_eItemType_PnEnumValueMType;
+  brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_attr, dest,
+                  dest_code, (void*)this, 1, &m_node);
 
-  strcpy(name, item_name);
-  strcpy(number, item_number);
+  brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_attrenum);
 
-  brow_CreateNode(attrnav->brow->ctx, item_name, attrnav->brow->nc_enum_mtype,
-                  dest, dest_code, (void*)this, 1, &node);
-
-  brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_attr);
-  brow_SetAnnotation(node, 0, item_name, strlen(item_name));
-  brow_SetAnnotation(node, 1, item_number, strlen(item_number));
-  if (*(int*)value_p == num)
-    brow_SetRadiobutton(node, 0, 1);
-  else
-    brow_SetRadiobutton(node, 0, 0);
-  brow_SetTraceAttr(node, name, "", flow_eTraceType_User);
+  brow_SetAnnotation(m_node, 0, m_name.c_str(), m_name.length());
+  brow_SetTraceAttr(m_node, m_name.c_str(), "", flow_eTraceType_User);
 }
 
-int ItemPnEnumValueMType::scan(GsdmlAttrNav* attrnav, void* p)
+int ItemPnDevice::open_children_impl()
 {
-  if (!first_scan)
-  {
-    if (old_value == *(int*)p)
-      // No change since last time
-      return 1;
-  }
-  else
-    first_scan = 0;
+  
+    // int idx = 1;
+    // new ItemPnEnumValue(attrnav, "No", idx++, pwr_eType_UInt32,
+    //                     &attrnav->pn_runtime_data->m_PnDevice->m_device_num,
+    //                     m_node, flow_eDest_IntoLast);
 
-  if (*(int*)p == num)
-    brow_SetRadiobutton(node, 0, 1);
-  else
-    brow_SetRadiobutton(node, 0, 0);
-
-  old_value = *(int*)p;
-  return 1;
-}
-
-ItemPnDevice::ItemPnDevice(GsdmlAttrNav* attrnav, const char* item_name,
-                           brow_tNode dest, flow_eDest dest_code)
-    : old_value(0), first_scan(1)
-{
-  type = attrnav_eItemType_PnDevice;
-
-  strcpy(name, item_name);
-
-  brow_CreateNode(attrnav->brow->ctx, item_name, attrnav->brow->nc_attr, dest,
-                  dest_code, (void*)this, 1, &node);
-
-  brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_attrenum);
-
-  brow_SetAnnotation(node, 0, item_name, strlen(item_name));
-  brow_SetTraceAttr(node, name, "", flow_eTraceType_User);
-}
-
-int ItemPnDevice::open_children(GsdmlAttrNav* attrnav, double x, double y)
-{
-  double node_x, node_y;
-
-  brow_GetNodePosition(node, &node_x, &node_y);
-
-  if (brow_IsOpen(node))
-  {
-    // Close
-    brow_SetNodraw(attrnav->brow->ctx);
-    brow_CloseNode(attrnav->brow->ctx, node);
-    if (brow_IsOpen(node) & attrnav_mOpen_Attributes)
-      // brow_RemoveAnnotPixmap( node, 1);
-      brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_attrenum);
-    if (brow_IsOpen(node) & attrnav_mOpen_Children)
-      brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_attrenum);
-    brow_ResetOpen(node, attrnav_mOpen_All);
-    brow_ResetNodraw(attrnav->brow->ctx);
-    brow_Redraw(attrnav->brow->ctx, node_y);
-  }
-  else
-  {
-    brow_SetNodraw(attrnav->brow->ctx);
-
-    int idx = 0;
-    new ItemPnEnumValue(attrnav, "No", idx++, pwr_eType_UInt32,
-                        &attrnav->device_num, node, flow_eDest_IntoLast);
-
-    for (unsigned int i = 0;
-         i < attrnav->gsdml->ApplicationProcess->DeviceAccessPointList
-                 ->DeviceAccessPointItem.size();
-         i++)
+    for (auto const& dap_item : m_attrnav->gsdml->getDeviceAccessPointMap())
     {
-      gsdml_DeviceAccessPointItem* item =
-          attrnav->gsdml->ApplicationProcess->DeviceAccessPointList
-              ->DeviceAccessPointItem[i];
-      char name[sizeof((char*)item->ModuleInfo->Body.Name.p) + 2 +
-                sizeof(item->ModuleInfo->Body.OrderNumber) + 1 + 1];
-      snprintf(name, sizeof(name), "%s (%s)",
-               (char*)item->ModuleInfo->Body.Name.p,
-               item->ModuleInfo->Body.OrderNumber);
-      new ItemPnEnumValue(attrnav, name, idx++, pwr_eType_UInt32,
-                          &attrnav->device_num, node, flow_eDest_IntoLast,
-                          (char*)item->ModuleInfo->Body.InfoText.p);
+      std::ostringstream dap_item_display_text(
+          *dap_item.second->_ModuleInfo._Name, std::ios_base::ate);
+      dap_item_display_text << " (" << dap_item.second->_ModuleInfo._OrderNumber
+                            << ")";
+
+      // new ItemPnEnumValue(attrnav, dap_item_display_text.str().c_str(),
+      // idx++, pwr_eType_UInt32,
+      //                     &attrnav->pn_runtime_data->m_PnDevice->m_device_num,
+      //                     m_node, flow_eDest_IntoLast,
+      //                     dap_item.second->_ModuleInfo._InfoText->c_str());
+
+      new ItemPnIDSelectValue(
+          m_attrnav, dap_item_display_text.str().c_str(), dap_item.first.c_str(),
+          &m_attrnav->pn_runtime_data->m_PnDevice->m_DAP_ID, m_node,
+          flow_eDest_IntoLast, dap_item.second->_ModuleInfo._InfoText->c_str());
     }
 
-    brow_SetOpen(node, attrnav_mOpen_Children);
-    brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_openmap);
-    brow_ResetNodraw(attrnav->brow->ctx);
-    brow_Redraw(attrnav->brow->ctx, node_y);
-  }
+    // for (unsigned int i = 0;
+    //      i < attrnav->gsdml->ApplicationProcess->DeviceAccessPointList
+    //              ->DeviceAccessPointItem.size();
+    //      i++)
+    // {
+    //   gsdml_DeviceAccessPointItem* item =
+    //       attrnav->gsdml->ApplicationProcess->DeviceAccessPointList
+    //           ->DeviceAccessPointItem[i];
+    //   char name[sizeof((char*)item->ModuleInfo->Body.Name.p) + 2 +
+    //             sizeof(item->ModuleInfo->Body.OrderNumber) + 1 + 1];
+    //   snprintf(name, sizeof(name), "%s (%s)",
+    //            (char*)item->ModuleInfo->Body.Name.p,
+    //            item->ModuleInfo->Body.OrderNumber);
+    //   new ItemPnEnumValue(attrnav, name, idx++, pwr_eType_UInt32,
+    //                       &attrnav->pn_runtime_data->m_PnDevice->m_device_num,
+    //                       m_node, flow_eDest_IntoLast,
+    //                       (char*)item->ModuleInfo->Body.InfoText.p);
+    // }
+
   return 1;
 }
 
-int ItemPnDevice::scan(GsdmlAttrNav* attrnav, void* p)
+int ItemPnDevice::scan(GsdmlAttrNav* attrnav, void* value_p)
 {
-  char buf[200];
 
   // Note, first scan is set the two first scans to detect load from data file
-  if (!first_scan)
+  if (!m_first_scan)
   {
-    if (old_value == *(int*)p)
+    if (m_old_value == *(std::string*)value_p)
       // No change since last time
       return 1;
   }
@@ -2221,2089 +2422,2086 @@ int ItemPnDevice::scan(GsdmlAttrNav* attrnav, void* p)
   if (attrnav->device_confirm_active)
     return 1;
 
-  if (!first_scan)
+  if (!m_first_scan)
   {
-    if (old_value == 0)
+    if (m_old_value == "")
     {
-      GsdmlAttrNav::device_changed_ok(attrnav, (void*)((long int)old_value));
+      // When we go from nothing we skip the check...
+      GsdmlAttrNav::device_changed_ok(attrnav, (void*)&m_old_value);
       return 1;
     }
     else
     {
       if (GsdmlAttrNav::device_check_change_ok(attrnav))
       {
-        GsdmlAttrNav::device_update_change(attrnav);
+        // GsdmlAttrNav::device_update_change(attrnav);
+        // attrnav->collapse(); // Close all after change
+        GsdmlAttrNav::device_changed_ok(attrnav, (void*)&m_old_value);
+        return 1;
       }
       else
       {
-        attrnav->wow->DisplayQuestion(
+        attrnav->m_wow->DisplayQuestion(
             attrnav, "Device Changed",
             "All configuration data will be lost when changing the device.\n"
             "Do you really want to change the device ?",
             GsdmlAttrNav::device_changed_ok,
-            GsdmlAttrNav::device_changed_cancel, (void*)((long int)old_value));
+            GsdmlAttrNav::device_changed_cancel, (void*)&m_old_value);
         attrnav->device_confirm_active = 1;
         return 1;
       }
     }
   }
 
-  if (*(int*)p == 0)
-    strcpy(buf, "No");
+  std::string annotation;
+  auto dap_item = attrnav->m_selected_device_item;
+
+  if (*(std::string*)value_p == "")
+    annotation = "None";
   else
   {
-    if (attrnav->device_num == 0)
-      strcpy(buf, "No");
-    else
-    {
-      gsdml_DeviceAccessPointItem* item =
-          attrnav->gsdml->ApplicationProcess->DeviceAccessPointList
-              ->DeviceAccessPointItem[attrnav->device_num - 1];
-      snprintf(buf, sizeof(buf), "%s (%s)",
-               (char*)item->ModuleInfo->Body.Name.p,
-               item->ModuleInfo->Body.OrderNumber);
-    }
-  }
-  brow_SetAnnotation(node, 1, buf, strlen(buf));
-  old_value = attrnav->device_num;
+    std::ostringstream dap_item_display_text(*dap_item->_ModuleInfo._Name,
+                                             std::ios_base::ate);
+    dap_item_display_text << " (" << dap_item->_ModuleInfo._OrderNumber << ")";
 
-  if (first_scan)
-    first_scan = 0;
+    annotation = dap_item_display_text.str();
+  }
+
+  brow_SetAnnotation(m_node, 1, annotation.c_str(), annotation.length());
+
+  m_old_value = attrnav->pn_runtime_data->m_PnDevice->m_DAP_ID;
+
+  if (m_first_scan)
+    m_first_scan = 0;
 
   return 1;
 }
 
-ItemPnSlot::ItemPnSlot(GsdmlAttrNav* attrnav, const char* item_name,
-                       GsdmlSlotData* item_slotdata, brow_tNode dest,
-                       flow_eDest dest_code)
-    : slotdata(item_slotdata), old_value(0), first_scan(1)
+ItemPnSlot::ItemPnSlot(GsdmlAttrNav* attrnav, const char* name,
+                       ProfinetSlot* item_slotdata, brow_tNode dest,
+                       flow_eDest dest_code, const char* infotext)
+    : ItemPn(attrnav, attrnav_eItemType_PnSlot, name, infotext), m_slotdata(item_slotdata), m_old_value("")
 {
-  type = attrnav_eItemType_PnSlot;
+  brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_attr,
+                  dest, dest_code, (void*)this, 1, &m_node);
 
-  strcpy(name, item_name);
+  brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_map);
 
-  brow_CreateNode(attrnav->brow->ctx, item_name, attrnav->brow->nc_attr, dest,
-                  dest_code, (void*)this, 1, &node);
-
-  brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_map);
-
-  brow_SetAnnotation(node, 0, item_name, strlen(item_name));
-  brow_SetTraceAttr(node, name, "", flow_eTraceType_User);
+  brow_SetAnnotation(m_node, 0, m_name.c_str(), m_name.length());
+  brow_SetTraceAttr(m_node, m_name.c_str(), "", flow_eTraceType_User);
 }
 
-int ItemPnSlot::open_children(GsdmlAttrNav* attrnav, double x, double y)
+int ItemPnSlot::open_children_impl()
 {
-  double node_x, node_y;
+    // new ItemPnModuleType(attrnav, "ModuleType", m_slotdata->slot_number,
+    //                      m_slotdata->slot_idx, m_node, flow_eDest_IntoLast);
+    // if (m_slotdata->module_enum_number != 0)
+    // {
+    //   new ItemPnModuleClass(attrnav, "ModuleClass", slotdata, m_node,
+    //                         flow_eDest_IntoLast);
 
-  brow_GetNodePosition(node, &node_x, &node_y);
+    //   int m_device_num = 1;
+    //   gsdml_UseableModules* um =
+    //       attrnav->gsdml->ApplicationProcess->DeviceAccessPointList
+    //           ->DeviceAccessPointItem[m_device_num - 1]
+    //           ->UseableModules;
+    //   if (um)
+    //   {
+    //     unsigned int subslot_number = 0;
+    //     unsigned int subslot_index = 0;
+    //     gsdml_ModuleItem* mi =
+    //         (gsdml_ModuleItem*)um
+    //             ->ModuleItemRef[slotdata->module_enum_number - 1]
+    //             ->Body.ModuleItemTarget.p;
 
-  if (brow_IsOpen(node))
-  {
-    // Close
-    brow_SetNodraw(attrnav->brow->ctx);
-    brow_CloseNode(attrnav->brow->ctx, node);
-    if (brow_IsOpen(node) & attrnav_mOpen_Attributes)
-      brow_RemoveAnnotPixmap(node, 1);
-    if (brow_IsOpen(node) & attrnav_mOpen_Children)
-      brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_map);
-    brow_ResetOpen(node, attrnav_mOpen_All);
-    brow_ResetNodraw(attrnav->brow->ctx);
-    brow_Redraw(attrnav->brow->ctx, node_y);
-  }
-  else
-  {
-    brow_SetNodraw(attrnav->brow->ctx);
+    //     if (mi && mi->ModuleInfo)
+    //     {
+    //       // TODO Fix
+    //       // new ItemPnModuleInfo(attrnav, "ModuleInfo", mi->ModuleInfo,
+    //       m_node,
+    //       //                      flow_eDest_IntoLast);
+    //     }
+    //     if (mi->VirtualSubmoduleList)
+    //     {
+    //       char subslot_name[80];
 
-    new ItemPnModuleType(attrnav, "ModuleType", slotdata->slot_number,
-                         slotdata->slot_idx, node, flow_eDest_IntoLast);
-    if (slotdata->module_enum_number != 0)
-    {
-      new ItemPnModuleClass(attrnav, "ModuleClass", slotdata, node,
-                            flow_eDest_IntoLast);
+    //       for (unsigned int i = 0;
+    //            i < mi->VirtualSubmoduleList->VirtualSubmoduleItem.size();
+    //            i++)
+    //       {
+    //         if (strcmp(mi->VirtualSubmoduleList->VirtualSubmoduleItem[i]
+    //                        ->Body.FixedInSubslots.str,
+    //                    "") == 0)
+    //         {
+    //           // FixedInSubslots not supplied, default subslot number is 1
 
-      gsdml_UseableModules* um =
-          attrnav->gsdml->ApplicationProcess->DeviceAccessPointList
-              ->DeviceAccessPointItem[attrnav->device_num - 1]
-              ->UseableModules;
-      if (um)
-      {
-        unsigned int subslot_number = 0;
-        unsigned int subslot_index = 0;
-        gsdml_ModuleItem* mi =
-            (gsdml_ModuleItem*)um
-                ->ModuleItemRef[slotdata->module_enum_number - 1]
-                ->Body.ModuleItemTarget.p;
+    //           if (mi->VirtualSubmoduleList->VirtualSubmoduleItem.size() == 1)
+    //             subslot_number = 1;
+    //           else
+    //             subslot_number++;
 
-        if (mi && mi->ModuleInfo)
-        {
-          new ItemPnModuleInfo(attrnav, "ModuleInfo", mi->ModuleInfo, node,
-                               flow_eDest_IntoLast);
-        }
-        if (mi->VirtualSubmoduleList)
-        {
-          char subslot_name[80];
+    //           sprintf(subslot_name, "Subslot %d", subslot_number);
 
-          for (unsigned int i = 0;
-               i < mi->VirtualSubmoduleList->VirtualSubmoduleItem.size(); i++)
-          {
-            if (strcmp(mi->VirtualSubmoduleList->VirtualSubmoduleItem[i]
-                           ->Body.FixedInSubslots.str,
-                       "") == 0)
-            {
-              // FixedInSubslots not supplied, default subslot number is 1
+    //           GsdmlSubslotData* ssd;
+    //           if (slotdata->subslot_data.size() <= subslot_index)
+    //           {
+    //             ssd = new GsdmlSubslotData();
+    //             ssd->subslot_number = subslot_number;
+    //             ssd->subslot_idx = subslot_index;
+    //             ssd->submodule_ident_number =
+    //                 mi->VirtualSubmoduleList->VirtualSubmoduleItem[i]
+    //                     ->Body.SubmoduleIdentNumber;
+    //             slotdata->subslot_data.push_back(ssd);
+    //           }
+    //           else
+    //           {
+    //             ssd = slotdata->subslot_data[subslot_index];
+    //             ssd->subslot_idx = subslot_index;
+    //             ssd->submodule_ident_number =
+    //                 mi->VirtualSubmoduleList->VirtualSubmoduleItem[i]
+    //                     ->Body.SubmoduleIdentNumber;
+    //             if (ssd->subslot_number != subslot_number)
+    //             {
+    //               ssd->subslot_number = subslot_number;
+    //               printf("GSML-Error, datafile corrupt, unexpected subslot "
+    //                      "number\n");
+    //             }
+    //           }
 
-              if (mi->VirtualSubmoduleList->VirtualSubmoduleItem.size() == 1)
-                subslot_number = 1;
-              else
-                subslot_number++;
+    //           new ItemPnSubslot(
+    //               attrnav, subslot_name, ssd,
+    //               mi->VirtualSubmoduleList->VirtualSubmoduleItem[0],
+    //               slotdata->slot_idx, m_node, flow_eDest_IntoLast);
+    //         }
+    //         else
+    //         {
+    //           // FixedInSubslots supplied, create all fixed subslots
 
-              sprintf(subslot_name, "Subslot %d", subslot_number);
+    //           gsdml_Valuelist* vl = new gsdml_Valuelist(
+    //               mi->VirtualSubmoduleList->VirtualSubmoduleItem[i]
+    //                   ->Body.FixedInSubslots.str);
+    //           gsdml_ValuelistIterator iter(vl);
 
-              GsdmlSubslotData* ssd;
-              if (slotdata->subslot_data.size() <= subslot_index)
-              {
-                ssd = new GsdmlSubslotData();
-                ssd->subslot_number = subslot_number;
-                ssd->subslot_idx = subslot_index;
-                ssd->submodule_ident_number =
-                    mi->VirtualSubmoduleList->VirtualSubmoduleItem[i]
-                        ->Body.SubmoduleIdentNumber;
-                slotdata->subslot_data.push_back(ssd);
-              }
-              else
-              {
-                ssd = slotdata->subslot_data[subslot_index];
-                ssd->subslot_idx = subslot_index;
-                ssd->submodule_ident_number =
-                    mi->VirtualSubmoduleList->VirtualSubmoduleItem[i]
-                        ->Body.SubmoduleIdentNumber;
-                if (ssd->subslot_number != subslot_number)
-                {
-                  ssd->subslot_number = subslot_number;
-                  printf("GSML-Error, datafile corrupt, unexpected subslot "
-                         "number\n");
-                }
-              }
+    //           for (unsigned int j = iter.begin(); j != iter.end();
+    //                j = iter.next())
+    //           {
+    //             subslot_number = j;
+    //             sprintf(subslot_name, "Subslot %d", subslot_number);
 
-              new ItemPnSubslot(
-                  attrnav, subslot_name, ssd,
-                  mi->VirtualSubmoduleList->VirtualSubmoduleItem[0],
-                  slotdata->slot_idx, node, flow_eDest_IntoLast);
-            }
-            else
-            {
-              // FixedInSubslots supplied, create all fixed subslots
+    //             GsdmlSubslotData* ssd;
+    //             if (slotdata->subslot_data.size() <= subslot_index)
+    //             {
+    //               ssd = new GsdmlSubslotData();
+    //               ssd->subslot_number = subslot_number;
+    //               ssd->subslot_idx = subslot_index;
+    //               ssd->submodule_ident_number =
+    //                   mi->VirtualSubmoduleList->VirtualSubmoduleItem[i]
+    //                       ->Body.SubmoduleIdentNumber;
+    //               slotdata->subslot_data.push_back(ssd);
+    //             }
+    //             else
+    //             {
+    //               ssd = slotdata->subslot_data[subslot_index];
+    //               ssd->subslot_idx = subslot_index;
+    //               ssd->submodule_ident_number =
+    //                   mi->VirtualSubmoduleList->VirtualSubmoduleItem[i]
+    //                       ->Body.SubmoduleIdentNumber;
+    //               if (ssd->subslot_number != subslot_number)
+    //               {
+    //                 ssd->subslot_number = subslot_number;
+    //                 printf("GSML-Error, datafile corrupt, unexpected subslot
+    //                 "
+    //                        "number\n");
+    //               }
+    //             }
 
-              gsdml_Valuelist* vl = new gsdml_Valuelist(
-                  mi->VirtualSubmoduleList->VirtualSubmoduleItem[i]
-                      ->Body.FixedInSubslots.str);
-              gsdml_ValuelistIterator iter(vl);
+    //             new ItemPnSubslot(
+    //                 attrnav, subslot_name, ssd,
+    //                 mi->VirtualSubmoduleList->VirtualSubmoduleItem[i],
+    //                 slotdata->slot_idx, m_node, flow_eDest_IntoLast);
+    //             subslot_index++;
+    //           }
+    //           delete vl;
+    //         }
+    //       }
+    //     }
+    //     if (mi->UseableSubmodules && !streq(mi->Body.PhysicalSubslots.str,
+    //     ""))
+    //     {
+    //       gsdml_Valuelist* vl =
+    //           new gsdml_Valuelist(mi->Body.PhysicalSubslots.str);
+    //       gsdml_ValuelistIterator iter(vl);
+    //       char subslot_name[80];
 
-              for (unsigned int j = iter.begin(); j != iter.end();
-                   j = iter.next())
-              {
-                subslot_number = j;
-                sprintf(subslot_name, "Subslot %d", subslot_number);
+    //       for (unsigned int j = iter.begin(); j != iter.end(); j =
+    //       iter.next())
+    //       {
+    //         // Check that there is an useable module for this slot
+    //         int fixed_found = 0;
+    //         int fixed_enum = 0;
+    //         gsdml_VirtualSubmoduleItem* fixed_si = 0;
+    //         int used_found = 0;
+    //         int used_enum = 0;
+    //         gsdml_VirtualSubmoduleItem* used_si = 0;
 
-                GsdmlSubslotData* ssd;
-                if (slotdata->subslot_data.size() <= subslot_index)
-                {
-                  ssd = new GsdmlSubslotData();
-                  ssd->subslot_number = subslot_number;
-                  ssd->subslot_idx = subslot_index;
-                  ssd->submodule_ident_number =
-                      mi->VirtualSubmoduleList->VirtualSubmoduleItem[i]
-                          ->Body.SubmoduleIdentNumber;
-                  slotdata->subslot_data.push_back(ssd);
-                }
-                else
-                {
-                  ssd = slotdata->subslot_data[subslot_index];
-                  ssd->subslot_idx = subslot_index;
-                  ssd->submodule_ident_number =
-                      mi->VirtualSubmoduleList->VirtualSubmoduleItem[i]
-                          ->Body.SubmoduleIdentNumber;
-                  if (ssd->subslot_number != subslot_number)
-                  {
-                    ssd->subslot_number = subslot_number;
-                    printf("GSML-Error, datafile corrupt, unexpected subslot "
-                           "number\n");
-                  }
-                }
+    //         for (unsigned int i = 0;
+    //              i < mi->UseableSubmodules->SubmoduleItemRef.size(); i++)
+    //         {
+    //           gsdml_Valuelist* vl_allowed =
+    //               new
+    //               gsdml_Valuelist(mi->UseableSubmodules->SubmoduleItemRef[i]
+    //                                       ->Body.AllowedInSubslots.str);
+    //           gsdml_Valuelist* vl_fixed =
+    //               new
+    //               gsdml_Valuelist(mi->UseableSubmodules->SubmoduleItemRef[i]
+    //                                       ->Body.FixedInSubslots.str);
+    //           gsdml_Valuelist* vl_used =
+    //               new
+    //               gsdml_Valuelist(mi->UseableSubmodules->SubmoduleItemRef[i]
+    //                                       ->Body.UsedInSubslots.str);
 
-                new ItemPnSubslot(
-                    attrnav, subslot_name, ssd,
-                    mi->VirtualSubmoduleList->VirtualSubmoduleItem[i],
-                    slotdata->slot_idx, node, flow_eDest_IntoLast);
-                subslot_index++;
-              }
-              delete vl;
-            }
-          }
-        }
-        if (mi->UseableSubmodules && !streq(mi->Body.PhysicalSubslots.str, ""))
-        {
-          gsdml_Valuelist* vl =
-              new gsdml_Valuelist(mi->Body.PhysicalSubslots.str);
-          gsdml_ValuelistIterator iter(vl);
-          char subslot_name[80];
+    //           if (vl_allowed->in_list(j))
+    //           {
+    //             // Check if fixed
+    //             if (vl_fixed->in_list(j))
+    //             {
+    //               // Fixed in subslot, insert the submodule directly
+    //               fixed_found = 1;
+    //               fixed_si =
+    //               (gsdml_VirtualSubmoduleItem*)mi->UseableSubmodules
+    //                              ->SubmoduleItemRef[i]
+    //                              ->Body.SubmoduleItemTarget.p;
+    //               for (unsigned int k = 0;
+    //                    k < attrnav->gsdml->ApplicationProcess->SubmoduleList
+    //                            ->SubmoduleItem.size();
+    //                    k++)
+    //               {
+    //                 if (attrnav->gsdml->ApplicationProcess->SubmoduleList
+    //                         ->SubmoduleItem[k] == fixed_si)
+    //                 {
+    //                   fixed_enum = k + 1;
+    //                   break;
+    //                 }
+    //               }
+    //             }
 
-          for (unsigned int j = iter.begin(); j != iter.end(); j = iter.next())
-          {
-            // Check that there is an useable module for this slot
-            int fixed_found = 0;
-            int fixed_enum = 0;
-            gsdml_VirtualSubmoduleItem* fixed_si = 0;
-            int used_found = 0;
-            int used_enum = 0;
-            gsdml_VirtualSubmoduleItem* used_si = 0;
+    //             // Check if used
+    //             if (vl_used->in_list(j))
+    //             {
+    //               used_found = 1;
+    //               used_si =
+    //               (gsdml_VirtualSubmoduleItem*)mi->UseableSubmodules
+    //                             ->SubmoduleItemRef[i]
+    //                             ->Body.SubmoduleItemTarget.p;
+    //               for (unsigned int k = 0;
+    //                    k < attrnav->gsdml->ApplicationProcess->SubmoduleList
+    //                            ->SubmoduleItem.size();
+    //                    k++)
+    //               {
+    //                 if (attrnav->gsdml->ApplicationProcess->SubmoduleList
+    //                         ->SubmoduleItem[k] == used_si)
+    //                 {
+    //                   used_enum = k + 1;
+    //                   break;
+    //                 }
+    //               }
+    //             }
+    //           }
+    //           delete vl_allowed;
+    //           delete vl_used;
+    //           delete vl_fixed;
+    //         }
 
-            for (unsigned int i = 0;
-                 i < mi->UseableSubmodules->SubmoduleItemRef.size(); i++)
-            {
-              gsdml_Valuelist* vl_allowed =
-                  new gsdml_Valuelist(mi->UseableSubmodules->SubmoduleItemRef[i]
-                                          ->Body.AllowedInSubslots.str);
-              gsdml_Valuelist* vl_fixed =
-                  new gsdml_Valuelist(mi->UseableSubmodules->SubmoduleItemRef[i]
-                                          ->Body.FixedInSubslots.str);
-              gsdml_Valuelist* vl_used =
-                  new gsdml_Valuelist(mi->UseableSubmodules->SubmoduleItemRef[i]
-                                          ->Body.UsedInSubslots.str);
+    //         subslot_number = j;
+    //         sprintf(subslot_name, "Subslot %d", subslot_number);
 
-              if (vl_allowed->in_list(j))
-              {
-                // Check if fixed
-                if (vl_fixed->in_list(j))
-                {
-                  // Fixed in subslot, insert the submodule directly
-                  fixed_found = 1;
-                  fixed_si = (gsdml_VirtualSubmoduleItem*)mi->UseableSubmodules
-                                 ->SubmoduleItemRef[i]
-                                 ->Body.SubmoduleItemTarget.p;
-                  for (unsigned int k = 0;
-                       k < attrnav->gsdml->ApplicationProcess->SubmoduleList
-                               ->SubmoduleItem.size();
-                       k++)
-                  {
-                    if (attrnav->gsdml->ApplicationProcess->SubmoduleList
-                            ->SubmoduleItem[k] == fixed_si)
-                    {
-                      fixed_enum = k + 1;
-                      break;
-                    }
-                  }
-                }
+    //         if (fixed_found)
+    //         {
+    //           GsdmlSubslotData* ssd;
+    //           if (slotdata->subslot_data.size() <= subslot_index)
+    //           {
+    //             ssd = new GsdmlSubslotData();
+    //             ssd->subslot_number = subslot_number;
+    //             ssd->subslot_idx = subslot_index;
+    //             ssd->submodule_ident_number =
+    //                 fixed_si->Body.SubmoduleIdentNumber;
+    //             ssd->submodule_enum_number = fixed_enum;
+    //             slotdata->subslot_data.push_back(ssd);
+    //           }
+    //           else
+    //           {
+    //             ssd = slotdata->subslot_data[subslot_index];
+    //             ssd->subslot_idx = subslot_index;
+    //             ssd->submodule_ident_number =
+    //                 fixed_si->Body.SubmoduleIdentNumber;
+    //             ssd->submodule_enum_number = fixed_enum;
+    //             if (ssd->subslot_number != subslot_number)
+    //             {
+    //               ssd->subslot_number = subslot_number;
+    //               printf("GSML-Error, datafile corrupt, unexpected subslot "
+    //                      "number\n");
+    //             }
+    //           }
 
-                // Check if used
-                if (vl_used->in_list(j))
-                {
-                  used_found = 1;
-                  used_si = (gsdml_VirtualSubmoduleItem*)mi->UseableSubmodules
-                                ->SubmoduleItemRef[i]
-                                ->Body.SubmoduleItemTarget.p;
-                  for (unsigned int k = 0;
-                       k < attrnav->gsdml->ApplicationProcess->SubmoduleList
-                               ->SubmoduleItem.size();
-                       k++)
-                  {
-                    if (attrnav->gsdml->ApplicationProcess->SubmoduleList
-                            ->SubmoduleItem[k] == used_si)
-                    {
-                      used_enum = k + 1;
-                      break;
-                    }
-                  }
-                }
-              }
-              delete vl_allowed;
-              delete vl_used;
-              delete vl_fixed;
-            }
+    //           new ItemPnSubslot(attrnav, subslot_name, ssd, fixed_si,
+    //                             slotdata->slot_idx, m_node,
+    //                             flow_eDest_IntoLast);
+    //           subslot_index++;
+    //         }
+    //         else
+    //         {
+    //           // Add selectable subslot
+    //           GsdmlSubslotData* ssd;
 
-            subslot_number = j;
-            sprintf(subslot_name, "Subslot %d", subslot_number);
+    //           if (slotdata->subslot_data.size() <= subslot_index)
+    //           {
+    //             ssd = new GsdmlSubslotData();
+    //             ssd->subslot_number = subslot_number;
+    //             ssd->subslot_idx = subslot_index;
+    //             if (used_found)
+    //             {
+    //               ssd->submodule_ident_number =
+    //                   used_si->Body.SubmoduleIdentNumber;
+    //               ssd->submodule_enum_number = used_enum;
+    //             }
+    //             slotdata->subslot_data.push_back(ssd);
+    //           }
+    //           else
+    //           {
+    //             ssd = slotdata->subslot_data[subslot_index];
+    //             ssd->subslot_idx = subslot_index;
+    //             if (ssd->subslot_number != subslot_number)
+    //             {
+    //               ssd->subslot_number = subslot_number;
+    //               printf("GSML-Error, datafile corrupt, unexpected subslot "
+    //                      "number\n");
+    //             }
+    //             else if (used_found)
+    //             {
+    //               ssd->submodule_ident_number =
+    //                   used_si->Body.SubmoduleIdentNumber;
+    //               ssd->submodule_enum_number = used_enum;
+    //             }
+    //           }
 
-            if (fixed_found)
-            {
-              GsdmlSubslotData* ssd;
-              if (slotdata->subslot_data.size() <= subslot_index)
-              {
-                ssd = new GsdmlSubslotData();
-                ssd->subslot_number = subslot_number;
-                ssd->subslot_idx = subslot_index;
-                ssd->submodule_ident_number =
-                    fixed_si->Body.SubmoduleIdentNumber;
-                ssd->submodule_enum_number = fixed_enum;
-                slotdata->subslot_data.push_back(ssd);
-              }
-              else
-              {
-                ssd = slotdata->subslot_data[subslot_index];
-                ssd->subslot_idx = subslot_index;
-                ssd->submodule_ident_number =
-                    fixed_si->Body.SubmoduleIdentNumber;
-                ssd->submodule_enum_number = fixed_enum;
-                if (ssd->subslot_number != subslot_number)
-                {
-                  ssd->subslot_number = subslot_number;
-                  printf("GSML-Error, datafile corrupt, unexpected subslot "
-                         "number\n");
-                }
-              }
-
-              new ItemPnSubslot(attrnav, subslot_name, ssd, fixed_si,
-                                slotdata->slot_idx, node, flow_eDest_IntoLast);
-              subslot_index++;
-            }
-            else
-            {
-              // Add selectable subslot
-              GsdmlSubslotData* ssd;
-
-              if (slotdata->subslot_data.size() <= subslot_index)
-              {
-                ssd = new GsdmlSubslotData();
-                ssd->subslot_number = subslot_number;
-                ssd->subslot_idx = subslot_index;
-                if (used_found)
-                {
-                  ssd->submodule_ident_number =
-                      used_si->Body.SubmoduleIdentNumber;
-                  ssd->submodule_enum_number = used_enum;
-                }
-                slotdata->subslot_data.push_back(ssd);
-              }
-              else
-              {
-                ssd = slotdata->subslot_data[subslot_index];
-                ssd->subslot_idx = subslot_index;
-                if (ssd->subslot_number != subslot_number)
-                {
-                  ssd->subslot_number = subslot_number;
-                  printf("GSML-Error, datafile corrupt, unexpected subslot "
-                         "number\n");
-                }
-                else if (used_found)
-                {
-                  ssd->submodule_ident_number =
-                      used_si->Body.SubmoduleIdentNumber;
-                  ssd->submodule_enum_number = used_enum;
-                }
-              }
-
-              new ItemPnSubslotPhys(attrnav, subslot_name, ssd, used_si,
-                                    slotdata->slot_idx, mi->UseableSubmodules,
-                                    node, flow_eDest_IntoLast);
-              subslot_index++;
-            }
-          }
-          delete vl;
-        }
-      }
-    }
-    brow_SetOpen(node, attrnav_mOpen_Children);
-    brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_openmap);
-    brow_ResetNodraw(attrnav->brow->ctx);
-    brow_Redraw(attrnav->brow->ctx, node_y);
-  }
+    //           new ItemPnSubslotPhys(attrnav, subslot_name, ssd, used_si,
+    //                                 slotdata->slot_idx,
+    //                                 mi->UseableSubmodules, m_node,
+    //                                 flow_eDest_IntoLast);
+    //           subslot_index++;
+    //         }
+    //       }
+    //       delete vl;
+    //     }
+    //   }
+    // }
+  
   return 1;
 }
 
 int ItemPnSlot::scan(GsdmlAttrNav* attrnav, void* p)
 {
-  char buf[200];
+  // char buf[200];
 
-  if (!first_scan)
+  if (!m_first_scan)
   {
-    if (old_value == *(int*)p)
+    if (m_old_value == *(std::string*)p)
       // No change since last time
       return 1;
   }
 
-  if (*(int*)p == 0)
-    strcpy(buf, "No");
-  else
-  {
-    gsdml_UseableModules* um =
-        attrnav->gsdml->ApplicationProcess->DeviceAccessPointList
-            ->DeviceAccessPointItem[attrnav->device_num - 1]
-            ->UseableModules;
-    if (!um)
-      return 1;
-    gsdml_ModuleItem* mi =
-        (gsdml_ModuleItem*)um->ModuleItemRef[slotdata->module_enum_number - 1]
-            ->Body.ModuleItemTarget.p;
-    if (!mi || !mi->ModuleInfo->Body.Name.p)
-      return 1;
+  // if (*(int*)p == 0)
+  //   strcpy(buf, "No");
+  // else
+  // {
+  //   int m_device_num = 1;
+  //   gsdml_UseableModules* um =
+  //       attrnav->gsdml->ApplicationProcess->DeviceAccessPointList
+  //           ->DeviceAccessPointItem[m_device_num - 1]
+  //           ->UseableModules;
+  //   if (!um)
+  //     return 1;
 
-    snprintf(buf, sizeof(buf), "%s (%s)", (char*)mi->ModuleInfo->Body.Name.p,
-             mi->ModuleInfo->Body.OrderNumber);
-  }
-  brow_SetAnnotation(node, 1, buf, strlen(buf));
-  old_value = *(int*)p;
+  // gsdml_ModuleItem* mi =
+  //     (gsdml_ModuleItem*)um->ModuleItemRef[slotdata->module_enum_number - 1]
+  //         ->Body.ModuleItemTarget.p;
 
-  if (first_scan)
-    first_scan = 0;
+  // if (!mi || !mi->ModuleInfo->Body.Name.p)
+  //   return 1;
+
+  // snprintf(buf, sizeof(buf), "%s (%s)", (char*)mi->ModuleInfo->Body.Name.p,
+  //          mi->ModuleInfo->Body.OrderNumber);
+  //}
+
+  // brow_SetAnnotation(m_node, 1, buf, strlen(buf));
+
+  m_old_value = *(std::string*)p;
+
+  if (m_first_scan)
+    m_first_scan = 0;
 
   return 1;
 }
 
-ItemPnSubslot::ItemPnSubslot(GsdmlAttrNav* attrnav, const char* item_name,
-                             GsdmlSubslotData* item_subslotdata,
-                             gsdml_VirtualSubmoduleItem* item_virtualsubmodule,
-                             int item_slot_idx, brow_tNode dest,
-                             flow_eDest dest_code)
-    : subslotdata(item_subslotdata), virtualsubmodule(item_virtualsubmodule),
-      slot_idx(item_slot_idx)
-{
-  type = attrnav_eItemType_PnSubslot;
-
-  strcpy(name, item_name);
-
-  if (virtualsubmodule && virtualsubmodule->RecordDataList)
-    parent = 1;
-
-  brow_CreateNode(attrnav->brow->ctx, item_name, attrnav->brow->nc_attr, dest,
-                  dest_code, (void*)this, 1, &node);
-
-  if (parent)
-    brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_map);
-  else
-    brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_leaf);
-
-  brow_SetAnnotation(node, 0, item_name, strlen(item_name));
-}
-
-int ItemPnSubslot::open_children(GsdmlAttrNav* attrnav, double x, double y)
-{
-  double node_x, node_y;
-
-  brow_GetNodePosition(node, &node_x, &node_y);
-
-  if (brow_IsOpen(node))
+ItemPnSubslot::ItemPnSubslot(
+    GsdmlAttrNav* attrnav, const char* name, ProfinetSubslot* subslot_data,
+    std::shared_ptr<GSDML::ModuleItem> parent_module_item, uint subslot_number,
+    std::shared_ptr<GSDML::SubmoduleItem> attached_submodule_item,
+    brow_tNode dest, flow_eDest dest_code, const char* infotext)
+    : ItemPn(attrnav, attrnav_eItemType_PnSubslot, name, infotext, 1),
+      m_subslot_data(subslot_data), m_parent_module_item(parent_module_item),
+      m_subslot_number(subslot_number), m_is_selectable(false),
+      m_attached_submodule_item(attached_submodule_item)
+{  
+  // Setup if not directly attached with constructor argument
+  // "attached_submodule_item"
+  if (!m_attached_submodule_item)
   {
-    // Close
-    brow_SetNodraw(attrnav->brow->ctx);
-    brow_CloseNode(attrnav->brow->ctx, node);
-    if (brow_IsOpen(node) & attrnav_mOpen_Children)
+    // Do we belong in a DAP?
+    if (m_parent_module_item->_ModuleItemType == GSDML::ModuleItemType_DAP)
     {
-      if (parent)
-        brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_map);
-      else
-        brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_leaf);
-    }
-    brow_ResetOpen(node, attrnav_mOpen_All);
-    brow_ResetNodraw(attrnav->brow->ctx);
-    brow_Redraw(attrnav->brow->ctx, node_y);
-  }
-  else
-  {
-    brow_SetNodraw(attrnav->brow->ctx);
+      auto parent = std::static_pointer_cast<GSDML::DeviceAccessPointItem>(
+          m_parent_module_item);
 
-    unsigned int record_index = 0;
-    if (virtualsubmodule)
-    {
-      gsdml_RecordDataList* rl = virtualsubmodule->RecordDataList;
-      if (rl)
+      // Check system defined submodule list to see if this slot is "defined by
+      // the system"
+      for (auto const& submodule : parent->_SystemDefinedSubmoduleList)
       {
-        GsdmlDataRecord* dr;
-
-        for (unsigned int j = 0; j < rl->ParameterRecordDataItem.size(); j++)
+        if (submodule.second->_SubslotNumber == m_subslot_number)
         {
-          if (subslotdata->data_record.size() <= record_index)
-          {
-            dr = new GsdmlDataRecord();
-            dr->record_idx = record_index;
-            subslotdata->data_record.push_back(dr);
-          }
-          else
-          {
-            dr = subslotdata->data_record[record_index];
-            dr->record_idx = record_index;
-          }
-
-          new ItemPnParRecord(attrnav, "", rl->ParameterRecordDataItem[j], dr,
-                              node, flow_eDest_IntoLast);
-          record_index++;
-        }
-      }
-    }
-
-    if (attrnav->viewio && virtualsubmodule->IOData)
-    {
-      new ItemPnIOData(attrnav, "IOData", virtualsubmodule->IOData,
-                       subslotdata->subslot_idx, slot_idx, node,
-                       flow_eDest_IntoLast);
-    }
-    brow_SetOpen(node, attrnav_mOpen_Children);
-    brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_openmap);
-    brow_ResetNodraw(attrnav->brow->ctx);
-    brow_Redraw(attrnav->brow->ctx, node_y);
-  }
-  return 1;
-}
-
-ItemPnSubslotPhys::ItemPnSubslotPhys(
-    GsdmlAttrNav* attrnav, const char* item_name,
-    GsdmlSubslotData* item_subslotdata,
-    gsdml_VirtualSubmoduleItem* item_virtualsubmodule, int item_slot_idx,
-    gsdml_UseableSubmodules* item_us, brow_tNode dest, flow_eDest dest_code)
-    : subslotdata(item_subslotdata), virtualsubmodule(item_virtualsubmodule),
-      us(item_us), slot_idx(item_slot_idx)
-{
-  type = attrnav_eItemType_PnSubslotPhys;
-
-  strcpy(name, item_name);
-
-  parent = 1;
-
-  brow_CreateNode(attrnav->brow->ctx, item_name, attrnav->brow->nc_attr, dest,
-                  dest_code, (void*)this, 1, &node);
-
-  if (parent)
-    brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_map);
-  else
-    brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_leaf);
-
-  brow_SetAnnotation(node, 0, item_name, strlen(item_name));
-}
-
-int ItemPnSubslotPhys::open_children(GsdmlAttrNav* attrnav, double x, double y)
-{
-  double node_x, node_y;
-
-  brow_GetNodePosition(node, &node_x, &node_y);
-
-  if (brow_IsOpen(node))
-  {
-    // Close
-    brow_SetNodraw(attrnav->brow->ctx);
-    brow_CloseNode(attrnav->brow->ctx, node);
-    if (brow_IsOpen(node) & attrnav_mOpen_Children)
-    {
-      if (parent)
-        brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_map);
-      else
-        brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_leaf);
-    }
-    brow_ResetOpen(node, attrnav_mOpen_All);
-    brow_ResetNodraw(attrnav->brow->ctx);
-    brow_Redraw(attrnav->brow->ctx, node_y);
-  }
-  else
-  {
-    brow_SetNodraw(attrnav->brow->ctx);
-
-    new ItemPnSubmoduleType(
-        attrnav, "SubmoduleType", subslotdata->subslot_number, slot_idx,
-        subslotdata->subslot_idx, us, node, flow_eDest_IntoLast);
-
-    gsdml_VirtualSubmoduleItem* subm = 0;
-    if (subslotdata->submodule_enum_number)
-    {
-      subm = attrnav->gsdml->ApplicationProcess->SubmoduleList
-                 ->SubmoduleItem[subslotdata->submodule_enum_number - 1];
-    }
-
-    if (subm && subm->ModuleInfo)
-    {
-      new ItemPnModuleInfo(attrnav, "SubmoduleInfo", subm->ModuleInfo, node,
-                           flow_eDest_IntoLast);
-    }
-
-    unsigned int record_index = 0;
-    if (subm)
-    {
-      gsdml_RecordDataList* rl = subm->RecordDataList;
-      if (rl)
-      {
-        GsdmlDataRecord* dr;
-
-        for (unsigned int j = 0; j < rl->ParameterRecordDataItem.size(); j++)
-        {
-          if (subslotdata->data_record.size() <= record_index)
-          {
-            dr = new GsdmlDataRecord();
-            dr->record_idx = record_index;
-            subslotdata->data_record.push_back(dr);
-          }
-          else
-          {
-            dr = subslotdata->data_record[record_index];
-            dr->record_idx = record_index;
-          }
-
-          new ItemPnParRecord(attrnav, "", rl->ParameterRecordDataItem[j], dr,
-                              node, flow_eDest_IntoLast);
-          record_index++;
-        }
-      }
-    }
-
-    if (attrnav->viewio && subm && subm->IOData)
-    {
-      new ItemPnIOData(attrnav, "IOData", subm->IOData,
-                       subslotdata->subslot_idx, slot_idx, node,
-                       flow_eDest_IntoLast);
-    }
-    brow_SetOpen(node, attrnav_mOpen_Children);
-    brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_openmap);
-    brow_ResetNodraw(attrnav->brow->ctx);
-    brow_Redraw(attrnav->brow->ctx, node_y);
-  }
-  return 1;
-}
-
-ItemPnDAP::ItemPnDAP(GsdmlAttrNav* attrnav, const char* item_name,
-                     GsdmlSlotData* item_slotdata, brow_tNode dest,
-                     flow_eDest dest_code)
-    : slotdata(item_slotdata)
-{
-  type = attrnav_eItemType_PnDAP;
-
-  strcpy(name, item_name);
-  parent = 1;
-
-  brow_CreateNode(attrnav->brow->ctx, item_name, attrnav->brow->nc_object, dest,
-                  dest_code, (void*)this, 1, &node);
-
-  brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_map);
-
-  brow_SetAnnotation(node, 0, item_name, strlen(item_name));
-}
-
-int ItemPnDAP::open_children(GsdmlAttrNav* attrnav, double x, double y)
-{
-  double node_x, node_y;
-
-  brow_GetNodePosition(node, &node_x, &node_y);
-
-  if (brow_IsOpen(node))
-  {
-    // Close
-    brow_SetNodraw(attrnav->brow->ctx);
-    brow_CloseNode(attrnav->brow->ctx, node);
-    if (brow_IsOpen(node) & attrnav_mOpen_Children)
-      brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_map);
-    brow_ResetOpen(node, attrnav_mOpen_All);
-    brow_ResetNodraw(attrnav->brow->ctx);
-    brow_Redraw(attrnav->brow->ctx, node_y);
-  }
-  else
-  {
-    brow_SetNodraw(attrnav->brow->ctx);
-
-    if (attrnav->device_num)
-    {
-      gsdml_DeviceAccessPointItem* mi = attrnav->device_item;
-      unsigned int subslot_index = 0;
-      unsigned int subslot_number = 0;
-
-      if (attrnav->device_item->ModuleInfo)
-      {
-        new ItemPnModuleInfo(attrnav, "ModuleInfo",
-                             attrnav->device_item->ModuleInfo, node,
-                             flow_eDest_IntoLast);
-      }
-
-      if (mi->VirtualSubmoduleList)
-      {
-        char subslot_name[80];
-
-        for (unsigned int i = 0;
-             i < mi->VirtualSubmoduleList->VirtualSubmoduleItem.size(); i++)
-        {
-          if (strcmp(mi->VirtualSubmoduleList->VirtualSubmoduleItem[i]
-                         ->Body.FixedInSubslots.str,
-                     "") == 0)
-          {
-            // FixedInSubslots not supplied, default subslot number is 1
-
-            if (mi->VirtualSubmoduleList->VirtualSubmoduleItem.size() == 1)
-              subslot_number = 1;
-            else
-              subslot_number++;
-
-            sprintf(subslot_name, "Subslot %d", subslot_number);
-
-            GsdmlSubslotData* ssd;
-            if (slotdata->subslot_data.size() <= subslot_index)
-            {
-              ssd = new GsdmlSubslotData();
-              ssd->subslot_number = subslot_number;
-              ssd->subslot_idx = subslot_index;
-              ssd->submodule_ident_number =
-                  mi->VirtualSubmoduleList->VirtualSubmoduleItem[i]
-                      ->Body.SubmoduleIdentNumber;
-              slotdata->subslot_data.push_back(ssd);
-            }
-            else
-            {
-              ssd = slotdata->subslot_data[subslot_index];
-              ssd->subslot_idx = subslot_index;
-              ssd->submodule_ident_number =
-                  mi->VirtualSubmoduleList->VirtualSubmoduleItem[i]
-                      ->Body.SubmoduleIdentNumber;
-              if (ssd->subslot_number != subslot_number)
-              {
-                ssd->subslot_number = subslot_number;
-                printf("GSML-Error, datafile corrupt, unexpected subslot "
-                       "number\n");
-              }
-            }
-
-            new ItemPnSubslot(attrnav, subslot_name, ssd,
-                              mi->VirtualSubmoduleList->VirtualSubmoduleItem[0],
-                              slotdata->slot_idx, node, flow_eDest_IntoLast);
-
-            subslot_index++;
-          }
-          else
-          {
-            // FixedInSubslots supplied, create all fixed subslots
-
-            gsdml_Valuelist* vl = new gsdml_Valuelist(
-                mi->VirtualSubmoduleList->VirtualSubmoduleItem[i]
-                    ->Body.FixedInSubslots.str);
-            gsdml_ValuelistIterator iter(vl);
-
-            for (unsigned int j = iter.begin(); j != iter.end();
-                 j = iter.next())
-            {
-              subslot_number = j;
-              sprintf(subslot_name, "Subslot %d", subslot_number);
-
-              GsdmlSubslotData* ssd;
-              if (slotdata->subslot_data.size() <= subslot_index)
-              {
-                ssd = new GsdmlSubslotData();
-                ssd->subslot_number = subslot_number;
-                ssd->subslot_idx = subslot_index;
-                ssd->submodule_ident_number =
-                    mi->VirtualSubmoduleList->VirtualSubmoduleItem[i]
-                        ->Body.SubmoduleIdentNumber;
-                slotdata->subslot_data.push_back(ssd);
-              }
-              else
-              {
-                ssd = slotdata->subslot_data[subslot_index];
-                ssd->subslot_idx = subslot_index;
-                ssd->submodule_ident_number =
-                    mi->VirtualSubmoduleList->VirtualSubmoduleItem[i]
-                        ->Body.SubmoduleIdentNumber;
-                if (ssd->subslot_number != subslot_number)
-                {
-                  ssd->subslot_number = subslot_number;
-                  printf("GSML-Error, datafile corrupt, unexpected subslot "
-                         "number\n");
-                }
-              }
-
-              new ItemPnSubslot(
-                  attrnav, subslot_name, ssd,
-                  mi->VirtualSubmoduleList->VirtualSubmoduleItem[i],
-                  slotdata->slot_idx, node, flow_eDest_IntoLast);
-              subslot_index++;
-            }
-            delete vl;
-          }
-        }
-      }
-      if (attrnav->device_item->SystemDefinedSubmoduleList)
-      {
-        if (attrnav->device_item->SystemDefinedSubmoduleList
-                ->InterfaceSubmoduleItem)
-        {
-          gsdml_InterfaceSubmoduleItem* ii =
-              attrnav->device_item->SystemDefinedSubmoduleList
-                  ->InterfaceSubmoduleItem;
-          char name[200] = "Interface ";
-
-          if (attrnav->device_item->SubslotList)
-          {
-            for (unsigned int i = 0;
-                 i < attrnav->device_item->SubslotList->SubslotItem.size(); i++)
-            {
-              if (ii->Body.SubslotNumber ==
-                  attrnav->device_item->SubslotList->SubslotItem[i]
-                      ->Body.SubslotNumber)
-              {
-                strncat(name,
-                        (char*)attrnav->device_item->SubslotList->SubslotItem[i]
-                            ->Body.TextId.p,
-                        sizeof(name) - strlen(name) - 1);
-                strncat(name, " ", sizeof(name) - strlen(name) - 1);
-                sprintf(&name[strlen(name)], "%hu", ii->Body.SubslotNumber);
-              }
-            }
-          }
-
-          GsdmlSubslotData* ssd;
-          if (slotdata->subslot_data.size() <= subslot_index)
-          {
-            ssd = new GsdmlSubslotData();
-            ssd->subslot_number = ii->Body.SubslotNumber;
-            ssd->subslot_idx = subslot_index;
-            ssd->submodule_ident_number = ii->Body.SubmoduleIdentNumber;
-            slotdata->subslot_data.push_back(ssd);
-          }
-          else
-          {
-            ssd = slotdata->subslot_data[subslot_index];
-            ssd->subslot_idx = subslot_index;
-            ssd->submodule_ident_number = ii->Body.SubmoduleIdentNumber;
-            if (ssd->subslot_number != ii->Body.SubslotNumber)
-            {
-              ssd->subslot_number = ii->Body.SubslotNumber;
-              printf(
-                  "GSDML-Error, datafile corrupt, unexpected subslot number\n");
-            }
-          }
-
-          new ItemPnInterfaceSubmodule(attrnav, name, ii, ssd, node,
-                                       flow_eDest_IntoLast);
-          subslot_index++;
-        }
-        for (unsigned int j = 0;
-             j < attrnav->device_item->SystemDefinedSubmoduleList
-                     ->PortSubmoduleItem.size();
-             j++)
-        {
-          gsdml_PortSubmoduleItem* pi =
-              attrnav->device_item->SystemDefinedSubmoduleList
-                  ->PortSubmoduleItem[j];
-          char name[80] = "Port ";
-
-          for (unsigned int i = 0;
-               i < attrnav->device_item->SubslotList->SubslotItem.size(); i++)
-          {
-            if (pi->Body.SubslotNumber ==
-                attrnav->device_item->SubslotList->SubslotItem[i]
-                    ->Body.SubslotNumber)
-            {
-              strncat(name,
-                      (char*)attrnav->device_item->SubslotList->SubslotItem[i]
-                          ->Body.TextId.p,
-                      sizeof(name) - strlen(name) - 1);
-              strncat(name, " ", sizeof(name) - strlen(name) - 1);
-              sprintf(&name[strlen(name)], "%hu", pi->Body.SubslotNumber);
-            }
-          }
-
-          GsdmlSubslotData* ssd;
-          if (slotdata->subslot_data.size() <= subslot_index)
-          {
-            ssd = new GsdmlSubslotData();
-            ssd->subslot_number = pi->Body.SubslotNumber;
-            ssd->subslot_idx = subslot_index;
-            ssd->submodule_ident_number = pi->Body.SubmoduleIdentNumber;
-            slotdata->subslot_data.push_back(ssd);
-          }
-          else
-          {
-            ssd = slotdata->subslot_data[subslot_index];
-            ssd->subslot_idx = subslot_index;
-            ssd->submodule_ident_number = pi->Body.SubmoduleIdentNumber;
-            if (ssd->subslot_number != pi->Body.SubslotNumber)
-            {
-              ssd->subslot_number = pi->Body.SubslotNumber;
-              printf(
-                  "GSML-Error, datafile corrupt, unexpected subslot number\n");
-            }
-          }
-
-          new ItemPnPortSubmodule(attrnav, name, pi, ssd, node,
-                                  flow_eDest_IntoLast);
-          subslot_index++;
-        }
-      }
-      // Do we have a list of usable submodules? For instance PortSubmoduleItems such as FibreChannel modules or Copper Modules for the interfaces...
-      if (attrnav->device_item->UseableSubmodules)
-      {       
-        new ItemPnSubmoduleType(attrnav, "SubmoduleType",  32769, 0, 2, attrnav->device_item->UseableSubmodules, node, flow_eDest_IntoLast);
-        //new ItemPnSubmoduleType(attrnav, "SubmoduleType",  32770, 2, 3, attrnav->device_item->UseableSubmodules, node, flow_eDest_IntoLast); 
-        // for (auto const& submodule_item_ref : attrnav->device_item->UseableSubmodules->SubmoduleItemRef)
-        // {
-        //   for (auto const& subslot : attrnav->device_item->SubslotList->SubslotItem)
-        //   {            
-        //     if (subslot->Body.SubslotNumber > 0x8000)
-        //     {
-              
-          //   }
-          // }
-          // Loopa genom subslotlist igen...
-           char name[200];
-           char order_number[200];
-          //new ItemPnSubmoduleType(attrnav, "hej", )
-          //gsdml_PortSubmoduleItem* psmi =  (gsdml_PortSubmoduleItem*)submodule_item_ref->Body.SubmoduleItemTarget.p;
-          //strncat(name, (char*)psmi->ModuleInfo->Body.Name.p, sizeof(name));
-          //strncat(order_number, (char*)psmi->ModuleInfo->Body.OrderNumber, sizeof(order_number));
-                    
-          
-        
-      }
-    }
-
-    brow_SetOpen(node, attrnav_mOpen_Children);
-    brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_openmap);
-    brow_ResetNodraw(attrnav->brow->ctx);
-    brow_Redraw(attrnav->brow->ctx, node_y);
-  }
-  return 1;
-}
-
-ItemPnNetwork::ItemPnNetwork(GsdmlAttrNav* attrnav, const char* item_name,
-                             brow_tNode dest, flow_eDest dest_code)
-{
-  type = attrnav_eItemType_PnNetwork;
-
-  strcpy(name, item_name);
-  parent = 1;
-
-  brow_CreateNode(attrnav->brow->ctx, item_name, attrnav->brow->nc_object, dest,
-                  dest_code, (void*)this, 1, &node);
-
-  brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_map);
-
-  brow_SetAnnotation(node, 0, item_name, strlen(item_name));
-}
-
-int ItemPnNetwork::open_children(GsdmlAttrNav* attrnav, double x, double y)
-{
-  double node_x, node_y;
-
-  brow_GetNodePosition(node, &node_x, &node_y);
-
-  if (brow_IsOpen(node))
-  {
-    // Close
-    brow_SetNodraw(attrnav->brow->ctx);
-    brow_CloseNode(attrnav->brow->ctx, node);
-    if (brow_IsOpen(node) & attrnav_mOpen_Children)
-      brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_map);
-    brow_ResetOpen(node, attrnav_mOpen_All);
-    brow_ResetNodraw(attrnav->brow->ctx);
-    brow_Redraw(attrnav->brow->ctx, node_y);
-  }
-  else
-  {
-    brow_SetNodraw(attrnav->brow->ctx);
-
-    void* p = (void*)attrnav->dev_data.device_name;
-    new ItemPnBase(attrnav, "DeviceName", "LocalGsdmlAttr", pwr_eType_String,
-                   sizeof(attrnav->dev_data.device_name), 0, 0, p, 0, node,
-                   flow_eDest_IntoLast);
-
-    p = (void*)attrnav->dev_data.ip_address;
-    new ItemPnBase(attrnav, "IP Address", "LocalGsdmlAttr", pwr_eType_String,
-                   sizeof(attrnav->dev_data.ip_address), 0, 0, p, 0, node,
-                   flow_eDest_IntoLast);
-
-    p = (void*)attrnav->dev_data.subnet_mask;
-    new ItemPnBase(attrnav, "Subnet Mask", "LocalGsdmlAttr", pwr_eType_String,
-                   sizeof(attrnav->dev_data.subnet_mask), 0, 0, p, 0, node,
-                   flow_eDest_IntoLast);
-
-    p = (void*)attrnav->dev_data.mac_address;
-    new ItemPnBase(attrnav, "MAC Address", "LocalGsdmlAttr", pwr_eType_String,
-                   sizeof(attrnav->dev_data.mac_address), 0, 0, p, 0, node,
-                   flow_eDest_IntoLast);
-
-    p = (void*)&attrnav->dev_data.skip_ip_assignment;
-    new ItemPnParYesNo(attrnav, "Skip IP Assignment", (int*)p, node,
-                       flow_eDest_IntoLast);
-
-    if (attrnav->device_item &&
-        attrnav->device_item->SystemDefinedSubmoduleList &&
-        attrnav->device_item->SystemDefinedSubmoduleList
-            ->InterfaceSubmoduleItem)
-    {
-      p = (void*)&attrnav->send_clock;
-      new ItemPnEnumSendClock(attrnav, "SendClock",
-                              attrnav->device_item->SystemDefinedSubmoduleList
-                                  ->InterfaceSubmoduleItem,
-                              p, node, flow_eDest_IntoLast);
-
-      p = (void*)&attrnav->time_ratio;
-      new ItemPnEnumTimeRatio(attrnav, "ReductionRatio",
-                              attrnav->device_item->SystemDefinedSubmoduleList
-                                  ->InterfaceSubmoduleItem,
-                              p, node, flow_eDest_IntoLast);
-
-      p = (void*)&attrnav->phase;
-      new ItemPnBase(attrnav, "Phase", "LocalGsdmlAttr", pwr_eType_UInt32,
-                     sizeof(pwr_tUInt32), 0, 0, p, 0, node,
-                     flow_eDest_IntoLast);
-    }
-    else
-    {
-      p = (void*)&attrnav->send_clock;
-      new ItemPnEnumSendClock(attrnav, "SendClock", 0, p, node,
-                              flow_eDest_IntoLast);
-
-      p = (void*)&attrnav->time_ratio;
-      new ItemPnEnumTimeRatio(attrnav, "ReductionRatio", 0, p, node,
-                              flow_eDest_IntoLast);
-
-      p = (void*)&attrnav->phase;
-      new ItemPnBase(attrnav, "Phase", "LocalGsdmlAttr", pwr_eType_UInt32,
-                     sizeof(pwr_tUInt32), 0, 0, p, 0, node,
-                     flow_eDest_IntoLast);
-    }
-    brow_SetOpen(node, attrnav_mOpen_Children);
-    brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_openmap);
-    brow_ResetNodraw(attrnav->brow->ctx);
-    brow_Redraw(attrnav->brow->ctx, node_y);
-  }
-  return 1;
-}
-
-ItemPnDeviceInfo::ItemPnDeviceInfo(GsdmlAttrNav* attrnav, const char* item_name,
-                                   brow_tNode dest, flow_eDest dest_code)
-{
-  type = attrnav_eItemType_PnDeviceInfo;
-
-  strcpy(name, item_name);
-  parent = 1;
-
-  brow_CreateNode(attrnav->brow->ctx, item_name, attrnav->brow->nc_object, dest,
-                  dest_code, (void*)this, 1, &node);
-
-  brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_map);
-
-  brow_SetAnnotation(node, 0, item_name, strlen(item_name));
-}
-
-int ItemPnDeviceInfo::open_children(GsdmlAttrNav* attrnav, double x, double y)
-{
-  double node_x, node_y;
-
-  brow_GetNodePosition(node, &node_x, &node_y);
-
-  if (brow_IsOpen(node))
-  {
-    // Close
-    brow_SetNodraw(attrnav->brow->ctx);
-    brow_CloseNode(attrnav->brow->ctx, node);
-    if (brow_IsOpen(node) & attrnav_mOpen_Children)
-      brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_map);
-    brow_ResetOpen(node, attrnav_mOpen_All);
-    brow_ResetNodraw(attrnav->brow->ctx);
-    brow_Redraw(attrnav->brow->ctx, node_y);
-  }
-  else
-  {
-    brow_SetNodraw(attrnav->brow->ctx);
-
-    void* p = (void*)attrnav->gsdml->DeviceIdentity->Body.VendorName;
-    new ItemPnBase(attrnav, "Vendor", "LocalGsdmlAttr", pwr_eType_String,
-                   sizeof(pwr_tString80), 0, 0, p, 1, node,
-                   flow_eDest_IntoLast);
-
-    p = (void*)attrnav->gsdml->DeviceIdentity->Body.InfoText.p;
-    new ItemPnBase(attrnav, "Text", "LocalGsdmlAttr", pwr_eType_String,
-                   sizeof(pwr_tString80), 0, 0, p, 1, node,
-                   flow_eDest_IntoLast);
-
-    p = (void*)attrnav->gsdml->DeviceFunction->Body.MainFamily;
-    new ItemPnBase(attrnav, "MainFamily", "LocalGsdmlAttr", pwr_eType_String,
-                   sizeof(pwr_tString80), 0, 0, p, 1, node,
-                   flow_eDest_IntoLast);
-
-    p = (void*)attrnav->gsdml->DeviceFunction->Body.ProductFamily;
-    new ItemPnBase(attrnav, "ProductFamily", "LocalGsdmlAttr", pwr_eType_String,
-                   sizeof(pwr_tString80), 0, 0, p, 1, node,
-                   flow_eDest_IntoLast);
-
-    brow_SetOpen(node, attrnav_mOpen_Children);
-    brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_openmap);
-    brow_ResetNodraw(attrnav->brow->ctx);
-    brow_Redraw(attrnav->brow->ctx, node_y);
-  }
-  return 1;
-}
-
-ItemPnInterfaceSubmodule::ItemPnInterfaceSubmodule(
-    GsdmlAttrNav* attrnav, const char* item_name,
-    gsdml_InterfaceSubmoduleItem* item_ii, GsdmlSubslotData* item_subslotdata,
-    brow_tNode dest, flow_eDest dest_code)
-    : ii(item_ii), subslotdata(item_subslotdata)
-{
-  type = attrnav_eItemType_PnInterfaceSubmodule;
-
-  strcpy(name, item_name);
-  parent = 1;
-
-  brow_CreateNode(attrnav->brow->ctx, item_name, attrnav->brow->nc_object, dest,
-                  dest_code, (void*)this, 1, &node);
-
-  brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_map);
-
-  brow_SetAnnotation(node, 0, item_name, strlen(item_name));
-}
-
-int ItemPnInterfaceSubmodule::open_children(GsdmlAttrNav* attrnav, double x,
-                                            double y)
-{
-  double node_x, node_y;
-
-  brow_GetNodePosition(node, &node_x, &node_y);
-
-  if (brow_IsOpen(node))
-  {
-    // Close
-    brow_SetNodraw(attrnav->brow->ctx);
-    brow_CloseNode(attrnav->brow->ctx, node);
-    if (brow_IsOpen(node) & attrnav_mOpen_Children)
-      brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_map);
-    brow_ResetOpen(node, attrnav_mOpen_All);
-    brow_ResetNodraw(attrnav->brow->ctx);
-    brow_Redraw(attrnav->brow->ctx, node_y);
-  }
-  else
-  {
-    brow_SetNodraw(attrnav->brow->ctx);
-
-    char* p = (char*)ii->Body.TextId.p;
-    new ItemPnBase(attrnav, "Text", "LocalGsdmlAttr", pwr_eType_String,
-                   sizeof(pwr_tString80), 0, 0, p, 1, node,
-                   flow_eDest_IntoLast);
-
-    p = ii->Body.SupportedRT_Class;
-    new ItemPnBase(attrnav, "SupportedRT_Class", "LocalGsdmlAttr",
-                   pwr_eType_String, sizeof(pwr_tString80), 0, 0, p, 1, node,
-                   flow_eDest_IntoLast);
-
-    p = ii->Body.SupportedRT_Classes;
-    new ItemPnBase(attrnav, "SupportedRT_Classes", "LocalGsdmlAttr",
-                   pwr_eType_String, sizeof(pwr_tString80), 0, 0, p, 1, node,
-                   flow_eDest_IntoLast);
-
-    p = (char*)&ii->Body.IsochroneModeSupported;
-    new ItemPnBase(attrnav, "IsochroneModeSupported", "LocalGsdmlAttr",
-                   pwr_eType_Boolean, sizeof(pwr_tBoolean), 0, 0, p, 1, node,
-                   flow_eDest_IntoLast);
-
-    if (*(pwr_tBoolean*)p)
-    {
-      p = ii->Body.IsochroneModeInRT_Classes;
-      new ItemPnBase(attrnav, "IsochroneModeSupported", "LocalGsdmlAttr",
-                     pwr_eType_String, sizeof(pwr_tString80), 0, 0, p, 1, node,
-                     flow_eDest_IntoLast);
-    }
-
-    p = ii->Body.SupportedProtocols;
-    new ItemPnBase(attrnav, "SupportedProtocols", "LocalGsdmlAttr",
-                   pwr_eType_String, sizeof(pwr_tString80), 0, 0, p, 1, node,
-                   flow_eDest_IntoLast);
-
-    p = ii->Body.SupportedMibs;
-    new ItemPnBase(attrnav, "SupportedMibs", "LocalGsdmlAttr", pwr_eType_String,
-                   sizeof(pwr_tString80), 0, 0, p, 1, node,
-                   flow_eDest_IntoLast);
-
-    p = (char*)&ii->Body.NetworkComponentDiagnosisSupported;
-    new ItemPnBase(attrnav, "NetworkComponentDiagnosisSupported",
-                   "LocalGsdmlAttr", pwr_eType_Boolean, sizeof(pwr_tBoolean), 0,
-                   0, p, 1, node, flow_eDest_IntoLast);
-
-    p = (char*)&ii->Body.DelayMeasurementSupported;
-    new ItemPnBase(attrnav, "DelayMeasurementSupported", "LocalGsdmlAttr",
-                   pwr_eType_Boolean, sizeof(pwr_tBoolean), 0, 0, p, 1, node,
-                   flow_eDest_IntoLast);
-
-    gsdml_RecordDataList* rl = ii->RecordDataList;
-    if (rl)
-    {
-      unsigned int record_index = 0;
-      GsdmlDataRecord* dr;
-
-      for (unsigned int j = 0; j < rl->ParameterRecordDataItem.size(); j++)
-      {
-        if (subslotdata->data_record.size() <= record_index)
-        {
-          dr = new GsdmlDataRecord();
-          dr->record_idx = record_index;
-          subslotdata->data_record.push_back(dr);
-        }
-        else
-        {
-          dr = subslotdata->data_record[record_index];
-          dr->record_idx = record_index;
-        }
-
-        new ItemPnParRecord(attrnav, "", rl->ParameterRecordDataItem[j], dr,
-                            node, flow_eDest_IntoLast);
-        record_index++;
-      }
-    }
-
-    brow_SetOpen(node, attrnav_mOpen_Children);
-    brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_openmap);
-    brow_ResetNodraw(attrnav->brow->ctx);
-    brow_Redraw(attrnav->brow->ctx, node_y);
-  }
-  return 1;
-}
-
-ItemPnPortSubmodule::ItemPnPortSubmodule(GsdmlAttrNav* attrnav,
-                                         const char* item_name,
-                                         gsdml_PortSubmoduleItem* item_pi,
-                                         GsdmlSubslotData* item_subslotdata,
-                                         brow_tNode dest, flow_eDest dest_code)
-    : pi(item_pi), subslotdata(item_subslotdata)
-{
-  type = attrnav_eItemType_PnPortSubmodule;
-
-  strcpy(name, item_name);
-  parent = 1;
-
-  brow_CreateNode(attrnav->brow->ctx, item_name, attrnav->brow->nc_object, dest,
-                  dest_code, (void*)this, 1, &node);
-
-  brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_map);
-
-  brow_SetAnnotation(node, 0, item_name, strlen(item_name));
-}
-
-int ItemPnPortSubmodule::open_children(GsdmlAttrNav* attrnav, double x,
-                                       double y)
-{
-  double node_x, node_y;
-
-  brow_GetNodePosition(node, &node_x, &node_y);
-
-  if (brow_IsOpen(node))
-  {
-    // Close
-    brow_SetNodraw(attrnav->brow->ctx);
-    brow_CloseNode(attrnav->brow->ctx, node);
-    if (brow_IsOpen(node) & attrnav_mOpen_Children)
-      brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_map);
-    brow_ResetOpen(node, attrnav_mOpen_All);
-    brow_ResetNodraw(attrnav->brow->ctx);
-    brow_Redraw(attrnav->brow->ctx, node_y);
-  }
-  else
-  {
-    brow_SetNodraw(attrnav->brow->ctx);
-
-    char* p = (char*)pi->Body.TextId.p;
-    new ItemPnBase(attrnav, "Text", "LocalGsdmlAttr", pwr_eType_String,
-                   sizeof(pwr_tString80), 0, 0, p, 1, node,
-                   flow_eDest_IntoLast);
-
-    p = pi->Body.MAUType;
-    new ItemPnBase(attrnav, "MAUType", "LocalGsdmlAttr", pwr_eType_String,
-                   sizeof(pwr_tString80), 0, 0, p, 1, node,
-                   flow_eDest_IntoLast);
-
-    p = (char*)&pi->Body.MaxPortTxDelay;
-    new ItemPnBase(attrnav, "MaxPortTxDelay", "LocalGsdmlAttr",
-                   pwr_eType_UInt16, sizeof(pwr_tUInt16), 0, 0, p, 1, node,
-                   flow_eDest_IntoLast);
-
-    p = (char*)&pi->Body.MaxPortRxDelay;
-    new ItemPnBase(attrnav, "MaxPortRxDelay", "LocalGsdmlAttr",
-                   pwr_eType_UInt16, sizeof(pwr_tUInt16), 0, 0, p, 1, node,
-                   flow_eDest_IntoLast);
-
-    p = (char*)&pi->Body.PortDeactivationSupported;
-    new ItemPnBase(attrnav, "PortDeactivationSupported", "LocalGsdmlAttr",
-                   pwr_eType_Boolean, sizeof(pwr_tBoolean), 0, 0, p, 1, node,
-                   flow_eDest_IntoLast);
-
-    p = pi->Body.LinkStateDiagnosisCapability;
-    new ItemPnBase(attrnav, "LinkStateDiagnosisCapability", "LocalGsdmlAttr",
-                   pwr_eType_String, sizeof(pwr_tString80), 0, 0, p, 1, node,
-                   flow_eDest_IntoLast);
-
-    p = (char*)&pi->Body.PowerBudgetControlSupported;
-    new ItemPnBase(attrnav, "PowerBudgetControlSupported", "LocalGsdmlAttr",
-                   pwr_eType_Boolean, sizeof(pwr_tBoolean), 0, 0, p, 1, node,
-                   flow_eDest_IntoLast);
-
-    p = (char*)&pi->Body.SupportsRingportConfig;
-    new ItemPnBase(attrnav, "SupportsRingportConfig", "LocalGsdmlAttr",
-                   pwr_eType_Boolean, sizeof(pwr_tBoolean), 0, 0, p, 1, node,
-                   flow_eDest_IntoLast);
-
-    p = (char*)&pi->Body.IsDefaultRingport;
-    new ItemPnBase(attrnav, "IsDefaultRingport", "LocalGsdmlAttr",
-                   pwr_eType_Boolean, sizeof(pwr_tBoolean), 0, 0, p, 1, node,
-                   flow_eDest_IntoLast);
-
-    p = (char*)&pi->Body.CheckMAUTypeSupported;
-    new ItemPnBase(attrnav, "CheckMAUTypeSupported", "LocalGsdmlAttr",
-                   pwr_eType_Boolean, sizeof(pwr_tBoolean), 0, 0, p, 1, node,
-                   flow_eDest_IntoLast);
-
-    p = (char*)&pi->Body.CheckMAUTypeDifferenceSupported;
-    new ItemPnBase(attrnav, "CheckMAUTypeDifferenceSupported", "LocalGsdmlAttr",
-                   pwr_eType_Boolean, sizeof(pwr_tBoolean), 0, 0, p, 1, node,
-                   flow_eDest_IntoLast);
-
-    gsdml_RecordDataList* rl = pi->RecordDataList;
-    if (rl)
-    {
-      GsdmlDataRecord* dr;
-      unsigned int record_index = 0;
-
-      for (unsigned int j = 0; j < rl->ParameterRecordDataItem.size(); j++)
-      {
-        if (subslotdata->data_record.size() <= record_index)
-        {
-          dr = new GsdmlDataRecord();
-          dr->record_idx = record_index;
-          subslotdata->data_record.push_back(dr);
-        }
-        else
-        {
-          dr = subslotdata->data_record[record_index];
-          dr->record_idx = record_index;
-        }
-
-        new ItemPnParRecord(attrnav, "", rl->ParameterRecordDataItem[j], dr,
-                            node, flow_eDest_IntoLast);
-        record_index++;
-      }
-    }
-
-    brow_SetOpen(node, attrnav_mOpen_Children);
-    brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_openmap);
-    brow_ResetNodraw(attrnav->brow->ctx);
-    brow_Redraw(attrnav->brow->ctx, node_y);
-  }
-  return 1;
-}
-
-ItemPnModuleInfo::ItemPnModuleInfo(GsdmlAttrNav* attrnav, const char* item_name,
-                                   gsdml_ModuleInfo* item_info, brow_tNode dest,
-                                   flow_eDest dest_code)
-    : info(item_info)
-{
-  type = attrnav_eItemType_PnModuleInfo;
-
-  strcpy(name, item_name);
-  parent = 1;
-
-  brow_CreateNode(attrnav->brow->ctx, item_name, attrnav->brow->nc_object, dest,
-                  dest_code, (void*)this, 1, &node);
-
-  brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_map);
-
-  brow_SetAnnotation(node, 0, item_name, strlen(item_name));
-}
-
-int ItemPnModuleInfo::open_children(GsdmlAttrNav* attrnav, double x, double y)
-{
-  double node_x, node_y;
-
-  brow_GetNodePosition(node, &node_x, &node_y);
-
-  if (brow_IsOpen(node))
-  {
-    // Close
-    brow_SetNodraw(attrnav->brow->ctx);
-    brow_CloseNode(attrnav->brow->ctx, node);
-    if (brow_IsOpen(node) & attrnav_mOpen_Attributes)
-      brow_RemoveAnnotPixmap(node, 1);
-    if (brow_IsOpen(node) & attrnav_mOpen_Children)
-      brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_map);
-    brow_ResetOpen(node, attrnav_mOpen_All);
-    brow_ResetNodraw(attrnav->brow->ctx);
-    brow_Redraw(attrnav->brow->ctx, node_y);
-  }
-  else
-  {
-    brow_SetNodraw(attrnav->brow->ctx);
-
-    new ItemPnBase(attrnav, "Name", "LocalGsdmlAttr", pwr_eType_String, 32, 0,
-                   0, info->Body.Name.p, 1, node, flow_eDest_IntoLast);
-    new ItemPnBase(attrnav, "Text", "LocalGsdmlAttr", pwr_eType_String, 32, 0,
-                   0, info->Body.InfoText.p, 1, node, flow_eDest_IntoLast);
-    if (!streq(info->Body.VendorName, ""))
-      new ItemPnBase(attrnav, "VendorName", "LocalGsdmlAttr", pwr_eType_String,
-                     32, 0, 0, info->Body.VendorName, 1, node,
-                     flow_eDest_IntoLast);
-    if (!streq(info->Body.OrderNumber, ""))
-      new ItemPnBase(attrnav, "OrderNumber", "LocalGsdmlAttr", pwr_eType_String,
-                     32, 0, 0, info->Body.OrderNumber, 1, node,
-                     flow_eDest_IntoLast);
-    if (!streq(info->Body.HardwareRelease, ""))
-      new ItemPnBase(attrnav, "HardwareRelease", "LocalGsdmlAttr",
-                     pwr_eType_String, 32, 0, 0, info->Body.HardwareRelease, 1,
-                     node, flow_eDest_IntoLast);
-    if (!streq(info->Body.SoftwareRelease, ""))
-      new ItemPnBase(attrnav, "SoftwareRelease", "LocalGsdmlAttr",
-                     pwr_eType_String, 32, 0, 0, info->Body.SoftwareRelease, 1,
-                     node, flow_eDest_IntoLast);
-    brow_SetOpen(node, attrnav_mOpen_Children);
-    brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_openmap);
-    brow_ResetNodraw(attrnav->brow->ctx);
-    brow_Redraw(attrnav->brow->ctx, node_y);
-  }
-  return 1;
-}
-
-ItemPnModuleType::ItemPnModuleType(GsdmlAttrNav* attrnav, const char* item_name,
-                                   int item_slot_number, int item_slot_idx,
-                                   brow_tNode dest, flow_eDest dest_code)
-    : slot_number(item_slot_number), slot_idx(item_slot_idx), old_value(0),
-      first_scan(1)
-{
-  type = attrnav_eItemType_PnModuleType;
-
-  strcpy(name, item_name);
-
-  brow_CreateNode(attrnav->brow->ctx, item_name, attrnav->brow->nc_attr, dest,
-                  dest_code, (void*)this, 1, &node);
-
-  brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_attrenum);
-
-  brow_SetAnnotation(node, 0, item_name, strlen(item_name));
-  brow_SetTraceAttr(node, name, "", flow_eTraceType_User);
-}
-
-static int gsdml_comp_nodes_name(const void* n1, const void* n2)
-{
-  ItemPnEnumValueMType* item1;
-  ItemPnEnumValueMType* item2;
-  brow_tObject o1 = *(brow_tObject*)n1;
-  brow_tObject o2 = *(brow_tObject*)n2;
-
-  brow_GetUserData(o1, (void**)&item1);
-  brow_GetUserData(o2, (void**)&item2);
-
-  return strcmp(item1->name, item2->name);
-}
-
-static int gsdml_comp_nodes_number(const void* n1, const void* n2)
-{
-  ItemPnEnumValueMType* item1;
-  ItemPnEnumValueMType* item2;
-  brow_tObject o1 = *(brow_tObject*)n1;
-  brow_tObject o2 = *(brow_tObject*)n2;
-
-  brow_GetUserData(o1, (void**)&item1);
-  brow_GetUserData(o2, (void**)&item2);
-
-  return strcmp(item1->number, item2->number);
-}
-
-int ItemPnModuleType::open_children(GsdmlAttrNav* attrnav, double x, double y)
-{
-  double node_x, node_y;
-
-  brow_GetNodePosition(node, &node_x, &node_y);
-
-  if (brow_IsOpen(node))
-  {
-    // Close
-    brow_SetNodraw(attrnav->brow->ctx);
-    brow_CloseNode(attrnav->brow->ctx, node);
-    if (brow_IsOpen(node) & attrnav_mOpen_Attributes)
-      brow_RemoveAnnotPixmap(node, 1);
-    if (brow_IsOpen(node) & attrnav_mOpen_Children)
-      brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_attrenum);
-    brow_ResetOpen(node, attrnav_mOpen_All);
-    brow_ResetNodraw(attrnav->brow->ctx);
-    brow_Redraw(attrnav->brow->ctx, node_y);
-  }
-  else
-  {
-    brow_SetNodraw(attrnav->brow->ctx);
-
-    int idx = 0;
-    new ItemPnEnumValueMType(
-        attrnav, "No", "", idx++, pwr_eType_UInt32,
-        &attrnav->dev_data.slot_data[slot_idx]->module_enum_number, node,
-        flow_eDest_IntoLast);
-
-    gsdml_UseableModules* um =
-        attrnav->gsdml->ApplicationProcess->DeviceAccessPointList
-            ->DeviceAccessPointItem[attrnav->device_num - 1]
-            ->UseableModules;
-    if (!um)
-    {
-      brow_ResetNodraw(attrnav->brow->ctx);
-      brow_Redraw(attrnav->brow->ctx, node_y);
-      return 1;
-    }
-    for (unsigned int i = 0; i < um->ModuleItemRef.size(); i++)
-    {
-      if (um->ModuleItemRef[i]->Body.AllowedInSlots.list &&
-          um->ModuleItemRef[i]->Body.AllowedInSlots.list->in_list(slot_number))
-      {
-        char mname[160] = "ModuleName";
-        gsdml_ModuleItem* mi =
-            (gsdml_ModuleItem*)um->ModuleItemRef[i]->Body.ModuleItemTarget.p;
-        if (!mi || !mi->ModuleInfo->Body.Name.p)
-          continue;
-        strncpy(mname, (char*)mi->ModuleInfo->Body.Name.p, sizeof(mname));
-        new ItemPnEnumValueMType(
-            attrnav, mname, mi->ModuleInfo->Body.OrderNumber, idx,
-            pwr_eType_UInt32,
-            &attrnav->dev_data.slot_data[slot_idx]->module_enum_number, node,
-            flow_eDest_IntoLast, (char*)mi->ModuleInfo->Body.InfoText.p);
-      }
-      else if (um->ModuleItemRef[i]->Body.FixedInSlots.list &&
-               um->ModuleItemRef[i]->Body.FixedInSlots.list->in_list(
-                   slot_number))
-      {
-        char mname[160] = "ModuleName";
-        gsdml_ModuleItem* mi =
-            (gsdml_ModuleItem*)um->ModuleItemRef[i]->Body.ModuleItemTarget.p;
-        if (!mi || !mi->ModuleInfo->Body.Name.p)
-          continue;
-        strncpy(mname, (char*)mi->ModuleInfo->Body.Name.p, sizeof(mname));
-        new ItemPnEnumValueMType(
-            attrnav, mname, mi->ModuleInfo->Body.OrderNumber, idx,
-            pwr_eType_UInt32,
-            &attrnav->dev_data.slot_data[slot_idx]->module_enum_number, node,
-            flow_eDest_IntoLast);
-      }
-      idx++;
-    }
-
-    // Sort
-    switch (attrnav->order_moduletype)
-    {
-    case attr_eOrderModuleType_Name:
-      brow_SortChildren(attrnav->brow->ctx, node, 1, gsdml_comp_nodes_name);
-      break;
-    case attr_eOrderModuleType_Number:
-      brow_SortChildren(attrnav->brow->ctx, node, 1, gsdml_comp_nodes_number);
-      break;
-    default:;
-    }
-
-    brow_SetOpen(node, attrnav_mOpen_Children);
-    brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_openmap);
-    brow_ResetNodraw(attrnav->brow->ctx);
-    brow_Redraw(attrnav->brow->ctx, node_y);
-  }
-  return 1;
-}
-
-int ItemPnModuleType::scan(GsdmlAttrNav* attrnav, void* p)
-{
-  char buf[200];
-  char buf2[200];
-
-  if (!first_scan)
-  {
-    if (old_value == *(int*)p)
-      // No change since last time
-      return 1;
-  }
-
-  if (*(int*)p == 0)
-  {
-    strcpy(buf, "No");
-    strcpy(buf2, "");
-  }
-  else
-  {
-    gsdml_UseableModules* um =
-        attrnav->gsdml->ApplicationProcess->DeviceAccessPointList
-            ->DeviceAccessPointItem[attrnav->device_num - 1]
-            ->UseableModules;
-    if (!um)
-      return 1;
-    gsdml_ModuleItem* mi =
-        (gsdml_ModuleItem*)um
-            ->ModuleItemRef
-                [attrnav->dev_data.slot_data[slot_idx]->module_enum_number - 1]
-            ->Body.ModuleItemTarget.p;
-    if (!mi || !mi->ModuleInfo || !mi->ModuleInfo->Body.Name.p)
-      return 1;
-    strncpy(buf, (char*)mi->ModuleInfo->Body.Name.p, sizeof(buf));
-    strncpy(buf2, mi->ModuleInfo->Body.OrderNumber, sizeof(buf2));
-  }
-  brow_SetAnnotation(node, 1, buf, strlen(buf));
-  brow_SetAnnotation(node, 2, buf2, strlen(buf2));
-  old_value = *(int*)p;
-
-  if (!first_scan)
-  {
-    int sts;
-    brow_tObject parentnode;
-    sts = brow_GetParent(attrnav->brow->ctx, node, &parentnode);
-    if (EVEN(sts))
-      return 1;
-
-    ItemPnSlot* parentitem;
-    brow_GetUserData(parentnode, (void**)&parentitem);
-
-    // Note, this object is deleted here !
-    parentitem->close(attrnav, 0, 0);
-
-    // Remove old subslot data
-    if (parentitem->slotdata)
-      parentitem->slotdata->slot_reset();
-
-    parentitem->open_children(attrnav, 0, 0);
-
-    brow_SelectClear(attrnav->brow->ctx);
-    brow_SetInverse(parentnode, 1);
-    brow_SelectInsert(attrnav->brow->ctx, parentnode);
-    brow_CenterObject(attrnav->brow->ctx, parentnode, 0.25);
-
-    // Search for a default module class
-    char devname[200];
-    pwr_tObjName mclass;
-    pwr_tCid mcid = 0;
-    brow_tObject next;
-    pwr_tCid* datap;
-
-    strncpy(devname,
-            (char*)attrnav->gsdml->ApplicationProcess->DeviceAccessPointList
-                ->DeviceAccessPointItem[attrnav->device_num - 1]
-                ->ModuleInfo->Body.Name.p,
-            sizeof(devname));
-
-    sts = attrnav->search_class(pn_cModuleClassFile, devname, buf, mclass);
-    if (ODD(sts))
-    {
-      for (int i = 0; attrnav->gsdml->module_classlist[i].cid; i++)
-      {
-        if (str_NoCaseStrcmp(mclass,
-                             attrnav->gsdml->module_classlist[i].name) == 0)
-        {
-          mcid = attrnav->gsdml->module_classlist[i].cid;
+          m_attached_submodule_item = submodule.second;
           break;
         }
       }
     }
 
-    sts = brow_GetNext(attrnav->brow->ctx, parentnode, &next);
-    if (ODD(sts))
-      sts = brow_GetNext(attrnav->brow->ctx, next, &next);
-    if (ODD(sts))
+    /*
+      Should we load default values or from already read data
+    */
+    for (auto const& submodule_item : m_parent_module_item->_UseableSubmodules)
     {
-      ItemPn* item;
-
-      brow_GetUserData(next, (void**)&item);
-      if (item->type == attrnav_eItemType_PnModuleClass)
+      if (submodule_item.second->_AllowedInSubslots.inList(m_subslot_number))
       {
-        brow_GetTraceData(next, (void**)&datap);
-        *datap = mcid;
-      }
-    }
-  }
-  else
-    first_scan = 0;
-
-  return 1;
-}
-
-ItemPnSubmoduleType::ItemPnSubmoduleType(
-    GsdmlAttrNav* attrnav, const char* item_name, int item_subslot_number,
-    int item_slot_idx, int item_subslot_idx, gsdml_UseableSubmodules* item_us,
-    brow_tNode dest, flow_eDest dest_code)
-    : subslot_number(item_subslot_number), slot_idx(item_slot_idx),
-      subslot_idx(item_subslot_idx), us(item_us), old_value(0), first_scan(1)
-{
-  type = attrnav_eItemType_PnSubmoduleType;
-
-  strcpy(name, item_name);
-
-  brow_CreateNode(attrnav->brow->ctx, item_name, attrnav->brow->nc_attr, dest,
-                  dest_code, (void*)this, 1, &node);
-
-  brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_attrenum);
-
-  brow_SetAnnotation(node, 0, item_name, strlen(item_name));
-  brow_SetTraceAttr(node, name, "", flow_eTraceType_User);
-}
-
-int ItemPnSubmoduleType::open_children(GsdmlAttrNav* attrnav, double x,
-                                       double y)
-{
-  double node_x, node_y;
-
-  brow_GetNodePosition(node, &node_x, &node_y);
-
-  if (brow_IsOpen(node))
-  {
-    // Close
-    brow_SetNodraw(attrnav->brow->ctx);
-    brow_CloseNode(attrnav->brow->ctx, node);
-    if (brow_IsOpen(node) & attrnav_mOpen_Attributes)
-      brow_RemoveAnnotPixmap(node, 1);
-    if (brow_IsOpen(node) & attrnav_mOpen_Children)
-      brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_attrenum);
-    brow_ResetOpen(node, attrnav_mOpen_All);
-    brow_ResetNodraw(attrnav->brow->ctx);
-    brow_Redraw(attrnav->brow->ctx, node_y);
-  }
-  else
-  {
-    brow_SetNodraw(attrnav->brow->ctx);
-
-    new ItemPnEnumValueMType(attrnav, "No", "", 0, pwr_eType_UInt32,
-                             &attrnav->dev_data.slot_data[slot_idx]
-                                  ->subslot_data[subslot_idx]
-                                  ->submodule_enum_number,
-                             node, flow_eDest_IntoLast);
-
-    if (!us)
-      return 1;
-
-    for (unsigned int i = 0; i < us->SubmoduleItemRef.size(); i++)
-    {
-      gsdml_Valuelist* vl_allowed = new gsdml_Valuelist(
-          us->SubmoduleItemRef[i]->Body.AllowedInSubslots.str);
-      gsdml_Valuelist* vl_fixed = new gsdml_Valuelist(
-          us->SubmoduleItemRef[i]->Body.FixedInSubslots.str);
-
-      if (vl_allowed->in_list(subslot_number))
-      {
-        if (vl_fixed->in_list(subslot_number))
+        //If we have no data already selected pick the default subslot from the start
+        if (m_subslot_data->m_submodule_ID == "")
         {
-          delete vl_allowed;
-          delete vl_fixed;
-          continue;
-        }
-        char mname[160] = "ModuleName";
-        // gsdml_VirtualSubmoduleItem* mi =
-        //     (gsdml_VirtualSubmoduleItem*)us->SubmoduleItemRef[i]
-        //         ->Body.SubmoduleItemTarget.p;
-        gsdml_PortSubmoduleItem* mi =
-            (gsdml_PortSubmoduleItem*)us->SubmoduleItemRef[i]
-                ->Body.SubmoduleItemTarget.p;
-        if (!mi || !mi->ModuleInfo || !mi->ModuleInfo->Body.Name.p)
-          continue;
-        strncpy(mname, (char*)mi->ModuleInfo->Body.Name.p, sizeof(mname));
-
-        // Find index in submodule list
-        int idx = 0;
-        for (unsigned int j = 0; j < attrnav->gsdml->ApplicationProcess
-                                         ->SubmoduleList->PortSubmoduleItem.size();
-             j++)
-        {
-          gsdml_PortSubmoduleItem* si =
-              (gsdml_PortSubmoduleItem*)attrnav->gsdml->ApplicationProcess
-                  ->SubmoduleList->PortSubmoduleItem[j];
-          if (si->ModuleInfo == mi->ModuleInfo)
+          if (!submodule_item.second->_UsedInSubslots.empty() && submodule_item.second->_UsedInSubslots.inList(m_subslot_number))
           {
-            idx = j + 1;
-            break;
+            m_attached_submodule_item = submodule_item.second->_SubmoduleItemTarget;
           }
         }
-        if (idx == 0)
-          continue;
+        else
+        {
+          // Load matching ID, if this data is wrong (maybe the GSDML file actually changed between versions even though it shouldn't)
+          // Nothing is pre loaded and one have to choose making the user aware...
+          if (submodule_item.first == m_subslot_data->m_submodule_ID)
+          {
+            m_attached_submodule_item = submodule_item.second->_SubmoduleItemTarget;
+          }          
+        }
 
-        new ItemPnEnumValueMType(attrnav, mname,
-                                 mi->ModuleInfo->Body.OrderNumber, idx,
-                                 pwr_eType_UInt32,
-                                 &attrnav->dev_data.slot_data[slot_idx]
-                                      ->subslot_data[subslot_idx]
-                                      ->submodule_enum_number,
-                                 node, flow_eDest_IntoLast);
+        m_is_selectable = true;
+        //m_has_settings = true;
       }
-      delete vl_allowed;
-      delete vl_fixed;
+    }
+  }
+
+  // Set data if we have something attached
+  if (m_attached_submodule_item)
+  {
+    m_subslot_data->m_submodule_ident_number = m_attached_submodule_item->_SubmoduleIdentNumber;
+    m_subslot_data->m_subslot_number = m_subslot_number;
+    m_subslot_data->m_submodule_ID = m_attached_submodule_item->_ID;
+    // TODO Create function in IOData class to calculate total length of Input/Output
+  }  
+
+  brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_attr,
+                  dest, dest_code, (void*)this, 1, &m_node);
+
+  // if (m_is_selectable)
+  //   brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_attrenum);
+  // else
+  brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_map);
+
+  brow_SetAnnotation(m_node, 0, m_name.c_str(), m_name.length());
+  brow_SetTraceAttr(m_node, m_name.c_str(), "", flow_eTraceType_User);
+}
+
+int ItemPnSubslot::open_children_impl()
+{
+    // Use a shorter name
+    auto parent = m_parent_module_item;
+
+    // This is a subslot in which you can select different submodules
+    if (m_is_selectable)
+    {
+      new ItemPnSubmoduleSelection(m_attrnav, "Submodule selection",
+                                   m_subslot_data, m_subslot_number, parent,
+                                   m_node, flow_eDest_IntoLast, "Select a submodule...");
     }
 
-    brow_SetOpen(node, attrnav_mOpen_Children);
-    brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_openmap);
-    brow_ResetNodraw(attrnav->brow->ctx);
-    brow_Redraw(attrnav->brow->ctx, node_y);
-  }
+    // Do we have an attached submodule in this slot?
+    if (m_attached_submodule_item)
+    {
+      switch (m_attached_submodule_item->_SubmoduleItemType)
+      {      
+        case GSDML::SubmoduleItemType_Virtual:
+        case GSDML::SubmoduleItemType_Submodule:
+        {
+          // IOData
+          if (m_attrnav->viewio && m_attached_submodule_item->_IOData.has_data())
+          {
+            new ItemPnIOData(m_attrnav, "IOData",
+                             &m_attached_submodule_item->_IOData, m_subslot_data,
+                             m_node, flow_eDest_IntoLast, "IO Data for this submodule.");
+          }
+
+          // RecordDataList
+          // Loop through and add the data
+          for (auto const& record_data :
+               m_attached_submodule_item->_RecordDataList)
+          {
+            // Skip if we already have this data loaded/initialized
+            // count returns either 1 or 0 depending on if key exists
+            if (m_subslot_data->m_data_record_map.count(record_data._Index) <= 0)
+            {
+              m_subslot_data->m_data_record_map.emplace(record_data._Index,
+                                                        ProfinetDataRecord());
+            }
+
+            ProfinetDataRecord* pdr =
+                &m_subslot_data->m_data_record_map.at(record_data._Index);
+            new ItemPnParRecord(m_attrnav, record_data._Name->c_str(), &record_data,
+                                pdr, m_node, flow_eDest_IntoLast, "A block of configurable parameters for the module.");
+          }
+          break;
+        case GSDML::SubmoduleItemType_Port:          
+          display_port_submodule();
+          break;
+        case GSDML::SubmoduleItemType_Interface:
+          // TODO
+          std::cout << "opened interface submodule" << std::endl;
+          display_interface_submodule();
+          break;
+        default:
+          std::cout << "Unknown submodule?!?!?!" << std::endl;
+        }
+      }
+    }
+    // This is a subslot with no attached submodule
+    else
+    {
+      // TODO
+      std::cout << "Empty subslot" << std::endl;
+    }
+
+    // unsigned int record_index = 0;
+    // if (virtualsubmodule)
+    // {
+    //   gsdml_RecordDataList* rl = virtualsubmodule->RecordDataList;
+    //   if (rl)
+    //   {
+    //     GsdmlDataRecord* dr;
+
+    //     for (unsigned int j = 0; j < rl->ParameterRecordDataItem.size(); j++)
+    //     {
+    //       if (subslotdata->data_record.size() <= record_index)
+    //       {
+    //         dr = new GsdmlDataRecord();
+    //         dr->record_idx = record_index;
+    //         subslotdata->data_record.push_back(dr);
+    //       }
+    //       else
+    //       {
+    //         dr = subslotdata->data_record[record_index];
+    //         dr->record_idx = record_index;
+    //       }
+
+    //       new ItemPnParRecord(attrnav, "", rl->ParameterRecordDataItem[j],
+    //       dr,
+    //                           m_node, flow_eDest_IntoLast);
+    //       record_index++;
+    //     }
+    //   }
+    // }
+
+    // if (attrnav->viewio && virtualsubmodule->IOData)
+    // {
+    //   new ItemPnIOData(attrnav, "IOData", virtualsubmodule->IOData,
+    //                    subslotdata->subslot_idx, slot_idx, m_node,
+    //                    flow_eDest_IntoLast);
+    // }
+
   return 1;
 }
 
-int ItemPnSubmoduleType::scan(GsdmlAttrNav* attrnav, void* p)
+void ItemPnSubslot::display_port_submodule()
 {
-  char buf[200];
-
-  if (!first_scan)
+  // Display information and settings for a port submodule
+  auto port_submodule = std::static_pointer_cast<GSDML::PortSubmoduleItem>(m_attached_submodule_item);
+  
+  if (port_submodule->_MaxPortRxDelay)
   {
-    if (old_value == *(int*)p)
+    new ItemPnInfo(m_attrnav, "MaxPortRxDelay", "LocalGsdmlAttr", pwr_eType_UInt16, 0,
+    &port_submodule->_MaxPortRxDelay, m_node, flow_eDest_IntoLast, "");
+  }
+
+  if (port_submodule->_MaxPortRxDelay)
+  {
+    new ItemPnInfo(m_attrnav, "MaxPortTxDelay", "LocalGsdmlAttr", pwr_eType_UInt16, 0,
+    &port_submodule->_MaxPortTxDelay, m_node, flow_eDest_IntoLast, "");
+  }  
+
+  if (!port_submodule->_LinkStateDiagnosisCapability.empty())
+  {
+    new ItemPnInfo(m_attrnav, "LinkStateDiagnosisCapability", "LocalGsdmlAttr", pwr_eType_String, port_submodule->_LinkStateDiagnosisCapability.length(),
+    &port_submodule->_LinkStateDiagnosisCapability, m_node, flow_eDest_IntoLast, "");
+  }
+  
+  new ItemPnInfo(m_attrnav, "PortDeactivationSupported", "LocalGsdmlAttr", pwr_eType_Boolean, 0,
+  &port_submodule->_PortDeactivationSupported, m_node, flow_eDest_IntoLast, "");  
+
+  if (port_submodule->_MAUTypes)
+  {
+    new ItemPnInfo(m_attrnav, "MAUTypes", "LocalGsdmlAttr", pwr_eType_UInt16, 0,
+    &port_submodule->_MAUTypes, m_node, flow_eDest_IntoLast, "");
+  }  
+
+  new ItemPnInfo(m_attrnav, "CheckMAUTypeSupported", "LocalGsdmlAttr", pwr_eType_Boolean, 0,
+  &port_submodule->_CheckMAUTypeSupported, m_node, flow_eDest_IntoLast, "");  
+
+  new ItemPnInfo(m_attrnav, "CheckMAUTypeDifferenceSupported", "LocalGsdmlAttr", pwr_eType_Boolean, 0,
+  &port_submodule->_CheckMAUTypeDifferenceSupported, m_node, flow_eDest_IntoLast, "");  
+
+  new ItemPnInfo(m_attrnav, "SupportsRingportConfig", "LocalGsdmlAttr", pwr_eType_Boolean, 0,
+  &port_submodule->_SupportsRingportConfig, m_node, flow_eDest_IntoLast, "");  
+
+  new ItemPnInfo(m_attrnav, "IsDefaultRingport", "LocalGsdmlAttr", pwr_eType_Boolean, 0,
+  &port_submodule->_IsDefaultRingport, m_node, flow_eDest_IntoLast, "");  
+
+  if (!port_submodule->_Writeable_IM_Records.empty())
+  {
+    new ItemPnInfo(m_attrnav, "Writeable_IM_Records", "LocalGsdmlAttr", pwr_eType_String, port_submodule->_Writeable_IM_Records.as_string().length(),
+    &port_submodule->_Writeable_IM_Records.as_string(), m_node, flow_eDest_IntoLast, "");
+  }
+}
+
+void ItemPnSubslot::display_interface_submodule()
+{
+  // Display information and settings for a port submodule
+  auto interface_submodule = std::static_pointer_cast<GSDML::InterfaceSubmoduleItem>(m_attached_submodule_item);
+    
+  new ItemPnEnumRTClass(m_attrnav, "RT_CLASS", interface_submodule, &m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR.RT_CLASS, m_node, flow_eDest_IntoLast);
+
+  static bool test;
+  new ItemPnSkipIPAssignment(m_attrnav, "Skip IP", &test, m_node, flow_eDest_IntoLast);
+  
+  // if (interface_submodule->_MaxPortRxDelay)
+  // {
+  //   new ItemPnInfo(attrnav, "MaxPortRxDelay", "LocalGsdmlAttr", pwr_eType_UInt16, 0,
+  //   &interface_submodule->_MaxPortRxDelay, m_node, flow_eDest_IntoLast);
+  // }
+  
+  // new ItemPnInfo(attrnav, "CheckMAUTypeSupported", "LocalGsdmlAttr", pwr_eType_Boolean, 0,
+  // &interface_submodule->_CheckMAUTypeSupported, m_node, flow_eDest_IntoLast);  
+
+  // if (!interface_submodule->_LinkStateDiagnosisCapability.empty())
+  // {
+  //   new ItemPnInfo(attrnav, "LinkStateDiagnosisCapability", "LocalGsdmlAttr", pwr_eType_String, interface_submodule->_LinkStateDiagnosisCapability.length(),
+  //   &interface_submodule->_LinkStateDiagnosisCapability, m_node, flow_eDest_IntoLast);
+  // }
+}
+
+int ItemPnSubslot::scan(GsdmlAttrNav* attrnav, void* dummy_p)
+{
+  // Note, first scan is set the two first scans to detect load from data file
+  if (!m_first_scan)
+  {
+    if (m_old_value == m_subslot_data->m_submodule_ID)
       // No change since last time
       return 1;
   }
 
-  if (*(int*)p == 0)
-    strcpy(buf, "No");
-  else
+  // Value did change, update the data if the ID is valid which it should  be :)
+  if (attrnav->gsdml->getSubmoduleMap().count(m_subslot_data->m_submodule_ID))
   {
-    if (!us)
-      return 1;
+    m_attached_submodule_item = attrnav->gsdml->getSubmoduleMap()[m_subslot_data->m_submodule_ID];
 
-    // gsdml_VirtualSubmoduleItem *si = (gsdml_VirtualSubmoduleItem
-    // *)us->SubmoduleItemRef[attrnav->dev_data.slot_data[slot_idx]->subslot_data[subslot_idx]->submodule_enum_number-1]->Body.SubmoduleItemTarget.p;
-    gsdml_VirtualSubmoduleItem* si =
-        (gsdml_VirtualSubmoduleItem*)
-            attrnav->gsdml->ApplicationProcess->SubmoduleList
-                ->SubmoduleItem[attrnav->dev_data.slot_data[slot_idx]
-                                    ->subslot_data[subslot_idx]
-                                    ->submodule_enum_number -
-                                1];
-    if (!si || !si->ModuleInfo->Body.Name.p)
-      return 1;
-    strncpy(buf, (char*)si->ModuleInfo->Body.Name.p, sizeof(buf));
+    // Update the data
+    m_subslot_data->m_submodule_ident_number = m_attached_submodule_item->_SubmoduleIdentNumber;
+    m_subslot_data->m_subslot_number = m_subslot_number;
+    // ID is traced and is updating the subslot ID reference directly
   }
-  brow_SetAnnotation(node, 1, buf, strlen(buf));
-  old_value = *(int*)p;
-
-  if (!first_scan)
+  
+  // Update annotation for selectable subslots
+  if (m_is_selectable && m_attached_submodule_item && m_attached_submodule_item->_ModuleInfo._Name)
   {
-    int sts;
-    brow_tObject parentnode;
-    sts = brow_GetParent(attrnav->brow->ctx, node, &parentnode);
-    if (EVEN(sts))
-      return 1;
-
-    ItemPnSubslot* parentitem;
-    brow_GetUserData(parentnode, (void**)&parentitem);
-
-    // Note, this object is deleted here !
-    parentitem->close(attrnav, 0, 0);
-
-    // Remove old subslot data
-    // if ( parentitem->slotdata)
-    //  parentitem->slotdata->slot_reset();
-
-    parentitem->open_children(attrnav, 0, 0);
-
-    brow_SelectClear(attrnav->brow->ctx);
-    brow_SetInverse(parentnode, 1);
-    brow_SelectInsert(attrnav->brow->ctx, parentnode);
-    brow_CenterObject(attrnav->brow->ctx, parentnode, 0.25);
+    brow_SetAnnotation(m_node, 1, m_attached_submodule_item->_ModuleInfo._Name->c_str(), m_attached_submodule_item->_ModuleInfo._Name->length());
+    
+    // We also close the subslot after a change, easy way to force an update to the "Information" kept herein...
+    double node_x, node_y;
+    brow_GetNodePosition(m_node, &node_x, &node_y);
+    ItemPn::close(attrnav, node_x, node_y);
   }
-  else
-    first_scan = 0;
+
+  // double node_x, node_y;
+  // brow_GetNodePosition(m_node, &node_x, &node_y);
+  // ItemPn::close(attrnav, node_x, node_y);
+  
+
+  m_old_value = m_subslot_data->m_submodule_ID;
+
+  if (m_first_scan)
+    m_first_scan = 0;
 
   return 1;
 }
 
-ItemPnParRecord::ItemPnParRecord(GsdmlAttrNav* attrnav, const char* item_name,
-                                 gsdml_ParameterRecordDataItem* item_par_record,
-                                 GsdmlDataRecord* item_datarecord,
-                                 brow_tNode dest, flow_eDest dest_code)
-    : par_record(item_par_record), datarecord(item_datarecord)
+ItemPnSubmoduleSelection::ItemPnSubmoduleSelection(
+    GsdmlAttrNav* attrnav, const char* name, ProfinetSubslot* subslot_data,
+    uint subslot_number, std::shared_ptr<GSDML::ModuleItem> module_item,
+    brow_tNode dest, flow_eDest dest_code, const char* infotext)
+    : ItemPn(attrnav, attrnav_eItemType_PnSubmoduleSelection, name, infotext, 1),
+      m_subslot_data(subslot_data), m_module_item(module_item),
+      m_subslot_number(subslot_number)
 {
-  type = attrnav_eItemType_PnParRecord;
-  if (par_record->Ref.size() == 0)
-    parent = 0;
-  else
-    parent = 1;
-  strncpy(name, (char*)par_record->Body.Name.p, sizeof(name));
+  brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_attr,
+                  dest, dest_code, (void*)this, 1, &m_node);
 
-  brow_CreateNode(attrnav->brow->ctx, item_name, attrnav->brow->nc_attr, dest,
-                  dest_code, (void*)this, 1, &node);
-
-  if (parent)
-    brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_map);
-  else
-    brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_leaf);
-
-  brow_SetAnnotation(node, 0, name, strlen(name));
-
-  // If we currently have no data we allocate memory and set it to the constants
-  // given by the gsdml file
-  if (!datarecord->data)
-  {
-    datarecord->data = (unsigned char*)calloc(1, par_record->Body.Length);
-    datarecord->data_reversed_endianess =
-        (unsigned char*)calloc(1, par_record->Body.Length);
-    datarecord->data_length = par_record->Body.Length;
-    datarecord->index = par_record->Body.Index;
-    datarecord->transfer_sequence = par_record->Body.TransferSequence;
-
-    // Read all constants
-    for (unsigned int i = 0; i < par_record->Const.size(); i++)
-    {
-      void* const_data;
-      int len;
-      gsdml_Const* con = par_record->Const[i];
-
-      attrnav->gsdml->ostring_to_data(
-          (unsigned char**)&const_data, con->Body.Data,
-          par_record->Body.Length - con->Body.ByteOffset, &len);
-      if (len > (int)(par_record->Body.Length - con->Body.ByteOffset))
-        len = par_record->Body.Length - con->Body.ByteOffset;
-      memcpy((char*)datarecord->data + con->Body.ByteOffset, const_data, len);
-      memcpy((char*)datarecord->data_reversed_endianess + con->Body.ByteOffset,
-             const_data, len);
-      free(const_data);
-    }
-
-    // And now, set the default values since the default values overwrite the
-    // constant data and some of the defaults are "non changeable/invisible"...
-    attrnav->gsdml->set_par_record_default(datarecord->data,
-                                           datarecord->data_reversed_endianess,
-                                           par_record->Body.Length, par_record);
-  }
-  else
-  {
-    // We have data already, at this state (first time we open this node)
-    // reversed_endianess should not have any allocated memory
-    if (!datarecord->data_reversed_endianess)
-    {
-      datarecord->data_reversed_endianess =
-          (unsigned char*)calloc(1, par_record->Body.Length);
-      memcpy(datarecord->data_reversed_endianess, datarecord->data,
-             par_record->Body.Length);
-      // Depending on if the data read is native to the host or not we byte swap
-      // either one of the data containers...
-      if (attrnav->dev_data.read_data_is_native_ordered)
-        attrnav->gsdml->populate_and_align_par_reversed_record_data(
-            datarecord->data, datarecord->data_reversed_endianess, par_record);
-      else
-        attrnav->gsdml->populate_and_align_par_reversed_record_data(
-            datarecord->data_reversed_endianess, datarecord->data, par_record);
-    }
-  }
+  brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_attrenum);
+  brow_SetAnnotation(m_node, 0, m_name.c_str(), m_name.length());
+  brow_SetTraceAttr(m_node, m_name.c_str(), "", flow_eTraceType_User);
 }
 
-int ItemPnParRecord::open_children(GsdmlAttrNav* attrnav, double x, double y)
+int ItemPnSubmoduleSelection::open_children_impl()
 {
-  double node_x, node_y;
-
-  brow_GetNodePosition(node, &node_x, &node_y);
-
-  if (brow_IsOpen(node))
-  {
-    // Close
-    brow_SetNodraw(attrnav->brow->ctx);
-    brow_CloseNode(attrnav->brow->ctx, node);
-    if (brow_IsOpen(node) & attrnav_mOpen_Attributes)
-      brow_RemoveAnnotPixmap(node, 1);
-    if (brow_IsOpen(node) & attrnav_mOpen_Children)
-      brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_map);
-    brow_ResetOpen(node, attrnav_mOpen_All);
-    brow_ResetNodraw(attrnav->brow->ctx);
-    brow_Redraw(attrnav->brow->ctx, node_y);
-  }
-  else
-  {
-    brow_SetNodraw(attrnav->brow->ctx);
-
-    for (unsigned int i = 0; i < par_record->Ref.size(); i++)
+    for (auto const& submodule_item : m_module_item->_UseableSubmodules)
     {
-      gsdml_eValueDataType datatype;
+      std::ostringstream submodule_item_display_text(
+          *submodule_item.second->_SubmoduleItemTarget->_ModuleInfo._Name,
+          std::ios_base::ate);
+      submodule_item_display_text
+          << " (" 
+          << (submodule_item.second->_SubmoduleItemTarget->_ModuleInfo._OrderNumber.empty() ? *submodule_item.second->_SubmoduleItemTarget->_ModuleInfo._Name : submodule_item.second->_SubmoduleItemTarget->_ModuleInfo._OrderNumber)
+          << ")";
 
-      if (!par_record->Ref[i]->Body.Visible)
-        continue;
-
-      attrnav->gsdml->string_to_value_datatype(
-          par_record->Ref[i]->Body.DataType, &datatype);
-      switch (datatype)
+      // Only add those that are valid for this subslot
+      if (submodule_item.second->_AllowedInSubslots.inList(m_subslot_number))
       {
-      case gsdml_eValueDataType_:
-        break;
-      case gsdml_eValueDataType_Bit:
-      case gsdml_eValueDataType_BitArea:
-        new ItemPnParEnum(attrnav, "", par_record->Ref[i], datatype,
-                          datarecord->data, datarecord->data_reversed_endianess,
-                          node, flow_eDest_IntoLast);
-        break;
-      case gsdml_eValueDataType_Integer8:
-      case gsdml_eValueDataType_Unsigned8:
-      default:
-        if (streq(par_record->Ref[i]->Body.ValueItemTarget.ref, "") ||
-            (par_record->Ref[i]->Body.ValueItemTarget.p &&
-             !((gsdml_ValueItem*)par_record->Ref[i]->Body.ValueItemTarget.p)
-                  ->Assignments))
-          new ItemPnParValue(
-              attrnav, "", par_record->Ref[i], datatype, datarecord->data,
-              datarecord->data_reversed_endianess, node, flow_eDest_IntoLast);
-        else
-          new ItemPnParEnum(
-              attrnav, "", par_record->Ref[i], datatype, datarecord->data,
-              datarecord->data_reversed_endianess, node, flow_eDest_IntoLast);
+        new ItemPnIDSelectValue(
+            m_attrnav, submodule_item_display_text.str().c_str(),
+            submodule_item.first, &m_subslot_data->m_submodule_ID, m_node,
+            flow_eDest_IntoLast,
+            submodule_item.second->_SubmoduleItemTarget->_ModuleInfo._InfoText
+                ->c_str());
       }
     }
-    brow_SetOpen(node, attrnav_mOpen_Children);
-    brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_openmap);
-    brow_ResetNodraw(attrnav->brow->ctx);
-    brow_Redraw(attrnav->brow->ctx, node_y);
-  }
+
+    // new ItemPnSubmoduleType(
+    //     attrnav, "SubmoduleType", subslotdata->subslot_number, slot_idx,
+    //     subslotdata->subslot_idx, us, m_node, flow_eDest_IntoLast);
+
+    // gsdml_VirtualSubmoduleItem* subm = 0;
+    // if (subslotdata->submodule_enum_number)
+    // {
+    //   subm = attrnav->gsdml->ApplicationProcess->SubmoduleList
+    //              ->SubmoduleItem[subslotdata->submodule_enum_number - 1];
+    // }
+
+    // if (subm && subm->ModuleInfo)
+    // {
+    //   // TODO Fix
+    //   // new ItemPnModuleInfo(attrnav, "SubmoduleInfo", subm->ModuleInfo,
+    // m_node,
+    //   //                      flow_eDest_IntoLast);
+    // }
+
+    // unsigned int record_index = 0;
+    // if (subm)
+    // {
+    //   gsdml_RecordDataList* rl = subm->RecordDataList;
+    //   if (rl)
+    //   {
+    //     GsdmlDataRecord* dr;
+
+    //     for (unsigned int j = 0; j < rl->ParameterRecordDataItem.size();
+    // j++)
+    //     {
+    //       if (subslotdata->data_record.size() <= record_index)
+    //       {
+    //         dr = new GsdmlDataRecord();
+    //         dr->record_idx = record_index;
+    //         subslotdata->data_record.push_back(dr);
+    //       }
+    //       else
+    //       {
+    //         dr = subslotdata->data_record[record_index];
+    //         dr->record_idx = record_index;
+    //       }
+
+    //       new ItemPnParRecord(attrnav, "", rl->ParameterRecordDataItem[j],
+    // dr,
+    //                           m_node, flow_eDest_IntoLast);
+    //       record_index++;
+    //     }
+    //   }
+    // }
+
+    // if (attrnav->viewio && subm && subm->IOData)
+    // {
+    //   new ItemPnIOData(attrnav, "IOData", subm->IOData,
+    //                    subslotdata->subslot_idx, slot_idx, m_node,
+    //                    flow_eDest_IntoLast);
+    // }
+ 
   return 1;
 }
 
-ItemPnParValue::ItemPnParValue(GsdmlAttrNav* attrnav, const char* item_name,
-                               gsdml_Ref* item_value_ref,
-                               gsdml_eValueDataType item_datatype,
-                               unsigned char* item_data,
-                               unsigned char* item_data_reversed_endianess,
-                               brow_tNode dest, flow_eDest dest_code)
-    : value_ref(item_value_ref), datatype(item_datatype), data(item_data),
-      data_reversed_endianess(item_data_reversed_endianess), first_scan(1),
-      noedit(1)
+int ItemPnSubmoduleSelection::scan(GsdmlAttrNav* attrnav, void* value_p)
 {
-  type = attrnav_eItemType_PnParValue;
-  strncpy(name, (char*)value_ref->Body.TextId.p, sizeof(name));
-  byte_offset = value_ref->Body.ByteOffset;
-  noedit = !value_ref->Body.Changeable;
 
-  switch (datatype)
+  // Note, first scan is set the two first scans to detect load from data file
+  if (!m_first_scan)
   {
-  case gsdml_eValueDataType_Integer8:
-  case gsdml_eValueDataType_Unsigned8:
-    size = 1;
+    if (m_old_value == *(std::string*)value_p)
+      // No change since last time
+      return 1;
+  }
+
+  std::string annotation;
+  if (m_module_item->_UseableSubmodules.count(*(std::string*)value_p))
+  {
+    auto submodule_item_ref =
+        m_module_item->_UseableSubmodules[*(std::string*)value_p];
+    annotation = *submodule_item_ref->_SubmoduleItemTarget->_ModuleInfo._Name;
+  }
+  else
+  {
+    annotation = "None";
+  }
+
+  double node_x, node_y;
+  brow_GetNodePosition(m_node, &node_x, &node_y);
+  ItemPn::close(attrnav, node_x, node_y);
+  brow_SetAnnotation(m_node, 1, annotation.c_str(), annotation.length());
+
+  m_old_value = m_subslot_data->m_submodule_ID;
+
+  if (m_first_scan)
+    m_first_scan = 0;
+
+  return 1;
+}
+
+ItemPnDAP::ItemPnDAP(GsdmlAttrNav* attrnav, const char* name,
+                     ProfinetSlot* item_slotdata, brow_tNode dest,
+                     flow_eDest dest_code, const char* infotext)
+    : ItemPn(attrnav, attrnav_eItemType_PnDAP, name, infotext, 1), m_slotdata(item_slotdata)
+{
+  brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_object,
+                  dest, dest_code, (void*)this, 1, &m_node);
+
+  brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_map);
+
+  brow_SetAnnotation(m_node, 0, m_name.c_str(), m_name.length());
+}
+
+int ItemPnDAP::open_children_impl()
+{
+    // If this is created we do have a DAP selected but we check anyways...
+    if (m_attrnav->m_selected_device_item)
+    {
+      // Let's create shorthand versions for readability
+      auto dap = m_attrnav->m_selected_device_item;
+      auto ppd =
+          m_attrnav->pn_runtime_data->m_PnDevice; // ( pwr_pn_data == ppd :D )
+
+      // Display information
+      new ItemPnModuleInfo(m_attrnav, "ModuleInfo", &dap->_ModuleInfo, m_node,
+                           flow_eDest_IntoLast, "Module information.");
+
+      // First we create the virtual submodules if any (usually at least one...)
+      // The virtual submodules start at subslot 1. And ISO 15745-4 says that
+      // there must not be more than 1 virtual submodule item. But standards
+      // change so we might as well loop through it since the name does imply a
+      // list :) Who knows...
+      size_t subslot_number = 1;
+      for (auto const& virtual_submodule_item : dap->_VirtualSubmoduleList)
+      {
+        // m_slotdata->m_subslot_map[subslot_number].m_subslot_number =
+        // subslot_number;
+
+        std::ostringstream subslot_name("Subslot ", std::ios_base::ate);
+        subslot_name << subslot_number << " ("
+                     << *virtual_submodule_item.second->_ModuleInfo._Name
+                     << ")";
+
+        new ItemPnSubslot(m_attrnav, subslot_name.str().c_str(),
+                          &m_slotdata->m_subslot_map[subslot_number], dap,
+                          subslot_number, virtual_submodule_item.second, m_node,
+                          flow_eDest_IntoLast, "Virtual submodule of this module/DAP.");
+
+        subslot_number++;
+      }
+
+      // If we have a subslotlist add those extra subslots. This is schema
+      // >= 2.1
+      if (!dap->_SubslotList.empty())
+      {
+        for (auto const& subslot : dap->_SubslotList)
+        {
+          std::ostringstream subslot_name("Subslot ", std::ios_base::ate);
+          subslot_name << subslot._SubslotNumber << " (" << *subslot._Text
+                       << ")";
+
+          new ItemPnSubslot(m_attrnav, subslot_name.str().c_str(),
+                            &m_slotdata->m_subslot_map[subslot._SubslotNumber],
+                            dap, subslot._SubslotNumber, nullptr, m_node,
+                            flow_eDest_IntoLast, "Subslot from the DAPs subslot list.");
+        }
+      }
+      else if (dap->_SystemDefinedSubmoduleList.size() > 0) // Do we have a systemdefined subslot list?
+      {
+        for (auto const& submodule : dap->_SystemDefinedSubmoduleList)
+        {
+          std::ostringstream subslot_name("Subslot ", std::ios_base::ate);
+          subslot_name << submodule.second->_SubslotNumber << " (" << *submodule.second->_Text << ")";
+
+          new ItemPnSubslot(m_attrnav, subslot_name.str().c_str(),
+                            &m_slotdata->m_subslot_map[submodule.second->_SubslotNumber],
+                            dap, submodule.second->_SubslotNumber, nullptr, m_node,
+                            flow_eDest_IntoLast, "System defined subslot");
+        }
+      }
+    }
+
+  return 1;
+}
+
+ItemPnNetwork::ItemPnNetwork(GsdmlAttrNav* attrnav, const char* item_name,
+                             brow_tNode dest, flow_eDest dest_code, const char* infotext)
+    : ItemPn(attrnav, attrnav_eItemType_PnNetwork, item_name, "Network settings. Do note that it's not necessary to set the MAC address. Only do this if you know what you're doing and why you are doing it. If the latter is unknown then leave it be.", 1)
+{
+  brow_CreateNode(attrnav->brow->ctx, item_name, attrnav->brow->nc_object, dest,
+                  dest_code, (void*)this, 1, &m_node);
+
+  brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_map);
+
+  brow_SetAnnotation(m_node, 0, item_name, strlen(item_name));
+}
+
+int ItemPnNetwork::open_children_impl()
+{
+  void* value = (void*)0;
+  ProfinetNetworkSettings& network_settings =
+      m_attrnav->pn_runtime_data->m_PnDevice->m_NetworkSettings;
+
+    value = &network_settings.m_device_name;
+    new ItemPnBase(m_attrnav, "DeviceName", "LocalGsdmlAttr", pwr_eType_String,
+                   RUNTIME_PARSER_STRING_MAX_LENGTH, 0, 0, value, 0, m_node,
+                   flow_eDest_IntoLast, "Device name. Adhere to standard hostname naming policies. For clarity one could use the hostname followed by a hyphen (-) and then the device name. Example: mnutv-et200sp1");
+
+    value = &network_settings.m_ip_address;
+    new ItemPnBase(m_attrnav, "IP Address", "LocalGsdmlAttr", pwr_eType_String,
+                   RUNTIME_PARSER_STRING_MAX_LENGTH, 0, 0, value, 0, m_node,
+                   flow_eDest_IntoLast, "Example: 192.168.90.1");
+
+    value = &network_settings.m_subnet_mask;
+    new ItemPnBase(m_attrnav, "Subnet Mask", "LocalGsdmlAttr", pwr_eType_String,
+                   RUNTIME_PARSER_STRING_MAX_LENGTH, 0, 0, value, 0, m_node,
+                   flow_eDest_IntoLast, "Example: 255.255.255.0");
+
+    value = &network_settings.m_mac_address;
+    new ItemPnBase(m_attrnav, "MAC Address", "LocalGsdmlAttr", pwr_eType_String,
+                   RUNTIME_PARSER_STRING_MAX_LENGTH, 0, 0, value, 0, m_node,
+                   flow_eDest_IntoLast, "Example: aa:bb:cc:dd:ee:ff\nRemember that you do not, in most cases, need to edit this. If you know for certain that this is needed and why then go ahead.");
+
+    value = &network_settings.m_skip_ip_assignment;
+    new ItemPnEnumYesNo(m_attrnav, "Skip IP Assignment", (int*)value, m_node,
+                        flow_eDest_IntoLast,
+                        "Enable skip IP assignment if you want to let another "
+                        "controller or supervisor hand out IP data.");
+
+    // if (attrnav->device_item &&
+    //     attrnav->device_item->SystemDefinedSubmoduleList &&
+    //     attrnav->device_item->SystemDefinedSubmoduleList
+    //         ->InterfaceSubmoduleItem)
+    // {
+    //   p = (void*)&attrnav->send_clock;
+    //   new ItemPnEnumSendClock(attrnav, "SendClock",
+    //                           attrnav->device_item->SystemDefinedSubmoduleList
+    //                               ->InterfaceSubmoduleItem,
+    //                           p, m_node, flow_eDest_IntoLast);
+
+    //   p = (void*)&attrnav->time_ratio;
+    //   new ItemPnEnumTimeRatio(attrnav, "ReductionRatio",
+    //                           attrnav->device_item->SystemDefinedSubmoduleList
+    //                               ->InterfaceSubmoduleItem,
+    //                           p, m_node, flow_eDest_IntoLast);
+
+    // value = (void*)&attrnav->phase;
+    // new ItemPnBase(attrnav, "Phase", "LocalGsdmlAttr", pwr_eType_UInt32,
+    //                  sizeof(pwr_tUInt32), 0, 0, value, 0, m_node,
+    //                  flow_eDest_IntoLast);
+    // }
+    // else
+    // {
+    //   p = (void*)&attrnav->send_clock;
+    //   new ItemPnEnumSendClock(attrnav, "SendClock", 0, p, m_node,
+    //                           flow_eDest_IntoLast);
+
+    //   p = (void*)&attrnav->time_ratio;
+    //   new ItemPnEnumTimeRatio(attrnav, "ReductionRatio", 0, p, m_node,
+    //                           flow_eDest_IntoLast);
+
+    //   p = (void*)&attrnav->phase;
+    //   new ItemPnBase(attrnav, "Phase", "LocalGsdmlAttr", pwr_eType_UInt32,
+    //                  sizeof(pwr_tUInt32), 0, 0, p, 0, m_node,
+    //                  flow_eDest_IntoLast);
+    //}
+
+  return 1;
+}
+
+ItemPnDeviceInfo::ItemPnDeviceInfo(GsdmlAttrNav* attrnav, const char* item_name,
+                                   brow_tNode dest, flow_eDest dest_code, const char* infotext)
+    : ItemPn(attrnav, attrnav_eItemType_PnDeviceInfo, item_name,
+             "Show information about this device family.", 1)
+{
+  brow_CreateNode(attrnav->brow->ctx, item_name, attrnav->brow->nc_object, dest,
+                  dest_code, (void*)this, 1, &m_node);
+
+  brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_map);
+
+  brow_SetAnnotation(m_node, 0, item_name, strlen(item_name));
+}
+
+int ItemPnDeviceInfo::open_children_impl()
+{
+  
+    // void* p = (void*)attrnav->gsdml->DeviceIdentity->Body.VendorName;
+    // value = attrnav->gsdml->m_DeviceIdentity->_VendorName.c_str();
+    // TODO Parse this in the new parser...
+    new ItemPnInfo(m_attrnav, "Vendor", "LocalGsdmlAttr", pwr_eType_String,
+                   m_attrnav->gsdml->m_DeviceIdentity->_VendorName.length(),
+                   &m_attrnav->gsdml->m_DeviceIdentity->_VendorName,
+                   m_node, flow_eDest_IntoLast, "");
+    new ItemPnInfo(m_attrnav, "VendorID", "LocalGsdmlAttr", pwr_eType_UInt32, 0,
+                   &m_attrnav->gsdml->m_DeviceIdentity->_DeviceID, m_node,
+                   flow_eDest_IntoLast, "");
+    new ItemPnInfo(m_attrnav, "Info", "LocalGsdmlAttr", pwr_eType_String,
+                   m_attrnav->gsdml->m_DeviceIdentity->_InfoText->length(),
+                   &(*m_attrnav->gsdml->m_DeviceIdentity->_InfoText), m_node,
+                   flow_eDest_IntoLast, "");
+    new ItemPnInfo(m_attrnav, "DeviceID", "LocalGsdmlAttr", pwr_eType_UInt32, 0,
+                   &m_attrnav->gsdml->m_DeviceIdentity->_VendorID, m_node,
+                   flow_eDest_IntoLast, "");
+    new ItemPnInfo(m_attrnav, "MainFamily", "LocalGsdmlAttr", pwr_eType_String,
+                   m_attrnav->gsdml->m_DeviceFunction->_MainFamily.length(),
+                   &m_attrnav->gsdml->m_DeviceFunction->_MainFamily,
+                   m_node, flow_eDest_IntoLast, "");
+    new ItemPnInfo(m_attrnav, "ProductFamily", "LocalGsdmlAttr", pwr_eType_String,
+                   m_attrnav->gsdml->m_DeviceFunction->_ProductFamily.length(),
+                   &m_attrnav->gsdml->m_DeviceFunction->_ProductFamily,
+                   m_node, flow_eDest_IntoLast, "");
+
+    // new ItemPnBase(attrnav, "Vendor", "LocalGsdmlAttr", pwr_eType_String,
+    //                sizeof(pwr_tString80), 0, 0, value, 1, m_node,
+    //                flow_eDest_IntoLast);
+
+    // value = attrnav->gsdml->m_DeviceIdentity->_InfoText->c_str();
+    // new ItemPnBase(attrnav, "Text", "LocalGsdmlAttr", pwr_eType_String,
+    //                sizeof(pwr_tString80), 0, 0, value, 1, m_node,
+    //                flow_eDest_IntoLast);
+
+    // value = attrnav->gsdml->m_DeviceFunction->_MainFamily.c_str();
+    // new ItemPnBase(attrnav, "MainFamily", "LocalGsdmlAttr", pwr_eType_String,
+    //                sizeof(pwr_tString80), 0, 0, value, 1, m_node,
+    //                flow_eDest_IntoLast);
+
+    // value = attrnav->gsdml->m_DeviceFunction->_ProductFamily.c_str();
+    // new ItemPnBase(attrnav, "ProductFamily", "LocalGsdmlAttr",
+    // pwr_eType_String,
+    //                sizeof(pwr_tString80), 0, 0, value, 1, m_node,
+    //                flow_eDest_IntoLast);
+
+  return 1;
+}
+
+// ItemPnInterfaceSubmodule::ItemPnInterfaceSubmodule(
+//     GsdmlAttrNav* attrnav, const char* item_name,
+//     std::shared_ptr<GSDML::InterfaceSubmoduleItem> interface_submodule_item,
+//     ProfinetSubslot* subslot_data, brow_tNode dest, flow_eDest dest_code)
+//     : m_interface_submodule_item(interface_submodule_item),
+//       m_subslot_data(subslot_data)
+// {
+//   m_type = attrnav_eItemType_PnInterfaceSubmodule;
+
+//   m_name = std::string(item_name);
+
+//   m_is_parent = 1;
+
+//   brow_CreateNode(attrnav->brow->ctx, item_name, attrnav->brow->nc_object, dest,
+//                   dest_code, (void*)this, 1, &m_node);
+
+//   brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_map);
+
+//   brow_SetAnnotation(m_node, 0, m_name.c_str(), m_name.length());
+// }
+
+// int ItemPnInterfaceSubmodule::open_children(GsdmlAttrNav* attrnav, double x,
+//                                             double y)
+// {
+//   double node_x, node_y;
+
+//   brow_GetNodePosition(m_node, &node_x, &node_y);
+
+//   if (brow_IsOpen(m_node))
+//   {
+//     // Close
+//     brow_SetNodraw(attrnav->brow->ctx);
+//     brow_CloseNode(attrnav->brow->ctx, m_node);
+//     if (brow_IsOpen(m_node) & attrnav_mOpen_Children)
+//       brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_map);
+//     brow_ResetOpen(m_node, attrnav_mOpen_All);
+//     brow_ResetNodraw(attrnav->brow->ctx);
+//     brow_Redraw(attrnav->brow->ctx, node_y);
+//   }
+//   else
+//   {
+//     brow_SetNodraw(attrnav->brow->ctx);
+
+//     // char* p = (char*)ii->Body.TextId.p;
+//     // new ItemPnBase(attrnav, "Text", "LocalGsdmlAttr", pwr_eType_String,
+//     //                sizeof(pwr_tString80), 0, 0, p, 1, m_node,
+//     //                flow_eDest_IntoLast);
+
+//     // p = ii->Body.SupportedRT_Class;
+//     // new ItemPnBase(attrnav, "SupportedRT_Class", "LocalGsdmlAttr",
+//     //                pwr_eType_String, sizeof(pwr_tString80), 0, 0, p, 1,
+//     //                m_node, flow_eDest_IntoLast);
+
+//     // p = ii->Body.SupportedRT_Classes;
+//     // new ItemPnBase(attrnav, "SupportedRT_Classes", "LocalGsdmlAttr",
+//     //                pwr_eType_String, sizeof(pwr_tString80), 0, 0, p, 1,
+//     //                m_node, flow_eDest_IntoLast);
+
+//     // p = (char*)&ii->Body.IsochroneModeSupported;
+//     // new ItemPnBase(attrnav, "IsochroneModeSupported", "LocalGsdmlAttr",
+//     //                pwr_eType_Boolean, sizeof(pwr_tBoolean), 0, 0, p, 1,
+//     //                m_node, flow_eDest_IntoLast);
+
+//     // if (*(pwr_tBoolean*)p)
+//     // {
+//     //   p = ii->Body.IsochroneModeInRT_Classes;
+//     //   new ItemPnBase(attrnav, "IsochroneModeSupported", "LocalGsdmlAttr",
+//     //                  pwr_eType_String, sizeof(pwr_tString80), 0, 0, p, 1,
+//     //                  m_node, flow_eDest_IntoLast);
+//     // }
+
+//     // p = ii->Body.SupportedProtocols;
+//     // new ItemPnBase(attrnav, "SupportedProtocols", "LocalGsdmlAttr",
+//     //                pwr_eType_String, sizeof(pwr_tString80), 0, 0, p, 1,
+//     //                m_node, flow_eDest_IntoLast);
+
+//     // p = ii->Body.SupportedMibs;
+//     // new ItemPnBase(attrnav, "SupportedMibs", "LocalGsdmlAttr",
+//     // pwr_eType_String,
+//     //                sizeof(pwr_tString80), 0, 0, p, 1, m_node,
+//     //                flow_eDest_IntoLast);
+
+//     // p = (char*)&ii->Body.NetworkComponentDiagnosisSupported;
+//     // new ItemPnBase(attrnav, "NetworkComponentDiagnosisSupported",
+//     //                "LocalGsdmlAttr", pwr_eType_Boolean, sizeof(pwr_tBoolean),
+//     //                0, 0, p, 1, m_node, flow_eDest_IntoLast);
+
+//     // p = (char*)&ii->Body.DelayMeasurementSupported;
+//     // new ItemPnBase(attrnav, "DelayMeasurementSupported", "LocalGsdmlAttr",
+//     //                pwr_eType_Boolean, sizeof(pwr_tBoolean), 0, 0, p, 1,
+//     //                m_node, flow_eDest_IntoLast);
+
+//     // gsdml_RecordDataList* rl = ii->RecordDataList;
+//     // if (rl)
+//     // {
+//     //   unsigned int record_index = 0;
+//     //   GsdmlDataRecord* dr;
+
+//     //   for (unsigned int j = 0; j < rl->ParameterRecordDataItem.size(); j++)
+//     //   {
+//     //     if (subslotdata->data_record.size() <= record_index)
+//     //     {
+//     //       dr = new GsdmlDataRecord();
+//     //       dr->record_idx = record_index;
+//     //       subslotdata->data_record.push_back(dr);
+//     //     }
+//     //     else
+//     //     {
+//     //       dr = subslotdata->data_record[record_index];
+//     //       dr->record_idx = record_index;
+//     //     }
+
+//     //     new ItemPnParRecord(attrnav, "", rl->ParameterRecordDataItem[j], dr,
+//     //                         m_node, flow_eDest_IntoLast);
+//     //     record_index++;
+//     //   }
+//     // }
+
+//     brow_SetOpen(m_node, attrnav_mOpen_Children);
+//     brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_openmap);
+//     brow_ResetNodraw(attrnav->brow->ctx);
+//     brow_Redraw(attrnav->brow->ctx, node_y);
+//   }
+//   return 1;
+// }
+
+// ItemPnPortSubmodule::ItemPnPortSubmodule(
+//     GsdmlAttrNav* attrnav, const char* item_name,
+//     std::shared_ptr<GSDML::PortSubmoduleItem> port_submodule_item,
+//     ProfinetSubslot* subslot_data, brow_tNode dest, flow_eDest dest_code)
+//     : m_port_submodule_item(port_submodule_item), m_subslot_data(subslot_data)
+// {
+//   m_type = attrnav_eItemType_PnPortSubmodule;
+
+//   m_name = std::string(item_name);
+
+//   m_is_parent = 1;
+
+//   brow_CreateNode(attrnav->brow->ctx, item_name, attrnav->brow->nc_object, dest,
+//                   dest_code, (void*)this, 1, &m_node);
+
+//   brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_map);
+
+//   brow_SetAnnotation(m_node, 0, m_name.c_str(), m_name.length());
+// }
+
+// int ItemPnPortSubmodule::open_children(GsdmlAttrNav* attrnav, double x,
+//                                        double y)
+// {
+//   double node_x, node_y;
+
+//   brow_GetNodePosition(m_node, &node_x, &node_y);
+
+//   if (brow_IsOpen(m_node))
+//   {
+//     // Close
+//     brow_SetNodraw(attrnav->brow->ctx);
+//     brow_CloseNode(attrnav->brow->ctx, m_node);
+//     if (brow_IsOpen(m_node) & attrnav_mOpen_Children)
+//       brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_map);
+//     brow_ResetOpen(m_node, attrnav_mOpen_All);
+//     brow_ResetNodraw(attrnav->brow->ctx);
+//     brow_Redraw(attrnav->brow->ctx, node_y);
+//   }
+//   else
+//   {
+//     brow_SetNodraw(attrnav->brow->ctx);
+
+//     // char* p = (char*)pi->Body.TextId.p;
+//     // new ItemPnBase(attrnav, "Text", "LocalGsdmlAttr", pwr_eType_String,
+//     //                sizeof(pwr_tString80), 0, 0, p, 1, m_node,
+//     //                flow_eDest_IntoLast);
+
+//     // p = pi->Body.MAUType;
+//     // new ItemPnBase(attrnav, "MAUType", "LocalGsdmlAttr", pwr_eType_String,
+//     //                sizeof(pwr_tString80), 0, 0, p, 1, m_node,
+//     //                flow_eDest_IntoLast);
+
+//     // p = (char*)&pi->Body.MaxPortTxDelay;
+//     // new ItemPnBase(attrnav, "MaxPortTxDelay", "LocalGsdmlAttr",
+//     //                pwr_eType_UInt16, sizeof(pwr_tUInt16), 0, 0, p, 1, m_node,
+//     //                flow_eDest_IntoLast);
+
+//     // p = (char*)&pi->Body.MaxPortRxDelay;
+//     // new ItemPnBase(attrnav, "MaxPortRxDelay", "LocalGsdmlAttr",
+//     //                pwr_eType_UInt16, sizeof(pwr_tUInt16), 0, 0, p, 1, m_node,
+//     //                flow_eDest_IntoLast);
+
+//     // p = (char*)&pi->Body.PortDeactivationSupported;
+//     // new ItemPnBase(attrnav, "PortDeactivationSupported", "LocalGsdmlAttr",
+//     //                pwr_eType_Boolean, sizeof(pwr_tBoolean), 0, 0, p, 1,
+//     //                m_node, flow_eDest_IntoLast);
+
+//     // p = pi->Body.LinkStateDiagnosisCapability;
+//     // new ItemPnBase(attrnav, "LinkStateDiagnosisCapability", "LocalGsdmlAttr",
+//     //                pwr_eType_String, sizeof(pwr_tString80), 0, 0, p, 1,
+//     //                m_node, flow_eDest_IntoLast);
+
+//     // p = (char*)&pi->Body.PowerBudgetControlSupported;
+//     // new ItemPnBase(attrnav, "PowerBudgetControlSupported", "LocalGsdmlAttr",
+//     //                pwr_eType_Boolean, sizeof(pwr_tBoolean), 0, 0, p, 1,
+//     //                m_node, flow_eDest_IntoLast);
+
+//     // p = (char*)&pi->Body.SupportsRingportConfig;
+//     // new ItemPnBase(attrnav, "SupportsRingportConfig", "LocalGsdmlAttr",
+//     //                pwr_eType_Boolean, sizeof(pwr_tBoolean), 0, 0, p, 1,
+//     //                m_node, flow_eDest_IntoLast);
+
+//     // p = (char*)&pi->Body.IsDefaultRingport;
+//     // new ItemPnBase(attrnav, "IsDefaultRingport", "LocalGsdmlAttr",
+//     //                pwr_eType_Boolean, sizeof(pwr_tBoolean), 0, 0, p, 1,
+//     //                m_node, flow_eDest_IntoLast);
+
+//     // p = (char*)&pi->Body.CheckMAUTypeSupported;
+//     // new ItemPnBase(attrnav, "CheckMAUTypeSupported", "LocalGsdmlAttr",
+//     //                pwr_eType_Boolean, sizeof(pwr_tBoolean), 0, 0, p, 1,
+//     //                m_node, flow_eDest_IntoLast);
+
+//     // p = (char*)&pi->Body.CheckMAUTypeDifferenceSupported;
+//     // new ItemPnBase(attrnav, "CheckMAUTypeDifferenceSupported",
+//     // "LocalGsdmlAttr",
+//     //                pwr_eType_Boolean, sizeof(pwr_tBoolean), 0, 0, p, 1,
+//     //                m_node, flow_eDest_IntoLast);
+
+//     // gsdml_RecordDataList* rl = pi->RecordDataList;
+//     // if (rl)
+//     // {
+//     //   GsdmlDataRecord* dr;
+//     //   unsigned int record_index = 0;
+
+//     //   for (unsigned int j = 0; j < rl->ParameterRecordDataItem.size(); j++)
+//     //   {
+//     //     if (subslotdata->data_record.size() <= record_index)
+//     //     {
+//     //       dr = new GsdmlDataRecord();
+//     //       dr->record_idx = record_index;
+//     //       subslotdata->data_record.push_back(dr);
+//     //     }
+//     //     else
+//     //     {
+//     //       dr = subslotdata->data_record[record_index];
+//     //       dr->record_idx = record_index;
+//     //     }
+
+//     //     new ItemPnParRecord(attrnav, "", rl->ParameterRecordDataItem[j], dr,
+//     //                         m_node, flow_eDest_IntoLast);
+//     //     record_index++;
+//     //   }
+//     // }
+
+//     brow_SetOpen(m_node, attrnav_mOpen_Children);
+//     brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_openmap);
+//     brow_ResetNodraw(attrnav->brow->ctx);
+//     brow_Redraw(attrnav->brow->ctx, node_y);
+//   }
+//   return 1;
+// }
+
+ItemPnModuleInfo::ItemPnModuleInfo(GsdmlAttrNav* attrnav, const char* name,
+                                   GSDML::ModuleInfo* item_info,
+                                   brow_tNode dest, flow_eDest dest_code, const char* infotext)
+    : ItemPn(attrnav, attrnav_eItemType_PnModuleInfo, name, infotext, 1), m_module_info(item_info)
+{
+  brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_object,
+                  dest, dest_code, (void*)this, 1, &m_node);
+
+  brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_map);
+
+  brow_SetAnnotation(m_node, 0, m_name.c_str(), m_name.length());
+}
+
+int ItemPnModuleInfo::open_children_impl()
+{
+  
+    if (m_module_info->_Name->length())
+      new ItemPnInfo(m_attrnav, "Name", "LocalGsdmlAttr", pwr_eType_String,
+                     m_module_info->_Name->length(),
+                     &(*m_module_info->_Name), m_node,
+                     flow_eDest_IntoLast, "");
+    if (m_module_info->_VendorName.length())
+      new ItemPnInfo(m_attrnav, "VendorName", "LocalGsdmlAttr", pwr_eType_String,
+                     m_module_info->_VendorName.length(),
+                     &m_module_info->_VendorName, m_node,
+                     flow_eDest_IntoLast, "");
+    if (m_module_info->_OrderNumber.length())
+      new ItemPnInfo(m_attrnav, "OrderNumber", "LocalGsdmlAttr", pwr_eType_String,
+                     m_module_info->_OrderNumber.length(),
+                     &m_module_info->_OrderNumber, m_node,
+                     flow_eDest_IntoLast, "");
+    if (m_module_info->_HardwareRelease.length())
+      new ItemPnInfo(m_attrnav, "HardwareRelease", "LocalGsdmlAttr",
+                     pwr_eType_String, m_module_info->_HardwareRelease.length(),
+                     &m_module_info->_HardwareRelease, m_node,
+                     flow_eDest_IntoLast, "");
+    if (m_module_info->_SoftwareRelease.length())
+      new ItemPnInfo(m_attrnav, "SoftwareRelease", "LocalGsdmlAttr",
+                     pwr_eType_String, m_module_info->_SoftwareRelease.length(),
+                     &m_module_info->_SoftwareRelease, m_node,
+                     flow_eDest_IntoLast, "");
+
+  return 1;
+}
+
+// ItemPnModuleType::ItemPnModuleType(GsdmlAttrNav* attrnav, const char*
+// item_name,
+//                                    int item_slot_number, int item_slot_idx,
+//                                    brow_tNode dest, flow_eDest dest_code)
+//     : slot_number(item_slot_number), slot_idx(item_slot_idx), old_value(0),
+//       first_scan(1)
+// {
+//   m_type = attrnav_eItemType_PnModuleType;
+//   m_name = std::string(item_name);
+
+//   brow_CreateNode(attrnav->brow->ctx, item_name, attrnav->brow->nc_attr,
+//   dest,
+//                   dest_code, (void*)this, 1, &m_node);
+
+//   brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_attrenum);
+
+//   brow_SetAnnotation(m_node, 0, item_name, strlen(item_name));
+//   brow_SetTraceAttr(m_node, m_name.c_str(), "", flow_eTraceType_User);
+// }
+
+// static int gsdml_comp_nodes_name(const void* n1, const void* n2)
+// {
+//   ItemPnEnumValueMType* item1;
+//   ItemPnEnumValueMType* item2;
+//   brow_tObject o1 = *(brow_tObject*)n1;
+//   brow_tObject o2 = *(brow_tObject*)n2;
+
+//   brow_GetUserData(o1, (void**)&item1);
+//   brow_GetUserData(o2, (void**)&item2);
+
+//   return strcmp(item1->m_name.c_str(), item2->m_name.c_str()); // TODO tidy
+//   up
+// }
+
+// static int gsdml_comp_nodes_number(const void* n1, const void* n2)
+// {
+//   ItemPnEnumValueMType* item1;
+//   ItemPnEnumValueMType* item2;
+//   brow_tObject o1 = *(brow_tObject*)n1;
+//   brow_tObject o2 = *(brow_tObject*)n2;
+
+//   brow_GetUserData(o1, (void**)&item1);
+//   brow_GetUserData(o2, (void**)&item2);
+
+//   return strcmp(item1->number, item2->number);
+// }
+
+// int ItemPnModuleType::open_children(GsdmlAttrNav* attrnav, double x, double
+// y)
+// {
+//   double node_x, node_y;
+
+//   brow_GetNodePosition(m_node, &node_x, &node_y);
+
+//   if (brow_IsOpen(m_node))
+//   {
+//     // Close
+//     brow_SetNodraw(attrnav->brow->ctx);
+//     brow_CloseNode(attrnav->brow->ctx, m_node);
+//     if (brow_IsOpen(m_node) & attrnav_mOpen_Attributes)
+//       brow_RemoveAnnotPixmap(m_node, 1);
+//     if (brow_IsOpen(m_node) & attrnav_mOpen_Children)
+//       brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_attrenum);
+//     brow_ResetOpen(m_node, attrnav_mOpen_All);
+//     brow_ResetNodraw(attrnav->brow->ctx);
+//     brow_Redraw(attrnav->brow->ctx, node_y);
+//   }
+//   else
+//   {
+//     brow_SetNodraw(attrnav->brow->ctx);
+
+//     int idx = 0;
+//     new ItemPnEnumValueMType(
+//         attrnav, "No", "", idx++, pwr_eType_UInt32,
+//         &attrnav->dev_data.slot_data[slot_idx]->module_enum_number, m_node,
+//         flow_eDest_IntoLast);
+
+//     int m_device_num = 1;
+//     gsdml_UseableModules* um =
+//         attrnav->gsdml->ApplicationProcess->DeviceAccessPointList
+//             ->DeviceAccessPointItem[m_device_num - 1]
+//             ->UseableModules;
+//     if (!um)
+//     {
+//       brow_ResetNodraw(attrnav->brow->ctx);
+//       brow_Redraw(attrnav->brow->ctx, node_y);
+//       return 1;
+//     }
+//     for (unsigned int i = 0; i < um->ModuleItemRef.size(); i++)
+//     {
+//       if (um->ModuleItemRef[i]->Body.AllowedInSlots.list &&
+//           um->ModuleItemRef[i]->Body.AllowedInSlots.list->in_list(slot_number))
+//       {
+//         char mname[160] = "ModuleName";
+//         gsdml_ModuleItem* mi =
+//             (gsdml_ModuleItem*)um->ModuleItemRef[i]->Body.ModuleItemTarget.p;
+//         if (!mi || !mi->ModuleInfo->Body.Name.p)
+//           continue;
+//         strncpy(mname, (char*)mi->ModuleInfo->Body.Name.p, sizeof(mname));
+//         new ItemPnEnumValueMType(
+//             attrnav, mname, mi->ModuleInfo->Body.OrderNumber, idx,
+//             pwr_eType_UInt32,
+//             &attrnav->dev_data.slot_data[slot_idx]->module_enum_number,
+//             m_node, flow_eDest_IntoLast,
+//             (char*)mi->ModuleInfo->Body.InfoText.p);
+//       }
+//       else if (um->ModuleItemRef[i]->Body.FixedInSlots.list &&
+//                um->ModuleItemRef[i]->Body.FixedInSlots.list->in_list(
+//                    slot_number))
+//       {
+//         char mname[160] = "ModuleName";
+//         gsdml_ModuleItem* mi =
+//             (gsdml_ModuleItem*)um->ModuleItemRef[i]->Body.ModuleItemTarget.p;
+//         if (!mi || !mi->ModuleInfo->Body.Name.p)
+//           continue;
+//         strncpy(mname, (char*)mi->ModuleInfo->Body.Name.p, sizeof(mname));
+//         new ItemPnEnumValueMType(
+//             attrnav, mname, mi->ModuleInfo->Body.OrderNumber, idx,
+//             pwr_eType_UInt32,
+//             &attrnav->dev_data.slot_data[slot_idx]->module_enum_number,
+//             m_node, flow_eDest_IntoLast);
+//       }
+//       idx++;
+//     }
+
+//     // Sort
+//     switch (attrnav->order_moduletype)
+//     {
+//     case attr_eOrderModuleType_Name:
+//       brow_SortChildren(attrnav->brow->ctx, m_node, 1,
+//       gsdml_comp_nodes_name); break;
+//     case attr_eOrderModuleType_Number:
+//       brow_SortChildren(attrnav->brow->ctx, m_node, 1,
+//       gsdml_comp_nodes_number); break;
+//     default:;
+//     }
+
+//     brow_SetOpen(m_node, attrnav_mOpen_Children);
+//     brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_openmap);
+//     brow_ResetNodraw(attrnav->brow->ctx);
+//     brow_Redraw(attrnav->brow->ctx, node_y);
+//   }
+//   return 1;
+// }
+
+// int ItemPnModuleType::scan(GsdmlAttrNav* attrnav, void* p)
+// {
+//   char buf[200];
+//   char buf2[200];
+
+//   if (!first_scan)
+//   {
+//     if (old_value == *(int*)p)
+//       // No change since last time
+//       return 1;
+//   }
+
+//   if (*(int*)p == 0)
+//   {
+//     strcpy(buf, "No");
+//     strcpy(buf2, "");
+//   }
+//   else
+//   {
+//     int m_device_num = 1;
+//     gsdml_UseableModules* um =
+//         attrnav->gsdml->ApplicationProcess->DeviceAccessPointList
+//             ->DeviceAccessPointItem[m_device_num - 1]
+//             ->UseableModules;
+//     if (!um)
+//       return 1;
+//     gsdml_ModuleItem* mi =
+//         (gsdml_ModuleItem*)um
+//             ->ModuleItemRef
+//                 [attrnav->dev_data.slot_data[slot_idx]->module_enum_number -
+//                 1]
+//             ->Body.ModuleItemTarget.p;
+//     if (!mi || !mi->ModuleInfo || !mi->ModuleInfo->Body.Name.p)
+//       return 1;
+//     strncpy(buf, (char*)mi->ModuleInfo->Body.Name.p, sizeof(buf));
+//     strncpy(buf2, mi->ModuleInfo->Body.OrderNumber, sizeof(buf2));
+//   }
+//   brow_SetAnnotation(m_node, 1, buf, strlen(buf));
+//   brow_SetAnnotation(m_node, 2, buf2, strlen(buf2));
+//   old_value = *(int*)p;
+
+//   if (!first_scan)
+//   {
+//     int sts;
+//     brow_tObject parentnode;
+//     sts = brow_GetParent(attrnav->brow->ctx, m_node, &parentnode);
+//     if (EVEN(sts))
+//       return 1;
+
+//     ItemPnSlot* parentitem;
+//     brow_GetUserData(parentnode, (void**)&parentitem);
+
+//     // Note, this object is deleted here !
+//     parentitem->close(attrnav, 0, 0);
+
+//     // Remove old subslot data
+//     // TODO FIX!
+//     // if (parentitem->slotdata)
+//     //   parentitem->m_slotdata->slot_reset();
+
+//     parentitem->open_children(attrnav, 0, 0);
+
+//     brow_SelectClear(attrnav->brow->ctx);
+//     brow_SetInverse(parentnode, 1);
+//     brow_SelectInsert(attrnav->brow->ctx, parentnode);
+//     brow_CenterObject(attrnav->brow->ctx, parentnode, 0.25);
+
+//     // Search for a default module class
+//     char devname[200];
+//     pwr_tObjName mclass;
+//     pwr_tCid mcid = 0;
+//     brow_tObject next;
+//     pwr_tCid* datap;
+
+//     int m_device_num = 1;
+//     strncpy(devname,
+//             (char*)attrnav->gsdml->ApplicationProcess->DeviceAccessPointList
+//                 ->DeviceAccessPointItem[m_device_num - 1]
+//                 ->ModuleInfo->Body.Name.p,
+//             sizeof(devname));
+
+//     sts = attrnav->search_class(pn_cModuleClassFile, devname, buf, mclass);
+//     if (ODD(sts))
+//     {
+//       for (int i = 0; attrnav->gsdml->module_classlist[i].cid; i++)
+//       {
+//         if (str_NoCaseStrcmp(mclass,
+//                              attrnav->gsdml->module_classlist[i].name) == 0)
+//         {
+//           mcid = attrnav->gsdml->module_classlist[i].cid;
+//           break;
+//         }
+//       }
+//     }
+
+//     sts = brow_GetNext(attrnav->brow->ctx, parentnode, &next);
+//     if (ODD(sts))
+//       sts = brow_GetNext(attrnav->brow->ctx, next, &next);
+//     if (ODD(sts))
+//     {
+//       ItemPn* item;
+
+//       brow_GetUserData(next, (void**)&item);
+//       if (item->m_type == attrnav_eItemType_PnModuleClass)
+//       {
+//         brow_GetTraceData(next, (void**)&datap);
+//         *datap = mcid;
+//       }
+//     }
+//   }
+//   else
+//     first_scan = 0;
+
+//   return 1;
+// }
+
+// ItemPnSubmoduleType::ItemPnSubmoduleType(
+//     GsdmlAttrNav* attrnav, const char* item_name, int item_subslot_number,
+//     int item_slot_idx, int item_subslot_idx, gsdml_UseableSubmodules*
+//     item_us, brow_tNode dest, flow_eDest dest_code) :
+//     subslot_number(item_subslot_number), slot_idx(item_slot_idx),
+//       subslot_idx(item_subslot_idx), us(item_us), old_value(0), first_scan(1)
+// {
+//   m_type = attrnav_eItemType_PnSubmoduleType;
+//   m_name = std::string(item_name);
+
+//   brow_CreateNode(attrnav->brow->ctx, item_name, attrnav->brow->nc_attr,
+//   dest,
+//                   dest_code, (void*)this, 1, &m_node);
+
+//   brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_attrenum);
+
+//   brow_SetAnnotation(m_node, 0, item_name, strlen(item_name));
+//   brow_SetTraceAttr(m_node, m_name.c_str(), "", flow_eTraceType_User);
+// }
+
+// int ItemPnSubmoduleType::open_children(GsdmlAttrNav* attrnav, double x,
+//                                        double y)
+// {
+//   double node_x, node_y;
+
+//   brow_GetNodePosition(m_node, &node_x, &node_y);
+
+//   if (brow_IsOpen(m_node))
+//   {
+//     // Close
+//     brow_SetNodraw(attrnav->brow->ctx);
+//     brow_CloseNode(attrnav->brow->ctx, m_node);
+//     if (brow_IsOpen(m_node) & attrnav_mOpen_Attributes)
+//       brow_RemoveAnnotPixmap(m_node, 1);
+//     if (brow_IsOpen(m_node) & attrnav_mOpen_Children)
+//       brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_attrenum);
+//     brow_ResetOpen(m_node, attrnav_mOpen_All);
+//     brow_ResetNodraw(attrnav->brow->ctx);
+//     brow_Redraw(attrnav->brow->ctx, node_y);
+//   }
+//   else
+//   {
+//     brow_SetNodraw(attrnav->brow->ctx);
+
+//     new ItemPnEnumValueMType(attrnav, "No", "", 0, pwr_eType_UInt32,
+//                              &attrnav->dev_data.slot_data[slot_idx]
+//                                   ->subslot_data[subslot_idx]
+//                                   ->submodule_enum_number,
+//                              m_node, flow_eDest_IntoLast);
+
+//     if (!us)
+//       return 1;
+
+//     for (unsigned int i = 0; i < us->SubmoduleItemRef.size(); i++)
+//     {
+//       gsdml_Valuelist* vl_allowed = new gsdml_Valuelist(
+//           us->SubmoduleItemRef[i]->Body.AllowedInSubslots.str);
+//       gsdml_Valuelist* vl_fixed = new gsdml_Valuelist(
+//           us->SubmoduleItemRef[i]->Body.FixedInSubslots.str);
+
+//       if (vl_allowed->in_list(subslot_number))
+//       {
+//         if (vl_fixed->in_list(subslot_number))
+//         {
+//           delete vl_allowed;
+//           delete vl_fixed;
+//           continue;
+//         }
+//         char mname[160] = "ModuleName";
+//         // TODO fix this later on.
+//         // gsdml_VirtualSubmoduleItem* mi =
+//         //     (gsdml_VirtualSubmoduleItem*)us->SubmoduleItemRef[i]
+//         //         ->Body.SubmoduleItemTarget.p;
+//         gsdml_PortSubmoduleItem* mi =
+//             (gsdml_PortSubmoduleItem*)us->SubmoduleItemRef[i]
+//                 ->Body.SubmoduleItemTarget.p;
+//         if (!mi || !mi->ModuleInfo || !mi->ModuleInfo->Body.Name.p)
+//           continue;
+//         strncpy(mname, (char*)mi->ModuleInfo->Body.Name.p, sizeof(mname));
+
+//         // Find index in submodule list
+//         int idx = 0;
+//         for (unsigned int j = 0; j < attrnav->gsdml->ApplicationProcess
+//                                          ->SubmoduleList->PortSubmoduleItem.size();
+//              j++)
+//         {
+//           gsdml_PortSubmoduleItem* si =
+//               (gsdml_PortSubmoduleItem*)attrnav->gsdml->ApplicationProcess
+//                   ->SubmoduleList->PortSubmoduleItem[j];
+//           if (si->ModuleInfo == mi->ModuleInfo)
+//           {
+//             idx = j + 1;
+//             break;
+//           }
+//         }
+//         if (idx == 0)
+//           continue;
+
+//         new ItemPnEnumValueMType(attrnav, mname,
+//                                  mi->ModuleInfo->Body.OrderNumber, idx,
+//                                  pwr_eType_UInt32,
+//                                  &attrnav->dev_data.slot_data[slot_idx]
+//                                       ->subslot_data[subslot_idx]
+//                                       ->submodule_enum_number,
+//                                  m_node, flow_eDest_IntoLast);
+//       }
+//       delete vl_allowed;
+//       delete vl_fixed;
+//     }
+
+//     brow_SetOpen(m_node, attrnav_mOpen_Children);
+//     brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_openmap);
+//     brow_ResetNodraw(attrnav->brow->ctx);
+//     brow_Redraw(attrnav->brow->ctx, node_y);
+//   }
+//   return 1;
+// }
+
+// int ItemPnSubmoduleType::scan(GsdmlAttrNav* attrnav, void* p)
+// {
+//   char buf[200];
+
+//   if (!first_scan)
+//   {
+//     if (old_value == *(int*)p)
+//       // No change since last time
+//       return 1;
+//   }
+
+//   if (*(int*)p == 0)
+//     strcpy(buf, "No");
+//   else
+//   {
+//     if (!us)
+//       return 1;
+
+//     // gsdml_VirtualSubmoduleItem *si = (gsdml_VirtualSubmoduleItem
+//     //
+//     *)us->SubmoduleItemRef[attrnav->dev_data.slot_data[slot_idx]->subslot_data[subslot_idx]->submodule_enum_number-1]->Body.SubmoduleItemTarget.p;
+//     gsdml_VirtualSubmoduleItem* si =
+//         (gsdml_VirtualSubmoduleItem*)
+//             attrnav->gsdml->ApplicationProcess->SubmoduleList
+//                 ->SubmoduleItem[attrnav->dev_data.slot_data[slot_idx]
+//                                     ->subslot_data[subslot_idx]
+//                                     ->submodule_enum_number -
+//                                 1];
+//     if (!si || !si->ModuleInfo->Body.Name.p)
+//       return 1;
+//     strncpy(buf, (char*)si->ModuleInfo->Body.Name.p, sizeof(buf));
+//   }
+//   brow_SetAnnotation(m_node, 1, buf, strlen(buf));
+//   old_value = *(int*)p;
+
+//   if (!first_scan)
+//   {
+//     int sts;
+//     brow_tObject parentnode;
+//     sts = brow_GetParent(attrnav->brow->ctx, m_node, &parentnode);
+//     if (EVEN(sts))
+//       return 1;
+
+//     ItemPnSubslot* parentitem;
+//     brow_GetUserData(parentnode, (void**)&parentitem);
+
+//     // Note, this object is deleted here !
+//     parentitem->close(attrnav, 0, 0);
+
+//     // Remove old subslot data
+//     // if ( parentitem->slotdata)
+//     //  parentitem->slotdata->slot_reset();
+
+//     parentitem->open_children(attrnav, 0, 0);
+
+//     brow_SelectClear(attrnav->brow->ctx);
+//     brow_SetInverse(parentnode, 1);
+//     brow_SelectInsert(attrnav->brow->ctx, parentnode);
+//     brow_CenterObject(attrnav->brow->ctx, parentnode, 0.25);
+//   }
+//   else
+//     first_scan = 0;
+
+//   return 1;
+// }
+
+ItemPnParRecord::ItemPnParRecord(
+    GsdmlAttrNav* attrnav, const char* name,
+    GSDML::ParameterRecordDataItem const* parameter_record_data_item,
+    ProfinetDataRecord* data_record, brow_tNode dest, flow_eDest dest_code, const char* infotext)
+    : ItemPn(attrnav, attrnav_eItemType_PnParRecord, name, infotext),
+      m_parameter_record_data_item(parameter_record_data_item),
+      m_data_record(data_record)
+{  
+  if (m_parameter_record_data_item->_Ref.size())
+    m_is_parent = 1;
+
+  brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_attr,
+                  dest, dest_code, (void*)this, 1, &m_node);
+
+  if (m_is_parent)
+    brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_map);
+  else
+    brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_leaf);
+
+  brow_SetAnnotation(m_node, 0, m_name.c_str(), m_name.length());
+
+  // Inititalize the parameter record
+  // create convienence pointers for readability
+  auto prdi = m_parameter_record_data_item;
+  bool empty_state = false;
+
+  if (m_data_record->m_data_length == 0 && prdi->_Length > 0)
+  {
+    empty_state = true;
+    // We come from an empty state, initialize the data, the data will be free'd
+    // by the container class
+    m_data_record->m_data =
+        new unsigned char[prdi->_Length](); // () at the end zero initializes
+                                            // the vector
+    m_data_record->m_data_length = prdi->_Length;
+    m_data_record->m_index = prdi->_Index;
+    m_data_record->m_transfer_sequence = prdi->_TransferSequence;
+  }
+
+  // Now read all Const data if we come from an empty state. And fill our data
+  // container accordingly The getData() function returns a pointer to all the
+  // data from all the Const items.
+  if (empty_state)
+  {
+    memcpy(m_data_record->m_data, prdi->getData(), prdi->_Length);
+
+    /*
+      Fetch all the default values. It's weird how they implemented this stuff like this. Wouldn't it be easier
+      to just let the Const data actually BE the default. Instead the defaults are in the Refs, and sometimes even
+      contradicting what the Const says....super weird....
+      ET200S Example:
+      <Const Data="0x04,0x01,0x00,0x00,0x03,0x02,0x02" ByteOffset="0"/>
+      <Ref ValueItemTarget="Slot reference junction" DataType="BitArea" ByteOffset="6" BitOffset="0" BitLength="6" DefaultValue="1" AllowedValues="1..63" Changeable="true" Visible="true" TextId="Slot reference junction"/>
+
+      Anyways...go through all the refs and set default data
+    */
+
+    set_default_data();    
+  }
+}
+
+void ItemPnParRecord::set_default_data()
+{
+  // TODO Fix this for all datatypes...
+  for (auto const& ref : m_parameter_record_data_item->_Ref)
+  {
+    switch (ref.second->_DataType)
+    {
+    case GSDML::ValueDataType_Float32:
+    case GSDML::ValueDataType_Float64:
+      printf("Attribute with default value %f\n",
+             ref.second->_DefaultValue);
+      m_data_record->m_data[ref.second->_ByteOffset] = ref.second->_DefaultValue;
+      break;
+    case GSDML::ValueDataType_Bit:
+    case GSDML::ValueDataType_BitArea:
+      printf("Bit/BitArea with default value %d\n",
+             (int)ref.second->_DefaultValue);
+      m_data_record->m_data[ref.second->_ByteOffset] = (uint8_t)ref.second->_DefaultValue << ref.second->_BitOffset;
+      break;
+    case GSDML::ValueDataType_Unsigned16:
+    case GSDML::ValueDataType_Integer16:
+    {
+      printf("16 bit attribute with default value %d\n", (ushort)ref.second->_DefaultValue);
+      ushort temp = htons((ushort)ref.second->_DefaultValue);      
+      *((ushort*)&m_data_record->m_data[ref.second->_ByteOffset]) = temp;
+      break;
+    }
+    case GSDML::ValueDataType_Unsigned32:
+    case GSDML::ValueDataType_Integer32:
+    {      
+      printf("32 bit attribute with default value %d\n", (uint)ref.second->_DefaultValue);
+      uint temp = htonl((uint)ref.second->_DefaultValue);      
+      *((uint*)&m_data_record->m_data[ref.second->_ByteOffset]) = temp;
+      break;    
+    }
+    default: 
+      printf("Unhandeled ValueDataType in ItemPnParRecord::set_default_data(): %d\n",
+             (int)ref.second->_DefaultValue);      
+    }
+  }
+}
+
+int ItemPnParRecord::open_children_impl()
+{
+    // Once here we have either saved data or data from the Const elements (not
+    // to mix up with default values since they are in the Ref's). But the default
+    // values should be loaded by now if we come from an empty state. Now we map 
+    // each Ref to the respective data. And the conf is network byte ordered
+
+    for (auto const& ref : m_parameter_record_data_item->_Ref)
+    {
+      // Set a name for this ref, the ref must have a TextId according to spec
+      std::string node_name = *ref.second->_Text;
+
+      switch (ref.second->_DataType)
+      {
+      case GSDML::ValueDataType_Bit:
+      case GSDML::ValueDataType_BitArea:
+        new ItemPnParEnum(m_attrnav, node_name.c_str(), ref.second,
+                          m_data_record->m_data, m_node, flow_eDest_IntoLast, "BitArea/Bit for a device parameter.");
+        break;
+      default:
+
+
+      // TODO Start using new classes here!
+        // Inget valueitemtarget ref eller (valueitemtarget finns OCH men inga
+        // assignments finns)
+        if (ref.second->_ValueItem &&
+            ref.second->_ValueItem->_Assignments.size())
+        {
+          new ItemPnParEnum(m_attrnav, node_name.c_str(), ref.second,
+                            m_data_record->m_data, m_node, flow_eDest_IntoLast, "List of allowed values for a device parameter.");
+        }
+        else
+        {
+          new ItemPnParValue(m_attrnav, node_name.c_str(), ref.second,
+                             m_data_record->m_data, m_node,
+                             flow_eDest_IntoLast, "An arbitrary input value for a device parameter. Limited by data type and/or a list of allowed values.");
+
+        }
+      }
+    }
+  return 1;
+}
+
+ItemPnParValue::ItemPnParValue(GsdmlAttrNav* attrnav, const char* name,
+                               std::shared_ptr<GSDML::Ref> ref,
+                               unsigned char* data, brow_tNode dest,
+                               flow_eDest dest_code, const char* infotext)
+    : ItemPn(attrnav, attrnav_eItemType_PnParValue, name, infotext), 
+      m_ref(ref), m_gsdml_datatype(ref->_DataType), m_data(data)
+{
+  m_byte_offset = m_ref->_ByteOffset;
+  m_noedit = !m_ref->_Changeable;
+
+  switch (m_gsdml_datatype)
+  {
+  case GSDML::ValueDataType_Integer8:
+  case GSDML::ValueDataType_Unsigned8:
+    m_size = 1;
     break;
-  case gsdml_eValueDataType_Integer16:
-  case gsdml_eValueDataType_Unsigned16:
-    size = 2;
+  case GSDML::ValueDataType_Integer16:
+  case GSDML::ValueDataType_Unsigned16:
+    m_size = 2;
     break;
-  case gsdml_eValueDataType_Integer32:
-  case gsdml_eValueDataType_Unsigned32:
-  case gsdml_eValueDataType_Float32:
-    size = 4;
+  case GSDML::ValueDataType_Integer32:
+  case GSDML::ValueDataType_Unsigned32:
+  case GSDML::ValueDataType_Float32:
+    m_size = 4;
     break;
-  case gsdml_eValueDataType_Integer64:
-  case gsdml_eValueDataType_Unsigned64:
-  case gsdml_eValueDataType_Float64:
-    size = 8;
+  case GSDML::ValueDataType_Integer64:
+  case GSDML::ValueDataType_Unsigned64:
+  case GSDML::ValueDataType_Float64:
+    m_size = 8;
     break;
-  case gsdml_eValueDataType_VisibleString:
-  case gsdml_eValueDataType_OctetString:
-    size = value_ref->Body.Length;
+  case GSDML::ValueDataType_VisibleString:
+  case GSDML::ValueDataType_OctetString:
+    m_size = m_ref->_Length;
     break;
-  case gsdml_eValueDataType_Date:
-  case gsdml_eValueDataType_TimeOfDayWithDate:
-  case gsdml_eValueDataType_TimeOfDayWithoutDate:
-  case gsdml_eValueDataType_TimeDiffWithDate:
-  case gsdml_eValueDataType_TimeDiffWithoutDate:
-  case gsdml_eValueDataType_NetworkTime:
-  case gsdml_eValueDataType_NetworkTimeDiff:
-    size = 8;
+  case GSDML::ValueDataType_Date:
+  case GSDML::ValueDataType_TimeOfDayWithDate:
+  case GSDML::ValueDataType_TimeOfDayWithoutDate:
+  case GSDML::ValueDataType_TimeDiffWithDate:
+  case GSDML::ValueDataType_TimeDiffWithoutDate:
+  case GSDML::ValueDataType_NetworkTime:
+  case GSDML::ValueDataType_NetworkTimeDiff:
+    m_size = 8;
     break;
   default:
-    size = 0;
+    m_size = 0;
   }
-  brow_CreateNode(attrnav->brow->ctx, item_name, attrnav->brow->nc_attr, dest,
-                  dest_code, (void*)this, 1, &node);
 
-  brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_attr);
+  // Allocate memory for the m_old_value member variable
+  if (m_size > 0)
+  {
+    m_old_value = new unsigned char[m_size](); // Zero initialized
+  }
 
-  brow_SetAnnotation(node, 0, name, strlen(name));
-  brow_SetTraceAttr(node, name, "", flow_eTraceType_User);
+  brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_attr, dest,
+                  dest_code, (void*)this, 1, &m_node);
+
+  brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_attr);
+
+  brow_SetAnnotation(m_node, 0, m_name.c_str(), m_name.length());
+  brow_SetTraceAttr(m_node, m_name.c_str(), "", flow_eTraceType_User);
 }
 
-int ItemPnParValue::scan(GsdmlAttrNav* attrnav, void* p)
+int ItemPnParValue::scan(GsdmlAttrNav* attrnav, void* value_p)
 {
-  if (!first_scan)
+  if (!m_first_scan)
   {
-    if (memcmp(&data[byte_offset], old_value, size) == 0)
+    if (memcmp(&m_data[m_byte_offset], m_old_value, m_size) == 0)
       // No change since last time
       return 1;
   }
   else
-    first_scan = 0;
+    m_first_scan = 0;
 
-  char buf[80];
-  attrnav->gsdml->datavalue_to_string(datatype, &data[byte_offset], size, buf,
-                                      sizeof(buf));
-  brow_SetAnnotation(node, 1, buf, strlen(buf));
+  //char buf[80];
+  std::string value = GSDML::datavalue_to_string(m_gsdml_datatype, &m_data[m_byte_offset]);
+  // GSDML::datavalue_to_string(m_gsdml_datatype, &m_data[m_byte_offset], m_size,
+  //                            buf, sizeof(buf));
+  brow_SetAnnotation(m_node, 1, value.c_str(), value.length());
 
-  memcpy(old_value, &data[byte_offset], size);
+  memcpy(m_old_value, &m_data[m_byte_offset], m_size);
   return 1;
 }
 
@@ -4311,11 +4509,9 @@ void ItemPnParValue::value_changed(GsdmlAttrNav* attrnav, const char* value_str)
 {
   int sts;
 
-  unsigned char* buf = (unsigned char*)calloc(1, size);
-  unsigned char* buf_reversed_endianess = (unsigned char*)calloc(1, size);
-
-  sts = attrnav->gsdml->string_to_datavalue(
-      datatype, buf, buf_reversed_endianess, size, value_str);
+  unsigned char* buf = (unsigned char*)calloc(1, m_size);
+  
+  sts = GSDML::string_to_datavalue(m_gsdml_datatype, buf, value_str);
   if (sts == PB__NYI)
   {
     attrnav->message('E', "Not yet implemented");
@@ -4328,1357 +4524,1436 @@ void ItemPnParValue::value_changed(GsdmlAttrNav* attrnav, const char* value_str)
   }
 
   // Check allowed values
-  switch (datatype)
+  switch (m_gsdml_datatype)
   {
-  case gsdml_eValueDataType_Integer8:
+  case GSDML::ValueDataType_Integer8:
   {
     char val = *(char*)buf;
-    if (!streq(value_ref->Body.AllowedValues, ""))
+    if (!m_ref->_AllowedValues.empty())
     {
-      gsdml_SValuelist* vl =
-          new gsdml_SValuelist(value_ref->Body.AllowedValues);
-      if (ODD(vl->sts()))
+      if (!m_ref->_AllowedValues.inList(val))
       {
-        if (!vl->in_list(val))
-        {
-          attrnav->message('E', "Value not allowed");
-          return;
-        }
+        attrnav->message('E', "Value not allowed");
+        return;
       }
-      delete vl;
     }
     break;
   }
-  case gsdml_eValueDataType_Integer16:
+  case GSDML::ValueDataType_Integer16:
   {
     short val = *(short*)buf;
-    if (!streq(value_ref->Body.AllowedValues, ""))
+    if (!m_ref->_AllowedValues.empty())
     {
-      gsdml_SValuelist* vl =
-          new gsdml_SValuelist(value_ref->Body.AllowedValues);
-      if (ODD(vl->sts()))
+      if (!m_ref->_AllowedValues.inList(val))
       {
-        if (!vl->in_list(val))
-        {
-          attrnav->message('E', "Value not allowed");
-          return;
-        }
+        attrnav->message('E', "Value not allowed");
+        return;
       }
-      delete vl;
     }
     break;
   }
-  case gsdml_eValueDataType_Integer32:
+  case GSDML::ValueDataType_Integer32:
   {
     int val = *(int*)buf;
-    if (!streq(value_ref->Body.AllowedValues, ""))
+    if (!m_ref->_AllowedValues.empty())
     {
-      gsdml_SValuelist* vl =
-          new gsdml_SValuelist(value_ref->Body.AllowedValues);
-      if (ODD(vl->sts()))
+      if (!m_ref->_AllowedValues.inList(val))
       {
-        if (!vl->in_list(val))
-        {
-          attrnav->message('E', "Value not allowed");
-          return;
-        }
+        attrnav->message('E', "Value not allowed");
+        return;
       }
-      delete vl;
     }
     break;
   }
-  case gsdml_eValueDataType_Integer64:
+  case GSDML::ValueDataType_Integer64:
   {
     pwr_tInt64 val = *(pwr_tInt64*)buf;
-    if (!streq(value_ref->Body.AllowedValues, ""))
+    if (!m_ref->_AllowedValues.empty())
     {
-      gsdml_SValuelist* vl =
-          new gsdml_SValuelist(value_ref->Body.AllowedValues);
-      if (ODD(vl->sts()))
+      if (!m_ref->_AllowedValues.inList(val))
       {
-        if (!vl->in_list(val))
-        {
-          attrnav->message('E', "Value not allowed");
-          return;
-        }
+        attrnav->message('E', "Value not allowed");
+        return;
       }
-      delete vl;
     }
     break;
   }
-  case gsdml_eValueDataType_Unsigned8:
+  case GSDML::ValueDataType_Unsigned8:
   {
     unsigned char val = *(unsigned char*)buf;
-    if (!streq(value_ref->Body.AllowedValues, ""))
+    if (!m_ref->_AllowedValues.empty())
     {
-      gsdml_Valuelist* vl = new gsdml_Valuelist(value_ref->Body.AllowedValues);
-      if (ODD(vl->sts()))
+      if (!m_ref->_AllowedValues.inList(val))
       {
-        if (!vl->in_list(val))
-        {
-          attrnav->message('E', "Value not allowed");
-          return;
-        }
+        attrnav->message('E', "Value not allowed");
+        return;
       }
-      delete vl;
     }
     break;
   }
-  case gsdml_eValueDataType_Unsigned16:
+  case GSDML::ValueDataType_Unsigned16:
   {
     unsigned short val = *(unsigned short*)buf;
-    if (!streq(value_ref->Body.AllowedValues, ""))
+    if (!m_ref->_AllowedValues.empty())
     {
-      gsdml_Valuelist* vl = new gsdml_Valuelist(value_ref->Body.AllowedValues);
-      if (ODD(vl->sts()))
+      if (!m_ref->_AllowedValues.inList(val))
       {
-        if (!vl->in_list(val))
-        {
-          attrnav->message('E', "Value not allowed");
-          return;
-        }
+        attrnav->message('E', "Value not allowed");
+        return;
       }
-      delete vl;
     }
     break;
   }
-  case gsdml_eValueDataType_Unsigned32:
+  case GSDML::ValueDataType_Unsigned32:
   {
-    unsigned int val = *(unsigned int*)buf;
-    if (!streq(value_ref->Body.AllowedValues, ""))
+    unsigned int val = ntohl(*(unsigned int*)buf);
+    if (!m_ref->_AllowedValues.empty())
     {
-      gsdml_Valuelist* vl = new gsdml_Valuelist(value_ref->Body.AllowedValues);
-      if (ODD(vl->sts()))
+      if (!m_ref->_AllowedValues.inList(val))
       {
-        if (!vl->in_list(val))
-        {
-          attrnav->message('E', "Value not allowed");
-          return;
-        }
+        attrnav->message('E', "Value not allowed");
+        return;
       }
-      delete vl;
     }
     break;
   }
-  case gsdml_eValueDataType_Unsigned64:
+  case GSDML::ValueDataType_Unsigned64:
   {
     pwr_tUInt64 val = *(pwr_tUInt64*)buf;
-    if (!streq(value_ref->Body.AllowedValues, ""))
+    if (!m_ref->_AllowedValues.empty())
     {
-      gsdml_Valuelist* vl = new gsdml_Valuelist(value_ref->Body.AllowedValues);
-      if (ODD(vl->sts()))
+      if (!m_ref->_AllowedValues.inList(val))
       {
-        if (!vl->in_list(val))
-        {
-          attrnav->message('E', "Value not allowed");
-          return;
-        }
+        attrnav->message('E', "Value not allowed");
+        return;
       }
-      delete vl;
     }
     break;
   }
-  case gsdml_eValueDataType_Float32:
+  case GSDML::ValueDataType_Float32:
   {
     float val = *(float*)buf;
-    if (!streq(value_ref->Body.AllowedValues, ""))
+    if (!m_ref->_AllowedValues.empty())
     {
-      gsdml_FValuelist* vl =
-          new gsdml_FValuelist(value_ref->Body.AllowedValues);
-      if (ODD(vl->sts()))
+      if (!m_ref->_AllowedValues.inList(val))
       {
-        if (!vl->in_list(val))
-        {
-          attrnav->message('E', "Value not allowed");
-          return;
-        }
+        attrnav->message('E', "Value not allowed");
+        return;
       }
-      delete vl;
     }
     break;
   }
-  case gsdml_eValueDataType_Float64:
+  case GSDML::ValueDataType_Float64:
   {
     double val = *(double*)buf;
-    if (!streq(value_ref->Body.AllowedValues, ""))
+    if (!m_ref->_AllowedValues.empty())
     {
-      gsdml_FValuelist* vl =
-          new gsdml_FValuelist(value_ref->Body.AllowedValues);
-      if (ODD(vl->sts()))
+      if (!m_ref->_AllowedValues.inList(val))
       {
-        if (!vl->in_list(val))
-        {
-          attrnav->message('E', "Value not allowed");
-          return;
-        }
+        attrnav->message('E', "Value not allowed");
+        return;
       }
-      delete vl;
     }
     break;
   }
   default:;
   }
 
-  memcpy(&data[byte_offset], buf, size);
-  memcpy(&data_reversed_endianess[byte_offset], buf_reversed_endianess, size);
+  memcpy(&m_data[m_byte_offset], buf, m_size);  
 
   free(buf);
-  free(buf_reversed_endianess);
   attrnav->set_modified(1);
 }
 
-ItemPnParEnum::ItemPnParEnum(GsdmlAttrNav* attrnav, const char* item_name,
-                             gsdml_Ref* item_value_ref,
-                             gsdml_eValueDataType item_datatype,
-                             unsigned char* item_data,
-                             unsigned char* item_data_reversed_endianess,
-                             brow_tNode dest, flow_eDest dest_code)
-    : value_ref(item_value_ref), datatype(item_datatype), data(item_data),
-      data_reversed_endianess(item_data_reversed_endianess), mask(0),
-      old_value(0), first_scan(1), noedit(1)
+ItemPnParEnum::ItemPnParEnum(GsdmlAttrNav* attrnav, const char* name,
+                             std::shared_ptr<GSDML::Ref> ref,
+                             unsigned char* data, brow_tNode dest,
+                             flow_eDest dest_code, const char* infotext)
+    : ItemPn(attrnav, attrnav_eItemType_PnParEnum, name, infotext),
+      m_ref(ref), m_gsdml_datatype(ref->_DataType), m_data(data), m_mask(0),
+      m_old_value(0)
 {
-  type = attrnav_eItemType_PnParEnum;
-  strncpy(name, (char*)value_ref->Body.TextId.p, sizeof(name));
-  byte_offset = value_ref->Body.ByteOffset;
-  bit_offset = value_ref->Body.BitOffset;
-  switch (datatype)
+  m_byte_offset = m_ref->_ByteOffset;
+  m_bit_offset = m_ref->_BitOffset;
+
+  switch (m_gsdml_datatype)
   {
-  case gsdml_eValueDataType_Bit:
-    bit_length = 1;
+  case GSDML::ValueDataType_Bit:
+    m_bit_length = 1;
     break;
-  case gsdml_eValueDataType_BitArea:
-    bit_length = value_ref->Body.BitLength;
+  case GSDML::ValueDataType_BitArea:
+    m_bit_length = m_ref->_BitLength;
     break;
-  case gsdml_eValueDataType_Integer8:
-  case gsdml_eValueDataType_Unsigned8:
-    bit_length = 8;
+  case GSDML::ValueDataType_Integer8:
+  case GSDML::ValueDataType_Unsigned8:
+    m_bit_length = 8;
     break;
-  case gsdml_eValueDataType_Integer16:
-  case gsdml_eValueDataType_Unsigned16:
-    bit_length = 16;
+  case GSDML::ValueDataType_Integer16:
+  case GSDML::ValueDataType_Unsigned16:
+    m_bit_length = 16;
     break;
+  // What about 32bit floats.....TODO dive into this...
+  // There's also a weird 4 byte trailer... namely "F_MessageTrailer4Byte"
   default:;
   }
-  for (unsigned int i = 0; i < bit_length; i++)
-    mask |= (mask << 1) | 1;
-  mask <<= bit_offset;
-  noedit = !value_ref->Body.Changeable;
 
-  // Get the values and corresponding texts
-  gsdml_ValueItem* vi = (gsdml_ValueItem*)value_ref->Body.ValueItemTarget.p;
+  for (unsigned int i = 0; i < m_bit_length; i++)
+    m_mask |= (m_mask << 1) | 1;
+  m_mask <<= m_bit_offset;
 
-  gsdml_Valuelist* allowed_values = 0;
-  if (!streq(value_ref->Body.AllowedValues, ""))
-    allowed_values = new gsdml_Valuelist(value_ref->Body.AllowedValues);
+  m_noedit = !m_ref->_Changeable; // TODO Check if default value here should be
+                                  // true instead of false when parsing elements
+                                  // with no changeable/visible attribute!
 
-  if (vi && vi->Assignments)
+  // If we have Assignments
+  if (m_ref->_ValueItem && !m_ref->_ValueItem->_Assignments.empty())
   {
-    for (unsigned int i = 0; i < vi->Assignments->Assign.size(); i++)
+    // If we have assignments. For some reason ValueItem elements are allowed to
+    // be empty according to spec. But if we have an Assignments element spec
+    // says that at least one Assign element must exist with Content and TextId.
+    for (auto const& assign : m_ref->_ValueItem->_Assignments)
     {
-      ParEnumValue eval;
-      int num;
-
-      num = sscanf(vi->Assignments->Assign[i]->Body.Content, "%u", &eval.value);
-
-      if (num != 1)
-        continue;
-
-      if (allowed_values && !allowed_values->in_list(eval.value))
-        continue;
-
-      strncpy(eval.text, (char*)vi->Assignments->Assign[i]->Body.TextId.p,
-              sizeof(eval.text));
-      eval.value <<= bit_offset;
-
-      values.push_back(eval);
+      // We still have to check if the assign element (the content) is a valid
+      // value. If we have no list of valid values they are all valid... The
+      // content must adhere to regex \-?[\d+]{1,20} in other words. stuff like
+      // -123 or +123. 12+3 is also valid but who would write that...
+      if (m_ref->_AllowedValues.empty() ||
+          m_ref->_AllowedValues.inList(assign._Content))
+      {
+        ParEnumValue enum_value;
+        enum_value.text = *assign._Text;
+        enum_value.value = assign._Content;
+        enum_value.value <<= m_bit_offset;
+        m_values.push_back(enum_value);
+      }
     }
   }
-  else if (datatype == gsdml_eValueDataType_Bit)
+  // We do not have Assignments for this Ref.
+  else
   {
-    ParEnumValue eval;
+    // If we don't have an allowed values attribute the datatype and size is
+    // what limits the value. We implement bit datatype for this case...
+    // TODO Check if
+    if (m_ref->_AllowedValues.empty())
+    {
+      ParEnumValue enum_value;
 
-    eval.value = 1;
-    strncpy(eval.text, "On", sizeof(eval.text));
-    eval.value <<= bit_offset;
-    values.push_back(eval);
+      enum_value.value = 1;
+      enum_value.text = "On";
+      enum_value.value <<= m_bit_offset;
+      m_values.push_back(enum_value);
 
-    eval.value = 0;
-    strncpy(eval.text, "Off", sizeof(eval.text));
-    values.push_back(eval);
+      enum_value.value = 0;
+      enum_value.text = "Off";
+      m_values.push_back(enum_value);
+    }
+    else
+    {
+      for (auto it = m_ref->_AllowedValues.begin();
+           it != m_ref->_AllowedValues.end(); ++it)
+      {
+        ParEnumValue enum_value;
+        enum_value.text = std::to_string(it.value());
+        enum_value.value = it.value();
+        enum_value.value <<= m_bit_offset;
+      }
+    }
   }
+  // // Get the values and corresponding texts
+  // gsdml_ValueItem* vi = (gsdml_ValueItem*)m_ref->Body.ValueItemTarget.p;
 
-  if (allowed_values)
-    delete allowed_values;
+  // gsdml_Valuelist* allowed_values = 0;
+  // if (!streq(m_ref->Body.AllowedValues, ""))
+  //   allowed_values = new gsdml_Valuelist(m_ref->Body.AllowedValues);
 
-  brow_CreateNode(attrnav->brow->ctx, item_name, attrnav->brow->nc_attr, dest,
-                  dest_code, (void*)this, 1, &node);
+  // if (vi && vi->Assignments)
+  // {
+  //   for (unsigned int i = 0; i < vi->Assignments->Assign.size(); i++)
+  //   {
+  //     ParEnumValue eval;
+  //     int num;
 
-  brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_attrenum);
-  brow_SetAnnotation(node, 0, name, strlen(name));
-  brow_SetTraceAttr(node, name, "", flow_eTraceType_User);
+  //     num = sscanf(vi->Assignments->Assign[i]->Body.Content, "%u",
+  //     &eval.value);
+
+  //     if (num != 1)
+  //       continue;
+
+  //     if (allowed_values && !allowed_values->in_list(eval.value))
+  //       continue;
+
+  //     strncpy(eval.text, (char*)vi->Assignments->Assign[i]->Body.TextId.p,
+  //             sizeof(eval.text));
+  //     eval.value <<= m_bit_offset;
+
+  //     values.push_back(eval);
+  //   }
+  // }
+  // else if (m_gsdml_datatype == GSDML::ValueDataType_Bit)
+  // {
+  //   ParEnumValue eval;
+
+  //   eval.value = 1;
+  //   strncpy(eval.text, "On", sizeof(eval.text));
+  //   eval.value <<= m_bit_offset;
+  //   values.push_back(eval);
+
+  //   eval.value = 0;
+  //   strncpy(eval.text, "Off", sizeof(eval.text));
+  //   values.push_back(eval);
+  // }
+
+  // if (allowed_values)
+  //   delete allowed_values;
+
+  brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_attr, dest,
+                  dest_code, (void*)this, 1, &m_node);
+
+  brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_attrenum);
+  brow_SetAnnotation(m_node, 0, m_name.c_str(), m_name.length());
+  brow_SetTraceAttr(m_node, m_name.c_str(), "", flow_eTraceType_User);
 }
 
 int ItemPnParEnum::scan(GsdmlAttrNav* attrnav, void* p)
 {
-  if (!first_scan)
+  if (!m_first_scan)
   {
-    if ((*(unsigned int*)&data[byte_offset] & mask) == old_value)
+    if ((*(unsigned int*)&m_data[m_byte_offset] & m_mask) == m_old_value)
       // No change since last time
       return 1;
   }
   else
-    first_scan = 0;
+    m_first_scan = 0;
 
-  unsigned int value = *(unsigned int*)&data[byte_offset] & mask;
-  for (unsigned int i = 0; i < values.size(); i++)
+  unsigned int value = *(unsigned int*)&m_data[m_byte_offset] & m_mask;
+
+  for (auto const& enum_value : m_values)
   {
-    if (values[i].value == value)
+    if (value == enum_value.value)
     {
-      brow_SetAnnotation(node, 1, values[i].text, strlen(values[i].text));
+      brow_SetAnnotation(m_node, 1, enum_value.text.c_str(),
+                         enum_value.text.length());
       break;
     }
   }
+  // for (unsigned int i = 0; i < m_values.size(); i++)
+  // {
+  //   if (values[i].value == value)
+  //   {
+  //     brow_SetAnnotation(m_node, 1, values[i].text, strlen(values[i].text));
+  //     break;
+  //   }
+  // }
 
-  old_value = value;
+  m_old_value = value;
   return 1;
 }
 
-int ItemPnParEnum::open_children(GsdmlAttrNav* attrnav, double x, double y)
-{
-  double node_x, node_y;
-
-  brow_GetNodePosition(node, &node_x, &node_y);
-
-  if (brow_IsOpen(node))
+int ItemPnParEnum::open_children_impl()
+{   
+  for (auto& enum_value : m_values)
   {
-    // Close
-    brow_SetNodraw(attrnav->brow->ctx);
-    brow_CloseNode(attrnav->brow->ctx, node);
-    if (brow_IsOpen(node) & attrnav_mOpen_Attributes)
-      brow_RemoveAnnotPixmap(node, 1);
-    if (brow_IsOpen(node) & attrnav_mOpen_Children)
-      brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_attrenum);
-    brow_ResetOpen(node, attrnav_mOpen_All);
-    brow_ResetNodraw(attrnav->brow->ctx);
-    brow_Redraw(attrnav->brow->ctx, node_y);
-  }
-  else
-  {
-    brow_SetNodraw(attrnav->brow->ctx);
-
-    for (unsigned int i = 0; i < values.size(); i++)
+    switch (m_gsdml_datatype)
     {
-
-      if (datatype == gsdml_eValueDataType_Unsigned16)
-      {
-        new ItemPnParEnumValue(attrnav, values[i].text, datatype, data,
-                               data_reversed_endianess, byte_offset,
-                               values[i].value, mask, noedit, node,
-                               flow_eDest_IntoLast);
-      }
-      else
-      {
-        new ItemPnParEnumBit(attrnav, values[i].text, datatype, data,
-                             data_reversed_endianess, byte_offset,
-                             values[i].value, mask, noedit, node,
-                             flow_eDest_IntoLast);
-      }
+      case GSDML::ValueDataType_BitArea:
+      case GSDML::ValueDataType_Bit:
+        new ItemPnParEnumBit(m_attrnav, enum_value.text.c_str(), m_gsdml_datatype,
+                             m_data, m_byte_offset, enum_value.value, m_mask,
+                             m_noedit, m_node, flow_eDest_IntoLast, "");
+        break;      
+      default:
+        new ItemPnParEnumValue(m_attrnav, enum_value.text.c_str(),
+                               m_gsdml_datatype, m_data, m_byte_offset,
+                               enum_value.value, m_mask, m_noedit, m_node,
+                               flow_eDest_IntoLast, "");
+        break;
     }
-
-    brow_SetOpen(node, attrnav_mOpen_Children);
-    brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_openmap);
-    brow_ResetNodraw(attrnav->brow->ctx);
-    brow_Redraw(attrnav->brow->ctx, node_y);
   }
   return 1;
 }
 
 ItemPnParEnumValue::ItemPnParEnumValue(
-    GsdmlAttrNav* attrnav, const char* item_name,
-    gsdml_eValueDataType item_datatype, unsigned char* item_data,
-    unsigned char* item_data_reversed_endianess, unsigned int item_byte_offset,
-    unsigned int item_value, unsigned int item_mask, int item_noedit,
-    brow_tNode dest, flow_eDest dest_code)
-    : datatype(item_datatype), data(item_data),
-      data_reversed_endianess(item_data_reversed_endianess),
-      byte_offset(item_byte_offset), value(item_value), mask(item_mask),
-      first_scan(1), old_value(0), noedit(item_noedit)
+    GsdmlAttrNav* attrnav, const char* name,
+    GSDML::eValueDataType gsdml_datatype, unsigned char* data,
+    unsigned int byte_offset, unsigned int enum_value, unsigned int mask,
+    int noedit, brow_tNode dest, flow_eDest dest_code, const char* infotext)
+    : ItemPn(attrnav, attrnav_eItemType_PnParEnumValue, name, infotext),
+      m_gsdml_datatype(gsdml_datatype), m_data(data),
+      m_byte_offset(byte_offset), m_enum_value(enum_value), m_mask(mask),
+      m_old_value(0)
 {
-  type = attrnav_eItemType_PnParEnumValue;
-  strncpy(name, (char*)item_name, sizeof(name));
+  m_noedit = noedit;
 
-  brow_CreateNode(attrnav->brow->ctx, item_name, attrnav->brow->nc_enum, dest,
-                  dest_code, (void*)this, 1, &node);
-  brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_attr);
+  brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_enum, dest,
+                  dest_code, (void*)this, 1, &m_node);
+  brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_attr);
 
-  brow_SetAnnotation(node, 0, name, strlen(name));
-  brow_SetTraceAttr(node, name, "", flow_eTraceType_User);
+  brow_SetAnnotation(m_node, 0, m_name.c_str(), m_name.length());
+  brow_SetTraceAttr(m_node, m_name.c_str(), "", flow_eTraceType_User);
 }
 
 int ItemPnParEnumValue::scan(GsdmlAttrNav* attrnav, void* p)
 {
-  if (!first_scan)
+  if (!m_first_scan)
   {
-    if ((*(unsigned int*)&data[byte_offset] & mask) == old_value)
+    if ((*(unsigned int*)&m_data[m_byte_offset] & m_mask) == m_old_value)
       // No change since last time
       return 1;
   }
   else
-    first_scan = 0;
+    m_first_scan = 0;
 
-  unsigned int current_value = *(unsigned int*)&data[byte_offset] & mask;
-  if (current_value == value)
-    brow_SetRadiobutton(node, 0, 1);
+  unsigned int current_value = *(unsigned int*)&m_data[m_byte_offset] & m_mask;
+  if (current_value == m_enum_value)
+    brow_SetRadiobutton(m_node, 0, 1);
   else
-    brow_SetRadiobutton(node, 0, 0);
+    brow_SetRadiobutton(m_node, 0, 0);
 
-  old_value = current_value;
+  m_old_value = current_value;
   return 1;
 }
 
 void ItemPnParEnumValue::update(GsdmlAttrNav* attrnav)
 {
-  if (noedit)
+  if (m_noedit)
   {
     attrnav->message('E', "Parameter is not changeable");
     return;
   }
-  *(unsigned int*)&data[byte_offset] = value;
+  *(unsigned int*)&m_data[m_byte_offset] = m_enum_value;
 
-  // Change the reversed data aswell since this value can be of arbitrary size
-  switch (datatype)
-  {
-  case gsdml_eValueDataType_Unsigned16:
-  case gsdml_eValueDataType_Integer16:
-  {
-    union
-    {
-      char b[2];
-      short data;
-    } val;
-    memcpy(val.b, &value, 2);
-    char tmpb = val.b[1];
-    val.b[1] = val.b[0];
-    val.b[0] = tmpb;
+  //   // Change the reversed data aswell since this value can be of arbitrary
+  //   size switch (datatype)
+  //   {
+  //   case gsdml_eValueDataType_Unsigned16:
+  //   case gsdml_eValueDataType_Integer16:
+  //   {
+  //     union
+  //     {
+  //       char b[2];
+  //       short data;
+  //     } val;
+  //     memcpy(val.b, &value, 2);
+  //     char tmpb = val.b[1];
+  //     val.b[1] = val.b[0];
+  //     val.b[0] = tmpb;
 
-    *(unsigned int*)&data_reversed_endianess[byte_offset] = val.data;
-    break;
-  }
-  // Don't know if the standard has enumerations greater than 16bits...
-  case gsdml_eValueDataType_Unsigned32:
-  case gsdml_eValueDataType_Integer32:
-  {
-    union
-    {
-      char b[4];
-      int data;
-    } val;
-    memcpy(val.b, &value, 4);
-    char tmpb = val.b[0];
-    val.b[0] = val.b[3];
-    val.b[1] = val.b[2];
-    val.b[2] = val.b[1];
-    val.b[3] = tmpb;
+  //     *(unsigned int*)&data_reversed_endianess[byte_offset] = val.data;
+  //     break;
+  //   }
+  //   // Don't know if the standard has enumerations greater than 16bits...
+  //   case gsdml_eValueDataType_Unsigned32:
+  //   case gsdml_eValueDataType_Integer32:
+  //   {
+  //     union
+  //     {
+  //       char b[4];
+  //       int data;
+  //     } val;
+  //     memcpy(val.b, &value, 4);
+  //     char tmpb = val.b[0];
+  //     val.b[0] = val.b[3];
+  //     val.b[1] = val.b[2];
+  //     val.b[2] = val.b[1];
+  //     val.b[3] = tmpb;
 
-    *(unsigned int*)&data_reversed_endianess[byte_offset] = val.data;
-    break;
-  }
-  default:
-  {
-    // Just write the same data...
-    *(unsigned int*)&data_reversed_endianess[byte_offset] = value;
-    break;
-  }
-  }
+  //     *(unsigned int*)&data_reversed_endianess[byte_offset] = val.data;
+  //     break;
+  //   }
+  //   default:
+  //   {
+  //     // Just write the same data...
+  //     *(unsigned int*)&data_reversed_endianess[byte_offset] = value;
+  //     break;
+  //   }
+  //   }
 
   attrnav->set_modified(1);
 }
 
-ItemPnParEnumBit::ItemPnParEnumBit(GsdmlAttrNav* attrnav, const char* item_name,
-                                   gsdml_eValueDataType item_datatype,
-                                   unsigned char* item_data,
-                                   unsigned char* item_data_reversed_endianess,
-                                   unsigned int item_byte_offset,
-                                   unsigned int item_value,
-                                   unsigned int item_mask, int item_noedit,
-                                   brow_tNode dest, flow_eDest dest_code)
-    : datatype(item_datatype), data(item_data),
-      data_reversed_endianess(item_data_reversed_endianess),
-      byte_offset(item_byte_offset), value(item_value), mask(item_mask),
-      first_scan(1), old_value(0), noedit(item_noedit)
+ItemPnParEnumBit::ItemPnParEnumBit(GsdmlAttrNav* attrnav, const char* name,
+                                   GSDML::eValueDataType gsdml_datatype,
+                                   unsigned char* data,
+                                   unsigned int byte_offset,
+                                   unsigned int enum_value, unsigned int mask,
+                                   int noedit, brow_tNode dest,
+                                   flow_eDest dest_code, const char* infotext)
+    : ItemPn(attrnav, attrnav_eItemType_PnParEnumBit, name, infotext),
+      m_gsdml_datatype(gsdml_datatype), m_data(data),
+      m_byte_offset(byte_offset), m_enum_value(enum_value), m_mask(mask),
+      m_old_value(0)
 {
-  type = attrnav_eItemType_PnParEnumBit;
-  strncpy(name, (char*)item_name, sizeof(name));
+  m_noedit = noedit;
 
-  brow_CreateNode(attrnav->brow->ctx, item_name, attrnav->brow->nc_enum, dest,
-                  dest_code, (void*)this, 1, &node);
-  brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_attr);
+  brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_enum, dest,
+                  dest_code, (void*)this, 1, &m_node);
+  brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_attr);
 
-  brow_SetAnnotation(node, 0, name, strlen(name));
-  brow_SetTraceAttr(node, name, "", flow_eTraceType_User);
+  brow_SetAnnotation(m_node, 0, m_name.c_str(), m_name.length());
+  brow_SetTraceAttr(m_node, m_name.c_str(), "", flow_eTraceType_User);
 }
 
 int ItemPnParEnumBit::scan(GsdmlAttrNav* attrnav, void* p)
 {
-  if (!first_scan)
+  if (!m_first_scan)
   {
-    if ((*(unsigned int*)&data[byte_offset] & mask) == old_value)
+    if ((*(unsigned int*)&m_data[m_byte_offset] & m_mask) == m_old_value)
       // No change since last time
       return 1;
   }
   else
-    first_scan = 0;
+    m_first_scan = 0;
 
-  unsigned int current_value = *(unsigned int*)&data[byte_offset] & mask;
-  if (current_value == value)
-    brow_SetRadiobutton(node, 0, 1);
+  unsigned int current_value = *(unsigned int*)&m_data[m_byte_offset] & m_mask;
+  if (current_value == m_enum_value)
+    brow_SetRadiobutton(m_node, 0, 1);
   else
-    brow_SetRadiobutton(node, 0, 0);
+    brow_SetRadiobutton(m_node, 0, 0);
 
-  old_value = current_value;
+  m_old_value = current_value;
   return 1;
 }
 
 void ItemPnParEnumBit::update(GsdmlAttrNav* attrnav)
 {
-  if (noedit)
+  if (m_noedit)
   {
     attrnav->message('E', "Parameter is not changeable");
     return;
   }
-  *(unsigned int*)&data[byte_offset] &= ~mask;
-  *(unsigned int*)&data[byte_offset] |= value;
+  *(unsigned int*)&m_data[m_byte_offset] &= ~m_mask;
+  *(unsigned int*)&m_data[m_byte_offset] |= m_enum_value;
 
-  *(unsigned int*)&data_reversed_endianess[byte_offset] &= ~mask;
-  *(unsigned int*)&data_reversed_endianess[byte_offset] |= value;
+  // *(unsigned int*)&data_reversed_endianess[byte_offset] &= ~mask;
+  // *(unsigned int*)&data_reversed_endianess[byte_offset] |= value;
 
   attrnav->set_modified(1);
 }
 
-ItemPnModuleClass::ItemPnModuleClass(GsdmlAttrNav* attrnav,
-                                     const char* item_name,
-                                     GsdmlSlotData* item_slotdata,
-                                     brow_tNode dest, flow_eDest dest_code)
-    : slotdata(item_slotdata), first_scan(1)
+// ItemPnModuleClass::ItemPnModuleClass(GsdmlAttrNav* attrnav,
+//                                      const char* item_name,
+//                                      GsdmlSlotData* item_slotdata,
+//                                      brow_tNode dest, flow_eDest dest_code)
+//     : slotdata(item_slotdata), first_scan(1)
+// {
+//   m_type = attrnav_eItemType_PnModuleClass;
+
+//   m_name = std::string(item_name);
+
+//   brow_CreateNode(attrnav->brow->ctx, item_name, attrnav->brow->nc_attr,
+//   dest,
+//                   dest_code, (void*)this, 1, &m_node);
+
+//   brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_attrenum);
+
+//   brow_SetAnnotation(m_node, 0, item_name, strlen(item_name));
+//   brow_SetTraceAttr(m_node, m_name.c_str(), "", flow_eTraceType_User);
+// }
+
+// int ItemPnModuleClass::open_children(GsdmlAttrNav* attrnav, double x, double
+// y)
+// {
+//   double node_x, node_y;
+
+//   brow_GetNodePosition(m_node, &node_x, &node_y);
+
+//   if (brow_IsOpen(m_node))
+//   {
+//     // Close
+//     brow_SetNodraw(attrnav->brow->ctx);
+//     brow_CloseNode(attrnav->brow->ctx, m_node);
+//     if (brow_IsOpen(m_node) & attrnav_mOpen_Attributes)
+//       brow_RemoveAnnotPixmap(m_node, 1);
+//     if (brow_IsOpen(m_node) & attrnav_mOpen_Children)
+//       brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_attrenum);
+//     brow_ResetOpen(m_node, attrnav_mOpen_All);
+//     brow_ResetNodraw(attrnav->brow->ctx);
+//     brow_Redraw(attrnav->brow->ctx, node_y);
+//   }
+//   else
+//   {
+//     brow_SetNodraw(attrnav->brow->ctx);
+
+//     for (int i = 0; attrnav->gsdml->module_classlist[i].cid; i++)
+//     {
+//       new ItemPnEnumValue(attrnav, attrnav->gsdml->module_classlist[i].name,
+//                           attrnav->gsdml->module_classlist[i].cid,
+//                           pwr_eType_UInt32, &slotdata->module_class, m_node,
+//                           flow_eDest_IntoLast);
+//     }
+
+//     brow_SetOpen(m_node, attrnav_mOpen_Children);
+//     brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_openmap);
+//     brow_ResetNodraw(attrnav->brow->ctx);
+//     brow_Redraw(attrnav->brow->ctx, node_y);
+//   }
+//   return 1;
+// }
+
+// int ItemPnModuleClass::scan(GsdmlAttrNav* attrnav, void* p)
+// {
+//   char buf[200];
+
+//   if (!first_scan)
+//   {
+//     if (old_value == *(int*)p)
+//       // No change since last time
+//       return 1;
+//   }
+
+//   if (*(int*)p == 0)
+//     strcpy(buf, "No");
+//   else
+//   {
+//     int found = 0;
+
+//     int i;
+//     for (i = 0; attrnav->gsdml->module_classlist[i].cid; i++)
+//     {
+//       if (attrnav->gsdml->module_classlist[i].cid == *(pwr_tCid*)p)
+//       {
+//         found = 1;
+//         break;
+//       }
+//     }
+//     if (!found)
+//       strcpy(buf, "Unknown class");
+//     else
+//       strcpy(buf, attrnav->gsdml->module_classlist[i].name);
+//   }
+//   brow_SetAnnotation(m_node, 1, buf, strlen(buf));
+//   old_value = *(int*)p;
+
+//   if (first_scan)
+//     first_scan = 0;
+//   return 1;
+// }
+
+ItemPnIOData::ItemPnIOData(GsdmlAttrNav* attrnav, const char* name,
+                           GSDML::IOData* iodata, ProfinetSubslot* subslot,
+                           brow_tNode dest, flow_eDest dest_code, const char* infotext)
+    : ItemPn(attrnav, attrnav_eItemType_PnIOData, name, infotext),
+      m_iodata(iodata), m_subslot(subslot)
 {
-  type = attrnav_eItemType_PnModuleClass;
+  if (iodata->_Input._DataItem.size() || iodata->_Output._DataItem.size())
+    m_is_parent = 1;
 
-  strcpy(name, item_name);
+  brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_attr,
+                  dest, dest_code, (void*)this, 1, &m_node);
 
-  brow_CreateNode(attrnav->brow->ctx, item_name, attrnav->brow->nc_attr, dest,
-                  dest_code, (void*)this, 1, &node);
-
-  brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_attrenum);
-
-  brow_SetAnnotation(node, 0, item_name, strlen(item_name));
-  brow_SetTraceAttr(node, name, "", flow_eTraceType_User);
-}
-
-int ItemPnModuleClass::open_children(GsdmlAttrNav* attrnav, double x, double y)
-{
-  double node_x, node_y;
-
-  brow_GetNodePosition(node, &node_x, &node_y);
-
-  if (brow_IsOpen(node))
-  {
-    // Close
-    brow_SetNodraw(attrnav->brow->ctx);
-    brow_CloseNode(attrnav->brow->ctx, node);
-    if (brow_IsOpen(node) & attrnav_mOpen_Attributes)
-      brow_RemoveAnnotPixmap(node, 1);
-    if (brow_IsOpen(node) & attrnav_mOpen_Children)
-      brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_attrenum);
-    brow_ResetOpen(node, attrnav_mOpen_All);
-    brow_ResetNodraw(attrnav->brow->ctx);
-    brow_Redraw(attrnav->brow->ctx, node_y);
-  }
+  if (m_is_parent)
+    brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_map);
   else
-  {
-    brow_SetNodraw(attrnav->brow->ctx);
+    brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_leaf);
 
-    for (int i = 0; attrnav->gsdml->module_classlist[i].cid; i++)
-    {
-      new ItemPnEnumValue(attrnav, attrnav->gsdml->module_classlist[i].name,
-                          attrnav->gsdml->module_classlist[i].cid,
-                          pwr_eType_UInt32, &slotdata->module_class, node,
-                          flow_eDest_IntoLast);
-    }
-
-    brow_SetOpen(node, attrnav_mOpen_Children);
-    brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_openmap);
-    brow_ResetNodraw(attrnav->brow->ctx);
-    brow_Redraw(attrnav->brow->ctx, node_y);
-  }
-  return 1;
+  brow_SetAnnotation(m_node, 0, m_name.c_str(), m_name.length());
 }
 
-int ItemPnModuleClass::scan(GsdmlAttrNav* attrnav, void* p)
+int ItemPnIOData::open_children_impl()
 {
-  char buf[200];
-
-  if (!first_scan)
-  {
-    if (old_value == *(int*)p)
-      // No change since last time
-      return 1;
-  }
-
-  if (*(int*)p == 0)
-    strcpy(buf, "No");
-  else
-  {
-    int found = 0;
-
-    int i;
-    for (i = 0; attrnav->gsdml->module_classlist[i].cid; i++)
-    {
-      if (attrnav->gsdml->module_classlist[i].cid == *(pwr_tCid*)p)
-      {
-        found = 1;
-        break;
-      }
-    }
-    if (!found)
-      strcpy(buf, "Unknown class");
-    else
-      strcpy(buf, attrnav->gsdml->module_classlist[i].name);
-  }
-  brow_SetAnnotation(node, 1, buf, strlen(buf));
-  old_value = *(int*)p;
-
-  if (first_scan)
-    first_scan = 0;
-  return 1;
-}
-
-ItemPnIOData::ItemPnIOData(GsdmlAttrNav* attrnav, const char* item_name,
-                           gsdml_IOData* item_iodata, int item_subslot_idx,
-                           int item_slot_idx, brow_tNode dest,
-                           flow_eDest dest_code)
-    : iodata(item_iodata), subslot_idx(item_subslot_idx),
-      slot_idx(item_slot_idx)
-{
-  type = attrnav_eItemType_PnIOData;
-
-  strcpy(name, item_name);
-
-  if (iodata->Input || iodata->Output)
-    parent = 1;
-
-  brow_CreateNode(attrnav->brow->ctx, item_name, attrnav->brow->nc_attr, dest,
-                  dest_code, (void*)this, 1, &node);
-
-  if (parent)
-    brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_map);
-  else
-    brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_leaf);
-
-  brow_SetAnnotation(node, 0, item_name, strlen(item_name));
-}
-
-int ItemPnIOData::open_children(GsdmlAttrNav* attrnav, double x, double y)
-{
-  double node_x, node_y;
-
-  brow_GetNodePosition(node, &node_x, &node_y);
-
-  if (brow_IsOpen(node))
-  {
-    // Close
-    brow_SetNodraw(attrnav->brow->ctx);
-    brow_CloseNode(attrnav->brow->ctx, node);
-    if (brow_IsOpen(node) & attrnav_mOpen_Children)
-    {
-      if (parent)
-        brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_map);
-      else
-        brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_leaf);
-    }
-    brow_ResetOpen(node, attrnav_mOpen_All);
-    brow_ResetNodraw(attrnav->brow->ctx);
-    brow_Redraw(attrnav->brow->ctx, node_y);
-  }
-  else
-  {
-    brow_SetNodraw(attrnav->brow->ctx);
-
-    if (iodata->Input)
-    {
-      new ItemPnInput(attrnav, "Input", iodata->Input, node,
-                      flow_eDest_IntoLast);
-    }
-    if (iodata->Output)
-    {
-      new ItemPnOutput(attrnav, "Output", iodata->Output, node,
-                       flow_eDest_IntoLast);
-    }
-
-    GsdmlSubslotData* ssd =
-        attrnav->dev_data.slot_data[slot_idx]->subslot_data[subslot_idx];
-    if (iodata->Input)
-    {
-      void* p = (void*)&ssd->io_input_length;
-      new ItemPnBase(attrnav, "InputLength", "LocalGsdmlAttr", pwr_eType_UInt32,
-                     sizeof(ssd->io_input_length), 0, 0, p, 0, node,
-                     flow_eDest_IntoLast);
-    }
-    if (iodata->Output)
-    {
-      void* p = (void*)&ssd->io_output_length;
-      new ItemPnBase(attrnav, "OutputLength", "LocalGsdmlAttr",
-                     pwr_eType_UInt32, sizeof(ssd->io_output_length), 0, 0, p,
-                     0, node, flow_eDest_IntoLast);
-    }
-
-    brow_SetOpen(node, attrnav_mOpen_Children);
-    brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_openmap);
-    brow_ResetNodraw(attrnav->brow->ctx);
-    brow_Redraw(attrnav->brow->ctx, node_y);
-  }
-  return 1;
-}
-
-ItemPnInput::ItemPnInput(GsdmlAttrNav* attrnav, const char* item_name,
-                         gsdml_Input* item_input, brow_tNode dest,
-                         flow_eDest dest_code)
-    : input(item_input)
-{
-  type = attrnav_eItemType_PnInput;
-
-  strcpy(name, item_name);
-
-  if (input->DataItem.size())
-    parent = 1;
-
-  brow_CreateNode(attrnav->brow->ctx, item_name, attrnav->brow->nc_attr, dest,
-                  dest_code, (void*)this, 1, &node);
-
-  if (parent)
-    brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_map);
-  else
-    brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_leaf);
-
-  brow_SetAnnotation(node, 0, item_name, strlen(item_name));
-}
-
-int ItemPnInput::open_children(GsdmlAttrNav* attrnav, double x, double y)
-{
-  double node_x, node_y;
-
-  brow_GetNodePosition(node, &node_x, &node_y);
-
-  if (brow_IsOpen(node))
-  {
-    // Close
-    brow_SetNodraw(attrnav->brow->ctx);
-    brow_CloseNode(attrnav->brow->ctx, node);
-    if (brow_IsOpen(node) & attrnav_mOpen_Children)
-    {
-      if (parent)
-        brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_map);
-      else
-        brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_leaf);
-    }
-    brow_ResetOpen(node, attrnav_mOpen_All);
-    brow_ResetNodraw(attrnav->brow->ctx);
-    brow_Redraw(attrnav->brow->ctx, node_y);
-  }
-  else
-  {
-    brow_SetNodraw(attrnav->brow->ctx);
-
-    for (unsigned int i = 0; i < input->DataItem.size(); i++)
-    {
-      new ItemPnDataItem(attrnav, (char*)input->DataItem[i]->Body.TextId.p,
-                         input->DataItem[i], node, flow_eDest_IntoLast);
-    }
-
-    brow_SetOpen(node, attrnav_mOpen_Children);
-    brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_openmap);
-    brow_ResetNodraw(attrnav->brow->ctx);
-    brow_Redraw(attrnav->brow->ctx, node_y);
-  }
-  return 1;
-}
-
-ItemPnOutput::ItemPnOutput(GsdmlAttrNav* attrnav, const char* item_name,
-                           gsdml_Output* item_output, brow_tNode dest,
-                           flow_eDest dest_code)
-    : output(item_output)
-{
-  type = attrnav_eItemType_PnOutput;
-
-  strcpy(name, item_name);
-
-  if (output->DataItem.size())
-    parent = 1;
-
-  brow_CreateNode(attrnav->brow->ctx, item_name, attrnav->brow->nc_attr, dest,
-                  dest_code, (void*)this, 1, &node);
-
-  if (parent)
-    brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_map);
-  else
-    brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_leaf);
-
-  brow_SetAnnotation(node, 0, item_name, strlen(item_name));
-}
-
-int ItemPnOutput::open_children(GsdmlAttrNav* attrnav, double x, double y)
-{
-  double node_x, node_y;
-
-  brow_GetNodePosition(node, &node_x, &node_y);
-
-  if (brow_IsOpen(node))
-  {
-    // Close
-    brow_SetNodraw(attrnav->brow->ctx);
-    brow_CloseNode(attrnav->brow->ctx, node);
-    if (brow_IsOpen(node) & attrnav_mOpen_Children)
-    {
-      if (parent)
-        brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_map);
-      else
-        brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_leaf);
-    }
-    brow_ResetOpen(node, attrnav_mOpen_All);
-    brow_ResetNodraw(attrnav->brow->ctx);
-    brow_Redraw(attrnav->brow->ctx, node_y);
-  }
-  else
-  {
-    brow_SetNodraw(attrnav->brow->ctx);
-
-    for (unsigned int i = 0; i < output->DataItem.size(); i++)
-    {
-      new ItemPnDataItem(attrnav, (char*)output->DataItem[i]->Body.TextId.p,
-                         output->DataItem[i], node, flow_eDest_IntoLast);
-    }
-
-    brow_SetOpen(node, attrnav_mOpen_Children);
-    brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_openmap);
-    brow_ResetNodraw(attrnav->brow->ctx);
-    brow_Redraw(attrnav->brow->ctx, node_y);
-  }
-  return 1;
-}
-
-ItemPnDataItem::ItemPnDataItem(GsdmlAttrNav* attrnav, const char* item_name,
-                               gsdml_DataItem* item_dataitem, brow_tNode dest,
-                               flow_eDest dest_code)
-    : dataitem(item_dataitem)
-{
-  type = attrnav_eItemType_PnDataItem;
-
-  strcpy(name, item_name);
-
-  if (dataitem->BitDataItem.size())
-    parent = 1;
-
-  brow_CreateNode(attrnav->brow->ctx, item_name, attrnav->brow->nc_attr, dest,
-                  dest_code, (void*)this, 1, &node);
-
-  if (parent)
-    brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_map);
-  else
-    brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_leaf);
-
-  brow_SetAnnotation(node, 0, item_name, strlen(item_name));
-  brow_SetAnnotation(node, 1, dataitem->Body.DataType,
-                     strlen(dataitem->Body.DataType));
-}
-
-int ItemPnDataItem::open_children(GsdmlAttrNav* attrnav, double x, double y)
-{
-  double node_x, node_y;
-
-  brow_GetNodePosition(node, &node_x, &node_y);
-
-  if (brow_IsOpen(node))
-  {
-    // Close
-    brow_SetNodraw(attrnav->brow->ctx);
-    brow_CloseNode(attrnav->brow->ctx, node);
-    if (brow_IsOpen(node) & attrnav_mOpen_Children)
-    {
-      if (parent)
-        brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_map);
-      else
-        brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_leaf);
-    }
-    brow_ResetOpen(node, attrnav_mOpen_All);
-    brow_ResetNodraw(attrnav->brow->ctx);
-    brow_Redraw(attrnav->brow->ctx, node_y);
-  }
-  else
-  {
-    brow_SetNodraw(attrnav->brow->ctx);
-
-    void* p;
-    if (streq(dataitem->Body.DataType, "OctetString") ||
-        streq(dataitem->Body.DataType, "VisibleString"))
-    {
-      p = (void*)&dataitem->Body.Length;
-      new ItemPnBase(attrnav, "Length", "LocalGsdmlAttr", pwr_eType_UInt16,
-                     sizeof(dataitem->Body.Length), 0, 0, p, 1, node,
-                     flow_eDest_IntoLast);
-    }
-    p = (void*)dataitem->Body.DataType;
-    new ItemPnBase(attrnav, "Type", "LocalGsdmlAttr", pwr_eType_String,
-                   sizeof(dataitem->Body.DataType), 0, 0, p, 1, node,
-                   flow_eDest_IntoLast);
-
-    p = (void*)&dataitem->Body.UseAsBits;
-    new ItemPnBase(attrnav, "UseAsBits", "LocalGsdmlAttr", pwr_eType_Boolean,
-                   sizeof(dataitem->Body.UseAsBits), 0, 0, p, 1, node,
-                   flow_eDest_IntoLast);
-
-    for (unsigned int i = 0; i < dataitem->BitDataItem.size(); i++)
-    {
-      new ItemPnBitDataItem(
-          attrnav, (char*)dataitem->BitDataItem[i]->Body.TextId.p,
-          dataitem->BitDataItem[i], node, flow_eDest_IntoLast);
-    }
-    brow_SetOpen(node, attrnav_mOpen_Children);
-    brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_openmap);
-    brow_ResetNodraw(attrnav->brow->ctx);
-    brow_Redraw(attrnav->brow->ctx, node_y);
-  }
-  return 1;
-}
-
-ItemPnBitDataItem::ItemPnBitDataItem(GsdmlAttrNav* attrnav,
-                                     const char* item_name,
-                                     gsdml_BitDataItem* item_bitdataitem,
-                                     brow_tNode dest, flow_eDest dest_code)
-    : bitdataitem(item_bitdataitem)
-{
-  type = attrnav_eItemType_PnBitDataItem;
-
-  strcpy(name, item_name);
-
-  brow_CreateNode(attrnav->brow->ctx, item_name, attrnav->brow->nc_attr, dest,
-                  dest_code, (void*)this, 1, &node);
-
-  brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_leaf);
-
-  brow_SetAnnotation(node, 0, item_name, strlen(item_name));
-}
-
-int ItemPnBitDataItem::open_children(GsdmlAttrNav* attrnav, double x, double y)
-{
-  double node_x, node_y;
-
-  brow_GetNodePosition(node, &node_x, &node_y);
-
-  if (brow_IsOpen(node))
-  {
-    // Close
-    brow_SetNodraw(attrnav->brow->ctx);
-    brow_CloseNode(attrnav->brow->ctx, node);
-    if (brow_IsOpen(node) & attrnav_mOpen_Children)
-    {
-      if (parent)
-        brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_map);
-      else
-        brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_leaf);
-    }
-    brow_ResetOpen(node, attrnav_mOpen_All);
-    brow_ResetNodraw(attrnav->brow->ctx);
-    brow_Redraw(attrnav->brow->ctx, node_y);
-  }
-  else
-  {
-    brow_SetNodraw(attrnav->brow->ctx);
-
-    void* p = (void*)&bitdataitem->Body.BitOffset;
-    new ItemPnBase(attrnav, "BitOffset", "LocalGsdmlAttr", pwr_eType_UInt8,
-                   sizeof(bitdataitem->Body.BitOffset), 0, 0, p, 1, node,
-                   flow_eDest_IntoLast);
-
-    brow_SetOpen(node, attrnav_mOpen_Children);
-    brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_openmap);
-    brow_ResetNodraw(attrnav->brow->ctx);
-    brow_Redraw(attrnav->brow->ctx, node_y);
-  }
-  return 1;
-}
-
-ItemPnEnumByteOrder::ItemPnEnumByteOrder(GsdmlAttrNav* attrnav,
-                                         const char* item_name,
-                                         const char* attr, int attr_type,
-                                         int attr_size, void* attr_value_p,
-                                         int attr_noedit, brow_tNode dest,
-                                         flow_eDest dest_code)
-    : ItemPnBase(attrnav, item_name, attr, attr_type, attr_size, 0, 0,
-                 attr_value_p, attr_noedit, dest, dest_code)
-{
-  type = attrnav_eItemType_PnEnumByteOrder;
-  brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_attrenum);
-}
-
-int ItemPnEnumByteOrder::open_children(GsdmlAttrNav* attrnav, double x,
-                                       double y)
-{
-  double node_x, node_y;
-
-  brow_GetNodePosition(node, &node_x, &node_y);
-
-  if (brow_IsOpen(node))
-  {
-    // Close
-    brow_SetNodraw(attrnav->brow->ctx);
-    brow_CloseNode(attrnav->brow->ctx, node);
-    if (brow_IsOpen(node) & attrnav_mOpen_Attributes)
-      brow_RemoveAnnotPixmap(node, 1);
-    if (brow_IsOpen(node) & attrnav_mOpen_Children)
-      brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_attrenum);
-    brow_ResetOpen(node, attrnav_mOpen_All);
-    brow_ResetNodraw(attrnav->brow->ctx);
-    brow_Redraw(attrnav->brow->ctx, node_y);
-  }
-  else if (!noedit)
-  {
-    int found;
-
-    found = 0;
-    brow_SetNodraw(attrnav->brow->ctx);
-    new ItemPnEnumValue(attrnav, "LittleEndian", 0, pwr_eType_UInt32,
-                        this->value_p, node, flow_eDest_IntoLast);
-    new ItemPnEnumValue(attrnav, "BigEndian", 1, pwr_eType_UInt32,
-                        this->value_p, node, flow_eDest_IntoLast);
-    brow_SetOpen(node, attrnav_mOpen_Children);
-    brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_openmap);
-    brow_ResetNodraw(attrnav->brow->ctx);
-    brow_Redraw(attrnav->brow->ctx, node_y);
-  }
-  return 1;
-}
-
-int ItemPnEnumByteOrder::scan(GsdmlAttrNav* attrnav, void* p)
-{
-  char buf[80];
-
-  if (!first_scan)
-  {
-    if (old_value == *(int*)p)
-      // No change since last time
-      return 1;
-  }
-  else
-    first_scan = 0;
-
-  if (*(int*)p == 0)
-    strcpy(buf, "LittleEndian");
-  else
-    strcpy(buf, "BigEndian");
-
-  brow_SetAnnotation(node, 1, buf, strlen(buf));
-  old_value = *(int*)p;
+    // if (iodata->Input)
+    // {
+    //   new ItemPnInput(attrnav, "Input", iodata->Input, m_node,
+    //                   flow_eDest_IntoLast);
+    // }
+    // if (iodata->Output)
+    // {
+    //   new ItemPnOutput(attrnav, "Output", iodata->Output, m_node,
+    //                    flow_eDest_IntoLast);
+    // }
+
+    // GsdmlSubslotData* ssd =
+    //     attrnav->dev_data.slot_data[slot_idx]->subslot_data[subslot_idx];
+    // if (iodata->Input)
+    // {
+    //   void* p = (void*)&ssd->io_input_length;
+    //   new ItemPnBase(attrnav, "InputLength", "LocalGsdmlAttr",
+    //   pwr_eType_UInt32,
+    //                  sizeof(ssd->io_input_length), 0, 0, p, 0, m_node,
+    //                  flow_eDest_IntoLast);
+    // }
+    // if (iodata->Output)
+    // {
+    //   void* p = (void*)&ssd->io_output_length;
+    //   new ItemPnBase(attrnav, "OutputLength", "LocalGsdmlAttr",
+    //                  pwr_eType_UInt32, sizeof(ssd->io_output_length), 0, 0,
+    //                  p, 0, m_node, flow_eDest_IntoLast);
+    // }
 
   return 1;
 }
 
-ItemPnEnumTimeRatio::ItemPnEnumTimeRatio(
-    GsdmlAttrNav* attrnav, const char* item_name,
-    gsdml_InterfaceSubmoduleItem* item_interfacesubmodule, void* attr_value_p,
-    brow_tNode dest, flow_eDest dest_code)
-    : interfacesubmodule(item_interfacesubmodule), value_p(attr_value_p),
-      first_scan(1), old_value(0)
+// ItemPnInput::ItemPnInput(GsdmlAttrNav* attrnav, const char* item_name,
+//                          gsdml_Input* item_input, brow_tNode dest,
+//                          flow_eDest dest_code)
+//     : input(item_input)
+// {
+//   m_type = attrnav_eItemType_PnInput;
+
+//   m_name = std::string(item_name);
+
+//   if (input->DataItem.size())
+//     m_is_parent = 1;
+
+//   brow_CreateNode(attrnav->brow->ctx, item_name, attrnav->brow->nc_attr,
+//   dest,
+//                   dest_code, (void*)this, 1, &m_node);
+
+//   if (m_is_parent)
+//     brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_map);
+//   else
+//     brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_leaf);
+
+//   brow_SetAnnotation(m_node, 0, item_name, strlen(item_name));
+// }
+
+// int ItemPnInput::open_children(GsdmlAttrNav* attrnav, double x, double y)
+// {
+//   double node_x, node_y;
+
+//   brow_GetNodePosition(m_node, &node_x, &node_y);
+
+//   if (brow_IsOpen(m_node))
+//   {
+//     // Close
+//     brow_SetNodraw(attrnav->brow->ctx);
+//     brow_CloseNode(attrnav->brow->ctx, m_node);
+//     if (brow_IsOpen(m_node) & attrnav_mOpen_Children)
+//     {
+//       if (m_is_parent)
+//         brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_map);
+//       else
+//         brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_leaf);
+//     }
+//     brow_ResetOpen(m_node, attrnav_mOpen_All);
+//     brow_ResetNodraw(attrnav->brow->ctx);
+//     brow_Redraw(attrnav->brow->ctx, node_y);
+//   }
+//   else
+//   {
+//     brow_SetNodraw(attrnav->brow->ctx);
+
+//     for (unsigned int i = 0; i < input->DataItem.size(); i++)
+//     {
+//       new ItemPnDataItem(attrnav, (char*)input->DataItem[i]->Body.TextId.p,
+//                          input->DataItem[i], m_node, flow_eDest_IntoLast);
+//     }
+
+//     brow_SetOpen(m_node, attrnav_mOpen_Children);
+//     brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_openmap);
+//     brow_ResetNodraw(attrnav->brow->ctx);
+//     brow_Redraw(attrnav->brow->ctx, node_y);
+//   }
+//   return 1;
+// }
+
+// ItemPnOutput::ItemPnOutput(GsdmlAttrNav* attrnav, const char* item_name,
+//                            gsdml_Output* item_output, brow_tNode dest,
+//                            flow_eDest dest_code)
+//     : output(item_output)
+// {
+//   m_type = attrnav_eItemType_PnOutput;
+
+//   m_name = std::string(item_name);
+
+//   if (output->DataItem.size())
+//     m_is_parent = 1;
+
+//   brow_CreateNode(attrnav->brow->ctx, item_name, attrnav->brow->nc_attr,
+//   dest,
+//                   dest_code, (void*)this, 1, &m_node);
+
+//   if (m_is_parent)
+//     brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_map);
+//   else
+//     brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_leaf);
+
+//   brow_SetAnnotation(m_node, 0, item_name, strlen(item_name));
+// }
+
+// int ItemPnOutput::open_children(GsdmlAttrNav* attrnav, double x, double y)
+// {
+//   double node_x, node_y;
+
+//   brow_GetNodePosition(m_node, &node_x, &node_y);
+
+//   if (brow_IsOpen(m_node))
+//   {
+//     // Close
+//     brow_SetNodraw(attrnav->brow->ctx);
+//     brow_CloseNode(attrnav->brow->ctx, m_node);
+//     if (brow_IsOpen(m_node) & attrnav_mOpen_Children)
+//     {
+//       if (m_is_parent)
+//         brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_map);
+//       else
+//         brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_leaf);
+//     }
+//     brow_ResetOpen(m_node, attrnav_mOpen_All);
+//     brow_ResetNodraw(attrnav->brow->ctx);
+//     brow_Redraw(attrnav->brow->ctx, node_y);
+//   }
+//   else
+//   {
+//     brow_SetNodraw(attrnav->brow->ctx);
+
+//     for (unsigned int i = 0; i < output->DataItem.size(); i++)
+//     {
+//       new ItemPnDataItem(attrnav, (char*)output->DataItem[i]->Body.TextId.p,
+//                          output->DataItem[i], m_node, flow_eDest_IntoLast);
+//     }
+
+//     brow_SetOpen(m_node, attrnav_mOpen_Children);
+//     brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_openmap);
+//     brow_ResetNodraw(attrnav->brow->ctx);
+//     brow_Redraw(attrnav->brow->ctx, node_y);
+//   }
+//   return 1;
+// }
+
+// ItemPnDataItem::ItemPnDataItem(GsdmlAttrNav* attrnav, const char* item_name,
+//                                gsdml_DataItem* item_dataitem, brow_tNode
+//                                dest, flow_eDest dest_code)
+//     : dataitem(item_dataitem)
+// {
+//   m_type = attrnav_eItemType_PnDataItem;
+
+//   m_name = std::string(item_name);
+
+//   if (dataitem->BitDataItem.size())
+//     m_is_parent = 1;
+
+//   brow_CreateNode(attrnav->brow->ctx, item_name, attrnav->brow->nc_attr,
+//   dest,
+//                   dest_code, (void*)this, 1, &m_node);
+
+//   if (m_is_parent)
+//     brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_map);
+//   else
+//     brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_leaf);
+
+//   brow_SetAnnotation(m_node, 0, item_name, strlen(item_name));
+//   brow_SetAnnotation(m_node, 1, dataitem->Body.DataType,
+//                      strlen(dataitem->Body.DataType));
+// }
+
+// int ItemPnDataItem::open_children(GsdmlAttrNav* attrnav, double x, double y)
+// {
+//   double node_x, node_y;
+
+//   brow_GetNodePosition(m_node, &node_x, &node_y);
+
+//   if (brow_IsOpen(m_node))
+//   {
+//     // Close
+//     brow_SetNodraw(attrnav->brow->ctx);
+//     brow_CloseNode(attrnav->brow->ctx, m_node);
+//     if (brow_IsOpen(m_node) & attrnav_mOpen_Children)
+//     {
+//       if (m_is_parent)
+//         brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_map);
+//       else
+//         brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_leaf);
+//     }
+//     brow_ResetOpen(m_node, attrnav_mOpen_All);
+//     brow_ResetNodraw(attrnav->brow->ctx);
+//     brow_Redraw(attrnav->brow->ctx, node_y);
+//   }
+//   else
+//   {
+//     brow_SetNodraw(attrnav->brow->ctx);
+
+//     void* p;
+//     if (streq(dataitem->Body.DataType, "OctetString") ||
+//         streq(dataitem->Body.DataType, "VisibleString"))
+//     {
+//       p = (void*)&dataitem->Body.Length;
+//       new ItemPnBase(attrnav, "Length", "LocalGsdmlAttr", pwr_eType_UInt16,
+//                      sizeof(dataitem->Body.Length), 0, 0, p, 1, m_node,
+//                      flow_eDest_IntoLast);
+//     }
+//     p = (void*)dataitem->Body.DataType;
+//     new ItemPnBase(attrnav, "Type", "LocalGsdmlAttr", pwr_eType_String,
+//                    sizeof(dataitem->Body.DataType), 0, 0, p, 1, m_node,
+//                    flow_eDest_IntoLast);
+
+//     p = (void*)&dataitem->Body.UseAsBits;
+//     new ItemPnBase(attrnav, "UseAsBits", "LocalGsdmlAttr", pwr_eType_Boolean,
+//                    sizeof(dataitem->Body.UseAsBits), 0, 0, p, 1, m_node,
+//                    flow_eDest_IntoLast);
+
+//     for (unsigned int i = 0; i < dataitem->BitDataItem.size(); i++)
+//     {
+//       new ItemPnBitDataItem(
+//           attrnav, (char*)dataitem->BitDataItem[i]->Body.TextId.p,
+//           dataitem->BitDataItem[i], m_node, flow_eDest_IntoLast);
+//     }
+//     brow_SetOpen(m_node, attrnav_mOpen_Children);
+//     brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_openmap);
+//     brow_ResetNodraw(attrnav->brow->ctx);
+//     brow_Redraw(attrnav->brow->ctx, node_y);
+//   }
+//   return 1;
+// }
+
+// ItemPnBitDataItem::ItemPnBitDataItem(GsdmlAttrNav* attrnav,
+//                                      const char* item_name,
+//                                      gsdml_BitDataItem* item_bitdataitem,
+//                                      brow_tNode dest, flow_eDest dest_code)
+//     : bitdataitem(item_bitdataitem)
+// {
+//   m_type = attrnav_eItemType_PnBitDataItem;
+
+//   m_name = std::string(item_name);
+
+//   brow_CreateNode(attrnav->brow->ctx, item_name, attrnav->brow->nc_attr,
+//   dest,
+//                   dest_code, (void*)this, 1, &m_node);
+
+//   brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_leaf);
+
+//   brow_SetAnnotation(m_node, 0, item_name, strlen(item_name));
+// }
+
+// int ItemPnBitDataItem::open_children(GsdmlAttrNav* attrnav, double x, double
+// y)
+// {
+//   double node_x, node_y;
+
+//   brow_GetNodePosition(m_node, &node_x, &node_y);
+
+//   if (brow_IsOpen(m_node))
+//   {
+//     // Close
+//     brow_SetNodraw(attrnav->brow->ctx);
+//     brow_CloseNode(attrnav->brow->ctx, m_node);
+//     if (brow_IsOpen(m_node) & attrnav_mOpen_Children)
+//     {
+//       if (m_is_parent)
+//         brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_map);
+//       else
+//         brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_leaf);
+//     }
+//     brow_ResetOpen(m_node, attrnav_mOpen_All);
+//     brow_ResetNodraw(attrnav->brow->ctx);
+//     brow_Redraw(attrnav->brow->ctx, node_y);
+//   }
+//   else
+//   {
+//     brow_SetNodraw(attrnav->brow->ctx);
+
+//     void* p = (void*)&bitdataitem->Body.BitOffset;
+//     new ItemPnBase(attrnav, "BitOffset", "LocalGsdmlAttr", pwr_eType_UInt8,
+//                    sizeof(bitdataitem->Body.BitOffset), 0, 0, p, 1, m_node,
+//                    flow_eDest_IntoLast);
+
+//     brow_SetOpen(m_node, attrnav_mOpen_Children);
+//     brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_openmap);
+//     brow_ResetNodraw(attrnav->brow->ctx);
+//     brow_Redraw(attrnav->brow->ctx, node_y);
+//   }
+//   return 1;
+// }
+
+// ItemPnEnumByteOrder::ItemPnEnumByteOrder(GsdmlAttrNav* attrnav,
+//                                          const char* item_name,
+//                                          const char* attr, pwr_eType
+//                                          attr_type, int attr_size, void*
+//                                          attr_value_p, int attr_noedit,
+//                                          brow_tNode dest, flow_eDest
+//                                          dest_code)
+//     : ItemPnBase(attrnav, item_name, attr, attr_type, attr_size, 0, 0,
+//                  attr_value_p, attr_noedit, dest, dest_code)
+// {
+//   m_type = attrnav_eItemType_PnEnumByteOrder;
+//   brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_attrenum);
+// }
+
+// int ItemPnEnumByteOrder::open_children(GsdmlAttrNav* attrnav, double x,
+//                                        double y)
+// {
+//   double node_x, node_y;
+
+//   brow_GetNodePosition(m_node, &node_x, &node_y);
+
+//   if (brow_IsOpen(m_node))
+//   {
+//     // Close
+//     brow_SetNodraw(attrnav->brow->ctx);
+//     brow_CloseNode(attrnav->brow->ctx, m_node);
+//     if (brow_IsOpen(m_node) & attrnav_mOpen_Attributes)
+//       brow_RemoveAnnotPixmap(m_node, 1);
+//     if (brow_IsOpen(m_node) & attrnav_mOpen_Children)
+//       brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_attrenum);
+//     brow_ResetOpen(m_node, attrnav_mOpen_All);
+//     brow_ResetNodraw(attrnav->brow->ctx);
+//     brow_Redraw(attrnav->brow->ctx, node_y);
+//   }
+//   else if (!m_noedit)
+//   {
+//     int found;
+
+//     found = 0;
+//     brow_SetNodraw(attrnav->brow->ctx);
+//     new ItemPnEnumValue(attrnav, "LittleEndian", 0, pwr_eType_UInt32,
+//                         this->m_value_p, m_node, flow_eDest_IntoLast);
+//     new ItemPnEnumValue(attrnav, "BigEndian", 1, pwr_eType_UInt32,
+//                         this->m_value_p, m_node, flow_eDest_IntoLast);
+//     brow_SetOpen(m_node, attrnav_mOpen_Children);
+//     brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_openmap);
+//     brow_ResetNodraw(attrnav->brow->ctx);
+//     brow_Redraw(attrnav->brow->ctx, node_y);
+//   }
+//   return 1;
+// }
+
+// int ItemPnEnumByteOrder::scan(GsdmlAttrNav* attrnav, void* p)
+// {
+//   pwr_tString256 buf;
+
+//   if (!m_first_scan)
+//   {
+//     if (old_value == *(int*)p)
+//       // No change since last time
+//       return 1;
+//   }
+//   else
+//     m_first_scan = 0;
+
+//   if (*(int*)p == 0)
+//     strcpy(buf, "LittleEndian");
+//   else
+//     strcpy(buf, "BigEndian");
+
+//   brow_SetAnnotation(m_node, 1, buf, strlen(buf));
+//   old_value = *(int*)p;
+
+//   return 1;
+// }
+
+// ItemPnEnumTimeRatio::ItemPnEnumTimeRatio(
+//     GsdmlAttrNav* attrnav, const char* item_name,
+//     gsdml_InterfaceSubmoduleItem* item_interfacesubmodule, void*
+//     attr_value_p, brow_tNode dest, flow_eDest dest_code) :
+//     interfacesubmodule(item_interfacesubmodule), value_p(attr_value_p),
+//       first_scan(1), old_value(0)
+// {
+//   m_type = attrnav_eItemType_PnEnumTimeRatio;
+//   m_name = std::string(item_name);
+
+//   if (interfacesubmodule && interfacesubmodule->ApplicationRelations &&
+//       interfacesubmodule->ApplicationRelations->TimingProperties &&
+//       strcmp(interfacesubmodule->ApplicationRelations->TimingProperties->Body
+//                  .ReductionRatio.str,
+//              "") != 0)
+//     strncpy(valuelist_str,
+//             interfacesubmodule->ApplicationRelations->TimingProperties->Body
+//                 .ReductionRatio.str,
+//             sizeof(valuelist_str));
+//   else
+//     strcpy(valuelist_str, "1 2 4 8 16 32 64 128 256 512");
+
+//   brow_CreateNode(attrnav->brow->ctx, item_name, attrnav->brow->nc_attr,
+//   dest,
+//                   dest_code, (void*)this, 1, &m_node);
+
+//   brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_attrenum);
+
+//   brow_SetAnnotation(m_node, 0, item_name, strlen(item_name));
+//   brow_SetTraceAttr(m_node, m_name.c_str(), "", flow_eTraceType_User);
+// }
+
+// int ItemPnEnumTimeRatio::open_children(GsdmlAttrNav* attrnav, double x,
+//                                        double y)
+// {
+//   double node_x, node_y;
+
+//   brow_GetNodePosition(m_node, &node_x, &node_y);
+
+//   if (brow_IsOpen(m_node))
+//   {
+//     // Close
+//     brow_SetNodraw(attrnav->brow->ctx);
+//     brow_CloseNode(attrnav->brow->ctx, m_node);
+//     if (brow_IsOpen(m_node) & attrnav_mOpen_Attributes)
+//       brow_RemoveAnnotPixmap(m_node, 1);
+//     if (brow_IsOpen(m_node) & attrnav_mOpen_Children)
+//       brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_attrenum);
+//     brow_ResetOpen(m_node, attrnav_mOpen_All);
+//     brow_ResetNodraw(attrnav->brow->ctx);
+//     brow_Redraw(attrnav->brow->ctx, node_y);
+//   }
+//   else
+//   {
+//     int found;
+
+//     found = 0;
+
+//     brow_SetNodraw(attrnav->brow->ctx);
+
+//     gsdml_Valuelist* vl = new gsdml_Valuelist(valuelist_str);
+//     gsdml_ValuelistIterator iter(vl);
+
+//     for (unsigned int j = iter.begin(); j != iter.end(); j = iter.next())
+//     {
+//       char enumtext[20];
+//       sprintf(enumtext, "%d", j);
+
+//       new ItemPnEnumValue(attrnav, enumtext, j, pwr_eType_UInt32,
+//       this->value_p,
+//                           m_node, flow_eDest_IntoLast);
+//     }
+//     delete vl;
+
+//     brow_SetOpen(m_node, attrnav_mOpen_Children);
+//     brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_openmap);
+//     brow_ResetNodraw(attrnav->brow->ctx);
+//     brow_Redraw(attrnav->brow->ctx, node_y);
+//   }
+//   return 1;
+// }
+
+// int ItemPnEnumTimeRatio::scan(GsdmlAttrNav* attrnav, void* p)
+// {
+//   char buf[80];
+
+//   if (!first_scan)
+//   {
+//     if (old_value == *(int*)p)
+//       // No change since last time
+//       return 1;
+//   }
+//   else
+//   {
+//     if (*(int*)p == 0)
+//     {
+//       // Set initial value
+//       gsdml_Valuelist* vl = new gsdml_Valuelist(valuelist_str);
+//       gsdml_ValuelistIterator iter(vl);
+
+//       *(int*)p = iter.begin();
+//       delete vl;
+//     }
+//     first_scan = 0;
+//   }
+
+//   sprintf(buf, "%d", *(int*)p);
+
+//   brow_SetAnnotation(m_node, 1, buf, strlen(buf));
+//   old_value = *(int*)p;
+
+//   return 1;
+// }
+
+ItemPnEnumYesNo::ItemPnEnumYesNo(GsdmlAttrNav* attrnav, const char* name,
+                                 int* value_p, brow_tNode dest,
+                                 flow_eDest dest_code, char const* infotext)
+    : ItemPn(attrnav, attrnav_eItemType_PnEnumYesNo, name, infotext), m_value_p(value_p), m_old_value(0)
 {
-  type = attrnav_eItemType_PnEnumTimeRatio;
-  strcpy(name, item_name);
+  brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_attr, dest,
+                  dest_code, (void*)this, 1, &m_node);
 
-  if (interfacesubmodule && interfacesubmodule->ApplicationRelations &&
-      interfacesubmodule->ApplicationRelations->TimingProperties &&
-      strcmp(interfacesubmodule->ApplicationRelations->TimingProperties->Body
-                 .ReductionRatio.str,
-             "") != 0)
-    strncpy(valuelist_str,
-            interfacesubmodule->ApplicationRelations->TimingProperties->Body
-                .ReductionRatio.str,
-            sizeof(valuelist_str));
-  else
-    strcpy(valuelist_str, "1 2 4 8 16 32 64 128 256 512");
-
-  brow_CreateNode(attrnav->brow->ctx, item_name, attrnav->brow->nc_attr, dest,
-                  dest_code, (void*)this, 1, &node);
-
-  brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_attrenum);
-
-  brow_SetAnnotation(node, 0, item_name, strlen(item_name));
-  brow_SetTraceAttr(node, name, "", flow_eTraceType_User);
+  brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_attrenum);
+  brow_SetAnnotation(m_node, 0, m_name.c_str(), m_name.length());
+  brow_SetTraceAttr(m_node, m_name.c_str(), "", flow_eTraceType_User);
 }
 
-int ItemPnEnumTimeRatio::open_children(GsdmlAttrNav* attrnav, double x,
-                                       double y)
+int ItemPnEnumYesNo::scan(GsdmlAttrNav* attrnav, void* value_p)
 {
-  double node_x, node_y;
-
-  brow_GetNodePosition(node, &node_x, &node_y);
-
-  if (brow_IsOpen(node))
+  if (!m_first_scan)
   {
-    // Close
-    brow_SetNodraw(attrnav->brow->ctx);
-    brow_CloseNode(attrnav->brow->ctx, node);
-    if (brow_IsOpen(node) & attrnav_mOpen_Attributes)
-      brow_RemoveAnnotPixmap(node, 1);
-    if (brow_IsOpen(node) & attrnav_mOpen_Children)
-      brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_attrenum);
-    brow_ResetOpen(node, attrnav_mOpen_All);
-    brow_ResetNodraw(attrnav->brow->ctx);
-    brow_Redraw(attrnav->brow->ctx, node_y);
-  }
-  else
-  {
-    int found;
-
-    found = 0;
-
-    brow_SetNodraw(attrnav->brow->ctx);
-
-    gsdml_Valuelist* vl = new gsdml_Valuelist(valuelist_str);
-    gsdml_ValuelistIterator iter(vl);
-
-    for (unsigned int j = iter.begin(); j != iter.end(); j = iter.next())
-    {
-      char enumtext[20];
-      sprintf(enumtext, "%d", j);
-
-      new ItemPnEnumValue(attrnav, enumtext, j, pwr_eType_UInt32, this->value_p,
-                          node, flow_eDest_IntoLast);
-    }
-    delete vl;
-
-    brow_SetOpen(node, attrnav_mOpen_Children);
-    brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_openmap);
-    brow_ResetNodraw(attrnav->brow->ctx);
-    brow_Redraw(attrnav->brow->ctx, node_y);
-  }
-  return 1;
-}
-
-int ItemPnEnumTimeRatio::scan(GsdmlAttrNav* attrnav, void* p)
-{
-  char buf[80];
-
-  if (!first_scan)
-  {
-    if (old_value == *(int*)p)
-      // No change since last time
-      return 1;
-  }
-  else
-  {
-    if (*(int*)p == 0)
-    {
-      // Set initial value
-      gsdml_Valuelist* vl = new gsdml_Valuelist(valuelist_str);
-      gsdml_ValuelistIterator iter(vl);
-
-      *(int*)p = iter.begin();
-      delete vl;
-    }
-    first_scan = 0;
-  }
-
-  sprintf(buf, "%d", *(int*)p);
-
-  brow_SetAnnotation(node, 1, buf, strlen(buf));
-  old_value = *(int*)p;
-
-  return 1;
-}
-
-ItemPnParYesNo::ItemPnParYesNo(GsdmlAttrNav* attrnav, const char* item_name,
-                               int* attr_value_p, brow_tNode dest,
-                               flow_eDest dest_code)
-    : value_p(attr_value_p), old_value(0), first_scan(1)
-{
-  type = attrnav_eItemType_PnNetworkSettingYesNo;
-  strcpy(name, item_name);
-
-  brow_CreateNode(attrnav->brow->ctx, item_name, attrnav->brow->nc_attr, dest,
-                  dest_code, (void*)this, 1, &node);
-
-  brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_attrenum);
-  brow_SetAnnotation(node, 0, name, strlen(name));
-  brow_SetTraceAttr(node, name, "", flow_eTraceType_User);
-}
-
-int ItemPnParYesNo::scan(GsdmlAttrNav* attrnav, void* p)
-{
-  if (!first_scan)
-  {
-    if (old_value == *(int*)p)
+    if (m_old_value == *(int*)value_p)
       // No change since last time
       return 1;
   }
   else
-    first_scan = 0;
+    m_first_scan = 0;
 
-  int value = *(int*)p;
+  int value = *(int*)value_p;
 
   if (value == 0)
   {
-    brow_SetAnnotation(node, 1, "No", 2);
+    brow_SetAnnotation(m_node, 1, "No", 2);
   }
   else
   {
-    brow_SetAnnotation(node, 1, "Yes", 3);
+    brow_SetAnnotation(m_node, 1, "Yes", 3);
   }
 
-  old_value = *(int*)p;
+  m_old_value = *(int*)value_p;
   return 1;
 }
 
-int ItemPnParYesNo::open_children(GsdmlAttrNav* attrnav, double x, double y)
+int ItemPnEnumYesNo::open_children_impl()
 {
-  double node_x, node_y;
-
-  brow_GetNodePosition(node, &node_x, &node_y);
-
-  if (brow_IsOpen(node))
-  {
-    // Close
-    brow_SetNodraw(attrnav->brow->ctx);
-    brow_CloseNode(attrnav->brow->ctx, node);
-    if (brow_IsOpen(node) & attrnav_mOpen_Attributes)
-      brow_RemoveAnnotPixmap(node, 1);
-    if (brow_IsOpen(node) & attrnav_mOpen_Children)
-      brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_attrenum);
-    brow_ResetOpen(node, attrnav_mOpen_All);
-    brow_ResetNodraw(attrnav->brow->ctx);
-    brow_Redraw(attrnav->brow->ctx, node_y);
-  }
-  else
-  {
-    brow_SetNodraw(attrnav->brow->ctx);
-
-    new ItemPnEnumValue(attrnav, "No", 0, pwr_eType_UInt32, this->value_p, node,
-                        flow_eDest_IntoLast);
-    new ItemPnEnumValue(attrnav, "Yes", 1, pwr_eType_UInt32, this->value_p,
-                        node, flow_eDest_IntoLast);
-
-    brow_SetOpen(node, attrnav_mOpen_Children);
-    brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_openmap);
-    brow_ResetNodraw(attrnav->brow->ctx);
-    brow_Redraw(attrnav->brow->ctx, node_y);
-  }
+  m_attrnav->pn_runtime_data->save_to_file("testxmlfile"); // TODO Remove, this is for test :D
+  
+  new ItemPnEnumValue(m_attrnav, "No", 0, pwr_eType_UInt32, this->m_value_p,
+                      m_node, flow_eDest_IntoLast, "The opposite to Yes");
+  new ItemPnEnumValue(m_attrnav, "Yes", 1, pwr_eType_UInt32, this->m_value_p,
+                      m_node, flow_eDest_IntoLast, "The opposite to No");
   return 1;
 }
 
-ItemPnEnumSendClock::ItemPnEnumSendClock(
-    GsdmlAttrNav* attrnav, const char* item_name,
-    gsdml_InterfaceSubmoduleItem* item_interfacesubmodule, void* attr_value_p,
-    brow_tNode dest, flow_eDest dest_code)
-    : interfacesubmodule(item_interfacesubmodule), value_p(attr_value_p),
-      first_scan(1), old_value(0)
+// ItemPnEnumSendClock::ItemPnEnumSendClock(
+//     GsdmlAttrNav* attrnav, const char* item_name,
+//     gsdml_InterfaceSubmoduleItem* item_interfacesubmodule, void*
+//     attr_value_p, brow_tNode dest, flow_eDest dest_code) :
+//     interfacesubmodule(item_interfacesubmodule), value_p(attr_value_p),
+//       first_scan(1), old_value(0)
+// {
+//   m_type = attrnav_eItemType_PnEnumSendClock;
+//   m_name = std::string(item_name);
+
+//   if (interfacesubmodule && interfacesubmodule->ApplicationRelations &&
+//       interfacesubmodule->ApplicationRelations->TimingProperties &&
+//       strcmp(interfacesubmodule->ApplicationRelations->TimingProperties->Body
+//                  .SendClock.str,
+//              "") != 0)
+//     strncpy(valuelist_str,
+//             interfacesubmodule->ApplicationRelations->TimingProperties->Body
+//                 .SendClock.str,
+//             sizeof(valuelist_str));
+//   else
+//     strcpy(valuelist_str, "1 2 4 8 16 32 64 128");
+
+//   brow_CreateNode(attrnav->brow->ctx, item_name, attrnav->brow->nc_attr,
+//   dest,
+//                   dest_code, (void*)this, 1, &m_node);
+
+//   brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_attrenum);
+
+//   brow_SetAnnotation(m_node, 0, item_name, strlen(item_name));
+//   brow_SetTraceAttr(m_node, m_name.c_str(), "", flow_eTraceType_User);
+// }
+
+// int ItemPnEnumSendClock::open_children(GsdmlAttrNav* attrnav, double x,
+//                                        double y)
+// {
+//   double node_x, node_y;
+
+//   brow_GetNodePosition(m_node, &node_x, &node_y);
+
+//   if (brow_IsOpen(m_node))
+//   {
+//     // Close
+//     brow_SetNodraw(attrnav->brow->ctx);
+//     brow_CloseNode(attrnav->brow->ctx, m_node);
+//     if (brow_IsOpen(m_node) & attrnav_mOpen_Attributes)
+//       brow_RemoveAnnotPixmap(m_node, 1);
+//     if (brow_IsOpen(m_node) & attrnav_mOpen_Children)
+//       brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_attrenum);
+//     brow_ResetOpen(m_node, attrnav_mOpen_All);
+//     brow_ResetNodraw(attrnav->brow->ctx);
+//     brow_Redraw(attrnav->brow->ctx, node_y);
+//   }
+//   else
+//   {
+//     int found;
+
+//     found = 0;
+
+//     brow_SetNodraw(attrnav->brow->ctx);
+
+//     gsdml_Valuelist* vl = new gsdml_Valuelist(valuelist_str);
+//     gsdml_ValuelistIterator iter(vl);
+
+//     for (unsigned int j = iter.begin(); j != iter.end(); j = iter.next())
+//     {
+//       char enumtext[20];
+//       sprintf(enumtext, "%d", j);
+
+//       new ItemPnEnumValue(attrnav, enumtext, j, pwr_eType_UInt32,
+//       this->value_p,
+//                           m_node, flow_eDest_IntoLast);
+//     }
+//     delete vl;
+
+//     brow_SetOpen(m_node, attrnav_mOpen_Children);
+//     brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_openmap);
+//     brow_ResetNodraw(attrnav->brow->ctx);
+//     brow_Redraw(attrnav->brow->ctx, node_y);
+//   }
+//   return 1;
+// }
+
+// int ItemPnEnumSendClock::scan(GsdmlAttrNav* attrnav, void* p)
+// {
+//   char buf[80];
+
+//   if (!first_scan)
+//   {
+//     if (old_value == *(int*)p)
+//       // No change since last time
+//       return 1;
+//   }
+//   else
+//   {
+//     if (*(int*)p == 0)
+//     {
+//       // Set initial value
+//       gsdml_Valuelist* vl = new gsdml_Valuelist(valuelist_str);
+//       gsdml_ValuelistIterator iter(vl);
+
+//       *(int*)p = iter.begin();
+//       delete vl;
+//     }
+//     first_scan = 0;
+//   }
+
+//   sprintf(buf, "%d", *(int*)p);
+
+//   brow_SetAnnotation(m_node, 1, buf, strlen(buf));
+//   old_value = *(int*)p;
+
+//   return 1;
+// }
+
+ItemPnEnumRTClass::ItemPnEnumRTClass(GsdmlAttrNav* attrnav, const char* name,
+                  std::shared_ptr<GSDML::InterfaceSubmoduleItem> interface_submodule_item,
+                  std::string* pwr_pn_value_p, brow_tNode dest, flow_eDest dest_code)
+  : ItemPn(attrnav, attrnav_eItemType_PnEnumRTClass, name, "Choose (from supported classes) what RT Class you want.\nRT_CLASS_UDP: RT over UDP/IP (Not used much nowadays)\nRT_CLASS_1: RT (for CC-A and CC-B)\nRT_CLASS_2: IRT (Not used today, deprecated)\nRT_CLASS_3: IRT (CC-C)"),
+    ISelection<std::string>(pwr_pn_value_p),
+    m_interface_submodule_item(interface_submodule_item)
 {
-  type = attrnav_eItemType_PnEnumSendClock;
-  strcpy(name, item_name);
+  brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_attr, dest,
+                  dest_code, (void*)this, 1, &m_node);
+  brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_attrenum);
+  brow_SetAnnotation(m_node, 0, m_name.c_str(), m_name.length());
 
-  if (interfacesubmodule && interfacesubmodule->ApplicationRelations &&
-      interfacesubmodule->ApplicationRelations->TimingProperties &&
-      strcmp(interfacesubmodule->ApplicationRelations->TimingProperties->Body
-                 .SendClock.str,
-             "") != 0)
-    strncpy(valuelist_str,
-            interfacesubmodule->ApplicationRelations->TimingProperties->Body
-                .SendClock.str,
-            sizeof(valuelist_str));
+  // No value set (either from read file or from earlier selections)  
+  if (*m_value_p == "")
+  {
+    if (interface_submodule_item->_SupportedRT_Classes.getList().size())
+      set_default(interface_submodule_item->_SupportedRT_Classes.getList()[0]);
+    else
+      set_default("RT_CLASS_1");
+  } 
   else
-    strcpy(valuelist_str, "1 2 4 8 16 32 64 128");
-
-  brow_CreateNode(attrnav->brow->ctx, item_name, attrnav->brow->nc_attr, dest,
-                  dest_code, (void*)this, 1, &node);
-
-  brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_attrenum);
-
-  brow_SetAnnotation(node, 0, item_name, strlen(item_name));
-  brow_SetTraceAttr(node, name, "", flow_eTraceType_User);
+  {
+    set_default(*m_value_p);
+  }
 }
 
-int ItemPnEnumSendClock::open_children(GsdmlAttrNav* attrnav, double x,
-                                       double y)
-{
-  double node_x, node_y;
-
-  brow_GetNodePosition(node, &node_x, &node_y);
-
-  if (brow_IsOpen(node))
-  {
-    // Close
-    brow_SetNodraw(attrnav->brow->ctx);
-    brow_CloseNode(attrnav->brow->ctx, node);
-    if (brow_IsOpen(node) & attrnav_mOpen_Attributes)
-      brow_RemoveAnnotPixmap(node, 1);
-    if (brow_IsOpen(node) & attrnav_mOpen_Children)
-      brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_attrenum);
-    brow_ResetOpen(node, attrnav_mOpen_All);
-    brow_ResetNodraw(attrnav->brow->ctx);
-    brow_Redraw(attrnav->brow->ctx, node_y);
-  }
-  else
-  {
-    int found;
-
-    found = 0;
-
-    brow_SetNodraw(attrnav->brow->ctx);
-
-    gsdml_Valuelist* vl = new gsdml_Valuelist(valuelist_str);
-    gsdml_ValuelistIterator iter(vl);
-
-    for (unsigned int j = iter.begin(); j != iter.end(); j = iter.next())
-    {
-      char enumtext[20];
-      sprintf(enumtext, "%d", j);
-
-      new ItemPnEnumValue(attrnav, enumtext, j, pwr_eType_UInt32, this->value_p,
-                          node, flow_eDest_IntoLast);
+int ItemPnEnumRTClass::open_children_impl()
+{  
+    // Create our enum values if we have more than one value to choose from :)
+    if (m_interface_submodule_item && m_interface_submodule_item->_SupportedRT_Classes.getList().size() > 1)
+    {       
+      for (auto const& rt_class : m_interface_submodule_item->_SupportedRT_Classes.getList())
+      {
+        new ItemPnValueSelectItem<std::string>(m_attrnav, pwr_eType_String, rt_class.c_str(), "", this, m_value_p, rt_class, rt_class.c_str(), m_node, flow_eDest_IntoLast);
+      }
     }
-    delete vl;
-
-    brow_SetOpen(node, attrnav_mOpen_Children);
-    brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_openmap);
-    brow_ResetNodraw(attrnav->brow->ctx);
-    brow_Redraw(attrnav->brow->ctx, node_y);
-  }
-  return 1;
-}
-
-int ItemPnEnumSendClock::scan(GsdmlAttrNav* attrnav, void* p)
-{
-  char buf[80];
-
-  if (!first_scan)
-  {
-    if (old_value == *(int*)p)
-      // No change since last time
-      return 1;
-  }
-  else
-  {
-    if (*(int*)p == 0)
-    {
-      // Set initial value
-      gsdml_Valuelist* vl = new gsdml_Valuelist(valuelist_str);
-      gsdml_ValuelistIterator iter(vl);
-
-      *(int*)p = iter.begin();
-      delete vl;
+    else if (m_interface_submodule_item && m_interface_submodule_item->_SupportedRT_Classes.getList().size() == 1)
+    {      
+      auto const& rt_class = m_interface_submodule_item->_SupportedRT_Classes.getList()[0];
+      new ItemPnValueSelectItem<std::string>(m_attrnav, pwr_eType_String, rt_class.c_str(), "hej", this, m_value_p, rt_class, rt_class.c_str(), m_node, flow_eDest_IntoLast);
     }
-    first_scan = 0;
-  }
-
-  sprintf(buf, "%d", *(int*)p);
-
-  brow_SetAnnotation(node, 1, buf, strlen(buf));
-  old_value = *(int*)p;
+    else
+    {
+      // Default if no interface submodule exists at all (older specs don't have this and the default is RT_CLASS_1, regular RT)
+      std::string rt_class("RT_CLASS_1");
+      new ItemPnValueSelectItem<std::string>(m_attrnav, pwr_eType_String, rt_class.c_str(), "(hej)", this, m_value_p, rt_class, rt_class.c_str(), m_node, flow_eDest_IntoLast);
+    }
 
   return 1;
 }
+
+void ItemPnEnumRTClass::select(ItemPnValueSelectItem<std::string> const* selected_item) const
+{
+  // Store data  
+  *m_value_p = selected_item->value();
+  brow_SetAnnotation(m_node, 1, m_value_p->c_str(), m_value_p->length());
+  // Close this node, for this class we have a saved reference to attrnav as e member variable
+  double node_x, node_y;
+  brow_GetNodePosition(m_node, &node_x, &node_y);
+  ItemPn::close(m_attrnav, node_x, node_y);
+}
+
+void ItemPnEnumRTClass::set_default(std::string default_value)
+{
+  *m_value_p = default_value;
+  brow_SetAnnotation(m_node, 1, m_value_p->c_str(), m_value_p->length());
+}
+
+/* ======================================= Skip IP Assignment node ======================================= */
+
+ItemPnSkipIPAssignment::ItemPnSkipIPAssignment(GsdmlAttrNav* attrnav, const char* name,
+                  bool* pwr_pn_value_p, brow_tNode dest, flow_eDest dest_code)
+  : ItemPn(attrnav, attrnav_eItemType_PnSkipIPAssignment, name, "Select yes here if you want another supervisor or controller to handle the IP assignment"),
+  ISelection<bool>(pwr_pn_value_p)
+{
+  brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_attr, dest,
+                  dest_code, (void*)this, 1, &m_node);
+  brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_attrenum);
+  brow_SetAnnotation(m_node, 0, m_name.c_str(), m_name.length());
+
+  set_default(*m_value_p);
+}
+
+int ItemPnSkipIPAssignment::open_children_impl()
+{
+    new ItemPnValueSelectItem<bool>(m_attrnav, pwr_eType_Boolean, "Yes", "hej", this, m_value_p, true, "Select to skip IP assignment", m_node, flow_eDest_IntoLast);
+    new ItemPnValueSelectItem<bool>(m_attrnav, pwr_eType_Boolean, "No", "hej", this, m_value_p, false, "Select to let ProviewR handle the IP assignment", m_node, flow_eDest_IntoLast);
+
+    return 1;
+}
+
+void ItemPnSkipIPAssignment::select(ItemPnValueSelectItem<bool> const* selected_item) const
+{
+  // Store data  
+  *m_value_p = selected_item->value();
+
+  if (*m_value_p)  
+    brow_SetAnnotation(m_node, 1, "Yes", sizeof("Yes"));
+  else
+    brow_SetAnnotation(m_node, 1, "No", sizeof("No"));
+
+  // Close this node, for this class we have a saved reference to attrnav as e member variable
+  double node_x, node_y;
+  brow_GetNodePosition(m_node, &node_x, &node_y);
+  ItemPn::close(m_attrnav, node_x, node_y);
+}
+
+void ItemPnSkipIPAssignment::set_default(bool default_value)
+{
+  *m_value_p = default_value;
+  if (*m_value_p)  
+    brow_SetAnnotation(m_node, 1, "Yes", sizeof("Yes"));
+  else
+    brow_SetAnnotation(m_node, 1, "No", sizeof("No"));
+}
+
+/* ======================================= END Skip IP Assignment node ======================================= */
+
+/* ======================================= IPv4 Input Node ======================================= */
+
+ItemPnIPv4Input::ItemPnIPv4Input(GsdmlAttrNav* attrnav, const char* name, const char* extra_text,
+      std::string* value_p, const char* infotext, brow_tNode dest, flow_eDest dest_code)
+  : ItemPnValueInput<std::string>(attrnav, pwr_eType_String, name, extra_text,
+    value_p, infotext, dest, dest_code) 
+{
+}
+
+void ItemPnIPv4Input::value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str)
+{
+  std::cout << "Implementation specific value_changed_impl called, value: " << value_str << std::endl;
+}
+
+// int ItemPnIPv4Input::scan(GsdmlAttrNav* attrnav, void* value_p)
+// {
+//   T* = (T*)value_p;
+// }
+
+// void ItemPnIPv4Input::set_default(std::string default_value)
+// {  
+//   *m_value_p = default_value;
+// }
+
+// void ItemPnIPv4Input::update_value(std::string new_value)
+// {
+//   *m_value_p = new_value;
+// }
+
+/* ======================================= END IPv4 Input Node ======================================= */

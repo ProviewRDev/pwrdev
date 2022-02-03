@@ -42,6 +42,7 @@
 typedef struct
 {
   pn_gsdml* gsdml;
+  std::shared_ptr<ProfinetRuntimeData> pwr_pn_data;
   GsdmlAttr* attr;
   pwr_tAttrRef aref;
   gsdml_sModuleClass* mc;
@@ -49,7 +50,7 @@ typedef struct
 } xtt_pndevice_sCtx;
 
 pwr_tStatus xtt_pndevice_create_ctx(pwr_tAttrRef aref, void* editor_ctx,
-                                    xtt_pndevice_sCtx** ctxp);
+                                    xtt_pndevice_sCtx** ctxp, char const* pwr_pn_data_file);
 int xtt_pndevice_help_cb(void* sctx, const char* text);
 void xtt_pndevice_close_cb(void* sctx);
 int xtt_pndevice_save_cb(void* sctx);

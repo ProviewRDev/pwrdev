@@ -39,33 +39,39 @@
 
 /* cow_pn_gsdml_attrnav.h -- Profibus gsd configurator navigator */
 
+#include <memory>
+
 #include "flow_browapi.h"
 
 #include "cow_pn_gsdml_attr.h"
 
 #define pn_cModuleClassFile "$pwr_exe/pn_module_classes.dat"
 
-typedef enum {
-  attrnav_eItemType_PnBase,
-  attrnav_eItemType_PnEnumValue,
-  attrnav_eItemType_PnDevice,
-  attrnav_eItemType_PnNetwork,
-  attrnav_eItemType_PnNetworkSettingYesNo,
+typedef enum
+{
+  attrnav_eItemType_,
+  attrnav_eItemType_PnBase, // Base item for input values such as IP, MAC
+  attrnav_eItemType_PnEnumValue, // Generic Enumeration value, used in PnEnum's
+  attrnav_eItemType_PnDevice, // The DAP selection class, need a better name
+  attrnav_eItemType_PnIDSelectValue, // Selection of ID for a module or submodule
+  attrnav_eItemType_PnNetwork, // Displays the network settings
+  attrnav_eItemType_PnEnumYesNo, // Simple enum for a Yes/No selection
   attrnav_eItemType_PnDeviceInfo,
-  attrnav_eItemType_PnDAP,
-  attrnav_eItemType_PnInterfaceSubmodule,
-  attrnav_eItemType_PnPortSubmodule,
-  attrnav_eItemType_PnSlot,
-  attrnav_eItemType_PnSubslot,
-  attrnav_eItemType_PnSubslotPhys,
-  attrnav_eItemType_PnModuleInfo,
-  attrnav_eItemType_PnModuleType,
-  attrnav_eItemType_PnSubmoduleType,
-  attrnav_eItemType_PnParRecord,
-  attrnav_eItemType_PnParValue,
-  attrnav_eItemType_PnParEnum,
-  attrnav_eItemType_PnParEnumBit,
-  attrnav_eItemType_PnParEnumValue,
+  attrnav_eItemType_PnDAP, // The actual DAP selected by the PnDevice class
+  attrnav_eItemType_PnInterfaceSubmodule, // Represents the interface submodule in the DAP
+  attrnav_eItemType_PnPortSubmodule, // Represents the selcted port submodule in the DAP
+  attrnav_eItemType_PnSlot, // A slot in which you can fit a Module
+  attrnav_eItemType_PnSubslot, // A subslot in which a Submodule can go
+  attrnav_eItemType_PnSubslotPhys, // Not used yet
+  attrnav_eItemType_PnModuleInfo, // Displays the element ModuleInfo
+  attrnav_eItemType_PnModuleSelect, // Selects a module to go in a Slot for instance
+  attrnav_eItemType_PnSubmoduleSelection,
+  attrnav_eItemType_PnSubmoduleType, // Selects a submodule to go in a subslot. Need a new name
+  attrnav_eItemType_PnParRecord, // A ParameterRecordDataItem
+  attrnav_eItemType_PnParValue, // A Parameter value input
+  attrnav_eItemType_PnParEnum, // A Parameter enumeration when selecting from a (often smaller) known set of values
+  attrnav_eItemType_PnParEnumBit, // THe actual value selection when ParEnum is a bit
+  attrnav_eItemType_PnParEnumValue, // The actual value selection when ParEnum is not a bit.
   attrnav_eItemType_PnModuleClass,
   attrnav_eItemType_PnIOData,
   attrnav_eItemType_PnInput,
@@ -75,10 +81,16 @@ typedef enum {
   attrnav_eItemType_PnEnumByteOrder,
   attrnav_eItemType_PnEnumTimeRatio,
   attrnav_eItemType_PnEnumSendClock,
-  attrnav_eItemType_PnEnumValueMType
+  attrnav_eItemType_PnEnumValueMType,
+
+  attrnav_eItemType_PnValueSelectItem,
+  attrnav_eItemType_PnValueInput,
+  attrnav_eItemType_PnEnumRTClass,
+  attrnav_eItemType_PnSkipIPAssignment
 } attrnav_eItemType;
 
-typedef enum {
+typedef enum
+{
   attrnav_mOpen_All = ~0,
   attrnav_mOpen_Children = 1 << 0,
   attrnav_mOpen_Attributes = 1 << 1
@@ -123,32 +135,10 @@ class CoWowTimer;
 class GsdmlAttrNav
 {
 public:
-  void* parent_ctx;
-  pn_gsdml* gsdml;
-  char name[80];
-  GsdmlAttrNavBrow* brow;
-  attr_sItem* itemlist;
-  int item_cnt;
-  int edit_mode;
-  int trace_started;
-  void (*message_cb)(void*, char, const char*);
-  void (*change_value_cb)(void*);
-  CoWow* wow;
-  CoWowTimer* trace_timerid;
-  unsigned int device_num;
-  gsdml_DeviceAccessPointItem* device_item;
-  int device_confirm_active;
-  int modified;
-  GsdmlDeviceData dev_data;
-  int device_read;
-  int viewio;
-  unsigned int time_ratio;
-  unsigned int send_clock;
-  unsigned int phase;
-  attr_eOrderModuleType order_moduletype;
-
   GsdmlAttrNav(void* xn_parent_ctx, const char* xn_name, pn_gsdml* xn_gsd,
-               int xn_edit_mode, pwr_tStatus* status);
+               int xn_edit_mode,
+               std::shared_ptr<ProfinetRuntimeData> pwr_pn_data,
+               pwr_tStatus* status);
   virtual ~GsdmlAttrNav();
 
   virtual void display_attr_help_text() {}
@@ -156,7 +146,7 @@ public:
 
   void start_trace(pwr_tObjid Objid, char* object_str);
   int set_attr_value(const char* value_str);
-  int check_attr_value(char** value);
+  int check_attr_value(std::string& p_value);
   int get_select(pwr_sAttrRef* attrref, int* is_attr);
   void message(char sev, const char* text);
   void force_trace_scan();
@@ -166,8 +156,8 @@ public:
   void zoom(double zoom_factor);
   void unzoom();
   void get_zoom(double* zoom_factor);
-  void set_modified(int value) { modified = value; }
-  int is_modified() { return modified; }
+  void set_modified(bool value) { modified = value; }
+  bool is_modified() { return modified; }
   int save(const char* filename);
   int open(const char* filename);
   void collapse();
@@ -181,116 +171,213 @@ public:
     order_moduletype = type;
   }
 
+  /* static member function */
   static void trace_scan(void* data);
   static int trace_scan_bc(brow_tObject object, void* p);
   static int trace_connect_bc(brow_tObject object, char* name, char* attr,
                               flow_eTraceType type, void** p);
   static int trace_disconnect_bc(brow_tObject object);
   static int init_brow_cb(FlowCtx* fctx, void* client_data);
-  static int attr_string_to_value(int type_id, const char* value_str,
-                                  void* buffer_ptr, int buff_size,
-                                  int attr_size);
-  static void attrvalue_to_string(int type_id, void* value_ptr, char* str,
-                                  int size, int* len, char* format);
+  // static int attr_string_to_value(int type_id, const char* value_str,
+  //                                 void* buffer_ptr, int buff_size,
+  //                                 int attr_size);
+  // static void attr_value_to_string(int type_id, void const* value_ptr,
+  //                                  char* str, int size, int* len, char* format);
   static int brow_cb(FlowCtx* ctx, flow_tEvent event);
   static void device_changed_ok(void* ctx, void* data);
   static void device_changed_cancel(void* ctx, void* data);
   static pwr_tBoolean device_check_change_ok(void* ctx);
   static void device_update_change(void* ctx);
+
+  /* member variables */
+  void* parent_ctx;
+  pn_gsdml* gsdml;
+  pwr_tString256 m_name;
+  GsdmlAttrNavBrow* brow;
+  attr_sItem* itemlist;
+  int item_cnt;
+  int edit_mode;
+  int trace_started;
+  void (*message_cb)(void*, char, const char*);
+  void (*change_value_cb)(void*);
+  CoWow* m_wow;
+  CoWowTimer* trace_timerid;
+  // unsigned int device_num; TODO Really needed? This data is always accessible
+  // through pn_runtime_data....
+  //gsdml_DeviceAccessPointItem* device_item;
+  std::shared_ptr<GSDML::DeviceAccessPointItem> m_selected_device_item;
+  int device_confirm_active;
+  GsdmlDeviceData dev_data;
+  // static ProfinetRuntimeData pn_runtime_data;
+  std::shared_ptr<ProfinetRuntimeData> pn_runtime_data;
+  int device_read;
+  int viewio;
+  // unsigned int time_ratio;
+  // unsigned int send_clock;
+  // unsigned int phase;
+  attr_eOrderModuleType order_moduletype;
+
+private:
+  bool modified;
 };
 
 class ItemPn
 {
 public:
-  ItemPn() : parent(0), info_text(0) {}
-  ItemPn(const char* info_text) : parent(0), info_text(info_text) {}
-  attrnav_eItemType type;
-  brow_tNode node;
-  char name[120];
-  int parent;
-  const char* info_text;
-
-  virtual ~ItemPn() {}
-
-  virtual int open_children(GsdmlAttrNav* attrnav, double x, double y)
+  // ItemPn() : m_value_type(pwr_eType_), m_is_parent(0), m_first_scan(1), m_noedit(1), m_has_settings(false) {}
+  // ItemPn(char const* infotext)
+  //     : m_value_type(pwr_eType_), m_is_parent(0), m_infotext(infotext ? infotext : ""), m_first_scan(1),
+  //       m_noedit(1), m_has_settings(false)
+  // {
+  // }
+  ItemPn(GsdmlAttrNav* attrnav, attrnav_eItemType type, std::string name, std::string infotext,
+         int is_parent = 0)
+      : m_type(type), m_value_type(pwr_eType_), m_name(name), m_is_parent(is_parent), m_infotext(infotext),
+        m_first_scan(1), m_noedit(1), m_has_settings(false), m_attrnav(attrnav)
   {
-    return 1;
   }
-  virtual int close(GsdmlAttrNav* attrnav, double x, double y);
-  virtual int scan(GsdmlAttrNav* attrnav, void* p) { return 1; }
-  virtual void update(GsdmlAttrNav* attrnav) {}
+
+  attrnav_eItemType m_type;  
+  pwr_eType m_value_type; // If a subclass of this class is a carrier of data we can deduce what type of data using this.
+  brow_tNode m_node;
+  std::string m_name;
+  int m_is_parent;
+  std::string m_infotext;
+  int m_first_scan;
+  int m_noedit;
+  bool m_has_settings;
+  GsdmlAttrNav* m_attrnav;
+
+  virtual ~ItemPn() = default;
+
+  // Open the node, missleading name saying open children...
+  virtual int open_children(GsdmlAttrNav* attrnav, double x, double y) final;
+  virtual int open_children_impl() = 0;
+
+
+  // The item is selected, such as an enum being selected, a parent about to be
+  // opened, or a parameter value...
+  // Use ( in brow_cb() ) to call templated implementation specifics to regain RTTI
+  virtual void selected(GsdmlAttrNav* attrnav){};
+
+  // Called when user types input in a command input field
+  // Use to call templated implementation specifics to regain RTTI
   virtual void value_changed(GsdmlAttrNav* attrnav, const char* value_str) {}
+
+  // If this is a value of some sort. Return string representation as an rvalue ref
+  virtual std::string&& to_string() { return std::move(std::string("")); }
+
+  int virtual close(GsdmlAttrNav* attrnav, double x, double y) const final;
+  virtual int scan(GsdmlAttrNav* attrnav, void* p) { return 1; }
+  
+  virtual void update(GsdmlAttrNav* attrnav) {} //TODO What's this?
 };
 
-//! Item for a normal attribute.
+/*
+  Display Information as text/numbers
+*/
+class ItemPnInfo : public ItemPn
+{
+public:
+  ItemPnInfo(GsdmlAttrNav* attrnav, const char* item_name,
+             const char* trace_attr_name, pwr_eType pwr_type_id, size_t attr_size,
+             void const* value_p, brow_tNode dest, flow_eDest dest_code, const char* infotext);
+
+  pwr_eType m_pwr_type_id;
+
+  int open_children_impl() override { return 1; } // Must override for concrete class
+};
+
+/*
+  A normal attribute, int, float, string and so on.
+*/
 class ItemPnBase : public ItemPn
 {
 public:
-  ItemPnBase(GsdmlAttrNav* attrnav, const char* item_name, const char* attr,
-             int attr_type, int attr_size, double attr_min_limit,
-             double attr_max_limit, void* attr_value_p, int attr_noedit,
-             brow_tNode dest, flow_eDest dest_code);
-  void* value_p;
-  char old_value[80];
-  int first_scan;
-  int type_id;
-  int size;
-  double min_limit;
-  double max_limit;
-  int noedit;
-  int subgraph;
+  ItemPnBase(GsdmlAttrNav* attrnav, const char* item_name,
+             const char* trace_attr_name, pwr_eType attr_type, size_t attr_size,
+             double attr_min_limit, double attr_max_limit, void* attr_value_p,
+             int attr_noedit, brow_tNode dest, flow_eDest dest_code, const char* infotext);
 
-  virtual int scan(GsdmlAttrNav* attrnav, void* p);
-  virtual void value_changed(GsdmlAttrNav* attrnav, const char* value_str);
+  void* m_value_p;
+  void const* m_const_value_p;
+  pwr_tString256 m_old_value;
+  
+  size_t m_size;
+  double m_min_limit;
+  double m_max_limit;
+  //int m_subgraph;
+
+  virtual int scan(GsdmlAttrNav* attrnav, void* value) override;
+  virtual void value_changed(GsdmlAttrNav* attrnav,
+                             const char* value_str) override;
+  int open_children_impl() override { return 1; }
 };
 
-//! Item for an enum attribute.
+class ItemPnIDSelectValue : public ItemPn
+{
+public:
+  ItemPnIDSelectValue(GsdmlAttrNav* attrnav, const char* item_name,
+                   std::string id_enum_value, std::string* id_p,
+                   brow_tNode dest, flow_eDest dest_code,
+                   const char* info_text = 0);
+  std::string m_id_enum_value;
+  std::string* m_id;
+  std::string m_old_value;
+
+  void selected(GsdmlAttrNav* attrnav) override;
+  int scan(GsdmlAttrNav* attrnav, void* mod_id_p);
+  int open_children_impl() override { return 1; }
+};
+
+//! Item for a generic enum attribute.
 class ItemPnEnumValue : public ItemPn
 {
 public:
-  ItemPnEnumValue(GsdmlAttrNav* attrnav, const char* item_name, int item_num,
-                  int item_type_id, void* attr_value_p, brow_tNode dest,
-                  flow_eDest dest_code, const char* info_text = 0);
-  int num;
-  int type_id;
-  void* value_p;
-  int old_value;
-  int first_scan;
+  ItemPnEnumValue(GsdmlAttrNav* attrnav, const char* item_name,
+                  int item_enum_value, pwr_eType item_type_id,
+                  void* attr_value_p, brow_tNode dest, flow_eDest dest_code,
+                  const char* info_text = 0);
+  int m_enum_value;
+  pwr_eType m_type_id;
+  void* m_value_p;
+  int m_old_value;
 
   int scan(GsdmlAttrNav* attrnav, void* p);
+  int open_children_impl() override { return 1; }
 };
 
 //! Item for an enum attribute.
-class ItemPnEnumValueMType : public ItemPn
-{
-public:
-  ItemPnEnumValueMType(GsdmlAttrNav* attrnav, const char* item_name,
-                       const char* item_number, int item_num, int item_type_id,
-                       void* attr_value_p, brow_tNode dest,
-                       flow_eDest dest_code, const char* info_text = 0);
-  int num;
-  int type_id;
-  void* value_p;
-  int old_value;
-  int first_scan;
-  char number[80];
+// class ItemPnEnumValueMType : public ItemPn
+// {
+// public:
+//   ItemPnEnumValueMType(GsdmlAttrNav* attrnav, const char* item_name,
+//                        const char* item_number, int item_num, int item_type_id,
+//                        void* attr_value_p, brow_tNode dest,
+//                        flow_eDest dest_code, const char* info_text = 0);
+//   int num;
+//   int type_id;
+//   void* value_p;
+//   int old_value;
+//   int first_scan;
+//   char number[80];
 
-  int scan(GsdmlAttrNav* attrnav, void* p);
-};
+//   int scan(GsdmlAttrNav* attrnav, void* p);
+// };
 
-//! Item for a device.
+//! Item for a device aka DAP. A DAP can be considered just like a module only that it's always mounted in slot 0.
+// Therefore it makes use of the ItemPnModuleEnumValue for selecting what DAP to use...
 class ItemPnDevice : public ItemPn
 {
 public:
   ItemPnDevice(GsdmlAttrNav* attrnav, const char* item_name, brow_tNode dest,
-               flow_eDest dest_code);
+               flow_eDest dest_code, const char* infotext);
   virtual ~ItemPnDevice() {}
 
-  int old_value;
-  int first_scan;
+  std::string m_old_value;
 
-  int open_children(GsdmlAttrNav* attrnav, double x, double y);
-  int scan(GsdmlAttrNav* attrnav, void* p);
+  int open_children_impl();
+  int scan(GsdmlAttrNav* attrnav, void* value_p);
 };
 
 //! Item for a slot.
@@ -298,15 +385,14 @@ class ItemPnSlot : public ItemPn
 {
 public:
   ItemPnSlot(GsdmlAttrNav* attrnav, const char* item_name,
-             GsdmlSlotData* item_slotdata, brow_tNode dest,
-             flow_eDest dest_code);
+             ProfinetSlot* item_slotdata, brow_tNode dest,
+             flow_eDest dest_code, const char* infotext);
   virtual ~ItemPnSlot() {}
 
-  GsdmlSlotData* slotdata;
-  int old_value;
-  int first_scan;
+  ProfinetSlot* m_slotdata;
+  std::string m_old_value;
 
-  int open_children(GsdmlAttrNav* attrnav, double x, double y);
+  int open_children_impl();
   int scan(GsdmlAttrNav* attrnav, void* p);
 };
 
@@ -315,35 +401,46 @@ class ItemPnSubslot : public ItemPn
 {
 public:
   ItemPnSubslot(GsdmlAttrNav* attrnav, const char* item_name,
-                GsdmlSubslotData* item_subslotdata,
-                gsdml_VirtualSubmoduleItem* item_virtualsubmodule,
-                int item_slot_idx, brow_tNode dest, flow_eDest dest_code);
-  virtual ~ItemPnSubslot() {}
+                ProfinetSubslot* subslot_data,
+                std::shared_ptr<GSDML::ModuleItem> parent_module_item,
+                uint subslot_number,
+                std::shared_ptr<GSDML::SubmoduleItem> attached_submodule_item,
+                brow_tNode dest, flow_eDest dest_code, const char* infotext);
 
-  GsdmlSubslotData* subslotdata;
-  gsdml_VirtualSubmoduleItem* virtualsubmodule;
-  int slot_idx;
+  ProfinetSubslot* m_subslot_data;
+  std::shared_ptr<GSDML::ModuleItem> m_parent_module_item;
+  uint m_subslot_number;
+  bool m_is_selectable; 
+  std::shared_ptr<GSDML::SubmoduleItem> m_attached_submodule_item;   
 
-  int open_children(GsdmlAttrNav* attrnav, double x, double y);
+  // Trace compare
+  std::string m_old_value;
+
+  int open_children_impl() override;
+  int scan(GsdmlAttrNav* attrnav, void* dummy_p) override;
+
+private:
+  void display_interface_submodule();
+  void display_port_submodule();
 };
 
 //! Item for a physical subslot.
-class ItemPnSubslotPhys : public ItemPn
+class ItemPnSubmoduleSelection : public ItemPn
 {
 public:
-  ItemPnSubslotPhys(GsdmlAttrNav* attrnav, const char* item_name,
-                    GsdmlSubslotData* item_subslotdata,
-                    gsdml_VirtualSubmoduleItem* item_virtualsubmodule,
-                    int item_slot_idx, gsdml_UseableSubmodules* item_us,
-                    brow_tNode dest, flow_eDest dest_code);
-  virtual ~ItemPnSubslotPhys() {}
+  ItemPnSubmoduleSelection(GsdmlAttrNav* attrnav, const char* item_name,
+                    ProfinetSubslot* subslot_data,
+                    uint subslot_number,
+                    std::shared_ptr<GSDML::ModuleItem> module_item,
+                    brow_tNode dest, flow_eDest dest_code, const char* infotext);
+  
+  ProfinetSubslot* m_subslot_data;  
+  std::shared_ptr<GSDML::ModuleItem> m_module_item;
+  int m_subslot_number;
+  std::string m_old_value;
 
-  GsdmlSubslotData* subslotdata;
-  gsdml_VirtualSubmoduleItem* virtualsubmodule;
-  gsdml_UseableSubmodules* us;
-  int slot_idx;
-
-  int open_children(GsdmlAttrNav* attrnav, double x, double y);
+  int open_children_impl();
+  int scan(GsdmlAttrNav* attrnav, void* id_p);
 };
 
 //! Item for the DeviceAccessPoint, slot 0
@@ -351,23 +448,21 @@ class ItemPnDAP : public ItemPn
 {
 public:
   ItemPnDAP(GsdmlAttrNav* attrnav, const char* item_name,
-            GsdmlSlotData* item_slotdata, brow_tNode dest,
-            flow_eDest dest_code);
-  GsdmlSlotData* slotdata;
-  virtual ~ItemPnDAP() {}
+            ProfinetSlot* item_slotdata, brow_tNode dest, flow_eDest dest_code, const char* infotext);
 
-  virtual int open_children(GsdmlAttrNav* attrnav, double x, double y);
+  ProfinetSlot* m_slotdata;
+
+  virtual int open_children_impl();
 };
 
 //! Item for Network settings
-class ItemPnNetwork : public ItemPn
+class ItemPnNetwork final : public ItemPn
 {
 public:
   ItemPnNetwork(GsdmlAttrNav* attrnav, const char* item_name, brow_tNode dest,
-                flow_eDest dest_code);
-  virtual ~ItemPnNetwork() {}
+                flow_eDest dest_code, const char* infotext);
 
-  virtual int open_children(GsdmlAttrNav* attrnav, double x, double y);
+  int open_children_impl() final;
 };
 
 //! Item for Network settings
@@ -375,170 +470,160 @@ class ItemPnDeviceInfo : public ItemPn
 {
 public:
   ItemPnDeviceInfo(GsdmlAttrNav* attrnav, const char* item_name,
-                   brow_tNode dest, flow_eDest dest_code);
-  virtual ~ItemPnDeviceInfo() {}
-
-  virtual int open_children(GsdmlAttrNav* attrnav, double x, double y);
+                   brow_tNode dest, flow_eDest dest_code, const char* infotext);
+  
+  int open_children_impl() override;
 };
 
-//! Item for an InterfaceSubmoduleItem
-class ItemPnInterfaceSubmodule : public ItemPn
-{
-public:
-  ItemPnInterfaceSubmodule(GsdmlAttrNav* attrnav, const char* item_name,
-                           gsdml_InterfaceSubmoduleItem* item_ii,
-                           GsdmlSubslotData* item_subslotdata, brow_tNode dest,
-                           flow_eDest dest_code);
-  virtual ~ItemPnInterfaceSubmodule() {}
+//! Item for an InterfaceSubmoduleItem (Not a subslot but the actual module)
+// class ItemPnInterfaceSubmodule : public ItemPn
+// {
+// public:
+//   ItemPnInterfaceSubmodule(GsdmlAttrNav* attrnav, const char* item_name,
+//                            std::shared_ptr<GSDML::InterfaceSubmoduleItem> interface_submodule_item,
+//                            ProfinetSubslot* subslot_data, brow_tNode dest, flow_eDest dest_code);  
 
-  gsdml_InterfaceSubmoduleItem* ii;
-  GsdmlSubslotData* subslotdata;
-  virtual int open_children(GsdmlAttrNav* attrnav, double x, double y);
-};
+//   std::shared_ptr<GSDML::InterfaceSubmoduleItem> m_interface_submodule_item;
+//   ProfinetSubslot* m_subslot_data;
+  
+//   int open_children(GsdmlAttrNav* attrnav, double x, double y) override;
+// };
 
 //! Item for a PortSubmoduleItem
-class ItemPnPortSubmodule : public ItemPn
-{
-public:
-  ItemPnPortSubmodule(GsdmlAttrNav* attrnav, const char* item_name,
-                      gsdml_PortSubmoduleItem* item_pi,
-                      GsdmlSubslotData* item_subslotdata, brow_tNode dest,
-                      flow_eDest dest_code);
-  virtual ~ItemPnPortSubmodule() {}
+// class ItemPnPortSubmodule : public ItemPn
+// {
+// public:
+//   ItemPnPortSubmodule(GsdmlAttrNav* attrnav, const char* item_name,
+//                       std::shared_ptr<GSDML::PortSubmoduleItem> port_submodule_item,
+//                       ProfinetSubslot* subslot_data, brow_tNode dest,
+//                       flow_eDest dest_code);
 
-  gsdml_PortSubmoduleItem* pi;
-  GsdmlSubslotData* subslotdata;
-  virtual int open_children(GsdmlAttrNav* attrnav, double x, double y);
-};
+//   std::shared_ptr<GSDML::PortSubmoduleItem> m_port_submodule_item;
+//   ProfinetSubslot* m_subslot_data;
+  
+//   int open_children(GsdmlAttrNav* attrnav, double x, double y) override;
+// };
 
 //! Item for a moduleinfo.
 class ItemPnModuleInfo : public ItemPn
 {
 public:
   ItemPnModuleInfo(GsdmlAttrNav* attrnav, const char* item_name,
-                   gsdml_ModuleInfo* item_info, brow_tNode dest,
-                   flow_eDest dest_code);
-  virtual ~ItemPnModuleInfo() {}
+                   GSDML::ModuleInfo* item_info, brow_tNode dest,
+                   flow_eDest dest_code, const char* infotext);
 
-  gsdml_ModuleInfo* info;
+  GSDML::ModuleInfo* m_module_info;
 
-  virtual int open_children(GsdmlAttrNav* attrnav, double x, double y);
+  virtual int open_children_impl();
 };
 
-//! Item for module type selection.
-class ItemPnModuleType : public ItemPn
-{
-public:
-  ItemPnModuleType(GsdmlAttrNav* attrnav, const char* item_name,
-                   int item_slot_number, int item_slot_idx, brow_tNode dest,
-                   flow_eDest dest_code);
-  virtual ~ItemPnModuleType() {}
+// ! Item for module type selection.
+// class ItemPnModuleSelect : public ItemPn
+// {
+// public:
+//   ItemPnModuleSelect(GsdmlAttrNav* attrnav, const char* item_name,
+//                    int item_slot_number, int item_slot_idx, brow_tNode dest,
+//                    flow_eDest dest_code);
+//   virtual ~ItemPnModuleSelect() {}
 
-  int slot_number;
-  int slot_idx;
-  int old_value;
-  int first_scan;
+//   int m_slot_number;
+//   int m_slot_idx;
+//   int m_old_value; // Use string?  
 
-  int open_children(GsdmlAttrNav* attrnav, double x, double y);
-  int scan(GsdmlAttrNav* attrnav, void* p);
-};
+//   int open_children(GsdmlAttrNav* attrnav, double x, double y);
+//   int scan(GsdmlAttrNav* attrnav, void* p);
+// };
 
-//! Item for module type selection.
-class ItemPnSubmoduleType : public ItemPn
-{
-public:
-  ItemPnSubmoduleType(GsdmlAttrNav* attrnav, const char* item_name,
-                      int item_subslot_number, int item_slot_idx,
-                      int item_subslot_idx, gsdml_UseableSubmodules* item_us,
-                      brow_tNode dest, flow_eDest dest_code);
-  virtual ~ItemPnSubmoduleType() {}
+//! Item for submodule type selection.
+// class ItemPnSubmoduleType : public ItemPn
+// {
+// public:
+//   ItemPnSubmoduleType(GsdmlAttrNav* attrnav, const char* item_name,
+//                       int item_subslot_number, int item_slot_idx,
+//                       int item_subslot_idx, gsdml_UseableSubmodules* item_us,
+//                       brow_tNode dest, flow_eDest dest_code);
+//   virtual ~ItemPnSubmoduleType() {}
 
-  int subslot_number;
-  int slot_idx;
-  int subslot_idx;
-  gsdml_UseableSubmodules* us;
-  int old_value;
-  int first_scan;
+//   int subslot_number;
+//   int slot_idx;
+//   int subslot_idx;
+//   gsdml_UseableSubmodules* us;
+//   int old_value;
+//   int first_scan;
 
-  int open_children(GsdmlAttrNav* attrnav, double x, double y);
-  int scan(GsdmlAttrNav* attrnav, void* p);
-};
+//   int open_children(GsdmlAttrNav* attrnav, double x, double y);
+//   int scan(GsdmlAttrNav* attrnav, void* p);
+// };
 
 //! Item for module type selection.
 class ItemPnParRecord : public ItemPn
 {
 public:
-  ItemPnParRecord(GsdmlAttrNav* attrnav, const char* item_name,
-                  gsdml_ParameterRecordDataItem* item_par_record,
-                  GsdmlDataRecord* item_datarecord, brow_tNode dest,
-                  flow_eDest dest_code);
+  ItemPnParRecord(
+      GsdmlAttrNav* attrnav, const char* item_name,
+      GSDML::ParameterRecordDataItem const* parameter_record_data_item,
+      ProfinetDataRecord* data_record, brow_tNode dest, flow_eDest dest_code, const char* infotext);
   virtual ~ItemPnParRecord() {}
 
-  gsdml_ParameterRecordDataItem* par_record;
-  GsdmlDataRecord* datarecord;
+  GSDML::ParameterRecordDataItem const* m_parameter_record_data_item;
+  ProfinetDataRecord* m_data_record;
 
-  virtual int open_children(GsdmlAttrNav* attrnav, double x, double y);
+  virtual int open_children_impl();
+
+private:
+  void set_default_data();
 };
 
 //! Item for module type selection.
 class ItemPnParValue : public ItemPn
 {
 public:
-  ItemPnParValue(GsdmlAttrNav* attrnav, const char* item_name,
-                 gsdml_Ref* item_value_ref, gsdml_eValueDataType item_datatype,
-                 unsigned char* item_data,
-                 unsigned char* item_data_reversed_endianess, brow_tNode dest,
-                 flow_eDest dest_code);
-  virtual ~ItemPnParValue() {}
+  ItemPnParValue(GsdmlAttrNav* attrnav, const char* item_name, std::shared_ptr<GSDML::Ref> ref,
+                 unsigned char* data, brow_tNode dest, flow_eDest dest_code, const char* infotext);
+  ~ItemPnParValue() { if (m_old_value) delete m_old_value; m_old_value = (unsigned char*)0; };
 
-  gsdml_Ref* value_ref;
-  gsdml_eValueDataType datatype;
-  unsigned char* data;
-  unsigned char* data_reversed_endianess;
-  unsigned int byte_offset;
-  unsigned int size;
-  int first_scan;
-  char old_value[80];
-  int noedit;
+  std::shared_ptr<GSDML::Ref> m_ref;
+  GSDML::eValueDataType m_gsdml_datatype;
+  unsigned char* m_data;
+  unsigned int m_byte_offset;
+  unsigned int m_size;
+  unsigned char* m_old_value;
 
   int scan(GsdmlAttrNav* attrnav, void* p);
   void value_changed(GsdmlAttrNav* attrnav, const char* value_str);
+  int open_children_impl() override { return 1; }
 };
 
 class ParEnumValue
 {
 public:
   ParEnumValue() {}
-  unsigned int value;
-  char text[160];
+  //unsigned int value;
+  int value;
+  //char text[160];
+  std::string text;
 };
 
 //! Item for module type selection.
 class ItemPnParEnum : public ItemPn
 {
 public:
-  ItemPnParEnum(GsdmlAttrNav* attrnav, const char* item_name,
-                gsdml_Ref* item_value_ref, gsdml_eValueDataType item_datatype,
-                unsigned char* item_data,
-                unsigned char* item_data_reversed_endianess, brow_tNode dest,
-                flow_eDest dest_code);
-  virtual ~ItemPnParEnum() {}
+  ItemPnParEnum(GsdmlAttrNav* attrnav, const char* item_name, std::shared_ptr<GSDML::Ref> ref, unsigned char* data,
+                brow_tNode dest, flow_eDest dest_code, const char* infotext);
+  ~ItemPnParEnum() = default;
 
-  gsdml_Ref* value_ref;
-  gsdml_eValueDataType datatype;
-  unsigned char* data;
-  unsigned char* data_reversed_endianess;
-  unsigned int byte_offset;
-  unsigned int bit_offset;
-  unsigned int bit_length;
-  std::vector<ParEnumValue> values;
-  unsigned int mask;
-  unsigned int old_value;
-  int first_scan;
-  int noedit;
+  std::shared_ptr<GSDML::Ref> m_ref;
+  GSDML::eValueDataType m_gsdml_datatype;
+  unsigned char* m_data;
+  unsigned int m_byte_offset;
+  unsigned int m_bit_offset;
+  unsigned int m_bit_length;
+  std::vector<ParEnumValue> m_values; // Will be populated with valid values from which we can choose from, depending on valueitemttargets and the allowed values.
+  unsigned int m_mask;
+  unsigned int m_old_value;
 
-  virtual int open_children(GsdmlAttrNav* attrnav, double x, double y);
-  int scan(GsdmlAttrNav* attrnav, void* p);
+  int open_children_impl() override;
+  int scan(GsdmlAttrNav* attrnav, void* p) override;
 };
 
 //! Item for module type selection.
@@ -546,53 +631,46 @@ class ItemPnParEnumBit : public ItemPn
 {
 public:
   ItemPnParEnumBit(GsdmlAttrNav* attrnav, const char* item_name,
-                   gsdml_eValueDataType item_datatype, unsigned char* item_data,
-                   unsigned char* item_data_reversed_endianess,
-                   unsigned int item_byte_offset, unsigned int item_value,
-                   unsigned int item_mask, int item_noedit, brow_tNode dest,
-                   flow_eDest dest_code);
+                   GSDML::eValueDataType gsdml_datatype, unsigned char* data,
+                   unsigned int byte_offset, unsigned int enum_value,
+                   unsigned int mask, int noedit, brow_tNode dest,
+                   flow_eDest dest_code, const char* infotext);
   virtual ~ItemPnParEnumBit() {}
 
-  gsdml_Assign* assign;
-  gsdml_eValueDataType datatype;
-  unsigned char* data;
-  unsigned char* data_reversed_endianess;
-  unsigned int byte_offset;
-  unsigned int value;
-  unsigned int mask;
-  int first_scan;
-  unsigned int old_value;
-  int noedit;
+  //gsdml_Assign* assign;
+  GSDML::eValueDataType m_gsdml_datatype;
+  unsigned char* m_data;
+  unsigned int m_byte_offset;
+  unsigned int m_enum_value;
+  unsigned int m_mask;
+  unsigned int m_old_value;
 
   int scan(GsdmlAttrNav* attrnav, void* p);
   void update(GsdmlAttrNav* attrnav);
+  int open_children_impl() override { return 1; }
 };
 
 class ItemPnParEnumValue : public ItemPn
 {
 public:
   ItemPnParEnumValue(GsdmlAttrNav* attrnav, const char* item_name,
-                     gsdml_eValueDataType item_datatype,
-                     unsigned char* item_data,
-                     unsigned char* item_data_reversed_endianess,
-                     unsigned int item_byte_offset, unsigned int item_value,
-                     unsigned int item_mask, int item_noedit, brow_tNode dest,
-                     flow_eDest dest_code);
+                     GSDML::eValueDataType gsdml_datatype,
+                     unsigned char* data, unsigned int byte_offset, unsigned int enum_value,
+                     unsigned int mask, int noedit, brow_tNode dest,
+                     flow_eDest dest_code, const char* infotext);
   virtual ~ItemPnParEnumValue() {}
 
-  gsdml_Assign* assign;
-  gsdml_eValueDataType datatype;
-  unsigned char* data;
-  unsigned char* data_reversed_endianess;
-  unsigned int byte_offset;
-  unsigned int value;
-  unsigned int mask;
-  int first_scan;
-  unsigned int old_value;
-  int noedit;
+  //std::shared_ptr<GSDML::Assign> m_assign;
+  GSDML::eValueDataType m_gsdml_datatype;
+  unsigned char* m_data;
+  unsigned int m_byte_offset;
+  unsigned int m_enum_value;
+  unsigned int m_mask;
+  unsigned int m_old_value;
 
   int scan(GsdmlAttrNav* attrnav, void* p);
   void update(GsdmlAttrNav* attrnav);
+  int open_children_impl() override { return 1; }
 };
 
 //! Item for a IOData.
@@ -600,71 +678,70 @@ class ItemPnIOData : public ItemPn
 {
 public:
   ItemPnIOData(GsdmlAttrNav* attrnav, const char* item_name,
-               gsdml_IOData* item_iodata, int item_subslot_idx,
-               int item_slot_idx, brow_tNode dest, flow_eDest dest_code);
+               GSDML::IOData* iodata, ProfinetSubslot* subslot, brow_tNode dest,
+               flow_eDest dest_code, const char* infotext);
   virtual ~ItemPnIOData() {}
 
-  gsdml_IOData* iodata;
-  int subslot_idx;
-  int slot_idx;
+  GSDML::IOData* m_iodata;
+  ProfinetSubslot* m_subslot;
 
-  int open_children(GsdmlAttrNav* attrnav, double x, double y);
+  int open_children_impl();
 };
 
 //! Item for a Input.
-class ItemPnInput : public ItemPn
-{
-public:
-  ItemPnInput(GsdmlAttrNav* attrnav, const char* item_name,
-              gsdml_Input* item_input, brow_tNode dest, flow_eDest dest_code);
-  virtual ~ItemPnInput() {}
+// class ItemPnInput : public ItemPn
+// {
+// public:
+//   ItemPnInput(GsdmlAttrNav* attrnav, const char* item_name,
+//               gsdml_Input* item_input, brow_tNode dest, flow_eDest dest_code);
+//   virtual ~ItemPnInput() {}
 
-  gsdml_Input* input;
+//   gsdml_Input* input;
 
-  int open_children(GsdmlAttrNav* attrnav, double x, double y);
-};
+//   int open_children(GsdmlAttrNav* attrnav, double x, double y);
+// };
 
 //! Item for a Output.
-class ItemPnOutput : public ItemPn
-{
-public:
-  ItemPnOutput(GsdmlAttrNav* attrnav, const char* item_name,
-               gsdml_Output* item_output, brow_tNode dest,
-               flow_eDest dest_code);
-  virtual ~ItemPnOutput() {}
+// class ItemPnOutput : public ItemPn
+// {
+// public:
+//   ItemPnOutput(GsdmlAttrNav* attrnav, const char* item_name,
+//                gsdml_Output* item_output, brow_tNode dest,
+//                flow_eDest dest_code);
+//   virtual ~ItemPnOutput() {}
 
-  gsdml_Output* output;
+//   gsdml_Output* output;
 
-  int open_children(GsdmlAttrNav* attrnav, double x, double y);
-};
+//   int open_children(GsdmlAttrNav* attrnav, double x, double y);
+// };
 
 //! Item for a DataItem.
-class ItemPnDataItem : public ItemPn
-{
-public:
-  ItemPnDataItem(GsdmlAttrNav* attrnav, const char* item_name,
-                 gsdml_DataItem* item_dataitem, brow_tNode dest,
-                 flow_eDest dest_code);
-  virtual ~ItemPnDataItem() {}
+// class ItemPnDataItem : public ItemPn
+// {
+// public:
+//   ItemPnDataItem(GsdmlAttrNav* attrnav, const char* item_name,
+//                  gsdml_DataItem* item_dataitem, brow_tNode dest,
+//                  flow_eDest dest_code);
+//   virtual ~ItemPnDataItem() {}
 
-  gsdml_DataItem* dataitem;
+//   gsdml_DataItem* dataitem;
 
-  int open_children(GsdmlAttrNav* attrnav, double x, double y);
-};
+//   int open_children(GsdmlAttrNav* attrnav, double x, double y);
+// };
 
 //! Item for a BitDataItem.
-class ItemPnBitDataItem : public ItemPn
-{
-public:
-  ItemPnBitDataItem(GsdmlAttrNav* attrnav, const char* item_name,
-                    gsdml_BitDataItem* item_bitdataitem, brow_tNode dest,
-                    flow_eDest dest_code);
-  virtual ~ItemPnBitDataItem() {}
+// class ItemPnBitDataItem : public ItemPn
+// {
+// public:
+//   ItemPnBitDataItem(GsdmlAttrNav* attrnav, const char* item_name,
+//                     gsdml_BitDataItem* item_bitdataitem, brow_tNode dest,
+//                     flow_eDest dest_code);
+//   virtual ~ItemPnBitDataItem() {}
 
-  gsdml_BitDataItem* bitdataitem;
+//   gsdml_BitDataItem* bitdataitem;
 
-  int open_children(GsdmlAttrNav* attrnav, double x, double y);
-};
+//   int open_children(GsdmlAttrNav* attrnav, double x, double y);
+// };
 
 //! Item for module class selection.
 class ItemPnModuleClass : public ItemPn
@@ -679,81 +756,376 @@ public:
   int old_value;
   int first_scan;
 
-  int open_children(GsdmlAttrNav* attrnav, double x, double y);
+  int open_children_impl(GsdmlAttrNav* attrnav, double x, double y);
   int scan(GsdmlAttrNav* attrnav, void* p);
 };
 
 //! Item for slave byte order.
-class ItemPnEnumByteOrder : public ItemPnBase
-{
-public:
-  ItemPnEnumByteOrder(GsdmlAttrNav* attrnav, const char* item_name,
-                      const char* attr, int attr_type, int attr_size,
-                      void* attr_value_p, int attr_noedit, brow_tNode dest,
-                      flow_eDest dest_code);
-  virtual ~ItemPnEnumByteOrder() {}
+// class ItemPnEnumByteOrder : public ItemPnBase
+// {
+// public:
+//   ItemPnEnumByteOrder(GsdmlAttrNav* attrnav, const char* item_name,
+//                       const char* attr, pwr_eType attr_type, int attr_size,
+//                       void* attr_value_p, int attr_noedit, brow_tNode dest,
+//                       flow_eDest dest_code);
+//   virtual ~ItemPnEnumByteOrder() {}
 
-  int old_value;
+//   int old_value;
 
-  int open_children(GsdmlAttrNav* attrnav, double x, double y);
-  int scan(GsdmlAttrNav* attrnav, void* p);
-};
+//   int open_children(GsdmlAttrNav* attrnav, double x, double y);
+//   int scan(GsdmlAttrNav* attrnav, void* p);
+// };
 
 //! Item for time ratio.
-class ItemPnEnumTimeRatio : public ItemPn
-{
-public:
-  ItemPnEnumTimeRatio(GsdmlAttrNav* attrnav, const char* item_name,
-                      gsdml_InterfaceSubmoduleItem* item_interfacesubmodule,
-                      void* attr_value_p, brow_tNode dest,
-                      flow_eDest dest_code);
-  virtual ~ItemPnEnumTimeRatio() {}
+// class ItemPnEnumTimeRatio : public ItemPn
+// {
+// public:
+//   ItemPnEnumTimeRatio(GsdmlAttrNav* attrnav, const char* item_name,
+//                       gsdml_InterfaceSubmoduleItem* item_interfacesubmodule,
+//                       void* attr_value_p, brow_tNode dest,
+//                       flow_eDest dest_code);
+//   virtual ~ItemPnEnumTimeRatio() {}
 
-  gsdml_InterfaceSubmoduleItem* interfacesubmodule;
-  void* value_p;
-  char valuelist_str[200];
-  int first_scan;
-  int old_value;
+//   gsdml_InterfaceSubmoduleItem* interfacesubmodule;
+//   void* value_p;
+//   char valuelist_str[200];
+//   int first_scan;
+//   int old_value;
 
-  int open_children(GsdmlAttrNav* attrnav, double x, double y);
-  int scan(GsdmlAttrNav* attrnav, void* p);
-};
+//   int open_children(GsdmlAttrNav* attrnav, double x, double y);
+//   int scan(GsdmlAttrNav* attrnav, void* p);
+// };
 
 //! Item for send clock.
-class ItemPnEnumSendClock : public ItemPn
+// class ItemPnEnumSendClock : public ItemPn
+// {
+// public:
+//   ItemPnEnumSendClock(GsdmlAttrNav* attrnav, const char* item_name,
+//                       gsdml_InterfaceSubmoduleItem* item_interfacesubmodule,
+//                       void* attr_value_p, brow_tNode dest,
+//                       flow_eDest dest_code);
+//   virtual ~ItemPnEnumSendClock() {}
+
+//   gsdml_InterfaceSubmoduleItem* interfacesubmodule;
+//   void* value_p;
+//   char valuelist_str[200];
+//   int first_scan;
+//   int old_value;
+
+//   int open_children(GsdmlAttrNav* attrnav, double x, double y);
+//   int scan(GsdmlAttrNav* attrnav, void* p);
+// };
+
+class ItemPnEnumYesNo : public ItemPn
 {
 public:
-  ItemPnEnumSendClock(GsdmlAttrNav* attrnav, const char* item_name,
-                      gsdml_InterfaceSubmoduleItem* item_interfacesubmodule,
-                      void* attr_value_p, brow_tNode dest,
-                      flow_eDest dest_code);
-  virtual ~ItemPnEnumSendClock() {}
+  ItemPnEnumYesNo(GsdmlAttrNav* attrnav, const char* item_name,
+                  int* attr_value_p, brow_tNode dest, flow_eDest dest_code,
+                  char const* infotext = 0);
+  virtual ~ItemPnEnumYesNo() {}
 
-  gsdml_InterfaceSubmoduleItem* interfacesubmodule;
-  void* value_p;
-  char valuelist_str[200];
-  int first_scan;
-  int old_value;
+  int* m_value_p;
+  int m_old_value;
 
-  int open_children(GsdmlAttrNav* attrnav, double x, double y);
-  int scan(GsdmlAttrNav* attrnav, void* p);
+  int open_children_impl() override;
+  int scan(GsdmlAttrNav* attrnav, void* value_p) override;
 };
 
-class ItemPnParYesNo : public ItemPn
+template<typename T>
+class IHasSelectables;
+
+// template<typename T>
+// class ISelectable
+// {
+// public:
+//   explicit ISelectable(IHasSelectables<T>* parent, T select_value) : m_select_value(select_value), m_parent(parent) {}
+//   virtual ~ISelectable() = default;
+
+//   virtual void unselect() = 0;
+//   virtual void select() = 0;
+
+//   bool m_is_selected;
+//   T m_select_value;
+//   IHasSelectables<T>* m_parent;
+// };
+
+// template<typename T>
+// class IHasSelectables
+// {
+// public:
+//   explicit IHasSelectables(T* value_p) : m_value_p(value_p) {}
+//   virtual ~IHasSelectables() = default;
+//   virtual void select(ISelectable<T>* selectable) final {
+//     for (auto s : m_selectables)
+//       s.second->unselect();
+//     selectable->select();
+//     select_impl(selectable);
+//   }
+//   virtual void select_impl(ISelectable<T>* selectable) = 0;
+
+//   T* m_value_p;
+//   std::map<size_t, ISelectable<T>*> m_selectables;
+// };
+
+// template<typename T>
+// class ItemPnValueSelectionItem : public ItemPn, public ISelectable<T>
+// {
+// public:
+//   ItemPnValueSelectionItem(GsdmlAttrNav* attrnav, pwr_eType value_type, const char* name,
+//       IHasSelectables<T>* parent, T select_value, const char* infotext,
+//       brow_tNode dest, flow_eDest dest_code) 
+//     : ItemPn(attrnav_eItemType_PnValueSelectionItem, name, infotext),
+//       ISelectable<T>(parent, select_value)
+//   {
+//     m_value_type = value_type;
+//     brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_enum, dest,
+//                   dest_code, (void*)this, 1, &m_node);
+
+//     brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_attr);
+//     brow_SetAnnotation(m_node, 0, m_name.c_str(), m_name.length());
+    
+//     // Set if this is selected or not    
+//     brow_SetRadiobutton(m_node, 0, 0);
+//     // add call to parent->select("this") to brow_cb
+//     //brow_SetTraceAttr(m_node, m_name.c_str(), "", flow_eTraceType_User);
+//   }
+  
+//   void select() override { brow_SetRadiobutton(m_node, 0, 1); }
+
+//   void unselect() override { brow_SetRadiobutton(m_node, 0, 0); }
+// };
+
+// TODO continue with the templated value item input/select classes that use the "trace functionality" to replace all other
+// brow_cb need to cast depending on parent_type, and event is catched using ItemPnValueSelectItem/ItemPnValueInput class enums
+
+/*
+==================================================== NEW CLASSES ====================================================
+*/
+
+/*
+======================= TEMPLATES CLASSES FOR CHANGING CONFIGURATION PROPERTIES =======================
+*/
+
+template<typename T>
+class ItemPnValueSelectItem;
+
+template<typename T>
+class ISelection
 {
 public:
-  ItemPnParYesNo(GsdmlAttrNav* attrnav, const char* item_name,                      
-                      int* attr_value_p, brow_tNode dest,
-                      flow_eDest dest_code);
-  virtual ~ItemPnParYesNo() {}
+  explicit ISelection(T* value_p) : m_value_p(value_p) {}
+  virtual ~ISelection() = default;
+  virtual void select(ItemPnValueSelectItem<T> const* selected_item) const = 0;
+  virtual void set_default(T default_value) = 0;
 
-  int* value_p;
-  int old_value;
-  int first_scan;
-  int noedit;
-
-  virtual int open_children(GsdmlAttrNav* attrnav, double x, double y);
-  int scan(GsdmlAttrNav* attrnav, void* p);
+  T* m_value_p;  
 };
+
+template<typename T>
+class ItemPnValueSelectItem : public ItemPn
+{
+public:
+  ItemPnValueSelectItem(GsdmlAttrNav* attrnav, pwr_eType value_type, const char* annotation_1, const char* annotation_2,
+      ISelection<T>* parent, T const* value_p, T select_value, const char* infotext,
+      brow_tNode dest, flow_eDest dest_code) 
+    : ItemPn(attrnav, attrnav_eItemType_PnValueSelectItem, annotation_1, infotext),
+      m_parent(parent), m_value_p(value_p), m_select_value(select_value), m_annotation_2(annotation_2)
+  {
+    m_value_type = value_type;    
+    brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_enum, dest,
+                  dest_code, (void*)this, 1, &m_node);
+
+    brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_attr);
+    brow_SetAnnotation(m_node, 0, m_name.c_str(), m_name.length());
+    if (m_annotation_2 != "")
+      brow_SetAnnotation(m_node, 1, m_annotation_2.c_str(), m_annotation_2.length());
+    brow_SetTraceAttr(m_node, m_name.c_str(), "", flow_eTraceType_User);
+  }
+  
+  int scan(GsdmlAttrNav* attrnav, void* dummy) override
+  {    
+    if (!m_first_scan)
+    {
+      if (*m_value_p == m_old_value)
+        return 1;
+    }
+    else
+    {
+      m_first_scan = 0;
+    }
+    
+    // Control the radiobuttons
+    if (*m_value_p == m_select_value)
+      brow_SetRadiobutton(m_node, 0, 1);
+    else
+      brow_SetRadiobutton(m_node, 0, 0);
+
+    m_old_value = *m_value_p;
+
+    return 1;
+  }
+
+  void selected(GsdmlAttrNav* attrnav) override
+  {
+    m_parent->select(this);
+  }
+
+  T const& value() const { return m_select_value; }
+
+  int open_children_impl() override { return 1; }
+
+private:
+  ISelection<T> const* m_parent;
+  T const* m_value_p;
+  T const m_select_value;
+  T m_old_value;
+  std::string m_annotation_2;
+};
+
+template<typename T>
+class ItemPnValueInput : public ItemPn
+{
+public:
+  ItemPnValueInput(GsdmlAttrNav* attrnav, pwr_eType value_type, const char* annotation_1, const char* annotation_2,
+      T* value_p, const char* infotext, brow_tNode dest, flow_eDest dest_code) 
+    : ItemPn(attrnav, attrnav_eItemType_PnValueInput, annotation_1, infotext),
+      m_value_p(value_p), m_annotation_2(annotation_2)
+  {
+    m_value_type = value_type;   
+    m_noedit = 0; 
+    brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_attr, dest,
+                  dest_code, (void*)this, 1, &m_node);
+
+    brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_attr);
+    brow_SetAnnotation(m_node, 0, m_name.c_str(), m_name.length());
+    if (m_annotation_2 != "")
+      brow_SetAnnotation(m_node, 1, m_annotation_2.c_str(), m_annotation_2.length());
+    brow_SetTraceAttr(m_node, m_name.c_str(), "", flow_eTraceType_User);
+  }
+  
+  int scan(GsdmlAttrNav* attrnav, void* value_p) override
+  {  
+    T* value = (T*)value_p;
+
+    if (!m_first_scan)
+    {
+      if (*value == m_old_value)
+        return 1;
+    }
+    else
+    {
+      m_first_scan = 0;
+    }
+    
+    // Do something if the data has changed...    
+    m_old_value = *value;
+
+    return 1;
+  }  
+
+  void value_changed(GsdmlAttrNav* attrnav, const char* value_str) override
+  {
+    std::cout << "Value changed called, value: " << value_str << std::endl;
+
+    value_changed_impl(attrnav, value_str);
+  }
+
+  std::string&& to_string() override
+  {
+    std::ostringstream result(std::ios_base::out);
+    result.precision(12); // For when this is a float/double    
+    result << std::fixed << *m_value_p;
+    
+    std::string value(result.str());
+    return std::move(value);    
+  }
+
+  virtual void value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) = 0;
+
+  int open_children_impl() override { return 1; }
+
+private:  
+  T* m_value_p;  
+  T m_old_value;
+  std::string m_annotation_2;
+};
+
+
+
+/*
+  ======================================== "CONCRETE" IMPLEMENTATIONS ========================================
+*/
+/*
+  RT_CLASS Selection item
+  Used together with ItemPnEnumValue (for the values...)
+*/
+class ItemPnEnumRTClass : public ItemPn, public ISelection<std::string>
+{
+public:
+  ItemPnEnumRTClass(GsdmlAttrNav* attrnav, const char* name,
+                    std::shared_ptr<GSDML::InterfaceSubmoduleItem> interface_submodule_item,
+                  std::string* pwr_pn_value_p, brow_tNode dest, flow_eDest dest_code);
+  virtual ~ItemPnEnumRTClass() {}
+
+  std::shared_ptr<GSDML::InterfaceSubmoduleItem> m_interface_submodule_item;  
+  
+  int open_children_impl() override;  
+  void select(ItemPnValueSelectItem<std::string> const* selected_item) const override;
+  void set_default(std::string default_value) override;
+};
+
+class ItemPnSkipIPAssignment : public ItemPn, public ISelection<bool>
+{
+public:
+  ItemPnSkipIPAssignment(GsdmlAttrNav* attrnav, const char* name,
+                  bool* pwr_pn_value_p, brow_tNode dest, flow_eDest dest_code);
+  virtual ~ItemPnSkipIPAssignment() {}
+
+  int open_children_impl() override;  
+  void select(ItemPnValueSelectItem<bool> const* selected_item) const override;
+  void set_default(bool default_value) override;
+};
+
+class ItemPnIPv4Input : public ItemPnValueInput<std::string>
+{
+public:
+  ItemPnIPv4Input(GsdmlAttrNav* attrnav, const char* name, const char* extra_text,
+      std::string* value_p, const char* infotext, brow_tNode dest, flow_eDest dest_code);
+  virtual ~ItemPnIPv4Input() {}
+
+  void value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override;
+
+  // int open_children_impl() override { return 1; };    
+  // int scan(GsdmlAttrNav* attrnav, void* string_value) override;
+
+  // void set_default(std::string default_value);
+  // void update_value(std::string new_value);  
+};
+
+template<typename T>
+class ItemPnParameterInput : public ItemPnValueInput<T>
+{
+public:
+  ItemPnParameterInput(GsdmlAttrNav* attrnav, const char* name, const char* extra_text,
+      T* value_p, const char* infotext, brow_tNode dest, flow_eDest dest_code,
+      std::shared_ptr<GSDML::Ref> ref)
+    : ItemPnValueInput<T>(attrnav, pwr_eType_, name, extra_text,
+    value_p, infotext, dest, dest_code), m_ref(ref) {}
+  virtual ~ItemPnParameterInput() = default;
+
+  void value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override
+  {
+    std::cout << "Implementation goes here for parameter input" << std::endl;
+  }
+
+private:
+  std::shared_ptr<GSDML::Ref> m_ref;
+  // int open_children_impl() override { return 1; };    
+  // int scan(GsdmlAttrNav* attrnav, void* string_value) override;
+
+  // void set_default(std::string default_value);
+  // void update_value(std::string new_value);  
+};
+
 
 #endif

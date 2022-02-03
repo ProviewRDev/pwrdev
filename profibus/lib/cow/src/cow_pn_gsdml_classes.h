@@ -18,6 +18,7 @@ class pn_gsdml;
 
 namespace GSDML
 {
+
 typedef enum
 {
   ValueDataType_,
@@ -45,6 +46,37 @@ typedef enum
   ValueDataType__
 } eValueDataType;
 
+typedef enum
+{
+  SubmoduleItemType_,
+  SubmoduleItemType_Virtual,
+  SubmoduleItemType_Port,
+  SubmoduleItemType_Interface,  
+  SubmoduleItemType_Submodule,
+  SubmoduleItemType__
+} eSubmoduleItemType;
+
+typedef enum
+{
+  ModuleItemType_,
+  ModuleItemType_DAP,
+  ModuleItemType_Module,
+  ModuleItemType__
+} eModuleItemType;
+
+// Convienence methods regarding GSDML things...
+
+//int datavalue_to_string(eValueDataType datatype, void* value,
+//                                  unsigned int size, char* str,
+//                                  unsigned int strsize);
+
+//std::string attr_value_to_string(int type_id, void const* value_ptr);//, int size, int* len)
+//std::string attr_value_to_string(int type_id, void const* value_ptr, const char* _file, int _line);
+//int string_to_datavalue(eValueDataType datatype, void* value,
+  //                                unsigned int size, const char* str);
+
+//int string_to_value_datatype(char const* str, eValueDataType* type);
+
 class Node
 {
 public:
@@ -56,16 +88,64 @@ protected:
 };
 
 /*
+  ValueList is for GSDML data in the format: 1 3..6 8 10 12 or 1..10 or 1 2 3
+
   To iterate over all possible values of a list like this:
   for (auto& item : list.getList())
     for (auto i = item.first; i <= item.second; i++)
       whatever;
+
+  or only the prefix ++ operator can be used no other overload exists:
+  for (auto it = listname.begin(); it != listname.end(); ++it)
+    ; // do something with it...
 */
-template <typename T> class ValueList
+template <typename T> 
+class ValueList
 {
+private:
+  std::vector<std::pair<T, T>> listItems;
+  bool m_empty;
+  std::string m_original_string;
+
 public:
-  ValueList(char const* input)
+  class iterator
   {
+  public:
+    iterator(ValueList<T>& parent, bool is_end = false) : m_parent(parent) {
+      if (is_end)
+        m_value = m_parent.max();
+      else
+        m_value = m_parent.min();              
+    }    
+    ~iterator() = default;
+    bool operator!=(iterator const& rhs) {
+      return m_value <= rhs.m_value;      
+    }
+    iterator& operator++() {
+      while (!m_parent.inList(++m_value))
+      {
+        if (m_value >= m_parent.max())
+        {
+          m_value = m_parent.max();
+          (m_value)++;
+          break;
+        }
+      }
+      return *this;
+    }
+    T value() {
+      return m_value;
+    }
+
+  private:
+    T m_value;
+    ValueList<T>& m_parent;
+  };
+
+  ValueList(char const* input)
+    : m_empty(true)
+  {
+    m_original_string = std::string(input);
     // Lets parse it...
     std::istringstream buf(input, std::ios_base::in);
 
@@ -73,6 +153,7 @@ public:
     std::string rangeDelimeter("..");
     while (buf >> value)
     {
+      m_empty = false;
       std::size_t pos;
       if ((pos = value.find(rangeDelimeter)) != std::string::npos)
       {
@@ -92,7 +173,12 @@ public:
     }
   }
 
-  bool inList(T value)
+  bool empty() const
+  {
+    return m_empty;
+  }
+
+  bool inList(T value) const
   {
     for (auto& range : listItems)
       if (value >= range.first && value <= range.second)
@@ -107,17 +193,51 @@ public:
         std::cout << i << std::endl;
   }
 
-  std::vector<std::pair<T, T>>& getList() { return listItems; }
+  T min() const
+  {    
+    T min = listItems[0].first;
+    for (auto& range : listItems)
+        if (min >= range.first)  // Spec says that ranges like x..y must have the lesser item to the left of ".."
+          min = range.first;
+    return min;
+  }
 
-private:
-  std::vector<std::pair<T, T>> listItems;
+  T max() const
+  {
+    T max = listItems[0].second;
+    for (auto& range : listItems)
+        if (max <= range.second)  // Spec says that ranges like x..y must have the lesser item to the left of ".."
+          max = range.second;
+    return max;
+  }
+
+  std::string& as_string()
+  {
+    return m_original_string;
+  }
+
+  ValueList<T>::iterator begin()
+  {
+    return iterator(*this);
+  }
+
+  ValueList<T>::iterator end()
+  {
+   return iterator(*this, true);
+  }
+
+  std::vector<std::pair<T, T>>& getList() { return listItems; }
 };
 
+
+/*
+  TokenList is for GSDML data in the format: token1;token2
+*/
 class TokenList
 {
 public:
   TokenList(char const* input);
-  ~TokenList() {}
+  ~TokenList() = default;
   bool inList(std::string const& value) const;
   void print();
   std::vector<std::string>& getList();
@@ -135,9 +255,7 @@ public:
   ~Const() = default;
 
   ushort _ByteOffset;
-
-private:
-  std::vector<unsigned char*> _data;
+  std::vector<unsigned char> _data;
 };
 
 class BitDataItem
@@ -159,6 +277,7 @@ public:
   // Attributes
   eValueDataType _DataType;
   std::string _Id;
+  ushort _Length;
   bool _UseAsBits;
   std::shared_ptr<std::string> _Text;
 
@@ -200,6 +319,8 @@ public:
   std::string _HardwareRelease;
   std::shared_ptr<std::string> _CategoryItemText;
   std::shared_ptr<std::string> _CategoryItemInfoText;
+  std::shared_ptr<std::string> _SubCategoryItemText;
+  std::shared_ptr<std::string> _SubCategoryItemInfoText;
 };
 
 class SubslotItem
@@ -213,6 +334,7 @@ public:
 
 class CertificationInfo
 {
+public:
   CertificationInfo(pugi::xml_node&&, pn_gsdml*);
   CertificationInfo(CertificationInfo&&) = default;
   std::string _ConformanceClass;
@@ -223,7 +345,7 @@ class CertificationInfo
 class IOConfigData
 {
 public:
-  IOConfigData(pugi::xml_node&& IOConfigData, pn_gsdml* gsdml);
+  IOConfigData(pugi::xml_node&&, pn_gsdml*);
   IOConfigData(IOConfigData&&) = default;
   ushort _MaxApplicationInputLength;
   ushort _MaxApplicationOutputLength;
@@ -267,6 +389,7 @@ public:
   float _DefaultValue; // Using float works for all available data types...
   ValueList<float>
       _AllowedValues; // Using float works for all available data types...
+  ushort _Length;
   bool _Changeable;
   bool _Visible;
   std::shared_ptr<std::string> _Text;
@@ -297,7 +420,7 @@ public:
   ParameterRecordDataItem(pugi::xml_node&&, pn_gsdml*);
   ParameterRecordDataItem(ParameterRecordDataItem&&);
   ~ParameterRecordDataItem();
-  unsigned char* getData();
+  unsigned char* getData() const;
 
   // Attributes
   ushort _Index;
@@ -352,34 +475,203 @@ public:
   IOData(IOData&&) = default;
   Input _Input;
   Output _Output;
+
+  // Convienience method
+  bool has_data() const { return _Input._DataItem.size() || _Output._DataItem.size(); }
 };
 
-class VirtualSubmoduleItem
+class MAUTypeItem
 {
 public:
-  VirtualSubmoduleItem(pugi::xml_node&&, pn_gsdml* gsdml);
-  VirtualSubmoduleItem(VirtualSubmoduleItem&&) = default;
+  MAUTypeItem(pugi::xml_node&&, pn_gsdml* gsdml);
+  MAUTypeItem(MAUTypeItem&&) = default;
   // Attributes
+  uint _Value;
+  bool _AdjustSupported;
+};
+class SubmoduleItem
+{
+public:
+  SubmoduleItem(pugi::xml_node&&, pn_gsdml*, eSubmoduleItemType = SubmoduleItemType_Submodule);
+  SubmoduleItem(SubmoduleItem&&) = default;
+  virtual ~SubmoduleItem() = default;  
+  
   uint _SubmoduleIdentNumber;
+  uint _SubslotNumber; // Some SubmoduleItems are fixed and thus have a SubslotNumber specified, some don't. But we keep it here for consistency
   GSDML::ValueList<uint> _FixedInSubslots;
   GSDML::ValueList<uint> _Writeable_IM_Records;
-  bool _MayIssueProcessAlarm;
+  bool _MayIssueProcessAlarm;  
+  std::shared_ptr<std::string> _Text; // Some SubmoduleItems have a TextId attribute and some don't...
+  std::string _ID;
 
   // Elements
   IOData _IOData;
   std::vector<ParameterRecordDataItem> _RecordDataList;
-  ModuleInfo _ModuleInfo;
+  ModuleInfo _ModuleInfo;    
+
+  // Type tag...
+  eSubmoduleItemType _SubmoduleItemType;
+};
+
+class VirtualSubmoduleItem : public SubmoduleItem
+{
+public:
+  VirtualSubmoduleItem(pugi::xml_node&&, pn_gsdml* gsdml);
+  VirtualSubmoduleItem(VirtualSubmoduleItem&&) = default;
+
+  // No more known attributes specific to VirtualSubmoduleItem
+  
+  // No more known elements specific to VirtualSubmoduleItem  
+};
+
+class PortSubmoduleItem : public SubmoduleItem
+{
+public:
+  PortSubmoduleItem(pugi::xml_node&&, pn_gsdml* gsdml);
+  PortSubmoduleItem(PortSubmoduleItem&&) = default;
+  
+  // Attributes
+  uint _MaxPortRxDelay;
+  uint _MaxPortTxDelay;
+  std::string _LinkStateDiagnosisCapability; // i.e "Up+Down"
+  bool _PortDeactivationSupported;
+  uint _MAUTypes;
+  bool _SupportsRingportConfig;
+  bool _IsDefaultRingport;
+  GSDML::ValueList<float> _Writeable_IM_Records; // i.e "1 2 3"
+  bool _CheckMAUTypeSupported;
+  GSDML::ValueList<float> _FiberOpticTypes; // i.e "2 3"
+  bool _PowerBudgetControlSupported;
+  bool _ShortPreamble100MBitSupported;
+  bool _CheckMAUTypeDifferenceSupported;
+
+  // Elements specific to PortSubmoduleItem
+  std::vector<MAUTypeItem> _MAUTypeList;
+};
+
+class RT_Class3Properties
+{
+public:
+  RT_Class3Properties(pugi::xml_node&&, pn_gsdml* gsdml);
+  RT_Class3Properties(RT_Class3Properties&&) = default;
+  
+  // Attributes
+  TokenList _StartupMode; // i.e "Legacy;Advanced"
+  std::string _ForwardingMode;
+  uint _MaxBridgeDelay;
+  uint _MaxNumberIR_FrameData;
+};
+
+class TimingProperties
+{
+public:
+  TimingProperties(pugi::xml_node&&, pn_gsdml* gsdml);
+  TimingProperties(TimingProperties&&) = default;
+  
+  // Attributes
+  ValueList<uint> _SendClock; // i.e "8 16 32 64 128"
+  ValueList<uint> _ReductionRatioPow2; // i.e "1 2 4 8 16 32 64 128 256 512"
+};
+
+class RT_Class3TimingProperties
+{
+public:
+  RT_Class3TimingProperties(pugi::xml_node&&, pn_gsdml* gsdml);
+  RT_Class3TimingProperties(RT_Class3TimingProperties&&) = default;
+  
+  // Attributes
+  ValueList<uint> _SendClock; // i.e "8 12 16 20 24 28 32 36 40 44 48 52 56 60 64 68 72 76 80 84 88 92 96 100 104 108 112 116 120 124 128"
+  ValueList<uint> _ReductionRatioPow2; // i.e "1 2 4 8 16"
+};
+
+class ApplicationRelations
+{
+public:
+  ApplicationRelations(pugi::xml_node&&, pn_gsdml* gsdml);
+  ApplicationRelations(ApplicationRelations&&) = default;
+
+  // Attributes
+  uint _NumberOfAR;
+  TokenList _StartupMode; // i.e "Legacy;Advanced"
+
+  // Elements
+  TimingProperties _TimingProperties;
+  RT_Class3TimingProperties _RT_Class3TimingProperties;
+};
+
+class SynchronisationMode
+{
+public:
+  SynchronisationMode(pugi::xml_node&&, pn_gsdml* gsdml);
+  SynchronisationMode(SynchronisationMode&&) = default;
+
+  // Attributes
+  std::string _SupportedRole; // i.e "SyncSlave"
+  uint _MaxLocalJitter;
+  uint _T_PLL_MAX;
+  TokenList _SupportedSyncProtocols; // i.e "PTCP" Not really a list but since the name of the attribute is in plural one can just guess...
+};
+
+class MediaRedundancy
+{
+public:
+  MediaRedundancy(pugi::xml_node&&, pn_gsdml* gsdml);
+  MediaRedundancy(MediaRedundancy&&) = default;
+
+  std::string _SupportedRole; // i.e "Client"
+  bool _AdditionalProtocolsSupported;
+};
+
+
+class InterfaceSubmoduleItem : public SubmoduleItem
+{
+public:
+  InterfaceSubmoduleItem(pugi::xml_node&&, pn_gsdml* gsdml);
+  InterfaceSubmoduleItem(InterfaceSubmoduleItem&&) = default;
+  // Attributes
+  TokenList _SupportedRT_Classes; // i.e "RT_CLASS_1;RT_CLASS_3"
+  TokenList _SupportedProtocols; // i.e "SNMP;LLDP"
+  bool _DCP_HelloSupported;  
+  bool _DelayMeasurementSupported;
+
+  RT_Class3Properties _RT_Class3Properties;
+  SynchronisationMode _SynchronisationMode;
+  ApplicationRelations _ApplicationRelations;
+  MediaRedundancy _MediaRedundancy;
+};
+
+class SubmoduleItemRef
+{
+public:
+  SubmoduleItemRef(pugi::xml_node&&, pn_gsdml* gsdml);
+  SubmoduleItemRef(SubmoduleItemRef&&) = default;
+  std::shared_ptr<SubmoduleItem> _SubmoduleItemTarget;
+  GSDML::ValueList<uint> _AllowedInSubslots; // Duh ... allowed in 
+  GSDML::ValueList<uint> _UsedInSubslots; // Default if none selected
+  GSDML::ValueList<uint> _FixedInSubslots; // Must be in
 };
 
 class ModuleItem
 {
 public:
-  ModuleItem(pugi::xml_node&&, pn_gsdml* gsdml);
+  ModuleItem(pugi::xml_node&&, pn_gsdml* gsdml, eModuleItemType = ModuleItemType_Module);  
   ModuleItem(ModuleItem&&) = default;
+  virtual ~ModuleItem() = default;
+  
+  // Attributes
   uint _ModuleIdentNumber;
+  ValueList<uint> _PhysicalSubslots;
+  std::string _ID;
+
+  // Elements
   ModuleInfo _ModuleInfo;
-  std::map<std::string, std::shared_ptr<VirtualSubmoduleItem>>
+  std::map<std::string, std::shared_ptr<SubmoduleItem>>
       _VirtualSubmoduleList;
+  std::map<std::string, std::shared_ptr<SubmoduleItemRef>>
+      _UseableSubmodules;
+  
+  // Type tag...
+  eModuleItemType _ModuleItemType;
 };
 
 class ModuleItemRef
@@ -391,7 +683,35 @@ public:
   GSDML::ValueList<uint> _AllowedInSlots;
 };
 
-class DeviceAccessPointItem
+class DeviceIdentity
+{
+public:
+  DeviceIdentity(pugi::xml_node&&, pn_gsdml* gsdml);
+  DeviceIdentity(DeviceIdentity&&) = default;
+
+  // Attributes
+  uint _VendorID;
+  uint _DeviceID;
+  
+  // Simple Elements
+  std::shared_ptr<std::string> _InfoText;
+  std::string _VendorName;
+};
+
+class DeviceFunction
+{
+public:
+  DeviceFunction(pugi::xml_node&&, pn_gsdml* gsdml);
+  DeviceFunction(DeviceFunction&&) = default;
+
+  // No Attributes
+
+  // "Simple" Elements
+  std::string _MainFamily;
+  std::string _ProductFamily;
+};
+
+class DeviceAccessPointItem : public ModuleItem
 {
 public:
   DeviceAccessPointItem(pugi::xml_node&&, pn_gsdml* gsdml);
@@ -401,7 +721,7 @@ public:
   std::string _RequiredSchemaVersion;
   // ID="DIM 1"
   GSDML::ValueList<uint> _PhysicalSlots;
-  uint _ModuleIdentNumber;
+  // _ModuleIdentNumber; Inherited
   ushort _MinDeviceInterval;
   std::string _ImplementationType;
   std::string _DNS_CompatibleName;
@@ -417,12 +737,20 @@ public:
   bool _NameOfStationNotTransferable;
   ushort _NumberOfDeviceAccessAR;
   ushort _NumberOfSubmodules;
+  bool _LLDP_NoD_Supported;
+  //ValueList<uint> _PhysicalSubslots;  Inherited
+  uint _ResetToFactoryModes;
+
 
   // Sub elements
-  ModuleInfo _ModuleInfo;
+  //ModuleInfo _ModuleInfo; Inherited
+  CertificationInfo _CertificationInfo;
   std::vector<SubslotItem> _SubslotList;
   IOConfigData _IOConfigData;
   std::map<std::string, std::shared_ptr<ModuleItemRef>> _UseableModules;
+  //std::map<std::string, std::shared_ptr<SubmoduleItem>> _VirtualSubmoduleList; Inherited
+  std::map<std::string, std::shared_ptr<SubmoduleItem>> _SystemDefinedSubmoduleList;
+  //std::map<std::string, std::shared_ptr<SubmoduleItemRef>> _UseableSubmodules; Inherited
 };
 
 } // namespace GSDML

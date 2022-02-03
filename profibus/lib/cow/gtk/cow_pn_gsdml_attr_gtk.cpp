@@ -85,7 +85,8 @@ void GsdmlAttrGtk::change_value()
 {
   int sts;
   GtkWidget* text_w;
-  char* value;
+  //char* value;
+  std::string value;
 
   if (input_open)
   {
@@ -101,7 +102,7 @@ void GsdmlAttrGtk::change_value()
     return;
   }
 
-  sts = attrnav->check_attr_value(&value);
+  sts = attrnav->check_attr_value(value);
   if (EVEN(sts))
   {
     if (sts == PB__NOATTRSEL)
@@ -117,12 +118,11 @@ void GsdmlAttrGtk::change_value()
   message(' ', "");
   gtk_widget_grab_focus(cmd_input);
 
-  if (value)
+  if (!value.empty())
   {
     gint pos = 0;
     gtk_editable_delete_text(GTK_EDITABLE(cmd_input), 0, -1);
-    gtk_editable_insert_text(GTK_EDITABLE(cmd_input), value, strlen(value),
-                             &pos);
+    gtk_editable_insert_text(GTK_EDITABLE(cmd_input), value.c_str(), value.length(), &pos);
 
     // Select the text
     gtk_editable_set_position(GTK_EDITABLE(cmd_input), -1);
@@ -331,8 +331,8 @@ static void destroy_event(GtkWidget* w, gpointer data) {}
 
 GsdmlAttrGtk::GsdmlAttrGtk(GtkWidget* a_parent_wid, void* a_parent_ctx,
                            void* a_object, pn_gsdml* a_gsdml, int a_edit_mode,
-                           const char* a_data_filename, pwr_tStatus* a_sts)
-    : GsdmlAttr(a_parent_ctx, a_object, a_gsdml, a_edit_mode, a_data_filename)
+                           std::shared_ptr<ProfinetRuntimeData> pwr_pn_data, pwr_tStatus* a_sts)
+    : GsdmlAttr(a_parent_ctx, a_object, a_edit_mode)
 {
   int sts;
 
@@ -521,7 +521,7 @@ GsdmlAttrGtk::GsdmlAttrGtk(GtkWidget* a_parent_wid, void* a_parent_ctx,
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(help), GTK_WIDGET(help_menu));
 
   // Navigator
-  attrnav = new GsdmlAttrNavGtk(this, vbox, "Plant", gsdml, edit_mode,
+  attrnav = new GsdmlAttrNavGtk(this, vbox, "Plant", a_gsdml, pwr_pn_data, edit_mode,
                                 &brow_widget, &sts);
   attrnav->message_cb = &GsdmlAttr::gsdmlattr_message;
   attrnav->change_value_cb = &GsdmlAttr::gsdmlattr_change_value_cb;
@@ -601,5 +601,8 @@ GsdmlAttrGtk::GsdmlAttrGtk(GtkWidget* a_parent_wid, void* a_parent_ctx,
 
   wow = new CoWowGtk(toplevel);
 
-  *a_sts = attrnav->open(data_filename);
+  /*
+    TODO Make this just a check wether we had a missing file or a different GSDML conf file as base for our configuration.
+  */
+  //*a_sts = attrnav->open(data_filename); 
 }

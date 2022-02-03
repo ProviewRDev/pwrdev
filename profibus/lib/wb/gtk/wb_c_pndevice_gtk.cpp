@@ -81,15 +81,17 @@ static pwr_tStatus Configure(ldh_sMenuCall* ip)
   device_sCtx* ctx;
   pwr_tFileName datafile;
 
+  // Construct pwr_pn data filename
   sprintf(datafile, "$pwrp_load/pwr_pn_%s.xml",
           id_to_string(ip->Pointed.Objid));
+  dcli_translate_filename(datafile, datafile);
 
-  sts = pndevice_create_ctx(ip->PointedSession, ip->Pointed, ip->wnav, &ctx);
+  sts = pndevice_create_ctx(ip->PointedSession, ip->Pointed, ip->wnav, &ctx, datafile);
   if (EVEN(sts))
     return sts;
 
   ctx->attr = new GsdmlAttrGtk(CoXHelpGtk::get_widget(), ctx, 0, ctx->gsdml,
-                               ctx->edit_mode, datafile, &sts);
+                               ctx->edit_mode, ctx->pwr_pn_data, &sts);
   if (sts == PB__CONFIGABORTED)
   {
     delete ctx->attr;

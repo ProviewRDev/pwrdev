@@ -45,6 +45,7 @@
 #include "co_dcli.h"
 #include "co_msg.h"
 #include "co_string.h"
+#include "co_fs_util.h"
 
 #include "rt_pb_msg.h"
 
@@ -81,11 +82,11 @@ public:
 };
 
 static int pndevice_add_channels(device_sCtx* ctx,
-                                 gsdml_VirtualSubmoduleItem* vi,
+                                 GSDML::VirtualSubmoduleItem* vi,
                                  int subslot_number,
                                  std::vector<ChanItem>& input_vect,
                                  std::vector<ChanItem>& output_vect);
-static int pndevice_check_io(device_sCtx* ctx, gsdml_VirtualSubmoduleList* vsl,
+static int pndevice_check_io(device_sCtx* ctx, std::map<std::string, std::shared_ptr<GSDML::SubmoduleItem>> const& vsl,
                              std::vector<ChanItem>& input_vect,
                              std::vector<ChanItem>& output_vect);
 
@@ -120,6 +121,7 @@ int pndevice_help_cb(void* sctx, const char* text)
 void pndevice_close_cb(void* sctx)
 {
   device_sCtx* ctx = (device_sCtx*)sctx;
+  ctx->pwr_pn_data.reset(); // For clarity
   delete ctx->attr;
   delete ctx->gsdml;
   free((char*)ctx);
@@ -135,7 +137,7 @@ int pndevice_save_cb(void* sctx)
   pwr_tStatus rsts = PB__SUCCESS;
 
   // Syntax check
-  if (ctx->attr->attrnav->device_num == 0)
+  if (ctx->attr->attrnav->pn_runtime_data->m_PnDevice->m_DAP_ID == "")
   {
     MsgWindow::message('E', "Device type not selected");
     return PB__SYNTAX;
@@ -318,7 +320,7 @@ int pndevice_save_cb(void* sctx)
       std::vector<ChanItem> output_vect;
 
       sts = pndevice_check_io(
-          ctx, ctx->attr->attrnav->device_item->VirtualSubmoduleList,
+          ctx, ctx->attr->attrnav->m_selected_device_item->_VirtualSubmoduleList,
           input_vect, output_vect);
       if (sts == PB__CREATECHAN)
       {
@@ -334,19 +336,24 @@ int pndevice_save_cb(void* sctx)
       {
         std::vector<ChanItem> input_vect;
         std::vector<ChanItem> output_vect;
-        gsdml_UseableModules* um =
-            ctx->gsdml->ApplicationProcess->DeviceAccessPointList
-                ->DeviceAccessPointItem[ctx->attr->attrnav->device_num - 1]
-                ->UseableModules;
+        
+        int m_device_num = 1;
+        auto& um = ctx->attr->attrnav->m_selected_device_item->_UseableModules;
+        // gsdml_UseableModules* um =
+        //     ctx->gsdml->ApplicationProcess->DeviceAccessPointList
+        //         ->DeviceAccessPointItem[m_device_num - 1]
+        //         ->UseableModules;
 
-        if (!um)
+        if (!um.size())
           continue;
-        gsdml_ModuleItem* mi =
-            (gsdml_ModuleItem*)um->ModuleItemRef[slot->module_enum_number - 1]
-                ->Body.ModuleItemTarget.p;
+        // TODO Fick check IO and all that later!
+        // auto& 
+        // gsdml_ModuleItem* mi =
+        //     (gsdml_ModuleItem*)um->ModuleItemRef[slot->module_enum_number - 1]
+        //         ->Body.ModuleItemTarget.p;
 
-        sts = pndevice_check_io(ctx, mi->VirtualSubmoduleList, input_vect,
-                                output_vect);
+        // sts = pndevice_check_io(ctx, mi->VirtualSubmoduleList, input_vect,
+        //                         output_vect);
         if (sts == PB__CREATECHAN)
         {
           char msg[20];
@@ -609,54 +616,58 @@ static pwr_tStatus generate_viewer_data(device_sCtx* ctx)
   return 1;
 }
 
-static int pndevice_check_io(device_sCtx* ctx, gsdml_VirtualSubmoduleList* vsl,
+static int pndevice_check_io(device_sCtx* ctx, std::map<std::string, std::shared_ptr<GSDML::SubmoduleItem>> const& vsl,
                              std::vector<ChanItem>& input_vect,
                              std::vector<ChanItem>& output_vect)
 {
   int sts;
 
-  if (vsl)
+  if (vsl.size())
   {
     unsigned int subslot_number = 0;
 
-    for (unsigned int i = 0; i < vsl->VirtualSubmoduleItem.size(); i++)
+    for (auto const& submodule_item : vsl)
+    //for (unsigned int i = 0; i < vsl->VirtualSubmoduleItem.size(); i++)
     {
-      if (strcmp(vsl->VirtualSubmoduleItem[i]->Body.FixedInSubslots.str, "") ==
-          0)
+      if (submodule_item.second->_FixedInSubslots.empty() && submodule_item.second->_SubmoduleItemType == GSDML::SubmoduleItemType_Virtual)
+      // if (strcmp(vsl->VirtualSubmoduleItem[i]->Body.FixedInSubslots.str, "") ==
+      //     0)
       {
+        printf("in pndevice_check_io. No fixedinslots for this virtual submodule item\n");
         // FixedInSubslots not supplied, default subslot number is 1
+        // TODO FIX!
+        // if (submodule_item.second. vsl->VirtualSubmoduleItem.size() == 1)
+        //   subslot_number = 1;
+        // else
+        //   subslot_number++;
 
-        if (vsl->VirtualSubmoduleItem.size() == 1)
-          subslot_number = 1;
-        else
-          subslot_number++;
-
-        sts = pndevice_add_channels(ctx, vsl->VirtualSubmoduleItem[i],
-                                    subslot_number, input_vect, output_vect);
-        if (EVEN(sts))
-          return sts;
+        // sts = pndevice_add_channels(ctx, vsl->VirtualSubmoduleItem[i],
+        //                             subslot_number, input_vect, output_vect);
+        // if (EVEN(sts))
+        //   return sts;
       }
       else
       {
+        printf("in pndevice_check_io. fixedinslots this virtual submodule item has (says yoda)\n");
         // FixedInSubslots supplied, create channels for all fixed subslots
+        // TODO FIX!
+        // gsdml_Valuelist* vl = new gsdml_Valuelist(
+        //     vsl->VirtualSubmoduleItem[i]->Body.FixedInSubslots.str);
+        // gsdml_ValuelistIterator iter(vl);
 
-        gsdml_Valuelist* vl = new gsdml_Valuelist(
-            vsl->VirtualSubmoduleItem[i]->Body.FixedInSubslots.str);
-        gsdml_ValuelistIterator iter(vl);
+        // for (unsigned int j = iter.begin(); j != iter.end(); j = iter.next())
+        // {
+        //   subslot_number = j;
 
-        for (unsigned int j = iter.begin(); j != iter.end(); j = iter.next())
-        {
-          subslot_number = j;
-
-          sts = pndevice_add_channels(ctx, vsl->VirtualSubmoduleItem[i],
-                                      subslot_number, input_vect, output_vect);
-          if (EVEN(sts))
-          {
-            delete vl;
-            return sts;
-          }
-        }
-        delete vl;
+        //   sts = pndevice_add_channels(ctx, vsl->VirtualSubmoduleItem[i],
+        //                               subslot_number, input_vect, output_vect);
+        //   if (EVEN(sts))
+        //   {
+        //     delete vl;
+        //     return sts;
+        //   }
+        // }
+        // delete vl;
       }
     }
   }
@@ -664,57 +675,53 @@ static int pndevice_check_io(device_sCtx* ctx, gsdml_VirtualSubmoduleList* vsl,
 }
 
 static int pndevice_add_channels(device_sCtx* ctx,
-                                 gsdml_VirtualSubmoduleItem* vi,
+                                 GSDML::VirtualSubmoduleItem* vi,
                                  int subslot_number,
                                  std::vector<ChanItem>& input_vect,
                                  std::vector<ChanItem>& output_vect)
 {
   // Find input data
-  if (vi->IOData && vi->IOData->Input)
+  if (vi->_IOData._Input._DataItem.size())
   {
-    for (unsigned int i = 0; i < vi->IOData->Input->DataItem.size(); i++)
+    for (unsigned int i = 0; i < vi->_IOData._Input._DataItem.size(); i++)
     {
-      gsdml_DataItem* di = vi->IOData->Input->DataItem[i];
-      gsdml_eValueDataType datatype;
+      GSDML::DataItem& di = vi->_IOData._Input._DataItem[i];
 
-      ctx->attr->attrnav->gsdml->string_to_value_datatype(di->Body.DataType,
-                                                          &datatype);
-
-      if (!di->Body.UseAsBits)
+      if (!di._UseAsBits)
       {
         unsigned int representation = 0;
         int invalid_type = 0;
 
-        switch (datatype)
+        switch (di._DataType)
         {
-        case gsdml_eValueDataType_Integer8:
+        case GSDML::ValueDataType_Integer8:
           representation = pwr_eDataRepEnum_Int8;
           break;
-        case gsdml_eValueDataType_Unsigned8:
+        case GSDML::ValueDataType_Unsigned8:
           representation = pwr_eDataRepEnum_UInt8;
           break;
-        case gsdml_eValueDataType_Integer16:
+        case GSDML::ValueDataType_Integer16:
           representation = pwr_eDataRepEnum_Int16;
           break;
-        case gsdml_eValueDataType_Unsigned16:
+        case GSDML::ValueDataType_Unsigned16:
           representation = pwr_eDataRepEnum_UInt16;
           break;
-        case gsdml_eValueDataType_Integer32:
+        case GSDML::ValueDataType_Integer32:
           representation = pwr_eDataRepEnum_Int32;
           break;
-        case gsdml_eValueDataType_Unsigned32:
+        case GSDML::ValueDataType_Unsigned32:
           representation = pwr_eDataRepEnum_UInt32;
           break;
-        case gsdml_eValueDataType_Integer64:
+        case GSDML::ValueDataType_Integer64:
           representation = pwr_eDataRepEnum_Int64;
           break;
-        case gsdml_eValueDataType_Unsigned64:
+        case GSDML::ValueDataType_Unsigned64:
           representation = pwr_eDataRepEnum_UInt64;
           break;
-        case gsdml_eValueDataType_Float32:
+        case GSDML::ValueDataType_Float32:
           representation = pwr_eDataRepEnum_Float32;
           break;
-        case gsdml_eValueDataType_Float64:
+        case GSDML::ValueDataType_Float64:
           representation = pwr_eDataRepEnum_Float64;
           break;
         default:
@@ -730,7 +737,7 @@ static int pndevice_add_channels(device_sCtx* ctx,
         ci.representation = representation;
         ci.use_as_bit = 0;
         ci.cid = pwr_cClass_ChanAi;
-        strncpy(ci.description, (char*)di->Body.TextId.p,
+        strncpy(ci.description, di._Text->c_str(),
                 sizeof(ci.description));
         ci.description[sizeof(ci.description) - 1] = 0;
 
@@ -742,32 +749,32 @@ static int pndevice_add_channels(device_sCtx* ctx,
         unsigned int bits;
         unsigned int representation = 0;
 
-        switch (datatype)
+        switch (di._DataType)
         {
-        case gsdml_eValueDataType_Integer8:
-        case gsdml_eValueDataType_Unsigned8:
+        case GSDML::ValueDataType_Integer8:
+        case GSDML::ValueDataType_Unsigned8:
           representation = pwr_eDataRepEnum_Bit8;
           bits = 8;
           break;
-        case gsdml_eValueDataType_Integer16:
-        case gsdml_eValueDataType_Unsigned16:
+        case GSDML::ValueDataType_Integer16:
+        case GSDML::ValueDataType_Unsigned16:
           representation = pwr_eDataRepEnum_Bit16;
           bits = 16;
           break;
-        case gsdml_eValueDataType_Integer32:
-        case gsdml_eValueDataType_Unsigned32:
+        case GSDML::ValueDataType_Integer32:
+        case GSDML::ValueDataType_Unsigned32:
           representation = pwr_eDataRepEnum_Bit32;
           bits = 32;
           break;
-        case gsdml_eValueDataType_Integer64:
-        case gsdml_eValueDataType_Unsigned64:
+        case GSDML::ValueDataType_Integer64:
+        case GSDML::ValueDataType_Unsigned64:
           representation = pwr_eDataRepEnum_Bit64;
           bits = 64;
           break;
         default:
           bits = 0;
         }
-        if (di->BitDataItem.size() == 0)
+        if (di._BitDataItem.size() == 0)
         {
           // Add all bits
           for (unsigned int j = 0; j < bits; j++)
@@ -779,7 +786,7 @@ static int pndevice_add_channels(device_sCtx* ctx,
             ci.representation = representation;
             ci.use_as_bit = 1;
             ci.cid = pwr_cClass_ChanDi;
-            strncpy(ci.description, (char*)di->Body.TextId.p,
+            strncpy(ci.description, di._Text->c_str(),
                     sizeof(ci.description));
             ci.description[sizeof(ci.description) - 2] = 0;
 
@@ -788,16 +795,16 @@ static int pndevice_add_channels(device_sCtx* ctx,
         }
         else
         {
-          for (unsigned int j = 0; j < di->BitDataItem.size(); j++)
+          for (unsigned int j = 0; j < di._BitDataItem.size(); j++)
           {
             // Add channel
             ChanItem ci;
             ci.subslot_number = subslot_number;
-            ci.number = di->BitDataItem[j]->Body.BitOffset;
+            ci.number = di._BitDataItem[j]._BitOffset;
             ci.representation = representation;
             ci.use_as_bit = 1;
             ci.cid = pwr_cClass_ChanDi;
-            strncpy(ci.description, (char*)di->BitDataItem[j]->Body.TextId.p,
+            strncpy(ci.description, (char*)di._BitDataItem[j]._Text->c_str(),
                     sizeof(ci.description));
             ci.description[sizeof(ci.description) - 2] = 0;
 
@@ -809,51 +816,47 @@ static int pndevice_add_channels(device_sCtx* ctx,
   }
 
   // Find output data
-  if (vi->IOData && vi->IOData->Output)
+  if (vi->_IOData._Output._DataItem.size())
   {
-    for (unsigned int i = 0; i < vi->IOData->Output->DataItem.size(); i++)
+    for (unsigned int i = 0; i < vi->_IOData._Output._DataItem.size(); i++)
     {
-      gsdml_DataItem* di = vi->IOData->Output->DataItem[i];
-      gsdml_eValueDataType datatype;
-
-      ctx->attr->attrnav->gsdml->string_to_value_datatype(di->Body.DataType,
-                                                          &datatype);
-
-      if (!di->Body.UseAsBits)
+      GSDML::DataItem& di = vi->_IOData._Output._DataItem[i];
+      
+      if (!di._UseAsBits)
       {
         unsigned int representation = 0;
         int invalid_type = 0;
 
-        switch (datatype)
+        switch (di._DataType)
         {
-        case gsdml_eValueDataType_Integer8:
+        case GSDML::ValueDataType_Integer8:
           representation = pwr_eDataRepEnum_Int8;
           break;
-        case gsdml_eValueDataType_Unsigned8:
+        case GSDML::ValueDataType_Unsigned8:
           representation = pwr_eDataRepEnum_UInt8;
           break;
-        case gsdml_eValueDataType_Integer16:
+        case GSDML::ValueDataType_Integer16:
           representation = pwr_eDataRepEnum_Int16;
           break;
-        case gsdml_eValueDataType_Unsigned16:
+        case GSDML::ValueDataType_Unsigned16:
           representation = pwr_eDataRepEnum_UInt16;
           break;
-        case gsdml_eValueDataType_Integer32:
+        case GSDML::ValueDataType_Integer32:
           representation = pwr_eDataRepEnum_Int32;
           break;
-        case gsdml_eValueDataType_Unsigned32:
+        case GSDML::ValueDataType_Unsigned32:
           representation = pwr_eDataRepEnum_UInt32;
           break;
-        case gsdml_eValueDataType_Integer64:
+        case GSDML::ValueDataType_Integer64:
           representation = pwr_eDataRepEnum_Int64;
           break;
-        case gsdml_eValueDataType_Unsigned64:
+        case GSDML::ValueDataType_Unsigned64:
           representation = pwr_eDataRepEnum_UInt64;
           break;
-        case gsdml_eValueDataType_Float32:
+        case GSDML::ValueDataType_Float32:
           representation = pwr_eDataRepEnum_Float32;
           break;
-        case gsdml_eValueDataType_Float64:
+        case GSDML::ValueDataType_Float64:
           representation = pwr_eDataRepEnum_Float64;
           break;
         default:
@@ -872,7 +875,7 @@ static int pndevice_add_channels(device_sCtx* ctx,
         ci.representation = representation;
         ci.use_as_bit = 0;
         ci.cid = pwr_cClass_ChanAo;
-        strncpy(ci.description, (char*)di->Body.TextId.p,
+        strncpy(ci.description, di._Text->c_str(),
                 sizeof(ci.description));
         ci.description[sizeof(ci.description) - 2] = 0;
 
@@ -884,32 +887,32 @@ static int pndevice_add_channels(device_sCtx* ctx,
         unsigned int bits;
         unsigned int representation = 0;
 
-        switch (datatype)
+        switch (di._DataType)
         {
-        case gsdml_eValueDataType_Integer8:
-        case gsdml_eValueDataType_Unsigned8:
+        case GSDML::ValueDataType_Integer8:
+        case GSDML::ValueDataType_Unsigned8:
           representation = pwr_eDataRepEnum_Bit8;
           bits = 8;
           break;
-        case gsdml_eValueDataType_Integer16:
-        case gsdml_eValueDataType_Unsigned16:
+        case GSDML::ValueDataType_Integer16:
+        case GSDML::ValueDataType_Unsigned16:
           representation = pwr_eDataRepEnum_Bit16;
           bits = 16;
           break;
-        case gsdml_eValueDataType_Integer32:
-        case gsdml_eValueDataType_Unsigned32:
+        case GSDML::ValueDataType_Integer32:
+        case GSDML::ValueDataType_Unsigned32:
           representation = pwr_eDataRepEnum_Bit32;
           bits = 32;
           break;
-        case gsdml_eValueDataType_Integer64:
-        case gsdml_eValueDataType_Unsigned64:
+        case GSDML::ValueDataType_Integer64:
+        case GSDML::ValueDataType_Unsigned64:
           representation = pwr_eDataRepEnum_Bit64;
           bits = 64;
           break;
         default:
           bits = 0;
         }
-        if (di->BitDataItem.size() == 0)
+        if (di._BitDataItem.size() == 0)
         {
           // Add all bits
           for (unsigned int j = 0; j < bits; j++)
@@ -921,7 +924,7 @@ static int pndevice_add_channels(device_sCtx* ctx,
             ci.representation = representation;
             ci.use_as_bit = 1;
             ci.cid = pwr_cClass_ChanDo;
-            strncpy(ci.description, (char*)di->Body.TextId.p,
+            strncpy(ci.description, di._Text->c_str(),
                     sizeof(ci.description));
             ci.description[sizeof(ci.description) - 2] = 0;
 
@@ -930,16 +933,16 @@ static int pndevice_add_channels(device_sCtx* ctx,
         }
         else
         {
-          for (unsigned int j = 0; j < di->BitDataItem.size(); j++)
+          for (unsigned int j = 0; j < di._BitDataItem.size(); j++)
           {
             // Add channel
             ChanItem ci;
             ci.subslot_number = subslot_number;
-            ci.number = di->BitDataItem[j]->Body.BitOffset;
+            ci.number = di._BitDataItem[j]._BitOffset;
             ci.representation = representation;
             ci.use_as_bit = 1;
             ci.cid = pwr_cClass_ChanDo;
-            strncpy(ci.description, (char*)di->BitDataItem[j]->Body.TextId.p,
+            strncpy(ci.description, di._BitDataItem[j]._Text->c_str(),
                     sizeof(ci.description));
             ci.description[sizeof(ci.description) - 2] = 0;
 
@@ -953,7 +956,7 @@ static int pndevice_add_channels(device_sCtx* ctx,
 }
 
 pwr_tStatus pndevice_create_ctx(ldh_tSession ldhses, pwr_tAttrRef aref,
-                                void* editor_ctx, device_sCtx** ctxp)
+                                void* editor_ctx, device_sCtx** ctxp, char const* pwr_pn_data_file)
 {
   pwr_tOName name;
   char* gsdmlfile;
@@ -1023,6 +1026,9 @@ pwr_tStatus pndevice_create_ctx(ldh_tSession ldhses, pwr_tAttrRef aref,
     strcpy(fname, gsdmlfile);
   free(gsdmlfile);
 
+
+  // TODO Load new parser data instead...
+
   ctx->gsdml = new pn_gsdml();
   sts = ctx->gsdml->read(fname);
   if (EVEN(sts))
@@ -1030,8 +1036,14 @@ pwr_tStatus pndevice_create_ctx(ldh_tSession ldhses, pwr_tAttrRef aref,
     free(ctx);
     return sts;
   }
-  ctx->gsdml->build();
+  //ctx->gsdml->build();
   ctx->gsdml->set_classes(ctx->mc);
+
+  // Now load the pwr_pn data if any. If there is none a default constructed object is created to start working on
+  char* name_of_gsdml_file;
+  basename(fname, &name_of_gsdml_file); // We want only the actual filename not the path...
+  ctx->pwr_pn_data.reset(new ProfinetRuntimeData());
+  sts = ctx->pwr_pn_data->read_pwr_pn_xml(pwr_pn_data_file, name_of_gsdml_file);
 
   *ctxp = ctx;
   return 1;
@@ -1062,12 +1074,14 @@ pwr_tStatus pndevice_init(device_sCtx* ctx)
       corrupt = 1;
       continue;
     }
-    if (idx >= ctx->attr->attrnav->dev_data.slot_data.size())
+    // if (idx >= ctx->attr->attrnav->dev_data.slot_data.size())
+    if (idx >= ctx->attr->attrnav->pn_runtime_data->m_PnDevice->m_slot_list.size())
     {
       corrupt = 1;
       continue;
     }
-    ctx->attr->attrnav->dev_data.slot_data[idx]->module_oid = module_oid;
+    // ctx->attr->attrnav->dev_data.slot_data[idx]->module_oid = module_oid;
+    ctx->attr->attrnav->pn_runtime_data->m_PnDevice->m_slot_list[idx].m_module_oid = module_oid;
   }
 
   if (corrupt)
@@ -1080,12 +1094,14 @@ pwr_tStatus pndevice_init(device_sCtx* ctx)
          ODD(sts);
          sts = ldh_GetNextSibling(ctx->ldhses, module_oid, &module_oid))
     {
-      if (idx >= ctx->attr->attrnav->dev_data.slot_data.size())
+      //if (idx >= ctx->attr->attrnav->dev_data.slot_data.size())
+      if (idx >= ctx->attr->attrnav->pn_runtime_data->m_PnDevice->m_slot_list.size())
       {
         corrupt = 1;
         break;
       }
-      ctx->attr->attrnav->dev_data.slot_data[idx]->module_oid = module_oid;
+      //ctx->attr->attrnav->dev_data.slot_data[idx]->module_oid = module_oid;
+      ctx->attr->attrnav->pn_runtime_data->m_PnDevice->m_slot_list[idx].m_module_oid = module_oid;
       idx++;
     }
     if (corrupt)

@@ -112,13 +112,14 @@ void GsdmlAttr::activate_copy()
     return;
   }
 
-  if (item->type != attrnav_eItemType_PnSlot)
+  if (item->m_type != attrnav_eItemType_PnSlot)
   {
     message('E', "Only slots can be copied");
     return;
   }
 
-  attrnav->dev_data.copy_slot(item->slotdata->slot_idx);
+  // TODO FIx copying!
+  //attrnav->dev_data.copy_slot(item->slotdata->slot_idx);
 
   message('I', "Slot copied");
 }
@@ -135,13 +136,14 @@ void GsdmlAttr::activate_cut()
     return;
   }
 
-  if (item->type != attrnav_eItemType_PnSlot)
+  if (item->m_type != attrnav_eItemType_PnSlot)
   {
     message('E', "Only slots can be cut");
     return;
   }
 
-  attrnav->dev_data.cut_slot(item->slotdata->slot_idx);
+  // TODO Fix Cutting
+  //attrnav->dev_data.cut_slot(item->slotdata->slot_idx);
   attrnav->redraw();
 }
 
@@ -157,13 +159,14 @@ void GsdmlAttr::activate_paste()
     return;
   }
 
-  if (item->type != attrnav_eItemType_PnSlot)
+  if (item->m_type != attrnav_eItemType_PnSlot)
   {
     message('E', "Select a slot");
     return;
   }
 
-  attrnav->dev_data.paste_slot(item->slotdata->slot_idx);
+  // TODO Fix paste!
+  //attrnav->dev_data.paste_slot(item->slotdata->slot_idx);
   attrnav->redraw();
 }
 
@@ -287,11 +290,11 @@ GsdmlAttr::~GsdmlAttr() {
     delete wow;
 }
 
-GsdmlAttr::GsdmlAttr(void* a_parent_ctx, void* a_object, pn_gsdml* a_gsdml,
-                     int a_edit_mode, const char* a_data_filename)
-    : parent_ctx(a_parent_ctx), gsdml(a_gsdml), edit_mode(a_edit_mode),
+GsdmlAttr::GsdmlAttr(void* a_parent_ctx, void* a_object,
+                     int a_edit_mode)
+    : parent_ctx(a_parent_ctx), edit_mode(a_edit_mode),
       input_open(0), object(a_object), close_cb(0), save_cb(0), help_cb(0),
       client_data(0), recall_idx(-1), value_current_recall(0)
 {
-  dcli_translate_filename(data_filename, a_data_filename);
+  //dcli_translate_filename(data_filename, a_data_filename);
 }

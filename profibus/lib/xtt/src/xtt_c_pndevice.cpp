@@ -40,6 +40,7 @@
 
 #include "co_cdh.h"
 #include "co_string.h"
+#include "co_fs_util.h"
 
 #include "rt_pb_msg.h"
 #include "rt_xnav_msg.h"
@@ -84,7 +85,7 @@ void xtt_pndevice_close_cb(void* sctx)
 int xtt_pndevice_save_cb(void* sctx) { return 1; }
 
 pwr_tStatus xtt_pndevice_create_ctx(pwr_tAttrRef aref, void* editor_ctx,
-                                    xtt_pndevice_sCtx** ctxp)
+                                    xtt_pndevice_sCtx** ctxp, char const* pwr_pn_data_file)
 {
   pwr_tOName name;
   pwr_tString80 gsdmlfile;
@@ -154,8 +155,14 @@ pwr_tStatus xtt_pndevice_create_ctx(pwr_tAttrRef aref, void* editor_ctx,
     free(ctx);
     return sts;
   }
-  ctx->gsdml->build();
+  //ctx->gsdml->build();
   ctx->gsdml->set_classes(ctx->mc);
+
+  // Now load the pwr_pn data if any. If there is none a default constructed object is created to start working on
+  char* name_of_gsdml_file;
+  basename(fname, &name_of_gsdml_file); // We want only the actual filename not the path...
+  ctx->pwr_pn_data.reset(new ProfinetRuntimeData());
+  sts = ctx->pwr_pn_data->read_pwr_pn_xml(pwr_pn_data_file, name_of_gsdml_file);
 
   *ctxp = ctx;
   return 1;

@@ -66,7 +66,7 @@ public:
   CoWowEntryGtk* cmd_entry;
 
   GsdmlAttrGtk(GtkWidget* a_parent_wid, void* a_parent_ctx, void* a_object,
-               pn_gsdml* a_gsdml, int a_edit_mode, const char* a_data_filename,
+               pn_gsdml* a_gsdml, int a_edit_mode, std::shared_ptr<ProfinetRuntimeData> pwr_pn_data,
                pwr_tStatus* a_sts);
   ~GsdmlAttrGtk();
 
