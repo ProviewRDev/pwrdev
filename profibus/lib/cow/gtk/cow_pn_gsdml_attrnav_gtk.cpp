@@ -105,23 +105,23 @@ void GsdmlAttrNavGtk::display_attr_help_text()
    * the base class does,
    * but since they already contained references they were used instead...
    */
-  case attrnav_eItemType_PnParValue:
-  case attrnav_eItemType_PnParEnum:
-  {
-    ItemPnParEnum* item = (ItemPnParEnum*)base_item;
-    std::shared_ptr<GSDML::ValueItem> vi = 0;    
+  // case attrnav_eItemType_PnParValue:
+  // case attrnav_eItemType_PnParEnum:
+  // {
+  //   ItemPnParEnum* item = (ItemPnParEnum*)base_item;
+  //   std::shared_ptr<GSDML::ValueItem> vi = 0;    
 
-    if (item->m_ref)
-      vi = item->m_ref->_ValueItem;
+  //   if (item->m_ref)
+  //     vi = item->m_ref->_ValueItem;
 
-    // If we do have help available show it
-    if (vi && vi->_Help)
-      ((GsdmlAttrGtk*)parent_ctx)->attr_help_text(vi->_Help->c_str());
-    else
-      ((GsdmlAttrGtk*)parent_ctx)->attr_help_text("");
+  //   // If we do have help available show it
+  //   if (vi && vi->_Help)
+  //     ((GsdmlAttrGtk*)parent_ctx)->attr_help_text(vi->_Help->c_str());
+  //   else
+  //     ((GsdmlAttrGtk*)parent_ctx)->attr_help_text("");
 
-    break;
-  }
+  //   break;
+  // }
   default:
   {
     // Do we have an associated info text string to show the user some more

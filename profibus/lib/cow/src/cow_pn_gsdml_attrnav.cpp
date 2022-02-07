@@ -42,6 +42,8 @@
 #include <memory>
 #include <arpa/inet.h>
 #include <typeinfo>
+#include <regex>
+//#include <exception>
 
 #include "co_cdh.h"
 #include "co_dcli.h"
@@ -70,54 +72,105 @@
 
 static char null_str[] = "";
 
-//
-// Convert attribute string to value
-//
-// int GsdmlAttrNav::attr_string_to_value(int type_id, const char* value_str,
-//                                        void* buffer_ptr, int buff_size,
-//                                        int attr_size)
-// {
-//   switch (type_id)
-//   {
-//   case pwr_eType_Boolean:
-//   {
-//     if (sscanf(value_str, "%d", (pwr_tBoolean*)buffer_ptr) != 1)
-//       return ATTRNAV__INPUT_SYNTAX;
-//     if (*(pwr_tBoolean*)buffer_ptr > 1)
-//       return ATTRNAV__INPUT_SYNTAX;
-//     break;
-//   }
-//   case pwr_eType_Float32:
-//   {
-//     pwr_tFloat32 f;
-//     if (sscanf(value_str, "%f", &f) != 1)
-//       return ATTRNAV__INPUT_SYNTAX;
-//     memcpy(buffer_ptr, (char*)&f, sizeof(f));
+/*
+  Instantiates the correct template class depending on the type of value encountered in the GSDML file.
+*/
+void create_parameter_value_class(GsdmlAttrNav* attrnav, const char* name, std::shared_ptr<GSDML::Ref> ref,
+                          void* data, brow_tNode node)
+{
+  bool create_selection = false;
 
-//     break;
-//   }
-//   case pwr_eType_Int32:
-//   {
-//     if (sscanf(value_str, "%d", (int*)buffer_ptr) != 1)
-//       return ATTRNAV__INPUT_SYNTAX;
-//     break;
-//   }
-//   case pwr_eType_UInt32:
-//   {
-//     if (sscanf(value_str, "%u", (int*)buffer_ptr) != 1)
-//       return ATTRNAV__INPUT_SYNTAX;
-//     break;
-//   }
-//   case pwr_eType_String:
-//   {
-//     if ((int)strlen(value_str) >= attr_size)
-//       return ATTRNAV__STRINGTOLONG;
-//     strncpy((char*)buffer_ptr, value_str, MIN(attr_size, buff_size));
-//     break;
-//   }
-//   }
-//   return 1;
-// }
+  if (ref->_ValueItem && ref->_ValueItem->_Assignments.size())
+    create_selection = true;
+
+  // Create a handy infotext depending on what we have to play with...
+  // TODO
+  // TODO Also move infotext parameter to constructor of ItemPnParameterSelection
+
+  switch (ref->_DataType)
+  {
+    case GSDML::ValueDataType_Bit:
+    case GSDML::ValueDataType_BitArea:
+      //new ItemPnParEnum(attrnav, name, ref, (unsigned char*)data, node, flow_eDest_IntoLast, "BitArea/Bit value selection.");
+      new ItemPnParameterSelection<uint8_t>(attrnav, name, (uint8_t*)data, node, flow_eDest_IntoLast, ref);
+      break;
+    case GSDML::ValueDataType_Integer8:
+      if (create_selection)
+        new ItemPnParameterSelection<int8_t>(attrnav, name, (int8_t*)data, node, flow_eDest_IntoLast, ref);
+        //new ItemPnParEnum(attrnav, name, ref, (unsigned char*)data, node, flow_eDest_IntoLast, "Unsigned32 value selection.");
+      else
+        new ItemPnParameterInput<int8_t>(attrnav, name, (int8_t*)data, "Integer8 value input.", node, flow_eDest_IntoLast, ref);
+      break;
+    case GSDML::ValueDataType_Unsigned8:
+      if (create_selection)
+        new ItemPnParameterSelection<uint8_t>(attrnav, name, (uint8_t*)data, node, flow_eDest_IntoLast, ref);
+        //new ItemPnParEnum(attrnav, name, ref, (unsigned char*)data, node, flow_eDest_IntoLast, "Unsigned32 value selection.");
+      else
+        new ItemPnParameterInput<uint8_t>(attrnav, name, (uint8_t*)data, "Unsigned8 value input.", node, flow_eDest_IntoLast, ref);
+      break;
+    case GSDML::ValueDataType_Integer16:
+      if (create_selection)
+        new ItemPnParameterSelection<int16_t>(attrnav, name, (int16_t*)data, node, flow_eDest_IntoLast, ref);
+        //new ItemPnParEnum(attrnav, name, ref, (unsigned char*)data, node, flow_eDest_IntoLast, "Unsigned32 value selection.");
+      else
+        new ItemPnParameterInput<int16_t>(attrnav, name, (int16_t*)data, "Integer16 value input.", node, flow_eDest_IntoLast, ref);
+      break;
+    case GSDML::ValueDataType_Unsigned16:
+      if (create_selection)
+        new ItemPnParameterSelection<uint16_t>(attrnav, name, (uint16_t*)data, node, flow_eDest_IntoLast, ref);
+        //new ItemPnParEnum(attrnav, name, ref, (unsigned char*)data, node, flow_eDest_IntoLast, "Unsigned32 value selection.");
+      else
+        new ItemPnParameterInput<uint16_t>(attrnav, name, (uint16_t*)data, "Unsigned16s value input.", node, flow_eDest_IntoLast, ref);
+      break;
+    case GSDML::ValueDataType_Integer32:
+      if (create_selection)
+        new ItemPnParameterSelection<int32_t>(attrnav, name, (int32_t*)data, node, flow_eDest_IntoLast, ref);
+        //new ItemPnParEnum(attrnav, name, ref, (unsigned char*)data, node, flow_eDest_IntoLast, "Unsigned32 value selection.");
+      else
+        new ItemPnParameterInput<int32_t>(attrnav, name, (int32_t*)data, "Integer32 value input.", node, flow_eDest_IntoLast, ref);
+      break;
+    case GSDML::ValueDataType_Unsigned32:
+      if (create_selection)
+        new ItemPnParameterSelection<uint32_t>(attrnav, name, (uint32_t*)data, node, flow_eDest_IntoLast, ref);
+        //new ItemPnParEnum(attrnav, name, ref, (unsigned char*)data, node, flow_eDest_IntoLast, "Unsigned32 value selection.");
+      else
+        new ItemPnParameterInput<uint32_t>(attrnav, name, (uint32_t*)data, "Unsigned32 value input.", node, flow_eDest_IntoLast, ref);
+      break;
+    case GSDML::ValueDataType_Integer64:
+      if (create_selection)
+        new ItemPnParameterSelection<int64_t>(attrnav, name, (int64_t*)data, node, flow_eDest_IntoLast, ref);
+        //new ItemPnParEnum(attrnav, name, ref, (unsigned char*)data, node, flow_eDest_IntoLast, "Unsigned32 value selection.");
+      else
+        new ItemPnParameterInput<int64_t>(attrnav, name, (int64_t*)data, "Integer64 value input.", node, flow_eDest_IntoLast, ref);
+      break;
+    case GSDML::ValueDataType_Unsigned64:
+      if (create_selection)
+        new ItemPnParameterSelection<uint64_t>(attrnav, name, (uint64_t*)data, node, flow_eDest_IntoLast, ref);
+        //new ItemPnParEnum(attrnav, name, ref, (unsigned char*)data, node, flow_eDest_IntoLast, "Unsigned32 value selection.");
+      else
+        new ItemPnParameterInput<uint64_t>(attrnav, name, (uint64_t*)data, "Unsigned64 value input.", node, flow_eDest_IntoLast, ref);
+      break;
+    case GSDML::ValueDataType_Float32:
+      if (create_selection)
+        new ItemPnParameterSelection<float>(attrnav, name, (float*)data, node, flow_eDest_IntoLast, ref);
+        //new ItemPnParEnum(attrnav, name, ref, (unsigned char*)data, node, flow_eDest_IntoLast, "Unsigned32 value selection.");
+      else
+        new ItemPnParameterInput<float>(attrnav, name, (float*)data, "Float32 value input.", node, flow_eDest_IntoLast, ref);
+      break;
+    case GSDML::ValueDataType_Float64:
+      if (create_selection)
+        new ItemPnParameterSelection<double>(attrnav, name, (double*)data, node, flow_eDest_IntoLast, ref);
+        //new ItemPnParEnum(attrnav, name, ref, (unsigned char*)data, node, flow_eDest_IntoLast, "Unsigned32 value selection.");
+      else
+        new ItemPnParameterInput<double>(attrnav, name, (double*)data, "Float64 value input.", node, flow_eDest_IntoLast, ref);
+      break;
+    case GSDML::ValueDataType_VisibleString:
+        new ItemPnParameterInput<double>(attrnav, name, (double*)data, "String input.", node, flow_eDest_IntoLast, ref);
+      break;
+    default:
+      std::cout << "Unhandled GSDML Datatype for parameter Ref element." << std::endl;
+  }
+}
 
 void GsdmlAttrNav::message(char sev, const char* text)
 {
@@ -250,8 +303,7 @@ void GsdmlAttrNav::expand_all()
           item->m_type == attrnav_eItemType_PnModuleClass ||
           item->m_type == attrnav_eItemType_PnEnumByteOrder ||
           item->m_type == attrnav_eItemType_PnEnumTimeRatio ||
-          item->m_type == attrnav_eItemType_PnSubmoduleSelection ||
-          item->m_type == attrnav_eItemType_PnEnumSendClock))
+          item->m_type == attrnav_eItemType_PnSubmoduleSelection))
       item->open_children(this, 0, 0);
     brow_GetObjectList(brow->ctx, &olist, &ocnt);
   }
@@ -307,9 +359,6 @@ int GsdmlAttrNav::check_attr_value(std::string& p_value)
   brow_tNode* node_list;
   int node_count;
   ItemPn* base_item;
-  //static char buf[200];
-  //std::string value;
-  //int len;
 
   brow_GetSelectedNodes(brow->ctx, &node_list, &node_count);
   if (!node_count)
@@ -321,41 +370,16 @@ int GsdmlAttrNav::check_attr_value(std::string& p_value)
   switch (base_item->m_type)
   {
   case attrnav_eItemType_PnValueInput:
-    // Call into the base item to fetch the string instead..
-    p_value = base_item->to_string();
-    break;
-  case attrnav_eItemType_PnBase:  
-  {
-    ItemPnBase* item = (ItemPnBase*)base_item;
-
-    if (item->m_noedit)
+    if (base_item->m_noedit)
     {
       p_value = "";
       return PB__ATTRNOEDIT;
     }
-    p_value = GSDML::attr_value_to_string(item->m_value_type, item->m_value_p);
-    //GSDML::attr_value_to_string(item->m_type_id, item->m_value_p, &len, NULL);
-    //*p_value_p = buf;
-    return PB__SUCCESS;
-  }
-  case attrnav_eItemType_PnParValue:
-  {
-    ItemPnParValue* item = (ItemPnParValue*)base_item;
-    //int sts;
 
-    if (item->m_noedit)
-      return PB__ATTRNOEDIT;
-
-    p_value = GSDML::datavalue_to_string(item->m_gsdml_datatype, &item->m_data[item->m_byte_offset]);
-    // sts = GSDML::datavalue_to_string(item->m_gsdml_datatype,
-    //                                  &item->m_data[item->m_byte_offset],
-    //                                  item->m_size, buf, sizeof(buf));
-    // if (EVEN(sts))
-    //   strcpy(buf, "");
-    //*p_value_p = buf;
-    //p_value_p = value.c_str();
-    return PB__SUCCESS;
-  }
+    // Call into the base item to fetch the string value
+    p_value = base_item->to_string();
+    
+    break;
   default:
     return PB__ATTRNOEDIT;
   }
@@ -626,12 +650,15 @@ int GsdmlAttrNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
       //   selection_item->select();  
       // }
       break;
-    case attrnav_eItemType_PnBase:
     case attrnav_eItemType_PnValueInput:
+      if (attrnav->change_value_cb)
+        attrnav->change_value_cb(attrnav->parent_ctx);
+      break;
+    //case attrnav_eItemType_PnBase:    
     case attrnav_eItemType_PnParValue:
-      if (((ItemPnBase*)item)->m_is_parent)
+      if (item->m_is_parent)
         item->open_children(attrnav, 0, 0);
-      else if (!((ItemPnBase*)item)->m_is_parent && attrnav->change_value_cb)
+      else if (!item->m_is_parent && attrnav->change_value_cb)
         (attrnav->change_value_cb)(attrnav->parent_ctx);
       break;
     case attrnav_eItemType_PnEnumByteOrder:
@@ -688,6 +715,9 @@ int GsdmlAttrNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
         break;
       }
       item->update(attrnav);
+      break;
+    case attrnav_eItemType_:
+      attrnav->message('I', "Non interactable item...");
       break;
     default:
       item->open_children(attrnav, 0, 0);
@@ -965,16 +995,16 @@ int GsdmlAttrNav::trace_connect_bc(brow_tObject object, char* name, char* attr,
     // We won't be passing any pointer we're just interested in the scan() call.
     *p = (void*)1;
     break;
-  case attrnav_eItemType_PnBase:
-    // case attrnav_eItemType_PnEnumByteOrder:
-    {
-      ItemPnBase* item = (ItemPnBase*)base_item;
-      if (item->m_size == 0)
-        break;
+  // case attrnav_eItemType_PnBase:
+  //   // case attrnav_eItemType_PnEnumByteOrder:
+  //   {
+  //     ItemPnBase* item = (ItemPnBase*)base_item;
+  //     if (item->m_size == 0)
+  //       break;
 
-      *p = item->m_value_p;
-      break;
-    }
+  //     *p = item->m_value_p;
+  //     break;
+  //   }
   case attrnav_eItemType_PnDevice:
   {
     //*p = &attrnav->device_num; NEW PARSER
@@ -1225,14 +1255,14 @@ int GsdmlAttrNav::object_attr()
   brow_SetNodraw(brow->ctx);
 
   // Test here
-  static std::string test_string("Hejsan");
-  new ItemPnIPv4Input(this, "IPv4 Input", "", &test_string, "Information goes here", NULL, flow_eDest_IntoLast);
+  // static std::string test_string("Hejsan");  
+  // new ItemPnIPv4Input(this, "IPv4 Input", &test_string, "Information goes here", NULL, flow_eDest_IntoLast);
 
   // static uint32_t test_uint32 = 1234;
   // new ItemPnParameterInput<uint32_t>(this, "Unsigned 32", "", &test_uint32, "Information goes here", NULL, flow_eDest_IntoLast, this->gsdml->getDeviceAccessPointMap()["IM 155-6 MF HF V5.0"]->_VirtualSubmoduleList["IM 155-6 MF HF V5.0"]->_RecordDataList[3]._Ref["Modbus hold time [ms]"]);
 
-  // static double test_double = 12.3456789;
-  // new ItemPnParameterInput<double>(this, "Double", "", &test_double, "Information goes here", NULL, flow_eDest_IntoLast);
+  //static double test_double = 12.3456789;
+  //new ItemPnParameterInput<double>(this, "Double", "", &test_double, "Information goes here", NULL, flow_eDest_IntoLast);
 
   // Add a network folder that contains the network settings used for the device
   new ItemPnNetwork(this, "NetworkSettings", NULL, flow_eDest_IntoLast, "General network settings.");
@@ -2016,10 +2046,10 @@ ItemPnInfo::ItemPnInfo(GsdmlAttrNav* attrnav, const char* name,
                        flow_eDest dest_code, const char* infotext)
     : ItemPn(attrnav, attrnav_eItemType_, name, infotext), m_pwr_type_id(pwr_type_id)
 {
-
+  m_closed_annotation = attrnav->brow->pixmap_attr;
   brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_attr, dest,
                   dest_code, (void*)this, 1, &m_node);
-  brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_attr);
+  brow_SetAnnotPixmap(m_node, 0, m_closed_annotation);
   brow_SetAnnotation(m_node, 0, m_name.c_str(), m_name.length());
 
   std::string value = GSDML::attr_value_to_string(m_pwr_type_id, value_p);
@@ -2027,92 +2057,92 @@ ItemPnInfo::ItemPnInfo(GsdmlAttrNav* attrnav, const char* name,
   brow_SetAnnotation(m_node, 1, value.c_str(), value.length());
 }
 
-ItemPnBase::ItemPnBase(GsdmlAttrNav* attrnav, const char* name,
-                       const char* trace_attr_name, pwr_eType attr_type,
-                       size_t attr_size, double attr_min_limit,
-                       double attr_max_limit, void* attr_value_p,
-                       int attr_noedit, brow_tNode dest, flow_eDest dest_code, const char* infotext)
-    : ItemPn(attrnav, attrnav_eItemType_PnBase, name, infotext), m_value_p(attr_value_p), m_const_value_p(0),
-      m_size(attr_size), m_min_limit(attr_min_limit),
-      m_max_limit(attr_max_limit)//, m_subgraph(0)
-{
-  memset(m_old_value, 0, sizeof(m_old_value));
-  m_noedit = attr_noedit;
-  m_value_type = attr_type;
+// ItemPnBase::ItemPnBase(GsdmlAttrNav* attrnav, const char* name,
+//                        const char* trace_attr_name, pwr_eType attr_type,
+//                        size_t attr_size, double attr_min_limit,
+//                        double attr_max_limit, void* attr_value_p,
+//                        int attr_noedit, brow_tNode dest, flow_eDest dest_code, const char* infotext)
+//     : ItemPn(attrnav, attrnav_eItemType_PnBase, name, infotext), m_value_p(attr_value_p), m_const_value_p(0),
+//       m_size(attr_size), m_min_limit(attr_min_limit),
+//       m_max_limit(attr_max_limit)//, m_subgraph(0)
+// {
+//   memset(m_old_value, 0, sizeof(m_old_value));
+//   m_noedit = attr_noedit;
+//   m_value_type = attr_type;
 
-  brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_attr, dest,
-                  dest_code, (void*)this, 1, &m_node);
+//   brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_attr, dest,
+//                   dest_code, (void*)this, 1, &m_node);
 
-  if (m_is_parent)
-    brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_attrenum);
-  else
-    brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_attr);
+//   if (m_is_parent)
+//     brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_attrenum);
+//   else
+//     brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_attr);
 
-  brow_SetAnnotation(m_node, 0, m_name.c_str(), m_name.length());
-  brow_SetTraceAttr(m_node, trace_attr_name, "", flow_eTraceType_User);
-}
+//   brow_SetAnnotation(m_node, 0, m_name.c_str(), m_name.length());
+//   brow_SetTraceAttr(m_node, trace_attr_name, "", flow_eTraceType_User);
+// }
 
-int ItemPnBase::scan(GsdmlAttrNav* attrnav, void* value_p)
-{
-  //pwr_tString256 buf;
-  //int length;
+// int ItemPnBase::scan(GsdmlAttrNav* attrnav, void* value_p)
+// {
+//   //pwr_tString256 buf;
+//   //int length;
 
-  if (m_size == 0)
-    return 1;
+//   if (m_size == 0)
+//     return 1;
 
-  if (!m_first_scan)
-  {
-    if (memcmp(m_old_value, value_p, m_size) == 0)
-    {
-      return 1;
-    }
-  }
-  else
-    m_first_scan = 0;
+//   if (!m_first_scan)
+//   {
+//     if (memcmp(m_old_value, value_p, m_size) == 0)
+//     {
+//       return 1;
+//     }
+//   }
+//   else
+//     m_first_scan = 0;
 
-  std::string value = GSDML::attr_value_to_string(m_value_type, value_p);
-  // attrnav->attr_value_to_string(m_type_id, value_p, buf, sizeof(buf), &length,
-  //                               NULL);
-  brow_SetAnnotation(m_node, 1, value.c_str(), value.length());
-  memcpy(m_old_value, value_p, MIN(m_size, sizeof(m_old_value)));
+//   std::string value = GSDML::attr_value_to_string(m_value_type, value_p);
+//   // attrnav->attr_value_to_string(m_type_id, value_p, buf, sizeof(buf), &length,
+//   //                               NULL);
+//   brow_SetAnnotation(m_node, 1, value.c_str(), value.length());
+//   memcpy(m_old_value, value_p, MIN(m_size, sizeof(m_old_value)));
 
-  return 1;
-}
+//   return 1;
+// }
 
-void ItemPnBase::value_changed(GsdmlAttrNav* attrnav, const char* value_str)
-{
-  //pwr_tString256 buf;
-  int sts;
+// void ItemPnBase::value_changed(GsdmlAttrNav* attrnav, const char* value_str)
+// {
+//   //pwr_tString256 buf;
+//   int sts;
 
   
-  sts = GSDML::attr_string_to_value(m_value_type, m_value_p, value_str);
-  // sts = attrnav->attr_string_to_value(m_type_id, value_str, buf, sizeof(buf),
-  //                                     m_size);
-  if (EVEN(sts))
-  {
-    attrnav->message('E', "Syntax error");
-    return;
-  }
+//   sts = GSDML::attr_string_to_value(m_value_type, m_value_p, value_str);
+//   // sts = attrnav->attr_string_to_value(m_type_id, value_str, buf, sizeof(buf),
+//   //                                     m_size);
+//   if (EVEN(sts))
+//   {
+//     attrnav->message('E', "Syntax error");
+//     return;
+//   }
 
-  if (!feq(m_max_limit, 0.0) || !feq(m_min_limit, 0.0))
-  {
-    switch (m_value_type)
-    {
-    case pwr_eType_Int32:
-    case pwr_eType_UInt32:
-      if (*(int*)&m_value_p < m_min_limit || *(int*)&m_value_p > m_max_limit)
-      {
-        attrnav->message('E', "Min or maxvalue exceeded");
-        return;
-      }
-      break;
-    default:;
-    }
-  }
+//   if (!feq(m_max_limit, 0.0) || !feq(m_min_limit, 0.0))
+//   {
+//     switch (m_value_type)
+//     {
+//     case pwr_eType_Int32:
+//     case pwr_eType_UInt32:
+//       if (*(int*)&m_value_p < m_min_limit || *(int*)&m_value_p > m_max_limit)
+//       {
+//         attrnav->message('E', "Min or maxvalue exceeded");
+//         return;
+//       }
+//       break;
+//     default:;
+//     }
+//   }
   
-  //memcpy(m_value_p, buf, m_size);
-  attrnav->set_modified(1);
-}
+//   //memcpy(m_value_p, buf, m_size);
+//   attrnav->set_modified(1);
+// }
 
 int ItemPn::open_children(GsdmlAttrNav* attrnav, double x, double y)
 {
@@ -2138,7 +2168,7 @@ int ItemPn::open_children(GsdmlAttrNav* attrnav, double x, double y)
   return 1;
 }
 
-int ItemPn::close(GsdmlAttrNav* attrnav, double x, double y) const
+int ItemPn::close(GsdmlAttrNav* attrnav, double x, double y, bool reopen_after_close)
 {
   double node_x, node_y;
 
@@ -2149,42 +2179,47 @@ int ItemPn::close(GsdmlAttrNav* attrnav, double x, double y) const
     // Close
     brow_SetNodraw(attrnav->brow->ctx);
     brow_CloseNode(attrnav->brow->ctx, m_node);
+
     if (brow_IsOpen(m_node) & attrnav_mOpen_Attributes)
       brow_RemoveAnnotPixmap(m_node, 1);
+
     if (brow_IsOpen(m_node) & attrnav_mOpen_Children)
     {
-      switch (m_type)
-      {
-      case attrnav_eItemType_PnDevice:
-      case attrnav_eItemType_PnParEnum:
-      case attrnav_eItemType_PnEnumByteOrder:
-      case attrnav_eItemType_PnEnumTimeRatio:
-      case attrnav_eItemType_PnEnumSendClock:
-      case attrnav_eItemType_PnModuleSelect:
-      // case attrnav_eItemType_PnSubmoduleType:
-      case attrnav_eItemType_PnSubmoduleSelection:
-      case attrnav_eItemType_PnModuleClass:
-      case attrnav_eItemType_PnEnumYesNo:
-      case attrnav_eItemType_PnEnumRTClass:
-      case attrnav_eItemType_PnSkipIPAssignment:
-        brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_attrenum);
-        break;
-      case attrnav_eItemType_PnSlot:
-        brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_map);
-        break;
-      case attrnav_eItemType_PnSubslot:
-        if (m_has_settings)
-          brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_attrenum);
-        else
-          brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_map);
-        break;
-      default:
-        if (m_is_parent)
-          brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_map);
-        else
-          brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_leaf);
-      }
+      brow_SetAnnotPixmap(m_node, 0, m_closed_annotation);
+      // switch (m_type)
+      // {
+      // case attrnav_eItemType_PnDevice:
+      // case attrnav_eItemType_PnParEnum:
+      // case attrnav_eItemType_PnEnumByteOrder:
+      // case attrnav_eItemType_PnEnumTimeRatio:
+      // case attrnav_eItemType_PnEnumSendClock:
+      // case attrnav_eItemType_PnModuleSelect:
+      // // case attrnav_eItemType_PnSubmoduleType:
+      // case attrnav_eItemType_PnSubmoduleSelection:
+      // case attrnav_eItemType_PnModuleClass:
+      // case attrnav_eItemType_PnEnumYesNo:
+      // //case attrnav_eItemType_PnEnumRTClass:
+      // //case attrnav_eItemType_PnSkipIPAssignment:
+      // case attrnav_eItemType_PnValueSelection:
+      //   brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_attrenum);
+      //   break;
+      // case attrnav_eItemType_PnSlot:
+      //   brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_map);
+      //   break;
+      // case attrnav_eItemType_PnSubslot:
+      //   if (m_has_settings)
+      //     brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_attrenum);
+      //   else
+      //     brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_map);
+      //   break;
+      // default:
+      //   if (m_is_parent)
+      //     brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_map);
+      //   else
+      //     brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_leaf);
+      // }
     }
+
     brow_ResetOpen(m_node, attrnav_mOpen_All);
     brow_SelectClear(attrnav->brow->ctx);
     brow_SetInverse(m_node, 1);
@@ -2192,6 +2227,12 @@ int ItemPn::close(GsdmlAttrNav* attrnav, double x, double y) const
     brow_ResetNodraw(attrnav->brow->ctx);
     brow_Redraw(attrnav->brow->ctx, node_y);
   }
+
+  if (reopen_after_close)
+  {
+    open_children(m_attrnav, 0.0, 0);
+  }
+
   return 1;
 }
 
@@ -2350,11 +2391,10 @@ ItemPnDevice::ItemPnDevice(GsdmlAttrNav* attrnav, const char* name,
                            brow_tNode dest, flow_eDest dest_code, const char* infotext)
     : ItemPn(attrnav, attrnav_eItemType_PnDevice, name, "Choose DAP"), m_old_value("")
 {
+  m_closed_annotation = attrnav->brow->pixmap_attrenum;
   brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_attr, dest,
                   dest_code, (void*)this, 1, &m_node);
-
-  brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_attrenum);
-
+  brow_SetAnnotPixmap(m_node, 0, m_closed_annotation);
   brow_SetAnnotation(m_node, 0, m_name.c_str(), m_name.length());
   brow_SetTraceAttr(m_node, m_name.c_str(), "", flow_eTraceType_User);
 }
@@ -2853,6 +2893,7 @@ ItemPnSubslot::ItemPnSubslot(
       m_subslot_number(subslot_number), m_is_selectable(false),
       m_attached_submodule_item(attached_submodule_item)
 {  
+  m_closed_annotation = attrnav->brow->pixmap_map;
   // Setup if not directly attached with constructor argument
   // "attached_submodule_item"
   if (!m_attached_submodule_item)
@@ -2929,14 +2970,11 @@ ItemPnSubslot::ItemPnSubslot(
 
 int ItemPnSubslot::open_children_impl()
 {
-    // Use a shorter name
-    auto parent = m_parent_module_item;
-
     // This is a subslot in which you can select different submodules
     if (m_is_selectable)
     {
       new ItemPnSubmoduleSelection(m_attrnav, "Submodule selection",
-                                   m_subslot_data, m_subslot_number, parent,
+                                   m_subslot_data, m_subslot_number, m_parent_module_item,
                                    m_node, flow_eDest_IntoLast, "Select a submodule...");
     }
 
@@ -2971,7 +3009,7 @@ int ItemPnSubslot::open_children_impl()
 
             ProfinetDataRecord* pdr =
                 &m_subslot_data->m_data_record_map.at(record_data._Index);
-            new ItemPnParRecord(m_attrnav, record_data._Name->c_str(), &record_data,
+            new ItemPnParameterRecordDataItem(m_attrnav, record_data._Name->c_str(), &record_data,
                                 pdr, m_node, flow_eDest_IntoLast, "A block of configurable parameters for the module.");
           }
           break;
@@ -3091,10 +3129,10 @@ void ItemPnSubslot::display_interface_submodule()
   // Display information and settings for a port submodule
   auto interface_submodule = std::static_pointer_cast<GSDML::InterfaceSubmoduleItem>(m_attached_submodule_item);
     
-  new ItemPnEnumRTClass(m_attrnav, "RT_CLASS", interface_submodule, &m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR.RT_CLASS, m_node, flow_eDest_IntoLast);
+  
 
-  static bool test;
-  new ItemPnSkipIPAssignment(m_attrnav, "Skip IP", &test, m_node, flow_eDest_IntoLast);
+  // static bool test;
+  // new ItemPnSkipIPAssignment(m_attrnav, "Skip IP", &test, m_node, flow_eDest_IntoLast);
   
   // if (interface_submodule->_MaxPortRxDelay)
   // {
@@ -3114,42 +3152,59 @@ void ItemPnSubslot::display_interface_submodule()
 
 int ItemPnSubslot::scan(GsdmlAttrNav* attrnav, void* dummy_p)
 {
+  bool submodule_id_changed = false;
+  // bool rt_class_changed = false;
+
   // Note, first scan is set the two first scans to detect load from data file
   if (!m_first_scan)
-  {
-    if (m_old_value == m_subslot_data->m_submodule_ID)
-      // No change since last time
+  {    
+    if (m_old_value != m_subslot_data->m_submodule_ID)
+      submodule_id_changed = true;
+    // if (m_old_rt_class != m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR.RT_CLASS)
+    //   rt_class_changed = true;
+      
+    if (!submodule_id_changed)
       return 1;
   }
 
-  // Value did change, update the data if the ID is valid which it should  be :)
-  if (attrnav->gsdml->getSubmoduleMap().count(m_subslot_data->m_submodule_ID))
+  if (submodule_id_changed)
   {
-    m_attached_submodule_item = attrnav->gsdml->getSubmoduleMap()[m_subslot_data->m_submodule_ID];
+    // Value did change, update the data if the ID is valid which it should  be :)
+    if (attrnav->gsdml->getSubmoduleMap().count(m_subslot_data->m_submodule_ID))
+    {
+      m_attached_submodule_item = attrnav->gsdml->getSubmoduleMap()[m_subslot_data->m_submodule_ID];
 
-    // Update the data
-    m_subslot_data->m_submodule_ident_number = m_attached_submodule_item->_SubmoduleIdentNumber;
-    m_subslot_data->m_subslot_number = m_subslot_number;
-    // ID is traced and is updating the subslot ID reference directly
-  }
-  
-  // Update annotation for selectable subslots
-  if (m_is_selectable && m_attached_submodule_item && m_attached_submodule_item->_ModuleInfo._Name)
-  {
-    brow_SetAnnotation(m_node, 1, m_attached_submodule_item->_ModuleInfo._Name->c_str(), m_attached_submodule_item->_ModuleInfo._Name->length());
+      // Update the data
+      m_subslot_data->m_submodule_ident_number = m_attached_submodule_item->_SubmoduleIdentNumber;
+      m_subslot_data->m_subslot_number = m_subslot_number;
+      // ID is traced and is updating the subslot ID reference directly
+    }
     
-    // We also close the subslot after a change, easy way to force an update to the "Information" kept herein...
-    double node_x, node_y;
-    brow_GetNodePosition(m_node, &node_x, &node_y);
-    ItemPn::close(attrnav, node_x, node_y);
+    // Update annotation for selectable subslots
+    if (m_is_selectable && m_attached_submodule_item && m_attached_submodule_item->_ModuleInfo._Name)
+    {
+      brow_SetAnnotation(m_node, 1, m_attached_submodule_item->_ModuleInfo._Name->c_str(), m_attached_submodule_item->_ModuleInfo._Name->length());
+      
+      // We also close the subslot after a change, easy way to force an update to the "Information" kept herein...
+      double node_x, node_y;
+      brow_GetNodePosition(m_node, &node_x, &node_y);
+      ItemPn::close(attrnav, node_x, node_y);
+    }
   }
-
-  // double node_x, node_y;
-  // brow_GetNodePosition(m_node, &node_x, &node_y);
-  // ItemPn::close(attrnav, node_x, node_y);
   
+  // if (rt_class_changed)
+  // {
+  //   // close and reopen the Interface subslot if the rt_class changes. This is to update the send clock class that depends on this chosen value
+  //   if (m_attached_submodule_item && m_attached_submodule_item->_SubmoduleItemType == GSDML::SubmoduleItemType_Interface)
+  //   {
+  //     double node_x, node_y;
+  //     brow_GetNodePosition(m_node, &node_x, &node_y);
+  //     ItemPn::close(attrnav, node_x, node_y, true); // Close AND reopen :D
+  //   }
+  // }
 
   m_old_value = m_subslot_data->m_submodule_ID;
+//  m_old_rt_class = m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR.RT_CLASS;
 
   if (m_first_scan)
     m_first_scan = 0;
@@ -3165,6 +3220,7 @@ ItemPnSubmoduleSelection::ItemPnSubmoduleSelection(
       m_subslot_data(subslot_data), m_module_item(module_item),
       m_subslot_number(subslot_number)
 {
+  m_closed_annotation = attrnav->brow->pixmap_attrenum;
   brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_attr,
                   dest, dest_code, (void*)this, 1, &m_node);
 
@@ -3298,6 +3354,7 @@ ItemPnDAP::ItemPnDAP(GsdmlAttrNav* attrnav, const char* name,
                      flow_eDest dest_code, const char* infotext)
     : ItemPn(attrnav, attrnav_eItemType_PnDAP, name, infotext, 1), m_slotdata(item_slotdata)
 {
+  m_closed_annotation = attrnav->brow->pixmap_map;
   brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_object,
                   dest, dest_code, (void*)this, 1, &m_node);
 
@@ -3373,54 +3430,64 @@ int ItemPnDAP::open_children_impl()
                             flow_eDest_IntoLast, "System defined subslot");
         }
       }
+
+      // Add timing properties
+      new ItemPnTimingProperties(m_attrnav, "Timing Properties", dap, m_node, flow_eDest_IntoLast);
     }
 
   return 1;
 }
 
-ItemPnNetwork::ItemPnNetwork(GsdmlAttrNav* attrnav, const char* item_name,
+ItemPnNetwork::ItemPnNetwork(GsdmlAttrNav* attrnav, const char* name,
                              brow_tNode dest, flow_eDest dest_code, const char* infotext)
-    : ItemPn(attrnav, attrnav_eItemType_PnNetwork, item_name, "Network settings. Do note that it's not necessary to set the MAC address. Only do this if you know what you're doing and why you are doing it. If the latter is unknown then leave it be.", 1)
+    : ItemPn(attrnav, attrnav_eItemType_PnNetwork, name, "Network settings. Do note that it's not necessary to set the MAC address. Only do this if you know what you're doing and why you are doing it. If the latter is unknown then leave it be.", 1)
 {
-  brow_CreateNode(attrnav->brow->ctx, item_name, attrnav->brow->nc_object, dest,
-                  dest_code, (void*)this, 1, &m_node);
+  m_closed_annotation = attrnav->brow->pixmap_map;  
 
-  brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_map);
-
-  brow_SetAnnotation(m_node, 0, item_name, strlen(item_name));
+  brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_object, dest,
+                  dest_code, (void*)this, 1, &m_node);  
+  brow_SetAnnotPixmap(m_node, 0, m_closed_annotation);
+  brow_SetAnnotation(m_node, 0, m_name.c_str(), m_name.length());
 }
 
 int ItemPnNetwork::open_children_impl()
 {
-  void* value = (void*)0;
+//  void* value = (void*)0;
   ProfinetNetworkSettings& network_settings =
       m_attrnav->pn_runtime_data->m_PnDevice->m_NetworkSettings;
 
-    value = &network_settings.m_device_name;
-    new ItemPnBase(m_attrnav, "DeviceName", "LocalGsdmlAttr", pwr_eType_String,
-                   RUNTIME_PARSER_STRING_MAX_LENGTH, 0, 0, value, 0, m_node,
-                   flow_eDest_IntoLast, "Device name. Adhere to standard hostname naming policies. For clarity one could use the hostname followed by a hyphen (-) and then the device name. Example: mnutv-et200sp1");
+    //value = &network_settings.m_device_name;
+    new ItemPnDeviceNameInput(m_attrnav, "Device Name", &network_settings.m_device_name, "Device name. Adhere to standard hostname naming policies (RFC 1123). For clarity one could use the hostname followed by a hyphen (-) and then the device name. Example: mnutv-et200sp1", m_node, flow_eDest_IntoLast);
+    // new ItemPnBase(m_attrnav, "DeviceName", "LocalGsdmlAttr", pwr_eType_String,
+    //                RUNTIME_PARSER_STRING_MAX_LENGTH, 0, 0, value, 0, m_node,
+    //                flow_eDest_IntoLast, "Device name. Adhere to standard hostname naming policies. For clarity one could use the hostname followed by a hyphen (-) and then the device name. Example: mnutv-et200sp1");
 
-    value = &network_settings.m_ip_address;
-    new ItemPnBase(m_attrnav, "IP Address", "LocalGsdmlAttr", pwr_eType_String,
-                   RUNTIME_PARSER_STRING_MAX_LENGTH, 0, 0, value, 0, m_node,
-                   flow_eDest_IntoLast, "Example: 192.168.90.1");
+    //value = &network_settings.m_ip_address;
+    new ItemPnIPv4Input(m_attrnav, "IP Address", &network_settings.m_ip_address, "Example: 192.168.90.1", m_node, flow_eDest_IntoLast);
+    // new ItemPnBase(m_attrnav, "IP Address", "LocalGsdmlAttr", pwr_eType_String,
+    //                RUNTIME_PARSER_STRING_MAX_LENGTH, 0, 0, value, 0, m_node,
+    //                flow_eDest_IntoLast, "Example: 192.168.90.1");
 
-    value = &network_settings.m_subnet_mask;
-    new ItemPnBase(m_attrnav, "Subnet Mask", "LocalGsdmlAttr", pwr_eType_String,
-                   RUNTIME_PARSER_STRING_MAX_LENGTH, 0, 0, value, 0, m_node,
-                   flow_eDest_IntoLast, "Example: 255.255.255.0");
+    //value = &network_settings.m_subnet_mask;
+    new ItemPnIPv4Input(m_attrnav, "Subnet Mask", &network_settings.m_subnet_mask, "Example: 255.255.255.0", m_node, flow_eDest_IntoLast);
+    // new ItemPnBase(m_attrnav, "Subnet Mask", "LocalGsdmlAttr", pwr_eType_String,
+    //                RUNTIME_PARSER_STRING_MAX_LENGTH, 0, 0, value, 0, m_node,
+    //                flow_eDest_IntoLast, "Example: 255.255.255.0");
 
-    value = &network_settings.m_mac_address;
-    new ItemPnBase(m_attrnav, "MAC Address", "LocalGsdmlAttr", pwr_eType_String,
-                   RUNTIME_PARSER_STRING_MAX_LENGTH, 0, 0, value, 0, m_node,
-                   flow_eDest_IntoLast, "Example: aa:bb:cc:dd:ee:ff\nRemember that you do not, in most cases, need to edit this. If you know for certain that this is needed and why then go ahead.");
 
-    value = &network_settings.m_skip_ip_assignment;
-    new ItemPnEnumYesNo(m_attrnav, "Skip IP Assignment", (int*)value, m_node,
-                        flow_eDest_IntoLast,
-                        "Enable skip IP assignment if you want to let another "
-                        "controller or supervisor hand out IP data.");
+
+    //value = &network_settings.m_mac_address;
+    new ItemPnMACInput(m_attrnav, "MAC Address", &network_settings.m_mac_address, "Example: aa:BB:c1:D2:34:56\nRemember that you do not, in most cases, need to edit this. If you know for certain that this is needed and why then go ahead.", m_node, flow_eDest_IntoLast);
+    // new ItemPnBase(m_attrnav, "MAC Address", "LocalGsdmlAttr", pwr_eType_String,
+    //                RUNTIME_PARSER_STRING_MAX_LENGTH, 0, 0, value, 0, m_node,
+    //                flow_eDest_IntoLast, "Example: aa:bb:cc:dd:ee:ff\nRemember that you do not, in most cases, need to edit this. If you know for certain that this is needed and why then go ahead.");
+
+    new ItemPnSkipIPAssignment(m_attrnav, "Skip IP Assignment", &network_settings.m_skip_ip_assignment, m_node, flow_eDest_IntoLast);
+    // value = &network_settings.m_skip_ip_assignment;
+    // new ItemPnEnumYesNo(m_attrnav, "Skip IP Assignment", (int*)value, m_node,
+    //                     flow_eDest_IntoLast,
+    //                     "Enable skip IP assignment if you want to let another "
+    //                     "controller or supervisor hand out IP data.");
 
     // if (attrnav->device_item &&
     //     attrnav->device_item->SystemDefinedSubmoduleList &&
@@ -3463,17 +3530,16 @@ int ItemPnNetwork::open_children_impl()
   return 1;
 }
 
-ItemPnDeviceInfo::ItemPnDeviceInfo(GsdmlAttrNav* attrnav, const char* item_name,
+ItemPnDeviceInfo::ItemPnDeviceInfo(GsdmlAttrNav* attrnav, const char* name,
                                    brow_tNode dest, flow_eDest dest_code, const char* infotext)
-    : ItemPn(attrnav, attrnav_eItemType_PnDeviceInfo, item_name,
+    : ItemPn(attrnav, attrnav_eItemType_PnDeviceInfo, name,
              "Show information about this device family.", 1)
 {
-  brow_CreateNode(attrnav->brow->ctx, item_name, attrnav->brow->nc_object, dest,
+  m_closed_annotation = attrnav->brow->pixmap_map;
+  brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_object, dest,
                   dest_code, (void*)this, 1, &m_node);
-
-  brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_map);
-
-  brow_SetAnnotation(m_node, 0, item_name, strlen(item_name));
+  brow_SetAnnotPixmap(m_node, 0, m_closed_annotation);
+  brow_SetAnnotation(m_node, 0, m_name.c_str(), m_name.length());
 }
 
 int ItemPnDeviceInfo::open_children_impl()
@@ -3791,6 +3857,7 @@ ItemPnModuleInfo::ItemPnModuleInfo(GsdmlAttrNav* attrnav, const char* name,
                                    brow_tNode dest, flow_eDest dest_code, const char* infotext)
     : ItemPn(attrnav, attrnav_eItemType_PnModuleInfo, name, infotext, 1), m_module_info(item_info)
 {
+  m_closed_annotation = attrnav->brow->pixmap_map;
   brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_object,
                   dest, dest_code, (void*)this, 1, &m_node);
 
@@ -4276,7 +4343,7 @@ int ItemPnModuleInfo::open_children_impl()
 //   return 1;
 // }
 
-ItemPnParRecord::ItemPnParRecord(
+ItemPnParameterRecordDataItem::ItemPnParameterRecordDataItem(
     GsdmlAttrNav* attrnav, const char* name,
     GSDML::ParameterRecordDataItem const* parameter_record_data_item,
     ProfinetDataRecord* data_record, brow_tNode dest, flow_eDest dest_code, const char* infotext)
@@ -4284,6 +4351,7 @@ ItemPnParRecord::ItemPnParRecord(
       m_parameter_record_data_item(parameter_record_data_item),
       m_data_record(data_record)
 {  
+  m_closed_annotation = attrnav->brow->pixmap_map;
   if (m_parameter_record_data_item->_Ref.size())
     m_is_parent = 1;
 
@@ -4337,7 +4405,7 @@ ItemPnParRecord::ItemPnParRecord(
   }
 }
 
-void ItemPnParRecord::set_default_data()
+void ItemPnParameterRecordDataItem::set_default_data()
 {
   // TODO Fix this for all datatypes...
   for (auto const& ref : m_parameter_record_data_item->_Ref)
@@ -4379,7 +4447,7 @@ void ItemPnParRecord::set_default_data()
   }
 }
 
-int ItemPnParRecord::open_children_impl()
+int ItemPnParameterRecordDataItem::open_children_impl()
 {
     // Once here we have either saved data or data from the Const elements (not
     // to mix up with default values since they are in the Ref's). But the default
@@ -4391,536 +4459,540 @@ int ItemPnParRecord::open_children_impl()
       // Set a name for this ref, the ref must have a TextId according to spec
       std::string node_name = *ref.second->_Text;
 
-      switch (ref.second->_DataType)
-      {
-      case GSDML::ValueDataType_Bit:
-      case GSDML::ValueDataType_BitArea:
-        new ItemPnParEnum(m_attrnav, node_name.c_str(), ref.second,
-                          m_data_record->m_data, m_node, flow_eDest_IntoLast, "BitArea/Bit for a device parameter.");
-        break;
-      default:
+      create_parameter_value_class(m_attrnav, node_name.c_str(), ref.second, m_data_record->m_data, m_node);
+      // parameter_value_item_factory(m_attrnav, node_name.c_str(), ref.second,
+      //                     m_data_record->m_data, m_node);
+
+      // switch (ref.second->_DataType)
+      // {
+      // case GSDML::ValueDataType_Bit:
+      // case GSDML::ValueDataType_BitArea:
+      //   new ItemPnParEnum(m_attrnav, node_name.c_str(), ref.second,
+      //                     m_data_record->m_data, m_node, flow_eDest_IntoLast, "BitArea/Bit for a device parameter.");
+      //   break;
+      // default:
 
 
-      // TODO Start using new classes here!
-        // Inget valueitemtarget ref eller (valueitemtarget finns OCH men inga
-        // assignments finns)
-        if (ref.second->_ValueItem &&
-            ref.second->_ValueItem->_Assignments.size())
-        {
-          new ItemPnParEnum(m_attrnav, node_name.c_str(), ref.second,
-                            m_data_record->m_data, m_node, flow_eDest_IntoLast, "List of allowed values for a device parameter.");
-        }
-        else
-        {
-          new ItemPnParValue(m_attrnav, node_name.c_str(), ref.second,
-                             m_data_record->m_data, m_node,
-                             flow_eDest_IntoLast, "An arbitrary input value for a device parameter. Limited by data type and/or a list of allowed values.");
+      // // TODO Start using new classes here!
+      //   // Inget valueitemtarget ref eller (valueitemtarget finns OCH men inga
+      //   // assignments finns)
+      //   if (ref.second->_ValueItem &&
+      //       ref.second->_ValueItem->_Assignments.size())
+      //   {
+      //     new ItemPnParEnum(m_attrnav, node_name.c_str(), ref.second,
+      //                       m_data_record->m_data, m_node, flow_eDest_IntoLast, "List of allowed values for a device parameter.");
+      //   }
+      //   else
+      //   {
+      //     new ItemPnParValue(m_attrnav, node_name.c_str(), ref.second,
+      //                        m_data_record->m_data, m_node,
+      //                        flow_eDest_IntoLast, "An arbitrary input value for a device parameter. Limited by data type and/or a list of allowed values.");
 
-        }
-      }
+      //   }
+      // }
     }
   return 1;
 }
 
-ItemPnParValue::ItemPnParValue(GsdmlAttrNav* attrnav, const char* name,
-                               std::shared_ptr<GSDML::Ref> ref,
-                               unsigned char* data, brow_tNode dest,
-                               flow_eDest dest_code, const char* infotext)
-    : ItemPn(attrnav, attrnav_eItemType_PnParValue, name, infotext), 
-      m_ref(ref), m_gsdml_datatype(ref->_DataType), m_data(data)
-{
-  m_byte_offset = m_ref->_ByteOffset;
-  m_noedit = !m_ref->_Changeable;
+// ItemPnParValue::ItemPnParValue(GsdmlAttrNav* attrnav, const char* name,
+//                                std::shared_ptr<GSDML::Ref> ref,
+//                                unsigned char* data, brow_tNode dest,
+//                                flow_eDest dest_code, const char* infotext)
+//     : ItemPn(attrnav, attrnav_eItemType_PnParValue, name, infotext), 
+//       m_ref(ref), m_gsdml_datatype(ref->_DataType), m_data(data)
+// {
+//   m_byte_offset = m_ref->_ByteOffset;
+//   m_noedit = !m_ref->_Changeable;
 
-  switch (m_gsdml_datatype)
-  {
-  case GSDML::ValueDataType_Integer8:
-  case GSDML::ValueDataType_Unsigned8:
-    m_size = 1;
-    break;
-  case GSDML::ValueDataType_Integer16:
-  case GSDML::ValueDataType_Unsigned16:
-    m_size = 2;
-    break;
-  case GSDML::ValueDataType_Integer32:
-  case GSDML::ValueDataType_Unsigned32:
-  case GSDML::ValueDataType_Float32:
-    m_size = 4;
-    break;
-  case GSDML::ValueDataType_Integer64:
-  case GSDML::ValueDataType_Unsigned64:
-  case GSDML::ValueDataType_Float64:
-    m_size = 8;
-    break;
-  case GSDML::ValueDataType_VisibleString:
-  case GSDML::ValueDataType_OctetString:
-    m_size = m_ref->_Length;
-    break;
-  case GSDML::ValueDataType_Date:
-  case GSDML::ValueDataType_TimeOfDayWithDate:
-  case GSDML::ValueDataType_TimeOfDayWithoutDate:
-  case GSDML::ValueDataType_TimeDiffWithDate:
-  case GSDML::ValueDataType_TimeDiffWithoutDate:
-  case GSDML::ValueDataType_NetworkTime:
-  case GSDML::ValueDataType_NetworkTimeDiff:
-    m_size = 8;
-    break;
-  default:
-    m_size = 0;
-  }
+//   switch (m_gsdml_datatype)
+//   {
+//   case GSDML::ValueDataType_Integer8:
+//   case GSDML::ValueDataType_Unsigned8:
+//     m_size = 1;
+//     break;
+//   case GSDML::ValueDataType_Integer16:
+//   case GSDML::ValueDataType_Unsigned16:
+//     m_size = 2;
+//     break;
+//   case GSDML::ValueDataType_Integer32:
+//   case GSDML::ValueDataType_Unsigned32:
+//   case GSDML::ValueDataType_Float32:
+//     m_size = 4;
+//     break;
+//   case GSDML::ValueDataType_Integer64:
+//   case GSDML::ValueDataType_Unsigned64:
+//   case GSDML::ValueDataType_Float64:
+//     m_size = 8;
+//     break;
+//   case GSDML::ValueDataType_VisibleString:
+//   case GSDML::ValueDataType_OctetString:
+//     m_size = m_ref->_Length;
+//     break;
+//   case GSDML::ValueDataType_Date:
+//   case GSDML::ValueDataType_TimeOfDayWithDate:
+//   case GSDML::ValueDataType_TimeOfDayWithoutDate:
+//   case GSDML::ValueDataType_TimeDiffWithDate:
+//   case GSDML::ValueDataType_TimeDiffWithoutDate:
+//   case GSDML::ValueDataType_NetworkTime:
+//   case GSDML::ValueDataType_NetworkTimeDiff:
+//     m_size = 8;
+//     break;
+//   default:
+//     m_size = 0;
+//   }
 
-  // Allocate memory for the m_old_value member variable
-  if (m_size > 0)
-  {
-    m_old_value = new unsigned char[m_size](); // Zero initialized
-  }
+//   // Allocate memory for the m_old_value member variable
+//   if (m_size > 0)
+//   {
+//     m_old_value = new unsigned char[m_size](); // Zero initialized
+//   }
 
-  brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_attr, dest,
-                  dest_code, (void*)this, 1, &m_node);
+//   brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_attr, dest,
+//                   dest_code, (void*)this, 1, &m_node);
 
-  brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_attr);
+//   brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_attr);
 
-  brow_SetAnnotation(m_node, 0, m_name.c_str(), m_name.length());
-  brow_SetTraceAttr(m_node, m_name.c_str(), "", flow_eTraceType_User);
-}
+//   brow_SetAnnotation(m_node, 0, m_name.c_str(), m_name.length());
+//   brow_SetTraceAttr(m_node, m_name.c_str(), "", flow_eTraceType_User);
+// }
 
-int ItemPnParValue::scan(GsdmlAttrNav* attrnav, void* value_p)
-{
-  if (!m_first_scan)
-  {
-    if (memcmp(&m_data[m_byte_offset], m_old_value, m_size) == 0)
-      // No change since last time
-      return 1;
-  }
-  else
-    m_first_scan = 0;
+// int ItemPnParValue::scan(GsdmlAttrNav* attrnav, void* value_p)
+// {
+//   if (!m_first_scan)
+//   {
+//     if (memcmp(&m_data[m_byte_offset], m_old_value, m_size) == 0)
+//       // No change since last time
+//       return 1;
+//   }
+//   else
+//     m_first_scan = 0;
 
-  //char buf[80];
-  std::string value = GSDML::datavalue_to_string(m_gsdml_datatype, &m_data[m_byte_offset]);
-  // GSDML::datavalue_to_string(m_gsdml_datatype, &m_data[m_byte_offset], m_size,
-  //                            buf, sizeof(buf));
-  brow_SetAnnotation(m_node, 1, value.c_str(), value.length());
+//   //char buf[80];
+//   std::string value = GSDML::datavalue_to_string(m_gsdml_datatype, &m_data[m_byte_offset]);
+//   // GSDML::datavalue_to_string(m_gsdml_datatype, &m_data[m_byte_offset], m_size,
+//   //                            buf, sizeof(buf));
+//   brow_SetAnnotation(m_node, 1, value.c_str(), value.length());
 
-  memcpy(m_old_value, &m_data[m_byte_offset], m_size);
-  return 1;
-}
+//   memcpy(m_old_value, &m_data[m_byte_offset], m_size);
+//   return 1;
+// }
 
-void ItemPnParValue::value_changed(GsdmlAttrNav* attrnav, const char* value_str)
-{
-  int sts;
+// void ItemPnParValue::value_changed(GsdmlAttrNav* attrnav, const char* value_str)
+// {
+//   int sts;
 
-  unsigned char* buf = (unsigned char*)calloc(1, m_size);
+//   unsigned char* buf = (unsigned char*)calloc(1, m_size);
   
-  sts = GSDML::string_to_datavalue(m_gsdml_datatype, buf, value_str);
-  if (sts == PB__NYI)
-  {
-    attrnav->message('E', "Not yet implemented");
-    return;
-  }
-  else if (EVEN(sts))
-  {
-    attrnav->message('E', "Input syntax error");
-    return;
-  }
+//   sts = GSDML::string_to_datavalue(m_gsdml_datatype, buf, value_str);
+//   if (sts == PB__NYI)
+//   {
+//     attrnav->message('E', "Not yet implemented");
+//     return;
+//   }
+//   else if (EVEN(sts))
+//   {
+//     attrnav->message('E', "Input syntax error");
+//     return;
+//   }
 
-  // Check allowed values
-  switch (m_gsdml_datatype)
-  {
-  case GSDML::ValueDataType_Integer8:
-  {
-    char val = *(char*)buf;
-    if (!m_ref->_AllowedValues.empty())
-    {
-      if (!m_ref->_AllowedValues.inList(val))
-      {
-        attrnav->message('E', "Value not allowed");
-        return;
-      }
-    }
-    break;
-  }
-  case GSDML::ValueDataType_Integer16:
-  {
-    short val = *(short*)buf;
-    if (!m_ref->_AllowedValues.empty())
-    {
-      if (!m_ref->_AllowedValues.inList(val))
-      {
-        attrnav->message('E', "Value not allowed");
-        return;
-      }
-    }
-    break;
-  }
-  case GSDML::ValueDataType_Integer32:
-  {
-    int val = *(int*)buf;
-    if (!m_ref->_AllowedValues.empty())
-    {
-      if (!m_ref->_AllowedValues.inList(val))
-      {
-        attrnav->message('E', "Value not allowed");
-        return;
-      }
-    }
-    break;
-  }
-  case GSDML::ValueDataType_Integer64:
-  {
-    pwr_tInt64 val = *(pwr_tInt64*)buf;
-    if (!m_ref->_AllowedValues.empty())
-    {
-      if (!m_ref->_AllowedValues.inList(val))
-      {
-        attrnav->message('E', "Value not allowed");
-        return;
-      }
-    }
-    break;
-  }
-  case GSDML::ValueDataType_Unsigned8:
-  {
-    unsigned char val = *(unsigned char*)buf;
-    if (!m_ref->_AllowedValues.empty())
-    {
-      if (!m_ref->_AllowedValues.inList(val))
-      {
-        attrnav->message('E', "Value not allowed");
-        return;
-      }
-    }
-    break;
-  }
-  case GSDML::ValueDataType_Unsigned16:
-  {
-    unsigned short val = *(unsigned short*)buf;
-    if (!m_ref->_AllowedValues.empty())
-    {
-      if (!m_ref->_AllowedValues.inList(val))
-      {
-        attrnav->message('E', "Value not allowed");
-        return;
-      }
-    }
-    break;
-  }
-  case GSDML::ValueDataType_Unsigned32:
-  {
-    unsigned int val = ntohl(*(unsigned int*)buf);
-    if (!m_ref->_AllowedValues.empty())
-    {
-      if (!m_ref->_AllowedValues.inList(val))
-      {
-        attrnav->message('E', "Value not allowed");
-        return;
-      }
-    }
-    break;
-  }
-  case GSDML::ValueDataType_Unsigned64:
-  {
-    pwr_tUInt64 val = *(pwr_tUInt64*)buf;
-    if (!m_ref->_AllowedValues.empty())
-    {
-      if (!m_ref->_AllowedValues.inList(val))
-      {
-        attrnav->message('E', "Value not allowed");
-        return;
-      }
-    }
-    break;
-  }
-  case GSDML::ValueDataType_Float32:
-  {
-    float val = *(float*)buf;
-    if (!m_ref->_AllowedValues.empty())
-    {
-      if (!m_ref->_AllowedValues.inList(val))
-      {
-        attrnav->message('E', "Value not allowed");
-        return;
-      }
-    }
-    break;
-  }
-  case GSDML::ValueDataType_Float64:
-  {
-    double val = *(double*)buf;
-    if (!m_ref->_AllowedValues.empty())
-    {
-      if (!m_ref->_AllowedValues.inList(val))
-      {
-        attrnav->message('E', "Value not allowed");
-        return;
-      }
-    }
-    break;
-  }
-  default:;
-  }
+//   // Check allowed values
+//   switch (m_gsdml_datatype)
+//   {
+//   case GSDML::ValueDataType_Integer8:
+//   {
+//     char val = *(char*)buf;
+//     if (!m_ref->_AllowedValues.empty())
+//     {
+//       if (!m_ref->_AllowedValues.inList(val))
+//       {
+//         attrnav->message('E', "Value not allowed");
+//         return;
+//       }
+//     }
+//     break;
+//   }
+//   case GSDML::ValueDataType_Integer16:
+//   {
+//     short val = *(short*)buf;
+//     if (!m_ref->_AllowedValues.empty())
+//     {
+//       if (!m_ref->_AllowedValues.inList(val))
+//       {
+//         attrnav->message('E', "Value not allowed");
+//         return;
+//       }
+//     }
+//     break;
+//   }
+//   case GSDML::ValueDataType_Integer32:
+//   {
+//     int val = *(int*)buf;
+//     if (!m_ref->_AllowedValues.empty())
+//     {
+//       if (!m_ref->_AllowedValues.inList(val))
+//       {
+//         attrnav->message('E', "Value not allowed");
+//         return;
+//       }
+//     }
+//     break;
+//   }
+//   case GSDML::ValueDataType_Integer64:
+//   {
+//     pwr_tInt64 val = *(pwr_tInt64*)buf;
+//     if (!m_ref->_AllowedValues.empty())
+//     {
+//       if (!m_ref->_AllowedValues.inList(val))
+//       {
+//         attrnav->message('E', "Value not allowed");
+//         return;
+//       }
+//     }
+//     break;
+//   }
+//   case GSDML::ValueDataType_Unsigned8:
+//   {
+//     unsigned char val = *(unsigned char*)buf;
+//     if (!m_ref->_AllowedValues.empty())
+//     {
+//       if (!m_ref->_AllowedValues.inList(val))
+//       {
+//         attrnav->message('E', "Value not allowed");
+//         return;
+//       }
+//     }
+//     break;
+//   }
+//   case GSDML::ValueDataType_Unsigned16:
+//   {
+//     unsigned short val = *(unsigned short*)buf;
+//     if (!m_ref->_AllowedValues.empty())
+//     {
+//       if (!m_ref->_AllowedValues.inList(val))
+//       {
+//         attrnav->message('E', "Value not allowed");
+//         return;
+//       }
+//     }
+//     break;
+//   }
+//   case GSDML::ValueDataType_Unsigned32:
+//   {
+//     unsigned int val = ntohl(*(unsigned int*)buf);
+//     if (!m_ref->_AllowedValues.empty())
+//     {
+//       if (!m_ref->_AllowedValues.inList(val))
+//       {
+//         attrnav->message('E', "Value not allowed");
+//         return;
+//       }
+//     }
+//     break;
+//   }
+//   case GSDML::ValueDataType_Unsigned64:
+//   {
+//     pwr_tUInt64 val = *(pwr_tUInt64*)buf;
+//     if (!m_ref->_AllowedValues.empty())
+//     {
+//       if (!m_ref->_AllowedValues.inList(val))
+//       {
+//         attrnav->message('E', "Value not allowed");
+//         return;
+//       }
+//     }
+//     break;
+//   }
+//   case GSDML::ValueDataType_Float32:
+//   {
+//     float val = *(float*)buf;
+//     if (!m_ref->_AllowedValues.empty())
+//     {
+//       if (!m_ref->_AllowedValues.inList(val))
+//       {
+//         attrnav->message('E', "Value not allowed");
+//         return;
+//       }
+//     }
+//     break;
+//   }
+//   case GSDML::ValueDataType_Float64:
+//   {
+//     double val = *(double*)buf;
+//     if (!m_ref->_AllowedValues.empty())
+//     {
+//       if (!m_ref->_AllowedValues.inList(val))
+//       {
+//         attrnav->message('E', "Value not allowed");
+//         return;
+//       }
+//     }
+//     break;
+//   }
+//   default:;
+//   }
 
-  memcpy(&m_data[m_byte_offset], buf, m_size);  
+//   memcpy(&m_data[m_byte_offset], buf, m_size);  
 
-  free(buf);
-  attrnav->set_modified(1);
-}
+//   free(buf);
+//   attrnav->set_modified(1);
+// }
 
-ItemPnParEnum::ItemPnParEnum(GsdmlAttrNav* attrnav, const char* name,
-                             std::shared_ptr<GSDML::Ref> ref,
-                             unsigned char* data, brow_tNode dest,
-                             flow_eDest dest_code, const char* infotext)
-    : ItemPn(attrnav, attrnav_eItemType_PnParEnum, name, infotext),
-      m_ref(ref), m_gsdml_datatype(ref->_DataType), m_data(data), m_mask(0),
-      m_old_value(0)
-{
-  m_byte_offset = m_ref->_ByteOffset;
-  m_bit_offset = m_ref->_BitOffset;
+// ItemPnParEnum::ItemPnParEnum(GsdmlAttrNav* attrnav, const char* name,
+//                              std::shared_ptr<GSDML::Ref> ref,
+//                              unsigned char* data, brow_tNode dest,
+//                              flow_eDest dest_code, const char* infotext)
+//     : ItemPn(attrnav, attrnav_eItemType_PnParEnum, name, infotext),
+//       m_ref(ref), m_gsdml_datatype(ref->_DataType), m_data(data), m_mask(0),
+//       m_old_value(0)
+// {
+//   m_byte_offset = m_ref->_ByteOffset;
+//   m_bit_offset = m_ref->_BitOffset;
 
-  switch (m_gsdml_datatype)
-  {
-  case GSDML::ValueDataType_Bit:
-    m_bit_length = 1;
-    break;
-  case GSDML::ValueDataType_BitArea:
-    m_bit_length = m_ref->_BitLength;
-    break;
-  case GSDML::ValueDataType_Integer8:
-  case GSDML::ValueDataType_Unsigned8:
-    m_bit_length = 8;
-    break;
-  case GSDML::ValueDataType_Integer16:
-  case GSDML::ValueDataType_Unsigned16:
-    m_bit_length = 16;
-    break;
-  // What about 32bit floats.....TODO dive into this...
-  // There's also a weird 4 byte trailer... namely "F_MessageTrailer4Byte"
-  default:;
-  }
+//   switch (m_gsdml_datatype)
+//   {
+//   case GSDML::ValueDataType_Bit:
+//     m_bit_length = 1;
+//     break;
+//   case GSDML::ValueDataType_BitArea:
+//     m_bit_length = m_ref->_BitLength;
+//     break;
+//   case GSDML::ValueDataType_Integer8:
+//   case GSDML::ValueDataType_Unsigned8:
+//     m_bit_length = 8;
+//     break;
+//   case GSDML::ValueDataType_Integer16:
+//   case GSDML::ValueDataType_Unsigned16:
+//     m_bit_length = 16;
+//     break;
+//   // What about 32bit floats.....TODO dive into this...
+//   // There's also a weird 4 byte trailer... namely "F_MessageTrailer4Byte"
+//   default:;
+//   }
 
-  for (unsigned int i = 0; i < m_bit_length; i++)
-    m_mask |= (m_mask << 1) | 1;
-  m_mask <<= m_bit_offset;
+//   for (unsigned int i = 0; i < m_bit_length; i++)
+//     m_mask |= (m_mask << 1) | 1;
+//   m_mask <<= m_bit_offset;
 
-  m_noedit = !m_ref->_Changeable; // TODO Check if default value here should be
-                                  // true instead of false when parsing elements
-                                  // with no changeable/visible attribute!
+//   m_noedit = !m_ref->_Changeable; // TODO Check if default value here should be
+//                                   // true instead of false when parsing elements
+//                                   // with no changeable/visible attribute!
 
-  // If we have Assignments
-  if (m_ref->_ValueItem && !m_ref->_ValueItem->_Assignments.empty())
-  {
-    // If we have assignments. For some reason ValueItem elements are allowed to
-    // be empty according to spec. But if we have an Assignments element spec
-    // says that at least one Assign element must exist with Content and TextId.
-    for (auto const& assign : m_ref->_ValueItem->_Assignments)
-    {
-      // We still have to check if the assign element (the content) is a valid
-      // value. If we have no list of valid values they are all valid... The
-      // content must adhere to regex \-?[\d+]{1,20} in other words. stuff like
-      // -123 or +123. 12+3 is also valid but who would write that...
-      if (m_ref->_AllowedValues.empty() ||
-          m_ref->_AllowedValues.inList(assign._Content))
-      {
-        ParEnumValue enum_value;
-        enum_value.text = *assign._Text;
-        enum_value.value = assign._Content;
-        enum_value.value <<= m_bit_offset;
-        m_values.push_back(enum_value);
-      }
-    }
-  }
-  // We do not have Assignments for this Ref.
-  else
-  {
-    // If we don't have an allowed values attribute the datatype and size is
-    // what limits the value. We implement bit datatype for this case...
-    // TODO Check if
-    if (m_ref->_AllowedValues.empty())
-    {
-      ParEnumValue enum_value;
+//   // If we have Assignments
+//   if (m_ref->_ValueItem && !m_ref->_ValueItem->_Assignments.empty())
+//   {
+//     // If we have assignments. For some reason ValueItem elements are allowed to
+//     // be empty according to spec. But if we have an Assignments element spec
+//     // says that at least one Assign element must exist with Content and TextId.
+//     for (auto const& assign : m_ref->_ValueItem->_Assignments)
+//     {
+//       // We still have to check if the assign element (the content) is a valid
+//       // value. If we have no list of valid values they are all valid... The
+//       // content must adhere to regex \-?[\d+]{1,20} in other words. stuff like
+//       // -123 or +123. 12+3 is also valid but who would write that...
+//       if (m_ref->_AllowedValues.empty() ||
+//           m_ref->_AllowedValues.inList(assign._Content))
+//       {
+//         ParEnumValue enum_value;
+//         enum_value.text = *assign._Text;
+//         enum_value.value = assign._Content;
+//         enum_value.value <<= m_bit_offset;
+//         m_values.push_back(enum_value);
+//       }
+//     }
+//   }
+//   // We do not have Assignments for this Ref.
+//   else
+//   {
+//     // If we don't have an allowed values attribute the datatype and size is
+//     // what limits the value. We implement bit datatype for this case...
+//     // TODO Check if
+//     if (m_ref->_AllowedValues.empty())
+//     {
+//       ParEnumValue enum_value;
 
-      enum_value.value = 1;
-      enum_value.text = "On";
-      enum_value.value <<= m_bit_offset;
-      m_values.push_back(enum_value);
+//       enum_value.value = 1;
+//       enum_value.text = "On";
+//       enum_value.value <<= m_bit_offset;
+//       m_values.push_back(enum_value);
 
-      enum_value.value = 0;
-      enum_value.text = "Off";
-      m_values.push_back(enum_value);
-    }
-    else
-    {
-      for (auto it = m_ref->_AllowedValues.begin();
-           it != m_ref->_AllowedValues.end(); ++it)
-      {
-        ParEnumValue enum_value;
-        enum_value.text = std::to_string(it.value());
-        enum_value.value = it.value();
-        enum_value.value <<= m_bit_offset;
-      }
-    }
-  }
-  // // Get the values and corresponding texts
-  // gsdml_ValueItem* vi = (gsdml_ValueItem*)m_ref->Body.ValueItemTarget.p;
+//       enum_value.value = 0;
+//       enum_value.text = "Off";
+//       m_values.push_back(enum_value);
+//     }
+//     else
+//     {
+//       for (auto it = m_ref->_AllowedValues.begin();
+//            it != m_ref->_AllowedValues.end(); ++it)
+//       {
+//         ParEnumValue enum_value;
+//         enum_value.text = std::to_string(it.value());
+//         enum_value.value = it.value();
+//         enum_value.value <<= m_bit_offset;
+//       }
+//     }
+//   }
+//   // // Get the values and corresponding texts
+//   // gsdml_ValueItem* vi = (gsdml_ValueItem*)m_ref->Body.ValueItemTarget.p;
 
-  // gsdml_Valuelist* allowed_values = 0;
-  // if (!streq(m_ref->Body.AllowedValues, ""))
-  //   allowed_values = new gsdml_Valuelist(m_ref->Body.AllowedValues);
+//   // gsdml_Valuelist* allowed_values = 0;
+//   // if (!streq(m_ref->Body.AllowedValues, ""))
+//   //   allowed_values = new gsdml_Valuelist(m_ref->Body.AllowedValues);
 
-  // if (vi && vi->Assignments)
-  // {
-  //   for (unsigned int i = 0; i < vi->Assignments->Assign.size(); i++)
-  //   {
-  //     ParEnumValue eval;
-  //     int num;
+//   // if (vi && vi->Assignments)
+//   // {
+//   //   for (unsigned int i = 0; i < vi->Assignments->Assign.size(); i++)
+//   //   {
+//   //     ParEnumValue eval;
+//   //     int num;
 
-  //     num = sscanf(vi->Assignments->Assign[i]->Body.Content, "%u",
-  //     &eval.value);
+//   //     num = sscanf(vi->Assignments->Assign[i]->Body.Content, "%u",
+//   //     &eval.value);
 
-  //     if (num != 1)
-  //       continue;
+//   //     if (num != 1)
+//   //       continue;
 
-  //     if (allowed_values && !allowed_values->in_list(eval.value))
-  //       continue;
+//   //     if (allowed_values && !allowed_values->in_list(eval.value))
+//   //       continue;
 
-  //     strncpy(eval.text, (char*)vi->Assignments->Assign[i]->Body.TextId.p,
-  //             sizeof(eval.text));
-  //     eval.value <<= m_bit_offset;
+//   //     strncpy(eval.text, (char*)vi->Assignments->Assign[i]->Body.TextId.p,
+//   //             sizeof(eval.text));
+//   //     eval.value <<= m_bit_offset;
 
-  //     values.push_back(eval);
-  //   }
-  // }
-  // else if (m_gsdml_datatype == GSDML::ValueDataType_Bit)
-  // {
-  //   ParEnumValue eval;
+//   //     values.push_back(eval);
+//   //   }
+//   // }
+//   // else if (m_gsdml_datatype == GSDML::ValueDataType_Bit)
+//   // {
+//   //   ParEnumValue eval;
 
-  //   eval.value = 1;
-  //   strncpy(eval.text, "On", sizeof(eval.text));
-  //   eval.value <<= m_bit_offset;
-  //   values.push_back(eval);
+//   //   eval.value = 1;
+//   //   strncpy(eval.text, "On", sizeof(eval.text));
+//   //   eval.value <<= m_bit_offset;
+//   //   values.push_back(eval);
 
-  //   eval.value = 0;
-  //   strncpy(eval.text, "Off", sizeof(eval.text));
-  //   values.push_back(eval);
-  // }
+//   //   eval.value = 0;
+//   //   strncpy(eval.text, "Off", sizeof(eval.text));
+//   //   values.push_back(eval);
+//   // }
 
-  // if (allowed_values)
-  //   delete allowed_values;
+//   // if (allowed_values)
+//   //   delete allowed_values;
 
-  brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_attr, dest,
-                  dest_code, (void*)this, 1, &m_node);
+//   brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_attr, dest,
+//                   dest_code, (void*)this, 1, &m_node);
 
-  brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_attrenum);
-  brow_SetAnnotation(m_node, 0, m_name.c_str(), m_name.length());
-  brow_SetTraceAttr(m_node, m_name.c_str(), "", flow_eTraceType_User);
-}
+//   brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_attrenum);
+//   brow_SetAnnotation(m_node, 0, m_name.c_str(), m_name.length());
+//   brow_SetTraceAttr(m_node, m_name.c_str(), "", flow_eTraceType_User);
+// }
 
-int ItemPnParEnum::scan(GsdmlAttrNav* attrnav, void* p)
-{
-  if (!m_first_scan)
-  {
-    if ((*(unsigned int*)&m_data[m_byte_offset] & m_mask) == m_old_value)
-      // No change since last time
-      return 1;
-  }
-  else
-    m_first_scan = 0;
+// int ItemPnParEnum::scan(GsdmlAttrNav* attrnav, void* p)
+// {
+//   if (!m_first_scan)
+//   {
+//     if ((*(unsigned int*)&m_data[m_byte_offset] & m_mask) == m_old_value)
+//       // No change since last time
+//       return 1;
+//   }
+//   else
+//     m_first_scan = 0;
 
-  unsigned int value = *(unsigned int*)&m_data[m_byte_offset] & m_mask;
+//   unsigned int value = *(unsigned int*)&m_data[m_byte_offset] & m_mask;
 
-  for (auto const& enum_value : m_values)
-  {
-    if (value == enum_value.value)
-    {
-      brow_SetAnnotation(m_node, 1, enum_value.text.c_str(),
-                         enum_value.text.length());
-      break;
-    }
-  }
-  // for (unsigned int i = 0; i < m_values.size(); i++)
-  // {
-  //   if (values[i].value == value)
-  //   {
-  //     brow_SetAnnotation(m_node, 1, values[i].text, strlen(values[i].text));
-  //     break;
-  //   }
-  // }
+//   for (auto const& enum_value : m_values)
+//   {
+//     if (value == enum_value.value)
+//     {
+//       brow_SetAnnotation(m_node, 1, enum_value.text.c_str(),
+//                          enum_value.text.length());
+//       break;
+//     }
+//   }
+//   // for (unsigned int i = 0; i < m_values.size(); i++)
+//   // {
+//   //   if (values[i].value == value)
+//   //   {
+//   //     brow_SetAnnotation(m_node, 1, values[i].text, strlen(values[i].text));
+//   //     break;
+//   //   }
+//   // }
 
-  m_old_value = value;
-  return 1;
-}
+//   m_old_value = value;
+//   return 1;
+// }
 
-int ItemPnParEnum::open_children_impl()
-{   
-  for (auto& enum_value : m_values)
-  {
-    switch (m_gsdml_datatype)
-    {
-      case GSDML::ValueDataType_BitArea:
-      case GSDML::ValueDataType_Bit:
-        new ItemPnParEnumBit(m_attrnav, enum_value.text.c_str(), m_gsdml_datatype,
-                             m_data, m_byte_offset, enum_value.value, m_mask,
-                             m_noedit, m_node, flow_eDest_IntoLast, "");
-        break;      
-      default:
-        new ItemPnParEnumValue(m_attrnav, enum_value.text.c_str(),
-                               m_gsdml_datatype, m_data, m_byte_offset,
-                               enum_value.value, m_mask, m_noedit, m_node,
-                               flow_eDest_IntoLast, "");
-        break;
-    }
-  }
-  return 1;
-}
+// int ItemPnParEnum::open_children_impl()
+// {   
+//   for (auto& enum_value : m_values)
+//   {
+//     switch (m_gsdml_datatype)
+//     {
+//       case GSDML::ValueDataType_BitArea:
+//       case GSDML::ValueDataType_Bit:
+//         new ItemPnParEnumBit(m_attrnav, enum_value.text.c_str(), m_gsdml_datatype,
+//                              m_data, m_byte_offset, enum_value.value, m_mask,
+//                              m_noedit, m_node, flow_eDest_IntoLast, "");
+//         break;      
+//       default:
+//         new ItemPnParEnumValue(m_attrnav, enum_value.text.c_str(),
+//                                m_gsdml_datatype, m_data, m_byte_offset,
+//                                enum_value.value, m_mask, m_noedit, m_node,
+//                                flow_eDest_IntoLast, "");
+//         break;
+//     }
+//   }
+//   return 1;
+// }
 
-ItemPnParEnumValue::ItemPnParEnumValue(
-    GsdmlAttrNav* attrnav, const char* name,
-    GSDML::eValueDataType gsdml_datatype, unsigned char* data,
-    unsigned int byte_offset, unsigned int enum_value, unsigned int mask,
-    int noedit, brow_tNode dest, flow_eDest dest_code, const char* infotext)
-    : ItemPn(attrnav, attrnav_eItemType_PnParEnumValue, name, infotext),
-      m_gsdml_datatype(gsdml_datatype), m_data(data),
-      m_byte_offset(byte_offset), m_enum_value(enum_value), m_mask(mask),
-      m_old_value(0)
-{
-  m_noedit = noedit;
+// ItemPnParEnumValue::ItemPnParEnumValue(
+//     GsdmlAttrNav* attrnav, const char* name,
+//     GSDML::eValueDataType gsdml_datatype, unsigned char* data,
+//     unsigned int byte_offset, unsigned int enum_value, unsigned int mask,
+//     int noedit, brow_tNode dest, flow_eDest dest_code, const char* infotext)
+//     : ItemPn(attrnav, attrnav_eItemType_PnParEnumValue, name, infotext),
+//       m_gsdml_datatype(gsdml_datatype), m_data(data),
+//       m_byte_offset(byte_offset), m_enum_value(enum_value), m_mask(mask),
+//       m_old_value(0)
+// {
+//   m_noedit = noedit;
 
-  brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_enum, dest,
-                  dest_code, (void*)this, 1, &m_node);
-  brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_attr);
+//   brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_enum, dest,
+//                   dest_code, (void*)this, 1, &m_node);
+//   brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_attr);
 
-  brow_SetAnnotation(m_node, 0, m_name.c_str(), m_name.length());
-  brow_SetTraceAttr(m_node, m_name.c_str(), "", flow_eTraceType_User);
-}
+//   brow_SetAnnotation(m_node, 0, m_name.c_str(), m_name.length());
+//   brow_SetTraceAttr(m_node, m_name.c_str(), "", flow_eTraceType_User);
+// }
 
-int ItemPnParEnumValue::scan(GsdmlAttrNav* attrnav, void* p)
-{
-  if (!m_first_scan)
-  {
-    if ((*(unsigned int*)&m_data[m_byte_offset] & m_mask) == m_old_value)
-      // No change since last time
-      return 1;
-  }
-  else
-    m_first_scan = 0;
+// int ItemPnParEnumValue::scan(GsdmlAttrNav* attrnav, void* p)
+// {
+//   if (!m_first_scan)
+//   {
+//     if ((*(unsigned int*)&m_data[m_byte_offset] & m_mask) == m_old_value)
+//       // No change since last time
+//       return 1;
+//   }
+//   else
+//     m_first_scan = 0;
 
-  unsigned int current_value = *(unsigned int*)&m_data[m_byte_offset] & m_mask;
-  if (current_value == m_enum_value)
-    brow_SetRadiobutton(m_node, 0, 1);
-  else
-    brow_SetRadiobutton(m_node, 0, 0);
+//   unsigned int current_value = *(unsigned int*)&m_data[m_byte_offset] & m_mask;
+//   if (current_value == m_enum_value)
+//     brow_SetRadiobutton(m_node, 0, 1);
+//   else
+//     brow_SetRadiobutton(m_node, 0, 0);
 
-  m_old_value = current_value;
-  return 1;
-}
+//   m_old_value = current_value;
+//   return 1;
+// }
 
-void ItemPnParEnumValue::update(GsdmlAttrNav* attrnav)
-{
-  if (m_noedit)
-  {
-    attrnav->message('E', "Parameter is not changeable");
-    return;
-  }
-  *(unsigned int*)&m_data[m_byte_offset] = m_enum_value;
+// void ItemPnParEnumValue::update(GsdmlAttrNav* attrnav)
+// {
+//   if (m_noedit)
+//   {
+//     attrnav->message('E', "Parameter is not changeable");
+//     return;
+//   }
+//   *(unsigned int*)&m_data[m_byte_offset] = m_enum_value;
 
   //   // Change the reversed data aswell since this value can be of arbitrary
   //   size switch (datatype)
@@ -4968,67 +5040,67 @@ void ItemPnParEnumValue::update(GsdmlAttrNav* attrnav)
   //   }
   //   }
 
-  attrnav->set_modified(1);
-}
+//   attrnav->set_modified(1);
+// }
 
-ItemPnParEnumBit::ItemPnParEnumBit(GsdmlAttrNav* attrnav, const char* name,
-                                   GSDML::eValueDataType gsdml_datatype,
-                                   unsigned char* data,
-                                   unsigned int byte_offset,
-                                   unsigned int enum_value, unsigned int mask,
-                                   int noedit, brow_tNode dest,
-                                   flow_eDest dest_code, const char* infotext)
-    : ItemPn(attrnav, attrnav_eItemType_PnParEnumBit, name, infotext),
-      m_gsdml_datatype(gsdml_datatype), m_data(data),
-      m_byte_offset(byte_offset), m_enum_value(enum_value), m_mask(mask),
-      m_old_value(0)
-{
-  m_noedit = noedit;
+// ItemPnParEnumBit::ItemPnParEnumBit(GsdmlAttrNav* attrnav, const char* name,
+//                                    GSDML::eValueDataType gsdml_datatype,
+//                                    unsigned char* data,
+//                                    unsigned int byte_offset,
+//                                    unsigned int enum_value, unsigned int mask,
+//                                    int noedit, brow_tNode dest,
+//                                    flow_eDest dest_code, const char* infotext)
+//     : ItemPn(attrnav, attrnav_eItemType_PnParEnumBit, name, infotext),
+//       m_gsdml_datatype(gsdml_datatype), m_data(data),
+//       m_byte_offset(byte_offset), m_enum_value(enum_value), m_mask(mask),
+//       m_old_value(0)
+// {
+//   m_noedit = noedit;
 
-  brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_enum, dest,
-                  dest_code, (void*)this, 1, &m_node);
-  brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_attr);
+//   brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_enum, dest,
+//                   dest_code, (void*)this, 1, &m_node);
+//   brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_attr);
 
-  brow_SetAnnotation(m_node, 0, m_name.c_str(), m_name.length());
-  brow_SetTraceAttr(m_node, m_name.c_str(), "", flow_eTraceType_User);
-}
+//   brow_SetAnnotation(m_node, 0, m_name.c_str(), m_name.length());
+//   brow_SetTraceAttr(m_node, m_name.c_str(), "", flow_eTraceType_User);
+// }
 
-int ItemPnParEnumBit::scan(GsdmlAttrNav* attrnav, void* p)
-{
-  if (!m_first_scan)
-  {
-    if ((*(unsigned int*)&m_data[m_byte_offset] & m_mask) == m_old_value)
-      // No change since last time
-      return 1;
-  }
-  else
-    m_first_scan = 0;
+// int ItemPnParEnumBit::scan(GsdmlAttrNav* attrnav, void* p)
+// {
+//   if (!m_first_scan)
+//   {
+//     if ((*(unsigned int*)&m_data[m_byte_offset] & m_mask) == m_old_value)
+//       // No change since last time
+//       return 1;
+//   }
+//   else
+//     m_first_scan = 0;
 
-  unsigned int current_value = *(unsigned int*)&m_data[m_byte_offset] & m_mask;
-  if (current_value == m_enum_value)
-    brow_SetRadiobutton(m_node, 0, 1);
-  else
-    brow_SetRadiobutton(m_node, 0, 0);
+//   unsigned int current_value = *(unsigned int*)&m_data[m_byte_offset] & m_mask;
+//   if (current_value == m_enum_value)
+//     brow_SetRadiobutton(m_node, 0, 1);
+//   else
+//     brow_SetRadiobutton(m_node, 0, 0);
 
-  m_old_value = current_value;
-  return 1;
-}
+//   m_old_value = current_value;
+//   return 1;
+// }
 
-void ItemPnParEnumBit::update(GsdmlAttrNav* attrnav)
-{
-  if (m_noedit)
-  {
-    attrnav->message('E', "Parameter is not changeable");
-    return;
-  }
-  *(unsigned int*)&m_data[m_byte_offset] &= ~m_mask;
-  *(unsigned int*)&m_data[m_byte_offset] |= m_enum_value;
+// void ItemPnParEnumBit::update(GsdmlAttrNav* attrnav)
+// {
+//   if (m_noedit)
+//   {
+//     attrnav->message('E', "Parameter is not changeable");
+//     return;
+//   }
+//   *(unsigned int*)&m_data[m_byte_offset] &= ~m_mask;
+//   *(unsigned int*)&m_data[m_byte_offset] |= m_enum_value;
 
-  // *(unsigned int*)&data_reversed_endianess[byte_offset] &= ~mask;
-  // *(unsigned int*)&data_reversed_endianess[byte_offset] |= value;
+//   // *(unsigned int*)&data_reversed_endianess[byte_offset] &= ~mask;
+//   // *(unsigned int*)&data_reversed_endianess[byte_offset] |= value;
 
-  attrnav->set_modified(1);
-}
+//   attrnav->set_modified(1);
+// }
 
 // ItemPnModuleClass::ItemPnModuleClass(GsdmlAttrNav* attrnav,
 //                                      const char* item_name,
@@ -5809,30 +5881,19 @@ int ItemPnEnumYesNo::open_children_impl()
 //   return 1;
 // }
 
+/* ======================================= RT_CLASS Selection node ======================================= */
+
 ItemPnEnumRTClass::ItemPnEnumRTClass(GsdmlAttrNav* attrnav, const char* name,
                   std::shared_ptr<GSDML::InterfaceSubmoduleItem> interface_submodule_item,
                   std::string* pwr_pn_value_p, brow_tNode dest, flow_eDest dest_code)
-  : ItemPn(attrnav, attrnav_eItemType_PnEnumRTClass, name, "Choose (from supported classes) what RT Class you want.\nRT_CLASS_UDP: RT over UDP/IP (Not used much nowadays)\nRT_CLASS_1: RT (for CC-A and CC-B)\nRT_CLASS_2: IRT (Not used today, deprecated)\nRT_CLASS_3: IRT (CC-C)"),
-    ISelection<std::string>(pwr_pn_value_p),
+  : ValueSelection<std::string>(attrnav, attrnav_eItemType_PnEnumRTClass, name, 
+        "Choose (from supported classes) what RT Class you want.\nRT_CLASS_UDP: RT over UDP/IP (Not used much nowadays)\nRT_CLASS_1: RT (for CC-A and CC-B)\nRT_CLASS_2: IRT (Not used today, deprecated)\nRT_CLASS_3: IRT (CC-C)", 
+        dest, dest_code,
+        pwr_pn_value_p),
     m_interface_submodule_item(interface_submodule_item)
 {
-  brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_attr, dest,
-                  dest_code, (void*)this, 1, &m_node);
-  brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_attrenum);
-  brow_SetAnnotation(m_node, 0, m_name.c_str(), m_name.length());
-
-  // No value set (either from read file or from earlier selections)  
-  if (*m_value_p == "")
-  {
-    if (interface_submodule_item->_SupportedRT_Classes.getList().size())
-      set_default(interface_submodule_item->_SupportedRT_Classes.getList()[0]);
-    else
-      set_default("RT_CLASS_1");
-  } 
-  else
-  {
-    set_default(*m_value_p);
-  }
+  m_closed_annotation = attrnav->brow->pixmap_attrenum;
+  setup_node();
 }
 
 int ItemPnEnumRTClass::open_children_impl()
@@ -5842,65 +5903,91 @@ int ItemPnEnumRTClass::open_children_impl()
     {       
       for (auto const& rt_class : m_interface_submodule_item->_SupportedRT_Classes.getList())
       {
-        new ItemPnValueSelectItem<std::string>(m_attrnav, pwr_eType_String, rt_class.c_str(), "", this, m_value_p, rt_class, rt_class.c_str(), m_node, flow_eDest_IntoLast);
+        new ItemPnValueSelectItem<std::string>(m_attrnav, rt_class.c_str(), this, m_value_p, rt_class, rt_class.c_str(), m_node, flow_eDest_IntoLast);
       }
     }
     else if (m_interface_submodule_item && m_interface_submodule_item->_SupportedRT_Classes.getList().size() == 1)
     {      
       auto const& rt_class = m_interface_submodule_item->_SupportedRT_Classes.getList()[0];
-      new ItemPnValueSelectItem<std::string>(m_attrnav, pwr_eType_String, rt_class.c_str(), "hej", this, m_value_p, rt_class, rt_class.c_str(), m_node, flow_eDest_IntoLast);
+      new ItemPnValueSelectItem<std::string>(m_attrnav, rt_class.c_str(), this, m_value_p, rt_class, rt_class.c_str(), m_node, flow_eDest_IntoLast);
     }
     else
     {
       // Default if no interface submodule exists at all (older specs don't have this and the default is RT_CLASS_1, regular RT)
       std::string rt_class("RT_CLASS_1");
-      new ItemPnValueSelectItem<std::string>(m_attrnav, pwr_eType_String, rt_class.c_str(), "(hej)", this, m_value_p, rt_class, rt_class.c_str(), m_node, flow_eDest_IntoLast);
+      new ItemPnValueSelectItem<std::string>(m_attrnav, rt_class.c_str(), this, m_value_p, rt_class, rt_class.c_str(), m_node, flow_eDest_IntoLast);
     }
 
   return 1;
 }
 
-void ItemPnEnumRTClass::select(ItemPnValueSelectItem<std::string> const* selected_item) const
+void ItemPnEnumRTClass::select(ItemPnValueSelectItem<std::string>* selected_item)
 {
-  // Store data  
+  // Store data (This is traced by the subslot which will detect this and close itself just to reopen itself again to update the sendclock class)  
   *m_value_p = selected_item->value();
-  brow_SetAnnotation(m_node, 1, m_value_p->c_str(), m_value_p->length());
-  // Close this node, for this class we have a saved reference to attrnav as e member variable
-  double node_x, node_y;
-  brow_GetNodePosition(m_node, &node_x, &node_y);
-  ItemPn::close(m_attrnav, node_x, node_y);
+  
+  // We now close and reopen the parent to reset the entire tree since send clock for instance is dependent on this value
+  brow_tNode parent_node;
+  void* parent;
+  brow_GetParent(m_attrnav->brow->ctx, m_node, &parent_node);  
+  brow_GetUserData(parent_node, &parent);
+
+  // Bold move but we're pretty confident what our parent actually is...
+  ItemPnSubslot* subslot = (ItemPnSubslot*)parent;
+  std::cout << "Closing and reopening: " << subslot->m_name << std::endl;
+  subslot->close(m_attrnav, 0, 0, true); // Close AND reopen  
 }
 
-void ItemPnEnumRTClass::set_default(std::string default_value)
+void ItemPnEnumRTClass::setup_node()
 {
-  *m_value_p = default_value;
+  std::string value;
+  // No value set (either from read file or from earlier selections)  
+  if (*m_value_p == "")
+  {
+    if (m_interface_submodule_item->_SupportedRT_Classes.getList().size())
+      value = m_interface_submodule_item->_SupportedRT_Classes.getList()[0];
+    else
+      value = "RT_CLASS_1";
+  } 
+  else
+  {
+    value = *m_value_p;
+  }
+
+  *m_value_p = value;
   brow_SetAnnotation(m_node, 1, m_value_p->c_str(), m_value_p->length());
 }
+
+void ItemPnEnumRTClass::scan_impl(ItemPnValueSelectItem<std::string> const* selected_item) const
+{
+  // Control the radiobuttons
+  if (*selected_item->m_value_p == selected_item->m_select_value)
+    brow_SetRadiobutton(selected_item->m_node, 0, 1);
+  else
+    brow_SetRadiobutton(selected_item->m_node, 0, 0);
+}
+
+/* ======================================= END RT_CLASS Selection node ======================================= */
 
 /* ======================================= Skip IP Assignment node ======================================= */
 
 ItemPnSkipIPAssignment::ItemPnSkipIPAssignment(GsdmlAttrNav* attrnav, const char* name,
                   bool* pwr_pn_value_p, brow_tNode dest, flow_eDest dest_code)
-  : ItemPn(attrnav, attrnav_eItemType_PnSkipIPAssignment, name, "Select yes here if you want another supervisor or controller to handle the IP assignment"),
-  ISelection<bool>(pwr_pn_value_p)
+  : ValueSelection<bool>(attrnav, attrnav_eItemType_PnSkipIPAssignment, name, "Select yes here if you want another supervisor or controller to handle the IP assignment", dest, dest_code, pwr_pn_value_p)
 {
-  brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_attr, dest,
-                  dest_code, (void*)this, 1, &m_node);
-  brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_attrenum);
-  brow_SetAnnotation(m_node, 0, m_name.c_str(), m_name.length());
-
-  set_default(*m_value_p);
+  m_closed_annotation = attrnav->brow->pixmap_map;
+  setup_node();
 }
 
 int ItemPnSkipIPAssignment::open_children_impl()
 {
-    new ItemPnValueSelectItem<bool>(m_attrnav, pwr_eType_Boolean, "Yes", "hej", this, m_value_p, true, "Select to skip IP assignment", m_node, flow_eDest_IntoLast);
-    new ItemPnValueSelectItem<bool>(m_attrnav, pwr_eType_Boolean, "No", "hej", this, m_value_p, false, "Select to let ProviewR handle the IP assignment", m_node, flow_eDest_IntoLast);
+    new ItemPnValueSelectItem<bool>(m_attrnav, "Yes", this, m_value_p, true, "Select to skip IP assignment", m_node, flow_eDest_IntoLast);
+    new ItemPnValueSelectItem<bool>(m_attrnav, "No", this, m_value_p, false, "Select to let ProviewR handle the IP assignment", m_node, flow_eDest_IntoLast);
 
     return 1;
 }
 
-void ItemPnSkipIPAssignment::select(ItemPnValueSelectItem<bool> const* selected_item) const
+void ItemPnSkipIPAssignment::select(ItemPnValueSelectItem<bool>* selected_item)
 {
   // Store data  
   *m_value_p = selected_item->value();
@@ -5914,46 +6001,263 @@ void ItemPnSkipIPAssignment::select(ItemPnValueSelectItem<bool> const* selected_
   double node_x, node_y;
   brow_GetNodePosition(m_node, &node_x, &node_y);
   ItemPn::close(m_attrnav, node_x, node_y);
+
+  m_attrnav->pn_runtime_data->save_to_file("testxmlfile");
 }
 
-void ItemPnSkipIPAssignment::set_default(bool default_value)
+void ItemPnSkipIPAssignment::setup_node()
 {
-  *m_value_p = default_value;
   if (*m_value_p)  
     brow_SetAnnotation(m_node, 1, "Yes", sizeof("Yes"));
   else
     brow_SetAnnotation(m_node, 1, "No", sizeof("No"));
 }
 
+void ItemPnSkipIPAssignment::scan_impl(ItemPnValueSelectItem<bool> const* selected_item) const
+{
+  // Control the radiobuttons
+  if (*selected_item->m_value_p == selected_item->m_select_value)
+    brow_SetRadiobutton(selected_item->m_node, 0, 1);
+  else
+    brow_SetRadiobutton(selected_item->m_node, 0, 0);
+}
+ 
+
 /* ======================================= END Skip IP Assignment node ======================================= */
+
+/* ======================================= Send Clock Selection node ======================================= */
+
+ItemPnSendClock::ItemPnSendClock(GsdmlAttrNav* attrnav, const char* name,
+                  GSDML::ApplicationRelations& application_relations,
+                  uint16_t* pwr_pn_value_p, brow_tNode dest, flow_eDest dest_code)
+  : ValueSelection<uint16_t>(attrnav, attrnav_eItemType_PnSendClock, name, 
+        "Choose (from supported modes) what Send Clock factor you want.\nThis is the speed at which data aquisition will be performed at on the bus. Each RT cycle is 31.25us. That cycle time is then multiplied with the send clock factor to get our cycle time. On top of that we have the reduction ratio that is multiplied with the cycle time to get the resulting bus cycle time.\nExample: Send clock factor 32 is chosen together with a reduction ratio of 16, (31.25us * 32) * 16 -> (1ms) * 16 -> 16ms.", 
+        dest, dest_code,
+        pwr_pn_value_p), m_application_relations(application_relations)
+{
+  m_closed_annotation = attrnav->brow->pixmap_attrenum;
+  setup_node();
+}
+
+int ItemPnSendClock::open_children_impl()
+{ 
+  for (auto it = m_send_clock_list->begin(); it != m_send_clock_list->end(); ++it)  
+  {
+    std::ostringstream select_value(std::ios_base::out);
+    select_value << it.value();
+    new ItemPnValueSelectItem<uint16_t>(m_attrnav, select_value.str().c_str(), this, m_value_p, it.value(), "Send Clock factor selection item...", m_node, flow_eDest_IntoLast);
+  }
+
+  return 1;
+}
+
+void ItemPnSendClock::select(ItemPnValueSelectItem<uint16_t>* selected_item)
+{
+  // Store data  
+  *m_value_p = selected_item->value();
+
+  std::string value = to_string();
+  brow_SetAnnotation(m_node, 1, value.c_str(), value.length());
+  // Close this node, for this class we have a saved reference to attrnav as e member variable
+  double node_x, node_y;
+  brow_GetNodePosition(m_node, &node_x, &node_y);
+  ItemPn::close(m_attrnav, node_x, node_y);
+}
+
+void ItemPnSendClock::setup_node()
+{ 
+  // Check if RT_CLASS_3 is chosen, if not we use the non RT_CLASS_3 settings.
+  // The _SendClock valuelists are created with default values if there are no
+  // corresponding elements in the GSDML file...so this is safe...
+  if (m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR.RT_CLASS == "RT_CLASS_3")
+    m_send_clock_list = &m_application_relations._RT_Class3TimingProperties._SendClock;
+  else
+    m_send_clock_list = &m_application_relations._TimingProperties._SendClock;
+  
+  // We have no value? Value is 0...
+  if (!*m_value_p)
+  { 
+    // Choose a default.
+    // To make it easy we set the send clock to the max. And in the reductionratio class we set it to the lowest, placing us 
+    // somehere inbetween if the user should choose not to care about these settings.
+    *m_value_p = m_send_clock_list->max();
+    std::cout << "SendClock: Setting default to" << *m_value_p << std::endl;
+  }
+
+  // Last but not least, check if the value is in our send_clock_list since one can change RT_CLASS
+  // at any time. And the different classes use different timing properties.
+  // Set the default max as we did above in these cases...
+  if (!m_send_clock_list->inList(*m_value_p))  
+    *m_value_p = m_send_clock_list->max();
+  
+  std::string value = to_string();
+  brow_SetAnnotation(m_node, 1, value.c_str(), value.length());
+}
+
+void ItemPnSendClock::scan_impl(ItemPnValueSelectItem<uint16_t> const* selected_item) const
+{
+  // Control the radiobuttons
+  if (*selected_item->m_value_p == selected_item->m_select_value)
+    brow_SetRadiobutton(selected_item->m_node, 0, 1);
+  else
+    brow_SetRadiobutton(selected_item->m_node, 0, 0);
+}
+
+/* ======================================= END Send Clock Selection node ======================================= */
+
+/* ======================================= Reduction Ratio Selection node ======================================= */
+
+ItemPnReductionRatio::ItemPnReductionRatio(GsdmlAttrNav* attrnav, const char* name,
+                  GSDML::ApplicationRelations& application_relations,
+                  uint16_t* pwr_pn_value_p, brow_tNode dest, flow_eDest dest_code)
+  : ValueSelection<uint16_t>(attrnav, attrnav_eItemType_PnSendClock, name, 
+        "Choose (from supported modes) what Reduction Ratio you want.\nThis is used together with the Send Clock Factor to determine the bus cycle time. See Send Clock Factor selection for more information.", 
+        dest, dest_code,
+        pwr_pn_value_p), m_application_relations(application_relations)
+{
+  m_closed_annotation = attrnav->brow->pixmap_attrenum;
+  setup_node();
+}
+
+int ItemPnReductionRatio::open_children_impl()
+{ 
+  for (auto it = m_reduction_ratio_list->begin(); it != m_reduction_ratio_list->end(); ++it)  
+  {
+    std::ostringstream select_value(std::ios_base::out);
+    select_value << it.value();
+    new ItemPnValueSelectItem<uint16_t>(m_attrnav, select_value.str().c_str(), this, m_value_p, it.value(), "Send Clock factor selection item...", m_node, flow_eDest_IntoLast);
+  }
+
+  return 1;
+}
+
+void ItemPnReductionRatio::select(ItemPnValueSelectItem<uint16_t>* selected_item)
+{
+  // Store data  
+  *m_value_p = selected_item->value();
+
+  std::string value = to_string();
+  brow_SetAnnotation(m_node, 1, value.c_str(), value.length());
+  // Close this node, for this class we have a saved reference to attrnav as e member variable
+  double node_x, node_y;
+  brow_GetNodePosition(m_node, &node_x, &node_y);
+  ItemPn::close(m_attrnav, node_x, node_y);
+}
+
+void ItemPnReductionRatio::setup_node()
+{ 
+  // Check if RT_CLASS_3 is chosen, if not we use the non RT_CLASS_3 settings.
+  // The _SendClock valuelists are created with default values if there are no
+  // corresponding elements in the GSDML file...so this is safe...
+  if (m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR.RT_CLASS == "RT_CLASS_3")
+    m_reduction_ratio_list = &m_application_relations._RT_Class3TimingProperties._ReductionRatioPow2;
+  else
+    m_reduction_ratio_list = &m_application_relations._TimingProperties._ReductionRatioPow2;
+  
+  // We have no value? Value is 0...
+  if (!*m_value_p)
+  { 
+    // Choose a default.
+    // To make it easy we set the send clock to the max. And in the reductionratio class we set it to the lowest, placing us 
+    // somehere inbetween if the user should choose not to care about these settings.
+    *m_value_p = m_reduction_ratio_list->min();
+    std::cout << "Reduction Ratio: Setting default to" << *m_value_p << std::endl;
+  }
+
+  // Last but not least, check if the value is in our send_clock_list since one can change RT_CLASS
+  // at any time. And the different classes use different timing properties.
+  // Set the default max as we did above in these cases...
+  if (!m_reduction_ratio_list->inList(*m_value_p))  
+    *m_value_p = m_reduction_ratio_list->min();
+  
+  std::string value = to_string();
+  brow_SetAnnotation(m_node, 1, value.c_str(), value.length());
+}
+
+void ItemPnReductionRatio::scan_impl(ItemPnValueSelectItem<uint16_t> const* selected_item) const
+{
+  // Control the radiobuttons
+  if (*selected_item->m_value_p == selected_item->m_select_value)
+    brow_SetRadiobutton(selected_item->m_node, 0, 1);
+  else
+    brow_SetRadiobutton(selected_item->m_node, 0, 0);
+}
+
+/* ======================================= END Reduction Ratio Selection node ======================================= */
 
 /* ======================================= IPv4 Input Node ======================================= */
 
-ItemPnIPv4Input::ItemPnIPv4Input(GsdmlAttrNav* attrnav, const char* name, const char* extra_text,
-      std::string* value_p, const char* infotext, brow_tNode dest, flow_eDest dest_code)
-  : ItemPnValueInput<std::string>(attrnav, pwr_eType_String, name, extra_text,
-    value_p, infotext, dest, dest_code) 
-{
-}
-
 void ItemPnIPv4Input::value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str)
 {
-  std::cout << "Implementation specific value_changed_impl called, value: " << value_str << std::endl;
+  std::regex const ipv4_regex("^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)");
+
+  if (std::regex_match(value_str, ipv4_regex))
+  {
+    *m_value_p = value_str;
+    brow_SetAnnotation(m_node, 1, m_value_p->c_str(), m_value_p->length());
+  }
+  else
+  {
+    attrnav->message('E', "Invalid format!");
+  }
 }
 
-// int ItemPnIPv4Input::scan(GsdmlAttrNav* attrnav, void* value_p)
-// {
-//   T* = (T*)value_p;
-// }
-
-// void ItemPnIPv4Input::set_default(std::string default_value)
-// {  
-//   *m_value_p = default_value;
-// }
-
-// void ItemPnIPv4Input::update_value(std::string new_value)
-// {
-//   *m_value_p = new_value;
-// }
-
 /* ======================================= END IPv4 Input Node ======================================= */
+
+/* ======================================= MAC Address Input Node ======================================= */
+
+void ItemPnMACInput::value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str)
+{
+  std::regex const mac_regex("^([0-9A-Fa-f]{2}[:]){5}([0-9A-Fa-f]{2})");  
+
+  if (std::regex_match(value_str, mac_regex))
+  {
+    *m_value_p = value_str;
+    brow_SetAnnotation(m_node, 1, m_value_p->c_str(), m_value_p->length());
+  }
+  else
+  {
+    attrnav->message('E', "Invalid format! Separation is done using a colon. Hyphen is not supported.");
+  }
+}
+
+/* ======================================= END MAC Address Input Node ======================================= */
+
+/* ======================================= Device Name Input Node ======================================= */
+
+void ItemPnDeviceNameInput::value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str)
+{
+  std::regex const hostname_regex("^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])");  
+
+  if (std::regex_match(value_str, hostname_regex))
+  {
+    *m_value_p = value_str;
+    brow_SetAnnotation(m_node, 1, m_value_p->c_str(), m_value_p->length());
+  }
+  else
+  {
+    attrnav->message('E', "Invalid name! PROFINET Device names follow RFC 1123. Make sure you do to ;)");
+  }
+}
+
+/* ======================================= END Device Name Input Node ======================================= */
+
+/* ======================================= Phase Input Node ======================================= */
+
+void ItemPnPhaseInput::value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str)
+{
+  std::regex const phase_regex("^[1-9]");
+
+  if (std::regex_match(value_str, phase_regex))
+  {
+    std::istringstream input(value_str, std::ios_base::in);
+    input >> *m_value_p;
+    brow_SetAnnotation(m_node, 1, input.str().c_str(), input.str().length());
+  }
+  else
+  {
+    attrnav->message('E', "Invalid format! We only want one integer value here :)");
+  }
+}
+
+/* ======================================= END Phase Input Node ======================================= */

@@ -50,7 +50,7 @@
 typedef enum
 {
   attrnav_eItemType_,
-  attrnav_eItemType_PnBase, // Base item for input values such as IP, MAC
+  //attrnav_eItemType_PnBase, // Base item for input values such as IP, MAC
   attrnav_eItemType_PnEnumValue, // Generic Enumeration value, used in PnEnum's
   attrnav_eItemType_PnDevice, // The DAP selection class, need a better name
   attrnav_eItemType_PnIDSelectValue, // Selection of ID for a module or submodule
@@ -80,13 +80,18 @@ typedef enum
   attrnav_eItemType_PnBitDataItem,
   attrnav_eItemType_PnEnumByteOrder,
   attrnav_eItemType_PnEnumTimeRatio,
-  attrnav_eItemType_PnEnumSendClock,
+  //attrnav_eItemType_PnEnumSendClock,
   attrnav_eItemType_PnEnumValueMType,
 
+  attrnav_eItemType_PnValueSelection,
   attrnav_eItemType_PnValueSelectItem,
   attrnav_eItemType_PnValueInput,
   attrnav_eItemType_PnEnumRTClass,
-  attrnav_eItemType_PnSkipIPAssignment
+  attrnav_eItemType_PnSkipIPAssignment,
+  attrnav_eItemType_PnParameterSelection,
+  attrnav_eItemType_PnTimingProperties,
+  attrnav_eItemType_PnSendClock,
+  attrnav_eItemType_PnReductionRatio
 } attrnav_eItemType;
 
 typedef enum
@@ -172,18 +177,18 @@ public:
   }
 
   /* static member function */
+  /* Trace thingies */
   static void trace_scan(void* data);
   static int trace_scan_bc(brow_tObject object, void* p);
   static int trace_connect_bc(brow_tObject object, char* name, char* attr,
                               flow_eTraceType type, void** p);
   static int trace_disconnect_bc(brow_tObject object);
+  
+  /* Brow thingies */
   static int init_brow_cb(FlowCtx* fctx, void* client_data);
-  // static int attr_string_to_value(int type_id, const char* value_str,
-  //                                 void* buffer_ptr, int buff_size,
-  //                                 int attr_size);
-  // static void attr_value_to_string(int type_id, void const* value_ptr,
-  //                                  char* str, int size, int* len, char* format);
   static int brow_cb(FlowCtx* ctx, flow_tEvent event);
+  
+  /* device / DAP related */
   static void device_changed_ok(void* ctx, void* data);
   static void device_changed_cancel(void* ctx, void* data);
   static pwr_tBoolean device_check_change_ok(void* ctx);
@@ -202,19 +207,15 @@ public:
   void (*change_value_cb)(void*);
   CoWow* m_wow;
   CoWowTimer* trace_timerid;
-  // unsigned int device_num; TODO Really needed? This data is always accessible
-  // through pn_runtime_data....
-  //gsdml_DeviceAccessPointItem* device_item;
+
   std::shared_ptr<GSDML::DeviceAccessPointItem> m_selected_device_item;
   int device_confirm_active;
   GsdmlDeviceData dev_data;
-  // static ProfinetRuntimeData pn_runtime_data;
+
   std::shared_ptr<ProfinetRuntimeData> pn_runtime_data;
   int device_read;
   int viewio;
-  // unsigned int time_ratio;
-  // unsigned int send_clock;
-  // unsigned int phase;
+
   attr_eOrderModuleType order_moduletype;
 
 private:
@@ -223,18 +224,12 @@ private:
 
 class ItemPn
 {
-public:
-  // ItemPn() : m_value_type(pwr_eType_), m_is_parent(0), m_first_scan(1), m_noedit(1), m_has_settings(false) {}
-  // ItemPn(char const* infotext)
-  //     : m_value_type(pwr_eType_), m_is_parent(0), m_infotext(infotext ? infotext : ""), m_first_scan(1),
-  //       m_noedit(1), m_has_settings(false)
-  // {
-  // }
+public:  
   ItemPn(GsdmlAttrNav* attrnav, attrnav_eItemType type, std::string name, std::string infotext,
          int is_parent = 0)
       : m_type(type), m_value_type(pwr_eType_), m_name(name), m_is_parent(is_parent), m_infotext(infotext),
-        m_first_scan(1), m_noedit(1), m_has_settings(false), m_attrnav(attrnav)
-  {
+        m_first_scan(1), m_noedit(1), m_attrnav(attrnav), m_closed_annotation(attrnav->brow->pixmap_leaf)
+  {    
   }
 
   attrnav_eItemType m_type;  
@@ -245,8 +240,9 @@ public:
   std::string m_infotext;
   int m_first_scan;
   int m_noedit;
-  bool m_has_settings;
+  //bool m_has_settings;
   GsdmlAttrNav* m_attrnav;
+  flow_sAnnotPixmap* m_closed_annotation;
 
   virtual ~ItemPn() = default;
 
@@ -264,10 +260,10 @@ public:
   // Use to call templated implementation specifics to regain RTTI
   virtual void value_changed(GsdmlAttrNav* attrnav, const char* value_str) {}
 
-  // If this is a value of some sort. Return string representation as an rvalue ref
-  virtual std::string&& to_string() { return std::move(std::string("")); }
+  // If this is a value of some sort. Return string representation
+  virtual std::string to_string() { return std::string(""); }
 
-  int virtual close(GsdmlAttrNav* attrnav, double x, double y) const final;
+  int virtual close(GsdmlAttrNav* attrnav, double x, double y, bool reopen_after_close = false) final;
   virtual int scan(GsdmlAttrNav* attrnav, void* p) { return 1; }
   
   virtual void update(GsdmlAttrNav* attrnav) {} //TODO What's this?
@@ -291,28 +287,28 @@ public:
 /*
   A normal attribute, int, float, string and so on.
 */
-class ItemPnBase : public ItemPn
-{
-public:
-  ItemPnBase(GsdmlAttrNav* attrnav, const char* item_name,
-             const char* trace_attr_name, pwr_eType attr_type, size_t attr_size,
-             double attr_min_limit, double attr_max_limit, void* attr_value_p,
-             int attr_noedit, brow_tNode dest, flow_eDest dest_code, const char* infotext);
+// class ItemPnBase : public ItemPn
+// {
+// public:
+//   ItemPnBase(GsdmlAttrNav* attrnav, const char* item_name,
+//              const char* trace_attr_name, pwr_eType attr_type, size_t attr_size,
+//              double attr_min_limit, double attr_max_limit, void* attr_value_p,
+//              int attr_noedit, brow_tNode dest, flow_eDest dest_code, const char* infotext);
 
-  void* m_value_p;
-  void const* m_const_value_p;
-  pwr_tString256 m_old_value;
+//   void* m_value_p;
+//   void const* m_const_value_p;
+//   pwr_tString256 m_old_value;
   
-  size_t m_size;
-  double m_min_limit;
-  double m_max_limit;
-  //int m_subgraph;
+//   size_t m_size;
+//   double m_min_limit;
+//   double m_max_limit;
+//   //int m_subgraph;
 
-  virtual int scan(GsdmlAttrNav* attrnav, void* value) override;
-  virtual void value_changed(GsdmlAttrNav* attrnav,
-                             const char* value_str) override;
-  int open_children_impl() override { return 1; }
-};
+//   virtual int scan(GsdmlAttrNav* attrnav, void* value) override;
+//   virtual void value_changed(GsdmlAttrNav* attrnav,
+//                              const char* value_str) override;
+//   int open_children_impl() override { return 1; }
+// };
 
 class ItemPnIDSelectValue : public ItemPn
 {
@@ -556,14 +552,14 @@ public:
 // };
 
 //! Item for module type selection.
-class ItemPnParRecord : public ItemPn
+class ItemPnParameterRecordDataItem : public ItemPn
 {
 public:
-  ItemPnParRecord(
+  ItemPnParameterRecordDataItem(
       GsdmlAttrNav* attrnav, const char* item_name,
       GSDML::ParameterRecordDataItem const* parameter_record_data_item,
       ProfinetDataRecord* data_record, brow_tNode dest, flow_eDest dest_code, const char* infotext);
-  virtual ~ItemPnParRecord() {}
+  virtual ~ItemPnParameterRecordDataItem() {}
 
   GSDML::ParameterRecordDataItem const* m_parameter_record_data_item;
   ProfinetDataRecord* m_data_record;
@@ -575,103 +571,103 @@ private:
 };
 
 //! Item for module type selection.
-class ItemPnParValue : public ItemPn
-{
-public:
-  ItemPnParValue(GsdmlAttrNav* attrnav, const char* item_name, std::shared_ptr<GSDML::Ref> ref,
-                 unsigned char* data, brow_tNode dest, flow_eDest dest_code, const char* infotext);
-  ~ItemPnParValue() { if (m_old_value) delete m_old_value; m_old_value = (unsigned char*)0; };
+// class ItemPnParValue : public ItemPn
+// {
+// public:
+//   ItemPnParValue(GsdmlAttrNav* attrnav, const char* item_name, std::shared_ptr<GSDML::Ref> ref,
+//                  unsigned char* data, brow_tNode dest, flow_eDest dest_code, const char* infotext);
+//   ~ItemPnParValue() { if (m_old_value) delete m_old_value; m_old_value = (unsigned char*)0; };
 
-  std::shared_ptr<GSDML::Ref> m_ref;
-  GSDML::eValueDataType m_gsdml_datatype;
-  unsigned char* m_data;
-  unsigned int m_byte_offset;
-  unsigned int m_size;
-  unsigned char* m_old_value;
+//   std::shared_ptr<GSDML::Ref> m_ref;
+//   GSDML::eValueDataType m_gsdml_datatype;
+//   unsigned char* m_data;
+//   unsigned int m_byte_offset;
+//   unsigned int m_size;
+//   unsigned char* m_old_value;
 
-  int scan(GsdmlAttrNav* attrnav, void* p);
-  void value_changed(GsdmlAttrNav* attrnav, const char* value_str);
-  int open_children_impl() override { return 1; }
-};
+//   int scan(GsdmlAttrNav* attrnav, void* p);
+//   void value_changed(GsdmlAttrNav* attrnav, const char* value_str);
+//   int open_children_impl() override { return 1; }
+// };
 
-class ParEnumValue
-{
-public:
-  ParEnumValue() {}
-  //unsigned int value;
-  int value;
-  //char text[160];
-  std::string text;
-};
+// class ParEnumValue
+// {
+// public:
+//   ParEnumValue() {}
+//   //unsigned int value;
+//   int value;
+//   //char text[160];
+//   std::string text;
+// };
 
-//! Item for module type selection.
-class ItemPnParEnum : public ItemPn
-{
-public:
-  ItemPnParEnum(GsdmlAttrNav* attrnav, const char* item_name, std::shared_ptr<GSDML::Ref> ref, unsigned char* data,
-                brow_tNode dest, flow_eDest dest_code, const char* infotext);
-  ~ItemPnParEnum() = default;
+// //! Item for module type selection.
+// class ItemPnParEnum : public ItemPn
+// {
+// public:
+//   ItemPnParEnum(GsdmlAttrNav* attrnav, const char* item_name, std::shared_ptr<GSDML::Ref> ref, unsigned char* data,
+//                 brow_tNode dest, flow_eDest dest_code, const char* infotext);
+//   ~ItemPnParEnum() = default;
 
-  std::shared_ptr<GSDML::Ref> m_ref;
-  GSDML::eValueDataType m_gsdml_datatype;
-  unsigned char* m_data;
-  unsigned int m_byte_offset;
-  unsigned int m_bit_offset;
-  unsigned int m_bit_length;
-  std::vector<ParEnumValue> m_values; // Will be populated with valid values from which we can choose from, depending on valueitemttargets and the allowed values.
-  unsigned int m_mask;
-  unsigned int m_old_value;
+//   std::shared_ptr<GSDML::Ref> m_ref;
+//   GSDML::eValueDataType m_gsdml_datatype;
+//   unsigned char* m_data;
+//   unsigned int m_byte_offset;
+//   unsigned int m_bit_offset;
+//   unsigned int m_bit_length;
+//   std::vector<ParEnumValue> m_values; // Will be populated with valid values from which we can choose from, depending on valueitemttargets and the allowed values.
+//   unsigned int m_mask;
+//   unsigned int m_old_value;
 
-  int open_children_impl() override;
-  int scan(GsdmlAttrNav* attrnav, void* p) override;
-};
+//   int open_children_impl() override;
+//   int scan(GsdmlAttrNav* attrnav, void* p) override;
+// };
 
-//! Item for module type selection.
-class ItemPnParEnumBit : public ItemPn
-{
-public:
-  ItemPnParEnumBit(GsdmlAttrNav* attrnav, const char* item_name,
-                   GSDML::eValueDataType gsdml_datatype, unsigned char* data,
-                   unsigned int byte_offset, unsigned int enum_value,
-                   unsigned int mask, int noedit, brow_tNode dest,
-                   flow_eDest dest_code, const char* infotext);
-  virtual ~ItemPnParEnumBit() {}
+// //! Item for module type selection.
+// class ItemPnParEnumBit : public ItemPn
+// {
+// public:
+//   ItemPnParEnumBit(GsdmlAttrNav* attrnav, const char* item_name,
+//                    GSDML::eValueDataType gsdml_datatype, unsigned char* data,
+//                    unsigned int byte_offset, unsigned int enum_value,
+//                    unsigned int mask, int noedit, brow_tNode dest,
+//                    flow_eDest dest_code, const char* infotext);
+//   virtual ~ItemPnParEnumBit() {}
 
-  //gsdml_Assign* assign;
-  GSDML::eValueDataType m_gsdml_datatype;
-  unsigned char* m_data;
-  unsigned int m_byte_offset;
-  unsigned int m_enum_value;
-  unsigned int m_mask;
-  unsigned int m_old_value;
+//   //gsdml_Assign* assign;
+//   GSDML::eValueDataType m_gsdml_datatype;
+//   unsigned char* m_data;
+//   unsigned int m_byte_offset;
+//   unsigned int m_enum_value;
+//   unsigned int m_mask;
+//   unsigned int m_old_value;
 
-  int scan(GsdmlAttrNav* attrnav, void* p);
-  void update(GsdmlAttrNav* attrnav);
-  int open_children_impl() override { return 1; }
-};
+//   int scan(GsdmlAttrNav* attrnav, void* p);
+//   void update(GsdmlAttrNav* attrnav);
+//   int open_children_impl() override { return 1; }
+// };
 
-class ItemPnParEnumValue : public ItemPn
-{
-public:
-  ItemPnParEnumValue(GsdmlAttrNav* attrnav, const char* item_name,
-                     GSDML::eValueDataType gsdml_datatype,
-                     unsigned char* data, unsigned int byte_offset, unsigned int enum_value,
-                     unsigned int mask, int noedit, brow_tNode dest,
-                     flow_eDest dest_code, const char* infotext);
-  virtual ~ItemPnParEnumValue() {}
+// class ItemPnParEnumValue : public ItemPn
+// {
+// public:
+//   ItemPnParEnumValue(GsdmlAttrNav* attrnav, const char* item_name,
+//                      GSDML::eValueDataType gsdml_datatype,
+//                      unsigned char* data, unsigned int byte_offset, unsigned int enum_value,
+//                      unsigned int mask, int noedit, brow_tNode dest,
+//                      flow_eDest dest_code, const char* infotext);
+//   virtual ~ItemPnParEnumValue() {}
 
-  //std::shared_ptr<GSDML::Assign> m_assign;
-  GSDML::eValueDataType m_gsdml_datatype;
-  unsigned char* m_data;
-  unsigned int m_byte_offset;
-  unsigned int m_enum_value;
-  unsigned int m_mask;
-  unsigned int m_old_value;
+//   //std::shared_ptr<GSDML::Assign> m_assign;
+//   GSDML::eValueDataType m_gsdml_datatype;
+//   unsigned char* m_data;
+//   unsigned int m_byte_offset;
+//   unsigned int m_enum_value;
+//   unsigned int m_mask;
+//   unsigned int m_old_value;
 
-  int scan(GsdmlAttrNav* attrnav, void* p);
-  void update(GsdmlAttrNav* attrnav);
-  int open_children_impl() override { return 1; }
-};
+//   int scan(GsdmlAttrNav* attrnav, void* p);
+//   void update(GsdmlAttrNav* attrnav);
+//   int open_children_impl() override { return 1; }
+// };
 
 //! Item for a IOData.
 class ItemPnIOData : public ItemPn
@@ -831,9 +827,6 @@ public:
   int scan(GsdmlAttrNav* attrnav, void* value_p) override;
 };
 
-template<typename T>
-class IHasSelectables;
-
 // template<typename T>
 // class ISelectable
 // {
@@ -910,13 +903,34 @@ template<typename T>
 class ItemPnValueSelectItem;
 
 template<typename T>
-class ISelection
+class ValueSelection : public ItemPn
 {
 public:
-  explicit ISelection(T* value_p) : m_value_p(value_p) {}
-  virtual ~ISelection() = default;
-  virtual void select(ItemPnValueSelectItem<T> const* selected_item) const = 0;
-  virtual void set_default(T default_value) = 0;
+  explicit ValueSelection(GsdmlAttrNav* attrnav, attrnav_eItemType type, std::string name, std::string infotext, 
+                    brow_tNode dest, flow_eDest dest_code,
+                    T* value_p)
+    : ItemPn(attrnav, attrnav_eItemType_PnValueSelection, name, infotext),
+      m_value_p(value_p)  
+  {
+    brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_attr, dest,
+                  dest_code, (void*)this, 1, &m_node);
+    brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_attrenum);
+    brow_SetAnnotation(m_node, 0, m_name.c_str(), m_name.length());
+  }
+  virtual ~ValueSelection() = default;
+  virtual void select(ItemPnValueSelectItem<T>* selected_item) = 0;
+  virtual void scan_impl(ItemPnValueSelectItem<T> const* selected_item) const = 0;
+  virtual void setup_node() = 0;
+
+  std::string to_string() override
+  {
+    std::ostringstream result(std::ios_base::out);
+    result.precision(12); // For when this is a float/double    
+    result << std::fixed << *m_value_p;
+    
+    std::string value(result.str());
+    return value;
+  }
 
   T* m_value_p;  
 };
@@ -925,22 +939,21 @@ template<typename T>
 class ItemPnValueSelectItem : public ItemPn
 {
 public:
-  ItemPnValueSelectItem(GsdmlAttrNav* attrnav, pwr_eType value_type, const char* annotation_1, const char* annotation_2,
-      ISelection<T>* parent, T const* value_p, T select_value, const char* infotext,
+  ItemPnValueSelectItem(GsdmlAttrNav* attrnav, const char* annotation_1,
+      ValueSelection<T>* parent, T const* value_p, T select_value, const char* infotext,
       brow_tNode dest, flow_eDest dest_code) 
     : ItemPn(attrnav, attrnav_eItemType_PnValueSelectItem, annotation_1, infotext),
-      m_parent(parent), m_value_p(value_p), m_select_value(select_value), m_annotation_2(annotation_2)
-  {
-    m_value_type = value_type;    
+      m_parent(parent), m_value_p(value_p), m_select_value(select_value)
+  {    
     brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_enum, dest,
                   dest_code, (void*)this, 1, &m_node);
 
     brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_attr);
     brow_SetAnnotation(m_node, 0, m_name.c_str(), m_name.length());
-    if (m_annotation_2 != "")
-      brow_SetAnnotation(m_node, 1, m_annotation_2.c_str(), m_annotation_2.length());
     brow_SetTraceAttr(m_node, m_name.c_str(), "", flow_eTraceType_User);
   }
+
+  brow_tNode get_node() const { return ItemPn::m_node; }
   
   int scan(GsdmlAttrNav* attrnav, void* dummy) override
   {    
@@ -954,11 +967,7 @@ public:
       m_first_scan = 0;
     }
     
-    // Control the radiobuttons
-    if (*m_value_p == m_select_value)
-      brow_SetRadiobutton(m_node, 0, 1);
-    else
-      brow_SetRadiobutton(m_node, 0, 0);
+    m_parent->scan_impl(this);
 
     m_old_value = *m_value_p;
 
@@ -974,54 +983,32 @@ public:
 
   int open_children_impl() override { return 1; }
 
-private:
-  ISelection<T> const* m_parent;
+  ValueSelection<T>* m_parent;
   T const* m_value_p;
   T const m_select_value;
   T m_old_value;
-  std::string m_annotation_2;
 };
 
 template<typename T>
 class ItemPnValueInput : public ItemPn
 {
 public:
-  ItemPnValueInput(GsdmlAttrNav* attrnav, pwr_eType value_type, const char* annotation_1, const char* annotation_2,
+  ItemPnValueInput(GsdmlAttrNav* attrnav, const char* annotation_1,
       T* value_p, const char* infotext, brow_tNode dest, flow_eDest dest_code) 
     : ItemPn(attrnav, attrnav_eItemType_PnValueInput, annotation_1, infotext),
-      m_value_p(value_p), m_annotation_2(annotation_2)
-  {
-    m_value_type = value_type;   
+      m_value_p(value_p)
+  {    
     m_noedit = 0; 
     brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_attr, dest,
                   dest_code, (void*)this, 1, &m_node);
 
     brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_attr);
     brow_SetAnnotation(m_node, 0, m_name.c_str(), m_name.length());
-    if (m_annotation_2 != "")
-      brow_SetAnnotation(m_node, 1, m_annotation_2.c_str(), m_annotation_2.length());
-    brow_SetTraceAttr(m_node, m_name.c_str(), "", flow_eTraceType_User);
+    std::string current_value(to_string());
+    brow_SetAnnotation(m_node, 1, current_value.c_str(), current_value.length());
   }
   
-  int scan(GsdmlAttrNav* attrnav, void* value_p) override
-  {  
-    T* value = (T*)value_p;
-
-    if (!m_first_scan)
-    {
-      if (*value == m_old_value)
-        return 1;
-    }
-    else
-    {
-      m_first_scan = 0;
-    }
-    
-    // Do something if the data has changed...    
-    m_old_value = *value;
-
-    return 1;
-  }  
+  void set_changeable(bool changeable) { m_noedit = !changeable; }
 
   void value_changed(GsdmlAttrNav* attrnav, const char* value_str) override
   {
@@ -1030,24 +1017,23 @@ public:
     value_changed_impl(attrnav, value_str);
   }
 
-  std::string&& to_string() override
+  std::string to_string() override
   {
     std::ostringstream result(std::ios_base::out);
     result.precision(12); // For when this is a float/double    
     result << std::fixed << *m_value_p;
     
     std::string value(result.str());
-    return std::move(value);    
+    return value;    
   }
 
   virtual void value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) = 0;
 
   int open_children_impl() override { return 1; }
 
-private:  
+protected:  
   T* m_value_p;  
-  T m_old_value;
-  std::string m_annotation_2;
+  //T m_old_value;
 };
 
 
@@ -1059,7 +1045,7 @@ private:
   RT_CLASS Selection item
   Used together with ItemPnEnumValue (for the values...)
 */
-class ItemPnEnumRTClass : public ItemPn, public ISelection<std::string>
+class ItemPnEnumRTClass : public ValueSelection<std::string>
 {
 public:
   ItemPnEnumRTClass(GsdmlAttrNav* attrnav, const char* name,
@@ -1070,11 +1056,13 @@ public:
   std::shared_ptr<GSDML::InterfaceSubmoduleItem> m_interface_submodule_item;  
   
   int open_children_impl() override;  
-  void select(ItemPnValueSelectItem<std::string> const* selected_item) const override;
-  void set_default(std::string default_value) override;
+  void select(ItemPnValueSelectItem<std::string>* selected_item) override;
+  void setup_node() override;
+  void scan_impl(ItemPnValueSelectItem<std::string> const* selected_item) const override;
+
 };
 
-class ItemPnSkipIPAssignment : public ItemPn, public ISelection<bool>
+class ItemPnSkipIPAssignment : public ValueSelection<bool>
 {
 public:
   ItemPnSkipIPAssignment(GsdmlAttrNav* attrnav, const char* name,
@@ -1082,50 +1070,576 @@ public:
   virtual ~ItemPnSkipIPAssignment() {}
 
   int open_children_impl() override;  
-  void select(ItemPnValueSelectItem<bool> const* selected_item) const override;
-  void set_default(bool default_value) override;
+  void select(ItemPnValueSelectItem<bool>* selected_item) override;
+  void setup_node() override;
+  void scan_impl(ItemPnValueSelectItem<bool> const* selected_item) const override;
 };
 
+class ItemPnSendClock : public ValueSelection<uint16_t>
+{
+public:
+  ItemPnSendClock(GsdmlAttrNav* attrnav, const char* name,
+                  GSDML::ApplicationRelations& application_relations,
+                  uint16_t* pwr_pn_value_p, brow_tNode dest, flow_eDest dest_code);
+  virtual ~ItemPnSendClock() {}
+
+  int open_children_impl() override;  
+  void select(ItemPnValueSelectItem<uint16_t>* selected_item) override;
+  void setup_node() override;
+  void scan_impl(ItemPnValueSelectItem<uint16_t> const* selected_item) const override;
+
+private:
+  GSDML::ApplicationRelations& m_application_relations;
+  GSDML::ValueList<uint>* m_send_clock_list;  
+};
+
+class ItemPnReductionRatio : public ValueSelection<uint16_t>
+{
+public:
+  ItemPnReductionRatio(GsdmlAttrNav* attrnav, const char* name,
+                  GSDML::ApplicationRelations& application_relations,
+                  uint16_t* pwr_pn_value_p, brow_tNode dest, flow_eDest dest_code);
+  virtual ~ItemPnReductionRatio() {}
+
+  int open_children_impl() override;  
+  void select(ItemPnValueSelectItem<uint16_t>* selected_item) override;
+  void setup_node() override;
+  void scan_impl(ItemPnValueSelectItem<uint16_t> const* selected_item) const override;
+
+private:
+  GSDML::ApplicationRelations& m_application_relations;
+  GSDML::ValueList<uint>* m_reduction_ratio_list;  
+};
+
+/*
+  Class for a IPv4 input field. It make sure the input is in the correct
+  format. It does not check wether it's a valid IPv4 address. Not yet anyways :)
+*/
 class ItemPnIPv4Input : public ItemPnValueInput<std::string>
 {
 public:
-  ItemPnIPv4Input(GsdmlAttrNav* attrnav, const char* name, const char* extra_text,
-      std::string* value_p, const char* infotext, brow_tNode dest, flow_eDest dest_code);
+  ItemPnIPv4Input(GsdmlAttrNav* attrnav, const char* name,
+      std::string* value_p, const char* infotext, brow_tNode dest, flow_eDest dest_code)
+  : ItemPnValueInput<std::string>(attrnav, name, value_p, infotext, dest, dest_code) {}
   virtual ~ItemPnIPv4Input() {}
 
   void value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override;
-
-  // int open_children_impl() override { return 1; };    
-  // int scan(GsdmlAttrNav* attrnav, void* string_value) override;
-
-  // void set_default(std::string default_value);
-  // void update_value(std::string new_value);  
 };
 
+/*
+  Class for a MAC address input field. It make sure the input is in the correct
+  format. It does not check wether it's a valid MAC address. Not yet anyways :)
+*/
+class ItemPnMACInput : public ItemPnValueInput<std::string>
+{
+public:
+  ItemPnMACInput(GsdmlAttrNav* attrnav, const char* name,
+      std::string* value_p, const char* infotext, brow_tNode dest, flow_eDest dest_code)
+  : ItemPnValueInput<std::string>(attrnav, name, value_p, infotext, dest, dest_code) {}
+  virtual ~ItemPnMACInput() {}
+
+  void value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override;
+};
+
+/*
+  Class for a MAC address input field. It make sure the input is in the correct
+  format. It does not check wether it's a valid MAC address. Not yet anyways :)
+*/
+class ItemPnDeviceNameInput : public ItemPnValueInput<std::string>
+{
+public:
+  ItemPnDeviceNameInput(GsdmlAttrNav* attrnav, const char* name,
+      std::string* value_p, const char* infotext, brow_tNode dest, flow_eDest dest_code)
+  : ItemPnValueInput<std::string>(attrnav, name, value_p, infotext, dest, dest_code) {}
+  virtual ~ItemPnDeviceNameInput() {}
+
+  void value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override;
+};
+
+class ItemPnPhaseInput : public ItemPnValueInput<uint>
+{
+public:
+  ItemPnPhaseInput(GsdmlAttrNav* attrnav, const char* name,
+      uint* value_p, const char* infotext, brow_tNode dest, flow_eDest dest_code)
+  : ItemPnValueInput<uint>(attrnav, name, value_p, infotext, dest, dest_code) {}
+  virtual ~ItemPnPhaseInput() {}
+
+  void value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override;
+};
+
+// Just a container for the timing properties values
+class ItemPnTimingProperties : public ItemPn
+{
+public:
+  ItemPnTimingProperties(GsdmlAttrNav* attrnav, const char* name,
+      std::shared_ptr<GSDML::DeviceAccessPointItem> dap,
+      brow_tNode dest, flow_eDest dest_code)
+    : ItemPn(attrnav, attrnav_eItemType_PnTimingProperties, name, "Timing Properties such as what RT_CLASS to run, what Send Clock factor to use and also Reduction Ratio."),
+      m_dap(dap)
+  {
+    m_closed_annotation = attrnav->brow->pixmap_map;
+
+    brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_attr, dest,
+                  dest_code, (void*)this, 1, &m_node);
+    brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_map);
+    brow_SetAnnotation(m_node, 0, m_name.c_str(), m_name.length());
+
+    // Setup our interface submodule if there is one available...
+    for (auto const& submodule_item : dap->_SystemDefinedSubmoduleList)
+    {
+      if (submodule_item.second->_SubmoduleItemType == GSDML::SubmoduleItemType_Interface)
+      {
+        m_interface_submodule = std::static_pointer_cast<GSDML::InterfaceSubmoduleItem>(submodule_item.second);
+      }
+    }
+
+    // In the olden days, interface submodule items did not exist. We create a default one for this purpose
+    // to make our children happy.
+    if (!m_interface_submodule)
+      m_interface_submodule.reset(new GSDML::InterfaceSubmoduleItem());    
+  }
+
+  virtual ~ItemPnTimingProperties() {}
+
+  int open_children_impl() override
+  {    
+    new ItemPnEnumRTClass(m_attrnav, "RT_CLASS", m_interface_submodule, &m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR.RT_CLASS, m_node, flow_eDest_IntoLast);
+
+    new ItemPnSendClock(m_attrnav, "Send Clock", m_interface_submodule->_ApplicationRelations, &m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR.m_send_clock_factor, m_node, flow_eDest_IntoLast);
+
+    new ItemPnReductionRatio(m_attrnav, "Reduction Ratio", m_interface_submodule->_ApplicationRelations, &m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR.m_reduction_ratio, m_node, flow_eDest_IntoLast);
+
+    new ItemPnPhaseInput(m_attrnav, "Phase", &m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR.m_phase, "Phases explained here (TODO)", m_node, flow_eDest_IntoLast);
+
+    return 1;
+  }
+private:
+  std::shared_ptr<GSDML::DeviceAccessPointItem> m_dap;
+  std::shared_ptr<GSDML::InterfaceSubmoduleItem> m_interface_submodule;
+};
+
+/*
+  =============================  Device Parameter Classes (used to change device parameters) =============================
+  There are two types of top classes. One where you select from a list of allowed values and one where you type a value into
+  an input prompt.
+*/
+
+/* Helper class for converting between host values and big endian values used in the profinet configuration */
+template<typename T>
+class ValueInterpreter
+{
+public:
+  // Convert a string to the current template datatype
+  T to_value(std::string string_representation)
+  {
+    T value;
+    std::istringstream input(string_representation, std::ios_base::in);
+    input.precision(12); // For when this is a float/double    
+    input >> std::fixed >> value;
+    
+    if (input.fail())
+      throw std::string("Conversion error");
+    
+    return std::move(value);    
+  }
+
+  // Convert a value to PNIO order
+  T to_pn_value(T value)
+  {
+    switch (sizeof(T))
+    {
+      case 2:
+        value = htons(value);
+        break;
+      case 4:
+        value = htonl(value);
+        break;
+      case 8:
+        // TODO Implement
+        std::cout << "NYI 8 byte long datatype" << std::endl;    
+        break;
+      default:
+        break;
+    }
+    return value;
+  }
+
+  // Convert value to host order
+  T to_host_value(T value)
+  {
+    switch (sizeof(T))
+    {
+      case 2:
+        value = ntohs(value);
+        break;
+      case 4:
+        value = ntohl(value);
+        break;
+      case 8:
+        std::cout << "NYI 8 byte long datatype" << std::endl;    
+        break;
+      default:
+        break;
+    }
+    return value;
+  }
+};
+
+/* 
+  Template class for all datatypes available 
+  This is an input style type of item. No selections...
+  It takes a Ref element as a constructor parameter in order to check where the data should go and what 
+  the allowed values are...
+
+  TODO Test this with string datavalue types. Might need template specialization for that
+*/
 template<typename T>
 class ItemPnParameterInput : public ItemPnValueInput<T>
 {
 public:
-  ItemPnParameterInput(GsdmlAttrNav* attrnav, const char* name, const char* extra_text,
+  ItemPnParameterInput(GsdmlAttrNav* attrnav, const char* name,
       T* value_p, const char* infotext, brow_tNode dest, flow_eDest dest_code,
       std::shared_ptr<GSDML::Ref> ref)
-    : ItemPnValueInput<T>(attrnav, pwr_eType_, name, extra_text,
-    value_p, infotext, dest, dest_code), m_ref(ref) {}
+    : ItemPnValueInput<T>(attrnav, name,
+      value_p, infotext, dest, dest_code), m_ref(ref)
+  {
+    // Set the value pointer to point to our offset in the Const data
+    this->m_value_p = (T*)&((unsigned char*)this->m_value_p)[ref->_ByteOffset];
+    
+    this->set_changeable(m_ref->_Changeable);
+
+    std::string value = this->to_string();
+    brow_SetAnnotation(this->m_node, 1, value.c_str(), value.length());
+  }
   virtual ~ItemPnParameterInput() = default;
 
   void value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override
   {
+    T value;
     std::cout << "Implementation goes here for parameter input" << std::endl;
+    
+    try {
+      value = interpreter.to_value(value_str);
+    } catch (std::string& e)
+    {
+      attrnav->message('E', "Not a valid input for this datatype.");
+      return;
+    }
+
+    std::cout << "Value (before): " << value << std::endl;
+
+    // Check allowed values if it is present
+    if (!m_ref->_AllowedValues.empty() && !m_ref->_AllowedValues.inList(value))
+    {
+      attrnav->message('E', "Value is outside allowed ranges");
+      return;
+    }
+
+    // Store the value
+    value = interpreter.to_pn_value(value);
+    *this->m_value_p = value;
+
+    // All ok, update annotation to reflect stored value...
+    std::string value_string = this->to_string();
+    brow_SetAnnotation(this->m_node, 1, value_string.c_str(), value_string.length());
+
+    std::cout << "Value (after): " << value << std::endl;
+
+    ItemPn::m_attrnav->pn_runtime_data->save_to_file("testxmlfile");
+  }
+
+  std::string to_string() override
+  {
+    T temp = interpreter.to_host_value(*this->m_value_p);
+    std::ostringstream result(std::ios_base::out);
+    result.precision(12); // For when this is a float/double    
+    result << std::fixed << temp;    
+
+    std::string value(result.str());
+    return value;    
   }
 
 private:
+  ValueInterpreter<T> interpreter;
   std::shared_ptr<GSDML::Ref> m_ref;
-  // int open_children_impl() override { return 1; };    
-  // int scan(GsdmlAttrNav* attrnav, void* string_value) override;
-
-  // void set_default(std::string default_value);
-  // void update_value(std::string new_value);  
 };
 
+template<typename T>
+class ItemPnParameterSelection : public ValueSelection<T>
+{
+public:
+  ItemPnParameterSelection(GsdmlAttrNav* attrnav, const char* name,
+                  T* pwr_pn_value_p, brow_tNode dest, flow_eDest dest_code,
+                  std::shared_ptr<GSDML::Ref> ref)
+    : ValueSelection<T>(attrnav, attrnav_eItemType_PnParameterSelection, name, "No help text available", dest, dest_code, pwr_pn_value_p),
+      m_ref(ref), m_is_bitarea(false), m_is_bit(false)
+  {
+    ItemPn::m_closed_annotation = attrnav->brow->pixmap_attrenum;
+
+    // Set InfoText to the Value Item help element reference text...
+    if (m_ref->_ValueItem && m_ref->_ValueItem->_Help)
+      ItemPn::m_infotext = *m_ref->_ValueItem->_Help;
+
+    // Set the value pointer to point to our offset in the Const data
+    this->m_value_p = (T*)&((unsigned char*)this->m_value_p)[ref->_ByteOffset]; 
+    this->m_noedit = !m_ref->_Changeable;
+
+    // ParameterSelections can be Bit/BitArea types. If so, we need to pinpoint the bits correctly.
+    // The size of these are always 1 byte. Create a bitmask to use...
+    // TODO Check specification for the default value of a bitlength element. ought to be 1 so this
+    // expression can be simplified when this is confirmed...
+    m_mask = (1 << ref->_BitLength) - (ref->_BitLength ? 1 : 0);
+    m_mask <<= ref->_BitOffset;
+
+    if (ref->_DataType == GSDML::ValueDataType_Bit)
+      m_is_bit = true;
+    if (ref->_DataType == GSDML::ValueDataType_BitArea)
+      m_is_bitarea = true;
+
+    std::cout << "Mask: " << +m_mask << std::endl;
+
+    setup_node();
+  }
+
+  virtual ~ItemPnParameterSelection() = default;
+
+  void scan_impl(ItemPnValueSelectItem<T> const* selected_item) const
+  { 
+    T value = *this->m_value_p;
+    if (m_is_bit || m_is_bitarea)
+    {
+      value = *this->m_value_p & m_mask;
+    }
+    else
+    {
+      value = *this->m_value_p;
+    }
+
+    if (value == selected_item->value())
+      brow_SetRadiobutton(selected_item->get_node(), 0, 1);
+    else
+      brow_SetRadiobutton(ItemPn::m_node, 0, 0);
+  }
+
+  int open_children_impl() override
+  {
+    if (m_is_bit)
+    {
+      new ItemPnValueSelectItem<T>(ItemPn::m_attrnav, "On", this, this->m_value_p, 1 << m_ref->_BitOffset, "Select to enable this feature.", ItemPn::m_node, flow_eDest_IntoLast);
+      new ItemPnValueSelectItem<T>(ItemPn::m_attrnav, "Off", this, this->m_value_p, 0, "Select to disable this feature.", ItemPn::m_node, flow_eDest_IntoLast);
+      return 1;
+    }
+
+    // TODO If the need arises, implement something to populate a list of values when there are no assignments
+
+    // If we have assignments
+    for (auto const& assign : m_ref->_ValueItem->_Assignments)
+    {
+      if (m_ref->_AllowedValues.inList(assign._Content))
+      {
+        if (m_is_bitarea)
+          new ItemPnValueSelectItem<T>(ItemPn::m_attrnav, assign._Text->c_str(), this, this->m_value_p, static_cast<T>(assign._Content) << m_ref->_BitOffset, assign._Text->c_str(), ItemPn::m_node, flow_eDest_IntoLast);
+        else
+          new ItemPnValueSelectItem<T>(ItemPn::m_attrnav, assign._Text->c_str(), this, this->m_value_p, static_cast<T>(assign._Content), assign._Text->c_str(), ItemPn::m_node, flow_eDest_IntoLast);
+      }
+    }
+    return 1;
+  }
+
+  void select(ItemPnValueSelectItem<T>* selected_item) override
+  {
+    if (m_is_bit || m_is_bitarea)
+    {
+      *this->m_value_p &= ~m_mask; // Clear the bits
+      //*this->m_value_p |= (selected_item->value() << m_ref->_BitOffset);
+      *this->m_value_p |= selected_item->value();
+    }
+    else
+      *this->m_value_p = selected_item->value();    
+    
+    brow_SetAnnotation(ItemPn::m_node, 1, selected_item->m_name.c_str(), selected_item->m_name.length());
+    // Close this node, for this class we have a saved reference to attrnav as e member variable
+    double node_x, node_y;
+    brow_GetNodePosition(ItemPn::m_node, &node_x, &node_y);
+    ItemPn::close(ItemPn::m_attrnav, node_x, node_y);
+  }
+
+  std::string to_string() override
+  {
+    T temp = interpreter.to_host_value(*this->m_value_p);
+    std::ostringstream result(std::ios_base::out);
+    result.precision(12); // For when this is a float/double    
+    result << std::fixed << temp;    
+
+    std::string value(result.str());
+    return value;    
+  }
+
+  void setup_node() override
+  {
+    std::string annotation;
+    T value;
+    if (m_is_bitarea || m_is_bit)
+    {
+      value = (*this->m_value_p & m_mask);
+    }
+    else
+    {
+      value = interpreter.to_host_value(*this->m_value_p);
+    }    
+
+    // Is this a Bit?
+    if (m_is_bit)
+    {
+      annotation = (value ? "On" : "Off");
+    }    
+    else if (m_ref->_ValueItem)
+    {
+      for (auto const& assign : m_ref->_ValueItem->_Assignments)
+      {
+        if (assign._Content == value)
+        {
+          annotation = *assign._Text;
+          break;
+        }
+      }
+    }
+
+    brow_SetAnnotation(ItemPn::m_node, 1, annotation.c_str(), annotation.length());
+  }
+
+private:
+  ValueInterpreter<T> interpreter;
+  std::shared_ptr<GSDML::Ref> m_ref;
+  uint8_t m_mask;
+  bool m_is_bitarea;
+  bool m_is_bit;
+};
+
+
+/*
+  ========================================= Specializations for ParameterSelection =======================================
+
+  Template specializations for our ParameterSelection classes. Float/Double has no bitwise operations. 
+  So we specialize those functions here.
+*/
+
+template<>
+inline void ItemPnParameterSelection<float>::scan_impl(ItemPnValueSelectItem<float> const* selected_item) const
+{ 
+  float value = *this->m_value_p;
+  float selected_value = selected_item->value();
+  if (feqf(value, selected_value))      
+    brow_SetRadiobutton(selected_item->get_node(), 0, 1);
+  else
+    brow_SetRadiobutton(ItemPn::m_node, 0, 0);
+}
+
+template<>
+inline void ItemPnParameterSelection<double>::scan_impl(ItemPnValueSelectItem<double> const* selected_item) const
+{   
+  double value = *this->m_value_p;
+  double selected_value = selected_item->value();
+  if (feq(value, selected_value))  
+    brow_SetRadiobutton(selected_item->get_node(), 0, 1);
+  else
+    brow_SetRadiobutton(ItemPn::m_node, 0, 0);
+}
+
+template<>
+inline void ItemPnParameterSelection<float>::select(ItemPnValueSelectItem<float>* selected_item)
+{
+  *this->m_value_p = selected_item->value();    
+    
+  brow_SetAnnotation(ItemPn::m_node, 1, selected_item->m_name.c_str(), selected_item->m_name.length());
+  // Close this node, for this class we have a saved reference to attrnav as e member variable
+  double node_x, node_y;
+  brow_GetNodePosition(ItemPn::m_node, &node_x, &node_y);
+  ItemPn::close(ItemPn::m_attrnav, node_x, node_y);
+}
+
+template<>
+inline void ItemPnParameterSelection<double>::select(ItemPnValueSelectItem<double>* selected_item)
+{
+  *this->m_value_p = selected_item->value();    
+    
+  brow_SetAnnotation(ItemPn::m_node, 1, selected_item->m_name.c_str(), selected_item->m_name.length());
+  // Close this node, for this class we have a saved reference to attrnav as e member variable
+  double node_x, node_y;
+  brow_GetNodePosition(ItemPn::m_node, &node_x, &node_y);
+  ItemPn::close(ItemPn::m_attrnav, node_x, node_y);
+}
+
+template<>
+inline void ItemPnParameterSelection<float>::setup_node()
+{
+  std::string annotation;
+  float value = *this->m_value_p;
+  
+  if (m_ref->_ValueItem)
+  {
+    for (auto const& assign : m_ref->_ValueItem->_Assignments)
+    {
+      if (assign._Content == value)
+      {
+        annotation = *assign._Text;
+        break;
+      }
+    }
+  }
+  brow_SetAnnotation(ItemPn::m_node, 1, annotation.c_str(), annotation.length());
+}
+
+template<>
+inline void ItemPnParameterSelection<double>::setup_node()
+{
+  std::string annotation;
+  double value = *this->m_value_p;
+  
+  // Do we do this for doubles??? TODO 
+  // value = interpreter.to_host_value(*this->m_value_p);    
+  if (m_ref->_ValueItem)
+  {
+    for (auto const& assign : m_ref->_ValueItem->_Assignments)
+    {
+      if (assign._Content == value)
+      {
+        annotation = *assign._Text;
+        break;
+      }
+    }
+  }
+  brow_SetAnnotation(ItemPn::m_node, 1, annotation.c_str(), annotation.length());
+}
+
+// Mostly here to satisfy the compiler since i don't beleive there are floating point value items in existence
+template<>
+inline int ItemPnParameterSelection<float>::open_children_impl()
+{
+  // TODO If the need arises, implement something to populate a list of values when there are no assignments
+  // If we have assignments
+  for (auto const& assign : m_ref->_ValueItem->_Assignments)
+  {
+    new ItemPnValueSelectItem<float>(ItemPn::m_attrnav, assign._Text->c_str(), this, this->m_value_p, static_cast<float>(assign._Content), assign._Text->c_str(), ItemPn::m_node, flow_eDest_IntoLast);
+  }
+  return 1;
+}
+
+// Mostly here to satisfy the compiler since i don't beleive there are floating point value items in existence
+template<>
+inline int ItemPnParameterSelection<double>::open_children_impl()
+{
+  // TODO If the need arises, implement something to populate a list of values when there are no assignments
+  // If we have assignments
+  for (auto const& assign : m_ref->_ValueItem->_Assignments)
+  {
+    new ItemPnValueSelectItem<double>(ItemPn::m_attrnav, assign._Text->c_str(), this, this->m_value_p, static_cast<double>(assign._Content), assign._Text->c_str(), ItemPn::m_node, flow_eDest_IntoLast);
+  }
+  return 1;
+}
+
+/*
+  ========================================= END Specializations for ParameterSelection =======================================
+*/
 
 #endif

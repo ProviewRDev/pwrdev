@@ -480,7 +480,7 @@ Const::Const(pugi::xml_node&& xmlNode, Node* parent, pn_gsdml* gsdml)
 // #if (pwr_dHost_byteOrder == pwr_dLittleEndian)  
 //   _ByteOffset = static_cast<ParameterRecordDataItem*>(m_Parent)->_Length - 1 - _ByteOffset;
 // #endif          
-  size_t pos = 0;
+  //size_t pos = 0;
   //unsigned char* data = static_cast<ParameterRecordDataItem*>(m_Parent)->getData();
   //unsigned char* constData = (data + _ByteOffset);
   while (getline(buf, value, ','))
@@ -792,12 +792,25 @@ TimingProperties::TimingProperties(pugi::xml_node&& timingProperties, pn_gsdml* 
   : _SendClock(timingProperties.attribute("SendClock").as_string()),
     _ReductionRatioPow2(timingProperties.attribute("ReductionRatioPow2").as_string())
 {
+  // Fill in default values if these are not present
+  if (_SendClock.empty())
+    _SendClock = ValueList<uint>("8 16 32 64 128");
+
+  if (_ReductionRatioPow2.empty())
+    _ReductionRatioPow2 = ValueList<uint>("1 2 4 8 16 32 64 128 256 512");
 }
 
 RT_Class3TimingProperties::RT_Class3TimingProperties(pugi::xml_node&& rt_Class3TimingProperties, pn_gsdml* gsdml)
   : _SendClock(rt_Class3TimingProperties.attribute("SendClock").as_string()),
     _ReductionRatioPow2(rt_Class3TimingProperties.attribute("ReductionRatioPow2").as_string())
 {
+  // Fill in default values if these are not present. Even though class 3 properties are always there.
+  // Until confirmed with the spec leave this as is...
+  if (_SendClock.empty())
+    _SendClock = ValueList<uint>("8 16 32 64 128");
+
+  if (_ReductionRatioPow2.empty())
+    _ReductionRatioPow2 = ValueList<uint>("1 2 4 8 16");
 }
 
 MediaRedundancy::MediaRedundancy(pugi::xml_node&& mediaRedundancy, pn_gsdml* gsdml)
@@ -836,6 +849,12 @@ SubmoduleItem::SubmoduleItem(
     _RecordDataList.push_back(ParameterRecordDataItem(std::move(parameterRecordDataItem), gsdml));
 }
 
+SubmoduleItem::SubmoduleItem(eSubmoduleItemType submoduleType)
+  : _FixedInSubslots(""), _Writeable_IM_Records(""), _SubmoduleItemType(submoduleType)
+{
+
+}
+
 InterfaceSubmoduleItem::InterfaceSubmoduleItem(pugi::xml_node&& interfaceSubmoduleItem, pn_gsdml* gsdml)
   : SubmoduleItem(std::move(interfaceSubmoduleItem), gsdml, GSDML::SubmoduleItemType_Interface),
     _SupportedRT_Classes(interfaceSubmoduleItem.attribute("SupportedRT_Classes").as_string()),
@@ -846,6 +865,13 @@ InterfaceSubmoduleItem::InterfaceSubmoduleItem(pugi::xml_node&& interfaceSubmodu
     _SynchronisationMode(interfaceSubmoduleItem.child("SynchronisationMode"), gsdml),
     _ApplicationRelations(interfaceSubmoduleItem.child("ApplicationRelations"), gsdml),
     _MediaRedundancy(interfaceSubmoduleItem.child("MediaRedundancy"), gsdml)
+{
+}
+
+InterfaceSubmoduleItem::InterfaceSubmoduleItem()
+  : SubmoduleItem(GSDML::SubmoduleItemType_Interface),
+    _SupportedRT_Classes("RT_CLASS_1"),
+    _SupportedProtocols("")
 {
 }
 

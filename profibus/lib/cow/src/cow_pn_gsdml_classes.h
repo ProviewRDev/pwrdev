@@ -309,6 +309,7 @@ class ModuleInfo
 {
 public:
   ModuleInfo(pugi::xml_node&&, pn_gsdml*);
+  ModuleInfo() = default;
   ModuleInfo(ModuleInfo&&) = default;
 
   std::shared_ptr<std::string> _Name;
@@ -448,6 +449,7 @@ class Input
 {
 public:
   Input(pugi::xml_node&&, pn_gsdml* gsdml);
+  Input() = default;
   Input(Input&&) = default;
 
   // TODO parse Consistency?? Something we need to use?
@@ -460,6 +462,7 @@ class Output
 {
 public:
   Output(pugi::xml_node&&, pn_gsdml* gsdml);
+  Output() = default;
   Output(Output&&) = default;
 
   // TODO parse Consistency??
@@ -472,6 +475,7 @@ class IOData
 {
 public:
   IOData(pugi::xml_node&&, pn_gsdml* gsdml);
+  IOData() {}
   IOData(IOData&&) = default;
   Input _Input;
   Output _Output;
@@ -493,7 +497,8 @@ class SubmoduleItem
 {
 public:
   SubmoduleItem(pugi::xml_node&&, pn_gsdml*, eSubmoduleItemType = SubmoduleItemType_Submodule);
-  SubmoduleItem(SubmoduleItem&&) = default;
+  SubmoduleItem(eSubmoduleItemType = SubmoduleItemType_Submodule);
+  SubmoduleItem(SubmoduleItem&&) = default;  
   virtual ~SubmoduleItem() = default;  
   
   uint _SubmoduleIdentNumber;
@@ -553,6 +558,7 @@ class RT_Class3Properties
 {
 public:
   RT_Class3Properties(pugi::xml_node&&, pn_gsdml* gsdml);
+  RT_Class3Properties() : _StartupMode("Legacy") {}
   RT_Class3Properties(RT_Class3Properties&&) = default;
   
   // Attributes
@@ -566,6 +572,7 @@ class TimingProperties
 {
 public:
   TimingProperties(pugi::xml_node&&, pn_gsdml* gsdml);
+  TimingProperties() : _SendClock("8 16 32 64 128"), _ReductionRatioPow2("1 2 4 8 16 32 64 128 256 512") {}
   TimingProperties(TimingProperties&&) = default;
   
   // Attributes
@@ -577,6 +584,7 @@ class RT_Class3TimingProperties
 {
 public:
   RT_Class3TimingProperties(pugi::xml_node&&, pn_gsdml* gsdml);
+  RT_Class3TimingProperties() : _SendClock("8 12 16 20 24 28 32 36 40 44 48 52 56 60 64 68 72 76 80 84 88 92 96 100 104 108 112 116 120 124 128"), _ReductionRatioPow2("1 2 4 8 16") {}
   RT_Class3TimingProperties(RT_Class3TimingProperties&&) = default;
   
   // Attributes
@@ -588,6 +596,7 @@ class ApplicationRelations
 {
 public:
   ApplicationRelations(pugi::xml_node&&, pn_gsdml* gsdml);
+  ApplicationRelations() : _StartupMode("Legacy") {} 
   ApplicationRelations(ApplicationRelations&&) = default;
 
   // Attributes
@@ -603,6 +612,7 @@ class SynchronisationMode
 {
 public:
   SynchronisationMode(pugi::xml_node&&, pn_gsdml* gsdml);
+  SynchronisationMode() : _SupportedSyncProtocols("") {}
   SynchronisationMode(SynchronisationMode&&) = default;
 
   // Attributes
@@ -616,6 +626,7 @@ class MediaRedundancy
 {
 public:
   MediaRedundancy(pugi::xml_node&&, pn_gsdml* gsdml);
+  MediaRedundancy() = default;
   MediaRedundancy(MediaRedundancy&&) = default;
 
   std::string _SupportedRole; // i.e "Client"
@@ -627,6 +638,7 @@ class InterfaceSubmoduleItem : public SubmoduleItem
 {
 public:
   InterfaceSubmoduleItem(pugi::xml_node&&, pn_gsdml* gsdml);
+  InterfaceSubmoduleItem();
   InterfaceSubmoduleItem(InterfaceSubmoduleItem&&) = default;
   // Attributes
   TokenList _SupportedRT_Classes; // i.e "RT_CLASS_1;RT_CLASS_3"
