@@ -320,7 +320,7 @@ public:
 class ItemPnIDSelectValue : public ItemPn
 {
 public:
-  ItemPnIDSelectValue(GsdmlAttrNav* attrnav, const char* item_name,
+  ItemPnIDSelectValue(GsdmlAttrNav* attrnav, const char* item_name, std::string const order_number,
                    std::string id_enum_value, std::string* id_p,
                    brow_tNode dest, flow_eDest dest_code,
                    const char* info_text = 0);
@@ -370,12 +370,12 @@ public:
 
 //! Item for a device aka DAP. A DAP can be considered just like a module only that it's always mounted in slot 0.
 // Therefore it makes use of the ItemPnModuleEnumValue for selecting what DAP to use...
-class ItemPnDevice : public ItemPn
+class ItemPnDAPSelection : public ItemPn
 {
 public:
-  ItemPnDevice(GsdmlAttrNav* attrnav, const char* item_name, brow_tNode dest,
+  ItemPnDAPSelection(GsdmlAttrNav* attrnav, const char* item_name, brow_tNode dest,
                flow_eDest dest_code, const char* infotext);
-  virtual ~ItemPnDevice() {}
+  virtual ~ItemPnDAPSelection() {}
 
   std::string m_old_value;
 

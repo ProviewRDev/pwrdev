@@ -1287,7 +1287,7 @@ int GsdmlAttrNav::object_attr()
   new ItemPnDeviceInfo(this, "DeviceInfo", NULL, flow_eDest_IntoLast, "Information about this device family.");
 
   // Add an item to select DAP
-  new ItemPnDevice(this, "DAP Selection", NULL, flow_eDest_IntoLast, "Choose DAP (Device Access Point)");
+  new ItemPnDAPSelection(this, "DAP Selection", NULL, flow_eDest_IntoLast, "Choose DAP (Device Access Point)");
 
   // Have we chosen a DAP?
   if (m_selected_device_item)
@@ -2248,17 +2248,19 @@ int ItemPn::close(GsdmlAttrNav* attrnav, double x, double y, bool reopen_after_c
 
 ItemPnIDSelectValue::ItemPnIDSelectValue(GsdmlAttrNav* attrnav,
                                          const char* name,
+                                         std::string const order_number,
                                          std::string id_enum_value,
                                          std::string* id_p, brow_tNode dest,
                                          flow_eDest dest_code,
                                          const char* infotext)
     : ItemPn(attrnav, attrnav_eItemType_PnIDSelectValue, name, infotext), m_id_enum_value(id_enum_value), m_id(id_p)
 {
-  brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_enum,
+  brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_enum_mtype,
                   dest, dest_code, (void*)this, 1, &m_node);
 
   brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_attr);
   brow_SetAnnotation(m_node, 0, m_name.c_str(), m_name.length());
+  brow_SetAnnotation(m_node, 1, order_number.c_str(), order_number.length());
 
   // Set if this is selected or not
   if (*m_id == m_id_enum_value)
@@ -2397,7 +2399,7 @@ int ItemPnEnumValue::scan(GsdmlAttrNav* attrnav, void* value_p)
 //   return 1;
 // }
 
-ItemPnDevice::ItemPnDevice(GsdmlAttrNav* attrnav, const char* name,
+ItemPnDAPSelection::ItemPnDAPSelection(GsdmlAttrNav* attrnav, const char* name,
                            brow_tNode dest, flow_eDest dest_code, const char* infotext)
   : ItemPn(attrnav, attrnav_eItemType_PnDevice, name, "Choose DAP"), m_old_value("")
 {
@@ -2405,11 +2407,11 @@ ItemPnDevice::ItemPnDevice(GsdmlAttrNav* attrnav, const char* name,
   brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_attr, dest,
                   dest_code, (void*)this, 1, &m_node);
   brow_SetAnnotPixmap(m_node, 0, m_closed_annotation);
-  brow_SetAnnotation(m_node, 0, m_name.c_str(), m_name.length());
+  brow_SetAnnotation(m_node, 0, m_name.c_str(), m_name.length());  
   brow_SetTraceAttr(m_node, m_name.c_str(), "", flow_eTraceType_User);
 }
 
-int ItemPnDevice::open_children_impl()
+int ItemPnDAPSelection::open_children_impl()
 {
   
     // int idx = 1;
@@ -2419,10 +2421,9 @@ int ItemPnDevice::open_children_impl()
 
     for (auto const& dap_item : m_attrnav->gsdml->getDeviceAccessPointMap())
     {
-      std::ostringstream dap_item_display_text(
-          *dap_item.second->_ModuleInfo._Name, std::ios_base::ate);
-      dap_item_display_text << " (" << dap_item.second->_ModuleInfo._OrderNumber
-                            << ")";
+      std::string module_name = *dap_item.second->_ModuleInfo._Name;
+      std::ostringstream order_number(std::ios_base::out);
+      order_number << "<" << dap_item.second->_ModuleInfo._OrderNumber << ">";
 
       // new ItemPnEnumValue(attrnav, dap_item_display_text.str().c_str(),
       // idx++, pwr_eType_UInt32,
@@ -2431,7 +2432,7 @@ int ItemPnDevice::open_children_impl()
       //                     dap_item.second->_ModuleInfo._InfoText->c_str());
 
       new ItemPnIDSelectValue(
-          m_attrnav, dap_item_display_text.str().c_str(), dap_item.first.c_str(),
+          m_attrnav, module_name.c_str(), order_number.str(), dap_item.first.c_str(),
           &m_attrnav->pn_runtime_data->m_PnDevice->m_DAP_ID, m_node,
           flow_eDest_IntoLast, dap_item.second->_ModuleInfo._InfoText->c_str());
     }
@@ -2458,7 +2459,7 @@ int ItemPnDevice::open_children_impl()
   return 1;
 }
 
-int ItemPnDevice::scan(GsdmlAttrNav* attrnav, void* value_p)
+int ItemPnDAPSelection::scan(GsdmlAttrNav* attrnav, void* value_p)
 {
 
   // Note, first scan is set the two first scans to detect load from data file
@@ -3258,19 +3259,16 @@ int ItemPnSubmoduleSelection::open_children_impl()
 {
     for (auto const& submodule_item : m_module_item->_UseableSubmodules)
     {
-      std::ostringstream submodule_item_display_text(
-          *submodule_item.second->_SubmoduleItemTarget->_ModuleInfo._Name,
-          std::ios_base::ate);
-      submodule_item_display_text
-          << " (" 
-          << (submodule_item.second->_SubmoduleItemTarget->_ModuleInfo._OrderNumber.empty() ? *submodule_item.second->_SubmoduleItemTarget->_ModuleInfo._Name : submodule_item.second->_SubmoduleItemTarget->_ModuleInfo._OrderNumber)
-          << ")";
+      std::string submodule_name = *submodule_item.second->_SubmoduleItemTarget->_ModuleInfo._Name;
+      std::ostringstream submodule_order_number(std::ios_base::out);
+      submodule_order_number << "<" << (submodule_item.second->_SubmoduleItemTarget->_ModuleInfo._OrderNumber.empty() ? *submodule_item.second->_SubmoduleItemTarget->_ModuleInfo._Name : submodule_item.second->_SubmoduleItemTarget->_ModuleInfo._OrderNumber)
+          << ">";
 
       // Only add those that are valid for this subslot
       if (submodule_item.second->_AllowedInSubslots.inList(m_subslot_number))
       {
         new ItemPnIDSelectValue(
-            m_attrnav, submodule_item_display_text.str().c_str(),
+            m_attrnav, submodule_name.c_str(), submodule_order_number.str(),
             submodule_item.first, &m_subslot_data->m_submodule_ID, m_node,
             flow_eDest_IntoLast,
             submodule_item.second->_SubmoduleItemTarget->_ModuleInfo._InfoText
@@ -5959,39 +5957,8 @@ int ItemPnModuleSelection::open_children_impl()
 {
   for (auto const& category : m_categories)
   {
-    new ItemPnMenu(m_attrnav, category.first, category.second, m_node, flow_eDest_IntoLast, m_category_map, this);
-    //new ItemPnMenu(m_attrnav, category.c_str(), )
-    //std::cout << "Category " << category << std::endl;
-
-    // for (auto it = range.first; it != range.second; ++it)
-    //   std::cout << "\t" << *it->second->_ModuleInfo._Name << std::endl;
-  } 
-  
-  
-  // for (auto const& module : m_attrnav->m_selected_device_item->_UseableModules)
-  // {
-  //   // First check if this is Fixed in this subslot
-  //   if (module.second->_FixedInSlots.inList(m_slot_data->m_slot_number))
-  //   {
-  //     std::cout << "Fixing " << module.first << " in slot: " << m_slot_data->m_slot_number << std::endl;
-  //     break;
-  //   }
-  //   // Check if it's allowed in here
-  //   if (module.second->_AllowedInSlots.inList(m_slot_data->m_slot_number))
-  //   {
-  //     std::string infotext = "No help available...";
-  //     std::ostringstream name(std::ios_base::out);
-      
-  //     name << *module.second->_ModuleItemTarget->_ModuleInfo._Name;
-  //     if (module.second->_ModuleItemTarget->_ModuleInfo._OrderNumber != "")
-  //       name << " (" << module.second->_ModuleItemTarget->_ModuleInfo._OrderNumber << ")";
-
-  //     if (module.second->_ModuleItemTarget->_ModuleInfo._InfoText)
-  //       infotext = *module.second->_ModuleItemTarget->_ModuleInfo._InfoText;
-      
-  //     new ItemPnValueSelectItem<std::string>(m_attrnav, name.str().c_str(), this, &m_slot_data->m_module_ID, module.first, infotext.c_str(), m_node, flow_eDest_IntoLast);
-  //   }
-  // }  
+    new ItemPnMenu(m_attrnav, category.first, category.second, m_node, flow_eDest_IntoLast, m_category_map, this);    
+  }  
 
   return 1;
 }
@@ -5999,18 +5966,18 @@ int ItemPnModuleSelection::open_children_impl()
 void ItemPnModuleSelection::select(ItemPnValueSelectItem<std::string>* selected_item)
 {
   // Store data (This is traced by the subslot which will detect this and close itself just to reopen itself again to update the sendclock class)  
-  // *m_value_p = selected_item->value();
+  *m_value_p = selected_item->value();
   
-  // // We now close and reopen the parent to reset the entire tree since send clock for instance is dependent on this value
-  // brow_tNode parent_node;
-  // void* parent;
-  // brow_GetParent(m_attrnav->brow->ctx, m_node, &parent_node);  
-  // brow_GetUserData(parent_node, &parent);
+  // We now close and reopen the parent to reset the entire tree since send clock for instance is dependent on this value
+  brow_tNode parent_node;
+  void* parent;
+  brow_GetParent(m_attrnav->brow->ctx, m_node, &parent_node);  
+  brow_GetUserData(parent_node, &parent);
 
-  // // Bold move but we're pretty confident what our parent actually is...
-  // ItemPnSubslot* subslot = (ItemPnSubslot*)parent;
-  // std::cout << "Closing and reopening: " << subslot->m_name << std::endl;
-  // subslot->close(m_attrnav, 0, 0, true); // Close AND reopen  
+  // Bold move but we're pretty confident what our parent actually is...
+  ItemPnSlot* slot = (ItemPnSlot*)parent;
+  std::cout << "Closing and reopening: " << slot->m_name << std::endl;
+  slot->close(m_attrnav, 0, 0, true); // Close AND reopen  
 }
 
 void ItemPnModuleSelection::setup_node()
@@ -6024,11 +5991,7 @@ void ItemPnModuleSelection::setup_node()
       m_category_map.emplace(*module.second->_ModuleItemTarget->_ModuleInfo._CategoryItemText, module.second->_ModuleItemTarget);
     }
   }
-  // for (auto const& module : m_category_map.find)
-  // {
-
-  // }
-    //std::cout << *module.second->_ModuleItemTarget->_ModuleInfo._CategoryItemText << std::endl;
+    
   // std::string value;
   // // No value set (either from read file or from earlier selections)  
   // if (*m_value_p == "")
@@ -6043,8 +6006,8 @@ void ItemPnModuleSelection::setup_node()
   //   value = *m_value_p;
   // }
 
-  // *m_value_p = value;
-  // brow_SetAnnotation(m_node, 1, m_value_p->c_str(), m_value_p->length());
+  //*m_value_p = value;
+  brow_SetAnnotation(m_node, 1, m_value_p->c_str(), m_value_p->length());
 }
 
 void ItemPnModuleSelection::scan_impl(ItemPnValueSelectItem<std::string> const* selected_item) const
