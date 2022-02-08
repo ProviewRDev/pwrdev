@@ -932,7 +932,8 @@ ModuleItem::ModuleItem(pugi::xml_node&& moduleItem, pn_gsdml* gsdml, eModuleItem
 ModuleItemRef::ModuleItemRef(pugi::xml_node&& moduleItemRef, pn_gsdml* gsdml)
     : _ModuleItemTarget(gsdml->getModuleMap()[std::move(std::string(
           moduleItemRef.attribute("ModuleItemTarget").as_string()))]),
-      _AllowedInSlots(moduleItemRef.attribute("AllowedInSlots").as_string())
+      _AllowedInSlots(moduleItemRef.attribute("AllowedInSlots").as_string()),
+      _FixedInSlots(moduleItemRef.attribute("FixedInSlots").as_string())
 {
 }
 

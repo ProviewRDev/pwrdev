@@ -693,6 +693,7 @@ public:
   ModuleItemRef(ModuleItemRef&&) = default;
   std::shared_ptr<ModuleItem> _ModuleItemTarget;
   GSDML::ValueList<uint> _AllowedInSlots;
+  GSDML::ValueList<uint> _FixedInSlots;
 };
 
 class DeviceIdentity
