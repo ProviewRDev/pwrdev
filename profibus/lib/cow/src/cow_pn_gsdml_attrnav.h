@@ -53,19 +53,13 @@ typedef enum
   //attrnav_eItemType_PnBase, // Base item for input values such as IP, MAC
   attrnav_eItemType_PnEnumValue, // Generic Enumeration value, used in PnEnum's
   attrnav_eItemType_PnDevice, // The DAP selection class, need a better name
-  attrnav_eItemType_PnIDSelectValue, // Selection of ID for a module or submodule
-  attrnav_eItemType_PnNetwork, // Displays the network settings
+  
+  
   attrnav_eItemType_PnEnumYesNo, // Simple enum for a Yes/No selection
-  attrnav_eItemType_PnDeviceInfo,
-  attrnav_eItemType_PnDAP, // The actual DAP selected by the PnDevice class
-  attrnav_eItemType_PnInterfaceSubmodule, // Represents the interface submodule in the DAP
-  attrnav_eItemType_PnPortSubmodule, // Represents the selcted port submodule in the DAP
-  attrnav_eItemType_PnSlot, // A slot in which you can fit a Module
-  attrnav_eItemType_PnSubslot, // A subslot in which a Submodule can go
+  
+  
   attrnav_eItemType_PnSubslotPhys, // Not used yet
-  attrnav_eItemType_PnModuleInfo, // Displays the element ModuleInfo
-  attrnav_eItemType_PnModuleSelect, // Selects a module to go in a Slot for instance
-  attrnav_eItemType_PnSubmoduleSelection,
+  
   attrnav_eItemType_PnSubmoduleType, // Selects a submodule to go in a subslot. Need a new name
   attrnav_eItemType_PnParRecord, // A ParameterRecordDataItem
   attrnav_eItemType_PnParValue, // A Parameter value input
@@ -83,6 +77,19 @@ typedef enum
   //attrnav_eItemType_PnEnumSendClock,
   attrnav_eItemType_PnEnumValueMType,
 
+  attrnav_eItemType_PnIDSelectValue, // Selection of ID for a module or submodule
+  
+  attrnav_eItemType_PnMenu, // A simple menu item for categories of modules...
+  attrnav_eItemType_PnNetwork, // Displays the network settings
+  attrnav_eItemType_PnDeviceInfo,
+  attrnav_eItemType_PnDAP, // The actual DAP selected by the PnDevice class
+  attrnav_eItemType_PnInterfaceSubmodule, // Represents the interface submodule in the DAP
+  attrnav_eItemType_PnPortSubmodule, // Represents the selcted port submodule in the DAP
+  attrnav_eItemType_PnSubmoduleSelection,
+  attrnav_eItemType_PnSlot, // A slot in which you can fit a Module
+  attrnav_eItemType_PnSubslot, // A subslot in which a Submodule can go
+  attrnav_eItemType_PnModuleInfo, // Displays the element ModuleInfo
+  attrnav_eItemType_PnModuleSelection, // Selects a module to go in a Slot for instance
   attrnav_eItemType_PnValueSelection,
   attrnav_eItemType_PnValueSelectItem,
   attrnav_eItemType_PnValueInput,
@@ -377,15 +384,26 @@ public:
 };
 
 //! Item for a slot.
+// class ItemPnDAP : public ItemPn
+// {
+// public:
+//   ItemPnDAP(GsdmlAttrNav* attrnav, const char* item_name,
+//             ProfinetSlot* item_slotdata, brow_tNode dest, flow_eDest dest_code, const char* infotext);
+
+//   ProfinetSlot* m_slotdata;
+
+//   virtual int open_children_impl();
+// };
 class ItemPnSlot : public ItemPn
 {
 public:
-  ItemPnSlot(GsdmlAttrNav* attrnav, const char* item_name,
-             ProfinetSlot* item_slotdata, brow_tNode dest,
-             flow_eDest dest_code, const char* infotext);
+  ItemPnSlot(GsdmlAttrNav* attrnav, const char* name,
+             ProfinetSlot* slotdata,
+             brow_tNode dest, flow_eDest dest_code, const char* infotext);
   virtual ~ItemPnSlot() {}
 
   ProfinetSlot* m_slotdata;
+
   std::string m_old_value;
 
   int open_children_impl();
@@ -939,17 +957,19 @@ template<typename T>
 class ItemPnValueSelectItem : public ItemPn
 {
 public:
-  ItemPnValueSelectItem(GsdmlAttrNav* attrnav, const char* annotation_1,
+  ItemPnValueSelectItem(GsdmlAttrNav* attrnav, const char* annotation_1, std::string annotation_2,
       ValueSelection<T>* parent, T const* value_p, T select_value, const char* infotext,
       brow_tNode dest, flow_eDest dest_code) 
     : ItemPn(attrnav, attrnav_eItemType_PnValueSelectItem, annotation_1, infotext),
       m_parent(parent), m_value_p(value_p), m_select_value(select_value)
   {    
-    brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_enum, dest,
+    brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_enum_mtype, dest,
                   dest_code, (void*)this, 1, &m_node);
 
     brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_attr);
     brow_SetAnnotation(m_node, 0, m_name.c_str(), m_name.length());
+    if (annotation_2 != "")
+      brow_SetAnnotation(m_node, 1, annotation_2.c_str(), annotation_2.length());
     brow_SetTraceAttr(m_node, m_name.c_str(), "", flow_eTraceType_User);
   }
 
@@ -1041,9 +1061,41 @@ protected:
 /*
   ======================================== "CONCRETE" IMPLEMENTATIONS ========================================
 */
+
+/*
+  Module Selection item
+*/
+class ItemPnModuleSelection : public ValueSelection<std::string>
+{
+public:
+  ItemPnModuleSelection(GsdmlAttrNav* attrnav, const char* name, ProfinetSlot* slot_data,
+                  std::string* id_value_p, brow_tNode dest, flow_eDest dest_code, const char* infotext);
+  virtual ~ItemPnModuleSelection() {}
+  
+  int open_children_impl() override;  
+  void select(ItemPnValueSelectItem<std::string>* selected_item) override;  
+  void setup_node() override;
+  void scan_impl(ItemPnValueSelectItem<std::string> const* selected_item) const override;
+
+  ProfinetSlot* m_slot_data;
+  std::map<std::string, std::string> m_categories;
+  std::multimap<std::string, std::shared_ptr<GSDML::ModuleItem>> m_category_map;
+};
+
+class ItemPnMenu : public ItemPn
+{
+public:
+  ItemPnMenu(GsdmlAttrNav* attrnav, std::string const& category_name, std::string const& infotext, brow_tNode dest, flow_eDest dest_code,
+              std::multimap<std::string, std::shared_ptr<GSDML::ModuleItem>>& items, ItemPnModuleSelection* parent);  
+
+  int open_children_impl() override;
+
+  std::multimap<std::string, std::shared_ptr<GSDML::ModuleItem>>& m_items;  
+  ItemPnModuleSelection* m_parent;
+};
+
 /*
   RT_CLASS Selection item
-  Used together with ItemPnEnumValue (for the values...)
 */
 class ItemPnEnumRTClass : public ValueSelection<std::string>
 {
@@ -1291,7 +1343,7 @@ public:
   It takes a Ref element as a constructor parameter in order to check where the data should go and what 
   the allowed values are...
 
-  TODO Test this with string datavalue types. Might need template specialization for that
+  TODO Test this with string datavalue types. Might need more template specialization for that
 */
 template<typename T>
 class ItemPnParameterInput : public ItemPnValueInput<T>
@@ -1316,7 +1368,6 @@ public:
   void value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override
   {
     T value;
-    std::cout << "Implementation goes here for parameter input" << std::endl;
     
     try {
       value = interpreter.to_value(value_str);
@@ -1425,8 +1476,8 @@ public:
   {
     if (m_is_bit)
     {
-      new ItemPnValueSelectItem<T>(ItemPn::m_attrnav, "On", this, this->m_value_p, 1 << m_ref->_BitOffset, "Select to enable this feature.", ItemPn::m_node, flow_eDest_IntoLast);
-      new ItemPnValueSelectItem<T>(ItemPn::m_attrnav, "Off", this, this->m_value_p, 0, "Select to disable this feature.", ItemPn::m_node, flow_eDest_IntoLast);
+      new ItemPnValueSelectItem<T>(ItemPn::m_attrnav, "On", "", this, this->m_value_p, 1 << m_ref->_BitOffset, "Select to enable this feature.", ItemPn::m_node, flow_eDest_IntoLast);
+      new ItemPnValueSelectItem<T>(ItemPn::m_attrnav, "Off", "", this, this->m_value_p, 0, "Select to disable this feature.", ItemPn::m_node, flow_eDest_IntoLast);
       return 1;
     }
 
@@ -1438,9 +1489,9 @@ public:
       if (m_ref->_AllowedValues.inList(assign._Content))
       {
         if (m_is_bitarea)
-          new ItemPnValueSelectItem<T>(ItemPn::m_attrnav, assign._Text->c_str(), this, this->m_value_p, static_cast<T>(assign._Content) << m_ref->_BitOffset, assign._Text->c_str(), ItemPn::m_node, flow_eDest_IntoLast);
+          new ItemPnValueSelectItem<T>(ItemPn::m_attrnav, assign._Text->c_str(), "", this, this->m_value_p, static_cast<T>(assign._Content) << m_ref->_BitOffset, assign._Text->c_str(), ItemPn::m_node, flow_eDest_IntoLast);
         else
-          new ItemPnValueSelectItem<T>(ItemPn::m_attrnav, assign._Text->c_str(), this, this->m_value_p, static_cast<T>(assign._Content), assign._Text->c_str(), ItemPn::m_node, flow_eDest_IntoLast);
+          new ItemPnValueSelectItem<T>(ItemPn::m_attrnav, assign._Text->c_str(), "", this, this->m_value_p, static_cast<T>(assign._Content), assign._Text->c_str(), ItemPn::m_node, flow_eDest_IntoLast);
       }
     }
     return 1;
@@ -1620,7 +1671,7 @@ inline int ItemPnParameterSelection<float>::open_children_impl()
   // If we have assignments
   for (auto const& assign : m_ref->_ValueItem->_Assignments)
   {
-    new ItemPnValueSelectItem<float>(ItemPn::m_attrnav, assign._Text->c_str(), this, this->m_value_p, static_cast<float>(assign._Content), assign._Text->c_str(), ItemPn::m_node, flow_eDest_IntoLast);
+    new ItemPnValueSelectItem<float>(ItemPn::m_attrnav, assign._Text->c_str(), "", this, this->m_value_p, static_cast<float>(assign._Content), assign._Text->c_str(), ItemPn::m_node, flow_eDest_IntoLast);
   }
   return 1;
 }
@@ -1633,7 +1684,7 @@ inline int ItemPnParameterSelection<double>::open_children_impl()
   // If we have assignments
   for (auto const& assign : m_ref->_ValueItem->_Assignments)
   {
-    new ItemPnValueSelectItem<double>(ItemPn::m_attrnav, assign._Text->c_str(), this, this->m_value_p, static_cast<double>(assign._Content), assign._Text->c_str(), ItemPn::m_node, flow_eDest_IntoLast);
+    new ItemPnValueSelectItem<double>(ItemPn::m_attrnav, assign._Text->c_str(), "", this, this->m_value_p, static_cast<double>(assign._Content), assign._Text->c_str(), ItemPn::m_node, flow_eDest_IntoLast);
   }
   return 1;
 }

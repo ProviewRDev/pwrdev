@@ -43,6 +43,7 @@
 #include <arpa/inet.h>
 #include <typeinfo>
 #include <regex>
+#include <iomanip>
 //#include <exception>
 
 #include "co_cdh.h"
@@ -78,14 +79,21 @@ static char null_str[] = "";
 void create_parameter_value_class(GsdmlAttrNav* attrnav, const char* name, std::shared_ptr<GSDML::Ref> ref,
                           void* data, brow_tNode node)
 {
-  bool create_selection = false;
+  bool create_selection = false;  
+  std::string help = "No help available...";
 
   if (ref->_ValueItem && ref->_ValueItem->_Assignments.size())
     create_selection = true;
 
-  // Create a handy infotext depending on what we have to play with...
-  // TODO
-  // TODO Also move infotext parameter to constructor of ItemPnParameterSelection
+  if (ref && ref->_ValueItem && ref->_ValueItem->_Help)
+    help = *ref->_ValueItem->_Help;
+  
+  std::ostringstream infotext(help, std::ios_base::ate);
+
+  if (!ref->_AllowedValues.empty())
+    infotext << std::endl << "Allowed values: " << ref->_AllowedValues.min() << " - " << ref->_AllowedValues.max();
+  else
+    infotext << std::endl << "No known allowed values. The datatype will limit the value entered...";
 
   switch (ref->_DataType)
   {
@@ -99,73 +107,73 @@ void create_parameter_value_class(GsdmlAttrNav* attrnav, const char* name, std::
         new ItemPnParameterSelection<int8_t>(attrnav, name, (int8_t*)data, node, flow_eDest_IntoLast, ref);
         //new ItemPnParEnum(attrnav, name, ref, (unsigned char*)data, node, flow_eDest_IntoLast, "Unsigned32 value selection.");
       else
-        new ItemPnParameterInput<int8_t>(attrnav, name, (int8_t*)data, "Integer8 value input.", node, flow_eDest_IntoLast, ref);
+        new ItemPnParameterInput<int8_t>(attrnav, name, (int8_t*)data, (std::string("Integer8 value input. ") + infotext.str()).c_str(), node, flow_eDest_IntoLast, ref);
       break;
     case GSDML::ValueDataType_Unsigned8:
       if (create_selection)
         new ItemPnParameterSelection<uint8_t>(attrnav, name, (uint8_t*)data, node, flow_eDest_IntoLast, ref);
         //new ItemPnParEnum(attrnav, name, ref, (unsigned char*)data, node, flow_eDest_IntoLast, "Unsigned32 value selection.");
       else
-        new ItemPnParameterInput<uint8_t>(attrnav, name, (uint8_t*)data, "Unsigned8 value input.", node, flow_eDest_IntoLast, ref);
+        new ItemPnParameterInput<uint8_t>(attrnav, name, (uint8_t*)data, (std::string("Unsigned8 value input. ") + infotext.str()).c_str(), node, flow_eDest_IntoLast, ref);
       break;
     case GSDML::ValueDataType_Integer16:
       if (create_selection)
         new ItemPnParameterSelection<int16_t>(attrnav, name, (int16_t*)data, node, flow_eDest_IntoLast, ref);
         //new ItemPnParEnum(attrnav, name, ref, (unsigned char*)data, node, flow_eDest_IntoLast, "Unsigned32 value selection.");
       else
-        new ItemPnParameterInput<int16_t>(attrnav, name, (int16_t*)data, "Integer16 value input.", node, flow_eDest_IntoLast, ref);
+        new ItemPnParameterInput<int16_t>(attrnav, name, (int16_t*)data, (std::string("Integer16 value input. ") + infotext.str()).c_str(), node, flow_eDest_IntoLast, ref);
       break;
     case GSDML::ValueDataType_Unsigned16:
       if (create_selection)
         new ItemPnParameterSelection<uint16_t>(attrnav, name, (uint16_t*)data, node, flow_eDest_IntoLast, ref);
         //new ItemPnParEnum(attrnav, name, ref, (unsigned char*)data, node, flow_eDest_IntoLast, "Unsigned32 value selection.");
       else
-        new ItemPnParameterInput<uint16_t>(attrnav, name, (uint16_t*)data, "Unsigned16s value input.", node, flow_eDest_IntoLast, ref);
+        new ItemPnParameterInput<uint16_t>(attrnav, name, (uint16_t*)data, (std::string("Unsigned16 value input. ") + infotext.str()).c_str(), node, flow_eDest_IntoLast, ref);
       break;
     case GSDML::ValueDataType_Integer32:
       if (create_selection)
         new ItemPnParameterSelection<int32_t>(attrnav, name, (int32_t*)data, node, flow_eDest_IntoLast, ref);
         //new ItemPnParEnum(attrnav, name, ref, (unsigned char*)data, node, flow_eDest_IntoLast, "Unsigned32 value selection.");
       else
-        new ItemPnParameterInput<int32_t>(attrnav, name, (int32_t*)data, "Integer32 value input.", node, flow_eDest_IntoLast, ref);
+        new ItemPnParameterInput<int32_t>(attrnav, name, (int32_t*)data, (std::string("Integer32 value input. ") + infotext.str()).c_str(), node, flow_eDest_IntoLast, ref);
       break;
     case GSDML::ValueDataType_Unsigned32:
       if (create_selection)
         new ItemPnParameterSelection<uint32_t>(attrnav, name, (uint32_t*)data, node, flow_eDest_IntoLast, ref);
         //new ItemPnParEnum(attrnav, name, ref, (unsigned char*)data, node, flow_eDest_IntoLast, "Unsigned32 value selection.");
       else
-        new ItemPnParameterInput<uint32_t>(attrnav, name, (uint32_t*)data, "Unsigned32 value input.", node, flow_eDest_IntoLast, ref);
+        new ItemPnParameterInput<uint32_t>(attrnav, name, (uint32_t*)data, (std::string("Unsigned32 value input. ") + infotext.str()).c_str(), node, flow_eDest_IntoLast, ref);
       break;
     case GSDML::ValueDataType_Integer64:
       if (create_selection)
         new ItemPnParameterSelection<int64_t>(attrnav, name, (int64_t*)data, node, flow_eDest_IntoLast, ref);
         //new ItemPnParEnum(attrnav, name, ref, (unsigned char*)data, node, flow_eDest_IntoLast, "Unsigned32 value selection.");
       else
-        new ItemPnParameterInput<int64_t>(attrnav, name, (int64_t*)data, "Integer64 value input.", node, flow_eDest_IntoLast, ref);
+        new ItemPnParameterInput<int64_t>(attrnav, name, (int64_t*)data, (std::string("Integer64 value input. ") + infotext.str()).c_str(), node, flow_eDest_IntoLast, ref);
       break;
     case GSDML::ValueDataType_Unsigned64:
       if (create_selection)
         new ItemPnParameterSelection<uint64_t>(attrnav, name, (uint64_t*)data, node, flow_eDest_IntoLast, ref);
         //new ItemPnParEnum(attrnav, name, ref, (unsigned char*)data, node, flow_eDest_IntoLast, "Unsigned32 value selection.");
       else
-        new ItemPnParameterInput<uint64_t>(attrnav, name, (uint64_t*)data, "Unsigned64 value input.", node, flow_eDest_IntoLast, ref);
+        new ItemPnParameterInput<uint64_t>(attrnav, name, (uint64_t*)data, (std::string("Unsigned64 value input. ") + infotext.str()).c_str(), node, flow_eDest_IntoLast, ref);
       break;
     case GSDML::ValueDataType_Float32:
       if (create_selection)
         new ItemPnParameterSelection<float>(attrnav, name, (float*)data, node, flow_eDest_IntoLast, ref);
         //new ItemPnParEnum(attrnav, name, ref, (unsigned char*)data, node, flow_eDest_IntoLast, "Unsigned32 value selection.");
       else
-        new ItemPnParameterInput<float>(attrnav, name, (float*)data, "Float32 value input.", node, flow_eDest_IntoLast, ref);
+        new ItemPnParameterInput<float>(attrnav, name, (float*)data, (std::string("Float32 value input. ") + infotext.str()).c_str(), node, flow_eDest_IntoLast, ref);
       break;
     case GSDML::ValueDataType_Float64:
       if (create_selection)
         new ItemPnParameterSelection<double>(attrnav, name, (double*)data, node, flow_eDest_IntoLast, ref);
         //new ItemPnParEnum(attrnav, name, ref, (unsigned char*)data, node, flow_eDest_IntoLast, "Unsigned32 value selection.");
       else
-        new ItemPnParameterInput<double>(attrnav, name, (double*)data, "Float64 value input.", node, flow_eDest_IntoLast, ref);
+        new ItemPnParameterInput<double>(attrnav, name, (double*)data, (std::string("Float64 value input. ") + infotext.str()).c_str(), node, flow_eDest_IntoLast, ref);
       break;
     case GSDML::ValueDataType_VisibleString:
-        new ItemPnParameterInput<double>(attrnav, name, (double*)data, "String input.", node, flow_eDest_IntoLast, ref);
+        new ItemPnParameterInput<double>(attrnav, name, (double*)data, (std::string("String input. ") + infotext.str()).c_str(), node, flow_eDest_IntoLast, ref);
       break;
     default:
       std::cout << "Unhandled GSDML Datatype for parameter Ref element." << std::endl;
@@ -297,7 +305,7 @@ void GsdmlAttrNav::expand_all()
 
     if (!(item->m_type == attrnav_eItemType_PnParEnum ||
           item->m_type == attrnav_eItemType_PnDevice ||
-          item->m_type == attrnav_eItemType_PnModuleSelect ||
+          item->m_type == attrnav_eItemType_PnModuleSelection ||
           item->m_type == attrnav_eItemType_PnSubmoduleType ||
           item->m_type == attrnav_eItemType_PnDataItem ||
           item->m_type == attrnav_eItemType_PnModuleClass ||
@@ -636,6 +644,9 @@ int GsdmlAttrNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
     brow_GetUserData(node_list[0], (void**)&item);
     switch (item->m_type)
     {
+    case attrnav_eItemType_PnMenu:
+      item->open_children(attrnav, 0, 0);
+      break;
     case attrnav_eItemType_PnValueSelectItem:
       item->selected(attrnav);
       // Here we need to downcast our base item since all RTTI is lost when fiddling with void pointers...
@@ -1160,12 +1171,12 @@ void GsdmlAttrNavBrow::create_nodeclasses()
 
   brow_CreateNodeClass(ctx, "NavigatorEnumMType", flow_eNodeGroup_Common,
                        &nc_enum_mtype);
-  brow_AddRadiobutton(nc_enum_mtype, 24, 0.03, 0.7, 0.7, 0, flow_eDrawType_Line,
+  brow_AddRadiobutton(nc_enum_mtype, 30, 0.03, 0.7, 0.7, 0, flow_eDrawType_Line,
                       1);
   brow_AddAnnotPixmap(nc_enum_mtype, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
   brow_AddAnnot(nc_enum_mtype, 2, 0.6, 0, flow_eDrawType_TextHelvetica, 2,
                 flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_enum_mtype, 12, 0.6, 1, flow_eDrawType_TextHelvetica, 2,
+  brow_AddAnnot(nc_enum_mtype, 20, 0.6, 1, flow_eDrawType_TextHelvetica, 2,
                 flow_eAnnotType_OneLine, 1);
   brow_AddFrame(nc_enum_mtype, 0, 0, 20, 0.83, flow_eDrawType_LineGray, -1, 1);
 
@@ -1276,7 +1287,6 @@ int GsdmlAttrNav::object_attr()
   new ItemPnDeviceInfo(this, "DeviceInfo", NULL, flow_eDest_IntoLast, "Information about this device family.");
 
   // Add an item to select DAP
-  // TODO note to self, continue from here
   new ItemPnDevice(this, "DAP Selection", NULL, flow_eDest_IntoLast, "Choose DAP (Device Access Point)");
 
   // Have we chosen a DAP?
@@ -2389,7 +2399,7 @@ int ItemPnEnumValue::scan(GsdmlAttrNav* attrnav, void* value_p)
 
 ItemPnDevice::ItemPnDevice(GsdmlAttrNav* attrnav, const char* name,
                            brow_tNode dest, flow_eDest dest_code, const char* infotext)
-    : ItemPn(attrnav, attrnav_eItemType_PnDevice, name, "Choose DAP"), m_old_value("")
+  : ItemPn(attrnav, attrnav_eItemType_PnDevice, name, "Choose DAP"), m_old_value("")
 {
   m_closed_annotation = attrnav->brow->pixmap_attrenum;
   brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_attr, dest,
@@ -2518,21 +2528,36 @@ int ItemPnDevice::scan(GsdmlAttrNav* attrnav, void* value_p)
 }
 
 ItemPnSlot::ItemPnSlot(GsdmlAttrNav* attrnav, const char* name,
-                       ProfinetSlot* item_slotdata, brow_tNode dest,
-                       flow_eDest dest_code, const char* infotext)
-    : ItemPn(attrnav, attrnav_eItemType_PnSlot, name, infotext), m_slotdata(item_slotdata), m_old_value("")
+                       ProfinetSlot* slotdata, 
+                       brow_tNode dest, flow_eDest dest_code, const char* infotext)
+    : ItemPn(attrnav, attrnav_eItemType_PnSlot, name, infotext), m_slotdata(slotdata), m_old_value("")
 {
+  m_closed_annotation = attrnav->brow->pixmap_map;
+
   brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_attr,
                   dest, dest_code, (void*)this, 1, &m_node);
 
   brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_map);
 
   brow_SetAnnotation(m_node, 0, m_name.c_str(), m_name.length());
-  brow_SetTraceAttr(m_node, m_name.c_str(), "", flow_eTraceType_User);
+  //brow_SetTraceAttr(m_node, m_name.c_str(), "", flow_eTraceType_User);
 }
 
 int ItemPnSlot::open_children_impl()
 {
+  new ItemPnModuleSelection(m_attrnav, "Module Selection", m_slotdata, &m_slotdata->m_module_ID, m_node, flow_eDest_IntoLast, "Select what module to put in this slot...");
+  /*
+    Module selection
+      - select among useable modules. (will need slotnumber m_slotdata->m_slot_number)
+
+    If module is selected
+      - Show everything like in the ItemPnDAP
+
+    Select module class
+  */
+
+  // TODO Recreate the DAP selection as a general Module selection item to be used here aswell...The DAP is in itself a module aswell...
+
     // new ItemPnModuleType(attrnav, "ModuleType", m_slotdata->slot_number,
     //                      m_slotdata->slot_idx, m_node, flow_eDest_IntoLast);
     // if (m_slotdata->module_enum_number != 0)
@@ -5881,6 +5906,158 @@ int ItemPnEnumYesNo::open_children_impl()
 //   return 1;
 // }
 
+/* ======================================= Menu node ======================================= */
+ItemPnMenu::ItemPnMenu(GsdmlAttrNav* attrnav, std::string const& category_name, std::string const& infotext, brow_tNode dest, flow_eDest dest_code,
+    std::multimap<std::string, std::shared_ptr<GSDML::ModuleItem>>& items, ItemPnModuleSelection* parent)
+  : ItemPn(attrnav, attrnav_eItemType_PnMenu, category_name, infotext),
+  m_items(items), m_parent(parent)
+{
+  m_closed_annotation = attrnav->brow->pixmap_attrenum;
+  brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_attr, dest,
+                  dest_code, (void*)this, 1, &m_node);
+
+  brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_attrenum);
+  brow_SetAnnotation(m_node, 0, m_name.c_str(), m_name.length());    
+}
+
+int ItemPnMenu::open_children_impl()
+{
+  auto range = m_items.equal_range(m_name);
+  for (auto it = range.first; it != range.second; ++it)
+  {
+    std::string module_name = *it->second->_ModuleInfo._Name;    
+    std::ostringstream order_number(std::ios_base::out);
+    if (it->second->_ModuleInfo._OrderNumber != "")
+      order_number << "<" << it->second->_ModuleInfo._OrderNumber << ">";
+    // std::ostringstream name(std::ios_base::out);
+    // name << std::left << std::setw(60) << module_name;
+    // if (it->second->_ModuleInfo._OrderNumber != "")
+    //   name << "(" << it->second->_ModuleInfo._OrderNumber << ")";
+    std::string infotext = *it->second->_ModuleInfo._InfoText;
+    new ItemPnValueSelectItem<std::string>(m_attrnav, module_name.c_str(), order_number.str(), m_parent, &m_parent->m_slot_data->m_module_ID, it->second->_ID, infotext.c_str(), m_node, flow_eDest_IntoLast);
+
+  }
+    //std::cout << "\t" << *it->second->_ModuleInfo._Name << std::endl;
+
+
+  return 1;
+}
+/* ======================================= END Menu node ======================================= */
+
+/* ======================================= Module Selection node ======================================= */
+
+ItemPnModuleSelection::ItemPnModuleSelection(GsdmlAttrNav* attrnav, const char* name, ProfinetSlot* slot_data,
+                  std::string* id_value_p, brow_tNode dest, flow_eDest dest_code, const char* infotext)
+  : ValueSelection<std::string>(attrnav, attrnav_eItemType_PnModuleSelection, name, infotext, dest, dest_code, id_value_p),
+    m_slot_data(slot_data)
+{
+  m_closed_annotation = m_attrnav->brow->pixmap_attrenum;
+  setup_node();
+}
+
+int ItemPnModuleSelection::open_children_impl()
+{
+  for (auto const& category : m_categories)
+  {
+    new ItemPnMenu(m_attrnav, category.first, category.second, m_node, flow_eDest_IntoLast, m_category_map, this);
+    //new ItemPnMenu(m_attrnav, category.c_str(), )
+    //std::cout << "Category " << category << std::endl;
+
+    // for (auto it = range.first; it != range.second; ++it)
+    //   std::cout << "\t" << *it->second->_ModuleInfo._Name << std::endl;
+  } 
+  
+  
+  // for (auto const& module : m_attrnav->m_selected_device_item->_UseableModules)
+  // {
+  //   // First check if this is Fixed in this subslot
+  //   if (module.second->_FixedInSlots.inList(m_slot_data->m_slot_number))
+  //   {
+  //     std::cout << "Fixing " << module.first << " in slot: " << m_slot_data->m_slot_number << std::endl;
+  //     break;
+  //   }
+  //   // Check if it's allowed in here
+  //   if (module.second->_AllowedInSlots.inList(m_slot_data->m_slot_number))
+  //   {
+  //     std::string infotext = "No help available...";
+  //     std::ostringstream name(std::ios_base::out);
+      
+  //     name << *module.second->_ModuleItemTarget->_ModuleInfo._Name;
+  //     if (module.second->_ModuleItemTarget->_ModuleInfo._OrderNumber != "")
+  //       name << " (" << module.second->_ModuleItemTarget->_ModuleInfo._OrderNumber << ")";
+
+  //     if (module.second->_ModuleItemTarget->_ModuleInfo._InfoText)
+  //       infotext = *module.second->_ModuleItemTarget->_ModuleInfo._InfoText;
+      
+  //     new ItemPnValueSelectItem<std::string>(m_attrnav, name.str().c_str(), this, &m_slot_data->m_module_ID, module.first, infotext.c_str(), m_node, flow_eDest_IntoLast);
+  //   }
+  // }  
+
+  return 1;
+}
+
+void ItemPnModuleSelection::select(ItemPnValueSelectItem<std::string>* selected_item)
+{
+  // Store data (This is traced by the subslot which will detect this and close itself just to reopen itself again to update the sendclock class)  
+  // *m_value_p = selected_item->value();
+  
+  // // We now close and reopen the parent to reset the entire tree since send clock for instance is dependent on this value
+  // brow_tNode parent_node;
+  // void* parent;
+  // brow_GetParent(m_attrnav->brow->ctx, m_node, &parent_node);  
+  // brow_GetUserData(parent_node, &parent);
+
+  // // Bold move but we're pretty confident what our parent actually is...
+  // ItemPnSubslot* subslot = (ItemPnSubslot*)parent;
+  // std::cout << "Closing and reopening: " << subslot->m_name << std::endl;
+  // subslot->close(m_attrnav, 0, 0, true); // Close AND reopen  
+}
+
+void ItemPnModuleSelection::setup_node()
+{
+  // Populate a multimap with all allowed modules and also gather all unique categories (keys)
+  for (auto const& module : m_attrnav->m_selected_device_item->_UseableModules)
+  {
+    if (module.second->_AllowedInSlots.inList(m_slot_data->m_slot_number))
+    {
+      m_categories.emplace(*module.second->_ModuleItemTarget->_ModuleInfo._CategoryItemText, *module.second->_ModuleItemTarget->_ModuleInfo._CategoryItemInfoText);
+      m_category_map.emplace(*module.second->_ModuleItemTarget->_ModuleInfo._CategoryItemText, module.second->_ModuleItemTarget);
+    }
+  }
+  // for (auto const& module : m_category_map.find)
+  // {
+
+  // }
+    //std::cout << *module.second->_ModuleItemTarget->_ModuleInfo._CategoryItemText << std::endl;
+  // std::string value;
+  // // No value set (either from read file or from earlier selections)  
+  // if (*m_value_p == "")
+  // {
+  //   if (m_interface_submodule_item->_SupportedRT_Classes.getList().size())
+  //     value = m_interface_submodule_item->_SupportedRT_Classes.getList()[0];
+  //   else
+  //     value = "RT_CLASS_1";
+  // } 
+  // else
+  // {
+  //   value = *m_value_p;
+  // }
+
+  // *m_value_p = value;
+  // brow_SetAnnotation(m_node, 1, m_value_p->c_str(), m_value_p->length());
+}
+
+void ItemPnModuleSelection::scan_impl(ItemPnValueSelectItem<std::string> const* selected_item) const
+{
+  // Control the radiobuttons
+  if (*this->m_value_p == selected_item->value())
+    brow_SetRadiobutton(selected_item->m_node, 0, 1);
+  else
+    brow_SetRadiobutton(selected_item->m_node, 0, 0);
+}
+
+/* ======================================= END Module Selection node ======================================= */
+
 /* ======================================= RT_CLASS Selection node ======================================= */
 
 ItemPnEnumRTClass::ItemPnEnumRTClass(GsdmlAttrNav* attrnav, const char* name,
@@ -5903,19 +6080,19 @@ int ItemPnEnumRTClass::open_children_impl()
     {       
       for (auto const& rt_class : m_interface_submodule_item->_SupportedRT_Classes.getList())
       {
-        new ItemPnValueSelectItem<std::string>(m_attrnav, rt_class.c_str(), this, m_value_p, rt_class, rt_class.c_str(), m_node, flow_eDest_IntoLast);
+        new ItemPnValueSelectItem<std::string>(m_attrnav, rt_class.c_str(), "", this, m_value_p, rt_class, rt_class.c_str(), m_node, flow_eDest_IntoLast);
       }
     }
     else if (m_interface_submodule_item && m_interface_submodule_item->_SupportedRT_Classes.getList().size() == 1)
     {      
       auto const& rt_class = m_interface_submodule_item->_SupportedRT_Classes.getList()[0];
-      new ItemPnValueSelectItem<std::string>(m_attrnav, rt_class.c_str(), this, m_value_p, rt_class, rt_class.c_str(), m_node, flow_eDest_IntoLast);
+      new ItemPnValueSelectItem<std::string>(m_attrnav, rt_class.c_str(), "", this, m_value_p, rt_class, rt_class.c_str(), m_node, flow_eDest_IntoLast);
     }
     else
     {
       // Default if no interface submodule exists at all (older specs don't have this and the default is RT_CLASS_1, regular RT)
       std::string rt_class("RT_CLASS_1");
-      new ItemPnValueSelectItem<std::string>(m_attrnav, rt_class.c_str(), this, m_value_p, rt_class, rt_class.c_str(), m_node, flow_eDest_IntoLast);
+      new ItemPnValueSelectItem<std::string>(m_attrnav, rt_class.c_str(), "", this, m_value_p, rt_class, rt_class.c_str(), m_node, flow_eDest_IntoLast);
     }
 
   return 1;
@@ -5981,8 +6158,8 @@ ItemPnSkipIPAssignment::ItemPnSkipIPAssignment(GsdmlAttrNav* attrnav, const char
 
 int ItemPnSkipIPAssignment::open_children_impl()
 {
-    new ItemPnValueSelectItem<bool>(m_attrnav, "Yes", this, m_value_p, true, "Select to skip IP assignment", m_node, flow_eDest_IntoLast);
-    new ItemPnValueSelectItem<bool>(m_attrnav, "No", this, m_value_p, false, "Select to let ProviewR handle the IP assignment", m_node, flow_eDest_IntoLast);
+    new ItemPnValueSelectItem<bool>(m_attrnav, "Yes", "", this, m_value_p, true, "Select to skip IP assignment", m_node, flow_eDest_IntoLast);
+    new ItemPnValueSelectItem<bool>(m_attrnav, "No", "", this, m_value_p, false, "Select to let ProviewR handle the IP assignment", m_node, flow_eDest_IntoLast);
 
     return 1;
 }
@@ -6045,7 +6222,7 @@ int ItemPnSendClock::open_children_impl()
   {
     std::ostringstream select_value(std::ios_base::out);
     select_value << it.value();
-    new ItemPnValueSelectItem<uint16_t>(m_attrnav, select_value.str().c_str(), this, m_value_p, it.value(), "Send Clock factor selection item...", m_node, flow_eDest_IntoLast);
+    new ItemPnValueSelectItem<uint16_t>(m_attrnav, select_value.str().c_str(), "", this, m_value_p, it.value(), "Send Clock factor selection item...", m_node, flow_eDest_IntoLast);
   }
 
   return 1;
@@ -6125,7 +6302,7 @@ int ItemPnReductionRatio::open_children_impl()
   {
     std::ostringstream select_value(std::ios_base::out);
     select_value << it.value();
-    new ItemPnValueSelectItem<uint16_t>(m_attrnav, select_value.str().c_str(), this, m_value_p, it.value(), "Send Clock factor selection item...", m_node, flow_eDest_IntoLast);
+    new ItemPnValueSelectItem<uint16_t>(m_attrnav, select_value.str().c_str(), "", this, m_value_p, it.value(), "Send Clock factor selection item...", m_node, flow_eDest_IntoLast);
   }
 
   return 1;
@@ -6147,7 +6324,7 @@ void ItemPnReductionRatio::select(ItemPnValueSelectItem<uint16_t>* selected_item
 void ItemPnReductionRatio::setup_node()
 { 
   // Check if RT_CLASS_3 is chosen, if not we use the non RT_CLASS_3 settings.
-  // The _SendClock valuelists are created with default values if there are no
+  // The _reductionRatio valuelists are created with default values if there are no
   // corresponding elements in the GSDML file...so this is safe...
   if (m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR.RT_CLASS == "RT_CLASS_3")
     m_reduction_ratio_list = &m_application_relations._RT_Class3TimingProperties._ReductionRatioPow2;
@@ -6158,15 +6335,15 @@ void ItemPnReductionRatio::setup_node()
   if (!*m_value_p)
   { 
     // Choose a default.
-    // To make it easy we set the send clock to the max. And in the reductionratio class we set it to the lowest, placing us 
+    // To make it easy we set the reductionratio to the min. And in the send clock class we set it to the highest, placing us 
     // somehere inbetween if the user should choose not to care about these settings.
     *m_value_p = m_reduction_ratio_list->min();
     std::cout << "Reduction Ratio: Setting default to" << *m_value_p << std::endl;
   }
 
-  // Last but not least, check if the value is in our send_clock_list since one can change RT_CLASS
+  // Last but not least, check if the value is in our reduction ratio list since one can change RT_CLASS
   // at any time. And the different classes use different timing properties.
-  // Set the default max as we did above in these cases...
+  // Set the default min as we did above in these cases...
   if (!m_reduction_ratio_list->inList(*m_value_p))  
     *m_value_p = m_reduction_ratio_list->min();
   
