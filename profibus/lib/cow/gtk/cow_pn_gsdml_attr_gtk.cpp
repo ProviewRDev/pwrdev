@@ -336,8 +336,8 @@ GsdmlAttrGtk::GsdmlAttrGtk(GtkWidget* a_parent_wid, void* a_parent_ctx,
 {
   int sts;
 
-  toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", 700,
-                                      "default-width", 700, "title",
+  toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", 600,
+                                      "default-width", 800, "title",
                                       "profinetConfigurator", NULL);
 
   g_signal_connect(toplevel, "delete_event", G_CALLBACK(delete_event), this);
