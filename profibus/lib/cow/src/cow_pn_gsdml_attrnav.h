@@ -134,8 +134,8 @@ public:
   void zoom(double zoom_factor);
   void unzoom();
   void get_zoom(double* zoom_factor);
-  void set_modified(bool value) { modified = value; }
-  bool is_modified() { return modified; }
+  void set_modified(bool value) { m_modified = value; }
+  bool is_modified() { return m_modified; }
   int save();
   //int open(const char* filename);
   void collapse();
@@ -193,7 +193,7 @@ public:
   attr_eOrderModuleType order_moduletype;
 
 private:
-  bool modified;
+  bool m_modified;
 };
 
 class ItemPn
@@ -226,13 +226,15 @@ public:
   // The item is selected, such as an enum being selected, a parent about to be
   // opened, or a parameter value...
   // Use ( in brow_cb() ) to call templated implementation specifics to regain RTTI
-  virtual void selected(GsdmlAttrNav* attrnav) {}
+  virtual void selected(GsdmlAttrNav* attrnav) final;
+  virtual bool selected_impl(GsdmlAttrNav* attrnav) = 0;
 
   virtual void set_trace_value(void** p) { if (m_type & attrnav_mItemType_Traceable) std::cerr << "No trace value set for: " << m_name << std::endl; }
 
   // Called when user types input in a command input field
   // Use to call templated implementation specifics to regain RTTI
-  virtual void value_changed(GsdmlAttrNav* attrnav, const char* value_str) {}
+  virtual void value_changed(GsdmlAttrNav* attrnav, const char* value_str) final;
+  virtual bool value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) = 0;
 
   // If this is a value of some sort. Return string representation
   virtual std::string to_string() { return std::string(""); }
@@ -256,6 +258,8 @@ public:
   pwr_eType m_pwr_type_id;
 
   int open_children_impl() override { return 1; } // Must override for concrete class
+  bool selected_impl(GsdmlAttrNav* attrnav) override { return false; }
+  bool value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override { return false; }
 };
 
 class ItemPnIDSelectValue : public ItemPn
@@ -269,9 +273,12 @@ public:
   std::string* m_id;
   std::string m_old_value;
 
-  void selected(GsdmlAttrNav* attrnav) override;
-  int scan(GsdmlAttrNav* attrnav, void* mod_id_p);
   int open_children_impl() override { return 1; }
+  bool selected_impl(GsdmlAttrNav* attrnav) override;
+  bool value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override { return false; }
+
+  int scan(GsdmlAttrNav* attrnav, void* mod_id_p);
+  
   void set_trace_value(void** p) override { *p = m_id; }
 };
 
@@ -289,6 +296,8 @@ public:
   int open_children_impl();
   int scan(GsdmlAttrNav* attrnav, void* value_p);
   void set_trace_value(void** p) override { *p = &m_attrnav->pn_runtime_data->m_PnDevice->m_DAP_ID; }
+  bool selected_impl(GsdmlAttrNav* attrnav) override  { return false; }
+  bool value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override { return false; }
 };
 class ItemPnSlot : public ItemPn
 {
@@ -306,6 +315,8 @@ public:
   std::string m_old_value;
 
   int open_children_impl();
+  bool selected_impl(GsdmlAttrNav* attrnav) override  { return false; }
+  bool value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override { return false; }
   //int scan(GsdmlAttrNav* attrnav, void* dummy_p);
   void attach_module(std::shared_ptr<GSDML::ModuleItem> module);
 };
@@ -331,6 +342,9 @@ public:
   std::string m_old_value;
 
   int open_children_impl() override;
+  bool selected_impl(GsdmlAttrNav* attrnav) override  { return false; }
+  bool value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override { return false; }
+
   int scan(GsdmlAttrNav* attrnav, void* dummy_p) override;
   void set_trace_value(void** p) { *p = (void*)1; /* Set a dummy */ }
   static uint calculate_input_length(GSDML::Input const* input);
@@ -356,7 +370,10 @@ public:
   int m_subslot_number;
   std::string m_old_value;
 
-  int open_children_impl();
+  int open_children_impl() override;
+  bool selected_impl(GsdmlAttrNav* attrnav) override  { return false; }
+  bool value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override { return false; }
+
   int scan(GsdmlAttrNav* attrnav, void* id_p);
   void set_trace_value(void** p) override { *p = &m_subslot_data->m_submodule_ID; }
 };
@@ -367,10 +384,13 @@ class ItemPnDAP : public ItemPn
 public:
   ItemPnDAP(GsdmlAttrNav* attrnav, const char* item_name,
             ProfinetSlot* item_slotdata, brow_tNode dest, flow_eDest dest_code, const char* infotext);
+  virtual ~ItemPnDAP() = default;
 
   ProfinetSlot* m_slotdata;
 
-  virtual int open_children_impl();
+  int open_children_impl() override;
+  bool selected_impl(GsdmlAttrNav* attrnav) override  { return false; }
+  bool value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override { return false; }
 };
 
 //! Item for Network settings
@@ -381,6 +401,8 @@ public:
                 flow_eDest dest_code, const char* infotext);
 
   int open_children_impl() final;
+  bool selected_impl(GsdmlAttrNav* attrnav) override  { return false; }
+  bool value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override { return false; }
 };
 
 //! Item for Network settings
@@ -391,6 +413,8 @@ public:
                    brow_tNode dest, flow_eDest dest_code, const char* infotext);
   
   int open_children_impl() override;
+  bool selected_impl(GsdmlAttrNav* attrnav) override  { return false; }
+  bool value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override { return false; }
 };
 
 //! Item for a moduleinfo.
@@ -404,6 +428,8 @@ public:
   GSDML::ModuleInfo* m_module_info;
 
   virtual int open_children_impl();
+  bool selected_impl(GsdmlAttrNav* attrnav) override  { return false; }
+  bool value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override { return false; }
 };
 
 //! Item for module type selection.
@@ -420,6 +446,8 @@ public:
   ProfinetDataRecord* m_data_record;
 
   virtual int open_children_impl();
+  bool selected_impl(GsdmlAttrNav* attrnav) override  { return false; }
+  bool value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override { return false; }
 
 private:
   void set_default_data();
@@ -438,6 +466,8 @@ public:
   ProfinetSubslot* m_subslot;
 
   int open_children_impl();
+  bool selected_impl(GsdmlAttrNav* attrnav) override  { return false; }
+  bool value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override { return false; }
 };
 
 //! Item for a Input.
@@ -451,6 +481,8 @@ public:
   GSDML::Input const* m_input;
 
   int open_children_impl();
+  bool selected_impl(GsdmlAttrNav* attrnav) override  { return false; }
+  bool value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override { return false; }
 };
 
 //! Item for a Output.
@@ -464,6 +496,8 @@ public:
   GSDML::Output const* m_output;
 
   int open_children_impl();
+  bool selected_impl(GsdmlAttrNav* attrnav) override  { return false; }
+  bool value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override { return false; }
 };
 
 //! Item for a DataItem.
@@ -478,6 +512,8 @@ public:
   GSDML::DataItem const* m_data_item;
 
   int open_children_impl();
+  bool selected_impl(GsdmlAttrNav* attrnav) override  { return false; }
+  bool value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override { return false; }
 };
 
 //! Item for a BitDataItem.
@@ -488,6 +524,8 @@ public:
                     flow_eDest dest_code);
   virtual ~ItemPnBitDataItem() {}
   int open_children_impl() { return 1; };
+  bool selected_impl(GsdmlAttrNav* attrnav) override  { return false; }
+  bool value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override { return false; }
 };
 
 /*
@@ -519,13 +557,17 @@ public:
   virtual ~ValueSelection() = default;
   virtual void select(ItemPnValueSelectItem<T>* selected_item) = 0;  
 
-  void selected(GsdmlAttrNav* attrnav) override 
+  bool selected_impl(GsdmlAttrNav* attrnav) override 
   {
     if (!m_noedit)
       ItemPn::open_children(attrnav, 0, 0); 
     else
       attrnav->message('I', "Attribute can't be modified");
+
+    return false; // This does not modify anything
   };
+
+  bool value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override { return false; }  
 
   virtual void scan_impl(ItemPnValueSelectItem<T> const* selected_item) const = 0;
   virtual void setup_node() = 0;
@@ -588,10 +630,13 @@ public:
     return 1;
   }
 
-  void selected(GsdmlAttrNav* attrnav) override
+  bool selected_impl(GsdmlAttrNav* attrnav) override
   {
     m_parent->select(this);
+    return true;
   }
+
+  bool value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override { return false; }  
 
   T const& value() const { return m_select_value; }
 
@@ -624,11 +669,13 @@ public:
   
   void set_changeable(bool changeable) { m_noedit = !changeable; }
 
-  void value_changed(GsdmlAttrNav* attrnav, const char* value_str) override
+  bool value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override
   {
-    value_changed_impl(attrnav, value_str);
+    return do_value_changed(attrnav, value_str);    
   }
 
+  bool selected_impl(GsdmlAttrNav* attrnav) override { return false; }
+  
   std::string to_string() override
   {
     std::ostringstream result(std::ios_base::out);
@@ -639,7 +686,7 @@ public:
     return value;    
   }
 
-  virtual void value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) = 0;
+  virtual bool do_value_changed(GsdmlAttrNav* attrnav, const char* value_str) = 0;
 
   int open_children_impl() override { return 1; }
 
@@ -668,17 +715,19 @@ public:
   
   void set_changeable(bool changeable) { m_noedit = !changeable; }
 
-  void value_changed(GsdmlAttrNav* attrnav, const char* value_str) override
+  bool value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override
   {
-    value_changed_impl(attrnav, value_str);
+    return do_value_changed(attrnav, value_str);
   }
+
+  bool selected_impl(GsdmlAttrNav* attrnav) override { return false; }
 
   std::string to_string() override
   {    
     return std::string(m_value_p, m_value_p + m_length);
   }
 
-  virtual void value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) = 0;
+  virtual bool do_value_changed(GsdmlAttrNav* attrnav, const char* value_str) = 0;
 
   int open_children_impl() override { return 1; }
 
@@ -718,6 +767,8 @@ public:
               std::multimap<std::string, std::shared_ptr<GSDML::ModuleItem>>& items, ItemPnModuleSelection* parent);  
 
   int open_children_impl() override;
+  bool selected_impl(GsdmlAttrNav* attrnav) override { return false; }
+  bool value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override { return false; }
 
   std::multimap<std::string, std::shared_ptr<GSDML::ModuleItem>>& m_items;  
   ItemPnModuleSelection* m_parent;
@@ -819,7 +870,7 @@ public:
   : ItemPnValueInput<std::string>(attrnav, name, value_p, infotext, dest, dest_code) {}
   virtual ~ItemPnIPv4Input() {}
 
-  void value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override;
+  bool do_value_changed(GsdmlAttrNav* attrnav, const char* value_str) override;
 };
 
 /*
@@ -834,7 +885,7 @@ public:
   : ItemPnValueInput<std::string>(attrnav, name, value_p, infotext, dest, dest_code) {}
   virtual ~ItemPnMACInput() {}
 
-  void value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override;
+  bool do_value_changed(GsdmlAttrNav* attrnav, const char* value_str) override;
 };
 
 /*
@@ -849,7 +900,7 @@ public:
   : ItemPnValueInput<std::string>(attrnav, name, value_p, infotext, dest, dest_code) {}
   virtual ~ItemPnDeviceNameInput() {}
 
-  void value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override;
+  bool do_value_changed(GsdmlAttrNav* attrnav, const char* value_str) override;
 };
 
 class ItemPnPhaseInput : public ItemPnValueInput<uint>
@@ -860,7 +911,7 @@ public:
   : ItemPnValueInput<uint>(attrnav, name, value_p, infotext, dest, dest_code) {}
   virtual ~ItemPnPhaseInput() {}
 
-  void value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override;
+  bool do_value_changed(GsdmlAttrNav* attrnav, const char* value_str) override;
 };
 
 // Just a container for the timing properties values
@@ -910,6 +961,10 @@ public:
 
     return 1;
   }
+
+  bool selected_impl(GsdmlAttrNav* attrnav) override { return false; }
+  bool value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override { return false; }
+
 private:
   std::shared_ptr<GSDML::DeviceAccessPointItem> m_dap;
   std::shared_ptr<GSDML::InterfaceSubmoduleItem> m_interface_submodule;
@@ -1010,7 +1065,7 @@ public:
   }
   virtual ~ItemPnParameterInput() = default;
 
-  void value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override
+  bool do_value_changed(GsdmlAttrNav* attrnav, const char* value_str) override
   {
     T value;
     
@@ -1019,14 +1074,14 @@ public:
     } catch (std::string& e)
     {
       attrnav->message('E', "Not a valid input for this datatype.");
-      return;
+      return false;
     }
 
     // Check allowed values if it is present
     if (!m_ref->_AllowedValues.empty() && !m_ref->_AllowedValues.inList(value))
     {
       attrnav->message('E', "Value is outside allowed ranges");
-      return;
+      return false;
     }
 
     // Store the value
@@ -1036,6 +1091,8 @@ public:
     // All ok, update annotation to reflect stored value...
     std::string value_string = this->to_string();
     brow_SetAnnotation(this->m_node, 1, value_string.c_str(), value_string.length());
+
+    return true;
   }
 
   std::string to_string() override
@@ -1082,7 +1139,7 @@ public:
   }
   virtual ~ItemPnParameterInput() = default;
 
-  void value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override
+  bool do_value_changed(GsdmlAttrNav* attrnav, const char* value_str) override
   {
     uint8_t value;
     
@@ -1091,14 +1148,14 @@ public:
     } catch (std::string& e)
     {
       attrnav->message('E', "Not a valid input for this datatype.");
-      return;
+      return false;
     }
 
     // Check allowed values if it is present
     if (!m_ref->_AllowedValues.empty() && !m_ref->_AllowedValues.inList(value))
     {
       attrnav->message('E', "Value is outside allowed ranges");
-      return;
+      return false;
     }
 
     // Store the value
@@ -1114,6 +1171,8 @@ public:
     // All ok, update annotation to reflect stored value...
     std::string value_string = this->to_string();
     brow_SetAnnotation(this->m_node, 1, value_string.c_str(), value_string.length());
+
+    return true;
   }
 
   std::string to_string() override
@@ -1163,7 +1222,7 @@ public:
   }
   virtual ~ItemPnParameterInput() = default;
 
-  void value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str)
+  bool do_value_changed(GsdmlAttrNav* attrnav, const char* value_str)
   {
     std::string value(value_str);
 
@@ -1171,7 +1230,7 @@ public:
     if (value.length() >  m_ref->_Length - 1)
     {      
       attrnav->message('W', "Input longer than allowed");
-      return;
+      return false;
     }
 
     // Store the value    
@@ -1180,6 +1239,8 @@ public:
 
     // All ok, update annotation to reflect stored value...  
     brow_SetAnnotation(this->m_node, 1, value.c_str(), value.length());    
+
+    return true;
   }
 
 private:
@@ -1317,7 +1378,7 @@ public:
     // Close this node, for this class we have a saved reference to attrnav as e member variable
     double node_x, node_y;
     brow_GetNodePosition(ItemPn::m_node, &node_x, &node_y);
-    ItemPn::close(ItemPn::m_attrnav, node_x, node_y);
+    ItemPn::close(ItemPn::m_attrnav, node_x, node_y);    
   }
 
   std::string to_string() override

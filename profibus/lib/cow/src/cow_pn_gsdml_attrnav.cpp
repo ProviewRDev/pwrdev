@@ -247,7 +247,7 @@ GsdmlAttrNav::GsdmlAttrNav(void* xn_parent_ctx, const char* xn_name, pn_gsdml* x
                            std::shared_ptr<ProfinetRuntimeData> pwr_pn_data, pwr_tStatus* status)
     : parent_ctx(xn_parent_ctx), gsdml(xn_gsdml), edit_mode(xn_edit_mode), trace_started(0), message_cb(0),
       change_value_cb(0), device_confirm_active(0), device_read(0), viewio(0),
-      order_moduletype(attr_eOrderModuleType_Default)
+      order_moduletype(attr_eOrderModuleType_Default), m_modified(false)
 {
   strcpy(m_name, xn_name);
   pn_runtime_data = pwr_pn_data;  
@@ -1189,30 +1189,15 @@ int GsdmlAttrNav::save()
           .m_name = *ext_diag_item.second._Name;
     }
   }
-  
-  pn_runtime_data->save();
+    
+  if (!pn_runtime_data->save())
+    m_wow->DisplayError("Error saving", "An error occured while saving the runtime configuration file.");
 
   collapse();
   brow_ResetNodraw(brow->ctx);
   brow_Redraw(brow->ctx, 0);
 
   return sts;
-}
-
-ItemPnInfo::ItemPnInfo(GsdmlAttrNav* attrnav, const char* name, const char* trace_attr_name,
-                       pwr_eType pwr_type_id, size_t attr_size, void const* value_p, brow_tNode dest,
-                       flow_eDest dest_code, const char* infotext)
-    : ItemPn(attrnav, attrnav_mItemType_, name, infotext), m_pwr_type_id(pwr_type_id)
-{
-  m_closed_annotation = attrnav->brow->pixmap_attr;
-  brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_attr, dest, dest_code, (void*)this, 1,
-                  &m_node);
-  brow_SetAnnotPixmap(m_node, 0, m_closed_annotation);
-  brow_SetAnnotation(m_node, 0, m_name.c_str(), m_name.length());
-
-  std::string value = GSDML::attr_value_to_string(m_pwr_type_id, value_p);
-
-  brow_SetAnnotation(m_node, 1, value.c_str(), value.length());
 }
 
 int ItemPn::open_children(GsdmlAttrNav* attrnav, double x, double y)
@@ -1237,6 +1222,18 @@ int ItemPn::open_children(GsdmlAttrNav* attrnav, double x, double y)
     brow_Redraw(attrnav->brow->ctx, node_y);
   }
   return 1;
+}
+
+void ItemPn::selected(GsdmlAttrNav* attrnav)
+{
+  if (selected_impl(attrnav))
+    attrnav->set_modified(true);
+}
+
+void ItemPn::value_changed(GsdmlAttrNav* attrnav, const char* value_str)
+{
+  if (value_changed_impl(attrnav, value_str))
+    attrnav->set_modified(true);
 }
 
 int ItemPn::close(GsdmlAttrNav* attrnav, double x, double y, bool reopen_after_close)
@@ -1278,6 +1275,22 @@ int ItemPn::close(GsdmlAttrNav* attrnav, double x, double y, bool reopen_after_c
   return 1;
 }
 
+ItemPnInfo::ItemPnInfo(GsdmlAttrNav* attrnav, const char* name, const char* trace_attr_name,
+                       pwr_eType pwr_type_id, size_t attr_size, void const* value_p, brow_tNode dest,
+                       flow_eDest dest_code, const char* infotext)
+    : ItemPn(attrnav, attrnav_mItemType_, name, infotext), m_pwr_type_id(pwr_type_id)
+{
+  m_closed_annotation = attrnav->brow->pixmap_attr;
+  brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_attr, dest, dest_code, (void*)this, 1,
+                  &m_node);
+  brow_SetAnnotPixmap(m_node, 0, m_closed_annotation);
+  brow_SetAnnotation(m_node, 0, m_name.c_str(), m_name.length());
+
+  std::string value = GSDML::attr_value_to_string(m_pwr_type_id, value_p);
+
+  brow_SetAnnotation(m_node, 1, value.c_str(), value.length());
+}
+
 ItemPnIDSelectValue::ItemPnIDSelectValue(GsdmlAttrNav* attrnav, const char* name,
                                          std::string const order_number, std::string id_enum_value,
                                          std::string* id_p, brow_tNode dest, flow_eDest dest_code,
@@ -1298,13 +1311,13 @@ ItemPnIDSelectValue::ItemPnIDSelectValue(GsdmlAttrNav* attrnav, const char* name
   brow_SetTraceAttr(m_node, m_name.c_str(), "", flow_eTraceType_User);
 }
 
-void ItemPnIDSelectValue::selected(GsdmlAttrNav* attrnav)
+bool ItemPnIDSelectValue::selected_impl(GsdmlAttrNav* attrnav)
 {
   int value;
   if (!attrnav->edit_mode)
   {
     attrnav->message('E', "Not in edit mode");
-    return;
+    return false;
   }
 
   brow_GetRadiobutton(m_node, 0, &value);
@@ -1314,8 +1327,9 @@ void ItemPnIDSelectValue::selected(GsdmlAttrNav* attrnav)
     brow_SetRadiobutton(m_node, 0, 1);
 
     *m_id = m_id_enum_value;
-    attrnav->set_modified(1);
+    return true;
   }
+  return false;
 }
 
 int ItemPnIDSelectValue::scan(GsdmlAttrNav* attrnav, void* id_p)
@@ -3062,7 +3076,7 @@ void ItemPnModuleClass::scan_impl(ItemPnValueSelectItem<uint32_t> const* selecte
 
 /* ======================================= IPv4 Input Node ======================================= */
 
-void ItemPnIPv4Input::value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str)
+bool ItemPnIPv4Input::do_value_changed(GsdmlAttrNav* attrnav, const char* value_str)
 {
   std::regex const ipv4_regex(
       "^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)");
@@ -3075,14 +3089,16 @@ void ItemPnIPv4Input::value_changed_impl(GsdmlAttrNav* attrnav, const char* valu
   else
   {
     attrnav->message('E', "Invalid format!");
+    return false;
   }
+  return true;
 }
 
 /* ======================================= END IPv4 Input Node ======================================= */
 
 /* ======================================= MAC Address Input Node ======================================= */
 
-void ItemPnMACInput::value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str)
+bool ItemPnMACInput::do_value_changed(GsdmlAttrNav* attrnav, const char* value_str)
 {
   std::regex const mac_regex("^([0-9A-Fa-f]{2}[:]){5}([0-9A-Fa-f]{2})");
 
@@ -3095,14 +3111,16 @@ void ItemPnMACInput::value_changed_impl(GsdmlAttrNav* attrnav, const char* value
   {
     attrnav->message('E', "Invalid format! Separation is done using a colon. "
                           "Hyphen is not supported.");
+    return false;
   }
+  return true;
 }
 
 /* ==================================== END MAC Address Input Node ==================================== */
 
 /* ======================================= Device Name Input Node ======================================= */
 
-void ItemPnDeviceNameInput::value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str)
+bool ItemPnDeviceNameInput::do_value_changed(GsdmlAttrNav* attrnav, const char* value_str)
 {
   std::regex const hostname_regex("^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-"
                                   "Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])");
@@ -3115,14 +3133,16 @@ void ItemPnDeviceNameInput::value_changed_impl(GsdmlAttrNav* attrnav, const char
   else
   {
     attrnav->message('E', "Invalid name! PROFINET Device names follow RFC 1123. Make sure you do to ;)");
+    return false;
   }
+  return true;
 }
 
 /* ==================================== END Device Name Input Node ==================================== */
 
 /* ======================================= Phase Input Node ======================================= */
 
-void ItemPnPhaseInput::value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str)
+bool ItemPnPhaseInput::do_value_changed(GsdmlAttrNav* attrnav, const char* value_str)
 {
   std::regex const phase_regex("^[1-9]");
 
@@ -3135,7 +3155,9 @@ void ItemPnPhaseInput::value_changed_impl(GsdmlAttrNav* attrnav, const char* val
   else
   {
     attrnav->message('E', "Invalid format! Enter a value between 1 - 9");
+    return false;
   }
+  return true;
 }
 
 /* ======================================= END Phase Input Node ======================================= */

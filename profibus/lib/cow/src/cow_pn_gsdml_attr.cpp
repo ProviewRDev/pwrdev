@@ -243,7 +243,7 @@ void GsdmlAttr::activate_cmd_apply()
     if (EVEN(sts))
       message('E', "Error saving profinet runtime data");
     else
-      attrnav->set_modified(0);
+      attrnav->set_modified(false);
   }
 }
 
@@ -271,17 +271,19 @@ void GsdmlAttr::cmd_close_no_cb(void* ctx, void* data)
   (attr->close_cb)(attr->parent_ctx);
 }
 
+/* Activate command cancel */
+/* This cancels the configuration asking the user if that's really what he/she wants. */
 void GsdmlAttr::activate_cmd_ca()
 {
   if (close_cb)
   {
     if (edit_mode && attrnav->is_modified())
     {
-      wow->DisplayQuestion((void*)this, "Apply", "Do you want to apply changes?",
-                           cmd_close_apply_cb, cmd_close_no_cb, 0);
+      wow->DisplayQuestion((void*)this, "Cancel", "All changes will be lost. Are you sure?",
+                           cmd_close_no_cb, [](void* ctx, void* data) { /* NOOP */ }, 0);
     }
     else
-      (close_cb)(parent_ctx);
+    (close_cb)(parent_ctx);
   }
 }
 
