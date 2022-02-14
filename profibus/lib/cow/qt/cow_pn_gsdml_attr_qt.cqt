@@ -257,8 +257,8 @@ GsdmlAttrQt::GsdmlAttrQt(void* a_parent_ctx, void* a_object, pn_gsdml* a_gsdml,
   int sts;
 
   toplevel = new GsdmlAttrQtWidget(this);
-  toplevel->setMinimumSize(700, 700);
-  toplevel->setWindowTitle(fl("profinetConfigurator"));
+  toplevel->setMinimumSize(800, 600);
+  toplevel->setWindowTitle(fl("PROFINET Device Configurator"));
   toplevel->setAttribute(Qt::WA_DeleteOnClose);
 
   // Menu
