@@ -270,7 +270,7 @@ void pn_gsdml::_build_submoduleList()
   for (pugi::xml_node& submoduleItem : _xmlSubmoduleList->children("SubmoduleItem"))
   {
     std::string ID(submoduleItem.attribute("ID").value());
-    _submoduleMap[std::move(ID)].reset(new GSDML::SubmoduleItem(std::move(submoduleItem), this, GSDML::SubmoduleItemType_)); 
+    _submoduleMap[std::move(ID)].reset(new GSDML::SubmoduleItem(std::move(submoduleItem), this, GSDML::SubmoduleItemType_Submodule)); 
   } 
 
   for (pugi::xml_node& portSubmoduleItem : _xmlSubmoduleList->children("PortSubmoduleItem"))

@@ -81,7 +81,7 @@ public:
   int recall_idx;
   static char value_recall[30][160];
   int value_current_recall;
-  pwr_tFileName data_filename;
+ // pwr_tFileName data_filename;
   CoWow* wow;
 
   GsdmlAttr(void* a_parent_ctx, void* a_object, int a_edit_mode);

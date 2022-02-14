@@ -64,19 +64,6 @@ typedef enum
   ModuleItemType__
 } eModuleItemType;
 
-// Convienence methods regarding GSDML things...
-
-//int datavalue_to_string(eValueDataType datatype, void* value,
-//                                  unsigned int size, char* str,
-//                                  unsigned int strsize);
-
-//std::string attr_value_to_string(int type_id, void const* value_ptr);//, int size, int* len)
-//std::string attr_value_to_string(int type_id, void const* value_ptr, const char* _file, int _line);
-//int string_to_datavalue(eValueDataType datatype, void* value,
-  //                                unsigned int size, const char* str);
-
-//int string_to_value_datatype(char const* str, eValueDataType* type);
-
 class Node
 {
 public:
@@ -95,7 +82,7 @@ protected:
     for (auto i = item.first; i <= item.second; i++)
       whatever;
 
-  or only the prefix ++ operator can be used no other overload exists:
+  or, only the prefix ++ operator can be used no other overload exists:
   for (auto it = listname.begin(); it != listname.end(); ++it)
     ; // do something with it...
 */
@@ -276,6 +263,7 @@ public:
   DataItem(DataItem&&) = default;
   // Attributes
   eValueDataType _DataType;
+  std::string _DataTypeString;
   std::string _Id;
   ushort _Length;
   bool _UseAsBits;
@@ -381,21 +369,21 @@ class Ref : public Node
 public:
   Ref(pugi::xml_node&&, Node* parent, pn_gsdml*);
   Ref(Ref&&) = default;
-  // Attributes
-  // ValueItemTarget="Diag:Load voltage"
+  
+  // Attributes  
   eValueDataType _DataType; // "Bit"
   ushort _ByteOffset;
   ushort _BitOffset;
   ushort _BitLength;
-  float _DefaultValue; // Using float works for all available data types...
-  ValueList<float>
-      _AllowedValues; // Using float works for all available data types...
+  double _DefaultValue;
+  std::string _DefaultValueString; // This is an extra field for storing the original value unparsed. For instance when datatype is "VisibleString"
+  ValueList<double> _AllowedValues; // Using double here works for all available data types...use more memory though but it's fine...
   ushort _Length;
   bool _Changeable;
   bool _Visible;
   std::shared_ptr<std::string> _Text;
   std::shared_ptr<ValueItem> _ValueItem;
-  // ID="Diag:Load voltage"
+  std::string _ID;  // i.e. "Diag:Load voltage". This is used to distinguish some values when we're not using menus. Otherwise this is implicitly stored as the reference for the map container
 };
 
 class MenuItem : public Node

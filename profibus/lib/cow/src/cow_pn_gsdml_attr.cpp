@@ -112,7 +112,7 @@ void GsdmlAttr::activate_copy()
     return;
   }
 
-  if (item->m_type != attrnav_eItemType_PnSlot)
+  if (item->m_type != attrnav_mItemType_Copyable)
   {
     message('E', "Only slots can be copied");
     return;
@@ -136,7 +136,7 @@ void GsdmlAttr::activate_cut()
     return;
   }
 
-  if (item->m_type != attrnav_eItemType_PnSlot)
+  if (item->m_type != attrnav_mItemType_Movable)
   {
     message('E', "Only slots can be cut");
     return;
@@ -159,7 +159,7 @@ void GsdmlAttr::activate_paste()
     return;
   }
 
-  if (item->m_type != attrnav_eItemType_PnSlot)
+  if (item->m_type != attrnav_mItemType_Movable)
   {
     message('E', "Select a slot");
     return;
@@ -217,13 +217,13 @@ void GsdmlAttr::activate_cmd_ok()
 {
   int sts;
 
-  attrnav->save(data_filename);
+  attrnav->save();
 
   if (save_cb)
   {
     sts = (save_cb)(parent_ctx);
     if (EVEN(sts))
-      message('E', "Error saving profibus data");
+      message('E', "Error saving profinet runtime data");
     else if (close_cb)
       (close_cb)(parent_ctx);
   }
@@ -235,13 +235,13 @@ void GsdmlAttr::activate_cmd_apply()
 {
   int sts;
 
-  attrnav->save(data_filename);
+  attrnav->save();
 
   if (save_cb)
   {
     sts = (save_cb)(parent_ctx);
     if (EVEN(sts))
-      message('E', "Error saving profibus data");
+      message('E', "Error saving profinet runtime data");
     else
       attrnav->set_modified(0);
   }
@@ -252,13 +252,13 @@ void GsdmlAttr::cmd_close_apply_cb(void* ctx, void* data)
   GsdmlAttr* attr = (GsdmlAttr*)ctx;
   int sts;
 
-  attr->attrnav->save(attr->data_filename);
+  attr->attrnav->save();
 
   if (attr->save_cb)
   {
     sts = (attr->save_cb)(attr->parent_ctx);
     if (EVEN(sts))
-      attr->message('E', "Error saving profibus data");
+      attr->message('E', "Error saving profinet runtime data");
     else
       (attr->close_cb)(attr->parent_ctx);
   }
@@ -277,7 +277,7 @@ void GsdmlAttr::activate_cmd_ca()
   {
     if (edit_mode && attrnav->is_modified())
     {
-      wow->DisplayQuestion((void*)this, "Apply", "Do you want to apply changes",
+      wow->DisplayQuestion((void*)this, "Apply", "Do you want to apply changes?",
                            cmd_close_apply_cb, cmd_close_no_cb, 0);
     }
     else

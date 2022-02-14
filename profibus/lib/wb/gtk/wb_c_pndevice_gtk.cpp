@@ -97,6 +97,7 @@ static pwr_tStatus Configure(ldh_sMenuCall* ip)
     delete ctx->attr;
     return 1;
   }
+
   ctx->attr->close_cb = pndevice_close_cb;
   ctx->attr->save_cb = pndevice_save_cb;
   ctx->attr->help_cb = pndevice_help_cb;

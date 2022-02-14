@@ -66,7 +66,8 @@ GsdmlAttrNavGtk::GsdmlAttrNavGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid,
   *w = form_widget;
 
   m_wow = new CoWowGtk(brow_widget);
-  trace_timerid = m_wow->timer_new();
+  trace_timerid = m_wow->timer_new();  
+
   *status = 1;
 }
 
@@ -95,41 +96,9 @@ void GsdmlAttrNavGtk::display_attr_help_text()
 
   brow_GetUserData(node_list[0], (void**)&base_item);
   free(node_list);
-
-  // TODO Remove this and let the class itself set it's own text giving more control in the node itself of what to display here...
-
-  switch (base_item->m_type)
-  {
-  /*
-   * The following two item types could make use of the same info_text that the
-   * the base class does,
-   * but since they already contained references they were used instead...
-   */
-  // case attrnav_eItemType_PnParValue:
-  // case attrnav_eItemType_PnParEnum:
-  // {
-  //   ItemPnParEnum* item = (ItemPnParEnum*)base_item;
-  //   std::shared_ptr<GSDML::ValueItem> vi = 0;    
-
-  //   if (item->m_ref)
-  //     vi = item->m_ref->_ValueItem;
-
-  //   // If we do have help available show it
-  //   if (vi && vi->_Help)
-  //     ((GsdmlAttrGtk*)parent_ctx)->attr_help_text(vi->_Help->c_str());
-  //   else
-  //     ((GsdmlAttrGtk*)parent_ctx)->attr_help_text("");
-
-  //   break;
-  // }
-  default:
-  {
-    // Do we have an associated info text string to show the user some more
-    // info?
-    if (!base_item->m_infotext.empty())
-      ((GsdmlAttrGtk*)parent_ctx)->attr_help_text(base_item->m_infotext.c_str());
-    else
-      ((GsdmlAttrGtk*)parent_ctx)->attr_help_text("");
-  }
-  }
+  
+  if (!base_item->m_infotext.empty())
+    ((GsdmlAttrGtk*)parent_ctx)->attr_help_text(base_item->m_infotext.c_str());
+  else
+    ((GsdmlAttrGtk*)parent_ctx)->attr_help_text("");
 }

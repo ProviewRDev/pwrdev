@@ -11,378 +11,6 @@
 namespace GSDML
 {
 
-
-
-// Do we need this?
-
-// int string_to_value(GSDML::eType type, unsigned int size,
-//                               const char* str, void* buf)
-// {
-//   switch (type)
-//   {
-//   case gsdml_eType_Integer:
-//     sscanf(str, "%d", (int*)buf);
-//     break;
-//   case gsdml_eType_Boolean:
-//     if (streq(str, "true"))
-//       *(gsdml_tBoolean*)buf = 1;
-//     else
-//       *(gsdml_tBoolean*)buf = 0;
-//     break;
-//   case gsdml_eType_Unsigned8:
-//     sscanf(str, "%hhu", (unsigned char*)buf);
-//     break;
-//   case gsdml_eType_Unsigned16:
-//     sscanf(str, "%hu", (unsigned short*)buf);
-//     break;
-//   case gsdml_eType_Unsigned32:
-//     sscanf(str, "%u", (unsigned int*)buf);
-//     break;
-//   case gsdml_eType_Unsigned16hex:
-//     sscanf(str, "%hx", (unsigned short*)buf);
-//     break;
-//   case gsdml_eType_Unsigned32hex:
-//     sscanf(str, "%x", (unsigned int*)buf);
-//     break;
-//   case gsdml_eType_String:
-//   case gsdml_eType_NormalizedString:
-//   case gsdml_eType_Token:
-//   case gsdml_eType_TokenList:
-//   case gsdml_eType_ValueList:
-//   case gsdml_eType_SignedOrFloatValueList:
-//   case gsdml_eType_Id:
-//   case gsdml_eType_IdT:
-//   case gsdml_eType_Enum:
-//     if (strlen(str) >= size)
-//     {
-//       error_message_line("Attribute size to small, value cut off");
-//     }
-//     strncpy((char*)buf, str, size);
-//     break;
-//   case gsdml_eType_RefId:
-//     if (strlen(str) >= size)
-//     {
-//       error_message_line("Attribute size to small, value cut off");
-//     }
-//     strncpy(((gsdml_tRefId*)buf)->ref, str, size);
-//     break;
-//   case gsdml_eType_RefIdT:
-//     if (strlen(str) >= size)
-//     {
-//       error_message_line("Attribute size to small, value cut off");
-//     }
-//     strncpy(((gsdml_tRefIdT*)buf)->ref, str, size);
-//     break;
-//   case gsdml_eType_AllocatedString:
-//     *(gsdml_tAllocatedString*)buf = (char*)malloc(strlen(str) + 1);
-//     strcpy(*(char**)buf, str);
-//     break;
-//   case gsdml_eType_:
-//   case gsdml_eType__:
-//     break;
-//   }
-//   return 1;
-// }
-
-
-
-
-
-//
-// Get the length of an IO type specified in a data item
-//
-int get_datavalue_length(GSDML::eValueDataType datatype, int strlength,
-                                   unsigned int* len)
-{
-  switch (datatype)
-  {
-  case GSDML::ValueDataType_Integer8:
-  case GSDML::ValueDataType_Unsigned8:
-    *len = 1;
-    break;
-  case GSDML::ValueDataType_Integer16:
-  case GSDML::ValueDataType_Unsigned16:
-    *len = 2;
-    break;
-  case GSDML::ValueDataType_Integer32:
-  case GSDML::ValueDataType_Unsigned32:
-  case GSDML::ValueDataType_Float32:
-    *len = 4;
-    break;
-  case GSDML::ValueDataType_Integer64:
-  case GSDML::ValueDataType_Unsigned64:
-  case GSDML::ValueDataType_Float64:
-    *len = 8;
-    break;
-  case GSDML::ValueDataType_VisibleString:
-  case GSDML::ValueDataType_OctetString:
-    *len = strlength; // TODO check if we can create data for this
-    break;
-  case GSDML::ValueDataType_Date:
-  case GSDML::ValueDataType_TimeOfDayWithDate:
-  case GSDML::ValueDataType_TimeOfDayWithoutDate:
-  case GSDML::ValueDataType_TimeDiffWithDate:
-  case GSDML::ValueDataType_TimeDiffWithoutDate:
-  case GSDML::ValueDataType_NetworkTime:
-  case GSDML::ValueDataType_NetworkTimeDiff:
-    // TODO
-    return PB__NYI;
-  default:
-    return PB__NYI;
-  }
-  return PB__SUCCESS;
-}
-
-// int datavalue_to_string(eValueDataType datatype, void* value,
-//                                   unsigned int size, char* str,
-//                                   unsigned int strsize)
-// {
-//   switch (datatype)
-//   {
-//   case GSDML::ValueDataType_Integer8:
-//     snprintf(str, strsize, "%hhd", *(char*)value);
-//     break;
-//   case GSDML::ValueDataType_Unsigned8:
-//     snprintf(str, strsize, "%hhu", *(unsigned char*)value);
-//     break;
-//   case GSDML::ValueDataType_Integer16:
-//   {
-//     short v;
-
-//     memcpy(&v, value, sizeof(v));
-
-//     snprintf(str, strsize, "%hd", v);
-
-//     break;
-//   }
-//   case GSDML::ValueDataType_Unsigned16:
-//   {
-//     unsigned short v;
-
-//     memcpy(&v, value, sizeof(v));
-
-//     snprintf(str, strsize, "%hu", v);
-
-//     break;
-//   }
-//   case GSDML::ValueDataType_Integer32:
-//   {
-//     int v;
-
-//     memcpy(&v, value, sizeof(v));
-
-//     snprintf(str, strsize, "%d", v);
-
-//     break;
-//   }
-//   case GSDML::ValueDataType_Unsigned32:
-//   {
-//     unsigned int v;
-//     v = ntohl(*(pwr_tUInt32*)value);
-//     //memcpy(&v, value, sizeof(v));
-
-//     snprintf(str, strsize, "%u", v);
-//     break;
-//   }
-//   case GSDML::ValueDataType_Float32:
-//     snprintf(str, strsize, "%g", *(float*)value);
-//     break;
-//   case GSDML::ValueDataType_Integer64:
-//   {
-//     pwr_tInt64 v;
-// #if (pwr_dHost_byteOrder == pwr_dLittleEndian)
-//     memcpy(&v, value, sizeof(v));
-// #elif (pwr_dHost_byteOrder == pwr_dBigEndian)
-//     memcpy(&v, &data[item[i].ref->Reference_Offset], sizeof(v));
-// #endif
-//     snprintf(str, strsize, pwr_dFormatInt64, v);
-//     break;
-//   }
-//   case GSDML::ValueDataType_Unsigned64:
-//   {
-//     pwr_tUInt64 v;
-// #if (pwr_dHost_byteOrder == pwr_dLittleEndian)
-//     memcpy(&v, value, sizeof(v));
-// #elif (pwr_dHost_byteOrder == pwr_dBigEndian)
-//     memcpy(&v, &data[item[i].ref->Reference_Offset], sizeof(v));
-// #endif
-//     snprintf(str, strsize, pwr_dFormatUInt64, v);
-//     break;
-//   }
-//   case GSDML::ValueDataType_Float64:
-//     snprintf(str, strsize, "%lg", *(double*)value);
-//     break;
-//   case GSDML::ValueDataType_VisibleString:
-//     strncpy(str, (char*)value, strsize);
-//     break;
-//   case GSDML::ValueDataType_OctetString:
-//   {
-//     unsigned int len = 0;
-//     for (unsigned int i = 0; i < size; i++)
-//     {
-//       if (i == size - 1)
-//       {
-//         if (len + 4 >= strsize)
-//           break;
-//         len += sprintf(&str[i * 5], "0x%02hhx", *(((unsigned char*)value) + i));
-//       }
-//       else
-//       {
-//         if (len + 5 >= strsize)
-//           break;
-//         len +=
-//             sprintf(&str[i * 5], "0x%02hhx,", *(((unsigned char*)value) + i));
-//       }
-//     }
-//     break;
-//   }
-//   case GSDML::ValueDataType_Date:
-//   case GSDML::ValueDataType_TimeOfDayWithDate:
-//   case GSDML::ValueDataType_TimeOfDayWithoutDate:
-//   case GSDML::ValueDataType_TimeDiffWithDate:
-//   case GSDML::ValueDataType_TimeDiffWithoutDate:
-//   case GSDML::ValueDataType_NetworkTime:
-//   case GSDML::ValueDataType_NetworkTimeDiff:
-//     sprintf(str, "Not implemented data type");
-//     return 0;
-//   default:
-//     return 0;
-//   }
-//   return 1;
-// }
-
-// int string_to_datavalue(GSDML::eValueDataType datatype, void* value, unsigned int size, const char* str)
-// {
-//   switch (datatype)
-//   {
-//   case GSDML::ValueDataType_Integer8:
-//     if (sscanf(str, "%hhd", (char*)value) != 1)
-//       return PB__SYNTAX;
-//     break;
-//   case GSDML::ValueDataType_Unsigned8:
-//     if (sscanf(str, "%hhu", (unsigned char*)value) != 1)
-//       return PB__SYNTAX;
-//     break;
-//   case GSDML::ValueDataType_Integer16:
-//   {
-//     short v;
-//     if (sscanf(str, "%hd", &v) != 1)
-//       return PB__SYNTAX;
-
-//     memcpy(value, &v, sizeof(v));
-
-//     unsigned char b[2];
-//     memcpy(b, &v, sizeof(b));
-//     break;
-//   }
-//   case GSDML::ValueDataType_Unsigned16:
-//   {
-//     unsigned short v;
-//     if (sscanf(str, "%hu", &v) != 1)
-//       return PB__SYNTAX;
-
-//     memcpy(value, &v, sizeof(v));
-
-//     unsigned char b[2];
-//     memcpy(b, &v, sizeof(b));
-//     break;
-//   }
-//   case GSDML::ValueDataType_Integer32:
-//   {
-//     int v;
-//     if (sscanf(str, "%d", &v) != 1)
-//       return PB__SYNTAX;
-
-//     memcpy(value, &v, sizeof(v));
-
-//     unsigned char b[4];
-//     memcpy(b, &v, sizeof(b));
-//     break;
-//   }
-//   case GSDML::ValueDataType_Unsigned32:
-//   {
-//     unsigned int v;
-//     std::istringstream input(str, std::ios_base::in);
-//     // if (sscanf(str, "%u", &v) != 1)
-//     //   return PB__SYNTAX;
-//     input >> v;
-//     v = htonl(v);
-//     memcpy(value, &v, sizeof(v));
-//     break;
-//   }
-//   case GSDML::ValueDataType_Float32:
-//   {
-//     if (sscanf(str, "%g", (float*)value) != 1)
-//       return PB__SYNTAX;
-
-//     float* tmp = (float*)value;
-
-//     unsigned char b[4];
-//     memcpy(b, tmp, sizeof(b));
-//     break;
-//   }
-//   case GSDML::ValueDataType_Integer64:
-//   {
-//     pwr_tInt64 v;
-//     if (sscanf(str, pwr_dFormatInt64, &v) != 1)
-//       return PB__SYNTAX;
-
-//     memcpy(value, &v, sizeof(v));
-
-//     unsigned char b[8];
-//     memcpy(b, &v, sizeof(b));
-//     break;
-//   }
-//   case GSDML::ValueDataType_Unsigned64:
-//   {
-//     pwr_tUInt64 v;
-//     if (sscanf(str, pwr_dFormatUInt64, &v) != 1)
-//       return PB__SYNTAX;
-
-//     memcpy(value, &v, sizeof(v));
-
-//     unsigned char b[8];
-//     memcpy(b, &v, sizeof(b));
-//     break;
-//   }
-//   case GSDML::ValueDataType_Float64:
-//   {
-//     if (sscanf(str, "%lg", (double*)value) != 1)
-//       return PB__SYNTAX;
-
-//     unsigned char b[8];
-//     memcpy(b, &value, sizeof(b));
-//     break;
-//   }
-//   case GSDML::ValueDataType_VisibleString:
-//     strncpy((char*)value, str, size);
-//     break;
-//   case GSDML::ValueDataType_OctetString:
-//   {
-//     unsigned int len;
-//     for (unsigned int i = 0; i < size; i++)
-//     {
-//       len = sscanf(&str[i * 5], "0x%2hhx",
-//                    (unsigned char*)((unsigned char*)value + i));
-//       if (len != 1)
-//         break;
-//     }
-//     break;
-//   }
-//   case GSDML::ValueDataType_Date:
-//   case GSDML::ValueDataType_TimeOfDayWithDate:
-//   case GSDML::ValueDataType_TimeOfDayWithoutDate:
-//   case GSDML::ValueDataType_TimeDiffWithDate:
-//   case GSDML::ValueDataType_TimeDiffWithoutDate:
-//   case GSDML::ValueDataType_NetworkTime:
-//   case GSDML::ValueDataType_NetworkTimeDiff:
-//     return PB__NYI;
-//   default:
-//     return PB__NYI;
-//   }
-//   return 1;
-// }
-
 int string_to_value_datatype(char const* str, eValueDataType* type)
 {
   if (strcmp(str, "Bit") == 0)
@@ -435,6 +63,29 @@ int string_to_value_datatype(char const* str, eValueDataType* type)
   return 1;
 }
 
+uint io_datatype_length(GSDML::eValueDataType datatype)
+{
+  switch (datatype)
+  {
+    case ValueDataType_Integer8:
+    case ValueDataType_Unsigned8:
+      return 1;
+    case ValueDataType_Integer16:
+    case ValueDataType_Unsigned16:
+      return 2;
+    case ValueDataType_Float32:
+    case ValueDataType_Integer32:
+    case ValueDataType_Unsigned32:
+      return 4;
+    case ValueDataType_Float64:
+    case ValueDataType_Integer64:
+    case ValueDataType_Unsigned64:
+      return 8;
+    default:;
+  }
+  return 0;
+}
+
 TokenList::TokenList(char const* input)
 {
    // Lets parse it...
@@ -474,31 +125,18 @@ Const::Const(pugi::xml_node&& xmlNode, Node* parent, pn_gsdml* gsdml)
   // <Const Data="0x01,0x00" ByteOffset="0" />
 	// <Const Data="0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00" ByteOffset="2" />  
   // [ 0] [ 1] [ 2] [ 3] [ 4] [ 5] [ 6] [ 7] [ 8] [ 9] [10] [11] [12] [13] [14] [15]
-  //                                                                       0x00 0x01
+  // 0x01 0x00 
   std::string value;
   unsigned int byte;
-// #if (pwr_dHost_byteOrder == pwr_dLittleEndian)  
-//   _ByteOffset = static_cast<ParameterRecordDataItem*>(m_Parent)->_Length - 1 - _ByteOffset;
-// #endif          
-  //size_t pos = 0;
-  //unsigned char* data = static_cast<ParameterRecordDataItem*>(m_Parent)->getData();
-  //unsigned char* constData = (data + _ByteOffset);
+  size_t pos = 0;
+  unsigned char* data = static_cast<ParameterRecordDataItem*>(m_Parent)->getData() + _ByteOffset;  
   while (getline(buf, value, ','))
   {
     std::istringstream val(value, std::ios_base::in);
     val.seekg(2); // Skip the 0x part
-    val >> std::hex >> byte;
-
-    // The data we read is network byte ordered so for little endian machines we add the data in the reveresed order
-#if (pwr_dHost_byteOrder == pwr_dLittleEndian)
-    //*(constData - pos) = byte;
-    //_data.push_back((constData - pos++));
-    _data.insert(_data.begin(), byte);
-#else
-    //*(constData + pos) = byte;
-    //_data.insert(_data.begin(), (constData + pos++));
+    val >> std::hex >> byte;    
+    *(data + pos++) = byte;
     _data.push_back(byte);    
-#endif        
   }
 }
 
@@ -533,14 +171,20 @@ BitDataItem::BitDataItem(pugi::xml_node&& bitDataItem, pn_gsdml* gsdml)
 }
 
 DataItem::DataItem(pugi::xml_node&& dataItem, pn_gsdml* gsdml)
-    : _Id(dataItem.attribute("Id").as_string()),
-      _Length(dataItem.attribute("Lendth").as_uint()),
+    : _DataTypeString(dataItem.attribute("DataType").as_string()),
+      _Id(dataItem.attribute("Id").as_string()),
+      _Length(dataItem.attribute("Length").as_uint()),
       _UseAsBits(dataItem.attribute("UseAsBits").as_bool()),
       _Text(gsdml->_get_TextId(
           std::move(std::string(dataItem.attribute("TextId").value()))))
 {
   string_to_value_datatype(dataItem.attribute("DataType").as_string(),
                            &_DataType);
+
+  // If we have no length, deduce the length from the datatype, makes it easier later on to calculate data lengths and the time to do this is neglible
+  if (_Length == 0)
+    _Length = io_datatype_length(_DataType);
+
   for (pugi::xml_node& bitDataItem : dataItem.children("BitDataItem"))
   {
     _BitDataItem.push_back(BitDataItem(std::move(bitDataItem), gsdml));
@@ -608,13 +252,15 @@ Ref::Ref(pugi::xml_node&& ref, Node* parent, pn_gsdml* gsdml)
       _ByteOffset(ref.attribute("ByteOffset").as_uint()),
       _BitOffset(ref.attribute("BitOffset").as_uint()),
       _BitLength(ref.attribute("BitLength").as_uint()),
-      _DefaultValue(ref.attribute("DefaultValue").as_float()),
+      _DefaultValue(ref.attribute("DefaultValue").as_double()),
+      _DefaultValueString(ref.attribute("DefaultValue").as_string()),
       _AllowedValues(
-          ValueList<float>(ref.attribute("AllowedValues").as_string())),
+          ValueList<double>(ref.attribute("AllowedValues").as_string())),
       _Length(ref.attribute("Length").as_uint()),
       _Changeable(ref.attribute("Changeable").empty() ? true : ref.attribute("Changeable").as_bool()), // This defaults to true if missing according to ISO 15745-4:2003/Amd.1:2006(E)
       _Visible(ref.attribute("Visible").empty() ? true : ref.attribute("Visible").as_bool()), // This defaults to true if missing according to ISO 15745-4:2003/Amd.1:2006(E)
-      _Text(gsdml->_get_TextId(ref.attribute("TextId").value()))
+      _Text(gsdml->_get_TextId(ref.attribute("TextId").value())),
+      _ID(ref.attribute("ID").as_string())
 {
   setParent(parent);
   string_to_value_datatype(ref.attribute("DataType").as_string(), &_DataType);
@@ -623,16 +269,6 @@ Ref::Ref(pugi::xml_node&& ref, Node* parent, pn_gsdml* gsdml)
     _ValueItem = gsdml->getValueMap()[std::move(
         std::string(ref.attribute("ValueItemTarget").as_string()))];
   }
-
-
-  // Test iterator TODO REMOVE :D
-  // if (!_AllowedValues.empty())
-  // {
-  //   std::cout << "NEW ALLOWED VALUES:" << std::endl;
-  //   for (auto it = _AllowedValues.begin(); it != _AllowedValues.end(); ++it)
-  //     std::cout << it.value() << std::endl;
-  //   std::cout << "END" << std::endl << std::endl << std::endl;
-  // }
 }
 
 ParameterRecordDataItem::ParameterRecordDataItem(
@@ -651,15 +287,15 @@ ParameterRecordDataItem::ParameterRecordDataItem(
     _Const.push_back(GSDML::Const(std::move(iConst), this, gsdml));
   }
 
-  // populated our data
-  size_t index = 0;
-  for (auto it = _Const.begin(); it != _Const.end(); ++it)  
-  {    
-    for (auto const& data : it->_data)
-    {
-      _data[index++] = data;
-    }    
-  }
+  // populate our data
+  // size_t index = 0;
+  // for (auto it = _Const.begin(); it != _Const.end(); ++it)  
+  // {    
+  //   for (auto const& data : it->_data)
+  //   {
+  //     _data[index++] = data;
+  //   }    
+  // }
 
   for (pugi::xml_node& ref : parameterRecordDataItem.children("Ref"))
   {
@@ -1061,7 +697,7 @@ ChannelDiagItem::ChannelDiagItem(pugi::xml_node&& channelDiagItem,
        channelDiagItem.child("ExtChannelDiagList")
            .children("ExtChannelDiagItem"))
     _ExtChannelDiagList.emplace(std::make_pair(
-        channelDiagItem.attribute("ErrorType").as_uint(),
+        extChannelDiagItem.attribute("ErrorType").as_uint(),
         ExtChannelDiagItem(std::move(extChannelDiagItem), gsdml)));
 }
 

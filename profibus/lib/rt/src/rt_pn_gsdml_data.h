@@ -109,13 +109,14 @@ public:
   ~ProfinetIOCR() = default;
   void build(pugi::xml_node&&) const;
 
-  //unsigned short m_type; // Really needed? We could just leverage just ONE IOCR element since type is the only thing that differs, and that can be deduced based on input/output
-  unsigned int m_properties;
+  // unsigned short m_type; // Really needed? We could just leverage just ONE IOCR element since type is the only thing that differs, and that can be deduced based on input/output
+  // unsigned int m_properties;
   unsigned short m_send_clock_factor;
   unsigned short m_reduction_ratio;
-  unsigned int m_phase;
-  unsigned int m_api;
-  std::string RT_CLASS;
+  unsigned int m_phase; // TODO Initialize to 1 ???
+  unsigned int m_api; // Check with the spec what to do with submodule items specifying a specific API...
+  std::string m_rt_class;
+  std::string m_startup_mode;
 };
 class GsdmlIOCRData
 {
@@ -206,7 +207,7 @@ public:
   ~ProfinetSlot() = default;
   void build(pugi::xml_node&&) const;
 
-  unsigned int m_module_enum_number;
+  //unsigned int m_module_enum_number;
   unsigned int m_module_ident_number;
 
   //unsigned int m_dap_fixed_slot;
@@ -370,7 +371,8 @@ public:
   void build(pugi::xml_node&&) const;
 
   // Attributes
-  pwr_tString256 m_pn_runtime_conf_file; // The GSDML file this configuration is based on...
+  std::string m_gsdml_source_file;
+  //pwr_tString256 m_pn_runtime_conf_file; // The GSDML file this configuration is based on...
   //std::string m_pn_runtime_conf_file; // The GSDML file this configuration is based on...
   //int m_device_num; // Index used to map what DAP to use from the GSDML. We also use m_ID, m_ID takes preceedence if it's mapped...  
   // std::string m_device_text; // Module->Name in the GSDML
@@ -400,12 +402,15 @@ public:
   ~ProfinetRuntimeData() = default;
   int read_pwr_pn_xml(std::string const& p_filename, std::string const& p_gsdml_file);
   void reset_to_default();
-  bool save_to_file(std::string&& p_filename) const;
+  //bool save_to_file(std::string&& p_filename) const;
+  bool save() const;
 
   std::shared_ptr<ProfinetDevice> m_PnDevice;
 
   bool m_file_missing; // This will be set to true if the file was missing while reading the pwr_pn data.
   bool m_gsdml_mismatch; // This will be set to true if the GSDML used is different from the one used to create the pwr_pn data.
+
+  std::string m_pwr_pn_filename; // We keep a reference to the filename here. No need to pass it around...
 
   // TODO Do we need this?
   // int m_byte_order;
