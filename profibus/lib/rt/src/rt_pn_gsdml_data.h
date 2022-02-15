@@ -146,9 +146,10 @@ public:
   //ProfinetSubslot& operator=(ProfinetSubslot const&);
   ~ProfinetSubslot() = default;
   void build(pugi::xml_node&&) const;
+  void reset();
 
   // Attributes
-  unsigned int m_subslot_number;
+  unsigned int m_subslot_number; // This is more or less fixed and is not affected by a reset
   //unsigned int m_subslot_idx; // TODO What's this...
   //unsigned int m_submodule_enum_number;
   unsigned int m_submodule_ident_number;  

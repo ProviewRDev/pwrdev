@@ -449,6 +449,14 @@ void ProfinetSubslot::build(pugi::xml_node&& p_subslot) const
   
 }
 
+void ProfinetSubslot::reset()
+{
+  m_submodule_ident_number = 0;
+  m_data_record_map.clear();
+  m_io_input_length = 0;
+  m_io_output_length = 0;
+}
+
 ProfinetSlot::ProfinetSlot(pugi::xml_node&& p_Slot)
   : //m_module_enum_number(p_Slot.attribute("ModuleEnumNumber").as_uint()),
     m_module_ident_number(p_Slot.attribute("ModuleIdentNumber").as_uint()),

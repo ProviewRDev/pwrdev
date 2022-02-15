@@ -318,7 +318,7 @@ public:
   bool selected_impl(GsdmlAttrNav* attrnav) override  { return false; }
   bool value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override { return false; }
   //int scan(GsdmlAttrNav* attrnav, void* dummy_p);
-  void attach_module(std::shared_ptr<GSDML::ModuleItem> module);
+  void attach_module(std::shared_ptr<GSDML::ModuleItem> module, bool reset_subslots = false);
 };
 
 //! Item for a subslot.
@@ -345,8 +345,10 @@ public:
   bool selected_impl(GsdmlAttrNav* attrnav) override  { return false; }
   bool value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override { return false; }
 
-  int scan(GsdmlAttrNav* attrnav, void* dummy_p) override;
-  void set_trace_value(void** p) { *p = (void*)1; /* Set a dummy */ }
+  void attach_submodule(std::shared_ptr<GSDML::SubmoduleItem> submodule);
+
+  //int scan(GsdmlAttrNav* attrnav, void* dummy_p) override;
+  //void set_trace_value(void** p) { *p = (void*)1; /* Set a dummy */ }
   static uint calculate_input_length(GSDML::Input const* input);
   static uint calculate_output_length(GSDML::Output const* output);
 
@@ -354,30 +356,6 @@ private:
   void display_interface_submodule();
   void display_port_submodule();
 };
-
-//! Item for a physical subslot.
-class ItemPnSubmoduleSelection : public ItemPn
-{
-public:
-  ItemPnSubmoduleSelection(GsdmlAttrNav* attrnav, const char* item_name,
-                    ProfinetSubslot* subslot_data,
-                    uint subslot_number,
-                    std::shared_ptr<GSDML::ModuleItem> module_item,
-                    brow_tNode dest, flow_eDest dest_code, const char* infotext);
-  
-  ProfinetSubslot* m_subslot_data;  
-  std::shared_ptr<GSDML::ModuleItem> m_module_item;
-  int m_subslot_number;
-  std::string m_old_value;
-
-  int open_children_impl() override;
-  bool selected_impl(GsdmlAttrNav* attrnav) override  { return false; }
-  bool value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override { return false; }
-
-  int scan(GsdmlAttrNav* attrnav, void* id_p);
-  void set_trace_value(void** p) override { *p = &m_subslot_data->m_submodule_ID; }
-};
-
 //! Item for the DeviceAccessPoint, slot 0
 class ItemPnDAP : public ItemPn
 {
@@ -772,6 +750,25 @@ public:
 
   std::multimap<std::string, std::shared_ptr<GSDML::ModuleItem>>& m_items;  
   ItemPnModuleSelection* m_parent;
+};
+
+/*
+  Submodule Selection Class
+*/
+class ItemPnSubmoduleSelection : public ValueSelection<std::string>
+{
+public:
+  ItemPnSubmoduleSelection(GsdmlAttrNav* attrnav, const char* name, std::shared_ptr<GSDML::ModuleItem> module_item, ProfinetSubslot* subslot_data,
+                  std::string* id_value_p, brow_tNode dest, flow_eDest dest_code, const char* infotext);
+  virtual ~ItemPnSubmoduleSelection() {}
+  
+  int open_children_impl() override;  
+  void select(ItemPnValueSelectItem<std::string>* selected_item) override;  
+  void setup_node() override;
+  void scan_impl(ItemPnValueSelectItem<std::string> const* selected_item) const override;
+
+  std::shared_ptr<GSDML::ModuleItem> m_module_item;
+  ProfinetSubslot* m_subslot_data;  
 };
 
 /*

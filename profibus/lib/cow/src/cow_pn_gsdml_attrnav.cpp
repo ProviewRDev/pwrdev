@@ -862,7 +862,7 @@ pwr_tBoolean GsdmlAttrNav::device_check_change_ok(void* ctx)
     {
       // There was no such ID in that DAPs usable modules list...We have
       // incompatibilities...
-      std::cerr << oor.what() << std::endl;
+      std::cerr << "Exception in device_check_change_ok(): " << oor.what() << std::endl;
       return false;
     }
   }
@@ -1491,6 +1491,7 @@ ItemPnSlot::ItemPnSlot(GsdmlAttrNav* attrnav, const char* name, ProfinetSlot* sl
   {
     // m_attached_module_item =
     // m_attrnav->gsdml->getModuleMap().at(m_slot_data->m_module_ID);
+    // TODO wrap with try-catch block and deal with exceptions
     attach_module(m_attrnav->gsdml->getModuleMap().at(m_slot_data->m_module_ID));
     // We also need to check if this is fixed or not since it affect the "look n
     // feel" of this slot
@@ -1586,7 +1587,7 @@ int ItemPnSlot::open_children_impl()
   return 1;
 }
 
-void ItemPnSlot::attach_module(std::shared_ptr<GSDML::ModuleItem> module)
+void ItemPnSlot::attach_module(std::shared_ptr<GSDML::ModuleItem> module, bool reset_subslots)
 {
   if (module)
   {
@@ -1605,8 +1606,9 @@ void ItemPnSlot::attach_module(std::shared_ptr<GSDML::ModuleItem> module)
   // TODO Should we update API here aswell???
 
   // This might get called from a module selection so we make sure we start from
-  // a clean slate
-  m_slot_data->m_subslot_map.clear(); // Delete all subslot data. Destructors in ProfinetDataRecord
+  // a clean slate. These call set the reset_subslots of course ...
+  if (reset_subslots)
+    m_slot_data->m_subslot_map.clear(); // Delete all subslot data. Destructors in ProfinetDataRecord
                                       // class will free data record data
 }
 
@@ -1615,7 +1617,7 @@ ItemPnSubslot::ItemPnSubslot(GsdmlAttrNav* attrnav, const char* name, ProfinetSu
                              std::shared_ptr<GSDML::SubmoduleItem> attached_submodule_item, brow_tNode dest,
                              flow_eDest dest_code, const char* infotext)
     : ItemPn(attrnav,
-             attrnav_mItemType_Parent | attrnav_mItemType_Traceable | attrnav_mItemType_ExpandForSave, name,
+             attrnav_mItemType_Parent | attrnav_mItemType_ExpandForSave, name,
              infotext, 1),
       m_subslot_data(subslot_data), m_parent_module_item(parent_module_item),
       m_subslot_number(subslot_number), m_is_selectable(false),
@@ -1624,6 +1626,12 @@ ItemPnSubslot::ItemPnSubslot(GsdmlAttrNav* attrnav, const char* name, ProfinetSu
   m_closed_annotation = attrnav->brow->pixmap_map;
   brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_attr, dest, dest_code, (void*)this, 1,
                   &m_node);
+
+  // Always set our subslot_number
+  subslot_data->m_subslot_number = m_subslot_number;
+
+  if (attached_submodule_item)
+    attach_submodule(attached_submodule_item);
 
   // Setup if not directly attached with constructor argument
   // "attached_submodule_item"
@@ -1640,55 +1648,55 @@ ItemPnSubslot::ItemPnSubslot(GsdmlAttrNav* attrnav, const char* name, ProfinetSu
       {
         if (submodule.second->_SubslotNumber == m_subslot_number)
         {
-          m_attached_submodule_item = submodule.second;
+          attach_submodule(submodule.second);
+          //m_attached_submodule_item = submodule.second;
           break;
         }
       }
     }
-
-    /*
-      Should we load default values or from already read data
-    */
-    for (auto const& submodule_item : m_parent_module_item->_UseableSubmodules)
+  
+    // We still have no attached submodule item
+    if (!m_attached_submodule_item)
     {
-      if (submodule_item.second->_AllowedInSubslots.inList(m_subslot_number))
+      /*
+        Should we load default values or from already read data
+      */
+      for (auto const& submodule_item : m_parent_module_item->_UseableSubmodules)
       {
-        // If we have no data already selected pick the default subslot from the
-        // start
-        if (m_subslot_data->m_submodule_ID == "")
+        if (submodule_item.second->_AllowedInSubslots.inList(m_subslot_number))
         {
-          if (!submodule_item.second->_UsedInSubslots.empty() &&
-              submodule_item.second->_UsedInSubslots.inList(m_subslot_number))
+          // If we have no data already selected pick the default subslot from the
+          // start
+          if (m_subslot_data->m_submodule_ID == "")
           {
-            m_attached_submodule_item = submodule_item.second->_SubmoduleItemTarget;
+            if (!submodule_item.second->_UsedInSubslots.empty() &&
+                submodule_item.second->_UsedInSubslots.inList(m_subslot_number))
+            {
+              attach_submodule(submodule_item.second->_SubmoduleItemTarget);
+              //m_attached_submodule_item = submodule_item.second->_SubmoduleItemTarget;
+            }
           }
-        }
-        else
-        {
-          // Load matching ID, if this data is wrong (maybe the GSDML file
-          // actually changed between versions even though it shouldn't) Nothing
-          // is pre loaded and one have to choose making the user aware...
-          if (submodule_item.first == m_subslot_data->m_submodule_ID)
+          else
           {
-            m_attached_submodule_item = submodule_item.second->_SubmoduleItemTarget;
+            // Load matching ID, if this data is wrong (maybe the GSDML file
+            // actually changed between versions even though it shouldn't) Nothing
+            // is pre loaded and one have to choose making the user aware...
+            if (submodule_item.first == m_subslot_data->m_submodule_ID)
+            {
+              attach_submodule(submodule_item.second->_SubmoduleItemTarget);
+              //m_attached_submodule_item = submodule_item.second->_SubmoduleItemTarget;
+            }
           }
-        }
 
-        m_is_selectable = true;
+          m_is_selectable = true;
+        }
       }
     }
   }
-
-  // Set data if we have something attached
+  
+  // Okay so we have something attached, set annotations for some subslots
   if (m_attached_submodule_item)
   {
-    m_subslot_data->m_submodule_ident_number = m_attached_submodule_item->_SubmoduleIdentNumber;
-    m_subslot_data->m_subslot_number = m_subslot_number;
-    m_subslot_data->m_submodule_ID = m_attached_submodule_item->_ID;
-
-    m_subslot_data->m_io_input_length = calculate_input_length(&m_attached_submodule_item->_IOData._Input);
-    m_subslot_data->m_io_output_length = calculate_output_length(&m_attached_submodule_item->_IOData._Output);
-
     if (m_is_selectable)
     {
       brow_SetAnnotation(m_node, 1, m_attached_submodule_item->_ModuleInfo._Name->c_str(), m_attached_submodule_item->_ModuleInfo._Name->length());    
@@ -1697,7 +1705,6 @@ ItemPnSubslot::ItemPnSubslot(GsdmlAttrNav* attrnav, const char* name, ProfinetSu
 
   brow_SetAnnotPixmap(m_node, 0, m_closed_annotation);  
   brow_SetAnnotation(m_node, 0, m_name.c_str(), m_name.length());
-  brow_SetTraceAttr(m_node, m_name.c_str(), "", flow_eTraceType_User);
 }
 
 uint ItemPnSubslot::calculate_input_length(GSDML::Input const* input)
@@ -1705,7 +1712,7 @@ uint ItemPnSubslot::calculate_input_length(GSDML::Input const* input)
   uint input_length = 0;
   for (auto const& data_item : input->_DataItem)
   {
-    // Octet string have this attribute
+    // All data items have this attribute, it's calculated from datatype if missing when parsing...
     if (data_item._Length)
     {
       input_length += data_item._Length;
@@ -1724,7 +1731,7 @@ uint ItemPnSubslot::calculate_output_length(GSDML::Output const* output)
   uint output_length = 0;
   for (auto const& data_item : output->_DataItem)
   {
-    // Octet string have this attribute
+    // All data items have this attribute, it's calculated from datatype if missing when parsing...
     if (data_item._Length)
     {
       output_length += data_item._Length;
@@ -1743,8 +1750,7 @@ int ItemPnSubslot::open_children_impl()
   // This is a subslot in which you can select different submodules
   if (m_is_selectable)
   {
-    new ItemPnSubmoduleSelection(m_attrnav, "Submodule selection", m_subslot_data, m_subslot_number,
-                                 m_parent_module_item, m_node, flow_eDest_IntoLast, "Select a submodule...");
+    new ItemPnSubmoduleSelection(m_attrnav, "Submodule Selection", m_parent_module_item, m_subslot_data, &m_subslot_data->m_submodule_ID, m_node, flow_eDest_IntoLast, "Select a submodule to go into this subslot...");
   }
 
   // Do we have an attached submodule in this slot?
@@ -1861,131 +1867,26 @@ void ItemPnSubslot::display_interface_submodule()
   // TODO Add lots of info...
 }
 
-int ItemPnSubslot::scan(GsdmlAttrNav* attrnav, void* dummy_p)
+void ItemPnSubslot::attach_submodule(std::shared_ptr<GSDML::SubmoduleItem> submodule)
 {
-  bool submodule_id_changed = false;
-
-  // Note, first scan is set the two first scans to detect load from data file
-  if (!m_first_scan)
+  if (submodule)
   {
-    if (m_old_value != m_subslot_data->m_submodule_ID)
-      submodule_id_changed = true;
+    m_attached_submodule_item = submodule;
+    m_subslot_data->m_submodule_ID = submodule->_ID;
+    m_subslot_data->m_submodule_ident_number = submodule->_SubmoduleIdentNumber;
 
-    if (!submodule_id_changed)
-      return 1;
-  }
-
-  if (submodule_id_changed)
-  {
-    // Value did change, update the data if the ID is valid which it should  be
-    // :)
-    if (attrnav->gsdml->getSubmoduleMap().count(m_subslot_data->m_submodule_ID))
-    {
-      m_attached_submodule_item = attrnav->gsdml->getSubmoduleMap()[m_subslot_data->m_submodule_ID];
-
-      // Update the data
-      m_subslot_data->m_submodule_ident_number = m_attached_submodule_item->_SubmoduleIdentNumber;
-      m_subslot_data->m_subslot_number = m_subslot_number;
-      // ID is traced and is updating the subslot ID reference directly
-    }
-
-    // Update annotation for selectable subslots
-    if (m_is_selectable && m_attached_submodule_item && m_attached_submodule_item->_ModuleInfo._Name)
-    {
-      brow_SetAnnotation(m_node, 1, m_attached_submodule_item->_ModuleInfo._Name->c_str(),
-                         m_attached_submodule_item->_ModuleInfo._Name->length());
-
-      // We also close the subslot after a change, easy way to force an update
-      // to the "Information" kept herein...
-      double node_x, node_y;
-      brow_GetNodePosition(m_node, &node_x, &node_y);
-      ItemPn::close(attrnav, node_x, node_y);
-    }
-  }
-
-  m_old_value = m_subslot_data->m_submodule_ID;
-
-  if (m_first_scan)
-    m_first_scan = 0;
-
-  return 1;
-}
-
-ItemPnSubmoduleSelection::ItemPnSubmoduleSelection(GsdmlAttrNav* attrnav, const char* name,
-                                                   ProfinetSubslot* subslot_data, uint subslot_number,
-                                                   std::shared_ptr<GSDML::ModuleItem> module_item,
-                                                   brow_tNode dest, flow_eDest dest_code,
-                                                   const char* infotext)
-    : ItemPn(attrnav, (attrnav_mItemType_Parent | attrnav_mItemType_Traceable), name, infotext, 1),
-      m_subslot_data(subslot_data), m_module_item(module_item), m_subslot_number(subslot_number)
-{
-  m_closed_annotation = attrnav->brow->pixmap_attrenum;
-  brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_attr, dest, dest_code, (void*)this, 1,
-                  &m_node);
-
-  brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_attrenum);
-  brow_SetAnnotation(m_node, 0, m_name.c_str(), m_name.length());
-  brow_SetTraceAttr(m_node, m_name.c_str(), "", flow_eTraceType_User);
-}
-
-int ItemPnSubmoduleSelection::open_children_impl()
-{
-  for (auto const& submodule_item : m_module_item->_UseableSubmodules)
-  {
-    std::string submodule_name = *submodule_item.second->_SubmoduleItemTarget->_ModuleInfo._Name;
-    std::ostringstream submodule_order_number(std::ios_base::out);
-    submodule_order_number << "<"
-                           << (submodule_item.second->_SubmoduleItemTarget->_ModuleInfo._OrderNumber.empty()
-                                   ? *submodule_item.second->_SubmoduleItemTarget->_ModuleInfo._Name
-                                   : submodule_item.second->_SubmoduleItemTarget->_ModuleInfo._OrderNumber)
-                           << ">";
-
-    // Only add those that are valid for this subslot
-    if (submodule_item.second->_AllowedInSubslots.inList(m_subslot_number))
-    {
-      new ItemPnIDSelectValue(m_attrnav, submodule_name.c_str(), submodule_order_number.str(),
-                              submodule_item.first, &m_subslot_data->m_submodule_ID, m_node,
-                              flow_eDest_IntoLast,
-                              submodule_item.second->_SubmoduleItemTarget->_ModuleInfo._InfoText->c_str());
-    }
-  }
-
-  return 1;
-}
-
-int ItemPnSubmoduleSelection::scan(GsdmlAttrNav* attrnav, void* value_p)
-{
-
-  // Note, first scan is set the two first scans to detect load from data file
-  if (!m_first_scan)
-  {
-    if (m_old_value == *(std::string*)value_p)
-      // No change since last time
-      return 1;
-  }
-
-  std::string annotation;
-  if (m_module_item->_UseableSubmodules.count(*(std::string*)value_p))
-  {
-    auto submodule_item_ref = m_module_item->_UseableSubmodules[*(std::string*)value_p];
-    annotation = *submodule_item_ref->_SubmoduleItemTarget->_ModuleInfo._Name;
+    m_subslot_data->m_io_input_length = calculate_input_length(&m_attached_submodule_item->_IOData._Input);
+    m_subslot_data->m_io_output_length = calculate_output_length(&m_attached_submodule_item->_IOData._Output);
   }
   else
   {
-    annotation = "None";
+    m_attached_submodule_item.reset();
+    m_subslot_data->m_submodule_ID = "";
+    m_subslot_data->m_submodule_ident_number = 0;
+    m_subslot_data->m_data_record_map.clear();
+    m_subslot_data->m_io_input_length = 0;
+    m_subslot_data->m_io_output_length = 0;
   }
-
-  double node_x, node_y;
-  brow_GetNodePosition(m_node, &node_x, &node_y);
-  ItemPn::close(attrnav, node_x, node_y);
-  brow_SetAnnotation(m_node, 1, annotation.c_str(), annotation.length());
-
-  m_old_value = m_subslot_data->m_submodule_ID;
-
-  if (m_first_scan)
-    m_first_scan = 0;
-
-  return 1;
 }
 
 ItemPnDAP::ItemPnDAP(GsdmlAttrNav* attrnav, const char* name, ProfinetSlot* item_slotdata, brow_tNode dest,
@@ -2036,21 +1937,7 @@ int ItemPnDAP::open_children_impl()
       subslot_number++;
     }
 
-    // If we have a subslotlist add those extra subslots. This is schema
-    // >= 2.1
-    if (!dap->_SubslotList.empty())
-    {
-      for (auto const& subslot : dap->_SubslotList)
-      {
-        std::ostringstream subslot_name("Subslot ", std::ios_base::ate);
-        subslot_name << subslot._SubslotNumber << " (" << *subslot._Text << ")";
-
-        new ItemPnSubslot(m_attrnav, subslot_name.str().c_str(),
-                          &m_slotdata->m_subslot_map[subslot._SubslotNumber], dap, subslot._SubslotNumber,
-                          nullptr, m_node, flow_eDest_IntoLast, "Subslot from the DAPs subslot list.");
-      }
-    }
-    else if (dap->_SystemDefinedSubmoduleList.size() > 0) // Do we have a systemdefined subslot list?
+    if (dap->_SystemDefinedSubmoduleList.size() > 0) // Do we have a systemdefined subslot list?
     {
       for (auto const& submodule : dap->_SystemDefinedSubmoduleList)
       {
@@ -2064,6 +1951,20 @@ int ItemPnDAP::open_children_impl()
       }
     }
 
+    // If we have physical subslots, we add them. If we don't we should have the rest in the systemdefined list
+    if (!dap->_PhysicalSubslots.empty())
+    {
+      for (auto it = dap->_PhysicalSubslots.begin(); it != dap->_PhysicalSubslots.end(); ++it)
+      {    
+        std::ostringstream subslot_name("Subslot ", std::ios_base::ate);
+        subslot_name << it.value();
+
+        new ItemPnSubslot(m_attrnav, subslot_name.str().c_str(),
+                          &m_slotdata->m_subslot_map[it.value()], dap, it.value(),
+                          nullptr, m_node, flow_eDest_IntoLast, "Physical subslot of the DAP.");
+      }
+    }
+    
     // Add timing properties
     new ItemPnTimingProperties(m_attrnav, "Timing Properties", dap, m_node, flow_eDest_IntoLast);
   }
@@ -2570,13 +2471,13 @@ void ItemPnModuleSelection::select(ItemPnValueSelectItem<std::string>* selected_
   // Check if we are attaching a (new) module or removing a module
   if (m_value_p->empty())
   {
-    slot->attach_module(nullptr);
+    slot->attach_module(nullptr, true);
     brow_SetAnnotation(slot->m_node, 1, "", 0);
   }
   else
   {
     auto module = m_attrnav->gsdml->getModuleMap().at(*m_value_p);
-    slot->attach_module(module);
+    slot->attach_module(module, true);
     brow_SetAnnotation(slot->m_node, 1, module->_ModuleInfo._Name->c_str(),
                        module->_ModuleInfo._Name->length());
   }
@@ -2631,6 +2532,104 @@ void ItemPnModuleSelection::scan_impl(ItemPnValueSelectItem<std::string> const* 
 }
 
 /* ==================================== END Module Selection node ==================================== */
+
+/* ======================================= Submodule Selection node ======================================= */
+
+ItemPnSubmoduleSelection::ItemPnSubmoduleSelection(GsdmlAttrNav* attrnav, const char* name, std::shared_ptr<GSDML::ModuleItem> module_item, ProfinetSubslot* subslot_data,
+                                             std::string* id_value_p, brow_tNode dest, flow_eDest dest_code,
+                                             const char* infotext)
+    : ValueSelection<std::string>(attrnav, attrnav_mItemType_Parent, name, infotext, dest, dest_code,
+                                  id_value_p),
+      m_module_item(module_item),
+      m_subslot_data(subslot_data)
+{
+  m_closed_annotation = m_attrnav->brow->pixmap_attrenum;
+  setup_node();
+}
+
+int ItemPnSubmoduleSelection::open_children_impl()
+{
+  // Add selection for "No Module"
+  new ItemPnValueSelectItem<std::string>(m_attrnav, "No Submodule", "", this, &m_subslot_data->m_submodule_ID, "",
+                                         "Select to remove the submodule from this subslot", m_node, flow_eDest_IntoLast);
+  for (auto const& submodule : m_module_item->_UseableSubmodules)
+  {
+    std::string submodule_name = *submodule.second->_SubmoduleItemTarget->_ModuleInfo._Name;
+    std::ostringstream submodule_order_number(std::ios_base::out);
+    submodule_order_number << "<"
+                           << (submodule.second->_SubmoduleItemTarget->_ModuleInfo._OrderNumber.empty()
+                                   ? *submodule.second->_SubmoduleItemTarget->_ModuleInfo._Name
+                                   : submodule.second->_SubmoduleItemTarget->_ModuleInfo._OrderNumber)
+                           << ">"; 
+    std::string infotext;
+    if (submodule.second->_SubmoduleItemTarget->_ModuleInfo._InfoText)
+      infotext = *submodule.second->_SubmoduleItemTarget->_ModuleInfo._InfoText;
+    else
+      infotext = "No further help available about this submodule...";
+
+    if (submodule.second->_AllowedInSubslots.inList(m_subslot_data->m_subslot_number))
+    {
+      new ItemPnValueSelectItem<std::string>(m_attrnav, submodule_name.c_str(), submodule_order_number.str().c_str(), this, &m_subslot_data->m_submodule_ID, submodule.first,
+                                         infotext.c_str(), m_node, flow_eDest_IntoLast);
+    }
+  }
+
+  return 1;
+}
+
+void ItemPnSubmoduleSelection::select(ItemPnValueSelectItem<std::string>* selected_item)
+{
+  *m_value_p = selected_item->value();
+
+  // We now close and reopen the parent to reset the entire tree since send
+  // clock for instance is dependent on this value
+  brow_tNode parent_node;
+  void* parent;
+  brow_GetParent(m_attrnav->brow->ctx, m_node, &parent_node);
+  brow_GetUserData(parent_node, &parent);
+
+  // Bold move but we're pretty confident what our parent actually is...
+  ItemPnSubslot* subslot = (ItemPnSubslot*)parent;
+
+  // Check if we are attaching a (new) module or removing a module
+  if (m_value_p->empty())
+  {
+    subslot->attach_submodule(nullptr);
+    brow_SetAnnotation(subslot->m_node, 1, "", 0);
+  }
+  else
+  {
+    auto submodule = m_attrnav->gsdml->getSubmoduleMap().at(*m_value_p);
+    subslot->attach_submodule(submodule);
+    brow_SetAnnotation(subslot->m_node, 1, submodule->_ModuleInfo._Name->c_str(),
+                       submodule->_ModuleInfo._Name->length());
+  }
+
+  subslot->close(m_attrnav, 0, 0, true); // Close AND reopen  
+}
+
+void ItemPnSubmoduleSelection::setup_node()
+{
+  m_noedit = 0; // Enable edit
+
+  if (*m_value_p != "")
+  {
+    // Fetch the name from the GSDML
+    std::string name = *m_attrnav->gsdml->getSubmoduleMap()[*m_value_p]->_ModuleInfo._Name;
+    brow_SetAnnotation(m_node, 1, name.c_str(), name.length());
+  }
+}
+
+void ItemPnSubmoduleSelection::scan_impl(ItemPnValueSelectItem<std::string> const* selected_item) const
+{
+  // Control the radiobuttons
+  if (*this->m_value_p == selected_item->value())
+    brow_SetRadiobutton(selected_item->m_node, 0, 1);
+  else
+    brow_SetRadiobutton(selected_item->m_node, 0, 0);
+}
+
+/* ==================================== END Submodule Selection node ==================================== */
 
 /* ==================================== RT_CLASS Selection node ==================================== */
 
