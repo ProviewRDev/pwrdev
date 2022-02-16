@@ -663,7 +663,7 @@ int GsdmlAttrNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
     }
     else if (item->m_type & attrnav_mItemType_Selectable)
     {
-      item->selected(attrnav); // TODO Remove this argument, it's not needed
+      item->selected();
     }
     else if (item->m_type & attrnav_mItemType_Parent)
     {
@@ -695,7 +695,7 @@ int GsdmlAttrNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
     case flow_eObjectType_Node:
       brow_GetUserData(event->object.object, (void**)&item);
       if (item->m_type & attrnav_mItemType_Selectable)
-        item->selected(attrnav);
+        item->selected();
       break;
     default:;
     }
@@ -1224,10 +1224,10 @@ int ItemPn::open_children(GsdmlAttrNav* attrnav, double x, double y)
   return 1;
 }
 
-void ItemPn::selected(GsdmlAttrNav* attrnav)
+void ItemPn::selected()
 {
-  if (selected_impl(attrnav))
-    attrnav->set_modified(true);
+  if (selected_impl(m_attrnav))
+    m_attrnav->set_modified(true);
 }
 
 void ItemPn::value_changed(GsdmlAttrNav* attrnav, const char* value_str)
@@ -1489,18 +1489,24 @@ ItemPnSlot::ItemPnSlot(GsdmlAttrNav* attrnav, const char* name, ProfinetSlot* sl
   // Attach a module if we have some data available in our ID
   if (m_slot_data->m_module_ID != "")
   {
-    // m_attached_module_item =
-    // m_attrnav->gsdml->getModuleMap().at(m_slot_data->m_module_ID);
-    // TODO wrap with try-catch block and deal with exceptions
-    attach_module(m_attrnav->gsdml->getModuleMap().at(m_slot_data->m_module_ID));
-    // We also need to check if this is fixed or not since it affect the "look n
-    // feel" of this slot
-    if (m_attrnav->m_selected_device_item->_UseableModules[m_slot_data->m_module_ID]->_FixedInSlots.inList(
-            m_slot_data->m_slot_number))
-      m_is_fixed = true;
+    // Try to attach the module
+    try 
+    {
+      attach_module(m_attrnav->gsdml->getModuleMap().at(m_slot_data->m_module_ID));
 
-    brow_SetAnnotation(m_node, 1, m_attached_module_item->_ModuleInfo._Name->c_str(),
-                       m_attached_module_item->_ModuleInfo._Name->length());
+      // We also need to check if this is fixed or not since it affects the "look n
+      // feel" of this slot
+      if (m_attrnav->m_selected_device_item->_UseableModules.at(m_slot_data->m_module_ID)->_FixedInSlots.inList(
+          m_slot_data->m_slot_number))
+      {
+        m_is_fixed = true;
+      }
+    }
+    catch (std::out_of_range &oor)
+    {
+      std::cerr << "Module ID (" << m_slot_data->m_module_ID << ") not found in the ModuleList of the GSDML! Reset of slot " << m_slot_data->m_slot_number << std::endl;
+      attach_module(nullptr, true); // Reset the whole slot!
+    }    
   }
 
   // We have no attached module
@@ -1508,18 +1514,21 @@ ItemPnSlot::ItemPnSlot(GsdmlAttrNav* attrnav, const char* name, ProfinetSlot* sl
   {
     // Setup
     // First check if this slot has a module that is fixed to it.
-    for (auto const& module : m_attrnav->m_selected_device_item->_UseableModules)
+    for (auto const& module_item_ref : m_attrnav->m_selected_device_item->_UseableModules)
     {
-      if (!module.second->_FixedInSlots.empty())
+      if (!module_item_ref.second->_FixedInSlots.empty())
       {
-        if (module.second->_FixedInSlots.inList(m_slot_data->m_slot_number))
+        if (module_item_ref.second->_FixedInSlots.inList(m_slot_data->m_slot_number))
         { // We have a fixed module, attach it...
           m_is_fixed = true;
-          m_slot_data->m_module_ID = module.first;
-          m_attached_module_item = m_attrnav->gsdml->getModuleMap()[m_slot_data->m_module_ID];
+          attach_module(module_item_ref.second->_ModuleItemTarget);
+          //attach_module(m_attrnav->gsdml->getModuleMap()[m_slot_data->m_module_ID]);          
 
-          // Fill in required data, not much atm...
-          m_slot_data->m_module_ident_number = m_attached_module_item->_ModuleIdentNumber;
+          // m_slot_data->m_module_ID = module_item_ref.first;
+          // m_attached_module_item = m_attrnav->gsdml->getModuleMap()[m_slot_data->m_module_ID];
+
+          // // Fill in required data, not much atm...
+          // m_slot_data->m_module_ident_number = m_attached_module_item->_ModuleIdentNumber;
         }
       }
     }
@@ -1528,12 +1537,21 @@ ItemPnSlot::ItemPnSlot(GsdmlAttrNav* attrnav, const char* name, ProfinetSlot* sl
   {
     // Noop atm
   }
+
+  if (m_attached_module_item)
+  {
+    if (m_attached_module_item->_ModuleInfo._Name)
+    {
+      brow_SetAnnotation(m_node, 1, m_attached_module_item->_ModuleInfo._Name->c_str(), m_attached_module_item->_ModuleInfo._Name->length());
+    }
+  }
 }
 
 int ItemPnSlot::open_children_impl()
 {
-  new ItemPnModuleSelection(m_attrnav, "Module Selection", m_slot_data, &m_slot_data->m_module_ID, m_node,
-                            flow_eDest_IntoLast, "Select what module to put in this slot...");
+  if (!m_is_fixed)
+    new ItemPnModuleSelection(m_attrnav, "Module Selection", m_slot_data, &m_slot_data->m_module_ID, m_node,
+                             flow_eDest_IntoLast, "Select what module to put in this slot...");
 
   if (m_attached_module_item)
   {
@@ -1661,18 +1679,26 @@ ItemPnSubslot::ItemPnSubslot(GsdmlAttrNav* attrnav, const char* name, ProfinetSu
       /*
         Should we load default values or from already read data
       */
-      for (auto const& submodule_item : m_parent_module_item->_UseableSubmodules)
+      for (auto const& submodule_item_ref : m_parent_module_item->_UseableSubmodules)
       {
-        if (submodule_item.second->_AllowedInSubslots.inList(m_subslot_number))
+        if (submodule_item_ref.second->_AllowedInSubslots.inList(m_subslot_number))
         {
+          // First check if this is a fixed subslot
+          if (!submodule_item_ref.second->_FixedInSubslots.empty() && submodule_item_ref.second->_FixedInSubslots.inList(m_subslot_number))
+          {
+            attach_submodule(submodule_item_ref.second->_SubmoduleItemTarget);
+            m_is_selectable = false;
+            break;
+          }
+
           // If we have no data already selected pick the default subslot from the
           // start
           if (m_subslot_data->m_submodule_ID == "")
           {
-            if (!submodule_item.second->_UsedInSubslots.empty() &&
-                submodule_item.second->_UsedInSubslots.inList(m_subslot_number))
+            if (!submodule_item_ref.second->_UsedInSubslots.empty() &&
+                submodule_item_ref.second->_UsedInSubslots.inList(m_subslot_number))
             {
-              attach_submodule(submodule_item.second->_SubmoduleItemTarget);
+              attach_submodule(submodule_item_ref.second->_SubmoduleItemTarget);
               //m_attached_submodule_item = submodule_item.second->_SubmoduleItemTarget;
             }
           }
@@ -1681,9 +1707,9 @@ ItemPnSubslot::ItemPnSubslot(GsdmlAttrNav* attrnav, const char* name, ProfinetSu
             // Load matching ID, if this data is wrong (maybe the GSDML file
             // actually changed between versions even though it shouldn't) Nothing
             // is pre loaded and one have to choose making the user aware...
-            if (submodule_item.first == m_subslot_data->m_submodule_ID)
+            if (submodule_item_ref.first == m_subslot_data->m_submodule_ID)
             {
-              attach_submodule(submodule_item.second->_SubmoduleItemTarget);
+              attach_submodule(submodule_item_ref.second->_SubmoduleItemTarget);
               //m_attached_submodule_item = submodule_item.second->_SubmoduleItemTarget;
             }
           }
@@ -1697,10 +1723,8 @@ ItemPnSubslot::ItemPnSubslot(GsdmlAttrNav* attrnav, const char* name, ProfinetSu
   // Okay so we have something attached, set annotations for some subslots
   if (m_attached_submodule_item)
   {
-    if (m_is_selectable)
-    {
-      brow_SetAnnotation(m_node, 1, m_attached_submodule_item->_ModuleInfo._Name->c_str(), m_attached_submodule_item->_ModuleInfo._Name->length());    
-    }
+    if (m_attached_submodule_item->_ModuleInfo._Name)
+      brow_SetAnnotation(m_node, 1, m_attached_submodule_item->_ModuleInfo._Name->c_str(), m_attached_submodule_item->_ModuleInfo._Name->length());
   } 
 
   brow_SetAnnotPixmap(m_node, 0, m_closed_annotation);  
@@ -2026,10 +2050,6 @@ ItemPnDeviceInfo::ItemPnDeviceInfo(GsdmlAttrNav* attrnav, const char* name, brow
 
 int ItemPnDeviceInfo::open_children_impl()
 {
-
-  // void* p = (void*)attrnav->gsdml->DeviceIdentity->Body.VendorName;
-  // value = attrnav->gsdml->m_DeviceIdentity->_VendorName.c_str();
-  // TODO Parse this in the new parser...
   new ItemPnInfo(m_attrnav, "Vendor", "LocalGsdmlAttr", pwr_eType_String,
                  m_attrnav->gsdml->m_DeviceIdentity->_VendorName.length(),
                  &m_attrnav->gsdml->m_DeviceIdentity->_VendorName, m_node, flow_eDest_IntoLast, "");
@@ -2153,7 +2173,8 @@ ItemPnParameterRecordDataItem::ItemPnParameterRecordDataItem(
 
 void ItemPnParameterRecordDataItem::set_default_data()
 {
-  // TODO Fix this for all datatypes...
+  // TODO Fix for all remaining datatypes like time/date thingies and stuff like that...
+
   for (auto const& ref : m_parameter_record_data_item->_Ref)
   {
     switch (ref.second->_DataType)

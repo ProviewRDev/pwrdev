@@ -226,7 +226,7 @@ public:
   // The item is selected, such as an enum being selected, a parent about to be
   // opened, or a parameter value...
   // Use ( in brow_cb() ) to call templated implementation specifics to regain RTTI
-  virtual void selected(GsdmlAttrNav* attrnav) final;
+  virtual void selected() final;
   virtual bool selected_impl(GsdmlAttrNav* attrnav) = 0;
 
   virtual void set_trace_value(void** p) { if (m_type & attrnav_mItemType_Traceable) std::cerr << "No trace value set for: " << m_name << std::endl; }
