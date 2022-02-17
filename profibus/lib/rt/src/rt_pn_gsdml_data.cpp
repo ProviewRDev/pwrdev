@@ -460,11 +460,13 @@ void ProfinetSubslot::reset()
 ProfinetSlot::ProfinetSlot(pugi::xml_node&& p_Slot)
   : //m_module_enum_number(p_Slot.attribute("ModuleEnumNumber").as_uint()),
     m_module_ident_number(p_Slot.attribute("ModuleIdentNumber").as_uint()),
-    //m_dap_fixed_slot(p_Slot.attribute("DapFixedInSlot").as_uint()),
     m_module_class(p_Slot.attribute("ModuleClass").as_uint()),
+    //m_dap_fixed_slot(p_Slot.attribute("DapFixedInSlot").as_uint()),
     //m_module_text(p_Slot.attribute("ModuleText").as_string()),    
     m_module_ID(p_Slot.attribute("ModuleID").as_string()),
-    m_slot_number(p_Slot.attribute("SlotNumber").as_uint())
+    m_slot_number(p_Slot.attribute("SlotNumber").as_uint()),    
+    m_module_oid(pwr_cNOid),
+    m_is_modified(false)
 {
   //strncpy(m_module_text, p_Slot.attribute("ModuleText").as_string(), sizeof(pwr_tString256));
 

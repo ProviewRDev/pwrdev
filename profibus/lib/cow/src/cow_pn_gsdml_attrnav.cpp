@@ -1621,6 +1621,10 @@ void ItemPnSlot::attach_module(std::shared_ptr<GSDML::ModuleItem> module, bool r
     m_slot_data->m_module_class = 0;
   }
 
+  // Set this slot to modified state. Will be used to check if we should try to create channels.
+  // If there's already channels present and we modify a slot the user will get a notification.
+  m_slot_data->m_is_modified = true;
+
   // TODO Should we update API here aswell???
 
   // This might get called from a module selection so we make sure we start from

@@ -213,7 +213,6 @@ public:
 
   //unsigned int m_dap_fixed_slot;
   pwr_tCid m_module_class;
-  pwr_tOid m_module_oid;
   //pwr_tString256 m_module_text;
   std::string m_module_ID; // This is unique even across the same ident number
   unsigned int m_slot_number;
@@ -221,6 +220,10 @@ public:
   //unsigned int m_slot_idx; // What's this?
   std::map<uint, ProfinetSubslot> m_subslot_map;
   //std::vector<ProfinetSubslot> m_subslot_list;
+
+  // Non saved members
+  pwr_tOid m_module_oid; // Meta, never saved. Only used as temporary storage for oids when creating modules/channels
+  bool m_is_modified; // Meta, never save. Indicates wether or not this slot had it's module updated before applyig/saving...
 };
 
 
