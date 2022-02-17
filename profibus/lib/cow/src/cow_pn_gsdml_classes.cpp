@@ -176,7 +176,8 @@ DataItem::DataItem(pugi::xml_node&& dataItem, pn_gsdml* gsdml)
       _Length(dataItem.attribute("Length").as_uint()),
       _UseAsBits(dataItem.attribute("UseAsBits").as_bool()),
       _Text(gsdml->_get_TextId(
-          std::move(std::string(dataItem.attribute("TextId").value()))))
+          std::move(std::string(dataItem.attribute("TextId").value())))),
+      _TextId(dataItem.attribute("TextId").as_string())
 {
   string_to_value_datatype(dataItem.attribute("DataType").as_string(),
                            &_DataType);

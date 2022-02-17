@@ -268,6 +268,7 @@ public:
   ushort _Length;
   bool _UseAsBits;
   std::shared_ptr<std::string> _Text;
+  std::string _TextId; // We save this string as is aswell. It's super nice to have as part of a channel name
 
   // Elements
   std::vector<BitDataItem> _BitDataItem;
