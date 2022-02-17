@@ -118,9 +118,12 @@ void create_parameter_value_class(GsdmlAttrNav* attrnav, const char* name, std::
     break;
   case GSDML::ValueDataType_BitArea:
     if (create_selection)
-      new ItemPnParameterSelection<uint8_t>(attrnav, name, (uint8_t*)data, node, flow_eDest_IntoLast, ref);      
+      new ItemPnParameterSelection<uint8_t>(attrnav, name, (uint8_t*)data, node, flow_eDest_IntoLast, ref);
     else
-      new ItemPnParameterInput<uint8_t>(attrnav, name, (uint8_t*)data, (std::string("Integer8 (BitArea) value input. ") + infotext.str()).c_str(), node, flow_eDest_IntoLast, ref);      
+      new ItemPnParameterInput<uint8_t>(
+          attrnav, name, (uint8_t*)data,
+          (std::string("Integer8 (BitArea) value input. ") + infotext.str()).c_str(), node,
+          flow_eDest_IntoLast, ref);
     break;
   case GSDML::ValueDataType_Integer8:
     if (create_selection)
@@ -208,7 +211,8 @@ void create_parameter_value_class(GsdmlAttrNav* attrnav, const char* name, std::
                                           flow_eDest_IntoLast, ref);
     break;
   default:
-    std::cerr << "Unhandled GSDML Datatype for parameter Ref element in create_parameter_value_class()" << std::endl;
+    std::cerr << "Unhandled GSDML Datatype for parameter Ref element in create_parameter_value_class()"
+              << std::endl;
   }
 }
 
@@ -250,7 +254,7 @@ GsdmlAttrNav::GsdmlAttrNav(void* xn_parent_ctx, const char* xn_name, pn_gsdml* x
       order_moduletype(attr_eOrderModuleType_Default), m_modified(false)
 {
   strcpy(m_name, xn_name);
-  pn_runtime_data = pwr_pn_data;  
+  pn_runtime_data = pwr_pn_data;
 
   *status = 1;
 }
@@ -1047,8 +1051,8 @@ int GsdmlAttrNav::object_attr()
         "perfectly fine in most cases to update your GSDML file since most, if not all, suppliers\n"
         "of PROFINET devices follow the specification. However, you should glance through your settings\n"
         "just to be sure.");
-    
-    m_wow->DisplayText("New GSDML file detected", msg.c_str());    
+
+    m_wow->DisplayText("New GSDML file detected", msg.c_str());
     pn_runtime_data->m_gsdml_mismatch = false; // Reset this since we've made the use aware :)
   }
 
@@ -1145,7 +1149,7 @@ int GsdmlAttrNav::init_brow_cb(FlowCtx* fctx, void* client_data)
   attrnav->brow = new GsdmlAttrNavBrow(ctx, (void*)attrnav);
 
   attrnav->brow->brow_setup();
-  attrnav->brow->create_nodeclasses();  
+  attrnav->brow->create_nodeclasses();
 
   // Create the root item
   attrnav->object_attr();
@@ -1160,7 +1164,7 @@ int GsdmlAttrNav::init_brow_cb(FlowCtx* fctx, void* client_data)
 
 int GsdmlAttrNav::save()
 {
-  int sts = PB__SUCCESS;  
+  int sts = PB__SUCCESS;
 
   if (pn_runtime_data->m_PnDevice->m_DAP_ID == "")
     return PB__NODEVICE;
@@ -1189,7 +1193,7 @@ int GsdmlAttrNav::save()
           .m_name = *ext_diag_item.second._Name;
     }
   }
-    
+
   if (!pn_runtime_data->save())
     m_wow->DisplayError("Error saving", "An error occured while saving the runtime configuration file.");
 
@@ -1380,13 +1384,18 @@ ItemPnDAPSelection::ItemPnDAPSelection(GsdmlAttrNav* attrnav, const char* name, 
       m_attrnav->pn_runtime_data->reset_to_default();
 
       std::ostringstream message(std::ios_base::out);
-      message << "The ID for the DAP cannot be found! This shouldn't happen if the supplier of the GSDML followed" << std::endl
-              << "the specification. We have to reset all configuration in order to continue..." << std::endl << std::endl
-              << "If you would like to solve this yourself by checking the GSDML file and the runtime configuration hit cancel" << std::endl              
-              << "in the configuration window and your settings are still safe and sound in: " << std::endl
-              << m_attrnav->pn_runtime_data->m_pwr_pn_filename;
+      message
+          << "The ID for the DAP cannot be found! This shouldn't happen if the supplier of the GSDML followed"
+          << std::endl
+          << "the specification. We have to reset all configuration in order to continue..." << std::endl
+          << std::endl
+          << "If you would like to solve this yourself by checking the GSDML file and the runtime "
+             "configuration hit cancel"
+          << std::endl
+          << "in the configuration window and your settings are still safe and sound in: " << std::endl
+          << m_attrnav->pn_runtime_data->m_pwr_pn_filename;
 
-      attrnav->m_wow->DisplayText("Oh oh!", message.str().c_str());      
+      attrnav->m_wow->DisplayText("Oh oh!", message.str().c_str());
     }
   }
 }
@@ -1490,23 +1499,25 @@ ItemPnSlot::ItemPnSlot(GsdmlAttrNav* attrnav, const char* name, ProfinetSlot* sl
   if (m_slot_data->m_module_ID != "")
   {
     // Try to attach the module
-    try 
+    try
     {
       attach_module(m_attrnav->gsdml->getModuleMap().at(m_slot_data->m_module_ID));
 
       // We also need to check if this is fixed or not since it affects the "look n
       // feel" of this slot
-      if (m_attrnav->m_selected_device_item->_UseableModules.at(m_slot_data->m_module_ID)->_FixedInSlots.inList(
-          m_slot_data->m_slot_number))
+      if (m_attrnav->m_selected_device_item->_UseableModules.at(m_slot_data->m_module_ID)
+              ->_FixedInSlots.inList(m_slot_data->m_slot_number))
       {
         m_is_fixed = true;
       }
     }
-    catch (std::out_of_range &oor)
+    catch (std::out_of_range& oor)
     {
-      std::cerr << "Module ID (" << m_slot_data->m_module_ID << ") not found in the ModuleList of the GSDML! Reset of slot " << m_slot_data->m_slot_number << std::endl;
+      std::cerr << "Module ID (" << m_slot_data->m_module_ID
+                << ") not found in the ModuleList of the GSDML! Reset of slot " << m_slot_data->m_slot_number
+                << std::endl;
       attach_module(nullptr, true); // Reset the whole slot!
-    }    
+    }
   }
 
   // We have no attached module
@@ -1522,13 +1533,6 @@ ItemPnSlot::ItemPnSlot(GsdmlAttrNav* attrnav, const char* name, ProfinetSlot* sl
         { // We have a fixed module, attach it...
           m_is_fixed = true;
           attach_module(module_item_ref.second->_ModuleItemTarget);
-          //attach_module(m_attrnav->gsdml->getModuleMap()[m_slot_data->m_module_ID]);          
-
-          // m_slot_data->m_module_ID = module_item_ref.first;
-          // m_attached_module_item = m_attrnav->gsdml->getModuleMap()[m_slot_data->m_module_ID];
-
-          // // Fill in required data, not much atm...
-          // m_slot_data->m_module_ident_number = m_attached_module_item->_ModuleIdentNumber;
         }
       }
     }
@@ -1542,7 +1546,8 @@ ItemPnSlot::ItemPnSlot(GsdmlAttrNav* attrnav, const char* name, ProfinetSlot* sl
   {
     if (m_attached_module_item->_ModuleInfo._Name)
     {
-      brow_SetAnnotation(m_node, 1, m_attached_module_item->_ModuleInfo._Name->c_str(), m_attached_module_item->_ModuleInfo._Name->length());
+      brow_SetAnnotation(m_node, 1, m_attached_module_item->_ModuleInfo._Name->c_str(),
+                         m_attached_module_item->_ModuleInfo._Name->length());
     }
   }
 }
@@ -1550,8 +1555,13 @@ ItemPnSlot::ItemPnSlot(GsdmlAttrNav* attrnav, const char* name, ProfinetSlot* sl
 int ItemPnSlot::open_children_impl()
 {
   if (!m_is_fixed)
-    new ItemPnModuleSelection(m_attrnav, "Module Selection", m_slot_data, &m_slot_data->m_module_ID, m_node,
-                             flow_eDest_IntoLast, "Select what module to put in this slot...");
+    new ItemPnModuleSelection(
+        m_attrnav, "Module Selection", m_slot_data, &m_slot_data->m_module_ID, m_node, flow_eDest_IntoLast,
+        "Select what module to put in this slot.\n Changing the module to something not directly compatible "
+        "with the current channel configuration will result in incompatible data areas. The reason is "
+        "because ProviewR will not delete any channels for you (except when changing module class). This is "
+        "for your sake, to not loose channel connection information. Move your channels elsewhere or delete "
+        "them before applying this new configuration and ProviewR will happily create them for you.");
 
   if (m_attached_module_item)
   {
@@ -1621,26 +1631,20 @@ void ItemPnSlot::attach_module(std::shared_ptr<GSDML::ModuleItem> module, bool r
     m_slot_data->m_module_class = 0;
   }
 
-  // Set this slot to modified state. Will be used to check if we should try to create channels.
-  // If there's already channels present and we modify a slot the user will get a notification.
-  m_slot_data->m_is_modified = true;
-
   // TODO Should we update API here aswell???
 
   // This might get called from a module selection so we make sure we start from
   // a clean slate. These call set the reset_subslots of course ...
   if (reset_subslots)
     m_slot_data->m_subslot_map.clear(); // Delete all subslot data. Destructors in ProfinetDataRecord
-                                      // class will free data record data
+                                        // class will free data record data
 }
 
 ItemPnSubslot::ItemPnSubslot(GsdmlAttrNav* attrnav, const char* name, ProfinetSubslot* subslot_data,
                              std::shared_ptr<GSDML::ModuleItem> parent_module_item, uint subslot_number,
                              std::shared_ptr<GSDML::SubmoduleItem> attached_submodule_item, brow_tNode dest,
                              flow_eDest dest_code, const char* infotext)
-    : ItemPn(attrnav,
-             attrnav_mItemType_Parent | attrnav_mItemType_ExpandForSave, name,
-             infotext, 1),
+    : ItemPn(attrnav, attrnav_mItemType_Parent | attrnav_mItemType_ExpandForSave, name, infotext, 1),
       m_subslot_data(subslot_data), m_parent_module_item(parent_module_item),
       m_subslot_number(subslot_number), m_is_selectable(false),
       m_attached_submodule_item(attached_submodule_item)
@@ -1671,12 +1675,12 @@ ItemPnSubslot::ItemPnSubslot(GsdmlAttrNav* attrnav, const char* name, ProfinetSu
         if (submodule.second->_SubslotNumber == m_subslot_number)
         {
           attach_submodule(submodule.second);
-          //m_attached_submodule_item = submodule.second;
+          // m_attached_submodule_item = submodule.second;
           break;
         }
       }
     }
-  
+
     // We still have no attached submodule item
     if (!m_attached_submodule_item)
     {
@@ -1688,7 +1692,8 @@ ItemPnSubslot::ItemPnSubslot(GsdmlAttrNav* attrnav, const char* name, ProfinetSu
         if (submodule_item_ref.second->_AllowedInSubslots.inList(m_subslot_number))
         {
           // First check if this is a fixed subslot
-          if (!submodule_item_ref.second->_FixedInSubslots.empty() && submodule_item_ref.second->_FixedInSubslots.inList(m_subslot_number))
+          if (!submodule_item_ref.second->_FixedInSubslots.empty() &&
+              submodule_item_ref.second->_FixedInSubslots.inList(m_subslot_number))
           {
             attach_submodule(submodule_item_ref.second->_SubmoduleItemTarget);
             m_is_selectable = false;
@@ -1703,7 +1708,7 @@ ItemPnSubslot::ItemPnSubslot(GsdmlAttrNav* attrnav, const char* name, ProfinetSu
                 submodule_item_ref.second->_UsedInSubslots.inList(m_subslot_number))
             {
               attach_submodule(submodule_item_ref.second->_SubmoduleItemTarget);
-              //m_attached_submodule_item = submodule_item.second->_SubmoduleItemTarget;
+              // m_attached_submodule_item = submodule_item.second->_SubmoduleItemTarget;
             }
           }
           else
@@ -1714,7 +1719,7 @@ ItemPnSubslot::ItemPnSubslot(GsdmlAttrNav* attrnav, const char* name, ProfinetSu
             if (submodule_item_ref.first == m_subslot_data->m_submodule_ID)
             {
               attach_submodule(submodule_item_ref.second->_SubmoduleItemTarget);
-              //m_attached_submodule_item = submodule_item.second->_SubmoduleItemTarget;
+              // m_attached_submodule_item = submodule_item.second->_SubmoduleItemTarget;
             }
           }
 
@@ -1723,15 +1728,16 @@ ItemPnSubslot::ItemPnSubslot(GsdmlAttrNav* attrnav, const char* name, ProfinetSu
       }
     }
   }
-  
+
   // Okay so we have something attached, set annotations for some subslots
   if (m_attached_submodule_item)
   {
     if (m_attached_submodule_item->_ModuleInfo._Name)
-      brow_SetAnnotation(m_node, 1, m_attached_submodule_item->_ModuleInfo._Name->c_str(), m_attached_submodule_item->_ModuleInfo._Name->length());
-  } 
+      brow_SetAnnotation(m_node, 1, m_attached_submodule_item->_ModuleInfo._Name->c_str(),
+                         m_attached_submodule_item->_ModuleInfo._Name->length());
+  }
 
-  brow_SetAnnotPixmap(m_node, 0, m_closed_annotation);  
+  brow_SetAnnotPixmap(m_node, 0, m_closed_annotation);
   brow_SetAnnotation(m_node, 0, m_name.c_str(), m_name.length());
 }
 
@@ -1778,7 +1784,9 @@ int ItemPnSubslot::open_children_impl()
   // This is a subslot in which you can select different submodules
   if (m_is_selectable)
   {
-    new ItemPnSubmoduleSelection(m_attrnav, "Submodule Selection", m_parent_module_item, m_subslot_data, &m_subslot_data->m_submodule_ID, m_node, flow_eDest_IntoLast, "Select a submodule to go into this subslot...");
+    new ItemPnSubmoduleSelection(m_attrnav, "Submodule Selection", m_parent_module_item, m_subslot_data,
+                                 &m_subslot_data->m_submodule_ID, m_node, flow_eDest_IntoLast,
+                                 "Select a submodule to go into this subslot...");
   }
 
   // Do we have an attached submodule in this slot?
@@ -1979,20 +1987,20 @@ int ItemPnDAP::open_children_impl()
       }
     }
 
-    // If we have physical subslots, we add them. If we don't we should have the rest in the systemdefined list
+    // If we have physical subslots, we add them. If we don't we should have the rest in the systemdefined
+    // list
     if (!dap->_PhysicalSubslots.empty())
     {
       for (auto it = dap->_PhysicalSubslots.begin(); it != dap->_PhysicalSubslots.end(); ++it)
-      {    
+      {
         std::ostringstream subslot_name("Subslot ", std::ios_base::ate);
         subslot_name << it.value();
 
-        new ItemPnSubslot(m_attrnav, subslot_name.str().c_str(),
-                          &m_slotdata->m_subslot_map[it.value()], dap, it.value(),
-                          nullptr, m_node, flow_eDest_IntoLast, "Physical subslot of the DAP.");
+        new ItemPnSubslot(m_attrnav, subslot_name.str().c_str(), &m_slotdata->m_subslot_map[it.value()], dap,
+                          it.value(), nullptr, m_node, flow_eDest_IntoLast, "Physical subslot of the DAP.");
       }
     }
-    
+
     // Add timing properties
     new ItemPnTimingProperties(m_attrnav, "Timing Properties", dap, m_node, flow_eDest_IntoLast);
   }
@@ -2507,7 +2515,11 @@ void ItemPnModuleSelection::select(ItemPnValueSelectItem<std::string>* selected_
                        module->_ModuleInfo._Name->length());
   }
 
-  slot->close(m_attrnav, 0, 0, true); // Close AND reopen  
+  // Set this slot to modified state. Will be used to check if we should try to create channels.
+  // If there's already channels present and we modify a slot the user will get a notification.
+  slot->m_slot_data->m_is_modified = true;
+
+  slot->close(m_attrnav, 0, 0, true); // Close AND reopen
 }
 
 void ItemPnModuleSelection::setup_node()
@@ -2560,13 +2572,14 @@ void ItemPnModuleSelection::scan_impl(ItemPnValueSelectItem<std::string> const* 
 
 /* ======================================= Submodule Selection node ======================================= */
 
-ItemPnSubmoduleSelection::ItemPnSubmoduleSelection(GsdmlAttrNav* attrnav, const char* name, std::shared_ptr<GSDML::ModuleItem> module_item, ProfinetSubslot* subslot_data,
-                                             std::string* id_value_p, brow_tNode dest, flow_eDest dest_code,
-                                             const char* infotext)
+ItemPnSubmoduleSelection::ItemPnSubmoduleSelection(GsdmlAttrNav* attrnav, const char* name,
+                                                   std::shared_ptr<GSDML::ModuleItem> module_item,
+                                                   ProfinetSubslot* subslot_data, std::string* id_value_p,
+                                                   brow_tNode dest, flow_eDest dest_code,
+                                                   const char* infotext)
     : ValueSelection<std::string>(attrnav, attrnav_mItemType_Parent, name, infotext, dest, dest_code,
                                   id_value_p),
-      m_module_item(module_item),
-      m_subslot_data(subslot_data)
+      m_module_item(module_item), m_subslot_data(subslot_data)
 {
   m_closed_annotation = m_attrnav->brow->pixmap_attrenum;
   setup_node();
@@ -2575,8 +2588,9 @@ ItemPnSubmoduleSelection::ItemPnSubmoduleSelection(GsdmlAttrNav* attrnav, const 
 int ItemPnSubmoduleSelection::open_children_impl()
 {
   // Add selection for "No Module"
-  new ItemPnValueSelectItem<std::string>(m_attrnav, "No Submodule", "", this, &m_subslot_data->m_submodule_ID, "",
-                                         "Select to remove the submodule from this subslot", m_node, flow_eDest_IntoLast);
+  new ItemPnValueSelectItem<std::string>(m_attrnav, "No Submodule", "", this, &m_subslot_data->m_submodule_ID,
+                                         "", "Select to remove the submodule from this subslot", m_node,
+                                         flow_eDest_IntoLast);
   for (auto const& submodule : m_module_item->_UseableSubmodules)
   {
     std::string submodule_name = *submodule.second->_SubmoduleItemTarget->_ModuleInfo._Name;
@@ -2585,7 +2599,7 @@ int ItemPnSubmoduleSelection::open_children_impl()
                            << (submodule.second->_SubmoduleItemTarget->_ModuleInfo._OrderNumber.empty()
                                    ? *submodule.second->_SubmoduleItemTarget->_ModuleInfo._Name
                                    : submodule.second->_SubmoduleItemTarget->_ModuleInfo._OrderNumber)
-                           << ">"; 
+                           << ">";
     std::string infotext;
     if (submodule.second->_SubmoduleItemTarget->_ModuleInfo._InfoText)
       infotext = *submodule.second->_SubmoduleItemTarget->_ModuleInfo._InfoText;
@@ -2594,8 +2608,9 @@ int ItemPnSubmoduleSelection::open_children_impl()
 
     if (submodule.second->_AllowedInSubslots.inList(m_subslot_data->m_subslot_number))
     {
-      new ItemPnValueSelectItem<std::string>(m_attrnav, submodule_name.c_str(), submodule_order_number.str().c_str(), this, &m_subslot_data->m_submodule_ID, submodule.first,
-                                         infotext.c_str(), m_node, flow_eDest_IntoLast);
+      new ItemPnValueSelectItem<std::string>(
+          m_attrnav, submodule_name.c_str(), submodule_order_number.str().c_str(), this,
+          &m_subslot_data->m_submodule_ID, submodule.first, infotext.c_str(), m_node, flow_eDest_IntoLast);
     }
   }
 
@@ -2630,7 +2645,7 @@ void ItemPnSubmoduleSelection::select(ItemPnValueSelectItem<std::string>* select
                        submodule->_ModuleInfo._Name->length());
   }
 
-  subslot->close(m_attrnav, 0, 0, true); // Close AND reopen  
+  subslot->close(m_attrnav, 0, 0, true); // Close AND reopen
 }
 
 void ItemPnSubmoduleSelection::setup_node()
@@ -2717,7 +2732,7 @@ void ItemPnEnumRTClass::select(ItemPnValueSelectItem<std::string>* selected_item
   brow_GetUserData(parent_node, &parent);
 
   // Bold move but we're pretty confident what our parent actually is...
-  ItemPnSubslot* subslot = (ItemPnSubslot*)parent;  
+  ItemPnSubslot* subslot = (ItemPnSubslot*)parent;
   subslot->close(m_attrnav, 0, 0, true); // Close AND reopen
 }
 
@@ -3016,7 +3031,11 @@ ItemPnModuleClass::ItemPnModuleClass(GsdmlAttrNav* attrnav, const char* name, ui
     : ValueSelection<uint32_t>(attrnav, attrnav_mItemType_Parent, name,
                                "Choose a Pn Module to represent the data for this module. Most of "
                                "the time it's enough to choose PnModule and ProviewR will populate "
-                               "according to GSDML file.",
+                               "according to GSDML file.\nRemember that if you do change the module class"
+                               "the module and all channel items underneath it will be removed, and the"
+                               "module will of course be replaced with the new module class object. Keep"
+                               "that in mind. Maybe what you want is to move the channel items before"
+                               "applying this new configuration in order to \"save\" the io connections.",
                                dest, dest_code, pwr_pn_value_p)
 {
   m_closed_annotation = attrnav->brow->pixmap_attrenum;

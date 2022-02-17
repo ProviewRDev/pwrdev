@@ -241,7 +241,7 @@ void GsdmlAttr::activate_cmd_apply()
   {
     sts = (save_cb)(parent_ctx);
     if (EVEN(sts))
-      message('E', "Error saving profinet runtime data");
+      message('E', "Error creating modules/channels.");
     else
       attrnav->set_modified(false);
   }
