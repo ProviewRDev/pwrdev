@@ -65,6 +65,7 @@ typedef enum
 } gsdmldata_eTag;
 
 GsdmlSlotData* GsdmlDeviceData::paste_slotdata = 0;
+ProfinetSlot* ProfinetRuntimeData::m_paste_slotdata = 0;
 
 GsdmlExtChannelDiag::GsdmlExtChannelDiag() : error_type(0)
 {
@@ -262,11 +263,7 @@ int GsdmlDeviceData::print(const char* filename)
 
 ProfinetExtChannelDiag::ProfinetExtChannelDiag(pugi::xml_node&& p_ExtChannelDiag)
   : m_name(p_ExtChannelDiag.attribute("Name").as_string()),
-    m_help(p_ExtChannelDiag.attribute("Help").as_string())
-{
-  // strncpy(m_name, p_ExtChannelDiag.attribute("Name").as_string(), sizeof(pwr_tString256)); // No null-termination if size > 256
-  // strncpy(m_help, p_ExtChannelDiag.attribute("Help").as_string(), sizeof(pwr_tString256)); // No null-termination if size > 256
-}
+    m_help(p_ExtChannelDiag.attribute("Help").as_string()) { }
 
 void ProfinetExtChannelDiag::build(pugi::xml_node&& p_ext_channel_diag, uint p_error_type) const
 {
@@ -280,9 +277,6 @@ ProfinetChannelDiag::ProfinetChannelDiag(pugi::xml_node&& p_ChannelDiag)
   : m_name(p_ChannelDiag.attribute("Name").as_string()),
     m_help(p_ChannelDiag.attribute("Help").as_string())  
 {
-  // strncpy(m_name, p_ChannelDiag.attribute("Name").as_string(), sizeof(pwr_tString256)); // No null-termination if size > 256
-  // strncpy(m_help, p_ChannelDiag.attribute("Help").as_string(), sizeof(pwr_tString256)); // No null-termination if size > 256
-
   for (pugi::xml_node& ext_channel_diag : p_ChannelDiag.children("ExtChannelDiag"))
   {
     m_ext_channel_diag_map.emplace(ext_channel_diag.attribute("ErrorType").as_uint(), std::move(ProfinetExtChannelDiag(std::move(ext_channel_diag))));
@@ -303,9 +297,7 @@ void ProfinetChannelDiag::build(pugi::xml_node&& p_channel_diag, uint p_error_ty
 }
 
 ProfinetIOCR::ProfinetIOCR(pugi::xml_node&& p_IOCR)
-  : //m_type(p_IOCR.attribute("Type").as_uint()),
-    //m_properties(p_IOCR.attribute("Properties").as_uint()),
-    m_send_clock_factor(p_IOCR.attribute("SendClockFactor").as_uint()),
+  : m_send_clock_factor(p_IOCR.attribute("SendClockFactor").as_uint()),
     m_reduction_ratio(p_IOCR.attribute("ReductionRatio").as_uint()),
     m_phase(p_IOCR.attribute("Phase").as_uint()),
     m_api(p_IOCR.attribute("API").as_uint()),
@@ -317,9 +309,7 @@ ProfinetIOCR::ProfinetIOCR(pugi::xml_node&& p_IOCR)
 
 void ProfinetIOCR::build(pugi::xml_node&& p_iocr) const
 {
-  // Attributes
-  //p_iocr.append_attribute("Type").set_value(m_type);
-  //p_iocr.append_attribute("Properties").set_value(m_properties);
+  // Attributes  
   p_iocr.append_attribute("SendClockFactor").set_value(m_send_clock_factor);
   p_iocr.append_attribute("ReductionRatio").set_value(m_reduction_ratio);
   p_iocr.append_attribute("Phase").set_value(m_phase);
@@ -329,20 +319,15 @@ void ProfinetIOCR::build(pugi::xml_node&& p_iocr) const
 }
 
 ProfinetDataRecord::ProfinetDataRecord(pugi::xml_node&& p_DataRecord)
-  : //m_record_idx(0),
-  m_data_length(p_DataRecord.attribute("DataLength").as_uint()),
-  m_index(p_DataRecord.attribute("Index").as_uint()),
-  m_transfer_sequence(p_DataRecord.attribute("TransferSequence").as_uint())
+  : m_data_length(p_DataRecord.attribute("DataLength").as_uint()),
+    m_index(p_DataRecord.attribute("Index").as_uint()),
+    m_transfer_sequence(p_DataRecord.attribute("TransferSequence").as_uint())
 {
   m_data = new unsigned char[m_data_length]();
   
   // Lets parse it...
   std::istringstream buf(p_DataRecord.attribute("Data").as_string(),
                          std::ios_base::in);
-    
-// #if (pwr_dHost_byteOrder == pwr_dLittleEndian)  
-//   size_t offset = m_data_length - 1;
-// #endif       
 
   std::string value;
   unsigned int byte; // We need this to be a uint
@@ -351,19 +336,13 @@ ProfinetDataRecord::ProfinetDataRecord(pugi::xml_node&& p_DataRecord)
   {
     std::istringstream val(value, std::ios_base::in);
     val.seekg(2); // Skip the 0x part
-    val >> std::hex >> byte;
-
-  //#if (pwr_dHost_byteOrder == pwr_dLittleEndian)
-  //  *(m_data + offset - pos++) = (unsigned char)byte;    
-  //#else
-    *(m_data + pos++) = (unsigned char)byte;    
-  //#endif
+    val >> std::hex >> byte;  
+    *(m_data + pos++) = (unsigned char)byte;
   }
 }
 
 ProfinetDataRecord::ProfinetDataRecord(ProfinetDataRecord&& o)
-  : //m_record_idx(0),
-    m_data(o.m_data),
+  : m_data(o.m_data),
     m_data_length(o.m_data_length),
     m_index(o.m_index),
     m_transfer_sequence(o.m_transfer_sequence)
@@ -380,17 +359,10 @@ void ProfinetDataRecord::build(pugi::xml_node&& p_data_record) const
   
   std::ostringstream buf(std::ios_base::out);
   size_t offset = 0;  
-// #if (pwr_dHost_byteOrder == pwr_dLittleEndian)
-//   offset = m_data_length - 1;
-// #endif
 
   for (size_t pos = 0; pos < m_data_length; pos++)
-  {    
-  // #if (pwr_dHost_byteOrder == pwr_dLittleEndian)
-  //   buf << "0x" << std::hex << std::setfill('0') << std::setw(2) << std::right << +(*(m_data + offset - pos));
-  // #else
-    buf << "0x" << std::hex << std::setfill('0') << std::setw(2) << std::right << +(*(m_data + offset + pos));
-  //#endif
+  {      
+    buf << "0x" << std::hex << std::setfill('0') << std::setw(2) << std::right << +(*(m_data + offset + pos));  
     if (pos != (m_data_length - 1)) buf << ",";    
   }
 
@@ -407,35 +379,43 @@ ProfinetDataRecord::~ProfinetDataRecord()
 }
 
 ProfinetSubslot::ProfinetSubslot(pugi::xml_node&& p_Subslot)
-  : m_subslot_number(p_Subslot.attribute("SubslotNumber").as_uint()),
-   // m_subslot_idx(0), // Used in the configurator
-   // m_submodule_enum_number(p_Subslot.attribute("SubmoduleEnumNumber").as_uint()),
+  : m_subslot_number(p_Subslot.attribute("SubslotNumber").as_uint()),   
     m_submodule_ident_number(p_Subslot.attribute("SubmoduleIdentNumber").as_uint()),
     m_io_input_length(p_Subslot.attribute("IOInputLength").as_uint()),
     m_io_output_length(p_Subslot.attribute("IOOutputLength").as_uint()),
     m_submodule_ID(p_Subslot.attribute("ID").as_string())
 {
   for (pugi::xml_node& data_record : p_Subslot.children("DataRecord"))
-  {
-    //m_data_record_list.push_back(std::move(ProfinetDataRecord(std::move(data_record))));
+  {    
     uint index = data_record.attribute("Index").as_uint();    
     m_data_record_map.emplace(index, ProfinetDataRecord(std::move(data_record)));
   }
 }
 
-// ProfinetSubslot& ProfinetSubslot::operator=(ProfinetSubslot const& other)
-// {
-//   if (this == &other)
-//     return *this;
+ProfinetSubslot::ProfinetSubslot(ProfinetSubslot const& other)
+{
+  // Deep copy record data otherwise we will be modifying the same data references when we start copy slots
+  for (auto const& data_record : other.m_data_record_map)
+  {
+    m_data_record_map[data_record.first].m_data = new unsigned char[data_record.second.m_data_length]();
+    memcpy(m_data_record_map[data_record.first].m_data, data_record.second.m_data, data_record.second.m_data_length);
+    
+    m_data_record_map[data_record.first].m_data_length = data_record.second.m_data_length;
+    m_data_record_map[data_record.first].m_index = data_record.second.m_index;
+    m_data_record_map[data_record.first].m_transfer_sequence = data_record.second.m_transfer_sequence;
+  }
 
-//   return *this;
-// }
+  m_io_input_length = other.m_io_input_length;
+  m_io_output_length = other.m_io_output_length;
+  m_submodule_ID = other.m_submodule_ID;
+  m_submodule_ident_number = other.m_submodule_ident_number;
+  m_subslot_number = other.m_subslot_number;
+}
 
 void ProfinetSubslot::build(pugi::xml_node&& p_subslot) const
 {
   // Attributes
-  p_subslot.append_attribute("SubslotNumber").set_value(m_subslot_number);
-  //p_subslot.append_attribute("SubmoduleEnumNumber").set_value(m_submodule_enum_number);
+  p_subslot.append_attribute("SubslotNumber").set_value(m_subslot_number);  
   p_subslot.append_attribute("SubmoduleIdentNumber").set_value(m_submodule_ident_number);
   p_subslot.append_attribute("IOInputLength").set_value(m_io_input_length);
   p_subslot.append_attribute("IOOutputLength").set_value(m_io_output_length);
@@ -445,8 +425,7 @@ void ProfinetSubslot::build(pugi::xml_node&& p_subslot) const
   for (auto const& datarecord : m_data_record_map)
   {
     datarecord.second.build(p_subslot.append_child("DataRecord"));
-  }
-  
+  }  
 }
 
 void ProfinetSubslot::reset()
@@ -458,48 +437,45 @@ void ProfinetSubslot::reset()
 }
 
 ProfinetSlot::ProfinetSlot(pugi::xml_node&& p_Slot)
-  : //m_module_enum_number(p_Slot.attribute("ModuleEnumNumber").as_uint()),
-    m_module_ident_number(p_Slot.attribute("ModuleIdentNumber").as_uint()),
-    m_module_class(p_Slot.attribute("ModuleClass").as_uint()),
-    //m_dap_fixed_slot(p_Slot.attribute("DapFixedInSlot").as_uint()),
-    //m_module_text(p_Slot.attribute("ModuleText").as_string()),    
+  : m_module_ident_number(p_Slot.attribute("ModuleIdentNumber").as_uint()),
+    m_module_class(p_Slot.attribute("ModuleClass").as_uint()),    
     m_module_ID(p_Slot.attribute("ModuleID").as_string()),
     m_slot_number(p_Slot.attribute("SlotNumber").as_uint()),    
     m_module_oid(pwr_cNOid),
     m_is_modified(false)
 {
-  //strncpy(m_module_text, p_Slot.attribute("ModuleText").as_string(), sizeof(pwr_tString256));
-
   for (pugi::xml_node& subslot : p_Slot.children("Subslot"))
   {
-    uint subslot_number = subslot.attribute("SubslotNumber").as_uint();    
-    //m_subslot_list.push_back(ProfinetSubslot(std::move(subslot)));
+    uint subslot_number = subslot.attribute("SubslotNumber").as_uint();     
     m_subslot_map.emplace(subslot_number, ProfinetSubslot(std::move(subslot)));
   }
 }
 
-// ProfinetSlot& ProfinetSlot::operator=(ProfinetSlot const& other)
-// {
-//   if (this == &other)
-//     return *this;
-
-//   m_module_ident_number = other.m_module_ident_number;
-//   m_module_oid = other.m_module_oid;
-//   m_slot_number = other.m_slot_number;
+ProfinetSlot& ProfinetSlot::operator=(ProfinetSlot const& other)
+{
+  if (this == &other)
+    return *this;
   
-//   return *this;
-// }
+  m_api = other.m_api;
+  m_is_modified = true;
+  m_module_class = other.m_module_class;
+  m_module_ID = other.m_module_ID;
+  m_module_ident_number = other.m_module_ident_number;
+  m_module_oid = other.m_module_oid; // Not really used in the configurator
+  // Ignore slot_number since it should stay unchanged...
+
+  m_subslot_map = other.m_subslot_map;
+
+  return *this;
+}
 
 void ProfinetSlot::build(pugi::xml_node&& p_slot) const
 {
-  // Attributes
-  //p_slot.append_attribute("ModuleEnumNumber").set_value(m_module_enum_number);
+  // Attributes  
   p_slot.append_attribute("ModuleIdentNumber").set_value(m_module_ident_number);
-  p_slot.append_attribute("ModuleClass").set_value(m_module_class);
-  //p_slot.append_attribute("ModuleText").set_value(m_module_text);
+  p_slot.append_attribute("ModuleClass").set_value(m_module_class);  
   p_slot.append_attribute("ModuleID").set_value(m_module_ID.c_str());
-  p_slot.append_attribute("SlotNumber").set_value(m_slot_number);
-  //p_slot.append_attribute("DapFixedInSlot").set_value(m_dap_fixed_slot);
+  p_slot.append_attribute("SlotNumber").set_value(m_slot_number);  
 
   // Subslots
   for (auto const& subslot : m_subslot_map)
@@ -513,13 +489,7 @@ ProfinetNetworkSettings::ProfinetNetworkSettings(pugi::xml_node&& p_PnNetworkSet
     m_ip_address(p_PnNetworkSettings.attribute("IP_Address").as_string()),
     m_subnet_mask(p_PnNetworkSettings.attribute("SubnetMask").as_string()),
     m_mac_address(p_PnNetworkSettings.attribute("MAC_Address").as_string()),
-    m_skip_ip_assignment(p_PnNetworkSettings.attribute("Skip_IP_Assignment").as_bool())
-{
-  // strncpy(m_device_name, p_PnNetworkSettings.attribute("DeviceName").as_string(), sizeof(pwr_tString256));
-  // strncpy(m_ip_address, p_PnNetworkSettings.attribute("IP_Address").as_string(), sizeof(pwr_tString256));
-  // strncpy(m_subnet_mask, p_PnNetworkSettings.attribute("SubnetMask").as_string(), sizeof(pwr_tString256));
-  // strncpy(m_mac_address, p_PnNetworkSettings.attribute("MAC_Address").as_string(), sizeof(pwr_tString256));
-}
+    m_skip_ip_assignment(p_PnNetworkSettings.attribute("Skip_IP_Assignment").as_bool()) { }
 
 void ProfinetNetworkSettings::build(pugi::xml_node&& p_network_settings) const
 {
@@ -531,9 +501,7 @@ void ProfinetNetworkSettings::build(pugi::xml_node&& p_network_settings) const
 }
 
 ProfinetDevice::ProfinetDevice(pugi::xml_node&& p_pn_device)
-  : m_gsdml_source_file(p_pn_device.attribute("GSDML_Source").as_string()),
-    //m_pn_runtime_conf_file(p_pn_device.attribute("GsdmlFile").as_string()),
-    //m_device_num(p_pn_device.attribute("DeviceNumber").as_uint()),    
+  : m_gsdml_source_file(p_pn_device.attribute("GSDML_Source").as_string()),    
     m_moduleinfo_name(p_pn_device.attribute("ModuleInfoName").as_string()),
     m_DAP_ID(p_pn_device.attribute("DAP_ID").as_string()),
     m_vendor_id(p_pn_device.attribute("VendorId").as_uint()),
@@ -542,19 +510,10 @@ ProfinetDevice::ProfinetDevice(pugi::xml_node&& p_pn_device)
     m_NetworkSettings(p_pn_device.child("NetworkSettings")),
     m_IOCR(p_pn_device.child("IOCR"))
 {
-  //strncpy(m_pn_runtime_conf_file, p_pn_device.attribute("GsdmlFile").as_string(), sizeof(pwr_tString256));
-  //strncpy(m_device_text, p_pn_device.attribute("DeviceText").as_string(), sizeof(pwr_tString256));
-  //strncpy(m_DAP_ID, p_pn_device.attribute("DAP_ID").as_string(), sizeof(pwr_tString256));
-
   for (pugi::xml_node& slot : p_pn_device.children("Slot"))
   {
     m_slot_list.push_back(ProfinetSlot(std::move(slot)));
   }
-
-  // for (pugi::xml_node& iocr : p_pn_device.children("IOCR"))
-  // {
-  //   m_iocr_list.push_back(ProfinetIOCR(std::move(iocr)));
-  // }
 
   for (pugi::xml_node& channel_diag : p_pn_device.child("Diagnostics").children("ChannelDiag"))
   {
@@ -564,13 +523,11 @@ ProfinetDevice::ProfinetDevice(pugi::xml_node&& p_pn_device)
 
 void ProfinetDevice::build(pugi::xml_node&& p_pn_device) const
 {
-  p_pn_device.append_attribute("GSDML_Source").set_value(m_gsdml_source_file.c_str());
-  //p_pn_device.append_attribute("DeviceNumber").set_value(m_device_num);
+  p_pn_device.append_attribute("GSDML_Source").set_value(m_gsdml_source_file.c_str());  
   p_pn_device.append_attribute("ModuleInfoName").set_value(m_moduleinfo_name.c_str());
   p_pn_device.append_attribute("DAP_ID").set_value(m_DAP_ID.c_str());
   p_pn_device.append_attribute("VendorId").set_value(m_vendor_id);
-  p_pn_device.append_attribute("DeviceId").set_value(m_device_id);
-  //p_pn_device.append_attribute("Version").set_value(m_version.c_str());
+  p_pn_device.append_attribute("DeviceId").set_value(m_device_id);  
 
   m_NetworkSettings.build(p_pn_device.append_child("NetworkSettings"));
 
@@ -591,9 +548,7 @@ void ProfinetDevice::build(pugi::xml_node&& p_pn_device) const
 
 void ProfinetRuntimeData::reset_to_default()
 {
-  m_PnDevice.reset(new ProfinetDevice());
-  //m_PnDevice->m_iocr_list.push_back(ProfinetIOCR());
-  //m_PnDevice->m_iocr_list.push_back(ProfinetIOCR());
+  m_PnDevice.reset(new ProfinetDevice());  
 }
 
 int ProfinetRuntimeData::read_pwr_pn_xml(std::string const& p_filename, std::string const& p_gsdml_file)

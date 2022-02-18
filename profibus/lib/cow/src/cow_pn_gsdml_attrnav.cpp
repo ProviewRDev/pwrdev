@@ -1486,7 +1486,7 @@ int ItemPnDAPSelection::scan(GsdmlAttrNav* attrnav, void* value_p)
 
 ItemPnSlot::ItemPnSlot(GsdmlAttrNav* attrnav, const char* name, ProfinetSlot* slot_data, brow_tNode dest,
                        flow_eDest dest_code, const char* infotext)
-    : ItemPn(attrnav, attrnav_mItemType_Parent | attrnav_mItemType_ExpandForSave, name, infotext),
+    : ItemPn(attrnav, attrnav_mItemType_Parent | attrnav_mItemType_ExpandForSave | attrnav_mItemType_Copyable | attrnav_mItemType_Movable, name, infotext),
       m_slot_data(slot_data), m_old_value("")
 {
   m_closed_annotation = attrnav->brow->pixmap_map;

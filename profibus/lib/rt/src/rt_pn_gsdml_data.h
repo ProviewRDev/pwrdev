@@ -61,11 +61,11 @@ public:
   ProfinetDataRecord() = default;
   ProfinetDataRecord(pugi::xml_node&&);
   ProfinetDataRecord(ProfinetDataRecord&&);
-  ProfinetDataRecord(ProfinetDataRecord const&) = default;
+  ProfinetDataRecord(ProfinetDataRecord const&) = default;  
   ~ProfinetDataRecord();
+  //ProfinetDataRecord& operator=(ProfinetDataRecord const&);
   void build(pugi::xml_node&&) const;
-
-  //unsigned int m_record_idx; // Stack index....
+  
   unsigned char* m_data;
   unsigned int m_data_length;
   unsigned short m_index;
@@ -108,9 +108,7 @@ public:
   ProfinetIOCR(ProfinetIOCR const&) = delete;
   ~ProfinetIOCR() = default;
   void build(pugi::xml_node&&) const;
-
-  // unsigned short m_type; // Really needed? We could just leverage just ONE IOCR element since type is the only thing that differs, and that can be deduced based on input/output
-  // unsigned int m_properties;
+  
   unsigned short m_send_clock_factor;
   unsigned short m_reduction_ratio;
   unsigned int m_phase; // TODO Initialize to 1 ???
@@ -142,24 +140,19 @@ public:
   ProfinetSubslot() = default;
   ProfinetSubslot(pugi::xml_node&&);
   ProfinetSubslot(ProfinetSubslot&&) = default;
-  ProfinetSubslot(ProfinetSubslot const&) = delete;  
-  //ProfinetSubslot& operator=(ProfinetSubslot const&);
+  ProfinetSubslot(ProfinetSubslot const&);    
   ~ProfinetSubslot() = default;
   void build(pugi::xml_node&&) const;
   void reset();
 
   // Attributes
-  unsigned int m_subslot_number; // This is more or less fixed and is not affected by a reset
-  //unsigned int m_subslot_idx; // TODO What's this...
-  //unsigned int m_submodule_enum_number;
-  unsigned int m_submodule_ident_number;  
-  //unsigned int api;
+  unsigned int m_subslot_number; // This is more or less fixed and is not affected by a reset  
+  unsigned int m_submodule_ident_number;    
   unsigned int m_io_input_length;
   unsigned int m_io_output_length;
   std::string m_submodule_ID;
 
-  // Elements
-  //std::vector<ProfinetDataRecord> m_data_record_list;
+  // Elements  
   std::map<uint, ProfinetDataRecord> m_data_record_map; // Indexed on the actual Index attribute of the ParameterRecordDataItem
 };
 
@@ -205,21 +198,16 @@ public:
   ProfinetSlot(pugi::xml_node&&);
   ProfinetSlot(ProfinetSlot&&) = default;
   ProfinetSlot(ProfinetSlot const&) = delete;
+  ProfinetSlot& operator=(const ProfinetSlot &);
   ~ProfinetSlot() = default;
   void build(pugi::xml_node&&) const;
 
-  //unsigned int m_module_enum_number;
   unsigned int m_module_ident_number;
-
-  //unsigned int m_dap_fixed_slot;
-  pwr_tCid m_module_class;
-  //pwr_tString256 m_module_text;
+  pwr_tCid m_module_class;  
   std::string m_module_ID; // This is unique even across the same ident number
   unsigned int m_slot_number;
-  unsigned int m_api; // TODO Check if this is on device level even....
-  //unsigned int m_slot_idx; // What's this?
-  std::map<uint, ProfinetSubslot> m_subslot_map;
-  //std::vector<ProfinetSubslot> m_subslot_list;
+  unsigned int m_api; // TODO Check if this is on device level even....  
+  std::map<uint, ProfinetSubslot> m_subslot_map;  
 
   // Non saved members
   pwr_tOid m_module_oid; // Meta, never saved. Only used as temporary storage for oids when creating modules/channels
@@ -271,18 +259,6 @@ public:
   }
   int print(std::ofstream& fp, bool reverse_endianess);
 };
-
-// class GsdmlExtChannelAddValueDataItem
-// {
-// public:
-//   GsdmlExtChannelAddValueDataItem();
-//   unsigned char id;
-//   char data_type[80];
-//   unsigned short length;
-
-//   int print(std::ofstream& fp);
-// };
-
 class ProfinetExtChannelDiag
 {
 public:
@@ -306,7 +282,7 @@ public:
   unsigned short error_type;
   char name[200];
   char help[4096];
-  // std::vector<GsdmlExtChannelAddValueDataItem*> data_item;
+  // std::vector<GsdmlExtChannelAddValueDataItem*> data_item; TODO Do we want this extra level of diagnostic information available?
 
   int print(std::ofstream& fp);
 };
@@ -352,11 +328,7 @@ public:
   ProfinetNetworkSettings(ProfinetNetworkSettings const&) = delete;
   ~ProfinetNetworkSettings() = default;
   void build(pugi::xml_node&&) const;
-
-  // pwr_tString256 m_device_name;
-  // pwr_tString256 m_ip_address;
-  // pwr_tString256 m_subnet_mask;
-  // pwr_tString256 m_mac_address;
+  
   std::string m_device_name;
   std::string m_ip_address;
   std::string m_subnet_mask;
@@ -375,26 +347,17 @@ public:
   void build(pugi::xml_node&&) const;
 
   // Attributes
-  std::string m_gsdml_source_file;
-  //pwr_tString256 m_pn_runtime_conf_file; // The GSDML file this configuration is based on...
-  //std::string m_pn_runtime_conf_file; // The GSDML file this configuration is based on...
-  //int m_device_num; // Index used to map what DAP to use from the GSDML. We also use m_ID, m_ID takes preceedence if it's mapped...  
-  std::string m_moduleinfo_name; // ModuleInfo->Name in the GSDML
-  // std::string m_ID; // DAP ID to map what DAP to use from the GSDML
-  //pwr_tString256 m_device_text; // Module->Name in the GSDML
+  std::string m_gsdml_source_file;  
+  std::string m_moduleinfo_name; // ModuleInfo->Name in the GSDML  
   std::string m_DAP_ID; // DAP ID to map what DAP to use from the GSDML
   unsigned short m_vendor_id; // Part of DeviceIdentity
-  unsigned short m_device_id; // Part of DeviceIdentity
-  //std::string m_version;  
+  unsigned short m_device_id; // Part of DeviceIdentity  
 
   // Elements
   ProfinetNetworkSettings m_NetworkSettings;  
   std::vector<ProfinetSlot> m_slot_list;
   ProfinetIOCR m_IOCR;
-  std::unordered_map<uint, ProfinetChannelDiag> m_channel_diag_map;
-
-  // Misc
-  static ProfinetSlot* m_paste_slotdata;
+  std::unordered_map<uint, ProfinetChannelDiag> m_channel_diag_map;  
 };
 
 class ProfinetRuntimeData
@@ -405,8 +368,7 @@ public:
   ProfinetRuntimeData(ProfinetRuntimeData const&) = delete;
   ~ProfinetRuntimeData() = default;
   int read_pwr_pn_xml(std::string const& p_filename, std::string const& p_gsdml_file);
-  void reset_to_default();
-  //bool save_to_file(std::string&& p_filename) const;
+  void reset_to_default();  
   bool save() const;
 
   std::shared_ptr<ProfinetDevice> m_PnDevice;
@@ -415,6 +377,9 @@ public:
   bool m_gsdml_mismatch; // This will be set to true if the GSDML used is different from the one used to create the pwr_pn data.
 
   std::string m_pwr_pn_filename; // We keep a reference to the filename here. No need to pass it around...
+
+  // Misc
+  static ProfinetSlot* m_paste_slotdata;
 
   // TODO Do we need this?
   // int m_byte_order;

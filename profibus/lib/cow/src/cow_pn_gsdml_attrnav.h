@@ -184,8 +184,8 @@ public:
 
   std::shared_ptr<GSDML::DeviceAccessPointItem> m_selected_device_item;
   int device_confirm_active;
+  
   GsdmlDeviceData dev_data;
-
   std::shared_ptr<ProfinetRuntimeData> pn_runtime_data;
   int device_read;
   int viewio;

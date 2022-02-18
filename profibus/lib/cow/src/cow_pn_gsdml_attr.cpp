@@ -108,13 +108,17 @@ void GsdmlAttr::activate_copy()
   sts = attrnav->get_select((ItemPn**)&item);
   if (EVEN(sts))
   {
-    message('E', "Select a module");
+    message('W', "Nothing selected");
     return;
   }
 
-  if (item->m_type != attrnav_mItemType_Copyable)
+  if (item->m_type & attrnav_mItemType_Copyable)
   {
-    message('E', "Only slots can be copied");
+    ProfinetRuntimeData::m_paste_slotdata = item->m_slot_data;
+  }
+  else
+  {
+    message('E', "You can only copy slots!");
     return;
   }
 
@@ -159,14 +163,16 @@ void GsdmlAttr::activate_paste()
     return;
   }
 
-  if (item->m_type != attrnav_mItemType_Movable)
+  if (item->m_type & attrnav_mItemType_Movable)
+  {    
+    attrnav->pn_runtime_data->m_PnDevice->m_slot_list[item->m_slot_data->m_slot_number] = *ProfinetRuntimeData::m_paste_slotdata;
+  }
+  else
   {
     message('E', "Select a slot");
     return;
   }
 
-  // TODO Fix paste!
-  //attrnav->dev_data.paste_slot(item->slotdata->slot_idx);
   attrnav->redraw();
 }
 
