@@ -188,13 +188,6 @@ void GsdmlAttrGtk::activate_copy(GtkWidget* w, gpointer data)
   attr->activate_copy();
 }
 
-void GsdmlAttrGtk::activate_cut(GtkWidget* w, gpointer data)
-{
-  GsdmlAttr* attr = (GsdmlAttr*)data;
-
-  attr->activate_cut();
-}
-
 void GsdmlAttrGtk::activate_paste(GtkWidget* w, gpointer data)
 {
   GsdmlAttr* attr = (GsdmlAttr*)data;
@@ -383,11 +376,6 @@ GsdmlAttrGtk::GsdmlAttrGtk(GtkWidget* a_parent_wid, void* a_parent_ctx,
   gtk_widget_add_accelerator(menubutton_copy, "activate", accel_g, 'c',
       GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
 
-  menubutton_cut = gtk_menu_item_new_with_mnemonic("C_ut");
-  g_signal_connect(menubutton_cut, "activate", G_CALLBACK(activate_cut), this);
-  gtk_widget_add_accelerator(menubutton_cut, "activate", accel_g, 'x',
-      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
-
   menubutton_paste =
       gtk_menu_item_new_with_mnemonic("P_aste");
   g_signal_connect(menubutton_paste, "activate", G_CALLBACK(activate_paste),
@@ -404,8 +392,7 @@ GsdmlAttrGtk::GsdmlAttrGtk(GtkWidget* a_parent_wid, void* a_parent_ctx,
                    this);
 
   GtkMenu* edit_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
-  gtk_menu_shell_append(GTK_MENU_SHELL(edit_menu), menubutton_copy);
-  gtk_menu_shell_append(GTK_MENU_SHELL(edit_menu), menubutton_cut);
+  gtk_menu_shell_append(GTK_MENU_SHELL(edit_menu), menubutton_copy);  
   gtk_menu_shell_append(GTK_MENU_SHELL(edit_menu), menubutton_paste);
   gtk_menu_shell_append(GTK_MENU_SHELL(edit_menu), edit_collapse);
   gtk_menu_shell_append(GTK_MENU_SHELL(edit_menu), edit_expand_all);
@@ -593,8 +580,7 @@ GsdmlAttrGtk::GsdmlAttrGtk(GtkWidget* a_parent_wid, void* a_parent_ctx,
   {
     gtk_widget_set_sensitive(cmd_ok, FALSE);
     gtk_widget_set_sensitive(cmd_apply, FALSE);
-    gtk_widget_set_sensitive(menubutton_copy, FALSE);
-    gtk_widget_set_sensitive(menubutton_cut, FALSE);
+    gtk_widget_set_sensitive(menubutton_copy, FALSE);    
     gtk_widget_set_sensitive(menubutton_paste, FALSE);
     gtk_widget_set_sensitive(menubutton_changevalue, FALSE);
   }

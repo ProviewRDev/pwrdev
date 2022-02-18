@@ -114,42 +114,20 @@ void GsdmlAttr::activate_copy()
 
   if (item->m_type & attrnav_mItemType_Copyable)
   {
+    // Save a static reference, enabling us to copy between different devices across different configurators.
+    // The slots themself will reset if they do not find the ID. I.e. you copy from an ET200SP to
+    // an ABB Frequency Converter :D It's stupid but still safe...
     ProfinetRuntimeData::m_paste_slotdata = item->m_slot_data;
   }
   else
   {
     message('E', "You can only copy slots!");
     return;
-  }
-
-  // TODO FIx copying!
-  //attrnav->dev_data.copy_slot(item->slotdata->slot_idx);
+  } 
 
   message('I', "Slot copied");
 }
 
-void GsdmlAttr::activate_cut()
-{
-  ItemPnSlot* item;
-  int sts;
-
-  sts = attrnav->get_select((ItemPn**)&item);
-  if (EVEN(sts))
-  {
-    message('E', "Select a slot");
-    return;
-  }
-
-  if (item->m_type != attrnav_mItemType_Movable)
-  {
-    message('E', "Only slots can be cut");
-    return;
-  }
-
-  // TODO Fix Cutting
-  //attrnav->dev_data.cut_slot(item->slotdata->slot_idx);
-  attrnav->redraw();
-}
 
 void GsdmlAttr::activate_paste()
 {
@@ -165,6 +143,7 @@ void GsdmlAttr::activate_paste()
 
   if (item->m_type & attrnav_mItemType_Movable)
   {    
+    // Copy assignment constructor of ProfinetSlot will invoke ProfinetSubslot copy constructor to deep copy the data
     attrnav->pn_runtime_data->m_PnDevice->m_slot_list[item->m_slot_data->m_slot_number] = *ProfinetRuntimeData::m_paste_slotdata;
   }
   else

@@ -95,8 +95,7 @@ public:
   void activate_ordermoduletype(attr_eOrderModuleType type);
   void activate_exit();
   void activate_help();
-  void activate_copy();
-  void activate_cut();
+  void activate_copy();  
   void activate_paste();
   void activate_print();
   void activate_viewio(int set);

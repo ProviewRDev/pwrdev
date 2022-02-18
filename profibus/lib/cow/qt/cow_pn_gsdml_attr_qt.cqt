@@ -154,11 +154,6 @@ void GsdmlAttrQtWidget::activate_copy()
   attr->activate_copy();
 }
 
-void GsdmlAttrQtWidget::activate_cut()
-{
-  attr->activate_cut();
-}
-
 void GsdmlAttrQtWidget::activate_paste()
 {
   attr->activate_paste();
@@ -274,9 +269,7 @@ GsdmlAttrQt::GsdmlAttrQt(void* a_parent_ctx, void* a_object, pn_gsdml* a_gsdml,
   // Edit entry
   QMenu* edit = menu_bar->addMenu(translate_utf8("&Edit"));
   menubutton_copy = addMenuItem(
-      toplevel, edit, "&Copy", SLOT(activate_copy()), "CTRL+C", "edit-copy");
-  menubutton_cut = addMenuItem(
-      toplevel, edit, "&Cut", SLOT(activate_cut()), "CTRL+X", "edit-cut");
+      toplevel, edit, "&Copy", SLOT(activate_copy()), "CTRL+C", "edit-copy");  
   menubutton_paste = addMenuItem(
       toplevel, edit, "&Paste", SLOT(activate_paste()), "CTRL+V", "edit-paste");
   addMenuItem(toplevel, edit, "C&ollapse", SLOT(activate_collapse()));
@@ -367,8 +360,7 @@ GsdmlAttrQt::GsdmlAttrQt(void* a_parent_ctx, void* a_object, pn_gsdml* a_gsdml,
   if (!edit_mode) {
     buttons->button(QDialogButtonBox::Ok)->setEnabled(false);
     buttons->button(QDialogButtonBox::Apply)->setEnabled(false);
-    menubutton_copy->setEnabled(false);
-    menubutton_cut->setEnabled(false);
+    menubutton_copy->setEnabled(false);    
     menubutton_paste->setEnabled(false);
     menubutton_changevalue->setEnabled(false);
   }
