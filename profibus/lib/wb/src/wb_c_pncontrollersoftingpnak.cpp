@@ -38,6 +38,8 @@
  * PnControllerSoftingPNAK class. */
 
 #include <string.h>
+#include <iostream>
+#include <sstream>
 
 #include "pwr_baseclasses.h"
 #include "pwr_profibusclasses.h"
@@ -48,6 +50,8 @@
 #include "wb_pwrb_msg.h"
 #include "wb_session.h"
 #include "wb_wsx.h"
+
+#include "cow_msgwindow.h"
 
 //
 //  Syntax check.
@@ -62,10 +66,38 @@ static pwr_tStatus SyntaxCheck(ldh_tSesContext Session,
   return wsx_CheckIoDevice(Session, Object, ErrorCount, WarningCount,
                            wsx_mCardOption_None);
 }
+/*
+  Called when the user removes a child of the PnControllerSoftingPNAK.
+  We use it to remove the configuration file for this device.
+*/
+static pwr_tStatus PostUnadopt(
+    ldh_tSesContext Session, pwr_tOid Object, pwr_tOid Source, pwr_tCid Class)
+{
+  
+  if (cdh_ObjidIsNotNull(Source))
+  {
+    std::string oid_string(cdh_ObjidToFnString(0, Source));
+    std::ostringstream pwr_pn_filename(std::ios_base::out);
+    std::ostringstream rm_cmd(std::ios_base::out);
+
+    pwr_pn_filename << "$pwrp_load/pwr_pn_" << oid_string << ".xml";
+    std::cout << "-- Delete " << pwr_pn_filename.str() << std::endl;
+    rm_cmd << "rm -f " << pwr_pn_filename.str();
+    if (system(rm_cmd.str().c_str()) != EXIT_SUCCESS)
+    {
+      std::ostringstream msg(std::ios_base::out);
+      msg << "Could not delete " << pwr_pn_filename.str() << "! You have to do it manually.";
+      MsgWindow::message('E', msg.str().c_str());           
+    }
+  }
+  
+  return PWRB__SUCCESS;
+}
 
 //
 //  Every method to be exported to the workbench should be registred here.
 //
 
 pwr_dExport pwr_BindMethods(PnControllerSoftingPNAK) = {
-    pwr_BindMethod(SyntaxCheck), pwr_NullMethod};
+    pwr_BindMethod(SyntaxCheck), pwr_BindMethod(PostUnadopt),
+    pwr_NullMethod};
