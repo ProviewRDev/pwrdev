@@ -1291,9 +1291,56 @@ ItemPnInfo::ItemPnInfo(GsdmlAttrNav* attrnav, const char* name, const char* trac
   brow_SetAnnotPixmap(m_node, 0, m_closed_annotation);
   brow_SetAnnotation(m_node, 0, m_name.c_str(), m_name.length());
 
-  std::string value = GSDML::attr_value_to_string(m_pwr_type_id, value_p);
+  std::string value = value_to_string(m_pwr_type_id, value_p);
 
   brow_SetAnnotation(m_node, 1, value.c_str(), value.length());
+}
+
+std::string ItemPnInfo::value_to_string(int type_id, void const* value_ptr)
+{
+  std::ostringstream result(std::ios_base::out);
+
+  if (value_ptr == 0)
+  {
+    result << "Undefined (Null pointer argument)";
+    return result.str();
+  }
+
+  switch (type_id)
+  {
+  case pwr_eType_Boolean:
+    result << (*(pwr_tBoolean*)value_ptr ? "Yes" : "No");
+    break;
+  case pwr_eType_Float32:
+    result << *(pwr_tFloat32*)value_ptr;
+    break;
+  case pwr_eType_UInt8:
+    result << *(pwr_tUInt8*)value_ptr;
+    break;
+  case pwr_eType_UInt16:
+    result << *(pwr_tUInt16*)value_ptr;
+    break;
+  case pwr_eType_UInt32:
+    result << *(pwr_tUInt32*)value_ptr;
+    break;
+  case pwr_eType_Int8:
+    result << *(pwr_tInt8*)value_ptr;
+    break;
+  case pwr_eType_Int16:
+    result << *(pwr_tInt16*)value_ptr;
+    break;
+  case pwr_eType_Int32:
+    result << *(pwr_tInt32*)value_ptr;
+    break;
+  case pwr_eType_String:
+  {
+    result << *(std::string*)value_ptr;
+    break;
+  }
+  default:;
+  }
+
+  return result.str();
 }
 
 ItemPnIDSelectValue::ItemPnIDSelectValue(GsdmlAttrNav* attrnav, const char* name,
@@ -1486,7 +1533,10 @@ int ItemPnDAPSelection::scan(GsdmlAttrNav* attrnav, void* value_p)
 
 ItemPnSlot::ItemPnSlot(GsdmlAttrNav* attrnav, const char* name, ProfinetSlot* slot_data, brow_tNode dest,
                        flow_eDest dest_code, const char* infotext)
-    : ItemPn(attrnav, attrnav_mItemType_Parent | attrnav_mItemType_ExpandForSave | attrnav_mItemType_Copyable | attrnav_mItemType_Movable, name, infotext),
+    : ItemPn(attrnav,
+             attrnav_mItemType_Parent | attrnav_mItemType_ExpandForSave | attrnav_mItemType_Copyable |
+                 attrnav_mItemType_Movable,
+             name, infotext),
       m_slot_data(slot_data), m_old_value("")
 {
   m_closed_annotation = attrnav->brow->pixmap_map;

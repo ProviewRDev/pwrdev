@@ -65,8 +65,7 @@ public:
   gsdml_sModuleClass* module_classlist;
   pwr_tFileName m_gsdml_file;
   
-  int read(const char* filename);  
-  //void set_language(const char* lang);
+  int read(const char* filename);    
   void set_classes(gsdml_sModuleClass* mclist) { module_classlist = mclist; }
 
   static int ostring_to_data(unsigned char** data, const char* str, int size,
@@ -80,9 +79,7 @@ public:
   std::unordered_map<std::string, std::shared_ptr<GSDML::SubmoduleItem>>& getSubmoduleMap();
   std::unordered_map<std::string, std::shared_ptr<GSDML::ValueItem>>& getValueMap();
   std::unordered_map<std::string, std::shared_ptr<std::string>>& getTextIdMap();  
-  std::unordered_map<std::string, std::shared_ptr<GSDML::DeviceAccessPointItem>>& getDeviceAccessPointMap();
-  //std::vector<std::shared_ptr<GSDML::DeviceAccessPointItem>>& getDeviceAccessPointList(); // For backward comaptibility used for migration to new maps...
-  //std::vector<std::shared_ptr<GSDML::ModuleItem>>& getModuleList(); // For backward comaptibility used for migration to new maps...
+  std::unordered_map<std::string, std::shared_ptr<GSDML::DeviceAccessPointItem>>& getDeviceAccessPointMap();  
 
   /*
     Utility functions for finding references
@@ -132,9 +129,7 @@ private:
   std::unordered_map<std::string, std::shared_ptr<GSDML::SubmoduleItem>> _submoduleMap;
   std::unordered_map<std::string, std::shared_ptr<GSDML::ValueItem>> _valueMap;
   std::unordered_map<std::string, std::shared_ptr<std::string>> _textIdMap;
-  std::unordered_map<std::string, std::shared_ptr<GSDML::DeviceAccessPointItem>> _deviceAccessPointMap;
-  // std::vector<std::shared_ptr<GSDML::DeviceAccessPointItem>> _deviceAccessPointList;
-  // std::vector<std::shared_ptr<GSDML::ModuleItem>> _moduleList;
+  std::unordered_map<std::string, std::shared_ptr<GSDML::DeviceAccessPointItem>> _deviceAccessPointMap;  
 };
 
 #endif

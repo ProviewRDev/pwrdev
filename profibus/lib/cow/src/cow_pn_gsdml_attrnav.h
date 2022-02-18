@@ -42,7 +42,6 @@
 #include <memory>
 #include <byteswap.h>
 
-#include "cow_pn_gsdml_util.h"
 #include "flow_browapi.h"
 #include "cow_pn_gsdml_attr.h"
 
@@ -260,6 +259,8 @@ public:
   int open_children_impl() override { return 1; } // Must override for concrete class
   bool selected_impl(GsdmlAttrNav* attrnav) override { return false; }
   bool value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override { return false; }
+
+  std::string value_to_string(int type_id, void const* value_ptr);
 };
 
 class ItemPnIDSelectValue : public ItemPn

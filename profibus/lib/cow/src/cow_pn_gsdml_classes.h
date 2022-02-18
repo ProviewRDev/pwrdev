@@ -64,6 +64,40 @@ typedef enum
   ModuleItemType__
 } eModuleItemType;
 
+template<typename T>
+T reverse_type(const T in_type )
+{
+  T return_value;
+  char *type_to_convert = ( char* ) & in_type;
+  char *return_type = ( char* ) & return_value;
+  switch(sizeof(T))
+  {
+    case 2:
+      return_type[0] = type_to_convert[1];
+      return_type[1] = type_to_convert[0];  
+      break;
+    case 4:
+      return_type[0] = type_to_convert[3];
+      return_type[1] = type_to_convert[2];
+      return_type[2] = type_to_convert[1];
+      return_type[3] = type_to_convert[0];
+      break;
+    case 8:
+      return_type[0] = type_to_convert[7];
+      return_type[1] = type_to_convert[6];
+      return_type[2] = type_to_convert[5];
+      return_type[3] = type_to_convert[4];
+      return_type[4] = type_to_convert[3];
+      return_type[5] = type_to_convert[2];
+      return_type[6] = type_to_convert[1];
+      return_type[7] = type_to_convert[0];
+      break;
+    default:
+      return_value = in_type;
+  }  
+  return return_value;
+}
+
 class Node
 {
 public:
