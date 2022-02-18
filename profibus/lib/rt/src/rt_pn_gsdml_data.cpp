@@ -534,7 +534,7 @@ ProfinetDevice::ProfinetDevice(pugi::xml_node&& p_pn_device)
   : m_gsdml_source_file(p_pn_device.attribute("GSDML_Source").as_string()),
     //m_pn_runtime_conf_file(p_pn_device.attribute("GsdmlFile").as_string()),
     //m_device_num(p_pn_device.attribute("DeviceNumber").as_uint()),    
-    //m_device_text(p_pn_device.attribute("DeviceText").as_string()),
+    m_moduleinfo_name(p_pn_device.attribute("ModuleInfoName").as_string()),
     m_DAP_ID(p_pn_device.attribute("DAP_ID").as_string()),
     m_vendor_id(p_pn_device.attribute("VendorId").as_uint()),
     m_device_id(p_pn_device.attribute("DeviceId").as_uint()),
@@ -566,7 +566,7 @@ void ProfinetDevice::build(pugi::xml_node&& p_pn_device) const
 {
   p_pn_device.append_attribute("GSDML_Source").set_value(m_gsdml_source_file.c_str());
   //p_pn_device.append_attribute("DeviceNumber").set_value(m_device_num);
-  //p_pn_device.append_attribute("DeviceText").set_value(m_device_text);
+  p_pn_device.append_attribute("ModuleInfoName").set_value(m_moduleinfo_name.c_str());
   p_pn_device.append_attribute("DAP_ID").set_value(m_DAP_ID.c_str());
   p_pn_device.append_attribute("VendorId").set_value(m_vendor_id);
   p_pn_device.append_attribute("DeviceId").set_value(m_device_id);
