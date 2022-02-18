@@ -64,17 +64,6 @@
 
 using namespace std;
 
-char* id_to_string(pwr_tOid oid)
-{
-  unsigned char vid[4];
-  static char str[40];
-
-  memcpy(&vid, &oid.vid, sizeof(vid));
-  sprintf(str, "%3.3u_%3.3u_%3.3u_%3.3u_%8.8x", vid[3], vid[2], vid[1], vid[0],
-          oid.oix);
-  return str;
-}
-
 static pwr_tStatus Configure(ldh_sMenuCall* ip)
 {
   pwr_tStatus sts;
@@ -82,8 +71,7 @@ static pwr_tStatus Configure(ldh_sMenuCall* ip)
   pwr_tFileName datafile;
 
   // Construct pwr_pn data filename
-  sprintf(datafile, "$pwrp_load/pwr_pn_%s.xml",
-          id_to_string(ip->Pointed.Objid));
+  sprintf(datafile, "$pwrp_load/pwr_pn_%s.xml", cdh_ObjidToFnString(0, ip->Pointed.Objid));
   dcli_translate_filename(datafile, datafile);
 
   sts = pndevice_create_ctx(ip->PointedSession, ip->Pointed, ip->wnav, &ctx, datafile);
@@ -132,7 +120,7 @@ static pwr_tStatus CopyDevice(ldh_sMenuCall* ip)
 
   // Check if data file exist
   sprintf(datafile_src, "$pwrp_load/pwr_pn_%s.xml",
-          id_to_string(ip->Pointed.Objid));
+          cdh_ObjidToFnString(0, ip->Pointed.Objid));
   dcli_translate_filename(datafile_src, datafile_src);
 
   sts = dcli_search_file(datafile_src, found_file, DCLI_DIR_SEARCH_INIT);
@@ -162,7 +150,7 @@ static pwr_tStatus CopyDevice(ldh_sMenuCall* ip)
   if (EVEN(sts))
     return sts;
 
-  sprintf(datafile_dest, "$pwrp_load/pwr_pn_%s.xml", id_to_string(oid));
+  sprintf(datafile_dest, "$pwrp_load/pwr_pn_%s.xml", cdh_ObjidToFnString(0, oid));
   dcli_translate_filename(datafile_dest, datafile_dest);
 
   snprintf(cmd, sizeof(cmd), "cp %s %s", datafile_src, datafile_dest);
@@ -181,7 +169,7 @@ static pwr_tStatus CopyDeviceFilter(ldh_sMenuCall* ip)
 
   // Check if data file exist
   sprintf(datafile, "$pwrp_load/pwr_pn_%s.xml",
-          id_to_string(ip->Pointed.Objid));
+          cdh_ObjidToFnString(0, ip->Pointed.Objid));
   dcli_translate_filename(datafile, datafile);
 
   sts = dcli_search_file(datafile, found_file, DCLI_DIR_SEARCH_INIT);
@@ -226,7 +214,7 @@ static pwr_tStatus GetIoDeviceData(pwr_tAttrRef Object, const char* Attr,
   pwr_tFileName datafile;
   pwr_tStatus sts;
 
-  sprintf(datafile, "$pwrp_load/pwr_pn_%s.xml", id_to_string(Object.Objid));
+  sprintf(datafile, "$pwrp_load/pwr_pn_%s.xml", cdh_ObjidToFnString(0, Object.Objid));
   dcli_translate_filename(datafile, datafile);
 
   GsdmlDeviceData* data = new GsdmlDeviceData();
@@ -250,7 +238,7 @@ static pwr_tStatus SetIoDeviceData(pwr_tAttrRef Object, const char* Attr,
   pwr_tFileName datafile;
   pwr_tStatus sts;
 
-  sprintf(datafile, "$pwrp_load/pwr_pn_%s.xml", id_to_string(Object.Objid));
+  sprintf(datafile, "$pwrp_load/pwr_pn_%s.xml", cdh_ObjidToFnString(0, Object.Objid));
   dcli_translate_filename(datafile, datafile);
 
   GsdmlDeviceData* data = new GsdmlDeviceData();
