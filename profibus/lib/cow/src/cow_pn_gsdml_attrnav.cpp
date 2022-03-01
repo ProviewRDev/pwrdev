@@ -667,7 +667,7 @@ int GsdmlAttrNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
     }
     else if (item->m_type & attrnav_mItemType_Selectable)
     {
-      item->selected();
+      item->selected(attrnav);
     }
     else if (item->m_type & attrnav_mItemType_Parent)
     {
@@ -699,7 +699,7 @@ int GsdmlAttrNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
     case flow_eObjectType_Node:
       brow_GetUserData(event->object.object, (void**)&item);
       if (item->m_type & attrnav_mItemType_Selectable)
-        item->selected();
+        item->selected(attrnav);
       break;
     default:;
     }
@@ -1229,10 +1229,11 @@ int ItemPn::open_children(GsdmlAttrNav* attrnav, double x, double y)
   return 1;
 }
 
-void ItemPn::selected()
+void ItemPn::selected(GsdmlAttrNav* attrnav)
 {
-  if (selected_impl(m_attrnav))
-    m_attrnav->set_modified(true);
+
+  if (selected_impl(attrnav))
+    attrnav->set_modified(true);
 }
 
 void ItemPn::value_changed(GsdmlAttrNav* attrnav, const char* value_str)

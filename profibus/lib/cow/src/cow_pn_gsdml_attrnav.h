@@ -225,7 +225,7 @@ public:
   // The item is selected, such as an enum being selected, a parent about to be
   // opened, or a parameter value...
   // Use ( in brow_cb() ) to call templated implementation specifics to regain RTTI
-  virtual void selected() final;
+  virtual void selected(GsdmlAttrNav* attrnav) final;
   virtual bool selected_impl(GsdmlAttrNav* attrnav) = 0;
 
   virtual void set_trace_value(void** p) { if (m_type & attrnav_mItemType_Traceable) std::cerr << "No trace value set for: " << m_name << std::endl; }
@@ -525,7 +525,7 @@ public:
   explicit ValueSelection(GsdmlAttrNav* attrnav, attrnav_eItemType type, std::string name, std::string infotext, 
                     brow_tNode dest, flow_eDest dest_code,
                     T* value_p)
-    : ItemPn(attrnav, attrnav_mItemType_Parent, name, infotext),
+    : ItemPn(attrnav, type, name, infotext),
       m_value_p(value_p)  
   {
     brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_attr_parameter, dest,
@@ -1253,7 +1253,7 @@ public:
   ItemPnParameterSelection(GsdmlAttrNav* attrnav, const char* name,
                   T* pwr_pn_value_p, brow_tNode dest, flow_eDest dest_code,
                   std::shared_ptr<GSDML::Ref> ref)
-    : ValueSelection<T>(attrnav, attrnav_mItemType_Parent, name, "No help text available", dest, dest_code, pwr_pn_value_p),
+    : ValueSelection<T>(attrnav, attrnav_mItemType_Selectable, name, "No help text available", dest, dest_code, pwr_pn_value_p),
       m_ref(ref), m_is_bitarea(false), m_is_bit(false)
   {
     ItemPn::m_closed_annotation = attrnav->brow->pixmap_attrenum;
@@ -1421,8 +1421,11 @@ public:
     {
       for (auto const& assign : m_ref->_ValueItem->_Assignments)
       {
+        T temp = assign._Content << (m_is_bit || m_is_bitarea ? m_ref->_BitOffset : 0);
+        
         // Check if the values are equal after shifting the assign values.
-        if (assign._Content << (m_is_bit || m_is_bitarea ? m_ref->_BitOffset : 0) == value)
+        // TODO Check datatype of the assign attribute
+        if (temp == value)
         {
           annotation = *assign._Text;
           break;
