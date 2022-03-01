@@ -385,7 +385,7 @@ class Assign
 public:
   Assign(pugi::xml_node&&, pn_gsdml*);
   Assign(Assign&&) = default;
-  int _Content;
+  uint _Content;
   std::shared_ptr<std::string> _Text;
 };
 

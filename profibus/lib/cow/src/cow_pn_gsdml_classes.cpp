@@ -215,7 +215,7 @@ IOData::IOData(pugi::xml_node&& ioData, pn_gsdml* gsdml)
 }
 
 Assign::Assign(pugi::xml_node&& assign, pn_gsdml* gsdml)
-    : _Content(assign.attribute("Content").as_int()),
+    : _Content(assign.attribute("Content").as_uint()),
       _Text(gsdml->_get_TextId(
           std::move(std::string(assign.attribute("TextId").as_string()))))
 {
