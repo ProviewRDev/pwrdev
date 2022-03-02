@@ -82,12 +82,14 @@ CoLogWGtk::CoLogWGtk(void* logw_parent_ctx, GtkWidget* logw_parent_wid,
 
   // File Entry
   GtkWidget* file_close
-      = gtk_image_menu_item_new_from_stock(GTK_STOCK_CLOSE, accel_g);
+      = gtk_menu_item_new_with_mnemonic("_Close");
   g_signal_connect(
       file_close, "activate", G_CALLBACK(CoLogWGtk::activate_exit), this);
+  gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w',
+      GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
   GtkWidget* file_print
-      = gtk_image_menu_item_new_from_stock(GTK_STOCK_PRINT, accel_g);
+      = gtk_menu_item_new_with_mnemonic("_Print");
   g_signal_connect(
       file_print, "activate", G_CALLBACK(CoLogWGtk::activate_print), this);
 
@@ -100,22 +102,19 @@ CoLogWGtk::CoLogWGtk(void* logw_parent_ctx, GtkWidget* logw_parent_wid,
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(file), GTK_WIDGET(file_menu));
 
   // View menu
-  GtkWidget* view_zoom_in
-      = gtk_image_menu_item_new_from_stock(GTK_STOCK_ZOOM_IN, NULL);
+  GtkWidget* view_zoom_in = gtk_menu_item_new_with_mnemonic("Zoom _in");
   g_signal_connect(
       view_zoom_in, "activate", G_CALLBACK(CoLogWGtk::activate_zoom_in), this);
   gtk_widget_add_accelerator(view_zoom_in, "activate", accel_g, 'i',
       GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
-  GtkWidget* view_zoom_out
-      = gtk_image_menu_item_new_from_stock(GTK_STOCK_ZOOM_OUT, NULL);
+  GtkWidget* view_zoom_out = gtk_menu_item_new_with_mnemonic("Zoom _out");
   g_signal_connect(view_zoom_out, "activate",
       G_CALLBACK(CoLogWGtk::activate_zoom_out), this);
   gtk_widget_add_accelerator(view_zoom_out, "activate", accel_g, 'o',
       GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
-  GtkWidget* view_zoom_reset
-      = gtk_image_menu_item_new_from_stock(GTK_STOCK_ZOOM_100, NULL);
+  GtkWidget* view_zoom_reset = gtk_menu_item_new_with_mnemonic("Zoom _reset");
   g_signal_connect(view_zoom_reset, "activate",
       G_CALLBACK(CoLogWGtk::activate_zoom_reset), this);
 
@@ -128,7 +127,7 @@ CoLogWGtk::CoLogWGtk(void* logw_parent_ctx, GtkWidget* logw_parent_wid,
   gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), view);
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(view), GTK_WIDGET(view_menu));
 
-  form = gtk_vbox_new(FALSE, 0);
+  form = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 
   // Create logwnav
   logwnav = new CoLogWNavGtk(this, form, l_show_item, &nav_widget);

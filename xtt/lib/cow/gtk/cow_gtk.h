@@ -37,5 +37,5 @@
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #include <gtk/gtk.h>
-#include <gtk/gtkprivate.h>
+//#include <gtk/gtkprivate.h>
 #pragma GCC diagnostic pop

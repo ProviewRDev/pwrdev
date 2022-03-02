@@ -835,11 +835,6 @@ static int graph_object_collect_build(Graph* graph, pwr_sAttrRef* attrref)
   grow_SetLayout(graph->grow->ctx, x0 - 1, y0 - 2.3,
       x0 + trend_width + name_width + 3, y0 + trend_cnt * trend_height + 1.5);
 
-  // Set graph attributes
-  mask = grow_eAttr_double_buffer_on;
-  grow_attr.double_buffer_on = 1;
-  grow_SetAttributes(graph->grow->ctx, &grow_attr, mask);
-
   return 1;
 }
 

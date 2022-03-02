@@ -76,6 +76,8 @@ public:
   double y_low;
   int window_width;
   int window_height;
+  int old_window_width;
+  int old_window_height;
   int nav_window_width;
   int nav_window_height;
   int nav_rect_ll_x, nav_rect_ll_y, nav_rect_ur_x, nav_rect_ur_y;
@@ -266,11 +268,14 @@ public:
   }
   void print(double ll_x, double ll_y, double ur_x, double ur_y);
   void draw(int ll_x, int ll_y, int ur_x, int ur_y);
+  void draw_invalidated(int ll_x, int ll_y, int ur_x, int ur_y);
   void clear();
   void nav_zoom();
+  void nav_zoom_invalidated();
   void print_zoom();
   void nav_clear();
   void nav_draw(int ll_x, int ll_y, int ur_x, int ur_y);
+  void nav_draw_invalidated(int ll_x, int ll_y, int ur_x, int ur_y);
   int event_handler(flow_eEvent event, int x, int y, int w, int h);
   int event_handler_nav(flow_eEvent event, int x, int y);
   void enable_event(flow_eEvent event, flow_eEventType event_type,
@@ -494,6 +499,7 @@ public:
   {
     text_coding = coding;
   }
+  void update_color_theme(int ct);
   ~FlowCtx();
 };
 

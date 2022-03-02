@@ -280,9 +280,11 @@ WVselGtk::WVselGtk(pwr_tStatus* status, void* wv_parent_ctx,
 
   // File Entry
   GtkWidget* file_close
-      = gtk_image_menu_item_new_from_stock(GTK_STOCK_CLOSE, accel_g);
+      = gtk_menu_item_new_with_mnemonic("_Close");
   g_signal_connect(
       file_close, "activate", G_CALLBACK(WVselGtk::activate_close), this);
+  gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w',
+      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
 
   GtkMenu* file_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_close);
@@ -330,14 +332,14 @@ WVselGtk::WVselGtk(pwr_tStatus* status, void* wv_parent_ctx,
   gtk_widget_set_size_request(cancel_button, 70, 25);
   g_signal_connect(cancel_button, "clicked", G_CALLBACK(activate_cancel), this);
 
-  GtkWidget* hboxbuttons = gtk_hbox_new(TRUE, 40);
+  GtkWidget* hboxbuttons = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 40);
   gtk_box_pack_start(GTK_BOX(hboxbuttons), ok_button, FALSE, FALSE, 20);
   gtk_box_pack_end(GTK_BOX(hboxbuttons), cancel_button, FALSE, FALSE, 20);
 
   GtkWidget* scrolled_window = gtk_scrolled_window_new(NULL, NULL);
   gtk_container_add(GTK_CONTAINER(scrolled_window), widgets.volumelist);
 
-  GtkWidget* vbox = gtk_vbox_new(FALSE, 0);
+  GtkWidget* vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start(GTK_BOX(vbox), GTK_WIDGET(menu_bar), FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(vbox), scrolled_window, TRUE, TRUE, 0);
   gtk_box_pack_end(GTK_BOX(vbox), hboxbuttons, FALSE, FALSE, 10);

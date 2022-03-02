@@ -1300,5 +1300,5 @@ double FlowAnnot::tsize(int text_idx)
 
 double FlowAnnot::nav_tsize(int text_idx)
 {
-  return ctx->zoom_factor / ctx->base_zoom_factor * (8 + 2 * text_idx);
+  return ctx->nav_zoom_factor / ctx->base_zoom_factor * (8 + 2 * text_idx);
 }

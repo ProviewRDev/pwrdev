@@ -61,13 +61,13 @@ void WUtedGtk::clock_cursor()
     cursor = gdk_cursor_new_for_display(
         gtk_widget_get_display(toplevel), GDK_WATCH);
 
-  gdk_window_set_cursor(toplevel->window, cursor);
+  gdk_window_set_cursor(gtk_widget_get_window(toplevel), cursor);
   gdk_display_flush(gtk_widget_get_display(toplevel));
 }
 
 void WUtedGtk::reset_cursor()
 {
-  gdk_window_set_cursor(toplevel->window, NULL);
+  gdk_window_set_cursor(gtk_widget_get_window(toplevel), NULL);
 }
 
 void WUtedGtk::remove_command_window()
@@ -249,8 +249,10 @@ WUtedGtk::WUtedGtk(void* wu_parent_ctx, GtkWidget* wu_parent_wid,
 
   // File Entry
   GtkWidget* file_close
-      = gtk_image_menu_item_new_from_stock(GTK_STOCK_CLOSE, accel_g);
+      = gtk_menu_item_new_with_mnemonic("_Close");
   g_signal_connect(file_close, "activate", G_CALLBACK(activate_quit), this);
+  gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w',
+      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
 
   GtkMenu* file_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_close);
@@ -319,7 +321,7 @@ WUtedGtk::WUtedGtk(void* wu_parent_ctx, GtkWidget* wu_parent_wid,
 
     widgets.optmenubuttons[j] = gtk_menu_item_new();
     widgets.optmenubuttonslabel[j] = gtk_label_new(command_ptr->command);
-    gtk_misc_set_alignment(GTK_MISC(widgets.optmenubuttonslabel[j]), 0.0, 0.5);
+    //gtk_misc_set_alignment(GTK_MISC(widgets.optmenubuttonslabel[j]), 0.0, 0.5);
     gtk_container_add(GTK_CONTAINER(widgets.optmenubuttons[j]),
         widgets.optmenubuttonslabel[j]);
 
@@ -341,9 +343,7 @@ WUtedGtk::WUtedGtk(void* wu_parent_ctx, GtkWidget* wu_parent_wid,
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(commands), GTK_WIDGET(commands_menu));
 
   // Menu Help
-  GtkWidget* help_utils = gtk_image_menu_item_new_with_mnemonic("_On Window");
-  gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(help_utils),
-      gtk_image_new_from_stock("gtk-help", GTK_ICON_SIZE_MENU));
+  GtkWidget* help_utils = gtk_menu_item_new_with_mnemonic("_On Window");
   g_signal_connect(
       help_utils, "activate", G_CALLBACK(activate_helputils), this);
   gtk_widget_add_accelerator(help_utils, "activate", accel_g, 'h',
@@ -362,22 +362,21 @@ WUtedGtk::WUtedGtk(void* wu_parent_ctx, GtkWidget* wu_parent_wid,
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(help), GTK_WIDGET(help_menu));
 
   // Qualifier labels, entries and checkboxes
-  GtkWidget* qual_box_qual = gtk_vbox_new(FALSE, 0);
-  GtkWidget* qual_box_value = gtk_vbox_new(FALSE, 0);
+  GtkWidget* qual_box_qual = gtk_grid_new();
+  gtk_grid_set_row_homogeneous(GTK_GRID(qual_box_qual), TRUE);
   for (j = 0; j < 10; j++) {
     widgets.qualifier[j] = gtk_label_new("Qual");
+    gtk_widget_set_halign(widgets.qualifier[j], GTK_ALIGN_START);    
     gtk_widget_set_size_request(widgets.qualifier[j], 120, 20);
-    gtk_misc_set_alignment(GTK_MISC(widgets.qualifier[j]), 0.0, 0.5);
-    gtk_box_pack_start(
-        GTK_BOX(qual_box_qual), widgets.qualifier[j], FALSE, FALSE, 5);
-    GtkWidget* box = gtk_hbox_new(FALSE, 0);
+    gtk_grid_attach(GTK_GRID(qual_box_qual), widgets.qualifier[j], 1, j + 1, 1, 1);
+    GtkWidget* box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
     widgets.value[j] = gtk_entry_new();
-    gtk_widget_set_size_request(widgets.value[j], -1, 20);
+    gtk_widget_set_size_request(widgets.value[j], 360, 20);
     gtk_box_pack_start(GTK_BOX(box), widgets.value[j], TRUE, TRUE, 0);
     widgets.present[j] = gtk_check_button_new();
     gtk_widget_set_size_request(widgets.present[j], -1, 20);
     gtk_box_pack_start(GTK_BOX(box), widgets.present[j], FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(qual_box_value), box, FALSE, FALSE, 5);
+    gtk_grid_attach(GTK_GRID(qual_box_qual), box, 2, j + 1, 8, 1);
   }
 
   g_signal_connect(
@@ -404,10 +403,10 @@ WUtedGtk::WUtedGtk(void* wu_parent_ctx, GtkWidget* wu_parent_wid,
   // Command label
   GtkWidget* cmdlabel = gtk_label_new("Command");
   widgets.commandlabel = gtk_label_new("No command selected");
-  gtk_misc_set_alignment(GTK_MISC(widgets.commandlabel), 0.0, 0.5);
+  //gtk_misc_set_alignment(GTK_MISC(widgets.commandlabel), 0.0, 0.5);
   gtk_widget_set_size_request(widgets.commandlabel, 140, -1);
 
-  GtkWidget* vbox_command = gtk_hbox_new(FALSE, 0);
+  GtkWidget* vbox_command = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   gtk_box_pack_start(GTK_BOX(vbox_command), cmdlabel, FALSE, FALSE, 10);
   gtk_box_pack_start(
       GTK_BOX(vbox_command), widgets.commandlabel, FALSE, FALSE, 10);
@@ -417,27 +416,26 @@ WUtedGtk::WUtedGtk(void* wu_parent_ctx, GtkWidget* wu_parent_wid,
   gtk_widget_set_size_request(applybutton, 70, 25);
   g_signal_connect(applybutton, "clicked", G_CALLBACK(activate_ok), this);
 
-  GtkWidget* left_box = gtk_vbox_new(FALSE, 0);
+  GtkWidget* left_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start(GTK_BOX(left_box), vbox_command, FALSE, FALSE, 10);
 
-  GtkWidget* button_box = gtk_hbox_new(FALSE, 0);
+  GtkWidget* button_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   gtk_box_pack_start(GTK_BOX(button_box), applybutton, FALSE, FALSE, 50);
 
-  GtkWidget* qual_box = gtk_hbox_new(FALSE, 0);
+  GtkWidget* qual_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   gtk_box_pack_start(GTK_BOX(qual_box), left_box, FALSE, FALSE, 10);
-  gtk_box_pack_start(GTK_BOX(qual_box), gtk_vseparator_new(), FALSE, FALSE, 0);
-  gtk_box_pack_start(GTK_BOX(qual_box), qual_box_qual, FALSE, FALSE, 10);
-  gtk_box_pack_start(GTK_BOX(qual_box), qual_box_value, TRUE, TRUE, 10);
+  gtk_box_pack_start(GTK_BOX(qual_box), gtk_separator_new(GTK_ORIENTATION_VERTICAL), FALSE, FALSE, 0);
+  gtk_box_pack_start(GTK_BOX(qual_box), qual_box_qual, TRUE, TRUE, 10);
 
   // Statusbar
-  GtkWidget* statusbar = gtk_hbox_new(FALSE, 0);
+  GtkWidget* statusbar = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   widgets.label = gtk_label_new("");
   gtk_box_pack_start(GTK_BOX(statusbar), widgets.label, FALSE, FALSE, 20);
 
-  GtkWidget* vbox = gtk_vbox_new(FALSE, 0);
+  GtkWidget* vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start(GTK_BOX(vbox), GTK_WIDGET(menu_bar), FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(vbox), qual_box, TRUE, TRUE, 0);
-  gtk_box_pack_start(GTK_BOX(vbox), gtk_hseparator_new(), FALSE, FALSE, 3);
+  gtk_box_pack_start(GTK_BOX(vbox), gtk_separator_new(GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 3);
   gtk_box_pack_start(GTK_BOX(vbox), button_box, FALSE, FALSE, 3);
   gtk_box_pack_start(GTK_BOX(vbox), statusbar, FALSE, FALSE, 3);
 

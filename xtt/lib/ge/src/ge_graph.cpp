@@ -641,14 +641,8 @@ void Graph::set_subgraph_path(int path_cnt, char* path)
 
 void Graph::dashboard_init()
 {
-  grow_sAttributes grow_attr;
-  unsigned long mask;
-
   update_color_theme(1);
   grow_SetBackgroundColor(grow->ctx, glow_eDrawType_CustomColor1);
-  mask = grow_eAttr_double_buffer_on;
-  grow_attr.double_buffer_on = 1;
-  grow_SetAttributes(grow->ctx, &grow_attr, mask);
 }
 
 // Called when GraphAttributes is modified
@@ -3354,13 +3348,10 @@ void GraphGrow::grow_setup()
     grow_attr.enable_bg_pixmap = 0;
   else
     grow_attr.enable_bg_pixmap = 1;
-  mask |= grow_eAttr_double_buffer_on;
   mask |= grow_eAttr_environment;
   if (((Graph*)graph)->mode == graph_eMode_Development) {
-    grow_attr.double_buffer_on = 1;
     grow_attr.environment = glow_eEnv_Development;
   } else {
-    grow_attr.double_buffer_on = 0;
     grow_attr.environment = glow_eEnv_Runtime;
   }
   if (((Graph*)graph)->dashboard) {
@@ -3461,11 +3452,6 @@ void GraphGrow::grow_trace_setup()
     grow_attr.enable_bg_pixmap = 0;
   else
     grow_attr.enable_bg_pixmap = 1;
-  mask |= grow_eAttr_double_buffer_on;
-  if (((Graph*)graph)->mode == graph_eMode_Development)
-    grow_attr.double_buffer_on = 1;
-  else
-    grow_attr.double_buffer_on = 0;
   grow_SetAttributes(ctx, &grow_attr, mask);
   grow_SetCtxUserData(ctx, graph);
   grow_SetMoveRestrictions(ctx, glow_eMoveRestriction_Disable, 0, 0, NULL);
@@ -3572,7 +3558,7 @@ int graph_init_grow_base_cb(GlowCtx* fctx, void* client_data)
   // GrowCtx *secondary_ctx;
 
   graph->grow = new GraphGrow(ctx, (void*)graph);
-  graph->grow_stack[0] = new GraphGrow(ctx, (void*)graph);
+  //graph->grow_stack[0] = new GraphGrow(ctx, (void*)graph);
   graph->grow_cnt++;
 
   graph->grow->grow_setup();

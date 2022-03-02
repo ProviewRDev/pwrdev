@@ -1,0 +1,70 @@
+
+toolbar * { 
+  min-width: 14px;
+  min-height: 14px;
+}
+
+separator { 
+  padding: 2px;
+  margin: 0px;
+}
+
+button { 
+  margin: 0px;
+  padding: 3px;
+}
+
+toolbutton button { 
+  margin: 0px;
+  padding: 3px;
+}
+
+browwidget * { 
+  background: white;
+}
+
+#plcnavigator { 
+  background-color: red;
+}
+
+#wbplant { 
+  background-color: white;
+  border-width: 1px;
+}
+#wbplant_focus { 
+  background-color: lightgray;
+}
+
+#wbnode { 
+  background-color: white;
+  border-width: 1px;
+}
+/* active, hover, selected, insensitive, inconsistent, focus, backdrop */
+#wbnode_focus { 
+  background-color: lightgray
+}
+
+#wbpalette { 
+  background-color: white;
+  border-width: 1px;
+}
+#wbpalette_focus { 
+  background-color: lightgray;
+}
+
+dialog button { 
+  margin-left: 20px;
+  margin-right: 20px;
+  min-width: 90px;
+}
+
+#modaldialog button { 
+  margin-left: 20px;
+  margin-right: 20px;
+  min-width: 90px;
+}
+#confirmdialog button { 
+  margin-left: 20px;
+  margin-right: 20px;
+  min-width: 90px;
+}

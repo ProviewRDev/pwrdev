@@ -147,15 +147,15 @@ void NavGtk::set_inputfocus(int focus)
     return;
 
   if (focus) {
-    GdkColor color;
+    //GdkColor color;
 
-    gdk_color_parse("Black", &color);
-    gtk_widget_modify_bg(form_widget, GTK_STATE_NORMAL, &color);
+    //gdk_color_parse("Black", &color);
+    //gtk_widget_modify_bg(form_widget, GTK_STATE_NORMAL, &color);
     gtk_widget_grab_focus(brow_widget);
   } else {
-    GdkColor color;
+    //GdkColor color;
 
-    gdk_color_parse("White", &color);
-    gtk_widget_modify_bg(form_widget, GTK_STATE_NORMAL, &color);
+    //gdk_color_parse("White", &color);
+    //gtk_widget_modify_bg(form_widget, GTK_STATE_NORMAL, &color);
   }
 }

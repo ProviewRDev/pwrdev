@@ -62,8 +62,8 @@ public:
   GtkWidget* lbox_reset;
   GtkWidget* bbox_image;
   GtkWidget* bbox_image_gray;
-  GtkWidget* tools_xtt;
-  GtkWidget* tools_op;
+  GtkToolItem* tools_xtt;
+  GtkToolItem* tools_op;
   GtkWidget* file_xtt;
   GtkWidget* file_op;
   GdkCursor* clock_cursor;

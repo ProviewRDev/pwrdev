@@ -96,12 +96,6 @@ public:
   */
   void open(std::ifstream& fp);
 
-  //! Erase the object
-  void erase(GlowWind* w)
-  {
-    erase(w, (GlowTransform*)NULL, hot, NULL);
-  }
-
   //! Set object highlight.
   /*!
     \param on	If 1, set highlight. If 0, reset highlight.
@@ -156,19 +150,8 @@ public:
   void draw(GlowWind* w, GlowTransform* t, int highlight, int hot, void* node,
       void* colornode);
 
-  //! Erase the object.
-  /*!
-    \param t		Transform of parent node.
-    \param hot		Draw as hot, with larger line width.
-    \param node		Parent node. Can be zero.
-  */
-  void erase(GlowWind* w, GlowTransform* t, int hot, void* node);
-
   //! Redraw the area inside the objects border.
-  void draw()
-  {
-    draw(&ctx->mw, 0, 0, 0, 0, 0);
-  }
+  void draw();
 
   //! Set the bar value
   /*!

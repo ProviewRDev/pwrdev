@@ -125,6 +125,8 @@ public:
   }
   void clear()
   {
+    if (!attrnav->brow)
+      return;
     attrnav->clear();
   }
   static int get_plant_select_c(void* attr_ctx, char* value, int size);

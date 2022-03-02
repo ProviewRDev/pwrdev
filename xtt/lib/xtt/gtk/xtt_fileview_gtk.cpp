@@ -286,22 +286,22 @@ XttFileviewGtk::XttFileviewGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid,
       input_text, "activate", G_CALLBACK(XttFileviewGtk::list_input_cb), this);
   GtkWidget* input_label = gtk_label_new(CoWowGtk::translate_utf8("Save as"));
 
-  GtkWidget* hboxentry = gtk_hbox_new(FALSE, 40);
+  GtkWidget* hboxentry = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 40);
   gtk_box_pack_start(GTK_BOX(hboxentry), input_label, FALSE, FALSE, 15);
   gtk_box_pack_end(GTK_BOX(hboxentry), input_text, TRUE, TRUE, 15);
 
-  GtkWidget* hboxbuttons = gtk_hbox_new(TRUE, 40);
+  GtkWidget* hboxbuttons = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 40);
   gtk_box_pack_start(GTK_BOX(hboxbuttons), ok_button, FALSE, FALSE, 20);
   gtk_box_pack_end(GTK_BOX(hboxbuttons), cancel_button, FALSE, FALSE, 20);
 
   GtkWidget* scrolled_window = gtk_scrolled_window_new(NULL, NULL);
   gtk_container_add(GTK_CONTAINER(scrolled_window), list);
 
-  GtkWidget* vbox = gtk_vbox_new(FALSE, 0);
+  GtkWidget* vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start(GTK_BOX(vbox), scrolled_window, TRUE, TRUE, 30);
   if (type == fileview_eType_Save) {
     gtk_box_pack_start(GTK_BOX(vbox), hboxentry, FALSE, FALSE, 10);
-    gtk_box_pack_start(GTK_BOX(vbox), gtk_hseparator_new(), FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), gtk_separator_new(GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 0);
   }
   gtk_box_pack_end(GTK_BOX(vbox), hboxbuttons, FALSE, FALSE, 10);
 

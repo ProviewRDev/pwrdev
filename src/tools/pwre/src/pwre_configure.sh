@@ -189,8 +189,8 @@ pwre_config_check_lib()
                     conf_lib=$conf_lib" -l${lib%%.*}"
                 fi
 	    elif test $3 == "gtk"; then
-                conf_libgtk=$conf_libgtk" \\\`pkg-config --libs gtk+-2.0\\\`"
-                conf_incdirgtk=$conf_incdirgtk" \\\`pkg-config --cflags gtk+-2.0\\\`"
+                conf_libgtk=$conf_libgtk" \\\`pkg-config --libs gtk+-3.0\\\`"
+                conf_incdirgtk=$conf_incdirgtk" \\\`pkg-config --cflags gtk+-3.0\\\`"
 	    elif test $3 == "qt"; then
                 conf_libqt=$conf_libqt" \\\`pkg-config --libs Qt5Core Qt5Widgets Qt5PrintSupport Qt5Network phonon4qt5\\\`"
                 conf_incdirqt=$conf_incdirqt" \\\`pkg-config --cflags Qt5Core Qt5Widgets Qt5PrintSupport Qt5Network phonon4qt5\\\`"
@@ -361,8 +361,8 @@ if [ $pwre_hw == "hw_arm" ] && [ $ebuild -eq 1 ]; then
         pwre_config_check_include qt    QT   0 "/usr/include/$hwpl-linux-$gnu/qt5/QtNetwork/QtNetwork"
 #    fi
 #    if [ $pwre_conf_gtk -eq 1 ]; then
-        pwre_config_check_lib gtk       GTK      gtk gtk 0 "/usr/lib/libgtk-x11-2.0.so:/usr/lib/$hwpl-linux-$gnu/libgtk-x11-2.0.so"
-        pwre_config_check_include gtk   GTK   0 "/usr/local/include/gtk-2.0/gtk.h:/usr/local/include/gtk-2.0/gtk/gtk.h:/usr/include/gtk-2.0/gtk/gtk.h"
+        pwre_config_check_lib gtk       GTK      gtk gtk 0 "/usr/lib/libgtk-3.so:/usr/lib/$hwpl-linux-$gnu/libgtk-3.so"
+        pwre_config_check_include gtk   GTK   0 "/usr/local/include/gtk-3.0/gtk.h:/usr/local/include/gtk-3.0/gtk/gtk.h:/usr/include/gtk-3.0/gtk/gtk.h"
 #    fi
 
     pwre_config_check_include jni   JNI   1 $jdk/include/jni.h
@@ -446,8 +446,8 @@ else
         pwre_config_check_include qt    QT   0 "/usr/include/$hwpl-linux-$gnu/qt5/QtGui/QtGui"
         pwre_config_check_include qt    QT   0 "/usr/include/$hwpl-linux-$gnu/qt5/QtNetwork/QtNetwork"
 #   else
-        pwre_config_check_lib gtk       GTK      gtk gtk 0 "/usr/lib/libgtk-x11-2.0.so:/usr/lib/$hwpl-linux-$gnu/libgtk-x11-2.0.so:/usr/lib64/libgtk-x11-2.0.so"
-        pwre_config_check_include gtk   GTK   0 "/usr/local/include/gtk-2.0/gtk.h:/usr/local/include/gtk-2.0/gtk/gtk.h:/usr/include/gtk-2.0/gtk/gtk.h"
+        pwre_config_check_lib gtk       GTK      gtk gtk 0 "/usr/lib/libgtk-3.so:/usr/lib/$hwpl-linux-$gnu/libgtk-3.so:/usr/lib64/libgtk-3.so"
+        pwre_config_check_include gtk   GTK   0 "/usr/local/include/gtk-3.0/gtk.h:/usr/local/include/gtk-3.0/gtk/gtk.h:/usr/include/gtk-3.0/gtk/gtk.h"
 #    fi
 
     echo ""

@@ -84,7 +84,9 @@ public:
   void print(double ll_x, double ll_y, double ur_x, double ur_y);
   void save(std::ofstream& fp, flow_eSaveMode mode);
   void open(std::ifstream& fp);
+  void draw();
   void draw(int ll_x, int ll_y, int ur_x, int ur_y);
+  void nav_draw();
   void nav_draw(int ll_x, int ll_y, int ur_x, int ur_y);
   void erase(){}
   void nav_erase(){}

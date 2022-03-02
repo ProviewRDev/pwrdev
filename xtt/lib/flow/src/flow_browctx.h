@@ -114,6 +114,7 @@ public:
   void center_object(FlowArrayElem* object, double factor);
   int page(double factor);
   void zoom_absolute(double factor);
+  void update_color_theme(int ct);
 
   ~BrowCtx(){}
   double indentation;

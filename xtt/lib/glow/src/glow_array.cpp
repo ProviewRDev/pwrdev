@@ -1172,6 +1172,7 @@ void GlowArray::draw_inverse(void* pos, int hot, void* node)
   }
 }
 
+#if 0
 void GlowArray::erase(GlowWind* w, void* pos, int hot, void* node)
 {
   int i;
@@ -1189,6 +1190,7 @@ void GlowArray::erase(GlowWind* w, GlowTransform* t, int hot, void* node)
     a[i]->erase(w, t, hot, node);
   }
 }
+#endif
 
 void GlowArray::nav_draw(void* pos, int highlight, void* node)
 {

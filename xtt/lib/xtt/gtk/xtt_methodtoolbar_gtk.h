@@ -49,8 +49,8 @@ typedef struct {
 class XttMethodToolbarGtk : public XttMethodToolbar {
 public:
   GtkWidget* m_toolbar_w;
-  GtkWidget* m_op_button_w[32];
-  GtkWidget* m_mnt_button_w[32];
+  GtkToolItem* m_op_button_w[32];
+  GtkToolItem* m_mnt_button_w[32];
   xtt_sMethodButtonCb m_cb[64];
   gint m_timerid;
 

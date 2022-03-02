@@ -34,6 +34,8 @@
  * General Public License plus this exception.
  */
 
+#include <math.h>
+
 #include "co_dcli.h"
 #include "co_string.h"
 
@@ -49,8 +51,7 @@
 typedef void* GdkImlibImage;
 
 #define DRAW_PRESS_PIX 9
-
-static int pango = 1;
+#define DRAW_TSCALE 0.93
 
 typedef struct {
   GtkWidget* w;
@@ -69,34 +70,17 @@ typedef struct {
   guint timer_id;
 } draw_sTimerCb;
 
+typedef int GdkPixmap; // TODO
+
 typedef struct {
-  GdkPixmap* pixmap[DRAW_PIXMAP_SIZE];
+  cairo_surface_t* pixmap[DRAW_PIXMAP_SIZE];
+  unsigned char* data[DRAW_PIXMAP_SIZE];
 } draw_sPixmap;
 
-static char font_names[draw_eFont__][DRAW_FONT_SIZE][80]
-    = { { "-*-Helvetica-Bold-R-Normal--8-*-*-*-P-*-ISO8859-1",
-            "-*-Helvetica-Bold-R-Normal--10-*-*-*-P-*-ISO8859-1",
-            "-*-Helvetica-Bold-R-Normal--12-*-*-*-P-*-ISO8859-1",
-            "-*-Helvetica-Bold-R-Normal--14-*-*-*-P-*-ISO8859-1",
-            "-*-Helvetica-Bold-R-Normal--14-*-*-*-P-*-ISO8859-1",
-            "-*-Helvetica-Bold-R-Normal--18-*-*-*-P-*-ISO8859-1",
-            "-*-Helvetica-Bold-R-Normal--18-*-*-*-P-*-ISO8859-1",
-            "-*-Helvetica-Bold-R-Normal--18-*-*-*-P-*-ISO8859-1",
-            "-*-Helvetica-Bold-R-Normal--24-*-*-*-P-*-ISO8859-1" },
-        { "-*-Helvetica-Medium-R-Normal--8-*-*-*-P-*-ISO8859-1",
-            "-*-Helvetica-Medium-R-Normal--10-*-*-*-P-*-ISO8859-1",
-            "-*-Helvetica-Medium-R-Normal--12-*-*-*-P-*-ISO8859-1",
-            "-*-Helvetica-Medium-R-Normal--14-*-*-*-P-*-ISO8859-1",
-            "-*-Helvetica-Medium-R-Normal--14-*-*-*-P-*-ISO8859-1",
-            "-*-Helvetica-Medium-R-Normal--18-*-*-*-P-*-ISO8859-1",
-            "-*-Helvetica-Medium-R-Normal--18-*-*-*-P-*-ISO8859-1",
-            "-*-Helvetica-Medium-R-Normal--18-*-*-*-P-*-ISO8859-1",
-            "-*-Helvetica-Medium-R-Normal--24-*-*-*-P-*-ISO8859-1" } };
+char FlowDrawGtk::font_name[40] = "Lucida Sans";
 
 static GdkEvent last_event;
 
-static GdkColor flow_allocate_color(
-    FlowDrawGtk* draw_ctx, const char* named_color);
 static void event_timer(FlowCtx* ctx, int time_ms);
 static void cancel_event_timer(FlowCtx* ctx);
 static gboolean event_timer_cb(void* ctx);
@@ -120,223 +104,192 @@ static int flow_create_cursor(FlowDrawGtk* draw_ctx)
 
 static int draw_free_gc(FlowDrawGtk* draw_ctx)
 {
-  int i, j;
-
-  for (i = 1; i < draw_eCursor__; i++)
-    gdk_cursor_unref(draw_ctx->cursors[i]);
-
-  gdk_gc_unref(draw_ctx->gc_yellow);
-  gdk_gc_unref(draw_ctx->gc_green);
-  gdk_gc_unref(draw_ctx->gc_darkgray);
-  gdk_gc_unref(draw_ctx->gc_inverse);
-  for (i = 0; i < flow_eDrawType__; i++) {
-    for (j = 0; j < DRAW_TYPE_SIZE; j++)
-      gdk_gc_unref(draw_ctx->gcs[i][j]);
-  }
-
-  for (i = 0; i < draw_eFont__; i++) {
-    for (j = 0; j < DRAW_FONT_SIZE; j++) {
-      gdk_font_unref(draw_ctx->font[i][j]);
-    }
-  }
-  return 1;
-}
-
-static int flow_create_gc(FlowDrawGtk* draw_ctx, GdkWindow* window)
-{
-  GdkFont* font;
-  GdkGCValues xgcv;
-  int i;
-
-  memset(&xgcv, 0, sizeof(xgcv));
-
-  /* Inverse gc */
-  xgcv.background = draw_ctx->foreground;
-  xgcv.foreground = draw_ctx->background;
-  xgcv.cap_style = GDK_CAP_BUTT;
-  draw_ctx->gc_inverse = gdk_gc_new_with_values(window, &xgcv,
-      (GdkGCValuesMask)(
-          GDK_GC_FOREGROUND | GDK_GC_BACKGROUND | GDK_GC_CAP_STYLE));
-
-  /* Yellow gc */
-  xgcv.foreground = flow_allocate_color(draw_ctx, "yellow");
-  xgcv.background = draw_ctx->background;
-  draw_ctx->gc_yellow = gdk_gc_new_with_values(
-      window, &xgcv, (GdkGCValuesMask)(GDK_GC_FOREGROUND | GDK_GC_BACKGROUND));
-
-  /* Green gc */
-  xgcv.foreground = flow_allocate_color(draw_ctx, "lightgreen");
-  xgcv.background = draw_ctx->background;
-  draw_ctx->gc_green = gdk_gc_new_with_values(
-      window, &xgcv, (GdkGCValuesMask)(GDK_GC_FOREGROUND | GDK_GC_BACKGROUND));
-
-  /* DarkGray gc */
-  xgcv.foreground = flow_allocate_color(draw_ctx, "gray28");
-  xgcv.background = draw_ctx->background;
-  draw_ctx->gc_darkgray = gdk_gc_new_with_values(
-      window, &xgcv, (GdkGCValuesMask)(GDK_GC_FOREGROUND | GDK_GC_BACKGROUND));
-
-  /* Black line gc */
-  xgcv.foreground = draw_ctx->foreground;
-  xgcv.background = draw_ctx->background;
-  for (i = 0; i < DRAW_TYPE_SIZE; i++) {
-    xgcv.line_width = i + 1;
-
-    draw_ctx->gcs[flow_eDrawType_Line][i] = gdk_gc_new_with_values(window,
-        &xgcv, (GdkGCValuesMask)(
-                   GDK_GC_FOREGROUND | GDK_GC_BACKGROUND | GDK_GC_LINE_WIDTH));
-  }
-
-  /* Erase line gc */
-  xgcv.foreground = draw_ctx->background;
-  xgcv.background = draw_ctx->background;
-  for (i = 0; i < DRAW_TYPE_SIZE; i++) {
-    xgcv.line_width = i + 1;
-
-    draw_ctx->gcs[flow_eDrawType_LineErase][i] = gdk_gc_new_with_values(window,
-        &xgcv, (GdkGCValuesMask)(
-                   GDK_GC_FOREGROUND | GDK_GC_BACKGROUND | GDK_GC_LINE_WIDTH));
-  }
-
-  /* Red line gc */
-  xgcv.foreground = flow_allocate_color(draw_ctx, "red");
-  xgcv.background = draw_ctx->background;
-  for (i = 0; i < DRAW_TYPE_SIZE; i++) {
-    xgcv.line_width = i + 1;
-
-    draw_ctx->gcs[flow_eDrawType_LineRed][i] = gdk_gc_new_with_values(window,
-        &xgcv, (GdkGCValuesMask)(
-                   GDK_GC_FOREGROUND | GDK_GC_BACKGROUND | GDK_GC_LINE_WIDTH));
-  }
-
-  /* Gray line gc */
-  xgcv.foreground = flow_allocate_color(draw_ctx, "gray");
-  xgcv.background = draw_ctx->background;
-  for (i = 0; i < DRAW_TYPE_SIZE; i++) {
-    xgcv.line_width = i + 1;
-
-    draw_ctx->gcs[flow_eDrawType_LineGray][i] = gdk_gc_new_with_values(window,
-        &xgcv, (GdkGCValuesMask)(
-                   GDK_GC_FOREGROUND | GDK_GC_BACKGROUND | GDK_GC_LINE_WIDTH));
-  }
-
-  /* Dashed line gc */
-  xgcv.foreground = draw_ctx->foreground;
-  xgcv.background = draw_ctx->background;
-  xgcv.line_style = GDK_LINE_ON_OFF_DASH;
-  gint dash_offset = 0;
-  for (i = 0; i < DRAW_TYPE_SIZE; i++) {
-    xgcv.line_width = i + 1;
-    gint8 dashes = 7 + i;
-
-    draw_ctx->gcs[flow_eDrawType_LineDashed][i] = gdk_gc_new_with_values(
-        window, &xgcv, (GdkGCValuesMask)(GDK_GC_FOREGROUND | GDK_GC_BACKGROUND
-                           | GDK_GC_LINE_WIDTH | GDK_GC_LINE_STYLE));
-    gdk_gc_set_dashes(
-        draw_ctx->gcs[flow_eDrawType_LineDashed][i], 0, &dashes, 1);
-  }
-
-  /* Red dashed line gc */
-  xgcv.foreground = flow_allocate_color(draw_ctx, "red");
-  xgcv.background = draw_ctx->background;
-  xgcv.line_style = GDK_LINE_ON_OFF_DASH;
-  dash_offset = 0;
-  for (i = 0; i < DRAW_TYPE_SIZE; i++) {
-    xgcv.line_width = i + 1;
-    gint8 dashes = 7 + i;
-
-    draw_ctx->gcs[flow_eDrawType_LineDashedRed][i] = gdk_gc_new_with_values(
-        window, &xgcv, (GdkGCValuesMask)(GDK_GC_FOREGROUND | GDK_GC_BACKGROUND
-                           | GDK_GC_LINE_WIDTH | GDK_GC_LINE_STYLE));
-    gdk_gc_set_dashes(draw_ctx->gcs[flow_eDrawType_LineDashedRed][i],
-        dash_offset, &dashes, 1);
-  }
-
-  /* Text */
-  xgcv.foreground = draw_ctx->foreground;
-  xgcv.background = draw_ctx->background;
-  for (i = 0; i < DRAW_TYPE_SIZE; i++) {
-    draw_ctx->gcs[flow_eDrawType_TextHelvetica][i]
-        = gdk_gc_new_with_values(window, &xgcv,
-            (GdkGCValuesMask)(GDK_GC_FOREGROUND | GDK_GC_BACKGROUND));
-  }
-
-  for (i = 0; i < DRAW_TYPE_SIZE; i++) {
-    draw_ctx->gcs[flow_eDrawType_TextHelveticaBold][i]
-        = gdk_gc_new_with_values(window, &xgcv,
-            (GdkGCValuesMask)(GDK_GC_FOREGROUND | GDK_GC_BACKGROUND));
-  }
-
-  xgcv.foreground = draw_ctx->background;
-  xgcv.background = draw_ctx->background;
-  for (i = 0; i < DRAW_TYPE_SIZE; i++) {
-    draw_ctx->gcs[flow_eDrawType_TextHelveticaErase][i]
-        = gdk_gc_new_with_values(window, &xgcv,
-            (GdkGCValuesMask)(GDK_GC_FOREGROUND | GDK_GC_BACKGROUND));
-  }
-
-  for (i = 0; i < DRAW_TYPE_SIZE; i++) {
-    draw_ctx->gcs[flow_eDrawType_TextHelveticaEraseBold][i]
-        = gdk_gc_new_with_values(window, &xgcv,
-            (GdkGCValuesMask)(GDK_GC_FOREGROUND | GDK_GC_BACKGROUND));
-  }
-
-  for (i = 0; i < DRAW_FONT_SIZE; i++) {
-    font = gdk_font_load(font_names[draw_eFont_HelveticaBold][i]);
-    gdk_gc_set_font(draw_ctx->gcs[flow_eDrawType_TextHelveticaBold][i], font);
-    gdk_gc_set_font(
-        draw_ctx->gcs[flow_eDrawType_TextHelveticaEraseBold][i], font);
-    draw_ctx->font[draw_eFont_HelveticaBold][i] = font;
-  }
-  for (i = 0; i < DRAW_FONT_SIZE; i++) {
-    font = gdk_font_load(font_names[draw_eFont_Helvetica][i]);
-    gdk_gc_set_font(draw_ctx->gcs[flow_eDrawType_TextHelvetica][i], font);
-    gdk_gc_set_font(draw_ctx->gcs[flow_eDrawType_TextHelveticaErase][i], font);
-    draw_ctx->font[draw_eFont_Helvetica][i] = font;
-  }
+  cairo_pattern_destroy(draw_ctx->gc_black);
+  cairo_pattern_destroy(draw_ctx->gc_gray);
+  cairo_pattern_destroy(draw_ctx->gc_darkgray);
+  cairo_pattern_destroy(draw_ctx->gc_red);
+  cairo_pattern_destroy(draw_ctx->gc_yellow);
+  cairo_pattern_destroy(draw_ctx->gc_green);
+  cairo_pattern_destroy(draw_ctx->gc_erase);
+  cairo_pattern_destroy(draw_ctx->gc_inverse);
 
   return 1;
 }
 
-static GdkColor flow_allocate_color(
-    FlowDrawGtk* draw_ctx, const char* named_color)
+typedef struct {
+  double fg[3];
+  double bg[3];
+  double inverse[3];
+  double gray[3];
+  double darkgray[3];
+  double red[3];
+  double yellow[3];
+  double green[3];
+} draw_sTheme;
+
+static draw_sTheme theme[] = {
+  {{0.0, 0.0, 0.0}, // Foreground
+   {1.0, 1.0, 1.0}, // Background
+   {0.0, 0.0, 0.0}, // Inverse
+   {0.6, 0.6, 0.6}, // Gray
+   {0.3, 0.3, 0.3}, // Darkgray
+   {1.0, 0.2, 0.2}, // Red
+   {1.0, 1.0, 0.0}, // Yellow
+   {0.2, 1.0, 0.2}  // Green
+  }, // Sand
+  {{0.288, 0.118, 0.009}, // Foreground
+   {1.000, 0.949, 0.891}, // Background
+   {0.0, 0.0, 0.0}, // Inverse
+   {0.6, 0.6, 0.6}, // Gray
+   {0.3, 0.3, 0.3}, // Darkgray
+   {1.0, 0.2, 0.2}, // Red
+   {1.0, 1.0, 0.0}, // Yellow
+   {0.2, 1.0, 0.2}  // Green
+  }, // Maroon
+  {{0.000, 0.000, 0.000}, // Foreground
+   {0.906, 0.851, 0.851}, // Background
+   {0.0, 0.0, 0.0}, // Inverse
+   {0.6, 0.6, 0.6}, // Gray
+   {0.3, 0.3, 0.3}, // Darkgray
+   {1.0, 0.2, 0.2}, // Red
+   {1.0, 1.0, 0.0}, // Yellow
+   {0.2, 1.0, 0.2}  // Green
+  }, // Sienna
+  {{1.000, 0.749, 0.459}, // Foreground
+   {0.184, 0.067, 0.000}, // Background
+   {0.0, 0.0, 0.0}, // Inverse
+   {0.6, 0.6, 0.6}, // Gray
+   {0.3, 0.3, 0.3}, // Darkgray
+   {1.0, 0.2, 0.2}, // Red
+   {1.0, 1.0, 0.0}, // Yellow
+   {0.2, 1.0, 0.2}  // Green
+  }, // DarkBlue
+  {{1.000, 1.000, 1.000}, // Foreground
+   {0.122, 0.184, 0.247}, // Background
+   {1.0, 1.0, 1.0}, // Inverse
+   {0.6, 0.6, 0.6}, // Gray
+   {0.3, 0.3, 0.3}, // Darkgray
+   {1.0, 0.2, 0.2}, // Red
+   {1.0, 1.0, 0.0}, // Yellow
+   {0.2, 1.0, 0.2} // Green
+  }, // Classic
+  {{0.0, 0.0, 0.0}, // Foreground
+   {1.0, 1.0, 1.0}, // Background
+   {0.0, 0.0, 0.0}, // Inverse
+   {0.6, 0.6, 0.6}, // Gray
+   {0.3, 0.3, 0.3}, // Darkgray
+   {1.0, 0.2, 0.2}, // Red
+   {1.0, 1.0, 0.0}, // Yellow
+   {0.2, 1.0, 0.2}  // Green
+  }, // Midnight
+  {{1.000, 0.686, 0.424}, // Foreground
+   {0.145, 0.153, 0.251}, // Background
+   {0.0, 0.0, 0.0}, // Inverse
+   {0.6, 0.6, 0.6}, // Gray
+   {0.3, 0.3, 0.3}, // Darkgray
+   {1.0, 0.2, 0.2}, // Red
+   {1.0, 1.0, 0.0}, // Yellow
+   {0.2, 1.0, 0.2}  // Green
+  }, // PlayRoom
+  {{0.098, 0.388, 0.753}, // Foreground
+   {1.000, 0.886, 0.988}, // Background
+   {0.0, 0.0, 0.0}, // Inverse
+   {0.6, 0.6, 0.6}, // Gray
+   {0.3, 0.3, 0.3}, // Darkgray
+   {1.0, 0.2, 0.2}, // Red
+   {1.0, 1.0, 0.0}, // Yellow
+   {0.2, 1.0, 0.2}  // Green
+  }, // NordicLight
+  {{0.000, 0.000, 0.000}, // Foreground
+   {0.906, 0.941, 1.000}, // Background
+   {0.0, 0.0, 0.0}, // Inverse
+   {0.6, 0.6, 0.6}, // Gray
+   {0.3, 0.3, 0.3}, // Darkgray
+   {1.0, 0.2, 0.2}, // Red
+   {1.0, 1.0, 0.0}, // Yellow
+   {0.2, 1.0, 0.2}  // Green
+  }, // Contrast
+  {{0.0, 0.0, 0.0}, // Foreground
+   {1.0, 1.0, 1.0}, // Background
+   {0.0, 0.0, 0.0}, // Inverse
+   {0.6, 0.6, 0.6}, // Gray
+   {0.3, 0.3, 0.3}, // Darkgray
+   {1.0, 0.2, 0.2}, // Red
+   {1.0, 1.0, 0.0}, // Yellow
+   {0.2, 1.0, 0.2}  // Green
+  }, // AzureContrast
+  {{0.0, 0.0, 0.0}, // Foreground
+   {0.639, 0.812, 0.980}, // Background
+   {0.0, 0.0, 0.0}, // Inverse
+   {0.6, 0.6, 0.6}, // Gray
+   {0.3, 0.3, 0.3}, // Darkgray
+   {1.0, 0.2, 0.2}, // Red
+   {1.0, 1.0, 0.0}, // Yellow
+   {0.2, 1.0, 0.2}  // Green
+  }, // OchreContrast
+  {{0.0, 0.0, 0.0}, // Foreground
+   {0.988, 0.812, 0.475}, // Background
+   {0.0, 0.0, 0.0}, // Inverse
+   {0.6, 0.6, 0.6}, // Gray
+   {0.3, 0.3, 0.3}, // Darkgray
+   {1.0, 0.2, 0.2}, // Red
+   {1.0, 1.0, 0.0}, // Yellow
+   {0.2, 1.0, 0.2}  // Green
+  }, // Chesterfield
+  {{0.941, 0.823, 0.718}, // Foreground
+   {0.223, 0.027, 0.012}, // Background
+   {0.0, 0.0, 0.0}, // Inverse
+   {0.6, 0.6, 0.6}, // Gray
+   {0.3, 0.3, 0.3}, // Darkgray
+   {1.0, 0.2, 0.2}, // Red
+   {1.0, 1.0, 0.0}, // Yellow
+   {0.2, 1.0, 0.2}  // Green
+  }, // TerraVerte
+  {{0.0, 0.0, 0.0}, // Foreground
+   {1.0, 1.0, 1.0}, // Background
+   {0.0, 0.0, 0.0}, // Inverse
+   {0.6, 0.6, 0.6}, // Gray
+   {0.3, 0.3, 0.3}, // Darkgray
+   {1.0, 0.2, 0.2}, // Red
+   {1.0, 1.0, 0.0}, // Yellow
+   {0.2, 1.0, 0.2}  // Green
+  }, // Polar
+  {{0.000, 0.000, 0.000}, // Foreground
+   {0.890, 0.937, 1.000}, // Background
+   {0.0, 0.0, 0.0}, // Inverse
+   {0.6, 0.6, 0.6}, // Gray
+   {0.3, 0.3, 0.3}, // Darkgray
+   {1.0, 0.2, 0.2}, // Red
+   {1.0, 1.0, 0.0}, // Yellow
+   {0.2, 1.0, 0.2}  // Green
+  }};
+
+static int flow_create_gc(FlowDrawGtk* draw_ctx, int ct)
 {
-  GdkColor color;
+  // GdkRGBA c;
+  //gtk_style_context_get_color(draw_ctx->style_context, GTK_STATE_FLAG_NORMAL, &c);
+  //draw_ctx->gc_black = cairo_pattern_create_rgba(c.red, c.green, c.blue, c.alpha);
 
-  if (draw_ctx->color_vect_cnt == 0) {
-    gdk_color_parse("black", &draw_ctx->color_vect[0]);
-    gdk_colormap_alloc_color(
-        draw_ctx->colormap, &draw_ctx->color_vect[0], FALSE, TRUE);
-    gdk_color_parse("white", &draw_ctx->color_vect[1]);
-    gdk_colormap_alloc_color(
-        draw_ctx->colormap, &draw_ctx->color_vect[1], FALSE, TRUE);
-    draw_ctx->color_vect_cnt = 2;
-  }
+  int i = ct;
+  if (i >= sizeof(theme)/sizeof(theme[0]))
+    i = 0;
 
-  if (streq(named_color, "black"))
-    return draw_ctx->color_vect[0];
-  else if (streq(named_color, "white"))
-    return draw_ctx->color_vect[1];
-  else {
-    if (draw_ctx->color_vect_cnt >= (int)(sizeof(draw_ctx->color_vect)
-                                        / sizeof(draw_ctx->color_vect[0]))) {
-      printf("Flow allocate color error: max number of colors exceeded\n");
-      return draw_ctx->color_vect[0];
-    }
+  draw_ctx->gc_black = cairo_pattern_create_rgb(theme[i].fg[0], theme[i].fg[1], theme[i].fg[2]);
+  draw_ctx->gc_erase = cairo_pattern_create_rgb(theme[i].bg[0], theme[i].bg[1], theme[i].bg[2]);
+  draw_ctx->gc_inverse = cairo_pattern_create_rgb(theme[i].inverse[0], theme[i].inverse[1], theme[i].inverse[2]);
+  draw_ctx->gc_gray = cairo_pattern_create_rgb(theme[i].gray[0], theme[i].gray[1], theme[i].gray[2]);
+  draw_ctx->gc_darkgray = cairo_pattern_create_rgb(theme[i].darkgray[0], theme[i].darkgray[1], theme[i].darkgray[2]);
+  draw_ctx->gc_red = cairo_pattern_create_rgb(theme[i].red[0], theme[i].red[1], theme[i].red[2]);
+  draw_ctx->gc_yellow = cairo_pattern_create_rgb(theme[i].yellow[0], theme[i].yellow[1], theme[i].yellow[2]);
+  draw_ctx->gc_green = cairo_pattern_create_rgb(theme[i].green[0], theme[i].green[1], theme[i].green[2]);
+  
+  return 1;
+}
 
-    if (streq(named_color, "yellow")) {
-      color.red = 61952;
-      color.green = 58880;
-      color.blue = 0;
-    } else if (!gdk_color_parse(named_color, &color))
-      gdk_color_parse("black", &color);
-    gdk_colormap_alloc_color(draw_ctx->colormap, &color, FALSE, TRUE);
-
-    draw_ctx->color_vect[draw_ctx->color_vect_cnt] = color;
-    draw_ctx->color_vect_cnt++;
-
-    return color;
-  }
+void FlowDrawGtk::update_color_theme(int ct)
+{
+  draw_free_gc(this);
+  flow_create_gc(this, ct);
 }
 
 FlowDrawGtk::~FlowDrawGtk()
@@ -346,7 +299,10 @@ FlowDrawGtk::~FlowDrawGtk()
   basectx->set_nodraw();
   delete basectx;
   draw_free_gc(this);
-  gdk_colormap_free_colors(colormap, color_vect, color_vect_cnt);
+  if (font_face_bold)
+    cairo_font_face_destroy(font_face_bold);
+  if (font_face_normal)
+    cairo_font_face_destroy(font_face_normal);
 
   if (timer_id)
     g_source_remove(timer_id);
@@ -410,11 +366,13 @@ FlowDrawGtk::FlowDrawGtk(GtkWidget* x_toplevel, void** flow_ctx,
     int (*init_proc)(GtkWidget* w, FlowCtx* ctx, void* client_data),
     void* client_data, flow_eCtxType type)
     : toplevel(x_toplevel), nav_shell(0), nav_toplevel(0), display(0),
-      window(0), nav_window(0), screen(0), timer_id(0), color_vect_cnt(0),
-      closing_down(0)
+      window(0), nav_window(0), screen(0), timer_id(0),
+      closing_down(0), cairo_cr(0), cairo_cr_refcnt(0), cairo_region(0),
+      cairo_context(0), cairo_nav_cr(0), cairo_nav_cr_refcnt(0), cairo_nav_region(0),
+      cairo_nav_context(0), antialias(CAIRO_ANTIALIAS_GRAY), 
+      nav_antialias(CAIRO_ANTIALIAS_NONE), style_context(0),
+      font_face_bold(0), font_face_normal(0)
 {
-  memset(gcs, 0, sizeof(gcs));
-  memset(font, 0, sizeof(font));
   memset(cursors, 0, sizeof(cursors));
 
   if (type == flow_eCtxType_Brow)
@@ -426,18 +384,10 @@ FlowDrawGtk::FlowDrawGtk(GtkWidget* x_toplevel, void** flow_ctx,
   basectx->fdraw = this;
 
   display = gtk_widget_get_display(toplevel);
-  window = toplevel->window;
+  window = gtk_widget_get_window(toplevel);
   screen = gtk_widget_get_screen(toplevel);
-
-  colormap = gdk_colormap_new(gdk_visual_get_system(), TRUE);
-
-  // GtkStyle *style = gtk_widget_get_style( toplevel);
-  // background = style->bg[GTK_STATE_NORMAL];
-  // gdk_colormap_alloc_color( colormap, &background, FALSE, TRUE);
-
-  foreground = flow_allocate_color(this, "black");
-  flow_create_gc(this, window);
-
+  style_context = gtk_widget_get_style_context(toplevel);
+  flow_create_gc(this, 0);
   set_white_background(basectx);
 
   flow_create_cursor(this);
@@ -448,14 +398,77 @@ FlowDrawGtk::FlowDrawGtk(GtkWidget* x_toplevel, void** flow_ctx,
 int FlowDrawGtk::init_nav(GtkWidget* nav_widget, void* flow_ctx)
 {
   nav_toplevel = nav_widget;
-  nav_window = nav_toplevel->window;
+  nav_window = gtk_widget_get_window(nav_toplevel);
 
-  //  flow_create_gc( this, nav_window);
-
-  gtk_widget_modify_bg(nav_widget, GTK_STATE_NORMAL, &background);
+  // flow_create_gc(this, nav_window);
 
   ((FlowCtx*)flow_ctx)->no_nav = 0;
   return 1;
+}
+
+void FlowDrawGtk::invalidate(int x, int y, int width, int height)
+{
+  GdkRectangle rect;
+
+  rect.x = x;
+  rect.y = y;
+  rect.width = width;
+  rect.height = height;
+  gdk_window_invalidate_rect(window, &rect, FALSE);
+}
+
+void FlowDrawGtk::invalidate_nav(int x, int y, int width, int height)
+{
+  GdkRectangle rect;
+
+  rect.x = x;
+  rect.y = y;
+  rect.width = width;
+  rect.height = height;
+  gdk_window_invalidate_rect(nav_window, &rect, FALSE);
+}
+
+int FlowDrawGtk::expose(FlowCtx* ctx, cairo_t* cr, int is_navigator)
+{
+  int sts;
+  int x, y, width, height;
+  GdkRectangle rect;
+
+  if (!is_navigator) {
+    pwr_Assert(cairo_cr_refcnt == 0);
+
+    cairo_cr = cr;
+    cairo_cr_refcnt++;
+    get_window_size(ctx, &ctx->window_width, &ctx->window_height);
+    if (gdk_cairo_get_clip_rectangle(cr, &rect)) {
+      x = rect.x;
+      y = rect.y;
+      width = rect.width;
+      height = rect.height;
+    } else {
+      x = 0;
+      y = 0;
+      width = ctx->window_width;
+      height = ctx->window_height;
+    }
+    //gtk_render_background(style_context, cr, 0, 0, x + width, y + height);
+    fill_rect(ctx, x, y, width, height, flow_eDrawType_LineErase);
+    sts = ctx->event_handler(flow_eEvent_Exposure, x, y, width, height);
+    cairo_cr = 0;
+    cairo_cr_refcnt--;
+    pwr_Assert(cairo_cr_refcnt == 0);
+  } else {  
+    pwr_Assert(cairo_nav_cr_refcnt == 0);
+
+    cairo_nav_cr = cr;
+    cairo_nav_cr_refcnt++;
+    nav_fill_rect(ctx, 0, 0, ctx->nav_window_width, ctx->nav_window_height, flow_eDrawType_LineErase);
+    sts = ctx->event_handler_nav(flow_eEvent_Exposure, 0, 0);
+    cairo_nav_cr = 0;
+    cairo_nav_cr_refcnt--;
+    pwr_Assert(cairo_nav_cr_refcnt == 0);
+  }
+  return sts;
 }
 
 int FlowDrawGtk::event_handler(FlowCtx* ctx, GdkEvent event)
@@ -479,58 +492,58 @@ int FlowDrawGtk::event_handler(FlowCtx* ctx, GdkEvent event)
       guint keysym = event.key.keyval;
 
       switch (keysym) {
-      case GDK_Return:
+      case GDK_KEY_Return:
         sts = ctx->event_handler(flow_eEvent_Key_Return, 0, 0, 0, 0);
         //            printf( "-- Return key event\n");
         break;
-      case GDK_Up:
+      case GDK_KEY_Up:
         if (event.key.state & GDK_SHIFT_MASK)
           sts = ctx->event_handler(flow_eEvent_Key_ShiftUp, 0, 0, 0, 0);
         else
           sts = ctx->event_handler(flow_eEvent_Key_Up, 0, 0, 0, 0);
         break;
-      case GDK_Down:
+      case GDK_KEY_Down:
         if (event.key.state & GDK_SHIFT_MASK)
           sts = ctx->event_handler(flow_eEvent_Key_ShiftDown, 0, 0, 0, 0);
         else
           sts = ctx->event_handler(flow_eEvent_Key_Down, 0, 0, 0, 0);
         break;
-      case GDK_Right:
+      case GDK_KEY_Right:
         if (event.key.state & GDK_SHIFT_MASK)
           sts = ctx->event_handler(flow_eEvent_Key_ShiftRight, 0, 0, 0, 0);
         else
           sts = ctx->event_handler(flow_eEvent_Key_Right, 0, 0, 0, 0);
         break;
-      case GDK_Left:
+      case GDK_KEY_Left:
         if (event.key.state & GDK_SHIFT_MASK)
           sts = ctx->event_handler(flow_eEvent_Key_ShiftLeft, 0, 0, 0, 0);
         else
           sts = ctx->event_handler(flow_eEvent_Key_Left, 0, 0, 0, 0);
         break;
-      case GDK_Page_Up:
+      case GDK_KEY_Page_Up:
       case 0xFF41:
         sts = ctx->event_handler(flow_eEvent_Key_PageUp, 0, 0, 0, 0);
         break;
-      case GDK_Page_Down:
+      case GDK_KEY_Page_Down:
       case 0xFF42:
         sts = ctx->event_handler(flow_eEvent_Key_PageDown, 0, 0, 0, 0);
         break;
-      case GDK_BackSpace:
+      case GDK_KEY_BackSpace:
         sts = ctx->event_handler(flow_eEvent_Key_BackSpace, 0, 0, 0, 0);
         break;
-      case GDK_KP_F1:
+      case GDK_KEY_KP_F1:
         sts = ctx->event_handler(flow_eEvent_Key_PF1, 0, 0, 0, 0);
         break;
-      case GDK_KP_F2:
+      case GDK_KEY_KP_F2:
         sts = ctx->event_handler(flow_eEvent_Key_PF2, 0, 0, 0, 0);
         break;
-      case GDK_KP_F3:
+      case GDK_KEY_KP_F3:
         sts = ctx->event_handler(flow_eEvent_Key_PF3, 0, 0, 0, 0);
         break;
-      case GDK_KP_F4:
+      case GDK_KEY_KP_F4:
         sts = ctx->event_handler(flow_eEvent_Key_PF4, 0, 0, 0, 0);
         break;
-      case GDK_Tab:
+      case GDK_KEY_Tab:
         sts = ctx->event_handler(flow_eEvent_Key_Tab, 0, 0, 0, 0);
         break;
       default:;
@@ -810,7 +823,9 @@ int FlowDrawGtk::event_handler(FlowCtx* ctx, GdkEvent event)
       if (event.motion.is_hint) {
         int x, y;
 
-        gdk_window_get_pointer(event.any.window, &x, &y, NULL);
+        gdk_window_get_device_position(event.any.window, 
+	    gdk_seat_get_pointer(gdk_display_get_default_seat(gdk_display_get_default())),
+	    &x, &y, NULL);
         event.button.x = x;
         event.button.y = y;
       }
@@ -953,7 +968,9 @@ int FlowDrawGtk::event_handler(FlowCtx* ctx, GdkEvent event)
       if (event.motion.is_hint) {
         int x, y;
 
-        gdk_window_get_pointer(event.any.window, &x, &y, NULL);
+        gdk_window_get_device_position(event.any.window, 
+	    gdk_seat_get_pointer(gdk_display_get_default_seat(gdk_display_get_default())),
+            &x, &y, NULL);
         event.button.x = x;
         event.button.y = y;
       }
@@ -982,20 +999,81 @@ void FlowDrawGtk::enable_event(FlowCtx* ctx, flow_eEvent event,
   ctx->enable_event(event, event_type, event_cb);
 }
 
+cairo_t* FlowDrawGtk::get_cairo(int create)
+{
+  if (!cairo_cr_refcnt) {
+    if (!create)
+      printf("** Cairo context create error\n");
+
+    cairo_region = cairo_region_create();
+    cairo_context = gdk_window_begin_draw_frame(window, cairo_region);
+    cairo_cr = gdk_drawing_context_get_cairo_context(cairo_context);
+  }
+  cairo_cr_refcnt++;
+  return cairo_cr;
+}
+
+void FlowDrawGtk::end_cairo(cairo_t* cr)
+{
+  pwr_Assert(cairo_cr_refcnt != 0);
+  cairo_cr_refcnt--;
+
+  if (cairo_cr_refcnt == 0) {
+    gdk_window_end_draw_frame(window, cairo_context);
+    cairo_region_destroy(cairo_region);
+  }
+}
+
+cairo_t* FlowDrawGtk::get_cairo_nav()
+{
+  if (!cairo_nav_cr_refcnt) {
+    cairo_nav_region = cairo_region_create();
+    cairo_nav_context = gdk_window_begin_draw_frame(nav_window, cairo_nav_region);
+    cairo_nav_cr = gdk_drawing_context_get_cairo_context(cairo_nav_context);
+  }
+  cairo_nav_cr_refcnt++;
+  return cairo_nav_cr;
+}
+
+void FlowDrawGtk::end_cairo_nav(cairo_t* cr)
+{
+  pwr_Assert(cairo_nav_cr_refcnt != 0);
+  cairo_nav_cr_refcnt--;
+
+  if (cairo_nav_cr_refcnt == 0) {
+    gdk_window_end_draw_frame(nav_window, cairo_nav_context);
+    cairo_region_destroy(cairo_nav_region);
+  }
+}
+
 int FlowDrawGtk::rect(FlowCtx* ctx, int x, int y, int width, int height,
     flow_eDrawType gc_type, int idx, int highlight, int dimmed)
 {
   if (ctx->nodraw)
     return 1;
 
-  if (dimmed)
-    gc_type = flow_eDrawType_LineGray;
-  else if (gc_type == flow_eDrawType_LineGray && highlight)
-    gc_type = flow_eDrawType_Line;
-  else if (highlight)
-    gc_type = flow_eDrawType(gc_type + 1);
+  cairo_t *cr = get_cairo();
 
-  gdk_draw_rectangle(window, gcs[gc_type][idx], 0, x, y, width, height);
+  cairo_set_antialias(cr, antialias);
+  if (highlight) {
+    if (gc_type == flow_eDrawType_LineGray)
+      cairo_set_source(cr, gc_black);
+    else
+      cairo_set_source(cr, gc_red);
+  } else {
+    if (dimmed || gc_type == flow_eDrawType_LineGray)
+      cairo_set_source(cr, gc_gray);
+    else if (gc_type == flow_eDrawType_LineErase)
+      cairo_set_source(cr, gc_erase);
+    else
+      cairo_set_source(cr, gc_black);
+  }
+  cairo_set_line_width(cr, idx+1);
+
+  cairo_rectangle(cr, x, y, width, height);
+  cairo_stroke(cr);
+  end_cairo(cr);
+
   return 1;
 }
 
@@ -1005,8 +1083,15 @@ int FlowDrawGtk::rect_erase(
   if (ctx->nodraw)
     return 1;
 
-  gdk_draw_rectangle(
-      window, gcs[flow_eDrawType_LineErase][idx], 0, x, y, width, height);
+  cairo_t *cr = get_cairo();
+
+  cairo_set_antialias(cr, antialias);
+  cairo_set_source(cr, gc_erase);
+  cairo_set_line_width(cr, idx+1);
+
+  cairo_rectangle(cr, x, y, width, height);
+  cairo_stroke(cr);
+  end_cairo(cr);
   return 1;
 }
 
@@ -1016,11 +1101,20 @@ int FlowDrawGtk::nav_rect(FlowCtx* ctx, int x, int y, int width, int height,
   if (ctx->no_nav || ctx->nodraw)
     return 1;
 
-  if (gc_type == flow_eDrawType_LineGray && highlight)
-    gc_type = flow_eDrawType_Line;
+  cairo_t *cr = get_cairo_nav();
 
-  gdk_draw_rectangle(
-      nav_window, gcs[gc_type + highlight][idx], 0, x, y, width, height);
+  cairo_set_antialias(cr, nav_antialias);
+  if (gc_type == flow_eDrawType_LineGray && highlight)
+    cairo_set_source(cr, gc_black);
+  else if (highlight)
+    cairo_set_source(cr, gc_red);
+  else
+    cairo_set_source(cr, gc_black);
+  cairo_set_line_width(cr, idx+1);
+
+  cairo_rectangle(cr, x, y, width, height);
+  cairo_stroke(cr);
+  end_cairo_nav(cr);
   return 1;
 }
 
@@ -1030,8 +1124,15 @@ int FlowDrawGtk::nav_rect_erase(
   if (ctx->no_nav || ctx->nodraw)
     return 1;
 
-  gdk_draw_rectangle(
-      nav_window, gcs[flow_eDrawType_LineErase][idx], 0, x, y, width, height);
+  cairo_t *cr = get_cairo_nav();
+
+  cairo_set_antialias(cr, nav_antialias);
+  cairo_set_source(cr, gc_erase);
+  cairo_set_line_width(cr, idx+1);
+
+  cairo_rectangle(cr, x, y, width, height);
+  cairo_stroke(cr);
+  end_cairo_nav(cr);
   return 1;
 }
 
@@ -1041,12 +1142,25 @@ int FlowDrawGtk::triangle(FlowCtx* ctx, int x, int y, int width, int height,
   if (ctx->nodraw)
     return 1;
 
-  if (gc_type == flow_eDrawType_LineGray && highlight)
-    gc_type = flow_eDrawType_Line;
+  cairo_t *cr = get_cairo();
 
-  GdkPoint p[4] = { { x, y + height }, { x + width / 2, y },
-    { x + width, y + height }, { x, y + height } };
-  gdk_draw_polygon(window, gcs[gc_type + highlight][idx], 0, p, 4);
+  cairo_set_antialias(cr, antialias);
+  if (dimmed || gc_type == flow_eDrawType_LineGray)
+    cairo_set_source(cr, gc_gray);
+  else if (gc_type == flow_eDrawType_LineGray && highlight)
+    cairo_set_source(cr, gc_black);
+  else if (highlight)
+    cairo_set_source(cr, gc_red);
+  else
+    cairo_set_source(cr, gc_black);
+  cairo_set_line_width(cr, idx+1);
+
+  cairo_move_to(cr, x, y + height);
+  cairo_line_to(cr, x + width / 2, y);
+  cairo_line_to(cr, x + width, y + height);
+  cairo_line_to(cr, x, y + height);
+  cairo_stroke(cr);
+  end_cairo(cr);
   return 1;
 }
 
@@ -1056,9 +1170,18 @@ int FlowDrawGtk::triangle_erase(
   if (ctx->nodraw)
     return 1;
 
-  GdkPoint p[4] = { { x, y + height }, { x + width / 2, y },
-    { x + width, y + height }, { x, y + height } };
-  gdk_draw_polygon(window, gcs[flow_eDrawType_LineErase][idx], 0, p, 4);
+  cairo_t *cr = get_cairo();
+
+  cairo_set_antialias(cr, antialias);
+  cairo_set_source(cr, gc_erase);
+  cairo_set_line_width(cr, idx+1);
+
+  cairo_move_to(cr, x, y + height);
+  cairo_line_to(cr, x + width / 2, y);
+  cairo_line_to(cr, x + width, y + height);
+  cairo_line_to(cr, x, y + height);
+  cairo_stroke(cr);
+  end_cairo(cr);
   return 1;
 }
 
@@ -1068,12 +1191,21 @@ int FlowDrawGtk::nav_triangle(FlowCtx* ctx, int x, int y, int width, int height,
   if (ctx->no_nav || ctx->nodraw)
     return 1;
 
-  if (gc_type == flow_eDrawType_LineGray && highlight)
-    gc_type = flow_eDrawType_Line;
+  cairo_t *cr = get_cairo_nav();
 
-  GdkPoint p[4] = { { x, y + height }, { x + width / 2, y },
-    { x + width, y + height }, { x, y + height } };
-  gdk_draw_polygon(nav_window, gcs[gc_type + highlight][idx], 0, p, 4);
+  cairo_set_antialias(cr, nav_antialias);
+  if (highlight)
+    cairo_set_source(cr, gc_red);
+  else
+    cairo_set_source(cr, gc_black);
+  cairo_set_line_width(cr, idx+1);
+
+  cairo_move_to(cr, x, y + height);
+  cairo_line_to(cr, x + width / 2, y);
+  cairo_line_to(cr, x + width, y + height);
+  cairo_line_to(cr, x, y + height);
+  cairo_stroke(cr);
+  end_cairo_nav(cr);
   return 1;
 }
 
@@ -1083,9 +1215,17 @@ int FlowDrawGtk::nav_fill_triangle(
   if (ctx->no_nav || ctx->nodraw || gc_type != flow_eDrawType_LineRed)
     return 1;
 
-  GdkPoint p[4] = { { x, y + height }, { x + width / 2, y },
-    { x + width, y + height }, { x, y + height } };
-  gdk_draw_polygon(nav_window, gcs[gc_type][0], 1, p, 4);
+  cairo_t *cr = get_cairo_nav();
+
+  cairo_set_antialias(cr, nav_antialias);
+  cairo_set_source(cr, gc_red);
+
+  cairo_move_to(cr, x, y + height);
+  cairo_line_to(cr, x + width / 2, y);
+  cairo_line_to(cr, x + width, y + height);
+  cairo_line_to(cr, x, y + height);
+  cairo_fill(cr);
+  end_cairo_nav(cr);
   return 1;
 }
 
@@ -1095,59 +1235,110 @@ int FlowDrawGtk::nav_triangle_erase(
   if (ctx->no_nav || ctx->nodraw)
     return 1;
 
-  GdkPoint p[4] = { { x, y + height }, { x + width / 2, y },
-    { x + width, y + height }, { x, y + height } };
-  gdk_draw_polygon(nav_window, gcs[flow_eDrawType_LineErase][idx], 0, p, 4);
+  cairo_t *cr = get_cairo_nav();
+
+  cairo_set_antialias(cr, nav_antialias);
+  cairo_set_source(cr, gc_erase);
+
+  cairo_move_to(cr, x, y + height);
+  cairo_line_to(cr, x + width / 2, y);
+  cairo_line_to(cr, x + width, y + height);
+  cairo_line_to(cr, x, y + height);
+  cairo_fill(cr);
+  end_cairo_nav(cr);
   return 1;
 }
 
 int FlowDrawGtk::arrow(FlowCtx* ctx, int x1, int y1, int x2, int y2, int x3,
     int y3, flow_eDrawType gc_type, int idx, int highlight)
 {
-  GdkPoint p[4] = { { x1, y1 }, { x2, y2 }, { x3, y3 }, { x1, y1 } };
   if (ctx->nodraw)
     return 1;
 
-  if (gc_type == flow_eDrawType_LineGray && highlight)
-    gc_type = flow_eDrawType_Line;
+  cairo_t *cr = get_cairo();
 
-  gdk_draw_polygon(window, gcs[gc_type + highlight][idx], 1, p, 4);
+  cairo_set_antialias(cr, antialias);
+  if (highlight)
+    cairo_set_source(cr, gc_red);
+  else {
+    if (gc_type == flow_eDrawType_LineGray)
+      cairo_set_source(cr, gc_gray);
+    else
+      cairo_set_source(cr, gc_black);
+  }
+  cairo_move_to(cr, x1, y1);
+  cairo_line_to(cr, x2, y2);
+  cairo_line_to(cr, x3, y3);
+  cairo_close_path(cr);
+  cairo_fill(cr);
+  end_cairo(cr);
   return 1;
 }
 
 int FlowDrawGtk::arrow_erase(
     FlowCtx* ctx, int x1, int y1, int x2, int y2, int x3, int y3, int idx)
 {
-  GdkPoint p[4] = { { x1, y1 }, { x2, y2 }, { x3, y3 }, { x1, y1 } };
   if (ctx->nodraw)
     return 1;
 
-  gdk_draw_polygon(window, gcs[flow_eDrawType_LineErase][idx], 1, p, 4);
+  cairo_t *cr = get_cairo();
+
+  cairo_set_antialias(cr, antialias);
+  cairo_set_source(cr, gc_erase);
+
+  cairo_move_to(cr, x1, y1);
+  cairo_line_to(cr, x2, y2);
+  cairo_line_to(cr, x3, y3);
+  cairo_close_path(cr);
+  cairo_fill(cr);
+  end_cairo(cr);
   return 1;
 }
 
 int FlowDrawGtk::nav_arrow(FlowCtx* ctx, int x1, int y1, int x2, int y2, int x3,
     int y3, flow_eDrawType gc_type, int idx, int highlight)
 {
-  GdkPoint p[4] = { { x1, y1 }, { x2, y2 }, { x3, y3 }, { x1, y1 } };
   if (ctx->no_nav || ctx->nodraw)
     return 1;
 
-  if (gc_type == flow_eDrawType_LineGray && highlight)
-    gc_type = flow_eDrawType_Line;
+  cairo_t *cr = get_cairo_nav();
 
-  gdk_draw_polygon(nav_window, gcs[gc_type + highlight][idx], 1, p, 4);
+  cairo_set_antialias(cr, nav_antialias);
+  if (gc_type == flow_eDrawType_LineGray && highlight)
+    cairo_set_source(cr, gc_black);
+  else if (gc_type == flow_eDrawType_LineGray)
+    cairo_set_source(cr, gc_gray);
+  else if (highlight)
+    cairo_set_source(cr, gc_red);
+  else
+    cairo_set_source(cr, gc_black);
+
+  cairo_move_to(cr, x1, y1);
+  cairo_line_to(cr, x2, y2);
+  cairo_line_to(cr, x3, y3);
+  cairo_line_to(cr, x1, y1);
+  cairo_fill(cr);
+  end_cairo_nav(cr);
   return 1;
 }
 
 int FlowDrawGtk::nav_arrow_erase(
     FlowCtx* ctx, int x1, int y1, int x2, int y2, int x3, int y3, int idx)
 {
-  GdkPoint p[4] = { { x1, y1 }, { x2, y2 }, { x3, y3 }, { x1, y1 } };
   if (ctx->no_nav || ctx->nodraw)
     return 1;
 
-  gdk_draw_polygon(nav_window, gcs[flow_eDrawType_LineErase][idx], 1, p, 4);
+  cairo_t *cr = get_cairo_nav();
+
+  cairo_set_antialias(cr, nav_antialias);
+  cairo_set_source(cr, gc_erase);
+
+  cairo_move_to(cr, x1, y1);
+  cairo_line_to(cr, x2, y2);
+  cairo_line_to(cr, x3, y3);
+  cairo_line_to(cr, x1, y1);
+  cairo_fill(cr);
+  end_cairo_nav(cr);
   return 1;
 }
 
@@ -1158,15 +1349,36 @@ int FlowDrawGtk::arc(FlowCtx* ctx, int x, int y, int width, int height,
   if (ctx->nodraw)
     return 1;
 
-  if (dimmed)
-    gc_type = flow_eDrawType_LineGray;
-  else if (gc_type == flow_eDrawType_LineGray && highlight)
-    gc_type = flow_eDrawType_Line;
-  else if (highlight)
-    gc_type = flow_eDrawType(gc_type + 1);
+  if (width == 0 || height == 0)
+    return 1;
 
-  gdk_draw_arc(window, gcs[gc_type][idx], 0, x, y, width, height, angle1 * 64,
-      angle2 * 64);
+  cairo_matrix_t matrix;
+  cairo_t *cr = get_cairo();
+
+  cairo_set_antialias(cr, antialias);
+  if (dimmed)
+    cairo_set_source(cr, gc_gray);
+  else if (gc_type == flow_eDrawType_LineGray && highlight)
+    cairo_set_source(cr, gc_black);
+  else if (highlight)
+    cairo_set_source(cr, gc_red);
+  else
+    cairo_set_source(cr, gc_black);
+  cairo_set_line_width(cr, idx+1);
+
+  if (width != height) {
+    cairo_get_matrix(cr, &matrix);
+    cairo_translate(cr, x + width/2, y + height/2);
+    cairo_scale(cr, 1, (double)height/width);
+    cairo_translate(cr, -(x + width/2), -(y + height/2));
+  }
+  cairo_arc(cr, x+width/2, y+height/2, 0.5 * width, -M_PI/180*(angle1 + angle2),- M_PI/180*angle1);
+
+  if (width != height)
+    cairo_set_matrix(cr, &matrix);
+
+  cairo_stroke(cr);
+  end_cairo(cr);
   return 1;
 }
 
@@ -1176,8 +1388,27 @@ int FlowDrawGtk::arc_erase(FlowCtx* ctx, int x, int y, int width, int height,
   if (ctx->nodraw)
     return 1;
 
-  gdk_draw_arc(window, gcs[flow_eDrawType_LineErase][idx], 0, x, y, width,
-      height, angle1 * 64, angle2 * 64);
+  cairo_matrix_t matrix;
+  cairo_t *cr = get_cairo();
+
+  cairo_set_antialias(cr, antialias);
+  cairo_set_source(cr, gc_erase);
+  cairo_set_line_width(cr, idx+1);
+
+  if (width != height) {
+    cairo_get_matrix(cr, &matrix);
+    cairo_translate(cr, x + width/2, y + height/2);
+    cairo_scale(cr, 1, (double)height/width);
+    cairo_translate(cr, -(x + width/2), -(y + height/2));
+  }
+
+  cairo_arc(cr, x+width/2, y+height/2, 0.5 * width, -M_PI/180*(angle1+angle2), -M_PI/180*angle1);
+
+  if (width != height)
+    cairo_set_matrix(cr, &matrix);
+
+  cairo_stroke(cr);
+  end_cairo(cr);
   return 1;
 }
 
@@ -1187,11 +1418,34 @@ int FlowDrawGtk::nav_arc(FlowCtx* ctx, int x, int y, int width, int height,
   if (ctx->no_nav || ctx->nodraw)
     return 1;
 
-  if (gc_type == flow_eDrawType_LineGray && highlight)
-    gc_type = flow_eDrawType_Line;
+  if (width == 0 || height == 0)
+    return 1;
 
-  gdk_draw_arc(nav_window, gcs[gc_type + highlight][idx], 0, x, y, width,
-      height, angle1 * 64, angle2 * 64);
+  cairo_matrix_t matrix;
+  cairo_t *cr = get_cairo_nav();
+
+  cairo_set_antialias(cr, nav_antialias);
+  if (gc_type == flow_eDrawType_LineGray && highlight)
+    cairo_set_source(cr, gc_black);
+  else if (highlight)
+    cairo_set_source(cr, gc_red);
+  else
+    cairo_set_source(cr, gc_black);
+  cairo_set_line_width(cr, idx+1);
+
+  if (width != height) {
+    cairo_get_matrix(cr, &matrix);
+    cairo_translate(cr, x + width/2, y + height/2);
+    cairo_scale(cr, 1, (double)height/width);
+    cairo_translate(cr, -(x + width/2), -(y + height/2));
+  }
+  cairo_arc(cr, x+width/2, y+height/2, 0.5 * width, -M_PI/180*(angle1 + angle2),- M_PI/180*angle1);
+
+  if (width != height)
+    cairo_set_matrix(cr, &matrix);
+
+  cairo_stroke(cr);
+  end_cairo_nav(cr);
   return 1;
 }
 
@@ -1201,8 +1455,29 @@ int FlowDrawGtk::nav_arc_erase(FlowCtx* ctx, int x, int y, int width,
   if (ctx->no_nav || ctx->nodraw)
     return 1;
 
-  gdk_draw_arc(nav_window, gcs[flow_eDrawType_LineErase][idx], 0, x, y, width,
-      height, angle1 * 64, angle2 * 64);
+  if (width == 0 || height == 0)
+    return 1;
+
+  cairo_matrix_t matrix;
+  cairo_t *cr = get_cairo_nav();
+
+  cairo_set_antialias(cr, nav_antialias);
+  cairo_set_source(cr, gc_erase);
+  cairo_set_line_width(cr, idx+1);
+
+  if (width != height) {
+    cairo_get_matrix(cr, &matrix);
+    cairo_translate(cr, x + width/2, y + height/2);
+    cairo_scale(cr, 1, (double)height/width);
+    cairo_translate(cr, -(x + width/2), -(y + height/2));
+  }
+  cairo_arc(cr, x+width/2, y+height/2, 0.5 * width, -M_PI/180*(angle1 + angle2),- M_PI/180*angle1);
+
+  if (width != height)
+    cairo_set_matrix(cr, &matrix);
+
+  cairo_stroke(cr);
+  end_cairo_nav(cr);
   return 1;
 }
 
@@ -1212,14 +1487,32 @@ int FlowDrawGtk::line(FlowCtx* ctx, int x1, int y1, int x2, int y2,
   if (ctx->nodraw)
     return 1;
 
-  if (dimmed)
-    gc_type = flow_eDrawType_LineGray;
-  else if (gc_type == flow_eDrawType_LineGray && highlight)
-    gc_type = flow_eDrawType_Line;
-  else if (highlight)
-    gc_type = flow_eDrawType(gc_type + 1);
+  cairo_t *cr = get_cairo();
 
-  gdk_draw_line(window, gcs[gc_type][idx], x1, y1, x2, y2);
+  cairo_set_antialias(cr, antialias);
+  if (dimmed || gc_type == flow_eDrawType_LineGray)
+    cairo_set_source(cr, gc_gray);
+  else if (gc_type == flow_eDrawType_LineGray && highlight)
+    cairo_set_source(cr, gc_black);
+  else if (highlight)
+    cairo_set_source(cr, gc_red);
+  else
+    cairo_set_source(cr, gc_black);
+  if (gc_type == flow_eDrawType_LineDashed) {
+    double d[] = {7.0};
+    cairo_set_dash(cr, d, 1, 0);
+  }
+      
+  cairo_set_line_width(cr, idx+1);
+
+  cairo_move_to(cr, x1, y1);
+  cairo_line_to(cr, x2, y2);
+  cairo_stroke(cr);
+  
+  if (gc_type == flow_eDrawType_LineDashed)
+    cairo_set_dash(cr, 0, 0, 0);
+
+  end_cairo(cr);
   return 1;
 }
 
@@ -1229,7 +1522,15 @@ int FlowDrawGtk::line_erase(
   if (ctx->nodraw)
     return 1;
 
-  gdk_draw_line(window, gcs[flow_eDrawType_LineErase][idx], x1, y1, x2, y2);
+  cairo_t *cr = get_cairo();
+  cairo_set_antialias(cr, antialias);
+  cairo_set_source(cr, gc_erase);
+  cairo_set_line_width(cr, idx+1);
+
+  cairo_move_to(cr, x1, y1);
+  cairo_line_to(cr, x2, y2);
+  cairo_stroke(cr);
+  end_cairo(cr);
   return 1;
 }
 
@@ -1239,10 +1540,21 @@ int FlowDrawGtk::nav_line(FlowCtx* ctx, int x1, int y1, int x2, int y2,
   if (ctx->no_nav || ctx->nodraw)
     return 1;
 
-  if (gc_type == flow_eDrawType_LineGray && highlight)
-    gc_type = flow_eDrawType_Line;
+  cairo_t *cr = get_cairo_nav();
 
-  gdk_draw_line(nav_window, gcs[gc_type + highlight][idx], x1, y1, x2, y2);
+  cairo_set_antialias(cr, nav_antialias);
+  if (gc_type == flow_eDrawType_LineGray && highlight)
+    cairo_set_source(cr, gc_black);
+  else if (highlight)
+    cairo_set_source(cr, gc_red);
+  else
+    cairo_set_source(cr, gc_black);
+  cairo_set_line_width(cr, idx+1);
+
+  cairo_move_to(cr, x1, y1);
+  cairo_line_to(cr, x2, y2);
+  cairo_stroke(cr);
+  end_cairo_nav(cr);
   return 1;
 }
 
@@ -1252,178 +1564,16 @@ int FlowDrawGtk::nav_line_erase(
   if (ctx->no_nav || ctx->nodraw)
     return 1;
 
-  gdk_draw_line(nav_window, gcs[flow_eDrawType_LineErase][idx], x1, y1, x2, y2);
-  return 1;
-}
+  cairo_t *cr = get_cairo_nav();
 
-#define FONTSTR "Lucida Sans"
-#define FONT_SCALE 0.7
+  cairo_set_antialias(cr, nav_antialias);
+  cairo_set_source(cr, gc_erase);
+  cairo_set_line_width(cr, idx+1);
 
-static char* font_string(flow_eDrawType gc_type, double size)
-{
-  static char str[80];
-  switch (gc_type) {
-  case flow_eDrawType_TextHelveticaBold:
-  case flow_eDrawType_TextHelveticaEraseBold:
-    sprintf(str, "%s Bold %f", FONTSTR, FONT_SCALE * size);
-    break;
-  default:
-    sprintf(str, "%s %f", FONTSTR, FONT_SCALE * size);
-  }
-  for (char* s = str; *s; s++)
-    if (*s == ',')
-      *s = '.';
-  return str;
-}
-
-int FlowDrawGtk::text_pango(FlowCtx* ctx, int x, int y, char* text, int len,
-    flow_eDrawType gc_type, int idx, int highlight, int dimmed, int line,
-    double size)
-{
-  if (ctx->nodraw)
-    return 1;
-
-  PangoRenderer* pr = gdk_pango_renderer_get_default(screen);
-  gdk_pango_renderer_set_drawable(GDK_PANGO_RENDERER(pr), window);
-
-  if (dimmed) {
-    GdkGCValues xgcv;
-
-    gdk_gc_get_values(gcs[flow_eDrawType_LineGray][0], &xgcv);
-
-    gdk_gc_set_values(gcs[gc_type][0], &xgcv, GDK_GC_FOREGROUND);
-  }
-
-  gdk_pango_renderer_set_gc(GDK_PANGO_RENDERER(pr), gcs[gc_type][0]);
-
-  PangoContext* pctx = gdk_pango_context_get_for_screen(screen);
-  PangoLayout* layout = pango_layout_new(pctx);
-  if (ctx->text_coding != flow_eTextCoding_UTF_8) {
-    char* textutf8
-        = g_convert(text, -1, "UTF-8", "ISO8859-1", NULL, NULL, NULL);
-    pango_layout_set_text(layout, textutf8, -1);
-    g_free(textutf8);
-  } else
-    pango_layout_set_text(layout, text, -1);
-
-  PangoFontDescription* desc
-      = pango_font_description_from_string(font_string(gc_type, size));
-  pango_layout_set_font_description(layout, desc);
-
-  int w, h;
-  pango_layout_get_size(layout, &w, &h);
-
-  // Erase old test first
-  gdk_draw_rectangle(window, gcs[flow_eDrawType_LineErase][idx], 1, x,
-      y - (int)(0.8 / PANGO_SCALE * h), w / PANGO_SCALE, h / PANGO_SCALE);
-
-  pango_renderer_draw_layout(
-      pr, layout, PANGO_SCALE * x, (int)(PANGO_SCALE * y - h * 0.8));
-
-  gdk_pango_renderer_set_drawable(GDK_PANGO_RENDERER(pr), 0);
-  gdk_pango_renderer_set_gc(GDK_PANGO_RENDERER(pr), 0);
-  g_object_unref(layout);
-  pango_font_description_free(desc);
-  g_object_unref(pctx);
-
-  if (dimmed) {
-    GdkGCValues xgcv;
-
-    gdk_gc_get_values(gcs[flow_eDrawType_Line][0], &xgcv);
-
-    gdk_gc_set_values(gcs[gc_type][0], &xgcv, GDK_GC_FOREGROUND);
-  }
-  return 1;
-}
-
-int FlowDrawGtk::text_inverse_pango(FlowCtx* ctx, int x, int y, char* text,
-    int len, flow_eDrawType gc_type, int idx, int line, double size)
-{
-  if (ctx->nodraw)
-    return 1;
-
-  if (gc_type == flow_eDrawType_TextHelvetica)
-    gc_type = flow_eDrawType_TextHelveticaErase;
-  else if (gc_type == flow_eDrawType_TextHelveticaBold)
-    gc_type = flow_eDrawType_TextHelveticaEraseBold;
-
-  PangoRenderer* pr = gdk_pango_renderer_get_default(screen);
-  gdk_pango_renderer_set_drawable(GDK_PANGO_RENDERER(pr), window);
-  gdk_pango_renderer_set_gc(GDK_PANGO_RENDERER(pr), gcs[gc_type][idx]);
-
-  PangoContext* pctx = gdk_pango_context_get_for_screen(screen);
-  PangoLayout* layout = pango_layout_new(pctx);
-  if (ctx->text_coding != flow_eTextCoding_UTF_8) {
-    char* textutf8
-        = g_convert(text, -1, "UTF-8", "ISO8859-1", NULL, NULL, NULL);
-    pango_layout_set_text(layout, textutf8, -1);
-    g_free(textutf8);
-  } else
-    pango_layout_set_text(layout, text, -1);
-
-  PangoFontDescription* desc
-      = pango_font_description_from_string(font_string(gc_type, size));
-  pango_layout_set_font_description(layout, desc);
-
-  int w, h;
-  pango_layout_get_size(layout, &w, &h);
-
-  pango_renderer_draw_layout(
-      pr, layout, PANGO_SCALE * x, (int)(PANGO_SCALE * y - h * 0.8));
-
-  gdk_pango_renderer_set_drawable(GDK_PANGO_RENDERER(pr), 0);
-  gdk_pango_renderer_set_gc(GDK_PANGO_RENDERER(pr), 0);
-  g_object_unref(layout);
-  pango_font_description_free(desc);
-  g_object_unref(pctx);
-
-  return 1;
-}
-
-int FlowDrawGtk::text_erase_pango(FlowCtx* ctx, int x, int y, char* text,
-    int len, flow_eDrawType gc_type, int idx, int line, double size)
-{
-  if (ctx->nodraw)
-    return 1;
-
-  if (gc_type == flow_eDrawType_TextHelvetica)
-    gc_type = flow_eDrawType_TextHelveticaErase;
-  else if (gc_type == flow_eDrawType_TextHelveticaBold)
-    gc_type = flow_eDrawType_TextHelveticaEraseBold;
-
-  PangoRenderer* pr = gdk_pango_renderer_get_default(screen);
-  gdk_pango_renderer_set_drawable(GDK_PANGO_RENDERER(pr), window);
-  gdk_pango_renderer_set_gc(GDK_PANGO_RENDERER(pr), gcs[gc_type][idx]);
-
-  PangoContext* pctx = gdk_pango_context_get_for_screen(screen);
-  PangoLayout* layout = pango_layout_new(pctx);
-  if (ctx->text_coding != flow_eTextCoding_UTF_8) {
-    char* textutf8
-        = g_convert(text, -1, "UTF-8", "ISO8859-1", NULL, NULL, NULL);
-    pango_layout_set_text(layout, textutf8, -1);
-    g_free(textutf8);
-  } else
-    pango_layout_set_text(layout, text, -1);
-
-  PangoFontDescription* desc
-      = pango_font_description_from_string(font_string(gc_type, size));
-  pango_layout_set_font_description(layout, desc);
-
-  int w, h;
-  pango_layout_get_size(layout, &w, &h);
-
-  gdk_draw_rectangle(window, gcs[flow_eDrawType_LineErase][idx], 1, x,
-      y - (int)(0.8 / PANGO_SCALE * h), w / PANGO_SCALE,
-      (int)(h / PANGO_SCALE * 1.2));
-  // pango_renderer_draw_layout( pr, layout, PANGO_SCALE * x, PANGO_SCALE * y -
-  // h * 0.8);
-
-  gdk_pango_renderer_set_drawable(GDK_PANGO_RENDERER(pr), 0);
-  gdk_pango_renderer_set_gc(GDK_PANGO_RENDERER(pr), 0);
-  g_object_unref(layout);
-  pango_font_description_free(desc);
-  g_object_unref(pctx);
-
+  cairo_move_to(cr, x1, y1);
+  cairo_line_to(cr, x2, y2);
+  cairo_stroke(cr);
+  end_cairo_nav(cr);
   return 1;
 }
 
@@ -1431,6 +1581,34 @@ int FlowDrawGtk::text(FlowCtx* ctx, int x, int y, char* text, int len,
     flow_eDrawType gc_type, int idx, int highlight, int dimmed, int line,
     double size)
 {
+  if (ctx->nodraw)
+    return 1;
+
+  size *= DRAW_TSCALE;
+
+  char* textutf8 = 0;
+  if (ctx->text_coding != flow_eTextCoding_UTF_8) {
+    textutf8 = g_convert(text, -1, "UTF-8", "ISO8859-1", NULL, NULL, NULL);
+    text = textutf8;
+  }
+
+  cairo_t *cr = get_cairo();
+  if (gc_type == flow_eDrawType_TextHelveticaErase ||
+      gc_type == flow_eDrawType_TextHelveticaEraseBold)
+    cairo_set_source(cr, gc_erase);
+  else
+    cairo_set_source(cr, gc_black);
+
+  cairo_set_font_face(cr, get_font_face(gc_type));
+  cairo_set_font_size(cr, size);
+  cairo_move_to(cr, x, y);
+  cairo_show_text(cr, text);
+  end_cairo(cr);
+
+  if (textutf8)
+    g_free(textutf8);
+
+#if 0
   if (ctx->nodraw)
     return 1;
 
@@ -1442,24 +1620,66 @@ int FlowDrawGtk::text(FlowCtx* ctx, int x, int y, char* text, int len,
 
   gdk_draw_text(
       window, font[font_idx][idx], gcs[gc_type][idx], x, y, text, len);
+#endif
   return 1;
 }
 
-int FlowDrawGtk::text_inverse(FlowCtx* ctx, int x, int y, char* text, int len,
+int FlowDrawGtk::text_inverse(FlowCtx* ctx, int x, int y, char* txt, int len,
     flow_eDrawType gc_type, int idx, int line, double size)
 {
   if (ctx->nodraw)
     return 1;
 
-  if (pango)
-    return text_inverse_pango(ctx, x, y, text, len, gc_type, idx, line, size);
-  else
-    return text_erase(ctx, x, y, text, len, gc_type, idx, line, size);
+  switch (gc_type) {
+  case flow_eDrawType_TextHelveticaErase:
+    gc_type =  flow_eDrawType_TextHelvetica;
+    break;
+  case flow_eDrawType_TextHelveticaEraseBold:
+    gc_type =  flow_eDrawType_TextHelveticaBold;
+    break;
+  case flow_eDrawType_TextHelvetica:
+    gc_type =  flow_eDrawType_TextHelveticaErase;
+    break;
+  case flow_eDrawType_TextHelveticaBold:
+    gc_type =  flow_eDrawType_TextHelveticaEraseBold;
+    break;
+  default:
+    ;
+  }
+  return text(ctx, x, y, txt, len, gc_type, idx, 0, 0, line, size);
 }
 
 int FlowDrawGtk::text_erase(FlowCtx* ctx, int x, int y, char* text, int len,
     flow_eDrawType gc_type, int idx, int line, double size)
 {
+  if (ctx->nodraw)
+    return 1;
+
+  size *= DRAW_TSCALE;
+
+  char* textutf8 = 0;
+  if (ctx->text_coding != flow_eTextCoding_UTF_8) {
+    textutf8 = g_convert(text, -1, "UTF-8", "ISO8859-1", NULL, NULL, NULL);
+    text = textutf8;
+  }
+
+  cairo_text_extents_t extents;
+  cairo_t *cr = get_cairo();
+  cairo_set_source(cr, gc_erase);
+
+  cairo_set_font_face(cr, get_font_face(gc_type));
+  cairo_set_font_size(cr, size);
+  cairo_text_extents(cr, text, &extents);
+  cairo_set_source(cr, gc_erase);
+  cairo_rectangle(cr, (double)x + extents.x_bearing, (double)y + extents.y_bearing, extents.width, extents.height);
+  cairo_fill(cr);
+
+  end_cairo(cr);
+
+  if (textutf8)
+    g_free(textutf8);
+
+#if 0
   if (ctx->nodraw)
     return 1;
 
@@ -1475,6 +1695,7 @@ int FlowDrawGtk::text_erase(FlowCtx* ctx, int x, int y, char* text, int len,
 
   gdk_draw_text(
       window, font[font_idx][idx], gcs[gc_type][idx], x, y, text, len);
+#endif
   return 1;
 }
 
@@ -1483,10 +1704,21 @@ int FlowDrawGtk::nav_text(FlowCtx* ctx, int x, int y, char* text, int len,
 {
   if (ctx->no_nav || ctx->nodraw)
     return 1;
-  int font_idx = get_font_idx(gc_type);
 
-  gdk_draw_text(
-      nav_window, font[font_idx][idx], gcs[gc_type][idx], x, y, text, len);
+  size *= DRAW_TSCALE;
+
+  cairo_t *cr = get_cairo_nav();
+  if (gc_type == flow_eDrawType_TextHelveticaErase ||
+      gc_type == flow_eDrawType_TextHelveticaEraseBold)
+    cairo_set_source(cr, gc_erase);
+  else
+    cairo_set_source(cr, gc_black);
+
+  cairo_set_font_face(cr, get_font_face(gc_type));
+  cairo_set_font_size(cr, size);
+  cairo_move_to(cr, x, y);
+  cairo_show_text(cr, text);
+  end_cairo_nav(cr);
   return 1;
 }
 
@@ -1495,20 +1727,40 @@ int FlowDrawGtk::nav_text_erase(FlowCtx* ctx, int x, int y, char* text, int len,
 {
   if (ctx->no_nav || ctx->nodraw)
     return 1;
-  int font_idx = get_font_idx(gc_type);
 
-  if (gc_type == flow_eDrawType_TextHelvetica)
-    gc_type = flow_eDrawType_TextHelveticaErase;
-  else if (gc_type == flow_eDrawType_TextHelveticaBold)
-    gc_type = flow_eDrawType_TextHelveticaEraseBold;
-  gdk_draw_text(
-      nav_window, font[font_idx][idx], gcs[gc_type][idx], x, y, text, len);
+  size *= DRAW_TSCALE;
+
+  char* textutf8 = 0;
+  if (ctx->text_coding != flow_eTextCoding_UTF_8) {
+    textutf8 = g_convert(text, -1, "UTF-8", "ISO8859-1", NULL, NULL, NULL);
+    text = textutf8;
+  }
+
+  cairo_text_extents_t extents;
+  cairo_t *cr = get_cairo_nav();
+  cairo_set_source(cr, gc_erase);
+
+  cairo_set_font_face(cr, get_font_face(gc_type));
+  cairo_set_font_size(cr, size);
+  cairo_text_extents(cr, text, &extents);
+  cairo_set_source(cr, gc_erase);
+  cairo_rectangle(cr, (double)x + extents.x_bearing, (double)y + extents.y_bearing, extents.width, extents.height);
+  cairo_fill(cr);
+
+  end_cairo_nav(cr);
+
+  if (textutf8)
+    g_free(textutf8);
+
   return 1;
 }
 
 int FlowDrawGtk::pixmaps_create(
     FlowCtx* ctx, flow_sPixmapData* pixmap_data, void** pixmaps)
 {
+  cairo_format_t format = CAIRO_FORMAT_A1;
+  int stride;
+
   draw_sPixmap* pms;
   flow_sPixmapDataElem *prev_pdata = NULL,
       *pdata = (flow_sPixmapDataElem *)pixmap_data;
@@ -1517,8 +1769,25 @@ int FlowDrawGtk::pixmaps_create(
   pms = (draw_sPixmap*)calloc(1, sizeof(*pms));
   for (i = 0; i < DRAW_PIXMAP_SIZE; i++) {
     if (i == 0 || (i > 0 && pdata->bits != prev_pdata->bits)) {
-      pms->pixmap[i] = gdk_pixmap_create_from_data(window, (char*)pdata->bits,
-          pdata->width, pdata->height, 1, &foreground, &background);
+      stride = cairo_format_stride_for_width(format, pdata->width);
+
+      pms->data[i] = (unsigned char *)calloc(1, stride * pdata->height);
+      int pwidth = ((pdata->width - 1)/8 + 1);
+      int pidx = 0;
+      int sidx = 0;
+      for (int j = 0; j < pdata->height; j++) {
+	for (int k = 0; k < pwidth; k++) {
+	  pms->data[i][sidx] = pdata->bits[pidx];
+	  pidx++;	  
+	  sidx++;
+	}
+	sidx = (j + 1) * stride;
+      }
+
+      pms->pixmap[i] = cairo_image_surface_create_for_data(pms->data[i], 
+	  format, pdata->width, pdata->height, stride);
+
+      //free(data);
     } else
       pms->pixmap[i] = pms->pixmap[i - 1];
     prev_pdata = pdata;
@@ -1536,35 +1805,40 @@ void FlowDrawGtk::pixmaps_delete(FlowCtx* ctx, void* pixmaps)
   pms = (draw_sPixmap*)pixmaps;
   for (i = 0; i < DRAW_PIXMAP_SIZE; i++) {
     if (i == 0 || (i > 0 && pms->pixmap[i] != pms->pixmap[i - 1])) {
-      g_object_unref(pms->pixmap[i]);
+      cairo_surface_destroy(pms->pixmap[i]);
+      free(pms->data[i]);
     }
   }
   free(pixmaps);
+
 }
 
 int FlowDrawGtk::pixmap(FlowCtx* ctx, int x, int y,
     flow_sPixmapData* pixmap_data, void* pixmaps, flow_eDrawType gc_type,
     int idx, int highlight, int line)
 {
-  draw_sPixmap* pms;
-  flow_sPixmapDataElem* pdata = (flow_sPixmapDataElem*)pixmap_data + idx;
-
   if (ctx->nodraw)
     return 1;
 
-  pms = (draw_sPixmap*)pixmaps;
+  cairo_t *cr = get_cairo();
+ 
+  draw_sPixmap* pms = (draw_sPixmap*)pixmaps;
+#if 0
+  flow_sPixmapDataElem* pdata = (flow_sPixmapDataElem*)pixmap_data + idx;
 
-  // gdk_draw_drawable( window, gcs[gc_type][idx],
-  //		     pms->pixmap[idx],
-  //		     0, 0, x, y, pdata->width, pdata->height);
-  gdk_draw_rectangle(
-      window, gcs[gc_type][idx], 1, x, y, pdata->width, pdata->height);
-  gdk_gc_set_clip_mask(gcs[flow_eDrawType_LineErase][idx], pms->pixmap[idx]);
-  gdk_gc_set_clip_origin(gcs[flow_eDrawType_LineErase][idx], x, y);
-  gdk_draw_rectangle(window, gcs[flow_eDrawType_LineErase][idx], 1, x, y,
-      pdata->width, pdata->height);
-  gdk_gc_set_clip_mask(gcs[flow_eDrawType_LineErase][idx], NULL);
-  gdk_gc_set_clip_origin(gcs[flow_eDrawType_LineErase][idx], 0, 0);
+  cairo_set_source(cr, gc_erase);
+  cairo_rectangle(cr, x, y, pdata->width, pdata->height);
+  cairo_fill(cr);
+#endif
+
+  if (gc_type == flow_eDrawType_LineRed)
+    cairo_set_source(cr, gc_red);
+  else
+    cairo_set_source(cr, gc_black);
+  cairo_mask_surface(cr, pms->pixmap[idx], x, y);
+  cairo_fill(cr);
+
+  end_cairo(cr);
 
   return 1;
 }
@@ -1573,25 +1847,24 @@ int FlowDrawGtk::pixmap_inverse(FlowCtx* ctx, int x, int y,
     flow_sPixmapData* pixmap_data, void* pixmaps, flow_eDrawType gc_type,
     int idx, int line)
 {
-  draw_sPixmap* pms;
-  flow_sPixmapDataElem* pdata = (flow_sPixmapDataElem*)pixmap_data + idx;
-
   if (ctx->nodraw)
     return 1;
 
-  pms = (draw_sPixmap*)pixmaps;
+  cairo_t *cr = get_cairo();
+ 
+  draw_sPixmap* pms = (draw_sPixmap*)pixmaps;
+  flow_sPixmapDataElem* pdata = (flow_sPixmapDataElem*)pixmap_data + idx;
 
-  // gdk_draw_drawable( window, gc_inverse,
-  //		     pms->pixmap[idx],
-  //		     0, 0, x, y, pdata->width, pdata->height);
-  gdk_draw_rectangle(window, gcs[flow_eDrawType_LineErase][idx], 1, x, y,
-      pdata->width, pdata->height);
-  gdk_gc_set_clip_mask(gcs[gc_type][idx], pms->pixmap[idx]);
-  gdk_gc_set_clip_origin(gcs[gc_type][idx], x, y);
-  gdk_draw_rectangle(
-      window, gcs[gc_type][idx], 1, x, y, pdata->width, pdata->height);
-  gdk_gc_set_clip_mask(gcs[gc_type][idx], NULL);
-  gdk_gc_set_clip_origin(gcs[gc_type][idx], 0, 0);
+  cairo_set_source(cr, gc_black);
+  cairo_rectangle(cr, x, y, pdata->width, pdata->height);
+  cairo_fill(cr);
+
+  cairo_set_source(cr, gc_erase);
+  cairo_mask_surface(cr, pms->pixmap[idx], x, y);
+  cairo_fill(cr);
+
+  end_cairo(cr);
+
   return 1;
 }
 
@@ -1600,10 +1873,9 @@ int FlowDrawGtk::pixmap_erase(FlowCtx* ctx, int x, int y,
     int idx, int line)
 {
   flow_sPixmapDataElem* pdata = (flow_sPixmapDataElem*)pixmap_data + idx;
-  if (ctx->nodraw)
-    return 1;
 
-  gdk_window_clear_area(window, x, y, pdata->width, pdata->height);
+  fill_rect(ctx, x, y, pdata->width, pdata->height, flow_eDrawType_LineErase);
+
   return 1;
 }
 
@@ -1611,16 +1883,24 @@ int FlowDrawGtk::nav_pixmap(FlowCtx* ctx, int x, int y,
     flow_sPixmapData* pixmap_data, void* pixmaps, flow_eDrawType gc_type,
     int idx, int highlight, int line)
 {
-  draw_sPixmap* pms;
-  flow_sPixmapDataElem* pdata = (flow_sPixmapDataElem*)pixmap_data + idx;
-
   if (ctx->no_nav || ctx->nodraw)
     return 1;
 
-  pms = (draw_sPixmap*)pixmaps;
+  cairo_t *cr = get_cairo_nav();
+ 
+  draw_sPixmap* pms = (draw_sPixmap*)pixmaps;
+  flow_sPixmapDataElem* pdata = (flow_sPixmapDataElem*)pixmap_data + idx;
 
-  gdk_draw_drawable(nav_window, gcs[gc_type][idx], pms->pixmap[idx], 0, 0, x, y,
-      pdata->width, pdata->height);
+  cairo_set_source(cr, gc_erase);
+  cairo_rectangle(cr, x, y, pdata->width, pdata->height);
+  cairo_fill(cr);
+
+  cairo_set_source(cr, gc_black);
+  cairo_mask_surface(cr, pms->pixmap[idx], x, y);
+  cairo_fill(cr);
+
+  end_cairo_nav(cr);
+
   return 1;
 }
 
@@ -1629,10 +1909,8 @@ int FlowDrawGtk::nav_pixmap_erase(FlowCtx* ctx, int x, int y,
     int idx, int line)
 {
   flow_sPixmapDataElem* pdata = (flow_sPixmapDataElem*)pixmap_data + idx;
-  if (ctx->no_nav || ctx->nodraw)
-    return 1;
 
-  gdk_window_clear_area(nav_window, x, y, pdata->width, pdata->height);
+  nav_fill_rect(ctx, x, y, pdata->width, pdata->height, flow_eDrawType_LineErase);
   return 1;
 }
 
@@ -1642,14 +1920,65 @@ int FlowDrawGtk::fill_rect(
   if (ctx->nodraw)
     return 1;
 
-  if (gc_type == flow_eDrawType_Green)
-    gdk_draw_rectangle(window, gc_green, 1, x, y, w, h);
-  else if (gc_type == flow_eDrawType_Yellow)
-    gdk_draw_rectangle(window, gc_yellow, 1, x, y, w, h);
-  else if (gc_type == flow_eDrawType_DarkGray)
-    gdk_draw_rectangle(window, gc_darkgray, 1, x, y, w, h);
-  else
-    gdk_draw_rectangle(window, gcs[gc_type][0], 1, x, y, w, h);
+  cairo_t *cr = get_cairo();
+
+  cairo_set_antialias(cr, antialias);
+  switch (gc_type) {
+  case flow_eDrawType_LineRed:
+    cairo_set_source(cr, gc_red);
+    break;
+  case flow_eDrawType_Green:
+    cairo_set_source(cr, gc_green);
+    break;
+  case flow_eDrawType_Yellow:
+    cairo_set_source(cr, gc_yellow);
+    break;
+  case flow_eDrawType_DarkGray:
+    cairo_set_source(cr, gc_darkgray);
+    break;
+  case flow_eDrawType_LineErase:
+    cairo_set_source(cr, gc_erase);
+    break;
+  default:
+    cairo_set_source(cr, gc_black);
+  }
+  cairo_rectangle(cr, x, y, w, h);
+  cairo_fill(cr);
+  end_cairo(cr);
+  return 1;
+}
+
+int FlowDrawGtk::nav_fill_rect(
+    FlowCtx* ctx, int x, int y, int w, int h, flow_eDrawType gc_type)
+{
+  if (ctx->no_nav || ctx->nodraw)
+    return 1;
+
+  cairo_t *cr = get_cairo_nav();
+
+  cairo_set_antialias(cr, nav_antialias);
+  switch (gc_type) {
+  case flow_eDrawType_LineRed:
+    cairo_set_source(cr, gc_red);
+    break;
+  case flow_eDrawType_Green:
+    cairo_set_source(cr, gc_green);
+    break;
+  case flow_eDrawType_Yellow:
+    cairo_set_source(cr, gc_yellow);
+    break;
+  case flow_eDrawType_DarkGray:
+    cairo_set_source(cr, gc_darkgray);
+    break;
+  case flow_eDrawType_LineErase:
+    cairo_set_source(cr, gc_erase);
+    break;
+  default:
+    cairo_set_source(cr, gc_black);
+  }
+  cairo_rectangle(cr, x, y, w, h);
+  cairo_fill(cr);
+  end_cairo_nav(cr);
   return 1;
 }
 
@@ -1659,16 +1988,34 @@ int FlowDrawGtk::fill_triangle(
   if (ctx->nodraw)
     return 1;
 
-  GdkPoint p[4]
-      = { { x, y + h }, { x + w / 2, y }, { x + w, y + h }, { x, y + h } };
-  if (gc_type == flow_eDrawType_Green)
-    gdk_draw_polygon(window, gc_green, 1, p, 4);
-  else if (gc_type == flow_eDrawType_Yellow)
-    gdk_draw_polygon(window, gc_yellow, 1, p, 4);
-  else if (gc_type == flow_eDrawType_DarkGray)
-    gdk_draw_polygon(window, gc_darkgray, 1, p, 4);
-  else
-    gdk_draw_polygon(window, gcs[gc_type][0], 1, p, 4);
+  cairo_t *cr = get_cairo();
+
+  cairo_set_antialias(cr, antialias);
+  switch (gc_type) {
+  case flow_eDrawType_LineRed:
+    cairo_set_source(cr, gc_red);
+    break;
+  case flow_eDrawType_Green:
+    cairo_set_source(cr, gc_green);
+    break;
+  case flow_eDrawType_Yellow:
+    cairo_set_source(cr, gc_yellow);
+    break;
+  case flow_eDrawType_DarkGray:
+    cairo_set_source(cr, gc_darkgray);
+    break;
+  case flow_eDrawType_LineErase:
+    cairo_set_source(cr, gc_erase);
+    break;
+  default:
+    cairo_set_source(cr, gc_black);
+  }
+  cairo_move_to(cr, x, y + h);
+  cairo_line_to(cr, x + w / 2, y);
+  cairo_line_to(cr, x + w, y + h);
+  cairo_line_to(cr, x, y + h);
+  cairo_fill(cr);
+  end_cairo(cr);
   return 1;
 }
 
@@ -1681,14 +2028,18 @@ int FlowDrawGtk::image(FlowCtx* ctx, int x, int y, int width, int height,
   if (width == 0 || height == 0)
     return 1;
 
+  cairo_t *cr = get_cairo();
+
   if (clip_mask)
     set_image_clip_mask(ctx, clip_mask, x, y);
 
-  gdk_draw_pixbuf(window, gcs[flow_eDrawType_Line][0], (GdkPixbuf*)image, 0, 0,
-      x, y, width, height, GDK_RGB_DITHER_NONE, 0, 0);
+  gdk_cairo_set_source_pixbuf(cr, (GdkPixbuf *)image, x, y);
+  cairo_paint(cr);
 
   if (clip_mask)
     reset_image_clip_mask(ctx);
+
+  end_cairo(cr);
 
   return 1;
 }
@@ -1698,30 +2049,37 @@ void FlowDrawGtk::clear(FlowCtx* ctx)
   if (ctx->nodraw)
     return;
 
-  gdk_window_clear(window);
+  fill_rect(ctx, 0, 0, ctx->window_width, ctx->window_height, flow_eDrawType_LineErase);
+  //gdk_window_clear(window);
 }
 
 void FlowDrawGtk::nav_clear(FlowCtx* ctx)
 {
-  if (ctx->no_nav || ctx->nodraw)
-    return;
-
-  gdk_window_clear(nav_window);
+  nav_fill_rect(ctx, 0, 0, ctx->nav_window_width, ctx->nav_window_height, flow_eDrawType_LineErase);
 }
 
 void FlowDrawGtk::get_window_size(FlowCtx* ctx, int* width, int* height)
 {
-  gdk_drawable_get_size(window, width, height);
+  *width = gdk_window_get_width(window);
+  *height = gdk_window_get_height(window); 
 }
 
 void FlowDrawGtk::get_nav_window_size(FlowCtx* ctx, int* width, int* height)
 {
-  gdk_drawable_get_size(nav_window, width, height);
+  *width = gdk_window_get_width(nav_window);
+  *height = gdk_window_get_height(nav_window);
 }
 
 void FlowDrawGtk::set_nav_window_size(FlowCtx* ctx, int width, int height)
 {
-  gdk_window_resize(nav_window, width, height);
+  GdkGeometry hints;
+  hints.min_width = width;
+  hints.max_width = width;
+  hints.min_height = height;
+  hints.max_height = height;
+  gtk_window_set_geometry_hints(GTK_WINDOW(nav_toplevel), GTK_WIDGET(nav_toplevel), 
+     &hints, (GdkWindowHints)(GDK_HINT_MIN_SIZE | GDK_HINT_MAX_SIZE));
+  gtk_window_set_default_size(GTK_WINDOW(nav_toplevel), width, height);
 }
 
 static gboolean draw_timer_cb(void* data)
@@ -1803,58 +2161,58 @@ void FlowDrawGtk::set_nav_cursor(FlowCtx* ctx, draw_eCursor cursor)
 int FlowDrawGtk::get_text_extent(FlowCtx* ctx, const char* text, int len,
     flow_eDrawType gc_type, int idx, int* width, int* height, double size)
 {
-  if (pango)
-    return get_text_extent_pango(
-        ctx, text, len, gc_type, idx, size, width, height);
+  cairo_text_extents_t extents;
 
-  int text_width, text_ascent, text_descent, text_lbearing, text_rbearing;
-  int font_idx = get_font_idx(gc_type);
+  size *= DRAW_TSCALE;
 
-  gdk_text_extents(font[font_idx][idx], text, len, &text_lbearing,
-      &text_rbearing, &text_width, &text_ascent, &text_descent);
-  *height = int(1.6 * text_ascent) + text_descent;
-  *width = text_width;
-  return 1;
-}
-
-int FlowDrawGtk::get_text_extent_pango(FlowCtx* ctx, const char* text, int len,
-    flow_eDrawType gc_type, int idx, double size, int* width, int* height)
-{
-  PangoRenderer* pr = gdk_pango_renderer_get_default(screen);
-  gdk_pango_renderer_set_drawable(GDK_PANGO_RENDERER(pr), window);
-  gdk_pango_renderer_set_gc(GDK_PANGO_RENDERER(pr), gcs[gc_type][idx]);
-
-  PangoContext* pctx = gdk_pango_context_get_for_screen(screen);
-  PangoLayout* layout = pango_layout_new(pctx);
+  char* textutf8 = 0;
   if (ctx->text_coding != flow_eTextCoding_UTF_8) {
-    char* textutf8
-        = g_convert(text, -1, "UTF-8", "ISO8859-1", NULL, NULL, NULL);
-    pango_layout_set_text(layout, textutf8, -1);
+    textutf8 = g_convert(text, -1, "UTF-8", "ISO8859-1", NULL, NULL, NULL);
+    text = textutf8;
+  }
+
+  cairo_t *cr = get_cairo(1);
+
+  cairo_set_font_face(cr, get_font_face(gc_type));
+  cairo_set_font_size(cr, size);
+
+  cairo_text_extents(cr, text, &extents);
+  *width = extents.width;
+  *height = extents.height;
+
+  end_cairo(cr);
+
+  if (textutf8)
     g_free(textutf8);
-  } else
-    pango_layout_set_text(layout, text, -1);
-
-  PangoFontDescription* desc
-      = pango_font_description_from_string(font_string(gc_type, size));
-  pango_layout_set_font_description(layout, desc);
-
-  int w, h;
-  pango_layout_get_size(layout, &w, &h);
-
-  *width = w / PANGO_SCALE;
-  *height = h / PANGO_SCALE;
-
-  gdk_pango_renderer_set_drawable(GDK_PANGO_RENDERER(pr), 0);
-  gdk_pango_renderer_set_gc(GDK_PANGO_RENDERER(pr), 0);
-  g_object_unref(layout);
-  pango_font_description_free(desc);
-  g_object_unref(pctx);
 
   return 1;
 }
+
+cairo_font_face_t* FlowDrawGtk::get_font_face(flow_eDrawType gc_type)
+{
+  if (gc_type == flow_eDrawType_TextHelveticaBold ||
+      gc_type == flow_eDrawType_TextHelveticaEraseBold) {
+    if (!font_face_bold)
+      font_face_bold = cairo_toy_font_face_create(font_name, CAIRO_FONT_SLANT_NORMAL,
+          CAIRO_FONT_WEIGHT_BOLD);
+    return font_face_bold;
+  }
+  else {
+    if (!font_face_normal)
+      font_face_normal = cairo_toy_font_face_create(font_name, CAIRO_FONT_SLANT_NORMAL,
+        CAIRO_FONT_WEIGHT_NORMAL);
+    return font_face_normal;
+  }
+}
+
 
 void FlowDrawGtk::copy_area(FlowCtx* ctx, int x, int y)
 {
+  if (ctx->nodraw)
+    return;
+
+  ctx->draw(0, 0, ctx->window_width, ctx->window_height);
+#if 0
   GdkGC* gc;
   if (ctx->nodraw)
     return;
@@ -1893,15 +2251,13 @@ void FlowDrawGtk::copy_area(FlowCtx* ctx, int x, int y)
       gdk_window_clear_area(window, x, ctx->window_height + y,
           ctx->window_width, ctx->window_height);
   }
+#endif
 }
 
 void FlowDrawGtk::clear_area(
     FlowCtx* ctx, int ll_x, int ur_x, int ll_y, int ur_y)
 {
-  if (ctx->nodraw)
-    return;
-
-  gdk_window_clear_area(window, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y);
+  fill_rect(ctx, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, flow_eDrawType_LineErase);
 }
 
 void FlowDrawGtk::set_inputfocus(FlowCtx* ctx)
@@ -1918,42 +2274,25 @@ void FlowDrawGtk::set_click_sensitivity(FlowCtx* ctx, int value)
 void FlowDrawGtk::set_image_clip_mask(
     FlowCtx* ctx, flow_tPixmap pixmap, int x, int y)
 {
+#if 0
   GdkPixmap* gpixmap = gdk_pixmap_foreign_new((Pixmap)pixmap);
   gdk_gc_set_clip_mask(gcs[flow_eDrawType_Line][0], gpixmap);
   gdk_gc_set_clip_origin(gcs[flow_eDrawType_Line][0], x, y);
+#endif
 }
 
 void FlowDrawGtk::reset_image_clip_mask(FlowCtx* ctx)
 {
+#if 0
   gdk_gc_set_clip_mask(gcs[flow_eDrawType_Line][0], NULL);
   gdk_gc_set_clip_origin(gcs[flow_eDrawType_Line][0], 0, 0);
+#endif
 }
 
 void FlowDrawGtk::set_white_background(FlowCtx* ctx)
 {
-  // background.red = int( 0.9 * 65534);
-  // background.green = int( 0.9 * 65534);
-  // background.blue = int( 0.9 * 65534);
+  //fill_rect(ctx, 0, 0, ctx->window_width, ctx->window_height, flow_eDrawType_LineErase);
 
-  // if ( !gdk_colormap_alloc_color( colormap, &background, TRUE, TRUE))
-  //   return;
-
-  background = flow_allocate_color(this, "white");
-
-  // Change erase gcs
-  for (int i = 0; i < DRAW_TYPE_SIZE; i++) {
-    gdk_gc_set_foreground(gcs[flow_eDrawType_LineErase][i], &background);
-    gdk_gc_set_background(gcs[flow_eDrawType_LineErase][i], &background);
-    gdk_gc_set_foreground(
-        gcs[flow_eDrawType_TextHelveticaErase][i], &background);
-    gdk_gc_set_background(
-        gcs[flow_eDrawType_TextHelveticaErase][i], &background);
-    gdk_gc_set_foreground(
-        gcs[flow_eDrawType_TextHelveticaEraseBold][i], &background);
-    gdk_gc_set_background(
-        gcs[flow_eDrawType_TextHelveticaEraseBold][i], &background);
-  }
-  gtk_widget_modify_bg(toplevel, GTK_STATE_NORMAL, &background);
 }
 
 int FlowDrawGtk::get_font_idx(int gc_type)

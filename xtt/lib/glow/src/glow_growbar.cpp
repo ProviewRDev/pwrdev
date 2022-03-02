@@ -55,15 +55,11 @@ GrowBar::GrowBar(GrowCtx* glow_ctx, const char* name, double x, double y,
       bar_bordercolor(glow_eDrawType_Inherit), bar_borderwidth(1), user_data(0)
 {
   if (!nodraw)
-    draw(&ctx->mw, (GlowTransform*)NULL, highlight, hot, NULL, NULL);
+    draw();
 }
 
 GrowBar::~GrowBar()
 {
-  if (ctx->nodraw)
-    return;
-  erase(&ctx->mw);
-  erase(&ctx->navw);
 }
 
 void GrowBar::save(std::ofstream& fp, glow_eSaveMode mode)
@@ -257,7 +253,6 @@ void GrowBar::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
     idx = line_width;
     idx += hot;
     if (idx < 0) {
-      erase(w, t, hot, node);
       return;
     }
   } else {
@@ -411,58 +406,6 @@ void GrowBar::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
   }
 }
 
-void GrowBar::erase(GlowWind* w, GlowTransform* t, int hot, void* node)
-{
-  if (!(display_level & ctx->display_level))
-    return;
-  if (w == &ctx->navw) {
-    if (ctx->no_nav)
-      return;
-    hot = 0;
-  }
-  int idx;
-  if (fix_line_width) {
-    idx = line_width;
-    idx += hot;
-    if (idx < 0)
-      return;
-  } else {
-    if (node && ((GrowNode*)node)->line_width)
-      idx = int(
-          w->zoom_factor_y / w->base_zoom_factor * ((GrowNode*)node)->line_width
-          - 1);
-    else
-      idx = int(w->zoom_factor_y / w->base_zoom_factor * line_width - 1);
-    idx += hot;
-  }
-  idx = MAX(0, idx);
-  idx = MIN(idx, DRAW_TYPE_SIZE - 1);
-  int x1, y1, x2, y2, ll_x, ll_y, ur_x, ur_y;
-
-  if (!t) {
-    x1 = int(trf.x(ll.x, ll.y) * w->zoom_factor_x) - w->offset_x;
-    y1 = int(trf.y(ll.x, ll.y) * w->zoom_factor_y) - w->offset_y;
-    x2 = int(trf.x(ur.x, ur.y) * w->zoom_factor_x) - w->offset_x;
-    y2 = int(trf.y(ur.x, ur.y) * w->zoom_factor_y) - w->offset_y;
-  } else {
-    x1 = int(trf.x(t, ll.x, ll.y) * w->zoom_factor_x) - w->offset_x;
-    y1 = int(trf.y(t, ll.x, ll.y) * w->zoom_factor_y) - w->offset_y;
-    x2 = int(trf.x(t, ur.x, ur.y) * w->zoom_factor_x) - w->offset_x;
-    y2 = int(trf.y(t, ur.x, ur.y) * w->zoom_factor_y) - w->offset_y;
-  }
-  ll_x = MIN(x1, x2);
-  ur_x = MAX(x1, x2);
-  ll_y = MIN(y1, y2);
-  ur_y = MAX(y1, y2);
-
-  w->set_draw_buffer_only();
-  if (border)
-    ctx->gdraw->rect_erase(w, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, idx);
-  ctx->gdraw->fill_rect(
-      w, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, glow_eDrawType_LineErase);
-  w->reset_draw_buffer_only();
-}
-
 int GrowBar::trace_scan()
 {
   if (!trace.p)
@@ -505,8 +448,6 @@ void GrowBar::align(double x, double y, glow_eAlignDirection direction)
 {
   double dx, dy;
 
-  erase(&ctx->mw);
-  erase(&ctx->navw);
   ctx->set_defered_redraw();
   draw();
   switch (direction) {

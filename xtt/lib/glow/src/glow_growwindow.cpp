@@ -64,15 +64,14 @@ GrowWindow::GrowWindow(GrowCtx* glow_ctx, const char* name, double x, double y,
   strcpy(owner, "");
 
   if (!nodraw)
-    draw(&ctx->mw, (GlowTransform*)NULL, highlight, hot, NULL, NULL);
+    draw();
 }
 
 GrowWindow::~GrowWindow()
 {
-  if (!ctx->nodraw) {
-    erase(&ctx->mw);
-    erase(&ctx->navw);
-  }
+  if (!ctx->nodraw)
+    draw();
+
   if (window_ctx) {
     if (window_ctx->trace_started)
       window_ctx->trace_close();
@@ -320,14 +319,16 @@ void GrowWindow::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
         = window_ctx->mw.subwindow_scale * w->zoom_factor_x;
     window_ctx->mw.zoom_factor_y
         = window_ctx->mw.subwindow_scale * w->zoom_factor_y;
-    // window_ctx->draw_buffer_only = ctx->draw_buffer_only;
 
     ctx->gdraw->push_customcolors(window_ctx->customcolors);
+#if 0
     if (fill)
       ctx->gdraw->fill_rect(
           w, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, fill_drawtype);
-
-    window_ctx->draw(&window_ctx->mw, ll_x, ll_y, ur_x, ur_y);
+#endif
+    ctx->gdraw->push_background(fill_drawtype);
+    window_ctx->draw_invalidated(&window_ctx->mw, ll_x, ll_y, ur_x, ur_y);
+    ctx->gdraw->pop_background();
     ctx->gdraw->pop_customcolors();
   }
 
@@ -337,41 +338,6 @@ void GrowWindow::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
   drawtype = ctx->get_drawtype(draw_type, glow_eDrawType_LineHighlight,
       highlight, (GrowNode*)colornode, 0);
   ctx->gdraw->rect(w, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, drawtype, idx, 0);
-}
-
-void GrowWindow::erase(GlowWind* w, GlowTransform* t, int hot, void* node)
-{
-  if (!(display_level & ctx->display_level))
-    return;
-  int idx;
-  idx = int(w->zoom_factor_y / w->base_zoom_factor * line_width - 1);
-  idx += hot;
-
-  idx = MAX(0, idx);
-  idx = MIN(idx, DRAW_TYPE_SIZE - 1);
-  int x1, y1, x2, y2, ll_x, ll_y, ur_x, ur_y;
-
-  if (!t) {
-    x1 = int(trf.x(ll.x, ll.y) * w->zoom_factor_x) - w->offset_x;
-    y1 = int(trf.y(ll.x, ll.y) * w->zoom_factor_y) - w->offset_y;
-    x2 = int(trf.x(ur.x, ur.y) * w->zoom_factor_x) - w->offset_x;
-    y2 = int(trf.y(ur.x, ur.y) * w->zoom_factor_y) - w->offset_y;
-  } else {
-    x1 = int(trf.x(t, ll.x, ll.y) * w->zoom_factor_x) - w->offset_x;
-    y1 = int(trf.y(t, ll.x, ll.y) * w->zoom_factor_y) - w->offset_y;
-    x2 = int(trf.x(t, ur.x, ur.y) * w->zoom_factor_x) - w->offset_x;
-    y2 = int(trf.y(t, ur.x, ur.y) * w->zoom_factor_y) - w->offset_y;
-  }
-  ll_x = MIN(x1, x2);
-  ur_x = MAX(x1, x2);
-  ll_y = MIN(y1, y2);
-  ur_y = MAX(y1, y2);
-
-  w->set_draw_buffer_only();
-  ctx->gdraw->rect_erase(w, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, idx);
-  ctx->gdraw->fill_rect(
-      w, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, glow_eDrawType_LineErase);
-  w->reset_draw_buffer_only();
 }
 
 void GrowWindow::draw_brief(GlowWind* w, GlowTransform* t, int highlight,
@@ -434,7 +400,6 @@ int GrowWindow::trace_scan()
     int ll_y
         = int((y_low + y_low_offs) * ctx->mw.zoom_factor_y) - ctx->mw.offset_y;
 
-    // window_ctx->draw_buffer_only = ctx->draw_buffer_only;
     ctx->gdraw->set_clip_rectangle(&ctx->mw, ll_x, ll_y, ur_x, ur_y);
 
     if (ctx->trace_ctrl_func)
@@ -522,8 +487,6 @@ void GrowWindow::align(double x, double y, glow_eAlignDirection direction)
 {
   double dx, dy;
 
-  erase(&ctx->mw);
-  erase(&ctx->navw);
   ctx->set_defered_redraw();
   draw();
   switch (direction) {
@@ -721,7 +684,6 @@ int GrowWindow::event_handler(
     int ll_y
         = int((y_low + y_low_offs) * ctx->mw.zoom_factor_y) - ctx->mw.offset_y;
 
-    // window_ctx->draw_buffer_only = ctx->draw_buffer_only;
     ctx->gdraw->push_customcolors(window_ctx->customcolors);
     ctx->gdraw->set_clip_rectangle(&ctx->mw, ll_x, ll_y, ur_x, ur_y);
 
@@ -960,7 +922,6 @@ void GrowWindow::new_ctx(bool is_updating_attributes)
   window_ctx->userdata_save_callback = ctx->userdata_save_callback;
   window_ctx->userdata_open_callback = ctx->userdata_open_callback;
   window_ctx->userdata_copy_callback = ctx->userdata_copy_callback;
-  // window_ctx->double_buffer_on = ctx->double_buffer_on;
   window_ctx->user_data = ctx->user_data;
   window_ctx->hot_mode = ctx->hot_mode;
   window_ctx->path_cnt = ctx->path_cnt;
@@ -970,7 +931,7 @@ void GrowWindow::new_ctx(bool is_updating_attributes)
   memcpy(window_ctx->event_callback, ctx->event_callback,
       sizeof(ctx->event_callback));
   window_ctx->event_move_node = ctx->event_move_node;
-  window_ctx->background_disabled = 1;
+  //window_ctx->background_disabled = 1;
 
   copied = false;
   for (int i = 0; i < 4; i++) {
@@ -1052,11 +1013,8 @@ void GrowWindow::new_ctx(bool is_updating_attributes)
 void GrowWindow::redraw_cb(void* o)
 {
   GrowWindow* gw = (GrowWindow*)o;
-  int only = gw->ctx->mw.window->draw_buffer_only;
 
-  // gw->ctx->draw_buffer_only = gw->window_ctx->draw_buffer_only;
   gw->draw_background();
-  gw->ctx->mw.window->draw_buffer_only = only;
 }
 
 void GrowWindow::draw_background()

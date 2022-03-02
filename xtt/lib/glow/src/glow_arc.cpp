@@ -147,7 +147,6 @@ void GlowArc::draw(GlowWind* w, void* pos, int highlight, int hot, void* node)
   idx += hot;
   idx = MAX(0, idx);
   idx = MIN(idx, DRAW_TYPE_SIZE - 1);
-  w->set_draw_buffer_only();
   if (!fill) {
     ctx->gdraw->arc(w, ll_x + ((GlowPoint*)pos)->z_x - w->offset_x,
         ll_y + ((GlowPoint*)pos)->z_y - w->offset_y, ur_x - ll_x, ur_y - ll_y,
@@ -156,7 +155,6 @@ void GlowArc::draw(GlowWind* w, void* pos, int highlight, int hot, void* node)
     ctx->gdraw->fill_arc(w, ll_x + ((GlowPoint*)pos)->z_x - w->offset_x,
         ll_y + ((GlowPoint*)pos)->z_y - w->offset_y, ur_x - ll_x, ur_y - ll_y,
         angle1, angle2, draw_type, highlight);
-  w->reset_draw_buffer_only();
 }
 
 void GlowArc::draw_shadow(
@@ -184,7 +182,6 @@ void GlowArc::draw_shadow(
   int ish = 1;
   int offs = border;
 
-  w->set_draw_buffer_only();
   if (shadow && idx > 2) {
     if (angle1 == 0) {
       ctx->gdraw->arc(w, ll_x - w->offset_x + idx / 2 - idx + offs,
@@ -266,7 +263,6 @@ void GlowArc::draw_shadow(
           MAX(0, ur_y - ll_y - idx), angle1, angle2, glow_eDrawType_Line, 0,
           highlight);
   }
-  w->reset_draw_buffer_only();
 }
 
 void GlowArc::erase(GlowWind* w, void* pos, int hot, void* node)

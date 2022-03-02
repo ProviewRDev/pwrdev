@@ -20,6 +20,7 @@ appl pwrtest03a S $pwrp_web/*.png
 appl pwrtest03a S $pwrp_web/*.jpg
 appl pwrtest03a S $pwrp_web/*.pdf
 appl pwrtest03a S $pwrp_web/*.pwg
+appl pwrtest03a S $pwrp_web/*.flw
 appl pwrtest03a E $pwrp_exe/*.png
 appl pwrtest03a E $pwrp_exe/*.ge_com
 builddir pop 1 ""

@@ -203,12 +203,6 @@ public:
   */
   void draw(GlowWind* w, int* ll_x, int* ll_y, int* ur_x, int* ur_y);
 
-  //! Erase the object
-  void erase(GlowWind* w)
-  {
-    erase(w, (GlowTransform*)NULL, hot, NULL);
-  }
-
   //! Move the object.
   /*!
     \param delta_x	Moved distance in x direction.
@@ -475,14 +469,6 @@ public:
   */
   virtual void draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
       void* node, void* colornode);
-
-  //! Erase the object.
-  /*!
-    \param t		Transform of parent node.
-    \param hot		Draw as hot, with larger line width.
-    \param node		Parent node. Can be zero.
-  */
-  virtual void erase(GlowWind* w, GlowTransform* t, int hot, void* node);
 
   //! Redraw the area inside the objects border.
   void draw();

@@ -41,6 +41,7 @@
 #include "co_time.h"
 
 #include "cow_xhelp.h"
+#include "cow_wutl_gtk.h"
 
 #include "wb_expw_gtk.h"
 #include "wb_expwnav_gtk.h"
@@ -83,14 +84,14 @@ WbExpWGtk::WbExpWGtk(void* expw_parent_ctx, GtkWidget* expw_parent_wid,
   GtkMenuBar* menu_bar = (GtkMenuBar*)g_object_new(GTK_TYPE_MENU_BAR, NULL);
 
   // File Entry
-  GtkWidget* file_close
-      = gtk_image_menu_item_new_from_stock(GTK_STOCK_CLOSE, accel_g);
-  g_signal_connect(
-      file_close, "activate", G_CALLBACK(WbExpWGtk::activate_exit), this);
+  GtkWidget* file_close = gtk_menu_item_new_with_mnemonic("_Close");
+  g_signal_connect(file_close, "activate", G_CALLBACK(activate_exit), this);
+  gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w',
+      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
 
   file_export = gtk_menu_item_new_with_mnemonic(btext);
   g_signal_connect(
-      file_export, "activate", G_CALLBACK(WbExpWGtk::activate_export), this);
+      file_export, "activate", G_CALLBACK(activate_export), this);
 
   GtkMenu* file_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_export);
@@ -102,21 +103,21 @@ WbExpWGtk::WbExpWGtk(void* expw_parent_ctx, GtkWidget* expw_parent_wid,
   // Edit menu
   GtkWidget* edit_update = gtk_menu_item_new_with_mnemonic("_Update");
   g_signal_connect(
-      edit_update, "activate", G_CALLBACK(WbExpWGtk::activate_update), this);
+      edit_update, "activate", G_CALLBACK(activate_update), this);
   gtk_widget_add_accelerator(edit_update, "activate", accel_g, 'u',
       GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
   edit_check_all = gtk_menu_item_new_with_mnemonic("_Check all");
   g_signal_connect(edit_check_all, "activate",
-      G_CALLBACK(WbExpWGtk::activate_check_all), this);
+      G_CALLBACK(activate_check_all), this);
 
   edit_check_clear = gtk_menu_item_new_with_mnemonic("C_heck clear");
   g_signal_connect(edit_check_clear, "activate",
-      G_CALLBACK(WbExpWGtk::activate_check_clear), this);
+      G_CALLBACK(activate_check_clear), this);
 
   edit_check_reset = gtk_menu_item_new_with_mnemonic("Check _reset");
   g_signal_connect(edit_check_reset, "activate",
-      G_CALLBACK(WbExpWGtk::activate_check_reset), this);
+      G_CALLBACK(activate_check_reset), this);
 
   edit_show_all = gtk_check_menu_item_new_with_mnemonic("_Show all");
   g_signal_connect(
@@ -136,24 +137,21 @@ WbExpWGtk::WbExpWGtk(void* expw_parent_ctx, GtkWidget* expw_parent_wid,
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(edit), GTK_WIDGET(edit_menu));
 
   // View menu
-  GtkWidget* view_zoom_in
-      = gtk_image_menu_item_new_from_stock(GTK_STOCK_ZOOM_IN, NULL);
+  GtkWidget* view_zoom_in = gtk_menu_item_new_with_mnemonic("Zoom _In");
   g_signal_connect(
-      view_zoom_in, "activate", G_CALLBACK(WbExpWGtk::activate_zoom_in), this);
+      view_zoom_in, "activate", G_CALLBACK(activate_zoom_in), this);
   gtk_widget_add_accelerator(view_zoom_in, "activate", accel_g, 'i',
       GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
-  GtkWidget* view_zoom_out
-      = gtk_image_menu_item_new_from_stock(GTK_STOCK_ZOOM_OUT, NULL);
-  g_signal_connect(view_zoom_out, "activate",
-      G_CALLBACK(WbExpWGtk::activate_zoom_out), this);
+  GtkWidget* view_zoom_out = gtk_menu_item_new_with_mnemonic("Zoom _Out");
+  g_signal_connect(
+      view_zoom_out, "activate", G_CALLBACK(activate_zoom_out), this);
   gtk_widget_add_accelerator(view_zoom_out, "activate", accel_g, 'o',
       GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
-  GtkWidget* view_zoom_reset
-      = gtk_image_menu_item_new_from_stock(GTK_STOCK_ZOOM_100, NULL);
+  GtkWidget* view_zoom_reset = gtk_menu_item_new_with_mnemonic("Zoom _Reset");
   g_signal_connect(view_zoom_reset, "activate",
-      G_CALLBACK(WbExpWGtk::activate_zoom_reset), this);
+      G_CALLBACK(activate_zoom_reset), this);
 
   GtkMenu* view_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(view_menu), view_zoom_in);
@@ -165,10 +163,9 @@ WbExpWGtk::WbExpWGtk(void* expw_parent_ctx, GtkWidget* expw_parent_wid,
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(view), GTK_WIDGET(view_menu));
 
   // Help Entry
-  GtkWidget* help_help
-      = gtk_image_menu_item_new_from_stock(GTK_STOCK_HELP, accel_g);
+  GtkWidget* help_help = gtk_menu_item_new_with_mnemonic("_Help");
   g_signal_connect(
-      help_help, "activate", G_CALLBACK(WbExpWGtk::activate_help), this);
+      help_help, "activate", G_CALLBACK(activate_help), this);
 
   GtkMenu* help_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(help_menu), help_help);
@@ -180,51 +177,22 @@ WbExpWGtk::WbExpWGtk(void* expw_parent_ctx, GtkWidget* expw_parent_wid,
   // Toolbar
   GtkToolbar* tools = (GtkToolbar*)g_object_new(GTK_TYPE_TOOLBAR, NULL);
 
-  pwr_tFileName fname;
-  GtkWidget* tools_export = gtk_button_new();
-  dcli_translate_filename(fname, "$pwr_exe/wb_export.png");
-  gtk_container_add(
-      GTK_CONTAINER(tools_export), gtk_image_new_from_file(fname));
-  g_signal_connect(tools_export, "clicked", G_CALLBACK(activate_export), this);
-  g_object_set(tools_export, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(tools, tools_export, action, "");
+  wutl_tools_item(tools, "$pwr_exe/wb_export.png", G_CALLBACK(activate_export), 
+      action, this, 1, 0);
 
-  GtkWidget* tools_update = gtk_button_new();
-  dcli_translate_filename(fname, "$pwr_exe/ge_update.png");
-  gtk_container_add(
-      GTK_CONTAINER(tools_update), gtk_image_new_from_file(fname));
-  g_signal_connect(tools_update, "clicked", G_CALLBACK(activate_update), this);
-  g_object_set(tools_update, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(tools, tools_update, "Update", "");
+  wutl_tools_item(tools, "$pwr_exe/ge_update.png", G_CALLBACK(activate_update), 
+      "Update", this, 1, 0);
 
-  GtkWidget* tools_zoom_in = gtk_button_new();
-  dcli_translate_filename(fname, "$pwr_exe/xtt_zoom_in.png");
-  gtk_container_add(
-      GTK_CONTAINER(tools_zoom_in), gtk_image_new_from_file(fname));
-  g_signal_connect(
-      tools_zoom_in, "clicked", G_CALLBACK(activate_zoom_in), this);
-  g_object_set(tools_zoom_in, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(tools, tools_zoom_in, "Zoom in", "");
+  wutl_tools_item(tools, "$pwr_exe/ge_zoom_in.png", G_CALLBACK(activate_zoom_in), 
+      "Zoom in", this, 0, 0);
 
-  GtkWidget* tools_zoom_out = gtk_button_new();
-  dcli_translate_filename(fname, "$pwr_exe/xtt_zoom_out.png");
-  gtk_container_add(
-      GTK_CONTAINER(tools_zoom_out), gtk_image_new_from_file(fname));
-  g_signal_connect(
-      tools_zoom_out, "clicked", G_CALLBACK(activate_zoom_out), this);
-  g_object_set(tools_zoom_out, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(tools, tools_zoom_out, "Zoom out", "");
+  wutl_tools_item(tools, "$pwr_exe/ge_zoom_out.png", G_CALLBACK(activate_zoom_out), 
+      "Zoom out", this, 0, 0);
 
-  GtkWidget* tools_zoom_reset = gtk_button_new();
-  dcli_translate_filename(fname, "$pwr_exe/xtt_zoom_reset.png");
-  gtk_container_add(
-      GTK_CONTAINER(tools_zoom_reset), gtk_image_new_from_file(fname));
-  g_signal_connect(
-      tools_zoom_reset, "clicked", G_CALLBACK(activate_zoom_reset), this);
-  g_object_set(tools_zoom_reset, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(tools, tools_zoom_reset, "Zoom reset", "");
+  wutl_tools_item(tools, "$pwr_exe/ge_zoom_reset.png", G_CALLBACK(activate_zoom_reset), 
+      "Zoom reset", this, 0, 0);
 
-  form = gtk_vbox_new(FALSE, 0);
+  form = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 
   // Create expwnav
   expwnav = new WbExpWNavGtk(

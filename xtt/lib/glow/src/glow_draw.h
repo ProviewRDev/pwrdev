@@ -57,7 +57,8 @@ public:
 
   virtual void get_window_size(GlowWind* w, int* width, int* height);
   virtual void set_window_size(GlowWind* w, int width, int height);
-
+  virtual void set_anti_aliasing(int anti_aliasing) {}
+  virtual void invalidate(GlowWind *wind, int x, int y, int width, int height) {}
   virtual int rect(GlowWind* w, int x, int y, int width, int height,
       glow_eDrawType gc_type, int idx, int highlight);
   virtual int rect_erase(
@@ -119,8 +120,7 @@ public:
   virtual void clear_area(GlowWind* w, int ll_x, int ur_x, int ll_y, int ur_y);
   virtual void set_inputfocus(GlowWind* w);
   virtual void set_background(GlowWind* w, glow_eDrawType drawtype,
-      glow_tPixmap pixmap, glow_tImImage image, int pixmap_width,
-      int pixmap_height);
+      char *image);
   virtual void reset_background(GlowWind* w);
   virtual void set_image_clip_mask(
       DrawWind* w, glow_tPixmap pixmap, int x, int y);
@@ -134,9 +134,6 @@ public:
       glow_eDrawType gc_type, int idx = 0);
   virtual void set_click_sensitivity(GlowWind* w, int value);
   virtual void draw_background(GlowWind* wind, int x, int y, int w, int h);
-  virtual int create_buffer(GlowWind* w);
-  virtual void delete_buffer(GlowWind* w);
-  virtual void buffer_background(DrawWind* w, GlowCtx* cctx);
   virtual int export_image(char* filename);
   virtual int print(char* filename, double x0, double x1, int end);
   // virtual void set_clip( DrawWind *w, GC gc) {}
@@ -180,6 +177,8 @@ public:
       int point_cnt, glow_eDrawType d0, glow_eDrawType d1, glow_eDrawType d2,
       glow_eGradient gradient);
   virtual void event_exec(void* event, unsigned int size);
+  virtual void push_background(glow_eDrawType color);
+  virtual void pop_background();
   virtual int open_color_selection(double* r, double* g, double* b);
   virtual void update_color(glow_eDrawType color);
   virtual void push_customcolors(GlowCustomColors* cc);
@@ -194,9 +193,6 @@ class DrawWind {
 public:
   DrawWind();
   int type;
-  int double_buffered; //!< Double buffering is configured.
-  int double_buffer_on; //!< Double buffering is on.
-  int draw_buffer_only; //!< Draw in double buffering buffer only.
   int is_nav; //!< Is navigator window.
 };
 

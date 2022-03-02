@@ -523,6 +523,7 @@ public:
   int eventlog_enabled();
   void appl_startup();
   void refresh();
+  void update_color_theme(int ct);
 
   static int init_brow_base_cb(FlowCtx* fctx, void* client_data);
   static int get_trace_attr(pwr_sAttrRef* arp, char* attr);

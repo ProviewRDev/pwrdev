@@ -49,6 +49,7 @@
 #include "co_cdh.h"
 #include "co_time.h"
 #include "cow_wow_gtk.h"
+#include "cow_wutl_gtk.h"
 #include "rt_gdh.h"
 #include "rt_mh_util.h"
 #include "rt_elog.h"
@@ -70,6 +71,23 @@ using namespace std;
 //#define SENS 1
 //#define INSENS 0
 #define DONT_SET_SENS -1
+
+// Text font options menu
+typedef struct {
+  char text[80];
+  int idx;
+} sComboTableText;
+
+static sComboTableText sea_time_combo_table[] = {
+  {"All    ", time_ePeriod_AllTime},
+  {"Today", time_ePeriod_Today},
+  {"Yesterday", time_ePeriod_Yesterday},
+  {"This Week", time_ePeriod_ThisWeek},
+  {"Last Week", time_ePeriod_LastWeek},
+  {"This Month", time_ePeriod_ThisMonth},
+  {"Last Month", time_ePeriod_LastMonth},
+  {"Time", time_ePeriod_UserDefined}
+};
 
 static gint delete_event(GtkWidget* w, GdkEvent* event, gpointer data)
 {
@@ -105,7 +123,7 @@ HistGtk::HistGtk(void* hist_parent_ctx, GtkWidget* hist_parent_wid,
 
   CoWowGtk::SetWindowIcon(parent_wid_hist);
 
-  GtkWidget* hist_vbox = gtk_vbox_new(FALSE, 0);
+  GtkWidget* hist_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 
   // Menu
   // Accelerators
@@ -116,24 +134,20 @@ HistGtk::HistGtk(void* hist_parent_ctx, GtkWidget* hist_parent_wid,
   GtkMenuBar* menu_bar = (GtkMenuBar*)g_object_new(GTK_TYPE_MENU_BAR, NULL);
 
   // File entry
-  GtkWidget* file_print = gtk_image_menu_item_new_with_mnemonic(
+  GtkWidget* file_print = gtk_menu_item_new_with_mnemonic(
       CoWowGtk::translate_utf8("_Print"));
-  gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(file_print),
-      gtk_image_new_from_stock("gtk-print", GTK_ICON_SIZE_MENU));
   g_signal_connect(file_print, "activate", G_CALLBACK(activate_print), this);
 
-  GtkWidget* file_export = gtk_image_menu_item_new_with_mnemonic(
+  GtkWidget* file_export = gtk_menu_item_new_with_mnemonic(
       CoWowGtk::translate_utf8("_Export"));
   g_signal_connect(file_export, "activate", G_CALLBACK(activate_export), this);
 
-  GtkWidget* file_analyse = gtk_image_menu_item_new_with_mnemonic(
+  GtkWidget* file_analyse = gtk_menu_item_new_with_mnemonic(
       CoWowGtk::translate_utf8("Open _Analyser"));
   g_signal_connect(file_analyse, "activate", G_CALLBACK(activate_analyse), this);
 
-  GtkWidget* file_close = gtk_image_menu_item_new_with_mnemonic(
+  GtkWidget* file_close = gtk_menu_item_new_with_mnemonic(
       CoWowGtk::translate_utf8("_Close"));
-  gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(file_close),
-      gtk_image_new_from_stock("gtk-close", GTK_ICON_SIZE_MENU));
   g_signal_connect(file_close, "activate", G_CALLBACK(activate_exit), this);
   gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w',
       GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
@@ -186,28 +200,22 @@ HistGtk::HistGtk(void* hist_parent_ctx, GtkWidget* hist_parent_wid,
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(functions), GTK_WIDGET(func_menu));
 
   // View entry
-  GtkWidget* view_zoom_in = gtk_image_menu_item_new_with_mnemonic(
+  GtkWidget* view_zoom_in = gtk_menu_item_new_with_mnemonic(
       CoWowGtk::translate_utf8("Zoom _In"));
-  gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(view_zoom_in),
-      gtk_image_new_from_stock("gtk-zoom-in", GTK_ICON_SIZE_MENU));
   g_signal_connect(
       view_zoom_in, "activate", G_CALLBACK(activate_zoom_in), this);
   gtk_widget_add_accelerator(view_zoom_in, "activate", accel_g, 'i',
       GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
 
-  GtkWidget* view_zoom_out = gtk_image_menu_item_new_with_mnemonic(
+  GtkWidget* view_zoom_out = gtk_menu_item_new_with_mnemonic(
       CoWowGtk::translate_utf8("Zoom _Out"));
-  gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(view_zoom_out),
-      gtk_image_new_from_stock("gtk-zoom-out", GTK_ICON_SIZE_MENU));
   g_signal_connect(
       view_zoom_out, "activate", G_CALLBACK(activate_zoom_out), this);
   gtk_widget_add_accelerator(view_zoom_out, "activate", accel_g, 'o',
       GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
 
-  GtkWidget* view_zoom_reset = gtk_image_menu_item_new_with_mnemonic(
+  GtkWidget* view_zoom_reset = gtk_menu_item_new_with_mnemonic(
       CoWowGtk::translate_utf8("Zoom _Reset"));
-  gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(view_zoom_reset),
-      gtk_image_new_from_stock("gtk-zoom-100", GTK_ICON_SIZE_MENU));
   g_signal_connect(
       view_zoom_reset, "activate", G_CALLBACK(activate_zoom_reset), this);
   gtk_widget_add_accelerator(view_zoom_reset, "activate", accel_g, 'b',
@@ -250,10 +258,8 @@ HistGtk::HistGtk(void* hist_parent_ctx, GtkWidget* hist_parent_wid,
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(view), GTK_WIDGET(view_menu));
 
   // Help entry
-  GtkWidget* help_help = gtk_image_menu_item_new_with_mnemonic(
+  GtkWidget* help_help = gtk_menu_item_new_with_mnemonic(
       CoWowGtk::translate_utf8("_Help"));
-  gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(help_help),
-      gtk_image_new_from_stock("gtk-help", GTK_ICON_SIZE_MENU));
   g_signal_connect(help_help, "activate", G_CALLBACK(activate_help), this);
   gtk_widget_add_accelerator(
       help_help, "activate", accel_g, 'h', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
@@ -277,7 +283,7 @@ HistGtk::HistGtk(void* hist_parent_ctx, GtkWidget* hist_parent_wid,
   GtkWidget* sea_time_start_label
       = gtk_label_new(CoWowGtk::translate_utf8("Start time"));
   gtk_widget_set_size_request(sea_time_start_label, 120, -1);
-  gtk_misc_set_alignment(GTK_MISC(sea_time_start_label), 0.0, 0.5);
+  //gtk_misc_set_alignment(GTK_MISC(sea_time_start_label), 0.0, 0.5);
   start_time_entry_w = gtk_entry_new();
   gtk_widget_set_size_request(start_time_entry_w, 160, -1);
 
@@ -287,68 +293,37 @@ HistGtk::HistGtk(void* hist_parent_ctx, GtkWidget* hist_parent_wid,
   stop_time_entry_w = gtk_entry_new();
   gtk_widget_set_size_request(stop_time_entry_w, 160, -1);
 
-  // Time option menu
-  GtkWidget* sea_time_all
-      = gtk_menu_item_new_with_label(CoWowGtk::translate_utf8("All    "));
-  g_signal_connect(sea_time_all, "activate", G_CALLBACK(all_cb), this);
+  // Search time combobox
+  GtkTreeIter sea_time_iter;
+  GtkListStore *sea_time_liststore;
 
-  GtkWidget* sea_time_today
-      = gtk_menu_item_new_with_label(CoWowGtk::translate_utf8("Today"));
-  g_signal_connect(sea_time_today, "activate", G_CALLBACK(today_cb), this);
+  sea_time_liststore = gtk_list_store_new(1, G_TYPE_STRING);
+  for (int i = 0; i < sizeof(sea_time_combo_table)/sizeof(sea_time_combo_table[0]); i++)
+    gtk_list_store_insert_with_values(sea_time_liststore, &sea_time_iter, i, 0, CoWowGtk::convert_utf8(sea_time_combo_table[i].text), -1);
+  GtkWidget *sea_time_combo = gtk_combo_box_new_with_model(GTK_TREE_MODEL(sea_time_liststore));
 
-  GtkWidget* sea_time_yesterday
-      = gtk_menu_item_new_with_label(CoWowGtk::translate_utf8("Yesterday"));
+  GtkCellRenderer *sea_time_combocell = gtk_cell_renderer_text_new();
+  gtk_cell_layout_pack_start(GTK_CELL_LAYOUT(sea_time_combo), sea_time_combocell, TRUE);
+  gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(sea_time_combo), sea_time_combocell,
+      "text", 0, NULL);
   g_signal_connect(
-      sea_time_yesterday, "activate", G_CALLBACK(yesterday_cb), this);
-
-  GtkWidget* sea_time_thisw
-      = gtk_menu_item_new_with_label(CoWowGtk::translate_utf8("This Week"));
-  g_signal_connect(sea_time_thisw, "activate", G_CALLBACK(thisw_cb), this);
-
-  GtkWidget* sea_time_lastw
-      = gtk_menu_item_new_with_label(CoWowGtk::translate_utf8("Last Week"));
-  g_signal_connect(sea_time_lastw, "activate", G_CALLBACK(lastw_cb), this);
-
-  GtkWidget* sea_time_thism
-      = gtk_menu_item_new_with_label(CoWowGtk::translate_utf8("This Month"));
-  g_signal_connect(sea_time_thism, "activate", G_CALLBACK(thism_cb), this);
-
-  GtkWidget* sea_time_lastm
-      = gtk_menu_item_new_with_label(CoWowGtk::translate_utf8("Last Month"));
-  g_signal_connect(sea_time_lastm, "activate", G_CALLBACK(lastm_cb), this);
-
-  GtkWidget* sea_time_time
-      = gtk_menu_item_new_with_label(CoWowGtk::translate_utf8("Time"));
-  g_signal_connect(sea_time_time, "activate", G_CALLBACK(time_cb), this);
-
-  GtkMenu* sea_time_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
-  gtk_menu_shell_append(GTK_MENU_SHELL(sea_time_menu), sea_time_all);
-  gtk_menu_shell_append(GTK_MENU_SHELL(sea_time_menu), sea_time_today);
-  gtk_menu_shell_append(GTK_MENU_SHELL(sea_time_menu), sea_time_yesterday);
-  gtk_menu_shell_append(GTK_MENU_SHELL(sea_time_menu), sea_time_thisw);
-  gtk_menu_shell_append(GTK_MENU_SHELL(sea_time_menu), sea_time_lastw);
-  gtk_menu_shell_append(GTK_MENU_SHELL(sea_time_menu), sea_time_thism);
-  gtk_menu_shell_append(GTK_MENU_SHELL(sea_time_menu), sea_time_lastm);
-  gtk_menu_shell_append(GTK_MENU_SHELL(sea_time_menu), sea_time_time);
-  GtkWidget* sea_time_omenu = (GtkWidget*)g_object_new(
-      GTK_TYPE_OPTION_MENU, "menu", sea_time_menu, NULL);
-
-  gtk_option_menu_set_history(GTK_OPTION_MENU(sea_time_omenu), 0);
-
-  GtkWidget* sea_timebox = gtk_hbox_new(FALSE, 0);
+      sea_time_combo, "changed", G_CALLBACK(activate_sea_time_combo), this);
+  gtk_combo_box_set_active(GTK_COMBO_BOX(sea_time_combo), 0);
+  
+  GtkWidget* sea_timebox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   gtk_box_pack_start(
       GTK_BOX(sea_timebox), sea_time_start_label, FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(sea_timebox), start_time_entry_w, FALSE, FALSE, 0);
   gtk_box_pack_start(
       GTK_BOX(sea_timebox), sea_time_stop_label, FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(sea_timebox), stop_time_entry_w, FALSE, FALSE, 0);
-  gtk_box_pack_start(GTK_BOX(sea_timebox), sea_time_omenu, FALSE, FALSE, 10);
+  gtk_box_pack_start(GTK_BOX(sea_timebox), sea_time_combo, FALSE, FALSE, 10);
 
   // Event type box
   GtkWidget* sea_type_label
       = gtk_label_new(CoWowGtk::translate_utf8("Event type"));
   gtk_widget_set_size_request(sea_type_label, 120, -1);
-  gtk_misc_set_alignment(GTK_MISC(sea_type_label), 0.0, 0.5);
+  //gtk_misc_set_alignment(GTK_MISC(sea_type_label), 0.0, 0.5);
 
   info_toggle_w
       = gtk_check_button_new_with_label(CoWowGtk::translate_utf8("Info"));
@@ -384,7 +359,7 @@ HistGtk::HistGtk(void* hist_parent_ctx, GtkWidget* hist_parent_wid,
       = gtk_check_button_new_with_label(CoWowGtk::translate_utf8("Ack"));
   gtk_widget_set_size_request(ack_toggle_w, 120, -1);
 
-  GtkWidget* sea_typebox = gtk_hbox_new(FALSE, 0);
+  GtkWidget* sea_typebox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   gtk_box_pack_start(GTK_BOX(sea_typebox), sea_type_label, FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(sea_typebox), info_toggle_w, FALSE, FALSE, 0);
   gtk_box_pack_start(
@@ -407,7 +382,7 @@ HistGtk::HistGtk(void* hist_parent_ctx, GtkWidget* hist_parent_wid,
   GtkWidget* sea_prio_label
       = gtk_label_new(CoWowGtk::translate_utf8("Priority"));
   gtk_widget_set_size_request(sea_prio_label, 120, -1);
-  gtk_misc_set_alignment(GTK_MISC(sea_prio_label), 0.0, 0.5);
+  //gtk_misc_set_alignment(GTK_MISC(sea_prio_label), 0.0, 0.5);
 
   prioA_toggle_w
       = gtk_check_button_new_with_label(CoWowGtk::translate_utf8("A-Alarm"));
@@ -422,7 +397,7 @@ HistGtk::HistGtk(void* hist_parent_ctx, GtkWidget* hist_parent_wid,
       = gtk_check_button_new_with_label(CoWowGtk::translate_utf8("D-Alarm"));
   gtk_widget_set_size_request(prioD_toggle_w, 120, -1);
 
-  GtkWidget* sea_priobox = gtk_hbox_new(FALSE, 0);
+  GtkWidget* sea_priobox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   gtk_box_pack_start(GTK_BOX(sea_priobox), sea_prio_label, FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(sea_priobox), prioA_toggle_w, FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(sea_priobox), prioB_toggle_w, FALSE, FALSE, 0);
@@ -433,10 +408,10 @@ HistGtk::HistGtk(void* hist_parent_ctx, GtkWidget* hist_parent_wid,
   GtkWidget* sea_eventname_label
       = gtk_label_new(CoWowGtk::translate_utf8("Event name"));
   gtk_widget_set_size_request(sea_eventname_label, 120, -1);
-  gtk_misc_set_alignment(GTK_MISC(sea_eventname_label), 0.0, 0.5);
+  //gtk_misc_set_alignment(GTK_MISC(sea_eventname_label), 0.0, 0.5);
   event_name_entry_w = gtk_entry_new();
 
-  GtkWidget* sea_eventnamebox = gtk_hbox_new(FALSE, 0);
+  GtkWidget* sea_eventnamebox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   gtk_box_pack_start(
       GTK_BOX(sea_eventnamebox), sea_eventname_label, FALSE, FALSE, 0);
   gtk_box_pack_start(
@@ -446,10 +421,10 @@ HistGtk::HistGtk(void* hist_parent_ctx, GtkWidget* hist_parent_wid,
   GtkWidget* sea_eventtext_label
       = gtk_label_new(CoWowGtk::translate_utf8("Event text"));
   gtk_widget_set_size_request(sea_eventtext_label, 120, -1);
-  gtk_misc_set_alignment(GTK_MISC(sea_eventtext_label), 0.0, 0.5);
+  //gtk_misc_set_alignment(GTK_MISC(sea_eventtext_label), 0.0, 0.5);
   event_text_entry_w = gtk_entry_new();
 
-  GtkWidget* sea_eventtextbox = gtk_hbox_new(FALSE, 0);
+  GtkWidget* sea_eventtextbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   gtk_box_pack_start(
       GTK_BOX(sea_eventtextbox), sea_eventtext_label, FALSE, FALSE, 0);
   gtk_box_pack_start(
@@ -459,16 +434,16 @@ HistGtk::HistGtk(void* hist_parent_ctx, GtkWidget* hist_parent_wid,
   GtkWidget* sea_numevents_label
       = gtk_label_new(CoWowGtk::translate_utf8("Number of Events:"));
   gtk_widget_set_size_request(sea_numevents_label, 140, -1);
-  gtk_misc_set_alignment(GTK_MISC(sea_numevents_label), 0.0, 0.5);
+  //gtk_misc_set_alignment(GTK_MISC(sea_numevents_label), 0.0, 0.5);
   nrofevents_string_lbl_w = gtk_label_new("");
-  gtk_misc_set_alignment(GTK_MISC(nrofevents_string_lbl_w), 0.0, 0.5);
+  //gtk_misc_set_alignment(GTK_MISC(nrofevents_string_lbl_w), 0.0, 0.5);
 
   GtkWidget* sea_search_button
       = gtk_button_new_with_label(CoWowGtk::translate_utf8("Search"));
   gtk_widget_set_size_request(sea_search_button, 80, 25);
   g_signal_connect(sea_search_button, "clicked", G_CALLBACK(ok_btn), this);
 
-  GtkWidget* sea_numeventsbox = gtk_hbox_new(FALSE, 0);
+  GtkWidget* sea_numeventsbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   gtk_box_pack_start(
       GTK_BOX(sea_numeventsbox), sea_numevents_label, FALSE, FALSE, 0);
   gtk_box_pack_start(
@@ -478,15 +453,15 @@ HistGtk::HistGtk(void* hist_parent_ctx, GtkWidget* hist_parent_wid,
 
   // Searchcondition box 1
   search_string_lbl_w = gtk_label_new("");
-  gtk_misc_set_alignment(GTK_MISC(search_string_lbl_w), 0.0, 0.5);
+  //gtk_misc_set_alignment(GTK_MISC(search_string_lbl_w), 0.0, 0.5);
   search_string2_lbl_w = gtk_label_new("");
-  gtk_misc_set_alignment(GTK_MISC(search_string2_lbl_w), 0.0, 0.5);
+  //gtk_misc_set_alignment(GTK_MISC(search_string2_lbl_w), 0.0, 0.5);
   search_string3_lbl_w = gtk_label_new("");
-  gtk_misc_set_alignment(GTK_MISC(search_string3_lbl_w), 0.0, 0.5);
+  //gtk_misc_set_alignment(GTK_MISC(search_string3_lbl_w), 0.0, 0.5);
   search_string4_lbl_w = gtk_label_new("");
-  gtk_misc_set_alignment(GTK_MISC(search_string4_lbl_w), 0.0, 0.5);
+  //gtk_misc_set_alignment(GTK_MISC(search_string4_lbl_w), 0.0, 0.5);
 
-  GtkWidget* sea_stringbox = gtk_vbox_new(FALSE, 0);
+  GtkWidget* sea_stringbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start(
       GTK_BOX(sea_stringbox), search_string_lbl_w, FALSE, FALSE, 2);
   gtk_box_pack_start(
@@ -502,14 +477,14 @@ HistGtk::HistGtk(void* hist_parent_ctx, GtkWidget* hist_parent_wid,
   // GTK_SHADOW_ETCHED_IN);
   gtk_container_add(GTK_CONTAINER(sea_stringframe), sea_stringbox);
 
-  search_vbox = gtk_vbox_new(FALSE, 0);
+  search_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start(GTK_BOX(search_vbox), sea_timebox, FALSE, FALSE, 5);
   gtk_box_pack_start(GTK_BOX(search_vbox), sea_typebox, FALSE, FALSE, 5);
   gtk_box_pack_start(GTK_BOX(search_vbox), sea_priobox, FALSE, FALSE, 5);
   gtk_box_pack_start(GTK_BOX(search_vbox), sea_eventnamebox, FALSE, FALSE, 5);
   gtk_box_pack_start(GTK_BOX(search_vbox), sea_eventtextbox, FALSE, FALSE, 5);
   gtk_box_pack_start(
-      GTK_BOX(search_vbox), gtk_hseparator_new(), FALSE, FALSE, 2);
+      GTK_BOX(search_vbox), gtk_separator_new(GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 2);
   gtk_box_pack_start(GTK_BOX(search_vbox), sea_numeventsbox, FALSE, FALSE, 5);
   gtk_box_pack_start(GTK_BOX(search_vbox), sea_stringframe, FALSE, FALSE, 3);
 
@@ -523,49 +498,20 @@ HistGtk::HistGtk(void* hist_parent_ctx, GtkWidget* hist_parent_wid,
   hist->selection_changed_cb = &selection_changed_cb;
 
   // Toolbar
-  pwr_tFileName fname;
   GtkToolbar* tools = (GtkToolbar*)g_object_new(GTK_TYPE_TOOLBAR, NULL);
 
-  GtkWidget* tools_zoom_in = gtk_button_new();
-  dcli_translate_filename(fname, "$pwr_exe/xtt_zoom_in.png");
-  gtk_container_add(
-      GTK_CONTAINER(tools_zoom_in), gtk_image_new_from_file(fname));
-  g_signal_connect(
-      tools_zoom_in, "clicked", G_CALLBACK(activate_zoom_in), this);
-  g_object_set(tools_zoom_in, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(
-      tools, tools_zoom_in, CoWowGtk::translate_utf8("Zoom in"), "");
+  wutl_tools_item(tools, "$pwr_exe/xtt_zoom_in.png", G_CALLBACK(activate_zoom_in),
+		  "Zoom in", this);
 
-  GtkWidget* tools_zoom_out = gtk_button_new();
-  dcli_translate_filename(fname, "$pwr_exe/xtt_zoom_out.png");
-  gtk_container_add(
-      GTK_CONTAINER(tools_zoom_out), gtk_image_new_from_file(fname));
-  g_signal_connect(
-      tools_zoom_out, "clicked", G_CALLBACK(activate_zoom_out), this);
-  g_object_set(tools_zoom_out, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(
-      tools, tools_zoom_out, CoWowGtk::translate_utf8("Zoom out"), "");
+  wutl_tools_item(tools, "$pwr_exe/xtt_zoom_out.png", G_CALLBACK(activate_zoom_out),
+		  "Zoom out", this);
 
-  GtkWidget* tools_zoom_reset = gtk_button_new();
-  dcli_translate_filename(fname, "$pwr_exe/xtt_zoom_reset.png");
-  gtk_container_add(
-      GTK_CONTAINER(tools_zoom_reset), gtk_image_new_from_file(fname));
-  g_signal_connect(
-      tools_zoom_reset, "clicked", G_CALLBACK(activate_zoom_reset), this);
-  g_object_set(tools_zoom_reset, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(
-      tools, tools_zoom_reset, CoWowGtk::translate_utf8("Zoom reset"), "");
+  wutl_tools_item(tools, "$pwr_exe/xtt_zoom_reset.png", G_CALLBACK(activate_zoom_reset),
+		  "Zoom reset", this);
 
-  // Hide search dialog checkbutton
-  GtkWidget* tools_hidesearch = gtk_toggle_button_new();
-  dcli_translate_filename(fname, "$pwr_exe/xtt_maximize.png");
-  gtk_container_add(
-      GTK_CONTAINER(tools_hidesearch), gtk_image_new_from_file(fname));
-  g_signal_connect(
-      tools_hidesearch, "clicked", G_CALLBACK(activate_hidesearch), this);
-  g_object_set(tools_hidesearch, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(
-      tools, tools_hidesearch, CoWowGtk::translate_utf8("Maximize"), "");
+  // Hide search dialog toggle button
+  wutl_tools_toggle_button(tools, "$pwr_exe/xtt_maximize.png", G_CALLBACK(activate_hidesearch), 
+    "Maximize", this, 0, 1);
 
   // Method toolbar
   methodtoolbar
@@ -587,7 +533,7 @@ HistGtk::HistGtk(void* hist_parent_ctx, GtkWidget* hist_parent_wid,
   sup_methodtoolbar->m_parent_ctx = hist;
   sup_methodtoolbar->get_select_cb = hist->get_select_supobject;
 
-  GtkWidget* toolsbox = gtk_hbox_new(FALSE, 0);
+  GtkWidget* toolsbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   gtk_box_pack_start(GTK_BOX(toolsbox), GTK_WIDGET(tools), FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(toolsbox),
       GTK_WIDGET(gtk_separator_tool_item_new()), FALSE, FALSE, 4);
@@ -766,7 +712,7 @@ void HistGtk::activate_hidesearch(GtkWidget* w, gpointer data)
 {
   HistGtk* histOP = (HistGtk*)data;
 
-  int set = (int)gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(w));
+  int set = (int)gtk_toggle_tool_button_get_active(GTK_TOGGLE_TOOL_BUTTON(w));
   if (set)
     g_object_set(histOP->search_vbox, "visible", FALSE, NULL);
   else
@@ -849,60 +795,15 @@ void HistGtk::cancel_cb(GtkWidget* w, gpointer data)
   //  printf("hist_cancel_cb\n");
 }
 
-void HistGtk::today_cb(GtkWidget* w, gpointer data)
+void HistGtk::activate_sea_time_combo(GtkWidget* w, gpointer data)
 {
   Hist* histOP = (Hist*)data;
-
-  histOP->time_cb(time_ePeriod_Today);
-}
-
-void HistGtk::yesterday_cb(GtkWidget* w, gpointer data)
-{
-  Hist* histOP = (Hist*)data;
-
-  histOP->time_cb(time_ePeriod_Yesterday);
-}
-
-void HistGtk::thisw_cb(GtkWidget* w, gpointer data)
-{
-  Hist* histOP = (Hist*)data;
-
-  histOP->time_cb(time_ePeriod_ThisWeek);
-}
-
-void HistGtk::lastw_cb(GtkWidget* w, gpointer data)
-{
-  Hist* histOP = (Hist*)data;
-
-  histOP->time_cb(time_ePeriod_LastWeek);
-}
-
-void HistGtk::thism_cb(GtkWidget* w, gpointer data)
-{
-  Hist* histOP = (Hist*)data;
-
-  histOP->time_cb(time_ePeriod_ThisMonth);
-}
-
-void HistGtk::lastm_cb(GtkWidget* w, gpointer data)
-{
-  Hist* histOP = (Hist*)data;
-
-  histOP->time_cb(time_ePeriod_LastMonth);
-}
-
-void HistGtk::all_cb(GtkWidget* w, gpointer data)
-{
-  Hist* histOP = (Hist*)data;
-
-  histOP->time_cb(time_ePeriod_AllTime);
-}
-
-void HistGtk::time_cb(GtkWidget* w, gpointer data)
-{
-  Hist* histOP = (Hist*)data;
-
-  histOP->time_cb(time_ePeriod_UserDefined);
+  int active;
+  
+  active = gtk_combo_box_get_active(GTK_COMBO_BOX(w));
+  if (active < 0 || active >= sizeof(sea_time_combo_table)/sizeof(sea_time_combo_table[0]))
+    return;
+  histOP->time_cb((time_ePeriod)sea_time_combo_table[active].idx);
 }
 
 void HistGtk::set_num_of_events(int nrOfEvents)

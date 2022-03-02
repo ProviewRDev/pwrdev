@@ -761,7 +761,8 @@ void GlowCtx::draw(GlowWind* w, int ll_x, int ll_y, int ur_x, int ur_y)
 {
   int i;
 
-  if (ctx_type == glow_eCtxType_Grow || ctx_type == glow_eCtxType_Curve) {
+  if (ctx_type == glow_eCtxType_Grow || ctx_type == glow_eCtxType_Curve ||
+      ctx_type == glow_eCtxType_ColPal) {
     ((GrowCtx*)this)->draw(w, ll_x, ll_y, ur_x, ur_y);
     return;
   }
@@ -913,40 +914,36 @@ void GlowCtx::nav_zoom()
   if (nodraw || no_nav)
     return;
 
+  nav_draw(&navw, 0, 0, navw.window_width, navw.window_height);
+}
+
+void GlowCtx::nav_zoom_invalidated()
+{
   if (ctx_type == glow_eCtxType_Curve) {
-    ((CurveCtx*)this)->nav_zoom();
+    ((CurveCtx*)this)->nav_zoom_invalidated();
     return;
   }
 
-  if (a.size() > 0) {
-    double x_nav_left, x_nav_right, y_nav_low, y_nav_high;
+  if (a.size() == 0)
+    return;
 
-    get_borders();
-    //    std::cout << "Borders : <" << x_left << " > " << x_right << " ^ " <<
-    //		y_high << " Y " << y_low << '\n';
-    x_nav_left = MIN(x_left, mw.offset_x / mw.zoom_factor_x);
-    x_nav_right
-        = MAX(x_right, (mw.offset_x + mw.window_width) / mw.zoom_factor_x);
-    y_nav_low = MIN(y_low, mw.offset_y / mw.zoom_factor_y);
-    y_nav_high
-        = MAX(y_high, (mw.offset_y + mw.window_height) / mw.zoom_factor_y);
-    if (feq(x_nav_right, x_nav_left) || feq(y_nav_high, y_nav_low))
-      return;
-    navw.zoom_factor_x = MIN(navw.window_width / (x_nav_right - x_nav_left),
-        navw.window_height / (y_nav_high - y_nav_low));
-    navw.zoom_factor_y = navw.zoom_factor_x;
-    navw.offset_x = int(x_nav_left * navw.zoom_factor_x);
-    navw.offset_y = int(y_nav_low * navw.zoom_factor_y);
-    //    navw.window_width = 200;
-    //    navw.window_height = y_nav_high * navw.zoom_factor_y - navw.offset_y;
-    //    if ( navw.window_height < 200)
-    //      navw.window_height = 200;
-    //    glow_draw_set_nav_window_size( this, navw.window_width,
-    //    navw.window_height);
-    a.nav_zoom();
-    nav_clear();
-    nav_draw(&navw, 0, 0, navw.window_width, navw.window_height);
-  }
+  double x_nav_left, x_nav_right, y_nav_low, y_nav_high;
+
+  get_borders();
+  x_nav_left = MIN(x_left, mw.offset_x / mw.zoom_factor_x);
+  x_nav_right
+      = MAX(x_right, (mw.offset_x + mw.window_width) / mw.zoom_factor_x);
+  y_nav_low = MIN(y_low, mw.offset_y / mw.zoom_factor_y);
+  y_nav_high
+      = MAX(y_high, (mw.offset_y + mw.window_height) / mw.zoom_factor_y);
+  if (feq(x_nav_right, x_nav_left) || feq(y_nav_high, y_nav_low))
+    return;
+  navw.zoom_factor_x = MIN(navw.window_width / (x_nav_right - x_nav_left),
+      navw.window_height / (y_nav_high - y_nav_low));
+  navw.zoom_factor_y = navw.zoom_factor_x;
+  navw.offset_x = int(x_nav_left * navw.zoom_factor_x);
+  navw.offset_y = int(y_nav_low * navw.zoom_factor_y);
+  a.nav_zoom();
 }
 
 void GlowCtx::print_zoom()
@@ -971,18 +968,11 @@ void GlowCtx::nav_clear()
 
 void GlowCtx::nav_draw(GlowWind* w, int ll_x, int ll_y, int ur_x, int ur_y)
 {
-  int i;
-
   if (no_nav)
     return;
 
   if (ll_x == ur_x)
     return;
-
-  if (ctx_type == glow_eCtxType_Grow) {
-    ((GrowCtx*)this)->nav_draw(w, ll_x, ll_y, ur_x, ur_y);
-    return;
-  }
 
   if (defered_redraw_active) {
     if (ll_x < navw.defered_x_low)
@@ -993,6 +983,19 @@ void GlowCtx::nav_draw(GlowWind* w, int ll_x, int ll_y, int ur_x, int ur_y)
       navw.defered_x_high = ur_x;
     if (ur_y > navw.defered_y_high)
       navw.defered_y_high = ur_y;
+    return;
+  }
+  gdraw->invalidate(w, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y);
+}
+
+void GlowCtx::nav_draw_invalidated(GlowWind* w, int ll_x, int ll_y, int ur_x, int ur_y)
+{
+  int i;
+
+  nav_zoom_invalidated();
+
+  if (ctx_type == glow_eCtxType_Grow) {
+    ((GrowCtx*)this)->draw_invalidated(w, ll_x, ll_y, ur_x, ur_y);
     return;
   }
 
@@ -1011,8 +1014,6 @@ void GlowCtx::nav_draw(GlowWind* w, int ll_x, int ll_y, int ur_x, int ur_y)
       navw.zoom_factor_y * (mw.offset_y + mw.window_height) / mw.zoom_factor_y
       - navw.offset_y);
 
-  //  std::cout << "Nav rect: ll : " << nav_rect_ll_x << "," << nav_rect_ll_y <<
-  //	" ur: " << nav_rect_ur_x << "," << nav_rect_ur_y << '\n';
   gdraw->rect(&navw, nav_rect_ll_x, nav_rect_ll_y,
       nav_rect_ur_x - nav_rect_ll_x, nav_rect_ur_y - nav_rect_ll_y,
       glow_eDrawType_Line, 0, 0);
@@ -1197,11 +1198,7 @@ int GlowCtx::event_handler(glow_eEvent event, int x, int y, int w, int h)
       ((CurveCtx*)this)->adjust_layout();
 
     gdraw->get_window_size(&mw, &mw.window_width, &mw.window_height);
-    if (gdraw->create_buffer(&mw))
-      draw(&mw, mw.subwindow_x, mw.subwindow_y,
-          mw.subwindow_x + mw.window_width, mw.subwindow_y + mw.window_height);
-    else
-      draw(&mw, x, y, x + w, y + h);
+    draw(&mw, x, y, x + w, y + h);
     nav_zoom();
     if (ctx_type == glow_eCtxType_Brow)
       ((BrowCtx*)this)->change_scrollbar();
@@ -1475,7 +1472,8 @@ int GlowCtx::event_handler_nav(glow_eEvent event, int x, int y)
     break;
   case glow_eEvent_Exposure:
     gdraw->get_window_size(&navw, &navw.window_width, &navw.window_height);
-    nav_zoom();
+    //nav_zoom();
+    nav_draw_invalidated(&navw, 0, 0, navw.window_width, navw.window_height);
     break;
   case glow_eEvent_ButtonMotion:
     if (nav_rect_movement_active) {
@@ -1726,6 +1724,8 @@ int GlowCtx::trace_init(int (*connect_func)(void*, GlowTraceData*),
   trace_scan_func = scan_func;
   trace_ctrl_func = ctrl_func;
 
+  set_nodraw();
+
   sts = a.trace_init();
 
   sts = trace_connect_func(this, 0);
@@ -1740,6 +1740,7 @@ int GlowCtx::trace_init(int (*connect_func)(void*, GlowTraceData*),
     e.any.y = 0;
     event_callback[glow_eEvent_Open](this, &e);
   }
+  reset_nodraw();
   trace_started = 1;
   return sts;
 }
@@ -1899,6 +1900,9 @@ void GlowCtx::reconfigure()
 
 void GlowCtx::redraw()
 {
+  if (a.size() == 0)
+    return;
+
   gdraw->get_window_size(&mw, &mw.window_width, &mw.window_height);
   get_borders();
   clear(&mw);
@@ -2202,39 +2206,6 @@ void GlowCtx::set_colortheme_is_default(int isdefault)
 {
   if (customcolors)
     customcolors->set_colortheme_is_default(isdefault);
-}
-
-void GlowWind::set_draw_buffer_only()
-{
-  if (window->double_buffer_on)
-    window->draw_buffer_only++;
-}
-
-void GlowWind::reset_draw_buffer_only()
-{
-  if (window->double_buffer_on)
-    window->draw_buffer_only--;
-}
-
-int GlowWind::draw_buffer_only()
-{
-  return window->draw_buffer_only;
-}
-int GlowWind::double_buffer_on()
-{
-  return window->double_buffer_on;
-}
-int GlowWind::double_buffered()
-{
-  return window->double_buffered;
-}
-void GlowWind::set_double_buffered(int val)
-{
-  window->double_buffered = val;
-}
-void GlowWind::set_double_buffer_on(int val)
-{
-  window->double_buffer_on = val;
 }
 
 void GlowCtx::auto_scrolling_stop()

@@ -97,12 +97,6 @@ public:
   */
   void open(std::ifstream& fp);
 
-  //! Erase the object
-  void erase(GlowWind* w)
-  {
-    erase(w, (GlowTransform*)NULL, hot, NULL);
-  }
-
   //! Draw the objects if any part is inside the drawing area.
   /*!
     \param ll_x		Lower left x coordinate of drawing area.
@@ -171,14 +165,6 @@ public:
   void draw(GlowWind* w, GlowTransform* t, int highlight, int hot, void* node,
       void* colornode);
 
-  //! Erase the object.
-  /*!
-    \param t		Transform of parent node.
-    \param hot		Draw as hot, with larger line width.
-    \param node		Parent node. Can be zero.
-  */
-  void erase(GlowWind* w, GlowTransform* t, int hot, void* node);
-
   //! Redraw the area inside the objects border.
   void draw();
 
@@ -205,14 +191,9 @@ public:
   {
     bar_value = value;
     if (!parent) {
-      if (!fill)
-	erase(&ctx->mw);
       draw();
     }
     else {
-      ctx->set_draw_buffer_only();
-      parent->erase();
-      ctx->reset_draw_buffer_only();
       parent->draw();
     }
   }

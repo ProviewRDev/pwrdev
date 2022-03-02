@@ -124,9 +124,9 @@ public:
   GtkWidget* menu_moveobjdown_w;
   GtkWidget* menu_moveobjinto_w;
   GtkWidget* menu_moveobjontop_w;
-  GtkWidget* tools_edit_w;
-  GtkWidget* tools_buildnode_w;
-  GtkWidget* tools_save_w;
+  GtkToolItem* tools_edit_w;
+  GtkToolItem* tools_buildnode_w;
+  GtkToolItem* tools_save_w;
   GtkWidget* view_alltoplevel_w;
   GtkAccelGroup* accel_g;
   int set_focus_disabled;

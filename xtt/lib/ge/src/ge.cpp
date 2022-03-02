@@ -1110,7 +1110,7 @@ void Ge::refresh_objects_cb(void* ge_ctx, unsigned int type)
 void Ge::close()
 {
   if (graph->is_modified()) {
-    open_yesnodia("Do you wan't to save changes", "Save", Ge::exit_save_cb,
+    open_yesnodia("Do you want to save changes", "Save", Ge::exit_save_cb,
         Ge::exit_nosave_cb);
     return;
   }

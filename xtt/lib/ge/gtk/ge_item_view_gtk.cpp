@@ -105,7 +105,7 @@ GeItemViewGtk::GeItemViewGtk(gpointer gectx)
   scrolled_widget = gtk_scrolled_window_new(NULL, NULL);
   gtk_container_add(GTK_CONTAINER(scrolled_widget), tree_widget);
 
-  toplevel_widget = gtk_vbox_new(FALSE, 0);
+  toplevel_widget = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start(
       GTK_BOX(toplevel_widget), autosave_button, FALSE, FALSE, 8);
   gtk_box_pack_start(GTK_BOX(toplevel_widget), scrolled_widget, TRUE, TRUE, 0);
@@ -483,8 +483,7 @@ gboolean button_press_tree_widget(
   }
 
   select_tree_item_pos(tree_widget, ev->x, ev->y);
-  gtk_menu_popup(
-      menu, NULL, NULL, NULL, NULL, ev->button, gtk_get_current_event_time());
+  gtk_menu_popup_at_pointer(menu, (GdkEvent *)ev);
 
   return TRUE;
 }

@@ -112,10 +112,16 @@ void FlowFrame::erase(void* pos, int hot, void* node)
 void FlowFrame::get_borders(double pos_x, double pos_y, double* x_right,
     double* x_left, double* y_high, double* y_low, void* node)
 {
+  double ur_x;
+  if (ctx->type() == flow_eCtxType_Brow && ((BrowCtx*)ctx)->frame_x_right > 0)
+    ur_x = ((BrowCtx*)ctx)->frame_x_right;
+  else
+    ur_x = pos_x + ur.x;
+
   if (pos_x + ll.x < *x_left)
     *x_left = pos_x + ll.x;
-  if (pos_x + ur.x > *x_right)
-    *x_right = pos_x + ur.x;
+  if (ur_x > *x_right)
+    *x_right = ur_x;
   if (pos_y + ll.y < *y_low)
     *y_low = pos_y + ll.y;
   if (pos_y + ur.y > *y_high)

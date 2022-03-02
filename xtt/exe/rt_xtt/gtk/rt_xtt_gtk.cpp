@@ -52,6 +52,7 @@
 
 #include "cow_login_gtk.h"
 #include "cow_xhelp_gtk.h"
+#include "cow_wutl_gtk.h"
 
 #include "xtt_hotkey_gtk.h"
 #include "xtt_item.h"
@@ -730,6 +731,27 @@ XttGtk::XttGtk(int argc, char* argv[], int* return_sts)
     strcat(title, nodename);
 
   // Gtk
+  GtkCssProvider *provider;
+  pwr_tTime t;
+
+  dcli_translate_filename(fname, "$pwr_load/rt_xtt_gtk.css");
+  provider = gtk_css_provider_new();
+  gtk_style_context_add_provider_for_screen(gdk_display_get_default_screen(
+      gdk_display_get_default()), GTK_STYLE_PROVIDER(provider), 
+      GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+  gtk_css_provider_load_from_path(provider, fname, NULL);
+  g_object_unref(provider);
+
+  dcli_translate_filename(fname, "$pwrp_load/rt_xtt.css");
+  if (ODD(dcli_file_time(fname, &t))) {
+    provider = gtk_css_provider_new();
+    gtk_style_context_add_provider_for_screen(gdk_display_get_default_screen(
+        gdk_display_get_default()), GTK_STYLE_PROVIDER(provider), 
+        GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+    gtk_css_provider_load_from_path(provider, fname, NULL);
+    g_object_unref(provider);
+  }
+
   toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height",
       window_height, "default-width", window_width, "title", title, NULL);
 
@@ -747,10 +769,8 @@ XttGtk::XttGtk(int argc, char* argv[], int* return_sts)
   GtkMenuBar* menu_bar = (GtkMenuBar*)g_object_new(GTK_TYPE_MENU_BAR, NULL);
 
   // File Entry
-  GtkWidget* file_print = gtk_image_menu_item_new_with_mnemonic(
+  GtkWidget* file_print = gtk_menu_item_new_with_mnemonic(
       CoWowGtk::translate_utf8("_Print"));
-  gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(file_print),
-      gtk_image_new_from_stock(GTK_STOCK_PRINT, GTK_ICON_SIZE_MENU));
   g_signal_connect(
       file_print, "activate", G_CALLBACK(XttGtk::activate_print), this);
 
@@ -764,10 +784,8 @@ XttGtk::XttGtk(int argc, char* argv[], int* return_sts)
   g_signal_connect(
       file_logout, "activate", G_CALLBACK(XttGtk::activate_logout), this);
 
-  GtkWidget* file_close = gtk_image_menu_item_new_with_mnemonic(
+  GtkWidget* file_close = gtk_menu_item_new_with_mnemonic(
       CoWowGtk::translate_utf8("_Close"));
-  gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(file_close),
-      gtk_image_new_from_stock("gtk-close", GTK_ICON_SIZE_MENU));
   g_signal_connect(
       file_close, "activate", G_CALLBACK(XttGtk::activate_exit), this);
   gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w',
@@ -1012,28 +1030,22 @@ XttGtk::XttGtk(int argc, char* argv[], int* return_sts)
       GTK_MENU_ITEM(functions), GTK_WIDGET(functions_menu));
 
   // View menu
-  GtkWidget* view_zoom_in = gtk_image_menu_item_new_with_mnemonic(
+  GtkWidget* view_zoom_in = gtk_menu_item_new_with_mnemonic(
       CoWowGtk::translate_utf8("Zoom _In"));
-  gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(view_zoom_in),
-      gtk_image_new_from_stock("gtk-zoom-in", GTK_ICON_SIZE_MENU));
   g_signal_connect(
       view_zoom_in, "activate", G_CALLBACK(XttGtk::activate_zoom_in), this);
   gtk_widget_add_accelerator(view_zoom_in, "activate", accel_g, 'i',
       GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
-  GtkWidget* view_zoom_out = gtk_image_menu_item_new_with_mnemonic(
+  GtkWidget* view_zoom_out = gtk_menu_item_new_with_mnemonic(
       CoWowGtk::translate_utf8("Zoom _Out"));
-  gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(view_zoom_out),
-      gtk_image_new_from_stock("gtk-zoom-out", GTK_ICON_SIZE_MENU));
   g_signal_connect(
       view_zoom_out, "activate", G_CALLBACK(XttGtk::activate_zoom_out), this);
   gtk_widget_add_accelerator(view_zoom_out, "activate", accel_g, 'o',
       GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
-  GtkWidget* view_zoom_reset = gtk_image_menu_item_new_with_mnemonic(
+  GtkWidget* view_zoom_reset = gtk_menu_item_new_with_mnemonic(
       CoWowGtk::translate_utf8("Zoom _Reset"));
-  gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(view_zoom_reset),
-      gtk_image_new_from_stock("gtk-zoom-100", GTK_ICON_SIZE_MENU));
   g_signal_connect(view_zoom_reset, "activate",
       G_CALLBACK(XttGtk::activate_zoom_reset), this);
 
@@ -1048,10 +1060,8 @@ XttGtk::XttGtk(int argc, char* argv[], int* return_sts)
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(view), GTK_WIDGET(view_menu));
 
   // Menu Help
-  GtkWidget* help_overview = gtk_image_menu_item_new_with_mnemonic(
+  GtkWidget* help_overview = gtk_menu_item_new_with_mnemonic(
       CoWowGtk::translate_utf8("_Overview"));
-  gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(help_overview),
-      gtk_image_new_from_stock("gtk-help", GTK_ICON_SIZE_MENU));
   g_signal_connect(
       help_overview, "activate", G_CALLBACK(XttGtk::activate_help), this);
   gtk_widget_add_accelerator(help_overview, "activate", accel_g, 'h',
@@ -1086,53 +1096,20 @@ XttGtk::XttGtk(int argc, char* argv[], int* return_sts)
   // Toolbar
   GtkToolbar* tools = (GtkToolbar*)g_object_new(GTK_TYPE_TOOLBAR, NULL);
 
-  GtkWidget* tools_back = gtk_button_new();
-  dcli_translate_filename(fname, "$pwr_exe/xtt_arrowleft.png");
-  gtk_container_add(GTK_CONTAINER(tools_back), gtk_image_new_from_file(fname));
-  g_signal_connect(tools_back, "clicked", G_CALLBACK(activate_back), this);
-  g_object_set(tools_back, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(
-      tools, tools_back, CoWowGtk::translate_utf8("Go back"), "");
+  wutl_tools_item(tools, "$pwr_exe/xtt_arrowleft.png", G_CALLBACK(activate_back), 
+      "Go back", this, 1, 1);
 
-  GtkWidget* tools_advuser = gtk_button_new();
-  dcli_translate_filename(fname, "$pwr_exe/xtt_advuser.png");
-  gtk_container_add(
-      GTK_CONTAINER(tools_advuser), gtk_image_new_from_file(fname));
-  g_signal_connect(tools_advuser, "clicked",
-      G_CALLBACK(XttGtk::activate_advanceduser), this);
-  g_object_set(tools_advuser, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(
-      tools, tools_advuser, CoWowGtk::translate_utf8("Advanced user"), "");
+  GtkToolItem *tools_advuser = wutl_tools_item(tools, "$pwr_exe/xtt_advuser.png", G_CALLBACK(activate_advanceduser), 
+      "Advanced user", this, 1, 1);
 
-  GtkWidget* tools_zoom_in = gtk_button_new();
-  dcli_translate_filename(fname, "$pwr_exe/xtt_zoom_in.png");
-  gtk_container_add(
-      GTK_CONTAINER(tools_zoom_in), gtk_image_new_from_file(fname));
-  g_signal_connect(
-      tools_zoom_in, "clicked", G_CALLBACK(activate_zoom_in), this);
-  g_object_set(tools_zoom_in, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(
-      tools, tools_zoom_in, CoWowGtk::translate_utf8("Zoom in"), "");
+  wutl_tools_item(tools, "$pwr_exe/xtt_zoom_in.png", G_CALLBACK(activate_zoom_in), 
+      "Zoom in", this, 1, 1);
 
-  GtkWidget* tools_zoom_out = gtk_button_new();
-  dcli_translate_filename(fname, "$pwr_exe/xtt_zoom_out.png");
-  gtk_container_add(
-      GTK_CONTAINER(tools_zoom_out), gtk_image_new_from_file(fname));
-  g_signal_connect(
-      tools_zoom_out, "clicked", G_CALLBACK(activate_zoom_out), this);
-  g_object_set(tools_zoom_out, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(
-      tools, tools_zoom_out, CoWowGtk::translate_utf8("Zoom out"), "");
+  wutl_tools_item(tools, "$pwr_exe/xtt_zoom_out.png", G_CALLBACK(activate_zoom_out), 
+      "Zoom out", this, 1, 1);
 
-  GtkWidget* tools_zoom_reset = gtk_button_new();
-  dcli_translate_filename(fname, "$pwr_exe/xtt_zoom_reset.png");
-  gtk_container_add(
-      GTK_CONTAINER(tools_zoom_reset), gtk_image_new_from_file(fname));
-  g_signal_connect(
-      tools_zoom_reset, "clicked", G_CALLBACK(activate_zoom_reset), this);
-  g_object_set(tools_zoom_reset, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(
-      tools, tools_zoom_reset, CoWowGtk::translate_utf8("Zoom reset"), "");
+  wutl_tools_item(tools, "$pwr_exe/xtt_zoom_reset.png", G_CALLBACK(activate_zoom_reset), 
+      "Zoom reset", this, 1, 1);
 
   // Toolbar
   methodtoolbar
@@ -1142,7 +1119,7 @@ XttGtk::XttGtk(int argc, char* argv[], int* return_sts)
       = (GtkToolbar*)((XttMethodToolbarGtk*)methodtoolbar)->build();
 
   // Statusbar and cmd input
-  GtkWidget* statusbar = gtk_hbox_new(FALSE, 0);
+  GtkWidget* statusbar = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   msg_label = gtk_label_new("");
   gtk_widget_set_size_request(msg_label, -1, 25);
   cmd_prompt = gtk_label_new("value > ");
@@ -1175,18 +1152,18 @@ XttGtk::XttGtk(int argc, char* argv[], int* return_sts)
   methodtoolbar->m_parent_ctx = xnav;
   methodtoolbar->get_select_cb = xnav_get_select;
 
-  GtkWidget* vbox1 = gtk_vbox_new(FALSE, 0);
+  GtkWidget* vbox1 = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start(GTK_BOX(vbox1), GTK_WIDGET(menu_bar), FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(vbox1), GTK_WIDGET(tools), FALSE, FALSE, 0);
 
   dcli_translate_filename(fname, "$pwr_exe/pwr_logohalf2y.png");
   GtkWidget* xtt_image = gtk_image_new_from_file(fname);
 
-  GtkWidget* hbox1 = gtk_hbox_new(FALSE, 0);
+  GtkWidget* hbox1 = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   gtk_box_pack_start(GTK_BOX(hbox1), GTK_WIDGET(vbox1), TRUE, TRUE, 0);
   gtk_box_pack_end(GTK_BOX(hbox1), GTK_WIDGET(xtt_image), FALSE, FALSE, 0);
 
-  GtkWidget* vbox = gtk_vbox_new(FALSE, 0);
+  GtkWidget* vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start(GTK_BOX(vbox), GTK_WIDGET(hbox1), FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(vbox), GTK_WIDGET(tools2), FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(vbox), GTK_WIDGET(brow_widget), TRUE, TRUE, 0);
@@ -1235,12 +1212,10 @@ XttGtk::XttGtk(int argc, char* argv[], int* return_sts)
   hotkey->register_action("SetValue", hotkey_SetValue, this);
   hotkey->register_action("Command", hotkey_Command, this);
 
-  int n_screens = gdk_display_get_n_screens(gdk_display_get_default());
-  for (int i = 0; i < n_screens; i++) {
-    GdkWindow* root = gdk_screen_get_root_window(
-        gdk_display_get_screen(gdk_display_get_default(), i));
-    gdk_window_add_filter(root, xtt_hotkey_filter, hotkey);
-  }
+  GdkWindow* root = gdk_screen_get_root_window(
+        gdk_display_get_default_screen(gdk_display_get_default()));
+  gdk_window_add_filter(root, xtt_hotkey_filter, hotkey);
+
   methodtoolbar->set_sensitive();
 
   if (select_opplace)
@@ -1278,7 +1253,7 @@ void XttGtk::create_input_dialog()
   g_signal_connect(india_text, "activate", G_CALLBACK(activate_india_ok), this);
   india_label = gtk_label_new("");
   GtkWidget* india_image = (GtkWidget*)g_object_new(GTK_TYPE_IMAGE, "stock",
-      GTK_STOCK_DIALOG_QUESTION, "icon-size", GTK_ICON_SIZE_DIALOG, "xalign",
+      "gtk-dialog-question", "icon-size", GTK_ICON_SIZE_DIALOG, "xalign",
       0.5, "yalign", 1.0, NULL);
 
   GtkWidget* india_ok
@@ -1291,19 +1266,19 @@ void XttGtk::create_input_dialog()
   g_signal_connect(
       india_cancel, "clicked", G_CALLBACK(activate_india_cancel), this);
 
-  GtkWidget* india_hboxtext = gtk_hbox_new(FALSE, 0);
+  GtkWidget* india_hboxtext = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   gtk_box_pack_start(GTK_BOX(india_hboxtext), india_image, FALSE, FALSE, 15);
   gtk_box_pack_start(GTK_BOX(india_hboxtext), india_label, FALSE, FALSE, 15);
   gtk_box_pack_end(GTK_BOX(india_hboxtext), india_text, TRUE, TRUE, 30);
 
-  GtkWidget* india_hboxbuttons = gtk_hbox_new(TRUE, 40);
-  gtk_box_pack_start(GTK_BOX(india_hboxbuttons), india_ok, FALSE, FALSE, 0);
-  gtk_box_pack_end(GTK_BOX(india_hboxbuttons), india_cancel, FALSE, FALSE, 0);
+  GtkWidget* india_hboxbuttons = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 40);
+  gtk_box_pack_start(GTK_BOX(india_hboxbuttons), india_ok, FALSE, FALSE, 20);
+  gtk_box_pack_end(GTK_BOX(india_hboxbuttons), india_cancel, FALSE, FALSE, 20);
 
-  GtkWidget* india_vbox = gtk_vbox_new(FALSE, 0);
+  GtkWidget* india_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start(GTK_BOX(india_vbox), india_hboxtext, TRUE, TRUE, 30);
   gtk_box_pack_start(
-      GTK_BOX(india_vbox), gtk_hseparator_new(), FALSE, FALSE, 0);
+      GTK_BOX(india_vbox), gtk_separator_new(GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 0);
   gtk_box_pack_end(GTK_BOX(india_vbox), india_hboxbuttons, FALSE, FALSE, 15);
   gtk_container_add(GTK_CONTAINER(india_widget), india_vbox);
   gtk_widget_show_all(india_widget);

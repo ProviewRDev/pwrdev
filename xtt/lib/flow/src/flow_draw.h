@@ -60,6 +60,8 @@ public:
   virtual void get_nav_window_size(FlowCtx* ctx, int* width, int* height);
   virtual void set_nav_window_size(FlowCtx* ctx, int width, int height);
 
+  virtual void invalidate(int x, int y, int width, int height) {}
+  virtual void invalidate_nav(int x, int y, int width, int height) {}
   virtual int rect(FlowCtx* ctx, int x, int y, int width, int height,
       flow_eDrawType gc_type, int idx, int highlight, int dimmed);
   virtual int rect_erase(
@@ -171,6 +173,7 @@ public:
       flow_tPixmap* im_nav_mask);
   virtual FlowPrintDraw* print_draw_new(void* context, const char* title,
       int page, void* flow_ctx, int page_border, int* sts);
+  virtual void update_color_theme(int ct) {}
 };
 
 #endif

@@ -953,8 +953,7 @@ static pwr_tBoolean isValidHandler(mh_sHead* p, qcom_sAid* aid, sHandler** h)
   if (!(p->ver == mh_cVersion
           || (mh_cVersion == 5
                  && (p->ver == 3
-                        || p->ver
-                            == 4)))) { /* V5 is compatible with V3 and V4 */
+                 || p->ver == 4 || p->ver == 6)))) { /* V5 is compatible with V3 and V4 */
     /* Different versions, not yet implemented */
     errh_Warning("Received a Message with different version: %d != %d", p->ver,
         mh_cVersion);

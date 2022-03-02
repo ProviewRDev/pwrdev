@@ -244,32 +244,23 @@ void FlowLine::get_borders(double pos_x, double pos_y, double* x_right,
 void FlowLine::move(void* pos, double x1, double y1, double x2, double y2,
     int highlight, int dimmed, int hot)
 {
-  erase(pos, hot, NULL);
-  nav_erase(pos, NULL);
   p1.x = x1;
   p1.y = y1;
   p2.x = x2;
   p2.y = y2;
   zoom();
   nav_zoom();
-  draw(pos, highlight, dimmed, hot, NULL);
-  nav_draw(pos, highlight, NULL);
 }
 
 void FlowLine::shift(void* pos, double delta_x, double delta_y, int highlight,
     int dimmed, int hot)
 {
-  erase(pos, hot, NULL);
-  nav_erase(pos, NULL);
   p1.x += delta_x;
   p1.y += delta_y;
   p2.x += delta_x;
   p2.y += delta_y;
   zoom();
   nav_zoom();
-
-  draw(pos, highlight, dimmed, hot, NULL);
-  nav_draw(pos, highlight, NULL);
 }
 
 std::ostream& operator<<(std::ostream& o, const FlowLine l)

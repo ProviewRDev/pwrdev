@@ -205,8 +205,6 @@ void FlowArc::get_borders(double pos_x, double pos_y, double* x_right,
 void FlowArc::move(void* pos, double x1, double y1, double x2, double y2,
     int ang1, int ang2, int highlight, int dimmed, int hot)
 {
-  erase(pos, hot, NULL);
-  nav_erase(pos, NULL);
   ll.x = x1;
   ll.y = y1;
   ur.x = x2;
@@ -215,24 +213,17 @@ void FlowArc::move(void* pos, double x1, double y1, double x2, double y2,
   angle2 = ang2;
   zoom();
   nav_zoom();
-  draw(pos, highlight, dimmed, hot, NULL);
-  nav_draw(pos, highlight, NULL);
 }
 
 void FlowArc::shift(void* pos, double delta_x, double delta_y, int highlight,
     int dimmed, int hot)
 {
-  erase(pos, hot, NULL);
-  nav_erase(pos, NULL);
   ll.x += delta_x;
   ll.y += delta_y;
   ur.x += delta_x;
   ur.y += delta_y;
   zoom();
   nav_zoom();
-
-  draw(pos, highlight, dimmed, hot, NULL);
-  nav_draw(pos, highlight, NULL);
 }
 
 std::ostream& operator<<(std::ostream& o, const FlowArc a)

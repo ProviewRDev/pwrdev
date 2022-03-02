@@ -42,7 +42,7 @@
 #include "flow_ctx.h"
 
 #include <gtk/gtk.h>
-#include <gtk/gtkprivate.h>
+//#include <gtk/gtkprivate.h>
 
 #if defined __cplusplus
 extern "C" {

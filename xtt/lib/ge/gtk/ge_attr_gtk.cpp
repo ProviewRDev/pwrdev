@@ -120,14 +120,11 @@ void AttrGtk::change_value()
     text_w = cmd_scrolledinput;
     g_object_set(text_w, "visible", TRUE, NULL);
 
-    int w, h;
-    gdk_drawable_get_size(pane->window, &w, &h);
+    int h;
+    h = gdk_window_get_height(gtk_widget_get_window(pane));
     gtk_paned_set_position(GTK_PANED(pane), h - 170);
     gtk_widget_grab_focus(cmd_scrolledtextview);
     input_max_length = size - 1;
-    // XtManageChild( text_w);
-    // XtManageChild( cmd_scrolled_ok);
-    // XtManageChild( cmd_scrolled_ca);
   } else {
     text_w = cmd_input;
     g_object_set(text_w, "visible", TRUE, NULL);
@@ -291,8 +288,8 @@ static void attr_activate_cmd_scrolled_ok(GtkWidget* w, gpointer data)
     attr->set_prompt("");
     attr->input_open = 0;
 
-    int w, h;
-    gdk_drawable_get_size(attr->pane->window, &w, &h);
+    int h;
+    h = gdk_window_get_height(gtk_widget_get_window(attr->pane));
     gtk_paned_set_position(GTK_PANED(attr->pane), h - 50);
 
     if (attr->redraw_cb)
@@ -310,8 +307,8 @@ static void attr_activate_cmd_scrolled_ca(GtkWidget* w, gpointer data)
   if (attr->input_open) {
     g_object_set(attr->cmd_scrolledinput, "visible", FALSE, NULL);
 
-    int w, h;
-    gdk_drawable_get_size(attr->pane->window, &w, &h);
+    int h;
+    h = gdk_window_get_height(gtk_widget_get_window(attr->pane));
     gtk_paned_set_position(GTK_PANED(attr->pane), h - 50);
 
     attr->set_prompt("");
@@ -383,9 +380,10 @@ AttrGtk::AttrGtk(GtkWidget* a_parent_wid, void* a_parent_ctx, attr_eType a_type,
       parent_wid(a_parent_wid), msg_label(0), input_max_length(0)
 {
   int sts;
+  int default_height = 700;
 
   if (!embedded) {
-    toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", 700,
+    toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", default_height,
         "default-width", 500, "title", "Object Attributes", NULL);
 
     g_signal_connect(toplevel, "delete_event", G_CALLBACK(delete_event), this);
@@ -395,7 +393,7 @@ AttrGtk::AttrGtk(GtkWidget* a_parent_wid, void* a_parent_ctx, attr_eType a_type,
 
     CoWowGtk::SetWindowIcon(toplevel);
   }
-  GtkWidget* vbox = gtk_vbox_new(FALSE, 0);
+  GtkWidget* vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 
   if (!embedded) {
     // Menu
@@ -407,10 +405,11 @@ AttrGtk::AttrGtk(GtkWidget* a_parent_wid, void* a_parent_ctx, attr_eType a_type,
     GtkMenuBar* menu_bar = (GtkMenuBar*)g_object_new(GTK_TYPE_MENU_BAR, NULL);
 
     // File entry
-    GtkWidget* file_close
-        = gtk_image_menu_item_new_from_stock(GTK_STOCK_CLOSE, accel_g);
+    GtkWidget* file_close = gtk_menu_item_new_with_mnemonic("_Close");
     g_signal_connect(
         file_close, "activate", G_CALLBACK(attr_activate_close), this);
+    gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w',
+        GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
     GtkMenu* file_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
     gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_close);
@@ -458,9 +457,11 @@ AttrGtk::AttrGtk(GtkWidget* a_parent_wid, void* a_parent_ctx, attr_eType a_type,
 
     // Help entry
     GtkWidget* help_help
-        = gtk_image_menu_item_new_from_stock(GTK_STOCK_HELP, accel_g);
+        = gtk_menu_item_new_with_mnemonic("_Help");
     g_signal_connect(
         help_help, "activate", G_CALLBACK(attr_activate_help), this);
+    gtk_widget_add_accelerator(help_help, "activate", accel_g, 'h',
+        GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
     GtkMenu* help_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
     gtk_menu_shell_append(GTK_MENU_SHELL(help_menu), help_help);
@@ -469,7 +470,7 @@ AttrGtk::AttrGtk(GtkWidget* a_parent_wid, void* a_parent_ctx, attr_eType a_type,
     gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), help);
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(help), GTK_WIDGET(help_menu));
 
-    pane = gtk_vpaned_new();
+    pane = gtk_paned_new(GTK_ORIENTATION_VERTICAL);
 
     attrnav = new AttrNavGtk(
         this, pane, type, "Plant", itemlist, item_cnt, &brow_widget, &sts);
@@ -483,7 +484,7 @@ AttrGtk::AttrGtk(GtkWidget* a_parent_wid, void* a_parent_ctx, attr_eType a_type,
     attrnav->get_current_color_tone_cb = &Attr::get_current_color_tone_c;
     attrnav->get_object_list_cb = &Attr::get_object_list_c;
 
-    GtkWidget* statusbar = gtk_hbox_new(FALSE, 0);
+    GtkWidget* statusbar = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
     // msg_label = gtk_statusbar_new();
     msg_label = gtk_label_new("");
     gtk_widget_set_size_request(msg_label, -1, 25);
@@ -527,11 +528,11 @@ AttrGtk::AttrGtk(GtkWidget* a_parent_wid, void* a_parent_ctx, attr_eType a_type,
     g_signal_connect(cmd_scrolled_ca, "clicked",
         G_CALLBACK(attr_activate_cmd_scrolled_ca), this);
 
-    GtkWidget* hboxbuttons = gtk_hbox_new(TRUE, 40);
+    GtkWidget* hboxbuttons = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 40);
     gtk_box_pack_start(GTK_BOX(hboxbuttons), cmd_scrolled_ok, FALSE, FALSE, 0);
     gtk_box_pack_end(GTK_BOX(hboxbuttons), cmd_scrolled_ca, FALSE, FALSE, 0);
 
-    cmd_scrolledinput = gtk_vbox_new(FALSE, 0);
+    cmd_scrolledinput = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     gtk_box_pack_start(
         GTK_BOX(cmd_scrolledinput), scrolledwindow, TRUE, TRUE, 0);
     gtk_box_pack_start(
@@ -545,9 +546,9 @@ AttrGtk::AttrGtk(GtkWidget* a_parent_wid, void* a_parent_ctx, attr_eType a_type,
     g_object_set(cmd_input, "visible", FALSE, NULL);
     g_object_set(cmd_scrolledinput, "visible", FALSE, NULL);
 
-    int w, h;
-    gdk_drawable_get_size(pane->window, &w, &h);
-    gtk_paned_set_position(GTK_PANED(pane), h - 50);
+    int h;
+    h = gdk_window_get_height(gtk_widget_get_window(pane));
+    gtk_paned_set_position(GTK_PANED(pane), default_height - 65);
 
     if (parent_wid)
       gtk_window_set_transient_for(

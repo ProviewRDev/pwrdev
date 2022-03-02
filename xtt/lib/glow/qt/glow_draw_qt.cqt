@@ -1436,7 +1436,7 @@ void GlowDrawQt::clear(GlowWind* wind)
   }
   DrawWindQt* w = (DrawWindQt*)wind->window;
 
-  buffer_background(w, 0);
+  buffer_background(wind, 0);
 }
 
 void GlowDrawQt::copy_buffer(
@@ -1759,7 +1759,7 @@ void GlowDrawQt::set_background(GlowWind* wind, glow_eDrawType drawtype,
     w->window->setPalette(pal);
 
     if (w->buffer) {
-      buffer_background(w, 0);
+      buffer_background(wind, 0);
     }
   } else {
     if (w->background_pixmap) {
@@ -1774,7 +1774,7 @@ void GlowDrawQt::set_background(GlowWind* wind, glow_eDrawType drawtype,
         w->background_pixmap->scaled(w->buffer->size(), Qt::IgnoreAspectRatio));
     w->window->setPalette(pal);
     if (w->buffer) {
-      buffer_background(w, 0);
+      buffer_background(wind, 0);
     }
   }
 }
@@ -1935,7 +1935,7 @@ int GlowDrawQt::create_buffer(GlowWind* wind)
     window_height = ctx->navw.window_height;
   }
 
-  buffer_background(w, 0);
+  buffer_background(wind, 0);
   return 1;
 }
 
@@ -1943,12 +1943,12 @@ void GlowDrawQt::delete_buffer(GlowWind* wind)
 {
 }
 
-void GlowDrawQt::buffer_background(DrawWind* wind, GlowCtx* cctx)
+void GlowDrawQt::buffer_background(GlowWind* wind, GlowCtx* cctx)
 {
-  DrawWindQt* w = (DrawWindQt*)wind;
+  DrawWindQt* w = (DrawWindQt*)wind->window;
   int window_width, window_height, subwindow_x, subwindow_y;
 
-  if (ctx->mw.window == wind) {
+  if (ctx->mw.window == w) {
     window_width = ctx->mw.window_width;
     window_height = ctx->mw.window_height;
     subwindow_x = ctx->mw.subwindow_x;

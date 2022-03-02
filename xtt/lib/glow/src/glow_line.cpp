@@ -143,13 +143,10 @@ void GlowLine::draw(GlowWind* w, void* pos, int hightlight, int hot, void* node)
   idx += hot;
   idx = MAX(0, idx);
   idx = MIN(idx, DRAW_TYPE_SIZE - 1);
-  w->set_draw_buffer_only();
   ctx->gdraw->line(w, p1_x + ((GlowPoint*)pos)->z_x - w->offset_x,
       p1_y + ((GlowPoint*)pos)->z_y - w->offset_y,
       p2_x + ((GlowPoint*)pos)->z_x - w->offset_x,
       p2_y + ((GlowPoint*)pos)->z_y - w->offset_y, draw_type, idx, hightlight);
-
-  w->reset_draw_buffer_only();
 }
 
 void GlowLine::draw_shadow(
@@ -179,7 +176,6 @@ void GlowLine::draw_shadow(
   int ish = 1;
   int offs = border;
 
-  w->set_draw_buffer_only();
   if (shadow && idx > 2) {
     if (p1_x == p2_x) {
       // Vertical line
@@ -225,7 +221,6 @@ void GlowLine::draw_shadow(
             glow_eDrawType_Line, 0, hightlight);
     }
   }
-  w->reset_draw_buffer_only();
 }
 
 void GlowLine::erase(GlowWind* w, void* pos, int hot, void* node)

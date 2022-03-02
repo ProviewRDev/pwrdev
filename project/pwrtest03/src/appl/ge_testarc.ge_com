@@ -39,6 +39,8 @@ main()
   ClearAll();
   SetDraw(0);
 
+  SetBackgroundColor(eDrawType_Color32);
+
   x = 31.0;
   y = 0.2;
   x2 = x + 2.3;

@@ -183,6 +183,10 @@ $(inc_dir)/%.hpp : %.hpp
 	@ $(cp) $(cpflags) $(source) $(target)
 	@ chmod u+w $(target)
 
+$(load_dir)/%.css : %.css
+	@ $(log_h_h)
+	@ $(cp) $(cpflags) $(source) $(target)
+
 %.class : %.java
 	@ echo "Warning, rule shall not be used: %.class : %.java"
 

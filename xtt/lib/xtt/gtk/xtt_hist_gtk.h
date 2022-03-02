@@ -109,16 +109,8 @@ public:
   static void activate_helpevent(GtkWidget* w, gpointer data);
   static void create_form(GtkWidget* w, gpointer data);
   static void ok_btn(GtkWidget* w, gpointer data);
-  // callbackfunctions from the searchdialog
+  static void activate_sea_time_combo(GtkWidget* w, gpointer data);
   static void cancel_cb(GtkWidget* w, gpointer data);
-  static void today_cb(GtkWidget* w, gpointer data);
-  static void yesterday_cb(GtkWidget* w, gpointer data);
-  static void thisw_cb(GtkWidget* w, gpointer data);
-  static void lastw_cb(GtkWidget* w, gpointer data);
-  static void thism_cb(GtkWidget* w, gpointer data);
-  static void lastm_cb(GtkWidget* w, gpointer data);
-  static void all_cb(GtkWidget* w, gpointer data);
-  static void time_cb(GtkWidget* w, gpointer data);
 };
 
 #else

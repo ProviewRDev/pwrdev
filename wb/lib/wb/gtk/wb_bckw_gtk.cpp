@@ -83,37 +83,35 @@ WbBckWGtk::WbBckWGtk(void* bckw_parent_ctx, GtkWidget* bckw_parent_wid,
   GtkMenuBar* menu_bar = (GtkMenuBar*)g_object_new(GTK_TYPE_MENU_BAR, NULL);
 
   // File Entry
-  GtkWidget* file_close
-      = gtk_image_menu_item_new_from_stock(GTK_STOCK_CLOSE, accel_g);
-  g_signal_connect(
-      file_close, "activate", G_CALLBACK(WbBckWGtk::activate_exit), this);
+  GtkWidget* file_close = gtk_menu_item_new_with_mnemonic("_Close");
+  g_signal_connect(file_close, "activate", G_CALLBACK(activate_exit), this);
+  gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w',
+      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
 
-  GtkWidget* file_print
-      = gtk_image_menu_item_new_from_stock(GTK_STOCK_PRINT, accel_g);
-  g_signal_connect(
-      file_print, "activate", G_CALLBACK(WbBckWGtk::activate_print), this);
+  GtkWidget* file_print = gtk_menu_item_new_with_mnemonic("_Print");
+  g_signal_connect(file_print, "activate", G_CALLBACK(activate_print), this);
 
   file_transfer_wb = gtk_menu_item_new_with_mnemonic("_Transfer to database");
   g_signal_connect(file_transfer_wb, "activate",
-      G_CALLBACK(WbBckWGtk::activate_transfer_wb), this);
+      G_CALLBACK(activate_transfer_wb), this);
 
   GtkWidget* file_filter = gtk_menu_item_new_with_mnemonic("_Filter");
   g_signal_connect(
-      file_filter, "activate", G_CALLBACK(WbBckWGtk::activate_filter), this);
+      file_filter, "activate", G_CALLBACK(activate_filter), this);
 
   GtkWidget* file_open = gtk_menu_item_new_with_mnemonic("_Open");
   g_signal_connect(
-      file_open, "activate", G_CALLBACK(WbBckWGtk::activate_open), this);
+      file_open, "activate", G_CALLBACK(activate_open), this);
 
   GtkWidget* file_diff
       = gtk_menu_item_new_with_mnemonic("_Compare Backup File");
   g_signal_connect(
-      file_diff, "activate", G_CALLBACK(WbBckWGtk::activate_diff), this);
+      file_diff, "activate", G_CALLBACK(activate_diff), this);
 
   GtkWidget* file_diff_wb
       = gtk_menu_item_new_with_mnemonic("C_ompare Database");
   g_signal_connect(
-      file_diff_wb, "activate", G_CALLBACK(WbBckWGtk::activate_diff_wb), this);
+      file_diff_wb, "activate", G_CALLBACK(activate_diff_wb), this);
 
   GtkMenu* file_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_open);
@@ -131,11 +129,11 @@ WbBckWGtk::WbBckWGtk(void* bckw_parent_ctx, GtkWidget* bckw_parent_wid,
   // Edit menu
   edit_check_all = gtk_menu_item_new_with_mnemonic("_Check all");
   g_signal_connect(edit_check_all, "activate",
-      G_CALLBACK(WbBckWGtk::activate_check_all), this);
+      G_CALLBACK(activate_check_all), this);
 
   edit_check_clear = gtk_menu_item_new_with_mnemonic("_Check clear");
   g_signal_connect(edit_check_clear, "activate",
-      G_CALLBACK(WbBckWGtk::activate_check_clear), this);
+      G_CALLBACK(activate_check_clear), this);
 
   GtkMenu* edit_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(edit_menu), edit_check_all);
@@ -146,24 +144,21 @@ WbBckWGtk::WbBckWGtk(void* bckw_parent_ctx, GtkWidget* bckw_parent_wid,
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(edit), GTK_WIDGET(edit_menu));
 
   // View menu
-  GtkWidget* view_zoom_in
-      = gtk_image_menu_item_new_from_stock(GTK_STOCK_ZOOM_IN, NULL);
+  GtkWidget* view_zoom_in = gtk_menu_item_new_with_mnemonic("Zoom _In");
   g_signal_connect(
-      view_zoom_in, "activate", G_CALLBACK(WbBckWGtk::activate_zoom_in), this);
+      view_zoom_in, "activate", G_CALLBACK(activate_zoom_in), this);
   gtk_widget_add_accelerator(view_zoom_in, "activate", accel_g, 'i',
       GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
-  GtkWidget* view_zoom_out
-      = gtk_image_menu_item_new_from_stock(GTK_STOCK_ZOOM_OUT, NULL);
-  g_signal_connect(view_zoom_out, "activate",
-      G_CALLBACK(WbBckWGtk::activate_zoom_out), this);
+  GtkWidget* view_zoom_out = gtk_menu_item_new_with_mnemonic("Zoom _Out");
+  g_signal_connect(
+      view_zoom_out, "activate", G_CALLBACK(activate_zoom_out), this);
   gtk_widget_add_accelerator(view_zoom_out, "activate", accel_g, 'o',
       GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
-  GtkWidget* view_zoom_reset
-      = gtk_image_menu_item_new_from_stock(GTK_STOCK_ZOOM_100, NULL);
+  GtkWidget* view_zoom_reset = gtk_menu_item_new_with_mnemonic("Zoom _Reset");
   g_signal_connect(view_zoom_reset, "activate",
-      G_CALLBACK(WbBckWGtk::activate_zoom_reset), this);
+      G_CALLBACK(activate_zoom_reset), this);
 
   GtkMenu* view_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(view_menu), view_zoom_in);
@@ -175,10 +170,11 @@ WbBckWGtk::WbBckWGtk(void* bckw_parent_ctx, GtkWidget* bckw_parent_wid,
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(view), GTK_WIDGET(view_menu));
 
   // Help menu
-  GtkWidget* help_backup
-      = gtk_image_menu_item_new_from_stock(GTK_STOCK_HELP, NULL);
+  GtkWidget* help_backup = gtk_menu_item_new_with_mnemonic("_Help");
   g_signal_connect(
-      help_backup, "activate", G_CALLBACK(WbBckWGtk::activate_help), this);
+      help_backup, "activate", G_CALLBACK(activate_help), this);
+  gtk_widget_add_accelerator(help_backup, "activate", accel_g, 'h',
+      GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
   GtkMenu* help_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(help_menu), help_backup);
@@ -187,7 +183,7 @@ WbBckWGtk::WbBckWGtk(void* bckw_parent_ctx, GtkWidget* bckw_parent_wid,
   gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), help);
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(help), GTK_WIDGET(help_menu));
 
-  form = gtk_vbox_new(FALSE, 0);
+  form = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 
   // Create bckwnav
   bckwnav = new WbBckWNavGtk(

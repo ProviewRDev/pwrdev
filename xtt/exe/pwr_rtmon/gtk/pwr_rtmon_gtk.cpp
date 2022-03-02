@@ -40,6 +40,7 @@
 #include <stdlib.h>
 
 #include "co_string.h"
+#include "co_dcli.h"
 
 #include "cow_rtmon_gtk.h"
 #include "cow_xhelp_gtk.h"
@@ -80,6 +81,17 @@ int main(int argc, char* argv[])
 
   setlocale(LC_NUMERIC, "POSIX");
   setlocale(LC_TIME, "en_US");
+
+  // Load css file
+  GtkCssProvider *provider;
+  pwr_tFileName fname;
+  dcli_translate_filename(fname, "$pwr_load/pwr_rtmon_gtk.css");
+  provider = gtk_css_provider_new();
+  gtk_style_context_add_provider_for_screen(gdk_display_get_default_screen(
+      gdk_display_get_default()), GTK_STYLE_PROVIDER(provider), 
+      GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+  gtk_css_provider_load_from_path(provider, fname, NULL);
+  g_object_unref(provider);
 
   // Create help window
   CoXHelp* xhelp = new CoXHelpGtk(0, 0, xhelp_eUtility_Xtt, &sts);

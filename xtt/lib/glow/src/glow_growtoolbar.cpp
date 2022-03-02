@@ -72,8 +72,6 @@ GrowToolbar::GrowToolbar(GrowCtx* glow_ctx, const char* name,
 
 GrowToolbar::~GrowToolbar()
 {
-  erase(&ctx->mw);
-  erase(&ctx->navw);
 
   ctx->set_defered_redraw();
   ctx->delete_node_cons(this);
@@ -381,10 +379,6 @@ int GrowToolbar::event_handler(
         && ((!ctx->trace_started && hot) || (ctx->trace_started && hot_tool))) {
       if (!ctx->hot_found)
         ctx->gdraw->set_cursor(w, glow_eDrawCursor_Normal);
-      if (root_node)
-        root_node->erase(w);
-      else
-        erase(w);
       if (hot_tool)
         ((GrowNode*)nc->a.a[hot_tool - 1])->set_hot(0);
       hot_tool = 0;

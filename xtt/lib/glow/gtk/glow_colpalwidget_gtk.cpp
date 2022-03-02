@@ -40,6 +40,7 @@
 
 typedef struct _ColPalWidgetGtk ColPalWidgetGtk;
 typedef struct _ColPalWidgetGtkClass ColPalWidgetGtkClass;
+typedef struct _ColPalWidgetGtkPrivate ColPalWidgetGtkPrivate;
 
 typedef struct {
   GtkWidget* colpal;
@@ -51,9 +52,12 @@ typedef struct {
 } colpalwidget_sScroll;
 
 struct _ColPalWidgetGtk {
-  GtkDrawingArea parent;
+  GtkDrawingArea bin;
+  ColPalWidgetGtkPrivate *priv;
+};
 
-  /* Private */
+struct _ColPalWidgetGtkPrivate {
+  GdkWindow *window;
   void* colpal_ctx;
   void* draw_ctx;
   int (*init_proc)(GlowCtx* ctx, void* clien_data);
@@ -74,33 +78,55 @@ struct _ColPalWidgetGtk {
   gint scroll_timerid;
   glow_sScroll scroll_data;
   int scroll_configure;
+  int destroyed;
+  GtkAdjustment* hadjustment;
+  GtkAdjustment* vadjustment;
+  guint hscroll_policy : 1;
+  guint vscroll_policy : 1;
+};
+
+enum {
+  PROP_0,
+  PROP_HADJUSTMENT,
+  PROP_VADJUSTMENT,
+  PROP_HSCROLL_POLICY,
+  PROP_VSCROLL_POLICY
 };
 
 struct _ColPalWidgetGtkClass {
   GtkDrawingAreaClass parent_class;
 };
 
-G_DEFINE_TYPE(ColPalWidgetGtk, colpalwidgetgtk, GTK_TYPE_DRAWING_AREA);
+G_DEFINE_TYPE_WITH_CODE(ColPalWidgetGtk, colpalwidgetgtk, GTK_TYPE_DRAWING_AREA,
+	      G_ADD_PRIVATE(ColPalWidgetGtk)
+	      G_IMPLEMENT_INTERFACE(GTK_TYPE_SCROLLABLE, NULL));
+
 static gboolean scroll_callback_cb(void* d);
+static void colpalwidgetgtk_get_property(GObject *object, guint prop_id, 
+				       GValue *value, GParamSpec *pspec);
+static void colpalwidgetgtk_set_property(GObject *object, guint prop_id, 
+				       const GValue *value, GParamSpec *pspec);
 
 static void scroll_callback(glow_sScroll* data)
 {
   colpalwidget_sScroll* scroll_data = (colpalwidget_sScroll*)data->scroll_data;
+  ColPalWidgetGtkPrivate *colpal = (ColPalWidgetGtkPrivate *)((ColPalWidgetGtk*)scroll_data->colpal)->priv;
 
-  if (((ColPalWidgetGtk*)scroll_data->colpal)->scroll_timerid)
-    g_source_remove(((ColPalWidgetGtk*)scroll_data->colpal)->scroll_timerid);
+  if (colpal->scroll_timerid)
+    g_source_remove(colpal->scroll_timerid);
 
-  ((ColPalWidgetGtk*)scroll_data->colpal)->scroll_timerid
-      = g_timeout_add(200, scroll_callback_cb, scroll_data->colpal);
-  ((ColPalWidgetGtk*)scroll_data->colpal)->scroll_data = *data;
+  colpal->scroll_timerid = g_timeout_add(200, scroll_callback_cb, scroll_data->colpal);
+  colpal->scroll_data = *data;
 }
 
 static gboolean scroll_callback_cb(void* d)
 {
-  glow_sScroll* data = &((ColPalWidgetGtk*)d)->scroll_data;
+  ColPalWidgetGtkPrivate *colpal = ((ColPalWidgetGtk*)d)->priv;
+  glow_sScroll* data = &colpal->scroll_data;
   colpalwidget_sScroll* scroll_data = (colpalwidget_sScroll*)data->scroll_data;
+  GtkAdjustment *adj;
 
-  ((ColPalWidgetGtk*)scroll_data->colpal)->scroll_timerid = 0;
+  colpal->scroll_timerid = 0;
 
   if (data->total_width <= data->window_width) {
     if (data->offset_x == 0)
@@ -143,59 +169,47 @@ static gboolean scroll_callback_cb(void* d)
     data->window_height = 1;
 
   if (scroll_data->scroll_h_managed) {
-    ((ColPalWidgetGtk*)scroll_data->colpal)->scroll_h_ignore = 1;
-    if (data->window_width
-            != ((ColPalWidgetGtk*)scroll_data->colpal)->scroll_h_pagesize
-        || data->total_width
-            != ((ColPalWidgetGtk*)scroll_data->colpal)->scroll_h_upper
-        || ((ColPalWidgetGtk*)scroll_data->colpal)->scroll_configure) {
-      g_object_set(((GtkScrollbar*)scroll_data->scroll_h)->range.adjustment,
-          "upper", (gdouble)data->total_width, "page-size",
-          (gdouble)data->window_width, "value", (gdouble)data->offset_x, NULL);
-      gtk_adjustment_changed(
-          ((GtkScrollbar*)scroll_data->scroll_h)->range.adjustment);
+    colpal->scroll_h_ignore = 1;
+    if (data->window_width != colpal->scroll_h_pagesize
+        || data->total_width != colpal->scroll_h_upper
+        || colpal->scroll_configure) {
+      adj = gtk_range_get_adjustment(GTK_RANGE(scroll_data->scroll_h));
+      gtk_adjustment_set_value(adj, data->offset_x);
+      gtk_adjustment_set_upper(adj, data->total_width);
+      gtk_adjustment_set_page_size(adj, data->window_width);
     } else {
-      gtk_range_set_value(
-          GTK_RANGE(scroll_data->scroll_h), (gdouble)data->offset_x);
+      adj = gtk_range_get_adjustment(GTK_RANGE(scroll_data->scroll_h));
+      gtk_adjustment_set_value(adj, data->offset_x);
     }
-    ((ColPalWidgetGtk*)scroll_data->colpal)->scroll_h_value
-        = (gdouble)data->offset_x;
-    ((ColPalWidgetGtk*)scroll_data->colpal)->scroll_h_pagesize
-        = data->window_width;
-    ((ColPalWidgetGtk*)scroll_data->colpal)->scroll_h_upper = data->total_width;
+    colpal->scroll_h_value = (gdouble)data->offset_x;
+    colpal->scroll_h_pagesize = data->window_width;
+    colpal->scroll_h_upper = data->total_width;
   }
 
   if (scroll_data->scroll_v_managed) {
-    ((ColPalWidgetGtk*)scroll_data->colpal)->scroll_v_ignore = 1;
-    if (data->window_height
-            != ((ColPalWidgetGtk*)scroll_data->colpal)->scroll_v_pagesize
-        || data->total_height
-            != ((ColPalWidgetGtk*)scroll_data->colpal)->scroll_v_upper
-        || ((ColPalWidgetGtk*)scroll_data->colpal)->scroll_configure) {
-      g_object_set(((GtkScrollbar*)scroll_data->scroll_v)->range.adjustment,
-          "upper", (gdouble)data->total_height, "page-size",
-          (gdouble)data->window_height, "value", (gdouble)data->offset_y, NULL);
-      gtk_adjustment_changed(
-          ((GtkScrollbar*)scroll_data->scroll_v)->range.adjustment);
+    colpal->scroll_v_ignore = 1;
+    if (data->window_height != colpal->scroll_v_pagesize
+        || data->total_height != colpal->scroll_v_upper
+        || colpal->scroll_configure) {
+      adj = gtk_range_get_adjustment(GTK_RANGE(scroll_data->scroll_v));
+      gtk_adjustment_set_upper(adj, data->total_height);
+      gtk_adjustment_set_page_size(adj, data->window_height);
+      gtk_adjustment_set_value(adj, data->offset_y);
     } else {
-      g_object_set(((GtkScrollbar*)scroll_data->scroll_v)->range.adjustment,
-          "value", (gdouble)data->offset_y, NULL);
-      gtk_adjustment_value_changed(
-          ((GtkScrollbar*)scroll_data->scroll_v)->range.adjustment);
+      gtk_range_set_value(
+          GTK_RANGE(scroll_data->scroll_v), (gdouble)data->offset_y);
     }
-    ((ColPalWidgetGtk*)scroll_data->colpal)->scroll_v_value
-        = (gdouble)data->offset_y;
-    ((ColPalWidgetGtk*)scroll_data->colpal)->scroll_h_pagesize
-        = data->window_width;
-    ((ColPalWidgetGtk*)scroll_data->colpal)->scroll_h_upper = data->total_width;
+    colpal->scroll_v_value = (gdouble)data->offset_y;
+    colpal->scroll_h_pagesize = data->window_width;
+    colpal->scroll_h_upper = data->total_width;
   }
-  ((ColPalWidgetGtk*)scroll_data->colpal)->scroll_configure = 0;
+  colpal->scroll_configure = 0;
   return FALSE;
 }
 
 static void scroll_h_action(GtkWidget* w, gpointer data)
 {
-  ColPalWidgetGtk* colpalw = (ColPalWidgetGtk*)data;
+  ColPalWidgetGtkPrivate* colpalw = ((ColPalWidgetGtk*)data)->priv;
   if (colpalw->scroll_h_ignore) {
     colpalw->scroll_h_ignore = 0;
     return;
@@ -209,7 +223,7 @@ static void scroll_h_action(GtkWidget* w, gpointer data)
 
 static void scroll_v_action(GtkWidget* w, gpointer data)
 {
-  ColPalWidgetGtk* colpalw = (ColPalWidgetGtk*)data;
+  ColPalWidgetGtkPrivate* colpalw = ((ColPalWidgetGtk*)data)->priv;
 
   if (colpalw->scroll_v_ignore) {
     colpalw->scroll_v_ignore = 0;
@@ -227,49 +241,65 @@ static int colpal_init_proc(GtkWidget* w, GlowCtx* fctx, void* client_data)
   colpalwidget_sScroll* scroll_data;
   ColPalCtx* ctx;
 
-  ctx = (ColPalCtx*)((ColPalWidgetGtk*)w)->colpal_ctx;
+  ctx = (ColPalCtx*)((ColPalWidgetGtk*)w)->priv->colpal_ctx;
 
-  if (((ColPalWidgetGtk*)w)->scroll_h) {
+  if (((ColPalWidgetGtk*)w)->priv->scroll_h) {
     scroll_data = (colpalwidget_sScroll*)malloc(sizeof(colpalwidget_sScroll));
     scroll_data->colpal = w;
-    scroll_data->scroll_h = ((ColPalWidgetGtk*)w)->scroll_h;
-    scroll_data->scroll_v = ((ColPalWidgetGtk*)w)->scroll_v;
-    scroll_data->form = ((ColPalWidgetGtk*)w)->form;
+    scroll_data->scroll_h = ((ColPalWidgetGtk*)w)->priv->scroll_h;
+    scroll_data->scroll_v = ((ColPalWidgetGtk*)w)->priv->scroll_v;
+    scroll_data->form = ((ColPalWidgetGtk*)w)->priv->form;
     scroll_data->scroll_h_managed = 1;
     scroll_data->scroll_v_managed = 1;
 
     ctx->register_scroll_callback((void*)scroll_data, scroll_callback);
   }
 
+  ctx->set_nodraw();
   ctx->configure();
+  ctx->reset_nodraw();
 
-  if (((ColPalWidgetGtk*)w)->init_proc)
-    return (((ColPalWidgetGtk*)w)->init_proc)(ctx, client_data);
+  if (((ColPalWidgetGtk*)w)->priv->init_proc)
+    return (((ColPalWidgetGtk*)w)->priv->init_proc)(ctx, client_data);
   else
     return 1;
 }
 
-static gboolean colpalwidgetgtk_expose(GtkWidget* glow, GdkEventExpose* event)
+static gboolean colpalwidgetgtk_expose(GtkWidget* widget, cairo_t* cr)
 {
-  ((GlowDrawGtk*)((ColPalCtx*)((ColPalWidgetGtk*)glow)->colpal_ctx)->gdraw)
-      ->event_handler(*(GdkEvent*)event);
+  ColPalWidgetGtk* colpal = (ColPalWidgetGtk*)widget;
+  ((GlowDrawGtk*)((ColPalCtx*)colpal->priv->colpal_ctx)->gdraw)->
+      expose(cr, colpal->priv->is_navigator);
   return TRUE;
 }
 
-static void colpalwidgetgtk_destroy(GtkObject* object)
+static void colpalwidgetgtk_destroy(GtkWidget* widget)
 {
-  ColPalWidgetGtk* colpal = (ColPalWidgetGtk*)object;
+  ColPalWidgetGtk* colpal = (ColPalWidgetGtk*)widget;
 
-  if (colpal->scroll_timerid)
-    g_source_remove(colpal->scroll_timerid);
-  if (colpal->is_navigator && colpal->colpal_ctx) {
-    ((ColPalCtx*)colpal->colpal_ctx)->no_nav = 1;
+  if (!colpal->priv->destroyed) {
+    colpal->priv->destroyed = 1;
+    if (colpal->priv->scroll_timerid)
+      g_source_remove(colpal->priv->scroll_timerid);
+    if (colpal->priv->is_navigator) {
+      if (colpal->priv->colpal_ctx
+          && !((ColPalWidgetGtk*)colpal->priv->main_colpal_widget)->priv->destroyed)
+        ((ColPalCtx*)colpal->priv->colpal_ctx)->no_nav = 1;
+    } else
+      delete (GlowDrawGtk*)colpal->priv->draw_ctx;
+    if (colpal->priv->hadjustment)
+      g_object_unref(colpal->priv->hadjustment);
+    if (colpal->priv->vadjustment)
+      g_object_unref(colpal->priv->vadjustment);
   }
-  GTK_OBJECT_CLASS(colpalwidgetgtk_parent_class)->destroy(object);
+  GTK_WIDGET_CLASS(colpalwidgetgtk_parent_class)->destroy(widget);
 }
 
-static gboolean colpalwidgetgtk_event(GtkWidget* glow, GdkEvent* event)
+static gboolean colpalwidgetgtk_event(GtkWidget* colpal, GdkEvent* event)
 {
+  if (((ColPalWidgetGtk*)colpal)->priv->destroyed)
+   return TRUE;
+
   if (event->type == GDK_MOTION_NOTIFY) {
     GdkEvent* next = gdk_event_peek();
     if (next && next->type == GDK_MOTION_NOTIFY) {
@@ -279,7 +309,7 @@ static gboolean colpalwidgetgtk_event(GtkWidget* glow, GdkEvent* event)
       gdk_event_free(next);
   }
 
-  ((GlowDrawGtk*)((ColPalCtx*)((ColPalWidgetGtk*)glow)->colpal_ctx)->gdraw)
+  ((GlowDrawGtk*)((ColPalCtx*)((ColPalWidgetGtk*)colpal)->priv->colpal_ctx)->gdraw)
       ->event_handler(*event);
   return TRUE;
 }
@@ -289,17 +319,19 @@ static void colpalwidgetgtk_realize(GtkWidget* widget)
   GdkWindowAttr attr;
   gint attr_mask;
   ColPalWidgetGtk* colpal;
+  GtkAllocation allocation;
 
   g_return_if_fail(widget != NULL);
   g_return_if_fail(IS_COLPALWIDGETGTK(widget));
 
-  GTK_WIDGET_SET_FLAGS(widget, GTK_REALIZED);
+  gtk_widget_set_realized(widget, TRUE);
   colpal = COLPALWIDGETGTK(widget);
 
-  attr.x = widget->allocation.x;
-  attr.y = widget->allocation.y;
-  attr.width = widget->allocation.width;
-  attr.height = widget->allocation.height;
+  gtk_widget_get_allocation(widget, &allocation);
+  attr.x = allocation.x;
+  attr.y = allocation.y;
+  attr.width = allocation.width;
+  attr.height = allocation.height;
   attr.wclass = GDK_INPUT_OUTPUT;
   attr.window_type = GDK_WINDOW_CHILD;
   attr.event_mask = gtk_widget_get_events(widget) | GDK_EXPOSURE_MASK
@@ -307,47 +339,57 @@ static void colpalwidgetgtk_realize(GtkWidget* widget)
       | GDK_POINTER_MOTION_MASK | GDK_BUTTON_MOTION_MASK | GDK_ENTER_NOTIFY_MASK
       | GDK_LEAVE_NOTIFY_MASK;
   attr.visual = gtk_widget_get_visual(widget);
-  attr.colormap = gtk_widget_get_colormap(widget);
 
-  attr_mask = GDK_WA_X | GDK_WA_Y | GDK_WA_VISUAL | GDK_WA_COLORMAP;
-  widget->window = gdk_window_new(widget->parent->window, &attr, attr_mask);
-  widget->style = gtk_style_attach(widget->style, widget->window);
-  gdk_window_set_user_data(widget->window, widget);
-  gtk_style_set_background(widget->style, widget->window, GTK_STATE_ACTIVE);
+  attr_mask = GDK_WA_X | GDK_WA_Y | GDK_WA_VISUAL;
+  colpal->priv->window = gdk_window_new(gtk_widget_get_parent_window(widget), &attr, attr_mask);
+  gtk_widget_set_window(widget, colpal->priv->window);
+  gtk_widget_register_window(widget, colpal->priv->window);
+  //widget->style = gtk_style_attach(widget->style, widget->window);
+  //gtk_style_set_background(widget->style, widget->window, GTK_STATE_ACTIVE);
 
-  GTK_WIDGET_SET_FLAGS(widget, GTK_CAN_FOCUS);
+  gtk_widget_set_can_focus(widget, TRUE);
 
-  if (colpal->is_navigator) {
-    if (!colpal->colpal_ctx) {
+  if (colpal->priv->is_navigator) {
+    if (!colpal->priv->colpal_ctx) {
       ColPalWidgetGtk* main_colpal
-          = (ColPalWidgetGtk*)colpal->main_colpal_widget;
+          = (ColPalWidgetGtk*)colpal->priv->main_colpal_widget;
 
-      colpal->colpal_ctx = main_colpal->colpal_ctx;
-      colpal->draw_ctx = main_colpal->draw_ctx;
-      ((GlowDrawGtk*)colpal->draw_ctx)->init_nav(widget);
+      colpal->priv->colpal_ctx = main_colpal->priv->colpal_ctx;
+      colpal->priv->draw_ctx = main_colpal->priv->draw_ctx;
+      ((GlowDrawGtk*)colpal->priv->draw_ctx)->init_nav(widget);
     }
   } else {
-    if (!colpal->colpal_ctx) {
-      colpal->draw_ctx = new GlowDrawGtk(widget, &colpal->colpal_ctx,
-          colpal_init_proc, colpal->client_data, glow_eCtxType_ColPal);
+    if (!colpal->priv->colpal_ctx) {
+      colpal->priv->draw_ctx = new GlowDrawGtk(widget, &colpal->priv->colpal_ctx,
+          colpal_init_proc, colpal->priv->client_data, glow_eCtxType_ColPal);
     }
   }
 }
 
 static void colpalwidgetgtk_class_init(ColPalWidgetGtkClass* klass)
 {
-  GtkWidgetClass* widget_class;
-  GtkObjectClass* object_class;
-  widget_class = GTK_WIDGET_CLASS(klass);
-  object_class = GTK_OBJECT_CLASS(klass);
+  GtkWidgetClass* widget_class = GTK_WIDGET_CLASS(klass);
+  GObjectClass* gobject_class = G_OBJECT_CLASS(klass);
+
   widget_class->realize = colpalwidgetgtk_realize;
-  widget_class->expose_event = colpalwidgetgtk_expose;
+  widget_class->draw = colpalwidgetgtk_expose;
   widget_class->event = colpalwidgetgtk_event;
-  object_class->destroy = colpalwidgetgtk_destroy;
+  widget_class->destroy = colpalwidgetgtk_destroy;
+  gobject_class->set_property = colpalwidgetgtk_set_property;
+  gobject_class->get_property = colpalwidgetgtk_get_property;
+
+  gtk_widget_class_set_css_name(widget_class, "colpalwidget");
+
+  // GtkScrollable interface
+  g_object_class_override_property(gobject_class, PROP_HADJUSTMENT, "hadjustment");
+  g_object_class_override_property(gobject_class, PROP_VADJUSTMENT, "vadjustment");
+  g_object_class_override_property(gobject_class, PROP_HSCROLL_POLICY, "hscroll-policy");
+  g_object_class_override_property(gobject_class, PROP_VSCROLL_POLICY, "vscroll-policy");
 }
 
-static void colpalwidgetgtk_init(ColPalWidgetGtk* glow)
+static void colpalwidgetgtk_init(ColPalWidgetGtk* colpal)
 {
+  colpal->priv = (ColPalWidgetGtkPrivate *)colpalwidgetgtk_get_instance_private(colpal);
 }
 
 GtkWidget* colpalwidgetgtk_new(
@@ -355,17 +397,20 @@ GtkWidget* colpalwidgetgtk_new(
 {
   ColPalWidgetGtk* w;
   w = (ColPalWidgetGtk*)g_object_new(COLPALWIDGETGTK_TYPE, NULL);
-  w->init_proc = init_proc;
-  w->colpal_ctx = 0;
-  w->is_navigator = 0;
-  w->client_data = client_data;
-  w->scroll_h = 0;
-  w->scroll_v = 0;
-  w->scroll_h_ignore = 0;
-  w->scroll_v_ignore = 0;
-  w->scroll_h_value = 0;
-  w->scroll_v_value = 0;
-  w->scroll_configure = 0;
+  w->priv->init_proc = init_proc;
+  w->priv->colpal_ctx = 0;
+  w->priv->is_navigator = 0;
+  w->priv->client_data = client_data;
+  w->priv->scroll_h = 0;
+  w->priv->scroll_v = 0;
+  w->priv->scroll_h_ignore = 0;
+  w->priv->scroll_v_ignore = 0;
+  w->priv->scroll_h_value = 0;
+  w->priv->scroll_v_value = 0;
+  w->priv->scroll_configure = 0;
+  w->priv->hadjustment = NULL;
+  w->priv->vadjustment = NULL;
+  w->priv->destroyed = 0;
   return (GtkWidget*)w;
 }
 
@@ -378,31 +423,34 @@ GtkWidget* scrolledcolpalwidgetgtk_new(
   GtkWidget* form = gtk_scrolled_window_new(NULL, NULL);
 
   w = (ColPalWidgetGtk*)g_object_new(COLPALWIDGETGTK_TYPE, NULL);
-  w->init_proc = init_proc;
-  w->colpal_ctx = 0;
-  w->is_navigator = 0;
-  w->client_data = client_data;
-  w->scroll_h = GTK_SCROLLED_WINDOW(form)->hscrollbar;
-  w->scroll_v = GTK_SCROLLED_WINDOW(form)->vscrollbar;
-  w->scroll_h_ignore = 0;
-  w->scroll_v_ignore = 0;
-  w->scroll_h_ignore = 0;
-  w->scroll_v_ignore = 0;
-  w->scroll_h_value = 0;
-  w->scroll_v_value = 0;
-  w->scroll_configure = 0;
-  w->form = form;
+  w->priv->init_proc = init_proc;
+  w->priv->colpal_ctx = 0;
+  w->priv->is_navigator = 0;
+  w->priv->client_data = client_data;
+  w->priv->scroll_h = gtk_scrolled_window_get_hscrollbar(GTK_SCROLLED_WINDOW(form));
+  w->priv->scroll_v = gtk_scrolled_window_get_vscrollbar(GTK_SCROLLED_WINDOW(form));
+  w->priv->scroll_h_ignore = 0;
+  w->priv->scroll_v_ignore = 0;
+  w->priv->scroll_h_ignore = 0;
+  w->priv->scroll_v_ignore = 0;
+  w->priv->scroll_h_value = 0;
+  w->priv->scroll_v_value = 0;
+  w->priv->scroll_configure = 0;
+  w->priv->form = form;
+  w->priv->hadjustment = gtk_adjustment_new(0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+  w->priv->vadjustment = gtk_adjustment_new(0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+  w->priv->destroyed = 0;
+
   *colpalwidget = GTK_WIDGET(w);
 
-  g_signal_connect(((GtkScrollbar*)w->scroll_h)->range.adjustment,
+  g_signal_connect(gtk_range_get_adjustment(GTK_RANGE((GtkScrollbar*)w->priv->scroll_h)),
       "value-changed", G_CALLBACK(scroll_h_action), w);
-  g_signal_connect(((GtkScrollbar*)w->scroll_v)->range.adjustment,
+  g_signal_connect(gtk_range_get_adjustment(GTK_RANGE((GtkScrollbar*)w->priv->scroll_v)),
       "value-changed", G_CALLBACK(scroll_v_action), w);
 
-  GtkWidget* viewport = gtk_viewport_new(NULL, NULL);
-  gtk_container_add(GTK_CONTAINER(viewport), GTK_WIDGET(w));
-  gtk_container_add(GTK_CONTAINER(form), GTK_WIDGET(viewport));
+  gtk_container_add(GTK_CONTAINER(form), GTK_WIDGET(w));
 
+  gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(form), GTK_POLICY_ALWAYS, GTK_POLICY_ALWAYS);
   return (GtkWidget*)form;
 }
 
@@ -410,19 +458,61 @@ GtkWidget* colpalnavwidgetgtk_new(GtkWidget* main_colpal)
 {
   ColPalWidgetGtk* w;
   w = (ColPalWidgetGtk*)g_object_new(COLPALWIDGETGTK_TYPE, NULL);
-  w->init_proc = 0;
-  w->colpal_ctx = 0;
-  w->is_navigator = 1;
-  w->main_colpal_widget = main_colpal;
-  w->client_data = 0;
-  w->scroll_h = 0;
-  w->scroll_v = 0;
-  w->scroll_h_ignore = 0;
-  w->scroll_v_ignore = 0;
-  w->scroll_h_ignore = 0;
-  w->scroll_v_ignore = 0;
-  w->scroll_h_value = 0;
-  w->scroll_v_value = 0;
-  w->scroll_configure = 0;
+  w->priv->init_proc = 0;
+  w->priv->colpal_ctx = 0;
+  w->priv->is_navigator = 1;
+  w->priv->main_colpal_widget = main_colpal;
+  w->priv->client_data = 0;
+  w->priv->scroll_h = 0;
+  w->priv->scroll_v = 0;
+  w->priv->scroll_h_ignore = 0;
+  w->priv->scroll_v_ignore = 0;
+  w->priv->scroll_h_ignore = 0;
+  w->priv->scroll_v_ignore = 0;
+  w->priv->scroll_h_value = 0;
+  w->priv->scroll_v_value = 0;
+  w->priv->scroll_configure = 0;
+  w->priv->hadjustment = NULL;
+  w->priv->vadjustment = NULL;
+  w->priv->destroyed = 0;
   return (GtkWidget*)w;
 }
+
+static void colpalwidgetgtk_set_property(GObject *object, guint prop_id, 
+				       const GValue *value, GParamSpec *pspec)
+{
+  //FlowWidgetGtk *flow = (FlowWidgetGtk *)object;
+
+  switch (prop_id) {
+  case PROP_HADJUSTMENT:
+    break;
+  case PROP_VADJUSTMENT:
+    break;
+  case PROP_HSCROLL_POLICY:
+    break;
+  case PROP_VSCROLL_POLICY:
+    break;
+  }
+}
+
+static void colpalwidgetgtk_get_property(GObject *object, guint prop_id, 
+				       GValue *value, GParamSpec *pspec)
+{
+  ColPalWidgetGtk *colpal = (ColPalWidgetGtk *)object;
+
+  switch (prop_id) {
+  case PROP_HADJUSTMENT:
+    g_value_set_object(value, colpal->priv->hadjustment);
+    break;
+  case PROP_VADJUSTMENT:
+    g_value_set_object(value, colpal->priv->vadjustment);
+    break;
+  case PROP_HSCROLL_POLICY:
+    g_value_set_enum(value, colpal->priv->hscroll_policy);
+    break;
+  case PROP_VSCROLL_POLICY:
+    g_value_set_enum(value, colpal->priv->vscroll_policy);
+    break;
+  }
+}
+

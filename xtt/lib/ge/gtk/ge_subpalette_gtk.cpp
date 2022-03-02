@@ -102,10 +102,13 @@ void SubPaletteGtk::create_popup_menu(char* filename, int x, int y)
   gtk_menu_shell_append(GTK_MENU_SHELL(menu), w);
   gtk_widget_show(w);
 
-  // g_signal_connect( menu, "deactivate",
-  //		    G_CALLBACK(popup_unmap_cb), this);
-  gtk_menu_popup(menu, NULL, NULL, menu_position_func, this, 0,
-      gtk_get_current_event_time());
+  GdkEvent ev;
+  memset(&ev, 0, sizeof(ev));
+  ev.button.x = x;
+  ev.button.y = y;
+  ev.type = GDK_BUTTON_PRESS;
+  ev.any.window = gtk_widget_get_window(form_widget);
+  gtk_menu_popup_at_pointer(menu, &ev);
 }
 
 void SubPaletteGtk::menu_position_func(

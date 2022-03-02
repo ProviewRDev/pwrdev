@@ -125,6 +125,7 @@ WbGtk::WbGtk(int argc, char* argv[]) : mainwindow(0)
   int i;
   int quiet = 0;
   unsigned int options = 0;
+  pwr_tFileName fname;
 
   Wb::main_wb = this;
 
@@ -206,6 +207,15 @@ WbGtk::WbGtk(int argc, char* argv[]) : mainwindow(0)
       arg_cnt++;
     }
   }
+
+  GtkCssProvider *provider;
+  dcli_translate_filename(fname, "$pwr_load/wb_gtk.css");
+  provider = gtk_css_provider_new();
+  gtk_style_context_add_provider_for_screen(gdk_display_get_default_screen(
+      gdk_display_get_default()), GTK_STYLE_PROVIDER(provider), 
+      GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+  gtk_css_provider_load_from_path(provider, fname, NULL);
+  g_object_unref(provider);
 
   toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", 100,
       "default-width", 100, "title", "Pwr wb", NULL);

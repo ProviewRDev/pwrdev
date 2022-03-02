@@ -236,10 +236,12 @@ int XttHotkey::event_handler(GdkXEvent* xevent, gpointer data)
 {
   XttHotkey* hotkey = (XttHotkey*)data;
   XKeyEvent* e = (XKeyEvent*)xevent;
+  GdkDisplay* display = gdk_display_get_default();
+  Display* dp = gdk_x11_display_get_xdisplay(display);
 
   if (e->type == KeyPress) {
     int key = e->keycode;
-    int keysym = XkbKeycodeToKeysym(GDK_DISPLAY(), key, 0, 0);
+    int keysym = XkbKeycodeToKeysym(dp, key, 0, 0);
 
     for (int i = 0; i < (int)hotkey->m_keys.size(); i++) {
       if (hotkey->m_keys[i].m_keysym == keysym
@@ -259,7 +261,7 @@ int XttHotkey::event_handler(GdkXEvent* xevent, gpointer data)
 int XttHotkey::grab_key(int keysym, int modifier)
 {
   GdkDisplay* display = gdk_display_get_default();
-  int n_screens = gdk_display_get_n_screens(display);
+  GdkScreen* screen = gdk_display_get_default_screen(display);
 
   Display* dp = gdk_x11_display_get_xdisplay(display);
   int mode = GrabModeAsync;
@@ -268,20 +270,18 @@ int XttHotkey::grab_key(int keysym, int modifier)
   if (!keycode)
     return 0;
 
-  gdk_error_trap_push();
+  gdk_x11_display_error_trap_push(display);
 
-  for (int i = 0; i < n_screens; i++) {
-    GdkWindow* root
-        = gdk_screen_get_root_window(gdk_display_get_screen(display, i));
-    Window w = gdk_x11_drawable_get_xid(root);
+  GdkWindow* root = gdk_screen_get_root_window(screen);
+  Window w = gdk_x11_window_get_xid(root);
 
-    XGrabKey(dp, keycode, modifier, w, True, mode, mode);
-    XGrabKey(dp, keycode, modifier | LockMask, w, True, mode, mode);
-    XGrabKey(dp, keycode, modifier | Mod2Mask, w, True, mode, mode);
-    XGrabKey(dp, keycode, modifier | LockMask | Mod2Mask, w, True, mode, mode);
-  }
-  gdk_flush();
-  gdk_error_trap_pop();
+  XGrabKey(dp, keycode, modifier, w, True, mode, mode);
+  XGrabKey(dp, keycode, modifier | LockMask, w, True, mode, mode);
+  XGrabKey(dp, keycode, modifier | Mod2Mask, w, True, mode, mode);
+  XGrabKey(dp, keycode, modifier | LockMask | Mod2Mask, w, True, mode, mode);
+
+  gdk_display_flush(display);
+  gdk_x11_display_error_trap_pop_ignored(display);
   return 1;
 }
 

@@ -260,6 +260,7 @@ void brow_SetInverseColor(brow_tCtx ctx, flow_eDrawType color);
 int brow_GetObjectLevel(brow_tObject object);
 void brow_SetTextCoding(brow_tCtx ctx, flow_eTextCoding coding);
 void brow_ChangeObjectNodeClass(brow_tObject object, brow_tNodeClass new_nc);
+void brow_UpdateColorTheme(brow_tCtx ctx, int ct);
 
 #if defined __cplusplus
 }

@@ -1031,6 +1031,9 @@ static int xnav_set_func(void* client_data, void* client_flag)
     if (xnav->gbl.color_theme != idx) {
       xnav->gbl.color_theme = idx;
 
+      xnav->update_color_theme(idx);
+      if (xnav->ev)
+	xnav->ev->update_color_theme(idx);
       for (elem = xnav->appl.root; elem; elem = elem->next) {
         if (elem->type == applist_eType_Graph)
           ((XttGe*)elem->ctx)->update_color_theme(idx);
@@ -2636,6 +2639,8 @@ static int xnav_eventlist_func(void* client_data, void* client_flag)
       xnav->ev->sound_cb = xnav_ev_sound_cb;
       xnav->ev->pop_cb = xnav_ev_pop_cb;
       xnav->ev->is_authorized_cb = xnav->is_authorized_cb;
+      if (xnav->gbl.color_theme)
+	xnav->ev->update_color_theme(xnav->gbl.color_theme);
     } else {
       xnav->message('I', "Eventlist is already loaded");
     }
@@ -10488,6 +10493,9 @@ static void xnav_colortheme_selector_ok_cb(
     if (xnav->gbl.color_theme != idx) {
       xnav->gbl.color_theme = idx;
 
+      xnav->update_color_theme(idx);
+      if (xnav->ev)
+	xnav->ev->update_color_theme(idx);
       for (elem = xnav->appl.root; elem; elem = elem->next) {
         if (elem->type == applist_eType_Graph)
           ((XttGe*)elem->ctx)->update_color_theme(idx);

@@ -93,6 +93,7 @@ XNavGtk::XNavGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid,
   form_widget
       = scrolledbrowwidgetgtk_new(init_brow_base_cb, this, &brow_widget);
 
+  gtk_widget_set_name(brow_widget, "rtnavigator");
   gtk_widget_show_all(brow_widget);
 
   displayed = 1;
@@ -182,13 +183,13 @@ void XNavGtk::set_clock_cursor()
     clock_cursor = gdk_cursor_new_for_display(
         gtk_widget_get_display(form_widget), GDK_WATCH);
 
-  gdk_window_set_cursor(form_widget->window, clock_cursor);
+  gdk_window_set_cursor(gtk_widget_get_window(form_widget), clock_cursor);
   gdk_display_flush(gtk_widget_get_display(form_widget));
 }
 
 void XNavGtk::reset_cursor()
 {
-  gdk_window_set_cursor(form_widget->window, NULL);
+  gdk_window_set_cursor(gtk_widget_get_window(form_widget), NULL);
 }
 
 void XNavGtk::set_transient(void* basewidget)
@@ -410,8 +411,14 @@ void XNavGtk::get_popup_menu(pwr_sAttrRef attrref, xmenu_eItemType item_type,
 
   popupmenu_x = x;
   popupmenu_y = y;
-  gtk_menu_popup(GTK_MENU(popup), NULL, NULL, menu_position_func, this, 0,
-      gtk_get_current_event_time());
+
+  GdkEvent ev;
+  memset(&ev, 0, sizeof(ev));
+  ev.button.x = x;
+  ev.button.y = y;
+  ev.type = GDK_BUTTON_PRESS;
+  ev.any.window = gtk_widget_get_window(brow_widget);
+  gtk_menu_popup_at_pointer(GTK_MENU(popup), &ev);
 }
 
 void XNavGtk::menu_position_func(

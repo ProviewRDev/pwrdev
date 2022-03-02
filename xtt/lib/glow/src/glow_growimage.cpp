@@ -96,8 +96,8 @@ GrowImage::GrowImage(GrowCtx* glow_ctx, const char* name, double x, double y,
       ur.posit(ll.x + double(current_width) / ctx->mw.zoom_factor_x,
           ll.y + double(current_height) / ctx->mw.zoom_factor_y);
   }
-  draw(&ctx->mw, (GlowTransform*)NULL, highlight, hot, NULL, NULL);
   get_node_borders();
+  draw();
 }
 
 void GrowImage::copy_from(const GrowImage& im)
@@ -118,19 +118,7 @@ GrowImage::~GrowImage()
   ctx->object_deleted(this);
 
   if (!ctx->nodraw) {
-    erase(&ctx->mw);
-    erase(&ctx->navw);
-
-    ctx->draw(&ctx->mw,
-        x_left * ctx->mw.zoom_factor_x - ctx->mw.offset_x - DRAW_MP,
-        y_low * ctx->mw.zoom_factor_y - ctx->mw.offset_y - DRAW_MP,
-        x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x + DRAW_MP,
-        y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y + DRAW_MP);
-    ctx->draw(&ctx->navw,
-        x_left * ctx->navw.zoom_factor_x - ctx->navw.offset_x - 1,
-        y_low * ctx->navw.zoom_factor_y - ctx->navw.offset_y - 1,
-        x_right * ctx->navw.zoom_factor_x - ctx->navw.offset_x + 1,
-        y_high * ctx->navw.zoom_factor_y - ctx->navw.offset_y + 1);
+    draw();
     if (hot)
       ctx->gdraw->set_cursor(&ctx->mw, glow_eDrawCursor_Normal);
   }
@@ -296,8 +284,6 @@ void GrowImage::move(double delta_x, double delta_y, int grid)
     double x_grid, y_grid;
 
     /* Move to closest grid point */
-    erase(&ctx->mw);
-    erase(&ctx->navw);
     ctx->find_grid(x_left + delta_x / ctx->mw.zoom_factor_x,
         y_low + delta_y / ctx->mw.zoom_factor_y, &x_grid, &y_grid);
     trf.move(x_grid - x_left, y_grid - y_low);
@@ -305,8 +291,6 @@ void GrowImage::move(double delta_x, double delta_y, int grid)
   } else {
     double dx, dy;
 
-    erase(&ctx->mw);
-    erase(&ctx->navw);
     dx = delta_x / ctx->mw.zoom_factor_x;
     dy = delta_y / ctx->mw.zoom_factor_y;
     trf.move(dx, dy);
@@ -315,16 +299,7 @@ void GrowImage::move(double delta_x, double delta_y, int grid)
     y_high += dy;
     y_low += dy;
   }
-  ctx->draw(&ctx->mw,
-      x_left * ctx->mw.zoom_factor_x - ctx->mw.offset_x - DRAW_MP,
-      y_low * ctx->mw.zoom_factor_y - ctx->mw.offset_y - DRAW_MP,
-      x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x + DRAW_MP,
-      y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y + DRAW_MP);
-  ctx->draw(&ctx->navw,
-      x_left * ctx->navw.zoom_factor_x - ctx->navw.offset_x - 1,
-      y_low * ctx->navw.zoom_factor_y - ctx->navw.offset_y - 1,
-      x_right * ctx->navw.zoom_factor_x - ctx->navw.offset_x + 1,
-      y_high * ctx->navw.zoom_factor_y - ctx->navw.offset_y + 1);
+  draw();
   ctx->redraw_defered();
 }
 
@@ -429,7 +404,6 @@ int GrowImage::event_handler(
     if (!sts && hot) {
       if (!ctx->hot_found)
         ctx->gdraw->set_cursor(w, glow_eDrawCursor_Normal);
-      erase(w);
       redraw = 1;
       hot = 0;
     }
@@ -663,9 +637,6 @@ void GrowImage::draw(GlowWind* w, int* ll_x, int* ll_y, int* ur_x, int* ur_y)
 
 void GrowImage::set_highlight(int on)
 {
-  erase(&ctx->mw);
-  erase(&ctx->navw);
-
   highlight = on;
   draw();
 }
@@ -711,8 +682,6 @@ void GrowImage::set_position(double x, double y)
   old_x_right = x_right;
   old_y_low = y_low;
   old_y_high = y_high;
-  erase(&ctx->mw);
-  erase(&ctx->navw);
   trf.posit(x, y);
   get_node_borders();
   ctx->draw(&ctx->mw,
@@ -720,16 +689,7 @@ void GrowImage::set_position(double x, double y)
       old_y_low * ctx->mw.zoom_factor_y - ctx->mw.offset_y - DRAW_MP,
       old_x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x + DRAW_MP,
       old_y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y + DRAW_MP);
-  ctx->draw(&ctx->mw,
-      x_left * ctx->mw.zoom_factor_x - ctx->mw.offset_x - DRAW_MP,
-      y_low * ctx->mw.zoom_factor_y - ctx->mw.offset_y - DRAW_MP,
-      x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x + DRAW_MP,
-      y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y + DRAW_MP);
-  ctx->draw(&ctx->navw,
-      x_left * ctx->navw.zoom_factor_x - ctx->navw.offset_x - 1,
-      y_low * ctx->navw.zoom_factor_y - ctx->navw.offset_y - 1,
-      x_right * ctx->navw.zoom_factor_x - ctx->navw.offset_x + 1,
-      y_high * ctx->navw.zoom_factor_y - ctx->navw.offset_y + 1);
+  draw();
 }
 
 void GrowImage::set_scale(
@@ -772,8 +732,6 @@ void GrowImage::set_scale(
   old_x_right = x_right;
   old_y_low = y_low;
   old_y_high = y_high;
-  erase(&ctx->mw);
-  erase(&ctx->navw);
   trf.scale_from_stored(scale_x, scale_y, x0, y0);
   get_node_borders();
 
@@ -807,16 +765,7 @@ void GrowImage::set_scale(
       old_y_low * ctx->mw.zoom_factor_y - ctx->mw.offset_y - DRAW_MP,
       old_x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x + DRAW_MP,
       old_y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y + DRAW_MP);
-  ctx->draw(&ctx->mw,
-      x_left * ctx->mw.zoom_factor_x - ctx->mw.offset_x - DRAW_MP,
-      y_low * ctx->mw.zoom_factor_y - ctx->mw.offset_y - DRAW_MP,
-      x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x + DRAW_MP,
-      y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y + DRAW_MP);
-  ctx->draw(&ctx->navw,
-      x_left * ctx->navw.zoom_factor_x - ctx->navw.offset_x - 1,
-      y_low * ctx->navw.zoom_factor_y - ctx->navw.offset_y - 1,
-      x_right * ctx->navw.zoom_factor_x - ctx->navw.offset_x + 1,
-      y_high * ctx->navw.zoom_factor_y - ctx->navw.offset_y + 1);
+  draw();
 }
 
 void GrowImage::set_rotation(
@@ -855,8 +804,6 @@ void GrowImage::set_rotation(
   old_x_right = x_right;
   old_y_low = y_low;
   old_y_high = y_high;
-  erase(&ctx->mw);
-  erase(&ctx->navw);
   trf.rotate_from_stored(angle, x0, y0);
   get_node_borders();
   ctx->draw(&ctx->mw,
@@ -864,16 +811,7 @@ void GrowImage::set_rotation(
       old_y_low * ctx->mw.zoom_factor_y - ctx->mw.offset_y - DRAW_MP,
       old_x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x + DRAW_MP,
       old_y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y + DRAW_MP);
-  ctx->draw(&ctx->mw,
-      x_left * ctx->mw.zoom_factor_x - ctx->mw.offset_x - DRAW_MP,
-      y_low * ctx->mw.zoom_factor_y - ctx->mw.offset_y - DRAW_MP,
-      x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x + DRAW_MP,
-      y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y + DRAW_MP);
-  ctx->draw(&ctx->navw,
-      x_left * ctx->navw.zoom_factor_x - ctx->navw.offset_x - 1,
-      y_low * ctx->navw.zoom_factor_y - ctx->navw.offset_y - 1,
-      x_right * ctx->navw.zoom_factor_x - ctx->navw.offset_x + 1,
-      y_high * ctx->navw.zoom_factor_y - ctx->navw.offset_y + 1);
+  draw();
 }
 
 void GrowImage::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
@@ -1048,42 +986,6 @@ void GrowImage::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
   }
 }
 
-void GrowImage::erase(GlowWind* w, GlowTransform* t, int hot, void* node)
-{
-  if (!(display_level & ctx->display_level))
-    return;
-  if (w == &ctx->navw) {
-    if (ctx->no_nav)
-      return;
-    hot = 0;
-  }
-  int x1, y1, x2, y2, ll_x, ll_y, ur_x, ur_y;
-
-  if (!t) {
-    x1 = int(trf.x(ll.x, ll.y) * w->zoom_factor_x) - w->offset_x;
-    y1 = int(trf.y(ll.x, ll.y) * w->zoom_factor_y) - w->offset_y;
-    x2 = int(trf.x(ur.x, ur.y) * w->zoom_factor_x) - w->offset_x;
-    y2 = int(trf.y(ur.x, ur.y) * w->zoom_factor_y) - w->offset_y;
-  } else {
-    x1 = int(trf.x(t, ll.x, ll.y) * w->zoom_factor_x) - w->offset_x;
-    y1 = int(trf.y(t, ll.x, ll.y) * w->zoom_factor_y) - w->offset_y;
-    x2 = int(trf.x(t, ur.x, ur.y) * w->zoom_factor_x) - w->offset_x;
-    y2 = int(trf.y(t, ur.x, ur.y) * w->zoom_factor_y) - w->offset_y;
-  }
-  ll_x = MIN(x1, x2);
-  ur_x = MAX(x1, x2);
-  ll_y = MIN(y1, y2);
-  ur_y = MAX(y1, y2);
-
-  w->set_draw_buffer_only();
-  if (ctx->enable_bg_pixmap)
-    ctx->gdraw->draw_background(w, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y);
-  else
-    ctx->gdraw->fill_rect(
-        w, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, glow_eDrawType_LineErase);
-  w->reset_draw_buffer_only();
-}
-
 void GrowImage::draw()
 {
   ctx->draw(&ctx->mw,
@@ -1145,8 +1047,6 @@ void GrowImage::align(double x, double y, glow_eAlignDirection direction)
   if (fixposition)
     return;
 
-  erase(&ctx->mw);
-  erase(&ctx->navw);
   ctx->set_defered_redraw();
   draw();
   switch (direction) {

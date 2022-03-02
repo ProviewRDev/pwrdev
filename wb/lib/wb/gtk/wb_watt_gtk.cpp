@@ -97,8 +97,7 @@ void WAttGtk::change_value(int set_focus)
     text_w = cmd_scrolledinput;
     g_object_set(text_w, "visible", TRUE, NULL);
 
-    int w, h;
-    gdk_drawable_get_size(pane->window, &w, &h);
+    int h = gdk_window_get_height(gtk_widget_get_window(pane));
     gtk_paned_set_position(GTK_PANED(pane), h - 170);
     gtk_widget_grab_focus(cmd_scrolledtextview);
     input_max_length = input_size;
@@ -285,8 +284,7 @@ void WAttGtk::change_value_close()
       set_prompt("");
       input_open = 0;
 
-      int w, h;
-      gdk_drawable_get_size(pane->window, &w, &h);
+      int h = gdk_window_get_height(gtk_widget_get_window(pane));
       gtk_paned_set_position(GTK_PANED(pane), h - 50);
 
       wattnav->redraw();
@@ -394,8 +392,7 @@ void WAttGtk::activate_cmd_scrolled_ok(GtkWidget* w, gpointer data)
     watt->set_prompt("");
     watt->input_open = 0;
 
-    int w, h;
-    gdk_drawable_get_size(watt->pane->window, &w, &h);
+    int h = gdk_window_get_height(gtk_widget_get_window(watt->pane));
     gtk_paned_set_position(GTK_PANED(watt->pane), h - 50);
 
     ((WAttNav*)watt->wattnav)->redraw();
@@ -422,8 +419,7 @@ void WAttGtk::activate_cmd_scrolled_ca(GtkWidget* w, gpointer data)
   if (watt->input_open) {
     g_object_set(watt->cmd_scrolledinput, "visible", FALSE, NULL);
 
-    int w, h;
-    gdk_drawable_get_size(watt->pane->window, &w, &h);
+    int h = gdk_window_get_height(gtk_widget_get_window(watt->pane));
     gtk_paned_set_position(GTK_PANED(watt->pane), h - 50);
 
     watt->set_prompt("");
@@ -487,12 +483,13 @@ WAttGtk::WAttGtk(GtkWidget* wa_parent_wid, void* wa_parent_ctx,
   int sts;
   int size;
   char* namep;
+  int default_height = 570;
 
   sts = ldh_AttrRefToName(ldhses, &aref, ldh_eName_Hierarchy, &namep, &size);
   if (EVEN(sts))
     return;
 
-  toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", 570,
+  toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", default_height,
       "default-width", 410, "title", CoWowGtk::convert_utf8(namep), NULL);
 
   g_signal_connect(toplevel, "delete_event", G_CALLBACK(delete_event), this);
@@ -502,7 +499,7 @@ WAttGtk::WAttGtk(GtkWidget* wa_parent_wid, void* wa_parent_ctx,
 
   CoWowGtk::SetWindowIcon(toplevel);
 
-  GtkWidget* vbox = gtk_vbox_new(FALSE, 0);
+  GtkWidget* vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 
   // Menu
   // Accelerators
@@ -514,11 +511,13 @@ WAttGtk::WAttGtk(GtkWidget* wa_parent_wid, void* wa_parent_ctx,
 
   // File entry
   GtkWidget* file_close
-      = gtk_image_menu_item_new_from_stock(GTK_STOCK_CLOSE, accel_g);
+      = gtk_menu_item_new_with_mnemonic("_Close");
   g_signal_connect(file_close, "activate", G_CALLBACK(activate_exit), this);
+  gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w',
+      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
 
   GtkWidget* file_print
-      = gtk_image_menu_item_new_from_stock(GTK_STOCK_PRINT, accel_g);
+      = gtk_menu_item_new_with_mnemonic("_Print");
   g_signal_connect(file_print, "activate", G_CALLBACK(activate_print), this);
 
   GtkMenu* file_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
@@ -554,8 +553,10 @@ WAttGtk::WAttGtk(GtkWidget* wa_parent_wid, void* wa_parent_ctx,
 
   // Help entry
   GtkWidget* help_help
-      = gtk_image_menu_item_new_from_stock(GTK_STOCK_HELP, accel_g);
+      = gtk_menu_item_new_with_mnemonic("_Help");
   g_signal_connect(help_help, "activate", G_CALLBACK(activate_help), this);
+  gtk_widget_add_accelerator(help_help, "activate", accel_g, 'h',
+      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
 
   GtkMenu* help_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(help_menu), help_help);
@@ -564,7 +565,7 @@ WAttGtk::WAttGtk(GtkWidget* wa_parent_wid, void* wa_parent_ctx,
   gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), help);
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(help), GTK_WIDGET(help_menu));
 
-  pane = gtk_vpaned_new();
+  pane = gtk_paned_new(GTK_ORIENTATION_VERTICAL);
 
   if (((WUtility*)parent_ctx)->utype == wb_eUtility_WNav)
     parent_ctx = ((WNav*)parent_ctx)->parent_ctx;
@@ -576,7 +577,7 @@ WAttGtk::WAttGtk(GtkWidget* wa_parent_wid, void* wa_parent_ctx,
   ((WAttNav*)wattnav)->message_cb = &WAtt::message_cb;
   ((WAttNav*)wattnav)->change_value_cb = &WAtt::change_value_cb;
 
-  GtkWidget* statusbar = gtk_hbox_new(FALSE, 0);
+  GtkWidget* statusbar = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   msg_label = gtk_label_new("");
   gtk_widget_set_size_request(msg_label, -1, 25);
   cmd_prompt = gtk_label_new("value > ");
@@ -619,11 +620,11 @@ WAttGtk::WAttGtk(GtkWidget* wa_parent_wid, void* wa_parent_ctx,
   g_signal_connect(
       cmd_scrolled_ca, "clicked", G_CALLBACK(activate_cmd_scrolled_ca), this);
 
-  GtkWidget* hboxbuttons = gtk_hbox_new(TRUE, 40);
+  GtkWidget* hboxbuttons = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 40);
   gtk_box_pack_start(GTK_BOX(hboxbuttons), cmd_scrolled_ok, FALSE, FALSE, 0);
   gtk_box_pack_end(GTK_BOX(hboxbuttons), cmd_scrolled_ca, FALSE, FALSE, 0);
 
-  cmd_scrolledinput = gtk_vbox_new(FALSE, 0);
+  cmd_scrolledinput = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start(GTK_BOX(cmd_scrolledinput), scrolledwindow, TRUE, TRUE, 0);
   gtk_box_pack_start(GTK_BOX(cmd_scrolledinput), hboxbuttons, FALSE, FALSE, 5);
 
@@ -635,9 +636,8 @@ WAttGtk::WAttGtk(GtkWidget* wa_parent_wid, void* wa_parent_ctx,
   g_object_set(cmd_input, "visible", FALSE, NULL);
   g_object_set(cmd_scrolledinput, "visible", FALSE, NULL);
 
-  int w, h;
-  gdk_drawable_get_size(pane->window, &w, &h);
-  gtk_paned_set_position(GTK_PANED(pane), h - 50);
+  int h = gdk_window_get_height(gtk_widget_get_window(pane));
+  gtk_paned_set_position(GTK_PANED(pane), default_height - 65);
 
   if (utility == wb_eUtility_Wtt) {
     ((Wtt*)parent_ctx)

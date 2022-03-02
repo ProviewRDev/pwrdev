@@ -68,15 +68,11 @@ GrowFolder::GrowFolder(GrowCtx* glow_ctx, const char* name, double x, double y,
   y_low_offs = header_height;
 
   if (!nodraw)
-    draw(&ctx->mw, (GlowTransform*)NULL, highlight, hot, NULL, NULL);
+    draw();
 }
 
 GrowFolder::~GrowFolder()
 {
-  if (ctx->nodraw)
-    return;
-  erase(&ctx->mw);
-  erase(&ctx->navw);
 }
 
 void GrowFolder::save(std::ofstream& fp, glow_eSaveMode mode)
@@ -627,46 +623,6 @@ void GrowFolder::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
   GrowWindow::draw(w, t, highlight, hot, node, colornode);
   ctx->gdraw->line(
       w, p[0].x + 1, p[0].y, p[3].x - 1, p[3].y, color_selected, idx, 0);
-}
-
-void GrowFolder::erase(GlowWind* w, GlowTransform* t, int hot, void* node)
-{
-  if (!(display_level & ctx->display_level))
-    return;
-  if (w == &ctx->navw) {
-    if (ctx->no_nav)
-      return;
-    hot = 0;
-  }
-  int idx;
-  idx = int(w->zoom_factor_y / w->base_zoom_factor * line_width - 1);
-  idx += hot;
-
-  idx = MAX(0, idx);
-  idx = MIN(idx, DRAW_TYPE_SIZE - 1);
-  int x1, y1, x2, y2, ll_x, ll_y, ur_x, ur_y;
-
-  if (!t) {
-    x1 = int(trf.x(ll.x, ll.y) * w->zoom_factor_x) - w->offset_x;
-    y1 = int(trf.y(ll.x, ll.y) * w->zoom_factor_y) - w->offset_y;
-    x2 = int(trf.x(ur.x, ur.y) * w->zoom_factor_x) - w->offset_x;
-    y2 = int(trf.y(ur.x, ur.y) * w->zoom_factor_y) - w->offset_y;
-  } else {
-    x1 = int(trf.x(t, ll.x, ll.y) * w->zoom_factor_x) - w->offset_x;
-    y1 = int(trf.y(t, ll.x, ll.y) * w->zoom_factor_y) - w->offset_y;
-    x2 = int(trf.x(t, ur.x, ur.y) * w->zoom_factor_x) - w->offset_x;
-    y2 = int(trf.y(t, ur.x, ur.y) * w->zoom_factor_y) - w->offset_y;
-  }
-  ll_x = MIN(x1, x2);
-  ur_x = MAX(x1, x2);
-  ll_y = MIN(y1, y2);
-  ur_y = MAX(y1, y2);
-
-  w->set_draw_buffer_only();
-  ctx->gdraw->rect_erase(w, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, idx);
-  ctx->gdraw->fill_rect(
-      w, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, glow_eDrawType_LineErase);
-  w->reset_draw_buffer_only();
 }
 
 void GrowFolder::draw()

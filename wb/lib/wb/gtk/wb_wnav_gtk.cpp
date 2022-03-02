@@ -48,6 +48,7 @@ extern "C" {
 
 #include "cow_login_gtk.h"
 #include "cow_logw_gtk.h"
+#include "cow_wutl_gtk.h"
 
 #include "flow_browwidget_gtk.h"
 
@@ -162,15 +163,9 @@ void WNavGtk::set_inputfocus(int focus)
     return;
 
   if (!focus) {
-    GdkColor color;
-
-    gdk_color_parse("White", &color);
-    gtk_widget_modify_bg(form_widget, GTK_STATE_NORMAL, &color);
+    wutl_widget_name_suffix_sub(form_widget);
   } else {
-    GdkColor color;
-
-    gdk_color_parse("Black", &color);
-    gtk_widget_modify_bg(form_widget, GTK_STATE_NORMAL, &color);
+    wutl_widget_name_suffix_add(form_widget, "focus");
     gtk_widget_grab_focus(brow_widget);
   }
 }
@@ -308,20 +303,22 @@ void WNavGtk::sel_convert_cb(GtkWidget* w, GtkSelectionData* selection_data,
   pwr_sAttrRef attrref;
   char name[200];
   char* buffp;
+  GdkAtom target;
 
-  if (selection_data->target == GDK_TARGET_STRING
-      || selection_data->target == wnav->graph_atom
-      || selection_data->target == wnav->objid_atom
-      || selection_data->target == wnav->attrref_atom) {
+  target = gtk_selection_data_get_target(selection_data);
+  if (target == GDK_TARGET_STRING
+      || target == wnav->graph_atom
+      || target == wnav->objid_atom
+      || target == wnav->attrref_atom) {
     brow_tNode* node_list;
     int node_count;
     wnav_eSelectionFormat format;
 
-    if (selection_data->target == wnav->graph_atom)
+    if (target == wnav->graph_atom)
       format = wnav_eSelectionFormat_Graph;
-    else if (selection_data->target == wnav->objid_atom)
+    else if (target == wnav->objid_atom)
       format = wnav_eSelectionFormat_Objid;
-    else if (selection_data->target == wnav->attrref_atom)
+    else if (target == wnav->attrref_atom)
       format = wnav_eSelectionFormat_Attrref;
     else
       format = wnav_eSelectionFormat_User;
@@ -577,7 +574,7 @@ int WNavGtk::continue_dialog(char* title, char* text)
       G_CALLBACK(wnav_message_dialog_delete_event), this);
   GtkWidget* question_label = gtk_label_new(text);
   GtkWidget* question_image = (GtkWidget*)g_object_new(GTK_TYPE_IMAGE, "stock",
-      GTK_STOCK_DIALOG_QUESTION, "icon-size", GTK_ICON_SIZE_DIALOG, "xalign",
+      "gtk-dialog-question", "icon-size", GTK_ICON_SIZE_DIALOG, "xalign",
       0.5, "yalign", 1.0, NULL);
 
   GtkWidget* question_ok = gtk_button_new_with_label("Continue");
@@ -590,21 +587,21 @@ int WNavGtk::continue_dialog(char* title, char* text)
   g_signal_connect(
       question_no, "clicked", G_CALLBACK(wnav_continue_dialog_cancel), this);
 
-  GtkWidget* question_hboxtext = gtk_hbox_new(FALSE, 0);
+  GtkWidget* question_hboxtext = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   gtk_box_pack_start(
       GTK_BOX(question_hboxtext), question_image, FALSE, FALSE, 15);
   gtk_box_pack_start(
       GTK_BOX(question_hboxtext), question_label, TRUE, TRUE, 15);
 
-  GtkWidget* question_hboxbuttons = gtk_hbox_new(TRUE, 40);
+  GtkWidget* question_hboxbuttons = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 40);
   gtk_box_pack_start(
       GTK_BOX(question_hboxbuttons), question_ok, FALSE, FALSE, 0);
   gtk_box_pack_end(GTK_BOX(question_hboxbuttons), question_no, FALSE, FALSE, 0);
 
-  GtkWidget* question_vbox = gtk_vbox_new(FALSE, 0);
+  GtkWidget* question_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start(GTK_BOX(question_vbox), question_hboxtext, TRUE, TRUE, 30);
   gtk_box_pack_start(
-      GTK_BOX(question_vbox), gtk_hseparator_new(), FALSE, FALSE, 0);
+      GTK_BOX(question_vbox), gtk_separator_new(GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 0);
   gtk_box_pack_end(
       GTK_BOX(question_vbox), question_hboxbuttons, FALSE, FALSE, 15);
   gtk_container_add(GTK_CONTAINER(question_widget), question_vbox);
@@ -633,7 +630,7 @@ int WNavGtk::prompt_dialog(char* title, char* text, char** value)
   message_dialog_entry = gtk_entry_new();
   GtkWidget* india_label = gtk_label_new(text);
   GtkWidget* india_image = (GtkWidget*)g_object_new(GTK_TYPE_IMAGE, "stock",
-      GTK_STOCK_DIALOG_QUESTION, "icon-size", GTK_ICON_SIZE_DIALOG, "xalign",
+      "gtk-dialog-question", "icon-size", GTK_ICON_SIZE_DIALOG, "xalign",
       0.5, "yalign", 1.0, NULL);
 
   GtkWidget* india_ok = gtk_button_new_with_label("Ok");
@@ -645,20 +642,20 @@ int WNavGtk::prompt_dialog(char* title, char* text, char** value)
   g_signal_connect(
       india_cancel, "clicked", G_CALLBACK(wnav_message_dialog_cancel), this);
 
-  GtkWidget* india_hboxtext = gtk_hbox_new(FALSE, 0);
+  GtkWidget* india_hboxtext = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   gtk_box_pack_start(GTK_BOX(india_hboxtext), india_image, FALSE, FALSE, 15);
   gtk_box_pack_start(GTK_BOX(india_hboxtext), india_label, FALSE, FALSE, 15);
   gtk_box_pack_end(
       GTK_BOX(india_hboxtext), message_dialog_entry, TRUE, TRUE, 30);
 
-  GtkWidget* india_hboxbuttons = gtk_hbox_new(TRUE, 40);
+  GtkWidget* india_hboxbuttons = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 40);
   gtk_box_pack_start(GTK_BOX(india_hboxbuttons), india_ok, FALSE, FALSE, 0);
   gtk_box_pack_end(GTK_BOX(india_hboxbuttons), india_cancel, FALSE, FALSE, 0);
 
-  GtkWidget* india_vbox = gtk_vbox_new(FALSE, 0);
+  GtkWidget* india_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start(GTK_BOX(india_vbox), india_hboxtext, TRUE, TRUE, 30);
   gtk_box_pack_start(
-      GTK_BOX(india_vbox), gtk_hseparator_new(), FALSE, FALSE, 0);
+      GTK_BOX(india_vbox), gtk_separator_new(GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 0);
   gtk_box_pack_end(GTK_BOX(india_vbox), india_hboxbuttons, FALSE, FALSE, 15);
   gtk_container_add(GTK_CONTAINER(india_widget), india_vbox);
 

@@ -43,6 +43,7 @@
 
 typedef struct _BrowWidgetGtk BrowWidgetGtk;
 typedef struct _BrowWidgetGtkClass BrowWidgetGtkClass;
+typedef struct _BrowWidgetGtkPrivate BrowWidgetGtkPrivate;
 
 typedef struct {
   GtkWidget* brow;
@@ -54,9 +55,12 @@ typedef struct {
 } browwidget_sScroll;
 
 struct _BrowWidgetGtk {
-  GtkDrawingArea parent;
+  GtkDrawingArea bin;
+  BrowWidgetGtkPrivate *priv;
+};
 
-  /* Private */
+struct _BrowWidgetGtkPrivate {
+  GdkWindow *window;
   void* brow_ctx;
   void* draw_ctx;
   int (*init_proc)(FlowCtx* ctx, void* clien_data);
@@ -78,33 +82,54 @@ struct _BrowWidgetGtk {
   flow_sScroll scroll_data;
   int scroll_configure;
   unsigned int destroyed;
+  GtkAdjustment* hadjustment;
+  GtkAdjustment* vadjustment;
+  guint hscroll_policy : 1;
+  guint vscroll_policy : 1;  
+};
+
+enum {
+  PROP_0,
+  PROP_HADJUSTMENT,
+  PROP_VADJUSTMENT,
+  PROP_HSCROLL_POLICY,
+  PROP_VSCROLL_POLICY
 };
 
 struct _BrowWidgetGtkClass {
   GtkDrawingAreaClass parent_class;
 };
 
-G_DEFINE_TYPE(BrowWidgetGtk, browwidgetgtk, GTK_TYPE_DRAWING_AREA);
+G_DEFINE_TYPE_WITH_CODE(BrowWidgetGtk, browwidgetgtk, GTK_TYPE_DRAWING_AREA,
+			G_ADD_PRIVATE(BrowWidgetGtk)
+			G_IMPLEMENT_INTERFACE(GTK_TYPE_SCROLLABLE, NULL));
 static gboolean scroll_callback_cb(void* d);
+
+static void browwidgetgtk_get_property(GObject *object, guint prop_id, 
+				       GValue *value, GParamSpec *pspec);
+static void browwidgetgtk_set_property(GObject *object, guint prop_id, 
+				       const GValue *value, GParamSpec *pspec);
 
 static void scroll_callback(flow_sScroll* data)
 {
   browwidget_sScroll* scroll_data = (browwidget_sScroll*)data->scroll_data;
+  BrowWidgetGtkPrivate *brow = (BrowWidgetGtkPrivate *)((BrowWidgetGtk*)scroll_data->brow)->priv;
 
-  if (((BrowWidgetGtk*)scroll_data->brow)->scroll_timerid)
-    g_source_remove(((BrowWidgetGtk*)scroll_data->brow)->scroll_timerid);
+  if (brow->scroll_timerid)
+    g_source_remove(brow->scroll_timerid);
 
-  ((BrowWidgetGtk*)scroll_data->brow)->scroll_timerid
-      = g_timeout_add(200, scroll_callback_cb, scroll_data->brow);
-  ((BrowWidgetGtk*)scroll_data->brow)->scroll_data = *data;
+  brow->scroll_timerid = g_timeout_add(200, scroll_callback_cb, scroll_data->brow);
+  brow->scroll_data = *data;
 }
 
 static gboolean scroll_callback_cb(void* d)
 {
-  flow_sScroll* data = &((BrowWidgetGtk*)d)->scroll_data;
+  BrowWidgetGtkPrivate *brow = ((BrowWidgetGtk*)d)->priv;
+  flow_sScroll* data = &brow->scroll_data;
   browwidget_sScroll* scroll_data = (browwidget_sScroll*)data->scroll_data;
+  GtkAdjustment *adj;
 
-  ((BrowWidgetGtk*)scroll_data->brow)->scroll_timerid = 0;
+  brow->scroll_timerid = 0;
 
   if (data->total_width <= data->window_width) {
     if (data->offset_x == 0)
@@ -147,63 +172,50 @@ static gboolean scroll_callback_cb(void* d)
     data->window_height = 1;
 
   if (scroll_data->scroll_h_managed) {
-    ((BrowWidgetGtk*)scroll_data->brow)->scroll_h_ignore = 1;
-    if (data->window_width
-            != ((BrowWidgetGtk*)scroll_data->brow)->scroll_h_pagesize
-        || data->total_width
-            != ((BrowWidgetGtk*)scroll_data->brow)->scroll_h_upper
-        || ((BrowWidgetGtk*)scroll_data->brow)->scroll_configure) {
-      g_object_set(((GtkScrollbar*)scroll_data->scroll_h)->range.adjustment,
-          "upper", (gdouble)data->total_width, "page-size",
-          (gdouble)data->window_width, "value", (gdouble)data->offset_x, NULL);
-      gtk_adjustment_changed(
-          ((GtkScrollbar*)scroll_data->scroll_h)->range.adjustment);
+    brow->scroll_h_ignore = 1;
+    if (data->window_width != brow->scroll_h_pagesize
+        || data->total_width != brow->scroll_h_upper
+        || brow->scroll_configure) {
+      adj = gtk_range_get_adjustment(GTK_RANGE(scroll_data->scroll_h));
+      gtk_adjustment_set_value(adj, data->offset_x);
+      gtk_adjustment_set_upper(adj, data->total_width);
+      gtk_adjustment_set_page_size(adj, data->window_width);
     } else {
-      g_object_set(((GtkScrollbar*)scroll_data->scroll_h)->range.adjustment,
-          "value", (gdouble)data->offset_x, NULL);
-      gtk_adjustment_value_changed(
-          ((GtkScrollbar*)scroll_data->scroll_h)->range.adjustment);
+      adj = gtk_range_get_adjustment(GTK_RANGE(scroll_data->scroll_h));
+      gtk_adjustment_set_value(adj, data->offset_x);
     }
-    ((BrowWidgetGtk*)scroll_data->brow)->scroll_h_value
-        = (gdouble)data->offset_x;
-    ((BrowWidgetGtk*)scroll_data->brow)->scroll_h_pagesize = data->window_width;
-    ((BrowWidgetGtk*)scroll_data->brow)->scroll_h_upper = data->total_width;
+    brow->scroll_h_value = (gdouble)data->offset_x;
+    brow->scroll_h_pagesize = data->window_width;
+    brow->scroll_h_upper = data->total_width;
   }
 
   if (scroll_data->scroll_v_managed) {
-    ((BrowWidgetGtk*)scroll_data->brow)->scroll_v_ignore = 1;
-    if (data->window_height
-            != ((BrowWidgetGtk*)scroll_data->brow)->scroll_v_pagesize
-        || data->total_height
-            != ((BrowWidgetGtk*)scroll_data->brow)->scroll_v_upper
-        || ((BrowWidgetGtk*)scroll_data->brow)->scroll_configure) {
-      g_object_set(((GtkScrollbar*)scroll_data->scroll_v)->range.adjustment,
-          "upper", (gdouble)data->total_height, "page-size",
-          (gdouble)data->window_height,
-          //  "value", (gdouble)data->offset_y,
-          NULL);
-      gtk_adjustment_changed(
-          ((GtkScrollbar*)scroll_data->scroll_v)->range.adjustment);
-      ((BrowWidgetGtk*)scroll_data->brow)->scroll_v_ignore = 1;
+    brow->scroll_v_ignore = 1;
+    if (data->window_height != brow->scroll_v_pagesize
+        || data->total_height != brow->scroll_v_upper
+        || brow->scroll_configure) {
+
+      adj = gtk_range_get_adjustment(GTK_RANGE(scroll_data->scroll_v));
+      gtk_adjustment_set_upper(adj, data->total_height);
+      gtk_adjustment_set_page_size(adj, data->window_height);
+      brow->scroll_v_ignore = 1;
       gtk_range_set_value(
           GTK_RANGE(scroll_data->scroll_v), (gdouble)data->offset_y);
     } else {
       gtk_range_set_value(
           GTK_RANGE(scroll_data->scroll_v), (gdouble)data->offset_y);
     }
-    ((BrowWidgetGtk*)scroll_data->brow)->scroll_v_value
-        = (gdouble)data->offset_y;
-    ((BrowWidgetGtk*)scroll_data->brow)->scroll_v_pagesize
-        = data->window_height;
-    ((BrowWidgetGtk*)scroll_data->brow)->scroll_v_upper = data->total_height;
+    brow->scroll_v_value = (gdouble)data->offset_y;
+    brow->scroll_v_pagesize = data->window_height;
+    brow->scroll_v_upper = data->total_height;
   }
-  ((BrowWidgetGtk*)scroll_data->brow)->scroll_configure = 0;
+  brow->scroll_configure = 0;
   return FALSE;
 }
 
 static void scroll_h_action(GtkWidget* w, gpointer data)
 {
-  BrowWidgetGtk* broww = (BrowWidgetGtk*)data;
+  BrowWidgetGtkPrivate* broww = ((BrowWidgetGtk*)data)->priv;
   if (broww->scroll_h_ignore) {
     broww->scroll_h_ignore = 0;
     return;
@@ -224,7 +236,7 @@ static void scroll_h_action(GtkWidget* w, gpointer data)
 
 static void scroll_v_action(GtkWidget* w, gpointer data)
 {
-  BrowWidgetGtk* broww = (BrowWidgetGtk*)data;
+  BrowWidgetGtkPrivate* broww = ((BrowWidgetGtk*)data)->priv;
 
   if (broww->scroll_v_ignore) {
     broww->scroll_v_ignore = 0;
@@ -251,41 +263,45 @@ static int brow_init_proc(GtkWidget* w, FlowCtx* fctx, void* client_data)
   browwidget_sScroll* scroll_data;
   BrowCtx* ctx;
 
-  ctx = (BrowCtx*)((BrowWidgetGtk*)w)->brow_ctx;
+  ctx = (BrowCtx*)((BrowWidgetGtk*)w)->priv->brow_ctx;
 
-  if (((BrowWidgetGtk*)w)->scroll_h) {
+  if (((BrowWidgetGtk*)w)->priv->scroll_h) {
     scroll_data = (browwidget_sScroll*)malloc(sizeof(browwidget_sScroll));
     scroll_data->brow = w;
-    scroll_data->scroll_h = ((BrowWidgetGtk*)w)->scroll_h;
-    scroll_data->scroll_v = ((BrowWidgetGtk*)w)->scroll_v;
-    scroll_data->form = ((BrowWidgetGtk*)w)->form;
+    scroll_data->scroll_h = ((BrowWidgetGtk*)w)->priv->scroll_h;
+    scroll_data->scroll_v = ((BrowWidgetGtk*)w)->priv->scroll_v;
+    scroll_data->form = ((BrowWidgetGtk*)w)->priv->form;
     scroll_data->scroll_h_managed = 1;
     scroll_data->scroll_v_managed = 1;
 
     ctx->register_scroll_callback((void*)scroll_data, scroll_callback);
   }
-  return (((BrowWidgetGtk*)w)->init_proc)(ctx, client_data);
+  return (((BrowWidgetGtk*)w)->priv->init_proc)(ctx, client_data);
 }
 
-static gboolean browwidgetgtk_expose(GtkWidget* flow, GdkEventExpose* event)
+static gboolean browwidgetgtk_expose(GtkWidget* brow, cairo_t* cr)
 {
-  ((FlowDrawGtk*)((BrowCtx*)((BrowWidgetGtk*)flow)->brow_ctx)->fdraw)
-      ->event_handler(
-          (FlowCtx*)((BrowWidgetGtk*)flow)->brow_ctx, *(GdkEvent*)event);
+  ((FlowDrawGtk*)((BrowCtx*)((BrowWidgetGtk*)brow)->priv->brow_ctx)->fdraw)
+    ->expose((FlowCtx*)((BrowWidgetGtk*)brow)->priv->brow_ctx, cr,
+    ((BrowWidgetGtk*)brow)->priv->is_navigator);
   return TRUE;
 }
 
-static void browwidgetgtk_grab_focus(GtkWidget* flow)
+static void browwidgetgtk_grab_focus(GtkWidget* widget)
 {
-  GTK_WIDGET_CLASS(browwidgetgtk_parent_class)->grab_focus(flow);
-  gdk_window_focus(flow->window, GDK_CURRENT_TIME);
+  BrowWidgetGtk* brow = (BrowWidgetGtk*)widget;
+  if (!brow->priv->window)
+    return;
+
+  GTK_WIDGET_CLASS(browwidgetgtk_parent_class)->grab_focus(widget);
+  gdk_window_focus(brow->priv->window, GDK_CURRENT_TIME);
 }
 
-static gboolean browwidgetgtk_event(GtkWidget* flow, GdkEvent* event)
+static gboolean browwidgetgtk_event(GtkWidget* brow, GdkEvent* event)
 {
   if (event->type == GDK_MOTION_NOTIFY) {
     gdk_display_flush(
-        ((FlowDrawGtk*)((BrowCtx*)((BrowWidgetGtk*)flow)->brow_ctx)->fdraw)
+        ((FlowDrawGtk*)((BrowCtx*)((BrowWidgetGtk*)brow)->priv->brow_ctx)->fdraw)
             ->display);
     GdkEvent* next = gdk_event_peek();
     if (next && next->type == GDK_MOTION_NOTIFY) {
@@ -294,11 +310,11 @@ static gboolean browwidgetgtk_event(GtkWidget* flow, GdkEvent* event)
     } else if (next)
       gdk_event_free(next);
   } else if (event->type == GDK_CONFIGURE) {
-    ((BrowWidgetGtk*)flow)->scroll_configure = 1;
+    ((BrowWidgetGtk*)brow)->priv->scroll_configure = 1;
   }
 
-  ((FlowDrawGtk*)((BrowCtx*)((BrowWidgetGtk*)flow)->brow_ctx)->fdraw)
-      ->event_handler((FlowCtx*)((BrowWidgetGtk*)flow)->brow_ctx, *event);
+  ((FlowDrawGtk*)((BrowCtx*)((BrowWidgetGtk*)brow)->priv->brow_ctx)->fdraw)
+      ->event_handler((FlowCtx*)((BrowWidgetGtk*)brow)->priv->brow_ctx, *event);
   return TRUE;
 }
 
@@ -307,17 +323,19 @@ static void browwidgetgtk_realize(GtkWidget* widget)
   GdkWindowAttr attr;
   gint attr_mask;
   BrowWidgetGtk* brow;
+  GtkAllocation allocation;
 
   g_return_if_fail(widget != NULL);
   g_return_if_fail(IS_BROWWIDGETGTK(widget));
 
-  GTK_WIDGET_SET_FLAGS(widget, GTK_REALIZED);
+  gtk_widget_set_realized(widget, TRUE);
   brow = BROWWIDGETGTK(widget);
 
-  attr.x = widget->allocation.x;
-  attr.y = widget->allocation.y;
-  attr.width = widget->allocation.width;
-  attr.height = widget->allocation.height;
+  gtk_widget_get_allocation(widget, &allocation);
+  attr.x = allocation.x;
+  attr.y = allocation.y;
+  attr.width = allocation.width;
+  attr.height = allocation.height;
   attr.wclass = GDK_INPUT_OUTPUT;
   attr.window_type = GDK_WINDOW_CHILD;
   attr.event_mask = gtk_widget_get_events(widget) | GDK_EXPOSURE_MASK
@@ -326,61 +344,79 @@ static void browwidgetgtk_realize(GtkWidget* widget)
       | GDK_BUTTON_MOTION_MASK | GDK_ENTER_NOTIFY_MASK | GDK_LEAVE_NOTIFY_MASK
       | GDK_SCROLL_MASK | GDK_STRUCTURE_MASK;
   attr.visual = gtk_widget_get_visual(widget);
-  attr.colormap = gtk_widget_get_colormap(widget);
 
-  attr_mask = GDK_WA_X | GDK_WA_Y | GDK_WA_VISUAL | GDK_WA_COLORMAP;
-  widget->window = gdk_window_new(widget->parent->window, &attr, attr_mask);
-  widget->style = gtk_style_attach(widget->style, widget->window);
-  gdk_window_set_user_data(widget->window, widget);
-  gtk_style_set_background(widget->style, widget->window, GTK_STATE_ACTIVE);
+  attr_mask = GDK_WA_X | GDK_WA_Y | GDK_WA_VISUAL;
+  brow->priv->window = gdk_window_new(gtk_widget_get_parent_window(widget), &attr, attr_mask);
+  gtk_widget_set_window(widget, brow->priv->window);
+  //gdk_window_set_user_data(brow->priv->window, widget);
+  gtk_widget_register_window(widget, brow->priv->window);
 
-  GTK_WIDGET_SET_FLAGS(widget, GTK_CAN_FOCUS);
+  //widget->style = gtk_style_attach(widget->style, brow->window);
+  //gtk_style_set_background(widget->style, brow->window, GTK_STATE_ACTIVE);
 
-  if (brow->is_navigator) {
-    if (!brow->brow_ctx) {
-      BrowWidgetGtk* main_brow = (BrowWidgetGtk*)brow->main_brow_widget;
+  gtk_widget_set_can_focus(widget, TRUE);
 
-      brow->brow_ctx = main_brow->brow_ctx;
-      brow->draw_ctx = main_brow->draw_ctx;
-      ((FlowDrawGtk*)brow->draw_ctx)->init_nav(widget, brow->brow_ctx);
+  if (brow->priv->is_navigator) {
+    if (!brow->priv->brow_ctx) {
+      BrowWidgetGtk* main_brow = (BrowWidgetGtk*)brow->priv->main_brow_widget;
+
+      brow->priv->brow_ctx = main_brow->priv->brow_ctx;
+      brow->priv->draw_ctx = main_brow->priv->draw_ctx;
+      ((FlowDrawGtk*)brow->priv->draw_ctx)->init_nav(widget, brow->priv->brow_ctx);
     }
   } else {
-    if (!brow->brow_ctx) {
-      brow->draw_ctx = new FlowDrawGtk(widget, &brow->brow_ctx, brow_init_proc,
-          brow->client_data, flow_eCtxType_Brow);
+    if (!brow->priv->brow_ctx) {
+      brow->priv->draw_ctx = new FlowDrawGtk(widget, &brow->priv->brow_ctx, brow_init_proc,
+	  brow->priv->client_data, flow_eCtxType_Brow);
     }
   }
 }
 
-static void browwidgetgtk_destroy(GtkObject* object)
+static void browwidgetgtk_destroy(GtkWidget* widget)
 {
-  BrowWidgetGtk* brow = (BrowWidgetGtk*)object;
+  BrowWidgetGtk* brow = (BrowWidgetGtk*)widget;
 
-  if (brow->destroyed == NOTDESTROYED) {
-    brow->destroyed = 1;
-    if (brow->scroll_timerid)
-      g_source_remove(brow->scroll_timerid);
-    if (!brow->is_navigator)
-      delete (FlowDrawGtk*)brow->draw_ctx;
+  if (brow->priv->destroyed == NOTDESTROYED) {
+    brow->priv->destroyed = 1;
+    if (brow->priv->scroll_timerid)
+      g_source_remove(brow->priv->scroll_timerid);
+    if (!brow->priv->is_navigator)
+      delete (FlowDrawGtk*)brow->priv->draw_ctx;
+    if (brow->priv->hadjustment)
+      g_object_unref(brow->priv->hadjustment);
+    if (brow->priv->vadjustment)
+      g_object_unref(brow->priv->vadjustment);
   }
 
-  GTK_OBJECT_CLASS(browwidgetgtk_parent_class)->destroy(object);
+  GTK_WIDGET_CLASS(browwidgetgtk_parent_class)->destroy(widget);
 }
 
 static void browwidgetgtk_class_init(BrowWidgetGtkClass* klass)
 {
   GtkWidgetClass* widget_class = GTK_WIDGET_CLASS(klass);
-  GtkObjectClass* object_class = GTK_OBJECT_CLASS(klass);
+  GObjectClass* gobject_class = G_OBJECT_CLASS(klass);
+
   widget_class = GTK_WIDGET_CLASS(klass);
   widget_class->realize = browwidgetgtk_realize;
-  widget_class->expose_event = browwidgetgtk_expose;
+  widget_class->draw = browwidgetgtk_expose;
   widget_class->event = browwidgetgtk_event;
   widget_class->grab_focus = browwidgetgtk_grab_focus;
-  object_class->destroy = browwidgetgtk_destroy;
+  widget_class->destroy = browwidgetgtk_destroy;
+  gobject_class->set_property = browwidgetgtk_set_property;
+  gobject_class->get_property = browwidgetgtk_get_property;
+
+  gtk_widget_class_set_css_name(widget_class, "browwidget");
+
+  // GtkScrollable interface
+  g_object_class_override_property(gobject_class, PROP_HADJUSTMENT, "hadjustment");
+  g_object_class_override_property(gobject_class, PROP_VADJUSTMENT, "vadjustment");
+  g_object_class_override_property(gobject_class, PROP_HSCROLL_POLICY, "hscroll-policy");
+  g_object_class_override_property(gobject_class, PROP_VSCROLL_POLICY, "vscroll-policy");
 }
 
-static void browwidgetgtk_init(BrowWidgetGtk* flow)
+static void browwidgetgtk_init(BrowWidgetGtk* brow)
 {
+  brow->priv = (BrowWidgetGtkPrivate *)browwidgetgtk_get_instance_private(brow);
 }
 
 GtkWidget* browwidgetgtk_new(
@@ -388,13 +424,15 @@ GtkWidget* browwidgetgtk_new(
 {
   BrowWidgetGtk* w;
   w = (BrowWidgetGtk*)g_object_new(BROWWIDGETGTK_TYPE, NULL);
-  w->init_proc = init_proc;
-  w->brow_ctx = 0;
-  w->is_navigator = 0;
-  w->client_data = client_data;
-  w->scroll_h = 0;
-  w->scroll_v = 0;
-  w->destroyed = NOTDESTROYED;
+  w->priv->init_proc = init_proc;
+  w->priv->brow_ctx = 0;
+  w->priv->is_navigator = 0;
+  w->priv->client_data = client_data;
+  w->priv->scroll_h = 0;
+  w->priv->scroll_v = 0;
+  w->priv->hadjustment = NULL;
+  w->priv->vadjustment = NULL;
+  w->priv->destroyed = NOTDESTROYED;
   return (GtkWidget*)w;
 }
 
@@ -407,30 +445,32 @@ GtkWidget* scrolledbrowwidgetgtk_new(
   GtkWidget* form = gtk_scrolled_window_new(NULL, NULL);
 
   w = (BrowWidgetGtk*)g_object_new(BROWWIDGETGTK_TYPE, NULL);
-  w->init_proc = init_proc;
-  w->brow_ctx = 0;
-  w->is_navigator = 0;
-  w->client_data = client_data;
-  w->scroll_h = GTK_SCROLLED_WINDOW(form)->hscrollbar;
-  w->scroll_v = GTK_SCROLLED_WINDOW(form)->vscrollbar;
-  w->scroll_h_ignore = 0;
-  w->scroll_v_ignore = 0;
-  w->scroll_h_value = 0;
-  w->scroll_v_value = 0;
-  w->scroll_configure = 0;
-  w->form = form;
-  w->destroyed = NOTDESTROYED;
+  w->priv->init_proc = init_proc;
+  w->priv->brow_ctx = 0;
+  w->priv->is_navigator = 0;
+  w->priv->client_data = client_data;
+  w->priv->scroll_h = gtk_scrolled_window_get_hscrollbar(GTK_SCROLLED_WINDOW(form));
+  w->priv->scroll_v = gtk_scrolled_window_get_vscrollbar(GTK_SCROLLED_WINDOW(form));
+  w->priv->scroll_h_ignore = 0;
+  w->priv->scroll_v_ignore = 0;
+  w->priv->scroll_h_value = 0;
+  w->priv->scroll_v_value = 0;
+  w->priv->scroll_configure = 0;
+  w->priv->form = form;
+  w->priv->destroyed = NOTDESTROYED;
+  w->priv->hadjustment = gtk_adjustment_new(0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+  w->priv->vadjustment = gtk_adjustment_new(0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+
   *browwidget = GTK_WIDGET(w);
 
-  g_signal_connect(((GtkScrollbar*)w->scroll_h)->range.adjustment,
+  g_signal_connect(gtk_scrolled_window_get_hadjustment(GTK_SCROLLED_WINDOW(form)),
       "value-changed", G_CALLBACK(scroll_h_action), w);
-  g_signal_connect(((GtkScrollbar*)w->scroll_v)->range.adjustment,
+  g_signal_connect(gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(form)),
       "value-changed", G_CALLBACK(scroll_v_action), w);
 
-  GtkWidget* viewport = gtk_viewport_new(NULL, NULL);
-  gtk_viewport_set_shadow_type(GTK_VIEWPORT(viewport), GTK_SHADOW_NONE);
-  gtk_container_add(GTK_CONTAINER(viewport), GTK_WIDGET(w));
-  gtk_container_add(GTK_CONTAINER(form), GTK_WIDGET(viewport));
+  gtk_container_add(GTK_CONTAINER(form), GTK_WIDGET(w));
+
+  gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(form), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 
   return (GtkWidget*)form;
 }
@@ -439,20 +479,61 @@ GtkWidget* brownavwidgetgtk_new(GtkWidget* main_brow)
 {
   BrowWidgetGtk* w;
   w = (BrowWidgetGtk*)g_object_new(BROWWIDGETGTK_TYPE, NULL);
-  w->init_proc = 0;
-  w->brow_ctx = 0;
-  w->is_navigator = 1;
-  w->main_brow_widget = main_brow;
-  w->client_data = 0;
-  w->scroll_h = 0;
-  w->scroll_v = 0;
-  w->scroll_h_ignore = 0;
-  w->scroll_v_ignore = 0;
-  w->scroll_configure = 0;
+  w->priv->init_proc = 0;
+  w->priv->brow_ctx = 0;
+  w->priv->is_navigator = 1;
+  w->priv->main_brow_widget = main_brow;
+  w->priv->client_data = 0;
+  w->priv->scroll_h = 0;
+  w->priv->scroll_v = 0;
+  w->priv->scroll_h_ignore = 0;
+  w->priv->scroll_v_ignore = 0;
+  w->priv->scroll_configure = 0;
+  w->priv->hadjustment = NULL;
+  w->priv->vadjustment = NULL;
+  w->priv->destroyed = NOTDESTROYED;
   return (GtkWidget*)w;
+}
+
+static void browwidgetgtk_set_property(GObject *object, guint prop_id, 
+				       const GValue *value, GParamSpec *pspec)
+{
+  //BrowWidgetGtk *brow = (BrowWidgetGtk *)object;
+
+  switch (prop_id) {
+  case PROP_HADJUSTMENT:
+    break;
+  case PROP_VADJUSTMENT:
+    break;
+  case PROP_HSCROLL_POLICY:
+    break;
+  case PROP_VSCROLL_POLICY:
+    break;
+  }
+}
+
+static void browwidgetgtk_get_property(GObject *object, guint prop_id, 
+				       GValue *value, GParamSpec *pspec)
+{
+  BrowWidgetGtk *brow = (BrowWidgetGtk *)object;
+
+  switch (prop_id) {
+  case PROP_HADJUSTMENT:
+    g_value_set_object(value, brow->priv->hadjustment);
+    break;
+  case PROP_VADJUSTMENT:
+    g_value_set_object(value, brow->priv->vadjustment);
+    break;
+  case PROP_HSCROLL_POLICY:
+    g_value_set_enum(value, brow->priv->hscroll_policy);
+    break;
+  case PROP_VSCROLL_POLICY:
+    g_value_set_enum(value, brow->priv->vscroll_policy);
+    break;
+  }
 }
 
 void browwidgetgtk_modify_ctx(GtkWidget* w, void* ctx)
 {
-  ((BrowWidgetGtk*)w)->brow_ctx = ctx;
+  ((BrowWidgetGtk*)w)->priv->brow_ctx = ctx;
 }

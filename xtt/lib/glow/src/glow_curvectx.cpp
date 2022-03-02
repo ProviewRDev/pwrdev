@@ -95,44 +95,46 @@ void CurveCtx::adjust_layout()
   int width, height;
 
   gdraw->get_window_size(&mw, &width, &height);
-  if ((mw.window_height != height && !feq(y_high, y_low)) || !layout_adjusted) {
+  if (y_high == 0 && y_low == 0)
+    get_borders();
+  if ((layout_height != height || !layout_adjusted) && !feq(y_high, y_low)) {
     mw.zoom_factor_y = height / (y_high - y_low);
     if (!layout_adjusted && initial_position == glow_eDirection_Right) {
       mw.offset_x = int(x_right * mw.zoom_factor_x) - width;
     }
     draw(&mw, 0, 0, width, height);
     layout_adjusted = 1;
+    layout_height = height;
   }
 }
 
-void CurveCtx::nav_zoom()
+void CurveCtx::nav_zoom_invalidated()
 {
   if (nodraw)
     return;
-  if (a.size() > 0) {
-    double x_nav_left, x_nav_right, y_nav_low, y_nav_high;
+  if (a.size()== 0)
+    return;
 
-    get_borders();
-    //    std::cout << "Borders : <" << x_left << " > " << x_right << " ^ " <<
-    //		y_high << " Y " << y_low << '\n';
-    x_nav_left = x_left;
-    x_nav_right = x_right;
-    y_nav_low = y_low;
-    y_nav_high = y_high;
-    if (feq(x_nav_right, x_nav_left) || feq(y_nav_high, y_nav_low))
-      return;
-    navw.zoom_factor_x = navw.window_width / (x_nav_right - x_nav_left);
-    navw.zoom_factor_y = navw.window_height / (y_nav_high - y_nav_low);
-    navw.offset_x = int(x_nav_left * navw.zoom_factor_x);
-    navw.offset_y = int(y_nav_low * navw.zoom_factor_y);
-    a.nav_zoom();
-    clear(&navw);
-    nav_draw(&navw, 0, 0, navw.window_width, navw.window_height);
-  }
+  double x_nav_left, x_nav_right, y_nav_low, y_nav_high;
+
+  get_borders();
+  x_nav_left = x_left;
+  x_nav_right = x_right;
+  y_nav_low = y_low;
+  y_nav_high = y_high;
+  if (feq(x_nav_right, x_nav_left) || feq(y_nav_high, y_nav_low))
+    return;
+  navw.zoom_factor_x = navw.window_width / (x_nav_right - x_nav_left);
+  navw.zoom_factor_y = navw.window_height / (y_nav_high - y_nav_low);
+  navw.offset_x = int(x_nav_left * navw.zoom_factor_x);
+  navw.offset_y = int(y_nav_low * navw.zoom_factor_y);
+  a.nav_zoom();
 }
 
 void CurveCtx::get_prefered_zoom_y(int height, double* factor_y)
 {
+  if (y_high == 0 && y_low == 0)
+    get_borders();
   *factor_y = height / (y_high - y_low);
 }
 
@@ -191,7 +193,7 @@ int CurveCtx::event_handler_nav(glow_eEvent event, int x, int y)
     break;
   case glow_eEvent_Exposure:
     gdraw->get_window_size(&navw, &navw.window_width, &navw.window_height);
-    nav_zoom();
+    nav_draw_invalidated(&navw, 0, 0, navw.window_width, navw.window_height);
     break;
   case glow_eEvent_ButtonMotion:
     if (nav_rect_movement_active) {

@@ -1,0 +1,126 @@
+
+toolbar * { 
+  min-width: 14px;
+  min-height: 14px;
+}
+
+separator { 
+  padding: 2px;
+  margin: 0px;
+}
+
+button { 
+  margin: 0px;
+  padding: 3px;
+}
+
+toolbutton button { 
+  margin: 0px;
+  padding: 3px;
+}
+
+dialog button { 
+  margin-left: 20px;
+  margin-right: 20px;
+  min-width: 90px;
+ }
+dialog image { 
+  margin-top: 30px;
+  margin-left: 30px;
+ }
+message-dialog button { 
+  margin-left: 20px;
+  margin-right: 20px;
+  min-width: 90px;
+ }
+
+browwidget * { 
+  background: gray;
+}
+
+#t2 {
+  background-image: url("/data0/x6-0-g3/rls/os_linux/hw_x86_64/exp/exe/pwr_logga.png");
+}
+#graph2 {
+  background-image: url("/data0/x6-0-g3/rls/os_linux/hw_x86_64/exp/exe/pwr_logga.png");
+}
+
+#plctrace { 
+  background-image: url("/data0/x6-0-g3/rls/os_linux/hw_x86_64/exp/exe/pwr_logga.png");
+  color: blue;
+}
+
+#rtnavigator { 
+  background-color: gray;
+  color: yellow;
+}
+
+#plcnavigator { 
+  background-color: red;
+}
+
+#opaalarm1 { 
+  background-color: #ff8080;
+}
+#opaalarm2 { 
+  background-color: #ff8080;
+}
+#opaalarm3 { 
+  background-color: #ff8080;
+}
+#opaalarm4 { 
+  background-color: #ff8080;
+}
+#opaalarm5 { 
+  background-color: #ff8080;
+}
+
+#opbalarm_yellow { 
+  background-color: yellow;
+}
+#opbalarm_green { 
+  background-color: #50ff00;
+}
+#opbalarm_white { 
+  background-color: #ffffff;
+}
+#opbalarm_blue { 
+  background-color: #a0a0ff;
+}
+#opbalarm_violet { 
+  background-color: #ff80ff;
+}
+
+#op_aack_button { 
+  min-width: 24px;
+  min-height: 14px;
+  margin: 0px;
+  padding: 3px;
+}
+
+#op_back_button { 
+  min-width: 24px;
+  min-height: 14px;
+  margin: 0px;
+  padding: 3px;
+}
+
+#op_incr_button { 
+  min-width: 24px;
+  min-height: 14px;
+  margin: 0px;
+  padding: 3px;
+}
+#op_decr_button { 
+  min-width: 24px;
+  min-height: 14px;
+  margin: 0px;
+  padding: 3px;
+}
+#opnodebutton0 { border-style:solid; border-width: 1px; border-color: #202020;}
+#opnodeind0 { border-style:solid; border-width: 1px; border-color: black;}
+#opnodeind0_red { background-color: #ff5050; border-style:solid; border-width: 1px; border-color: black;}
+#opnodeind0_green { background-color: #50ff00; border-style: solid; border-width: 1px; border-color: black;}
+#opnodeind0_yellow { background-color: yellow; border-style: solid; border-width: 1px; border-color: black;}
+#opnodeind0_black { background-color: black;}
+#opnodeind0_gray { background-color: #505050; border-style: solid; border-width: 1px; border-color: black;}

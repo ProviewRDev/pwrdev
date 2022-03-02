@@ -241,28 +241,19 @@ void FlowText::get_borders(double pos_x, double pos_y, double* x_right,
 void FlowText::move(
     void* pos, double x, double y, int highlight, int dimmed, int hot)
 {
-  erase(pos, hot, NULL);
-  nav_erase(pos, NULL);
   p.x = x;
   p.y = y;
   zoom();
   nav_zoom();
-  draw(pos, highlight, dimmed, hot, NULL);
-  nav_draw(pos, highlight, NULL);
 }
 
 void FlowText::shift(void* pos, double delta_x, double delta_y, int highlight,
     int dimmed, int hot)
 {
-  erase(pos, hot, NULL);
-  nav_erase(pos, NULL);
   p.x += delta_x;
   p.y += delta_y;
   zoom();
   nav_zoom();
-
-  draw(pos, highlight, dimmed, hot, NULL);
-  nav_draw(pos, highlight, NULL);
 }
 
 std::ostream& operator<<(std::ostream& o, const FlowText t)

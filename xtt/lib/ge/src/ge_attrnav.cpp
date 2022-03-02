@@ -1595,7 +1595,7 @@ void AttrNavBrow::allocate_pixmaps()
 //
 AttrNav::AttrNav(void* xn_parent_ctx, attr_eType xn_type, const char* xn_name,
     attr_sItem* xn_itemlist, int xn_item_cnt, pwr_tStatus* status)
-    : parent_ctx(xn_parent_ctx), type(xn_type), itemlist(xn_itemlist),
+      : parent_ctx(xn_parent_ctx), type(xn_type), brow(0), itemlist(xn_itemlist),
       item_cnt(xn_item_cnt), trace_started(0), graph(0), last_selected(0),
       last_selected_id(0), filter_type(attr_eFilterType_No), message_cb(NULL),
       get_object_list_cb(0), set_inputfocus_cb(0), traverse_inputfocus_cb(0)

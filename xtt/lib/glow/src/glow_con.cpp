@@ -398,24 +398,8 @@ GlowCon::GlowCon(GrowCtx* glow_ctx, const char* name, GlowConClass* con_class,
 
 GlowCon::~GlowCon()
 {
-  int i;
-
   ctx->object_deleted(this);
 
-  if (!ctx->nodraw) {
-    for (i = 0; i < l_num; i++) {
-      ((GlowLine*)line_a[i])->erase(&ctx->mw, &cc->zero, hot, NULL);
-      ((GlowLine*)line_a[i])->erase(&ctx->navw, &cc->zero, 0, NULL);
-    }
-    for (i = 0; i < a_num; i++) {
-      ((GlowArc*)arc_a[i])->erase(&ctx->mw, &cc->zero, hot, NULL);
-      ((GlowArc*)arc_a[i])->erase(&ctx->navw, &cc->zero, 0, NULL);
-    }
-    arrow_a.erase(&ctx->mw, &cc->zero, hot, NULL);
-    arrow_a.erase(&ctx->navw, &cc->zero, 0, NULL);
-    ref_a.erase(&ctx->mw, &cc->zero, hot, NULL);
-    ref_a.erase(&ctx->navw, &cc->zero, 0, NULL);
-  }
   ctx->remove(this);
   ctx->select_remove(this);
 
@@ -720,8 +704,6 @@ void GlowCon::reconfigure()
       move_ref(x1, y1, x2, y2);
     } else if (temporary_ref) {
       temporary_ref = 0;
-      ref_a.erase(&ctx->mw, &cc->zero, hot, NULL);
-      ref_a.erase(&ctx->navw, &cc->zero, 0, NULL);
       source_node->conpoint_refcon_reconfig(source_conpoint);
       dest_node->conpoint_refcon_reconfig(dest_conpoint);
     }
@@ -3024,7 +3006,7 @@ void GlowCon::find_vert_line_low_border(double x, double start_y,
 
 int GlowCon::event_handler(GlowWind* w, glow_eEvent event, int x, int y)
 {
-  int sts, i;
+  int sts;
 
   sts = 0;
   switch (event) {
@@ -3060,18 +3042,8 @@ int GlowCon::event_handler(GlowWind* w, glow_eEvent event, int x, int y)
     }
     if (!sts && hot) {
       ctx->gdraw->set_cursor(w, glow_eDrawCursor_Normal);
-      if (temporary_ref || cc->con_type == glow_eConType_Reference)
-        ref_a.erase(w, &cc->zero, hot, NULL);
-      else {
-        if (!w->window->double_buffer_on) {
-          draw();
-        }
-        for (i = 0; i < l_num; i++)
-          ((GlowLine*)line_a[i])->erase(w, &cc->zero, hot, NULL);
-        for (i = 0; i < a_num; i++)
-          ((GlowArc*)arc_a[i])->erase(w, &cc->zero, hot, NULL);
-        arrow_a.erase(w, &cc->zero, hot, NULL);
-        //	  }
+      if (!(temporary_ref || cc->con_type == glow_eConType_Reference)) {
+	draw();
       }
       hot = 0;
 
@@ -3611,21 +3583,12 @@ void GlowCon::trace_close()
 
 void GlowCon::change_conclass(GlowConClass* conclass)
 {
-  int i;
-
   if (conclass == cc)
     return;
 
   // Erase
-  if (temporary_ref || cc->con_type == glow_eConType_Reference)
-    ref_a.erase(&ctx->mw, &cc->zero, hot, NULL);
-  else {
-    for (i = 0; i < l_num; i++)
-      ((GlowLine*)line_a[i])->erase(&ctx->mw, &cc->zero, hot, NULL);
-    for (i = 0; i < a_num; i++)
-      ((GlowArc*)arc_a[i])->erase(&ctx->mw, &cc->zero, hot, NULL);
-    arrow_a.erase(&ctx->mw, &cc->zero, hot, NULL);
-  }
+  ctx->set_defered_redraw();
+  draw();
 
   cc = conclass;
 
@@ -3643,6 +3606,7 @@ void GlowCon::change_conclass(GlowConClass* conclass)
     ref_a.draw(&ctx->mw, &cc->zero, highlight, hot, NULL);
   else
     draw();
+  ctx->redraw_defered();
 }
 
 void GlowCon::export_javabean(GlowTransform* t, void* node,

@@ -114,7 +114,6 @@ typedef struct {
   int display_level;
   glow_eHotMode default_hot_mode;
   int enable_bg_pixmap;
-  int double_buffer_on;
   glow_eHotMode hot_mode;
   glow_eDirection initial_position;
   glow_eEnv environment;
@@ -142,13 +141,12 @@ typedef enum {
   grow_eAttr_display_level = 1 << 15,
   grow_eAttr_default_hot_mode = 1 << 16,
   grow_eAttr_enable_bg_pixmap = 1 << 17,
-  grow_eAttr_double_buffer_on = 1 << 18,
-  grow_eAttr_hot_mode = 1 << 19,
-  grow_eAttr_initial_position = 1 << 20,
-  grow_eAttr_environment = 1 << 21,
-  grow_eAttr_tooltip_text_size = 1 << 22,
-  grow_eAttr_color_theme = 1 << 23,
-  grow_eAttr_dashboard = 1 << 24
+  grow_eAttr_hot_mode = 1 << 18,
+  grow_eAttr_initial_position = 1 << 19,
+  grow_eAttr_environment = 1 << 20,
+  grow_eAttr_tooltip_text_size = 1 << 21,
+  grow_eAttr_color_theme = 1 << 22,
+  grow_eAttr_dashboard = 1 << 23
 } grow_eAttribute;
 
 typedef GrowCtx* grow_tCtx;
@@ -3395,6 +3393,7 @@ int grow_GetDashboardNextFree(grow_tCtx ctx, int start_row, int start_col,
     int rows, int columns, double *x, double *y);
 void grow_GetDashCellInfo(grow_tObject o, int *rows, int *columns);
 void grow_SetGraphBorders(grow_tCtx ctx, double x0, double y0, double x1, double y1);
+void grow_GetBorders(grow_tCtx ctx);
 void grow_DisableSubwindowEvents(grow_tCtx ctx, int disable);
 
 /*@}*/

@@ -1500,10 +1500,10 @@ XNav::XNav(void* xn_parent_ctx, const char* xn_name, xnav_sStartMenu* root_menu,
     : parent_ctx(xn_parent_ctx), brow_cnt(0), TraceList(NULL), trace_started(0),
       message_cb(NULL), close_cb(NULL), map_cb(NULL), change_value_cb(NULL),
       set_dimension_cb(NULL), selection_changed_cb(0), ccm_func_registred(0),
-      verify(0), menu_tree(NULL), ev(0), op(0), clog(0), closing_down(0),
-      opplace_p(0), base_priv(pwr_mPrv_System), priv(pwr_mPrv_System),
-      displayed(0), current_logging_index(-1), search_last_found(0),
-      search_compiled(0), attach_audio(0), audio(0),
+      verify(0), menu_tree(NULL), ev(0), op(0), ge_main(0), multiview_main(0),
+      clog(0), closing_down(0), opplace_p(0), base_priv(pwr_mPrv_System), 
+      priv(pwr_mPrv_System), displayed(0), current_logging_index(-1), 
+      search_last_found(0), search_compiled(0), attach_audio(0), audio(0),
       op_close_button(xn_op_close_button), cologin(0), scctx(0),
       last_xcolwind(0), current_cmd_ctx(0), elog_enabled(0), elog_checked(0),
       keyboard(0), keyboard_owner(0)
@@ -3878,6 +3878,8 @@ int XNav::init_brow_base_cb(FlowCtx* fctx, void* client_data)
 
   if (Lng::translatefile_coding() == lng_eCoding_UTF_8)
     brow_SetTextCoding(ctx, flow_eTextCoding_UTF_8);
+  if (xnav->gbl.color_theme)
+    brow_UpdateColorTheme(ctx, xnav->gbl.color_theme);
 
   xnav->brow = new XNavBrow(ctx, (void*)xnav, brow_eUserType_XNav);
   xnav->brow_stack[0] = new XNavBrow(ctx, (void*)xnav, brow_eUserType_XNav);
@@ -4832,4 +4834,9 @@ void XNav::refresh()
 
   brow_ResetNodraw(brow->ctx);
   brow_Redraw(brow->ctx, 0);
+}
+
+void XNav::update_color_theme(int ct)
+{
+  brow_UpdateColorTheme(brow->ctx, ct);
 }

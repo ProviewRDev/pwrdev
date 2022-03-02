@@ -68,11 +68,9 @@ GrowSubAnnot::GrowSubAnnot(GrowCtx* glow_ctx, const char* name, double x,
     rect.ll.posit(p.x, p.y - ctx->draw_delta);
     rect.ur.posit(p.x + ctx->draw_delta, p.y);
   }
-  if (!nodraw) {
-    rect.draw(&ctx->mw, (void*)&pzero, highlight, hot, NULL);
-    text.draw(&ctx->mw, (void*)&pzero, highlight, hot, NULL);
-  }
   get_node_borders();
+  if (!nodraw)
+    draw();
 }
 
 GrowSubAnnot::~GrowSubAnnot()
@@ -81,19 +79,7 @@ GrowSubAnnot::~GrowSubAnnot()
   if (ctx->nodraw)
     return;
 
-  erase(&ctx->mw);
-  erase(&ctx->navw);
-
-  ctx->draw(&ctx->mw,
-      x_left * ctx->mw.zoom_factor_x - ctx->mw.offset_x - DRAW_MP,
-      y_low * ctx->mw.zoom_factor_y - ctx->mw.offset_y - DRAW_MP,
-      x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x + DRAW_MP,
-      y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y + DRAW_MP);
-  ctx->draw(&ctx->navw,
-      x_left * ctx->navw.zoom_factor_x - ctx->navw.offset_x - 1,
-      y_low * ctx->navw.zoom_factor_y - ctx->navw.offset_y - 1,
-      x_right * ctx->navw.zoom_factor_x - ctx->navw.offset_x + 1,
-      y_high * ctx->navw.zoom_factor_y - ctx->navw.offset_y + 1);
+  draw();
   if (hot)
     ctx->gdraw->set_cursor(&ctx->mw, glow_eDrawCursor_Normal);
 }
@@ -112,8 +98,6 @@ void GrowSubAnnot::move(double delta_x, double delta_y, int grid)
     double x_grid, y_grid;
 
     /* Move to closest grid point */
-    erase(&ctx->mw);
-    erase(&ctx->navw);
     ctx->find_grid(x_left + double(delta_x) / ctx->mw.zoom_factor_x,
         y_low + double(delta_y) / ctx->mw.zoom_factor_y, &x_grid, &y_grid);
     trf.move(x_grid - x_left, y_grid - y_low);
@@ -121,8 +105,6 @@ void GrowSubAnnot::move(double delta_x, double delta_y, int grid)
   } else {
     double dx, dy;
 
-    erase(&ctx->mw);
-    erase(&ctx->navw);
     dx = delta_x / ctx->mw.zoom_factor_x;
     dy = delta_y / ctx->mw.zoom_factor_y;
     trf.move(dx, dy);
@@ -219,7 +201,6 @@ int GrowSubAnnot::event_handler(
     }
     if (!sts && hot) {
       ctx->gdraw->set_cursor(w, glow_eDrawCursor_Normal);
-      erase(w);
       hot = 0;
       redraw = 1;
     }
@@ -451,29 +432,6 @@ void GrowSubAnnot::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
   }
 }
 
-void GrowSubAnnot::erase(GlowWind* w, GlowTransform* t, int hot, void* node)
-{
-  if (w == &ctx->navw) {
-    if (ctx->no_nav)
-      return;
-    hot = 0;
-  }
-  w->set_draw_buffer_only();
-  if (t) {
-    GlowPoint p1(p);
-
-    p1.x = trf.x(t, p.x, p.y) - trf.x(p.x, p.y);
-    p1.y = trf.y(t, p.x, p.y) - trf.y(p.x, p.y);
-    p1.zoom();
-    rect.erase(w, (void*)&p1, hot, NULL);
-    text.erase(w, (void*)&p1, hot, NULL);
-  } else {
-    rect.erase(w, (void*)&pzero, hot, NULL);
-    text.erase(w, (void*)&pzero, hot, NULL);
-  }
-  w->reset_draw_buffer_only();
-}
-
 void GrowSubAnnot::set_transform(GlowTransform* t)
 {
   double x1, y1;
@@ -492,8 +450,6 @@ void GrowSubAnnot::align(double x, double y, glow_eAlignDirection direction)
 {
   double dx, dy, x1, y1;
 
-  erase(&ctx->mw);
-  erase(&ctx->navw);
   ctx->set_defered_redraw();
   draw();
   switch (direction) {
@@ -602,8 +558,6 @@ void GrowSubAnnot::set_textbold(int bold)
       || (!bold && draw_type == glow_eDrawType_TextHelvetica))
     return;
 
-  erase(&ctx->mw);
-  erase(&ctx->navw);
   if (bold)
     draw_type = glow_eDrawType_TextHelveticaBold;
   else

@@ -107,17 +107,13 @@ public:
     \param ur_y		y coordinate for upper right corner in pixel.
 
     If draw is defered the area of defered redraw is extended with this new
-    area, and nothing
-    more is done. If double buffering is on, drawing is made in the buffer and
-    the specified
-    area is the copied to the screen.
+    area, and nothing more is done.
     Sets a clip of the specified area and draws first all connections in the
-    area, and then all
-    other objects in the area. Draws the tooltip text, if this is active, and
-    selection rectangle
-    if this is active.
+    area, and then all other objects in the area. Draws the tooltip text, if 
+    sthis is active, and selection rectangle if this is active.
   */
   void draw(GlowWind* w, int ll_x, int ll_y, int ur_x, int ur_y);
+  void draw_invalidated(GlowWind* w, int ll_x, int ll_y, int ur_x, int ur_y);
 
   void erase(GlowWind* w, int ll_x, int ll_y, int ur_x, int ur_y);
 
@@ -1023,14 +1019,6 @@ public:
   {
     return dashboard;
   }
-  void set_draw_buffer_only()
-  {
-    mw.set_draw_buffer_only();
-  }
-  void reset_draw_buffer_only()
-  {
-    mw.reset_draw_buffer_only();
-  }
   static void set_default_color_theme(char* theme);
 
   static int get_dimension(char* filename, int* width, int* heigth);
@@ -1139,7 +1127,7 @@ public:
   //! GrowFolder)
   int is_subwindow; //!< Is a subwindow context.
   char owner[256]; //!< Owner, used by application
-  int bitmap_fonts; //!< Use bitmap fonts
+  int anti_aliasing; //!< Use anti-aliasing
   glow_eEnv environment; //!< Environment Development or Runtime.
   glow_eTextCoding text_coding; //!< Text coding
   int recursive_trace; //!< Subgraph recursive trace

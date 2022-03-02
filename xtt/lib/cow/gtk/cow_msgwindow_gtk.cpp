@@ -87,15 +87,13 @@ MsgWindowGtk::MsgWindowGtk(void* msg_parent_ctx, GtkWidget* msg_parent_wid,
   g_signal_connect(
       file_clear, "activate", G_CALLBACK(MsgWindowGtk::activate_clear), this);
 
-  GtkWidget* file_print = gtk_image_menu_item_new_with_mnemonic(
+  GtkWidget* file_print = gtk_menu_item_new_with_mnemonic(
       CoWowGtk::translate_utf8("_Print"));
   g_signal_connect(
       file_print, "activate", G_CALLBACK(MsgWindowGtk::activate_print), this);
 
-  GtkWidget* file_close = gtk_image_menu_item_new_with_mnemonic(
+  GtkWidget* file_close = gtk_menu_item_new_with_mnemonic(
       CoWowGtk::translate_utf8("_Close"));
-  gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(file_close),
-      gtk_image_new_from_stock("gtk-close", GTK_ICON_SIZE_MENU));
   g_signal_connect(
       file_close, "activate", G_CALLBACK(MsgWindowGtk::activate_exit), this);
   gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w',
@@ -112,28 +110,22 @@ MsgWindowGtk::MsgWindowGtk(void* msg_parent_ctx, GtkWidget* msg_parent_wid,
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(file), GTK_WIDGET(file_menu));
 
   // View menu
-  GtkWidget* view_zoom_in = gtk_image_menu_item_new_with_mnemonic(
+  GtkWidget* view_zoom_in = gtk_menu_item_new_with_mnemonic(
       CoWowGtk::translate_utf8("Zoom _In"));
-  gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(view_zoom_in),
-      gtk_image_new_from_stock("gtk-zoom-in", GTK_ICON_SIZE_MENU));
   g_signal_connect(view_zoom_in, "activate",
       G_CALLBACK(MsgWindowGtk::activate_zoom_in), this);
   gtk_widget_add_accelerator(view_zoom_in, "activate", accel_g, 'i',
       GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
-  GtkWidget* view_zoom_out = gtk_image_menu_item_new_with_mnemonic(
+  GtkWidget* view_zoom_out = gtk_menu_item_new_with_mnemonic(
       CoWowGtk::translate_utf8("Zoom _Out"));
-  gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(view_zoom_out),
-      gtk_image_new_from_stock("gtk-zoom-out", GTK_ICON_SIZE_MENU));
   g_signal_connect(view_zoom_out, "activate",
       G_CALLBACK(MsgWindowGtk::activate_zoom_out), this);
   gtk_widget_add_accelerator(view_zoom_out, "activate", accel_g, 'o',
       GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
-  GtkWidget* view_zoom_reset = gtk_image_menu_item_new_with_mnemonic(
+  GtkWidget* view_zoom_reset = gtk_menu_item_new_with_mnemonic(
       CoWowGtk::translate_utf8("Zoom _Reset"));
-  gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(view_zoom_reset),
-      gtk_image_new_from_stock("gtk-zoom-100", GTK_ICON_SIZE_MENU));
   g_signal_connect(view_zoom_reset, "activate",
       G_CALLBACK(MsgWindowGtk::activate_zoom_reset), this);
 
@@ -147,7 +139,7 @@ MsgWindowGtk::MsgWindowGtk(void* msg_parent_ctx, GtkWidget* msg_parent_wid,
   gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), view);
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(view), GTK_WIDGET(view_menu));
 
-  form = gtk_vbox_new(FALSE, 0);
+  form = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 
   // Create msgnav
   msgnav = new MsgListGtk(this, form, &nav_widget);

@@ -52,29 +52,40 @@ public:
   GdkWindow* window;
   GdkWindow* nav_window;
   GdkScreen* screen;
-  GdkGC* gc;
-  GdkGC* gc_erase;
-  GdkGC* gc_inverse;
-  GdkGC* gc_yellow;
-  GdkGC* gc_green;
-  GdkGC* gc_darkgray;
-  GdkGC* gcs[flow_eDrawType__][DRAW_TYPE_SIZE];
-  // XFontStruct	*font_struct[draw_eFont__][DRAW_FONT_SIZE];
-  GdkFont* font[draw_eFont__][DRAW_FONT_SIZE];
-  GdkColormap* colormap;
+  cairo_pattern_t *gc_black;
+  cairo_pattern_t *gc_gray;
+  cairo_pattern_t *gc_darkgray;
+  cairo_pattern_t *gc_red;
+  cairo_pattern_t *gc_yellow;
+  cairo_pattern_t *gc_green;
+  cairo_pattern_t *gc_erase;
+  cairo_pattern_t *gc_inverse;
   GdkCursor* cursors[draw_eCursor__];
-  GdkColor background;
-  GdkColor foreground;
   guint timer_id;
-  GdkColor color_vect[20];
-  int color_vect_cnt;
   int closing_down;
+  cairo_t *cairo_cr;
+  int cairo_cr_refcnt;
+  cairo_region_t *cairo_region;
+  GdkDrawingContext *cairo_context;
+  cairo_t *cairo_nav_cr;
+  int cairo_nav_cr_refcnt;
+  cairo_region_t *cairo_nav_region;
+  GdkDrawingContext *cairo_nav_context;
+  cairo_antialias_t antialias;
+  cairo_antialias_t nav_antialias;
+  GtkStyleContext *style_context;
+  cairo_font_face_t *font_face_bold;
+  cairo_font_face_t *font_face_normal;
+  static char font_name[40];
 
   FlowDrawGtk(GtkWidget* toplevel, void** flow_ctx,
       int (*init_proc)(GtkWidget* w, FlowCtx* ctx, void* client_data),
       void* client_data, flow_eCtxType type);
   ~FlowDrawGtk();
   int init_nav(GtkWidget* nav_widget, void* flow_ctx);
+  void invalidate(int x, int y, int width, int height);
+  void invalidate_nav(int x, int y, int width, int height);
+  int expose(FlowCtx* ctx, cairo_t* cr, int is_navigator);
   int event_handler(FlowCtx* ctx, GdkEvent event);
   void enable_event(FlowCtx* ctx, flow_eEvent event, flow_eEventType event_type,
       int (*event_cb)(FlowCtx* ctx, flow_tEvent event));
@@ -85,6 +96,10 @@ public:
   void get_nav_window_size(FlowCtx* ctx, int* width, int* height);
   void set_nav_window_size(FlowCtx* ctx, int width, int height);
 
+  cairo_t* get_cairo(int create = 0);
+  void end_cairo(cairo_t *cr);
+  cairo_t* get_cairo_nav();
+  void end_cairo_nav(cairo_t *cr);
   int rect(FlowCtx* ctx, int x, int y, int width, int height,
       flow_eDrawType gc_type, int idx, int highlight, int dimmed);
   int rect_erase(FlowCtx* ctx, int x, int y, int width, int height, int idx);
@@ -137,6 +152,8 @@ public:
       flow_eDrawType gc_type, int idx, int line, double size);
   int fill_rect(FlowCtx* ctx, int x, int y, int width, int height,
       flow_eDrawType gc_type);
+  int nav_fill_rect(FlowCtx* ctx, int x, int y, int width, int height,
+      flow_eDrawType gc_type);
   int fill_triangle(FlowCtx* ctx, int x, int y, int width, int height,
       flow_eDrawType gc_type);
   int image(FlowCtx* ctx, int x, int y, int width, int height,
@@ -156,6 +173,7 @@ public:
       flow_sPixmapData* pixmap_data, void* pixmaps, flow_eDrawType gc_type,
       int idx, int line);
 
+  cairo_font_face_t* get_font_face(flow_eDrawType gc_type);
   void set_timer(FlowCtx* ctx, int time_ms, void (*callback_func)(FlowCtx* ctx),
       void** id);
   void cancel_timer(FlowCtx* ctx, void* id);
@@ -200,17 +218,9 @@ public:
       flow_tImImage* orig_im, flow_tImImage* im, flow_tPixmap* im_pixmap,
       flow_tPixmap* im_mask, flow_tPixmap* im_nav_pixmap,
       flow_tPixmap* im_nav_mask);
-  int text_pango(FlowCtx* ctx, int x, int y, char* text, int len,
-      flow_eDrawType gc_type, int idx, int highlight, int dimmed, int line,
-      double size);
-  int text_inverse_pango(FlowCtx* ctx, int x, int y, char* text, int len,
-      flow_eDrawType gc_type, int idx, int line, double size);
-  int text_erase_pango(FlowCtx* ctx, int x, int y, char* text, int len,
-      flow_eDrawType gc_type, int idx, int line, double size);
-  int get_text_extent_pango(FlowCtx* ctx, const char* text, int len,
-      flow_eDrawType gc_type, int idx, double size, int* width, int* height);
   FlowPrintDraw* print_draw_new(void* context, const char* title, int page,
       void* flow_ctx, int page_border, int* sts);
+  void update_color_theme(int ct);
 };
 
 #endif

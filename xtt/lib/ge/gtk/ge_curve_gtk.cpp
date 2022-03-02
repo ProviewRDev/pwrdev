@@ -55,6 +55,7 @@
 
 #include "ge_curve_gtk.h"
 #include "ge_msg.h"
+#include "cow_wutl_gtk.h"
 
 typedef struct {
   char text[40];
@@ -97,23 +98,15 @@ void GeCurveGtk::set_period(time_ePeriod period, int nocallback)
 
 int GeCurveGtk::get_period(time_ePeriod* period)
 {
-  gchar* gtext;
+  int active;
   *period = time_ePeriod_;
 
-  gtext = gtk_combo_box_get_active_text(GTK_COMBO_BOX(timebox_timecombo));
-  if (!gtext)
+  active = gtk_combo_box_get_active(GTK_COMBO_BOX(timebox_timecombo));
+  if (active < 0)
     return 0;
 
-  for (int i = 0; curve_timecombo_text[i].text[0]; i++) {
-    if (strcmp(CoWowGtk::translate_utf8(curve_timecombo_text[i].text), gtext)
-        == 0) {
-      *period = curve_timecombo_text[i].period;
-      g_free(gtext);
-      return 1;
-    }
-  }
-  g_free(gtext);
-  return 0;
+  *period = curve_timecombo_text[active].period;
+  return 1;
 }
 
 void GeCurveGtk::activate_exit(GtkWidget* w, gpointer data)
@@ -256,20 +249,16 @@ void GeCurveGtk::activate_timecombo(GtkWidget* w, gpointer data)
 {
   GeCurve* curve = (GeCurve*)data;
   time_ePeriod period;
-  gchar* gtext;
-  int sts;
+  int active;
 
   if (((GeCurveGtk*)curve)->disable_timecombo_callback)
     return;
 
-  gtext = gtk_combo_box_get_active_text(
-      GTK_COMBO_BOX(((GeCurveGtk*)curve)->timebox_timecombo));
-  if (!gtext)
+  active = gtk_combo_box_get_active(GTK_COMBO_BOX(((GeCurveGtk*)curve)->timebox_timecombo));
+  if (active < 0)
     return;
 
-  sts = ((GeCurveGtk*)curve)->get_period(&period);
-  if (EVEN(sts))
-    return;
+  period = curve_timecombo_text[active].period;
 
   if (period == time_ePeriod_UserDefined)
     curve->activate_edit();
@@ -296,7 +285,7 @@ void GeCurveGtk::activate_filledcurves(GtkWidget* w, gpointer data)
   GeCurve* curve = (GeCurve*)data;
   int set;
 
-  if (w == ((GeCurveGtk*)curve)->tools_curve_fill) {
+  if ((GtkToolItem*)w == ((GeCurveGtk*)curve)->tools_curve_fill) {
     curve->fill_curves = !curve->fill_curves;
     set = curve->fill_curves;
   } else {
@@ -449,7 +438,8 @@ void GeCurveGtk::activate_minmax_cancel(GtkWidget* w, gpointer data)
 void GeCurveGtk::activate_export_ok(GtkWidget* w, gpointer data)
 {
   GeCurve* curve = (GeCurve*)data;
-  char* value;
+  int active;
+  gchar *value;
   pwr_tTime from, to;
   int rows = 5000;
   pwr_tFileName filename;
@@ -460,22 +450,12 @@ void GeCurveGtk::activate_export_ok(GtkWidget* w, gpointer data)
   from = pwr_cNTime;
   time_GetTime(&to);
 
-  value = gtk_combo_box_get_active_text(
+  active = gtk_combo_box_get_active(
       GTK_COMBO_BOX(((GeCurveGtk*)curve)->export_attrcombo_widget));
-  if (!value)
+  if (active < 0)
     return;
 
-  if (streq(value, CoWowGtk::translate_utf8("All Attributes")))
-    idx = -1;
-  else {
-    for (int i = 0; i < curve->cd->cols; i++) {
-      if (streq(value, CoWowGtk::convert_utf8(curve->cd->y_name[i]))) {
-        idx = i;
-        break;
-      }
-    }
-  }
-  g_free(value);
+  idx = active - 1;
 
   if (((GeCurveGtk*)curve)->layout_mask & curve_mEnable_ExportTime) {
     value = gtk_editable_get_chars(
@@ -630,8 +610,8 @@ void GeCurveGtk::resize()
   int main_height, main_width, height, width;
   double zoom_y;
 
-  gdk_drawable_get_size(
-      growaxis_main_widget->window, &main_width, &main_height);
+  main_width = gdk_window_get_width(gtk_widget_get_window(growaxis_main_widget));
+  main_height = gdk_window_get_height(gtk_widget_get_window(growaxis_main_widget));
 
   curve_GetPreferedZoomY(growcurve_ctx, main_height, &zoom_y);
   grow_ZoomY(growaxis_ctx, zoom_y);
@@ -639,7 +619,7 @@ void GeCurveGtk::resize()
 
   width = int(zoom_y * axis_window_width);
   height = main_height;
-  gtk_widget_set_size_request(growaxis_main_widget, width + 4, height);
+  gtk_widget_set_size_request(growaxis_main_widget, width + 4, -1);
 }
 
 void GeCurveGtk::axis_set_width(int width)
@@ -765,13 +745,13 @@ void GeCurveGtk::set_clock_cursor()
     clock_cursor = gdk_cursor_new_for_display(
         gtk_widget_get_display(toplevel), GDK_WATCH);
 
-  gdk_window_set_cursor(toplevel->window, clock_cursor);
+  gdk_window_set_cursor(gtk_widget_get_window(toplevel), clock_cursor);
   gdk_display_flush(gtk_widget_get_display(toplevel));
 }
 
 void GeCurveGtk::reset_cursor()
 {
-  gdk_window_set_cursor(toplevel->window, NULL);
+  gdk_window_set_cursor(gtk_widget_get_window(toplevel), NULL);
 }
 
 void* GeCurveGtk::get_widget()
@@ -828,12 +808,13 @@ GeCurveGtk::GeCurveGtk(void* gc_parent_ctx, GtkWidget* parent_widget,
 {
   int window_width = 900;
   int window_height = 700;
-  const int names_height = 150;
-  const int nav_height = 120;
-  pwr_tFileName fname;
+  int names_height = 120;
+  const int nav_height = 90;
   float height_scale = 1;
   int nonav = 0;
 
+  if (cd)
+    names_height = (cd->cols + 2) * 20;
   if (gc_width != 0)
     window_width = gc_width;
   if (gc_height != 0) {
@@ -876,10 +857,8 @@ GeCurveGtk::GeCurveGtk(void* gc_parent_ctx, GtkWidget* parent_widget,
   gtk_widget_add_accelerator(file_refresh, "activate", accel_g, 'r',
       GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
 
-  GtkWidget* file_print = gtk_image_menu_item_new_with_mnemonic(
+  GtkWidget* file_print = gtk_menu_item_new_with_mnemonic(
       CoWowGtk::translate_utf8("_Print"));
-  gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(file_print),
-      gtk_image_new_from_stock("gtk-print", GTK_ICON_SIZE_MENU));
   g_signal_connect(file_print, "activate", G_CALLBACK(activate_print), this);
 
   menu_export
@@ -906,10 +885,8 @@ GeCurveGtk::GeCurveGtk(void* gc_parent_ctx, GtkWidget* parent_widget,
   gtk_widget_add_accelerator(menu_snapshot, "activate", accel_g, 'n',
       GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
 
-  GtkWidget* file_close = gtk_image_menu_item_new_with_mnemonic(
+  GtkWidget* file_close = gtk_menu_item_new_with_mnemonic(
       CoWowGtk::translate_utf8("_Close"));
-  gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(file_close),
-      gtk_image_new_from_stock("gtk-close", GTK_ICON_SIZE_MENU));
   g_signal_connect(file_close, "activate", G_CALLBACK(activate_exit), this);
   gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w',
       GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
@@ -931,27 +908,21 @@ GeCurveGtk::GeCurveGtk(void* gc_parent_ctx, GtkWidget* parent_widget,
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(file), GTK_WIDGET(file_menu));
 
   // View menu
-  GtkWidget* view_zoom_in = gtk_image_menu_item_new_with_mnemonic(
+  GtkWidget* view_zoom_in = gtk_menu_item_new_with_mnemonic(
       CoWowGtk::translate_utf8("Zoom _In"));
-  gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(view_zoom_in),
-      gtk_image_new_from_stock("gtk-zoom-in", GTK_ICON_SIZE_MENU));
   g_signal_connect(view_zoom_in, "activate", G_CALLBACK(activate_zoomin), this);
   gtk_widget_add_accelerator(view_zoom_in, "activate", accel_g, 'i',
       GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
-  GtkWidget* view_zoom_out = gtk_image_menu_item_new_with_mnemonic(
+  GtkWidget* view_zoom_out = gtk_menu_item_new_with_mnemonic(
       CoWowGtk::translate_utf8("Zoom _Out"));
-  gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(view_zoom_out),
-      gtk_image_new_from_stock("gtk-zoom-out", GTK_ICON_SIZE_MENU));
   g_signal_connect(
       view_zoom_out, "activate", G_CALLBACK(activate_zoomout), this);
   gtk_widget_add_accelerator(view_zoom_out, "activate", accel_g, 'o',
       GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
-  GtkWidget* view_zoom_reset = gtk_image_menu_item_new_with_mnemonic(
+  GtkWidget* view_zoom_reset = gtk_menu_item_new_with_mnemonic(
       CoWowGtk::translate_utf8("Zoom _Reset"));
-  gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(view_zoom_reset),
-      gtk_image_new_from_stock("gtk-zoom-100", GTK_ICON_SIZE_MENU));
   g_signal_connect(
       view_zoom_reset, "activate", G_CALLBACK(activate_zoomreset), this);
 
@@ -992,10 +963,8 @@ GeCurveGtk::GeCurveGtk(void* gc_parent_ctx, GtkWidget* parent_widget,
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(view), GTK_WIDGET(view_menu));
 
   // Menu Help
-  GtkWidget* help_help = gtk_image_menu_item_new_with_mnemonic(
+  GtkWidget* help_help = gtk_menu_item_new_with_mnemonic(
       CoWowGtk::translate_utf8("_Help"));
-  gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(help_help),
-      gtk_image_new_from_stock("gtk-help", GTK_ICON_SIZE_MENU));
   g_signal_connect(help_help, "activate", G_CALLBACK(activate_help), this);
   gtk_widget_add_accelerator(
       help_help, "activate", accel_g, 'h', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
@@ -1011,276 +980,135 @@ GeCurveGtk::GeCurveGtk(void* gc_parent_ctx, GtkWidget* parent_widget,
   // Toolbar
   GtkToolbar* tools = (GtkToolbar*)g_object_new(GTK_TYPE_TOOLBAR, NULL);
 
-  GtkWidget* tools_zoom_in = gtk_button_new();
-  dcli_translate_filename(fname, "$pwr_exe/xtt_zoom_in.png");
-  gtk_container_add(
-      GTK_CONTAINER(tools_zoom_in), gtk_image_new_from_file(fname));
-  g_signal_connect(tools_zoom_in, "clicked", G_CALLBACK(activate_zoomin), this);
-  g_object_set(tools_zoom_in, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(
-      tools, tools_zoom_in, CoWowGtk::translate_utf8("Zoom in"), "");
+  wutl_tools_item(tools, "$pwr_exe/xtt_zoom_in.png", G_CALLBACK(activate_zoomin),
+		  "Zoom in", this);
 
-  GtkWidget* tools_zoom_out = gtk_button_new();
-  dcli_translate_filename(fname, "$pwr_exe/xtt_zoom_out.png");
-  gtk_container_add(
-      GTK_CONTAINER(tools_zoom_out), gtk_image_new_from_file(fname));
-  g_signal_connect(
-      tools_zoom_out, "clicked", G_CALLBACK(activate_zoomout), this);
-  g_object_set(tools_zoom_out, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(
-      tools, tools_zoom_out, CoWowGtk::translate_utf8("Zoom out"), "");
+  wutl_tools_item(tools, "$pwr_exe/xtt_zoom_out.png", G_CALLBACK(activate_zoomout),
+		  "Zoom out", this);
 
-  GtkWidget* tools_zoom_reset = gtk_button_new();
-  dcli_translate_filename(fname, "$pwr_exe/xtt_zoom_reset.png");
-  gtk_container_add(
-      GTK_CONTAINER(tools_zoom_reset), gtk_image_new_from_file(fname));
-  g_signal_connect(
-      tools_zoom_reset, "clicked", G_CALLBACK(activate_zoomreset), this);
-  g_object_set(tools_zoom_reset, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(
-      tools, tools_zoom_reset, CoWowGtk::translate_utf8("Zoom reset"), "");
+  wutl_tools_item(tools, "$pwr_exe/xtt_zoom_reset.png", G_CALLBACK(activate_zoomreset),
+		  "Zoom reset", this);
 
-  GtkWidget* tools_page_left = gtk_button_new();
-  dcli_translate_filename(fname, "$pwr_exe/ge_page_left.png");
-  gtk_container_add(
-      GTK_CONTAINER(tools_page_left), gtk_image_new_from_file(fname));
-  g_signal_connect(
-      tools_page_left, "clicked", G_CALLBACK(activate_page_left), this);
-  g_object_set(tools_page_left, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(
-      tools, tools_page_left, CoWowGtk::translate_utf8("Page left"), "");
+  wutl_tools_item(tools, "$pwr_exe/xtt_zoom_reset.png", G_CALLBACK(activate_zoomreset),
+		  "Zoom reset", this);
 
-  GtkWidget* tools_scroll_left = gtk_button_new();
-  dcli_translate_filename(fname, "$pwr_exe/ge_scroll_left.png");
-  gtk_container_add(
-      GTK_CONTAINER(tools_scroll_left), gtk_image_new_from_file(fname));
-  g_signal_connect(
-      tools_scroll_left, "clicked", G_CALLBACK(activate_scroll_left), this);
-  g_object_set(tools_scroll_left, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(
-      tools, tools_scroll_left, CoWowGtk::translate_utf8("Scroll left"), "");
+  wutl_tools_item(tools, "$pwr_exe/ge_page_left.png", G_CALLBACK(activate_page_left),
+		  "Page left", this);
 
-  GtkWidget* tools_scroll_right = gtk_button_new();
-  dcli_translate_filename(fname, "$pwr_exe/ge_scroll_right.png");
-  gtk_container_add(
-      GTK_CONTAINER(tools_scroll_right), gtk_image_new_from_file(fname));
-  g_signal_connect(
-      tools_scroll_right, "clicked", G_CALLBACK(activate_scroll_right), this);
-  g_object_set(tools_scroll_right, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(
-      tools, tools_scroll_right, CoWowGtk::translate_utf8("Scroll right"), "");
+  wutl_tools_item(tools, "$pwr_exe/ge_scroll_left.png", G_CALLBACK(activate_scroll_left),
+		  "Scroll left", this);
 
-  GtkWidget* tools_page_right = gtk_button_new();
-  dcli_translate_filename(fname, "$pwr_exe/ge_page_right.png");
-  gtk_container_add(
-      GTK_CONTAINER(tools_page_right), gtk_image_new_from_file(fname));
-  g_signal_connect(
-      tools_page_right, "clicked", G_CALLBACK(activate_page_right), this);
-  g_object_set(tools_page_right, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(
-      tools, tools_page_right, CoWowGtk::translate_utf8("Page right"), "");
+  wutl_tools_item(tools, "$pwr_exe/ge_scroll_right.png", G_CALLBACK(activate_scroll_right),
+		  "Scroll right", this);
 
-  tools_add = gtk_button_new();
-  dcli_translate_filename(fname, "$pwr_exe/xtt_add.png");
-  gtk_container_add(GTK_CONTAINER(tools_add), gtk_image_new_from_file(fname));
-  g_signal_connect(tools_add, "clicked", G_CALLBACK(activate_add), this);
-  g_object_set(tools_add, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(
-      tools, tools_add, CoWowGtk::translate_utf8("Add"), "");
+  wutl_tools_item(tools, "$pwr_exe/ge_page_right.png", G_CALLBACK(activate_page_right),
+		  "Page right", this);
 
-  tools_curvetype_line = gtk_button_new();
-  dcli_translate_filename(fname, "$pwr_exe/xtt_curve_line.png");
-  gtk_container_add(
-      GTK_CONTAINER(tools_curvetype_line), gtk_image_new_from_file(fname));
-  g_signal_connect(tools_curvetype_line, "clicked",
-      G_CALLBACK(activate_curvetype_line), this);
-  g_object_set(tools_curvetype_line, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(
-      tools, tools_curvetype_line, CoWowGtk::translate_utf8("Curve line"), "");
+  tools_add = wutl_tools_item(tools, "$pwr_exe/xtt_add.png", G_CALLBACK(activate_add),
+		  "Add", this);
 
-  tools_curvetype_points = gtk_button_new();
-  dcli_translate_filename(fname, "$pwr_exe/xtt_curve_points.png");
-  gtk_container_add(
-      GTK_CONTAINER(tools_curvetype_points), gtk_image_new_from_file(fname));
-  g_signal_connect(tools_curvetype_points, "clicked",
-      G_CALLBACK(activate_curvetype_points), this);
-  g_object_set(tools_curvetype_points, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(tools, tools_curvetype_points,
-      CoWowGtk::translate_utf8("Curve points"), "");
+  tools_curvetype_line = wutl_tools_item(tools, "$pwr_exe/xtt_curve_line.png", G_CALLBACK(activate_curvetype_line),
+		  "Curve line", this);
 
-  tools_curvetype_linepoints = gtk_button_new();
-  dcli_translate_filename(fname, "$pwr_exe/xtt_curve_linepoints.png");
-  gtk_container_add(GTK_CONTAINER(tools_curvetype_linepoints),
-      gtk_image_new_from_file(fname));
-  g_signal_connect(tools_curvetype_linepoints, "clicked",
-      G_CALLBACK(activate_curvetype_linepoints), this);
-  g_object_set(tools_curvetype_linepoints, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(tools, tools_curvetype_linepoints,
-      CoWowGtk::translate_utf8("Curve line and points"), "");
+  tools_curvetype_points = wutl_tools_item(tools, "$pwr_exe/xtt_curve_points.png", G_CALLBACK(activate_curvetype_points),
+		  "Curve points", this);
 
-  tools_curvetype_square = gtk_button_new();
-  dcli_translate_filename(fname, "$pwr_exe/xtt_curve_square.png");
-  gtk_container_add(
-      GTK_CONTAINER(tools_curvetype_square), gtk_image_new_from_file(fname));
-  g_signal_connect(tools_curvetype_square, "clicked",
-      G_CALLBACK(activate_curvetype_square), this);
-  g_object_set(tools_curvetype_square, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(tools, tools_curvetype_square,
-      CoWowGtk::translate_utf8("Curve square"), "");
+  tools_curvetype_linepoints = wutl_tools_item(tools, "$pwr_exe/xtt_curve_linepoints.png", G_CALLBACK(activate_curvetype_linepoints),
+		  "Curve line and points", this);
 
-  tools_curve_fill = gtk_button_new();
-  dcli_translate_filename(fname, "$pwr_exe/xtt_curve_fill.png");
-  gtk_container_add(
-      GTK_CONTAINER(tools_curve_fill), gtk_image_new_from_file(fname));
-  g_signal_connect(
-      tools_curve_fill, "clicked", G_CALLBACK(activate_filledcurves), this);
-  g_object_set(tools_curve_fill, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(
-      tools, tools_curve_fill, CoWowGtk::translate_utf8("Filled curves"), "");
+  tools_curvetype_square = wutl_tools_item(tools, "$pwr_exe/xtt_curve_square.png", G_CALLBACK(activate_curvetype_square),
+		  "Curve square", this);
 
-  tools_curve_digsplit = gtk_button_new();
-  dcli_translate_filename(fname, "$pwr_exe/xtt_curve_digsplit.png");
-  gtk_container_add(
-      GTK_CONTAINER(tools_curve_digsplit), gtk_image_new_from_file(fname));
-  g_signal_connect(
-      tools_curve_digsplit, "clicked", G_CALLBACK(activate_digsplit), this);
-  g_object_set(tools_curve_digsplit, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(tools, tools_curve_digsplit,
-      CoWowGtk::translate_utf8("Split digital curves"), "");
+  tools_curve_fill = wutl_tools_item(tools, "$pwr_exe/xtt_curve_fill.png", G_CALLBACK(activate_filledcurves),
+		  "Filled curves", this);
 
-  tools_snapshot = gtk_button_new();
-  dcli_translate_filename(fname, "$pwr_exe/xtt_snapshot.png");
-  gtk_container_add(
-      GTK_CONTAINER(tools_snapshot), gtk_image_new_from_file(fname));
-  g_signal_connect(
-      tools_snapshot, "clicked", G_CALLBACK(activate_snapshot), this);
-  g_object_set(tools_snapshot, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(
-      tools, tools_snapshot, CoWowGtk::translate_utf8("Snapshot"), "");
+  tools_curve_digsplit = wutl_tools_item(tools, "$pwr_exe/xtt_curve_digsplit.png", G_CALLBACK(activate_digsplit),
+		  "Split digital curves", this);
+
+  tools_snapshot = wutl_tools_item(tools, "$pwr_exe/xtt_snapshot.png", G_CALLBACK(activate_snapshot),
+		  "Snapshot", this);
+
 
   // Time box
   GtkToolbar* timetools = (GtkToolbar*)g_object_new(GTK_TYPE_TOOLBAR, NULL);
 
+  GtkToolItem *sea_time_start_label_tool = gtk_tool_item_new();
   GtkWidget* sea_time_start_label
       = gtk_label_new(CoWowGtk::translate_utf8("Time"));
   gtk_widget_set_size_request(sea_time_start_label, 70, -1);
-  gtk_misc_set_alignment(GTK_MISC(sea_time_start_label), 0.0, 0.5);
-  gtk_toolbar_append_widget(timetools, sea_time_start_label, "", "");
+  gtk_container_add(GTK_CONTAINER(sea_time_start_label_tool), sea_time_start_label);
+  //gtk_misc_set_alignment(GTK_MISC(sea_time_start_label), 0.0, 0.5);
+  gtk_toolbar_insert(timetools, sea_time_start_label_tool, -1);
 
   // Time option menu
-  timebox_timecombo = gtk_combo_box_new_text();
+  GtkTreeIter iter;
+  GtkListStore *liststore;
 
+  liststore = gtk_list_store_new(1, G_TYPE_STRING);
   for (int i = 0; curve_timecombo_text[i].text[0]; i++)
-    gtk_combo_box_append_text(GTK_COMBO_BOX(timebox_timecombo),
-        CoWowGtk::translate_utf8(curve_timecombo_text[i].text));
+    gtk_list_store_insert_with_values(liststore, &iter, i, 0, CoWowGtk::translate_utf8(curve_timecombo_text[i].text), -1);
+  timebox_timecombo = gtk_combo_box_new_with_model(GTK_TREE_MODEL(liststore));
 
+  GtkCellRenderer *combocell = gtk_cell_renderer_text_new();
+  gtk_cell_layout_pack_start(GTK_CELL_LAYOUT(timebox_timecombo), combocell, TRUE);
+  gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(timebox_timecombo), combocell,
+      "text", 0, NULL);
   g_signal_connect(
       timebox_timecombo, "changed", G_CALLBACK(activate_timecombo), this);
+  GtkToolItem *timebox_timecombo_tool = gtk_tool_item_new();
+  gtk_container_add(GTK_CONTAINER(timebox_timecombo_tool), timebox_timecombo);
+  gtk_toolbar_insert(timetools, timebox_timecombo_tool, -1);
 
-  gtk_toolbar_append_widget(timetools, timebox_timecombo, 0, "");
   timebox_start_time = gtk_entry_new();
   gtk_widget_set_size_request(timebox_start_time, 160, -1);
-  gtk_toolbar_append_widget(timetools, timebox_start_time, "", "");
+  GtkToolItem *timebox_start_time_tool = gtk_tool_item_new();
+  gtk_container_add(GTK_CONTAINER(timebox_start_time_tool), timebox_start_time);
+  gtk_toolbar_insert(timetools, timebox_start_time_tool, -1);
+
 
   GtkWidget* sea_time_stop_label = gtk_label_new(CoWowGtk::translate_utf8("-"));
   gtk_widget_set_size_request(sea_time_stop_label, 20, -1);
-  gtk_toolbar_append_widget(timetools, sea_time_stop_label, "", "");
+  GtkToolItem *sea_time_stop_label_tool = gtk_tool_item_new();
+  gtk_container_add(GTK_CONTAINER(sea_time_stop_label_tool), sea_time_stop_label);
+  gtk_toolbar_insert(timetools, sea_time_stop_label_tool, -1);
 
   timebox_stop_time = gtk_entry_new();
   gtk_widget_set_size_request(timebox_stop_time, 160, -1);
-  gtk_toolbar_append_widget(timetools, timebox_stop_time, "", "");
+  GtkToolItem *timebox_stop_time_tool = gtk_tool_item_new();
+  gtk_container_add(GTK_CONTAINER(timebox_stop_time_tool), timebox_stop_time);
+  gtk_toolbar_insert(timetools, timebox_stop_time_tool, -1);
 
-  GtkWidget* timebox_prev_period = gtk_button_new();
-  dcli_translate_filename(fname, "$pwr_exe/ge_scroll_left.png");
-  gtk_container_add(
-      GTK_CONTAINER(timebox_prev_period), gtk_image_new_from_file(fname));
-  g_signal_connect(
-      timebox_prev_period, "clicked", G_CALLBACK(activate_prev_period), this);
-  g_object_set(timebox_prev_period, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(timetools, timebox_prev_period,
-      CoWowGtk::translate_utf8("Previous period"), "");
+  wutl_tools_item(timetools, "$pwr_exe/ge_scroll_left.png", G_CALLBACK(activate_prev_period),
+		  "Previous period", this);
 
-  GtkWidget* timebox_next_period = gtk_button_new();
-  dcli_translate_filename(fname, "$pwr_exe/ge_scroll_right.png");
-  gtk_container_add(
-      GTK_CONTAINER(timebox_next_period), gtk_image_new_from_file(fname));
-  g_signal_connect(
-      timebox_next_period, "clicked", G_CALLBACK(activate_next_period), this);
-  g_object_set(timebox_next_period, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(timetools, timebox_next_period,
-      CoWowGtk::translate_utf8("Next period"), "");
+  wutl_tools_item(timetools, "$pwr_exe/ge_scroll_right.png", G_CALLBACK(activate_next_period),
+		  "Next period", this);
 
-  GtkWidget* timebox_increase_period = gtk_button_new();
-  dcli_translate_filename(fname, "$pwr_exe/xtt_up.png");
-  gtk_container_add(
-      GTK_CONTAINER(timebox_increase_period), gtk_image_new_from_file(fname));
-  g_signal_connect(timebox_increase_period, "clicked",
-      G_CALLBACK(activate_increase_period), this);
-  g_object_set(timebox_increase_period, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(timetools, timebox_increase_period,
-      CoWowGtk::translate_utf8("Increase period"), "");
+  wutl_tools_item(timetools, "$pwr_exe/xtt_up.png", G_CALLBACK(activate_increase_period),
+		  "Increase period", this);
 
-  GtkWidget* timebox_decrease_period = gtk_button_new();
-  dcli_translate_filename(fname, "$pwr_exe/xtt_down.png");
-  gtk_container_add(
-      GTK_CONTAINER(timebox_decrease_period), gtk_image_new_from_file(fname));
-  g_signal_connect(timebox_decrease_period, "clicked",
-      G_CALLBACK(activate_decrease_period), this);
-  g_object_set(timebox_decrease_period, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(timetools, timebox_decrease_period,
-      CoWowGtk::translate_utf8("Decrease period"), "");
+  wutl_tools_item(timetools, "$pwr_exe/xtt_down.png", G_CALLBACK(activate_decrease_period),
+		  "Decrease period", this);
 
-  GtkWidget* timebox_reload = gtk_button_new();
-  dcli_translate_filename(fname, "$pwr_exe/ge_reload.png");
-  gtk_container_add(
-      GTK_CONTAINER(timebox_reload), gtk_image_new_from_file(fname));
-  g_signal_connect(
-      timebox_reload, "clicked", G_CALLBACK(activate_reload), this);
-  g_object_set(timebox_reload, "can-focus", FALSE, NULL);
-  // gtk_toolbar_append_widget( timetools, timebox_reload,
-  // CoWowGtk::translate_utf8("Update"), "");
-
-  GtkWidget* timebox_add = gtk_button_new();
-  dcli_translate_filename(fname, "$pwr_exe/xtt_add.png");
-  gtk_container_add(GTK_CONTAINER(timebox_add), gtk_image_new_from_file(fname));
-  g_signal_connect(timebox_add, "clicked", G_CALLBACK(activate_add), this);
-  g_object_set(timebox_add, "can-focus", FALSE, NULL);
-  // gtk_toolbar_append_widget( timetools, timebox_add,
-  // CoWowGtk::translate_utf8("Add curve item"), "");
-
-  GtkWidget* timebox_remove = gtk_button_new();
-  dcli_translate_filename(fname, "$pwr_exe/xtt_remove.png");
-  gtk_container_add(
-      GTK_CONTAINER(timebox_remove), gtk_image_new_from_file(fname));
-  g_signal_connect(
-      timebox_remove, "clicked", G_CALLBACK(activate_remove), this);
-  g_object_set(timebox_remove, "can-focus", FALSE, NULL);
-  // gtk_toolbar_append_widget( timetools, timebox_remove,
-  // CoWowGtk::translate_utf8("Remove selected curve"), "");
 
   GtkToolbar* curvebuttonbox
       = (GtkToolbar*)g_object_new(GTK_TYPE_TOOLBAR, NULL);
-  // GtkWidget *curvebuttonbox = gtk_hbox_new( FALSE, 0);
-  gtk_toolbar_append_widget(curvebuttonbox, timebox_reload,
-      CoWowGtk::translate_utf8("Update curve"), "");
-  gtk_toolbar_append_widget(curvebuttonbox, timebox_add,
-      CoWowGtk::translate_utf8("Add curve item"), "");
 
-  sea_timebox = gtk_hbox_new(FALSE, 0);
-  //  gtk_box_pack_start( GTK_BOX(sea_timebox), sea_time_start_label, FALSE,
-  //  FALSE, 0);
-  //  gtk_box_pack_start( GTK_BOX(sea_timebox), timebox_timecombo, FALSE, FALSE,
-  //  10);
-  //  gtk_box_pack_start( GTK_BOX(sea_timebox), timebox_start_time, FALSE,
-  //  FALSE, 0);
-  //  gtk_box_pack_start( GTK_BOX(sea_timebox), sea_time_stop_label, FALSE,
-  //  FALSE, 0);
-  //  gtk_box_pack_start( GTK_BOX(sea_timebox), timebox_stop_time, FALSE, FALSE,
-  //  0);
+  wutl_tools_item(curvebuttonbox, "$pwr_exe/ge_reload.png", G_CALLBACK(activate_reload),
+		  "Update", this);
+
+  wutl_tools_item(curvebuttonbox, "$pwr_exe/xtt_add.png", G_CALLBACK(activate_add),
+		  "Add curve item", this);
+
+  // wutl_tools_item(curvebuttonbox, "$pwr_exe/xtt_remove.png", G_CALLBACK(activate_remove),
+  //		  "Remove selected curve", this);
+
+
+  sea_timebox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   gtk_box_pack_start(
       GTK_BOX(sea_timebox), GTK_WIDGET(timetools), FALSE, FALSE, 0);
   gtk_box_pack_start(
-      GTK_BOX(sea_timebox), gtk_hseparator_new(), FALSE, FALSE, 10);
+      GTK_BOX(sea_timebox), gtk_separator_new(GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 10);
   gtk_box_pack_start(
       GTK_BOX(sea_timebox), GTK_WIDGET(curvebuttonbox), FALSE, FALSE, 0);
 
@@ -1296,36 +1124,35 @@ GeCurveGtk::GeCurveGtk(void* gc_parent_ctx, GtkWidget* parent_widget,
 
   growaxis_main_widget = growwidgetgtk_new(init_growaxis_cb, this);
 
-  if (!nonav)
+  if (!nonav) {
     nav_widget = curvenavwidgetgtk_new(growcurve_main_widget);
-
-  GtkWidget* hbox = gtk_hbox_new(FALSE, 0);
-  gtk_box_pack_start(GTK_BOX(hbox), growaxis_main_widget, FALSE, FALSE, 0);
-  gtk_box_pack_start(GTK_BOX(hbox), growcurve_main_widget, TRUE, TRUE, 0);
+    gtk_widget_set_size_request(nav_widget, -1, nav_height);
+  }
+  GtkWidget* hbox = gtk_grid_new();
+  gtk_grid_attach(GTK_GRID(hbox), growaxis_main_widget, 1, 1, 1, 1);
+  gtk_grid_attach(GTK_GRID(hbox), growcurve_main_widget, 2, 1, 8, 1);
+  gtk_widget_set_vexpand(growcurve_main_widget, TRUE);
+  gtk_widget_set_hexpand(growcurve_main_widget, TRUE);
+  gtk_widget_set_vexpand(growaxis_main_widget, TRUE);
+  gtk_widget_set_hexpand(growaxis_main_widget, FALSE);
+  gtk_widget_set_vexpand(hbox, TRUE);
+  gtk_widget_set_hexpand(hbox, TRUE);
   gtk_widget_show_all(hbox);
 
-  GtkWidget* vpaned1 = gtk_vpaned_new();
-  GtkWidget* vpaned2 = gtk_vpaned_new();
+  GtkWidget* vpaned1 = gtk_paned_new(GTK_ORIENTATION_VERTICAL);
 
-  gtk_paned_add1(GTK_PANED(vpaned1), grownames_main_widget);
-  gtk_paned_add2(GTK_PANED(vpaned1), vpaned2);
-  gtk_widget_show_all(vpaned1);
+  gtk_paned_pack1(GTK_PANED(vpaned1), grownames_main_widget, FALSE, FALSE);
+  gtk_paned_pack2(GTK_PANED(vpaned1), hbox, TRUE, TRUE);
 
-  gtk_paned_pack1(GTK_PANED(vpaned2), hbox, TRUE, TRUE);
-  if (!nonav)
-    gtk_paned_pack2(GTK_PANED(vpaned2), nav_widget, FALSE, TRUE);
-  gtk_widget_show_all(vpaned2);
-
-  GtkWidget* tools_box = gtk_hbox_new(FALSE, 0);
+  GtkWidget* tools_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   gtk_box_pack_start(GTK_BOX(tools_box), GTK_WIDGET(tools), FALSE, FALSE, 0);
-  //  gtk_box_pack_start( GTK_BOX(tools_box), GTK_WIDGET(sea_timebox), FALSE,
-  //  FALSE, 0);
 
-  vbox = gtk_vbox_new(FALSE, 0);
+  vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start(GTK_BOX(vbox), GTK_WIDGET(menu_bar), FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(vbox), GTK_WIDGET(tools_box), FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(vbox), GTK_WIDGET(sea_timebox), FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(vbox), GTK_WIDGET(vpaned1), TRUE, TRUE, 0);
+  gtk_box_pack_end(GTK_BOX(vbox), GTK_WIDGET(nav_widget), FALSE, FALSE, 0);
 
   if (!(options & curve_mOptions_Embedded)) {
     gtk_container_add(GTK_CONTAINER(toplevel), vbox);
@@ -1335,8 +1162,6 @@ GeCurveGtk::GeCurveGtk(void* gc_parent_ctx, GtkWidget* parent_widget,
     gtk_widget_set_size_request(vbox, window_width, window_height);
 
   gtk_paned_set_position(GTK_PANED(vpaned1), names_height * height_scale);
-  gtk_paned_set_position(GTK_PANED(vpaned2),
-      (window_height - names_height - nav_height - 50) * height_scale);
   g_object_set(sea_timebox, "visible", FALSE, NULL);
   g_object_set(menu_new, "visible", FALSE, NULL);
   g_object_set(menu_save, "visible", FALSE, NULL);
@@ -1417,27 +1242,27 @@ void GeCurveGtk::create_minmax_dialog()
   g_signal_connect(
       minmax_save, "clicked", G_CALLBACK(activate_minmax_save), this);
 
-  GtkWidget* minmax_hbox1 = gtk_hbox_new(FALSE, 0);
+  GtkWidget* minmax_hbox1 = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   gtk_box_pack_start(GTK_BOX(minmax_hbox1), min_label, FALSE, FALSE, 15);
   gtk_box_pack_start(
       GTK_BOX(minmax_hbox1), minmax_textmin_widget, TRUE, TRUE, 30);
 
-  GtkWidget* minmax_hbox2 = gtk_hbox_new(FALSE, 0);
+  GtkWidget* minmax_hbox2 = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   gtk_box_pack_start(GTK_BOX(minmax_hbox2), max_label, FALSE, FALSE, 15);
   gtk_box_pack_start(
       GTK_BOX(minmax_hbox2), minmax_textmax_widget, TRUE, TRUE, 30);
 
-  GtkWidget* minmax_hboxbuttons = gtk_hbox_new(TRUE, 40);
-  gtk_box_pack_start(GTK_BOX(minmax_hboxbuttons), minmax_ok, FALSE, FALSE, 0);
+  GtkWidget* minmax_hboxbuttons = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 40);
+  gtk_box_pack_start(GTK_BOX(minmax_hboxbuttons), minmax_ok, FALSE, FALSE, 20);
   gtk_box_pack_start(
-      GTK_BOX(minmax_hboxbuttons), minmax_cancel, FALSE, FALSE, 0);
-  gtk_box_pack_end(GTK_BOX(minmax_hboxbuttons), minmax_save, FALSE, FALSE, 0);
+      GTK_BOX(minmax_hboxbuttons), minmax_cancel, FALSE, FALSE, 20);
+  gtk_box_pack_end(GTK_BOX(minmax_hboxbuttons), minmax_save, FALSE, FALSE, 20);
 
-  GtkWidget* minmax_vbox = gtk_vbox_new(FALSE, 0);
+  GtkWidget* minmax_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start(GTK_BOX(minmax_vbox), minmax_hbox1, FALSE, FALSE, 15);
   gtk_box_pack_start(GTK_BOX(minmax_vbox), minmax_hbox2, TRUE, TRUE, 15);
   gtk_box_pack_start(
-      GTK_BOX(minmax_vbox), gtk_hseparator_new(), FALSE, FALSE, 0);
+      GTK_BOX(minmax_vbox), gtk_separator_new(GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 0);
   gtk_box_pack_end(GTK_BOX(minmax_vbox), minmax_hboxbuttons, FALSE, FALSE, 15);
   gtk_container_add(GTK_CONTAINER(minmax_widget), minmax_vbox);
 
@@ -1468,13 +1293,22 @@ void GeCurveGtk::create_export_dialog()
 
   GtkWidget* attr_label = gtk_label_new(CoWowGtk::translate_utf8("Attribute"));
   gtk_widget_set_size_request(attr_label, 90, -1);
-  export_attrcombo_widget = gtk_combo_box_new_text();
-  gtk_combo_box_append_text(GTK_COMBO_BOX(export_attrcombo_widget),
+
+  GtkTreeIter iter;
+  GtkListStore *liststore;
+
+  liststore = gtk_list_store_new(1, G_TYPE_STRING);
+  gtk_list_store_insert_with_values(liststore, &iter, 0, 0,
       CoWowGtk::translate_utf8("All Attributes"));
   for (int i = 0; i < cd->cols; i++) {
-    gtk_combo_box_append_text(GTK_COMBO_BOX(export_attrcombo_widget),
+    gtk_list_store_insert_with_values(liststore, &iter, i+1, 0,
         CoWowGtk::convert_utf8(cd->y_name[i]));
   }
+  export_attrcombo_widget = gtk_combo_box_new_with_model(GTK_TREE_MODEL(liststore));
+  GtkCellRenderer *combocell = gtk_cell_renderer_text_new();
+  gtk_cell_layout_pack_start(GTK_CELL_LAYOUT(export_attrcombo_widget), combocell, TRUE);
+  gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(export_attrcombo_widget), combocell,
+      "text", 0, NULL);
   gtk_combo_box_set_active(GTK_COMBO_BOX(export_attrcombo_widget), 0);
 
   GtkWidget* fromtime_label = NULL;
@@ -1517,12 +1351,12 @@ void GeCurveGtk::create_export_dialog()
   g_signal_connect(
       export_cancel, "clicked", G_CALLBACK(activate_export_cancel), this);
 
-  GtkWidget* export_hbox1 = gtk_hbox_new(FALSE, 0);
+  GtkWidget* export_hbox1 = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   gtk_box_pack_start(GTK_BOX(export_hbox1), attr_label, FALSE, FALSE, 15);
   gtk_box_pack_start(
       GTK_BOX(export_hbox1), export_attrcombo_widget, TRUE, TRUE, 30);
 
-  GtkWidget* export_hbox2 = gtk_hbox_new(FALSE, 0);
+  GtkWidget* export_hbox2 = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   if (layout_mask & curve_mEnable_ExportTime) {
     gtk_box_pack_start(GTK_BOX(export_hbox2), fromtime_label, FALSE, FALSE, 15);
     gtk_box_pack_start(
@@ -1532,30 +1366,30 @@ void GeCurveGtk::create_export_dialog()
         GTK_BOX(export_hbox2), export_totime_widget, FALSE, FALSE, 30);
   }
 
-  GtkWidget* export_hbox4 = gtk_hbox_new(FALSE, 0);
+  GtkWidget* export_hbox4 = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   if (layout_mask & curve_mEnable_ExportTime) {
     gtk_box_pack_start(GTK_BOX(export_hbox4), rows_label, FALSE, FALSE, 15);
     gtk_box_pack_start(
         GTK_BOX(export_hbox4), export_rows_widget, FALSE, FALSE, 30);
   }
 
-  GtkWidget* export_hbox5 = gtk_hbox_new(FALSE, 0);
+  GtkWidget* export_hbox5 = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   gtk_box_pack_start(GTK_BOX(export_hbox5), filename_label, FALSE, FALSE, 15);
   gtk_box_pack_start(
       GTK_BOX(export_hbox5), export_filename_widget, TRUE, TRUE, 30);
   gtk_box_pack_end(GTK_BOX(export_hbox5), export_browse, FALSE, FALSE, 10);
 
-  GtkWidget* export_hboxbuttons = gtk_hbox_new(TRUE, 40);
+  GtkWidget* export_hboxbuttons = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 40);
   gtk_box_pack_start(GTK_BOX(export_hboxbuttons), export_ok, FALSE, FALSE, 0);
   gtk_box_pack_end(GTK_BOX(export_hboxbuttons), export_cancel, FALSE, FALSE, 0);
 
-  GtkWidget* export_vbox = gtk_vbox_new(FALSE, 0);
+  GtkWidget* export_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start(GTK_BOX(export_vbox), export_hbox1, FALSE, FALSE, 15);
   gtk_box_pack_start(GTK_BOX(export_vbox), export_hbox2, FALSE, FALSE, 15);
   gtk_box_pack_start(GTK_BOX(export_vbox), export_hbox4, TRUE, TRUE, 15);
   gtk_box_pack_start(GTK_BOX(export_vbox), export_hbox5, TRUE, TRUE, 15);
   gtk_box_pack_start(
-      GTK_BOX(export_vbox), gtk_hseparator_new(), FALSE, FALSE, 0);
+      GTK_BOX(export_vbox), gtk_separator_new(GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 0);
   gtk_box_pack_end(GTK_BOX(export_vbox), export_hboxbuttons, FALSE, FALSE, 15);
   gtk_container_add(GTK_CONTAINER(export_widget), export_vbox);
 

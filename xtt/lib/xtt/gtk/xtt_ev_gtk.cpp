@@ -46,6 +46,7 @@
 #include "rt_xnav_msg.h"
 
 #include "cow_wow_gtk.h"
+#include "cow_wutl_gtk.h"
 
 #include "xtt_ev_gtk.h"
 #include "xtt_evala_gtk.h"
@@ -96,7 +97,6 @@ EvGtk::EvGtk(void* ev_parent_ctx, GtkWidget* ev_parent_wid, char* eve_name,
 {
   pwr_tStatus sts;
   pwr_sClass_OpPlace* opp;
-  pwr_tFileName fname;
   const int eve_width = 700;
   const int eve_height = 600;
   const int ala_width = 700;
@@ -138,7 +138,7 @@ EvGtk::EvGtk(void* ev_parent_ctx, GtkWidget* ev_parent_wid, char* eve_name,
 
     CoWowGtk::SetWindowIcon(parent_wid_eve);
 
-    GtkWidget* eve_vbox = gtk_vbox_new(FALSE, 0);
+    GtkWidget* eve_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 
     // Menu
     // Accelerators
@@ -149,27 +149,23 @@ EvGtk::EvGtk(void* ev_parent_ctx, GtkWidget* ev_parent_wid, char* eve_name,
     GtkMenuBar* menu_bar = (GtkMenuBar*)g_object_new(GTK_TYPE_MENU_BAR, NULL);
 
     // File entry
-    GtkWidget* file_print = gtk_image_menu_item_new_with_mnemonic(
+    GtkWidget* file_print = gtk_menu_item_new_with_mnemonic(
         CoWowGtk::translate_utf8("_Print"));
-    gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(file_print),
-        gtk_image_new_from_stock("gtk-print", GTK_ICON_SIZE_MENU));
     g_signal_connect(
         file_print, "activate", G_CALLBACK(eve_activate_print), this);
 
-    GtkWidget* file_export = gtk_image_menu_item_new_with_mnemonic(
+    GtkWidget* file_export = gtk_menu_item_new_with_mnemonic(
         CoWowGtk::translate_utf8("_Export"));
     g_signal_connect(
         file_export, "activate", G_CALLBACK(eve_activate_export), this);
 
-    GtkWidget* file_analyse = gtk_image_menu_item_new_with_mnemonic(
+    GtkWidget* file_analyse = gtk_menu_item_new_with_mnemonic(
         CoWowGtk::translate_utf8("Open _Analyser"));
     g_signal_connect(
         file_analyse, "activate", G_CALLBACK(eve_activate_analyse), this);
 
-    GtkWidget* file_close = gtk_image_menu_item_new_with_mnemonic(
+    GtkWidget* file_close = gtk_menu_item_new_with_mnemonic(
         CoWowGtk::translate_utf8("_Close"));
-    gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(file_close),
-        gtk_image_new_from_stock("gtk-close", GTK_ICON_SIZE_MENU));
     g_signal_connect(
         file_close, "activate", G_CALLBACK(eve_activate_exit), this);
     gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w',
@@ -219,28 +215,22 @@ EvGtk::EvGtk(void* ev_parent_ctx, GtkWidget* ev_parent_wid, char* eve_name,
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(functions), GTK_WIDGET(func_menu));
 
     // View entry
-    GtkWidget* view_zoom_in = gtk_image_menu_item_new_with_mnemonic(
+    GtkWidget* view_zoom_in = gtk_menu_item_new_with_mnemonic(
         CoWowGtk::translate_utf8("Zoom _In"));
-    gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(view_zoom_in),
-        gtk_image_new_from_stock("gtk-zoom-in", GTK_ICON_SIZE_MENU));
     g_signal_connect(
         view_zoom_in, "activate", G_CALLBACK(eve_activate_zoom_in), this);
     gtk_widget_add_accelerator(view_zoom_in, "activate", accel_g, 'i',
         GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
 
-    GtkWidget* view_zoom_out = gtk_image_menu_item_new_with_mnemonic(
+    GtkWidget* view_zoom_out = gtk_menu_item_new_with_mnemonic(
         CoWowGtk::translate_utf8("Zoom _Out"));
-    gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(view_zoom_out),
-        gtk_image_new_from_stock("gtk-zoom-out", GTK_ICON_SIZE_MENU));
     g_signal_connect(
         view_zoom_out, "activate", G_CALLBACK(eve_activate_zoom_out), this);
     gtk_widget_add_accelerator(view_zoom_out, "activate", accel_g, 'o',
         GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
 
-    GtkWidget* view_zoom_reset = gtk_image_menu_item_new_with_mnemonic(
+    GtkWidget* view_zoom_reset = gtk_menu_item_new_with_mnemonic(
         CoWowGtk::translate_utf8("Zoom _Reset"));
-    gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(view_zoom_reset),
-        gtk_image_new_from_stock("gtk-zoom-100", GTK_ICON_SIZE_MENU));
     g_signal_connect(
         view_zoom_reset, "activate", G_CALLBACK(eve_activate_zoom_reset), this);
     gtk_widget_add_accelerator(view_zoom_reset, "activate", accel_g, 'b',
@@ -275,10 +265,8 @@ EvGtk::EvGtk(void* ev_parent_ctx, GtkWidget* ev_parent_wid, char* eve_name,
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(view), GTK_WIDGET(view_menu));
 
     // Help entry
-    GtkWidget* help_help = gtk_image_menu_item_new_with_mnemonic(
+    GtkWidget* help_help = gtk_menu_item_new_with_mnemonic(
         CoWowGtk::translate_utf8("_Help"));
-    gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(help_help),
-        gtk_image_new_from_stock("gtk-help", GTK_ICON_SIZE_MENU));
     g_signal_connect(
         help_help, "activate", G_CALLBACK(eve_activate_help), this);
     gtk_widget_add_accelerator(help_help, "activate", accel_g, 'h',
@@ -311,35 +299,14 @@ EvGtk::EvGtk(void* ev_parent_ctx, GtkWidget* ev_parent_wid, char* eve_name,
     // Toolbar
     GtkToolbar* tools = (GtkToolbar*)g_object_new(GTK_TYPE_TOOLBAR, NULL);
 
-    GtkWidget* tools_zoom_in = gtk_button_new();
-    dcli_translate_filename(fname, "$pwr_exe/xtt_zoom_in.png");
-    gtk_container_add(
-        GTK_CONTAINER(tools_zoom_in), gtk_image_new_from_file(fname));
-    g_signal_connect(
-        tools_zoom_in, "clicked", G_CALLBACK(eve_activate_zoom_in), this);
-    g_object_set(tools_zoom_in, "can-focus", FALSE, NULL);
-    gtk_toolbar_append_widget(
-        tools, tools_zoom_in, CoWowGtk::translate_utf8("Zoom in"), "");
+    wutl_tools_item(tools, "$pwr_exe/xtt_zoom_in.png", G_CALLBACK(eve_activate_zoom_in),
+		  "Zoom in", this);
 
-    GtkWidget* tools_zoom_out = gtk_button_new();
-    dcli_translate_filename(fname, "$pwr_exe/xtt_zoom_out.png");
-    gtk_container_add(
-        GTK_CONTAINER(tools_zoom_out), gtk_image_new_from_file(fname));
-    g_signal_connect(
-        tools_zoom_out, "clicked", G_CALLBACK(eve_activate_zoom_out), this);
-    g_object_set(tools_zoom_out, "can-focus", FALSE, NULL);
-    gtk_toolbar_append_widget(
-        tools, tools_zoom_out, CoWowGtk::translate_utf8("Zoom out"), "");
+    wutl_tools_item(tools, "$pwr_exe/xtt_zoom_out.png", G_CALLBACK(eve_activate_zoom_out),
+		  "Zoom out", this);
 
-    GtkWidget* tools_zoom_reset = gtk_button_new();
-    dcli_translate_filename(fname, "$pwr_exe/xtt_zoom_reset.png");
-    gtk_container_add(
-        GTK_CONTAINER(tools_zoom_reset), gtk_image_new_from_file(fname));
-    g_signal_connect(
-        tools_zoom_reset, "clicked", G_CALLBACK(eve_activate_zoom_reset), this);
-    g_object_set(tools_zoom_reset, "can-focus", FALSE, NULL);
-    gtk_toolbar_append_widget(
-        tools, tools_zoom_reset, CoWowGtk::translate_utf8("Zoom reset"), "");
+    wutl_tools_item(tools, "$pwr_exe/xtt_zoom_reset.png", G_CALLBACK(eve_activate_zoom_reset),
+		  "Zoom reset", this);
 
     eve_methodtoolbar = new XttMethodToolbarGtk(
         0, 0, ~pwr_mXttOpMethodsMask_ParentObjectGraph, ~0, "");
@@ -358,7 +325,7 @@ EvGtk::EvGtk(void* ev_parent_ctx, GtkWidget* ev_parent_wid, char* eve_name,
     eve_sup_methodtoolbar->m_parent_ctx = eve;
     eve_sup_methodtoolbar->get_select_cb = eve->get_select_supobject;
 
-    GtkWidget* eve_toolsbox = gtk_hbox_new(FALSE, 0);
+    GtkWidget* eve_toolsbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
     gtk_box_pack_start(
         GTK_BOX(eve_toolsbox), GTK_WIDGET(tools), FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(eve_toolsbox),
@@ -397,7 +364,7 @@ EvGtk::EvGtk(void* ev_parent_ctx, GtkWidget* ev_parent_wid, char* eve_name,
 
     CoWowGtk::SetWindowIcon(parent_wid_ala);
 
-    GtkWidget* ala_vbox = gtk_vbox_new(FALSE, 0);
+    GtkWidget* ala_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 
     // Menu
     // Accelerators
@@ -408,17 +375,13 @@ EvGtk::EvGtk(void* ev_parent_ctx, GtkWidget* ev_parent_wid, char* eve_name,
     GtkMenuBar* menu_bar = (GtkMenuBar*)g_object_new(GTK_TYPE_MENU_BAR, NULL);
 
     // File entry
-    GtkWidget* file_print = gtk_image_menu_item_new_with_mnemonic(
+    GtkWidget* file_print = gtk_menu_item_new_with_mnemonic(
         CoWowGtk::translate_utf8("_Print"));
-    gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(file_print),
-        gtk_image_new_from_stock("gtk-print", GTK_ICON_SIZE_MENU));
     g_signal_connect(
         file_print, "activate", G_CALLBACK(ala_activate_print), this);
 
-    GtkWidget* file_close = gtk_image_menu_item_new_with_mnemonic(
+    GtkWidget* file_close = gtk_menu_item_new_with_mnemonic(
         CoWowGtk::translate_utf8("_Close"));
-    gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(file_close),
-        gtk_image_new_from_stock("gtk-close", GTK_ICON_SIZE_MENU));
     g_signal_connect(
         file_close, "activate", G_CALLBACK(ala_activate_exit), this);
     gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w',
@@ -472,35 +435,29 @@ EvGtk::EvGtk(void* ev_parent_ctx, GtkWidget* ev_parent_wid, char* eve_name,
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(functions), GTK_WIDGET(func_menu));
 
     // View entry
-    GtkWidget* view_shift_view = gtk_image_menu_item_new_with_mnemonic(
+    GtkWidget* view_shift_view = gtk_menu_item_new_with_mnemonic(
         CoWowGtk::translate_utf8("S_hift View"));
     g_signal_connect(
         view_shift_view, "activate", G_CALLBACK(ala_activate_shift_view), this);
     gtk_widget_add_accelerator(view_shift_view, "activate", accel_g, 'n',
         GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
 
-    GtkWidget* view_zoom_in = gtk_image_menu_item_new_with_mnemonic(
+    GtkWidget* view_zoom_in = gtk_menu_item_new_with_mnemonic(
         CoWowGtk::translate_utf8("Zoom _In"));
-    gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(view_zoom_in),
-        gtk_image_new_from_stock("gtk-zoom-in", GTK_ICON_SIZE_MENU));
     g_signal_connect(
         view_zoom_in, "activate", G_CALLBACK(ala_activate_zoom_in), this);
     gtk_widget_add_accelerator(view_zoom_in, "activate", accel_g, 'i',
         GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
 
-    GtkWidget* view_zoom_out = gtk_image_menu_item_new_with_mnemonic(
+    GtkWidget* view_zoom_out = gtk_menu_item_new_with_mnemonic(
         CoWowGtk::translate_utf8("Zoom _Out"));
-    gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(view_zoom_out),
-        gtk_image_new_from_stock("gtk-zoom-out", GTK_ICON_SIZE_MENU));
     g_signal_connect(
         view_zoom_out, "activate", G_CALLBACK(ala_activate_zoom_out), this);
     gtk_widget_add_accelerator(view_zoom_out, "activate", accel_g, 'o',
         GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
 
-    GtkWidget* view_zoom_reset = gtk_image_menu_item_new_with_mnemonic(
+    GtkWidget* view_zoom_reset = gtk_menu_item_new_with_mnemonic(
         CoWowGtk::translate_utf8("Zoom _Reset"));
-    gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(view_zoom_reset),
-        gtk_image_new_from_stock("gtk-zoom-100", GTK_ICON_SIZE_MENU));
     g_signal_connect(
         view_zoom_reset, "activate", G_CALLBACK(ala_activate_zoom_reset), this);
     gtk_widget_add_accelerator(view_zoom_reset, "activate", accel_g, 'b',
@@ -668,10 +625,8 @@ EvGtk::EvGtk(void* ev_parent_ctx, GtkWidget* ev_parent_wid, char* eve_name,
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(view), GTK_WIDGET(view_menu));
 
     // Help entry
-    GtkWidget* help_help = gtk_image_menu_item_new_with_mnemonic(
+    GtkWidget* help_help = gtk_menu_item_new_with_mnemonic(
         CoWowGtk::translate_utf8("_Help"));
-    gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(help_help),
-        gtk_image_new_from_stock("gtk-help", GTK_ICON_SIZE_MENU));
     g_signal_connect(
         help_help, "activate", G_CALLBACK(ala_activate_help), this);
     gtk_widget_add_accelerator(help_help, "activate", accel_g, 'h',
@@ -705,44 +660,17 @@ EvGtk::EvGtk(void* ev_parent_ctx, GtkWidget* ev_parent_wid, char* eve_name,
     // Toolbar
     GtkToolbar* tools = (GtkToolbar*)g_object_new(GTK_TYPE_TOOLBAR, NULL);
 
-    GtkWidget* tools_ack = gtk_button_new();
-    dcli_translate_filename(fname, "$pwr_exe/xtt_acknowledge.png");
-    gtk_container_add(GTK_CONTAINER(tools_ack), gtk_image_new_from_file(fname));
-    g_signal_connect(
-        tools_ack, "clicked", G_CALLBACK(ala_activate_ack_last), this);
-    g_object_set(tools_ack, "can-focus", FALSE, NULL);
-    gtk_toolbar_append_widget(
-        tools, tools_ack, CoWowGtk::translate_utf8("Acknowledge"), "");
+    wutl_tools_item(tools, "$pwr_exe/xtt_acknowledge.png", G_CALLBACK(ala_activate_ack_last),
+		  "Acknowledge", this);
 
-    GtkWidget* tools_zoom_in = gtk_button_new();
-    dcli_translate_filename(fname, "$pwr_exe/xtt_zoom_in.png");
-    gtk_container_add(
-        GTK_CONTAINER(tools_zoom_in), gtk_image_new_from_file(fname));
-    g_signal_connect(
-        tools_zoom_in, "clicked", G_CALLBACK(ala_activate_zoom_in), this);
-    g_object_set(tools_zoom_in, "can-focus", FALSE, NULL);
-    gtk_toolbar_append_widget(
-        tools, tools_zoom_in, CoWowGtk::translate_utf8("Zoom in"), "");
+    wutl_tools_item(tools, "$pwr_exe/xtt_zoom_in.png", G_CALLBACK(ala_activate_zoom_in),
+		  "Zoom in", this);
 
-    GtkWidget* tools_zoom_out = gtk_button_new();
-    dcli_translate_filename(fname, "$pwr_exe/xtt_zoom_out.png");
-    gtk_container_add(
-        GTK_CONTAINER(tools_zoom_out), gtk_image_new_from_file(fname));
-    g_signal_connect(
-        tools_zoom_out, "clicked", G_CALLBACK(ala_activate_zoom_out), this);
-    g_object_set(tools_zoom_out, "can-focus", FALSE, NULL);
-    gtk_toolbar_append_widget(
-        tools, tools_zoom_out, CoWowGtk::translate_utf8("Zoom out"), "");
+    wutl_tools_item(tools, "$pwr_exe/xtt_zoom_out.png", G_CALLBACK(ala_activate_zoom_out),
+		  "Zoom out", this);
 
-    GtkWidget* tools_zoom_reset = gtk_button_new();
-    dcli_translate_filename(fname, "$pwr_exe/xtt_zoom_reset.png");
-    gtk_container_add(
-        GTK_CONTAINER(tools_zoom_reset), gtk_image_new_from_file(fname));
-    g_signal_connect(
-        tools_zoom_reset, "clicked", G_CALLBACK(ala_activate_zoom_reset), this);
-    g_object_set(tools_zoom_reset, "can-focus", FALSE, NULL);
-    gtk_toolbar_append_widget(
-        tools, tools_zoom_reset, CoWowGtk::translate_utf8("Zoom reset"), "");
+    wutl_tools_item(tools, "$pwr_exe/xtt_zoom_reset.png", G_CALLBACK(ala_activate_zoom_reset),
+		  "Zoom reset", this);
 
     ala_methodtoolbar = new XttMethodToolbarGtk(
         0, 0, ~pwr_mXttOpMethodsMask_ParentObjectGraph, ~0, "");
@@ -762,7 +690,7 @@ EvGtk::EvGtk(void* ev_parent_ctx, GtkWidget* ev_parent_wid, char* eve_name,
     ala_sup_methodtoolbar->m_parent_ctx = ala;
     ala_sup_methodtoolbar->get_select_cb = ala->get_select_supobject;
 
-    GtkWidget* ala_toolsbox = gtk_hbox_new(FALSE, 0);
+    GtkWidget* ala_toolsbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
     gtk_box_pack_start(
         GTK_BOX(ala_toolsbox), GTK_WIDGET(tools), FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(ala_toolsbox),
@@ -803,7 +731,7 @@ EvGtk::EvGtk(void* ev_parent_ctx, GtkWidget* ev_parent_wid, char* eve_name,
 
     CoWowGtk::SetWindowIcon(parent_wid_blk);
 
-    GtkWidget* blk_vbox = gtk_vbox_new(FALSE, 0);
+    GtkWidget* blk_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 
     // Menu
     // Accelerators
@@ -814,17 +742,13 @@ EvGtk::EvGtk(void* ev_parent_ctx, GtkWidget* ev_parent_wid, char* eve_name,
     GtkMenuBar* menu_bar = (GtkMenuBar*)g_object_new(GTK_TYPE_MENU_BAR, NULL);
 
     // File entry
-    GtkWidget* file_print = gtk_image_menu_item_new_with_mnemonic(
+    GtkWidget* file_print = gtk_menu_item_new_with_mnemonic(
         CoWowGtk::translate_utf8("_Print"));
-    gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(file_print),
-        gtk_image_new_from_stock("gtk-print", GTK_ICON_SIZE_MENU));
     g_signal_connect(
         file_print, "activate", G_CALLBACK(blk_activate_print), this);
 
-    GtkWidget* file_close = gtk_image_menu_item_new_with_mnemonic(
+    GtkWidget* file_close = gtk_menu_item_new_with_mnemonic(
         CoWowGtk::translate_utf8("_Close"));
-    gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(file_close),
-        gtk_image_new_from_stock("gtk-close", GTK_ICON_SIZE_MENU));
     g_signal_connect(
         file_close, "activate", G_CALLBACK(blk_activate_exit), this);
     gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w',
@@ -870,28 +794,22 @@ EvGtk::EvGtk(void* ev_parent_ctx, GtkWidget* ev_parent_wid, char* eve_name,
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(functions), GTK_WIDGET(func_menu));
 
     // View entry
-    GtkWidget* view_zoom_in = gtk_image_menu_item_new_with_mnemonic(
+    GtkWidget* view_zoom_in = gtk_menu_item_new_with_mnemonic(
         CoWowGtk::translate_utf8("Zoom _In"));
-    gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(view_zoom_in),
-        gtk_image_new_from_stock("gtk-zoom-in", GTK_ICON_SIZE_MENU));
     g_signal_connect(
         view_zoom_in, "activate", G_CALLBACK(blk_activate_zoom_in), this);
     gtk_widget_add_accelerator(view_zoom_in, "activate", accel_g, 'i',
         GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
 
-    GtkWidget* view_zoom_out = gtk_image_menu_item_new_with_mnemonic(
+    GtkWidget* view_zoom_out = gtk_menu_item_new_with_mnemonic(
         CoWowGtk::translate_utf8("Zoom _Out"));
-    gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(view_zoom_out),
-        gtk_image_new_from_stock("gtk-zoom-out", GTK_ICON_SIZE_MENU));
     g_signal_connect(
         view_zoom_out, "activate", G_CALLBACK(blk_activate_zoom_out), this);
     gtk_widget_add_accelerator(view_zoom_out, "activate", accel_g, 'o',
         GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
 
-    GtkWidget* view_zoom_reset = gtk_image_menu_item_new_with_mnemonic(
+    GtkWidget* view_zoom_reset = gtk_menu_item_new_with_mnemonic(
         CoWowGtk::translate_utf8("Zoom _Reset"));
-    gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(view_zoom_reset),
-        gtk_image_new_from_stock("gtk-zoom-100", GTK_ICON_SIZE_MENU));
     g_signal_connect(
         view_zoom_reset, "activate", G_CALLBACK(blk_activate_zoom_reset), this);
     gtk_widget_add_accelerator(view_zoom_reset, "activate", accel_g, 'b',
@@ -908,10 +826,8 @@ EvGtk::EvGtk(void* ev_parent_ctx, GtkWidget* ev_parent_wid, char* eve_name,
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(view), GTK_WIDGET(view_menu));
 
     // Help entry
-    GtkWidget* help_help = gtk_image_menu_item_new_with_mnemonic(
+    GtkWidget* help_help = gtk_menu_item_new_with_mnemonic(
         CoWowGtk::translate_utf8("_Help"));
-    gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(help_help),
-        gtk_image_new_from_stock("gtk-help", GTK_ICON_SIZE_MENU));
     g_signal_connect(
         help_help, "activate", G_CALLBACK(blk_activate_help), this);
     gtk_widget_add_accelerator(help_help, "activate", accel_g, 'h',

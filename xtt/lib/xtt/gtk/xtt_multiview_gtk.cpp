@@ -272,7 +272,7 @@ XttMultiViewGtk::XttMultiViewGtk(GtkWidget* mv_parent_wid, void* mv_parent_ctx,
     CoWowGtk::SetWindowIcon(toplevel);
   } else {
     toplevel = parent_wid;
-    box_widget = gtk_hbox_new(FALSE, 0);
+    box_widget = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   }
 
   if (mv.Layout == pwr_eMultiViewLayoutEnum_Fix) {
@@ -286,16 +286,16 @@ XttMultiViewGtk::XttMultiViewGtk(GtkWidget* mv_parent_wid, void* mv_parent_ctx,
 
     switch (mv.Layout) {
     case pwr_eMultiViewLayoutEnum_Box:
-      col_widget = gtk_hbox_new(FALSE, 0);
+      col_widget = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
       break;
     case pwr_eMultiViewLayoutEnum_Fix:
       col_widget = gtk_fixed_new();
       break;
     case pwr_eMultiViewLayoutEnum_Pane:
-      col_widget = gtk_hpaned_new();
+      col_widget = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
       break;
     case pwr_eMultiViewLayoutEnum_Table:
-      col_widget = gtk_table_new(rows, cols, FALSE);
+      col_widget = gtk_grid_new();
       break;
     default:
       return;
@@ -310,13 +310,13 @@ XttMultiViewGtk::XttMultiViewGtk(GtkWidget* mv_parent_wid, void* mv_parent_ctx,
 
       switch (mv.Layout) {
       case pwr_eMultiViewLayoutEnum_Box:
-        row_widget = gtk_vbox_new(FALSE, 0);
+        row_widget = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
         break;
       case pwr_eMultiViewLayoutEnum_Fix:
       case pwr_eMultiViewLayoutEnum_Table:
         break;
       case pwr_eMultiViewLayoutEnum_Pane:
-        row_widget = gtk_vpaned_new();
+        row_widget = gtk_paned_new(GTK_ORIENTATION_VERTICAL);
         break;
       default:;
       }
@@ -816,7 +816,7 @@ XttMultiViewGtk::XttMultiViewGtk(GtkWidget* mv_parent_wid, void* mv_parent_ctx,
 
         if (mv.Action[i * rows + j].Options
             & pwr_mMultiViewElemOptionsMask_Exchangeable) {
-          exchange_widget[i * rows + j] = gtk_hbox_new(FALSE, 0);
+          exchange_widget[i * rows + j] = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
           if (comp_widget[i * rows + j])
             gtk_box_pack_start(GTK_BOX(exchange_widget[i * rows + j]),
                 GTK_WIDGET(comp_widget[i * rows + j]), TRUE, TRUE, 0);
@@ -841,9 +841,8 @@ XttMultiViewGtk::XttMultiViewGtk(GtkWidget* mv_parent_wid, void* mv_parent_ctx,
                   GTK_WIDGET(exchange_widget[i * rows + j]), TRUE, TRUE);
             break;
           case pwr_eMultiViewLayoutEnum_Table:
-            gtk_table_attach(GTK_TABLE(col_widget),
-                GTK_WIDGET(exchange_widget[i * rows + j]), j, j + 1, i, i + 1,
-                GTK_FILL, GTK_FILL, 0, 0);
+            gtk_grid_attach(GTK_GRID(col_widget),
+                GTK_WIDGET(exchange_widget[i * rows + j]), j, i, 1, 1);
             break;
           default:;
           }
@@ -871,9 +870,8 @@ XttMultiViewGtk::XttMultiViewGtk(GtkWidget* mv_parent_wid, void* mv_parent_ctx,
                     GTK_WIDGET(comp_widget[i * rows + j]), TRUE, TRUE);
               break;
             case pwr_eMultiViewLayoutEnum_Table:
-              gtk_table_attach(GTK_TABLE(col_widget),
-                  GTK_WIDGET(comp_widget[i * rows + j]), j, j + 1, i, i + 1,
-                  GTK_FILL, GTK_FILL, 0, 0);
+              gtk_grid_attach(GTK_GRID(col_widget),
+                  GTK_WIDGET(comp_widget[i * rows + j]), j, i, 1, 1);
             default:;
             }
           }
@@ -882,7 +880,7 @@ XttMultiViewGtk::XttMultiViewGtk(GtkWidget* mv_parent_wid, void* mv_parent_ctx,
             && ((j + 1) % rows != 0
                    && mv.Options & pwr_mMultiViewOptionsMask_RowSeparators))
           gtk_box_pack_start(GTK_BOX(row_widget),
-              GTK_WIDGET(gtk_hseparator_new()), FALSE, FALSE, 0);
+              GTK_WIDGET(gtk_separator_new(GTK_ORIENTATION_HORIZONTAL)), FALSE, FALSE, 0);
       }
 
       switch (mv.Layout) {
@@ -907,7 +905,7 @@ XttMultiViewGtk::XttMultiViewGtk(GtkWidget* mv_parent_wid, void* mv_parent_ctx,
           && (i != cols - 1
                  && mv.Options & pwr_mMultiViewOptionsMask_ColumnSeparators))
         gtk_box_pack_start(GTK_BOX(col_widget),
-            GTK_WIDGET(gtk_vseparator_new()), FALSE, FALSE, 0);
+            GTK_WIDGET(gtk_separator_new(GTK_ORIENTATION_VERTICAL)), FALSE, FALSE, 0);
 
       if (escape)
         break;

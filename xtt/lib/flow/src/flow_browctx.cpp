@@ -86,6 +86,7 @@ void BrowCtx::configure(double y_redraw)
   a.configure();
   get_borders();
   frame_x_right = MAX(x_right, 1.0 * (window_width + offset_x) / zoom_factor);
+  a.get_borders();
   a.zoom();
   redraw(y_redraw);
   change_scrollbar();
@@ -123,12 +124,8 @@ void BrowCtx::redraw(double y_redraw)
   fdraw->get_window_size(this, &window_width, &window_height);
 
   if (y_redraw) {
-    fdraw->clear_area(this, 0, window_width,
-        int(y_redraw * zoom_factor - offset_y), window_height);
-    draw(
-        0, int(y_redraw * zoom_factor - offset_y), window_width, window_height);
+    draw(0, int(y_redraw * zoom_factor - offset_y), window_width, window_height);
   } else {
-    clear();
     draw(0, 0, window_width, window_height);
   }
   nav_zoom();
@@ -153,7 +150,6 @@ void BrowCtx::zoom(double factor)
   if ((y_high - y_low) * zoom_factor <= window_height)
     offset_y = 0;
   a.zoom();
-  clear();
   draw(0, 0, window_width, window_height);
   nav_zoom();
   a_nc.zoom(); // Zoom inactive nodeclasses
@@ -410,7 +406,13 @@ void BrowCtx::zoom_absolute(double factor)
 
   zoom_factor = factor;
   a.zoom();
-  clear();
   draw(0, 0, window_width, window_height);
   nav_zoom();
 }
+
+void BrowCtx::update_color_theme(int ct)
+{
+  fdraw->update_color_theme(ct);
+  redraw(0);
+}
+

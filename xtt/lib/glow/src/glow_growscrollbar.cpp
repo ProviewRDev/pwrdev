@@ -51,15 +51,14 @@ GrowScrollBar::GrowScrollBar(GrowCtx* glow_ctx, const char* name, double x,
       callback_userdata(0), value_changed_cb(0), bar_color(bar_d_type)
 {
   if (!nodraw)
-    draw(&ctx->mw, (GlowTransform*)NULL, highlight, hot, NULL, NULL);
+    draw();
 }
 
 GrowScrollBar::~GrowScrollBar()
 {
   if (ctx->nodraw)
     return;
-  erase(&ctx->mw);
-  erase(&ctx->navw);
+  draw();
 }
 
 void GrowScrollBar::save(std::ofstream& fp, glow_eSaveMode mode)
@@ -74,6 +73,20 @@ void GrowScrollBar::set_highlight(int on)
 {
   highlight = on;
   draw();
+}
+
+void GrowScrollBar::draw()
+{
+  ctx->draw(&ctx->mw,
+      x_left * ctx->mw.zoom_factor_x - ctx->mw.offset_x - DRAW_MP,
+      y_low * ctx->mw.zoom_factor_y - ctx->mw.offset_y - DRAW_MP,
+      x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x + DRAW_MP,
+      y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y + DRAW_MP);
+  ctx->draw(&ctx->navw,
+      x_left * ctx->navw.zoom_factor_x - ctx->navw.offset_x - 1,
+      y_low * ctx->navw.zoom_factor_y - ctx->navw.offset_y - 1,
+      x_right * ctx->navw.zoom_factor_x - ctx->navw.offset_x + 1,
+      y_high * ctx->navw.zoom_factor_y - ctx->navw.offset_y + 1);
 }
 
 void GrowScrollBar::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
@@ -179,47 +192,6 @@ void GrowScrollBar::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
   ctx->gdraw->rect(w, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, bdrawtype, idx, 0);
 }
 
-void GrowScrollBar::erase(GlowWind* w, GlowTransform* t, int hot, void* node)
-{
-  if (!(display_level & ctx->display_level))
-    return;
-  if (w == &ctx->navw) {
-    if (ctx->no_nav)
-      return;
-    hot = 0;
-  }
-  int idx;
-
-  idx = int(w->zoom_factor_y / w->base_zoom_factor * line_width - 1);
-  idx += hot;
-
-  idx = MAX(0, idx);
-  idx = MIN(idx, DRAW_TYPE_SIZE - 1);
-  int x1, y1, x2, y2, ll_x, ll_y, ur_x, ur_y;
-
-  if (!t) {
-    x1 = int(trf.x(ll.x, ll.y) * w->zoom_factor_x) - w->offset_x;
-    y1 = int(trf.y(ll.x, ll.y) * w->zoom_factor_y) - w->offset_y;
-    x2 = int(trf.x(ur.x, ur.y) * w->zoom_factor_x) - w->offset_x;
-    y2 = int(trf.y(ur.x, ur.y) * w->zoom_factor_y) - w->offset_y;
-  } else {
-    x1 = int(trf.x(t, ll.x, ll.y) * w->zoom_factor_x) - w->offset_x;
-    y1 = int(trf.y(t, ll.x, ll.y) * w->zoom_factor_y) - w->offset_y;
-    x2 = int(trf.x(t, ur.x, ur.y) * w->zoom_factor_x) - w->offset_x;
-    y2 = int(trf.y(t, ur.x, ur.y) * w->zoom_factor_y) - w->offset_y;
-  }
-  ll_x = MIN(x1, x2);
-  ur_x = MAX(x1, x2);
-  ll_y = MIN(y1, y2);
-  ur_y = MAX(y1, y2);
-
-  w->set_draw_buffer_only();
-  ctx->gdraw->rect_erase(w, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, idx);
-  ctx->gdraw->fill_rect(
-      w, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, glow_eDrawType_LineErase);
-  w->reset_draw_buffer_only();
-}
-
 double GrowScrollBar::set_value(double value, double length)
 {
   bar_value = value;
@@ -230,9 +202,6 @@ double GrowScrollBar::set_value(double value, double length)
     bar_value = min_value;
   if (bar_value > max_value - bar_length)
     bar_value = max_value - bar_length;
-
-  if (!fill)
-    erase(&ctx->mw);
 
   draw();
   return bar_value;

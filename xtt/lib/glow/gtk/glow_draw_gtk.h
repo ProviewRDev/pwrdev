@@ -47,8 +47,14 @@
 
 #define DRAW_CLIP_SIZE 10
 #define CUSTOMCOLORS_STACK_SIZE 10
+#define DRAW_ERASE_STACK_SIZE 10
 
 class GlowCustomColorsGtk;
+
+typedef void* GdkGC;
+typedef void* GdkFont;
+typedef void* GdkColormap;
+typedef void *GdkPixmap;
 
 class DrawWindGtk : public DrawWind {
 public:
@@ -56,10 +62,11 @@ public:
   GtkWidget* toplevel;
   GtkWidget* shell;
   GdkWindow* window;
-  GdkColormap* colormap;
-  GdkPixmap* buffer;
-  int buffer_width;
-  int buffer_height;
+  GtkStyleContext *style_context;
+  //GdkColormap* colormap;
+  //GdkPixmap* buffer;
+  //int buffer_width;
+  //int buffer_height;
   int clip_on;
   int clip_cnt;
   GdkRectangle clip_rectangle[DRAW_CLIP_SIZE];
@@ -79,11 +86,12 @@ public:
   DrawWindGtk nav_wind;
   GdkDisplay* display;
   GdkScreen* screen;
-  GdkGC* gc;
-  GdkGC* gc_erase;
-  GdkGC* gc_inverse;
-  GdkGC* gcs[glow_eDrawType_CustomColor__][DRAW_TYPE_SIZE];
-  GdkFont* font[glow_eFont__][glow_eDrawFont__][DRAW_FONT_SIZE];
+  cairo_pattern_t* gc_black;
+  cairo_pattern_t* gc_red;
+  cairo_pattern_t* gc_erase;
+  cairo_pattern_t* gc_inverse;
+  cairo_pattern_t* gcs[glow_eDrawType_CustomColor__];
+  cairo_font_face_t *font_face[glow_eFont__][glow_eFontType__];
   GdkCursor* cursors[glow_eDrawCursor__];
   int ef;
   GdkColormap* colormap;
@@ -97,7 +105,21 @@ public:
   int closing_down;
   GlowCustomColorsGtk* customcolors[CUSTOMCOLORS_STACK_SIZE];
   int customcolors_cnt;
+  cairo_t *cairo_cr;
+  int cairo_cr_refcnt;
+  cairo_region_t *cairo_region;
+  GdkDrawingContext *cairo_context;
+  cairo_t *cairo_nav_cr;
+  int cairo_nav_cr_refcnt;
+  cairo_region_t *cairo_nav_region;
+  GdkDrawingContext *cairo_nav_context;
+  cairo_pattern_t* erase_stack[DRAW_ERASE_STACK_SIZE];
+  int erase_stack_cnt;
+  cairo_antialias_t antialias;
+  int css_background;
+  static char font_names[glow_eFont__][40];
 
+  int expose(cairo_t* cr, int is_navigator);
   int event_handler(GdkEvent event);
   virtual void enable_event(glow_eEvent event, glow_eEventType event_type,
       int (*event_cb)(GlowCtx* ctx, glow_tEvent event));
@@ -106,7 +128,12 @@ public:
 
   virtual void get_window_size(GlowWind* w, int* width, int* height);
   virtual void set_window_size(GlowWind* w, int width, int height);
+  virtual void set_anti_aliasing(int anti_aliasing);
 
+  void invalidate(GlowWind *wind, int x, int y, int width, int height);
+  cairo_t* get_cairo(GlowWind* wind, int create = 0);
+  cairo_t* get_cairo(GlowWind* wind, int x, int y, int width, int height);
+  void end_cairo(GlowWind* wind, cairo_t *cr);
   virtual int rect(GlowWind* w, int x, int y, int width, int height,
       glow_eDrawType gc_type, int idx, int highlight);
   virtual int rect_erase(
@@ -167,8 +194,7 @@ public:
   virtual void clear_area(GlowWind* w, int ll_x, int ur_x, int ll_y, int ur_y);
   virtual void set_inputfocus(GlowWind* w);
   virtual void set_background(GlowWind* w, glow_eDrawType drawtype,
-      glow_tPixmap pixmap, glow_tImImage image, int pixmap_width,
-      int pixmap_height);
+      char *image);
   virtual void reset_background(GlowWind* w);
   virtual void set_image_clip_mask(glow_tPixmap pixmap, int x, int y);
   virtual void reset_image_clip_mask();
@@ -181,9 +207,6 @@ public:
       glow_eDrawType gc_type, int idx = 0);
   virtual void set_click_sensitivity(GlowWind* w, int value);
   virtual void draw_background(GlowWind* wind, int x, int y, int w, int h);
-  virtual int create_buffer(GlowWind* w);
-  virtual void delete_buffer(GlowWind* w);
-  virtual void buffer_background(DrawWind* w, GlowCtx* cctx);
   virtual int print(char* filename, double x0, double x1, int end);
   virtual int export_image(char* filename);
   void set_clip(DrawWind* w, GdkGC* gc);
@@ -197,7 +220,9 @@ public:
   GdkPoint* points_to_gdk_points_curve(
       GlowWind* w, glow_sPointX* points, int point_cnt, int* cnt);
   int get_font_type(int gc_type);
-  void load_font(glow_eFont font_idx, int font_type, int idx);
+  glow_eFontType drawtype_to_fonttype(glow_eDrawType gc_type);
+  cairo_font_face_t* get_font_face(glow_eFont font, glow_eFontType font_type);
+  void free_font_face();
 
   int image_get_width(glow_tImImage image);
   int image_get_height(glow_tImImage image);
@@ -237,19 +262,12 @@ public:
   virtual int gradient_fill_polyline(GlowWind* wind, glow_sPointX* points,
       int point_cnt, glow_eDrawType d0, glow_eDrawType d1, glow_eDrawType d2,
       glow_eGradient gradient);
-  int text_pango(GlowWind* wind, int x, int y, char* text, int len,
-      glow_eDrawType gc_type, glow_eDrawType color, int idx, int highlight,
-      int line, glow_eFont font_idx, double size, int rot);
-  int text_erase_pango(GlowWind* wind, int x, int y, char* text, int len,
-      glow_eDrawType gc_type, int idx, int line, glow_eFont font_idx,
-      double size, int rot);
-  int get_text_extent_pango(const char* text, int len, glow_eDrawType gc_type,
-      int idx, glow_eFont font_idx, int* width, int* height, int* descent,
-      double size, int rot);
   void log_event(GdkEvent* event);
   virtual void event_exec(void* event, unsigned int size);
   virtual int open_color_selection(double* r, double* g, double* b);
   virtual void update_color(glow_eDrawType color);
+  void push_background(glow_eDrawType color);
+  void pop_background();
   void push_customcolors(GlowCustomColors* cc);
   void set_customcolors(GlowCustomColors* cc);
   void pop_customcolors();

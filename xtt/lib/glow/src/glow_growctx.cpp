@@ -99,7 +99,7 @@ GrowCtx::GrowCtx(const char* ctx_name, double zoom_fact)
       mb3_action(glow_eMB3Action_PopupMenu), scale_equal(0), translate_on(0),
       input_focus_mark(glow_eInputFocusMark_Relief), background_disabled(0),
       redraw_callback(0), redraw_data(0), has_subwindows(-1), is_subwindow(0),
-      bitmap_fonts(0), environment(glow_eEnv_Runtime),
+      anti_aliasing(0), environment(glow_eEnv_Runtime),
       text_coding(glow_eTextCoding_ISO8859_1), recursive_trace(0),
       edit_set_mode(glow_eEditSetMode_None), dashboard(0), dash(0), 
       dash_cell_width(8), dash_cell_height(6), disable_subw_events(0)
@@ -143,11 +143,8 @@ void GrowCtx::set_mode(grow_eMode grow_mode)
   if (edit_mode == grow_eMode_Scale) {
     // Erase scale rectangle
     select_rect_active = 0;
-    gdraw->rect_erase(&mw, select_rect_ll_x, select_rect_ll_y,
-        select_rect_ur_x - select_rect_ll_x,
-        select_rect_ur_y - select_rect_ll_y, 0);
-    draw(&mw, select_rect_ll_x, select_rect_ll_y, select_rect_ur_x,
-        select_rect_ur_y);
+    draw(&mw, select_rect_ll_x - 1, select_rect_ll_y - 1, select_rect_ur_x + 1,
+        select_rect_ur_y + 1);
   }
 
   edit_mode = grow_mode;
@@ -171,10 +168,9 @@ void GrowCtx::set_mode(grow_eMode grow_mode)
     select_rect_ur_y = int(ur_y * mw.zoom_factor_y) - mw.offset_y;
     scale_x = 1;
     scale_y = 1;
-
-    gdraw->rect(&mw, select_rect_ll_x, select_rect_ll_y,
-        select_rect_ur_x - select_rect_ll_x,
-        select_rect_ur_y - select_rect_ll_y, glow_eDrawType_Line, 0, 0);
+    select_rect_active = 1;
+    draw(&mw, select_rect_ll_x - 1, select_rect_ll_y - 1, select_rect_ur_x + 1, 
+	select_rect_ur_y + 1);
 
   } else {
     gdraw->set_cursor(&mw, glow_eDrawCursor_DiamondCross);
@@ -679,15 +675,14 @@ int GrowCtx::event_handler(glow_eEvent event, int x, int y, int w, int h)
     break;
 
   case glow_eEvent_Exposure: {
-    int width, height;
-
-    if (ctx_type == glow_eCtxType_Curve)
+    if (ctx_type == glow_eCtxType_Curve) {
       ((CurveCtx*)this)->adjust_layout();
+    }
 
-    gdraw->get_window_size(&mw, &width, &height);
-    if (mw.window_width != width || mw.window_height != height) {
-      mw.window_width = width;
-      mw.window_height = height;
+    gdraw->get_window_size(&mw, &mw.window_width, &mw.window_height);
+    if (mw.window_width != mw.old_window_width || mw.window_height != mw.old_window_height) {
+      mw.old_window_width = mw.window_width;
+      mw.old_window_height = mw.window_height;
 
       if (event_callback[glow_eEvent_Resized]) {
         static glow_sEvent e;
@@ -699,11 +694,7 @@ int GrowCtx::event_handler(glow_eEvent event, int x, int y, int w, int h)
       change_scrollbar();
     }
 
-    if (gdraw->create_buffer(&mw))
-      draw(&mw, mw.subwindow_x, mw.subwindow_y,
-          mw.subwindow_x + mw.window_width, mw.subwindow_y + mw.window_height);
-    else
-      draw(&mw, x, y, x + w, y + h);
+    draw_invalidated(&mw, x, y, x + w, y + h);
     nav_zoom();
   } break;
   case glow_eEvent_CursorMotion:
@@ -980,12 +971,18 @@ int GrowCtx::event_handler(glow_eEvent event, int x, int y, int w, int h)
         break;
       default:;
       }
-      gdraw->line_erase(&mw, con_create_conpoint_x, con_create_conpoint_y,
-          con_create_last_x, con_create_last_y, 0);
-      draw(&mw, con_create_conpoint_x, con_create_conpoint_y, con_create_last_x,
-          con_create_last_y);
-      gdraw->line(&mw, con_create_conpoint_x, con_create_conpoint_y, x, y,
-          glow_eDrawType_Line, 0, 0);
+      int ll_x, ll_y, ur_x, ur_y;
+      ll_x = MIN(con_create_conpoint_x, con_create_last_x);
+      ll_y = MIN(con_create_conpoint_y, con_create_last_y);
+      ur_x = MAX(con_create_conpoint_x, con_create_last_x);
+      ur_y = MAX(con_create_conpoint_y, con_create_last_y);
+      draw(&mw, ll_x, ll_y, ur_x, ur_y);
+      ll_x = MIN(con_create_conpoint_x, x);
+      ll_y = MIN(con_create_conpoint_y, y);
+      ur_x = MAX(con_create_conpoint_x, x);
+      ur_y = MAX(con_create_conpoint_y, y);
+      draw(&mw, ll_x, ll_y, ur_x, ur_y);
+
       con_create_last_x = x;
       con_create_last_y = y;
       hot_found = (hot_mode == glow_eHotMode_Disabled);
@@ -999,6 +996,7 @@ int GrowCtx::event_handler(glow_eEvent event, int x, int y, int w, int h)
       int draw_ur_x;
       int draw_ur_y;
 
+#if 0
       if (edit_mode == grow_eMode_Circle)
         gdraw->arc_erase(&mw, select_rect_ll_x, select_rect_ll_y,
             select_rect_ur_x - select_rect_ll_x,
@@ -1007,6 +1005,7 @@ int GrowCtx::event_handler(glow_eEvent event, int x, int y, int w, int h)
         gdraw->rect_erase(&mw, select_rect_ll_x, select_rect_ll_y,
             select_rect_ur_x - select_rect_ll_x,
             select_rect_ur_y - select_rect_ll_y, 0);
+#endif
 
       if (scale_equal
           && (edit_mode == grow_eMode_Circle || edit_mode == grow_eMode_Rect
@@ -1318,9 +1317,11 @@ int GrowCtx::event_handler(glow_eEvent event, int x, int y, int w, int h)
       default:;
       }
 
+#if 0
       gdraw->rect_erase(&mw, select_rect_ll_x, select_rect_ll_y,
           select_rect_ur_x - select_rect_ll_x,
           select_rect_ur_y - select_rect_ll_y, 0);
+#endif
 
       modified = 1;
 
@@ -1329,8 +1330,8 @@ int GrowCtx::event_handler(glow_eEvent event, int x, int y, int w, int h)
       select_rect_ur_x = int(MAX(x2, x1));
       select_rect_ur_y = int(MAX(y2, y1));
 
-      draw(&mw, select_rect_ll_x, select_rect_ll_y, select_rect_ur_x,
-          select_rect_ur_y);
+      draw(&mw, select_rect_ll_x - 1, select_rect_ll_y - 1, select_rect_ur_x + 1,
+          select_rect_ur_y + 1);
 
       scale_select(scale_x, scale_y, scale_type);
 
@@ -1617,6 +1618,7 @@ int GrowCtx::event_handler(glow_eEvent event, int x, int y, int w, int h)
       select_rect_last_x = x;
       select_rect_last_y = y;
 
+#if 0
       if (edit_mode == grow_eMode_Circle)
         gdraw->arc_erase(&mw, select_rect_ll_x, select_rect_ll_y,
             select_rect_ur_x - select_rect_ll_x,
@@ -1625,6 +1627,9 @@ int GrowCtx::event_handler(glow_eEvent event, int x, int y, int w, int h)
         gdraw->rect_erase(&mw, select_rect_ll_x, select_rect_ll_y,
             select_rect_ur_x - select_rect_ll_x,
             select_rect_ur_y - select_rect_ll_y, 0);
+#endif
+      draw(&mw, select_rect_ll_x - 1, select_rect_ll_y - 1, select_rect_ur_x + 1,
+          select_rect_ur_y + 1);
 
       if (scale_equal && (edit_mode == grow_eMode_Rect
                              || edit_mode == grow_eMode_RectRounded
@@ -1707,10 +1712,12 @@ int GrowCtx::event_handler(glow_eEvent event, int x, int y, int w, int h)
       }
     } else if (select_rect_active && edit_mode == grow_eMode_Scale) {
     } else if (con_create_active) {
-      gdraw->line_erase(&mw, con_create_conpoint_x, con_create_conpoint_y,
-          con_create_last_x, con_create_last_y, 0);
-      draw(&mw, con_create_conpoint_x, con_create_conpoint_y, con_create_last_x,
-          con_create_last_y);
+      int ll_x, ll_y, ur_x, ur_y;
+      ll_x = MIN(con_create_conpoint_x, con_create_last_x);
+      ll_y = MIN(con_create_conpoint_y, con_create_last_y);
+      ur_x = MAX(con_create_conpoint_x, con_create_last_x);
+      ur_y = MAX(con_create_conpoint_y, con_create_last_y);
+      draw(&mw, ll_x, ll_y, ur_x, ur_y);
 
       if (edit_mode == grow_eMode_Line || edit_mode == grow_eMode_PolyLine) {
         switch (move_restriction) {
@@ -1939,7 +1946,6 @@ void GrowCtx::save_grow(std::ofstream& fp, glow_eSaveMode mode)
 {
   int i;
   char* s;
-  int double_buffered = mw.double_buffered();
 
   if (dashboard) {
     x0 = 0;
@@ -2023,8 +2029,6 @@ void GrowCtx::save_grow(std::ofstream& fp, glow_eSaveMode mode)
      << '\n';
   fp << int(glow_eSave_GrowCtx_background_tiled) << FSPACE << background_tiled
      << '\n';
-  fp << int(glow_eSave_GrowCtx_double_buffered) << FSPACE << double_buffered
-     << '\n';
   fp << int(glow_eSave_GrowCtx_cycle) << FSPACE << int(cycle) << '\n';
   fp << int(glow_eSave_GrowCtx_mb3_action) << FSPACE << int(mb3_action) << '\n';
   fp << int(glow_eSave_GrowCtx_translate_on) << FSPACE << translate_on << '\n';
@@ -2032,7 +2036,7 @@ void GrowCtx::save_grow(std::ofstream& fp, glow_eSaveMode mode)
      << int(input_focus_mark) << '\n';
   fp << int(glow_eSave_GrowCtx_recursive_trace) << FSPACE << recursive_trace
      << '\n';
-  fp << int(glow_eSave_GrowCtx_bitmap_fonts) << FSPACE << bitmap_fonts << '\n';
+  fp << int(glow_eSave_GrowCtx_anti_aliasing) << FSPACE << anti_aliasing << '\n';
   fp << int(glow_eSave_GrowCtx_customcolors) << '\n';
   if (customcolors)
     customcolors->save(fp, mode);
@@ -2100,7 +2104,6 @@ void GrowCtx::open_grow(std::ifstream& fp)
   int tmp;
   int i, j;
   char c;
-  int double_buffered = 0;
 
   for (;;) {
     if (!fp.good()) {
@@ -2272,7 +2275,7 @@ void GrowCtx::open_grow(std::ifstream& fp)
       fp >> background_tiled;
       break;
     case glow_eSave_GrowCtx_double_buffered:
-      fp >> double_buffered;
+      fp >> tmp; // Obsolete
       break;
     case glow_eSave_GrowCtx_cycle:
       fp >> tmp;
@@ -2297,7 +2300,10 @@ void GrowCtx::open_grow(std::ifstream& fp)
         (userdata_open_callback)(&fp, this, glow_eUserdataCbType_Ctx);
       break;
     case glow_eSave_GrowCtx_bitmap_fonts:
-      fp >> bitmap_fonts;
+      fp >> tmp; // Obsolete
+      break;
+    case glow_eSave_GrowCtx_anti_aliasing:
+      fp >> anti_aliasing;
       break;
     case glow_eSave_GrowCtx_customcolors:
       if (!customcolors)
@@ -2319,28 +2325,6 @@ void GrowCtx::open_grow(std::ifstream& fp)
     if (end_found)
       break;
   }
-  if (dashboard)
-    double_buffered = 1;
-  if (!is_component) {
-    if (double_buffered && mw.window && !mw.double_buffer_on()) {
-      mw.set_double_buffer_on(1);
-      gdraw->create_buffer(&mw);
-    } else if (!double_buffered && mw.window && mw.double_buffer_on()
-        && environment != glow_eEnv_Development) {
-      mw.set_double_buffer_on(0);
-      gdraw->delete_buffer(&mw);
-    }
-    if (double_buffered && navw.window && !navw.double_buffer_on()) {
-      navw.set_double_buffer_on(1);
-      if (!gdraw->create_buffer(&navw))
-        navw.set_double_buffer_on(0);
-    } else if (!double_buffered && navw.window && navw.double_buffer_on()) {
-      navw.set_double_buffer_on(0);
-      gdraw->delete_buffer(&navw);
-    }
-    if (mw.window)
-      mw.set_double_buffered(double_buffered);
-  }
 
   if (!streq(color_theme, "")) {
     if (streq(color_theme, "$default")) {
@@ -2351,8 +2335,10 @@ void GrowCtx::open_grow(std::ifstream& fp)
   }
   if (environment == glow_eEnv_Runtime)
     grid_on = 0;
-  if (gdraw)
+  if (gdraw) {
     set_background(background_color);
+    gdraw->set_anti_aliasing(anti_aliasing);
+  }
 }
 
 int GrowCtx::save_subgraph(char* filename, glow_eSaveMode mode)
@@ -2544,7 +2530,6 @@ void GrowCtx::clear_all(int keep_paste)
   strcpy(java_name, "");
   strcpy(background_image, "");
   background_tiled = 0;
-  mw.set_double_buffered(0);
   is_javaapplet = 0;
   is_javaapplication = 0;
   cycle = glow_eCycle_Slow;
@@ -2628,8 +2613,6 @@ void GrowCtx::redraw_defered()
 
 void GrowCtx::draw(GlowWind* w, int ll_x, int ll_y, int ur_x, int ur_y)
 {
-  int i;
-
   if (nodraw || (w == &navw && no_nav))
     return;
 
@@ -2645,13 +2628,18 @@ void GrowCtx::draw(GlowWind* w, int ll_x, int ll_y, int ur_x, int ur_y)
     return;
   }
 
+  gdraw->invalidate(w, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y);
+}
+
+void GrowCtx::draw_invalidated(GlowWind* w, int ll_x, int ll_y, int ur_x, int ur_y)
+{
+  int i;
+
   gdraw->set_clip_rectangle(w, ll_x, ll_y, ur_x, ur_y);
-  w->set_draw_buffer_only();
 
   if (redraw_callback)
     (redraw_callback)(redraw_data);
-  if (w->double_buffer_on())
-    gdraw->buffer_background(w->window, this);
+
   for (i = 0; i < a.a_size; i++) {
     if (a.a[i]->type() == glow_eObjectType_Con)
       a.a[i]->draw(w, ll_x, ll_y, ur_x, ur_y);
@@ -2664,21 +2652,29 @@ void GrowCtx::draw(GlowWind* w, int ll_x, int ll_y, int ur_x, int ur_y)
     draw_grid(w, ll_x, ll_y, ur_x, ur_y);
   if (w == &mw)
     tiptext->draw();
-  w->reset_draw_buffer_only();
-  if (w->double_buffer_on() && !w->draw_buffer_only()) // Test
-    gdraw->copy_buffer(w, ll_x, ll_y, ur_x, ur_y);
   gdraw->reset_clip_rectangle(w);
 
-  if (select_rect_active && w == &mw) {
-    if (edit_mode == grow_eMode_Circle)
-      gdraw->arc(w, select_rect_ll_x, select_rect_ll_y,
-          select_rect_ur_x - select_rect_ll_x,
-          select_rect_ur_y - select_rect_ll_y, 0, 360, glow_eDrawType_Line, 0,
-          0);
-    else
+  if (w == &mw) {
+    if (select_rect_active) {
+      if (edit_mode == grow_eMode_Circle)
+	gdraw->arc(w, select_rect_ll_x, select_rect_ll_y,
+            select_rect_ur_x - select_rect_ll_x,
+            select_rect_ur_y - select_rect_ll_y, 0, 360, glow_eDrawType_Line, 0,
+            0);
+      else
+        gdraw->rect(w, select_rect_ll_x, select_rect_ll_y,
+            select_rect_ur_x - select_rect_ll_x,
+            select_rect_ur_y - select_rect_ll_y, glow_eDrawType_Line, 0, 0);
+    }
+#if 0
+    else if (scale_active)
       gdraw->rect(w, select_rect_ll_x, select_rect_ll_y,
           select_rect_ur_x - select_rect_ll_x,
           select_rect_ur_y - select_rect_ll_y, glow_eDrawType_Line, 0, 0);
+#endif
+    else if (con_create_active)
+      gdraw->line(w, con_create_conpoint_x, con_create_conpoint_y,
+	  con_create_last_x, con_create_last_y, glow_eDrawType_Line, 0, 0);
   }
   if (w == &navw) {
     nav_rect_ll_x = int(
@@ -2763,10 +2759,10 @@ void GrowCtx::scale_select(double scale_x, double scale_y, glow_eScaleType type)
   }
 
   t.scale(sx, sy, x0, y0);
-  a_sel.erase(&mw, (GlowTransform*)NULL, 0, NULL);
+  //a_sel.erase(&mw, (GlowTransform*)NULL, 0, NULL);
   // Some objects might be hot, erase as hot also
-  a_sel.erase(&mw, (GlowTransform*)NULL, 1, NULL);
-  a_sel.erase(&navw, (GlowTransform*)NULL, 0, NULL);
+  //a_sel.erase(&mw, (GlowTransform*)NULL, 1, NULL);
+  //a_sel.erase(&navw, (GlowTransform*)NULL, 0, NULL);
   set_defered_redraw();
   ur_x = ur_y = -1e10;
   ll_x = ll_y = 1e10;
@@ -2824,8 +2820,6 @@ void GrowCtx::rotate_select(double angle, glow_eRotationPoint type)
   default:;
   }
   t.rotate(angle, x0, y0);
-  a_sel.erase(&mw, (GlowTransform*)NULL, 0, NULL);
-  a_sel.erase(&navw, (GlowTransform*)NULL, 0, NULL);
   set_defered_redraw();
   a_sel.set_transform(&t);
   // a_sel.draw( (GlowTransform *)NULL, 1, 0, NULL, NULL);
@@ -2856,8 +2850,6 @@ void GrowCtx::flip_select(glow_eFlipDirection dir)
   x0 = (ur_x + ll_x) / 2;
   y0 = (ur_y + ll_y) / 2;
 
-  a_sel.erase(&mw, (GlowTransform*)NULL, 0, NULL);
-  a_sel.erase(&navw, (GlowTransform*)NULL, 0, NULL);
   set_defered_redraw();
   a_sel.flip(x0, y0, dir);
   draw(&mw, ll_x * mw.zoom_factor_x - mw.offset_x - DRAW_MP,
@@ -2880,6 +2872,14 @@ void GrowCtx::set_background(glow_eDrawType color)
   if (background_disabled)
     return;
 
+  if (enable_bg_pixmap && !streq(background_image, ""))
+    gdraw->set_background(&mw, color, background_image);
+  else {
+    gdraw->set_background(&mw, color, 0);
+    if (!no_nav)
+      gdraw->set_background(&navw, color, 0);
+  }
+#if 0
   if (enable_bg_pixmap && !streq(background_image, "")) {
     glow_tPixmap pixmap = 0;
     glow_tImImage image = 0;
@@ -2907,6 +2907,7 @@ void GrowCtx::set_background(glow_eDrawType color)
     if (!no_nav)
       gdraw->set_background(&navw, color, 0, 0, 0, 0);
   }
+#endif
   background_color = color;
 }
 
@@ -4642,6 +4643,7 @@ int GrowCtx::read_customcolor_file(char* name)
         ((GrowWindow*)a[i])->window_ctx->read_customcolor_file(name);
       }
     }
+    redraw();
     return sts;
   } else
     return 0;

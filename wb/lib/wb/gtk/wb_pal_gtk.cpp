@@ -46,7 +46,7 @@ extern "C" {
 #include "flow_browwidget_gtk.h"
 
 #include "glow_growctx.h"
-
+#include "cow_wutl_gtk.h"
 #include "wb_pal_gtk.h"
 
 static void pal_sel_lose_cb(
@@ -107,17 +107,11 @@ void PalGtk::set_inputfocus(int focus)
   if (!displayed)
     return;
 
-  if (focus) {
-    GdkColor color;
-
-    gdk_color_parse("Black", &color);
-    gtk_widget_modify_bg(form_widget, GTK_STATE_NORMAL, &color);
-    gtk_widget_grab_focus(brow_widget);
+  if (!focus) {
+    wutl_widget_name_suffix_sub(form_widget);
   } else {
-    GdkColor color;
-
-    gdk_color_parse("White", &color);
-    gtk_widget_modify_bg(form_widget, GTK_STATE_NORMAL, &color);
+    wutl_widget_name_suffix_add(form_widget, "focus");
+    gtk_widget_grab_focus(brow_widget);
   }
 }
 

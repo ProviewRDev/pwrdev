@@ -42,11 +42,15 @@
 
 typedef struct _KeyboardWidgetGtk KeyboardWidgetGtk;
 typedef struct _KeyboardWidgetGtkClass KeyboardWidgetGtkClass;
+typedef struct _KeyboardWidgetGtkPrivate KeyboardWidgetGtkPrivate;
 
 struct _KeyboardWidgetGtk {
-  GtkDrawingArea parent;
+  GtkDrawingArea bin;
+  KeyboardWidgetGtkPrivate *priv;
+};
 
-  /* Private */
+struct _KeyboardWidgetGtkPrivate {
+  GdkWindow *window;
   void* keyboard_ctx;
   void* draw_ctx;
   int (*init_proc)(GlowCtx* ctx, void* clien_data);
@@ -54,48 +58,65 @@ struct _KeyboardWidgetGtk {
   void* client_data;
   GtkWidget* main_keyboard_widget;
   GtkWidget* form;
+  int destroyed;
 };
 
 struct _KeyboardWidgetGtkClass {
   GtkDrawingAreaClass parent_class;
 };
 
-G_DEFINE_TYPE(KeyboardWidgetGtk, keyboardwidgetgtk, GTK_TYPE_DRAWING_AREA);
+G_DEFINE_TYPE_WITH_CODE(KeyboardWidgetGtk, keyboardwidgetgtk, GTK_TYPE_DRAWING_AREA,
+			G_ADD_PRIVATE(KeyboardWidgetGtk));
 
 static int keyboard_init_proc(GtkWidget* w, GlowCtx* fctx, void* client_data)
 {
   KeyboardCtx* ctx;
 
-  ctx = (KeyboardCtx*)((KeyboardWidgetGtk*)w)->keyboard_ctx;
+  ctx = (KeyboardCtx*)((KeyboardWidgetGtk*)w)->priv->keyboard_ctx;
 
   ctx->configure();
 
-  if (((KeyboardWidgetGtk*)w)->init_proc)
-    return (((KeyboardWidgetGtk*)w)->init_proc)(ctx, client_data);
+  if (((KeyboardWidgetGtk*)w)->priv->init_proc)
+    return (((KeyboardWidgetGtk*)w)->priv->init_proc)(ctx, client_data);
   else
     return 1;
 }
 
-static gboolean keyboardwidgetgtk_expose(GtkWidget* glow, GdkEventExpose* event)
+static gboolean keyboardwidgetgtk_expose(GtkWidget* widget, cairo_t* cr)
 {
-  ((GlowDrawGtk*)((KeyboardCtx*)((KeyboardWidgetGtk*)glow)->keyboard_ctx)
-          ->gdraw)
-      ->event_handler(*(GdkEvent*)event);
+  KeyboardWidgetGtk* keyboard = (KeyboardWidgetGtk*)widget;
+
+  ((GlowDrawGtk*)((KeyboardCtx*)keyboard->priv->keyboard_ctx)->gdraw)->
+      expose(cr, keyboard->priv->is_navigator);
   return TRUE;
 }
 
-static void keyboardwidgetgtk_destroy(GtkObject* object)
+static void keyboardwidgetgtk_destroy(GtkWidget* widget)
 {
-  KeyboardWidgetGtk* keyboard = (KeyboardWidgetGtk*)object;
+  KeyboardWidgetGtk* keyboard = (KeyboardWidgetGtk*)widget;
 
+  if (!keyboard->priv->destroyed) {
+    keyboard->priv->destroyed = 1;
+    if (keyboard->priv->is_navigator) {
+      if (keyboard->priv->keyboard_ctx
+	  && !((KeyboardWidgetGtk*)keyboard->priv->main_keyboard_widget)->priv->destroyed)
+	((KeyboardCtx*)keyboard->priv->keyboard_ctx)->no_nav = 1;
+    } else
+      delete (GlowDrawGtk*)keyboard->priv->draw_ctx;
+  }
+#if 0
   if (keyboard->is_navigator && keyboard->keyboard_ctx) {
     ((KeyboardCtx*)keyboard->keyboard_ctx)->no_nav = 1;
   }
-  GTK_OBJECT_CLASS(keyboardwidgetgtk_parent_class)->destroy(object);
+#endif
+  GTK_WIDGET_CLASS(keyboardwidgetgtk_parent_class)->destroy(widget);
 }
 
-static gboolean keyboardwidgetgtk_event(GtkWidget* glow, GdkEvent* event)
+static gboolean keyboardwidgetgtk_event(GtkWidget* keyboard, GdkEvent* event)
 {
+  if (((KeyboardWidgetGtk*)keyboard)->priv->destroyed)
+    return TRUE;
+
   if (event->type == GDK_MOTION_NOTIFY) {
     GdkEvent* next = gdk_event_peek();
     if (next && next->type == GDK_MOTION_NOTIFY) {
@@ -105,7 +126,7 @@ static gboolean keyboardwidgetgtk_event(GtkWidget* glow, GdkEvent* event)
       gdk_event_free(next);
   }
 
-  ((GlowDrawGtk*)((KeyboardCtx*)((KeyboardWidgetGtk*)glow)->keyboard_ctx)
+  ((GlowDrawGtk*)((KeyboardCtx*)((KeyboardWidgetGtk*)keyboard)->priv->keyboard_ctx)
           ->gdraw)
       ->event_handler(*event);
   return TRUE;
@@ -116,17 +137,19 @@ static void keyboardwidgetgtk_realize(GtkWidget* widget)
   GdkWindowAttr attr;
   gint attr_mask;
   KeyboardWidgetGtk* keyboard;
+  GtkAllocation allocation;
 
   g_return_if_fail(widget != NULL);
   g_return_if_fail(IS_KEYBOARDWIDGETGTK(widget));
 
-  GTK_WIDGET_SET_FLAGS(widget, GTK_REALIZED);
+  gtk_widget_set_realized(widget, TRUE);
   keyboard = KEYBOARDWIDGETGTK(widget);
 
-  attr.x = widget->allocation.x;
-  attr.y = widget->allocation.y;
-  attr.width = widget->allocation.width;
-  attr.height = widget->allocation.height;
+  gtk_widget_get_allocation(widget, &allocation);
+  attr.x = allocation.x;
+  attr.y = allocation.y;
+  attr.width = allocation.width;
+  attr.height = allocation.height;
   attr.wclass = GDK_INPUT_OUTPUT;
   attr.window_type = GDK_WINDOW_CHILD;
   attr.event_mask = gtk_widget_get_events(widget) | GDK_EXPOSURE_MASK
@@ -134,29 +157,29 @@ static void keyboardwidgetgtk_realize(GtkWidget* widget)
       | GDK_POINTER_MOTION_MASK | GDK_BUTTON_MOTION_MASK | GDK_ENTER_NOTIFY_MASK
       | GDK_LEAVE_NOTIFY_MASK;
   attr.visual = gtk_widget_get_visual(widget);
-  attr.colormap = gtk_widget_get_colormap(widget);
 
-  attr_mask = GDK_WA_X | GDK_WA_Y | GDK_WA_VISUAL | GDK_WA_COLORMAP;
-  widget->window = gdk_window_new(widget->parent->window, &attr, attr_mask);
-  widget->style = gtk_style_attach(widget->style, widget->window);
-  gdk_window_set_user_data(widget->window, widget);
-  gtk_style_set_background(widget->style, widget->window, GTK_STATE_ACTIVE);
+  attr_mask = GDK_WA_X | GDK_WA_Y | GDK_WA_VISUAL;
+  keyboard->priv->window = gdk_window_new(gtk_widget_get_parent_window(widget), &attr, attr_mask);
+  gtk_widget_set_window(widget, keyboard->priv->window);
+  gtk_widget_register_window(widget, keyboard->priv->window);
+  //widget->style = gtk_style_attach(widget->style, widget->window);
+  //gtk_style_set_background(widget->style, widget->window, GTK_STATE_ACTIVE);
 
-  GTK_WIDGET_SET_FLAGS(widget, GTK_CAN_FOCUS);
+  gtk_widget_set_can_focus(widget, TRUE);
 
-  if (keyboard->is_navigator) {
-    if (!keyboard->keyboard_ctx) {
+  if (keyboard->priv->is_navigator) {
+    if (!keyboard->priv->keyboard_ctx) {
       KeyboardWidgetGtk* main_keyboard
-          = (KeyboardWidgetGtk*)keyboard->main_keyboard_widget;
+          = (KeyboardWidgetGtk*)keyboard->priv->main_keyboard_widget;
 
-      keyboard->keyboard_ctx = main_keyboard->keyboard_ctx;
-      keyboard->draw_ctx = main_keyboard->draw_ctx;
-      ((GlowDrawGtk*)keyboard->draw_ctx)->init_nav(widget);
+      keyboard->priv->keyboard_ctx = main_keyboard->priv->keyboard_ctx;
+      keyboard->priv->draw_ctx = main_keyboard->priv->draw_ctx;
+      ((GlowDrawGtk*)keyboard->priv->draw_ctx)->init_nav(widget);
     }
   } else {
-    if (!keyboard->keyboard_ctx) {
-      keyboard->draw_ctx = new GlowDrawGtk(widget, &keyboard->keyboard_ctx,
-          keyboard_init_proc, keyboard->client_data, glow_eCtxType_Keyboard);
+    if (!keyboard->priv->keyboard_ctx) {
+      keyboard->priv->draw_ctx = new GlowDrawGtk(widget, &keyboard->priv->keyboard_ctx,
+          keyboard_init_proc, keyboard->priv->client_data, glow_eCtxType_Keyboard);
     }
   }
 }
@@ -164,17 +187,16 @@ static void keyboardwidgetgtk_realize(GtkWidget* widget)
 static void keyboardwidgetgtk_class_init(KeyboardWidgetGtkClass* klass)
 {
   GtkWidgetClass* widget_class;
-  GtkObjectClass* object_class;
   widget_class = GTK_WIDGET_CLASS(klass);
-  object_class = GTK_OBJECT_CLASS(klass);
   widget_class->realize = keyboardwidgetgtk_realize;
-  widget_class->expose_event = keyboardwidgetgtk_expose;
+  widget_class->draw = keyboardwidgetgtk_expose;
   widget_class->event = keyboardwidgetgtk_event;
-  object_class->destroy = keyboardwidgetgtk_destroy;
+  widget_class->destroy = keyboardwidgetgtk_destroy;
 }
 
-static void keyboardwidgetgtk_init(KeyboardWidgetGtk* glow)
+static void keyboardwidgetgtk_init(KeyboardWidgetGtk* keyboard)
 {
+  keyboard->priv = (KeyboardWidgetGtkPrivate *)keyboardwidgetgtk_get_instance_private(keyboard);
 }
 
 GtkWidget* keyboardwidgetgtk_new(
@@ -182,10 +204,11 @@ GtkWidget* keyboardwidgetgtk_new(
 {
   KeyboardWidgetGtk* w;
   w = (KeyboardWidgetGtk*)g_object_new(KEYBOARDWIDGETGTK_TYPE, NULL);
-  w->init_proc = init_proc;
-  w->keyboard_ctx = 0;
-  w->is_navigator = 0;
-  w->client_data = client_data;
+  w->priv->init_proc = init_proc;
+  w->priv->keyboard_ctx = 0;
+  w->priv->is_navigator = 0;
+  w->priv->client_data = client_data;
+  w->priv->destroyed = 0;
   return (GtkWidget*)w;
 }
 
@@ -193,10 +216,11 @@ GtkWidget* keyboardnavwidgetgtk_new(GtkWidget* main_keyboard)
 {
   KeyboardWidgetGtk* w;
   w = (KeyboardWidgetGtk*)g_object_new(KEYBOARDWIDGETGTK_TYPE, NULL);
-  w->init_proc = 0;
-  w->keyboard_ctx = 0;
-  w->is_navigator = 1;
-  w->main_keyboard_widget = main_keyboard;
-  w->client_data = 0;
+  w->priv->init_proc = 0;
+  w->priv->keyboard_ctx = 0;
+  w->priv->is_navigator = 1;
+  w->priv->main_keyboard_widget = main_keyboard;
+  w->priv->client_data = 0;
+  w->priv->destroyed = 0;
   return (GtkWidget*)w;
 }

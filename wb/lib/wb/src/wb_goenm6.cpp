@@ -199,7 +199,7 @@ int goen_create_nodetype_m6(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid,
       f_height - f_annot_offs_y - f_yoffs, 3, flow_eDrawType_TextHelvetica, 3,
       flow_eAnnotType_OneLine, flow_mDisplayLevel_1);
   if (graph_index != 1)
-    flow_AddText(nc_pid, "Proview",
+    flow_AddText(nc_pid, "ProviewR",
         f_width - f_header_width + f_header_sep1 + f_repeat,
         f_height - f_repeat / 2 - f_yoffs, flow_eDrawType_TextHelvetica, 9);
   else {

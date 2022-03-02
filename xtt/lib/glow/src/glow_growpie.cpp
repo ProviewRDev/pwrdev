@@ -62,15 +62,11 @@ GrowPie::GrowPie(GrowCtx* glow_ctx, const char* name, double x1, double y1,
   memset(sector_size, 0, sizeof(sector_size));
 
   if (!nodraw)
-    draw(&ctx->mw, (GlowTransform*)NULL, highlight, hot, NULL, NULL);
+    draw();
 }
 
 GrowPie::~GrowPie()
 {
-  if (ctx->nodraw)
-    return;
-  erase(&ctx->mw);
-  erase(&ctx->navw);
 }
 
 void GrowPie::save(std::ofstream& fp, glow_eSaveMode mode)
@@ -473,61 +469,6 @@ void GrowPie::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
   }
 }
 
-void GrowPie::erase(GlowWind* w, GlowTransform* t, int hot, void* node)
-{
-  if (ctx->nodraw)
-    return;
-
-  int idx;
-
-  if (w == &ctx->navw) {
-    if (ctx->no_nav)
-      return;
-    hot = 0;
-  }
-  if (node && ((GrowNode*)node)->line_width)
-    idx = int(
-        w->zoom_factor_y / w->base_zoom_factor * ((GrowNode*)node)->line_width
-        - 1);
-  else
-    idx = int(w->zoom_factor_y / w->base_zoom_factor * line_width - 1);
-  idx += hot;
-  idx = MAX(0, idx);
-  idx = MIN(idx, DRAW_TYPE_SIZE - 1);
-
-  int x1, y1, x2, y2, ll_x, ll_y, ur_x, ur_y;
-  int rot;
-
-  if (!t) {
-    x1 = int(trf.x(ll.x, ll.y) * w->zoom_factor_x + 0.5) - w->offset_x;
-    y1 = int(trf.y(ll.x, ll.y) * w->zoom_factor_y + 0.5) - w->offset_y;
-    x2 = int(trf.x(ur.x, ur.y) * w->zoom_factor_x + 0.5) - w->offset_x;
-    y2 = int(trf.y(ur.x, ur.y) * w->zoom_factor_y + 0.5) - w->offset_y;
-    rot = int(trf.rot());
-  } else {
-    x1 = int(trf.x(t, ll.x, ll.y) * w->zoom_factor_x + 0.5) - w->offset_x;
-    y1 = int(trf.y(t, ll.x, ll.y) * w->zoom_factor_y + 0.5) - w->offset_y;
-    x2 = int(trf.x(t, ur.x, ur.y) * w->zoom_factor_x + 0.5) - w->offset_x;
-    y2 = int(trf.y(t, ur.x, ur.y) * w->zoom_factor_y + 0.5) - w->offset_y;
-    rot = int(trf.rot(t));
-  }
-
-  ll_x = MIN(x1, x2);
-  ur_x = MAX(x1, x2);
-  ll_y = MIN(y1, y2);
-  ur_y = MAX(y1, y2);
-
-  // printf( "eras: %d %d\n", ll_x, ll_y);
-
-  w->set_draw_buffer_only();
-  if (border)
-    ctx->gdraw->arc_erase(
-        w, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, angle1 - rot, angle2, idx);
-  ctx->gdraw->fill_arc(w, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, angle1 - rot,
-      angle2, glow_eDrawType_LineErase, 0);
-  w->reset_draw_buffer_only();
-}
-
 void GrowPie::draw()
 {
   ctx->draw(&ctx->mw,
@@ -546,8 +487,6 @@ void GrowPie::align(double x, double y, glow_eAlignDirection direction)
 {
   double dx, dy;
 
-  erase(&ctx->mw);
-  erase(&ctx->navw);
   ctx->set_defered_redraw();
   draw();
   switch (direction) {
@@ -661,12 +600,8 @@ void GrowPie::set_values(double* values)
     sector_size[i] = values[i];
   if (!parent)
     draw();
-  else {
-    ctx->set_draw_buffer_only();
-    parent->erase();
-    ctx->reset_draw_buffer_only();
+  else
     parent->draw();    
-  }
 }
 
 void GrowPie::convert(glow_eConvert version)

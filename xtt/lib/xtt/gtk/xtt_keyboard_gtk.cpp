@@ -87,7 +87,7 @@ XttKeyboardGtk::XttKeyboardGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid,
 
   keyboard_widget = keyboardwidgetgtk_new(init_keyboard_cb, this);
 
-  GtkWidget* vbox = gtk_vbox_new(FALSE, 0);
+  GtkWidget* vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 
   gtk_box_pack_end(GTK_BOX(vbox), GTK_WIDGET(keyboard_widget), TRUE, TRUE, 0);
 
@@ -97,11 +97,15 @@ XttKeyboardGtk::XttKeyboardGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid,
   // Set position
   keyboard_GetSize(keyboardctx, &width, &height);
 
-  GtkWindow* window = GTK_WINDOW(toplevel);
-  GdkScreen* screen = gtk_window_get_screen(window);
+  GdkWindow* window = gtk_widget_get_window(toplevel);
+  GdkDisplay* display = gtk_widget_get_display(toplevel);
+  GdkMonitor* monitor = gdk_display_get_monitor_at_window(display, window);
+  GdkRectangle geom;
 
-  int screen_width = gdk_screen_get_width(screen);
-  int screen_height = gdk_screen_get_height(screen);
+  gdk_monitor_get_geometry(monitor, &geom);
+
+  int screen_width = geom.width;
+  int screen_height = geom.height;
 
   if (width > screen_width) {
     height = ((float)screen_width) * 0.9 / width * height;

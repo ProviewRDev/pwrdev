@@ -180,6 +180,7 @@ public:
   pwr_tStatus set_view(pwr_tOid view);
   void view_shift();
   int eve_export_events(const char *filename);
+  void update_color_theme(int ct);
 
   void eve_activate_print();
   void ala_activate_print();

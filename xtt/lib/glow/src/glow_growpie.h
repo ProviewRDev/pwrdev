@@ -106,12 +106,6 @@ public:
    */
   void trace_close();
 
-  //! Erase the object
-  void erase(GlowWind* w)
-  {
-    erase(w, (GlowTransform*)NULL, hot, NULL);
-  }
-
   //! Draw the objects if any part is inside the drawing area.
   /*!
     \param ll_x		Lower left x coordinate of drawing area.
@@ -156,14 +150,6 @@ public:
   glow_eDrawType sector_color[PIE_MAX_SECTORS]; //!< Sector color.
   double sector_size[PIE_MAX_SECTORS]; //!< Sector size in range 0-1.
   GlowTraceData trace; //!< Obsolete
-
-  //! Erase the object.
-  /*!
-    \param t		Transform of parent node.
-    \param hot		Draw as hot, with larger line width.
-    \param node		Parent node. Can be zero.
-  */
-  void erase(GlowWind* w, GlowTransform* t, int hot, void* node);
 
   //! Draw the object.
   /*!

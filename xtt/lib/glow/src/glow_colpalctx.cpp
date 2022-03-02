@@ -56,8 +56,8 @@ void ColPalCtx::configure()
   int i;
   double d = 0.02;
 
-  if (nodraw)
-    return;
+  //if (nodraw)
+  //  return;
 
   display_fill = new GrowRect(this, "FillRect", d, 0,
       display_entry_width - 2 * d, entry_height, glow_eDrawType_Color37, 1, 0,
@@ -684,7 +684,7 @@ int ColPalCtx::event_handler(glow_eEvent event, int x, int y, int w, int h)
       change_scrollbar();
     }
 
-    draw(&mw, x, y, x + w, y + h);
+    draw_invalidated(&mw, x, y, x + w, y + h);
     break;
   default:;
   }

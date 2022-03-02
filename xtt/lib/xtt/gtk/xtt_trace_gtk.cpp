@@ -51,6 +51,7 @@
 #include "rt_gdh.h"
 
 #include "cow_wow_gtk.h"
+#include "cow_wutl_gtk.h"
 
 #include "flow_widget_gtk.h"
 
@@ -313,7 +314,6 @@ RtTraceGtk::RtTraceGtk(void* tr_parent_ctx, GtkWidget* tr_parent_wid,
   char title[220];
   pwr_tAName hostname;
   pwr_tOName plcconnect;
-  pwr_tFileName fname;
   pwr_tObjid parent;
   pwr_tCid parent_cid;
 
@@ -415,8 +415,10 @@ RtTraceGtk::RtTraceGtk(void* tr_parent_ctx, GtkWidget* tr_parent_wid,
       file_cleartrace, "activate", G_CALLBACK(activate_cleartrace), this);
 
   GtkWidget* file_close
-      = gtk_image_menu_item_new_from_stock(GTK_STOCK_CLOSE, accel_g);
+      = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Close"));
   g_signal_connect(file_close, "activate", G_CALLBACK(activate_close), this);
+  gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w',
+      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
 
   GtkMenu* file_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_print);
@@ -495,24 +497,23 @@ RtTraceGtk::RtTraceGtk(void* tr_parent_ctx, GtkWidget* tr_parent_wid,
   // View Entry
 
   GtkWidget* view_zoom_in
-      = gtk_image_menu_item_new_from_stock(GTK_STOCK_ZOOM_IN, NULL);
-  g_signal_connect(view_zoom_in, "activate", G_CALLBACK(activate_zoomin), this);
+    = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("Zoom _in"));
+  g_signal_connect(
+      view_zoom_in, "activate", G_CALLBACK(activate_zoomin), this);
   gtk_widget_add_accelerator(view_zoom_in, "activate", accel_g, 'i',
-      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+      GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
   GtkWidget* view_zoom_out
-      = gtk_image_menu_item_new_from_stock(GTK_STOCK_ZOOM_OUT, NULL);
+    = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("Zoom _out"));
   g_signal_connect(
       view_zoom_out, "activate", G_CALLBACK(activate_zoomout), this);
   gtk_widget_add_accelerator(view_zoom_out, "activate", accel_g, 'o',
-      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+      GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
   GtkWidget* view_zoom_reset
-      = gtk_image_menu_item_new_from_stock(GTK_STOCK_ZOOM_100, NULL);
+    = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("Zoom _reset"));
   g_signal_connect(
       view_zoom_reset, "activate", G_CALLBACK(activate_zoomreset), this);
-  gtk_widget_add_accelerator(view_zoom_reset, "activate", accel_g, 'b',
-      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
 
   // Submenu ScanTime
   GSList* view_sc_group = NULL;
@@ -601,10 +602,8 @@ RtTraceGtk::RtTraceGtk(void* tr_parent_ctx, GtkWidget* tr_parent_wid,
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(mode), GTK_WIDGET(mode_menu));
 
   // Menu Help
-  GtkWidget* help_help = gtk_image_menu_item_new_with_mnemonic(
+  GtkWidget* help_help = gtk_menu_item_new_with_mnemonic(
       CoWowGtk::translate_utf8("On _Trace"));
-  gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(help_help),
-      gtk_image_new_from_stock("gtk-help", GTK_ICON_SIZE_MENU));
   g_signal_connect(help_help, "activate", G_CALLBACK(activate_help), this);
   gtk_widget_add_accelerator(
       help_help, "activate", accel_g, 'h', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
@@ -636,70 +635,40 @@ RtTraceGtk::RtTraceGtk(void* tr_parent_ctx, GtkWidget* tr_parent_wid,
   if (ODD(sts)) {
     sts = gdh_GetObjectClass(parent, &parent_cid);
     if (ODD(sts) && parent_cid != pwr_cClass_plc) {
-      GtkWidget* tools_parent_window = gtk_button_new();
-      dcli_translate_filename(fname, "$pwr_exe/xtt_up.png");
-      gtk_container_add(
-          GTK_CONTAINER(tools_parent_window), gtk_image_new_from_file(fname));
-      g_signal_connect(tools_parent_window, "clicked",
-          G_CALLBACK(activate_parent_window), this);
-      gtk_toolbar_append_widget(
-          tools, tools_parent_window, "Open parent window", "");
+      wutl_tools_item(tools, "$pwr_exe/xtt_up.png", G_CALLBACK(activate_parent_window), 
+      "Open parent window", this, 0, 1);
     }
   }
 
-  GtkWidget* tools_display_object = gtk_button_new();
-  dcli_translate_filename(fname, "$pwr_exe/xtt_navigator.png");
-  gtk_container_add(
-      GTK_CONTAINER(tools_display_object), gtk_image_new_from_file(fname));
-  g_signal_connect(tools_display_object, "clicked",
-      G_CALLBACK(activate_display_object), this);
-  gtk_toolbar_append_widget(
-      tools, tools_display_object, "Display object in Navigator", "");
+  wutl_tools_item(tools, "$pwr_exe/xtt_navigator.png", G_CALLBACK(activate_display_object), 
+      "Display object in Navigator", this, 0, 1);
 
-  GtkWidget* tools_show_cross = gtk_button_new();
-  dcli_translate_filename(fname, "$pwr_exe/xtt_crossref.png");
-  gtk_container_add(
-      GTK_CONTAINER(tools_show_cross), gtk_image_new_from_file(fname));
-  g_signal_connect(
-      tools_show_cross, "clicked", G_CALLBACK(activate_show_cross), this);
-  gtk_toolbar_append_widget(
-      tools, tools_show_cross, "Show Crossreferences", "");
+  wutl_tools_item(tools, "$pwr_exe/xtt_crossref.png", G_CALLBACK(activate_show_cross), 
+      "Show Crossreferences", this, 0, 1);
 
-  GtkWidget* tools_zoom_in = gtk_button_new();
-  dcli_translate_filename(fname, "$pwr_exe/xtt_zoom_in.png");
-  gtk_container_add(
-      GTK_CONTAINER(tools_zoom_in), gtk_image_new_from_file(fname));
-  g_signal_connect(tools_zoom_in, "clicked", G_CALLBACK(activate_zoomin), this);
-  gtk_toolbar_append_widget(tools, tools_zoom_in, "Zoom in", "");
+  wutl_tools_item(tools, "$pwr_exe/ge_zoom_in.png", G_CALLBACK(activate_zoomin), 
+      "Zoom in", this, 0, 1);
 
-  GtkWidget* tools_zoom_out = gtk_button_new();
-  dcli_translate_filename(fname, "$pwr_exe/xtt_zoom_out.png");
-  gtk_container_add(
-      GTK_CONTAINER(tools_zoom_out), gtk_image_new_from_file(fname));
-  g_signal_connect(
-      tools_zoom_out, "clicked", G_CALLBACK(activate_zoomout), this);
-  gtk_toolbar_append_widget(tools, tools_zoom_out, "Zoom out", "");
+  wutl_tools_item(tools, "$pwr_exe/ge_zoom_out.png", G_CALLBACK(activate_zoomout), 
+      "Zoom out", this, 0, 1);
 
-  GtkWidget* tools_zoom_reset = gtk_button_new();
-  dcli_translate_filename(fname, "$pwr_exe/xtt_zoom_reset.png");
-  gtk_container_add(
-      GTK_CONTAINER(tools_zoom_reset), gtk_image_new_from_file(fname));
-  g_signal_connect(
-      tools_zoom_reset, "clicked", G_CALLBACK(activate_zoomreset), this);
-  gtk_toolbar_append_widget(tools, tools_zoom_reset, "Zoom reset", "");
+  wutl_tools_item(tools, "$pwr_exe/ge_zoom_reset.png", G_CALLBACK(activate_zoomreset), 
+      "Zoom reset", this, 0, 1);
+
 
   // Flow widget
   GtkWidget* flow_scrolled
       = scrolledflowwidgetgtk_new(init_flow, this, &flow_widget);
+  gtk_widget_set_name(flow_widget, "plctrace");
   gtk_widget_show_all(flow_widget);
 
   nav_widget = flownavwidgetgtk_new(flow_widget);
 
-  GtkWidget* paned = gtk_hpaned_new();
+  GtkWidget* paned = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
   gtk_paned_pack1(GTK_PANED(paned), flow_scrolled, TRUE, TRUE);
   gtk_paned_pack2(GTK_PANED(paned), nav_widget, FALSE, TRUE);
 
-  GtkWidget* vbox = gtk_vbox_new(FALSE, 0);
+  GtkWidget* vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start(GTK_BOX(vbox), GTK_WIDGET(menu_bar), FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(vbox), GTK_WIDGET(tools), FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(vbox), GTK_WIDGET(paned), TRUE, TRUE, 0);

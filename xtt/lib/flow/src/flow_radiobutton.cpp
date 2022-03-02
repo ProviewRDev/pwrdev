@@ -135,7 +135,7 @@ void FlowRadiobutton::draw(
     ctx->fdraw->line_erase(ctx, ur_x - 2, ur_y - 2, ll_x + 2, ur_y - 2, idx);
     ctx->fdraw->line_erase(ctx, ur_x - 1, ur_y - 1, ur_x - 1, ll_y + 1, idx);
     ctx->fdraw->line_erase(ctx, ur_x - 2, ur_y - 2, ur_x - 2, ll_y + 2, idx);
-    ctx->fdraw->fill_rect(ctx, ll_x + 3, ll_y + 3, ur_x - ll_x - 5,
+    ctx->fdraw->fill_rect(ctx, ll_x + 2, ll_y + 2, ur_x - ll_x - 5,
         ur_y - ll_y - 5, flow_eDrawType_Line);
   } else {
     ctx->fdraw->line_erase(ctx, ll_x + 1, ll_y + 1, ur_x - 1, ll_y + 1, idx);
@@ -150,7 +150,7 @@ void FlowRadiobutton::draw(
         flow_eDrawType_LineGray, idx, 0, 0);
     ctx->fdraw->line(ctx, ur_x - 2, ur_y - 2, ur_x - 2, ll_y + 2,
         flow_eDrawType_LineGray, idx, 0, 0);
-    ctx->fdraw->fill_rect(ctx, ll_x + 3, ll_y + 3, ur_x - ll_x - 5,
+    ctx->fdraw->fill_rect(ctx, ll_x + 2, ll_y + 2, ur_x - ll_x - 5,
         ur_y - ll_y - 5, flow_eDrawType_LineErase);
   }
 }
@@ -222,32 +222,23 @@ void FlowRadiobutton::move(
 
   width = ur.x - ll.x;
   height = ur.y - ll.y;
-  erase(pos, hot, NULL);
-  nav_erase(pos, NULL);
   ll.x = x;
   ll.y = y;
   ur.x = x + width;
   ur.y = y + height;
   zoom();
   nav_zoom();
-  draw(pos, highlight, dimmed, hot, NULL);
-  nav_draw(pos, highlight, NULL);
 }
 
 void FlowRadiobutton::shift(void* pos, double delta_x, double delta_y,
     int highlight, int dimmed, int hot)
 {
-  erase(pos, hot, NULL);
-  nav_erase(pos, NULL);
   ll.x += delta_x;
   ll.y += delta_y;
   ur.x += delta_x;
   ur.y += delta_y;
   zoom();
   nav_zoom();
-
-  draw(pos, highlight, dimmed, hot, NULL);
-  nav_draw(pos, highlight, NULL);
 }
 
 std::ostream& operator<<(std::ostream& o, const FlowRadiobutton r)

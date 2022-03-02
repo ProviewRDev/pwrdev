@@ -248,9 +248,6 @@ void FlowArrow::nav_erase(void* pos, void* node)
 void FlowArrow::move(void* pos, double x1, double y1, double x2, double y2,
     int highlight, int dimmed, int hot)
 {
-  erase(pos, hot, NULL);
-  nav_erase(pos, NULL);
-
   if (fabs(x2 - x1) < DBL_EPSILON) {
     if (y1 > y2) {
       p1.x = x2 + arrow_width / 2;
@@ -286,15 +283,11 @@ void FlowArrow::move(void* pos, double x1, double y1, double x2, double y2,
   p_dest.y = y2;
   zoom();
   nav_zoom();
-  draw(pos, highlight, dimmed, hot, NULL);
-  nav_draw(pos, highlight, NULL);
 }
 
 void FlowArrow::shift(void* pos, double delta_x, double delta_y, int highlight,
     int dimmed, int hot)
 {
-  erase(pos, hot, NULL);
-  nav_erase(pos, NULL);
   p_dest.x += delta_x;
   p_dest.y += delta_y;
   p1.x += delta_x;
@@ -303,9 +296,6 @@ void FlowArrow::shift(void* pos, double delta_x, double delta_y, int highlight,
   p2.y += delta_y;
   zoom();
   nav_zoom();
-
-  draw(pos, highlight, dimmed, hot, NULL);
-  nav_draw(pos, highlight, NULL);
 }
 
 int FlowArrow::event_handler(

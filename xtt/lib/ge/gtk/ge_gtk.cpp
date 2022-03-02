@@ -66,38 +66,93 @@
 #include "ge_subpalette_gtk.h"
 #include "ge_util.h"
 
+#include "cow_wutl_gtk.h"
+
 #include "wb_log.h"
 #include "wb_nav_gtk.h"
 #include "wb_wnav_selformat.h"
 
-static GtkWidget* image_button(const char* filename)
-{
-  GtkWidget *image, *box;
-  pwr_tFileName fname;
+// Text font options menu
+typedef struct {
+  char text[80];
+  int idx;
+} sComboTableText;
 
-  box = gtk_button_new();
-  // gtk_container_set_border_width(GTK_CONTAINER(box), 2);
+typedef struct {
+  char text[80];
+  char image[80];
+  int idx;
+} sComboTableImage;
 
-  dcli_translate_filename(fname, filename);
-  image = gtk_image_new_from_file(fname);
+static sComboTableText gridsize_combo_table[] = {
+  {"Gridsize 0.1", 1},
+  {"Gridsize 0.25", 2},
+  {"Gridsize 0.5", 3},
+  {"Gridsize 1.0", 4}
+};
 
-  gtk_container_add(GTK_CONTAINER(box), image);
-  g_object_set(box, "can-focus", FALSE, NULL);
-  gtk_widget_show(image);
+static sComboTableText font_combo_table[] = {
+  {"Helvetica", glow_eFont_Helvetica},
+  {"Times", glow_eFont_Times},
+  {"New Century Schoolbook", glow_eFont_NewCenturySchoolbook},
+  {"Courier", glow_eFont_Courier},
+  {"LucidaSans", glow_eFont_LucidaSans}
+};
 
-  return box;
-}
+static sComboTableImage textsize_combo_table[] = {
+  {"Textsize 8", "$pwr_exe/ge_textsize_8.png", 0},
+  {"Textsize 10", "$pwr_exe/ge_textsize_10.png", 1},
+  {"Textsize 12", "$pwr_exe/ge_textsize_12.png", 2},
+  {"Textsize 14", "$pwr_exe/ge_textsize_14.png", 3},
+  {"Textsize 18", "$pwr_exe/ge_textsize_18.png", 4},
+  {"Textsize 24", "$pwr_exe/ge_textsize_24.png", 5}
+};
 
-static GtkWidget* image_widget(const char* filename)
-{
-  GtkWidget* image;
-  pwr_tFileName fname;
+static sComboTableImage linetype_combo_table[] = {
+  {"Linetype 1", "$pwr_exe/ge_linetype_1.png", 1},
+  {"Linetype 2", "$pwr_exe/ge_linetype_2.png", 2},
+  {"Linetype 3", "$pwr_exe/ge_linetype_3.png", 3},
+  {"Linetype 4", "$pwr_exe/ge_linetype_4.png", 4},
+  {"Linetype 5", "$pwr_exe/ge_linetype_5.png", 5},
+  {"Linetype 6", "$pwr_exe/ge_linetype_6.png", 6},
+  {"Linetype 7", "$pwr_exe/ge_linetype_7.png", 7}
+};
 
-  dcli_translate_filename(fname, filename);
-  image = gtk_image_new_from_file(fname);
+static sComboTableImage linewidth_combo_table[] = {
+  {"Linewidth 1", "$pwr_exe/ge_linewidth_1.png", 1},
+  {"Linewidth 2", "$pwr_exe/ge_linewidth_2.png", 2},
+  {"Linewidth 3", "$pwr_exe/ge_linewidth_3.png", 3},
+  {"Linewidth 4", "$pwr_exe/ge_linewidth_4.png", 4},
+  {"Linewidth 5", "$pwr_exe/ge_linewidth_5.png", 5},
+  {"Linewidth 6", "$pwr_exe/ge_linewidth_6.png", 6},
+  {"Linewidth 7", "$pwr_exe/ge_linewidth_7.png", 7},
+  {"Linewidth 8", "$pwr_exe/ge_linewidth_8.png", 8},
+};
 
-  return image;
-}
+static sComboTableImage grad_combo_table[] = {
+  {"Gradient No", "$pwr_exe/ge_gradient_no.png", glow_eGradient_No},
+  {"Gradient HorizontalUp", "$pwr_exe/ge_gradient_horizup.png", glow_eGradient_HorizontalUp},
+  {"Gradient HorizontalDown", "$pwr_exe/ge_gradient_horizdown.png", glow_eGradient_HorizontalDown},
+  {"Gradient HorizontalTube1", "$pwr_exe/ge_gradient_horiztube1.png", glow_eGradient_HorizontalTube1},
+  {"Gradient HorizontalTube2", "$pwr_exe/ge_gradient_horiztube2.png", glow_eGradient_HorizontalTube2},
+  {"Gradient VerticalLeft", "$pwr_exe/ge_gradient_vertleft.png", glow_eGradient_VerticalLeft},
+  {"Gradient VerticalRight", "$pwr_exe/ge_gradient_vertright.png", glow_eGradient_VerticalRight},
+  {"Gradient VerticalTube1", "$pwr_exe/ge_gradient_verttube1.png", glow_eGradient_VerticalTube1},
+  {"Gradient VerticalTube2", "$pwr_exe/ge_gradient_verttube2.png", glow_eGradient_VerticalTube2},
+  {"Gradient DiagonalUpperLeft", "$pwr_exe/ge_gradient_diagupperleft.png", glow_eGradient_DiagonalUpperLeft},
+  {"Gradient DiagonalLowerLeft", "$pwr_exe/ge_gradient_diaglowerleft.png", glow_eGradient_DiagonalLowerLeft},
+  {"Gradient DiagonalUpperRight", "$pwr_exe/ge_gradient_diagupperright.png", glow_eGradient_DiagonalUpperRight},
+  {"Gradient DiagonalLowerRight", "$pwr_exe/ge_gradient_diaglowerright.png", glow_eGradient_DiagonalLowerRight},
+  {"Gradient DiagonalUpTube", "$pwr_exe/ge_gradient_diaguptube.png", glow_eGradient_DiagonalUpTube},
+  {"Gradient DiagonalDownTube", "$pwr_exe/ge_gradient_diagdowntube.png", glow_eGradient_DiagonalDownTube},
+  {"Gradient Globe", "$pwr_exe/ge_gradient_globe.png", glow_eGradient_Globe},
+  {"Gradient RadialCenter", "$pwr_exe/ge_gradient_radcenter.png", glow_eGradient_RadialCenter},
+  {"Gradient RadialUpperLeft", "$pwr_exe/ge_gradient_radupperleft.png", glow_eGradient_RadialUpperLeft},
+  {"Gradient RadialLowerLeft", "$pwr_exe/ge_gradient_radlowerleft.png", glow_eGradient_RadialLowerLeft},
+  {"Gradient RadialUpperRight", "$pwr_exe/ge_gradient_radupperright.png", glow_eGradient_RadialUpperRight},
+  {"Gradient RadialLowerRight", "$pwr_exe/ge_gradient_radlowerright.png", glow_eGradient_RadialLowerRight}
+};
+
 
 int GeGtk::create_modal_dialog(const char* title, const char* text,
     const char* button1, const char* button2, const char* button3,
@@ -641,13 +696,13 @@ void GeGtk::activate_show_grid(GtkWidget* w, gpointer data)
   GeGtk* gectx = (GeGtk*)data;
 
   gboolean bset
-      = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(gectx->show_grid_w));
+      = gtk_toggle_tool_button_get_active(GTK_TOGGLE_TOOL_BUTTON(gectx->show_grid_w));
 
-  if (w != gectx->show_grid_w)
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(gectx->show_grid_w), !bset);
+  if (w != (GtkWidget *)gectx->show_grid_w)
+    gtk_toggle_tool_button_set_active(GTK_TOGGLE_TOOL_BUTTON(gectx->show_grid_w), !bset);
 
-  int set = (int)gtk_toggle_button_get_active(
-      GTK_TOGGLE_BUTTON(gectx->show_grid_w));
+  int set = (int)gtk_toggle_tool_button_get_active(
+      GTK_TOGGLE_TOOL_BUTTON(gectx->show_grid_w));
   ((Ge*)gectx)->activate_show_grid(set);
 }
 
@@ -968,19 +1023,19 @@ void GeGtk::activate_conpoint(GtkWidget* w, gpointer gectx)
 
 void GeGtk::activate_fill(GtkWidget* w, gpointer gectx)
 {
-  int set = (int)gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(w));
+  int set = (int)gtk_toggle_tool_button_get_active(GTK_TOGGLE_TOOL_BUTTON(w));
   ((Ge*)gectx)->activate_fill(set);
 }
 
 void GeGtk::activate_border(GtkWidget* w, gpointer gectx)
 {
-  int set = (int)gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(w));
+  int set = (int)gtk_toggle_tool_button_get_active(GTK_TOGGLE_TOOL_BUTTON(w));
   ((Ge*)gectx)->activate_border(set);
 }
 
 void GeGtk::activate_shadow(GtkWidget* w, gpointer gectx)
 {
-  int set = (int)gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(w));
+  int set = (int)gtk_toggle_tool_button_get_active(GTK_TOGGLE_TOOL_BUTTON(w));
   ((Ge*)gectx)->activate_shadow(set);
 }
 
@@ -1019,29 +1074,9 @@ void GeGtk::activate_gradient_no(GtkWidget* w, gpointer gectx)
   ((Ge*)gectx)->activate_gradient(glow_eGradient_No);
 }
 
-void GeGtk::activate_gradient_horizup(GtkWidget* w, gpointer gectx)
-{
-  ((Ge*)gectx)->activate_gradient(glow_eGradient_HorizontalUp);
-}
-
 void GeGtk::activate_gradient_horizdown(GtkWidget* w, gpointer gectx)
 {
   ((Ge*)gectx)->activate_gradient(glow_eGradient_HorizontalDown);
-}
-
-void GeGtk::activate_gradient_horiztube1(GtkWidget* w, gpointer gectx)
-{
-  ((Ge*)gectx)->activate_gradient(glow_eGradient_HorizontalTube1);
-}
-
-void GeGtk::activate_gradient_horiztube2(GtkWidget* w, gpointer gectx)
-{
-  ((Ge*)gectx)->activate_gradient(glow_eGradient_HorizontalTube2);
-}
-
-void GeGtk::activate_gradient_vertleft(GtkWidget* w, gpointer gectx)
-{
-  ((Ge*)gectx)->activate_gradient(glow_eGradient_VerticalLeft);
 }
 
 void GeGtk::activate_gradient_vertright(GtkWidget* w, gpointer gectx)
@@ -1049,74 +1084,23 @@ void GeGtk::activate_gradient_vertright(GtkWidget* w, gpointer gectx)
   ((Ge*)gectx)->activate_gradient(glow_eGradient_VerticalRight);
 }
 
-void GeGtk::activate_gradient_verttube1(GtkWidget* w, gpointer gectx)
-{
-  ((Ge*)gectx)->activate_gradient(glow_eGradient_VerticalTube1);
-}
-
-void GeGtk::activate_gradient_verttube2(GtkWidget* w, gpointer gectx)
-{
-  ((Ge*)gectx)->activate_gradient(glow_eGradient_VerticalTube2);
-}
-
-void GeGtk::activate_gradient_diagupperleft(GtkWidget* w, gpointer gectx)
-{
-  ((Ge*)gectx)->activate_gradient(glow_eGradient_DiagonalUpperLeft);
-}
-
-void GeGtk::activate_gradient_diaglowerleft(GtkWidget* w, gpointer gectx)
-{
-  ((Ge*)gectx)->activate_gradient(glow_eGradient_DiagonalLowerLeft);
-}
-
-void GeGtk::activate_gradient_diagupperright(GtkWidget* w, gpointer gectx)
-{
-  ((Ge*)gectx)->activate_gradient(glow_eGradient_DiagonalUpperRight);
-}
-
 void GeGtk::activate_gradient_diaglowerright(GtkWidget* w, gpointer gectx)
 {
   ((Ge*)gectx)->activate_gradient(glow_eGradient_DiagonalLowerRight);
 }
 
-void GeGtk::activate_gradient_diaguptube(GtkWidget* w, gpointer gectx)
+void GeGtk::activate_gradient_combo(GtkWidget* w, gpointer gectx)
 {
-  ((Ge*)gectx)->activate_gradient(glow_eGradient_DiagonalUpTube);
-}
+  int active;
 
-void GeGtk::activate_gradient_diagdowntube(GtkWidget* w, gpointer gectx)
-{
-  ((Ge*)gectx)->activate_gradient(glow_eGradient_DiagonalDownTube);
-}
+  if (!((Ge*)gectx)->graph)
+    return;
 
-void GeGtk::activate_gradient_globe(GtkWidget* w, gpointer gectx)
-{
-  ((Ge*)gectx)->activate_gradient(glow_eGradient_Globe);
-}
+  active = gtk_combo_box_get_active(GTK_COMBO_BOX(w));
+  if (active < 0 || active >= sizeof(grad_combo_table)/sizeof(grad_combo_table[0]))
+    return;
 
-void GeGtk::activate_gradient_radcenter(GtkWidget* w, gpointer gectx)
-{
-  ((Ge*)gectx)->activate_gradient(glow_eGradient_RadialCenter);
-}
-
-void GeGtk::activate_gradient_radupperleft(GtkWidget* w, gpointer gectx)
-{
-  ((Ge*)gectx)->activate_gradient(glow_eGradient_RadialUpperLeft);
-}
-
-void GeGtk::activate_gradient_radlowerleft(GtkWidget* w, gpointer gectx)
-{
-  ((Ge*)gectx)->activate_gradient(glow_eGradient_RadialLowerLeft);
-}
-
-void GeGtk::activate_gradient_radupperright(GtkWidget* w, gpointer gectx)
-{
-  ((Ge*)gectx)->activate_gradient(glow_eGradient_RadialUpperRight);
-}
-
-void GeGtk::activate_gradient_radlowerright(GtkWidget* w, gpointer gectx)
-{
-  ((Ge*)gectx)->activate_gradient(glow_eGradient_RadialLowerRight);
+  ((Ge*)gectx)->activate_gradient((glow_eGradient)grad_combo_table[active].idx);
 }
 
 void GeGtk::activate_reset_mode(GtkWidget* w, gpointer gectx)
@@ -1141,157 +1125,118 @@ void GeGtk::activate_scale_half(GtkWidget* w, gpointer gectx)
 
 void GeGtk::activate_grid(GtkWidget* w, gpointer gectx)
 {
-  int set = (int)gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(w));
+  int set = (int)gtk_toggle_tool_button_get_active(GTK_TOGGLE_TOOL_BUTTON(w));
   ((Ge*)gectx)->activate_grid(set);
 }
 
-void GeGtk::activate_linewidth_1(GtkWidget* w, gpointer gectx)
+void GeGtk::activate_linewidth_combo(GtkWidget* w, gpointer gectx)
 {
-  ((Ge*)gectx)->activate_linewidth(1);
-  printf("linewidth 1\n");
-}
-void GeGtk::activate_linewidth_2(GtkWidget* w, gpointer gectx)
-{
-  ((Ge*)gectx)->activate_linewidth(2);
-  printf("linewidth 2\n");
-}
-void GeGtk::activate_linewidth_3(GtkWidget* w, gpointer gectx)
-{
-  ((Ge*)gectx)->activate_linewidth(3);
-}
-void GeGtk::activate_linewidth_4(GtkWidget* w, gpointer gectx)
-{
-  ((Ge*)gectx)->activate_linewidth(4);
-}
-void GeGtk::activate_linewidth_5(GtkWidget* w, gpointer gectx)
-{
-  ((Ge*)gectx)->activate_linewidth(5);
-}
-void GeGtk::activate_linewidth_6(GtkWidget* w, gpointer gectx)
-{
-  ((Ge*)gectx)->activate_linewidth(6);
-}
-void GeGtk::activate_linewidth_7(GtkWidget* w, gpointer gectx)
-{
-  ((Ge*)gectx)->activate_linewidth(7);
-}
-void GeGtk::activate_linewidth_8(GtkWidget* w, gpointer gectx)
-{
-  ((Ge*)gectx)->activate_linewidth(8);
-}
-void GeGtk::activate_linewidth_16(GtkWidget* w, gpointer gectx)
-{
-  ((Ge*)gectx)->activate_linewidth(16);
+  int active;
+
+  if (!((Ge*)gectx)->graph)
+    return;
+
+  active = gtk_combo_box_get_active(GTK_COMBO_BOX(w));
+  if (active < 0 || active >= sizeof(linewidth_combo_table)/sizeof(linewidth_combo_table[0]))
+    return;
+
+  if (((Ge*)gectx)->graph)
+    ((Ge*)gectx)->activate_linewidth(linewidth_combo_table[active].idx);
 }
 
-void GeGtk::activate_linetype1(GtkWidget* w, gpointer gectx)
+void GeGtk::activate_linetype_combo(GtkWidget* w, gpointer gectx)
 {
-  ((Ge*)gectx)->activate_linetype1();
+  int active;
+
+  if (!((Ge*)gectx)->graph)
+    return;
+
+  active = gtk_combo_box_get_active(GTK_COMBO_BOX(w));
+  if (active < 0 || active >= sizeof(linetype_combo_table)/sizeof(linetype_combo_table[0]))
+    return;
+
+  switch (linetype_combo_table[active].idx) {
+  case 1:
+    ((Ge*)gectx)->activate_linetype1();
+    break;
+  case 2:
+    ((Ge*)gectx)->activate_linetype2();
+    break;
+  case 3:
+    ((Ge*)gectx)->activate_linetype3();
+    break;
+  case 4:
+    ((Ge*)gectx)->activate_linetype4();
+    break;
+  case 5:
+    ((Ge*)gectx)->activate_linetype5();
+    break;
+  case 6:
+    ((Ge*)gectx)->activate_linetype6();
+    break;
+  case 7:
+    ((Ge*)gectx)->activate_linetype7();
+    break;
+  }
 }
 
-void GeGtk::activate_linetype2(GtkWidget* w, gpointer gectx)
+void GeGtk::activate_gridsize_combo(GtkWidget* w, gpointer gectx)
 {
-  ((Ge*)gectx)->activate_linetype2();
+  int active;
+
+  if (!((Ge*)gectx)->graph)
+    return;
+
+  active = gtk_combo_box_get_active(GTK_COMBO_BOX(w));
+  if (active < 0 || active >= sizeof(gridsize_combo_table)/sizeof(gridsize_combo_table[0]))
+    return;
+
+  switch(gridsize_combo_table[active].idx) {
+  case 1:
+    ((Ge*)gectx)->activate_gridsize(0.1);
+    break;
+  case 2:
+    ((Ge*)gectx)->activate_gridsize(0.25);
+    break;
+  case 3:
+    ((Ge*)gectx)->activate_gridsize(0.5);
+    break;
+  case 4:
+    ((Ge*)gectx)->activate_gridsize(1.0);
+    break;
+  }
 }
 
-void GeGtk::activate_linetype3(GtkWidget* w, gpointer gectx)
+void GeGtk::activate_textsize_combo(GtkWidget* w, gpointer gectx)
 {
-  ((Ge*)gectx)->activate_linetype3();
+  int active;
+
+  if (!((Ge*)gectx)->graph)
+    return;
+
+  active = gtk_combo_box_get_active(GTK_COMBO_BOX(w));
+  if (active < 0 || active >= sizeof(textsize_combo_table)/sizeof(textsize_combo_table[0]))
+    return;
+
+  ((Ge*)gectx)->activate_textsize(textsize_combo_table[active].idx);
 }
 
-void GeGtk::activate_linetype4(GtkWidget* w, gpointer gectx)
+void GeGtk::activate_font_combo(GtkWidget* w, gpointer gectx)
 {
-  ((Ge*)gectx)->activate_linetype4();
-}
+  int active;
 
-void GeGtk::activate_linetype5(GtkWidget* w, gpointer gectx)
-{
-  ((Ge*)gectx)->activate_linetype5();
-}
+  if (!((Ge*)gectx)->graph)
+    return;
 
-void GeGtk::activate_linetype6(GtkWidget* w, gpointer gectx)
-{
-  ((Ge*)gectx)->activate_linetype6();
-}
-
-void GeGtk::activate_linetype7(GtkWidget* w, gpointer gectx)
-{
-  ((Ge*)gectx)->activate_linetype7();
-}
-
-void GeGtk::activate_gridsize_4(GtkWidget* w, gpointer gectx)
-{
-  ((Ge*)gectx)->activate_gridsize(1);
-}
-
-void GeGtk::activate_gridsize_3(GtkWidget* w, gpointer gectx)
-{
-  ((Ge*)gectx)->activate_gridsize(0.5);
-}
-
-void GeGtk::activate_gridsize_2(GtkWidget* w, gpointer gectx)
-{
-  ((Ge*)gectx)->activate_gridsize(0.25);
-}
-
-void GeGtk::activate_gridsize_1(GtkWidget* w, gpointer gectx)
-{
-  ((Ge*)gectx)->activate_gridsize(0.1);
-}
-
-void GeGtk::activate_textsize_0(GtkWidget* w, gpointer gectx)
-{
-  ((Ge*)gectx)->activate_textsize(0);
-}
-void GeGtk::activate_textsize_1(GtkWidget* w, gpointer gectx)
-{
-  ((Ge*)gectx)->activate_textsize(1);
-}
-
-void GeGtk::activate_textsize_2(GtkWidget* w, gpointer gectx)
-{
-  ((Ge*)gectx)->activate_textsize(2);
-}
-
-void GeGtk::activate_textsize_3(GtkWidget* w, gpointer gectx)
-{
-  ((Ge*)gectx)->activate_textsize(3);
-}
-
-void GeGtk::activate_textsize_4(GtkWidget* w, gpointer gectx)
-{
-  ((Ge*)gectx)->activate_textsize(4);
-}
-
-void GeGtk::activate_textsize_5(GtkWidget* w, gpointer gectx)
-{
-  ((Ge*)gectx)->activate_textsize(5);
-}
-
-void GeGtk::activate_textfont_1(GtkWidget* w, gpointer gectx)
-{
-  ((Ge*)gectx)->activate_textfont(glow_eFont_Helvetica);
-}
-void GeGtk::activate_textfont_2(GtkWidget* w, gpointer gectx)
-{
-  ((Ge*)gectx)->activate_textfont(glow_eFont_Times);
-}
-void GeGtk::activate_textfont_3(GtkWidget* w, gpointer gectx)
-{
-  ((Ge*)gectx)->activate_textfont(glow_eFont_NewCenturySchoolbook);
-}
-void GeGtk::activate_textfont_4(GtkWidget* w, gpointer gectx)
-{
-  ((Ge*)gectx)->activate_textfont(glow_eFont_Courier);
-}
-void GeGtk::activate_textfont_5(GtkWidget* w, gpointer gectx)
-{
-  ((Ge*)gectx)->activate_textfont(glow_eFont_LucidaSans);
+  active = gtk_combo_box_get_active(GTK_COMBO_BOX(w));
+  if (active < 0 || active >= sizeof(font_combo_table)/sizeof(font_combo_table[0]))
+    return;
+  ((Ge*)gectx)->activate_textfont((glow_eFont)font_combo_table[active].idx);
 }
 
 void GeGtk::activate_textbold(GtkWidget* w, gpointer gectx)
 {
-  int set = (int)gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(w));
+  int set = (int)gtk_toggle_tool_button_get_active(GTK_TOGGLE_TOOL_BUTTON(w));
   ((Ge*)gectx)->activate_textbold(set);
 }
 
@@ -1598,17 +1543,17 @@ void GeGtk::valchanged_cmd_input(GtkWidget* w, gpointer data)
 
 void GeGtk::update()
 {
-  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(grid_on_w), graph->grid);
-  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(show_grid_w), graph->get_show_grid());
+  gtk_toggle_tool_button_set_active(GTK_TOGGLE_TOOL_BUTTON(grid_on_w), graph->grid);
+  gtk_toggle_tool_button_set_active(GTK_TOGGLE_TOOL_BUTTON(show_grid_w), graph->get_show_grid());
 
   if (fabs(graph->grid_size_x - 0.1) < DBL_EPSILON)
-    gtk_option_menu_set_history(GTK_OPTION_MENU(grid_size_w), 3);
-  else if (fabs(graph->grid_size_x - 0.2) < DBL_EPSILON)
-    gtk_option_menu_set_history(GTK_OPTION_MENU(grid_size_w), 2);
+    gtk_combo_box_set_active(GTK_COMBO_BOX(gridsize_combo), 0);
+  else if (fabs(graph->grid_size_x - 0.25) < DBL_EPSILON)
+    gtk_combo_box_set_active(GTK_COMBO_BOX(gridsize_combo), 1);
   else if (fabs(graph->grid_size_x - 0.5) < DBL_EPSILON)
-    gtk_option_menu_set_history(GTK_OPTION_MENU(grid_size_w), 1);
+    gtk_combo_box_set_active(GTK_COMBO_BOX(gridsize_combo), 2);
   else
-    gtk_option_menu_set_history(GTK_OPTION_MENU(grid_size_w), 0);
+    gtk_combo_box_set_active(GTK_COMBO_BOX(gridsize_combo), 3);
 }
 
 static gint delete_event(GtkWidget* w, GdkEvent* event, gpointer gectx)
@@ -1636,14 +1581,6 @@ static gint yesnodia_delete_event(GtkWidget* w, GdkEvent* event, gpointer gectx)
 
 static void destroy_event(GtkWidget* w, gpointer data)
 {
-}
-
-static void set_widget_font(GtkWidget* w, const char* font_name)
-{
-  PangoFontDescription* desc;
-
-  desc = pango_font_description_from_string(font_name);
-  gtk_widget_modify_font(w, desc);
 }
 
 gboolean GeGtk::ge_action_inputfocus(
@@ -1743,7 +1680,7 @@ GeGtk::GeGtk(void* x_parent_ctx, GtkWidget* x_parent_widget,
   GtkToolbar* tools3 = (GtkToolbar*)g_object_new(GTK_TYPE_TOOLBAR, NULL);
 
   // File Entry
-  GtkWidget* file_new = gtk_image_menu_item_new_from_stock(GTK_STOCK_NEW, NULL);
+  GtkWidget* file_new = gtk_menu_item_new_with_mnemonic("_New");
   g_signal_connect(file_new, "activate", G_CALLBACK(activate_new), this);
 
   GtkWidget* file_open = gtk_menu_item_new_with_mnemonic("_Open Graph...");
@@ -1752,18 +1689,19 @@ GeGtk::GeGtk(void* x_parent_ctx, GtkWidget* x_parent_widget,
   GtkWidget* file_opendashboard = gtk_menu_item_new_with_mnemonic("Open _Dashboard...");
   g_signal_connect(file_opendashboard, "activate", G_CALLBACK(activate_opendashboard), this);
 
-  GtkWidget* file_save
-      = gtk_image_menu_item_new_from_stock(GTK_STOCK_SAVE, accel_g);
+  GtkWidget* file_save = gtk_menu_item_new_with_mnemonic("_Save");
   g_signal_connect(file_save, "activate", G_CALLBACK(activate_save), this);
+  gtk_widget_add_accelerator(file_save, "activate", accel_g, 's',
+      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
 
   GtkWidget* file_save_as
-      = gtk_image_menu_item_new_from_stock(GTK_STOCK_SAVE_AS, accel_g);
+      = gtk_menu_item_new_with_mnemonic("S_ave as");
   g_signal_connect(
       file_save_as, "activate", G_CALLBACK(activate_save_as), this);
   gtk_widget_add_accelerator(file_save_as, "activate", accel_g, 's',
       GdkModifierType(GDK_CONTROL_MASK | GDK_SHIFT_MASK), GTK_ACCEL_VISIBLE);
 
-  GtkWidget* file_build = gtk_image_menu_item_new_with_mnemonic("_Build");
+  GtkWidget* file_build = gtk_menu_item_new_with_mnemonic("_Build");
   g_signal_connect(file_build, "activate", G_CALLBACK(activate_build), this);
 
   GtkWidget* file_graph_attr
@@ -1892,12 +1830,14 @@ GeGtk::GeGtk(void* x_parent_ctx, GtkWidget* x_parent_widget,
       file_history, "activate", G_CALLBACK(activate_history), this);
 
   GtkWidget* file_print
-      = gtk_image_menu_item_new_from_stock(GTK_STOCK_PRINT, accel_g);
+      = gtk_menu_item_new_with_mnemonic("_Print");
   g_signal_connect(file_print, "activate", G_CALLBACK(activate_print), this);
 
   GtkWidget* file_close
-      = gtk_image_menu_item_new_from_stock(GTK_STOCK_CLOSE, accel_g);
+      = gtk_menu_item_new_with_mnemonic("_Close");
   g_signal_connect(file_close, "activate", G_CALLBACK(activate_exit), this);
+  gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w',
+      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
 
   GtkMenu* file_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_new);
@@ -1927,31 +1867,37 @@ GeGtk::GeGtk(void* x_parent_ctx, GtkWidget* x_parent_widget,
 
   // Edit entry
   GtkWidget* edit_cut
-      = gtk_image_menu_item_new_from_stock(GTK_STOCK_CUT, accel_g);
+      = gtk_menu_item_new_with_mnemonic("C_ut");
   g_signal_connect(edit_cut, "activate", G_CALLBACK(activate_cut), this);
+  gtk_widget_add_accelerator(edit_cut, "activate", accel_g, 'x',
+      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
 
   GtkWidget* edit_copy
-      = gtk_image_menu_item_new_from_stock(GTK_STOCK_COPY, accel_g);
+      = gtk_menu_item_new_with_mnemonic("_Copy");
   g_signal_connect(edit_copy, "activate", G_CALLBACK(activate_copy), this);
+  gtk_widget_add_accelerator(edit_copy, "activate", accel_g, 'c',
+      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
 
   GtkWidget* edit_paste
-      = gtk_image_menu_item_new_from_stock(GTK_STOCK_PASTE, accel_g);
+      = gtk_menu_item_new_with_mnemonic("_Paste");
   g_signal_connect(edit_paste, "activate", G_CALLBACK(activate_paste), this);
+  gtk_widget_add_accelerator(edit_paste, "activate", accel_g, 'v',
+      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
 
   GtkWidget* edit_delete
-      = gtk_image_menu_item_new_from_stock(GTK_STOCK_DELETE, accel_g);
+      = gtk_menu_item_new_with_mnemonic("_Delete");
   g_signal_connect(edit_delete, "activate", G_CALLBACK(activate_delete), this);
-  gtk_widget_add_accelerator(edit_delete, "activate", accel_g, GDK_Delete,
+  gtk_widget_add_accelerator(edit_delete, "activate", accel_g, GDK_KEY_Delete,
       GdkModifierType(0), GTK_ACCEL_VISIBLE);
 
   GtkWidget* edit_undo
-      = gtk_image_menu_item_new_from_stock(GTK_STOCK_UNDO, accel_g);
+      = gtk_menu_item_new_with_mnemonic("_Undo");
   g_signal_connect(edit_undo, "activate", G_CALLBACK(activate_undo), this);
   gtk_widget_add_accelerator(
       edit_undo, "activate", accel_g, 'z', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
   GtkWidget* edit_redo
-      = gtk_image_menu_item_new_from_stock(GTK_STOCK_REDO, accel_g);
+      = gtk_menu_item_new_with_mnemonic("_Redo");
   g_signal_connect(edit_redo, "activate", G_CALLBACK(activate_redo), this);
   gtk_widget_add_accelerator(edit_redo, "activate", accel_g, 'z',
       GdkModifierType(GDK_CONTROL_MASK | GDK_MOD1_MASK), GTK_ACCEL_VISIBLE);
@@ -2037,29 +1983,25 @@ GeGtk::GeGtk(void* x_parent_ctx, GtkWidget* x_parent_widget,
   GtkWidget* functions_push = gtk_menu_item_new_with_mnemonic("P_ush");
   g_signal_connect(functions_push, "activate", G_CALLBACK(activate_push), this);
 
-  GtkWidget* functions_scale_equal
-      = gtk_menu_item_new_with_mnemonic("_Scale Equal");
+  GtkWidget* functions_scale_equal = gtk_menu_item_new_with_mnemonic("_Scale Equal");
   g_signal_connect(functions_scale_equal, "activate",
       G_CALLBACK(activate_scale_equal), this);
   gtk_widget_add_accelerator(functions_scale_equal, "activate", accel_g, 'e',
       GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
-  GtkWidget* functions_move_horizontal
-      = gtk_menu_item_new_with_mnemonic("_Horizontal");
+  GtkWidget* functions_move_horizontal = gtk_menu_item_new_with_mnemonic("_Horizontal");
   g_signal_connect(functions_move_horizontal, "activate",
       G_CALLBACK(activate_move_horizontal), this);
   gtk_widget_add_accelerator(functions_move_horizontal, "activate", accel_g,
       'h', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
-  GtkWidget* functions_move_vertical
-      = gtk_menu_item_new_with_mnemonic("_Vertical");
+  GtkWidget* functions_move_vertical = gtk_menu_item_new_with_mnemonic("_Vertical");
   g_signal_connect(functions_move_vertical, "activate",
       G_CALLBACK(activate_move_vertical), this);
   gtk_widget_add_accelerator(functions_move_vertical, "activate", accel_g, 'g',
       GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
-  GtkWidget* functions_move_no
-      = gtk_image_menu_item_new_from_stock(GTK_STOCK_NO, accel_g);
+  GtkWidget* functions_move_no = gtk_menu_item_new_with_mnemonic("_No");
   g_signal_connect(
       functions_move_no, "activate", G_CALLBACK(activate_move_reset), this);
 
@@ -2227,28 +2169,28 @@ GeGtk::GeGtk(void* x_parent_ctx, GtkWidget* x_parent_widget,
   g_signal_connect(functions_select_nextright, "activate",
       G_CALLBACK(activate_select_nextright), this);
   gtk_widget_add_accelerator(functions_select_nextright, "activate", accel_g,
-      GDK_Right, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+      GDK_KEY_Right, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
   GtkWidget* functions_select_nextleft
       = gtk_menu_item_new_with_mnemonic("Next Left");
   g_signal_connect(functions_select_nextleft, "activate",
       G_CALLBACK(activate_select_nextleft), this);
   gtk_widget_add_accelerator(functions_select_nextleft, "activate", accel_g,
-      GDK_Left, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+      GDK_KEY_Left, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
   GtkWidget* functions_select_nextup
       = gtk_menu_item_new_with_mnemonic("Next Up");
   g_signal_connect(functions_select_nextup, "activate",
       G_CALLBACK(activate_select_nextup), this);
   gtk_widget_add_accelerator(functions_select_nextup, "activate", accel_g,
-      GDK_Up, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+      GDK_KEY_Up, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
   GtkWidget* functions_select_nextdown
       = gtk_menu_item_new_with_mnemonic("Next Down");
   g_signal_connect(functions_select_nextdown, "activate",
       G_CALLBACK(activate_select_nextdown), this);
   gtk_widget_add_accelerator(functions_select_nextdown, "activate", accel_g,
-      GDK_Down, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+      GDK_KEY_Down, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
   GtkWidget* functions_select = gtk_menu_item_new_with_mnemonic("Select");
   GtkMenu* functions_select_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
@@ -2524,21 +2466,21 @@ GeGtk::GeGtk(void* x_parent_ctx, GtkWidget* x_parent_widget,
       view_preview_stop, "activate", G_CALLBACK(activate_preview_stop), this);
 
   GtkWidget* view_zoom_in
-      = gtk_image_menu_item_new_from_stock(GTK_STOCK_ZOOM_IN, NULL);
+      = gtk_menu_item_new_with_mnemonic("Zoom _in");
   g_signal_connect(
       view_zoom_in, "activate", G_CALLBACK(activate_zoom_in), this);
   gtk_widget_add_accelerator(view_zoom_in, "activate", accel_g, 'i',
       GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
   GtkWidget* view_zoom_out
-      = gtk_image_menu_item_new_from_stock(GTK_STOCK_ZOOM_OUT, NULL);
+      = gtk_menu_item_new_with_mnemonic("Zoom _out");
   g_signal_connect(
       view_zoom_out, "activate", G_CALLBACK(activate_zoom_out), this);
   gtk_widget_add_accelerator(view_zoom_out, "activate", accel_g, 'o',
       GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
   GtkWidget* view_zoom_reset
-      = gtk_image_menu_item_new_from_stock(GTK_STOCK_ZOOM_100, NULL);
+      = gtk_menu_item_new_with_mnemonic("Zoom _reset");
   g_signal_connect(
       view_zoom_reset, "activate", G_CALLBACK(activate_zoom_reset), this);
 
@@ -2573,8 +2515,10 @@ GeGtk::GeGtk(void* x_parent_ctx, GtkWidget* x_parent_widget,
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(view), GTK_WIDGET(view_menu));
 
   // Menu Help
-  GtkWidget* help_help = gtk_image_menu_item_new_from_stock(GTK_STOCK_HELP, 0);
+  GtkWidget* help_help = gtk_menu_item_new_with_mnemonic("_Help");
   g_signal_connect(help_help, "activate", G_CALLBACK(activate_help), this);
+  gtk_widget_add_accelerator(help_help, "activate", accel_g, 'h',
+      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
 
   GtkWidget* help_help_subgraph
       = gtk_menu_item_new_with_mnemonic("H_elp on Subgraphs");
@@ -2592,889 +2536,353 @@ GeGtk::GeGtk(void* x_parent_ctx, GtkWidget* x_parent_widget,
   // Toolbar buttons
 
   // Shape buttons
-  GtkWidget* tools_rect = image_button("$pwr_exe/ge_rect.png");
-  g_signal_connect(tools_rect, "clicked", G_CALLBACK(activate_rect), this);
-  gtk_toolbar_append_widget(tools, tools_rect, "Draw a rectangle", "");
+  wutl_tools_item(tools, "$pwr_exe/ge_rect.png", G_CALLBACK(activate_rect), 
+      "Draw a rectangle", this, 0, 0);
 
-  GtkWidget* tools_rectrounded = image_button("$pwr_exe/ge_roundedrect.png");
-  g_signal_connect(
-      tools_rectrounded, "clicked", G_CALLBACK(activate_rectrounded), this);
-  gtk_toolbar_append_widget(
-      tools, tools_rectrounded, "Draw a rounded rectangle", "");
+  wutl_tools_item(tools, "$pwr_exe/ge_roundedrect.png", G_CALLBACK(activate_rectrounded), 
+      "Draw a rounded rectangle", this, 0, 0);
 
-  GtkWidget* tools_circ = image_button("$pwr_exe/ge_circ.png");
-  g_signal_connect(tools_circ, "clicked", G_CALLBACK(activate_circle), this);
-  gtk_toolbar_append_widget(tools, tools_circ, "Draw a circle or ellipse", "");
+  wutl_tools_item(tools, "$pwr_exe/ge_circ.png", G_CALLBACK(activate_circle), 
+      "Draw a circle or ellipse", this, 0, 0);
 
-  GtkWidget* tools_line = image_button("$pwr_exe/ge_line.png");
-  g_signal_connect(tools_line, "clicked", G_CALLBACK(activate_line), this);
-  gtk_toolbar_append_widget(tools, tools_line, "Draw a line", "");
+  wutl_tools_item(tools, "$pwr_exe/ge_line.png", G_CALLBACK(activate_line), 
+      "Draw a line", this, 0, 0);
 
-  GtkWidget* tools_polyline = image_button("$pwr_exe/ge_polyline.png");
-  g_signal_connect(
-      tools_polyline, "clicked", G_CALLBACK(activate_polyline), this);
-  gtk_toolbar_append_widget(
-      tools, tools_polyline, "Draw a polyline or polygon", "");
+  wutl_tools_item(tools, "$pwr_exe/ge_polyline.png", G_CALLBACK(activate_polyline), 
+      "Draw a polyline or polygon", this, 0, 0);
 
-  GtkWidget* tools_text = image_button("$pwr_exe/ge_text.png");
-  g_signal_connect(tools_text, "clicked", G_CALLBACK(activate_text), this);
-  gtk_toolbar_append_widget(tools, tools_text, "Draw a text", "");
+  wutl_tools_item(tools, "$pwr_exe/ge_text.png", G_CALLBACK(activate_text), 
+      "Draw a text", this, 0, 0);
 
-  GtkWidget* tools_annot = image_button("$pwr_exe/ge_annot.png");
-  g_signal_connect(tools_annot, "clicked", G_CALLBACK(activate_annot), this);
-  gtk_toolbar_append_widget(tools, tools_annot, "Insert an annotation", "");
+  wutl_tools_item(tools, "$pwr_exe/ge_annot.png", G_CALLBACK(activate_annot), 
+      "Insert an annotation", this, 0, 0);
 
-  GtkWidget* tools_conpoint = image_button("$pwr_exe/ge_conpoint.png");
-  g_signal_connect(
-      tools_conpoint, "clicked", G_CALLBACK(activate_conpoint), this);
-  gtk_toolbar_append_widget(
-      tools, tools_conpoint, "Insert a connectionpoint", "");
+  wutl_tools_item(tools, "$pwr_exe/ge_conpoint.png", G_CALLBACK(activate_conpoint), 
+      "Insert a connection point", this, 0, 0);
 
   // Border checkbutton
-  GtkWidget* tools_border = gtk_toggle_button_new();
-  dcli_translate_filename(fname, "$pwr_exe/ge_border.png");
-  gtk_container_add(
-      GTK_CONTAINER(tools_border), gtk_image_new_from_file(fname));
-  g_signal_connect(tools_border, "clicked", G_CALLBACK(activate_border), this);
-  g_object_set(tools_border, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(tools, tools_border,
-      "Set border property on selected objects, and as default", "");
+  wutl_tools_toggle_button(tools, "$pwr_exe/ge_border.png", G_CALLBACK(activate_border), 
+    "Set border property on selected objects, and as default", this, 1, 0);
+
 
   // Fill checkbutton
-  GtkWidget* tools_fill = gtk_toggle_button_new();
-  dcli_translate_filename(fname, "$pwr_exe/ge_fill.png");
-  gtk_container_add(GTK_CONTAINER(tools_fill), gtk_image_new_from_file(fname));
-  g_signal_connect(tools_fill, "clicked", G_CALLBACK(activate_fill), this);
-  g_object_set(tools_fill, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(tools, tools_fill,
-      "Set fill property on selected objects, and as default", "");
+  wutl_tools_toggle_button(tools, "$pwr_exe/ge_fill.png", G_CALLBACK(activate_fill), 
+    "Set fill property on selected objects, and as default", this, 1, 0);
 
   // 3D checkbutton
-  GtkWidget* tools_shadow = gtk_toggle_button_new();
-  dcli_translate_filename(fname, "$pwr_exe/ge_3d.png");
-  gtk_container_add(
-      GTK_CONTAINER(tools_shadow), gtk_image_new_from_file(fname));
-  g_signal_connect(tools_shadow, "clicked", G_CALLBACK(activate_shadow), this);
-  g_object_set(tools_shadow, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(tools, tools_shadow,
-      "Set 3D property on selected objects, and as default", "");
+  wutl_tools_toggle_button(tools, "$pwr_exe/ge_3d.png", G_CALLBACK(activate_shadow), 
+    "Set 3d property on selected objects, and as default", this, 1, 0);
 
   // Pop button
-  GtkWidget* tools_pop = gtk_button_new();
-  dcli_translate_filename(fname, "$pwr_exe/ge_pop.png");
-  gtk_container_add(GTK_CONTAINER(tools_pop), gtk_image_new_from_file(fname));
-  g_signal_connect(tools_pop, "clicked", G_CALLBACK(activate_pop), this);
-  g_object_set(tools_pop, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(tools, tools_pop, "Pop selected objects", "");
+  wutl_tools_item(tools, "$pwr_exe/ge_pop.png", G_CALLBACK(activate_pop), 
+      "Pop selected objects", this, 1, 0);
 
   // Push button
-  GtkWidget* tools_push = gtk_button_new();
-  dcli_translate_filename(fname, "$pwr_exe/ge_push.png");
-  gtk_container_add(GTK_CONTAINER(tools_push), gtk_image_new_from_file(fname));
-  g_signal_connect(tools_push, "clicked", G_CALLBACK(activate_push), this);
-  g_object_set(tools_push, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(tools, tools_push, "Push selected objects", "");
+  wutl_tools_item(tools, "$pwr_exe/ge_push.png", G_CALLBACK(activate_push), 
+      "Push selected objects", this, 1, 0);
 
   // Move horizontal
-  GtkWidget* tools_move_horiz = gtk_button_new();
-  dcli_translate_filename(fname, "$pwr_exe/ge_move_horiz.png");
-  gtk_container_add(
-      GTK_CONTAINER(tools_move_horiz), gtk_image_new_from_file(fname));
-  g_signal_connect(
-      tools_move_horiz, "clicked", G_CALLBACK(activate_move_horizontal), this);
-  g_object_set(tools_move_horiz, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(tools, tools_move_horiz, "Move horizontal", "");
+  wutl_tools_item(tools, "$pwr_exe/ge_move_horiz.png", G_CALLBACK(activate_move_horizontal), 
+      "Move horizontal", this, 1, 0);
 
   // Move vertical
-  GtkWidget* tools_move_vert = gtk_button_new();
-  dcli_translate_filename(fname, "$pwr_exe/ge_move_vert.png");
-  gtk_container_add(
-      GTK_CONTAINER(tools_move_vert), gtk_image_new_from_file(fname));
-  g_signal_connect(
-      tools_move_vert, "clicked", G_CALLBACK(activate_move_vertical), this);
-  g_object_set(tools_move_vert, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(tools, tools_move_vert, "Move vertical", "");
+  wutl_tools_item(tools, "$pwr_exe/ge_move_vert.png", G_CALLBACK(activate_move_vertical), 
+      "Move vertical", this, 1, 0);
 
   // Group button
-  GtkWidget* tools_group = gtk_button_new();
-  dcli_translate_filename(fname, "$pwr_exe/ge_group.png");
-  gtk_container_add(GTK_CONTAINER(tools_group), gtk_image_new_from_file(fname));
-  g_signal_connect(tools_group, "clicked", G_CALLBACK(activate_group), this);
-  g_object_set(tools_group, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(tools, tools_group, "Group selected objects", "");
+  wutl_tools_item(tools, "$pwr_exe/ge_group.png", G_CALLBACK(activate_group), 
+      "Group selected objects", this, 1, 0);
 
   // Ungroup button
-  GtkWidget* tools_ungroup = gtk_button_new();
-  dcli_translate_filename(fname, "$pwr_exe/ge_ungroup.png");
-  gtk_container_add(
-      GTK_CONTAINER(tools_ungroup), gtk_image_new_from_file(fname));
-  g_signal_connect(
-      tools_ungroup, "clicked", G_CALLBACK(activate_ungroup), this);
-  g_object_set(tools_ungroup, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(tools, tools_ungroup, "Split selected group", "");
+  wutl_tools_item(tools, "$pwr_exe/ge_ungroup.png", G_CALLBACK(activate_ungroup), 
+      "Split selected group", this, 1, 0);
 
   // Align horizontal up
-  GtkWidget* tools_align_horiz_down
-      = image_button("$pwr_exe/ge_align_horiz_bottom.png");
-  g_signal_connect(tools_align_horiz_down, "clicked",
-      G_CALLBACK(activate_align_horiz_down), this);
-  gtk_toolbar_append_widget(tools, tools_align_horiz_down,
-      "Align selected objects bottom side horizontal", "");
+  wutl_tools_item(tools, "$pwr_exe/ge_align_horiz_bottom.png", G_CALLBACK(activate_align_horiz_down), 
+      "Align selected objects bottom side horizontal", this, 0, 0);
 
   // Align horizontal center
-  GtkWidget* tools_align_horiz_center
-      = image_button("$pwr_exe/ge_align_horiz_center.png");
-  g_signal_connect(tools_align_horiz_center, "clicked",
-      G_CALLBACK(activate_align_horiz_center), this);
-  gtk_toolbar_append_widget(tools, tools_align_horiz_center,
-      "Align selected objects center horizontal", "");
+  wutl_tools_item(tools, "$pwr_exe/ge_align_horiz_center.png", G_CALLBACK(activate_align_horiz_center), 
+      "Align selected objects center horizontal", this, 0, 0);
 
   // Align horizontal up
-  GtkWidget* tools_align_horiz_up
-      = image_button("$pwr_exe/ge_align_horiz_top.png");
-  g_signal_connect(tools_align_horiz_up, "clicked",
-      G_CALLBACK(activate_align_horiz_up), this);
-  gtk_toolbar_append_widget(tools, tools_align_horiz_up,
-      "Align selected objects top side horizontal", "");
+  wutl_tools_item(tools, "$pwr_exe/ge_align_horiz_top.png", G_CALLBACK(activate_align_horiz_up), 
+      "Align selected objects top side horizontal", this, 0, 0);
 
   // Align vertical left
-  GtkWidget* tools_align_vert_left
-      = image_button("$pwr_exe/ge_align_vert_left.png");
-  g_signal_connect(tools_align_vert_left, "clicked",
-      G_CALLBACK(activate_align_vert_left), this);
-  gtk_toolbar_append_widget(tools, tools_align_vert_left,
-      "Align selected objects left side vertical", "");
+  wutl_tools_item(tools, "$pwr_exe/ge_align_vert_left.png", G_CALLBACK(activate_align_vert_left), 
+      "Align selected objects left side vertical", this, 0, 0);
 
-  // Align vertontal center
-  GtkWidget* tools_align_vert_center
-      = image_button("$pwr_exe/ge_align_vert_center.png");
-  g_signal_connect(tools_align_vert_center, "clicked",
-      G_CALLBACK(activate_align_vert_center), this);
-  gtk_toolbar_append_widget(tools, tools_align_vert_center,
-      "Align selected objects center vertical", "");
+  // Align vertical center
+  wutl_tools_item(tools, "$pwr_exe/ge_align_vert_center.png", G_CALLBACK(activate_align_vert_center), 
+      "Align selected objects center vertical", this, 0, 0);
 
   // Align vertical right
-  GtkWidget* tools_align_vert_right
-      = image_button("$pwr_exe/ge_align_vert_right.png");
-  g_signal_connect(tools_align_vert_right, "clicked",
-      G_CALLBACK(activate_align_vert_right), this);
-  gtk_toolbar_append_widget(tools, tools_align_vert_right,
-      "Align selected objects right side vertcial", "");
+  wutl_tools_item(tools, "$pwr_exe/ge_align_vert_right.png", G_CALLBACK(activate_align_vert_right), 
+      "Align selected objects right side vertical", this, 0, 0);
 
   // Equidistance vertical left
-  GtkWidget* tools_equid_horiz_left
-      = image_button("$pwr_exe/ge_equidist_left.png");
-  g_signal_connect(tools_equid_horiz_left, "clicked",
-      G_CALLBACK(activate_equid_horiz_left), this);
-  gtk_toolbar_append_widget(tools, tools_equid_horiz_left,
-      "Set equal distance between objects left side horizontal", "");
+  wutl_tools_item(tools, "$pwr_exe/ge_equidist_left.png", G_CALLBACK(activate_equid_horiz_left), 
+      "Set equal distance between objects left side horizontal", this, 0, 0);
 
   // Equidistance horizontal bottom
-  GtkWidget* tools_equid_vert_down
-      = image_button("$pwr_exe/ge_equidist_bottom.png");
-  g_signal_connect(tools_equid_vert_down, "clicked",
-      G_CALLBACK(activate_equid_vert_down), this);
-  gtk_toolbar_append_widget(tools, tools_equid_vert_down,
-      "Set equal distance between objects bottom side vertical", "");
+  wutl_tools_item(tools, "$pwr_exe/ge_equidist_bottom.png", G_CALLBACK(activate_equid_vert_down), 
+      "Set equal distance between objects bottom side vertical", this, 0, 0);
 
   // View Planthierarchy
-  GtkWidget* tools_view_plant = image_button("$pwr_exe/xtt_navigator.png");
-  g_signal_connect(
-      tools_view_plant, "clicked", G_CALLBACK(activate_view_plant), this);
-  gtk_toolbar_append_widget(
-      tools, tools_view_plant, "View plant hierarchy", "");
+  wutl_tools_item(tools, "$pwr_exe/xtt_navigator.png", G_CALLBACK(activate_view_plant), 
+      "View plant hierarchy", this, 0, 0);
 
   // Open Object attributes
-  GtkWidget* tools_open_object = image_button("$pwr_exe/xtt_object.png");
-  g_signal_connect(tools_open_object, "clicked",
-      G_CALLBACK(activate_objectattributes), this);
-  gtk_toolbar_append_widget(
-      tools, tools_open_object, "Open selected object", "");
+  wutl_tools_item(tools, "$pwr_exe/xtt_object.png", G_CALLBACK(activate_objectattributes), 
+      "Open selected object", this, 0, 0);
 
   // Ordinary edit mode button
-  GtkWidget* tools_reset_mode = image_button("$pwr_exe/ge_reset.png");
-  g_signal_connect(
-      tools_reset_mode, "clicked", G_CALLBACK(activate_reset_mode), this);
-  gtk_toolbar_append_widget(tools2, tools_reset_mode, "Mode reset", "");
+  wutl_tools_item(tools2, "$pwr_exe/ge_reset.png", G_CALLBACK(activate_reset_mode), 
+      "Mode reset", this, 0, 0);
 
   // Scale button
-  GtkWidget* tools_scale = image_button("$pwr_exe/ge_scale.png");
-  g_signal_connect(tools_scale, "clicked", G_CALLBACK(activate_scale), this);
-  gtk_toolbar_append_widget(tools2, tools_scale, "Scale selected objects", "");
+  wutl_tools_item(tools2, "$pwr_exe/ge_scale.png", G_CALLBACK(activate_scale), 
+      "Scale selected objects", this, 0, 0);
 
   // Scale double button
-  GtkWidget* tools_scale_double = image_button("$pwr_exe/ge_scale_double.png");
-  g_signal_connect(
-      tools_scale_double, "clicked", G_CALLBACK(activate_scale_double), this);
-  gtk_toolbar_append_widget(
-      tools2, tools_scale_double, "Scale selected objects to double size", "");
+  wutl_tools_item(tools2, "$pwr_exe/ge_scale_double.png", G_CALLBACK(activate_scale_double), 
+      "Scale selected objects to double size", this, 0, 0);
 
   // Scale half button
-  GtkWidget* tools_scale_half = image_button("$pwr_exe/ge_scale_half.png");
-  g_signal_connect(
-      tools_scale_half, "clicked", G_CALLBACK(activate_scale_half), this);
-  gtk_toolbar_append_widget(
-      tools2, tools_scale_half, "Scale selected objects to half size", "");
+  wutl_tools_item(tools2, "$pwr_exe/ge_scale_half.png", G_CALLBACK(activate_scale_half), 
+      "Scale selected objects to half size", this, 0, 0);
 
   // Rotate 90 button
-  GtkWidget* tools_rotate90 = image_button("$pwr_exe/ge_flip.png");
-  g_signal_connect(
-      tools_rotate90, "clicked", G_CALLBACK(activate_rotate90), this);
-  gtk_toolbar_append_widget(
-      tools2, tools_rotate90, "Rotate selected objects 90 degrees", "");
+  wutl_tools_item(tools2, "$pwr_exe/ge_flip.png", G_CALLBACK(activate_rotate90), 
+      "Rotate selected objects 90 degrees", this, 0, 0);
 
   // Mirror horizontal button
-  GtkWidget* tools_mirror_horiz
-      = image_button("$pwr_exe/ge_mirrorhorizontal.png");
-  g_signal_connect(
-      tools_mirror_horiz, "clicked", G_CALLBACK(activate_flip_horiz), this);
-  gtk_toolbar_append_widget(
-      tools2, tools_mirror_horiz, "Mirror selected objects horizontal", "");
+  wutl_tools_item(tools2, "$pwr_exe/ge_mirrorhorizontal.png", G_CALLBACK(activate_flip_horiz), 
+      "Mirror selected objects horizontal", this, 0, 0);
 
   // Mirror vertical button
-  GtkWidget* tools_mirror_vert = image_button("$pwr_exe/ge_mirrorvertical.png");
-  g_signal_connect(
-      tools_mirror_vert, "clicked", G_CALLBACK(activate_flip_vert), this);
-  gtk_toolbar_append_widget(
-      tools2, tools_mirror_vert, "Mirror selected objects vertical", "");
+  wutl_tools_item(tools2, "$pwr_exe/ge_mirrorvertical.png", G_CALLBACK(activate_flip_vert), 
+      "Mirror selected objects vertical", this, 0, 0);
 
   // Tools row
 
-  GtkWidget* tools_save = image_button("$pwr_exe/wb_save.png");
-  gtk_toolbar_append_widget(tools3, tools_save, "Save", "");
-  g_signal_connect(tools_save, "clicked", G_CALLBACK(activate_save), this);
+  wutl_tools_item(tools3, "$pwr_exe/wb_save.png", G_CALLBACK(activate_save), 
+      "Save", this, 0, 0);
 
-  GtkWidget* tools_build = image_button("$pwr_exe/wb_build.png");
-  gtk_toolbar_append_widget(tools3, tools_build, "Build", "");
-  g_signal_connect(tools_build, "clicked", G_CALLBACK(activate_build), this);
+  wutl_tools_item(tools3, "$pwr_exe/wb_build.png", G_CALLBACK(activate_build), 
+      "Build", this, 0, 0);
 
   // Zoom buttons
-  GtkWidget* tools_zoom_in = image_button("$pwr_exe/ge_zoom_in.png");
-  g_signal_connect(
-      tools_zoom_in, "clicked", G_CALLBACK(activate_zoom_in), this);
-  gtk_toolbar_append_widget(tools3, tools_zoom_in, "Zoom in", "");
+  wutl_tools_item(tools3, "$pwr_exe/ge_zoom_in.png", G_CALLBACK(activate_zoom_in), 
+      "Zoom in", this, 0, 0);
 
-  GtkWidget* tools_zoom_out = image_button("$pwr_exe/ge_zoom_out.png");
-  g_signal_connect(
-      tools_zoom_out, "clicked", G_CALLBACK(activate_zoom_out), this);
-  gtk_toolbar_append_widget(tools3, tools_zoom_out, "Zoom out", "");
+  wutl_tools_item(tools3, "$pwr_exe/ge_zoom_out.png", G_CALLBACK(activate_zoom_out), 
+      "Zoom out", this, 0, 0);
 
-  GtkWidget* tools_zoom_reset = image_button("$pwr_exe/ge_zoom_reset.png");
-  g_signal_connect(
-      tools_zoom_reset, "clicked", G_CALLBACK(activate_zoom_reset), this);
-  gtk_toolbar_append_widget(tools3, tools_zoom_reset, "Zoom reset", "");
+  wutl_tools_item(tools3, "$pwr_exe/ge_zoom_reset.png", G_CALLBACK(activate_zoom_reset), 
+      "Zoom reset", this, 0, 0);
 
   // Undo and redo
-  GtkWidget* tools_undo = image_button("$pwr_exe/ge_undo.png");
-  gtk_toolbar_append_widget(tools3, tools_undo, "Undo", "");
-  g_signal_connect(tools_undo, "clicked", G_CALLBACK(activate_undo), this);
+  wutl_tools_item(tools3, "$pwr_exe/ge_undo.png", G_CALLBACK(activate_undo), 
+      "Undo", this, 0, 0);
 
-  GtkWidget* tools_redo = image_button("$pwr_exe/ge_redo.png");
-  gtk_toolbar_append_widget(tools3, tools_redo, "Redo", "");
-  g_signal_connect(tools_redo, "clicked", G_CALLBACK(activate_redo), this);
+  wutl_tools_item(tools3, "$pwr_exe/ge_redo.png", G_CALLBACK(activate_redo), 
+      "Redo", this, 0, 0);
 
-  // Line width option menu
-  GtkWidget* tools_linewidth_1
-      = gtk_image_menu_item_new_with_label("Linewidth 1");
-  dcli_translate_filename(fname, "$pwr_exe/ge_linewidth_1.png");
-  gtk_image_menu_item_set_image(
-      GTK_IMAGE_MENU_ITEM(tools_linewidth_1), gtk_image_new_from_file(fname));
-  g_signal_connect(
-      tools_linewidth_1, "activate", G_CALLBACK(activate_linewidth_1), this);
-  GtkWidget* tools_linewidth_2
-      = gtk_image_menu_item_new_with_label("Linewidth 2");
-  dcli_translate_filename(fname, "$pwr_exe/ge_linewidth_2.png");
-  gtk_image_menu_item_set_image(
-      GTK_IMAGE_MENU_ITEM(tools_linewidth_2), gtk_image_new_from_file(fname));
-  g_signal_connect(
-      tools_linewidth_2, "activate", G_CALLBACK(activate_linewidth_2), this);
-  GtkWidget* tools_linewidth_3
-      = gtk_image_menu_item_new_with_label("Linewidth 3");
-  dcli_translate_filename(fname, "$pwr_exe/ge_linewidth_3.png");
-  gtk_image_menu_item_set_image(
-      GTK_IMAGE_MENU_ITEM(tools_linewidth_3), gtk_image_new_from_file(fname));
-  g_signal_connect(
-      tools_linewidth_3, "activate", G_CALLBACK(activate_linewidth_3), this);
-  GtkWidget* tools_linewidth_4
-      = gtk_image_menu_item_new_with_label("Linewidth 4");
-  dcli_translate_filename(fname, "$pwr_exe/ge_linewidth_4.png");
-  gtk_image_menu_item_set_image(
-      GTK_IMAGE_MENU_ITEM(tools_linewidth_4), gtk_image_new_from_file(fname));
-  g_signal_connect(
-      tools_linewidth_4, "activate", G_CALLBACK(activate_linewidth_4), this);
-  GtkWidget* tools_linewidth_5
-      = gtk_image_menu_item_new_with_label("Linewidth 5");
-  dcli_translate_filename(fname, "$pwr_exe/ge_linewidth_5.png");
-  gtk_image_menu_item_set_image(
-      GTK_IMAGE_MENU_ITEM(tools_linewidth_5), gtk_image_new_from_file(fname));
-  g_signal_connect(
-      tools_linewidth_5, "activate", G_CALLBACK(activate_linewidth_5), this);
-  GtkWidget* tools_linewidth_6
-      = gtk_image_menu_item_new_with_label("Linewidth 6");
-  dcli_translate_filename(fname, "$pwr_exe/ge_linewidth_6.png");
-  gtk_image_menu_item_set_image(
-      GTK_IMAGE_MENU_ITEM(tools_linewidth_6), gtk_image_new_from_file(fname));
-  g_signal_connect(
-      tools_linewidth_6, "activate", G_CALLBACK(activate_linewidth_6), this);
-  GtkWidget* tools_linewidth_7
-      = gtk_image_menu_item_new_with_label("Linewidth 7");
-  dcli_translate_filename(fname, "$pwr_exe/ge_linewidth_7.png");
-  gtk_image_menu_item_set_image(
-      GTK_IMAGE_MENU_ITEM(tools_linewidth_7), gtk_image_new_from_file(fname));
-  g_signal_connect(
-      tools_linewidth_7, "activate", G_CALLBACK(activate_linewidth_7), this);
-  GtkWidget* tools_linewidth_8
-      = gtk_image_menu_item_new_with_label("Linewidth 8");
-  dcli_translate_filename(fname, "$pwr_exe/ge_linewidth_8.png");
-  gtk_image_menu_item_set_image(
-      GTK_IMAGE_MENU_ITEM(tools_linewidth_8), gtk_image_new_from_file(fname));
-  g_signal_connect(
-      tools_linewidth_8, "activate", G_CALLBACK(activate_linewidth_8), this);
+  // Linewidth combobox
+  GtkTreeIter linewidth_iter;
+  GtkListStore *linewidth_liststore;
 
-  // Test
-  // GtkWidget *tools_linewidth_16 = gtk_image_menu_item_new_with_label(
-  // "Linewidth 16");
-  // dcli_translate_filename( fname, "$pwr_exe/ge_linewidth_8.png");
-  // gtk_image_menu_item_set_image( GTK_IMAGE_MENU_ITEM(tools_linewidth_16),
-  //				 gtk_image_new_from_file( fname));
-  // g_signal_connect(tools_linewidth_16, "activate",
-  // G_CALLBACK(activate_linewidth_16), this);
+  linewidth_liststore = gtk_list_store_new(1, G_TYPE_STRING);
+  for (int i = 0; i < sizeof(linewidth_combo_table)/sizeof(linewidth_combo_table[0]); i++)
+    gtk_list_store_insert_with_values(linewidth_liststore, &linewidth_iter, i, 0, CoWowGtk::convert_utf8(linewidth_combo_table[i].text), -1);
+  GtkWidget *linewidth_combo = gtk_combo_box_new_with_model(GTK_TREE_MODEL(linewidth_liststore));
 
-  GtkMenu* linewidth_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
-  gtk_menu_shell_append(GTK_MENU_SHELL(linewidth_menu), tools_linewidth_1);
-  gtk_menu_shell_append(GTK_MENU_SHELL(linewidth_menu), tools_linewidth_2);
-  gtk_menu_shell_append(GTK_MENU_SHELL(linewidth_menu), tools_linewidth_3);
-  gtk_menu_shell_append(GTK_MENU_SHELL(linewidth_menu), tools_linewidth_4);
-  gtk_menu_shell_append(GTK_MENU_SHELL(linewidth_menu), tools_linewidth_5);
-  gtk_menu_shell_append(GTK_MENU_SHELL(linewidth_menu), tools_linewidth_6);
-  gtk_menu_shell_append(GTK_MENU_SHELL(linewidth_menu), tools_linewidth_7);
-  gtk_menu_shell_append(GTK_MENU_SHELL(linewidth_menu), tools_linewidth_8);
-  //  gtk_menu_shell_append( GTK_MENU_SHELL(linewidth_menu),
-  //  tools_linewidth_16);
-  GtkWidget* tools_linewidth_omenu = (GtkWidget*)g_object_new(
-      GTK_TYPE_OPTION_MENU, "menu", linewidth_menu, NULL);
+  GtkCellRenderer *linewidth_combocell = gtk_cell_renderer_text_new();
+  gtk_cell_layout_pack_start(GTK_CELL_LAYOUT(linewidth_combo), linewidth_combocell, TRUE);
+  gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(linewidth_combo), linewidth_combocell,
+      "text", 0, NULL);
+  g_signal_connect(
+      linewidth_combo, "changed", G_CALLBACK(activate_linewidth_combo), this);
+  GtkToolItem *linewidth_combo_tool = gtk_tool_item_new();
+  gtk_container_add(GTK_CONTAINER(linewidth_combo_tool), linewidth_combo);
+  gtk_toolbar_insert(tools3, linewidth_combo_tool, -1);
+  gtk_combo_box_set_active(GTK_COMBO_BOX(linewidth_combo), 0);
+  
+  // Linetype combobox
+  GtkTreeIter linetype_iter;
+  GtkListStore *linetype_liststore;
 
-  gtk_option_menu_set_history(GTK_OPTION_MENU(tools_linewidth_omenu), 0);
-  g_object_set(tools_linewidth_omenu, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(tools3, tools_linewidth_omenu, "Line Width", "");
+  linetype_liststore = gtk_list_store_new(1, G_TYPE_STRING);
+  for (int i = 0; i < sizeof(linetype_combo_table)/sizeof(linetype_combo_table[0]); i++)
+    gtk_list_store_insert_with_values(linetype_liststore, &linetype_iter, i, 0, CoWowGtk::convert_utf8(linetype_combo_table[i].text), -1);
+  GtkWidget *linetype_combo = gtk_combo_box_new_with_model(GTK_TREE_MODEL(linetype_liststore));
 
-  // Line type option menu
-  GtkWidget* tools_linetype_1
-      = gtk_image_menu_item_new_with_label("Linetype 1");
-  dcli_translate_filename(fname, "$pwr_exe/ge_linetype_1.png");
-  gtk_image_menu_item_set_image(
-      GTK_IMAGE_MENU_ITEM(tools_linetype_1), gtk_image_new_from_file(fname));
+  GtkCellRenderer *linetype_combocell = gtk_cell_renderer_text_new();
+  gtk_cell_layout_pack_start(GTK_CELL_LAYOUT(linetype_combo), linetype_combocell, TRUE);
+  gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(linetype_combo), linetype_combocell,
+      "text", 0, NULL);
   g_signal_connect(
-      tools_linetype_1, "activate", G_CALLBACK(activate_linetype1), this);
-  GtkWidget* tools_linetype_2
-      = gtk_image_menu_item_new_with_label("Linetype 2");
-  dcli_translate_filename(fname, "$pwr_exe/ge_linetype_2.png");
-  gtk_image_menu_item_set_image(
-      GTK_IMAGE_MENU_ITEM(tools_linetype_2), gtk_image_new_from_file(fname));
-  g_signal_connect(
-      tools_linetype_2, "activate", G_CALLBACK(activate_linetype2), this);
-  GtkWidget* tools_linetype_3
-      = gtk_image_menu_item_new_with_label("Linetype 3");
-  dcli_translate_filename(fname, "$pwr_exe/ge_linetype_3.png");
-  gtk_image_menu_item_set_image(
-      GTK_IMAGE_MENU_ITEM(tools_linetype_3), gtk_image_new_from_file(fname));
-  g_signal_connect(
-      tools_linetype_3, "activate", G_CALLBACK(activate_linetype3), this);
-  GtkWidget* tools_linetype_4
-      = gtk_image_menu_item_new_with_label("Linetype 4");
-  dcli_translate_filename(fname, "$pwr_exe/ge_linetype_4.png");
-  gtk_image_menu_item_set_image(
-      GTK_IMAGE_MENU_ITEM(tools_linetype_4), gtk_image_new_from_file(fname));
-  g_signal_connect(
-      tools_linetype_4, "activate", G_CALLBACK(activate_linetype4), this);
-  GtkWidget* tools_linetype_5
-      = gtk_image_menu_item_new_with_label("Linetype 5");
-  dcli_translate_filename(fname, "$pwr_exe/ge_linetype_5.png");
-  gtk_image_menu_item_set_image(
-      GTK_IMAGE_MENU_ITEM(tools_linetype_5), gtk_image_new_from_file(fname));
-  g_signal_connect(
-      tools_linetype_5, "activate", G_CALLBACK(activate_linetype5), this);
-  GtkWidget* tools_linetype_6
-      = gtk_image_menu_item_new_with_label("Linetype 6");
-  dcli_translate_filename(fname, "$pwr_exe/ge_linetype_6.png");
-  gtk_image_menu_item_set_image(
-      GTK_IMAGE_MENU_ITEM(tools_linetype_6), gtk_image_new_from_file(fname));
-  g_signal_connect(
-      tools_linetype_6, "activate", G_CALLBACK(activate_linetype6), this);
-  GtkWidget* tools_linetype_7
-      = gtk_image_menu_item_new_with_label("Linetype 7");
-  dcli_translate_filename(fname, "$pwr_exe/ge_linetype_7.png");
-  gtk_image_menu_item_set_image(
-      GTK_IMAGE_MENU_ITEM(tools_linetype_7), gtk_image_new_from_file(fname));
-  g_signal_connect(
-      tools_linetype_7, "activate", G_CALLBACK(activate_linetype7), this);
+      linetype_combo, "changed", G_CALLBACK(activate_linetype_combo), this);
+  GtkToolItem *linetype_combo_tool = gtk_tool_item_new();
+  gtk_container_add(GTK_CONTAINER(linetype_combo_tool), linetype_combo);
+  gtk_toolbar_insert(tools3, linetype_combo_tool, -1);
+  gtk_combo_box_set_active(GTK_COMBO_BOX(linetype_combo), 0);
+  
+  // Textsize combobox
+  GtkTreeIter textsize_iter;
+  GtkListStore *textsize_liststore;
 
-  GtkMenu* linetype_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
-  gtk_menu_shell_append(GTK_MENU_SHELL(linetype_menu), tools_linetype_1);
-  gtk_menu_shell_append(GTK_MENU_SHELL(linetype_menu), tools_linetype_2);
-  gtk_menu_shell_append(GTK_MENU_SHELL(linetype_menu), tools_linetype_3);
-  gtk_menu_shell_append(GTK_MENU_SHELL(linetype_menu), tools_linetype_4);
-  gtk_menu_shell_append(GTK_MENU_SHELL(linetype_menu), tools_linetype_5);
-  gtk_menu_shell_append(GTK_MENU_SHELL(linetype_menu), tools_linetype_6);
-  gtk_menu_shell_append(GTK_MENU_SHELL(linetype_menu), tools_linetype_7);
-  GtkWidget* tools_linetype_omenu = (GtkWidget*)g_object_new(
-      GTK_TYPE_OPTION_MENU, "menu", linetype_menu, NULL);
+  textsize_liststore = gtk_list_store_new(1, G_TYPE_STRING);
+  for (int i = 0; i < sizeof(textsize_combo_table)/sizeof(textsize_combo_table[0]); i++)
+    gtk_list_store_insert_with_values(textsize_liststore, &textsize_iter, i, 0, CoWowGtk::convert_utf8(textsize_combo_table[i].text), -1);
+  GtkWidget *textsize_combo = gtk_combo_box_new_with_model(GTK_TREE_MODEL(textsize_liststore));
 
-  gtk_option_menu_set_history(GTK_OPTION_MENU(tools_linetype_omenu), 0);
-  g_object_set(tools_linetype_omenu, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(tools3, tools_linetype_omenu, "Line Type", "");
+  GtkCellRenderer *textsize_combocell = gtk_cell_renderer_text_new();
+  gtk_cell_layout_pack_start(GTK_CELL_LAYOUT(textsize_combo), textsize_combocell, TRUE);
+  gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(textsize_combo), textsize_combocell,
+      "text", 0, NULL);
+  g_signal_connect(
+      textsize_combo, "changed", G_CALLBACK(activate_textsize_combo), this);
+  GtkToolItem *textsize_combo_tool = gtk_tool_item_new();
+  gtk_container_add(GTK_CONTAINER(textsize_combo_tool), textsize_combo);
+  gtk_toolbar_insert(tools3, textsize_combo_tool, -1);
+  gtk_combo_box_set_active(GTK_COMBO_BOX(textsize_combo), 3);
+  
+  // Font combobox
+  GtkTreeIter font_iter;
+  GtkListStore *font_liststore;
 
-  // Text size options menu
-  GtkWidget* tools_textsize_8
-      = gtk_image_menu_item_new_with_label("Textsize 8");
-  dcli_translate_filename(fname, "$pwr_exe/ge_textsize_8.png");
-  gtk_image_menu_item_set_image(
-      GTK_IMAGE_MENU_ITEM(tools_textsize_8), gtk_image_new_from_file(fname));
-  g_signal_connect(
-      tools_textsize_8, "activate", G_CALLBACK(activate_textsize_0), this);
-  GtkWidget* tools_textsize_10
-      = gtk_image_menu_item_new_with_label("Textsize 10");
-  dcli_translate_filename(fname, "$pwr_exe/ge_textsize_10.png");
-  gtk_image_menu_item_set_image(
-      GTK_IMAGE_MENU_ITEM(tools_textsize_10), gtk_image_new_from_file(fname));
-  g_signal_connect(
-      tools_textsize_10, "activate", G_CALLBACK(activate_textsize_1), this);
-  GtkWidget* tools_textsize_12
-      = gtk_image_menu_item_new_with_label("Textsize 12");
-  dcli_translate_filename(fname, "$pwr_exe/ge_textsize_12.png");
-  gtk_image_menu_item_set_image(
-      GTK_IMAGE_MENU_ITEM(tools_textsize_12), gtk_image_new_from_file(fname));
-  g_signal_connect(
-      tools_textsize_12, "activate", G_CALLBACK(activate_textsize_2), this);
-  GtkWidget* tools_textsize_14
-      = gtk_image_menu_item_new_with_label("Textsize 14");
-  dcli_translate_filename(fname, "$pwr_exe/ge_textsize_14.png");
-  gtk_image_menu_item_set_image(
-      GTK_IMAGE_MENU_ITEM(tools_textsize_14), gtk_image_new_from_file(fname));
-  g_signal_connect(
-      tools_textsize_14, "activate", G_CALLBACK(activate_textsize_3), this);
-  GtkWidget* tools_textsize_18
-      = gtk_image_menu_item_new_with_label("Textsize 18");
-  dcli_translate_filename(fname, "$pwr_exe/ge_textsize_18.png");
-  gtk_image_menu_item_set_image(
-      GTK_IMAGE_MENU_ITEM(tools_textsize_18), gtk_image_new_from_file(fname));
-  g_signal_connect(
-      tools_textsize_18, "activate", G_CALLBACK(activate_textsize_4), this);
-  GtkWidget* tools_textsize_24
-      = gtk_image_menu_item_new_with_label("Textsize 24");
-  dcli_translate_filename(fname, "$pwr_exe/ge_textsize_24.png");
-  gtk_image_menu_item_set_image(
-      GTK_IMAGE_MENU_ITEM(tools_textsize_24), gtk_image_new_from_file(fname));
-  g_signal_connect(
-      tools_textsize_24, "activate", G_CALLBACK(activate_textsize_5), this);
+  font_liststore = gtk_list_store_new(1, G_TYPE_STRING);
+  for (int i = 0; i < sizeof(font_combo_table)/sizeof(font_combo_table[0]); i++)
+    gtk_list_store_insert_with_values(font_liststore, &font_iter, i, 0, CoWowGtk::convert_utf8(font_combo_table[i].text), -1);
+  GtkWidget *font_combo = gtk_combo_box_new_with_model(GTK_TREE_MODEL(font_liststore));
 
-  GtkMenu* textsize_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
-  gtk_menu_shell_append(GTK_MENU_SHELL(textsize_menu), tools_textsize_8);
-  gtk_menu_shell_append(GTK_MENU_SHELL(textsize_menu), tools_textsize_10);
-  gtk_menu_shell_append(GTK_MENU_SHELL(textsize_menu), tools_textsize_12);
-  gtk_menu_shell_append(GTK_MENU_SHELL(textsize_menu), tools_textsize_14);
-  gtk_menu_shell_append(GTK_MENU_SHELL(textsize_menu), tools_textsize_18);
-  gtk_menu_shell_append(GTK_MENU_SHELL(textsize_menu), tools_textsize_24);
-  GtkWidget* tools_textsize_omenu = (GtkWidget*)g_object_new(
-      GTK_TYPE_OPTION_MENU, "menu", textsize_menu, NULL);
-
-  gtk_option_menu_set_history(GTK_OPTION_MENU(tools_textsize_omenu), 2);
-  g_object_set(tools_textsize_omenu, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(tools3, tools_textsize_omenu, "Text Size", "");
-
-  // Text font options menu
-  GtkWidget* tools_textfont_1 = gtk_image_menu_item_new_with_label("Helvetica");
-  set_widget_font(gtk_bin_get_child(GTK_BIN(tools_textfont_1)), "Helvetica");
+  GtkCellRenderer *font_combocell = gtk_cell_renderer_text_new();
+  gtk_cell_layout_pack_start(GTK_CELL_LAYOUT(font_combo), font_combocell, TRUE);
+  gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(font_combo), font_combocell,
+      "text", 0, NULL);
   g_signal_connect(
-      tools_textfont_1, "activate", G_CALLBACK(activate_textfont_1), this);
+      font_combo, "changed", G_CALLBACK(activate_font_combo), this);
+  GtkToolItem *font_combo_tool = gtk_tool_item_new();
+  gtk_container_add(GTK_CONTAINER(font_combo_tool), font_combo);
+  gtk_toolbar_insert(tools3, font_combo_tool, -1);
+  gtk_combo_box_set_active(GTK_COMBO_BOX(font_combo), 4);
+  
+  // Bold togglebutton
+  wutl_tools_toggle_button(tools3, "$pwr_exe/ge_textbold.png", G_CALLBACK(activate_textbold), 
+    "Set bold on selected text, and as default", this, 0, 0);
 
-  GtkWidget* tools_textfont_2 = gtk_image_menu_item_new_with_label("Times");
-  set_widget_font(gtk_bin_get_child(GTK_BIN(tools_textfont_2)), "Times");
+  // Gridsize combobox
+  GtkTreeIter gridsize_iter;
+  GtkListStore *gridsize_liststore;
+
+  gridsize_liststore = gtk_list_store_new(1, G_TYPE_STRING);
+  for (int i = 0; i < sizeof(gridsize_combo_table)/sizeof(gridsize_combo_table[0]); i++)
+    gtk_list_store_insert_with_values(gridsize_liststore, &gridsize_iter, i, 0, CoWowGtk::convert_utf8(gridsize_combo_table[i].text), -1);
+  gridsize_combo = gtk_combo_box_new_with_model(GTK_TREE_MODEL(gridsize_liststore));
+
+  GtkCellRenderer *gridsize_combocell = gtk_cell_renderer_text_new();
+  gtk_cell_layout_pack_start(GTK_CELL_LAYOUT(gridsize_combo), gridsize_combocell, TRUE);
+  gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(gridsize_combo), gridsize_combocell,
+      "text", 0, NULL);
   g_signal_connect(
-      tools_textfont_2, "activate", G_CALLBACK(activate_textfont_2), this);
-
-  GtkWidget* tools_textfont_3
-      = gtk_image_menu_item_new_with_label("New Century Schoolbook");
-  set_widget_font(
-      gtk_bin_get_child(GTK_BIN(tools_textfont_3)), "New Century Schoolbook");
-  g_signal_connect(
-      tools_textfont_3, "activate", G_CALLBACK(activate_textfont_3), this);
-
-  GtkWidget* tools_textfont_4 = gtk_image_menu_item_new_with_label("Courier");
-  set_widget_font(gtk_bin_get_child(GTK_BIN(tools_textfont_4)), "Courier");
-  g_signal_connect(
-      tools_textfont_4, "activate", G_CALLBACK(activate_textfont_4), this);
-
-  GtkWidget* tools_textfont_5
-      = gtk_image_menu_item_new_with_label("Lucida Sans");
-  set_widget_font(gtk_bin_get_child(GTK_BIN(tools_textfont_5)), "Lucida Sans");
-  g_signal_connect(
-      tools_textfont_5, "activate", G_CALLBACK(activate_textfont_5), this);
-
-  GtkMenu* textfont_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
-  gtk_menu_shell_append(GTK_MENU_SHELL(textfont_menu), tools_textfont_1);
-  gtk_menu_shell_append(GTK_MENU_SHELL(textfont_menu), tools_textfont_2);
-  gtk_menu_shell_append(GTK_MENU_SHELL(textfont_menu), tools_textfont_3);
-  gtk_menu_shell_append(GTK_MENU_SHELL(textfont_menu), tools_textfont_4);
-  gtk_menu_shell_append(GTK_MENU_SHELL(textfont_menu), tools_textfont_5);
-  GtkWidget* tools_textfont_omenu = (GtkWidget*)g_object_new(
-      GTK_TYPE_OPTION_MENU, "menu", textfont_menu, NULL);
-
-  gtk_option_menu_set_history(GTK_OPTION_MENU(tools_textfont_omenu), 0);
-  g_object_set(tools_textfont_omenu, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(tools3, tools_textfont_omenu, "Font", "");
-
-  // Bold checkbutton
-  GtkWidget* tools_textbold = gtk_check_button_new_with_label("Bold");
-  gtk_toolbar_append_widget(
-      tools3, tools_textbold, "Set bold on selected text, and as default", "");
-  g_signal_connect(
-      tools_textbold, "toggled", G_CALLBACK(activate_textbold), this);
-  g_object_set(tools_textbold, "can-focus", FALSE, NULL);
-
-  // Grid size options menu
-  GtkWidget* tools_gridsize_4 = gtk_menu_item_new_with_label("Gridsize 1.0");
-  g_signal_connect(
-      tools_gridsize_4, "activate", G_CALLBACK(activate_gridsize_4), this);
-  GtkWidget* tools_gridsize_3 = gtk_menu_item_new_with_label("Gridsize 0.5");
-  g_signal_connect(
-      tools_gridsize_3, "activate", G_CALLBACK(activate_gridsize_3), this);
-  GtkWidget* tools_gridsize_2 = gtk_menu_item_new_with_label("Gridsize 0.25");
-  g_signal_connect(
-      tools_gridsize_2, "activate", G_CALLBACK(activate_gridsize_2), this);
-  GtkWidget* tools_gridsize_1 = gtk_menu_item_new_with_label("Gridsize 0.1");
-  g_signal_connect(
-      tools_gridsize_1, "activate", G_CALLBACK(activate_gridsize_1), this);
-
-  GtkMenu* gridsize_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
-  gtk_menu_shell_append(GTK_MENU_SHELL(gridsize_menu), tools_gridsize_4);
-  gtk_menu_shell_append(GTK_MENU_SHELL(gridsize_menu), tools_gridsize_3);
-  gtk_menu_shell_append(GTK_MENU_SHELL(gridsize_menu), tools_gridsize_2);
-  gtk_menu_shell_append(GTK_MENU_SHELL(gridsize_menu), tools_gridsize_1);
-  GtkWidget* tools_gridsize_omenu = (GtkWidget*)g_object_new(
-      GTK_TYPE_OPTION_MENU, "menu", gridsize_menu, NULL);
-
-  grid_size_w = tools_gridsize_omenu;
-  gtk_option_menu_set_history(GTK_OPTION_MENU(tools_gridsize_omenu), 0);
-  g_object_set(tools_gridsize_omenu, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(tools2, tools_gridsize_omenu, "Grid Size", "");
-
+      gridsize_combo, "changed", G_CALLBACK(activate_gridsize_combo), this);
+  GtkToolItem *gridsize_combo_tool = gtk_tool_item_new();
+  gtk_container_add(GTK_CONTAINER(gridsize_combo_tool), gridsize_combo);
+  gtk_toolbar_insert(tools2, gridsize_combo_tool, -1);
+  gtk_combo_box_set_active(GTK_COMBO_BOX(gridsize_combo), 3);
+  
   // Show grid checkbutton
-  show_grid_w = gtk_toggle_button_new();
-  dcli_translate_filename(fname, "$pwr_exe/ge_showgrid.png");
-  gtk_container_add(GTK_CONTAINER(show_grid_w), gtk_image_new_from_file(fname));
-  g_signal_connect(
-      show_grid_w, "clicked", G_CALLBACK(activate_show_grid), this);
-  g_object_set(show_grid_w, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(tools2, show_grid_w, "Show grid", "");
+  show_grid_w = wutl_tools_toggle_button(tools2, "$pwr_exe/ge_showgrid.png", G_CALLBACK(activate_show_grid), 
+    "Show grid", this, 1, 0);
 
   // Snap to grid checkbutton
-  grid_on_w = gtk_toggle_button_new();
-  dcli_translate_filename(fname, "$pwr_exe/ge_snap.png");
-  gtk_container_add(GTK_CONTAINER(grid_on_w), gtk_image_new_from_file(fname));
-  g_signal_connect(grid_on_w, "clicked", G_CALLBACK(activate_grid), this);
-  g_object_set(grid_on_w, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(tools2, grid_on_w, "Snap to grid", "");
+  grid_on_w = wutl_tools_toggle_button(tools2, "$pwr_exe/ge_snap.png", G_CALLBACK(activate_grid), 
+    "Snap to grid", this, 1, 0);
 
   // Brightness
-  GtkWidget* tools_decr_lightness = image_button("$pwr_exe/ge_arrowleft.png");
-  gtk_toolbar_append_widget(
-      tools2, tools_decr_lightness, "Decrease brightness", "");
-  g_signal_connect(tools_decr_lightness, "clicked",
-      G_CALLBACK(activate_decr_lightness), this);
+  wutl_tools_item(tools2, "$pwr_exe/ge_arrowleft.png", G_CALLBACK(activate_decr_lightness), 
+      "Decrease brightness", this, 0, 0);
 
-  gtk_toolbar_append_widget(
-      tools2, image_widget("$pwr_exe/ge_brightness.png"), "", "");
+  wutl_tools_item(tools2, "$pwr_exe/ge_brightness.png", NULL, NULL, this, 0, 0);
 
-  GtkWidget* tools_incr_lightness = image_button("$pwr_exe/ge_arrowright.png");
-  gtk_toolbar_append_widget(
-      tools2, tools_incr_lightness, "Increase brightness", "");
-  g_signal_connect(tools_incr_lightness, "clicked",
-      G_CALLBACK(activate_incr_lightness), this);
+  wutl_tools_item(tools2, "$pwr_exe/ge_arrowright.png", G_CALLBACK(activate_incr_lightness), 
+      "Increase brightness", this, 0, 0);
 
   // Separator
-  gtk_toolbar_append_widget(tools2, GTK_WIDGET(gtk_vseparator_new()), "", "");
+  gtk_toolbar_insert(tools2, gtk_separator_tool_item_new(), -1);
 
   // Intensity
-  GtkWidget* tools_decr_intensity = image_button("$pwr_exe/ge_arrowleft.png");
-  gtk_toolbar_append_widget(
-      tools2, tools_decr_intensity, "Decrease color intensity", "");
-  g_signal_connect(tools_decr_intensity, "clicked",
-      G_CALLBACK(activate_decr_intensity), this);
+  wutl_tools_item(tools2, "$pwr_exe/ge_arrowleft.png", G_CALLBACK(activate_decr_intensity), 
+      "Decrease color intensity", this, 0, 0);
 
-  gtk_toolbar_append_widget(
-      tools2, image_widget("$pwr_exe/ge_color.png"), "", "");
+  wutl_tools_item(tools2, "$pwr_exe/ge_color.png", NULL, NULL, this, 0, 0);
 
-  GtkWidget* tools_incr_intensity = image_button("$pwr_exe/ge_arrowright.png");
-  gtk_toolbar_append_widget(
-      tools2, tools_incr_intensity, "Increase color intensity", "");
-  g_signal_connect(tools_incr_intensity, "clicked",
-      G_CALLBACK(activate_incr_intensity), this);
+  wutl_tools_item(tools2, "$pwr_exe/ge_arrowright.png", G_CALLBACK(activate_incr_intensity), 
+      "Increase color intensity", this, 0, 0);
 
   // Separator
-  gtk_toolbar_append_widget(tools2, GTK_WIDGET(gtk_vseparator_new()), "", "");
+  gtk_toolbar_insert(tools2, gtk_separator_tool_item_new(), -1);
 
   // Shift
-  GtkWidget* tools_decr_shift = image_button("$pwr_exe/ge_arrowleft.png");
-  gtk_toolbar_append_widget(tools2, tools_decr_shift, "Shift color", "");
-  g_signal_connect(
-      tools_decr_shift, "clicked", G_CALLBACK(activate_decr_shift), this);
+  wutl_tools_item(tools2, "$pwr_exe/ge_arrowleft.png", G_CALLBACK(activate_decr_shift), 
+      "Shift color", this, 0, 0);
 
-  gtk_toolbar_append_widget(
-      tools2, image_widget("$pwr_exe/ge_colorshift.png"), "", "");
+  wutl_tools_item(tools2, "$pwr_exe/ge_colorshift.png", NULL, NULL, this, 0, 0);
 
-  GtkWidget* tools_incr_shift = image_button("$pwr_exe/ge_arrowright.png");
-  gtk_toolbar_append_widget(tools2, tools_incr_shift, "Shift color", "");
-  g_signal_connect(
-      tools_incr_shift, "clicked", G_CALLBACK(activate_incr_shift), this);
+  wutl_tools_item(tools2, "$pwr_exe/ge_arrowright.png", G_CALLBACK(activate_incr_shift), 
+      "Shift color", this, 0, 0);
 
   // Gradient option menu
-  GtkWidget* tools_gradient_no
-      = gtk_image_menu_item_new_with_label("Gradient No");
-  dcli_translate_filename(fname, "$pwr_exe/ge_gradient_no.png");
-  gtk_image_menu_item_set_image(
-      GTK_IMAGE_MENU_ITEM(tools_gradient_no), gtk_image_new_from_file(fname));
+  GtkTreeIter iter;
+  GtkListStore *grad_liststore;
+  GError *gerror;
+  GdkPixbuf *pixbuf;
+
+  grad_liststore = gtk_list_store_new(2, G_TYPE_STRING, GDK_TYPE_PIXBUF);
+  for (int i = 0; i < sizeof(grad_combo_table)/sizeof(grad_combo_table[0]); i++) {
+
+    dcli_translate_filename(fname, grad_combo_table[i].image);
+    pixbuf = gdk_pixbuf_new_from_file(fname, &gerror);
+    if (pixbuf)
+      gtk_list_store_insert_with_values(grad_liststore, &iter, i, 0, CoWowGtk::convert_utf8(grad_combo_table[i].text), 1,
+	  pixbuf, -1);
+  }
+
+  GtkWidget *grad_combo = gtk_combo_box_new_with_model(GTK_TREE_MODEL(grad_liststore));
+  GtkCellRenderer *grad_combocell = gtk_cell_renderer_text_new();
+  gtk_cell_layout_pack_start(GTK_CELL_LAYOUT(grad_combo), grad_combocell, TRUE);
+  gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(grad_combo), grad_combocell,
+      "text", 0, NULL);
+  grad_combocell = gtk_cell_renderer_pixbuf_new();
+  gtk_cell_layout_pack_start(GTK_CELL_LAYOUT(grad_combo), grad_combocell, TRUE);
+  gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(grad_combo), grad_combocell,
+      "pixbuf", 1, NULL);
   g_signal_connect(
-      tools_gradient_no, "activate", G_CALLBACK(activate_gradient_no), this);
-  GtkWidget* tools_gradient_horizup
-      = gtk_image_menu_item_new_with_label("Gradient HorizontalUp");
-  dcli_translate_filename(fname, "$pwr_exe/ge_gradient_horizup.png");
-  gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(tools_gradient_horizup),
-      gtk_image_new_from_file(fname));
-  g_signal_connect(tools_gradient_horizup, "activate",
-      G_CALLBACK(activate_gradient_horizup), this);
-  GtkWidget* tools_gradient_horizdown
-      = gtk_image_menu_item_new_with_label("Gradient HorizontalDown");
-  dcli_translate_filename(fname, "$pwr_exe/ge_gradient_horizdown.png");
-  gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(tools_gradient_horizdown),
-      gtk_image_new_from_file(fname));
-  g_signal_connect(tools_gradient_horizdown, "activate",
-      G_CALLBACK(activate_gradient_horizdown), this);
-  GtkWidget* tools_gradient_horiztube1
-      = gtk_image_menu_item_new_with_label("Gradient HorizontalTube1");
-  dcli_translate_filename(fname, "$pwr_exe/ge_gradient_horiztube1.png");
-  gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(tools_gradient_horiztube1),
-      gtk_image_new_from_file(fname));
-  g_signal_connect(tools_gradient_horiztube1, "activate",
-      G_CALLBACK(activate_gradient_horiztube1), this);
-  GtkWidget* tools_gradient_horiztube2
-      = gtk_image_menu_item_new_with_label("Gradient HorizontalTube2");
-  dcli_translate_filename(fname, "$pwr_exe/ge_gradient_horiztube2.png");
-  gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(tools_gradient_horiztube2),
-      gtk_image_new_from_file(fname));
-  g_signal_connect(tools_gradient_horiztube2, "activate",
-      G_CALLBACK(activate_gradient_horiztube2), this);
-  GtkWidget* tools_gradient_vertleft
-      = gtk_image_menu_item_new_with_label("Gradient VerticalLeft");
-  dcli_translate_filename(fname, "$pwr_exe/ge_gradient_vertleft.png");
-  gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(tools_gradient_vertleft),
-      gtk_image_new_from_file(fname));
-  g_signal_connect(tools_gradient_vertleft, "activate",
-      G_CALLBACK(activate_gradient_vertleft), this);
-  GtkWidget* tools_gradient_vertright
-      = gtk_image_menu_item_new_with_label("Gradient VerticalRight");
-  dcli_translate_filename(fname, "$pwr_exe/ge_gradient_vertright.png");
-  gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(tools_gradient_vertright),
-      gtk_image_new_from_file(fname));
-  g_signal_connect(tools_gradient_vertright, "activate",
-      G_CALLBACK(activate_gradient_vertright), this);
-  GtkWidget* tools_gradient_verttube1
-      = gtk_image_menu_item_new_with_label("Gradient VerticalTube1");
-  dcli_translate_filename(fname, "$pwr_exe/ge_gradient_verttube1.png");
-  gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(tools_gradient_verttube1),
-      gtk_image_new_from_file(fname));
-  g_signal_connect(tools_gradient_verttube1, "activate",
-      G_CALLBACK(activate_gradient_verttube1), this);
-  GtkWidget* tools_gradient_verttube2
-      = gtk_image_menu_item_new_with_label("Gradient VerticalTube2");
-  dcli_translate_filename(fname, "$pwr_exe/ge_gradient_verttube2.png");
-  gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(tools_gradient_verttube2),
-      gtk_image_new_from_file(fname));
-  g_signal_connect(tools_gradient_verttube2, "activate",
-      G_CALLBACK(activate_gradient_verttube2), this);
-  GtkWidget* tools_gradient_diagupperleft
-      = gtk_image_menu_item_new_with_label("Gradient DiagonalUpperLeft");
-  dcli_translate_filename(fname, "$pwr_exe/ge_gradient_diagupperleft.png");
-  gtk_image_menu_item_set_image(
-      GTK_IMAGE_MENU_ITEM(tools_gradient_diagupperleft),
-      gtk_image_new_from_file(fname));
-  g_signal_connect(tools_gradient_diagupperleft, "activate",
-      G_CALLBACK(activate_gradient_diagupperleft), this);
-  GtkWidget* tools_gradient_diaglowerleft
-      = gtk_image_menu_item_new_with_label("Gradient DiagonalLowerLeft");
-  dcli_translate_filename(fname, "$pwr_exe/ge_gradient_diaglowerleft.png");
-  gtk_image_menu_item_set_image(
-      GTK_IMAGE_MENU_ITEM(tools_gradient_diaglowerleft),
-      gtk_image_new_from_file(fname));
-  g_signal_connect(tools_gradient_diaglowerleft, "activate",
-      G_CALLBACK(activate_gradient_diaglowerleft), this);
-  GtkWidget* tools_gradient_diagupperright
-      = gtk_image_menu_item_new_with_label("Gradient DiagonalUpperRight");
-  dcli_translate_filename(fname, "$pwr_exe/ge_gradient_diagupperright.png");
-  gtk_image_menu_item_set_image(
-      GTK_IMAGE_MENU_ITEM(tools_gradient_diagupperright),
-      gtk_image_new_from_file(fname));
-  g_signal_connect(tools_gradient_diagupperright, "activate",
-      G_CALLBACK(activate_gradient_diagupperright), this);
-  GtkWidget* tools_gradient_diaglowerright
-      = gtk_image_menu_item_new_with_label("Gradient DiagonalLowerRight");
-  dcli_translate_filename(fname, "$pwr_exe/ge_gradient_diaglowerright.png");
-  gtk_image_menu_item_set_image(
-      GTK_IMAGE_MENU_ITEM(tools_gradient_diaglowerright),
-      gtk_image_new_from_file(fname));
-  g_signal_connect(tools_gradient_diaglowerright, "activate",
-      G_CALLBACK(activate_gradient_diaglowerright), this);
-  GtkWidget* tools_gradient_diaguptube
-      = gtk_image_menu_item_new_with_label("Gradient DiagonalUpTube");
-  dcli_translate_filename(fname, "$pwr_exe/ge_gradient_diaguptube.png");
-  gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(tools_gradient_diaguptube),
-      gtk_image_new_from_file(fname));
-  g_signal_connect(tools_gradient_diaguptube, "activate",
-      G_CALLBACK(activate_gradient_diaguptube), this);
-  GtkWidget* tools_gradient_diagdowntube
-      = gtk_image_menu_item_new_with_label("Gradient DiagonalDownTube");
-  dcli_translate_filename(fname, "$pwr_exe/ge_gradient_diagdowntube.png");
-  gtk_image_menu_item_set_image(
-      GTK_IMAGE_MENU_ITEM(tools_gradient_diagdowntube),
-      gtk_image_new_from_file(fname));
-  g_signal_connect(tools_gradient_diagdowntube, "activate",
-      G_CALLBACK(activate_gradient_diagdowntube), this);
-  GtkWidget* tools_gradient_globe
-      = gtk_image_menu_item_new_with_label("Gradient Globe");
-  dcli_translate_filename(fname, "$pwr_exe/ge_gradient_globe.png");
-  gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(tools_gradient_globe),
-      gtk_image_new_from_file(fname));
-  g_signal_connect(tools_gradient_globe, "activate",
-      G_CALLBACK(activate_gradient_globe), this);
-  GtkWidget* tools_gradient_radcenter
-      = gtk_image_menu_item_new_with_label("Gradient RadialCenter");
-  dcli_translate_filename(fname, "$pwr_exe/ge_gradient_radcenter.png");
-  gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(tools_gradient_radcenter),
-      gtk_image_new_from_file(fname));
-  g_signal_connect(tools_gradient_radcenter, "activate",
-      G_CALLBACK(activate_gradient_radcenter), this);
-  GtkWidget* tools_gradient_radupperleft
-      = gtk_image_menu_item_new_with_label("Gradient RadialUpperLeft");
-  dcli_translate_filename(fname, "$pwr_exe/ge_gradient_radupperleft.png");
-  gtk_image_menu_item_set_image(
-      GTK_IMAGE_MENU_ITEM(tools_gradient_radupperleft),
-      gtk_image_new_from_file(fname));
-  g_signal_connect(tools_gradient_radupperleft, "activate",
-      G_CALLBACK(activate_gradient_radupperleft), this);
-  GtkWidget* tools_gradient_radlowerleft
-      = gtk_image_menu_item_new_with_label("Gradient RadialLowerLeft");
-  dcli_translate_filename(fname, "$pwr_exe/ge_gradient_radlowerleft.png");
-  gtk_image_menu_item_set_image(
-      GTK_IMAGE_MENU_ITEM(tools_gradient_radlowerleft),
-      gtk_image_new_from_file(fname));
-  g_signal_connect(tools_gradient_radlowerleft, "activate",
-      G_CALLBACK(activate_gradient_radlowerleft), this);
-  GtkWidget* tools_gradient_radupperright
-      = gtk_image_menu_item_new_with_label("Gradient RadialUpperRight");
-  dcli_translate_filename(fname, "$pwr_exe/ge_gradient_radupperright.png");
-  gtk_image_menu_item_set_image(
-      GTK_IMAGE_MENU_ITEM(tools_gradient_radupperright),
-      gtk_image_new_from_file(fname));
-  g_signal_connect(tools_gradient_radupperright, "activate",
-      G_CALLBACK(activate_gradient_radupperright), this);
-  GtkWidget* tools_gradient_radlowerright
-      = gtk_image_menu_item_new_with_label("Gradient RadialLowerRight");
-  dcli_translate_filename(fname, "$pwr_exe/ge_gradient_radlowerright.png");
-  gtk_image_menu_item_set_image(
-      GTK_IMAGE_MENU_ITEM(tools_gradient_radlowerright),
-      gtk_image_new_from_file(fname));
-  g_signal_connect(tools_gradient_radlowerright, "activate",
-      G_CALLBACK(activate_gradient_radlowerright), this);
+      grad_combo, "changed", G_CALLBACK(activate_gradient_combo), this);
+  GtkToolItem *grad_combo_tool = gtk_tool_item_new();
+  gtk_container_add(GTK_CONTAINER(grad_combo_tool), grad_combo);
+  gtk_toolbar_insert(tools2, grad_combo_tool, -1);
 
-  GtkMenu* gradient_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
-  gtk_menu_shell_append(GTK_MENU_SHELL(gradient_menu), tools_gradient_no);
-  gtk_menu_shell_append(GTK_MENU_SHELL(gradient_menu), tools_gradient_horizup);
-  gtk_menu_shell_append(
-      GTK_MENU_SHELL(gradient_menu), tools_gradient_horizdown);
-  gtk_menu_shell_append(
-      GTK_MENU_SHELL(gradient_menu), tools_gradient_horiztube1);
-  gtk_menu_shell_append(
-      GTK_MENU_SHELL(gradient_menu), tools_gradient_horiztube2);
-  gtk_menu_shell_append(GTK_MENU_SHELL(gradient_menu), tools_gradient_vertleft);
-  gtk_menu_shell_append(
-      GTK_MENU_SHELL(gradient_menu), tools_gradient_vertright);
-  gtk_menu_shell_append(
-      GTK_MENU_SHELL(gradient_menu), tools_gradient_verttube1);
-  gtk_menu_shell_append(
-      GTK_MENU_SHELL(gradient_menu), tools_gradient_verttube2);
-  gtk_menu_shell_append(
-      GTK_MENU_SHELL(gradient_menu), tools_gradient_diagupperleft);
-  gtk_menu_shell_append(
-      GTK_MENU_SHELL(gradient_menu), tools_gradient_diaglowerleft);
-  gtk_menu_shell_append(
-      GTK_MENU_SHELL(gradient_menu), tools_gradient_diagupperright);
-  gtk_menu_shell_append(
-      GTK_MENU_SHELL(gradient_menu), tools_gradient_diaglowerright);
-  gtk_menu_shell_append(
-      GTK_MENU_SHELL(gradient_menu), tools_gradient_diaguptube);
-  gtk_menu_shell_append(
-      GTK_MENU_SHELL(gradient_menu), tools_gradient_diagdowntube);
-  gtk_menu_shell_append(GTK_MENU_SHELL(gradient_menu), tools_gradient_globe);
-  gtk_menu_shell_append(
-      GTK_MENU_SHELL(gradient_menu), tools_gradient_radcenter);
-  gtk_menu_shell_append(
-      GTK_MENU_SHELL(gradient_menu), tools_gradient_radupperleft);
-  gtk_menu_shell_append(
-      GTK_MENU_SHELL(gradient_menu), tools_gradient_radlowerleft);
-  gtk_menu_shell_append(
-      GTK_MENU_SHELL(gradient_menu), tools_gradient_radupperright);
-  gtk_menu_shell_append(
-      GTK_MENU_SHELL(gradient_menu), tools_gradient_radlowerright);
-  GtkWidget* tools_gradient_omenu = (GtkWidget*)g_object_new(
-      GTK_TYPE_OPTION_MENU, "menu", gradient_menu, NULL);
-
-  gtk_option_menu_set_history(GTK_OPTION_MENU(tools_gradient_omenu), 0);
-  g_object_set(tools_gradient_omenu, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(tools2, tools_gradient_omenu, "Gradient", "");
+  gtk_combo_box_set_active(GTK_COMBO_BOX(grad_combo), 0);
 
   // Gradient buttons
-  GtkWidget* tools_button_gradient_no = gtk_button_new();
-  dcli_translate_filename(fname, "$pwr_exe/ge_gradient_no.png");
-  gtk_container_add(
-      GTK_CONTAINER(tools_button_gradient_no), gtk_image_new_from_file(fname));
-  g_signal_connect(tools_button_gradient_no, "clicked",
-      G_CALLBACK(activate_gradient_no), this);
-  g_object_set(tools_button_gradient_no, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(tools2, tools_button_gradient_no,
-      "Reset gradient on selected object", "");
+  wutl_tools_item(tools2, "$pwr_exe/ge_gradient_no.png", G_CALLBACK(activate_gradient_no), 
+      "Reset gradient on selected object", this, 0, 0);
 
-  GtkWidget* tools_button_gradient_vert = gtk_button_new();
-  dcli_translate_filename(fname, "$pwr_exe/ge_gradient_vertright.png");
-  gtk_container_add(GTK_CONTAINER(tools_button_gradient_vert),
-      gtk_image_new_from_file(fname));
-  g_signal_connect(tools_button_gradient_vert, "clicked",
-      G_CALLBACK(activate_gradient_vertright), this);
-  g_object_set(tools_button_gradient_vert, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(tools2, tools_button_gradient_vert,
-      "Set vertical gradient on selected object", "");
+  wutl_tools_item(tools2, "$pwr_exe/ge_gradient_vertright.png", G_CALLBACK(activate_gradient_vertright), 
+      "Set vertical gradient on selected object", this, 0, 0);
 
-  GtkWidget* tools_button_gradient_horiz = gtk_button_new();
-  dcli_translate_filename(fname, "$pwr_exe/ge_gradient_horizdown.png");
-  gtk_container_add(GTK_CONTAINER(tools_button_gradient_horiz),
-      gtk_image_new_from_file(fname));
-  g_signal_connect(tools_button_gradient_horiz, "clicked",
-      G_CALLBACK(activate_gradient_horizdown), this);
-  g_object_set(tools_button_gradient_horiz, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(tools2, tools_button_gradient_horiz,
-      "Set horizontal gradient on selected object", "");
+  wutl_tools_item(tools2, "$pwr_exe/ge_gradient_horizdown.png", G_CALLBACK(activate_gradient_horizdown), 
+      "Set horizontal gradient on selected object", this, 0, 0);
 
-  GtkWidget* tools_button_gradient_diag = gtk_button_new();
-  dcli_translate_filename(fname, "$pwr_exe/ge_gradient_diaglowerright.png");
-  gtk_container_add(GTK_CONTAINER(tools_button_gradient_diag),
-      gtk_image_new_from_file(fname));
-  g_signal_connect(tools_button_gradient_diag, "clicked",
-      G_CALLBACK(activate_gradient_diaglowerright), this);
-  g_object_set(tools_button_gradient_diag, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(tools2, tools_button_gradient_diag,
-      "Set diagonal gradient on selected object", "");
+  wutl_tools_item(tools2, "$pwr_exe/ge_gradient_diaglowerright.png", G_CALLBACK(activate_gradient_diaglowerright), 
+      "Set diagonal gradient on selected object", this, 0, 0);
 
   // Statusbar and cmd input
-  GtkWidget* statusbar = gtk_hbox_new(FALSE, 0);
+  GtkWidget* statusbar = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   msg_label = gtk_label_new("");
   gtk_widget_set_size_request(msg_label, -1, 25);
   cmd_prompt = gtk_label_new("value > ");
@@ -3529,10 +2937,10 @@ GeGtk::GeGtk(void* x_parent_ctx, GtkWidget* x_parent_widget,
   graph->refresh_objects_cb = &Ge::refresh_objects_cb;
 
   // Vertical palette pane
-  GtkWidget* vpaned1 = gtk_vpaned_new();
-  GtkWidget* vpaned2 = gtk_vpaned_new();
+  GtkWidget* vpaned1 = gtk_paned_new(GTK_ORIENTATION_VERTICAL);
+  GtkWidget* vpaned2 = gtk_paned_new(GTK_ORIENTATION_VERTICAL);
 
-  GtkWidget* palbox = gtk_hbox_new(FALSE, 0);
+  GtkWidget* palbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
 
   // SubGraphs palette
   subpalette
@@ -3559,8 +2967,8 @@ GeGtk::GeGtk(void* x_parent_ctx, GtkWidget* x_parent_widget,
     gtk_box_pack_start(GTK_BOX(palbox), plant_widget, TRUE, TRUE, 0);
   }
 
-  GtkWidget* hpaned2 = gtk_hpaned_new();
-  hpaned3 = gtk_hpaned_new();
+  GtkWidget* hpaned2 = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
+  hpaned3 = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
 
   objectnav = new AttrGtk(hpaned3, this, attr_eType_ObjectTree, 0, 0, 0);
   objectnav_w = ((AttrGtk*)objectnav)->brow_widget;
@@ -3591,7 +2999,7 @@ GeGtk::GeGtk(void* x_parent_ctx, GtkWidget* x_parent_widget,
   gtk_widget_show(((GraphGtk*)graph)->nav_widget);
 
   // Horizontal pane
-  GtkWidget* hpaned = gtk_hpaned_new();
+  GtkWidget* hpaned = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
   gtk_paned_pack1(GTK_PANED(hpaned), grow_widget, TRUE, TRUE);
   gtk_paned_pack2(GTK_PANED(hpaned), vpaned2, FALSE, TRUE);
   gtk_widget_show(vpaned1);
@@ -3601,13 +3009,13 @@ GeGtk::GeGtk(void* x_parent_ctx, GtkWidget* x_parent_widget,
 
   gtk_paned_pack1(GTK_PANED(hpaned3), graph_list, FALSE, FALSE);
   gtk_paned_pack2(GTK_PANED(hpaned3), objectnav_w, TRUE, TRUE);
-  // gtk_widget_show( hpaned3);
+  gtk_widget_show( hpaned3);
 
   gtk_paned_pack1(GTK_PANED(hpaned2), hpaned3, FALSE, FALSE);
   gtk_paned_pack2(GTK_PANED(hpaned2), hpaned, TRUE, TRUE);
   gtk_widget_show(hpaned2);
 
-  GtkWidget* vbox = gtk_vbox_new(FALSE, 0);
+  GtkWidget* vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start(GTK_BOX(vbox), GTK_WIDGET(menu_bar), FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(vbox), GTK_WIDGET(tools3), FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(vbox), GTK_WIDGET(tools2), FALSE, FALSE, 0);
@@ -3646,7 +3054,7 @@ GeGtk::GeGtk(void* x_parent_ctx, GtkWidget* x_parent_widget,
   g_signal_connect(india_text, "activate", G_CALLBACK(activate_india_ok), this);
   india_label = gtk_label_new("Graph Name");
   GtkWidget* india_image = (GtkWidget*)g_object_new(GTK_TYPE_IMAGE, "stock",
-      GTK_STOCK_DIALOG_QUESTION, "icon-size", GTK_ICON_SIZE_DIALOG, "xalign",
+      "gtk-dialog-question", "icon-size", GTK_ICON_SIZE_DIALOG, "xalign",
       0.5, "yalign", 1.0, NULL);
   GtkWidget* india_ok = gtk_button_new_with_label("Ok");
   gtk_widget_set_size_request(india_ok, 70, 25);
@@ -3656,19 +3064,19 @@ GeGtk::GeGtk(void* x_parent_ctx, GtkWidget* x_parent_widget,
   g_signal_connect(
       india_cancel, "clicked", G_CALLBACK(activate_india_cancel), this);
 
-  GtkWidget* india_hboxtext = gtk_hbox_new(FALSE, 0);
+  GtkWidget* india_hboxtext = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   gtk_box_pack_start(GTK_BOX(india_hboxtext), india_image, FALSE, FALSE, 15);
   gtk_box_pack_start(GTK_BOX(india_hboxtext), india_label, FALSE, FALSE, 15);
   gtk_box_pack_end(GTK_BOX(india_hboxtext), india_text, TRUE, TRUE, 30);
 
-  GtkWidget* india_hboxbuttons = gtk_hbox_new(TRUE, 40);
-  gtk_box_pack_start(GTK_BOX(india_hboxbuttons), india_ok, FALSE, FALSE, 0);
-  gtk_box_pack_end(GTK_BOX(india_hboxbuttons), india_cancel, FALSE, FALSE, 0);
+  GtkWidget* india_hboxbuttons = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 40);
+  gtk_box_pack_start(GTK_BOX(india_hboxbuttons), india_ok, FALSE, FALSE, 30);
+  gtk_box_pack_end(GTK_BOX(india_hboxbuttons), india_cancel, FALSE, FALSE, 30);
 
   GtkWidget* india_vbox = gtk_dialog_get_content_area(GTK_DIALOG(india_widget));
   gtk_box_pack_start(GTK_BOX(india_vbox), india_hboxtext, TRUE, TRUE, 30);
   gtk_box_pack_start(
-      GTK_BOX(india_vbox), gtk_hseparator_new(), FALSE, FALSE, 0);
+      GTK_BOX(india_vbox), gtk_separator_new(GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 0);
   gtk_box_pack_end(GTK_BOX(india_vbox), india_hboxbuttons, FALSE, FALSE, 15);
   gtk_widget_show_all(india_widget);
   g_object_set(india_widget, "visible", FALSE, NULL);
@@ -3685,7 +3093,7 @@ GeGtk::GeGtk(void* x_parent_ctx, GtkWidget* x_parent_widget,
       confirm_widget, "delete_event", G_CALLBACK(confirm_delete_event), this);
   confirm_label = gtk_label_new("Graph Name");
   GtkWidget* confirm_image = (GtkWidget*)g_object_new(GTK_TYPE_IMAGE, "stock",
-      GTK_STOCK_DIALOG_WARNING, "icon-size", GTK_ICON_SIZE_DIALOG, "xalign",
+      "gtk-dialog-warning", "icon-size", GTK_ICON_SIZE_DIALOG, "xalign",
       0.5, "yalign", 1.0, NULL);
 
   GtkWidget* confirm_ok = gtk_button_new_with_label("Ok");
@@ -3697,20 +3105,20 @@ GeGtk::GeGtk(void* x_parent_ctx, GtkWidget* x_parent_widget,
   g_signal_connect(
       confirm_cancel, "clicked", G_CALLBACK(activate_confirm_cancel), this);
 
-  GtkWidget* confirm_hboxtext = gtk_hbox_new(FALSE, 0);
+  GtkWidget* confirm_hboxtext = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   gtk_box_pack_start(
       GTK_BOX(confirm_hboxtext), confirm_image, FALSE, FALSE, 15);
   gtk_box_pack_start(GTK_BOX(confirm_hboxtext), confirm_label, TRUE, TRUE, 15);
 
-  GtkWidget* confirm_hboxbuttons = gtk_hbox_new(TRUE, 40);
-  gtk_box_pack_start(GTK_BOX(confirm_hboxbuttons), confirm_ok, FALSE, FALSE, 0);
+  GtkWidget* confirm_hboxbuttons = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 40);
+  gtk_box_pack_start(GTK_BOX(confirm_hboxbuttons), confirm_ok, FALSE, FALSE, 30);
   gtk_box_pack_end(
-      GTK_BOX(confirm_hboxbuttons), confirm_cancel, FALSE, FALSE, 0);
+      GTK_BOX(confirm_hboxbuttons), confirm_cancel, FALSE, FALSE, 30);
 
-  GtkWidget* confirm_vbox = gtk_vbox_new(FALSE, 0);
+  GtkWidget* confirm_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start(GTK_BOX(confirm_vbox), confirm_hboxtext, TRUE, TRUE, 30);
   gtk_box_pack_start(
-      GTK_BOX(confirm_vbox), gtk_hseparator_new(), FALSE, FALSE, 0);
+      GTK_BOX(confirm_vbox), gtk_separator_new(GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 0);
   gtk_box_pack_end(
       GTK_BOX(confirm_vbox), confirm_hboxbuttons, FALSE, FALSE, 15);
   gtk_container_add(GTK_CONTAINER(confirm_widget), confirm_vbox);
@@ -3729,7 +3137,7 @@ GeGtk::GeGtk(void* x_parent_ctx, GtkWidget* x_parent_widget,
       yesnodia_widget, "delete_event", G_CALLBACK(yesnodia_delete_event), this);
   yesnodia_label = gtk_label_new("Graph Name");
   GtkWidget* yesnodia_image = (GtkWidget*)g_object_new(GTK_TYPE_IMAGE, "stock",
-      GTK_STOCK_DIALOG_QUESTION, "icon-size", GTK_ICON_SIZE_DIALOG, "xalign",
+      "gtk-dialog-question", "icon-size", GTK_ICON_SIZE_DIALOG, "xalign",
       0.5, "yalign", 1.0, NULL);
 
   GtkWidget* yesnodia_yes = gtk_button_new_with_label("Yes");
@@ -3745,24 +3153,24 @@ GeGtk::GeGtk(void* x_parent_ctx, GtkWidget* x_parent_widget,
   g_signal_connect(
       yesnodia_cancel, "clicked", G_CALLBACK(activate_yesnodia_cancel), this);
 
-  GtkWidget* yesnodia_hboxtext = gtk_hbox_new(FALSE, 0);
+  GtkWidget* yesnodia_hboxtext = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   gtk_box_pack_start(
       GTK_BOX(yesnodia_hboxtext), yesnodia_image, FALSE, FALSE, 15);
   gtk_box_pack_start(
       GTK_BOX(yesnodia_hboxtext), yesnodia_label, TRUE, TRUE, 15);
 
-  GtkWidget* yesnodia_hboxbuttons = gtk_hbox_new(TRUE, 40);
+  GtkWidget* yesnodia_hboxbuttons = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 40);
   gtk_box_pack_start(
-      GTK_BOX(yesnodia_hboxbuttons), yesnodia_yes, FALSE, FALSE, 0);
+      GTK_BOX(yesnodia_hboxbuttons), yesnodia_yes, FALSE, FALSE, 30);
   gtk_box_pack_start(
-      GTK_BOX(yesnodia_hboxbuttons), yesnodia_no, FALSE, FALSE, 0);
+      GTK_BOX(yesnodia_hboxbuttons), yesnodia_no, FALSE, FALSE, 30);
   gtk_box_pack_end(
-      GTK_BOX(yesnodia_hboxbuttons), yesnodia_cancel, FALSE, FALSE, 0);
+      GTK_BOX(yesnodia_hboxbuttons), yesnodia_cancel, FALSE, FALSE, 30);
 
-  GtkWidget* yesnodia_vbox = gtk_vbox_new(FALSE, 0);
+  GtkWidget* yesnodia_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start(GTK_BOX(yesnodia_vbox), yesnodia_hboxtext, TRUE, TRUE, 30);
   gtk_box_pack_start(
-      GTK_BOX(yesnodia_vbox), gtk_hseparator_new(), FALSE, FALSE, 0);
+      GTK_BOX(yesnodia_vbox), gtk_separator_new(GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 0);
   gtk_box_pack_end(
       GTK_BOX(yesnodia_vbox), yesnodia_hboxbuttons, FALSE, FALSE, 15);
   gtk_container_add(GTK_CONTAINER(yesnodia_widget), yesnodia_vbox);

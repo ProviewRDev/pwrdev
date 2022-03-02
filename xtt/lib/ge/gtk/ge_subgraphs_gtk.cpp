@@ -68,7 +68,7 @@ static void attr_focus_in_event(GtkWidget* w, GdkEvent* event, gpointer data)
 {
   SubGraphsGtk* subgraphs = (SubGraphsGtk*)data;
 
-  gdk_window_focus(subgraphs->brow_widget->window, GDK_CURRENT_TIME);
+  gdk_window_focus(gtk_widget_get_window(subgraphs->brow_widget), GDK_CURRENT_TIME);
 }
 
 static void subgraphs_activate_close(GtkWidget* w, gpointer data)
@@ -190,9 +190,11 @@ SubGraphsGtk::SubGraphsGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid,
       GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
   GtkWidget* file_close
-      = gtk_image_menu_item_new_from_stock(GTK_STOCK_CLOSE, accel_g);
+      = gtk_menu_item_new_with_mnemonic("_Close");
   g_signal_connect(
       file_close, "activate", G_CALLBACK(subgraphs_activate_close), this);
+  gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w',
+      GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
   GtkMenu* file_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_attributes);
@@ -208,9 +210,11 @@ SubGraphsGtk::SubGraphsGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid,
 
   // Help entry
   GtkWidget* help_help
-      = gtk_image_menu_item_new_from_stock(GTK_STOCK_HELP, accel_g);
+      = gtk_menu_item_new_with_mnemonic("_Help");
   g_signal_connect(
       help_help, "activate", G_CALLBACK(subgraphs_activate_help), this);
+  gtk_widget_add_accelerator(help_help, "activate", accel_g, 'h',
+      GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
   GtkMenu* help_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(help_menu), help_help);
@@ -222,7 +226,7 @@ SubGraphsGtk::SubGraphsGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid,
   form_widget
       = scrolledbrowwidgetgtk_new(SubGraphs::init_brow_cb, this, &brow_widget);
 
-  GtkWidget* vbox = gtk_vbox_new(FALSE, 0);
+  GtkWidget* vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start(GTK_BOX(vbox), GTK_WIDGET(menu_bar), FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(vbox), GTK_WIDGET(form_widget), TRUE, TRUE, 0);
 

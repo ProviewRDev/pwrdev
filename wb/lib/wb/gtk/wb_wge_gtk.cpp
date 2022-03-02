@@ -308,9 +308,10 @@ WGeGtk::WGeGtk(GtkWidget* wge_parent_wid, void* wge_parent_ctx, char* wge_name,
     menu_bar = (GtkMenuBar*)g_object_new(GTK_TYPE_MENU_BAR, NULL);
 
     // File Entry
-    GtkWidget* file_close
-        = gtk_image_menu_item_new_from_stock(GTK_STOCK_CLOSE, accel_g);
+    GtkWidget* file_close = gtk_menu_item_new_with_mnemonic("_Close");
     g_signal_connect(file_close, "activate", G_CALLBACK(activate_exit), this);
+    gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w',
+	GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
 
     GtkMenu* file_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
     gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_close);
@@ -320,24 +321,18 @@ WGeGtk::WGeGtk(GtkWidget* wge_parent_wid, void* wge_parent_ctx, char* wge_name,
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(file), GTK_WIDGET(file_menu));
 
     // View menu
-    GtkWidget* view_zoom_in
-        = gtk_image_menu_item_new_from_stock(GTK_STOCK_ZOOM_IN, NULL);
-    g_signal_connect(
-        view_zoom_in, "activate", G_CALLBACK(activate_zoom_in), this);
+    GtkWidget* view_zoom_in = gtk_menu_item_new_with_mnemonic("Zoom _in");
+    g_signal_connect(view_zoom_in, "activate", G_CALLBACK(activate_zoom_in), this);
     gtk_widget_add_accelerator(view_zoom_in, "activate", accel_g, 'i',
-        GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+	GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
-    GtkWidget* view_zoom_out
-        = gtk_image_menu_item_new_from_stock(GTK_STOCK_ZOOM_OUT, NULL);
-    g_signal_connect(
-        view_zoom_out, "activate", G_CALLBACK(activate_zoom_out), this);
+    GtkWidget* view_zoom_out = gtk_menu_item_new_with_mnemonic("Zoom _out");
+    g_signal_connect(view_zoom_out, "activate", G_CALLBACK(activate_zoom_out), this);
     gtk_widget_add_accelerator(view_zoom_out, "activate", accel_g, 'o',
         GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
-    GtkWidget* view_zoom_reset
-        = gtk_image_menu_item_new_from_stock(GTK_STOCK_ZOOM_100, NULL);
-    g_signal_connect(
-        view_zoom_reset, "activate", G_CALLBACK(activate_zoom_reset), this);
+    GtkWidget* view_zoom_reset = gtk_menu_item_new_with_mnemonic("Zoom _reset");
+    g_signal_connect(view_zoom_reset, "activate", G_CALLBACK(activate_zoom_reset), this);
 
     GtkMenu* view_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
     gtk_menu_shell_append(GTK_MENU_SHELL(view_menu), view_zoom_in);
@@ -349,9 +344,10 @@ WGeGtk::WGeGtk(GtkWidget* wge_parent_wid, void* wge_parent_ctx, char* wge_name,
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(view), GTK_WIDGET(view_menu));
 
     // Menu Help
-    GtkWidget* help_help
-        = gtk_image_menu_item_new_from_stock(GTK_STOCK_HELP, accel_g);
+    GtkWidget* help_help = gtk_menu_item_new_with_mnemonic("_Help");
     g_signal_connect(help_help, "activate", G_CALLBACK(activate_help), this);
+    gtk_widget_add_accelerator(help_help, "activate", accel_g, 'h',
+	GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
 
     GtkMenu* help_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
     gtk_menu_shell_append(GTK_MENU_SHELL(help_menu), help_help);
@@ -361,7 +357,7 @@ WGeGtk::WGeGtk(GtkWidget* wge_parent_wid, void* wge_parent_ctx, char* wge_name,
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(help), GTK_WIDGET(help_menu));
   }
 
-  graph_form = gtk_vbox_new(FALSE, 0);
+  graph_form = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   graph = new GraphGtk(this, graph_form, "Plant", &grow_widget, &sts,
       "pwrp_exe:", graph_eMode_Runtime, scrollbar, 1, object_name, 0, 0);
   ((Graph*)graph)->message_cb = &message;
@@ -423,7 +419,7 @@ void WGeGtk::create_confirm_dialog()
       confirm_widget, "delete_event", G_CALLBACK(confirm_delete_event), this);
   confirm_label = gtk_label_new("");
   GtkWidget* confirm_image = (GtkWidget*)g_object_new(GTK_TYPE_IMAGE, "stock",
-      GTK_STOCK_DIALOG_QUESTION, "icon-size", GTK_ICON_SIZE_DIALOG, "xalign",
+      "gtk-dialog-question", "icon-size", GTK_ICON_SIZE_DIALOG, "xalign",
       0.5, "yalign", 1.0, NULL);
 
   GtkWidget* confirm_ok = gtk_button_new_with_label("Yes");
@@ -436,20 +432,20 @@ void WGeGtk::create_confirm_dialog()
   g_signal_connect(
       confirm_cancel, "clicked", G_CALLBACK(activate_confirm_cancel), this);
 
-  GtkWidget* confirm_hboxtext = gtk_hbox_new(FALSE, 0);
+  GtkWidget* confirm_hboxtext = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   gtk_box_pack_start(
       GTK_BOX(confirm_hboxtext), confirm_image, FALSE, FALSE, 15);
   gtk_box_pack_start(GTK_BOX(confirm_hboxtext), confirm_label, TRUE, TRUE, 15);
 
-  GtkWidget* confirm_hboxbuttons = gtk_hbox_new(TRUE, 40);
+  GtkWidget* confirm_hboxbuttons = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 40);
   gtk_box_pack_start(GTK_BOX(confirm_hboxbuttons), confirm_ok, FALSE, FALSE, 0);
   gtk_box_pack_end(
       GTK_BOX(confirm_hboxbuttons), confirm_cancel, FALSE, FALSE, 0);
 
-  GtkWidget* confirm_vbox = gtk_vbox_new(FALSE, 0);
+  GtkWidget* confirm_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start(GTK_BOX(confirm_vbox), confirm_hboxtext, TRUE, TRUE, 30);
   gtk_box_pack_start(
-      GTK_BOX(confirm_vbox), gtk_hseparator_new(), FALSE, FALSE, 0);
+      GTK_BOX(confirm_vbox), gtk_separator_new(GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 0);
   gtk_box_pack_end(
       GTK_BOX(confirm_vbox), confirm_hboxbuttons, FALSE, FALSE, 15);
   gtk_container_add(GTK_CONTAINER(confirm_widget), confirm_vbox);

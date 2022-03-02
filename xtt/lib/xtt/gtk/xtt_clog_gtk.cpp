@@ -79,7 +79,7 @@ CLogGtk::CLogGtk(void* clog_parent_ctx, GtkWidget* clog_parent_wid,
 
   CoWowGtk::SetWindowIcon(toplevel);
 
-  GtkWidget* vbox = gtk_vbox_new(FALSE, 0);
+  GtkWidget* vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 
   // Menu
   // Accelerators
@@ -123,10 +123,8 @@ CLogGtk::CLogGtk(void* clog_parent_ctx, GtkWidget* clog_parent_wid,
       = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Print"));
   g_signal_connect(file_print, "activate", G_CALLBACK(activate_print), this);
 
-  GtkWidget* file_close = gtk_image_menu_item_new_with_mnemonic(
+  GtkWidget* file_close = gtk_menu_item_new_with_mnemonic(
       CoWowGtk::translate_utf8("_Close"));
-  gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(file_close),
-      gtk_image_new_from_stock("gtk-close", GTK_ICON_SIZE_MENU));
   g_signal_connect(file_close, "activate", G_CALLBACK(activate_exit), this);
   gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w',
       GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
@@ -146,28 +144,22 @@ CLogGtk::CLogGtk(void* clog_parent_ctx, GtkWidget* clog_parent_wid,
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(file), GTK_WIDGET(file_menu));
 
   // View menu
-  GtkWidget* view_zoom_in = gtk_image_menu_item_new_with_mnemonic(
+  GtkWidget* view_zoom_in = gtk_menu_item_new_with_mnemonic(
       CoWowGtk::translate_utf8("Zoom _In"));
-  gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(view_zoom_in),
-      gtk_image_new_from_stock("gtk-zoom-in", GTK_ICON_SIZE_MENU));
   g_signal_connect(
       view_zoom_in, "activate", G_CALLBACK(activate_zoom_in), this);
   gtk_widget_add_accelerator(view_zoom_in, "activate", accel_g, 'i',
       GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
-  GtkWidget* view_zoom_out = gtk_image_menu_item_new_with_mnemonic(
+  GtkWidget* view_zoom_out = gtk_menu_item_new_with_mnemonic(
       CoWowGtk::translate_utf8("Zoom _Out"));
-  gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(view_zoom_out),
-      gtk_image_new_from_stock("gtk-zoom-out", GTK_ICON_SIZE_MENU));
   g_signal_connect(
       view_zoom_out, "activate", G_CALLBACK(activate_zoom_out), this);
   gtk_widget_add_accelerator(view_zoom_out, "activate", accel_g, 'o',
       GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
-  GtkWidget* view_zoom_reset = gtk_image_menu_item_new_with_mnemonic(
+  GtkWidget* view_zoom_reset = gtk_menu_item_new_with_mnemonic(
       CoWowGtk::translate_utf8("Zoom _Reset"));
-  gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(view_zoom_reset),
-      gtk_image_new_from_stock("gtk-zoom-100", GTK_ICON_SIZE_MENU));
   g_signal_connect(
       view_zoom_reset, "activate", G_CALLBACK(activate_zoom_reset), this);
 
@@ -182,10 +174,8 @@ CLogGtk::CLogGtk(void* clog_parent_ctx, GtkWidget* clog_parent_wid,
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(view), GTK_WIDGET(view_menu));
 
   // Menu Help
-  GtkWidget* help_help = gtk_image_menu_item_new_with_mnemonic(
+  GtkWidget* help_help = gtk_menu_item_new_with_mnemonic(
       CoWowGtk::translate_utf8("_Help on System Messages"));
-  gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(help_help),
-      gtk_image_new_from_stock("gtk-help", GTK_ICON_SIZE_MENU));
   g_signal_connect(help_help, "activate", G_CALLBACK(activate_help), this);
   gtk_widget_add_accelerator(
       help_help, "activate", accel_g, 'h', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
@@ -239,19 +229,19 @@ void CLogGtk::set_clock_cursor()
     clock_cursor = gdk_cursor_new_for_display(
         gtk_widget_get_display(toplevel), GDK_WATCH);
 
-  gdk_window_set_cursor(toplevel->window, clock_cursor);
+  gdk_window_set_cursor(gtk_widget_get_window(toplevel), clock_cursor);
   gdk_display_flush(gtk_widget_get_display(toplevel));
 }
 
 void CLogGtk::reset_cursor()
 {
-  gdk_window_set_cursor(toplevel->window, NULL);
+  gdk_window_set_cursor(gtk_widget_get_window(toplevel), NULL);
 }
 
 void CLogGtk::free_cursor()
 {
   if (clock_cursor)
-    gdk_cursor_unref(clock_cursor);
+    g_object_unref(clock_cursor);
 }
 
 gboolean CLogGtk::action_inputfocus(
@@ -474,10 +464,10 @@ void CLogGtk::create_filter_dialog()
       filter_form, "delete_event", G_CALLBACK(filter_delete_event), this);
 
   GtkWidget* severity_label = gtk_label_new("Message Severity");
-  gtk_misc_set_alignment(GTK_MISC(severity_label), 0.0, 0.05);
+  //gtk_misc_set_alignment(GTK_MISC(severity_label), 0.0, 0.05);
   gtk_widget_set_size_request(severity_label, 140, -1);
   GtkWidget* string_label = gtk_label_new("String");
-  gtk_misc_set_alignment(GTK_MISC(string_label), 0.0, 0.5);
+  //gtk_misc_set_alignment(GTK_MISC(string_label), 0.0, 0.5);
   gtk_widget_set_size_request(string_label, 140, -1);
   filter_string_w = gtk_entry_new();
 
@@ -488,7 +478,7 @@ void CLogGtk::create_filter_dialog()
   show_fatal_w = gtk_check_button_new_with_label("Fatal");
   show_text_w = gtk_check_button_new_with_label("Text");
 
-  GtkWidget* severity_vbox = gtk_vbox_new(FALSE, 0);
+  GtkWidget* severity_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start(GTK_BOX(severity_vbox), show_success_w, FALSE, FALSE, 7);
   gtk_box_pack_start(GTK_BOX(severity_vbox), show_info_w, FALSE, FALSE, 7);
   gtk_box_pack_start(GTK_BOX(severity_vbox), show_warning_w, FALSE, FALSE, 7);
@@ -496,11 +486,11 @@ void CLogGtk::create_filter_dialog()
   gtk_box_pack_start(GTK_BOX(severity_vbox), show_fatal_w, FALSE, FALSE, 7);
   gtk_box_pack_start(GTK_BOX(severity_vbox), show_text_w, FALSE, FALSE, 7);
 
-  GtkWidget* severity_hbox = gtk_hbox_new(FALSE, 0);
+  GtkWidget* severity_hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   gtk_box_pack_start(GTK_BOX(severity_hbox), severity_label, FALSE, FALSE, 7);
   gtk_box_pack_start(GTK_BOX(severity_hbox), severity_vbox, FALSE, FALSE, 7);
 
-  GtkWidget* string_hbox = gtk_hbox_new(FALSE, 0);
+  GtkWidget* string_hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   gtk_box_pack_start(GTK_BOX(string_hbox), string_label, FALSE, FALSE, 7);
   gtk_box_pack_start(GTK_BOX(string_hbox), filter_string_w, TRUE, TRUE, 7);
 
@@ -515,17 +505,17 @@ void CLogGtk::create_filter_dialog()
   g_signal_connect(
       filter_cancel, "clicked", G_CALLBACK(filter_cancel_cb), this);
 
-  GtkWidget* filter_hboxbuttons = gtk_hbox_new(TRUE, 40);
+  GtkWidget* filter_hboxbuttons = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 40);
   gtk_box_pack_start(GTK_BOX(filter_hboxbuttons), filter_ok, FALSE, FALSE, 0);
   gtk_box_pack_start(
       GTK_BOX(filter_hboxbuttons), filter_apply, FALSE, FALSE, 0);
   gtk_box_pack_end(GTK_BOX(filter_hboxbuttons), filter_cancel, FALSE, FALSE, 0);
 
-  GtkWidget* filter_vbox = gtk_vbox_new(FALSE, 0);
+  GtkWidget* filter_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start(GTK_BOX(filter_vbox), severity_hbox, FALSE, FALSE, 15);
   gtk_box_pack_start(GTK_BOX(filter_vbox), string_hbox, TRUE, TRUE, 15);
   gtk_box_pack_start(
-      GTK_BOX(filter_vbox), gtk_hseparator_new(), FALSE, FALSE, 0);
+      GTK_BOX(filter_vbox), gtk_separator_new(GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 0);
   gtk_box_pack_end(GTK_BOX(filter_vbox), filter_hboxbuttons, FALSE, FALSE, 15);
   gtk_container_add(GTK_CONTAINER(filter_form), filter_vbox);
   gtk_widget_show_all(filter_form);

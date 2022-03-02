@@ -57,6 +57,7 @@
 using namespace std;
 
 #define DRAW_PRESS_PIX 9
+#define DRAW_TSCALE 0.93
 
 typedef struct {
   GtkWidget w;
@@ -85,138 +86,51 @@ typedef struct {
   int blue;
 } draw_sColor;
 
-static char font_names[glow_eFont__][glow_eDrawFont__][DRAW_FONT_SIZE][80] = {
-  { { "-*-Helvetica-Medium-R-Normal--8-*-*-*-P-*-ISO8859-1",
-        "-*-Helvetica-Bold-R-Normal--10-*-*-*-P-*-ISO8859-1",
-        "-*-Helvetica-Bold-R-Normal--12-*-*-*-P-*-ISO8859-1",
-        "-*-Helvetica-Bold-R-Normal--14-*-*-*-P-*-ISO8859-1",
-        "-*-Helvetica-Bold-R-Normal--14-*-*-*-P-*-ISO8859-1",
-        "-*-Helvetica-Bold-R-Normal--18-*-*-*-P-*-ISO8859-1",
-        "-*-Helvetica-Bold-R-Normal--18-*-*-*-P-*-ISO8859-1",
-        "-*-Helvetica-Bold-R-Normal--18-*-*-*-P-*-ISO8859-1",
-        "-*-Helvetica-Bold-R-Normal--24-*-*-*-P-*-ISO8859-1" },
-      { "-*-Helvetica-Medium-R-Normal--8-*-*-*-P-*-ISO8859-1",
-          "-*-Helvetica-Medium-R-Normal--10-*-*-*-P-*-ISO8859-1",
-          "-*-Helvetica-Medium-R-Normal--12-*-*-*-P-*-ISO8859-1",
-          "-*-Helvetica-Medium-R-Normal--14-*-*-*-P-*-ISO8859-1",
-          "-*-Helvetica-Medium-R-Normal--14-*-*-*-P-*-ISO8859-1",
-          "-*-Helvetica-Medium-R-Normal--18-*-*-*-P-*-ISO8859-1",
-          "-*-Helvetica-Medium-R-Normal--18-*-*-*-P-*-ISO8859-1",
-          "-*-Helvetica-Medium-R-Normal--18-*-*-*-P-*-ISO8859-1",
-          "-*-Helvetica-Medium-R-Normal--24-*-*-*-P-*-ISO8859-1" } },
-  { { "-*-times-Medium-R-Normal--8-*-*-*-*-*-ISO8859-1",
-        "-*-times-Bold-R-Normal--10-*-*-*-*-*-ISO8859-1",
-        "-*-times-Bold-R-Normal--12-*-*-*-*-*-ISO8859-1",
-        "-*-times-Bold-R-Normal--14-*-*-*-*-*-ISO8859-1",
-        "-*-times-Bold-R-Normal--14-*-*-*-*-*-ISO8859-1",
-        "-*-times-Bold-R-Normal--18-*-*-*-*-*-ISO8859-1",
-        "-*-times-Bold-R-Normal--18-*-*-*-*-*-ISO8859-1",
-        "-*-times-Bold-R-Normal--18-*-*-*-*-*-ISO8859-1",
-        "-*-times-Bold-R-Normal--24-*-*-*-*-*-ISO8859-1" },
-      { "-*-times-Medium-R-Normal--8-*-*-*-*-*-ISO8859-1",
-          "-*-times-Medium-R-Normal--10-*-*-*-*-*-ISO8859-1",
-          "-*-times-Medium-R-Normal--12-*-*-*-*-*-ISO8859-1",
-          "-*-times-Medium-R-Normal--14-*-*-*-*-*-ISO8859-1",
-          "-*-times-Medium-R-Normal--14-*-*-*-*-*-ISO8859-1",
-          "-*-times-Medium-R-Normal--18-*-*-*-*-*-ISO8859-1",
-          "-*-times-Medium-R-Normal--18-*-*-*-*-*-ISO8859-1",
-          "-*-times-Medium-R-Normal--18-*-*-*-*-*-ISO8859-1",
-          "-*-times-Medium-R-Normal--24-*-*-*-*-*-ISO8859-1" } },
-  { { "-*-new century schoolbook-Medium-R-Normal--8-*-*-*-*-*-ISO8859-1",
-        "-*-new century schoolbook-Bold-R-Normal--10-*-*-*-*-*-ISO8859-1",
-        "-*-new century schoolbook-Bold-R-Normal--12-*-*-*-*-*-ISO8859-1",
-        "-*-new century schoolbook-Bold-R-Normal--14-*-*-*-*-*-ISO8859-1",
-        "-*-new century schoolbook-Bold-R-Normal--14-*-*-*-*-*-ISO8859-1",
-        "-*-new century schoolbook-Bold-R-Normal--18-*-*-*-*-*-ISO8859-1",
-        "-*-new century schoolbook-Bold-R-Normal--18-*-*-*-*-*-ISO8859-1",
-        "-*-new century schoolbook-Bold-R-Normal--18-*-*-*-*-*-ISO8859-1",
-        "-*-new century schoolbook-Bold-R-Normal--24-*-*-*-*-*-ISO8859-1" },
-      { "-*-new century schoolbook-Medium-R-Normal--8-*-*-*-*-*-ISO8859-1",
-          "-*-new century schoolbook-Medium-R-Normal--10-*-*-*-*-*-ISO8859-1",
-          "-*-new century schoolbook-Medium-R-Normal--12-*-*-*-*-*-ISO8859-1",
-          "-*-new century schoolbook-Medium-R-Normal--14-*-*-*-*-*-ISO8859-1",
-          "-*-new century schoolbook-Medium-R-Normal--14-*-*-*-*-*-ISO8859-1",
-          "-*-new century schoolbook-Medium-R-Normal--18-*-*-*-*-*-ISO8859-1",
-          "-*-new century schoolbook-Medium-R-Normal--18-*-*-*-*-*-ISO8859-1",
-          "-*-new century schoolbook-Medium-R-Normal--18-*-*-*-*-*-ISO8859-1",
-          "-*-new century "
-          "schoolbook-Medium-R-Normal--24-*-*-*-*-*-ISO8859-1" } },
-  { { "-*-courier-Medium-R-Normal--8-*-*-*-m-*-ISO8859-1",
-        "-*-courier-Bold-R-Normal--10-*-*-*-m-*-ISO8859-1",
-        "-*-courier-Bold-R-Normal--12-*-*-*-m-*-ISO8859-1",
-        "-*-courier-Bold-R-Normal--14-*-*-*-m-*-ISO8859-1",
-        "-*-courier-Bold-R-Normal--14-*-*-*-m-*-ISO8859-1",
-        "-*-courier-Bold-R-Normal--18-*-*-*-m-*-ISO8859-1",
-        "-*-courier-Bold-R-Normal--18-*-*-*-m-*-ISO8859-1",
-        "-*-courier-Bold-R-Normal--18-*-*-*-m-*-ISO8859-1",
-        "-*-courier-Bold-R-Normal--24-*-*-*-m-*-ISO8859-1" },
-      { "-*-courier-Medium-R-Normal--8-*-*-*-m-*-ISO8859-1",
-          "-*-courier-Medium-R-Normal--10-*-*-*-m-*-ISO8859-1",
-          "-*-courier-Medium-R-Normal--12-*-*-*-m-*-ISO8859-1",
-          "-*-courier-Medium-R-Normal--14-*-*-*-m-*-ISO8859-1",
-          "-*-courier-Medium-R-Normal--14-*-*-*-m-*-ISO8859-1",
-          "-*-courier-Medium-R-Normal--18-*-*-*-m-*-ISO8859-1",
-          "-*-courier-Medium-R-Normal--18-*-*-*-m-*-ISO8859-1",
-          "-*-courier-Medium-R-Normal--18-*-*-*-m-*-ISO8859-1",
-          "-*-courier-Medium-R-Normal--24-*-*-*-m-*-ISO8859-1" } }
-};
+char GlowDrawGtk::font_names[glow_eFont__][40] = {"Helvetica",
+				       "Times",
+				       "New century schoolbook",
+				       "Courier",
+				       "Lucida Sans"};
 
 static GdkEvent last_event;
 
-static GdkColor glow_allocate_named_color(
-    GlowDrawGtk* draw_ctx, const char* named_color);
-static GdkColor glow_allocate_color(
-    GlowDrawGtk* draw_ctx, int rgb_red, int rgb_green, int rgb_blue);
-static GdkColor glow_allocate_custom_color(GlowDrawGtk* draw_ctx,
-    glow_eDrawType drawtype, int rgb_red, int rgb_green, int rgb_blue);
 static void event_timer(GlowDrawGtk* ctx, int time_ms);
 static void cancel_event_timer(GlowDrawGtk* ctx);
 static gboolean event_timer_cb(void* ctx);
 static int glow_read_color_file(
     const char* filename, draw_sColor** color_array, int* size);
 
-static GdkGC* get_gc(GlowDrawGtk* draw_ctx, int i, int j)
+static cairo_pattern_t* get_gc(GlowDrawGtk* draw_ctx, int i, int j)
 {
   int crea = 0;
 
   if (GlowColor::is_custom((glow_eDrawType)i)) {
     if (!draw_ctx->get_customcolors())
-      return draw_ctx->gcs[0][0];
-    if (!draw_ctx->get_customcolors()->gcs[i - glow_eDrawType_CustomColor1][j])
+      return draw_ctx->gcs[0];
+    if (!draw_ctx->get_customcolors()->gcs[i - glow_eDrawType_CustomColor1])
       crea = 1;
-  } else if (!draw_ctx->gcs[i][j])
+  } else if (!draw_ctx->gcs[i])
     crea = 1;
 
   if (crea) {
-    GdkGCValues xgcv;
     double r, g, b;
 
     GlowColor::rgb_color(i, &r, &g, &b, draw_ctx->get_customcolors());
-    if (GlowColor::is_custom((glow_eDrawType)i))
-      xgcv.foreground = glow_allocate_custom_color(draw_ctx, (glow_eDrawType)i,
-          int(r * 65535), int(g * 65535), int(b * 65535));
-    else
-      xgcv.foreground = glow_allocate_color(
-          draw_ctx, int(r * 65535), int(g * 65535), int(b * 65535));
-    xgcv.background = draw_ctx->background;
-    xgcv.cap_style = GDK_CAP_BUTT;
-    xgcv.line_width = j + 1;
-
     if (GlowColor::is_custom((glow_eDrawType)i)) {
-      draw_ctx->get_customcolors()->gcs[i - glow_eDrawType_CustomColor1][j]
-          = gdk_gc_new_with_values(draw_ctx->m_wind.window, &xgcv,
-              (GdkGCValuesMask)(GDK_GC_FOREGROUND | GDK_GC_BACKGROUND
-                  | GDK_GC_LINE_WIDTH | GDK_GC_CAP_STYLE));
-    } else
-      draw_ctx->gcs[i][j] = gdk_gc_new_with_values(draw_ctx->m_wind.window,
-          &xgcv, (GdkGCValuesMask)(GDK_GC_FOREGROUND | GDK_GC_BACKGROUND
-                     | GDK_GC_LINE_WIDTH | GDK_GC_CAP_STYLE));
+      draw_ctx->get_customcolors()->gcs[i - glow_eDrawType_CustomColor1]
+          = cairo_pattern_create_rgb(r, g, b);
+      //printf("C Custom:  %4d %llu\n", i - glow_eDrawType_CustomColor1, (unsigned long long)draw_ctx->get_customcolors()->gcs[i - glow_eDrawType_CustomColor1]);
+    }
+    else {
+      draw_ctx->gcs[i] = cairo_pattern_create_rgb(r, g, b);
+      //printf("C Regular: %4d %llu\n", i, (unsigned long long)draw_ctx->gcs[i]);
+    }
   }
   if (GlowColor::is_custom((glow_eDrawType)i))
-    return draw_ctx->get_customcolors()
-        ->gcs[i - glow_eDrawType_CustomColor1][j];
+    return draw_ctx->get_customcolors()->gcs[i - glow_eDrawType_CustomColor1];
   else
-    return draw_ctx->gcs[i][j];
+    return draw_ctx->gcs[i];
+
 }
 
 static int glow_create_cursor(GlowDrawGtk* draw_ctx)
@@ -262,25 +176,17 @@ static int glow_create_cursor(GlowDrawGtk* draw_ctx)
 
 static int draw_free_gc(GlowDrawGtk* draw_ctx)
 {
-  int i, j, k;
+  cairo_pattern_destroy(draw_ctx->gc_black);
+  cairo_pattern_destroy(draw_ctx->gc_red);
+  cairo_pattern_destroy(draw_ctx->gc_inverse);
 
-  for (i = 1; i < glow_eDrawCursor__; i++)
-    gdk_cursor_unref(draw_ctx->cursors[i]);
+  for (int i = 1; i < glow_eDrawCursor__; i++)
+    g_object_unref(draw_ctx->cursors[i]);
 
-  gdk_gc_unref(draw_ctx->gc_inverse);
-  for (i = 0; i < glow_eDrawType_Color__; i++) {
-    for (j = 0; j < DRAW_TYPE_SIZE; j++) {
-      if (draw_ctx->gcs[i][j])
-        gdk_gc_unref(draw_ctx->gcs[i][j]);
-    }
-  }
-
-  for (i = 0; i < glow_eFont__; i++) {
-    for (j = 0; j < glow_eDrawFont__; j++) {
-      for (k = 0; k < DRAW_FONT_SIZE; k++) {
-        if (draw_ctx->font[i][j][k])
-          gdk_font_unref(draw_ctx->font[i][j][k]);
-      }
+  for (int i = 0; i < glow_eDrawType_Color__; i++) {
+    if (draw_ctx->gcs[i]) {
+      cairo_pattern_destroy(draw_ctx->gcs[i]);
+      //printf("X Regular: %4d %llu\n", i, (unsigned long long)draw_ctx->gcs[i]);
     }
   }
   return 1;
@@ -288,257 +194,22 @@ static int draw_free_gc(GlowDrawGtk* draw_ctx)
 
 static int glow_create_gc(GlowDrawGtk* draw_ctx, GdkWindow* window)
 {
-  GdkFont* font;
-  GdkGCValues xgcv;
-  int i;
-  draw_sColor *color_array, *color_p;
-  int size, sts;
+  draw_ctx->gc_black = cairo_pattern_create_rgb(0.0, 0.0, 0.0);
+  draw_ctx->gc_red = cairo_pattern_create_rgb(1.0, 0.2, 0.2);
+  draw_ctx->gc_inverse = cairo_pattern_create_rgb(0.0, 0.0, 0.0);
+  draw_ctx->gc_erase = get_gc(draw_ctx, glow_eDrawType_Color32, 0);
 
-  memset(&xgcv, 0, sizeof(xgcv));
-
-  /* Inverse gc */
-  xgcv.background = glow_allocate_named_color(draw_ctx, "black");
-  xgcv.foreground = draw_ctx->background;
-  xgcv.cap_style = GDK_CAP_BUTT;
-  draw_ctx->gc_inverse = gdk_gc_new_with_values(window, &xgcv,
-      (GdkGCValuesMask)(
-          GDK_GC_FOREGROUND | GDK_GC_BACKGROUND | GDK_GC_CAP_STYLE));
-
-  /* Black line gc */
-  xgcv.foreground = glow_allocate_named_color(draw_ctx, "black");
-  xgcv.background = draw_ctx->background;
-  xgcv.cap_style = GDK_CAP_BUTT;
-  for (i = 0; i < DRAW_TYPE_SIZE; i++) {
-    xgcv.line_width = i + 1;
-
-    draw_ctx->gcs[glow_eDrawType_Line][i] = gdk_gc_new_with_values(
-        window, &xgcv, (GdkGCValuesMask)(GDK_GC_FOREGROUND | GDK_GC_BACKGROUND
-                           | GDK_GC_LINE_WIDTH | GDK_GC_CAP_STYLE));
+  if (0) {
+    draw_sColor *color_array;
+    int size, sts;
+    sts = glow_read_color_file(
+        "/home/claes/test/ge_colors.dat", &color_array, &size);
   }
-
-  /* Erase line gc */
-  xgcv.foreground = draw_ctx->background;
-  xgcv.background = draw_ctx->background;
-  xgcv.cap_style = GDK_CAP_BUTT;
-  // xgcv.fill_rule = WindingRule;
-  for (i = 0; i < DRAW_TYPE_SIZE; i++) {
-    xgcv.line_width = i + 1;
-
-    draw_ctx->gcs[glow_eDrawType_LineErase][i] = gdk_gc_new_with_values(
-        window, &xgcv, (GdkGCValuesMask)(GDK_GC_FOREGROUND | GDK_GC_BACKGROUND
-                           | GDK_GC_LINE_WIDTH | GDK_GC_CAP_STYLE));
-  }
-
-  /* Red line gc */
-  xgcv.foreground = glow_allocate_named_color(draw_ctx, "red");
-  xgcv.background = draw_ctx->background;
-  xgcv.cap_style = GDK_CAP_BUTT;
-  for (i = 0; i < DRAW_TYPE_SIZE; i++) {
-    xgcv.line_width = i + 1;
-
-    draw_ctx->gcs[glow_eDrawType_LineRed][i] = gdk_gc_new_with_values(
-        window, &xgcv, (GdkGCValuesMask)(GDK_GC_FOREGROUND | GDK_GC_BACKGROUND
-                           | GDK_GC_LINE_WIDTH | GDK_GC_CAP_STYLE));
-  }
-
-  /* Gray line gc */
-  xgcv.foreground = glow_allocate_named_color(draw_ctx, "gray");
-  xgcv.background = draw_ctx->background;
-  xgcv.cap_style = GDK_CAP_BUTT;
-  // xgcv.fill_rule = WindingRule;
-  for (i = 0; i < DRAW_TYPE_SIZE; i++) {
-    xgcv.line_width = i + 1;
-
-    draw_ctx->gcs[glow_eDrawType_LineGray][i] = gdk_gc_new_with_values(
-        window, &xgcv, (GdkGCValuesMask)(GDK_GC_FOREGROUND | GDK_GC_BACKGROUND
-                           | GDK_GC_LINE_WIDTH | GDK_GC_CAP_STYLE));
-  }
-
-  sts = glow_read_color_file(
-      "/home/claes/test/ge_colors.dat", &color_array, &size);
-  if (ODD(sts)) {
-    color_p = color_array;
-    for (int j = glow_eDrawType_Color4; j <= glow_eDrawType_Color300; j++) {
-      if (j - glow_eDrawType_Color4 >= size)
-        break;
-
-      xgcv.foreground = glow_allocate_color(
-          draw_ctx, color_p->red, color_p->green, color_p->blue);
-      xgcv.background = draw_ctx->background;
-      xgcv.cap_style = GDK_CAP_BUTT;
-      // xgcv.fill_rule = WindingRule;
-      for (i = 0; i < DRAW_TYPE_SIZE; i++) {
-        xgcv.line_width = i + 1;
-
-        draw_ctx->gcs[j][i] = gdk_gc_new_with_values(window, &xgcv,
-            (GdkGCValuesMask)(GDK_GC_FOREGROUND | GDK_GC_BACKGROUND
-                | GDK_GC_LINE_WIDTH | GDK_GC_CAP_STYLE));
-      }
-      color_p++;
-    }
-    free((char*)color_array);
-  }
-
-  /* Dashed line gc */
-  xgcv.foreground = glow_allocate_named_color(draw_ctx, "black");
-  xgcv.background = draw_ctx->background;
-  xgcv.line_style = GDK_LINE_ON_OFF_DASH;
-  xgcv.cap_style = GDK_CAP_BUTT;
-  for (i = 0; i < DRAW_TYPE_SIZE; i++) {
-    xgcv.line_width = i + 1;
-    gint8 dashes = 7 + i;
-
-    draw_ctx->gcs[glow_eDrawType_LineDashed][i] = gdk_gc_new_with_values(window,
-        &xgcv, (GdkGCValuesMask)(GDK_GC_FOREGROUND | GDK_GC_BACKGROUND
-                   | GDK_GC_LINE_WIDTH | GDK_GC_LINE_STYLE | GDK_GC_CAP_STYLE));
-    gdk_gc_set_dashes(
-        draw_ctx->gcs[glow_eDrawType_LineDashed][i], 0, &dashes, 1);
-  }
-
-  /* Red dashed line gc */
-  xgcv.foreground = glow_allocate_named_color(draw_ctx, "red");
-  xgcv.background = draw_ctx->background;
-  xgcv.line_style = GDK_LINE_ON_OFF_DASH;
-  xgcv.cap_style = GDK_CAP_BUTT;
-  for (i = 0; i < DRAW_TYPE_SIZE; i++) {
-    xgcv.line_width = i + 1;
-    gint8 dashes = 7 + i;
-
-    draw_ctx->gcs[glow_eDrawType_LineDashedRed][i]
-        = gdk_gc_new_with_values(window, &xgcv,
-            (GdkGCValuesMask)(GDK_GC_FOREGROUND | GDK_GC_BACKGROUND
-                | GDK_GC_LINE_WIDTH | GDK_GC_LINE_STYLE | GDK_GC_CAP_STYLE));
-    gdk_gc_set_dashes(
-        draw_ctx->gcs[glow_eDrawType_LineDashedRed][i], 0, &dashes, 1);
-  }
-
-  /* Text */
-  xgcv.foreground = glow_allocate_named_color(draw_ctx, "black");
-  xgcv.background = draw_ctx->background;
-  for (i = 0; i < DRAW_TYPE_SIZE; i++) {
-    draw_ctx->gcs[glow_eDrawType_TextHelvetica][i]
-        = gdk_gc_new_with_values(window, &xgcv,
-            (GdkGCValuesMask)(GDK_GC_FOREGROUND | GDK_GC_BACKGROUND));
-  }
-
-  for (i = 0; i < DRAW_TYPE_SIZE; i++) {
-    draw_ctx->gcs[glow_eDrawType_TextHelveticaBold][i]
-        = gdk_gc_new_with_values(window, &xgcv,
-            (GdkGCValuesMask)(GDK_GC_FOREGROUND | GDK_GC_BACKGROUND));
-  }
-
-  xgcv.foreground = draw_ctx->background;
-  xgcv.background = draw_ctx->background;
-  for (i = 0; i < DRAW_TYPE_SIZE; i++) {
-    draw_ctx->gcs[glow_eDrawType_TextHelveticaErase][i]
-        = gdk_gc_new_with_values(window, &xgcv,
-            (GdkGCValuesMask)(GDK_GC_FOREGROUND | GDK_GC_BACKGROUND));
-  }
-
-  for (i = 0; i < DRAW_TYPE_SIZE; i++) {
-    draw_ctx->gcs[glow_eDrawType_TextHelveticaEraseBold][i]
-        = gdk_gc_new_with_values(window, &xgcv,
-            (GdkGCValuesMask)(GDK_GC_FOREGROUND | GDK_GC_BACKGROUND));
-  }
-
-  for (i = 0; i < DRAW_FONT_SIZE; i++) {
-    font = gdk_font_load(
-        font_names[glow_eFont_Helvetica][glow_eDrawFont_HelveticaBold][i]);
-    gdk_gc_set_font(draw_ctx->gcs[glow_eDrawType_TextHelveticaBold][i], font);
-    gdk_gc_set_font(
-        draw_ctx->gcs[glow_eDrawType_TextHelveticaEraseBold][i], font);
-    draw_ctx->font[glow_eFont_Helvetica][glow_eDrawFont_HelveticaBold][i]
-        = font;
-  }
-  for (i = 0; i < DRAW_FONT_SIZE; i++) {
-    font = gdk_font_load(
-        font_names[glow_eFont_Helvetica][glow_eDrawFont_Helvetica][i]);
-    gdk_gc_set_font(draw_ctx->gcs[glow_eDrawType_TextHelvetica][i], font);
-    gdk_gc_set_font(draw_ctx->gcs[glow_eDrawType_TextHelveticaErase][i], font);
-    draw_ctx->font[glow_eFont_Helvetica][glow_eDrawFont_Helvetica][i] = font;
-  }
-
   return 1;
 }
 
-static GdkColor glow_allocate_named_color(
-    GlowDrawGtk* draw_ctx, const char* named_color)
-{
-  GdkColor color;
-
-  if (draw_ctx->color_vect_cnt >= (int)(sizeof(draw_ctx->color_vect)
-                                      / sizeof(draw_ctx->color_vect[0]))) {
-    printf("Glow allocate color error: max number of colors exceeded\n");
-    return draw_ctx->color_vect[0];
-  }
-
-  if (!gdk_color_parse(named_color, &color))
-    gdk_color_parse("black", &color);
-  gdk_colormap_alloc_color(draw_ctx->colormap, &color, FALSE, TRUE);
-
-  draw_ctx->color_vect[draw_ctx->color_vect_cnt] = color;
-  draw_ctx->color_vect_cnt++;
-
-  return color;
-}
-
-static GdkColor glow_allocate_color(
-    GlowDrawGtk* draw_ctx, int rgb_red, int rgb_green, int rgb_blue)
-{
-  GdkColor color;
-
-  if (draw_ctx->color_vect_cnt >= (int)(sizeof(draw_ctx->color_vect)
-                                      / sizeof(draw_ctx->color_vect[0]))) {
-    printf("Glow allocate color error: max number of colors exceeded\n");
-    return draw_ctx->color_vect[0];
-  }
-
-  color.red = rgb_red;
-  color.green = rgb_green;
-  color.blue = rgb_blue;
-
-  if (!gdk_colormap_alloc_color(draw_ctx->colormap, &color, TRUE, TRUE)) {
-    printf("** Color not allocated !\n");
-    color = glow_allocate_named_color(draw_ctx, "black");
-  }
-
-  draw_ctx->color_vect[draw_ctx->color_vect_cnt] = color;
-  draw_ctx->color_vect_cnt++;
-
-  return color;
-}
-
-static GdkColor glow_allocate_custom_color(GlowDrawGtk* draw_ctx,
-    glow_eDrawType drawtype, int rgb_red, int rgb_green, int rgb_blue)
-{
-  GdkColor color;
-  int idx = drawtype - glow_eDrawType_CustomColor1;
-
-  if (!draw_ctx->get_customcolors())
-    return color;
-
-  color.red = rgb_red;
-  color.green = rgb_green;
-  color.blue = rgb_blue;
-
-  if (!gdk_colormap_alloc_color(draw_ctx->colormap, &color, TRUE, TRUE)) {
-    printf("** Color not allocated !\n");
-    color = glow_allocate_named_color(draw_ctx, "black");
-    return color;
-  }
-
-  if (draw_ctx->get_customcolors()->color_vect[idx].pixel != 0)
-    gdk_colormap_free_colors(
-        draw_ctx->colormap, &draw_ctx->get_customcolors()->color_vect[idx], 1);
-
-  draw_ctx->get_customcolors()->color_vect[idx] = color;
-
-  return color;
-}
-
 DrawWindGtk::DrawWindGtk()
-    : toplevel(0), shell(0), window(0), colormap(0), buffer(0), buffer_width(0),
-      buffer_height(0), clip_on(0), clip_cnt(0), background_pixmap(0),
+    : toplevel(0), shell(0), window(0), clip_on(0), clip_cnt(0), background_pixmap(0),
       background_pixmap_width(0), background_pixmap_height(0)
 {
   memset(clip_rectangle, 0, sizeof(clip_rectangle));
@@ -554,32 +225,23 @@ GlowDrawGtk::~GlowDrawGtk()
   else
     delete ctx;
   draw_free_gc(this);
-
-  gdk_colormap_free_colors(colormap, color_vect, color_vect_cnt);
-
-  if (m_wind.buffer)
-    g_object_unref(m_wind.buffer);
-  if (m_wind.background_pixmap)
-    g_object_unref(m_wind.background_pixmap);
-
-  if (nav_wind.buffer)
-    g_object_unref(nav_wind.buffer);
-  if (nav_wind.background_pixmap)
-    g_object_unref(nav_wind.background_pixmap);
+  free_font_face();
 
   if (timer_id)
     g_source_remove(timer_id);
+
 }
 
 int GlowDrawGtk::init_nav(GtkWidget* nav_widget)
 {
   nav_wind.toplevel = nav_widget;
-  nav_wind.window = nav_wind.toplevel->window;
+  nav_wind.window = gtk_widget_get_window(nav_wind.toplevel);
 
-  gtk_widget_modify_bg(nav_widget, GTK_STATE_NORMAL, &background);
+  //gtk_widget_modify_bg(nav_widget, GTK_STATE_NORMAL, &background);
   //  glow_create_gc( this, nav_wind.window);
 
   ctx->no_nav = 0;
+
   return 1;
 }
 
@@ -587,10 +249,13 @@ GlowDrawGtk::GlowDrawGtk(GtkWidget* toplevel, void** glow_ctx,
     int (*init_proc)(GtkWidget* w, GlowCtx* ctx, void* client_data),
     void* client_data, glow_eCtxType type)
     : ef(0), timer_id(0), click_sensitivity(0), color_vect_cnt(0),
-      closing_down(0), customcolors_cnt(0)
+      closing_down(0), customcolors_cnt(0), cairo_cr(0), cairo_cr_refcnt(0), cairo_region(0),
+      cairo_context(0), cairo_nav_cr(0), cairo_nav_cr_refcnt(0), cairo_nav_region(0),
+      cairo_nav_context(0), erase_stack_cnt(0), antialias(CAIRO_ANTIALIAS_GRAY),
+      css_background(0)
 {
   memset(gcs, 0, sizeof(gcs));
-  memset(font, 0, sizeof(font));
+  memset(font_face, 0, sizeof(font_face));
   memset(cursors, 0, sizeof(cursors));
   memset(customcolors, 0, sizeof(customcolors));
   nav_wind.is_nav = 1;
@@ -613,15 +278,12 @@ GlowDrawGtk::GlowDrawGtk(GtkWidget* toplevel, void** glow_ctx,
   m_wind.toplevel = toplevel;
 
   display = gtk_widget_get_display(m_wind.toplevel);
-  m_wind.window = m_wind.toplevel->window;
+  m_wind.window = gtk_widget_get_window(m_wind.toplevel);
+  m_wind.style_context = gtk_widget_get_style_context(m_wind.toplevel);
   screen = gtk_widget_get_screen(m_wind.toplevel);
 
   ctx->mw.window = &m_wind;
   ctx->navw.window = &nav_wind;
-
-  GtkStyle* style = gtk_widget_get_style(m_wind.toplevel);
-  background = style->bg[GTK_STATE_NORMAL];
-  original_background = background;
 
   if (type == glow_eCtxType_Grow || type == glow_eCtxType_Curve
       || type == glow_eCtxType_Keyboard) {
@@ -629,15 +291,60 @@ GlowDrawGtk::GlowDrawGtk(GtkWidget* toplevel, void** glow_ctx,
     push_customcolors(ctx->customcolors);
   }
 
-  colormap = gdk_colormap_new(gdk_visual_get_system(), TRUE);
-
   glow_create_gc(this, m_wind.window);
 
   glow_create_cursor(this);
 
   get_window_size(&ctx->mw, &ctx->mw.window_width, &ctx->mw.window_height);
-  create_buffer(&ctx->mw);
   init_proc(toplevel, ctx, client_data);
+}
+
+int GlowDrawGtk::expose(cairo_t* cr, int is_navigator)
+{
+  int sts;
+  int x, y, width, height;
+  GdkRectangle rect;
+
+  if (!is_navigator) {
+    pwr_Assert(cairo_cr_refcnt == 0);
+
+    cairo_cr = cr;
+    cairo_cr_refcnt++;
+    //cairo_save(cairo_cr);
+    get_window_size(&ctx->mw, &ctx->mw.window_width, &ctx->mw.window_height);
+    if (gdk_cairo_get_clip_rectangle(cr, &rect)) {
+      x = rect.x;
+      y = rect.y;
+      width = rect.width;
+      height = rect.height;
+    } else {
+      x = 0;
+      y = 0;
+      width = ctx->mw.window_width;
+      height = ctx->mw.window_height;
+    }
+    if (css_background)
+      gtk_render_background(((DrawWindGtk *)ctx->mw.window)->style_context, 
+	  cr, 0, 0, x + width, y + height);
+    else
+      fill_rect(&ctx->mw, x, y, width, height, glow_eDrawType_LineErase);
+    sts = ctx->event_handler(glow_eEvent_Exposure, x, y, width, height);
+    cairo_cr = 0;
+    cairo_cr_refcnt--;
+    pwr_Assert(cairo_cr_refcnt == 0);
+  } else {
+    pwr_Assert(cairo_nav_cr_refcnt == 0);
+
+    cairo_nav_cr = cr;
+    cairo_nav_cr_refcnt++;
+    //cairo_save(cairo_nav_cr);
+    fill_rect(&ctx->navw, 0, 0, ctx->navw.window_width, ctx->navw.window_height, glow_eDrawType_LineErase);
+    sts = ctx->event_handler_nav(glow_eEvent_Exposure, 0, 0);
+    cairo_nav_cr = 0;
+    cairo_nav_cr_refcnt--;
+    pwr_Assert(cairo_nav_cr_refcnt == 0);
+  }
+  return sts;
 }
 
 int GlowDrawGtk::event_handler(GdkEvent event)
@@ -668,7 +375,7 @@ int GlowDrawGtk::event_handler(GdkEvent event)
 
       keysym = event.key.keyval;
       if ((keysym >= 0x020 && keysym <= 0x20ac)
-          || (keysym >= 0xFF80 && keysym <= 0xFFB9 && keysym != GDK_KP_Enter
+          || (keysym >= 0xFF80 && keysym <= 0xFFB9 && keysym != GDK_KEY_KP_Enter
                  && keysym != 0xFF44)) {
         unsigned char buff;
         // gint unival = gdk_keyval_to_unicode( keysym);
@@ -687,50 +394,50 @@ int GlowDrawGtk::event_handler(GdkEvent event)
         }
       } else {
         switch (keysym) {
-        case GDK_Return:
-        case GDK_KP_Enter:
+        case GDK_KEY_Return:
+        case GDK_KEY_KP_Enter:
         case 0xFF44: // XK_KP_Enter sometimes...
           sts = ctx->event_handler(glow_eEvent_Key_Return, 0, 0, 0, 0);
           break;
-        case GDK_Up:
+        case GDK_KEY_Up:
           sts = ctx->event_handler(glow_eEvent_Key_Up, 0, 0, 0, 0);
           break;
-        case GDK_Down:
+        case GDK_KEY_Down:
           sts = ctx->event_handler(glow_eEvent_Key_Down, 0, 0, 0, 0);
           break;
-        case GDK_Right:
+        case GDK_KEY_Right:
           sts = ctx->event_handler(glow_eEvent_Key_Right, 0, 0, 0, 0);
           break;
-        case GDK_Left:
+        case GDK_KEY_Left:
           sts = ctx->event_handler(glow_eEvent_Key_Left, 0, 0, 0, 0);
           break;
-        case GDK_Page_Up:
+        case GDK_KEY_Page_Up:
           sts = ctx->event_handler(glow_eEvent_Key_PageUp, 0, 0, 0, 0);
           break;
-        case GDK_Page_Down:
+        case GDK_KEY_Page_Down:
           sts = ctx->event_handler(glow_eEvent_Key_PageDown, 0, 0, 0, 0);
           break;
-        case GDK_Delete:
-        case GDK_BackSpace:
+        case GDK_KEY_Delete:
+        case GDK_KEY_BackSpace:
           sts = ctx->event_handler(glow_eEvent_Key_BackSpace, 0, 0, 0, 0);
           break;
-        case GDK_KP_F1:
+        case GDK_KEY_KP_F1:
           sts = ctx->event_handler(glow_eEvent_Key_PF1, 0, 0, 0, 0);
           break;
-        case GDK_KP_F2:
+        case GDK_KEY_KP_F2:
           sts = ctx->event_handler(glow_eEvent_Key_PF2, 0, 0, 0, 0);
           break;
-        case GDK_KP_F3:
+        case GDK_KEY_KP_F3:
           sts = ctx->event_handler(glow_eEvent_Key_PF3, 0, 0, 0, 0);
           break;
-        case GDK_KP_F4:
+        case GDK_KEY_KP_F4:
           sts = ctx->event_handler(glow_eEvent_Key_PF4, 0, 0, 0, 0);
           break;
-        case GDK_Cancel:
-        case GDK_Escape:
+        case GDK_KEY_Cancel:
+        case GDK_KEY_Escape:
           sts = ctx->event_handler(glow_eEvent_Key_Escape, 0, 0, 0, 0);
           break;
-        case GDK_Tab:
+        case GDK_KEY_Tab:
           if (event.key.state & GDK_SHIFT_MASK)
             sts = ctx->event_handler(glow_eEvent_Key_ShiftTab, 0, 0, 0, 0);
           else
@@ -1088,7 +795,9 @@ int GlowDrawGtk::event_handler(GdkEvent event)
       if (event.motion.is_hint) {
         int x, y;
 
-        gdk_window_get_pointer(event.any.window, &x, &y, NULL);
+        gdk_window_get_device_position(event.any.window, 
+	    gdk_seat_get_pointer(gdk_display_get_default_seat(display)), 
+	    &x, &y, NULL);
         event.button.x = x;
         event.button.y = y;
       }
@@ -1244,7 +953,9 @@ int GlowDrawGtk::event_handler(GdkEvent event)
       if (event.motion.is_hint) {
         int x, y;
 
-        gdk_window_get_pointer(event.any.window, &x, &y, NULL);
+        gdk_window_get_device_position(event.any.window, 
+	    gdk_seat_get_pointer(gdk_display_get_default_seat(display)), 
+	    &x, &y, NULL);
         event.button.x = x;
         event.button.y = y;
       }
@@ -1271,51 +982,158 @@ void GlowDrawGtk::enable_event(glow_eEvent event, glow_eEventType event_type,
   ctx->enable_event(event, event_type, event_cb);
 }
 
+void GlowDrawGtk::invalidate(GlowWind *wind, int x, int y, int width, int height)
+{
+  DrawWindGtk* w = (DrawWindGtk*)wind->window;
+  GdkRectangle rect;
+
+  rect.x = x;
+  rect.y = y;
+  rect.width = width;
+  rect.height = height;
+  gdk_window_invalidate_rect(w->window, &rect, FALSE);
+}
+
+cairo_t* GlowDrawGtk::get_cairo(GlowWind* wind, int create)
+{
+  if (wind->window == ctx->mw.window) {
+    if (!cairo_cr_refcnt) {
+      if (!create)
+	printf("** Cairo context create error (glow)\n");
+
+      cairo_region = cairo_region_create();
+      cairo_context = gdk_window_begin_draw_frame(m_wind.window, cairo_region);
+      cairo_cr = gdk_drawing_context_get_cairo_context(cairo_context);
+      //cairo_save(cairo_cr);
+    }
+    cairo_cr_refcnt++;
+    return cairo_cr;
+  } else {
+    if (!cairo_nav_cr_refcnt) {
+      cairo_nav_region = cairo_region_create();
+      cairo_nav_context = gdk_window_begin_draw_frame(nav_wind.window, cairo_nav_region);
+      cairo_nav_cr = gdk_drawing_context_get_cairo_context(cairo_nav_context);
+      //cairo_save(cairo_nav_cr);
+    }
+    cairo_nav_cr_refcnt++;
+    return cairo_nav_cr;
+  }
+}
+
+cairo_t* GlowDrawGtk::get_cairo(GlowWind* wind, int x, int y, int width, int height)
+{
+  if (wind->window == ctx->mw.window) {
+    if (!cairo_cr_refcnt) {
+      cairo_rectangle_int_t rect;
+      rect.x = x;
+      rect.y = y;
+      rect.width = width;
+      rect.height = height;
+      cairo_region = cairo_region_create_rectangle(&rect);
+      cairo_region_reference(cairo_region);
+      cairo_context = gdk_window_begin_draw_frame(m_wind.window, cairo_region);
+      cairo_cr = gdk_drawing_context_get_cairo_context(cairo_context);
+      //cairo_save(cairo_cr);
+    }
+    cairo_cr_refcnt++;
+    return cairo_cr;
+  } else {
+    if (!cairo_nav_cr_refcnt) {
+      cairo_nav_region = cairo_region_create();
+      cairo_nav_context = gdk_window_begin_draw_frame(nav_wind.window, cairo_nav_region);
+      cairo_nav_cr = gdk_drawing_context_get_cairo_context(cairo_nav_context);
+      //cairo_save(cairo_nav_cr);
+    }
+    cairo_nav_cr_refcnt++;
+    return cairo_nav_cr;
+  }
+}
+
+void GlowDrawGtk::end_cairo(GlowWind* wind, cairo_t* cr)
+{
+  if (wind->window == ctx->mw.window) {
+    pwr_Assert(cairo_cr_refcnt != 0);
+    cairo_cr_refcnt--;
+
+    if (cairo_cr_refcnt == 0) {
+      gdk_window_end_draw_frame(m_wind.window, cairo_context);
+      cairo_region_destroy(cairo_region);
+    }
+    else {
+      //cairo_restore(cairo_cr);
+      //cairo_save(cairo_cr);
+    }
+  } else {
+    pwr_Assert(cairo_nav_cr_refcnt != 0);
+    cairo_nav_cr_refcnt--;
+
+    if (cairo_nav_cr_refcnt == 0) {
+      gdk_window_end_draw_frame(nav_wind.window, cairo_nav_context);
+      cairo_region_destroy(cairo_nav_region);
+    }
+    else {
+      //cairo_restore(cairo_nav_cr);
+      //cairo_save(cairo_nav_cr);
+    }
+  }
+}
+
 int GlowDrawGtk::rect(GlowWind* wind, int x, int y, int width, int height,
     glow_eDrawType gc_type, int idx, int highlight)
 {
+  DrawWindGtk* ww = (DrawWindGtk*)wind->window;
+
   if (ctx->nodraw)
     return 1;
-  DrawWindGtk* w = (DrawWindGtk*)wind->window;
 
-  if (gc_type == glow_eDrawType_LineGray && highlight)
-    gc_type = glow_eDrawType_Line;
+  cairo_t *cr = get_cairo(wind);
 
-  if (w->clip_on)
-    set_clip(w, get_gc(this, gc_type + highlight, idx));
+  if (ww->clip_on)
+    set_cairo_clip(ww, cr);
 
-  if (!w->draw_buffer_only)
-    gdk_draw_rectangle(w->window, get_gc(this, gc_type + highlight, idx), 0, x,
-        y, width, height);
-  if (w->double_buffer_on)
-    gdk_draw_rectangle(w->buffer, get_gc(this, gc_type + highlight, idx), 0, x,
-        y, width, height);
+  cairo_set_antialias(cr, antialias);
+  if (highlight) {
+    if (gc_type == glow_eDrawType_LineGray)
+      cairo_set_source(cr, gc_black);
+    else
+      cairo_set_source(cr, gc_red);
+  } else {
+    cairo_set_source(cr, get_gc(this, gc_type + highlight, idx));
+  }
+  cairo_set_line_width(cr, idx+1);
 
-  if (w->clip_on)
-    reset_clip(w, get_gc(this, gc_type + highlight, idx));
+  cairo_rectangle(cr, x, y, width, height);
+  cairo_stroke(cr);
+  if (ww->clip_on)
+    reset_cairo_clip(ww, cr);
+  end_cairo(wind, cr);
 
+  return 1;
   return 1;
 }
 
 int GlowDrawGtk::rect_erase(
     GlowWind* wind, int x, int y, int width, int height, int idx)
 {
+  DrawWindGtk* ww = (DrawWindGtk*)wind->window;
+
   if (ctx->nodraw)
     return 1;
-  DrawWindGtk* w = (DrawWindGtk*)wind->window;
 
-  if (w->clip_on)
-    set_clip(w, get_gc(this, glow_eDrawType_LineErase, idx));
+  cairo_t *cr = get_cairo(wind);
 
-  if (!w->draw_buffer_only)
-    gdk_draw_rectangle(w->window, get_gc(this, glow_eDrawType_LineErase, idx),
-        0, x, y, width, height);
-  if (w->double_buffer_on)
-    gdk_draw_rectangle(w->buffer, get_gc(this, glow_eDrawType_LineErase, idx),
-        0, x, y, width, height);
+  if (ww->clip_on)
+    set_cairo_clip(ww, cr);
 
-  if (w->clip_on)
-    reset_clip(w, get_gc(this, glow_eDrawType_LineErase, idx));
+  cairo_set_antialias(cr, antialias);
+  cairo_set_source(cr, gc_erase);
+  cairo_set_line_width(cr, idx+1);
+
+  cairo_rectangle(cr, x, y, width, height);
+  cairo_stroke(cr);
+  if (ww->clip_on)
+    reset_cairo_clip(ww, cr);
+  end_cairo(wind, cr);
 
   return 1;
 }
@@ -1323,62 +1141,74 @@ int GlowDrawGtk::rect_erase(
 int GlowDrawGtk::arrow(GlowWind* wind, int x1, int y1, int x2, int y2, int x3,
     int y3, glow_eDrawType gc_type, int idx, int highlight)
 {
+  DrawWindGtk* w = (DrawWindGtk*)wind->window;
+
   if (ctx->nodraw)
     return 1;
 
-  GdkPoint p[4] = { { x1, y1 }, { x2, y2 }, { x3, y3 }, { x1, y1 } };
-  DrawWindGtk* w = (DrawWindGtk*)wind->window;
+  cairo_t *cr = get_cairo(wind);
 
+  if (w->clip_on)
+    set_cairo_clip(w, cr);
+
+  cairo_set_antialias(cr, antialias);
   if (gc_type == glow_eDrawType_LineGray && highlight)
-    gc_type = glow_eDrawType_Line;
+    cairo_set_source(cr, gc_black);
+  else if (highlight)
+    cairo_set_source(cr, gc_red);
+  else
+    cairo_set_source(cr, get_gc(this, gc_type, 0));
+  
+  cairo_move_to(cr, x1, y1);
+  cairo_line_to(cr, x2, y2);
+  cairo_line_to(cr, x3, y3);
+  cairo_close_path(cr);
+  cairo_fill(cr);
 
   if (w->clip_on)
-    set_clip(w, get_gc(this, gc_type + highlight, idx));
-
-  if (!w->draw_buffer_only)
-    gdk_draw_polygon(
-        w->window, get_gc(this, gc_type + highlight, idx), 1, p, 4);
-  if (w->double_buffer_on)
-    gdk_draw_polygon(
-        w->buffer, get_gc(this, gc_type + highlight, idx), 1, p, 4);
-
-  if (w->clip_on)
-    reset_clip(w, get_gc(this, gc_type + highlight, idx));
-
+    set_cairo_clip(w, cr);
+  end_cairo(wind, cr);
+  return 1;
   return 1;
 }
 
 int GlowDrawGtk::arrow_erase(
     GlowWind* wind, int x1, int y1, int x2, int y2, int x3, int y3, int idx)
 {
+  DrawWindGtk* w = (DrawWindGtk*)wind->window;
+
   if (ctx->nodraw)
     return 1;
 
-  GdkPoint p[4] = { { x1, y1 }, { x2, y2 }, { x3, y3 }, { x1, y1 } };
-  DrawWindGtk* w = (DrawWindGtk*)wind->window;
+  cairo_t *cr = get_cairo(wind);
 
   if (w->clip_on)
-    set_clip(w, get_gc(this, glow_eDrawType_LineErase, idx));
+    set_cairo_clip(w, cr);
 
-  if (!w->draw_buffer_only)
-    gdk_draw_polygon(
-        w->window, get_gc(this, glow_eDrawType_LineErase, idx), 1, p, 4);
-  if (w->double_buffer_on)
-    gdk_draw_polygon(
-        w->buffer, get_gc(this, glow_eDrawType_LineErase, idx), 1, p, 4);
+  cairo_set_source(cr, gc_erase);
+  
+  cairo_move_to(cr, x1, y1);
+  cairo_line_to(cr, x2, y2);
+  cairo_line_to(cr, x3, y3);
+  cairo_close_path(cr);
+  cairo_fill(cr);
 
   if (w->clip_on)
-    reset_clip(w, get_gc(this, glow_eDrawType_LineErase, idx));
-
+    set_cairo_clip(w, cr);
+  end_cairo(wind, cr);
   return 1;
 }
 
 int GlowDrawGtk::arc(GlowWind* wind, int x, int y, int width, int height,
     int angle1, int angle2, glow_eDrawType gc_type, int idx, int highlight)
 {
+  DrawWindGtk* w = (DrawWindGtk*)wind->window;
+
   if (ctx->nodraw)
     return 1;
-  DrawWindGtk* w = (DrawWindGtk*)wind->window;
+
+  if (width == 0 || height == 0)
+    return 1;
 
   if (w->clip_on
       && !(w->clip_rectangle[w->clip_cnt - 1].x <= x + width
@@ -1390,6 +1220,9 @@ int GlowDrawGtk::arc(GlowWind* wind, int x, int y, int width, int height,
                      + w->clip_rectangle[w->clip_cnt - 1].height
                  >= y))
     return 1;
+
+  cairo_matrix_t matrix;
+  cairo_t *cr = get_cairo(wind);
 
   if (gc_type == glow_eDrawType_LineGray && highlight)
     gc_type = glow_eDrawType_Line;
@@ -1398,27 +1231,34 @@ int GlowDrawGtk::arc(GlowWind* wind, int x, int y, int width, int height,
   if (highlight && ctx->type() == glow_eCtxType_Grow)
     gc_type = glow_eDrawType_LineHighlight;
 
-  // if ( width < 35 && height < 35) {width++; height++;} // This looks good in
-  // Reflexion X ...
-
   if (angle1 >= 360)
     angle1 = angle1 - angle1 / 360 * 360;
   else if (angle1 < 0)
     angle1 = angle1 + (-angle1 / 360 + 1) * 360;
 
   if (w->clip_on)
-    set_clip(w, get_gc(this, gc_type + highlight, idx));
+    set_cairo_clip(w, cr);
 
-  if (!w->draw_buffer_only)
-    gdk_draw_arc(w->window, get_gc(this, gc_type + highlight, idx), 0, x, y,
-        width, height, angle1 * 64, angle2 * 64);
+  cairo_set_antialias(cr, antialias);
+  cairo_set_source(cr, get_gc(this, gc_type, 0));
+  cairo_set_line_width(cr, idx+1);
 
-  if (w->double_buffer_on)
-    gdk_draw_arc(w->buffer, get_gc(this, gc_type + highlight, idx), 0, x, y,
-        width, height, angle1 * 64, angle2 * 64);
+  if (width != height) {
+    cairo_get_matrix(cr, &matrix);
+    cairo_translate(cr, x + width/2, y + height/2);
+    cairo_scale(cr, 1, (double)height/width);
+    cairo_translate(cr, -(x + width/2), -(y + height/2));
+  }
+  cairo_arc(cr, x+width/2, y+height/2, 0.5 * width, -M_PI/180*(angle1 + angle2),- M_PI/180*angle1);
+
+  if (width != height)
+    cairo_set_matrix(cr, &matrix);
+
+  cairo_stroke(cr);
 
   if (w->clip_on)
-    reset_clip(w, get_gc(this, gc_type + highlight, idx));
+    reset_cairo_clip(w, cr);
+  end_cairo(wind, cr);
 
   return 1;
 }
@@ -1426,12 +1266,16 @@ int GlowDrawGtk::arc(GlowWind* wind, int x, int y, int width, int height,
 int GlowDrawGtk::fill_arc(GlowWind* wind, int x, int y, int width, int height,
     int angle1, int angle2, glow_eDrawType gc_type, int highlight)
 {
-  if (ctx->nodraw)
-    return 1;
   DrawWindGtk* w = (DrawWindGtk*)wind->window;
 
-  if (gc_type == glow_eDrawType_LineGray && highlight)
-    gc_type = glow_eDrawType_LineRed;
+  if (ctx->nodraw)
+    return 1;
+
+  if (width == 0 || height == 0)
+    return 1;
+
+  cairo_matrix_t matrix;
+  cairo_t *cr = get_cairo(wind);
 
   if (angle1 >= 360)
     angle1 = angle1 - angle1 / 360 * 360;
@@ -1439,17 +1283,31 @@ int GlowDrawGtk::fill_arc(GlowWind* wind, int x, int y, int width, int height,
     angle1 = angle1 + (-angle1 / 360 + 1) * 360;
 
   if (w->clip_on)
-    set_clip(w, get_gc(this, gc_type + highlight, 0));
+    set_cairo_clip(w, cr);
 
-  if (!w->draw_buffer_only)
-    gdk_draw_arc(w->window, get_gc(this, gc_type + highlight, 0), 1, x, y,
-        width, height, angle1 * 64, angle2 * 64);
-  if (w->double_buffer_on)
-    gdk_draw_arc(w->buffer, get_gc(this, gc_type + highlight, 0), 1, x, y,
-        width, height, angle1 * 64, angle2 * 64);
+  cairo_set_antialias(cr, antialias);
+  cairo_set_source(cr, get_gc(this, gc_type, 0));
+
+  if (width != height) {
+    cairo_get_matrix(cr, &matrix);
+    cairo_translate(cr, x + width/2, y + height/2);
+    cairo_scale(cr, 1, (double)height/width);
+    cairo_translate(cr, -(x + width/2), -(y + height/2));
+  }
+  if (angle2 != 360)
+    cairo_move_to(cr, x + width/2, y+height/2);
+  cairo_arc(cr, x+width/2, y+height/2, 0.5 * width, -M_PI/180*(angle1 + angle2),- M_PI/180*angle1);
+  if (angle2 != 360)
+    cairo_line_to(cr, x + width/2, y + height/2);
+
+  if (width != height)
+    cairo_set_matrix(cr, &matrix);
+
+  cairo_fill(cr);
 
   if (w->clip_on)
-    reset_clip(w, get_gc(this, gc_type + highlight, 0));
+    reset_cairo_clip(w, cr);
+  end_cairo(wind, cr);
 
   return 1;
 }
@@ -1457,9 +1315,13 @@ int GlowDrawGtk::fill_arc(GlowWind* wind, int x, int y, int width, int height,
 int GlowDrawGtk::arc_erase(GlowWind* wind, int x, int y, int width, int height,
     int angle1, int angle2, int idx)
 {
+  DrawWindGtk* w = (DrawWindGtk*)wind->window;
+
   if (ctx->nodraw)
     return 1;
-  DrawWindGtk* w = (DrawWindGtk*)wind->window;
+
+  if (width == 0 || height == 0)
+    return 1;
 
   if (w->clip_on
       && !(w->clip_rectangle[w->clip_cnt - 1].x <= x + width
@@ -1472,8 +1334,8 @@ int GlowDrawGtk::arc_erase(GlowWind* wind, int x, int y, int width, int height,
                  >= y))
     return 1;
 
-  // if ( width < 35 && height < 35) {width++; height++;} // This looks good in
-  // Reflexion X ...
+  cairo_matrix_t matrix;
+  cairo_t *cr = get_cairo(wind);
 
   if (angle1 >= 360)
     angle1 = angle1 - angle1 / 360 * 360;
@@ -1481,17 +1343,29 @@ int GlowDrawGtk::arc_erase(GlowWind* wind, int x, int y, int width, int height,
     angle1 = angle1 + (-angle1 / 360 + 1) * 360;
 
   if (w->clip_on)
-    set_clip(w, get_gc(this, glow_eDrawType_LineErase, idx));
+    set_cairo_clip(w, cr);
 
-  if (!w->draw_buffer_only)
-    gdk_draw_arc(w->window, get_gc(this, glow_eDrawType_LineErase, idx), 0, x,
-        y, width, height, angle1 * 64, angle2 * 64);
-  if (w->double_buffer_on)
-    gdk_draw_arc(w->buffer, get_gc(this, glow_eDrawType_LineErase, idx), 0, x,
-        y, width, height, angle1 * 64, angle2 * 64);
+  cairo_set_antialias(cr, antialias);
+  cairo_set_source(cr, gc_erase);
+  cairo_set_line_width(cr, idx+1);
+
+  if (width != height) {
+    cairo_get_matrix(cr, &matrix);
+    cairo_translate(cr, x + width/2, y + height/2);
+    cairo_scale(cr, 1, (double)height/width);
+    cairo_translate(cr, -(x + width/2), -(y + height/2));
+  }
+  cairo_arc(cr, x+width/2, y+height/2, 0.5 * width, -M_PI/180*(angle1 + angle2),- M_PI/180*angle1);
+
+  if (width != height)
+    cairo_set_matrix(cr, &matrix);
+
+  cairo_stroke(cr);
 
   if (w->clip_on)
-    reset_clip(w, get_gc(this, glow_eDrawType_LineErase, idx));
+    reset_cairo_clip(w, cr);
+  end_cairo(wind, cr);
+
   return 1;
 }
 
@@ -1500,6 +1374,7 @@ int GlowDrawGtk::line(GlowWind* wind, int x1, int y1, int x2, int y2,
 {
   if (ctx->nodraw)
     return 1;
+
   DrawWindGtk* w = (DrawWindGtk*)wind->window;
 
   if (w->clip_on
@@ -1520,18 +1395,24 @@ int GlowDrawGtk::line(GlowWind* wind, int x1, int y1, int x2, int y2,
   if (gc_type == glow_eDrawType_LineGray && highlight)
     gc_type = glow_eDrawType_Line;
 
-  if (w->clip_on)
-    set_clip(w, get_gc(this, gc_type + highlight, idx));
-
-  if (!w->draw_buffer_only)
-    gdk_draw_line(
-        w->window, get_gc(this, gc_type + highlight, idx), x1, y1, x2, y2);
-  if (w->double_buffer_on)
-    gdk_draw_line(
-        w->buffer, get_gc(this, gc_type + highlight, idx), x1, y1, x2, y2);
+  cairo_t *cr = get_cairo(wind);
 
   if (w->clip_on)
-    reset_clip(w, get_gc(this, gc_type + highlight, idx));
+    set_cairo_clip(w, cr);
+
+  cairo_set_antialias(cr, antialias);
+  cairo_set_source(cr, get_gc(this, gc_type, 0));
+  cairo_set_line_width(cr, idx+1);
+
+  cairo_move_to(cr, x1, y1);
+  cairo_line_to(cr, x2, y2);
+  cairo_stroke(cr);
+  
+  if (w->clip_on)
+    reset_cairo_clip(w, cr);
+
+  end_cairo(wind, cr);
+
   return 1;
 }
 
@@ -1540,6 +1421,7 @@ int GlowDrawGtk::line_dashed(GlowWind* wind, int x1, int y1, int x2, int y2,
 {
   if (ctx->nodraw)
     return 1;
+
   DrawWindGtk* w = (DrawWindGtk*)wind->window;
 
   if (w->clip_on
@@ -1560,31 +1442,33 @@ int GlowDrawGtk::line_dashed(GlowWind* wind, int x1, int y1, int x2, int y2,
   if (gc_type == glow_eDrawType_LineGray && highlight)
     gc_type = glow_eDrawType_Line;
 
-  gdk_gc_set_line_attributes(get_gc(this, gc_type + highlight, idx), idx + 1,
-      GDK_LINE_ON_OFF_DASH, GDK_CAP_BUTT, GDK_JOIN_MITER);
-  gint dash_offset = 0;
-  gint8 dashes[4];
+  cairo_t *cr = get_cairo(wind);
+
+  if (w->clip_on)
+    set_cairo_clip(w, cr);
+
+  cairo_set_antialias(cr, antialias);
+  cairo_set_source(cr, get_gc(this, gc_type, 0));
+  cairo_set_line_width(cr, idx+1);
+  int dash_offset = 0;
+  double dashes[4];
   switch (line_type) {
   case glow_eLineType_Dashed1:
     dashes[0] = 1 + idx;
-    gdk_gc_set_dashes(
-        get_gc(this, gc_type + highlight, idx), dash_offset, dashes, 1);
+    cairo_set_dash(cr, dashes, 1, dash_offset);
     break;
   case glow_eLineType_Dashed2:
     dashes[0] = 1 + 2 * idx;
-    gdk_gc_set_dashes(
-        get_gc(this, gc_type + highlight, idx), dash_offset, dashes, 1);
+    cairo_set_dash(cr, dashes, 1, dash_offset);
     break;
   case glow_eLineType_Dashed3:
     dashes[0] = 1 + 3 * idx;
-    gdk_gc_set_dashes(
-        get_gc(this, gc_type + highlight, idx), dash_offset, dashes, 1);
+    cairo_set_dash(cr, dashes, 1, dash_offset);
     break;
   case glow_eLineType_Dotted: {
     dashes[0] = 1 + idx;
     dashes[1] = 1 + 4 * idx;
-    gdk_gc_set_dashes(
-        get_gc(this, gc_type + highlight, idx), dash_offset, dashes, 2);
+    cairo_set_dash(cr, dashes, 2, dash_offset);
     break;
   }
   case glow_eLineType_DotDashed1: {
@@ -1592,8 +1476,7 @@ int GlowDrawGtk::line_dashed(GlowWind* wind, int x1, int y1, int x2, int y2,
     dashes[1] = 1 + 2 * idx;
     dashes[2] = 1 + idx;
     dashes[3] = 1 + 2 * idx;
-    gdk_gc_set_dashes(
-        get_gc(this, gc_type + highlight, idx), dash_offset, dashes, 4);
+    cairo_set_dash(cr, dashes, 4, dash_offset);
     break;
   }
   case glow_eLineType_DotDashed2: {
@@ -1601,28 +1484,21 @@ int GlowDrawGtk::line_dashed(GlowWind* wind, int x1, int y1, int x2, int y2,
     dashes[1] = 1 + 3 * idx;
     dashes[2] = 1 + idx;
     dashes[3] = 1 + 3 * idx;
-    gdk_gc_set_dashes(
-        get_gc(this, gc_type + highlight, idx), dash_offset, dashes, 4);
+    cairo_set_dash(cr, dashes, 4, dash_offset);
     break;
   }
   default:;
   }
 
+  cairo_move_to(cr, x1, y1);
+  cairo_line_to(cr, x2, y2);
+  cairo_stroke(cr);
+  cairo_set_dash(cr, 0, 0, 0);
+  
   if (w->clip_on)
-    set_clip(w, get_gc(this, gc_type + highlight, idx));
+    reset_cairo_clip(w, cr);
 
-  if (!w->draw_buffer_only)
-    gdk_draw_line(
-        w->window, get_gc(this, gc_type + highlight, idx), x1, y1, x2, y2);
-  if (w->double_buffer_on)
-    gdk_draw_line(
-        w->buffer, get_gc(this, gc_type + highlight, idx), x1, y1, x2, y2);
-
-  if (w->clip_on)
-    reset_clip(w, get_gc(this, gc_type + highlight, idx));
-
-  gdk_gc_set_line_attributes(get_gc(this, gc_type + highlight, idx), idx + 1,
-      GDK_LINE_SOLID, GDK_CAP_BUTT, GDK_JOIN_MITER);
+  end_cairo(wind, cr);
   return 1;
 }
 
@@ -1631,6 +1507,7 @@ int GlowDrawGtk::line_erase(
 {
   if (ctx->nodraw)
     return 1;
+
   DrawWindGtk* w = (DrawWindGtk*)wind->window;
 
   if (w->clip_on
@@ -1644,18 +1521,23 @@ int GlowDrawGtk::line_erase(
                  >= MIN(y1, y2)))
     return 1;
 
-  if (w->clip_on)
-    set_clip(w, get_gc(this, glow_eDrawType_LineErase, idx));
-
-  if (!w->draw_buffer_only)
-    gdk_draw_line(
-        w->window, get_gc(this, glow_eDrawType_LineErase, idx), x1, y1, x2, y2);
-  if (w->double_buffer_on)
-    gdk_draw_line(
-        w->buffer, get_gc(this, glow_eDrawType_LineErase, idx), x1, y1, x2, y2);
+  cairo_t *cr = get_cairo(wind);
 
   if (w->clip_on)
-    reset_clip(w, get_gc(this, glow_eDrawType_LineErase, idx));
+    set_cairo_clip(w, cr);
+
+  cairo_set_antialias(cr, antialias);
+  cairo_set_source(cr, gc_erase);
+  cairo_set_line_width(cr, idx+1);
+
+  cairo_move_to(cr, x1, y1);
+  cairo_line_to(cr, x2, y2);
+  cairo_stroke(cr);
+  
+  if (w->clip_on)
+    reset_cairo_clip(w, cr);
+
+  end_cairo(wind, cr);
 
   return 1;
 }
@@ -1665,26 +1547,35 @@ int GlowDrawGtk::polyline(GlowWind* wind, glow_sPointX* points, int point_cnt,
 {
   if (ctx->nodraw)
     return 1;
+
   DrawWindGtk* w = (DrawWindGtk*)wind->window;
 
   if (gc_type == glow_eDrawType_LineGray && highlight)
     gc_type = glow_eDrawType_Line;
 
-  if (w->clip_on)
-    set_clip(w, get_gc(this, gc_type + highlight, idx));
-
   int cnt;
   GdkPoint* gpoints = points_to_gdk_points_curve(wind, points, point_cnt, &cnt);
-  if (!w->draw_buffer_only)
-    gdk_draw_lines(
-        w->window, get_gc(this, gc_type + highlight, idx), gpoints, cnt);
-  if (w->double_buffer_on)
-    gdk_draw_lines(
-        w->buffer, get_gc(this, gc_type + highlight, idx), gpoints, cnt);
+  cairo_t *cr = get_cairo(wind);
+
+  if (w->clip_on)
+    set_cairo_clip(w, cr);
+
+  cairo_set_antialias(cr, antialias);
+  cairo_set_source(cr, get_gc(this, gc_type, 0));
+  cairo_set_line_width(cr, idx+1);
+  cairo_set_line_join(cr, CAIRO_LINE_JOIN_BEVEL);
+
+  cairo_move_to(cr, gpoints[0].x, gpoints[0].y);
+  for (int i = 1; i < cnt; i++)
+    cairo_line_to(cr, (double)gpoints[i].x, (double)gpoints[i].y);
+  cairo_stroke(cr);
+
+  if (w->clip_on)
+    reset_cairo_clip(w, cr);
 
   free(gpoints);
-  if (w->clip_on)
-    reset_clip(w, get_gc(this, gc_type + highlight, idx));
+  end_cairo(wind, cr);
+
   return 1;
 }
 
@@ -1693,25 +1584,33 @@ int GlowDrawGtk::fill_polyline(GlowWind* wind, glow_sPointX* points,
 {
   if (ctx->nodraw)
     return 1;
+
   DrawWindGtk* w = (DrawWindGtk*)wind->window;
 
   if (gc_type == glow_eDrawType_LineGray && highlight)
     gc_type = glow_eDrawType_Line;
 
-  if (w->clip_on)
-    set_clip(w, get_gc(this, gc_type + highlight, 0));
-
   GdkPoint* gpoints = points_to_gdk_points(points, point_cnt);
-  if (!w->draw_buffer_only)
-    gdk_draw_polygon(
-        w->window, get_gc(this, gc_type + highlight, 0), 1, gpoints, point_cnt);
-  if (w->double_buffer_on)
-    gdk_draw_polygon(
-        w->buffer, get_gc(this, gc_type + highlight, 0), 1, gpoints, point_cnt);
+  cairo_t *cr = get_cairo(wind);
+
+  if (w->clip_on)
+    set_cairo_clip(w, cr);
+
+  cairo_set_antialias(cr, antialias);
+  cairo_set_source(cr, get_gc(this, gc_type, 0));
+
+  cairo_move_to(cr, gpoints[0].x, gpoints[0].y);
+  for (int i = 1; i < point_cnt; i++)
+    cairo_line_to(cr, gpoints[i].x, gpoints[i].y);
+
+  cairo_fill(cr);
+  
+  if (w->clip_on)
+    reset_cairo_clip(w, cr);
 
   free(gpoints);
-  if (w->clip_on)
-    reset_clip(w, get_gc(this, gc_type + highlight, 0));
+  end_cairo(wind, cr);
+
   return 1;
 }
 
@@ -1720,23 +1619,31 @@ int GlowDrawGtk::polyline_erase(
 {
   if (ctx->nodraw)
     return 1;
-  DrawWindGtk* w = (DrawWindGtk*)wind->window;
 
-  if (w->clip_on)
-    set_clip(w, get_gc(this, glow_eDrawType_LineErase, idx));
+  DrawWindGtk* w = (DrawWindGtk*)wind->window;
 
   int cnt;
   GdkPoint* gpoints = points_to_gdk_points_curve(wind, points, point_cnt, &cnt);
-  if (!w->draw_buffer_only)
-    gdk_draw_lines(
-        w->window, get_gc(this, glow_eDrawType_LineErase, idx), gpoints, cnt);
-  if (w->double_buffer_on)
-    gdk_draw_lines(
-        w->buffer, get_gc(this, glow_eDrawType_LineErase, idx), gpoints, cnt);
+  cairo_t *cr = get_cairo(wind);
+
+  if (w->clip_on)
+    set_cairo_clip(w, cr);
+
+  cairo_set_antialias(cr, antialias);
+  cairo_set_source(cr, gc_erase);
+  cairo_set_line_width(cr, idx+1);
+
+  cairo_move_to(cr, gpoints[0].x, gpoints[0].y);
+  for (int i = 1; i < cnt; i++)
+    cairo_line_to(cr, gpoints[i].x, gpoints[i].y);
+  cairo_stroke(cr);
+  
+  if (w->clip_on)
+    reset_cairo_clip(w, cr);
 
   free(gpoints);
-  if (w->clip_on)
-    reset_clip(w, get_gc(this, glow_eDrawType_LineErase, idx));
+  end_cairo(wind, cr);
+
   return 1;
 }
 
@@ -1746,51 +1653,61 @@ int GlowDrawGtk::text(GlowWind* wind, int x, int y, char* text, int len,
 {
   if (ctx->nodraw)
     return 1;
+
+  char* textutf8 = 0;
+  if (((GrowCtx*)ctx)->text_coding != glow_eTextCoding_UTF_8) {
+    textutf8 = g_convert(text, -1, "UTF-8", "ISO8859-1", NULL, NULL, NULL);
+    text = textutf8;
+  }
+
   DrawWindGtk* w = (DrawWindGtk*)wind->window;
+  size *= DRAW_TSCALE;
 
-  if (!((GrowCtx*)ctx)->bitmap_fonts)
-    return text_pango(wind, x, y, text, len, gc_type, color, idx, highlight,
-        line, font_idx, size, rot);
-
-  if (font_idx > glow_eFont_Courier)
+  if (font_idx >= glow_eFont__)
     font_idx = glow_eFont_Helvetica;
 
+  cairo_t *cr = get_cairo(wind);
   if (w->clip_on)
-    set_clip(w, get_gc(this, gc_type, idx));
+    set_cairo_clip(w, cr);
 
-  int font_type = get_font_type(gc_type);
-  load_font(font_idx, font_type, idx);
+  cairo_set_source(cr, get_gc(this, color, 0));
 
-  if (font_idx != glow_eFont_Helvetica)
-    gdk_gc_set_font(get_gc(this, gc_type, idx), font[font_idx][font_type][idx]);
+  
+  cairo_font_face_t *font_face = get_font_face(font_idx, drawtype_to_fonttype(gc_type));
+  cairo_set_font_face(cr, font_face);
+  cairo_set_font_size(cr, size);
 
-  if (color != glow_eDrawType_Line) {
-    GdkGCValues xgcv;
+  if (rot != 0) {
+    cairo_matrix_t matrix;
+    cairo_text_extents_t extents;
 
-    gdk_gc_get_values(get_gc(this, color, 0), &xgcv);
+    cairo_text_extents(cr, text, &extents);
 
-    gdk_gc_set_values(get_gc(this, gc_type, idx), &xgcv, GDK_GC_FOREGROUND);
+    rot = 360 - rot;
+    cairo_get_matrix(cr, &matrix);
+    cairo_translate(cr, x + extents.width/2, y - extents.height/2);
+    cairo_rotate(cr, rot * M_PI/180);
+    if (rot == 90)
+      cairo_translate(cr, 0, extents.width/2);
+    else if (rot == 270)
+      cairo_translate(cr, -extents.height/2, -extents.width/2 + extents.height);
+    else
+      cairo_translate(cr, -extents.width/2, extents.height/2);
+    cairo_move_to(cr, 0, 0);
+    cairo_show_text(cr, text);
+    cairo_set_matrix(cr, &matrix);
   }
-
-  if (!w->draw_buffer_only)
-    gdk_draw_text(w->window, font[font_idx][font_type][idx],
-        get_gc(this, gc_type, idx), x, y, text, len);
-  if (w->double_buffer_on)
-    gdk_draw_text(w->buffer, font[font_idx][font_type][idx],
-        get_gc(this, gc_type, idx), x, y, text, len);
+  else {
+    cairo_move_to(cr, x, y);
+    cairo_show_text(cr, text);
+  }
   if (w->clip_on)
-    reset_clip(w, get_gc(this, gc_type, idx));
+    reset_cairo_clip(w, cr);
+  end_cairo(wind, cr);
 
-  if (color != glow_eDrawType_Line) {
-    GdkGCValues xgcv;
+  if (textutf8)
+    g_free(textutf8);
 
-    gdk_gc_get_values(get_gc(this, glow_eDrawType_Line, 0), &xgcv);
-
-    gdk_gc_set_values(get_gc(this, gc_type, idx), &xgcv, GDK_GC_FOREGROUND);
-  }
-  if (font_idx != glow_eFont_Helvetica)
-    gdk_gc_set_font(
-        get_gc(this, gc_type, idx), font[glow_eFont_Helvetica][font_type][idx]);
   return 1;
 }
 
@@ -1805,26 +1722,36 @@ int GlowDrawGtk::text_cursor(GlowWind* wind, int x, int y, char* text, int len,
   int theight, tdescent, width, height, descent;
   get_text_extent(
       "A", 1, gc_type, idx, font, &width, &height, &descent, size, 0);
-  if (pos != 0)
+  if (pos != 0) {
+    char *textp = (char*)malloc(pos + 1);
+    strncpy(textp, text, pos);
+    textp[pos] = 0;
     get_text_extent(
-        text, pos, gc_type, idx, font, &width, &theight, &tdescent, size, 0);
+        textp, pos, gc_type, idx, font, &width, &theight, &tdescent, size, 0);
+    free(textp);
+  }
   else
     width = 0;
 
-  if (w->clip_on)
-    set_clip(w, get_gc(this, gc_type, idx));
+  gc_type = glow_eDrawType_Line;
 
-  if (!w->draw_buffer_only) {
-    gdk_draw_line(w->window, get_gc(this, color, 1), x + width, y + descent,
-        x + width, y - height + descent);
-  }
-  if (w->double_buffer_on) {
-    gdk_draw_line(w->buffer, get_gc(this, color, 1), x + width, y + descent,
-        x + width, y - height + descent);
-  }
-  if (w->clip_on)
-    reset_clip(w, get_gc(this, gc_type, idx));
+  cairo_t *cr = get_cairo(wind);
 
+  if (w->clip_on)
+    set_cairo_clip(w, cr);
+
+  cairo_set_antialias(cr, antialias);
+  cairo_set_source(cr, get_gc(this, gc_type, 0));
+  cairo_set_line_width(cr, 2);
+
+  cairo_move_to(cr, x + width, y + descent);
+  cairo_line_to(cr, x + width, y - height + descent);
+  cairo_stroke(cr);
+  
+  if (w->clip_on)
+    reset_cairo_clip(w, cr);
+
+  end_cairo(wind, cr);
   return 1;
 }
 
@@ -1834,40 +1761,54 @@ int GlowDrawGtk::text_erase(GlowWind* wind, int x, int y, char* text, int len,
 {
   if (ctx->nodraw)
     return 1;
+
   DrawWindGtk* w = (DrawWindGtk*)wind->window;
+  size *= DRAW_TSCALE;
 
-  if (!((GrowCtx*)ctx)->bitmap_fonts)
-    return text_erase_pango(
-        wind, x, y, text, len, gc_type, idx, line, font_idx, size, rot);
+  char* textutf8 = 0;
+  if (((GrowCtx*)ctx)->text_coding != glow_eTextCoding_UTF_8) {
+    textutf8 = g_convert(text, -1, "UTF-8", "ISO8859-1", NULL, NULL, NULL);
+    text = textutf8;
+  }
 
-  if (font_idx > glow_eFont_Courier)
-    font_idx = glow_eFont_Helvetica;
+  cairo_text_extents_t extents;
+  cairo_t *cr = get_cairo(wind);
+  if (w->clip_on)
+    set_cairo_clip(w, cr);
 
-  if (gc_type == glow_eDrawType_TextHelvetica)
-    gc_type = glow_eDrawType_TextHelveticaErase;
-  else if (gc_type == glow_eDrawType_TextHelveticaBold)
-    gc_type = glow_eDrawType_TextHelveticaEraseBold;
+  cairo_set_source(cr, gc_erase);
 
-  int font_type = get_font_type(gc_type);
-  load_font(font_idx, font_type, idx);
-
-  if (font_idx != glow_eFont_Helvetica)
-    gdk_gc_set_font(get_gc(this, gc_type, idx), font[font_idx][font_type][idx]);
+  cairo_font_face_t *font_face = get_font_face(font_idx, drawtype_to_fonttype(gc_type));
+  cairo_set_font_face(cr, font_face);
+  cairo_set_font_size(cr, size);
+  cairo_text_extents(cr, text, &extents);
+  cairo_set_source(cr, gc_erase);
+  double px, py, ph, pw;
+  if (rot == 90) {
+    px = x;
+    py = y - extents.width;
+    ph = extents.width;
+    pw = extents.height;
+  } else if (rot == 270) {
+    px = x;
+    py = y - extents.height;
+    ph = extents.width;
+    pw = extents.height;
+  } else {
+    px = (double)x + extents.x_bearing;
+    py = (double)y + extents.y_bearing;
+    pw = extents.width;
+    ph = extents.height;
+  }
+  cairo_rectangle(cr, px, py, pw, ph);
+  cairo_fill(cr);
 
   if (w->clip_on)
-    set_clip(w, get_gc(this, gc_type, idx));
-  if (!w->draw_buffer_only)
-    gdk_draw_text(w->window, font[font_idx][font_type][idx],
-        get_gc(this, gc_type, idx), x, y, text, len);
-  if (w->double_buffer_on)
-    gdk_draw_text(w->buffer, font[font_idx][font_type][idx],
-        get_gc(this, gc_type, idx), x, y, text, len);
-  if (w->clip_on)
-    reset_clip(w, get_gc(this, gc_type, idx));
+    reset_cairo_clip(w, cr);
+  end_cairo(wind, cr);
 
-  if (font_idx != glow_eFont_Helvetica)
-    gdk_gc_set_font(
-        get_gc(this, gc_type, idx), font[glow_eFont_Helvetica][font_type][idx]);
+  if (textutf8)
+    g_free(textutf8);
 
   return 1;
 }
@@ -1906,30 +1847,24 @@ int GlowDrawGtk::pixmap_erase(GlowWind* wind, int x, int y,
 int GlowDrawGtk::image(GlowWind* wind, int x, int y, int width, int height,
     glow_tImImage image, glow_tPixmap pixmap, glow_tPixmap clip_mask)
 {
-  DrawWindGtk* w = (DrawWindGtk*)wind->window;
   if (ctx->nodraw)
     return 1;
 
   if (width == 0 || height == 0)
     return 1;
 
-  if (clip_mask)
-    set_image_clip_mask(clip_mask, x, y);
-  else if (w->clip_on)
-    set_clip(w, get_gc(this, glow_eDrawType_Line, 0));
+  DrawWindGtk* w = (DrawWindGtk*)wind->window;
 
-  if (!w->draw_buffer_only)
-    gdk_draw_pixbuf(w->window, get_gc(this, glow_eDrawType_Line, 0),
-        (GdkPixbuf*)image, 0, 0, x, y, width, height, GDK_RGB_DITHER_NONE, 0,
-        0);
-  if (w->double_buffer_on)
-    gdk_draw_pixbuf(w->buffer, get_gc(this, glow_eDrawType_Line, 0),
-        (GdkPixbuf*)image, 0, 0, x, y, width, height, GDK_RGB_DITHER_NONE, 0,
-        0);
-  if (clip_mask)
-    reset_image_clip_mask();
-  else if (w->clip_on)
-    reset_clip(w, get_gc(this, glow_eDrawType_Line, 0));
+  cairo_t *cr = get_cairo(wind);
+  if (w->clip_on)
+    set_cairo_clip(w, cr);
+
+  gdk_cairo_set_source_pixbuf(cr, (GdkPixbuf *)image, x, y);
+  cairo_paint(cr);
+
+  if (w->clip_on)
+    set_cairo_clip(w, cr);
+
   return 1;
 }
 
@@ -1938,103 +1873,68 @@ int GlowDrawGtk::image_d(GlowWind* wind, double x, double y, int width,
     glow_tPixmap clip_mask)
 {
   DrawWindGtk* w = (DrawWindGtk*)wind->window;
-  cairo_t* cr;
+
   if (ctx->nodraw)
     return 1;
 
   if (width == 0 || height == 0)
     return 1;
 
-  cr = gdk_cairo_create(w->window);
-
-  if (clip_mask)
-    set_image_clip_mask(clip_mask, x, y);
-  else if (w->clip_on) {
-    set_clip(w, get_gc(this, glow_eDrawType_Line, 0));
+  cairo_t *cr = get_cairo(wind);
+  if (w->clip_on)
     set_cairo_clip(w, cr);
-  }
 
-  if (!w->draw_buffer_only) {
-    gdk_cairo_set_source_pixbuf(cr, (GdkPixbuf*)image, x, y);
-    cairo_paint(cr);
-  }
-  if (w->double_buffer_on) {
-    cairo_t* cr2;
+  gdk_cairo_set_source_pixbuf(cr, (GdkPixbuf*)image, x, y);
+  cairo_paint(cr);
 
-    cr2 = gdk_cairo_create(w->buffer);
-    gdk_cairo_set_source_pixbuf(cr2, (GdkPixbuf*)image, x, y);
-    cairo_paint(cr2);
-    cairo_destroy(cr2);
-  }
-  if (clip_mask)
-    reset_image_clip_mask();
-  else if (w->clip_on) {
-    reset_clip(w, get_gc(this, glow_eDrawType_Line, 0));
+  if (w->clip_on)
     reset_cairo_clip(w, cr);
-  }
-  cairo_destroy(cr);
+  end_cairo(wind, cr);
   return 1;
 }
 
 int GlowDrawGtk::fill_rect(
-    GlowWind* wind, int x, int y, int w, int h, glow_eDrawType gc_type)
+    GlowWind* wind, int x, int y, int width, int height, glow_eDrawType gc_type)
 {
-  DrawWindGtk* ww = (DrawWindGtk*)wind->window;
   if (ctx->nodraw)
     return 1;
 
-  if (ww->clip_on)
-    set_clip(ww, get_gc(this, gc_type, 0));
-  if (!ww->draw_buffer_only)
-    gdk_draw_rectangle(ww->window, get_gc(this, gc_type, 0), 1, x, y, w, h);
-  if (ww->double_buffer_on)
-    gdk_draw_rectangle(ww->buffer, get_gc(this, gc_type, 0), 1, x, y, w, h);
-  if (ww->clip_on)
-    reset_clip(ww, get_gc(this, gc_type, 0));
+  DrawWindGtk* w = (DrawWindGtk*)wind->window;
+
+  cairo_t *cr = get_cairo(wind);
+
+  cairo_set_antialias(cr, antialias);
+
+  if (w->clip_on)
+    set_cairo_clip(w, cr);
+
+  if (gc_type == glow_eDrawType_LineErase)
+    cairo_set_source(cr, gc_erase);
+  else
+    cairo_set_source(cr, get_gc(this, gc_type, 0));
+  cairo_rectangle(cr, x, y, width, height);
+  cairo_fill(cr);
+
+  if (w->clip_on)
+    reset_cairo_clip(w, cr);
+  end_cairo(wind, cr);
   return 1;
 }
 
 void GlowDrawGtk::clear(GlowWind* wind)
 {
-  if (ctx->nodraw)
-    return;
-  DrawWindGtk* w = (DrawWindGtk*)wind->window;
-
-  if (!w->double_buffer_on)
-    gdk_window_clear(w->window);
-  else
-    buffer_background(w, 0);
 }
 
 void GlowDrawGtk::copy_buffer(
     GlowWind* wind, int ll_x, int ll_y, int ur_x, int ur_y)
 {
-  if (ctx->nodraw)
-    return;
-  DrawWindGtk* w = (DrawWindGtk*)wind->window;
-
-  int x0 = MIN(ll_x, ur_x);
-  int x1 = MAX(ll_x, ur_x);
-  int y0 = MIN(ll_y, ur_y);
-  int y1 = MAX(ll_y, ur_y);
-
-  if (w->clip_cnt) {
-    x0 = MAX(x0, w->clip_rectangle[w->clip_cnt - 1].x);
-    y0 = MAX(y0, w->clip_rectangle[w->clip_cnt - 1].y);
-    x1 = MIN(x1, w->clip_rectangle[w->clip_cnt - 1].x
-            + w->clip_rectangle[w->clip_cnt - 1].width);
-    y1 = MIN(y1, w->clip_rectangle[w->clip_cnt - 1].y
-            + w->clip_rectangle[w->clip_cnt - 1].height);
-  }
-
-  gdk_draw_drawable(w->window, get_gc(this, glow_eDrawType_Line, 0), w->buffer,
-      x0, y0, x0, y0, x1 - x0, y1 - y0);
 }
 
 void GlowDrawGtk::get_window_size(GlowWind* wind, int* width, int* height)
 {
   DrawWindGtk* w = (DrawWindGtk*)wind->window;
-  gdk_drawable_get_size(w->window, width, height);
+  *width = gdk_window_get_width(w->window);
+  *height = gdk_window_get_height(w->window); 
 }
 
 void GlowDrawGtk::set_window_size(GlowWind* wind, int width, int height)
@@ -2045,6 +1945,14 @@ void GlowDrawGtk::set_window_size(GlowWind* wind, int width, int height)
     return;
 
   gdk_window_resize(w->window, width, height);
+}
+
+void GlowDrawGtk::set_anti_aliasing(int anti_aliasing)
+{
+  if (anti_aliasing)
+    antialias = CAIRO_ANTIALIAS_GRAY;
+  else
+    antialias = CAIRO_ANTIALIAS_NONE;
 }
 
 static gboolean draw_timer_cb(void* data)
@@ -2122,134 +2030,59 @@ int GlowDrawGtk::get_text_extent(const char* text, int len,
     glow_eDrawType gc_type, int idx, glow_eFont font_idx, int* width,
     int* height, int* descent, double size, int rot)
 {
-  int text_width, text_ascent, text_descent, text_lbearing, text_rbearing;
+  cairo_text_extents_t extents;
+  cairo_font_face_t *font_face;
 
-  if (!((GrowCtx*)ctx)->bitmap_fonts)
-    return get_text_extent_pango(
-        text, len, gc_type, idx, font_idx, width, height, descent, size, rot);
+  size *= DRAW_TSCALE;
 
-  if (font_idx > glow_eFont_Courier)
-    font_idx = glow_eFont_Helvetica;
+  char* textutf8 = 0;
+  if (((GrowCtx*)ctx)->text_coding != glow_eTextCoding_UTF_8) {
+    textutf8 = g_convert(text, -1, "UTF-8", "ISO8859-1", NULL, NULL, NULL);
+    text = textutf8;
+  }
 
-  int font_type = get_font_type(gc_type);
-  load_font(font_idx, font_type, idx);
+  cairo_t *cr = get_cairo(&ctx->mw, 1);
 
-  gdk_text_extents(font[font_idx][font_type][idx], text, len, &text_lbearing,
-      &text_rbearing, &text_width, &text_ascent, &text_descent);
-  //  *height = text_ascent + text_descent;  // text_descent is allways zero...
-  //  *descent = text_descent;
-  text_ascent = int(1.2 * text_ascent);
-  *height = int(1.3 * text_ascent);
-  *descent = int(0.3 * text_ascent);
-  *width = text_width;
+  font_face = get_font_face(font_idx, drawtype_to_fonttype(gc_type));
+  cairo_set_font_face(cr, font_face);
+  cairo_set_font_size(cr, size);
+
+  cairo_text_extents(cr, text, &extents);
+  if (text[0] == ' ') {
+    cairo_text_extents_t spaceextents;
+    
+    cairo_text_extents(cr, "1", &spaceextents);
+    for (const char *s = text; *s == ' '; s++)
+      extents.width += spaceextents.width;
+  }
+  if (rot == 90 || rot == 270) {
+    *height = extents.width;
+    *width = extents.height;
+  } else {
+    *height = extents.height;
+    *width = extents.width;
+  }
+  *descent = extents.height + extents.y_bearing;
+  end_cairo(&ctx->mw, cr);
+
+  if (textutf8)
+    g_free(textutf8);
+
   return 1;
 }
 
 void GlowDrawGtk::copy_area(GlowWind* wind, int x, int y)
 {
-  DrawWindGtk* w = (DrawWindGtk*)wind->window;
-  GdkGC* gc;
   if (ctx->nodraw)
     return;
-  int window_width, window_height;
 
-  if (&ctx->mw == wind) {
-    window_width = ctx->mw.window_width;
-    window_height = ctx->mw.window_height;
-  } else {
-    window_width = ctx->navw.window_width;
-    window_height = ctx->navw.window_height;
-  }
-
-  gc = get_gc(this, glow_eDrawType_Line, 3);
-  if (x >= 0 && y >= 0) {
-    gdk_draw_drawable(w->window, gc, w->window, 0, 0, x, y, window_width - x,
-        window_height - y);
-    if (!w->double_buffer_on) {
-      if (x)
-        gdk_window_clear_area(w->window, 0, 0, x, window_height);
-      if (y)
-        gdk_window_clear_area(w->window, x, 0, window_width, y);
-    } else {
-      gdk_draw_drawable(w->buffer, gc, w->buffer, 0, 0, x, y, window_width - x,
-          window_height - y);
-      if (x)
-        gdk_draw_rectangle(w->buffer, get_gc(this, glow_eDrawType_LineErase, 0),
-            1, 0, 0, x, window_height);
-      if (y)
-        gdk_draw_rectangle(w->buffer, get_gc(this, glow_eDrawType_LineErase, 0),
-            1, x, 0, window_width, y);
-    }
-  } else if (x <= 0 && y <= 0) {
-    gdk_draw_drawable(w->window, gc, w->window, -x, -y, 0, 0, window_width + x,
-        window_height + y);
-    if (!w->double_buffer_on) {
-      if (x)
-        gdk_window_clear_area(
-            w->window, window_width + x, 0, window_width, window_height);
-      if (y)
-        gdk_window_clear_area(
-            w->window, 0, window_height + y, window_width + x, window_height);
-    } else {
-      gdk_draw_drawable(w->buffer, gc, w->buffer, -x, -y, 0, 0,
-          window_width + x, window_height + y);
-      if (x)
-        gdk_draw_rectangle(w->buffer, get_gc(this, glow_eDrawType_LineErase, 0),
-            1, window_width + x, 0, -x, window_height);
-      if (y)
-        gdk_draw_rectangle(w->buffer, get_gc(this, glow_eDrawType_LineErase, 0),
-            1, 0, window_height + y, window_width + x, -y);
-    }
-  } else if (x <= 0 && y >= 0) {
-    gdk_draw_drawable(w->window, gc, w->window, -x, 0, 0, y, window_width + x,
-        window_height - y);
-    if (!w->double_buffer_on) {
-      if (x)
-        gdk_window_clear_area(
-            w->window, window_width + x, 0, window_width, window_height);
-      if (y)
-        gdk_window_clear_area(w->window, 0, 0, window_width + x, y);
-    } else {
-      gdk_draw_drawable(w->buffer, gc, w->buffer, -x, 0, 0, y, window_width + x,
-          window_height - y);
-      if (x)
-        gdk_draw_rectangle(w->buffer, get_gc(this, glow_eDrawType_LineErase, 0),
-            1, window_width + x, 0, -x, window_height);
-      if (y)
-        gdk_draw_rectangle(w->buffer, get_gc(this, glow_eDrawType_LineErase, 0),
-            1, 0, 0, window_width + x, y);
-    }
-  } else // x > 0 && y < 0
-  {
-    gdk_draw_drawable(w->window, gc, w->window, 0, -y, x, 0, window_width - x,
-        window_height + y);
-    if (!w->double_buffer_on) {
-      if (x)
-        gdk_window_clear_area(w->window, 0, 0, x, window_height);
-      if (y)
-        gdk_window_clear_area(
-            w->window, x, window_height + y, window_width, window_height);
-    } else {
-      gdk_draw_drawable(w->buffer, gc, w->buffer, 0, -y, x, 0, window_width - x,
-          window_height + y);
-      if (x)
-        gdk_draw_rectangle(w->buffer, get_gc(this, glow_eDrawType_LineErase, 0),
-            1, 0, 0, x, window_height);
-      if (y)
-        gdk_draw_rectangle(w->buffer, get_gc(this, glow_eDrawType_LineErase, 0),
-            1, x, window_height + y, window_width - x, -y);
-    }
-  }
+  ctx->draw(wind, 0, 0, ctx->mw.window_width, ctx->mw.window_height);
 }
 
 void GlowDrawGtk::clear_area(
     GlowWind* wind, int ll_x, int ur_x, int ll_y, int ur_y)
 {
-  if (ctx->nodraw)
-    return;
-  DrawWindGtk* w = (DrawWindGtk*)wind->window;
-
-  gdk_window_clear_area(w->window, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y);
+  fill_rect(wind, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, glow_eDrawType_LineErase);
 }
 
 void GlowDrawGtk::set_inputfocus(GlowWind* wind)
@@ -2306,10 +2139,41 @@ static int glow_read_color_file(
   return 1;
 }
 
-void GlowDrawGtk::set_background(GlowWind* wind, glow_eDrawType drawtype,
-    glow_tPixmap pixmap, glow_tImImage image, int pixmap_width,
-    int pixmap_height)
+void GlowDrawGtk::push_background(glow_eDrawType drawtype)
 {
+  if (erase_stack_cnt > DRAW_ERASE_STACK_SIZE) {
+    printf("** Erase stack exceeded\n");
+    return;
+  }
+  erase_stack[erase_stack_cnt] = get_gc(this, drawtype, 0);
+  erase_stack_cnt++;
+  gc_erase = erase_stack[erase_stack_cnt - 1];
+}
+
+void GlowDrawGtk::pop_background()
+{
+  if (erase_stack_cnt == 0)
+    return;
+  erase_stack_cnt--;
+  if (erase_stack != 0)
+    gc_erase = erase_stack[erase_stack_cnt - 1];
+}
+
+void GlowDrawGtk::set_background(GlowWind* wind, glow_eDrawType drawtype,
+    char *image)
+{
+  if (drawtype == glow_eDrawType_LineErase)
+    drawtype = glow_eDrawType_Color32;
+
+  if (erase_stack_cnt == 1)
+    erase_stack_cnt--;
+  pwr_Assert(erase_stack_cnt == 0);
+  push_background(drawtype);
+
+  if (image)
+    css_background = 1;
+
+#if 0
   DrawWindGtk* w = (DrawWindGtk*)wind->window;
   GdkGCValues xgcv;
   int i;
@@ -2356,53 +2220,27 @@ void GlowDrawGtk::set_background(GlowWind* wind, glow_eDrawType drawtype,
     if (w->buffer)
       buffer_background(w, 0);
   }
+#endif
 }
 
 void GlowDrawGtk::reset_background(GlowWind* wind)
 {
-  GdkGCValues xgcv;
-
-  background = original_background;
-  gtk_widget_modify_bg(m_wind.toplevel, GTK_STATE_NORMAL, &background);
-  if (!ctx->no_nav)
-    gtk_widget_modify_bg(nav_wind.toplevel, GTK_STATE_NORMAL, &background);
-
-  // Change erase gcs
-  xgcv.foreground = background;
-  xgcv.background = background;
-  for (int i = 0; i < DRAW_TYPE_SIZE; i++) {
-    gdk_gc_set_values(get_gc(this, glow_eDrawType_LineErase, i), &xgcv,
-        (GdkGCValuesMask)(GDK_GC_FOREGROUND | GDK_GC_BACKGROUND));
-    gdk_gc_set_values(get_gc(this, glow_eDrawType_TextHelveticaErase, i), &xgcv,
-        (GdkGCValuesMask)(GDK_GC_FOREGROUND | GDK_GC_BACKGROUND));
-    gdk_gc_set_values(get_gc(this, glow_eDrawType_TextHelveticaEraseBold, i),
-        &xgcv, (GdkGCValuesMask)(GDK_GC_FOREGROUND | GDK_GC_BACKGROUND));
-  }
 }
 
 void GlowDrawGtk::set_clip(DrawWind* wind, GdkGC* gc)
 {
-  DrawWindGtk* w = (DrawWindGtk*)wind;
-  gdk_gc_set_clip_rectangle(gc, &w->clip_rectangle[w->clip_cnt - 1]);
 }
 
 void GlowDrawGtk::reset_clip(DrawWind* w, GdkGC* gc)
 {
-  gdk_gc_set_clip_rectangle(gc, NULL);
 }
 
 void GlowDrawGtk::set_image_clip_mask(glow_tPixmap pixmap, int x, int y)
 {
-  // GdkPixmap *gpixmap = gdk_pixmap_foreign_new( pixmap);
-  gdk_gc_set_clip_mask(
-      get_gc(this, glow_eDrawType_Line, 0), (GdkPixmap*)pixmap);
-  gdk_gc_set_clip_origin(get_gc(this, glow_eDrawType_Line, 0), x, y);
 }
 
 void GlowDrawGtk::reset_image_clip_mask()
 {
-  gdk_gc_set_clip_mask(get_gc(this, glow_eDrawType_Line, 0), NULL);
-  gdk_gc_set_clip_origin(get_gc(this, glow_eDrawType_Line, 0), 0, 0);
 }
 
 int GlowDrawGtk::set_clip_rectangle(
@@ -2467,54 +2305,56 @@ int GlowDrawGtk::draw_point(
     GlowWind* wind, int x1, int y1, glow_eDrawType gc_type)
 {
   DrawWindGtk* w = (DrawWindGtk*)wind->window;
+
   if (ctx->nodraw)
     return 1;
 
-  if (w->clip_on)
-    set_clip(w, get_gc(this, gc_type, 0));
-
-  gdk_draw_point(w->window, get_gc(this, gc_type, 0), x1, y1);
-  if (w->double_buffer_on)
-    gdk_draw_point(w->buffer, get_gc(this, gc_type, 0), x1, y1);
+  cairo_t *cr = get_cairo(wind);
 
   if (w->clip_on)
-    reset_clip(w, get_gc(this, gc_type, 0));
+    set_cairo_clip(w, cr);
+
+  cairo_set_antialias(cr, antialias);
+  cairo_set_source(cr, get_gc(this, gc_type, 0));
+  cairo_set_line_width(cr, 1);
+
+  cairo_move_to(cr, x1, y1);
+  cairo_line_to(cr, x1, y1);
+  cairo_stroke(cr);
+  if (w->clip_on)
+    reset_cairo_clip(w, cr);
+  end_cairo(wind, cr);
+
   return 1;
 }
 
 int GlowDrawGtk::draw_points(GlowWind* wind, glow_sPointX* points,
     int point_num, glow_eDrawType gc_type, int idx)
 {
-  if (ctx->nodraw)
-    return 1;
   DrawWindGtk* w = (DrawWindGtk*)wind->window;
 
-  if (w->clip_on)
-    set_clip(w, get_gc(this, gc_type, 0));
-
-  if (idx > 0) {
-    for (int i = 0; i < point_num; i++) {
-      if (!w->draw_buffer_only)
-        gdk_draw_rectangle(w->window, get_gc(this, gc_type, 0), 1,
-            points[i].x - idx / 2, points[i].y - idx / 2, idx, idx);
-      if (w->double_buffer_on)
-        gdk_draw_rectangle(w->buffer, get_gc(this, gc_type, 0), 1,
-            points[i].x - idx / 2, points[i].y - idx / 2, idx, idx);
-    }
-    if (w->clip_on)
-      reset_clip(w, get_gc(this, gc_type, 0));
+  if (ctx->nodraw)
     return 1;
-  }
 
-  GdkPoint* gpoints = points_to_gdk_points(points, point_num);
-  if (!w->draw_buffer_only)
-    gdk_draw_points(w->window, get_gc(this, gc_type, 0), gpoints, point_num);
-  if (w->double_buffer_on)
-    gdk_draw_points(w->buffer, get_gc(this, gc_type, 0), gpoints, point_num);
-  free(gpoints);
+  cairo_t *cr = get_cairo(wind);
 
   if (w->clip_on)
-    reset_clip(w, get_gc(this, gc_type, 0));
+    set_cairo_clip(w, cr);
+
+  cairo_set_antialias(cr, antialias);
+  cairo_set_source(cr, get_gc(this, gc_type, 0));
+  cairo_set_line_width(cr, idx + 2);
+  //cairo_set_line_cap(cr, CAIRO_LINE_CAP_ROUND);
+
+  for (int i = 0; i < point_num; i++) {
+    cairo_move_to(cr, points[i].x, points[i].y - (idx + 1));
+    cairo_line_to(cr, points[i].x, points[i].y);
+  }
+  cairo_stroke(cr);
+  if (w->clip_on)
+    reset_cairo_clip(w, cr);
+  end_cairo(wind, cr);
+
   return 1;
 }
 
@@ -2525,106 +2365,7 @@ void GlowDrawGtk::set_click_sensitivity(GlowWind* wind, int value)
 
 void GlowDrawGtk::draw_background(GlowWind* wind, int x, int y, int w, int h)
 {
-  DrawWindGtk* ww = (DrawWindGtk*)wind->window;
-  gdk_window_clear_area(ww->window, x, y, w, h);
-}
-
-int GlowDrawGtk::create_buffer(GlowWind* wind)
-{
-  DrawWindGtk* w = (DrawWindGtk*)wind->window;
-  int window_width, window_height;
-
-  if (!w->is_nav) {
-    window_width = ctx->mw.window_width;
-    window_height = ctx->mw.window_height;
-  } else {
-    window_width = ctx->navw.window_width;
-    window_height = ctx->navw.window_height;
-  }
-
-  if (!w->double_buffer_on || !window_width)
-    return 0;
-
-  if (window_width == w->buffer_width && window_height == w->buffer_height)
-    return 0;
-
-  if (w->buffer)
-    g_object_unref(w->buffer);
-
-  w->buffer = gdk_pixmap_new(w->window, window_width, window_height, -1);
-  w->buffer_width = window_width;
-  w->buffer_height = window_height;
-
-  buffer_background(w, 0);
-  return 1;
-}
-
-void GlowDrawGtk::delete_buffer(GlowWind* wind)
-{
-  DrawWindGtk* w = (DrawWindGtk*)wind->window;
-
-  if (w->buffer)
-    g_object_unref(w->buffer);
-  w->buffer = 0;
-  w->buffer_width = 0;
-  w->buffer_height = 0;
-}
-
-void GlowDrawGtk::buffer_background(DrawWind* wind, GlowCtx* cctx)
-{
-  DrawWindGtk* w = (DrawWindGtk*)wind;
-  int window_width, window_height, subwindow_x, subwindow_y;
-
-  if (ctx->mw.window == wind) {
-    window_width = ctx->mw.window_width;
-    window_height = ctx->mw.window_height;
-    subwindow_x = ctx->mw.subwindow_x;
-    subwindow_y = ctx->mw.subwindow_y;
-  } else {
-    window_width = ctx->navw.window_width;
-    window_height = ctx->navw.window_height;
-    subwindow_x = ctx->navw.subwindow_x;
-    subwindow_y = ctx->navw.subwindow_y;
-  }
-
-  if (!w->double_buffer_on || !window_width)
-    return;
-
-  if (w->background_pixmap) {
-    if (w->clip_on)
-      set_clip(w, get_gc(this, glow_eDrawType_Line, 0));
-
-    if (!((GrowCtx*)ctx)->background_tiled)
-      gdk_draw_drawable(w->background_pixmap,
-          get_gc(this, glow_eDrawType_Line, 0), w->buffer, 0, 0, 0, 0,
-          w->buffer_width, w->buffer_height);
-    else {
-      int i, j;
-      for (i = 0; i <= w->buffer_width / w->background_pixmap_width; i++)
-        for (j = 0; j <= w->buffer_height / w->background_pixmap_height; j++)
-          gdk_draw_drawable(w->background_pixmap,
-              get_gc(this, glow_eDrawType_Line, 0), w->buffer, 0, 0,
-              i * w->background_pixmap_width, j * w->background_pixmap_height,
-              w->background_pixmap_width, w->background_pixmap_height);
-    }
-    if (w->clip_on)
-      reset_clip(w, get_gc(this, glow_eDrawType_Line, 0));
-  } else {
-    glow_eDrawType bg;
-    if (cctx)
-      bg = ((GrowCtx*)cctx)->background_color;
-    else
-      bg = ((GrowCtx*)ctx)->background_color;
-    // glow_eDrawType bg = glow_eDrawType_CustomColor1;
-    // glow_eDrawType bg = glow_eDrawType_LineErase;
-    if (w->clip_on)
-      set_clip(w, get_gc(this, bg, 0));
-
-    gdk_draw_rectangle(w->buffer, get_gc(this, bg, 0), 1, subwindow_x,
-        subwindow_y, window_width, window_height);
-    if (w->clip_on)
-      reset_clip(w, get_gc(this, bg, 0));
-  }
+  fill_rect(wind, x, y, w, h, glow_eDrawType_LineErase);
 }
 
 int GlowDrawGtk::export_image(char* filename)
@@ -2635,12 +2376,7 @@ int GlowDrawGtk::export_image(char* filename)
   GdkPixbuf* image;
   gboolean sts;
 
-  if (w->double_buffer_on)
-    image = gdk_pixbuf_get_from_drawable(
-        NULL, w->buffer, 0, 0, 0, 0, 0, w->buffer_width, w->buffer_height);
-  else
-    image = gdk_pixbuf_get_from_drawable(
-        NULL, w->window, 0, 0, 0, 0, 0, window_width, window_height);
+  image = gdk_pixbuf_get_from_window(w->window, 0, 0, window_width, window_height);
   if (!image)
     return 0;
 
@@ -2682,12 +2418,7 @@ int GlowDrawGtk::print(char* filename, double x0, double x1, int end)
 
   GdkPixbuf* image;
 
-  if (w->double_buffer_on)
-    image = gdk_pixbuf_get_from_drawable(
-        NULL, w->buffer, 0, 0, 0, 0, 0, w->buffer_width, w->buffer_height);
-  else
-    image = gdk_pixbuf_get_from_drawable(
-        NULL, w->window, 0, 0, 0, 0, 0, window_width, window_height);
+  image = gdk_pixbuf_get_from_window(w->window, 0, 0, window_width, window_height);
   if (!image)
     return 0;
 
@@ -2854,11 +2585,35 @@ GdkPoint* GlowDrawGtk::points_to_gdk_points_curve(
   return gpoints;
 }
 
-void GlowDrawGtk::load_font(glow_eFont font_idx, int font_type, int idx)
+glow_eFontType GlowDrawGtk::drawtype_to_fonttype(glow_eDrawType gc_type)
 {
-  if (!font[font_idx][font_type][idx])
-    font[font_idx][font_type][idx]
-        = gdk_font_load(font_names[font_idx][font_type][idx]);
+  switch (gc_type) {
+  case glow_eDrawType_TextHelveticaBold:
+  case glow_eDrawType_TextHelveticaEraseBold:
+    return glow_eFontType_Bold;
+  default:
+    return glow_eFontType_Normal;
+  }
+}
+
+cairo_font_face_t* GlowDrawGtk::get_font_face(glow_eFont font, glow_eFontType font_type)
+{
+  if (!font_face[font][font_type])
+    font_face[font][font_type] = cairo_toy_font_face_create(font_names[font], 
+	 CAIRO_FONT_SLANT_NORMAL,
+	 font_type == glow_eFontType_Bold ? CAIRO_FONT_WEIGHT_BOLD : CAIRO_FONT_WEIGHT_NORMAL);
+
+  return font_face[font][font_type];
+}
+
+void GlowDrawGtk::free_font_face()
+{
+  for (int i = 0; i < glow_eFont__; i++) {
+    for (int j = 0; j < glow_eFontType__; j++) {
+      if (font_face[i][j])
+	cairo_font_face_destroy(font_face[i][j]);
+    }
+  }
 }
 
 int GlowDrawGtk::get_font_type(int gc_type)
@@ -2868,10 +2623,10 @@ int GlowDrawGtk::get_font_type(int gc_type)
   switch (gc_type) {
   case glow_eDrawType_TextHelveticaBold:
   case glow_eDrawType_TextHelveticaEraseBold:
-    font_type = glow_eDrawFont_HelveticaBold;
+    font_type = glow_eFontType_Bold;
     break;
   default:
-    font_type = glow_eDrawFont_Helvetica;
+    font_type = glow_eFontType_Normal;
     break;
   }
 
@@ -2983,6 +2738,8 @@ int GlowDrawGtk::image_scale(int width, int height, glow_tImImage orig_im,
 // Scale from orig_im
 
 #if defined PWRE_CONF_RSVG
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
     if (im_data && *im_data && *im) {
       RsvgHandle* handle;
       const char* imagefile;
@@ -2993,6 +2750,7 @@ int GlowDrawGtk::image_scale(int width, int height, glow_tImImage orig_im,
       imagefile = rsvg_handle_get_base_uri(handle);
       *im = rsvg_pixbuf_from_file_at_size(imagefile, width, height, NULL);
     } else
+#pragma GCC diagnostic pop
 #endif
     {
       if (*im)
@@ -3012,6 +2770,8 @@ int GlowDrawGtk::image_load(char* imagefile, glow_tImImage* orig_im,
   if (*orig_im)
     g_object_unref((GdkPixbuf*)*orig_im);
 #if defined PWRE_CONF_RSVG
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   if (im_data && streq(strchr(imagefile, '.'), ".svg")) {
     RsvgHandle* handle;
 
@@ -3019,6 +2779,7 @@ int GlowDrawGtk::image_load(char* imagefile, glow_tImImage* orig_im,
     *im_data = (glow_tImImage*)handle;
     *orig_im = (glow_tImImage*)rsvg_pixbuf_from_file(imagefile, NULL);
   } else
+#pragma GCC diagnostic pop
 #endif
   {
     *orig_im = (glow_tImImage*)gdk_pixbuf_new_from_file(imagefile, 0);
@@ -3497,35 +3258,23 @@ int GlowDrawGtk::gradient_fill_rect(GlowWind* wind, int x, int y, int w, int h,
   if (ctx->nodraw)
     return 1;
 
-  cairo_t* cr = NULL;
-  for (int i = 0; i < 2; i++) {
-    if (i == 0) {
-      if (!ww->draw_buffer_only)
-        cr = gdk_cairo_create(ww->window);
-      else
-        continue;
-    } else if (i == 1) {
-      if (ww->double_buffer_on)
-        cr = gdk_cairo_create(ww->buffer);
-      else
-        continue;
-    }
+  cairo_t *cr = get_cairo(wind);
 
-    if (ww->clip_on)
-      set_cairo_clip(ww, cr);
+  if (ww->clip_on)
+    set_cairo_clip(ww, cr);
 
-    cairo_pattern_t* pat;
-    if (!gradient_create_pattern(x, y, w, h, d0, d1, d2, gradient, &pat))
-      return 0;
-    cairo_rectangle(cr, x, y, w, h);
-    cairo_set_source(cr, pat);
-    cairo_fill(cr);
+  cairo_pattern_t* pat;
+  if (!gradient_create_pattern(x, y, w, h, d0, d1, d2, gradient, &pat))
+    return 0;
+  cairo_rectangle(cr, x, y, w, h);
+  cairo_set_source(cr, pat);
+  cairo_fill(cr);
 
-    if (ww->clip_on)
-      reset_cairo_clip(ww, cr);
-    cairo_pattern_destroy(pat);
-    cairo_destroy(cr);
-  }
+  if (ww->clip_on)
+    reset_cairo_clip(ww, cr);
+  cairo_pattern_destroy(pat);
+  end_cairo(wind, cr);
+
   return 1;
 }
 
@@ -3537,52 +3286,40 @@ int GlowDrawGtk::gradient_fill_rectrounded(GlowWind* wind, int x, int y, int w,
   if (ctx->nodraw)
     return 1;
 
-  cairo_t* cr = NULL;
-  for (int i = 0; i < 2; i++) {
-    if (i == 0) {
-      if (!ww->draw_buffer_only)
-        cr = gdk_cairo_create(ww->window);
-      else
-        continue;
-    } else if (i == 1) {
-      if (ww->double_buffer_on)
-        cr = gdk_cairo_create(ww->buffer);
-      else
-        continue;
-    }
+  cairo_t* cr = get_cairo(wind);
 
-    if (ww->clip_on)
-      set_cairo_clip(ww, cr);
+  if (ww->clip_on)
+    set_cairo_clip(ww, cr);
 
-    cairo_pattern_t* pat;
-    if (!gradient_create_pattern(x, y, w, h, d0, d1, d2, gradient, &pat))
-      return 0;
+  cairo_pattern_t* pat;
+  if (!gradient_create_pattern(x, y, w, h, d0, d1, d2, gradient, &pat))
+    return 0;
 
-    if (roundamount >= 0) {
-      cairo_move_to(cr, x + roundamount, y);
-      cairo_line_to(cr, x + w - roundamount, y);
-      cairo_arc(
-          cr, x + w - roundamount, y + roundamount, roundamount, -M_PI / 2, 0);
-      cairo_line_to(cr, x + w, y + h - roundamount);
-      cairo_arc(cr, x + w - roundamount, y + h - roundamount, roundamount, 0,
-          M_PI / 2);
-      cairo_line_to(cr, x + roundamount, y + h);
-      cairo_arc(cr, x + roundamount, y + h - roundamount, roundamount, M_PI / 2,
-          M_PI);
-      cairo_line_to(cr, x, y + roundamount);
-      cairo_arc(cr, x + roundamount, y + roundamount, roundamount, M_PI,
-          M_PI * 3 / 2);
-    } else
-      cairo_rectangle(cr, x, y, w, h);
+  if (roundamount >= 0) {
+    cairo_move_to(cr, x + roundamount, y);
+    cairo_line_to(cr, x + w - roundamount, y);
+    cairo_arc(
+        cr, x + w - roundamount, y + roundamount, roundamount, -M_PI / 2, 0);
+    cairo_line_to(cr, x + w, y + h - roundamount);
+    cairo_arc(cr, x + w - roundamount, y + h - roundamount, roundamount, 0,
+        M_PI / 2);
+    cairo_line_to(cr, x + roundamount, y + h);
+    cairo_arc(cr, x + roundamount, y + h - roundamount, roundamount, M_PI / 2,
+        M_PI);
+    cairo_line_to(cr, x, y + roundamount);
+    cairo_arc(cr, x + roundamount, y + roundamount, roundamount, M_PI,
+        M_PI * 3 / 2);
+  } else
+    cairo_rectangle(cr, x, y, w, h);
 
-    cairo_set_source(cr, pat);
-    cairo_fill(cr);
+  cairo_set_source(cr, pat);
+  cairo_fill(cr);
 
-    if (ww->clip_on)
-      reset_cairo_clip(ww, cr);
-    cairo_pattern_destroy(pat);
-    cairo_destroy(cr);
-  }
+  if (ww->clip_on)
+    reset_cairo_clip(ww, cr);
+  cairo_pattern_destroy(pat);
+  end_cairo(wind, cr);
+
   return 1;
 }
 
@@ -3599,45 +3336,33 @@ int GlowDrawGtk::gradient_fill_arc(GlowWind* wind, int x, int y, int w, int h,
   else if (angle1 < 0)
     angle1 = angle1 + (-angle1 / 360 + 1) * 360;
 
-  cairo_t* cr = NULL;
-  for (int i = 0; i < 2; i++) {
-    if (i == 0) {
-      if (!ww->draw_buffer_only)
-        cr = gdk_cairo_create(ww->window);
-      else
-        continue;
-    } else if (i == 1) {
-      if (ww->double_buffer_on)
-        cr = gdk_cairo_create(ww->buffer);
-      else
-        continue;
-    }
+  cairo_t* cr = get_cairo(wind);
 
-    if (ww->clip_on)
-      set_cairo_clip(ww, cr);
+  if (ww->clip_on)
+    set_cairo_clip(ww, cr);
 
-    cairo_pattern_t* pat;
-    if (!gradient_create_pattern(x, y, w, h, d0, d1, d2, gradient, &pat))
-      return 0;
+  cairo_pattern_t* pat;
+  if (!gradient_create_pattern(x, y, w, h, d0, d1, d2, gradient, &pat))
+    return 0;
 
-    cairo_save(cr);
-    cairo_translate(cr, double(x) + double(w) / 2, double(y) + double(h) / 2);
-    cairo_scale(cr, double(w) / 2, double(h) / 2);
-    if (!(angle2 == 360 || angle2 == 180))
-      cairo_move_to(cr, 0, 0);
-    cairo_arc(cr, 0, 0, 1, -double(angle1 + angle2) / 180 * M_PI,
-        -double(angle1) / 180 * M_PI);
-    if (!(angle2 == 360 || angle2 == 180))
-      cairo_move_to(cr, 0, 0);
-    cairo_restore(cr);
-    cairo_set_source(cr, pat);
-    cairo_fill(cr);
+  cairo_save(cr);
+  cairo_translate(cr, double(x) + double(w) / 2, double(y) + double(h) / 2);
+  cairo_scale(cr, double(w) / 2, double(h) / 2);
+  if (!(angle2 == 360 || angle2 == 180))
+    cairo_move_to(cr, 0, 0);
+  cairo_arc(cr, 0, 0, 1, -double(angle1 + angle2) / 180 * M_PI,
+      -double(angle1) / 180 * M_PI);
+  if (!(angle2 == 360 || angle2 == 180))
+    cairo_move_to(cr, 0, 0);
+  cairo_restore(cr);
+  cairo_set_source(cr, pat);
+  cairo_fill(cr);
 
-    if (ww->clip_on)
-      reset_cairo_clip(ww, cr);
-    cairo_pattern_destroy(pat);
-    cairo_destroy(cr);
-  }
+  if (ww->clip_on)
+    reset_cairo_clip(ww, cr);
+  cairo_pattern_destroy(pat);
+  end_cairo(wind, cr);
+
   return 1;
 }
 
@@ -3649,333 +3374,41 @@ int GlowDrawGtk::gradient_fill_polyline(GlowWind* wind, glow_sPointX* points,
   if (ctx->nodraw)
     return 1;
 
-  cairo_t* cr = NULL;
+  cairo_t* cr = get_cairo(wind);
   double x0, y0, x1, y1;
-  for (int i = 0; i < 2; i++) {
-    if (i == 0) {
-      if (!ww->draw_buffer_only)
-        cr = gdk_cairo_create(ww->window);
-      else
-        continue;
-    } else if (i == 1) {
-      if (ww->double_buffer_on)
-        cr = gdk_cairo_create(ww->buffer);
-      else
-        continue;
-    }
 
-    if (ww->clip_on)
+  if (ww->clip_on)
       set_cairo_clip(ww, cr);
 
-    x0 = y0 = 1e37;
-    x1 = y1 = 1e-37;
-    for (int j = 0; j < point_cnt; j++) {
-      if (points[j].x < x0)
-        x0 = points[j].x;
-      if (points[j].y < y0)
-        y0 = points[j].y;
-      if (points[j].x > x1)
-        x1 = points[j].x;
-      if (points[j].y > y1)
-        y1 = points[j].y;
-
-      if (j == 0)
-        cairo_move_to(cr, points[j].x, points[j].y);
-      else
-        cairo_line_to(cr, points[j].x, points[j].y);
-    }
-
-    cairo_pattern_t* pat;
-    if (!gradient_create_pattern((int)x0, (int)y0, (int)(x1 - x0),
-            (int)(y1 - y0), d0, d1, d2, gradient, &pat))
-      return 0;
-    cairo_set_source(cr, pat);
-    cairo_fill(cr);
-
-    if (ww->clip_on)
-      reset_cairo_clip(ww, cr);
-    cairo_pattern_destroy(pat);
-    cairo_destroy(cr);
+  x0 = y0 = 1e37;
+  x1 = y1 = 1e-37;
+  for (int j = 0; j < point_cnt; j++) {
+    if (points[j].x < x0)
+      x0 = points[j].x;
+    if (points[j].y < y0)
+      y0 = points[j].y;
+    if (points[j].x > x1)
+      x1 = points[j].x;
+    if (points[j].y > y1)
+      y1 = points[j].y;
+    
+    if (j == 0)
+      cairo_move_to(cr, points[j].x, points[j].y);
+    else
+      cairo_line_to(cr, points[j].x, points[j].y);
   }
 
-  return 1;
-}
+  cairo_pattern_t* pat;
+  if (!gradient_create_pattern((int)x0, (int)y0, (int)(x1 - x0),
+      (int)(y1 - y0), d0, d1, d2, gradient, &pat))
+    return 0;
+  cairo_set_source(cr, pat);
+  cairo_fill(cr);
 
-#define FONT_SCALE 0.7
-#define FONT_DESCENT 0.22
-
-static char* font_string(int font_idx, int font_type, double size)
-{
-  static char str[80];
-  char bold_str[20];
-
-  if (font_type == glow_eDrawFont_HelveticaBold)
-    strcpy(bold_str, "Bold ");
-  else
-    strcpy(bold_str, "");
-
-  switch (font_idx) {
-  case glow_eFont_Helvetica:
-    sprintf(str, "%s %s%f", "Helvetica", bold_str, FONT_SCALE * size);
-    break;
-  case glow_eFont_Times:
-    sprintf(str, "%s %s%f", "DejaVu Serif", bold_str, FONT_SCALE * size);
-    break;
-  case glow_eFont_NewCenturySchoolbook:
-    sprintf(
-        str, "%s %s%f", "Century Schoolbook L", bold_str, FONT_SCALE * size);
-    break;
-  case glow_eFont_Courier:
-    sprintf(str, "%s %s%f", "Courier 10 pitch", bold_str, FONT_SCALE * size);
-    break;
-  default:
-    sprintf(str, "%s %s%f", "Lucida Sans", bold_str, FONT_SCALE * size);
-  }
-  for (char* s = str; *s; s++)
-    if (*s == ',')
-      *s = '.';
-  return str;
-}
-
-int GlowDrawGtk::text_pango(GlowWind* wind, int x, int y, char* text, int len,
-    glow_eDrawType gc_type, glow_eDrawType color, int idx, int highlight,
-    int line, glow_eFont font_idx, double size, int rot)
-{
-  if (ctx->nodraw)
-    return 1;
-  DrawWindGtk* w = (DrawWindGtk*)wind->window;
-
-  if (font_idx >= glow_eFont__)
-    font_idx = glow_eFont_Helvetica;
-
-  int font_type = get_font_type(gc_type);
-
-  if (w->clip_on)
-    set_clip(w, get_gc(this, gc_type, idx));
-
-  if (color != glow_eDrawType_Line) {
-    GdkGCValues xgcv;
-
-    gdk_gc_get_values(get_gc(this, color, 0), &xgcv);
-
-    gdk_gc_set_values(get_gc(this, gc_type, idx), &xgcv, GDK_GC_FOREGROUND);
-  }
-  PangoRenderer* pr = gdk_pango_renderer_get_default(screen);
-  gdk_pango_renderer_set_gc(GDK_PANGO_RENDERER(pr), get_gc(this, gc_type, idx));
-
-  for (int i = 0; i < 2; i++) {
-    if (i == 0) {
-      if (!w->draw_buffer_only && !w->double_buffer_on)
-        gdk_pango_renderer_set_drawable(GDK_PANGO_RENDERER(pr), w->window);
-      else
-        continue;
-    } else if (i == 1) {
-      if (w->double_buffer_on)
-        gdk_pango_renderer_set_drawable(GDK_PANGO_RENDERER(pr), w->buffer);
-      else
-        continue;
-    }
-
-    PangoLayout* layout;
-    if (((GrowCtx*)ctx)->text_coding != glow_eTextCoding_UTF_8) {
-      char* textutf8
-          = g_convert(text, -1, "UTF-8", "ISO8859-1", NULL, NULL, NULL);
-      layout = gtk_widget_create_pango_layout(w->toplevel, textutf8);
-      g_free(textutf8);
-    } else
-      layout = gtk_widget_create_pango_layout(w->toplevel, text);
-
-    if (rot != 0) {
-      rot = 360 - rot;
-      PangoContext* pc = pango_layout_get_context(layout);
-      pango_context_set_base_gravity(pc, PANGO_GRAVITY_SOUTH);
-      PangoMatrix lpm = PANGO_MATRIX_INIT;
-      pango_matrix_rotate(&lpm, (double)rot);
-      pango_context_set_matrix(pc, &lpm);
-      pango_layout_context_changed(layout);
-      // pango_context_set_matrix( pc, 0);
-    }
-
-    PangoFontDescription* desc = pango_font_description_from_string(
-        font_string(font_idx, font_type, size));
-    pango_layout_set_font_description(layout, desc);
-
-    int width, height;
-    pango_layout_get_size(layout, &width, &height);
-    height = (int)(height * 0.9);
-
-    int px, py;
-    if (rot == 180) {
-      px = -PANGO_SCALE * x - width;
-      py = (int)(-PANGO_SCALE * y - FONT_DESCENT * height);
-    } else if (rot == 90) {
-      px = -PANGO_SCALE * y - width + height / 2;
-      py = PANGO_SCALE * x;
-    } else if (rot == 270) {
-      px = PANGO_SCALE * y - width;
-      py = -PANGO_SCALE * x - height;
-    } else {
-      px = PANGO_SCALE * x;
-      py = (int)(PANGO_SCALE * y - (1.0 - FONT_DESCENT) * height);
-    }
-    pango_renderer_draw_layout(pr, layout, px, py);
-
-    if (rot != 0) {
-      PangoContext* pc = pango_layout_get_context(layout);
-      pango_context_set_matrix(pc, 0);
-    }
-    g_object_unref(layout);
-    pango_font_description_free(desc);
-  }
-  gdk_pango_renderer_set_drawable(GDK_PANGO_RENDERER(pr), 0);
-  gdk_pango_renderer_set_gc(GDK_PANGO_RENDERER(pr), 0);
-
-  if (w->clip_on)
-    reset_clip(w, get_gc(this, gc_type, idx));
-
-  if (color != glow_eDrawType_Line) {
-    GdkGCValues xgcv;
-
-    gdk_gc_get_values(get_gc(this, glow_eDrawType_Line, 0), &xgcv);
-
-    gdk_gc_set_values(get_gc(this, gc_type, idx), &xgcv, GDK_GC_FOREGROUND);
-  }
-
-  return 1;
-}
-
-int GlowDrawGtk::text_erase_pango(GlowWind* wind, int x, int y, char* text,
-    int len, glow_eDrawType gc_type, int idx, int line, glow_eFont font_idx,
-    double size, int rot)
-{
-  if (ctx->nodraw)
-    return 1;
-  DrawWindGtk* w = (DrawWindGtk*)wind->window;
-  int px, py, pw, ph;
-
-  if (font_idx >= glow_eFont__)
-    font_idx = glow_eFont_Helvetica;
-
-  if (gc_type == glow_eDrawType_TextHelvetica)
-    gc_type = glow_eDrawType_TextHelveticaErase;
-  else if (gc_type == glow_eDrawType_TextHelveticaBold)
-    gc_type = glow_eDrawType_TextHelveticaEraseBold;
-
-  int font_type = get_font_type(gc_type);
-
-  if (w->clip_on)
-    set_clip(w, get_gc(this, gc_type, idx));
-
-  PangoRenderer* pr = gdk_pango_renderer_get_default(screen);
-  gdk_pango_renderer_set_gc(GDK_PANGO_RENDERER(pr), gcs[gc_type][0]);
-  gdk_pango_renderer_set_drawable(GDK_PANGO_RENDERER(pr), w->window);
-
-  PangoLayout* layout;
-  if (((GrowCtx*)ctx)->text_coding != glow_eTextCoding_UTF_8) {
-    char* textutf8
-        = g_convert(text, -1, "UTF-8", "ISO8859-1", NULL, NULL, NULL);
-    layout = gtk_widget_create_pango_layout(w->toplevel, textutf8);
-    g_free(textutf8);
-  } else
-    layout = gtk_widget_create_pango_layout(w->toplevel, text);
-
-  PangoFontDescription* desc = pango_font_description_from_string(
-      font_string(font_idx, font_type, size));
-  pango_layout_set_font_description(layout, desc);
-
-  int width, height;
-  pango_layout_get_size(layout, &width, &height);
-  height = (int)(height * 0.9);
-
-  if (rot == 90) {
-    px = x; // - height/PANGO_SCALE/2;
-    py = y - width / PANGO_SCALE;
-    ph = width / PANGO_SCALE;
-    pw = height / PANGO_SCALE;
-  } else if (rot == 270) {
-    px = x; // - height/PANGO_SCALE/2;
-    py = y - height / PANGO_SCALE / 2;
-    ph = width / PANGO_SCALE;
-    pw = height / PANGO_SCALE;
-  } else {
-    px = x;
-    py = (int)(y - (1.0 - FONT_DESCENT) * height / PANGO_SCALE);
-    pw = width / PANGO_SCALE;
-    ph = height / PANGO_SCALE;
-  }
-
-  if (!w->draw_buffer_only)
-    gdk_draw_rectangle(
-        w->window, get_gc(this, gc_type, idx), 1, px, py, pw, ph);
-  if (w->double_buffer_on)
-    gdk_draw_rectangle(
-        w->buffer, get_gc(this, gc_type, idx), 1, px, py, pw, ph);
-
-  g_object_unref(layout);
-  pango_font_description_free(desc);
-  gdk_pango_renderer_set_drawable(GDK_PANGO_RENDERER(pr), 0);
-  gdk_pango_renderer_set_gc(GDK_PANGO_RENDERER(pr), 0);
-
-  if (w->clip_on)
-    reset_clip(w, get_gc(this, gc_type, idx));
-
-  return 1;
-}
-
-int GlowDrawGtk::get_text_extent_pango(const char* text, int len,
-    glow_eDrawType gc_type, int idx, glow_eFont font_idx, int* width,
-    int* height, int* descent, double size, int rot)
-{
-  DrawWindGtk* w = &m_wind;
-
-  if (font_idx >= glow_eFont__)
-    font_idx = glow_eFont_Helvetica;
-
-  if (gc_type == glow_eDrawType_TextHelvetica)
-    gc_type = glow_eDrawType_TextHelveticaErase;
-  else if (gc_type == glow_eDrawType_TextHelveticaBold)
-    gc_type = glow_eDrawType_TextHelveticaEraseBold;
-
-  int font_type = get_font_type(gc_type);
-
-  PangoRenderer* pr = gdk_pango_renderer_get_default(screen);
-  gdk_pango_renderer_set_gc(GDK_PANGO_RENDERER(pr), gcs[gc_type][0]);
-  gdk_pango_renderer_set_drawable(GDK_PANGO_RENDERER(pr), w->window);
-
-  PangoLayout* layout;
-  if (((GrowCtx*)ctx)->text_coding != glow_eTextCoding_UTF_8) {
-    char* textutf8
-        = g_convert(text, len, "UTF-8", "ISO8859-1", NULL, NULL, NULL);
-    layout = gtk_widget_create_pango_layout(w->toplevel, textutf8);
-    g_free(textutf8);
-  } else {
-    char* textp = (char*)calloc(1, len + 1);
-    strncpy(textp, text, len);
-    layout = gtk_widget_create_pango_layout(w->toplevel, textp);
-    free(textp);
-  }
-
-  PangoFontDescription* desc = pango_font_description_from_string(
-      font_string(font_idx, font_type, size));
-  pango_layout_set_font_description(layout, desc);
-
-  int lwidth, lheight;
-  pango_layout_get_size(layout, &lwidth, &lheight);
-  lheight = (int)(lheight * 0.9);
-
-  if (rot == 90 || rot == 270) {
-    *height = lwidth / PANGO_SCALE;
-    *width = lheight / PANGO_SCALE;
-  } else {
-    *width = lwidth / PANGO_SCALE;
-    *height = lheight / PANGO_SCALE;
-  }
-  *descent = (int)(FONT_DESCENT * lheight / PANGO_SCALE);
-
-  g_object_unref(layout);
-  pango_font_description_free(desc);
-  gdk_pango_renderer_set_drawable(GDK_PANGO_RENDERER(pr), 0);
-  gdk_pango_renderer_set_gc(GDK_PANGO_RENDERER(pr), 0);
+  if (ww->clip_on)
+    reset_cairo_clip(ww, cr);
+  cairo_pattern_destroy(pat);
+  end_cairo(wind, cr);
 
   return 1;
 }
@@ -3995,7 +3428,9 @@ void GlowDrawGtk::log_event(GdkEvent* event)
       int x, y;
 
       if (e.motion.is_hint) {
-        gdk_window_get_pointer(e.any.window, &x, &y, NULL);
+        gdk_window_get_device_position(e.any.window, 
+	    gdk_seat_get_pointer(gdk_display_get_default_seat(display)), 
+	    &x, &y, NULL);
         e.button.x = x;
         e.button.y = y;
         e.motion.is_hint = 0;
@@ -4072,65 +3507,58 @@ void GlowDrawGtk::event_exec(void* event, unsigned int size)
 int GlowDrawGtk::open_color_selection(double* r, double* g, double* b)
 {
   int sts;
-  GdkColor color;
-  GtkWidget* w = gtk_color_selection_dialog_new("Color selection");
-  GtkWidget* csel = gtk_color_selection_dialog_get_color_selection(
-      GTK_COLOR_SELECTION_DIALOG(w));
-  color.red = int(*r * 0xffff);
-  color.green = int(*g * 0xffff);
-  color.blue = int(*b * 0xffff);
-  gtk_color_selection_set_current_color(GTK_COLOR_SELECTION(csel), &color);
-  gint response = gtk_dialog_run(GTK_DIALOG(w));
+  GdkRGBA color;
+  GtkWidget* csel = gtk_color_chooser_dialog_new("Color selection", GTK_WINDOW(m_wind.toplevel));
+  color.red = 1.0;
+  color.green = 1.0;
+  color.blue = 1.0;
+  color.alpha = 1.0;
+  gtk_color_chooser_set_rgba(GTK_COLOR_CHOOSER(csel), &color);
+  gint response = gtk_dialog_run(GTK_DIALOG(csel));
   if (response == GTK_RESPONSE_OK) {
-    gtk_color_selection_get_current_color(GTK_COLOR_SELECTION(csel), &color);
-    *r = (double)color.red / 0xffff;
-    *g = (double)color.green / 0xffff;
-    *b = (double)color.blue / 0xffff;
+    gtk_color_chooser_get_rgba(GTK_COLOR_CHOOSER(csel), &color);
+    *r = color.red;
+    *g = color.green;
+    *b = color.blue;
     sts = 1;
   } else
     sts = 0;
-  gtk_widget_destroy(w);
+  gtk_widget_destroy(csel);
   return sts;
 }
 
 void GlowDrawGtk::update_color(glow_eDrawType color)
 {
   if (!GlowColor::is_custom(color)) {
-    for (int j = 0; j < DRAW_TYPE_SIZE; j++) {
-      if (gcs[color][j]) {
-        gdk_gc_unref(gcs[color][j]);
-        gcs[color][j] = 0;
-      }
+    if (gcs[color]) {
+      //printf("X Regular: %4d %llu %d\n", color, (unsigned long long)gcs[color]);
+      cairo_pattern_destroy(gcs[color]);
+      gcs[color] = 0;
     }
   } else if (get_customcolors()) {
     // A customcolor
-    for (int j = 0; j < DRAW_TYPE_SIZE; j++) {
-      if (get_customcolors()->gcs[color - glow_eDrawType_CustomColor1][j]) {
-        gdk_gc_unref(
-            get_customcolors()->gcs[color - glow_eDrawType_CustomColor1][j]);
-        get_customcolors()->gcs[color - glow_eDrawType_CustomColor1][j] = 0;
-      }
+    if (get_customcolors()->gcs[color - glow_eDrawType_CustomColor1]) {
+      //printf("X Custom: %4d %llu\n", color - glow_eDrawType_CustomColor1, (unsigned long long)get_customcolors()->gcs[color - glow_eDrawType_CustomColor1]);
+      cairo_pattern_destroy(get_customcolors()->gcs[color - glow_eDrawType_CustomColor1]);
+      get_customcolors()->gcs[color - glow_eDrawType_CustomColor1] = 0;
     }
-    for (int j = 0; j < DRAW_TYPE_SIZE; j++) {
-      if (get_customcolors()->gcs[color - glow_eDrawType_CustomColor1 + 1][j]) {
-        gdk_gc_unref(get_customcolors()
-                         ->gcs[color - glow_eDrawType_CustomColor1 + 1][j]);
-        get_customcolors()->gcs[color - glow_eDrawType_CustomColor1 + 1][j] = 0;
-      }
+    if (get_customcolors()->gcs[color - glow_eDrawType_CustomColor1 + 1]) {
+      cairo_pattern_destroy(get_customcolors()
+                         ->gcs[color - glow_eDrawType_CustomColor1 + 1]);
+      //printf("X Custom:  %4d %llu\n", color - glow_eDrawType_CustomColor1 + 1, (unsigned long long)get_customcolors()->gcs[color - glow_eDrawType_CustomColor1 + 1]);
+      get_customcolors()->gcs[color - glow_eDrawType_CustomColor1 + 1] = 0;
     }
-    for (int j = 0; j < DRAW_TYPE_SIZE; j++) {
-      if (get_customcolors()->gcs[color - glow_eDrawType_CustomColor1 + 2][j]) {
-        gdk_gc_unref(get_customcolors()
-                         ->gcs[color - glow_eDrawType_CustomColor1 + 2][j]);
-        get_customcolors()->gcs[color - glow_eDrawType_CustomColor1 + 2][j] = 0;
-      }
+    if (get_customcolors()->gcs[color - glow_eDrawType_CustomColor1 + 2]) {
+      cairo_pattern_destroy(get_customcolors()
+                         ->gcs[color - glow_eDrawType_CustomColor1 + 2]);
+      //printf("X Custom:  %4d %llu\n", color - glow_eDrawType_CustomColor1 + 2, (unsigned long long)get_customcolors()->gcs[color - glow_eDrawType_CustomColor1 + 2]);
+      get_customcolors()->gcs[color - glow_eDrawType_CustomColor1 + 2] = 0;
     }
-    for (int j = 0; j < DRAW_TYPE_SIZE; j++) {
-      if (get_customcolors()->gcs[color - glow_eDrawType_CustomColor1 + 3][j]) {
-        gdk_gc_unref(get_customcolors()
-                         ->gcs[color - glow_eDrawType_CustomColor1 + 3][j]);
-        get_customcolors()->gcs[color - glow_eDrawType_CustomColor1 + 3][j] = 0;
-      }
+    if (get_customcolors()->gcs[color - glow_eDrawType_CustomColor1 + 3]) {
+      cairo_pattern_destroy(get_customcolors()
+                         ->gcs[color - glow_eDrawType_CustomColor1 + 3]);
+      //printf("X Custom:  %4d %llu\n", color - glow_eDrawType_CustomColor1 + 3, (unsigned long long)get_customcolors()->gcs[color - glow_eDrawType_CustomColor1 + 3]);
+      get_customcolors()->gcs[color - glow_eDrawType_CustomColor1 + 3] = 0;
     }
   }
 }
@@ -4196,20 +3624,14 @@ void GlowDrawGtk::remove_customcolors(GlowCustomColors* cc)
 void GlowDrawGtk::reset_customcolors(GlowCustomColors* cc)
 {
   for (int i = 0; i < cc->colors_size; i++) {
-    for (int j = 0; j < DRAW_TYPE_SIZE; j++) {
-      if (((GlowCustomColorsGtk*)cc)->gcs[i][j])
-        gdk_gc_unref(((GlowCustomColorsGtk*)cc)->gcs[i][j]);
+    if (((GlowCustomColorsGtk*)cc)->gcs[i]) {
+      cairo_pattern_destroy(((GlowCustomColorsGtk*)cc)->gcs[i]);
+      //printf("X Custom:  %4d %llu\n", i, (unsigned long long)((GlowCustomColorsGtk*)cc)->gcs[i]);
     }
   }
   memset(((GlowCustomColorsGtk*)cc)->gcs, 0,
       sizeof(((GlowCustomColorsGtk*)cc)->gcs));
 
-  for (int i = 0;
-       i < glow_eDrawType_CustomColor__ - glow_eDrawType_CustomColor1; i++) {
-    if (((GlowCustomColorsGtk*)cc)->color_vect[i].pixel != 0)
-      gdk_colormap_free_colors(
-          colormap, &((GlowCustomColorsGtk*)cc)->color_vect[i], 1);
-  }
   memset(((GlowCustomColorsGtk*)cc)->color_vect, 0,
       sizeof(((GlowCustomColorsGtk*)cc)->color_vect));
 }

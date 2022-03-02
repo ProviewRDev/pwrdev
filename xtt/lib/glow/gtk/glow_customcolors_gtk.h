@@ -51,8 +51,7 @@ public:
   {
   }
 
-  GdkGC* gcs[glow_eDrawType_CustomColor__ - glow_eDrawType_CustomColor1]
-            [DRAW_TYPE_SIZE];
+  cairo_pattern_t* gcs[glow_eDrawType_CustomColor__ - glow_eDrawType_CustomColor1];
   GdkColor
       color_vect[glow_eDrawType_CustomColor__ - glow_eDrawType_CustomColor1];
   int color_vect_cnt;

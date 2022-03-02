@@ -79,6 +79,15 @@ hpp_includes := $(sort \
              ) \
            )
 
+css_sources := $(sort \
+             $(foreach file, \
+               $(foreach dir, \
+                 $(source_dirs), \
+                 $(wildcard $(dir)/$(comp_name)*.css) \
+               ), $(notdir $(file)) \
+             ) \
+           )
+
 exe_name   := $(comp_name)
 exe_flv_name   := $(comp_name)
 ifneq ($(src_name),src)
@@ -96,6 +105,7 @@ ifneq ($(src_name),src)
   export_flv_obj := $(bld_dir)/$(exe_name)_$(src_name)$(obj_ext)
 endif
 export_includes := $(addprefix $(inc_dir)/,$(h_includes) $(hpp_includes))
+export_css := $(addprefix $(load_dir)/,$(css_sources))
 
 l_targets := $(addprefix $(bld_dir)/,$(basename $(l_sources)))
 l_targets := $(addsuffix $(c_ext),$(l_targets))
@@ -124,7 +134,7 @@ all : init copy lib exe | silent
 
 init : dirs | silent
 
-copy : $(export_includes) | silent
+copy : $(export_includes) $(export_css) | silent
 
 lib :
 

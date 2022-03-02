@@ -43,6 +43,7 @@
 #include "co_string.h"
 
 #include "cow_wow_gtk.h"
+#include "cow_wutl_gtk.h"
 
 #include "ge_methods.h"
 
@@ -113,7 +114,6 @@ static int methods_command_cb(char* command, void* udata)
 
 GtkWidget* XttMethodToolbarGtk::build()
 {
-  pwr_tFileName fname;
 
   // Toolbar
   m_toolbar_w = (GtkWidget*)g_object_new(GTK_TYPE_TOOLBAR, NULL);
@@ -126,15 +126,8 @@ GtkWidget* XttMethodToolbarGtk::build()
       strcpy(tooltip, GeMethods::op_tooltip[i]);
       strcat(tooltip, m_tooltip_suffix);
 
-      m_op_button_w[i] = gtk_button_new();
-      dcli_translate_filename(fname, GeMethods::op_image[i]);
-      gtk_container_add(
-          GTK_CONTAINER(m_op_button_w[i]), gtk_image_new_from_file(fname));
-      g_signal_connect(
-          m_op_button_w[i], "clicked", G_CALLBACK(activate_button), &m_cb[i]);
-      g_object_set(m_op_button_w[i], "can-focus", FALSE, NULL);
-      gtk_toolbar_append_widget(GTK_TOOLBAR(m_toolbar_w), m_op_button_w[i],
-          CoWowGtk::translate_utf8(tooltip), "");
+      m_op_button_w[i] = wutl_tools_item(GTK_TOOLBAR(m_toolbar_w), GeMethods::op_image[i], 
+	  G_CALLBACK(activate_button), tooltip, &m_cb[i], 1, 1);
     }
   }
   for (int i = 0; i < GeMethods::mntmeth_size; i++) {
@@ -145,15 +138,8 @@ GtkWidget* XttMethodToolbarGtk::build()
       strcpy(tooltip, GeMethods::mnt_tooltip[i]);
       strcat(tooltip, m_tooltip_suffix);
 
-      m_mnt_button_w[i] = gtk_button_new();
-      dcli_translate_filename(fname, GeMethods::mnt_image[i]);
-      gtk_container_add(
-          GTK_CONTAINER(m_mnt_button_w[i]), gtk_image_new_from_file(fname));
-      g_signal_connect(m_mnt_button_w[i], "clicked",
-          G_CALLBACK(activate_button), &m_cb[32 + i]);
-      g_object_set(m_mnt_button_w[i], "can-focus", FALSE, NULL);
-      gtk_toolbar_append_widget(GTK_TOOLBAR(m_toolbar_w), m_mnt_button_w[i],
-          CoWowGtk::translate_utf8(tooltip), "");
+      m_mnt_button_w[i] = wutl_tools_item(GTK_TOOLBAR(m_toolbar_w), GeMethods::mnt_image[i], 
+	  G_CALLBACK(activate_button), tooltip, &m_cb[32+i], 1, 1);
     }
   }
   return m_toolbar_w;
@@ -193,12 +179,12 @@ void XttMethodToolbarGtk::set_current_sensitive()
     for (int i = 0; i < GeMethods::opmeth_size; i++) {
       if (m_op_method_mask & (1 << i)
           && !streq(GeMethods::op_image[i], ""))
-        gtk_widget_set_sensitive(m_op_button_w[i], FALSE);
+        gtk_widget_set_sensitive(GTK_WIDGET(m_op_button_w[i]), FALSE);
     }
     for (int i = 0; i < GeMethods::mntmeth_size; i++) {
       if (m_mnt_method_mask & (1 << i)
           && !streq(GeMethods::mnt_image[i], ""))
-        gtk_widget_set_sensitive(m_mnt_button_w[i], FALSE);
+        gtk_widget_set_sensitive(GTK_WIDGET(m_mnt_button_w[i]), FALSE);
     }
   } else {
     gdh_sVolumeInfo info;
@@ -212,12 +198,12 @@ void XttMethodToolbarGtk::set_current_sensitive()
       for (int i = 0; i < GeMethods::opmeth_size; i++) {
         if (m_op_method_mask & (1 << i)
             && !streq(GeMethods::op_image[i], ""))
-          gtk_widget_set_sensitive(m_op_button_w[i], FALSE);
+          gtk_widget_set_sensitive(GTK_WIDGET(m_op_button_w[i]), FALSE);
       }
       for (int i = 0; i < GeMethods::mntmeth_size; i++) {
         if (m_mnt_method_mask & (1 << i)
             && !streq(GeMethods::mnt_image[i], ""))
-          gtk_widget_set_sensitive(m_mnt_button_w[i], FALSE);
+          gtk_widget_set_sensitive(GTK_WIDGET(m_mnt_button_w[i]), FALSE);
       }
       return;
     }
@@ -245,18 +231,18 @@ void XttMethodToolbarGtk::set_current_sensitive()
       if (m_op_method_mask & (1 << i)
           && !streq(GeMethods::op_image[i], "")) {
         if (xm_mask.OpMethods & (1 << i))
-          gtk_widget_set_sensitive(m_op_button_w[i], TRUE);
+          gtk_widget_set_sensitive(GTK_WIDGET(m_op_button_w[i]), TRUE);
         else
-          gtk_widget_set_sensitive(m_op_button_w[i], FALSE);
+          gtk_widget_set_sensitive(GTK_WIDGET(m_op_button_w[i]), FALSE);
       }
     }
     for (int i = 0; i < GeMethods::mntmeth_size; i++) {
       if (m_mnt_method_mask & (1 << i)
           && !streq(GeMethods::mnt_image[i], "")) {
         if (xm_mask.MntMethods & (1 << i))
-          gtk_widget_set_sensitive(m_mnt_button_w[i], TRUE);
+          gtk_widget_set_sensitive(GTK_WIDGET(m_mnt_button_w[i]), TRUE);
         else
-          gtk_widget_set_sensitive(m_mnt_button_w[i], FALSE);
+          gtk_widget_set_sensitive(GTK_WIDGET(m_mnt_button_w[i]), FALSE);
       }
     }
     if (mask_store) {

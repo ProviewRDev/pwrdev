@@ -1,0 +1,36 @@
+
+toolbar * { 
+  min-width: 14px;
+  min-height: 14px;
+}
+
+separator { 
+  padding: 2px;
+  margin: 0px;
+}
+
+button { 
+  margin: 0px;
+  padding: 3px;
+}
+
+toolbutton button { 
+  margin: 0px;
+  padding: 3px;
+}
+
+#ind_gray { 
+  background-color: #d5d5d5
+}
+
+#ind_green { 
+  background-color: #50ff00
+}
+
+#ind_yellow { 
+  background-color: yellow;
+}
+
+#ind_red { 
+  background-color: #ff6060
+}

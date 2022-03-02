@@ -101,8 +101,8 @@ void XColWindGtk::change_value(int set_focus)
     text_w = cmd_scrolledinput;
     g_object_set(text_w, "visible", TRUE, NULL);
 
-    int w, h;
-    gdk_drawable_get_size(pane->window, &w, &h);
+    int h;
+    h = gdk_window_get_height(gtk_widget_get_window(pane));
     gtk_paned_set_position(GTK_PANED(pane), h - 170);
     if (set_focus)
       gtk_widget_grab_focus(cmd_scrolledtextview);
@@ -393,8 +393,8 @@ void XColWindGtk::change_value_close()
         set_prompt("");
         input_open = 0;
 
-        int w, h;
-        gdk_drawable_get_size(pane->window, &w, &h);
+        int h;
+        h = gdk_window_get_height(gtk_widget_get_window(pane));
         gtk_paned_set_position(GTK_PANED(pane), h - 50);
 
         xattnav->redraw();
@@ -409,8 +409,8 @@ void XColWindGtk::change_value_close()
       set_prompt("");
       input_open = 0;
 
-      int w, h;
-      gdk_drawable_get_size(pane->window, &w, &h);
+      int h;
+      h = gdk_window_get_height(gtk_widget_get_window(pane));
       gtk_paned_set_position(GTK_PANED(pane), h - 50);
 
       xattnav->redraw();
@@ -506,8 +506,8 @@ void XColWindGtk::activate_cmd_scrolled_ok(GtkWidget* w, gpointer data)
     xcolwind->set_prompt("");
     xcolwind->input_open = 0;
 
-    int w, h;
-    gdk_drawable_get_size(xcolwind->pane->window, &w, &h);
+    int h;
+    h = gdk_window_get_height(gtk_widget_get_window(xcolwind->pane));
     gtk_paned_set_position(GTK_PANED(xcolwind->pane), h - 50);
 
     xcolwind->xattnav->redraw();
@@ -523,8 +523,8 @@ void XColWindGtk::activate_cmd_scrolled_ca(GtkWidget* w, gpointer data)
   if (xcolwind->input_open) {
     g_object_set(xcolwind->cmd_scrolledinput, "visible", FALSE, NULL);
 
-    int w, h;
-    gdk_drawable_get_size(xcolwind->pane->window, &w, &h);
+    int h;
+    h = gdk_window_get_height(gtk_widget_get_window(xcolwind->pane));
     gtk_paned_set_position(GTK_PANED(xcolwind->pane), h - 50);
 
     xcolwind->set_prompt("");
@@ -606,7 +606,7 @@ XColWindGtk::XColWindGtk(GtkWidget* xa_parent_wid, void* xa_parent_ctx,
 
   CoWowGtk::SetWindowIcon(toplevel);
 
-  GtkWidget* vbox = gtk_vbox_new(FALSE, 0);
+  GtkWidget* vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 
   // Menu
   // Accelerators
@@ -617,18 +617,14 @@ XColWindGtk::XColWindGtk(GtkWidget* xa_parent_wid, void* xa_parent_ctx,
   GtkMenuBar* menu_bar = (GtkMenuBar*)g_object_new(GTK_TYPE_MENU_BAR, NULL);
 
   // File entry
-  GtkWidget* file_close = gtk_image_menu_item_new_with_mnemonic(
+  GtkWidget* file_close = gtk_menu_item_new_with_mnemonic(
       CoWowGtk::translate_utf8("_Close"));
-  gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(file_close),
-      gtk_image_new_from_stock("gtk-close", GTK_ICON_SIZE_MENU));
   g_signal_connect(file_close, "activate", G_CALLBACK(activate_exit), this);
   gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w',
       GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
 
-  GtkWidget* file_save = gtk_image_menu_item_new_with_mnemonic(
+  GtkWidget* file_save = gtk_menu_item_new_with_mnemonic(
       CoWowGtk::translate_utf8("_Save"));
-  gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(file_save),
-      gtk_image_new_from_stock("gtk-save", GTK_ICON_SIZE_MENU));
   g_signal_connect(file_save, "activate", G_CALLBACK(activate_save), this);
   gtk_widget_add_accelerator(file_save, "activate", accel_g, 's',
       GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
@@ -668,20 +664,20 @@ XColWindGtk::XColWindGtk(GtkWidget* xa_parent_wid, void* xa_parent_ctx,
   GtkWidget* edit_delete
       = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Delete"));
   g_signal_connect(edit_delete, "activate", G_CALLBACK(activate_delete), this);
-  gtk_widget_add_accelerator(edit_delete, "activate", accel_g, GDK_Delete,
+  gtk_widget_add_accelerator(edit_delete, "activate", accel_g, GDK_KEY_Delete,
       GdkModifierType(0), GTK_ACCEL_VISIBLE);
 
   GtkWidget* edit_moveup
       = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("Move _Up"));
   g_signal_connect(edit_moveup, "activate", G_CALLBACK(activate_moveup), this);
-  gtk_widget_add_accelerator(edit_moveup, "activate", accel_g, GDK_Up,
+  gtk_widget_add_accelerator(edit_moveup, "activate", accel_g, GDK_KEY_Up,
       GdkModifierType(GDK_SHIFT_MASK), GTK_ACCEL_VISIBLE);
 
   GtkWidget* edit_movedown
       = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("Move _Down"));
   g_signal_connect(
       edit_movedown, "activate", G_CALLBACK(activate_movedown), this);
-  gtk_widget_add_accelerator(edit_movedown, "activate", accel_g, GDK_Down,
+  gtk_widget_add_accelerator(edit_movedown, "activate", accel_g, GDK_KEY_Down,
       GdkModifierType(GDK_SHIFT_MASK), GTK_ACCEL_VISIBLE);
 
   GtkMenu* edit_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
@@ -754,24 +750,23 @@ XColWindGtk::XColWindGtk(GtkWidget* xa_parent_wid, void* xa_parent_ctx,
   // View Entry
 
   GtkWidget* view_zoom_in
-      = gtk_image_menu_item_new_from_stock(GTK_STOCK_ZOOM_IN, NULL);
-  g_signal_connect(view_zoom_in, "activate", G_CALLBACK(activate_zoomin), this);
+    = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("Zoom _in"));
+  g_signal_connect(
+      view_zoom_in, "activate", G_CALLBACK(activate_zoomin), this);
   gtk_widget_add_accelerator(view_zoom_in, "activate", accel_g, 'i',
-      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+      GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
   GtkWidget* view_zoom_out
-      = gtk_image_menu_item_new_from_stock(GTK_STOCK_ZOOM_OUT, NULL);
+    = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("Zoom _out"));
   g_signal_connect(
       view_zoom_out, "activate", G_CALLBACK(activate_zoomout), this);
   gtk_widget_add_accelerator(view_zoom_out, "activate", accel_g, 'o',
-      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+      GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
   GtkWidget* view_zoom_reset
-      = gtk_image_menu_item_new_from_stock(GTK_STOCK_ZOOM_100, NULL);
+    = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("Zoom _reset"));
   g_signal_connect(
       view_zoom_reset, "activate", G_CALLBACK(activate_zoomreset), this);
-  gtk_widget_add_accelerator(view_zoom_reset, "activate", accel_g, 'b',
-      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
 
   // Submenu ScanTime
   GSList* view_sc_group = NULL;
@@ -831,10 +826,8 @@ XColWindGtk::XColWindGtk(GtkWidget* xa_parent_wid, void* xa_parent_ctx,
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(view), GTK_WIDGET(view_menu));
 
   // Help entry
-  GtkWidget* help_help = gtk_image_menu_item_new_with_mnemonic(
+  GtkWidget* help_help = gtk_menu_item_new_with_mnemonic(
       CoWowGtk::translate_utf8("_Help"));
-  gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(help_help),
-      gtk_image_new_from_stock("gtk-help", GTK_ICON_SIZE_MENU));
   g_signal_connect(help_help, "activate", G_CALLBACK(activate_help), this);
   gtk_widget_add_accelerator(
       help_help, "activate", accel_g, 'h', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
@@ -847,7 +840,7 @@ XColWindGtk::XColWindGtk(GtkWidget* xa_parent_wid, void* xa_parent_ctx,
   gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), help);
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(help), GTK_WIDGET(help_menu));
 
-  pane = gtk_vpaned_new();
+  pane = gtk_paned_new(GTK_ORIENTATION_VERTICAL);
   memset(&ar, 0, sizeof(ar));
 
   switch (type) {
@@ -870,7 +863,7 @@ XColWindGtk::XColWindGtk(GtkWidget* xa_parent_wid, void* xa_parent_ctx,
   xattnav->is_authorized_cb = &xcolwind_is_authorized_cb;
   xattnav->init_cb = &init_cb;
 
-  GtkWidget* statusbar = gtk_hbox_new(FALSE, 0);
+  GtkWidget* statusbar = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   msg_label = gtk_label_new("");
   gtk_widget_set_size_request(msg_label, -1, 25);
   cmd_prompt = gtk_label_new("value > ");
@@ -911,11 +904,11 @@ XColWindGtk::XColWindGtk(GtkWidget* xa_parent_wid, void* xa_parent_ctx,
   g_signal_connect(
       cmd_scrolled_ca, "clicked", G_CALLBACK(activate_cmd_scrolled_ca), this);
 
-  GtkWidget* hboxbuttons = gtk_hbox_new(TRUE, 40);
+  GtkWidget* hboxbuttons = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 40);
   gtk_box_pack_start(GTK_BOX(hboxbuttons), cmd_scrolled_ok, FALSE, FALSE, 0);
   gtk_box_pack_end(GTK_BOX(hboxbuttons), cmd_scrolled_ca, FALSE, FALSE, 0);
 
-  cmd_scrolledinput = gtk_vbox_new(FALSE, 0);
+  cmd_scrolledinput = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start(GTK_BOX(cmd_scrolledinput), scrolledwindow, TRUE, TRUE, 0);
   gtk_box_pack_start(GTK_BOX(cmd_scrolledinput), hboxbuttons, FALSE, FALSE, 5);
 
@@ -927,8 +920,8 @@ XColWindGtk::XColWindGtk(GtkWidget* xa_parent_wid, void* xa_parent_ctx,
   g_object_set(cmd_input, "visible", FALSE, NULL);
   g_object_set(cmd_scrolledinput, "visible", FALSE, NULL);
 
-  int w, h;
-  gdk_drawable_get_size(pane->window, &w, &h);
+  int h;
+  h = gdk_window_get_height(gtk_widget_get_window(pane));
   gtk_paned_set_position(GTK_PANED(pane), h - 50);
 
   wow = new CoWowGtk(toplevel);

@@ -70,6 +70,8 @@ public:
   //! direction.
   int window_width; //!< Window width in pixel.
   int window_height; //!< Window height in pixel.
+  int old_window_width; //!< Old window width in pixel.
+  int old_window_height; //!< Old window height in pixel.
   int subwindow_x; //!< Subwindow x coordinate in pixel.
   int subwindow_y; //!< Subwindow y coordinate in pixel.
   double subwindow_scale; //!< Subwindow scale.
@@ -82,26 +84,12 @@ public:
       int offs_x, int offs_y)
       : window(0), zoom_factor_x(zoom_fact_x), zoom_factor_y(zoom_fact_y),
         base_zoom_factor(base_zoom_fact), offset_x(offs_x), offset_y(offs_y),
-        window_width(0), window_height(0), subwindow_x(0), subwindow_y(0),
+        window_width(0), window_height(0), old_window_width(0), 
+        old_window_height(0), subwindow_x(0), subwindow_y(0),
         subwindow_scale(1)
   {
   }
 
-  //! Draw in the double buffering buffer only.
-  /*! Increase the draw_buffer_only count. As long as this is > 0, no drawing is
-   * made to the screen, only in the buffer. */
-  void set_draw_buffer_only();
-
-  //! Reset draw in the double buffering buffer only.
-  /*! Decrease the draw_buffer_only count. As long as this is > 0, no drawing is
-   * made to the screen, only in the buffer. */
-  void reset_draw_buffer_only();
-
-  int draw_buffer_only();
-  int double_buffer_on();
-  int double_buffered();
-  void set_double_buffered(int val);
-  void set_double_buffer_on(int val);
 };
 
 //! Backcall data for scrollbar reconfiguration
@@ -631,6 +619,7 @@ public:
   /*! The zoomfactor of the navigation window is updated to match the extent of
    * the working space. */
   void nav_zoom();
+  void nav_zoom_invalidated();
 
   //! Zoom to appropriate scale for postscript output.
   void print_zoom();
@@ -651,6 +640,7 @@ public:
     pixel.
   */
   void nav_draw(GlowWind* w, int ll_x, int ll_y, int ur_x, int ur_y);
+  void nav_draw_invalidated(GlowWind* w, int ll_x, int ll_y, int ur_x, int ur_y);
 
   //! Redraw an area of the navigation window. Arguments in double.
   /*!

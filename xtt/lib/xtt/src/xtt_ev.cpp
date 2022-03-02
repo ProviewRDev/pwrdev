@@ -960,3 +960,10 @@ void Ev::view_shift()
     }
   }
 }
+
+void Ev::update_color_theme(int ct)
+{
+  brow_UpdateColorTheme(eve->brow->ctx, ct);
+  brow_UpdateColorTheme(ala->brow->ctx, ct);
+  brow_UpdateColorTheme(blk->brow->ctx, ct);
+}

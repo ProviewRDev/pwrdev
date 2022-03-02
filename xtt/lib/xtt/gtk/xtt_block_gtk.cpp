@@ -169,7 +169,7 @@ BlockGtk::BlockGtk(void* b_parent_ctx, GtkWidget* b_parent_wid,
   toggleNo = gtk_radio_button_new_with_label(bl_group, "No Blocking");
   bl_group = gtk_radio_button_get_group(GTK_RADIO_BUTTON(toggleNo));
 
-  GtkWidget* toggle_vbox = gtk_vbox_new(FALSE, 0);
+  GtkWidget* toggle_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start(GTK_BOX(toggle_vbox), toggleA, FALSE, FALSE, 7);
   gtk_box_pack_start(GTK_BOX(toggle_vbox), toggleB, FALSE, FALSE, 7);
   gtk_box_pack_start(GTK_BOX(toggle_vbox), toggleC, FALSE, FALSE, 7);
@@ -188,14 +188,14 @@ BlockGtk::BlockGtk(void* b_parent_ctx, GtkWidget* b_parent_wid,
   gtk_widget_set_size_request(buttonCancel, 70, 25);
   g_signal_connect(buttonCancel, "clicked", G_CALLBACK(activate_cancel), this);
 
-  GtkWidget* hboxbuttons = gtk_hbox_new(TRUE, 40);
+  GtkWidget* hboxbuttons = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 40);
   gtk_box_pack_start(GTK_BOX(hboxbuttons), buttonOk, FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(hboxbuttons), buttonApply, FALSE, FALSE, 0);
   gtk_box_pack_end(GTK_BOX(hboxbuttons), buttonCancel, FALSE, FALSE, 0);
 
-  GtkWidget* vbox = gtk_vbox_new(FALSE, 0);
+  GtkWidget* vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start(GTK_BOX(vbox), toggle_vbox, FALSE, FALSE, 15);
-  gtk_box_pack_start(GTK_BOX(vbox), gtk_hseparator_new(), FALSE, FALSE, 0);
+  gtk_box_pack_start(GTK_BOX(vbox), gtk_separator_new(GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 0);
   gtk_box_pack_end(GTK_BOX(vbox), hboxbuttons, FALSE, FALSE, 15);
   gtk_container_add(GTK_CONTAINER(toplevel), vbox);
   gtk_widget_show_all(toplevel);

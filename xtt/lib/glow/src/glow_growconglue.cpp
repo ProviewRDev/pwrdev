@@ -85,13 +85,11 @@ GrowConGlue::GrowConGlue(
   }
   get_node_borders();
   if (!nodraw)
-    draw(&ctx->mw, (GlowTransform*)NULL, highlight, hot, NULL, NULL);
+    draw();
 }
 
 GrowConGlue::~GrowConGlue()
 {
-  erase(&ctx->mw, (GlowTransform*)NULL, hot, NULL);
-  erase(&ctx->navw, (GlowTransform*)NULL, hot, NULL);
 }
 
 void GrowConGlue::configure(GlowCon* con)
@@ -430,7 +428,6 @@ void GrowConGlue::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
   idx_right = MAX(0, idx_right);
   idx_right = MIN(idx_right, DRAW_TYPE_SIZE - 1);
 
-  w->set_draw_buffer_only();
   if (lw_up != -1 && lw_down == -1 && lw_right == -1 && lw_left == -1) {
     // Up termination
     ctx->gdraw->fill_rect(
@@ -1211,38 +1208,6 @@ void GrowConGlue::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
     ctx->gdraw->line(w, ll_x, m_y, m_x, m_y, drawtype, idx, 0);
     ctx->gdraw->line(w, m_x, m_y, ur_x, m_y, drawtype, idx, 0);
   }
-  w->reset_draw_buffer_only();
-}
-
-void GrowConGlue::erase(GlowWind* w, GlowTransform* t, int hot, void* node)
-{
-  double x1, y1, x2, y2;
-  int ll_x, ll_y, ur_x, ur_y;
-
-  if (w == &ctx->navw) {
-    if (ctx->no_nav)
-      return;
-    hot = 0;
-  }
-
-  if (!t) {
-    x1 = x_left * w->zoom_factor_x - w->offset_x;
-    y1 = y_low * w->zoom_factor_y - w->offset_y;
-    x2 = x_right * w->zoom_factor_x - w->offset_x;
-    y2 = y_high * w->zoom_factor_y - w->offset_y;
-  } else {
-    x1 = t->x(x_left, y_low) * w->zoom_factor_x - w->offset_x;
-    y1 = t->y(x_left, y_low) * w->zoom_factor_y - w->offset_y;
-    x2 = t->x(x_right, y_high) * w->zoom_factor_x - w->offset_x;
-    y2 = t->y(x_right, y_high) * w->zoom_factor_y - w->offset_y;
-  }
-  ll_x = int(MIN(x1, x2) + 0.5);
-  ur_x = int(MAX(x1, x2) + 0.5);
-  ll_y = int(MIN(y1, y2) + 0.5);
-  ur_y = int(MAX(y1, y2) + 0.5);
-
-  ctx->gdraw->fill_rect(w, ll_x, ll_y, ur_x - ll_x + 1, ur_y - ll_y + 1,
-      glow_eDrawType_LineErase);
 }
 
 void GrowConGlue::draw()
@@ -1263,8 +1228,6 @@ void GrowConGlue::align(double x, double y, glow_eAlignDirection direction)
 {
   double dx, dy;
 
-  erase(&ctx->mw);
-  erase(&ctx->navw);
   ctx->set_defered_redraw();
   draw();
   switch (direction) {

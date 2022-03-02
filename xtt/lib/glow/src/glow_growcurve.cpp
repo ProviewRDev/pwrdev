@@ -50,7 +50,7 @@ GrowCurve::GrowCurve(GrowCtx* glow_ctx, const char* name, glow_sCurveData* data,
   if (data)
     configure_curves(data);
   if (!nodraw)
-    draw(&ctx->mw, (GlowTransform*)NULL, highlight, hot, NULL, NULL);
+    draw();
 }
 
 GrowCurve::~GrowCurve()
@@ -784,8 +784,6 @@ void GrowCurve::add_points(glow_sCurveData* data, unsigned int* no_of_points)
 
           //y_value = MAX(ll.y, MIN(y_value, ur.y));
         }
-        if (!fill)
-          erase(&ctx->mw);
 
         if (!fill_curve)
           curve[idx]->add_and_shift_y_value(y_value);
@@ -818,8 +816,6 @@ void GrowCurve::add_points(glow_sCurveData* data, unsigned int* no_of_points)
             //y_values[i] = MAX(ll.y, MIN(y_values[i], ur.y));
           }
         }
-        if (!fill)
-          erase(&ctx->mw);
 
         if (!fill_curve)
           curve[idx]->add_and_shift_y_values(y_values, no_of_points[0]);
@@ -832,9 +828,5 @@ void GrowCurve::add_points(glow_sCurveData* data, unsigned int* no_of_points)
     ctx->nodraw--;
 
     draw();
-    // draw( (GlowTransform *)NULL, highlight, hot, NULL, NULL);
-    ctx->nav_draw(
-        &ctx->navw, 0, 0, ctx->navw.window_width, ctx->navw.window_height);
-    // nav_draw( (GlowTransform *) NULL, highlight, NULL, NULL);
   }
 }

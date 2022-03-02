@@ -111,9 +111,9 @@ public:
       GlowWind* w, void* pos, int highlight, int hot, void* node){}
   virtual void draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
       void* node, void* colornode){}
-  virtual void erase(){}
-  virtual void erase(GlowWind* w, void* pos, int hot, void* node){}
-  virtual void erase(GlowWind* w, GlowTransform* t, int hot, void* node){}
+  //virtual void erase(){}
+  //virtual void erase(GlowWind* w, void* pos, int hot, void* node){}
+  //virtual void erase(GlowWind* w, GlowTransform* t, int hot, void* node){}
   virtual void draw_inverse(void* pos, int hot, void* node){}
   virtual void move(double delta_x, double delta_y, int grid){}
   virtual void move_noerase(int delta_x, int delta_y, int grid){}

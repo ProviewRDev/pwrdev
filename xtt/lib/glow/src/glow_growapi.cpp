@@ -726,14 +726,6 @@ void grow_SetAttributes(
     ctx->default_hot_mode = ctx->hot_mode = attr->default_hot_mode;
   if (mask & grow_eAttr_enable_bg_pixmap)
     ctx->enable_bg_pixmap = attr->enable_bg_pixmap;
-  if (mask & grow_eAttr_double_buffer_on) {
-    if (!ctx->mw.window->double_buffer_on)
-      ctx->mw.window->double_buffer_on = attr->double_buffer_on;
-    if (ctx->mw.window->double_buffer_on) {
-      ctx->gdraw->create_buffer(&ctx->mw);
-      // ctx->mw.window->double_buffered = 1;
-    }
-  }
   if (mask & grow_eAttr_hot_mode) {
     ctx->default_hot_mode = attr->hot_mode;
     ctx->hot_mode = attr->hot_mode;
@@ -789,8 +781,6 @@ void grow_GetAttributes(
     attr->default_hot_mode = ctx->default_hot_mode;
   if (mask & grow_eAttr_enable_bg_pixmap)
     attr->enable_bg_pixmap = ctx->enable_bg_pixmap;
-  if (mask & grow_eAttr_double_buffer_on)
-    attr->double_buffer_on = ctx->mw.window->double_buffer_on;
   if (mask & grow_eAttr_hot_mode)
     attr->hot_mode = ctx->hot_mode;
   if (mask & grow_eAttr_initial_position)
@@ -3557,11 +3547,6 @@ int grow_GetGraphAttrInfo(grow_tCtx ctx, grow_sAttrInfo** info, int* attr_cnt)
   attrinfo[i].type = glow_eType_Boolean;
   attrinfo[i++].size = sizeof(ctx->background_tiled);
 
-  strcpy(attrinfo[i].name, "DoubleBuffered");
-  attrinfo[i].value_p = &ctx->mw.window->double_buffered;
-  attrinfo[i].type = glow_eType_Boolean;
-  attrinfo[i++].size = sizeof(ctx->mw.window->double_buffered);
-
   strcpy(attrinfo[i].name, "MB3Action");
   attrinfo[i].value_p = &ctx->mb3_action;
   attrinfo[i].type = glow_eType_MB3Action;
@@ -3572,10 +3557,10 @@ int grow_GetGraphAttrInfo(grow_tCtx ctx, grow_sAttrInfo** info, int* attr_cnt)
   attrinfo[i].type = glow_eType_Boolean;
   attrinfo[i++].size = sizeof(ctx->translate_on);
 
-  strcpy(attrinfo[i].name, "BitmapFonts");
-  attrinfo[i].value_p = &ctx->bitmap_fonts;
+  strcpy(attrinfo[i].name, "AntiAliasing");
+  attrinfo[i].value_p = &ctx->anti_aliasing;
   attrinfo[i].type = glow_eType_Boolean;
-  attrinfo[i++].size = sizeof(ctx->bitmap_fonts);
+  attrinfo[i++].size = sizeof(ctx->anti_aliasing);
 
   strcpy(attrinfo[i].name, "HotIndication");
   attrinfo[i].value_p = &ctx->hot_indication;
@@ -3699,7 +3684,7 @@ void grow_UpdateObject(grow_tCtx ctx, grow_tObject object, grow_sAttrInfo* info)
     ((GrowRect*)object)->zoom();
     ((GrowRect*)object)->nav_zoom();
     ((GrowRect*)object)->get_node_borders();
-    ((GrowRect*)object)->draw(&ctx->mw, INT_MIN, INT_MIN, INT_MAX, INT_MAX);
+    ((GrowRect*)object)->draw();
     break;
   case glow_eObjectType_GrowRectRounded:
     // Set changed dynamic
@@ -3732,7 +3717,7 @@ void grow_UpdateObject(grow_tCtx ctx, grow_tObject object, grow_sAttrInfo* info)
     ((GrowRectRounded*)object)->zoom();
     ((GrowRectRounded*)object)->nav_zoom();
     ((GrowRectRounded*)object)->get_node_borders();
-    ((GrowRectRounded*)object)->draw(&ctx->mw, INT_MIN, INT_MIN, INT_MAX, INT_MAX);
+    ((GrowRectRounded*)object)->draw();
     break;
   case glow_eObjectType_GrowPolyLine:
     // Set changed dynamic
@@ -3765,7 +3750,7 @@ void grow_UpdateObject(grow_tCtx ctx, grow_tObject object, grow_sAttrInfo* info)
     ((GrowPolyLine*)object)->zoom();
     ((GrowPolyLine*)object)->nav_zoom();
     ((GrowPolyLine*)object)->get_node_borders();
-    ((GrowPolyLine*)object)->draw(&ctx->mw, INT_MIN, INT_MIN, INT_MAX, INT_MAX);
+    ((GrowPolyLine*)object)->draw();
     break;
   case glow_eObjectType_GrowLine:
     info_p = info;
@@ -3796,7 +3781,7 @@ void grow_UpdateObject(grow_tCtx ctx, grow_tObject object, grow_sAttrInfo* info)
     ((GrowLine*)object)->zoom();
     ((GrowLine*)object)->nav_zoom();
     ((GrowLine*)object)->get_node_borders();
-    ((GrowLine*)object)->draw(&ctx->mw, INT_MIN, INT_MIN, INT_MAX, INT_MAX);
+    ((GrowLine*)object)->draw();
     break;
   case glow_eObjectType_GrowArc:
     info_p = info;
@@ -3827,14 +3812,14 @@ void grow_UpdateObject(grow_tCtx ctx, grow_tObject object, grow_sAttrInfo* info)
     ((GrowArc*)object)->zoom();
     ((GrowArc*)object)->nav_zoom();
     ((GrowArc*)object)->get_node_borders();
-    ((GrowArc*)object)->draw(&ctx->mw, INT_MIN, INT_MIN, INT_MAX, INT_MAX);
+    ((GrowArc*)object)->draw();
     break;
   case glow_eObjectType_GrowConPoint:
     ((GrowConPoint*)object)->move(0, 0, 0);
     ((GrowConPoint*)object)->zoom();
     ((GrowConPoint*)object)->nav_zoom();
     ((GrowConPoint*)object)->get_node_borders();
-    ((GrowConPoint*)object)->draw(&ctx->mw, INT_MIN, INT_MIN, INT_MAX, INT_MAX);
+    ((GrowConPoint*)object)->draw();
     break;
   case glow_eObjectType_GrowSubAnnot:
     ((GrowSubAnnot*)object)->text.text_size
@@ -3845,7 +3830,7 @@ void grow_UpdateObject(grow_tCtx ctx, grow_tObject object, grow_sAttrInfo* info)
     ((GrowSubAnnot*)object)->zoom();
     ((GrowSubAnnot*)object)->nav_zoom();
     ((GrowSubAnnot*)object)->get_node_borders();
-    ((GrowSubAnnot*)object)->draw(&ctx->mw, INT_MIN, INT_MIN, INT_MAX, INT_MAX);
+    ((GrowSubAnnot*)object)->draw();
     break;
   case glow_eObjectType_GrowText:
 
@@ -3883,7 +3868,7 @@ void grow_UpdateObject(grow_tCtx ctx, grow_tObject object, grow_sAttrInfo* info)
     ((GrowText*)object)->zoom();
     ((GrowText*)object)->nav_zoom();
     ((GrowText*)object)->get_node_borders();
-    ((GrowText*)object)->draw(&ctx->mw, INT_MIN, INT_MIN, INT_MAX, INT_MAX);
+    ((GrowText*)object)->draw();
     break;
   case glow_eObjectType_GrowImage:
     // Set changed dynamic
@@ -3920,7 +3905,7 @@ void grow_UpdateObject(grow_tCtx ctx, grow_tObject object, grow_sAttrInfo* info)
     ((GrowImage*)object)->zoom();
     ((GrowImage*)object)->nav_zoom();
     ((GrowImage*)object)->get_node_borders();
-    ((GrowImage*)object)->draw(&ctx->mw, INT_MIN, INT_MIN, INT_MAX, INT_MAX);
+    ((GrowImage*)object)->draw();
     break;
   case glow_eObjectType_GrowBar:
     // Set changed dynamic
@@ -3953,7 +3938,7 @@ void grow_UpdateObject(grow_tCtx ctx, grow_tObject object, grow_sAttrInfo* info)
     ((GrowBar*)object)->zoom();
     ((GrowBar*)object)->nav_zoom();
     ((GrowBar*)object)->get_node_borders();
-    ((GrowBar*)object)->draw(&ctx->mw, INT_MIN, INT_MIN, INT_MAX, INT_MAX);
+    ((GrowBar*)object)->draw();
     break;
   case glow_eObjectType_GrowTrend:
   case glow_eObjectType_GrowXYCurve:
@@ -3988,7 +3973,7 @@ void grow_UpdateObject(grow_tCtx ctx, grow_tObject object, grow_sAttrInfo* info)
     ((GrowTrend*)object)->zoom();
     ((GrowTrend*)object)->nav_zoom();
     ((GrowTrend*)object)->get_node_borders();
-    ((GrowTrend*)object)->draw(&ctx->mw, INT_MIN, INT_MIN, INT_MAX, INT_MAX);
+    ((GrowTrend*)object)->draw();
     break;
   case glow_eObjectType_GrowWindow:
     ((GrowWindow*)object)->update_attributes();
@@ -4031,7 +4016,7 @@ void grow_UpdateObject(grow_tCtx ctx, grow_tObject object, grow_sAttrInfo* info)
     ((GrowAxis*)object)->zoom();
     ((GrowAxis*)object)->nav_zoom();
     ((GrowAxis*)object)->get_node_borders();
-    ((GrowAxis*)object)->draw(&ctx->mw, INT_MIN, INT_MIN, INT_MAX, INT_MAX);
+    ((GrowAxis*)object)->draw();
     break;
   case glow_eObjectType_GrowAxisArc:
     // Set changed dynamic
@@ -4065,7 +4050,7 @@ void grow_UpdateObject(grow_tCtx ctx, grow_tObject object, grow_sAttrInfo* info)
     ((GrowAxisArc*)object)->zoom();
     ((GrowAxisArc*)object)->nav_zoom();
     ((GrowAxisArc*)object)->get_node_borders();
-    ((GrowAxisArc*)object)->draw(&ctx->mw, INT_MIN, INT_MIN, INT_MAX, INT_MAX);
+    ((GrowAxisArc*)object)->draw();
     break;
   case glow_eObjectType_GrowPie:
     // Set changed dynamic
@@ -4098,7 +4083,7 @@ void grow_UpdateObject(grow_tCtx ctx, grow_tObject object, grow_sAttrInfo* info)
     ((GrowAxisArc*)object)->zoom();
     ((GrowAxisArc*)object)->nav_zoom();
     ((GrowAxisArc*)object)->get_node_borders();
-    ((GrowAxisArc*)object)->draw(&ctx->mw, INT_MIN, INT_MIN, INT_MAX, INT_MAX);
+    ((GrowAxisArc*)object)->draw();
     break;
   case glow_eObjectType_GrowNode:
   case glow_eObjectType_GrowGroup:
@@ -4149,7 +4134,7 @@ void grow_UpdateObject(grow_tCtx ctx, grow_tObject object, grow_sAttrInfo* info)
     ((GrowNode*)object)->zoom();
     ((GrowNode*)object)->nav_zoom();
     ((GrowNode*)object)->get_node_borders();
-    ((GrowNode*)object)->draw(&ctx->mw, INT_MIN, INT_MIN, INT_MAX, INT_MAX);
+    ((GrowNode*)object)->draw();
     break;
   case glow_eObjectType_GrowSlider:
     // Set changed annotations
@@ -4199,7 +4184,7 @@ void grow_UpdateObject(grow_tCtx ctx, grow_tObject object, grow_sAttrInfo* info)
     ((GrowNode*)object)->zoom();
     ((GrowNode*)object)->nav_zoom();
     ((GrowNode*)object)->get_node_borders();
-    ((GrowNode*)object)->draw(&ctx->mw, INT_MIN, INT_MIN, INT_MAX, INT_MAX);
+    ((GrowNode*)object)->draw();
     break;
   case glow_eObjectType_GrowDashCell:
     ((GrowDashCell*)object)->update_attributes();
@@ -6118,6 +6103,11 @@ void grow_SetGraphBorders(grow_tCtx ctx, double x0, double y0, double x1, double
   ((GrowCtx*)ctx)->y0 = y0;
   ((GrowCtx*)ctx)->x1 = x1;
   ((GrowCtx*)ctx)->y1 = y1;
+}
+
+void grow_GetBorders(grow_tCtx ctx)
+{
+  ((GrowCtx*)ctx)->get_borders();
 }
 
 void grow_DisableSubwindowEvents(grow_tCtx ctx, int disable)

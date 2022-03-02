@@ -79,7 +79,7 @@ NodelistGtk::NodelistGtk(void* nodelist_parent_ctx,
 
   CoWowGtk::SetWindowIcon(toplevel);
 
-  GtkWidget* vbox = gtk_vbox_new(FALSE, 0);
+  GtkWidget* vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 
   // Menu
   // Accelerators
@@ -90,10 +90,8 @@ NodelistGtk::NodelistGtk(void* nodelist_parent_ctx,
   GtkMenuBar* menu_bar = (GtkMenuBar*)g_object_new(GTK_TYPE_MENU_BAR, NULL);
 
   // File entry
-  GtkWidget* file_close = gtk_image_menu_item_new_with_mnemonic(
+  GtkWidget* file_close = gtk_menu_item_new_with_mnemonic(
       CoWowGtk::translate_utf8("_Close"));
-  gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(file_close),
-      gtk_image_new_from_stock("gtk-close", GTK_ICON_SIZE_MENU));
   g_signal_connect(file_close, "activate", G_CALLBACK(activate_exit), this);
   gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w',
       GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
@@ -114,34 +112,23 @@ NodelistGtk::NodelistGtk(void* nodelist_parent_ctx,
       file_remove_node, "activate", G_CALLBACK(activate_remove_node), this);
 
   pwr_tFileName fname;
-  GtkWidget* file_open_xtt = gtk_image_menu_item_new_with_mnemonic(
+  GtkWidget* file_open_xtt = gtk_menu_item_new_with_mnemonic(
       CoWowGtk::translate_utf8("Open Runtime _Navigator"));
-  dcli_translate_filename(fname, "$pwr_exe/xtt_navigator.png");
-  gtk_image_menu_item_set_image(
-      GTK_IMAGE_MENU_ITEM(file_open_xtt), gtk_image_new_from_file(fname));
   g_signal_connect(
       file_open_xtt, "activate", G_CALLBACK(activate_open_xtt), this);
 
-  GtkWidget* file_open_opplace = gtk_image_menu_item_new_with_mnemonic(
+  GtkWidget* file_open_opplace = gtk_menu_item_new_with_mnemonic(
       CoWowGtk::translate_utf8("_Open Operatorplace"));
-  dcli_translate_filename(fname, "$pwr_exe/xtt_op.png");
-  gtk_image_menu_item_set_image(
-      GTK_IMAGE_MENU_ITEM(file_open_opplace), gtk_image_new_from_file(fname));
   g_signal_connect(
       file_open_opplace, "activate", G_CALLBACK(activate_open_opplace), this);
 
-  GtkWidget* file_open_rtmon = gtk_image_menu_item_new_with_mnemonic(
+  GtkWidget* file_open_rtmon = gtk_menu_item_new_with_mnemonic(
       CoWowGtk::translate_utf8("Open Runtime _Monitor"));
-  dcli_translate_filename(fname, "$pwr_exe/xtt_rtmon.png");
-  gtk_image_menu_item_set_image(
-      GTK_IMAGE_MENU_ITEM(file_open_rtmon), gtk_image_new_from_file(fname));
   g_signal_connect(
       file_open_rtmon, "activate", G_CALLBACK(activate_open_rtmon), this);
 
-  GtkWidget* file_save = gtk_image_menu_item_new_with_mnemonic(
+  GtkWidget* file_save = gtk_menu_item_new_with_mnemonic(
       CoWowGtk::translate_utf8("_Save Configuration"));
-  gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(file_save),
-      gtk_image_new_from_stock("gtk-save", GTK_ICON_SIZE_MENU));
   g_signal_connect(file_save, "activate", G_CALLBACK(activate_save), this);
 
   GtkWidget* file_reconnect = gtk_menu_item_new_with_mnemonic(
@@ -253,28 +240,22 @@ NodelistGtk::NodelistGtk(void* nodelist_parent_ctx,
   gtk_menu_item_set_submenu(
       GTK_MENU_ITEM(view_mode), GTK_WIDGET(view_mode_menu));
 
-  GtkWidget* view_zoom_in = gtk_image_menu_item_new_with_mnemonic(
+  GtkWidget* view_zoom_in = gtk_menu_item_new_with_mnemonic(
       CoWowGtk::translate_utf8("Zoom _In"));
-  gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(view_zoom_in),
-      gtk_image_new_from_stock("gtk-zoom-in", GTK_ICON_SIZE_MENU));
   g_signal_connect(
       view_zoom_in, "activate", G_CALLBACK(activate_zoom_in), this);
   gtk_widget_add_accelerator(view_zoom_in, "activate", accel_g, 'i',
       GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
-  GtkWidget* view_zoom_out = gtk_image_menu_item_new_with_mnemonic(
+  GtkWidget* view_zoom_out = gtk_menu_item_new_with_mnemonic(
       CoWowGtk::translate_utf8("Zoom _Out"));
-  gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(view_zoom_out),
-      gtk_image_new_from_stock("gtk-zoom-out", GTK_ICON_SIZE_MENU));
   g_signal_connect(
       view_zoom_out, "activate", G_CALLBACK(activate_zoom_out), this);
   gtk_widget_add_accelerator(view_zoom_out, "activate", accel_g, 'o',
       GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
-  GtkWidget* view_zoom_reset = gtk_image_menu_item_new_with_mnemonic(
+  GtkWidget* view_zoom_reset = gtk_menu_item_new_with_mnemonic(
       CoWowGtk::translate_utf8("Zoom _Reset"));
-  gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(view_zoom_reset),
-      gtk_image_new_from_stock("gtk-zoom-100", GTK_ICON_SIZE_MENU));
   g_signal_connect(
       view_zoom_reset, "activate", G_CALLBACK(activate_zoom_reset), this);
 
@@ -293,10 +274,8 @@ NodelistGtk::NodelistGtk(void* nodelist_parent_ctx,
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(view), GTK_WIDGET(view_menu));
 
   // Menu Help
-  GtkWidget* help_help = gtk_image_menu_item_new_with_mnemonic(
+  GtkWidget* help_help = gtk_menu_item_new_with_mnemonic(
       CoWowGtk::translate_utf8("_Help"));
-  gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(help_help),
-      gtk_image_new_from_stock("gtk-help", GTK_ICON_SIZE_MENU));
   g_signal_connect(help_help, "activate", G_CALLBACK(activate_help), this);
   gtk_widget_add_accelerator(
       help_help, "activate", accel_g, 'h', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
@@ -319,97 +298,81 @@ NodelistGtk::NodelistGtk(void* nodelist_parent_ctx,
   // Toolbar
   GtkToolbar* tools = (GtkToolbar*)g_object_new(GTK_TYPE_TOOLBAR, NULL);
 
-  GtkWidget* tools_save = gtk_button_new();
-  gtk_container_add(GTK_CONTAINER(tools_save),
-      gtk_image_new_from_stock("gtk-save", GTK_ICON_SIZE_SMALL_TOOLBAR));
+  GtkToolItem* tools_save = gtk_tool_button_new(gtk_image_new_from_icon_name("gtk-save", GTK_ICON_SIZE_SMALL_TOOLBAR), NULL);
   g_signal_connect(tools_save, "clicked", G_CALLBACK(activate_save), this);
   g_object_set(tools_save, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(
-      tools, tools_save, CoWowGtk::translate_utf8("Save configuration"), "");
+  gtk_toolbar_insert(tools, tools_save, -1);
+  gtk_tool_item_set_tooltip_text(tools_save, CoWowGtk::translate_utf8("Save configuration"));
 
-  GtkWidget* tools_add_node = gtk_button_new();
-  gtk_container_add(GTK_CONTAINER(tools_add_node),
-      gtk_image_new_from_stock("gtk-add", GTK_ICON_SIZE_SMALL_TOOLBAR));
+  GtkToolItem* tools_add_node = gtk_tool_button_new(gtk_image_new_from_icon_name("gtk-add", GTK_ICON_SIZE_SMALL_TOOLBAR), NULL);
   g_signal_connect(
       tools_add_node, "clicked", G_CALLBACK(activate_add_node), this);
   g_object_set(tools_add_node, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(
-      tools, tools_add_node, CoWowGtk::translate_utf8("Add node"), "");
+  gtk_toolbar_insert(tools, tools_add_node, -1);
+  gtk_tool_item_set_tooltip_text(tools_add_node, CoWowGtk::translate_utf8("Add node"));
 
-  GtkWidget* tools_remove_node = gtk_button_new();
-  gtk_container_add(GTK_CONTAINER(tools_remove_node),
-      gtk_image_new_from_stock("gtk-remove", GTK_ICON_SIZE_SMALL_TOOLBAR));
+  GtkToolItem* tools_remove_node = gtk_tool_button_new(gtk_image_new_from_icon_name("gtk-remove", GTK_ICON_SIZE_SMALL_TOOLBAR), NULL);
   g_signal_connect(
       tools_remove_node, "clicked", G_CALLBACK(activate_remove_node), this);
   g_object_set(tools_remove_node, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(
-      tools, tools_remove_node, CoWowGtk::translate_utf8("Remove node"), "");
+  gtk_toolbar_insert(tools, tools_remove_node, -1);
+  gtk_tool_item_set_tooltip_text(tools_remove_node, CoWowGtk::translate_utf8("Remove node"));
 
-  GtkWidget* tools_xtt = gtk_button_new();
   dcli_translate_filename(fname, "$pwr_exe/xtt_navigator.png");
-  gtk_container_add(GTK_CONTAINER(tools_xtt), gtk_image_new_from_file(fname));
+  GtkToolItem* tools_xtt = gtk_tool_button_new(gtk_image_new_from_file(fname), NULL);
   g_signal_connect(tools_xtt, "clicked", G_CALLBACK(activate_open_xtt), this);
   g_object_set(tools_xtt, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(tools, tools_xtt,
-      CoWowGtk::translate_utf8("Start Runtime Navigator on selected node"), "");
+  gtk_toolbar_insert(tools, tools_xtt, -1);
+  gtk_tool_item_set_tooltip_text(tools_xtt, 
+      CoWowGtk::translate_utf8("Start Runtime Navigator on selected node"));
 
-  GtkWidget* tools_op = gtk_button_new();
   dcli_translate_filename(fname, "$pwr_exe/xtt_op.png");
-  gtk_container_add(GTK_CONTAINER(tools_op), gtk_image_new_from_file(fname));
+  GtkToolItem* tools_op = gtk_tool_button_new(gtk_image_new_from_file(fname), NULL);
   g_signal_connect(
       tools_op, "clicked", G_CALLBACK(activate_open_opplace), this);
   g_object_set(tools_op, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(tools, tools_op,
-      CoWowGtk::translate_utf8("Start Operatorplace on selected node"), "");
+  gtk_toolbar_insert(tools, tools_op, -1);
+  gtk_tool_item_set_tooltip_text(tools_op, CoWowGtk::translate_utf8("Start Operatorplace on selected node"));
 
-  GtkWidget* tools_rtmon = gtk_button_new();
   dcli_translate_filename(fname, "$pwr_exe/xtt_rtmon.png");
-  gtk_container_add(GTK_CONTAINER(tools_rtmon), gtk_image_new_from_file(fname));
+  GtkToolItem* tools_rtmon = gtk_tool_button_new(gtk_image_new_from_file(fname), NULL);
   g_signal_connect(
       tools_rtmon, "clicked", G_CALLBACK(activate_open_rtmon), this);
   g_object_set(tools_rtmon, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(tools, tools_rtmon,
-      CoWowGtk::translate_utf8("Start Runtime Monitor on selected node"), "");
+  gtk_toolbar_insert(tools, tools_rtmon, -1);
+  gtk_tool_item_set_tooltip_text(tools_rtmon, CoWowGtk::translate_utf8("Start Runtime Monitor on selected node"));
 
-  GtkWidget* tools_zoom_in = gtk_button_new();
   dcli_translate_filename(fname, "$pwr_exe/xtt_zoom_in.png");
-  gtk_container_add(
-      GTK_CONTAINER(tools_zoom_in), gtk_image_new_from_file(fname));
+  GtkToolItem* tools_zoom_in = gtk_tool_button_new(gtk_image_new_from_file(fname), NULL);
   g_signal_connect(
       tools_zoom_in, "clicked", G_CALLBACK(activate_zoom_in), this);
   g_object_set(tools_zoom_in, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(
-      tools, tools_zoom_in, CoWowGtk::translate_utf8("Zoom in"), "");
+  gtk_toolbar_insert(tools, tools_zoom_in, -1);
+  gtk_tool_item_set_tooltip_text(tools_zoom_in, CoWowGtk::translate_utf8("Zoom in"));
 
-  GtkWidget* tools_zoom_out = gtk_button_new();
   dcli_translate_filename(fname, "$pwr_exe/xtt_zoom_out.png");
-  gtk_container_add(
-      GTK_CONTAINER(tools_zoom_out), gtk_image_new_from_file(fname));
+  GtkToolItem* tools_zoom_out = gtk_tool_button_new(gtk_image_new_from_file(fname), NULL);
   g_signal_connect(
       tools_zoom_out, "clicked", G_CALLBACK(activate_zoom_out), this);
   g_object_set(tools_zoom_out, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(
-      tools, tools_zoom_out, CoWowGtk::translate_utf8("Zoom out"), "");
+  gtk_toolbar_insert(tools, tools_zoom_out, -1);
+  gtk_tool_item_set_tooltip_text(tools_zoom_out, CoWowGtk::translate_utf8("Zoom out"));
 
-  GtkWidget* tools_zoom_reset = gtk_button_new();
   dcli_translate_filename(fname, "$pwr_exe/xtt_zoom_reset.png");
-  gtk_container_add(
-      GTK_CONTAINER(tools_zoom_reset), gtk_image_new_from_file(fname));
+  GtkToolItem* tools_zoom_reset = gtk_tool_button_new(gtk_image_new_from_file(fname), NULL);
   g_signal_connect(
       tools_zoom_reset, "clicked", G_CALLBACK(activate_zoom_reset), this);
   g_object_set(tools_zoom_reset, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(
-      tools, tools_zoom_reset, CoWowGtk::translate_utf8("Zoom reset"), "");
+  gtk_toolbar_insert(tools, tools_zoom_reset, -1);
+  gtk_tool_item_set_tooltip_text(tools_zoom_reset, CoWowGtk::translate_utf8("Zoom reset"));
 
-  GtkWidget* tools_reconnect = gtk_button_new();
   dcli_translate_filename(fname, "$pwr_exe/xtt_reconnect.png");
-  gtk_container_add(
-      GTK_CONTAINER(tools_reconnect), gtk_image_new_from_file(fname));
+  GtkToolItem* tools_reconnect = gtk_tool_button_new(gtk_image_new_from_file(fname), NULL);
   g_signal_connect(
       tools_reconnect, "clicked", G_CALLBACK(activate_reconnect), this);
   g_object_set(tools_reconnect, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(
-      tools, tools_reconnect, CoWowGtk::translate_utf8("Reconnect"), "");
+  gtk_toolbar_insert(tools, tools_reconnect, -1);
+  gtk_tool_item_set_tooltip_text(tools_reconnect, CoWowGtk::translate_utf8("Reconnect"));
 
   gtk_box_pack_start(GTK_BOX(vbox), GTK_WIDGET(menu_bar), FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(vbox), GTK_WIDGET(tools), FALSE, FALSE, 0);
@@ -445,19 +408,19 @@ void NodelistGtk::set_clock_cursor()
     clock_cursor = gdk_cursor_new_for_display(
         gtk_widget_get_display(toplevel), GDK_WATCH);
 
-  gdk_window_set_cursor(toplevel->window, clock_cursor);
+  gdk_window_set_cursor(gtk_widget_get_window(toplevel), clock_cursor);
   gdk_display_flush(gtk_widget_get_display(toplevel));
 }
 
 void NodelistGtk::reset_cursor()
 {
-  gdk_window_set_cursor(toplevel->window, NULL);
+  gdk_window_set_cursor(gtk_widget_get_window(toplevel), NULL);
 }
 
 void NodelistGtk::free_cursor()
 {
   if (clock_cursor)
-    gdk_cursor_unref(clock_cursor);
+    g_object_unref(clock_cursor);
 }
 
 gboolean NodelistGtk::action_inputfocus(
@@ -760,7 +723,7 @@ void NodelistGtk::create_add_input_dialog()
   add_india_label3 = gtk_label_new("");
   add_india_label4 = gtk_label_new("");
   GtkWidget* add_india_image = (GtkWidget*)g_object_new(GTK_TYPE_IMAGE, "stock",
-      GTK_STOCK_DIALOG_QUESTION, "icon-size", GTK_ICON_SIZE_DIALOG, "xalign",
+      "gtk-dialog-question", "icon-size", GTK_ICON_SIZE_DIALOG, "xalign",
       0.5, "yalign", 0.4, NULL);
 
   GtkWidget* add_india_ok = gtk_button_new_with_label("Ok");
@@ -772,7 +735,7 @@ void NodelistGtk::create_add_input_dialog()
   g_signal_connect(add_india_cancel, "clicked",
       G_CALLBACK(NodelistGtk::activate_add_india_cancel), this);
 
-  GtkWidget* add_india_vboxtext = gtk_vbox_new(FALSE, 0);
+  GtkWidget* add_india_vboxtext = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start(
       GTK_BOX(add_india_vboxtext), add_india_text, FALSE, FALSE, 12);
   gtk_box_pack_start(
@@ -782,7 +745,7 @@ void NodelistGtk::create_add_input_dialog()
   gtk_box_pack_start(
       GTK_BOX(add_india_vboxtext), add_india_text4, FALSE, FALSE, 12);
 
-  GtkWidget* add_india_vboxlabel = gtk_vbox_new(FALSE, 0);
+  GtkWidget* add_india_vboxlabel = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start(
       GTK_BOX(add_india_vboxlabel), add_india_label, FALSE, FALSE, 15);
   gtk_box_pack_start(
@@ -792,7 +755,7 @@ void NodelistGtk::create_add_input_dialog()
   gtk_box_pack_start(
       GTK_BOX(add_india_vboxlabel), add_india_label4, FALSE, FALSE, 15);
 
-  GtkWidget* add_india_hboxtext = gtk_hbox_new(FALSE, 0);
+  GtkWidget* add_india_hboxtext = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   gtk_box_pack_start(
       GTK_BOX(add_india_hboxtext), add_india_image, FALSE, FALSE, 40);
   gtk_box_pack_start(
@@ -800,17 +763,17 @@ void NodelistGtk::create_add_input_dialog()
   gtk_box_pack_end(
       GTK_BOX(add_india_hboxtext), add_india_vboxtext, TRUE, TRUE, 30);
 
-  GtkWidget* add_india_hboxbuttons = gtk_hbox_new(TRUE, 40);
+  GtkWidget* add_india_hboxbuttons = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 40);
   gtk_box_pack_start(
       GTK_BOX(add_india_hboxbuttons), add_india_ok, FALSE, FALSE, 0);
   gtk_box_pack_end(
       GTK_BOX(add_india_hboxbuttons), add_india_cancel, FALSE, FALSE, 0);
 
-  GtkWidget* add_india_vbox = gtk_vbox_new(FALSE, 0);
+  GtkWidget* add_india_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start(
       GTK_BOX(add_india_vbox), add_india_hboxtext, TRUE, TRUE, 30);
   gtk_box_pack_start(
-      GTK_BOX(add_india_vbox), gtk_hseparator_new(), FALSE, FALSE, 0);
+      GTK_BOX(add_india_vbox), gtk_separator_new(GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 0);
   gtk_box_pack_end(
       GTK_BOX(add_india_vbox), add_india_hboxbuttons, FALSE, FALSE, 15);
   gtk_container_add(GTK_CONTAINER(add_india_widget), add_india_vbox);
@@ -938,7 +901,7 @@ void NodelistGtk::create_mod_input_dialog()
   mod_india_label3 = gtk_label_new("");
   mod_india_label4 = gtk_label_new("");
   GtkWidget* mod_india_image = (GtkWidget*)g_object_new(GTK_TYPE_IMAGE, "stock",
-      GTK_STOCK_DIALOG_QUESTION, "icon-size", GTK_ICON_SIZE_DIALOG, "xalign",
+      "gtk-dialog-question", "icon-size", GTK_ICON_SIZE_DIALOG, "xalign",
       0.5, "yalign", 0.4, NULL);
 
   GtkWidget* mod_india_ok = gtk_button_new_with_label("Ok");
@@ -950,7 +913,7 @@ void NodelistGtk::create_mod_input_dialog()
   g_signal_connect(mod_india_cancel, "clicked",
       G_CALLBACK(NodelistGtk::activate_mod_india_cancel), this);
 
-  GtkWidget* mod_india_vboxtext = gtk_vbox_new(FALSE, 0);
+  GtkWidget* mod_india_vboxtext = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start(
       GTK_BOX(mod_india_vboxtext), mod_india_text, FALSE, FALSE, 12);
   gtk_box_pack_start(
@@ -960,7 +923,7 @@ void NodelistGtk::create_mod_input_dialog()
   gtk_box_pack_start(
       GTK_BOX(mod_india_vboxtext), mod_india_text4, FALSE, FALSE, 12);
 
-  GtkWidget* mod_india_vboxlabel = gtk_vbox_new(FALSE, 0);
+  GtkWidget* mod_india_vboxlabel = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start(
       GTK_BOX(mod_india_vboxlabel), mod_india_label, FALSE, FALSE, 15);
   gtk_box_pack_start(
@@ -970,7 +933,7 @@ void NodelistGtk::create_mod_input_dialog()
   gtk_box_pack_start(
       GTK_BOX(mod_india_vboxlabel), mod_india_label4, FALSE, FALSE, 15);
 
-  GtkWidget* mod_india_hboxtext = gtk_hbox_new(FALSE, 0);
+  GtkWidget* mod_india_hboxtext = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start(
       GTK_BOX(mod_india_hboxtext), mod_india_image, FALSE, FALSE, 40);
   gtk_box_pack_start(
@@ -978,17 +941,16 @@ void NodelistGtk::create_mod_input_dialog()
   gtk_box_pack_end(
       GTK_BOX(mod_india_hboxtext), mod_india_vboxtext, TRUE, TRUE, 30);
 
-  GtkWidget* mod_india_hboxbuttons = gtk_hbox_new(TRUE, 40);
+  GtkWidget* mod_india_hboxbuttons = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 40);
   gtk_box_pack_start(
       GTK_BOX(mod_india_hboxbuttons), mod_india_ok, FALSE, FALSE, 0);
   gtk_box_pack_end(
       GTK_BOX(mod_india_hboxbuttons), mod_india_cancel, FALSE, FALSE, 0);
 
-  GtkWidget* mod_india_vbox = gtk_vbox_new(FALSE, 0);
+  GtkWidget* mod_india_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start(
       GTK_BOX(mod_india_vbox), mod_india_hboxtext, TRUE, TRUE, 30);
-  gtk_box_pack_start(
-      GTK_BOX(mod_india_vbox), gtk_hseparator_new(), FALSE, FALSE, 0);
+  gtk_box_pack_start(GTK_BOX(mod_india_vbox), gtk_separator_new(GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 0);
   gtk_box_pack_end(
       GTK_BOX(mod_india_vbox), mod_india_hboxbuttons, FALSE, FALSE, 15);
   gtk_container_add(GTK_CONTAINER(mod_india_widget), mod_india_vbox);

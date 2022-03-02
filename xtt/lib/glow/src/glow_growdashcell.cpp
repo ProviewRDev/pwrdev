@@ -163,9 +163,6 @@ void GrowDashCell::open(std::ifstream& fp)
 void GrowDashCell::update_attributes()
 {
   if (cell_rows != cell_rows_old || cell_columns != cell_columns_old) {
-    erase(&ctx->mw, (GlowTransform*)NULL, hot, NULL);
-    erase(&ctx->navw, (GlowTransform*)NULL, hot, NULL);
-
     frame->ur.x = frame->ll.x + cell_columns * ctx->dash_cell_width;
     frame->ur.y = frame->ll.y + cell_rows * ctx->dash_cell_height;
     cell_rows_old = cell_rows;
@@ -212,7 +209,6 @@ void GrowDashCell::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
   if (node && !root_node && node != (void*)this)
     root_node = (GrowNode*)node;
 
-  w->set_draw_buffer_only();
   GrowGroup::draw(w, t, highlight, hot, node, colornode);
   if (!node)
     node = (void*)this;
@@ -228,19 +224,6 @@ void GrowDashCell::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
   } else
     frame->draw(w, &trf, highlight, hot, node, colornode);
 
-  w->reset_draw_buffer_only();
-
-}
-
-void GrowDashCell::erase(GlowWind* w, GlowTransform* t, int hot, void* node)
-{
-  w->set_draw_buffer_only();
-  if (t) {
-    GlowTransform t2 = *t * trf;
-    frame->erase(w, &t2, hot, node);
-  } else
-    frame->erase(w, &trf, hot, node);
-  w->reset_draw_buffer_only();
 }
 
 int GrowDashCell::local_event_handler(glow_eEvent event, double x, double y)
@@ -363,7 +346,6 @@ int GrowDashCell::event_handler(
       if (!sts && hot) {
 	if (!ctx->hot_found)
 	  ctx->gdraw->set_cursor(w, glow_eDrawCursor_Normal);
-	//erase(w);
 	hot = 0;
 	redraw = 1;
       }

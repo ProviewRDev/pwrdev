@@ -239,8 +239,7 @@ void GlowDraw::set_inputfocus(GlowWind* w)
 }
 
 void GlowDraw::set_background(GlowWind* w, glow_eDrawType drawtype,
-    glow_tPixmap pixmap, glow_tImImage image, int pixmap_width,
-    int pixmap_height)
+    char *image)
 {
 }
 
@@ -288,19 +287,6 @@ void GlowDraw::set_click_sensitivity(GlowWind* w, int value)
 }
 
 void GlowDraw::draw_background(GlowWind* wind, int x, int y, int w, int h)
-{
-}
-
-int GlowDraw::create_buffer(GlowWind* w)
-{
-  return 1;
-}
-
-void GlowDraw::delete_buffer(GlowWind* w)
-{
-}
-
-void GlowDraw::buffer_background(DrawWind* w, GlowCtx* cctx)
 {
 }
 
@@ -425,7 +411,16 @@ int GlowDraw::gradient_fill_polyline(GlowWind* wind, glow_sPointX* points,
   return fill_polyline(wind, points, point_cnt, d0, 0);
 }
 
+
 void GlowDraw::event_exec(void* event, unsigned int size)
+{
+}
+
+void GlowDraw::push_background(glow_eDrawType drawtype)
+{
+}
+
+void GlowDraw::pop_background()
 {
 }
 
@@ -460,6 +455,6 @@ void GlowDraw::reset_customcolors(GlowCustomColors* cc)
 }
 
 DrawWind::DrawWind()
-    : double_buffered(0), double_buffer_on(0), draw_buffer_only(0), is_nav(0)
+    : is_nav(0)
 {
 }

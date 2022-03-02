@@ -133,7 +133,7 @@ void CoWowGtk::DisplayQuestion(void* ctx, const char* title, const char* text,
   question_label = gtk_label_new(translate_utf8(text));
 
   GtkWidget* question_image = (GtkWidget*)g_object_new(GTK_TYPE_IMAGE, "stock",
-      GTK_STOCK_DIALOG_QUESTION, "icon-size", GTK_ICON_SIZE_DIALOG, "xalign",
+      "gtk-dialog-question", "icon-size", GTK_ICON_SIZE_DIALOG, "xalign",
       0.5, "yalign", 1.0, NULL);
 
   GtkWidget* question_ok = gtk_button_new_with_label(translate_utf8("Yes"));
@@ -145,22 +145,22 @@ void CoWowGtk::DisplayQuestion(void* ctx, const char* title, const char* text,
   g_signal_connect(
       question_no, "clicked", G_CALLBACK(question_cancel_cb), cbdata);
 
-  GtkWidget* question_hboxtext = gtk_hbox_new(FALSE, 0);
+  GtkWidget* question_hboxtext = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   gtk_box_pack_start(
       GTK_BOX(question_hboxtext), question_image, FALSE, FALSE, 15);
   gtk_box_pack_start(
       GTK_BOX(question_hboxtext), question_label, TRUE, TRUE, 15);
 
-  GtkWidget* question_hboxbuttons = gtk_hbox_new(TRUE, 40);
+  GtkWidget* question_hboxbuttons = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 40);
   gtk_box_pack_start(
-      GTK_BOX(question_hboxbuttons), question_ok, FALSE, FALSE, 0);
-  gtk_box_pack_end(GTK_BOX(question_hboxbuttons), question_no, FALSE, FALSE, 0);
+      GTK_BOX(question_hboxbuttons), question_ok, FALSE, FALSE, 40);
+  gtk_box_pack_end(GTK_BOX(question_hboxbuttons), question_no, FALSE, FALSE, 40);
 
   GtkWidget* question_vbox
       = gtk_dialog_get_content_area(GTK_DIALOG(question_widget));
   gtk_box_pack_start(GTK_BOX(question_vbox), question_hboxtext, TRUE, TRUE, 30);
   gtk_box_pack_start(
-      GTK_BOX(question_vbox), gtk_hseparator_new(), FALSE, FALSE, 0);
+      GTK_BOX(question_vbox), gtk_separator_new(GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 0);
   gtk_box_pack_end(
       GTK_BOX(question_vbox), question_hboxbuttons, FALSE, FALSE, 15);
   gtk_widget_show_all(question_widget);
@@ -241,7 +241,7 @@ void CoWowGtk::CreateInputDialog(void* ctx, const char* title, const char* text,
   inputdialog_label = gtk_label_new(translate_utf8(text));
 
   GtkWidget* inputdialog_image = (GtkWidget*)g_object_new(GTK_TYPE_IMAGE,
-      "stock", GTK_STOCK_DIALOG_QUESTION, "icon-size", GTK_ICON_SIZE_DIALOG,
+      "stock", "gtk-dialog-question", "icon-size", GTK_ICON_SIZE_DIALOG,
       "xalign", 0.5, "yalign", 1.0, NULL);
 
   GtkWidget* inputdialog_ok = gtk_button_new_with_label(translate_utf8("Yes"));
@@ -254,21 +254,22 @@ void CoWowGtk::CreateInputDialog(void* ctx, const char* title, const char* text,
   g_signal_connect(
       inputdialog_no, "clicked", G_CALLBACK(inputdialog_cancel_cb), cbdata);
 
-  GtkWidget* textinput = gtk_entry_new_with_max_length(input_length);
+  GtkWidget* textinput = gtk_entry_new();
+  gtk_entry_set_max_length(GTK_ENTRY(textinput), input_length);
   cbdata->input_widget = textinput;
   g_signal_connect(
       textinput, "activate", G_CALLBACK(inputdialog_ok_cb), cbdata);
 
-  GtkWidget* inputdialog_hboxtext = gtk_hbox_new(FALSE, 0);
+  GtkWidget* inputdialog_hboxtext = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   gtk_box_pack_start(
       GTK_BOX(inputdialog_hboxtext), inputdialog_image, FALSE, FALSE, 15);
   gtk_box_pack_start(
       GTK_BOX(inputdialog_hboxtext), inputdialog_label, TRUE, TRUE, 15);
 
-  GtkWidget* inputdialog_hboxinput = gtk_hbox_new(FALSE, 0);
+  GtkWidget* inputdialog_hboxinput = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   gtk_box_pack_start(GTK_BOX(inputdialog_hboxinput), textinput, TRUE, TRUE, 15);
 
-  GtkWidget* inputdialog_hboxbuttons = gtk_hbox_new(TRUE, 40);
+  GtkWidget* inputdialog_hboxbuttons = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 40);
   gtk_box_pack_start(
       GTK_BOX(inputdialog_hboxbuttons), inputdialog_ok, FALSE, FALSE, 0);
   gtk_box_pack_end(
@@ -281,7 +282,7 @@ void CoWowGtk::CreateInputDialog(void* ctx, const char* title, const char* text,
   gtk_box_pack_start(
       GTK_BOX(inputdialog_vbox), inputdialog_hboxinput, FALSE, FALSE, 5);
   gtk_box_pack_start(
-      GTK_BOX(inputdialog_vbox), gtk_hseparator_new(), FALSE, FALSE, 0);
+      GTK_BOX(inputdialog_vbox), gtk_separator_new(GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 0);
   gtk_box_pack_end(
       GTK_BOX(inputdialog_vbox), inputdialog_hboxbuttons, FALSE, FALSE, 15);
   gtk_widget_show_all(inputdialog_widget);
@@ -395,7 +396,7 @@ void CoWowGtk::DisplayText(
   g_free(textutf8);
 
   GtkWidget* displaytext_image = (GtkWidget*)g_object_new(GTK_TYPE_IMAGE,
-      "stock", GTK_STOCK_DIALOG_INFO, "icon-size", GTK_ICON_SIZE_DIALOG,
+      "stock", "gtk-dialog-info", "icon-size", GTK_ICON_SIZE_DIALOG,
       "xalign", 0.5, "yalign", 1.0, NULL);
 
   GtkWidget* displaytext_close
@@ -404,13 +405,13 @@ void CoWowGtk::DisplayText(
   g_signal_connect(
       displaytext_close, "clicked", G_CALLBACK(displaytext_close_cb), dialog);
 
-  GtkWidget* displaytext_hboxtext = gtk_hbox_new(FALSE, 0);
+  GtkWidget* displaytext_hboxtext = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   gtk_box_pack_start(
       GTK_BOX(displaytext_hboxtext), displaytext_image, FALSE, FALSE, 15);
   gtk_box_pack_start(
       GTK_BOX(displaytext_hboxtext), displaytext_label, TRUE, TRUE, 15);
 
-  GtkWidget* displaytext_hboxbuttons = gtk_hbox_new(TRUE, 40);
+  GtkWidget* displaytext_hboxbuttons = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 40);
   gtk_box_pack_end(
       GTK_BOX(displaytext_hboxbuttons), displaytext_close, FALSE, FALSE, 0);
 
@@ -418,7 +419,7 @@ void CoWowGtk::DisplayText(
   gtk_box_pack_start(
       GTK_BOX(displaytext_vbox), displaytext_hboxtext, TRUE, TRUE, 30);
   gtk_box_pack_start(
-      GTK_BOX(displaytext_vbox), gtk_hseparator_new(), FALSE, FALSE, 0);
+      GTK_BOX(displaytext_vbox), gtk_separator_new(GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 0);
   gtk_box_pack_end(
       GTK_BOX(displaytext_vbox), displaytext_hboxbuttons, FALSE, FALSE, 15);
   gtk_widget_show_all(dialog);
@@ -605,7 +606,7 @@ void* CoWowGtk::CreateList(const char* title, const char* texts, int textsize,
   g_signal_connect(
       cancel_button, "clicked", G_CALLBACK(CoWowGtk::list_cancel_cb), ctx);
 
-  GtkWidget* hboxbuttons = gtk_hbox_new(TRUE, 40);
+  GtkWidget* hboxbuttons = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 40);
   gtk_box_pack_start(GTK_BOX(hboxbuttons), ok_button, FALSE, FALSE, 20);
   if (show_apply_button)
     gtk_box_pack_start(GTK_BOX(hboxbuttons), apply_button, FALSE, FALSE, 20);
@@ -614,7 +615,7 @@ void* CoWowGtk::CreateList(const char* title, const char* texts, int textsize,
   GtkWidget* scrolled_window = gtk_scrolled_window_new(NULL, NULL);
   gtk_container_add(GTK_CONTAINER(scrolled_window), ctx->list);
 
-  GtkWidget* vbox = gtk_vbox_new(FALSE, 0);
+  GtkWidget* vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start(GTK_BOX(vbox), scrolled_window, TRUE, TRUE, 0);
   gtk_box_pack_end(GTK_BOX(vbox), hboxbuttons, FALSE, FALSE, 10);
 
@@ -730,17 +731,16 @@ int CoWowGtk::DisplayWarranty()
 
   GtkWidget* dialog_label = gtk_label_new(text);
   GtkWidget* scrolled_window = gtk_scrolled_window_new(NULL, NULL);
-  gtk_scrolled_window_add_with_viewport(
-      GTK_SCROLLED_WINDOW(scrolled_window), dialog_label);
+  gtk_container_add(GTK_CONTAINER(scrolled_window), dialog_label);
   g_object_set(scrolled_window, "can-focus", FALSE, NULL);
 
   dcli_translate_filename(fname, "$pwr_exe/pwr_logofull.png");
   GtkWidget* dialog_image = gtk_image_new_from_file(fname);
   g_object_set(dialog_image, "xalign", 0.5, "yalign", 0.0, NULL);
-  GtkWidget* hbox = gtk_hbox_new(FALSE, 0);
+  GtkWidget* hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   gtk_box_pack_start(GTK_BOX(hbox), dialog_image, FALSE, FALSE, 15);
   gtk_box_pack_start(GTK_BOX(hbox), scrolled_window, TRUE, TRUE, 15);
-  gtk_box_pack_start(GTK_BOX(dialog->vbox), hbox, TRUE, TRUE, 30);
+  gtk_box_pack_start(GTK_BOX(gtk_dialog_get_content_area(dialog)), hbox, TRUE, TRUE, 30);
 
   gtk_window_resize(GTK_WINDOW(dialog), 850, 600);
   gtk_widget_show_all(GTK_WIDGET(dialog));
@@ -802,14 +802,13 @@ void CoWowGtk::DisplayLicense()
 
   GtkWidget* dialog_label = gtk_label_new(text);
 
-  GtkWidget* hbox = gtk_hbox_new(FALSE, 0);
+  GtkWidget* hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   gtk_box_pack_start(GTK_BOX(hbox), dialog_label, TRUE, TRUE, 15);
 
   GtkWidget* scrolled_window = gtk_scrolled_window_new(NULL, NULL);
-  gtk_scrolled_window_add_with_viewport(
-      GTK_SCROLLED_WINDOW(scrolled_window), hbox);
+  gtk_container_add(GTK_CONTAINER(scrolled_window), hbox);
 
-  gtk_box_pack_start(GTK_BOX(dialog->vbox), scrolled_window, TRUE, TRUE, 30);
+  gtk_box_pack_start(GTK_BOX(gtk_dialog_get_content_area(dialog)), scrolled_window, TRUE, TRUE, 30);
 
   gtk_widget_show_all(GTK_WIDGET(dialog));
 }
@@ -829,16 +828,26 @@ static void wow_get_selection_cb(GtkWidget* w, GtkSelectionData* selection_data,
     guint time, gpointer clientdata)
 {
   wow_sSelection* data = (wow_sSelection*)clientdata;
+  int length;
+  GdkAtom target;
+  const guchar *sdata;
 
-  if (selection_data->length > 0 && selection_data->target == data->atom) {
-    if (selection_data->length > int(sizeof(data->str) - 1)) {
-      data->sts = 0;
-      return;
+  length = gtk_selection_data_get_length(selection_data);
+  if (length > 0) {
+    target = gtk_selection_data_get_target(selection_data);
+    if (target == data->atom) {
+      if (length > int(sizeof(data->str) - 1)) {
+	data->sts = 0;
+	return;
+      }
+      sdata = gtk_selection_data_get_data(selection_data);
+      strncpy(data->str, (char*)sdata, length);
+      data->str[length] = 0;
+      data->len = length;
+      data->sts = 1;
     }
-    strncpy(data->str, (char*)selection_data->data, selection_data->length);
-    data->str[selection_data->length] = 0;
-    data->len = selection_data->length;
-    data->sts = 1;
+    else
+      data->sts = 0;
   } else
     data->sts = 0;
   data->received = 1;
@@ -885,8 +894,8 @@ void CoWowGtk::CreateFileSelDia(const char* title, void* parent_ctx,
     gaction = GTK_FILE_CHOOSER_ACTION_SAVE;
 
   dialog = gtk_file_chooser_dialog_new(title, NULL,
-      gaction, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-      GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT, NULL);
+      gaction, "_Cancel", GTK_RESPONSE_CANCEL,
+      "_Open", GTK_RESPONSE_ACCEPT, NULL);
 
   if (file_type == wow_eFileSelType_Dbs) {
     pwr_tFileName folder;
@@ -1039,6 +1048,7 @@ void CoWowGtk::PopupPosition(
 {
   gint x0, y0, x1, y1;
   GtkWidget* grandparent;
+  GtkAllocation allocation;
   x1 = y1 = 0;
 
   x0 = (gint)x_event;
@@ -1046,10 +1056,11 @@ void CoWowGtk::PopupPosition(
 
   grandparent = gtk_widget_get_parent(parent);
   while (!GTK_IS_WINDOW(grandparent)) {
-    if (!x1 && !y1 && (parent->allocation.x || parent->allocation.y)) {
+    gtk_widget_get_allocation(parent, &allocation);
+    if (!x1 && !y1 && (allocation.x || allocation.y)) {
       // Add first widget with nonzero position
-      x1 = parent->allocation.x;
-      y1 = parent->allocation.y;
+      x1 = allocation.x;
+      y1 = allocation.y;
       x0 += x1;
       y0 += y1;
     }
@@ -1123,16 +1134,16 @@ gboolean CoWowEntryGtk::event_cb(GtkWidget* w, GdkEvent* event, gpointer data)
   gchar* text = gtk_editable_get_chars(GTK_EDITABLE(w), 0, -1);
 
   switch (event->key.keyval) {
-  case GDK_Return:
-  case GDK_KP_Enter:
-  case GDK_Linefeed: {
+  case GDK_KEY_Return:
+  case GDK_KEY_KP_Enter:
+  case GDK_KEY_Linefeed: {
     // Insert in recall buffer
     if (!streq(text, "")) {
       en->m_re->push(text);
     }
     break;
   }
-  case GDK_Up: {
+  case GDK_KEY_Up: {
     const char *prev = en->m_re->popUp(text);
     gint pos = 0;
     gtk_editable_delete_text(GTK_EDITABLE(w), 0, -1);
@@ -1141,7 +1152,7 @@ gboolean CoWowEntryGtk::event_cb(GtkWidget* w, GdkEvent* event, gpointer data)
     sts = TRUE;
     break;
   }
-  case GDK_Down: {
+  case GDK_KEY_Down: {
     const char *next = en->m_re->popDown(text);
     gint pos = 0;
     gtk_editable_delete_text(GTK_EDITABLE(w), 0, -1);
@@ -1150,7 +1161,7 @@ gboolean CoWowEntryGtk::event_cb(GtkWidget* w, GdkEvent* event, gpointer data)
     sts = TRUE;
     break;
   }
-  case GDK_Escape:
+  case GDK_KEY_Escape:
     if (en->m_hide_on_esc)
       gtk_widget_hide(w);
     en->m_re->resetTmp();
@@ -1259,6 +1270,7 @@ int CoWowGtk::CreateModalDialog(const char* title, const char* text,
 
   g_signal_connect(
       dialog_w, "delete_event", G_CALLBACK(modaldia_delete_event), &status);
+  gtk_widget_set_name(dialog_w, "modaldialog");
   GtkWidget* text_w = gtk_label_new(text);
 
   if (image) {
@@ -1267,43 +1279,43 @@ int CoWowGtk::CreateModalDialog(const char* title, const char* text,
   }
   if (!image) {
     image_w = (GtkWidget*)g_object_new(GTK_TYPE_IMAGE, "stock",
-        GTK_STOCK_DIALOG_QUESTION, "icon-size", GTK_ICON_SIZE_DIALOG, "xalign",
+        "gtk-dialog-question", "icon-size", GTK_ICON_SIZE_DIALOG, "xalign",
         0.5, "yalign", 1.0, NULL);
   }
 
   gtk_window_set_modal(GTK_WINDOW(dialog_w), TRUE);
 
-  GtkWidget* hboxtext = gtk_hbox_new(FALSE, 0);
+  GtkWidget* hboxtext = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   gtk_box_pack_start(GTK_BOX(hboxtext), image_w, FALSE, FALSE, 15);
   gtk_box_pack_start(GTK_BOX(hboxtext), text_w, TRUE, TRUE, 15);
 
-  GtkWidget* hboxbuttons = gtk_hbox_new(TRUE, 40);
+  GtkWidget* hboxbuttons = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 40);
 
   if (button1) {
     GtkWidget* button1_w = gtk_button_new_with_label(translate_utf8(button1));
     gtk_widget_set_size_request(button1_w, -1, 28);
     g_signal_connect(
         button1_w, "clicked", G_CALLBACK(modaldia_button1_cb), &status);
-    gtk_box_pack_start(GTK_BOX(hboxbuttons), button1_w, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(hboxbuttons), button1_w, FALSE, FALSE, 30);
   }
   if (button2) {
     GtkWidget* button2_w = gtk_button_new_with_label(translate_utf8(button2));
     gtk_widget_set_size_request(button2_w, -1, 28);
     g_signal_connect(
         button2_w, "clicked", G_CALLBACK(modaldia_button2_cb), &status);
-    gtk_box_pack_start(GTK_BOX(hboxbuttons), button2_w, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(hboxbuttons), button2_w, FALSE, FALSE, 30);
   }
   if (button3) {
     GtkWidget* button3_w = gtk_button_new_with_label(translate_utf8(button3));
     gtk_widget_set_size_request(button3_w, -1, 28);
     g_signal_connect(
         button3_w, "clicked", G_CALLBACK(modaldia_button3_cb), &status);
-    gtk_box_pack_end(GTK_BOX(hboxbuttons), button3_w, FALSE, FALSE, 0);
+    gtk_box_pack_end(GTK_BOX(hboxbuttons), button3_w, FALSE, FALSE, 30);
   }
 
-  GtkWidget* vbox = gtk_vbox_new(FALSE, 0);
+  GtkWidget* vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start(GTK_BOX(vbox), hboxtext, TRUE, TRUE, 30);
-  gtk_box_pack_start(GTK_BOX(vbox), gtk_hseparator_new(), FALSE, FALSE, 0);
+  gtk_box_pack_start(GTK_BOX(vbox), gtk_separator_new(GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 0);
   gtk_box_pack_end(GTK_BOX(vbox), hboxbuttons, FALSE, FALSE, 15);
   gtk_container_add(GTK_CONTAINER(dialog_w), vbox);
   gtk_widget_show_all(dialog_w);
@@ -1327,9 +1339,9 @@ static gboolean modaldia_keypress_cb(
   gchar* text = gtk_editable_get_chars(GTK_EDITABLE(w), 0, -1);
 
   switch (keysym) {
-  case GDK_Return:
-  case GDK_KP_Enter:
-  case GDK_Linefeed: {
+  case GDK_KEY_Return:
+  case GDK_KEY_KP_Enter:
+  case GDK_KEY_Linefeed: {
     // Terminate
     *(int*)data = wow_eModalDialogReturn_ReturnPressed;
     gtk_main_quit();
@@ -1375,13 +1387,14 @@ wow_sModalInputDialog* CoWowGtk::CreateModalInputDialog(const char* title,
   }
   if (!image) {
     image_w = (GtkWidget*)g_object_new(GTK_TYPE_IMAGE, "stock",
-        GTK_STOCK_DIALOG_QUESTION, "icon-size", GTK_ICON_SIZE_DIALOG, "xalign",
+        "gtk-dialog-question", "icon-size", GTK_ICON_SIZE_DIALOG, "xalign",
         0.5, "yalign", 1.0, NULL);
   }
 
   GtkWidget* textinput;
   if (!recall) {
-    textinput = gtk_entry_new_with_max_length(input_length);
+    textinput = gtk_entry_new();
+    gtk_entry_set_max_length(GTK_ENTRY(textinput), input_length);
     g_signal_connect(textinput, "key-press-event",
         G_CALLBACK(modaldia_keypress_cb), &status);
   } else {
@@ -1391,38 +1404,38 @@ wow_sModalInputDialog* CoWowGtk::CreateModalInputDialog(const char* title,
         textinput, "activate", G_CALLBACK(modaldia_activate_cb), &status);
   }
 
-  GtkWidget* hboxtext = gtk_hbox_new(FALSE, 0);
+  GtkWidget* hboxtext = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   gtk_box_pack_start(GTK_BOX(hboxtext), image_w, FALSE, FALSE, 15);
   gtk_box_pack_start(GTK_BOX(hboxtext), text_w, FALSE, FALSE, 15);
   gtk_box_pack_start(GTK_BOX(hboxtext), textinput, TRUE, TRUE, 15);
 
-  GtkWidget* hboxbuttons = gtk_hbox_new(TRUE, 40);
+  GtkWidget* hboxbuttons = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 40);
 
   if (button1) {
     GtkWidget* button1_w = gtk_button_new_with_label(translate_utf8(button1));
     gtk_widget_set_size_request(button1_w, 90, 28);
     g_signal_connect(
         button1_w, "clicked", G_CALLBACK(modaldia_button1_cb), &status);
-    gtk_box_pack_start(GTK_BOX(hboxbuttons), button1_w, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(hboxbuttons), button1_w, FALSE, FALSE, 30);
   }
   if (button2) {
     GtkWidget* button2_w = gtk_button_new_with_label(translate_utf8(button2));
     gtk_widget_set_size_request(button2_w, 90, 28);
     g_signal_connect(
         button2_w, "clicked", G_CALLBACK(modaldia_button2_cb), &status);
-    gtk_box_pack_start(GTK_BOX(hboxbuttons), button2_w, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(hboxbuttons), button2_w, FALSE, FALSE, 30);
   }
   if (button3) {
     GtkWidget* button3_w = gtk_button_new_with_label(translate_utf8(button3));
     gtk_widget_set_size_request(button3_w, 90, 28);
     g_signal_connect(
         button3_w, "clicked", G_CALLBACK(modaldia_button3_cb), &status);
-    gtk_box_pack_end(GTK_BOX(hboxbuttons), button3_w, FALSE, FALSE, 0);
+    gtk_box_pack_end(GTK_BOX(hboxbuttons), button3_w, FALSE, FALSE, 30);
   }
 
-  GtkWidget* vbox = gtk_vbox_new(FALSE, 0);
+  GtkWidget* vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start(GTK_BOX(vbox), hboxtext, TRUE, TRUE, 30);
-  gtk_box_pack_start(GTK_BOX(vbox), gtk_hseparator_new(), FALSE, FALSE, 0);
+  gtk_box_pack_start(GTK_BOX(vbox), gtk_separator_new(GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 0);
   gtk_box_pack_end(GTK_BOX(vbox), hboxbuttons, FALSE, FALSE, 15);
   gtk_container_add(GTK_CONTAINER(dialog_w), vbox);
   gtk_widget_show_all(dialog_w);
@@ -1451,7 +1464,6 @@ pwr_tStatus CoWowGtk::CreateMenuItem(
   int name_cnt;
   char label[80];
   GtkWidget* child = NULL;
-  pwr_tFileName fname;
 
   name_cnt = dcli_parse(name, "-", "", (char*)name_array,
       sizeof(name_array) / sizeof(name_array[0]), sizeof(name_array[0]), 0);
@@ -1459,22 +1471,8 @@ pwr_tStatus CoWowGtk::CreateMenuItem(
     return 0;
 
   if (name_cnt == 1) {
-    if (pixmap == wow_ePixmap_No || pixmap >= wow_ePixmap__)
-      *(GtkWidget**)w
+    *(GtkWidget**)w
           = gtk_menu_item_new_with_label(translate_utf8(name_array[0]));
-    else {
-      *(GtkWidget**)w
-          = gtk_image_menu_item_new_with_label(translate_utf8(name_array[0]));
-      switch (pixmap) {
-      case wow_ePixmap_Graph:
-        dcli_translate_filename(fname, "$pwr_exe/wtt_ge.png");
-        break;
-      default:
-        dcli_translate_filename(fname, "$pwr_exe/wtt_ge.png");
-      }
-      gtk_image_menu_item_set_image(
-          GTK_IMAGE_MENU_ITEM(*(GtkWidget**)w), gtk_image_new_from_file(fname));
-    }
     if (append)
       gtk_menu_shell_append(GTK_MENU_SHELL(menu), *(GtkWidget**)w);
     else
@@ -1505,21 +1503,7 @@ pwr_tStatus CoWowGtk::CreateMenuItem(
       if (!found) {
         // Create the menu item
         GtkWidget* item;
-        if (i == name_cnt - 1 && pixmap != wow_ePixmap_No
-            && pixmap <= wow_ePixmap__) {
-          item = gtk_image_menu_item_new_with_label(
-              translate_utf8(name_array[i]));
-          switch (pixmap) {
-          case wow_ePixmap_Graph:
-            dcli_translate_filename(fname, "$pwr_exe/wtt_ge.png");
-            break;
-          default:
-            dcli_translate_filename(fname, "$pwr_exe/wtt_ge.png");
-          }
-          gtk_image_menu_item_set_image(
-              GTK_IMAGE_MENU_ITEM(item), gtk_image_new_from_file(fname));
-        } else
-          item = gtk_menu_item_new_with_label(translate_utf8(name_array[i]));
+	item = gtk_menu_item_new_with_label(translate_utf8(name_array[i]));
 
         if (append)
           gtk_menu_shell_append(GTK_MENU_SHELL(parent), item);

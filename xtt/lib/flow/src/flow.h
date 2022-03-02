@@ -47,6 +47,7 @@ extern "C" {
 #define DRAW_TYPE_SIZE 9
 #define DRAW_FONT_SIZE 9
 #define DRAW_PIXMAP_SIZE 9
+#define DRAW_FMP 4
 
 #define FSPACE " "
 

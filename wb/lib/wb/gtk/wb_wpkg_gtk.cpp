@@ -45,6 +45,7 @@
 #include "co_time.h"
 
 #include "cow_logw_gtk.h"
+#include "cow_wutl_gtk.h"
 #include "cow_xhelp.h"
 
 #include "wb_error.h"
@@ -192,13 +193,13 @@ void WPkgGtk::set_clock_cursor()
     clock_cursor = gdk_cursor_new_for_display(
         gtk_widget_get_display(toplevel), GDK_WATCH);
 
-  gdk_window_set_cursor(toplevel->window, clock_cursor);
+  gdk_window_set_cursor(gtk_widget_get_window(toplevel), clock_cursor);
   gdk_display_flush(gtk_widget_get_display(toplevel));
 }
 
 void WPkgGtk::reset_cursor()
 {
-  gdk_window_set_cursor(toplevel->window, NULL);
+  gdk_window_set_cursor(gtk_widget_get_window(toplevel), NULL);
   gdk_display_flush(gtk_widget_get_display(toplevel));
 }
 
@@ -226,7 +227,6 @@ WPkgGtk::WPkgGtk(GtkWidget* wa_parent_wid, void* wa_parent_ctx)
   const int window_width = 600;
   const int window_height = 600;
   int sts;
-  pwr_tFileName fname;
 
   toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height",
       window_height, "default-width", window_width, "title", "Distributor",
@@ -250,10 +250,11 @@ WPkgGtk::WPkgGtk(GtkWidget* wa_parent_wid, void* wa_parent_ctx)
   g_signal_connect(
       file_history, "activate", G_CALLBACK(WPkgGtk::activate_history), this);
 
-  GtkWidget* file_close
-      = gtk_image_menu_item_new_from_stock(GTK_STOCK_CLOSE, accel_g);
+  GtkWidget* file_close = gtk_menu_item_new_with_mnemonic("_Close");
   g_signal_connect(
       file_close, "activate", G_CALLBACK(WPkgGtk::activate_exit), this);
+  gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w',
+      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
 
   GtkMenu* file_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_history);
@@ -292,24 +293,21 @@ WPkgGtk::WPkgGtk(GtkWidget* wa_parent_wid, void* wa_parent_ctx)
       GTK_MENU_ITEM(functions), GTK_WIDGET(functions_menu));
 
   // View menu
-  GtkWidget* view_zoom_in
-      = gtk_image_menu_item_new_from_stock(GTK_STOCK_ZOOM_IN, NULL);
+  GtkWidget* view_zoom_in = gtk_menu_item_new_with_mnemonic("Zoom _In");
   g_signal_connect(
-      view_zoom_in, "activate", G_CALLBACK(WPkgGtk::activate_zoom_in), this);
+      view_zoom_in, "activate", G_CALLBACK(activate_zoom_in), this);
   gtk_widget_add_accelerator(view_zoom_in, "activate", accel_g, 'i',
       GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
-  GtkWidget* view_zoom_out
-      = gtk_image_menu_item_new_from_stock(GTK_STOCK_ZOOM_OUT, NULL);
+  GtkWidget* view_zoom_out = gtk_menu_item_new_with_mnemonic("Zoom _Out");
   g_signal_connect(
-      view_zoom_out, "activate", G_CALLBACK(WPkgGtk::activate_zoom_out), this);
+      view_zoom_out, "activate", G_CALLBACK(activate_zoom_out), this);
   gtk_widget_add_accelerator(view_zoom_out, "activate", accel_g, 'o',
       GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
-  GtkWidget* view_zoom_reset
-      = gtk_image_menu_item_new_from_stock(GTK_STOCK_ZOOM_100, NULL);
+  GtkWidget* view_zoom_reset = gtk_menu_item_new_with_mnemonic("Zoom _Reset");
   g_signal_connect(view_zoom_reset, "activate",
-      G_CALLBACK(WPkgGtk::activate_zoom_reset), this);
+      G_CALLBACK(activate_zoom_reset), this);
 
   GtkWidget* view_dmode_filediff
       = gtk_check_menu_item_new_with_mnemonic("_Display File Differences");
@@ -339,9 +337,7 @@ WPkgGtk::WPkgGtk(GtkWidget* wa_parent_wid, void* wa_parent_ctx)
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(view), GTK_WIDGET(view_menu));
 
   // Menu Help
-  GtkWidget* help_help = gtk_image_menu_item_new_with_mnemonic("_Help");
-  gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(help_help),
-      gtk_image_new_from_stock("gtk-help", GTK_ICON_SIZE_MENU));
+  GtkWidget* help_help = gtk_menu_item_new_with_mnemonic("_Help");
   g_signal_connect(
       help_help, "activate", G_CALLBACK(WPkgGtk::activate_help), this);
   gtk_widget_add_accelerator(
@@ -357,43 +353,19 @@ WPkgGtk::WPkgGtk(GtkWidget* wa_parent_wid, void* wa_parent_ctx)
   // Toolbar
   GtkToolbar* tools = (GtkToolbar*)g_object_new(GTK_TYPE_TOOLBAR, NULL);
 
-  GtkWidget* tools_distribute = gtk_button_new();
-  dcli_translate_filename(fname, "$pwr_exe/wb_send.png");
-  gtk_container_add(
-      GTK_CONTAINER(tools_distribute), gtk_image_new_from_file(fname));
-  g_signal_connect(tools_distribute, "clicked",
-      G_CALLBACK(WPkgGtk::activate_distribute), this);
-  g_object_set(tools_distribute, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(tools, tools_distribute, "Distribute", "");
+  wutl_tools_item(tools, "$pwr_exe/wb_send.png", 
+      G_CALLBACK(activate_distribute), "Zoom in", this, 0, 0);
 
-  GtkWidget* tools_zoom_in = gtk_button_new();
-  dcli_translate_filename(fname, "$pwr_exe/xtt_zoom_in.png");
-  gtk_container_add(
-      GTK_CONTAINER(tools_zoom_in), gtk_image_new_from_file(fname));
-  g_signal_connect(
-      tools_zoom_in, "clicked", G_CALLBACK(WPkgGtk::activate_zoom_in), this);
-  g_object_set(tools_zoom_in, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(tools, tools_zoom_in, "Zoom in", "");
+  wutl_tools_item(tools, "$pwr_exe/xtt_zoom_in.png", 
+      G_CALLBACK(activate_zoom_in), "Zoom in", this, 1, 0);
 
-  GtkWidget* tools_zoom_out = gtk_button_new();
-  dcli_translate_filename(fname, "$pwr_exe/xtt_zoom_out.png");
-  gtk_container_add(
-      GTK_CONTAINER(tools_zoom_out), gtk_image_new_from_file(fname));
-  g_signal_connect(
-      tools_zoom_out, "clicked", G_CALLBACK(WPkgGtk::activate_zoom_out), this);
-  g_object_set(tools_zoom_out, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(tools, tools_zoom_out, "Zoom out", "");
+  wutl_tools_item(tools, "$pwr_exe/xtt_zoom_out.png", 
+      G_CALLBACK(activate_zoom_out), "Zoom out", this, 1, 0);
 
-  GtkWidget* tools_zoom_reset = gtk_button_new();
-  dcli_translate_filename(fname, "$pwr_exe/xtt_zoom_reset.png");
-  gtk_container_add(
-      GTK_CONTAINER(tools_zoom_reset), gtk_image_new_from_file(fname));
-  g_signal_connect(tools_zoom_reset, "clicked",
-      G_CALLBACK(WPkgGtk::activate_zoom_reset), this);
-  g_object_set(tools_zoom_reset, "can-focus", FALSE, NULL);
-  gtk_toolbar_append_widget(tools, tools_zoom_reset, "Zoom reset", "");
+  wutl_tools_item(tools, "$pwr_exe/xtt_zoom_reset.png", 
+      G_CALLBACK(activate_zoom_reset), "Zoom reset", this, 1, 0);
 
-  GtkWidget* vbox = gtk_vbox_new(FALSE, 0);
+  GtkWidget* vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 
   utility = ((WUtility*)parent_ctx)->utype;
   wpkgnav = new WPkgNavGtk(
@@ -402,7 +374,7 @@ WPkgGtk::WPkgGtk(GtkWidget* wa_parent_wid, void* wa_parent_ctx)
   ((WPkgNav*)wpkgnav)->set_clock_cursor_cb = set_clock_cursor_cb;
   ((WPkgNav*)wpkgnav)->reset_cursor_cb = reset_cursor_cb;
 
-  GtkWidget* statusbar = gtk_hbox_new(FALSE, 0);
+  GtkWidget* statusbar = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   msg_label = gtk_label_new("");
 
   gtk_box_pack_start(GTK_BOX(statusbar), msg_label, FALSE, FALSE, 20);

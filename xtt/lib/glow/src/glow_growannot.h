@@ -126,14 +126,6 @@ public:
   void draw(GlowWind* w, GlowTransform* t, int highlight, int hot, void* node,
       void* colornode);
 
-  //! Erase the object.
-  /*!
-    \param t		Transform of parent node.
-    \param hot		Draw as hot, with larger line width.
-    \param node		Parent node. Can be zero.
-  */
-  void erase(GlowWind* w, GlowTransform* t, int hot, void* node);
-
   //! Redraw the background of the annotation
   /*!
     \param t		Transform of parent node.

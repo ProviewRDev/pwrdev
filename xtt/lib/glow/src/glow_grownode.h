@@ -89,12 +89,6 @@ public:
   */
   void copy_from(const GrowNode& n);
 
-  //! Erase the object
-  void erase(GlowWind* w)
-  {
-    erase(w, (GlowTransform*)NULL, hot, NULL);
-  }
-
   //! Update the borders of the object.
   /*! The borders of the object is stored in x_right, x_left, y_high and y_low.
    */
@@ -710,7 +704,7 @@ public:
       double angle, double x0, double y0, glow_eRotationPoint type);
 
   //! Redraw the area inside the objects border.
-  void draw();
+  virtual void draw();
 
   //! Draw the objects if any part is inside the drawing area.
   /*!
@@ -750,17 +744,6 @@ public:
   */
   void draw(GlowWind* w, GlowTransform* t, int highlight, int hot, void* node,
       void* colornode);
-
-  //! Erase the object.
-  void erase();
-
-  //! Erase the object.
-  /*!
-    \param t		Transform of parent node.
-    \param hot		Draw as hot, with larger line width.
-    \param node		Parent node. Can be zero.
-  */
-  void erase(GlowWind* w, GlowTransform* t, int hot, void* node);
 
   //! Add a transform to the current transform.
   /*!

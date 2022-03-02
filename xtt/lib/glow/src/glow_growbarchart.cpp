@@ -63,15 +63,11 @@ GrowBarChart::GrowBarChart(GrowCtx* glow_ctx, const char* name, double x,
   memset(bar_values, 0, sizeof(bar_values));
 
   if (!nodraw)
-    draw(&ctx->mw, (GlowTransform*)NULL, highlight, hot, NULL, NULL);
+    draw();
 }
 
 GrowBarChart::~GrowBarChart()
 {
-  if (ctx->nodraw)
-    return;
-  erase(&ctx->mw);
-  erase(&ctx->navw);
 }
 
 void GrowBarChart::save(std::ofstream& fp, glow_eSaveMode mode)
@@ -587,6 +583,7 @@ void GrowBarChart::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
   }
 }
 
+#if 0
 void GrowBarChart::erase(GlowWind* w, GlowTransform* t, int hot, void* node)
 {
   if (ctx->nodraw)
@@ -633,13 +630,12 @@ void GrowBarChart::erase(GlowWind* w, GlowTransform* t, int hot, void* node)
 
   // printf( "eras: %d %d\n", ll_x, ll_y);
 
-  w->set_draw_buffer_only();
   if (border)
     ctx->gdraw->rect_erase(w, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, idx);
   ctx->gdraw->fill_rect(
       w, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, glow_eDrawType_LineErase);
-  w->reset_draw_buffer_only();
 }
+#endif
 
 void GrowBarChart::draw()
 {
@@ -659,8 +655,6 @@ void GrowBarChart::align(double x, double y, glow_eAlignDirection direction)
 {
   double dx, dy;
 
-  erase(&ctx->mw);
-  erase(&ctx->navw);
   ctx->set_defered_redraw();
   draw();
   switch (direction) {

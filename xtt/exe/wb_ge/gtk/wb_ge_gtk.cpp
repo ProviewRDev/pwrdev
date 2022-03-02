@@ -79,6 +79,15 @@ int main(int argc, char* argv[])
   setlocale(LC_NUMERIC, "POSIX");
   setlocale(LC_TIME, "en_US");
 
+  GtkCssProvider *provider;
+  dcli_translate_filename(fname, "$pwr_exe/pwr.css");
+  provider = gtk_css_provider_new();
+  gtk_style_context_add_provider_for_screen(gdk_display_get_default_screen(
+      gdk_display_get_default()), GTK_STYLE_PROVIDER(provider), 
+      GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+  gtk_css_provider_load_from_path(provider, fname, NULL);
+  g_object_unref(provider);
+
   toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", 100,
       "default-width", 100, "title", "Pwr wb_ge", NULL);
 

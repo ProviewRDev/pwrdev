@@ -125,11 +125,11 @@ void NodelistNavGtk::set_clock_cursor()
     clock_cursor = gdk_cursor_new_for_display(
         gtk_widget_get_display(parent_wid), GDK_WATCH);
 
-  gdk_window_set_cursor(parent_wid->window, clock_cursor);
+  gdk_window_set_cursor(gtk_widget_get_window(parent_wid), clock_cursor);
   gdk_display_flush(gtk_widget_get_display(parent_wid));
 }
 
 void NodelistNavGtk::reset_cursor()
 {
-  gdk_window_set_cursor(parent_wid->window, NULL);
+  gdk_window_set_cursor(gtk_widget_get_window(parent_wid), NULL);
 }

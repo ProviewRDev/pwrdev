@@ -70,11 +70,6 @@ public:
   void open(std::ifstream& fp);
   void draw(GlowWind* w, int ll_x, int ll_y, int ur_x, int ur_y);
   void draw(GlowWind* w, int* ll_x, int* ll_y, int* ur_x, int* ur_y);
-  void erase(GlowWind* w)
-  {
-    text.erase(w, (void*)&pzero, hot, NULL);
-    rect.erase(w, (void*)&pzero, hot, NULL);
-  }
   void move(double delta_x, double delta_y, int grid);
   void move_noerase(int delta_x, int delta_y, int grid);
   void set_highlight(int on);
@@ -129,7 +124,6 @@ public:
   }
   void draw(GlowWind* w, GlowTransform* t, int highlight, int hot, void* node,
       void* colornode);
-  void erase(GlowWind* w, GlowTransform* t, int hot, void* node);
   void set_transform(GlowTransform* t);
   void set_transform_from_stored(GlowTransform* t)
   {

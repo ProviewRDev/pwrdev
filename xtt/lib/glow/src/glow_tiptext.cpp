@@ -47,7 +47,9 @@ static void tiptext_timer_cb(GlowCtx* ctx)
   ctx->tiptext->timer_id = 0;
   ctx->tiptext->active = true;
 
-  ctx->tiptext->draw();
+  ctx->draw(&ctx->mw, ctx->tiptext->text_x - 1, ctx->tiptext->text_y - 1, 
+      ctx->tiptext->text_x + ctx->tiptext->text_width + 1,
+      ctx->tiptext->text_y + ctx->tiptext->text_height + 1);
 }
 GlowTipText::~GlowTipText()
 {
@@ -106,9 +108,6 @@ void GlowTipText::draw()
       glow_eFont_LucidaSans,
       ctx->mw.zoom_factor_y / ctx->mw.base_zoom_factor * (8 + 2 * text_size),
       0);
-  if (ctx->mw.double_buffer_on() && !ctx->mw.draw_buffer_only())
-    ctx->gdraw->copy_buffer(
-        &ctx->mw, text_x, text_y, text_x + text_width, text_y + text_height);
 }
 
 void GlowTipText::remove_text(GlowArrayElem* e)
@@ -124,9 +123,7 @@ void GlowTipText::remove_text(GlowArrayElem* e)
 
   if (active) {
     active = false;
-    ctx->gdraw->fill_rect(&ctx->mw, text_x, text_y, text_width + 1,
-        text_height + 1, glow_eDrawType_LineErase);
-    ctx->draw(&ctx->mw, text_x, text_y, text_x + text_width + 1,
+    ctx->draw(&ctx->mw, text_x - 1, text_y - 1, text_x + text_width + 1,
         text_y + text_height + 1);
   }
 }

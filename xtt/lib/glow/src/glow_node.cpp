@@ -96,9 +96,6 @@ GlowNode::~GlowNode()
   if (ctx->type() == glow_eCtxType_Grow)
     return;
 
-  erase();
-  nav_erase();
-
   ctx->set_defered_redraw();
   ctx->delete_node_cons(this);
   ctx->draw(&ctx->mw,

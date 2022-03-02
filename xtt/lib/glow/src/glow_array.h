@@ -149,10 +149,10 @@ public:
   void save(std::ofstream& fp, glow_eSaveMode mode);
   void open(GrowCtx* ctx, std::ifstream& fp);
   void draw(GlowWind* w, void* pos, int highlight, int hot, void* node);
-  void erase(GlowWind* w, void* pos, int hot, void* node);
+  //void erase(GlowWind* w, void* pos, int hot, void* node);
   void draw(GlowWind* w, GlowTransform* t, int highlight, int hot, void* node,
       void* colornode);
-  void erase(GlowWind* w, GlowTransform* t, int hot, void* node);
+  //void erase(GlowWind* w, GlowTransform* t, int hot, void* node);
   void draw_inverse(void* pos, int hot, void* node);
   void nav_draw(void* pos, int highlight, void* node);
   void nav_draw(GlowTransform* t, int highlight, void* node, void* colornode);

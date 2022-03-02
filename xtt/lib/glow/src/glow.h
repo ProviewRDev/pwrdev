@@ -1057,10 +1057,10 @@ typedef enum {
 
 //! Types of fonts
 typedef enum {
-  glow_eDrawFont_HelveticaBold, //!< Helvetica bold
-  glow_eDrawFont_Helvetica, //!< Helvetica normal
-  glow_eDrawFont__
-} glow_eDrawFont;
+  glow_eFontType_Bold, //!< Bold font
+  glow_eFontType_Normal, //!< Normal font
+  glow_eFontType__
+} glow_eFontType;
 
 //! How to move a routed connection
 typedef enum { glow_eMoveType_Frozen, glow_eMoveType_Route } glow_eMoveType;
@@ -1617,6 +1617,7 @@ typedef enum {
   glow_eSave_GrowCtx_customcolors = 2249,
   glow_eSave_GrowCtx_dashboard = 2250,
   glow_eSave_GrowCtx_dash = 2251,
+  glow_eSave_GrowCtx_anti_aliasing = 2252,
   glow_eSave_GrowSubAnnot_x_right = 2300,
   glow_eSave_GrowSubAnnot_x_left = 2301,
   glow_eSave_GrowSubAnnot_y_high = 2302,

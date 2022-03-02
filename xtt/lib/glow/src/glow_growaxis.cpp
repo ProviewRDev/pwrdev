@@ -71,15 +71,11 @@ GrowAxis::GrowAxis(GrowCtx* glow_ctx, const char* name, double x1, double y1,
 
   configure();
   if (!nodraw)
-    draw(&ctx->mw, (GlowTransform*)NULL, highlight, hot, NULL, NULL);
+    draw();
 }
 
 GrowAxis::~GrowAxis()
 {
-  if (ctx->nodraw)
-    return;
-  erase(&ctx->mw);
-  erase(&ctx->navw);
 }
 
 void GrowAxis::configure()
@@ -283,7 +279,6 @@ void GrowAxis::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
     idx = line_width;
     idx += hot;
     if (idx < 0) {
-      erase(w, t, hot, node);
       return;
     }
   } else {
@@ -511,6 +506,7 @@ void GrowAxis::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
   }
 }
 
+#if 0
 void GrowAxis::erase(GlowWind* w, GlowTransform* t, int hot, void* node)
 {
   if (ctx->nodraw)
@@ -540,11 +536,10 @@ void GrowAxis::erase(GlowWind* w, GlowTransform* t, int hot, void* node)
   ll_y = MIN(y1, y2) - hotw;
   ur_y = MAX(y1, y2) + hotw;
 
-  w->set_draw_buffer_only();
   ctx->gdraw->fill_rect(
       w, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, glow_eDrawType_LineErase);
-  w->reset_draw_buffer_only();
 }
+#endif
 
 void GrowAxis::draw()
 {
@@ -564,8 +559,6 @@ void GrowAxis::align(double x, double y, glow_eAlignDirection direction)
 {
   double dx, dy;
 
-  erase(&ctx->mw);
-  erase(&ctx->navw);
   ctx->set_defered_redraw();
   draw();
   switch (direction) {
@@ -610,8 +603,6 @@ void GrowAxis::align(double x, double y, glow_eAlignDirection direction)
 
 void GrowAxis::set_textsize(int size)
 {
-  erase(&ctx->mw);
-  erase(&ctx->navw);
   text_size = size;
   get_node_borders();
   draw();
@@ -623,8 +614,6 @@ void GrowAxis::set_textbold(int bold)
       || (!bold && text_drawtype == glow_eDrawType_TextHelvetica))
     return;
 
-  erase(&ctx->mw);
-  erase(&ctx->navw);
   if (bold)
     text_drawtype = glow_eDrawType_TextHelveticaBold;
   else
@@ -686,8 +675,6 @@ void GrowAxis::set_range(double minval, double maxval, int keep_settings)
         { 49, 2, 4, 8, "%2.0f" }, // 24
         { 26, 5, 5, 5, "%2.0f" } } }; // 25
 
-  erase(&ctx->mw);
-  erase(&ctx->navw);
   max_value = maxval;
   min_value = minval;
 
@@ -890,7 +877,6 @@ void GrowAxis::trace_close()
 void GrowAxis::set_conf(double max_val, double min_val, int no_of_lines,
     int long_quot, int value_quot, double rot, const char* value_format)
 {
-  erase(&ctx->mw);
   max_value = max_val;
   min_value = min_val;
   lines = no_of_lines;
@@ -1019,7 +1005,6 @@ void GrowAxis::set_visibility(glow_eVis visibility)
     if (invisible)
       return;
     invisible = 1;
-    erase(&ctx->mw);
     break;
   case glow_eVis_Dimmed:
     break;

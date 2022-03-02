@@ -80,7 +80,7 @@ public:
   GtkWidget* balarm_mark;
   GtkWidget* appl_form;
   GtkWidget* decr_button;
-  GtkWidget* tools_close;
+  GtkToolItem* tools_close;
   GtkWidget* functions_close;
   GtkWidget* funcbox[5];
   GtkMenuBar* menu_bar;

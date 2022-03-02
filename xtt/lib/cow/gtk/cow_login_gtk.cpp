@@ -153,29 +153,26 @@ CoLoginGtk::CoLoginGtk(void* wl_parent_ctx, GtkWidget* wl_parent_wid,
 
   widgets.label = gtk_label_new("");
 
-  GtkWidget* vbox1 = gtk_vbox_new(FALSE, 0);
-  gtk_box_pack_start(GTK_BOX(vbox1), usernamelabel, FALSE, FALSE, 15);
-  gtk_box_pack_start(GTK_BOX(vbox1), passwordlabel, FALSE, FALSE, 15);
-
-  GtkWidget* vbox2 = gtk_vbox_new(FALSE, 0);
-  gtk_box_pack_start(GTK_BOX(vbox2), widgets.usernamevalue, FALSE, FALSE, 15);
-  gtk_box_pack_start(GTK_BOX(vbox2), widgets.passwordvalue, FALSE, FALSE, 15);
-
-  GtkWidget* hbox = gtk_hbox_new(FALSE, 0);
-  gtk_box_pack_start(GTK_BOX(hbox), india_image, FALSE, FALSE, 25);
-  gtk_box_pack_start(GTK_BOX(hbox), vbox1, FALSE, FALSE, 15);
-  gtk_box_pack_end(GTK_BOX(hbox), vbox2, TRUE, TRUE, 15);
-
-  GtkWidget* india_hboxbuttons = gtk_hbox_new(TRUE, 40);
+  GtkWidget *hbox = gtk_grid_new();
+  gtk_widget_set_margin_start(hbox, 40);
+  gtk_grid_set_row_spacing(GTK_GRID(hbox), 20);
+  gtk_grid_set_column_spacing(GTK_GRID(hbox), 40);
+  gtk_grid_attach(GTK_GRID(hbox), india_image, 1, 1, 1, 2);
+  gtk_grid_attach(GTK_GRID(hbox), usernamelabel, 2, 1, 1, 1);
+  gtk_grid_attach(GTK_GRID(hbox), passwordlabel, 2, 2, 1, 1);
+  gtk_grid_attach(GTK_GRID(hbox), widgets.usernamevalue, 3, 1, 3, 1);
+  gtk_grid_attach(GTK_GRID(hbox), widgets.passwordvalue, 3, 2, 3, 1);
+    
+  GtkWidget* india_hboxbuttons = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 40);
   gtk_box_pack_start(
-      GTK_BOX(india_hboxbuttons), widgets.okbutton, FALSE, FALSE, 0);
-  gtk_box_pack_end(GTK_BOX(india_hboxbuttons), india_cancel, FALSE, FALSE, 0);
+      GTK_BOX(india_hboxbuttons), widgets.okbutton, FALSE, FALSE, 40);
+  gtk_box_pack_end(GTK_BOX(india_hboxbuttons), india_cancel, FALSE, FALSE, 40);
 
-  GtkWidget* india_vbox = gtk_vbox_new(FALSE, 0);
+  GtkWidget* india_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start(GTK_BOX(india_vbox), hbox, TRUE, TRUE, 30);
   gtk_box_pack_start(GTK_BOX(india_vbox), widgets.label, FALSE, FALSE, 5);
   gtk_box_pack_start(
-      GTK_BOX(india_vbox), gtk_hseparator_new(), FALSE, FALSE, 0);
+      GTK_BOX(india_vbox), gtk_separator_new(GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 0);
   gtk_box_pack_end(GTK_BOX(india_vbox), india_hboxbuttons, FALSE, FALSE, 15);
   gtk_container_add(GTK_CONTAINER(widgets.toplevel), india_vbox);
 

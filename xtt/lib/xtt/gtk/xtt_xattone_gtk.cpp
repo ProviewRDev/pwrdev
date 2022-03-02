@@ -330,8 +330,10 @@ XAttOneGtk::XAttOneGtk(GtkWidget* xa_parent_wid, void* xa_parent_ctx,
 
   // File entry
   GtkWidget* file_close
-      = gtk_image_menu_item_new_from_stock(GTK_STOCK_CLOSE, accel_g);
+      = gtk_menu_item_new_with_mnemonic("_Close");
   g_signal_connect(file_close, "activate", G_CALLBACK(activate_exit), this);
+  gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w',
+      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
 
   GtkMenu* file_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_close);
@@ -342,8 +344,10 @@ XAttOneGtk::XAttOneGtk(GtkWidget* xa_parent_wid, void* xa_parent_ctx,
 
   // Help entry
   GtkWidget* help_help
-      = gtk_image_menu_item_new_from_stock(GTK_STOCK_HELP, accel_g);
+      = gtk_menu_item_new_with_mnemonic("_Help");
   g_signal_connect(help_help, "activate", G_CALLBACK(activate_help), this);
+  gtk_widget_add_accelerator(file_close, "activate", accel_g, 'h',
+      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
 
   GtkMenu* help_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(help_menu), help_help);
@@ -359,7 +363,7 @@ XAttOneGtk::XAttOneGtk(GtkWidget* xa_parent_wid, void* xa_parent_ctx,
   gtk_widget_set_size_request(cmd_prompt, -1, 25);
   cmd_label = gtk_label_new("");
   gtk_widget_set_size_request(cmd_label, -1, 25);
-  gtk_misc_set_alignment(GTK_MISC(cmd_label), 0.0, 0.5);
+  //gtk_misc_set_alignment(GTK_MISC(cmd_label), 0.0, 0.5);
   cmd_entry = new CoWowEntryGtk(&value_recall);
   cmd_input = cmd_entry->widget();
   gtk_widget_set_size_request(cmd_input, -1, 25);
@@ -374,7 +378,7 @@ XAttOneGtk::XAttOneGtk(GtkWidget* xa_parent_wid, void* xa_parent_ctx,
   gtk_container_add(GTK_CONTAINER(viewport), cmd_scrolledtextview);
   gtk_container_add(GTK_CONTAINER(scrolledwindow), viewport);
 
-  cmd_scrolledinput = gtk_vbox_new(FALSE, 0);
+  cmd_scrolledinput = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start(GTK_BOX(cmd_scrolledinput), scrolledwindow, TRUE, TRUE, 0);
 
   // Buttons
@@ -395,25 +399,25 @@ XAttOneGtk::XAttOneGtk(GtkWidget* xa_parent_wid, void* xa_parent_ctx,
   g_signal_connect(
       cmd_scrolled_ca, "clicked", G_CALLBACK(activate_cmd_scrolled_ca), this);
 
-  GtkWidget* hboxbuttons = gtk_hbox_new(TRUE, 40);
+  GtkWidget* hboxbuttons = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 40);
   gtk_box_pack_start(GTK_BOX(hboxbuttons), cmd_scrolled_ok, FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(hboxbuttons), cmd_scrolled_ap, FALSE, FALSE, 0);
   gtk_box_pack_end(GTK_BOX(hboxbuttons), cmd_scrolled_ca, FALSE, FALSE, 0);
 
   // Horizontal box
-  GtkWidget* statusbar = gtk_hbox_new(FALSE, 0);
+  GtkWidget* statusbar = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   gtk_box_pack_start(GTK_BOX(statusbar), msg_label, FALSE, FALSE, 15);
   gtk_box_pack_start(GTK_BOX(statusbar), cmd_prompt, FALSE, FALSE, 15);
   gtk_box_pack_start(GTK_BOX(statusbar), cmd_label, TRUE, TRUE, 15);
   gtk_box_pack_start(GTK_BOX(statusbar), cmd_input, TRUE, TRUE, 15);
   gtk_box_pack_start(GTK_BOX(statusbar), cmd_scrolledinput, TRUE, TRUE, 15);
 
-  GtkWidget* vbox = gtk_vbox_new(FALSE, 0);
+  GtkWidget* vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 
   gtk_box_pack_start(GTK_BOX(vbox), GTK_WIDGET(menu_bar), FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(vbox), GTK_WIDGET(statusbar), TRUE, TRUE, 0);
   gtk_box_pack_start(
-      GTK_BOX(vbox), GTK_WIDGET(gtk_hseparator_new()), FALSE, FALSE, 0);
+      GTK_BOX(vbox), GTK_WIDGET(gtk_separator_new(GTK_ORIENTATION_HORIZONTAL)), FALSE, FALSE, 0);
   gtk_box_pack_end(GTK_BOX(vbox), hboxbuttons, FALSE, FALSE, 5);
 
   gtk_container_add(GTK_CONTAINER(toplevel), vbox);

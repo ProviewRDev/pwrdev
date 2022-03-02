@@ -677,10 +677,8 @@ int GeCurve::init_growcurve_cb(GlowCtx* fctx, void* client_data)
   mask = 0;
   mask |= grow_eAttr_grid_on;
   grow_attr.grid_on = 0;
-  mask |= grow_eAttr_double_buffer_on;
   grow_attr.default_hot_mode = glow_eHotMode_TraceAction;
   mask |= grow_eAttr_default_hot_mode;
-  grow_attr.double_buffer_on = 1;
   if (curve->initial_right_position) {
     mask |= grow_eAttr_initial_position;
     grow_attr.initial_position = glow_eDirection_Right;
@@ -938,8 +936,6 @@ int GeCurve::init_growaxis_cb(GlowCtx* fctx, void* client_data)
 
   mask = 0;
   // Double buffer is used to avoid pulldown menu at print
-  mask |= grow_eAttr_double_buffer_on;
-  grow_attr.double_buffer_on = 1;
   mask |= grow_eAttr_grid_on;
   grow_attr.grid_on = 0;
   mask |= grow_eAttr_hot_mode;
@@ -973,9 +969,6 @@ int GeCurve::init_grownames_cb(GlowCtx* fctx, void* client_data)
     grow_SetTextCoding((GrowCtx*)curve->grownames_ctx, glow_eTextCoding_UTF_8);
 
   mask = 0;
-  // Double buffer is used for print
-  mask |= grow_eAttr_double_buffer_on;
-  grow_attr.double_buffer_on = 1;
   mask |= grow_eAttr_grid_on;
   grow_attr.grid_on = 0;
   mask |= grow_eAttr_hot_mode;
@@ -1245,6 +1238,7 @@ int GeCurve::config_names()
   grow_SetAnnotation(cursor_annot[cd->cols], 0, "0", 1);
   grow_SetAnnotation(mark1_annot[cd->cols], 0, "0", 1);
   grow_SetAnnotation(mark2_annot[cd->cols], 0, "0", 1);
+  grow_GetBorders(grownames_ctx);
 
   return 1;
 }

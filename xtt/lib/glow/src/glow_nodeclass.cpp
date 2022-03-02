@@ -387,7 +387,7 @@ void GlowNodeClass::erase(GlowWind* w, GlowPoint* pos, int hot, void* node)
   int i;
 
   for (i = 0; i < a.a_size; i++) {
-    a.a[i]->erase(w, pos, hot, node);
+    // a.a[i]->erase(w, pos, hot, node);
   }
 }
 
@@ -406,7 +406,7 @@ void GlowNodeClass::erase(GlowWind* w, GlowTransform* t, int hot, void* node)
   int i;
 
   for (i = 0; i < a.a_size; i++) {
-    a.a[i]->erase(w, t, hot, node);
+    // a.a[i]->erase(w, t, hot, node);
   }
 }
 
@@ -458,8 +458,8 @@ void GlowNodeClass::erase_annotation(
     if ((a.a[i]->type() == glow_eObjectType_Annot
             || a.a[i]->type() == glow_eObjectType_GrowAnnot)
         && ((GlowAnnot*)a.a[i])->number == num) {
-      a.a[i]->erase(&ctx->mw, pos, hot, node);
-      a.a[i]->erase(&ctx->navw, pos, 0, node);
+      //a.a[i]->erase(&ctx->mw, pos, hot, node);
+      //a.a[i]->erase(&ctx->navw, pos, 0, node);
       break;
     }
   }
@@ -489,8 +489,8 @@ void GlowNodeClass::erase_annotation(
   for (i = 0; i < a.a_size; i++) {
     if (a.a[i]->type() == glow_eObjectType_GrowAnnot
         && ((GlowAnnot*)a.a[i])->number == num) {
-      ((GrowAnnot*)a.a[i])->erase_background(&ctx->mw, t, hot, node);
-      a.a[i]->erase(&ctx->navw, t, 0, node);
+      //((GrowAnnot*)a.a[i])->erase_background(&ctx->mw, t, hot, node);
+      //a.a[i]->erase(&ctx->navw, t, 0, node);
       break;
     }
   }

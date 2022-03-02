@@ -116,8 +116,6 @@ public:
   void draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
       void* node, void* colornode);
 
-  void erase(GlowWind* w, GlowTransform* t, int hot, void* node);
-  
   int local_event_handler(glow_eEvent event, double x, double y);
 
   int event_handler(GlowWind* w, glow_eEvent event, double fx, double fy);

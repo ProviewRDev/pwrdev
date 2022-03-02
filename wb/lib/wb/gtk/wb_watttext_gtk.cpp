@@ -294,13 +294,15 @@ WAttTextGtk::WAttTextGtk(GtkWidget* wa_parent_wid, void* wa_parent_ctx,
   GtkMenuBar* menu_bar = (GtkMenuBar*)g_object_new(GTK_TYPE_MENU_BAR, NULL);
 
   // File entry
-  GtkWidget* file_close
-      = gtk_image_menu_item_new_from_stock(GTK_STOCK_CLOSE, accel_g);
+  GtkWidget* file_close = gtk_menu_item_new_with_mnemonic("_Close");
   g_signal_connect(file_close, "activate", G_CALLBACK(activate_exit), this);
+  gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w',
+      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
 
-  GtkWidget* file_save
-      = gtk_image_menu_item_new_from_stock(GTK_STOCK_SAVE, accel_g);
+  GtkWidget* file_save = gtk_menu_item_new_with_mnemonic("_Save");
   g_signal_connect(file_save, "activate", G_CALLBACK(activate_save), this);
+  gtk_widget_add_accelerator(file_save, "activate", accel_g, 's',
+      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
 
   GtkWidget* file_saveandclose
       = gtk_menu_item_new_with_mnemonic("S_ave and close");
@@ -319,17 +321,23 @@ WAttTextGtk::WAttTextGtk(GtkWidget* wa_parent_wid, void* wa_parent_ctx,
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(file), GTK_WIDGET(file_menu));
 
   // Edit entry
-  GtkWidget* edit_copy
-      = gtk_image_menu_item_new_from_stock(GTK_STOCK_COPY, accel_g);
-  g_signal_connect(edit_copy, "activate", G_CALLBACK(activate_copy), this);
+  GtkWidget *edit_cut = gtk_menu_item_new_with_mnemonic("C_ut");
+  g_signal_connect(
+      edit_cut, "activate", G_CALLBACK(activate_cut), this);
+  gtk_widget_add_accelerator(edit_cut, "activate", accel_g, 'x',
+      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
 
-  GtkWidget* edit_cut
-      = gtk_image_menu_item_new_from_stock(GTK_STOCK_CUT, accel_g);
-  g_signal_connect(edit_cut, "activate", G_CALLBACK(activate_cut), this);
+  GtkWidget *edit_copy = gtk_menu_item_new_with_mnemonic("_Copy");
+  g_signal_connect(
+      edit_copy, "activate", G_CALLBACK(activate_copy), this);
+  gtk_widget_add_accelerator(edit_copy, "activate", accel_g, 'c',
+      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
 
-  GtkWidget* edit_paste
-      = gtk_image_menu_item_new_from_stock(GTK_STOCK_PASTE, accel_g);
-  g_signal_connect(edit_paste, "activate", G_CALLBACK(activate_paste), this);
+  GtkWidget *edit_paste = gtk_menu_item_new_with_mnemonic("_Paste");
+  g_signal_connect(
+      edit_paste, "activate", G_CALLBACK(activate_paste), this);
+  gtk_widget_add_accelerator(edit_paste, "activate", accel_g, 'v',
+      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
 
   GtkMenu* edit_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(edit_menu), edit_copy);
@@ -342,8 +350,10 @@ WAttTextGtk::WAttTextGtk(GtkWidget* wa_parent_wid, void* wa_parent_ctx,
 
   // Help entry
   GtkWidget* help_help
-      = gtk_image_menu_item_new_from_stock(GTK_STOCK_HELP, accel_g);
+      = gtk_menu_item_new_with_mnemonic("_Help");
   g_signal_connect(help_help, "activate", G_CALLBACK(activate_help), this);
+  gtk_widget_add_accelerator(help_help, "activate", accel_g, 'h',
+      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
 
   GtkMenu* help_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(help_menu), help_help);
@@ -378,7 +388,7 @@ WAttTextGtk::WAttTextGtk(GtkWidget* wa_parent_wid, void* wa_parent_ctx,
   gtk_widget_set_size_request(button_cancel, 70, 25);
   g_signal_connect(button_cancel, "clicked", G_CALLBACK(activate_cancel), this);
 
-  GtkWidget* hboxbuttons = gtk_hbox_new(TRUE, 40);
+  GtkWidget* hboxbuttons = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 40);
   gtk_box_pack_start(GTK_BOX(hboxbuttons), button_ok, FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(hboxbuttons), button_apply, FALSE, FALSE, 0);
   gtk_box_pack_end(GTK_BOX(hboxbuttons), button_cancel, FALSE, FALSE, 0);
@@ -386,7 +396,7 @@ WAttTextGtk::WAttTextGtk(GtkWidget* wa_parent_wid, void* wa_parent_ctx,
   msg_label = gtk_label_new("");
   gtk_widget_set_size_request(msg_label, -1, 25);
 
-  vbox = gtk_vbox_new(FALSE, 0);
+  vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start(GTK_BOX(vbox), GTK_WIDGET(menu_bar), FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(vbox), scrolledwindow, TRUE, TRUE, 0);
   gtk_box_pack_start(GTK_BOX(vbox), hboxbuttons, FALSE, FALSE, 5);

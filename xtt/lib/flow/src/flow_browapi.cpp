@@ -685,7 +685,7 @@ static void loadPBM(const char *filename, PBM* img)
   while (fgetc(f) != '\n')
     ;
 
-  int size = img->width * (img->height / 8 + 1);
+  int size = img->height * (img->width / 8 + 1);
   img->data = new unsigned char[size];
 
   for (int i = 0; i < size; i++) {
@@ -919,4 +919,9 @@ void brow_SetTextCoding(brow_tCtx ctx, flow_eTextCoding coding)
 void brow_ChangeObjectNodeClass(brow_tObject object, brow_tNodeClass new_nc)
 {
   ((FlowNode*)object)->change_nodeclass((FlowNodeClass*)new_nc);
+}
+
+void brow_UpdateColorTheme(brow_tCtx ctx, int ct)
+{
+  ctx->update_color_theme(ct);
 }
