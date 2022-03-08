@@ -1183,12 +1183,22 @@ int GsdmlAttrNav::save()
   for (auto const& diag_item : gsdml->getChannelDiagMap())
   {
     pn_runtime_data->m_PnDevice->m_channel_diag_map[diag_item.first].m_name = *diag_item.second._Name;
-    pn_runtime_data->m_PnDevice->m_channel_diag_map[diag_item.first].m_help = *diag_item.second._Help;
+
+    // Not all diag items do have a help item (it's optional)
+    if (diag_item.second._Help)
+    {
+      pn_runtime_data->m_PnDevice->m_channel_diag_map[diag_item.first].m_help = *diag_item.second._Help;
+    }
+
     for (auto const& ext_diag_item : diag_item.second._ExtChannelDiagList)
     {
-      pn_runtime_data->m_PnDevice->m_channel_diag_map[diag_item.first]
-          .m_ext_channel_diag_map[ext_diag_item.first]
-          .m_help = *ext_diag_item.second._Help;
+      if (ext_diag_item.second._Help)
+      {
+        pn_runtime_data->m_PnDevice->m_channel_diag_map[diag_item.first]
+            .m_ext_channel_diag_map[ext_diag_item.first]
+            .m_help = *ext_diag_item.second._Help;
+      }
+      
       pn_runtime_data->m_PnDevice->m_channel_diag_map[diag_item.first]
           .m_ext_channel_diag_map[ext_diag_item.first]
           .m_name = *ext_diag_item.second._Name;
