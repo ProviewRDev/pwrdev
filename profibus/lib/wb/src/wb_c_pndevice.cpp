@@ -39,6 +39,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <algorithm>
+#include <regex>
 #include <stdexcept>
 #include <iomanip>
 
@@ -117,8 +118,7 @@ static int create_channel(ldh_tSession ldhses, ChanItem const& chan, pwr_tOid ta
 
   pwr_tAttrRef chan_aref = cdh_ObjidToAref(chan_oid);
 
-  // Set Representation
-  // pwr_tEnum representation = chan.representation;
+  // Set Representation  
   sts = set_attribute(ldhses, (void*)&chan.representation, sizeof(chan.representation), "Representation",
                       &chan_aref);
   if (EVEN(sts))
@@ -139,37 +139,95 @@ static int pndevice_fill_io_vector_from_data_item(std::vector<ChanItem>& io_vect
                                                   bool is_output = false)
 {
   ChanItem ci;
+  std::regex disallowed_characters_re(R"([^A-Za-z0-9_])"); // Match anything NOT in A-Z, a-z, 0-9 or _ i.e. all disallowed characters
 
-  // We must handle octet strings a little bit different. And how we do may not fit everyones need...
-  if (data_item->_DataType == GSDML::ValueDataType_OctetString)
+  // If we have bits we fill with Di/Do
+  if (data_item->_UseAsBits)
   {
-    size_t octet_index = 0;
-    // We add UInt8 Channel items for each byte in the input
-    for (size_t byte = 0; byte < data_item->_Length; byte++)
+    // Use as bits
+    unsigned int bits;
+
+    switch (data_item->_DataType)
     {
-      ci.number = 0;
-      ci.representation = pwr_eDataRepEnum_UInt8;
-      ci.use_as_bit = 0;
+    case GSDML::ValueDataType_Integer8:
+    case GSDML::ValueDataType_Unsigned8:    
+    case GSDML::ValueDataType_OctetString: 
+      ci.representation = pwr_eDataRepEnum_Bit8;
+      bits = 8;
+      break;
+    case GSDML::ValueDataType_Integer16:
+    case GSDML::ValueDataType_Unsigned16:
+      ci.representation = pwr_eDataRepEnum_Bit16;
+      bits = 16;
+      break;
+    case GSDML::ValueDataType_Integer32:
+    case GSDML::ValueDataType_Unsigned32:
+      ci.representation = pwr_eDataRepEnum_Bit32;
+      bits = 32;
+      break;
+    case GSDML::ValueDataType_Integer64:
+    case GSDML::ValueDataType_Unsigned64:
+      ci.representation = pwr_eDataRepEnum_Bit64;
+      bits = 64;
+      break;
+    default:
+      bits = 0;
+    }
 
-      if (is_output)
-        ci.cid = pwr_cClass_ChanIo;
-      else
-        ci.cid = pwr_cClass_ChanIi;
+    if (is_output)
+      ci.cid = pwr_cClass_ChanDo;
+    else
+      ci.cid = pwr_cClass_ChanDi;
 
-      ci.description = (data_item->_Text ? *data_item->_Text : "No description");
+    ci.use_as_bit = true;
 
-      std::ostringstream name(std::ios_base::out);
-      name << (data_item->_TextId != "" ? data_item->_TextId : "Ch") << "_" << start_index << "_"
-           << octet_index++;
-      ci.name = name.str();
-      ci.name.erase(std::remove(ci.name.begin(), ci.name.end(), ' '),
-                    ci.name.end());                           // Remove any whitespaces
-      std::replace(ci.name.begin(), ci.name.end(), '-', '_'); // Replace - with _
-      io_vector.push_back(ci);
+    // For those sloppy suppliers of GSDML that do not provide this list :/
+    if (data_item->_BitDataItem.size() == 0)
+    {
+      // If this is a octetstring we multiply the biuts with length
+      if (data_item->_DataType == GSDML::ValueDataType_OctetString)
+        bits *= data_item->_Length;
+
+      // Add default bits
+      for (unsigned int number = 0; number < bits; number++)
+      {
+        // Add Channel
+        ci.number = data_item->_DataType == GSDML::ValueDataType_OctetString ? number % 8 : number;
+        ci.description = std::string("Bit ") + std::to_string(number); // Okay lots of overhead here...
+
+        std::ostringstream name(std::ios_base::out);
+        name << (data_item->_Text ? *data_item->_Text : "Ch") << "_" << start_index << "_" << number;
+        ci.name = name.str();
+        ci.name.erase(std::remove(ci.name.begin(), ci.name.end(), ' '),
+                      ci.name.end());                           // Remove any whitespaces
+        std::replace(ci.name.begin(), ci.name.end(), '-', '_'); // Replace - with _
+
+        io_vector.push_back(ci);
+      }
+    }
+    else // Add only configured bit items
+    {      
+      for (auto const& bit_data_item : data_item->_BitDataItem)
+      {
+        // Add channel
+        ci.number = bit_data_item._BitOffset;
+        ci.description = bit_data_item._Text
+                             ? *bit_data_item._Text
+                             : std::string(" Bit ") + std::to_string(ci.number);
+
+        std::ostringstream name(std::ios_base::out);
+        name << (data_item->_Text ? *data_item->_Text : "Ch") << "_" << start_index << "_" << ci.number;
+        ci.name = name.str();
+        ci.name.erase(std::remove(ci.name.begin(), ci.name.end(), ' '),
+                      ci.name.end());                           // Remove any whitespaces
+        ci.name = std::regex_replace(ci.name, disallowed_characters_re, "_"); // Replace all illegal characters with a '_'                    
+
+        io_vector.push_back(ci);
+      }
     }
     return PB__SUCCESS;
   }
-  else if (!data_item->_UseAsBits)
+  else
   {
     switch (data_item->_DataType)
     {
@@ -177,6 +235,7 @@ static int pndevice_fill_io_vector_from_data_item(std::vector<ChanItem>& io_vect
       ci.representation = pwr_eDataRepEnum_Int8;
       break;
     case GSDML::ValueDataType_Unsigned8:
+    case GSDML::ValueDataType_OctetString:
       ci.representation = pwr_eDataRepEnum_UInt8;
       break;
     case GSDML::ValueDataType_Integer16:
@@ -212,105 +271,43 @@ static int pndevice_fill_io_vector_from_data_item(std::vector<ChanItem>& io_vect
     ci.use_as_bit = 0;
 
     if (is_output)
-      ci.cid = pwr_cClass_ChanAo;
+    {
+      ci.cid = data_item->_DataType == GSDML::ValueDataType_OctetString ? pwr_cClass_ChanIo : pwr_cClass_ChanAo;
+    }
     else
-      ci.cid = pwr_cClass_ChanAi;
+    {
+      ci.cid = data_item->_DataType == GSDML::ValueDataType_OctetString ? pwr_cClass_ChanIi : pwr_cClass_ChanAi;
+    }
 
     ci.description = *data_item->_Text;
-  }
-  else
-  {
-    // Use as bits
-    unsigned int bits;
 
-    switch (data_item->_DataType)
-    {
-    case GSDML::ValueDataType_Integer8:
-    case GSDML::ValueDataType_Unsigned8:
-      ci.representation = pwr_eDataRepEnum_Bit8;
-      bits = 8;
-      break;
-    case GSDML::ValueDataType_Integer16:
-    case GSDML::ValueDataType_Unsigned16:
-      ci.representation = pwr_eDataRepEnum_Bit16;
-      bits = 16;
-      break;
-    case GSDML::ValueDataType_Integer32:
-    case GSDML::ValueDataType_Unsigned32:
-      ci.representation = pwr_eDataRepEnum_Bit32;
-      bits = 32;
-      break;
-    case GSDML::ValueDataType_Integer64:
-    case GSDML::ValueDataType_Unsigned64:
-      ci.representation = pwr_eDataRepEnum_Bit64;
-      bits = 64;
-      break;
-    default:
-      bits = 0;
-    }
-
-    if (is_output)
-      ci.cid = pwr_cClass_ChanDo;
-    else
-      ci.cid = pwr_cClass_ChanDi;
-
-    ci.use_as_bit = true;
-
-    ushort bit_index = 0;
-
-    // For those sloppy suppliers of GSDML that do not provide this list :/
-    if (data_item->_BitDataItem.size() == 0)
-    {
-      // Add all bits
-      for (unsigned int number = 0; number < bits; number++)
+    // If this is octetstring we add one item for each byte
+    if (data_item->_DataType == GSDML::ValueDataType_OctetString)
+    {      
+      for (size_t byte = 0; byte < data_item->_Length; byte++)
       {
-        // Add Channel
-        ci.number = number;
-        ci.description = std::string("Bit ") + std::to_string(number); // Okay lots of overhead here...
-
         std::ostringstream name(std::ios_base::out);
-        name << (data_item->_Text ? *data_item->_Text : "Ch") << "_" << start_index << "_" << bit_index++;
+        name << (data_item->_TextId != "" ? data_item->_TextId : "Ch") << "_" << start_index << "_"
+            << byte;
         ci.name = name.str();
         ci.name.erase(std::remove(ci.name.begin(), ci.name.end(), ' '),
-                      ci.name.end());                           // Remove any whitespaces
-        std::replace(ci.name.begin(), ci.name.end(), '-', '_'); // Replace - with _
-
+                      ci.name.end());                           // Remove any whitespaces      
+        ci.name = std::regex_replace(ci.name, disallowed_characters_re, "_"); // Replace all illegal characters with a '_'            
         io_vector.push_back(ci);
       }
     }
     else
     {
-      for (auto const& bit_data_item : data_item->_BitDataItem)
-      {
-        // Add channel
-        ci.number = bit_data_item._BitOffset;
-        ci.description = bit_data_item._Text
-                             ? *bit_data_item._Text
-                             : std::string(" Bit ") + std::to_string(bit_data_item._BitOffset);
+      std::ostringstream name(std::ios_base::out);
+      name << (data_item->_TextId != "" ? "" : "Ch") << std::setw(2) << std::setfill('0') << start_index
+          << (data_item->_TextId != "" ? "_" + data_item->_TextId : "");
+      ci.name = name.str();
+      ci.name.erase(std::remove(ci.name.begin(), ci.name.end(), ' '), ci.name.end()); // Remove any whitespaces
+      ci.name = std::regex_replace(ci.name, disallowed_characters_re, "_"); // Replace all illegal characters with a '_'
 
-        std::ostringstream name(std::ios_base::out);
-        name << (data_item->_Text ? *data_item->_Text : "Ch") << "_" << start_index << "_" << bit_index++;
-        ci.name = name.str();
-        ci.name.erase(std::remove(ci.name.begin(), ci.name.end(), ' '),
-                      ci.name.end());                           // Remove any whitespaces
-        std::replace(ci.name.begin(), ci.name.end(), '-', '_'); // Replace - with _
-
-        io_vector.push_back(ci);
-      }
+      io_vector.push_back(ci);
     }
-    return PB__SUCCESS;
   }
-
-  // Set a name for the channel object
-  std::ostringstream name(std::ios_base::out);
-  name << (data_item->_TextId != "" ? "" : "Ch") << std::setw(2) << std::setfill('0') << start_index
-       << (data_item->_TextId != "" ? "_" + data_item->_TextId : "");
-  ci.name = name.str();
-  ci.name.erase(std::remove(ci.name.begin(), ci.name.end(), ' '), ci.name.end()); // Remove any whitespaces
-  std::replace(ci.name.begin(), ci.name.end(), '-', '_');                         // Replace - with _
-
-  io_vector.push_back(ci);
-
   return PB__SUCCESS;
 }
 
