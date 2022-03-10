@@ -198,6 +198,26 @@ SObject pwrb:Type
      EndBody
     EndObject
     !/**
+    !  StandardLight.
+    !*/
+    Object StandardLight $Value
+     Body SysBody
+       Attr PgmName = "StandardLight"
+       Attr Text = "StandardLight"
+       Attr Value = 15
+     EndBody
+    EndObject
+    !/**
+    !  StandardDark.
+    !*/
+    Object StandardDark $Value
+     Body SysBody
+       Attr PgmName = "StandardDark"
+       Attr Text = "StandardDark"
+       Attr Value = 16
+     EndBody
+    EndObject
+    !/**
     !  Custom.
     !*/
     Object Custom $Value

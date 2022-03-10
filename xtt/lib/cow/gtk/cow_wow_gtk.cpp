@@ -1797,3 +1797,17 @@ void CoWowGtk::update_title(GtkWidget* w, int editmode)
     }
   }
 }
+
+int CoWowGtk::GetDarkTheme(GtkWidget *w)
+{
+  if (m_dark_theme == -1) {
+    GdkRGBA color;
+    GtkStyleContext* style_context = gtk_widget_get_style_context(w);
+    gtk_style_context_get_color(style_context, GTK_STATE_FLAG_NORMAL, &color);
+    if ( (color.red + color.blue + color.green)/3 > 0.5)
+      m_dark_theme = 1;
+    else
+      m_dark_theme = 0;
+  }
+  return m_dark_theme;
+}

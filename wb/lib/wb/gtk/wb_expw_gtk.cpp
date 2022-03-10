@@ -75,6 +75,8 @@ WbExpWGtk::WbExpWGtk(void* expw_parent_ctx, GtkWidget* expw_parent_wid,
   g_signal_connect(toplevel, "focus-in-event",
       G_CALLBACK(WbExpWGtk::action_inputfocus), this);
 
+  int dark_theme = wutl_get_dark_theme(toplevel);
+
   CoWowGtk::SetWindowIcon(toplevel);
 
   GtkAccelGroup* accel_g
@@ -176,21 +178,38 @@ WbExpWGtk::WbExpWGtk(void* expw_parent_ctx, GtkWidget* expw_parent_wid,
 
   // Toolbar
   GtkToolbar* tools = (GtkToolbar*)g_object_new(GTK_TYPE_TOOLBAR, NULL);
+  pwr_tFileName icon;
 
-  wutl_tools_item(tools, "$pwr_exe/wb_export.png", G_CALLBACK(activate_export), 
+  switch (type) {
+  case expw_eType_Export:
+    strcpy(icon, dark_theme ? "$pwr_exe/ico_send_d_30.png" : "$pwr_exe/ico_send_l_30.png");
+    break;
+  case expw_eType_Import:
+    strcpy(icon, dark_theme ? "$pwr_exe/ico_send_d_30.png" : "$pwr_exe/ico_send_l_30.png");
+    break;
+  case expw_eType_BuildDirectories:
+    strcpy(icon, dark_theme ? "$pwr_exe/ico_build_d_30.png" : "$pwr_exe/ico_build_l_30.png");
+    break;
+  }
+
+  wutl_tools_item(tools, icon, G_CALLBACK(activate_export), 
       action, this, 1, 0);
 
-  wutl_tools_item(tools, "$pwr_exe/ge_update.png", G_CALLBACK(activate_update), 
-      "Update", this, 1, 0);
+  wutl_tools_item(tools, 
+      dark_theme ? "$pwr_exe/ico_refresh_d_30.png" : "$pwr_exe/ico_refresh_l_30.png", 
+      G_CALLBACK(activate_update), "Update", this, 1, 0);
 
-  wutl_tools_item(tools, "$pwr_exe/ge_zoom_in.png", G_CALLBACK(activate_zoom_in), 
-      "Zoom in", this, 0, 0);
+  wutl_tools_item(tools, 
+      dark_theme ? "$pwr_exe/ico_zoomin_d_30.png" : "$pwr_exe/ico_zoomin_l_30.png", 
+      G_CALLBACK(activate_zoom_in), "Zoom in", this, 0, 0);
 
-  wutl_tools_item(tools, "$pwr_exe/ge_zoom_out.png", G_CALLBACK(activate_zoom_out), 
-      "Zoom out", this, 0, 0);
+  wutl_tools_item(tools,
+      dark_theme ? "$pwr_exe/ico_zoomout_d_30.png" : "$pwr_exe/ico_zoomout_l_30.png", 
+      G_CALLBACK(activate_zoom_out), "Zoom out", this, 0, 0);
 
-  wutl_tools_item(tools, "$pwr_exe/ge_zoom_reset.png", G_CALLBACK(activate_zoom_reset), 
-      "Zoom reset", this, 0, 0);
+  wutl_tools_item(tools,
+      dark_theme ? "$pwr_exe/ico_zoomreset_d_30.png" : "$pwr_exe/ico_zoomreset_l_30.png", 
+      G_CALLBACK(activate_zoom_reset), "Zoom reset", this, 0, 0);
 
   form = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 

@@ -47,6 +47,7 @@
 #include "cow_msgwindow_gtk.h"
 #include "cow_statusmon_nodelist_gtk.h"
 #include "cow_statusmon_nodelistnav_gtk.h"
+#include "cow_wutl_gtk.h"
 
 static gint delete_event(GtkWidget* w, GdkEvent* event, gpointer data)
 {
@@ -76,6 +77,8 @@ NodelistGtk::NodelistGtk(void* nodelist_parent_ctx,
   g_signal_connect(toplevel, "destroy", G_CALLBACK(destroy_event), this);
   g_signal_connect(
       toplevel, "focus-in-event", G_CALLBACK(action_inputfocus), this);
+
+  int dark_theme = CoWowGtk::GetDarkTheme(toplevel);
 
   CoWowGtk::SetWindowIcon(toplevel);
 
@@ -111,7 +114,6 @@ NodelistGtk::NodelistGtk(void* nodelist_parent_ctx,
   g_signal_connect(
       file_remove_node, "activate", G_CALLBACK(activate_remove_node), this);
 
-  pwr_tFileName fname;
   GtkWidget* file_open_xtt = gtk_menu_item_new_with_mnemonic(
       CoWowGtk::translate_utf8("Open Runtime _Navigator"));
   g_signal_connect(
@@ -298,81 +300,41 @@ NodelistGtk::NodelistGtk(void* nodelist_parent_ctx,
   // Toolbar
   GtkToolbar* tools = (GtkToolbar*)g_object_new(GTK_TYPE_TOOLBAR, NULL);
 
-  GtkToolItem* tools_save = gtk_tool_button_new(gtk_image_new_from_icon_name("gtk-save", GTK_ICON_SIZE_SMALL_TOOLBAR), NULL);
-  g_signal_connect(tools_save, "clicked", G_CALLBACK(activate_save), this);
-  g_object_set(tools_save, "can-focus", FALSE, NULL);
-  gtk_toolbar_insert(tools, tools_save, -1);
-  gtk_tool_item_set_tooltip_text(tools_save, CoWowGtk::translate_utf8("Save configuration"));
+  wutl_tools_item(tools, 
+      dark_theme ? "$pwr_exe/ico_save_d_30.png" : "$pwr_exe/ico_save_l_30.png", 
+      G_CALLBACK(activate_save), "Save configuration", this, 1, 1);
 
-  GtkToolItem* tools_add_node = gtk_tool_button_new(gtk_image_new_from_icon_name("gtk-add", GTK_ICON_SIZE_SMALL_TOOLBAR), NULL);
-  g_signal_connect(
-      tools_add_node, "clicked", G_CALLBACK(activate_add_node), this);
-  g_object_set(tools_add_node, "can-focus", FALSE, NULL);
-  gtk_toolbar_insert(tools, tools_add_node, -1);
-  gtk_tool_item_set_tooltip_text(tools_add_node, CoWowGtk::translate_utf8("Add node"));
+  wutl_tools_item(tools, 
+      dark_theme ? "$pwr_exe/ico_add_d_30.png" : "$pwr_exe/ico_add_l_30.png", 
+      G_CALLBACK(activate_add_node), "Add node", this, 1, 1);
 
-  GtkToolItem* tools_remove_node = gtk_tool_button_new(gtk_image_new_from_icon_name("gtk-remove", GTK_ICON_SIZE_SMALL_TOOLBAR), NULL);
-  g_signal_connect(
-      tools_remove_node, "clicked", G_CALLBACK(activate_remove_node), this);
-  g_object_set(tools_remove_node, "can-focus", FALSE, NULL);
-  gtk_toolbar_insert(tools, tools_remove_node, -1);
-  gtk_tool_item_set_tooltip_text(tools_remove_node, CoWowGtk::translate_utf8("Remove node"));
+  wutl_tools_item(tools, 
+      dark_theme ? "$pwr_exe/ico_remove_d_30.png" : "$pwr_exe/ico_remove_l_30.png", 
+      G_CALLBACK(activate_remove_node), "Remove node", this, 1, 1);
 
-  dcli_translate_filename(fname, "$pwr_exe/xtt_navigator.png");
-  GtkToolItem* tools_xtt = gtk_tool_button_new(gtk_image_new_from_file(fname), NULL);
-  g_signal_connect(tools_xtt, "clicked", G_CALLBACK(activate_open_xtt), this);
-  g_object_set(tools_xtt, "can-focus", FALSE, NULL);
-  gtk_toolbar_insert(tools, tools_xtt, -1);
-  gtk_tool_item_set_tooltip_text(tools_xtt, 
-      CoWowGtk::translate_utf8("Start Runtime Navigator on selected node"));
+  wutl_tools_item(tools, 
+      dark_theme ? "$pwr_exe/ico_navigator_d_30.png" : "$pwr_exe/ico_navigator_l_30.png", 
+      G_CALLBACK(activate_open_xtt), "Start Runtime Navigator on selected node", this, 1, 1);
 
-  dcli_translate_filename(fname, "$pwr_exe/xtt_op.png");
-  GtkToolItem* tools_op = gtk_tool_button_new(gtk_image_new_from_file(fname), NULL);
-  g_signal_connect(
-      tools_op, "clicked", G_CALLBACK(activate_open_opplace), this);
-  g_object_set(tools_op, "can-focus", FALSE, NULL);
-  gtk_toolbar_insert(tools, tools_op, -1);
-  gtk_tool_item_set_tooltip_text(tools_op, CoWowGtk::translate_utf8("Start Operatorplace on selected node"));
+  wutl_tools_item(tools, 
+      dark_theme ? "$pwr_exe/ico_opplace_d_30.png" : "$pwr_exe/ico_opplace_l_30.png", 
+      G_CALLBACK(activate_open_opplace), "Start Operatorplace on selected node", this, 1, 1);
 
-  dcli_translate_filename(fname, "$pwr_exe/xtt_rtmon.png");
-  GtkToolItem* tools_rtmon = gtk_tool_button_new(gtk_image_new_from_file(fname), NULL);
-  g_signal_connect(
-      tools_rtmon, "clicked", G_CALLBACK(activate_open_rtmon), this);
-  g_object_set(tools_rtmon, "can-focus", FALSE, NULL);
-  gtk_toolbar_insert(tools, tools_rtmon, -1);
-  gtk_tool_item_set_tooltip_text(tools_rtmon, CoWowGtk::translate_utf8("Start Runtime Monitor on selected node"));
+  wutl_tools_item(tools, 
+      dark_theme ? "$pwr_exe/ico_runtime_monitor_d_30.png" : "$pwr_exe/ico_runtime_monitor_l_30.png", 
+      G_CALLBACK(activate_open_rtmon), "Start Runtime Monitor on selected node", this, 1, 1);
 
-  dcli_translate_filename(fname, "$pwr_exe/xtt_zoom_in.png");
-  GtkToolItem* tools_zoom_in = gtk_tool_button_new(gtk_image_new_from_file(fname), NULL);
-  g_signal_connect(
-      tools_zoom_in, "clicked", G_CALLBACK(activate_zoom_in), this);
-  g_object_set(tools_zoom_in, "can-focus", FALSE, NULL);
-  gtk_toolbar_insert(tools, tools_zoom_in, -1);
-  gtk_tool_item_set_tooltip_text(tools_zoom_in, CoWowGtk::translate_utf8("Zoom in"));
+    wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_zoomin_d_30.png" : "$pwr_exe/ico_zoomin_l_30.png", G_CALLBACK(activate_zoom_in), 
+      "Zoom in", this, 1, 1);
 
-  dcli_translate_filename(fname, "$pwr_exe/xtt_zoom_out.png");
-  GtkToolItem* tools_zoom_out = gtk_tool_button_new(gtk_image_new_from_file(fname), NULL);
-  g_signal_connect(
-      tools_zoom_out, "clicked", G_CALLBACK(activate_zoom_out), this);
-  g_object_set(tools_zoom_out, "can-focus", FALSE, NULL);
-  gtk_toolbar_insert(tools, tools_zoom_out, -1);
-  gtk_tool_item_set_tooltip_text(tools_zoom_out, CoWowGtk::translate_utf8("Zoom out"));
+    wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_zoomout_d_30.png" : "$pwr_exe/ico_zoomout_l_30.png", G_CALLBACK(activate_zoom_out), 
+      "Zoom out", this, 1, 1);
 
-  dcli_translate_filename(fname, "$pwr_exe/xtt_zoom_reset.png");
-  GtkToolItem* tools_zoom_reset = gtk_tool_button_new(gtk_image_new_from_file(fname), NULL);
-  g_signal_connect(
-      tools_zoom_reset, "clicked", G_CALLBACK(activate_zoom_reset), this);
-  g_object_set(tools_zoom_reset, "can-focus", FALSE, NULL);
-  gtk_toolbar_insert(tools, tools_zoom_reset, -1);
-  gtk_tool_item_set_tooltip_text(tools_zoom_reset, CoWowGtk::translate_utf8("Zoom reset"));
+    wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_zoomreset_d_30.png" : "$pwr_exe/ico_zoomreset_l_30.png", G_CALLBACK(activate_zoom_reset), 
+      "Zoom reset", this, 1, 1);
 
-  dcli_translate_filename(fname, "$pwr_exe/xtt_reconnect.png");
-  GtkToolItem* tools_reconnect = gtk_tool_button_new(gtk_image_new_from_file(fname), NULL);
-  g_signal_connect(
-      tools_reconnect, "clicked", G_CALLBACK(activate_reconnect), this);
-  g_object_set(tools_reconnect, "can-focus", FALSE, NULL);
-  gtk_toolbar_insert(tools, tools_reconnect, -1);
-  gtk_tool_item_set_tooltip_text(tools_reconnect, CoWowGtk::translate_utf8("Reconnect"));
+    wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_refresh_d_30.png" : "$pwr_exe/ico_refresh_l_30.png", G_CALLBACK(activate_reconnect), 
+      "Reconnect", this, 1, 1);
 
   gtk_box_pack_start(GTK_BOX(vbox), GTK_WIDGET(menu_bar), FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(vbox), GTK_WIDGET(tools), FALSE, FALSE, 0);

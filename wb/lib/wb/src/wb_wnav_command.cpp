@@ -198,7 +198,7 @@ dcli_tCmdTable wnav_command_table[] = {
           "/OUTPUT", "/NOCONFIRM", "/LOG", "/CLASS", "/HIERARCHY", "/NAME",
           "/ATTRIBUTE", "/SIGNALOBJECTSEG", "/SIGCHANCONSEG", "/SHOSIGCHANCON",
           "/SHODETECTTEXT", "/VOLUMENAME", "/VALUE", "/SOURCE", "/MODAL",
-          "/IGNOREMISSING", "" } },
+	  "/IGNOREMISSING", "/INDEX", "" } },
   { "SETUP", &wnav_setup_func,
       {
           "",
@@ -1401,6 +1401,34 @@ static int wnav_set_func(void* client_data, void* client_flag)
       }
     } else {
       wnav->message('E', "Graph not found");
+    }
+  } else if (str_NoCaseStrncmp(arg1_str, "COLORTHEME", strlen(arg1_str)) == 0) {
+    // Command is "SET COLORTHEME"
+    char idx_str[20];
+    int idx;
+    int num;
+
+    if (EVEN(dcli_get_qualifier("/INDEX", idx_str, sizeof(idx_str)))) {
+      wnav->message('E', "Type syntax error");
+      return WNAV__HOLDCOMMAND;
+    }
+
+    if (EVEN(dcli_get_qualifier("/LOCAL", 0, 0))) {
+      num = sscanf(idx_str, "%d", &idx);
+      if (num != 1) {
+	wnav->message('E', "Type syntax error");
+	return WNAV__HOLDCOMMAND;
+      }
+      idx = CoWow::SetColorTheme(idx);
+
+      // Global command to all windows
+      pwr_tCmd cmd;
+      sprintf(cmd, "SET COLORTHEME /INDEX=%d", idx);
+      (wnav->gbl_command_cb)(wnav->parent_ctx, cmd);
+    }
+    else {
+      wnav->gbl.color_theme = CoWow::ColorTheme();
+      wnav->update_color_theme(CoWow::ColorTheme());
     }
   } else {
     wnav->message('E', "Syntax error");

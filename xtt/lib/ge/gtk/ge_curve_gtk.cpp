@@ -840,6 +840,8 @@ GeCurveGtk::GeCurveGtk(void* gc_parent_ctx, GtkWidget* parent_widget,
     toplevel = parent_widget;
   }
 
+  int dark_theme = CoWowGtk::GetDarkTheme(toplevel);
+
   GtkAccelGroup* accel_g
       = (GtkAccelGroup*)g_object_new(GTK_TYPE_ACCEL_GROUP, NULL);
   gtk_window_add_accel_group(GTK_WINDOW(toplevel), accel_g);
@@ -980,53 +982,65 @@ GeCurveGtk::GeCurveGtk(void* gc_parent_ctx, GtkWidget* parent_widget,
   // Toolbar
   GtkToolbar* tools = (GtkToolbar*)g_object_new(GTK_TYPE_TOOLBAR, NULL);
 
-  wutl_tools_item(tools, "$pwr_exe/xtt_zoom_in.png", G_CALLBACK(activate_zoomin),
-		  "Zoom in", this);
+  wutl_tools_item(tools, 
+      dark_theme ? "$pwr_exe/ico_zoomin_d_30.png" : "$pwr_exe/ico_zoomin_l_30.png", 
+      G_CALLBACK(activate_zoomin), "Zoom in", this);
 
-  wutl_tools_item(tools, "$pwr_exe/xtt_zoom_out.png", G_CALLBACK(activate_zoomout),
-		  "Zoom out", this);
+  wutl_tools_item(tools,
+      dark_theme ? "$pwr_exe/ico_zoomout_d_30.png" : "$pwr_exe/ico_zoomout_l_30.png", 
+      G_CALLBACK(activate_zoomout), "Zoom out", this);
 
-  wutl_tools_item(tools, "$pwr_exe/xtt_zoom_reset.png", G_CALLBACK(activate_zoomreset),
-		  "Zoom reset", this);
+  wutl_tools_item(tools, 
+      dark_theme ? "$pwr_exe/ico_zoomreset_d_30.png" : "$pwr_exe/ico_zoomreset_l_30.png", 
+      G_CALLBACK(activate_zoomreset), "Zoom reset", this);
 
-  wutl_tools_item(tools, "$pwr_exe/xtt_zoom_reset.png", G_CALLBACK(activate_zoomreset),
-		  "Zoom reset", this);
+  wutl_tools_item(tools,
+      dark_theme ? "$pwr_exe/ico_page_left_d_30.png" : "$pwr_exe/ico_page_left_l_30.png", 
+      G_CALLBACK(activate_page_left), "Page left", this);
 
-  wutl_tools_item(tools, "$pwr_exe/ge_page_left.png", G_CALLBACK(activate_page_left),
-		  "Page left", this);
+  wutl_tools_item(tools,
+      dark_theme ? "$pwr_exe/ico_scroll_left_d_30.png" : "$pwr_exe/ico_scroll_left_l_30.png", 
+      G_CALLBACK(activate_scroll_left), "Scroll left", this);
 
-  wutl_tools_item(tools, "$pwr_exe/ge_scroll_left.png", G_CALLBACK(activate_scroll_left),
-		  "Scroll left", this);
+  wutl_tools_item(tools,
+      dark_theme ? "$pwr_exe/ico_scroll_right_d_30.png" : "$pwr_exe/ico_scroll_right_l_30.png", 
+      G_CALLBACK(activate_scroll_right), "Scroll right", this);
 
-  wutl_tools_item(tools, "$pwr_exe/ge_scroll_right.png", G_CALLBACK(activate_scroll_right),
-		  "Scroll right", this);
+  wutl_tools_item(tools,
+      dark_theme ? "$pwr_exe/ico_page_right_d_30.png" : "$pwr_exe/ico_page_right_l_30.png", 
+      G_CALLBACK(activate_page_right), "Page right", this);
 
-  wutl_tools_item(tools, "$pwr_exe/ge_page_right.png", G_CALLBACK(activate_page_right),
-		  "Page right", this);
+  tools_add = wutl_tools_item(tools, 
+      dark_theme ? "$pwr_exe/ico_add_d_30.png" : "$pwr_exe/ico_add_l_30.png", 
+      G_CALLBACK(activate_add), "Add", this);
 
-  tools_add = wutl_tools_item(tools, "$pwr_exe/xtt_add.png", G_CALLBACK(activate_add),
-		  "Add", this);
+  tools_curvetype_line = wutl_tools_item(tools, 
+      dark_theme ? "$pwr_exe/ico_curve_line_d_30.png" : "$pwr_exe/ico_curve_line_l_30.png", 
+      G_CALLBACK(activate_curvetype_line), "Curve line", this);
 
-  tools_curvetype_line = wutl_tools_item(tools, "$pwr_exe/xtt_curve_line.png", G_CALLBACK(activate_curvetype_line),
-		  "Curve line", this);
+  tools_curvetype_points = wutl_tools_item(tools, 
+      dark_theme ? "$pwr_exe/ico_curve_points_d_30.png" : "$pwr_exe/ico_curve_points_l_30.png", 
+      G_CALLBACK(activate_curvetype_points), "Curve points", this);
 
-  tools_curvetype_points = wutl_tools_item(tools, "$pwr_exe/xtt_curve_points.png", G_CALLBACK(activate_curvetype_points),
-		  "Curve points", this);
+  tools_curvetype_linepoints = wutl_tools_item(tools, 
+      dark_theme ? "$pwr_exe/ico_curve_linepoints_d_30.png" : "$pwr_exe/ico_curve_linepoints_l_30.png", 
+      G_CALLBACK(activate_curvetype_linepoints), "Curve line and points", this);
 
-  tools_curvetype_linepoints = wutl_tools_item(tools, "$pwr_exe/xtt_curve_linepoints.png", G_CALLBACK(activate_curvetype_linepoints),
-		  "Curve line and points", this);
+  tools_curvetype_square = wutl_tools_item(tools, 
+      dark_theme ? "$pwr_exe/ico_curve_square_d_30.png" : "$pwr_exe/ico_curve_square_l_30.png", 
+      G_CALLBACK(activate_curvetype_square), "Curve square", this);
 
-  tools_curvetype_square = wutl_tools_item(tools, "$pwr_exe/xtt_curve_square.png", G_CALLBACK(activate_curvetype_square),
-		  "Curve square", this);
+  tools_curve_fill = wutl_tools_item(tools, 
+      dark_theme ? "$pwr_exe/ico_curve_fill_d_30.png" : "$pwr_exe/ico_curve_fill_l_30.png", 
+      G_CALLBACK(activate_filledcurves), "Filled curves", this);
 
-  tools_curve_fill = wutl_tools_item(tools, "$pwr_exe/xtt_curve_fill.png", G_CALLBACK(activate_filledcurves),
-		  "Filled curves", this);
+  tools_curve_digsplit = wutl_tools_item(tools, 
+      dark_theme ? "$pwr_exe/ico_curve_digsplit_d_30.png" : "$pwr_exe/ico_curve_digsplit_l_30.png", 
+      G_CALLBACK(activate_digsplit), "Split digital curves", this);
 
-  tools_curve_digsplit = wutl_tools_item(tools, "$pwr_exe/xtt_curve_digsplit.png", G_CALLBACK(activate_digsplit),
-		  "Split digital curves", this);
-
-  tools_snapshot = wutl_tools_item(tools, "$pwr_exe/xtt_snapshot.png", G_CALLBACK(activate_snapshot),
-		  "Snapshot", this);
+  tools_snapshot = wutl_tools_item(tools, 
+      dark_theme ? "$pwr_exe/ico_snapshot_d_30.png" : "$pwr_exe/ico_snapshot_l_30.png", 
+      G_CALLBACK(activate_snapshot), "Snapshot", this);
 
 
   // Time box
@@ -1078,27 +1092,33 @@ GeCurveGtk::GeCurveGtk(void* gc_parent_ctx, GtkWidget* parent_widget,
   gtk_container_add(GTK_CONTAINER(timebox_stop_time_tool), timebox_stop_time);
   gtk_toolbar_insert(timetools, timebox_stop_time_tool, -1);
 
-  wutl_tools_item(timetools, "$pwr_exe/ge_scroll_left.png", G_CALLBACK(activate_prev_period),
-		  "Previous period", this);
+  wutl_tools_item(timetools, 
+      dark_theme ? "$pwr_exe/ico_page_left_d_16.png" : "$pwr_exe/ico_page_left_l_16.png", 
+      G_CALLBACK(activate_prev_period), "Previous period", this);
 
-  wutl_tools_item(timetools, "$pwr_exe/ge_scroll_right.png", G_CALLBACK(activate_next_period),
-		  "Next period", this);
+  wutl_tools_item(timetools,
+      dark_theme ? "$pwr_exe/ico_page_right_d_16.png" : "$pwr_exe/ico_page_right_l_16.png", 
+      G_CALLBACK(activate_next_period), "Next period", this);
 
-  wutl_tools_item(timetools, "$pwr_exe/xtt_up.png", G_CALLBACK(activate_increase_period),
-		  "Increase period", this);
+  wutl_tools_item(timetools,
+      dark_theme ? "$pwr_exe/ico_up_d_16.png" : "$pwr_exe/ico_up_l_16.png", 
+      G_CALLBACK(activate_increase_period), "Increase period", this);
 
-  wutl_tools_item(timetools, "$pwr_exe/xtt_down.png", G_CALLBACK(activate_decrease_period),
-		  "Decrease period", this);
+  wutl_tools_item(timetools,
+      dark_theme ? "$pwr_exe/ico_down_d_16.png" : "$pwr_exe/ico_down_l_16.png", 
+      G_CALLBACK(activate_decrease_period), "Decrease period", this);
 
 
   GtkToolbar* curvebuttonbox
       = (GtkToolbar*)g_object_new(GTK_TYPE_TOOLBAR, NULL);
 
-  wutl_tools_item(curvebuttonbox, "$pwr_exe/ge_reload.png", G_CALLBACK(activate_reload),
-		  "Update", this);
+  wutl_tools_item(curvebuttonbox,
+      dark_theme ? "$pwr_exe/ico_refresh_d_16.png" : "$pwr_exe/ico_refresh_l_16.png", 
+      G_CALLBACK(activate_reload), "Update", this);
 
-  wutl_tools_item(curvebuttonbox, "$pwr_exe/xtt_add.png", G_CALLBACK(activate_add),
-		  "Add curve item", this);
+  wutl_tools_item(curvebuttonbox,
+      dark_theme ? "$pwr_exe/ico_add_d_16.png" : "$pwr_exe/ico_add_l_16.png", 
+      G_CALLBACK(activate_add), "Add curve item", this);
 
   // wutl_tools_item(curvebuttonbox, "$pwr_exe/xtt_remove.png", G_CALLBACK(activate_remove),
   //		  "Remove selected curve", this);

@@ -3603,7 +3603,6 @@ int sev_dbsqlite::commit_transaction(void* thread)
 
 sev_dbsqlite::~sev_dbsqlite()
 {
-  printf("Freeing memory\n");
   for (size_t idx = 0; idx < m_items.size(); idx++) {
     if (m_items[idx].old_value != 0) {
       free(m_items[idx].old_value);

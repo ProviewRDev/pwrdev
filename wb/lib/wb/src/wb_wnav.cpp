@@ -2209,7 +2209,7 @@ WNavGbl::WNavGbl()
     : priv(0), verify(0), advanced_user(1), all_toplevel(0), bypass(0),
       show_class(1), show_alias(0), show_descrip(1), show_attrref(0),
       show_attrxref(0), show_objref(0), show_objxref(0), show_truedb(0),
-      enable_comment(0), enable_revisions(0)
+      enable_comment(0), enable_revisions(0), color_theme(0)
 {
   strcpy(version, wnav_cVersion);
   strcpy(platform, "");
@@ -2240,7 +2240,8 @@ int WNavGbl::symbolfile_exec(void* wnav)
 void WNav::set_options(int ena_comment, int ena_revisions, int sh_class,
     int sh_alias, int sh_descrip, int sh_objref, int sh_objxref, int sh_attrref,
     int sh_attrxref, int bu_force, int bu_debug, int bu_crossref,
-    int bu_crossrefsim, int bu_crossrefgraph, int bu_manual, int bu_nocopy)
+    int bu_crossrefsim, int bu_crossrefgraph, int bu_manual, int bu_nocopy,
+    int col_theme)
 {
   gbl.enable_comment = ena_comment;
   gbl.enable_revisions = ena_revisions;
@@ -2258,6 +2259,10 @@ void WNav::set_options(int ena_comment, int ena_revisions, int sh_class,
   gbl.build.crossref_graph = bu_crossrefgraph;
   gbl.build.manual = bu_manual;
   gbl.build.nocopy = bu_nocopy;
+  if (gbl.color_theme != col_theme) {
+    gbl.color_theme = col_theme;
+    update_color_theme(col_theme);
+  }
   ldh_refresh(pwr_cNObjid);
 }
 
@@ -2265,7 +2270,7 @@ void WNav::get_options(int* ena_comment, int* ena_revisions, int* sh_class,
     int* sh_alias, int* sh_descrip, int* sh_objref, int* sh_objxref,
     int* sh_attrref, int* sh_attrxref, int* bu_force, int* bu_debug,
     int* bu_crossref, int* bu_crossrefsim, int* bu_crossrefgraph,
-    int* bu_manual, int* bu_nocopy)
+    int* bu_manual, int* bu_nocopy, int *col_theme)
 {
   *ena_comment = gbl.enable_comment;
   *ena_revisions = gbl.enable_revisions;
@@ -2283,6 +2288,7 @@ void WNav::get_options(int* ena_comment, int* ena_revisions, int* sh_class,
   *bu_crossrefgraph = gbl.build.crossref_graph;
   *bu_manual = gbl.build.manual;
   *bu_nocopy = gbl.build.nocopy;
+  *col_theme = gbl.color_theme;
 }
 
 int WNav::save_settnings(std::ofstream& fp)
@@ -2384,6 +2390,7 @@ int WNav::save_settnings(std::ofstream& fp)
     fp << "endif\n";
   else if (window_type == wnav_eWindowType_W2)
     fp << "endif\n";
+  fp << "set colortheme/index=" << gbl.color_theme << "\n";
   return 1;
 }
 
@@ -3484,6 +3491,12 @@ void WNav::foe_get_build_options_cb(void* ctx, wb_build_opt** opt)
   WNav* wnav = (WNav*)ctx;
 
   *opt = &wnav->gbl.build;
+}
+
+void WNav::update_color_theme(int ct)
+{
+  if (brow)
+    brow_UpdateColorTheme(brow->ctx, ct);
 }
 
 ApplListElem::ApplListElem(applist_eType al_type, void* al_ctx,

@@ -274,6 +274,8 @@ CoXHelpGtk::CoXHelpGtk(GtkWidget* xa_parent_wid, void* xa_parent_ctx,
   g_signal_connect(toplevel, "focus-in-event",
       G_CALLBACK(CoXHelpGtk::action_inputfocus), this);
 
+  int dark_theme = CoWowGtk::GetDarkTheme(toplevel);
+
   CoWowGtk::SetWindowIcon(toplevel);
 
   // Menu
@@ -415,26 +417,33 @@ CoXHelpGtk::CoXHelpGtk(GtkWidget* xa_parent_wid, void* xa_parent_ctx,
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(help), GTK_WIDGET(help_menu));
 
   // Toolbar
-  wutl_tools_item(tools, "$pwr_exe/xtt_home.png",
+  wutl_tools_item(tools, 
+      dark_theme ? "$pwr_exe/ico_home_d_30.png" : "$pwr_exe/ico_home_l_30.png",
       G_CALLBACK(activate_home), "Go to start page", this);
 
-  wutl_tools_item(tools, "$pwr_exe/xtt_back.png",
+  wutl_tools_item(tools,
+      dark_theme ? "$pwr_exe/ico_back_d_30.png" : "$pwr_exe/ico_back_l_30.png",
       G_CALLBACK(activate_back), "Go back", this);
 
-  wutl_tools_item(tools, "$pwr_exe/xtt_previous.png",
+  wutl_tools_item(tools,
+      dark_theme ? "$pwr_exe/ico_previous_d_30.png" : "$pwr_exe/ico_previous_l_30.png",
       G_CALLBACK(activate_previoustopic), "Previous topic", this);
 
-  wutl_tools_item(tools, "$pwr_exe/xtt_next.png",
+  wutl_tools_item(tools,
+      dark_theme ? "$pwr_exe/ico_next_d_30.png" : "$pwr_exe/ico_next_l_30.png",
       G_CALLBACK(activate_nexttopic), "Next topic", this);
 
-  wutl_tools_item(tools, "$pwr_exe/xtt_zoom_in.png",
+  wutl_tools_item(tools,
+      dark_theme ? "$pwr_exe/ico_zoomin_d_30.png" : "$pwr_exe/ico_zoomin_l_30.png",
       G_CALLBACK(activate_zoom_in), "Zoom in", this);
 
-  wutl_tools_item(tools, "$pwr_exe/xtt_zoom_out.png",
+  wutl_tools_item(tools,
+      dark_theme ? "$pwr_exe/ico_zoomout_d_30.png" : "$pwr_exe/ico_zoomout_l_30.png",
       G_CALLBACK(activate_zoom_out), "Zoom out", this);
 
-  wutl_tools_item(tools, "$pwr_exe/xtt_zoom_reset.png",
-      G_CALLBACK(activate_zoom_in), "Zoom reset", this);
+  wutl_tools_item(tools,
+      dark_theme ? "$pwr_exe/ico_zoomreset_d_30.png" : "$pwr_exe/ico_zoomreset_l_30.png",
+      G_CALLBACK(activate_zoom_reset), "Zoom reset", this);
 
 
   GtkWidget* vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);

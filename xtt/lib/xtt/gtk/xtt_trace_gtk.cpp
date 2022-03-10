@@ -380,6 +380,8 @@ RtTraceGtk::RtTraceGtk(void* tr_parent_ctx, GtkWidget* tr_parent_wid,
   g_signal_connect(toplevel, "delete_event", G_CALLBACK(delete_event), this);
   g_signal_connect(toplevel, "destroy", G_CALLBACK(destroy_event), this);
 
+  int dark_theme = CoWowGtk::GetDarkTheme(toplevel);
+
   CoWowGtk::SetWindowIcon(toplevel);
 
   GtkAccelGroup* accel_g
@@ -640,12 +642,13 @@ RtTraceGtk::RtTraceGtk(void* tr_parent_ctx, GtkWidget* tr_parent_wid,
     }
   }
 
-  wutl_tools_item(tools, "$pwr_exe/xtt_navigator.png", G_CALLBACK(activate_display_object), 
+  wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_navigator_d_30.png" : "$pwr_exe/ico_navigator_l_30.png", G_CALLBACK(activate_display_object), 
       "Display object in Navigator", this, 0, 1);
 
-  wutl_tools_item(tools, "$pwr_exe/xtt_crossref.png", G_CALLBACK(activate_show_cross), 
+  wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_crossref_d_30.png" : "$pwr_exe/ico_crossref_l_30.png", G_CALLBACK(activate_show_cross), 
       "Show Crossreferences", this, 0, 1);
 
+#if 0
   wutl_tools_item(tools, "$pwr_exe/ge_zoom_in.png", G_CALLBACK(activate_zoomin), 
       "Zoom in", this, 0, 1);
 
@@ -654,7 +657,16 @@ RtTraceGtk::RtTraceGtk(void* tr_parent_ctx, GtkWidget* tr_parent_wid,
 
   wutl_tools_item(tools, "$pwr_exe/ge_zoom_reset.png", G_CALLBACK(activate_zoomreset), 
       "Zoom reset", this, 0, 1);
+#endif
 
+    wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_zoomin_d_30.png" : "$pwr_exe/ico_zoomin_l_30.png", G_CALLBACK(activate_zoomin), 
+      "Zoom in", this, 0, 1);
+
+    wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_zoomout_d_30.png" : "$pwr_exe/ico_zoomout_l_30.png", G_CALLBACK(activate_zoomout), 
+      "Zoom out", this, 0, 1);
+
+    wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_zoomreset_d_30.png" : "$pwr_exe/ico_zoomreset_l_30.png", G_CALLBACK(activate_zoomreset), 
+      "Zoom reset", this, 0, 1);
 
   // Flow widget
   GtkWidget* flow_scrolled

@@ -143,6 +143,7 @@ public:
   int build_manual;
   int build_nocopy;
   int enable_revisions;
+  int color_theme;
   int wnav_mapped;
   int wnavnode_mapped;
   WUted* utedctx;

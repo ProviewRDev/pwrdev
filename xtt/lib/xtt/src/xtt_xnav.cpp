@@ -3488,7 +3488,7 @@ int XNavGbl::load_config(XNav* xnav)
   op_wind_eventname_seg = xnav->opplace_p->OpWindEventNameSegments;
   strcpy(setupscript, xnav->opplace_p->SetupScript);
   str_trim(setupscript, setupscript);
-  color_theme = xnav->opplace_p->ColorTheme;
+  color_theme = CoWow::SetColorTheme(xnav->opplace_p->ColorTheme);
 
   return XNAV__SUCCESS;
 }

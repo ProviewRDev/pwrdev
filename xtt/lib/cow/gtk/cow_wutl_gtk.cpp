@@ -38,6 +38,8 @@
 #include "cow_wutl_gtk.h"
 #include "co_dcli.h"
 
+static int dark_theme = -1;
+
 GtkToolItem* wutl_tools_item(GtkToolbar *tools, const char *img, GCallback cb, const char* tooltip, void *ctx, int disable_focus, int translate)
 {
   pwr_tFileName fname;
@@ -106,4 +108,25 @@ void wutl_widget_name_suffix_sub(GtkWidget *w)
     return;
   *s = 0;
   gtk_widget_set_name(w, name);
+}
+
+int wutl_get_dark_theme(GtkWidget *toplevel)
+{
+  if (dark_theme == -1) {
+    GdkRGBA color;
+    GtkStyleContext* style_context = gtk_widget_get_style_context(toplevel);
+    gtk_style_context_get_color(style_context, GTK_STATE_FLAG_NORMAL, &color);
+    if ( (color.red + color.blue + color.green)/3 > 0.5)
+      dark_theme = 1;
+    else
+      dark_theme = 0;
+  }
+  return dark_theme;
+}
+
+int wutl_dark_theme()
+{
+  if (dark_theme == -1)
+    return 0;
+  return dark_theme;
 }

@@ -251,7 +251,7 @@ GlowDrawGtk::GlowDrawGtk(GtkWidget* toplevel, void** glow_ctx,
     : ef(0), timer_id(0), click_sensitivity(0), color_vect_cnt(0),
       closing_down(0), customcolors_cnt(0), cairo_cr(0), cairo_cr_refcnt(0), cairo_region(0),
       cairo_context(0), cairo_nav_cr(0), cairo_nav_cr_refcnt(0), cairo_nav_region(0),
-      cairo_nav_context(0), erase_stack_cnt(0), antialias(CAIRO_ANTIALIAS_GRAY),
+      cairo_nav_context(0), erase_stack_cnt(0), antialias(CAIRO_ANTIALIAS_NONE),
       css_background(0)
 {
   memset(gcs, 0, sizeof(gcs));
@@ -1101,8 +1101,10 @@ int GlowDrawGtk::rect(GlowWind* wind, int x, int y, int width, int height,
     cairo_set_source(cr, get_gc(this, gc_type + highlight, idx));
   }
   cairo_set_line_width(cr, idx+1);
+  //cairo_set_line_join(cr, CAIRO_LINE_JOIN_MITER);
+  //cairo_set_line_cap(cr, CAIRO_LINE_CAP_BUTT);
 
-  cairo_rectangle(cr, x, y, width, height);
+  cairo_rectangle(cr, x, y, width+1, height+1);
   cairo_stroke(cr);
   if (ww->clip_on)
     reset_cairo_clip(ww, cr);
@@ -1129,7 +1131,7 @@ int GlowDrawGtk::rect_erase(
   cairo_set_source(cr, gc_erase);
   cairo_set_line_width(cr, idx+1);
 
-  cairo_rectangle(cr, x, y, width, height);
+  cairo_rectangle(cr, x, y, width+1, height+1);
   cairo_stroke(cr);
   if (ww->clip_on)
     reset_cairo_clip(ww, cr);
@@ -3508,7 +3510,13 @@ int GlowDrawGtk::open_color_selection(double* r, double* g, double* b)
 {
   int sts;
   GdkRGBA color;
-  GtkWidget* csel = gtk_color_chooser_dialog_new("Color selection", GTK_WINDOW(m_wind.toplevel));
+  GtkWidget *p;
+
+  p = m_wind.toplevel;
+  while (p && !GTK_IS_WINDOW(p))
+    p = gtk_widget_get_parent(p);
+
+  GtkWidget* csel = gtk_color_chooser_dialog_new("Color selection", GTK_WINDOW(p));
   color.red = 1.0;
   color.green = 1.0;
   color.blue = 1.0;

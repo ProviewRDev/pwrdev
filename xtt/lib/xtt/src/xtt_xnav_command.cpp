@@ -1028,6 +1028,7 @@ static int xnav_set_func(void* client_data, void* client_flag)
       return XNAV__HOLDCOMMAND;
     }
 
+    idx = CoWow::SetColorTheme(idx);
     if (xnav->gbl.color_theme != idx) {
       xnav->gbl.color_theme = idx;
 
@@ -10490,6 +10491,7 @@ static void xnav_colortheme_selector_ok_cb(
     }
   }
   if (found) {
+    idx = CoWow::SetColorTheme(idx);
     if (xnav->gbl.color_theme != idx) {
       xnav->gbl.color_theme = idx;
 

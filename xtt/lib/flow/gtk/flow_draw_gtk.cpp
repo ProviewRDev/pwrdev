@@ -38,6 +38,7 @@
 
 #include "co_dcli.h"
 #include "co_string.h"
+#include "cow_wow.h"
 
 #include "flow_browwidget_gtk.h"
 #include "flow_draw_gtk.h"
@@ -104,14 +105,22 @@ static int flow_create_cursor(FlowDrawGtk* draw_ctx)
 
 static int draw_free_gc(FlowDrawGtk* draw_ctx)
 {
-  cairo_pattern_destroy(draw_ctx->gc_black);
-  cairo_pattern_destroy(draw_ctx->gc_gray);
-  cairo_pattern_destroy(draw_ctx->gc_darkgray);
-  cairo_pattern_destroy(draw_ctx->gc_red);
-  cairo_pattern_destroy(draw_ctx->gc_yellow);
-  cairo_pattern_destroy(draw_ctx->gc_green);
-  cairo_pattern_destroy(draw_ctx->gc_erase);
-  cairo_pattern_destroy(draw_ctx->gc_inverse);
+  if (draw_ctx->gc_black)
+    cairo_pattern_destroy(draw_ctx->gc_black);
+  if (draw_ctx->gc_gray)
+    cairo_pattern_destroy(draw_ctx->gc_gray);
+  if (draw_ctx->gc_darkgray)
+    cairo_pattern_destroy(draw_ctx->gc_darkgray);
+  if (draw_ctx->gc_red)
+    cairo_pattern_destroy(draw_ctx->gc_red);
+  if (draw_ctx->gc_yellow)
+    cairo_pattern_destroy(draw_ctx->gc_yellow);
+  if (draw_ctx->gc_green)
+    cairo_pattern_destroy(draw_ctx->gc_green);
+  if (draw_ctx->gc_erase)
+    cairo_pattern_destroy(draw_ctx->gc_erase);
+  if (draw_ctx->gc_inverse)
+    cairo_pattern_destroy(draw_ctx->gc_inverse);
 
   return 1;
 }
@@ -128,6 +137,7 @@ typedef struct {
 } draw_sTheme;
 
 static draw_sTheme theme[] = {
+  // Standard, not used
   {{0.0, 0.0, 0.0}, // Foreground
    {1.0, 1.0, 1.0}, // Background
    {0.0, 0.0, 0.0}, // Inverse
@@ -262,6 +272,24 @@ static draw_sTheme theme[] = {
    {1.0, 0.2, 0.2}, // Red
    {1.0, 1.0, 0.0}, // Yellow
    {0.2, 1.0, 0.2}  // Green
+  }, // StandardLight
+  {{0.0, 0.0, 0.0}, // Foreground
+   {1.0, 1.0, 1.0}, // Background
+   {0.0, 0.0, 0.0}, // Inverse
+   {0.6, 0.6, 0.6}, // Gray
+   {0.3, 0.3, 0.3}, // Darkgray
+   {1.0, 0.2, 0.2}, // Red
+   {1.0, 1.0, 0.0}, // Yellow
+   {0.2, 1.0, 0.2}  // Green
+  }, // StandardDark
+  {{1.000, 1.000, 1.000}, // Foreground
+   {0.180, 0.180, 0.180}, // Background
+   {0.6, 0.6, 0.6}, // Inverse
+   {0.3, 0.3, 0.3}, // Gray
+   {0.15, 0.15, 0.15}, // Darkgray
+   {1.0, 0.2, 0.2}, // Red
+   {1.0, 1.0, 0.0}, // Yellow
+   {0.2, 1.0, 0.2} // Green
   }};
 
 static int flow_create_gc(FlowDrawGtk* draw_ctx, int ct)
@@ -366,10 +394,12 @@ FlowDrawGtk::FlowDrawGtk(GtkWidget* x_toplevel, void** flow_ctx,
     int (*init_proc)(GtkWidget* w, FlowCtx* ctx, void* client_data),
     void* client_data, flow_eCtxType type)
     : toplevel(x_toplevel), nav_shell(0), nav_toplevel(0), display(0),
-      window(0), nav_window(0), screen(0), timer_id(0),
+      window(0), nav_window(0), screen(0), gc_black(0), gc_gray(0), 
+      gc_darkgray(0), gc_red(0), gc_yellow(0), gc_green(0), gc_erase(0),
+      gc_inverse(0), timer_id(0),
       closing_down(0), cairo_cr(0), cairo_cr_refcnt(0), cairo_region(0),
       cairo_context(0), cairo_nav_cr(0), cairo_nav_cr_refcnt(0), cairo_nav_region(0),
-      cairo_nav_context(0), antialias(CAIRO_ANTIALIAS_GRAY), 
+      cairo_nav_context(0), antialias(CAIRO_ANTIALIAS_NONE), 
       nav_antialias(CAIRO_ANTIALIAS_NONE), style_context(0),
       font_face_bold(0), font_face_normal(0)
 {
@@ -387,8 +417,9 @@ FlowDrawGtk::FlowDrawGtk(GtkWidget* x_toplevel, void** flow_ctx,
   window = gtk_widget_get_window(toplevel);
   screen = gtk_widget_get_screen(toplevel);
   style_context = gtk_widget_get_style_context(toplevel);
-  flow_create_gc(this, 0);
-  set_white_background(basectx);
+  update_color_theme(CoWow::ColorTheme());
+  //flow_create_gc(this, 0);
+  //set_white_background(basectx);
 
   flow_create_cursor(this);
 
@@ -1505,6 +1536,8 @@ int FlowDrawGtk::line(FlowCtx* ctx, int x1, int y1, int x2, int y2,
       
   cairo_set_line_width(cr, idx+1);
 
+  if (y1 == y2)
+    x1--;
   cairo_move_to(cr, x1, y1);
   cairo_line_to(cr, x2, y2);
   cairo_stroke(cr);
@@ -1527,6 +1560,8 @@ int FlowDrawGtk::line_erase(
   cairo_set_source(cr, gc_erase);
   cairo_set_line_width(cr, idx+1);
 
+  if (y1 == y2)
+    x1--;
   cairo_move_to(cr, x1, y1);
   cairo_line_to(cr, x2, y2);
   cairo_stroke(cr);

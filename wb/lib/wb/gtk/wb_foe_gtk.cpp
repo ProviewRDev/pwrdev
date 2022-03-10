@@ -1202,6 +1202,8 @@ pwr_tStatus WFoeGtk::create_window(int x_top, int y_top, int width_adb,
   g_signal_connect(
       toplevel, "focus-in-event", G_CALLBACK(WFoeGtk::action_inputfocus), this);
 
+  int dark_theme = wutl_get_dark_theme(toplevel);
+
   CoWowGtk::SetWindowIcon(toplevel);
 
   GtkAccelGroup* accel_g
@@ -1834,65 +1836,83 @@ pwr_tStatus WFoeGtk::create_window(int x_top, int y_top, int width_adb,
   // Toolbar
   GtkToolbar* tools = (GtkToolbar*)g_object_new(GTK_TYPE_TOOLBAR, NULL);
 
-  widgets.tools_save = wutl_tools_item(tools, "$pwr_exe/wb_save.png", 
+  widgets.tools_save = wutl_tools_item(tools, 
+      dark_theme ? "$pwr_exe/ico_save_d_30.png" : "$pwr_exe/ico_save_l_30.png", 
       G_CALLBACK(activate_save), "Save", this, 1, 0);
 
-  wutl_tools_item(tools, "$pwr_exe/wb_print.png", 
+  wutl_tools_item(tools,
+      dark_theme ? "$pwr_exe/ico_print_d_30.png" : "$pwr_exe/ico_print_l_30.png", 
       G_CALLBACK(activate_print), "Print documents", this, 1, 0);
 
-  wutl_tools_item(tools, "$pwr_exe/foe_edit.png", 
+  wutl_tools_item(tools, 
+      dark_theme ? "$pwr_exe/ico_edit_d_30.png" : "$pwr_exe/ico_edit_l_30.png", 
       G_CALLBACK(activate_edit_togg), "Set edit mode", this, 1, 0);
 
-  wutl_tools_item(tools, "$pwr_exe/foe_view.png", 
+  wutl_tools_item(tools,
+      dark_theme ? "$pwr_exe/ico_noedit_d_30.png" : "$pwr_exe/ico_noedit_l_30.png", 
       G_CALLBACK(activate_view_togg), "Set view mode", this, 1, 0);
 
-  widgets.tools_build = wutl_tools_item(tools, "$pwr_exe/wb_build.png", 
+  widgets.tools_build = wutl_tools_item(tools, 
+      dark_theme ? "$pwr_exe/ico_build_d_30.png" : "$pwr_exe/ico_build_l_30.png", 
       G_CALLBACK(activate_compile), "Build Program", this, 1, 0);
 
-  wutl_tools_item(tools, "$pwr_exe/xtt_zoom_in.png", 
+  wutl_tools_item(tools, 
+      dark_theme ? "$pwr_exe/ico_zoomin_d_30.png" : "$pwr_exe/ico_zoomin_l_30.png", 
       G_CALLBACK(activate_zoomin), "Zoom in", this, 1, 0);
 
-  wutl_tools_item(tools, "$pwr_exe/xtt_zoom_out.png", 
+  wutl_tools_item(tools,
+      dark_theme ? "$pwr_exe/ico_zoomout_d_30.png" : "$pwr_exe/ico_zoomout_l_30.png", 
       G_CALLBACK(activate_zoomout), "Zoom out", this, 1, 0);
 
-  wutl_tools_item(tools, "$pwr_exe/xtt_zoom_reset.png", 
+  wutl_tools_item(tools,
+      dark_theme ? "$pwr_exe/ico_zoomreset_d_30.png" : "$pwr_exe/ico_zoomreset_l_30.png", 
       G_CALLBACK(activate_unzoom), "Zoom reset", this, 1, 0);
 
-  wutl_tools_item(tools, "$pwr_exe/foe_objectpalette.png", 
+  wutl_tools_item(tools, 
+      dark_theme ? "$pwr_exe/ico_objectpalette_d_30.png" : "$pwr_exe/ico_objectpalette_l_30.png", 
       G_CALLBACK(activate_palette_object), "Show Object palette", this, 1, 0);
 
-  wutl_tools_item(tools, "$pwr_exe/foe_conpalette.png", 
+  wutl_tools_item(tools,
+      dark_theme ? "$pwr_exe/ico_conpalette_d_30.png" : "$pwr_exe/ico_conpalette_l_30.png", 
       G_CALLBACK(activate_palette_con), "Show Connection palette", this, 1, 0);
 
-  wutl_tools_item(tools, "$pwr_exe/xtt_navigator.png", 
+  wutl_tools_item(tools,
+      dark_theme ? "$pwr_exe/ico_navigator_d_30.png" : "$pwr_exe/ico_navigator_l_30.png", 
       G_CALLBACK(activate_palette_plant), "Show Plant Hierarchy", this, 1, 0);
 
   // Redraw pushbutton
-  widgets.tools_redraw = wutl_tools_item(tools, "$pwr_exe/foe_redraw.png", 
+  widgets.tools_redraw = wutl_tools_item(tools, 
+      dark_theme ? "$pwr_exe/ico_refresh_d_30.png" : "$pwr_exe/ico_refresh_l_30.png", 
       G_CALLBACK(activate_redraw), "Redraw", this, 1, 0);
 
   // Feedback connection checkbutton
-  widgets.tools_confeedback = wutl_tools_toggle_button(tools, "$pwr_exe/foe_confeedback.png", 
+  widgets.tools_confeedback = wutl_tools_toggle_button(tools,
+      dark_theme ? "$pwr_exe/ico_confeedback_d_30.png" : "$pwr_exe/ico_confeedback_l_30.png", 
       G_CALLBACK(activate_confeedback), "Feedback connection", this, 1, 0);
 
   // Singlelinetext button
-  widgets.tools_singlelinetext = wutl_tools_item(tools, "$pwr_exe/foe_singlelinetext.png", 
+  widgets.tools_singlelinetext = wutl_tools_item(tools, 
+      dark_theme ? "$pwr_exe/ico_singlelinetext_d_30.png" : "$pwr_exe/ico_singlelinetext_l_30.png", 
       G_CALLBACK(activate_singlelinetext), "Single line text", this, 1, 0);
 
   // Bodytext button
-  widgets.tools_bodytext = wutl_tools_item(tools, "$pwr_exe/foe_bodytext.png", 
+  widgets.tools_bodytext = wutl_tools_item(tools,
+      dark_theme ? "$pwr_exe/ico_multilinetext_d_30.png" : "$pwr_exe/ico_multilinetext_l_30.png", 
       G_CALLBACK(activate_bodytext), "Multi line text", this, 1, 0);
 
   // Textheader button
-  widgets.tools_textheader = wutl_tools_item(tools, "$pwr_exe/foe_textheader.png", 
+  widgets.tools_textheader = wutl_tools_item(tools, 
+      dark_theme ? "$pwr_exe/ico_headertext_d_30.png" : "$pwr_exe/ico_headertext_l_30.png", 
       G_CALLBACK(activate_textheader), "Text header", this, 1, 0);
 
   // Document button
-  widgets.tools_document = wutl_tools_item(tools, "$pwr_exe/foe_document.png", 
+  widgets.tools_document = wutl_tools_item(tools,
+      dark_theme ? "$pwr_exe/ico_document_d_30.png" : "$pwr_exe/ico_document_l_30.png", 
       G_CALLBACK(activate_document), "Document portrait", this, 1, 0);
 
   // Document_Landscape button
-  widgets.tools_document_landscape = wutl_tools_item(tools, "$pwr_exe/foe_document_landscape.png", 
+  widgets.tools_document_landscape = wutl_tools_item(tools,
+      dark_theme ? "$pwr_exe/ico_document_landscape_d_30.png" : "$pwr_exe/ico_document_landscape_l_30.png", 
       G_CALLBACK(activate_document_landscape), "Document landscape", this, 1, 0);
 
   // Statusbar and cmd input

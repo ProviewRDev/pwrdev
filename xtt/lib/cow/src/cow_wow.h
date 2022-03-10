@@ -121,6 +121,8 @@ protected:
   static char m_default_printer[80];
   static void* m_transient_wid;
   static wow_eIconType m_icon_type;
+  static int m_dark_theme;
+  static int m_color_theme;
 
 public:
   CoWow();
@@ -174,6 +176,10 @@ public:
   static void SetAutoRemove(bool on);
   static void SetTransient(void* transient_wid);
   static void SetIconType(wow_eIconType type);
+  static int ColorTheme() {return m_color_theme;}
+  static int SetColorTheme(int color_theme);
+  static int DarkTheme();
+
 };
 
 #endif

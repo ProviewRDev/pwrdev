@@ -2838,14 +2838,13 @@ GeGtk::GeGtk(void* x_parent_ctx, GtkWidget* x_parent_widget,
   // Gradient option menu
   GtkTreeIter iter;
   GtkListStore *grad_liststore;
-  GError *gerror;
   GdkPixbuf *pixbuf;
 
   grad_liststore = gtk_list_store_new(2, G_TYPE_STRING, GDK_TYPE_PIXBUF);
   for (int i = 0; i < sizeof(grad_combo_table)/sizeof(grad_combo_table[0]); i++) {
 
     dcli_translate_filename(fname, grad_combo_table[i].image);
-    pixbuf = gdk_pixbuf_new_from_file(fname, &gerror);
+    pixbuf = gdk_pixbuf_new_from_file(fname, NULL);
     if (pixbuf)
       gtk_list_store_insert_with_values(grad_liststore, &iter, i, 0, CoWowGtk::convert_utf8(grad_combo_table[i].text), 1,
 	  pixbuf, -1);
@@ -3032,8 +3031,8 @@ GeGtk::GeGtk(void* x_parent_ctx, GtkWidget* x_parent_widget,
   g_object_set(hpaned3, "visible", FALSE, NULL);
 
   gtk_paned_set_position(GTK_PANED(hpaned2), 150);
-  gtk_paned_set_position(GTK_PANED(hpaned), window_width - palette_width - 175);
-  gtk_paned_set_position(GTK_PANED(vpaned1), window_height - 380);
+  gtk_paned_set_position(GTK_PANED(hpaned), window_width - palette_width - 85);
+  gtk_paned_set_position(GTK_PANED(vpaned1), window_height - 405);
   gtk_paned_set_position(GTK_PANED(vpaned2), window_height - 290);
 
   if (ldhses)

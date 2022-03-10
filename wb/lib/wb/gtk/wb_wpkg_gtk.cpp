@@ -237,6 +237,8 @@ WPkgGtk::WPkgGtk(GtkWidget* wa_parent_wid, void* wa_parent_ctx)
   g_signal_connect(
       toplevel, "focus-in-event", G_CALLBACK(action_inputfocus), this);
 
+  int dark_theme = wutl_get_dark_theme(toplevel);
+
   CoWowGtk::SetWindowIcon(toplevel);
 
   GtkAccelGroup* accel_g
@@ -353,16 +355,20 @@ WPkgGtk::WPkgGtk(GtkWidget* wa_parent_wid, void* wa_parent_ctx)
   // Toolbar
   GtkToolbar* tools = (GtkToolbar*)g_object_new(GTK_TYPE_TOOLBAR, NULL);
 
-  wutl_tools_item(tools, "$pwr_exe/wb_send.png", 
-      G_CALLBACK(activate_distribute), "Zoom in", this, 0, 0);
+  wutl_tools_item(tools, 
+      dark_theme ? "$pwr_exe/ico_send_d_30.png": "$pwr_exe/ico_send_l_30.png", 
+      G_CALLBACK(activate_distribute), "Distribute", this, 0, 0);
 
-  wutl_tools_item(tools, "$pwr_exe/xtt_zoom_in.png", 
+  wutl_tools_item(tools,
+      dark_theme ? "$pwr_exe/ico_zoomin_d_30.png": "$pwr_exe/ico_zoomin_l_30.png", 
       G_CALLBACK(activate_zoom_in), "Zoom in", this, 1, 0);
 
-  wutl_tools_item(tools, "$pwr_exe/xtt_zoom_out.png", 
+  wutl_tools_item(tools,
+      dark_theme ? "$pwr_exe/ico_zoomout_d_30.png": "$pwr_exe/ico_zoomout_l_30.png", 
       G_CALLBACK(activate_zoom_out), "Zoom out", this, 1, 0);
 
-  wutl_tools_item(tools, "$pwr_exe/xtt_zoom_reset.png", 
+  wutl_tools_item(tools,
+      dark_theme ? "$pwr_exe/ico_zoomreset_d_30.png": "$pwr_exe/ico_zoomreset_l_30.png", 
       G_CALLBACK(activate_zoom_reset), "Zoom reset", this, 1, 0);
 
   GtkWidget* vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);

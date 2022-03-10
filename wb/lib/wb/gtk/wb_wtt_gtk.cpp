@@ -1961,6 +1961,19 @@ void WttGtk::update_options_form()
       GTK_TOGGLE_BUTTON(build_crossrefgraph_w), build_crossref_graph);
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(build_manual_w), build_manual);
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(build_nocopy_w), build_nocopy);
+  switch (color_theme) {
+  case 15:
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(dark_theme_w), 0);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(light_theme_w), 1);
+    break;
+  case 16:
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(dark_theme_w), 1);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(light_theme_w), 0);
+    break;
+  default:
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(dark_theme_w), 0);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(light_theme_w), 0);
+  }
 }
 
 /************************************************************************
@@ -2001,15 +2014,22 @@ void WttGtk::set_options()
       GTK_TOGGLE_BUTTON(build_crossrefgraph_w));
   build_manual
       = (int)gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(build_manual_w));
+  if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(dark_theme_w)))
+    color_theme = 16;
+  else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(light_theme_w)))
+    color_theme = 15;
+  else
+    color_theme = 0;
 
   wnav->set_options(enable_comment, enable_revisions, show_class, show_alias,
       show_descrip, show_objref, show_objxref, show_attrref, show_attrxref,
       build_force, build_debug, build_crossref, build_crossref_sim,
-      build_crossref_graph, build_manual, build_nocopy);
+      build_crossref_graph, build_manual, build_nocopy, color_theme);
   wnavnode->set_options(enable_comment, enable_revisions, show_class,
       show_alias, show_descrip, show_objref, show_objxref, show_attrref,
       show_attrxref, build_force, build_debug, build_crossref,
-      build_crossref_sim, build_crossref_graph, build_manual, build_nocopy);
+      build_crossref_sim, build_crossref_graph, build_manual, build_nocopy,
+      color_theme);
 }
 
 // Callbacks from the options form
@@ -2249,6 +2269,8 @@ WttGtk::WttGtk(void* wt_parent_ctx, GtkWidget* wt_parent_wid,
   g_signal_connect(toplevel, "destroy", G_CALLBACK(destroy_event), this);
   g_signal_connect(
       toplevel, "focus-in-event", G_CALLBACK(WttGtk::action_inputfocus), this);
+
+  int dark_theme = wutl_get_dark_theme(toplevel);
 
   CoWowGtk::SetWindowIcon(toplevel);
 
@@ -2844,51 +2866,48 @@ WttGtk::WttGtk(void* wt_parent_ctx, GtkWidget* wt_parent_wid,
   // Toolbar
   GtkToolbar* tools = (GtkToolbar*)g_object_new(GTK_TYPE_TOOLBAR, NULL);
 
-  tools_save_w = wutl_tools_item(tools, "$pwr_exe/wb_save.png", 
+  tools_save_w = wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_save_d_30.png" : "$pwr_exe/ico_save_l_30.png", 
       G_CALLBACK(activate_save), "Save", this, 1, 0);
 
-  tools_edit_w = wutl_tools_item(tools, "$pwr_exe/foe_edit.png", 
+  tools_edit_w = wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_edit_d_30.png" : "$pwr_exe/ico_edit_l_30.png", 
       G_CALLBACK(activate_configure), "Edit", this, 1, 0);
 
   if (wb_type == wb_eType_ClassEditor
       || (wbctx && volid && (volclass == pwr_eClass_SharedVolume
                                 || volclass == pwr_eClass_SubVolume))) {
-    tools_buildnode_w = wutl_tools_item(tools, "$pwr_exe/wb_build.png", 
+    tools_buildnode_w = wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_build_d_30.png" : "$pwr_exe/ico_build_l_30.png", 
        G_CALLBACK(activate_buildvolume), "Build Volume", this, 1, 0);
   } else {
-    tools_buildnode_w = wutl_tools_item(tools, "$pwr_exe/wb_build.png", 
+    tools_buildnode_w = wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_build_d_30.png" : "$pwr_exe/ico_build_l_30.png", 
        G_CALLBACK(activate_buildnode), "Build Node", this, 1, 0);
   }
 
-  wutl_tools_item(tools, "$pwr_exe/wpkg_distribute.png", 
-      G_CALLBACK(activate_distribute), "Distribute", this, 1, 0);
+    wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_distribute_d_30.png" : "$pwr_exe/ico_distribute_l_30.png", G_CALLBACK(activate_distribute), 
+      "Distribute", this, 0, 1);
 
-  wutl_tools_item(tools, "$pwr_exe/wtt_program.png", 
+    wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_plc_d_30.png" : "$pwr_exe/ico_plc_l_30.png", 
       G_CALLBACK(activate_openplc), "Open Program", this, 1, 0);
 
-  wutl_tools_item(tools, "$pwr_exe/wtt_ge.png", 
+  wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_ge_d_30.png" : "$pwr_exe/ico_ge_l_30.png", 
       G_CALLBACK(activate_openge), "Open Ge", this, 1, 0);
 
-  wutl_tools_item(tools, "$pwr_exe/wtt_utilities.png", 
-      G_CALLBACK(activate_utilities), "Utilities", this, 1, 0);
-
-  wutl_tools_item(tools, "$pwr_exe/wtt_twowindows.png", 
+  wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_twowind_d_30.png" : "$pwr_exe/ico_twowind_l_30.png", 
       G_CALLBACK(activate_twowindows), "Two windows/One window", this, 1, 0);
 
-  wutl_tools_item(tools, "$pwr_exe/wtt_messages.png", 
+  wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_messages_d_30.png" : "$pwr_exe/ico_messages_l_30.png", 
       G_CALLBACK(activate_messages), "Show messages", this, 1, 0);
 
-  wutl_tools_item(tools, "$pwr_exe/wb_options.png", 
+  wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_options_d_30.png" : "$pwr_exe/ico_options_l_30.png", 
       G_CALLBACK(activate_view), "Options", this, 1, 0);
 
-  wutl_tools_item(tools, "$pwr_exe/xtt_zoom_in.png", 
-      G_CALLBACK(activate_zoom_in), "Zoom in", this, 1, 0);
+    wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_zoomin_d_30.png" : "$pwr_exe/ico_zoomin_l_30.png", G_CALLBACK(activate_zoom_in), 
+      "Zoom in", this, 0, 1);
 
-  wutl_tools_item(tools, "$pwr_exe/xtt_zoom_out.png", 
-      G_CALLBACK(activate_zoom_out), "Zoom out", this, 1, 0);
+    wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_zoomout_d_30.png" : "$pwr_exe/ico_zoomout_l_30.png", G_CALLBACK(activate_zoom_out), 
+      "Zoom out", this, 0, 1);
 
-  wutl_tools_item(tools, "$pwr_exe/xtt_zoom_reset.png", 
-      G_CALLBACK(activate_zoom_in), "Zoom reset", this, 1, 0);
+    wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_zoomreset_d_30.png" : "$pwr_exe/ico_zoomreset_l_30.png", G_CALLBACK(activate_zoom_reset), 
+      "Zoom reset", this, 0, 1);
 
   GtkToolItem* tools_set_advuser = wutl_tools_item(tools, "$pwr_exe/xtt_advuser.png", 
       G_CALLBACK(activate_set_advuser), "Advanced user", this, 1, 0);
@@ -3024,7 +3043,8 @@ WttGtk::WttGtk(void* wt_parent_ctx, GtkWidget* wt_parent_wid,
   wnav->get_options(&enable_comment, &enable_revisions, &show_class,
       &show_alias, &show_descrip, &show_objref, &show_objxref, &show_attrref,
       &show_attrxref, &build_force, &build_debug, &build_crossref,
-      &build_crossref_sim, &build_crossref_graph, &build_manual, &build_nocopy);
+      &build_crossref_sim, &build_crossref_graph, &build_manual, &build_nocopy,
+      &color_theme);
 
   if (wbctx && volid) {
     wnav->volume_attached(wbctx, ldhses, 0);
@@ -3178,12 +3198,23 @@ void WttGtk::create_options_dialog()
   gtk_box_pack_start(GTK_BOX(build_vbox), build_manual_w, FALSE, FALSE, 7);
   gtk_box_pack_start(GTK_BOX(build_vbox), build_nocopy_w, FALSE, FALSE, 7);
 
+  GtkWidget* view_label = gtk_label_new("View");
+  dark_theme_w = gtk_check_button_new_with_label("Dark theme");
+  light_theme_w = gtk_check_button_new_with_label("Light Theme");
+
+  GtkWidget* view_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+  gtk_box_pack_start(GTK_BOX(view_vbox), view_label, FALSE, FALSE, 15);
+  gtk_box_pack_start(GTK_BOX(view_vbox), dark_theme_w, FALSE, FALSE, 7);
+  gtk_box_pack_start(GTK_BOX(view_vbox), light_theme_w, FALSE, FALSE, 7);
+
   GtkWidget* hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   gtk_box_pack_start(GTK_BOX(hbox), hier_vbox, FALSE, FALSE, 50);
   gtk_box_pack_start(GTK_BOX(hbox), gtk_separator_new(GTK_ORIENTATION_VERTICAL), FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(hbox), entry_vbox, FALSE, FALSE, 50);
   gtk_box_pack_start(GTK_BOX(hbox), gtk_separator_new(GTK_ORIENTATION_VERTICAL), FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(hbox), build_vbox, FALSE, FALSE, 50);
+  gtk_box_pack_start(GTK_BOX(hbox), gtk_separator_new(GTK_ORIENTATION_VERTICAL), FALSE, FALSE, 0);
+  gtk_box_pack_start(GTK_BOX(hbox), view_vbox, FALSE, FALSE, 50);
 
   GtkWidget* options_ok = gtk_button_new_with_label("Ok");
   gtk_widget_set_size_request(options_ok, 70, 25);
@@ -3199,11 +3230,11 @@ void WttGtk::create_options_dialog()
       G_CALLBACK(WttGtk::activate_options_cancel), this);
 
   GtkWidget* options_hboxbuttons = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 40);
-  gtk_box_pack_start(GTK_BOX(options_hboxbuttons), options_ok, FALSE, FALSE, 0);
+  gtk_box_pack_start(GTK_BOX(options_hboxbuttons), options_ok, FALSE, FALSE, 30);
   gtk_box_pack_start(
-      GTK_BOX(options_hboxbuttons), options_apply, FALSE, FALSE, 0);
+      GTK_BOX(options_hboxbuttons), options_apply, FALSE, FALSE, 30);
   gtk_box_pack_end(
-      GTK_BOX(options_hboxbuttons), options_cancel, FALSE, FALSE, 0);
+      GTK_BOX(options_hboxbuttons), options_cancel, FALSE, FALSE, 30);
 
   GtkWidget* options_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start(GTK_BOX(options_vbox), hbox, TRUE, TRUE, 30);

@@ -85,6 +85,8 @@ RtMonGtk::RtMonGtk(void* rtmon_parent_ctx, GtkWidget* rtmon_parent_wid,
   g_signal_connect(
       toplevel, "focus-in-event", G_CALLBACK(action_inputfocus), this);
 
+  int dark_theme = CoWowGtk::GetDarkTheme(toplevel);
+
   CoWowGtk::SetWindowIcon(toplevel);
 
   GtkWidget* vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
@@ -179,20 +181,25 @@ RtMonGtk::RtMonGtk(void* rtmon_parent_ctx, GtkWidget* rtmon_parent_wid,
   GtkToolbar* tools = (GtkToolbar*)g_object_new(GTK_TYPE_TOOLBAR, NULL);
 
   pwr_tFileName fname;
-  wutl_tools_item(tools, "$pwr_exe/ge_zoom_in.png", G_CALLBACK(activate_zoom_in), 
-      "Zoom in", this, 1, 1);
+  wutl_tools_item(tools, 
+      dark_theme ? "$pwr_exe/ico_zoomin_d_30.png" : "$pwr_exe/ico_zoomin_l_30.png", 
+      G_CALLBACK(activate_zoom_in), "Zoom in", this, 1, 1);
 
-  wutl_tools_item(tools, "$pwr_exe/ge_zoom_out.png", G_CALLBACK(activate_zoom_out), 
-      "Zoom out", this, 1, 1);
+  wutl_tools_item(tools, 
+      dark_theme ? "$pwr_exe/ico_zoomout_d_30.png" : "$pwr_exe/ico_zoomout_l_30.png", 
+      G_CALLBACK(activate_zoom_out), "Zoom out", this, 1, 1);
 
-  wutl_tools_item(tools, "$pwr_exe/ge_zoom_reset.png", G_CALLBACK(activate_zoom_reset), 
-      "Zoom reset", this, 1, 1);
+  wutl_tools_item(tools,
+      dark_theme ? "$pwr_exe/ico_zoomreset_d_30.png" : "$pwr_exe/ico_zoomreset_l_30.png", 
+      G_CALLBACK(activate_zoom_reset), "Zoom reset", this, 1, 1);
 
-  tools_xtt = wutl_tools_item(tools, "$pwr_exe/xtt_navigator.png", G_CALLBACK(activate_xtt), 
-      "Start Runtime Navigator", this, 1, 1);
+  tools_xtt = wutl_tools_item(tools,
+      dark_theme ? "$pwr_exe/ico_navigator_d_30.png" : "$pwr_exe/ico_navigator_l_30.png", 
+      G_CALLBACK(activate_xtt), "Start Runtime Navigator", this, 1, 1);
 
-  tools_op = wutl_tools_item(tools, "$pwr_exe/xtt_op.png", G_CALLBACK(activate_op), 
-      "Start Operator Environment", this, 1, 1);
+  tools_op = wutl_tools_item(tools,
+      dark_theme ? "$pwr_exe/ico_opplace_d_30.png" : "$pwr_exe/ico_opplace_l_30.png", 
+      G_CALLBACK(activate_op), "Start Operator Environment", this, 1, 1);
 
   // Button box
   dcli_translate_filename(fname, "$pwr_exe/pwr_logofully.png");
@@ -276,8 +283,9 @@ static gboolean rtmon_scan(void* data)
     char widget_name[80];
     pwr_tStatus sts = rtmon->nodelistnav->node_list[0].item->data.SystemStatus;
 
+    int dark_theme = CoWow::DarkTheme();
     if (sts == PWR__SRVCONNECTION) {
-      strcpy(widget_name, "gray");
+      strcpy(widget_name, dark_theme ? "darkgray" : "gray");
       strcpy(text, "Down");
       gtk_widget_set_sensitive(rtmon->bbox_start, TRUE);
       gtk_widget_set_sensitive(rtmon->bbox_restart, FALSE);
@@ -291,13 +299,13 @@ static gboolean rtmon_scan(void* data)
       g_object_set(rtmon->bbox_image_gray, "visible", TRUE, NULL);
     } else {
       if (((sts & 7) == 2) || ((sts & 7) == 4)) {
-        strcpy(widget_name, "red");
+        strcpy(widget_name, dark_theme ? "darkred" : "red");
         strcpy(text, "Running");
       } else if ((sts & 7) == 0) {
-        strcpy(widget_name, "yellow");
+        strcpy(widget_name, dark_theme ? "darkyellow" : "yellow");
         strcpy(text, "Running");
       } else {
-        strcpy(widget_name, "green");
+        strcpy(widget_name, dark_theme ? "darkgreen" : "green");
         strcpy(text, "Running");
       }
       gtk_widget_set_sensitive(rtmon->bbox_start, FALSE);

@@ -46,6 +46,8 @@ bool CoWow::m_printdialog_disable = false;
 char CoWow::m_default_printer[80] = "";
 void* CoWow::m_transient_wid = 0;
 wow_eIconType CoWow::m_icon_type = wow_eIconType_Rt;
+int CoWow::m_color_theme = 0;
+int CoWow::m_dark_theme = -1;
 
 CoWowTimer::CoWowTimer()
 {
@@ -329,4 +331,18 @@ void CoWow::SetTransient(void* transient_wid)
 void CoWow::SetIconType(wow_eIconType type)
 {
   m_icon_type = type;
+}
+
+int CoWow::SetColorTheme(int color_theme) {
+  if (color_theme == 0)
+    m_color_theme = DarkTheme() ? 16 : 15;
+  else
+    m_color_theme = color_theme;
+  return m_color_theme;
+}
+
+int CoWow::DarkTheme() {
+  if (m_dark_theme == -1)
+    return 0;
+  return m_dark_theme;
 }

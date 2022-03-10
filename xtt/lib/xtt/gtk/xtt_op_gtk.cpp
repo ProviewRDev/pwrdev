@@ -112,6 +112,8 @@ OpGtk::OpGtk(void* op_parent_ctx, GtkWidget* op_parent_wid, char* opplace,
       (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", OP_HEIGHT_MIN,
                                "default-width", 1100, NULL);
 
+  int dark_theme = CoWowGtk::GetDarkTheme(toplevel);
+
   gtk_window_set_decorated(GTK_WINDOW(toplevel), FALSE);
   CoWowGtk::SetWindowIcon(toplevel);
 
@@ -557,32 +559,41 @@ OpGtk::OpGtk(void* op_parent_ctx, GtkWidget* op_parent_wid, char* opplace,
   tools2 = (GtkWidget*)g_object_new(GTK_TYPE_TOOLBAR, NULL);
 
   // Zoom buttons
-  wutl_tools_item(GTK_TOOLBAR(tools), "$pwr_exe/ge_zoom_in.png", G_CALLBACK(activate_zoom_in), 
-      "Zoom in", this, 0, 1);
+  wutl_tools_item(GTK_TOOLBAR(tools), 
+      dark_theme ? "$pwr_exe/ico_zoomin_d_20.png" : "$pwr_exe/ico_zoomin_l_20.png", 
+      G_CALLBACK(activate_zoom_in), "Zoom in", this, 0, 1);
 
-  wutl_tools_item(GTK_TOOLBAR(tools), "$pwr_exe/ge_zoom_out.png", G_CALLBACK(activate_zoom_out), 
-      "Zoom out", this, 0, 1);
+  wutl_tools_item(GTK_TOOLBAR(tools),
+      dark_theme ? "$pwr_exe/ico_zoomout_d_20.png" : "$pwr_exe/ico_zoomout_l_20.png", 
+      G_CALLBACK(activate_zoom_out), "Zoom out", this, 0, 1);
 
-  wutl_tools_item(GTK_TOOLBAR(tools), "$pwr_exe/xtt_help.png", G_CALLBACK(activate_help), 
-      "Help", this, 0, 1);
+  wutl_tools_item(GTK_TOOLBAR(tools),
+      dark_theme ? "$pwr_exe/ico_help_d_20.png" : "$pwr_exe/ico_help_l_20.png", 
+      G_CALLBACK(activate_help), "Help", this, 0, 1);
  
-  tools_close = wutl_tools_item(GTK_TOOLBAR(tools), "$pwr_exe/xtt_close.png", G_CALLBACK(activate_exit), 
-      "Close", this, 0, 1);
+  tools_close = wutl_tools_item(GTK_TOOLBAR(tools),
+      dark_theme ? "$pwr_exe/ico_close_d_20.png" : "$pwr_exe/ico_close_l_20.png", 
+      G_CALLBACK(activate_exit), "Close", this, 0, 1);
  
-  wutl_tools_item(GTK_TOOLBAR(tools2), "$pwr_exe/xtt_alarmlist.png", G_CALLBACK(activate_alarmlist), 
-      "Alarm List", this, 0, 1);
+  wutl_tools_item(GTK_TOOLBAR(tools2),
+      dark_theme ? "$pwr_exe/ico_alarmlist_d_20.png" : "$pwr_exe/ico_alarmlist_l_20.png", 
+      G_CALLBACK(activate_alarmlist), "Alarm List", this, 0, 1);
  
-  wutl_tools_item(GTK_TOOLBAR(tools2), "$pwr_exe/xtt_eventlist.png", G_CALLBACK(activate_eventlist), 
-      "Event List", this, 0, 1);
+  wutl_tools_item(GTK_TOOLBAR(tools2),
+      dark_theme ? "$pwr_exe/ico_eventlist_d_20.png" : "$pwr_exe/ico_eventlist_l_20.png", 
+      G_CALLBACK(activate_eventlist), "Event List", this, 0, 1);
  
-  wutl_tools_item(GTK_TOOLBAR(tools2), "$pwr_exe/xtt_eventlog.png", G_CALLBACK(activate_eventlog), 
-      "Event Log", this, 0, 1);
+  wutl_tools_item(GTK_TOOLBAR(tools2),
+      dark_theme ? "$pwr_exe/ico_eventlog_d_20.png" : "$pwr_exe/ico_eventlog_l_20.png", 
+      G_CALLBACK(activate_eventlog), "Search Event Log", this, 0, 1);
  
-  wutl_tools_item(GTK_TOOLBAR(tools2), "$pwr_exe/xtt_blocklist.png", G_CALLBACK(activate_blocklist), 
-      "Blocked Alarms", this, 0, 1);
+  wutl_tools_item(GTK_TOOLBAR(tools2),
+      dark_theme ? "$pwr_exe/ico_blocklist_d_20.png" : "$pwr_exe/ico_blocklist_l_20.png", 
+      G_CALLBACK(activate_blocklist), "Blocked Alarms", this, 0, 1);
  
-  wutl_tools_item(GTK_TOOLBAR(tools2), "$pwr_exe/xtt_navigator.png", G_CALLBACK(activate_navigator), 
-      "Navigator", this, 0, 1);
+  wutl_tools_item(GTK_TOOLBAR(tools2),
+      dark_theme ? "$pwr_exe/ico_navigator_d_20.png" : "$pwr_exe/ico_navigator_l_20.png", 
+      G_CALLBACK(activate_navigator), "Navigator", this, 0, 1);
  
 
   // System pushbuttons

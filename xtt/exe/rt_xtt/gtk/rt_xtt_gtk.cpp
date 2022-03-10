@@ -760,6 +760,8 @@ XttGtk::XttGtk(int argc, char* argv[], int* return_sts)
   g_signal_connect(
       toplevel, "focus-in-event", G_CALLBACK(XttGtk::action_inputfocus), this);
 
+  int dark_theme = CoWowGtk::GetDarkTheme(toplevel);
+
   CoWowGtk::SetWindowIcon(toplevel);
 
   GtkAccelGroup* accel_g
@@ -1096,20 +1098,25 @@ XttGtk::XttGtk(int argc, char* argv[], int* return_sts)
   // Toolbar
   GtkToolbar* tools = (GtkToolbar*)g_object_new(GTK_TYPE_TOOLBAR, NULL);
 
-  wutl_tools_item(tools, "$pwr_exe/xtt_arrowleft.png", G_CALLBACK(activate_back), 
-      "Go back", this, 1, 1);
+  wutl_tools_item(tools,
+      dark_theme ? "$pwr_exe/ico_back_d_30.png" : "$pwr_exe/ico_back_l_30.png", 
+      G_CALLBACK(activate_back), "Go back", this, 1, 1);
 
-  GtkToolItem *tools_advuser = wutl_tools_item(tools, "$pwr_exe/xtt_advuser.png", G_CALLBACK(activate_advanceduser), 
-      "Advanced user", this, 1, 1);
+  GtkToolItem *tools_advuser = wutl_tools_item(tools,
+      dark_theme ? "$pwr_exe/ico_advuser_d_30.png" : "$pwr_exe/ico_advuser_l_30.png", 
+      G_CALLBACK(activate_advanceduser), "Advanced user", this, 1, 1);
 
-  wutl_tools_item(tools, "$pwr_exe/xtt_zoom_in.png", G_CALLBACK(activate_zoom_in), 
-      "Zoom in", this, 1, 1);
+  wutl_tools_item(tools, 
+      dark_theme ? "$pwr_exe/ico_zoomin_d_30.png" : "$pwr_exe/ico_zoomin_l_30.png", 
+      G_CALLBACK(activate_zoom_in), "Zoom in", this, 1, 1);
 
-  wutl_tools_item(tools, "$pwr_exe/xtt_zoom_out.png", G_CALLBACK(activate_zoom_out), 
-      "Zoom out", this, 1, 1);
+  wutl_tools_item(tools,
+      dark_theme ? "$pwr_exe/ico_zoomout_d_30.png" : "$pwr_exe/ico_zoomout_l_30.png", 
+      G_CALLBACK(activate_zoom_out), "Zoom out", this, 1, 1);
 
-  wutl_tools_item(tools, "$pwr_exe/xtt_zoom_reset.png", G_CALLBACK(activate_zoom_reset), 
-      "Zoom reset", this, 1, 1);
+  wutl_tools_item(tools,
+      dark_theme ? "$pwr_exe/ico_zoomreset_d_30.png" : "$pwr_exe/ico_zoomreset_l_30.png", 
+      G_CALLBACK(activate_zoom_reset), "Zoom reset", this, 1, 1);
 
   // Toolbar
   methodtoolbar

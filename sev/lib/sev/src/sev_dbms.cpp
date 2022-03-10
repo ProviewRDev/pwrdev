@@ -5498,7 +5498,6 @@ void sev_dbms::delete_thread(void* thread)
 
 sev_dbms::~sev_dbms()
 {
-  printf("Freeing memory\n");
   for (size_t idx = 0; idx < m_items.size(); idx++) {
     if (m_items[idx].cache)
       // Write last value

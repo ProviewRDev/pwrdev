@@ -186,6 +186,7 @@ public:
       GdkAtom* graph_atom, GdkAtom* objid_atom, GdkAtom* attrref_atom);
   static int GetSelection(GtkWidget* w, char* str, int size, GdkAtom atom);
   static void SetWindowIcon(GtkWidget* w);
+  static int GetDarkTheme(GtkWidget *w);
   static void question_ok_cb(GtkWidget* w, gpointer data);
   static void question_cancel_cb(GtkWidget* w, gpointer data);
   static void inputdialog_ok_cb(GtkWidget* w, gpointer data);

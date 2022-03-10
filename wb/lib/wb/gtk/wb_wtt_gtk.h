@@ -95,6 +95,8 @@ public:
   GtkWidget* build_manual_w;
   GtkWidget* build_nocopy_w;
   GtkWidget* enable_revisions_w;
+  GtkWidget* dark_theme_w;
+  GtkWidget* light_theme_w;
   GtkWidget* menu_save_w;
   GtkWidget* menu_revert_w;
   GtkWidget* menu_cut_w;

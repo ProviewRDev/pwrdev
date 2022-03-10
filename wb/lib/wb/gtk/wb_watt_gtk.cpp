@@ -636,7 +636,6 @@ WAttGtk::WAttGtk(GtkWidget* wa_parent_wid, void* wa_parent_ctx,
   g_object_set(cmd_input, "visible", FALSE, NULL);
   g_object_set(cmd_scrolledinput, "visible", FALSE, NULL);
 
-  int h = gdk_window_get_height(gtk_widget_get_window(pane));
   gtk_paned_set_position(GTK_PANED(pane), default_height - 65);
 
   if (utility == wb_eUtility_Wtt) {

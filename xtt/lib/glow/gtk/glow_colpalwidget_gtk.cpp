@@ -362,6 +362,7 @@ static void colpalwidgetgtk_realize(GtkWidget* widget)
     if (!colpal->priv->colpal_ctx) {
       colpal->priv->draw_ctx = new GlowDrawGtk(widget, &colpal->priv->colpal_ctx,
           colpal_init_proc, colpal->priv->client_data, glow_eCtxType_ColPal);
+      ((GlowDrawGtk*)colpal->priv->draw_ctx)->set_anti_aliasing(0);
     }
   }
 }

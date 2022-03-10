@@ -176,6 +176,7 @@ public:
   int enable_comment;
   int enable_revisions;
   wb_build_opt build;
+  int color_theme;
 
   int load_config(void* wnav);
   int symbolfile_exec(void* wnav);
@@ -423,12 +424,12 @@ public:
       int sh_alias, int sh_descrip, int sh_objref, int sh_objxref,
       int sh_attrref, int sh_attrxref, int bu_force, int bu_debug,
       int bu_crossref, int bu_crossrefsim, int bu_crossrefgraph, int bu_manual,
-      int bu_nocopy);
+      int bu_nocopy, int col_theme);
   void get_options(int* ena_comment, int* ena_revisions, int* sh_class,
       int* sh_alias, int* sh_descrip, int* sh_objref, int* sh_objxref,
       int* sh_attrref, int* sh_attrxref, int* bu_force, int* bu_debug,
       int* bu_crossref, int* bu_crossrefsim, int* bu_crossrefgraph,
-      int* bu_manual, int* bu_nocopy);
+      int* bu_manual, int* bu_nocopy, int *col_theme);
   int save_settnings(std::ofstream& fp);
   int node_to_objid(brow_tNode node, pwr_tObjid* objid);
   int unselect_objid(pwr_tObjid objid);
@@ -457,6 +458,7 @@ public:
   int get_next(
       pwr_tOid oid, wnav_eDestCode dest, pwr_tOid* next_oid, wnav_eDestCode* d);
   void set_select_visible();
+  void update_color_theme(int ct);
   static int get_next_free_vid(
       pwr_tVid min_vid, pwr_tVid max_vid, pwr_tVid* next);
   static int check_new_vid(pwr_tVid vid);
