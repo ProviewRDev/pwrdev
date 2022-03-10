@@ -819,6 +819,7 @@ void GrowNode::set_scale(
   get_node_borders();
 
   // Avoid escalating position
+#if 0
   switch( type) {
   case glow_eScaleType_LowerLeft:
     x_left = old_x_left;
@@ -845,6 +846,7 @@ void GrowNode::set_scale(
   default:
     ;
   }
+#endif
 
   call_redraw_node_cons();
   ctx->draw(&ctx->mw,
