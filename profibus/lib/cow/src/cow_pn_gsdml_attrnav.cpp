@@ -1548,7 +1548,7 @@ ItemPnSlot::ItemPnSlot(GsdmlAttrNav* attrnav, const char* name, ProfinetSlot* sl
              attrnav_mItemType_Parent | attrnav_mItemType_ExpandForSave | attrnav_mItemType_Copyable |
                  attrnav_mItemType_Movable,
              name, infotext),
-      m_slot_data(slot_data), m_old_value("")
+      m_slot_data(slot_data)
 {
   m_closed_annotation = attrnav->brow->pixmap_map;
 
@@ -1650,7 +1650,7 @@ int ItemPnSlot::open_children_impl()
       std::ostringstream subslot_name("Subslot ", std::ios_base::ate);
       subslot_name << subslot_number << " (" << *virtual_submodule_item.second->_ModuleInfo._Name << ")";
 
-      new ItemPnSubslot(m_attrnav, subslot_name.str().c_str(), &m_slot_data->m_subslot_map[subslot_number],
+      new ItemPnSubslot(m_attrnav, subslot_name.str().c_str(), m_slot_data, &m_slot_data->m_subslot_map[subslot_number],
                         module, subslot_number, virtual_submodule_item.second, m_node, flow_eDest_IntoLast,
                         "Virtual submodule of this module/DAP.");
 
@@ -1667,7 +1667,7 @@ int ItemPnSlot::open_children_impl()
         std::ostringstream subslot_name("Subslot ", std::ios_base::ate);
         subslot_name << it.value();
 
-        new ItemPnSubslot(m_attrnav, subslot_name.str().c_str(), &m_slot_data->m_subslot_map[it.value()],
+        new ItemPnSubslot(m_attrnav, subslot_name.str().c_str(), m_slot_data, &m_slot_data->m_subslot_map[it.value()],
                           module, it.value(), nullptr, m_node, flow_eDest_IntoLast,
                           "Subslot from the modules physical subslot list.");
       }
@@ -1702,11 +1702,12 @@ void ItemPnSlot::attach_module(std::shared_ptr<GSDML::ModuleItem> module, bool r
                                         // class will free data record data
 }
 
-ItemPnSubslot::ItemPnSubslot(GsdmlAttrNav* attrnav, const char* name, ProfinetSubslot* subslot_data,
+ItemPnSubslot::ItemPnSubslot(GsdmlAttrNav* attrnav, const char* name, ProfinetSlot* parent_slot_data, ProfinetSubslot* subslot_data,
                              std::shared_ptr<GSDML::ModuleItem> parent_module_item, uint subslot_number,
                              std::shared_ptr<GSDML::SubmoduleItem> attached_submodule_item, brow_tNode dest,
                              flow_eDest dest_code, const char* infotext)
     : ItemPn(attrnav, attrnav_mItemType_Parent | attrnav_mItemType_ExpandForSave, name, infotext, 1),
+      m_parent_slot_data(parent_slot_data),
       m_subslot_data(subslot_data), m_parent_module_item(parent_module_item),
       m_subslot_number(subslot_number), m_is_selectable(false),
       m_attached_submodule_item(attached_submodule_item)
@@ -1990,7 +1991,7 @@ void ItemPnSubslot::attach_submodule(std::shared_ptr<GSDML::SubmoduleItem> submo
 ItemPnDAP::ItemPnDAP(GsdmlAttrNav* attrnav, const char* name, ProfinetSlot* item_slotdata, brow_tNode dest,
                      flow_eDest dest_code, const char* infotext)
     : ItemPn(attrnav, attrnav_mItemType_Parent | attrnav_mItemType_ExpandForSave, name, infotext, 1),
-      m_slotdata(item_slotdata)
+      m_slot_data(item_slotdata)
 {
   m_closed_annotation = attrnav->brow->pixmap_map;
   brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_object, dest, dest_code, (void*)this,
@@ -2028,7 +2029,7 @@ int ItemPnDAP::open_children_impl()
       std::ostringstream subslot_name("Subslot ", std::ios_base::ate);
       subslot_name << subslot_number << " (" << *virtual_submodule_item.second->_ModuleInfo._Name << ")";
 
-      new ItemPnSubslot(m_attrnav, subslot_name.str().c_str(), &m_slotdata->m_subslot_map[subslot_number],
+      new ItemPnSubslot(m_attrnav, subslot_name.str().c_str(), m_slot_data, &m_slot_data->m_subslot_map[subslot_number],
                         dap, subslot_number, virtual_submodule_item.second, m_node, flow_eDest_IntoLast,
                         "Virtual submodule of this module/DAP.");
 
@@ -2042,8 +2043,8 @@ int ItemPnDAP::open_children_impl()
         std::ostringstream subslot_name("Subslot ", std::ios_base::ate);
         subslot_name << submodule.second->_SubslotNumber << " (" << *submodule.second->_Text << ")";
 
-        new ItemPnSubslot(m_attrnav, subslot_name.str().c_str(),
-                          &m_slotdata->m_subslot_map[submodule.second->_SubslotNumber], dap,
+        new ItemPnSubslot(m_attrnav, subslot_name.str().c_str(), m_slot_data,
+                          &m_slot_data->m_subslot_map[submodule.second->_SubslotNumber], dap,
                           submodule.second->_SubslotNumber, nullptr, m_node, flow_eDest_IntoLast,
                           "System defined subslot");
       }
@@ -2058,7 +2059,7 @@ int ItemPnDAP::open_children_impl()
         std::ostringstream subslot_name("Subslot ", std::ios_base::ate);
         subslot_name << it.value();
 
-        new ItemPnSubslot(m_attrnav, subslot_name.str().c_str(), &m_slotdata->m_subslot_map[it.value()], dap,
+        new ItemPnSubslot(m_attrnav, subslot_name.str().c_str(), m_slot_data, &m_slot_data->m_subslot_map[it.value()], dap,
                           it.value(), nullptr, m_node, flow_eDest_IntoLast, "Physical subslot of the DAP.");
       }
     }
@@ -2706,6 +2707,9 @@ void ItemPnSubmoduleSelection::select(ItemPnValueSelectItem<std::string>* select
     brow_SetAnnotation(subslot->m_node, 1, submodule->_ModuleInfo._Name->c_str(),
                        submodule->_ModuleInfo._Name->length());
   }
+
+  // Set the entire module to a modified state since we've just updated the subslot
+  subslot->m_parent_slot_data->m_is_modified = true; 
 
   subslot->close(m_attrnav, 0, 0, true); // Close AND reopen
 }

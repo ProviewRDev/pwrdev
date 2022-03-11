@@ -312,13 +312,9 @@ public:
   bool m_is_fixed;
   std::shared_ptr<GSDML::ModuleItem> m_attached_module_item;   
 
-  // Trace compare
-  std::string m_old_value;
-
   int open_children_impl();
   bool selected_impl(GsdmlAttrNav* attrnav) override  { return false; }
-  bool value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override { return false; }
-  //int scan(GsdmlAttrNav* attrnav, void* dummy_p);
+  bool value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override { return false; }  
   void attach_module(std::shared_ptr<GSDML::ModuleItem> module, bool reset_subslots = false);
 };
 
@@ -327,20 +323,19 @@ class ItemPnSubslot : public ItemPn
 {
 public:
   ItemPnSubslot(GsdmlAttrNav* attrnav, const char* item_name,
+                ProfinetSlot* parent_slot_data, 
                 ProfinetSubslot* subslot_data,
                 std::shared_ptr<GSDML::ModuleItem> parent_module_item,
                 uint subslot_number,
                 std::shared_ptr<GSDML::SubmoduleItem> attached_submodule_item,
                 brow_tNode dest, flow_eDest dest_code, const char* infotext);
 
+  ProfinetSlot* m_parent_slot_data;
   ProfinetSubslot* m_subslot_data;
   std::shared_ptr<GSDML::ModuleItem> m_parent_module_item;
   uint m_subslot_number;
   bool m_is_selectable; 
   std::shared_ptr<GSDML::SubmoduleItem> m_attached_submodule_item;   
-
-  // Trace compare
-  std::string m_old_value;
 
   int open_children_impl() override;
   bool selected_impl(GsdmlAttrNav* attrnav) override  { return false; }
@@ -348,8 +343,6 @@ public:
 
   void attach_submodule(std::shared_ptr<GSDML::SubmoduleItem> submodule);
 
-  //int scan(GsdmlAttrNav* attrnav, void* dummy_p) override;
-  //void set_trace_value(void** p) { *p = (void*)1; /* Set a dummy */ }
   static uint calculate_input_length(GSDML::Input const* input);
   static uint calculate_output_length(GSDML::Output const* output);
 
@@ -365,7 +358,7 @@ public:
             ProfinetSlot* item_slotdata, brow_tNode dest, flow_eDest dest_code, const char* infotext);
   virtual ~ItemPnDAP() = default;
 
-  ProfinetSlot* m_slotdata;
+  ProfinetSlot* m_slot_data;
 
   int open_children_impl() override;
   bool selected_impl(GsdmlAttrNav* attrnav) override  { return false; }
