@@ -134,12 +134,39 @@ static int create_channel(ldh_tSession ldhses, ChanItem const& chan, pwr_tOid ta
   return sts;
 }
 
+
+static std::string generate_channel_object_name(GSDML::DataItem const* data_item, size_t start_index, unsigned int number, bool channel_name_from_id = false)
+{
+  std::regex disallowed_characters_re(R"([^A-Za-z0-9_])"); // Match anything NOT in A-Z, a-z, 0-9 or _ i.e. all disallowed characters
+  std::ostringstream name(std::ios_base::out);
+  if (channel_name_from_id)
+  {
+    name << (data_item->_TextId != "" ? "" : "Ch") << std::setw(2) << std::setfill('0') << start_index << (data_item->_TextId != "" ? "_" + data_item->_TextId : "");
+  }
+  else
+  {
+    name << (data_item->_Text ? *data_item->_Text : "Ch") << "_" << start_index << "_" << number;
+  }
+
+  std::string new_name;
+  new_name = name.str();
+  new_name.erase(std::remove(new_name.begin(), new_name.end(), ' '),
+                new_name.end());                           // Remove any whitespaces
+  new_name = std::regex_replace(new_name, disallowed_characters_re, "_"); // Replace all illegal characters with a '_'      
+  if (new_name.length() > 31) new_name.erase(31, std::string::npos); // We can only have 32 characters including null termination :(
+  
+  // In 999 out of 1000 cases we now have a unique name given the start_index and number within a sequence of bits for instance.
+  // In some cases though one can choose the same submodule more than once for some specific modules. One shouldn't do that but it is
+  // possible. If one does, the name will of course be a duplicate and the channel creation will fail. Should we care about this?
+
+  return new_name;
+}
+
 static int pndevice_fill_io_vector_from_data_item(std::vector<ChanItem>& io_vector,
                                                   GSDML::DataItem const* data_item, size_t const& start_index,
                                                   bool is_output = false)
 {
-  ChanItem ci;
-  std::regex disallowed_characters_re(R"([^A-Za-z0-9_])"); // Match anything NOT in A-Z, a-z, 0-9 or _ i.e. all disallowed characters
+  ChanItem ci;  
 
   // If we have bits we fill with Di/Do
   if (data_item->_UseAsBits)
@@ -194,13 +221,7 @@ static int pndevice_fill_io_vector_from_data_item(std::vector<ChanItem>& io_vect
         // Add Channel
         ci.number = data_item->_DataType == GSDML::ValueDataType_OctetString ? number % 8 : number;
         ci.description = std::string("Bit ") + std::to_string(number); // Okay lots of overhead here...
-
-        std::ostringstream name(std::ios_base::out);
-        name << (data_item->_Text ? *data_item->_Text : "Ch") << "_" << start_index << "_" << number;
-        ci.name = name.str();
-        ci.name.erase(std::remove(ci.name.begin(), ci.name.end(), ' '),
-                      ci.name.end());                           // Remove any whitespaces
-        std::replace(ci.name.begin(), ci.name.end(), '-', '_'); // Replace - with _
+        ci.name = generate_channel_object_name(data_item, start_index, number);
 
         io_vector.push_back(ci);
       }
@@ -213,14 +234,8 @@ static int pndevice_fill_io_vector_from_data_item(std::vector<ChanItem>& io_vect
         ci.number = bit_data_item._BitOffset;
         ci.description = bit_data_item._Text
                              ? *bit_data_item._Text
-                             : std::string(" Bit ") + std::to_string(ci.number);
-
-        std::ostringstream name(std::ios_base::out);
-        name << (data_item->_Text ? *data_item->_Text : "Ch") << "_" << start_index << "_" << ci.number;
-        ci.name = name.str();
-        ci.name.erase(std::remove(ci.name.begin(), ci.name.end(), ' '),
-                      ci.name.end());                           // Remove any whitespaces
-        ci.name = std::regex_replace(ci.name, disallowed_characters_re, "_"); // Replace all illegal characters with a '_'                    
+                             : std::string(" Bit ") + std::to_string(ci.number);       
+        ci.name = generate_channel_object_name(data_item, start_index, ci.number);
 
         io_vector.push_back(ci);
       }
@@ -286,25 +301,14 @@ static int pndevice_fill_io_vector_from_data_item(std::vector<ChanItem>& io_vect
     {      
       for (size_t byte = 0; byte < data_item->_Length; byte++)
       {
-        std::ostringstream name(std::ios_base::out);
-        name << (data_item->_TextId != "" ? data_item->_TextId : "Ch") << "_" << start_index << "_"
-            << byte;
-        ci.name = name.str();
-        ci.name.erase(std::remove(ci.name.begin(), ci.name.end(), ' '),
-                      ci.name.end());                           // Remove any whitespaces      
-        ci.name = std::regex_replace(ci.name, disallowed_characters_re, "_"); // Replace all illegal characters with a '_'            
+        ci.name = generate_channel_object_name(data_item, start_index, byte);
+
         io_vector.push_back(ci);
       }
     }
     else
     {
-      std::ostringstream name(std::ios_base::out);
-      name << (data_item->_TextId != "" ? "" : "Ch") << std::setw(2) << std::setfill('0') << start_index
-          << (data_item->_TextId != "" ? "_" + data_item->_TextId : "");
-      ci.name = name.str();
-      ci.name.erase(std::remove(ci.name.begin(), ci.name.end(), ' '), ci.name.end()); // Remove any whitespaces
-      ci.name = std::regex_replace(ci.name, disallowed_characters_re, "_"); // Replace all illegal characters with a '_'
-
+      ci.name = generate_channel_object_name(data_item, start_index, ci.number, true);
       io_vector.push_back(ci);
     }
   }
@@ -590,6 +594,10 @@ int pndevice_save_cb(void* sctx)
         {
           io_data = &module_item->_UseableSubmodules.at(subslot.second.m_submodule_ID)
                          ->_SubmoduleItemTarget->_IOData;
+        }
+        else
+        {
+          continue;
         }
 
         // Populate channel vectors with the data collected for this subslot
