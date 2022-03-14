@@ -897,12 +897,21 @@ public:
 class ItemPnPhaseInput : public ItemPnValueInput<uint>
 {
 public:
-  ItemPnPhaseInput(GsdmlAttrNav* attrnav, const char* name,
-      uint* value_p, const char* infotext, brow_tNode dest, flow_eDest dest_code)
-  : ItemPnValueInput<uint>(attrnav, name, value_p, infotext, dest, dest_code) {}
+  ItemPnPhaseInput(GsdmlAttrNav* attrnav, const char* name, uint* value_p, ItemPnReductionRatio* iprr,
+                   const char* infotext, brow_tNode dest, flow_eDest dest_code)
+      : ItemPnValueInput<uint>(attrnav, name, value_p, infotext, dest, dest_code), m_reduction_ratio(iprr)
+  {
+    // If our value is zero we are default initialized, set phase to 1
+    if (*value_p == 0)
+    {
+      do_value_changed(attrnav, "1"); // Set to 1      
+    }
+  }
   virtual ~ItemPnPhaseInput() {}
 
   bool do_value_changed(GsdmlAttrNav* attrnav, const char* value_str) override;
+
+  ItemPnReductionRatio* m_reduction_ratio;
 };
 
 // Just a container for the timing properties values
@@ -946,9 +955,9 @@ public:
 
     new ItemPnSendClock(m_attrnav, "Send Clock", m_interface_submodule->_ApplicationRelations, &m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR.m_send_clock_factor, m_node, flow_eDest_IntoLast);
 
-    new ItemPnReductionRatio(m_attrnav, "Reduction Ratio", m_interface_submodule->_ApplicationRelations, &m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR.m_reduction_ratio, m_node, flow_eDest_IntoLast);
+    ItemPnReductionRatio* iprr = new ItemPnReductionRatio(m_attrnav, "Reduction Ratio", m_interface_submodule->_ApplicationRelations, &m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR.m_reduction_ratio, m_node, flow_eDest_IntoLast);
 
-    new ItemPnPhaseInput(m_attrnav, "Phase", &m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR.m_phase, "Phases explained here (TODO)", m_node, flow_eDest_IntoLast);
+    new ItemPnPhaseInput(m_attrnav, "Phase", &m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR.m_phase, iprr, "Phase for this device. Phase cannot exceed your reduction ratio.", m_node, flow_eDest_IntoLast);
 
     return 1;
   }

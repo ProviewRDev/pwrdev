@@ -3253,17 +3253,27 @@ bool ItemPnDeviceNameInput::do_value_changed(GsdmlAttrNav* attrnav, const char* 
 
 bool ItemPnPhaseInput::do_value_changed(GsdmlAttrNav* attrnav, const char* value_str)
 {
-  std::regex const phase_regex("^[1-9]");
+  std::regex const phase_regex("^[1-9][0-9]*");
 
   if (std::regex_match(value_str, phase_regex))
   {
+    uint value;
     std::istringstream input(value_str, std::ios_base::in);
-    input >> *m_value_p;
-    brow_SetAnnotation(m_node, 1, input.str().c_str(), input.str().length());
+    input >> value;
+    if (value <= *m_reduction_ratio->m_value_p)
+    {
+      *m_value_p = value;
+      brow_SetAnnotation(m_node, 1, input.str().c_str(), input.str().length());
+    }
+    else
+    {
+      attrnav->message('E', "Phase cannot exceed reduction ratio.");
+      return false;
+    }    
   }
   else
   {
-    attrnav->message('E', "Invalid format! Enter a value between 1 - 9");
+    attrnav->message('E', "Invalid format! Enter a value 1 - Reduction Ratio");
     return false;
   }
   return true;

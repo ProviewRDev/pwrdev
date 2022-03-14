@@ -111,7 +111,7 @@ public:
   
   unsigned short m_send_clock_factor;
   unsigned short m_reduction_ratio;
-  unsigned int m_phase; // TODO Initialize to 1 ???
+  unsigned int m_phase; // Phase can not be greater than reduction ratio and must be > 0.
   unsigned int m_api; // Check with the spec what to do with submodule items specifying a specific API...
   std::string m_rt_class;
   std::string m_startup_mode;
