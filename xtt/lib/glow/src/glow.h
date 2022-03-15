@@ -1547,7 +1547,7 @@ typedef enum {
   glow_eSave_GrowRect_bgcolor_gradient = 1924,
   glow_eSave_GrowRect_background_drawtype = 1925,
   glow_eSave_GrowRect_fill_eq_background = 1926,
-  glow_eSave_GrowRect_transparency = 1929,
+  glow_eSave_GrowRect_transparency = 1927,
   glow_eSave_GrowLine_x_right = 2000,
   glow_eSave_GrowLine_x_left = 2001,
   glow_eSave_GrowLine_y_high = 2002,

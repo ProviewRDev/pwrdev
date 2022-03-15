@@ -1025,6 +1025,7 @@ var Glow = {
   eSave_GrowRect_bgcolor_gradient    	: 1924,
   eSave_GrowRect_background_drawtype  : 1925,
   eSave_GrowRect_fill_eq_background   : 1926,
+  eSave_GrowRect_transparency 		: 1927,
   eSave_GrowLine_x_right		: 2000,
   eSave_GrowLine_x_left		: 2001,
   eSave_GrowLine_y_high		: 2002,
@@ -1036,6 +1037,7 @@ var Glow = {
   eSave_GrowLine_trf			: 2008,
   eSave_GrowLine_original_border_drawtype : 2009,
   eSave_GrowLine_line_type 		: 2010,
+  eSave_GrowLine_transparency 		: 2011,
   eSave_GrowConPoint_x_right		: 2100,
   eSave_GrowConPoint_x_left		: 2101,
   eSave_GrowConPoint_y_high		: 2102,
@@ -1095,6 +1097,7 @@ var Glow = {
   eSave_GrowCtx_customcolors    	: 2249,
   eSave_GrowCtx_dashboard	    	: 2250,
   eSave_GrowCtx_dash		    	: 2251,
+  eSave_GrowCtx_anti_aliasing	    	: 2252,
   eSave_GrowSubAnnot_x_right		: 2300,
   eSave_GrowSubAnnot_x_left		: 2301,
   eSave_GrowSubAnnot_y_high		: 2302,
@@ -1132,6 +1135,7 @@ var Glow = {
   eSave_GrowArc_fill_eq_background    : 2424,
   eSave_GrowArc_fill_eq_light 		: 2425,
   eSave_GrowArc_fill_eq_shadow		: 2426,
+  eSave_GrowArc_transparency 		: 2427,
   eSave_PolyLine_draw_type		: 2500,
   eSave_PolyLine_line_width		: 2501,
   eSave_PolyLine_a_points		: 2502,
@@ -1167,6 +1171,7 @@ var Glow = {
   eSave_GrowPolyLine_fill_eq_bgshadow : 2627,
   eSave_GrowPolyLine_fill_eq_background : 2628,
   eSave_GrowPolyLine_background_drawtype : 2629,
+  eSave_GrowPolyLine_transparency 	: 2630,
   eSave_GrowNode_node_part		: 2700,
   eSave_GrowNode_dynamic		: 2701,
   eSave_GrowNode_dynamicsize		: 2702,
@@ -1200,6 +1205,7 @@ var Glow = {
   eSave_GrowNode_disable_cb          	: 2730,
   eSave_GrowNode_original_background_drawtype  : 2731,
   eSave_GrowNode_background_drawtype  : 2732,
+  eSave_GrowNode_transparency 		: 2733,
   eSave_Transform_a11			: 2800,
   eSave_Transform_a12			: 2801,
   eSave_Transform_a13			: 2802,
@@ -1222,6 +1228,7 @@ var Glow = {
   eSave_GrowText_trf 			: 3009,
   eSave_GrowText_font 		: 3010,
   eSave_GrowText_adjustment 		: 3011,
+  eSave_GrowText_transparency 		: 3012,
   eSave_GrowBar_max_value 		: 3100,
   eSave_GrowBar_min_value 		: 3101,
   eSave_GrowBar_bar_value 		: 3102,
@@ -3862,6 +3869,7 @@ function GrowNode( ctx) {
   this.gradient = 0;
   this.text_type = Glow.eDrawType_TextHelvetica;
   this.text_font = Glow.eFont_No;
+  this.transparency = 0;
   this.disable_cb = 0;
   
   this.nc_name = null;
@@ -4007,6 +4015,9 @@ function GrowNode( ctx) {
 	break;
       case Glow.eSave_GrowNode_text_font:
 	this.text_font = parseInt(tokens[1], 10);
+	break;
+      case Glow.eSave_GrowNode_transparency:
+	this.transparency = parseFloat(tokens[1], 10);
 	break;
       case Glow.eSave_GrowNode_disable_cb:
 	this.disable_cb = parseInt(tokens[1], 10);
@@ -4928,6 +4939,10 @@ function GrowNode( ctx) {
     if ( this.ctx.customcolors.colortheme_lightness != this.color_lightness)
       this.color_lightness = this.ctx.customcolors.colortheme_lightness;
   };
+
+  this.setTransparency = function(transparency) {
+    this.transparency = transparency;
+  };
 }
 
 function GrowGroup( ctx) {
@@ -5456,6 +5471,7 @@ function GrowRect( ctx) {
   this.disable_gradient = 0;
   this.bgcolor_gradient = 0;
   this.fill_eq_background = 0;
+  this.transparency = 0;
   this.dynamicsize = 0;
   this.trf = new GlowTransform();
 
@@ -5553,6 +5569,9 @@ function GrowRect( ctx) {
 	break;
       case Glow.eSave_GrowRect_fill_eq_background:
 	this.fill_eq_background = parseInt(tokens[1], 10);
+	break;
+      case Glow.eSave_GrowRect_transparency:
+	this.transparency = parseFloat(tokens[1], 10);
 	break;
       case Glow.eSave_GrowRect_dynamicsize:
 	this.dynamicsize = parseInt(tokens[1], 10);
@@ -5659,6 +5678,11 @@ function GrowRect( ctx) {
     var chot = 0;
     var idx;
     var drawtype;
+    var transp = this.transparency;
+
+    if (colornode !== null && Number(colornode.transparency) > Number(this.transparency))
+      transp = colornode.transparency;
+
     if ( this.fixcolor !== 0)
       colornode = null;
 
@@ -5732,7 +5756,7 @@ function GrowRect( ctx) {
       points[5].y = ur_y;
       points[6].x = ll_x;
       points[6].y = ll_y;
-      this.ctx.gdraw.fill_polyline(points, 7, drawtype, 0);
+      this.ctx.gdraw.fill_polyline(points, 7, drawtype, 0, transp);
 
       // Draw dark shadow
       drawtype = GlowColor.shift_drawtype( fillcolor, drawtype_incr + chot, colornode);
@@ -5751,7 +5775,7 @@ function GrowRect( ctx) {
       points[5].y = ll_y;
       points[6].x = ur_x;
       points[6].y = ur_y;
-      this.ctx.gdraw.fill_polyline(points, 7, drawtype, 0);
+      this.ctx.gdraw.fill_polyline(points, 7, drawtype, 0, transp);
     }
     if ( this.fill !== 0) {
       if ( display_shadow && ish !== 0) {
@@ -5761,7 +5785,7 @@ function GrowRect( ctx) {
 	  else
 	    drawtype = fillcolor;
 	  this.ctx.gdraw.fill_rect( ll_x + ish, ll_y + ish, ur_x - ll_x - 2 * ish, ur_y - ll_y - 2 * ish,
-			       drawtype);
+			       drawtype, transp);
 	}
 	else {
 	  var fa0, fa1, fa2;
@@ -5797,7 +5821,7 @@ function GrowRect( ctx) {
 	    drawtype = GlowColor.shift_drawtype( fillcolor, chot, null);
 	  else
 	    drawtype = fillcolor;
-	  this.ctx.gdraw.fill_rect( ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, drawtype);
+	  this.ctx.gdraw.fill_rect( ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, drawtype, transp);
 	}
 	else {
 	  var fb0, fb1, fb2;
@@ -5829,7 +5853,7 @@ function GrowRect( ctx) {
     if ( this.border !== 0 || !(this.fill !== 0 || (display_shadow && this.shadow_width !== 0))) {
       drawtype = GlowColor.get_drawtype( this.draw_type, Glow.eDrawType_LineHighlight,
 					 highlight, colornode, 0, 0);
-      this.ctx.gdraw.rect( ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, drawtype, idx, 0);
+      this.ctx.gdraw.rect( ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, drawtype, idx, 0, transp);
     }
   };
 
@@ -6365,6 +6389,7 @@ function GrowLine( ctx) {
   this.p2 = new GlowPoint(this.ctx);
   this.draw_type = 0;
   this.line_width = 0;
+  this.transparency = 0;
 				      
   this.type = function() {
     return Glow.eObjectType_GrowLine;
@@ -6404,6 +6429,9 @@ function GrowLine( ctx) {
 	break;
       case Glow.eSave_GrowLine_original_border_drawtype: 
 	this.original_border_drawtype = parseInt(tokens[1], 10); 
+	break;
+      case Glow.eSave_GrowLine_transparency:
+	this.transparency = parseFloat(tokens[1], 10);
 	break;
       case Glow.eSave_GrowLine_dynamicsize:
 	this.dynamicsize = parseInt(tokens[1], 10);
@@ -6488,6 +6516,11 @@ function GrowLine( ctx) {
 
     var drawtype;
     var idx;
+    var transp = this.transparency;
+
+    if (colornode !== null && Number(colornode.transparency) > Number(this.transparency))
+      transp = colornode.transparency;
+
     if ( node !== null && node.line_width !== 0)
       idx = Math.floor( this.ctx.mw.zoom_factor_y / this.ctx.mw.base_zoom_factor * 
 		       node.line_width - 1);
@@ -6516,9 +6549,9 @@ function GrowLine( ctx) {
 				       highlight, colornode, 0, 0);
 
     if ( this.line_type == Glow.eLineType_Solid)
-      this.ctx.gdraw.line( x1, y1, x2, y2, drawtype, idx, 0);
+      this.ctx.gdraw.line( x1, y1, x2, y2, drawtype, idx, 0, transp);
     else
-      this.ctx.gdraw.line_dashed( x1, y1, x2, y2, drawtype, idx, 0, this.line_type);
+      this.ctx.gdraw.line_dashed( x1, y1, x2, y2, drawtype, idx, 0, this.line_type, transp);
     
   };
 
@@ -6551,6 +6584,7 @@ function GrowArc( ctx) {
   this.fill_eq_background;
   this.fill_eq_light;
   this.fill_eq_shadow;
+  this.transparency = 0;
   this.dynamicsize;
   this.trf = new GlowTransform();
 
@@ -6649,6 +6683,9 @@ function GrowArc( ctx) {
 	break;
       case Glow.eSave_GrowArc_fill_eq_shadow:
 	this.fill_eq_shadow = parseInt(tokens[1], 10);
+	break;
+      case Glow.eSave_GrowArc_transparency:
+	this.transparency = parseFloat(tokens[1], 10);
 	break;
       case Glow.eSave_GrowArc_dynamicsize:
 	this.dynamicsize = parseInt(tokens[1], 10);
@@ -6752,6 +6789,7 @@ function GrowArc( ctx) {
     var drawtype;
     var idx;
     var chot = 0;
+    var transp = this.transparency;
 
     if ( this.ctx.hot_indication == Glow.eHotIndication_No)
       hot = 0;
@@ -6763,7 +6801,10 @@ function GrowArc( ctx) {
       chot = -hot;
       hot = 0;
     }
-    
+     
+    if (colornode !== null && Number(colornode.transparency) > Number(this.transparency))
+      transp = colornode.transparency;
+
     if ( this.fixcolor !== 0)
       colornode = null;
     
@@ -6851,7 +6892,7 @@ function GrowArc( ctx) {
 	  else
 	    drawtype = fillcolor;
 	  this.ctx.gdraw.fill_arc( ll_x, ll_y, ur_x - ll_x, ur_y - ll_y,
-				   this.angle1 - rot, this.angle2, drawtype);
+				   this.angle1 - rot, this.angle2, drawtype, transp);
 	}
 	else {
 	  var fa1, fa2;
@@ -6879,13 +6920,13 @@ function GrowArc( ctx) {
 	  drawtype = GlowColor.shift_drawtype( fillcolor, -drawtype_incr + chot, colornode);
 	  
 	  this.ctx.gdraw.fill_arc( ll_x, ll_y, ur_x - ll_x, ur_y - ll_y,
-			      35, 140, drawtype);
+			      35, 140, drawtype, transp);
 
 	  // Draw dark shadow
 	  drawtype = GlowColor.shift_drawtype( fillcolor, drawtype_incr + chot, colornode);
 	  
 	  this.ctx.gdraw.fill_arc( ll_x, ll_y, ur_x - ll_x, ur_y - ll_y,
-			      215, 140, drawtype);
+			      215, 140, drawtype, transp);
 	  
 	  // Draw medium shadow and body
 	  if ( chot !== 0)
@@ -6894,9 +6935,9 @@ function GrowArc( ctx) {
 	    drawtype = fillcolor;
 	  
 	  this.ctx.gdraw.fill_arc(ll_x, ll_y, ur_x - ll_x, ur_y - ll_y,
-			     -5, 40, drawtype);
+			     -5, 40, drawtype, transp);
 	  this.ctx.gdraw.fill_arc(ll_x, ll_y, ur_x - ll_x, ur_y - ll_y,
-			     175, 40, drawtype);
+			     175, 40, drawtype, transp);
 		    
 	  this.ctx.gdraw.fill_arc(ll_x + ish, ll_y + ish, ur_x - ll_x - 2*ish, ur_y - ll_y - 2*ish,
 			     this.angle1 - rot, this.angle2, drawtype);
@@ -6929,7 +6970,7 @@ function GrowArc( ctx) {
       drawtype = GlowColor.get_drawtype( this.draw_type, Glow.eDrawType_LineHighlight,
 					 highlight, colornode, 0, 0);
       this.ctx.gdraw.arc( ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, 
-		     this.angle1 - rot, this.angle2, drawtype, idx, 0);
+		     this.angle1 - rot, this.angle2, drawtype, idx, 0, transp);
     }    
   };
 
@@ -6978,6 +7019,7 @@ function GrowText( ctx) {
   this.original_color_drawtype;
   this.font;
   this.adjustment = Glow.eAdjustment_Left;
+  this.transparency = 0;
   this.dynamicsize;
   this.trf = new GlowTransform();
 
@@ -7029,6 +7071,9 @@ function GrowText( ctx) {
 	break;
       case Glow.eSave_GrowText_adjustment: 
 	this.adjustment = parseInt(tokens[1], 10); 
+	break;
+      case Glow.eSave_GrowText_transparency:
+	this.transparency = parseFloat(tokens[1], 10);
 	break;
       case Glow.eSave_GrowText_dynamicsize:
 	this.dynamicsize = parseInt(tokens[1], 10);
@@ -7111,6 +7156,11 @@ function GrowText( ctx) {
   this.tdraw = function( t, highlight, hot, node, colornode) {
     if ( this.ctx.nodraw !== 0 || this.text === null)
       return;
+
+    var transp = this.transparency;
+
+    if (colornode !== null && Number(colornode.transparency) > Number(this.transparency))
+      transp = colornode.transparency;
 
     var x1, y1, rx1, ry1;
     var z_width, z_height, z_descent;
@@ -7205,7 +7255,7 @@ function GrowText( ctx) {
 	var color = GlowColor.get_drawtype( this.color_drawtype, Glow.eDrawType_LineHighlight,
 					    highlight, colornode, 2, 0);
 	this.ctx.gdraw.text( x1, y1, this.text, ldraw_type, color, idx, highlight, 
-			0, lfont, tsize, rot);
+			0, lfont, tsize, rot, transp);
       }
     }
     else if ( idx >= 0) {
@@ -7467,7 +7517,7 @@ function GrowAnnot( ctx) {
       this.ctx.gdraw.text( x1, y1,
 		      node.annotv[this.number], 
 		      ldraw_type, color, idx, 
-		      highlight, 0, lfont, tsize, rot);
+		      highlight, 0, lfont, tsize, rot, transp);
       break;
     }
     case Glow.eAnnotType_MultiLine: {
@@ -7547,6 +7597,7 @@ function GrowPolyline( ctx) {
   this.fill_eq_bglight = 0;
   this.fill_eq_bgshadow = 0;
   this.fill_eq_background = 0;
+  this.transparency = 0;
   this.dynamicsize = 0;
   this.trf = new GlowTransform();
 
@@ -7683,6 +7734,9 @@ function GrowPolyline( ctx) {
       case Glow.eSave_GrowPolyLine_fill_eq_background:
 	this.fill_eq_background = parseInt(tokens[1], 10);
 	break;
+      case Glow.eSave_GrowPolyLine_transparency:
+	this.transparency = parseFloat(tokens[1], 10);
+	break;
       case Glow.eSave_GrowPolyLine_dynamicsize:
 	this.dynamicsize = parseInt(tokens[1], 10);
 	break;
@@ -7785,6 +7839,10 @@ function GrowPolyline( ctx) {
     var i;
     var drawtype;
     var idx;
+    var transp = this.transparency;
+
+    if (colornode !== null && Number(colornode.transparency) > Number(this.transparency))
+      transp = colornode.transparency;
 
     if ( this.fixcolor !== 0)
       colornode = null;
@@ -7852,7 +7910,7 @@ function GrowPolyline( ctx) {
 	drawtype = GlowColor.shift_drawtype( drawtype, chot, null);
 
       if ( grad == Glow.eGradient_No || drawtype == Glow.eDrawType_ColorRed)
-	this.ctx.gdraw.fill_polyline( this.points, this.a_points.size(), drawtype, 0);
+	this.ctx.gdraw.fill_polyline( this.points, this.a_points.size(), drawtype, 0, transp);
       else {
 	var f1, f2;
 	var rotation;
@@ -7904,14 +7962,14 @@ function GrowPolyline( ctx) {
 	  p[2].x = sp[i+1].x;
 	  p[2].y = sp[i+1].y;
 
-	  this.ctx.gdraw.fill_polyline( p, 4, sp[i].drawtype, 0);
+	  this.ctx.gdraw.fill_polyline( p, 4, sp[i].drawtype, 0, transp);
 	}
       } 
     }
     if ( this.border !== 0 || !(this.fill !== 0 || (display_shadow && this.shadow_width !== 0))) {
       drawtype = GlowColor.get_drawtype( this.draw_type, Glow.eDrawType_LineHighlight,
 					 highlight, colornode, 0, 0);
-      this.ctx.gdraw.polyline( this.points, this.a_points.size(), drawtype, idx, 0);
+      this.ctx.gdraw.polyline( this.points, this.a_points.size(), drawtype, idx, 0, transp);
     }
   };
 
@@ -11302,7 +11360,6 @@ function GrowScrollBar( ctx) {
   }
 
   this.set_value = function( value, length) {
-    console.log("Value", value);
     this.bar_value = value; 
     if ( length != 0)
       this.bar_length = length;
@@ -15147,19 +15204,28 @@ function GlowDraw( ctx) {
 
   this.gctx.save();
 
-  this.rect = function( x, y, width, height, gc_type, idx, highlight) {
+  this.rect = function( x, y, width, height, gc_type, idx, highlight, transparency = 0) {
     this.gctx.lineWidth = idx + 1;
-    this.gctx.strokeStyle = this.getColor( gc_type);
+    if (Number(transparency) === 0)
+      this.gctx.strokeStyle = this.getColor( gc_type);
+    else
+      this.gctx.strokeStyle = this.getColorTransparent(gc_type, transparency)
     this.gctx.strokeRect( x, y, width, height);
   };
 
-  this.fill_rect = function( x, y, width, height, gc_type) {
-    this.gctx.fillStyle = this.getColor( gc_type);
+  this.fill_rect = function( x, y, width, height, gc_type, transparency = 0) {
+    if (Number(transparency) === 0)
+      this.gctx.fillStyle = this.getColor( gc_type);
+    else
+      this.gctx.fillStyle = this.getColorTransparent(gc_type, transparency)
     this.gctx.fillRect( x, y, width, height);
   };
 
-  this.line = function( x1, y1, x2, y2, gc_type, idx, highlight) {
-    this.gctx.strokeStyle = this.getColor( gc_type);
+  this.line = function( x1, y1, x2, y2, gc_type, idx, highlight, transparency = 0) {
+    if (Number(transparency) === 0)
+      this.gctx.strokeStyle = this.getColor( gc_type);
+    else
+      this.gctx.strokeStyle = this.getColorTransparent(gc_type, transparency)
     this.gctx.lineWidth = idx + 1;
     this.gctx.beginPath();
     this.gctx.moveTo( x1, y1);
@@ -15167,7 +15233,7 @@ function GlowDraw( ctx) {
     this.gctx.stroke();
   };
   
-  this.line_dashed = function( x1, y1, x2, y2, gc_type, idx, highlight, line_type) {
+  this.line_dashed = function( x1, y1, x2, y2, gc_type, idx, highlight, line_type, transparency = 0) {
     
     var dash = null;
     switch ( line_type) {
@@ -15194,7 +15260,10 @@ function GlowDraw( ctx) {
     default: break;
     }
 
-    this.gctx.strokeStyle = this.getColor( gc_type);
+    if (Number(transparency) === 0)
+      this.gctx.strokeStyle = this.getColor( gc_type);
+    else
+      this.gctx.strokeStyle = this.getColorTransparent(gc_type, transparency)
     this.gctx.lineWidth = idx + 1;
     this.gctx.beginPath();
     if ( dash !== null)
@@ -15207,8 +15276,11 @@ function GlowDraw( ctx) {
       this.gctx.setLineDash( []);
   };
   
-  this.arc = function( x, y, width, height, a1, a2, gc_type, idx, highlight) {
-    this.gctx.strokeStyle = this.getColor( gc_type);
+  this.arc = function( x, y, width, height, a1, a2, gc_type, idx, highlight, transparency = 0) {
+    if (Number(transparency) === 0)
+      this.gctx.strokeStyle = this.getColor( gc_type);
+    else
+      this.gctx.strokeStyle = this.getColorTransparent(gc_type, transparency)
     this.gctx.lineWidth = idx + 1;
     this.gctx.beginPath();
     if ( typeof this.gctx.ellipse == 'function')
@@ -15218,8 +15290,11 @@ function GlowDraw( ctx) {
     this.gctx.stroke();
   };
 
-  this.fill_arc = function( x, y, width, height, a1, a2, gc_type) {
-    this.gctx.fillStyle = this.getColor( gc_type);
+  this.fill_arc = function( x, y, width, height, a1, a2, gc_type, transparency = 0) {
+    if (Number(transparency) === 0)
+      this.gctx.fillStyle = this.getColor( gc_type);
+    else
+      this.gctx.fillStyle = this.getColorTransparent(gc_type, transparency)
     this.gctx.beginPath();
     if ( a2 != 360)
       this.gctx.moveTo( x + width/2, y + height/2);
@@ -15230,14 +15305,17 @@ function GlowDraw( ctx) {
     this.gctx.fill();
   };
 
-  this.polyline = function( points, point_cnt, gc_type, idx, highlight) {
+  this.polyline = function( points, point_cnt, gc_type, idx, highlight, transparency = 0) {
     if ( this.nodraw)
       return;
     if ( points.length === 0)
       return;
 
     this.gctx.lineWidth = idx + 1;
-    this.gctx.strokeStyle = this.getColor( gc_type);
+    if (Number(transparency) === 0)
+      this.gctx.strokeStyle = this.getColor( gc_type);
+    else
+      this.gctx.strokeStyle = this.getColorTransparent(gc_type, transparency)
     this.gctx.beginPath();
     this.gctx.moveTo( points[0].x, points[0].y);
     for ( var i = 1; i < point_cnt; i++) 
@@ -15246,11 +15324,14 @@ function GlowDraw( ctx) {
     this.gctx.stroke();
   };
 
-  this.fill_polyline = function( points, point_cnt, gc_type, highlight) {
+  this.fill_polyline = function( points, point_cnt, gc_type, highlight, transparency = 0) {
     if ( this.nodraw)
       return;
 
-    this.gctx.fillStyle = this.getColor( gc_type);
+    if (Number(transparency) === 0)
+      this.gctx.fillStyle = this.getColor( gc_type);
+    else
+      this.gctx.fillStyle = this.getColorTransparent(gc_type, transparency)
       
     this.gctx.beginPath();
     this.gctx.moveTo( points[0].x, points[0].y);
@@ -15260,7 +15341,7 @@ function GlowDraw( ctx) {
   };
 
   this.text = function( x, y, text, gc_type, color, idx, highlight, line, 
-			font_idx, size, rot) {
+			font_idx, size, rot, transparency = 0) {
     var tsize;
 
     switch( idx) {
@@ -15277,7 +15358,10 @@ function GlowDraw( ctx) {
     this.gctx.font = tsize + "px Arial";
     this.gctx.lineWidth = 0.5;
 
-    this.gctx.fillStyle = this.getColor( color);
+    if (Number(transparency) === 0)
+      this.gctx.fillStyle = this.getColor(color);
+    else
+      this.gctx.fillStyle = this.getColorTransparent(color, transparency)
     this.gctx.fillText( text, x, y);
   };
 
@@ -15286,6 +15370,13 @@ function GlowDraw( ctx) {
     var rgb = GlowColor.rgb_color(gc_type, this.get_customcolors());
 
     return "rgb(" + Math.floor( 255 * rgb.r) + "," + Math.floor( 255 * rgb.g) + "," + Math.floor( 255 * rgb.b) + ")";
+  };
+
+  this.getColorTransparent = function( gc_type, transparency) {
+    //console.log("CustomColor cnt", this.customcolors_cnt);
+    var rgb = GlowColor.rgb_color(gc_type, this.get_customcolors());
+
+    return "rgba(" + Math.floor( 255 * rgb.r) + "," + Math.floor( 255 * rgb.g) + "," + Math.floor( 255 * rgb.b) + "," + (1.0 - transparency) + ")";
   };
 
   this.getTextExtent = function( text, idx, type, gc_type) {
@@ -16064,6 +16155,8 @@ function GrowCtx( ctx) {
 	break;
       case Glow.eSave_GrowCtx_dash:
 	i = this.dash.open(lines, i+1);
+	break;
+      case Glow.eSave_GrowCtx_anti_aliasing:
 	break;
       default:
 	console.log( "Syntax error in GrowCtx open_growctx", key);

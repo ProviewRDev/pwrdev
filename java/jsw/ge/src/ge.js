@@ -109,6 +109,8 @@ var DynC = {
   mDynType2_DsTrend	        : 1 << 10,
   mDynType2_DsTrendCurve        : 1 << 11,
   mDynType2_SevHist	        : 1 << 12,
+  mDynType2_DigTransparency     : 1 << 13,
+  mDynType2_AnalogTransparency	: 1 << 14,
 
   mActionType1_No		: 0,
   mActionType1_Inherit		: 1 << 0,
@@ -172,41 +174,43 @@ var DynC = {
   eDynPrio_DsTrend			: 27,
   eDynPrio_DsTrendCurve			: 28,
   eDynPrio_SevHist			: 29,
-  eDynPrio_AnalogText			: 30,
-  eDynPrio_Table			: 31,
-  eDynPrio_SliderBackground	       	: 32,
-  eDynPrio_Video			: 33,
-  eDynPrio_StatusColor	       		: 34,
-  eDynPrio_PopupMenu			: 35,
-  eDynPrio_Confirm			: 36,
-  eDynPrio_SetDig			: 37,
-  eDynPrio_ResetDig			: 38,
-  eDynPrio_ToggleDig			: 39,
-  eDynPrio_StoDig			: 40,
-  eDynPrio_Help				: 41,
-  eDynPrio_OpenGraph			: 42,
-  eDynPrio_OpenURL			: 43,
-  eDynPrio_CommandDoubleClick	       	: 44,
-  eDynPrio_IncrAnalog			: 45,
-  eDynPrio_RadioButton	       		: 46,
-  eDynPrio_Slider			: 47,
-  eDynPrio_TipText			: 48,
-  eDynPrio_PulldownMenu	       		: 49,
-  eDynPrio_OptionMenu			: 50,
-  eDynPrio_InputFocus			: 51,
-  eDynPrio_DigCommand			: 52,
-  eDynPrio_SetValue			: 53,
-  eDynPrio_Pie				: 54,
-  eDynPrio_BarChart			: 55,
-  eDynPrio_Axis				: 56,
-  eDynPrio_MethodToolbar	       	: 57,
-  eDynPrio_MethodPulldownMenu	       	: 58,
-  eDynPrio_ScrollingText	       	: 59,
-  eDynPrio_ColorThemeLightness       	: 60,
-  eDynPrio_DigSwap		       	: 61,
-  eDynPrio_DigScript		       	: 62,
-  eDynPrio_CatchSignal           	: 63,
-  eDynPrio_EmitSignal     	       	: 64,
+  eDynPrio_DigTransparency	      	: 30,
+  eDynPrio_AnalogTransparency	       	: 31,
+  eDynPrio_AnalogText			: 32,
+  eDynPrio_Table			: 33,
+  eDynPrio_SliderBackground	       	: 34,
+  eDynPrio_Video			: 35,
+  eDynPrio_StatusColor	       		: 36,
+  eDynPrio_PopupMenu			: 37,
+  eDynPrio_Confirm			: 38,
+  eDynPrio_SetDig			: 39,
+  eDynPrio_ResetDig			: 40,
+  eDynPrio_ToggleDig			: 41,
+  eDynPrio_StoDig			: 42,
+  eDynPrio_Help				: 43,
+  eDynPrio_OpenGraph			: 44,
+  eDynPrio_OpenURL			: 45,
+  eDynPrio_CommandDoubleClick	       	: 46,
+  eDynPrio_IncrAnalog			: 47,
+  eDynPrio_RadioButton	       		: 48,
+  eDynPrio_Slider			: 49,
+  eDynPrio_TipText			: 50,
+  eDynPrio_PulldownMenu	       		: 51,
+  eDynPrio_OptionMenu			: 52,
+  eDynPrio_InputFocus			: 53,
+  eDynPrio_DigCommand			: 54,
+  eDynPrio_SetValue			: 55,
+  eDynPrio_Pie				: 56,
+  eDynPrio_BarChart			: 57,
+  eDynPrio_Axis				: 58,
+  eDynPrio_MethodToolbar	       	: 59,
+  eDynPrio_MethodPulldownMenu	       	: 60,
+  eDynPrio_ScrollingText	       	: 61,
+  eDynPrio_ColorThemeLightness       	: 62,
+  eDynPrio_DigSwap		       	: 63,
+  eDynPrio_DigScript		       	: 64,
+  eDynPrio_CatchSignal           	: 65,
+  eDynPrio_EmitSignal     	       	: 66,
   eDynPrio_Script  			: 9998,
   eDynPrio_Command  			: 9999,
   eDynPrio_CloseGraph 		: 10000,
@@ -281,6 +285,8 @@ var DynC = {
   eSave_CatchSignal		       	: 74,
   eSave_EmitSignal		       	: 75,
   eSave_SevHist			       	: 76,
+  eSave_DigTransparency	            	: 77,
+  eSave_AnalogTransparency            	: 78,
   eSave_End		       		: 99,
   eSave_Dyn_dyn_type1	       		: 100,
   eSave_Dyn_action_type1      	: 101,
@@ -736,6 +742,12 @@ var DynC = {
   eSave_SevHist_timerange_attr 		: 7615,
   eSave_SevHist_update_attr 		: 7616,
   eSave_SevHist_updatetime 		: 7617,
+  eSave_DigTransparency_attribute 	: 7700,
+  eSave_DigTransparency_low_value 	: 7701,
+  eSave_DigTransparency_high_value 	: 7702,
+  eSave_AnalogTransparency_attribute 	: 7800,
+  eSave_AnalogTransparency_min_value 	: 7801,
+  eSave_AnalogTransparency_max_value 	: 7802,
 
   eAnimSequence_Inherit      	: 0,
   eAnimSequence_Cycle		: 1,
@@ -1048,6 +1060,12 @@ function Dyn( graph) {
 	break;
       case DynC.eSave_SevHist: 
 	elem = new DynSevHist(this); 
+	break;
+      case DynC.eSave_DigTransparency: 
+	elem = new DynDigTransparency(this); 
+	break;
+      case DynC.eSave_AnalogTransparency: 
+	elem = new DynAnalogTransparency(this); 
 	break;
       case DynC.eSave_FillLevel: 
 	elem = new DynFillLevel(this); 
@@ -7351,6 +7369,215 @@ function DynSevHist( dyn) {
     }    
     return i;
   };
+}
+
+function DynDigTransparency(dyn) {
+  this.dyn = dyn;
+  this.dyn_type1 = 0;
+  this.dyn_type2 = DynC.mDynType2_DigTransparency;
+  this.action_type1 = 0;
+  this.action_type2 = 0;
+  this.prio = DynC.eDynPrio_DigTransparency;
+  this.instance_mask = 0;
+  this.instance = 0;
+
+  this.a = null;
+  this.attribute;
+  this.low_value;
+  this.high_value;
+  this.firstScan = true;
+	
+  this.connect = function( o) {
+    var object = o;
+
+    this.a = new DynReference( this.dyn, this.attribute);
+    this.a.connect(this.dyn);
+    if ( !this.a.sts) {
+      console.log("DigTransparency: " + this.attribute);
+      return 1;
+    }
+
+    return 1;
+  };
+
+  this.disconnect = function() {
+    if ( this.a !== null)
+      this.a.disconnect(this.dyn);
+  };
+
+	
+  this.scan = function( o) {
+    var object = o;
+    var value = this.dyn.getDig(this.a.p, this.a.typeid, this.a.bitmask, this.a.database);
+
+    if ( this.a.inverted)
+      value = !value;
+
+    if ( !this.firstScan) {
+      if ( this.a.oldValue == value)
+	return;
+    }
+    else
+      this.firstScan = false;
+	
+    if ( !value)
+      object.setTransparency(this.low_value);
+    else
+      object.setTransparency(this.high_value);
+    this.dyn.repaintNow = true;
+    this.a.oldValue = value;
+  };
+
+  this.open = function( lines, row) {
+    var end = false;
+    var i;
+    var elem;
+
+    for ( i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(' ');
+      var key = parseInt(tokens[0], 10);
+
+      if ( this.dyn.debug) console.log( "DynTransparency : " + lines[i]);
+
+      elem = null;
+
+      switch ( key) {
+      case DynC.eSave_DigTransparency: 
+	break;
+      case DynC.eSave_DigTransparency_attribute: 
+	if ( tokens.length > 1)
+	  this.attribute = tokens[1];
+	break;
+      case DynC.eSave_DigTransparency_low_value: 
+	this.low_value = parseFloat( tokens[1], 10);
+	break;
+      case DynC.eSave_DigTransparency_high_value: 
+	this.high_value = parseFloat( tokens[1], 10);
+	break;
+      case DynC.eSave_End:
+	end = true;
+	break;
+      default:
+        console.log( "Syntax error in DynDigTransparency");
+	break;
+      }
+
+      if ( end)
+	break;
+    }
+
+    return i;		
+  };
+
+  this.action = function( object, e) {
+    return 1;
+  };
+}
+
+function DynAnalogTransparency( dyn) {
+  this.dyn = dyn;
+  this.dyn_type1 = 0;
+  this.dyn_type2 = DynC.mDynType2_AnalogTransparency;
+  this.action_type1 = 0;
+  this.action_type2 = 0;
+  this.prio = DynC.eDynPrio_AnalogTransparency;
+  this.instance_mask = 0;
+  this.instance = 0;
+
+  this.a = null;
+  this.attribute;
+  this.max_value;
+  this.min_value;
+  this.firstScan = true;
+
+  this.connect = function( object) {
+
+    if ( this.attribute.trim() === null)
+      return 0;
+
+    this.a = new DynReference( this.dyn, this.attribute);
+    this.a.connect(this.dyn);
+    if ( !this.a.sts) {
+      console.log("AnalogTransparency: " + attribute);
+      return 1;
+    }
+
+    return 1;
+  }
+
+  this.disconnect = function() {
+    if ( this.a === null)
+      return;
+    this.a.disconnect(this.dyn);
+  }
+
+  this.scan = function( object) {
+    if ( this.a === null || !this.a.sts)
+      return;
+  
+    var pvalue = this.a.get_ref_value(this.dyn);
+
+    if ( !this.firstScan) {
+      if ( Math.abs( this.a.oldValue - pvalue) < Number.MIN_VALUE)
+	// No change since last time
+	return;
+    }
+    else
+      this.firstScan = false;
+
+    if ( this.max_value == this.min_value)
+      return;
+
+    var value = (pvalue - this.min_value) / (this.max_value - this.min_value);
+    object.setTransparency( value);
+    this.a.oldValue = pvalue;
+  };
+
+  this.action = function( object, e) {
+    return 1;
+  };
+
+  this.open = function( lines, row) {
+    var end = false;
+    var i;
+    var elem;
+
+    for ( i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(' ');
+      var key = parseInt(tokens[0], 10);
+
+      if ( this.dyn.debug) console.log( "DynAnalogTransparency : " + lines[i]);
+
+      elem = null;
+
+      switch ( key) {
+      case DynC.eSave_AnalogTransparency: 
+	break;
+      case DynC.eSave_AnalogTransparency_attribute: 
+	if ( tokens.length > 1)
+	  this.attribute = tokens[1];
+	break;
+      case DynC.eSave_AnalogTransparency_min_value: 
+	this.min_value = parseFloat( tokens[1]);
+	break;
+      case DynC.eSave_AnalogTransparency_max_value: 
+	this.max_value = parseFloat( tokens[1]);
+	break;
+      case DynC.eSave_End:
+	end = true;
+	break;
+      default:
+	console.log( "Syntax error in DynAnalogTransparency");
+	break;
+      }
+
+      if ( end)
+	break;
+    }
+		
+    return i;
+  };
+
 }
 
 
