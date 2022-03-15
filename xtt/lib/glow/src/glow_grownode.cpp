@@ -67,7 +67,7 @@ GrowNode::GrowNode(GrowCtx* glow_ctx, const char* name,
       input_selected(0), gradient(glow_eGradient_No),
       text_type(glow_eDrawType_TextHelvetica), text_font(glow_eFont_No),
       disable_cb(0), annot_scrollingtext(-1), annot_offset_x(0),
-      annot_offset_y(0)
+      annot_offset_y(0), transparency(0)
 {
   memset(argv, 0, sizeof(argv));
   memset(argsize, 0, sizeof(argsize));
@@ -204,6 +204,7 @@ void GrowNode::save(std::ofstream& fp, glow_eSaveMode mode)
   fp << int(glow_eSave_GrowNode_gradient) << FSPACE << int(gradient) << '\n';
   fp << int(glow_eSave_GrowNode_text_type) << FSPACE << int(text_type) << '\n';
   fp << int(glow_eSave_GrowNode_text_font) << FSPACE << int(text_font) << '\n';
+  fp << int(glow_eSave_GrowNode_transparency) << FSPACE << transparency << '\n';
   fp << int(glow_eSave_GrowNode_disable_cb) << FSPACE << disable_cb << '\n';
 
   if (user_data && ctx->userdata_save_callback) {
@@ -381,6 +382,9 @@ void GrowNode::open(std::ifstream& fp)
     case glow_eSave_GrowNode_text_font:
       fp >> tmp;
       text_font = (glow_eFont)tmp;
+      break;
+    case glow_eSave_GrowNode_transparency:
+      fp >> transparency;
       break;
     case glow_eSave_GrowNode_disable_cb:
       fp >> disable_cb;

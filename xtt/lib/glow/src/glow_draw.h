@@ -60,7 +60,7 @@ public:
   virtual void set_anti_aliasing(int anti_aliasing) {}
   virtual void invalidate(GlowWind *wind, int x, int y, int width, int height) {}
   virtual int rect(GlowWind* w, int x, int y, int width, int height,
-      glow_eDrawType gc_type, int idx, int highlight);
+      glow_eDrawType gc_type, int idx, int highlight, double transparency = 0);
   virtual int rect_erase(
       GlowWind* w, int x, int y, int width, int height, int idx);
   virtual int arrow(GlowWind* w, int x1, int y1, int x2, int y2, int x3, int y3,
@@ -68,25 +68,26 @@ public:
   virtual int arrow_erase(
       GlowWind* w, int x1, int y1, int x2, int y2, int x3, int y3, int idx);
   virtual int arc(GlowWind* w, int x, int y, int width, int height, int angle1,
-      int angle2, glow_eDrawType gc_type, int idx, int highlight);
+      int angle2, glow_eDrawType gc_type, int idx, int highlight, double transparency = 0);
   virtual int fill_arc(GlowWind* w, int x, int y, int width, int height,
-      int angle1, int angle2, glow_eDrawType gc_type, int highlight);
+      int angle1, int angle2, glow_eDrawType gc_type, int highlight, double transparency = 0);
   virtual int arc_erase(GlowWind* w, int x, int y, int width, int height,
       int angle1, int angle2, int idx);
   virtual int line(GlowWind* w, int x1, int y1, int x2, int y2,
-      glow_eDrawType gc_type, int idx, int highlight);
+      glow_eDrawType gc_type, int idx, int highlight, double transparency = 0);
   virtual int line_dashed(GlowWind* w, int x1, int y1, int x2, int y2,
-      glow_eDrawType gc_type, int idx, int highlight, glow_eLineType line_type);
+      glow_eDrawType gc_type, int idx, int highlight, glow_eLineType line_type,
+      double transparency = 0);
   virtual int line_erase(GlowWind* w, int x1, int y1, int x2, int y2, int idx);
   virtual int polyline(GlowWind* w, glow_sPointX* points, int point_cnt,
-      glow_eDrawType gc_type, int idx, int highlight);
+      glow_eDrawType gc_type, int idx, int highlight, double transparency = 0);
   virtual int fill_polyline(GlowWind* w, glow_sPointX* points, int point_cnt,
-      glow_eDrawType gc_type, int highlight);
+      glow_eDrawType gc_type, int highlight, double transparency = 0);
   virtual int polyline_erase(
       GlowWind* w, glow_sPointX* points, int point_cnt, int idx);
   virtual int text(GlowWind* w, int x, int y, char* text, int len,
       glow_eDrawType gc_type, glow_eDrawType color, int idx, int highlight,
-      int line, glow_eFont font_idx, double size, int rot);
+      int line, glow_eFont font_idx, double size, int rot, double transparency = 0);
   virtual int text_cursor(GlowWind* w, int x, int y, char* text, int len,
       glow_eDrawType gc_type, glow_eDrawType color, int idx, int highlight,
       int pos, glow_eFont font, double size);
@@ -94,7 +95,8 @@ public:
       glow_eDrawType gc_type, int idx, int line, glow_eFont font_idx,
       double size, int rot);
   virtual int fill_rect(
-      GlowWind* w, int x, int y, int width, int height, glow_eDrawType gc_type);
+      GlowWind* w, int x, int y, int width, int height, glow_eDrawType gc_type,
+      double transparency = 0);
   virtual int pixmaps_create(
       GlowWind* w, glow_sPixmapData* pixmap_data, void** pixmaps);
   virtual void pixmaps_delete(GlowWind* w, void* pixmaps);

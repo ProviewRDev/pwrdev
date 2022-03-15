@@ -163,6 +163,8 @@ typedef enum {
   ge_eDynPrio_DsTrend,
   ge_eDynPrio_DsTrendCurve,
   ge_eDynPrio_SevHist,
+  ge_eDynPrio_DigTransparency,
+  ge_eDynPrio_AnalogTransparency,
   ge_eDynPrio_AnalogText,
   ge_eDynPrio_Table,
   ge_eDynPrio_SliderBackground,
@@ -256,7 +258,9 @@ typedef enum {
   ge_mDynType2_RefUpdate = 1 << 9,
   ge_mDynType2_DsTrend = 1 << 10,
   ge_mDynType2_DsTrendCurve = 1 << 11,
-  ge_mDynType2_SevHist = 1 << 12
+  ge_mDynType2_SevHist = 1 << 12,
+  ge_mDynType2_DigTransparency = 1 << 13,
+  ge_mDynType2_AnalogTransparency = 1 << 14
 } ge_mDynType2;
 
 //! Action types.
@@ -404,6 +408,8 @@ typedef enum {
   ge_eSave_CatchSignal = 74,
   ge_eSave_EmitSignal = 75,
   ge_eSave_SevHist = 76,
+  ge_eSave_DigTransparency = 77,
+  ge_eSave_AnalogTransparency = 78,
   ge_eSave_End = 99,
   ge_eSave_Dyn_dyn_type1 = 100,
   ge_eSave_Dyn_action_type1 = 101,
@@ -861,7 +867,13 @@ typedef enum {
   ge_eSave_SevHist_timerange = 7614,
   ge_eSave_SevHist_timerange_attr = 7615,
   ge_eSave_SevHist_update_attr = 7616,
-  ge_eSave_SevHist_updatetime = 7617
+  ge_eSave_SevHist_updatetime = 7617,
+  ge_eSave_DigTransparency_attribute = 7700,
+  ge_eSave_DigTransparency_low_value = 7701,
+  ge_eSave_DigTransparency_high_value = 7702,
+  ge_eSave_AnalogTransparency_attribute = 7800,
+  ge_eSave_AnalogTransparency_min_value = 7801,
+  ge_eSave_AnalogTransparency_max_value = 7802
 } ge_eSave;
 
 class GeDynElem;
@@ -2864,6 +2876,63 @@ public:
 
   GeSevHist(GeDyn* e_dyn);
   GeSevHist(const GeSevHist& x);
+  void get_attributes(attr_sItem* attrinfo, int* item_count);
+  void save(std::ofstream& fp);
+  void open(std::ifstream& fp);
+  int connect(grow_tObject object, glow_sTraceData* trace_data, bool now);
+  int disconnect(grow_tObject object);
+  int scan(grow_tObject object);
+  void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
+  void replace_attribute(char* from, char* to, int* cnt, int strict);
+  int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
+};
+
+//! Changes the fill color up to a certain level of the component.
+class GeDigTransparency : public GeDynElem {
+public:
+  pwr_tAName attribute;
+  double low_value;
+  double high_value;
+
+  pwr_tBoolean* p;
+  pwr_tSubid subid;
+  int size;
+  graph_eDatabase db;
+  int inverted;
+  bool first_scan;
+  pwr_tBoolean old_value;
+  int a_typeid;
+  unsigned int bitmask;
+
+  GeDigTransparency(GeDyn* e_dyn);
+  GeDigTransparency(const GeDigTransparency& x);
+  void get_attributes(attr_sItem* attrinfo, int* item_count);
+  void save(std::ofstream& fp);
+  void open(std::ifstream& fp);
+  int connect(grow_tObject object, glow_sTraceData* trace_data, bool now);
+  int disconnect(grow_tObject object);
+  int scan(grow_tObject object);
+  void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
+  void replace_attribute(char* from, char* to, int* cnt, int strict);
+  int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
+};
+
+//! Changes the fill color up to a certain level of the component.
+class GeAnalogTransparency : public GeDynElem {
+public:
+  pwr_tAName attribute;
+  float min_value;
+  float max_value;
+
+  pwr_tFloat32* p;
+  pwr_tSubid subid;
+  int size;
+  graph_eDatabase db;
+  bool first_scan;
+  pwr_tFloat32 old_value;
+
+  GeAnalogTransparency(GeDyn* e_dyn);
+  GeAnalogTransparency(const GeAnalogTransparency& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
   void save(std::ofstream& fp);
   void open(std::ifstream& fp);

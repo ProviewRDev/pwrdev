@@ -52,7 +52,7 @@ GrowLine::GrowLine(GrowCtx* glow_ctx, const char* name, double x1, double y1,
     : GlowLine(glow_ctx, x1, y1, x2, y2, d_type, line_w, fix_line_w), hot(0),
       pzero(ctx), highlight(0), inverse(0), original_border_drawtype(d_type),
       user_data(NULL), dynamic(0), dynamicsize(0),
-      line_type(glow_eLineType_Solid)
+      line_type(glow_eLineType_Solid), transparency(0)
 {
   strcpy(n_name, name);
   pzero.nav_zoom();
@@ -254,6 +254,7 @@ void GrowLine::save(std::ofstream& fp, glow_eSaveMode mode)
   fp << int(glow_eSave_GrowLine_original_border_drawtype) << FSPACE
      << int(original_border_drawtype) << '\n';
   fp << int(glow_eSave_GrowLine_line_type) << FSPACE << int(line_type) << '\n';
+  fp << int(glow_eSave_GrowLine_transparency) << FSPACE << transparency << '\n';
   fp << int(glow_eSave_GrowLine_line_part) << '\n';
   GlowLine::save(fp, mode);
   fp << int(glow_eSave_GrowLine_trf) << '\n';
@@ -302,6 +303,9 @@ void GrowLine::open(std::ifstream& fp)
     case glow_eSave_GrowLine_line_type:
       fp >> tmp;
       line_type = (glow_eLineType)tmp;
+      break;
+    case glow_eSave_GrowLine_transparency:
+      fp >> transparency;
       break;
     case glow_eSave_GrowLine_line_part:
       GlowLine::open(fp);
@@ -624,6 +628,10 @@ void GrowLine::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
       && ctx->hot_indication != glow_eHotIndication_LineWidth)
     hot = 0;
 
+  double transp = transparency;
+  if (colornode && ((GrowNode*)colornode)->transparency > transparency)
+    transp = ((GrowNode*)colornode)->transparency;
+
   glow_eDrawType drawtype;
   int idx;
   if (node && ((GrowNode*)node)->line_width)
@@ -654,9 +662,9 @@ void GrowLine::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
       highlight, (GrowNode*)colornode, 0);
 
   if (line_type == glow_eLineType_Solid)
-    ctx->gdraw->line(w, x1, y1, x2, y2, drawtype, idx, 0);
+    ctx->gdraw->line(w, x1, y1, x2, y2, drawtype, idx, 0, transp);
   else
-    ctx->gdraw->line_dashed(w, x1, y1, x2, y2, drawtype, idx, 0, line_type);
+    ctx->gdraw->line_dashed(w, x1, y1, x2, y2, drawtype, idx, 0, line_type, transp);
 }
 
 void GrowLine::draw()

@@ -202,6 +202,7 @@ public:
   virtual void set_shadow(int shadow){}
   virtual void set_shadow_width(double width){}
   virtual void set_gradient(glow_eGradient gradient){}
+  virtual void set_transparency(double transparency){}
   virtual void set_drawtype(glow_eDrawType draw_type){}
   virtual void set_linewidth(int linewidth){}
   virtual void set_position(double x, double y){}
@@ -316,6 +317,10 @@ public:
   virtual glow_eDrawType get_text_color()
   {
     return glow_eDrawType_No;
+  }
+  virtual double get_transparency()
+  {
+    return 0;
   }
   virtual glow_eGradient get_gradient()
   {

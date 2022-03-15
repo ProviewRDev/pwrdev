@@ -537,6 +537,12 @@ GeDyn::GeDyn(const GeDyn& x)
     case ge_mDynType2_SevHist:
       e = new GeSevHist((const GeSevHist&)*elem);
       break;
+    case ge_mDynType2_DigTransparency:
+      e = new GeDigTransparency((const GeDigTransparency&)*elem);
+      break;
+    case ge_mDynType2_AnalogTransparency:
+      e = new GeAnalogTransparency((const GeAnalogTransparency&)*elem);
+      break;
     default:;
     }
     switch (elem->action_type1) {
@@ -827,6 +833,12 @@ void GeDyn::open(std::ifstream& fp)
       break;
     case ge_eSave_SevHist:
       e = (GeDynElem*)new GeSevHist(this);
+      break;
+    case ge_eSave_DigTransparency:
+      e = (GeDynElem*)new GeDigTransparency(this);
+      break;
+    case ge_eSave_AnalogTransparency:
+      e = (GeDynElem*)new GeAnalogTransparency(this);
       break;
     case ge_eSave_DigCommand:
       e = (GeDynElem*)new GeDigCommand(this);
@@ -1862,6 +1874,12 @@ GeDynElem* GeDyn::create_dyn2_element(int mask, int instance)
   case ge_mDynType2_SevHist:
     e = (GeDynElem*)new GeSevHist(this);
     break;
+  case ge_mDynType2_DigTransparency:
+    e = (GeDynElem*)new GeDigTransparency(this);
+    break;
+  case ge_mDynType2_AnalogTransparency:
+    e = (GeDynElem*)new GeAnalogTransparency(this);
+    break;
   default:;
   }
   return e;
@@ -2088,6 +2106,12 @@ GeDynElem* GeDyn::copy_element(GeDynElem& x)
       break;
     case ge_mDynType2_SevHist:
       e = (GeDynElem*)new GeSevHist((GeSevHist&)x);
+      break;
+    case ge_mDynType2_DigTransparency:
+      e = (GeDynElem*)new GeDigTransparency((GeDigTransparency&)x);
+      break;
+    case ge_mDynType2_AnalogTransparency:
+      e = (GeDynElem*)new GeAnalogTransparency((GeAnalogTransparency&)x);
       break;
     default:;
     }
@@ -22905,6 +22929,370 @@ int GeSevHist::syntax_check(
       (*warning_cnt)++;
     }
   }
+  return 1;
+}
+
+GeDigTransparency::GeDigTransparency(GeDyn* e_dyn)
+      : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_DigTransparency,
+      ge_mActionType1_No, ge_mActionType2_No, ge_eDynPrio_DigTransparency),
+      low_value(50), high_value(100)
+{
+  strcpy(attribute, "");
+}
+
+GeDigTransparency::GeDigTransparency(const GeDigTransparency& x)
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
+          x.prio),
+      low_value(x.low_value), high_value(x.high_value)
+{
+  strcpy(attribute, x.attribute);
+}
+
+void GeDigTransparency::get_attributes(attr_sItem* attrinfo, int* item_count)
+{
+  int i = *item_count;
+
+  strcpy(attrinfo[i].name, "DigTransparency.Attribute");
+  attrinfo[i].value = attribute;
+  attrinfo[i].type = glow_eType_String;
+  attrinfo[i++].size = sizeof(attribute);
+
+  strcpy(attrinfo[i].name, "DigTransparency.LowValue");
+  attrinfo[i].value = &low_value;
+  attrinfo[i].type = glow_eType_Double;
+  attrinfo[i++].size = sizeof(low_value);
+
+  strcpy(attrinfo[i].name, "DigTransparency.HighValue");
+  attrinfo[i].value = &high_value;
+  attrinfo[i].type = glow_eType_Double;
+  attrinfo[i++].size = sizeof(high_value);
+
+  *item_count = i;
+}
+
+void GeDigTransparency::set_attribute(
+    grow_tObject object, const char* attr_name, int* cnt)
+{
+  (*cnt)--;
+  if (*cnt == 0) {
+    char msg[200];
+
+    strncpy(attribute, attr_name, sizeof(attribute));
+    snprintf(msg, sizeof(msg), "DigTransparency.Attribute = %s", attr_name);
+    msg[sizeof(msg) - 1] = 0;
+    dyn->graph->message('I', msg);
+  }
+}
+
+void GeDigTransparency::replace_attribute(char* from, char* to, int* cnt, int strict)
+{
+  GeDyn::replace_attribute(attribute, sizeof(attribute), from, to, cnt, strict);
+}
+
+void GeDigTransparency::save(std::ofstream& fp)
+{
+  fp << int(ge_eSave_DigTransparency) << '\n';
+  fp << int(ge_eSave_DigTransparency_attribute) << FSPACE << attribute << '\n';
+  fp << int(ge_eSave_DigTransparency_low_value) << FSPACE << low_value << '\n';
+  fp << int(ge_eSave_DigTransparency_high_value) << FSPACE << high_value << '\n';
+  fp << int(ge_eSave_End) << '\n';
+}
+
+void GeDigTransparency::open(std::ifstream& fp)
+{
+  int type = 0;
+  int end_found = 0;
+  char dummy[40];
+
+  for (;;) {
+    if (!fp.good()) {
+      fp.clear();
+      fp.getline(dummy, sizeof(dummy));
+      printf("** Read error GeDigTransparency: \"%d %s\"\n", type, dummy);
+    }
+
+    fp >> type;
+
+    switch (type) {
+    case ge_eSave_DigTransparency:
+      break;
+    case ge_eSave_DigTransparency_attribute:
+      fp.get();
+      fp.getline(attribute, sizeof(attribute));
+      break;
+    case ge_eSave_DigTransparency_low_value:
+      fp >> low_value;
+      break;
+    case ge_eSave_DigTransparency_high_value:
+      fp >> high_value;
+      break;
+    case ge_eSave_End:
+      end_found = 1;
+      break;
+    default:
+      std::cout << "GeDigTransparency:open syntax error\n";
+      fp.getline(dummy, sizeof(dummy));
+    }
+    if (end_found)
+      break;
+  }
+}
+
+int GeDigTransparency::connect(
+    grow_tObject object, glow_sTraceData* trace_data, bool now)
+{
+  int attr_type, attr_size;
+  pwr_tAName parsed_name;
+  int sts;
+
+  size = 4;
+  p = 0;
+  db = dyn->parse_attr_name(
+      attribute, parsed_name, &inverted, &attr_type, &attr_size);
+  if (streq(parsed_name, ""))
+    return 1;
+
+  a_typeid = attr_type;
+  get_bit(parsed_name, attr_type, &bitmask);
+
+  switch (db) {
+  case graph_eDatabase_Local:
+    p = (pwr_tBoolean*)dyn->graph->localdb_ref_or_create(
+        parsed_name, attr_type);
+    break;
+  case graph_eDatabase_Gdh:
+    sts = dyn->graph->ref_object_info(
+        dyn->cycle, parsed_name, (void**)&p, &subid, size, object, now);
+    if (EVEN(sts))
+      return sts;
+    break;
+  default:;
+  }
+
+  trace_data->p = &pdummy;
+  first_scan = true;
+  return 1;
+}
+
+int GeDigTransparency::disconnect(grow_tObject object)
+{
+  if (p && db == graph_eDatabase_Gdh)
+    gdh_UnrefObjectInfo(subid);
+  p = 0;
+
+  return 1;
+}
+
+int GeDigTransparency::scan(grow_tObject object)
+{
+  if (!p)
+    return 1;
+
+  pwr_tBoolean val = *p;
+
+  if (!get_dig(&val, p, a_typeid, bitmask))
+    return 1;
+
+  if (inverted)
+    val = !val;
+
+  if (!first_scan) {
+    if (old_value == val && !dyn->reset_color)
+      // No change since last time
+      return 1;
+  } else
+    first_scan = false;
+
+  if (*p)
+    grow_SetObjectTransparency(object, high_value);
+  else
+    grow_SetObjectTransparency(object, low_value);
+
+  old_value = *p;
+  return 1;
+}
+
+int GeDigTransparency::syntax_check(
+    grow_tObject object, int* error_cnt, int* warning_cnt)
+{
+  int types[] = { pwr_eType_Float32, 0 };
+  graph_eDatabase databases[] = { graph_eDatabase_Gdh, graph_eDatabase__ };
+
+  dyn->syntax_check_attribute(object, "DigTransparency.Attribute", attribute, 0,
+      types, databases, error_cnt, warning_cnt);
+  return 1;
+}
+
+GeAnalogTransparency::GeAnalogTransparency(GeDyn* e_dyn)
+      : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_AnalogTransparency,
+      ge_mActionType1_No, ge_mActionType2_No, ge_eDynPrio_AnalogTransparency),
+      min_value(0), max_value(100)
+{
+  strcpy(attribute, "");
+}
+
+GeAnalogTransparency::GeAnalogTransparency(const GeAnalogTransparency& x)
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
+          x.prio),
+      min_value(x.min_value), max_value(x.max_value)
+{
+  strcpy(attribute, x.attribute);
+}
+
+void GeAnalogTransparency::get_attributes(attr_sItem* attrinfo, int* item_count)
+{
+  int i = *item_count;
+
+  strcpy(attrinfo[i].name, "AnalogTransparency.Attribute");
+  attrinfo[i].value = attribute;
+  attrinfo[i].type = glow_eType_String;
+  attrinfo[i++].size = sizeof(attribute);
+
+  strcpy(attrinfo[i].name, "AnalogTransparency.MinValue");
+  attrinfo[i].value = &min_value;
+  attrinfo[i].type = glow_eType_Float;
+  attrinfo[i++].size = sizeof(min_value);
+
+  strcpy(attrinfo[i].name, "AnalogTransparency.MaxValue");
+  attrinfo[i].value = &max_value;
+  attrinfo[i].type = glow_eType_Float;
+  attrinfo[i++].size = sizeof(max_value);
+
+  *item_count = i;
+}
+
+void GeAnalogTransparency::set_attribute(
+    grow_tObject object, const char* attr_name, int* cnt)
+{
+  (*cnt)--;
+  if (*cnt == 0) {
+    char msg[200];
+
+    strncpy(attribute, attr_name, sizeof(attribute));
+    snprintf(msg, sizeof(msg), "AnalogTransparency.Attribute = %s", attr_name);
+    msg[sizeof(msg) - 1] = 0;
+    dyn->graph->message('I', msg);
+  }
+}
+
+void GeAnalogTransparency::replace_attribute(char* from, char* to, int* cnt, int strict)
+{
+  GeDyn::replace_attribute(attribute, sizeof(attribute), from, to, cnt, strict);
+}
+
+void GeAnalogTransparency::save(std::ofstream& fp)
+{
+  fp << int(ge_eSave_AnalogTransparency) << '\n';
+  fp << int(ge_eSave_AnalogTransparency_attribute) << FSPACE << attribute << '\n';
+  fp << int(ge_eSave_AnalogTransparency_max_value) << FSPACE << max_value << '\n';
+  fp << int(ge_eSave_AnalogTransparency_min_value) << FSPACE << min_value << '\n';
+  fp << int(ge_eSave_End) << '\n';
+}
+
+void GeAnalogTransparency::open(std::ifstream& fp)
+{
+  int type = 0;
+  int end_found = 0;
+  char dummy[40];
+
+  for (;;) {
+    if (!fp.good()) {
+      fp.clear();
+      fp.getline(dummy, sizeof(dummy));
+      printf("** Read error GeAnalogTransparency: \"%d %s\"\n", type, dummy);
+    }
+
+    fp >> type;
+
+    switch (type) {
+    case ge_eSave_AnalogTransparency:
+      break;
+    case ge_eSave_AnalogTransparency_attribute:
+      fp.get();
+      fp.getline(attribute, sizeof(attribute));
+      break;
+    case ge_eSave_AnalogTransparency_max_value:
+      fp >> max_value;
+      break;
+    case ge_eSave_AnalogTransparency_min_value:
+      fp >> min_value;
+      break;
+    case ge_eSave_End:
+      end_found = 1;
+      break;
+    default:
+      std::cout << "GeAnalogTransparency:open syntax error\n";
+      fp.getline(dummy, sizeof(dummy));
+    }
+    if (end_found)
+      break;
+  }
+}
+
+int GeAnalogTransparency::connect(
+    grow_tObject object, glow_sTraceData* trace_data, bool now)
+{
+  int attr_type, attr_size;
+  pwr_tAName parsed_name;
+  int sts;
+  int inverted;
+
+  size = 4;
+  p = 0;
+  db = dyn->parse_attr_name(
+      attribute, parsed_name, &inverted, &attr_type, &attr_size);
+  if (streq(parsed_name, ""))
+    return 1;
+
+  sts = dyn->graph->ref_object_info(
+      dyn->cycle, parsed_name, (void**)&p, &subid, size, object, now);
+  if (EVEN(sts))
+    return sts;
+
+  trace_data->p = &pdummy;
+  first_scan = true;
+
+  return 1;
+}
+
+int GeAnalogTransparency::disconnect(grow_tObject object)
+{
+  if (p && db == graph_eDatabase_Gdh)
+    gdh_UnrefObjectInfo(subid);
+  p = 0;
+
+  return 1;
+}
+
+int GeAnalogTransparency::scan(grow_tObject object)
+{
+  if (!p)
+    return 1;
+
+  if (!first_scan) {
+    if (fabs(old_value - *p) < FLT_EPSILON)
+      // No change since last time
+      return 1;
+  } else
+    first_scan = false;
+
+  if (feqf(max_value, min_value))
+    return 1;
+
+  double value = (*p - min_value) / (max_value - min_value);
+  grow_SetObjectTransparency(object, value);
+  old_value = *p;
+  return 1;
+}
+
+int GeAnalogTransparency::syntax_check(
+    grow_tObject object, int* error_cnt, int* warning_cnt)
+{
+  int types[] = { pwr_eType_Float32, 0 };
+  graph_eDatabase databases[] = { graph_eDatabase_Gdh, graph_eDatabase__ };
+
+  dyn->syntax_check_attribute(object, "AnalogTransparency.Attribute", attribute, 0,
+      types, databases, error_cnt, warning_cnt);
   return 1;
 }
 

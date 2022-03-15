@@ -53,7 +53,7 @@ GrowText::GrowText(GrowCtx* glow_ctx, const char* name, const char* text1,
           glow_ctx, text1, x, y, d_type, color_d_type, t_size, display_lev),
       hot(0), pzero(ctx), highlight(0), inverse(0), user_data(NULL), dynamic(0),
       dynamicsize(0), original_color_drawtype(glow_eDrawType_Line),
-      font(t_font), adjustment(glow_eAdjustment_Left)
+      font(t_font), adjustment(glow_eAdjustment_Left), transparency(0)
 {
   strcpy(n_name, name);
   pzero.nav_zoom();
@@ -246,6 +246,7 @@ void GrowText::save(std::ofstream& fp, glow_eSaveMode mode)
   fp << int(glow_eSave_GrowText_font) << FSPACE << int(font) << '\n';
   fp << int(glow_eSave_GrowText_adjustment) << FSPACE << int(adjustment)
      << '\n';
+  fp << int(glow_eSave_GrowText_transparency) << FSPACE << transparency << '\n';
   fp << int(glow_eSave_GrowText_dynamicsize) << FSPACE << dynamicsize << '\n';
   fp << int(glow_eSave_GrowText_dynamic) << '\n';
   if (dynamic) {
@@ -312,6 +313,9 @@ void GrowText::open(std::ifstream& fp)
     case glow_eSave_GrowText_adjustment:
       fp >> tmp;
       adjustment = (glow_eAdjustment)tmp;
+      break;
+    case glow_eSave_GrowText_transparency:
+      fp >> transparency;
       break;
     case glow_eSave_GrowText_dynamicsize:
       fp >> dynamicsize;
@@ -614,6 +618,11 @@ void GrowText::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
       return;
     hot = 0;
   }
+
+  double transp = transparency;
+  if (colornode && ((GrowNode*)colornode)->transparency > transparency)
+    transp = ((GrowNode*)colornode)->transparency;
+
   int x1, y1, rx1 = 0, ry1 = 0;
   int z_width = 0, z_height = 0, z_descent;
   int rot;
@@ -708,13 +717,13 @@ void GrowText::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
       glow_eDrawType color = ctx->get_drawtype(color_drawtype,
           glow_eDrawType_LineHighlight, highlight, (GrowNode*)colornode, 2);
       ctx->gdraw->text(w, x1, y1, text, strlen(text), ldraw_type, color, idx,
-          highlight, 0, lfont, tsize, rot);
+	  highlight, 0, lfont, tsize, rot, transp);
     }
   } else if (idx >= 0 && ctx->environment == glow_eEnv_Development) {
     ctx->gdraw->get_text_extent("A", 1, draw_type, MAX(0, idx), font, &z_width,
         &z_height, &z_descent, tsize, rot);
     ctx->gdraw->rect(w, x1, y1 - (z_height - z_descent), z_width, z_height,
-        glow_eDrawType_LineGray, idx, 0);
+        glow_eDrawType_LineGray, idx, transp);
   }
 }
  

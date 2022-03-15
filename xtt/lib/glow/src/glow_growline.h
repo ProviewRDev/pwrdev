@@ -284,6 +284,7 @@ public:
   GlowTransform trf; //!< Transformation matrix of object.
   char last_group[32]; //!< The last group the object was a member of.
   glow_eLineType line_type; //!< Line type, solid, dashed, dotted, etc.
+  double transparency; //!< Border and fill color transparency.
 
   //! Set user data.
   /*!
@@ -301,6 +302,21 @@ public:
   void get_user_data(void** data)
   {
     *data = user_data;
+  }
+
+  //! Set transparency.
+  /*!
+    \param transp	Transparency value.
+  */
+  void set_transparency(double transp)
+  {
+    transparency = transp;
+    draw();
+  }
+
+  double get_transparency()
+  {
+    return transparency;
   }
 
   //! Set dynamic code

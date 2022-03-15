@@ -317,6 +317,7 @@ public:
   int fill_eq_light; //!< Fill is drawn with light shadow color.
   int fill_eq_shadow; //!< Fill is drawn with dark shadow color.
   int fill_eq_background; //!< Background color is fill color.
+  double transparency; //!< Border and fill color transparency.
 
   //! Set user data.
   /*!
@@ -351,6 +352,21 @@ public:
   {
     *code = dynamic;
     *size = dynamicsize;
+  }
+
+  //! Set transparency.
+  /*!
+    \param transp	Transparency value.
+  */
+  void set_transparency(double transp)
+  {
+    transparency = transp;
+    draw();
+  }
+
+  double get_transparency()
+  {
+    return transparency;
   }
 
   //! Get grow context.

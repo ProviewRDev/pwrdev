@@ -348,6 +348,21 @@ public:
     draw();
   }
 
+  //! Set transparency.
+  /*!
+    \param transp	Transparency value.
+  */
+  void set_transparency(double transp)
+  {
+    transparency = transp;
+    draw();
+  }
+
+  double get_transparency()
+  {
+    return transparency;
+  }
+
   //! todo
   void set_drawtype(glow_eDrawType drawtype);
 
@@ -429,6 +444,7 @@ public:
   int disable_gradient; //!< Disable gradient, even if parent node has gradient.
   float round; //!< Value to round or floor points.
   glow_eCurveType curvetype; //!< Curve type.
+  double transparency; //!< Border and fill color transparency.
 
   //! Set user data.
   /*!

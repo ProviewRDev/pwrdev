@@ -3372,6 +3372,8 @@ glow_eDrawType grow_GetObjectBorderColor(grow_tObject o);
 glow_eDrawType grow_GetObjectTextColor(grow_tObject o);
 glow_eGradient grow_GetObjectGradient(grow_tObject o);
 void grow_SetObjectGradient(grow_tObject o, glow_eGradient gradient);
+double grow_GetObjectTransparency(grow_tObject o);
+void grow_SetObjectTransparency(grow_tObject o, double transparency);
 int grow_GetObjectShadow(grow_tObject o);
 void grow_SetObjectOriginalFillColor(grow_tObject o, glow_eDrawType color);
 void grow_SetObjectOriginalBorderColor(grow_tObject o, glow_eDrawType color);

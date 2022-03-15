@@ -1079,7 +1079,7 @@ void GlowDrawGtk::end_cairo(GlowWind* wind, cairo_t* cr)
 }
 
 int GlowDrawGtk::rect(GlowWind* wind, int x, int y, int width, int height,
-    glow_eDrawType gc_type, int idx, int highlight)
+    glow_eDrawType gc_type, int idx, int highlight, double transparency)
 {
   DrawWindGtk* ww = (DrawWindGtk*)wind->window;
 
@@ -1087,6 +1087,7 @@ int GlowDrawGtk::rect(GlowWind* wind, int x, int y, int width, int height,
     return 1;
 
   cairo_t *cr = get_cairo(wind);
+  cairo_pattern_t *pat = 0;
 
   if (ww->clip_on)
     set_cairo_clip(ww, cr);
@@ -1098,19 +1099,27 @@ int GlowDrawGtk::rect(GlowWind* wind, int x, int y, int width, int height,
     else
       cairo_set_source(cr, gc_red);
   } else {
-    cairo_set_source(cr, get_gc(this, gc_type + highlight, idx));
+    if (feq(transparency, 0.0))
+      cairo_set_source(cr, get_gc(this, gc_type + highlight, idx));
+    else {
+      double r1, g1, b1;
+
+      GlowColor::rgb_color(gc_type, &r1, &g1, &b1, get_customcolors());
+      pat = cairo_pattern_create_rgba(r1, g1, b1, 1.0 - transparency);
+      cairo_set_source(cr,  pat);
+    }
   }
   cairo_set_line_width(cr, idx+1);
-  //cairo_set_line_join(cr, CAIRO_LINE_JOIN_MITER);
-  //cairo_set_line_cap(cr, CAIRO_LINE_CAP_BUTT);
 
   cairo_rectangle(cr, x, y, width+1, height+1);
   cairo_stroke(cr);
   if (ww->clip_on)
     reset_cairo_clip(ww, cr);
+  if (pat)
+    cairo_pattern_destroy(pat);
+
   end_cairo(wind, cr);
 
-  return 1;
   return 1;
 }
 
@@ -1202,7 +1211,8 @@ int GlowDrawGtk::arrow_erase(
 }
 
 int GlowDrawGtk::arc(GlowWind* wind, int x, int y, int width, int height,
-    int angle1, int angle2, glow_eDrawType gc_type, int idx, int highlight)
+    int angle1, int angle2, glow_eDrawType gc_type, int idx, int highlight,
+    double transparency)
 {
   DrawWindGtk* w = (DrawWindGtk*)wind->window;
 
@@ -1225,6 +1235,7 @@ int GlowDrawGtk::arc(GlowWind* wind, int x, int y, int width, int height,
 
   cairo_matrix_t matrix;
   cairo_t *cr = get_cairo(wind);
+  cairo_pattern_t *pat = 0;
 
   if (gc_type == glow_eDrawType_LineGray && highlight)
     gc_type = glow_eDrawType_Line;
@@ -1242,7 +1253,16 @@ int GlowDrawGtk::arc(GlowWind* wind, int x, int y, int width, int height,
     set_cairo_clip(w, cr);
 
   cairo_set_antialias(cr, antialias);
-  cairo_set_source(cr, get_gc(this, gc_type, 0));
+  if (feq(transparency, 0.0))
+    cairo_set_source(cr, get_gc(this, gc_type, 0));
+  else {
+    double r1, g1, b1;
+
+    GlowColor::rgb_color(gc_type, &r1, &g1, &b1, get_customcolors());
+    pat = cairo_pattern_create_rgba(r1, g1, b1, 1.0 - transparency);
+    cairo_set_source(cr, pat);
+  }
+
   cairo_set_line_width(cr, idx+1);
 
   if (width != height) {
@@ -1260,13 +1280,16 @@ int GlowDrawGtk::arc(GlowWind* wind, int x, int y, int width, int height,
 
   if (w->clip_on)
     reset_cairo_clip(w, cr);
+  if (pat)
+    cairo_pattern_destroy(pat);
   end_cairo(wind, cr);
 
   return 1;
 }
 
 int GlowDrawGtk::fill_arc(GlowWind* wind, int x, int y, int width, int height,
-    int angle1, int angle2, glow_eDrawType gc_type, int highlight)
+    int angle1, int angle2, glow_eDrawType gc_type, int highlight,
+    double transparency)
 {
   DrawWindGtk* w = (DrawWindGtk*)wind->window;
 
@@ -1278,6 +1301,7 @@ int GlowDrawGtk::fill_arc(GlowWind* wind, int x, int y, int width, int height,
 
   cairo_matrix_t matrix;
   cairo_t *cr = get_cairo(wind);
+  cairo_pattern_t *pat = 0;
 
   if (angle1 >= 360)
     angle1 = angle1 - angle1 / 360 * 360;
@@ -1288,7 +1312,15 @@ int GlowDrawGtk::fill_arc(GlowWind* wind, int x, int y, int width, int height,
     set_cairo_clip(w, cr);
 
   cairo_set_antialias(cr, antialias);
-  cairo_set_source(cr, get_gc(this, gc_type, 0));
+  if (feq(transparency, 0.0))
+    cairo_set_source(cr, get_gc(this, gc_type, 0));
+  else {
+    double r1, g1, b1;
+
+    GlowColor::rgb_color(gc_type, &r1, &g1, &b1, get_customcolors());
+    pat = cairo_pattern_create_rgba(r1, g1, b1, 1.0 - transparency);
+    cairo_set_source(cr, pat);
+  }
 
   if (width != height) {
     cairo_get_matrix(cr, &matrix);
@@ -1309,6 +1341,8 @@ int GlowDrawGtk::fill_arc(GlowWind* wind, int x, int y, int width, int height,
 
   if (w->clip_on)
     reset_cairo_clip(w, cr);
+  if (pat)
+    cairo_pattern_destroy(pat);
   end_cairo(wind, cr);
 
   return 1;
@@ -1372,7 +1406,7 @@ int GlowDrawGtk::arc_erase(GlowWind* wind, int x, int y, int width, int height,
 }
 
 int GlowDrawGtk::line(GlowWind* wind, int x1, int y1, int x2, int y2,
-    glow_eDrawType gc_type, int idx, int highlight)
+    glow_eDrawType gc_type, int idx, int highlight, double transparency)
 {
   if (ctx->nodraw)
     return 1;
@@ -1398,12 +1432,21 @@ int GlowDrawGtk::line(GlowWind* wind, int x1, int y1, int x2, int y2,
     gc_type = glow_eDrawType_Line;
 
   cairo_t *cr = get_cairo(wind);
+  cairo_pattern_t *pat = 0;
 
   if (w->clip_on)
     set_cairo_clip(w, cr);
 
   cairo_set_antialias(cr, antialias);
-  cairo_set_source(cr, get_gc(this, gc_type, 0));
+  if (feq(transparency, 0.0))
+    cairo_set_source(cr, get_gc(this, gc_type, 0));
+  else {
+    double r1, g1, b1;
+    
+    GlowColor::rgb_color(gc_type, &r1, &g1, &b1, get_customcolors());
+    pat = cairo_pattern_create_rgba(r1, g1, b1, 1.0 - transparency);
+    cairo_set_source(cr, pat);
+  }
   cairo_set_line_width(cr, idx+1);
 
   cairo_move_to(cr, x1, y1);
@@ -1412,6 +1455,8 @@ int GlowDrawGtk::line(GlowWind* wind, int x1, int y1, int x2, int y2,
   
   if (w->clip_on)
     reset_cairo_clip(w, cr);
+  if (pat)
+    cairo_pattern_destroy(pat);
 
   end_cairo(wind, cr);
 
@@ -1419,7 +1464,8 @@ int GlowDrawGtk::line(GlowWind* wind, int x1, int y1, int x2, int y2,
 }
 
 int GlowDrawGtk::line_dashed(GlowWind* wind, int x1, int y1, int x2, int y2,
-    glow_eDrawType gc_type, int idx, int highlight, glow_eLineType line_type)
+    glow_eDrawType gc_type, int idx, int highlight, glow_eLineType line_type,
+    double transparency)
 {
   if (ctx->nodraw)
     return 1;
@@ -1445,12 +1491,21 @@ int GlowDrawGtk::line_dashed(GlowWind* wind, int x1, int y1, int x2, int y2,
     gc_type = glow_eDrawType_Line;
 
   cairo_t *cr = get_cairo(wind);
+  cairo_pattern_t *pat = 0;
 
   if (w->clip_on)
     set_cairo_clip(w, cr);
 
   cairo_set_antialias(cr, antialias);
-  cairo_set_source(cr, get_gc(this, gc_type, 0));
+  if (feq(transparency, 0.0))
+    cairo_set_source(cr, get_gc(this, gc_type, 0));
+  else {
+    double r1, g1, b1;
+    
+    GlowColor::rgb_color(gc_type, &r1, &g1, &b1, get_customcolors());
+    pat = cairo_pattern_create_rgba(r1, g1, b1, 1.0 - transparency);
+    cairo_set_source(cr, pat);
+  }
   cairo_set_line_width(cr, idx+1);
   int dash_offset = 0;
   double dashes[4];
@@ -1499,6 +1554,8 @@ int GlowDrawGtk::line_dashed(GlowWind* wind, int x1, int y1, int x2, int y2,
   
   if (w->clip_on)
     reset_cairo_clip(w, cr);
+  if (pat)
+    cairo_pattern_destroy(pat);
 
   end_cairo(wind, cr);
   return 1;
@@ -1545,7 +1602,7 @@ int GlowDrawGtk::line_erase(
 }
 
 int GlowDrawGtk::polyline(GlowWind* wind, glow_sPointX* points, int point_cnt,
-    glow_eDrawType gc_type, int idx, int highlight)
+    glow_eDrawType gc_type, int idx, int highlight, double transparency)
 {
   if (ctx->nodraw)
     return 1;
@@ -1558,12 +1615,21 @@ int GlowDrawGtk::polyline(GlowWind* wind, glow_sPointX* points, int point_cnt,
   int cnt;
   GdkPoint* gpoints = points_to_gdk_points_curve(wind, points, point_cnt, &cnt);
   cairo_t *cr = get_cairo(wind);
+  cairo_pattern_t *pat = 0;
 
   if (w->clip_on)
     set_cairo_clip(w, cr);
 
   cairo_set_antialias(cr, antialias);
-  cairo_set_source(cr, get_gc(this, gc_type, 0));
+  if (feq(transparency, 0.0))
+    cairo_set_source(cr, get_gc(this, gc_type, 0));
+  else {
+    double r1, g1, b1;
+    
+    GlowColor::rgb_color(gc_type, &r1, &g1, &b1, get_customcolors());
+    pat = cairo_pattern_create_rgba(r1, g1, b1, 1.0 - transparency);
+    cairo_set_source(cr, pat);
+  }
   cairo_set_line_width(cr, idx+1);
   cairo_set_line_join(cr, CAIRO_LINE_JOIN_BEVEL);
 
@@ -1574,6 +1640,8 @@ int GlowDrawGtk::polyline(GlowWind* wind, glow_sPointX* points, int point_cnt,
 
   if (w->clip_on)
     reset_cairo_clip(w, cr);
+  if (pat)
+    cairo_pattern_destroy(pat);
 
   free(gpoints);
   end_cairo(wind, cr);
@@ -1582,7 +1650,7 @@ int GlowDrawGtk::polyline(GlowWind* wind, glow_sPointX* points, int point_cnt,
 }
 
 int GlowDrawGtk::fill_polyline(GlowWind* wind, glow_sPointX* points,
-    int point_cnt, glow_eDrawType gc_type, int highlight)
+    int point_cnt, glow_eDrawType gc_type, int highlight, double transparency)
 {
   if (ctx->nodraw)
     return 1;
@@ -1594,12 +1662,21 @@ int GlowDrawGtk::fill_polyline(GlowWind* wind, glow_sPointX* points,
 
   GdkPoint* gpoints = points_to_gdk_points(points, point_cnt);
   cairo_t *cr = get_cairo(wind);
+  cairo_pattern_t *pat = 0;
 
   if (w->clip_on)
     set_cairo_clip(w, cr);
 
   cairo_set_antialias(cr, antialias);
-  cairo_set_source(cr, get_gc(this, gc_type, 0));
+  if (feq(transparency, 0.0))
+    cairo_set_source(cr, get_gc(this, gc_type, 0));
+  else {
+    double r1, g1, b1;
+
+    GlowColor::rgb_color(gc_type, &r1, &g1, &b1, get_customcolors());
+    pat = cairo_pattern_create_rgba(r1, g1, b1, 1.0 - transparency);
+    cairo_set_source(cr, pat);
+  }
 
   cairo_move_to(cr, gpoints[0].x, gpoints[0].y);
   for (int i = 1; i < point_cnt; i++)
@@ -1609,6 +1686,8 @@ int GlowDrawGtk::fill_polyline(GlowWind* wind, glow_sPointX* points,
   
   if (w->clip_on)
     reset_cairo_clip(w, cr);
+  if (pat)
+    cairo_pattern_destroy(pat);
 
   free(gpoints);
   end_cairo(wind, cr);
@@ -1651,7 +1730,7 @@ int GlowDrawGtk::polyline_erase(
 
 int GlowDrawGtk::text(GlowWind* wind, int x, int y, char* text, int len,
     glow_eDrawType gc_type, glow_eDrawType color, int idx, int highlight,
-    int line, glow_eFont font_idx, double size, int rot)
+    int line, glow_eFont font_idx, double size, int rot, double transparency)
 {
   if (ctx->nodraw)
     return 1;
@@ -1669,11 +1748,20 @@ int GlowDrawGtk::text(GlowWind* wind, int x, int y, char* text, int len,
     font_idx = glow_eFont_Helvetica;
 
   cairo_t *cr = get_cairo(wind);
+  cairo_pattern_t *pat = 0;
+
   if (w->clip_on)
     set_cairo_clip(w, cr);
 
-  cairo_set_source(cr, get_gc(this, color, 0));
-
+  if (feq(transparency, 0.0))
+    cairo_set_source(cr, get_gc(this, color, 0));
+  else {
+    double r1, g1, b1;
+    
+    GlowColor::rgb_color(color, &r1, &g1, &b1, get_customcolors());
+    pat = cairo_pattern_create_rgba(r1, g1, b1, 1.0 - transparency);
+    cairo_set_source(cr, pat);
+  }
   
   cairo_font_face_t *font_face = get_font_face(font_idx, drawtype_to_fonttype(gc_type));
   cairo_set_font_face(cr, font_face);
@@ -1705,6 +1793,9 @@ int GlowDrawGtk::text(GlowWind* wind, int x, int y, char* text, int len,
   }
   if (w->clip_on)
     reset_cairo_clip(w, cr);
+  if (pat)
+    cairo_pattern_destroy(pat);
+
   end_cairo(wind, cr);
 
   if (textutf8)
@@ -1896,7 +1987,8 @@ int GlowDrawGtk::image_d(GlowWind* wind, double x, double y, int width,
 }
 
 int GlowDrawGtk::fill_rect(
-    GlowWind* wind, int x, int y, int width, int height, glow_eDrawType gc_type)
+    GlowWind* wind, int x, int y, int width, int height, glow_eDrawType gc_type,
+    double transparency)
 {
   if (ctx->nodraw)
     return 1;
@@ -1904,6 +1996,7 @@ int GlowDrawGtk::fill_rect(
   DrawWindGtk* w = (DrawWindGtk*)wind->window;
 
   cairo_t *cr = get_cairo(wind);
+  cairo_pattern_t *pat = 0;
 
   cairo_set_antialias(cr, antialias);
 
@@ -1912,13 +2005,25 @@ int GlowDrawGtk::fill_rect(
 
   if (gc_type == glow_eDrawType_LineErase)
     cairo_set_source(cr, gc_erase);
-  else
-    cairo_set_source(cr, get_gc(this, gc_type, 0));
+  else {
+    if (feq(transparency, 0.0))
+      cairo_set_source(cr, get_gc(this, gc_type, 0));
+    else {
+      double r1, g1, b1;
+
+      GlowColor::rgb_color(gc_type, &r1, &g1, &b1, get_customcolors());
+      pat = cairo_pattern_create_rgba(r1, g1, b1, 1.0 - transparency);
+      cairo_set_source(cr, pat);
+    }
+  }
   cairo_rectangle(cr, x, y, width, height);
   cairo_fill(cr);
 
   if (w->clip_on)
     reset_cairo_clip(w, cr);
+  if (pat)
+    cairo_pattern_destroy(pat);
+
   end_cairo(wind, cr);
   return 1;
 }

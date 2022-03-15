@@ -66,7 +66,7 @@ void GlowDraw::set_window_size(GlowWind* w, int width, int height)
 }
 
 int GlowDraw::rect(GlowWind* w, int x, int y, int width, int height,
-    glow_eDrawType gc_type, int idx, int highlight)
+    glow_eDrawType gc_type, int idx, int highlight, double transparency)
 {
   return 1;
 }
@@ -90,13 +90,13 @@ int GlowDraw::arrow_erase(
 }
 
 int GlowDraw::arc(GlowWind* w, int x, int y, int width, int height, int angle1,
-    int angle2, glow_eDrawType gc_type, int idx, int highlight)
+    int angle2, glow_eDrawType gc_type, int idx, int highlight, double transparency)
 {
   return 1;
 }
 
 int GlowDraw::fill_arc(GlowWind* w, int x, int y, int width, int height,
-    int angle1, int angle2, glow_eDrawType gc_type, int highlight)
+    int angle1, int angle2, glow_eDrawType gc_type, int highlight, double transparency)
 {
   return 1;
 }
@@ -108,13 +108,14 @@ int GlowDraw::arc_erase(GlowWind* w, int x, int y, int width, int height,
 }
 
 int GlowDraw::line(GlowWind* w, int x1, int y1, int x2, int y2,
-    glow_eDrawType gc_type, int idx, int highlight)
+    glow_eDrawType gc_type, int idx, int highlight, double transparency)
 {
   return 1;
 }
 
 int GlowDraw::line_dashed(GlowWind* w, int x1, int y1, int x2, int y2,
-    glow_eDrawType gc_type, int idx, int highlight, glow_eLineType line_type)
+    glow_eDrawType gc_type, int idx, int highlight, glow_eLineType line_type,
+    double transparency)
 {
   return 1;
 }
@@ -125,13 +126,13 @@ int GlowDraw::line_erase(GlowWind* w, int x1, int y1, int x2, int y2, int idx)
 }
 
 int GlowDraw::polyline(GlowWind* w, glow_sPointX* points, int point_cnt,
-    glow_eDrawType gc_type, int idx, int highlight)
+    glow_eDrawType gc_type, int idx, int highlight, double transparency)
 {
   return 1;
 }
 
 int GlowDraw::fill_polyline(GlowWind* w, glow_sPointX* points, int point_cnt,
-    glow_eDrawType gc_type, int highlight)
+    glow_eDrawType gc_type, int highlight, double transparency)
 {
   return 1;
 }
@@ -144,7 +145,7 @@ int GlowDraw::polyline_erase(
 
 int GlowDraw::text(GlowWind* w, int x, int y, char* text, int len,
     glow_eDrawType gc_type, glow_eDrawType color, int idx, int highlight,
-    int line, glow_eFont font_idx, double size, int rot)
+    int line, glow_eFont font_idx, double size, int rot, double transparency)
 {
   return 1;
 }
@@ -164,7 +165,8 @@ int GlowDraw::text_erase(GlowWind* w, int x, int y, char* text, int len,
 }
 
 int GlowDraw::fill_rect(
-    GlowWind* w, int x, int y, int width, int height, glow_eDrawType gc_type)
+    GlowWind* w, int x, int y, int width, int height, glow_eDrawType gc_type,
+    double transparency)
 {
   return 1;
 }

@@ -236,10 +236,9 @@ public:
   glow_eFont text_font; //!< Text font.
   int disable_cb; //!< Disable event callbacks
   int annot_scrollingtext; //!< Annotation number for scrolling text annotation.
-  double
-      annot_offset_x; //!< Offset for annotation text position in x direction.
-  double
-      annot_offset_y; //!< Offset for annotation text position in y direction.
+  double annot_offset_x; //!< Offset for annotation text position in x direction.
+  double annot_offset_y; //!< Offset for annotation text position in y direction.
+  double transparency; //!< Border and fill color transparency.
 
   //! Set dynamic code
   /*!
@@ -1066,6 +1065,21 @@ public:
   {
     gradient = gradientval;
     draw();
+  }
+
+  //! Set transparency.
+  /*!
+    \param transp	Transparency value.
+  */
+  void set_transparency(double transp)
+  {
+    transparency = transp;
+    draw();
+  }
+
+  double get_transparency()
+  {
+    return transparency;
   }
 
   //! Set root node.

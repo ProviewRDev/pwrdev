@@ -336,6 +336,8 @@ public:
   //! drawn at edit time.
   glow_eFont font; //!< Text font
   glow_eAdjustment adjustment; //!< Text adjustment.
+  double transparency; //!< Border and fill color transparency.
+  
 
   //! Set user data.
   /*!
@@ -353,6 +355,21 @@ public:
   void get_user_data(void** data)
   {
     *data = user_data;
+  }
+
+  //! Set transparency.
+  /*!
+    \param transp	Transparency value.
+  */
+  void set_transparency(double transp)
+  {
+    transparency = transp;
+    draw();
+  }
+
+  double get_transparency()
+  {
+    return transparency;
   }
 
   //! Set dynamic code

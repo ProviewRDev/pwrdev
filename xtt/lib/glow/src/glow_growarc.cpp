@@ -60,7 +60,7 @@ GrowArc::GrowArc(GrowCtx* glow_ctx, const char* name, double x1, double y1,
       relief(glow_eRelief_Up), shadow_contrast(2), disable_shadow(0),
       fixcolor(0), gradient(glow_eGradient_No), gradient_contrast(4),
       disable_gradient(0), fixposition(0), fill_eq_light(0), fill_eq_shadow(0),
-      fill_eq_background(0)
+      fill_eq_background(0), transparency(0)
 {
   strcpy(n_name, name);
   pzero.nav_zoom();
@@ -281,6 +281,7 @@ void GrowArc::save(std::ofstream& fp, glow_eSaveMode mode)
      << '\n';
   fp << int(glow_eSave_GrowArc_fill_eq_background) << FSPACE
      << fill_eq_background << '\n';
+  fp << int(glow_eSave_GrowArc_transparency) << FSPACE << transparency << '\n';
   fp << int(glow_eSave_GrowArc_dynamicsize) << FSPACE << dynamicsize << '\n';
   fp << int(glow_eSave_GrowArc_dynamic) << '\n';
   if (dynamic) {
@@ -394,6 +395,9 @@ void GrowArc::open(std::ifstream& fp)
       break;
     case glow_eSave_GrowArc_fill_eq_background:
       fp >> fill_eq_background;
+      break;
+    case glow_eSave_GrowArc_transparency:
+      fp >> transparency;
       break;
     case glow_eSave_GrowArc_dynamicsize:
       fp >> dynamicsize;
@@ -699,6 +703,11 @@ void GrowArc::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
       hot = 0;
     }
   }
+
+  double transp = transparency;
+  if (colornode && ((GrowNode*)colornode)->transparency > transparency)
+    transp = ((GrowNode*)colornode)->transparency;
+
   if (fixcolor)
     colornode = 0;
 
@@ -796,7 +805,7 @@ void GrowArc::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
           drawtype = fillcolor;
 
         ctx->gdraw->fill_arc(w, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y,
-            angle1 - rot, angle2, drawtype, 0);
+	    angle1 - rot, angle2, drawtype, 0, transp);
       } else {
         glow_eDrawType f1, f2;
 
@@ -826,14 +835,14 @@ void GrowArc::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
             fillcolor, -drawtype_incr + chot, (GrowNode*)colornode);
 
         ctx->gdraw->fill_arc(
-            w, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, 35, 140, drawtype, 0);
+	    w, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, 35, 140, drawtype, 0, transp);
 
         // Draw dark shadow
         drawtype = ctx->shift_drawtype(
             fillcolor, drawtype_incr + chot, (GrowNode*)colornode);
 
         ctx->gdraw->fill_arc(
-            w, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, 215, 140, drawtype, 0);
+	    w, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, 215, 140, drawtype, 0, transp);
 
         // Draw medium shadow and body
         if (chot)
@@ -842,12 +851,12 @@ void GrowArc::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
           drawtype = fillcolor;
 
         ctx->gdraw->fill_arc(
-            w, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, -5, 40, drawtype, 0);
+            w, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, -5, 40, drawtype, 0, transp);
         ctx->gdraw->fill_arc(
-            w, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, 175, 40, drawtype, 0);
+            w, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, 175, 40, drawtype, 0, transp);
 
         ctx->gdraw->fill_arc(w, ll_x + ish, ll_y + ish, ur_x - ll_x - 2 * ish,
-            ur_y - ll_y - 2 * ish, angle1 - rot, angle2, drawtype, 0);
+            ur_y - ll_y - 2 * ish, angle1 - rot, angle2, drawtype, 0, 0.0);
       } else {
         glow_eDrawType f1, f2;
 
@@ -883,7 +892,7 @@ void GrowArc::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
     drawtype = ctx->get_drawtype(draw_type, glow_eDrawType_LineHighlight,
         highlight, (GrowNode*)colornode, 0);
     ctx->gdraw->arc(w, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, angle1 - rot,
-        angle2, drawtype, idx, 0);
+	angle2, drawtype, idx, 0, transp);
   }
 }
 

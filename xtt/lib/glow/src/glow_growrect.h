@@ -327,6 +327,7 @@ public:
   int disable_gradient; //!< Disable gradient, even if parent node has gradient.
   int bgcolor_gradient; //!< Gradient between fill and background color.
   int fill_eq_background; //!< Fill with background color.
+  double transparency; //!< Border and fill color transparency.
 
   //! Set user data.
   /*!
@@ -569,6 +570,21 @@ public:
   {
     gradient = gradientval;
     draw();
+  }
+
+  //! Set transparency.
+  /*!
+    \param transp	Transparency value.
+  */
+  void set_transparency(double transp)
+  {
+    transparency = transp;
+    draw();
+  }
+
+  double get_transparency()
+  {
+    return transparency;
   }
 
   void get_ctx(void** c)

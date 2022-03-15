@@ -61,7 +61,7 @@ GrowRect::GrowRect(GrowCtx* glow_ctx, const char* name, double x, double y,
       relief(glow_eRelief_Up), shadow_contrast(2), disable_shadow(0),
       invisible(0), fixcolor(0), fixposition(0), gradient(glow_eGradient_No),
       gradient_contrast(4), disable_gradient(0), bgcolor_gradient(0),
-      fill_eq_background(0)
+      fill_eq_background(0), transparency(0)
 {
   strcpy(n_name, name);
   pzero.nav_zoom();
@@ -292,6 +292,7 @@ void GrowRect::save(std::ofstream& fp, glow_eSaveMode mode)
      << int(background_drawtype) << '\n';
   fp << int(glow_eSave_GrowRect_fill_eq_background) << FSPACE
      << fill_eq_background << '\n';
+  fp << int(glow_eSave_GrowRect_transparency) << FSPACE << transparency << '\n';
   fp << int(glow_eSave_GrowRect_dynamicsize) << FSPACE << dynamicsize << '\n';
   fp << int(glow_eSave_GrowRect_dynamic) << '\n';
   if (dynamic) {
@@ -405,6 +406,9 @@ void GrowRect::open(std::ifstream& fp)
       break;
     case glow_eSave_GrowRect_fill_eq_background:
       fp >> fill_eq_background;
+      break;
+    case glow_eSave_GrowRect_transparency:
+      fp >> transparency;
       break;
     case glow_eSave_GrowRect_dynamicsize:
       fp >> dynamicsize;
@@ -719,6 +723,11 @@ void GrowRect::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
   }
   int idx;
   glow_eDrawType drawtype;
+
+  double transp = transparency;
+  if (colornode && ((GrowNode*)colornode)->transparency > transparency)
+    transp = ((GrowNode*)colornode)->transparency;
+
   if (fixcolor)
     colornode = 0;
 
@@ -800,7 +809,7 @@ void GrowRect::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
     points[5].y = ur_y;
     points[6].x = ll_x;
     points[6].y = ll_y;
-    ctx->gdraw->fill_polyline(w, points, 7, drawtype, 0);
+    ctx->gdraw->fill_polyline(w, points, 7, drawtype, 0, transp);
 
     // Draw dark shadow
     drawtype = ctx->shift_drawtype(
@@ -820,7 +829,7 @@ void GrowRect::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
     points[5].y = ll_y;
     points[6].x = ur_x;
     points[6].y = ur_y;
-    ctx->gdraw->fill_polyline(w, points, 7, drawtype, 0);
+    ctx->gdraw->fill_polyline(w, points, 7, drawtype, 0, transp);
   }
   if (fill) {
     if (display_shadow && ish != 0) {
@@ -830,7 +839,7 @@ void GrowRect::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
         else
           drawtype = fillcolor;
         ctx->gdraw->fill_rect(w, ll_x + ish, ll_y + ish, ur_x - ll_x - 2 * ish,
-            ur_y - ll_y - 2 * ish, drawtype);
+	    ur_y - ll_y - 2 * ish, drawtype, transp);
       } else {
         glow_eDrawType f0, f1, f2;
         double rotation;
@@ -867,8 +876,8 @@ void GrowRect::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
           drawtype = GlowColor::shift_drawtype(fillcolor, chot, 0);
         else
           drawtype = fillcolor;
-        ctx->gdraw->fill_rect(
-            w, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, drawtype);
+	ctx->gdraw->fill_rect(
+	     w, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, drawtype, transp);
       } else {
         glow_eDrawType f1, f2, f0;
         double rotation;
@@ -901,7 +910,8 @@ void GrowRect::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
   if (border || !(fill || (display_shadow && !feq(shadow_width, 0.0)))) {
     drawtype = ctx->get_drawtype(draw_type, glow_eDrawType_LineHighlight,
         highlight, (GrowNode*)colornode, 0);
-    ctx->gdraw->rect(w, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, drawtype, idx, 0);
+    ctx->gdraw->rect(w, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, drawtype, idx, 0,
+	transp);
   }
 }
 

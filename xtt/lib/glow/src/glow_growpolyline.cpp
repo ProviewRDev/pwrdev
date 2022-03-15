@@ -62,7 +62,8 @@ GrowPolyLine::GrowPolyLine(GrowCtx* glow_ctx, const char* name,
       disable_shadow(0), fill_eq_light(0), fill_eq_shadow(0),
       fill_eq_bglight(0), fill_eq_bgshadow(0), fill_eq_background(0),
       fixcolor(0), fixposition(0), gradient(glow_eGradient_No),
-      gradient_contrast(4), disable_gradient(0), round(0.5), curvetype(ctype)
+      gradient_contrast(4), disable_gradient(0), round(0.5), curvetype(ctype),
+      transparency(0)
 {
   strcpy(n_name, name);
   pzero.nav_zoom();
@@ -351,6 +352,10 @@ void GrowPolyLine::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
   glow_eDrawType drawtype;
   int idx;
 
+  double transp = transparency;
+  if (colornode && ((GrowNode*)colornode)->transparency > transparency)
+    transp = ((GrowNode*)colornode)->transparency;
+
   if (fixcolor)
     colornode = 0;
 
@@ -436,7 +441,7 @@ void GrowPolyLine::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
       drawtype = GlowColor::shift_drawtype(drawtype, chot, 0);
 
     if (grad == glow_eGradient_No || drawtype == glow_eDrawType_ColorRed)
-      ctx->gdraw->fill_polyline(w, points, a_points.a_size, drawtype, 0);
+      ctx->gdraw->fill_polyline(w, points, a_points.a_size, drawtype, 0, transp);
     else {
       glow_eDrawType f1, f2;
       double rotation;
@@ -486,7 +491,7 @@ void GrowPolyLine::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
         p[2].x = sp[i + 1].x;
         p[2].y = sp[i + 1].y;
 
-        ctx->gdraw->fill_polyline(w, p, 4, sp[i].drawtype, 0);
+        ctx->gdraw->fill_polyline(w, p, 4, sp[i].drawtype, 0, transp);
       }
       free(sp);
     }
@@ -499,13 +504,13 @@ void GrowPolyLine::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
     case glow_eCurveType_Square:
     case glow_eCurveType_DigSquare:
     case glow_eCurveType_Inherit:
-      ctx->gdraw->polyline(w, points, a_points.a_size, drawtype, idx, 0);
+      ctx->gdraw->polyline(w, points, a_points.a_size, drawtype, idx, 0, transp);
       break;
     case glow_eCurveType_Points:
       ctx->gdraw->draw_points(w, points, a_points.a_size, drawtype, 3);
       break;
     case glow_eCurveType_LinePoints:
-      ctx->gdraw->polyline(w, points, a_points.a_size, drawtype, idx, 0);
+      ctx->gdraw->polyline(w, points, a_points.a_size, drawtype, idx, 0, transp);
       ctx->gdraw->draw_points(w, points, a_points.a_size, drawtype, 3);
       break;
     }
@@ -850,6 +855,7 @@ void GrowPolyLine::save(std::ofstream& fp, glow_eSaveMode mode)
      << disable_gradient << '\n';
   fp << int(glow_eSave_GrowPolyLine_fill_eq_background) << FSPACE
      << fill_eq_background << '\n';
+  fp << int(glow_eSave_GrowPolyLine_transparency) << FSPACE << transparency << '\n';
   fp << int(glow_eSave_End) << '\n';
 }
 
@@ -986,6 +992,9 @@ void GrowPolyLine::open(std::ifstream& fp)
       break;
     case glow_eSave_GrowPolyLine_fill_eq_background:
       fp >> fill_eq_background;
+      break;
+    case glow_eSave_GrowPolyLine_transparency:
+      fp >> transparency;
       break;
     case glow_eSave_End:
       end_found = 1;
