@@ -300,7 +300,7 @@ MYSQL* sev_dbms_env::createDb(void)
     return 0;
   }
 
-  char query[400];
+  char query[500];
   int rc;
 
   // Update auto_increment in stats immediately
@@ -343,7 +343,7 @@ MYSQL* sev_dbms_env::createDb(void)
                  "description varchar(80),"
                  "vtype int unsigned,"
                  "vsize int unsigned,"
-                 "unit varchar(16));");
+                 "unit varchar(16)) character set \'latin1\';");
 
   rc = mysql_query(m_con, query);
   if (rc)
@@ -517,7 +517,7 @@ int sev_dbms_env::createSevVersion2Tables(void)
                  "deadband float,"
                  "options int unsigned,"
                  "scantime float,"
-                 "description varchar(80));");
+                 "description varchar(80)) character set \'latin1\';");
 
   rc = mysql_query(m_con, query);
   if (rc) {
@@ -531,7 +531,7 @@ int sev_dbms_env::createSevVersion2Tables(void)
                  "attributeidx int unsigned not null,"
                  "attributetype int unsigned not null,"
                  "attributesize int unsigned not null,"
-                 "PRIMARY KEY(tablename, attributename)) default charset=utf8;");
+                 "PRIMARY KEY(tablename, attributename)) character set \'latin1\';");
 
   rc = mysql_query(m_con, query);
   if (rc) {
@@ -702,6 +702,10 @@ MYSQL* sev_dbms_env::openDb(unsigned int* sts)
     *sts = mysql_errno(m_con);
     return 0;
   }
+  if (mysql_set_character_set(m_con, "latin1")) {
+    *sts = mysql_errno(m_con);
+    return 0;
+  }
 
   return con;
 }
@@ -716,6 +720,10 @@ MYSQL* sev_dbms_env::open_thread(unsigned int* sts)
   con = mysql_real_connect(
       con, host(), user(), passwd(), dbName(), port(), socket(), 0);
   if (con == 0) {
+    *sts = mysql_errno(m_con);
+    return 0;
+  }
+  if (mysql_set_character_set(m_con, "latin1")) {
     *sts = mysql_errno(m_con);
     return 0;
   }
@@ -1033,7 +1041,7 @@ int sev_dbms::delete_table(pwr_tStatus* sts, char* tablename)
 int sev_dbms::create_event_table(
     pwr_tStatus* sts, char* tablename, pwr_tMask options)
 {
-  char query[580];
+  char query[650];
   char timeformatstr[80];
   char idtypestr[20];
   char readoptstr[80];
@@ -1083,7 +1091,9 @@ int sev_dbms::create_event_table(
       "supobject_vid int unsigned, supobject_oix int unsigned, "
       "supobject_offset int unsigned,"
       "supobject_size int unsigned,"
-      "eventtext varchar(80), eventname varchar(80), eventstatus int unsigned%s)%s;",
+      "eventtext varchar(80),"
+      "eventname varchar(80),"
+      "eventstatus int unsigned%s)%s character set \'latin1\';",
       tablename, readoptstr, timeformatstr, timeindexstr, enginestr);
 
   int rc = mysql_query(m_env->con(), query);
@@ -3125,7 +3135,7 @@ char* sev_dbms::pwrtype_to_type(pwr_eType type, unsigned int size)
     strcpy(stype, "char(1)");
     break;
   case pwr_eType_String:
-    sprintf(stype, "varchar(%d)", size);
+    sprintf(stype, "varchar(%d) character set \'latin1\'", size);
     break;
   case pwr_eType_Time:
     strcpy(stype, "datetime");
