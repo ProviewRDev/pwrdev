@@ -3436,6 +3436,11 @@ SliderBackground <t>-   <t>Indicates that the subgraph is background to a slider
 DigCommand <t>Boolean   <t>Executes a command when signal gets high. <link>GeDynDigCommand
 DigScript <t>Boolean   <t>Executes a script when signal gets high. <link>GeDynDigScript
 ScrollingText <t>Boolean <t>Display a scrolling text. <link>GeDynScrollingText
+DigTransparency <t>Boolean   <t>Shift transparency depending on the value of a <link>GeDynDigTransparency
+	  <t>		<t>digital signal.
+AnalogTransparency <t>Float32  <t>Set transparency depening on the value of an <link>GeDynAnalogTransparency
+	  <t>		<t>analog signal.
+
 
 <h2>Inherit
 For an instance of a subgraph, Inherit means, that the dynamic is inherited from the subgraph 
@@ -4027,6 +4032,33 @@ DigScript.Level    <t><t>If level is 0, the script is executed when the signal c
                    <t><t>when the signal is high.
 DigScript.Script <t><t>Xtt script that is executed.
 </topic>
+
+<topic>GeDynDigTransparency <style>function
+DigTransparency
+Shift transparency depending on a digital signal. When the signal is low, the transparancy
+is set to the value specified in LowValue, and when the signal is high, to the value in
+HighValue.
+
+<b>Attribute <t><t>Description
+DigTransparency.Attribute <t><t>Signal in the database of type boolean that should 
+                   <t><t>influence the component.
+DigTransparency.LowValue  <t><t>Transparancy set when the signal is low. A value between 
+			<t><t>0 and 1.
+DigTransparency.HighValue  <t><t>Transparancy set when the signal is high. A value between 
+			<t><t>0 and 1.
+</topic>
+
+<topic>GeDynAnalogTransparency <style>function
+AnalogTransparency
+The transparency for en object is linked to an analog signal. The transparency depends on
+the value of the analog signal.
+
+<b>Attribute <t><t>Description
+AnalogTransparency.Attribute <t><t>Signal in the database of type Float32.
+AnalogTransparency.MinValue  <t><t>Signal value that corresponds to minimal transparency.
+AnalogTransparency.MaxValue  <t><t>Signal value that corresponds to maximal transparency.
+</topic>
+
 </headerlevel>
 <pagebreak>
 

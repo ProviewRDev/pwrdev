@@ -58,7 +58,7 @@ GrowRectRounded::GrowRectRounded(GrowCtx* glow_ctx, const char* name, double x,
       border(display_border), dynamic(0), dynamicsize(0), round_amount(15),
       shadow(display_shadow), shadow_width(5), relief(glow_eRelief_Up),
       shadow_contrast(2), disable_shadow(0), gradient(glow_eGradient_No),
-      gradient_contrast(4), disable_gradient(0), fixposition(0)
+      gradient_contrast(4), disable_gradient(0), fixposition(0), transparency(0)
 {
   strcpy(n_name, name);
   pzero.nav_zoom();
@@ -285,6 +285,7 @@ void GrowRectRounded::save(std::ofstream& fp, glow_eSaveMode mode)
      << disable_gradient << '\n';
   fp << int(glow_eSave_GrowRectRounded_fixposition) << FSPACE << fixposition
      << '\n';
+  fp << int(glow_eSave_GrowRectRounded_transparency) << FSPACE << transparency << '\n';
   fp << int(glow_eSave_GrowRectRounded_dynamicsize) << FSPACE << dynamicsize
      << '\n';
   fp << int(glow_eSave_GrowRectRounded_dynamic) << '\n';
@@ -386,6 +387,9 @@ void GrowRectRounded::open(std::ifstream& fp)
       break;
     case glow_eSave_GrowRectRounded_disable_gradient:
       fp >> disable_gradient;
+      break;
+    case glow_eSave_GrowRectRounded_transparency:
+      fp >> transparency;
       break;
     case glow_eSave_GrowRectRounded_dynamicsize:
       fp >> dynamicsize;
@@ -707,6 +711,10 @@ void GrowRectRounded::draw(GlowWind* w, GlowTransform* t, int highlight,
   int idx;
   glow_eDrawType drawtype;
 
+  double transp = transparency;
+  if (colornode && ((GrowNode*)colornode)->transparency > transparency)
+    transp = ((GrowNode*)colornode)->transparency;
+
   if (fix_line_width) {
     idx = line_width;
     idx += hot;
@@ -763,19 +771,19 @@ void GrowRectRounded::draw(GlowWind* w, GlowTransform* t, int highlight,
           drawtype = fillcolor;
 
         ctx->gdraw->fill_rect(w, ll_x, ll_y + amount, ur_x - ll_x,
-            ur_y - ll_y - 2 * amount, drawtype);
+            ur_y - ll_y - 2 * amount, drawtype, transp);
         ctx->gdraw->fill_rect(
-            w, ll_x + amount, ll_y, ur_x - ll_x - 2 * amount, amount, drawtype);
+            w, ll_x + amount, ll_y, ur_x - ll_x - 2 * amount, amount, drawtype, transp);
         ctx->gdraw->fill_rect(w, ll_x + amount, ur_y - amount,
-            ur_x - ll_x - 2 * amount, amount, drawtype);
+            ur_x - ll_x - 2 * amount, amount, drawtype, transp);
         ctx->gdraw->fill_arc(
-            w, ll_x, ll_y, 2 * amount, 2 * amount, 90, 90, drawtype, 0);
+            w, ll_x, ll_y, 2 * amount, 2 * amount, 90, 90, drawtype, 0, transp);
         ctx->gdraw->fill_arc(w, ll_x, ur_y - 2 * amount, 2 * amount, 2 * amount,
-            180, 90, drawtype, 0);
+            180, 90, drawtype, 0, transp);
         ctx->gdraw->fill_arc(w, ur_x - 2 * amount, ur_y - 2 * amount,
-            2 * amount, 2 * amount, 270, 90, drawtype, 0);
+            2 * amount, 2 * amount, 270, 90, drawtype, 0, transp);
         ctx->gdraw->fill_arc(w, ur_x - 2 * amount, ll_y, 2 * amount, 2 * amount,
-            0, 90, drawtype, 0);
+            0, 90, drawtype, 0, transp);
       } else {
         glow_eDrawType f1, f2;
         double rotation;
@@ -797,7 +805,7 @@ void GrowRectRounded::draw(GlowWind* w, GlowTransform* t, int highlight,
         }
         ctx->gdraw->gradient_fill_rectrounded(w, ll_x, ll_y, ur_x - ll_x,
             ur_y - ll_y, amount, fillcolor, f1, f2,
-            ctx->gdraw->gradient_rotate(rotation, grad));
+	    ctx->gdraw->gradient_rotate(rotation, grad), transp);
       }
     } else {
       int drawtype_incr = shadow_contrast;
@@ -878,7 +886,7 @@ void GrowRectRounded::draw(GlowWind* w, GlowTransform* t, int highlight,
         }
         ctx->gdraw->gradient_fill_rectrounded(w, ll_x + ish, ll_y + ish,
             ur_x - ll_x - 2 * ish, ur_y - ll_y - 2 * ish, amount - ish,
-            fillcolor, f1, f2, ctx->gdraw->gradient_rotate(rotation, grad));
+	    fillcolor, f1, f2, ctx->gdraw->gradient_rotate(rotation, grad), 0);
       }
     }
   }
@@ -887,21 +895,21 @@ void GrowRectRounded::draw(GlowWind* w, GlowTransform* t, int highlight,
         highlight, (GrowNode*)colornode, 0);
     int c = 0;
     ctx->gdraw->line(
-        w, ll_x + amount, ll_y, ur_x - amount, ll_y, drawtype, idx, 0);
+	w, ll_x + amount, ll_y, ur_x - amount, ll_y, drawtype, idx, 0, transp);
     ctx->gdraw->line(
-        w, ll_x, ll_y - c + amount, ll_x, ur_y - c - amount, drawtype, idx, 0);
+        w, ll_x, ll_y - c + amount, ll_x, ur_y - c - amount, drawtype, idx, 0, transp);
     ctx->gdraw->line(
-        w, ll_x + amount, ur_y, ur_x - amount, ur_y, drawtype, idx, 0);
+        w, ll_x + amount, ur_y, ur_x - amount, ur_y, drawtype, idx, 0, transp);
     ctx->gdraw->line(
-        w, ur_x - c, ll_y + amount, ur_x - c, ur_y - amount, drawtype, idx, 0);
+        w, ur_x - c, ll_y + amount, ur_x - c, ur_y - amount, drawtype, idx, 0, transp);
     ctx->gdraw->arc(
-        w, ll_x, ll_y, 2 * amount, 2 * amount, 90, 90, drawtype, idx, 0);
+        w, ll_x, ll_y, 2 * amount, 2 * amount, 90, 90, drawtype, idx, 0, transp);
     ctx->gdraw->arc(w, ll_x, ur_y - 2 * amount, 2 * amount, 2 * amount, 180, 90,
-        drawtype, idx, 0);
+        drawtype, idx, 0, transp);
     ctx->gdraw->arc(w, ur_x - 2 * amount, ur_y - 2 * amount, 2 * amount,
-        2 * amount, 270, 90, drawtype, idx, 0);
+        2 * amount, 270, 90, drawtype, idx, 0, transp);
     ctx->gdraw->arc(w, ur_x - 2 * amount, ll_y, 2 * amount, 2 * amount, 0, 90,
-        drawtype, idx, 0);
+        drawtype, idx, 0, transp);
   }
 }
 

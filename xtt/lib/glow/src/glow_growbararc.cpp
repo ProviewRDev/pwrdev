@@ -315,7 +315,7 @@ void GrowBarArc::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
     }
     ctx->gdraw->gradient_fill_arc(w, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y,
 	ang, float(angle2) * (value - min_value) / (max_value - min_value), 
-        bar_drawtype, f1, f2, gradient);
+        bar_drawtype, f1, f2, gradient, transparency);
   }
 
   // Draw inner circle background

@@ -1872,6 +1872,7 @@ typedef enum {
   glow_eSave_GrowRectRounded_gradient_contrast = 3820,
   glow_eSave_GrowRectRounded_disable_gradient = 3821,
   glow_eSave_GrowRectRounded_fixposition = 3822,
+  glow_eSave_GrowRectRounded_transparency = 3823,
   glow_eSave_GrowConGlue_line_width_up = 3900,
   glow_eSave_GrowConGlue_line_width_down = 3901,
   glow_eSave_GrowConGlue_line_width_left = 3902,

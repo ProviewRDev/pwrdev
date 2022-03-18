@@ -868,7 +868,7 @@ void GrowRect::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
         }
         ctx->gdraw->gradient_fill_rect(w, ll_x + ish, ll_y + ish,
             ur_x - ll_x - 2 * ish, ur_y - ll_y - 2 * ish, f0, f1, f2,
-            ctx->gdraw->gradient_rotate(rotation, grad));
+	    ctx->gdraw->gradient_rotate(rotation, grad), transp);
       }
     } else {
       if (grad == glow_eGradient_No || fillcolor == glow_eDrawType_ColorRed) {
@@ -903,7 +903,7 @@ void GrowRect::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
           f0 = fillcolor;
         }
         ctx->gdraw->gradient_fill_rect(w, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y,
-            f0, f1, f2, ctx->gdraw->gradient_rotate(rotation, grad));
+            f0, f1, f2, ctx->gdraw->gradient_rotate(rotation, grad), transp);
       }
     }
   }

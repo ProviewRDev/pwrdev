@@ -321,6 +321,7 @@ public:
   int gradient_contrast; //!< Gradient contrast.
   int disable_gradient; //!< Disable gradient, even if parent node has gradient.
   int fixposition; //!< Can't be moved.
+  double transparency; //!< Border and fill color transparency.
 
   //! Set user data.
   /*!

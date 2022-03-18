@@ -438,7 +438,7 @@ void GrowBarChart::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
 	  }
 	    ctx->gdraw->gradient_fill_rect(w, bar_ll_x, bar_up_ll_y,
 	        bar_ur_x - bar_ll_x, bar_up_ur_y - bar_up_ll_y, fillcolor, f1, f2,
-	        grad);
+	        grad, transparency);
 	  }
 	}
 
@@ -499,7 +499,7 @@ void GrowBarChart::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
 	    }
 	    ctx->gdraw->gradient_fill_rect(w, bar_ll_x, bar_down_ll_y,
 		bar_ur_x - bar_ll_x, bar_down_ur_y - bar_down_ll_y, fillcolor, f1, f2,
-		grad);
+		grad, transparency);
 	  }
 	}
       }

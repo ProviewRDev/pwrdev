@@ -421,7 +421,7 @@ void GrowPie::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
             fillcolor, gradient_contrast / 2 + chot, 0);
       }
       ctx->gdraw->gradient_fill_arc(w, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y,
-          ia1 - rot, ia2, fillcolor, f1, f2, grad);
+          ia1 - rot, ia2, fillcolor, f1, f2, grad, transparency);
     } else {
       int ish = int(shadow_width / 100 * MIN(ur_x - ll_x, ur_y - ll_y) + 0.5);
       int drawtype_incr = shadow_contrast;
@@ -437,7 +437,7 @@ void GrowPie::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
           fillcolor, drawtype_incr + chot, (GrowNode*)colornode);
 
       ctx->gdraw->gradient_fill_arc(w, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y,
-          ia1 - rot, ia2, fillcolor, f2, f1, glow_eGradient_DiagonalUpperLeft);
+          ia1 - rot, ia2, fillcolor, f2, f1, glow_eGradient_DiagonalUpperLeft, transparency);
 
       // Draw circle
       if (gradient_contrast >= 0) {
@@ -453,7 +453,7 @@ void GrowPie::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
       }
       ctx->gdraw->gradient_fill_arc(w, ll_x + ish, ll_y + ish,
           ur_x - ll_x - 2 * ish, ur_y - ll_y - 2 * ish, ia1 - rot, ia2,
-          fillcolor, f1, f2, grad);
+          fillcolor, f1, f2, grad, transparency);
     }
     a1 += a2;
     ia1 += ia2;

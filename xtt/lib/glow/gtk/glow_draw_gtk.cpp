@@ -2969,10 +2969,11 @@ void GlowDrawGtk::reset_cairo_clip(DrawWind* wind, cairo_t* cr)
 
 int GlowDrawGtk::gradient_create_pattern(int x, int y, int w, int h,
     glow_eDrawType d0, glow_eDrawType d1, glow_eDrawType d2,
-    glow_eGradient gradient, cairo_pattern_t** pat)
+    glow_eGradient gradient, double transparency, cairo_pattern_t** pat)
 {
   double r1, g1, b1, r2, g2, b2;
   int a = 15;
+  int notransp = feq(transparency, 0.0);
 
   GlowColor::rgb_color(d1, &r1, &g1, &b1, get_customcolors());
   GlowColor::rgb_color(d2, &r2, &g2, &b2, get_customcolors());
@@ -2980,54 +2981,98 @@ int GlowDrawGtk::gradient_create_pattern(int x, int y, int w, int h,
   switch (gradient) {
   case glow_eGradient_HorizontalUp:
     *pat = cairo_pattern_create_linear(x, y, x, y + h);
-    cairo_pattern_add_color_stop_rgb(*pat, 0.1, r2, g2, b2);
-    cairo_pattern_add_color_stop_rgb(*pat, 0.9, r1, g1, b1);
+    if (notransp) {
+      cairo_pattern_add_color_stop_rgb(*pat, 0.1, r2, g2, b2);
+      cairo_pattern_add_color_stop_rgb(*pat, 0.9, r1, g1, b1);
+    } else {
+      cairo_pattern_add_color_stop_rgba(*pat, 0.1, r2, g2, b2, 1.0 - transparency);
+      cairo_pattern_add_color_stop_rgba(*pat, 0.9, r1, g1, b1, 1.0 - transparency);
+    }
     break;
   case glow_eGradient_HorizontalDown:
     *pat = cairo_pattern_create_linear(x, y, x, y + h);
-    cairo_pattern_add_color_stop_rgb(*pat, 0.1, r1, g1, b1);
-    cairo_pattern_add_color_stop_rgb(*pat, 0.9, r2, g2, b2);
+    if (notransp) {
+      cairo_pattern_add_color_stop_rgb(*pat, 0.1, r1, g1, b1);
+      cairo_pattern_add_color_stop_rgb(*pat, 0.9, r2, g2, b2);
+    } else {
+      cairo_pattern_add_color_stop_rgba(*pat, 0.1, r1, g1, b1, 1.0 - transparency);
+      cairo_pattern_add_color_stop_rgba(*pat, 0.9, r2, g2, b2, 1.0 - transparency);
+    }
     break;
   case glow_eGradient_HorizontalTube1:
     *pat = cairo_pattern_create_linear(x, y, x, y + h);
-    cairo_pattern_add_color_stop_rgb(*pat, 0, r1, g1, b1);
-    cairo_pattern_add_color_stop_rgb(*pat, 0.5, r2, g2, b2);
-    cairo_pattern_add_color_stop_rgb(*pat, 1, r1, g1, b1);
+    if (notransp) {
+      cairo_pattern_add_color_stop_rgb(*pat, 0, r1, g1, b1);
+      cairo_pattern_add_color_stop_rgb(*pat, 0.5, r2, g2, b2);
+      cairo_pattern_add_color_stop_rgb(*pat, 1, r1, g1, b1);
+    } else {
+      cairo_pattern_add_color_stop_rgba(*pat, 0, r1, g1, b1, 1.0 - transparency);
+      cairo_pattern_add_color_stop_rgba(*pat, 0.5, r2, g2, b2, 1.0 - transparency);
+      cairo_pattern_add_color_stop_rgba(*pat, 1, r1, g1, b1, 1.0 - transparency);
+    }
     break;
   case glow_eGradient_HorizontalTube2: {
     double r0, g0, b0;
 
     *pat = cairo_pattern_create_linear(x, y, x, y + h);
     GlowColor::rgb_color(d0, &r0, &g0, &b0, get_customcolors());
-    cairo_pattern_add_color_stop_rgb(*pat, 0, r0, g0, b0);
-    cairo_pattern_add_color_stop_rgb(*pat, 0.3, r2, g2, b2);
-    cairo_pattern_add_color_stop_rgb(*pat, .95, r1, g1, b1);
+    if (notransp) {
+      cairo_pattern_add_color_stop_rgb(*pat, 0, r0, g0, b0);
+      cairo_pattern_add_color_stop_rgb(*pat, 0.3, r2, g2, b2);
+      cairo_pattern_add_color_stop_rgb(*pat, .95, r1, g1, b1);
+    } else {
+      cairo_pattern_add_color_stop_rgba(*pat, 0, r0, g0, b0, 1.0 - transparency);
+      cairo_pattern_add_color_stop_rgba(*pat, 0.3, r2, g2, b2, 1.0 - transparency);
+      cairo_pattern_add_color_stop_rgba(*pat, .95, r1, g1, b1, 1.0 - transparency);
+    }
     break;
   }
   case glow_eGradient_VerticalRight:
     *pat = cairo_pattern_create_linear(x, y, x + w, y);
-    cairo_pattern_add_color_stop_rgb(*pat, 0.1, r1, g1, b1);
-    cairo_pattern_add_color_stop_rgb(*pat, 0.9, r2, g2, b2);
+    if (notransp) {
+      cairo_pattern_add_color_stop_rgb(*pat, 0.1, r1, g1, b1);
+      cairo_pattern_add_color_stop_rgb(*pat, 0.9, r2, g2, b2);
+    } else {
+      cairo_pattern_add_color_stop_rgba(*pat, 0.1, r1, g1, b1, 1.0 - transparency);
+      cairo_pattern_add_color_stop_rgba(*pat, 0.9, r2, g2, b2, 1.0 - transparency);
+    }
     break;
   case glow_eGradient_VerticalLeft:
     *pat = cairo_pattern_create_linear(x, y, x + w, y);
-    cairo_pattern_add_color_stop_rgb(*pat, 0.1, r2, g2, b2);
-    cairo_pattern_add_color_stop_rgb(*pat, 0.9, r1, g1, b1);
+    if (notransp) {
+      cairo_pattern_add_color_stop_rgb(*pat, 0.1, r2, g2, b2);
+      cairo_pattern_add_color_stop_rgb(*pat, 0.9, r1, g1, b1);
+    } else {
+      cairo_pattern_add_color_stop_rgba(*pat, 0.1, r2, g2, b2, 1.0 - transparency);
+      cairo_pattern_add_color_stop_rgba(*pat, 0.9, r1, g1, b1, 1.0 - transparency);
+    }
     break;
   case glow_eGradient_VerticalTube1:
     *pat = cairo_pattern_create_linear(x, y, x + w, y);
-    cairo_pattern_add_color_stop_rgb(*pat, 0, r1, g1, b1);
-    cairo_pattern_add_color_stop_rgb(*pat, 0.5, r2, g2, b2);
-    cairo_pattern_add_color_stop_rgb(*pat, 1, r1, g1, b1);
+    if (notransp) {
+      cairo_pattern_add_color_stop_rgb(*pat, 0, r1, g1, b1);
+      cairo_pattern_add_color_stop_rgb(*pat, 0.5, r2, g2, b2);
+      cairo_pattern_add_color_stop_rgb(*pat, 1, r1, g1, b1);
+    } else {
+      cairo_pattern_add_color_stop_rgba(*pat, 0, r1, g1, b1, 1.0 - transparency);
+      cairo_pattern_add_color_stop_rgba(*pat, 0.5, r2, g2, b2, 1.0 - transparency);
+      cairo_pattern_add_color_stop_rgba(*pat, 1, r1, g1, b1, 1.0 - transparency);
+    }
     break;
   case glow_eGradient_VerticalTube2: {
     double r0, g0, b0;
 
     GlowColor::rgb_color(d0, &r0, &g0, &b0, get_customcolors());
     *pat = cairo_pattern_create_linear(x, y, x + w, y);
-    cairo_pattern_add_color_stop_rgb(*pat, 0, r0, g0, b0);
-    cairo_pattern_add_color_stop_rgb(*pat, 0.3, r2, g2, b2);
-    cairo_pattern_add_color_stop_rgb(*pat, 0.95, r1, g1, b1);
+    if (notransp) {
+      cairo_pattern_add_color_stop_rgb(*pat, 0, r0, g0, b0);
+      cairo_pattern_add_color_stop_rgb(*pat, 0.3, r2, g2, b2);
+      cairo_pattern_add_color_stop_rgb(*pat, 0.95, r1, g1, b1);
+    } else {
+      cairo_pattern_add_color_stop_rgba(*pat, 0, r0, g0, b0, 1.0 - transparency);
+      cairo_pattern_add_color_stop_rgba(*pat, 0.3, r2, g2, b2, 1.0 - transparency);
+      cairo_pattern_add_color_stop_rgba(*pat, 0.95, r1, g1, b1, 1.0 - transparency);
+    }
     break;
   }
   case glow_eGradient_DiagonalUpperLeft: {
@@ -3045,8 +3090,13 @@ int GlowDrawGtk::gradient_create_pattern(int x, int y, int w, int h,
       x1 = x + w + (h - w) / a;
     }
     *pat = cairo_pattern_create_linear(x0, y0, x1, y1);
-    cairo_pattern_add_color_stop_rgb(*pat, 0.1, r2, g2, b2);
-    cairo_pattern_add_color_stop_rgb(*pat, 0.9, r1, g1, b1);
+    if (notransp) {
+      cairo_pattern_add_color_stop_rgb(*pat, 0.1, r2, g2, b2);
+      cairo_pattern_add_color_stop_rgb(*pat, 0.9, r1, g1, b1);
+    } else {
+      cairo_pattern_add_color_stop_rgba(*pat, 0.1, r2, g2, b2, 1.0 - transparency);
+      cairo_pattern_add_color_stop_rgba(*pat, 0.9, r1, g1, b1, 1.0 - transparency);
+    }
     break;
   }
   case glow_eGradient_DiagonalLowerLeft: {
@@ -3064,8 +3114,13 @@ int GlowDrawGtk::gradient_create_pattern(int x, int y, int w, int h,
       x0 = x - (h - w) / a;
     }
     *pat = cairo_pattern_create_linear(x0, y0, x1, y1);
-    cairo_pattern_add_color_stop_rgb(*pat, 0.1, r2, g2, b2);
-    cairo_pattern_add_color_stop_rgb(*pat, 0.9, r1, g1, b1);
+    if (notransp) {
+      cairo_pattern_add_color_stop_rgb(*pat, 0.1, r2, g2, b2);
+      cairo_pattern_add_color_stop_rgb(*pat, 0.9, r1, g1, b1);
+    } else {
+      cairo_pattern_add_color_stop_rgba(*pat, 0.1, r2, g2, b2, 1.0 - transparency);
+      cairo_pattern_add_color_stop_rgba(*pat, 0.9, r1, g1, b1, 1.0 - transparency);
+    }
     break;
   }
   case glow_eGradient_DiagonalUpperRight: {
@@ -3083,8 +3138,13 @@ int GlowDrawGtk::gradient_create_pattern(int x, int y, int w, int h,
       x0 = x - (h - w) / a;
     }
     *pat = cairo_pattern_create_linear(x0, y0, x1, y1);
-    cairo_pattern_add_color_stop_rgb(*pat, 0.1, r1, g1, b1);
-    cairo_pattern_add_color_stop_rgb(*pat, 0.9, r2, g2, b2);
+    if (notransp) {
+      cairo_pattern_add_color_stop_rgb(*pat, 0.1, r1, g1, b1);
+      cairo_pattern_add_color_stop_rgb(*pat, 0.9, r2, g2, b2);
+    } else {
+      cairo_pattern_add_color_stop_rgba(*pat, 0.1, r1, g1, b1, 1.0 - transparency);
+      cairo_pattern_add_color_stop_rgba(*pat, 0.9, r2, g2, b2, 1.0 - transparency);
+    }
     break;
   }
   case glow_eGradient_DiagonalLowerRight: {
@@ -3102,8 +3162,13 @@ int GlowDrawGtk::gradient_create_pattern(int x, int y, int w, int h,
       x1 = x + w + (h - w) / a;
     }
     *pat = cairo_pattern_create_linear(x0, y0, x1, y1);
-    cairo_pattern_add_color_stop_rgb(*pat, 0.1, r1, g1, b1);
-    cairo_pattern_add_color_stop_rgb(*pat, 0.9, r2, g2, b2);
+    if (notransp) {
+      cairo_pattern_add_color_stop_rgb(*pat, 0.1, r1, g1, b1);
+      cairo_pattern_add_color_stop_rgb(*pat, 0.9, r2, g2, b2);
+    } else {
+      cairo_pattern_add_color_stop_rgba(*pat, 0.1, r1, g1, b1, 1.0 - transparency);
+      cairo_pattern_add_color_stop_rgba(*pat, 0.9, r2, g2, b2, 1.0 - transparency);
+    }
     break;
   }
   case glow_eGradient_DiagonalUpTube: {
@@ -3121,9 +3186,15 @@ int GlowDrawGtk::gradient_create_pattern(int x, int y, int w, int h,
       x1 = x + w + (h - w) / a;
     }
     *pat = cairo_pattern_create_linear(x0, y0, x1, y1);
-    cairo_pattern_add_color_stop_rgb(*pat, 0.1, r1, g1, b1);
-    cairo_pattern_add_color_stop_rgb(*pat, 0.5, r2, g2, b2);
-    cairo_pattern_add_color_stop_rgb(*pat, 0.9, r1, g1, b1);
+    if (notransp) {
+      cairo_pattern_add_color_stop_rgb(*pat, 0.1, r1, g1, b1);
+      cairo_pattern_add_color_stop_rgb(*pat, 0.5, r2, g2, b2);
+      cairo_pattern_add_color_stop_rgb(*pat, 0.9, r1, g1, b1);
+    } else {
+      cairo_pattern_add_color_stop_rgba(*pat, 0.1, r1, g1, b1, 1.0 - transparency);
+      cairo_pattern_add_color_stop_rgba(*pat, 0.5, r2, g2, b2, 1.0 - transparency);
+      cairo_pattern_add_color_stop_rgba(*pat, 0.9, r1, g1, b1, 1.0 - transparency);
+    }
     break;
   }
   case glow_eGradient_DiagonalDownTube: {
@@ -3141,45 +3212,81 @@ int GlowDrawGtk::gradient_create_pattern(int x, int y, int w, int h,
       x0 = x - (h - w) / a;
     }
     *pat = cairo_pattern_create_linear(x0, y0, x1, y1);
-    cairo_pattern_add_color_stop_rgb(*pat, 0.1, r1, g1, b1);
-    cairo_pattern_add_color_stop_rgb(*pat, 0.5, r2, g2, b2);
-    cairo_pattern_add_color_stop_rgb(*pat, 0.9, r1, g1, b1);
+    if (notransp) {
+      cairo_pattern_add_color_stop_rgb(*pat, 0.1, r1, g1, b1);
+      cairo_pattern_add_color_stop_rgb(*pat, 0.5, r2, g2, b2);
+      cairo_pattern_add_color_stop_rgb(*pat, 0.9, r1, g1, b1);
+    } else {
+      cairo_pattern_add_color_stop_rgba(*pat, 0.1, r1, g1, b1, 1.0 - transparency);
+      cairo_pattern_add_color_stop_rgba(*pat, 0.5, r2, g2, b2, 1.0 - transparency);
+      cairo_pattern_add_color_stop_rgba(*pat, 0.9, r1, g1, b1, 1.0 - transparency);
+    }
     break;
   }
   case glow_eGradient_Globe:
     *pat = cairo_pattern_create_radial(x + w / 3, y + h / 3, 0, x + w / 3,
         y + h / 3, sqrt(w * w / 4 + h * h / 4));
-    cairo_pattern_add_color_stop_rgb(*pat, 0.9, r1, g1, b1);
-    cairo_pattern_add_color_stop_rgb(*pat, 0.1, r2, g2, b2);
+    if (notransp) {
+      cairo_pattern_add_color_stop_rgb(*pat, 0.9, r1, g1, b1);
+      cairo_pattern_add_color_stop_rgb(*pat, 0.1, r2, g2, b2);
+    } else {
+      cairo_pattern_add_color_stop_rgba(*pat, 0.9, r1, g1, b1, 1.0 - transparency);
+      cairo_pattern_add_color_stop_rgba(*pat, 0.1, r2, g2, b2, 1.0 - transparency);
+    }
     break;
   case glow_eGradient_RadialCenter:
     *pat = cairo_pattern_create_radial(x + w / 2, y + h / 2, 0, x + w / 2,
         y + h / 2, sqrt(w * w / 4 + h * h / 4));
-    cairo_pattern_add_color_stop_rgb(*pat, 0.9, r1, g1, b1);
-    cairo_pattern_add_color_stop_rgb(*pat, 0.1, r2, g2, b2);
+    if (notransp) {
+      cairo_pattern_add_color_stop_rgb(*pat, 0.9, r1, g1, b1);
+      cairo_pattern_add_color_stop_rgb(*pat, 0.1, r2, g2, b2);
+    } else {
+      cairo_pattern_add_color_stop_rgba(*pat, 0.9, r1, g1, b1, 1.0 - transparency);
+      cairo_pattern_add_color_stop_rgba(*pat, 0.1, r2, g2, b2, 1.0 - transparency);
+    }
     break;
   case glow_eGradient_RadialUpperLeft:
     *pat = cairo_pattern_create_radial(x, y, 0, x, y, sqrt(w * w + h * h));
-    cairo_pattern_add_color_stop_rgb(*pat, 0.9, r1, g1, b1);
-    cairo_pattern_add_color_stop_rgb(*pat, 0.1, r2, g2, b2);
+    if (notransp) {
+      cairo_pattern_add_color_stop_rgb(*pat, 0.9, r1, g1, b1);
+      cairo_pattern_add_color_stop_rgb(*pat, 0.1, r2, g2, b2);
+    } else {
+      cairo_pattern_add_color_stop_rgba(*pat, 0.9, r1, g1, b1, 1.0 - transparency);
+      cairo_pattern_add_color_stop_rgba(*pat, 0.1, r2, g2, b2, 1.0 - transparency);
+    }
     break;
   case glow_eGradient_RadialLowerLeft:
     *pat = cairo_pattern_create_radial(
         x, y + h, 0, x, y + h, sqrt(w * w + h * h));
-    cairo_pattern_add_color_stop_rgb(*pat, 0.9, r1, g1, b1);
-    cairo_pattern_add_color_stop_rgb(*pat, 0.1, r2, g2, b2);
+    if (notransp) {
+      cairo_pattern_add_color_stop_rgb(*pat, 0.9, r1, g1, b1);
+      cairo_pattern_add_color_stop_rgb(*pat, 0.1, r2, g2, b2);
+    } else {
+      cairo_pattern_add_color_stop_rgba(*pat, 0.9, r1, g1, b1, 1.0 - transparency);
+      cairo_pattern_add_color_stop_rgba(*pat, 0.1, r2, g2, b2, 1.0 - transparency);
+    }
     break;
   case glow_eGradient_RadialUpperRight:
     *pat = cairo_pattern_create_radial(
         x + w, y, 0, x + w, y, sqrt(w * w + h * h));
-    cairo_pattern_add_color_stop_rgb(*pat, 0.9, r1, g1, b1);
-    cairo_pattern_add_color_stop_rgb(*pat, 0.1, r2, g2, b2);
+    if (notransp) {
+      cairo_pattern_add_color_stop_rgb(*pat, 0.9, r1, g1, b1);
+      cairo_pattern_add_color_stop_rgb(*pat, 0.1, r2, g2, b2);
+    } else {
+      cairo_pattern_add_color_stop_rgba(*pat, 0.9, r1, g1, b1, 1.0 - transparency);
+      cairo_pattern_add_color_stop_rgba(*pat, 0.1, r2, g2, b2, 1.0 - transparency);
+    }
     break;
   case glow_eGradient_RadialLowerRight:
     *pat = cairo_pattern_create_radial(
         x + w, y + h, 0, x + w, y + h, sqrt(w * w + h * h));
-    cairo_pattern_add_color_stop_rgb(*pat, 0.9, r1, g1, b1);
-    cairo_pattern_add_color_stop_rgb(*pat, 0.1, r2, g2, b2);
+    if (notransp) {
+      cairo_pattern_add_color_stop_rgb(*pat, 0.9, r1, g1, b1);
+      cairo_pattern_add_color_stop_rgb(*pat, 0.1, r2, g2, b2);
+    } else {
+      cairo_pattern_add_color_stop_rgba(*pat, 0.9, r1, g1, b1, 1.0 - transparency);
+      cairo_pattern_add_color_stop_rgba(*pat, 0.1, r2, g2, b2, 1.0 - transparency);
+    }
     break;
   default:
     return 0;
@@ -3359,7 +3466,7 @@ glow_eGradient GlowDrawGtk::gradient_rotate(double rot, glow_eGradient gradient)
 
 int GlowDrawGtk::gradient_fill_rect(GlowWind* wind, int x, int y, int w, int h,
     glow_eDrawType d0, glow_eDrawType d1, glow_eDrawType d2,
-    glow_eGradient gradient)
+    glow_eGradient gradient, double transparency)
 {
   DrawWindGtk* ww = (DrawWindGtk*)wind->window;
   if (ctx->nodraw)
@@ -3371,7 +3478,7 @@ int GlowDrawGtk::gradient_fill_rect(GlowWind* wind, int x, int y, int w, int h,
     set_cairo_clip(ww, cr);
 
   cairo_pattern_t* pat;
-  if (!gradient_create_pattern(x, y, w, h, d0, d1, d2, gradient, &pat))
+  if (!gradient_create_pattern(x, y, w, h, d0, d1, d2, gradient, transparency, &pat))
     return 0;
   cairo_rectangle(cr, x, y, w, h);
   cairo_set_source(cr, pat);
@@ -3387,7 +3494,7 @@ int GlowDrawGtk::gradient_fill_rect(GlowWind* wind, int x, int y, int w, int h,
 
 int GlowDrawGtk::gradient_fill_rectrounded(GlowWind* wind, int x, int y, int w,
     int h, int roundamount, glow_eDrawType d0, glow_eDrawType d1,
-    glow_eDrawType d2, glow_eGradient gradient)
+    glow_eDrawType d2, glow_eGradient gradient, double transparency)
 {
   DrawWindGtk* ww = (DrawWindGtk*)wind->window;
   if (ctx->nodraw)
@@ -3399,7 +3506,7 @@ int GlowDrawGtk::gradient_fill_rectrounded(GlowWind* wind, int x, int y, int w,
     set_cairo_clip(ww, cr);
 
   cairo_pattern_t* pat;
-  if (!gradient_create_pattern(x, y, w, h, d0, d1, d2, gradient, &pat))
+  if (!gradient_create_pattern(x, y, w, h, d0, d1, d2, gradient, transparency, &pat))
     return 0;
 
   if (roundamount >= 0) {
@@ -3432,7 +3539,7 @@ int GlowDrawGtk::gradient_fill_rectrounded(GlowWind* wind, int x, int y, int w,
 
 int GlowDrawGtk::gradient_fill_arc(GlowWind* wind, int x, int y, int w, int h,
     int angle1, int angle2, glow_eDrawType d0, glow_eDrawType d1,
-    glow_eDrawType d2, glow_eGradient gradient)
+    glow_eDrawType d2, glow_eGradient gradient, double transparency)
 {
   DrawWindGtk* ww = (DrawWindGtk*)wind->window;
   if (ctx->nodraw)
@@ -3449,7 +3556,7 @@ int GlowDrawGtk::gradient_fill_arc(GlowWind* wind, int x, int y, int w, int h,
     set_cairo_clip(ww, cr);
 
   cairo_pattern_t* pat;
-  if (!gradient_create_pattern(x, y, w, h, d0, d1, d2, gradient, &pat))
+  if (!gradient_create_pattern(x, y, w, h, d0, d1, d2, gradient, transparency, &pat))
     return 0;
 
   cairo_save(cr);
@@ -3475,7 +3582,7 @@ int GlowDrawGtk::gradient_fill_arc(GlowWind* wind, int x, int y, int w, int h,
 
 int GlowDrawGtk::gradient_fill_polyline(GlowWind* wind, glow_sPointX* points,
     int point_cnt, glow_eDrawType d0, glow_eDrawType d1, glow_eDrawType d2,
-    glow_eGradient gradient)
+    glow_eGradient gradient, double transparency)
 {
   DrawWindGtk* ww = (DrawWindGtk*)wind->window;
   if (ctx->nodraw)
@@ -3507,7 +3614,7 @@ int GlowDrawGtk::gradient_fill_polyline(GlowWind* wind, glow_sPointX* points,
 
   cairo_pattern_t* pat;
   if (!gradient_create_pattern((int)x0, (int)y0, (int)(x1 - x0),
-      (int)(y1 - y0), d0, d1, d2, gradient, &pat))
+      (int)(y1 - y0), d0, d1, d2, gradient, transparency, &pat))
     return 0;
   cairo_set_source(cr, pat);
   cairo_fill(cr);

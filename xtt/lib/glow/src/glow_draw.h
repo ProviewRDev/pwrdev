@@ -168,16 +168,16 @@ public:
   virtual glow_eGradient gradient_rotate(double rot, glow_eGradient gradient);
   virtual int gradient_fill_rect(GlowWind* wind, int x, int y, int w, int h,
       glow_eDrawType d0, glow_eDrawType d1, glow_eDrawType d2,
-      glow_eGradient gradient);
+      glow_eGradient gradient, double transparency);
   virtual int gradient_fill_rectrounded(GlowWind* wind, int x, int y, int w,
       int h, int roundamount, glow_eDrawType d0, glow_eDrawType d1,
-      glow_eDrawType d2, glow_eGradient gradient);
+      glow_eDrawType d2, glow_eGradient gradient, double transparency);
   virtual int gradient_fill_arc(GlowWind* wind, int x, int y, int w, int h,
       int angle1, int angle2, glow_eDrawType d0, glow_eDrawType d1,
-      glow_eDrawType d2, glow_eGradient gradient);
+      glow_eDrawType d2, glow_eGradient gradient, double transparency);
   virtual int gradient_fill_polyline(GlowWind* wind, glow_sPointX* points,
       int point_cnt, glow_eDrawType d0, glow_eDrawType d1, glow_eDrawType d2,
-      glow_eGradient gradient);
+      glow_eGradient gradient, double transparency);
   virtual void event_exec(void* event, unsigned int size);
   virtual void push_background(glow_eDrawType color);
   virtual void pop_background();

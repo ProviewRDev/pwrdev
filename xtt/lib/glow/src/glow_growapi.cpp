@@ -1339,6 +1339,8 @@ int grow_GetObjectAttrInfo(
     strcpy(attrinfo[i].name, "transparency");
     attrinfo[i].value_p = &op->transparency;
     attrinfo[i].type = glow_eType_Double;
+    attrinfo[i].minlimit = 0;
+    attrinfo[i].maxlimit = 1;
     attrinfo[i++].size = sizeof(op->transparency);
 
     strcpy(attrinfo[i].name, "invisible");
@@ -1441,6 +1443,13 @@ int grow_GetObjectAttrInfo(
     attrinfo[i].type = glow_eType_Gradient;
     attrinfo[i++].size = sizeof(op->gradient);
 
+    strcpy(attrinfo[i].name, "transparency");
+    attrinfo[i].value_p = &op->transparency;
+    attrinfo[i].type = glow_eType_Double;
+    attrinfo[i].minlimit = 0;
+    attrinfo[i].maxlimit = 1;
+    attrinfo[i++].size = sizeof(op->transparency);
+
     strcpy(attrinfo[i].name, "disable_shadow");
     attrinfo[i].value_p = &op->disable_shadow;
     attrinfo[i].type = glow_eType_Boolean;
@@ -1517,6 +1526,8 @@ int grow_GetObjectAttrInfo(
     strcpy(attrinfo[i].name, "transparency");
     attrinfo[i].value_p = &op->transparency;
     attrinfo[i].type = glow_eType_Double;
+    attrinfo[i].minlimit = 0;
+    attrinfo[i].maxlimit = 1;
     attrinfo[i++].size = sizeof(op->transparency);
 
     strcpy(attrinfo[i].name, "disable_shadow");
@@ -1599,6 +1610,8 @@ int grow_GetObjectAttrInfo(
     strcpy(attrinfo[i].name, "transparency");
     attrinfo[i].value_p = &op->transparency;
     attrinfo[i].type = glow_eType_Double;
+    attrinfo[i].minlimit = 0;
+    attrinfo[i].maxlimit = 1;
     attrinfo[i++].size = sizeof(op->transparency);
 
     strcpy(attrinfo[i].name, "Dynamic");
@@ -1667,6 +1680,8 @@ int grow_GetObjectAttrInfo(
     strcpy(attrinfo[i].name, "transparency");
     attrinfo[i].value_p = &op->transparency;
     attrinfo[i].type = glow_eType_Double;
+    attrinfo[i].minlimit = 0;
+    attrinfo[i].maxlimit = 1;
     attrinfo[i++].size = sizeof(op->transparency);
 
     strcpy(attrinfo[i].name, "relief");
@@ -1819,6 +1834,8 @@ int grow_GetObjectAttrInfo(
     strcpy(attrinfo[i].name, "Transparency");
     attrinfo[i].value_p = &op->transparency;
     attrinfo[i].type = glow_eType_Double;
+    attrinfo[i].minlimit = 0;
+    attrinfo[i].maxlimit = 1;
     attrinfo[i++].size = sizeof(op->transparency);
 
     strcpy(attrinfo[i].name, "Dynamic");
@@ -3088,6 +3105,8 @@ int grow_GetObjectAttrInfo(
     strcpy(attrinfo[i].name, "Transparency");
     attrinfo[i].value_p = &op->transparency;
     attrinfo[i].type = glow_eType_Double;
+    attrinfo[i].minlimit = 0;
+    attrinfo[i].maxlimit = 1;
     attrinfo[i++].size = sizeof(op->transparency);
 
     for (j = 0; j < 10; j++) {

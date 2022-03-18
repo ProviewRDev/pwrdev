@@ -611,7 +611,7 @@ void GrowTrend::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
         f1 = GlowColor::shift_drawtype(drawtype, gradient_contrast / 2, 0);
       }
       ctx->gdraw->gradient_fill_rect(w, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y,
-          drawtype, f1, f2, ctx->gdraw->gradient_rotate(rotation, grad));
+          drawtype, f1, f2, ctx->gdraw->gradient_rotate(rotation, grad), transparency);
     }
   }
   drawtype = ctx->get_drawtype(draw_type, glow_eDrawType_LineHighlight,

@@ -131,6 +131,10 @@ void GrowAnnot::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
     return;
   idx = MIN(idx, DRAW_TYPE_SIZE - 1);
 
+  double transp = 0;
+  if (colornode)
+    transp = ((GrowNode*)colornode)->transparency;
+
   glow_eFont lfont;
   glow_eDrawType ldraw_type;
 
@@ -237,7 +241,7 @@ void GrowAnnot::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
     }
 
     ctx->gdraw->text(w, x1, y1, textp, text_len, ldraw_type, color, idx,
-        highlight, 0, lfont, tsize, rot);
+	highlight, 0, lfont, tsize, rot, transp);
 
     if (((GlowNode*)node)->annotv_inputmode[number])
       ctx->gdraw->text_cursor(w, x1, y1, textp, text_len, ldraw_type, color,
@@ -261,7 +265,7 @@ void GrowAnnot::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
         if (len) {
           *s = 0;
           ctx->gdraw->text(w, x1, y1 + line_cnt * z_height, line, len,
-              ldraw_type, color, idx, highlight, 0, lfont, tsize, 0);
+	      ldraw_type, color, idx, highlight, 0, lfont, tsize, 0, transp);
           *s = 10;
         }
         len = 0;
@@ -272,7 +276,7 @@ void GrowAnnot::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
     }
     if (len)
       ctx->gdraw->text(w, x1, y1 + line_cnt * z_height, line, len, ldraw_type,
-          color, idx, highlight, 0, lfont, tsize, 0);
+	  color, idx, highlight, 0, lfont, tsize, 0, transp);
     break;
   }
   }

@@ -56,11 +56,14 @@ var Glow = {
   eMB3Action_Both		: 3,
 
   eTextSize_8			: 0,
-  eTextSize_10		: 1,
-  eTextSize_12		: 2,
-  eTextSize_14		: 4,
-  eTextSize_18		: 6,
-  eTextSize_24		: 8,
+  eTextSize_10			: 1,
+  eTextSize_12			: 2,
+  eTextSize_14			: 4,
+  eTextSize_18			: 6,
+  eTextSize_24			: 8,
+
+  eFontType_Bold		: 0,
+  eFontType_Normal		: 1,
 
   eTextCoding_ISO8859_1      	: 0,
   eTextCoding_UTF_8		: 1,
@@ -1338,29 +1341,30 @@ var Glow = {
   eSave_GrowRectRounded_original_border_drawtype : 3808,
   eSave_GrowRectRounded_original_fill_drawtype : 3809,
   eSave_GrowRectRounded_fill_drawtype : 3810,
-  eSave_GrowRectRounded_border 	: 3811,
+  eSave_GrowRectRounded_border 		: 3811,
   eSave_GrowRectRounded_trf 		: 3812,
   eSave_GrowRectRounded_round_amount	: 3813,
   eSave_GrowRectRounded_shadow_width 	: 3814,
   eSave_GrowRectRounded_relief      	: 3815,
   eSave_GrowRectRounded_shadow      	: 3816,
   eSave_GrowRectRounded_shadow_contrast : 3817,
-  eSave_GrowRectRounded_disable_shadow : 3818,
+  eSave_GrowRectRounded_disable_shadow 	: 3818,
   eSave_GrowRectRounded_gradient   	: 3819,
   eSave_GrowRectRounded_gradient_contrast : 3820,
   eSave_GrowRectRounded_disable_gradient : 3821,
-  eSave_GrowRectRounded_fixposition  : 3822,
+  eSave_GrowRectRounded_fixposition  	: 3822,
+  eSave_GrowRectRounded_transparency 	: 3823,
   eSave_GrowConGlue_line_width_up 	: 3900,
   eSave_GrowConGlue_line_width_down 	: 3901,
   eSave_GrowConGlue_line_width_left 	: 3902,
   eSave_GrowConGlue_line_width_right 	: 3903,
-  eSave_GrowConGlue_node_part 	: 3904,
+  eSave_GrowConGlue_node_part 		: 3904,
   eSave_GrowConGlue_border	 	: 3905,
   eSave_GrowWindow_file_name	 	: 4000,
   eSave_GrowWindow_rect_part	 	: 4001,
-  eSave_GrowWindow_userdata_cb	: 4002,
+  eSave_GrowWindow_userdata_cb		: 4002,
   eSave_GrowWindow_scrollbar_width	: 4003,
-  eSave_GrowWindow_vertical_scrollbar : 4004,
+  eSave_GrowWindow_vertical_scrollbar 	: 4004,
   eSave_GrowWindow_horizontal_scrollbar : 4005,
   eSave_GrowWindow_scrollbar_color 	: 4006,
   eSave_GrowWindow_scrollbar_bg_color : 4007,
@@ -5812,7 +5816,7 @@ function GrowRect( ctx) {
 	    fa0 = fillcolor;
 	  }
 	  this.ctx.gdraw.gradient_fill_rect( ll_x + ish, ll_y + ish, ur_x - ll_x - 2 * ish, ur_y - ll_y - 2 * ish,
-					fa0, fa1, fa2, this.ctx.gdraw.gradient_rotate( rotationa, grad));
+	      fa0, fa1, fa2, this.ctx.gdraw.gradient_rotate( rotationa, grad), transp);
 	}
       }
       else {
@@ -5846,7 +5850,7 @@ function GrowRect( ctx) {
 	    fb1 = GlowColor.shift_drawtype( fillcolor, this.gradient_contrast/2, null);
 	    fb0 = fillcolor;
 	  }
-	  this.ctx.gdraw.gradient_fill_rect( ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, fb0, fb1, fb2, this.ctx.gdraw.gradient_rotate( rotationb, grad));
+	  this.ctx.gdraw.gradient_fill_rect( ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, fb0, fb1, fb2, this.ctx.gdraw.gradient_rotate( rotationb, grad), transp);
 	}
       }
     }
@@ -6094,6 +6098,9 @@ function GrowRectRounded( ctx) {
       case Glow.eSave_GrowRectRounded_gradient_contrast:
 	this.gradient_contrast = parseInt(tokens[1], 10);
 	break;
+      case Glow.eSave_GrowRectRounded_transparency:
+	this.transparency = parseFloat(tokens[1], 10);
+	break;
       case Glow.eSave_GrowRectRounded_disable_gradient:
 	this.disable_gradient = parseInt(tokens[1], 10);
 	break;
@@ -6200,6 +6207,10 @@ function GrowRectRounded( ctx) {
     var chot = 0;
     var idx;
     var drawtype;
+    var transp = this.transparency;
+
+    if (colornode !== null && Number(colornode.transparency) > Number(this.transparency))
+      transp = colornode.transparency;
 
     if ( node !== null && node.line_width !== 0)
       idx = Math.floor( this.ctx.mw.zoom_factor_y / this.ctx.mw.base_zoom_factor * 
@@ -6249,17 +6260,17 @@ function GrowRectRounded( ctx) {
 	  else
 	    drawtype = fillcolor;
 
-	  this.ctx.gdraw.fill_rect( ll_x, ll_y + amount, ur_x - ll_x, ur_y - ll_y - 2*amount, drawtype);
-	  this.ctx.gdraw.fill_rect( ll_x + amount, ll_y, ur_x - ll_x - 2*amount, amount, drawtype);
-	  this.ctx.gdraw.fill_rect( ll_x + amount, ur_y - amount, ur_x - ll_x - 2*amount, amount, drawtype);
+	  this.ctx.gdraw.fill_rect( ll_x, ll_y + amount, ur_x - ll_x, ur_y - ll_y - 2*amount, drawtype, transp);
+	  this.ctx.gdraw.fill_rect( ll_x + amount, ll_y, ur_x - ll_x - 2*amount, amount, drawtype, transp);
+	  this.ctx.gdraw.fill_rect( ll_x + amount, ur_y - amount, ur_x - ll_x - 2*amount, amount, drawtype, transp);
 	  this.ctx.gdraw.fill_arc( ll_x, ll_y, 2*amount, 2*amount, 90, 90, 
-			      drawtype);
+			      drawtype, transp);
 	  this.ctx.gdraw.fill_arc( ll_x, ur_y - 2*amount, 2*amount, 2*amount, 180, 90, 
-			      drawtype);
+			      drawtype, transp);
 	  this.ctx.gdraw.fill_arc( ur_x - 2*amount, ur_y - 2*amount, 2*amount, 2*amount, 270, 90, 
-			      drawtype);
+			      drawtype, transp);
 	  this.ctx.gdraw.fill_arc( ur_x - 2*amount, ll_y, 2*amount, 2*amount, 0, 90, 
-			      drawtype);
+			      drawtype, transp);
 	}
 	else {
 	  var fa1, fa2;
@@ -6278,7 +6289,7 @@ function GrowRectRounded( ctx) {
 	    fa1 = GlowColor.shift_drawtype( fillcolor, this.gradient_contrast/2 + chot, null);
 	  }
 	  this.ctx.gdraw.gradient_fill_rectrounded( ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, amount,
-					       fillcolor, fa1, fa2, this.ctx.gdraw.gradient_rotate( rotationa, grad));	
+	      fillcolor, fa1, fa2, this.ctx.gdraw.gradient_rotate( rotationa, grad), transp);	
 	}
       }
       else {
@@ -6349,7 +6360,7 @@ function GrowRectRounded( ctx) {
 	    fb1 = GlowColor.shift_drawtype( fillcolor, this.gradient_contrast/2 + chot, null);
 	  }
 	  this.ctx.gdraw.gradient_fill_rectrounded( ll_x + ish, ll_y + ish, ur_x - ll_x - 2 * ish, ur_y - ll_y - 2 * ish,
-					       amount - ish, fillcolor, fb1, fb2, this.ctx.gdraw.gradient_rotate( rotationb, grad));	
+					       amount - ish, fillcolor, fb1, fb2, this.ctx.gdraw.gradient_rotate( rotationb, grad), 0);	
 	}
       }
     }
@@ -6905,7 +6916,7 @@ function GrowArc( ctx) {
 	    fa1 = GlowColor.shift_drawtype( fillcolor, this.gradient_contrast/2 + chot, null);
 	  }
 	  this.ctx.gdraw.gradient_fill_arc( ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, this.angle1 - rot, 
-				       this.angle2, fillcolor, fa1, fa2, grad);
+	      this.angle2, fillcolor, fa1, fa2, grad, transp);
 	}
       }
       else {
@@ -6950,7 +6961,7 @@ function GrowArc( ctx) {
 	  fb2 = GlowColor.shift_drawtype( fillcolor, drawtype_incr + chot, colornode);
 
 	  this.ctx.gdraw.gradient_fill_arc( ll_x, ll_y, ur_x - ll_x, ur_y - ll_y,
-				       this.angle1 - rot, this.angle2, fillcolor, fb2, fb1, Glow.eGradient_DiagonalUpperLeft);
+				       this.angle1 - rot, this.angle2, fillcolor, fb2, fb1, Glow.eGradient_DiagonalUpperLeft, transp);
 
 	  // Draw circle
 	  if ( this.gradient_contrast >= 0) {
@@ -6962,7 +6973,7 @@ function GrowArc( ctx) {
 	    fb1 = GlowColor.shift_drawtype( fillcolor, this.gradient_contrast/2 + chot, null);
 	  }
 	  this.ctx.gdraw.gradient_fill_arc( ll_x + ish, ll_y + ish, ur_x - ll_x - 2*ish, ur_y - ll_y - 2*ish,
-				       this.angle1 - rot, this.angle2, fillcolor, fb1, fb2, grad);
+				       this.angle1 - rot, this.angle2, fillcolor, fb1, fb2, grad, transp);
 	}
       }
     }
@@ -7203,7 +7214,7 @@ function GrowText( ctx) {
 
     if ( this.text !== "") {
       if ( highl !== 0 || (hot !== 0 && node === null) || this.adjustment != Glow.eAdjustment_Left) {
-	var dim = this.ctx.gdraw.getTextExtent( this.text, Math.max( 0, idx), lfont, ldraw_type);
+	var dim = this.ctx.gdraw.getTextExtent( this.text, Math.max( 0, idx), lfont, ldraw_type, tsize);
 	z_width = dim.width;
 	z_height = dim.height;
 	z_descent = z_height/4;
@@ -7259,7 +7270,7 @@ function GrowText( ctx) {
       }
     }
     else if ( idx >= 0) {
-      var dim2 = this.ctx.gdraw.getTextExtent( "A", Math.max( 0, idx), lfont, ldraw_type);
+      var dim2 = this.ctx.gdraw.getTextExtent( "A", Math.max( 0, idx), lfont, ldraw_type, tsize);
       z_width = dim2.width;
       z_height = dim2.height;
       z_descent = z_height/4;
@@ -7411,6 +7422,10 @@ function GrowAnnot( ctx) {
 
     var lfont;
     var ldraw_type;
+    var transp = 0;
+
+    if (colornode !== null)
+      transp = colornode.transparency;
 
     if ( node !== null && node.annot_scrollingtext == this.number) {
       offset_x = node.annot_offset_x;
@@ -7549,7 +7564,7 @@ function GrowAnnot( ctx) {
     idx = Math.min( idx, Glow.DRAW_TYPE_SIZE-1);
   
     var d = this.ctx.gdraw.getTextExtent( node.annotv[this.number], idx, 
-					  this.font, this.draw_type);
+					  this.font, this.draw_type, tsize);
 	
     dim.width = d.width;
     dim.height = d.height;
@@ -7928,7 +7943,7 @@ function GrowPolyline( ctx) {
 	  f1 = GlowColor.shift_drawtype( drawtype, this.gradient_contrast/2, null);
 	}
 	this.ctx.gdraw.gradient_fill_polyline( this.points, this.a_points.size(),
-					  drawtype, f1, f2, this.ctx.gdraw.gradient_rotate( rotation, grad));	
+					  drawtype, f1, f2, this.ctx.gdraw.gradient_rotate( rotation, grad), transp);	
       }
     }
 
@@ -9800,7 +9815,7 @@ function GrowBar( ctx) {
 	  fa2 = GlowColor.shift_drawtype( drawtype, -Math.floor((this.gradient_contrast)/2-0.6), null);
 	  fa1 = GlowColor.shift_drawtype( drawtype, this.gradient_contrast/2, null);
 	}
-	this.ctx.gdraw.gradient_fill_rect( ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, drawtype, fa1, fa2, this.ctx.gdraw.gradient_rotate( rotation, grad));
+	this.ctx.gdraw.gradient_fill_rect( ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, drawtype, fa1, fa2, this.ctx.gdraw.gradient_rotate( rotation, grad), 0);
       }
     }
     drawtype = GlowColor.get_drawtype( this.draw_type, Glow.eDrawType_LineHighlight,
@@ -9882,7 +9897,7 @@ function GrowBar( ctx) {
 	  fb2 = GlowColor.shift_drawtype( dt, -Math.floor((this.gradient_contrast)/2-0.6), null);
 	  fb1 = GlowColor.shift_drawtype( dt, this.gradient_contrast/2, null);
 	}
-	this.ctx.gdraw.gradient_fill_rect( x0, y0, width, height, dt, fb1, fb2, this.ctx.gdraw.gradient_rotate( rotation, grad));
+	this.ctx.gdraw.gradient_fill_rect( x0, y0, width, height, dt, fb1, fb2, this.ctx.gdraw.gradient_rotate( rotation, grad), 0);
       }
 
       dt = drawtype;
@@ -10089,7 +10104,7 @@ function GrowBarArc( ctx) {
       this.ctx.gdraw.gradient_fill_arc(ll_x, ll_y, ur_x - ll_x, ur_y - ll_y,
 				       ang, this.angle2 * (value - this.min_value) / 
 				       (this.max_value - this.min_value), 
-				       this.bar_drawtype, f1, f2, this.gradient);
+				       this.bar_drawtype, f1, f2, this.gradient, 0);
     }
 
     // Draw inner circle background
@@ -10379,7 +10394,7 @@ function GrowTrend( ctx) {
 	  f2 = GlowColor.shift_drawtype( drawtype, -Math.floor(this.gradient_contrast/2-0.6), null);
 	  f1 = GlowColor.shift_drawtype( drawtype, this.gradient_contrast/2, null);
 	}
-	this.ctx.gdraw.gradient_fill_rect( ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, drawtype, f1, f2, this.ctx.gdraw.gradient_rotate( rotation, grad));
+	this.ctx.gdraw.gradient_fill_rect( ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, drawtype, f1, f2, this.ctx.gdraw.gradient_rotate( rotation, grad), 0);
       }
     }
     drawtype = GlowColor.get_drawtype( this.draw_type, Glow.eDrawType_LineHighlight,
@@ -11026,7 +11041,7 @@ function GrowMenu( ctx) {
     this.item_cnt = 0;
     for ( i = 0; i < this.info.item.length; i++) {
       if ( this.info.item[i].occupied) {
-	var dim = this.ctx.gdraw.getTextExtent( this.info.item[i].text, Math.max( 0, text_idx), this.font, this.text_drawtype);
+	var dim = this.ctx.gdraw.getTextExtent( this.info.item[i].text, Math.max( 0, text_idx), this.font, this.text_drawtype, tsize);
 	z_width = dim.width;
 	z_height = dim.height;
 	z_descent = z_height/4;		
@@ -12772,7 +12787,7 @@ function GrowAxis( ctx) {
 	    text = this.format_text( this.format, this.max_value - i * this.increment);
 	    var d = this.ctx.gdraw.getTextExtent( text,
 						  Math.max( 0, text_idx), Glow.eFont_Helvetica,
-						  this.text_drawtype);
+						  this.text_drawtype, tsize);
 	    z_width = d.width;
 	    z_height = d.height;
 	    z_descent = z_height/4;
@@ -12824,7 +12839,7 @@ function GrowAxis( ctx) {
       // Calculate max value text height
       if ( draw_text) {
 	var d2 = this.ctx.gdraw.getTextExtent( "0",
-							Math.max( 0, text_idx), Glow.eFont_Helvetica, this.text_drawtype);
+							Math.max( 0, text_idx), Glow.eFont_Helvetica, this.text_drawtype, tsize);
 
 	z_width = d2.width;
 	z_height = d2.height;
@@ -12849,7 +12864,7 @@ function GrowAxis( ctx) {
 	if ( draw_text && i % this.valuequotient === 0) {
 	  text = this.format_text( this.format, this.max_value - i * this.increment);
 	  var d3 = this.ctx.gdraw.getTextExtent( text, 
-						Math.max( 0, text_idx), Glow.eFont_Helvetica, this.text_drawtype);
+						Math.max( 0, text_idx), Glow.eFont_Helvetica, this.text_drawtype, tsize);
 	  z_width = d3.width;
 	  z_height = d3.height;
 	  z_descent = z_height/4;
@@ -12879,7 +12894,7 @@ function GrowAxis( ctx) {
 	  if ( i % this.valuequotient === 0) {
 	    text = this.format_text( this.format, this.max_value - i * this.increment);
 	    var d4 = this.ctx.gdraw.getTextExtent( text, 
-						  Math.max( 0, text_idx), Glow.eFont_Helvetica, this.text_drawtype);
+						  Math.max( 0, text_idx), Glow.eFont_Helvetica, this.text_drawtype, tsize);
 	    z_width = d4.width;
 	    z_height = d4.height;
 	    z_descent = z_height/4;
@@ -12931,7 +12946,7 @@ function GrowAxis( ctx) {
       if ( draw_text) {
 	var d5 = this.ctx.gdraw.getTextExtent( "0", 
 					      Math.max( 0, text_idx), Glow.eFont_Helvetica,
-					      this.text_drawtype);
+					      this.text_drawtype, tsize);
 
 	z_width = d5.width;
 	z_height = d5.height;
@@ -12955,7 +12970,7 @@ function GrowAxis( ctx) {
 	if ( draw_text && i % this.valuequotient === 0) {
 	  text = this.format_text( this.format, this.max_value - i * this.increment);
 	  var d6 = this.ctx.gdraw.getTextExtent( text, 
-						Math.max( 0, text_idx), Glow.eFont_Helvetica, this.text_drawtype);
+						Math.max( 0, text_idx), Glow.eFont_Helvetica, this.text_drawtype, tsize);
 	  z_width = d6.width;
 	  z_height = d6.height;
 	  z_descent = z_height/4;
@@ -13281,7 +13296,7 @@ function GrowAxisArc( ctx) {
 	text = this.format_text( this.format, this.min_value + this.increment);
       var d = this.ctx.gdraw.getTextExtent( text,
 					    Math.max( 0, text_idx), Glow.eFont_Helvetica, 
-					    this.text_drawtype);
+					    this.text_drawtype, tsize);
       z_width = d.width;
       z_height = d.height;
       z_descent = z_height/4;
@@ -13316,7 +13331,7 @@ function GrowAxisArc( ctx) {
 	    text = this.format_text( this.format, this.min_value + i * this.increment);
 	    d = this.ctx.gdraw.getTextExtent( text,
 					 Math.max( 0, text_idx), Glow.eFont_Helvetica, 
-					 this.text_drawtype);
+					 this.text_drawtype, tsize);
 	    z_width = d.width;
 	    z_height = d.height;
 	    z_descent = z_height/4;
@@ -13704,7 +13719,7 @@ function GrowPie( ctx) {
 	  f1 = GlowColor.shift_drawtype( fillcolor, this.gradient_contrast/2 + chot, 0);
 	}
 	this.ctx.gdraw.gradient_fill_arc( ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, ia1 - rot, 
-				     ia2, fillcolor, f1, f2, grad);
+				     ia2, fillcolor, f1, f2, grad, 0);
       }
       else {
 	var ish = Math.floor( this.shadow_width / 100 * Math.min(ur_x - ll_x, ur_y - ll_y) + 0.5);
@@ -13719,7 +13734,7 @@ function GrowPie( ctx) {
 	f2 = GlowColor.shift_drawtype( fillcolor, drawtype_incr + chot, colornode);
 		
 	this.ctx.gdraw.gradient_fill_arc( ll_x, ll_y, ur_x - ll_x, ur_y - ll_y,
-				     ia1 - rot, ia2, fillcolor, f2, f1, Glow.eGradient_DiagonalUpperLeft);
+				     ia1 - rot, ia2, fillcolor, f2, f1, Glow.eGradient_DiagonalUpperLeft, 0);
 		
 	// Draw circle
 	if ( this.gradient_contrast >= 0) {
@@ -13731,7 +13746,7 @@ function GrowPie( ctx) {
 	  f1 = GlowColor.shift_drawtype( fillcolor, this.gradient_contrast/2 + chot, null);
 	}
 	this.ctx.gdraw.gradient_fill_arc( ll_x + ish, ll_y + ish, ur_x - ll_x - 2*ish, ur_y - ll_y - 2*ish,
-				     ia1 - rot, ia2, fillcolor, f1, f2, grad);
+				     ia1 - rot, ia2, fillcolor, f1, f2, grad, 0);
       }
       a1 += a2;
       ia1 += ia2;
@@ -14037,7 +14052,7 @@ function GrowBarChart( ctx) {
 		f1 = GlowColor.shift_drawtype( fillcolor, this.gradient_contrast/2 + chot, null);
 	      }
 	      this.ctx.gdraw.gradient_fill_rect( bar_ll_x, bar_up_ll_y, bar_ur_x - bar_ll_x, 
-					       bar_up_ur_y - bar_up_ll_y, fillcolor, f1, f2, grad);
+					       bar_up_ur_y - bar_up_ll_y, fillcolor, f1, f2, grad, 0);
 	    }
 	  }
 	
@@ -14091,7 +14106,7 @@ function GrowBarChart( ctx) {
 		f1 = GlowColor.shift_drawtype( fillcolor, this.gradient_contrast/2 + chot, null);
 	      }
 	      this.ctx.gdraw.gradient_fill_rect( bar_ll_x, bar_down_ll_y, bar_ur_x - bar_ll_x, 
-						 bar_down_ur_y - bar_down_ll_y, fillcolor, f1, f2, grad);
+						 bar_down_ur_y - bar_down_ll_y, fillcolor, f1, f2, grad, 0);
 	    }
 	  }
 	}
@@ -14881,7 +14896,7 @@ function GrowTable( ctx) {
 		 this.column_adjustment[0] == Glow.eAdjustment_Center) {
 	      var width, height, descent;
 	      var dim = this.ctx.gdraw.getTextExtent( this.cell_value[offs], 
-						      text_idx, this.font, this.text_drawtype);
+						      text_idx, this.font, this.text_drawtype, tsize);
 	      width = dim.width;
 	      height = dim.height;
 	      descent = height/4;
@@ -15006,7 +15021,7 @@ function GrowTable( ctx) {
 	      if ( this.column_adjustment[i] == Glow.eAdjustment_Right ||
 		   this.column_adjustment[i] == Glow.eAdjustment_Center) {
 		var width, height, descent;
-		var dim = this.ctx.gdraw.getTextExtent( this.cell_value[offs], 
+		var dim = this.ctx.gdraw.getTextExten( this.cell_value[offs], 
 							text_idx, this.font, this.text_drawtype);
 		width = dim.width;
 		height = dim.height;
@@ -15343,19 +15358,35 @@ function GlowDraw( ctx) {
   this.text = function( x, y, text, gc_type, color, idx, highlight, line, 
 			font_idx, size, rot, transparency = 0) {
     var tsize;
+    tsize = size;
+    var fonttype = this.drawtype_to_fonttype(gc_type);
+    var typestr = "";
+    var fontname;
 
-    switch( idx) {
-    case 0: tsize = 8; break;
-    case 1: tsize = 10; break;
-    case 2: tsize = 12; break;
-    case 3: tsize = 14; break;
-    case 4: tsize = 14; break;
-    case 5: tsize = 16; break;
-    case 6: tsize = 18; break;
-    case 7: tsize = 18; break;
-    default: tsize = 3 * idx; break;
+    if (fonttype === Glow.eFontType_Bold)
+      typestr = "bold";
+
+    switch (font_idx) {
+    case Glow.eFont_Helvetica:
+      fontname = "Helvetica";
+      break;
+    case Glow.eFont_Times:
+      fontname = "\'Times New Roman\'";
+      break;
+    case Glow.eFont_NewCenturySchoolbook:
+      fontname = "\'New Century Schoolbook\'";
+      break;
+    case Glow.eFont_Courier:
+      fontname = "Courier";
+      break;
+    case Glow.eFont_LucidaSans:
+      fontname = "Arial";
+      break;
+    default:
+      fontname = "Arial";
     }
-    this.gctx.font = tsize + "px Arial";
+    this.gctx.font = typestr + " " + tsize + "px " + fontname;
+    //console.log("Font:", typestr + " " + tsize + "px " + fontname);
     this.gctx.lineWidth = 0.5;
 
     if (Number(transparency) === 0)
@@ -15363,6 +15394,16 @@ function GlowDraw( ctx) {
     else
       this.gctx.fillStyle = this.getColorTransparent(color, transparency)
     this.gctx.fillText( text, x, y);
+  };
+
+  this.drawtype_to_fonttype = function(gc_type) {
+    switch (gc_type) {
+    case Glow.eDrawType_TextHelveticaBold:
+    case Glow.eDrawType_TextHelveticaEraseBold:
+      return Glow.eFontType_Bold;
+    default:
+      return Glow.eFontType_Normal;
+    }
   };
 
   this.getColor = function( gc_type) {
@@ -15379,41 +15420,51 @@ function GlowDraw( ctx) {
     return "rgba(" + Math.floor( 255 * rgb.r) + "," + Math.floor( 255 * rgb.g) + "," + Math.floor( 255 * rgb.b) + "," + (1.0 - transparency) + ")";
   };
 
-  this.getTextExtent = function( text, idx, type, gc_type) {
+  this.getTextExtent = function( text, idx, type, gc_type, size = 0) {
     var tsize;
     var dim = new GlowDimension();
 
-    switch( idx) {
-    case 0: tsize = 8; break;
-    case 1: tsize = 10; break;
-    case 2: tsize = 12; break;
-    case 3: tsize = 14; break;
-    case 4: tsize = 14; break;
-    case 5: tsize = 8; break;
-    case 6: tsize = 18; break;
-    case 7: tsize = 18; break;
-    default: tsize = 3 * idx; break;
-    }
-    this.gctx.font = tsize + "px Arial";
+    if (Number(size) === 0) {
+      switch( idx) {
+      case 0: tsize = 8; break;
+      case 1: tsize = 10; break;
+      case 2: tsize = 12; break;
+      case 3: tsize = 14; break;
+      case 4: tsize = 14; break;
+      case 5: tsize = 8; break;
+      case 6: tsize = 18; break;
+      case 7: tsize = 18; break;
+      default: tsize = 3 * idx; break;
+      }
+    } else
+       tsize =  size;
+
+    var fonttype = this.drawtype_to_fonttype(gc_type);
+
+    if (fonttype === Glow.eFontType_Bold)
+      this.gctx.font = "bold " + tsize + "px Arial";
+    else
+      this.gctx.font = tsize + "px Arial";
+
     dim.width = this.gctx.measureText( text).width;
     dim.height = tsize;
     return dim;
   };
 
-  this.gradient_fill_rect = function( x, y, width, height, gc_type, f1, f2, gradient) {
+  this.gradient_fill_rect = function( x, y, width, height, gc_type, f1, f2, gradient, transparency) {
     if ( this.nodraw)
       return;
 
-    this.setGradient( gradient, f1, f2, x, y, width, height);
+    this.setGradient( gradient, f1, f2, transparency, x, y, width, height);
 
     this.gctx.fillRect( x, y, width, height);    
   };
 
-  this.gradient_fill_rectrounded = function( x, y, width, height, amount, gc_type, f1, f2, gradient) {
+  this.gradient_fill_rectrounded = function( x, y, width, height, amount, gc_type, f1, f2, gradient, transparency) {
     if ( this.nodraw)
       return;
 
-    this.setGradient( gradient, f1, f2, x, y, width, height);
+    this.setGradient( gradient, f1, f2, transparency, x, y, width, height);
 
     this.gctx.beginPath();
     this.gctx.moveTo( x + amount, y);
@@ -15425,11 +15476,11 @@ function GlowDraw( ctx) {
     this.gctx.fill();
   };
 
-  this.gradient_fill_arc = function( x, y, width, height, a1, a2, gc_type, f1, f2, gradient) {
+  this.gradient_fill_arc = function( x, y, width, height, a1, a2, gc_type, f1, f2, gradient, transparency) {
     if ( this.nodraw)
       return;
 
-    this.setGradient( gradient, f1, f2, x, y, width, height);
+    this.setGradient( gradient, f1, f2, transparency, x, y, width, height);
 
     this.gctx.beginPath();
     if ( a2 != 360)
@@ -15441,13 +15492,13 @@ function GlowDraw( ctx) {
     this.gctx.fill();
   };
 
-  this.gradient_fill_polyline = function( points, point_cnt, gc_type, f1, f2, gradient) {
+  this.gradient_fill_polyline = function( points, point_cnt, gc_type, f1, f2, gradient, transparency) {
     if ( this.nodraw)
       return;
     if ( points.length === 0)
       return;
 
-    var color = this.getColor(gc_type);
+    // var color = this.getColor(gc_type);
 
     var x_low = Number.MAX_VALUE;
     var x_high = -Number.MAX_VALUE;
@@ -15470,7 +15521,7 @@ function GlowDraw( ctx) {
 	y_low = points[i].y;
     }
 
-    this.setGradient( gradient, f1, f2, x_low, y_low, x_high - x_low, y_high - y_low);
+    this.setGradient( gradient, f1, f2, transparency, x_low, y_low, x_high - x_low, y_high - y_low);
 
     this.gctx.fill();
   };
@@ -15483,7 +15534,7 @@ function GlowDraw( ctx) {
     return gradient;
   };
 
-  this.setGradient = function( gradient, f1, f2, x, y, w, h) {
+  this.setGradient = function( gradient, f1, f2, transparency, x, y, w, h) {
     var gx0 = 0;
     var gy0 = 0;
     var gx1 = 0; 
@@ -15630,8 +15681,13 @@ function GlowDraw( ctx) {
       case Glow.eGradient_DiagonalUpperRight:
       case Glow.eGradient_DiagonalLowerRight: {
 	var linear = this.gctx.createLinearGradient( gx0, gy0, gx1, gy1);
-	linear.addColorStop( 0, this.getColor(f2));
-	linear.addColorStop( 1, this.getColor(f1));
+        if (Number(transparency) === 0) {
+	  linear.addColorStop( 0, this.getColor(f2));
+	  linear.addColorStop( 1, this.getColor(f1));
+        } else {
+	  linear.addColorStop( 0, this.getColorTransparent(f2, transparency));
+	  linear.addColorStop( 1, this.getColorTransparent(f1, transparency));
+        }
 	this.gctx.fillStyle = linear;
 	break;
       }
@@ -15640,18 +15696,30 @@ function GlowDraw( ctx) {
       case Glow.eGradient_DiagonalUpTube:
       case Glow.eGradient_DiagonalDownTube: {
 	var linear = this.gctx.createLinearGradient( gx0, gy0, gx1, gy1);
-	linear.addColorStop( 0, this.getColor(f1));
-	linear.addColorStop( 0.5, this.getColor(f2));
-	linear.addColorStop( 1, this.getColor(f1));
+        if (Number(transparency) === 0) {
+	  linear.addColorStop( 0, this.getColor(f1));
+	  linear.addColorStop( 0.5, this.getColor(f2));
+	  linear.addColorStop( 1, this.getColor(f1));
+        } else {
+	  linear.addColorStop( 0, this.getColorTransparent(f1, transparency));
+	  linear.addColorStop( 0.5, this.getColorTransparent(f2, transparency));
+	  linear.addColorStop( 1, this.getColorTransparent(f1, transparency));
+        }
 	this.gctx.fillStyle = linear;
 	break;
       }
       case Glow.eGradient_HorizontalTube2:
       case Glow.eGradient_VerticalTube2: {
 	var linear = this.gctx.createLinearGradient( gx0, gy0, gx1, gy1);
-	linear.addColorStop( 0, this.getColor(f1));
-	linear.addColorStop( 0.3, this.getColor(f2));
-	linear.addColorStop( 0.95, this.getColor(f1));
+        if (Number(transparency) === 0) {
+	  linear.addColorStop( 0, this.getColor(f1));
+	  linear.addColorStop( 0.3, this.getColor(f2));
+	  linear.addColorStop( 0.95, this.getColor(f1));
+        } else {
+	  linear.addColorStop( 0, this.getColorTransparent(f1, transparency));
+	  linear.addColorStop( 0.3, this.getColorTransparent(f2, transparency));
+	  linear.addColorStop( 0.95, this.getColorTransparent(f1, transparency));
+        }
 	this.gctx.fillStyle = linear;
 	break;
       }
@@ -15662,8 +15730,13 @@ function GlowDraw( ctx) {
       case Glow.eGradient_RadialUpperRight: 
       case Glow.eGradient_RadialLowerRight:{
 	var radial = this.gctx.createRadialGradient( gx0, gy0, 1, gx0, gy0, gr);
-	radial.addColorStop( 0, this.getColor(f2));
-	radial.addColorStop( 1, this.getColor(f1));
+        if (Number(transparency) === 0) {
+	  radial.addColorStop( 0, this.getColor(f2));
+	  radial.addColorStop( 1, this.getColor(f1));
+        } else {
+	  radial.addColorStop( 0, this.getColorTransparent(f2, transparency));
+	  radial.addColorStop( 1, this.getColorTransparent(f1, transparency));
+        }
 	this.gctx.fillStyle = radial;
 	break;
       }

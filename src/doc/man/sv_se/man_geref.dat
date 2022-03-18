@@ -3361,6 +3361,8 @@ SliderBackground <t>-   <t>Markerar att subgrafen är bakgrund till en slider-kom
 DigCommand <t>Boolean   <t>Exekverar ett kommando när signalen blir hög. <link>GeDynDigCommand
 DigScript <t>Boolean   <t>Exekverar ett script när signalen blir hög. <link>GeDynDigScript
 ScrollingText <t>Boolean   <t>Visar en rullande text. <link>GeDynScrollingText
+DigTransparency <t>Boolean   <t>Skiftar transparens beroende på en digital signal. <link>GeDynDigTransparency
+AnalogTransparency <t>Float32  <t>Skiftar transparens beroende på en analog signal. <link>GeDynAnalogTransparency
 
 <h2>Inherit
 För en instans av en subgraph betyder det att dynamiken ärvs från subgrafs-klassen, dvs den 
@@ -3566,7 +3568,7 @@ gränslinjen uppåt med ökande värde, vid Down nedåt, vid Left åt vänster och vid 
 höger.
 
 <b>Attribut <t><t>Beskrivning
-FillLevel.Attribute <t><t>Signal i rtdb av type Float32.
+FillLevel.Attribute <t><t>Signal i rtdb av typ Float32.
 FillLevel.BackgroundColor <t><t>Bakgrundsfärg.
 FillLevel.Direction <t><t>Riktning Up, Down, Left eller Right.
 FillLevel.MinValue <t><t>Minvärde. När värdet på Attribute är lika med 
@@ -3900,7 +3902,7 @@ signalvärdet ändras från 0 till 1, eller cykliskt när signalvärdet är högt.
 
 DigCommand kan finnas i flera instanser, vilket gör det möjlit att exekvera flera kommandon.
 
-<b>Attribute <t><t>Description
+<b>Attribut <t><t>Beskrivning
 DigCommand.Attribute <t><t>Signal i databasen av typ boolean som ska påverka komponenten.
 DigCommand.Level  <t><t>Om Level är 0, exekveras kommandot när signalen ändras från 0 till 1.
                   <t><t>Om level är 1, exekveras kommandot cykliskt när signalen är hög.
@@ -3918,7 +3920,7 @@ Exekvera ett script när signalen går från låg till hög, eller när signalen är hö
 Objektet kopplas till en digital signal i rtdb. Scriptet exekveras antingen när 
 signalvärdet ändras från 0 till 1, eller cykliskt när signalvärdet är högt.
 
-<b>Attribute <t><t>Description
+<b>Attribut <t><t>Beskrivning
 DigScript.Attribute <t><t>Signal i databasen av typ boolean som ska påverka komponenten.
 DigScript.Level  <t><t>Om Level är 0, exekveras scriptet när signalen ändras från 0 till 1.
                  <t><t>Om level är 1, exekveras scriptet cykliskt när signalen är hög.
@@ -3927,6 +3929,31 @@ DigScript.Arguments <t><t>Argument som kan användas som p1-p9 i scriptet. Argume
                  <t><t>ersätts $object med aktuell instans for en objektbild.
 DigScript.Script <t><t>Xtt script som exekveras när signalen går från 0 till 1.
 </topic>
+
+<topic>GeDynDigTransparency <style>function
+DigTransparency
+Ändra transparans beroende på en digital signal. När signalen är låg sätts transparensen till
+det värdet som är angivet i LowValue, och när signalen är hög till värdet i HighValue.
+
+<b>Attribut <t><t>Beskrivning
+DigTransparency.Attribute <t><t>Signal i databasen av typ boolean som ska påverka komponenten.
+DigTransparency.LowValue  <t><t>Transparans som sätts när signalen är låg. Ett värde mellan 
+			<t><t>0 och 1.
+DigTransparency.HighValue  <t><t>Transparans som sätts när signalen är hög. Ett värde mellan 
+			<t><t>0 och 1.
+</topic>
+
+<topic>GeDynAnalogTransparency <style>function
+AnalogTransparency
+Transparansen för ett objekt kopplas till en analog signal, och transparansen bestäms av värdet
+på den analoga signalen.
+
+<b>Attribut <t><t>Beskrivning
+AnalogTransparency.Attribute <t><t>Signal i databasen av typ Float32.
+AnalogTransparency.MinValue  <t><t>Signalvärde som motsvarar minimal transparans.
+AnalogTransparency.MaxValue  <t><t>Signalvärde som motsvarar maximal transparans.
+</topic>
+
 </headerlevel>
 <pagebreak>
 

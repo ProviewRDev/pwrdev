@@ -387,28 +387,28 @@ glow_eGradient GlowDraw::gradient_rotate(double rot, glow_eGradient gradient)
 
 int GlowDraw::gradient_fill_rect(GlowWind* wind, int x, int y, int w, int h,
     glow_eDrawType d0, glow_eDrawType d1, glow_eDrawType d2,
-    glow_eGradient gradient)
+    glow_eGradient gradient, double transparency)
 {
   return fill_rect(wind, x, y, w, h, d0);
 }
 
 int GlowDraw::gradient_fill_rectrounded(GlowWind* wind, int x, int y, int w,
     int h, int roundamount, glow_eDrawType d0, glow_eDrawType d1,
-    glow_eDrawType d2, glow_eGradient gradient)
+    glow_eDrawType d2, glow_eGradient gradient, double transparency)
 {
   return fill_rect(wind, x, y, w, h, d0);
 }
 
 int GlowDraw::gradient_fill_arc(GlowWind* wind, int x, int y, int w, int h,
     int angle1, int angle2, glow_eDrawType d0, glow_eDrawType d1,
-    glow_eDrawType d2, glow_eGradient gradient)
+    glow_eDrawType d2, glow_eGradient gradient, double transparency)
 {
   return fill_arc(wind, x, y, w, h, angle1, angle2, d0, 0);
 }
 
 int GlowDraw::gradient_fill_polyline(GlowWind* wind, glow_sPointX* points,
     int point_cnt, glow_eDrawType d0, glow_eDrawType d1, glow_eDrawType d2,
-    glow_eGradient gradient)
+    glow_eGradient gradient, double transparency)
 {
   return fill_polyline(wind, points, point_cnt, d0, 0);
 }

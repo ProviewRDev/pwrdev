@@ -251,20 +251,20 @@ public:
   void reset_cairo_clip(DrawWind* wind, cairo_t* cr);
   int gradient_create_pattern(int x, int y, int w, int h, glow_eDrawType d0,
       glow_eDrawType d1, glow_eDrawType d2, glow_eGradient gradient,
-      cairo_pattern_t** pat);
+      double transparency, cairo_pattern_t** pat);
   virtual glow_eGradient gradient_rotate(double rot, glow_eGradient gradient);
   virtual int gradient_fill_rect(GlowWind* wind, int x, int y, int w, int h,
       glow_eDrawType d0, glow_eDrawType d1, glow_eDrawType d2,
-      glow_eGradient gradient);
+      glow_eGradient gradient, double transparency);
   virtual int gradient_fill_rectrounded(GlowWind* wind, int x, int y, int w,
       int h, int roundamount, glow_eDrawType d0, glow_eDrawType d1,
-      glow_eDrawType d2, glow_eGradient gradient);
+      glow_eDrawType d2, glow_eGradient gradient, double transparency);
   virtual int gradient_fill_arc(GlowWind* wind, int x, int y, int w, int h,
       int angle1, int angle2, glow_eDrawType d0, glow_eDrawType d1,
-      glow_eDrawType d2, glow_eGradient gradient);
+      glow_eDrawType d2, glow_eGradient gradient, double transparency);
   virtual int gradient_fill_polyline(GlowWind* wind, glow_sPointX* points,
       int point_cnt, glow_eDrawType d0, glow_eDrawType d1, glow_eDrawType d2,
-      glow_eGradient gradient);
+      glow_eGradient gradient, double transparency);
   void log_event(GdkEvent* event);
   virtual void event_exec(void* event, unsigned int size);
   virtual int open_color_selection(double* r, double* g, double* b);

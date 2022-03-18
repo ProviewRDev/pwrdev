@@ -821,7 +821,7 @@ void GrowArc::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
               fillcolor, gradient_contrast / 2 + chot, 0);
         }
         ctx->gdraw->gradient_fill_arc(w, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y,
-            angle1 - rot, angle2, fillcolor, f1, f2, grad);
+            angle1 - rot, angle2, fillcolor, f1, f2, grad, transp);
       }
     } else {
       int ish = int(shadow_width / 100 * MIN(ur_x - ll_x, ur_y - ll_y) + 0.5);
@@ -868,7 +868,7 @@ void GrowArc::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
 
         ctx->gdraw->gradient_fill_arc(w, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y,
             angle1 - rot, angle2, fillcolor, f2, f1,
-            glow_eGradient_DiagonalUpperLeft);
+            glow_eGradient_DiagonalUpperLeft, transp);
 
         // Draw circle
         if (gradient_contrast >= 0) {
@@ -884,7 +884,7 @@ void GrowArc::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
         }
         ctx->gdraw->gradient_fill_arc(w, ll_x + ish, ll_y + ish,
             ur_x - ll_x - 2 * ish, ur_y - ll_y - 2 * ish, angle1 - rot, angle2,
-            fillcolor, f1, f2, grad);
+            fillcolor, f1, f2, grad, transp);
       }
     }
   }

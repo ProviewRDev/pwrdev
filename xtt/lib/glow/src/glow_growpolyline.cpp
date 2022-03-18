@@ -460,7 +460,7 @@ void GrowPolyLine::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
         f1 = GlowColor::shift_drawtype(drawtype, gradient_contrast / 2, 0);
       }
       ctx->gdraw->gradient_fill_polyline(w, points, a_points.a_size, drawtype,
-          f1, f2, ctx->gdraw->gradient_rotate(rotation, grad));
+	  f1, f2, ctx->gdraw->gradient_rotate(rotation, grad), transp);
     }
   }
 

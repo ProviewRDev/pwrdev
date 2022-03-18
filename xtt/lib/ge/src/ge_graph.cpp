@@ -1489,8 +1489,8 @@ int Graph::get_attr_items(grow_tObject object, attr_sItem** itemlist,
       strcpy(items[i].name, grow_info_p->name);
       items[i].type = grow_info_p->type;
       items[i].size = grow_info_p->size;
-      items[i].minlimit = 0;
-      items[i].maxlimit = 0;
+      items[i].minlimit = grow_info_p->minlimit;
+      items[i].maxlimit = grow_info_p->maxlimit;
       items[i].noedit = grow_info_p->no_edit;
       items[i].multiline = grow_info_p->multiline;
       items[i].input_validation_cb = grow_info_p->input_validation_cb;
