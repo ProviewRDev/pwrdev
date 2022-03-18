@@ -1263,3 +1263,10 @@ int Pal::get_select(pwr_tClassId* classid)
   }
   return 1;
 }
+
+void Pal::update_color_theme(int ct)
+{
+  if (brow_ctx)
+    brow_UpdateColorTheme(brow_ctx, ct);
+}
+

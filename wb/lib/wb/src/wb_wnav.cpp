@@ -612,7 +612,8 @@ WNav::WNav(void* xn_parent_ctx, const char* xn_name, const char* xn_layout,
       window_type(xn_type), ldhses(xn_ldhses), wbctx(0), brow(0), brow_cnt(0),
       trace_started(0), message_cb(NULL), close_cb(NULL), map_cb(NULL),
       change_value_cb(NULL), script_filename_cb(NULL),
-      get_build_options_cb(NULL), ccm_func_registred(0), menu_tree(NULL),
+      get_build_options_cb(NULL), update_color_theme_cb(NULL),
+      ccm_func_registred(0), menu_tree(NULL),
       closing_down(0), base_priv(pwr_mPrv_System), priv(pwr_mPrv_System),
       editmode(0), layout_objid(pwr_cNObjid), search_last(pwr_cNObjid),
       search_compiled(0), search_type(wnav_eSearchType_No), selection_owner(0),
@@ -2259,10 +2260,8 @@ void WNav::set_options(int ena_comment, int ena_revisions, int sh_class,
   gbl.build.crossref_graph = bu_crossrefgraph;
   gbl.build.manual = bu_manual;
   gbl.build.nocopy = bu_nocopy;
-  if (gbl.color_theme != col_theme) {
-    gbl.color_theme = col_theme;
-    update_color_theme(col_theme);
-  }
+  if (gbl.color_theme != col_theme && update_color_theme_cb)
+    (update_color_theme_cb)(parent_ctx, CoWow::SetColorTheme(col_theme));
   ldh_refresh(pwr_cNObjid);
 }
 
@@ -2390,7 +2389,8 @@ int WNav::save_settnings(std::ofstream& fp)
     fp << "endif\n";
   else if (window_type == wnav_eWindowType_W2)
     fp << "endif\n";
-  fp << "set colortheme/index=" << gbl.color_theme << "\n";
+  if (window_type == wnav_eWindowType_W1)
+    fp << "set colortheme/index=" << gbl.color_theme << "\n";
   return 1;
 }
 
@@ -3497,6 +3497,7 @@ void WNav::update_color_theme(int ct)
 {
   if (brow)
     brow_UpdateColorTheme(brow->ctx, ct);
+  gbl.color_theme = CoWow::ColorTheme();
 }
 
 ApplListElem::ApplListElem(applist_eType al_type, void* al_ctx,

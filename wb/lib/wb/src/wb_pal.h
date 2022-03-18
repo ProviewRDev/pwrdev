@@ -128,6 +128,7 @@ public:
   int object_exist(brow_tObject object);
   int session_opened(ldh_tSesContext pal_ldhses, char* pal_root_name);
   int session_closed();
+  void update_color_theme(int ct);
 
   static int init_brow_cb(FlowCtx* fctx, void* client_data);
   static int brow_cb(FlowCtx* ctx, flow_tEvent event);

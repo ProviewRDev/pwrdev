@@ -370,6 +370,14 @@ void Wtt::configure_cb(void* ctx, int edit)
   }
 }
 
+void Wtt::update_color_theme_cb(void *ctx, int ct)
+{
+  Wtt* wtt = (Wtt*)ctx;
+  wtt->wnav->update_color_theme(ct);
+  wtt->wnavnode->update_color_theme(ct);
+  wtt->palette->update_color_theme(ct);
+}
+
 void Wtt::findregex_ok(Wtt* wtt, char* search_str)
 {
   int sts;

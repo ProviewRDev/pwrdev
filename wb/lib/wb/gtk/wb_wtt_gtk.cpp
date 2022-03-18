@@ -2950,6 +2950,7 @@ WttGtk::WttGtk(void* wt_parent_ctx, GtkWidget* wt_parent_wid,
   wnav->global_unselect_objid_cb = Wtt::global_unselect_objid_cb;
   wnav->set_window_char_cb = Wtt::set_window_char_cb;
   wnav->open_vsel_cb = Wtt::open_vsel_cb;
+  wnav->update_color_theme_cb = Wtt::update_color_theme_cb;
   focused_wnav = wnav;
   wnav_mapped = 1;
 
@@ -2977,6 +2978,7 @@ WttGtk::WttGtk(void* wt_parent_ctx, GtkWidget* wt_parent_wid,
   wnavnode->global_unselect_objid_cb = Wtt::global_unselect_objid_cb;
   wnavnode->set_window_char_cb = Wtt::set_window_char_cb;
   wnavnode->open_vsel_cb = Wtt::open_vsel_cb;
+  wnavnode->update_color_theme_cb = Wtt::update_color_theme_cb;
   wnavnode_mapped = 1;
 
   gtk_paned_pack1(GTK_PANED(wnav_paned), wnav_brow_widget, TRUE, TRUE);

@@ -359,6 +359,7 @@ public:
   static void create_pal_popup_menu_cb(void* wtt, pwr_tCid cid, int x, int y);
   static void gbl_command_cb(void* ctx, const char* cmd);
   static void configure_cb(void* ctx, int edit);
+  static void update_color_theme_cb(void *ctx, int ct);
   static void findregex_ok(Wtt* wtt, char* search_str);
   static void find_ok(Wtt* wtt, char* search_str);
   static void file_selected_cb(

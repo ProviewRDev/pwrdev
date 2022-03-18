@@ -3931,8 +3931,10 @@ int XNav::init_brow_base_cb(FlowCtx* fctx, void* client_data)
     if (xnav->op)
       xnav->op->set_title(xnav->user);
 
-  } else
+  } else {
     xnav->login();
+    xnav->gbl.color_theme = CoWow::ColorTheme();
+  }
 
   if (xnav->opplace_p
       && (xnav->opplace_p->Options & pwr_mOpPlaceOptionsMask_OperatorLog

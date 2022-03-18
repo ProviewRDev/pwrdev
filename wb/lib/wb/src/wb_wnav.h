@@ -227,6 +227,7 @@ public:
   void (*set_window_char_cb)(void*, int, int);
   void (*open_vsel_cb)(void*, wb_eType, char*, wow_eFileSelType);
   void (*get_build_options_cb)(void*, wb_build_opt**);
+  void (*update_color_theme_cb)(void*, int);
   int ccm_func_registred;
   wnav_sMenu* menu_tree;
   int closing_down;

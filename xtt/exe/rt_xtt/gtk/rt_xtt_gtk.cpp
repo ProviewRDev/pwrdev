@@ -761,6 +761,7 @@ XttGtk::XttGtk(int argc, char* argv[], int* return_sts)
       toplevel, "focus-in-event", G_CALLBACK(XttGtk::action_inputfocus), this);
 
   int dark_theme = CoWowGtk::GetDarkTheme(toplevel);
+  CoWow::SetColorTheme(0);
 
   CoWowGtk::SetWindowIcon(toplevel);
 

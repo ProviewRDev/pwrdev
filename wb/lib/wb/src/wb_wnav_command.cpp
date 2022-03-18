@@ -1412,24 +1412,15 @@ static int wnav_set_func(void* client_data, void* client_flag)
       wnav->message('E', "Type syntax error");
       return WNAV__HOLDCOMMAND;
     }
-
-    if (EVEN(dcli_get_qualifier("/LOCAL", 0, 0))) {
-      num = sscanf(idx_str, "%d", &idx);
-      if (num != 1) {
-	wnav->message('E', "Type syntax error");
-	return WNAV__HOLDCOMMAND;
-      }
-      idx = CoWow::SetColorTheme(idx);
-
-      // Global command to all windows
-      pwr_tCmd cmd;
-      sprintf(cmd, "SET COLORTHEME /INDEX=%d", idx);
-      (wnav->gbl_command_cb)(wnav->parent_ctx, cmd);
+    num = sscanf(idx_str, "%d", &idx);
+    if (num != 1) {
+      wnav->message('E', "Type syntax error");
+      return WNAV__HOLDCOMMAND;
     }
-    else {
-      wnav->gbl.color_theme = CoWow::ColorTheme();
-      wnav->update_color_theme(CoWow::ColorTheme());
-    }
+
+    idx = CoWow::SetColorTheme(idx);
+    if (wnav->update_color_theme_cb)
+      (wnav->update_color_theme_cb)(wnav->parent_ctx, idx);
   } else {
     wnav->message('E', "Syntax error");
     return WNAV__SYNTAX;
