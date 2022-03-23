@@ -519,10 +519,44 @@ void wb_crrgen::load(pwr_tStatus* rsts, int sim, int graph)
           case ge_eSave_DigSwap_attribute:
           case ge_eSave_DigScript_attribute:
           case ge_eSave_DigCommand_attribute:
+          case ge_eSave_RefUpdate_attribute:
           case ge_eSave_Slider_minvalue_attr:
           case ge_eSave_Slider_maxvalue_attr:
           case ge_eSave_Slider_insensitive_attr:
           case ge_eSave_AnalogColor_attribute:
+          case ge_eSave_DsTrend_dstrend_object1:
+          case ge_eSave_DsTrend_dstrend_object2:
+          case ge_eSave_DsTrend_mark1_attr:
+          case ge_eSave_DsTrend_mark2_attr:
+          case ge_eSave_DsTrend_hold_attr:
+          case ge_eSave_DsTrend_minvalue_attr1:
+          case ge_eSave_DsTrend_maxvalue_attr1:
+          case ge_eSave_DsTrend_minvalue_attr2:
+          case ge_eSave_DsTrend_maxvalue_attr2:
+          case ge_eSave_DsTrendCurve_dstrend_object:
+          case ge_eSave_DsTrendCurve_mark1_attr:
+          case ge_eSave_DsTrendCurve_mark2_attr:
+          case ge_eSave_DsTrendCurve_hold_attr:
+          case ge_eSave_DsTrendCurve_minvalue_attr1:
+          case ge_eSave_DsTrendCurve_maxvalue_attr1:
+          case ge_eSave_DsTrendCurve_minvalue_attr2:
+          case ge_eSave_DsTrendCurve_maxvalue_attr2:
+          case ge_eSave_OptionMenu_text_attribute:
+          case ge_eSave_OptionMenu_size_attribute:
+          case ge_eSave_OptionMenu_update_attribute:
+          case ge_eSave_SevHist_sevhist_object1:
+          case ge_eSave_SevHist_sevhist_object2:
+          case ge_eSave_SevHist_attribute1:
+          case ge_eSave_SevHist_attribute2:
+          case ge_eSave_SevHist_mark1_attr:
+          case ge_eSave_SevHist_mark2_attr:
+          case ge_eSave_SevHist_hold_attr:
+          case ge_eSave_SevHist_minvalue_attr1:
+          case ge_eSave_SevHist_maxvalue_attr1:
+          case ge_eSave_SevHist_minvalue_attr2:
+          case ge_eSave_SevHist_maxvalue_attr2:
+          case ge_eSave_SevHist_timerange_attr:
+          case ge_eSave_SevHist_update_attr:
           case ge_eSave_DigSound_soundobject:
           case ge_eSave_PopupMenu_ref_object: {
             if ((s = strchr(linep[1], '#')))
