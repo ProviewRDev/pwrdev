@@ -94,7 +94,7 @@ static sComboTableText gridsize_combo_table[] = {
 static sComboTableText font_combo_table[] = {
   {"Helvetica", glow_eFont_Helvetica},
   {"Times", glow_eFont_Times},
-  {"New Century Schoolbook", glow_eFont_NewCenturySchoolbook},
+  {"New Century SB", glow_eFont_NewCenturySchoolbook},
   {"Courier", glow_eFont_Courier},
   {"LucidaSans", glow_eFont_LucidaSans}
 };
@@ -1668,6 +1668,7 @@ GeGtk::GeGtk(void* x_parent_ctx, GtkWidget* x_parent_widget,
   g_signal_connect(
       toplevel, "focus-in-event", G_CALLBACK(ge_action_inputfocus), this);
 
+  int dark_theme = CoWowGtk::GetDarkTheme(toplevel);
   CoWowGtk::SetWindowIcon(toplevel);
 
   GtkAccelGroup* accel_g
@@ -2536,159 +2537,214 @@ GeGtk::GeGtk(void* x_parent_ctx, GtkWidget* x_parent_widget,
   // Toolbar buttons
 
   // Shape buttons
-  wutl_tools_item(tools, "$pwr_exe/ge_rect.png", G_CALLBACK(activate_rect), 
-      "Draw a rectangle", this, 0, 0);
+  wutl_tools_item(tools, 
+      dark_theme ? "$pwr_exe/ico_rect_d_24.png" : "$pwr_exe/ico_rect_l_24.png",
+      G_CALLBACK(activate_rect), "Draw a rectangle", this, 0, 0);
 
-  wutl_tools_item(tools, "$pwr_exe/ge_roundedrect.png", G_CALLBACK(activate_rectrounded), 
-      "Draw a rounded rectangle", this, 0, 0);
+  wutl_tools_item(tools, 
+      dark_theme ? "$pwr_exe/ico_roundedrect_d_24.png" : "$pwr_exe/ico_roundedrect_l_24.png",
+      G_CALLBACK(activate_rectrounded), "Draw a rounded rectangle", this, 0, 0);
 
-  wutl_tools_item(tools, "$pwr_exe/ge_circ.png", G_CALLBACK(activate_circle), 
-      "Draw a circle or ellipse", this, 0, 0);
+  wutl_tools_item(tools, 
+      dark_theme ? "$pwr_exe/ico_arc_d_24.png" : "$pwr_exe/ico_arc_l_24.png",
+      G_CALLBACK(activate_circle), "Draw a circle or ellipse", this, 0, 0);
 
-  wutl_tools_item(tools, "$pwr_exe/ge_line.png", G_CALLBACK(activate_line), 
-      "Draw a line", this, 0, 0);
+  wutl_tools_item(tools,
+      dark_theme ? "$pwr_exe/ico_line_d_24.png" : "$pwr_exe/ico_line_l_24.png",
+      G_CALLBACK(activate_line), "Draw a line", this, 0, 0);
 
-  wutl_tools_item(tools, "$pwr_exe/ge_polyline.png", G_CALLBACK(activate_polyline), 
-      "Draw a polyline or polygon", this, 0, 0);
+  wutl_tools_item(tools, 
+      dark_theme ? "$pwr_exe/ico_polyline_d_24.png" : "$pwr_exe/ico_polyline_l_24.png",
+      G_CALLBACK(activate_polyline), "Draw a polyline or polygon", this, 0, 0);
 
-  wutl_tools_item(tools, "$pwr_exe/ge_text.png", G_CALLBACK(activate_text), 
-      "Draw a text", this, 0, 0);
+  wutl_tools_item(tools,
+      dark_theme ? "$pwr_exe/ico_text_d_24.png" : "$pwr_exe/ico_text_l_24.png",
+      G_CALLBACK(activate_text), "Draw a text", this, 0, 0);
 
-  wutl_tools_item(tools, "$pwr_exe/ge_annot.png", G_CALLBACK(activate_annot), 
-      "Insert an annotation", this, 0, 0);
+  wutl_tools_item(tools,
+      dark_theme ? "$pwr_exe/ico_annot_d_24.png" : "$pwr_exe/ico_annot_l_24.png",
+      G_CALLBACK(activate_annot), "Insert an annotation", this, 0, 0);
 
   wutl_tools_item(tools, "$pwr_exe/ge_conpoint.png", G_CALLBACK(activate_conpoint), 
       "Insert a connection point", this, 0, 0);
 
   // Border checkbutton
-  wutl_tools_toggle_button(tools, "$pwr_exe/ge_border.png", G_CALLBACK(activate_border), 
-    "Set border property on selected objects, and as default", this, 1, 0);
+  wutl_tools_toggle_button(tools,
+      dark_theme ? "$pwr_exe/ico_border_d_24.png" : "$pwr_exe/ico_border_l_24.png",
+      G_CALLBACK(activate_border), 
+     "Set border property on selected objects, and as default", this, 1, 0);
 
 
   // Fill checkbutton
-  wutl_tools_toggle_button(tools, "$pwr_exe/ge_fill.png", G_CALLBACK(activate_fill), 
+  wutl_tools_toggle_button(tools, 
+    dark_theme ? "$pwr_exe/ico_fill_d_24.png" : "$pwr_exe/ico_fill_l_24.png", 
+    G_CALLBACK(activate_fill), 
     "Set fill property on selected objects, and as default", this, 1, 0);
 
   // 3D checkbutton
-  wutl_tools_toggle_button(tools, "$pwr_exe/ge_3d.png", G_CALLBACK(activate_shadow), 
-    "Set 3d property on selected objects, and as default", this, 1, 0);
+  wutl_tools_toggle_button(tools,
+      dark_theme ? "$pwr_exe/ico_3d_d_24.png" : "$pwr_exe/ico_3d_l_24.png",
+     G_CALLBACK(activate_shadow), 
+     "Set 3d property on selected objects, and as default", this, 1, 0);
 
   // Pop button
-  wutl_tools_item(tools, "$pwr_exe/ge_pop.png", G_CALLBACK(activate_pop), 
-      "Pop selected objects", this, 1, 0);
+  wutl_tools_item(tools,
+      dark_theme ? "$pwr_exe/ico_pop_d_24.png" : "$pwr_exe/ico_pop_l_24.png",
+      G_CALLBACK(activate_pop), "Pop selected objects", this, 1, 0);
 
   // Push button
-  wutl_tools_item(tools, "$pwr_exe/ge_push.png", G_CALLBACK(activate_push), 
-      "Push selected objects", this, 1, 0);
+  wutl_tools_item(tools,
+      dark_theme ? "$pwr_exe/ico_push_d_24.png" : "$pwr_exe/ico_push_l_24.png",
+      G_CALLBACK(activate_push), "Push selected objects", this, 1, 0);
 
   // Move horizontal
-  wutl_tools_item(tools, "$pwr_exe/ge_move_horiz.png", G_CALLBACK(activate_move_horizontal), 
-      "Move horizontal", this, 1, 0);
+  wutl_tools_item(tools,
+      dark_theme ? "$pwr_exe/ico_move_horiz_d_24.png" : "$pwr_exe/ico_move_horiz_l_24.png",
+      G_CALLBACK(activate_move_horizontal), "Move horizontal", this, 1, 0);
 
   // Move vertical
-  wutl_tools_item(tools, "$pwr_exe/ge_move_vert.png", G_CALLBACK(activate_move_vertical), 
-      "Move vertical", this, 1, 0);
+  wutl_tools_item(tools,
+      dark_theme ? "$pwr_exe/ico_move_vert_d_24.png" : "$pwr_exe/ico_move_vert_l_24.png",
+      G_CALLBACK(activate_move_vertical), "Move vertical", this, 1, 0);
 
   // Group button
-  wutl_tools_item(tools, "$pwr_exe/ge_group.png", G_CALLBACK(activate_group), 
-      "Group selected objects", this, 1, 0);
+  wutl_tools_item(tools,
+      dark_theme ? "$pwr_exe/ico_group_d_24.png" : "$pwr_exe/ico_group_l_24.png",
+      G_CALLBACK(activate_group), "Group selected objects", this, 1, 0);
 
   // Ungroup button
-  wutl_tools_item(tools, "$pwr_exe/ge_ungroup.png", G_CALLBACK(activate_ungroup), 
-      "Split selected group", this, 1, 0);
+  wutl_tools_item(tools,
+      dark_theme ? "$pwr_exe/ico_ungroup_d_24.png" : "$pwr_exe/ico_ungroup_l_24.png",
+      G_CALLBACK(activate_ungroup), "Split selected group", this, 1, 0);
 
-  // Align horizontal up
-  wutl_tools_item(tools, "$pwr_exe/ge_align_horiz_bottom.png", G_CALLBACK(activate_align_horiz_down), 
+  // Align horizontal down
+  wutl_tools_item(tools,
+      dark_theme ? "$pwr_exe/ico_align_horiz_bottom_d_24.png" : "$pwr_exe/ico_align_horiz_bottom_l_24.png",
+      G_CALLBACK(activate_align_horiz_down), 
       "Align selected objects bottom side horizontal", this, 0, 0);
 
   // Align horizontal center
-  wutl_tools_item(tools, "$pwr_exe/ge_align_horiz_center.png", G_CALLBACK(activate_align_horiz_center), 
+  wutl_tools_item(tools,
+      dark_theme ? "$pwr_exe/ico_align_horiz_center_d_24.png" : "$pwr_exe/ico_align_horiz_center_l_24.png",
+      G_CALLBACK(activate_align_horiz_center), 
       "Align selected objects center horizontal", this, 0, 0);
 
   // Align horizontal up
-  wutl_tools_item(tools, "$pwr_exe/ge_align_horiz_top.png", G_CALLBACK(activate_align_horiz_up), 
+  wutl_tools_item(tools,
+      dark_theme ? "$pwr_exe/ico_align_horiz_top_d_24.png" : "$pwr_exe/ico_align_horiz_top_l_24.png",
+      G_CALLBACK(activate_align_horiz_up), 
       "Align selected objects top side horizontal", this, 0, 0);
 
   // Align vertical left
-  wutl_tools_item(tools, "$pwr_exe/ge_align_vert_left.png", G_CALLBACK(activate_align_vert_left), 
+  wutl_tools_item(tools,
+      dark_theme ? "$pwr_exe/ico_align_vert_left_d_24.png" : "$pwr_exe/ico_align_vert_left_l_24.png",
+      G_CALLBACK(activate_align_vert_left), 
       "Align selected objects left side vertical", this, 0, 0);
 
   // Align vertical center
-  wutl_tools_item(tools, "$pwr_exe/ge_align_vert_center.png", G_CALLBACK(activate_align_vert_center), 
+  wutl_tools_item(tools,
+      dark_theme ? "$pwr_exe/ico_align_vert_center_d_24.png" : "$pwr_exe/ico_align_vert_center_l_24.png",
+      G_CALLBACK(activate_align_vert_center), 
       "Align selected objects center vertical", this, 0, 0);
 
   // Align vertical right
-  wutl_tools_item(tools, "$pwr_exe/ge_align_vert_right.png", G_CALLBACK(activate_align_vert_right), 
+  wutl_tools_item(tools,
+      dark_theme ? "$pwr_exe/ico_align_vert_right_d_24.png" : "$pwr_exe/ico_align_vert_right_l_24.png",
+      G_CALLBACK(activate_align_vert_right), 
       "Align selected objects right side vertical", this, 0, 0);
 
   // Equidistance vertical left
-  wutl_tools_item(tools, "$pwr_exe/ge_equidist_left.png", G_CALLBACK(activate_equid_horiz_left), 
+  wutl_tools_item(tools,
+      dark_theme ? "$pwr_exe/ico_equidist_left_d_24.png" : "$pwr_exe/ico_equidist_left_l_24.png",
+       G_CALLBACK(activate_equid_horiz_left), 
       "Set equal distance between objects left side horizontal", this, 0, 0);
 
   // Equidistance horizontal bottom
-  wutl_tools_item(tools, "$pwr_exe/ge_equidist_bottom.png", G_CALLBACK(activate_equid_vert_down), 
+  wutl_tools_item(tools,
+      dark_theme ? "$pwr_exe/ico_equidist_bottom_d_24.png" : "$pwr_exe/ico_equidist_bottom_l_24.png",
+      G_CALLBACK(activate_equid_vert_down), 
       "Set equal distance between objects bottom side vertical", this, 0, 0);
 
   // View Planthierarchy
-  wutl_tools_item(tools, "$pwr_exe/xtt_navigator.png", G_CALLBACK(activate_view_plant), 
+  wutl_tools_item(tools,
+      dark_theme ? "$pwr_exe/ico_navigator_d_24.png" : "$pwr_exe/ico_navigator_l_24.png",
+      G_CALLBACK(activate_view_plant), 
       "View plant hierarchy", this, 0, 0);
 
   // Open Object attributes
-  wutl_tools_item(tools, "$pwr_exe/xtt_object.png", G_CALLBACK(activate_objectattributes), 
-      "Open selected object", this, 0, 0);
+  wutl_tools_item(tools, 
+      dark_theme ? "$pwr_exe/ico_properties_d_24.png" : "$pwr_exe/ico_properties_l_24.png",
+      G_CALLBACK(activate_objectattributes), "Open selected object", this, 0, 0);
 
   // Ordinary edit mode button
-  wutl_tools_item(tools2, "$pwr_exe/ge_reset.png", G_CALLBACK(activate_reset_mode), 
-      "Mode reset", this, 0, 0);
+  wutl_tools_item(tools2,
+      dark_theme ? "$pwr_exe/ico_reset_d_24.png" : "$pwr_exe/ico_reset_l_24.png",
+      G_CALLBACK(activate_reset_mode), "Mode reset", this, 0, 0);
 
   // Scale button
-  wutl_tools_item(tools2, "$pwr_exe/ge_scale.png", G_CALLBACK(activate_scale), 
-      "Scale selected objects", this, 0, 0);
+  wutl_tools_item(tools2,
+      dark_theme ? "$pwr_exe/ico_scale_d_24.png" : "$pwr_exe/ico_scale_l_24.png",
+      G_CALLBACK(activate_scale), "Scale selected objects", this, 0, 0);
 
   // Scale double button
-  wutl_tools_item(tools2, "$pwr_exe/ge_scale_double.png", G_CALLBACK(activate_scale_double), 
-      "Scale selected objects to double size", this, 0, 0);
+  wutl_tools_item(tools2,
+      dark_theme ? "$pwr_exe/ico_scale_double_d_24.png" : "$pwr_exe/ico_scale_double_l_24.png",
+      G_CALLBACK(activate_scale_double), "Scale selected objects to double size", this, 0, 0);
 
   // Scale half button
-  wutl_tools_item(tools2, "$pwr_exe/ge_scale_half.png", G_CALLBACK(activate_scale_half), 
-      "Scale selected objects to half size", this, 0, 0);
+  wutl_tools_item(tools2,
+      dark_theme ? "$pwr_exe/ico_scale_half_d_24.png" : "$pwr_exe/ico_scale_half_l_24.png",
+      G_CALLBACK(activate_scale_half), "Scale selected objects to half size", this, 0, 0);
 
   // Rotate 90 button
-  wutl_tools_item(tools2, "$pwr_exe/ge_flip.png", G_CALLBACK(activate_rotate90), 
+  wutl_tools_item(tools2,
+      dark_theme ? "$pwr_exe/ico_flip_d_24.png" : "$pwr_exe/ico_flip_l_24.png",
+      G_CALLBACK(activate_rotate90), 
       "Rotate selected objects 90 degrees", this, 0, 0);
 
   // Mirror horizontal button
-  wutl_tools_item(tools2, "$pwr_exe/ge_mirrorhorizontal.png", G_CALLBACK(activate_flip_horiz), 
+  wutl_tools_item(tools2,
+      dark_theme ? "$pwr_exe/ico_mirrorhorizontal_d_24.png" : "$pwr_exe/ico_mirrorhorizontal_l_24.png",
+       G_CALLBACK(activate_flip_horiz), 
       "Mirror selected objects horizontal", this, 0, 0);
 
   // Mirror vertical button
-  wutl_tools_item(tools2, "$pwr_exe/ge_mirrorvertical.png", G_CALLBACK(activate_flip_vert), 
+  wutl_tools_item(tools2,
+      dark_theme ? "$pwr_exe/ico_mirrorvertical_d_24.png" : "$pwr_exe/ico_mirrorvertical_l_24.png",
+      G_CALLBACK(activate_flip_vert), 
       "Mirror selected objects vertical", this, 0, 0);
 
   // Tools row
 
-  wutl_tools_item(tools3, "$pwr_exe/wb_save.png", G_CALLBACK(activate_save), 
-      "Save", this, 0, 0);
+  wutl_tools_item(tools3,
+      dark_theme ? "$pwr_exe/ico_save_d_24.png" : "$pwr_exe/ico_save_l_24.png",
+      G_CALLBACK(activate_save), "Save", this, 0, 0);
 
-  wutl_tools_item(tools3, "$pwr_exe/wb_build.png", G_CALLBACK(activate_build), 
-      "Build", this, 0, 0);
+  wutl_tools_item(tools3,
+      dark_theme ? "$pwr_exe/ico_build_d_24.png" : "$pwr_exe/ico_build_l_24.png",
+      G_CALLBACK(activate_build), "Build", this, 0, 0);
 
   // Zoom buttons
-  wutl_tools_item(tools3, "$pwr_exe/ge_zoom_in.png", G_CALLBACK(activate_zoom_in), 
-      "Zoom in", this, 0, 0);
+  wutl_tools_item(tools3,
+      dark_theme ? "$pwr_exe/ico_zoomin_d_24.png" : "$pwr_exe/ico_zoomin_l_24.png",
+      G_CALLBACK(activate_zoom_in), "Zoom in", this, 0, 0);
 
-  wutl_tools_item(tools3, "$pwr_exe/ge_zoom_out.png", G_CALLBACK(activate_zoom_out), 
-      "Zoom out", this, 0, 0);
+  wutl_tools_item(tools3,
+      dark_theme ? "$pwr_exe/ico_zoomout_d_24.png" : "$pwr_exe/ico_zoomout_l_24.png",
+      G_CALLBACK(activate_zoom_out), "Zoom out", this, 0, 0);
 
-  wutl_tools_item(tools3, "$pwr_exe/ge_zoom_reset.png", G_CALLBACK(activate_zoom_reset), 
-      "Zoom reset", this, 0, 0);
+  wutl_tools_item(tools3,
+      dark_theme ? "$pwr_exe/ico_zoomreset_d_24.png" : "$pwr_exe/ico_zoomreset_l_24.png",
+      G_CALLBACK(activate_zoom_reset), "Zoom reset", this, 0, 0);
 
   // Undo and redo
-  wutl_tools_item(tools3, "$pwr_exe/ge_undo.png", G_CALLBACK(activate_undo), 
-      "Undo", this, 0, 0);
+  wutl_tools_item(tools3,
+      dark_theme ? "$pwr_exe/ico_undo_d_24.png" : "$pwr_exe/ico_undo_l_24.png",
+      G_CALLBACK(activate_undo), "Undo", this, 0, 0);
 
-  wutl_tools_item(tools3, "$pwr_exe/ge_redo.png", G_CALLBACK(activate_redo), 
-      "Redo", this, 0, 0);
+  wutl_tools_item(tools3,
+      dark_theme ? "$pwr_exe/ico_redo_d_24.png" : "$pwr_exe/ico_redo_l_24.png",
+      G_CALLBACK(activate_redo), "Redo", this, 0, 0);
 
   // Linewidth combobox
   GtkTreeIter linewidth_iter;
@@ -2771,7 +2827,9 @@ GeGtk::GeGtk(void* x_parent_ctx, GtkWidget* x_parent_widget,
   gtk_combo_box_set_active(GTK_COMBO_BOX(font_combo), 4);
   
   // Bold togglebutton
-  wutl_tools_toggle_button(tools3, "$pwr_exe/ge_textbold.png", G_CALLBACK(activate_textbold), 
+  wutl_tools_toggle_button(tools3,
+      dark_theme ? "$pwr_exe/ico_textbold_d_24.png" : "$pwr_exe/ico_textbold_l_24.png",
+    G_CALLBACK(activate_textbold), 
     "Set bold on selected text, and as default", this, 0, 0);
 
   // Gridsize combobox
@@ -2781,7 +2839,7 @@ GeGtk::GeGtk(void* x_parent_ctx, GtkWidget* x_parent_widget,
   gridsize_liststore = gtk_list_store_new(1, G_TYPE_STRING);
   for (int i = 0; i < sizeof(gridsize_combo_table)/sizeof(gridsize_combo_table[0]); i++)
     gtk_list_store_insert_with_values(gridsize_liststore, &gridsize_iter, i, 0, CoWowGtk::convert_utf8(gridsize_combo_table[i].text), -1);
-  gridsize_combo = gtk_combo_box_new_with_model(GTK_TREE_MODEL(gridsize_liststore));
+ gridsize_combo = gtk_combo_box_new_with_model(GTK_TREE_MODEL(gridsize_liststore));
 
   GtkCellRenderer *gridsize_combocell = gtk_cell_renderer_text_new();
   gtk_cell_layout_pack_start(GTK_CELL_LAYOUT(gridsize_combo), gridsize_combocell, TRUE);
@@ -2795,45 +2853,61 @@ GeGtk::GeGtk(void* x_parent_ctx, GtkWidget* x_parent_widget,
   gtk_combo_box_set_active(GTK_COMBO_BOX(gridsize_combo), 3);
   
   // Show grid checkbutton
-  show_grid_w = wutl_tools_toggle_button(tools2, "$pwr_exe/ge_showgrid.png", G_CALLBACK(activate_show_grid), 
-    "Show grid", this, 1, 0);
+  show_grid_w = wutl_tools_toggle_button(tools2,
+      dark_theme ? "$pwr_exe/ico_showgrid_d_24.png" : "$pwr_exe/ico_showgrid_l_24.png",
+      G_CALLBACK(activate_show_grid), 
+      "Show grid", this, 1, 0);
 
   // Snap to grid checkbutton
-  grid_on_w = wutl_tools_toggle_button(tools2, "$pwr_exe/ge_snap.png", G_CALLBACK(activate_grid), 
-    "Snap to grid", this, 1, 0);
+  grid_on_w = wutl_tools_toggle_button(tools2,
+      dark_theme ? "$pwr_exe/ico_snap_d_24.png" : "$pwr_exe/ico_snap_l_24.png",
+      G_CALLBACK(activate_grid), 
+      "Snap to grid", this, 1, 0);
 
   // Brightness
-  wutl_tools_item(tools2, "$pwr_exe/ge_arrowleft.png", G_CALLBACK(activate_decr_lightness), 
-      "Decrease brightness", this, 0, 0);
+  wutl_tools_item(tools3,
+      dark_theme ? "$pwr_exe/ico_arrowleft_d_24.png" : "$pwr_exe/ico_arrowleft_l_24.png",
+      G_CALLBACK(activate_decr_lightness), "Decrease brightness", this, 0, 0);
 
-  wutl_tools_item(tools2, "$pwr_exe/ge_brightness.png", NULL, NULL, this, 0, 0);
+  wutl_tools_item(tools3,
+      dark_theme ? "$pwr_exe/ico_brightness_d_24.png" : "$pwr_exe/ico_brightness_l_24.png",
+      NULL, NULL, this, 0, 0);
 
-  wutl_tools_item(tools2, "$pwr_exe/ge_arrowright.png", G_CALLBACK(activate_incr_lightness), 
-      "Increase brightness", this, 0, 0);
+  wutl_tools_item(tools3,
+      dark_theme ? "$pwr_exe/ico_arrowright_d_24.png" : "$pwr_exe/ico_arrowright_l_24.png",
+      G_CALLBACK(activate_incr_lightness), "Increase brightness", this, 0, 0);
 
   // Separator
-  gtk_toolbar_insert(tools2, gtk_separator_tool_item_new(), -1);
+  gtk_toolbar_insert(tools3, gtk_separator_tool_item_new(), -1);
 
   // Intensity
-  wutl_tools_item(tools2, "$pwr_exe/ge_arrowleft.png", G_CALLBACK(activate_decr_intensity), 
-      "Decrease color intensity", this, 0, 0);
+  wutl_tools_item(tools3,
+      dark_theme ? "$pwr_exe/ico_arrowleft_d_24.png" : "$pwr_exe/ico_arrowleft_l_24.png",
+      G_CALLBACK(activate_decr_intensity), "Decrease color intensity", this, 0, 0);
 
-  wutl_tools_item(tools2, "$pwr_exe/ge_color.png", NULL, NULL, this, 0, 0);
+  wutl_tools_item(tools3,
+      dark_theme ? "$pwr_exe/ico_color_d_24.png" : "$pwr_exe/ico_color_l_24.png",
+      NULL, NULL, this, 0, 0);
 
-  wutl_tools_item(tools2, "$pwr_exe/ge_arrowright.png", G_CALLBACK(activate_incr_intensity), 
-      "Increase color intensity", this, 0, 0);
+  wutl_tools_item(tools3,
+      dark_theme ? "$pwr_exe/ico_arrowright_d_24.png" : "$pwr_exe/ico_arrowright_l_24.png",
+      G_CALLBACK(activate_incr_intensity), "Increase color intensity", this, 0, 0);
 
   // Separator
-  gtk_toolbar_insert(tools2, gtk_separator_tool_item_new(), -1);
+  gtk_toolbar_insert(tools3, gtk_separator_tool_item_new(), -1);
 
   // Shift
-  wutl_tools_item(tools2, "$pwr_exe/ge_arrowleft.png", G_CALLBACK(activate_decr_shift), 
-      "Shift color", this, 0, 0);
+  wutl_tools_item(tools3,
+      dark_theme ? "$pwr_exe/ico_arrowleft_d_24.png" : "$pwr_exe/ico_arrowleft_l_24.png",
+      G_CALLBACK(activate_decr_shift), "Shift color", this, 0, 0);
 
-  wutl_tools_item(tools2, "$pwr_exe/ge_colorshift.png", NULL, NULL, this, 0, 0);
+  wutl_tools_item(tools3,
+      dark_theme ? "$pwr_exe/ico_colorshift_d_24.png" : "$pwr_exe/ico_colorshift_l_24.png",
+      NULL, NULL, this, 0, 0);
 
-  wutl_tools_item(tools2, "$pwr_exe/ge_arrowright.png", G_CALLBACK(activate_incr_shift), 
-      "Shift color", this, 0, 0);
+  wutl_tools_item(tools3,
+      dark_theme ? "$pwr_exe/ico_arrowright_d_24.png" : "$pwr_exe/ico_arrowright_l_24.png",
+      G_CALLBACK(activate_incr_shift), "Shift color", this, 0, 0);
 
   // Gradient option menu
   GtkTreeIter iter;
