@@ -986,6 +986,7 @@ pwrc_set_func()
       export pwr_lis=$baseroot/$platform/exp/lis
       export pwr_obj=$baseroot/$platform/exp/obj
       export pwr_load=$baseroot/$platform/exp/load
+      export pwr_web=$baseroot/$platform/exp/web
       
       export PATH=$PATH:$pwr_exe
     fi
