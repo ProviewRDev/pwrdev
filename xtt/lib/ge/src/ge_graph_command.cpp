@@ -1359,10 +1359,21 @@ static int graph_set_func(void* client_data, void* client_flag)
       || str_NoCaseStrcmp(arg1_str, "NOSHOWATTRXREF") == 0
       || str_NoCaseStrcmp(arg1_str, "BUILDCROSSREF") == 0
       || str_NoCaseStrcmp(arg1_str, "NOBUILDCROSSREF") == 0
+      || str_NoCaseStrcmp(arg1_str, "BUILDCROSSREFSIM") == 0
+      || str_NoCaseStrcmp(arg1_str, "NOBUILDCROSSREFSIM") == 0
+      || str_NoCaseStrcmp(arg1_str, "BUILDCROSSREFGRAPH") == 0
+      || str_NoCaseStrcmp(arg1_str, "NOBUILDCROSSREFGRAPH") == 0
       || str_NoCaseStrcmp(arg1_str, "BUILDMANUAL") == 0
       || str_NoCaseStrcmp(arg1_str, "NOBUILDMANUAL") == 0
+      || str_NoCaseStrcmp(arg1_str, "BUILDDEBUG") == 0
+      || str_NoCaseStrcmp(arg1_str, "NOBUILDDEBUG") == 0
+      || str_NoCaseStrcmp(arg1_str, "BUILDNOCOPY") == 0
+      || str_NoCaseStrcmp(arg1_str, "NOBUILDNOCOPY") == 0
+      || str_NoCaseStrcmp(arg1_str, "ENABLEREVISIONS") == 0
+      || str_NoCaseStrcmp(arg1_str, "NOENABLEREVISIONS") == 0
       || str_NoCaseStrcmp(arg1_str, "WINDOW") == 0
-      || str_NoCaseStrcmp(arg1_str, "INPUTFOCUS") == 0) {
+      || str_NoCaseStrcmp(arg1_str, "INPUTFOCUS") == 0
+      || str_NoCaseStrcmp(arg1_str, "COLORTHEME") == 0) {
     // Compatible with xnav init file
   } else if (str_NoCaseStrncmp(arg1_str, "ENABLECOMMENT", strlen(arg1_str))
       == 0) {
