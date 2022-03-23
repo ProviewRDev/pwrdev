@@ -80,7 +80,7 @@ int main(int argc, char* argv[])
   setlocale(LC_TIME, "en_US");
 
   GtkCssProvider *provider;
-  dcli_translate_filename(fname, "$pwr_exe/pwr.css");
+  dcli_translate_filename(fname, "$pwr_load/wb_gtk.css");
   provider = gtk_css_provider_new();
   gtk_style_context_add_provider_for_screen(gdk_display_get_default_screen(
       gdk_display_get_default()), GTK_STYLE_PROVIDER(provider), 
