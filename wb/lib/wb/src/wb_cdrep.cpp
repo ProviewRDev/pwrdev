@@ -114,6 +114,8 @@ wb_cdrep::wb_cdrep(wb_mvrep* mvrep, wb_name name)
   if (EVEN(m_sts)) {
     wb_name n = wb_name("Class");
     wb_orep* c_orep = mvrep->object(&m_sts, n);
+    if (EVEN(m_sts))
+      throw wb_error(m_sts);
     c_orep->ref();
     for (wb_orep* orep = mvrep->first(&m_sts, c_orep); ODD(m_sts);) {
       orep->ref();
