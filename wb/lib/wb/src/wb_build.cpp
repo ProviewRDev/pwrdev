@@ -822,6 +822,11 @@ void wb_build::rootvolume(pwr_tVid vid)
   m_sts = dcli_file_time(fname, &rtt_time);
   if (opt.crossref && (evenSts() || time_Acomp(&modtime, &rtt_time) == 1)) {
     strcpy(cmd, "create crossreferencefiles");
+    if (opt.crossref_graph)
+      strcat(cmd, "/graph");
+    if (opt.crossref_sim)
+      strcat(cmd, "/simulation");
+
     m_wnav->command(cmd);
     if (ODD(sumsts))
       sumsts = PWRB__SUCCESS;
