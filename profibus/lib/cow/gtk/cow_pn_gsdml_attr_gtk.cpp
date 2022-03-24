@@ -345,7 +345,7 @@ GsdmlAttrGtk::GsdmlAttrGtk(GtkWidget* a_parent_wid, void* a_parent_ctx,
   g_signal_connect(toplevel, "focus-in-event", G_CALLBACK(action_inputfocus),
                    this);
 
-  GtkWidget* vbox = gtk_vbox_new(FALSE, 0);
+  GtkWidget* vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 
   // Menu
   // Accelerators
@@ -357,12 +357,16 @@ GsdmlAttrGtk::GsdmlAttrGtk(GtkWidget* a_parent_wid, void* a_parent_ctx,
 
   // File entry
   GtkWidget* file_print =
-      gtk_image_menu_item_new_from_stock(GTK_STOCK_PRINT, accel_g);
+      gtk_menu_item_new_with_mnemonic("_Print");
   g_signal_connect(file_print, "activate", G_CALLBACK(activate_print), this);
+  gtk_widget_add_accelerator(file_print, "activate", accel_g, 'p',
+      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
 
   GtkWidget* file_close =
-      gtk_image_menu_item_new_from_stock(GTK_STOCK_CLOSE, accel_g);
+      gtk_menu_item_new_with_mnemonic("_Close");
   g_signal_connect(file_close, "activate", G_CALLBACK(activate_exit), this);
+  gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w',
+      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
 
   GtkMenu* file_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_print);
@@ -373,17 +377,23 @@ GsdmlAttrGtk::GsdmlAttrGtk(GtkWidget* a_parent_wid, void* a_parent_ctx,
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(file), GTK_WIDGET(file_menu));
 
   // Edit entry
-  menubutton_copy = gtk_image_menu_item_new_from_stock(GTK_STOCK_COPY, accel_g);
+  menubutton_copy = gtk_menu_item_new_with_mnemonic("C_opy");
   g_signal_connect(menubutton_copy, "activate", G_CALLBACK(activate_copy),
                    this);
+  gtk_widget_add_accelerator(menubutton_copy, "activate", accel_g, 'c',
+      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
 
-  menubutton_cut = gtk_image_menu_item_new_from_stock(GTK_STOCK_CUT, accel_g);
+  menubutton_cut = gtk_menu_item_new_with_mnemonic("C_ut");
   g_signal_connect(menubutton_cut, "activate", G_CALLBACK(activate_cut), this);
+  gtk_widget_add_accelerator(menubutton_cut, "activate", accel_g, 'x',
+      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
 
   menubutton_paste =
-      gtk_image_menu_item_new_from_stock(GTK_STOCK_PASTE, accel_g);
+      gtk_menu_item_new_with_mnemonic("P_aste");
   g_signal_connect(menubutton_paste, "activate", G_CALLBACK(activate_paste),
                    this);
+  gtk_widget_add_accelerator(menubutton_paste, "activate", accel_g, 'v',
+      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
 
   GtkWidget* edit_collapse = gtk_menu_item_new_with_mnemonic("C_ollapse");
   g_signal_connect(edit_collapse, "activate", G_CALLBACK(activate_collapse),
@@ -463,7 +473,7 @@ GsdmlAttrGtk::GsdmlAttrGtk(GtkWidget* a_parent_wid, void* a_parent_ctx,
                    this);
 
   GtkWidget* view_zoom_in =
-      gtk_image_menu_item_new_from_stock(GTK_STOCK_ZOOM_IN, NULL);
+      gtk_menu_item_new_with_mnemonic("Zoom _in");
   g_signal_connect(view_zoom_in, "activate", G_CALLBACK(activate_zoom_in),
                    this);
   gtk_widget_add_accelerator(view_zoom_in, "activate", accel_g, 'i',
@@ -471,7 +481,7 @@ GsdmlAttrGtk::GsdmlAttrGtk(GtkWidget* a_parent_wid, void* a_parent_ctx,
                              GTK_ACCEL_VISIBLE);
 
   GtkWidget* view_zoom_out =
-      gtk_image_menu_item_new_from_stock(GTK_STOCK_ZOOM_OUT, NULL);
+      gtk_menu_item_new_with_mnemonic("Zoom _out");
   g_signal_connect(view_zoom_out, "activate", G_CALLBACK(activate_zoom_out),
                    this);
   gtk_widget_add_accelerator(view_zoom_out, "activate", accel_g, 'o',
@@ -479,7 +489,7 @@ GsdmlAttrGtk::GsdmlAttrGtk(GtkWidget* a_parent_wid, void* a_parent_ctx,
                              GTK_ACCEL_VISIBLE);
 
   GtkWidget* view_zoom_reset =
-      gtk_image_menu_item_new_from_stock(GTK_STOCK_ZOOM_100, NULL);
+      gtk_menu_item_new_with_mnemonic("Zoom _reset");
   g_signal_connect(view_zoom_reset, "activate", G_CALLBACK(activate_zoom_reset),
                    this);
   gtk_widget_add_accelerator(view_zoom_reset, "activate", accel_g, 'b',
@@ -498,8 +508,10 @@ GsdmlAttrGtk::GsdmlAttrGtk(GtkWidget* a_parent_wid, void* a_parent_ctx,
 
   // Help entry
   GtkWidget* help_help =
-      gtk_image_menu_item_new_from_stock(GTK_STOCK_HELP, accel_g);
+      gtk_menu_item_new_with_mnemonic("_Help");
   g_signal_connect(help_help, "activate", G_CALLBACK(activate_help), this);
+  gtk_widget_add_accelerator(help_help, "activate", accel_g, 'h',
+      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
 
   GtkMenu* help_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(help_menu), help_help);
@@ -515,7 +527,7 @@ GsdmlAttrGtk::GsdmlAttrGtk(GtkWidget* a_parent_wid, void* a_parent_ctx,
   attrnav->change_value_cb = &GsdmlAttr::gsdmlattr_change_value_cb;
 
   // Attribute Help Text
-  GtkWidget* help_area = gtk_hbox_new(FALSE, 0);
+  GtkWidget* help_area = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
 
   // We want scrollbars to the right in case the help text is very long
   GtkWidget* scroll_window = gtk_scrolled_window_new(NULL, NULL);
@@ -534,7 +546,7 @@ GsdmlAttrGtk::GsdmlAttrGtk(GtkWidget* a_parent_wid, void* a_parent_ctx,
   gtk_box_pack_start(GTK_BOX(help_area), scroll_window, TRUE, TRUE, 0);
 
   // Status bar and value input
-  GtkWidget* statusbar = gtk_hbox_new(FALSE, 0);
+  GtkWidget* statusbar = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   msg_label = gtk_label_new("");
   gtk_widget_set_size_request(msg_label, -1, 25);
   cmd_prompt = gtk_label_new("value > ");
@@ -559,16 +571,16 @@ GsdmlAttrGtk::GsdmlAttrGtk(GtkWidget* a_parent_wid, void* a_parent_ctx,
   gtk_widget_set_size_request(cmd_cancel, 70, 25);
   g_signal_connect(cmd_cancel, "clicked", G_CALLBACK(activate_cmd_ca), this);
 
-  GtkWidget* hboxbuttons = gtk_hbox_new(TRUE, 40);
-  gtk_box_pack_start(GTK_BOX(hboxbuttons), cmd_ok, FALSE, FALSE, 0);
-  gtk_box_pack_start(GTK_BOX(hboxbuttons), cmd_apply, FALSE, FALSE, 0);
-  gtk_box_pack_end(GTK_BOX(hboxbuttons), cmd_cancel, FALSE, FALSE, 0);
+  GtkWidget* hboxbuttons = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 40);
+  gtk_box_pack_start(GTK_BOX(hboxbuttons), cmd_ok, FALSE, FALSE, 30);
+  gtk_box_pack_start(GTK_BOX(hboxbuttons), cmd_apply, FALSE, FALSE, 30);
+  gtk_box_pack_end(GTK_BOX(hboxbuttons), cmd_cancel, FALSE, FALSE, 30);
 
   gtk_box_pack_start(GTK_BOX(vbox), GTK_WIDGET(menu_bar), FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(vbox), brow_widget, TRUE, TRUE, 0);
   gtk_box_pack_start(GTK_BOX(vbox), help_area, FALSE, FALSE, 3);
   gtk_box_pack_start(GTK_BOX(vbox), statusbar, FALSE, FALSE, 3);
-  gtk_box_pack_start(GTK_BOX(vbox), gtk_hseparator_new(), FALSE, FALSE, 0);
+  gtk_box_pack_start(GTK_BOX(vbox), gtk_separator_new(GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(vbox), hboxbuttons, FALSE, FALSE, 5);
 
   gtk_container_add(GTK_CONTAINER(toplevel), vbox);
