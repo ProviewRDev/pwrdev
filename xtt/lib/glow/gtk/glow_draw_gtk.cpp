@@ -327,7 +327,7 @@ int GlowDrawGtk::expose(cairo_t* cr, int is_navigator)
       gtk_render_background(((DrawWindGtk *)ctx->mw.window)->style_context, 
 	  cr, 0, 0, x + width, y + height);
     else
-      fill_rect(&ctx->mw, x, y, width, height, glow_eDrawType_LineErase);
+      draw_background(&ctx->mw, x, y, width, height);
     sts = ctx->event_handler(glow_eEvent_Exposure, x, y, width, height);
     cairo_cr = 0;
     cairo_cr_refcnt--;
@@ -338,7 +338,7 @@ int GlowDrawGtk::expose(cairo_t* cr, int is_navigator)
     cairo_nav_cr = cr;
     cairo_nav_cr_refcnt++;
     //cairo_save(cairo_nav_cr);
-    fill_rect(&ctx->navw, 0, 0, ctx->navw.window_width, ctx->navw.window_height, glow_eDrawType_LineErase);
+    draw_background(&ctx->navw, 0, 0, ctx->navw.window_width, ctx->navw.window_height);
     sts = ctx->event_handler_nav(glow_eEvent_Exposure, 0, 0);
     cairo_nav_cr = 0;
     cairo_nav_cr_refcnt--;
@@ -1111,7 +1111,7 @@ int GlowDrawGtk::rect(GlowWind* wind, int x, int y, int width, int height,
   }
   cairo_set_line_width(cr, idx+1);
 
-  cairo_rectangle(cr, x, y, width+1, height+1);
+  cairo_rectangle(cr, x, y, width, height);
   cairo_stroke(cr);
   if (ww->clip_on)
     reset_cairo_clip(ww, cr);
@@ -1140,7 +1140,7 @@ int GlowDrawGtk::rect_erase(
   cairo_set_source(cr, gc_erase);
   cairo_set_line_width(cr, idx+1);
 
-  cairo_rectangle(cr, x, y, width+1, height+1);
+  cairo_rectangle(cr, x, y, width, height);
   cairo_stroke(cr);
   if (ww->clip_on)
     reset_cairo_clip(ww, cr);
@@ -2016,7 +2016,7 @@ int GlowDrawGtk::fill_rect(
       cairo_set_source(cr, pat);
     }
   }
-  cairo_rectangle(cr, x, y, width, height);
+  cairo_rectangle(cr, x-1, y-1, width, height);
   cairo_fill(cr);
 
   if (w->clip_on)
@@ -2026,6 +2026,28 @@ int GlowDrawGtk::fill_rect(
 
   end_cairo(wind, cr);
   return 1;
+}
+
+void GlowDrawGtk::draw_background(GlowWind* wind, int x, int y, int width, int height)
+{
+  if (ctx->nodraw)
+    return;
+
+  DrawWindGtk* w = (DrawWindGtk*)wind->window;
+
+  cairo_t *cr = get_cairo(wind);
+
+  if (w->clip_on)
+    set_cairo_clip(w, cr);
+
+  cairo_set_source(cr, gc_erase);
+  cairo_rectangle(cr, x, y, width, height);
+  cairo_fill(cr);
+
+  if (w->clip_on)
+    reset_cairo_clip(w, cr);
+
+  end_cairo(wind, cr);
 }
 
 void GlowDrawGtk::clear(GlowWind* wind)
@@ -2470,10 +2492,6 @@ void GlowDrawGtk::set_click_sensitivity(GlowWind* wind, int value)
   click_sensitivity = value;
 }
 
-void GlowDrawGtk::draw_background(GlowWind* wind, int x, int y, int w, int h)
-{
-  fill_rect(wind, x, y, w, h, glow_eDrawType_LineErase);
-}
 
 int GlowDrawGtk::export_image(char* filename)
 {
@@ -3480,7 +3498,7 @@ int GlowDrawGtk::gradient_fill_rect(GlowWind* wind, int x, int y, int w, int h,
   cairo_pattern_t* pat;
   if (!gradient_create_pattern(x, y, w, h, d0, d1, d2, gradient, transparency, &pat))
     return 0;
-  cairo_rectangle(cr, x, y, w, h);
+  cairo_rectangle(cr, x-1, y-1, w, h);
   cairo_set_source(cr, pat);
   cairo_fill(cr);
 
