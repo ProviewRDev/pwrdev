@@ -67,7 +67,8 @@ public:
   virtual int text(double x, double y, char* text, int len, flow_eDrawType type,
       double size, int line);
   virtual int pixmap(
-      double x, double y, flow_sPixmapDataElem* data, flow_eDrawType type);
+      double x, double y, flow_sPixmapDataElem* data, void *pixmap, int idx, 
+      flow_eDrawType type);
   virtual int image(double x, double y, double width, double height,
       flow_tImImage image, flow_eDrawType type);
   virtual int arrow(double x1, double y1, double x2, double y2, double x3,

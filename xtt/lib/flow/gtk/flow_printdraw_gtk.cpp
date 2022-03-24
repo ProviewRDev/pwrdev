@@ -40,6 +40,12 @@
 
 #include "flow_printdraw_gtk.h"
 
+typedef struct {
+  cairo_surface_t* pixmap[DRAW_PIXMAP_SIZE];
+  unsigned char* data[DRAW_PIXMAP_SIZE];
+} draw_sPixmap;
+
+
 FlowPrintDrawGtk::FlowPrintDrawGtk(void* context, const char* t, int p,
     void* flow_ctx, int page_border, int* sts)
     : print_ctx((GtkPrintContext*)context), border(page_border),
@@ -319,8 +325,10 @@ int FlowPrintDrawGtk::text(double x, double y, char* text, int len,
 }
 
 int FlowPrintDrawGtk::pixmap(
-    double x, double y, flow_sPixmapDataElem* data, flow_eDrawType type)
+    double x, double y, flow_sPixmapDataElem* data, void *pixmaps, int idx, 
+    flow_eDrawType type)
 {
+#if 0
   int stride;
   cairo_surface_t* surface;
   unsigned char* sdata;
@@ -339,6 +347,8 @@ int FlowPrintDrawGtk::pixmap(
   stride = cairo_format_stride_for_width(CAIRO_FORMAT_A1, data->width);
   sdata = (unsigned char*)calloc(1, stride * data->height);
   data_p = (unsigned char*)data->bits;
+
+
   for (i = 0; i < data->height; i++) {
     bit_cnt = 0;
     sdata_p = sdata + i * stride;
@@ -354,7 +364,6 @@ int FlowPrintDrawGtk::pixmap(
     }
     data_p++;
   }
-
   surface = cairo_image_surface_create_for_data(
       sdata, CAIRO_FORMAT_A1, data->width, data->height, stride);
   cairo_scale(cairo, scale, scale);
@@ -368,6 +377,16 @@ int FlowPrintDrawGtk::pixmap(
 
   cairo_surface_destroy(surface);
   // free( sdata);
+#endif
+  float scale = 0.7;
+  draw_sPixmap* pms = (draw_sPixmap*)pixmaps;
+
+  cairo_scale(cairo, scale, scale);
+  cairo_mask_surface(cairo, pms->pixmap[idx], 
+    (print_margin_x + x - page_x) / scale,
+    (print_margin_y + y - page_y) / scale);
+  cairo_fill(cairo);
+  cairo_scale(cairo, 1.0 / scale, 1.0 / scale);
   return 1;
 }
 

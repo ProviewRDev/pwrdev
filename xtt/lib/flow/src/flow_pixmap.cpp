@@ -82,6 +82,7 @@ void FlowPixmap::traverse(int x, int y)
 
 void FlowPixmap::print(void* pos, void* node, int highlight)
 {
+#if 0
   int idx = int(
       ctx->print_zoom_factor / ctx->base_zoom_factor * (pixmap_size + 4) - 4);
   int size = int(8.0 + 6.0 / 3 * idx);
@@ -93,6 +94,7 @@ void FlowPixmap::print(void* pos, void* node, int highlight)
   ctx->current_print->pixmap(p.print_z_x + ((FlowPoint*)pos)->print_z_x,
       p.print_z_y + ((FlowPoint*)pos)->print_z_y, &pixmap_data[pixmap_size],
       draw_type);
+#endif
 }
 
 void FlowPixmap::save(std::ofstream& fp, flow_eSaveMode mode)

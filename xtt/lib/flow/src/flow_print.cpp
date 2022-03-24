@@ -101,7 +101,8 @@ int FlowPrint::text(double x, double y, char* text, int len,
 }
 
 int FlowPrint::pixmap(
-    double x, double y, flow_sPixmapDataElem* data, flow_eDrawType type)
+    double x, double y, flow_sPixmapDataElem* data, void *pixmap, int idx, 
+    flow_eDrawType type)
 {
   return 1;
 }

@@ -98,6 +98,7 @@ void FlowAnnotPixmap::print(void* pos, void* node, int highlight)
     x = p.print_z_x + ((FlowPoint*)pos)->print_z_x;
   ctx->current_print->pixmap(x, p.print_z_y + ((FlowPoint*)pos)->print_z_y,
       &((FlowNode*)node)->annotpixmapv[number]->pixmap_data[pixmap_size],
+      ((FlowNode*)node)->annotpixmapv[number]->pixmaps, pixmap_size,
       draw_type);
 }
 
