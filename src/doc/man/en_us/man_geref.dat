@@ -2384,6 +2384,7 @@ working area. If you first activate Functions/ScaleEqual a square is drawn.
 - Linewidth
 - 3D
 - Gradient
+- Transparency
 - Backgroundcolor
 
 <h2>Attributes
@@ -2392,6 +2393,7 @@ shadow_width   <t>The with of the 3D-shadow in % of width or length (the smalles
 shadow_contrast <t>Contrast of the 3D-shadow. A value in the range 1 - 3.
 gradient_contrast <t>Contrast of the gradient. A value in the range 0 - 10.
 gradient      <t>Type of gradient.
+transparency  <t>Level of transparency, A value in the range 0.0 - 1.0.
 invisible     <t>The object is invisible but sensitive for mouseclicks. This is used in a
               <t>subgraph to increase the area of sensitivity for the subgraph.
 fill_eq_background <t>Indicates that the fill color is drawn with the specified background color 
@@ -2426,6 +2428,7 @@ drawn.
 - Linewidth
 - 3D
 - Gradient
+- Transparency
 
 <h2>Attributes
 <b>Attribute      <t>Description
@@ -2435,6 +2438,7 @@ shadow_contrast <t>Contrast of the 3D-shadow.
 relief        <t>Up gives a shadow on the lower side, and Down gives a shadow on the upper side.
 gradient_contrast <t>Contrast of the gradient. A value in the range 0 - 10.
 gradient      <t>Type of gradient.
+transparency  <t>Level of transparency, A value in the range 0.0 - 1.0.
 disable_shadow <t>Disables the 3D-function. Is used when the object is a part of a subgraph
               <t>an not should be drawn with 3D when 3D is chosen for the instance of the 
               <t>subgraph.
@@ -2461,6 +2465,7 @@ Functions/ScaleEqual a circle is drawn.
 - Linewidth
 - 3D
 - Gradient
+- Transparency
 - Backgroundcolor
 
 <h2>Attributes
@@ -2471,6 +2476,7 @@ shadow_width   <t>The with of the 3D-shadow in % of width or length (the smalles
 shadow_contrast <t>Contrast of the 3D-shadow.
 gradient_contrast <t>Contrast of the gradient. A value in the range 0 - 10.
 gradient      <t>Type of gradient.
+transparency  <t>Level of transparency, A value in the range 0.0 - 1.0.
 relief        <t>Up gives a shadow on the lower side, and Down gives a shadow on the upper side.
 fixcolor      <t>The color is fix. This is used when the object is a part of a subgraph and
               <t>should not be affected by color setting of the subgraph.
@@ -2499,9 +2505,11 @@ vertical lines.
 - Bordercolor
 - Linewidth
 - Linetype
+- Transparency
 
 <h2>Attributes
 <b>Attribute     <t>Description
+transparency  <t>Level of transparency, A value in the range 0.0 - 1.0.
 Dynamic      <t>Not implemented.
 </topic>
 
@@ -2530,6 +2538,7 @@ disabled when drawing a polyline with 'Functions/MoveRestrictions/No'.
 - Linewidth
 - 3D
 - Gradient
+- Transparency
 - Backgroundcolor
 
 <h2>Attributes
@@ -2539,6 +2548,7 @@ shadow_contrast <t>Contrast of the 3D-shadow.
 gradient_contrast <t>Contrast of the gradient. A value in the range 0 - 10.
 relief        <t>Up gives a shadow on the lower side, and Down gives a shadow on the upper side.
 gradient      <t>Type of gradient.
+transparency  <t>Level of transparency, A value in the range 0.0 - 1.0.
 disable_shadow <t>Disables the 3D-function. Is used when the object is a part of a subgraph
               <t>an not should be drawn with 3D when 3D is chosen for the instance of the 
               <t>subgraph.
@@ -2579,11 +2589,13 @@ in the text string is 79.
 - Font size
 - Normal or bold text
 - Text color
+- Transparency
 
 <h2>Attributes
 <b>Attribute  <t>Description
 Text         <t>Actual text, maximum 79 characters.
 Adjustment   <t>Text adjustment, left, right or center.
+Transparency  <t>Level of transparency, A value in the range 0.0 - 1.0.
 Dynamic      <t>Not implemented.
 </topic>
 
@@ -6320,6 +6332,7 @@ GetObjectName <t><t>Get object name. <link>GetObjectName()
 GetObjectShadow <t><t>Get shadow of an object. <link>GetObjectShadow()
 GetObjectText <t><t>Get object text. <link>GetObjectText()
 GetObjectTextColor <t><t>Get text color of an object. <link>GetObjectTextColor()
+GetObjectTransparency <t><t>Get object transparency. <link>GetObjectTransparency()
 GetObjectType <t><t>Get object type. <link>GetObjectType()
 GetRgbColor <t><t>Get rgb values of a color. <link>GetRgbColor()
 GetTextExtent <t><t>Calculate the extent of a text. <link>GetTextExtent()
@@ -6355,6 +6368,7 @@ SetObjectFillColor <t><t>Set fill color of an object. <link>SetObjectFillColor()
 SetObjectGradient <t><t>Set gradient of an object. <link>SetObjectGradient()
 SetObjectShadow <t><t>Set object shadow. <link>SetObjectShadow()
 SetObjectTextColor <t><t>Set text color of an object. <link>SetObjectTextColor()
+SetObjectTransparency <t><t>Set object transparency. <link>SetObjectTransparency()
 SetRgbColor <t><t>Set rgb values of a color. <link>SetRgbColor()
 SetSelectTextBold <t><t>Set text bold on selected objects. <link>SetSelectTextBold()
 SetSelectTextFont <t><t>Set text font on selected objects. <link>SetSelectTextFont()
@@ -7546,6 +7560,26 @@ Returns the text color.
 <c> endif
 </topic>
 
+<topic>GetObjectTransparency() <style>function
+GetObjectTransparency()
+float GetObjectTransparency( int oid)
+
+<h2>Description
+Get the level of transparency of an object.
+
+<h2>Argument
+
+int <t>oid     <t>Object identity.
+
+Returns the tranparency. A float value in the range 0.0 - 1.0.
+
+<b>Example
+
+<c> float transparency; 
+
+<c> transparency = GetObjectTransparency( oid);
+</topic>
+
 <topic>GetObjectType() <style>function
 GetObjectType()
 int GetObjectType( int oid)
@@ -8261,6 +8295,22 @@ int <t>color   <t>Text color.
 <c> SetObjectTextColor( oid, eDrawType_CustomColor5);
 </topic>
 
+<topic>SetObjectTransparency() <style>function
+SetObjectTransparency()
+void SetObjectTransparency( int oid, float transparency)
+
+<h2>Description
+Set the level of transparency of an object.
+
+<h2>Argument
+
+int <t>oid     <t>Object identity.
+float <t>transparency <t>Level of transparency. A value in the range 0.0 - 1.0.
+
+<b>Example
+ 
+<c> SetObjectTransparency( oid, 0.5);
+</topic>
 
 <topic>SetRgbColor() <style>function
 void SetRgbColor()
@@ -8294,7 +8344,6 @@ on every fourth index, ie 310, 314, 318, ... 666.
 
 <c> SetObjectTextColor( oid, eDrawType_CustomColor5);
 </topic>
-
 
 <topic>SetSelectTextBold() <style>function
 void SetSelectTextBold()

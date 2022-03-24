@@ -686,6 +686,49 @@ static int graph_setobjectgradient_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
+static int graph_getobjecttransparency_func(void* filectx, ccm_sArg* arg_list,
+    int arg_count, int* return_decl, ccm_tFloat* return_float,
+    ccm_tInt* return_int, char* return_string)
+{
+  Graph* graph;
+
+  if (arg_count != 1)
+    return CCM__ARGMISM;
+
+  if (arg_list->value_decl != CCM_DECL_INT)
+    return CCM__ARGMISM;
+
+  graph_get_stored_graph(&graph);
+
+  *return_float = grow_GetObjectTransparency((grow_tObject)arg_list->value_int);
+  *return_decl = CCM_DECL_FLOAT;
+  return 1;
+}
+
+static int graph_setobjecttransparency_func(void* filectx, ccm_sArg* arg_list,
+    int arg_count, int* return_decl, ccm_tFloat* return_float,
+    ccm_tInt* return_int, char* return_string)
+{
+  Graph* graph;
+  ccm_sArg* arg_p2;
+
+  if (arg_count != 2)
+    return CCM__ARGMISM;
+
+  arg_p2 = arg_list->next;
+
+  if (arg_list->value_decl != CCM_DECL_INT)
+    return CCM__ARGMISM;
+  if (arg_p2->value_decl != CCM_DECL_FLOAT)
+    return CCM__ARGMISM;
+
+  graph_get_stored_graph(&graph);
+
+  grow_SetObjectTransparency(
+      (grow_tObject)arg_list->value_int, arg_p2->value_float);
+  return 1;
+}
+
 static int graph_getobjectfillcolor_func(void* filectx, ccm_sArg* arg_list,
     int arg_count, int* return_decl, ccm_tFloat* return_float,
     ccm_tInt* return_int, char* return_string)
@@ -4325,6 +4368,14 @@ int Graph::script_func_register(void)
     return sts;
   sts = ccm_register_function(
       "Ge", "SetObjectGradient", graph_setobjectgradient_func);
+  if (EVEN(sts))
+    return sts;
+  sts = ccm_register_function(
+      "Ge", "GetObjectTransparency", graph_getobjecttransparency_func);
+  if (EVEN(sts))
+    return sts;
+  sts = ccm_register_function(
+      "Ge", "SetObjectTransparency", graph_setobjecttransparency_func);
   if (EVEN(sts))
     return sts;
   sts = ccm_register_function(

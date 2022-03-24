@@ -2370,6 +2370,7 @@ arbetsarean. Om man först aktiverar Functions/ScaleEqual ritas en kvadrat.
 - Kantbredd
 - 3D
 - Gradient
+- Transparens
 - Bakgrundsfärg
 
 <h2>Attribut
@@ -2378,6 +2379,7 @@ shadow_width   <t>Bredden av 3D-skuggan i % av längd eller bredd (den minsta).
 shadow_contrast <t>Kontrast på 3D-skuggan. Ett värde mellan 1 - 3.
 gradient_contrast <t>Kontrast på gradienten. Ett värde mellan 0 - 10.
 gradient      <t>Typ av gradient.
+transparency  <t>Grad av transparens. Ett värde mellan 0.0 - 1.0.
 invisible     <t>Objektet är osynligt men känsligt för musklick. Används för subgrafer för att
               <t>den känsliga arean för subgrafen.
 fill_eq_background <t>Markerar att fyllnadsfärgen ritas med angiven bakgrundsfärg för objektet
@@ -2409,6 +2411,7 @@ dra med MB1 i arbetsarean. Om man först aktiverar Functions/ScaleEqual ritas en 
 - Kantbredd
 - 3D
 - Gradient
+- Transparens
 
 <h2>Attribut
 <b>Attribut     <t>Beskrivning
@@ -2418,6 +2421,7 @@ shadow_contrast <t>Kontrast på 3D-skuggan.
 relief       <t>Up ger skugga på undersidan och Down ger skugga på ovansidan
 gradient_contrast <t>Kontrast på gradienten. Ett värde mellan 0 - 10.
 gradient      <t>Typ av gradient.
+transparency  <t>Grad av transparens. Ett värde mellan 0.0 - 1.0.
 disable_shadow <t>Eliminerar 3D-funktionen. Används när objektet ingår i en 
              <t>subgraf och inte ska ritas med 3D när 3D är valt för subgrafs-instansen.
 disable_gradient <t>Eliminerar gradient-funktionen. Används när objektet ingår i en subgraf 
@@ -2442,6 +2446,7 @@ Functions/ScaleEqual ritas en cirkel.
 - Kantbredd
 - 3D
 - Gradient
+- Transparens
 - Bakgrundsfärg
 
 <h2>Attribut
@@ -2452,6 +2457,7 @@ shadow_width  <t>Bredden av 3D-skuggan i % av längd eller bredd (den minsta).
 shadow_contrast <t>Kontrast på 3D-skuggan.
 gradient_contrast <t>Kontrast på gradienten. Ett värde mellan 0 - 10.
 gradient      <t>Typ av gradient.
+transparency  <t>Grad av transparens. Ett värde mellan 0.0 - 1.0.
 relief       <t>Up ger skugga på undersidan och Down ger skugga på ovansidan
 fixcolor      <t>Färgen är fix. Används när objektet är den del av en subgraph, och färgen inte
               <t>ska påverkas av färgsättningen av subgrafen.
@@ -2478,9 +2484,11 @@ horisontella resp vertikala linjer.
 - Kantfärg
 - Kantbredd
 - Linjetyp
+- Transparens
 
 <h2>Attribut
 <b>Attribut     <t>Beskrivning
+transparency  <t>Grad av transparens. Ett värde mellan 0.0 - 1.0.
 Dynamic      <t>Ej implementerat
 </topic>
 
@@ -2508,6 +2516,7 @@ avbrytas i en polyline med Functions/MoveRestrictions/No.
 - Kantbredd
 - 3D
 - Gradient
+- Transparens
 - Bakgrundsfärg
 
 <h2>Attribut
@@ -2517,6 +2526,7 @@ shadow_contrast <t>Kontrast på 3D-skuggan.
 relief        <t>Up ger skugga på undersidan och Down ger skugga på ovansidan
 gradient_contrast <t>Kontrast på gradienten. Ett värde mellan 0 - 10.
 gradient      <t>Typ av gradient.
+transparency  <t>Grad av transparens. Ett värde mellan 0.0 - 1.0.
 disable_shadow <t>Eliminerar 3D-funktionen. Används när objektet ingår i en 
               <t>subgraf och inte ska ritas med 3D, när 3D är valt för subgrafs-instansen.
 disable_gradient <t>Eliminerar gradient-funktionen. Används när objektet ingår i en subgraf 
@@ -2556,11 +2566,13 @@ textsträngen är 79.
 - Normal, fet text
 - Text färg
 - Justering
+- Transparens
 
 <h2>Attribut
 <b>Attribut  <t>Beskrivning
 Text         <t>Aktuell text, max 79 tecken.
 Adjustment   <t>Justering av texten, vänster, höger eller mitt.
+Transparency  <t>Grad av transparens. Ett värde mellan 0.0 - 1.0.
 Dynamic      <t>Ej implementerat
 </topic>
 
@@ -6199,6 +6211,7 @@ GetObjectName <t><t>Hämta namn på ett objekt. <link>GetObjectName()
 GetObjectShadow <t><t>Hämta skuggning på ett objekt. <link>GetObjectShadow()
 GetObjectText <t><t>Hämta text för ett objekt. <link>GetObjectText()
 GetObjectTextColor <t><t>Hämta textfärg för ett objekt. <link>GetObjectTextColor()
+GetObjectTransparency <t><t>Hämta transparens för ett objekt. <link>GetObjectTransparency()
 GetObjectType <t><t>Hämta typ för ett objekt. <link>GetObjectType()
 GetRgbColor <t><t>Hämta rgb-värden för en färg. <link>GetRgbColor()
 GetTextExtent <t><t>Beräkna storleken på en text. <link>GetTextExtent()
@@ -6233,6 +6246,7 @@ SetObjectFillColor <t><t>Sätt fyllnadsfärg på ett objekt. <link>SetObjectFillCol
 SetObjectGradient <t><t>Sätt gradient på ett objekt. <link>SetObjectGradient()
 SetObjectShadow <t><t>Sätt skuggning på ett objekt. <link>SetObjectShadow()
 SetObjectTextColor <t><t>Sätt textfärg på ett objekt. <link>SetObjectTextColor()
+SetObjectTransparency <t><t>Sätt transparens på ett objekt. <link>SetObjectTransparency()
 SetRgbColor <t><t>Sätt rgb-värden för en färg. <link>SetRgbColor()
 SetSelectTextBold <t><t>Sätt fet text på utvalda objekt. <link>SetSelectTextBold()
 SetSelectTextFont <t><t>Sätt typsnitt på utvalda objekt. <link>SetSelectTextFont()
@@ -6785,7 +6799,7 @@ Returnerar id för det skapade objektet.
 CreatePie()
 int CreatePie(float x1, float y1 [,float x2, float y2, int colortheme])
 
-<h2>Description
+<h2>Beskrivning
 Skapa ett Pie objekt.
 
 <h2>Argument
@@ -7012,7 +7026,7 @@ Returnerar id för det skapade objektet.
 DashInsertObject()
 void DashInsertObject(int dashoid, int oid)
 
-<h2>Description
+<h2>Beskrivning
 Addera ett objekt till en dashcell.
 
 <h2>Argument
@@ -7373,6 +7387,26 @@ Returnerar värdet på textfärgen.
 <c> endif
 </topic>
 
+<topic>GetObjectTransparency() <style>function
+GetObjectTransparency()
+float GetObjectTransparency( int oid)
+
+<h2>Beskrivning
+Hämta transparens för ett objekt.
+
+<h2>Argument
+
+int <t>oid     <t>Objektets identitet.
+
+Returnerar transparensen. Ett flyttalsvärde mellan 0.0 och 1.0.
+
+<b>Exempel
+
+<c> float transparency; 
+
+<c> transparency = GetObjectTransparency( oid);
+</topic>
+
 <topic>GetObjectType() <style>function
 GetObjectType()
 int GetObjectType( int oid)
@@ -7557,7 +7591,7 @@ float <t>ur_y  <t>Returnerad y koordinat för övre högra.
 OpenGraph()
 void OpenGraph(string name)
 
-<h2>Description
+<h2>Beskrivning
 Öppna en graph.
 
 <h2>Argument
@@ -7611,7 +7645,7 @@ float <t>dy <t>Avstånd att flytta i y-led.
 PolyLineAdd()
 int PolyLineAdd(int id, float x, float y)
 
-<h2>Description
+<h2>Beskrivning
 Addera ett segment till ett PolyLine objekt.
 
 <h2>Argument
@@ -8094,6 +8128,23 @@ int <t>color   <t>Textfärg.
 <c> SetObjectTextColor( oid, eDrawType_CustomColor5);
 </topic>
 
+<topic>SetObjectTransparency() <style>function
+SetObjectTransparency()
+void SetObjectTransparency( int oid, float transparency)
+
+<h2>Beskrivning
+Sätter grad av transparens på ett objekt.
+
+<h2>Argument
+
+int <t>oid     <t>Objektets identitet.
+float <t>transparency <t>Grad av transparens. Ett värde mellan 0.0 och 1.0.
+
+<b>Exempel
+ 
+<c> SetObjectTransparency( oid, 0.5);
+</topic>
+
 
 <topic>SetRgbColor() <style>function
 void SetRgbColor()
@@ -8128,7 +8179,7 @@ b>Exempel
 void SetSelectTextBold()
 void SetSelectTextBold(int font)
 
-<h2>Description
+<h2>Beskrivning
 Sätt fet text på utvalda objekt.
 
 <h2>Argument
@@ -8148,7 +8199,7 @@ int <t>bold     <t>1 för fet text 0 för normal text.
 void SetSelectTextFont()
 void SetSelectTextFont(int font)
 
-<h2>Description
+<h2>Beskrivning
 Sätt typsnitt på utvalda objekt.
 
 <h2>Argument
