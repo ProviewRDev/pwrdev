@@ -2668,8 +2668,12 @@ GeGtk::GeGtk(void* x_parent_ctx, GtkWidget* x_parent_widget,
   // View Planthierarchy
   wutl_tools_item(tools,
       dark_theme ? "$pwr_exe/ico_navigator_d_24.png" : "$pwr_exe/ico_navigator_l_24.png",
-      G_CALLBACK(activate_view_plant), 
-      "View plant hierarchy", this, 0, 0);
+      G_CALLBACK(activate_view_plant), "View plant hierarchy", this, 0, 0);
+
+  // View objectlist
+  wutl_tools_toggle_button(tools,
+      dark_theme ? "$pwr_exe/ico_objectlist_d_24.png" : "$pwr_exe/ico_objectlist_l_24.png",
+     G_CALLBACK(activate_view_objectnav), "View object tree", this, 1, 0);
 
   // Open Object attributes
   wutl_tools_item(tools, 
