@@ -152,7 +152,7 @@ dcli_tCmdTable wnav_command_table[] = {
   { "COPY", &wnav_copy_func,
       { "dcli_arg1", "/FIRST", "/LAST", "/AFTER", "/BEFORE", "/HIERARCHY",
           "/SOURCE", "/DESTINATION", "/NAME", "/KEEPREFERENCES",
-          "/IGNORE_ERRORS", "/KEEPOID", "" } },
+	  "/IGNORE_ERRORS", "/KEEPOID", "/KEEPSYMBOLS", "" } },
   { "CUT", &wnav_cut_func, { "/KEEPREFERENCES", "" } },
   { "PASTE", &wnav_paste_func,
       { "dcli_arg1", "/INTO", "/BUFFER", "/KEEPOID", "/TOPLEVEL", "" } },
@@ -2894,6 +2894,7 @@ static int wnav_copy_func(void* client_data, void* client_flag)
     int* sel_is_attr;
     int sel_cnt;
     int keepref;
+    int keepsym;
     int ignore_errors;
     pwr_tStatus sts;
 
@@ -2907,9 +2908,10 @@ static int wnav_copy_func(void* client_data, void* client_flag)
     }
 
     keepref = ODD(dcli_get_qualifier("/KEEPREFERENCES", 0, 0));
+    keepsym = ODD(dcli_get_qualifier("/KEEPSYMBOLS", 0, 0));
     ignore_errors = ODD(dcli_get_qualifier("/IGNORE_ERRORS", 0, 0));
 
-    sts = ldh_Copy(wnav->ldhses, sel_list, keepref, keepref, ignore_errors);
+    sts = ldh_Copy(wnav->ldhses, sel_list, keepref, keepsym, ignore_errors);
     if (sel_cnt > 0) {
       free(sel_list);
       free(sel_is_attr);
