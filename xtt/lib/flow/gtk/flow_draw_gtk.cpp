@@ -1636,26 +1636,13 @@ int FlowDrawGtk::text(FlowCtx* ctx, int x, int y, char* text, int len,
 
   cairo_set_font_face(cr, get_font_face(gc_type));
   cairo_set_font_size(cr, size);
-  cairo_move_to(cr, x, y);
+  cairo_move_to(cr, x, y-1);
   cairo_show_text(cr, text);
   end_cairo(cr);
 
   if (textutf8)
     g_free(textutf8);
 
-#if 0
-  if (ctx->nodraw)
-    return 1;
-
-  if (pango)
-    return text_pango(
-        ctx, x, y, text, len, gc_type, idx, highlight, dimmed, line, size);
-
-  int font_idx = get_font_idx(gc_type);
-
-  gdk_draw_text(
-      window, font[font_idx][idx], gcs[gc_type][idx], x, y, text, len);
-#endif
   return 1;
 }
 
@@ -1714,23 +1701,6 @@ int FlowDrawGtk::text_erase(FlowCtx* ctx, int x, int y, char* text, int len,
   if (textutf8)
     g_free(textutf8);
 
-#if 0
-  if (ctx->nodraw)
-    return 1;
-
-  if (pango)
-    return text_erase_pango(ctx, x, y, text, len, gc_type, idx, line, size);
-
-  int font_idx = get_font_idx(gc_type);
-
-  if (gc_type == flow_eDrawType_TextHelvetica)
-    gc_type = flow_eDrawType_TextHelveticaErase;
-  else if (gc_type == flow_eDrawType_TextHelveticaBold)
-    gc_type = flow_eDrawType_TextHelveticaEraseBold;
-
-  gdk_draw_text(
-      window, font[font_idx][idx], gcs[gc_type][idx], x, y, text, len);
-#endif
   return 1;
 }
 
@@ -2247,46 +2217,6 @@ void FlowDrawGtk::copy_area(FlowCtx* ctx, int x, int y)
     return;
 
   ctx->draw(0, 0, ctx->window_width, ctx->window_height);
-#if 0
-  GdkGC* gc;
-  if (ctx->nodraw)
-    return;
-
-  gc = gcs[flow_eDrawType_Line][3];
-  if (x >= 0 && y >= 0) {
-    gdk_draw_drawable(window, gc, window, 0, 0, x, y, ctx->window_width - x,
-        ctx->window_height - y);
-    if (x)
-      gdk_window_clear_area(window, 0, 0, x, ctx->window_height);
-    if (y)
-      gdk_window_clear_area(window, x, 0, ctx->window_width, y);
-  } else if (x <= 0 && y <= 0) {
-    gdk_draw_drawable(window, gc, window, -x, -y, 0, 0, ctx->window_width + x,
-        ctx->window_height + y);
-    if (x)
-      gdk_window_clear_area(window, ctx->window_width + x, 0, ctx->window_width,
-          ctx->window_height);
-    if (y)
-      gdk_window_clear_area(window, 0, ctx->window_height + y,
-          ctx->window_width + x, ctx->window_height);
-  } else if (x <= 0 && y >= 0) {
-    gdk_draw_drawable(window, gc, window, -x, 0, 0, y, ctx->window_width + x,
-        ctx->window_height - y);
-    if (x)
-      gdk_window_clear_area(window, ctx->window_width + x, 0, ctx->window_width,
-          ctx->window_height);
-    if (y)
-      gdk_window_clear_area(window, 0, 0, ctx->window_width + x, y);
-  } else {
-    gdk_draw_drawable(window, gc, window, 0, -y, x, 0, ctx->window_width - x,
-        ctx->window_height + y);
-    if (x)
-      gdk_window_clear_area(window, 0, 0, x, ctx->window_height);
-    if (y)
-      gdk_window_clear_area(window, x, ctx->window_height + y,
-          ctx->window_width, ctx->window_height);
-  }
-#endif
 }
 
 void FlowDrawGtk::clear_area(
@@ -2309,19 +2239,10 @@ void FlowDrawGtk::set_click_sensitivity(FlowCtx* ctx, int value)
 void FlowDrawGtk::set_image_clip_mask(
     FlowCtx* ctx, flow_tPixmap pixmap, int x, int y)
 {
-#if 0
-  GdkPixmap* gpixmap = gdk_pixmap_foreign_new((Pixmap)pixmap);
-  gdk_gc_set_clip_mask(gcs[flow_eDrawType_Line][0], gpixmap);
-  gdk_gc_set_clip_origin(gcs[flow_eDrawType_Line][0], x, y);
-#endif
 }
 
 void FlowDrawGtk::reset_image_clip_mask(FlowCtx* ctx)
 {
-#if 0
-  gdk_gc_set_clip_mask(gcs[flow_eDrawType_Line][0], NULL);
-  gdk_gc_set_clip_origin(gcs[flow_eDrawType_Line][0], 0, 0);
-#endif
 }
 
 void FlowDrawGtk::set_white_background(FlowCtx* ctx)
