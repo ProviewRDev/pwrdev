@@ -1761,7 +1761,7 @@ static void  gdh_TranslateSuffixToClassData (
     {"ATTRREF" ,pwr_eType_AttrRef, sizeof(pwr_sAttrRef)},
     {"STATUS" ,pwr_eType_Status, sizeof(pwr_tStatus)},
     {"NETSTATUS" ,pwr_eType_NetStatus, sizeof(pwr_tNetStatus)},
-    {"BIT" ,graph_eType_Bit, sizeof(pwr_tBit)}
+    {"BIT" ,(pwr_eType)graph_eType_Bit, sizeof(pwr_tBit)}
   };
 
   static const int    XlationTblLen = sizeof(XlationTbl)/sizeof(XlationTbl[0]);
