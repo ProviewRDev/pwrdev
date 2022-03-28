@@ -103,6 +103,7 @@ EvGtk::EvGtk(void* ev_parent_ctx, GtkWidget* ev_parent_wid, char* eve_name,
   const int ala_height = 300;
   const int blk_width = 700;
   const int blk_height = 300;
+  int dark_theme = 0;
 
   *status = 1;
 
@@ -137,6 +138,7 @@ EvGtk::EvGtk(void* ev_parent_ctx, GtkWidget* ev_parent_wid, char* eve_name,
         G_CALLBACK(eve_action_inputfocus), this);
 
     CoWowGtk::SetWindowIcon(parent_wid_eve);
+    dark_theme = CoWowGtk::GetDarkTheme(parent_wid_eve);
 
     GtkWidget* eve_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 
@@ -299,14 +301,18 @@ EvGtk::EvGtk(void* ev_parent_ctx, GtkWidget* ev_parent_wid, char* eve_name,
     // Toolbar
     GtkToolbar* tools = (GtkToolbar*)g_object_new(GTK_TYPE_TOOLBAR, NULL);
 
-    wutl_tools_item(tools, "$pwr_exe/xtt_zoom_in.png", G_CALLBACK(eve_activate_zoom_in),
-		  "Zoom in", this);
+    wutl_tools_item(tools, 
+        dark_theme ? "$pwr_exe/ico_zoomin_d_20.png" : "$pwr_exe/ico_zoomin_l_20.png", 
+        G_CALLBACK(eve_activate_zoom_in), "Zoom in", this, 0, 1);
 
-    wutl_tools_item(tools, "$pwr_exe/xtt_zoom_out.png", G_CALLBACK(eve_activate_zoom_out),
-		  "Zoom out", this);
+    wutl_tools_item(tools, 
+        dark_theme ? "$pwr_exe/ico_zoomout_d_20.png" : "$pwr_exe/ico_zoomout_l_20.png", 
+        G_CALLBACK(eve_activate_zoom_out), "Zoom out", this, 0, 1);
 
-    wutl_tools_item(tools, "$pwr_exe/xtt_zoom_reset.png", G_CALLBACK(eve_activate_zoom_reset),
-		  "Zoom reset", this);
+    wutl_tools_item(tools, 
+        dark_theme ? "$pwr_exe/ico_zoomreset_d_20.png" : "$pwr_exe/ico_zoomreset_l_20.png", 
+        G_CALLBACK(eve_activate_zoom_reset), "Zoom reset", this, 0, 1);
+
 
     eve_methodtoolbar = new XttMethodToolbarGtk(
         0, 0, ~pwr_mXttOpMethodsMask_ParentObjectGraph, ~0, "");
@@ -363,6 +369,7 @@ EvGtk::EvGtk(void* ev_parent_ctx, GtkWidget* ev_parent_wid, char* eve_name,
         G_CALLBACK(ala_action_inputfocus), this);
 
     CoWowGtk::SetWindowIcon(parent_wid_ala);
+    dark_theme = CoWowGtk::GetDarkTheme(parent_wid_ala);
 
     GtkWidget* ala_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 
@@ -660,17 +667,21 @@ EvGtk::EvGtk(void* ev_parent_ctx, GtkWidget* ev_parent_wid, char* eve_name,
     // Toolbar
     GtkToolbar* tools = (GtkToolbar*)g_object_new(GTK_TYPE_TOOLBAR, NULL);
 
-    wutl_tools_item(tools, "$pwr_exe/xtt_acknowledge.png", G_CALLBACK(ala_activate_ack_last),
-		  "Acknowledge", this);
+    wutl_tools_item(tools,
+        dark_theme ? "$pwr_exe/ico_acknowledge_d_20.png" : "$pwr_exe/ico_acknowledge_l_20.png", 
+        G_CALLBACK(ala_activate_ack_last), "Acknowledge", this);
 
-    wutl_tools_item(tools, "$pwr_exe/xtt_zoom_in.png", G_CALLBACK(ala_activate_zoom_in),
-		  "Zoom in", this);
+    wutl_tools_item(tools, 
+        dark_theme ? "$pwr_exe/ico_zoomin_d_20.png" : "$pwr_exe/ico_zoomin_l_20.png", 
+        G_CALLBACK(ala_activate_zoom_in), "Zoom in", this, 0, 1);
 
-    wutl_tools_item(tools, "$pwr_exe/xtt_zoom_out.png", G_CALLBACK(ala_activate_zoom_out),
-		  "Zoom out", this);
+    wutl_tools_item(tools, 
+        dark_theme ? "$pwr_exe/ico_zoomout_d_20.png" : "$pwr_exe/ico_zoomout_l_20.png", 
+        G_CALLBACK(ala_activate_zoom_out), "Zoom out", this, 0, 1);
 
-    wutl_tools_item(tools, "$pwr_exe/xtt_zoom_reset.png", G_CALLBACK(ala_activate_zoom_reset),
-		  "Zoom reset", this);
+    wutl_tools_item(tools, 
+        dark_theme ? "$pwr_exe/ico_zoomreset_d_20.png" : "$pwr_exe/ico_zoomreset_l_20.png", 
+        G_CALLBACK(ala_activate_zoom_reset), "Zoom reset", this, 0, 1);
 
     ala_methodtoolbar = new XttMethodToolbarGtk(
         0, 0, ~pwr_mXttOpMethodsMask_ParentObjectGraph, ~0, "");

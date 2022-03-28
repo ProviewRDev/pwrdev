@@ -273,7 +273,8 @@ OpGtk::OpGtk(void* op_parent_ctx, GtkWidget* op_parent_wid, char* opplace,
 
   // Acknowledge button for a alarms
   GtkWidget* aalarm_ack = gtk_button_new();
-  dcli_translate_filename(fname, "$pwr_exe/xtt_acknowledge.png");
+  dcli_translate_filename(fname, dark_theme ? "$pwr_exe/ico_acknowledge_d_20.png" : 
+      "$pwr_exe/ico_acknowledge_l_20.png");
   gtk_container_add(GTK_CONTAINER(aalarm_ack), gtk_image_new_from_file(fname));
   gtk_widget_set_name(aalarm_ack, "op_aack_button");
   gtk_widget_set_size_request(aalarm_ack, 30, 20);
@@ -302,7 +303,8 @@ OpGtk::OpGtk(void* op_parent_ctx, GtkWidget* op_parent_wid, char* opplace,
 
   // Acknowledge button for b alarms
   GtkWidget* balarm_ack = gtk_button_new();
-  dcli_translate_filename(fname, "$pwr_exe/xtt_acknowledge.png");
+  dcli_translate_filename(fname, dark_theme ? "$pwr_exe/ico_acknowledge_d_20.png" : 
+      "$pwr_exe/ico_acknowledge_l_20.png"); 
   gtk_container_add(GTK_CONTAINER(balarm_ack), gtk_image_new_from_file(fname));
   gtk_widget_set_name(balarm_ack, "op_back_button");
   gtk_widget_set_size_request(balarm_ack, 30, 20);

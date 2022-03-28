@@ -121,6 +121,7 @@ HistGtk::HistGtk(void* hist_parent_ctx, GtkWidget* hist_parent_wid,
   g_signal_connect(
       parent_wid_hist, "focus-in-event", G_CALLBACK(action_inputfocus), this);
 
+  int dark_theme = CoWowGtk::GetDarkTheme(parent_wid_hist);
   CoWowGtk::SetWindowIcon(parent_wid_hist);
 
   GtkWidget* hist_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
@@ -500,18 +501,21 @@ HistGtk::HistGtk(void* hist_parent_ctx, GtkWidget* hist_parent_wid,
   // Toolbar
   GtkToolbar* tools = (GtkToolbar*)g_object_new(GTK_TYPE_TOOLBAR, NULL);
 
-  wutl_tools_item(tools, "$pwr_exe/xtt_zoom_in.png", G_CALLBACK(activate_zoom_in),
-		  "Zoom in", this);
+  wutl_tools_item(tools, 
+      dark_theme ? "$pwr_exe/ico_zoomin_d_20.png" : "$pwr_exe/ico_zoomin_l_20.png", 
+      G_CALLBACK(activate_zoom_in), "Zoom in", this, 0, 1);
 
-  wutl_tools_item(tools, "$pwr_exe/xtt_zoom_out.png", G_CALLBACK(activate_zoom_out),
-		  "Zoom out", this);
+  wutl_tools_item(tools, 
+      dark_theme ? "$pwr_exe/ico_zoomout_d_20.png" : "$pwr_exe/ico_zoomout_l_20.png", 
+      G_CALLBACK(activate_zoom_out), "Zoom out", this, 0, 1);
 
-  wutl_tools_item(tools, "$pwr_exe/xtt_zoom_reset.png", G_CALLBACK(activate_zoom_reset),
-		  "Zoom reset", this);
+  wutl_tools_item(tools, 
+      dark_theme ? "$pwr_exe/ico_zoomreset_d_20.png" : "$pwr_exe/ico_zoomreset_l_20.png", 
+      G_CALLBACK(activate_zoom_reset), "Zoom reset", this, 0, 1);
 
-  // Hide search dialog toggle button
-  wutl_tools_toggle_button(tools, "$pwr_exe/xtt_maximize.png", G_CALLBACK(activate_hidesearch), 
-    "Maximize", this, 0, 1);
+  wutl_tools_toggle_button(tools, 
+      dark_theme ? "$pwr_exe/ico_maximize_d_20.png" : "$pwr_exe/ico_maximize_l_20.png", 
+      G_CALLBACK(activate_hidesearch), "Maximize", this, 0, 1);
 
   // Method toolbar
   methodtoolbar

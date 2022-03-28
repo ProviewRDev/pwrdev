@@ -209,6 +209,7 @@ XttLogGtk::XttLogGtk(GtkWidget* a_parent_wid, void* a_parent_ctx,
   g_signal_connect(
       toplevel, "focus-in-event", G_CALLBACK(xttlog_focus_in_event), this);
 
+  int dark_theme = CoWowGtk::GetDarkTheme(toplevel);
   CoWowGtk::SetWindowIcon(toplevel);
 
   GtkWidget* vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
@@ -311,14 +312,17 @@ XttLogGtk::XttLogGtk(GtkWidget* a_parent_wid, void* a_parent_ctx,
   // Toolbar
   GtkToolbar* tools = (GtkToolbar*)g_object_new(GTK_TYPE_TOOLBAR, NULL);
 
-  wutl_tools_item(tools, "$pwr_exe/ge_zoom_in.png", G_CALLBACK(activate_zoom_in), 
-      "Zoom in", this, 0, 1);
+  wutl_tools_item(tools, 
+      dark_theme ? "$pwr_exe/ico_zoomin_d_30.png" : "$pwr_exe/ico_zoomin_l_30.png", 
+      G_CALLBACK(activate_zoom_in), "Zoom in", this, 1, 1);
 
-  wutl_tools_item(tools, "$pwr_exe/ge_zoom_out.png", G_CALLBACK(activate_zoom_out), 
-      "Zoom out", this, 0, 1);
+  wutl_tools_item(tools,
+      dark_theme ? "$pwr_exe/ico_zoomout_d_30.png" : "$pwr_exe/ico_zoomout_l_30.png", 
+      G_CALLBACK(activate_zoom_out), "Zoom out", this, 1, 1);
 
-  wutl_tools_item(tools, "$pwr_exe/ge_zoom_reset.png", G_CALLBACK(activate_zoom_reset), 
-      "Zoom reset", this, 0, 1);
+  wutl_tools_item(tools,
+      dark_theme ? "$pwr_exe/ico_zoomreset_d_30.png" : "$pwr_exe/ico_zoomreset_l_30.png", 
+      G_CALLBACK(activate_zoom_reset), "Zoom reset", this, 1, 1);
 
   // Statusbar and cmd input
   GtkWidget* statusbar = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
