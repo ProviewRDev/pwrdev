@@ -723,7 +723,7 @@ MYSQL* sev_dbms_env::open_thread(unsigned int* sts)
     *sts = mysql_errno(m_con);
     return 0;
   }
-  if (mysql_set_character_set(m_con, "latin1")) {
+  if (mysql_set_character_set(con, "latin1")) {
     *sts = mysql_errno(m_con);
     return 0;
   }
