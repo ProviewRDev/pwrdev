@@ -1809,7 +1809,25 @@ static int graph_setobjectattribute_func(void* filectx, ccm_sArg* arg_list,
     case ge_eAttrType_OptionMenuType:
     case ge_eAttrType_MethodsMenuType:
     case ge_eAttrType_MethodToolbarType:
-    case ge_eAttrType_KeyboardType: {
+    case ge_eAttrType_KeyboardType:
+    case ge_eAttrType_UcEntity: 
+    case ge_eAttrType_UcAcceleration: 
+    case ge_eAttrType_UcAngle: 
+    case ge_eAttrType_UcArea: 
+    case ge_eAttrType_UcEnergy: 
+    case ge_eAttrType_UcForce: 
+    case ge_eAttrType_UcFrequency: 
+    case ge_eAttrType_UcGeneral: 
+    case ge_eAttrType_UcLength: 
+    case ge_eAttrType_UcMass: 
+    case ge_eAttrType_UcMassFlow: 
+    case ge_eAttrType_UcPower: 
+    case ge_eAttrType_UcPressure: 
+    case ge_eAttrType_UcTemperature: 
+    case ge_eAttrType_UcTime: 
+    case ge_eAttrType_UcSpeed: 
+    case ge_eAttrType_UcVolume:
+    case ge_eAttrType_UcVolumeFlow: {
       int value;
 
       if (!(arg_p3->value_decl == CCM_DECL_INT
@@ -2154,7 +2172,25 @@ static int graph_getobjectattribute_func(void* filectx, ccm_sArg* arg_list,
     case ge_eAttrType_OptionMenuType:
     case ge_eAttrType_MethodsMenuType:
     case ge_eAttrType_MethodToolbarType:
-    case ge_eAttrType_KeyboardType: {
+    case ge_eAttrType_KeyboardType:
+    case ge_eAttrType_UcEntity: 
+    case ge_eAttrType_UcAcceleration: 
+    case ge_eAttrType_UcAngle: 
+    case ge_eAttrType_UcArea: 
+    case ge_eAttrType_UcEnergy: 
+    case ge_eAttrType_UcForce: 
+    case ge_eAttrType_UcFrequency: 
+    case ge_eAttrType_UcGeneral: 
+    case ge_eAttrType_UcLength: 
+    case ge_eAttrType_UcMass: 
+    case ge_eAttrType_UcMassFlow: 
+    case ge_eAttrType_UcPower: 
+    case ge_eAttrType_UcPressure: 
+    case ge_eAttrType_UcTemperature: 
+    case ge_eAttrType_UcTime: 
+    case ge_eAttrType_UcSpeed: 
+    case ge_eAttrType_UcVolume:
+    case ge_eAttrType_UcVolumeFlow: {
       int value;
 
       if (!(arg_p3->value_decl == CCM_DECL_INT

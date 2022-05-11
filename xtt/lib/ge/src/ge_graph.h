@@ -43,6 +43,7 @@
 
 #include "ge_graph_ccm.h"
 #include "ge_graph_journal.h"
+#include "ge_graph_unitconv.h"
 
 #include "ge_attr.h"
 
@@ -82,6 +83,24 @@ typedef enum {
   ge_eAttrType_DashElements = 1015, //!< Dash elements type.
   ge_eAttrType_IndicatorColor = 1016, //!< Indicator color type.
   ge_eAttrType_ScriptTriggerEvent = 1017, //!< Script trigger event.
+  ge_eAttrType_UcEntity = 1018, //!< Unit conversion, units.
+  ge_eAttrType_UcAcceleration = 1019, //!< Unit conversion, acceleration.
+  ge_eAttrType_UcAngle = 1020, //!< Unit conversion, angle.
+  ge_eAttrType_UcArea = 1021, //!< Unit conversion, area.
+  ge_eAttrType_UcEnergy = 1022, //!< Unit conversion, energy.
+  ge_eAttrType_UcForce = 1023, //!< Unit conversion, force.
+  ge_eAttrType_UcFrequency = 1024, //!< Unit conversion, frequency.
+  ge_eAttrType_UcGeneral = 1025, //!< Unit conversion, general.
+  ge_eAttrType_UcLength = 1026, //!< Unit conversion, length.
+  ge_eAttrType_UcMass = 1027, //!< Unit conversion, mass.
+  ge_eAttrType_UcMassFlow = 1028, //!< Unit conversion, mass flow.
+  ge_eAttrType_UcPower = 1029, //!< Unit conversion, power.
+  ge_eAttrType_UcPressure = 1030, //!< Unit conversion, pressure.
+  ge_eAttrType_UcSpeed = 1031, //!< Unit conversion, speed.
+  ge_eAttrType_UcTemperature = 1032, //!< Unit conversion, temperature.
+  ge_eAttrType_UcTime = 1033, //!< Unit conversion, time.
+  ge_eAttrType_UcVolume = 1034, //!< Unit conversion, volume.
+  ge_eAttrType_UcVolumeFlow = 1035, //!< Unit conversion, volume flow.
   ge_eAttrType_DynType2 = glow_eType_DynType2, //!< DynType mask 2.
   ge_eAttrType_ActionType2 = glow_eType_ActionType2, //!< ActionType mask 2.
 } ge_eAttrType;

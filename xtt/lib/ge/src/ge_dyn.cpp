@@ -34,7 +34,7 @@
  * General Public License plus this exception.
  */
 
-/* gedyn.cpp -- Display plant and node hiererachy */
+/* gedyn.cpp -- Display plant and node hierarchy */
 
 #include <math.h>
 #include <stdlib.h>
@@ -543,6 +543,9 @@ GeDyn::GeDyn(const GeDyn& x)
     case ge_mDynType2_AnalogTransparency:
       e = new GeAnalogTransparency((const GeAnalogTransparency&)*elem);
       break;
+    case ge_mDynType2_UnitConvert:
+      e = new GeUnitConvert((const GeUnitConvert&)*elem);
+      break;
     default:;
     }
     switch (elem->action_type1) {
@@ -839,6 +842,9 @@ void GeDyn::open(std::ifstream& fp)
       break;
     case ge_eSave_AnalogTransparency:
       e = (GeDynElem*)new GeAnalogTransparency(this);
+      break;
+    case ge_eSave_UnitConvert:
+      e = (GeDynElem*)new GeUnitConvert(this);
       break;
     case ge_eSave_DigCommand:
       e = (GeDynElem*)new GeDigCommand(this);
@@ -1880,6 +1886,9 @@ GeDynElem* GeDyn::create_dyn2_element(int mask, int instance)
   case ge_mDynType2_AnalogTransparency:
     e = (GeDynElem*)new GeAnalogTransparency(this);
     break;
+  case ge_mDynType2_UnitConvert:
+    e = (GeDynElem*)new GeUnitConvert(this);
+    break;
   default:;
   }
   return e;
@@ -2112,6 +2121,9 @@ GeDynElem* GeDyn::copy_element(GeDynElem& x)
       break;
     case ge_mDynType2_AnalogTransparency:
       e = (GeDynElem*)new GeAnalogTransparency((GeAnalogTransparency&)x);
+      break;
+    case ge_mDynType2_UnitConvert:
+      e = (GeDynElem*)new GeUnitConvert((GeUnitConvert&)x);
       break;
     default:;
     }
@@ -4874,7 +4886,7 @@ GeValue::GeValue(GeDyn* e_dyn, ge_mInstance e_instance)
     : GeDynElem(e_dyn, ge_mDynType1_Value, ge_mDynType2_No, ge_mActionType1_No,
           ge_mActionType2_No, ge_eDynPrio_Value),
       zero_blank(0), decimals_decr(0), annot_typeid(0), annot_size(0), tid(0),
-      update_open(0)
+      update_open(0), convert_element(0)
 {
   strcpy(attribute, "");
   strcpy(format, "");
@@ -5201,6 +5213,13 @@ int GeValue::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
     read_decimals(dyn, decimals_attr, decimals_decr, format);
   }
 
+  for (GeDynElem* elem = dyn->elements; elem; elem = elem->next) {
+    if (elem->dyn_type2 == ge_mDynType2_UnitConvert) {
+      convert_element = (GeUnitConvert*)elem;
+      break;
+    }
+  }
+
   trace_data->p = &pdummy;
   first_scan = true;
   return 1;
@@ -5242,6 +5261,9 @@ int GeValue::scan(grow_tObject object)
   switch (annot_typeid) {
   case pwr_eType_Float32: {
     pwr_tFloat32 val = *(pwr_tFloat32*)p;
+    if (convert_element)
+      val = uc_convert((graph_eUcEntity)convert_element->entity, convert_element->db_unit, 
+		       convert_element->display_unit, val);
 
     if (!first_scan) {
       if (memcmp(&old_value, &val, size) == 0)
@@ -6231,6 +6253,13 @@ int GeValueInput::change_value(grow_tObject object, char* text)
     }
   }
 
+  if (annot_typeid == pwr_eType_Float32 && value_element->convert_element) {
+    pwr_tFloat32 val = *(pwr_tFloat32 *)buf;
+    val = uc_convert((graph_eUcEntity)value_element->convert_element->entity, 
+		     value_element->convert_element->display_unit, 
+		     value_element->convert_element->db_unit, val);
+    *(pwr_tFloat32 *)buf = val;
+  }
   if (db == graph_eDatabase_Local)
     sts = dyn->graph->localdb_set_value(parsed_name, &buf, annot_size);
   else if (db == graph_eDatabase_Ccm)
@@ -23293,6 +23322,103 @@ int GeAnalogTransparency::syntax_check(
 
   dyn->syntax_check_attribute(object, "AnalogTransparency.Attribute", attribute, 0,
       types, databases, error_cnt, warning_cnt);
+  return 1;
+}
+
+GeUnitConvert::GeUnitConvert(GeDyn* e_dyn)
+    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_UnitConvert, ge_mActionType1_No,
+		ge_mActionType2_No, ge_eDynPrio_UnitConvert), entity(0), db_unit(0), display_unit(0)
+{
+}
+
+GeUnitConvert::GeUnitConvert(const GeUnitConvert& x)
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
+		x.prio), entity(x.entity), db_unit(x.db_unit), display_unit(x.display_unit)
+{
+}
+
+void GeUnitConvert::get_attributes(attr_sItem* attrinfo, int* item_count)
+{
+  int i = *item_count;
+
+  strcpy(attrinfo[i].name, "UnitConvert.Entity");
+  attrinfo[i].value = &entity;
+  attrinfo[i].type = ge_eAttrType_UcEntity;
+  attrinfo[i++].size = sizeof(entity);
+
+  strcpy(attrinfo[i].name, "UnitConvert.DbUnit");
+  attrinfo[i].value = &db_unit;
+  attrinfo[i].type = uc_entity_to_attrtype(entity);
+  attrinfo[i++].size = sizeof(db_unit);
+
+  strcpy(attrinfo[i].name, "UnitConvert.DisplayUnit");
+  attrinfo[i].value = &display_unit;
+  attrinfo[i].type = uc_entity_to_attrtype(entity);
+  attrinfo[i++].size = sizeof(display_unit);
+
+  dyn->display_access = true;
+  *item_count = i;
+}
+
+int GeUnitConvert::get_transtab(char** tt)
+{
+  static char transtab[][32]
+      = { "SubGraph", "SubGraph", "A1", "Text", "Dynamic", "", "" };
+
+  *tt = (char*)transtab;
+  return 0;
+}
+
+void GeUnitConvert::save(std::ofstream& fp)
+{
+  fp << int(ge_eSave_UnitConvert) << '\n';
+  fp << int(ge_eSave_UnitConvert_entity) << FSPACE << entity << '\n';
+  fp << int(ge_eSave_UnitConvert_db_unit) << FSPACE << db_unit << '\n';
+  fp << int(ge_eSave_UnitConvert_display_unit) << FSPACE << display_unit << '\n';
+  fp << int(ge_eSave_End) << '\n';
+}
+
+void GeUnitConvert::open(std::ifstream& fp)
+{
+  int type = 0;
+  int end_found = 0;
+  char dummy[40];
+
+  for (;;) {
+    if (!fp.good()) {
+      fp.clear();
+      fp.getline(dummy, sizeof(dummy));
+      printf("** Read error GeUnitConvert: \"%d %s\"\n", type, dummy);
+    }
+
+    fp >> type;
+
+    switch (type) {
+    case ge_eSave_UnitConvert:
+      break;
+    case ge_eSave_UnitConvert_entity:
+      fp >> entity;
+      break;
+    case ge_eSave_UnitConvert_db_unit:
+      fp >> db_unit;
+      break;
+    case ge_eSave_UnitConvert_display_unit:
+      fp >> display_unit;
+      break;
+    case ge_eSave_End:
+      end_found = 1;
+      break;
+    default:
+      std::cout << "GeUnitConvert:open syntax error\n";
+      fp.getline(dummy, sizeof(dummy));
+    }
+    if (end_found)
+      break;
+  }
+}
+
+int GeUnitConvert::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
+{
   return 1;
 }
 

@@ -101,6 +101,7 @@ static attrnav_sEnumElement elem_dyn_type2[] = {
   { (unsigned int)ge_mDynType2_RefUpdate, "RefUpdate" }, 
   { (unsigned int)ge_mDynType2_DigTransparency, "DigTransparency" },
   { (unsigned int)ge_mDynType2_AnalogTransparency, "AnalogTransparency" },
+  { (unsigned int)ge_mDynType2_UnitConvert, "UnitConvert" },
   { 0, "" }
 };
 
@@ -1193,6 +1194,216 @@ static attrnav_sEnumElement elem_script_trigger_event[]
 	{ ge_eScriptTriggerEvent_Close, "Close" },
 	{ 0, "" } };
 
+static attrnav_sEnumElement elem_ucentity[]
+    = { { graph_eUcEntity_Acceleration, "Acceleration" },
+	{ graph_eUcEntity_Angle, "Angle" },
+	{ graph_eUcEntity_Area, "Area" },
+        { graph_eUcEntity_Energy, "Energy" },
+        { graph_eUcEntity_Force, "Force" },
+        { graph_eUcEntity_Frequency, "Frequency" },
+        { graph_eUcEntity_General, "General" },
+	{ graph_eUcEntity_Length, "Length" },
+	{ graph_eUcEntity_Mass, "Mass" },
+	{ graph_eUcEntity_MassFlow, "MassFlow" },
+        { graph_eUcEntity_Power, "Power" },
+        { graph_eUcEntity_Pressure, "Pressure" },
+	{ graph_eUcEntity_Speed, "Speed" },
+	{ graph_eUcEntity_Temperature, "Temperature" },
+	{ graph_eUcEntity_Time, "Time" },
+	{ graph_eUcEntity_Volume, "Volume" },
+	{ graph_eUcEntity_VolumeFlow, "VolumeFlow" },
+	{ 0, "" } };
+
+static attrnav_sEnumElement elem_ucacceleration[]
+    = { { graph_eUcAcceleration_m_s2, "m/s2" },
+	{ graph_eUcAcceleration_ft_s2, "ft/s2" },
+	{ graph_eUcAcceleration_in_s2, "in/s2" },
+	{ 0, "" } };
+
+static attrnav_sEnumElement elem_ucangle[]
+    = { { graph_eUcAngle_rad, "rad" },
+	{ graph_eUcAngle_degree, "degree" },
+	{ graph_eUcAngle_min, "min" },
+	{ graph_eUcAngle_mrad, "mrad" },
+	{ graph_eUcAngle_percent, "percent" },
+	{ graph_eUcAngle_sec, "sec" },
+	{ 0, "" } };
+
+static attrnav_sEnumElement elem_ucarea[]
+    = { { graph_eUcArea_m2, "m2" },
+	{ graph_eUcArea_a, "a" },
+	{ graph_eUcArea_ac, "ac" },
+	{ graph_eUcArea_cm2, "cm2" },
+	{ graph_eUcArea_ha, "ha" },
+	{ graph_eUcArea_km2, "km2" },
+	{ graph_eUcArea_mm2, "mm2" },
+	{ graph_eUcArea_sq_in, "sq in" },
+	{ graph_eUcArea_sq_mi, "sq mi" },
+	{ graph_eUcArea_sq_ft, "sq ft" },
+	{ graph_eUcArea_sq_yd, "sq yd" },
+	{ 0, "" } };
+
+static attrnav_sEnumElement elem_ucenergy[]
+    = { { graph_eUcEnergy_J, "J" },
+	{ graph_eUcEnergy_cal, "cal" },
+	{ graph_eUcEnergy_kJ, "kJ" },
+	{ 0, "" } };
+
+static attrnav_sEnumElement elem_ucforce[]
+    = { { graph_eUcForce_N, "N" },
+	{ graph_eUcForce_kN, "kN" },
+	{ graph_eUcForce_kp, "kp" },
+	{ graph_eUcForce_MN, "MN" },
+	{ graph_eUcForce_p, "p" },
+	{ 0, "" } };
+
+static attrnav_sEnumElement elem_ucfrequency[]
+    = { { graph_eUcFrequency_Hz, "Hz" },
+	{ graph_eUcFrequency_kHz, "kHz" },
+	{ graph_eUcFrequency_MHz, "MHz" },
+	{ graph_eUcFrequency_rad_min, "rad/min" },
+	{ graph_eUcFrequency_rad_s, "rad/s" },
+	{ graph_eUcFrequency_RPM, "RPM" },
+	{ 0, "" } };
+
+static attrnav_sEnumElement elem_ucgeneral[]
+    = { { graph_eUcGeneral_1_1, "1:1" },
+	{ graph_eUcGeneral_Tera, "Tera" },
+	{ graph_eUcGeneral_Giga, "Giga" },
+	{ graph_eUcGeneral_Mega, "Mega" },
+	{ graph_eUcGeneral_Kilo, "Kilo" },
+	{ graph_eUcGeneral_Hecto, "Hecto" },
+	{ graph_eUcGeneral_Deca, "Deca" },
+	{ graph_eUcGeneral_Deci, "Deci" },
+	{ graph_eUcGeneral_Centi, "Centi" },
+	{ graph_eUcGeneral_Milli, "Milli" },
+	{ graph_eUcGeneral_Micro, "Micro" },
+	{ graph_eUcGeneral_Nano, "Nano" },
+	{ graph_eUcGeneral_Pico, "Pico" },
+	{ 0, "" } };
+
+static attrnav_sEnumElement elem_uclength[]
+    = { { graph_eUcLength_m, "m" },
+	{ graph_eUcLength_cm, "cm" },
+	{ graph_eUcLength_dm, "dm" },
+	{ graph_eUcLength_ft, "ft" },
+	{ graph_eUcLength_in, "in" },
+	{ graph_eUcLength_km, "km" },
+	{ graph_eUcLength_mi, "mi" },
+	{ graph_eUcLength_mm, "mm" },
+	{ graph_eUcLength_nm, "nm" },
+	{ graph_eUcLength_NM, "NM" },
+	{ graph_eUcLength_um, "um" },
+	{ graph_eUcLength_yd, "yd" },
+	{ 0, "" } };
+
+static attrnav_sEnumElement elem_ucmass[]
+    = { { graph_eUcMass_kg, "kg" },
+	{ graph_eUcMass_g, "g" },
+	{ graph_eUcMass_hg, "hg" },
+	{ graph_eUcMass_kt, "kt" },
+	{ graph_eUcMass_lb, "lb" },
+	{ graph_eUcMass_mg, "mg" },
+	{ graph_eUcMass_oz, "oz" },
+	{ graph_eUcMass_st, "st" },
+	{ graph_eUcMass_t, "t" },
+	{ graph_eUcMass_ug, "ug" },
+	{ 0, "" } };
+
+static attrnav_sEnumElement elem_ucmassflow[]
+    = { { graph_eUcMassFlow_kg_s, "kg/s" },
+	{ graph_eUcMassFlow_g_min, "g/min" },
+	{ graph_eUcMassFlow_g_s, "g/s" },
+	{ graph_eUcMassFlow_kg_min, "kg/min" },
+	{ graph_eUcMassFlow_lb_min, "lb/min" },
+	{ graph_eUcMassFlow_lb_s, "lb/s" },
+	{ graph_eUcMassFlow_mg_min, "mg/min" },
+	{ graph_eUcMassFlow_mg_s, "mg/s" },
+	{ graph_eUcMassFlow_oz_min, "oz/min" },
+	{ graph_eUcMassFlow_oz_s, "oz/s" },
+	{ 0, "" } };
+
+static attrnav_sEnumElement elem_ucpower[]
+    = { { graph_eUcPower_W, "W" },
+	{ graph_eUcPower_hp, "hp" },
+	{ graph_eUcPower_GW, "GW" },
+	{ graph_eUcPower_kW, "kW" },
+	{ graph_eUcPower_mW, "mW" },
+	{ graph_eUcPower_MW, "MW" },
+	{ graph_eUcPower_TW, "TW" },
+	{ graph_eUcPower_uW, "uW" },
+	{ 0, "" } };
+
+static attrnav_sEnumElement elem_ucpressure[]
+    = { { graph_eUcPressure_Pa, "Pa" },
+	{ graph_eUcPressure_atm, "atm" },
+	{ graph_eUcPressure_b, "b" },
+	{ graph_eUcPressure_kPa, "kPa" },
+	{ graph_eUcPressure_lb_ft2, "lb/ft2" },
+	{ graph_eUcPressure_lb_in2, "lb/in2" },
+	{ graph_eUcPressure_mb, "mb" },
+	{ graph_eUcPressure_mPa, "mPa" },
+	{ graph_eUcPressure_mmHg, "mmHg" },
+	{ graph_eUcPressure_MPa, "MPa" },
+	{ 0, "" } };
+
+static attrnav_sEnumElement elem_ucspeed[]
+    = { { graph_eUcSpeed_m_s, "m/s" },
+	{ graph_eUcSpeed_ft_min, "ft/min" },
+	{ graph_eUcSpeed_ft_s, "ft_s" },
+	{ graph_eUcSpeed_in_min, "in/min" },
+	{ graph_eUcSpeed_in_s, "in_s" },
+	{ graph_eUcSpeed_km_h, "km/h" },
+	{ graph_eUcSpeed_kn, "kn" },
+	{ graph_eUcSpeed_m_min, "m/min" },
+	{ graph_eUcSpeed_mm_s, "mm/s" },
+	{ graph_eUcSpeed_mi_h, "mi/h" },
+	{ graph_eUcSpeed_yd_min, "yd/min" },
+	{ graph_eUcSpeed_yd_s, "yd/s" },
+	{ 0, "" } };
+
+static attrnav_sEnumElement elem_uctemperature[]
+    = { { graph_eUcTemperature_K, "K" },
+	{ graph_eUcTemperature_C, "C" },
+	{ graph_eUcTemperature_F, "F" },
+	{ graph_eUcTemperature_R, "R" },
+	{ 0, "" } };
+
+static attrnav_sEnumElement elem_uctime[]
+    = { { graph_eUcTime_s, "s" },
+	{ graph_eUcTime_d, "d" },
+	{ graph_eUcTime_h, "h" },
+	{ graph_eUcTime_min, "min" },
+	{ graph_eUcTime_ms, "ms" },
+	{ graph_eUcTime_ns, "ns" },
+	{ graph_eUcTime_us, "us" },
+	{ graph_eUcTime_wk, "wk" },
+	{ graph_eUcTime_y, "y" },
+	{ 0, "" } };
+
+static attrnav_sEnumElement elem_ucvolume[]
+    = { { graph_eUcVolume_m3, "m3" },
+	{ graph_eUcVolume_cm3, "cm3" },
+	{ graph_eUcVolume_dm3, "dm3" },
+	{ graph_eUcVolume_ft3, "ft3" },
+	{ graph_eUcVolume_in3, "in3" },
+	{ graph_eUcVolume_mm3, "mm3" },
+	{ 0, "" } };
+
+static attrnav_sEnumElement elem_ucvolumeflow[]
+    = { { graph_eUcVolumeFlow_m3_s, "m3/s" },
+	{ graph_eUcVolumeFlow_cl_s, "cl/s" },
+	{ graph_eUcVolumeFlow_in3_min, "in3/min" },
+	{ graph_eUcVolumeFlow_in3_s, "in3/s" },
+	{ graph_eUcVolumeFlow_ft3_min, "ft3/min" },
+	{ graph_eUcVolumeFlow_ft3_s, "ft3/s" },
+	{ graph_eUcVolumeFlow_l_s, "l/s" },
+	{ graph_eUcVolumeFlow_m3_min, "m3/min" },
+	{ graph_eUcVolumeFlow_mm3_s, "mm3/s" },
+	{ graph_eUcVolumeFlow_yd3_min, "yd3/min" },
+	{ graph_eUcVolumeFlow_yd3_s, "yd3/s" },
+	{ 0, "" } };
+
 static attrnav_sEnum enum_types[] = {
   { (unsigned int)glow_eType_Direction,
       (attrnav_sEnumElement*)&elem_direction },
@@ -1243,6 +1454,24 @@ static attrnav_sEnum enum_types[] = {
       (attrnav_sEnumElement*)&elem_indicator_color },
   { (unsigned int)ge_eAttrType_ScriptTriggerEvent,
       (attrnav_sEnumElement*)&elem_script_trigger_event },
+  { (unsigned int)ge_eAttrType_UcEntity, (attrnav_sEnumElement*)&elem_ucentity },
+  { (unsigned int)ge_eAttrType_UcAcceleration, (attrnav_sEnumElement*)&elem_ucacceleration },
+  { (unsigned int)ge_eAttrType_UcAngle, (attrnav_sEnumElement*)&elem_ucangle },
+  { (unsigned int)ge_eAttrType_UcArea, (attrnav_sEnumElement*)&elem_ucarea },
+  { (unsigned int)ge_eAttrType_UcEnergy, (attrnav_sEnumElement*)&elem_ucenergy },
+  { (unsigned int)ge_eAttrType_UcGeneral, (attrnav_sEnumElement*)&elem_ucgeneral },
+  { (unsigned int)ge_eAttrType_UcForce, (attrnav_sEnumElement*)&elem_ucforce },
+  { (unsigned int)ge_eAttrType_UcFrequency, (attrnav_sEnumElement*)&elem_ucfrequency },
+  { (unsigned int)ge_eAttrType_UcLength, (attrnav_sEnumElement*)&elem_uclength },
+  { (unsigned int)ge_eAttrType_UcMass, (attrnav_sEnumElement*)&elem_ucmass },
+  { (unsigned int)ge_eAttrType_UcMassFlow, (attrnav_sEnumElement*)&elem_ucmassflow },
+  { (unsigned int)ge_eAttrType_UcPower, (attrnav_sEnumElement*)&elem_ucpower },
+  { (unsigned int)ge_eAttrType_UcPressure, (attrnav_sEnumElement*)&elem_ucpressure },
+  { (unsigned int)ge_eAttrType_UcSpeed, (attrnav_sEnumElement*)&elem_ucspeed },
+  { (unsigned int)ge_eAttrType_UcTemperature, (attrnav_sEnumElement*)&elem_uctemperature },
+  { (unsigned int)ge_eAttrType_UcTime, (attrnav_sEnumElement*)&elem_uctime },
+  { (unsigned int)ge_eAttrType_UcVolume, (attrnav_sEnumElement*)&elem_ucvolume },
+  { (unsigned int)ge_eAttrType_UcVolumeFlow, (attrnav_sEnumElement*)&elem_ucvolumeflow },
   { 0, NULL }
 };
 
@@ -1423,7 +1652,25 @@ int attrnav_attr_string_to_value(int type_id, char* value_str, void* buffer_ptr,
   case ge_eAttrType_DashType:
   case ge_eAttrType_DashElements:
   case ge_eAttrType_IndicatorColor:
-  case ge_eAttrType_ScriptTriggerEvent: {
+  case ge_eAttrType_ScriptTriggerEvent:
+  case ge_eAttrType_UcEntity:
+  case ge_eAttrType_UcAcceleration:
+  case ge_eAttrType_UcAngle:
+  case ge_eAttrType_UcArea:
+  case ge_eAttrType_UcEnergy:
+  case ge_eAttrType_UcForce:
+  case ge_eAttrType_UcFrequency:
+  case ge_eAttrType_UcGeneral:
+  case ge_eAttrType_UcLength:
+  case ge_eAttrType_UcMass:
+  case ge_eAttrType_UcMassFlow:
+  case ge_eAttrType_UcPower:
+  case ge_eAttrType_UcPressure:
+  case ge_eAttrType_UcSpeed:
+  case ge_eAttrType_UcTemperature:
+  case ge_eAttrType_UcTime:
+  case ge_eAttrType_UcVolume:
+  case ge_eAttrType_UcVolumeFlow: {
     if (sscanf(value_str, "%u", (int*)buffer_ptr) != 1)
       return ATTRNAV__INPUT_SYNTAX;
     break;
@@ -1511,7 +1758,25 @@ void attrnav_attrvalue_to_string(
   case ge_eAttrType_DashType:
   case ge_eAttrType_DashElements:
   case ge_eAttrType_IndicatorColor:
-  case ge_eAttrType_ScriptTriggerEvent: {
+  case ge_eAttrType_ScriptTriggerEvent:
+  case ge_eAttrType_UcEntity:
+  case ge_eAttrType_UcAcceleration:
+  case ge_eAttrType_UcAngle:
+  case ge_eAttrType_UcArea:
+  case ge_eAttrType_UcEnergy:
+  case ge_eAttrType_UcForce:
+  case ge_eAttrType_UcFrequency:
+  case ge_eAttrType_UcGeneral:
+  case ge_eAttrType_UcLength:
+  case ge_eAttrType_UcMass:
+  case ge_eAttrType_UcMassFlow:
+  case ge_eAttrType_UcPower:
+  case ge_eAttrType_UcPressure:
+  case ge_eAttrType_UcSpeed:
+  case ge_eAttrType_UcTemperature:
+  case ge_eAttrType_UcTime:
+  case ge_eAttrType_UcVolume:
+  case ge_eAttrType_UcVolumeFlow: {
     attrnav_sEnumElement* elem_p = NULL;
     attrnav_sEnum* enum_p;
     int found;
@@ -2295,7 +2560,8 @@ static int attrnav_brow_cb(FlowCtx* ctx, flow_tEvent event)
         brow_SetRadiobutton(node_list[0], 0, 1);
         *(int*)((AItemEnum*)item)->value_p = ((AItemEnum*)item)->num;
       }
-      if ((((AItemEnum*)item)->type_id == ge_eAttrType_OptionMenuType)
+      if ((((AItemEnum*)item)->type_id == ge_eAttrType_OptionMenuType
+	  || ((AItemEnum*)item)->type_id == ge_eAttrType_UcEntity)
           && attrnav->reconfigure_attr_cb) {
         if (attrnav->type == attr_eType_Attributes)
           (attrnav->reconfigure_attr_cb)(attrnav->parent_ctx);
@@ -2461,7 +2727,8 @@ static int attrnav_brow_cb(FlowCtx* ctx, flow_tEvent event)
               event->radiobutton.number, !event->radiobutton.value);
           *(int*)((AItemEnum*)item)->value_p = ((AItemEnum*)item)->num;
         }
-        if ((((AItemEnum*)item)->type_id == ge_eAttrType_OptionMenuType)
+        if ((((AItemEnum*)item)->type_id == ge_eAttrType_OptionMenuType
+	  || ((AItemEnum*)item)->type_id == ge_eAttrType_UcEntity)
             && attrnav->reconfigure_attr_cb) {
           if (attrnav->type == attr_eType_Attributes)
             (attrnav->reconfigure_attr_cb)(attrnav->parent_ctx);
@@ -3383,6 +3650,24 @@ AItemLocal::AItemLocal(AttrNav* attrnav, const char* item_name,
   case ge_eAttrType_DashElements:
   case ge_eAttrType_IndicatorColor:
   case ge_eAttrType_ScriptTriggerEvent:
+  case ge_eAttrType_UcEntity:
+  case ge_eAttrType_UcAcceleration:
+  case ge_eAttrType_UcAngle:
+  case ge_eAttrType_UcArea:
+  case ge_eAttrType_UcEnergy:
+  case ge_eAttrType_UcForce:
+  case ge_eAttrType_UcFrequency:
+  case ge_eAttrType_UcGeneral:
+  case ge_eAttrType_UcLength:
+  case ge_eAttrType_UcMass:
+  case ge_eAttrType_UcMassFlow:
+  case ge_eAttrType_UcPower:
+  case ge_eAttrType_UcPressure:
+  case ge_eAttrType_UcSpeed:
+  case ge_eAttrType_UcTemperature:
+  case ge_eAttrType_UcTime:
+  case ge_eAttrType_UcVolume:
+  case ge_eAttrType_UcVolumeFlow:
     if (!noedit) {
       brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_attrarray);
       parent = 1;

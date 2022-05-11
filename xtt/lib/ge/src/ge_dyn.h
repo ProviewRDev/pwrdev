@@ -163,6 +163,7 @@ typedef enum {
   ge_eDynPrio_DsTrend,
   ge_eDynPrio_DsTrendCurve,
   ge_eDynPrio_SevHist,
+  ge_eDynPrio_UnitConvert,
   ge_eDynPrio_DigTransparency,
   ge_eDynPrio_AnalogTransparency,
   ge_eDynPrio_AnalogText,
@@ -260,7 +261,8 @@ typedef enum {
   ge_mDynType2_DsTrendCurve = 1 << 11,
   ge_mDynType2_SevHist = 1 << 12,
   ge_mDynType2_DigTransparency = 1 << 13,
-  ge_mDynType2_AnalogTransparency = 1 << 14
+  ge_mDynType2_AnalogTransparency = 1 << 14,
+  ge_mDynType2_UnitConvert = 1 << 15
 } ge_mDynType2;
 
 //! Action types.
@@ -410,6 +412,7 @@ typedef enum {
   ge_eSave_SevHist = 76,
   ge_eSave_DigTransparency = 77,
   ge_eSave_AnalogTransparency = 78,
+  ge_eSave_UnitConvert = 79,
   ge_eSave_End = 99,
   ge_eSave_Dyn_dyn_type1 = 100,
   ge_eSave_Dyn_action_type1 = 101,
@@ -873,11 +876,15 @@ typedef enum {
   ge_eSave_DigTransparency_high_value = 7702,
   ge_eSave_AnalogTransparency_attribute = 7800,
   ge_eSave_AnalogTransparency_min_value = 7801,
-  ge_eSave_AnalogTransparency_max_value = 7802
+  ge_eSave_AnalogTransparency_max_value = 7802,
+  ge_eSave_UnitConvert_entity = 7900,
+  ge_eSave_UnitConvert_db_unit = 7901,
+  ge_eSave_UnitConvert_display_unit = 7902
 } ge_eSave;
 
 class GeDynElem;
 class Graph;
+class GeUnitConvert;
 
 //! This class handles the dynamics for an object.
 /*!
@@ -1554,6 +1561,7 @@ public:
   int annot_size;
   pwr_tTid tid;
   int update_open;
+  GeUnitConvert *convert_element;
 
   GeValue(GeDyn* e_dyn, ge_mInstance e_instance = ge_mInstance_1);
   GeValue(const GeValue& x);
@@ -2941,6 +2949,22 @@ public:
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
+  int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
+};
+
+//! UnitConvert.
+class GeUnitConvert : public GeDynElem {
+public:
+  int entity;
+  int db_unit;
+  int display_unit;
+
+  GeUnitConvert(GeDyn* e_dyn);
+  GeUnitConvert(const GeUnitConvert& x);
+  void get_attributes(attr_sItem* attrinfo, int* item_count);
+  int get_transtab(char** tt);
+  void save(std::ofstream& fp);
+  void open(std::ifstream& fp);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
