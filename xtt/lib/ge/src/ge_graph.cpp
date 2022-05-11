@@ -455,8 +455,8 @@ void Graph::clear_all()
 
   sts = attr_list.get_first((void**)&attrctx);
   while (sts) {
-    delete attrctx;
     attr_list.remove((void*)attrctx);
+    delete attrctx;
     sts = attr_list.get_first((void**)&attrctx);
   }
   grow_New(grow->ctx);
@@ -2560,8 +2560,8 @@ static int graph_grow_cb(GlowCtx* ctx, glow_tEvent event)
 
     Attr* attrctx;
     if (graph->attr_list.find(event->object.object, (void**)&attrctx)) {
-      delete attrctx;
       graph->attr_list.remove((void*)attrctx);
+      delete attrctx;
     }
     break;
   }

@@ -1503,9 +1503,10 @@ void Ge::open_list_cb(void* ctx, char* text, int ok_pressed)
 {
   ((sOpenList*)ctx)->gectx->open_graph(text, ((sOpenList *)ctx)->dashboard);
   ((sOpenList*)ctx)->gectx->set_title();
-  if (ok_pressed)
+  if (ok_pressed) {
     ((sOpenList*)ctx)->gectx->open_dialog = 0;
-  free(ctx);
+    free(ctx);
+  }
 }
 
 void Ge::open_cancel_cb(void* ctx)
