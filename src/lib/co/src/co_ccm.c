@@ -313,6 +313,9 @@ static int ccm_func_arrayclear(void* filectx, ccm_sArg* arg_list, int arg_count,
 static int ccm_func_sort(void* filectx, ccm_sArg* arg_list, int arg_count,
     int* return_decl, ccm_tFloat* return_float, ccm_tInt* return_int,
     char* return_string);
+static int ccm_func_ccm_env_js(void* filectx, ccm_sArg* arg_list, int arg_count,
+    int* return_decl, ccm_tFloat* return_float, ccm_tInt* return_int,
+    char* return_string);
 
 #define CCM_SYSFUNC_MAX 200
 
@@ -355,6 +358,7 @@ static ccm_sSysFunc ccm_sysfunc[CCM_SYSFUNC_MAX] = { { "std", "printf",
   { "std", "arraypush", &ccm_func_arraypush },
   { "std", "arrayclear", &ccm_func_arrayclear },
   { "std", "sort", &ccm_func_sort },
+  { "std", "ccm_env_js", &ccm_func_ccm_env_js },
   { "", "", 0 } };
 
 /************* TEST *********************/
@@ -655,17 +659,8 @@ void ccm_float_to_string(char* string, ccm_tFloat f)
   int i;
 
   /* If value is close to integer, round it */
-  if (fabs(f - floor(f)) <= FLT_EPSILON) {
-    if (f >= 0)
-      i = f + FLT_EPSILON;
-    else
-      i = f - FLT_EPSILON;
-    sprintf(string, "%d", i);
-  } else if (fabs(f - floor(f) + 1) <= FLT_EPSILON) {
-    if (f >= 0)
-      i = f + FLT_EPSILON;
-    else
-      i = f - FLT_EPSILON;
+  if (fabs(f - round(f)) <= FLT_EPSILON) {
+    i = round(f);
     sprintf(string, "%d", i);
   } else
     sprintf(string, "%f", f);
@@ -753,6 +748,12 @@ static void ccm_print_error(ccm_tFileCtx filectx, int sts)
     break;
   case CCM__MISPLACED:
     strcpy(text, "Misplaced statement");
+    break;
+  case CCM__INVARG:
+    strcpy(text, "Invalid argument");
+    break;
+  case CCM__NYI:
+    strcpy(text, "Not yet implemented in this environment");
     break;
   default:
     strcpy(text, "Unknown error code");
@@ -4817,6 +4818,8 @@ static int ccm_func_extract(void* filectx, ccm_sArg* arg_list, int arg_count,
     return CCM__VARTYPE;
   if (arg_p3->value_decl != K_DECL_STRING)
     return CCM__VARTYPE;
+  if (arg_p1->value_int < 1)
+    return CCM__INVARG;
 
   if (arg_p1->value_int > (int)strlen(arg_p3->value_string)
       || arg_p1->value_int < 1 || arg_p2->value_int < 1)
@@ -5399,6 +5402,8 @@ static int ccm_func_set_namespace(void* filectx, ccm_sArg* arg_list, int arg_cou
 {
   if (arg_count != 1)
     return CCM__ARGMISM;
+  if (arg_list->value_decl != K_DECL_STRING)
+    return CCM__VARTYPE;
 
   if (strlen(arg_list->value_string) > sizeof(((ccm_tFileCtx)filectx)->namespc) - 1)
     strcpy(((ccm_tFileCtx)filectx)->namespc, 
@@ -5978,6 +5983,18 @@ static int ccm_func_tstlog_vlog(void* filectx, ccm_sArg* arg_list, int arg_count
   }
   *return_int = 1;
   *return_decl = CCM_DECL_INT;
+  return 1;
+}
+
+static int ccm_func_ccm_env_js(void* filectx, ccm_sArg* arg_list, int arg_count,
+    int* return_decl, ccm_tFloat* return_float, ccm_tInt* return_int,
+    char* return_string)
+{
+  if (arg_count != 0)
+    return CCM__ARGMISM;
+
+  *return_int = 0;
+  *return_decl = K_DECL_INT;
   return 1;
 }
 

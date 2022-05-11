@@ -71,6 +71,8 @@ noaccess	<no access for operation>				/error
 noelem		<number of elements not specified>			/info
 noelemerror	<number of elements not specified>			/error
 misplaced	<misplaced statement>					/error
+invarg		<invalid argument>					/error
+nyi		<not yet implemented in this environment>		/error
 
 
 
