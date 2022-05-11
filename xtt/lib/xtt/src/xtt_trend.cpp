@@ -643,7 +643,7 @@ void XttTrend::trend_scan(void* data)
           write_buffer = trend->trend_p[i]->WriteBuffer;
           idx = write_buffer * trend_buff_size / 2
               + int(trend->trend_p[i]->NextWriteIndex[write_buffer])
-              - (values - 1 - k);
+              - (values - k);
 	  if (idx < 0)
 	    idx += trend_buff_size;
           trend->gcd->y_data[i][0] = trend->trend_p[i]->DataBuffer[idx];
@@ -1070,6 +1070,7 @@ void XttTrend::curve_add(
     gcd->rows[i] = max_points;
 
     gcd->cols = trend_cnt;
+    gcd->x_reverse = 1;
     gcd->get_borders();
     gcd->get_default_axis();
     gcd->select_color(0);
@@ -1264,6 +1265,7 @@ void XttTrend::curve_add(
     }
 
     gcd->cols = trend_cnt;
+    gcd->x_reverse = 1;
     gcd->get_borders();
     gcd->get_default_axis();
     gcd->select_color(0);
