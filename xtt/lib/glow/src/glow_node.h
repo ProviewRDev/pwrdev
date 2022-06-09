@@ -105,6 +105,13 @@ public:
     nc->get_obstacle_borders(pos.x, pos.y, &obst_x_right, &obst_x_left,
         &obst_y_high, &obst_y_low, (void*)this);
   }
+  void store_borders()
+  {
+    s_x_left = x_left;
+    s_x_right = x_right;
+    s_y_low = y_low;
+    s_y_high = y_high;
+  }
 
   //! Save the content of the object to file.
   /*!
@@ -157,6 +164,10 @@ public:
   double x_left; //!< Left border of object.
   double y_high; //!< High border of object.
   double y_low; //!< Low border of object.
+  double s_x_right; //!< Stored right border of object.
+  double s_x_left; //!< Stored left border of object.
+  double s_y_high; //!< Stored high border of object.
+  double s_y_low; //!< Stored low border of object.
   double
       obst_x_right; //!< Right border of object used for routing of connections.
   double

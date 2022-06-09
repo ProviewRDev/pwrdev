@@ -791,26 +791,26 @@ void GrowNode::set_scale(
 
   switch (type) {
   case glow_eScaleType_LowerLeft:
-    x0 = x_left;
-    y0 = y_low;
+    x0 = s_x_left;
+    y0 = s_y_low;
     break;
   case glow_eScaleType_LowerRight:
-    x0 = x_right;
-    y0 = y_low;
+    x0 = s_x_right;
+    y0 = s_y_low;
     break;
   case glow_eScaleType_UpperRight:
-    x0 = x_right;
-    y0 = y_high;
+    x0 = s_x_right;
+    y0 = s_y_high;
     break;
   case glow_eScaleType_UpperLeft:
-    x0 = x_left;
-    y0 = y_high;
+    x0 = s_x_left;
+    y0 = s_y_high;
     break;
   case glow_eScaleType_FixPoint:
     break;
   case glow_eScaleType_Center:
-    x0 = (x_left + x_right) / 2;
-    y0 = (y_low + y_high) / 2;
+    x0 = (s_x_left + s_x_right) / 2;
+    y0 = (s_y_low + s_y_high) / 2;
     break;
   default:;
   }

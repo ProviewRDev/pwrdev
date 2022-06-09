@@ -6022,6 +6022,11 @@ int grow_GetObjectBorder(grow_tObject o)
   return ((GlowArrayElem*)o)->get_border();
 }
 
+void grow_StoreObjectBorders(grow_tObject o)
+{
+  ((GlowArrayElem*)o)->store_borders();
+}
+
 glow_eDrawType grow_GetObjectFillColor(grow_tObject o)
 {
   return ((GlowArrayElem*)o)->get_fill_color();

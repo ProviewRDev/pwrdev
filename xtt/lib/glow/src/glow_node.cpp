@@ -47,7 +47,8 @@
 GlowNode::GlowNode(GrowCtx* glow_ctx, const char* name,
     GlowNodeClass* node_class, double x1, double y1, int nodraw,
     int rel_annot_pos)
-    : x_right(x1), x_left(x1), y_high(y1), y_low(y1), obst_x_right(x1),
+    : x_right(x1), x_left(x1), y_high(y1), y_low(y1),s_x_right(x1), s_x_left(x1), 
+      s_y_high(y1), s_y_low(y1), obst_x_right(x1),
       obst_x_left(x1), obst_y_high(y1), obst_y_low(y1), hot(0), ctx(glow_ctx),
       nc(node_class), nc_root(node_class), pos(glow_ctx, x1, y1),
       stored_pos(glow_ctx, x1, y1), highlight(0), inverse(0), local_nc(0),

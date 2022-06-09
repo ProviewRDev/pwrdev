@@ -81,6 +81,7 @@ public:
       double* y_high, double* y_low){}
   virtual void get_borders(double pos_x, double pos_y, double* x_right,
       double* x_left, double* y_high, double* y_low, void* node){}
+  virtual void store_borders(){}
   virtual int event_handler(GlowWind* w, glow_eEvent event, int x, int y)
   {
     return 0;

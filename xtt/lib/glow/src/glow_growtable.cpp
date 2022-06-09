@@ -1326,8 +1326,8 @@ void GrowTable::set_textsize(int size)
 
 void GrowTable::set_textbold(int bold)
 {
-  if ((bold && draw_type == glow_eDrawType_TextHelveticaBold)
-      || (!bold && draw_type == glow_eDrawType_TextHelvetica))
+  if ((bold && text_drawtype == glow_eDrawType_TextHelveticaBold)
+      || (!bold && text_drawtype == glow_eDrawType_TextHelvetica))
     return;
 
   if (bold)

@@ -3367,6 +3367,7 @@ int grow_GetRgbColor(
     grow_tCtx ctx, glow_eDrawType color, double* r, double* g, double* b);
 int grow_GetObjectFill(grow_tObject o);
 int grow_GetObjectBorder(grow_tObject o);
+void grow_StoreObjectBorders(grow_tObject o);
 glow_eDrawType grow_GetObjectFillColor(grow_tObject o);
 glow_eDrawType grow_GetObjectBorderColor(grow_tObject o);
 glow_eDrawType grow_GetObjectTextColor(grow_tObject o);

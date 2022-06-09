@@ -6374,7 +6374,7 @@ void GeAnalogColor::get_attributes(attr_sItem* attrinfo, int* item_count)
       strcpy(attrinfo[i].name, "AnalogTone.Tone");
       attrinfo[i].value = &color;
       attrinfo[i].type = glow_eType_ToneOrColor;
-      attrinfo[i++].size = sizeof(limit_type);
+      attrinfo[i++].size = sizeof(color);
 
       strcpy(attrinfo[i].name, "AnalogTone.LimitType");
       attrinfo[i].value = &limit_type;
@@ -6424,7 +6424,7 @@ void GeAnalogColor::get_attributes(attr_sItem* attrinfo, int* item_count)
       sprintf(attrinfo[i].name, "AnalogTone%d.Tone", inst);
       attrinfo[i].value = &color;
       attrinfo[i].type = glow_eType_ToneOrColor;
-      attrinfo[i++].size = sizeof(limit_type);
+      attrinfo[i++].size = sizeof(color);
 
       sprintf(attrinfo[i].name, "AnalogTone%d.LimitType", inst);
       attrinfo[i].value = &limit_type;
@@ -6490,7 +6490,7 @@ void GeAnalogColor::get_attributes(attr_sItem* attrinfo, int* item_count)
       sprintf(attrinfo[i].name, "AnalogColor%d.Color", inst);
       attrinfo[i].value = &color;
       attrinfo[i].type = glow_eType_Color;
-      attrinfo[i++].size = sizeof(limit_type);
+      attrinfo[i++].size = sizeof(color);
 
       sprintf(attrinfo[i].name, "AnalogColor%d.LimitType", inst);
       attrinfo[i].value = &limit_type;
@@ -7125,7 +7125,7 @@ int GeRotate::scan(grow_tObject object)
     first_scan = false;
 
   double value = val * factor + offset;
-  if (min_angle != 0 && max_angle != 0) {
+  if (!feq(min_angle, 0.0) || !feq(max_angle, 0.0)) {
     if (value < min_angle)
       value = min_angle;
     else if (value > max_angle)
@@ -7460,12 +7460,14 @@ int GeMove::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
   first_scan = true;
   if (!grow_TransformIsStored(object)) {
     grow_StoreTransform(object);
+    grow_StoreObjectBorders(object);
     grow_MeasureNode(object, &x_orig, &y_orig, &ur_x, &ur_y);
     width_orig = ur_x - x_orig;
     height_orig = ur_y - y_orig;
   } else {
     grow_RevertTransform(object);
     grow_GetObjectBorder(object);
+    grow_StoreObjectBorders(object);
     grow_MeasureNode(object, &x_orig, &y_orig, &ur_x, &ur_y);
     width_orig = ur_x - x_orig;
     height_orig = ur_y - y_orig;
