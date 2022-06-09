@@ -1,3 +1,4 @@
+!** Load: pwrct_buttonsmallcommand,pwrct_valueinputmediumbg,pwr_smiley__p6,pwr_smiley__p5,pwr_smiley__p4,pwr_smiley__p3,pwr_smiley__p2,pwr_smiley
 
 main()
   int id;

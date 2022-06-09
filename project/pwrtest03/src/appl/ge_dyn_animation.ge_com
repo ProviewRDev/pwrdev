@@ -1,3 +1,4 @@
+!** Load: pwrct_buttonsmallcommand,pwrct_indsquaregreen,pwr_valveanim__p7,pwr_valveanim__p6,pwr_valveanim__p5,pwr_valveanim__p4,pwr_valveanim__p3,pwr_valveanim__p2,pwr_valveanim
 
 main()
   int id;

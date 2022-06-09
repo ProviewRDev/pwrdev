@@ -1,3 +1,4 @@
+!** Load: pwrct_buttonsmallcommand,pwrct_indsquaregreenbg
 
 main()
   int id;
@@ -56,7 +57,7 @@ main()
 
 # One instance
   y += 1;
-  x2 += x0 + 1;
+  x2 = x0 + 1;
   y2 = y + 0.6;
   id = CreateText("One instance  Priority in decreasing order from top bar", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
 

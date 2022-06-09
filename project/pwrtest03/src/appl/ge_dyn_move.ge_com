@@ -1,3 +1,4 @@
+!** Load: pwrct_buttonsmallcommand,pwr_arrow
 
 main()
   int id;
@@ -135,7 +136,7 @@ main()
   x2 = x1 + 10.0;
   id = CreateLine(x1, y1, x2, y1);
 
-  x1 = xm + 1;
+  x1 = xm;
   y1 = ym;
   x2 = x1 + 2;
   y2 = y1 + 2;
@@ -163,7 +164,7 @@ main()
   id = CreateLine(x1, y1, x1, y2);
 
   x1 = xm;
-  y1 = ym + 3.5;
+  y1 = ym + 2.5;
   x2 = x1 + 2;
   y2 = y1 + 2;
   id = CreateObject("pwr_arrow", x1, y1, x2, y2);
@@ -327,7 +328,7 @@ main()
   SetObjectAttribute(id, "DynType1", mDynType1_Move);
   SetObjectAttribute(id, "Move.ScaleYAttribute", "Test03a-Ge-Dyn-Sin8s.ActualValue##Float32");
   SetObjectAttribute(id, "Move.ScaleYFactor", 0.05);
-  SetObjectAttribute(id, "Move.ScaleType", "LowerRight");
+  SetObjectAttribute(id, "Move.ScaleType", "LowerLeft");
   SetObjectAttribute(id, "Cycle", "Fast");
 
   SetGraphAttribute("x1", 30.0);

@@ -1,3 +1,4 @@
+!** Load: pwrct_buttonsmallcommand,pwrct_indsquaregreenbg,pwrct_indsquaregreen,pwr_trafficlight3__p4,pwr_trafficlight3__p3,pwr_trafficlight3__p2,pwr_trafficlight3
 
 main()
   int id;

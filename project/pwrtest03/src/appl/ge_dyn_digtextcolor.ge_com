@@ -1,3 +1,4 @@
+!** Load: pwrct_buttonsmallcommand,pwrct_valueinputmediumbg,pwrct_indsquaregreen
 
 main()
   int id;
@@ -60,7 +61,7 @@ main()
   SetObjectAttribute(id, "Value.Attribute", "Test03a-Ge-Dyn-Sin32s.ActualValue##Float32");
   SetObjectAttribute(id, "Value.Format", "%6.2f");
   SetObjectAttribute(id, "DynType2", mDynType2_DigTextColor);
-  SetObjectAttribute(id, "DigTextColor.attribute","Test03a-Ge-Dyn-Pulse2s.ActualValue##Boolean");
+  SetObjectAttribute(id, "DigTextColor.Attribute","Test03a-Ge-Dyn-Pulse2s.ActualValue##Boolean");
   SetObjectAttribute(id, "DigTextColor.Color", eDrawType_CustomColor26);
 
   SetObjectAttribute(id, "Cycle", "Fast");

@@ -1,3 +1,4 @@
+!** Load: pwrct_buttonsmallcommand,pwrct_indsquaregreenbg,pwrct_indsquaregreen
 
 main()
   int id;

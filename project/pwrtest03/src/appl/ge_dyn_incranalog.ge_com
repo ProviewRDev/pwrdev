@@ -1,3 +1,4 @@
+!** Load: pwrct_buttonsmallcommand,pwrct_buttonsmallset,pwrct_valuemediumcenter
 
 main()
   int id;
