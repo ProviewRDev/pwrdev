@@ -10831,6 +10831,7 @@ int gcg_comp_m42(gcg_ctx gcgctx, vldh_t_node node)
 
   switch (node->ln.cid) {
   case pwr_cClass_dataarithml:
+  case pwr_cClass_dataarithmtl:
     buff_size = DATAA_BUFF_SIZEL;
     break;
   default:
