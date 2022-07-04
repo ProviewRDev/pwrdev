@@ -50,17 +50,18 @@
 typedef enum
 {
   attrnav_mItemType_ = 0,
-  
+
   /* Selectable, Parent and Changeable are mutually exclusive and musn't appear in the same class together */
-  attrnav_mItemType_Selectable =    1 << 0,
-  attrnav_mItemType_Parent =        1 << 1,
-  attrnav_mItemType_Changeable =    1 << 2,
-  
+  attrnav_mItemType_Selectable = 1 << 0,
+  attrnav_mItemType_Parent = 1 << 1,
+  attrnav_mItemType_Changeable = 1 << 2,
+
   /* These you can mix as you want */
-  attrnav_mItemType_Traceable =     1 << 3,
-  attrnav_mItemType_Movable =       1 << 4, // PnSlot, but the code in brow_cb for a move doesn't do anything. TODO Remove or implement feature? Probably remove...who knows...
-  attrnav_mItemType_Copyable =      1 << 5, // Only PnSlot is copyable....TODO Fix?
-  attrnav_mItemType_ExpandForSave = 1 << 6  // Used to exand only the needed nodes when saving
+  attrnav_mItemType_Traceable = 1 << 3,
+  attrnav_mItemType_Movable = 1 << 4,  // PnSlot, but the code in brow_cb for a move doesn't do anything. TODO
+                                       // Remove or implement feature? Probably remove...who knows...
+  attrnav_mItemType_Copyable = 1 << 5, // Only PnSlot is copyable....TODO Fix?
+  attrnav_mItemType_ExpandForSave = 1 << 6 // Used to exand only the needed nodes when saving
 } attrnav_mItemType;
 
 typedef uint attrnav_eItemType;
@@ -112,10 +113,8 @@ class CoWowTimer;
 class GsdmlAttrNav
 {
 public:
-  GsdmlAttrNav(void* xn_parent_ctx, const char* xn_name, pn_gsdml* xn_gsd,
-               int xn_edit_mode,
-               std::shared_ptr<ProfinetRuntimeData> pwr_pn_data,
-               pwr_tStatus* status);
+  GsdmlAttrNav(void* xn_parent_ctx, const char* xn_name, pn_gsdml* xn_gsd, int xn_edit_mode,
+               std::shared_ptr<ProfinetRuntimeData> pwr_pn_data, pwr_tStatus* status);
   virtual ~GsdmlAttrNav();
 
   virtual void display_attr_help_text() {}
@@ -136,30 +135,25 @@ public:
   void set_modified(bool value) { m_modified = value; }
   bool is_modified() { return m_modified; }
   int save();
-  //int open(const char* filename);
+  // int open(const char* filename);
   void collapse();
   void expand_all();
   void redraw();
   void set_viewio(int set) { viewio = set; }
-  int search_class(const char* filename, const char* model, const char* module,
-                   char* mclass);
-  void set_order_moduletype(attr_eOrderModuleType type)
-  {
-    order_moduletype = type;
-  }
+  int search_class(const char* filename, const char* model, const char* module, char* mclass);
+  void set_order_moduletype(attr_eOrderModuleType type) { order_moduletype = type; }
 
   /* static member function */
   /* Trace thingies */
   static void trace_scan(void* data);
   static int trace_scan_bc(brow_tObject object, void* p);
-  static int trace_connect_bc(brow_tObject object, char* name, char* attr,
-                              flow_eTraceType type, void** p);
+  static int trace_connect_bc(brow_tObject object, char* name, char* attr, flow_eTraceType type, void** p);
   static int trace_disconnect_bc(brow_tObject object);
-  
+
   /* Brow thingies */
   static int init_brow_cb(FlowCtx* fctx, void* client_data);
   static int brow_cb(FlowCtx* ctx, flow_tEvent event);
-  
+
   /* device / DAP related */
   static void device_changed_ok(void* ctx, void* data);
   static void device_changed_cancel(void* ctx, void* data);
@@ -183,7 +177,7 @@ public:
 
   std::shared_ptr<GSDML::DeviceAccessPointItem> m_selected_device_item;
   int device_confirm_active;
-  
+
   GsdmlDeviceData dev_data;
   std::shared_ptr<ProfinetRuntimeData> pn_runtime_data;
   int device_read;
@@ -197,22 +191,23 @@ private:
 
 class ItemPn
 {
-public:  
+public:
   ItemPn(GsdmlAttrNav* attrnav, attrnav_eItemType type, std::string name, std::string infotext,
          int is_parent = 0)
       : m_type(type), m_value_type(pwr_eType_), m_name(name), m_is_parent(is_parent), m_infotext(infotext),
         m_first_scan(1), m_noedit(1), m_attrnav(attrnav), m_closed_annotation(attrnav->brow->pixmap_leaf)
-  {    
+  {
   }
 
-  attrnav_eItemType m_type;  
-  pwr_eType m_value_type; // If a subclass of this class is a carrier of data we can deduce what type of data using this.
+  attrnav_eItemType m_type;
+  pwr_eType m_value_type; // If a subclass of this class is a carrier of data we can deduce what type of data
+                          // using this.
   brow_tNode m_node;
   std::string m_name;
   int m_is_parent;
   std::string m_infotext;
   int m_first_scan;
-  int m_noedit;  
+  int m_noedit;
   GsdmlAttrNav* m_attrnav;
   flow_sAnnotPixmap* m_closed_annotation;
 
@@ -228,7 +223,11 @@ public:
   virtual void selected(GsdmlAttrNav* attrnav) final;
   virtual bool selected_impl(GsdmlAttrNav* attrnav) = 0;
 
-  virtual void set_trace_value(void** p) { if (m_type & attrnav_mItemType_Traceable) std::cerr << "No trace value set for: " << m_name << std::endl; }
+  virtual void set_trace_value(void** p)
+  {
+    if (m_type & attrnav_mItemType_Traceable)
+      std::cerr << "No trace value set for: " << m_name << std::endl;
+  }
 
   // Called when user types input in a command input field
   // Use to call templated implementation specifics to regain RTTI
@@ -240,8 +239,8 @@ public:
 
   int virtual close(GsdmlAttrNav* attrnav, double x, double y, bool reopen_after_close = false) final;
   virtual int scan(GsdmlAttrNav* attrnav, void* p) { return 1; }
-  
-  //virtual void update(GsdmlAttrNav* attrnav) {} //TODO What's this?
+
+  // virtual void update(GsdmlAttrNav* attrnav) {} //TODO What's this?
 };
 
 /*
@@ -250,9 +249,9 @@ public:
 class ItemPnInfo : public ItemPn
 {
 public:
-  ItemPnInfo(GsdmlAttrNav* attrnav, const char* item_name,
-             const char* trace_attr_name, pwr_eType pwr_type_id, size_t attr_size,
-             void const* value_p, brow_tNode dest, flow_eDest dest_code, const char* infotext);
+  ItemPnInfo(GsdmlAttrNav* attrnav, const char* item_name, const char* trace_attr_name, pwr_eType pwr_type_id,
+             size_t attr_size, void const* value_p, brow_tNode dest, flow_eDest dest_code,
+             const char* infotext);
 
   pwr_eType m_pwr_type_id;
 
@@ -267,9 +266,8 @@ class ItemPnIDSelectValue : public ItemPn
 {
 public:
   ItemPnIDSelectValue(GsdmlAttrNav* attrnav, const char* item_name, std::string const order_number,
-                   std::string id_enum_value, std::string* id_p,
-                   brow_tNode dest, flow_eDest dest_code,
-                   const char* info_text = 0);
+                      std::string id_enum_value, std::string* id_p, brow_tNode dest, flow_eDest dest_code,
+                      const char* info_text = 0);
   std::string m_id_enum_value;
   std::string* m_id;
   std::string m_old_value;
@@ -279,17 +277,18 @@ public:
   bool value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override { return false; }
 
   int scan(GsdmlAttrNav* attrnav, void* mod_id_p);
-  
+
   void set_trace_value(void** p) override { *p = m_id; }
 };
 
-//! Item for a device aka DAP. A DAP can be considered just like a module only that it's always mounted in slot 0.
+//! Item for a device aka DAP. A DAP can be considered just like a module only that it's always mounted in
+//! slot 0.
 // Therefore it makes use of the ItemPnModuleEnumValue for selecting what DAP to use...
 class ItemPnDAPSelection : public ItemPn
 {
 public:
-  ItemPnDAPSelection(GsdmlAttrNav* attrnav, const char* item_name, brow_tNode dest,
-               flow_eDest dest_code, const char* infotext);
+  ItemPnDAPSelection(GsdmlAttrNav* attrnav, const char* item_name, brow_tNode dest, flow_eDest dest_code,
+                     const char* infotext);
   virtual ~ItemPnDAPSelection() {}
 
   std::string m_old_value;
@@ -297,24 +296,23 @@ public:
   int open_children_impl();
   int scan(GsdmlAttrNav* attrnav, void* value_p);
   void set_trace_value(void** p) override { *p = &m_attrnav->pn_runtime_data->m_PnDevice->m_DAP_ID; }
-  bool selected_impl(GsdmlAttrNav* attrnav) override  { return false; }
+  bool selected_impl(GsdmlAttrNav* attrnav) override { return false; }
   bool value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override { return false; }
 };
 class ItemPnSlot : public ItemPn
 {
 public:
-  ItemPnSlot(GsdmlAttrNav* attrnav, const char* name,
-             ProfinetSlot* slot_data,
-             brow_tNode dest, flow_eDest dest_code, const char* infotext);
+  ItemPnSlot(GsdmlAttrNav* attrnav, const char* name, ProfinetSlot* slot_data, brow_tNode dest,
+             flow_eDest dest_code, const char* infotext);
   virtual ~ItemPnSlot() {}
 
   ProfinetSlot* m_slot_data;
   bool m_is_fixed;
-  std::shared_ptr<GSDML::ModuleItem> m_attached_module_item;   
+  std::shared_ptr<GSDML::ModuleItem> m_attached_module_item;
 
   int open_children_impl();
-  bool selected_impl(GsdmlAttrNav* attrnav) override  { return false; }
-  bool value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override { return false; }  
+  bool selected_impl(GsdmlAttrNav* attrnav) override { return false; }
+  bool value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override { return false; }
   void attach_module(std::shared_ptr<GSDML::ModuleItem> module, bool reset_subslots = false);
 };
 
@@ -322,23 +320,20 @@ public:
 class ItemPnSubslot : public ItemPn
 {
 public:
-  ItemPnSubslot(GsdmlAttrNav* attrnav, const char* item_name,
-                ProfinetSlot* parent_slot_data, 
-                ProfinetSubslot* subslot_data,
-                std::shared_ptr<GSDML::ModuleItem> parent_module_item,
-                uint subslot_number,
-                std::shared_ptr<GSDML::SubmoduleItem> attached_submodule_item,
+  ItemPnSubslot(GsdmlAttrNav* attrnav, const char* item_name, ProfinetSlot* parent_slot_data,
+                ProfinetSubslot* subslot_data, std::shared_ptr<GSDML::ModuleItem> parent_module_item,
+                uint subslot_number, std::shared_ptr<GSDML::SubmoduleItem> attached_submodule_item,
                 brow_tNode dest, flow_eDest dest_code, const char* infotext);
 
   ProfinetSlot* m_parent_slot_data;
   ProfinetSubslot* m_subslot_data;
   std::shared_ptr<GSDML::ModuleItem> m_parent_module_item;
   uint m_subslot_number;
-  bool m_is_selectable; 
-  std::shared_ptr<GSDML::SubmoduleItem> m_attached_submodule_item;   
+  bool m_is_selectable;
+  std::shared_ptr<GSDML::SubmoduleItem> m_attached_submodule_item;
 
   int open_children_impl() override;
-  bool selected_impl(GsdmlAttrNav* attrnav) override  { return false; }
+  bool selected_impl(GsdmlAttrNav* attrnav) override { return false; }
   bool value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override { return false; }
 
   void attach_submodule(std::shared_ptr<GSDML::SubmoduleItem> submodule);
@@ -354,14 +349,14 @@ private:
 class ItemPnDAP : public ItemPn
 {
 public:
-  ItemPnDAP(GsdmlAttrNav* attrnav, const char* item_name,
-            ProfinetSlot* item_slotdata, brow_tNode dest, flow_eDest dest_code, const char* infotext);
+  ItemPnDAP(GsdmlAttrNav* attrnav, const char* item_name, ProfinetSlot* item_slotdata, brow_tNode dest,
+            flow_eDest dest_code, const char* infotext);
   virtual ~ItemPnDAP() = default;
 
   ProfinetSlot* m_slot_data;
 
   int open_children_impl() override;
-  bool selected_impl(GsdmlAttrNav* attrnav) override  { return false; }
+  bool selected_impl(GsdmlAttrNav* attrnav) override { return false; }
   bool value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override { return false; }
 };
 
@@ -369,11 +364,11 @@ public:
 class ItemPnNetwork final : public ItemPn
 {
 public:
-  ItemPnNetwork(GsdmlAttrNav* attrnav, const char* item_name, brow_tNode dest,
-                flow_eDest dest_code, const char* infotext);
+  ItemPnNetwork(GsdmlAttrNav* attrnav, const char* item_name, brow_tNode dest, flow_eDest dest_code,
+                const char* infotext);
 
   int open_children_impl() final;
-  bool selected_impl(GsdmlAttrNav* attrnav) override  { return false; }
+  bool selected_impl(GsdmlAttrNav* attrnav) override { return false; }
   bool value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override { return false; }
 };
 
@@ -381,11 +376,11 @@ public:
 class ItemPnDeviceInfo : public ItemPn
 {
 public:
-  ItemPnDeviceInfo(GsdmlAttrNav* attrnav, const char* item_name,
-                   brow_tNode dest, flow_eDest dest_code, const char* infotext);
-  
+  ItemPnDeviceInfo(GsdmlAttrNav* attrnav, const char* item_name, brow_tNode dest, flow_eDest dest_code,
+                   const char* infotext);
+
   int open_children_impl() override;
-  bool selected_impl(GsdmlAttrNav* attrnav) override  { return false; }
+  bool selected_impl(GsdmlAttrNav* attrnav) override { return false; }
   bool value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override { return false; }
 };
 
@@ -393,14 +388,13 @@ public:
 class ItemPnModuleInfo : public ItemPn
 {
 public:
-  ItemPnModuleInfo(GsdmlAttrNav* attrnav, const char* item_name,
-                   GSDML::ModuleInfo* item_info, brow_tNode dest,
-                   flow_eDest dest_code, const char* infotext);
+  ItemPnModuleInfo(GsdmlAttrNav* attrnav, const char* item_name, GSDML::ModuleInfo* item_info,
+                   brow_tNode dest, flow_eDest dest_code, const char* infotext);
 
   GSDML::ModuleInfo* m_module_info;
 
   virtual int open_children_impl();
-  bool selected_impl(GsdmlAttrNav* attrnav) override  { return false; }
+  bool selected_impl(GsdmlAttrNav* attrnav) override { return false; }
   bool value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override { return false; }
 };
 
@@ -408,17 +402,17 @@ public:
 class ItemPnParameterRecordDataItem : public ItemPn
 {
 public:
-  ItemPnParameterRecordDataItem(
-      GsdmlAttrNav* attrnav, const char* item_name,
-      GSDML::ParameterRecordDataItem const* parameter_record_data_item,
-      ProfinetDataRecord* data_record, brow_tNode dest, flow_eDest dest_code, const char* infotext);
+  ItemPnParameterRecordDataItem(GsdmlAttrNav* attrnav, const char* item_name,
+                                GSDML::ParameterRecordDataItem const* parameter_record_data_item,
+                                ProfinetDataRecord* data_record, brow_tNode dest, flow_eDest dest_code,
+                                const char* infotext);
   virtual ~ItemPnParameterRecordDataItem() {}
 
   GSDML::ParameterRecordDataItem const* m_parameter_record_data_item;
   ProfinetDataRecord* m_data_record;
 
   virtual int open_children_impl();
-  bool selected_impl(GsdmlAttrNav* attrnav) override  { return false; }
+  bool selected_impl(GsdmlAttrNav* attrnav) override { return false; }
   bool value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override { return false; }
 
 private:
@@ -429,16 +423,15 @@ private:
 class ItemPnIOData : public ItemPn
 {
 public:
-  ItemPnIOData(GsdmlAttrNav* attrnav, const char* item_name,
-               GSDML::IOData* iodata, ProfinetSubslot* subslot, brow_tNode dest,
-               flow_eDest dest_code, const char* infotext);
+  ItemPnIOData(GsdmlAttrNav* attrnav, const char* item_name, GSDML::IOData* iodata, ProfinetSubslot* subslot,
+               brow_tNode dest, flow_eDest dest_code, const char* infotext);
   virtual ~ItemPnIOData() {}
 
   GSDML::IOData* m_iodata;
   ProfinetSubslot* m_subslot;
 
   int open_children_impl();
-  bool selected_impl(GsdmlAttrNav* attrnav) override  { return false; }
+  bool selected_impl(GsdmlAttrNav* attrnav) override { return false; }
   bool value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override { return false; }
 };
 
@@ -446,14 +439,14 @@ public:
 class ItemPnInput : public ItemPn
 {
 public:
-  ItemPnInput(GsdmlAttrNav* attrnav, const char* name,
-              GSDML::Input const* input, brow_tNode dest, flow_eDest dest_code);
+  ItemPnInput(GsdmlAttrNav* attrnav, const char* name, GSDML::Input const* input, brow_tNode dest,
+              flow_eDest dest_code);
   virtual ~ItemPnInput() {}
 
   GSDML::Input const* m_input;
 
   int open_children_impl();
-  bool selected_impl(GsdmlAttrNav* attrnav) override  { return false; }
+  bool selected_impl(GsdmlAttrNav* attrnav) override { return false; }
   bool value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override { return false; }
 };
 
@@ -461,14 +454,14 @@ public:
 class ItemPnOutput : public ItemPn
 {
 public:
-  ItemPnOutput(GsdmlAttrNav* attrnav, const char* name,
-               GSDML::Output const* output, brow_tNode dest, flow_eDest dest_code);
+  ItemPnOutput(GsdmlAttrNav* attrnav, const char* name, GSDML::Output const* output, brow_tNode dest,
+               flow_eDest dest_code);
   virtual ~ItemPnOutput() {}
 
   GSDML::Output const* m_output;
 
   int open_children_impl();
-  bool selected_impl(GsdmlAttrNav* attrnav) override  { return false; }
+  bool selected_impl(GsdmlAttrNav* attrnav) override { return false; }
   bool value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override { return false; }
 };
 
@@ -476,15 +469,14 @@ public:
 class ItemPnDataItem : public ItemPn
 {
 public:
-  ItemPnDataItem(GsdmlAttrNav* attrnav, const char* name,
-                 GSDML::DataItem const* data_item, brow_tNode dest,
+  ItemPnDataItem(GsdmlAttrNav* attrnav, const char* name, GSDML::DataItem const* data_item, brow_tNode dest,
                  flow_eDest dest_code);
   virtual ~ItemPnDataItem() {}
 
   GSDML::DataItem const* m_data_item;
 
   int open_children_impl();
-  bool selected_impl(GsdmlAttrNav* attrnav) override  { return false; }
+  bool selected_impl(GsdmlAttrNav* attrnav) override { return false; }
   bool value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override { return false; }
 };
 
@@ -496,50 +488,47 @@ public:
                     flow_eDest dest_code);
   virtual ~ItemPnBitDataItem() {}
   int open_children_impl() { return 1; };
-  bool selected_impl(GsdmlAttrNav* attrnav) override  { return false; }
+  bool selected_impl(GsdmlAttrNav* attrnav) override { return false; }
   bool value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override { return false; }
 };
 
 /*
-==================================================== NEW CLASSES ====================================================
+==================================================== NEW CLASSES
+====================================================
 */
 
 /*
 ======================= TEMPLATES CLASSES FOR CHANGING CONFIGURATION PROPERTIES =======================
 */
 
-template<typename T>
-class ItemPnValueSelectItem;
+template <typename T> class ItemPnValueSelectItem;
 
-template<typename T>
-class ValueSelection : public ItemPn
+template <typename T> class ValueSelection : public ItemPn
 {
 public:
-  explicit ValueSelection(GsdmlAttrNav* attrnav, attrnav_eItemType type, std::string name, std::string infotext, 
-                    brow_tNode dest, flow_eDest dest_code,
-                    T* value_p)
-    : ItemPn(attrnav, type, name, infotext),
-      m_value_p(value_p)  
+  explicit ValueSelection(GsdmlAttrNav* attrnav, attrnav_eItemType type, std::string name,
+                          std::string infotext, brow_tNode dest, flow_eDest dest_code, T* value_p)
+      : ItemPn(attrnav, type, name, infotext), m_value_p(value_p)
   {
-    brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_attr_parameter, dest,
-                  dest_code, (void*)this, 1, &m_node);
+    brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_attr_parameter, dest, dest_code,
+                    (void*)this, 1, &m_node);
     brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_attrenum);
     brow_SetAnnotation(m_node, 0, m_name.c_str(), m_name.length());
   }
   virtual ~ValueSelection() = default;
-  virtual void select(ItemPnValueSelectItem<T>* selected_item) = 0;  
+  virtual void select(ItemPnValueSelectItem<T>* selected_item) = 0;
 
-  bool selected_impl(GsdmlAttrNav* attrnav) override 
+  bool selected_impl(GsdmlAttrNav* attrnav) override
   {
     if (!m_noedit)
-      ItemPn::open_children(attrnav, 0, 0); 
+      ItemPn::open_children(attrnav, 0, 0);
     else
       attrnav->message('I', "Attribute can't be modified");
 
     return false; // This does not modify anything
   };
 
-  bool value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override { return false; }  
+  bool value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override { return false; }
 
   virtual void scan_impl(ItemPnValueSelectItem<T> const* selected_item) const = 0;
   virtual void setup_node() = 0;
@@ -547,30 +536,29 @@ public:
   std::string to_string() override
   {
     std::ostringstream result(std::ios_base::out);
-    result.precision(12); // For when this is a float/double    
+    result.precision(12); // For when this is a float/double
     result << std::fixed << *m_value_p;
-    
+
     std::string value(result.str());
     return value;
   }
 
-  T* m_value_p;  
+  T* m_value_p;
 };
 
-template<typename T>
-class ItemPnValueSelectItem : public ItemPn
+template <typename T> class ItemPnValueSelectItem : public ItemPn
 {
 public:
   ItemPnValueSelectItem(GsdmlAttrNav* attrnav, const char* annotation_1, std::string annotation_2,
-      ValueSelection<T>* parent, T* value_p, T select_value, const char* infotext,
-      brow_tNode dest, flow_eDest dest_code) 
-    : ItemPn(attrnav, attrnav_mItemType_Selectable | attrnav_mItemType_Traceable, annotation_1, infotext),
-      m_parent(parent), m_value_p(value_p), m_select_value(select_value)
-  {    
+                        ValueSelection<T>* parent, T* value_p, T select_value, const char* infotext,
+                        brow_tNode dest, flow_eDest dest_code)
+      : ItemPn(attrnav, attrnav_mItemType_Selectable | attrnav_mItemType_Traceable, annotation_1, infotext),
+        m_parent(parent), m_value_p(value_p), m_select_value(select_value)
+  {
     m_noedit = 0;
 
-    brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_enum_mtype, dest,
-                  dest_code, (void*)this, 1, &m_node);
+    brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_enum_mtype, dest, dest_code,
+                    (void*)this, 1, &m_node);
 
     brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_attr);
     brow_SetAnnotation(m_node, 0, m_name.c_str(), m_name.length());
@@ -582,9 +570,9 @@ public:
   brow_tNode get_node() const { return ItemPn::m_node; }
 
   void set_trace_value(void** p) override { *p = m_value_p; }
-  
+
   int scan(GsdmlAttrNav* attrnav, void* dummy) override
-  {    
+  {
     if (!m_first_scan)
     {
       if (*m_value_p == m_old_value)
@@ -594,7 +582,7 @@ public:
     {
       m_first_scan = 0;
     }
-    
+
     m_parent->scan_impl(this);
 
     m_old_value = *m_value_p;
@@ -608,7 +596,7 @@ public:
     return true;
   }
 
-  bool value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override { return false; }  
+  bool value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override { return false; }
 
   T const& value() const { return m_select_value; }
 
@@ -620,71 +608,23 @@ public:
   T m_old_value;
 };
 
-template<typename T>
-class ItemPnValueInput : public ItemPn
+template <typename T> class ItemPnValueInput : public ItemPn
 {
 public:
-  ItemPnValueInput(GsdmlAttrNav* attrnav, const char* annotation_1,
-      T* value_p, const char* infotext, brow_tNode dest, flow_eDest dest_code) 
-    : ItemPn(attrnav, attrnav_mItemType_Changeable, annotation_1, infotext),
-      m_value_p(value_p)
-  {    
-    m_noedit = 0; 
-    brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_attr_parameter, dest,
-                  dest_code, (void*)this, 1, &m_node);
+  ItemPnValueInput(GsdmlAttrNav* attrnav, const char* annotation_1, T* value_p, const char* infotext,
+                   brow_tNode dest, flow_eDest dest_code)
+      : ItemPn(attrnav, attrnav_mItemType_Changeable, annotation_1, infotext), m_value_p(value_p)
+  {
+    m_noedit = 0;
+    brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_attr_parameter, dest, dest_code,
+                    (void*)this, 1, &m_node);
 
     brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_attr);
     brow_SetAnnotation(m_node, 0, m_name.c_str(), m_name.length());
     std::string current_value(to_string());
     brow_SetAnnotation(m_node, 1, current_value.c_str(), current_value.length());
   }
-  
-  void set_changeable(bool changeable) { m_noedit = !changeable; }
 
-  bool value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override
-  {
-    return do_value_changed(attrnav, value_str);    
-  }
-
-  bool selected_impl(GsdmlAttrNav* attrnav) override { return false; }
-  
-  std::string to_string() override
-  {
-    std::ostringstream result(std::ios_base::out);
-    result.precision(12); // For when this is a float/double    
-    result << std::fixed << *m_value_p;
-    
-    std::string value(result.str());
-    return value;    
-  }
-
-  virtual bool do_value_changed(GsdmlAttrNav* attrnav, const char* value_str) = 0;
-
-  int open_children_impl() override { return 1; }
-
-protected:  
-  T* m_value_p;    
-};
-
-template<>
-class ItemPnValueInput<char*> : public ItemPn
-{
-public:
-  ItemPnValueInput(GsdmlAttrNav* attrnav, const char* annotation_1,
-      char* value_p, uint length, const char* infotext, brow_tNode dest, flow_eDest dest_code) 
-    : ItemPn(attrnav, attrnav_mItemType_Changeable, annotation_1, infotext),
-      m_value_p(value_p), m_length(length)
-  {    
-    m_noedit = 0; 
-    brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_attr_parameter, dest,
-                  dest_code, (void*)this, 1, &m_node);
-
-    brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_attr);
-    brow_SetAnnotation(m_node, 0, m_name.c_str(), m_name.length());
-    std::string current_value(to_string());
-    brow_SetAnnotation(m_node, 1, current_value.c_str(), current_value.length());
-  }
-  
   void set_changeable(bool changeable) { m_noedit = !changeable; }
 
   bool value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override
@@ -695,15 +635,57 @@ public:
   bool selected_impl(GsdmlAttrNav* attrnav) override { return false; }
 
   std::string to_string() override
-  {    
-    return std::string(m_value_p, m_value_p + m_length);
+  {
+    std::ostringstream result(std::ios_base::out);
+    result.precision(12); // For when this is a float/double
+    result << std::fixed << *m_value_p;
+
+    std::string value(result.str());
+    return value;
   }
 
   virtual bool do_value_changed(GsdmlAttrNav* attrnav, const char* value_str) = 0;
 
   int open_children_impl() override { return 1; }
 
-protected:  
+protected:
+  T* m_value_p;
+};
+
+template <> class ItemPnValueInput<char*> : public ItemPn
+{
+public:
+  ItemPnValueInput(GsdmlAttrNav* attrnav, const char* annotation_1, char* value_p, uint length,
+                   const char* infotext, brow_tNode dest, flow_eDest dest_code)
+      : ItemPn(attrnav, attrnav_mItemType_Changeable, annotation_1, infotext), m_value_p(value_p),
+        m_length(length)
+  {
+    m_noedit = 0;
+    brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_attr_parameter, dest, dest_code,
+                    (void*)this, 1, &m_node);
+
+    brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_attr);
+    brow_SetAnnotation(m_node, 0, m_name.c_str(), m_name.length());
+    std::string current_value(to_string());
+    brow_SetAnnotation(m_node, 1, current_value.c_str(), current_value.length());
+  }
+
+  void set_changeable(bool changeable) { m_noedit = !changeable; }
+
+  bool value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override
+  {
+    return do_value_changed(attrnav, value_str);
+  }
+
+  bool selected_impl(GsdmlAttrNav* attrnav) override { return false; }
+
+  std::string to_string() override { return std::string(m_value_p, m_value_p + m_length); }
+
+  virtual bool do_value_changed(GsdmlAttrNav* attrnav, const char* value_str) = 0;
+
+  int open_children_impl() override { return 1; }
+
+protected:
   char* m_value_p;
   uint m_length;
 };
@@ -719,11 +701,11 @@ class ItemPnModuleSelection : public ValueSelection<std::string>
 {
 public:
   ItemPnModuleSelection(GsdmlAttrNav* attrnav, const char* name, ProfinetSlot* slot_data,
-                  std::string* id_value_p, brow_tNode dest, flow_eDest dest_code, const char* infotext);
+                        std::string* id_value_p, brow_tNode dest, flow_eDest dest_code, const char* infotext);
   virtual ~ItemPnModuleSelection() {}
-  
-  int open_children_impl() override;  
-  void select(ItemPnValueSelectItem<std::string>* selected_item) override;  
+
+  int open_children_impl() override;
+  void select(ItemPnValueSelectItem<std::string>* selected_item) override;
   void setup_node() override;
   void scan_impl(ItemPnValueSelectItem<std::string> const* selected_item) const override;
 
@@ -735,14 +717,16 @@ public:
 class ItemPnMenu : public ItemPn
 {
 public:
-  ItemPnMenu(GsdmlAttrNav* attrnav, std::string const& category_name, std::string const& infotext, brow_tNode dest, flow_eDest dest_code,
-              std::multimap<std::string, std::shared_ptr<GSDML::ModuleItem>>& items, ItemPnModuleSelection* parent);  
+  ItemPnMenu(GsdmlAttrNav* attrnav, std::string const& category_name, std::string const& infotext,
+             brow_tNode dest, flow_eDest dest_code,
+             std::multimap<std::string, std::shared_ptr<GSDML::ModuleItem>>& items,
+             ItemPnModuleSelection* parent);
 
   int open_children_impl() override;
   bool selected_impl(GsdmlAttrNav* attrnav) override { return false; }
   bool value_changed_impl(GsdmlAttrNav* attrnav, const char* value_str) override { return false; }
 
-  std::multimap<std::string, std::shared_ptr<GSDML::ModuleItem>>& m_items;  
+  std::multimap<std::string, std::shared_ptr<GSDML::ModuleItem>>& m_items;
   ItemPnModuleSelection* m_parent;
 };
 
@@ -752,17 +736,19 @@ public:
 class ItemPnSubmoduleSelection : public ValueSelection<std::string>
 {
 public:
-  ItemPnSubmoduleSelection(GsdmlAttrNav* attrnav, const char* name, std::shared_ptr<GSDML::ModuleItem> module_item, ProfinetSubslot* subslot_data,
-                  std::string* id_value_p, brow_tNode dest, flow_eDest dest_code, const char* infotext);
+  ItemPnSubmoduleSelection(GsdmlAttrNav* attrnav, const char* name,
+                           std::shared_ptr<GSDML::ModuleItem> module_item, ProfinetSubslot* subslot_data,
+                           std::string* id_value_p, brow_tNode dest, flow_eDest dest_code,
+                           const char* infotext);
   virtual ~ItemPnSubmoduleSelection() {}
-  
-  int open_children_impl() override;  
-  void select(ItemPnValueSelectItem<std::string>* selected_item) override;  
+
+  int open_children_impl() override;
+  void select(ItemPnValueSelectItem<std::string>* selected_item) override;
   void setup_node() override;
   void scan_impl(ItemPnValueSelectItem<std::string> const* selected_item) const override;
 
   std::shared_ptr<GSDML::ModuleItem> m_module_item;
-  ProfinetSubslot* m_subslot_data;  
+  ProfinetSubslot* m_subslot_data;
 };
 
 /*
@@ -773,26 +759,25 @@ class ItemPnEnumRTClass : public ValueSelection<std::string>
 public:
   ItemPnEnumRTClass(GsdmlAttrNav* attrnav, const char* name,
                     std::shared_ptr<GSDML::InterfaceSubmoduleItem> interface_submodule_item,
-                  std::string* pwr_pn_value_p, brow_tNode dest, flow_eDest dest_code);
+                    std::string* pwr_pn_value_p, brow_tNode dest, flow_eDest dest_code);
   virtual ~ItemPnEnumRTClass() {}
 
-  std::shared_ptr<GSDML::InterfaceSubmoduleItem> m_interface_submodule_item;  
-  
-  int open_children_impl() override;  
+  std::shared_ptr<GSDML::InterfaceSubmoduleItem> m_interface_submodule_item;
+
+  int open_children_impl() override;
   void select(ItemPnValueSelectItem<std::string>* selected_item) override;
   void setup_node() override;
   void scan_impl(ItemPnValueSelectItem<std::string> const* selected_item) const override;
-
 };
 
 class ItemPnSkipIPAssignment : public ValueSelection<bool>
 {
 public:
-  ItemPnSkipIPAssignment(GsdmlAttrNav* attrnav, const char* name,
-                  bool* pwr_pn_value_p, brow_tNode dest, flow_eDest dest_code);
+  ItemPnSkipIPAssignment(GsdmlAttrNav* attrnav, const char* name, bool* pwr_pn_value_p, brow_tNode dest,
+                         flow_eDest dest_code);
   virtual ~ItemPnSkipIPAssignment() {}
 
-  int open_children_impl() override;  
+  int open_children_impl() override;
   void select(ItemPnValueSelectItem<bool>* selected_item) override;
   void setup_node() override;
   void scan_impl(ItemPnValueSelectItem<bool> const* selected_item) const override;
@@ -801,47 +786,46 @@ public:
 class ItemPnSendClock : public ValueSelection<uint16_t>
 {
 public:
-  ItemPnSendClock(GsdmlAttrNav* attrnav, const char* name,
-                  GSDML::ApplicationRelations& application_relations,
+  ItemPnSendClock(GsdmlAttrNav* attrnav, const char* name, GSDML::ApplicationRelations& application_relations,
                   uint16_t* pwr_pn_value_p, brow_tNode dest, flow_eDest dest_code);
   virtual ~ItemPnSendClock() {}
 
-  int open_children_impl() override;  
+  int open_children_impl() override;
   void select(ItemPnValueSelectItem<uint16_t>* selected_item) override;
   void setup_node() override;
   void scan_impl(ItemPnValueSelectItem<uint16_t> const* selected_item) const override;
 
 private:
   GSDML::ApplicationRelations& m_application_relations;
-  GSDML::ValueList<uint>* m_send_clock_list;  
+  GSDML::ValueList<uint>* m_send_clock_list;
 };
 
 class ItemPnReductionRatio : public ValueSelection<uint16_t>
 {
 public:
   ItemPnReductionRatio(GsdmlAttrNav* attrnav, const char* name,
-                  GSDML::ApplicationRelations& application_relations,
-                  uint16_t* pwr_pn_value_p, brow_tNode dest, flow_eDest dest_code);
+                       GSDML::ApplicationRelations& application_relations, uint16_t* pwr_pn_value_p,
+                       brow_tNode dest, flow_eDest dest_code);
   virtual ~ItemPnReductionRatio() {}
 
-  int open_children_impl() override;  
+  int open_children_impl() override;
   void select(ItemPnValueSelectItem<uint16_t>* selected_item) override;
   void setup_node() override;
   void scan_impl(ItemPnValueSelectItem<uint16_t> const* selected_item) const override;
 
 private:
   GSDML::ApplicationRelations& m_application_relations;
-  GSDML::ValueList<uint>* m_reduction_ratio_list;  
+  GSDML::ValueList<uint>* m_reduction_ratio_list;
 };
 
 class ItemPnModuleClass : public ValueSelection<uint32_t>
 {
 public:
-  ItemPnModuleClass(GsdmlAttrNav* attrnav, const char* name,
-                  uint32_t* pwr_pn_value_p, brow_tNode dest, flow_eDest dest_code);
+  ItemPnModuleClass(GsdmlAttrNav* attrnav, const char* name, uint32_t* pwr_pn_value_p, brow_tNode dest,
+                    flow_eDest dest_code);
   virtual ~ItemPnModuleClass() {}
 
-  int open_children_impl() override;  
+  int open_children_impl() override;
   void select(ItemPnValueSelectItem<uint32_t>* selected_item) override;
   void setup_node() override;
   void scan_impl(ItemPnValueSelectItem<uint32_t> const* selected_item) const override;
@@ -856,9 +840,11 @@ private:
 class ItemPnIPv4Input : public ItemPnValueInput<std::string>
 {
 public:
-  ItemPnIPv4Input(GsdmlAttrNav* attrnav, const char* name,
-      std::string* value_p, const char* infotext, brow_tNode dest, flow_eDest dest_code)
-  : ItemPnValueInput<std::string>(attrnav, name, value_p, infotext, dest, dest_code) {}
+  ItemPnIPv4Input(GsdmlAttrNav* attrnav, const char* name, std::string* value_p, const char* infotext,
+                  brow_tNode dest, flow_eDest dest_code)
+      : ItemPnValueInput<std::string>(attrnav, name, value_p, infotext, dest, dest_code)
+  {
+  }
   virtual ~ItemPnIPv4Input() {}
 
   bool do_value_changed(GsdmlAttrNav* attrnav, const char* value_str) override;
@@ -871,9 +857,11 @@ public:
 class ItemPnMACInput : public ItemPnValueInput<std::string>
 {
 public:
-  ItemPnMACInput(GsdmlAttrNav* attrnav, const char* name,
-      std::string* value_p, const char* infotext, brow_tNode dest, flow_eDest dest_code)
-  : ItemPnValueInput<std::string>(attrnav, name, value_p, infotext, dest, dest_code) {}
+  ItemPnMACInput(GsdmlAttrNav* attrnav, const char* name, std::string* value_p, const char* infotext,
+                 brow_tNode dest, flow_eDest dest_code)
+      : ItemPnValueInput<std::string>(attrnav, name, value_p, infotext, dest, dest_code)
+  {
+  }
   virtual ~ItemPnMACInput() {}
 
   bool do_value_changed(GsdmlAttrNav* attrnav, const char* value_str) override;
@@ -886,9 +874,11 @@ public:
 class ItemPnDeviceNameInput : public ItemPnValueInput<std::string>
 {
 public:
-  ItemPnDeviceNameInput(GsdmlAttrNav* attrnav, const char* name,
-      std::string* value_p, const char* infotext, brow_tNode dest, flow_eDest dest_code)
-  : ItemPnValueInput<std::string>(attrnav, name, value_p, infotext, dest, dest_code) {}
+  ItemPnDeviceNameInput(GsdmlAttrNav* attrnav, const char* name, std::string* value_p, const char* infotext,
+                        brow_tNode dest, flow_eDest dest_code)
+      : ItemPnValueInput<std::string>(attrnav, name, value_p, infotext, dest, dest_code)
+  {
+  }
   virtual ~ItemPnDeviceNameInput() {}
 
   bool do_value_changed(GsdmlAttrNav* attrnav, const char* value_str) override;
@@ -904,7 +894,7 @@ public:
     // If our value is zero we are default initialized, set phase to 1
     if (*value_p == 0)
     {
-      do_value_changed(attrnav, "1"); // Set to 1      
+      do_value_changed(attrnav, "1"); // Set to 1
     }
   }
   virtual ~ItemPnPhaseInput() {}
@@ -919,15 +909,17 @@ class ItemPnTimingProperties : public ItemPn
 {
 public:
   ItemPnTimingProperties(GsdmlAttrNav* attrnav, const char* name,
-      std::shared_ptr<GSDML::DeviceAccessPointItem> dap,
-      brow_tNode dest, flow_eDest dest_code)
-    : ItemPn(attrnav, attrnav_mItemType_Parent | attrnav_mItemType_ExpandForSave, name, "Timing Properties such as what RT_CLASS to run, what Send Clock factor to use and also Reduction Ratio."),
-      m_dap(dap)
+                         std::shared_ptr<GSDML::DeviceAccessPointItem> dap, brow_tNode dest,
+                         flow_eDest dest_code)
+      : ItemPn(attrnav, attrnav_mItemType_Parent | attrnav_mItemType_ExpandForSave, name,
+               "Timing Properties such as what RT_CLASS to run, what Send Clock factor to use and also "
+               "Reduction Ratio."),
+        m_dap(dap)
   {
     m_closed_annotation = attrnav->brow->pixmap_map;
 
-    brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_attr, dest,
-                  dest_code, (void*)this, 1, &m_node);
+    brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_attr, dest, dest_code, (void*)this,
+                    1, &m_node);
     brow_SetAnnotPixmap(m_node, 0, attrnav->brow->pixmap_map);
     brow_SetAnnotation(m_node, 0, m_name.c_str(), m_name.length());
 
@@ -936,7 +928,8 @@ public:
     {
       if (submodule_item.second->_SubmoduleItemType == GSDML::SubmoduleItemType_Interface)
       {
-        m_interface_submodule = std::static_pointer_cast<GSDML::InterfaceSubmoduleItem>(submodule_item.second);
+        m_interface_submodule =
+            std::static_pointer_cast<GSDML::InterfaceSubmoduleItem>(submodule_item.second);
         break;
       }
     }
@@ -950,14 +943,22 @@ public:
   virtual ~ItemPnTimingProperties() {}
 
   int open_children_impl() override
-  {    
-    new ItemPnEnumRTClass(m_attrnav, "RT_CLASS", m_interface_submodule, &m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR.m_rt_class, m_node, flow_eDest_IntoLast);
+  {
+    new ItemPnEnumRTClass(m_attrnav, "RT_CLASS", m_interface_submodule,
+                          &m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR.m_rt_class, m_node,
+                          flow_eDest_IntoLast);
 
-    new ItemPnSendClock(m_attrnav, "Send Clock", m_interface_submodule->_ApplicationRelations, &m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR.m_send_clock_factor, m_node, flow_eDest_IntoLast);
+    new ItemPnSendClock(m_attrnav, "Send Clock", m_interface_submodule->_ApplicationRelations,
+                        &m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR.m_send_clock_factor, m_node,
+                        flow_eDest_IntoLast);
 
-    ItemPnReductionRatio* iprr = new ItemPnReductionRatio(m_attrnav, "Reduction Ratio", m_interface_submodule->_ApplicationRelations, &m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR.m_reduction_ratio, m_node, flow_eDest_IntoLast);
+    ItemPnReductionRatio* iprr = new ItemPnReductionRatio(
+        m_attrnav, "Reduction Ratio", m_interface_submodule->_ApplicationRelations,
+        &m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR.m_reduction_ratio, m_node, flow_eDest_IntoLast);
 
-    new ItemPnPhaseInput(m_attrnav, "Phase", &m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR.m_phase, iprr, "Phase for this device. Phase cannot exceed your reduction ratio.", m_node, flow_eDest_IntoLast);
+    new ItemPnPhaseInput(m_attrnav, "Phase", &m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR.m_phase, iprr,
+                         "Phase for this device. Phase cannot exceed your reduction ratio.", m_node,
+                         flow_eDest_IntoLast);
 
     return 1;
   }
@@ -971,14 +972,13 @@ private:
 };
 
 /*
-  =============================  Device Parameter Classes (used to change device parameters) =============================
-  There are two types of top classes. One where you select from a list of allowed values and one where you type a value into
-  an input prompt.
+  =============================  Device Parameter Classes (used to change device parameters)
+  ============================= There are two types of top classes. One where you select from a list of
+  allowed values and one where you type a value into an input prompt.
 */
 
 /* Helper class for converting between host values and big endian values used in the profinet configuration */
-template<typename T>
-class ValueInterpreter
+template <typename T> class ValueInterpreter
 {
 public:
   // Convert a string to the current template datatype
@@ -986,78 +986,73 @@ public:
   {
     T value;
     std::istringstream input(string_representation, std::ios_base::in);
-    input.precision(12); // For when this is a float/double    
+    input.precision(12); // For when this is a float/double
     input >> std::fixed >> value;
-    
+
     if (input.fail())
       throw std::string("Conversion error");
-    
-    return std::move(value);    
+
+    return std::move(value);
   }
 
   // Convert a value to PNIO order
   T switch_value(T value) const
-  {    
-  #if (pwr_dHost_byteOrder == pwr_dLittleEndian)  
+  {
+#if (pwr_dHost_byteOrder == pwr_dLittleEndian)
     value = GSDML::reverse_type(value);
-  #endif    
+#endif
     return value;
-  } 
+  }
 };
 
 /* Specializations for the interpreter the 8-bit variants are needed for the stream not
     to treat it as a character */
-template<>
-inline uint8_t ValueInterpreter<uint8_t>::to_value(std::string string_representation)
+template <> inline uint8_t ValueInterpreter<uint8_t>::to_value(std::string string_representation)
 {
   uint8_t value;
   int temp;
   std::istringstream input(string_representation, std::ios_base::in);
-  input.precision(12); // For when this is a float/double    
+  input.precision(12); // For when this is a float/double
   input >> std::fixed >> temp;
   value = temp;
-  
+
   if (input.fail())
     throw std::string("Conversion error");
-  
-  return std::move(value);    
+
+  return std::move(value);
 }
 
-template<>
-inline int8_t ValueInterpreter<int8_t>::to_value(std::string string_representation)
+template <> inline int8_t ValueInterpreter<int8_t>::to_value(std::string string_representation)
 {
   int8_t value;
   int temp;
   std::istringstream input(string_representation, std::ios_base::in);
-  input.precision(12); // For when this is a float/double    
+  input.precision(12); // For when this is a float/double
   input >> std::fixed >> temp;
   value = temp;
-  
+
   if (input.fail())
     throw std::string("Conversion error");
-  
-  return std::move(value);    
+
+  return std::move(value);
 }
 
-/* 
-  Template class for all datatypes available 
+/*
+  Template class for all datatypes available
   This is an input style type of item. No selections...
-  It takes a Ref element as a constructor parameter in order to check where the data should go and what 
+  It takes a Ref element as a constructor parameter in order to check where the data should go and what
   the allowed values are...
 */
-template<typename T>
-class ItemPnParameterInput : public ItemPnValueInput<T>
+template <typename T> class ItemPnParameterInput : public ItemPnValueInput<T>
 {
 public:
-  ItemPnParameterInput(GsdmlAttrNav* attrnav, const char* name,
-      T* value_p, const char* infotext, brow_tNode dest, flow_eDest dest_code,
-      std::shared_ptr<GSDML::Ref> ref)
-    : ItemPnValueInput<T>(attrnav, name,
-      value_p, infotext, dest, dest_code), m_ref(ref)
+  ItemPnParameterInput(GsdmlAttrNav* attrnav, const char* name, T* value_p, const char* infotext,
+                       brow_tNode dest, flow_eDest dest_code, std::shared_ptr<GSDML::Ref> ref)
+      : ItemPnValueInput<T>(attrnav, name, value_p, infotext, dest, dest_code), m_ref(ref)
   {
     // Set the value pointer to point to our offset in the Const data
-    this->m_value_p = (T*)&((unsigned char*)this->m_value_p)[ref->_ByteOffset];    
-    
+    this->m_value_p = (T*)&((unsigned char*)this->m_value_p)[ref->_ByteOffset];
+
     this->set_changeable(m_ref->_Changeable);
 
     std::string value = this->to_string();
@@ -1068,10 +1063,12 @@ public:
   bool do_value_changed(GsdmlAttrNav* attrnav, const char* value_str) override
   {
     T value;
-    
-    try {
+
+    try
+    {
       value = interpreter.to_value(value_str);
-    } catch (std::string& e)
+    }
+    catch (std::string& e)
     {
       attrnav->message('E', "Not a valid input for this datatype.");
       return false;
@@ -1097,41 +1094,41 @@ public:
 
   std::string to_string() override
   {
-    //T temp = interpreter.to_host_value(*this->m_value_p);
+    // T temp = interpreter.to_host_value(*this->m_value_p);
     T temp = interpreter.switch_value(*this->m_value_p);
-    std::ostringstream result(std::ios_base::out);    
+    std::ostringstream result(std::ios_base::out);
     result.precision(12);
-    result << std::fixed << +temp;    
+    result << std::fixed << +temp;
 
     std::string value(result.str());
-    return value;    
+    return value;
   }
 
 private:
   ValueInterpreter<T> interpreter;
-  std::shared_ptr<GSDML::Ref> m_ref;  
+  std::shared_ptr<GSDML::Ref> m_ref;
 };
 
-template<>
-class ItemPnParameterInput<uint8_t> : public ItemPnValueInput<uint8_t>
+template <> class ItemPnParameterInput<uint8_t> : public ItemPnValueInput<uint8_t>
 {
 public:
-  ItemPnParameterInput(GsdmlAttrNav* attrnav, const char* name,
-      uint8_t* value_p, const char* infotext, brow_tNode dest, flow_eDest dest_code,
-      std::shared_ptr<GSDML::Ref> ref)
-    : ItemPnValueInput<uint8_t>(attrnav, name,
-      value_p, infotext, dest, dest_code), m_ref(ref), m_is_bitarea(false)
+  ItemPnParameterInput(GsdmlAttrNav* attrnav, const char* name, uint8_t* value_p, const char* infotext,
+                       brow_tNode dest, flow_eDest dest_code, std::shared_ptr<GSDML::Ref> ref)
+      : ItemPnValueInput<uint8_t>(attrnav, name, value_p, infotext, dest, dest_code), m_ref(ref),
+        m_is_bitarea(false)
   {
     // Set the value pointer to point to our offset in the Const data
     this->m_value_p = (uint8_t*)&((unsigned char*)this->m_value_p)[ref->_ByteOffset];
 
     // Need to handle this (in my oppinion crappy GSDML):
-    //<Ref ValueItemTarget="Blocking-time" ByteOffset="0" BitOffset="0" DataType="BitArea" BitLength="4" DefaultValue="2" AllowedValues="2..15" Changeable="true" Visible="true" TextId="Blocking-time" ID="Blocking-time" />
+    //<Ref ValueItemTarget="Blocking-time" ByteOffset="0" BitOffset="0" DataType="BitArea" BitLength="4"
+    //DefaultValue="2" AllowedValues="2..15" Changeable="true" Visible="true" TextId="Blocking-time"
+    //ID="Blocking-time" />
     if (ref->_DataType == GSDML::ValueDataType_BitArea)
       m_is_bitarea = true;
     m_mask = (1 << ref->_BitLength) - (ref->_BitLength ? 1 : 0);
-    m_mask <<= ref->_BitOffset;    
-    
+    m_mask <<= ref->_BitOffset;
+
     this->set_changeable(m_ref->_Changeable);
 
     std::string value = this->to_string();
@@ -1142,10 +1139,12 @@ public:
   bool do_value_changed(GsdmlAttrNav* attrnav, const char* value_str) override
   {
     uint8_t value;
-    
-    try {
+
+    try
+    {
       value = interpreter.to_value(value_str);
-    } catch (std::string& e)
+    }
+    catch (std::string& e)
     {
       attrnav->message('E', "Not a valid input for this datatype.");
       return false;
@@ -1167,7 +1166,7 @@ public:
     {
       *this->m_value_p = value;
     }
-    
+
     // All ok, update annotation to reflect stored value...
     std::string value_string = this->to_string();
     brow_SetAnnotation(this->m_node, 1, value_string.c_str(), value_string.length());
@@ -1176,18 +1175,18 @@ public:
   }
 
   std::string to_string() override
-  {    
+  {
     uint8_t temp = *this->m_value_p;
     if (m_is_bitarea)
     {
       temp &= m_mask;
       temp >>= m_ref->_BitOffset; // Shift value back
     }
-    std::ostringstream result(std::ios_base::out);        
-    result << std::fixed << +temp;    
+    std::ostringstream result(std::ios_base::out);
+    result << std::fixed << +temp;
 
     std::string value(result.str());
-    return value;    
+    return value;
   }
 
 private:
@@ -1197,15 +1196,13 @@ private:
   uint8_t m_mask;
 };
 
-template<>
-class ItemPnParameterInput<std::string> : public ItemPnValueInput<char*>
+template <> class ItemPnParameterInput<std::string> : public ItemPnValueInput<char*>
 {
 public:
-  ItemPnParameterInput(GsdmlAttrNav* attrnav, const char* name,
-      char* value_p, uint length, const char* infotext, brow_tNode dest, flow_eDest dest_code,
-      std::shared_ptr<GSDML::Ref> ref)
-    : ItemPnValueInput<char*>(attrnav, name,
-      value_p, length, infotext, dest, dest_code), m_ref(ref)
+  ItemPnParameterInput(GsdmlAttrNav* attrnav, const char* name, char* value_p, uint length,
+                       const char* infotext, brow_tNode dest, flow_eDest dest_code,
+                       std::shared_ptr<GSDML::Ref> ref)
+      : ItemPnValueInput<char*>(attrnav, name, value_p, length, infotext, dest, dest_code), m_ref(ref)
   {
     // Set the value pointer to point to our offset in the Const data
     this->m_value_p = (char*)&((unsigned char*)this->m_value_p)[ref->_ByteOffset];
@@ -1214,7 +1211,7 @@ public:
     new_infotext << std::endl << "Max length: " << length - 1;
 
     this->m_infotext = new_infotext.str();
-    
+
     this->set_changeable(m_ref->_Changeable);
 
     std::string value = this->to_string();
@@ -1227,18 +1224,18 @@ public:
     std::string value(value_str);
 
     // Check the length of the string entered. We save the last for a '\0'
-    if (value.length() >  m_ref->_Length - 1)
-    {      
+    if (value.length() > m_ref->_Length - 1)
+    {
       attrnav->message('W', "Input longer than allowed");
       return false;
     }
 
-    // Store the value    
-    memset(m_value_p, 0, m_length); // Set all to zero
+    // Store the value
+    memset(m_value_p, 0, m_length);                   // Set all to zero
     memcpy(m_value_p, value.c_str(), value.length()); // Copy data
 
-    // All ok, update annotation to reflect stored value...  
-    brow_SetAnnotation(this->m_node, 1, value.c_str(), value.length());    
+    // All ok, update annotation to reflect stored value...
+    brow_SetAnnotation(this->m_node, 1, value.c_str(), value.length());
 
     return true;
   }
@@ -1248,21 +1245,21 @@ private:
   std::shared_ptr<GSDML::Ref> m_ref;
 };
 
-template<typename T>
-class ItemPnParameterSelection : public ValueSelection<T>
+template <typename T> class ItemPnParameterSelection : public ValueSelection<T>
 {
 public:
-  ItemPnParameterSelection(GsdmlAttrNav* attrnav, const char* name,
-                  T* pwr_pn_value_p, brow_tNode dest, flow_eDest dest_code,
-                  std::shared_ptr<GSDML::Ref> ref)
-    : ValueSelection<T>(attrnav, attrnav_mItemType_Selectable, name, "No help text available", dest, dest_code, pwr_pn_value_p),
-      m_ref(ref), m_is_bitarea(false), m_is_bit(false)
+  ItemPnParameterSelection(GsdmlAttrNav* attrnav, const char* name, T* pwr_pn_value_p, brow_tNode dest,
+                           flow_eDest dest_code, std::shared_ptr<GSDML::Ref> ref)
+      : ValueSelection<T>(attrnav, attrnav_mItemType_Selectable, name, "No help text available", dest,
+                          dest_code, pwr_pn_value_p),
+        m_ref(ref), m_is_bitarea(false), m_is_bit(false)
   {
     ItemPn::m_closed_annotation = attrnav->brow->pixmap_attrenum;
 
     // Set InfoText to the Value Item help element reference text...
-    // OR set some sort of reference to the TextId which in some cases can clear out what setting it is we're chaning.
-    // Sometimes the name can be the same for a group of items in the GSDML and menus are used instead. But we're not using menus.    
+    // OR set some sort of reference to the TextId which in some cases can clear out what setting it is we're
+    // chaning. Sometimes the name can be the same for a group of items in the GSDML and menus are used
+    // instead. But we're not using menus.
     if (m_ref->_ValueItem && m_ref->_ValueItem->_Help)
     {
       ItemPn::m_infotext = *m_ref->_ValueItem->_Help;
@@ -1270,13 +1267,15 @@ public:
     else
     {
       std::ostringstream infotext(std::ios_base::out);
-      infotext << "No help about this exists. But here's the raw ID (might be empty) of the element to distinguish this item:" << std::endl;
-      infotext << "ID: " << m_ref->_ID << std::endl;         
+      infotext << "No help about this exists. But here's the raw ID (might be empty) of the element to "
+                  "distinguish this item:"
+               << std::endl;
+      infotext << "ID: " << m_ref->_ID << std::endl;
       ItemPn::m_infotext = infotext.str();
     }
 
     // Set the value pointer to point to our offset in the Const data
-    this->m_value_p = (T*)&((unsigned char*)this->m_value_p)[ref->_ByteOffset]; 
+    this->m_value_p = (T*)&((unsigned char*)this->m_value_p)[ref->_ByteOffset];
     this->m_noedit = !m_ref->_Changeable;
 
     // ParameterSelections can be Bit/BitArea types. If so, we need to pinpoint the bits correctly.
@@ -1298,19 +1297,19 @@ public:
 
   void scan_impl(ItemPnValueSelectItem<T> const* selected_item) const
   {
-    T value; 
-  
+    T value;
+
     if (m_is_bit || m_is_bitarea)
     {
       value = *this->m_value_p & m_mask;
     }
     else
     {
-    #if (pwr_dHost_byteOrder == pwr_dLittleEndian)
+#if (pwr_dHost_byteOrder == pwr_dLittleEndian)
       value = interpreter.switch_value(*this->m_value_p);
-    #else
+#else
       value = *this->m_value_p;
-    #endif
+#endif
     }
 
     if (value == selected_item->value())
@@ -1336,9 +1335,13 @@ public:
         if (m_ref->_AllowedValues.empty() || m_ref->_AllowedValues.inList(assign._Content))
         {
           if (m_is_bitarea || m_is_bit)
-            new ItemPnValueSelectItem<T>(ItemPn::m_attrnav, assign._Text->c_str(), "", this, this->m_value_p, static_cast<T>(assign._Content) << m_ref->_BitOffset, assign._Text->c_str(), ItemPn::m_node, flow_eDest_IntoLast);
+            new ItemPnValueSelectItem<T>(ItemPn::m_attrnav, assign._Text->c_str(), "", this, this->m_value_p,
+                                         static_cast<T>(assign._Content) << m_ref->_BitOffset,
+                                         assign._Text->c_str(), ItemPn::m_node, flow_eDest_IntoLast);
           else
-            new ItemPnValueSelectItem<T>(ItemPn::m_attrnav, assign._Text->c_str(), "", this, this->m_value_p, static_cast<T>(assign._Content), assign._Text->c_str(), ItemPn::m_node, flow_eDest_IntoLast);
+            new ItemPnValueSelectItem<T>(ItemPn::m_attrnav, assign._Text->c_str(), "", this, this->m_value_p,
+                                         static_cast<T>(assign._Content), assign._Text->c_str(),
+                                         ItemPn::m_node, flow_eDest_IntoLast);
         }
       }
       return 1;
@@ -1348,8 +1351,11 @@ public:
       // If this is a bit and we are missing out on assignments use default on/off
       if (m_is_bit)
       {
-        new ItemPnValueSelectItem<T>(ItemPn::m_attrnav, "On", "", this, this->m_value_p, 1 << m_ref->_BitOffset, "Select to enable this feature.", ItemPn::m_node, flow_eDest_IntoLast);
-        new ItemPnValueSelectItem<T>(ItemPn::m_attrnav, "Off", "", this, this->m_value_p, 0, "Select to disable this feature.", ItemPn::m_node, flow_eDest_IntoLast);
+        new ItemPnValueSelectItem<T>(ItemPn::m_attrnav, "On", "", this, this->m_value_p,
+                                     1 << m_ref->_BitOffset, "Select to enable this feature.", ItemPn::m_node,
+                                     flow_eDest_IntoLast);
+        new ItemPnValueSelectItem<T>(ItemPn::m_attrnav, "Off", "", this, this->m_value_p, 0,
+                                     "Select to disable this feature.", ItemPn::m_node, flow_eDest_IntoLast);
         return 1;
       }
     }
@@ -1367,34 +1373,34 @@ public:
     }
     else
     {
-    #if (pwr_dHost_byteOrder == pwr_dLittleEndian)
+#if (pwr_dHost_byteOrder == pwr_dLittleEndian)
       *this->m_value_p = interpreter.switch_value(selected_item->value());
-    #else
-      *this->m_value_p = selected_item->value();    
-    #endif
+#else
+      *this->m_value_p = selected_item->value();
+#endif
     }
-    
+
     brow_SetAnnotation(ItemPn::m_node, 1, selected_item->m_name.c_str(), selected_item->m_name.length());
     // Close this node, for this class we have a saved reference to attrnav as e member variable
     double node_x, node_y;
     brow_GetNodePosition(ItemPn::m_node, &node_x, &node_y);
-    ItemPn::close(ItemPn::m_attrnav, node_x, node_y);    
+    ItemPn::close(ItemPn::m_attrnav, node_x, node_y);
   }
 
   std::string to_string() override
   {
-    //T temp = interpreter.to_host_value(*this->m_value_p);
-  #if (pwr_dHost_byteOrder == pwr_dLittleEndian)
+    // T temp = interpreter.to_host_value(*this->m_value_p);
+#if (pwr_dHost_byteOrder == pwr_dLittleEndian)
     T temp = interpreter.switch_value(*this->m_value_p);
-  #else
+#else
     T temp = *this->m_value_p;
-  #endif
+#endif
     std::ostringstream result(std::ios_base::out);
-    result.precision(12); // For when this is a float/double    
-    result << std::fixed << +temp;    
+    result.precision(12); // For when this is a float/double
+    result << std::fixed << +temp;
 
     std::string value(result.str());
-    return value;    
+    return value;
   }
 
   void setup_node() override
@@ -1407,12 +1413,12 @@ public:
     }
     else
     {
-    #if (pwr_dHost_byteOrder == pwr_dLittleEndian)
+#if (pwr_dHost_byteOrder == pwr_dLittleEndian)
       value = interpreter.switch_value(*this->m_value_p);
-    #else
+#else
       value = *this->m_value_p;
-    #endif
-    }    
+#endif
+    }
 
     bool has_assignments = false;
     if (m_ref->_ValueItem && m_ref->_ValueItem->_Assignments.size())
@@ -1424,7 +1430,7 @@ public:
       for (auto const& assign : m_ref->_ValueItem->_Assignments)
       {
         T temp = assign._Content << (m_is_bit || m_is_bitarea ? m_ref->_BitOffset : 0);
-        
+
         // Check if the values are equal after shifting the assign values.
         // TODO Check datatype of the assign attribute
         if (temp == value)
@@ -1433,16 +1439,17 @@ public:
           break;
         }
       }
-      
-    }    
+    }
     else if (m_is_bit)
     {
       annotation = (value ? "On" : "Off");
     }
     else
-    {      
+    {
       // We need to handle cases like this
-      // <Ref ValueItemTarget="Blocking-time" ByteOffset="0" BitOffset="0" DataType="BitArea" BitLength="4" DefaultValue="2" AllowedValues="2..15" Changeable="true" Visible="true" TextId="Blocking-time" ID="Blocking-time" />      
+      // <Ref ValueItemTarget="Blocking-time" ByteOffset="0" BitOffset="0" DataType="BitArea" BitLength="4"
+      // DefaultValue="2" AllowedValues="2..15" Changeable="true" Visible="true" TextId="Blocking-time"
+      // ID="Blocking-time" />
       std::cerr << "Unhandled if case in ItemPnParameterSelection::setup_node()" << std::endl;
     }
 
@@ -1457,41 +1464,42 @@ private:
   bool m_is_bit;
 };
 
-
 /*
-  ========================================= Specializations for ParameterSelection =======================================
+  ========================================= Specializations for ParameterSelection
+  =======================================
 
-  Template specializations for our ParameterSelection classes. Float/Double has no bitwise operations. 
+  Template specializations for our ParameterSelection classes. Float/Double has no bitwise operations.
   So we specialize those functions here.
 */
 
-template<>
-inline void ItemPnParameterSelection<float>::scan_impl(ItemPnValueSelectItem<float> const* selected_item) const
-{ 
+template <>
+inline void
+ItemPnParameterSelection<float>::scan_impl(ItemPnValueSelectItem<float> const* selected_item) const
+{
   float value = *this->m_value_p;
   float selected_value = selected_item->value();
-  if (feqf(value, selected_value))      
+  if (feqf(value, selected_value))
     brow_SetRadiobutton(selected_item->get_node(), 0, 1);
   else
     brow_SetRadiobutton(ItemPn::m_node, 0, 0);
 }
 
-template<>
-inline void ItemPnParameterSelection<double>::scan_impl(ItemPnValueSelectItem<double> const* selected_item) const
-{   
+template <>
+inline void
+ItemPnParameterSelection<double>::scan_impl(ItemPnValueSelectItem<double> const* selected_item) const
+{
   double value = *this->m_value_p;
   double selected_value = selected_item->value();
-  if (feq(value, selected_value))  
+  if (feq(value, selected_value))
     brow_SetRadiobutton(selected_item->get_node(), 0, 1);
   else
     brow_SetRadiobutton(ItemPn::m_node, 0, 0);
 }
 
-template<>
-inline void ItemPnParameterSelection<float>::select(ItemPnValueSelectItem<float>* selected_item)
+template <> inline void ItemPnParameterSelection<float>::select(ItemPnValueSelectItem<float>* selected_item)
 {
-  *this->m_value_p = selected_item->value();    
-    
+  *this->m_value_p = selected_item->value();
+
   brow_SetAnnotation(ItemPn::m_node, 1, selected_item->m_name.c_str(), selected_item->m_name.length());
   // Close this node, for this class we have a saved reference to attrnav as e member variable
   double node_x, node_y;
@@ -1499,11 +1507,10 @@ inline void ItemPnParameterSelection<float>::select(ItemPnValueSelectItem<float>
   ItemPn::close(ItemPn::m_attrnav, node_x, node_y);
 }
 
-template<>
-inline void ItemPnParameterSelection<double>::select(ItemPnValueSelectItem<double>* selected_item)
+template <> inline void ItemPnParameterSelection<double>::select(ItemPnValueSelectItem<double>* selected_item)
 {
-  *this->m_value_p = selected_item->value();    
-    
+  *this->m_value_p = selected_item->value();
+
   brow_SetAnnotation(ItemPn::m_node, 1, selected_item->m_name.c_str(), selected_item->m_name.length());
   // Close this node, for this class we have a saved reference to attrnav as e member variable
   double node_x, node_y;
@@ -1511,12 +1518,11 @@ inline void ItemPnParameterSelection<double>::select(ItemPnValueSelectItem<doubl
   ItemPn::close(ItemPn::m_attrnav, node_x, node_y);
 }
 
-template<>
-inline void ItemPnParameterSelection<float>::setup_node()
+template <> inline void ItemPnParameterSelection<float>::setup_node()
 {
   std::string annotation;
   float value = *this->m_value_p;
-  
+
   if (m_ref->_ValueItem)
   {
     for (auto const& assign : m_ref->_ValueItem->_Assignments)
@@ -1531,12 +1537,11 @@ inline void ItemPnParameterSelection<float>::setup_node()
   brow_SetAnnotation(ItemPn::m_node, 1, annotation.c_str(), annotation.length());
 }
 
-template<>
-inline void ItemPnParameterSelection<double>::setup_node()
+template <> inline void ItemPnParameterSelection<double>::setup_node()
 {
   std::string annotation;
-  double value = *this->m_value_p;  
-  
+  double value = *this->m_value_p;
+
   if (m_ref->_ValueItem)
   {
     for (auto const& assign : m_ref->_ValueItem->_Assignments)
@@ -1552,31 +1557,34 @@ inline void ItemPnParameterSelection<double>::setup_node()
 }
 
 // Mostly here to satisfy the compiler since i don't beleive there are floating point value items in existence
-template<>
-inline int ItemPnParameterSelection<float>::open_children_impl()
-{  
+template <> inline int ItemPnParameterSelection<float>::open_children_impl()
+{
   // If we have assignments
   for (auto const& assign : m_ref->_ValueItem->_Assignments)
   {
-    new ItemPnValueSelectItem<float>(ItemPn::m_attrnav, assign._Text->c_str(), "", this, this->m_value_p, static_cast<float>(assign._Content), assign._Text->c_str(), ItemPn::m_node, flow_eDest_IntoLast);
+    new ItemPnValueSelectItem<float>(ItemPn::m_attrnav, assign._Text->c_str(), "", this, this->m_value_p,
+                                     static_cast<float>(assign._Content), assign._Text->c_str(),
+                                     ItemPn::m_node, flow_eDest_IntoLast);
   }
   return 1;
 }
 
 // Mostly here to satisfy the compiler since i don't beleive there are floating point value items in existence
-template<>
-inline int ItemPnParameterSelection<double>::open_children_impl()
-{  
+template <> inline int ItemPnParameterSelection<double>::open_children_impl()
+{
   // If we have assignments
   for (auto const& assign : m_ref->_ValueItem->_Assignments)
   {
-    new ItemPnValueSelectItem<double>(ItemPn::m_attrnav, assign._Text->c_str(), "", this, this->m_value_p, static_cast<double>(assign._Content), assign._Text->c_str(), ItemPn::m_node, flow_eDest_IntoLast);
+    new ItemPnValueSelectItem<double>(ItemPn::m_attrnav, assign._Text->c_str(), "", this, this->m_value_p,
+                                      static_cast<double>(assign._Content), assign._Text->c_str(),
+                                      ItemPn::m_node, flow_eDest_IntoLast);
   }
   return 1;
 }
 
 /*
-  ========================================= END Specializations for ParameterSelection =======================================
+  ========================================= END Specializations for ParameterSelection
+  =======================================
 */
 
 #endif

@@ -53,6 +53,8 @@
 #define SUBMODULE_INTERFACE 32768
 #define SUBMODULE_PORT_1 32769
 #define SUBMODULE_PORT_2 32770
+#define INPUT_CR 1
+#define OUTPUT_CR 2
 
 // New parser class
 class ProfinetDataRecord
@@ -61,11 +63,11 @@ public:
   ProfinetDataRecord() = default;
   ProfinetDataRecord(pugi::xml_node&&);
   ProfinetDataRecord(ProfinetDataRecord&&);
-  ProfinetDataRecord(ProfinetDataRecord const&) = default;  
+  ProfinetDataRecord(ProfinetDataRecord const&) = default;
   ~ProfinetDataRecord();
-  //ProfinetDataRecord& operator=(ProfinetDataRecord const&);
+  // ProfinetDataRecord& operator=(ProfinetDataRecord const&);
   void build(pugi::xml_node&&) const;
-  
+
   unsigned char* m_data;
   unsigned int m_data_length;
   unsigned short m_index;
@@ -75,8 +77,7 @@ class GsdmlDataRecord
 {
 public:
   GsdmlDataRecord()
-      : record_idx(0), data(0), data_reversed_endianess(0), data_length(0),
-        index(0), transfer_sequence(0)
+      : record_idx(0), data(0), data_reversed_endianess(0), data_length(0), index(0), transfer_sequence(0)
   {
   }
 
@@ -108,21 +109,18 @@ public:
   ProfinetIOCR(ProfinetIOCR const&) = delete;
   ~ProfinetIOCR() = default;
   void build(pugi::xml_node&&) const;
-  
+
   unsigned short m_send_clock_factor;
   unsigned short m_reduction_ratio;
   unsigned int m_phase; // Phase can not be greater than reduction ratio and must be > 0.
-  unsigned int m_api; // Check with the spec what to do with submodule items specifying a specific API...
+  unsigned int m_api;   // Check with the spec what to do with submodule items specifying a specific API...
   std::string m_rt_class;
   std::string m_startup_mode;
 };
 class GsdmlIOCRData
 {
 public:
-  GsdmlIOCRData()
-      : type(0), properties(0), send_clock_factor(0), phase(0), api(0)
-  {
-  }
+  GsdmlIOCRData() : type(0), properties(0), send_clock_factor(0), phase(0), api(0) {}
 
   unsigned short type;
   unsigned int properties;
@@ -140,29 +138,29 @@ public:
   ProfinetSubslot() = default;
   ProfinetSubslot(pugi::xml_node&&);
   ProfinetSubslot(ProfinetSubslot&&) = default;
-  ProfinetSubslot(ProfinetSubslot const&);    
+  ProfinetSubslot(ProfinetSubslot const&);
   ~ProfinetSubslot() = default;
   void build(pugi::xml_node&&) const;
   void reset();
 
   // Attributes
-  unsigned int m_subslot_number; // This is more or less fixed and is not affected by a reset  
-  unsigned int m_submodule_ident_number;    
+  unsigned int m_subslot_number; // This is more or less fixed and is not affected by a reset
+  unsigned int m_submodule_ident_number;
   unsigned int m_io_input_length;
   unsigned int m_io_output_length;
   std::string m_submodule_ID;
 
-  // Elements  
-  std::map<uint, ProfinetDataRecord> m_data_record_map; // Indexed on the actual Index attribute of the ParameterRecordDataItem
+  // Elements
+  std::map<uint, ProfinetDataRecord>
+      m_data_record_map; // Indexed on the actual Index attribute of the ParameterRecordDataItem
 };
 
 class GsdmlSubslotData
 {
 public:
   GsdmlSubslotData()
-      : subslot_number(0), subslot_idx(0), submodule_enum_number(0),
-        submodule_ident_number(0), api(0), io_input_length(0),
-        io_output_length(0)
+      : subslot_number(0), subslot_idx(0), submodule_enum_number(0), submodule_ident_number(0), api(0),
+        io_input_length(0), io_output_length(0)
   {
   }
 
@@ -180,8 +178,7 @@ public:
     for (unsigned int i = 0; i < data_record.size(); i++)
       delete data_record[i];
   }
-  GsdmlSubslotData(const GsdmlSubslotData& x)
-      : subslot_number(x.subslot_number), subslot_idx(x.subslot_idx)
+  GsdmlSubslotData(const GsdmlSubslotData& x) : subslot_number(x.subslot_number), subslot_idx(x.subslot_idx)
   {
     for (unsigned int i = 0; i < x.data_record.size(); i++)
     {
@@ -198,29 +195,30 @@ public:
   ProfinetSlot(pugi::xml_node&&);
   ProfinetSlot(ProfinetSlot&&) = default;
   ProfinetSlot(ProfinetSlot const&) = delete;
-  ProfinetSlot& operator=(const ProfinetSlot &);
+  ProfinetSlot& operator=(const ProfinetSlot&);
   ~ProfinetSlot() = default;
   void build(pugi::xml_node&&) const;
 
   unsigned int m_module_ident_number;
-  pwr_tCid m_module_class;  
+  pwr_tCid m_module_class;
   std::string m_module_ID; // This is unique even across the same ident number
   unsigned int m_slot_number;
-  unsigned int m_api; // TODO Check if this is on device level even....  
-  std::map<uint, ProfinetSubslot> m_subslot_map;  
+  unsigned int m_api; // TODO Check if this is on device level even....
+  std::map<uint, ProfinetSubslot> m_subslot_map;
 
   // Non saved members
-  pwr_tOid m_module_oid; // Meta, never saved. Only used as temporary storage for oids when creating modules/channels
-  bool m_is_modified; // Meta, never save. Indicates wether or not this slot had it's module updated before applyig/saving...
+  pwr_tOid m_module_oid; // Meta, never saved. Only used as temporary storage for oids when creating
+                         // modules/channels
+  bool m_is_modified;    // Meta, never save. Indicates wether or not this slot had it's module updated before
+                         // applyig/saving...
 };
-
 
 class GsdmlSlotData
 {
 public:
   GsdmlSlotData()
-      : module_enum_number(0), dap_fixed_slot(0), module_class(0),
-        module_oid(pwr_cNOid), slot_number(0), slot_idx(0)
+      : module_enum_number(0), dap_fixed_slot(0), module_class(0), module_oid(pwr_cNOid), slot_number(0),
+        slot_idx(0)
   {
     module_text[0] = 0;
   }
@@ -248,9 +246,8 @@ public:
     subslot_data.clear();
   }
   GsdmlSlotData(const GsdmlSlotData& x)
-      : module_enum_number(x.module_enum_number), module_class(x.module_class),
-        module_oid(pwr_cNObjid), slot_number(x.slot_number),
-        slot_idx(x.slot_idx)
+      : module_enum_number(x.module_enum_number), module_class(x.module_class), module_oid(pwr_cNObjid),
+        slot_number(x.slot_number), slot_idx(x.slot_idx)
   {
     for (unsigned int i = 0; i < x.subslot_data.size(); i++)
     {
@@ -282,7 +279,8 @@ public:
   unsigned short error_type;
   char name[200];
   char help[4096];
-  // std::vector<GsdmlExtChannelAddValueDataItem*> data_item; TODO Do we want this extra level of diagnostic information available?
+  // std::vector<GsdmlExtChannelAddValueDataItem*> data_item; TODO Do we want this extra level of diagnostic
+  // information available?
 
   int print(std::ofstream& fp);
 };
@@ -328,7 +326,7 @@ public:
   ProfinetNetworkSettings(ProfinetNetworkSettings const&) = delete;
   ~ProfinetNetworkSettings() = default;
   void build(pugi::xml_node&&) const;
-  
+
   std::string m_device_name;
   std::string m_ip_address;
   std::string m_subnet_mask;
@@ -347,17 +345,17 @@ public:
   void build(pugi::xml_node&&) const;
 
   // Attributes
-  std::string m_gsdml_source_file;  
-  std::string m_moduleinfo_name; // ModuleInfo->Name in the GSDML  
-  std::string m_DAP_ID; // DAP ID to map what DAP to use from the GSDML
-  unsigned short m_vendor_id; // Part of DeviceIdentity
-  unsigned short m_device_id; // Part of DeviceIdentity  
+  std::string m_gsdml_source_file;
+  std::string m_moduleinfo_name; // ModuleInfo->Name in the GSDML
+  std::string m_DAP_ID;          // DAP ID to map what DAP to use from the GSDML
+  unsigned short m_vendor_id;    // Part of DeviceIdentity
+  unsigned short m_device_id;    // Part of DeviceIdentity
 
   // Elements
-  ProfinetNetworkSettings m_NetworkSettings;  
+  ProfinetNetworkSettings m_NetworkSettings;
   std::vector<ProfinetSlot> m_slot_list;
-  ProfinetIOCR m_IOCR;
-  std::unordered_map<uint, ProfinetChannelDiag> m_channel_diag_map;  
+  std::map<uint, ProfinetIOCR> m_IOCR;
+  std::unordered_map<uint, ProfinetChannelDiag> m_channel_diag_map;
 };
 
 class ProfinetRuntimeData
@@ -368,13 +366,14 @@ public:
   ProfinetRuntimeData(ProfinetRuntimeData const&) = delete;
   ~ProfinetRuntimeData() = default;
   int read_pwr_pn_xml(std::string const& p_filename, std::string const& p_gsdml_file);
-  void reset_to_default();  
+  void reset_to_default();
   bool save() const;
 
   std::shared_ptr<ProfinetDevice> m_PnDevice;
 
-  bool m_file_missing; // This will be set to true if the file was missing while reading the pwr_pn data.
-  bool m_gsdml_mismatch; // This will be set to true if the GSDML used is different from the one used to create the pwr_pn data.
+  bool m_file_missing;   // This will be set to true if the file was missing while reading the pwr_pn data.
+  bool m_gsdml_mismatch; // This will be set to true if the GSDML used is different from the one used to
+                         // create the pwr_pn data.
 
   std::string m_pwr_pn_filename; // We keep a reference to the filename here. No need to pass it around...
 
@@ -391,8 +390,8 @@ class GsdmlDeviceData
 {
 public:
   GsdmlDeviceData()
-      : device_num(0), skip_ip_assignment(0), vendor_id(0), device_id(0),
-        byte_order(0), read_data_is_native_ordered(1), instance(0)
+      : device_num(0), skip_ip_assignment(0), vendor_id(0), device_id(0), byte_order(0),
+        read_data_is_native_ordered(1), instance(0)
   {
     device_name[0] = 0;
     ip_address[0] = 0;
