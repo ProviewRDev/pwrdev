@@ -457,9 +457,8 @@ int pndevice_save_cb(void* sctx)
 
     // Skip if if we have an oid (There's already an object in place, and we never remove existing configured
     // items) OR we do not have a module class, we need one to know what to create (The configurator forces
-    // one to select a module class). The DAP does not have a module class though...TODO What if the DAP
-    // carries data...does such DAPs exist?
-    if (cdh_ObjidIsNotNull(slot.m_module_oid) || slot.m_module_class == pwr_cNCid)
+    // one to select a module class). The DAP (slot 0) does not have a module class though, so we treat it differently
+    if (cdh_ObjidIsNotNull(slot.m_module_oid) || (slot.m_module_class == pwr_cNCid && slot.m_slot_number != 0))
       continue;
 
     // Create a fancy name like "M1" and so on and so forth...
@@ -498,6 +497,12 @@ int pndevice_save_cb(void* sctx)
 
     if (!created)
     {
+      // Special case for the DAP
+      if (slot.m_slot_number == 0)
+      {
+        slot.m_module_class = pwr_cClass_PnModule;
+      }
+
       // We are either at the beginning or at the end
       if (cdh_ObjidIsNull(last_object))
       {
@@ -526,10 +531,21 @@ int pndevice_save_cb(void* sctx)
     // Update slot number in our module object and set a name for the attribute ModuleName
     pwr_tAttrRef module_aref = cdh_ObjidToAref(slot.m_module_oid);
     set_attribute(ctx->ldhses, &slot.m_slot_number, sizeof(slot.m_slot_number), "Slot", &module_aref);
-    // Set both ModuleName and Description as a default.
-    std::string name = *ctx->attr->attrnav->gsdml->getModuleMap().at(slot.m_module_ID)->_ModuleInfo._Name;
-    set_attribute(ctx->ldhses, (void*)name.c_str(), name.length(), "ModuleName", &module_aref);
-    set_attribute(ctx->ldhses, (void*)name.c_str(), name.length(), "Description", &module_aref);
+    // Set both ModuleName and Description as a default. Again, slot 0 is treated a little different
+    if (slot.m_slot_number == 0)
+    {
+      std::string name = *ctx->attr->attrnav->gsdml->getDeviceAccessPointMap().at(slot.m_module_ID)->_ModuleInfo._Name;
+      std::string info = *ctx->attr->attrnav->gsdml->getDeviceAccessPointMap().at(slot.m_module_ID)->_ModuleInfo._InfoText;
+      set_attribute(ctx->ldhses, (void*)name.c_str(), name.length(), "ModuleName", &module_aref);
+      set_attribute(ctx->ldhses, (void*)info.c_str(), info.length(), "Description", &module_aref);
+    }
+    else
+    {
+      std::string name = *ctx->attr->attrnav->gsdml->getModuleMap().at(slot.m_module_ID)->_ModuleInfo._Name;
+      set_attribute(ctx->ldhses, (void*)name.c_str(), name.length(), "ModuleName", &module_aref);
+      set_attribute(ctx->ldhses, (void*)name.c_str(), name.length(), "Description", &module_aref);
+    }
+
   } // Done creating modules
 
   // Now we create all the channel items! :D
@@ -550,7 +566,14 @@ int pndevice_save_cb(void* sctx)
     free(slot_number_p);
 
     auto& slot = ctx->attr->attrnav->pn_runtime_data->m_PnDevice->m_slot_list[slot_number];
-    module_item = ctx->attr->attrnav->gsdml->getModuleMap().at(slot.m_module_ID);
+    if (slot.m_slot_number == 0) // DAP
+    {
+      module_item = ctx->attr->attrnav->gsdml->getDeviceAccessPointMap().at(slot.m_module_ID);
+    }
+    else
+    {
+      module_item = ctx->attr->attrnav->gsdml->getModuleMap().at(slot.m_module_ID);
+    }
 
     // Check if we have children, if we do AND this slot was modified in the configurator we have to notify
     // the user that he/she must move them temporary or remove them completely before ProviewR will create
