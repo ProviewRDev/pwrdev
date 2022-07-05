@@ -308,9 +308,10 @@ ProfinetIOCR::ProfinetIOCR(pugi::xml_node&& p_IOCR)
 {
 }
 
-void ProfinetIOCR::build(pugi::xml_node&& p_iocr) const
+void ProfinetIOCR::build(pugi::xml_node&& p_iocr, uint type) const
 {
   // Attributes
+  p_iocr.append_attribute("Type").set_value(type);
   p_iocr.append_attribute("SendClockFactor").set_value(m_send_clock_factor);
   p_iocr.append_attribute("ReductionRatio").set_value(m_reduction_ratio);
   p_iocr.append_attribute("Phase").set_value(m_phase);
@@ -510,8 +511,13 @@ ProfinetDevice::ProfinetDevice(pugi::xml_node&& p_pn_device)
       // m_version(p_pn_device.attribute("Version").as_string()), // TODO Why is this important???    It
       // referes to the profile revision in the profile body of the GSDML. Maybe we should save the PNIO
       // version of the DAP instead?
-      m_NetworkSettings(p_pn_device.child("NetworkSettings")), m_IOCR(p_pn_device.child("IOCR"))
+      m_NetworkSettings(p_pn_device.child("NetworkSettings"))
 {
+  for (pugi::xml_node& iocr : p_pn_device.child("IOCRs").children("IOCR"))
+  {
+    m_IOCR_map.emplace(iocr.attribute("Type").as_uint(), std::move(ProfinetIOCR(std::move(iocr))));
+  }
+
   for (pugi::xml_node& slot : p_pn_device.children("Slot"))
   {
     m_slot_list.push_back(ProfinetSlot(std::move(slot)));
@@ -539,7 +545,12 @@ void ProfinetDevice::build(pugi::xml_node&& p_pn_device) const
     slot.build(p_pn_device.append_child("Slot"));
   }
 
-  m_IOCR.build(p_pn_device.append_child("IOCR"));
+  // IOCR Section
+  pugi::xml_node iocrs = p_pn_device.append_child("IOCRs");
+  for (auto const& iocr : m_IOCR_map)
+  {
+    iocr.second.build(iocrs.append_child("IOCR"), iocr.first);
+  }
 
   // Diagnostics section
   pugi::xml_node diagnostics = p_pn_device.append_child("Diagnostics");

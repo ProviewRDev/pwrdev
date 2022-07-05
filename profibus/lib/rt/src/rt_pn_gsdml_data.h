@@ -107,8 +107,9 @@ public:
   ProfinetIOCR(pugi::xml_node&&);
   ProfinetIOCR(ProfinetIOCR&&) = default;
   ProfinetIOCR(ProfinetIOCR const&) = delete;
+  ProfinetIOCR& operator=(ProfinetIOCR&) = default;
   ~ProfinetIOCR() = default;
-  void build(pugi::xml_node&&) const;
+  void build(pugi::xml_node&&, uint type) const;
 
   unsigned short m_send_clock_factor;
   unsigned short m_reduction_ratio;
@@ -354,7 +355,7 @@ public:
   // Elements
   ProfinetNetworkSettings m_NetworkSettings;
   std::vector<ProfinetSlot> m_slot_list;
-  std::map<uint, ProfinetIOCR> m_IOCR;
+  std::map<uint, ProfinetIOCR> m_IOCR_map;
   std::unordered_map<uint, ProfinetChannelDiag> m_channel_diag_map;
 };
 

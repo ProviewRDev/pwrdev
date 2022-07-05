@@ -1198,12 +1198,15 @@ int GsdmlAttrNav::save()
             .m_ext_channel_diag_map[ext_diag_item.first]
             .m_help = *ext_diag_item.second._Help;
       }
-      
+
       pn_runtime_data->m_PnDevice->m_channel_diag_map[diag_item.first]
           .m_ext_channel_diag_map[ext_diag_item.first]
           .m_name = *ext_diag_item.second._Name;
     }
   }
+
+  // Make sure we copy INPUT_CR to OUTPUT_CR
+  pn_runtime_data->m_PnDevice->m_IOCR_map[OUTPUT_CR] = pn_runtime_data->m_PnDevice->m_IOCR_map.at(INPUT_CR);
 
   if (!pn_runtime_data->save())
     m_wow->DisplayError("Error saving", "An error occured while saving the runtime configuration file.");
@@ -1650,8 +1653,9 @@ int ItemPnSlot::open_children_impl()
       std::ostringstream subslot_name("Subslot ", std::ios_base::ate);
       subslot_name << subslot_number << " (" << *virtual_submodule_item.second->_ModuleInfo._Name << ")";
 
-      new ItemPnSubslot(m_attrnav, subslot_name.str().c_str(), m_slot_data, &m_slot_data->m_subslot_map[subslot_number],
-                        module, subslot_number, virtual_submodule_item.second, m_node, flow_eDest_IntoLast,
+      new ItemPnSubslot(m_attrnav, subslot_name.str().c_str(), m_slot_data,
+                        &m_slot_data->m_subslot_map[subslot_number], module, subslot_number,
+                        virtual_submodule_item.second, m_node, flow_eDest_IntoLast,
                         "Virtual submodule of this module/DAP.");
 
       subslot_number++;
@@ -1667,9 +1671,9 @@ int ItemPnSlot::open_children_impl()
         std::ostringstream subslot_name("Subslot ", std::ios_base::ate);
         subslot_name << it.value();
 
-        new ItemPnSubslot(m_attrnav, subslot_name.str().c_str(), m_slot_data, &m_slot_data->m_subslot_map[it.value()],
-                          module, it.value(), nullptr, m_node, flow_eDest_IntoLast,
-                          "Subslot from the modules physical subslot list.");
+        new ItemPnSubslot(m_attrnav, subslot_name.str().c_str(), m_slot_data,
+                          &m_slot_data->m_subslot_map[it.value()], module, it.value(), nullptr, m_node,
+                          flow_eDest_IntoLast, "Subslot from the modules physical subslot list.");
       }
     }
   }
@@ -1702,14 +1706,14 @@ void ItemPnSlot::attach_module(std::shared_ptr<GSDML::ModuleItem> module, bool r
                                         // class will free data record data
 }
 
-ItemPnSubslot::ItemPnSubslot(GsdmlAttrNav* attrnav, const char* name, ProfinetSlot* parent_slot_data, ProfinetSubslot* subslot_data,
+ItemPnSubslot::ItemPnSubslot(GsdmlAttrNav* attrnav, const char* name, ProfinetSlot* parent_slot_data,
+                             ProfinetSubslot* subslot_data,
                              std::shared_ptr<GSDML::ModuleItem> parent_module_item, uint subslot_number,
                              std::shared_ptr<GSDML::SubmoduleItem> attached_submodule_item, brow_tNode dest,
                              flow_eDest dest_code, const char* infotext)
     : ItemPn(attrnav, attrnav_mItemType_Parent | attrnav_mItemType_ExpandForSave, name, infotext, 1),
-      m_parent_slot_data(parent_slot_data),
-      m_subslot_data(subslot_data), m_parent_module_item(parent_module_item),
-      m_subslot_number(subslot_number), m_is_selectable(false),
+      m_parent_slot_data(parent_slot_data), m_subslot_data(subslot_data),
+      m_parent_module_item(parent_module_item), m_subslot_number(subslot_number), m_is_selectable(false),
       m_attached_submodule_item(attached_submodule_item)
 {
   m_closed_annotation = attrnav->brow->pixmap_map;
@@ -2029,8 +2033,9 @@ int ItemPnDAP::open_children_impl()
       std::ostringstream subslot_name("Subslot ", std::ios_base::ate);
       subslot_name << subslot_number << " (" << *virtual_submodule_item.second->_ModuleInfo._Name << ")";
 
-      new ItemPnSubslot(m_attrnav, subslot_name.str().c_str(), m_slot_data, &m_slot_data->m_subslot_map[subslot_number],
-                        dap, subslot_number, virtual_submodule_item.second, m_node, flow_eDest_IntoLast,
+      new ItemPnSubslot(m_attrnav, subslot_name.str().c_str(), m_slot_data,
+                        &m_slot_data->m_subslot_map[subslot_number], dap, subslot_number,
+                        virtual_submodule_item.second, m_node, flow_eDest_IntoLast,
                         "Virtual submodule of this module/DAP.");
 
       subslot_number++;
@@ -2059,8 +2064,9 @@ int ItemPnDAP::open_children_impl()
         std::ostringstream subslot_name("Subslot ", std::ios_base::ate);
         subslot_name << it.value();
 
-        new ItemPnSubslot(m_attrnav, subslot_name.str().c_str(), m_slot_data, &m_slot_data->m_subslot_map[it.value()], dap,
-                          it.value(), nullptr, m_node, flow_eDest_IntoLast, "Physical subslot of the DAP.");
+        new ItemPnSubslot(m_attrnav, subslot_name.str().c_str(), m_slot_data,
+                          &m_slot_data->m_subslot_map[it.value()], dap, it.value(), nullptr, m_node,
+                          flow_eDest_IntoLast, "Physical subslot of the DAP.");
       }
     }
 
@@ -2709,7 +2715,7 @@ void ItemPnSubmoduleSelection::select(ItemPnValueSelectItem<std::string>* select
   }
 
   // Set the entire module to a modified state since we've just updated the subslot
-  subslot->m_parent_slot_data->m_is_modified = true; 
+  subslot->m_parent_slot_data->m_is_modified = true;
 
   subslot->close(m_attrnav, 0, 0, true); // Close AND reopen
 }
@@ -2828,13 +2834,13 @@ void ItemPnEnumRTClass::setup_node()
   if (m_interface_submodule_item->_ApplicationRelations._StartupMode.getList().size())
   {
     if (m_interface_submodule_item->_ApplicationRelations._StartupMode.inList("Advanced"))
-      m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR.m_startup_mode = "Advanced";
+      m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR_map[INPUT_CR].m_startup_mode = "Advanced";
     else
-      m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR.m_startup_mode = "Legacy";
+      m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR_map[INPUT_CR].m_startup_mode = "Legacy";
   }
   else
   {
-    m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR.m_startup_mode = "Legacy";
+    m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR_map[INPUT_CR].m_startup_mode = "Legacy";
   }
 }
 
@@ -2966,7 +2972,7 @@ void ItemPnSendClock::setup_node()
   // Check if RT_CLASS_3 is chosen, if not we use the non RT_CLASS_3 settings.
   // The _SendClock valuelists are created with default values if there are no
   // corresponding elements in the GSDML file...so this is safe...
-  if (m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR.m_rt_class == "RT_CLASS_3")
+  if (m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR_map[INPUT_CR].m_rt_class == "RT_CLASS_3")
     m_send_clock_list = &m_application_relations._RT_Class3TimingProperties._SendClock;
   else
     m_send_clock_list = &m_application_relations._TimingProperties._SendClock;
@@ -3053,7 +3059,7 @@ void ItemPnReductionRatio::setup_node()
   // Check if RT_CLASS_3 is chosen, if not we use the non RT_CLASS_3 settings.
   // The _reductionRatio valuelists are created with default values if there are
   // no corresponding elements in the GSDML file...so this is safe...
-  if (m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR.m_rt_class == "RT_CLASS_3")
+  if (m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR_map[INPUT_CR].m_rt_class == "RT_CLASS_3")
     m_reduction_ratio_list = &m_application_relations._RT_Class3TimingProperties._ReductionRatioPow2;
   else
     m_reduction_ratio_list = &m_application_relations._TimingProperties._ReductionRatioPow2;
@@ -3269,7 +3275,7 @@ bool ItemPnPhaseInput::do_value_changed(GsdmlAttrNav* attrnav, const char* value
     {
       attrnav->message('E', "Phase cannot exceed reduction ratio.");
       return false;
-    }    
+    }
   }
   else
   {

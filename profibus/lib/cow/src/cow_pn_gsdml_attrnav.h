@@ -945,20 +945,21 @@ public:
   int open_children_impl() override
   {
     new ItemPnEnumRTClass(m_attrnav, "RT_CLASS", m_interface_submodule,
-                          &m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR.m_rt_class, m_node,
+                          &m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR_map[INPUT_CR].m_rt_class, m_node,
                           flow_eDest_IntoLast);
 
     new ItemPnSendClock(m_attrnav, "Send Clock", m_interface_submodule->_ApplicationRelations,
-                        &m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR.m_send_clock_factor, m_node,
-                        flow_eDest_IntoLast);
+                        &m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR_map[INPUT_CR].m_send_clock_factor,
+                        m_node, flow_eDest_IntoLast);
 
     ItemPnReductionRatio* iprr = new ItemPnReductionRatio(
         m_attrnav, "Reduction Ratio", m_interface_submodule->_ApplicationRelations,
-        &m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR.m_reduction_ratio, m_node, flow_eDest_IntoLast);
+        &m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR_map[INPUT_CR].m_reduction_ratio, m_node,
+        flow_eDest_IntoLast);
 
-    new ItemPnPhaseInput(m_attrnav, "Phase", &m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR.m_phase, iprr,
-                         "Phase for this device. Phase cannot exceed your reduction ratio.", m_node,
-                         flow_eDest_IntoLast);
+    new ItemPnPhaseInput(
+        m_attrnav, "Phase", &m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR_map[INPUT_CR].m_phase, iprr,
+        "Phase for this device. Phase cannot exceed your reduction ratio.", m_node, flow_eDest_IntoLast);
 
     return 1;
   }
@@ -1122,8 +1123,8 @@ public:
 
     // Need to handle this (in my oppinion crappy GSDML):
     //<Ref ValueItemTarget="Blocking-time" ByteOffset="0" BitOffset="0" DataType="BitArea" BitLength="4"
-    //DefaultValue="2" AllowedValues="2..15" Changeable="true" Visible="true" TextId="Blocking-time"
-    //ID="Blocking-time" />
+    // DefaultValue="2" AllowedValues="2..15" Changeable="true" Visible="true" TextId="Blocking-time"
+    // ID="Blocking-time" />
     if (ref->_DataType == GSDML::ValueDataType_BitArea)
       m_is_bitarea = true;
     m_mask = (1 << ref->_BitLength) - (ref->_BitLength ? 1 : 0);
