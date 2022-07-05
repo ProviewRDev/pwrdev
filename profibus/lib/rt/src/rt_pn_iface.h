@@ -91,7 +91,7 @@ void pack_alarm_ack_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes,
                         unsigned short ref, unsigned short prio);
 
 void pack_download_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes,
-                       GsdmlDeviceData* dev_data, unsigned short device_ref);
+                       ProfinetRuntimeData* dev_data, unsigned short device_ref);
 
 int unpack_write_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local);
 int unpack_read_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local);

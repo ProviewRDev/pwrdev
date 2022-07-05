@@ -38,13 +38,17 @@
 #define rt_io_pnak_locals_h
 
 #include <fstream>
+#include <memory>
 #include <vector>
 
+#include "rt_io_base.h"
 #include "rt_pn_gsdml_data.h"
 #include "rt_profinet.h"
 #include "rt_pnak.h"
 
 /* rt_io_pnak_locals.h -- Profinet io handling locals. */
+
+class ProfinetDevice;
 
 typedef struct _PN_Alarm_Data
 {
@@ -72,7 +76,7 @@ public:
 
   ~PnApiData() {}
 
-  int print(std::ofstream& fp);
+  //int print(std::ofstream& fp);
 };
 
 class PnIOCRData
@@ -94,7 +98,7 @@ public:
 
   ~PnIOCRData() {}
 
-  int print(std::ofstream& fp);
+  //int print(std::ofstream& fp);
 };
 
 class PnSubmoduleData
@@ -126,7 +130,7 @@ public:
 
   ~PnSubmoduleData() {}
 
-  int print(std::ofstream& fp);
+  //int print(std::ofstream& fp);
 };
 
 class PnModuleData
@@ -152,7 +156,7 @@ public:
       delete submodule_data[i];
   }
 
-  int print(std::ofstream& fp);
+  //int print(std::ofstream& fp);
 };
 
 class PnDeviceData
@@ -185,9 +189,9 @@ public:
     iocr_data.clear();
   }
 
-  int copy_slot(unsigned int slot_idx);
-  int cut_slot(unsigned int slot_idx);
-  int paste_slot(unsigned int slot_idx);
+  // int copy_slot(unsigned int slot_idx);
+  // int cut_slot(unsigned int slot_idx);
+  // int paste_slot(unsigned int slot_idx);
 };
 
 class PnDeviceInfo
@@ -219,9 +223,10 @@ public:
   unsigned char macaddress[6];
   unsigned char subnetmask[4];
 
-  std::vector<PnDeviceData*> device_data;
-  std::vector<PnDeviceInfo*> dev_info;
-  std::vector<GsdmlDeviceData*> xml_device_data;
+  //std::vector<PnDeviceData*> device_data;
+  //std::vector<PnDeviceInfo*> dev_info;
+  // std::vector<GsdmlDeviceData*> xml_device_data;
+  std::vector<std::shared_ptr<ProfinetDevice>> device_list;
 
   pthread_t handle_events;
   agent_args args;

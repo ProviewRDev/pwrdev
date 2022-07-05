@@ -137,7 +137,8 @@ static pwr_tStatus IoAgentRead(io_tCtx ctx, io_sAgent* ap)
   unsigned char* clean_io_datap;
   unsigned char status_data = 0;
   PnSubmoduleData* submodule;
-  PnDeviceData* pn_device;
+  //PnDeviceData* pn_device;
+  std::shared_ptr<ProfinetDevice> pn_device;
   unsigned char ioxs;
 
   
@@ -150,11 +151,11 @@ static pwr_tStatus IoAgentRead(io_tCtx ctx, io_sAgent* ap)
 
   //  pthread_mutex_lock(&local->mutex);
 
-  for (device_list = ap->racklist, ii = 1; device_list != NULL || ii < local->device_data.size(); device_list = device_list->next, ii++)
+  for (device_list = ap->racklist, ii = 1; device_list != NULL || ii < local->device_list.size(); device_list = device_list->next, ii++)
   {
     //pwr_sClass_PnDevice *device = (pwr_sClass_PnDevice*)(device_list->op);
     
-    pn_device = local->device_data[ii];    
+    pn_device = local->device_list[ii];    
 
     if (pn_device->device_state == PNAK_DEVICE_STATE_CONNECTED)
     { 

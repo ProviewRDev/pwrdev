@@ -50,217 +50,216 @@
 
 #include "pwr_baseclasses.h"
 
-typedef enum
-{
-  gsdmldata_eTag_,
-  gsdmldata_eTag_PnDevice,
-  gsdmldata_eTag_NetworkSettings,
-  gsdmldata_eTag_Slot,
-  gsdmldata_eTag_Subslot,
-  gsdmldata_eTag_DataRecord,
-  gsdmldata_eTag_IOCR,
-  gsdmldata_eTag_ChannelDiag,
-  gsdmldata_eTag_ExtChannelDiag,
-  gsdmldata_eTag__
-} gsdmldata_eTag;
+// typedef enum
+// {
+//   gsdmldata_eTag_,
+//   gsdmldata_eTag_PnDevice,
+//   gsdmldata_eTag_NetworkSettings,
+//   gsdmldata_eTag_Slot,
+//   gsdmldata_eTag_Subslot,
+//   gsdmldata_eTag_DataRecord,
+//   gsdmldata_eTag_IOCR,
+//   gsdmldata_eTag_ChannelDiag,
+//   gsdmldata_eTag_ExtChannelDiag,
+//   gsdmldata_eTag__
+// } gsdmldata_eTag;
 
-GsdmlSlotData* GsdmlDeviceData::paste_slotdata = 0;
+// GsdmlSlotData* GsdmlDeviceData::paste_slotdata = 0;
 ProfinetSlot* ProfinetRuntimeData::m_paste_slotdata = 0;
 
-GsdmlExtChannelDiag::GsdmlExtChannelDiag() : error_type(0)
-{
-  memset(name, 0, sizeof(name));
-  memset(help, 0, sizeof(help));
-}
+// GsdmlExtChannelDiag::GsdmlExtChannelDiag() : error_type(0)
+// {
+//   memset(name, 0, sizeof(name));
+//   memset(help, 0, sizeof(help));
+// }
 
-GsdmlChannelDiag::GsdmlChannelDiag() : error_type(0)
-{
-  memset(name, 0, sizeof(name));
-  memset(help, 0, sizeof(help));
-}
+// GsdmlChannelDiag::GsdmlChannelDiag() : error_type(0)
+// {
+//   memset(name, 0, sizeof(name));
+//   memset(help, 0, sizeof(help));
+// }
 
-int GsdmlExtChannelDiag::print(std::ofstream& fp)
-{
-  fp << "           <ExtChannelDiag ErrorType=\"" << error_type << "\"\n"
-     << "             Name=\"" << name << "\"\n"
-     << "             Help=\"" << help << "\" />\n";
+// int GsdmlExtChannelDiag::print(std::ofstream& fp) {
+//   fp << "           <ExtChannelDiag ErrorType=\"" << error_type << "\"\n"
+//      << "             Name=\"" << name << "\"\n"
+//      << "             Help=\"" << help << "\" />\n";
 
-  return 1;
-}
+//   return 1;
+// }
 
-int GsdmlChannelDiag::print(std::ofstream& fp)
-{
-  fp << "      <ChannelDiag ErrorType=\"" << error_type << "\"\n"
-     << "         Name=\"" << name << "\"\n"
-     << "         Help=\"" << help << "\">\n";
+// int GsdmlChannelDiag::print(std::ofstream& fp)
+// {
+//   fp << "      <ChannelDiag ErrorType=\"" << error_type << "\"\n"
+//      << "         Name=\"" << name << "\"\n"
+//      << "         Help=\"" << help << "\">\n";
 
-  for (auto& ecd : ext_channel_diag)
-    ecd->print(fp);
+//   for (auto& ecd : ext_channel_diag)
+//     ecd->print(fp);
 
-  fp << "      </ChannelDiag>\n";
-  return 1;
-}
+//   fp << "      </ChannelDiag>\n";
+//   return 1;
+// }
 
-GsdmlDataRecord::GsdmlDataRecord(const GsdmlDataRecord& x)
-    : record_idx(x.record_idx), data(x.data), data_length(x.data_length), index(x.index),
-      transfer_sequence(x.transfer_sequence)
-{
-  if (data)
-  {
-    data = (unsigned char*)malloc(data_length);
-    memcpy(data, x.data, data_length);
-  }
-}
+// GsdmlDataRecord::GsdmlDataRecord(const GsdmlDataRecord& x)
+//     : record_idx(x.record_idx), data(x.data), data_length(x.data_length),
+//       index(x.index), transfer_sequence(x.transfer_sequence)
+// {
+//   if (data)
+//   {
+//     data = (unsigned char*)malloc(data_length);
+//     memcpy(data, x.data, data_length);
+//   }
+// }
 
-int GsdmlDataRecord::print(std::ofstream& fp, bool reverse_endianess)
-{
-  char str[1024];
-  unsigned char* data;
+// int GsdmlDataRecord::print(std::ofstream& fp, bool reverse_endianess)
+// {
+//   char str[1024];
+//   unsigned char* data;
 
-  // If we have allocated memory for reversed endianess we come from the pn
-  // configurator otherwise we use the data as is. The method SetIoDeviceData
-  // for instance reads the raw data and then recreates the pn configuration
-  // file.
-  if (data_reversed_endianess)
-  {
-    data = (reverse_endianess ? this->data_reversed_endianess : this->data);
-  }
-  else
-  {
-    data = this->data;
-  }
+//   // If we have allocated memory for reversed endianess we come from the pn
+//   // configurator otherwise we use the data as is. The method SetIoDeviceData
+//   // for instance reads the raw data and then recreates the pn configuration
+//   // file.
+//   if (data_reversed_endianess)
+//   {
+//     data = (reverse_endianess ? this->data_reversed_endianess : this->data);
+//   }
+//   else
+//   {
+//     data = this->data;
+//   }
 
-  co_xml_parser::data_to_ostring(data, data_length, str, sizeof(str));
+//   co_xml_parser::data_to_ostring(data, data_length, str, sizeof(str));
 
-  fp << "      <DataRecord Index=\"" << index << "\"\n"
-     << "         TransferSequence=\"" << transfer_sequence << "\"\n"
-     << "         DataLength=\"" << data_length << "\"\n"
-     << "         Data=\"" << str << "\" />\n";
+//   fp << "      <DataRecord Index=\"" << index << "\"\n"
+//      << "         TransferSequence=\"" << transfer_sequence << "\"\n"
+//      << "         DataLength=\"" << data_length << "\"\n"
+//      << "         Data=\"" << str << "\" />\n";
 
-  return 1;
-}
+//   return 1;
+// }
 
-int GsdmlSubslotData::print(std::ofstream& fp, bool reverse_endianess)
-{
-  fp << "    <Subslot SubslotNumber=\"" << subslot_number << "\"\n"
-     << "       SubmoduleEnumNumber=\"" << submodule_enum_number << "\"\n"
-     << "       SubmoduleIdentNumber=\"" << submodule_ident_number << "\"\n"
-     << "       API=\"" << api << "\"\n"
-     << "       IOInputLength=\"" << io_input_length << "\"\n"
-     << "       IOOutputLength=\"" << io_output_length << "\" >\n";
+// int GsdmlSubslotData::print(std::ofstream& fp, bool reverse_endianess)
+// {
+//   fp << "    <Subslot SubslotNumber=\"" << subslot_number << "\"\n"
+//      << "       SubmoduleEnumNumber=\"" << submodule_enum_number << "\"\n"
+//      << "       SubmoduleIdentNumber=\"" << submodule_ident_number << "\"\n"
+//      << "       API=\"" << api << "\"\n"
+//      << "       IOInputLength=\"" << io_input_length << "\"\n"
+//      << "       IOOutputLength=\"" << io_output_length << "\" >\n";
 
-  for (unsigned int i = 0; i < data_record.size(); i++)
-  {
-    data_record[i]->print(fp, reverse_endianess);
-  }
+//   for (unsigned int i = 0; i < data_record.size(); i++)
+//   {
+//     data_record[i]->print(fp, reverse_endianess);
+//   }
 
-  fp << "    </Subslot>\n";
-  return 1;
-}
+//   fp << "    </Subslot>\n";
+//   return 1;
+// }
 
-int GsdmlSlotData::print(std::ofstream& fp, bool reverse_endianess)
-{
-  fp << "  <Slot ModuleEnumNumber=\"" << module_enum_number << "\"\n"
-     << "        ModuleIdentNumber=\"" << module_ident_number << "\"\n"
-     << "        ModuleClass=\"" << module_class << "\"\n"
-     << "        ModuleText=\"" << module_text << "\"\n"
-     << "        SlotNumber=\"" << slot_number << "\"\n"
-     << "        DapFixedInSlot=\"" << dap_fixed_slot << "\" >\n";
+// int GsdmlSlotData::print(std::ofstream& fp, bool reverse_endianess)
+// {
+//   fp << "  <Slot ModuleEnumNumber=\"" << module_enum_number << "\"\n"
+//      << "        ModuleIdentNumber=\"" << module_ident_number << "\"\n"
+//      << "        ModuleClass=\"" << module_class << "\"\n"
+//      << "        ModuleText=\"" << module_text << "\"\n"
+//      << "        SlotNumber=\"" << slot_number << "\"\n"
+//      << "        DapFixedInSlot=\"" << dap_fixed_slot << "\" >\n";
 
-  for (unsigned int i = 0; i < subslot_data.size(); i++)
-  {
-    subslot_data[i]->print(fp, reverse_endianess);
-  }
+//   for (unsigned int i = 0; i < subslot_data.size(); i++)
+//   {
+//     subslot_data[i]->print(fp, reverse_endianess);
+//   }
 
-  fp << "  </Slot>\n";
-  return 1;
-}
+//   fp << "  </Slot>\n";
+//   return 1;
+// }
 
-int GsdmlIOCRData::print(std::ofstream& fp)
-{
-  fp << "  <IOCR Type=\"" << type << "\"\n"
-     << "    Properties=\"" << properties << "\"\n"
-     << "    SendClockFactor=\"" << send_clock_factor << "\"\n"
-     << "    ReductionRatio=\"" << reduction_ratio << "\"\n"
-     << "    Phase=\"" << phase << "\"\n"
-     << "    API=\"" << api << "\" />\n";
+// int GsdmlIOCRData::print(std::ofstream& fp)
+// {
+//   fp << "  <IOCR Type=\"" << type << "\"\n"
+//      << "    Properties=\"" << properties << "\"\n"
+//      << "    SendClockFactor=\"" << send_clock_factor << "\"\n"
+//      << "    ReductionRatio=\"" << reduction_ratio << "\"\n"
+//      << "    Phase=\"" << phase << "\"\n"
+//      << "    API=\"" << api << "\" />\n";
 
-  return 1;
-}
+//   return 1;
+// }
 
-int GsdmlDeviceData::print(const char* filename)
-{
-  pwr_tFileName fname;
-  std::ofstream fp;
-  char* gsdmlfile_p;
-  bool reverse_endianess = false;
+// int GsdmlDeviceData::print(const char* filename)
+// {
+//   pwr_tFileName fname;
+//   std::ofstream fp;
+//   char* gsdmlfile_p;
+//   bool reverse_endianess = false;
 
-  // Print name of gsdmlfile, not path
-  if ((gsdmlfile_p = strrchr(gsdmlfile, '/')))
-    gsdmlfile_p++;
-  else
-    gsdmlfile_p = gsdmlfile;
+//   // Print name of gsdmlfile, not path
+//   if ((gsdmlfile_p = strrchr(gsdmlfile, '/')))
+//     gsdmlfile_p++;
+//   else
+//     gsdmlfile_p = gsdmlfile;
 
-  dcli_translate_filename(fname, filename);
+//   dcli_translate_filename(fname, filename);
 
-  fp.open(fname);
+//   fp.open(fname);
 
-  fp << "<PnDevice GsdmlFile=\"" << gsdmlfile_p << "\"\n"
-     << "  DeviceNumber=\"" << device_num << "\"\n"
-     << "  DeviceText=\"" << device_text << "\"\n"
-     << "  VendorId=\"" << vendor_id << "\"\n"
-     << "  DeviceId=\"" << device_id << "\"\n"
-     << "  Version=\"" << version << "\"\n"
-     << "  ByteOrder=\"" << byte_order << "\"\n"
-     << "  Instance=\"" << instance << "\">\n"
-     << "  <NetworkSettings \n"
-     << "    DeviceName=\"" << device_name << "\"\n"
-     << "    IP_Address=\"" << ip_address << "\"\n"
-     << "    SubnetMask=\"" << subnet_mask << "\"\n"
-     << "    MAC_Address=\"" << mac_address << "\"\n"
-     << "    Skip_IP_Assignment=\"" << skip_ip_assignment << "\" />\n";
+//   fp << "<PnDevice GsdmlFile=\"" << gsdmlfile_p << "\"\n"
+//      << "  DeviceNumber=\"" << device_num << "\"\n"
+//      << "  DeviceText=\"" << device_text << "\"\n"
+//      << "  VendorId=\"" << vendor_id << "\"\n"
+//      << "  DeviceId=\"" << device_id << "\"\n"
+//      << "  Version=\"" << version << "\"\n"
+//      << "  ByteOrder=\"" << byte_order << "\"\n"
+//      << "  Instance=\"" << instance << "\">\n"
+//      << "  <NetworkSettings \n"
+//      << "    DeviceName=\"" << device_name << "\"\n"
+//      << "    IP_Address=\"" << ip_address << "\"\n"
+//      << "    SubnetMask=\"" << subnet_mask << "\"\n"
+//      << "    MAC_Address=\"" << mac_address << "\"\n"
+//      << "    Skip_IP_Assignment=\"" << skip_ip_assignment << "\" />\n";
 
-// Save in accordance to the chosen endianess
-#if (pwr_dHost_byteOrder == pwr_dLittleEndian)
-  if (byte_order == pwr_eByteOrderingEnum_LittleEndian)
-  {
-    reverse_endianess = false;
-  }
-  else
-  {
-    // We use the data saved as the reversed endianess
-    reverse_endianess = true;
-  }
-#elif (pwr_dHost_byteOrder == pwr_dBigEndian)
-  if (byte_order == pwr_eByteOrderingEnum_LittleEndian)
-  {
-    reverse_endianess = true;
-  }
-  else
-  {
-    reverse_endianess = false;
-  }
-#endif
+// // Save in accordance to the chosen endianess
+// #if (pwr_dHost_byteOrder == pwr_dLittleEndian)
+//   if (byte_order == pwr_eByteOrderingEnum_LittleEndian)
+//   {
+//     reverse_endianess = false;
+//   }
+//   else
+//   {
+//     // We use the data saved as the reversed endianess
+//     reverse_endianess = true;
+//   }
+// #elif (pwr_dHost_byteOrder == pwr_dBigEndian)
+//   if (byte_order == pwr_eByteOrderingEnum_LittleEndian)
+//   {
+//     reverse_endianess = true;
+//   }
+//   else
+//   {
+//     reverse_endianess = false;
+//   }
+// #endif
 
-  for (unsigned int i = 0; i < slot_data.size(); i++)
-  {
-    slot_data[i]->print(fp, reverse_endianess);
-  }
-  for (unsigned int i = 0; i < iocr_data.size(); i++)
-  {
-    iocr_data[i]->print(fp);
-  }
-  for (unsigned int i = 0; i < channel_diag.size(); i++)
-  {
-    channel_diag[i]->print(fp);
-  }
+//   for (unsigned int i = 0; i < slot_data.size(); i++)
+//   {
+//     slot_data[i]->print(fp, reverse_endianess);
+//   }
+//   for (unsigned int i = 0; i < iocr_data.size(); i++)
+//   {
+//     iocr_data[i]->print(fp);
+//   }
+//   for (unsigned int i = 0; i < channel_diag.size(); i++)
+//   {
+//     channel_diag[i]->print(fp);
+//   }
 
-  fp << "</PnDevice>\n";
+//   fp << "</PnDevice>\n";
 
-  fp.close();
+//   fp.close();
 
-  return PB__SUCCESS;
-}
+//   return PB__SUCCESS;
+// }
 
 ProfinetExtChannelDiag::ProfinetExtChannelDiag(pugi::xml_node&& p_ExtChannelDiag)
     : m_name(p_ExtChannelDiag.attribute("Name").as_string()),
@@ -305,7 +304,7 @@ ProfinetIOCR::ProfinetIOCR(pugi::xml_node&& p_IOCR)
       m_phase(p_IOCR.attribute("Phase").as_uint()), m_api(p_IOCR.attribute("API").as_uint()),
       m_rt_class(p_IOCR.attribute("RT_CLASS").as_string()),
       m_startup_mode(p_IOCR.attribute("StartupMode").as_string())
-{
+{  
 }
 
 void ProfinetIOCR::build(pugi::xml_node&& p_iocr, uint type) const
@@ -383,12 +382,27 @@ ProfinetSubslot::ProfinetSubslot(pugi::xml_node&& p_Subslot)
       m_submodule_ident_number(p_Subslot.attribute("SubmoduleIdentNumber").as_uint()),
       m_io_input_length(p_Subslot.attribute("IOInputLength").as_uint()),
       m_io_output_length(p_Subslot.attribute("IOOutputLength").as_uint()),
-      m_submodule_ID(p_Subslot.attribute("ID").as_string())
+      m_api(p_Subslot.attribute("API").as_uint()),
+      m_submodule_ID(p_Subslot.attribute("ID").as_string()),
+      m_io_submodule_type(PROFINET_IO_SUBMODULE_TYPE_NO_INPUT_NO_OUTPUT)
 {
   for (pugi::xml_node& data_record : p_Subslot.children("DataRecord"))
   {
     uint index = data_record.attribute("Index").as_uint();
     m_data_record_map.emplace(index, ProfinetDataRecord(std::move(data_record)));
+  }
+
+  // Set submodule input type for this subslot. We only need this in the constructor and
+  // we don't need to bother updating this since we only need this data in the runtime where it is read from
+  // the file only once
+  if (m_io_input_length > 0)
+  {
+    m_io_submodule_type = PROFINET_IO_SUBMODULE_TYPE_INPUT;
+  }
+
+  if (m_io_output_length > 0)
+  {
+    m_io_submodule_type |= PROFINET_IO_SUBMODULE_TYPE_OUTPUT;
   }
 }
 
@@ -411,6 +425,10 @@ ProfinetSubslot::ProfinetSubslot(ProfinetSubslot const& other)
   m_submodule_ID = other.m_submodule_ID;
   m_submodule_ident_number = other.m_submodule_ident_number;
   m_subslot_number = other.m_subslot_number;
+  m_api = other.m_api;
+
+  // We can safely ignore "Runtime specific" member variables since we don't be copy construct these classes
+  // in the runtime
 }
 
 void ProfinetSubslot::build(pugi::xml_node&& p_subslot) const
@@ -421,6 +439,7 @@ void ProfinetSubslot::build(pugi::xml_node&& p_subslot) const
   p_subslot.append_attribute("IOInputLength").set_value(m_io_input_length);
   p_subslot.append_attribute("IOOutputLength").set_value(m_io_output_length);
   p_subslot.append_attribute("ID").set_value(m_submodule_ID.c_str());
+  p_subslot.append_attribute("API").set_value(m_api);
 
   // DataRecords
   for (auto const& datarecord : m_data_record_map)
@@ -455,7 +474,6 @@ ProfinetSlot& ProfinetSlot::operator=(ProfinetSlot const& other)
   if (this == &other)
     return *this;
 
-  m_api = other.m_api;
   m_is_modified = true;
   m_module_class = other.m_module_class;
   m_module_ID = other.m_module_ID;
@@ -560,6 +578,11 @@ void ProfinetDevice::build(pugi::xml_node&& p_pn_device) const
   }
 }
 
+void ProfinetRuntimeData::reset_to_default() { 
+  m_PnDevice.reset(new ProfinetDevice);
+  m_PnDevice->m_pn_local_runtime_data.reset(new PnDeviceData);
+}
+
 void ProfinetRuntimeData::reset_to_default() { m_PnDevice.reset(new ProfinetDevice()); }
 
 int ProfinetRuntimeData::read_pwr_pn_xml(std::string const& p_filename, std::string const& p_gsdml_file)
@@ -607,484 +630,487 @@ bool ProfinetRuntimeData::save() const
   return doc.save_file(m_pwr_pn_filename.c_str());
 }
 
-int GsdmlDeviceData::read(const char* filename, int new_filename)
-{
-  int sts;
-  GsdmlDataReader* reader = new GsdmlDataReader(this);
-  co_xml_parser* xml_parser = new co_xml_parser(reader);
+// int GsdmlDeviceData::read(const char* filename, int new_filename)
+// {
+//   int sts;
+//   GsdmlDataReader* reader = new GsdmlDataReader(this);
+//   co_xml_parser* xml_parser = new co_xml_parser(reader);
 
-  reader->new_filename = new_filename;
-  sts = xml_parser->read(filename);
-  delete xml_parser;
-  delete reader;
+//   reader->new_filename = new_filename;
+//   sts = xml_parser->read(filename);
+//   delete xml_parser;
+//   delete reader;
 
-  return sts;
-}
+//   return sts;
+// }
 
-int GsdmlDeviceData::copy_slot(unsigned int slot_idx)
-{
-  if (slot_idx >= slot_data.size())
-    return 0;
+// int GsdmlDeviceData::copy_slot(unsigned int slot_idx)
+// {
+//   if (slot_idx >= slot_data.size())
+//     return 0;
 
-  if (paste_slotdata)
-    delete paste_slotdata;
+//   if (paste_slotdata)
+//     delete paste_slotdata;
 
-  paste_slotdata = new GsdmlSlotData(*slot_data[slot_idx]);
-  return PB__SUCCESS;
-}
+//   paste_slotdata = new GsdmlSlotData(*slot_data[slot_idx]);
+//   return PB__SUCCESS;
+// }
 
-int GsdmlDeviceData::cut_slot(unsigned int slot_idx)
-{
-  if (slot_idx >= slot_data.size())
-    return 0;
+// int GsdmlDeviceData::cut_slot(unsigned int slot_idx)
+// {
+//   if (slot_idx >= slot_data.size())
+//     return 0;
 
-  unsigned int tmp_slot_idx;
-  unsigned int tmp_slot_number;
-  unsigned int prev_slot_idx = slot_data[slot_idx]->slot_idx;
-  unsigned int prev_slot_number = slot_data[slot_idx]->slot_number;
+//   unsigned int tmp_slot_idx;
+//   unsigned int tmp_slot_number;
+//   unsigned int prev_slot_idx = slot_data[slot_idx]->slot_idx;
+//   unsigned int prev_slot_number = slot_data[slot_idx]->slot_number;
 
-  delete slot_data[slot_idx];
+//   delete slot_data[slot_idx];
 
-  for (unsigned int i = slot_idx; i < slot_data.size() - 1; i++)
-  {
-    tmp_slot_idx = slot_data[i + 1]->slot_idx;
-    tmp_slot_number = slot_data[i + 1]->slot_number;
+//   for (unsigned int i = slot_idx; i < slot_data.size() - 1; i++)
+//   {
+//     tmp_slot_idx = slot_data[i + 1]->slot_idx;
+//     tmp_slot_number = slot_data[i + 1]->slot_number;
 
-    slot_data[i] = slot_data[i + 1];
+//     slot_data[i] = slot_data[i + 1];
 
-    slot_data[i]->slot_idx = prev_slot_idx;
-    slot_data[i]->slot_number = prev_slot_number;
-    prev_slot_idx = tmp_slot_idx;
-    prev_slot_number = tmp_slot_number;
-  }
-  slot_data[slot_data.size() - 1] = new GsdmlSlotData();
-  slot_data[slot_data.size() - 1]->slot_idx = prev_slot_idx;
-  slot_data[slot_data.size() - 1]->slot_number = prev_slot_number;
-  return PB__SUCCESS;
-}
+//     slot_data[i]->slot_idx = prev_slot_idx;
+//     slot_data[i]->slot_number = prev_slot_number;
+//     prev_slot_idx = tmp_slot_idx;
+//     prev_slot_number = tmp_slot_number;
+//   }
+//   slot_data[slot_data.size() - 1] = new GsdmlSlotData();
+//   slot_data[slot_data.size() - 1]->slot_idx = prev_slot_idx;
+//   slot_data[slot_data.size() - 1]->slot_number = prev_slot_number;
+//   return PB__SUCCESS;
+// }
 
-int GsdmlDeviceData::paste_slot(unsigned int slot_idx)
-{
-  if (slot_idx >= slot_data.size())
-    return 0;
+// int GsdmlDeviceData::paste_slot(unsigned int slot_idx)
+// {
+//   if (slot_idx >= slot_data.size())
+//     return 0;
 
-  if (!paste_slotdata)
-    return 0;
+//   if (!paste_slotdata)
+//     return 0;
 
-  unsigned int tmp_slot_idx;
-  unsigned int tmp_slot_number;
-  unsigned int prev_slot_idx = slot_data[slot_data.size() - 1]->slot_idx;
-  unsigned int prev_slot_number = slot_data[slot_data.size() - 1]->slot_number;
+//   unsigned int tmp_slot_idx;
+//   unsigned int tmp_slot_number;
+//   unsigned int prev_slot_idx = slot_data[slot_data.size() - 1]->slot_idx;
+//   unsigned int prev_slot_number = slot_data[slot_data.size() - 1]->slot_number;
 
-  delete slot_data[slot_data.size() - 1];
+//   delete slot_data[slot_data.size() - 1];
 
-  for (unsigned int i = slot_data.size() - 1; i > slot_idx; i--)
-  {
-    tmp_slot_idx = slot_data[i - 1]->slot_idx;
-    tmp_slot_number = slot_data[i - 1]->slot_number;
+//   for (unsigned int i = slot_data.size() - 1; i > slot_idx; i--)
+//   {
+//     tmp_slot_idx = slot_data[i - 1]->slot_idx;
+//     tmp_slot_number = slot_data[i - 1]->slot_number;
 
-    slot_data[i] = slot_data[i - 1];
+//     slot_data[i] = slot_data[i - 1];
 
-    slot_data[i]->slot_idx = prev_slot_idx;
-    slot_data[i]->slot_number = prev_slot_number;
-    prev_slot_idx = tmp_slot_idx;
-    prev_slot_number = tmp_slot_number;
-  }
-  slot_data[slot_idx] = new GsdmlSlotData(*paste_slotdata);
-  slot_data[slot_idx]->slot_idx = prev_slot_idx;
-  slot_data[slot_idx]->slot_number = prev_slot_number;
-  return PB__SUCCESS;
-}
+//     slot_data[i]->slot_idx = prev_slot_idx;
+//     slot_data[i]->slot_number = prev_slot_number;
+//     prev_slot_idx = tmp_slot_idx;
+//     prev_slot_number = tmp_slot_number;
+//   }
+//   slot_data[slot_idx] = new GsdmlSlotData(*paste_slotdata);
+//   slot_data[slot_idx]->slot_idx = prev_slot_idx;
+//   slot_data[slot_idx]->slot_number = prev_slot_number;
+//   return PB__SUCCESS;
+// }
 
-int GsdmlDeviceData::modify_value(const char* attr, const char* value)
-{
-  char attrvect[10][80];
-  int num;
-  int ival, num2;
+// int GsdmlDeviceData::modify_value(const char* attr, const char* value)
+// {
+//   char attrvect[10][80];
+//   int num;
+//   int ival, num2;
 
-  num = dcli_parse(attr, "-", "", (char*)attrvect, sizeof(attrvect) / sizeof(attrvect[0]),
-                   sizeof(attrvect[0]), 0);
+//   num = dcli_parse(attr, "-", "", (char*)attrvect,
+//                    sizeof(attrvect) / sizeof(attrvect[0]), sizeof(attrvect[0]),
+//                    0);
 
-  if (streq(attrvect[0], "NetworkSettings"))
-  {
-    if (num < 2)
-      return 0;
-    if (streq(attrvect[1], "DeviceName"))
-      strncpy(device_name, value, sizeof(device_name));
-    else if (streq(attrvect[1], "IP Address"))
-      strncpy(ip_address, value, sizeof(ip_address));
-    else if (streq(attrvect[1], "Subnet Mask"))
-      strncpy(subnet_mask, value, sizeof(subnet_mask));
-    else if (streq(attrvect[1], "MAC Address"))
-      strncpy(mac_address, value, sizeof(mac_address));
-    else if (streq(attrvect[1], "SendClock"))
-    {
-      num2 = sscanf(value, "%d", &ival);
-      if (num2 != 1)
-        return 0;
-      for (unsigned int i = 0; i < iocr_data.size(); i++)
-        iocr_data[i]->send_clock_factor = ival;
-    }
-    else if (streq(attrvect[1], "ReductionRatio"))
-    {
-      num2 = sscanf(value, "%d", &ival);
-      if (num2 != 1)
-        return 0;
-      for (unsigned int i = 0; i < iocr_data.size(); i++)
-        iocr_data[i]->reduction_ratio = ival;
-    }
-    else if (streq(attrvect[1], "Phase"))
-    {
-      num2 = sscanf(value, "%d", &ival);
-      if (num2 != 1)
-        return 0;
-      for (unsigned int i = 0; i < iocr_data.size(); i++)
-        iocr_data[i]->phase = ival;
-    }
-    else if (streq(attrvect[1], "API"))
-    {
-      num2 = sscanf(value, "%d", &ival);
-      if (num2 != 1)
-        return 0;
-      for (unsigned int i = 0; i < iocr_data.size(); i++)
-        iocr_data[i]->api = ival;
-    }
-    else
-      return 0;
-  }
-  else
-    return 0;
-  return 1;
-}
+//   if (streq(attrvect[0], "NetworkSettings"))
+//   {
+//     if (num < 2)
+//       return 0;
+//     if (streq(attrvect[1], "DeviceName"))
+//       strncpy(device_name, value, sizeof(device_name));
+//     else if (streq(attrvect[1], "IP Address"))
+//       strncpy(ip_address, value, sizeof(ip_address));
+//     else if (streq(attrvect[1], "Subnet Mask"))
+//       strncpy(subnet_mask, value, sizeof(subnet_mask));
+//     else if (streq(attrvect[1], "MAC Address"))
+//       strncpy(mac_address, value, sizeof(mac_address));
+//     else if (streq(attrvect[1], "SendClock"))
+//     {
+//       num2 = sscanf(value, "%d", &ival);
+//       if (num2 != 1)
+//         return 0;
+//       for (unsigned int i = 0; i < iocr_data.size(); i++)
+//         iocr_data[i]->send_clock_factor = ival;
+//     }
+//     else if (streq(attrvect[1], "ReductionRatio"))
+//     {
+//       num2 = sscanf(value, "%d", &ival);
+//       if (num2 != 1)
+//         return 0;
+//       for (unsigned int i = 0; i < iocr_data.size(); i++)
+//         iocr_data[i]->reduction_ratio = ival;
+//     }
+//     else if (streq(attrvect[1], "Phase"))
+//     {
+//       num2 = sscanf(value, "%d", &ival);
+//       if (num2 != 1)
+//         return 0;
+//       for (unsigned int i = 0; i < iocr_data.size(); i++)
+//         iocr_data[i]->phase = ival;
+//     }
+//     else if (streq(attrvect[1], "API"))
+//     {
+//       num2 = sscanf(value, "%d", &ival);
+//       if (num2 != 1)
+//         return 0;
+//       for (unsigned int i = 0; i < iocr_data.size(); i++)
+//         iocr_data[i]->api = ival;
+//     }
+//     else
+//       return 0;
+//   }
+//   else
+//     return 0;
+//   return 1;
+// }
 
-int GsdmlDeviceData::get_value(const char* attr, char* buf, int bufsize)
-{
-  char attrvect[10][80];
-  int num;
+// int GsdmlDeviceData::get_value(const char* attr, char* buf, int bufsize)
+// {
+//   char attrvect[10][80];
+//   int num;
 
-  num = dcli_parse(attr, "-", "", (char*)attrvect, sizeof(attrvect) / sizeof(attrvect[0]),
-                   sizeof(attrvect[0]), 0);
+//   num = dcli_parse(attr, "-", "", (char*)attrvect,
+//                    sizeof(attrvect) / sizeof(attrvect[0]), sizeof(attrvect[0]),
+//                    0);
 
-  if (streq(attrvect[0], "NetworkSettings"))
-  {
-    if (num < 2)
-      return 0;
-    if (streq(attrvect[1], "DeviceName"))
-      strncpy(buf, device_name, bufsize);
-    else if (streq(attrvect[1], "IP Address"))
-      strncpy(buf, ip_address, bufsize);
-    else if (streq(attrvect[1], "Subnet Mask"))
-      strncpy(buf, subnet_mask, bufsize);
-    else if (streq(attrvect[1], "MAC Address"))
-      strncpy(buf, mac_address, bufsize);
-    else if (streq(attrvect[1], "SendClock"))
-      snprintf(buf, bufsize, "%d", iocr_data[0]->send_clock_factor);
-    else if (streq(attrvect[1], "ReductionRatio"))
-      snprintf(buf, bufsize, "%d", iocr_data[0]->reduction_ratio);
-    else if (streq(attrvect[1], "Phase"))
-      snprintf(buf, bufsize, "%d", iocr_data[0]->phase);
-    else if (streq(attrvect[1], "API"))
-      snprintf(buf, bufsize, "%d", iocr_data[0]->api);
-    else
-      return 0;
-  }
-  else
-    return 0;
-  return 1;
-}
+//   if (streq(attrvect[0], "NetworkSettings"))
+//   {
+//     if (num < 2)
+//       return 0;
+//     if (streq(attrvect[1], "DeviceName"))
+//       strncpy(buf, device_name, bufsize);
+//     else if (streq(attrvect[1], "IP Address"))
+//       strncpy(buf, ip_address, bufsize);
+//     else if (streq(attrvect[1], "Subnet Mask"))
+//       strncpy(buf, subnet_mask, bufsize);
+//     else if (streq(attrvect[1], "MAC Address"))
+//       strncpy(buf, mac_address, bufsize);
+//     else if (streq(attrvect[1], "SendClock"))
+//       snprintf(buf, bufsize, "%d", iocr_data[0]->send_clock_factor);
+//     else if (streq(attrvect[1], "ReductionRatio"))
+//       snprintf(buf, bufsize, "%d", iocr_data[0]->reduction_ratio);
+//     else if (streq(attrvect[1], "Phase"))
+//       snprintf(buf, bufsize, "%d", iocr_data[0]->phase);
+//     else if (streq(attrvect[1], "API"))
+//       snprintf(buf, bufsize, "%d", iocr_data[0]->api);
+//     else
+//       return 0;
+//   }
+//   else
+//     return 0;
+//   return 1;
+// }
 
-int GsdmlDataReader::tag_name_to_id(const char* name, unsigned int* id)
-{
-  if (streq(name, "PnDevice"))
-    *id = gsdmldata_eTag_PnDevice;
-  else if (streq(name, "NetworkSettings"))
-    *id = gsdmldata_eTag_NetworkSettings;
-  else if (streq(name, "Slot"))
-    *id = gsdmldata_eTag_Slot;
-  else if (streq(name, "Subslot"))
-    *id = gsdmldata_eTag_Subslot;
-  else if (streq(name, "DataRecord"))
-    *id = gsdmldata_eTag_DataRecord;
-  else if (streq(name, "IOCR"))
-    *id = gsdmldata_eTag_IOCR;
-  else if (streq(name, "ChannelDiag"))
-    *id = gsdmldata_eTag_ChannelDiag;
-  else if (streq(name, "ExtChannelDiag"))
-    *id = gsdmldata_eTag_ExtChannelDiag;
-  else
-    return 0;
+// int GsdmlDataReader::tag_name_to_id(const char* name, unsigned int* id)
+// {
+//   if (streq(name, "PnDevice"))
+//     *id = gsdmldata_eTag_PnDevice;
+//   else if (streq(name, "NetworkSettings"))
+//     *id = gsdmldata_eTag_NetworkSettings;
+//   else if (streq(name, "Slot"))
+//     *id = gsdmldata_eTag_Slot;
+//   else if (streq(name, "Subslot"))
+//     *id = gsdmldata_eTag_Subslot;
+//   else if (streq(name, "DataRecord"))
+//     *id = gsdmldata_eTag_DataRecord;
+//   else if (streq(name, "IOCR"))
+//     *id = gsdmldata_eTag_IOCR;
+//   else if (streq(name, "ChannelDiag"))
+//     *id = gsdmldata_eTag_ChannelDiag;
+//   else if (streq(name, "ExtChannelDiag"))
+//     *id = gsdmldata_eTag_ExtChannelDiag;
+//   else
+//     return 0;
 
-  return 1;
-}
+//   return 1;
+// }
 
-int GsdmlDataReader::tag(const char* name)
-{
-  if (tag_name_to_id(name, &current_tag))
-    tag_stack_push(current_tag);
-  else
-  {
-    printf("XML-Parser: Unknown tag: %s\n", name);
-    return 0;
-  }
+// int GsdmlDataReader::tag(const char* name)
+// {
+//   if (tag_name_to_id(name, &current_tag))
+//     tag_stack_push(current_tag);
+//   else
+//   {
+//     printf("XML-Parser: Unknown tag: %s\n", name);
+//     return 0;
+//   }
 
-  switch (current_tag)
-  {
-  case gsdmldata_eTag_Slot:
-  {
-    GsdmlSlotData* sd = new GsdmlSlotData();
+//   switch (current_tag)
+//   {
+//   case gsdmldata_eTag_Slot:
+//   {
+//     GsdmlSlotData* sd = new GsdmlSlotData();
 
-    data->slot_data.push_back(sd);
-    object_stack_push(sd, current_tag);
-    break;
-  }
-  case gsdmldata_eTag_Subslot:
-  {
-    GsdmlSlotData* sd = (GsdmlSlotData*)get_object_stack(gsdmldata_eTag_Slot);
-    if (!sd)
-    {
-      printf("XML-Parser: Subslot outside slot");
-      break;
-    }
+//     data->slot_data.push_back(sd);
+//     object_stack_push(sd, current_tag);
+//     break;
+//   }
+//   case gsdmldata_eTag_Subslot:
+//   {
+//     GsdmlSlotData* sd = (GsdmlSlotData*)get_object_stack(gsdmldata_eTag_Slot);
+//     if (!sd)
+//     {
+//       printf("XML-Parser: Subslot outside slot");
+//       break;
+//     }
 
-    GsdmlSubslotData* ssd = new GsdmlSubslotData();
+//     GsdmlSubslotData* ssd = new GsdmlSubslotData();
 
-    sd->subslot_data.push_back(ssd);
-    object_stack_push(ssd, current_tag);
-    break;
-  }
-  case gsdmldata_eTag_DataRecord:
-  {
-    GsdmlSubslotData* ssd = (GsdmlSubslotData*)get_object_stack(gsdmldata_eTag_Subslot);
-    if (!ssd)
-    {
-      printf("XML-Parser: RecordData outside subslot\n");
-      break;
-    }
+//     sd->subslot_data.push_back(ssd);
+//     object_stack_push(ssd, current_tag);
+//     break;
+//   }
+//   case gsdmldata_eTag_DataRecord:
+//   {
+//     GsdmlSubslotData* ssd =
+//         (GsdmlSubslotData*)get_object_stack(gsdmldata_eTag_Subslot);
+//     if (!ssd)
+//     {
+//       printf("XML-Parser: RecordData outside subslot\n");
+//       break;
+//     }
 
-    GsdmlDataRecord* dr = new GsdmlDataRecord();
+//     GsdmlDataRecord* dr = new GsdmlDataRecord();
 
-    ssd->data_record.push_back(dr);
-    object_stack_push(dr, current_tag);
-    break;
-  }
-  case gsdmldata_eTag_IOCR:
-  {
-    GsdmlIOCRData* iod = new GsdmlIOCRData();
+//     ssd->data_record.push_back(dr);
+//     object_stack_push(dr, current_tag);
+//     break;
+//   }
+//   case gsdmldata_eTag_IOCR:
+//   {
+//     GsdmlIOCRData* iod = new GsdmlIOCRData();
 
-    data->iocr_data.push_back(iod);
-    object_stack_push(iod, current_tag);
-    break;
-  }
-  case gsdmldata_eTag_ChannelDiag:
-  {
-    GsdmlChannelDiag* cd = new GsdmlChannelDiag();
+//     data->iocr_data.push_back(iod);
+//     object_stack_push(iod, current_tag);
+//     break;
+//   }
+//   case gsdmldata_eTag_ChannelDiag:
+//   {
+//     GsdmlChannelDiag* cd = new GsdmlChannelDiag();
 
-    data->channel_diag.push_back(cd);
-    object_stack_push(cd, current_tag);
-    break;
-  }
-  case gsdmldata_eTag_ExtChannelDiag:
-  {
-    GsdmlChannelDiag* cd = (GsdmlChannelDiag*)get_object_stack(gsdmldata_eTag_ChannelDiag);
-    if (!cd)
-    {
-      printf("XML-Parser: ExtChannelDiag outside ChannelDiag\n");
-      break;
-    }
-    GsdmlExtChannelDiag* ecd = new GsdmlExtChannelDiag();
+//     data->channel_diag.push_back(cd);
+//     object_stack_push(cd, current_tag);
+//     break;
+//   }
+//   case gsdmldata_eTag_ExtChannelDiag:
+//   {
+//     GsdmlChannelDiag* cd = (GsdmlChannelDiag*)get_object_stack(gsdmldata_eTag_ChannelDiag);
+//     if (!cd)
+//     {
+//       printf("XML-Parser: ExtChannelDiag outside ChannelDiag\n");
+//       break;
+//     }
+//     GsdmlExtChannelDiag* ecd = new GsdmlExtChannelDiag();
 
-    cd->ext_channel_diag.push_back(ecd);
-    object_stack_push(ecd, current_tag);
-    break;
-  }
-  default:;
-  }
+//     cd->ext_channel_diag.push_back(ecd);
+//     object_stack_push(ecd, current_tag);
+//     break;
+//   }
+//   default:;
+//   }
 
-  return 1;
-}
-int GsdmlDataReader::metatag(const char* name) { return 1; }
-int GsdmlDataReader::tag_end(const char* name)
-{
-  unsigned int id;
+//   return 1;
+// }
+// int GsdmlDataReader::metatag(const char* name) { return 1; }
+// int GsdmlDataReader::tag_end(const char* name)
+// {
+//   unsigned int id;
 
-  if (tag_name_to_id(name, &id))
-    tag_stack_pull(id);
-  else
-  {
-    printf("XML-Parser: Tag/EndTag mismach: %s\n", name);
-    return 0;
-  }
+//   if (tag_name_to_id(name, &id))
+//     tag_stack_pull(id);
+//   else
+//   {
+//     printf("XML-Parser: Tag/EndTag mismach: %s\n", name);
+//     return 0;
+//   }
 
-  switch (id)
-  {
-  case gsdmldata_eTag_Slot:
-    object_stack_pull(id);
-    break;
-  case gsdmldata_eTag_Subslot:
-    object_stack_pull(id);
-    break;
-  case gsdmldata_eTag_DataRecord:
-    object_stack_pull(id);
-    break;
-  case gsdmldata_eTag_IOCR:
-    object_stack_pull(id);
-    break;
-  case gsdmldata_eTag_ExtChannelDiag:
-    object_stack_pull(id);
-    break;
-  default:;
-  }
-  return 1;
-}
-int GsdmlDataReader::metatag_end(const char* name) { return 1; }
-int GsdmlDataReader::tag_value(const char* name) { return 1; }
-int GsdmlDataReader::tag_attribute(const char* name, const char* value)
-{
-  switch (current_tag)
-  {
-  case gsdmldata_eTag_PnDevice:
-    if (streq(name, "GsdmlFile"))
-    {
-      if (!streq(data->gsdmlfile, ""))
-      {
-        // Check that the GSDML file is not changed
-        char* gsdmlfile_p;
+//   switch (id)
+//   {
+//   case gsdmldata_eTag_Slot:
+//     object_stack_pull(id);
+//     break;
+//   case gsdmldata_eTag_Subslot:
+//     object_stack_pull(id);
+//     break;
+//   case gsdmldata_eTag_DataRecord:
+//     object_stack_pull(id);
+//     break;
+//   case gsdmldata_eTag_IOCR:
+//     object_stack_pull(id);
+//     break;
+//   case gsdmldata_eTag_ExtChannelDiag:
+//     object_stack_pull(id);
+//     break;
+//   default:;
+//   }
+//   return 1;
+// }
+// int GsdmlDataReader::metatag_end(const char* name) { return 1; }
+// int GsdmlDataReader::tag_value(const char* name) { return 1; }
+// int GsdmlDataReader::tag_attribute(const char* name, const char* value)
+// {
+//   switch (current_tag)
+//   {
+//   case gsdmldata_eTag_PnDevice:
+//     if (streq(name, "GsdmlFile"))
+//     {
+//       if (!streq(data->gsdmlfile, ""))
+//       {
+//         // Check that the GSDML file is not changed
+//         char* gsdmlfile_p;
 
-        // Print name of gsdmlfile, not path
-        if ((gsdmlfile_p = strrchr(data->gsdmlfile, '/')))
-          gsdmlfile_p++;
-        else
-          gsdmlfile_p = data->gsdmlfile;
+//         // Print name of gsdmlfile, not path
+//         if ((gsdmlfile_p = strrchr(data->gsdmlfile, '/')))
+//           gsdmlfile_p++;
+//         else
+//           gsdmlfile_p = data->gsdmlfile;
 
-        if (!streq(value, gsdmlfile_p) && !new_filename)
-          return PB__GSDMLFILEMISMATCH;
-      }
-      else
-        strncpy(data->gsdmlfile, value, sizeof(data->gsdmlfile));
-    }
-    else if (streq(name, "DeviceText"))
-      strncpy(data->device_text, value, sizeof(data->device_text));
-    else if (streq(name, "DeviceNumber"))
-      sscanf(value, "%d", &data->device_num);
-    else if (streq(name, "VendorId"))
-      sscanf(value, "%hu", &data->vendor_id);
-    else if (streq(name, "DeviceId"))
-      sscanf(value, "%hu", &data->device_id);
-    else if (streq(name, "Version"))
-      strncpy(data->version, value, sizeof(data->version));
-    else if (streq(name, "ByteOrder"))
-      sscanf(value, "%d", &data->byte_order);
-    else if (streq(name, "Instance"))
-      sscanf(value, "%hu", &data->instance);
-    break;
-  case gsdmldata_eTag_NetworkSettings:
-    if (streq(name, "DeviceName"))
-      strncpy(data->device_name, value, sizeof(data->device_name));
-    else if (streq(name, "IP_Address"))
-      strncpy(data->ip_address, value, sizeof(data->ip_address));
-    else if (streq(name, "SubnetMask"))
-      strncpy(data->subnet_mask, value, sizeof(data->subnet_mask));
-    else if (streq(name, "MAC_Address"))
-      strncpy(data->mac_address, value, sizeof(data->mac_address));
-    else if (streq(name, "Skip_IP_Assignment"))
-      sscanf(value, "%d", &data->skip_ip_assignment);
-    break;
-  case gsdmldata_eTag_Slot:
-  {
-    GsdmlSlotData* sd = (GsdmlSlotData*)get_object_stack(current_tag);
+//         if (!streq(value, gsdmlfile_p) && !new_filename)
+//           return PB__GSDMLFILEMISMATCH;
+//       }
+//       else
+//         strncpy(data->gsdmlfile, value, sizeof(data->gsdmlfile));
+//     }
+//     else if (streq(name, "DeviceText"))
+//       strncpy(data->device_text, value, sizeof(data->device_text));
+//     else if (streq(name, "DeviceNumber"))
+//       sscanf(value, "%d", &data->device_num);
+//     else if (streq(name, "VendorId"))
+//       sscanf(value, "%hu", &data->vendor_id);
+//     else if (streq(name, "DeviceId"))
+//       sscanf(value, "%hu", &data->device_id);
+//     else if (streq(name, "Version"))
+//       strncpy(data->version, value, sizeof(data->version));
+//     else if (streq(name, "ByteOrder"))
+//       sscanf(value, "%d", &data->byte_order);
+//     else if (streq(name, "Instance"))
+//       sscanf(value, "%hu", &data->instance);
+//     break;
+//   case gsdmldata_eTag_NetworkSettings:
+//     if (streq(name, "DeviceName"))
+//       strncpy(data->device_name, value, sizeof(data->device_name));
+//     else if (streq(name, "IP_Address"))
+//       strncpy(data->ip_address, value, sizeof(data->ip_address));
+//     else if (streq(name, "SubnetMask"))
+//       strncpy(data->subnet_mask, value, sizeof(data->subnet_mask));
+//     else if (streq(name, "MAC_Address"))
+//       strncpy(data->mac_address, value, sizeof(data->mac_address));
+//     else if (streq(name, "Skip_IP_Assignment"))
+//       sscanf(value, "%d", &data->skip_ip_assignment);
+//     break;
+//   case gsdmldata_eTag_Slot:
+//   {
+//     GsdmlSlotData* sd = (GsdmlSlotData*)get_object_stack(current_tag);
 
-    if (streq(name, "ModuleEnumNumber"))
-      sscanf(value, "%d", &sd->module_enum_number);
-    else if (streq(name, "ModuleIdentNumber"))
-      sscanf(value, "%u", &sd->module_ident_number);
-    else if (streq(name, "ModuleClass"))
-      sscanf(value, "%u", &sd->module_class);
-    else if (streq(name, "ModuleText"))
-      strncpy(sd->module_text, value, sizeof(sd->module_text));
-    else if (streq(name, "SlotNumber"))
-      sscanf(value, "%u", &sd->slot_number);
-    else if (streq(name, "DapFixedInSlot"))
-      sscanf(value, "%u", &sd->dap_fixed_slot);
-    break;
-  }
-  case gsdmldata_eTag_Subslot:
-  {
-    GsdmlSubslotData* sd = (GsdmlSubslotData*)get_object_stack(current_tag);
+//     if (streq(name, "ModuleEnumNumber"))
+//       sscanf(value, "%d", &sd->module_enum_number);
+//     else if (streq(name, "ModuleIdentNumber"))
+//       sscanf(value, "%u", &sd->module_ident_number);
+//     else if (streq(name, "ModuleClass"))
+//       sscanf(value, "%u", &sd->module_class);
+//     else if (streq(name, "ModuleText"))
+//       strncpy(sd->module_text, value, sizeof(sd->module_text));
+//     else if (streq(name, "SlotNumber"))
+//       sscanf(value, "%u", &sd->slot_number);
+//     else if (streq(name, "DapFixedInSlot"))
+//       sscanf(value, "%u", &sd->dap_fixed_slot);
+//     break;
+//   }
+//   case gsdmldata_eTag_Subslot:
+//   {
+//     GsdmlSubslotData* sd = (GsdmlSubslotData*)get_object_stack(current_tag);
 
-    if (streq(name, "SubslotNumber"))
-      sscanf(value, "%u", &sd->subslot_number);
-    else if (streq(name, "SubmoduleIdentNumber"))
-      sscanf(value, "%u", &sd->submodule_ident_number);
-    else if (streq(name, "API"))
-      sscanf(value, "%u", &sd->api);
-    else if (streq(name, "SubmoduleEnumNumber"))
-      sscanf(value, "%d", &sd->submodule_enum_number);
-    else if (streq(name, "IOInputLength"))
-      sscanf(value, "%u", &sd->io_input_length);
-    else if (streq(name, "IOOutputLength"))
-      sscanf(value, "%u", &sd->io_output_length);
-    break;
-  }
-  case gsdmldata_eTag_DataRecord:
-  {
-    GsdmlDataRecord* dr = (GsdmlDataRecord*)get_object_stack(current_tag);
+//     if (streq(name, "SubslotNumber"))
+//       sscanf(value, "%u", &sd->subslot_number);
+//     else if (streq(name, "SubmoduleIdentNumber"))
+//       sscanf(value, "%u", &sd->submodule_ident_number);
+//     else if (streq(name, "API"))
+//       sscanf(value, "%u", &sd->api);
+//     else if (streq(name, "SubmoduleEnumNumber"))
+//       sscanf(value, "%d", &sd->submodule_enum_number);
+//     else if (streq(name, "IOInputLength"))
+//       sscanf(value, "%u", &sd->io_input_length);
+//     else if (streq(name, "IOOutputLength"))
+//       sscanf(value, "%u", &sd->io_output_length);
+//     break;
+//   }
+//   case gsdmldata_eTag_DataRecord:
+//   {
+//     GsdmlDataRecord* dr = (GsdmlDataRecord*)get_object_stack(current_tag);
 
-    if (streq(name, "DataLength"))
-      sscanf(value, "%u", &dr->data_length);
-    else if (streq(name, "Index"))
-      sscanf(value, "%hu", &dr->index);
-    else if (streq(name, "TransferSequence"))
-      sscanf(value, "%hu", &dr->transfer_sequence);
-    else if (streq(name, "Data"))
-    {
-      int len;
-      co_xml_parser::ostring_to_data(&dr->data, value, dr->data_length, &len);
-    }
-    break;
-  }
-  case gsdmldata_eTag_IOCR:
-  {
-    GsdmlIOCRData* iod = (GsdmlIOCRData*)get_object_stack(current_tag);
+//     if (streq(name, "DataLength"))
+//       sscanf(value, "%u", &dr->data_length);
+//     else if (streq(name, "Index"))
+//       sscanf(value, "%hu", &dr->index);
+//     else if (streq(name, "TransferSequence"))
+//       sscanf(value, "%hu", &dr->transfer_sequence);
+//     else if (streq(name, "Data"))
+//     {
+//       int len;
+//       co_xml_parser::ostring_to_data(&dr->data, value, dr->data_length, &len);
+//     }
+//     break;
+//   }
+//   case gsdmldata_eTag_IOCR:
+//   {
+//     GsdmlIOCRData* iod = (GsdmlIOCRData*)get_object_stack(current_tag);
 
-    if (streq(name, "Type"))
-      sscanf(value, "%hu", &iod->type);
-    else if (streq(name, "Properties"))
-      sscanf(value, "%u", &iod->properties);
-    else if (streq(name, "SendClockFactor"))
-      sscanf(value, "%hu", &iod->send_clock_factor);
-    else if (streq(name, "ReductionRatio"))
-      sscanf(value, "%hu", &iod->reduction_ratio);
-    else if (streq(name, "Phase"))
-      sscanf(value, "%u", &iod->phase);
-    else if (streq(name, "API"))
-      sscanf(value, "%u", &iod->api);
-    break;
-  }
-  case gsdmldata_eTag_ChannelDiag:
-  {
-    GsdmlChannelDiag* cd = (GsdmlChannelDiag*)get_object_stack(current_tag);
+//     if (streq(name, "Type"))
+//       sscanf(value, "%hu", &iod->type);
+//     else if (streq(name, "Properties"))
+//       sscanf(value, "%u", &iod->properties);
+//     else if (streq(name, "SendClockFactor"))
+//       sscanf(value, "%hu", &iod->send_clock_factor);
+//     else if (streq(name, "ReductionRatio"))
+//       sscanf(value, "%hu", &iod->reduction_ratio);
+//     else if (streq(name, "Phase"))
+//       sscanf(value, "%u", &iod->phase);
+//     else if (streq(name, "API"))
+//       sscanf(value, "%u", &iod->api);
+//     break;
+//   }
+//   case gsdmldata_eTag_ChannelDiag:
+//   {
+//     GsdmlChannelDiag* cd = (GsdmlChannelDiag*)get_object_stack(current_tag);
 
-    if (streq(name, "ErrorType"))
-      sscanf(value, "%hu", &cd->error_type);
-    else if (streq(name, "Name"))
-      strncpy(cd->name, value, sizeof(cd->name));
-    else if (streq(name, "Help"))
-      strncpy(cd->help, value, sizeof(cd->help));
-    break;
-  }
-  case gsdmldata_eTag_ExtChannelDiag:
-  {
-    GsdmlExtChannelDiag* ecd = (GsdmlExtChannelDiag*)get_object_stack(current_tag);
+//     if (streq(name, "ErrorType"))
+//       sscanf(value, "%hu", &cd->error_type);
+//     else if (streq(name, "Name"))
+//       strncpy(cd->name, value, sizeof(cd->name));
+//     else if (streq(name, "Help"))
+//       strncpy(cd->help, value, sizeof(cd->help));
+//     break;
+//   }
+//   case gsdmldata_eTag_ExtChannelDiag:
+//   {
+//     GsdmlExtChannelDiag* ecd = (GsdmlExtChannelDiag*)get_object_stack(current_tag);
 
-    if (streq(name, "ErrorType"))
-      sscanf(value, "%hu", &ecd->error_type);
-    else if (streq(name, "Name"))
-      strncpy(ecd->name, value, sizeof(ecd->name));
-    else if (streq(name, "Help"))
-      strncpy(ecd->help, value, sizeof(ecd->help));
-    break;
-  }
-  default:;
-  }
-  return 1;
-}
+//     if (streq(name, "ErrorType"))
+//       sscanf(value, "%hu", &ecd->error_type);
+//     else if (streq(name, "Name"))
+//       strncpy(ecd->name, value, sizeof(ecd->name));
+//     else if (streq(name, "Help"))
+//       strncpy(ecd->help, value, sizeof(ecd->help));
+//     break;
+//   }
+//   default:;
+//   }
+//   return 1;
+// }
