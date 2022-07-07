@@ -1206,7 +1206,8 @@ int GsdmlAttrNav::save()
   }
 
   // Make sure we copy INPUT_CR to OUTPUT_CR
-  pn_runtime_data->m_PnDevice->m_IOCR_map[OUTPUT_CR] = pn_runtime_data->m_PnDevice->m_IOCR_map.at(INPUT_CR);
+  pn_runtime_data->m_PnDevice->m_IOCR_map[PROFINET_IO_CR_TYPE_OUTPUT] =
+      pn_runtime_data->m_PnDevice->m_IOCR_map.at(PROFINET_IO_CR_TYPE_INPUT);
 
   if (!pn_runtime_data->save())
     m_wow->DisplayError("Error saving", "An error occured while saving the runtime configuration file.");
@@ -2834,13 +2835,14 @@ void ItemPnEnumRTClass::setup_node()
   if (m_interface_submodule_item->_ApplicationRelations._StartupMode.getList().size())
   {
     if (m_interface_submodule_item->_ApplicationRelations._StartupMode.inList("Advanced"))
-      m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR_map[INPUT_CR].m_startup_mode = "Advanced";
+      m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR_map[PROFINET_IO_CR_TYPE_INPUT].m_startup_mode =
+          "Advanced";
     else
-      m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR_map[INPUT_CR].m_startup_mode = "Legacy";
+      m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR_map[PROFINET_IO_CR_TYPE_INPUT].m_startup_mode = "Legacy";
   }
   else
   {
-    m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR_map[INPUT_CR].m_startup_mode = "Legacy";
+    m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR_map[PROFINET_IO_CR_TYPE_INPUT].m_startup_mode = "Legacy";
   }
 }
 
@@ -2972,7 +2974,8 @@ void ItemPnSendClock::setup_node()
   // Check if RT_CLASS_3 is chosen, if not we use the non RT_CLASS_3 settings.
   // The _SendClock valuelists are created with default values if there are no
   // corresponding elements in the GSDML file...so this is safe...
-  if (m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR_map[INPUT_CR].m_rt_class == "RT_CLASS_3")
+  if (m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR_map[PROFINET_IO_CR_TYPE_INPUT].m_rt_class ==
+      "RT_CLASS_3")
     m_send_clock_list = &m_application_relations._RT_Class3TimingProperties._SendClock;
   else
     m_send_clock_list = &m_application_relations._TimingProperties._SendClock;
@@ -3059,7 +3062,8 @@ void ItemPnReductionRatio::setup_node()
   // Check if RT_CLASS_3 is chosen, if not we use the non RT_CLASS_3 settings.
   // The _reductionRatio valuelists are created with default values if there are
   // no corresponding elements in the GSDML file...so this is safe...
-  if (m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR_map[INPUT_CR].m_rt_class == "RT_CLASS_3")
+  if (m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR_map[PROFINET_IO_CR_TYPE_INPUT].m_rt_class ==
+      "RT_CLASS_3")
     m_reduction_ratio_list = &m_application_relations._RT_Class3TimingProperties._ReductionRatioPow2;
   else
     m_reduction_ratio_list = &m_application_relations._TimingProperties._ReductionRatioPow2;

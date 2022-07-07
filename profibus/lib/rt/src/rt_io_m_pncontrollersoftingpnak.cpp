@@ -131,67 +131,56 @@ static pwr_tStatus IoAgentInit(io_tCtx ctx, io_sAgent* ap)
 static pwr_tStatus IoAgentRead(io_tCtx ctx, io_sAgent* ap)
 {
   io_sAgentLocal* local;
-  PnIOCRData* pn_iocr_data;
+  // PnIOCRData* pn_iocr_data;
   pwr_tUInt16 sts;
   unsigned char* io_datap;
   unsigned char* clean_io_datap;
   unsigned char status_data = 0;
-  PnSubmoduleData* submodule;
-  //PnDeviceData* pn_device;
+  // PnSubmoduleData* submodule;
   std::shared_ptr<ProfinetDevice> pn_device;
   unsigned char ioxs;
-
-  
-  unsigned short data_length = 0, ii, jj, kk, ll;
+  unsigned short data_length = 0, i;
 
   local = (io_sAgentLocal*)ap->Local;
-  io_sRack *device_list = NULL;
+  io_sRack* device_list = NULL;
 
   /* Read i/o for all devices and move it to clean io data area */
 
   //  pthread_mutex_lock(&local->mutex);
 
-  for (device_list = ap->racklist, ii = 1; device_list != NULL || ii < local->device_list.size(); device_list = device_list->next, ii++)
+  for (device_list = ap->racklist, i = 1; device_list != NULL || i < local->device_list.size();
+       device_list = device_list->next, i++)
   {
-    //pwr_sClass_PnDevice *device = (pwr_sClass_PnDevice*)(device_list->op);
-    
-    pn_device = local->device_list[ii];    
+    // pwr_sClass_PnDevice *device = (pwr_sClass_PnDevice*)(device_list->op);
 
-    if (pn_device->device_state == PNAK_DEVICE_STATE_CONNECTED)
-    { 
-      for (jj = 0; jj < pn_device->iocr_data.size(); jj++)
-      { 
-        pn_iocr_data = pn_device->iocr_data[jj];
+    pn_device = local->device_list[i];
 
-        if (pn_iocr_data->type == PROFINET_IO_CR_TYPE_INPUT)
-        {   
-          // TODO Implement iocrstate propagation to pn device. But as of now 
+    if (pn_device->m_rt_device_state == PNAK_DEVICE_STATE_CONNECTED)
+    {
+      // The map index is the IOCR Type
+      for (auto& iocr : pn_device->m_IOCR_map)
+      {
+        if (iocr.first == PROFINET_IO_CR_TYPE_INPUT)
+        {
+          // TODO Implement iocrstate propagation to pn device. But as of now
           // the status_data doesn't change according to what the data frames says
           // in other words. It's showing normal operation even with all modules
-          // pulled from an IO...       
-          data_length = pn_iocr_data->io_data_length;          
-          sts = pnak_get_iocr_data(0, pn_iocr_data->identifier,
-                                   pn_iocr_data->io_data, &data_length, &ioxs,
-                                   &status_data);
-
-
+          // pulled from an IO...
+          data_length = iocr.second.m_rt_io_data_length;
+          sts = pnak_get_iocr_data(0, iocr.second.m_rt_identifier, iocr.second.m_rt_io_data, &data_length,
+                                   &ioxs, &status_data);
           if (sts == PNAK_OK)
-          { 
-            for (kk = 0; kk < pn_device->module_data.size(); kk++)
+          {
+            for (auto& slot : pn_device->m_slot_list)
             {
-              for (ll = 0;
-                   ll < pn_device->module_data[kk]->submodule_data.size(); ll++)
+              for (auto& subslot : slot.m_subslot_map)
               {
-                submodule = pn_device->module_data[kk]->submodule_data[ll];
-                if ((submodule->type == PROFINET_IO_SUBMODULE_TYPE_INPUT) ||
-                    (submodule->type ==
-                     PROFINET_IO_SUBMODULE_TYPE_INPUT_AND_OUTPUT))
+                if (subslot.second.m_rt_io_submodule_type == PROFINET_IO_SUBMODULE_TYPE_INPUT ||
+                    subslot.second.m_rt_io_submodule_type == PROFINET_IO_SUBMODULE_TYPE_INPUT_AND_OUTPUT)
                 {
-                  io_datap = (pn_iocr_data->io_data + submodule->offset_io_in);
-                  clean_io_datap = (pn_iocr_data->clean_io_data +
-                                    submodule->offset_clean_io_in);
-                  memcpy(clean_io_datap, io_datap,
-                         submodule->io_in_data_length);
+                  io_datap = iocr.second.m_rt_io_data + subslot.second.m_rt_offset_io_in;
+                  clean_io_datap = iocr.second.m_rt_clean_io_data + subslot.second.m_rt_offset_clean_io_in;
+                  memcpy(clean_io_datap, io_datap, subslot.second.m_io_input_length);
                 }
               }
             }
@@ -216,80 +205,58 @@ static pwr_tStatus IoAgentRead(io_tCtx ctx, io_sAgent* ap)
 static pwr_tStatus IoAgentWrite(io_tCtx ctx, io_sAgent* ap)
 {
   io_sAgentLocal* local;
-  PnIOCRData* pn_iocr_data;
   pwr_tUInt16 sts;
   unsigned char* io_datap;
   unsigned char* clean_io_datap;
-  PnSubmoduleData* submodule;
-  PnDeviceData* pn_device;
-  io_sRack* slave_list;
+  io_sRack* device_list;
   pwr_sClass_PnDevice* sp = NULL;
+  std::shared_ptr<ProfinetDevice> pn_device;
 
-  unsigned short data_length, ii, jj, kk, ll;
-  // unsigned char *status_datap;
+  unsigned short data_length, i;
 
   local = (io_sAgentLocal*)ap->Local;
 
   /* Write i/o for all devices fetch it first from clean io data area */
 
   /* Iterate over the slaves.  */
-  slave_list = ap->racklist;
+  device_list = ap->racklist;
 
   //  pthread_mutex_lock(&local->mutex);
 
-  for (ii = 1; ii < local->device_data.size(); ii++)
+  for (device_list = ap->racklist, i = 1; device_list != NULL || i < local->device_list.size();
+       device_list = device_list->next, i++)
   {
-    if (slave_list != NULL)
-    {
-      sp = (pwr_sClass_PnDevice*)slave_list->op;
-      slave_list = slave_list->next;
-    }
-    pn_device = local->device_data[ii];
+    sp = (pwr_sClass_PnDevice*)device_list->op;
+    pn_device = local->device_list[i]; // TODO Maybe we should map against certain names instead.
 
-    if (pn_device->device_state == PNAK_DEVICE_STATE_CONNECTED)
+    if (pn_device->m_rt_device_state == PNAK_DEVICE_STATE_CONNECTED)
     {
-      for (jj = 0; jj < pn_device->iocr_data.size(); jj++)
+      // The map index is the IOCR Type
+      for (auto& iocr : pn_device->m_IOCR_map)
       {
-        pn_iocr_data = pn_device->iocr_data[jj];
-
-        if (pn_iocr_data->type == PROFINET_IO_CR_TYPE_OUTPUT)
+        if (iocr.first == PROFINET_IO_CR_TYPE_OUTPUT)
         {
-          data_length = pn_iocr_data->io_data_length;
+          data_length = iocr.second.m_rt_io_data_length;
 
-          /* Set io status to good */
+          memset(iocr.second.m_rt_io_data, PNAK_IOXS_STATUS_DATA_GOOD, data_length);
 
-          memset(pn_iocr_data->io_data, 0x80,
-                 data_length); // 0x80 is PNAK_IOXS_STATUS_DATA_GOOD
-
-          for (kk = 0; kk < pn_device->module_data.size(); kk++)
+          for (auto& slot : pn_device->m_slot_list)
           {
-            for (ll = 0; ll < pn_device->module_data[kk]->submodule_data.size();
-                 ll++)
+            for (auto& subslot : slot.m_subslot_map)
             {
-              submodule = pn_device->module_data[kk]->submodule_data[ll];
-              if ((submodule->type == PROFINET_IO_SUBMODULE_TYPE_OUTPUT) ||
-                  (submodule->type ==
-                   PROFINET_IO_SUBMODULE_TYPE_INPUT_AND_OUTPUT))
+              if (subslot.second.m_rt_io_submodule_type == PROFINET_IO_SUBMODULE_TYPE_OUTPUT ||
+                  subslot.second.m_rt_io_submodule_type == PROFINET_IO_SUBMODULE_TYPE_INPUT_AND_OUTPUT)
               {
-                io_datap = (pn_iocr_data->io_data + submodule->offset_io_out);
-                clean_io_datap = (pn_iocr_data->clean_io_data +
-                                  submodule->offset_clean_io_out);
-                memcpy(io_datap, clean_io_datap, submodule->io_out_data_length);
-
-                /*status_datap = io_datap + submodule->io_out_data_length;
-                 *status_datap = PNAK_IOXS_STATUS_NO_EXTENTION_FOLLOWS |
-                 *PNAK_IOXS_STATUS_DATA_GOOD;
-                 */
+                io_datap = iocr.second.m_rt_io_data + subslot.second.m_rt_offset_io_out;
+                clean_io_datap = iocr.second.m_rt_clean_io_data + subslot.second.m_rt_offset_clean_io_out;
+                memcpy(io_datap, clean_io_datap, subslot.second.m_io_output_length);
               }
             }
           }
-          char ioxs = CYCLIC_DATA_STATUS_DATA_VALID |
-                      CYCLIC_DATA_STATUS_STATE_PRIMARY |
-                      CYCLIC_DATA_STATUS_STATE_RUN |
-                      CYCLIC_DATA_STATUS_NORMAL_OPERATION;
-          sts = pnak_set_iocr_data(0, pn_iocr_data->identifier,
-                                   pn_iocr_data->io_data,
-                                   pn_iocr_data->io_data_length, ioxs);
+          char ioxs = CYCLIC_DATA_STATUS_DATA_VALID | CYCLIC_DATA_STATUS_STATE_PRIMARY |
+                      CYCLIC_DATA_STATUS_STATE_RUN | CYCLIC_DATA_STATUS_NORMAL_OPERATION;
+          sts = pnak_set_iocr_data(0, iocr.second.m_rt_identifier, iocr.second.m_rt_io_data,
+                                   iocr.second.m_rt_io_data_length, ioxs);
           if (sts != PNAK_OK)
           {
             printf("pnak_set_iocr_data failed!\n");
@@ -299,72 +266,60 @@ static pwr_tStatus IoAgentWrite(io_tCtx ctx, io_sAgent* ap)
 
       // Check if we have a read request, if so pack it and send it. We only
       // allow for one active "Read session" per device...
-      if (sp->ReadReq.SendReq &&
-          sp->ReadReq.status == pwr_ePnDeviceReadWriteState_Ready)
+      if (sp->ReadReq.SendReq && sp->ReadReq.status == pwr_ePnDeviceReadWriteState_Ready)
       {
         // Check length, and alert if we are trying to read more than we can
         // carry...
         if (sp->ReadReq.Length <= sizeof(sp->ReadReq.response.Data))
         {
-          pack_read_req(&local->service_req_res, pn_device->device_ref,
-                        &sp->ReadReq);
-          sp->ReadReq.status =
-              pwr_ePnDeviceReadWriteState_Busy; // Reset later in response
-          T_PNAK_RESULT pnak_result =
-              pnak_send_service_req_res(0, &local->service_req_res);
+          pack_read_req(&local->service_req_res, pn_device->m_rt_device_ref, &sp->ReadReq);
+          sp->ReadReq.status = pwr_ePnDeviceReadWriteState_Busy; // Reset later in response
+          T_PNAK_RESULT pnak_result = pnak_send_service_req_res(0, &local->service_req_res);
           if (pnak_result == PNAK_OK)
           {
             sp->ReadReq.counter++;
-            errh_Info("PROFINET: Async read request sent, dev: %d",
-                      pn_device->device_ref);
+            errh_Info("PROFINET: Async read request sent, dev: %d", pn_device->m_rt_device_ref);
           }
           else
           {
-            errh_Warning("PROFINET: Async read request, send failed, dev: %d",
-                         pn_device->device_ref);
+            errh_Warning("PROFINET: Async read request, send failed, dev: %d", pn_device->m_rt_device_ref);
           }
         }
         else
         {
           errh_Warning("PROFINET: Async read request not sent, data too large "
                        "for receiving buffer on device %d",
-                       pn_device->device_ref);
+                       pn_device->m_rt_device_ref);
         }
         sp->ReadReq.SendReq = 0;
       }
 
       // Check if we have a write request, if so pack it and send it. We only
       // allow for one active "Write session" per device...
-      if (sp->WriteReq.SendReq &&
-          sp->WriteReq.status == pwr_ePnDeviceReadWriteState_Ready)
+      if (sp->WriteReq.SendReq && sp->WriteReq.status == pwr_ePnDeviceReadWriteState_Ready)
       {
         // Check length, and alert if we are trying to read more than we can
         // carry...
         if (sp->WriteReq.Length <= sizeof(sp->WriteReq.Data))
         {
-          pack_write_req(&local->service_req_res, pn_device->device_ref,
-                         &sp->WriteReq);
-          sp->WriteReq.status =
-              pwr_ePnDeviceReadWriteState_Busy; // Reset later in response
-          T_PNAK_RESULT pnak_result =
-              pnak_send_service_req_res(0, &local->service_req_res);
+          pack_write_req(&local->service_req_res, pn_device->m_rt_device_ref, &sp->WriteReq);
+          sp->WriteReq.status = pwr_ePnDeviceReadWriteState_Busy; // Reset later in response
+          T_PNAK_RESULT pnak_result = pnak_send_service_req_res(0, &local->service_req_res);
           if (pnak_result == PNAK_OK)
           {
             sp->WriteReq.counter++;
-            errh_Info("PROFINET: Async write request sent, dev: %d",
-                      pn_device->device_ref);
+            errh_Info("PROFINET: Async write request sent, dev: %d", pn_device->m_rt_device_ref);
           }
           else
           {
-            errh_Warning("PROFINET: Async write request, send failed, dev: %d",
-                         pn_device->device_ref);
+            errh_Warning("PROFINET: Async write request, send failed, dev: %d", pn_device->m_rt_device_ref);
           }
         }
         else
         {
           errh_Warning("PROFINET: Async write request not sent, data too large "
                        "for buffer on device %d",
-                       pn_device->device_ref);
+                       pn_device->m_rt_device_ref);
         }
         sp->WriteReq.SendReq = 0;
       }
@@ -451,6 +406,5 @@ static pwr_tStatus IoAgentSwap(io_tCtx ctx, io_sAgent* ap, io_eEvent event)
 \*----------------------------------------------------------------------------*/
 
 pwr_dExport pwr_BindIoMethods(PnControllerSoftingPNAK) = {
-    pwr_BindIoMethod(IoAgentInit),  pwr_BindIoMethod(IoAgentRead),
-    pwr_BindIoMethod(IoAgentWrite), pwr_BindIoMethod(IoAgentClose),
-    pwr_BindIoMethod(IoAgentSwap),  pwr_NullMethod};
+    pwr_BindIoMethod(IoAgentInit),  pwr_BindIoMethod(IoAgentRead), pwr_BindIoMethod(IoAgentWrite),
+    pwr_BindIoMethod(IoAgentClose), pwr_BindIoMethod(IoAgentSwap), pwr_NullMethod};

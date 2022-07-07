@@ -48,15 +48,13 @@
 #include "co_xml_parser.h"
 #include "co_pugixml.hpp"
 #include "rt_profinet.h"
-#include "rt_io_pnak_locals.h"
+//#include "rt_io_pnak_locals.h"
 
 #define RUNTIME_PARSER_STRING_MAX_LENGTH sizeof(pwr_tString256)
 #define DAP_SLOT 0
 #define SUBMODULE_INTERFACE 32768
 #define SUBMODULE_PORT_1 32769
 #define SUBMODULE_PORT_2 32770
-#define INPUT_CR 1
-#define OUTPUT_CR 2
 
 // New parser class
 class ProfinetDataRecord
@@ -109,7 +107,7 @@ public:
   ProfinetIOCR() = default;
   ProfinetIOCR(pugi::xml_node&&);
   ProfinetIOCR(ProfinetIOCR&&) = default;
-  ProfinetIOCR(ProfinetIOCR const&) = delete;
+  ProfinetIOCR(ProfinetIOCR const&) = default;
   ProfinetIOCR& operator=(ProfinetIOCR&) = default;
   ~ProfinetIOCR() = default;
   void build(pugi::xml_node&&, uint type) const;
@@ -120,7 +118,16 @@ public:
   unsigned int m_api;   // Check with the spec what to do with submodule items specifying a specific API...
   std::string m_rt_class;
   std::string m_startup_mode;
+
+  // Stack Runtime specifics
+  unsigned short m_rt_identifier;
+  unsigned short m_rt_io_data_length;
+  unsigned char* m_rt_io_data;
+  unsigned short m_rt_clean_io_data_length;
+  unsigned char* m_rt_clean_io_data;
+  uint m_rt_properties; // Set TO PROFINET_IO_CR_RT_CLASS2 (hard coded for iocr in rt_pn_iface.cpp: ~673)
 };
+
 // class GsdmlIOCRData
 // {
 // public:
@@ -138,7 +145,6 @@ public:
 
 //   int print(std::ofstream& fp);
 // };
-
 
 class ProfinetSubslot
 {
@@ -159,11 +165,21 @@ public:
   unsigned int m_api; // Will default to 0. What's the correct default? TODO check specification
   std::string m_submodule_ID;
 
-  // Elements  
-  std::map<uint, ProfinetDataRecord> m_data_record_map; // Indexed on the actual Index attribute of the ParameterRecordDataItem
+  // Elements
+  std::map<ushort, ProfinetDataRecord>
+      m_data_record_map; // Indexed on the actual Index attribute of the ParameterRecordDataItem
 
   // Runtime specifics
-  ushort m_io_submodule_type;
+  ushort m_rt_io_submodule_type;
+  ushort m_rt_state;
+  ushort m_rt_phys_ident_number;
+
+  ushort m_rt_offset_io_in;
+  ushort m_rt_offset_clean_io_in;
+  ushort m_rt_offset_io_out;
+  ushort m_rt_offset_clean_io_out;
+  ushort m_rt_offset_status_in;
+  ushort m_rt_offset_status_out;
 };
 
 // class GsdmlSubslotData
@@ -207,7 +223,7 @@ public:
   ProfinetSlot() = default;
   ProfinetSlot(pugi::xml_node&&);
   ProfinetSlot(ProfinetSlot&&) = default;
-  ProfinetSlot(ProfinetSlot const&) = delete;
+  ProfinetSlot(ProfinetSlot const&) = default;
   ProfinetSlot& operator=(const ProfinetSlot&);
   ~ProfinetSlot() = default;
   void build(pugi::xml_node&&) const;
@@ -216,13 +232,17 @@ public:
   pwr_tCid m_module_class;
   std::string m_module_ID; // This is unique even across the same ident number
   unsigned int m_slot_number;
-  std::map<uint, ProfinetSubslot> m_subslot_map;  
+  std::map<uint, ProfinetSubslot> m_subslot_map;
 
   // Non saved members
   pwr_tOid m_module_oid; // Meta, never saved. Only used as temporary storage for oids when creating
                          // modules/channels
   bool m_is_modified;    // Meta, never save. Indicates wether or not this slot had it's module updated before
                          // applyig/saving...
+
+  // Runtime
+  ushort m_rt_state;
+  ushort m_rt_phys_ident_number;
 };
 
 // //  GsdmlSlotData()
@@ -266,13 +286,14 @@ public:
 //   }
 //   int print(std::ofstream& fp, bool reverse_endianess);
 // };
->>>>>>> Stashed changes
+
 class ProfinetExtChannelDiag
 {
 public:
   ProfinetExtChannelDiag() = default;
+  ProfinetExtChannelDiag(pugi::xml_node&&);
   ProfinetExtChannelDiag(ProfinetExtChannelDiag&&) = default;
-  ProfinetExtChannelDiag(ProfinetExtChannelDiag const&) = delete;
+  ProfinetExtChannelDiag(ProfinetExtChannelDiag const&) = default;
   ~ProfinetExtChannelDiag() = default;
   void build(pugi::xml_node&&, uint p_error_type) const;
 
@@ -288,8 +309,8 @@ public:
 //   unsigned short error_type;
 //   char name[200];
 //   char help[4096];
-//   // std::vector<GsdmlExtChannelAddValueDataItem*> data_item; TODO Do we want this extra level of diagnostic information available?
->>>>>>> Stashed changes
+//   // std::vector<GsdmlExtChannelAddValueDataItem*> data_item; TODO Do we want this extra level of
+//   diagnostic information available?
 
 //   int print(std::ofstream& fp);
 // };
@@ -299,7 +320,7 @@ public:
   ProfinetChannelDiag() = default;
   ProfinetChannelDiag(pugi::xml_node&&);
   ProfinetChannelDiag(ProfinetChannelDiag&&) = default;
-  ProfinetChannelDiag(ProfinetChannelDiag const&) = delete;
+  ProfinetChannelDiag(ProfinetChannelDiag const&) = default;
   ~ProfinetChannelDiag() = default;
   void build(pugi::xml_node&&, uint p_error_type) const;
 
@@ -331,7 +352,7 @@ public:
   ProfinetNetworkSettings() = default;
   ProfinetNetworkSettings(pugi::xml_node&&);
   ProfinetNetworkSettings(ProfinetNetworkSettings&&) = default;
-  ProfinetNetworkSettings(ProfinetNetworkSettings const&) = delete;
+  ProfinetNetworkSettings(ProfinetNetworkSettings const&) = default;
   ~ProfinetNetworkSettings() = default;
   void build(pugi::xml_node&&) const;
 
@@ -344,29 +365,55 @@ public:
 
 class ProfinetDevice
 {
+  typedef struct _PN_Alarm_Data
+  {
+    unsigned short alarm_type;
+    unsigned short alarm_prio;
+    unsigned short rem_alarms;
+    unsigned int slot_number;
+    unsigned int sub_slot_number;
+    unsigned int module_ident_number;
+    unsigned int submodule_ident_number;
+    unsigned short alarm_spec;
+    unsigned short data_length;
+    unsigned char* data;
+  } PN_Alarm_Data;
+
 public:
   ProfinetDevice() = default;
   ProfinetDevice(pugi::xml_node&&);
   ProfinetDevice(ProfinetDevice&&) = default;
-  ProfinetDevice(ProfinetDevice const&) = delete;
+  ProfinetDevice(ProfinetDevice const&) = default;
   ~ProfinetDevice() = default;
   void build(pugi::xml_node&&) const;
 
   // Attributes
-  std::string m_gsdml_source_file;  
-  std::string m_moduleinfo_name; // ModuleInfo->Name in the GSDML  
-  std::string m_DAP_ID; // DAP ID to map what DAP to use from the GSDML
-  unsigned short m_vendor_id; // Part of DeviceIdentity
-  unsigned short m_device_id; // Part of DeviceIdentity
+  std::string m_gsdml_source_file;
+  std::string m_moduleinfo_name; // ModuleInfo->Name in the GSDML
+  std::string m_DAP_ID;          // DAP ID to map what DAP to use from the GSDML
+  unsigned short m_vendor_id;    // Part of DeviceIdentity
+  unsigned short m_device_id;    // Part of DeviceIdentity
 
-  // Runtime specifics
-  //std::shared_ptr<PnDeviceData> m_pn_local_runtime_data;
+  // std::shared_ptr<PnDeviceData> m_pn_local_runtime_data;
 
   // Elements
   ProfinetNetworkSettings m_NetworkSettings;
   std::vector<ProfinetSlot> m_slot_list;
   std::map<uint, ProfinetIOCR> m_IOCR_map;
   std::unordered_map<uint, ProfinetChannelDiag> m_channel_diag_map;
+
+  // Runtime specifics
+  unsigned short m_rt_device_state;
+  unsigned short m_rt_device_ref;
+  unsigned short m_rt_alarm_ref;
+  PN_Alarm_Data m_rt_alarm_data;
+  ushort m_rt_number_of_diff_modules;
+
+  unsigned char m_rt_ipaddress[4];
+  unsigned char m_rt_subnetmask[4];
+  unsigned char m_rt_macaddress[6];
+  std::string m_rt_interface_name; // Used by the controller. Ignored by other devices...
+  std::string m_rt_version;        // Who knows? According to manual set this to "1.0"
 };
 
 class ProfinetRuntimeData

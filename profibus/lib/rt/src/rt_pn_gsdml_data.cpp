@@ -304,7 +304,7 @@ ProfinetIOCR::ProfinetIOCR(pugi::xml_node&& p_IOCR)
       m_phase(p_IOCR.attribute("Phase").as_uint()), m_api(p_IOCR.attribute("API").as_uint()),
       m_rt_class(p_IOCR.attribute("RT_CLASS").as_string()),
       m_startup_mode(p_IOCR.attribute("StartupMode").as_string())
-{  
+{
 }
 
 void ProfinetIOCR::build(pugi::xml_node&& p_iocr, uint type) const
@@ -382,9 +382,8 @@ ProfinetSubslot::ProfinetSubslot(pugi::xml_node&& p_Subslot)
       m_submodule_ident_number(p_Subslot.attribute("SubmoduleIdentNumber").as_uint()),
       m_io_input_length(p_Subslot.attribute("IOInputLength").as_uint()),
       m_io_output_length(p_Subslot.attribute("IOOutputLength").as_uint()),
-      m_api(p_Subslot.attribute("API").as_uint()),
-      m_submodule_ID(p_Subslot.attribute("ID").as_string()),
-      m_io_submodule_type(PROFINET_IO_SUBMODULE_TYPE_NO_INPUT_NO_OUTPUT)
+      m_api(p_Subslot.attribute("API").as_uint()), m_submodule_ID(p_Subslot.attribute("ID").as_string()),
+      m_rt_io_submodule_type(PROFINET_IO_SUBMODULE_TYPE_NO_INPUT_NO_OUTPUT)
 {
   for (pugi::xml_node& data_record : p_Subslot.children("DataRecord"))
   {
@@ -397,12 +396,12 @@ ProfinetSubslot::ProfinetSubslot(pugi::xml_node&& p_Subslot)
   // the file only once
   if (m_io_input_length > 0)
   {
-    m_io_submodule_type = PROFINET_IO_SUBMODULE_TYPE_INPUT;
+    m_rt_io_submodule_type = PROFINET_IO_SUBMODULE_TYPE_INPUT;
   }
 
   if (m_io_output_length > 0)
   {
-    m_io_submodule_type |= PROFINET_IO_SUBMODULE_TYPE_OUTPUT;
+    m_rt_io_submodule_type |= PROFINET_IO_SUBMODULE_TYPE_OUTPUT;
   }
 }
 
@@ -576,11 +575,6 @@ void ProfinetDevice::build(pugi::xml_node&& p_pn_device) const
   {
     channel_diag.second.build(diagnostics.append_child("ChannelDiag"), channel_diag.first);
   }
-}
-
-void ProfinetRuntimeData::reset_to_default() { 
-  m_PnDevice.reset(new ProfinetDevice);
-  m_PnDevice->m_pn_local_runtime_data.reset(new PnDeviceData);
 }
 
 void ProfinetRuntimeData::reset_to_default() { m_PnDevice.reset(new ProfinetDevice()); }
