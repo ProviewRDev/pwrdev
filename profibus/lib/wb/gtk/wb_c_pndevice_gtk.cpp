@@ -78,8 +78,8 @@ static pwr_tStatus Configure(ldh_sMenuCall* ip)
   if (EVEN(sts))
     return sts;
 
-  ctx->attr = new GsdmlAttrGtk(CoXHelpGtk::get_widget(), ctx, 0, ctx->gsdml,
-                               ctx->edit_mode, ctx->pwr_pn_data, &sts);
+  ctx->attr =
+      new GsdmlAttrGtk(CoXHelpGtk::get_widget(), ctx, 0, ctx->gsdml, ctx->edit_mode, ctx->pwr_pn_data, &sts);
   if (sts == PB__CONFIGABORTED)
   {
     delete ctx->attr;
@@ -94,9 +94,8 @@ static pwr_tStatus Configure(ldh_sMenuCall* ip)
     sts = pndevice_init(ctx);
   if (EVEN(sts))
   {
-    ctx->attr->wow->DisplayError(
-        "Configuration load error",
-        "Configuration load error\nCheck configuration data");
+    ctx->attr->wow->DisplayError("Configuration load error",
+                                 "Configuration load error\nCheck configuration data");
   }
 
   return 1;
@@ -119,8 +118,7 @@ static pwr_tStatus CopyDevice(ldh_sMenuCall* ip)
   char cmd[520];
 
   // Check if data file exist
-  sprintf(datafile_src, "$pwrp_load/pwr_pn_%s.xml",
-          cdh_ObjidToFnString(0, ip->Pointed.Objid));
+  sprintf(datafile_src, "$pwrp_load/pwr_pn_%s.xml", cdh_ObjidToFnString(0, ip->Pointed.Objid));
   dcli_translate_filename(datafile_src, datafile_src);
 
   sts = dcli_search_file(datafile_src, found_file, DCLI_DIR_SEARCH_INIT);
@@ -128,8 +126,7 @@ static pwr_tStatus CopyDevice(ldh_sMenuCall* ip)
   if (EVEN(sts))
     return sts;
 
-  sts = ldh_GetObjectPar(ip->PointedSession, ip->Pointed.Objid, "RtBody",
-                         "GSDMLfile", &gsdml, &size);
+  sts = ldh_GetObjectPar(ip->PointedSession, ip->Pointed.Objid, "RtBody", "GSDMLfile", &gsdml, &size);
   if (EVEN(sts))
     return sts;
   if (streq(gsdml, ""))
@@ -141,8 +138,7 @@ static pwr_tStatus CopyDevice(ldh_sMenuCall* ip)
 
   memset(aref, 0, sizeof(aref));
   aref[0] = ip->Pointed;
-  sts = ldh_CopyObjectTrees(ip->PointedSession, aref, ip->Pointed.Objid,
-                            ldh_eDest_After, 0, 1, 0, 0);
+  sts = ldh_CopyObjectTrees(ip->PointedSession, aref, ip->Pointed.Objid, ldh_eDest_After, 0, 1, 0, 0);
   if (EVEN(sts))
     return sts;
 
@@ -168,8 +164,7 @@ static pwr_tStatus CopyDeviceFilter(ldh_sMenuCall* ip)
   pwr_tFileName found_file;
 
   // Check if data file exist
-  sprintf(datafile, "$pwrp_load/pwr_pn_%s.xml",
-          cdh_ObjidToFnString(0, ip->Pointed.Objid));
+  sprintf(datafile, "$pwrp_load/pwr_pn_%s.xml", cdh_ObjidToFnString(0, ip->Pointed.Objid));
   dcli_translate_filename(datafile, datafile);
 
   sts = dcli_search_file(datafile, found_file, DCLI_DIR_SEARCH_INIT);
@@ -177,8 +172,7 @@ static pwr_tStatus CopyDeviceFilter(ldh_sMenuCall* ip)
   if (EVEN(sts))
     return 0;
 
-  sts = ldh_GetObjectPar(ip->PointedSession, ip->Pointed.Objid, "RtBody",
-                         "GSDMLfile", &gsdml, &size);
+  sts = ldh_GetObjectPar(ip->PointedSession, ip->Pointed.Objid, "RtBody", "GSDMLfile", &gsdml, &size);
   if (EVEN(sts))
     return sts;
   if (streq(gsdml, ""))
@@ -194,72 +188,69 @@ static pwr_tStatus CopyDeviceFilter(ldh_sMenuCall* ip)
 //  Syntax check.
 //
 
-static pwr_tStatus SyntaxCheck(ldh_tSesContext Session,
-                               pwr_tAttrRef Object, /* current object */
-                               int* ErrorCount,  /* accumulated error count */
-                               int* WarningCount /* accumulated waring count */
-                               )
+static pwr_tStatus SyntaxCheck(ldh_tSesContext Session, pwr_tAttrRef Object, /* current object */
+                               int* ErrorCount,                              /* accumulated error count */
+                               int* WarningCount                             /* accumulated waring count */
+)
 {
-  return wsx_CheckIoDevice(Session, Object, ErrorCount, WarningCount,
-                           wsx_mCardOption_None);
+  return wsx_CheckIoDevice(Session, Object, ErrorCount, WarningCount, wsx_mCardOption_None);
 }
 
 //
 //  Get value.
 //
 
-static pwr_tStatus GetIoDeviceData(pwr_tAttrRef Object, const char* Attr,
-                                   char* Buf, int BufSize)
-{
-  pwr_tFileName datafile;
-  pwr_tStatus sts;
+// static pwr_tStatus GetIoDeviceData(pwr_tAttrRef Object, const char* Attr, char* Buf, int BufSize)
+// {
+//   pwr_tFileName datafile;
+//   pwr_tStatus sts;
 
-  sprintf(datafile, "$pwrp_load/pwr_pn_%s.xml", cdh_ObjidToFnString(0, Object.Objid));
-  dcli_translate_filename(datafile, datafile);
+//   sprintf(datafile, "$pwrp_load/pwr_pn_%s.xml", cdh_ObjidToFnString(0, Object.Objid));
+//   dcli_translate_filename(datafile, datafile);
 
-  GsdmlDeviceData* data = new GsdmlDeviceData();
-  sts = data->read(datafile);
-  if (EVEN(sts))
-  {
-    delete data;
-    return sts;
-  }
+//   ProfinetRuntimeData* prd = new ProfinetRuntimeData();
+//   // GsdmlDeviceData* data = new GsdmlDeviceData();
+//   prd->read_pwr_pn_xml(datafile, "");
+//   // sts = data->read(datafile);
+//   if (EVEN(sts))
+//   {
+//     delete prd;
+//     return sts;
+//   }
 
-  sts = data->get_value(Attr, Buf, BufSize);
+//   sts = data->get_value(Attr, Buf, BufSize);
 
-  delete data;
+//   delete prd;
 
-  return sts;
-}
+//   return sts;
+// }
 
-static pwr_tStatus SetIoDeviceData(pwr_tAttrRef Object, const char* Attr,
-                                   const char* Value)
-{
-  pwr_tFileName datafile;
-  pwr_tStatus sts;
+// static pwr_tStatus SetIoDeviceData(pwr_tAttrRef Object, const char* Attr, const char* Value)
+// {
+//   pwr_tFileName datafile;
+//   pwr_tStatus sts;
 
-  sprintf(datafile, "$pwrp_load/pwr_pn_%s.xml", cdh_ObjidToFnString(0, Object.Objid));
-  dcli_translate_filename(datafile, datafile);
+//   sprintf(datafile, "$pwrp_load/pwr_pn_%s.xml", cdh_ObjidToFnString(0, Object.Objid));
+//   dcli_translate_filename(datafile, datafile);
 
-  GsdmlDeviceData* data = new GsdmlDeviceData();
-  sts = data->read(datafile);
-  if (EVEN(sts))
-  {
-    delete data;
-    return sts;
-  }
+//   GsdmlDeviceData* data = new GsdmlDeviceData();
+//   sts = data->read(datafile);
+//   if (EVEN(sts))
+//   {
+//     delete data;
+//     return sts;
+//   }
 
-  sts = data->modify_value(Attr, Value);
-  if (ODD(sts))
-    data->print(datafile);
+//   sts = data->modify_value(Attr, Value);
+//   if (ODD(sts))
+//     data->print(datafile);
 
-  delete data;
+//   delete data;
 
-  return sts;
-}
+//   return sts;
+// }
 
-static pwr_tStatus PostCopy(
-    ldh_tSesContext Session, pwr_tOid Object, pwr_tOid Source, pwr_tCid Class)
+static pwr_tStatus PostCopy(ldh_tSesContext Session, pwr_tOid Object, pwr_tOid Source, pwr_tCid Class)
 {
   return pndevice_postcopy(Session, Object, Source, Class);
 }
@@ -268,9 +259,9 @@ static pwr_tStatus PostCopy(
   Every method to be exported to the workbench should be registred here.
 \*----------------------------------------------------------------------------*/
 
-pwr_dExport pwr_BindMethods(PnDevice)
-    = { pwr_BindMethod(Configure), pwr_BindMethod(ConfigureFilter),
-        pwr_BindMethod(CopyDevice), pwr_BindMethod(CopyDeviceFilter),
-        pwr_BindMethod(SyntaxCheck), pwr_BindMethod(GetIoDeviceData),
-        pwr_BindMethod(SetIoDeviceData), pwr_BindMethod(PostCopy), 
-	pwr_NullMethod };
+pwr_dExport pwr_BindMethods(PnDevice) = {pwr_BindMethod(Configure), pwr_BindMethod(ConfigureFilter),
+                                         pwr_BindMethod(CopyDevice), pwr_BindMethod(CopyDeviceFilter),
+                                         pwr_BindMethod(SyntaxCheck),
+                                         /* pwr_BindMethod(GetIoDeviceData),*/
+                                         /* pwr_BindMethod(SetIoDeviceData), */
+                                         pwr_BindMethod(PostCopy), pwr_NullMethod};
