@@ -2136,12 +2136,12 @@ int ItemPnDeviceInfo::open_children_impl()
                  m_attrnav->gsdml->m_DeviceIdentity->_VendorName.length(),
                  &m_attrnav->gsdml->m_DeviceIdentity->_VendorName, m_node, flow_eDest_IntoLast, "");
   new ItemPnInfo(m_attrnav, "VendorID", "LocalGsdmlAttr", pwr_eType_UInt32, 0,
-                 &m_attrnav->gsdml->m_DeviceIdentity->_DeviceID, m_node, flow_eDest_IntoLast, "");
+                 &m_attrnav->gsdml->m_DeviceIdentity->_VendorID, m_node, flow_eDest_IntoLast, "");
   new ItemPnInfo(m_attrnav, "Info", "LocalGsdmlAttr", pwr_eType_String,
                  m_attrnav->gsdml->m_DeviceIdentity->_InfoText->length(),
                  &(*m_attrnav->gsdml->m_DeviceIdentity->_InfoText), m_node, flow_eDest_IntoLast, "");
   new ItemPnInfo(m_attrnav, "DeviceID", "LocalGsdmlAttr", pwr_eType_UInt32, 0,
-                 &m_attrnav->gsdml->m_DeviceIdentity->_VendorID, m_node, flow_eDest_IntoLast, "");
+                 &m_attrnav->gsdml->m_DeviceIdentity->_DeviceID, m_node, flow_eDest_IntoLast, "");
   new ItemPnInfo(m_attrnav, "MainFamily", "LocalGsdmlAttr", pwr_eType_String,
                  m_attrnav->gsdml->m_DeviceFunction->_MainFamily.length(),
                  &m_attrnav->gsdml->m_DeviceFunction->_MainFamily, m_node, flow_eDest_IntoLast, "");
