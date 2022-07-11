@@ -125,7 +125,7 @@ public:
   unsigned char* m_rt_io_data;
   unsigned short m_rt_clean_io_data_length;
   unsigned char* m_rt_clean_io_data;
-  uint m_rt_properties; // Set TO PROFINET_IO_CR_RT_CLASS2 (hard coded for iocr in rt_pn_iface.cpp: ~673)
+  uint m_rt_properties = 0; // Set TO PROFINET_IO_CR_RT_CLASS2 (hard coded for iocr in rt_pn_iface.cpp: ~673)
 };
 
 // class GsdmlIOCRData
@@ -393,6 +393,7 @@ public:
   std::string m_DAP_ID;          // DAP ID to map what DAP to use from the GSDML
   unsigned short m_vendor_id;    // Part of DeviceIdentity
   unsigned short m_device_id;    // Part of DeviceIdentity
+  unsigned int m_instance;       // Used to make out the ObjectUUID for DCERPC together with vendor ID and device ID.
 
   // std::shared_ptr<PnDeviceData> m_pn_local_runtime_data;
 
@@ -413,7 +414,7 @@ public:
   unsigned char m_rt_subnetmask[4];
   unsigned char m_rt_macaddress[6];
   std::string m_rt_interface_name; // Used by the controller. Ignored by other devices...
-  std::string m_rt_version;        // Who knows? According to manual set this to "1.0"
+  std::string m_rt_version = "1.0";        // Who knows? According to manual set this to "1.0"
 };
 
 class ProfinetRuntimeData

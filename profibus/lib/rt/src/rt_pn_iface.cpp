@@ -607,9 +607,8 @@ snprintf(pSDR->DeviceName, PN_MAX_DEVICE_NAME_LENGTH, pn_device->m_NetworkSettin
     if (pn_device->m_NetworkSettings.m_skip_ip_assignment)
       pSDR->AdditionalFlag |= PN_SERVICE_DOWNLOAD_ADD_FLAG_SKIP_IP_ASSIGNMENT;
 
-    // TODO Check into this aswell! Removed for now....
-    // pSDR->InstanceHighByte = _PN_U16_HIGH_BYTE(xml_dev_data->instance);
-    // pSDR->InstanceLowByte = _PN_U16_LOW_BYTE(xml_dev_data->instance);
+    pSDR->InstanceHighByte = _PN_U16_HIGH_BYTE(pn_device->m_instance);
+    pSDR->InstanceLowByte = _PN_U16_LOW_BYTE(pn_device->m_instance);
   }
 
   // TODO Check into what this is...manual says "Should be 1.0...."

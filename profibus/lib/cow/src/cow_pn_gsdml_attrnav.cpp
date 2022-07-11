@@ -1175,6 +1175,7 @@ int GsdmlAttrNav::save()
 
   pn_runtime_data->m_PnDevice->m_vendor_id = gsdml->m_DeviceIdentity->_VendorID;
   pn_runtime_data->m_PnDevice->m_device_id = gsdml->m_DeviceIdentity->_DeviceID;
+  pn_runtime_data->m_PnDevice->m_instance = m_selected_device_item->_ObjectUUID_LocalIndex;
   pn_runtime_data->m_PnDevice->m_moduleinfo_name = *m_selected_device_item->_ModuleInfo._Name;
   pn_runtime_data->m_PnDevice->m_gsdml_source_file = basename(gsdml->m_gsdml_file);
 

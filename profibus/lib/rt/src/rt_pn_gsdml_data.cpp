@@ -525,6 +525,7 @@ ProfinetDevice::ProfinetDevice(pugi::xml_node&& p_pn_device)
       m_DAP_ID(p_pn_device.attribute("DAP_ID").as_string()),
       m_vendor_id(p_pn_device.attribute("VendorId").as_uint()),
       m_device_id(p_pn_device.attribute("DeviceId").as_uint()),
+      m_instance(p_pn_device.attribute("Instance").as_uint()),
       // m_version(p_pn_device.attribute("Version").as_string()), // TODO Why is this important???    It
       // referes to the profile revision in the profile body of the GSDML. Maybe we should save the PNIO
       // version of the DAP instead?
@@ -554,6 +555,7 @@ void ProfinetDevice::build(pugi::xml_node&& p_pn_device) const
   p_pn_device.append_attribute("DAP_ID").set_value(m_DAP_ID.c_str());
   p_pn_device.append_attribute("VendorId").set_value(m_vendor_id);
   p_pn_device.append_attribute("DeviceId").set_value(m_device_id);
+  p_pn_device.append_attribute("Instance").set_value(m_instance);
 
   m_NetworkSettings.build(p_pn_device.append_child("NetworkSettings"));
 
