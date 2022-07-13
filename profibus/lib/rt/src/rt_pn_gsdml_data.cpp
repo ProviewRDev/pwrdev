@@ -50,6 +50,8 @@
 
 #include "pwr_baseclasses.h"
 
+ProfinetSlot* ProfinetRuntimeData::m_paste_slotdata = 0;
+
 ProfinetExtChannelDiag::ProfinetExtChannelDiag(pugi::xml_node&& p_ExtChannelDiag)
     : m_name(p_ExtChannelDiag.attribute("Name").as_string()),
       m_help(p_ExtChannelDiag.attribute("Help").as_string())
