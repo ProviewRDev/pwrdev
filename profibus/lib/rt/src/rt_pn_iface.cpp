@@ -417,18 +417,15 @@ void pack_download_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes, std::shared_ptr<Pr
   // Detail codes page 142 PNAK Manual (For when Code == 1)
   T_PNAK_SERVICE_DESCRIPTION* service_desc;
 
-  unsigned short device_ref = pn_device->m_rt_device_ref;
-  unsigned short num_iocrs = 0;
-  unsigned short num_apis = 0;
-  unsigned short num_modules = 0;
-  unsigned short num_submodules = 0;
-  unsigned short num_datarecords = 0;
-  unsigned short data_record_length = 0;
-
+  PN_U16 num_iocrs = 0;
+  PN_U16 num_apis = 0;
+  PN_U16 num_modules = 0;
+  PN_U16 num_datarecords = 0;
+  PN_U16 datarecord_ref_index = 0;
+  PN_U16 data_record_length = 0;
+  PN_U16 total_data_length = 0;
   char* pData;
-
-  unsigned short no_items;
-  unsigned short ii, length;
+  
   std::map<int, PnApiData> api_map;
 
   static unsigned short phase = 1;
@@ -439,8 +436,7 @@ void pack_download_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes, std::shared_ptr<Pr
 
   service_desc = (T_PNAK_SERVICE_DESCRIPTION*)&ServiceReqRes->ServiceChannel[0u];
 
-  service_desc->DeviceRef = device_ref;
-  //  service_desc->DeviceRef  = PN_DEVICE_REFERENCE_THIS_STATION;
+  service_desc->DeviceRef = pn_device->m_rt_device_ref;
   service_desc->Instance = PN; // PN_CONTROLLER
   service_desc->Service = PN_SERVICE_DOWNLOAD;
   service_desc->Primitive = PNAK_SERVICE_REQ;
@@ -450,25 +446,18 @@ void pack_download_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes, std::shared_ptr<Pr
   /* Calculate length of service */
 
   // Calculate number of IOCR's
-  // num_iocrs = xml_dev_data->iocr_data.size();
   num_iocrs = pn_device->m_IOCR_map.size();
 
   /* Calculate the rest */
-  // for (std::vector<GsdmlSlotData*>::iterator mod_it = xml_dev_data->slot_data.begin();
-  //      mod_it != xml_dev_data->slot_data.end(); mod_it++)
   for (auto const& slot : pn_device->m_slot_list)
   {
     // Skip empty slots
     if (slot.m_module_ID == "")
       continue;
 
+    // APIs are stored in the subslots. Why? APIs reference modules not submodules. TODO Look into...we can probably do this better...
     for (auto const& subslot : slot.m_subslot_map)
-    // for (std::vector<GsdmlSubslotData*>::iterator sub_it = (*mod_it)->subslot_data.begin();
-    //      sub_it != (*mod_it)->subslot_data.end(); sub_it++)
     {
-      // Count submodules
-      num_submodules++;
-
       // Count number of APIs we encounter and populate a map with indexes using
       // that API
       unsigned int api = subslot.second.m_api;
@@ -482,8 +471,6 @@ void pack_download_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes, std::shared_ptr<Pr
 
       // Count data records and record total length
       for (auto const& data_record : subslot.second.m_data_record_map)
-      // for (std::vector<GsdmlDataRecord*>::iterator drec_it = (*sub_it)->data_record.begin();
-      //      drec_it != (*sub_it)->data_record.end(); drec_it++)
       {
         num_datarecords++;
         data_record_length += data_record.second.m_data_length;
@@ -493,39 +480,18 @@ void pack_download_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes, std::shared_ptr<Pr
     num_modules++;
   }
 
-  // printf("Number of submodules for this slave: %d\n", num_submodules);
-  // printf("Data record size for slave: %d\n", data_record_length);
-  // printf("num_iocrs: %d\n", num_iocrs);
-  // printf("num_apis: %d\n", num_apis);
-  // printf("num_modules: %d\n", num_modules);
-  // printf("num_submodules: %d\n", num_submodules);
-  // printf("num_datarecords: %d\n", num_datarecords);
-  // printf("num_data_record_length: %d\n", data_record_length);
-
-  // printf("sizeof DOWNLOAD_REQ: %d\n", sizeof(T_PN_SERVICE_DOWNLOAD_REQ));
-  // printf("sizeof PN_IOCR: %d\n", sizeof(T_PN_IOCR));
-  // printf("sizeof T_PN_API: %d\n", sizeof(T_PN_API));
-  // printf("sizeof T_PN_MODULE: %d\n", sizeof(T_PN_MODULE));
-  // printf("sizeof T_PN_SUBMODULE: %d\n", sizeof(T_PN_SUBMODULE));
-  // printf("sizeof T_PN_DATA_RECORD: %d\n", sizeof(T_PN_DATA_RECORD));
-  // printf("sizeof T_PN_REFERENCE: %d\n", sizeof(T_PN_REFERENCE));
-
   pData = (char*)(service_desc + 1);
 
   /* Fill data in download request */
-
   T_PN_SERVICE_DOWNLOAD_REQ* pSDR = (T_PN_SERVICE_DOWNLOAD_REQ*)pData;
 
   unsigned char high_high_byte;
   unsigned char high_low_byte;
   unsigned char low_high_byte;
   unsigned char low_low_byte;
-  // unsigned char high_byte;
-  // unsigned char low_byte;
-  unsigned long ar_property;
-  unsigned short high_word;
-  unsigned short low_word;
-  // unsigned short sub_prop;
+  
+  PN_U32 ar_property;
+  
   T_PN_IOCR* pIOCR;
   T_PN_REFERENCE* pAPIReference;
   T_PN_REFERENCE* pModuleReference;
@@ -534,17 +500,7 @@ void pack_download_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes, std::shared_ptr<Pr
   T_PN_REFERENCE* pDataRecordReference;
   T_PN_DATA_RECORD* pDataRecord;
 
-  if (device_ref == 1)
-  {
-    printf("sizeof download-struct: %d\n", sizeof(T_PN_SERVICE_DOWNLOAD_REQ));
-    printf("sizeof IOCR-struct: %d\n", sizeof(T_PN_IOCR));
-    printf("sizeof API-struct: %d\n", sizeof(T_PN_API));
-    printf("sizeof MODULE-struct: %d\n", sizeof(T_PN_MODULE));
-    printf("sizeof SUBMODULE-struct: %d\n", sizeof(T_PN_SUBMODULE));
-    printf("sizeof DATARECORD-struct: %d\n", sizeof(T_PN_DATA_RECORD));
-    printf("sizeof REFERENCE-struct: %d\n", sizeof(T_PN_REFERENCE));
-  }
-
+  unsigned short no_items;
   no_items = sscanf(pn_device->m_NetworkSettings.m_subnet_mask.c_str(), "%hhi.%hhi.%hhi.%hhi",
                     &high_high_byte, &high_low_byte, &low_high_byte, &low_low_byte);
 
@@ -574,10 +530,12 @@ snprintf(pSDR->DeviceName, PN_MAX_DEVICE_NAME_LENGTH, pn_device->m_NetworkSettin
   
   
 
-  if (device_ref == PN_DEVICE_REFERENCE_THIS_STATION)
+  // If this device is the controller itself (i.e. ProviewR) act accordingly
+  if (pn_device->m_rt_device_ref == PN_DEVICE_REFERENCE_THIS_STATION)
   {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat-security"
+    // This device make use of the interface name...
     snprintf(pSDR->InterfaceName, PN_MAX_INTERFACE_NAME_LENGTH, pn_device->m_rt_interface_name.c_str());
 #pragma GCC diagnostic pop
     
@@ -599,11 +557,7 @@ snprintf(pSDR->DeviceName, PN_MAX_DEVICE_NAME_LENGTH, pn_device->m_NetworkSettin
 
     pSDR->Flag = PN_SERVICE_DOWNLOAD_FLAG_ACTIVATE;
 
-    // ar_property = PROFINET_AR_PROPERTY_STATE_PRIMARY |
-    //               PROFINET_AR_PROPERTY_PARAMETER_SERVER_CM |
-    //               PROFINET_AR_PROPERTY_STARTUP_MODE_ADVANCED;
-
-    // TODO Check if advanced startup and act accordingly
+    // Check if advanced startup and act accordingly
     ar_property = PROFINET_AR_PROPERTY_STATE_PRIMARY | PROFINET_AR_PROPERTY_PARAMETER_SERVER_CM;
 
     if (pn_device->m_IOCR_map.at(PROFINET_IO_CR_TYPE_INPUT).m_startup_mode == "Advanced")
@@ -626,17 +580,14 @@ snprintf(pSDR->DeviceName, PN_MAX_DEVICE_NAME_LENGTH, pn_device->m_NetworkSettin
     pSDR->InstanceLowByte = _PN_U16_LOW_BYTE(pn_device->m_instance);
   }
 
-  // TODO Check into what this is...manual says "Should be 1.0...."
+  // Manual says "Should be 1.0...."
   no_items =
       sscanf(pn_device->m_rt_version.c_str(), "%hhi.%hhi", &pSDR->VersionHighByte, &pSDR->VersionLowByte);
 
-  high_word = _PN_U32_HIGH_WORD(ar_property);
-  low_word = _PN_U32_LOW_WORD(ar_property);
-
-  pSDR->ARPropertiesHighWordHighByte = _PN_U16_HIGH_BYTE(high_word);
-  pSDR->ARPropertiesHighWordLowByte = _PN_U16_LOW_BYTE(high_word);
-  pSDR->ARPropertiesLowWordHighByte = _PN_U16_HIGH_BYTE(low_word);
-  pSDR->ARPropertiesLowWordLowByte = _PN_U16_LOW_BYTE(low_word);
+  pSDR->ARPropertiesHighWordHighByte = _PN_U32_HIGH_HIGH_BYTE(ar_property);
+  pSDR->ARPropertiesHighWordLowByte = _PN_U32_HIGH_LOW_BYTE(ar_property);
+  pSDR->ARPropertiesLowWordHighByte = _PN_U32_LOW_HIGH_BYTE(ar_property);
+  pSDR->ARPropertiesLowWordLowByte = _PN_U32_LOW_LOW_BYTE(ar_property);
 
   pSDR->DeviceIdHighByte = _PN_U16_HIGH_BYTE(pn_device->m_device_id);
   pSDR->DeviceIdLowByte = _PN_U16_LOW_BYTE(pn_device->m_device_id);
@@ -659,18 +610,21 @@ snprintf(pSDR->DeviceName, PN_MAX_DEVICE_NAME_LENGTH, pn_device->m_NetworkSettin
   pSDR->AlarmCRBlock.RTATimeoutFactorLowByte = 1;
   pSDR->AlarmCRBlock.RTARetryHighByte = 0;
   pSDR->AlarmCRBlock.RTARetryLowByte = 3;
-  pSDR->AlarmCRBlock.PropertiesHighWordHighByte = 0;
-  pSDR->AlarmCRBlock.PropertiesHighWordLowByte = 0;
-  pSDR->AlarmCRBlock.PropertiesLowWordHighByte = 0;
-  pSDR->AlarmCRBlock.PropertiesLowWordLowByte = 0;
-  pSDR->AlarmCRBlock.MaxAlarmLengthHighByte = 0;
-  pSDR->AlarmCRBlock.MaxAlarmLengthLowByte = 200;
+  
+  PN_U32 alarm_properties = PROFINET_ALARM_CR_PRIORITY_DEFAULT | PROFINET_ALARM_CR_USE_DATA_RTA;
+  pSDR->AlarmCRBlock.PropertiesHighWordHighByte =  _PN_U32_HIGH_HIGH_BYTE(alarm_properties);
+  pSDR->AlarmCRBlock.PropertiesHighWordLowByte = _PN_U32_HIGH_LOW_BYTE(alarm_properties);
+  pSDR->AlarmCRBlock.PropertiesLowWordHighByte = _PN_U32_LOW_HIGH_BYTE(alarm_properties);
+  pSDR->AlarmCRBlock.PropertiesLowWordLowByte = _PN_U32_LOW_LOW_BYTE(alarm_properties);
+  
+  pSDR->AlarmCRBlock.MaxAlarmLengthHighByte = _PN_U16_HIGH_BYTE(PROFINET_ALARM_DATA_MAX_LENGTH);
+  pSDR->AlarmCRBlock.MaxAlarmLengthLowByte = _PN_U16_LOW_BYTE(PROFINET_ALARM_DATA_MAX_LENGTH);
   pSDR->AlarmCRBlock.TagHeaderHighHighByte = 0xC0;
   pSDR->AlarmCRBlock.TagHeaderHighLowByte = 0;
   pSDR->AlarmCRBlock.TagHeaderLowHighByte = 0xA0;
   pSDR->AlarmCRBlock.TagHeaderLowLowByte = 0;
 
-  length = sizeof(T_PN_SERVICE_DOWNLOAD_REQ);
+  total_data_length = sizeof(T_PN_SERVICE_DOWNLOAD_REQ);
 
   /* Fill the IOCRS's */
 
@@ -678,7 +632,7 @@ snprintf(pSDR->DeviceName, PN_MAX_DEVICE_NAME_LENGTH, pn_device->m_NetworkSettin
 
   for (auto& iocr : pn_device->m_IOCR_map)
   {
-    length += sizeof(T_PN_IOCR);
+    total_data_length += sizeof(T_PN_IOCR);
 
     /* Fill data for IOCR */
     pIOCR->VersionHighByte = pSDR->VersionHighByte;
@@ -694,7 +648,7 @@ snprintf(pSDR->DeviceName, PN_MAX_DEVICE_NAME_LENGTH, pn_device->m_NetworkSettin
       iocr.second.m_rt_properties |=
           PROFINET_IO_CR_RT_CLASS2; // RT_CLASS_2 even if device says CLASS_1. Things
                                     // stop working when we use CLASS_1 even if a device says it want
-                                    // CLASS_1...
+                                    // CLASS_1...Might be a stack issue since our stack is pretty old now... 
 
     pIOCR->PropertiesHighWordHighByte = _PN_U32_HIGH_HIGH_BYTE(iocr.second.m_rt_properties);
     pIOCR->PropertiesHighWordLowByte = _PN_U32_HIGH_LOW_BYTE(iocr.second.m_rt_properties);
@@ -742,12 +696,10 @@ snprintf(pSDR->DeviceName, PN_MAX_DEVICE_NAME_LENGTH, pn_device->m_NetworkSettin
     /* Fill references to API */
 
     pAPIReference = (T_PN_REFERENCE*)(pIOCR + 1);
-    // printf("api_map.size(): %d\n", (int)api_map.size());
 
     for (const auto& cApi : api_map)
     {
-      // printf("Adding reference to API %d for this IOCR %d\n", cApi.second.api, cApi.first);
-      length += sizeof(T_PN_REFERENCE);
+      total_data_length += sizeof(T_PN_REFERENCE);
       pAPIReference->ReferenceHighByte = _PN_U16_HIGH_BYTE(cApi.second.api);
       pAPIReference->ReferenceLowByte = _PN_U16_LOW_BYTE(cApi.second.api);
       pAPIReference++;
@@ -762,19 +714,15 @@ snprintf(pSDR->DeviceName, PN_MAX_DEVICE_NAME_LENGTH, pn_device->m_NetworkSettin
 
   for (const auto& cApi : api_map)
   {
-    length += sizeof(T_PN_API);
+    total_data_length += sizeof(T_PN_API);
     /* Fill data for API */
-    // printf("cApi.second.api: %d\n", cApi.second.api);
-    // printf("cApi.second.module_index.size(): %d\n", (int)cApi.second.module_index.size());
     pAPI->APIHighWordHighByte = _PN_U32_HIGH_HIGH_BYTE(cApi.second.api);
     pAPI->APIHighWordLowByte = _PN_U32_HIGH_LOW_BYTE(cApi.second.api);
     pAPI->APILowWordHighByte = _PN_U32_LOW_HIGH_BYTE(cApi.second.api);
     pAPI->APILowWordLowByte = _PN_U32_LOW_LOW_BYTE(cApi.second.api);
 
     pAPI->NumberOfModulesHighByte = _PN_U16_HIGH_BYTE(cApi.second.module_index.size());
-    pAPI->NumberOfModulesLowByte = _PN_U16_LOW_BYTE(cApi.second.module_index.size()); // Blir 7?
-
-    // printf("number of modules (%d) for api %d\n", pAPI->NumberOfModulesLowByte, cApi.second.api);
+    pAPI->NumberOfModulesLowByte = _PN_U16_LOW_BYTE(cApi.second.module_index.size());
 
     /* Fill references to Modules */
 
@@ -782,8 +730,7 @@ snprintf(pSDR->DeviceName, PN_MAX_DEVICE_NAME_LENGTH, pn_device->m_NetworkSettin
 
     for (unsigned int index : cApi.second.module_index)
     {
-      //printf("Adding reference to module %d for API %d\n", index, cApi.second.api);
-      length += sizeof(T_PN_REFERENCE);
+      total_data_length += sizeof(T_PN_REFERENCE);
       pModuleReference->ReferenceHighByte = _PN_U16_HIGH_BYTE(index);
       pModuleReference->ReferenceLowByte = _PN_U16_LOW_BYTE(index);
       pModuleReference++;
@@ -802,7 +749,7 @@ snprintf(pSDR->DeviceName, PN_MAX_DEVICE_NAME_LENGTH, pn_device->m_NetworkSettin
     if (slot.m_module_ID == "")
       continue;
 
-    length += sizeof(T_PN_MODULE);
+    total_data_length += sizeof(T_PN_MODULE);
     /* Fill data for MODULE */
     pModule->VersionHighByte = pSDR->VersionHighByte;
     pModule->VersionLowByte = pSDR->VersionLowByte;
@@ -823,7 +770,7 @@ snprintf(pSDR->DeviceName, PN_MAX_DEVICE_NAME_LENGTH, pn_device->m_NetworkSettin
     for (auto& subslot : slot.m_subslot_map)
     // for (jj = 0; jj < xml_dev_data->slot_data[ii]->subslot_data.size(); jj++)
     {
-      length += sizeof(T_PN_SUBMODULE);
+      total_data_length += sizeof(T_PN_SUBMODULE);
       /* Fill data for the submodule */
 
       pSubModule->SubSlotNumberHighByte = _PN_U16_HIGH_BYTE(subslot.second.m_subslot_number);
@@ -845,14 +792,13 @@ snprintf(pSDR->DeviceName, PN_MAX_DEVICE_NAME_LENGTH, pn_device->m_NetworkSettin
       pSubModule->NumberOfDataRecordsLowByte = _PN_U16_LOW_BYTE(subslot.second.m_data_record_map.size());
 
       /* Add number of datarecords */
-
       pDataRecordReference = (T_PN_REFERENCE*)(pSubModule + 1);
 
-      for (int ref_index = 0; ref_index < subslot.second.m_data_record_map.size(); ref_index++)
+      for (auto &data_record : subslot.second.m_data_record_map)
       {
-        length += sizeof(T_PN_REFERENCE);
-        pDataRecordReference->ReferenceHighByte = _PN_U16_HIGH_BYTE(ref_index);
-        pDataRecordReference->ReferenceLowByte = _PN_U16_LOW_BYTE(ref_index);
+        total_data_length += sizeof(T_PN_REFERENCE);
+        pDataRecordReference->ReferenceHighByte = _PN_U16_HIGH_BYTE(datarecord_ref_index);
+        pDataRecordReference->ReferenceLowByte = _PN_U16_LOW_BYTE(datarecord_ref_index++);
         pDataRecordReference++;
       }
 
@@ -863,24 +809,19 @@ snprintf(pSDR->DeviceName, PN_MAX_DEVICE_NAME_LENGTH, pn_device->m_NetworkSettin
   }
 
   /* Fill the DATA_RECORD's */
-
   pDataRecord = (T_PN_DATA_RECORD*)pModule;
 
   for (auto& slot : pn_device->m_slot_list)
-  // for (ii = 0; ii < num_modules; ii++)
   {
     // Skip empty slot
     if (slot.m_module_ID == "")
       continue;
 
     for (auto& subslot : slot.m_subslot_map)
-    // for (jj = 0; jj < xml_dev_data->slot_data[ii]->subslot_data.size(); jj++)
     {
       for (auto& data_record : subslot.second.m_data_record_map)
-      // for (kk = 0; kk < xml_dev_data->slot_data[ii]->subslot_data[jj]->data_record.size(); kk++)
       {
-        length += sizeof(T_PN_DATA_RECORD) + data_record.second.m_data_length;
-        // printf("Fill data records slot (%d), subslot(%d): %d \n", ii, jj, kk);
+        total_data_length += sizeof(T_PN_DATA_RECORD) + data_record.second.m_data_length;
         pDataRecord->VersionHighByte = pSDR->VersionHighByte;
         pDataRecord->VersionLowByte = pSDR->VersionLowByte;
         pDataRecord->SequenceHighByte = _PN_U16_HIGH_BYTE(data_record.second.m_transfer_sequence);
@@ -903,23 +844,7 @@ snprintf(pSDR->DeviceName, PN_MAX_DEVICE_NAME_LENGTH, pn_device->m_NetworkSettin
     }
   }
 
-  service_desc->DataLength = length;
-
-  if (device_ref != 0)
-  {
-
-    pData = (char*)(pSDR);
-    printf("Download of device: %s\n", pn_device->m_NetworkSettings.m_device_name.c_str());
-    printf("Total datalength %d\n\n", length);
-    for (ii = 0; ii < length; ii++)
-    {
-      if (ii % 16 == 0)
-        printf("\n");
-      printf("%02hhX ", pData[ii]);
-    }
-    printf("\n");
-    printf("\n");
-  }
+  service_desc->DataLength = total_data_length;
 }
 
 // los = List Of Station (T_PN_SERVICE_GET_LIST_OF_STATION_CON)
