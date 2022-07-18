@@ -1,5 +1,11 @@
 /** Glow start **/
 
+var GLOW_ = {
+  SUCCESS    : 154763273,
+  NOSELECT   : 154304570,
+  GROUPCLASS : 154763378
+};
+
 var Glow = {
   GLOW__TERMINATED	       	: 21001,
   GLOW__SUBTERMINATED        	: 21003,
@@ -624,6 +630,86 @@ var Glow = {
   eDrawType__ 			: 670,
   eDrawType_Inherit 		: 9999,
   eDrawType_No 			: 10000,
+
+  eCtColor_Background : 310,
+  eCtColor_BackgroundGradient : 314,
+  eCtColor_AreaDelimiter : 318,
+  eCtColor_LineDelimiter : 322,
+  eCtColor_BackgroundTextAndLines : 326,
+  eCtColor_InputfieldFillcolor : 330,
+  eCtColor_InputfieldBordercolor : 334,
+  eCtColor_InputfieldTextcolor : 338,
+  eCtColor_RedIndicator : 350,
+  eCtColor_RedCurve : 354,
+  eCtColor_RedBar : 358,
+  eCtColor_RedBarLimit : 362,
+  eCtColor_RedValuefieldBackground : 366,
+  eCtColor_IndicatorBorderColor : 370,
+  eCtColor_IndicatorLowColor : 374,
+  eCtColor_IndicatorOnDelimiterLowColor : 378,
+  eCtColor_SliderColor : 382,
+  eCtColor_SliderBackgroundColor : 386,
+  eCtColor_ValuefieldFillcolor : 390,
+  eCtColor_ValuefieldBordercolor : 394,
+  eCtColor_ValuefieldTextcolor : 398,
+  eCtColor_GreenIndicator : 410,
+  eCtColor_GreenCurve : 414,
+  eCtColor_GreenBar : 418,
+  eCtColor_GreenBarLimit : 422,
+  eCtColor_GreenValuefieldBackground : 426,
+  eCtColor_LimitswitchHighColor : 430,
+  eCtColor_LimitswitchLowColor : 434,
+  eCtColor_LimitswitchBorderColor : 438,
+  eCtColor_AreaDelimiterTextAndLines : 442,
+  eCtColor_ButtonActiveFillcolor : 446,
+  eCtColor_ButtonFillcolor : 450,
+  eCtColor_ButtonBordercolor : 454,
+  eCtColor_ButtonTextcolor : 458,
+  eCtColor_ButtonInsensitiveTextcolor : 462,
+  eCtColor_ButtonInsensitiveBordercolor : 466,
+  eCtColor_YellowIndicator : 470,
+  eCtColor_YellowCurve : 474,
+  eCtColor_YellowBar : 478,
+  eCtColor_YellowBarLimit : 482,
+  eCtColor_YellowValuefieldBackground : 486,
+  eCtColor_SymbolFillcolor : 490,
+  eCtColor_SymbolBordercolor : 494,
+  eCtColor_SymbolLowColor : 498,
+  eCtColor_SymbolEmptyColor : 502,
+  eCtColor_BarBarColor : 510,
+  eCtColor_BarBackgroundColor : 514,
+  eCtColor_BarBarLimitColor : 518,
+  eCtColor_BarBackground : 522,
+  eCtColor_BarBackgroundLines : 526,
+  eCtColor_BlueIndicator : 530,
+  eCtColor_BlueCurve : 534,
+  eCtColor_BlueBar : 538,
+  eCtColor_BlueBarLimit : 542,
+  eCtColor_BlueValuefieldBackground : 546,
+  eCtColor_MenuFillcolor : 550,
+  eCtColor_MenuTextcolor : 554,
+  eCtColor_ToolbarFillcolor : 558,
+  eCtColor_ToolbarBordercolor : 562,
+  eCtColor_ToolbarTextcolor : 566,
+  eCtColor_DiagramFillcolor : 570,
+  eCtColor_DiagramBordercolor : 574,
+  eCtColor_DiagramCurveColor : 578,
+  eCtColor_AxisBordercolor : 582,
+  eCtColor_OrangeIndicator : 590,
+  eCtColor_OrangeCurve : 594,
+  eCtColor_OrangeBar : 598,
+  eCtColor_OrangeBarLimit : 600,
+  eCtColor_OrangeValuefieldBackground : 604,
+  eCtColor_TableFillcolor : 608,
+  eCtColor_TableBordercolor : 612,
+  eCtColor_TableTextcolor : 616,
+  eCtColor_ScrollbarFillcolor : 620,
+  eCtColor_ScrollbarBackground : 626,
+  eCtColor_MagentaIndicator : 650,
+  eCtColor_MagentaCurve : 654,
+  eCtColor_MagentaBar : 658,
+  eCtColor_MagentaBarLimit : 662,
+  eCtColor_MagentaValuefieldBackground : 666,
 
   eDrawType_FillHighlight 	: 173,
   eDrawType_LineHighlight 	: 175,
@@ -1735,6 +1821,11 @@ function GlowPoint( ctx) {
   this.y = 0.0;
   this.ctx = ctx;
   
+  this.construct = function(x, y) {
+    this.x = x;
+    this.y = y;
+  }
+
   this.open = function( lines, row) {
     var end = false;
     for ( var i = row; i < lines.length; i++) {
@@ -1980,8 +2071,8 @@ var GlowColor = {
 	else
 	  drawtype = local_drawtype;
       }
-      else if ( node !== null && fill == 1 && node.getFillDrawtype() != Glow.eDrawType_No) {
-	drawtype = node.getFillDrawtype();
+      else if ( node !== null && fill == 1 && node.getFillColor() != Glow.eDrawType_No) {
+	drawtype = node.getFillColor();
       }
       else if ( node !== null && fill == 2 && node.getTextDrawtype() != Glow.eDrawType_No) {
 	drawtype = node.getTextDrawtype();
@@ -1989,12 +2080,12 @@ var GlowColor = {
       else if ( node !== null && fill == 3 && node.getBackgroundDrawtype() != Glow.eDrawType_No) {
 	drawtype = node.getBackgroundDrawtype();
       }
-      else if ( node !== null && fill === 0 && node.getDrawtype() != Glow.eDrawType_No) {
-	drawtype = node.getDrawtype();
+      else if ( node !== null && fill === 0 && node.getBorderColor() != Glow.eDrawType_No) {
+	drawtype = node.getBorderColor();
       }
-      else
+      else {
 	drawtype = local_drawtype;
-
+      }
       if ( node !== null && lightness !== 0) {
 	if ( local_drawtype >= 30 && drawtype < 300) {
 	  base_drawtype = Math.floor(drawtype / 10) * 10;
@@ -2239,7 +2330,8 @@ function GlowCustomColors() {
   };
 
   this.read_colorfile = function( ctx, name) {
-    ctx.appl.frame.readGrowWeb( name, this.read_cb);
+    this.ctx = ctx;
+    ctx.appl.frame.readGrowWeb( name, this.read_cb, true);
   }
 
   this.read_cb = function( lines, row) {
@@ -2254,6 +2346,25 @@ function GlowArray( ctx) {
 
   this.add = function( elem) {
     this.a.push(elem);
+  };
+  this.get_first = function() {
+    var ret = {sts : 0, element : null}
+    if (this.length == 0)
+      return ret;
+    ret.element = this.a[0];
+    ret.sts = 1;
+    return ret;
+  };
+  this.get_next = function( elem) {
+    var ret = {sts : 0, element : null}
+    for ( var i = 0; i < this.a.length - 1; i++) {
+      if ( this.a[i] == elem) {
+	ret.element = this.a[i+1];
+        ret.sts = 1;
+	return ret;
+      }
+    }
+    return ret;
   };
   this.remove = function( elem) {
     for ( var i = 0; i < this.a.length; i++) {
@@ -2396,7 +2507,7 @@ function GlowArray( ctx) {
 	break;
       }
       case Glow.eSave_GrowPolyLine: {
-	o = new GrowPolyline( this.ctx);
+	o = new GrowPolyLine( this.ctx);
 	i = o.open( lines, i+1);
 	this.add( o);
 	break;
@@ -2536,6 +2647,66 @@ function GlowArray( ctx) {
 
   this.clear = function() {
     this.a.length = 0;
+  }
+  this.setFillColor = function(drawtype) {
+    for (let i = 0; i < this.a.length; i++)
+      this.a[i].setFillColor(drawtype);
+  }
+  this.resetFillColor = function() {
+    for (let i = 0; i < this.a.length; i++)
+      this.a[i].resetFillColor();
+  }
+  this.setBorderColor = function(drawtype) {
+    for (let i = 0; i < this.a.length; i++)
+      this.a[i].setBorderColor(drawtype);
+  }
+  this.resetBorderColor = function() {
+    for (let i = 0; i < this.a.length; i++)
+      this.a[i].resetBorderColor();
+  }
+  this.setOriginalFillColor = function(drawtype) {
+    for (let i = 0; i < this.a.length; i++)
+      this.a[i].setOriginalFillColor(drawtype);
+  }
+  this.setOriginalTextColor = function(drawtype) {
+    for (let i = 0; i < this.a.length; i++)
+      this.a[i].setOriginalTextColor(drawtype);
+  }
+  this.setOriginalBorderColor = function(drawtype) {
+    for (let i = 0; i < this.a.length; i++)
+      this.a[i].setOriginalBorderColor(drawtype);
+  }
+  this.setOriginalBackgroundColor = function(drawtype) {
+    for (let i = 0; i < this.a.length; i++)
+      this.a[i].setOriginalBackgroundColor(drawtype);
+  }
+  this.setLinewidth = function(linewidth) {
+    for (let i = 0; i < this.a.length; i++)
+      this.a[i].setLinewidth(linewidth);
+  }
+  this.setFill = function(fill) {
+    for (let i = 0; i < this.a.length; i++)
+      this.a[i].setFill(fill);
+  }
+  this.setBorder = function(border) {
+    for (let i = 0; i < this.a.length; i++)
+      this.a[i].setBorder(border);
+  }
+  this.setShadow = function(shadow) {
+    for (let i = 0; i < this.a.length; i++)
+      this.a[i].setShadow(shadow);
+  }
+  this.setGradient = function(gradient) {
+    for (let i = 0; i < this.a.length; i++)
+      this.a[i].setGradient(gradient);
+  }
+  this.setTransform = function(t) {
+    for (let i = 0; i < this.a.length; i++)
+      this.a[i].setTransform(t);
+  }
+  this.get_borders = function(t, g) {
+    for (let i = 0; i < this.a.length; i++)
+      this.a[i].get_borders(t, g);
   }
 }
 
@@ -2798,6 +2969,20 @@ function GlowTransform() {
   this.is_stored = function() { 
     return this.stored;
   };
+
+  this.store_reset = function() { 
+    this.stored = 0;
+  };
+
+  this.init = function(a11, a12, a13, a21, a22, a23, rotation) {
+    this.a11 = a11;
+    this.a12 = a12;
+    this.a13 = a13;
+    this.a21 = a21;
+    this.a22 = a22;
+    this.a23 = a23;
+    this.rotation = rotation;
+  };
 }
 
 function GlowNodeClass( ctx) {
@@ -3057,6 +3242,12 @@ function GlowNodeClass( ctx) {
     return null;
   };
 
+  this.getName = function() {
+    return this.nc_name;
+  };
+  this.isSlider = function() {
+    return this.slider;
+  };
 }
 
 function GlowNodeGroup( ctx) {
@@ -3840,16 +4031,94 @@ function GlowText( ctx) {
   };
 }
 
+function GlowArrayElem() {
+  this.getUserData = function() {
+    return null;
+  };
+  this.setUserData = function(userdata) {
+  };
+  this.setFillColor = function(drawtype) {
+  }
+  this.resetFillColor = function(drawtype) {
+  }
+  this.setOriginalFillColor = function(color) {
+  }
+  this.getFillColor = function() {
+    return 0;
+  }
+  this.setBorderColor = function(drawtype) {
+  }
+  this.resetBorderColor = function(drawtype) {
+  }
+  this.setOriginalBorderColor = function(color) {
+  }
+  this.getBorderColor = function() {
+    return 0;
+  }
+  this.setOriginalTextColor = function(drawtype) {
+  }
+  this.setOriginalBackgroundColor = function(drawtype) {
+  }
+  this.setLinewidth = function(linewidth) {
+  }
+  this.setLinetype = function(type) {
+  }
+  this.getFill = function() {
+    return 0;
+  }
+  this.setFill = function(fill) {
+  }
+  this.getBorder = function() {
+    return 0;
+  }
+  this.setBorder = function(border) {
+  }
+  this.storeBorders = function() {
+  }
+  this.setShadow = function(shadow) {
+  }
+  this.getShadow = function() {
+  return 0; 
+  }
+  this.getGradient = function() {
+    return 0;
+  }
+  this.setGradient = function(gradient) {
+  }
+  this.setTextSize = function(size) {
+  }
+  this.setTextBold = function(bold) {
+  }
+  this.setTextFont = function(font) {
+  }
+  this.getTransparency = function() {
+    return 0.0;
+  }
+  this.setTransparency = function(transparency) {
+  }
+  this.getName = function() {
+    return "";
+  }
+  this.setTransform = function(t) {
+  }
+  this.initTransform = function(a11, a12, a13, a21, a22, a23, rotation) {
+  }
+  this.setLinewidth = function(linewidth) {
+  }
+  this.storeBorders = function() {
+  }
+}
+
 function GrowNode( ctx) {
+  GlowArrayElem.call(this);
   this.MAX_CONPOINTS = 32;
   this.ctx = ctx;
   this.original_border_drawtype = Glow.eDrawType_No;
-  this.border_drawtype = 0;
   this.background_drawtype = Glow.eDrawType_No;
   this.original_fill_drawtype = Glow.eDrawType_No;
   this.original_text_drawtype = Glow.eDrawType_No;
   this.original_background_drawtype = Glow.eDrawType_No;
-  this.original_color_tone = Glow.eDrawType_No;
+  this.original_color_tone = Glow.eDrawTone_No;
   this.original_color_lightness = 0;
   this.original_color_intensity = 0;
   this.original_color_shift = 0;
@@ -3857,10 +4126,10 @@ function GrowNode( ctx) {
   this.color_lightness = 0;
   this.color_intensity = 0;
   this.color_shift = 0;
-  this.color_tone = Glow.eDrawType_No;
+  this.color_tone = Glow.eDrawTone_No;
   this.fill_drawtype = Glow.eDrawType_No;
-  this.text_drawtype = 0;
-  this.draw_type = 0;
+  this.text_drawtype = Glow.eDrawType_No;
+  this.draw_type = Glow.eDrawType_No;
   this.dimmed = 0;
   this.invisible = 0;
   this.flip_horizontal = 0;
@@ -3884,6 +4153,10 @@ function GrowNode( ctx) {
   this.x_left = 0;
   this.y_high = 0;
   this.y_low = 0;
+  this.s_x_right = 0;
+  this.s_x_left = 0;
+  this.s_y_high = 0;
+  this.s_y_low = 0;
   this.annotsize = new Array(10);
   this.annotv = new Array(10);
   this.pos = new GlowPoint( this.ctx);
@@ -3911,6 +4184,25 @@ function GrowNode( ctx) {
   this.type = function() {
     return Glow.eObjectType_GrowNode;
   };
+
+  this.construct = function(name, nc, x, y) {
+    this.pos.construct(x, y);
+    this.trf.move(this.pos.x, this.pos.y);
+    this.n_name = name;
+    this.nc = nc;
+    this.nc_root = nc;
+    this.nc_name = nc.nc_name;
+    this.get_node_borders();
+    this.storeBorders();
+  }
+
+  this.set_name = function(name) {
+    this.n_name = name;
+  }
+  this.get_name = function() {
+    return this.n_name;
+  }
+
 
   this.open = function( lines, row) {
     var end = false;
@@ -4149,6 +4441,7 @@ function GrowNode( ctx) {
       if ( end)
 	break;      
     }
+    this.storeBorders();
     return i;
   };
 
@@ -4181,7 +4474,7 @@ function GrowNode( ctx) {
   this.tdraw = function( t, highlight, hot, node, colornode) {
     if ( this.ctx.nodraw !== 0)
       return;
-  
+
     if ( node === null)
       node = this;
     if ( colornode === null)
@@ -4235,7 +4528,7 @@ function GrowNode( ctx) {
 	clip_sts = this.ctx.gdraw.set_clip_rectangle( x1 - 1, y1 - 1, x1 + x_level, y2 + 1);
 	break;
       case Glow.eDirection_Left:
-	x_level = Math.floor( (1 - fill_level) * ( x2 - x1) + 0.5);
+	x_level = Math.floor( (1 - this.fill_level) * ( x2 - x1) + 0.5);
 	clip_sts = this.ctx.gdraw.set_clip_rectangle( x1 - 1, y1 - 1, x1 + x_level, y2 + 1);
 	if ( this.level_color_tone != Glow.eDrawTone_No) {
 	  old_color_tone = this.color_tone;
@@ -4447,26 +4740,26 @@ function GrowNode( ctx) {
 
     switch( type) {
     case Glow.eScaleType_LowerLeft:
-      x0 = this.x_left;
-      y0 = this.y_low;
+      x0 = this.s_x_left;
+      y0 = this.s_y_low;
       break;
     case Glow.eScaleType_LowerRight:
-      x0 = this.x_right;
-      y0 = this.y_low;
+      x0 = this.s_x_right;
+      y0 = this.s_y_low;
       break;
     case Glow.eScaleType_UpperRight:
-      x0 = this.x_right;
-      y0 = this.y_high;
+      x0 = this.s_x_right;
+      y0 = this.s_y_high;
       break;
     case Glow.eScaleType_UpperLeft:
-      x0 = this.x_left;
-      y0 = this.y_high;
+      x0 = this.s_x_left;
+      y0 = this.s_y_high;
       break;
     case Glow.eScaleType_FixPoint:
 	    break;
     case Glow.eScaleType_Center:
-      x0 = (this.x_left + this.x_right) / 2;
-      y0 = (this.y_low + this.y_high) /2;
+      x0 = (this.s_x_left + this.s_x_right) / 2;
+      y0 = (this.s_y_low + this.s_y_high) /2;
       break;
     default:
       ;
@@ -4489,11 +4782,11 @@ function GrowNode( ctx) {
 	       this.y_high * this.ctx.mw.zoom_factor_y - this.ctx.mw.offset_y + Glow.DRAW_MP);
   };
 
-  this.setRotation = function( angel, x0, y0, type) {
+  this.setRotation = function( angle, x0, y0, type) {
     var old_x_left, old_x_right, old_y_low, old_y_high;
     var t = new GlowTransform();
 
-    if ( Math.abs( angel - this.trf.rotation + this.trf.s_rotation) < Number.MIN_VALUE)
+    if ( Math.abs( angle - this.trf.rotation + this.trf.s_rotation) < Number.MIN_VALUE)
       return;
 
     switch( type) {
@@ -4530,13 +4823,16 @@ function GrowNode( ctx) {
     old_y_low = this.y_low;
     old_y_high = this.y_high;
 
-    t.rotate( angel, x0, y0);
+    t.rotate( angle, x0, y0);
     this.trf.set_from_stored( t);
     this.get_node_borders();
   };
     
   this.storeTransform = function() {
     this.trf.store();
+  };
+  this.transformStoreReset = function() {
+    this.trf.store_reset();
   };
   this.transformIsStored = function() {
     return this.trf.is_stored();
@@ -4682,9 +4978,9 @@ function GrowNode( ctx) {
   this.get_node_borders = function() {
     var  g = new GlowGeometry();
 
-    g.ur_x = 10e-37;
+    g.ur_x = -10e37;
     g.ll_x = 10e37;
-    g.ur_y = 10e-37;
+    g.ur_y = -10e37;
     g.ll_y = 10e37;
 
     this.nc.get_borders( this.trf, g);
@@ -4702,6 +4998,13 @@ function GrowNode( ctx) {
     else
       this.nc.get_borders( this.trf, g);
   };
+
+  this.storeBorders = function() {
+    this.s_x_left = this.x_left;
+    this.s_x_right = this.x_right;
+    this.s_y_low = this.y_low;
+    this.s_y_high = this.y_high;
+  }
 
   this.get_background_object_limits = function( t, type, x, y, bo) {
     var dyn_type;
@@ -4777,6 +5080,15 @@ function GrowNode( ctx) {
     return 0;
   };
 
+  this.setTextFont = function(font) {
+    this.text_font = font;
+  }
+  this.setTextBold = function(bold) {
+    if (bold && this.text_type == Glow.eDrawType_TextHelvetica)
+      this.text_type = Glow.eDrawType_TextHelveticaBold;
+    else if (!bold && this.text_type == Glow.eDrawType_TextHelveticaBold)
+      this.text_type = Glow.eDrawType_TextHelvetica;
+  }
   this.getColorInverse = function() {
     return this.color_inverse;
   };
@@ -4792,7 +5104,7 @@ function GrowNode( ctx) {
   this.getColorTone = function() {
     return this.color_tone;
   };
-  this.getFillDrawtype = function() {
+  this.getFillColor = function() {
     return this.fill_drawtype;
   };
   this.getTextDrawtype = function() {
@@ -4801,7 +5113,7 @@ function GrowNode( ctx) {
   this.getBackgroundDrawtype = function() {
     return this.background_drawtype;
   };
-  this.getDrawtype = function() {
+  this.getBorderColor = function() {
     return this.draw_type;
   };
   this.getDimmed = function() {
@@ -4834,6 +5146,9 @@ function GrowNode( ctx) {
   this.getUserData = function() {
     return this.userdata;
   };
+  this.setUserData = function(userdata) {
+    this.userdata = userdata;
+  };
   this.setColorTone = function( color_tone) {
     this.color_tone = color_tone;
   };
@@ -4849,6 +5164,18 @@ function GrowNode( ctx) {
     this.color_intensity = 0;
     this.draw();
   };
+  this.setOriginalFillColor = function(drawtype) {    
+    this.original_color_tone = Glow.eDrawTone_No;
+    this.color_tone = Glow.eDrawTone_No;
+    this.original_color_shift = 0;
+    this.color_shift = 0;
+    this.original_color_lightness = 0;
+    this.color_lightness = 0;
+    this.original_color_intensity = 0;
+    this.color_intensity = 0;
+    this.original_fill_drawtype = drawtype;
+    this.resetFillColor();
+  };
   this.resetFillColor = function() {
     this.fill_drawtype = this.original_fill_drawtype;
     this.color_tone = this.original_color_tone;
@@ -4863,6 +5190,14 @@ function GrowNode( ctx) {
     this.color_lightness = 0;
     this.color_intensity = 0;
   };
+  this.setOriginalBorderColor = function( draw_type) {
+    this.original_border_drawtype = draw_type;
+    this.color_tone = Glow.eDrawTone_No;
+    this.color_shift = 0;
+    this.color_lightness = 0;
+    this.color_intensity = 0;
+    this.resetBorderColor();
+  };
   this.resetBorderColor = function() {
     this.draw_type = this.original_border_drawtype;
   };
@@ -4876,11 +5211,19 @@ function GrowNode( ctx) {
   this.resetTextColor = function() {
     this.text_drawtype = this.original_text_drawtype;
   };
+  this.setOriginalTextColor = function( draw_type) {
+    this.original_text_drawtype = draw_type;
+    this.resetTextColor();
+  };
   this.setBackgroundColor = function( draw_type) {
     this.background_drawtype = draw_type;
   };
   this.resetBackgroundColor = function() {
     this.background_drawtype = this.original_background_drawtype;
+  };
+  this.setOriginalBackgroundColor = function( draw_type) {
+    this.original_background_drawtype = draw_type;
+    this.background_drawtype = draw_type;
   };
   this.setColorInverse = function( color_inverse) {
     this.color_inverse = color_inverse;
@@ -4898,6 +5241,18 @@ function GrowNode( ctx) {
   this.setFillLevel = function( fill_level) {
     this.fill_level = fill_level;
   };
+  this.setShadow = function(shadow) {
+    this.shadow = shadow;
+  }
+  this.getShadow = function() {
+    return this.shadow;
+  }
+  this.setGradient = function(gradient) {
+    this.gradient = gradient;
+  }
+  this.getGradient = function() {
+    return this.gradient;
+  }
   this.setVisibility = function( visibility) {
     switch ( visibility) {
     case Glow.eVis_Visible:
@@ -4947,7 +5302,12 @@ function GrowNode( ctx) {
   this.setTransparency = function(transparency) {
     this.transparency = transparency;
   };
+  this.setTransform = function(t) {
+    this.trf = t.multiply(this.trf);
+    this.get_node_borders();
+  }
 }
+GrowNode.prototype = Object.create(GlowArrayElem.prototype);
 
 function GrowGroup( ctx) {
   GrowNode.call( this, ctx);
@@ -5012,6 +5372,12 @@ function GrowGroup( ctx) {
   this.get_object_list = function() {
     return this.nc.a;
   };
+  this.get_next_object = function(object) {
+    return this.nc.a.get_next(object);
+  };
+  this.get_first_object = function() {
+    return this.nc.a.get_first();
+  };
 }
 
 GrowGroup.prototype = Object.create(GrowNode.prototype);
@@ -5071,11 +5437,11 @@ function GrowSlider( ctx) {
   GrowNode.call( this, ctx);
   this.grownode_open = this.open;
 
-  this.direction;
-  this.max_value;
-  this.min_value;
-  this.max_pos;
-  this.min_pos;
+  this.direction = Glow.eDirection_Down;
+  this.max_value = 100;
+  this.min_value = 0;
+  this.max_pos = 0;
+  this.min_pos = 0;
     
   this.type = function() {
     return Glow.eObjectType_GrowSlider;
@@ -5193,6 +5559,16 @@ function GrowToolbar( ctx) {
   this.tools1_mask;
   this.tools2_mask;
 
+  this.construct = function(name, x, y, tools1, tools2, tools1_cnt, tools2_cnt) {
+    this.pos.construct(x, y);
+    this.trf.move(this.pos.x, this.pos.y);
+    this.n_name = name;
+    this.nc_name = name;
+    this.nc = new GlowNodeClass(this.ctx);
+    this.configure(tools1, tools2, tools1_cnt, tools2_cnt, 31, 15, 0, 0);
+    this.get_node_borders();
+    this.storeBorders();
+  }
 
   this.type = function() {
     return Glow.eObjectType_GrowToolbar;
@@ -5400,6 +5776,7 @@ function GrowToolbar( ctx) {
 	
     this.get_node_borders();
     this.scale();
+    this.storeBorders();
 
     console.log("Toolbar configure tools_mask " + this.tools1_mask + " " + this.tools2_mask);
   };
@@ -5442,8 +5819,8 @@ function GrowToolbar( ctx) {
       scale = (this.ctx.mw.window_width - ( this.x_left * this.ctx.mw.zoom_factor_x - this.ctx.mw.offset_x) - 10) /
 	(( this.x_right - this.x_left) * this.ctx.mw.zoom_factor_x);
 	    
-      thix.trf.scale( scale, 1, thix.x_left, thix.y_low);
-      thix.get_node_borders();
+      this.trf.scale( scale, 1, this.x_left, this.y_low);
+      this.get_node_borders();
     }
   };
 
@@ -5451,6 +5828,7 @@ function GrowToolbar( ctx) {
 GrowToolbar.prototype = Object.create(GrowNode.prototype);
 
 function GrowRect( ctx) {
+  GlowArrayElem.call(this);
   this.ctx = ctx;
   this.n_name = null;
   this.x_right = 0;
@@ -5478,6 +5856,7 @@ function GrowRect( ctx) {
   this.transparency = 0;
   this.dynamicsize = 0;
   this.trf = new GlowTransform();
+  this.userdata = null;
 
   this.ll = new GlowPoint( this.ctx);
   this.ur = new GlowPoint( this.ctx);
@@ -5486,9 +5865,29 @@ function GrowRect( ctx) {
   this.display_level = 0;
   this.fill = 0;
 
+  this.construct = function(name, x, y, width, height, draw_type, line_width,
+     fix_line_width, display_level, fill, border, shadow, fill_drawtype) {
+    this.ll.construct(x, y);
+    this.ur.construct(x + width, y + height);
+    this.draw_type = draw_type;
+    this.line_width = line_width;
+    this.display_level = display_level;
+    this.fill = fill;
+    this.border = border;
+    this.shadow = shadow;
+    this.fill_drawtype = fill_drawtype;
+    this.get_node_borders();
+  }
+
   this.type = function() {
     return Glow.eObjectType_GrowRect;
   };
+  this.set_name = function(name) {
+    this.n_name = name;
+  }
+  this.get_name = function() {
+    return this.n_name;
+  }
 
   this.open = function( lines, row) {
     var end = false;
@@ -5718,7 +6117,6 @@ function GrowRect( ctx) {
     ur_x = Math.max( x1, x2);
     ll_y = Math.min( y1, y2);
     ur_y = Math.max( y1, y2);
-
     var ish = this.shadow_width / 100 * Math.min(ur_x - ll_x, ur_y - ll_y) + 0.5;
     var display_shadow = ((node !== null && node.shadow !== 0) || this.shadow !== 0) && this.disable_shadow === 0;
     var fillcolor;
@@ -5728,7 +6126,6 @@ function GrowRect( ctx) {
     else
       fillcolor = GlowColor.get_drawtype( this.fill_drawtype, Glow.eDrawType_FillHighlight,
 					  highlight, colornode, 1, 0);
-
     var grad = this.gradient;
     if ( this.gradient == Glow.eGradient_No && 
 	 (node !== null && node.gradient != Glow.eGradient_No) && this.disable_gradient === 0)
@@ -5932,8 +6329,8 @@ function GrowRect( ctx) {
     case Glow.eScaleType_FixPoint:
       break;
     case Glow.eScaleType_Center:
-      x0 = (this.x_left + this.x_right) / 2;
-      y0 = (this.y_low + this.y_high) /2;
+      x0 = (this.x_left + this.s_x_right) / 2;
+      y0 = (this.y_low + this.s_y_high) /2;
       break;
     default:
       ;
@@ -5982,8 +6379,55 @@ function GrowRect( ctx) {
 		   this.y_high * this.ctx.mw.zoom_factor_y - this.ctx.mw.offset_y + Glow.DRAW_MP);
   };
 
+  this.set_rotation = function(angle, x0, y0, type) {
+    var old_x_left, old_x_right, old_y_low, old_y_high;
+
+    if (Math.abs(angle - this.trf.rotation + this.trf.s_rotation) < FLT_EPSILON)
+      return;
+
+    switch (type) {
+    case Glow.eRotationPoint_LowerLeft:
+      x0 = this.x_left;
+      y0 = this.y_low;
+      break;
+    case Glow.eRotationPoint_LowerRight:
+      x0 = this.x_right;
+      y0 = this.y_low;
+      break;
+    case Glow.eRotationPoint_UpperRight:
+      x0 = this.x_right;
+      y0 = this.y_high;
+      break;
+    case Glow.eRotationPoint_UpperLeft:
+      x0 = this.x_left;
+      y0 = this.y_high;
+      break;
+    case Glow.eRotationPoint_Center:
+      x0 = (this.x_left + this.x_right) / 2;
+      y0 = (this.y_high + this.y_low) / 2;
+      break;
+    default:;
+    }
+
+    old_x_left = this.x_left;
+    old_x_right = this.x_right;
+    old_y_low = this.y_low;
+    old_y_high = this.y_high;
+    trf.rotate_from_stored(angle, x0, y0);
+    this.get_node_borders();
+    this.ctx.draw(ctx.mw,
+      old_x_left * this.ctx.mw.zoom_factor_x - this.ctx.mw.offset_x - Glow.DRAW_MP,
+      old_y_low * this.ctx.mw.zoom_factor_y - this.ctx.mw.offset_y - Glow.DRAW_MP,
+      old_x_right * this.ctx.mw.zoom_factor_x - this.ctx.mw.offset_x + Glow.DRAW_MP,
+      old_y_high * this.ctx.mw.zoom_factor_y - this.ctx.mw.offset_y + Glow.DRAW_MP);
+    draw();
+  }
+
   this.getUserData = function() {
-    return null;
+    return this.userdata;
+  };
+  this.setUserData = function(userdata) {
+    this.userdata = userdata;
   };
   this.getClassDynType1 = function() { return 0;};
   this.getClassDynType2 = function() { return 0;};
@@ -5991,43 +6435,139 @@ function GrowRect( ctx) {
   this.getClassActionType2 = function() { return 0;};
   this.getClassCycle = function() { return Glow.eCycle_Slow;};
   this.get_background_object_limits = function( t, type, x, y, bo) { return 0;};
-
+  this.resetFillColor = function() {
+    this.fill_drawtype = this.original_fill_drawtype;
+  };
+  this.resetBorderColor = function() {
+    this.draw_type = this.original_border_drawtype;
+  };
+  this.setOriginalFillColor = function(color) {
+    this.original_fill_drawtype = color;
+    this.resetFillColor();
+  }
+  this.getFillColor = function() {
+    return this.fill_drawtype;
+  }
+  this.setOriginalBorderColor = function(color) {
+    this.original_border_drawtype = color;
+    this.resetBorderColor();
+  }
+  this.getBorderColor = function() {
+    return this.draw_type;
+  }
+  this.setOriginalBackgroundColor = function( draw_type) {
+    this.background_drawtype = draw_type;
+  };
+  this.getFill = function() {
+    return this.fill;
+  }
+  this.setFill = function(fill) {
+    this.fill = fill;
+  }
+  this.getBorder = function() {
+    return this.border;
+  }
+  this.setBorder = function(border) {
+    this.border = border;
+  }
+  this.setLinewidth = function(linewidth) {
+    this.line_width = linewidth
+  }
+  this.getShadow = function() {
+    return this.shadow;
+  }
+  this.setShadow = function(shadow) {
+    this.shadow = shadow;
+  }
+  this.getGradient = function() {
+    return this.gradient;
+  }
+  this.setGradient = function(gradient) {
+    this.gradient = gradient;
+  }
+  this.getTransparency = function() {
+    return this.transparency;
+  }
+  this.setTransparency = function(transparency) {
+    this.transparency = transparency;
+  }
+  this.getName = function() {
+    return this.n_name;
+  };
+  this.storeTransform = function() {
+    this.trf.store();
+  };
+  this.setTransform = function(t) {
+    this.trf = t.multiply(this.trf);
+    this.get_node_borders();
+  }
+  this.measure = function() {
+    var geom = new GlowGeometry();
+    geom.ll_x = this.ll.x;
+    geom.ll_y = this.ll.y;
+    geom.ur_x = this.ur.x;
+    geom.ur_y = this.ur.y;
+    
+    return geom;
+  };
 }
+GrowRect.prototype = Object.create(GlowArrayElem.prototype);
 
 function GrowRectRounded( ctx) {
+  GlowArrayElem.call(this);
   this.ctx = ctx;
-  this.n_name;
-  this.x_right;
-  this.x_left;
-  this.y_high;
-  this.y_low;
-  this.original_border_drawtype;
-  this.original_fill_drawtype;
-  this.fill_drawtype;
-  this.border;
-  this.shadow_width;
-  this.shadow_contrast;
-  this.shadow;
-  this.relief;
-  this.disable_shadow;
-  this.fixposition;
-  this.gradient;
-  this.gradient_contrast;
-  this.disable_gradient;
-  this.dynamicsize;    
+  this.n_name = null;
+  this.x_right = 0;
+  this.x_left = 0;
+  this.y_high = 0;
+  this.y_low = 0;
+  this.original_border_drawtype = 0;
+  this.original_fill_drawtype = 0;
+  this.fill_drawtype = 0;
+  this.border = 0;
+  this.shadow_width = 5
+  this.shadow_contrast = 2
+  this.shadow = 0
+  this.relief = Glow.eRelief_Up;
+  this.disable_shadow = 0
+  this.fixposition = 0
+  this.gradient = 0 
+  this.gradient_contrast = 4;
+  this.disable_gradient = Glow.eGradient_No;
+  this.dynamicsize = 0;    
   this.trf = new GlowTransform();
-  this.round_amount;
+  this.round_amount = 15;
+  this.userdata = null;
 
-  this.ll = new GlowPoint( ctx);
-  this.ur = new GlowPoint( ctx);
-  this.draw_type;
-  this.line_width;
-  this.display_level;
-  this.fill;
+  this.ll = new GlowPoint( this.ctx);
+  this.ur = new GlowPoint( this.ctx);
+  this.draw_type = 0;
+  this.line_width = 1;
+  this.display_level = 0;
+  this.fill = 0;
+
+  this.construct = function(name, x, y, width, height, draw_type, line_width,
+     fix_line_width, display_level, fill, border, shadow, fill_drawtype) {
+    this.ll.construct(x, y);
+    this.ur.construct(x + width, y + height);
+    this.draw_type = draw_type;
+    this.line_width = line_width;
+    this.display_level = display_level;
+    this.fill = fill;
+    this.border = border;
+    this.shadow = shadow;
+    this.fill_drawtype = fill_drawtype;
+  }
 
   this.type = function() {
     return Glow.eObjectType_GrowRectRounded;
   };
+  this.set_name = function(name) {
+    this.n_name = name;
+  }
+  this.get_name = function() {
+    return this.n_name;
+  }
 
   this.open = function( lines, row) {
     var end = false;
@@ -6382,9 +6922,79 @@ function GrowRectRounded( ctx) {
 		     drawtype, idx, 0);
     }	
   };
+  this.getUserData = function() {
+    return this.userdata;
+  };
+  this.setUserData = function(userdata) {
+    this.userdata = userdata;
+  };
+  this.resetFillColor = function() {
+    this.fill_drawtype = this.original_fill_drawtype;
+  };
+  this.resetBorderColor = function() {
+    this.draw_type = this.original_border_drawtype;
+  };
+  this.setOriginalFillColor = function(color) {
+    this.original_fill_drawtype = color;
+    this.resetFillColor();
+  }
+  this.getFillColor = function() {
+    return this.fill_drawtype;
+  }
+  this.setOriginalBorderColor = function(color) {
+    this.original_border_drawtype = color;
+    this.resetBorderColor();
+  }
+  this.getBorderColor = function() {
+    return this.draw_type;
+  }
+  this.getFill = function() {
+    return this.fill;
+  }
+  this.setFill = function(fill) {
+    this.fill = fill;
+  }
+  this.getBorder = function() {
+    return this.border;
+  }
+  this.setBorder = function(border) {
+    this.border = border;
+  }
+  this.setLinewidth = function(linewidth) {
+    this.line_width = linewidth
+  }
+  this.getShadow = function() {
+    return this.shadow;
+  }
+  this.setShadow = function(shadow) {
+    this.shadow = shadow;
+  }
+  this.getGradient = function() {
+    return this.gradient;
+  }
+  this.setGradient = function(gradient) {
+    this.gradient = gradient;
+  }
+  this.setLinewidth = function(linewidth) {
+    this.line_width = linewidth;
+  }
+  this.getTransparency = function() {
+    return this.transparency;
+  }
+  this.setTransparency = function(transparency) {
+    this.transparency = transparency;
+  }
+  this.getName = function() {
+    return this.n_name;
+  };
+  this.storeTransform = function() {
+    this.trf.store();
+  };
 }
+GrowRectRounded.prototype = Object.create(GlowArrayElem.prototype);
 
 function GrowLine( ctx) {
+  GlowArrayElem.call(this);
   this.ctx = ctx;
   this.n_name = null;
   this.x_right = 0;
@@ -6395,6 +7005,7 @@ function GrowLine( ctx) {
   this.original_border_drawtype;
   this.dynamicsize = 0;
   this.trf = new GlowTransform();
+  this.userdata = null;
   
   this.p1 = new GlowPoint(this.ctx);
   this.p2 = new GlowPoint(this.ctx);
@@ -6402,9 +7013,22 @@ function GrowLine( ctx) {
   this.line_width = 0;
   this.transparency = 0;
 				      
+  this.construct = function(name, x1, y1, x2, y2, draw_type, line_width, fix_line_width) {
+    this.p1.construct(x1, y1);
+    this.p2.construct(x2, y2);
+    this.draw_type = draw_type;
+    this.line_width = line_width;
+  }
+
   this.type = function() {
     return Glow.eObjectType_GrowLine;
   };
+  this.set_name = function(name) {
+    this.n_name = name;
+  }
+  this.get_name = function() {
+    return this.n_name;
+  }
 
   this.open = function( lines, row) {
     var end = false;
@@ -6568,49 +7192,110 @@ function GrowLine( ctx) {
 
   this.get_borders = function( t, g) {};
   this.get_background_object_limits = function( t, type, x, y, bo) { return 0;};
+  this.getUserData = function() {
+    return this.userdata;
+  };
+  this.setUserData = function(userdata) {
+    this.userdata = userdata;
+  };
+  this.resetBorderColor = function() {
+    this.draw_type = this.original_border_drawtype;
+  };
+  this.setOriginalBorderColor = function(color) {
+    this.original_border_drawtype = color;
+    this.resetBorderColor();
+  }
+  this.getBorderColor = function() {
+    return this.draw_type;
+  }
+  this.setOriginalFillColor = function(color) {
+    this.original_fill_drawtype = color;
+    this.resetFillColor();
+  }
+  this.setLinewidth = function(linewidth) {
+    this.line_width = linewidth;
+  }
+  this.setLinetype = function(type) {
+    this.line_type = type;
+  }
+  this.getTransparency = function() {
+    return this.transparency;
+  }
+  this.setTransparency = function(transparency) {
+    this.transparency = transparency;
+  }
+  this.getName = function() {
+    return this.n_name;
+  };
+  this.storeTransform = function() {
+    this.trf.store();
+  };
 }
+GrowLine.prototype = Object.create(GlowArrayElem.prototype);
 
 function GrowArc( ctx) {
+  GlowArrayElem.call(this);
   this.ctx = ctx;
   this.n_name =  null;
-  this.x_right;
-  this.x_left;
-  this.y_high;
-  this.y_low;
-  this.original_border_drawtype;
-  this.original_fill_drawtype;
-  this.fill_drawtype;
+  this.x_right = 0;
+  this.x_left = 0;
+  this.y_high = 0;
+  this.y_low = 0;
+  this.original_border_drawtype = 0;
+  this.original_fill_drawtype = 0;
+  this.fill_drawtype = 0;
   this.background_drawtype = Glow.eDrawType_No;
-  this.border;
-  this.shadow_width;
-  this.shadow_contrast;
-  this.shadow;
-  this.relief;
-  this.disable_shadow;
-  this.fixcolor;
-  this.fixposition;
-  this.gradient;
-  this.gradient_contrast;
-  this.disable_gradient;
-  this.fill_eq_background;
-  this.fill_eq_light;
-  this.fill_eq_shadow;
+  this.border = 0;
+  this.shadow_width = 5;
+  this.shadow_contrast = 2;
+  this.shadow = 0;
+  this.relief = Glow.eRelief_Up;
+  this.disable_shadow = 0;
+  this.fixcolor = 0;
+  this.fixposition = 0;
+  this.gradient = 0;
+  this.gradient_contrast = 4;
+  this.disable_gradient = 0;
+  this.fill_eq_background = 0;
+  this.fill_eq_light = 0;
+  this.fill_eq_shadow = 0;
   this.transparency = 0;
-  this.dynamicsize;
+  this.dynamicsize = 0;
   this.trf = new GlowTransform();
+  this.userdata = null;
 
   this.ll = new GlowPoint( ctx);
   this.ur = new GlowPoint( ctx);
-  this.draw_type;
-  this.angle1;
-  this.angle2;
-  this.line_width;
-  this.display_level;
-  this.fill;
+  this.draw_type = 0;
+  this.angle1 = 0;
+  this.angle2 = 360;
+  this.line_width = 1;
+  this.display_level = 0;
+  this.fill = 0;
+
+  this.construct = function(name, ll_x, ll_y, ur_x, ur_y, angle1, angle2, draw_type, line_width,
+      fill, border, shadow, fill_drawtype) {
+    this.ll.construct(ll_x, ll_y);
+    this.ur.construct(ur_x, ur_y);
+    this.angle1 = angle1;
+    this.angle2 = angle2;
+    this.draw_type = draw_type;
+    this.line_width = line_width;
+    this.fill = fill;
+    this.border = border;
+    this.shadow = shadow;
+    this.fill_drawtype = fill_drawtype;
+  }
 
   this.type = function() {
     return Glow.eObjectType_GrowArc;
   };
+  this.set_name = function(name) {
+    this.n_name = name;
+  }
+  this.get_name = function() {
+    return this.n_name;
+  }
 
   this.open = function( lines, row) {
     var end = false;
@@ -6890,7 +7575,6 @@ function GrowArc( ctx) {
       else if ( this.fill_eq_shadow !== 0 && this.fixcolor !== 0)
 	fillcolor = GlowColor.shift_drawtype( fillcolor, this.shadow_contrast + chot, 
 					     colornode);
-
       var grad = this.gradient;
       if ( this.gradient == Glow.eGradient_No && 
 	   (node !== null && node.gradient != Glow.eGradient_No) && this.disable_gradient === 0)
@@ -7016,11 +7700,183 @@ function GrowArc( ctx) {
       g.ur_y = ur_y;
     return g;
   };
+
+  this.get_node_borders = function() { 
+    var g = new GlowGeometry();
+    g.ll_x = g.ll_y = 1e37;
+    g.ur_x = g.ur_y = -1e37;
+    this.get_borders( null, g);
+    this.x_left = g.ll_x;
+    this.x_right = g.ur_x;
+    this.y_low = g.ll_y;
+    this.y_high = g.ur_y;
+  };
+
+  this.set_scale = function( scale_x, scale_y, x0, y0, type) {
+    var old_x_left, old_x_right, old_y_low, old_y_high;
+
+    if ( this.trf.s_a11 != 0 && this.trf.s_a22 != 0 &&
+	 Math.abs( scale_x - this.trf.a11 / this.trf.s_a11) < Number.MIN_VALUE &&
+	 Math.abs( scale_y - this.trf.a22 / this.trf.s_a22) < Number.MIN_VALUE)
+      return;
+
+    switch( type) {
+    case Glow.eScaleType_LowerLeft:
+      x0 = this.x_left;
+      y0 = this.y_low;
+      break;
+    case Glow.eScaleType_LowerRight:
+      x0 = this.x_right;
+      y0 = this.y_low;
+      break;
+    case Glow.eScaleType_UpperRight:
+      x0 = this.x_right;
+      y0 = this.y_high;
+      break;
+    case Glow.eScaleType_UpperLeft:
+      x0 = this.x_left;
+      y0 = this.y_high;
+      break;
+    case Glow.eScaleType_FixPoint:
+      break;
+    case Glow.eScaleType_Center:
+      x0 = (this.x_left + this.x_right) / 2;
+      y0 = (this.y_low + this.y_high) /2;
+      break;
+    default:
+      ;
+    }
+	
+    old_x_left = this.x_left;
+    old_x_right = this.x_right;
+    old_y_low = this.y_low;
+    old_y_high = this.y_high;
+    this.trf.scale_from_stored( scale_x, scale_y, x0, y0);
+    this.get_node_borders();
+
+    switch( type) {
+    case Glow.eScaleType_LowerLeft:
+      this.x_left = old_x_left;
+      this.y_low = old_y_low;
+      break;
+    case Glow.eScaleType_LowerRight:
+      this.x_right = old_x_right;
+      this.y_low = old_y_low;
+      break;
+    case Glow.eScaleType_UpperRight:
+      this.x_right = old_x_right;
+      this.y_high = old_y_high;
+      break;
+    case Glow.eScaleType_UpperLeft:
+      this.x_left = old_x_left;
+      this.y_high = old_y_high;
+      break;
+    case Glow.eScaleType_FixPoint:
+      break;
+    case Glow.eScaleType_Center:
+      x0 = (this.x_left + this.x_right) / 2;
+      y0 = (this.y_low + this.y_high) /2;
+      break;
+    default:
+      ;
+    }
+    this.ctx.draw( old_x_left * this.ctx.mw.zoom_factor_x - this.ctx.mw.offset_x - Glow.DRAW_MP,
+		   old_y_low * this.ctx.mw.zoom_factor_y - this.ctx.mw.offset_y - Glow.DRAW_MP,
+		   old_x_right * this.ctx.mw.zoom_factor_x - this.ctx.mw.offset_x + Glow.DRAW_MP,
+		   old_y_high * this.ctx.mw.zoom_factor_y - this.ctx.mw.offset_y + Glow.DRAW_MP);
+    this.ctx.draw( this.x_left * this.ctx.mw.zoom_factor_x - this.ctx.mw.offset_x - Glow.DRAW_MP,
+		   this.y_low * this.ctx.mw.zoom_factor_y - this.ctx.mw.offset_y - Glow.DRAW_MP,
+		   this.x_right * this.ctx.mw.zoom_factor_x - this.ctx.mw.offset_x + Glow.DRAW_MP,
+		   this.y_high * this.ctx.mw.zoom_factor_y - this.ctx.mw.offset_y + Glow.DRAW_MP);
+  };
+
   this.get_background_object_limits = function( t, type, x, y, bo) { return 0;};
 
+  this.getUserData = function() {
+    return this.userdata;
+  };
+  this.setUserData = function(userdata) {
+    this.userdata = userdata;
+  };
+  this.resetFillColor = function() {
+    this.fill_drawtype = this.original_fill_drawtype;
+  };
+  this.resetBorderColor = function() {
+    this.draw_type = this.original_border_drawtype;
+  };
+  this.setOriginalFillColor = function(color) {
+    this.original_fill_drawtype = color;
+    this.resetFillColor();
+  }
+  this.getFillColor = function() {
+    return this.fill_drawtype;
+  }
+  this.setOriginalBorderColor = function(color) {
+    this.original_border_drawtype = color;
+    this.resetBorderColor();
+  }
+  this.getBorderColor = function() {
+    return this.draw_type;
+  }
+  this.setOriginalBackgroundColor = function( draw_type) {
+    this.background_drawtype = draw_type;
+  };
+  this.getFill = function() {
+    return this.fill;
+  }
+  this.setFill = function(fill) {
+    this.fill = fill;
+  }
+  this.getBorder = function() {
+    return this.border;
+  }
+  this.setBorder = function(border) {
+    this.border = border;
+  }
+  this.setLinewidth = function(linewidth) {
+    this.line_width = linewidth
+  }
+  this.getShadow = function() {
+    return this.shadow;
+  }
+  this.setShadow = function(shadow) {
+    this.shadow = shadow;
+  }
+  this.getGradient = function() {
+    return this.gradient;
+  }
+  this.setGradient = function(gradient) {
+    this.gradient = gradient;
+  }
+  this.setLinewidth = function(linewidth) {
+    this.line_width = linewidth;
+  }
+  this.getTransparency = function() {
+    return this.transparency;
+  }
+  this.setTransparency = function(transparency) {
+    this.transparency = transparency;
+  }
+  this.getName = function() {
+    return this.n_name;
+  };
+  this.storeTransform = function() {
+    this.trf.store();
+  };
+  this.measure = function() {
+    var geom = new GlowGeometry();
+    geom.ll_x = this.ll.x;
+    geom.ll_y = this.ll.y;
+    geom.ur_x = this.ur.x;
+    geom.ur_y = this.ur.y;
+    
+    return geom;
+  };
 }
+GrowArc.prototype = Object.create(GlowArrayElem.prototype);
 
 function GrowText( ctx) {
+  GlowArrayElem.call(this);
   this.ctx = ctx;
   this.n_name;
   this.x_right;
@@ -7033,6 +7889,7 @@ function GrowText( ctx) {
   this.transparency = 0;
   this.dynamicsize;
   this.trf = new GlowTransform();
+  this.userdata = null;
 
   this.p = new GlowPoint( ctx);
   this.text;
@@ -7041,9 +7898,24 @@ function GrowText( ctx) {
   this.display_level;
   this.color_drawtype;
 
+  this.construct = function(name, text, x, y, draw_type, text_color, textsize, textfont) {
+    this.p.construct(x, y);
+    this.text = text;
+    this.draw_type = draw_type;
+    this.color_drawtype = text_color;
+    this.font = textfont;
+    this.text_size = textsize;
+  };
+
   this.type = function() {
     return Glow.eObjectType_GrowText;
   };
+  this.set_name = function(name) {
+    this.n_name = name;
+  }
+  this.get_name = function() {
+    return this.n_name;
+  }
 
   this.open = function( lines, row) {
     var end = false;
@@ -7282,27 +8154,90 @@ function GrowText( ctx) {
 
   this.get_borders = function( t, g) {};
   this.get_background_object_limits = function( t, type, x, y, bo) { return 0;};
+  this.getUserData = function() {
+    return this.userdata;
+  };
+  this.setUserData = function(userdata) {
+    this.userdata = userdata;
+  };
+  this.setOriginalBorderColor = function(color) {
+  }
+  this.getBorderColor = function() {
+    return this.draw_type;
+  }
+  this.getTransparency = function() {
+    return this.transparency;
+  }
+  this.setTransparency = function(transparency) {
+    this.transparency = transparency;
+  }
+  this.setText = function(text) {
+    this.text = text;
+  }
+  this.setTextSize = function(size) {
+    this.text_size = size;
+  }
+  this.setTextFont = function(font) {
+    this.text_font = font;
+  }
+  this.setTextBold = function(bold) {
+    if (bold && this.draw_type == Glow.eDrawType_TextHelvetica)
+      this.draw_type = Glow.eDrawType_TextHelveticaBold;
+    else if (!bold && this.draw_type == Glow.eDrawType_TextHelveticaBold)
+      this.draw_type = Glow.eDrawType_TextHelvetica;
+  }
+  this.setTextSize = function(size) {
+    this.text_size = size;
+  }
+  this.setTextFont = function(font) {
+    this.font = font;
+  }
+  this.setTextBold = function(bold) {
+    if (bold && this.draw_type == Glow.eDrawType_TextHelvetica)
+      this.draw_type = Glow.eDrawType_TextHelveticaBold;
+    else if (!bold && this.draw_type == Glow.eDrawType_TextHelveticaBold)
+      this.draw_type = Glow.eDrawType_TextHelvetica;
+  }
+  this.getName = function() {
+    return this.n_name;
+  };
+  this.initTransform = function(a11, a12, a13, a21, a22, a23, rotation) {
+    this.trf.init(a11, a12, a13, a21, a22, a23, rotation);
+  }
+  this.storeTransform = function() {
+    this.trf.store();
+  };
 }
+GrowText.prototype = Object.create(GlowArrayElem.prototype);
 
 function GrowAnnot( ctx) {
+  GlowArrayElem.call(this);
   this.ctx = ctx;
   this.p = new GlowPoint( ctx);
-  this.adjustment;
+  this.adjustment = Glow.eAdjustment_Left;
   this.trf = new GlowTransform();
 
-  this.number;
-  this.draw_type;
-  this.color_drawtype;
-  this.text_size;
-  this.display_level;
-  this.annot_type;
-  this.font;
-  this.protect;
+  this.number = 0;
+  this.draw_type = Glow.eDrawType_No;
+  this.color_drawtype = Glow.eDrawType_No;
+  this.text_size = 2;
+  this.display_level = 0;
+  this.annot_type = Glow.eAnnotType_OneLine;
+  this.font = Glow.eFont_No;
+  this.protect = 0;
 
   this.type = function() {
     return Glow.eObjectType_GrowAnnot;
   };
 
+  this.construct = function(name, number, x, y, draw_type, text_color, textsize, textfont) {
+    this.number = number;
+    this.p.construct(x, y);
+    this.draw_type = draw_type;
+    this.color_drawtype = text_color;
+    this.font = textfont;
+    this.text_size = textsize;
+  }
   this.getNumber = function() {
     return this.number;
   };
@@ -7487,7 +8422,6 @@ function GrowAnnot( ctx) {
       default: break;
       }
 	 
-
       if ( rot < 45 || rot >= 315) {
 	if ( node.annotv_inputmode[this.number] !== 0 &&
 	     node.input_selected !== 0) {
@@ -7576,7 +8510,15 @@ function GrowAnnot( ctx) {
   };
   this.get_borders = function( t, g) {};
   this.get_background_object_limits = function( t, type, x, y, bo) { return 0;};
+  this.getName = function() {
+    return this.n_name;
+  };
+  this.storeTransform = function() {
+    this.trf.store();
+  };
 }
+
+GrowAnnot.prototype = Object.create(GlowArrayElem.prototype);
 
 function GlowShadowInfo() {
   this.drawtype;
@@ -7584,20 +8526,21 @@ function GlowShadowInfo() {
   this.y;
 }
 
-function GrowPolyline( ctx) {
+function GrowPolyLine( ctx) {
+  GlowArrayElem.call(this);
   this.ctx = ctx;
   this.n_name = null;
-  this.x_right;
-  this.x_left;
-  this.y_high;
-  this.y_low;
+  this.x_right = 0;
+  this.x_left = 0;
+  this.y_high = 0;
+  this.y_low = 0;
   this.original_border_drawtype = 0;
   this.original_fill_drawtype = 0;
   this.fill_drawtype = 0;
   this.background_drawtype = 0;
   this.border = 1;
   this.fill_eq_border = 0;
-  this.shadow_width = 0;
+  this.shadow_width = 5;
   this.shadow_contrast = 0;
   this.shadow = 0;
   this.relief = 0;
@@ -7615,6 +8558,7 @@ function GrowPolyline( ctx) {
   this.transparency = 0;
   this.dynamicsize = 0;
   this.trf = new GlowTransform();
+  this.userdata = null;
 
   this.a_points = new GlowArray( ctx);
   this.points = [];
@@ -7622,6 +8566,15 @@ function GrowPolyline( ctx) {
   this.line_width = 0;
   this.fill = 0;
   this.closed_line = 0;
+
+  this.construct = function(name, points, point_cnt, draw_type, line_width,
+     fix_line_width, fill, border, shadow, fill_drawtype, closed) {
+    this.closed_line = closed;
+    this.draw_type = draw_type;
+    this.init(name, points, point_cnt, draw_type, line_width, fix_line_width,
+	fill, border, shadow, fill_drawtype);
+    this.get_node_borders();
+  }
 
   this.init = function( name, pointarray, point_cnt,
 			border_d_type, line_w, 
@@ -7653,9 +8606,26 @@ function GrowPolyline( ctx) {
       this.points[i] = new GlowPointX();
   };
 
+  this.add_points = function(points, point_cnt) {
+    for ( var i = 0; i < point_cnt; i++) {
+      var p = new GlowPoint(this.ctx);
+      p.x = points[i].x;
+      p.y = points[i].y;
+      this.a_points.add(p);
+      this.points.push(new GlowPointX());
+    }
+    this.get_node_borders();
+  };
+
   this.type = function() {
     return Glow.eObjectType_GrowPolyLine;
   };
+  this.set_name = function(name) {
+    this.n_name = name;
+  }
+  this.get_name = function() {
+    return this.n_name;
+  }
 
   this.open = function( lines, row) {
     var end = false;
@@ -7665,7 +8635,7 @@ function GrowPolyline( ctx) {
       var tokens = lines[i].split(' ');
       var key = parseInt(tokens[0], 10);
       
-      if ( this.ctx.debug) console.log( "GrowPolyline : " + lines[i]);
+      if ( this.ctx.debug) console.log( "GrowPolyLine : " + lines[i]);
       
       switch ( key) {
       case Glow.eSave_GrowPolyLine: 
@@ -7769,7 +8739,7 @@ function GrowPolyline( ctx) {
 	end = true;
 	break;
       default:
-	console.log( "Syntax error in GrowPolyline");
+	console.log( "Syntax error in GrowPolyLine");
 	break;
       }
       if ( end)
@@ -7790,7 +8760,7 @@ function GrowPolyline( ctx) {
       var tokens = lines[i].split(' ');
       var key = parseInt(tokens[0], 10);
       
-      if ( this.ctx.debug) console.log( "GrowPolyline : " + lines[i]);
+      if ( this.ctx.debug) console.log( "GrowPolyLine : " + lines[i]);
       
       switch ( key) {
 
@@ -7949,7 +8919,6 @@ function GrowPolyline( ctx) {
 
     var display_shadow = ((node !== null && node.shadow !== 0) || this.shadow !== 0) && this.disable_shadow === 0 &&
       this.fill_eq_light === 0 && this.fill_eq_shadow === 0;
-
     if ( display_shadow && this.shadow_width !== 0) {
       var sp;
       var p_num;
@@ -7957,7 +8926,6 @@ function GrowPolyline( ctx) {
       var trf_scale = this.trf.vertical_scale( t);
       var ish = Math.floor( this.shadow_width / 100 * trf_scale * 
 		       Math.min((this.x_right - this.x_left)*this.ctx.mw.zoom_factor_x, (this.y_high - this.y_low)*this.ctx.mw.zoom_factor_y) + 0.5);
-
       if ( ish >= 1) {
 	sp = this.calculate_shadow( ish, highlight, colornode, 0, chot);
 	p_num = sp.length;
@@ -8285,9 +9253,85 @@ function GrowPolyline( ctx) {
 	g.ur_y = y2;
     }
   };
+  this.get_node_borders = function() { 
+    var g = new GlowGeometry();
+    g.ll_x = g.ll_y = 1e37;
+    g.ur_x = g.ur_y = -1e37;
+    this.get_borders( null, g);
+    this.x_left = g.ll_x;
+    this.x_right = g.ur_x;
+    this.y_low = g.ll_y;
+    this.y_high = g.ur_y;
+  }
 
   this.get_background_object_limits = function( t, type, x, y, bo) { return 0;};
+  this.getUserData = function() {
+    return this.userdata;
+  };
+  this.setUserData = function(userdata) {
+    this.userdata = userdata;
+  };
+  this.resetFillColor = function() {
+    this.fill_drawtype = this.original_fill_drawtype;
+  };
+  this.resetBorderColor = function() {
+    this.draw_type = this.original_border_drawtype;
+  };
+  this.setOriginalFillColor = function(color) {
+    this.original_fill_drawtype = color;
+    this.resetFillColor();
+  }
+  this.getFillColor = function() {
+    return this.fill_drawtype;
+  }
+  this.setOriginalBorderColor = function(color) {
+    this.original_border_drawtype = color;
+    this.resetBorderColor();
+  }
+  this.getBorderColor = function() {
+    return this.draw_type;
+  }
+  this.setOriginalBackgroundColor = function( draw_type) {
+    this.background_drawtype = draw_type;
+  };
+  this.getFill = function() {
+    return this.fill;
+  }
+  this.setFill = function(fill) {
+    this.fill = fill;
+  }
+  this.getBorder = function() {
+    return this.border;
+  }
+  this.setBorder = function(border) {
+    this.border = border;
+  }
+  this.setLinewidth = function(linewidth) {
+    this.line_width = linewidth
+  }
+  this.getShadow = function() {
+    return this.shadow;
+  }
+  this.setShadow = function(shadow) {
+    this.shadow = shadow;
+  }
+  this.getGradient = function() {
+    return this.gradient;
+  }
+  this.setGradient = function(gradient) {
+    this.gradient = gradient;
+  }
+  this.getTransparency = function() {
+    return this.transparency;
+  }
+  this.setTransparency = function(transparency) {
+    this.transparency = transparency;
+  }
+  this.getName = function() {
+    return this.n_name;
+  };
 }
+GrowPolyLine.prototype = Object.create(GlowArrayElem.prototype);
 
 function GlowConPoint( ctx) {
   this.ctx = ctx;
@@ -8310,7 +9354,7 @@ function GlowConPoint( ctx) {
       var tokens = lines[i].split(' ');
       var key = parseInt(tokens[0], 10);
       
-      if ( this.ctx.debug) console.log( "GrowPolyline : " + lines[i]);
+      if ( this.ctx.debug) console.log( "GrowPolyLine : " + lines[i]);
       
       switch ( key) {
       case Glow.eSave_ConPoint: 
@@ -8359,9 +9403,23 @@ function GlowConPoint( ctx) {
 
   this.get_borders = function( t, g) {};
   this.get_background_object_limits = function( t, type, x, y, bo) { return 0;};
+  this.getUserData = function() {
+    return this.userdata;
+  };
+  this.setUserData = function(userdata) {
+    this.userdata = userdata;
+  };
+  this.getName = function() {
+    return this.n_name;
+  };
+  this.storeTransform = function() {
+    this.trf.store();
+  };
 }
+GrowText.prototype = Object.create(GlowArrayElem.prototype);
 
 function GrowConPoint( ctx) {
+  GlowArrayElem.call(this);
   this.ctx = ctx;
   this.n_name;
   this.x_right;
@@ -8663,9 +9721,14 @@ function GlowArc( ctx) {
 			    Glow.eDrawType_Line, 0, highlight);
     }
   };
+  this.getName = function() {
+    return this.n_name;
+  };
 }
+GrowConPoint.prototype = Object.create(GlowArrayElem.prototype);
 
 function GrowImage( ctx) {
+  GlowArrayElem.call(this);
   var self = this;
   this.ctx = ctx;
   this.n_name;
@@ -8681,6 +9744,7 @@ function GrowImage( ctx) {
   this.color_shift;
   this.color_tone;
   this.fixposition;
+  this.userdata = null;
  
   this.ll = new GlowPoint(ctx);
   this.ur = new GlowPoint(ctx);
@@ -8695,6 +9759,12 @@ function GrowImage( ctx) {
     return Glow.eObjectType_GrowImage;
   };
 
+  this.construct = function(name, filename, x, y) {
+    this.ll.construct(x, y);
+    this.n_name = name, 
+    this.image_filename = filename;
+    this.image.src = this.image_filename;
+  }
 
   this.open = function( lines, row) {
     var end = false;
@@ -8802,6 +9872,10 @@ function GrowImage( ctx) {
   };
 
   this.draw = function() {
+    if (this.ur.x == 0 && this.ur.y == 0) {
+      this.ur.x = this.ll.x + this.image.naturalWidth / this.ctx.mw.zoom_factor_x;
+      this.ur.y = this.ll.y + this.image.naturalHeight / this.ctx.mw.zoom_factor_y;
+    }
     if ( this.image.naturalWidth !== 0)
       this.tdraw( null, 0, 0, null, null);
   };
@@ -8973,7 +10047,26 @@ function GrowImage( ctx) {
     return this.n_name;
   };
   this.get_background_object_limits = function( t, type, x, y, bo) { return 0;};
+  this.getUserData = function() {
+    return this.userdata;
+  };
+  this.setUserData = function(userdata) {
+    this.userdata = userdata;
+  };
+  this.measure = function() {
+    var geom = new GlowGeometry();
+    geom.ll_x = this.ll.x;
+    geom.ll_y = this.ll.y;
+    geom.ur_x = this.ur.x;
+    geom.ur_y = this.ur.y;
+    
+    return geom;
+  };
+  this.storeTransform = function() {
+    this.trf.store();
+  };
 }
+GrowImage.prototype = Object.create(GlowArrayElem.prototype);
 
 function GrowConGlue( ctx) {
   GrowNode.call( this, ctx);
@@ -9660,6 +10753,9 @@ function GrowConGlue( ctx) {
   this.event_handler = function( event, fx, fy) { return 0;};
   this.get_borders = function( t, g) {};
   this.get_background_object_limits = function( t, type, x, y, bo) { return 0;};
+  this.getName = function() {
+    return this.n_name;
+  };
 }
 GrowConGlue.prototype = Object.create(GrowNode.prototype);
 
@@ -9668,11 +10764,11 @@ function GrowBar( ctx) {
   GrowRect.call( this, ctx);
   this.growrect_open = this.open;
 
-  this.max_value;
-  this.min_value;
+  this.max_value = 100;
+  this.min_value = 0;
   this.bar_value;
-  this.bar_bordercolor;
-  this.bar_borderwidth;
+  this.bar_bordercolor = Glow.eDrawType_Inherit;
+  this.bar_borderwidth = 1;
   this.bar_drawtype;
   this.userdata = null;
 
@@ -9794,6 +10890,7 @@ function GrowBar( ctx) {
     ur_x = Math.max( x1, x2);
     ll_y = Math.min( y1, y2);
     ur_y = Math.max( y1, y2);
+
     if ( this.fill !== 0) {
       drawtype = GlowColor.get_drawtype( this.fill_drawtype, Glow.eDrawType_FillHighlight,
 					 highlight, colornode, 1, 0);
@@ -9934,6 +11031,9 @@ function GrowBar( ctx) {
   this.get_background_object_limits = function( t, type, x, y, bo) {
     return 0;
   };
+  this.initTransform = function(a11, a12, a13, a21, a22, a23, rotation) {
+    this.trf.init(a11, a12, a13, a21, a22, a23, rotation);
+  }
 }
 
 GrowBar.prototype = Object.create(GrowRect.prototype);
@@ -10191,11 +11291,11 @@ function GrowTrend( ctx) {
   this.y_min_value = new Array(Glow.TREND_MAX_CURVES);
   this.x_max_value = new Array(Glow.TREND_MAX_CURVES);
   this.x_min_value = new Array(Glow.TREND_MAX_CURVES);
-  this.vertical_lines;
-  this.horizontal_lines;
-  this.fill_curve;
-  this.no_of_points;
-  this.curve_width;
+  this.vertical_lines = 4;
+  this.horizontal_lines = 4;
+  this.fill_curve = 0;
+  this.no_of_points = 100;
+  this.curve_width = 1;
   this.curve_drawtype = new Array(Glow.TREND_MAX_CURVES);
   this.curve_fill_drawtype = new Array(Glow.TREND_MAX_CURVES);
   this.scan_time;
@@ -10206,13 +11306,13 @@ function GrowTrend( ctx) {
   this.display_x_mark2 = 0;
   this.display_y_mark1 = 0;
   this.display_y_mark2 = 0;
-  this.x_mark1;
-  this.x_mark2;
-  this.y_mark1;
-  this.y_mark2;
+  this.x_mark1 = 0;
+  this.x_mark2 = 0;
+  this.y_mark1 = 0;
+  this.y_mark2 = 0;
   this.mark1_color = Glow.eDrawType_Inherit;
   this.mark2_color = Glow.eDrawType_Inherit;
-  this.direction;
+  this.direction = Glow.eHorizDirection_Left;
 
   for ( var i = 0; i < Glow.TREND_MAX_CURVES; i++)
     this.curve[i] = null;
@@ -10554,16 +11654,29 @@ function GrowTrend( ctx) {
       point_p = pointarray[i];
       if ( this.fill_curve === 0) {
 	point_p.y = this.ur.y;
-	point_p.x = this.ur.x - i * (this.ur.x - this.ll.x) / (points - 1);
+	if (this.direction === Glow.eHorizDirection_Right)
+	  point_p.x = this.ll.x + i * (this.ur.x - this.ll.x) / (points - 1);
+	else
+	  point_p.x = this.ur.x - i * (this.ur.x - this.ll.x) / (points - 1);
       }
       else {
 	point_p.y = this.ur.y;
-	if ( i === 0)
-	  point_p.x = this.ur.x;
-	else if ( i == points - 1)
-	  point_p.x = this.ll.x;
-	else
-	  point_p.x = this.ur.x - (i - 1) * (this.ur.x - this.ll.x) / (points - 3);
+	if (this.direction === Glow.eHorizDirection_Right) {
+	  if ( i === 0)
+	    point_p.x = this.ll.x;
+  	  else if ( i == points - 1)
+	    point_p.x = this.ur.x;
+	  else
+	    point_p.x = this.ll.x + (i - 1) * (this.ur.x - this.ll.x) / (points - 3);
+	}
+	else {
+	  if ( i === 0)
+	    point_p.x = this.ur.x;
+  	  else if ( i == points - 1)
+	    point_p.x = this.ll.x;
+	  else
+	    point_p.x = this.ur.x - (i - 1) * (this.ur.x - this.ll.x) / (points - 3);
+        }
       }
     }
 
@@ -10582,7 +11695,7 @@ function GrowTrend( ctx) {
 	dt_fill = this.draw_type;
 
       this.ctx.nodraw++;
-      this.curve[i] = new GrowPolyline( this.ctx);
+      this.curve[i] = new GrowPolyLine( this.ctx);
       this.curve[i].init( "", pointarray, points, dt, 
 			  this.curve_width,
 			  0, this.fill_curve, 1, 0, dt_fill);
@@ -10770,7 +11883,7 @@ function GrowTrend( ctx) {
       dt_fill = this.draw_type;
 	
     this.ctx.nodraw++;
-    this.curve[j] = new GrowPolyline( ctx);
+    this.curve[j] = new GrowPolyLine( ctx);
     this.curve[j].init( "", pointarray, cpoints, dt, 
 			this.curve_width,
 			0, this.fill_curve, 1, 0, dt_fill);
@@ -10785,6 +11898,13 @@ GrowTrend.prototype = Object.create(GrowRect.prototype);
 function GrowXYCurve( ctx) {
   GrowTrend.call( this, ctx);
   this.growtrend_open = this.open;
+
+  for ( var i = 0; i < Glow.TREND_MAX_CURVES; i++) {
+    this.y_min_value[i] = 0;
+    this.x_min_value[i] = 0;
+    this.y_max_value[i] = 100;
+    this.x_max_value[i] = 100;
+  }
 
   this.type = function() {
     return Glow.eObjectType_GrowXYCurve;
@@ -10952,7 +12072,7 @@ function GrowXYCurve( ctx) {
       dt_fill = this.draw_type;
 	
     this.ctx.nodraw++;
-    this.curve[j] = new GrowPolyline( ctx);
+    this.curve[j] = new GrowPolyLine( ctx);
     this.curve[j].init( "", pointarray, cpoints, dt, 
 			this.curve_width,
 			0, this.fill_curve, 1, 0, dt_fill);
@@ -11016,9 +12136,10 @@ function GrowMenu( ctx) {
     return Glow.eObjectType_GrowMenu;
   };
 
-  this.tdraw = function( t, highlight, hot, node, colornode) {
+  this.tdraw = function( t, highlight, hot, node, colornode) { 
     if ( this.ctx.nodraw != 0)
       return;
+
     var idx;
     var text_idx = Math.floor( this.trf.vertical_scale(t) * this.ctx.mw.zoom_factor_y / this.ctx.mw.base_zoom_factor * (this.text_size +4) - 4);
     var tsize =  this.trf.vertical_scale(t) * this.ctx.mw.zoom_factor_y / this.ctx.mw.base_zoom_factor * (8+2*this.text_size);
@@ -11490,19 +12611,19 @@ function GrowWindow( ctx) {
 
   this.file_name = "";
   this.input_file_name = "";
-  this.scrollbar_width;
+  this.scrollbar_width = 0.1;
   this.scrollbar_color;
   this.scrollbar_bg_color;
-  this.vertical_scrollbar;
-  this.horizontal_scrollbar;
-  this.window_scale;
+  this.vertical_scrollbar = 0;
+  this.horizontal_scrollbar = 0;
+  this.window_scale = 1;
   this.owner = "";
   this.userdata = null;
   this.windowCtx = null;
-  this.wctx_x0;
-  this.wctx_x1;
-  this.wctx_y0;
-  this.wctx_y1;
+  this.wctx_x0 = 0;
+  this.wctx_x1 = 0;
+  this.wctx_y0 = 0;
+  this.wctx_y1 = 0;
   this.y_low_offs = 0;
   this.h_value = 0;
   this.v_value = 0;
@@ -11690,11 +12811,18 @@ function GrowWindow( ctx) {
       return;
 
     var idx;
-    if ( (idx = this.file_name.indexOf('/')) != -1)
-      this.file_name = this.file_name.substring(idx+1);
-
-    if ( this.file_name.indexOf('.') == -1)
-      this.file_name = this.file_name + ".pwg";
+    if ( (idx = this.file_name.indexOf('/')) != -1) {
+      if (this.file_name.substring(0,1) == "@")
+        thils.file_name = "@" + this.file_name.substring(idx+1);
+      else
+        this.file_name = this.file_name.substring(idx+1);
+    }
+    if ( this.file_name.indexOf('.') == -1) {
+      if (this.file_name.substring(0,1) == "@")
+        this.file_name = this.file_name + ".ge_com";
+      else
+        this.file_name = this.file_name + ".pwg";
+    }
 
     var windOwner = this.owner;
     for ( var i = 0; i < 4; i++) {
@@ -12556,6 +13684,9 @@ function GrowFolder( ctx) {
     sts = this.growwindow_event_handler( e, fx, fy);
     return sts;
   };
+  this.setTextSize = function(size) {
+    this.text_size = size;
+  }
 }
 GrowFolder.prototype = Object.create(GrowWindow.prototype);
 
@@ -12623,17 +13754,17 @@ function GrowAxis( ctx) {
   GrowRect.call( this, ctx);
   this.growrect_open = this.open;
 
-  this.text_size;
-  this.text_drawtype;
-  this.text_color_drawtype;
-  this.max_value;
-  this.min_value;
-  this.lines;
+  this.text_size = 2;
+  this.text_drawtype = Glow.eDrawType_TextHelvetica;
+  this.text_color_drawtype = Glow.eDrawType_Line;
+  this.max_value = 100;
+  this.min_value = 0;
+  this.lines = 11;
   this.linelength;
-  this.longquotient;
-  this.valuequotient;
-  this.increment;
-  this.format = null;
+  this.longquotient = 1;
+  this.valuequotient = 1;
+  this.increment = 0;
+  this.format = "%3.0f";
   this.userdata = null;
   this.cFormat = null;
   this.sb;
@@ -12641,6 +13772,23 @@ function GrowAxis( ctx) {
   this.type = function() {
     return Glow.eObjectType_GrowAxis;
   };
+
+  this.construct = function(name, x, y, width, height, draw_type, line_width,
+     fix_line_width, display_level, fill, border, shadow, fill_drawtype) {
+    this.ll.construct(x, y);
+    this.ur.construct(x + width, y + height);
+    this.draw_type = draw_type;
+    this.line_width = line_width;
+    this.display_level = display_level;
+    this.fill = fill;
+    this.border = border;
+    this.shadow = shadow;
+    this.fill_drawtype = fill_drawtype;
+
+    this.configure();
+    if ( this.format !== null)
+      this.cFormat = new GlowCFormat(this.format);
+  }
 
   this.configure = function() {
     if ( this.lines <= 1)
@@ -13000,7 +14148,7 @@ function GrowAxis( ctx) {
   };
 
   this.getUserData = function() {
-    return userdata;
+    return this.userdata;
   };
 
   this.set_range = function( minval, maxval, keep_settings) {
@@ -13023,7 +14171,7 @@ function GrowAxis( ctx) {
       else
 	len = Math.abs( y2 - y1);
       
-      if ( len < 150)
+      if ( len < 250)
 	lix = 0;
       else 
 	lix = 1;
@@ -13123,6 +14271,18 @@ function GrowAxis( ctx) {
   this.get_background_object_limits = function( t, type, x, y, bo) {
     return 0;
   };
+  this.setTextSize = function(size) {
+    this.text_size = size;
+  }
+  this.setTextBold = function(bold) {
+    if (bold && this.text_drawtype == Glow.eDrawType_TextHelvetica)
+      this.text_drawtype = Glow.eDrawType_TextHelveticaBold;
+    else if (!bold && this.text_drawrtype == Glow.eDrawType_TextHelveticaBold)
+      this.text_drawtype = Glow.eDrawType_TextHelvetica;
+  }
+  this.initTransform = function(a11, a12, a13, a21, a22, a23, rotation) {
+    this.trf.init(a11, a12, a13, a21, a22, a23, rotation);
+  }
 }
 GrowAxis.prototype = Object.create(GrowRect.prototype);
 
@@ -13130,17 +14290,17 @@ function GrowAxisArc( ctx) {
   GrowArc.call( this, ctx);
   this.growarc_open = this.open;
 
-  this.text_size;
+  this.text_size = 2;
   this.text_drawtype;
   this.text_color_drawtype;
-  this.max_value;
-  this.min_value;
-  this.lines;
-  this.linelength;
-  this.longquotient;
-  this.valuequotient;
-  this.increment;
-  this.format = null;    
+  this.max_value = 0;
+  this.min_value = 100;
+  this.lines = 11;
+  this.linelength = 0.15;
+  this.longquotient = 1;
+  this.valuequotient = 1;
+  this.increment = 0;
+  this.format = "%3.0f";
   this.userdata = null;
   this.cFormat = null;
   this.sb = null;
@@ -13148,6 +14308,24 @@ function GrowAxisArc( ctx) {
   this.type = function() {
     return Glow.eObjectType_GrowAxisArc;
   };
+
+  this.construct = function(name, ll_x, ll_y, ur_x, ur_y, angle1, angle2, draw_type, line_width,
+      fill, border, shadow, fill_drawtype) {
+    this.ll.construct(ll_x, ll_y);
+    this.ur.construct(ur_x, ur_y);
+    this.angle1 = angle1;
+    this.angle2 = angle2;
+    this.draw_type = draw_type;
+    this.line_width = line_width;
+    this.fill = fill;
+    this.border = border;
+    this.shadow = shadow;
+    this.fill_drawtype = fill_drawtype;
+
+    this.configure();
+    if ( this.format !== null)
+      this.cFormat = new GlowCFormat(this.format);
+  }
 
   this.configure = function() {
     if ( this.lines <= 1)
@@ -13365,10 +14543,6 @@ function GrowAxisArc( ctx) {
     return sb;
   };
 
-  this.getUserData = function() {
-    return userdata;
-  };
-
   this.set_range = function( minval, maxval, keep_settings) {
     this.max_value = maxval;
     this.min_value = minval;
@@ -13474,6 +14648,15 @@ function GrowAxisArc( ctx) {
   this.get_background_object_limits = function( t, type, x, y, bo) {
     return 0;
   };
+  this.setTextSize = function(size) {
+    this.text_size = size;
+  }
+  this.setTextBold = function(bold) {
+    if (bold && this.text_drawtype == Glow.eDrawType_TextHelvetica)
+      this.text_drawtype = Glow.eDrawType_TextHelveticaBold;
+    else if (!bold && this.text_drawrtype == Glow.eDrawType_TextHelveticaBold)
+      this.text_drawtype = Glow.eDrawType_TextHelvetica;
+  }
 }
 GrowAxisArc.prototype = Object.create(GrowArc.prototype);
 
@@ -13483,10 +14666,9 @@ function GrowPie( ctx) {
   this.growarc_open = this.open;
 
   this.PIE_MAX_SECTORS = 12;
-    
   this.sectors;
-  this.min_value;
-  this.max_value;
+  this.min_value = 0;
+  this.max_value = 100;
   this.sector_color = new Array(this.PIE_MAX_SECTORS);
   this.sector_size = new Array(this.PIE_MAX_SECTORS);
   this.userdata = null;
@@ -13783,10 +14965,6 @@ function GrowPie( ctx) {
       this.sector_size[i] = values[i];
     this.draw();
   }
-
-  this.getUserData = function() { 
-    return userdata;
-  };
   this.getClassDynType1 = function() { return 0;};
   this.getClassDynType2 = function() { return 0;};
   this.getClassActionType1 = function() { return 0;};
@@ -14283,9 +15461,6 @@ function GrowBarChart( ctx) {
     }
   };
 
-  this.getUserData = function() { 
-    return userdata;
-  };
   this.getClassDynType1 = function() { return 0;};
   this.getClassDynType2 = function() { return 0;};
   this.getClassActionType1 = function() { return 0;};
@@ -15187,13 +16362,25 @@ function GrowTable( ctx) {
       return -1;
     return this.selected_cell_column;
   };
+  this.setTextSize = function(size) {
+    this.text_size = size;
+  }
+  this.setTextFont = function(font) {
+    this.font = font;
+  }
+  this.setTextBold = function(bold) {
+    if (bold && this.text_drawtype == Glow.eDrawType_TextHelvetica)
+      this.text_drawtype = Glow.eDrawType_TextHelveticaBold;
+    else if (!bold && this.text_drawrtype == Glow.eDrawType_TextHelveticaBold)
+      this.text_drawtype = Glow.eDrawType_TextHelvetica;
+  }
 }
 GrowTable.prototype = Object.create(GrowRect.prototype);
 
 function GrowCtxWindow() {
-  this.zoom_factor_x = 1;
-  this.zoom_factor_y = 1;
-  this.base_zoom_factor = 1;
+  this.zoom_factor_x = 20;
+  this.zoom_factor_y = 20;
+  this.base_zoom_factor = 20;
   this.offset_x = 0;
   this.offset_y = 0;
   this.window_width = 0;
@@ -15870,9 +17057,9 @@ function GrowCtx( ctx) {
   this.dyn_attr = [];
   this.slider = 0;
   this.subgraph = 0;
-  this.scantime = 0;
-  this.fast_scantime = 0;
-  this.animation_scantime = 0;
+  this.scantime = 0.5;
+  this.fast_scantime = 0.5;
+  this.animation_scantime = 0.5;
   this.java_width = 0;
   this.background_image = null;
   this.background_tiled = 0;
@@ -15897,12 +17084,16 @@ function GrowCtx( ctx) {
   this.recursive_trace = 0;
   this.nodraw = 0;
   this.owner = "";
+  this.objectname_cnt = 0;
   this.dashboard = 0;
   this.customcolors = new GlowCustomColors();
   this.dash = new GrowDashboard(this);    
   this.a = new GlowArray( this);
   this.a_nc = new GlowArray( this);
   this.a_cc = new GlowArray( this);
+  this.a_sel = new GlowArray( this);
+  this.modified = 0;
+  this.objectname_cnt = 0;
 
   if ( ctx == null)
     this.gdraw = new GlowDraw(this);
@@ -16075,7 +17266,10 @@ function GrowCtx( ctx) {
       case Glow.eSave_GrowCtx: 
 	break;
       case Glow.eSave_GrowCtx_conpoint_num_cnt:
+	break;
       case Glow.eSave_GrowCtx_objectname_cnt: 
+	this.objectname_cnt = parseInt(tokens[1], 10);
+	break;
       case Glow.eSave_GrowCtx_name:
 	this.name = tokens[1];
 	break;
@@ -16243,6 +17437,36 @@ function GrowCtx( ctx) {
     this.mw.offset_y = this.y0 * this.mw.zoom_factor_y;
 
     return i;
+  };
+
+  this.open_subgraph = function( lines, row) {
+    var end = false;
+
+    for ( var i = row; i < lines.length; i++) {
+      if ( lines[i].length > 2 && lines[i].substring(0,2) == "0!")
+	continue;
+      if ( lines[i].length > 1 && lines[i].substring(0,1) == "!")
+	continue;
+
+      var tokens = lines[i].split(' ');
+      var key = parseInt(tokens[0], 10);
+
+      if ( this.debug) console.log( "ctx : " + lines[i]);
+
+      switch ( key) {
+      case Glow.eSave_Ctx_a_nc: 
+	i = this.a_nc.open( lines, i+1);
+	break;
+      case Glow.eSave_End: 
+	end = true; 
+	break;
+      default:
+	console.log( "Syntax error in GlowCtx::open_subgraph", key);
+	break;
+      }
+      if ( end)
+	break;
+    }
   };
 
   this.get_nodeclass_from_name = function( nc_name) {
@@ -16517,6 +17741,7 @@ function GrowCtx( ctx) {
 	   this.a.get(i).type() == Glow.eObjectType_GrowToolbar ||
 	   this.a.get(i).type() == Glow.eObjectType_GrowAxis ||
 	   this.a.get(i).type() == Glow.eObjectType_GrowAxisArc) {
+
 	this.appl.traceConnect(this.a.get(i));
 	if ( this.a.get(i).type() == Glow.eObjectType_GrowGroup) {
 	  for ( var j = 0; j < this.a.get(i).nc.a.size(); j++) {
@@ -16644,6 +17869,60 @@ function GrowCtx( ctx) {
     this.a.remove(e);
   };
 
+  this.select_insert = function( e) {
+    this.a_sel.add(e);
+  };
+
+  this.select_remove = function( e) {
+    this.a_sel.remove(e);
+  };
+
+  this.select_clear = function( e) {
+    this.a_sel.clear(e);
+  };
+
+  this.set_select_textsize = function(size) {
+    for (let i = 0; i < this.a_sel.size(); i++) {
+      switch (this.a_sel.get(i).type()) {
+	case Glow.eObjectType_GrowText:
+	case Glow.eObjectType_GrowAxis:
+	case Glow.eObjectType_GrowAxisArc:
+	case Glow.eObjectType_GrowFolder:
+	case Glow.eObjectType_GrowTable:
+          this.a_sel.get(i).setTextSize(size);
+          break;
+        default: ;
+      }
+    }
+  }
+  this.set_select_textfont = function(font) {
+    for (let i = 0; i < this.a_sel.size(); i++) {
+      switch (this.a_sel.get(i).type()) {
+	case Glow.eObjectType_GrowText:
+	case Glow.eObjectType_GrowTable:
+	case Glow.eObjectType_GrowNode:
+	case Glow.eObjectType_GrowGroup:
+          this.a_sel.get(i).setTextFont(font);
+          break;
+        default: ;
+      }
+    }
+  }
+  this.set_select_textbold = function(bold) {
+    for (let i = 0; i < this.a_sel.size(); i++) {
+      switch (this.a_sel.get(i).type()) {
+	case Glow.eObjectType_GrowText:
+	case Glow.eObjectType_GrowAxis:
+	case Glow.eObjectType_GrowAxisArc:
+	case Glow.eObjectType_GrowTable:
+	case Glow.eObjectType_GrowSubAnnot:
+	case Glow.eObjectType_GrowNode:
+          this.a_sel.get(i).setTextBold(bold);
+          break;
+        default: ;
+      }
+    }
+  }
   this.register_callback_object = function( type, o) {
     this.callback_object = o;
     this.callback_object_type = type;
@@ -16729,7 +18008,7 @@ function GrowCtx( ctx) {
   this.findByName = function( name) {
     var uname = name.toUpperCase();
     for ( var i = 0; i < this.a.size(); i++) {
-      if ( this.a.get(i).n_name.toUpperCase() == uname)
+      if ( this.a.get(i).getName().toUpperCase() == uname)
 	return this.a.get(i);
     }
     return null;
@@ -16757,7 +18036,1833 @@ function GrowCtx( ctx) {
     // TODO
     return 0;
   }
+
+  this.set_modified = function(modified) {
+    this.modified = modified;
+  }
+
+  this.group_select = function() {
+    var name;
+    var i, j;
+    var a_group = new GlowArray(ctx);
+    var ret = {sts : GLOW_.SUCCESS, group : null};
+
+    if (this.a_sel.size() == 0) {
+      ret.sts = GLOW_.NOSELECT;
+      return ret;
+    }
+    // Connections, windows and tables in a group are not allowed
+    for (i = 0; i < this.a_sel.size(); i++) {
+      if (this.a_sel.get(i).type() == Glow.eObjectType_Con
+        || this.a_sel.get(i).type() == Glow.eObjectType_GrowWindow
+        || this.a_sel.get(i).type() == Glow.eObjectType_GrowFolder
+        || this.a_sel.get(i).type() == Glow.eObjectType_GrowTable) {
+        ret.sts = GLOW_.GROUPCLASS;
+	return ret;
+      }
+    }
+
+    name = "Grp" + this.objectname_cnt.toString() + "_";
+    this.objectname_cnt++;
+
+    // The objects in the group has to be in the same order as a
+    for (i = 0; i < this.a.size(); i++) {
+      for (j = 0; j < this.a_sel.size(); j++) {
+        if (this.a.get(i) == this.a_sel.get(j)) {
+          a_group.add(this.a.get(i));
+          break;
+        }
+      }
+      if (this.a_sel.size() == a_group.size())
+        break;
+    }
+
+    var g1 = new GrowGroup(this);
+    g1.set_name(name);
+    g1.nc = new GlowNodeGroup(this);
+    g1.nc.a = a_group;
+    g1.nc.nc_name = name;
+
+    // Remove objects
+    for (i = 0; i < this.a_sel.size(); i++)
+      this.a.remove(this.a_sel.get(i));
+    this.a_sel.clear();
+
+    this.a.add(g1);
+    g1.get_node_borders();
+
+    ret.group = g1;
+    return ret;
+  };
+
+  this.rotate_select = function(angle, type) {
+    var ll_x, ll_y, ur_x, ur_y;
+    var x0 = 0.0, y0 = 0.0;
+    var t = new GlowTransform();
+    var rg = new GlowGeometry();
+
+    rg.ur_x = rg.ur_y = -1e10;
+    rg.ll_x = rg.ll_y = 1e10;
+    this.a_sel.get_borders(null, rg);
+
+    switch (type) {
+    case Glow.eRotationPoint_LowerLeft:
+      x0 = rg.ll_x;
+      y0 = rg.ll_y;
+      break;
+    case Glow.eRotationPoint_LowerRight:
+      x0 = rg.ur_x;
+      y0 = rg.ll_y;
+      break;
+    case Glow.eRotationPoint_UpperRight:
+      x0 = rg.ur_x;
+      y0 = rg.ur_y;
+      break;
+    case Glow.eRotationPoint_UpperLeft:
+      x0 = rg.ll_x;
+      y0 = rg.ur_y;
+      break;
+    case Glow.eRotationPoint_Center:
+      x0 = (rg.ur_x + rg.ll_x) / 2;
+      y0 = (rg.ur_y + rg.ll_y) / 2;
+      break;
+    default:;
+    }
+    t.rotate(angle, x0, y0);
+    this.a_sel.setTransform(t);
+  }
+
+  this.incrNextObjectNameNum = function() {
+    return this.objectname_cnt++;
+  }
+
+  this.clear_all = function() {
+    this.delete_all();
+  }
+  this.delete_all = function() {
+    this.a_sel.a.length = 0;
+    this.a_sel.a_size = 0;
+    this.a.a.length = 0;
+    this.a.a_size = 0;
+  }
+  this.set_name = function(name) {
+    this.name = name;
+  }
 }
+
+function GrowApi() {
+  this.CreateGrowRect = function(ctx, name, x, y,
+      width, height, draw_type, line_width, fix_line_width, display_level, fill,
+      border, shadow, fill_draw_type, user_data) {
+    var r1 = new GrowRect(ctx);
+    r1.construct(name, x, y, width, height, draw_type, line_width,
+        fix_line_width, display_level, fill, border, shadow, fill_draw_type);
+    r1.setUserData(user_data);
+    ctx.insert(r1);
+    return r1;
+  }
+  this.CreateGrowRectRounded = function(ctx, name, x, y,
+      width, height, draw_type, line_width, fix_line_width, display_level, fill,
+      border, shadow, fill_draw_type, user_data) {
+    var r1 = new GrowRectRounded(ctx);
+    r1.construct(name, x, y, width, height, draw_type, line_width,
+        fix_line_width, display_level, fill, border, shadow, fill_draw_type);
+    r1.setUserData(user_data);
+    ctx.insert(r1);
+    return r1;
+  }
+  this.CreateGrowArc = function(ctx, name, ll_x, ll_y, ur_x, ur_y, angle1, angle2,
+      draw_type, line_width, fill, border, shadow, fill_draw_type, user_data) {
+    var r1 = new GrowArc(ctx);
+    r1.construct(name, ll_x, ll_y, ur_x, ur_y, angle1, angle2, draw_type, line_width,
+        fill, border, shadow, fill_draw_type);
+    r1.setUserData(user_data);
+    ctx.insert(r1);
+    return r1;
+  }
+  this.CreateGrowLine = function(ctx, name, x1, y1, x2, y2,
+      draw_type, line_width, fix_line_width, user_data) {
+    var r1 = new GrowLine(ctx);
+    r1.construct(name, x1, y1, x2, y2, draw_type, line_width,
+        fix_line_width);
+    r1.setUserData(user_data);
+    ctx.insert(r1);
+    return r1;
+  }
+  this.CreateGrowPolyLine = function(ctx, name, points, point_cnt,
+      draw_type, line_width, fix_line_width, fill, border, shadow, fill_draw_type, 
+      closed, user_data) {
+    var r1 = new GrowPolyLine(ctx);
+    r1.construct(name, points, point_cnt, draw_type, line_width, fix_line_width,
+        fill, border, shadow, fill_draw_type, closed);
+    r1.setUserData(user_data);
+    ctx.insert(r1);
+    return r1;
+  }
+  this.AddPolyLinePoints = function(o, points, point_cnt) {
+    o.add_points(points, point_cnt);
+  }
+  this.CreateGrowText = function(ctx, name, text, x, y,
+      draw_type, text_color, textsize, textfont, display_level, user_data) {
+    var r1 = new GrowText(ctx);
+    r1.construct(name, text, x, y, draw_type, text_color, textsize, textfont);
+    r1.setUserData(user_data);
+    ctx.insert(r1);
+    return r1;
+  }
+  this.CreateGrowAnnot = function(ctx, name, number, x, y,
+      draw_type, text_color, textsize, textfont, display_level, user_data) {
+    var r1 = new GrowAnnot(ctx);
+    r1.construct(name, number, x, y, draw_type, text_color, textsize, textfont);
+    r1.setUserData(user_data);
+    ctx.insert(r1);
+    return r1;
+  }
+  this.CreateGrowNode = function(ctx, name, nc, x, y, user_data) {
+    var r1 = new GrowNode(ctx);
+    r1.construct(name, nc, x, y);
+    r1.setUserData(user_data);
+    ctx.insert(r1);
+    return r1;
+  }
+  this.CreateGrowSlider = function(ctx, name, nc, x, y, user_data) {
+    var r1 = new GrowSlider(ctx);
+    r1.construct(name, nc, x, y);
+    r1.setUserData(user_data);
+    ctx.insert(r1);
+    return r1;
+  }
+  this.CreateGrowImage = function(ctx, name, filename, x, y, user_data) {
+    var r1 = new GrowImage(ctx);
+    r1.construct(name, filename, x, y);
+    r1.setUserData(user_data);
+    ctx.insert(r1);
+    return r1;
+  }
+  this.CreateGrowBar = function(ctx, x, y, user_data, colortheme) {
+    var r1 = new GrowBar(ctx);
+    var backgroundcolor;
+    var barcolor;
+    var barbordercolor;
+
+    if (colortheme) {
+      backgroundcolor = Glow.eCtColor_BarBackgroundColor;
+      barcolor = Glow.eCtColor_BarBarColor;
+      barbordercolor = Glow.eCtColor_BarBarLimitColor;
+    } else {
+      backgroundcolor = Glow.eDrawType_Color40;
+      barcolor = Glow.eDrawType_Color147;
+      barbordercolor = Glow.eDrawType_Color145;
+    }
+    r1.construct(name, x, y, 0.5, 5.0, Glow.eDrawType_Line, 1,
+        0, Glow.mDisplayLevel_1, 1, 1, 0, backgroundcolor);
+    r1.max_value = 100;
+    r1.min_value = 0;
+    r1.bar_value = 30;
+    r1.bar_bordercolor = barbordercolor;
+    r1.bar_drawtype = barcolor;
+    r1.setUserData(user_data);
+    r1.get_node_borders();
+    ctx.insert(r1);
+    return r1;
+  }
+  this.CreateGrowBarArc = function(ctx, x, y, user_data, colortheme) {
+    var r1 = new GrowBarArc(ctx);
+    var backgroundcolor;
+    var barcolor;
+    var barbordercolor;
+
+    if (colortheme) {
+      backgroundcolor = Glow.eCtColor_BarBackgroundColor;
+      barcolor = Glow.eCtColor_BarBarColor;
+      barbordercolor = Glow.eCtColor_BarBarLimitColor;
+    } else {
+      backgroundcolor = Glow.eDrawType_Color40;
+      barcolor = Glow.eDrawType_Color147;
+      barbordercolor = Glow.eDrawType_Color145;
+    }
+    r1.construct(name, x, y, x+5.0, y+5.0, 0, 360, Glow.eDrawType_Line, 1,
+        1, 1, 0, backgroundcolor);
+    r1.max_value = 100;
+    r1.min_value = 0;
+    r1.bar_width = 1.0;
+    r1.bar_value = 30;
+    r1.bar_bordercolor = barbordercolor;
+    r1.bar_drawtype = barcolor;
+    r1.setUserData(user_data);
+    r1.get_node_borders();
+    ctx.insert(r1);
+    return r1;
+  }
+  this.CreateGrowAxis = function(ctx, x, y, user_data, dynamic, colortheme) {
+    var r1 = new GrowAxis(ctx);
+    var bcolor;
+
+    if (colortheme) {
+      bcolor = Glow.eCtColor_AxisBordercolor;
+    } else {
+      bcolor = Glow.eDrawType_Line;
+    }
+    r1.construct(name, x, y, 1.2, 5.0, bcolor, 1, 0, Glow.eDisplayLevel_1,
+       0, 1, 0, 0);
+    r1.text_drawtype = Glow.eDrawType_TextHelvetica;
+    r1.max_value = 100;
+    r1.min_value = 0;
+    r1.lines = 11;
+    r1.longquotient = 2;
+    r1.valuequotient = 2;
+    r1.setUserData(user_data);
+    r1.get_node_borders();
+    ctx.insert(r1);
+    return r1;
+  }
+  this.CreateGrowAxisArc = function(ctx, x, y, user_data, dynamic, colortheme) {
+    var r1 = new GrowAxisArc(ctx);
+    var bcolor;
+
+    if (colortheme) {
+      bcolor = Glow.eCtColor_AxisBordercolor;
+    } else {
+      bcolor = Glow.eDrawType_Line;
+    }
+    r1.construct(name, x, y, x+5.0, y+5.0, 0, 180, bcolor, 1,
+        0, 1, 0, 0);
+    r1.text_drawtype = Glow.eDrawType_TextHelvetica;
+    r1.max_value = 100;
+    r1.min_value = 0;
+    r1.lines = 11;
+    r1.longquotient = 2;
+    r1.valuequotient = 2;
+    r1.setUserData(user_data);
+    r1.get_node_borders();
+    ctx.insert(r1);
+    return r1;
+  }
+  this.CreateGrowPie = function(ctx, x, y, user_data, colortheme) {
+    var r1 = new GrowPie(ctx);
+    var bcolor;
+    var bgcolor;
+
+    if (colortheme) {
+      bcolor = Glow.eDrawType_Line;
+      bgcolor = Glow.eCtColor_BarBackgroundColor;
+    } else {
+      bcolor = Glow.eDrawType_Line;
+      bgcolor = Glow.eDrawType_Color38;
+    }
+    r1.construct(name, x, y, x+5.0, y+5.0, 0, 360, bcolor, 1,
+        1, 1, 0, bgcolor);
+    r1.max_value = 100;
+    r1.min_value = 0;
+    r1.sectors = 12;
+    if (colortheme) {
+      r1.sector_color[0] = Glow.eCtColor_BlueIndicator;
+      r1.sector_color[1] = Glow.eCtColor_OrangeIndicator;
+      r1.sector_color[2] = Glow.eCtColor_GreenIndicator;
+      r1.sector_color[3] = Glow.eCtColor_MagentaIndicator;
+      r1.sector_color[4] = Glow.eCtColor_YellowIndicator;
+      r1.sector_color[5] = Glow.eCtColor_RedIndicator;
+    } else {
+      r1.sector_color[0] = Glow.eDrawType_Color115;
+      r1.sector_color[1] = Glow.eDrawType_Color145;
+      r1.sector_color[2] = Glow.eDrawType_Color175;
+      r1.sector_color[3] = Glow.eDrawType_Color205;
+      r1.sector_color[4] = Glow.eDrawType_Color235;
+      r1.sector_color[5] = Glow.eDrawType_Color265;
+    }
+    r1.sector_color[6] = Glow.eDrawType_Color295;
+    r1.sector_color[7] = Glow.eDrawType_Color105;
+    r1.sector_color[8] = Glow.eDrawType_Color135;
+    r1.sector_color[9] = Glow.eDrawType_Color165;
+    r1.sector_color[10] = Glow.eDrawType_Color195;
+    r1.sector_color[11] = Glow.eDrawType_Color205;
+    for (let i = 0; i < 12; i++)
+      r1.sector_size[i] = 8.333;
+    r1.setUserData(user_data);
+    r1.get_node_borders();
+    ctx.insert(r1);
+    return r1;
+  }
+  this.CreateGrowTrend = function(ctx, x, y, user_data, colortheme) {
+    var r1 = new GrowTrend(ctx);
+    var fcolor;
+    var bcolor;
+
+    if (colortheme) {
+      fcolor = Glow.eCtColor_DiagramFillcolor;
+      bcolor = Glow.eCtColor_DiagramBordercolor;
+    } else {
+      fcolor = Glow.eDrawType_Color40;
+      bcolor = Glow.eDrawType_Color37;
+    }
+
+    r1.construct(name, x, y, 4.0, 5.0, bcolor, 1,
+        0, Glow.mDisplayLevel_1, 1, 1, 0, fcolor);
+    r1.no_of_points = 100;
+    r1.scan_time = 0.5;
+    r1.fill_curve = 0;
+    r1.curve_width = 1;
+    r1.horizontal_lines = 4;
+    r1.vertical_lines = 4;
+    r1.y_min_value[0] = 0;
+    r1.y_min_value[1] = 0;
+    r1.y_max_value[0] = 100;
+    r1.y_max_value[1] = 100;
+    if (colortheme) {
+      r1.curve_drawtype[0] = Glow.eCtColor_DiagramCurveColor;
+      r1.curve_drawtype[1] = Glow.eCtColor_OrangeCurve;
+      r1.curve_fill_drawtype[0] = Glow.eCtColor_BarBarColor;
+      r1.curve_fill_drawtype[1] = Glow.eCtColor_OrangeBar;
+      r1.mark1_color = Glow.eCtColor_YellowCurve;
+      r1.mark2_color = Glow.eCtColor_RedCurve;
+    } else {
+      r1.curve_drawtype[0] = Glow.eDrawType_Color145;
+      r1.curve_drawtype[1] = Glow.eDrawType_Color295;
+      r1.curve_fill_drawtype[0] = Glow.eDrawType_Color139;
+      r1.curve_fill_drawtype[1] = Glow.eDrawType_Color289;
+      r1.mark1_color = Glow.eColor_Yellow;
+      r1.mark2_color = Glow.eColor_Red;
+    }
+    r1.setUserData(user_data);
+    r1.configure_curves();
+    r1.get_node_borders();
+    ctx.insert(r1);
+    return r1;
+  }
+  this.CreateGrowXYCurve = function(ctx, x, y, user_data, colortheme) {
+    var r1 = new GrowXYCurve(ctx);
+    var fcolor;
+    var bcolor;
+
+    if (colortheme) {
+      fcolor = Glow.eCtColor_DiagramFillcolor;
+      bcolor = Glow.eCtColor_DiagramBordercolor;
+    } else {
+      fcolor = Glow.eDrawType_Color40;
+      bcolor = Glow.eDrawType_Color37;
+    }
+
+    r1.construct(name, x, y, 4.0, 5.0, bcolor, 1,
+        0, Glow.mDisplayLevel_1, 1, 1, 0, fcolor);
+    r1.no_of_points = 100;
+    r1.scan_time = 0.5;
+    r1.fill_curve = 0;
+    r1.curve_width = 1;
+    r1.horizontal_lines = 4;
+    r1.vertical_lines = 4;
+    r1.y_min_value[0] = 0;
+    r1.y_min_value[1] = 0;
+    r1.y_max_value[0] = 100;
+    r1.y_max_value[1] = 100;
+    if (colortheme) {
+      r1.curve_drawtype[0] = Glow.eCtColor_DiagramCurveColor;
+      r1.curve_drawtype[1] = Glow.eCtColor_OrangeCurve;
+      r1.curve_fill_drawtype[0] = Glow.eCtColor_BarBarColor;
+      r1.curve_fill_drawtype[1] = Glow.eCtColor_OrangeBar;
+      r1.mark1_color = Glow.eCtColor_YellowCurve;
+      r1.mark2_color = Glow.eCtColor_RedCurve;
+    } else {
+      r1.curve_drawtype[0] = Glow.eDrawType_Color145;
+      r1.curve_drawtype[1] = Glow.eDrawType_Color295;
+      r1.curve_fill_drawtype[0] = Glow.eDrawType_Color139;
+      r1.curve_fill_drawtype[1] = Glow.eDrawType_Color289;
+      r1.mark1_color = Glow.eColor_Yellow;
+      r1.mark2_color = Glow.eColor_Red;
+    }
+    r1.setUserData(user_data);
+    r1.configure_curves();
+    r1.get_node_borders();
+    ctx.insert(r1);
+    return r1;
+  }
+  this.CreateGrowWindow = function(ctx, x, y) {
+    var r1 = new GrowWindow(ctx);
+    r1.construct(name, x, y, 8.0, 6.0, Glow.eDrawType_Line, 1,
+        0, Glow.mDisplayLevel_1, 0, 1, 0, 0);
+    r1.init(name, x, y, 8.0, 6.0, Glow.eDrawType_Line, 0.1, 
+			0, 1, 0, 0);
+    r1.get_node_borders();
+    ctx.insert(r1);
+    return r1;
+  }
+  this.CreateGrowToolbar = function(ctx, name, x, y, user_data) {
+    const opmeth_size = 12;
+    const op_subgraph = ["pwr_mb2opengraph", "pwr_mb2openobjectgraph", "pwr_mb2trend",
+        "pwr_mb2history", "pwr_mb2fast", "pwr_mb2camera", "pwr_mb2histevent",
+        "pwr_mb2blockevents", "pwr_mb2help", "pwr_mb2photo", "pwr_mb2note",
+        "pwr_mb2parentgraph"];
+    const mntmeth_size = 32;
+    const mnt_subgraph = ["pwr_mb2openobject", "pwr_mb2openplc", "pwr_mb2rtnavigator",
+        "pwr_mb2crossreferences", "pwr_mb2helpclass", "pwr_mb2datasheet",
+        "pwr_mb2circuitdiagram", "", "", "", "", "", "", "", "", "", "", "", "",
+        "", "", "", "", "", "", "", "", "", "", "", "", "pwr_mb2simulate"];
+
+    var r1 = new GrowToolbar(ctx);
+    r1.construct(name, x, y, op_subgraph, mnt_subgraph, opmeth_size, mntmeth_size);
+    r1.setUserData(user_data);
+    ctx.insert(r1);
+    return r1;
+  }
+  this.SetBackgroundColor = function(ctx, color) {
+    ctx.background_color = color;
+  }
+  this.SetModified = function(ctx, modified) {
+    ctx.modified = modified;
+  }
+  this.SetNodraw = function(ctx) {
+    ctx.nodraw++;
+  }
+  this.ResetNodraw = function(ctx) {
+    ctx.nodraw--;
+  }
+  this.Redraw = function(ctx) {
+    ctx.draw();
+  }
+  this.SelectInsert = function(ctx, o) {
+    ctx.select_insert(o);
+  }
+  this.SelectRemove = function(ctx, o) {
+    ctx.select_remove(o);
+  }
+  this.SelectClear = function(ctx) {
+    ctx.select_clear();
+  }
+  this.GetFirstObject = function(ctx) {
+    return ctx.a.get_first();
+  }
+  this.GetNextObject = function(ctx, o) {
+    return ctx.a.get_next(o);
+  }
+  this.GroupGetNextObject = function(group, object) {
+    if (!(group.type() == Glow.eObjectType_GrowGroup ||
+	  group.type() == Glow.eObjectType_GrowDashCell)) {
+      var ret = {sts : 0, element : null}
+      return ret;
+    }
+    return group.get_next_object(object);
+  }
+
+  this.GroupGetFirstObject = function(group) {
+    if (!(group.type() == Glow.eObjectType_GrowGroup ||
+	  group.type() == Glow.eObjectType_GrowDashCell)) {
+      var ret = {sts : 0, element : null}
+      return ret;
+    }
+    return group.get_first_object();
+  }
+  this.SetObjectName = function(o, name) {
+    o.set_name(name);
+  }
+  this.GetObjectName = function(o) {
+    return o.get_name();
+  }
+  this.GetObjectType = function(o) {
+    return o.type();
+  }
+  this.GetObjectClass = function(object) {
+    if (object.type() == Glow.eObjectType_GrowNode
+      || object.type() == Glow.eObjectType_GrowSlider
+      || object.type() == Glow.eObjectType_GrowConGlue
+      || object.type() == Glow.eObjectType_GrowGroup)
+    return object.nc.get_base_nc();
+  else
+    return 0;
+  }
+  this.GetNodeClassName = function(classid) {
+    return classid.getName();
+  }
+  this.GroupSelect = function(ctx) {
+    return ctx.group_select();  
+  }
+  this.SetUserData = function(o, userdata) {
+    o.setUserData(userdata);  
+  }
+  this.SetObjectOriginalFillColor = function(o, color) {
+    o.setOriginalFillColor(color);  
+  }
+  this.GetObjectFillColor = function(o) {
+    return o.getFillColor();
+  }
+  this.SetObjectOriginalBorderColor = function(o, color) {
+    o.setOriginalBorderColor(color);  
+  }
+  this.GetObjectBorderColor = function(o) {
+    return o.getBorderColor();
+  }
+  this.SetObjectOriginalTextColor = function(o, color) {
+    o.setOriginalTextColor(color);  
+  }
+  this.SetObjectOriginalBackgroundColor = function(o, color) {
+    o.setOriginalBackgroundColor(color);  
+  }
+  this.GetObjectFill = function(o) {
+    return o.getFill();
+  }
+  this.SetObjectFill = function(o, fill) {
+    o.setFill(fill);
+  }
+  this.GetObjectBorder = function(o) {
+    return o.getBorder();
+  }
+  this.SetObjectBorder = function(o, border) {
+    o.setBorder(border);
+  }
+  this.GetObjectShadow = function(o) {
+    return o.getShadow();
+  }
+  this.SetObjectShadow = function(o, shadow) {
+    o.setShadow(shadow);
+  }
+  this.GetObjectGradient = function(o) {
+    return o.getGradient();
+  }
+  this.SetObjectGradient = function(o, gradient) {
+    o.setGradient(gradient);
+  }
+  this.SetObjectLinewidth = function(o, linewidth) {
+    o.setLinewidth(linewidth);
+  }
+  this.GetObjectTransparency = function(o) {
+    return o.getTransparency();
+  }
+  this.SetObjectTransparency = function(o, transparency) {
+    o.setTransparency(transparency);
+  }
+  this.SetObjectText = function(o, text) {
+    o.setText(text);
+  }
+  this.SetObjectLinetype = function(o, type) {
+    o.setLinetype(type);
+  }
+  this.SetObjectTextSize = function(o, size) {
+    o.setTextSize(size);
+  }
+  this.SetObjectTextBold = function(o, bold) {
+    o.setTextBold(bold);
+  }
+  this.SetObjectTextFont = function(o, font) {
+    o.setTextFont(font);
+  }
+  this.InitObjectTransform = function(o, a11, a12, a13, a21, a22, a23, rotation) {
+    o.initTransform(a11, a12, a13, a21, a22, a23, rotation);
+  }
+  this.FindNodeClassByName = function(ctx, name) {
+    return ctx.get_nodeclass_from_name(name);
+  }
+  this.GetNextObjectNameNumber = function(ctx) {
+    return ctx.incrNextObjectNameNum();
+  }
+  this.IsSliderClass = function(nc) {
+    return nc.isSlider();
+  }
+  this.StoreTransform = function(o) {
+    return o.storeTransform();
+  }
+  this.RotateSelectedObjects = function(ctx, angle, type) {
+    ctx.rotate_select(angle, type);
+  }
+  this.SetSelectTextSize = function(ctx, size) {
+    ctx.set_select_textsize(size);
+  }
+  this.SetSelectTextFont = function(ctx, font) {
+    ctx.set_select_textfont(font);
+  }
+  this.SetSelectTextBold = function(ctx, bold) {
+    ctx.set_select_textbold(bold);
+  }
+  this.MeasureNode = function(o) {
+    return o.measure();
+  }
+  this.GetTextExtent = function(ctx, text, drawtype, textsize, font) {
+    var dim = ctx.gdraw.getTextExtent( text, textsize, font, drawtype, 0);
+    dim.width = dim.width / ctx.mw.zoom_factor_x;
+    dim.height = dim.height / ctx.mw.zoom_factor_x;
+    return dim;
+  }
+  this.SetObjectScale = function(o, scale_x, scale_y, x0, y0, type) {
+    return o.set_scale(scale_x, scale_y, x0, y0, type);
+  }
+  this.SetObjectClass = function(o, nc) {
+    return CCM_.NYI;
+  }
+  this.UpdateColorTheme = function(ctx, theme) {
+    var cname = "pwr_colortheme" + theme.toString() + ".pwgc";
+    ctx.customcolors.read_colorfile(ctx, cname);
+    ctx.gdraw.push_customcolors(ctx.customcolors);
+  }
+  this.SetObjectAttribute = function(o, name, value) {
+    switch (o.type()) {
+
+    case Glow.eObjectType_GrowNode:
+    case Glow.eObjectType_GrowGroup:
+    case Glow.eObjectType_GrowToolbar:
+      if (name === "Transparency") {
+	o.transparency = value;
+	return 1;
+      }
+      else if (name === "Text") {
+        o.setAnnotation(1, value);
+	return 1;
+      }
+      for (let i = 0; i < 10; i++) {
+        var aname = "A" + i.toString();
+        if (name === aname) {
+          o.setAnnotation(i, value);
+          return 1;
+        }
+      }
+      break;
+    case Glow.eObjectType_GrowRect:
+      if (name === "shadow_width") {
+	o.shadow_width = value;
+	return 1;
+      }
+      else if (name === "shadow_contrast") {
+	o.shadow_contrast = value;
+	return 1;
+      }
+      else if (name === "relief") {
+	o.relief = value;
+	return 1;
+      }
+      else if (name === "gradient_contrast") {
+	o.gradient_contrast = value;
+	return 1;
+      }
+      else if (name === "gradient") {
+	o.gradient = value;
+	return 1;
+      }
+      else if (name === "transparency") {
+	o.transparency = value;
+	return 1;
+      }
+      else if (name === "invisible") {
+	o.invisible = value;
+	return 1;
+      }
+      else if (name === "fill_eq_background") {
+	o.fill_eq_background = value;
+	return 1;
+      }
+      else if (name === "fixcolor") {
+	o.fixcolor = value;
+	return 1;
+      }
+      else if (name === "disable_shadow") {
+	o.disable_shadow = value;
+	return 1;
+      }
+      else if (name === "disable_gradient") {
+	o.disable_gradient = value;
+	return 1;
+      }
+      else if (name === "bgcolor_gradient") {
+	o.bgcolor_gradient = value;
+	return 1;
+      }
+      else if (name === "fixposition") {
+	o.fixposition = value;
+	return 1;
+      }
+      break;
+    case Glow.eObjectType_GrowRectRounded:
+      if (name === "round_amount") {
+	o.round_amount = value;
+	return 1;
+      }
+      else if (name === "shadow_width") {
+	o.shadow_width = value;
+	return 1;
+      }
+      else if (name === "shadow_contrast") {
+	o.shadow_contrast = value;
+	return 1;
+      }
+      else if (name === "relief") {
+	o.relief = value;
+	return 1;
+      }
+      else if (name === "gradient_contrast") {
+	o.gradient_contrast = value;
+	return 1;
+      }
+      else if (name === "gradient") {
+	o.gradient = value;
+	return 1;
+      }
+      else if (name === "transparency") {
+	o.transparency = value;
+	return 1;
+      }
+      else if (name === "disable_shadow") {
+	o.disable_shadow = value;
+	return 1;
+      }
+      else if (name === "disable_gradient") {
+	o.disable_gradient = value;
+	return 1;
+      }
+      else if (name === "fixposition") {
+	o.fixposition = value;
+	return 1;
+      }
+      break;
+    case Glow.eObjectType_GrowPolyLine:
+      if (name === "shadow_width") {
+	o.shadow_width = value;
+	return 1;
+      }
+      else if (name === "shadow_contrast") {
+	o.shadow_contrast = value;
+	return 1;
+      }
+      else if (name === "relief") {
+	o.relief = value;
+	return 1;
+      }
+      else if (name === "gradient_contrast") {
+	o.gradient_contrast = value;
+	return 1;
+      }
+      else if (name === "gradient") {
+	o.gradient = value;
+	return 1;
+      }
+      else if (name === "transparency") {
+	o.transparency = value;
+	return 1;
+      }
+      else if (name === "disable_shadow") {
+	o.disable_shadow = value;
+	return 1;
+      }
+      else if (name === "disable_gradient") {
+	o.disable_gradient = value;
+	return 1;
+      }
+      else if (name === "fill_eq_border") {
+	o.fill_eq_border = value;
+	return 1;
+      }
+      else if (name === "fill_eq_background") {
+	o.fill_eq_background = value;
+	return 1;
+      }
+      else if (name === "fill_eq_light") {
+	o.fill_eq_light = value;
+	return 1;
+      }
+      else if (name === "fill_eq_shadow") {
+	o.fill_eq_shadow = value;
+	return 1;
+      }
+      else if (name === "fill_eq_bglight") {
+	o.fill_eq_bglight = value;
+	return 1;
+      }
+      else if (name === "fill_eq_bgshadow") {
+	o.fill_eq_bgshadow = value;
+	return 1;
+      }
+      else if (name === "fixcolor") {
+	o.fixcolor = value;
+	return 1;
+      }
+      else if (name === "fixposition") {
+	o.fixposition = value;
+	return 1;
+      }
+      break;
+    case Glow.eObjectType_GrowLine:
+      if (name === "transparency") {
+	o.transparency = value;
+	return 1;
+      }
+      break;
+    case Glow.eObjectType_GrowArc:
+      if (name === "angle1") {
+	o.angle1 = value;
+	return 1;
+      }
+      else if (name === "angle2") {
+	o.angle2 = value;
+	return 1;
+      }
+      else if (name === "shadow_width") {
+	o.shadow_width = value;
+	return 1;
+      }
+      else if (name === "shadow_contrast") {
+	o.shadow_contrast = value;
+	return 1;
+      }
+      else if (name === "gradient_contrast") {
+	o.gradient_contrast = value;
+	return 1;
+      }
+      else if (name === "gradient") {
+	o.gradient = value;
+	return 1;
+      }
+      else if (name === "transparency") {
+	o.transparency = value;
+	return 1;
+      }
+      else if (name === "relief") {
+	o.relief = value;
+	return 1;
+      }
+      else if (name === "fixcolor") {
+	o.fixcolor = value;
+	return 1;
+      }
+      else if (name === "disable_shadow") {
+	o.disable_shadow = value;
+	return 1;
+      }
+      else if (name === "disable_gradient") {
+	o.disable_gradient = value;
+	return 1;
+      }
+      else if (name === "fixposition") {
+	o.fixposition = value;
+	return 1;
+      }
+      else if (name === "fill_eq_light") {
+	o.fill_eq_light = value;
+	return 1;
+      }
+      else if (name === "fill_eq_shadow") {
+	o.fill_eq_shadow = value;
+	return 1;
+      }
+      else if (name === "fill_eq_background") {
+	o.fill_eq_background = value;
+	return 1;
+      }
+      break;
+    case Glow.eObjectType_GrowConPoint:
+      if (name === "Number") {
+	o.number = value;
+	return 1;
+      }
+      else if (name === "Direction") {
+	o.direction = value;
+	return 1;
+      }
+      break;
+    case Glow.eObjectType_GrowSubAnnot:
+      if (name === "TextSize") {
+	o.text_size = value;
+	return 1;
+      }
+      else if (name === "Number") {
+	o.number = value;
+	return 1;
+      }
+      else if (name === "Adjustment") {
+	o.adjustment = value;
+	return 1;
+      }
+      else if (name === "Font") {
+	o.font = value;
+	return 1;
+      }
+      else if (name === "Type") {
+	o.annot_type = value;
+	return 1;
+      }
+      else if (name === "Protected") {
+	o.protect = value;
+	return 1;
+      }
+      break;
+    case Glow.eObjectType_GrowText:
+      if (name === "Text") {
+	o.text = value;
+	return 1;
+      }
+      else if (name === "Adjustment") {
+	o.adjustment = value;
+	return 1;
+      }
+      else if (name === "Transparency") {
+	o.transparency = value;
+	return 1;
+      }
+      break;
+    case Glow.eObjectType_GrowAxis:
+      if (name === "MaxValue" || name === "Axis.MaxValue") {
+	o.max_value = value;
+	o.configure();        
+	return 1;
+      }
+      else if (name === "MinValue" || name === "Axis.MinValue") {
+	o.min_value = value;
+	o.configure();
+	return 1;
+      }
+      else if (name === "Lines" || name === "Axis.Lines") {
+	o.lines = value;
+	o.configure();
+	return 1;
+      }
+      else if (name === "LongQuotient" || name === "Axis.LongQuotient") {
+	o.longquotient = value;
+	o.configure();
+	return 1;
+      }
+      else if (name === "ValueQuotient" || name === "Axis.ValueQuotient") {
+	o.valuequotient = value;
+	o.configure();
+	return 1;
+      }
+      else if (name === "Format" || name === "Axis.Format") {
+	o.format = value;
+        o.cFormat = new GlowCFormat(format);
+	return 1;
+      }
+      break;
+    case Glow.eObjectType_GrowAxisArc:
+      if (name === "Angle1" || name === "Axis.Angle1") {
+	o.angle1 = value;
+	return 1;
+      }
+      else if (name === "Angle2" || name === "Axis.Angle2") {
+	o.angle2 = value;
+	return 1;
+      }
+      else if (name === "LineLength" || name === "Axis.LineLength") {
+	o.linelength = value;
+	return 1;
+      }
+      else if (name === "MaxValue" || name === "Axis.MaxValue") {
+	o.max_value = value;
+	o.configure();        
+	return 1;
+      }
+      else if (name === "MinValue" || name === "Axis.MinValue") {
+	o.min_value = value;
+	o.configure();
+	return 1;
+      }
+      else if (name === "Lines" || name === "Axis.Lines") {
+	o.lines = value;
+	o.configure();
+	return 1;
+      }
+      else if (name === "LongQuotient" || name === "Axis.LongQuotient") {
+	o.longquotient = value;
+	o.configure();
+	return 1;
+      }
+      else if (name === "ValueQuotient" || name === "Axis.ValueQuotient") {
+	o.valuequotient = value;
+	o.configure();
+	return 1;
+      }
+      else if (name === "Format" || name === "Axis.Format") {
+	o.format = value;
+        o.cFormat = new GlowCFormat(format);
+	return 1;
+      }
+      break;
+    case Glow.eObjectType_GrowXYCurve:
+      if (name === "XY_Curve.NoOfPoints") {
+	o.no_of_points = value;
+	return 1;
+      }
+      else if (name === "XY_Curve.CurveLineWidth") {
+	o.curve_width = value;
+	return 1;
+      }
+      else if (name === "XY_Curve.FillCurve") {
+	o.fill_curve = value;
+	return 1;
+      }
+      else if (name === "XY_Curve.HorizontalLines") {
+	o.horizontal_lines = value;
+	return 1;
+      }
+      else if (name === "XY_Curve.VerticalLines") {
+	o.vertical_lines = value;
+	return 1;
+      }
+    case Glow.eObjectType_GrowWindow:
+      if (name === "Window.FileName") {
+	o.input_file_name = value;
+        o.update_attributes();  
+	return 1;
+      }
+      else if (name === "Window.Scale") {
+	o.window_scale = value;
+	return 1;
+      }
+      else if (name === "Window.VerticalScrollbar") {
+	o.vertical_scrollbar = value;
+	return 1;
+      }
+      else if (name === "Window.HorizontalScrollbar") {
+	o.horizontal_scrollbar = value;
+	return 1;
+      }
+      else if (name === "Window.ScrollbarWidth") {
+	o.scrollbar_width = value;
+	return 1;
+      }
+      else if (name === "Window.ScrollbarColor") {
+	o.scrollbar_color = value;
+	return 1;
+      }
+      else if (name === "Window.ScrollbarBgColor") {
+	o.scrollbar_bg_color = value;
+	return 1;
+      }
+      else if (name === "Window.Object") {
+	o.owner = value;
+	return 1;
+      }
+    }
+    var userdata = o.getUserData();
+    if (userdata != null) {
+      return userdata.setAttribute(o, name, value);
+    }
+    return 0;
+  }
+  this.SetGraphAttribute = function(ctx, name, value) {
+    if (name === "subgraph") {
+      ctx.subgraph = value;
+      return 1;
+    }
+    else if (name === "x0") {
+      ctx.x0 = value;
+      ctx.mw.offset_x = ctx.x0 * ctx.mw.zoom_factor_x;
+      return 1;
+    }
+    else if (name === "y0") {
+      ctx.y0 = value;
+      ctx.mw.offset_y = ctx.y0 * ctx.mw.zoom_factor_y;
+      return 1;
+    }
+    else if (name === "x1") {
+      ctx.x1 = value;
+      return 1;
+    }
+    else if (name === "y1") {
+      ctx.y1 = value;
+      return 1;
+    }
+    else if (name === "Scantime") {
+      ctx.scantime = value;
+      return 1;
+    }
+    else if (name === "FastScantime") {
+      ctx.fast_scantime = value;
+      return 1;
+    }
+    else if (name === "AnimationScantime") {
+      ctx.animation_scantime = value;
+      return 1;
+    }
+    else if (name === "BackgroundImage") {
+      ctx.background_image = value;
+      return 1;
+    }
+    else if (name === "MB3Action") {
+      ctx.mb3_action = value;
+      return 1;
+    }
+    else if (name === "Translate") {
+      ctx.translate_on = value;
+      return 1;
+    }
+    else if (name === "AntiAliasing") {
+      ctx.anti_aliasing = value;
+      return 1;
+    }
+    else if (name === "HotIndication") {
+      ctx.hot_indication = value;
+      return 1;
+    }
+    else if (name === "TooltipTextSize") {
+      ctx.tiptext_size = value;
+      return 1;
+    }
+    else if (name === "AppMotion") {
+      ctx.app_motion = value;
+      return 1;
+    }
+    else if (name === "ColorTheme") {
+      ctx.color_theme = value;
+      return 1;
+    }
+    else if (name === "Dashboard") {
+      ctx.dashboard = value;
+      return 1;
+    }
+    else if (name === "DashCellWidth") {
+      ctx.dash_cell_width = value;
+      return 1;
+    }
+    else if (name === "DashCellHeight") {
+      ctx.dash_cell_height = value;
+      return 1;
+    }
+    else if (name === "DashRows") {
+      ctx.dash_rows = value;
+      return 1;
+    }
+    else if (name === "DashColumns") {
+      ctx.dash_columns = value;
+      return 1;
+    }
+    return 0;
+  }
+  this.GetObjectAttribute = function(o, name) {
+    var ret = new ge_tValueReturn();
+    var userdata = o.getUserData();
+
+    switch (o.type()) {
+
+    case Glow.eObjectType_GrowNode:
+    case Glow.eObjectType_GrowGroup:
+    case Glow.eObjectType_GrowToolbar:
+      if (name === "Transparency") {
+	ret.value = o.transparency;
+	ret.decl = CcmC.K_DECL_FLOAT;
+	return ret;
+      }
+      else if (name === "Text") {
+        ret.value = o.getAnnotation(1);
+	ret.decl = CcmC.K_DECL_STRING;
+	return ret;
+      }
+      for (let i = 0; i < 10; i++) {
+        var aname = "A" + i.toString();
+        if (name === aname) {
+          ret.value = o.getAnnotation(i);
+	  ret.decl = CcmC.K_DECL_STRING;
+          return ret;
+        }
+      }
+      break;
+    case Glow.eObjectType_GrowRect:
+      if (name === "shadow_width") {
+	ret.value = o.shadow_width;
+	ret.decl = CcmC.K_DECL_FLOAT;
+	return ret;
+      }
+      else if (name === "shadow_contrast") {
+	ret.value = o.shadow_contrast;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      else if (name === "relief") {
+	ret.value = o.relief;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      else if (name === "gradient_contrast") {
+	ret.value = o.gradient_contrast;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      else if (name === "gradient") {
+	ret.value = o.gradient;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      else if (name === "transparency") {
+	ret.value = o.transparency;
+	ret.decl = CcmC.K_DECL_FLOAT;
+	return ret;
+      }
+      else if (name === "invisible") {
+	ret.value = o.invisible;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      else if (name === "fill_eq_background") {
+	ret.value = o.fill_eq_background;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      else if (name === "fixcolor") {
+	ret.value = o.fixcolor;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      else if (name === "disable_shadow") {
+	ret.value = o.disable_shadow;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      else if (name === "disable_gradient") {
+	ret.value = o.disable_gradient;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      else if (name === "bgcolor_gradient") {
+	ret.value = o.bgcolor_gradient;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      else if (name === "fixposition") {
+	ret.value = o.fixposition;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      break;
+    case Glow.eObjectType_GrowRectRounded:
+      if (name === "round_amount") {
+	ret.value = o.round_amount;
+	ret.decl = CcmC.K_DECL_FLOAT;
+	return ret;
+      }
+      else if (name === "shadow_width") {
+	ret.value = o.shadow_width;
+	ret.decl = CcmC.K_DECL_FLOAT;
+	return ret;
+      }
+      else if (name === "shadow_contrast") {
+	ret.value = o.shadow_contrast;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      else if (name === "relief") {
+	ret.value = o.relief;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      else if (name === "gradient_contrast") {
+	ret.value = o.gradient_contrast;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      else if (name === "gradient") {
+	ret.value = o.gradient;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      else if (name === "transparency") {
+	ret.value = o.transparency;
+	ret.decl = CcmC.K_DECL_FLOAT;
+	return ret;
+      }
+      else if (name === "disable_shadow") {
+	ret.value = o.disable_shadow;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      else if (name === "disable_gradient") {
+	ret.value = o.disable_gradient;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      else if (name === "fixposition") {
+	ret.value = o.fixposition;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      break;
+    case Glow.eObjectType_GrowPolyLine:
+      if (name === "shadow_width") {
+	ret.value = o.shadow_width;
+	ret.decl = CcmC.K_DECL_FLOAT;
+	return ret;
+      }
+      else if (name === "shadow_contrast") {
+	ret.value = o.shadow_contrast;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      else if (name === "relief") {
+	ret.value = o.relief;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      else if (name === "gradient_contrast") {
+	ret.value = o.gradient_contrast;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      else if (name === "gradient") {
+	ret.value = o.gradient;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      else if (name === "transparency") {
+	ret.value = o.transparency;
+	ret.decl = CcmC.K_DECL_FLOAT;
+	return ret;
+      }
+      else if (name === "disable_shadow") {
+	ret.value = o.disable_shadow;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      else if (name === "disable_gradient") {
+	ret.value = o.disable_gradient;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      else if (name === "fill_eq_border") {
+	ret.value = o.fill_eq_border;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      else if (name === "fill_eq_background") {
+	ret.value = o.fill_eq_background;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      else if (name === "fill_eq_light") {
+	ret.value = o.fill_eq_light;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      else if (name === "fill_eq_shadow") {
+	ret.value = o.fill_eq_shadow;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      else if (name === "fill_eq_bglight") {
+	ret.value = o.fill_eq_bglight;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      else if (name === "fill_eq_bgshadow") {
+	ret.value = o.fill_eq_bgshadow;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      else if (name === "fixcolor") {
+	ret.value = o.fixcolor;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      else if (name === "fixposition") {
+	ret.value = o.fixposition;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      break;
+    case Glow.eObjectType_GrowLine:
+      if (name === "transparency") {
+	ret.value = o.transparency;
+	ret.decl = CcmC.K_DECL_FLOAT;
+	return ret;
+      }
+      break;
+    case Glow.eObjectType_GrowArc:
+      if (name === "angle1") {
+	ret.value = o.angle1;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      else if (name === "angle2") {
+	ret.value = o.angle2;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      else if (name === "shadow_width") {
+	ret.value = o.shadow_width;
+	ret.decl = CcmC.K_DECL_FLOAT;
+	return ret;
+      }
+      else if (name === "shadow_contrast") {
+	ret.value = o.shadow_contrast;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      else if (name === "gradient_contrast") {
+	ret.value = o.gradient_contrast;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      else if (name === "gradient") {
+	ret.value = o.gradient;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      else if (name === "transparency") {
+	ret.value = o.transparency;
+	ret.decl = CcmC.K_DECL_FLOAT;
+	return ret;
+      }
+      else if (name === "relief") {
+	ret.value = o.relief;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      else if (name === "fixcolor") {
+	ret.value = o.fixcolor;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      else if (name === "disable_shadow") {
+	ret.value = o.disable_shadow;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      else if (name === "disable_gradient") {
+	ret.value = o.disable_gradient;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      else if (name === "fixposition") {
+	ret.value = o.fixposition;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      else if (name === "fill_eq_light") {
+	ret.value = o.fill_eq_light;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      else if (name === "fill_eq_shadow") {
+	ret.value = o.fill_eq_shadow;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      else if (name === "fill_eq_background") {
+	ret.value = o.fill_eq_background;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      break;
+    case Glow.eObjectType_GrowConPoint:
+      if (name === "Number") {
+	ret.value = o.number;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      else if (name === "Direction") {
+	ret.value = o.direction;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      break;
+    case Glow.eObjectType_GrowSubAnnot:
+      if (name === "TextSize") {
+	ret.value = o.text_size;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      else if (name === "Number") {
+	ret.value = o.number;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      else if (name === "Adjustment") {
+	ret.value = o.adjustment;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      else if (name === "Font") {
+	ret.value = o.font;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      else if (name === "Type") {
+	ret.value = o.annot_type;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      else if (name === "Protected") {
+	ret.value = o.protect;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      break;
+    case Glow.eObjectType_GrowText:
+      if (name === "Text") {
+	ret.value = o.text;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      else if (name === "Adjustment") {
+	ret.value = o.adjustment;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      else if (name === "Transparency") {
+	ret.value = o.transparency;
+	ret.decl = CcmC.K_DECL_FLOAT;
+	return ret;
+      }
+      break;
+    case Glow.eObjectType_GrowAxis:
+      if (name === "MaxValue" || name === "Axis.MaxValue") {
+	ret.value = o.max_value;
+	ret.decl = CcmC.K_DECL_FLOAT;
+	ret.value = o.configure();        
+	return ret;
+      }
+      else if (name === "MinValue" || name === "Axis.MinValue") {
+	ret.value = o.min_value;
+	ret.decl = CcmC.K_DECL_FLOAT;
+	ret.value = o.configure();
+	return ret;
+      }
+      else if (name === "Lines" || name === "Axis.Lines") {
+	ret.value = o.lines;
+	ret.decl = CcmC.K_DECL_INT;
+	ret.value = o.configure();
+	return ret;
+      }
+      else if (name === "LongQuotient" || name === "Axis.LongQuotient") {
+	ret.value = o.longquotient;
+	ret.decl = CcmC.K_DECL_INT;
+	ret.value = o.configure();
+	return ret;
+      }
+      else if (name === "ValueQuotient" || name === "Axis.ValueQuotient") {
+	ret.value = o.valuequotient;
+	ret.decl = CcmC.K_DECL_INT;
+	ret.value = o.configure();
+	return ret;
+      }
+      else if (name === "Format" || name === "Axis.Format") {
+	ret.value = o.format;
+	ret.decl = CcmC.K_DECL_STRING;
+	return ret;
+      }
+      break;
+    case Glow.eObjectType_GrowAxisArc:
+      if (name === "Angle1" || name === "Axis.Angle1") {
+	ret.value = o.angle1;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      else if (name === "Angle2" || name === "Axis.Angle2") {
+	ret.value = o.angle2;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      else if (name === "LineLength" || name === "Axis.LineLength") {
+	ret.value = o.linelength;
+	ret.decl = CcmC.K_DECL_FLOAT;
+	return ret;
+      }
+      else if (name === "MaxValue" || name === "Axis.MaxValue") {
+	ret.value = o.max_value;
+	ret.decl = CcmC.K_DECL_FLOAT;
+	return ret;
+      }
+      else if (name === "MinValue" || name === "Axis.MinValue") {
+	ret.value = o.min_value;
+	ret.decl = CcmC.K_DECL_FLOAT;
+	return ret;
+      }
+      else if (name === "Lines" || name === "Axis.Lines") {
+	ret.value = o.lines;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      else if (name === "LongQuotient" || name === "Axis.LongQuotient") {
+	ret.value = o.longquotient;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      else if (name === "ValueQuotient" || name === "Axis.ValueQuotient") {
+	ret.value = o.valuequotient;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      else if (name === "Format" || name === "Axis.Format") {
+	ret.value = o.format;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      break;
+    case Glow.eObjectType_GrowXYCurve:
+      if (name === "XY_Curve.NoOfPoints") {
+	ret.value = o.no_of_points;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      else if (name === "XY_Curve.CurveLineWidth") {
+	ret.value = o.curve_width;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      else if (name === "XY_Curve.FillCurve") {
+	ret.value = o.fill_curve;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      else if (name === "XY_Curve.HorizontalLines") {
+	ret.value = o.horizontal_lines;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      else if (name === "XY_Curve.VerticalLines") {
+	ret.value = o.vertical_lines;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+    case Glow.eObjectType_GrowWindow:
+      if (name === "Window.FileName") {
+	ret.value = o.input_file_name;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      else if (name === "Window.Scale") {
+	ret.value = o.window_scale;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      else if (name === "Window.VerticalScrollbar") {
+	ret.value = o.vertical_scrollbar;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      else if (name === "Window.HorizontalScrollbar") {
+	ret.value = o.horizontal_scrollbar;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      else if (name === "Window.ScrollbarWidth") {
+	ret.value = o.scrollbar_width;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      else if (name === "Window.ScrollbarColor") {
+	ret.value = o.scrollbar_color;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      else if (name === "Window.ScrollbarBgColor") {
+	ret.value = o.scrollbar_bg_color;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+      else if (name === "Window.Object") {
+	ret.value = o.owner;
+	ret.decl = CcmC.K_DECL_INT;
+	return ret;
+      }
+    }
+    if (userdata != null) {
+      return userdata.getAttribute(o, name);
+    }
+    ret.sts = 0;
+    return ret;
+  }
+  this.GetGraphAttribute = function(ctx, name) {
+    var ret = new ge_tValueReturn();
+    if (name === "subgraph") {
+      ret.value = ctx.subgraph;
+      ret.decl = CcmC.K_DECL_INT;
+      return ret;
+    }
+    else if (name === "x0") {
+      ret.value = ctx.x0;
+      ret.decl = CcmC.K_DECL_FLOAT;
+      return ret;
+    }
+    else if (name === "y0") {
+      ret.value = ctx.y0;
+      ret.decl = CcmC.K_DECL_FLOAT;
+      return ret;
+    }
+    else if (name === "x1") {
+      ret.value = ctx.x1;
+      ret.decl = CcmC.K_DECL_FLOAT;
+      return ret;
+    }
+    else if (name === "y1") {
+      ret.value = ctx.y1;
+      ret.decl = CcmC.K_DECL_FLOAT;
+      return ret;
+    }
+    else if (name === "Scantime") {
+      ret.value = ctx.scantime;
+      ret.decl = CcmC.K_DECL_FLOAT;
+      return ret;
+    }
+    else if (name === "FastScantime") {
+      ret.value = ctx.fast_scantime;
+      ret.decl = CcmC.K_DECL_FLOAT;
+      return ret;
+    }
+    else if (name === "AnimationScantime") {
+      ret.value = ctx.animation_scantime;
+      ret.decl = CcmC.K_DECL_FLOAT;
+      return ret;
+    }
+    else if (name === "BackgroundImage") {
+      ret.value = ctx.background_image;
+      ret.decl = CcmC.K_DECL_STRING;
+      return ret;
+    }
+    else if (name === "MB3Action") {
+      ret.value = ctx.mb3_action;
+      ret.decl = CcmC.K_DECL_INT;
+      return ret;
+    }
+    else if (name === "Translate") {
+      ret.value = ctx.translate_on;
+      ret.decl = CcmC.K_DECL_INT;
+      return ret;
+    }
+    else if (name === "AntiAliasing") {
+      ret.value = ctx.anti_aliasing;
+      ret.decl = CcmC.K_DECL_INT;
+      return ret;
+    }
+    else if (name === "HotIndication") {
+      ret.value = ctx.hot_indication;
+      ret.decl = CcmC.K_DECL_INT;
+      return ret;
+    }
+    else if (name === "TooltipTextSize") {
+      ret.value = ctx.tiptext_size;
+      ret.decl = CcmC.K_DECL_INT;
+      return ret;
+    }
+    else if (name === "AppMotion") {
+      ret.value = ctx.app_motion;
+      ret.decl = CcmC.K_DECL_INT;
+      return ret;
+    }
+    else if (name === "ColorTheme") {
+      ret.value = ctx.color_theme;
+      ret.decl = CcmC.K_DECL_STRING;
+      return ret;
+    }
+    else if (name === "Dashboard") {
+      ret.value = ctx.dashboard;
+      ret.decl = CcmC.K_DECL_INT;
+      return ret;
+    }
+    else if (name === "DashCellWidth") {
+      ret.value = ctx.dash_cell_width;
+      ret.decl = CcmC.K_DECL_INT;
+      return ret;
+    }
+    else if (name === "DashCellHeight") {
+      ret.value = ctx.dash_cell_height;
+      ret.decl = CcmC.K_DECL_INT;
+      return ret;
+    }
+    else if (name === "DashRows") {
+      ret.value = ctx.dash_rows;
+      ret.decl = CcmC.K_DECL_INT;
+      return ret;
+    }
+    else if (name === "DashColumns") {
+      ret.value = ctx.dash_columns;
+      ret.decl = CcmC.K_DECL_INT;
+      return ret;
+    }
+    ret.sts = 0;
+    return ret;
+  }
+}
+
 
 function GrowFrame( appl) {
   var self = this;
@@ -16779,7 +19884,7 @@ function GrowFrame( appl) {
   this.vars_object = null;
   this.tmp_ctx = null;
 
-  this.readGrowWeb = function( fname, read_cb) {
+  this.readGrowWeb = function( fname, read_cb, split) {
     var n = window.location.href.lastIndexOf('/');
     var target = window.location.href.substring(0,n+1);
     target += fname;
@@ -16790,9 +19895,14 @@ function GrowFrame( appl) {
     req.read_cb = read_cb;
 
     req.open("GET", target, true);
-    req.addEventListener( "load", function() {
+    if (split)
+      req.addEventListener( "load", function() {
 			    var lines = req.responseText.split('\n');
 			    req.read_cb( lines, 0);
+			  });
+    else
+      req.addEventListener( "load", function() {
+			    req.read_cb( req.responseText);
 			  });
     req.send(null);
   };
@@ -16898,14 +20008,17 @@ function GrowFrame( appl) {
 
     var vars = query.split('&');
     var graph = vars[0].substring(6);
-    var fname = graph + ".pwg";
+    var fname;
+    if (graph[0] == '@')
+      fname = graph + ".ge_com";
+    else
+      fname = graph + ".pwg";
 
     return fname;
   };
 
   this.get_instance = function() {
     var query = window.location.search.substring(1);
-
     var vars = query.split('&');
     if ( vars.length > 1) {
       return vars[1].substring(9);

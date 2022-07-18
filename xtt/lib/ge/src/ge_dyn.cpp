@@ -66,6 +66,15 @@
 
 static int pdummy;
 
+static char *dtostr(double f)
+{
+  static char str[30];
+  sprintf(str, "%g", f);
+  if (strchr(str, '.') == 0  && strchr(str,'e') == 0)
+    strcat(str, ".");
+  return str;
+}
+
 static int get_dig(
     pwr_tBoolean* val, pwr_tBoolean* p, int a_typeid, unsigned int bitmask)
 {
@@ -119,6 +128,30 @@ static int get_bit(char* parsed_name, int attr_type, unsigned int* bitmask)
         return 1;
       }
     }
+  }
+  return 0;
+}
+
+// Get instance number from bitmask
+static int instance_number(unsigned int instance)
+{
+  int inst = 1;
+  unsigned int m = instance;
+  while (m > 1) {
+    m = m >> 1;
+    inst++;
+  }
+  return inst;
+}
+
+// Get highest instance
+static unsigned int instance_highest(unsigned int instance_mask)
+{
+  unsigned int m = 1 << 31;
+  while (m > 1) {
+    if (m & instance_mask)
+      return m;    
+    m = m >> 1;
   }
   return 0;
 }
@@ -2319,6 +2352,27 @@ int GeDyn::change_value(grow_tObject object, char* text)
   return 1;
 }
 
+int GeDyn::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  if (dyn_type1 != ge_mDynType1_Inherit)
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DynType1\"," << dyn_type1 << ");" << '\n';
+  if (dyn_type2 != ge_mDynType2_No)
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DynType2\"," << dyn_type2 << ");" << '\n';
+  if (action_type1 != ge_mActionType1_Inherit)
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Action\"," << action_type1 << ");" << '\n';
+  if (action_type2 != ge_mActionType2_No)
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "ActionType2\"," << action_type2 << ");" << '\n';
+  if (access != glow_mAccess_RtDefault)
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Access\"," << access << ");" << '\n';
+  if (cycle != glow_eCycle_Inherit)
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Cycle\"," << cycle << ");" << '\n';
+  
+  for (GeDynElem* elem = elements; elem; elem = elem->next)
+    elem->export_script(o, fp, indentation, prefix);
+
+  return 1;
+}
+
 void GeDyn::export_java(grow_tObject object, std::ofstream& fp, char* var_name)
 {
   int inherit_dyn_type1, inherit_action_type1;
@@ -2810,6 +2864,25 @@ int GeDigLowColor::export_java(
   return 1;
 }
 
+int GeDigLowColor::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  char name[80];
+  if (dyn->total_dyn_type1 & ge_mDynType1_Tone)
+    sprintf(name, "%sDigLowTone", prefix);
+  else
+    sprintf(name, "%sDigLowColor", prefix);
+
+  if (!streq(attribute, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".Attribute\",\"" << attribute << "\");" << '\n';
+  if (color != glow_eDrawType_Inherit) {
+    if (dyn->total_dyn_type1 & ge_mDynType1_Tone)
+      fp << indentation << "SetObjectAttribute(id,\"" << name << ".Tone\"," << (int)color << ");" << '\n';
+    else
+      fp << indentation << "SetObjectAttribute(id,\"" << name << ".Color\"," << (int)color << ");" << '\n';
+  }
+  return 1;
+}
+
 int GeDigLowColor::syntax_check(
     grow_tObject object, int* error_cnt, int* warning_cnt)
 {
@@ -3158,6 +3231,37 @@ void GeDigColor::reset(grow_tObject object)
   old_value = 0;
 }
 
+int GeDigColor::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  char name[80];
+  if (dyn->total_dyn_type1 & ge_mDynType1_Tone)
+    sprintf(name, "%sDigTone", prefix);
+  else
+    sprintf(name, "%sDigColor", prefix);
+
+  // Find first instance and print instance mask
+  for (GeDynElem *elem = dyn->elements; elem; elem = elem->next) {
+    if (elem->dyn_type1 == ge_mDynType1_DigColor && elem->instance == ge_mInstance_1) {
+      if (instance ==  instance_highest(elem->instance_mask)) {
+	if (elem->instance_mask != 1)
+	  fp << indentation << "SetObjectAttribute(id,\"" << name << ".Instances\"," << elem->instance_mask << ");" << '\n';
+	break;
+      }
+    }
+  }
+  if (instance != ge_mInstance_1)
+    sprintf(&name[strlen(name)], "%d", instance_number(instance));
+  if (!streq(attribute, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".Attribute\",\"" << attribute << "\");" << '\n';
+  if (color != glow_eDrawType_Inherit) {
+    if (dyn->total_dyn_type1 & ge_mDynType1_Tone)
+      fp << indentation << "SetObjectAttribute(id,\"" << name << ".Tone\"," << (int)color << ");" << '\n';
+    else
+      fp << indentation << "SetObjectAttribute(id,\"" << name << ".Color\"," << (int)color << ");" << '\n';
+  }
+  return 1;
+}
+
 int GeDigColor::export_java(
     grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
@@ -3378,6 +3482,15 @@ int GeDigWarning::scan(grow_tObject object)
   return 1;
 }
 
+int GeDigWarning::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  if (!streq(attribute, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigWarning.Attribute\",\"" << attribute << "\");" << '\n';
+  if (use_colortheme != 0)
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigWarning.UseColorTheme\"," << use_colortheme << ");" << '\n';
+  return 1;
+}
+
 int GeDigWarning::export_java(
     grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
@@ -3582,6 +3695,15 @@ int GeDigError::scan(grow_tObject object)
   }
   old_value = val;
 
+  return 1;
+}
+
+int GeDigError::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  if (!streq(attribute, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigError.Attribute\",\"" << attribute << "\");" << '\n';
+  if (use_colortheme != 0)
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigError.UseColorTheme\"," << use_colortheme << ");" << '\n';
   return 1;
 }
 
@@ -3871,6 +3993,24 @@ int GeDigFlash::scan(grow_tObject object)
   }
   old_value = val;
 
+  return 1;
+}
+
+int GeDigFlash::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  if (!streq(attribute, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigFlash.Attribute\",\"" << attribute << "\");" << '\n';
+  if (dyn->total_dyn_type1 & ge_mDynType1_Tone) {
+    if (color != glow_eDrawType_Inherit)
+      fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigFlash.Tone\"," << color << ");" << '\n';
+    if (color2 != glow_eDrawType_Inherit)
+      fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigFlash.Tone2\"," << color2 << ");" << '\n';
+  } else {
+    if (color != glow_eDrawType_Inherit)
+      fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigFlash.Color\"," << color << ");" << '\n';
+    if (color2 != glow_eDrawType_Inherit)
+      fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigFlash.Color2\"," << color2 << ");" << '\n';
+  }
   return 1;
 }
 
@@ -4166,6 +4306,32 @@ int GeInvisible::scan(grow_tObject object)
   return 1;
 }
 
+int GeInvisible::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  char name[80];
+
+  sprintf(name, "%sInvisible", prefix);
+
+  // Find first instance and print instance mask
+  for (GeDynElem *elem = dyn->elements; elem; elem = elem->next) {
+    if (elem->dyn_type1 == ge_mDynType1_Invisible && elem->instance == ge_mInstance_1) {
+      if (instance ==  instance_highest(elem->instance_mask)) {
+	if (elem->instance_mask != 1)
+	  fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Invisible.Instances\"," << elem->instance_mask << ");" << '\n';
+	break;
+      }
+    }
+  }
+  if (instance != ge_mInstance_1)
+    sprintf(&name[strlen(name)], "%d", instance_number(instance));
+  if (!streq(attribute, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".Attribute\",\"" << attribute << "\");" << '\n';
+  if (dimmed != 0) {
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".Dimmed\"," << dimmed << ");" << '\n';
+  }
+  return 1;
+}
+
 int GeInvisible::export_java(
     grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
@@ -4365,6 +4531,15 @@ int GeDigTextColor::scan(grow_tObject object)
   return 1;
 }
 
+int GeDigTextColor::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  if (!streq(attribute, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigTextColor.Attribute\",\"" << attribute << "\");" << '\n';
+  if (color != glow_eDrawType_Inherit)
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigTextColor.Color\"," << color << ");" << '\n';
+  return 1;
+}
+
 int GeDigTextColor::export_java(
     grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
@@ -4560,6 +4735,15 @@ int GeDigBorder::scan(grow_tObject object)
     grow_ResetObjectBorderColor(object);
   }
   old_value = val;
+  return 1;
+}
+
+int GeDigBorder::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  if (!streq(attribute, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigBorder.Attribute\",\"" << attribute << "\");" << '\n';
+  if (color != glow_eDrawType_Inherit)
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigBorder.LowColor\"," << color << ");" << '\n';
   return 1;
 }
 
@@ -4839,6 +5023,35 @@ int GeDigText::scan(grow_tObject object)
   return 1;
 }
 
+int GeDigText::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  char name[80];
+
+  sprintf(name, "%sDigText", prefix);
+
+  // Find first instance and print instance mask
+  for (GeDynElem *elem = dyn->elements; elem; elem = elem->next) {
+    if (elem->dyn_type1 == ge_mDynType1_DigText && elem->instance == ge_mInstance_1) {
+      if (instance ==  instance_highest(elem->instance_mask)) {
+	if (elem->instance_mask != 1)
+	  fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigText.Instances\"," << elem->instance_mask << ");" << '\n';
+	break;
+      }
+    }
+  }
+  if (instance != ge_mInstance_1)
+    sprintf(&name[strlen(name)], "%d", instance_number(instance));
+  if (!streq(attribute, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".Attribute\",\"" << attribute << "\");" << '\n';
+  if (!streq(low_text, "")) {
+    if (instance == ge_mInstance_1)
+      fp << indentation << "SetObjectAttribute(id,\"" << name << ".LowText\",\"" << low_text << "\");" << '\n';
+    else
+      fp << indentation << "SetObjectAttribute(id,\"" << name << ".HighText\",\"" << low_text << "\");" << '\n';
+  }
+  return 1;
+}
+
 int GeDigText::export_java(
     grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
@@ -4952,27 +5165,27 @@ void GeValue::get_attributes(attr_sItem* attrinfo, int* item_count)
       inst++;
     }
 
-    sprintf(attrinfo[i].name, "Value[%d].Attribute", inst);
+    sprintf(attrinfo[i].name, "Value%d.Attribute", inst);
     attrinfo[i].value = attribute;
     attrinfo[i].type = glow_eType_String;
     attrinfo[i++].size = sizeof(attribute);
 
-    sprintf(attrinfo[i].name, "Value[%d].Format", inst);
+    sprintf(attrinfo[i].name, "Value%d.Format", inst);
     attrinfo[i].value = format;
     attrinfo[i].type = glow_eType_String;
     attrinfo[i++].size = sizeof(format);
 
-    sprintf(attrinfo[i].name, "Value[%d].ZeroBlank", inst);
+    sprintf(attrinfo[i].name, "Value%d.ZeroBlank", inst);
     attrinfo[i].value = &zero_blank;
     attrinfo[i].type = glow_eType_Int;
     attrinfo[i++].size = sizeof(zero_blank);
 
-    sprintf(attrinfo[i].name, "Value[%d].DecimalsAttr", inst);
+    sprintf(attrinfo[i].name, "Value%d.DecimalsAttr", inst);
     attrinfo[i].value = decimals_attr;
     attrinfo[i].type = glow_eType_String;
     attrinfo[i++].size = sizeof(decimals_attr);
 
-    sprintf(attrinfo[i].name, "Value[%d].DecimalsDecrease", inst);
+    sprintf(attrinfo[i].name, "Value%d.DecimalsDecrease", inst);
     attrinfo[i].value = &decimals_decr;
     attrinfo[i].type = glow_eType_Int;
     attrinfo[i++].size = sizeof(decimals_decr);
@@ -5699,6 +5912,38 @@ void GeValue::reset(grow_tObject object)
   memset(&old_value, 0, sizeof(old_value));
 }
 
+int GeValue::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  char name[80];
+
+  sprintf(name, "%sValue", prefix);
+
+  // Find first instance and print instance mask
+  for (GeDynElem *elem = dyn->elements; elem; elem = elem->next) {
+    if (elem->dyn_type1 == ge_mDynType1_Value && elem->instance == ge_mInstance_1) {
+      if (instance ==  instance_highest(elem->instance_mask)) {
+	if (elem->instance_mask != 1)
+	  fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Value.Instances\"," << elem->instance_mask << ");" << '\n';
+	break;
+      }
+    }
+  }
+  if (instance != ge_mInstance_1)
+    sprintf(&name[strlen(name)], "%d", instance_number(instance));
+  if (!streq(attribute, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".Attribute\",\"" << attribute << "\");" << '\n';
+  if (!streq(format, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".Format\",\"" << format << "\");" << '\n';
+  if (zero_blank != 0)
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".ZeroBlank\"," << zero_blank << ");" << '\n';
+  if (!streq(decimals_attr, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".DecimalsAttr\",\"" << decimals_attr << "\");" << '\n';
+  if (decimals_decr != 0)
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".DecimalsDecrease\"," << decimals_decr << ");" << '\n';
+  
+  return 1;
+}
+
 int GeValue::export_java(
     grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
@@ -6268,6 +6513,31 @@ int GeValueInput::change_value(grow_tObject object, char* text)
     sts = gdh_SetObjectInfo(parsed_name, &buf, annot_size);
   if (EVEN(sts))
     printf("AnnotationInput error: %s\n", value_element->attribute);
+  return 1;
+}
+
+int GeValueInput::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  if (min_value != 0)
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "ValueInput.MinValue\"," << dtostr(min_value) << ");" << '\n';
+  if (max_value != 0)
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "ValueInput.MaxValue\"," << dtostr(max_value) << ");" << '\n';
+  if (clear != 0)
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "ValueInput.Clear\"," << clear << ");" << '\n';
+  if (popup != 0)
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "ValueInput.Popup\"," << popup << ");" << '\n';
+  if (unselect != 0)
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "ValueInput.Unselect\"," << unselect << ");" << '\n';
+  if (escape_store != 0)
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "ValueInput.EscapeStore\"," << escape_store << ");" << '\n';
+  if (!streq(minvalue_attr, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "ValueInput.MinValueAttr\",\"" << minvalue_attr << "\");" << '\n';
+  if (!streq(maxvalue_attr, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "ValueInput.MaxValueAttr\",\"" << maxvalue_attr << "\");" << '\n';
+  if (keyboard_type != graph_eKeyboard_Standard)
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "ValueInput.KeyboardType\"," << keyboard_type << ");" << '\n';
+  if (update_open != 0)
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "ValueInput.UpdateOpen\"," << update_open << ");" << '\n';
   return 1;
 }
 
@@ -6892,6 +7162,49 @@ int GeAnalogColor::scan(grow_tObject object)
   return 1;
 }
 
+int GeAnalogColor::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  char name[80];
+  int e_common_attr;
+  if (dyn->total_dyn_type1 & ge_mDynType1_Tone)
+    sprintf(name, "%sAnalogTone", prefix);
+  else
+    sprintf(name, "%sAnalogColor", prefix);
+
+  // Find first instance and print instance mask
+  for (GeDynElem *elem = dyn->elements; elem; elem = elem->next) {
+    if (elem->dyn_type1 == ge_mDynType1_AnalogColor && elem->instance == ge_mInstance_1) {
+      if (instance ==  instance_highest(elem->instance_mask)) {
+	if (elem->instance_mask != 1)
+	  fp << indentation << "SetObjectAttribute(id,\"" << name << ".Instances\"," << elem->instance_mask << ");" << '\n';
+	e_common_attr = ((GeAnalogColor *)elem)->common_attr;
+	if (e_common_attr != 1)
+	  fp << indentation << "SetObjectAttribute(id,\"" << name << ".CommonAttribute\"," << e_common_attr << ");" << '\n';
+	break;
+      }
+    }
+  }
+  if (instance != ge_mInstance_1)
+    sprintf(&name[strlen(name)], "%d", instance_number(instance));
+  if (limit != 0)
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".Limit\"," << dtostr(limit) << ");" << '\n';
+  if (color != glow_eDrawType_Inherit) {
+    if (dyn->total_dyn_type1 & ge_mDynType1_Tone)
+      fp << indentation << "SetObjectAttribute(id,\"" << name << ".Tone\"," << (int)color << ");" << '\n';
+    else
+      fp << indentation << "SetObjectAttribute(id,\"" << name << ".Color\"," << (int)color << ");" << '\n';
+  }
+  if (limit_type != ge_eLimitType_Gt)
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".LimitType\"," << limit_type << ");" << '\n';
+  if (!e_common_attr || instance == ge_mInstance_1) {
+    if (!streq(attribute, ""))
+      fp << indentation << "SetObjectAttribute(id,\"" << name << ".Attribute\",\"" << attribute << "\");" << '\n';
+  }
+  if (border != 0)
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".Border\"," << border << ");" << '\n';
+  return 1;
+}
+
 int GeAnalogColor::export_java(
     grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
@@ -7137,6 +7450,25 @@ int GeRotate::scan(grow_tObject object)
   return 1;
 }
 
+int GeRotate::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  if (!streq(attribute, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Rotate.Attribute\",\"" << attribute << "\");" << '\n';
+  if (x0 != 0)
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Rotate.x0\"," << dtostr(x0) << ");" << '\n';
+  if (y0 != 0)
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Rotate.y0\"," << dtostr(y0) << ");" << '\n';
+  if (!feq(factor,1.0))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Rotate.Factor\"," << dtostr(factor) << ");" << '\n';
+  if (offset != 0)
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Rotate.Offset\"," << dtostr(offset) << ");" << '\n';
+  if (min_angle != 0)
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Rotate.MinAngle\"," << dtostr(min_angle) << ");" << '\n';
+  if (max_angle != 0)
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Rotate.MinAngle\"," << dtostr(max_angle) << ");" << '\n';
+  return 1;
+}
+
 int GeRotate::export_java(
     grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
@@ -7192,8 +7524,8 @@ int GeRotate::syntax_check(
 GeMove::GeMove(GeDyn* e_dyn)
     : GeDynElem(e_dyn, ge_mDynType1_Move, ge_mDynType2_No, ge_mActionType1_No,
           ge_mActionType2_No, ge_eDynPrio_Move),
-      x_offset(0), y_offset(0), x_factor(1), y_factor(0), scale_x_factor(1),
-      scale_y_factor(0), scale_type(glow_eScaleType_LowerLeft)
+      x_offset(0), y_offset(0), x_factor(1), y_factor(1), scale_x_factor(1),
+      scale_y_factor(1), scale_type(glow_eScaleType_LowerLeft)
 {
   strcpy(move_x_attribute, "");
   strcpy(move_y_attribute, "");
@@ -7695,6 +8027,33 @@ int GeMove::scan(grow_tObject object)
   return 1;
 }
 
+int GeMove::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  if (!streq(move_x_attribute, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Move.XAttribute\",\"" << move_x_attribute << "\");" << '\n';
+  if (!streq(move_y_attribute, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Move.YAttribute\",\"" << move_y_attribute << "\");" << '\n';
+  if (x_offset != 0)
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Move.XOffset\"," << dtostr(x_offset) << ");" << '\n';
+  if (y_offset != 0)
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Move.YOffset\"," << dtostr(y_offset) << ");" << '\n';
+  if (!feq(x_factor, 1.0))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Move.XFactor\"," << dtostr(x_factor) << ");" << '\n';
+  if (!feq(y_factor, 1.0))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Move.YFactor\"," << dtostr(y_factor) << ");" << '\n';
+  if (!streq(scale_x_attribute, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Move.ScaleXAttribute\",\"" << scale_x_attribute << "\");" << '\n';
+  if (!streq(scale_y_attribute, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Move.ScaleYAttribute\",\"" << scale_y_attribute << "\");" << '\n';
+  if (!feq(scale_x_factor, 1.0))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Move.ScaleXFactor\"," << dtostr(scale_x_factor) << ");" << '\n';
+  if (!feq(scale_y_factor, 1.0))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Move.ScaleYFactor\"," << dtostr(scale_y_factor) << ");" << '\n';
+  if (scale_type != glow_eScaleType_LowerLeft)
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Move.ScaleType\"," << scale_type << ");" << '\n';
+  return 1;
+}
+
 int GeMove::export_java(
     grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
@@ -7919,6 +8278,13 @@ int GeAnalogShift::scan(grow_tObject object)
   return 1;
 }
 
+int GeAnalogShift::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  if (!streq(attribute, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "AnalogShift.Attribute\",\"" << attribute << "\");" << '\n';
+  return 1;
+}
+
 int GeAnalogShift::export_java(
     grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
@@ -8102,6 +8468,13 @@ int GeDigShift::scan(grow_tObject object)
   }
   old_value = val;
 
+  return 1;
+}
+
+int GeDigShift::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  if (!streq(attribute, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigShift.Attribute\",\"" << attribute << "\");" << '\n';
   return 1;
 }
 
@@ -8403,6 +8776,17 @@ int GeDigFourShift::scan(grow_tObject object)
   return 1;
 }
 
+int GeDigFourShift::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  if (!streq(attribute1, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigFourShift.Attribute1\",\"" << attribute1 << "\");" << '\n';
+  if (!streq(attribute2, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigFourShift.Attribute2\",\"" << attribute2 << "\");" << '\n';
+  if (!streq(attribute3, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigFourShift.Attribute3\",\"" << attribute3 << "\");" << '\n';
+  return 1;
+}
+
 int GeDigFourShift::export_java(
     grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
@@ -8694,6 +9078,19 @@ int GeScrollingText::scan(grow_tObject object)
 
   grow_SetAnnotation(object, 1, (char*)p, strlen((char*)p));
 
+  return 1;
+}
+
+int GeScrollingText::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  if (!streq(attribute, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "ScrollingText.Attribute\",\"" << attribute << "\");" << '\n';
+  if (direction != glow_eDirection_Right)
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "ScrollingText.Direction\"," << direction << ");" << '\n';
+  if (!feq(speed, 2.0))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "ScrollingText.Speed\"," << dtostr(speed) << ");" << '\n';
+  if (bounce != 0)
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "ScrollingText.Bounce\"," << bounce << ");" << '\n';
   return 1;
 }
 
@@ -9033,6 +9430,32 @@ int GeDigBackgroundColor::scan(grow_tObject object)
   return 1;
 }
 
+int GeDigBackgroundColor::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  char name[80];
+
+  sprintf(name, "%sDigBackgroundColor", prefix);
+
+  // Find first instance and print instance mask
+  for (GeDynElem *elem = dyn->elements; elem; elem = elem->next) {
+    if (elem->dyn_type2 == ge_mDynType2_DigBackgroundColor && elem->instance == ge_mInstance_1) {
+      if (instance ==  instance_highest(elem->instance_mask)) {
+	if (elem->instance_mask != 1)
+	  fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigBackgroundColor.Instances\"," << elem->instance_mask << ");" << '\n';
+	break;
+      }
+    }
+  }
+  if (instance != ge_mInstance_1)
+    sprintf(&name[strlen(name)], "%d", instance_number(instance));
+  if (!streq(attribute, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".Attribute\",\"" << attribute << "\");" << '\n';
+  if (color != glow_eDrawType_Inherit)
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".Color\"," << color << ");" << '\n';
+  
+  return 1;
+}
+
 int GeDigBackgroundColor::export_java(
     grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
@@ -9282,6 +9705,15 @@ int GeDigSwap::scan(grow_tObject object)
   }
   old_value = val;
 
+  return 1;
+}
+
+int GeDigSwap::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  if (!streq(attribute, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigSwap.Attribute\",\"" << attribute << "\");" << '\n';
+  if (reset_value != 0)
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigSwap.ResetValue\"," << reset_value << ");" << '\n';
   return 1;
 }
 
@@ -9559,6 +9991,15 @@ int GeAnimation::scan(grow_tObject object)
     }
   }
   old_value = val;
+  return 1;
+}
+
+int GeAnimation::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  if (!streq(attribute, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Animation.Attribute\",\"" << attribute << "\");" << '\n';
+  if (sequence != ge_eAnimSequence_Inherit)
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Animation.Sequence\"," << sequence << ");" << '\n';
   return 1;
 }
 
@@ -9949,6 +10390,17 @@ int GeBar::scan(grow_tObject object)
   }
   default:;
   }
+  return 1;
+}
+
+int GeBar::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  if (!streq(attribute, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Bar.Attribute\",\"" << attribute << "\");" << '\n';
+  if (!streq(minvalue_attr, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Bar.MinValueAttr\",\"" << minvalue_attr << "\");" << '\n';
+  if (!streq(maxvalue_attr, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Bar.MaxValueAttr\",\"" << maxvalue_attr << "\");" << '\n';
   return 1;
 }
 
@@ -10610,6 +11062,35 @@ int GeTrend::scan(grow_tObject object)
     }
     acc_time = 0;
   }
+  return 1;
+}
+
+int GeTrend::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  if (!streq(attribute1, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Trend.Attribute1\",\"" << attribute1 << "\");" << '\n';
+  if (!streq(attribute2, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Trend.Attribute2\",\"" << attribute2 << "\");" << '\n';
+  if (!streq(minvalue_attr1, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Trend.MinValueAttr1\",\"" << minvalue_attr1 << "\");" << '\n';
+  if (!streq(maxvalue_attr1, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Trend.MaxValueAttr1\",\"" << maxvalue_attr1 << "\");" << '\n';
+  if (!streq(minvalue_attr2, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Trend.MinValueAttr2\",\"" << minvalue_attr2 << "\");" << '\n';
+  if (!streq(maxvalue_attr2, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Trend.MaxValueAttr2\",\"" << maxvalue_attr2 << "\");" << '\n';
+  if (!streq(hold_attr, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Trend.HoldAttr\",\"" << hold_attr << "\");" << '\n';
+  if (!streq(timerange_attr, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Trend.TimeRangeAttr\",\"" << timerange_attr << "\");" << '\n';
+  if (!streq(mark1_attr, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Trend.Mark1Attr\",\"" << mark1_attr << "\");" << '\n';
+  if (!streq(mark2_attr, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Trend.Mark2Attr\",\"" << mark2_attr << "\");" << '\n';
+  if (mark1_color != glow_eDrawType_Inherit)
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Trend.Mark1Color\"," << mark1_color << ");" << '\n';
+  if (mark2_color != glow_eDrawType_Inherit)
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Trend.Mark2Color\"," << mark2_color << ");" << '\n';
   return 1;
 }
 
@@ -11658,6 +12139,75 @@ int GeXY_Curve::scan(grow_tObject object)
   if (first_scan)
     first_scan = false;
 
+  return 1;
+}
+
+int GeXY_Curve::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  char name[80];
+
+  sprintf(name, "%sXY_Curve", prefix);
+
+  // Find first instance and print instance mask
+  for (GeDynElem *elem = dyn->elements; elem; elem = elem->next) {
+    if (elem->dyn_type1 == ge_mDynType1_XY_Curve && elem->instance == ge_mInstance_1) {
+      if (instance ==  instance_highest(elem->instance_mask)) {
+	if (elem->instance_mask != 1)
+	  fp << indentation << "SetObjectAttribute(id,\"" << prefix << "XY_Curve.Instances\"," << elem->instance_mask << ");" << '\n';
+	break;
+      }
+    }
+  }
+  if (instance != ge_mInstance_1)
+    sprintf(&name[strlen(name)], "%d", instance_number(instance));
+  if (datatype != 0)
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".DataType\"," << datatype << ");" << '\n';
+  if (!streq(x_attr, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".XAttr\",\"" << x_attr << "\");" << '\n';
+  if (!streq(y_attr, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".YAttr\",\"" << y_attr << "\");" << '\n';
+  if (!streq(update_attr, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".UpdateAttr\",\"" << update_attr << "\");" << '\n';
+  if (!streq(hold_attr, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".HoldAttr\",\"" << hold_attr << "\");" << '\n';
+  if (x_min_value != 0)
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".XMinValue\"," << dtostr(x_min_value) << ");" << '\n';
+  if (x_max_value != 0)
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".XMaxValue\"," << dtostr(x_max_value) << ");" << '\n';
+  if (y_min_value != 0)
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".YMinValue\"," << dtostr(y_min_value) << ");" << '\n';
+  if (y_max_value != 0)
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".YMaxValue\"," << dtostr(y_max_value) << ");" << '\n';
+  if (!streq(x_minvalue_attr, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".XMinValueAttr\",\"" << x_minvalue_attr << "\");" << '\n';
+  if (!streq(x_maxvalue_attr, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".XMaxValueAttr\",\"" << x_maxvalue_attr << "\");" << '\n';
+  if (!streq(y_minvalue_attr, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".YMinValueAttr\",\"" << y_minvalue_attr << "\");" << '\n';
+  if (!streq(y_maxvalue_attr, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".YMaxValueAttr\",\"" << y_maxvalue_attr << "\");" << '\n';
+  if (!streq(noofpoints_attr, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".NoOfPointsAttr\",\"" << noofpoints_attr << "\");" << '\n';
+  if (curve_color != glow_eDrawType_Inherit)
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".CurveColor\"," << curve_color << ");" << '\n';
+  if (fill_color != glow_eDrawType_Inherit)
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".FillColor\"," << fill_color << ");" << '\n';
+  if (horizontal_padding != 0)
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".HorizontalPadding\"," << horizontal_padding << ");" << '\n';
+  if (instance == ge_mInstance_1) {
+    if (!streq(x_mark1_attr, ""))
+      fp << indentation << "SetObjectAttribute(id,\"" << name << ".XMark1Attr\",\"" << x_mark1_attr << "\");" << '\n';
+    if (!streq(x_mark2_attr, ""))
+      fp << indentation << "SetObjectAttribute(id,\"" << name << ".XMark2Attr\",\"" << x_mark2_attr << "\");" << '\n';
+    if (!streq(y_mark1_attr, ""))
+      fp << indentation << "SetObjectAttribute(id,\"" << name << ".YMark1Attr\",\"" << y_mark1_attr << "\");" << '\n';
+    if (!streq(y_mark2_attr, ""))
+      fp << indentation << "SetObjectAttribute(id,\"" << name << ".YMark2Attr\",\"" << y_mark2_attr << "\");" << '\n';
+    if (mark1_color != glow_eDrawType_Inherit)
+      fp << indentation << "SetObjectAttribute(id,\"" << name << ".Mark1Color\"," << mark1_color << ");" << '\n';
+    if (mark2_color != glow_eDrawType_Inherit)
+      fp << indentation << "SetObjectAttribute(id,\"" << name << ".Mark2Color\"," << mark2_color << ");" << '\n';
+  }  
   return 1;
 }
 
@@ -12878,6 +13428,83 @@ int GeTable::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
+int GeTable::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  if (!streq(attribute[0], ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column1.Attribute\",\"" << attribute[0] << "\");" << '\n';
+  if (!streq(format[0], ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column1.Format\",\"" << format[0] << "\");" << '\n';
+  if (!streq(sel_attribute[0], ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column1.SelectAttribute\",\"" << sel_attribute[0] << "\");" << '\n';
+  if (!streq(attribute[1], ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column2.Attribute\",\"" << attribute[1] << "\");" << '\n';
+  if (!streq(format[1], ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column2.Format\",\"" << format[1] << "\");" << '\n';
+  if (!streq(sel_attribute[1], ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column2.SelectAttribute\",\"" << sel_attribute[1] << "\");" << '\n';
+  if (!streq(attribute[2], ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column3.Attribute\",\"" << attribute[2] << "\");" << '\n';
+  if (!streq(format[2], ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column3.Format\",\"" << format[2] << "\");" << '\n';
+  if (!streq(sel_attribute[2], ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column3.SelectAttribute\",\"" << sel_attribute[2] << "\");" << '\n';
+  if (!streq(attribute[3], ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column4.Attribute\",\"" << attribute[3] << "\");" << '\n';
+  if (!streq(format[3], ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column4.Format\",\"" << format[3] << "\");" << '\n';
+  if (!streq(sel_attribute[3], ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column4.SelectAttribute\",\"" << sel_attribute[3] << "\");" << '\n';
+  if (!streq(attribute[4], ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column5.Attribute\",\"" << attribute[4] << "\");" << '\n';
+  if (!streq(format[4], ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column5.Format\",\"" << format[4] << "\");" << '\n';
+  if (!streq(sel_attribute[4], ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column5.SelectAttribute\",\"" << sel_attribute[4] << "\");" << '\n';
+  if (!streq(attribute[5], ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column6.Attribute\",\"" << attribute[5] << "\");" << '\n';
+  if (!streq(format[5], ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column6.Format\",\"" << format[5] << "\");" << '\n';
+  if (!streq(sel_attribute[5], ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column6.SelectAttribute\",\"" << sel_attribute[5] << "\");" << '\n';
+  if (!streq(attribute[6], ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column7.Attribute\",\"" << attribute[6] << "\");" << '\n';
+  if (!streq(format[6], ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column7.Format\",\"" << format[6] << "\");" << '\n';
+  if (!streq(sel_attribute[6], ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column7.SelectAttribute\",\"" << sel_attribute[6] << "\");" << '\n';
+  if (!streq(attribute[7], ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column8.Attribute\",\"" << attribute[7] << "\");" << '\n';
+  if (!streq(format[7], ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column8.Format\",\"" << format[7] << "\");" << '\n';
+  if (!streq(sel_attribute[7], ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column8.SelectAttribute\",\"" << sel_attribute[7] << "\");" << '\n';
+  if (!streq(attribute[8], ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column9.Attribute\",\"" << attribute[8] << "\");" << '\n';
+  if (!streq(format[8], ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column9.Format\",\"" << format[8] << "\");" << '\n';
+  if (!streq(sel_attribute[8], ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column9.SelectAttribute\",\"" << sel_attribute[8] << "\");" << '\n';
+  if (!streq(attribute[9], ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column10.Attribute\",\"" << attribute[9] << "\");" << '\n';
+  if (!streq(format[9], ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column10.Format\",\"" << format[9] << "\");" << '\n';
+  if (!streq(sel_attribute[9], ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column10.SelectAttribute\",\"" << sel_attribute[9] << "\");" << '\n';
+  if (!streq(attribute[10], ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column11.Attribute\",\"" << attribute[10] << "\");" << '\n';
+  if (!streq(format[10], ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column11.Format\",\"" << format[10] << "\");" << '\n';
+  if (!streq(sel_attribute[10], ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column11.SelectAttribute\",\"" << sel_attribute[10] << "\");" << '\n';
+  if (!streq(attribute[11], ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column12.Attribute\",\"" << attribute[11] << "\");" << '\n';
+  if (!streq(format[11], ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column12.Format\",\"" << format[11] << "\");" << '\n';
+  if (!streq(sel_attribute[11], ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column12.SelectAttribute\",\"" << sel_attribute[11] << "\");" << '\n';
+  return 1;
+}
+
 int GeTable::export_java(
     grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
@@ -13264,6 +13891,27 @@ int GeStatusColor::scan(grow_tObject object)
   return 1;
 }
 
+int GeStatusColor::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  char name[80];
+  if (dyn->total_dyn_type1 & ge_mDynType1_Tone)
+    sprintf(name, "%sStatusTone", prefix);
+  else
+    sprintf(name, "%sStatusColor", prefix);
+
+  if (!streq(attribute, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".Attribute\",\"" << attribute << "\");" << '\n';
+  if (nostatus_color != glow_eDrawType_Inherit) {
+    if (dyn->total_dyn_type1 & ge_mDynType1_Tone)
+      fp << indentation << "SetObjectAttribute(id,\"" << name << ".NoStatusTone\"," << (int)nostatus_color << ");" << '\n';
+    else
+      fp << indentation << "SetObjectAttribute(id,\"" << name << ".NoStatusColor\"," << (int)nostatus_color << ");" << '\n';
+  }
+  if (use_colortheme != 0 && !(dyn->total_dyn_type1 & ge_mDynType1_Tone))
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".UseColorTheme\"," << use_colortheme << ");" << '\n';
+  return 1;
+}
+
 int GeStatusColor::export_java(
     grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
@@ -13549,6 +14197,17 @@ int GePie::scan(grow_tObject object)
   return 1;
 }
 
+int GePie::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  for (int j = 0; j < PIE_MAX_SECTORS; j++) {
+    if (!streq(attribute[j], ""))
+      fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Pie.Attribute" << j + 1 << "\",\"" << attribute[j] << "\");" << '\n';
+  }
+  if (fix_range != 0)
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Pie.FixRange\"," << fix_range << ");" << '\n';
+  return 1;
+}
+
 int GePie::export_java(
     grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
@@ -13821,6 +14480,17 @@ int GeBarChart::scan(grow_tObject object)
   }
   default:;
   }
+  return 1;
+}
+
+int GeBarChart::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  for (int j = 0; j < BARCHART_MAX_BARSEGMENTS; j++) {
+    if (!streq(attribute[j], ""))
+      fp << indentation << "SetObjectAttribute(id,\"" << prefix << "BarChart.Attribute" << j << "\",\"" << attribute[j] << "\");" << '\n';
+  }
+  if (fix_range != 0)
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "BarChart.FixRange\"," << fix_range << ");" << '\n';
   return 1;
 }
 
@@ -14140,6 +14810,17 @@ int GeAxis::scan(grow_tObject object)
   }
   default:;
   }
+  return 1;
+}
+
+int GeAxis::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  if (!streq(minvalue_attr, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Axis.MinValueAttr\",\"" << minvalue_attr << "\");" << '\n';
+  if (!streq(maxvalue_attr, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Axis.MaxValueAttr\",\"" << maxvalue_attr << "\");" << '\n';
+  if (keep_settings != 0)
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Axis.KeepSettings\"," << keep_settings << ");" << '\n';
   return 1;
 }
 
@@ -14469,6 +15150,15 @@ int GeTimeoutColor::scan(grow_tObject object)
   return 1;
 }
 
+int GeTimeoutColor::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  if (!feq(time, 5.0))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "TimeoutColor.Time\"," << dtostr(time) << ");" << '\n';
+  if (color != glow_eDrawType_Inherit)
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "TimeoutColor.Color\"," << color << ");" << '\n';
+  return 1;
+}
+
 int GeTimeoutColor::syntax_check(
     grow_tObject object, int* error_cnt, int* warning_cnt)
 {
@@ -14655,6 +15345,13 @@ int GeHostObject::connect(
       object_p++;
     }
   }
+  return 1;
+}
+
+int GeHostObject::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  if (!streq(hostobject, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "HostObject.Object\",\"" << hostobject << "\");" << '\n';
   return 1;
 }
 
@@ -15320,6 +16017,30 @@ int GeFillLevel::scan(grow_tObject object)
   return 1;
 }
 
+int GeFillLevel::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  if (!streq(attribute, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "FillLevel.Attribute\",\"" << attribute << "\");" << '\n';
+  if (color != glow_eDrawType_Inherit) {
+    if (dyn->total_dyn_type1 & ge_mDynType1_Tone)
+      fp << indentation << "SetObjectAttribute(id,\"" << prefix << "FillLevel.BackgroundTone\"," << color << ");" << '\n';
+    else
+      fp << indentation << "SetObjectAttribute(id,\"" << prefix << "FillLevel.BackgroundColor\"," << color << ");" << '\n';
+  }
+  if (direction != glow_eDirection_Down)
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "FillLevel.Direction\"," << direction << ");" << '\n';
+  if (!feqf(min_value, 0.0F))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "FillLevel.MinValue\"," << min_value << ");" << '\n';
+  if (!feqf(max_value, 100.0F))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "FillLevel.MaxValue\"," << max_value << ");" << '\n';
+  if (!streq(minvalue_attr, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "FillLevel.MinValueAttr\",\"" << minvalue_attr << "\");" << '\n';
+  if (!streq(maxvalue_attr, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "FillLevel.MaxValueAttr\",\"" << maxvalue_attr << "\");" << '\n';
+
+  return 1;
+}
+
 int GeFillLevel::export_java(
     grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
@@ -15598,12 +16319,45 @@ int GeDigCommand::scan(grow_tObject object)
 
       dyn->graph->get_command(command, cmd, dyn);
       sts = (dyn->graph->command_cb)(dyn->graph->parent_ctx, cmd, 0, 0);
-      return sts;
     }
   }
   old_value = val;
 
   return sts;
+}
+
+int GeDigCommand::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  char name[80];
+
+  sprintf(name, "%sDigCommand", prefix);
+
+  // Find first instance and print instance mask
+  for (GeDynElem *elem = dyn->elements; elem; elem = elem->next) {
+    if (elem->dyn_type1 == ge_mDynType1_DigCommand && elem->instance == ge_mInstance_1) {
+      if (instance ==  instance_highest(elem->instance_mask)) {
+	if (elem->instance_mask != 1)
+	  fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigCommand.Instances\"," << elem->instance_mask << ");" << '\n';
+	break;
+      }
+    }
+  }
+  if (instance != ge_mInstance_1)
+    sprintf(&name[strlen(name)], "%d", instance_number(instance));
+  if (!streq(attribute, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".Attribute\",\"" << attribute << "\");" << '\n';
+  if (level != 0)
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".Level\"," << level << ");" << '\n';
+  if (!streq(command, "")) {
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".Command\",\"";
+    for (char *s = command; *s; s++) {
+      if (*s == '\"')
+	fp << '\\';
+      fp << *s;
+    }
+    fp << "\");" << '\n';
+  }
+  return 1;
 }
 
 int GeDigCommand::export_java(
@@ -15859,6 +16613,26 @@ int GeDigScript::scan(grow_tObject object)
   old_value = val;
 
   return sts;
+}
+
+int GeDigScript::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  if (!streq(attribute, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigScript.Attribute\",\"" << attribute << "\");" << '\n';
+  if (level != 0)
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigScript.Level\"," << level << ");" << '\n';
+  if (!streq(arguments, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigScript.Arguments\",\"" << arguments << "\");" << '\n';
+  if (!streq(script, "")) {
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigScript.Script\",\"";
+    for (char *s = script; *s; s++) {
+      if (*s == '\"')
+	fp << '\\';
+      fp << *s;
+    }
+    fp << "\");" << '\n';
+  }
+  return 1;
 }
 
 int GeDigScript::export_java(
@@ -16200,6 +16974,15 @@ int GeRefUpdate::scan(grow_tObject object)
   return 1;
 }
 
+int GeRefUpdate::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  if (!streq(attribute, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "RefUpdate.Attribute\",\"" << attribute << "\");" << '\n';
+  if (whole_graph != 0)
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "RefUpdate.WholeGraph\"," << whole_graph << ");" << '\n';
+  return 1;
+}
+
 int GeRefUpdate::export_java(
     grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
@@ -16472,6 +17255,13 @@ int GePopupMenu::action(grow_tObject object, glow_tEvent event)
   }
   default:;
   }
+  return 1;
+}
+
+int GePopupMenu::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  if (!streq(ref_object, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "PopupMenu.ReferenceObject\",\"" << ref_object << "\");" << '\n';
   return 1;
 }
 
@@ -16772,6 +17562,29 @@ int GeSetDig::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
+int GeSetDig::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  char name[80];
+
+  sprintf(name, "%sSetDig", prefix);
+
+  // Find first instance and print instance mask
+  for (GeDynElem *elem = dyn->elements; elem; elem = elem->next) {
+    if (elem->action_type1 == ge_mActionType1_SetDig && elem->instance == ge_mInstance_1) {
+      if (instance ==  instance_highest(elem->instance_mask)) {
+	if (elem->instance_mask != 1)
+	  fp << indentation << "SetObjectAttribute(id,\"" << prefix << "SetDig.Instances\"," << elem->instance_mask << ");" << '\n';
+	break;
+      }
+    }
+  }
+  if (instance != ge_mInstance_1)
+    sprintf(&name[strlen(name)], "%d", instance_number(instance));
+  if (!streq(attribute, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".Attribute\",\"" << attribute << "\");" << '\n';
+  return 1;
+}
+
 int GeSetDig::export_java(
     grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
@@ -17011,6 +17824,29 @@ int GeResetDig::action(grow_tObject object, glow_tEvent event)
   }
   default:;
   }
+  return 1;
+}
+
+int GeResetDig::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  char name[80];
+
+  sprintf(name, "%sResetDig", prefix);
+
+  // Find first instance and print instance mask
+  for (GeDynElem *elem = dyn->elements; elem; elem = elem->next) {
+    if (elem->action_type1 == ge_mActionType1_ResetDig && elem->instance == ge_mInstance_1) {
+      if (instance ==  instance_highest(elem->instance_mask)) {
+	if (elem->instance_mask != 1)
+	  fp << indentation << "SetObjectAttribute(id,\"" << prefix << "ResetDig.Instances\"," << elem->instance_mask << ");" << '\n';
+	break;
+      }
+    }
+  }
+  if (instance != ge_mInstance_1)
+    sprintf(&name[strlen(name)], "%d", instance_number(instance));
+  if (!streq(attribute, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".Attribute\",\"" << attribute << "\");" << '\n';
   return 1;
 }
 
@@ -17259,6 +18095,13 @@ int GeToggleDig::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
+int GeToggleDig::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  if (!streq(attribute, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "ToggleDig.Attribute\",\"" << attribute << "\");" << '\n';
+  return 1;
+}
+
 int GeToggleDig::export_java(
     grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
@@ -17423,6 +18266,13 @@ int GeStoDig::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
+int GeStoDig::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  if (!streq(attribute, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "StoDig.Attribute\",\"" << attribute << "\");" << '\n';
+  return 1;
+}
+
 int GeStoDig::export_java(
     grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
@@ -17562,6 +18412,20 @@ int GeCommand::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
+int GeCommand::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  if (!streq(command, "")) {
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Command.Command\",\"";
+    for (char *s = command; *s; s++) {
+      if (*s == '\"')
+	fp << '\\';
+      fp << *s;
+    }
+    fp << "\");" << '\n';
+  }
+  return 1;
+}
+
 int GeCommand::export_java(
     grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
@@ -17692,6 +18556,13 @@ int GeCommandDoubleClick::action(grow_tObject object, glow_tEvent event)
     break;
   default:;
   }
+  return 1;
+}
+
+int GeCommandDoubleClick::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  if (!streq(command, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "CommandDoubleClick.Command\",\"" << command << "\");" << '\n';
   return 1;
 }
 
@@ -17909,6 +18780,24 @@ int GeScript::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
+int GeScript::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  if (trigger_event != ge_eScriptTriggerEvent_ClickMB1)
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Script.TriggerEvent\"," << trigger_event << ");" << '\n';
+  if (!streq(arguments, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Script.Arguments\",\"" << arguments << "\");" << '\n';
+  if (!streq(script, "")) {
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Script.Script\",\"";
+    for (char *s = script; *s; s++) {
+      if (*s == '\"')
+	fp << '\\';
+      fp << *s;
+    }
+    fp << "\");" << '\n';
+  }
+  return 1;
+}
+
 int GeScript::syntax_check(
     grow_tObject object, int* error_cnt, int* warning_cnt)
 {
@@ -18069,6 +18958,17 @@ int GeConfirm::action(grow_tObject object, glow_tEvent event)
   }
   default:;
   }
+  return 1;
+}
+
+int GeConfirm::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  if (!streq(text, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Confirm.Text\",\"" << text << "\");" << '\n';
+  if (on_set != 0)
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Confirm.OnSet\"," << on_set << ");" << '\n';
+  if (on_reset != 0)
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Confirm.OnReset\"," << on_reset << ");" << '\n';
   return 1;
 }
 
@@ -18278,6 +19178,19 @@ int GeIncrAnalog::action(grow_tObject object, glow_tEvent event)
   }
   default:;
   }
+  return 1;
+}
+
+int GeIncrAnalog::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  if (!streq(attribute, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "IncrAnalog.Attribute\",\"" << attribute << "\");" << '\n';
+  if (increment != 0)
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "IncrAnalog.Increment\"," << dtostr(increment) << ");" << '\n';
+  if (min_value != 0)
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "IncrAnalog.MinValue\"," << dtostr(min_value) << ");" << '\n';
+  if (max_value != 0)
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "IncrAnalog.MaxValue\"," << dtostr(max_value) << ");" << '\n';
   return 1;
 }
 
@@ -18543,6 +19456,13 @@ int GeRadioButton::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
+int GeRadioButton::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  if (!streq(attribute, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "RadioButton.Attribute\",\"" << attribute << "\");" << '\n';
+  return 1;
+}
+
 int GeRadioButton::export_java(
     grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
@@ -18713,6 +19633,13 @@ int GeTipText::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
+int GeTipText::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  if (!streq(text, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "ToolTip.Text\",\"" << text << "\");" << '\n';
+  return 1;
+}
+
 int GeTipText::export_java(
     grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
@@ -18859,6 +19786,15 @@ int GeHelp::action(grow_tObject object, glow_tEvent event)
     break;
   default:;
   }
+  return 1;
+}
+
+int GeHelp::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  if (!streq(topic, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Help.Topic\",\"" << topic << "\");" << '\n';
+  if (!streq(bookmark, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Help.BookMark\",\"" << bookmark << "\");" << '\n';
   return 1;
 }
 
@@ -19045,6 +19981,13 @@ int GeOpenGraph::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
+int GeOpenGraph::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  if (!streq(graph_object, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "OpenGraph.GraphObject\",\"" << graph_object << "\");" << '\n';
+  return 1;
+}
+
 int GeOpenGraph::export_java(
     grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
@@ -19205,6 +20148,13 @@ int GeOpenURL::action(grow_tObject object, glow_tEvent event)
     break;
   default:;
   }
+  return 1;
+}
+
+int GeOpenURL::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  if (!streq(url, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "OpenURL.URL\",\"" << url << "\");" << '\n';
   return 1;
 }
 
@@ -19638,6 +20588,20 @@ int GeInputFocus::action(grow_tObject object, glow_tEvent event)
   }
   return 1;
 }
+
+int GeInputFocus::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  if (initial_focus != 0)
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "InputFocus.InitialFocus\"," << initial_focus << ");" << '\n';
+  if (!streq(next_horizontal, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "InputFocus.NextHorizontal\",\"" << next_horizontal << "\");" << '\n';
+  if (!streq(next_vertical, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "InputFocus.NextVertical\",\"" << next_vertical << "\");" << '\n';
+  if (!streq(next_tab, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "InputFocus.NextTab\",\"" << next_tab << "\");" << '\n';
+  return 1;
+}
+
 
 int GeInputFocus::syntax_check(
     grow_tObject object, int* error_cnt, int* warning_cnt)
@@ -20310,6 +21274,21 @@ int GeSlider::action(grow_tObject object, glow_tEvent event)
   }
   default:;
   }
+  return 1;
+}
+
+int GeSlider::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  if (!streq(attribute, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Slider.Attribute\",\"" << attribute << "\");" << '\n';
+  if (!streq(minvalue_attr, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Slider.MinValueAttr\",\"" << minvalue_attr << "\");" << '\n';
+  if (!streq(maxvalue_attr, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Slider.MaxValueAttr\",\"" << maxvalue_attr << "\");" << '\n';
+  if (!streq(insensitive_attr, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Slider.InsensitiveAttr\",\"" << insensitive_attr << "\");" << '\n';
+  if (!streq(release_attr, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Slider.ReleaseAttr\",\"" << release_attr << "\");" << '\n';
   return 1;
 }
 
@@ -23143,6 +24122,17 @@ int GeDigTransparency::scan(grow_tObject object)
   return 1;
 }
 
+int GeDigTransparency::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  if (!streq(attribute, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigTransparency.Attribute\",\"" << attribute << "\");" << '\n';
+  if (!feq(low_value,50.0))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigTransparency.LowValue\"," << dtostr(low_value) << ");" << '\n';
+  if (!feq(high_value,100.0))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigTransparency.HighValue\"," << dtostr(high_value) << ");" << '\n';
+  return 1;
+}
+
 int GeDigTransparency::syntax_check(
     grow_tObject object, int* error_cnt, int* warning_cnt)
 {
@@ -23307,12 +24297,23 @@ int GeAnalogTransparency::scan(grow_tObject object)
   } else
     first_scan = false;
 
-  if (feqf(max_value, min_value))
+  if (feq(max_value, min_value))
     return 1;
 
   double value = (*p - min_value) / (max_value - min_value);
   grow_SetObjectTransparency(object, value);
   old_value = *p;
+  return 1;
+}
+
+int GeAnalogTransparency::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  if (!streq(attribute, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "AnalogTransparency.Attribute\",\"" << attribute << "\");" << '\n';
+  if (min_value != 0)
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "AnalogTransparency.MinValue\"," << dtostr(min_value) << ");" << '\n';
+  if (!feq(max_value,100.0))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "AnalogTransparency.MaxValue\"," << dtostr(max_value) << ");" << '\n';
   return 1;
 }
 
@@ -23417,6 +24418,17 @@ void GeUnitConvert::open(std::ifstream& fp)
     if (end_found)
       break;
   }
+}
+
+int GeUnitConvert::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  if (entity != 0)
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "UnitConvert.Entity\"," << entity << ");" << '\n';
+  if (db_unit != 0)
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "UnitConvert.DbUnit\"," << db_unit << ");" << '\n';
+  if (display_unit != 0)
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "UnitConvert.DisplayUnit\"," << display_unit << ");" << '\n';
+  return 1;
 }
 
 int GeUnitConvert::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
@@ -24340,6 +25352,26 @@ int GePulldownMenu::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
+int GePulldownMenu::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  char pref[200];
+
+  if (button_mask != 0)
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "PulldownMenu.ItemMask\"," << button_mask << ");" << '\n';
+
+  int b_mask = ge_mInstance_1;
+  for (int j = 0; j < 32; j++) {
+    if (b_mask & button_mask) {
+      if (!streq(items_text[j], ""))
+	fp << indentation << "SetObjectAttribute(id,\"" << prefix << "PulldownMenu.ItemText" << j+1 << "\",\"" << items_text[j] << "\");" << '\n';
+      sprintf(pref, "%sPulldownMenu.ItemDyn%d.", prefix, j + 1);
+      items_dyn[j]->export_script(o, fp, indentation, pref);
+    }
+    b_mask = b_mask << 1;
+  }
+  return 1;
+}
+
 int GePulldownMenu::export_java(
     grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
@@ -25253,6 +26285,42 @@ int GeOptionMenu::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
+int GeOptionMenu::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  if (optionmenu_type != ge_eOptionMenuType_Static)
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "OptionMenu.Type\"," << optionmenu_type << ");" << '\n';
+
+  if (!streq(attribute, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "OptionMenu.Attribute\",\"" << attribute << "\");" << '\n';
+
+  if (optionmenu_type == ge_eOptionMenuType_Dynamic) {
+    if (!streq(text_attribute, ""))
+      fp << indentation << "SetObjectAttribute(id,\"" << prefix << "OptionMenu.TextAttribute\",\"" << text_attribute << "\");" << '\n';
+
+    if (!streq(size_attribute, ""))
+      fp << indentation << "SetObjectAttribute(id,\"" << prefix << "OptionMenu.SizeAttribute\",\"" << size_attribute << "\");" << '\n';
+
+    if (!streq(update_attribute, ""))
+      fp << indentation << "SetObjectAttribute(id,\"" << prefix << "OptionMenu.UpdateAttribute\",\"" << update_attribute << "\");" << '\n';
+
+  } else {
+    if (button_mask != 0)
+      fp << indentation << "SetObjectAttribute(id,\"" << prefix << "OptionMenu.ItemMask\"," << button_mask << ");" << '\n';
+
+    int b_mask = ge_mInstance_1;
+    for (int j = 0; j < 32; j++) {
+      if (b_mask & button_mask) {
+	if (!streq(items_text[j], ""))
+	  fp << indentation << "SetObjectAttribute(id,\"" << prefix << "OptionMenu.ItemText" << j+1 << "\",\"" << items_text[j] << "\");" << '\n';
+	if (items_enum[j] != j)
+	  fp << indentation << "SetObjectAttribute(id,\"" << prefix << "OptionMenu.ItemEnum" << j+1 << "\"," << items_enum[j] << ");" << '\n';
+      }
+      b_mask = b_mask << 1;
+    }
+  }
+  return 1;
+}
+
 int GeOptionMenu::export_java(
     grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
@@ -25412,6 +26480,27 @@ void GeAnalogText::open(std::ifstream& fp)
     if (end_found)
       break;
   }
+}
+
+int GeAnalogText::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  if (!streq(attribute, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "AnalogText.Attribute\",\"" << attribute << "\");" << '\n';
+
+  if (button_mask != 0)
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "AnalogText.TextMask\"," << button_mask << ");" << '\n';
+
+  int b_mask = ge_mInstance_1;
+  for (int j = 0; j < 32; j++) {
+    if (b_mask & button_mask) {
+      if (!streq(items_text[j], ""))
+	fp << indentation << "SetObjectAttribute(id,\"" << prefix << "AnalogText.Text" << j+1 << "\",\"" << items_text[j] << "\");" << '\n';
+      if (items_enum[j] != j)
+	fp << indentation << "SetObjectAttribute(id,\"" << prefix << "AnalogText.Enum" << j+1 << "\"," << items_enum[j] << ");" << '\n';
+    }
+    b_mask = b_mask << 1;
+  }
+  return 1;
 }
 
 int GeAnalogText::export_java(
@@ -25655,6 +26744,31 @@ int GeSetValue::action(grow_tObject object, glow_tEvent event)
   }
   default:;
   }
+  return 1;
+}
+
+int GeSetValue::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  char name[80];
+
+  sprintf(name, "%sSetValue", prefix);
+
+  // Find first instance and print instance mask
+  for (GeDynElem *elem = dyn->elements; elem; elem = elem->next) {
+    if (elem->action_type1 == ge_mActionType1_SetValue && elem->instance == ge_mInstance_1) {
+      if (instance ==  instance_highest(elem->instance_mask)) {
+	if (elem->instance_mask != 1)
+	  fp << indentation << "SetObjectAttribute(id,\"" << prefix << "SetValue.Instances\"," << elem->instance_mask << ");" << '\n';
+	break;
+      }
+    }
+  }
+  if (instance != ge_mInstance_1)
+    sprintf(&name[strlen(name)], "%d", instance_number(instance));
+  if (!streq(attribute, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".Attribute\",\"" << attribute << "\");" << '\n';
+  if (!streq(value, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".Value\",\"" << value << "\");" << '\n';
   return 1;
 }
 
@@ -25910,6 +27024,15 @@ int GeMethodToolbar::action(grow_tObject object, glow_tEvent event)
   }
   default:;
   }
+  return 1;
+}
+
+int GeMethodToolbar::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  if (!streq(method_object, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "MethodToolbar.Object\",\"" << method_object << "\");" << '\n';
+  if (toolbar_type != ge_eMethodToolbarType_Object)
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "MethodToolbar.ToolbarType\"," << toolbar_type << ");" << '\n';
   return 1;
 }
 
@@ -26337,6 +27460,15 @@ int GeMethodPulldownMenu::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
+int GeMethodPulldownMenu::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  if (!streq(method_object, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "MethodPulldownMenu.Object\",\"" << method_object << "\");" << '\n';
+  if (menu_type != ge_eMethodsMenuType_Object)
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "MethodPulldownMenu.MenuType\"," << menu_type << ");" << '\n';
+  return 1;
+}
+
 int GeMethodPulldownMenu::export_java(
     grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
@@ -26457,6 +27589,13 @@ int GeCatchSignal::action(grow_tObject object, glow_tEvent event)
   }
   default:;
   }
+  return 1;
+}
+
+int GeCatchSignal::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  if (!streq(signal_name, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "CatchSignal.SignalName\",\"" << signal_name << "\");" << '\n';
   return 1;
 }
 
@@ -26584,6 +27723,15 @@ int GeEmitSignal::action(grow_tObject object, glow_tEvent event)
   }
   default:;
   }
+  return 1;
+}
+
+int GeEmitSignal::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  if (!streq(signal_name, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "EmitSignal.SignalName\",\"" << signal_name << "\");" << '\n';
+  if (global != 0)
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "EmitSignal.Global\"," << global << ");" << '\n';
   return 1;
 }
 

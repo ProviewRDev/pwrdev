@@ -45,6 +45,7 @@
 #include "glow_conpoint.h"
 #include "glow_growgroup.h"
 #include "glow_dashboard.h"
+#include "glow_exportscript.h"
 
 GrowNode::GrowNode(GrowCtx* glow_ctx, const char* name,
     GlowNodeClass* node_class, double x1, double y1, int nodraw,
@@ -2033,3 +2034,7 @@ void GrowNode::set_colortheme_lightness()
   }
 }
 
+int GrowNode::export_script(GlowExportScript* es)
+{
+  return es->node(this);
+}

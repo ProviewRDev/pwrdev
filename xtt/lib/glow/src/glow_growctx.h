@@ -173,6 +173,13 @@ public:
   */
   int export_flow(char* filename);
 
+  //! Save graph as script.
+  /*!
+    \param filename	Name of file to save in.
+  */
+  int export_script(char* filename,
+		    int (*userdata_cb)(void*, void*, std::ofstream&, char*));
+
   //! Open and load a subgraph from file.
   /*!
     \param filename	Name of file.

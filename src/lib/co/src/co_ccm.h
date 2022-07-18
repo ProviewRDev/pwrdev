@@ -181,6 +181,7 @@ typedef struct {
   int level;
   int num_decl;
   int num_neg;
+  int num_exp;
   char msg[80];
   int last_type;
   ccm_sOperand* curr_operand;

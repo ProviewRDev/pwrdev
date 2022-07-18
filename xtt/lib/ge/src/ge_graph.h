@@ -1539,6 +1539,12 @@ public:
   */
   int export_plcfo(char* filename);
 
+  //! Export as Ge script.
+  /*!
+    \param filename    	Filename.
+  */
+  int export_script(char* filename);
+
   //! Search on object.
   /*!
     \param name    	Object name.

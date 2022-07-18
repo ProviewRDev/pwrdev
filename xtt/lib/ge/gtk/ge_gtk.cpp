@@ -854,6 +854,11 @@ void GeGtk::activate_export_plcfo_as(GtkWidget* w, gpointer gectx)
   ((Ge*)gectx)->activate_export_plcfo_as();
 }
 
+void GeGtk::activate_export_script(GtkWidget* w, gpointer gectx)
+{
+  ((Ge*)gectx)->activate_export_script();
+}
+
 void GeGtk::graph_file_selected_cb(
     void* ctx, char* filename, wow_eFileSelType file_type)
 {
@@ -1782,12 +1787,18 @@ GeGtk::GeGtk(void* x_parent_ctx, GtkWidget* x_parent_widget,
   g_signal_connect(file_export_plcfo_as, "activate",
       G_CALLBACK(activate_export_plcfo_as), this);
 
+  GtkWidget* file_export_script
+      = gtk_menu_item_new_with_mnemonic("_Script");
+  g_signal_connect(file_export_script, "activate",
+      G_CALLBACK(activate_export_script), this);
+
   GtkWidget* file_export = gtk_menu_item_new_with_mnemonic("Export");
   GtkMenu* file_export_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(file_export_menu), file_export_java);
   gtk_menu_shell_append(GTK_MENU_SHELL(file_export_menu), file_export_java_as);
   gtk_menu_shell_append(GTK_MENU_SHELL(file_export_menu), file_export_plcfo);
   gtk_menu_shell_append(GTK_MENU_SHELL(file_export_menu), file_export_plcfo_as);
+  gtk_menu_shell_append(GTK_MENU_SHELL(file_export_menu), file_export_script);
 
   gtk_menu_item_set_submenu(
       GTK_MENU_ITEM(file_export), GTK_WIDGET(file_export_menu));

@@ -65,6 +65,7 @@
 #include "glow_growxycurve.h"
 #include "glow_growdashcell.h"
 #include "glow_exportflow.h"
+#include "glow_exportscript.h"
 #include "glow_dashboard.h"
 
 #include "glow_msg.h"
@@ -2448,6 +2449,14 @@ int GrowCtx::export_flow(char* filename)
   GlowExportFlow ef(this);
 
   return ef.export_flow(filename);
+}
+
+int GrowCtx::export_script(char* filename,
+		    int (*userdata_cb)(void*, void*, std::ofstream&, char*))
+{
+  GlowExportScript es(this);
+
+  return es.export_script(filename, userdata_cb);
 }
 
 int GrowCtx::open_subgraph_from_name(const char* name, glow_eSaveMode mode)

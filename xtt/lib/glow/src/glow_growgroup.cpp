@@ -40,6 +40,7 @@
 
 #include "glow_growgroup.h"
 #include "glow_draw.h"
+#include "glow_exportscript.h"
 #include "glow_nodegroup.h"
 #include "glow_msg.h"
 
@@ -297,4 +298,9 @@ int GrowGroup::clear()
   nc->a.delete_all();
   ctx->reset_nodraw();
   return 1;
+}
+
+int GrowGroup::export_script(GlowExportScript* es)
+{
+  return es->group(this);
 }

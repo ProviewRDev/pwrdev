@@ -45,6 +45,7 @@
 #include "glow_draw.h"
 #include "glow_grownode.h"
 #include "glow_exportflow.h"
+#include "glow_exportscript.h"
 
 GrowLine::GrowLine(GrowCtx* glow_ctx, const char* name, double x1, double y1,
     double x2, double y2, glow_eDrawType d_type, int line_w, int fix_line_w,
@@ -799,4 +800,8 @@ void GrowLine::convert(glow_eConvert version)
 void GrowLine::export_flow(GlowExportFlow* ef)
 {
   ef->line(this);
+}
+int GrowLine::export_script(GlowExportScript* es)
+{
+  return es->line(this);
 }

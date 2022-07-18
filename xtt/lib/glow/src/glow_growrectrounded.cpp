@@ -44,6 +44,7 @@
 #include "glow_growrectrounded.h"
 #include "glow_grownode.h"
 #include "glow_draw.h"
+#include "glow_exportscript.h"
 
 GrowRectRounded::GrowRectRounded(GrowCtx* glow_ctx, const char* name, double x,
     double y, double w, double h, glow_eDrawType border_d_type, int line_w,
@@ -1123,6 +1124,11 @@ void GrowRectRounded::flip(double x0, double y0, glow_eFlipDirection dir)
     set_scale(-1, 1, x0, y0, glow_eScaleType_FixPoint);
     break;
   }
+}
+
+int GrowRectRounded::export_script(GlowExportScript* es)
+{
+  return es->rectrounded(this);
 }
 
 void GrowRectRounded::convert(glow_eConvert version)

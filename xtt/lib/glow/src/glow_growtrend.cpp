@@ -42,6 +42,7 @@
 
 #include "glow_growtrend.h"
 #include "glow_grownode.h"
+#include "glow_exportscript.h"
 
 //! Constuctor
 /*!
@@ -1003,6 +1004,12 @@ void GrowTrend::export_javabean(GlowTransform* t, void* node,
           horizontal_lines, vertical_lines, line_width, rotation, pass,
           shape_cnt, node_cnt, fp);
 }
+
+int GrowTrend::export_script(GlowExportScript* es)
+{
+  return es->trend(this);
+}
+
 
 //! Set parameters for the trend.
 /*!

@@ -101,11 +101,30 @@ public:
   void move_from_stored(double x0, double y0);
   void set_from_stored(GlowTransform* t);
   double vertical_scale(GlowTransform* t);
+  void store_reset()
+  {
+    stored = false;
+  }
   bool is_stored()
   {
     return stored;
   }
   void pos_inverse(GlowTransform* t);
+  void init(double ia11, double ia12, double ia13, double ia21, 
+      double ia22, double ia23, double irotation)
+  {
+    a11 = ia11;
+    a12 = ia12;
+    a13 = ia13;
+    a21 = ia21;
+    a22 = ia22;
+    a23 = ia23;
+    rotation = irotation;
+  }
+  bool is_modified()
+  {
+    return !(feq(a11,1.0) && a12 == 0 && a13 == 0 && a21 == 0 && feq(a22,1.0) && a23 == 0 && rotation == 0);
+  }
   double a11;
   double a12;
   double a13;

@@ -1,0 +1,4754 @@
+/** Ge script **/
+
+//GeScript = function() {
+
+  this.setdefaultfill_func = function(self, filectx, arg_list,
+				      arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+
+    if (arg_count != 1) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    if (arg_list.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    graph = graph_get_stored_graph();
+    graph.fill = arg_list.value_int;
+    return ret;
+  }
+
+  this.setdefaultborder_func = function(self, filectx, arg_list,
+					arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+
+    if (arg_count != 1) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    if (arg_list.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    graph = graph_get_stored_graph();
+    graph.border = arg_list.value_int;
+    return ret;
+  }
+
+  this.setdefaultshadow_func = function(self, filectx, arg_list,
+					arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+
+    if (arg_count != 1) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    if (arg_list.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    graph = graph_get_stored_graph();
+    graph.shadow = arg_list.value_int;
+    return ret;
+  }
+
+  this.setdefaultbordercolor_func = function(self, filectx, arg_list,
+					arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+
+    if (arg_count != 1) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    if (arg_list.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    graph = graph_get_stored_graph();
+    graph.border_drawtype = arg_list.value_int;
+    return ret;
+  }
+
+  this.setdefaultfillcolor_func = function(self, filectx, arg_list,
+					arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+
+    if (arg_count != 1) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    if (arg_list.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    graph = graph_get_stored_graph();
+    graph.fill_drawtype = arg_list.value_int;
+    return ret;
+  }
+
+  this.setdefaulttextcolor_func = function(self, filectx, arg_list,
+					arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+
+    if (arg_count != 1) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    if (arg_list.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    graph = graph_get_stored_graph();
+    graph.text_drawtype = arg_list.value_int;
+    return ret;
+  }
+
+  this.gettextextent_func = function(self, filectx, arg_list, arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var arg_p2; // Textsize
+    var arg_p3; // Font
+    var arg_p4; // Bold
+    var arg_p5; // Width
+    var arg_p6 = null; // Height
+    var arg_p7 = null; // Descent
+    var graph;
+    var draw_type;
+    var z_width, z_height, z_descent;
+    var textsize;
+    var font;
+
+    if (arg_count < 5 || arg_count > 7)
+      return CCM_.ARGMISM;
+
+    arg_p2 = arg_list.next;
+    arg_p3 = arg_p2.next;
+    arg_p4 = arg_p3.next;
+    arg_p5 = arg_p4.next;
+    if (arg_count > 5)
+      arg_p6 = arg_p5.next;
+    if (arg_count > 6)
+      arg_p7 = arg_p6.next;
+
+    if (arg_list.value_decl != CcmC.K_DECL_STRING) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p2.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p3.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p4.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p5.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_count > 5 && arg_p6.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_count > 6 && arg_p7.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    graph = graph_get_stored_graph();
+
+    if (arg_p4.value_int)
+      draw_type = Glow.eDrawType_TextHelveticaBold;
+    else
+      draw_type = Glow.eDrawType_TextHelvetica;
+
+    switch (arg_p2.value_int) {
+    case 0:
+      textsize = 0;
+      break;
+    case 1:
+      textsize = 1;
+      break;
+    case 2:
+      textsize = 2;
+      break;
+    case 3:
+      textsize = 4;
+      break;
+    case 4:
+      textsize = 6;
+      break;
+    case 5:
+      textsize = 8;
+      break;
+    default:
+      textsize = 8;
+    }
+    font = arg_p3.value_int;
+    var rt = graph.growapi.GetTextExtent(graph.ctx, arg_list.value_string,
+		       draw_type, textsize, font);
+    arg_p5.value_float = rt.width;
+    arg_p5.value_returned = 1;
+
+    if (arg_count > 5) {
+      arg_p6.value_float = rt.height;
+      arg_p6.value_returned = 1;
+    }
+
+    if (arg_count > 6) {
+      arg_p7.value_float = rt.height/5;
+      arg_p7.value_returned = 1;
+    }
+    return ret;
+  }
+
+  this.selectadd_func = function(self, filectx, arg_list,
+				 arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+
+    if (arg_count != 1) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    
+    if (arg_list.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    graph = graph_get_stored_graph();
+    graph.growapi.SelectInsert(graph.ctx, arg_list.value_int);
+    return ret;
+  }
+
+  this.selectclear_func = function(self, filectx, arg_list,
+				   arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+
+    if (arg_count != 0){
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    graph = graph_get_stored_graph();
+
+    graph.growapi.SelectClear(graph.ctx);
+    return ret;
+  }
+
+  this.getcurrentobject_func = function(self, filectx, arg_list,
+					arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+
+    if (arg_count != 0) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    graph = graph_get_stored_graph();
+
+    ret.return_int = graph.current_cmd_object;
+    ret.return_decl = CcmC.K_DECL_INT;
+
+    return ret;
+  }
+
+  this.setextern_func = function(self, filectx, arg_list,
+				 arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    ret.sts = CCM_.NYI;
+    return ret;
+  }
+
+  this.setexternall_func = function(self, filectx, arg_list,
+				    arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    ret.sts = CCM_.NYI;
+    return ret;
+  }
+
+  this.setintern_func = function(self, filectx, arg_list,
+				 arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    ret.sts = CCM_.NYI;
+    return ret;
+  }
+
+  this.setinternall_func = function(self, filectx, arg_list,
+arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    ret.sts = CCM_.NYI;
+    return ret;
+  }
+
+  this.true_func = function(self, filectx, arg_list, arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    if (arg_count != 0) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    ret.return_int = 1;
+    ret.return_decl = CcmC.K_DECL_INT;
+    return ret;
+  }
+
+  this.false_func = function(self, filectx, arg_list, arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    if (arg_count != 0) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    ret.return_int = 0;
+    ret.return_decl = CcmC.K_DECL_INT;
+    return ret;
+  }
+
+  this.setdraw_func = function(self, filectx, arg_list, arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+
+    if (arg_count != 1) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    if (arg_list.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    graph = graph_get_stored_graph();
+
+    if (arg_list.value_int == 0)
+      graph.growapi.SetNodraw(graph.ctx);
+    else {
+      graph.growapi.ResetNodraw(graph.ctx);
+      graph.growapi.Redraw(graph.ctx);
+    }
+
+    return ret;
+  }
+
+  this.getfirstobject_func = function(self, filectx, arg_list,
+				      arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var first;
+    var sts;
+
+    if (arg_count != 0) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    graph = graph_get_stored_graph();
+
+    var rg = graph.growapi.GetFirstObject(graph.ctx);
+    if (ODD(rg.sts))
+      ret.return_int = rg.element;
+    else
+      ret.return_int = 0;
+    ret.return_decl = CcmC.K_DECL_INT;
+
+    return ret;
+  }
+
+  this.getnextobject_func = function(self, filectx, arg_list,
+				     arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var next;
+    var sts;
+
+    if (arg_count != 1) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    if (arg_list.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    graph = graph_get_stored_graph();
+
+    var rg = graph.growapi.GetNextObject(
+			     graph.ctx, arg_list.value_int);
+    if (ODD(rg.sts))
+      ret.return_int = rg.element;
+    else
+      ret.return_int = 0;
+    ret.return_decl = CcmC.K_DECL_INT;
+
+    return ret;
+  }
+
+  this.groupgetfirstobject_func = function(self, filectx, arg_list,
+					   arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var first;
+    var sts;
+
+    if (arg_count != 1) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    if (arg_list.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    graph = graph_get_stored_graph();
+
+    var rg = graph.growapi.GroupGetFirstObject(arg_list.value_int);
+    if (ODD(rg.sts))
+      ret.return_int = rg.element;
+    else
+      ret.return_int = 0;
+    ret.return_decl = CcmC.K_DECL_INT;
+
+    return ret;
+  }
+
+  this.groupgetnextobject_func = function(self, filectx, arg_list,
+					  arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var next;
+    var sts;
+    var arg_p2;
+
+    if (arg_count != 2) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    if (arg_list.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    arg_p2 = arg_list.next;
+    if (arg_p2.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    graph = graph_get_stored_graph();
+
+    var rg = graph.growapi.GroupGetNextObject(arg_list.value_int,
+				  arg_p2.value_int);
+    if (ODD(rg.sts))
+      ret.return_int = rg.element;
+    else
+      ret.return_int = 0;
+    ret.return_decl = CcmC.K_DECL_INT;
+
+    return ret;
+  }
+
+  this.dashinsertobject_func = function(self, filectx, arg_list,
+					arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var sts;
+    var arg_p2;
+
+    if (arg_count != 2) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    if (arg_list.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    arg_p2 = arg_list.next;
+    if (arg_p2.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    graph = graph_get_stored_graph();
+
+    sts = graph.growapi.DashInsertObject(arg_list.value_int,
+				arg_p2.value_int);
+    ret.return_int = sts;
+    ret.return_decl = CcmC.K_DECL_INT;
+
+    return ret;
+  }
+
+  this.groupselected_func = function(self, filectx, arg_list,
+				     arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var last_group_name;
+    var sts;
+
+    if (arg_count != 0) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    graph = graph_get_stored_graph();
+
+    var rg = graph.growapi.GroupSelect(graph.ctx);
+    if (EVEN(rg.sts)) {
+      ret.return_int = 0;
+      ret.return_decl = CcmC.K_DECL_INT;
+      return ret;
+    }
+
+    var dyn = new Dyn(graph);
+    graph.growapi.SetUserData(rg.group, dyn);
+    graph.growapi.SetModified(graph.ctx, 1);
+
+    ret.return_int = rg.group;
+    ret.return_decl = CcmC.K_DECL_INT;
+
+    return ret;
+  }
+
+  this.getobjecttype_func = function(self, filectx, arg_list,
+				     arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var type;
+
+    if (arg_count != 1) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    if (arg_list.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_list.value_int == 0) {
+      ret.sts = CCM_.INVARG;
+      return ret;
+    }
+
+    graph = graph_get_stored_graph();
+
+    type = graph.growapi.GetObjectType(arg_list.value_int);
+    ret.return_int = type;
+    ret.return_decl = CcmC.K_DECL_INT;
+
+    return ret;
+  }
+
+  this.getobjectclass_func = function(self, filectx, arg_list,
+				      arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var classid;
+    var name;
+
+    if (arg_count != 1) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    if (arg_list.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_list.value_int == 0) {
+      ret.sts = CCM_.INVARG;
+      return ret;
+    }
+
+    graph = graph_get_stored_graph();
+
+    ret.return_decl = CcmC.K_DECL_STRING;
+
+    var classid = graph.growapi.GetObjectClass(arg_list.value_int);
+    if (classid != 0) {
+      ret.return_string = graph.growapi.GetNodeClassName(classid);
+    } else
+      ret.return_string = "";
+    return ret;
+  }
+
+  this.getobjectfill_func = function(self, filectx, arg_list,
+				     arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+
+    if (arg_count != 1) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    if (arg_list.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_list.value_int == 0) {
+      ret.sts = CCM_.INVARG;
+      return ret;
+    }
+
+    graph = graph_get_stored_graph();
+
+    ret.return_int = graph.growapi.GetObjectFill(arg_list.value_int);
+    ret.return_decl = CcmC.K_DECL_INT;
+    return ret;
+  }
+
+  this.setobjectfill_func = function(self, filectx, arg_list,
+				     arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var arg_p2;
+
+    if (arg_count != 2) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    arg_p2 = arg_list.next;
+
+    if (arg_list.value_decl != CcmC.K_DECL_INT) {    
+      set.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p2.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    if (arg_list.value_int == 0) {
+      ret.sts = CCM_.INVARG;
+      return ret;
+    }
+    graph = graph_get_stored_graph();
+
+    graph.growapi.SetObjectFill(arg_list.value_int, arg_p2.value_int);
+    return ret;
+  }
+
+  this.getobjectborder_func = function(self, filectx, arg_list,
+				       arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+
+    if (arg_count != 1) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    if (arg_list.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_list.value_int == 0) {
+      ret.sts = CCM_.INVARG;
+      return ret;
+    }
+
+    graph = graph_get_stored_graph();
+
+    ret.return_int = graph.growapi.GetObjectBorder(arg_list.value_int);
+    ret.return_decl = CcmC.K_DECL_INT;
+    return ret;
+  }
+
+  this.setobjectborder_func = function(self, filectx, arg_list,
+				       arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var arg_p2;
+
+    if (arg_count != 2) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    arg_p2 = arg_list.next;
+
+    if (arg_list.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p2.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_list.value_int == 0) {
+      ret.sts = CCM_.INVARG;
+      return ret;
+    }
+
+    graph = graph_get_stored_graph();
+
+    graph.growapi.SetObjectBorder(arg_list.value_int, arg_p2.value_int);
+    return ret;
+  }
+
+  this.getobjectgradient_func = function(self, filectx, arg_list,
+					 arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+
+    if (arg_count != 1) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    if (arg_list.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_list.value_int == 0) {
+      ret.sts = CCM_.INVARG;
+      return ret;
+    }
+
+    graph = graph_get_stored_graph();
+
+    ret.return_int = graph.growapi.GetObjectGradient(arg_list.value_int);
+    ret.return_decl = CcmC.K_DECL_INT;
+    return ret;
+  }
+
+  this.setobjectgradient_func = function(self, filectx, arg_list,
+					 arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var arg_p2;
+
+    if (arg_count != 2) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    arg_p2 = arg_list.next;
+
+    if (arg_list.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p2.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_list.value_int == 0) {
+      ret.sts = CCM_.INVARG;
+      return ret;
+    }
+
+    graph = graph_get_stored_graph();
+
+    graph.growapi.SetObjectGradient(
+			   arg_list.value_int, arg_p2.value_int);
+    return ret;
+  }
+
+  this.getobjecttransparency_func = function(self, filectx, arg_list,
+					     arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+
+    if (arg_count != 1) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    if (arg_list.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_list.value_int == 0) {
+      ret.sts = CCM_.INVARG;
+      return ret;
+    }
+
+    graph = graph_get_stored_graph();
+
+    ret.return_float = graph.growapi.GetObjectTransparency(arg_list.value_int);
+    ret.return_decl = CcmC.K_DECL_FLOAT;
+    return ret;
+  }
+
+  this.setobjecttransparency_func = function(self, filectx, arg_list,
+					     arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var arg_p2;
+
+    if (arg_count != 2) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    arg_p2 = arg_list.next;
+
+    if (arg_list.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p2.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_list.value_int == 0) {
+      ret.sts = CCM_.INVARG;
+      return ret;
+    }
+
+    graph = graph_get_stored_graph();
+
+    graph.growapi.SetObjectTransparency(
+			       arg_list.value_int, arg_p2.value_float);
+    return ret;
+  }
+
+  this.getobjectfillcolor_func = function(self, filectx, arg_list,
+					  arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+
+    if (arg_count != 1) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    if (arg_list.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_list.value_int == 0) {
+      ret.sts = CCM_.INVARG;
+      return ret;
+    }
+
+    graph = graph_get_stored_graph();
+
+    ret.return_int = graph.growapi.GetObjectFillColor(arg_list.value_int);
+    ret.return_decl = CcmC.K_DECL_INT;
+    return ret;
+  }
+
+  this.setobjectfillcolor_func = function(self, filectx, arg_list,
+					  arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var arg_p2;
+
+    if (arg_count != 2) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    arg_p2 = arg_list.next;
+
+    if (arg_list.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p2.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_list.value_int == 0) {
+      ret.sts = CCM_.INVARG;
+      return ret;
+    }
+    if (arg_list.value_int == 0) {
+      ret.sts = CCM_.INVARG;
+      return ret;
+    }
+
+    graph = graph_get_stored_graph();
+
+    graph.growapi.SetObjectOriginalFillColor(arg_list.value_int, arg_p2.value_int);
+    return ret;
+  }
+
+  this.getobjectbordercolor_func = function(self, filectx, arg_list,
+					    arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+
+    if (arg_count != 1) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    if (arg_list.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_list.value_int == 0) {
+      ret.sts = CCM_.INVARG;
+      return ret;
+    }
+
+    graph = graph_get_stored_graph();
+
+    ret.return_int = graph.growapi.GetObjectBorderColor(arg_list.value_int);
+    ret.return_decl = CcmC.K_DECL_INT;
+    return ret;
+  }
+
+  this.setobjectbordercolor_func = function(self, filectx, arg_list,
+					    arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var arg_p2;
+
+    if (arg_count != 2) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    arg_p2 = arg_list.next;
+
+    if (arg_list.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p2.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_list.value_int == 0) {
+      ret.sts = CCM_.INVARG;
+      return ret;
+    }
+
+    graph = graph_get_stored_graph();
+
+    graph.growapi.SetObjectOriginalBorderColor(arg_list.value_int, arg_p2.value_int);
+    return ret;
+  }
+
+  this.getobjecttextcolor_func = function(self, filectx, arg_list,
+					  arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+
+    if (arg_count != 1) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    if (arg_list.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_list.value_int == 0) {
+      ret.sts = CCM_.INVARG;
+      return ret;
+    }
+
+    graph = graph_get_stored_graph();
+
+    ret.return_int = graph.growapi.GetObjectTextColor(arg_list.value_int);
+    ret.return_decl = CcmC.K_DECL_INT;
+    return ret;
+  }
+
+  this.setobjecttextcolor_func = function(self, filectx, arg_list,
+					  arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var arg_p2;
+
+    if (arg_count != 2) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    arg_p2 = arg_list.next;
+
+    if (arg_list.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p2.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_list.value_int == 0) {
+      ret.sts = CCM_.INVARG;
+      return ret;
+    }
+
+    graph = graph_get_stored_graph();
+
+    graph.growapi.SetObjectOriginalTextColor(arg_list.value_int, arg_p2.value_int);
+    return ret;
+  }
+
+  this.setobjectbackgroundcolor_func = function(self, filectx,
+						arg_list, arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var arg_p2;
+
+    if (arg_count != 2) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    arg_p2 = arg_list.next;
+
+    if (arg_list.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p2.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_list.value_int == 0) {
+      ret.sts = CCM_.INVARG;
+      return ret;
+    }
+
+    graph = graph_get_stored_graph();
+
+    graph.growapi.SetObjectOriginalBackgroundColor(arg_list.value_int, arg_p2.value_int);
+    return ret;
+  }
+
+  this.setobjectlinewidth_func = function(self, filectx,
+					  arg_list, arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var arg_p2;
+
+    if (arg_count != 2) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    arg_p2 = arg_list.next;
+
+    if (arg_list.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p2.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_list.value_int == 0) {
+      ret.sts = CCM_.INVARG;
+      return ret;
+    }
+
+    graph = graph_get_stored_graph();
+
+    graph.growapi.SetObjectLinewidth(
+			    arg_list.value_int, arg_p2.value_int);
+    return ret;
+  }
+
+  this.setobjectlinetype_func = function(self, filectx,
+					 arg_list, arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var arg_p2;
+
+    if (arg_count != 2) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    arg_p2 = arg_list.next;
+
+    if (arg_list.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p2.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_list.value_int == 0) {
+      ret.sts = CCM_.INVARG;
+      return ret;
+    }
+
+    graph = graph_get_stored_graph();
+
+    graph.growapi.SetObjectLinetype(
+			   arg_list.value_int, arg_p2.value_int);
+    return ret;
+  }
+
+  this.getobjectshadow_func = function(self, filectx, arg_list,
+				       arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+
+    if (arg_count != 1) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    if (arg_list.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_list.value_int == 0) {
+      ret.sts = CCM_.INVARG;
+      return ret;
+    }
+
+    graph = graph_get_stored_graph();
+
+    ret.return_int = graph.growapi.GetObjectShadow(arg_list.value_int);
+    ret.return_decl = CcmC.K_DECL_INT;
+    return ret;
+  }
+
+  this.setobjectshadow_func = function(self, filectx, arg_list,
+				       arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var arg_p2;
+
+    if (arg_count != 2) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    arg_p2 = arg_list.next;
+
+    if (arg_list.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p2.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_list.value_int == 0) {
+      ret.sts = CCM_.INVARG;
+      return ret;
+    }
+
+    graph = graph_get_stored_graph();
+
+    graph.growapi.SetObjectShadow(arg_list.value_int, arg_p2.value_int);
+    return ret;
+  }
+
+  this.setobjecttextsize_func = function(self, filectx, arg_list,
+				       arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var arg_p2;
+
+    if (arg_count != 2) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    arg_p2 = arg_list.next;
+
+    if (arg_list.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p2.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_list.value_int == 0) {
+      ret.sts = CCM_.INVARG;
+      return ret;
+    }
+
+    graph = graph_get_stored_graph();
+
+    graph.growapi.SetObjectTextSize(arg_list.value_int, arg_p2.value_int);
+    return ret;
+  }
+
+  this.setobjecttextbold_func = function(self, filectx, arg_list,
+				       arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var arg_p2;
+
+    if (arg_count != 2) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    arg_p2 = arg_list.next;
+
+    if (arg_list.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p2.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_list.value_int == 0) {
+      ret.sts = CCM_.INVARG;
+      return ret;
+    }
+
+    graph = graph_get_stored_graph();
+
+    graph.growapi.SetObjectTextBold(arg_list.value_int, arg_p2.value_int);
+    return ret;
+  }
+
+  this.setobjecttextfont_func = function(self, filectx, arg_list,
+				       arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var arg_p2;
+
+    if (arg_count != 2) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    arg_p2 = arg_list.next;
+
+    if (arg_list.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p2.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_list.value_int == 0) {
+      ret.sts = CCM_.INVARG;
+      return ret;
+    }
+
+    graph = graph_get_stored_graph();
+
+    graph.growapi.SetObjectTextFont(arg_list.value_int, arg_p2.value_int);
+    return ret;
+  }
+
+  this.setcurrentobject_func = function(self, filectx, arg_list,
+					arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+
+    if (arg_count != 1) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    if (arg_list.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    graph = graph_get_stored_graph();
+
+    graph.current_cmd_object = arg_list.value_int;
+    return ret;
+  }
+
+  this.getobjectname_func = function(self, filectx, arg_list,
+				     arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var name;
+    var sts;
+
+    if (arg_count != 1) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    if (arg_list.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    graph = graph_get_stored_graph();
+
+    ret.return_string = graph.growapi.GetObjectName(arg_list.value_int,
+			     Glow.eName_Object);
+    ret.return_decl = CcmC.K_DECL_STRING;
+    return ret;
+  }
+
+  this.setobjectname_func = function(self, filectx, arg_list,
+				     arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var arg_p2;
+
+    if (arg_count != 2) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    arg_p2 = arg_list.next;
+
+    if (arg_list.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p2.value_decl != CcmC.K_DECL_STRING) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    graph = graph_get_stored_graph();
+
+    graph.growapi.SetObjectName(arg_list.value_int, arg_p2.value_string);
+    return ret;
+  }
+
+  this.getobjectdyntype_func = function(self, filectx, arg_list,
+					arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var type;
+    var arg_p2; // Dyntype1 return
+    var arg_p3 = null; // Dyntype2 return
+    var arg_p4 = null; // Actiontype1 return
+    var arg_p5 = null; // Actiontype2 return
+    var dyn;
+    var o;
+
+    if (arg_count < 2 || arg_count > 5) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    arg_p2 = arg_list.next;
+    if (arg_count > 2)
+      arg_p3 = arg_p2.next;
+    if (arg_count > 3)
+      arg_p4 = arg_p3.next;
+    if (arg_count > 4)
+      arg_p5 = arg_p4.next;
+
+    if (arg_list.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p2.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_count > 2 && arg_p3.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_count > 3 && arg_p4.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_count > 4 && arg_p5.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    o = arg_list.value_int;
+    graph = graph_get_stored_graph();
+
+    type = graph.growapi.GetObjectType(o);
+    if (type == Glow.eObjectType_GrowNode || type == Glow.eObjectType_GrowSlider
+	|| type == Glow.eObjectType_GrowGroup
+	|| type == Glow.eObjectType_GrowToolbar) {
+      dyn = graph.growapi.GetUserData(o);
+      arg_p2.value_int = dyn.get_dyntype1(o);
+      arg_p2.value_returned = 1;
+      if (arg_count > 2) {
+	arg_p3.value_int = dyn.get_dyntype2(o);
+	arg_p3.value_returned = 1;
+      }
+      if (arg_count > 3) {
+	arg_p4.value_int = dyn.get_actiontype1(o);
+	arg_p4.value_returned = 1;
+      }
+      if (arg_count > 4) {
+	arg_p5.value_int = dyn.get_actiontype2(o);
+	arg_p5.value_returned = 1;
+      }
+    } else {
+      arg_p2.value_int = 0;
+      arg_p2.value_returned = 1;
+      if (arg_count > 2) {
+	arg_p3.value_int = 0;
+	arg_p3.value_returned = 1;
+      }
+      if (arg_count > 3) {
+	arg_p4.value_int = 0;
+	arg_p4.value_returned = 1;
+      }
+      if (arg_count > 4) {
+	arg_p5.value_int = 0;
+	arg_p5.value_returned = 1;
+      }
+    }
+    return ret;
+  }
+
+  this.getobjecttext_func = function(self, filectx, arg_list,
+				     arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var type;
+    var o;
+    var text;
+
+    if (arg_count != 1) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    if (arg_list.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    o = arg_list.value_int;
+    graph = graph_get_stored_graph();
+
+    type = graph.growapi.GetObjectType(o);
+    if (type == Glow.eObjectType_GrowText) {
+      text = graph.growapi.GetObjectText(o);
+      ret.return_string = text;
+    } else
+      ret.return_string = "";
+
+    ret.return_decl = CcmC.K_DECL_STRING;
+    return ret;
+  }
+
+  this.setobjecttext_func = function(self, filectx, arg_list,
+				     arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var type;
+    var o;
+    var arg_p2; // Text
+
+    if (arg_count != 2) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    arg_p2 = arg_list.next;
+
+    if (arg_list.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p2.value_decl != CcmC.K_DECL_STRING) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    o = arg_list.value_int;
+    graph = graph_get_stored_graph();
+
+    type = graph.growapi.GetObjectType(o);
+    if (type == Glow.eObjectType_GrowText) {
+      graph.growapi.SetObjectText(o, arg_p2.value_string);
+    }
+    return ret;
+  }
+
+  this.setobjecttransform_func = function(self, filectx, arg_list,
+      arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var o;
+    var arg_p2;
+    var arg_p3;
+    var arg_p4;
+    var arg_p5;
+    var arg_p6;
+    var arg_p7;
+    var arg_p8;
+
+    if (arg_count != 8) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    arg_p2 = arg_list.next;
+    arg_p3 = arg_p2.next;
+    arg_p4 = arg_p3.next;
+    arg_p5 = arg_p4.next;
+    arg_p6 = arg_p5.next;
+    arg_p7 = arg_p6.next;
+    arg_p8 = arg_p7.next;
+
+    if (arg_list.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p2.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p2.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p3.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p4.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p5.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p6.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p7.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p8.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    o = arg_list.value_int;
+    graph = graph_get_stored_graph();
+
+    graph.growapi.InitObjectTransform(o, arg_p2.value_float, arg_p3.value_float, arg_p4.value_float, 
+      arg_p5.value_float, arg_p6.value_float, arg_p7.value_float, arg_p8.value_float);
+    return ret;
+  }
+
+  this.findobjectbyname_func = function(self, filectx, arg_list,
+					arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var object;
+    var sts;
+
+    if (arg_count != 1) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    if (arg_list.value_decl != CcmC.K_DECL_STRING) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    graph = graph_get_stored_graph();
+
+    var rf = graph.growapi.FindObjectByName(graph.ctx, arg_list.value_string);
+    if (ODD(rf.sts))
+      ret.return_int = rf.object;
+    else
+      ret.return_int = 0;
+    ret.return_decl = CcmC.K_DECL_INT;
+
+    return ret;
+  }
+
+  this.reload_func = function(self, filectx, arg_list, arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    ret.sts = CCM_.NYI;
+    return ret;
+  }
+
+  this.rotateselected_func = function(self, filectx, arg_list, arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var arg_p2;
+    var angle;
+    var rotation_point;
+
+    if (arg_count < 1 || arg_count > 2) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    if (arg_list.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+  
+    if (arg_count > 1) {
+      arg_p2 = arg_list.next;
+      if (arg_p2.value_decl != CcmC.K_DECL_INT) {
+	ret.sts = CCM_.ARGMISM;
+	  return ret;
+	}
+      rotation_point = arg_p2.value_int;
+    }
+    else
+      rotation_point = Glow.eRotationPoint_Center;
+
+    angle = arg_list.value_float;
+
+    graph = graph_get_stored_graph();
+
+    graph.growapi.RotateSelectedObjects(graph.ctx, angle, rotation_point);
+
+    return ret;
+  }
+
+  this.setselecttextsize_func = function(self, filectx, arg_list, arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+
+    if (arg_count != 1) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    if (arg_list.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+  
+    graph = graph_get_stored_graph();
+
+    graph.growapi.SetSelectTextSize(graph.ctx, arg_list.value_int);
+
+    return ret;
+  }
+
+  this.setselecttextfont_func = function(self, filectx, arg_list, arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+
+    if (arg_count != 1) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    if (arg_list.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+  
+    graph = graph_get_stored_graph();
+
+    graph.growapi.SetSelectTextFont(graph.ctx, arg_list.value_int);
+
+    return ret;
+  }
+
+  this.setselecttextbold_func = function(self, filectx, arg_list, arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+
+    if (arg_count != 1) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    if (arg_list.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+  
+    graph = graph_get_stored_graph();
+
+    graph.growapi.SetSelectTextBold(graph.ctx, arg_list.value_int);
+
+    return ret;
+  }
+
+  this.setgraphattribute_func = function(self, filectx, arg_list,
+					 arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var arg_p2;
+    var arg_p3;
+    var value;
+    var sts;
+
+    if (arg_count != 2) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    var arg_p2 = arg_list.next;
+
+    if (arg_list.value_decl != CcmC.K_DECL_STRING) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    switch(arg_p2.value_decl) {
+    case CcmC.K_DECL_INT:
+      value = arg_p2.value_int;
+      break;
+    case CcmC.K_DECL_FLOAT:
+      value = arg_p2.value_float;
+      break;
+    case CcmC.K_DECL_STRING:
+      value = arg_p2.value_string;
+      break;
+    }
+
+    graph = graph_get_stored_graph();
+
+    sts = graph.growapi.SetGraphAttribute(graph.ctx, arg_list.value_string, value);
+    ret.return_int = sts;
+    ret.return_decl = CcmC.K_DECL_INT;
+    return ret;
+  }
+
+  this.getgraphattribute_func = function(self, filectx, arg_list,
+					 arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var arg_p2;
+
+    if (arg_count != 2) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    arg_p2 = arg_list.next;
+
+    if (arg_list.value_decl != CcmC.K_DECL_STRING) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    graph = graph_get_stored_graph();
+
+
+    var gret = graph.growapi.GetGraphAttribute(graph.ctx, arg_list.value_string);
+    if (EVEN(gret.sts)) {
+      ret.return_int = GE_.NOATTR;
+      ret.return_decl = CcmC.K_DECL_INT;
+      return ret;
+    }
+    
+    switch (gret.decl) {
+    case CcmC.K_DECL_INT:
+      arg_p2.value_int = gret.value;
+      break;  
+    case CcmC.K_DECL_FLOAT:
+      arg_p2.value_float = gret.value;
+      break;  
+    case CcmC.K_DECL_STRING:
+      arg_p2.value_string = gret.value;
+      break;  
+    }
+    arg_p2.value_decl = gret.decl;
+    arg_p2.value_returned = 1;
+
+    ret.return_int = GE_.SUCCESS;
+    ret.return_decl = CcmC.K_DECL_INT;
+    return ret;
+  }
+
+  this.trim_script = function(str) {
+    return this.ccm.trim(str);
+  }
+
+  this.setobjectattribute_func = function(self, filectx, arg_list,
+					  arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var type;
+    var arg_p2; // Attribute
+    var arg_p3; // Attribute value
+    var o;
+    var value;
+    var sts;
+
+    if (arg_count != 3) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    arg_p2 = arg_list.next;
+    arg_p3 = arg_p2.next;
+
+    if (arg_list.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p2.value_decl != CcmC.K_DECL_STRING) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    o = arg_list.value_int;
+    if (!o) {
+      ret.return_int = GE_.ARG;
+      ret.return_decl = CcmC.K_DECL_INT;
+      return ret;
+    }
+    graph = graph_get_stored_graph();
+
+    switch(arg_p3.value_decl) {
+    case CcmC.K_DECL_INT:
+      value = arg_p3.value_int;
+      break;
+    case CcmC.K_DECL_FLOAT:
+      value = arg_p3.value_float;
+      break;
+    case CcmC.K_DECL_STRING:
+      value = arg_p3.value_string;
+      break;
+    }
+
+    sts = graph.growapi.SetObjectAttribute(arg_list.value_int, arg_p2.value_string, value);
+    ret.return_int = sts;
+    ret.return_decl = CcmC.K_DECL_INT;
+    return ret;
+  }
+
+  this.getobjectattribute_func = function(self, filectx, arg_list,
+					  arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var type;
+    var arg_p2; // Attribute
+    var o;
+
+    if (arg_count != 2) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    arg_p2 = arg_list.next;
+
+    if (arg_list.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p2.value_decl != CcmC.K_DECL_STRING) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    o = arg_list.value_int;
+    graph = graph_get_stored_graph();
+
+    var aret = graph.growapi.GetObjectAttribute(arg_list.value_int, arg_p2.value_string);
+    if (EVEN(aret.sts)) {
+      ret.return_float = 0;
+      ret.return_decl = CcmC.K_DECL_FLOAT;
+      return ret;
+    }
+    ret.return_decl = aret.decl;
+    if (aret.decl == CcmC.K_DECL_FLOAT)
+      ret.return_float = aret.value;	
+    else if (aret.decl == CcmC.K_DECL_INT)
+      ret.return_int = aret.value;	
+    else
+      ret.return_string = aret.value;	
+    return ret;	
+
+    ret.return_int = 1;
+    ret.return_decl = CcmC.K_DECL_INT;
+    return ret;
+  }
+
+  this.getrgbcolor_func = function(self, filectx, arg_list,
+				   arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var arg_p2; // Red
+    var arg_p3; // Green
+    var arg_p4; // Blue
+    var r, g, b;
+
+    if (arg_count != 4) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    arg_p2 = arg_list.next;
+    arg_p3 = arg_p2.next;
+    arg_p4 = arg_p3.next;
+
+    if (arg_list.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p2.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p3.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p4.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    graph = graph_get_stored_graph();
+
+    var rr = graph.growapi.GetRgbColor(graph.ctx, arg_list.value_int);
+
+    arg_p2.value_float = rr.r;
+    arg_p3.value_float = rr.g;
+    arg_p4.value_float = rr.b;
+    arg_p2.value_returned = 1;
+    arg_p3.value_returned = 1;
+    arg_p4.value_returned = 1;
+
+    return ret;
+  }
+
+  this.setrgbcolor_func = function(self, filectx, arg_list,
+				   arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var arg_p2; // Red
+    var arg_p3; // Green
+    var arg_p4; // Blue
+    var r, g, b;
+
+    if (arg_count != 4) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    arg_p2 = arg_list.next;
+    arg_p3 = arg_p2.next;
+    arg_p4 = arg_p3.next;
+
+    if (arg_list.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p2.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p3.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p4.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    graph = graph_get_stored_graph();
+
+    r = arg_p2.value_float;
+    g = arg_p3.value_float;
+    b = arg_p4.value_float;
+
+    graph.growapi.SetRgbColor(
+		     graph.ctx, arg_list.value_int, r, g, b);
+    if (graph.update_colorpalette_cb)
+      graph.update_colorpalette_cb(graph.parent_ctx);
+
+    return ret;
+  }
+
+  this.measureobject_func = function(self, filectx, arg_list,
+				     arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var arg_p2; // ll_x
+    var arg_p3; // ll_y
+    var arg_p4; // ur_x
+    var arg_p5; // ur_y
+    var ll_x, ll_y, ur_x, ur_y;
+
+    if (arg_count != 5) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    arg_p2 = arg_list.next;
+    arg_p3 = arg_p2.next;
+    arg_p4 = arg_p3.next;
+    arg_p5 = arg_p4.next;
+
+    if (arg_list.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p2.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p3.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p4.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p5.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    graph = graph_get_stored_graph();
+
+    var rm = graph.growapi.MeasureNode( arg_list.value_int);
+    arg_p2.value_float = rm.ll_x;
+    arg_p3.value_float = rm.ll_y;
+    arg_p4.value_float = rm.ur_x;
+    arg_p5.value_float = rm.ur_y;
+    arg_p2.value_returned = 1;
+    arg_p3.value_returned = 1;
+    arg_p4.value_returned = 1;
+    arg_p5.value_returned = 1;
+
+    return ret;
+  }
+
+  this.deleteobject_func = function(self, filectx, arg_list,
+				    arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+
+    if (arg_count != 1) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    if (arg_list.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    graph = graph_get_stored_graph();
+
+    graph.growapi.DeleteObject(graph.ctx, arg_list.value_int);
+
+    return ret;
+  }
+
+  this.setobjectclass_func = function(self, filectx, arg_list,
+				      arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var arg_p2; // Class
+    var sts;
+    var nc;
+    var cname;
+
+    if (arg_count != 2) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    arg_p2 = arg_list.next;
+
+    if (arg_list.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p2.value_decl != CcmC.K_DECL_STRING) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    graph = graph_get_stored_graph();
+
+    var nc = graph.growapi.FindNodeClassByName(graph.ctx, arg_p2.value_string);
+    if (nc == null) {
+      ret.return_int = 0;
+      ret.return_decl = CcmC.K_DECL_INT;
+      return ret;
+    }
+
+    sts = graph.growapi.SetObjectClass(arg_list.value_int, nc);
+    ret.return_int = sts;
+    ret.return_decl = CcmC.K_DECL_INT;
+    return ret;
+  }
+
+  this.scaleobject_func = function(self, filectx, arg_list,
+				   arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var arg_p2; // scale x
+    var arg_p3; // scale y
+    var scalex, scaley;
+    var scale_type;
+    var oid = arg_list.value_int;
+
+    if (oid == 0)
+      return ret;
+
+    if (arg_count != 3) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    arg_p2 = arg_list.next;
+    arg_p3 = arg_p2.next;
+
+    if (arg_list.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p2.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p3.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    graph = graph_get_stored_graph();
+
+    scalex = arg_p2.value_float;
+    scaley = arg_p3.value_float;
+
+    scale_type = Glow.eScaleType_LowerLeft;
+
+    graph.growapi.StoreTransform(oid);
+    graph.growapi.SetObjectScale(oid, scalex, scaley, 0, 0, scale_type);
+
+    return ret;
+  }
+  this.moveobject_func = function(self, filectx, arg_list,
+				  arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var arg_p2; // scale x
+    var arg_p3; // scale y
+    var x0, y0;
+    var oid = arg_list.value_int;
+
+    if (oid == 0)
+      return ret;
+
+    if (arg_count != 3) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    arg_p2 = arg_list.next;
+    arg_p3 = arg_p2.next;
+
+    if (arg_list.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p2.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p3.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    graph = graph_get_stored_graph();
+
+    x0 = arg_p2.value_float;
+    y0 = arg_p3.value_float;
+
+    graph.growapi.MoveObject(oid, x0, y0);
+
+    return ret;
+  }
+
+  this.moveabsobject_func = function(self, filectx, arg_list,
+				     arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var arg_p2; // scale x
+    var arg_p3; // scale y
+    var x0, y0;
+    var ll_x, ll_y, ur_x, ur_y;
+    var oid = arg_list.value_int;
+
+    if (oid == 0)
+      return ret;
+
+    if (arg_count != 3) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    arg_p2 = arg_list.next;
+    arg_p3 = arg_p2.next;
+
+    if (arg_list.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p2.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p3.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    graph = graph_get_stored_graph();
+
+    var rm = graph.growapi.MeasureNode(oid);
+
+    x0 = arg_p2.value_float - rm.ll_x;
+    y0 = arg_p3.value_float - rm.ll_y;
+
+    graph.growapi.MoveObject(oid, x0, y0);
+
+    return ret;
+  }
+
+  this.setbackgroundcolor_func = function(self, filectx, arg_list,
+					  arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+
+    if (arg_count != 1) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    if (arg_list.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    graph = graph_get_stored_graph();
+
+    if (arg_list.value_int < 0 || arg_list.value_int >= Glow.eDrawType_CustomColor__) {
+      ret.return_int = GE_.SYNTAX;
+      ret.return_decl = CcmC.K_DECL_INT;
+      return ret;
+    }
+    graph.growapi.SetBackgroundColor(graph.ctx, arg_list.value_int);
+    ret.return_int = GE_.SUCCESS;
+    ret.return_decl = CcmC.K_DECL_INT;
+    return ret;
+  }
+
+  this.setcolortheme_func = function(self, filectx, arg_list,
+				     arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+
+    if (arg_count > 1) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    if (arg_count > 0) {
+      if (arg_list.value_decl != CcmC.K_DECL_INT) {
+	ret.sts = CCM_.ARGMISM;
+	return ret;
+      }
+    }
+
+    graph = graph_get_stored_graph();
+  
+    if (arg_count > 0)
+      graph.growapi.UpdateColorTheme(graph.ctx, arg_list.value_int);
+    else
+      graph.growapi.SetColorTheme(graph.ctx);
+    return ret;
+  }
+
+  this.opengraph_func = function(self, filectx, arg_list,
+				 arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var name;
+    var filename;
+    var s;
+  
+    if (arg_count != 1) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    if (arg_list.value_decl != CcmC.K_DECL_STRING) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    name = arg_list.value_string;
+    s = name.indexOf('.');
+    if (s != -1)
+      name =  substring(0, s);
+    filename = name.toLowerCase();
+    filename += ".pwg";
+
+    graph = graph_get_stored_graph();
+
+    graph.set_name(name);
+    graph.open(filename);
+
+    return ret;
+  }
+
+  this.savegraph_func = function(self, filectx, arg_list,
+				 arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var sts;
+    var s;
+    var name;
+    var oldname;
+    var filename;
+    
+    if (arg_count > 1) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    if (arg_count == 1) {
+      if (arg_list.value_decl != CcmC.K_DECL_STRING) {
+	ret.sts = CCM_.ARGMISM;
+	return ret;
+      }
+
+      name = arg_list.value_string;
+      s = name.indexOf('.');
+      if (s != -1)
+	name = name.substring(0, s);
+    }
+
+    graph = graph_get_stored_graph();
+
+    if (arg_count == 0)
+      graph.get_name(name);
+    else {
+      graph.set_name(name);
+    }
+    filename = name.toLowerCase();
+    s = filename.indexOf('.');
+    if (s != -1)
+      filename += ".pwg";
+  
+    sts = graph.save(filename);
+    ret.return_int = sts;
+    ret.return_decl = CcmC.K_DECL_INT;
+    return ret;
+  }
+
+  this.buildgraph_func = function(self, filectx, arg_list,
+				  arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    ret.sts = CCM_.NYI;
+    return ret;
+  }
+
+  this.clearall_func = function(self, filectx, arg_list,
+				arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+
+    if (arg_count != 0) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    graph = graph_get_stored_graph();
+    graph.ctx.clear_all();
+    return ret;
+  }
+
+  this.createrectangle_func = function(self, filectx, arg_list,
+				       arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var arg_p2;
+    var arg_p3;
+    var arg_p4;
+
+    var x, y, width, height;
+
+    if (arg_count != 4) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    arg_p2 = arg_list.next;
+    arg_p3 = arg_p2.next;
+    arg_p4 = arg_p3.next;
+
+    if (arg_list.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p2.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p3.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p4.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    x = arg_list.value_float;
+    y = arg_p2.value_float;
+    width = arg_p3.value_float;
+    height = arg_p4.value_float;
+
+    graph = graph_get_stored_graph();
+    var n = graph.growapi.CreateGrowRect(graph.ctx, "", x, y, width, height,
+			graph.get_border_drawtype(), graph.linewidth, 0, Glow.mDisplayLevel_1,
+			graph.fill, graph.border, graph.shadow, graph.get_fill_drawtype(),
+			null);
+    graph.growapi.SetModified(graph.ctx, 1);
+    graph.current_cmd_object = n;
+
+    ret.return_int = graph.current_cmd_object;
+    ret.return_decl = CcmC.K_DECL_INT;
+    return ret;
+  }
+
+  this.createrectrounded_func = function(self, filectx, arg_list, arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var arg_p2;
+    var arg_p3;
+    var arg_p4;
+
+    var x, y, width, height;
+
+    if (arg_count != 4) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    arg_p2 = arg_list.next;
+    arg_p3 = arg_p2.next;
+    arg_p4 = arg_p3.next;
+
+    if (arg_list.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p2.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p3.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p4.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    x = arg_list.value_float;
+    y = arg_p2.value_float;
+    width = arg_p3.value_float;
+    height = arg_p4.value_float;
+
+    graph = graph_get_stored_graph();
+
+    var n = graph.growapi.CreateGrowRectRounded(graph.ctx, "", x, y, width, height,
+			       graph.get_border_drawtype(), graph.linewidth, 0, Glow.mDisplayLevel_1,
+			       graph.fill, graph.border, graph.shadow, graph.get_fill_drawtype(),
+			       null);
+    graph.growapi.SetModified(graph.ctx, 1);
+    graph.current_cmd_object = n;
+    ret.return_int = graph.current_cmd_object;
+    ret.return_decl = CcmC.K_DECL_INT;
+    return ret;
+  }
+
+  this.createarc_func = function(self, filectx, arg_list, arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var arg_p2;
+    var arg_p3;
+    var arg_p4;
+    var arg_p5;
+    var arg_p6;
+
+    var x1, y1, x2, y2;
+    var angle1, angle2;
+
+    if (arg_count != 6) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    arg_p2 = arg_list.next;
+    arg_p3 = arg_p2.next;
+    arg_p4 = arg_p3.next;
+    arg_p5 = arg_p4.next;
+    arg_p6 = arg_p5.next;
+
+    if (arg_list.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p2.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p3.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p4.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p5.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p6.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    x1 = arg_list.value_float;
+    y1 = arg_p2.value_float;
+    x2 = arg_p3.value_float;
+    y2 = arg_p4.value_float;
+    angle1 = arg_p5.value_int;
+    angle2 = arg_p6.value_int;
+
+    graph = graph_get_stored_graph();
+    var n = graph.growapi.CreateGrowArc(graph.ctx, "", x1, y1, x2, y2, angle1, angle2,
+		       graph.get_border_drawtype(), graph.linewidth, graph.fill,
+		       graph.border, graph.shadow, graph.get_fill_drawtype(), null);
+    graph.growapi.SetModified(graph.ctx, 1);
+
+    graph.current_cmd_object = n;
+    ret.return_int = graph.current_cmd_object;
+    ret.return_decl = CcmC.K_DECL_INT;
+    return ret;
+  }
+
+  this.createline_func = function(self, filectx, arg_list, arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var arg_p2;
+    var arg_p3;
+    var arg_p4;
+
+    var x1, y1, x2, y2;
+
+    if (arg_count != 4) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    arg_p2 = arg_list.next;
+    arg_p3 = arg_p2.next;
+    arg_p4 = arg_p3.next;
+
+    if (arg_list.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p2.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p3.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p4.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    x1 = arg_list.value_float;
+    y1 = arg_p2.value_float;
+    x2 = arg_p3.value_float;
+    y2 = arg_p4.value_float;
+
+    graph = graph_get_stored_graph();
+
+    var n = graph.growapi.CreateGrowLine(graph.ctx, "", x1, y1, x2, y2,
+			graph.get_border_drawtype(), graph.linewidth, 0, null);
+    graph.growapi.SetModified(graph.ctx, 1);
+    graph.current_cmd_object = n;
+    ret.return_int = graph.current_cmd_object;
+    ret.return_decl = CcmC.K_DECL_INT;
+    return ret;
+  }
+
+  this.createpolyline_func = function(self, filectx, arg_list, arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var arg_p2;
+    var arg_p3;
+    var arg_p4;
+
+    var x1, y1, x2, y2;
+    var points = new Array(2);
+    var point_cnt;
+
+    if (arg_count != 4) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    arg_p2 = arg_list.next;
+    arg_p3 = arg_p2.next;
+    arg_p4 = arg_p3.next;
+
+    if (arg_list.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p2.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p3.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p4.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    x1 = arg_list.value_float;
+    y1 = arg_p2.value_float;
+    x2 = arg_p3.value_float;
+    y2 = arg_p4.value_float;
+
+    graph = graph_get_stored_graph();
+
+    var p1 = {x : x1, y : y1};
+    var p2 = {x : x2, y : y2};
+    points[0] = p1;
+    points[1] = p2;
+    point_cnt = 2;
+    var n = graph.growapi.CreateGrowPolyLine(graph.ctx, "", points,
+			    point_cnt, graph.get_border_drawtype(), graph.linewidth, 0,
+			    graph.fill, graph.border, graph.shadow, graph.get_fill_drawtype(),
+			    0, null);
+    graph.growapi.SetModified(graph.ctx, 1);
+    graph.current_cmd_object = n;
+    ret.return_int = graph.current_cmd_object;
+    ret.return_decl = CcmC.K_DECL_INT;
+    return ret;
+  }
+
+  this.polylineadd_func = function(self, filectx, arg_list, arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var arg_p2;
+    var arg_p3;
+
+    var oid;
+    var x, y;
+    var points = new Array(2);
+    var point_cnt;
+
+    if (arg_count != 3) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    arg_p2 = arg_list.next;
+    arg_p3 = arg_p2.next;
+
+    if (arg_list.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p2.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p3.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    oid = arg_list.value_int;
+    x = arg_p2.value_float;
+    y = arg_p3.value_float;
+
+    graph = graph_get_stored_graph();
+
+    var p1 = {x : x, y : y};
+    points[0] = p1;
+    point_cnt = 1;
+    graph.growapi.AddPolyLinePoints(oid, points, point_cnt);
+    graph.growapi.SetModified(graph.ctx, 1);
+
+    return ret;
+  }
+
+  this.createtext_func = function(self, filectx, arg_list,
+				  arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var arg_p2; // x
+    var arg_p3; // y
+    var arg_p4; // Size
+    var arg_p5; // Font
+    var arg_p6; // Bold
+    var arg_p7; // Color
+
+    var x, y;
+    var fill_color, border_color, text_color;
+    var textfont;
+    var textbold, textsize;
+
+    if (arg_count < 3 || arg_count > 7) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    arg_p2 = arg_list.next;
+    arg_p3 = arg_p2.next;
+
+    graph = graph_get_stored_graph();
+
+    if (arg_list.value_decl != CcmC.K_DECL_STRING) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p2.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p3.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    if (arg_count > 3) {
+      arg_p4 = arg_p3.next;
+      if (arg_p4.value_decl != CcmC.K_DECL_INT) {
+	ret.sts = CCM_.ARGMISM;
+        return ret;
+      }
+      textsize = arg_p4.value_int;
+    }
+    else
+      textsize = graph.textsize;
+
+    if (arg_count > 4) {
+      arg_p5 = arg_p4.next;
+      if (arg_p5.value_decl != CcmC.K_DECL_INT) {
+	ret.sts = CCM_.ARGMISM;
+	return ret;
+      }
+      textfont = arg_p5.value_int;
+    }
+    else
+      textfont = graph.textfont;
+
+    if (arg_count > 5) {
+      arg_p6 = arg_p5.next;
+      if (arg_p6.value_decl != CcmC.K_DECL_INT) {
+	ret.sts = CCM_.ARGMISM;
+        return ret;
+      }
+      textbold = arg_p6.value_int;
+    }
+    else {
+      textbold = graph.textbold;
+    }
+
+    if (arg_count > 6) {
+      arg_p7 = arg_p6.next;
+      if (arg_p7.value_decl != CcmC.K_DECL_INT) {
+	ret.sts = CCM_.ARGMISM;
+	return ret;
+      }
+      text_color = arg_p7.value_int;
+    }
+    else {
+      text_color = graph.get_text_drawtype();
+    }
+ 
+    x = arg_p2.value_float;
+    y = arg_p3.value_float;
+
+    var drawtype;
+
+    if (textbold)
+      drawtype = Glow.eDrawType_TextHelveticaBold;
+    else
+      drawtype = Glow.eDrawType_TextHelvetica;
+
+    switch (textsize) {
+    case 0:
+      textsize = 0;
+      break;
+    case 1:
+      textsize = 1;
+      break;
+    case 2:
+      textsize = 2;
+      break;
+    case 3:
+      textsize = 4;
+      break;
+    case 4:
+      textsize = 6;
+      break;
+    case 5:
+      textsize = 8;
+      break;
+    default:
+      textsize = 8;
+    }
+
+
+    var n = graph.growapi.CreateGrowText(graph.ctx, "", arg_list.value_string, x, y, drawtype,
+			text_color, textsize, textfont, Glow.mDisplayLevel_1, null);
+    graph.growapi.SetModified(graph.ctx, 1);
+    graph.current_cmd_object = n;
+    ret.return_int = graph.current_cmd_object;
+    ret.return_decl = CcmC.K_DECL_INT;
+    return ret;
+  }
+
+  this.createannot_func = function(self, filectx, arg_list,
+				  arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var arg_p2; // number
+    var arg_p3; // x
+    var arg_p4; // y
+    var arg_p5; // Size
+    var arg_p6; // Font
+    var arg_p7; // Bold
+    var arg_p8; // Color
+
+    var number;
+    var x, y;
+    var fill_color, border_color, text_color;
+    var textfont;
+    var textbold, textsize;
+
+    if (arg_count < 4 || arg_count > 8) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    arg_p2 = arg_list.next;
+    arg_p3 = arg_p2.next;
+    arg_p4 = arg_p3.next;
+
+    graph = graph_get_stored_graph();
+
+    if (arg_list.value_decl != CcmC.K_DECL_STRING) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p2.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p3.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p4.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    if (arg_count > 4) {
+      arg_p5 = arg_p4.next;
+      if (arg_p5.value_decl != CcmC.K_DECL_INT) {
+	ret.sts = CCM_.ARGMISM;
+        return ret;
+      }
+      textsize = arg_p5.value_int;
+    }
+    else
+      textsize = graph.textsize;
+
+    if (arg_count > 5) {
+      arg_p6 = arg_p5.next;
+      if (arg_p6.value_decl != CcmC.K_DECL_INT) {
+	ret.sts = CCM_.ARGMISM;
+	return ret;
+      }
+      textfont = arg_p6.value_int;
+    }
+    else
+      textfont = graph.textfont;
+
+    if (arg_count > 7) {
+      arg_p7 = arg_p6.next;
+      if (arg_p7.value_decl != CcmC.K_DECL_INT) {
+	ret.sts = CCM_.ARGMISM;
+        return ret;
+      }
+      textbold = arg_p7.value_int;
+    }
+    else {
+      textbold = graph.textbold;
+    }
+
+    if (arg_count > 8) {
+      arg_p7 = arg_p7.next;
+      if (arg_p8.value_decl != CcmC.K_DECL_INT) {
+	ret.sts = CCM_.ARGMISM;
+	return ret;
+      }
+      text_color = arg_p8.value_int;
+    }
+    else {
+      text_color = graph.get_text_drawtype();
+    }
+ 
+    number = arg_p2.value_int;
+    x = arg_p3.value_float;
+    y = arg_p4.value_float;
+
+    var drawtype;
+
+    if (textbold)
+      drawtype = Glow.eDrawType_TextHelveticaBold;
+    else
+      drawtype = Glow.eDrawType_TextHelvetica;
+
+    switch (textsize) {
+    case 0:
+      textsize = 0;
+      break;
+    case 1:
+      textsize = 1;
+      break;
+    case 2:
+      textsize = 2;
+      break;
+    case 3:
+      textsize = 4;
+      break;
+    case 4:
+      textsize = 6;
+      break;
+    case 5:
+      textsize = 8;
+      break;
+    default:
+      textsize = 8;
+    }
+
+
+    var n = graph.growapi.CreateGrowAnnot(graph.ctx, arg_list.value_string, number, x, y, drawtype,
+			text_color, textsize, textfont, Glow.mDisplayLevel_1, null);
+    graph.growapi.SetModified(graph.ctx, 1);
+    graph.current_cmd_object = n;
+    ret.return_int = graph.current_cmd_object;
+    ret.return_decl = CcmC.K_DECL_INT;
+    return ret;
+  }
+
+  this.createimage_func = function(self, filectx, arg_list,
+				   arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var arg_p2;
+    var arg_p3;
+    var arg_p4;
+    var arg_p5;
+  
+    var x1, y1, x2, y2;
+    var name;
+    var n1;
+    var scale_x, scale_y;
+    var sx, sy;
+    var ll_x, ll_y, ur_x, ur_y;
+    
+    if (arg_count < 3 || arg_count > 5) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    arg_p2 = arg_list.next;
+    arg_p3 = arg_p2.next;
+
+    if (arg_list.value_decl != CcmC.K_DECL_STRING) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p2.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p3.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    x1 = arg_p2.value_float;
+    y1 = arg_p3.value_float;
+
+    if (arg_count >= 4) {
+      arg_p4 = arg_p3.next;
+      if (arg_p4.value_decl != CcmC.K_DECL_FLOAT) {
+	ret.sts = CCM_.ARGMISM;
+	return ret;
+      }
+      scale_x = 1;
+      x2 = arg_p4.value_float;
+    }
+    else
+      scale_x = 0;
+
+    if (arg_count == 5) {
+      arg_p5 = arg_p4.next;
+      if (arg_p5.value_decl != CcmC.K_DECL_FLOAT) {
+	ret.sts = CCM_.ARGMISM;
+	return ret;
+      }
+      scale_y = 1;
+      y2 = arg_p5.value_float;    
+    }
+    else
+      scale_y = 0;
+
+
+    graph = graph_get_stored_graph();
+
+    name = "O" + graph.growapi.GetNextObjectNameNumber(graph.ctx).toString();
+  
+    n1 = graph.growapi.CreateGrowImage(graph.ctx, name, arg_list.value_string, x1, y1, null);
+    if (scale_x && scale_y) {
+      n1.ur.x = n1.ll.x + x2 - x1;
+      n1.ur.y = n1.ll.y + y2 - y1;
+    }
+    graph.current_cmd_object = n1;
+
+    graph.growapi.SetModified(graph.ctx, 1);
+
+    ret.return_int = graph.current_cmd_object;
+    ret.return_decl = CcmC.K_DECL_INT;
+    return ret;
+  }
+
+  this.createobject_func = function(self, filectx, arg_list,
+				    arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var arg_p2;
+    var arg_p3;
+    var arg_p4;
+    var arg_p5;
+  
+    var x1, y1, x2, y2;
+    var name;
+    var nc;
+    var n1;
+    var scale_x, scale_y;
+    var sx, sy;
+    var ll_x, ll_y, ur_x, ur_y;
+    var sts;
+    
+    if (arg_count < 3 || arg_count > 5) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    arg_p2 = arg_list.next;
+    arg_p3 = arg_p2.next;
+
+    if (arg_list.value_decl != CcmC.K_DECL_STRING) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p2.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p3.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    x1 = arg_p2.value_float;
+    y1 = arg_p3.value_float;
+
+    if (arg_count >= 4) {
+      arg_p4 = arg_p3.next;
+      if (arg_p4.value_decl != CcmC.K_DECL_FLOAT) {
+	ret.sts = CCM_.ARGMISM;
+	return ret;
+      }
+      scale_x = 1;
+      x2 = arg_p4.value_float;
+    }
+    else
+      scale_x = 0;
+
+    if (arg_count == 5) {
+      arg_p5 = arg_p4.next;
+      if (arg_p5.value_decl != CcmC.K_DECL_FLOAT) {
+	ret.sts = CCM_.ARGMISM;
+        return ret;
+      }
+      scale_y = 1;
+      y2 = arg_p5.value_float;    
+    }
+    else
+      scale_y = 0;
+
+
+    graph = graph_get_stored_graph();
+
+    nc = graph.growapi.FindNodeClassByName(graph.ctx, arg_list.value_string);
+    if (nc === null) {
+      ret.return_int = 0;
+      ret.return_decl = CcmC.K_DECL_INT;
+      return ret;
+    }
+
+    name =  "O" + graph.growapi.GetNextObjectNameNumber(graph.ctx).toString();
+
+    if (!graph.growapi.IsSliderClass(nc))
+      n1 = graph.growapi.CreateGrowNode(graph.ctx, name, nc, x1, y1, null);
+    else
+      n1 = graph.growapi.CreateGrowSlider(graph.ctx, name, nc, x1, y1, null);
+
+    var dyn = new Dyn(graph);
+    dyn.update_dyntype(n1);
+    dyn.update_elements();
+    n1.setUserData(dyn);
+
+    n1.move_to(x1, y1);
+    n1.get_node_borders();
+    n1.storeTransform();
+    n1.storeBorders();
+    if (scale_x || scale_y) {
+      var rm = n1.measure();      
+      if (scale_x)
+	sx = (x2 - x1) / (rm.ur_x - rm.ll_x);
+      else
+	sx = 1;
+      if (scale_y)
+	sy = (y2 - y1) / (rm.ur_y - rm.ll_y);
+      else
+	sy = 1;
+      n1.set_scale(sx, sy, x1, y1, Glow.eScaleType_LowerLeft);
+      n1.storeTransform();
+      n1.storeBorders();
+    }
+    graph.current_cmd_object = n1;
+    if (graph.growapi.IsSliderClass(nc))
+      n1.transformStoreReset();
+    graph.growapi.SetModified(graph.ctx, 1);
+
+    ret.return_int = graph.current_cmd_object;
+    ret.return_decl = CcmC.K_DECL_INT;
+    return ret;
+  }
+
+  this.createbar_func = function(self, filectx, arg_list,
+				 arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var arg_p2;
+    var arg_p3;
+    var arg_p4;
+    var arg_p5;
+    var arg_p6;
+  
+    var x1, y1, x2, y2;
+    var n1;
+    var scale_x, scale_y;
+    var sx, sy;
+    var ll_x, ll_y, ur_x, ur_y;
+    var colortheme;
+    var direction;
+    
+    if (arg_count < 2 || arg_count > 6) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    arg_p2 = arg_list.next;
+
+    if (arg_list.value_decl != CcmC.K_DECL_FLOAT ) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p2.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    x1 = arg_list.value_float;
+    y1 = arg_p2.value_float;
+
+    if (arg_count >= 3) {
+      arg_p3 = arg_p2.next;
+      if (arg_p3.value_decl != CcmC.K_DECL_FLOAT) {
+	ret.sts = CCM_.ARGMISM;
+	return ret;
+      }
+      scale_x = 1;
+      x2 = arg_p3.value_float;
+    }
+    else
+      scale_x = 0;
+
+    if (arg_count >= 4) {
+      arg_p4 = arg_p3.next;
+      if (arg_p4.value_decl != CcmC.K_DECL_FLOAT) {
+	ret.sts = CCM_.ARGMISM;
+	return ret;
+      }
+      scale_y = 1;
+      y2 = arg_p4.value_float;    
+    }
+    else
+      scale_y = 0;
+
+    if (arg_count >= 5) {
+      arg_p5 = arg_p4.next;
+      if (arg_p5.value_decl != CcmC.K_DECL_INT) {
+	ret.sts = CCM_.ARGMISM;
+	return ret;
+      }
+      colortheme = arg_p5.value_int;
+    }
+    else
+      colortheme = 0;
+
+    if (arg_count == 6) {
+      arg_p6 = arg_p5.next;
+      if (arg_p6.value_decl != CcmC.K_DECL_INT) {
+	ret.sts = CCM_.ARGMISM;
+	return ret;
+      }
+      direction = arg_p6.value_int;
+    }
+    else
+      direction = Glow.eDirection_Up;
+
+
+    graph = graph_get_stored_graph();
+
+    var dyn = new Dyn(graph);
+    dyn.dyn_type1 = DynC.mDynType1_Bar;
+    dyn.total_dyn_type1 = DynC.mDynType1_Bar;
+    dyn.update_elements();
+
+    switch (direction) {
+    case Glow.eDirection_Up:
+      n1 = graph.growapi.CreateGrowBar(graph.ctx, x1, y1, dyn,  colortheme);
+      break;
+    case Glow.eDirection_Down:
+      n1 = graph.growapi.CreateGrowBar(graph.ctx, x1, y1, dyn, colortheme);
+      graph.growapi.SelectClear(graph.ctx);
+      graph.growapi.SelectInsert(graph.ctx, n1);
+      graph.growapi.RotateSelectedObjects(graph.ctx, 180.0, Glow.eRotationPoint_Center);
+      graph.growapi.SelectClear(graph.ctx);
+      graph.growapi.StoreTransform(n1);
+      break;
+    case Glow.eDirection_Left:
+      // Default bar has width 0.5 and height 5.0
+      n1 = graph.growapi.CreateGrowBar(graph.ctx, x1, y1 + 0.5, dyn, colortheme);
+      graph.growapi.SelectClear(graph.ctx);
+      graph.growapi.SelectInsert(graph.ctx, n1);
+      graph.growapi.RotateSelectedObjects(graph.ctx, -90.0, Glow.eRotationPoint_LowerLeft);
+      graph.growapi.SelectClear(graph.ctx);
+      graph.growapi.StoreTransform(n1);
+      break;
+    case Glow.eDirection_Right:
+      n1 = graph.growapi.CreateGrowBar(graph.ctx, x1, y1 - 5.0, dyn, colortheme);
+      graph.growapi.SelectClear(graph.ctx);
+      graph.growapi.SelectInsert(graph.ctx, n1);
+      graph.growapi.RotateSelectedObjects(graph.ctx, 90.0, Glow.eRotationPoint_UpperLeft);
+      graph.growapi.SelectClear(graph.ctx);
+      graph.growapi.StoreTransform(n1);
+      break;
+    default:
+      break;
+    }
+
+    if (scale_x || scale_y) {
+      var rm = graph.growapi.MeasureNode(n1);
+      if (scale_x)
+	sx = (x2 - x1) / (rm.ur_x - rm.ll_x);
+      else
+	sx = 1;
+      if (scale_y)
+	sy = (y2 - y1) / (rm.ur_y - rm.ll_y);
+      else
+	sy = 1;
+      graph.growapi.SetObjectScale(n1, sx, sy, x1, y1, Glow.eScaleType_LowerLeft);
+      graph.growapi.StoreTransform(n1);
+    }
+    graph.current_cmd_object = n1;
+
+    graph.growapi.SetModified(graph.ctx, 1);
+
+    ret.return_int = graph.current_cmd_object;
+    ret.return_decl = CcmC.K_DECL_INT;
+    return ret;
+  }
+
+  this.createbararc_func = function(self, filectx, arg_list,
+				    arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var arg_p2;
+    var arg_p3;
+    var arg_p4;
+    var arg_p5;
+  
+    var x1, y1, x2, y2;
+    var n1;
+    var scale_x, scale_y;
+    var sx, sy;
+    var ll_x, ll_y, ur_x, ur_y;
+    var colortheme;
+    
+    if (arg_count < 2 || arg_count > 5) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    arg_p2 = arg_list.next;
+
+    if (arg_list.value_decl != CcmC.K_DECL_FLOAT ) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p2.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    x1 = arg_list.value_float;
+    y1 = arg_p2.value_float;
+
+    if (arg_count >= 3) {
+      arg_p3 = arg_p2.next;
+      if (arg_p3.value_decl != CcmC.K_DECL_FLOAT) {
+	ret.sts = CCM_.ARGMISM;
+	return ret;
+      }
+      scale_x = 1;
+      x2 = arg_p3.value_float;
+    }
+    else
+      scale_x = 0;
+
+    if (arg_count >= 4) {
+      arg_p4 = arg_p3.next;
+      if (arg_p4.value_decl != CcmC.K_DECL_FLOAT) {
+	ret.sts = CCM_.ARGMISM;
+	return ret;
+      }
+      scale_y = 1;
+      y2 = arg_p4.value_float;    
+    }
+    else
+      scale_y = 0;
+
+    if (arg_count >= 5) {
+      arg_p5 = arg_p4.next;
+      if (arg_p5.value_decl != CcmC.K_DECL_INT) {
+	ret.sts = CCM_.ARGMISM;
+	return ret;
+      }
+      colortheme = arg_p5.value_int;
+    }
+    else
+      colortheme = 0;
+
+    graph = graph_get_stored_graph();
+
+    var dyn = new Dyn(graph);
+    dyn.dyn_type1 = DynC.mDynType1_Bar;
+    dyn.total_dyn_type1 = DynC.mDynType1_Bar;
+    dyn.update_elements();
+
+    n1 = graph.growapi.CreateGrowBarArc(graph.ctx, x1, y1, dyn, colortheme);
+
+    if (scale_x || scale_y) {
+      var rg = graph.growapi.MeasureNode(n1);
+      if (scale_x)
+	sx = (x2 - x1) / (rg.ur_x - rg.ll_x);
+      else
+	sx = 1;
+      if (scale_y)
+	sy = (y2 - y1) / (rg.ur_y - rg.ll_y);
+      else
+	sy = 1;
+      graph.growapi.StoreTransform(n1);
+      graph.growapi.SetObjectScale(n1, sx, sy, x1, y1, Glow.eScaleType_LowerLeft);
+    }
+    graph.current_cmd_object = n1;
+
+    graph.growapi.SetModified(graph.ctx, 1);
+
+    ret.return_int = graph.current_cmd_object;
+    ret.return_decl = CcmC.K_DECL_INT;
+    return ret;
+  }
+
+  this.createaxis_func = function(self, filectx, arg_list,
+				  arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var arg_p2;
+    var arg_p3;
+    var arg_p4;
+    var arg_p5;
+    var arg_p6;
+    var arg_p7;
+  
+    var x1, y1, x2, y2;
+    var n1;
+    var scale_x, scale_y;
+    var sx, sy;
+    var ll_x, ll_y, ur_x, ur_y;
+    var colortheme;
+    var dynamic;
+    var direction;
+    
+    if (arg_count < 2 || arg_count > 7) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    arg_p2 = arg_list.next;
+
+    if (arg_list.value_decl != CcmC.K_DECL_FLOAT ) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p2.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    x1 = arg_list.value_float;
+    y1 = arg_p2.value_float;
+
+    if (arg_count >= 3) {
+      arg_p3 = arg_p2.next;
+      if (arg_p3.value_decl != CcmC.K_DECL_FLOAT) {
+	ret.sts = CCM_.ARGMISM;
+	return ret;
+      }
+      scale_x = 1;
+      x2 = arg_p3.value_float;
+    }
+    else
+      scale_x = 0;
+
+    if (arg_count >= 4) {
+      arg_p4 = arg_p3.next;
+      if (arg_p4.value_decl != CcmC.K_DECL_FLOAT) {
+	ret.sts = CCM_.ARGMISM;
+	return ret;
+      }
+      scale_y = 1;
+      y2 = arg_p4.value_float;    
+    }
+    else
+      scale_y = 0;
+
+    if (arg_count >= 5) {
+      arg_p5 = arg_p4.next;
+      if (arg_p5.value_decl != CcmC.K_DECL_INT) {
+	ret.sts = CCM_.ARGMISM;
+	return ret;
+      }
+      colortheme = arg_p5.value_int;
+    }
+    else
+      colortheme = 0;
+
+    if (arg_count >= 6) {
+      arg_p6 = arg_p5.next;
+      if (arg_p6.value_decl != CcmC.K_DECL_INT) {
+	ret.sts = CCM_.ARGMISM;
+	return ret;
+      }
+      dynamic = arg_p6.value_int;
+    }
+    else
+      dynamic = 0;
+
+    if (arg_count >= 7) {
+      arg_p7 = arg_p6.next;
+      if (arg_p7.value_decl != CcmC.K_DECL_INT) {
+	ret.sts = CCM_.ARGMISM;
+	return ret;
+      }
+      direction = arg_p7.value_int;
+    }
+    else
+      direction = Glow.eDirection_Right;
+
+
+    graph = graph_get_stored_graph();
+
+    var dyn = null;
+    if (dynamic) {
+      dyn = new Dyn(graph);
+      dyn.dyn_type2 = DynC.mDynType2_Axis;
+      dyn.total_dyn_type2 = DynC.mDynType2_Axis;
+      dyn.update_elements();
+    }
+
+    switch (direction) {
+    case Glow.eDirection_Left:
+      n1 = graph.growapi.CreateGrowAxis(graph.ctx, x1, y1, dyn, dynamic, colortheme);
+      break;
+    case Glow.eDirection_Right:
+      n1 = graph.growapi.CreateGrowAxis(graph.ctx, x1, y1, dyn, dynamic, colortheme);
+      graph.growapi.SelectClear(graph.ctx);
+      graph.growapi.SelectInsert(graph.ctx, n1);
+      graph.growapi.RotateSelectedObjects(graph.ctx, 180.0, Glow.eRotationPoint_Center);
+      graph.growapi.SelectClear(graph.ctx);
+      graph.growapi.StoreTransform(n1);
+      break;
+    case Glow.eDirection_Down:
+      // Default bar has width 1.2 and height 5.0
+      n1 = graph.growapi.CreateGrowAxis(graph.ctx, x1, y1 + 1.2, dyn, dynamic, colortheme);
+      graph.growapi.SelectClear(graph.ctx);
+      graph.growapi.SelectInsert(graph.ctx, n1);
+      graph.growapi.RotateSelectedObjects(graph.ctx, -90.0, Glow.eRotationPoint_LowerLeft);
+      graph.growapi.SelectClear(graph.ctx);
+      graph.growapi.StoreTransform(n1);
+      break;
+    case Glow.eDirection_Up:
+      n1 = graph.growapi.CreateGrowAxis(graph.ctx, x1, y1 - 5.0, dyn, dynamic, colortheme);
+      graph.growapi.SelectClear(graph.ctx);
+      graph.growapi.SelectInsert(graph.ctx, n1);
+      graph.growapi.RotateSelectedObjects(graph.ctx, 90.0, Glow.eRotationPoint_UpperLeft);
+      graph.growapi.SelectClear(graph.ctx);
+      graph.growapi.StoreTransform(n1);
+      break;
+    default:
+      break;
+    }
+
+    if (scale_x || scale_y) {
+      var rg = graph.growapi.MeasureNode(n1);
+      if (scale_x)
+	sx = (x2 - x1) / (rg.ur_x - rg.ll_x);
+      else
+	sx = 1;
+      if (scale_y)
+	sy = (y2 - y1) / (rg.ur_y - rg.ll_y);
+      else
+	sy = 1;
+      graph.growapi.SetObjectScale(n1, sx, sy, x1, y1, Glow.eScaleType_LowerLeft);
+      graph.growapi.StoreTransform(n1);
+    }
+    graph.current_cmd_object = n1;
+
+    graph.growapi.SetModified(graph.ctx, 1);
+
+    ret.return_int = graph.current_cmd_object;
+    ret.return_decl = CcmC.K_DECL_INT;
+    return ret;
+  }
+
+  this.createaxisarc_func = function(self, filectx, arg_list,
+				     arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var arg_p2;
+    var arg_p3;
+    var arg_p4;
+    var arg_p5;
+    var arg_p6;
+  
+    var x1, y1, x2, y2;
+    var n1;
+    var scale_x, scale_y;
+    var sx, sy;
+    var ll_x, ll_y, ur_x, ur_y;
+    var colortheme;
+    var dynamic;
+    
+    if (arg_count < 2 || arg_count > 6) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    arg_p2 = arg_list.next;
+
+    if (arg_list.value_decl != CcmC.K_DECL_FLOAT ) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p2.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    x1 = arg_list.value_float;
+    y1 = arg_p2.value_float;
+
+    if (arg_count >= 3) {
+      arg_p3 = arg_p2.next;
+      if (arg_p3.value_decl != CcmC.K_DECL_FLOAT) {
+	ret.sts = CCM_.ARGMISM;
+	return ret;
+      }
+      scale_x = 1;
+      x2 = arg_p3.value_float;
+    }
+    else
+      scale_x = 0;
+
+    if (arg_count >= 4) {
+      arg_p4 = arg_p3.next;
+      if (arg_p4.value_decl != CcmC.K_DECL_FLOAT) {
+	ret.sts = CCM_.ARGMISM;
+	return ret;
+      }
+      scale_y = 1;
+      y2 = arg_p4.value_float;    
+    }
+    else
+      scale_y = 0;
+
+    if (arg_count >= 5) {
+      arg_p5 = arg_p4.next;
+      if (arg_p5.value_decl != CcmC.K_DECL_INT) {
+	ret.sts = CCM_.ARGMISM;
+	return ret;
+      }
+      colortheme = arg_p5.value_int;
+    }
+    else
+      colortheme = 0;
+
+    if (arg_count >= 6) {
+      arg_p6 = arg_p5.next;
+      if (arg_p6.value_decl != CcmC.K_DECL_INT) {
+	ret.sts = CCM_.ARGMISM;
+	return ret;
+      }
+      dynamic = arg_p6.value_int;
+    }
+    else
+      dynamic = 0;
+
+
+    graph = graph_get_stored_graph();
+
+    var dyn = null;
+    if (dynamic) {
+      dyn = new Dyn(graph);
+      dyn.dyn_type2 = DynC.mDynType2_Axis;
+      dyn.total_dyn_type2 = DynC.mDynType2_Axis;
+      dyn.update_elements();
+    }
+
+    n1 = graph.growapi.CreateGrowAxisArc(graph.ctx, x1, y1, dyn, dynamic, colortheme);
+
+    if (scale_x || scale_y) {
+      var rg = graph.growapi.MeasureNode(n1);
+      if (scale_x)
+	sx = (x2 - x1) / (rg.ur_x - rg.ll_x);
+      else
+	sx = 1;
+      if (scale_y)
+	sy = (y2 - y1) / (rg.ur_y - rg.ll_y);
+      else
+	sy = 1;
+      graph.growapi.SetObjectScale(n1, sx, sy, x1, y1, Glow.eScaleType_LowerLeft);
+      graph.growapi.StoreTransform(n1);
+    }
+    graph.current_cmd_object = n1;
+
+    graph.growapi.SetModified(graph.ctx, 1);
+
+    ret.return_int = graph.current_cmd_object;
+    ret.return_decl = CcmC.K_DECL_INT;
+    return ret;
+  }
+
+  this.createpie_func = function(self, filectx, arg_list,
+				 arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var arg_p2;
+    var arg_p3;
+    var arg_p4;
+    var arg_p5;
+  
+    var x1, y1, x2, y2;
+    var n1;
+    var scale_x, scale_y;
+    var sx, sy;
+    var ll_x, ll_y, ur_x, ur_y;
+    var colortheme;
+    
+    if (arg_count < 2 || arg_count > 5) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    arg_p2 = arg_list.next;
+
+    if (arg_list.value_decl != CcmC.K_DECL_FLOAT ) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p2.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    x1 = arg_list.value_float;
+    y1 = arg_p2.value_float;
+
+    if (arg_count >= 3) {
+      arg_p3 = arg_p2.next;
+      if (arg_p3.value_decl != CcmC.K_DECL_FLOAT) {
+	ret.sts = CCM_.ARGMISM;
+	return ret;
+      }
+      scale_x = 1;
+      x2 = arg_p3.value_float;
+    }
+    else
+      scale_x = 0;
+
+    if (arg_count >= 4) {
+      arg_p4 = arg_p3.next;
+      if (arg_p4.value_decl != CcmC.K_DECL_FLOAT) {
+	ret.sts = CCM_.ARGMISM;
+	return ret;
+      }
+      scale_y = 1;
+      y2 = arg_p4.value_float;    
+    }
+    else
+      scale_y = 0;
+
+    if (arg_count >= 5) {
+      arg_p5 = arg_p4.next;
+      if (arg_p5.value_decl != CcmC.K_DECL_INT) {
+	ret.sts = CCM_.ARGMISM;
+	return ret;
+      }
+      colortheme = arg_p5.value_int;
+    }
+    else
+      colortheme = 0;
+
+    graph = graph_get_stored_graph();
+
+    var dyn = new Dyn(graph);
+    dyn.dyn_type1 = DynC.mDynType1_Pie;
+    dyn.total_dyn_type1 = DynC.mDynType1_Pie;
+    dyn.update_elements();
+
+    n1 = graph.growapi.CreateGrowPie(graph.ctx, x1, y1, dyn, colortheme);
+
+    if (scale_x || scale_y) {
+      var rg = graph.growapi.MeasureNode(n1);
+      if (scale_x)
+	sx = (x2 - x1) / (rg.ur_x - rg.ll_x);
+      else
+	sx = 1;
+      if (scale_y)
+	sy = (y2 - y1) / (rg.ur_y - rg.ll_y);
+      else
+	sy = 1;
+      graph.growapi.SetObjectScale(n1, sx, sy, x1, y1, Glow.eScaleType_LowerLeft);
+      graph.growapi.StoreTransform(n1);
+    }
+    graph.current_cmd_object = n1;
+
+    graph.growapi.SetModified(graph.ctx, 1);
+
+    ret.return_int = graph.current_cmd_object;
+    ret.return_decl = CcmC.K_DECL_INT;
+    return ret;
+  }
+
+  // Common for trend, dstrend, dstrendcurve and fastcurve
+
+  this.createtrend = function(filectx, arg_list, arg_count, dyntype1, dyntype2) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var arg_p2;
+    var arg_p3;
+    var arg_p4;
+    var arg_p5;
+  
+    var x1, y1, x2, y2;
+    var n1;
+    var scale_x, scale_y;
+    var sx, sy;
+    var ll_x, ll_y, ur_x, ur_y;
+    var colortheme;
+    
+    if (arg_count < 2 || arg_count > 5) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    arg_p2 = arg_list.next;
+    arg_p3 = arg_p2.next;
+
+    if (arg_list.value_decl != CcmC.K_DECL_FLOAT ) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p2.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    x1 = arg_list.value_float;
+    y1 = arg_p2.value_float;
+
+    if (arg_count >= 3) {
+      arg_p3 = arg_p2.next;
+      if (arg_p3.value_decl != CcmC.K_DECL_FLOAT) {
+	ret.sts = CCM_.ARGMISM;
+	return ret;
+      }
+      scale_x = 1;
+      x2 = arg_p3.value_float;
+    }
+    else
+      scale_x = 0;
+
+    if (arg_count >= 4) {
+      arg_p4 = arg_p3.next;
+      if (arg_p4.value_decl != CcmC.K_DECL_FLOAT) {
+	ret.sts = CCM_.ARGMISM;
+	return ret;
+      }
+      scale_y = 1;
+      y2 = arg_p4.value_float;    
+    }
+    else
+      scale_y = 0;
+
+    if (arg_count == 5) {
+      arg_p5 = arg_p4.next;
+      if (arg_p5.value_decl != CcmC.K_DECL_INT) {
+	ret.sts = CCM_.ARGMISM;
+	return ret;
+      }
+      colortheme = arg_p5.value_int;
+    }
+    else
+      colortheme = 0;
+
+
+    graph = graph_get_stored_graph();
+
+    var dyn = new Dyn(graph);
+    dyn.dyn_type1 = dyntype1;
+    dyn.total_dyn_type1 = dyntype1;
+    dyn.dyn_type2 = dyntype2;
+    dyn.total_dyn_type2 = dyntype2;
+    dyn.update_elements();
+
+    n1 = graph.growapi.CreateGrowTrend(graph.ctx, x1, y1, dyn, colortheme);
+
+    if (scale_x || scale_y) {
+      var rg = graph.growapi.MeasureNode(n1);
+      if (scale_x)
+	sx = (x2 - x1) / (rg.ur_x - rg.ll_x);
+      else
+	sx = 1;
+      if (scale_y)
+	sy = (y2 - y1) / (rg.ur_y - rg.ll_y);
+      else
+	sy = 1;
+      graph.growapi.SetObjectScale(n1, sx, sy, x1, y1, Glow.eScaleType_LowerLeft);
+      graph.growapi.StoreTransform(n1);
+    }
+    graph.current_cmd_object = n1;
+
+    graph.growapi.SetModified(graph.ctx, 1);
+
+    ret.return_int = graph.current_cmd_object;
+    ret.return_decl = CcmC.K_DECL_INT;
+    return ret;
+  }
+
+  this.createtrend_func = function(self, filectx, arg_list,
+				   arg_count) {
+    var graph = graph_get_stored_graph();
+    return graph.createtrend(filectx, arg_list, arg_count, DynC.mDynType1_Trend, 0);
+  }
+
+  this.createdstrend_func = function(self, filectx, arg_list,
+				     arg_count) {
+    var graph = graph_get_stored_graph();
+    return graph.createtrend(filectx, arg_list, arg_count, 0, ge.mDynType2_DsTrend);
+  }
+
+  this.createdstrendcurve_func = function(self, filectx, arg_list,
+					  arg_count) {
+    var graph = graph_get_stored_graph();
+    return graph.createtrend(filectx, arg_list, arg_count, 
+			     0, DynC.mDynType2_DsTrendCurve);
+  }
+
+  this.createfastcurve_func = function(self, filectx, arg_list,
+				       arg_count) {
+    var graph = graph_get_stored_graph();
+    return graph.createtrend(filectx, arg_list, arg_count, 
+			     DynC.mDynType1_FastCurve, 0);
+  }
+
+  // Common for xycurve and sevhist
+
+  this.createxycurve = function(filectx, arg_list, arg_count, dyntype1, dyntype2) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var arg_p2;
+    var arg_p3;
+    var arg_p4;
+    var arg_p5;
+  
+    var x1, y1, x2, y2;
+    var n1;
+    var scale_x, scale_y;
+    var sx, sy;
+    var ll_x, ll_y, ur_x, ur_y;
+    var colortheme;
+    
+    if (arg_count < 2 || arg_count > 5) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    arg_p2 = arg_list.next;
+    arg_p3 = arg_p2.next;
+
+    if (arg_list.value_decl != CcmC.K_DECL_FLOAT ) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p2.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    x1 = arg_list.value_float;
+    y1 = arg_p2.value_float;
+
+    if (arg_count >= 3) {
+      arg_p3 = arg_p2.next;
+      if (arg_p3.value_decl != CcmC.K_DECL_FLOAT) {
+	ret.sts = CCM_.ARGMISM;
+	return ret;
+      }
+      scale_x = 1;
+      x2 = arg_p3.value_float;
+    }
+    else
+      scale_x = 0;
+
+    if (arg_count >= 4) {
+      arg_p4 = arg_p3.next;
+      if (arg_p4.value_decl != CcmC.K_DECL_FLOAT) {
+	ret.sts = CCM_.ARGMISM;
+	return ret;
+      }
+      scale_y = 1;
+      y2 = arg_p4.value_float;    
+    }
+    else
+      scale_y = 0;
+
+    if (arg_count == 5) {
+      arg_p5 = arg_p4.next;
+      if (arg_p5.value_decl != CcmC.K_DECL_INT) {
+	ret.sts = CCM_.ARGMISM;
+	return ret;
+      }
+      colortheme = arg_p5.value_int;
+    }
+    else
+      colortheme = 0;
+
+
+    graph = graph_get_stored_graph();
+
+    var dyn = new Dyn(graph);
+    dyn.dyn_type1 = dyntype1;
+    dyn.total_dyn_type1 = dyntype1;
+    dyn.dyn_type2 = dyntype2;
+    dyn.total_dyn_type2 = dyntype2;
+    dyn.update_elements();
+
+    n1 = graph.growapi.CreateGrowXYCurve(graph.ctx, x1, y1, dyn, colortheme);
+
+    if (scale_x || scale_y) {
+      var rg = graph.growapi.MeasureNode(n1);
+      if (scale_x)
+	sx = (x2 - x1) / (rg.ur_x - rg.ll_x);
+      else
+	sx = 1;
+      if (scale_y)
+	sy = (y2 - y1) / (rg.ur_y - rg.ll_y);
+      else
+	sy = 1;
+      graph.growapi.SetObjectScale(n1, sx, sy, x1, y1, Glow.eScaleType_LowerLeft);
+      graph.growapi.StoreTransform(n1);
+    }
+    graph.current_cmd_object = n1;
+
+    graph.growapi.SetModified(graph.ctx, 1);
+
+    ret.return_int = graph.current_cmd_object;
+    ret.return_decl = CcmC.K_DECL_INT;
+    return ret;
+  }
+
+  this.createxycurve_func = function(self, filectx, arg_list,
+				     arg_count) {
+    var graph = graph_get_stored_graph();
+    return graph.createxycurve(filectx, arg_list, arg_count, 
+			       DynC.mDynType1_XY_Curve, 0);
+  }
+
+  this.createsevhist_func = function(self, filectx, arg_list,
+				     arg_count) {
+    var graph = graph_get_stored_graph();
+    return graph.createxycurve(filectx, arg_list, arg_count, 
+			       0, DynC.mDynType2_SevHist);
+  }
+
+  this.createwindow_func = function(self, filectx, arg_list,
+				    arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var arg_p2;
+    var arg_p3;
+    var arg_p4;
+    var arg_p5;
+  
+    var x1, y1, x2, y2;
+    var n1;
+    var scale_x, scale_y;
+    var sx, sy;
+    var ll_x, ll_y, ur_x, ur_y;
+    var colortheme;
+    
+    if (arg_count < 2 || arg_count > 5) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    arg_p2 = arg_list.next;
+    arg_p3 = arg_p2.next;
+
+    if (arg_list.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p2.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    x1 = arg_list.value_float;
+    y1 = arg_p2.value_float;
+
+    if (arg_count >= 3) {
+      arg_p3 = arg_p2.next;
+      if (arg_p3.value_decl != CcmC.K_DECL_FLOAT) {
+	ret.sts = CCM_.ARGMISM;
+	return ret;
+      }
+      scale_x = 1;
+      x2 = arg_p3.value_float;
+    }
+    else
+      scale_x = 0;
+
+    if (arg_count >= 4) {
+      arg_p4 = arg_p3.next;
+      if (arg_p4.value_decl != CcmC.K_DECL_FLOAT) {
+	ret.sts = CCM_.ARGMISM;
+	return ret;
+      }
+      scale_y = 1;
+      y2 = arg_p4.value_float;    
+    }
+    else
+      scale_y = 0;
+
+    if (arg_count == 5) {
+      arg_p5 = arg_p4.next;
+      if (arg_p5.value_decl != CcmC.K_DECL_INT) {
+	ret.sts = CCM_.ARGMISM;
+	return ret;
+      }
+      colortheme = arg_p5.value_int;
+    }
+    else
+      colortheme = 0;
+
+
+    graph = graph_get_stored_graph();
+
+    n1 = graph.growapi.CreateGrowWindow(graph.ctx, x1, y1);
+
+    if (scale_x || scale_y) {
+      rg = graph.growapi.MeasureNode(n1);
+      if (scale_x)
+	sx = (x2 - x1) / (rg.ur_x - rg.ll_x);
+      else
+	sx = 1;
+      if (scale_y)
+	sy = (y2 - y1) / (rg.ur_y - rg.ll_y);
+      else
+	sy = 1;
+      graph.growapi.SetObjectScale(n1, sx, sy, x1, y1, Glow.eScaleType_LowerLeft);
+      graph.growapi.StoreTransform(n1);
+    }
+    graph.current_cmd_object = n1;
+
+    graph.growapi.SetModified(graph.ctx, 1);
+
+    ret.return_int = graph.current_cmd_object;
+    ret.return_decl = CcmC.K_DECL_INT;
+    return ret;
+  }
+
+  this.createtoolbar_func = function(self, filectx, arg_list,
+				    arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var arg_p2;
+    var arg_p3;
+    var arg_p4;
+    var arg_p5;
+  
+    var x1, y1, x2, y2;
+    var name;
+    var nc;
+    var n1;
+    var scale_x, scale_y;
+    var sx, sy;
+    var ll_x, ll_y, ur_x, ur_y;
+    var sts;
+    
+    if (arg_count < 3 || arg_count > 5) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    arg_p2 = arg_list.next;
+    arg_p3 = arg_p2.next;
+
+    if (arg_list.value_decl != CcmC.K_DECL_STRING) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p2.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p3.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    x1 = arg_p2.value_float;
+    y1 = arg_p3.value_float;
+
+    if (arg_count >= 4) {
+      arg_p4 = arg_p3.next;
+      if (arg_p4.value_decl != CcmC.K_DECL_FLOAT) {
+	ret.sts = CCM_.ARGMISM;
+	return ret;
+      }
+      scale_x = 1;
+      x2 = arg_p4.value_float;
+    }
+    else
+      scale_x = 0;
+
+    if (arg_count == 5) {
+      arg_p5 = arg_p4.next;
+      if (arg_p5.value_decl != CcmC.K_DECL_FLOAT) {
+	ret.sts = CCM_.ARGMISM;
+        return ret;
+      }
+      scale_y = 1;
+      y2 = arg_p5.value_float;    
+    }
+    else
+      scale_y = 0;
+
+
+    graph = graph_get_stored_graph();
+
+    n1 = graph.growapi.CreateGrowToolbar(graph.ctx, arg_list.value_string, x1, y1, null);
+
+    var dyn = new Dyn(graph);
+    dyn.action_type1 = DynC.mActionType1_MethodToolbar;
+    dyn.total_action_type1 = DynC.mActionType1_MethodToolbar;
+    dyn.update_elements();
+    n1.setUserData(dyn);
+
+    n1.move_to(x1, y1);
+    n1.get_node_borders();
+    n1.storeTransform();
+    n1.storeBorders();
+    if (scale_x || scale_y) {
+      var rm = n1.measure();      
+      if (scale_x)
+	sx = (x2 - x1) / (rm.ur_x - rm.ll_x);
+      else
+	sx = 1;
+      if (scale_y)
+	sy = (y2 - y1) / (rm.ur_y - rm.ll_y);
+      else
+	sy = 1;
+      n1.set_scale(sx, sy, x1, y1, Glow.eScaleType_LowerLeft);
+      n1.storeTransform();
+      n1.storeBorders();
+    }
+    graph.current_cmd_object = n1;
+
+    graph.growapi.SetModified(graph.ctx, 1);
+
+    ret.return_int = graph.current_cmd_object;
+    ret.return_decl = CcmC.K_DECL_INT;
+    return ret;
+  }
+
+  this.getgraphname_func = function(self, filectx, arg_list,
+				    arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+
+    if (arg_count != 0) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    graph = graph_get_stored_graph();
+    ret.return_string = graph.get_name();
+    ret.return_decl = CcmC.K_DECL_STRING;
+
+    return ret;
+  }
+
+  this.setgraphname_func = function(self, filectx, arg_list,
+				    arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var graphname;
+    var oldname;
+    var s;
+
+    if (arg_count != 1) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    graph = graph_get_stored_graph();
+
+    if (arg_list.value_decl != CcmC.K_DECL_STRING) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    graphname = arg_list.value_string.toLowerCase();
+    s = graphname.indexOf('.');
+    if (s != -1)
+      graphname = graphname.substring(0, s);
+    graph.ctx.set_name(graphname);
+
+    return ret;
+  }
+
+  this.getinstanceobject_func = function(self, filectx, arg_list,
+					 arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+
+    if (arg_count !=  0) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    graph = graph_get_stored_graph();
+
+    ret.return_string = graph.growapi.GetOwner(graph.ctx);
+    ret.return_decl = CcmC.K_DECL_STRING;
+
+    return ret;
+  }
+
+
+  this.script_func_register = function() {
+    var sts;
+
+    this.ccm.register_function("Ge", "SetDefaultFill", this.setdefaultfill_func);
+    this.ccm.register_function("Ge", "SetDefaultBorder", this.setdefaultborder_func);
+    this.ccm.register_function("Ge", "SetDefaultShadow", this.setdefaultshadow_func);
+    this.ccm.register_function("Ge", "SetDefaultFillColor", this.setdefaultfillcolor_func);
+    this.ccm.register_function("Ge", "SetDefaultBorderColor", this.setdefaultbordercolor_func);
+    this.ccm.register_function("Ge", "SetDefaultTextColor", this.setdefaulttextcolor_func);
+    this.ccm.register_function("Ge", "GetTextExtent", this.gettextextent_func);
+    this.ccm.register_function("Ge", "GetCurrentObject", this.getcurrentobject_func);
+    this.ccm.register_function("Ge", "SelectAdd", this.selectadd_func);
+    this.ccm.register_function("Ge", "SelectClear", this.selectclear_func);
+    this.ccm.register_function("Ge", "SetExtern", this.setextern_func);
+    this.ccm.register_function("Ge", "SetIntern", this.setintern_func);
+    this.ccm.register_function("Ge", "SetExternAll", this.setexternall_func);
+    this.ccm.register_function("Ge", "SetInternAll", this.setinternall_func);
+    this.ccm.register_function("Ge", "SetDraw", this.setdraw_func);
+    this.ccm.register_function("Ge", "IsW1", this.false_func);
+    this.ccm.register_function("Ge", "IsW2", this.false_func);
+    this.ccm.register_function("Ge", "GetFirstObject", this.getfirstobject_func);
+    this.ccm.register_function("Ge", "GetNextObject", this.getnextobject_func);
+    this.ccm.register_function("Ge", "GroupGetFirstObject", this.groupgetfirstobject_func);
+    this.ccm.register_function("Ge", "GroupGetNextObject", this.groupgetnextobject_func);
+    this.ccm.register_function("Ge", "DashInsertObject", this.dashinsertobject_func);
+    this.ccm.register_function("Ge", "GroupSelected", this.groupselected_func);
+    this.ccm.register_function("Ge", "GetObjectType", this.getobjecttype_func);
+    this.ccm.register_function("Ge", "GetObjectClass", this.getobjectclass_func);
+    this.ccm.register_function("Ge", "GetObjectFill", this.getobjectfill_func);
+    this.ccm.register_function("Ge", "SetObjectFill", this.setobjectfill_func);
+    this.ccm.register_function("Ge", "GetObjectBorder", this.getobjectborder_func);
+    this.ccm.register_function("Ge", "SetObjectBorder", this.setobjectborder_func);
+    this.ccm.register_function("Ge", "GetObjectGradient", this.getobjectgradient_func);
+    this.ccm.register_function("Ge", "SetObjectGradient", this.setobjectgradient_func);
+    this.ccm.register_function("Ge", "GetObjectTransparency", this.getobjecttransparency_func);
+    this.ccm.register_function("Ge", "SetObjectTransparency", this.setobjecttransparency_func);
+    this.ccm.register_function("Ge", "GetObjectFillColor", this.getobjectfillcolor_func);
+    this.ccm.register_function("Ge", "SetObjectFillColor", this.setobjectfillcolor_func);
+    this.ccm.register_function("Ge", "GetObjectBorderColor", this.getobjectbordercolor_func);
+    this.ccm.register_function("Ge", "SetObjectBorderColor", this.setobjectbordercolor_func);
+    this.ccm.register_function("Ge", "GetObjectTextColor", this.getobjecttextcolor_func);
+    this.ccm.register_function("Ge", "SetObjectTextColor", this.setobjecttextcolor_func);
+    this.ccm.register_function("Ge", "SetObjectBackgroundColor", this.setobjectbackgroundcolor_func);
+    this.ccm.register_function("Ge", "SetObjectLineWidth", this.setobjectlinewidth_func);
+    this.ccm.register_function("Ge", "SetObjectLineType", this.setobjectlinetype_func);
+    this.ccm.register_function("Ge", "GetObjectShadow", this.getobjectshadow_func);
+    this.ccm.register_function("Ge", "SetObjectShadow", this.setobjectshadow_func);
+    this.ccm.register_function("Ge", "SetObjectTextSize", this.setobjecttextsize_func);
+    this.ccm.register_function("Ge", "SetObjectTextBold", this.setobjecttextbold_func);
+    this.ccm.register_function("Ge", "SetObjectTextFont", this.setobjecttextfont_func);
+    this.ccm.register_function("Ge", "SetCurrentObject", this.setcurrentobject_func);
+    this.ccm.register_function("Ge", "GetObjectName", this.getobjectname_func);
+    this.ccm.register_function("Ge", "SetObjectName", this.setobjectname_func);
+    this.ccm.register_function("Ge", "GetObjectDynType", this.getobjectdyntype_func);
+    this.ccm.register_function("Ge", "GetObjectText", this.getobjecttext_func);
+    this.ccm.register_function("Ge", "SetObjectText", this.setobjecttext_func);
+    this.ccm.register_function("Ge", "SetObjectTransform", this.setobjecttransform_func);
+    this.ccm.register_function("Ge", "FindObjectByName", this.findobjectbyname_func);
+    this.ccm.register_function("Ge", "Reload", this.reload_func);
+    this.ccm.register_function("Ge", "RotateSelected", this.rotateselected_func);
+    this.ccm.register_function("Ge", "SetSelectTextSize", this.setselecttextsize_func);
+    this.ccm.register_function("Ge", "SetSelectTextFont", this.setselecttextfont_func);
+    this.ccm.register_function("Ge", "SetSelectTextBold", this.setselecttextbold_func);
+    this.ccm.register_function("Ge", "SetObjectAttribute", this.setobjectattribute_func);
+    this.ccm.register_function("Ge", "GetGraphAttribute", this.getgraphattribute_func);
+    this.ccm.register_function("Ge", "SetGraphAttribute", this.setgraphattribute_func);
+    this.ccm.register_function("Ge", "GetObjectAttribute", this.getobjectattribute_func);
+    this.ccm.register_function("Ge", "GetRgbColor", this.getrgbcolor_func);
+    this.ccm.register_function("Ge", "SetRgbColor", this.setrgbcolor_func);
+    this.ccm.register_function("Ge", "MeasureObject", this.measureobject_func);
+    this.ccm.register_function("Ge", "DeleteObject", this.deleteobject_func);
+    this.ccm.register_function("Ge", "SetObjectClass", this.setobjectclass_func);
+    this.ccm.register_function("Ge", "ScaleObject", this.scaleobject_func);
+    this.ccm.register_function("Ge", "MoveObject", this.moveobject_func);
+    this.ccm.register_function("Ge", "MoveAbsObject", this.moveabsobject_func);
+    this.ccm.register_function("Ge", "GetGraphName", this.getgraphname_func);
+    this.ccm.register_function("Ge", "SetGraphName", this.setgraphname_func);
+    this.ccm.register_function("Ge", "SetBackgroundColor", this.setbackgroundcolor_func);
+    this.ccm.register_function("Ge", "SetColorTheme", this.setcolortheme_func);
+    this.ccm.register_function("Ge", "OpenGraph", this.opengraph_func);
+    this.ccm.register_function("Ge", "SaveGraph", this.savegraph_func);
+    this.ccm.register_function("Ge", "BuildGraph", this.buildgraph_func);
+    this.ccm.register_function("Ge", "ClearAll", this.clearall_func);
+    this.ccm.register_function("Ge", "CreateRectangle", this.createrectangle_func);
+    this.ccm.register_function("Ge", "CreateRectRounded", this.createrectrounded_func);
+    this.ccm.register_function("Ge", "CreateArc", this.createarc_func);
+    this.ccm.register_function("Ge", "CreateLine", this.createline_func);
+    this.ccm.register_function("Ge", "CreatePolyLine", this.createpolyline_func);
+    this.ccm.register_function("Ge", "PolyLineAdd", this.polylineadd_func);
+    this.ccm.register_function("Ge", "CreateText", this.createtext_func);
+    this.ccm.register_function("Ge", "CreateAnnot", this.createannot_func);
+    this.ccm.register_function("Ge", "CreateImage", this.createimage_func);
+    this.ccm.register_function("Ge", "CreateObject", this.createobject_func);
+    this.ccm.register_function("Ge", "CreateBar", this.createbar_func);
+    this.ccm.register_function("Ge", "CreateBarArc", this.createbararc_func);
+    this.ccm.register_function("Ge", "CreateAxis", this.createaxis_func);
+    this.ccm.register_function("Ge", "CreateAxisArc", this.createaxisarc_func);
+    this.ccm.register_function("Ge", "CreatePie", this.createpie_func);
+    this.ccm.register_function("Ge", "CreateTrend", this.createtrend_func);
+    this.ccm.register_function("Ge", "CreateDsTrend", this.createdstrend_func);
+    this.ccm.register_function("Ge", "CreateDsTrendCurve", this.createdstrendcurve_func);
+    this.ccm.register_function("Ge", "CreateFastCurve", this.createfastcurve_func);
+    this.ccm.register_function("Ge", "CreateXYCurve", this.createxycurve_func);
+    this.ccm.register_function("Ge", "CreateSevHist", this.createsevhist_func);
+    this.ccm.register_function("Ge", "CreateWindow", this.createwindow_func);
+    this.ccm.register_function("Ge", "CreateToolbar", this.createtoolbar_func);
+    this.ccm.register_function("Ge", "GetInstanceObject", this.getinstanceobject_func);
+  
+    sts = this.ccm.create_external_var(
+      "eObjectType_Rect", CcmC.K_DECL_INT, 0, Glow.eObjectType_GrowRect, 0);
+    sts = this.ccm.create_external_var(
+      "eObjectType_Line", CcmC.K_DECL_INT, 0, Glow.eObjectType_GrowLine, 0);
+    sts = this.ccm.create_external_var(
+      "eObjectType_Arc", CcmC.K_DECL_INT, 0, Glow.eObjectType_GrowArc, 0);
+    sts = this.ccm.create_external_var("eObjectType_ConPoint", CcmC.K_DECL_INT, 0,
+       Glow.eObjectType_GrowConPoint, 0);
+    sts = this.ccm.create_external_var(
+      "eObjectType_Annot", CcmC.K_DECL_INT, 0, Glow.eObjectType_GrowSubAnnot, 0);
+    sts = this.ccm.create_external_var("eObjectType_PolyLine", CcmC.K_DECL_INT, 0,
+      Glow.eObjectType_GrowPolyLine, 0);
+    sts = this.ccm.create_external_var(
+      "eObjectType_SubGraph", CcmC.K_DECL_INT, 0, Glow.eObjectType_GrowNode, 0);
+    sts = this.ccm.create_external_var(
+      "eObjectType_Text", CcmC.K_DECL_INT, 0, Glow.eObjectType_GrowText, 0);
+    sts = this.ccm.create_external_var(
+      "eObjectType_Bar", CcmC.K_DECL_INT, 0, Glow.eObjectType_GrowBar, 0);
+    sts = this.ccm.create_external_var(
+      "eObjectType_Trend", CcmC.K_DECL_INT, 0, Glow.eObjectType_GrowTrend, 0);
+    sts = this.ccm.create_external_var(
+      "eObjectType_Slider", CcmC.K_DECL_INT, 0, Glow.eObjectType_GrowSlider, 0);
+    sts = this.ccm.create_external_var(
+      "eObjectType_Image", CcmC.K_DECL_INT, 0, Glow.eObjectType_GrowImage, 0);
+    sts = this.ccm.create_external_var(
+      "eObjectType_Group", CcmC.K_DECL_INT, 0, Glow.eObjectType_GrowGroup, 0);
+    sts = this.ccm.create_external_var(
+      "eObjectType_Axis", CcmC.K_DECL_INT, 0, Glow.eObjectType_GrowAxis, 0);
+    sts = this.ccm.create_external_var("eObjectType_RectRounded", CcmC.K_DECL_INT, 0,
+      Glow.eObjectType_GrowRectRounded, 0);
+    sts = this.ccm.create_external_var("eObjectType_ConGlue", CcmC.K_DECL_INT, 0,
+      Glow.eObjectType_GrowConGlue, 0);
+    sts = this.ccm.create_external_var(
+      "eObjectType_Menu", CcmC.K_DECL_INT, 0, Glow.eObjectType_GrowMenu, 0);
+    sts = this.ccm.create_external_var(
+      "eObjectType_Window", CcmC.K_DECL_INT, 0, Glow.eObjectType_GrowWindow, 0);
+    sts = this.ccm.create_external_var(
+      "eObjectType_Table", CcmC.K_DECL_INT, 0, Glow.eObjectType_GrowTable, 0);
+    sts = this.ccm.create_external_var(
+      "eObjectType_Folder", CcmC.K_DECL_INT, 0, Glow.eObjectType_GrowFolder, 0);
+    sts = this.ccm.create_external_var("eObjectType_XYCurve", CcmC.K_DECL_INT, 0,
+      Glow.eObjectType_GrowXYCurve, 0);
+    sts = this.ccm.create_external_var("eObjectType_AxisArc", CcmC.K_DECL_INT, 0,
+      Glow.eObjectType_GrowAxisArc, 0);
+    sts = this.ccm.create_external_var(
+      "eObjectType_Pie", CcmC.K_DECL_INT, 0, Glow.eObjectType_GrowPie, 0);
+    sts = this.ccm.create_external_var("eObjectType_BarChart", CcmC.K_DECL_INT, 0,
+      Glow.eObjectType_GrowBarChart, 0);
+    sts = this.ccm.create_external_var("eObjectType_Toolbar", CcmC.K_DECL_INT, 0,
+      Glow.eObjectType_GrowToolbar, 0);
+
+    sts = this.ccm.create_external_var(
+      "mDynType1_No", CcmC.K_DECL_INT, 0, DynC.mDynType1_No, 0);
+    sts = this.ccm.create_external_var(
+      "mDynType1_Inherit", CcmC.K_DECL_INT, 0, DynC.mDynType1_Inherit, 0);
+    sts = this.ccm.create_external_var(
+      "mDynType1_Tone", CcmC.K_DECL_INT, 0, DynC.mDynType1_Tone, 0);
+    sts = this.ccm.create_external_var(
+      "mDynType1_DigLowColor", CcmC.K_DECL_INT, 0, DynC.mDynType1_DigLowColor, 0);
+    sts = this.ccm.create_external_var(
+      "mDynType1_DigColor", CcmC.K_DECL_INT, 0, DynC.mDynType1_DigColor, 0);
+    sts = this.ccm.create_external_var(
+      "mDynType1_DigError", CcmC.K_DECL_INT, 0, DynC.mDynType1_DigError, 0);
+    sts = this.ccm.create_external_var(
+      "mDynType1_DigWarning", CcmC.K_DECL_INT, 0, DynC.mDynType1_DigWarning, 0);
+    sts = this.ccm.create_external_var(
+      "mDynType1_DigFlash", CcmC.K_DECL_INT, 0, DynC.mDynType1_DigFlash, 0);
+    sts = this.ccm.create_external_var(
+      "mDynType1_Invisible", CcmC.K_DECL_INT, 0, DynC.mDynType1_Invisible, 0);
+    sts = this.ccm.create_external_var(
+      "mDynType1_DigBorder", CcmC.K_DECL_INT, 0, DynC.mDynType1_DigBorder, 0);
+    sts = this.ccm.create_external_var(
+      "mDynType1_DigText", CcmC.K_DECL_INT, 0, DynC.mDynType1_DigText, 0);
+    sts = this.ccm.create_external_var(
+      "mDynType1_Value", CcmC.K_DECL_INT, 0, DynC.mDynType1_Value, 0);
+    sts = this.ccm.create_external_var(
+      "mDynType1_AnalogColor", CcmC.K_DECL_INT, 0, DynC.mDynType1_AnalogColor, 0);
+    sts = this.ccm.create_external_var(
+      "mDynType1_Rotate", CcmC.K_DECL_INT, 0, DynC.mDynType1_Rotate, 0);
+    sts = this.ccm.create_external_var(
+      "mDynType1_Move", CcmC.K_DECL_INT, 0, DynC.mDynType1_Move, 0);
+    sts = this.ccm.create_external_var(
+      "mDynType1_AnalogShift", CcmC.K_DECL_INT, 0, DynC.mDynType1_AnalogShift, 0);
+    sts = this.ccm.create_external_var(
+      "mDynType1_DigShift", CcmC.K_DECL_INT, 0, DynC.mDynType1_DigShift, 0);
+    sts = this.ccm.create_external_var(
+      "mDynType1_Animation", CcmC.K_DECL_INT, 0, DynC.mDynType1_Animation, 0);
+    sts = this.ccm.create_external_var(
+      "mDynType1_Bar", CcmC.K_DECL_INT, 0, DynC.mDynType1_Bar, 0);
+    sts = this.ccm.create_external_var(
+      "mDynType1_Trend", CcmC.K_DECL_INT, 0, DynC.mDynType1_Trend, 0);
+    sts = this.ccm.create_external_var("mDynType1_SliderBackground", CcmC.K_DECL_INT, 0,
+      DynC.mDynType1_SliderBackground, 0);
+    sts = this.ccm.create_external_var(
+      "mDynType1_Video", CcmC.K_DECL_INT, 0, DynC.mDynType1_Video, 0);
+    sts = this.ccm.create_external_var(
+      "mDynType1_FillLevel", CcmC.K_DECL_INT, 0, DynC.mDynType1_FillLevel, 0);
+    sts = this.ccm.create_external_var(
+      "mDynType1_FastCurve", CcmC.K_DECL_INT, 0, DynC.mDynType1_FastCurve, 0);
+    sts = this.ccm.create_external_var(
+      "mDynType1_AnalogText", CcmC.K_DECL_INT, 0, DynC.mDynType1_AnalogText, 0);
+    sts = this.ccm.create_external_var(
+      "mDynType1_Table", CcmC.K_DECL_INT, 0, DynC.mDynType1_Table, 0);
+    sts = this.ccm.create_external_var(
+      "mDynType1_StatusColor", CcmC.K_DECL_INT, 0, DynC.mDynType1_StatusColor, 0);
+    sts = this.ccm.create_external_var(
+      "mDynType1_HostObject", CcmC.K_DECL_INT, 0, DynC.mDynType1_HostObject, 0);
+    sts = this.ccm.create_external_var(
+      "mDynType1_DigSound", CcmC.K_DECL_INT, 0, DynC.mDynType1_DigSound, 0);
+    sts = this.ccm.create_external_var(
+      "mDynType1_XY_Curve", CcmC.K_DECL_INT, 0, DynC.mDynType1_XY_Curve, 0);
+    sts = this.ccm.create_external_var(
+      "mDynType1_DigCommand", CcmC.K_DECL_INT, 0, DynC.mDynType1_DigCommand, 0);
+    sts = this.ccm.create_external_var(
+      "mDynType1_Pie", CcmC.K_DECL_INT, 0, DynC.mDynType1_Pie, 0);
+    sts = this.ccm.create_external_var(
+      "mDynType1_BarChart", CcmC.K_DECL_INT, 0, DynC.mDynType1_BarChart, 0);
+
+    sts = this.ccm.create_external_var(
+      "mDynType2_No", CcmC.K_DECL_INT, 0, DynC.mDynType2_No, 0);
+    sts = this.ccm.create_external_var(
+      "mDynType2_Axis", CcmC.K_DECL_INT, 0, DynC.mDynType2_Axis, 0);
+    sts = this.ccm.create_external_var("mDynType2_DigTextColor", CcmC.K_DECL_INT, 0,
+      DynC.mDynType2_DigTextColor, 0);
+    sts = this.ccm.create_external_var("mDynType2_TimeoutColor", CcmC.K_DECL_INT, 0,
+      DynC.mDynType2_TimeoutColor, 0);
+    sts = this.ccm.create_external_var("mDynType2_DigFourShift", CcmC.K_DECL_INT, 0,
+      DynC.mDynType2_DigFourShift, 0);
+    sts = this.ccm.create_external_var("mDynType2_ScrollingText", CcmC.K_DECL_INT, 0,
+      DynC.mDynType2_ScrollingText, 0);
+    sts = this.ccm.create_external_var("mDynType2_ColorThemeLightness", CcmC.K_DECL_INT,
+      0, DynC.mDynType2_ColorThemeLightness, 0);
+    sts = this.ccm.create_external_var("mDynType2_DigBackgroundColor", CcmC.K_DECL_INT,
+      0, DynC.mDynType2_DigBackgroundColor, 0);
+    sts = this.ccm.create_external_var("mDynType2_DigSwap", CcmC.K_DECL_INT,
+      0, DynC.mDynType2_DigSwap, 0);
+    sts = this.ccm.create_external_var("mDynType2_DigScript", CcmC.K_DECL_INT,
+      0, DynC.mDynType2_DigScript, 0);
+    sts = this.ccm.create_external_var("mDynType2_RefUpdate", CcmC.K_DECL_INT,
+      0, DynC.mDynType2_RefUpdate, 0);
+    sts = this.ccm.create_external_var("mDynType2_DigTransparency", CcmC.K_DECL_INT,
+      0, DynC.mDynType2_DigTransparency, 0);
+    sts = this.ccm.create_external_var("mDynType2_AnalogTransparency", CcmC.K_DECL_INT,
+      0, DynC.mDynType2_AnalogTransparency, 0);
+
+    sts = this.ccm.create_external_var(
+      "mActionType1_No", CcmC.K_DECL_INT, 0, DynC.mActionType1_No, 0);
+    sts = this.ccm.create_external_var(
+      "mActionType1_Inherit", CcmC.K_DECL_INT, 0, DynC.mActionType1_Inherit, 0);
+    sts = this.ccm.create_external_var("mActionType1_PopupMenu", CcmC.K_DECL_INT, 0,
+      DynC.mActionType1_PopupMenu, 0);
+    sts = this.ccm.create_external_var(
+      "mActionType1_SetDig", CcmC.K_DECL_INT, 0, DynC.mActionType1_SetDig, 0);
+    sts = this.ccm.create_external_var(
+      "mActionType1_ResetDig", CcmC.K_DECL_INT, 0, DynC.mActionType1_ResetDig, 0);
+    sts = this.ccm.create_external_var("mActionType1_ToggleDig", CcmC.K_DECL_INT, 0,
+      DynC.mActionType1_ToggleDig, 0);
+    sts = this.ccm.create_external_var(
+      "mActionType1_StoDig", CcmC.K_DECL_INT, 0, DynC.mActionType1_StoDig, 0);
+    sts = this.ccm.create_external_var(
+      "mActionType1_Command", CcmC.K_DECL_INT, 0, DynC.mActionType1_Command, 0);
+    sts = this.ccm.create_external_var("mActionType1_CommandDoubleClick",
+      CcmC.K_DECL_INT, 0, DynC.mActionType1_CommandDoubleClick, 0);
+    sts = this.ccm.create_external_var(
+      "mActionType1_Confirm", CcmC.K_DECL_INT, 0, DynC.mActionType1_Confirm, 0);
+    sts = this.ccm.create_external_var("mActionType1_IncrAnalog", CcmC.K_DECL_INT, 0,
+      DynC.mActionType1_IncrAnalog, 0);
+    sts = this.ccm.create_external_var("mActionType1_RadioButton", CcmC.K_DECL_INT, 0,
+      DynC.mActionType1_RadioButton, 0);
+    sts = this.ccm.create_external_var(
+      "mActionType1_Slider", CcmC.K_DECL_INT, 0, DynC.mActionType1_Slider, 0);
+    sts = this.ccm.create_external_var("mActionType1_ValueInput", CcmC.K_DECL_INT, 0,
+       DynC.mActionType1_ValueInput, 0);
+    sts = this.ccm.create_external_var(
+      "mActionType1_TipText", CcmC.K_DECL_INT, 0, DynC.mActionType1_TipText, 0);
+    sts = this.ccm.create_external_var(
+      "mActionType1_Help", CcmC.K_DECL_INT, 0, DynC.mActionType1_Help, 0);
+    sts = this.ccm.create_external_var("mActionType1_OpenGraph", CcmC.K_DECL_INT, 0,
+      DynC.mActionType1_OpenGraph, 0);
+    sts = this.ccm.create_external_var(
+      "mActionType1_OpenURL", CcmC.K_DECL_INT, 0, DynC.mActionType1_OpenURL, 0);
+    sts = this.ccm.create_external_var("mActionType1_InputFocus", CcmC.K_DECL_INT, 0,
+      DynC.mActionType1_InputFocus, 0);
+    sts = this.ccm.create_external_var("mActionType1_CloseGraph", CcmC.K_DECL_INT, 0,
+     DynC.mActionType1_CloseGraph, 0);
+    sts = this.ccm.create_external_var("mActionType1_PulldownMenu", CcmC.K_DECL_INT, 0,
+      DynC.mActionType1_PulldownMenu, 0);
+    sts = this.ccm.create_external_var("mActionType1_OptionMenu", CcmC.K_DECL_INT, 0,
+      DynC.mActionType1_OptionMenu, 0);
+    sts = this.ccm.create_external_var(
+      "mActionType1_SetValue", CcmC.K_DECL_INT, 0, DynC.mActionType1_SetValue, 0);
+    sts = this.ccm.create_external_var("mActionType1_MethodToolbar", CcmC.K_DECL_INT, 0,
+      DynC.mActionType1_MethodToolbar, 0);
+    sts = this.ccm.create_external_var("mActionType1_MethodPulldownMenu",
+       CcmC.K_DECL_INT, 0, DynC.mActionType1_MethodPulldownMenu, 0);
+    sts = this.ccm.create_external_var(
+      "mActionType1_Script", CcmC.K_DECL_INT, 0, DynC.mActionType1_Script, 0);
+    sts = this.ccm.create_external_var(
+      "mActionType1_CatchSignal", CcmC.K_DECL_INT, 0, DynC.mActionType1_CatchSignal, 0);
+    sts = this.ccm.create_external_var(
+      "mActionType1_EmitSignal", CcmC.K_DECL_INT, 0, DynC.mActionType1_EmitSignal, 0);
+
+    var varname;
+    for (let i = 1; i <= 300; i++) {
+      varname = "eDrawType_Color" + i.toString();
+      sts = this.ccm.create_external_var(varname, CcmC.K_DECL_INT, 0, i - 1, 0);
+    }
+    sts = this.ccm.create_external_var(
+      "eDrawType_LineErase", CcmC.K_DECL_INT, 0, 300, 0);
+    for (let i = 1; i <= 90; i++) {
+      varname = "eDrawType_CustomColor" + i.toString();
+      sts = this.ccm.create_external_var(
+          varname, CcmC.K_DECL_INT, 0, 310 + 4 * (i - 1), 0);
+    }
+
+    sts = this.ccm.create_external_var("mAccess_RtRead", CcmC.K_DECL_INT, 0,
+      Pwr.mAccess_RtRead, 0);
+    sts = this.ccm.create_external_var("mAccess_RtWrite", CcmC.K_DECL_INT, 0,
+      Pwr.mAccess_RtWrite, 0);
+    sts = this.ccm.create_external_var("mAccess_System", CcmC.K_DECL_INT, 0,
+      Pwr.mAccess_System, 0);
+    sts = this.ccm.create_external_var("mAccess_Maintenance", CcmC.K_DECL_INT, 0,
+      Pwr.mAccess_Maintenance, 0);
+    sts = this.ccm.create_external_var("mAccess_Process", CcmC.K_DECL_INT, 0,
+      Pwr.mAccess_Process, 0);
+    sts = this.ccm.create_external_var("mAccess_Instrument", CcmC.K_DECL_INT, 0,
+      Pwr.mAccess_Instrument, 0);
+    sts = this.ccm.create_external_var("mAccess_Operator1", CcmC.K_DECL_INT, 0,
+      Pwr.mAccess_Operator1, 0);
+    sts = this.ccm.create_external_var("mAccess_Operator2", CcmC.K_DECL_INT, 0,
+      Pwr.mAccess_Operator2, 0);
+    sts = this.ccm.create_external_var("mAccess_Operator3", CcmC.K_DECL_INT, 0,
+      Pwr.mAccess_Operator3, 0);
+    sts = this.ccm.create_external_var("mAccess_Operator4", CcmC.K_DECL_INT, 0,
+      Pwr.mAccess_Operator4, 0);
+    sts = this.ccm.create_external_var("mAccess_Operator5", CcmC.K_DECL_INT, 0,
+      Pwr.mAccess_Operator5, 0);
+    sts = this.ccm.create_external_var("mAccess_Operator6", CcmC.K_DECL_INT, 0,
+      Pwr.mAccess_Operator6, 0);
+    sts = this.ccm.create_external_var("mAccess_Operator7", CcmC.K_DECL_INT, 0,
+      Pwr.mAccess_Operator7, 0);
+    sts = this.ccm.create_external_var("mAccess_Operator8", CcmC.K_DECL_INT, 0,
+      Pwr.mAccess_Operator8, 0);
+    sts = this.ccm.create_external_var("mAccess_Operator9", CcmC.K_DECL_INT, 0,
+      Pwr.mAccess_Operator9, 0);
+    sts = this.ccm.create_external_var("mAccess_Operator10", CcmC.K_DECL_INT, 0,
+      Pwr.mAccess_Operator10, 0);
+    sts = this.ccm.create_external_var("mAccess_RtEventsAck", CcmC.K_DECL_INT, 0,
+      Pwr.mAccess_RtEventsAck, 0);
+    sts = this.ccm.create_external_var("mAccess_RtPlc", CcmC.K_DECL_INT, 0,
+      Pwr.mAccess_RtPlc, 0);
+    sts = this.ccm.create_external_var("mAccess_RtNavigator", CcmC.K_DECL_INT, 0,
+      Pwr.mAccess_RtNavigator, 0);
+    sts = this.ccm.create_external_var("mAccess_DevRead", CcmC.K_DECL_INT, 0,
+      Pwr.mAccess_DevRead, 0);
+    sts = this.ccm.create_external_var("mAccess_DevPlc", CcmC.K_DECL_INT, 0,
+      Pwr.mAccess_DevPlc, 0);
+    sts = this.ccm.create_external_var("mAccess_DevConfig", CcmC.K_DECL_INT, 0,
+      Pwr.mAccess_DevConfig, 0);
+    sts = this.ccm.create_external_var("mAccess_DevClass", CcmC.K_DECL_INT, 0,
+      Pwr.mAccess_DevClass, 0);
+    sts = this.ccm.create_external_var("mAccess_RtEventsBlock", CcmC.K_DECL_INT, 0,
+      Pwr.mAccess_RtEventsBlock, 0);
+    sts = this.ccm.create_external_var("mAccess_Administrator", CcmC.K_DECL_INT, 0,
+      Pwr.mAccess_Administrator, 0);
+    sts = this.ccm.create_external_var("mAccess_SevRead", CcmC.K_DECL_INT, 0,
+      Pwr.mAccess_SevRead, 0);
+    sts = this.ccm.create_external_var("mAccess_SevAdmin", CcmC.K_DECL_INT, 0,
+      Pwr.mAccess_SevAdmin, 0);
+    sts = this.ccm.create_external_var("mAccess_AllRt", CcmC.K_DECL_INT, 0,
+      Pwr.mAccess_AllRt, 0);
+    sts = this.ccm.create_external_var("mAccess_RtDefault", CcmC.K_DECL_INT, 0,
+      Pwr.mAccess_RtDefault, 0);
+    sts = this.ccm.create_external_var("mAccess_AllOperators", CcmC.K_DECL_INT, 0,
+      Pwr.mAccess_AllOperators, 0);
+    sts = this.ccm.create_external_var("mAccess_AllSev", CcmC.K_DECL_INT, 0,
+      Pwr.mAccess_AllSev, 0);
+    sts = this.ccm.create_external_var("mAccess_AllPwr", CcmC.K_DECL_INT, 0,
+      Pwr.mAccess_AllPwr, 0);
+    sts = this.ccm.create_external_var("mAccess_Default", CcmC.K_DECL_INT, 0,
+      Pwr.mAccess_Default, 0);
+
+    sts = this.ccm.create_external_var("eFont_Helvetica", CcmC.K_DECL_INT, 0,
+      Glow.eFont_Helvetica, 0);
+    sts = this.ccm.create_external_var("eFont_Times", CcmC.K_DECL_INT, 0,
+      Glow.eFont_Times, 0);
+    sts = this.ccm.create_external_var("eFont_NewCenturySchoolbook", CcmC.K_DECL_INT, 0,
+      Glow.eFont_NewCenturySchoolbook, 0);
+    sts = this.ccm.create_external_var("eFont_Courier", CcmC.K_DECL_INT, 0,
+      Glow.eFont_Courier, 0);
+    sts = this.ccm.create_external_var("eFont_LucidaSans", CcmC.K_DECL_INT, 0,
+      Glow.eFont_LucidaSans, 0);
+
+    sts = this.ccm.create_external_var("eDirection_Center", CcmC.K_DECL_INT, 0,
+      Glow.eDirection_Center, 0);
+    sts = this.ccm.create_external_var("eDirection_Right", CcmC.K_DECL_INT, 0,
+      Glow.eDirection_Right, 0);
+    sts = this.ccm.create_external_var("eDirection_Left", CcmC.K_DECL_INT, 0,
+      Glow.eDirection_Left, 0);
+    sts = this.ccm.create_external_var("eDirection_Up", CcmC.K_DECL_INT, 0,
+      Glow.eDirection_Up, 0);
+    sts = this.ccm.create_external_var("eDirection_Down", CcmC.K_DECL_INT, 0,
+      Glow.eDirection_Down, 0);
+
+
+  };
+
+  //}

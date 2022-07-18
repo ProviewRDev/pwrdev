@@ -4836,6 +4836,21 @@ void grow_GetObjectText(grow_tObject object, char* text, int size)
   ((GrowText*)object)->get_text(text, size);
 }
 
+void grow_SetObjectTextSize(grow_tObject object, int size)
+{
+  ((GlowArrayElem*)object)->set_textsize(size);
+}
+
+void grow_SetObjectTextBold(grow_tObject object, int bold)
+{
+  ((GlowArrayElem*)object)->set_textbold(bold);
+}
+
+void grow_SetObjectTextFont(grow_tObject object, glow_eFont font)
+{
+  ((GlowArrayElem*)object)->set_textfont(font);
+}
+
 void grow_SetSelectTextSize(grow_tCtx ctx, int size)
 {
   ctx->set_select_textsize(size);
@@ -4923,6 +4938,12 @@ void grow_ObjectToCtx(grow_tObject object, grow_tCtx* ctx)
   ((GlowArrayElem*)object)->get_ctx((void**)ctx);
 }
 
+void grow_InitTransform(grow_tObject object, double a11, double a12, double a13, double a21,
+		       double a22, double a23, double rotation)
+{
+  ((GlowArrayElem*)object)->init_transform(a11, a12, a13, a21, a22, a23, rotation);
+}
+
 void grow_StoreTransform(grow_tObject object)
 {
   ((GlowArrayElem*)object)->store_transform();
@@ -4931,6 +4952,11 @@ void grow_StoreTransform(grow_tObject object)
 void grow_RevertTransform(grow_tObject object)
 {
   ((GlowArrayElem*)object)->revert_transform();
+}
+
+void grow_TransformStoreReset(grow_tObject object)
+{
+  ((GlowArrayElem*)object)->transform_store_reset();  
 }
 
 int grow_TransformIsStored(grow_tObject object)
@@ -5863,6 +5889,12 @@ int grow_IsVisible(grow_tCtx ctx, grow_tObject object, glow_eVisible type)
 int grow_ExportFlow(grow_tCtx ctx, char* filename)
 {
   return ctx->export_flow(filename);
+}
+
+int grow_ExportScript(grow_tCtx ctx, char* filename, 
+		      int (*userdata_cb)(void*, grow_tObject, std::ofstream&, char*))
+{
+  return ctx->export_script(filename, userdata_cb);
 }
 
 void grow_ObjectSave(

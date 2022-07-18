@@ -44,6 +44,7 @@
 
 #include "glow_growpolyline.h"
 #include "glow_grownode.h"
+#include "glow_exportscript.h"
 
 GrowPolyLine::GrowPolyLine(GrowCtx* glow_ctx, const char* name,
     glow_sPoint* pointarray, int point_cnt, glow_eDrawType border_d_type,
@@ -1589,4 +1590,9 @@ void GrowPolyLine::convert(glow_eConvert version)
     break;
   }
   }
+}
+
+int GrowPolyLine::export_script(GlowExportScript* es)
+{
+  return es->polyline(this);
 }

@@ -40,6 +40,7 @@
 #include "glow_arc.h"
 
 class GlowExportFlow;
+class GlowExportScript;
 
 /*! \file glow_growarc.h
     \brief Contains the GrowArc class. */
@@ -493,6 +494,9 @@ public:
   //! Redraw the area inside the objects border.
   void draw();
 
+  void init_transform(double a11, double a12, double a13, double a21, 
+      double a22, double a23, double rotation);
+
   //! Add a transform to the current transform.
   /*!
     \param t		Transform.
@@ -644,6 +648,7 @@ public:
   void convert(glow_eConvert version);
 
   void export_flow(GlowExportFlow* ef);
+  int export_script(GlowExportScript* es);
 
   int get_fill()
   {

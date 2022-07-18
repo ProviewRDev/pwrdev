@@ -224,7 +224,8 @@ function Gdh() {
 	  }
 	  case Msg.GET_OBJECT_INFO_INT: {
 	    if ( this.gdh.debug) console.log("GetObjectInfoInt received");
-	    var value = dv.getUint32(9);
+	    //var value = dv.getUint32(9);
+	    var value = dv.getInt32(9);
 	    var pending_data = this.gdh.pending[id];
 	    pending_data.func_cb( id, pending_data.data, sts, value);
 	    delete this.gdh.pending[id];

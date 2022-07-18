@@ -41,6 +41,7 @@
 #include "glow_text.h"
 
 class GlowExportFlow;
+class GlowExportScript;
 
 /*! \file glow_growtext.h
     \brief Contains the GrowText class. */
@@ -457,6 +458,7 @@ public:
     original_color_drawtype = drawtype;
     reset_text_color();
   }
+
   //! Draw the object.
   /*!
     \param t		Transform of parent node. Can be zero.
@@ -506,6 +508,9 @@ public:
   {
     trf.store();
   }
+
+  void init_transform(double a11, double a12, double a13, double a21, 
+      double a22, double a23, double rotation);
 
   //! Export the object as a java shape.
   /*!
@@ -571,6 +576,7 @@ public:
   void convert(glow_eConvert version);
 
   void export_flow(GlowExportFlow* ef);
+  int export_script(GlowExportScript* es);
 
   glow_eDrawType get_text_color()
   {

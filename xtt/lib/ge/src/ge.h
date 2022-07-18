@@ -244,6 +244,7 @@ public:
   void activate_export_java_as();
   void activate_export_plcfo();
   void activate_export_plcfo_as();
+  void activate_export_script();
   void activate_creanextpage();
   void activate_nextpage();
   void activate_prevpage();
@@ -336,6 +337,7 @@ public:
   static void export_javabean(Ge* gectx, char* name);
   static void export_gejava(Ge* gectx, char* name);
   static void export_plcfo(Ge* gectx, char* filename);
+  static void export_script(Ge* gectx, char* filename);
   static void rotate(Ge* gectx, char* value_str);
   static int subpalette_get_select(void* gectx, char* text, char* filename);
   static void colorpalette_get_current(void* gectx, glow_eDrawType* fill_color,

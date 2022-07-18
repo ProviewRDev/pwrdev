@@ -45,6 +45,7 @@
 #include "glow_growaxis.h"
 #include "glow_grownode.h"
 #include "glow_draw.h"
+#include "glow_exportscript.h"
 
 #if defined OS_OPENBSD
 #define nearbyint rint
@@ -1010,4 +1011,9 @@ void GrowAxis::set_visibility(glow_eVis visibility)
     break;
   }
   draw();
+}
+
+int GrowAxis::export_script(GlowExportScript* es)
+{
+  return es->axis(this);
 }

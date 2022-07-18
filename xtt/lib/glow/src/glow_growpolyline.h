@@ -39,6 +39,8 @@
 
 #include "glow_polyline.h"
 
+class GlowExportScript;
+
 /*! \file glow_growpolyline.h
     \brief Contains the GrowPolyLine class. */
 /*! \addtogroup Glow */
@@ -730,6 +732,9 @@ public:
   {
     return fill_drawtype;
   }
+
+  int export_script(GlowExportScript* es);
+
   glow_eDrawType get_border_color()
   {
     return draw_type;

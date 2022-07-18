@@ -45,6 +45,7 @@
 #include "glow_grownode.h"
 #include "glow_draw.h"
 #include "glow_growscrollbar.h"
+#include "glow_exportscript.h"
 #include "glow_msg.h"
 
 GrowWindow::GrowWindow(GrowCtx* glow_ctx, const char* name, double x, double y,
@@ -1115,3 +1116,9 @@ int GrowWindow::set_source(char* source, char* new_owner)
 
   return sts;
 }
+
+int GrowWindow::export_script(GlowExportScript* es)
+{
+  return es->window(this);
+}
+

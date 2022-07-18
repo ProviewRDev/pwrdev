@@ -190,6 +190,7 @@ public:
   static void activate_export_java_as(GtkWidget* w, gpointer gectx);
   static void activate_export_plcfo(GtkWidget* w, gpointer gectx);
   static void activate_export_plcfo_as(GtkWidget* w, gpointer gectx);
+  static void activate_export_script(GtkWidget* w, gpointer gectx);
   static void activate_colortheme_select(GtkWidget* w, gpointer gectx);
   static void activate_colortheme_next(GtkWidget* w, gpointer gectx);
   static void activate_customcolors_read(GtkWidget* w, gpointer gectx);

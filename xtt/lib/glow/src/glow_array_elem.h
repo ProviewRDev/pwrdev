@@ -47,6 +47,7 @@
 
 class GlowWind;
 class GlowExportFlow;
+class GlowExportScript;
 
 //! Base class for all drawing objects and components.
 /*! A GlowArrayElem object can be inserted in a GlowArray std::vector, which
@@ -242,6 +243,9 @@ public:
   virtual void incr_color_shift(int shift){}
   virtual void set_original_color_shift(int shift){}
   virtual void reset_color_shift(){}
+  virtual void set_textsize(int size){}
+  virtual void set_textbold(int bold){}
+  virtual void set_textfont(glow_eFont font){}
   virtual void set_visibility(glow_eVis visibiliby){}
   virtual glow_eVis get_visibility()
   {
@@ -249,8 +253,11 @@ public:
   }
   virtual void set_transform(GlowTransform* t){}
   virtual void set_transform_from_stored(GlowTransform* t){}
+  virtual void init_transform(double a11, double a12, double a13, double a21, 
+      double a22, double a23, double rotation) {}
   virtual void store_transform(){}
   virtual void revert_transform(){}
+  virtual void transform_store_reset(){}
   virtual bool transform_is_stored()
   {
     return false;
@@ -295,6 +302,10 @@ public:
     return 0;
   }
   virtual void export_flow(GlowExportFlow* ef){}
+  virtual int export_script(GlowExportScript* es)
+  {
+    return 0;
+  }
   virtual int get_fill()
   {
     return 0;

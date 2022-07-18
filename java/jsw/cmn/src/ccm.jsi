@@ -1,0 +1,6354 @@
+/** Ccm start **/
+// fs = require('fs');
+
+var CcmC = {
+  FLT_EPSILON : Number(5.0e-6),
+
+  CCM_DECL_STRING : 1,
+  CCM_DECL_INT : 2,
+  CCM_DECL_FLOAT : 3,
+  CCM_DECL_UNKNOWN : 4,
+
+  K_STRING_SIZE : 400,
+  K_LINE_SIZE : 400,
+
+  NO_ELEM : -1,
+  FUNCLEVEL_MAX : 20,
+  SYSFUNC_MAX : 200,
+
+  K_ACTION_NO : 0,
+  K_ACTION_DOWN : 1,
+  K_ACTION_UP : 2,
+  K_ACTION_MUL : 3,
+  K_ACTION_DIV : 4,
+  K_ACTION_ADD : 5,
+  K_ACTION_SUB : 6,
+  K_ACTION_EQL : 7,
+  K_ACTION_LT : 8,
+  K_ACTION_GT : 9,
+  K_ACTION_GE : 10,
+  K_ACTION_LE : 11,
+  K_ACTION_EQ : 12,
+  K_ACTION_NE : 13,
+  K_ACTION_INV : 14,
+  K_ACTION_INCR : 15,
+  K_ACTION_DECR : 16,
+  K_ACTION_AND : 17,
+  K_ACTION_OR : 18,
+  K_ACTION_BITAND : 19,
+  K_ACTION_BITOR : 20,
+  K_ACTION_VAR : 21,
+  K_ACTION_NUM : 22,
+  K_ACTION_FLOAT : 23,
+  K_ACTION_END : 24,
+  K_ACTION_EQLADD : 25,
+  K_ACTION_EQLSUB : 26,
+  K_ACTION_DELIM : 27,
+  K_ACTION_EQLMUL : 28,
+  K_ACTION_EQLDIV : 29,
+  K_ACTION_CREALOCINT : 30,
+  K_ACTION_CREALOCFLOAT : 31,
+  K_ACTION_CREALOCSTRING : 32,
+  K_ACTION_CREAGBLINT : 33,
+  K_ACTION_CREAGBLFLOAT : 34,
+  K_ACTION_CREAGBLSTRING : 35,
+  K_ACTION_CREAEXTINT : 36,
+  K_ACTION_CREAEXTFLOAT : 37,
+  K_ACTION_CREAEXTSTRING : 38,
+  K_ACTION_STRING : 39,
+  K_ACTION_LSHIFT : 40,
+  K_ACTION_RSHIFT : 41,
+  K_ACTION_LIST : 42,
+  K_ACTION_FUNCTION : 43,
+  K_ACTION_RETURN : 44,
+  K_ACTION_BACKSLASH : 45,
+  K_ACTION_DELETE : 46,
+  K_ACTION_DELETEGBL : 47,
+
+  K_OPERAND_NO : 0,
+  K_OPERAND_NAME : 1,
+  K_OPERAND_VALUE : 2,
+  K_OPERAND_DECL : 3,
+  K_OPERAND_GLOBAL : 4,
+  K_OPERAND_EXTERN : 5,
+  K_OPERAND_FUNCTION : 6,
+  K_OPERAND_RETURN : 7,
+  K_OPERAND_DELETE : 8,
+  K_OPERAND_DELETEGBL : 9,
+
+  K_LOCTYPE_AFTER : 2,
+
+  K_TYPE_OPERATOR : 0,
+  K_TYPE_OPERAND : 1,
+
+  K_DECL_STRING : 1,
+  K_DECL_INT : 2,
+  K_DECL_FLOAT : 3,
+  K_DECL_UNKNOWN : 4,
+
+  K_STATE_VAR : 1,
+  K_STATE_NUM : 2,
+  K_STATE_STRING : 3,
+  K_STATE_OPERATOR : 4,
+  K_STATE_DELIM : 5,
+  K_STATE_PAR : 6,
+  K_STATE_END : 7,
+  K_STATE_ERROR : 8,
+  K_STATE_LIST : 9,
+  K_STATE_NUM_NEG : 10,
+
+  K_LINE_STATMENT : 0,
+  K_LINE_FUNCTION : 1,
+  K_LINE_ENDFUNCTION : 2,
+  K_LINE_MAIN : 3,
+  K_LINE_ENDMAIN : 4,
+  K_LINE_IF : 5,
+  K_LINE_ELSE : 6,
+  K_LINE_ENDIF : 7,
+  K_LINE_FOR : 8,
+  K_LINE_ENDFOR : 9,
+  K_LINE_WHILE : 10,
+  K_LINE_ENDWHILE : 11,
+  K_LINE_BREAK : 12,
+  K_LINE_CONTINUE : 13,
+  K_LINE_LABEL : 14,
+  K_LINE_GOTO : 15,
+};
+
+var CCM_ = {
+  SUCCESS                  : 141000713,
+  EXITFUNC                 : 141000723,
+  EXPRESSION               : 141000730,
+  VARTYPE                  : 141000738,
+  VARALREXIST              : 141000746,
+  VARNOTFOUND              : 141000754,
+  OPENFILE                 : 141000762,
+  SYNTAX                   : 141000770,
+  FUNCNOTFOUND             : 141000778,
+  UNKNVARTYPE              : 141000786,
+  FUNCMISM                 : 141000794,
+  MAINMISM                 : 141000802,
+  IFMISM                   : 141000810,
+  WHILEMISM                : 141000818,
+  FORMISM                  : 141000826,
+  ARGMISM                  : 141000834,
+  CONTMISM                 : 141000842,
+  BREAKMISM                : 141000850,
+  NOEXTVAR                 : 141000858,
+  GOTOMISM                 : 141000866,
+  SYSFUNCEXCEED            : 141000874,
+  EXTERNFUNC               : 141000883,
+  LONGLINE                 : 141000890,
+  STRINGEXCEED             : 141000898,
+  ARGEXCEED                : 141000906,
+  ARRAYBOUNDS              : 141000914,
+  ALREADYREG               : 141000923,
+  NOACCESS                 : 141000930,
+  NOELEM                   : 141000939,
+  NOELEMERROR              : 141000946,
+  MISPLACED                : 141000954,
+  INVARG                   : 141000962,
+  NYI                      : 141000970,
+};
+
+const testmode = 0;
+  
+
+function EVEN(sts) {
+  return sts % 2 == 0;
+}
+function ODD(sts) {
+  return sts % 2 == 1;
+}
+
+function ccm_sArg() {
+  this.value_name;
+  this.value_decl;
+  this.value_int;
+  this.value_float;
+  this.value_string;
+  this.value_type;
+  this.var_decl;
+  this.var_name;
+  this.value_returned;
+  this.next;
+}
+
+function ccm_sLine() {
+  this.line;
+  this.row = 0;
+  this.type = 0;
+  this.next = null;
+  this.prev = null;
+}
+
+function ccm_sIntvar() {
+  this.name;
+  this.namespc;
+  this.value = 0;
+  this.elements = 0;
+  this.array = 0;
+  this.next = null;
+}
+
+function ccm_sFloatvar() {
+  this.name;
+  this.namespc;
+  this.value = 0;
+  this.elements = 0;
+  this.array = 0;
+  this.next = null;
+}
+
+function ccm_sStringvar() {
+  this.name = null;
+  this.namespc = null;
+  this.value = null;
+  this.elements = 0;
+  this.array = 0;
+  this.next = null;
+}
+
+function ccm_sOperand() {
+  this.type = 0;
+  this.name = null;
+  this.value_decl = 0;
+  this.value_int = 0;
+  this.value_float = 0;
+  this.value_string = null;
+  this.result_decl = 0;
+  this.result_int = 0;
+  this.result_float = 0;
+  this.result_string = null;
+  this.result_done = 0;
+  this.o_operator = 0;
+  this.local_type = 0;
+  this.local_operator = 0;
+  this.prio = 0;
+  this.parlevel = 0;
+  this.done = 0;
+  this.orig_type = 0;
+  this.func = null;
+  this.next = null;
+  this.prev = null;
+}
+
+function ccm_sFunc() {
+  this.name;
+  this.decl = 0;
+  this.start_line = 0;
+  this.end_line = 0;
+  this.next = null;
+}
+
+function ccm_tFileCtx() {
+  this.main_start_line;
+  this.main_end_line;
+  this.verify = 0;
+  this.current_row = 0;
+  this.error_row = 0;
+  this.error_line = 0;
+  this.break_before;
+  this.namespc;
+  this.externcmd_func;
+  this.deffilename_func;
+  this.errormessage_func;
+  this.func_list;
+  this.gblint_list;
+  this.gblfloat_list;
+  this.gblstring_list;
+  this.line_list;
+  this.main_funcctx;
+  this.funcctx;
+  this.funcctx_stack = new Array();
+  this.funcctx_cnt = 0;
+  this.extfunc_return_mode = 0;
+  this.extfunc_line = null;
+  this.last_fgets;
+  this.main_arg_list = new Array();
+  this.main_arg_count = 0;
+  this.client_data = null;
+  this.ccm = null;
+  this.tst_log_file = null;
+  this.tst_log_category = null;
+}
+
+function ccm_tRowCtx() {
+  this.line;
+  this.filectx;
+  this.pos = 0;
+  this.delim_pos = 0;
+  this.state = 0;
+  this.level = 0;
+  this.num_decl = 0;
+  this.num_neg = 0;
+  this.num_exp = 0;
+  this.msg;
+  this.last_type = 0;
+  this.curr_operand = null;
+  this.list;
+}
+
+function ccm_tFuncCtx() {
+  this.msg;
+  this.filectx;
+  this.locint_list = null;
+  this.locfloat_list = null;
+  this.locstring_list = null;
+  this.list;
+  this.current_line = 0;
+  this.is_main = 0;
+  this.for_init = 0;
+  this.arg_list;
+  this.arg_count = 0;
+}
+
+function ccm_tSysFuncReturn() {
+  this.sts = CCM_.SUCCESS;
+  this.return_decl = 0;
+  this.return_float = 0;
+  this.return_int = 0;
+  this.return_string = null;
+}
+
+
+function ccm_tSysFunc(classname, name, sysfunc) {
+  this.classname = classname;
+  this.name = name;
+  this.sysfunc = sysfunc;
+}
+
+function Ccm() {
+  
+  this.ctable = new Array();
+  this.ptable = new Array();
+  this.ccm_sysfunc = new Array();
+  this.extint_list = null;
+  this.extfloat_list = null;
+  this.extstring_list = null;
+
+  this.func_printf = function(self, filectx, arg_list, arg_count) {
+    var sarg_list, sarg_count;
+    var ret = new ccm_tSysFuncReturn();
+
+    sarg_list = new ccm_sArg();
+    sarg_list.value_decl = CcmC.K_DECL_STRING;
+    sarg_list.next = arg_list;
+    sarg_count = arg_count + 1;
+    var rf = self.func_sprintf(self, filectx, sarg_list, sarg_count);
+    if (ODD(rf.sts)) {
+      console.log(sarg_list.value_string);
+      ret.return_int = rf.return_int;
+    }
+    ret.sts = rf.sts;
+    ret.return_decl = CcmC.K_DECL_INT;
+    return ret;
+  };
+  this.func_scanf = function(self, filectx, arg_list, arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    ret.sts = CCM_.NYI;
+    return ret;
+  };
+  this.func_ask = function(self, filectx, arg_list, arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    ret.sts = CCM_.NYI;
+    return ret;
+  };
+  this.func_say = function(self, filectx, arg_list, arg_count) {
+    var arg_p;
+    var str;
+    var ret = new ccm_tSysFuncReturn();
+
+    if (arg_count != 1) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    arg_p = arg_list;
+    if (arg_p.value_decl == CcmC.K_DECL_FLOAT)
+      str = arg_p.value_float.toString();
+    else if (arg_p.value_decl == CcmC.K_DECL_INT)
+      str = arg_p.value_int.toString();
+    else if (arg_p.value_decl == CcmC.K_DECL_STRING)
+      str = arg_p.value_string;
+        
+    console.log(str);
+    ret.return_decl = CcmC.K_DECL_INT;
+    ret.return_int = str.length;
+    ret.sts = 1;
+    return ret;
+  };
+  this.func_fprintf = function(self, filectx, arg_list, arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    ret.sts = CCM_.NYI;
+    return ret;
+  };
+  this.func_sprintf = function(self, filectx, arg_list, arg_count) {
+    var arg_p, arg_p1, arg_p2;
+    var format;
+    var frm;
+    var sts;
+    var pos, last_pos;
+    var i;
+    var str = '';
+    var ret = new ccm_tSysFuncReturn();
+
+    if (arg_count <= 1) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    arg_p1 = arg_list;
+    arg_p2 = arg_list.next;
+    if (arg_p1.value_decl != CcmC.K_DECL_STRING) {
+      ret.sts = CCM_.VARTYPE;
+      return ret;
+    }
+    if (arg_p2.value_decl != CcmC.K_DECL_STRING) {
+      ret.sts = CCM_.VARTYPE;
+      return ret;
+    }
+
+    format = arg_p2.value_string;
+
+    /* Replace any '\x' characters */
+    /* Indentation TODO
+    format = format.replace(/\\n/g,'\n');
+    format = format.replace(/\\"/g,'\"');
+    format = format.replace(/\\\\/g,'\\');
+    */
+    if (arg_count == 2) {
+      str = format;
+    }
+    else {
+      var argv = new Array(arg_count - 2);
+
+      arg_p = arg_p2.next;
+      for (i = 0; i < arg_count - 2; i++) {
+	switch (arg_p.value_decl) {
+	case CcmC.K_DECL_INT:
+	  argv[i] = arg_p.value_int;
+	  break;
+	case CcmC.K_DECL_FLOAT:
+	  argv[i] = arg_p.value_float;
+	  break;
+	case CcmC.K_DECL_STRING:
+	  argv[i] = arg_p.value_string;
+	  break;
+	}
+	arg_p = arg_p.next;
+      }
+      str = self.vsprintf(format, argv);
+    }
+    arg_p1.value_string = str;
+    arg_p1.value_returned = 1;
+    ret.return_int = arg_p1.value_string.length;
+    ret.return_decl = CcmC.K_DECL_INT;
+    return ret;
+  };
+  this.func_fgets = function(self, filectx, arg_list, arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    ret.sts = CCM_.NYI;
+    return ret;
+  };
+  this.func_fclose = function(self, filectx, arg_list, arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    ret.sts = CCM_.NYI;
+    return ret;
+  };
+  this.func_fopen = function(self, filectx, arg_list, arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    ret.sts = CCM_.NYI;
+    return ret;
+  };
+  this.func_exit = function(self, filectx, arg_list, arg_count) {
+    throw '';
+  };
+  this.func_element = function(self, filectx, arg_list, arg_count) {
+    var arg_p1, arg_p2, arg_p3;
+    var ret = new ccm_tSysFuncReturn();
+
+    if (arg_count != 3) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    arg_p1 = arg_list;
+    arg_p2 = arg_list.next;
+    arg_p3 = arg_p2.next;
+    if (arg_p1.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.VARTYPE;
+      return ret;
+    }
+    if (arg_p2.value_decl != CcmC.K_DECL_STRING) {
+      ret.sts = CCM_.VARTYPE;
+      return ret;
+    }
+    if (arg_p3.value_decl != CcmC.K_DECL_STRING) {
+      ret.sts = CCM_.VARTYPE;
+      return ret;
+    }
+
+    ret.return_string = self.element(arg_p1.value_int, 
+	arg_p3.value_string, arg_p2.value_string[0]);
+
+    ret.return_decl = CcmC.K_DECL_STRING;
+    return ret;
+  };
+  this.func_extract = function(self, filectx, arg_list, arg_count) {
+    var arg_p1, arg_p2, arg_p3;
+    var ret = new ccm_tSysFuncReturn();
+
+    if (arg_count != 3) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    arg_p1 = arg_list;
+    arg_p2 = arg_list.next;
+    arg_p3 = arg_p2.next;
+    if (arg_p1.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.VARTYPE;
+      return ret;
+    }
+    if (arg_p2.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.VARTYPE;
+      return ret;
+    }
+    if (arg_p3.value_decl != CcmC.K_DECL_STRING) {
+      ret.sts = CCM_.VARTYPE;
+      return ret;
+    }
+    if (arg_p1.value_int < 1) {
+      ret.sts = CCM_.INVARG;
+      return ret;
+    }
+
+    ret.return_string = arg_p3.value_string.substring(arg_p1.value_int - 1,
+	 arg_p1.value_int + arg_p2.value_int - 1);
+
+    ret.return_decl = CcmC.K_DECL_STRING;
+    return ret;
+  };
+  this.func_edit = function(self, filectx, arg_list, arg_count) {
+    var arg_p1;
+    var str;
+    var ret = new ccm_tSysFuncReturn();
+
+    if (arg_count != 1) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    arg_p1 = arg_list;
+    if (arg_p1.value_decl != CcmC.K_DECL_STRING) {
+      ret.sts = CCM_.VARTYPE;
+      return ret;
+    }
+
+    str = arg_p1.value_string.trim();
+    str = str.replace(/\t/g,' ');
+    str = str.replace(/ +(?= )/g,'');
+    ret.return_string = str;
+    ret.return_decl = CcmC.K_DECL_STRING;
+    return ret;
+  };
+  this.func_verify = function(self, filectx, arg_list, arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+
+    if (arg_count == 0) {
+      return_int = filectx.verify;
+      return_decl = CcmC.K_DECL_INT;
+    } else if (arg_list.value_decl == CcmC.K_DECL_INT) {
+      if (arg_list.value_int != 0)
+	filectx.verify = 1;
+      else
+	filectx.verify = 0;
+
+      ret.return_int = filectx.verify;
+      ret.return_decl = CcmC.K_DECL_INT;
+    } else {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    return ret;
+  };
+  this.func_time = function(self, filectx, arg_list, arg_count) {
+    var sts;
+    var value_string;
+    var ret = new ccm_tSysFuncReturn();
+
+    if (arg_count != 0) {
+      return CCM_.ARGMISM;
+      return ret;
+    }
+    ret.return_string = self.ctime();
+    ret.return_decl = CcmC.K_DECL_STRING;
+    return ret;
+  };
+  this.func_system = function(self, filectx, arg_list, arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    ret.sts = CCM_.NYI;
+    return ret;
+  };
+  this.func_strlen = function(self, filectx, arg_list, arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    if (arg_count != 1) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_list.value_decl != CcmC.K_DECL_STRING) {
+      ret.sts = CCM_.VARTYPE;
+      return ret;
+    }
+
+    ret.return_int = arg_list.value_string.length;
+    ret.return_decl = CcmC.K_DECL_INT;
+    return ret;
+  };
+  this.func_strchr = function(self, filectx, arg_list, arg_count) {
+    var arg_p2;
+    var s;
+    var ret = new ccm_tSysFuncReturn();
+
+    if (arg_count != 2) {
+      return CCM_.ARGMISM;
+      return ret;
+    }
+    arg_p2 = arg_list.next;
+    if (arg_list.value_decl != CcmC.K_DECL_STRING) {
+      ret.sts = CCM_.VARTYPE;
+      return ret;
+    }
+    if (arg_p2.value_decl != CcmC.K_DECL_STRING) {
+      ret.sts = CCM_.VARTYPE;
+      return ret;
+    }
+
+    s = arg_list.value_string.indexOf(arg_p2.value_string[0]);
+    if (s == -1)
+      ret.return_int = 0;
+    else
+      ret.return_int = s + 1;
+    
+    ret.return_decl = CcmC.K_DECL_INT;
+    return ret;
+  };
+  this.func_strrchr = function(self, filectx, arg_list, arg_count) {
+    var arg_p2;
+    var s;
+    var ret = new ccm_tSysFuncReturn();
+
+    if (arg_count != 2) {
+      return CCM_.ARGMISM;
+      return ret;
+    }
+    arg_p2 = arg_list.next;
+    if (arg_list.value_decl != CcmC.K_DECL_STRING) {
+      ret.sts = CCM_.VARTYPE;
+      return ret;
+    }
+    if (arg_p2.value_decl != CcmC.K_DECL_STRING) {
+      ret.sts = CCM_.VARTYPE;
+      return ret;
+    }
+
+    s = arg_list.value_string.lastIndexOf(arg_p2.value_string[0]);
+    if (s == -1)
+      ret.return_int = 0;
+    else
+      ret.return_int = s + 1;
+    
+    ret.return_decl = CcmC.K_DECL_INT;
+    return ret;
+  };
+  this.func_strstr = function(self, filectx, arg_list, arg_count) {
+    var arg_p2;
+    var s;
+    var ret = new ccm_tSysFuncReturn();
+
+    if (arg_count != 2) {
+      return CCM_.ARGMISM;
+      return ret;
+    }
+    arg_p2 = arg_list.next;
+    if (arg_list.value_decl != CcmC.K_DECL_STRING) {
+      ret.sts = CCM_.VARTYPE;
+      return ret;
+    }
+    if (arg_p2.value_decl != CcmC.K_DECL_STRING) {
+      ret.sts = CCM_.VARTYPE;
+      return ret;
+    }
+
+    s = arg_list.value_string.lastIndexOf(arg_p2.value_string);
+    if (s == -1)
+      ret.return_int = 0;
+    else
+      ret.return_int = s + 1;
+    
+    ret.return_decl = CcmC.K_DECL_INT;
+    return ret;
+  };
+  this.func_toupper = function(self, filectx, arg_list, arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+
+    if (arg_count != 1) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_list.value_decl != CcmC.K_DECL_STRING) {
+      ret.sts = CCM_.VARTYPE;
+      return ret;
+    }
+
+    ret.return_string = arg_list.value_string.toUpperCase();
+    ret.return_decl = CcmC.K_DECL_STRING;
+    return ret;
+  };
+  this.func_tolower = function(self, filectx, arg_list, arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+
+    if (arg_count != 1) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_list.value_decl != CcmC.K_DECL_STRING) {
+      ret.sts = CCM_.VARTYPE;
+      return ret;
+    }
+
+    ret.return_string = arg_list.value_string.toLowerCase();
+    ret.return_decl = CcmC.K_DECL_STRING;
+    return ret;
+  };
+  this.func_translate_filename = function(self, filectx, arg_list, arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var fname;
+
+    if (arg_count != 1) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_list.value_decl != CcmC.K_DECL_STRING) {
+      ret.sts = CCM_.VARTYPE;
+      return ret;
+    }
+    ret.return_string = arg_list.value_string.replace(/\$([a-zA-Z_]+[a-zA-Z_0-9]*)/ig, (_,n) => process.env[n]);
+    ret.return_decl = CcmC.K_DECL_STRING;
+    return ret;
+  };
+  this.func_get_pwr_config = function(self, filectx, arg_list, arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    ret.sts = CCM_.NYI;
+    return ret;
+  };
+  this.func_get_node_name = function(self, filectx, arg_list, arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    ret.sts = CCM_.NYI;
+    return ret;
+  };
+  this.func_get_language = function(self, filectx, arg_list, arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    ret.sts = CCM_.NYI;
+    return ret;
+  };
+  this.func_odd = function(self, filectx, arg_list, arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+
+    if (arg_count != 1) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_list.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM__VARTYPE;
+      return ret;
+    }
+
+    ret.return_int = (arg_list.value_int & 1);
+    ret.return_decl = CcmC.K_DECL_INT;
+    return ret;
+  };
+  this.func_even = function(self, filectx, arg_list, arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+
+    if (arg_count != 1) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_list.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM__VARTYPE;
+      return ret;
+    }
+
+    ret.return_int = (arg_list.value_int & 1) == 0 ? 1 : 0;
+    ret.return_decl = CcmC.K_DECL_INT;
+    return ret;
+  };
+  this.func_max = function(self, filectx, arg_list, arg_count) {
+    var arg_p2;
+    var ret = new ccm_tSysFuncReturn();
+
+    if (arg_count != 2) {
+      ret.sts = CCM_.ARGMISM;  
+      return ret;
+    }
+    arg_p2 = arg_list.next;
+
+    if (arg_list.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.VARTYPE;
+      return ret;
+    }
+    if (arg_p2.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.VARTYPE;
+      return ret;
+    }
+
+    ret.return_float = Math.max(arg_list.value_float, arg_p2.value_float);
+    ret.return_decl = CcmC.K_DECL_FLOAT;
+    return ret;
+  };
+  this.func_min = function(self, filectx, arg_list, arg_count) {
+    var arg_p2;
+    var ret = new ccm_tSysFuncReturn();
+
+    if (arg_count != 2) {
+      ret.sts = CCM_.ARGMISM;  
+      return ret;
+    }
+    arg_p2 = arg_list.next;
+
+    if (arg_list.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.VARTYPE;
+      return ret;
+    }
+    if (arg_p2.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.VARTYPE;
+      return ret;
+    }
+
+    ret.return_float = Math.min(arg_list.value_float, arg_p2.value_float);
+    ret.return_decl = CcmC.K_DECL_FLOAT;
+    return ret;
+  };
+  this.func_tstlog_open = function(self, filectx, arg_list, arg_count) {
+    var arg_p1, arg_p2;
+    var filename;
+    var ret = new ccm_tSysFuncReturn();
+
+    if (arg_count != 2) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    arg_p1 = arg_list;
+    arg_p2 = arg_p1.next;
+    if (arg_p1.value_decl != CcmC.K_DECL_STRING) {
+      ret.sts = CCM_.VARTYPE;
+      return ret;
+    }
+    if (arg_p2.value_decl != CcmC.K_DECL_STRING) {
+      ret.sts = CCM_.VARTYPE;
+      return ret;
+    }
+    filename = self.translate_filename(arg_p2.value_string);
+    filectx.tst_log_file = filename;
+    filectx.tst_log_category = arg_p1.value_string;
+    try {
+      fs.writeFileSync(filename, '', {flag: 'w+'});
+      ret.return_int = 1;
+      ret.sts = 1;
+    } catch (err) {
+      console.log(err);
+      ret.return_int = 0;
+      ret.sts = 0;
+    }
+    ret.return_decl = CcmC.K_DECL_INT;
+    return ret;
+  };
+  this.func_tstlog_close = function(self, filectx, arg_list, arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+
+    filectx.tst_log_file = null;
+    filectx.tst_log_category = null;
+
+    ret.return_decl = CcmC.K_DECL_INT;
+    ret.return_int = 1;
+    return ret;
+  };
+  this.func_tstlog_log = function(self, filectx, arg_list, arg_count) {
+    var arg_p1, arg_p2, arg_p3, arg_p4, arg_p5;
+    var log;
+    var str;
+    var datestr;
+    var ret = new ccm_tSysFuncReturn();
+
+    if (filectx.tst_log_file == null) {
+      ret.sts = CCM_.OPENFILE;
+      return ret;
+    }
+
+    if (!(arg_count == 3 || arg_count == 4 || arg_count == 5)) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    arg_p1 = arg_list;
+    arg_p2 = arg_list.next;
+    arg_p3 = arg_p2.next;
+    if (arg_p1.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.VARTYPE;
+      return ret;
+    }
+    if (arg_p2.value_decl != CcmC.K_DECL_STRING) {
+      ret.sts = CCM_.VARTYPE;
+      return ret;
+    }
+    if (arg_p3.value_decl != CcmC.K_DECL_STRING) {
+      ret.sts = CCM_.VARTYPE;
+      return ret;
+    }
+    if (arg_count >= 4) {
+      arg_p4 = arg_p3.next;
+      if (arg_p3.value_decl != CcmC.K_DECL_STRING) {
+	ret.sts = CCM_.VARTYPE;
+	return ret;
+      }
+    }
+    if (arg_count == 5) {
+      arg_p5 = arg_p4.next;
+      if (arg_p5.value_decl != CcmC.K_DECL_INT) {
+	ret.sts = CCM_.VARTYPE;
+	return ret;
+      }
+    }
+
+    log = arg_p1.value_int;
+    datestr = self.ctime();
+    if (arg_count == 3) 
+      str = arg_p2.value_string[0] + ' ' + datestr + ' ' + filectx.tst_log_category + ', ' + arg_p3.value_string + '\n';
+    else if (arg_count == 4) 
+      str = arg_p2.value_string[0] + ' ' + datestr + ' ' + filectx.tst_log_category + ', ' + arg_p3.value_string + ' ' + arg_p4.value_string + '\n';
+    else {
+      str = arg_p2.value_string[0] + ' ' + datestr + ' ' + filectx.tst_log_category + ', ' + arg_p3.value_string + ' ' + arg_p4.value_string + ' ' + arg_p5.value_int.stringOf() + '\n';
+    }
+    console.log('str:', str.substring(0,str.length-1));
+    try {
+      fs.writeFileSync(filectx.tst_log_file, str, {flag: 'a+'});
+      ret.return_int = 1;
+      ret.sts = 1;
+    } catch (err) {
+      console.log(err);
+      ret.return_int = 0;
+      ret.sts = 0;
+    }
+    ret.return_decl = CcmC.K_DECL_INT;
+    return ret;
+  }
+  this.func_tstlog_vlog = function(self, filectx, arg_list, arg_count) {
+    var arg_p1, arg_p2, arg_p3;
+    var log;
+    var datestring;
+    var ret = new ccm_tSysFuncReturn();
+
+    if (arg_count < 3) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    arg_p1 = arg_list;
+    arg_p2 = arg_list.next;
+    arg_p3 = arg_p2.next;
+    if (arg_p1.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.VARTYPE;
+      return ret;
+    }
+    if (arg_p2.value_decl != CcmC.K_DECL_STRING) {
+      ret.sts = CCM_.VARTYPE;
+      return ret;
+    }
+    if (arg_p3.value_decl != CcmC.K_DECL_STRING) {
+      ret.sts = CCM_.VARTYPE;
+      return ret;
+    }
+
+    log = arg_p1.value_int;
+    datestr = self.ctime();
+    if (arg_count == 3) {
+      str = arg_p2.value_string[0] + ' ' + datestr + ' ' + filectx.tst_log_category + ', ' + arg_p3.value_string;
+    } else {
+      var sarg_list, sarg_count;
+
+      sarg_list = new ccm_sArg();
+      sarg_list.value_decl = CcmC.K_DECL_STRING;
+      sarg_list.next = arg_p3;
+      sarg_count = arg_list - 1;
+      rf = self.func_sprintf(filectx, sarg_list, sarg_count);
+      if (EVEN(rf.sts)) {
+	ret.sts = rf.sts;
+	return ret;
+      }
+      rf = self.func_sprintf(filectx, arg_p3, arg_count - 2);
+      str = arg_p2.value_string[0] + ' ' + datestr + ' ' + filectx.tst_log_category + ', ' + rf.sarg_list.valule_string;
+    }
+    console.log(str);
+    try {
+      fs.writeFileSync(filectx.tst_log_file, str, {flag: 'a+'});
+      ret.return_int = 1;
+      ret.sts = 1;
+    } catch (err) {
+      console.log(err);
+      ret.return_int = 0;
+      ret.sts = 0;
+    }
+    ret.sts = 1;
+    return_decl = CcmC.K_DECL_INT;
+    return ret;
+  };
+  this.func_tzset = function(self, filectx, arg_list, arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    ret.sts = CCM_.NYI;
+    return ret;
+  };
+  this.func_sin = function(self, filectx, arg_list, arg_count) {
+    var arg_p1;
+    var ret = new ccm_tSysFuncReturn();
+
+    if (arg_count != 1) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    arg_p1 = arg_list;
+    if (arg_p1.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.VARTYPE;
+      return ret;
+    }
+
+    ret.return_decl = CcmC.K_DECL_FLOAT;
+    ret.return_float = Math.sin(arg_p1.value_float / 180 * Math.PI);
+    return ret;
+  };
+  this.func_cos = function(self, filectx, arg_list, arg_count) {
+    var arg_p1;
+    var ret = new ccm_tSysFuncReturn();
+
+    if (arg_count != 1) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    arg_p1 = arg_list;
+    if (arg_p1.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.VARTYPE;
+      return ret;
+    }
+
+    ret.return_decl = CcmC.K_DECL_FLOAT;
+    ret.return_float = Math.cos(arg_p1.value_float / 180 * Math.PI);
+    return ret;
+  };
+  this.func_random = function(self, filectx, arg_list, arg_count) {
+    var arg_p1, arg_p2;
+    var ret = new ccm_tSysFuncReturn();
+
+    if (arg_count != 2) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    arg_p1 = arg_list;
+    arg_p2 = arg_p1.next;
+    if (arg_p1.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.VARTYPE;
+      return ret;
+    }
+    if (arg_p2.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.VARTYPE;
+      return ret;
+    }
+
+    ret.return_decl = CcmC.K_DECL_FLOAT;
+    ret.return_float = arg_p1.value_float + Math.random() * 
+        (arg_p2.value_float - arg_p1.value_float);
+    return ret;
+  };
+  this.func_get_namespace = function(self, filectx, arg_list, arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+
+    if (arg_count != 0) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    ret.return_string = filectx.namespc;
+    ret.return_decl = CcmC.K_DECL_STRING;
+    return ret;
+  };
+  this.func_set_namespace = function(self, filectx, arg_list, arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+
+    if (arg_count != 1) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_list.value_decl != CcmC.K_DECL_STRING) {
+      ret.sts = CCM_.VARTYPE;
+      return ret;
+    }
+    filectx.namespc = arg_list.value_string;
+    ret.return_decl = CcmC.K_DECL_INT;
+    ret.return_int = 1;
+    return ret;
+  };
+  this.func_arraysize = function(self, filectx, arg_list, arg_count) {
+    var elements;
+    var ret = new ccm_tSysFuncReturn();
+
+    if (arg_count != 1) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    var ri = self.get_var_info(filectx.funcctx, arg_list.value_name);
+    if (EVEN(ri.sts) || ri.array == 0)
+      elements = 0;
+    else
+      elements = ri.elements;
+    
+    ret.return_decl = CcmC.K_DECL_INT;
+    ret.return_int = elements;
+    return ret;
+  };
+  this.func_arraypush = function(self, filectx, arg_list, arg_count) {
+    var arg_p2;
+    var ret = new ccm_tSysFuncReturn();
+
+    if (arg_count != 2) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    arg_p2 = arg_list.next;
+
+    var rp = self.pushvar(filectx.funcctx, arg_list.value_name, 
+	arg_p2.value_decl, arg_p2.value_float, arg_p2.value_int, arg_p2.value_string);
+
+    ret.return_decl = CcmC.K_DECL_INT;
+    ret.return_int = rp.sts;
+    return ret;
+  };
+  this.func_arrayclear = function(self, filectx, arg_list, arg_count) {
+    var sts;
+    var ret = new ccm_tSysFuncReturn();
+
+    if (arg_count != 1) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    sts = self.clearvar(filectx.funcctx, arg_list.value_name);
+
+    ret.return_decl = CcmC.K_DECL_INT;
+    ret.return_int = sts;
+    return ret;
+  };
+  this.func_sort = function(self, filectx, arg_list, arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    ret.sts = CCM_.NYI;
+    return ret;
+  };
+  this.func_ccm_env_js = function(self, filectx, arg_list, arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    if (arg_count != 0) {
+      ret.sts = CCM__ARGMISM;
+      return ret;
+    }
+    ret.return_int = 1;
+    ret.return_decl = CcmC.K_DECL_INT;
+    return ret;
+  };
+
+  this.ccm_sysfunc = [new ccm_tSysFunc("std", "printf", this.func_printf),
+  new ccm_tSysFunc("std", "scanf", this.func_scanf), 
+  new ccm_tSysFunc("std", "ask", this.func_ask),
+  new ccm_tSysFunc("std", "say", this.func_say), 
+  new ccm_tSysFunc("std", "fprintf", this.func_fprintf),
+  new ccm_tSysFunc("std", "sprintf", this.func_sprintf), 
+  new ccm_tSysFunc("std", "fgets", this.func_fgets),
+  new ccm_tSysFunc("std", "fclose", this.func_fclose), 
+  new ccm_tSysFunc("std", "fopen", this.func_fopen),
+  new ccm_tSysFunc("std", "exit", this.func_exit), 
+  new ccm_tSysFunc("std", "element", this.func_element),
+  new ccm_tSysFunc("std", "felement", this.func_felement),
+  new ccm_tSysFunc("std", "extract", this.func_extract), 
+  new ccm_tSysFunc("std", "edit", this.func_edit),
+  new ccm_tSysFunc("std", "verify", this.func_verify), 
+  new ccm_tSysFunc("std", "time", this.func_time),
+  new ccm_tSysFunc("std", "system", this.func_system), 
+  new ccm_tSysFunc("std", "strlen", this.func_strlen),
+  new ccm_tSysFunc("std", "strchr", this.func_strchr),
+  new ccm_tSysFunc("std", "strrchr", this.func_strrchr),
+  new ccm_tSysFunc("std", "strstr", this.func_strstr),
+  new ccm_tSysFunc("std", "toupper", this.func_toupper),
+  new ccm_tSysFunc("std", "tolower", this.func_tolower),
+  new ccm_tSysFunc("std", "translate_filename", this.func_translate_filename),
+  new ccm_tSysFunc("std", "get_pwr_config", this.func_get_pwr_config),
+  new ccm_tSysFunc("std", "get_node_name", this.func_get_node_name),
+  new ccm_tSysFunc("std", "get_language", this.func_get_language),
+  new ccm_tSysFunc("std", "ODD", this.func_odd), 
+  new ccm_tSysFunc("std", "EVEN", this.func_even),
+  new ccm_tSysFunc("std", "MAX", this.func_max),
+  new ccm_tSysFunc("std", "MIN", this.func_min),
+  new ccm_tSysFunc("std", "tstlog_open", this.func_tstlog_open),
+  new ccm_tSysFunc("std", "tstlog_close", this.func_tstlog_close),
+  new ccm_tSysFunc("std", "tstlog_log", this.func_tstlog_log),
+  new ccm_tSysFunc("std", "tstlog_vlog", this.func_tstlog_vlog),
+  new ccm_tSysFunc("std", "getmsg", this.func_getmsg),
+  new ccm_tSysFunc("std", "tzset", this.func_tzset),
+  new ccm_tSysFunc("std", "sin", this.func_sin),
+  new ccm_tSysFunc("std", "cos", this.func_cos),
+  new ccm_tSysFunc("std", "random", this.func_random),
+  new ccm_tSysFunc("std", "set_namespace", this.func_set_namespace),
+  new ccm_tSysFunc("std", "get_namespace", this.func_get_namespace),
+  new ccm_tSysFunc("std", "arraysize", this.func_arraysize),
+  new ccm_tSysFunc("std", "arraypush", this.func_arraypush),
+  new ccm_tSysFunc("std", "arrayclear", this.func_arrayclear),
+  new ccm_tSysFunc("std", "sort", this.func_sort),
+  new ccm_tSysFunc("std", "ccm_env_js", this.func_ccm_env_js)];
+
+
+/************* TEST *********************/
+
+  this.ctime =  function() {
+    var date = new Date();
+    var month;
+    
+    switch (date.getMonth()) {
+    case 0:
+      month = "JAN";
+      break;
+    case 1:
+      month = "FEB";
+      break;
+    case 2:
+      month = "MAR";
+      break;
+    case 3:
+      month = "APR";
+      break;
+    case 4:
+      month = "MAY";
+      break;
+    case 5:
+      month = "JUN";
+      break;
+    case 6:
+      month = "JUL";
+      break;
+    case 7:
+      month = "AUG";
+      break;
+    case 8:
+      month = "SEP";
+      break;
+    case 9:
+      month = "OCT";
+      break;
+    case 10:
+      month = "NOV";
+      break;
+    case 11:
+      month = "DEC";
+      break;
+    }
+    var datestr = ((date.getDate() < 10) ? '0' : '') + date.getDate() + "-" +
+      month + "-" +
+      date.getFullYear() + " " +
+      ((date.getHours() < 10) ? '0' : '') + date.getHours() + ":" +
+      ((date.getMinutes() < 10) ? '0' : '') + date.getMinutes() + ":" +
+      ((date.getSeconds() < 10) ? '0' : '') + date.getSeconds();
+    return datestr;
+  };
+
+  this.insertCharAt = function(str, index, chr) {
+    if (index > str.length) 
+      return str;
+    return str.substring(0, index) + chr + str.substring(index + 1);
+  };
+  
+  this.translate_filename = function(fname) {
+    var str;
+    str = fname.replace(/\$([a-zA-Z_]+[a-zA-Z_0-9]*)/ig, (_,n) => process.env[n]);
+    return str;
+  }
+
+  this.rtt_parse = function(string, parse_char, inc_parse_char,
+    outstr, max_rows, max_cols, keep_quota) {
+    var row;
+    var col;
+    var parsechar_found;
+    var inc_parsechar_found;
+    var next_token;
+    var char_found;
+    var one_token = 0;
+    var prev_char;
+    var nullstr;
+    var k;
+
+    prev_char = 0;
+    row = 0;
+    outstr[row] = '';
+    col = 0;
+    char_found = 0;
+    next_token = 0;
+    nullstr = 0;
+    for (let i = 0; i < string.length; i++) {
+      parsechar_found = 0;
+      inc_parsechar_found = 0;
+      if (string[i] === '"' && prev_char !== '\\') {
+	one_token = !one_token;
+	prev_char = string[i];
+	if (one_token == 0 && col == 0)
+	  nullstr = 1;
+	else
+	  nullstr = 0;
+	if (keep_quota == 0) {
+	  i++;
+	  continue;
+	}
+      } else if (string[i] === '"' && prev_char === '\\')
+	col--;
+      if (one_token == 0) {
+        for (let j = 0; j < parse_char.length; j++) {
+	  /* Check if this is a parse charachter */
+	  if (string[i] === parse_char[j]) {
+	    parsechar_found = 1;
+	    /* Next token */
+	    if (col > 0) {
+	      // *(outstr + row * max_cols + col) = '\0';
+	      row++;
+	      if (row >= max_rows)
+		return row;
+	      outstr[row] = '';
+	      col = 0;
+	      next_token = 0;
+	    }
+	    break;
+	  }
+	}
+	for (k = 0; k < inc_parse_char.length, k++;) {
+	  /* Check if this is a parse charachter */
+	  if (string[i] === inc_parse_char[k]) {
+	    parsechar_found = 1;
+	    inc_parsechar_found = 1;
+	    /* Next token */
+	    if (col > 0 || nullstr != 0) {
+	      // *(outstr + row * max_cols + col) = '\0';
+	      row++;
+	      if (row >= max_rows)
+		return row;
+	      col = 0;
+	      next_token = 0;
+	    }
+	    break;
+	  }
+	}
+      }
+      if (parsechar_found == 0 && next_token == 0) {
+	char_found++;
+	//outstr[row] = this.insertCharAt(outstr[row], col, string[i]);
+	outstr[row] += string[i];
+	col++;
+      }
+      if (inc_parsechar_found != 0) {
+	//outstr[row] = this.insertCharAt(outstr[row], col, inc_parse_char[k]);
+	outstr[row] += inc_parse_char[k];
+	col++;
+      }
+      prev_char = string[i];
+      if (col >= (max_cols - 1))
+	next_token = 1;
+      nullstr = 0;
+    }
+    // *(outstr + row * max_cols + col) = '\0';
+    row++;
+    
+    if (char_found == 0)
+      return 0;
+    
+    return row;
+  };
+
+  this.rtt_toupper = function(str) {
+    return str.toUpperCase();
+  }
+
+  this.element = function(num, str, delim) {
+    var s1, s2;
+    var i;
+    var element;
+
+    if (num <= 0)
+      return "";
+
+    s1 = str.indexOf(delim);
+    if (num == 1) {
+      if (s1 == -1) {
+	return str;
+      } else {
+	element = str.substring(0, s1);
+	return element;
+      }
+    } else if (s1 == -1) {
+      return "";
+    }
+    for (i = 2; i <= num; i++) {
+      s1++;
+      s2 = str.indexOf(delim, s1);
+      if (s2 == -1) {
+	if (i == num) {
+	  element = str.substring(s1);
+	  return element;
+	} else {
+	  return "";
+	}
+      } else if (i == num) {
+	element = str.substring(s1, s2);
+	return element;
+      }
+      s1 = s2;
+    }
+    return "";
+  }
+
+  this.remove_blank = function(in_str) {
+    return in_str.trim();
+  }
+
+  // Returns varname, array, element)
+  this.varname_parse = function(funcctx, name) {
+    var s, t;
+    var elementstr;
+    var vname;
+    var sts;
+    var array;
+    var element;
+    var varname;
+    var value_decl;
+    var value_int;
+    var value_float;
+    var value_string;
+    var ret = {
+      sts: CCM_.SUCCESS,
+      varname: null,
+      element: 0,
+      array: 0};
+
+    /* Check index in parameter */
+    s = name.indexOf("[");
+    if (s == -1) {
+      array = 0;
+      element = 0;
+      varname = name;
+      sts = 1;
+    } else {
+      t = name.indexOf("]", s);
+      if (t == -1) {
+	ret.sts = 0;
+	return ret;
+      }     
+      else if (t - s == 1) {
+	varname = name.substring(0, s);
+	array = 1;
+	element = CcmC.NO_ELEM;
+      }
+      else {
+	varname = name.substring(0, s);
+	elementstr = name.substring(s+1, t);
+	element = parseInt(elementstr);
+	if (isNaN(element)) {
+	  if (funcctx == null) {
+	    ret.sts = 0;
+	    return ret;
+	  }
+	  vname = this.remove_blank(elementstr);
+	  var rg = this.getvar(funcctx, vname);
+	  if (EVEN(rg.sts))
+	    return rg.sts;
+	  value_decl = rg.decl;
+	  value_int = rg.value_int;
+	  if (value_decl != CcmC.K_DECL_INT)
+	    return 0;
+	  element = value_int;
+	}
+	if ((element < 0) || (element > 5000)) {
+	  ret.sts = 0;
+	  return ret;
+	}
+	array = 1;
+      }
+    }
+    sts = 1;
+    ret.sts = sts;
+    ret.varname = varname;
+    ret.element = element;
+    ret.array = array;
+    return ret;
+  }
+
+  this.register_function = function(classname, name, sysfunc) {
+    var i;
+
+    for (i = 0; i < this.ccm_sysfunc.length; i++) {
+      if (this.ccm_sysfunc[i].classname === classname && 
+	  this.ccm_sysfunc[i].name === name)
+	return CCM_.ALREADYREG;
+    }
+    
+    if (this.ccm_sysfunc.length >= CcmC.SYSFUNC_MAX - 1)
+      return CcmC.CCM_.SYSFUNCEXCEED;
+
+    this.ccm_sysfunc[this.ccm_sysfunc.length] = new ccm_tSysFunc(classname, name, sysfunc);
+
+    return 1;
+  }
+
+  this.float_to_string = function(f) {
+    var i;
+
+    /* If value is close to integer, round it */
+    console.log(Math.abs(f - Math.round(f)));
+    if (Math.abs(f - Math.round(f)) <= CcmC.FLT_EPSILON) {
+      i = Math.round(f);
+      return i.toString();
+    } else
+      return f.toString();
+  }
+
+  this.print_error = function(filectx, sts) {
+    var text;
+
+    switch (sts) {
+    case CCM_.EXPRESSION:
+      text = "Syntax error in expression";
+      return;
+    case CCM_.VARTYPE:
+      text = "Variable type mismatch";
+      break;
+    case CCM_.VARALREXIST:
+      text = "Variable already declared";
+      break;
+    case CCM_.VARNOTFOUND:
+      text = "Variable not found";
+      break;
+    case CCM_.OPENFILE:
+      text = "Unable to open file";
+      break;
+    case CCM_.SYNTAX:
+      text = "Syntax error";
+      break;
+    case CCM_.FUNCNOTFOUND:
+      text = "Function not declared";
+      break;
+    case CCM_.UNKNVARTYPE:
+      text = "Unknown varable type";
+      break;
+    case CCM_.FUNCMISM:
+      text = "Function-endfunction mismatch";
+      break;
+    case CCM_.MAINMISM:
+      text = "Main-endmain mismatch";
+      break;
+    case CCM_.IFMISM:
+      text = "If-else-endif mismatch";
+      break;
+    case CCM_.WHILEMISM:
+      text = "While-endwhile mismatch";
+      break;
+    case CCM_.FORMISM:
+      text = "For-endfor mismatch";
+      break;
+    case CCM_.ARGMISM:
+      text = "Argument mismatch";
+      break;
+    case CCM_.CONTMISM:
+      text = "Continue-for/while mismatch";
+      break;
+    case CCM_.BREAKMISM:
+      text = "Break-if/for/while mismatch";
+      break;
+    case CCM_.NOEXTVAR:
+      text = "No external variables defined";
+      break;
+    case CCM_.GOTOMISM:
+      text = "Label in goto-expression not found";
+      break;
+    case CCM_.SYSFUNCEXCEED:
+      text = "Max number of functions exceeded";
+      break;
+    case CCM_.LONGLINE:
+      text = "Maximum line size exceeded";
+      break;
+    case CCM_.STRINGEXCEED:
+      text = "Maximum string size exceeded";
+      break;
+    case CCM_.ARGEXCEED:
+      text = "Maximum number of arguments exceeded";
+      break;
+    case CCM_.ARRAYBOUNDS:
+      text = "Array index out of bounds";
+      break;
+    case CCM_.NOACCESS:
+      text = "No access for operation";
+      break;
+    case CCM_.NOELEMERROR:
+      text = "Number of elements not specified";
+      break;
+    case CCM_.MISPLACED:
+      text = "Misplaced statement";
+      break;
+    case CCM_.INVARG:
+      text = "Invalid argument";
+      break;
+    case CCM_.NYI:
+      text = "Not yet implemented in this environment";
+      break;
+    default:
+      text = "Unknown error code";
+    }
+    if (filectx.error_row != 0) {
+      text = text + ", at line " + filectx.error_row.toString() + " " +
+      filectx.error_line;
+    }
+    console.log(text);
+    // (filectx.errormessage_func)(text, sts & 0x7, filectx.client_data);
+  }
+
+  this.init_ctable = function() {
+    this.ptable[CcmC.K_ACTION_DOWN] = 1;
+    this.ptable[CcmC.K_ACTION_UP] = 1;
+    this.ptable[CcmC.K_ACTION_MUL] = 8;
+    this.ptable[CcmC.K_ACTION_DIV] = 8;
+    this.ptable[CcmC.K_ACTION_ADD] = 10;
+    this.ptable[CcmC.K_ACTION_SUB] = 10;
+    this.ptable[CcmC.K_ACTION_EQL] = 20;
+    this.ptable[CcmC.K_ACTION_LT] = 13;
+    this.ptable[CcmC.K_ACTION_GT] = 13;
+    this.ptable[CcmC.K_ACTION_GE] = 13;
+    this.ptable[CcmC.K_ACTION_LE] = 13;
+    this.ptable[CcmC.K_ACTION_EQ] = 14;
+    this.ptable[CcmC.K_ACTION_NE] = 14;
+    this.ptable[CcmC.K_ACTION_INV] = 6;
+    this.ptable[CcmC.K_ACTION_INCR] = 2;
+    this.ptable[CcmC.K_ACTION_DECR] = 2;
+    this.ptable[CcmC.K_ACTION_AND] = 17;
+    this.ptable[CcmC.K_ACTION_OR] = 18;
+    this.ptable[CcmC.K_ACTION_BITAND] = 16;
+    this.ptable[CcmC.K_ACTION_BITOR] = 15;
+    this.ptable[CcmC.K_ACTION_EQLADD] = 19;
+    this.ptable[CcmC.K_ACTION_EQLSUB] = 19;
+    this.ptable[CcmC.K_ACTION_EQLMUL] = 19;
+    this.ptable[CcmC.K_ACTION_EQLDIV] = 19;
+    this.ptable[CcmC.K_ACTION_CREALOCINT] = 19;
+    this.ptable[CcmC.K_ACTION_CREALOCFLOAT] = 19;
+    this.ptable[CcmC.K_ACTION_CREALOCSTRING] = 19;
+    this.ptable[CcmC.K_ACTION_CREAGBLINT] = 19;
+    this.ptable[CcmC.K_ACTION_CREAGBLFLOAT] = 19;
+    this.ptable[CcmC.K_ACTION_CREAGBLSTRING] = 19;
+    this.ptable[CcmC.K_ACTION_CREAEXTINT] = 19;
+    this.ptable[CcmC.K_ACTION_CREAEXTFLOAT] = 19;
+    this.ptable[CcmC.K_ACTION_CREAEXTSTRING] = 19;
+    this.ptable[CcmC.K_ACTION_LSHIFT] = 12;
+    this.ptable[CcmC.K_ACTION_RSHIFT] = 12;
+    this.ptable[CcmC.K_ACTION_FUNCTION] = 2;
+    
+    this.ctable[0] = CcmC.K_ACTION_END;
+    this.ctable[';'.charCodeAt(0)] = CcmC.K_ACTION_END;
+    this.ctable['	'.charCodeAt(0)] = CcmC.K_ACTION_DELIM;
+    this.ctable[' '.charCodeAt(0)] = CcmC.K_ACTION_DELIM;
+    this.ctable[10] = CcmC.K_ACTION_DELIM;
+    this.ctable['!'.charCodeAt(0)] = CcmC.K_ACTION_INV;
+    this.ctable['='.charCodeAt(0)] = CcmC.K_ACTION_EQL;
+    this.ctable['>'.charCodeAt(0)] = CcmC.K_ACTION_GT;
+    this.ctable['<'.charCodeAt(0)] = CcmC.K_ACTION_LT;
+    this.ctable[')'.charCodeAt(0)] = CcmC.K_ACTION_DOWN;
+    this.ctable['('.charCodeAt(0)] = CcmC.K_ACTION_UP;
+    this.ctable['*'.charCodeAt(0)] = CcmC.K_ACTION_MUL;
+    this.ctable['/'.charCodeAt(0)] = CcmC.K_ACTION_DIV;
+    this.ctable['+'.charCodeAt(0)] = CcmC.K_ACTION_ADD;
+    this.ctable['-'.charCodeAt(0)] = CcmC.K_ACTION_SUB;
+    this.ctable['|'.charCodeAt(0)] = CcmC.K_ACTION_OR;
+    this.ctable['&'.charCodeAt(0)] = CcmC.K_ACTION_AND;
+    this.ctable['_'.charCodeAt(0)] = CcmC.K_ACTION_VAR;
+    this.ctable['A'.charCodeAt(0)] = CcmC.K_ACTION_VAR;
+    this.ctable['B'.charCodeAt(0)] = CcmC.K_ACTION_VAR;
+    this.ctable['C'.charCodeAt(0)] = CcmC.K_ACTION_VAR;
+    this.ctable['D'.charCodeAt(0)] = CcmC.K_ACTION_VAR;
+    this.ctable['E'.charCodeAt(0)] = CcmC.K_ACTION_VAR;
+    this.ctable['F'.charCodeAt(0)] = CcmC.K_ACTION_VAR;
+    this.ctable['G'.charCodeAt(0)] = CcmC.K_ACTION_VAR;
+    this.ctable['H'.charCodeAt(0)] = CcmC.K_ACTION_VAR;
+    this.ctable['I'.charCodeAt(0)] = CcmC.K_ACTION_VAR;
+    this.ctable['J'.charCodeAt(0)] = CcmC.K_ACTION_VAR;
+    this.ctable['K'.charCodeAt(0)] = CcmC.K_ACTION_VAR;
+    this.ctable['L'.charCodeAt(0)] = CcmC.K_ACTION_VAR;
+    this.ctable['M'.charCodeAt(0)] = CcmC.K_ACTION_VAR;
+    this.ctable['N'.charCodeAt(0)] = CcmC.K_ACTION_VAR;
+    this.ctable['O'.charCodeAt(0)] = CcmC.K_ACTION_VAR;
+    this.ctable['P'.charCodeAt(0)] = CcmC.K_ACTION_VAR;
+    this.ctable['Q'.charCodeAt(0)] = CcmC.K_ACTION_VAR;
+    this.ctable['R'.charCodeAt(0)] = CcmC.K_ACTION_VAR;
+    this.ctable['S'.charCodeAt(0)] = CcmC.K_ACTION_VAR;
+    this.ctable['T'.charCodeAt(0)] = CcmC.K_ACTION_VAR;
+    this.ctable['U'.charCodeAt(0)] = CcmC.K_ACTION_VAR;
+    this.ctable['V'.charCodeAt(0)] = CcmC.K_ACTION_VAR;
+    this.ctable['W'.charCodeAt(0)] = CcmC.K_ACTION_VAR;
+    this.ctable['X'.charCodeAt(0)] = CcmC.K_ACTION_VAR;
+    this.ctable['Y'.charCodeAt(0)] = CcmC.K_ACTION_VAR;
+    this.ctable['Z'.charCodeAt(0)] = CcmC.K_ACTION_VAR;
+    this.ctable['a'.charCodeAt(0)] = CcmC.K_ACTION_VAR;
+    this.ctable['b'.charCodeAt(0)] = CcmC.K_ACTION_VAR;
+    this.ctable['c'.charCodeAt(0)] = CcmC.K_ACTION_VAR;
+    this.ctable['d'.charCodeAt(0)] = CcmC.K_ACTION_VAR;
+    this.ctable['e'.charCodeAt(0)] = CcmC.K_ACTION_VAR;
+    this.ctable['f'.charCodeAt(0)] = CcmC.K_ACTION_VAR;
+    this.ctable['g'.charCodeAt(0)] = CcmC.K_ACTION_VAR;
+    this.ctable['h'.charCodeAt(0)] = CcmC.K_ACTION_VAR;
+    this.ctable['i'.charCodeAt(0)] = CcmC.K_ACTION_VAR;
+    this.ctable['j'.charCodeAt(0)] = CcmC.K_ACTION_VAR;
+    this.ctable['k'.charCodeAt(0)] = CcmC.K_ACTION_VAR;
+    this.ctable['l'.charCodeAt(0)] = CcmC.K_ACTION_VAR;
+    this.ctable['m'.charCodeAt(0)] = CcmC.K_ACTION_VAR;
+    this.ctable['n'.charCodeAt(0)] = CcmC.K_ACTION_VAR;
+    this.ctable['o'.charCodeAt(0)] = CcmC.K_ACTION_VAR;
+    this.ctable['p'.charCodeAt(0)] = CcmC.K_ACTION_VAR;
+    this.ctable['q'.charCodeAt(0)] = CcmC.K_ACTION_VAR;
+    this.ctable['r'.charCodeAt(0)] = CcmC.K_ACTION_VAR;
+    this.ctable['s'.charCodeAt(0)] = CcmC.K_ACTION_VAR;
+    this.ctable['t'.charCodeAt(0)] = CcmC.K_ACTION_VAR;
+    this.ctable['u'.charCodeAt(0)] = CcmC.K_ACTION_VAR;
+    this.ctable['v'.charCodeAt(0)] = CcmC.K_ACTION_VAR;
+    this.ctable['w'.charCodeAt(0)] = CcmC.K_ACTION_VAR;
+    this.ctable['x'.charCodeAt(0)] = CcmC.K_ACTION_VAR;
+    this.ctable['y'.charCodeAt(0)] = CcmC.K_ACTION_VAR;
+    this.ctable['z'.charCodeAt(0)] = CcmC.K_ACTION_VAR;
+    this.ctable['['.charCodeAt(0)] = CcmC.K_ACTION_VAR;
+    this.ctable[']'.charCodeAt(0)] = CcmC.K_ACTION_VAR;
+    this.ctable['0'.charCodeAt(0)] = CcmC.K_ACTION_NUM;
+    this.ctable['1'.charCodeAt(0)] = CcmC.K_ACTION_NUM;
+    this.ctable['2'.charCodeAt(0)] = CcmC.K_ACTION_NUM;
+    this.ctable['3'.charCodeAt(0)] = CcmC.K_ACTION_NUM;
+    this.ctable['4'.charCodeAt(0)] = CcmC.K_ACTION_NUM;
+    this.ctable['5'.charCodeAt(0)] = CcmC.K_ACTION_NUM;
+    this.ctable['6'.charCodeAt(0)] = CcmC.K_ACTION_NUM;
+    this.ctable['7'.charCodeAt(0)] = CcmC.K_ACTION_NUM;
+    this.ctable['8'.charCodeAt(0)] = CcmC.K_ACTION_NUM;
+    this.ctable['9'.charCodeAt(0)] = CcmC.K_ACTION_NUM;
+    this.ctable['.'.charCodeAt(0)] = CcmC.K_ACTION_FLOAT;
+    this.ctable['"'.charCodeAt(0)] = CcmC.K_ACTION_STRING;
+    this.ctable[','.charCodeAt(0)] = CcmC.K_ACTION_LIST;
+    this.ctable['\\'.charCodeAt(0)] = CcmC.K_ACTION_BACKSLASH;
+  }
+  
+  this.set_operand_parlevel = function(rowctx) {
+    var curr_operand;
+    var operand;
+
+    if (rowctx.curr_operand == null)
+      return;
+    curr_operand = rowctx.curr_operand;
+    operand = curr_operand.prev;
+    if (curr_operand.prev == null)
+      curr_operand.parlevel = 1;
+    else if (curr_operand.parlevel == 0)
+      curr_operand.parlevel = operand.parlevel;
+  }
+
+  this.set_operand_parlevel_down = function(rowctx) {
+    var curr_operand;
+    var operand;
+
+    curr_operand = rowctx.curr_operand;
+    operand = curr_operand.prev;
+    if (curr_operand.prev == null) {
+      curr_operand.parlevel = 1;
+      return;
+    }
+
+    if (operand.parlevel == 1) {
+      rowctx.state = CcmC.K_STATE_ERROR;
+      rowctx.msg = "Parenthesis mismatch";
+    } else {
+      curr_operand.parlevel = operand.parlevel - 1;
+    }
+  }
+
+  this.set_operand_parlevel_up = function(rowctx) {
+    var curr_operand;
+    var operand;
+
+    curr_operand = rowctx.curr_operand;
+    operand = curr_operand.prev;
+    if (curr_operand.prev == null) {
+      curr_operand.parlevel = 2;
+      return;
+    }
+
+    curr_operand.parlevel = operand.parlevel + 1;
+  }
+
+  this.create_no_operand = function(rowctx) {
+    var operand_p;
+    var prev_operand;
+
+    operand_p = new ccm_sOperand();
+
+    /* Insert in list */
+    if (rowctx.list == null) {
+      rowctx.list = operand_p;
+      rowctx.curr_operand = operand_p;
+    } else {
+      prev_operand = rowctx.curr_operand;
+      prev_operand.next = operand_p;
+      rowctx.curr_operand = operand_p;
+      operand_p.prev = prev_operand;
+    }
+    operand_p.type = CcmC.K_OPERAND_NO;
+  }
+
+  this.operand_found = function(rowctx) {
+    var operand_p;
+    var prev_operand;
+    var upname;
+
+    if (rowctx.last_type != CcmC.K_TYPE_OPERATOR) {
+      rowctx.state = CcmC.STATE_ERROR;
+      return CCM_.SYNTAX;
+    }
+
+    operand_p = new ccm_sOperand();
+
+    if (rowctx.state == CcmC.K_STATE_VAR) {
+      /* Variable found */
+      operand_p.type = CcmC.K_OPERAND_NAME;
+      operand_p.name = rowctx.line.substring(rowctx.delim_pos,
+          rowctx.pos);
+
+      rowctx.last_type = CcmC.K_TYPE_OPERAND;
+
+      /* Check if reserved word */
+      upname = this.rtt_toupper(operand_p.name);
+      if (upname === "INT") {
+	if (rowctx.curr_operand != null
+            && rowctx.curr_operand.type == CcmC.K_OPERAND_GLOBAL)
+	  operand_p.o_operator = CcmC.K_ACTION_CREAGBLINT;
+	else if (rowctx.curr_operand != null
+		 && rowctx.curr_operand.type == CcmC.K_OPERAND_EXTERN)
+	  operand_p.o_operator = CcmC.K_ACTION_CREAEXTINT;
+	else
+	  operand_p.o_operator = CcmC.K_ACTION_CREALOCINT;
+	operand_p.type = CcmC.K_OPERAND_DECL;
+	rowctx.last_type = CcmC.K_TYPE_OPERATOR;
+      } else if (upname === "FLOAT") {
+	if (rowctx.curr_operand != null
+            && rowctx.curr_operand.type == CcmC.K_OPERAND_GLOBAL)
+	  operand_p.o_operator = CcmC.K_ACTION_CREAGBLFLOAT;
+	else if (rowctx.curr_operand != null
+            && rowctx.curr_operand.type == CcmC.K_OPERAND_EXTERN)
+	  operand_p.o_operator = CcmC.K_ACTION_CREAEXTFLOAT;
+	else
+	  operand_p.o_operator = CcmC.K_ACTION_CREALOCFLOAT;
+	operand_p.type = CcmC.K_OPERAND_DECL;
+	rowctx.last_type = CcmC.K_TYPE_OPERATOR;
+      } else if (upname === "STRING") {
+	if (rowctx.curr_operand != null
+            && rowctx.curr_operand.type == CcmC.K_OPERAND_GLOBAL)
+	  operand_p.o_operator = CcmC.K_ACTION_CREAGBLSTRING;
+	else if (rowctx.curr_operand != null
+            && rowctx.curr_operand.type == CcmC.K_OPERAND_EXTERN)
+	  operand_p.o_operator = CcmC.K_ACTION_CREAEXTSTRING;
+	else
+	  operand_p.o_operator = CcmC.K_ACTION_CREALOCSTRING;
+	operand_p.type = CcmC.K_OPERAND_DECL;
+	rowctx.last_type = CcmC.K_TYPE_OPERATOR;
+      } else if (upname === "GLOBAL") {
+	operand_p.type = CcmC.K_OPERAND_GLOBAL;
+	operand_p.o_operator = CcmC.K_ACTION_NO;
+	rowctx.last_type = CcmC.K_TYPE_OPERATOR;
+      } else if (upname === "EXTERN") {
+	operand_p.type = CcmC.K_OPERAND_EXTERN;
+	operand_p.o_operator = CcmC.K_ACTION_NO;
+	rowctx.last_type = CcmC.K_TYPE_OPERATOR;
+      } else if (upname === "DELETE") {
+	operand_p.type = CcmC.K_OPERAND_DELETE;
+	operand_p.o_operator = CcmC.K_ACTION_DELETE;
+	rowctx.last_type = CcmC.K_TYPE_OPERATOR;
+      } else if (upname === "DELETEGBL") {
+	operand_p.type = CcmC.K_OPERAND_DELETEGBL;
+	operand_p.o_operator = CcmC.K_ACTION_DELETEGBL;
+	rowctx.last_type = CcmC.K_TYPE_OPERATOR;
+      } else if (upname === "RETURN") {
+	operand_p.type = CcmC.K_OPERAND_RETURN;
+	operand_p.o_operator = CcmC.K_ACTION_RETURN;
+	rowctx.last_type = CcmC.K_TYPE_OPERATOR;
+      }
+      
+    } else if (rowctx.state == CcmC.K_STATE_NUM) {
+      /* Numeric found */
+      operand_p.type = CcmC.K_OPERAND_VALUE;
+      operand_p.name = rowctx.line.substring(rowctx.delim_pos,
+	  rowctx.pos);
+      if (rowctx.num_decl == CcmC.K_DECL_FLOAT) {
+	operand_p.value_float = parseFloat(operand_p.name);
+	operand_p.value_decl = CcmC.K_DECL_FLOAT;
+	if (rowctx.num_neg)
+	  operand_p.value_float = -operand_p.value_float;
+      } else {
+	operand_p.value_int = parseInt(operand_p.name);
+	operand_p.value_decl = CcmC.K_DECL_INT;
+	if (rowctx.num_neg)
+	  operand_p.value_int = -operand_p.value_int;
+      }
+      rowctx.num_decl = 0;
+      rowctx.last_type = CcmC.K_TYPE_OPERAND;
+    } else if (rowctx.state == CcmC.K_STATE_STRING) {
+      /* String found */
+      operand_p.type = CcmC.K_OPERAND_VALUE;
+      if (rowctx.pos - rowctx.delim_pos > CcmC.K_STRING_SIZE - 1) {
+	rowctx.state = CcmC.K_STATE_ERROR;
+	rowctx.msg = "String too long";
+	return CCM_.SYNTAX;
+      }
+      operand_p.name = rowctx.line.substring(rowctx.delim_pos,
+          rowctx.pos);
+      operand_p.value_string = operand_p.name;
+      operand_p.value_decl = CcmC.K_DECL_STRING;
+      rowctx.last_type = CcmC.K_TYPE_OPERAND;
+    }
+
+    /* Insert in list */
+    if (rowctx.list == null) {
+      rowctx.list = operand_p;
+      rowctx.curr_operand = operand_p;
+    } else {
+      prev_operand = rowctx.curr_operand;
+      prev_operand.next = operand_p;
+      rowctx.curr_operand = operand_p;
+      operand_p.prev = prev_operand;
+    }
+    rowctx.num_neg = 0;
+
+    return CCM_.SUCCESS;
+  }
+
+  this.function_found = function(rowctx) {
+    var operand_p;
+    var prev_operand;
+
+    operand_p = new ccm_sOperand();
+
+    operand_p.type = CcmC.K_OPERAND_FUNCTION;
+    operand_p.name = rowctx.line.substring(rowctx.delim_pos,
+	rowctx.pos);
+    operand_p.o_operator = CcmC.K_ACTION_FUNCTION;
+    rowctx.last_type = CcmC.K_TYPE_OPERATOR;
+
+    /* Insert in list */
+    if (rowctx.list == null) {
+      rowctx.list = operand_p;
+      rowctx.curr_operand = operand_p;
+    } else {
+      prev_operand = rowctx.curr_operand;
+      prev_operand.next = operand_p;
+      rowctx.curr_operand = operand_p;
+      operand_p.prev = prev_operand;
+    }
+  }
+
+  this.create_list = function(filectx, line) {
+    var rowctx;
+    var msg;
+    var sts = CCM_.SUCCESS;
+    var c;
+    var ret = {
+      sts : CCM_.SUCCESS,
+      list : null};
+
+    rowctx = new ccm_tRowCtx();
+    rowctx.line = line;
+    rowctx.filectx = filectx;
+    rowctx.pos = 0;
+    rowctx.last_type = 0;
+
+    this.init_ctable();
+
+    for (;;) {
+      if (rowctx.pos > rowctx.line.length) {
+	rowctx.state = CcmC.K_STATE_ERROR;
+	rowctx.msg = "Expression to large";
+	break;
+      }
+      if (rowctx.state == CcmC.K_STATE_STRING) {
+	if (this.ctable[rowctx.line.charCodeAt(rowctx.pos)] != CcmC.K_ACTION_STRING
+	    || (this.ctable[rowctx.line.charCodeAt(rowctx.pos)]
+		== CcmC.K_ACTION_STRING
+		&& this.ctable[rowctx.line.charCodeAt(rowctx.pos - 1)]
+		== CcmC.K_ACTION_BACKSLASH)) {
+	  rowctx.pos++;
+	  continue;
+	}
+      }
+      if (rowctx.pos == rowctx.line.length)
+	c = 0;
+      else
+	c = rowctx.line.charCodeAt(rowctx.pos);
+      if (c > 254)
+	c = 122;
+      switch (this.ctable[c]) {
+      case CcmC.K_ACTION_VAR:
+	if (rowctx.state == CcmC.K_STATE_NUM) {
+          if (rowctx.line.charAt(rowctx.pos) === 'e' || rowctx.line.charAt(rowctx.pos) === 'E') {
+            rowctx.num_decl = CcmC.K_DECL_FLOAT;
+            rowctx.num_exp = 1;
+            rowctx.pos++;
+            break;
+          }
+	  rowctx.state = CcmC.K_STATE_ERROR;
+	  rowctx.msg = "Syntax error";
+	} else if (rowctx.state == CcmC.K_STATE_NUM_NEG) {
+	  rowctx.state = CcmC.K_STATE_VAR;
+	  rowctx.delim_pos = rowctx.pos;
+
+	  /* Create an -1 operand with multiplication operator */
+	  rowctx.last_type = CcmC.K_TYPE_OPERATOR;
+	  rowctx.delim_pos = rowctx.pos;
+	  this.create_no_operand(rowctx);
+	  rowctx.curr_operand.o_operator = CcmC.K_ACTION_MUL;
+	  rowctx.curr_operand.type = CcmC.K_OPERAND_VALUE;
+	  rowctx.curr_operand.name = "-1";
+	  rowctx.curr_operand.value_int = -1;
+	  rowctx.curr_operand.value_decl = CcmC.K_DECL_INT;
+	  rowctx.curr_operand.prio = this.ptable[rowctx.curr_operand.o_operator];
+	  this.set_operand_parlevel(rowctx);
+	} else if (!(rowctx.state == CcmC.K_STATE_VAR
+                     || rowctx.state == CcmC.K_STATE_STRING)) {
+	  rowctx.state = CcmC.K_STATE_VAR;
+	  rowctx.delim_pos = rowctx.pos;
+	}
+	rowctx.pos++;
+	break;
+
+      case CcmC.K_ACTION_NUM:
+	if (rowctx.state == CcmC.K_STATE_NUM_NEG) {
+	  rowctx.state = CcmC.K_STATE_NUM;
+	  rowctx.delim_pos = rowctx.pos;
+	  rowctx.num_neg = 1;
+	} else if (!(rowctx.state == CcmC.K_STATE_VAR
+                     || rowctx.state == CcmC.K_STATE_NUM)) {
+	  rowctx.state = CcmC.K_STATE_NUM;
+	  rowctx.delim_pos = rowctx.pos;
+	}
+	rowctx.pos++;
+	break;
+
+      case CcmC.K_ACTION_FLOAT:
+	if (rowctx.state == CcmC.K_STATE_NUM)
+	  rowctx.num_decl = CcmC.K_DECL_FLOAT;
+	else if (rowctx.state == CcmC.K_STATE_VAR)
+	  ;
+	else {
+	  rowctx.state = CcmC.K_STATE_ERROR;
+	  rowctx.msg = "Syntax error";
+	}
+	rowctx.pos++;
+	break;
+
+      case CcmC.K_ACTION_STRING:
+	if (rowctx.state == CcmC.K_STATE_NUM) {
+	  rowctx.state = CcmC.K_STATE_ERROR;
+	  rowctx.msg = "Syntax error";
+	} else if (rowctx.state != CcmC.K_STATE_STRING) {
+	  rowctx.state = CcmC.K_STATE_STRING;
+	  rowctx.delim_pos = rowctx.pos + 1;
+	} else {
+	  sts = this.operand_found(rowctx);
+	  if (EVEN(sts))
+	    break;
+	  rowctx.state = CcmC.K_STATE_DELIM;
+	}
+	rowctx.pos++;
+	break;
+
+      case CcmC.K_ACTION_LIST:
+	if (rowctx.state == CcmC.K_STATE_NUM || rowctx.state == CcmC.K_STATE_VAR) {
+	  sts = this.operand_found(rowctx);
+	  if (EVEN(sts))
+	    break;
+	  rowctx.last_type = CcmC.K_TYPE_OPERATOR;
+	} else if (!(rowctx.state == CcmC.K_STATE_DELIM
+                     && rowctx.last_type == CcmC.K_TYPE_OPERAND)) {
+	  rowctx.state = CcmC.K_STATE_ERROR;
+	  rowctx.msg = "Syntax error";
+	}
+
+	rowctx.curr_operand.o_operator = CcmC.K_ACTION_LIST;
+	rowctx.state = CcmC.K_STATE_LIST;
+	rowctx.last_type = CcmC.K_TYPE_OPERATOR;
+	this.set_operand_parlevel(rowctx);
+	rowctx.pos++;
+	break;
+
+      case CcmC.K_ACTION_DOWN:
+	if (rowctx.state == CcmC.K_STATE_NUM || rowctx.state == CcmC.K_STATE_VAR) {
+	  sts = this.operand_found(rowctx);
+	  if (EVEN(sts))
+	    break;
+	} else if (rowctx.state == CcmC.K_STATE_PAR) {
+	  this.create_no_operand(rowctx);
+	  rowctx.last_type = CcmC.K_TYPE_OPERAND;
+	} else if (rowctx.last_type != CcmC.K_TYPE_OPERAND) {
+	  this.create_no_operand(rowctx);
+	  rowctx.last_type = CcmC.K_TYPE_OPERAND;
+	}
+	rowctx.pos++;
+	this.set_operand_parlevel_down(rowctx);
+	rowctx.state = CcmC.K_STATE_PAR;
+	break;
+
+      case CcmC.K_ACTION_UP:
+	if (rowctx.state == CcmC.K_STATE_VAR && rowctx.last_type == CcmC.K_TYPE_OPERATOR)
+	  this.function_found(rowctx);
+	else if (rowctx.state == CcmC.K_STATE_NUM_NEG) {
+	  /* Create an -1 operand with multiplication operator */
+	  rowctx.last_type = CcmC.K_TYPE_OPERATOR;
+	  rowctx.delim_pos = rowctx.pos;
+	  this.create_no_operand(rowctx);
+	  rowctx.curr_operand.o_operator = CcmC.K_ACTION_MUL;
+	  rowctx.curr_operand.type = CcmC.K_OPERAND_VALUE;
+	  rowctx.curr_operand.name = "-1";
+	  rowctx.curr_operand.value_int = -1;
+	  rowctx.curr_operand.value_decl = CcmC.K_DECL_INT;
+	  rowctx.curr_operand.prio = this.ptable[rowctx.curr_operand.o_operator];
+	  this.set_operand_parlevel(rowctx);
+
+	  this.create_no_operand(rowctx);
+	} else if (rowctx.state == CcmC.K_STATE_NUM || rowctx.state == CcmC.K_STATE_VAR) {
+	  sts = this.operand_found(rowctx);
+	  if (EVEN(sts))
+	    break;
+	} else if (rowctx.last_type != CcmC.K_TYPE_OPERAND) {
+	  this.create_no_operand(rowctx);
+	  rowctx.last_type = CcmC.K_TYPE_OPERATOR;
+	}
+	rowctx.pos++;
+	this.set_operand_parlevel_up(rowctx);
+	rowctx.state = CcmC.K_STATE_PAR;
+	break;
+
+      case CcmC.K_ACTION_INV:
+	if (rowctx.line[rowctx.pos + 1] == '=') {
+	  if (rowctx.state == CcmC.K_STATE_NUM || rowctx.state == CcmC.K_STATE_VAR) {
+	    sts = this.operand_found(rowctx);
+	    if (EVEN(sts))
+	      break;
+	  }
+
+	  if (rowctx.last_type != CcmC.K_TYPE_OPERAND) {
+	    rowctx.state = CcmC.K_STATE_ERROR;
+	    rowctx.msg = "Syntax error";
+	    break;
+	  }
+
+	  rowctx.curr_operand.o_operator = CcmC.K_ACTION_NE;
+	  rowctx.pos++;
+	  rowctx.pos++;
+	  rowctx.last_type = CcmC.K_TYPE_OPERATOR;
+	  rowctx.state = CcmC.K_STATE_OPERATOR;
+	  rowctx.curr_operand.prio = this.ptable[rowctx.curr_operand.o_operator];
+	  this.set_operand_parlevel(rowctx);
+	} else {
+	  if (rowctx.state == CcmC.K_STATE_NUM || rowctx.state == CcmC.K_STATE_VAR) {
+	    rowctx.state = CcmC.K_STATE_ERROR;
+	    rowctx.msg = "Syntax error";
+	  } else {
+	    this.create_no_operand(rowctx);
+	    rowctx.last_type = CcmC.K_TYPE_OPERATOR;
+	    rowctx.curr_operand.o_operator = CcmC.K_ACTION_INV;
+	    rowctx.pos++;
+	    this.set_operand_parlevel(rowctx);
+	  }
+	}
+	break;
+
+      case CcmC.K_ACTION_ADD:
+	if (rowctx.state == CcmC.K_STATE_NUM || rowctx.state == CcmC.K_STATE_VAR) {
+	  sts = this.operand_found(rowctx);
+	  if (EVEN(sts))
+	    break;
+	}
+
+	if (rowctx.line[rowctx.pos + 1] == '+') {
+	  if (rowctx.last_type != CcmC.K_TYPE_OPERAND) {
+	    rowctx.state = CcmC.K_STATE_ERROR;
+	    rowctx.msg = "Syntax error";
+	    break;
+	  }
+	  rowctx.curr_operand.local_operator = CcmC.K_ACTION_INCR;
+	  rowctx.curr_operand.local_type = CcmC.K_LOCTYPE_AFTER;
+	  rowctx.pos++;
+	  rowctx.pos++;
+	  rowctx.state = CcmC.K_STATE_DELIM;
+	} else if (rowctx.line[rowctx.pos + 1] == '=') {
+	  if (rowctx.last_type != CcmC.K_TYPE_OPERAND) {
+	    rowctx.state = CcmC.K_STATE_ERROR;
+	    rowctx.msg = "Syntax error";
+	    break;
+	  }
+	  rowctx.curr_operand.o_operator = CcmC.K_ACTION_EQLADD;
+	  rowctx.pos++;
+	  rowctx.pos++;
+	  rowctx.last_type = CcmC.K_TYPE_OPERATOR;
+	  rowctx.state = CcmC.K_STATE_OPERATOR;
+	} else {
+	  if (rowctx.last_type != CcmC.K_TYPE_OPERAND) {
+	    rowctx.state = CcmC.K_STATE_ERROR;
+	    rowctx.msg = "Syntax error";
+	    break;
+	  }
+	  rowctx.curr_operand.o_operator = CcmC.K_ACTION_ADD;
+	  rowctx.pos++;
+	  rowctx.last_type = CcmC.K_TYPE_OPERATOR;
+	  rowctx.state = CcmC.K_STATE_OPERATOR;
+	}
+	rowctx.curr_operand.prio = this.ptable[rowctx.curr_operand.o_operator];
+	this.set_operand_parlevel(rowctx);
+	break;
+
+      case CcmC.K_ACTION_SUB:
+	if (rowctx.state == CcmC.K_STATE_NUM && rowctx.num_exp) {
+          rowctx.pos++;
+          break;
+        }
+	else if (rowctx.state == CcmC.K_STATE_NUM || rowctx.state == CcmC.K_STATE_VAR) {
+	  sts = this.operand_found(rowctx);
+	  if (EVEN(sts))
+	    break;
+	}
+
+	if (rowctx.line[rowctx.pos + 1] == '-') {
+	  if (rowctx.last_type != CcmC.K_TYPE_OPERAND) {
+	    rowctx.state = CcmC.K_STATE_ERROR;
+	    rowctx.msg = "Syntax error";
+	    break;
+	  }
+	  rowctx.curr_operand.local_operator = CcmC.K_ACTION_DECR;
+	  rowctx.curr_operand.local_type = CcmC.K_LOCTYPE_AFTER;
+	  rowctx.state = CcmC.K_STATE_DELIM;
+	  rowctx.pos++;
+	  rowctx.pos++;
+	} else if (rowctx.line[rowctx.pos + 1] == '=') {
+	  if (rowctx.last_type != CcmC.K_TYPE_OPERAND) {
+	    rowctx.state = CcmC.K_STATE_ERROR;
+	    rowctx.msg = "Syntax error";
+	    break;
+	  }
+	  rowctx.curr_operand.o_operator = CcmC.K_ACTION_EQLSUB;
+	  rowctx.pos++;
+	  rowctx.pos++;
+	  rowctx.last_type = CcmC.K_TYPE_OPERATOR;
+	  rowctx.state = CcmC.K_STATE_OPERATOR;
+	} else if (rowctx.last_type != CcmC.K_TYPE_OPERAND) {
+	  rowctx.state = CcmC.K_STATE_NUM_NEG;
+	  rowctx.pos++;
+	} else {
+	  rowctx.curr_operand.o_operator = CcmC.K_ACTION_SUB;
+	  rowctx.pos++;
+	  rowctx.last_type = CcmC.K_TYPE_OPERATOR;
+	  rowctx.state = CcmC.K_STATE_OPERATOR;
+	}
+	rowctx.curr_operand.prio = this.ptable[rowctx.curr_operand.o_operator];
+	this.set_operand_parlevel(rowctx);
+	break;
+
+      case CcmC.K_ACTION_MUL:
+	if (rowctx.state == CcmC.K_STATE_NUM || rowctx.state == CcmC.K_STATE_VAR) {
+	  sts = this.operand_found(rowctx);
+	  if (EVEN(sts))
+	    break;
+	}
+
+	if (rowctx.last_type != CcmC.K_TYPE_OPERAND) {
+	  rowctx.state = CcmC.K_STATE_ERROR;
+	  rowctx.msg = "Syntax error";
+	  break;
+	}
+
+	else if (rowctx.line[rowctx.pos + 1] == '=') {
+	  rowctx.curr_operand.o_operator = CcmC.K_ACTION_EQLMUL;
+	  rowctx.pos++;
+	  rowctx.pos++;
+	} else {
+	  rowctx.curr_operand.o_operator = CcmC.K_ACTION_MUL;
+	  rowctx.pos++;
+	}
+	rowctx.last_type = CcmC.K_TYPE_OPERATOR;
+	rowctx.state = CcmC.K_STATE_OPERATOR;
+	rowctx.curr_operand.prio = this.ptable[rowctx.curr_operand.o_operator];
+	this.set_operand_parlevel(rowctx);
+	break;
+
+      case CcmC.K_ACTION_DIV:
+	if (rowctx.state == CcmC.K_STATE_NUM || rowctx.state == CcmC.K_STATE_VAR) {
+	  sts = this.operand_found(rowctx);
+	  if (EVEN(sts))
+	    break;
+	}
+
+	if (rowctx.last_type != CcmC.K_TYPE_OPERAND) {
+	  rowctx.state = CcmC.K_STATE_ERROR;
+	  rowctx.msg = "Syntax error";
+	  break;
+	}
+
+	else if (rowctx.line[rowctx.pos + 1] == '=') {
+	  rowctx.curr_operand.o_operator = CcmC.K_ACTION_EQLDIV;
+	  rowctx.pos++;
+	  rowctx.pos++;
+	} else {
+	  rowctx.curr_operand.o_operator = CcmC.K_ACTION_DIV;
+	  rowctx.pos++;
+	}
+	rowctx.last_type = CcmC.K_TYPE_OPERATOR;
+	rowctx.state = CcmC.K_STATE_OPERATOR;
+	rowctx.curr_operand.prio = this.ptable[rowctx.curr_operand.o_operator];
+	this.set_operand_parlevel(rowctx);
+	break;
+
+      case CcmC.K_ACTION_EQL:
+	if (rowctx.state == CcmC.K_STATE_NUM || rowctx.state == CcmC.K_STATE_VAR) {
+	  sts = this.operand_found(rowctx);
+	  if (EVEN(sts))
+	    break;
+	}
+
+	if (rowctx.last_type != CcmC.K_TYPE_OPERAND) {
+	  rowctx.state = CcmC.K_STATE_ERROR;
+	  rowctx.msg = "Syntax error";
+	  break;
+	}
+
+	else if (rowctx.line[rowctx.pos + 1] == '=') {
+	  rowctx.curr_operand.o_operator = CcmC.K_ACTION_EQ;
+	  rowctx.pos++;
+	  rowctx.pos++;
+	} else {
+	  rowctx.curr_operand.o_operator = CcmC.K_ACTION_EQL;
+	  rowctx.pos++;
+	}
+	rowctx.last_type = CcmC.K_TYPE_OPERATOR;
+	rowctx.state = CcmC.K_STATE_OPERATOR;
+	rowctx.curr_operand.prio = this.ptable[rowctx.curr_operand.o_operator];
+	this.set_operand_parlevel(rowctx);
+	break;
+
+      case CcmC.K_ACTION_LT:
+	if (rowctx.state == CcmC.K_STATE_NUM || rowctx.state == CcmC.K_STATE_VAR) {
+	  sts = this.operand_found(rowctx);
+	  if (EVEN(sts))
+	    break;
+	}
+
+	if (rowctx.last_type != CcmC.K_TYPE_OPERAND) {
+	  rowctx.state = CcmC.K_STATE_ERROR;
+	  rowctx.msg = "Syntax error";
+	  break;
+	}
+
+	else if (rowctx.line[rowctx.pos + 1] == '=') {
+	  rowctx.curr_operand.o_operator = CcmC.K_ACTION_LE;
+	  rowctx.pos++;
+	  rowctx.pos++;
+	} else if (rowctx.line[rowctx.pos + 1] == '<') {
+	  rowctx.curr_operand.o_operator = CcmC.K_ACTION_LSHIFT;
+	  rowctx.pos++;
+	  rowctx.pos++;
+	} else {
+	  rowctx.curr_operand.o_operator = CcmC.K_ACTION_LT;
+	  rowctx.pos++;
+	}
+	rowctx.last_type = CcmC.K_TYPE_OPERATOR;
+	rowctx.state = CcmC.K_STATE_OPERATOR;
+	rowctx.curr_operand.prio = this.ptable[rowctx.curr_operand.o_operator];
+	this.set_operand_parlevel(rowctx);
+	break;
+
+      case CcmC.K_ACTION_GT:
+	if (rowctx.state == CcmC.K_STATE_NUM || rowctx.state == CcmC.K_STATE_VAR) {
+	  sts = this.operand_found(rowctx);
+	  if (EVEN(sts))
+	    break;
+	}
+
+	if (rowctx.last_type != CcmC.K_TYPE_OPERAND) {
+	  rowctx.state = CcmC.K_STATE_ERROR;
+	  rowctx.msg = "Syntax error";
+	  break;
+	}
+
+	else if (rowctx.line[rowctx.pos + 1] == '=') {
+	  rowctx.curr_operand.o_operator = CcmC.K_ACTION_GE;
+	  rowctx.pos++;
+	  rowctx.pos++;
+	} else if (rowctx.line[rowctx.pos + 1] == '>') {
+	  rowctx.curr_operand.o_operator = CcmC.K_ACTION_RSHIFT;
+	  rowctx.pos++;
+	  rowctx.pos++;
+	} else {
+	  rowctx.curr_operand.o_operator = CcmC.K_ACTION_GT;
+	  rowctx.pos++;
+	}
+	rowctx.last_type = CcmC.K_TYPE_OPERATOR;
+	rowctx.state = CcmC.K_STATE_OPERATOR;
+	rowctx.curr_operand.prio = this.ptable[rowctx.curr_operand.o_operator];
+	this.set_operand_parlevel(rowctx);
+	break;
+
+      case CcmC.K_ACTION_AND:
+	if (rowctx.state == CcmC.K_STATE_NUM || rowctx.state == CcmC.K_STATE_VAR) {
+	  sts = this.operand_found(rowctx);
+	  if (EVEN(sts))
+	    break;
+	}
+
+	if (rowctx.last_type != CcmC.K_TYPE_OPERAND) {
+	  rowctx.state = CcmC.K_STATE_ERROR;
+	  rowctx.msg = "Syntax error";
+	  break;
+	}
+
+	else if (rowctx.line[rowctx.pos + 1] == '&') {
+	  rowctx.curr_operand.o_operator = CcmC.K_ACTION_AND;
+	  rowctx.pos++;
+	  rowctx.pos++;
+	} else {
+	  rowctx.curr_operand.o_operator = CcmC.K_ACTION_BITAND;
+	  rowctx.pos++;
+	}
+	rowctx.last_type = CcmC.K_TYPE_OPERATOR;
+	rowctx.state = CcmC.K_STATE_OPERATOR;
+	rowctx.curr_operand.prio = this.ptable[rowctx.curr_operand.o_operator];
+	this.set_operand_parlevel(rowctx);
+	break;
+
+      case CcmC.K_ACTION_OR:
+	if (rowctx.state == CcmC.K_STATE_NUM || rowctx.state == CcmC.K_STATE_VAR) {
+	  sts = this.operand_found(rowctx);
+	  if (EVEN(sts))
+	    break;
+	}
+
+	if (rowctx.last_type != CcmC.K_TYPE_OPERAND) {
+	  rowctx.state = CcmC.K_STATE_ERROR;
+	  rowctx.msg = "Syntax error";
+	  break;
+	}
+
+	else if (rowctx.line[rowctx.pos + 1] == '|') {
+	  rowctx.curr_operand.o_operator = CcmC.K_ACTION_OR;
+	  rowctx.pos++;
+	  rowctx.pos++;
+	} else {
+	  rowctx.curr_operand.o_operator = CcmC.K_ACTION_BITOR;
+	  rowctx.pos++;
+	}
+	rowctx.last_type = CcmC.K_TYPE_OPERATOR;
+	rowctx.state = CcmC.K_STATE_OPERATOR;
+	rowctx.curr_operand.prio = this.ptable[rowctx.curr_operand.o_operator];
+	this.set_operand_parlevel(rowctx);
+	break;
+
+      case CcmC.K_ACTION_END:
+	if (rowctx.state == CcmC.K_STATE_VAR || rowctx.state == CcmC.K_STATE_NUM)
+	  /* Operand found */
+	  {
+	    sts = this.operand_found(rowctx);
+	    if (EVEN(sts))
+	      break;
+	  }
+
+	this.set_operand_parlevel(rowctx);
+	rowctx.state = CcmC.K_STATE_END;
+	break;
+
+      case CcmC.K_ACTION_DELIM:
+	if (rowctx.state == CcmC.K_STATE_VAR || rowctx.state == CcmC.K_STATE_NUM)
+	  /* Operand found */
+	  {
+	    sts = this.operand_found(rowctx);
+	    if (EVEN(sts))
+	      break;
+	  }
+
+	if (rowctx.state != CcmC.K_STATE_NUM_NEG)
+	  rowctx.state = CcmC.K_STATE_DELIM;
+	rowctx.pos++;
+	break;
+
+      default:
+	rowctx.pos++;
+      }
+      if (rowctx.state == CcmC.K_STATE_ERROR || rowctx.state == CcmC.K_STATE_END)
+	break;
+    }
+    if (rowctx.state == CcmC.K_STATE_ERROR) {
+      msg = rowctx.msg + ", line " + filectx.current_row.toString() + " pos " + rowctx.pos.toString() + " " + rowctx.line;
+      filectx.errormessage_func(msg, 0, filectx.client_data);
+      ret.sts = CCM_.EXPRESSION;
+      return ret;
+    }
+    ret.sts = sts;
+    ret.list = rowctx.list;
+    return ret;
+  }
+
+
+  this.operate_exec = function(funcctx, op, next) {
+    var next_decl;
+    var next_int;
+    var next_float;
+    var next_string;
+    var tmp_str;
+    var sts;
+    var op_arg;
+    var arg_list;
+    var arg_p, a_p, next_arg;
+    var arg_count;
+    var exit_function_found;
+
+    exit_function_found = 0;
+    if (next == null) {
+      if (!op.result_done) {
+	switch (op.value_decl) {
+	case CcmC.K_DECL_FLOAT:
+	  op.result_float = op.value_float;
+	  break;
+	case CcmC.K_DECL_INT:
+	  op.result_int = op.value_int;
+	  break;
+	default:
+	  op.result_string = op.value_string;
+	}
+	op.result_decl = op.value_decl;
+      }
+    } else {
+      if (op.type == CcmC.K_OPERAND_NO) {
+	if (!next.result_done) {
+	  if (next.type == CcmC.K_OPERAND_NAME) {
+	    var ret = this.getvar(funcctx, next.name);
+	    if (EVEN(ret.sts))
+	      return ret.sts;
+	    next.value_decl = ret.decl;
+	    next.value_int = ret.value_int;
+	    next.value_float = ret.value_float;
+	    next.value_string = ret.value_string;
+
+	  }
+	  switch (next.value_decl) {
+          case CcmC.K_DECL_FLOAT:
+	    next.result_float = next.value_float;
+	    break;
+	  case CcmC.K_DECL_INT:
+	    next.result_int = next.value_int;
+	    break;
+	  default:
+	    next.result_string = next.value_string;
+	  }
+	  next.result_decl = next.value_decl;
+	}
+      } else if (op.type == CcmC.K_OPERAND_NAME && !op.result_done) {
+	var ret2 = this.getvar(funcctx, op.name);
+	if (EVEN(ret2.sts))
+	  return ret2.sts;
+	op.value_decl = ret2.decl;
+	op.value_int = ret2.value_int;
+	op.value_float = ret2.value_float;
+	op.value_string = ret2.value_string;
+
+      } else if (op.type == CcmC.K_OPERAND_FUNCTION) {
+	/* Create an argument list */
+	arg_list = 0;
+	arg_count = 0;
+	for (op_arg = op.next; op_arg; op_arg = op_arg.next) {
+	  if (op_arg.type == CcmC.K_OPERAND_NO
+	      && op_arg.parlevel == op.parlevel - 1)
+	    break;
+
+	  if (op_arg.type == CcmC.K_OPERAND_NAME) {
+	    var ret3 = this.getvar(funcctx, op_arg.name);
+	    if (EVEN(ret3.sts))
+	      return ret3.sts;
+	    op_arg.value_decl = ret3.decl;
+	    op_arg.value_int = ret3.value_int;
+	    op_arg.value_float = ret3.value_float;
+	    op_arg.value_string = ret3.value_string;
+	  }
+	  arg_p = new ccm_sArg();
+	  switch (op_arg.value_decl) {
+	  case CcmC.K_DECL_INT:
+	    arg_p.value_int = op_arg.value_int;
+	    break;
+	  case CcmC.K_DECL_FLOAT:
+	    arg_p.value_float = op_arg.value_float;
+	    break;
+	  case CcmC.K_DECL_STRING:
+	    arg_p.value_string = op_arg.value_string;
+	    break;
+	  default:;
+	  }
+	  arg_p.value_decl = op_arg.value_decl;
+	  arg_p.value_type = op_arg.type;
+	  arg_p.value_name = op_arg.name;
+	  if (arg_list == 0)
+	    arg_list = arg_p;
+	  else {
+	    for (a_p = arg_list; a_p.next; a_p = a_p.next)
+	      ;
+	    a_p.next = arg_p;
+	  }
+	  arg_count++;
+	  op_arg.type = CcmC.K_OPERAND_NO;
+	  if (op_arg.parlevel == op.parlevel - 1)
+	    break;
+	}
+
+	var rf = this.function_exec(funcctx.filectx, op.name, op.func, arg_list,
+				    arg_count, 0);
+	sts = rf.sts;
+	op.result_decl = rf.return_decl;
+	op.result_float = rf.return_float;
+	op.result_int = rf.return_int;
+	op.result_string = rf.return_string;
+	funcctx.filectx.funcctx = funcctx;
+
+	/* Set returned argument values and free argumentlist */
+	for (arg_p = arg_list; arg_p; arg_p = next_arg) {
+	  if (arg_p.value_type == CcmC.K_OPERAND_NAME && arg_p.value_returned) {
+	    sts = this.setvar(funcctx, arg_p.value_name, arg_p.value_decl,
+			     arg_p.value_float, arg_p.value_int, arg_p.value_string);
+	    if (EVEN(sts))
+	      return sts;
+	  }
+	  next_arg = arg_p.next;
+	}
+
+	if (EVEN(sts))
+	  return sts;
+	if (sts == CCM_.EXITFUNC)
+	  exit_function_found = 1;
+      }
+
+      if (next.type == CcmC.K_OPERAND_NAME && next.result_done == 0
+	  && op.type != CcmC.K_OPERAND_DECL) {
+
+	var ret4 = this.getvar(funcctx, next.name);
+	if (EVEN(ret4.sts))
+	  return ret4.sts;
+	next.value_decl = ret4.decl;
+	next.value_int = ret4.value_int;
+	next.value_float = ret4.value_float;
+	next.value_string = ret4.value_string;
+      }
+      if (next.result_done != 0) {
+	/* Use result, not value for next-operand */
+	next_decl = next.result_decl;
+	next_int = next.result_int;
+	next_float = next.result_float;
+	next_string = next.result_string;
+      } else {
+	/* Use value for next-operand */
+	next_decl = next.value_decl;
+	next_int = next.value_int;
+	next_float = next.value_float;
+	next_string = next.value_string;
+      }
+
+      if (next.type == CcmC.K_OPERAND_NO && !next.result_done) {
+	next.result_float = op.result_float;
+	next.result_int = op.result_int;
+	next.result_string = op.result_string;
+	next.result_decl = op.result_decl;
+      } else if (next_decl == CcmC.K_DECL_UNKNOWN) {
+	next_decl = op.value_decl;
+      }
+
+      switch (op.o_operator) {
+	case CcmC.K_ACTION_EQL:
+	sts = this.setvar(
+			 funcctx, op.name, next_decl, next_float, next_int, next_string);
+	if (EVEN(sts))
+	  return sts;
+	break;
+	case CcmC.K_ACTION_RETURN:
+	if (!next.result_done) {
+	  next.result_decl = next_decl;
+	  switch (next_decl) {
+	  case CcmC.K_DECL_INT:
+	    next.result_int = next_int;
+	    break;
+	  case CcmC.K_DECL_FLOAT:
+	    next.result_float = next_float;
+	    break;
+	  case CcmC.K_DECL_STRING:
+	    next.result_string = next_string;
+	    break;
+	  }
+	}
+	break;
+	case CcmC.K_ACTION_MUL:
+	switch (op.result_decl) {
+	case CcmC.K_DECL_INT:
+	  switch (next_decl) {
+	  case CcmC.K_DECL_INT:
+	    next.result_int = op.result_int * next_int;
+	    next.result_decl = CcmC.K_DECL_INT;
+	    break;
+	  case CcmC.K_DECL_FLOAT:
+	    next.result_float = op.result_int * next_float;
+	    next.result_decl = CcmC.K_DECL_FLOAT;
+	    break;
+	  }
+	  break;
+	case CcmC.K_DECL_FLOAT:
+	  switch (next_decl) {
+	  case CcmC.K_DECL_INT:
+	    next.result_float = op.result_float * next_int;
+	    next.result_decl = CcmC.K_DECL_FLOAT;
+	    break;
+	  case CcmC.K_DECL_FLOAT:
+	    next.result_float = op.result_float * next_float;
+	    next.result_decl = CcmC.K_DECL_FLOAT;
+	    break;
+	  }
+	  break;
+	}
+	break;
+	case CcmC.K_ACTION_DIV:
+	switch (op.result_decl) {
+	case CcmC.K_DECL_INT:
+	  switch (next_decl) {
+	  case CcmC.K_DECL_INT:
+	    next.result_int = Math.floor(op.result_int / next_int);
+	    next.result_decl = CcmC.K_DECL_INT;
+	    break;
+	  case CcmC.K_DECL_FLOAT:
+	    next.result_float = op.result_int / next_float;
+	    next.result_decl = CcmC.K_DECL_FLOAT;
+	    break;
+	  }
+	  break;
+	case CcmC.K_DECL_FLOAT:
+	  switch (next_decl) {
+	  case CcmC.K_DECL_INT:
+	    next.result_float = op.result_float / next_int;
+	    next.result_decl = CcmC.K_DECL_FLOAT;
+	    break;
+	  case CcmC.K_DECL_FLOAT:
+	    next.result_float = op.result_float / next_float;
+	    next.result_decl = CcmC.K_DECL_FLOAT;
+	    break;
+	  }
+	  break;
+	}
+	break;
+	case CcmC.K_ACTION_ADD:
+	switch (op.result_decl) {
+	case CcmC.K_DECL_INT:
+	  switch (next_decl) {
+	  case CcmC.K_DECL_INT:
+	    next.result_int = op.result_int + next_int;
+	    next.result_decl = CcmC.K_DECL_INT;
+	    break;
+	  case CcmC.K_DECL_FLOAT:
+	    next.result_float = op.result_int + next_float;
+	    next.result_decl = CcmC.K_DECL_FLOAT;
+	    break;
+	  case CcmC.K_DECL_STRING:
+	    next.result_string += op.result_int.toString() + next_string;
+	    next.result_decl = CcmC.K_DECL_STRING;
+	    break;
+	  }
+	  break;
+	case CcmC.K_DECL_FLOAT:
+	  switch (next_decl) {
+	  case CcmC.K_DECL_INT:
+	    next.result_float = op.result_float + next_int;
+	    next.result_decl = CcmC.K_DECL_FLOAT;
+	    break;
+	  case CcmC.K_DECL_FLOAT:
+	    next.result_float = op.result_float + next_float;
+	    next.result_decl = CcmC.K_DECL_FLOAT;
+	    break;
+	  case CcmC.K_DECL_STRING:
+	    tmp_str = this.float_to_string(op.result_float);
+	    next.result_string = tmp_str + next_string;
+	    next.result_decl = CcmC.K_DECL_STRING;
+	    break;
+	  }
+	  break;
+	case CcmC.K_DECL_STRING:
+	  switch (next_decl) {
+	  case CcmC.K_DECL_INT:
+	    next.result_string = op.result_string + next_int.toString();
+	    next.result_decl = CcmC.K_DECL_STRING;
+	    break;
+	  case CcmC.K_DECL_FLOAT:
+	    tmp_str = this.float_to_string(next_float);
+	    next.result_string = op.result_string + tmp_str;
+	    next.result_decl = CcmC.K_DECL_STRING;
+	    break;
+	  case CcmC.K_DECL_STRING:
+	    next.result_string = op.result_string + next_string;
+	    next.result_decl = CcmC.K_DECL_STRING;
+	    break;
+	  }
+	  break;
+	}
+	break;
+	case CcmC.K_ACTION_EQLADD:
+	switch (op.result_decl) {
+	case CcmC.K_DECL_INT:
+	  switch (next_decl) {
+	  case CcmC.K_DECL_INT:
+	    next.result_int = op.result_int + next_int;
+	    next.result_decl = CcmC.K_DECL_INT;
+	    break;
+	  case CcmC.K_DECL_FLOAT:
+	    next.result_float = op.result_int + next_float;
+	    next.result_decl = CcmC.K_DECL_FLOAT;
+	    break;
+	  case CcmC.K_DECL_STRING:
+	    next.result_string += op.result_int.toString() + next_string;
+	    next.result_decl = CcmC.K_DECL_STRING;
+	    break;
+	  }
+	  break;
+	case CcmC.K_DECL_FLOAT:
+	  switch (next_decl) {
+	  case CcmC.K_DECL_INT:
+	    next.result_float = op.result_float + next_int;
+	    next.result_decl = CcmC.K_DECL_FLOAT;
+	    break;
+	  case CcmC.K_DECL_FLOAT:
+	    next.result_float = op.result_float + next_float;
+	    next.result_decl = CcmC.K_DECL_FLOAT;
+	    break;
+	  case CcmC.K_DECL_STRING:
+	    tmp_str = this.float_to_string(op.result_float);
+	    next.result_string = tmp_str + next_string;
+	    next.result_decl = CcmC.K_DECL_STRING;
+	    break;
+	  }
+	  break;
+	case CcmC.K_DECL_STRING:
+	  switch (next_decl) {
+	  case CcmC.K_DECL_INT:
+	    next.result_string = op.result_string + next_int.toString();
+	    next.result_decl = CcmC.K_DECL_STRING;
+	    break;
+	  case CcmC.K_DECL_FLOAT:
+	    tmp_str = this.float_to_string(next_float);
+	    next.result_string = op.result_string + tmp_str;
+	    next.result_decl = CcmC.K_DECL_STRING;
+	    break;
+	  case CcmC.K_DECL_STRING:
+	    next.result_string = op.result_string + next_string;
+	    next.result_decl = CcmC.K_DECL_STRING;
+	    break;
+	  }
+	  break;
+	}
+
+	sts = this.setvar(funcctx, op.name, next.result_decl, next.result_float,
+			  next.result_int, next.result_string);
+	if (EVEN(sts))
+	  return sts;
+	break;
+	case CcmC.K_ACTION_EQLSUB:
+	switch (op.result_decl) {
+	case CcmC.K_DECL_INT:
+	  switch (next_decl) {
+	  case CcmC.K_DECL_INT:
+	    next.result_int = op.result_int - next_int;
+	    next.result_decl = CcmC.K_DECL_INT;
+	    break;
+	  case CcmC.K_DECL_FLOAT:
+	    next.result_float = op.result_int - next_float;
+	    next.result_decl = CcmC.K_DECL_FLOAT;
+	    break;
+	  }
+	  break;
+	case CcmC.K_DECL_FLOAT:
+	  switch (next_decl) {
+	  case CcmC.K_DECL_INT:
+	    next.result_float = op.result_float - next_int;
+	    next.result_decl = CcmC.K_DECL_FLOAT;
+	    break;
+	  case CcmC.K_DECL_FLOAT:
+	    next.result_float = op.result_float - next_float;
+	    next.result_decl = CcmC.K_DECL_FLOAT;
+	    break;
+	  }
+	  break;
+	}
+
+	sts = this.setvar(funcctx, op.name, next.result_decl, next.result_float,
+			  next.result_int, next.result_string);
+	if (EVEN(sts))
+	  return sts;
+	break;
+	case CcmC.K_ACTION_SUB:
+	switch (op.result_decl) {
+	case CcmC.K_DECL_INT:
+	  switch (next_decl) {
+	  case CcmC.K_DECL_INT:
+	    next.result_int = op.result_int - next_int;
+	    next.result_decl = CcmC.K_DECL_INT;
+	    break;
+	  case CcmC.K_DECL_FLOAT:
+	    next.result_float = op.result_int - next_float;
+	    next.result_decl = CcmC.K_DECL_FLOAT;
+	    break;
+	  }
+	  break;
+	case CcmC.K_DECL_FLOAT:
+	  switch (next_decl) {
+	  case CcmC.K_DECL_INT:
+	    next.result_float = op.result_float - next_int;
+	    next.result_decl = CcmC.K_DECL_FLOAT;
+	    break;
+	  case CcmC.K_DECL_FLOAT:
+	    next.result_float = op.result_float - next_float;
+	    next.result_decl = CcmC.K_DECL_FLOAT;
+	    break;
+	  }
+	  break;
+	}
+	break;
+	case CcmC.K_ACTION_AND:
+	switch (op.result_decl) {
+	case CcmC.K_DECL_INT:
+	  switch (next_decl) {
+	  case CcmC.K_DECL_INT:
+	    next.result_int = (op.result_int && next_int) ? 1 : 0;
+	    next.result_decl = CcmC.K_DECL_INT;
+	    break;
+	  case CcmC.K_DECL_FLOAT:
+	    next.result_float = (op.result_int && next_float)  ? 1 : 0;
+	    next.result_decl = CcmC.K_DECL_FLOAT;
+	    break;
+	  }
+	  break;
+	case CcmC.K_DECL_FLOAT:
+	  switch (next_decl) {
+	  case CcmC.K_DECL_INT:
+	    next.result_float = (op.result_float && next_int)  ? 1 : 0;
+	    next.result_decl = CcmC.K_DECL_FLOAT;
+	    break;
+	  case CcmC.K_DECL_FLOAT:
+	    next.result_float = (op.result_float && next_float)  ? 1 : 0;
+	    next.result_decl = CcmC.K_DECL_FLOAT;
+	    break;
+	  }
+	  break;
+	}
+	break;
+	case CcmC.K_ACTION_OR:
+	switch (op.result_decl) {
+	case CcmC.K_DECL_INT:
+	  switch (next_decl) {
+	  case CcmC.K_DECL_INT:
+	    next.result_int = (op.result_int || next_int) ? 1 : 0;
+	    next.result_decl = CcmC.K_DECL_INT;
+	    break;
+	  case CcmC.K_DECL_FLOAT:
+	    next.result_float = (op.result_int || next_float) ? 1 : 0;
+	    next.result_decl = CcmC.K_DECL_FLOAT;
+	    break;
+	  }
+	  break;
+	case CcmC.K_DECL_FLOAT:
+	  switch (next_decl) {
+	  case CcmC.K_DECL_INT:
+	    next.result_float = (op.result_float || next_int) ? 1 : 0;
+	    next.result_decl = CcmC.K_DECL_FLOAT;
+	    break;
+	  case CcmC.K_DECL_FLOAT:
+	    next.result_float = (op.result_float || next_float) ? 1 : 0;
+	    next.result_decl = CcmC.K_DECL_FLOAT;
+	    break;
+	  }
+	  break;
+	}
+	break;
+	case CcmC.K_ACTION_EQ:
+	switch (op.result_decl) {
+	case CcmC.K_DECL_INT:
+	  switch (next_decl) {
+	  case CcmC.K_DECL_INT:
+	    if (op.result_int == next_int)
+	      next.result_int = 1;
+	    else
+	      next.result_int = 0;
+	    next.result_decl = CcmC.K_DECL_INT;
+	    break;
+	  case CcmC.K_DECL_FLOAT:
+	    if (Math.abs(op.result_int - next_float) < CcmC.FLT_EPSILON)
+	      next.result_int = 1;
+	    else
+	      next.result_int = 0;
+	    next.result_decl = CcmC.K_DECL_INT;
+	    break;
+	  default:
+	    next.result_int = 0;
+	    next.result_decl = CcmC.K_DECL_INT;
+	  }
+	  break;
+	case CcmC.K_DECL_FLOAT:
+	  switch (next_decl) {
+	  case CcmC.K_DECL_INT:
+	    if (Math.abs(op.result_float - next_int) < CcmC.FLT_EPSILON)
+	      next.result_int = 1;
+	    else
+	      next.result_int = 0;
+	    next.result_decl = CcmC.K_DECL_INT;
+	    break;
+	  case CcmC.K_DECL_FLOAT:
+	    if (Math.abs(op.result_float - next_float) < CcmC.FLT_EPSILON)
+	      next.result_int = 1;
+	    else
+	      next.result_int = 0;
+	    next.result_decl = CcmC.K_DECL_INT;
+	    break;
+	  default:
+	    next.result_int = 0;
+	    next.result_decl = CcmC.K_DECL_INT;
+	  }
+	  break;
+	case CcmC.K_DECL_STRING:
+	  switch (next_decl) {
+	  case CcmC.K_DECL_STRING:
+	    if (op.result_string === next_string)
+	      next.result_int = 1;
+	    else
+	      next.result_int = 0;
+	    next.result_decl = CcmC.K_DECL_INT;
+	    break;
+	  default:
+	    next.result_int = 0;
+	    next.result_decl = CcmC.K_DECL_INT;
+	  }
+	  break;
+	}
+	break;
+	case CcmC.K_ACTION_NE:
+	switch (op.result_decl) {
+	case CcmC.K_DECL_INT:
+	  switch (next_decl) {
+	  case CcmC.K_DECL_INT:
+	    next.result_int = (op.result_int != next_int) ? 1 : 0;
+	    next.result_decl = CcmC.K_DECL_INT;
+	    break;
+	  case CcmC.K_DECL_FLOAT:
+	    next.result_int
+	      = !(Math.abs(op.result_int - next_float) < CcmC.FLT_EPSILON);
+	    next.result_decl = CcmC.K_DECL_INT;
+	    break;
+	  default:
+	    next.result_int = 1;
+	    next.result_decl = CcmC.K_DECL_INT;
+	  }
+	  break;
+	case CcmC.K_DECL_FLOAT:
+	  switch (next_decl) {
+	  case CcmC.K_DECL_INT:
+	    next.result_int
+	      = !(Math.abs(op.result_float - next_int) < CcmC.FLT_EPSILON);
+	    next.result_decl = CcmC.K_DECL_INT;
+	    break;
+	  case CcmC.K_DECL_FLOAT:
+	    next.result_int
+	      = !(Math.abs(op.result_float - next_float) < CcmC.FLT_EPSILON);
+	    next.result_decl = CcmC.K_DECL_INT;
+	    break;
+	  default:
+	    next.result_int = 1;
+	    next.result_decl = CcmC.K_DECL_INT;
+	  }
+	  break;
+	case CcmC.K_DECL_STRING:
+	  switch (next_decl) {
+	  case CcmC.K_DECL_STRING:
+	    if (op.result_string === next_string)
+	      next.result_int = 0;
+	    else
+	      next.result_int = 1;
+	    next.result_decl = CcmC.K_DECL_INT;
+	    break;
+	  default:
+	    next.result_int = 1;
+	    next.result_decl = CcmC.K_DECL_INT;
+	  }
+	  break;
+	}
+	break;
+	case CcmC.K_ACTION_LT:
+	switch (op.result_decl) {
+	case CcmC.K_DECL_INT:
+	  switch (next_decl) {
+	  case CcmC.K_DECL_INT:
+	    next.result_int = (op.result_int < next_int) ? 1 : 0;
+	    next.result_decl = CcmC.K_DECL_INT;
+	    break;
+	  case CcmC.K_DECL_FLOAT:
+	    next.result_int = (op.result_int < next_float) ? 1 : 0;
+	    next.result_decl = CcmC.K_DECL_INT;
+	    break;
+	  }
+	  break;
+	case CcmC.K_DECL_FLOAT:
+	  switch (next_decl) {
+	  case CcmC.K_DECL_INT:
+	    next.result_int = (op.result_float < next_int) ? 1 : 0;
+	    next.result_decl = CcmC.K_DECL_INT;
+	    break;
+	  case CcmC.K_DECL_FLOAT:
+	    next.result_int = (op.result_float < next_float) ? 1 : 0;
+	    next.result_decl = CcmC.K_DECL_INT;
+	    break;
+	  }
+	  break;
+	}
+	break;
+	case CcmC.K_ACTION_GT:
+	switch (op.result_decl) {
+	case CcmC.K_DECL_INT:
+	  switch (next_decl) {
+	  case CcmC.K_DECL_INT:
+	    next.result_int = (op.result_int > next_int) ? 1 : 0;
+	    next.result_decl = CcmC.K_DECL_INT;
+	    break;
+	  case CcmC.K_DECL_FLOAT:
+	    next.result_int = (op.result_int > next_float) ? 1 : 0;
+	    next.result_decl = CcmC.K_DECL_INT;
+	    break;
+	  }
+	  break;
+	case CcmC.K_DECL_FLOAT:
+	  switch (next_decl) {
+	  case CcmC.K_DECL_INT:
+	    next.result_int = (op.result_float > next_int) ? 1 : 0;
+	    next.result_decl = CcmC.K_DECL_INT;
+	    break;
+	  case CcmC.K_DECL_FLOAT:
+	    next.result_int = (op.result_float > next_float) ? 1 : 0;
+	    next.result_decl = CcmC.K_DECL_INT;
+	    break;
+	  }
+	  break;
+	}
+	break;
+	case CcmC.K_ACTION_LE:
+	switch (op.result_decl) {
+	case CcmC.K_DECL_INT:
+	  switch (next_decl) {
+	  case CcmC.K_DECL_INT:
+	    next.result_int = (op.result_int <= next_int) ? 1 : 0;
+	    next.result_decl = CcmC.K_DECL_INT;
+	    break;
+	  case CcmC.K_DECL_FLOAT:
+	    next.result_int = (op.result_int <= next_float) ? 1 : 0;
+	    next.result_decl = CcmC.K_DECL_INT;
+	    break;
+	  }
+	  break;
+	case CcmC.K_DECL_FLOAT:
+	  switch (next_decl) {
+	  case CcmC.K_DECL_INT:
+	    next.result_int = (op.result_float <= next_int) ? 1 : 0;
+	    next.result_decl = CcmC.K_DECL_INT;
+	    break;
+	  case CcmC.K_DECL_FLOAT:
+	    next.result_int = (op.result_float <= next_float) ? 1 : 0;
+	    next.result_decl = CcmC.K_DECL_INT;
+	    break;
+	  }
+	  break;
+	}
+	break;
+      case CcmC.K_ACTION_GE:
+	switch (op.result_decl) {
+	case CcmC.K_DECL_INT:
+	  switch (next_decl) {
+	  case CcmC.K_DECL_INT:
+	    next.result_int = (op.result_int >= next_int) ? 1 : 0;
+	    next.result_decl = CcmC.K_DECL_INT;
+	    break;
+	  case CcmC.K_DECL_FLOAT:
+	    next.result_int = (op.result_int >= next_float) ? 1 : 0;
+	    next.result_decl = CcmC.K_DECL_INT;
+	    break;
+	  }
+	  break;
+	case CcmC.K_DECL_FLOAT:
+	  switch (next_decl) {
+	  case CcmC.K_DECL_INT:
+	    next.result_int = (op.result_float >= next_int) ? 1 : 0;
+	    next.result_decl = CcmC.K_DECL_INT;
+	    break;
+	  case CcmC.K_DECL_FLOAT:
+	    next.result_int = (op.result_float >= next_float) ? 1 : 0;
+	    next.result_decl = CcmC.K_DECL_INT;
+	    break;
+	  }
+	  break;
+	}
+      break;
+      case CcmC.K_ACTION_INV:
+      switch (next_decl) {
+      case CcmC.K_DECL_INT:
+	next.result_int = !next_int;
+	  next.result_decl = CcmC.K_DECL_INT;
+	  break;
+	default:
+	  next.result_float = next_float;
+	  next.result_decl = CcmC.K_DECL_FLOAT;
+	  break;
+	}
+	break;
+	case CcmC.K_ACTION_BITAND:
+	if (op.result_decl == CcmC.K_DECL_INT && next_decl == CcmC.K_DECL_INT) {
+	  next.result_int = op.result_int & next_int;
+	  next.result_decl = CcmC.K_DECL_INT;
+	}
+	break;
+	case CcmC.K_ACTION_BITOR:
+	if (op.result_decl == CcmC.K_DECL_INT && next_decl == CcmC.K_DECL_INT) {
+	  next.result_int = op.result_int | next_int;
+	  next.result_decl = CcmC.K_DECL_INT;
+	}
+	break;
+	case CcmC.K_ACTION_LSHIFT:
+	if (op.result_decl == CcmC.K_DECL_INT && next_decl == CcmC.K_DECL_INT) {
+	  next.result_int = op.result_int << next_int;
+	  next.result_decl = CcmC.K_DECL_INT;
+	}
+	break;
+	case CcmC.K_ACTION_RSHIFT:
+	if (op.result_decl == CcmC.K_DECL_INT && next_decl == CcmC.K_DECL_INT) {
+	  next.result_int = op.result_int >> next_int;
+	  next.result_decl = CcmC.K_DECL_INT;
+	}
+	break;
+	case CcmC.K_ACTION_CREALOCINT:
+	var rl1 = this.createvar(next.name, 0, CcmC.K_DECL_INT, 0, 0, null,
+			    funcctx.locint_list, funcctx.locfloat_list,
+			    funcctx.locstring_list);
+	if (EVEN(rl1.sts))
+	  return rl1.sts;
+	funcctx.locint_list = rl1.int_list;
+	funcctx.locfloat_list = rl1.float_list;
+	funcctx.locstring_list = rl1.string_list;
+	break;
+	case CcmC.K_ACTION_CREALOCFLOAT:
+	var rl2 = this.createvar(next.name, 0, CcmC.K_DECL_FLOAT, 0, 0, null,
+			    funcctx.locint_list, funcctx.locfloat_list,
+			    funcctx.locstring_list);
+	if (EVEN(rl2.sts))
+	  return rl2.sts;
+	funcctx.locint_list = rl2.int_list;
+	funcctx.locfloat_list = rl2.float_list;
+	funcctx.locstring_list = rl2.string_list;
+	break;
+	case CcmC.K_ACTION_CREALOCSTRING:
+	var rl3 = this.createvar(next.name, 0, CcmC.K_DECL_STRING, 0, 0, "",
+			    funcctx.locint_list, funcctx.locfloat_list,
+			    funcctx.locstring_list);
+	if (EVEN(rl3.sts))
+	  return rl3.sts;
+	funcctx.locint_list = rl3.int_list;
+	funcctx.locfloat_list = rl3.float_list;
+	funcctx.locstring_list = rl3.string_list;
+	break;
+	case CcmC.K_ACTION_CREAGBLINT:
+	var rv1 = this.createvar(next.name, 0, CcmC.K_DECL_INT, 0, 0, null,
+			    funcctx.filectx.gblint_list, funcctx.filectx.gblfloat_list,
+			    funcctx.filectx.gblstring_list);
+	if (EVEN(rv1.sts))
+	  return rv1.sts;
+	funcctx.filectx.gblint_list = rv1.int_list;
+	funcctx.filectx.gblfloat_list = rv1.float_list;
+	funcctx.filectx.gblstring_list = rv1.string_list;
+      break;
+	case CcmC.K_ACTION_CREAGBLFLOAT:
+	var rv2 = this.createvar(next.name, 0, CcmC.K_DECL_FLOAT, 0, 0, null,
+			    funcctx.filectx.gblint_list, funcctx.filectx.gblfloat_list,
+			    funcctx.filectx.gblstring_list);
+	if (EVEN(rv2.sts))
+	  return rv2.sts;
+	funcctx.filectx.gblint_list = rv2.int_list;
+	funcctx.filectx.gblfloat_list = rv2.float_list;
+	funcctx.filectx.gblstring_list = rv2.string_list;
+	break;
+	case CcmC.K_ACTION_CREAGBLSTRING:
+	var rv3 = this.createvar(next.name, 0, CcmC.K_DECL_STRING, 0, 0, "",
+			    funcctx.filectx.gblint_list, funcctx.filectx.gblfloat_list,
+			    funcctx.filectx.gblstring_list);
+	if (EVEN(rv3.sts))
+	  return rv3.sts;
+	funcctx.filectx.gblint_list = rv3.int_list;
+	funcctx.filectx.gblfloat_list = rv3.float_list;
+	funcctx.filectx.gblstring_list = rv3.string_list;
+	break;
+	case CcmC.K_ACTION_CREAEXTINT:
+	var rc1 = this.createvar(next.name, funcctx.filectx.namespc, CcmC.K_DECL_INT, 0, 0, null, 
+			    this.extint_list, this.extfloat_list, this.extstring_list);
+	if (rc1.sts == CCM_.VARALREXIST)
+	  sts = CCM_.SUCCESS;
+        else
+	  sts = rc1.sts;
+	if (EVEN(sts))
+	  return sts;
+	this.extint_list = rc1.int_list;
+	this.extfloat_list = rc1.float_list;
+	this.extstring_list = rc1.string_list;
+	break;
+	case CcmC.K_ACTION_CREAEXTFLOAT:
+	var rc2 = this.createvar(next.name, funcctx.filectx.namespc, CcmC.K_DECL_FLOAT, 
+	     0, 0, null, this.extint_list, this.extfloat_list, this.extstring_list);
+	if (rc2.sts == CCM_.VARALREXIST)
+	  sts = CCM_.SUCCESS;
+        else 
+	  sts = rc2.sts;
+	if (EVEN(sts))
+	  return sts;
+	this.extint_list = rc2.int_list;
+	this.extfloat_list = rc2.float_list;
+	this.extstring_list = rc2.string_list;
+	break;
+	case CcmC.K_ACTION_CREAEXTSTRING:
+	var rc3 = this.createvar(next.name, funcctx.filectx.namespc, CcmC.K_DECL_STRING, 
+			       0, 0, "", this.extint_list, this.extfloat_list, this.extstring_list);
+	if (rc3.sts == CCM_.VARALREXIST)
+	  sts = CCM_.SUCCESS;
+        else
+	  sts = rc3.sts;
+	if (EVEN(sts))
+	  return sts;
+	this.extint_list = rc3.int_list;
+	this.extfloat_list = rc3.float_list;
+	this.extstring_list = rc3.string_list;
+	break;
+	case CcmC.K_ACTION_DELETE:
+	var rd1 = this.deletevar(next.name, funcctx.filectx.namespc, this.extint_list, 
+            this.extfloat_list, this.extstring_list);
+	if (EVEN(rd1.sts))
+	  return rd1.sts;
+	this.extint_list = rd1.int_list;
+	this.extfloat_list = rd1.float_list;
+	this.extstring_list = rd1.string_list;
+	break;
+	case CcmC.K_ACTION_DELETEGBL:
+      var rd2 = this.deletevar(next.name, 0, funcctx.filectx.gblint_list, 
+	    funcctx.filectx.gblfloat_list, funcctx.filectx.gblstring_list);
+	if (EVEN(rd2.sts))
+	  return rd2.sts;
+	funcctx.filectx.gblint_list = rd2.int_list;
+	funcctx.filectx.gblfloat_list = rd2.float_list;
+	funcctx.filectx.gblstring_list = rd2.string_list;
+	break;
+      }
+      next.result_done = 1;
+      /*****
+      if (ccm_testmode)
+	printf("     Processing \"%s\"	\"%s\"	decl: %d, float: %f, "
+	       "int: " ccm_cIntFormat " str: \"%s\"\n",
+	       op.name, next.name, next.result_decl, next.result_float,
+	       next.result_int, next.result_string);
+      ****/ 
+    }
+    op.done = 1;
+
+    if (op.local_type == CcmC.K_LOCTYPE_AFTER) {
+      switch (op.local_operator) {
+      case CcmC.K_ACTION_INCR:
+	if (op.value_decl == CcmC.K_DECL_INT || op.value_decl == CcmC.K_DECL_FLOAT) {
+	  op.value_int++;
+	  op.value_float++;
+	  sts = this.setvar(funcctx, op.name, op.value_decl, op.value_float,
+			   op.value_int, "");
+	  if (EVEN(sts))
+	    return sts;
+	}
+	break;
+      case CcmC.K_ACTION_DECR:
+	if (op.value_decl == CcmC.K_DECL_INT || op.value_decl == CcmC.K_DECL_FLOAT) {
+	  op.value_int--;
+	  op.value_float--;
+	  sts = this.setvar(funcctx, op.name, op.value_decl, op.value_float,
+			   op.value_int, "");
+	  if (EVEN(sts))
+	    return sts;
+	}
+	break;
+      }
+    }
+    if (exit_function_found)
+      return CCM_.EXITFUNC;
+    return 1;
+  }
+
+  this.execute_list = function(funcctx, list) {
+    var sts;
+    var op;
+    var bp;
+    var exit_func_found;
+    var ret = {
+      sts : CCM_.SUCCESS,
+      result_decl : 0,
+      result_float : 0,
+      result_int : 0,
+      result_string : null};
+
+    /* Store type */
+    for (op = funcctx.list; op != null; op = op.next)
+      op.orig_type = op.type;
+
+    exit_func_found = 0;
+    for (op = funcctx.list; op != null; op = op.next) {
+      if (op.prev ==  null) {
+	/* First in list */
+	if (op.type == CcmC.K_OPERAND_NAME) {
+	  var rg = this.getvar(funcctx, op.name);
+	  if (EVEN(rg.sts)) {
+	    ret.sts = rg.sts;
+	    return ret;
+	  }
+	  op.value_decl = rg.decl;
+	  op.value_int = rg.value_int;
+	  op.value_float = rg.value_float;
+	  op.value_string = rg.value_string;
+	}
+	switch (op.value_decl) {
+	case CcmC.K_DECL_FLOAT:
+	  op.result_float = op.value_float;
+	  break;
+	case CcmC.K_DECL_INT:
+	  op.result_int = op.value_int;
+	  break;
+	default:
+	  op.result_string = op.value_string;
+	}
+	op.result_decl = op.value_decl;
+	op.result_done = 1;
+	
+	if (op.next == null) {
+	  sts = this.operate_exec(funcctx, op, null);
+	  if (EVEN(sts)) {
+	    ret.sts = sts;
+	    return ret;
+	  }
+	  if (sts == CCM_.EXITFUNC)
+	    exit_func_found = 1;
+	}
+      }
+      if (op.next == null) {
+	/* Last in list */
+	for (bp = op.prev; bp != null; bp = bp.prev) {
+	  if (bp.done == 0) {
+	    sts = this.operate_exec(funcctx, bp, op);
+	    if (EVEN(sts)) {
+	      ret.sts = sts;
+	      return ret;
+	    }
+	    if (sts == CCM_.EXITFUNC)
+	      exit_func_found = 1;
+	  }
+	}
+	ret.result_decl = op.result_decl;
+	switch (op.result_decl) {
+	case CcmC.K_DECL_FLOAT:
+	  ret.result_float = op.result_float;
+	  break;
+	case CcmC.K_DECL_INT:
+	  ret.result_int = op.result_int;
+	  break;
+	case CcmC.K_DECL_STRING:
+	  ret.result_string = op.result_string;
+	  break;
+	default:;
+	}
+      } else {
+	if (op.next.parlevel > op.parlevel) {
+	  /* Left parenthesis */
+	  if (op.next.prio < op.prio) {
+	    for (bp = op.prev; bp != null; bp = bp.prev) {
+	      if (bp.parlevel < op.parlevel)
+		break;
+	      if (bp.parlevel > op.parlevel)
+		continue;
+
+	      if (bp.prio <= op.prio && bp.done == 0) {
+		sts = this.operate_exec(funcctx, bp, op);
+		if (EVEN(sts)) {
+		  ret.sts = sts;
+		  return ret;
+		}
+		if (sts == CCM_.EXITFUNC)
+		  exit_func_found = 1;
+	      }
+	    }
+	  }
+	  continue;
+	} else if (op.next.parlevel < op.parlevel) {
+	  /* Right parentheseis, sum sinc last right parenthes */
+	  for (bp = op; bp !=  null; bp = bp.prev) {
+	    if (bp.parlevel < op.parlevel)
+	      break;
+	    if (bp.parlevel > op.parlevel)
+	      continue;
+	    
+	    if (bp.done == 0) {
+	      sts = this.operate_exec(funcctx, bp, op.next);
+	      if (EVEN(sts)) {
+		ret.sts = sts;
+		return ret;
+	      }
+	      if (sts == CCM_.EXITFUNC)
+		exit_func_found = 1;
+	    }
+	  }
+	  
+	} else {
+	  if (op.next.prio < op.prio) {
+	    for (bp = op.prev; bp != null; bp = bp.prev) {
+	      if (bp.parlevel < op.parlevel)
+		break;
+	      if (bp.parlevel > op.parlevel)
+		continue;
+	      if (bp.prio <= op.prio && bp.done == 0) {
+		sts = this.operate_exec(funcctx, bp, op);
+		if (EVEN(sts)) {
+		  ret.sts = sts;
+		  return ret;
+		}
+		if (sts == CCM_.EXITFUNC)
+		  exit_func_found = 1;
+	      }
+	    }
+	    if (op.next.type == CcmC.K_OPERAND_NAME) {
+	      var rg2 = this.getvar(funcctx, op.next.name);
+	      if (EVEN(rg2.sts)) {
+		ret.sts = rg2.sts;
+		return ret;
+	      }
+	      op.next.value_decl = rg2.decl;
+	      op.next.value_int = rg2.value_int;
+	      op.next.value_float = rg2.value_float;
+	      op.next.value_string = rg2.value_string;
+	    }
+	    switch (op.next.value_decl) {
+	    case CcmC.K_DECL_FLOAT:
+	      op.next.result_float = op.next.value_float;
+	      break;
+	    case CcmC.K_DECL_INT:
+	      op.next.result_int = op.next.value_int;
+	      break;
+	    case CcmC.K_DECL_STRING:
+	      op.next.result_string = op.next.value_string;
+	      break;
+	    default:;
+	    }
+	    op.next.result_decl = op.next.value_decl;
+	    op.next.result_done = 1;
+	    continue;
+	  } else {
+	    sts = this.operate_exec(funcctx, op, op.next);
+	    if (EVEN(sts)) {
+	      ret.sts = sts;
+	      return ret;
+	    }
+	    if (sts == CCM_.EXITFUNC)
+	      exit_func_found = 1;
+	    
+	    // Test
+	    if (op.next.prio > op.prio) {
+	      for (bp = op.prev; bp != null; bp = bp.prev) {
+		if (bp.parlevel < op.parlevel)
+		  break;
+		if (bp.parlevel > op.parlevel)
+		  continue;
+		if (bp.prio <= op.next.prio && bp.done == 0) {
+		  sts = this.operate_exec(funcctx, bp, op.next);
+		  if (EVEN(sts)) {
+		    ret.sts = sts;
+		    return ret;
+		  }
+		  if (sts == CCM_.EXITFUNC)
+		    exit_func_found = 1;
+		}
+	      }
+	    }
+	    
+	  }
+	}
+      }
+    }
+
+    /* Reset and restore type for next evaluation */
+    for (op = funcctx.list; op != null; op = op.next) {
+      op.type = op.orig_type;
+      op.done = 0;
+      op.result_done = 0;
+    }
+
+    if (exit_func_found != 0) {
+      ret.sts = CCM_.EXITFUNC;
+      return ret;
+    }
+    return ret;
+  }
+
+  this.line_exec = function(funcctx, line) {
+    var list;
+    var ret = {
+      sts : CCM_.SUCCESS,
+      return_decl : 0,
+      return_float : 0,
+      return_int : 0,
+      return_string : null};
+
+    var rc = this.create_list(funcctx.filectx, line);
+    if (EVEN(rc.sts)) {
+      ret.sts = rc.sts
+      return ret;
+    }
+    list = rc.list,
+    funcctx.list = list;
+
+    /*****
+    for (op = list; op != null; op = op.next) {
+      if (ccm_testmode)
+	printf("operator %d prio %d   parlevel %d Name %s\n", op.o_operator,
+	       op.prio, op.parlevel, op.name);
+    }
+    ****/
+
+    var re = this.execute_list(funcctx, list);
+    if (EVEN(re.sts) || (re.sts == CCM_.EXITFUNC)) {
+      ret.sts = re.sts;
+      return ret;
+    }
+
+    ret.return_decl = re.result_decl;
+    ret.return_float = re.result_float;
+    ret.return_int = re.result_int;
+    ret.return_string = re.result_string;
+
+    return ret;
+  }
+
+  this.getvar = function(funcctx, name) {
+    var int_p;
+    var float_p;
+    var string_p;
+    var int_list;
+    var float_list;
+    var string_list;
+    var found;
+    var i;
+    var sts;
+    var array;
+    var element;
+    var varname;
+    var namespc;
+    var ret = {
+      sts: CCM_.SUCCESS,
+      decl: 0,
+      value_int: 0,
+      value_float: 0,
+      value_string: null};
+
+    var rn = this.varname_parse(funcctx, name);
+    sts = rn.sts;
+    varname = rn.varname;
+    element = rn.element;
+    array = rn.array
+
+    if (EVEN(sts)) {
+      ret.sts = sts;
+      return ret;
+    }
+
+    /* Search int */
+    found = 0;
+    for (i = 0; i < 3; i++) {
+      if (i == 0) {
+	int_list = funcctx.locint_list;
+	float_list = funcctx.locfloat_list;
+	string_list = funcctx.locstring_list;
+	namespc = 0;
+      } else if (i == 1) {
+	int_list = funcctx.filectx.gblint_list;
+	float_list = funcctx.filectx.gblfloat_list;
+	string_list = funcctx.filectx.gblstring_list;
+	namespc = 0;
+      } else {
+	int_list = this.extint_list;
+	float_list = this.extfloat_list;
+	string_list = this.extstring_list;
+	namespc = funcctx.filectx.namespc;
+      }
+
+      for (int_p = int_list; int_p != null; int_p = int_p.next) {
+	if ((int_p.name === varname) && (!namespc || (int_p.namespc === namespc) 
+	      || (int_p.namespc == "__all__"))) {
+	  found = 1;
+	  break;
+	}
+      }
+      if (found) {
+	if (int_p.array != array) {
+	  ret.sts = CCM_.VARNOTFOUND;
+	  return ret;
+	}
+	if (int_p.array != 0 && element == CcmC.NO_ELEM) {
+	  ret.decl = CcmC.K_DECL_INT;
+	  ret.sts = CCM_.NOELEM;
+	  return ret;
+	}
+	if (int_p.array != 0 && (element < 0 || element >= int_p.elements)) {
+	  ret.sts = CCM_.ARRAYBOUNDS;
+	  return ret;
+	}
+
+	if (int_p.array != 0)
+	  ret.value_int = int_p.value[element];
+	else
+	  ret.value_int = int_p.value;
+	ret.decl = CcmC.K_DECL_INT;
+      } else {
+	/* Search float */
+	for (float_p = float_list; float_p != null; float_p = float_p.next) {
+	  if ((float_p.name === varname) && (!namespc || (float_p.namespc === namespc) || 
+					     (float_p.namespc === "__all__"))) {
+	    found = 1;
+	    break;
+	  }
+	}
+	if (found) {
+	  if (float_p.array != array)
+	    return CCM_.VARNOTFOUND;
+	  if (float_p.array && element == CcmC.NO_ELEM) {
+	    ret.decl = CcmC.K_DECL_FLOAT;
+	    ret.sts = CCM_.NOELEM;
+	    return ret;
+	  }
+	  if (float_p.array != 0 && (element < 0 || element >= float_p.elements)) {
+	    ret.sts = CCM_.ARRAYBOUNDS;
+	    return ret;
+	  }
+	  if (float_p.array != 0)
+	    ret.value_float = float_p.value[element];
+	  else
+	    ret.value_float = float_p.value;
+	  ret.decl = CcmC.K_DECL_FLOAT;
+	} else {
+	  /* Search string */
+	  for (string_p = string_list; string_p != null; string_p = string_p.next) {
+	    if ((string_p.name === varname) && (!namespc || (string_p.namespc === namespc) || (string_p.namespc === "__all__"))) {
+	      found = 1;
+	      break;
+	    }
+	  }
+	  if (found) {
+	    if (string_p.array != array) {
+	      ret.sts = CCM_.VARNOTFOUND;
+	      return ret;
+	    }
+	    if (string_p.array && element == CcmC.NO_ELEM) {
+	      ret.decl = CcmC.K_DECL_STRING;
+	      ret.sts = CCM_.NOELEM;
+	      return ret;
+	    }
+	    if (string_p.array && (element < 0 || element >= string_p.elements)) {
+	      ret.sts = CCM_.ARRAYBOUNDS;
+	      return ret;
+	    }
+	    if (string_p.array != 0)
+	      ret.value_string = string_p.value[element];
+	    else
+	      ret.value_string = string_p.value;
+	    ret.decl = CcmC.K_DECL_STRING;
+	  }
+	}
+      }
+      if (found)
+	break;
+    }
+    if (!found) {
+      ret.sts = CCM_.VARNOTFOUND;
+      return ret;
+    }
+    return ret;
+  }
+
+  this.ref_var = function(funcctx, name, valuep, decl, array, elements) {
+    var int_p;
+    var float_p;
+    var string_p;
+    var int_list;
+    var float_list;
+    var string_list;
+    var found;
+    var i;
+    var sts;
+    var parse_array;
+    var parse_element;
+    var varname;
+    var namespc;
+    var ret = {
+      sts: CCM_.SUCCESS,
+      varname: null,
+      element: 0,
+      array: 0,
+      valuep : 0};
+
+    var rn = this.varname_parse(funcctx, name);
+    if (EVEN(rn.sts)) {
+      ret.sts = rn.sts;
+      return ret;
+    }
+    varname = rn.varname;
+    parse_array = rn.array;
+    parse_element = rn.element;
+
+    /* Search int */
+    found = 0;
+    for (i = 0; i < 3; i++) {
+      if (i == 0) {
+	int_list = funcctx.locint_list;
+	float_list = funcctx.locfloat_list;
+	string_list = funcctx.locstring_list;
+	namespc = 0;
+      } else if (i == 1) {
+	int_list = funcctx.filectx.gblint_list;
+	float_list = funcctx.filectx.gblfloat_list;
+	string_list = funcctx.filectx.gblstring_list;
+	namespc = 0;
+      } else {
+	int_list = this.extint_list;
+	float_list = this.extfloat_list;
+	string_list = this.extstring_list;
+	namespc = funcctx.filectx.namespc;
+      }
+
+      for (int_p = int_list; int_p != null; int_p = int_p.next) {
+	if ((int_p.name === varname) && (!namespc || (int_p.namespc === namespc) || 
+					 (int_p.namespc === "__all__"))) {
+	  found = 1;
+	  break;
+	}
+      }
+      if (found) {
+	if (int_p.array != parse_array)
+	  parse_element = 0;
+	if (int_p.array != 0 && parse_element == CcmC.NO_ELEM) {
+	  ret.decl = CcmC.K_DECL_INT;
+	  ret.array = int_p.array;
+	  ret.elements = int_p.elements;
+	  ret.valuep = int_p.value; // TODO
+	  ret.sts = CCM_.NOELEM;
+	  return ret;
+	}
+	if (int_p.array != 0 && (parse_element < 0 || parse_element >= int_p.elements)) {
+          ret.sts = CCM_.ARRAYBOUNDS;
+	  return ret;
+	}
+	ret.valuep = int_p.value[parse_element]; //TODO
+	ret.decl = CcmC.K_DECL_INT;
+	ret.array = int_p.array;
+	ret.elements = int_p.elements;
+      } else {
+	/* Search float */
+	for (float_p = float_list; float_p != null; float_p = float_p.next) {
+	  if ((float_p.name === varname) && (!namespc || (float_p.namespc === namespc) || 
+					    (float_p.namespc === "__all__"))) {
+	    found = 1;
+	    break;
+	  }
+	}
+	if (found) {
+	  if (float_p.array != parse_array) {
+	    ret.sts = CCM_.VARNOTFOUND;
+	    return ret;
+	  }
+	  if (float_p.array != 0 && parse_element == CcmC.NO_ELEM) {
+	    ret.decl = CcmC.K_DECL_FLOAT;
+	    ret.array = float_p.array;
+	    ret.elements = float_p.elements;
+	    ret.valuep = float_p.value; //TODO
+	    ret.sts = CCM_.NOELEM;
+	    return ret;
+	  }
+	  if (float_p.array != 0 && (parse_element < 0 || parse_element >= float_p.elements)) {
+	    ret.sts = CCM_.ARRAYBOUNDS;
+	    return ret;
+	  }
+	  ret.valuep = float_p.value[parse_element]; //TODO
+	  ret.decl = CcmC.K_DECL_FLOAT;
+	  ret.array = float_p.array;
+	  ret.elements = float_p.elements;
+	} else {
+	  /* Search string */
+	  for (string_p = string_list; string_p != null; string_p = string_p.next) {
+	    if ((string_p.name === varname) && (!namespc || (string_p.namespc === namespc) || 
+						(string_p.namespc === "__all__"))) {
+	      found = 1;
+	      break;
+	    }
+	  }
+	  if (found) {
+	    if (string_p.array != parse_array) {
+	      ret.sts = CCM_.VARNOTFOUND;
+	      return ret;
+	    }
+	    if (string_p.array != 0 && parse_element == CcmC.NO_ELEM) {
+	      ret.decl = CcmC.K_DECL_STRING;
+	      ret.array = string_p.array;
+	      ret.elements = string_p.elements;
+	      ret.valuep = string_p.value; //TODO
+	      ret.sts = CCM_.NOELEM;
+	      return ret;
+	    }
+	    if (string_p.array != 0 && (parse_element < 0 || parse_element >= string_p.elements)) {
+	      ret.sts = CCM_.ARRAYBOUNDS;
+	      return ret;
+	    }
+	    ret.valuep = string_p.value[parse_element]; //TODO
+	    ret.decl = CcmC.K_DECL_STRING;
+	    ret.array = string_p.array;
+	    ret.elements = string_p.elements;
+	  }
+	}
+      }
+      if (found)
+	break;
+    }
+    if (!found) {
+      ret.sts = CCM_.VARNOTFOUND;
+      return ret;
+    }
+    
+    return ret;
+  }
+
+  this.get_var_info = function(funcctx, name) {
+    var int_p;
+    var float_p;
+    var string_p;
+    var int_list;
+    var float_list;
+    var string_list;
+    var found;
+    var i;
+    var sts;
+    var varname;
+    var namespc;
+    var ret = {
+      sts: CCM_.SUCCESS,
+      decl: 0,
+      elements: 0,
+      array: 0};
+
+    var rn = this.varname_parse(funcctx, name);
+    if (EVEN(rn.sts)) {
+      ret.sts = rn.sts;
+      return ret;
+    }
+    varname = rn.varname;
+
+    /* Search int */
+    found = 0;
+    for (i = 0; i < 3; i++) {
+      if (i == 0) {
+	int_list = funcctx.locint_list;
+	float_list = funcctx.locfloat_list;
+	string_list = funcctx.locstring_list;
+	namespc = 0;
+      } else if (i == 1) {
+	int_list = funcctx.filectx.gblint_list;
+	float_list = funcctx.filectx.gblfloat_list;
+	string_list = funcctx.filectx.gblstring_list;
+	namespc = 0;
+      } else {
+	int_list = this.extint_list;
+	float_list = this.extfloat_list;
+	string_list = this.extstring_list;
+	namespc = funcctx.filectx.namespc;
+      }
+
+      for (int_p = int_list; int_p != null; int_p = int_p.next) {
+	if ((int_p.name === varname) && (!namespc || (int_p.namespc === namespc) || 
+					 (int_p.namespc === "__all__"))) {
+	  found = 1;
+	  break;
+	}
+      }
+      if (found) {
+	ret.decl = CcmC.K_DECL_INT;
+	ret.array = int_p.array;
+	ret.elements = int_p.elements;
+	return ret;
+      } else {
+	/* Search float */
+	for (float_p = float_list; float_p != null; float_p = float_p.next) {
+	  if ((float_p.name === varname) && (!namespc || (float_p.namespc === namespc) || 
+					    (float_p.namespc === "__all__"))) {
+	    found = 1;
+	    break;
+	  }
+	}
+	if (found) {
+	  ret.decl = CcmC.K_DECL_FLOAT;
+	  ret.array = float_p.array;
+	  ret.elements = float_p.elements;
+	  return ret;
+	} else {
+	  /* Search string */
+	  for (string_p = string_list; string_p != null; string_p = string_p.next) {
+	    if ((string_p.name === varname) && (!namespc || (string_p.namespc === namespc) || 
+						(string_p.namespc === "__all__"))) {
+	      found = 1;
+	      break;
+	    }
+	  }
+	  if (found) {
+	    ret.decl = CcmC.K_DECL_STRING;
+	    ret.array = string_p.array;
+	    ret.elements = string_p.elements;
+	    return ret;
+	  }
+	}
+      }
+      if (found)
+	break;
+    }
+    if (!found) {
+      ret.sts = CCM_.VARNOTFOUND;
+      return ret;
+    }
+    
+    return ret;
+  }
+
+  this.pushvar = function(funcctx, name, decl, value_float, value_int, value_string) {
+    var int_p;
+    var float_p;
+    var string_p;
+    var int_list;
+    var float_list;
+    var string_list;
+    var found;
+    var i;
+    var array;
+    var element;
+    var varname;
+    var namespc;
+    
+    var rn = this.varname_parse(funcctx, name);
+    if (EVEN(rn.sts))
+      return rn.sts;
+    varname = rn.varname;
+    array = rn.array;
+    element = rn.element;
+    if (array == 0 || element != CcmC.NO_ELEM)
+      return CCM_.VARTYPE;
+    
+    found = 0;
+    for (i = 0; i < 3; i++) {
+      if (i == 0) {
+	int_list = funcctx.locint_list;
+	float_list = funcctx.locfloat_list;
+	string_list = funcctx.locstring_list;
+	namespc = 0;
+      } else if (i == 1) {
+	int_list = funcctx.filectx.gblint_list;
+	float_list = funcctx.filectx.gblfloat_list;
+	string_list = funcctx.filectx.gblstring_list;
+	namespc = 0;
+      } else {
+	int_list = this.extint_list;
+	float_list = this.extfloat_list;
+	string_list = this.extstring_list;
+	namespc = funcctx.filectx.namespc;
+      }
+      
+      for (int_p = int_list; int_p != null; int_p = int_p.next) {
+	if ((int_p.name === varname) && (!namespc || (int_p.namespc === namespc) || 
+					(int_p.namespc === "__all__"))) {
+	  found = 1;
+	  break;
+	}
+      }
+      if (found) {
+	if (int_p.array == 0)
+	  return CCM_.VARTYPE;
+
+	int_p.elements++;
+
+	if (decl == CcmC.K_DECL_INT)
+	  int_p.value.push(value_int);
+	else if (decl == CcmC.K_DECL_FLOAT)
+	  int_p.value.push(Math.floor(value_float));
+	else {
+	  var ival = parseInt(value_string);
+	  if (isNaN(ival))
+	    return CCM_.VARTYPE;
+	  int_p.value.push(ival);
+	}
+      } else {
+	/* Search float */
+	for (float_p = float_list; float_p != null; float_p = float_p.next) {
+	  if ((float_p.name === varname) && (!namespc || (float_p.namespc === namespc) || 
+					     (float_p.namespc === "__all__"))) {
+	    found = 1;
+	    break;
+	  }
+	}
+	if (found) {
+	  if (float_p.array == 0)
+	    return CCM_.VARTYPE;
+	  
+	  float_p.elements++;
+	  if (decl == CcmC.K_DECL_INT)
+	    float_p.value.push(value_int);
+	  else if (decl == CcmC.K_DECL_FLOAT)
+	    float_p.value.push(value_float);
+	  else {
+	    var f = parseFloat(value_string);
+	    if (isNaN(f))
+	      return CCM_.VARTYPE;
+	    float_p.value.push(f);
+	  }
+	} else {
+	  /* Search string */
+	  for (string_p = string_list; string_p != null; string_p = string_p.next) {
+	    if ((string_p.name === varname) && (!namespc || (string_p.namespc === namespc) ||
+						(string_p.namespc === "__all__"))) {
+	      found = 1;
+	      break;
+	    }
+	  }
+	  if (found) {
+	    if (string_p.array == 0)
+	      return CCM_.VARTYPE;
+	    
+	    string_p.elements++;
+	    
+	    if (decl == CcmC.K_DECL_INT)
+	      string_p.value.push(value_int.toString());
+	    else if (decl == CcmC.K_DECL_FLOAT)
+	      string_p.value.push(this.float_to_string(value_float));
+	    else
+	      string_p.value.push(value_string);
+	  }
+	}
+      }
+      if (found)
+	break;
+    }
+    if (!found)
+      return CCM_.VARNOTFOUND;
+    return 1;
+  }
+
+  this.clearvar = function(funcctx, name) {
+    var int_p;
+    var float_p;
+    var string_p;
+    var int_list;
+    var float_list;
+    var string_list;
+    var found;
+    var i;
+    var array;
+    var element;
+    var varname;
+    var namespc;
+
+    var rn = this.varname_parse(funcctx, name);
+    if (EVEN(rn.sts))
+      return rn.sts;
+    varname = rn.varname;
+    array = rn.array;
+    element = rn.element;
+    if (!array || element != CcmC.NO_ELEM)
+      return CCM_.VARTYPE;
+
+    found = 0;
+    for (i = 0; i < 3; i++) {
+      if (i == 0) {
+	int_list = funcctx.locint_list;
+	float_list = funcctx.locfloat_list;
+	string_list = funcctx.locstring_list;
+	namespc = 0;
+      } else if (i == 1) {
+	int_list = funcctx.filectx.gblint_list;
+	float_list = funcctx.filectx.gblfloat_list;
+	string_list = funcctx.filectx.gblstring_list;
+	namespc = 0;
+      } else {
+	int_list = this.extint_list;
+	float_list = this.extfloat_list;
+	string_list = this.extstring_list;
+	namespc = funcctx.filectx.namespc;
+      }
+
+      for (int_p = int_list; int_p != null; int_p = int_p.next) {
+	if ((int_p.name === varname) && (!namespc || (int_p.namespc === namespc) || 
+					 (int_p.namespc === "__all__"))) {
+	  found = 1;
+	  break;
+	}
+      }
+      if (found) {
+	if (int_p.array == 0)
+	  return CCM_.VARTYPE;
+
+	int_p.elements = 0;
+	int_p.value.length = 0;
+      } else {
+	/* Search float */
+	for (float_p = float_list; float_p != null; float_p = float_p.next) {
+	  if ((float_p.name === varname) && (!namespc || (float_p.namespc === namespc) || 
+					     (float_p.namespc === "__all__"))) {
+	    found = 1;
+	    break;
+	  }
+	}
+	if (found) {
+	  if (float_p.array == 0)
+	    return CCM_.VARTYPE;
+
+	  float_p.elements = 0;
+	  float_p.value.length = 0;
+	} else {
+	  /* Search string */
+	  for (string_p = string_list; string_p != null; string_p = string_p.next) {
+	    if ((string_p.name === varname) && (!namespc || (string_p.namespc === namespc) || 
+					      (string_p.namespc === "__all__"))) {
+	      found = 1;
+	      break;
+	    }
+	  }
+	  if (found) {
+	    if (string_p.array == 0)
+	      return CCM_.VARTYPE;
+
+	    string_p.elements = 0;
+	    string_p.value.length = 0;
+	  }
+	}
+      }
+      if (found)
+	break;
+    }
+    if (!found)
+      return CCM_.VARNOTFOUND;
+    return 1;
+  }
+
+  this.setvar = function(funcctx, name, decl, value_float, value_int, value_string) {
+    var int_p;
+    var float_p;
+    var string_p;
+    var int_list;
+    var float_list;
+    var string_list;
+    var found;
+    var i;
+    var array;
+    var element;
+    var varname;
+    var namespc;
+
+    var rn = this.varname_parse(funcctx, name);
+    if (EVEN(rn.sts))
+      return rn.sts;
+    varname = rn.varname;
+    array = rn.array;
+    element = rn.element;
+
+    if (array != 0 && element == CcmC.NO_ELEM)
+      return CCM_.NOELEMERROR;
+
+    found = 0;
+    for (i = 0; i < 3; i++) {
+      if (i == 0) {
+	int_list = funcctx.locint_list;
+	float_list = funcctx.locfloat_list;
+	string_list = funcctx.locstring_list;
+	namespc = 0;
+      } else if (i == 1) {
+	int_list = funcctx.filectx.gblint_list;
+	float_list = funcctx.filectx.gblfloat_list;
+	string_list = funcctx.filectx.gblstring_list;
+	namespc = 0;
+      } else {
+	int_list = this.extint_list;
+	float_list = this.extfloat_list;
+	string_list = this.extstring_list;
+	namespc = funcctx.filectx.namespc;
+      }
+
+      for (int_p = int_list; int_p != null; int_p = int_p.next) {
+	if ((int_p.name === varname) && (!namespc || (int_p.namespc === namespc) || 
+					 (int_p.namespc === "__all__"))) {
+	  found = 1;
+	  break;
+	}
+      }
+      if (found) {
+	if (int_p.array != array)
+	  return CCM_.VARNOTFOUND;
+	if (int_p.array != 0 && (element < 0 || element >= int_p.elements))
+	  return CCM_.ARRAYBOUNDS;
+
+	if (int_p.array != 0) {
+	  if (decl == CcmC.K_DECL_INT)
+	    int_p.value[element] = value_int;
+	  else if (decl == CcmC.K_DECL_FLOAT)
+	    int_p.value[element] = Math.floor(value_float);
+	  else {
+	    var ival = parseInt(value_string);
+	    if (isNaN(ival))
+		return CCM_.VARTYPE;
+	    int_p.value[element] = ival;
+	  }
+	} else {
+	  if (decl == CcmC.K_DECL_INT)
+	    int_p.value = value_int;
+	  else if (decl == CcmC.K_DECL_FLOAT)
+	    int_p.value = Math.floor(value_float);
+	  else {
+	    var ival2 = parseInt(value_string);
+	    if (isNaN(ival2))
+		return CCM_.VARTYPE;
+	    int_p.value = ival2;
+	  }
+	}
+      } else {
+	/* Search float */
+	for (float_p = float_list; float_p != null; float_p = float_p.next) {
+	  if ((float_p.name === varname) && (!namespc || (float_p.namespc, namespc) || 
+					  (float_p.namespc === "__all__"))) {
+	    found = 1;
+	    break;
+	  }
+	}
+	if (found) {
+	  if (float_p.array != array)
+	    return CCM_.VARNOTFOUND;
+	  if (float_p.array != 0 && (element < 0 || element >= float_p.elements))
+	    return CCM_.ARRAYBOUNDS;
+
+	  if (float_p.array != 0) {
+	    if (decl == CcmC.K_DECL_INT)
+	      float_p.value[element] = value_int;
+	    else if (decl == CcmC.K_DECL_FLOAT)
+	      float_p.value[element] = value_float;
+	    else {
+	      var f = parseFloat(value_string);
+	      if (isNaN(f))
+		return CCM_.VARTYPE;
+	      float_p.value[element] = f;
+	    }
+	  } else {
+	    if (decl == CcmC.K_DECL_INT)
+	      float_p.value = value_int;
+	    else if (decl == CcmC.K_DECL_FLOAT)
+	      float_p.value = value_float;
+	    else {
+	      var f2 = parseFloat(value_string);
+	      if (isNaN(f2))
+		return CCM_.VARTYPE;
+	      float_p.value = f2;
+	    }
+	  }
+	} else {
+	  /* Search string */
+	  for (string_p = string_list; string_p != null; string_p = string_p.next) {
+	    if ((string_p.name === varname) && (!namespc || (string_p.namespc === namespc) ||
+						(string_p.namespc === "__all__"))) {
+	      found = 1;
+	      break;
+	    }
+	  }
+	  if (found) {
+	    if (string_p.array != array)
+	      return CCM_.VARNOTFOUND;
+	    if (string_p.array != 0 && (element < 0 || element >= string_p.elements))
+	      return CCM_.ARRAYBOUNDS;
+
+	    if (string_p.array != 0) {
+	      if (decl == CcmC.K_DECL_INT)
+		string_p.value[element] = value_int.toString();
+	      else if (decl == CcmC.K_DECL_FLOAT)
+		string_p.value[element] = this.float_to_string(value_float);
+	      else
+		string_p.value[element] = value_string;
+	    } else {
+	      if (decl == CcmC.K_DECL_INT)
+		string_p.value = value_int.toString();
+	      else if (decl == CcmC.K_DECL_FLOAT)
+		string_p.value = this.float_to_string(value_float);
+	      else
+		string_p.value = value_string;
+	    }
+	  }
+	}
+      }
+      if (found)
+	break;
+    }
+    if (!found)
+      return CCM_.VARNOTFOUND;
+    return 1;
+  }
+
+  this.set_external_var = function(name, decl, value_float, value_int, value_string) {
+    var int_p;
+    var float_p;
+    var string_p;
+    var int_list;
+    var float_list;
+    var string_list;
+    var found;
+    var array;
+    var element;
+    var varname;
+
+    var rn = this.varname_parse(null, name);
+    if (EVEN(rn.sts))
+      return rn.sts;
+    varname = rn.varname;
+    array = rn.array;
+    element = rn.element;
+
+    if (array != 0 && element == CcmC.NO_ELEM)
+      return CCM_.NOELEMERROR;
+
+    found = 0;
+
+    if (decl == CcmC.K_DECL_INT) {
+      int_list = this.extint_list;
+
+      for (int_p = int_list; int_p != null; int_p = int_p.next) {
+	if ((int_p.name === varname)) {
+	  found = 1;
+	  break;
+	}
+      }
+      if (found) {
+	if (int_p.array != 0)
+	  int_p.value[element] = value_int;
+	else
+	  int_p.value = value_int;
+      }
+    } else if (decl == CcmC.K_DECL_FLOAT) {
+      /* Search float */
+      float_list = this.extfloat_list;
+
+      for (float_p = float_list; float_p != null; float_p = float_p.next) {
+	if ((float_p.name === varname)) {
+	  found = 1;
+	  break;
+	}
+      }
+      if (found) {
+	if (float_p.array != 0)
+	  float_p.value[element] = value_float;
+	else
+	  float_p.value = value_float;
+      }
+    } else if (decl == CcmC.K_DECL_STRING) {
+      /* Search string */
+      string_list = this.extstring_list;
+
+      for (string_p = string_list; string_p != null; string_p = string_p.next) {
+	if ((string_p.name === varname)) {
+	  found = 1;
+	  break;
+	}
+      }
+      if (found) {
+	if (string_p.array != 0)
+	  string_p.value[element] = value_string;
+	else
+	  string_p.value = value_string;
+      }
+    }
+    if (!found)
+      return CCM_.VARNOTFOUND;
+    return 1;
+  }
+
+  this.get_external_var = function(name, decl) {
+    var int_p;
+    var float_p;
+    var string_p;
+    var int_list;
+    var float_list;
+    var string_list;
+    var found;
+    var array;
+    var element;
+    var varname;
+    var ret = {
+      value_int : 0,
+      value_float : 0,
+      value_string : null,
+      sts : CCM_.SUCCESS};
+
+    var rn = this.varname_parse(null, name);
+    if (EVEN(rn.sts)) {
+      ret.sts = rn.sts;
+      return ret;
+    }
+    varname = rn.varname;
+    array = rn.array;
+    element = rn.element;
+
+    found = 0;
+
+    if (decl == CcmC.K_DECL_INT) {
+      int_list = this.extint_list;
+
+      for (int_p = int_list; int_p; int_p = int_p.next) {
+	if ((int_p.name === varname)) {
+	  found = 1;
+	  break;
+	}
+      }
+      if (found) {
+	if (int_p.array != 0 && element == CcmC.NO_ELEM) {
+	  ret.sts = CCM_.NOELEM;
+	  return ret;
+	}
+	if (int_p.array != 0)	  
+	  ret.value_int = int_p.value[element];
+	else
+	  ret.value_int = int_p.value;
+      }
+    } else if (decl == CcmC.K_DECL_FLOAT) {
+      /* Search float */
+      float_list = this.extfloat_list;
+
+      for (float_p = float_list; float_p != null; float_p = float_p.next) {
+	if ((float_p.name === varname)) {
+	  found = 1;
+	  break;
+	}
+      }
+      if (found) {
+	if (float_p.array != 0 && element == CcmC.NO_ELEM) {
+	  ret.sts = CCM_.NOELEM;
+	  return ret;
+	}
+	if (float_p.array != 0)
+	  ret.value_float = float_p.value[element];
+	else
+	  ret.value_float = float_p.value;
+      }
+    } else if (decl == CcmC.K_DECL_STRING) {
+      /* Search string */
+      string_list = this.extstring_list;
+
+      for (string_p = string_list; string_p != null; string_p = string_p.next) {
+	if ((string_p.name == varname)) {
+	  found = 1;
+	  break;
+	}
+      }
+      if (found) {
+	if (string_p.array != 0 && element == CcmC.NO_ELEM) {
+	  return CCM_.NOELEM;
+	}
+	if (string_p.array != 0)
+	  ret.value_string = string_p.value[element];
+	else
+	  ret.value_string = string_p.value;
+      }
+    }
+    if (!found) {
+      ret.sts = CCM_.VARNOTFOUND;
+      return ret;
+    }
+    return ret;
+  }
+
+  this.ref_external_var = function(name, decl, valuep) {
+    var int_p;
+    var float_p;
+    var string_p;
+    var int_list;
+    var float_list;
+    var string_list;
+    var found;
+    var varname;
+    var ret = {
+      sts: CCM_.SUCCESS,
+      varname: null,
+      element: 0,
+      array: 0,
+      valuep : 0};
+
+    var rn = this.varname_parse(null, name);
+    if (EVEN(rn.sts))
+      return rn.sts;
+
+    found = 0;
+
+    if (decl == CcmC.K_DECL_INT) {
+      int_list = this.extint_list;
+
+      for (int_p = int_list; int_p != null; int_p = int_p.next) {
+	if ((int_p.name === varname)) {
+	  found = 1;
+	  break;
+	}
+      }
+      if (found) {
+	if (int_p.array != 0 && element == CcmC.NO_ELEM) {
+	  ret.valuep = int_p.value; //TODO
+	  ret.sts = CCM_.NOELEM;
+	  return ret;
+	}
+	ret.valuep = int_p.value[element]; //TODO
+      }
+    } else if (decl == CcmC.K_DECL_FLOAT) {
+      /* Search float */
+      float_list = this.extfloat_list;
+      
+      for (float_p = float_list; float_p != 0; float_p = float_p.next) {
+	if ((float_p.name === varname)) {
+	  found = 1;
+	  break;
+	}
+      }
+      if (found) {
+	if (float_p.array != 0 && element == CcmC.NO_ELEM) {
+	  ret.valuep = float_p.value; // TODO
+	  ret.sts = CCM_.NOELEM;
+	  return ret;
+	}
+	ret.valuep = float_p.value[element]; // TODO
+      }
+    } else if (decl == CcmC.K_DECL_STRING) {
+      /* Search string */
+      string_list = this.extstring_list;
+      
+      for (string_p = string_list; string_p != null; string_p = string_p.next) {
+	if ((string_p.name === varname)) {
+	  found = 1;
+	  break;
+	}
+      }
+      if (found) {
+	if (string_p.array != 0 && element == CcmC.NO_ELEM) {
+	  ret.valuep = string_p.value; //TODO
+	  ret.sts = CCM_.NOELEM;
+	  return ret;
+	}
+	ret.valuep = string_p.value[element];
+      }
+    }
+    if (!found) {
+      ret.sts = CCM_.VARNOTFOUND;
+      return ret;
+    }
+    return ret;
+  }
+
+  this.createvar = function(name, namespc, decl, value_float, value_int, value_string, 
+      int_list, float_list, string_list) {
+    var int_p;
+    var float_p;
+    var string_p;
+    var array;
+    var elements;
+    var varname;
+    var sts;
+    var ret = {
+      sts: CCM_.SUCCESS,
+      int_list: int_list,
+      float_list: float_list,
+      string_list: string_list};
+
+    var rn = this.varname_parse(null, name);
+    sts = rn.sts;
+    varname = rn.varname;
+    array = rn.array;
+    elements = rn.element;
+    if (EVEN(sts)) {
+      ret.sts = sts;
+      return ret;
+    }
+    if (elements == CcmC.NO_ELEM)
+      elements = 0;
+
+    if (decl == CcmC.K_DECL_INT) {
+      for (int_p = int_list; int_p != null; int_p = int_p.next) {
+	if ((int_p.name === varname) && (!namespc || (int_p.namespc === namespc) || 
+					 (int_p.namespc === "__all__"))) {
+	  ret.sts = CCM_.VARALREXIST;
+	  return ret;
+	}
+      }
+
+      int_p = new ccm_sIntvar();
+      int_p.name = varname;
+      if (namespc)
+	int_p.namespc = namespc;
+      if (!array)
+	int_p.value = value_int;
+      else
+	int_p.value = new Array(elements);
+      int_p.elements = elements;
+      int_p.array = array;
+      int_p.next = int_list;
+      int_list = int_p;
+      ret.int_list = int_list;
+    } else if (decl == CcmC.K_DECL_FLOAT) {
+      for (float_p = float_list; float_p != null; float_p = float_p.next) {
+	if ((float_p.name === varname) && (!namespc || (float_p.namespc === namespc) || 
+					   (float_p.namespc === "__all__"))) {
+	  ret.sts = CCM_.VARALREXIST;
+	  return ret;
+	}
+      }
+
+      float_p = new ccm_sFloatvar();
+      float_p.name = varname ;
+      if (namespc)
+	float_p.namespc = namespc;
+      if (!array)
+	float_p.value = value_float;
+      else
+	float_p.value = new Array(elements);
+      float_p.elements = elements;
+      float_p.array = array;
+      float_p.next = float_list;
+      float_list = float_p;
+      ret.float_list = float_list;
+    } else if (decl == CcmC.K_DECL_STRING) {
+      for (string_p = string_list; string_p != null; string_p = string_p.next) {
+	if ((string_p.name === varname) && (!namespc || (string_p.namespc === namespc) || 
+					    (string_p.namespc === "__all__"))) {
+	  ret.sts = CCM_.VARALREXIST;
+	  return ret;
+	}
+      }
+
+      string_p = new ccm_sStringvar();
+      string_p.name = varname ;
+      if (namespc != null)
+	string_p.namespc = namespc;
+      if (!array)
+	string_p.value = value_string;
+      else 
+	string_p.value = new Array(elements);
+      string_p.elements = elements;
+      string_p.array = array;
+      string_p.next = string_list;
+      string_list = string_p;
+      ret.string_list = string_list;
+    }
+    return ret;
+  }
+
+  this.deletevar = function(name, namespc, int_list, float_list, string_list) {
+    var int_p, int_prev;
+    var float_p, float_prev;
+    var string_p, string_prev;
+    var varname;
+    var sts;
+    var found;
+    var ret = {
+      sts: CCM_.SUCCESS,
+      int_list: int_list,
+      float_list: float_list,
+      string_list: string_list};
+
+    var rn = this.varname_parse(null, name);
+    sts = rn.sts;
+    if (EVEN(sts)) {
+      ret.sts = sts;
+      return ret;
+    }
+    varname = rn.varname;
+
+    int_prev = 0;
+    found = 0;
+    for (int_p = int_list; int_p != null; int_p = int_p.next) {
+      if ((int_p.name === varname) && (!namespc || (int_p.namespc === namespc) || 
+				     (int_p.namespc === "__all__"))) {
+	found = 1;
+
+	if (!int_prev)
+	  int_list = int_p.next;
+	else
+	  int_prev.next = int_p.next;
+	break;
+      }
+      int_prev = int_p;
+    }
+
+    if (found) {
+      ret.int_list = int_list;
+      return ret;
+    }
+    
+    float_prev = 0;
+    for (float_p = float_list; float_p; float_p = float_p.next) {
+      if ((float_p.name === varname) && (!namespc || (float_p.namespc === namespc) || 
+          (float_p.namespc === "__all__"))) {
+	found = 1;
+
+	if (!float_prev)
+	  float_list = float_p.next;
+	else
+	  float_prev.next = float_p.next;
+	break;
+      }
+      float_prev = float_p;
+    }
+    if (found) {
+      ret.float_list = float_list;
+      return ret;
+    }
+
+    string_prev = 0;
+    for (string_p = string_list; string_p != null; string_p = string_p.next) {
+      if ((string_p.name === varname) && (!namespc || (string_p.namespc === namespc) || 
+					(string_p.namespc === "__all__"))) {
+	found = 1;
+	
+	if (!string_prev)
+	  string_list = string_p.next;
+	else
+	  string_prev.next = string_p.next;
+	break;
+      }
+      string_prev = string_p;
+    }
+    if (found) {
+      ret.string_list = string_list;
+      return ret;
+    }
+    ret.sts = CCM_.VARNOTFOUND;
+    return ret;
+  }
+
+  this.create_external_var = function(name, decl, value_float, value_int, value_string) {
+
+    var ret = this.createvar(name, "__all__", decl, value_float, value_int, value_string,
+        this.extint_list, this.extfloat_list, this.extstring_list);
+    if (ret.sts == CCM_.VARALREXIST)
+      return CCM_.SUCCESS;
+    this.extint_list = ret.int_list;
+    this.extfloat_list = ret.ext_float_list;
+    this.extstring_list = ret.extstring_list;
+
+    return ret.sts;
+  }
+
+  this.read_file = function(filectx, filename, line_list) {
+    var fname;
+    var ret = {
+      sts: CCM_.SUCCESS,
+      line_list: line_list};
+
+    if (filectx.deffilename_func != null)
+      fname = filectx.deffilename_func(filename, filectx.client_data);
+    else
+      fname = filename;
+
+    try {
+      var data = fs.readFileSync(fname, 'latin1');
+      var rf = this.read_buffer(filectx, data, line_list);
+      ret.line_list = rf.line_list;
+      ret.sts =  rf.sts;
+    } catch(err) {
+      if (err)
+	console.log(err);
+    }
+    return ret;
+  }
+
+  this.read_buffer = function(filectx, buffer, line_list) {
+    var str;
+    var line_p;
+    var line_list_p;
+    var s1, s2;
+    var row;
+    var ret = {
+      sts : CCM_.SUCCESS,
+      line_list: line_list};
+
+    row = 0;
+    s1 = 0;
+    s2 = buffer.indexOf('\n');
+    while (true) {
+      row++;
+      if (s2 == -1)
+	str = buffer.substring(s1);
+      else
+	str = buffer.substring(s1, s2);
+
+      str = this.remove_blank(str);
+      if (str[0] == '!' || str.length == 0
+	  || (str[0] == '#' && !this.StartsWith(str, "#include"))) {
+	if (s2 == -1)
+	  break;
+	s1 = s2 + 1;
+	s2 = buffer.indexOf('\n', s1);
+	continue;
+      }
+
+      /* Remove any trailing \r */
+      if (str[str.length - 1] == '\r')
+	str = str.substring(0, str.length - 1);
+
+      /* If last char i backslash, concatenate next line */
+      if (str[str.length - 1] == '\\') {
+	row++;
+	s1 = s2 + 1;
+	s2 = buffer.indexOf('\n', s1);
+	if (s2 == -1)
+	  str += buffer.substring(s1);
+	else
+	  str += buffer.substring(s1, s2);
+      }
+
+      if (str.substring(0,8) === "#include") {
+        /* TODO
+	pwr_tFileName fname;
+	char *s1, *se;
+	pwr_tStatus sts;
+	
+	s1= strchr(str, '<');
+	if (s1 == 0) {
+	  filectx.error_row = row;
+	  filectx.error_line = str;
+	  return CCM_.SYNTAX;
+	}
+	se = strrchr(str, '>');
+	if (se == 0) {
+	  filectx.error_row = row;
+	  filectx.error_line = str;
+	  return CCM_.SYNTAX;
+	}
+	strncpy(fname, s1+1, se - s1 - 1);
+	fname[se - s1 - 1] = 0;
+	sts = ccm_read_file(filectx, fname, &line_list_p);
+	if (EVEN(sts))
+	  return sts;
+	if (*line_list == NULL)
+	  *line_list = line_list_p;
+	
+	for (; line_list_p.next; line_list_p = line_list_p.next)
+	  ;
+	continue;
+	*/
+      }
+      
+      line_p = new ccm_sLine();
+      line_p.line = str;
+      line_p.row = row;
+      if (line_list_p == null)
+	line_list = line_p;
+      else {
+	line_p.prev = line_list_p;
+	line_list_p.next = line_p;
+      }
+      line_list_p = line_p;
+
+      if (s2 == -1)
+	break;
+      
+      s1 = s2 + 1;
+      s2 = buffer.indexOf('\n', s1);
+    }
+
+    if (line_list_p == null) {
+      /* Single line */
+      line_p = new ccm_sLine();
+      line_p.line = buffer;
+      line_p.row = row;
+      if (line_list_p == null)
+	line_list = line_p;
+      else {
+	line_p.prev = line_list_p;
+	line_list_p.next = line_p;
+      }
+      line_list_p = line_p;
+    }
+    ret.line_list = line_list;
+    return ret;
+  }
+
+  this.StartsWith = function(line, str) {
+    return (line.substring(0,str.length) == str);
+  }
+
+  this.init_filectx = function(filectx) {
+    var line_p;
+    var l_p;
+    var out_str = new Array(5);
+    var in_function;
+    var func_found;
+    var main_start_found;
+    var main_end_found;
+    var nr;
+    var func_p;
+
+    func_found = 0;
+    in_function = 0;
+    main_start_found = 0;
+    main_end_found = 0;
+    for (line_p = filectx.line_list; line_p; line_p = line_p.next) {
+      if (this.StartsWith(line_p.line, "function")
+	  && (line_p.line[8] === ' ' || line_p.line[8] == '	')) {
+	if (in_function != 0) {
+	  filectx.error_row = line_p.row;
+	  filectx.error_line = line_p.line;
+	  return CCM_.FUNCNOTFOUND;
+	}
+	func_found = 1;
+	
+	/* Parse the command string */
+	nr = this.rtt_parse(line_p.line, " 	(", "", out_str, 5, 32, 0);
+	if (nr < 4) {
+	  filectx.error_row = line_p.row;
+	  filectx.error_line = line_p.line;
+	  return CCM_.SYNTAX;
+	}
+
+	func_p = new ccm_sFunc();
+	func_p.name = out_str[2];
+	func_p.start_line = line_p;
+	if (out_str[1] === "int")
+	  func_p.decl = CcmC.K_DECL_INT;
+	else if (out_str[1] === "float")
+	  func_p.decl = CcmC.K_DECL_FLOAT;
+	else if (out_str[1] === "string")
+	  func_p.decl = CcmC.K_DECL_STRING;
+	else {
+	  filectx.error_row = line_p.row;
+	  filectx.error_line = line_p.line;
+	  return CCM_.UNKNVARTYPE;
+	}
+	
+	func_p.next = filectx.func_list;
+	filectx.func_list = func_p;
+	in_function = 1;
+	line_p.type = CcmC.K_LINE_FUNCTION;
+      } else if (this.StartsWith(line_p.line, "endfunction")) {
+	if (in_function == 0) {
+	  filectx.error_row = line_p.row;
+	  filectx.error_line = line_p.line;
+	  return CCM_.FUNCMISM;
+	}
+	
+	func_p = filectx.func_list;
+	func_p.end_line = line_p;
+	in_function = 0;
+	line_p.type = CcmC.K_LINE_ENDFUNCTION;
+      } else if (this.StartsWith(line_p.line, "main")) {
+	/* Parse the command string */
+	nr = this.rtt_parse(line_p.line, " 	(", "", out_str, 5, 32, 0);
+	if (nr < 1) {
+	  filectx.error_row = line_p.row;
+	  filectx.error_line = line_p.line;
+	  return CCM_.SYNTAX;
+	}
+
+	if (out_str[0] === "main") {
+	  if (main_start_found != 0) {
+	    filectx.error_row = line_p.row;
+	    filectx.error_line = line_p.line;
+	    return CCM_.MAINMISM;
+	  }
+	  
+	  filectx.main_start_line = line_p;
+	  main_start_found = 1;
+	  line_p.type = CcmC.K_LINE_MAIN;
+	}
+      } else if (this.StartsWith(line_p.line, "endmain")) {
+	if (main_start_found == 0) {
+	  filectx.error_row = line_p.row;
+	  filectx.error_line = line_p.line;
+	  return CCM_.MAINMISM;
+	}
+	
+	filectx.main_end_line = line_p;
+	main_end_found = 1;
+	line_p.type = CcmC.K_LINE_ENDMAIN;
+      } else if (this.StartsWith(line_p.line, "if")
+		 && (line_p.line[2] == ' ' || line_p.line[2] == '	'
+		     || line_p.line[2] == '(')) {
+	line_p.type = CcmC.K_LINE_IF;
+      } else if (this.StartsWith(line_p.line, "else")
+		 && (line_p.line[4] == ' ' || line_p.line[4] == '	'
+		     || line_p.line[4] == 10 || line_p.line.length == 4)) {
+	line_p.type = CcmC.K_LINE_ELSE;
+      } else if (this.StartsWith(line_p.line, "endif")
+		 && (line_p.line[5] == ' ' || line_p.line[5] == '	'
+		     || line_p.line[5] == 10 || line_p.line.length == 5
+		     || line_p.line[5] == ';')) {
+	line_p.type = CcmC.K_LINE_ENDIF;
+      } else if (this.StartsWith(line_p.line, "while")
+		 && (line_p.line[5] == ' ' || line_p.line[5] == '	'
+		     || line_p.line[5] == '(')) {
+	line_p.type = CcmC.K_LINE_WHILE;
+      } else if (this.StartsWith(line_p.line, "endwhile")
+		 && (line_p.line[8] == ' ' || line_p.line[8] == '	'
+		     || line_p.line[8] == 10 || line_p.line.length == 8
+		     || line_p.line[8] == ';')) {
+	line_p.type = CcmC.K_LINE_ENDWHILE;
+      } else if (this.StartsWith(line_p.line, "for")
+		 && (line_p.line[3] == ' ' || line_p.line[3] == '	'
+		     || line_p.line[3] == '(')) {
+	line_p.type = CcmC.K_LINE_FOR;
+      } else if (this.StartsWith(line_p.line, "endfor")
+		 && (line_p.line[6] == ' ' || line_p.line[6] == '	'
+		     || line_p.line[6] == 10 || line_p.line.length == 6
+		     || line_p.line[6] == ';')) {
+	line_p.type = CcmC.K_LINE_ENDFOR;
+      } else if (this.StartsWith(line_p.line, "break")
+		 && (line_p.line[5] == ' ' || line_p.line[5] == '	'
+		     || line_p.line[5] == 10 || line_p.line.length == 5
+		     || line_p.line[5] == ';')) {
+	line_p.type = CcmC.K_LINE_BREAK;
+      } else if (this.StartsWith(line_p.line, "continue")
+		 && (line_p.line[8] == ' ' || line_p.line[8] == '	'
+		     || line_p.line[8] == 10 || line_p.line.length == 8
+		     || line_p.line[8] == ';')) {
+	line_p.type = CcmC.K_LINE_CONTINUE;
+      } else if (this.StartsWith(line_p.line, "goto")
+		 && (line_p.line[4] == ' ' || line_p.line[4] == '	')) {
+	line_p.type = CcmC.K_LINE_GOTO;
+      } else if (line_p.line.length != 0
+		 && line_p.line[line_p.line.length - 1] == ':') {
+	/* Check label name */
+	/** TODO
+	ok = 1;
+	for (s = line_p.line; *s; s++) {
+	  if (!(isalnum(*s) || *s == '_')) {
+	    if (s != &line_p.line[strlen(line_p.line) - 1]) {
+	      ok = 0;
+	      break;
+	    }
+	  }
+	}
+	if (ok)
+	  line_p.type = CcmC.K_LINE_LABEL;
+	*/
+      }
+    }
+    if (filectx.line_list != null && main_start_found == 0 && main_end_found == 0
+	&& func_found == 0) {
+      /* No main and no function found, insert mainstart first and main end last
+	 in list */
+      for (line_p = filectx.line_list; line_p.next; line_p = line_p.next)
+	;
+      l_p = new ccm_sLine();
+      filectx.main_end_line = l_p;
+      l_p.type = CcmC.K_LINE_ENDMAIN;
+      l_p.row = line_p.row;
+      l_p.prev = line_p;
+      line_p.next = l_p;
+      main_end_found = 1;
+      
+      l_p = new ccm_sLine();
+      filectx.main_start_line = l_p;
+      l_p.type = CcmC.K_LINE_MAIN;
+      l_p.row = 1;
+      filectx.line_list.prev = l_p;
+      l_p.next = filectx.line_list;
+      filectx.line_list = l_p;
+      main_start_found = 1;
+    }
+    
+    if (main_start_found == 0)
+      return CCM_.MAINMISM;
+    if (main_end_found == 0)
+      return CCM_.MAINMISM;
+    if (in_function != 0)
+      return CCM_.FUNCMISM;
+    
+    return 1;
+  }
+
+  this.extract_parenthes_expr = function(line) {
+    var s1, s2;
+    var ret = {
+      expr : null,
+      sts : CCM_.SUCCESS};
+
+    s1 = line.indexOf('(');
+    if (s1 == -1) {
+      ret.sts = CCM_.SYNTAX;
+      return ret;
+    }
+    s2 = line.indexOf(')', s1+1);
+    if (s2 == -1) {
+      ret.sts = CCM_.SYNTAX;
+      return ret;
+    }
+    ret.expr = line.substring(s1 + 1, s2);
+    ret.expr = this.remove_blank(ret.expr);
+    return ret;
+  }
+
+  this.function_exec = function(filectx, name, func, arg_list, arg_count, resume) {
+    var return_found;
+    var decl;
+    var int_val;
+    var float_val;
+    var string_val;
+    var i;
+    var line_p;
+    var l_p;
+    var sts = 0;
+    var start_line = null;
+    var end_line = null;
+    var main_found;
+    var found;
+    var func_p = null;
+    var arg_str = new Array(0);
+    var elm_str = new Array(4);
+    var arg_p;
+    var nr;
+    var expr;
+    var funcctx;
+    var if_level;
+    var while_level;
+    var for_level;
+    var arg_name;
+    var label;
+    var goto_label;
+    var ret = {
+      sts : CCM_.SUCCESS,
+      return_decl : 0,
+      return_float : 0,
+      return_int : 0,
+      return_string : null,
+      func : null};
+
+    if (resume) {
+      funcctx = filectx.main_funcctx;
+      start_line = filectx.main_funcctx.current_line.next;
+      end_line = filectx.main_end_line;
+    } else {
+      main_found = 0;
+
+      if (func != null) {
+	var rf = func(filectx, arg_list, arg_count);
+	ret.sts = rf.sts;
+	ret.return_decl = rf.return_decl;
+	ret.return_float = rf.return_float;
+	ret.return_int = rf.return_int;
+	ret.return_string = rf.return_string;
+	return ret;
+      } else if (name === "main") {
+	start_line = filectx.main_start_line.next;
+	end_line = filectx.main_end_line;
+	main_found = 1;
+      } else {
+	var fclass_found = 0;
+	var fclass;
+	var fname;
+	var s;
+
+	s = name.indexOf('::');
+	if (s != -1) {
+	  fclass = name.substring(0, s);
+	  fname = name.substring(s+2);
+	  fclass_found = 1;
+	}
+
+	/* Search i system function list */
+	for (i = 0; i < this.ccm_sysfunc.length; i++) {
+	  if (fclass_found == 0) {
+	    if (name === this.ccm_sysfunc[i].name) {
+	      ret.func = this.ccm_sysfunc[i].sysfunc;
+	      var rs = this.ccm_sysfunc[i].sysfunc(this, filectx, arg_list, arg_count);
+	      ret.sts = rs.sts;
+	      ret.return_decl = rs.return_decl;
+	      ret.return_float = rs.return_float;
+	      ret.return_int = rs.return_int;
+	      ret.return_string = rs.return_string;
+	      return ret;
+	    }
+	  } else {
+	    if (fclass === this.ccm_sysfunc[i].classname && 
+		fname === this.ccm_sysfunc[i].name) {
+	      ret.func = this.ccm_sysfunc[i].sysfunc;
+	      var rs2 = this.ccm_sysfunc[i].sysfunc(this, filectx, arg_list, arg_count);
+	      ret.sts = rs2.sts;
+	      ret.return_decl = rs2.return_decl;
+	      ret.return_float = rs2.return_float;
+	      ret.return_int = rs2.return_int;
+	      ret.return_string = rs2.return_string;
+	      return ret;
+	    }
+	  }
+	}
+
+	/* Search for an application function */
+	found = 0;
+	for (func_p = filectx.func_list; func_p != null; func_p = func_p.next) {
+	  if (func_p.name === name) {
+	    start_line = func_p.start_line.next;
+	    end_line = func_p.end_line;
+	    found = 1;
+	    break;
+	  }
+	}
+	if (!found) {
+	  ret.sts = CCM_.FUNCNOTFOUND;
+	  return ret;
+	}
+      }
+
+      funcctx = new ccm_tFuncCtx();
+      funcctx.filectx = filectx;
+      funcctx.arg_list = arg_list;
+      funcctx.arg_count = arg_count;
+      filectx.funcctx = funcctx;
+
+      if (main_found != 0) {
+	funcctx.is_main = 1;
+	filectx.main_funcctx = funcctx;
+      }
+      /* Match the argument list and insert arguments as local variables */
+      if (funcctx.is_main == 0) {
+	var re = this.extract_parenthes_expr(func_p.start_line.line);
+	expr = re.expr;
+	nr = this.rtt_parse(expr, ",", "", arg_str, 30, 32, 0);
+	if (nr != arg_count) {
+	  ret.sts = CCM_.ARGMISM;
+	  return ret;
+	}
+	arg_p = arg_list;
+	for (i = 0; i < arg_count; i++) {
+	  this.remove_blank(arg_str[i], arg_str[i]);
+	  nr = this.rtt_parse(arg_str[i], " 	", "", elm_str, 4, 500, 0);
+	  if (nr != 2) {
+	    ret.sts = CCM_.SYNTAX;
+	    return ret;
+	  }
+	  if (elm_str[0] === "float") {
+	    var rc = this.createvar(elm_str[1], 0, CcmC.K_DECL_FLOAT, 0, 0, null,
+				    funcctx.locint_list, funcctx.locfloat_list,
+				    funcctx.locstring_list);
+	    if (EVEN(rc.sts)) {
+	      ret.sts = rc.sts;
+	      return ret;
+	    }
+	    funcctx.locint_list = rc.int_list;
+	    funcctx.locfloat_list = rc.float_list;
+	    funcctx.locstring_list = rc.string_list;
+	    sts = this.setvar(funcctx, elm_str[1], arg_p.value_decl,
+			      arg_p.value_float, arg_p.value_int, arg_p.value_string);
+	    if (EVEN(sts)) {
+	      ret.sts = sts;
+	      return ret;
+	    }
+	    arg_p.var_name = elm_str[1];
+	    arg_p.var_decl = CcmC.K_DECL_FLOAT;
+	  } else if (elm_str[0] === "int") {
+	    var rc2 = this.createvar(elm_str[1], 0, CcmC.K_DECL_INT, 0, 0, null,
+				    funcctx.locint_list, funcctx.locfloat_list,
+				    funcctx.locstring_list);
+	    if (EVEN(rc2.sts)) {
+	      ret.sts = rc2.sts;
+	      return ret;
+	    }
+	    funcctx.locint_list = rc2.int_list;
+	    funcctx.locfloat_list = rc2.float_list;
+	    funcctx.locstring_list = rc2.string_list;
+	    sts = this.setvar(funcctx, elm_str[1], arg_p.value_decl,
+			      arg_p.value_float, arg_p.value_int, arg_p.value_string);
+	    if (EVEN(sts)) {
+	      ret.sts = sts;
+	      return ret;
+	    }
+	    arg_p.var_name = elm_str[1];
+	    arg_p.var_decl = CcmC.K_DECL_INT;
+	  } else if (elm_str[0] === "string") {
+	    var rc3 = this.createvar(elm_str[1], 0, CcmC.K_DECL_STRING, 0, 0, null,
+				    funcctx.locint_list, funcctx.locfloat_list,
+				    funcctx.locstring_list);
+	    if (EVEN(rc3.sts)) {
+	      ret.sts = rc3.sts;
+	      return ret;
+	    }
+	    funcctx.locint_list = rc3.int_list;
+	    funcctx.locfloat_list = rc3.float_list;
+	    funcctx.locstring_list = rc3.string_list;
+	    sts = this.setvar(funcctx, elm_str[1], arg_p.value_decl,
+			     arg_p.value_float, arg_p.value_int, arg_p.value_string);
+	    if (EVEN(sts)) {
+	      ret.sts = sts;
+	      return ret;
+	    }
+	    arg_p.var_name = elm_str[1];
+	    arg_p.var_decl = CcmC.K_DECL_STRING;
+	  } else {
+	    ret.sts = CCM_.UNKNVARTYPE;
+	    return ret;
+	  }
+	  arg_p = arg_p.next;
+	}
+      } else {
+	/* Save the arguments as p1 - p9 */
+	arg_p = arg_list;
+	for (i = 1; i <= 9; i++) {
+	  arg_name =  "p" + i.toString();
+	  if (arg_p) {
+	    var rc4 = this.createvar(arg_name, 0, CcmC.K_DECL_STRING, 0, 0,
+				    arg_p.value_string, funcctx.locint_list,
+				    funcctx.locfloat_list, funcctx.locstring_list);
+	    if (EVEN(rc4.sts)) {
+	      ret.sts = rc4.sts;
+	      return ret;
+	    }
+	    funcctx.locint_list = rc4.int_list;
+	    funcctx.locfloat_list = rc4.float_list;
+	    funcctx.locstring_list = rc4.string_list;
+	    arg_p = arg_p.next;
+	  } else {
+	    var rc3 = this.createvar(arg_name, 0, CcmC.K_DECL_STRING, 0, 0, "",
+				    funcctx.locint_list, funcctx.locfloat_list,
+				    funcctx.locstring_list);
+	    if (EVEN(rc3.sts)) {
+	      ret.sts = rc3.sts;
+	      return ret;
+	    }
+	    funcctx.locint_list = rc3.int_list;
+	    funcctx.locfloat_list = rc3.float_list;
+	    funcctx.locstring_list = rc3.string_list;
+	  }
+	}
+      }
+
+      funcctx.for_init = 1;
+    }
+    return_found = 0;
+    for (line_p = start_line; line_p != end_line && line_p != null;
+	 line_p = line_p.next) {
+      if (filectx.verify != 0 && line_p.type != CcmC.K_LINE_STATMENT) {
+	if (filectx.break_before != 0)
+	  console.log("\nCCM-I-VERIFY, \"" + line_p.line + "\"");
+	else
+	  console.log("CCM-I-VERIFY, \"" + line_p.line + "\"");
+      }
+
+      filectx.current_row = line_p.row;
+
+      /***
+      if (ccm_testmode)
+	printf("%s", line_p.line);
+      ***/
+
+      switch (line_p.type) {
+      case CcmC.K_LINE_MAIN:
+      case CcmC.K_LINE_FUNCTION:
+	break;
+      case CcmC.K_LINE_IF:
+	var re2 = this.extract_parenthes_expr(line_p.line);
+	if (EVEN(re2.sts)) {
+	  ret.sts = re2.sts;
+	  return ret;
+	}
+	expr = re2.expr;
+	var rl = this.line_exec(funcctx, expr);
+	sts = rl.sts;
+	decl = rl.return_decl;
+	float_val = rl.return_float;
+	int_val = rl.return_int;
+	string_val = rl.return_string;
+	if (EVEN(sts)) {
+	  if (funcctx.filectx.error_row == 0) {
+	    funcctx.filectx.error_row = line_p.row;
+	    funcctx.filectx.error_line = line_p.line;
+	  }
+	  ret.sts = sts;
+	  return ret;
+	}
+	if (sts == CCM_.EXITFUNC) {
+	  ret.sts = sts;
+	  return ret;
+	}
+	if ((decl == CcmC.K_DECL_INT && int_val == 0)
+	    || (decl == CcmC.K_DECL_FLOAT && Math.abs(float_val) < CcmC.FLT_EPSILON)) {
+	  /* Find next matching endif */
+	  if_level = 0;
+	  found = 0;
+	  for (l_p = line_p.next; l_p != null; l_p = l_p.next) {
+	    if (l_p.type == CcmC.K_LINE_IF)
+	      if_level++;
+	    else if (l_p.type == CcmC.K_LINE_ENDIF) {
+	      if (if_level == 0) {
+		found = 1;
+		break;
+	      } else
+		if_level--;
+	    } else if (l_p.type == CcmC.K_LINE_ELSE) {
+	      if (if_level == 0) {
+		found = 1;
+		break;
+	      }
+	    }
+	  }
+	  if (found == 0) {
+	    ret.sts = CCM_.IFMISM;
+	    return ret;
+	  }
+	  line_p = l_p;
+	}
+	break;
+      case CcmC.K_LINE_ELSE:
+	/* Find next matching endif */
+	if_level = 0;
+	found = 0;
+	for (l_p = line_p.next; l_p != null; l_p = l_p.next) {
+	  if (l_p.type == CcmC.K_LINE_IF)
+	    if_level++;
+	  else if (l_p.type == CcmC.K_LINE_ENDIF) {
+	    if (if_level == 0) {
+	      found = 1;
+	      break;
+	    } else
+	      if_level--;
+	  }
+	}
+	if (found == 0) {
+	  ret.sts = CCM_.IFMISM;
+	  return ret;
+	}      
+	line_p = l_p;
+	break;
+      case CcmC.K_LINE_ENDIF:
+	break;
+      case CcmC.K_LINE_WHILE:
+	var re3 = this.extract_parenthes_expr(line_p.line);
+	sts = re3.sts;
+	expr = re3.expr;
+	if (EVEN(sts)) {
+	  ret.sts = sts;
+	  return ret;
+	}
+	var rl2 = this.line_exec(funcctx, expr);
+	sts = rl2.sts;
+	decl = rl2.return_decl;
+	float_val = rl2.return_float;
+	int_val = rl2.return_int;
+	string_val = rl2.return_string;
+	if (EVEN(sts)) {
+	  if (funcctx.filectx.error_row == 0) {
+	    funcctx.filectx.error_row = line_p.row;
+	    funcctx.filectx.error_line = line_p.line;
+	  }
+	  ret.sts = sts;
+	  return ret;
+	}
+	if (sts == CCM_.EXITFUNC) {
+	  ret.sts = sts;
+	  return ret;
+	}
+	if ((decl == CcmC.K_DECL_INT && int_val == 0)
+	    || (decl == CcmC.K_DECL_FLOAT && Math.abs(float_val) < CcmC.FLT_EPSILON)) {
+	  /* Find next matching endwhile */
+	  while_level = 0;
+	  found = 0;
+	  for (l_p = line_p.next; l_p != null; l_p = l_p.next) {
+	    if (l_p.type == CcmC.K_LINE_WHILE)
+	      while_level++;
+	    else if (l_p.type == CcmC.K_LINE_ENDWHILE) {
+	      if (while_level == 0) {
+		found = 1;
+		break;
+	      } else
+		while_level--;
+	    }
+	  }
+	  if (found == 0) {
+	    ret.sts = CCM_.WHILEMISM;
+	    return ret;
+	  }
+	  line_p = l_p;
+	}
+	break;
+      case CcmC.K_LINE_ENDWHILE:
+	/* Find previous matching while */
+	while_level = 0;
+	found = 0;
+	for (l_p = line_p.prev; l_p != null; l_p = l_p.prev) {
+	  if (l_p.type == CcmC.K_LINE_ENDWHILE)
+	    while_level++;
+	  else if (l_p.type == CcmC.K_LINE_WHILE) {
+	    if (while_level == 0) {
+	      found = 1;
+	      break;
+	    } else
+	      while_level--;
+	  }
+	}
+	if (found == 0) {
+	  ret.sts = CCM_.WHILEMISM;
+	  return ret;
+	}
+	line_p = l_p.prev;
+	break;
+      case CcmC.K_LINE_FOR:
+	var re4 = this.extract_parenthes_expr(line_p.line);
+	sts = re4.sts;
+	expr = re4.expr;
+	if (EVEN(sts)) {
+	  ret.sts = sts;
+	  return ret;
+	}
+	nr = this.rtt_parse(expr, ";", "", elm_str, 4, 500, 0);
+	if (nr > 3) {
+	  ret.sts = CCM_.SYNTAX;
+	  return ret;
+	}
+	if (nr < 3) {
+	  /* The parser doesn't count the null-strings */
+	  if (expr[0] == ';') {
+	    elm_str[2] = elm_str[1];
+	    elm_str[1] = elm_str[0];
+	    elm_str[0] = "";
+	    if (expr[1] == ';') {
+	      elm_str[2] = elm_str[1];
+	      elm_str[1] = elm_str[0];
+	      elm_str[0] = "";
+	    }
+	  }
+	}
+
+	if (funcctx.for_init != 0) {
+	  var rl3 = this.line_exec(funcctx, elm_str[0]);
+	  sts = rl3.sts;
+	  decl = rl3.return_decl;
+	  float_val = rl3.return_float;
+	  int_val = rl3.return_int;
+	  string_val = rl3.return_string;
+	}
+	else {
+	  var rl4 = this.line_exec(funcctx, elm_str[2]);
+	  sts = rl4.sts;
+	  decl = rl4.return_decl;
+	  float_val = rl4.return_float;
+	  int_val = rl4.return_int;
+	  string_val = rl4.return_string;
+	}
+	if (EVEN(sts)) {
+	  if (funcctx.filectx.error_row == 0) {
+	    funcctx.filectx.error_row = line_p.row;
+	    funcctx.filectx.error_line = line_p.line;
+	  }
+	  ret.sts = sts;
+	  return sts;
+	}
+	if (sts == CCM_.EXITFUNC) {
+	  ret.sts = sts;
+	  return ret;
+	}
+	funcctx.for_init = 1;
+	elm_str[1] = this.remove_blank(elm_str[1]);
+	if (elm_str[1] === "") {
+	  /* Null-string is always true */
+	  decl = CcmC.K_DECL_INT;
+	  int_val = 1;
+	} else {
+	  var rl4 = this.line_exec(funcctx, elm_str[1]);
+	  sts = rl4.sts;
+	  decl = rl4.return_decl;
+	  float_val = rl4.return_float;
+	  int_val = rl4.return_int;
+	  string_val = rl4.return_string;
+	  if (EVEN(sts)) {
+	    if (funcctx.filectx.error_row == 0) {
+	      funcctx.filectx.error_row = line_p.row;
+	      funcctx.filectx.error_line = line_p.line;
+	    }
+	    ret.sts = sts;
+	    return sts;
+	  }
+	  if (sts == CCM_.EXITFUNC) {
+	    ret.sts = sts;
+	    return ret;
+	  }
+	}
+	if ((decl == CcmC.K_DECL_INT && int_val == 0)
+	    || (decl == CcmC.K_DECL_FLOAT && Math.abs(float_val) < CcmC.FLT_EPSILON)) {
+	  /* Find next matching endfor */
+	  for_level = 0;
+	  found = 0;
+	  for (l_p = line_p.next; l_p != null; l_p = l_p.next) {
+	    if (l_p.type == CcmC.K_LINE_FOR)
+	      for_level++;
+	    else if (l_p.type == CcmC.K_LINE_ENDFOR) {
+	      if (for_level == 0) {
+		found = 1;
+		break;
+	      } else
+		for_level--;
+	    }
+	  }
+	  if (found == 0) {
+	    ret.sts = CCM_.FORMISM;
+	    return ret;
+	  }
+	  line_p = l_p;
+	}
+	break;
+      case CcmC.K_LINE_ENDFOR:
+	/* Find previous matching for */
+	for_level = 0;
+	found = 0;
+	for (l_p = line_p.prev; l_p != null; l_p = l_p.prev) {
+	  if (l_p.type == CcmC.K_LINE_ENDFOR)
+	    for_level++;
+	  else if (l_p.type == CcmC.K_LINE_FOR) {
+	    if (for_level == 0) {
+	      found = 1;
+	      break;
+	    } else
+	      for_level--;
+	  }
+	}
+	if (found == 0) {
+	  ret.sts = CCM_.FORMISM;
+	  return ret;
+	}
+	funcctx.for_init = 0;
+	line_p = l_p.prev;
+	break;
+      case CcmC.K_LINE_CONTINUE:
+	/* Find previous matching for or while statement */
+	found = 0;
+	for_level = 0;
+	while_level = 0;
+	for (l_p = line_p.prev; l_p != null; l_p = l_p.prev) {
+	  if (l_p.type == CcmC.K_LINE_ENDFOR)
+	    for_level++;
+	  else if (l_p.type == CcmC.K_LINE_FOR) {
+	    if (for_level == 0) {
+	      found = 1;
+	      funcctx.for_init = 0;
+	      break;
+	    } else
+	      for_level--;
+	  }
+	  if (l_p.type == CcmC.K_LINE_ENDWHILE)
+	    while_level++;
+	  else if (l_p.type == CcmC.K_LINE_WHILE) {
+	    if (while_level == 0) {
+	      found = 1;
+	      break;
+	    } else
+	      while_level--;
+	  }
+	}
+	if (found == 0) {
+	  ret.sts = CCM_.CONTMISM;
+	  return ret;
+	}
+	line_p = l_p.prev;
+	break;
+      case CcmC.K_LINE_BREAK:
+	/* Find next matching endfor or endwhile statement */
+	found = 0;
+	for_level = 0;
+	while_level = 0;
+	for (l_p = line_p.next; l_p != null; l_p = l_p.next) {
+	  if (l_p.type == CcmC.K_LINE_FOR)
+	    for_level++;
+	  else if (l_p.type == CcmC.K_LINE_ENDFOR) {
+	    if (for_level == 0) {
+	      found = 1;
+	      break;
+	    } else
+	      for_level--;
+	  } else if (l_p.type == CcmC.K_LINE_WHILE)
+	    while_level++;
+	  else if (l_p.type == CcmC.K_LINE_ENDWHILE) {
+	    if (while_level == 0) {
+	      found = 1;
+	      break;
+	    } else
+	      while_level--;
+	  }
+	}
+	if (found == 0) {
+	  ret.sts = CCM_.BREAKMISM;
+	  return ret;
+	}
+	line_p = l_p;
+	break;
+      case CcmC.K_LINE_LABEL:
+	break;
+      case CcmC.K_LINE_GOTO:
+	/* Find matching label inside this function */
+	goto_label = line_p.line.substring(5);
+	goto_label = this.remove_blank(goto_label);
+
+	found = 0;
+	for (l_p = start_line; l_p != end_line && l_p != null; l_p = l_p.next) {
+	  if (l_p.type == CcmC.K_LINE_LABEL) {
+	    label = l_p.line.substring(0, l_p.line.length - 1);
+	    label = this.remove_blank(label);
+	    if (label === goto_label) {
+	      found = 1;
+	      break;
+	    }
+	  }
+	}
+	if (found == 0) {
+	  ret.sts = CCM_.GOTOMISM;
+	  return ret;
+	}
+	line_p = l_p;
+	break;
+      default:
+
+	line_p.line = this.remove_blank(line_p.line);
+	if (line_p.line === "")
+	  break;
+	else if (line_p.line[line_p.line.length - 1] != ';') {
+	  /* This is an external command */
+	  /* TODO
+	     ccm_replace_symbol(funcctx, line_p.line, expr);
+	     if (filectx.verify != 0) {
+	     if (filectx.break_before != 0)
+	     printf("\nCCM-I-VERIFY, \"%s\"", expr);
+	     else
+	     printf("CCM-I-VERIFY, \"%s\"\n", expr);
+	     }
+
+	     if (funcctx.is_main && filectx.extfunc_return_mode) {
+	     funcctx.current_line = line_p;
+	     filectx.extfunc_line = expr;
+	     ret.sts = CCM_.EXTERNFUNC;
+	     return ret;
+	     }
+	     if (funcctx.filectx.externcmd_func)
+	     sts = (funcctx.filectx.externcmd_func)(
+	     expr, funcctx.filectx.client_data);
+	  */
+	} else {
+	  if (filectx.verify != 0) {
+	    if (filectx.break_before != 0)
+	      console.log("\nCCM-I-VERIFY, \"" + line_p.line + "\"");
+	    else
+	      console.log("CCM-I-VERIFY, \"" + line_p.line + "\"");
+	  }
+	  var rl5 = this.line_exec(funcctx, line_p.line);
+	  sts = rl5.sts;
+	  decl = rl5.return_decl;
+	  float_val = rl5.return_float;
+	  int_val = rl5.return_int;
+	  string_val = rl5.return_string;
+	  if (EVEN(sts)) {
+	    if (!funcctx.filectx.error_row) {
+	      funcctx.filectx.error_row = line_p.row;
+	      funcctx.filectx.error_line = line_p.line;
+	    }
+	    ret.sts = sts;
+	    return ret;
+	  }
+	  /*************
+	  if (ccm_testmode)
+	    printf("%s\n decl: %d, float: %f, int: " ccm_cIntFormat " str: %s\n",
+		   line_p.line, decl, float_val, int_val, string_val);
+	  *************/
+	  if (sts == CCM_.EXITFUNC) {
+	    ret.return_int = int_val;
+	    ret.return_decl = decl;
+	    return_found = 1;
+	  } else if (this.StartsWith(line_p.line, "return")
+		     && (line_p.line[6] == ' ' || line_p.line[6] == '	')) {
+	    /* Return statement, set return value and exit function */
+	    if (func_p == null) {
+	      ret.sts = CCM_.MISPLACED;
+	      return ret;
+	    }
+	    if (func_p.decl == CcmC.K_DECL_INT && decl == CcmC.K_DECL_INT)
+	      ret.return_int = int_val;
+	    else if (func_p.decl == CcmC.K_DECL_INT && decl == CcmC.K_DECL_FLOAT)
+	      ret.return_int = float_val;
+	    else if (func_p.decl == CcmC.K_DECL_FLOAT && decl == CcmC.K_DECL_INT)
+	      ret.return_float = int_val;
+	    else if (func_p.decl == CcmC.K_DECL_FLOAT && decl == CcmC.K_DECL_FLOAT)
+	      ret.return_float = float_val;
+	    else if (func_p.decl == CcmC.K_DECL_STRING && decl == CcmC.K_DECL_STRING)
+	      ret.return_string = string_val;
+	    else if (func_p.decl == CcmC.K_DECL_STRING)
+	      ret.return_string = "";
+	    ret.return_decl = func_p.decl;
+	    return_found = 1;
+	  }
+	}
+      }
+      if (return_found != 0)
+	break;
+    }
+
+    /* Modify values in argument list */
+    if (funcctx.is_main == 0) {
+      arg_p = funcctx.arg_list;
+      for (i = 0; i < funcctx.arg_count; i++) {
+	if (arg_p.value_type == CcmC.K_OPERAND_NAME) {
+	  var rv = this.getvar(funcctx, arg_p.var_name);
+	  sts = rv.sts;
+	  decl = rv.value_decl;
+	  float_val = rv.value_float;
+	  int_val = rv.value_int;
+	  string_val = rv.value_string;
+	  if (EVEN(sts)) {
+	    ret.sts = sts;
+	    return ret;
+	  }
+
+	  if (arg_p.var_decl == arg_p.value_decl) {
+	    if (decl == CcmC.K_DECL_FLOAT)
+	      arg_p.value_float = float_val;
+	    else if (decl == CcmC.K_DECL_INT)
+	      arg_p.value_int = int_val;
+	    else if (decl == CcmC.K_DECL_STRING)
+	      arg_p.value_string = string_val;
+	    arg_p.value_returned = 1;
+	  }
+	}
+	arg_p = arg_p.next;
+      }
+    }
+
+    /* Free variablelists and funcctx */
+  
+    filectx.funcctx = null;
+
+    if (sts == CCM_.EXITFUNC) {
+      ret.sts = sts;
+      return ret;
+    }
+    return ret;
+  }
+
+  this.file_exec = function(cmd, externcmd_func, deffilename_func,
+		 errormessage_func, verify,
+		 break_before, ctx, extfunc_return_mode, resume,
+		 extfunc_line, client_data) {
+    var decl;
+    var int_val;
+    var float_val;
+    var i;
+    var string_val;
+    var sts;
+    var filectx;
+    var elm_str = new Array(10);
+    var nr;
+    var arg_list = null, arg_p, a_p, next_arg;
+    var arg_count = 0;
+    var ret = {
+      sts : CCM_.SUCCESS,
+      appl_sts: CCM_.SUCCESS,
+      ctx : null,
+      ext_func_line : null};
+
+    while (1) {
+      if (resume) {
+	filectx = ctx;
+      } else {
+	/* Parse the commandline */
+	nr = this.rtt_parse(cmd, " 	", "", elm_str, 10, 500, 0);
+	if (nr < 1) {
+	  ret.sts = CCM_.SYNTAX;
+	  return ret;
+	}
+
+	/* Create an argumentlist */
+	arg_count = 0;
+	arg_list = 0;
+	for (i = 1; i < nr; i++) {
+	  arg_p = new ccm_sArg();
+	  arg_p.value_string = elm_str[i];
+	  arg_p.value_decl = CcmC.K_DECL_STRING;
+	  if (arg_list == null)
+	    arg_list = arg_p;
+	  else {
+	    for (a_p = arg_list; a_p.next != null; a_p = a_p.next)
+	      ;
+	    a_p.next = arg_p;
+	  }
+	  arg_count++;
+	}
+
+	filectx = new ccm_tFileCtx();
+	filectx.deffilename_func = deffilename_func;
+	filectx.externcmd_func = externcmd_func;
+	filectx.errormessage_func = errormessage_func;
+	filectx.verify = verify;
+	filectx.break_before = break_before;
+	filectx.extfunc_return_mode = extfunc_return_mode;
+	filectx.main_arg_list = arg_list;
+	filectx.main_arg_count = arg_count;
+	filectx.client_data = client_data;
+	//filectx.ccm = this;
+	ret.ctx = filectx;
+
+	var rs = this.read_file(filectx, elm_str[0], filectx.line_list);
+	sts = rs.sts;
+	filectx.line_list = rs.line_list;
+	if (EVEN(sts))
+	  break;
+
+	sts = this.init_filectx(filectx);
+	if (EVEN(sts))
+	  break;
+      }
+
+      var rf = this.function_exec(filectx, "main", null, arg_list, arg_count, resume);
+      sts = rf.sts;
+      decl = rf.return_decl;
+      float_val = rf.return_float;
+      int_val = rf.return_int;
+      string_val = rf.return_string;
+
+      if (sts == CCM_.EXTERNFUNC) {
+	ret.extfunc_line = filectx.extfunc_line;
+	return ret;
+      }
+      if (sts == CCM_.EXITFUNC)
+	ret.appl_sts = int_val;
+      else
+	ret.appl_sts = 1;
+
+      break;
+    }
+
+    if (EVEN(sts))
+      this.print_error(filectx, sts);
+
+    ret.sts = sts;
+    return ret;      
+  }
+
+
+  this.buffer_exec = function(buffer, args, externcmd_func,
+    deffilename_func, errormessage_func, verify,
+    break_before, extfunc_return_mode,
+    client_data) {
+    var decl;
+    var int_val;
+    var float_val;
+    var string_val;
+    var sts;
+    var filectx;
+    var i;
+    var elm_str = new Array(10);
+    var nr;
+    var arg_list = null, arg_p, a_p, next_arg;
+    var arg_count = 0;
+    var ret = {
+      sts : CCM_.SUCCESS,
+      appl_sts : 0,
+      extfunc_line : null};
+
+    while (1) {
+      if (args != null && args !==  "") {
+	/* Create an argumentlist */
+	nr = this.rtt_parse(args, " 	", "", elm_str, 10, 500, 0);
+	if (nr < 1) {
+	  ret.sts = CCM_.SYNTAX;
+	  return ret;
+	}
+	arg_count = 0;
+	arg_list = 0;
+	for (i = 0; i < nr; i++) {
+	  arg_p = new ccm_sArg();
+	  arg_p.value_string =  elm_str[i];
+	  arg_p.value_decl = CcmC.K_DECL_STRING;
+	  if (arg_list == null)
+	    arg_list = arg_p;
+	  else {
+	    for (a_p = arg_list; a_p.next; a_p = a_p.next)
+	      ;
+	    a_p.next = arg_p;
+	  }
+	  arg_count++;
+	}
+      }
+      
+      filectx = new ccm_tFileCtx();
+      filectx.deffilename_func = deffilename_func;
+      filectx.externcmd_func = externcmd_func;
+      filectx.errormessage_func = errormessage_func;
+      filectx.verify = verify;
+      filectx.break_before = break_before;
+      filectx.extfunc_return_mode = extfunc_return_mode;
+      filectx.main_arg_list = arg_list;
+      filectx.main_arg_count = arg_count;
+      filectx.client_data = client_data;
+      filectx.ccm = this;
+      ret.ctx = filectx;
+
+      var rr = this.read_buffer(filectx, buffer);
+      sts = rr.sts;
+      filectx.line_list = rr.line_list;
+      if (EVEN(sts))
+	break;
+
+      sts = this.init_filectx(filectx);
+      if (EVEN(sts))
+	break;
+
+      var rf = this.function_exec(filectx, "main", null, arg_list, arg_count, 0);
+      sts = rf.sts;
+      decl = rf.return_decl;
+      float_val = rf.return_float;
+      int_val = rf.return_int;
+      string_val = rf.return_string;
+      if (sts == CCM_.EXTERNFUNC) {
+	ret.extfunc_line = filectx.extfunc_line;
+	ret.sts = sts;
+	return sts;
+      }
+      if (sts == CCM_.EXITFUNC)
+	ret.appl_sts = int_val;
+      else
+	ret.appl_sts = 1;
+
+      break;
+    }
+
+    if (EVEN(sts))
+      this.print_error(filectx, sts);
+
+    ret.sts = sts;
+    return ret;
+  }
+
+  var re = {
+    not_string: /[^s]/,
+    not_bool: /[^t]/,
+    not_type: /[^T]/,
+    not_primitive: /[^v]/,
+    number: /[diefg]/,
+    numeric_arg: /[bcdiefguxX]/,
+    json: /[j]/,
+    not_json: /[^j]/,
+    text: /^[^\x25]+/,
+    modulo: /^\x25{2}/,
+    placeholder: /^\x25(?:([1-9]\d*)\$|\(([^)]+)\))?(\+)?(0|'[^$])?(-)?(\d+)?(?:\.(\d+))?([b-gijostTuvxX])/,
+        key: /^([a-z_][a-z_\d]*)/i,
+        key_access: /^\.([a-z_][a-z_\d]*)/i,
+        index_access: /^\[(\d+)\]/,
+        sign: /^[+-]/
+    }
+
+  var sprintf_cache = Object.create(null);
+  
+  this.sprintf = function(key) {
+    // `arguments` is not an array, but should be fine for this call
+    return this.sprintf_format(this.sprintf_parse(key), arguments)
+  }
+
+  this.vsprintf = function(fmt, argv) {
+    return this.sprintf.apply(this, [fmt].concat(argv || []))
+  }
+
+  this.sprintf_format = function(parse_tree, argv) {
+    var cursor = 1, tree_length = parse_tree.length, arg, output = '', i, k, ph, pad, pad_character, pad_length, is_positive, sign
+    for (i = 0; i < tree_length; i++) {
+      if (typeof parse_tree[i] === 'string') {
+	output += parse_tree[i]
+      }
+      else if (typeof parse_tree[i] === 'object') {
+	ph = parse_tree[i] // convenience purposes only
+	if (ph.keys) { // keyword argument
+	  arg = argv[cursor]
+	  for (k = 0; k < ph.keys.length; k++) {
+	    if (arg == undefined) {
+	      throw new Error(this.sprintf('[sprintf] Cannot access property "%s" of undefined value "%s"', ph.keys[k], ph.keys[k-1]))
+	    }
+	    arg = arg[ph.keys[k]]
+	  }
+	}
+	else if (ph.param_no) { // positional argument (explicit)
+	  arg = argv[ph.param_no]
+	}
+	else { // positional argument (implicit)
+	  arg = argv[cursor++]
+	}
+	
+	if (re.not_type.test(ph.type) && re.not_primitive.test(ph.type) && arg instanceof Function) {
+	  arg = arg()
+	}
+	
+	if (re.numeric_arg.test(ph.type) && (typeof arg !== 'number' && isNaN(arg))) {
+	  throw new TypeError(this.sprintf('[sprintf] expecting number but found %T', arg))
+	}
+	
+	if (re.number.test(ph.type)) {
+	  is_positive = arg >= 0
+	}
+	
+	switch (ph.type) {
+	  case 'b':
+	  arg = parseInt(arg, 10).toString(2)
+	  break
+	  case 'c':
+	  arg = String.fromCharCode(parseInt(arg, 10))
+	  break
+	  case 'd':
+	  case 'i':
+	  arg = parseInt(arg, 10)
+	  break
+	  case 'j':
+	  arg = JSON.stringify(arg, null, ph.width ? parseInt(ph.width) : 0)
+	  break
+	  case 'e':
+	  arg = ph.precision ? parseFloat(arg).toExponential(ph.precision) : parseFloat(arg).toExponential()
+	  break
+	  case 'f':
+	  arg = ph.precision ? parseFloat(arg).toFixed(ph.precision) : parseFloat(arg)
+	  break
+	  case 'g':
+	  arg = ph.precision ? String(Number(arg.toPrecision(ph.precision))) : parseFloat(arg)
+	  break
+	  case 'o':
+	  arg = (parseInt(arg, 10) >>> 0).toString(8)
+	  break
+	  case 's':
+	  arg = String(arg)
+	  arg = (ph.precision ? arg.substring(0, ph.precision) : arg)
+	  break
+	  case 't':
+	  arg = String(!!arg)
+	  arg = (ph.precision ? arg.substring(0, ph.precision) : arg)
+	  break
+	  case 'T':
+	  arg = Object.prototype.toString.call(arg).slice(8, -1).toLowerCase()
+	  arg = (ph.precision ? arg.substring(0, ph.precision) : arg)
+	  break
+	  case 'u':
+	  arg = parseInt(arg, 10) >>> 0
+	  break
+	  case 'v':
+	  arg = arg.valueOf()
+	  arg = (ph.precision ? arg.substring(0, ph.precision) : arg)
+	  break
+	  case 'x':
+	  arg = (parseInt(arg, 10) >>> 0).toString(16)
+	  break
+	  case 'X':
+	  arg = (parseInt(arg, 10) >>> 0).toString(16).toUpperCase()
+	  break
+	}
+	if (re.json.test(ph.type)) {
+	  output += arg
+	}
+	else {
+	  if (re.number.test(ph.type) && (!is_positive || ph.sign)) {
+	    sign = is_positive ? '+' : '-'
+	    arg = arg.toString().replace(re.sign, '')
+	  }
+	  else {
+	    sign = ''
+	  }
+	  pad_character = ph.pad_char ? ph.pad_char === '0' ? '0' : ph.pad_char.charAt(1) : ' '
+	  pad_length = ph.width - (sign + arg).length
+	  pad = ph.width ? (pad_length > 0 ? pad_character.repeat(pad_length) : '') : ''
+	  output += ph.align ? sign + arg + pad : (pad_character === '0' ? sign + pad + arg : pad + sign + arg)
+	}
+      }
+    }
+    return output
+  }
+
+  this.sprintf_parse = function(fmt) {
+    if (sprintf_cache[fmt]) {
+      return sprintf_cache[fmt]
+    }
+
+    var _fmt = fmt, match, parse_tree = [], arg_names = 0
+    while (_fmt) {
+      if ((match = re.text.exec(_fmt)) !== null) {
+	parse_tree.push(match[0])
+      }
+      else if ((match = re.modulo.exec(_fmt)) !== null) {
+	parse_tree.push('%')
+      }
+      else if ((match = re.placeholder.exec(_fmt)) !== null) {
+	if (match[2]) {
+	  arg_names |= 1
+	  var field_list = [], replacement_field = match[2], field_match = []
+	  if ((field_match = re.key.exec(replacement_field)) !== null) {
+	    field_list.push(field_match[1])
+	    while ((replacement_field = replacement_field.substring(field_match[0].length)) !== '') {
+	      if ((field_match = re.key_access.exec(replacement_field)) !== null) {
+		field_list.push(field_match[1])
+	      }
+	      else if ((field_match = re.index_access.exec(replacement_field)) !== null) {
+		field_list.push(field_match[1])
+	      }
+	      else {
+		throw new SyntaxError('[sprintf] failed to parse named argument key')
+	      }
+	    }
+	  }
+	  else {
+	    throw new SyntaxError('[sprintf] failed to parse named argument key')
+	  }
+	  match[2] = field_list
+	}
+	else {
+	  arg_names |= 2
+	}
+	if (arg_names === 3) {
+	  throw new Error('[sprintf] mixing positional and named placeholders is not (yet) supported')
+	}
+	
+	parse_tree.push(
+			{
+			placeholder: match[0],
+                        param_no:    match[1],
+                        keys:        match[2],
+                        sign:        match[3],
+                        pad_char:    match[4],
+                        align:       match[5],
+                        width:       match[6],
+                        precision:   match[7],
+                        type:        match[8]
+			    }
+			)
+      }
+      else {
+	throw new SyntaxError('[sprintf] unexpected placeholder')
+      }
+      _fmt = _fmt.substring(match[0].length)
+    }
+    return sprintf_cache[fmt] = parse_tree
+  }
+}
+/**** Test
+function msg_func(msg, sts, cdata) {console.log(msg);}
+function externcmd_func(cmd, cdata) {}
+function deffilename_func(name, cdata) {return name;}
+var ccm = new Ccm();
+ccm.file_exec('/home/claes/test/ra_ccmtest.rtt_com', externcmd_func, 
+    deffilename_func, msg_func, 0, 0, 0, 0, null, null);
+****/

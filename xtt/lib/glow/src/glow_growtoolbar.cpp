@@ -41,6 +41,7 @@
 #include "glow_growtoolbar.h"
 #include "glow_draw.h"
 #include "glow_nodegroup.h"
+#include "glow_exportscript.h"
 #include "glow_msg.h"
 
 #define TOOLBAR_SPACING 0.2
@@ -568,4 +569,9 @@ void GrowToolbar::scale()
     trf.scale(scale, 1, x_left, y_low);
     get_node_borders();
   }
+}
+
+int GrowToolbar::export_script(GlowExportScript* es)
+{
+  return es->toolbar(this);
 }

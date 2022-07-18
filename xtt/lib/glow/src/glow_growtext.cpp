@@ -45,6 +45,7 @@
 #include "glow_grownode.h"
 #include "glow_draw.h"
 #include "glow_exportflow.h"
+#include "glow_exportscript.h"
 
 GrowText::GrowText(GrowCtx* glow_ctx, const char* name, const char* text1,
     double x, double y, glow_eDrawType d_type, glow_eDrawType color_d_type,
@@ -812,6 +813,13 @@ void GrowText::get_borders(GlowTransform* t, double* x_right, double* x_left,
     *y_high = ur_y;
 }
 
+void GrowText::init_transform(double a11, double a12, double a13, double a21, 
+    double a22, double a23, double rotation)
+{
+  trf.init(a11, a12, a13, a21, a22, a23, rotation);
+  get_node_borders();
+}
+
 void GrowText::set_transform(GlowTransform* t)
 {
   trf = *t * trf;
@@ -1046,4 +1054,9 @@ void GrowText::convert(glow_eConvert version)
 void GrowText::export_flow(GlowExportFlow* ef)
 {
   ef->text(this);
+}
+
+int GrowText::export_script(GlowExportScript* es)
+{
+  return es->text(this);
 }

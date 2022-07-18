@@ -40,6 +40,8 @@
 #include "glow_growctx.h"
 #include "glow_draw.h"
 
+class GlowExportScript;
+
 /*! \file glow_growimage.h
     \brief Contains the GrowImage class. */
 /*! \addtogroup Glow */
@@ -665,6 +667,8 @@ public:
   {
     *c = (void*)ctx;
   } //!< Should be replace by get_ctx() !!
+
+  int export_script(GlowExportScript* es);
 
   //! Export the object as a java shape.
   /*!

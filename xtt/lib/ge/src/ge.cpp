@@ -1381,6 +1381,31 @@ void Ge::export_plcfo(Ge* gectx, char* filename)
     gectx->message(sts);
 }
 
+void Ge::activate_export_script()
+{
+  char name[80];
+
+  graph->get_name(name);
+
+  if (!streq(name, ""))
+    export_script(this, name);
+  else
+    open_input_dialog("Script name", "Export Script", "", Ge::export_script);
+}
+
+void Ge::export_script(Ge* gectx, char* filename)
+{
+  int sts;
+  pwr_tFileName fname;
+
+  sprintf(fname, "$pwrp_pop/%s.ge_com", filename);
+  dcli_translate_filename(fname, fname);
+
+  sts = gectx->graph->export_script(fname);
+  if (EVEN(sts))
+    gectx->message(sts);
+}
+
 void Ge::activate_creanextpage()
 {
   char old_name[40];

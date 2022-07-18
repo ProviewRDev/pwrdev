@@ -40,6 +40,7 @@
 #include "glow_line.h"
 
 class GlowExportFlow;
+class GlowExportScript;
 
 /*! \file glow_growline.h
     \brief Contains the GrowLine class. */
@@ -541,6 +542,7 @@ public:
   }
 
   void export_flow(GlowExportFlow* ef);
+  int export_script(GlowExportScript* es);
 
   glow_eDrawType get_border_color()
   {

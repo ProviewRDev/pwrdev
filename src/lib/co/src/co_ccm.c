@@ -1145,7 +1145,7 @@ static int operand_found(ccm_tRowCtx rowctx)
     strncpy(operand_p->name, &rowctx->line[rowctx->delim_pos],
         rowctx->pos - rowctx->delim_pos);
     if (rowctx->num_decl == K_DECL_FLOAT) {
-      nr = sscanf(operand_p->name, "%f", &operand_p->value_float);
+      nr = sscanf(operand_p->name, "%g", &operand_p->value_float);
       operand_p->value_decl = K_DECL_FLOAT;
       if (rowctx->num_neg)
         operand_p->value_float = -operand_p->value_float;
@@ -1261,6 +1261,12 @@ int ccm_create_list(ccm_tFileCtx filectx, char* line, ccm_sOperand** list)
     switch (ctable[(unsigned char)rowctx->line[rowctx->pos]]) {
     case K_ACTION_VAR:
       if (rowctx->state == K_STATE_NUM) {
+	if (rowctx->line[rowctx->pos] == 'e' || rowctx->line[rowctx->pos] == 'E') {
+	  rowctx->num_decl = K_DECL_FLOAT;
+	  rowctx->num_exp = 1;
+	  rowctx->pos++;
+	  break;
+	}
         rowctx->state = K_STATE_ERROR;
         strcpy(rowctx->msg, "Syntax error");
       } else if (rowctx->state == K_STATE_NUM_NEG) {
@@ -1473,7 +1479,11 @@ int ccm_create_list(ccm_tFileCtx filectx, char* line, ccm_sOperand** list)
       break;
 
     case K_ACTION_SUB:
-      if (rowctx->state == K_STATE_NUM || rowctx->state == K_STATE_VAR) {
+      if (rowctx->state == K_STATE_NUM && rowctx->num_exp) {
+        rowctx->pos++;
+	break;
+      }
+      else if (rowctx->state == K_STATE_NUM || rowctx->state == K_STATE_VAR) {
         sts = operand_found(rowctx);
         if (EVEN(sts))
           break;
@@ -3230,7 +3240,7 @@ static int ccm_pushvar(ccm_tFuncCtx funcctx, const char* name, int decl,
         *(int_p->value + int_p->elements - 1) = value_float;
       else {
         if (strchr(value_string, '.')) {
-          nr = sscanf(value_string, "%f", &f_var);
+          nr = sscanf(value_string, "%g", &f_var);
           if (nr != 1)
             return CCM__VARTYPE;
           *(int_p->value + int_p->elements - 1) = f_var;
@@ -3263,7 +3273,7 @@ static int ccm_pushvar(ccm_tFuncCtx funcctx, const char* name, int decl,
         else if (decl == K_DECL_FLOAT)
           *(float_p->value + float_p->elements - 1) = value_float;
         else {
-          nr = sscanf(value_string, "%f", float_p->value + float_p->elements - 1);
+          nr = sscanf(value_string, "%g", float_p->value + float_p->elements - 1);
           if (nr != 1)
             return CCM__VARTYPE;
         }
@@ -3465,7 +3475,7 @@ static int ccm_setvar(ccm_tFuncCtx funcctx, const char* name, int decl,
         *(int_p->value + element) = value_float;
       else {
         if (strchr(value_string, '.')) {
-          nr = sscanf(value_string, "%f", &f_var);
+          nr = sscanf(value_string, "%g", &f_var);
           if (nr != 1)
             return CCM__VARTYPE;
           *(int_p->value + element) = f_var;
@@ -3494,7 +3504,7 @@ static int ccm_setvar(ccm_tFuncCtx funcctx, const char* name, int decl,
         else if (decl == K_DECL_FLOAT)
           *(float_p->value + element) = value_float;
         else {
-          nr = sscanf(value_string, "%f", float_p->value + element);
+          nr = sscanf(value_string, "%g", float_p->value + element);
           if (nr != 1)
             return CCM__VARTYPE;
         }
@@ -4516,7 +4526,7 @@ static int ccm_func_ask(void* filectx, ccm_sArg* arg_list, int arg_count,
 
   arg_p = arg_list->next;
   if (arg_p->value_decl == K_DECL_FLOAT)
-    sts = scanf("%f", &arg_p->value_float);
+    sts = scanf("%g", &arg_p->value_float);
   else if (arg_p->value_decl == K_DECL_INT)
     sts = scanf("%ld", &arg_p->value_int);
   else if (arg_p->value_decl == K_DECL_STRING)

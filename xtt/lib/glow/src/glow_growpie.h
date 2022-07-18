@@ -207,6 +207,8 @@ public:
   void set_conf(double max_val, double min_val, int no_of_lines, int long_quot,
       int value_quot, double rot, const char* format);
 
+  int export_script(GlowExportScript* es);
+
   //! Conversion between different versions of Glow
   /*!
     \param version	Version to convert to.

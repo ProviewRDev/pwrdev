@@ -38,3 +38,12 @@
  2 11-FEB-2022 13:37:57.77 23319   NodeBuild    claes       pwrtest03a
  2 11-FEB-2022 13:37:57.77 23319   DirectoryBuild  claes       load
 1  11-FEB-2022 13:37:58.48 23589   CreatePackage  claes       pwrtest03a "pwrp_pkg_pwrtest03a_0001.tgz"
+ 2 27-MAY-2022 13:41:16.15 1025571 DirectoryBuild  claes       pop
+ 2 27-MAY-2022 13:41:16.21 1025571 DirectoryBuild  claes       appl
+ 3 27-MAY-2022 13:41:16.71 1025571 PlcBuild     claes       VolPwrtest03a:Test03a-Ge-Dyn-Plc-W
+ 3 27-MAY-2022 13:41:16.78 1025571 GeBuild      claes       pwr_logowithclose
+ 3 27-MAY-2022 13:41:16.79 1025571 GeBuild      claes       wtest1
+ 2 27-MAY-2022 13:41:16.81 1025571 VolumeBuild  claes       VolPwrtest03a
+ 2 27-MAY-2022 13:41:17.05 1025571 NodeBuild    claes       pwrtest03a
+ 2 27-MAY-2022 13:41:17.05 1025571 DirectoryBuild  claes       load
+1  27-MAY-2022 13:41:17.70 1025740 CreatePackage  claes       pwrtest03a "pwrp_pkg_pwrtest03a_0001.tgz"

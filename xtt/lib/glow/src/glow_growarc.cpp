@@ -45,6 +45,7 @@
 #include "glow_grownode.h"
 #include "glow_draw.h"
 #include "glow_exportflow.h"
+#include "glow_exportscript.h"
 
 GrowArc::GrowArc(GrowCtx* glow_ctx, const char* name, double x1, double y1,
     double x2, double y2, int ang1, int ang2, glow_eDrawType border_d_type,
@@ -942,6 +943,13 @@ void GrowArc::get_borders(GlowTransform* t, double* x_right, double* x_left,
     *y_high = ur_y;
 }
 
+void GrowArc::init_transform(double a11, double a12, double a13, double a21, 
+    double a22, double a23, double rotation)
+{
+  trf.init(a11, a12, a13, a21, a22, a23, rotation);
+  get_node_borders();
+}
+
 void GrowArc::set_transform(GlowTransform* t)
 {
   trf = *t * trf;
@@ -1111,4 +1119,8 @@ void GrowArc::convert(glow_eConvert version)
 void GrowArc::export_flow(GlowExportFlow* ef)
 {
   ef->arc(this);
+}
+int GrowArc::export_script(GlowExportScript* es)
+{
+  return es->arc(this);
 }

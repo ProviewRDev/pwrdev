@@ -120,9 +120,11 @@ static cairo_pattern_t* get_gc(GlowDrawGtk* draw_ctx, int i, int j)
       draw_ctx->get_customcolors()->gcs[i - glow_eDrawType_CustomColor1]
           = cairo_pattern_create_rgb(r, g, b);
       //printf("C Custom:  %4d %llu\n", i - glow_eDrawType_CustomColor1, (unsigned long long)draw_ctx->get_customcolors()->gcs[i - glow_eDrawType_CustomColor1]);
+      cairo_pattern_reference(draw_ctx->get_customcolors()->gcs[i - glow_eDrawType_CustomColor1]);
     }
     else {
       draw_ctx->gcs[i] = cairo_pattern_create_rgb(r, g, b);
+      cairo_pattern_reference(draw_ctx->gcs[i]);
       //printf("C Regular: %4d %llu\n", i, (unsigned long long)draw_ctx->gcs[i]);
     }
   }

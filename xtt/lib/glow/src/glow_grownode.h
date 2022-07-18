@@ -39,6 +39,8 @@
 
 #include "glow_node.h"
 
+class GlowExportScript;
+
 /*! \file glow_grownode.h
     \brief Contains the GrowNode class. */
 /*! \addtogroup Glow */
@@ -798,6 +800,10 @@ public:
   {
     trf.store();
   }
+  void transform_store_reset()
+  {
+    trf.store_reset();
+  }
   void revert_transform()
   {
     trf.revert();
@@ -1165,6 +1171,8 @@ public:
     return shadow;
   }
   void set_colortheme_lightness();
+
+  int export_script(GlowExportScript* es);
 
   //! Destructor
   /*! Remove the object from the context and erase it from the screen.

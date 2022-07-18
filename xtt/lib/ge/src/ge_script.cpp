@@ -49,6 +49,7 @@
 #include "ge_graph.h"
 #include "ge_script.h"
 #include "ge_dyn.h"
+#include "ge_methods.h"
 #include "ge_msg.h"
 
 static Graph* current_graph;
@@ -975,6 +976,78 @@ static int graph_setobjectshadow_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
+static int graph_setobjecttextsize_func(void* filectx, ccm_sArg* arg_list,
+    int arg_count, int* return_decl, ccm_tFloat* return_float,
+    ccm_tInt* return_int, char* return_string)
+{
+  Graph* graph;
+  ccm_sArg* arg_p2;
+
+  if (arg_count != 2)
+    return CCM__ARGMISM;
+
+  arg_p2 = arg_list->next;
+
+  if (arg_list->value_decl != CCM_DECL_INT)
+    return CCM__ARGMISM;
+  if (arg_p2->value_decl != CCM_DECL_INT)
+    return CCM__ARGMISM;
+
+  graph_get_stored_graph(&graph);
+
+  grow_SetObjectTextSize(
+      (grow_tObject)arg_list->value_int, arg_p2->value_int);
+  return 1;
+}
+
+static int graph_setobjecttextbold_func(void* filectx, ccm_sArg* arg_list,
+    int arg_count, int* return_decl, ccm_tFloat* return_float,
+    ccm_tInt* return_int, char* return_string)
+{
+  Graph* graph;
+  ccm_sArg* arg_p2;
+
+  if (arg_count != 2)
+    return CCM__ARGMISM;
+
+  arg_p2 = arg_list->next;
+
+  if (arg_list->value_decl != CCM_DECL_INT)
+    return CCM__ARGMISM;
+  if (arg_p2->value_decl != CCM_DECL_INT)
+    return CCM__ARGMISM;
+
+  graph_get_stored_graph(&graph);
+
+  grow_SetObjectTextBold(
+      (grow_tObject)arg_list->value_int, arg_p2->value_int);
+  return 1;
+}
+
+static int graph_setobjecttextfont_func(void* filectx, ccm_sArg* arg_list,
+    int arg_count, int* return_decl, ccm_tFloat* return_float,
+    ccm_tInt* return_int, char* return_string)
+{
+  Graph* graph;
+  ccm_sArg* arg_p2;
+
+  if (arg_count != 2)
+    return CCM__ARGMISM;
+
+  arg_p2 = arg_list->next;
+
+  if (arg_list->value_decl != CCM_DECL_INT)
+    return CCM__ARGMISM;
+  if (arg_p2->value_decl != CCM_DECL_INT)
+    return CCM__ARGMISM;
+
+  graph_get_stored_graph(&graph);
+
+  grow_SetObjectTextFont(
+      (grow_tObject)arg_list->value_int, (glow_eFont)arg_p2->value_int);
+  return 1;
+}
+
 static int graph_setcurrentobject_func(void* filectx, ccm_sArg* arg_list,
     int arg_count, int* return_decl, ccm_tFloat* return_float,
     ccm_tInt* return_int, char* return_string)
@@ -1185,6 +1258,50 @@ static int graph_setobjecttext_func(void* filectx, ccm_sArg* arg_list,
   if (type == glow_eObjectType_GrowText) {
     grow_SetObjectText(o, arg_p2->value_string);
   }
+  return 1;
+}
+
+static int graph_setobjecttransform_func(void* filectx, ccm_sArg* arg_list,
+    int arg_count, int* return_decl, ccm_tFloat* return_float,
+    ccm_tInt* return_int, char* return_string)
+{
+  Graph* graph;
+  grow_tObject o;
+  ccm_sArg* arg_p2, *arg_p3, *arg_p4, *arg_p5, *arg_p6, *arg_p7, *arg_p8;
+
+  if (arg_count != 8)
+    return CCM__ARGMISM;
+
+  arg_p2 = arg_list->next;
+  arg_p3 = arg_p2->next;
+  arg_p4 = arg_p3->next;
+  arg_p5 = arg_p4->next;
+  arg_p6 = arg_p5->next;
+  arg_p7 = arg_p6->next;
+  arg_p8 = arg_p7->next;
+
+  if (arg_list->value_decl != CCM_DECL_INT)
+    return CCM__ARGMISM;
+  if (arg_p2->value_decl != CCM_DECL_FLOAT)
+    return CCM__ARGMISM;
+  if (arg_p3->value_decl != CCM_DECL_FLOAT)
+    return CCM__ARGMISM;
+  if (arg_p4->value_decl != CCM_DECL_FLOAT)
+    return CCM__ARGMISM;
+  if (arg_p5->value_decl != CCM_DECL_FLOAT)
+    return CCM__ARGMISM;
+  if (arg_p6->value_decl != CCM_DECL_FLOAT)
+    return CCM__ARGMISM;
+  if (arg_p7->value_decl != CCM_DECL_FLOAT)
+    return CCM__ARGMISM;
+  if (arg_p8->value_decl != CCM_DECL_FLOAT)
+    return CCM__ARGMISM;
+
+  o = (grow_tObject)arg_list->value_int;
+  graph_get_stored_graph(&graph);
+
+  grow_InitTransform(o, arg_p2->value_float, arg_p3->value_float, arg_p4->value_float, 
+      arg_p5->value_float, arg_p6->value_float, arg_p7->value_float, arg_p8->value_float);
   return 1;
 }
 
@@ -2106,7 +2223,7 @@ static int graph_getobjectattribute_func(void* filectx, ccm_sArg* arg_list,
     if (!found) {
       *return_decl = CCM_DECL_INT;
       *return_int = GE__NOATTR;
-      return 1;
+      return CCM__INVARG;
     }
 
     switch (item_p->type) {
@@ -3392,6 +3509,8 @@ static int graph_createobject_func(void* filectx, ccm_sArg* arg_list,
   grow_StoreTransform(n1);
   graph->current_cmd_object = n1;
 
+  if (grow_IsSliderClass(nc))
+    grow_TransformStoreReset(n1);
   grow_SetModified(graph->grow->ctx, 1);
 
   *return_int = (long int)graph->current_cmd_object;
@@ -4248,6 +4367,94 @@ static int graph_createwindow_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
+static int graph_createtoolbar_func(void* filectx, ccm_sArg* arg_list,
+    int arg_count, int* return_decl, ccm_tFloat* return_float,
+    ccm_tInt* return_int, char* return_string)
+{
+  Graph* graph;
+  ccm_sArg* arg_p2;
+  ccm_sArg* arg_p3;
+  ccm_sArg* arg_p4;
+  ccm_sArg* arg_p5;
+  
+  double x1, y1, x2, y2;
+  grow_tNode n1;
+  int scale_x, scale_y;
+  double sx, sy;
+  double ll_x, ll_y, ur_x, ur_y;
+    
+  if (arg_count < 3 || arg_count > 5)
+    return CCM__ARGMISM;
+
+  arg_p2 = arg_list->next;
+  arg_p3 = arg_p2->next;
+
+  if (arg_list->value_decl != CCM_DECL_STRING)
+    return CCM__ARGMISM;
+  if (arg_p2->value_decl != CCM_DECL_FLOAT)
+    return CCM__ARGMISM;
+  if (arg_p3->value_decl != CCM_DECL_FLOAT)
+    return CCM__ARGMISM;
+
+  x1 = arg_p2->value_float;
+  y1 = arg_p3->value_float;
+
+  if (arg_count >= 4) {
+    arg_p4 = arg_p3->next;
+    if (arg_p4->value_decl != CCM_DECL_FLOAT)
+      return CCM__ARGMISM;
+    scale_x = 1;
+    x2 = arg_p4->value_float;
+  }
+  else
+    scale_x = 0;
+
+  if (arg_count == 5) {
+    arg_p5 = arg_p4->next;
+    if (arg_p5->value_decl != CCM_DECL_FLOAT)
+      return CCM__ARGMISM;
+    scale_y = 1;
+    y2 = arg_p5->value_float;    
+  }
+  else
+    scale_y = 0;
+
+
+  graph_get_stored_graph(&graph);
+
+  grow_CreateGrowToolbar(graph->grow->ctx, arg_list->value_string, arg_list->value_string,
+      (char*)GeMethods::op_subgraph, (char*)GeMethods::mnt_subgraph,
+      GeMethods::opmeth_size, GeMethods::mntmeth_size, x1, y1, NULL, &n1);
+
+  GeDyn* dyn = new GeDyn(graph);
+  dyn->action_type1 = dyn->total_action_type1 = ge_mActionType1_MethodToolbar;
+  dyn->update_elements();
+  grow_SetUserData(n1, (void*)dyn);
+
+  grow_MoveNode(n1, x1, y1);
+  grow_StoreTransform(n1);
+  if (scale_x || scale_y) {
+    grow_MeasureNode(n1, &ll_x, &ll_y, &ur_x, &ur_y);
+    if (scale_x)
+      sx = (x2 - x1) / (ur_x - ll_x);
+    else
+      sx = 1;
+    if (scale_y)
+      sy = (y2 - y1) / (ur_y - ll_y);
+    else
+      sy = 1;
+    grow_SetObjectScale(n1, sx, sy, x1, y1, glow_eScaleType_LowerLeft);
+  }
+  grow_StoreTransform(n1);
+  graph->current_cmd_object = n1;
+
+  grow_SetModified(graph->grow->ctx, 1);
+
+  *return_int = (long int)graph->current_cmd_object;
+  *return_decl = CCM_DECL_INT;
+  return 1;
+}
+
 static int graph_getgraphname_func(void* filectx, ccm_sArg* arg_list,
     int arg_count, int* return_decl, ccm_tFloat* return_float,
     ccm_tInt* return_int, char* return_string)
@@ -4439,6 +4646,10 @@ int Graph::script_func_register(void)
   if (EVEN(sts))
     return sts;
   sts = ccm_register_function(
+      "Ge", "SetObjectTransform", graph_setobjecttransform_func);
+  if (EVEN(sts))
+    return sts;
+  sts = ccm_register_function(
       "Ge", "SetObjectBackgroundColor", graph_setobjectbackgroundcolor_func);
   if (EVEN(sts))
     return sts;
@@ -4456,6 +4667,18 @@ int Graph::script_func_register(void)
     return sts;
   sts = ccm_register_function(
       "Ge", "SetObjectShadow", graph_setobjectshadow_func);
+  if (EVEN(sts))
+    return sts;
+  sts = ccm_register_function(
+      "Ge", "SetObjectTextSize", graph_setobjecttextsize_func);
+  if (EVEN(sts))
+    return sts;
+  sts = ccm_register_function(
+      "Ge", "SetObjectTextBold", graph_setobjecttextbold_func);
+  if (EVEN(sts))
+    return sts;
+  sts = ccm_register_function(
+      "Ge", "SetObjectTextFont", graph_setobjecttextfont_func);
   if (EVEN(sts))
     return sts;
   sts = ccm_register_function(
@@ -4629,6 +4852,9 @@ int Graph::script_func_register(void)
   if (EVEN(sts))
     return sts;
   sts = ccm_register_function("Ge", "CreateWindow", graph_createwindow_func);
+  if (EVEN(sts))
+    return sts;
+  sts = ccm_register_function("Ge", "CreateToolbar", graph_createtoolbar_func);
   if (EVEN(sts))
     return sts;
   sts = ccm_register_function(

@@ -45,6 +45,7 @@
 #include "glow_growpie.h"
 #include "glow_grownode.h"
 #include "glow_draw.h"
+#include "glow_exportscript.h"
 
 #if defined OS_OPENBSD
 #define nearbyint rint
@@ -602,6 +603,11 @@ void GrowPie::set_values(double* values)
     draw();
   else
     parent->draw();    
+}
+
+int GrowPie::export_script(GlowExportScript* es)
+{
+  return es->pie(this);
 }
 
 void GrowPie::convert(glow_eConvert version)

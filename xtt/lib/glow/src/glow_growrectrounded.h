@@ -590,6 +590,8 @@ public:
   int get_annot_background(
       GlowTransform* t, void* node, glow_eDrawType* background);
 
+  int export_script(GlowExportScript* es);
+
   //! Export the object as a java shape.
   /*!
     \param t		Transform of parent node. Can be zero.

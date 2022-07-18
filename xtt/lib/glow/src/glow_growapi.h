@@ -2145,6 +2145,10 @@ void grow_SetObjectText(grow_tObject object, char* text);
 */
 void grow_GetObjectText(grow_tObject object, char* text, int size);
 
+void grow_SetObjectTextSize(grow_tObject object, int size);
+void grow_SetObjectTextBold(grow_tObject object, int bold);
+void grow_SetObjectTextFont(grow_tObject ctx, glow_eFont font);
+
 //! Set text size on all selected objects.
 /*!
   \param ctx		Grow context.
@@ -2289,6 +2293,9 @@ void grow_SetSliderInfo(grow_tObject object, glow_eDirection direction,
 */
 void grow_ObjectToCtx(grow_tObject object, grow_tCtx* ctx);
 
+void grow_InitTransform(grow_tObject object, double a11, double a12, double a13, double a21,
+		       double a22, double a23, double rotation);
+
 //! Store the current transform of an object.
 /*!
   \param object	Object.
@@ -2305,6 +2312,8 @@ void grow_StoreTransform(grow_tObject object);
   \param object	Object.
 */
 void grow_RevertTransform(grow_tObject object);
+
+void grow_TransformStoreReset(grow_tObject object);
 
 //! Check if there is a stored transform
 /*!
@@ -3333,6 +3342,8 @@ int grow_DashInsertObject(grow_tObject group, grow_tObject object);
 int grow_GroupClear(grow_tObject group);
 int grow_IsVisible(grow_tCtx ctx, grow_tObject object, glow_eVisible type);
 int grow_ExportFlow(grow_tCtx ctx, char* filename);
+int grow_ExportScript(grow_tCtx ctx, char* filename, 
+		      int (*userdata_cb)(void*, grow_tObject, std::ofstream&, char*));
 void grow_ObjectSave(
     grow_tObject object, std::ofstream& fp, glow_eSaveMode mode);
 void grow_ObjectOpen(grow_tObject object, std::ifstream& fp);

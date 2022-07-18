@@ -4631,6 +4631,18 @@ int Graph::export_plcfo(char* filename)
   return grow_ExportFlow(grow->ctx, filename);
 }
 
+static int script_dyn_cb(void *dyn, grow_tObject o, std::ofstream& fp, char *indentation)
+{
+  char prefix[80] = "";
+
+  return ((GeDyn *)dyn)->export_script(o, fp, indentation, prefix);
+}
+
+int Graph::export_script(char* filename)
+{
+  return grow_ExportScript(grow->ctx, filename, script_dyn_cb);
+}
+
 void Graph::get_command(char* in, char* out, GeDyn* dyn)
 {
   char *s, *t0;

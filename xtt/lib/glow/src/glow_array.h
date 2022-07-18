@@ -54,6 +54,7 @@
 
 class GrowCtx;
 class GlowExportFlow;
+class GlowExportScript;
 
 class GlowArray {
 public:
@@ -254,6 +255,7 @@ public:
   void set_rootnode(void* node);
   void set_linetype(glow_eLineType type);
   void export_flow(GlowExportFlow* ef);
+  int export_script(GlowExportScript* es);
 
   friend class GlowNodeClass;
   friend class GlowCtx;

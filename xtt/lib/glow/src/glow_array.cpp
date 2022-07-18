@@ -63,6 +63,7 @@
 #include "glow_growxycurve.h"
 #include "glow_growdashcell.h"
 #include "glow_exportflow.h"
+#include "glow_exportscript.h"
 #include "glow_msg.h"
 #include "co_cdh.h"
 
@@ -1919,4 +1920,9 @@ void GlowArray::set_linetype(glow_eLineType type)
 void GlowArray::export_flow(GlowExportFlow* ef)
 {
   ef->array(this);
+}
+
+int GlowArray::export_script(GlowExportScript* es)
+{
+  return es->array(this);
 }

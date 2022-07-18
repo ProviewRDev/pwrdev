@@ -43,6 +43,7 @@
 #include "glow_growbar.h"
 #include "glow_grownode.h"
 #include "glow_draw.h"
+#include "glow_exportscript.h"
 
 GrowBar::GrowBar(GrowCtx* glow_ctx, const char* name, double x, double y,
     double w, double h, glow_eDrawType border_d_type, int line_w,
@@ -563,6 +564,11 @@ void GrowBar::get_bar_info(glow_sBarInfo* info)
   info->bar_drawtype = bar_drawtype;
   info->bar_bordercolor = bar_bordercolor;
   info->bar_borderwidth = bar_borderwidth;
+}
+
+int GrowBar::export_script(GlowExportScript* es)
+{
+  return es->bar(this);
 }
 
 void GrowBar::convert(glow_eConvert version)

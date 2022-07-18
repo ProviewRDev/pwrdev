@@ -1017,6 +1017,7 @@ public:
   void* get_p();
   void set_p(grow_tObject object, void* p);
   void update();
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   void export_java(grow_tObject object, std::ofstream& fp, char* var_name);
   void export_java_object(
       grow_tObject object, std::ofstream& fp, char* var_name);
@@ -1185,6 +1186,12 @@ public:
   {
   }
 
+  virtual int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+  {
+    return 1;
+  }
+
+
   //! Export java code for the dynamic element.
   /*!
     \param object	Owner object.
@@ -1248,6 +1255,7 @@ public:
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
   int set_color(grow_tObject object, glow_eDrawType color);
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int export_java(
       grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
@@ -1281,6 +1289,7 @@ public:
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
   int set_color(grow_tObject object, glow_eDrawType color);
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int export_java(
       grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
@@ -1313,6 +1322,7 @@ public:
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
   int set_color(grow_tObject object, glow_eDrawType color);
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int export_java(
       grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
@@ -1344,6 +1354,7 @@ public:
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int export_java(
       grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
@@ -1375,6 +1386,7 @@ public:
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int export_java(
       grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
@@ -1409,6 +1421,7 @@ public:
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
   int set_color(grow_tObject object, glow_eDrawType color);
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int export_java(
       grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
@@ -1440,6 +1453,7 @@ public:
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int export_java(
       grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
@@ -1471,6 +1485,7 @@ public:
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int export_java(
       grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
@@ -1502,6 +1517,7 @@ public:
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int export_java(
       grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
@@ -1535,6 +1551,7 @@ public:
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int export_java(
       grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
@@ -1575,6 +1592,7 @@ public:
   void reset(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int export_java(
       grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
@@ -1607,6 +1625,7 @@ public:
   int disconnect(grow_tObject object);
   int action(grow_tObject object, glow_tEvent event);
   int change_value(grow_tObject object, char* text);
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int export_java(
       grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
@@ -1645,6 +1664,7 @@ public:
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
   int set_color(grow_tObject object, glow_eDrawType color);
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int export_java(
       grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
@@ -1679,6 +1699,7 @@ public:
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int export_java(
       grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
@@ -1739,6 +1760,7 @@ public:
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int export_java(
       grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
@@ -1768,6 +1790,7 @@ public:
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int export_java(
       grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
@@ -1798,6 +1821,7 @@ public:
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int export_java(
       grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
@@ -1846,6 +1870,7 @@ public:
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int export_java(
       grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
@@ -1880,6 +1905,7 @@ public:
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int export_java(
       grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
@@ -1913,6 +1939,7 @@ public:
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int export_java(
       grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
@@ -1967,6 +1994,7 @@ public:
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
   int set_color(grow_tObject object, glow_eDrawType color);
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int export_java(
       grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
@@ -2007,6 +2035,7 @@ public:
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int export_java(
       grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
@@ -2025,6 +2054,7 @@ public:
   int connect(grow_tObject object, glow_sTraceData* trace_data, bool now);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int export_java(
       grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
@@ -2116,6 +2146,7 @@ public:
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int export_java(
       grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
@@ -2134,6 +2165,7 @@ public:
   int action(grow_tObject object, glow_tEvent event);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int export_java(
       grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
@@ -2153,6 +2185,7 @@ public:
   int action(grow_tObject object, glow_tEvent event);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int export_java(
       grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
@@ -2172,6 +2205,7 @@ public:
   int action(grow_tObject object, glow_tEvent event);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int export_java(
       grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
@@ -2191,6 +2225,7 @@ public:
   int action(grow_tObject object, glow_tEvent event);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int export_java(
       grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
@@ -2210,6 +2245,7 @@ public:
   int action(grow_tObject object, glow_tEvent event);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int export_java(
       grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
@@ -2228,6 +2264,7 @@ public:
   void open(std::ifstream& fp);
   int action(grow_tObject object, glow_tEvent event);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int export_java(
       grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
@@ -2246,6 +2283,7 @@ public:
   void open(std::ifstream& fp);
   int action(grow_tObject object, glow_tEvent event);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -2265,6 +2303,7 @@ public:
   void open(std::ifstream& fp);
   int action(grow_tObject object, glow_tEvent event);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -2281,6 +2320,7 @@ public:
   void save(std::ofstream& fp);
   void open(std::ifstream& fp);
   int action(grow_tObject object, glow_tEvent event);
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int export_java(
       grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
@@ -2302,6 +2342,7 @@ public:
   int action(grow_tObject object, glow_tEvent event);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int export_java(
       grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
@@ -2331,6 +2372,7 @@ public:
   int action(grow_tObject object, glow_tEvent event);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int export_java(
       grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
@@ -2347,6 +2389,7 @@ public:
   void save(std::ofstream& fp);
   void open(std::ifstream& fp);
   int action(grow_tObject object, glow_tEvent event);
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int export_java(
       grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
@@ -2365,6 +2408,7 @@ public:
   void save(std::ofstream& fp);
   void open(std::ifstream& fp);
   int action(grow_tObject object, glow_tEvent event);
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int export_java(
       grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
@@ -2384,6 +2428,7 @@ public:
   int action(grow_tObject object, glow_tEvent event);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int export_java(
       grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
@@ -2401,6 +2446,7 @@ public:
   void save(std::ofstream& fp);
   void open(std::ifstream& fp);
   int action(grow_tObject object, glow_tEvent event);
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int export_java(
       grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
@@ -2421,6 +2467,7 @@ public:
   void save(std::ofstream& fp);
   void open(std::ifstream& fp);
   int action(grow_tObject object, glow_tEvent event);
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -2493,6 +2540,7 @@ public:
   }
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int export_java(
       grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
@@ -2532,6 +2580,7 @@ public:
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
   void configure(grow_tObject object);
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -2607,6 +2656,7 @@ public:
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -2685,6 +2735,7 @@ public:
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int export_java(
       grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
@@ -2922,6 +2973,7 @@ public:
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -2929,8 +2981,8 @@ public:
 class GeAnalogTransparency : public GeDynElem {
 public:
   pwr_tAName attribute;
-  float min_value;
-  float max_value;
+  double min_value;
+  double max_value;
 
   pwr_tFloat32* p;
   pwr_tSubid subid;
@@ -2949,6 +3001,7 @@ public:
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -2965,6 +3018,7 @@ public:
   int get_transtab(char** tt);
   void save(std::ofstream& fp);
   void open(std::ifstream& fp);
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -2995,6 +3049,7 @@ public:
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int export_java(
       grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
@@ -3030,6 +3085,7 @@ public:
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int export_java(
       grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
@@ -3066,6 +3122,7 @@ public:
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int export_java(
       grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
@@ -3155,6 +3212,7 @@ public:
   int action(grow_tObject object, glow_tEvent event);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int export_java(
       grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
@@ -3188,6 +3246,7 @@ public:
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int export_java(
       grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
@@ -3223,6 +3282,7 @@ public:
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int export_java(
       grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
@@ -3245,6 +3305,7 @@ public:
   void open(std::ifstream& fp);
   int action(grow_tObject object, glow_tEvent event);
   int get_transtab(char** tt);
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int export_java(
       grow_tObject object, std::ofstream& fp, bool first, char* var_name);
 };
@@ -3288,6 +3349,7 @@ public:
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
   int get_transtab(char** tt);
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int export_java(
       grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   virtual int syntax_check(
@@ -3316,6 +3378,7 @@ public:
   }
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int export_java(
       grow_tObject object, std::ofstream& fp, bool first, char* var_name);
 };
@@ -3334,6 +3397,7 @@ public:
   int action(grow_tObject object, glow_tEvent event);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int export_java(
       grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
@@ -3357,6 +3421,7 @@ public:
   int action(grow_tObject object, glow_tEvent event);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int export_java(
       grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
@@ -3378,6 +3443,7 @@ public:
   void save(std::ofstream& fp);
   void open(std::ifstream& fp);
   int action(grow_tObject object, glow_tEvent event);
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int export_java(
       grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
@@ -3416,6 +3482,7 @@ public:
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int export_java(
       grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
@@ -3454,6 +3521,7 @@ public:
   int connect(grow_tObject object, glow_sTraceData* trace_data, bool now);
   int disconnect(grow_tObject object);
   int scan(grow_tObject object);
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -3468,6 +3536,7 @@ public:
   void save(std::ofstream& fp);
   void open(std::ifstream& fp);
   int action(grow_tObject object, glow_tEvent event);
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int export_java(
       grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
@@ -3485,6 +3554,7 @@ public:
   void save(std::ofstream& fp);
   void open(std::ifstream& fp);
   int action(grow_tObject object, glow_tEvent event);
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int export_java(
       grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);

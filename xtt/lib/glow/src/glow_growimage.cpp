@@ -44,6 +44,7 @@
 
 #include "glow_growimage.h"
 #include "glow_grownode.h"
+#include "glow_exportscript.h"
 
 //#if defined IMLIB
 static int rgb_tone(
@@ -1708,4 +1709,9 @@ void GrowImage::flip(double x0, double y0, glow_eFlipDirection dir)
     flip_vertical = !flip_vertical;
     break;
   }
+}
+
+int GrowImage::export_script(GlowExportScript* es)
+{
+  return es->image(this);
 }

@@ -195,6 +195,8 @@ public:
   void export_javabean(GlowTransform* t, void* node, glow_eExportPass pass,
       int* shape_cnt, int node_cnt, int in_nc, std::ofstream& fp);
 
+  int export_script(GlowExportScript* es);
+
   void convert(glow_eConvert version);
 
   void set_data(double* data[3], int data_curves, int data_points);

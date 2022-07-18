@@ -107,7 +107,7 @@ dcli_tCmdTable graph_command_table[] = { { "SHOW", &graph_show_func,
   { "EXIT", &graph_exit_func, { "" } }, { "QUIT", &graph_quit_func, { "" } },
   { "GROUP", &graph_group_func, { "" } },
   { "SELECT", &graph_select_func, { "dcli_arg1", "/NAME", "" } },
-  { "EXPORT", &graph_export_func, { "dcli_arg1", "/SIGNATURE", "/FILE", "" } },
+  { "EXPORT", &graph_export_func, { "dcli_arg1", "/NAME", "/SIGNATURE", "/FILE", "" } },
   { "DISABLE", &graph_disable_func, { "dcli_arg1", "" } },
   { "TWO", &graph_two_func, { "" } }, { "BUILD", &graph_build_func, { "" } },
   { "CUSTOMCOLOR", &graph_customcolor_func,
@@ -1609,7 +1609,28 @@ static int graph_export_func(void* client_data, void* client_flag)
 
   arg1_sts = dcli_get_qualifier("dcli_arg1", arg1_str, sizeof(arg1_str));
 
-  if (str_NoCaseStrncmp(arg1_str, "JAVA", strlen(arg1_str)) == 0) {
+  if (str_NoCaseStrncmp(arg1_str, "SCRIPT", strlen(arg1_str)) == 0) {
+    char name_str[80];
+    pwr_tFileName fname;
+    int sts;
+
+    if (EVEN(dcli_get_qualifier("/NAME", name_str, sizeof(name_str)))) {
+      graph->get_name(name_str);
+
+      if (streq(name_str, "")) {
+	graph->message('E', "Enter name");
+	return GE__FILENAME;
+      }
+    }
+    sprintf(fname, "$pwrp_pop/%s.ge_com", name_str);
+    dcli_translate_filename(fname, fname);
+
+    sts = graph->export_script(fname);
+    if (EVEN(sts)) {
+      graph->message('E', "Export error");
+    } else
+      graph->message('E', "Graph exported");
+  } else if (str_NoCaseStrncmp(arg1_str, "JAVA", strlen(arg1_str)) == 0) {
     char filename[120];
     char name[80];
     char graph_name[80];

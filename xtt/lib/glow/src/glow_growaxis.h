@@ -39,6 +39,8 @@
 
 #include "glow_growrect.h"
 
+class GlowExportScript;
+
 /*! \file glow_growaxis.h
     \brief Contains the GrowAxis class. */
 /*! \addtogroup Glow */
@@ -279,6 +281,7 @@ public:
 
   glow_eVis get_visibility();
   void set_visibility(glow_eVis visibility);
+  int export_script(GlowExportScript* es);
 };
 
 /*@}*/
