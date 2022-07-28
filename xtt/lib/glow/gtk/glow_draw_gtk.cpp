@@ -2018,7 +2018,7 @@ int GlowDrawGtk::fill_rect(
       cairo_set_source(cr, pat);
     }
   }
-  cairo_rectangle(cr, x-1, y-1, width, height);
+  cairo_rectangle(cr, x-1, y-1, width+1, height+1);
   cairo_fill(cr);
 
   if (w->clip_on)
