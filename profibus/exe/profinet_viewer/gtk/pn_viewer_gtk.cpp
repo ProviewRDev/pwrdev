@@ -86,8 +86,7 @@ PnViewerGtk::PnViewerGtk(void* v_parent_ctx, GtkWidget* v_parent_wid,
   GtkMenuBar* menu_bar = (GtkMenuBar*)g_object_new(GTK_TYPE_MENU_BAR, NULL);
 
   // File Entry
-  GtkWidget* file_close =
-      gtk_image_menu_item_new_from_stock(GTK_STOCK_CLOSE, accel_g);
+  GtkWidget* file_close = gtk_menu_item_new_with_mnemonic("_Close");
   g_signal_connect(file_close, "activate",
                    G_CALLBACK(PnViewerGtk::activate_exit), this);
 
@@ -132,21 +131,21 @@ PnViewerGtk::PnViewerGtk(void* v_parent_ctx, GtkWidget* v_parent_wid,
 
   // View menu
   GtkWidget* view_zoom_in =
-      gtk_image_menu_item_new_from_stock(GTK_STOCK_ZOOM_IN, NULL);
+      gtk_menu_item_new_with_mnemonic("Zoom _in");
   g_signal_connect(view_zoom_in, "activate",
                    G_CALLBACK(PnViewerGtk::activate_zoom_in), this);
   gtk_widget_add_accelerator(view_zoom_in, "activate", accel_g, 'i',
                              GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
   GtkWidget* view_zoom_out =
-      gtk_image_menu_item_new_from_stock(GTK_STOCK_ZOOM_OUT, NULL);
+      gtk_menu_item_new_with_mnemonic("Zoom _out");
   g_signal_connect(view_zoom_out, "activate",
                    G_CALLBACK(PnViewerGtk::activate_zoom_out), this);
   gtk_widget_add_accelerator(view_zoom_out, "activate", accel_g, 'o',
                              GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
   GtkWidget* view_zoom_reset =
-      gtk_image_menu_item_new_from_stock(GTK_STOCK_ZOOM_100, NULL);
+      gtk_menu_item_new_with_mnemonic("Zoom _reset");
   g_signal_connect(view_zoom_reset, "activate",
                    G_CALLBACK(PnViewerGtk::activate_zoom_reset), this);
 
@@ -161,7 +160,7 @@ PnViewerGtk::PnViewerGtk(void* v_parent_ctx, GtkWidget* v_parent_wid,
 
   // Help menu
   GtkWidget* help_help =
-      gtk_image_menu_item_new_from_stock(GTK_STOCK_HELP, NULL);
+      gtk_menu_item_new_with_mnemonic("_Help");
   g_signal_connect(help_help, "activate", G_CALLBACK(activate_help), this);
 
   GtkMenu* help_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
@@ -171,10 +170,10 @@ PnViewerGtk::PnViewerGtk(void* v_parent_ctx, GtkWidget* v_parent_wid,
   gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), help);
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(help), GTK_WIDGET(help_menu));
 
-  form = gtk_vbox_new(FALSE, 0);
+  form = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 
   // Statusbar and cmd input
-  GtkWidget* statusbar = gtk_hbox_new(FALSE, 0);
+  GtkWidget* statusbar = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   msg_label = gtk_label_new("");
   gtk_widget_set_size_request(msg_label, -1, 25);
   cmd_prompt = gtk_label_new("value > ");
@@ -193,9 +192,9 @@ PnViewerGtk::PnViewerGtk(void* v_parent_ctx, GtkWidget* v_parent_wid,
   gtk_widget_show_all(statusbar);
 
   // Create viewernav
-  GtkWidget* nav_paned = gtk_hpaned_new();
-  GtkWidget* nav_left = gtk_vbox_new(FALSE, 0);
-  GtkWidget* nav_right = gtk_vbox_new(FALSE, 0);
+  GtkWidget* nav_paned = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
+  GtkWidget* nav_left = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+  GtkWidget* nav_right = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   GtkWidget* header_left = gtk_label_new("Devices on Network");
   GtkWidget* header_right = gtk_label_new("Devices from Configuration");
 

@@ -293,7 +293,7 @@ unsigned int wmq_send(remnode_item* remnode, pwr_sClass_RemTrans* remtrans,
   memcpy(md.MsgId, MQCI_NONE, sizeof(md.MsgId));
 
   if ((remtrans->Address[0] <= MQPER_PERSISTENCE_AS_Q_DEF)
-      && (remtrans->Address[0] >= MQPER_NOT_PERSISTENT))
+      && ((pwr_tInt16)remtrans->Address[0] >= MQPER_NOT_PERSISTENT))
     md.Persistence = remtrans->Address[0];
   else
     md.Persistence = MQPER_NOT_PERSISTENT; // | MQPRE_NOT_PERSISTENT
@@ -343,7 +343,7 @@ int main(int argc, char* argv[])
 {
   remtrans_item* remtrans;
   unsigned char id[32];
-  unsigned char pname[32];
+  unsigned char pname[64];
 
   pwr_tStatus sts;
   int i;
