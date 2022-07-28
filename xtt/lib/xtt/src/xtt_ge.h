@@ -78,6 +78,9 @@ public:
   int height;
   unsigned int options;
   int color_theme;
+  glow_eDrawType default_fill_color;
+  glow_eDrawType default_border_color;
+  glow_eDrawType default_text_color;
   CoWow* wow;
 
   XttGe(void* parent_ctx, const char* name, const char* filename, int scrollbar,
@@ -176,6 +179,10 @@ public:
   static void eventlog_enable(int enable);
   static void file_selected_cb(void* ctx, void* data, char* text);
   static void ge_colortheme_selector_ok_cb(void* ctx, char* text, int ok_pressed);
+  static void get_current_colors_cb(void* ctx, glow_eDrawType* fill_color,
+      glow_eDrawType* border_color, glow_eDrawType* text_color);
+  static void set_current_colors_cb(void* ctx, glow_eDrawType fill_color,
+      glow_eDrawType border_color, glow_eDrawType text_color);
 };
 
 #endif

@@ -6938,6 +6938,10 @@ function DynBar( dyn)  {
         o.angle2 = value;
         return 1;
       }
+      else if (name === "BarArc.Direction") {
+        o.bar_direction = value;
+        return 1;
+      }
     }
     return 0;
   }
@@ -17690,7 +17694,13 @@ function Graph( appl) {
   this.current_cmd_object = null;
   this.subgraph_load_idx = 0;
   this.subgraph_load = null;
+  this.attribute_load_idx = 0;
+  this.attribute_load = null;
   this.read_buffer = null;
+  this.resized = false;
+  this.windowInnerWidth;
+  this.windowInnerHeight;
+  this.graphConfiguration = 0;
 
 #jsc_include gescript.jsi
 
@@ -17725,7 +17735,7 @@ function Graph( appl) {
   };
 
   this.readscript_cb = function(buffer) {
-    if (self.subgraph_load === null) {
+    if (self.subgraph_load === null && self.attribute_load === null) {
       var bix = 0;
       var width = 0;
       var height = 0;
@@ -17746,28 +17756,54 @@ function Graph( appl) {
 	self.ctx.gdraw.canvas.width = width;
 	self.ctx.gdraw.canvas.height = height;
       }         
-      if (buffer.substring(bix, bix+9) === "!** Load:") {
+      var aa = []
+      if (buffer.substring(bix, bix+18) === "!** GetObjectAttr:") {
+        var idx = buffer.indexOf('\n', bix);
+        var a = buffer.substring(bix+18, idx);
+        var aa = a.split(',');
+        bix = idx + 1;
+      }
+      if (aa.length > 0) {
+        for (let i = 0; i < aa.length; i++)
+	  aa[i] = aa[i].trim();
+	self.attribute_load = aa;
+	self.attribute_load_idx = 0;	
+      }
+      var sgc = [];
+      while (buffer.substring(bix, bix+9) === "!** Load:") {
         var idx = buffer.indexOf('\n', bix);
         var sg = buffer.substring(bix+9, idx);
         var sga = sg.split(',');
-        for (let i = 0; i < sga.length; i++)
-	  sga[i] = sga[i].trim();
-	self.subgraph_load = sga;
-	self.subgraph_load_idx = 1;	
+	sgc = sgc.concat(sga);
+        bix = idx + 1;
+      }
+      if (sgc.length > 0) {
+        for (let i = 0; i < sgc.length; i++)
+	  sgc[i] = sgc[i].trim();
+	self.subgraph_load = sgc;
+	self.subgraph_load_idx = 0;	
 	
 	self.script_buffer = buffer;
-	self.loadSubGraph(self.subgraph_load[self.subgraph_load_idx - 1]);
+	self.loadSubGraph(self.subgraph_load[self.subgraph_load_idx]);
+      } else if (aa.length > 0) {
+	self.loadAttribute(self.attribute_load[self.attribute_load_idx]);
       } else {
 	self.readscript(buffer);
       }
     } else {
-      if (self.subgraph_load_idx == self.subgraph_load.length) {
+      if ((self.subgraph_load == null || (self.subgraph_load_idx >= self.subgraph_load.length)) &&
+	  (self.attribute_load == null || (self.attribute_load_idx >= self.attribute_load.length))) {
         self.subgraph_load = null;
         self.subgraph_load_idx = 0;
+        self.attribute_load = null;
+        self.attribute_load_idx = 0;
 	self.readscript(buffer);
-      } else {
+      } else if (self.subgraph_load != null && self.subgraph_load_idx < self.subgraph_load.length) {
 	self.subgraph_load_idx++;
 	self.loadSubGraph(self.subgraph_load[self.subgraph_load_idx - 1]);
+      } else if (self.attribute_load != null){
+	self.attribute_load_idx++;
+	self.loadAttribute(self.attribute_load[self.attribute_load_idx - 1]);
       }
     }
   }
@@ -17788,6 +17824,12 @@ function Graph( appl) {
       this.script_func_register();
     }
 
+    /*
+    this.gdh = new Gdh();
+    this.gdh.open_cb = this.gdh_init_cb;
+    this.gdh.init();
+    */
+
     //str_trim(input_str, incommand);
     this.script_store_graph();
 
@@ -17795,11 +17837,19 @@ function Graph( appl) {
     this.ccm.buffer_exec(buffer, null, externcmd_func, 
       deffilename_func, msg_func, 0, 0, 0, 0, null, null);
 
-    this.ctx.draw();
+    if (this.ctx.x1 !== this.ctx.x0 && this.ctx.y1 !== this.ctx.y0) {
+      this.ctx.mw.zoom_factor_x = window.innerWidth / (this.ctx.x1 - this.ctx.x0);
+      this.ctx.mw.zoom_factor_y = window.innerHeight / (this.ctx.y1 - this.ctx.y0);
+      if (this.ctx.mw.zoom_factor_y < this.ctx.mw.zoom_factor_x)
+        this.ctx.mw.zoom_factor_x = this.ctx.mw.zoom_factor_y;
+      else
+        this.ctx.mw.zoom_factor_y = this.ctx.mw.zoom_factor_x;
+    }
+
+    this.ctx.traceConnect();
+    this.gdh.refObjectInfoList( self.trace_connected);
     this.frame.register_events( this.baseCtx);
-    this.gdh = new Gdh();
-    this.gdh.open_cb = this.gdh_init_cb;
-    this.gdh.init();
+    this.ctx.draw();
     this.read_buffer = null;
     return 1;
   };
@@ -17814,23 +17864,31 @@ function Graph( appl) {
     this.frame.readGrowWeb( fname, this.read_subgraph_cb, true);  
   }
 
-  var fname = this.frame.get_filename();  
-  if (fname[0] == '@')
-    this.frame.readGrowWeb(fname.substring(1), this.readscript_cb, false);
-  else
-    this.frame.readGrowWeb( fname, this.read_cb, true);  
-
-  this.ldb = new GraphLocalDb();
-  // Set init values for Ge demo
-  this.ldb.setObjectInfo( this, "$local.Demo-Ge-Dynamics-ScrollingText-ScrollingText.ActualValue##String80", "ProviewR");
-  this.ldb.setObjectInfo( this, "$local.Demo-Ge-Subgraphs-DynamicAxis-Av2.ActualValue##Float32", 100);
-  this.ldb.setObjectInfo( this, "$local.Demo-Ge-Subgraphs-DynamicAxisArc-Av2.ActualValue##Float32", 100);
+  this.load_graphconf_cb = function( id, self, sts, value) {
+    if (sts & 1)
+      self.graphConfiguration = value;
+    self.readscript_cb(self.script_buffer);
+  }
+  this.loadAttribute = function(name) {
+    if (name === "GraphConfiguration") {
+      var aname = this.ctx.getOwner() + "." + name;
+      this.gdh.getObjectInfoInt(aname, this.load_graphconf_cb, this);
+    }
+    else
+      self.readscript_cb(self.script_buffer);
+  }
 
   this.gdh_init_cb = function() {
     if ( self.priv == null)
       self.gdh.login( "", "", self.login_cb, self);
     self.ctx.traceConnect();
     self.gdh.refObjectInfoList( self.trace_connected);
+  };
+
+  this.gdh_init_cb_script = function() {
+    if ( self.priv == null)
+      self.gdh.login( "", "", self.login_cb, self);
+    self.frame.readGrowWeb(fname.substring(1), self.readscript_cb, false);
   };
 
   this.login_cb = function( id, data, sts, result) {
@@ -18381,6 +18439,22 @@ function Graph( appl) {
   this.get_text_drawtype = function () {
     return this.text_drawtype;
   };
+
+  var fname = this.frame.get_filename();  
+  if (fname[0] == '@') {
+    this.gdh = new Gdh();
+    this.gdh.open_cb = this.gdh_init_cb_script;
+    this.gdh.init();
+  }
+  else
+    this.frame.readGrowWeb( fname, this.read_cb, true);  
+
+  this.ldb = new GraphLocalDb();
+  // Set init values for Ge demo
+  this.ldb.setObjectInfo( this, "$local.Demo-Ge-Dynamics-ScrollingText-ScrollingText.ActualValue##String80", "ProviewR");
+  this.ldb.setObjectInfo( this, "$local.Demo-Ge-Subgraphs-DynamicAxis-Av2.ActualValue##Float32", 100);
+  this.ldb.setObjectInfo( this, "$local.Demo-Ge-Subgraphs-DynamicAxisArc-Av2.ActualValue##Float32", 100);
+
 };
 
 
@@ -19114,6 +19188,53 @@ function GlowCFormat(key) {
   this.parse_tree = this.parse( key);
 }
 
+window.addEventListener('resize', function(event) {
+  var graph = graph_get_stored_graph();
+  if (!graph)
+    return;
+  console.log("Resize event", window.innerWidth, window.innerHeight, graph.ctx.x1 - graph.ctx.x0,
+    graph.ctx.y1 - graph.ctx.y0);
+
+  var old_zx = graph.ctx.mw.zoom_factor_x;
+  var old_zy = graph.ctx.mw.zoom_factor_y;
+  var zx = window.innerWidth / (graph.ctx.x1 - graph.ctx.x0);
+  var zy = window.innerHeight / (graph.ctx.y1 - graph.ctx.y0);
+  graph.ctx.mw.zoom_factor_x = zx;
+  graph.ctx.mw.zoom_factor_y = zy;
+  if (graph.ctx.mw.zoom_factor_y < graph.ctx.mw.zoom_factor_x)
+    graph.ctx.mw.zoom_factor_x = graph.ctx.mw.zoom_factor_y;
+  else
+    graph.ctx.mw.zoom_factor_y = graph.ctx.mw.zoom_factor_x;
+  graph.ctx.gdraw.canvas.width = (graph.ctx.x1 - graph.ctx.x0) * graph.ctx.mw.zoom_factor_x;
+  graph.ctx.gdraw.canvas.height = (graph.ctx.y1 - graph.ctx.y0) * graph.ctx.mw.zoom_factor_y;
+  console.log("Zoom", graph.ctx.mw.zoom_factor_x, graph.ctx.mw.zoom_factor_y);
+  if (!graph.resized) {
+    graph.resized = true;
+    graph.windowInnerWidth = window.innerWidth;
+    graph.windowInnerHeight = window.innerHeight;
+    return;
+  }
+  if ((graph.windowInnerWidth < 300 && window.innerWidth >= 300) || 
+      (graph.windowInnerWidth >= 300 && window.innerWidth < 300) ||
+      (graph.windowInnerWidth < 500 && window.innerWidth >= 500) || 
+      (graph.windowInnerWidth >= 500 && window.innerWidth < 500) ||
+      (graph.windowInnerWidth < 700 && window.innerWidth >= 700) || 
+      (graph.windowInnerWidth >= 700 && window.innerWidth < 700) ||
+      (graph.windowInnerWidth < 1000 && window.innerWidth >= 1000) || 
+      (graph.windowInnerWidth >= 1000 && window.innerWidth < 1000) ||
+      (graph.windowInnerHeight < 300 && window.innerHeight >= 300) || 
+      (graph.windowInnerHeight >= 300 && window.innerHeight < 300) ||
+      (graph.windowInnerHeight < 500 && window.innerHeight >= 500) || 
+      (graph.windowInnerHeight >= 500 && window.innerHeight < 500) ||
+      (graph.windowInnerHeight < 700 && window.innerHeight >= 700) || 
+      (graph.windowInnerHeight >= 700 && window.innerHeight < 700) ||
+      (graph.windowInnerHeight < 1000 && window.innerHeight >= 1000) || 
+      (graph.windowInnerHeight >= 1000 && window.innerHeight < 1000))
+    window.location.reload();
+  graph.windowInnerWidth = window.innerWidth;
+  graph.windowInnerHeight = window.innerHeight;
+}, true);
 
 var appl = new Appl();
+
 

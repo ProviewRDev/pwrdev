@@ -45,12 +45,15 @@
 #include "co_dcli.h"
 #include "co_dcli_msg.h"
 #include "co_string.h"
+#include "cow_wow.h"
 
 #include "ge_graph.h"
 #include "ge_script.h"
 #include "ge_dyn.h"
 #include "ge_methods.h"
 #include "ge_msg.h"
+
+#include "rt_gdh.h"
 
 static Graph* current_graph;
 
@@ -62,6 +65,26 @@ void Graph::script_store_graph()
 static void graph_get_stored_graph(Graph** graph)
 {
   *graph = current_graph;
+}
+
+static int text_idx_to_size(int idx)
+{
+  switch (idx) {
+  case 0:
+    return 0; 
+  case 1:
+    return 1; 
+  case 2:
+    return 2;
+  case 3:
+    return 4;
+  case 4:
+    return 6;
+  case 5:
+    return 8;
+  default:
+    return 8;
+  }
 }
 
 static int graph_gettextextent_func(void* filectx, ccm_sArg* arg_list,
@@ -982,6 +1005,7 @@ static int graph_setobjecttextsize_func(void* filectx, ccm_sArg* arg_list,
 {
   Graph* graph;
   ccm_sArg* arg_p2;
+  int textsize;
 
   if (arg_count != 2)
     return CCM__ARGMISM;
@@ -995,8 +1019,9 @@ static int graph_setobjecttextsize_func(void* filectx, ccm_sArg* arg_list,
 
   graph_get_stored_graph(&graph);
 
+  textsize = text_idx_to_size(arg_p2->value_int);
   grow_SetObjectTextSize(
-      (grow_tObject)arg_list->value_int, arg_p2->value_int);
+      (grow_tObject)arg_list->value_int, textsize);
   return 1;
 }
 
@@ -2794,6 +2819,7 @@ static int graph_setcolortheme_func(void* filectx, ccm_sArg* arg_list,
     ccm_tInt* return_int, char* return_string)
 {
   Graph* graph;
+  int color_theme;
 
   if (arg_count > 1)
     return CCM__ARGMISM;
@@ -2805,8 +2831,11 @@ static int graph_setcolortheme_func(void* filectx, ccm_sArg* arg_list,
 
   graph_get_stored_graph(&graph);
   
-  if (arg_count > 0)
-    graph->update_color_theme(arg_list->value_int);
+  if (arg_count > 0) {
+    color_theme = arg_list->value_int;
+    color_theme = CoWow::SetColorTheme(color_theme);
+    graph->update_color_theme(color_theme);
+  }
   else
     grow_SetColorTheme(graph->grow->ctx);
   return 1;
@@ -3248,10 +3277,10 @@ static int graph_createtext_func(void* filectx, ccm_sArg* arg_list,
     arg_p4 = arg_p3->next;
     if (arg_p4->value_decl != CCM_DECL_INT)
       return CCM__ARGMISM;
-    textsize = arg_p4->value_int;
+    textsize = text_idx_to_size(arg_p4->value_int);
   }
   else
-    textsize = graph->textsize;
+    textsize = text_idx_to_size(graph->textsize);
 
   if (arg_count > 4) {
     arg_p5 = arg_p4->next;
@@ -3295,29 +3324,6 @@ static int graph_createtext_func(void* filectx, ccm_sArg* arg_list,
     drawtype = glow_eDrawType_TextHelveticaBold;
   else
     drawtype = glow_eDrawType_TextHelvetica;
-
-  switch (textsize) {
-  case 0:
-    textsize = 0;
-    break;
-  case 1:
-    textsize = 1;
-    break;
-  case 2:
-    textsize = 2;
-    break;
-  case 3:
-    textsize = 4;
-    break;
-  case 4:
-    textsize = 6;
-    break;
-  case 5:
-    textsize = 8;
-    break;
-  default:
-    textsize = 8;
-  }
 
 
   grow_CreateGrowText(graph->grow->ctx, "", arg_list->value_string, x, y, drawtype,
@@ -4518,10 +4524,223 @@ static int graph_getinstanceobject_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
+static int graph_getwindowsize_func(void* filectx, ccm_sArg* arg_list,
+    int arg_count, int* return_decl, ccm_tFloat* return_float,
+    ccm_tInt* return_int, char* return_string)
+{
+  Graph* graph;
+  ccm_sArg* arg_p2;
+  int width, height;
+
+  if (arg_count !=  2)
+    return CCM__ARGMISM;
+
+  arg_p2 = arg_list->next;
+  if (arg_list->value_decl != CCM_DECL_INT)
+    return CCM__ARGMISM;
+  if (arg_p2->value_decl != CCM_DECL_INT)
+    return CCM__ARGMISM;
+
+  graph_get_stored_graph(&graph);
+
+  grow_GetDefaultWindowSize(graph->grow->ctx, &width, &height);
+
+  arg_list->value_int = width;
+  arg_list->value_returned = 1;
+  arg_p2->value_int = height;
+  arg_p2->value_returned = 1;
+
+  return 1;
+}
+
+static int graph_getui_env_func(void* filectx, ccm_sArg* arg_list,
+    int arg_count, int* return_decl, ccm_tFloat* return_float,
+    ccm_tInt* return_int, char* return_string)
+{
+  if (arg_count !=  0)
+    return CCM__ARGMISM;
+
+  *return_int = glow_eUI_Env_Xtt;
+  *return_decl = CCM_DECL_INT;
+  return 1;
+}
+
+static int graph_getgraphconfig_func(void* filectx, ccm_sArg* arg_list,
+    int arg_count, int* return_decl, ccm_tFloat* return_float,
+    ccm_tInt* return_int, char* return_string)
+{
+  Graph* graph;
+  pwr_tAName aname;
+  pwr_tInt32 value = 0;
+  pwr_tStatus sts;
+
+  if (arg_count !=  0)
+    return CCM__ARGMISM;
+
+  graph_get_stored_graph(&graph);
+
+  strcpy(aname, graph->object_name[0]);
+  strcat(aname, ".GraphConfiguration");
+  sts = gdh_GetObjectInfo(aname, &value, sizeof(value));
+  if (EVEN(sts))
+    value = 0;
+
+  *return_int = value;
+  *return_decl = CCM_DECL_INT;
+  return 1;
+}
+
+static int graph_setdefaultfill_func(void* filectx, ccm_sArg* arg_list,
+    int arg_count, int* return_decl, ccm_tFloat* return_float,
+    ccm_tInt* return_int, char* return_string)
+{
+  Graph* graph;
+
+  if (arg_count != 1)
+    return CCM__ARGMISM;
+
+  graph_get_stored_graph(&graph);
+
+  if (arg_list->value_decl != CCM_DECL_INT)
+    return CCM__ARGMISM;
+
+  graph->fill = arg_list->value_int;
+
+  return 1;
+}
+
+static int graph_setdefaultborder_func(void* filectx, ccm_sArg* arg_list,
+    int arg_count, int* return_decl, ccm_tFloat* return_float,
+    ccm_tInt* return_int, char* return_string)
+{
+  Graph* graph;
+
+  if (arg_count != 1)
+    return CCM__ARGMISM;
+
+  graph_get_stored_graph(&graph);
+
+  if (arg_list->value_decl != CCM_DECL_INT)
+    return CCM__ARGMISM;
+
+  graph->border = arg_list->value_int;
+
+  return 1;
+}
+
+static int graph_setdefaultshadow_func(void* filectx, ccm_sArg* arg_list,
+    int arg_count, int* return_decl, ccm_tFloat* return_float,
+    ccm_tInt* return_int, char* return_string)
+{
+  Graph* graph;
+
+  if (arg_count != 1)
+    return CCM__ARGMISM;
+
+  graph_get_stored_graph(&graph);
+
+  if (arg_list->value_decl != CCM_DECL_INT)
+    return CCM__ARGMISM;
+
+  graph->shadow = arg_list->value_int;
+
+  return 1;
+}
+
+static int graph_setdefaultfillcolor_func(void* filectx, ccm_sArg* arg_list,
+    int arg_count, int* return_decl, ccm_tFloat* return_float,
+    ccm_tInt* return_int, char* return_string)
+{
+  Graph* graph;
+  glow_eDrawType fill_color, border_color, text_color;
+
+  if (arg_count != 1)
+    return CCM__ARGMISM;
+
+  graph_get_stored_graph(&graph);
+
+  if (arg_list->value_decl != CCM_DECL_INT)
+    return CCM__ARGMISM;
+
+  if (graph->get_current_colors_cb && graph->set_current_colors_cb) {
+    graph->get_current_colors_cb(graph->parent_ctx, &fill_color, &border_color, &text_color);
+    fill_color = (glow_eDrawType)arg_list->value_int;
+    graph->set_current_colors_cb(graph->parent_ctx, fill_color, border_color, text_color);
+  }
+
+  return 1;
+}
+
+static int graph_setdefaultbordercolor_func(void* filectx, ccm_sArg* arg_list,
+    int arg_count, int* return_decl, ccm_tFloat* return_float,
+    ccm_tInt* return_int, char* return_string)
+{
+  Graph* graph;
+  glow_eDrawType fill_color, border_color, text_color;
+
+  if (arg_count != 1)
+    return CCM__ARGMISM;
+
+  graph_get_stored_graph(&graph);
+
+  if (arg_list->value_decl != CCM_DECL_INT)
+    return CCM__ARGMISM;
+
+  if (graph->get_current_colors_cb && graph->set_current_colors_cb) {
+    graph->get_current_colors_cb(graph->parent_ctx, &fill_color, &border_color, &text_color);
+    border_color = (glow_eDrawType)arg_list->value_int;
+    graph->set_current_colors_cb(graph->parent_ctx, fill_color, border_color, text_color);
+  }
+
+  return 1;
+}
+
+static int graph_setdefaulttextcolor_func(void* filectx, ccm_sArg* arg_list,
+    int arg_count, int* return_decl, ccm_tFloat* return_float,
+    ccm_tInt* return_int, char* return_string)
+{
+  Graph* graph;
+  glow_eDrawType fill_color, border_color, text_color;
+
+  if (arg_count != 1)
+    return CCM__ARGMISM;
+
+  graph_get_stored_graph(&graph);
+
+  if (arg_list->value_decl != CCM_DECL_INT)
+    return CCM__ARGMISM;
+
+  if (graph->get_current_colors_cb && graph->set_current_colors_cb) {
+    graph->get_current_colors_cb(graph->parent_ctx, &fill_color, &border_color, &text_color);
+    text_color = (glow_eDrawType)arg_list->value_int;
+    graph->set_current_colors_cb(graph->parent_ctx, fill_color, border_color, text_color);
+  }
+
+  return 1;
+}
+
 int Graph::script_func_register(void)
 {
   int sts;
 
+  sts = ccm_register_function("Ge", "SetDefaultFill", graph_setdefaultfill_func);
+  if (EVEN(sts))
+    return sts;
+  sts = ccm_register_function("Ge", "SetDefaultBorder", graph_setdefaultborder_func);
+  if (EVEN(sts))
+    return sts;
+  sts = ccm_register_function("Ge", "SetDefaultShadow", graph_setdefaultshadow_func);
+  if (EVEN(sts))
+    return sts;
+  sts = ccm_register_function("Ge", "SetDefaultFillColor", graph_setdefaultfillcolor_func);
+  if (EVEN(sts))
+    return sts;
+  sts = ccm_register_function("Ge", "SetDefaultBorderColor", graph_setdefaultbordercolor_func);
+  if (EVEN(sts))
+    return sts;
+  sts = ccm_register_function("Ge", "SetDefaultTextColor", graph_setdefaulttextcolor_func);
+  if (EVEN(sts))
+    return sts;
   sts = ccm_register_function(
      "Ge", "GetTextExtent", graph_gettextextent_func);
   if (EVEN(sts))
@@ -4861,7 +5080,22 @@ int Graph::script_func_register(void)
       "Ge", "GetInstanceObject", graph_getinstanceobject_func);
   if (EVEN(sts))
     return sts;
+  sts = ccm_register_function(
+      "Ge", "GetWindowSize", graph_getwindowsize_func);
+  if (EVEN(sts))
+    return sts;
+  sts = ccm_register_function("Ge", "GetUI_Env", graph_getui_env_func);
+  if (EVEN(sts))
+    return sts;
+  sts = ccm_register_function("Ge", "GetGraphConfig", graph_getgraphconfig_func);
+  if (EVEN(sts))
+    return sts;
   
+  sts = ccm_create_external_var(
+      "eUI_Env_Web", CCM_DECL_INT, 0, glow_eUI_Env_Web, 0);
+  sts = ccm_create_external_var(
+      "eUI_Env_Xtt", CCM_DECL_INT, 0, glow_eUI_Env_Xtt, 0);
+
   sts = ccm_create_external_var(
       "eObjectType_Rect", CCM_DECL_INT, 0, glow_eObjectType_GrowRect, 0);
   sts = ccm_create_external_var(

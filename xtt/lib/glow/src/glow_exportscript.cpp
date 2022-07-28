@@ -56,6 +56,7 @@
 #include "glow_dashboard.h"
 #include "glow_exportscript.h"
 #include "ge_methods.h"
+#include "co_ccm.h"
 
 #define SCRIPT_SCALE 0.05
 
@@ -74,6 +75,8 @@ int GlowExportScript::export_script(char* filename,
   char nc_name[80];
   int is_toolbar;
   int has_toolbar;
+  int llen;
+  int new_line;
   int found;
   char* s;
 
@@ -89,10 +92,20 @@ int GlowExportScript::export_script(char* filename,
     *s = 0;
   fp.open(filename);
 
-  // Load command for web scripts
+  // Graph size
+  int default_width = int((ctx->x1 - ctx->x0) * ctx->mw.zoom_factor_x);
+  int default_height = int((ctx->y1 - ctx->y0) * ctx->mw.zoom_factor_y);
+  if (default_width > 0 && default_height > 0) {
+    fp << "!** DefaultWidth: " << default_width << '\n';
+    fp << "!** DefaultHeight: " << default_height << '\n';
+  }
+
+  // Load of subgraphs
   has_toolbar = 0;
+  new_line = 1;
   if (ctx->a_nc.size() > 0) {
     fp << "!** Load: ";
+    llen = 10;
     for (int i = 0; i < ctx->a_nc.size(); i++) {
       is_toolbar = 0;
       for (int j = 0; j < ctx->a.size(); j++) {	
@@ -105,9 +118,20 @@ int GlowExportScript::export_script(char* filename,
       }
       if (is_toolbar)
 	continue;
-      if (i != 0)
+      if (llen + strlen(((GlowNodeClass *)ctx->a_nc[i])->n_name) + 2 > K_LINE_SIZE) {
+	fp << '\n';
+	fp << "!** Load: ";
+	llen = 10;
+	new_line = 1;
+      }
+      if (new_line)
+	new_line = 0;
+      else {
 	fp << ",";
+	llen++;
+      }
       fp << ((GlowNodeClass *)ctx->a_nc[i])->n_name;
+      llen += strlen(((GlowNodeClass *)ctx->a_nc[i])->n_name);
     }
     if (has_toolbar) {
       // Add method buttons that are not present
@@ -121,8 +145,22 @@ int GlowExportScript::export_script(char* filename,
 	    break;
 	  }
 	}
-	if (!found)
-	    fp << "," << GeMethods::op_subgraph[j];
+	if (!found) {
+	  if (llen + strlen(GeMethods::op_subgraph[j]) + 2 > K_LINE_SIZE) {
+	    fp << '\n';
+	    fp << "!** Load: ";
+	    llen = 10;
+	    new_line = 1;
+	  }
+	  if (new_line)
+	    new_line = 0;
+	  else {
+	    fp << ",";
+	    llen++;
+	  }
+	  fp << GeMethods::op_subgraph[j];
+	  llen += strlen(GeMethods::op_subgraph[j]);
+	}
       }
       for (int j = 0; j < GeMethods::mntmeth_size; j++) {
 	if (strcmp(GeMethods::mnt_subgraph[j], "") == 0)
@@ -134,8 +172,22 @@ int GlowExportScript::export_script(char* filename,
 	    break;
 	  }
 	}
-	if (!found)
-	  fp << "," << GeMethods::mnt_subgraph[j];
+	if (!found) {
+	  if (llen + strlen(GeMethods::mnt_subgraph[j]) + 2 > K_LINE_SIZE) {
+	    fp << '\n';
+	    fp << "!** Load: ";
+	    llen = 10;
+	    new_line = 1;
+	  }
+	  if (new_line)
+	    new_line = 0;
+	  else {
+	    fp << ",";
+	    llen++;
+	  }
+	  fp << GeMethods::mnt_subgraph[j];
+	  llen += strlen(GeMethods::mnt_subgraph[j]);
+	}
       }
     }
     fp << '\n';
@@ -469,34 +521,55 @@ int GlowExportScript::polyline(GrowPolyLine* o)
   return 1;
 }
 
+static int text_size_to_idx(int size)
+{
+  if (size == 0)
+    return 0;
+  if (size == 1)
+    return 1;
+  if (size == 2)
+    return 2;
+  if (size <= 4)
+    return 3;
+  if (size <= 6)
+    return 4;
+  if (size <= 8)
+    return 5;
+  return 5;
+}
+
 int GlowExportScript::text(GrowText* o)
 {
   float x1, y1;
   int bold;
+  int textsize;
 
   if (o->draw_type == glow_eDrawType_TextHelveticaBold)
     bold = 1;
   else
     bold = 0;
+  textsize = text_size_to_idx(o->text_size);
 
   x1 = o->trf.x(o->p.x, o->p.y);
   y1 = o->trf.y(o->p.x, o->p.y);
 
   fp << "# Text " << o->n_name << " (" << x1 << "," << y1 << ")" << '\n';
   fp << "  id = CreateText(\"" << o->text << "\"," << dtostr(o->p.x) << "," << dtostr(o->p.y) << "," <<
-    o->text_size << "," << o->font << "," << bold << "," << o->color_drawtype << ");" << '\n';
+    textsize << "," << o->font << "," << bold << "," << o->color_drawtype << ");" << '\n';
   if (o->trf.is_modified())
     fp << "  SetObjectTransform(id," << dtostr(o->trf.a11) << "," << dtostr(o->trf.a12) << "," << dtostr(o->trf.a13) << "," 
         << dtostr(o->trf.a21) << "," << dtostr(o->trf.a22) << "," << dtostr(o->trf.a23) << "," << dtostr(o->trf.rotation) << ");" << '\n';
   if (!streq(o->n_name, ""))
     fp << "  SetObjectAttribute(id,\"Name\",\"" << o->n_name << "\");" << '\n';
 
-  fp << "  SetObjectTextSize(id," << o->text_size << ");" << '\n';
+#if 0
+  fp << "  SetObjectTextSize(id," << textsize << ");" << '\n';
   fp << "  SetObjectTextFont(id," << o->font <<  ");" << '\n';
   if (o->draw_type != glow_eDrawType_TextHelvetica)
     fp << "  SetObjectTextBold(id, 1);" << '\n';
   if (o->color_drawtype != glow_eDrawType_Line)
     fp << "  SetObjectTextColor(id," << o->color_drawtype << ");" << '\n';
+#endif
   if (o->adjustment != glow_eAdjustment_Left)
     fp << "  SetObjectAttribute(id,\"Adjustment\"," << (int)o->adjustment << ");" << '\n';
   if (!feq(o->transparency, 0.0))
@@ -892,9 +965,9 @@ int GlowExportScript::group(GrowGroup* o)
 
   fp << "  id = GroupSelected();" << '\n';
   
-  //if (o->trf.is_modified())
-  //  fp << "  SetObjectTransform(id," << dtostr(o->trf.a11) << "," << dtostr(o->trf.a12) << "," << dtostr(o->trf.a13) << "," 
-  //      << dtostr(o->trf.a21) << "," << dtostr(o->trf.a22) << "," << dtostr(o->trf.a23) << "," << dtostr(o->trf.rotation) << ");" << '\n';
+  if (o->trf.is_modified())
+    fp << "  SetObjectTransform(id," << dtostr(o->trf.a11) << "," << dtostr(o->trf.a12) << "," << dtostr(o->trf.a13) << "," 
+        << dtostr(o->trf.a21) << "," << dtostr(o->trf.a22) << "," << dtostr(o->trf.a23) << "," << dtostr(o->trf.rotation) << ");" << '\n';
 
   fp << "  SetObjectAttribute(id,\"Name\",\"" << o->n_name << "\");" << '\n';
   if (o->shadow)

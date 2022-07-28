@@ -221,6 +221,22 @@ void XttGe::message(char severity, const char* msg)
   }
 }
 
+void XttGe::get_current_colors_cb(void* ctx, glow_eDrawType* fill_color,
+      glow_eDrawType* border_color, glow_eDrawType* text_color)
+{
+  *fill_color = ((XttGe *)ctx)->default_fill_color;
+  *border_color = ((XttGe *)ctx)->default_border_color;
+  *text_color = ((XttGe *)ctx)->default_text_color;
+}
+
+void XttGe::set_current_colors_cb(void* ctx, glow_eDrawType fill_color,
+      glow_eDrawType border_color, glow_eDrawType text_color)
+{
+  ((XttGe *)ctx)->default_fill_color = fill_color;
+  ((XttGe *)ctx)->default_border_color = border_color;
+  ((XttGe *)ctx)->default_text_color = text_color;
+}
+
 int XttGe::set_object_focus(const char* name, int empty)
 {
   return graph->set_object_focus(name, empty);
@@ -584,7 +600,9 @@ XttGe::XttGe(void* xg_parent_ctx, const char* xg_name, const char* xg_filename,
       call_method_cb(0), get_current_objects_cb(xg_get_current_objects_cb),
       sound_cb(0), eventlog_cb(0), keyboard_cb(xg_keyboard_cb), namechanged_cb(0),
       width(xg_width), height(xg_height), options(xg_options), 
-      color_theme(xg_color_theme), wow(0)
+      color_theme(xg_color_theme), default_fill_color(glow_eDrawType_Line),
+      default_border_color(glow_eDrawType_Line), default_text_color(glow_eDrawType_Line),
+      wow(0)
 {
   strcpy(filename, xg_filename);
   strcpy(name, xg_name);

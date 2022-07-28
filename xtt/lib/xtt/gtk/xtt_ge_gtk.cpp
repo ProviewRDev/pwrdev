@@ -697,6 +697,8 @@ XttGeGtk::XttGeGtk(GtkWidget* xg_parent_wid, void* xg_parent_ctx,
       "pwrp_exe:", graph_eMode_Runtime, scrollbar, 1, object_name,
       use_default_access, access, 0, color_theme, dashboard, ge_keyboard_cb);
   // graph->set_scantime( scan_time);
+  graph->get_current_colors_cb = &get_current_colors_cb;
+  graph->set_current_colors_cb = &set_current_colors_cb;
   graph->message_cb = &message_cb;
   graph->close_cb = &graph_close_cb;
   graph->init_cb = &graph_init_cb;

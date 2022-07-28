@@ -2,6 +2,25 @@
 
 //GeScript = function() {
 
+  this.text_idx_to_size = function(idx) {
+    switch (idx) {
+    case 0:
+      return 0; 
+    case 1:
+      return 1; 
+    case 2:
+      return 2;
+    case 3:
+      return 4;
+    case 4:
+      return 6;
+    case 5:
+      return 8;
+    default:
+      return 8;
+    }
+  }
+
   this.setdefaultfill_func = function(self, filectx, arg_list,
 				      arg_count) {
     var ret = new ccm_tSysFuncReturn();
@@ -1198,7 +1217,8 @@ arg_count) {
 
     graph = graph_get_stored_graph();
 
-    graph.growapi.SetObjectTextSize(arg_list.value_int, arg_p2.value_int);
+    var textsize = graph.text_idx_to_size(arg_p2.value_int);
+    graph.growapi.SetObjectTextSize(arg_list.value_int, textsize);
     return ret;
   }
 
@@ -2273,6 +2293,7 @@ arg_count) {
 				     arg_count) {
     var ret = new ccm_tSysFuncReturn();
     var graph;
+    var color_theme;
 
     if (arg_count > 1) {
       ret.sts = CCM_.ARGMISM;
@@ -2288,8 +2309,13 @@ arg_count) {
 
     graph = graph_get_stored_graph();
   
-    if (arg_count > 0)
-      graph.growapi.UpdateColorTheme(graph.ctx, arg_list.value_int);
+
+    if (arg_count > 0) {
+      color_theme = arg_list.value_int;
+      if (color_theme === 0)
+        color_theme = 15;
+      graph.growapi.UpdateColorTheme(graph.ctx, color_theme);
+    }
     else
       graph.growapi.SetColorTheme(graph.ctx);
     return ret;
@@ -2772,10 +2798,10 @@ arg_count) {
 	ret.sts = CCM_.ARGMISM;
         return ret;
       }
-      textsize = arg_p4.value_int;
+      textsize = graph.text_idx_to_size(arg_p4.value_int);
     }
     else
-      textsize = graph.textsize;
+      textsize = graph.text_idx_to_size(graph.textsize);
 
     if (arg_count > 4) {
       arg_p5 = arg_p4.next;
@@ -2821,30 +2847,6 @@ arg_count) {
       drawtype = Glow.eDrawType_TextHelveticaBold;
     else
       drawtype = Glow.eDrawType_TextHelvetica;
-
-    switch (textsize) {
-    case 0:
-      textsize = 0;
-      break;
-    case 1:
-      textsize = 1;
-      break;
-    case 2:
-      textsize = 2;
-      break;
-    case 3:
-      textsize = 4;
-      break;
-    case 4:
-      textsize = 6;
-      break;
-    case 5:
-      textsize = 8;
-      break;
-    default:
-      textsize = 8;
-    }
-
 
     var n = graph.growapi.CreateGrowText(graph.ctx, "", arg_list.value_string, x, y, drawtype,
 			text_color, textsize, textfont, Glow.mDisplayLevel_1, null);
@@ -4335,6 +4337,55 @@ arg_count) {
     return ret;
   }
 
+  this.getwindowsize_func = function(self, filectx, arg_list, arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var arg_p2;
+
+    if (arg_count != 2)
+      return CCM_.ARGMISM;
+
+    arg_p2 = arg_list.next;
+    if (arg_list.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p2.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    arg_list.value_int = window.innerWidth;
+    arg_list.value_returned = 1;
+    arg_p2.value_int = window.innerHeight;
+    arg_p2.value_returned = 1;
+
+    return ret;
+  }
+
+  this.getui_env_func = function(self, filectx, arg_list, arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+
+    if (arg_count != 0)
+      return CCM_.ARGMISM;
+
+    ret.return_int = Glow.eUI_Env_Web;
+    ret.return_decl = CcmC.K_DECL_INT;
+    return ret;
+  }
+
+  this.getgraphconfig_func = function(self, filectx, arg_list, arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+
+    if (arg_count != 0)
+      return CCM_.ARGMISM;
+
+    graph = graph_get_stored_graph();
+    ret.return_int = graph.graphConfiguration;
+    ret.return_decl = CcmC.K_DECL_INT;
+    return ret;
+  }
+
 
   this.script_func_register = function() {
     var sts;
@@ -4443,7 +4494,15 @@ arg_count) {
     this.ccm.register_function("Ge", "CreateWindow", this.createwindow_func);
     this.ccm.register_function("Ge", "CreateToolbar", this.createtoolbar_func);
     this.ccm.register_function("Ge", "GetInstanceObject", this.getinstanceobject_func);
+    this.ccm.register_function("Ge", "GetWindowSize", this.getwindowsize_func);
+    this.ccm.register_function("Ge", "GetUI_Env", this.getui_env_func);
+    this.ccm.register_function("Ge", "GetGraphConfig", this.getgraphconfig_func);
   
+    sts = this.ccm.create_external_var(
+      "eUI_Env_Web", CcmC.K_DECL_INT, 0, Glow.eUI_Env_Web, 0);
+    sts = this.ccm.create_external_var(
+      "eUI_Env_Xtt", CcmC.K_DECL_INT, 0, Glow.eUI_Env_Xtt, 0);
+
     sts = this.ccm.create_external_var(
       "eObjectType_Rect", CcmC.K_DECL_INT, 0, Glow.eObjectType_GrowRect, 0);
     sts = this.ccm.create_external_var(

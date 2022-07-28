@@ -114,6 +114,12 @@ typedef enum {
   glow_eCtxType_Keyboard //!< Type is a virtual keyboard
 } glow_eCtxType;
 
+//! Type of Enviroment
+typedef enum {
+  glow_eUI_Env_Web,
+  glow_eUI_Env_Xtt
+} glow_eUI_Env;
+
 //! Policy when selecting an area with the select rectangle
 typedef enum {
   glow_eSelectPolicy_Surround, //!< All parts of an object has to be inside the
