@@ -2181,7 +2181,10 @@ int FlowDrawGtk::get_text_extent(FlowCtx* ctx, const char* text, int len,
   cairo_set_font_face(cr, get_font_face(gc_type));
   cairo_set_font_size(cr, size);
 
+  char c = ((char *)text)[len];
+  ((char *)text)[len] = 0;
   cairo_text_extents(cr, text, &extents);
+  ((char *)text)[len] = c;
   *width = extents.width;
   *height = extents.height;
 
