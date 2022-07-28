@@ -1,5 +1,5 @@
 Package: pwrdemo59
-Version: 5.9.0-2
+Version: 6.0.0-1
 Section: base
 Priority: optional
 Architecture: amd64
@@ -7,4 +7,4 @@ Depends: pwr59 (>= 5.9.0-2)
 Replaces:
 Maintainer: ProviewR <postmaster@proview.se>
 Description: ProviewR Demo Project package
- 5.9.0-1 Base release
+ 6.0.0-1 Base release

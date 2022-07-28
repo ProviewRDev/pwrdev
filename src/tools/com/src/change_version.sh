@@ -57,26 +57,21 @@ $pwre_croot/src/tools/pkg/deb/pwr/control \
 $pwre_croot/src/tools/pkg/deb/pwrdemo/control \
 $pwre_croot/src/tools/pkg/deb/pwrrt/control \
 $pwre_croot/src/tools/pkg/deb/pwrrpi/control \
-$pwre_croot/src/tools/pkg/deb/pwrsev/control \
 $pwre_croot/src/tools/pkg/ubu/pwr/control \
 $pwre_croot/src/tools/pkg/ubu/pwrdemo/control \
 $pwre_croot/src/tools/pkg/ubu/pwrrt/control \
 $pwre_croot/src/tools/pkg/ubu/pwrrpi/control \
-$pwre_croot/src/tools/pkg/ubu/pwrsev/control \
 $pwre_croot/src/tools/pkg/raspbian/pwr/control \
 $pwre_croot/src/tools/pkg/raspbian/pwrdemo/control \
 $pwre_croot/src/tools/pkg/raspbian/pwrrt/control \
-$pwre_croot/src/tools/pkg/raspbian/pwrsev/control \
 $pwre_croot/src/tools/pkg/deb_x86_64/pwr/control \
 $pwre_croot/src/tools/pkg/deb_x86_64/pwrdemo/control \
 $pwre_croot/src/tools/pkg/deb_x86_64/pwrrt/control \
-$pwre_croot/src/tools/pkg/deb_x86_64/pwrsev/control \
 $pwre_croot/src/tools/pkg/deb_armel/pwrrt/control \
 $pwre_croot/src/tools/pkg/ubu_x86_64/pwr/control \
 $pwre_croot/src/tools/pkg/ubu_x86_64/pwrdemo/control \
 $pwre_croot/src/tools/pkg/ubu_x86_64/pwrrt/control \
-$pwre_croot/src/tools/pkg/ubu_x86_64/pwrrpi/control \
-$pwre_croot/src/tools/pkg/ubu_x86_64/pwrsev/control"
+$pwre_croot/src/tools/pkg/ubu_x86_64/pwrrpi/control"
 
 if [ $1 == "-d" ]; then
   for file in $files; do
