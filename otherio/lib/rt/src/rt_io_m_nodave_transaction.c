@@ -87,7 +87,7 @@ static pwr_tStatus IoCardRead(
   pwr_sClass_Nodave_PLC* plcp = (pwr_sClass_Nodave_PLC*)rp->op;
   int res;
 
-  if (op->Continous == pwr_eYesNoEnum_No) {
+  if (op->Continuous == pwr_eYesNoEnum_No) {
     /* Only read if triggered by op */
     if (!op->SendOp)
       return IO__SUCCESS;
@@ -159,7 +159,7 @@ static pwr_tStatus IoCardWrite(
   pwr_sClass_Nodave_PLC* plcp = (pwr_sClass_Nodave_PLC*)rp->op;
   int res;
 
-  if (op->Continous == pwr_eYesNoEnum_No) {
+  if (op->Continuous == pwr_eYesNoEnum_No) {
     /* Only write if triggered by op */
     if (!op->SendOp)
       return IO__SUCCESS;

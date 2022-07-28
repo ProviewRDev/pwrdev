@@ -445,7 +445,7 @@ static pwr_tStatus mb_rtu_send_data(io_sRack* rp, io_sAgentLocal* local_master,
     for (i = 0; i < modules; i++) {
       sts = 1;
 
-      if (!modulep->Continous && !modulep->SendOp) {
+      if (!modulep->Continuous && !modulep->SendOp) {
         break;
       }
 

@@ -2690,14 +2690,14 @@ Volume OtherIO $ClassVolume 0.0.250.10
           EndBody
         EndObject
         !/**
-        ! @Summary Continous operation of the module.
+        ! @Summary Continuous operation of the module.
         ! If set to Yes the module is scanned cylically for each scan (read or write operation).
         ! If set to false the action defined by the FunctionCode-attribute will only be executed
         ! when the SendOp-attribute is set.
         !*/
-        Object Continous $Attribute 9 08-SEP-2008 14:44:22.43
+        Object Continuous $Attribute 9 08-SEP-2008 14:44:22.43
           Body SysBody 08-SEP-2008 14:45:19.10
-            Attr PgmName = "Continous"
+            Attr PgmName = "Continuous"
             Attr Size = 4
             Attr TypeRef = "pwrb:Type-YesNoEnum"
           EndBody
@@ -2785,7 +2785,7 @@ Volume OtherIO $ClassVolume 0.0.250.10
       EndObject
       Object Template Modbus_Module 2148761600 01-JAN-1970 01:00:00.00
         Body RtBody 16-MAR-2010 08:26:27.97
-          Attr Continous = 1
+          Attr Continuous = 1
           Attr ScanInterval = 1
           Attr Process = 1
         EndBody
@@ -2869,14 +2869,14 @@ Volume OtherIO $ClassVolume 0.0.250.10
           EndBody
         EndObject
         !/**
-        ! @Summary Continous operation of the module.
+        ! @Summary Continuous operation of the module.
         ! If set to Yes the module is scanned cylically for each scan (read or write operation).
         ! If set to false the action defined by the FunctionCode-attribute will only be executed
         ! when the SendOp-attribute is set.
         !*/
-        Object Continous $Attribute 17 17-OCT-2011 08:03:36.21
+        Object Continuous $Attribute 17 17-OCT-2011 08:03:36.21
           Body SysBody 17-OCT-2011 08:03:36.21
-            Attr PgmName = "Continous"
+            Attr PgmName = "Continuous"
             Attr Size = 4
             Attr TypeRef = "pwrb:Type-YesNoEnum"
           EndBody
@@ -3028,9 +3028,9 @@ Volume OtherIO $ClassVolume 0.0.250.10
       Object Template Modbus_ModuleReadWrite 2154790912 01-JAN-1970 01:00:00.00
         Body RtBody 17-OCT-2011 08:07:19.24
           Attr Process = 1
-          Attr Read.Continous = 1
+          Attr Read.Continuous = 1
           Attr Read.ScanInterval = 1
-          Attr Write.Continous = 1
+          Attr Write.Continuous = 1
           Attr Write.ScanInterval = 1
         EndBody
       EndObject
@@ -4122,14 +4122,14 @@ Volume OtherIO $ClassVolume 0.0.250.10
           EndBody
         EndObject
         !/**
-        ! @Summary Continous operation of the module.
+        ! @Summary Continuous operation of the module.
         ! If set to Yes the module is scanned cylically for each scan (read or write operation).
         ! If set to false the action defined by the FunctionCode-attribute will only be executed
         ! when the SendOp-attribute is set.
         !*/
-        Object Continous $Attribute 17 18-OCT-2011 11:18:07.74
+        Object Continuous $Attribute 17 18-OCT-2011 11:18:07.74
           Body SysBody 18-OCT-2011 11:18:07.74
-            Attr PgmName = "Continous"
+            Attr PgmName = "Continuous"
             Attr Size = 4
             Attr TypeRef = "pwrb:Type-YesNoEnum"
           EndBody
@@ -4217,7 +4217,7 @@ Volume OtherIO $ClassVolume 0.0.250.10
       EndObject
       Object Template Modbus_RTU_Module 2155839488 01-JAN-1970 01:00:00.00
         Body RtBody 18-OCT-2011 11:30:53.55
-          Attr Continous = 1
+          Attr Continuous = 1
           Attr ScanInterval = 1
           Attr Process = 1
         EndBody
@@ -8743,14 +8743,14 @@ Volume OtherIO $ClassVolume 0.0.250.10
           EndBody
         EndObject
         !/**
-        ! @Summary Continous operation of the module.
+        ! @Summary Continuous operation of the module.
         ! If set to Yes the module is scanned cylically for each scan (read or write operation).
         ! If set to false the action defined by the FunctionCode-attribute will only be executed
         ! when the SendOp-attribute is set.
         !*/
-        Object Continous $Attribute 9 28-FEB-2012 08:50:33.38
+        Object Continuous $Attribute 9 28-FEB-2012 08:50:33.38
           Body SysBody 28-FEB-2012 08:50:33.38
-            Attr PgmName = "Continous"
+            Attr PgmName = "Continuous"
             Attr Size = 4
             Attr TypeRef = "pwrb:Type-YesNoEnum"
           EndBody
@@ -8819,7 +8819,7 @@ Volume OtherIO $ClassVolume 0.0.250.10
         Body RtBody 28-FEB-2012 08:51:43.87
           Attr Process = 1
           Attr Area = 132
-          Attr Continous = 1
+          Attr Continuous = 1
         EndBody
       EndObject
     EndObject

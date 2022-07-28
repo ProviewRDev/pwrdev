@@ -449,7 +449,7 @@ pwr_tStatus mb_send_data(io_sRackLocal* local, io_sRack* rp,
     for (i = 0; i < modules; i++) {
       sts = 1;
 
-      if (!mp->Continous && !mp->SendOp) {
+      if (!mp->Continuous && !mp->SendOp) {
         break;
       }
 
