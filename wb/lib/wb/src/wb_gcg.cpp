@@ -9684,6 +9684,8 @@ int gcg_comp_m35(gcg_ctx gcgctx, vldh_t_node node)
 
         if (output_bodydef.Par->Output.Info.Type == pwr_eType_DataRef)
           strcpy(cast, "(pwr_tVoid *)");
+	else
+	  strcpy(cast, "");
         IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = %s&%c%s->%s;\n",
             GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid),
 	    bodydef[i].Par->Param.Info.PgmName, cast, output_prefix,
