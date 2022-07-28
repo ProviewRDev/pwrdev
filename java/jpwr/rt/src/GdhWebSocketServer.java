@@ -59,6 +59,7 @@ import javax.swing.*;
 */
 public class GdhWebSocketServer
 {
+  public final static int SOCKETSERVER_VERSION = 101;
   public final static int graph_eType_Bit = (1 << 15) + 1;
   public final static int SET_OBJECT_INFO_BOOLEAN = 1;
   public final static int SET_OBJECT_INFO_FLOAT = 2;
@@ -133,6 +134,7 @@ public class GdhWebSocketServer
   public final static int GET_DSTRENDCURVE_BUFFER = 71;
   public final static int GET_SEVHIST_INFO = 72;
   public final static int GET_SEVHIST_DATA = 73;
+  public final static int GET_SOCKETSERVER_VERSION = 74;
 
   public final static int GET_OP_SELF = 1;
   public final static int GET_OP_METHOD_PLC = 2;
@@ -221,6 +223,7 @@ public class GdhWebSocketServer
       public int type;
       public String text;
       public String name;
+      public String object;
       public String url;
   }
 
@@ -2396,6 +2399,11 @@ public class GdhWebSocketServer
 					  button.name = ret.str;
 				      else
 					  button.name = "";
+				      ret = gdh.getObjectInfoString(childName + ".Object");
+				      if (ret.oddSts())
+					  button.object = ret.str;
+				      else
+					  button.object = "";
 				      button.url = "";
 				      v.add( button);
 				      break;
@@ -2448,6 +2456,8 @@ public class GdhWebSocketServer
 			      refsize += ve.text.length();
 			      refsize += 2; // name length
 			      refsize += ve.name.length();
+			      refsize += 2; // object length
+			      refsize += ve.object.length();
 			      refsize += 2;  // url length
 			      refsize += ve.url.length();
 			  }
@@ -2529,6 +2539,10 @@ public class GdhWebSocketServer
 			      j += 2;
 			      for ( int k = 0; k < ve.name.length(); k++)
 				  bb.put( j++, (byte)ve.name.charAt(k));
+			      bb.putShort( j, (short)ve.object.length());
+			      j += 2;
+			      for ( int k = 0; k < ve.object.length(); k++)
+				  bb.put( j++, (byte)ve.object.charAt(k));
 			      bb.putShort( j, (short)ve.url.length());
 			      j += 2;
 			      for ( int k = 0; k < ve.url.length(); k++) {
@@ -3475,6 +3489,39 @@ public class GdhWebSocketServer
 		  }
 		  break;
 	      }
+	      case GET_SOCKETSERVER_VERSION:
+		  try {
+		      int sts = 1;
+		      if ( debug)
+			  System.out.println( "getSocketServerVersion: " + id + " version: " + SOCKETSERVER_VERSION);
+	      
+		      byte[] msg = new byte[15];
+		      msg[0] = (byte)130;
+		      msg[1] = 13;
+		      msg[2] = GET_SOCKETSERVER_VERSION;
+		      msg[3] = (byte)(id >> 24);
+		      msg[4] = (byte)((id >> 16) & 0xFF);
+		      msg[5] = (byte)((id >> 8) & 0xFF);
+		      msg[6] = (byte)(id & 0xFF);
+		      msg[7] = (byte)(sts >> 24);
+		      msg[8] = (byte)((sts >> 16) & 0xFF);
+		      msg[9] = (byte)((sts >> 8) & 0xFF);
+		      msg[10] = (byte)(sts & 0xFF);
+		      msg[11] = (byte)(SOCKETSERVER_VERSION >> 24);
+		      msg[12] = (byte)((SOCKETSERVER_VERSION >> 16) & 0xFF);
+		      msg[13] = (byte)((SOCKETSERVER_VERSION >> 8) & 0xFF);
+		      msg[14] = (byte)(SOCKETSERVER_VERSION & 0xFF);
+
+		      if ( debug)
+			  System.out.println( "Sending: " + msg);
+		      out.write( msg);
+		      out.flush();
+		  }
+		  catch(IOException e) {
+		      System.out.println("getObjectInfoInt: IO exception");
+		  }
+
+		  break;
 	      default:
 		  System.out.println("Unknown function code received: " + value[0]);
 	      }

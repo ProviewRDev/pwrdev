@@ -43,6 +43,7 @@ function OpWindMenu() {
 
   this.gdh_init_cb = function() {
     var oid = new PwrtObjid( 0, 0);
+    //self.gdh.getSocketServerVersion(self.get_version_cb, self);
     self.user = "Default";
     self.gdh.login( "", "", self.login_cb, self);
     self.gdh.getOpwindMenu( self.get_opplace(), self.get_menu_cb, 999);
@@ -61,6 +62,7 @@ function OpWindMenu() {
   };
 
   this.get_menu_cb = function( id, data, sts, result) {
+    console.log("get menu version", self.gdh.serverVersion());
     self.info = result;
     console.log( "Menu received", sts, data, result.buttons.length);
     var context = document.getElementById("opwindmenu");
@@ -213,7 +215,11 @@ function OpWindMenu() {
 	      var n = name.indexOf(".pwg");
 	      if ( n != -1)
 		name = name.substring(0,n);
-	      var url = "ge.html?graph=" + name;
+              var url;
+   	      if (self.info.buttons[i].object != null && self.info.buttons[i].object != "")
+	        url = "ge.html?graph=" + name + "&instance=" + self.info.buttons[i].object;
+              else
+	        url = "ge.html?graph=" + name;
 	    }
 	    else {
 	      var url = self.info.buttons[i].url;
@@ -238,6 +244,13 @@ function OpWindMenu() {
 	}
       }
     }
+  };
+
+  this.get_version_cb = function( id, data, sts, result) {
+    if ( sts & 1)
+      console.log("Version", result);
+    else
+      console.log("Version unknown");
   };
 
   this.login_cb = function( id, data, sts, result) {

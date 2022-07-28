@@ -52,6 +52,9 @@ var Glow = {
   eCtxType_ColPal		: 3,
   eCtxType_Curve		: 4,
 
+  eUI_Env_Xtt		: 0,
+  eUI_Env_Web		: 1,
+
   eSelectPolicy_Surround     	: 5,
   eSelectPolicy_Partial      	: 6,
   eSelectPolicy_Both		: 7,

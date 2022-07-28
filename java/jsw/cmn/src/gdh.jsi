@@ -34,6 +34,7 @@ function MenuButton() {
   this.type;
   this.text;
   this.name;
+  this.object;
   this.url;
 }
 
@@ -165,7 +166,8 @@ function Gdh() {
     GET_DSTRENDCURVE_INFO       : 70,
     GET_DSTRENDCURVE_BUFFER     : 71,
     GET_SEVHIST_INFO    	: 72,
-    GET_SEVHIST_DATA    	: 73
+    GET_SEVHIST_DATA    	: 73,
+    GET_SOCKETSERVER_VERSION    : 74
   };
 
   this.debug = false;
@@ -182,6 +184,7 @@ function Gdh() {
   this.listContinue = false;
   this.listCnt = 0;
   this.listId = 0;
+  this.version = 100;
 
   this.init = function() {
     if ( window.location.hostname === "")
@@ -192,6 +195,7 @@ function Gdh() {
     this.ws.gdh = this;
 
     this.ws.onopen = function( e) {
+      this.gdh.getServerVersion();
       if ( this.gdh.open_cb !== null)
         this.gdh.open_cb();
     };
@@ -682,6 +686,15 @@ function Gdh() {
 		for ( var k = 0; k < nsize; k++) {
 		  iarr[k] = dv.getUint8(j++);
 		}
+	        if (this.gdh.version > 100) {
+		  button.object = String.fromCharCode.apply( null, iarr);
+		  nsize = dv.getUint16(j);
+		  j += 2;
+		  iarr = new Uint8Array( nsize);
+		  for ( var k = 0; k < nsize; k++) {
+		    iarr[k] = dv.getUint8(j++);
+		  }
+                }
 		button.url = String.fromCharCode.apply( null, iarr);
 		result.buttons.push(button);
 	      }
@@ -1062,6 +1075,11 @@ function Gdh() {
 	    var pending_data = this.gdh.pending[id];
 	    pending_data.func_cb( id, pending_data.data, sts, result);
 	    delete this.gdh.pending[id];
+	    break;
+	  }
+	  case Msg.GET_SOCKETSERVER_VERSION: {
+	    if ( this.gdh.debug) console.log("GetSocketServerVersion received");
+            this.gdh.version = dv.getInt32(9);
 	    break;
 	  }
 	  default:
@@ -1832,5 +1850,21 @@ function Gdh() {
     this.ws.send(buf);
     this.next_id++;
   };
+
+  this.serverVersion = function() {
+    return this.version;
+  }
+
+  this.getServerVersion = function() {
+    var buf = new Uint8Array(6);
+    buf[0] = Msg.GET_SOCKETSERVER_VERSION;
+    buf[2] = this.next_id & 0xFF;
+    buf[3] = (this.next_id >> 8) & 0xFF;
+    buf[4] = (this.next_id >> 16) & 0xFF;
+    buf[5] = (this.next_id >> 24) & 0xFF;
+    this.ws.send(buf);
+    this.next_id++;
+  };
+
 }
 /** End Gdh **/
