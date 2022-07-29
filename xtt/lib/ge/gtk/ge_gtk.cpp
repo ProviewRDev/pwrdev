@@ -3088,6 +3088,7 @@ GeGtk::GeGtk(void* x_parent_ctx, GtkWidget* x_parent_widget,
 
   // Horizontal pane
   GtkWidget* hpaned = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
+  gtk_paned_set_wide_handle(GTK_PANED(hpaned), TRUE);
   gtk_paned_pack1(GTK_PANED(hpaned), grow_widget, TRUE, TRUE);
   gtk_paned_pack2(GTK_PANED(hpaned), vpaned2, FALSE, TRUE);
   gtk_widget_show(vpaned1);
