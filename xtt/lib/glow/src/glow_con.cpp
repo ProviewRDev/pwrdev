@@ -177,6 +177,7 @@ GlowCon::GlowCon(GrowCtx* glow_ctx, const char* name, GlowConClass* con_class,
       point_y[i] = y_vect[i];
     }
   }
+  ctx->set_nodraw();
   source->get_conpoint(source_cp, &src_x, &src_y, &source_direction);
   dest->get_conpoint(dest_cp, &dest_x, &dest_y, &dest_direction);
   switch (cc->con_type) {
@@ -388,6 +389,7 @@ GlowCon::GlowCon(GrowCtx* glow_ctx, const char* name, GlowConClass* con_class,
     ref_a.draw(&ctx->mw, &cc->zero, highlight, hot, NULL);
     ref_a.draw(&ctx->navw, &cc->zero, highlight, 0, NULL);
   }
+  ctx->reset_nodraw();
 
   strcpy(n_name, name);
   get_con_borders();
@@ -649,6 +651,7 @@ void GlowCon::reconfigure()
     return;
   }
 
+  ctx->set_nodraw();
   switch (cc->con_type) {
   case glow_eConType_Straight:
     l1 = (GlowLine*)line_a[0];
@@ -710,6 +713,7 @@ void GlowCon::reconfigure()
     break;
   }
   }
+  ctx->reset_nodraw();
   get_con_borders();
   ctx->draw(&ctx->mw,
       x_left * ctx->mw.zoom_factor_x - ctx->mw.offset_x - DRAW_MP,
