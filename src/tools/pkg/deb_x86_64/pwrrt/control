@@ -4,7 +4,7 @@ Section: base
 Priority: optional
 Architecture: amd64
 Depends: libc6 (>= 2.31-13+deb11u2),
- libgtk2.0-0 (>= 2.24.33-2),
+ libgtk-3-0 (>= 3.24.24-4),
  libasound2 (>= 1.2.4-1.1),
  librsvg2-2 (>= 2.50.3+dfsg-1),
  libdb5.3 (>=5.3.28+dfsg1-0.8),
