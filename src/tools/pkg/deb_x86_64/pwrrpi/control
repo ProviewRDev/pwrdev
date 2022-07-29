@@ -1,10 +1,10 @@
-Package: pwrrpi59
-Version: 5.9.0-2
+Package: pwrrpi60
+Version: 6.0.0-1
 Section: base
 Priority: optional
 Architecture: amd64
-Depends: pwr59 (>= 5.9.0-2)
-Replaces: pwr59
+Depends: pwr60 (>= 6.0.0-1)
+Replaces: pwr60
 Maintainer: ProviewR <postmaster@proview.se>
 Description: ProviewR RPI development package
- 5.9.0-1 Base release
+ 6.0.0-1 Base release

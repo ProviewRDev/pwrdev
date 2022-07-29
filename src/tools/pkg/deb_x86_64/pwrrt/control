@@ -17,7 +17,7 @@ Depends: libc6 (>= 2.31-13+deb11u2),
  xfonts-100dpi,
  xterm,
  libmariadb3 (>=1:10.5.12-0+deb11u1)
-Replaces: pwr34,pwr39,pwr40,pwr41,pwr42,pwr43,pwr44,pwr45,pwr46,pwr47,pwr48,pwr50,pwr51,pwr52,pwr53,pwr54,pwr55,pwr56,pwr57,pwr58
+Replaces: pwr34,pwr39,pwr40,pwr41,pwr42,pwr43,pwr44,pwr45,pwr46,pwr47,pwr48,pwr50,pwr51,pwr52,pwr53,pwr54,pwr55,pwr56,pwr57,pwr58,pwr59
 Maintainer: Proview <postmaster@proview.se>
 Description:
  6.0.0-1 Base release

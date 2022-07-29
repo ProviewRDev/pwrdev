@@ -1,4 +1,4 @@
-Package: pwr59
+Package: pwr60
 Version: 6.0.0-1
 Section: base
 Priority: optional
@@ -16,7 +16,7 @@ Depends: libc6 (>= 2.31-13),
  librabbitmq4 (>= 0.10.0-1), 
  libhdf5-openmpi-103 (>= 1.10.6+repack-4+deb11u1), 
  libusb-1.0-0 (>= 2:1.0.24-3)
-Replaces: pwrrt,pwr34,pwr39,pwr40,pwr41,pwr42,pwr43,pwr44,pwr45,pwr46,pwr47,pwr48,pwr50,pwr51,pwr52,pwr53,pwr54,pwr55,pwr56,pwr57,pwr58
+Replaces: pwrrt,pwr34,pwr39,pwr40,pwr41,pwr42,pwr43,pwr44,pwr45,pwr46,pwr47,pwr48,pwr50,pwr51,pwr52,pwr53,pwr54,pwr55,pwr56,pwr57,pwr58,pwr59
 Maintainer: ProviewR <postmaster@proview.se>
 Description: ProviewR development and runtime environment package
  6.0.0-1 Base release
