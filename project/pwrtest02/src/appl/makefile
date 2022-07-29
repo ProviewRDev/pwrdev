@@ -24,7 +24,7 @@ $(pwrp_exe)/wa_ldhtest : $(pwrp_appl)/wa_ldhtest.cpp
 	$(pwre_conf_libpwrwb) \
 	$(pwre_conf_libpwrxtt) $(pwre_conf_libpwrwbgtk) $(pwre_conf_libpwrwb) \
 	$(pwre_conf_libpwrxttgtk) $(pwre_conf_libpwrxtt) \
-	`pkg-config --libs gtk+-3.0` \
+	`pkg-config --libs gtk+-2.0` \
 	$(pwre_conf_libpwrrt) $(pwre_conf_libwb) $(pwre_conf_lib) $(asan)
 
 $(pwrp_exe)/wa_pwrwbtest.py : $(pwrp_appl)/wa_pwrwbtest.py
