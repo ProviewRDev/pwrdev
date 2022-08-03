@@ -895,7 +895,9 @@ function Dyn( graph) {
 
   this.repaintNow = false;
   this.ignoreColor = false;
+  this.ignoreInvisible = false;
   this.resetColor = false;
+  this.resetInvisible = false;
   this.ignoreBgColor = false;
   this.resetBgColor = false;
 
@@ -1901,6 +1903,8 @@ function Dyn( graph) {
     this.repaintNow = false;
     this.ignoreColor = false;
     this.resetColor = false;
+    this.ignoreInvisible = false;
+    this.resetInvisible = false;
     this.ignoreBgColor = false;
     this.resetBgColor = false;
     
@@ -2079,90 +2083,120 @@ function Dyn( graph) {
     if ( this.elements === null)
       return DynC.eValueInput_Error;
 
-    var e = object;
+    this.inputStr = str;
+    this.e = object;
 
-    var ctx_popped = e.dyn.graph.ctxPop( object.dyn.object.ctx);	
+    this.ctx_popped = this.e.dyn.graph.ctxPop( object.dyn.object.ctx);	
 
     var sts = null;
     var minval = 0;
     var maxval = 0;
-    if ( e.minvalue_attr !== null) {
+    if ( this.e.minvalue_attr !== null) {
 
-      var pname = e.dyn.parseAttrName( e.minvalue_attr);
+      var pname = this.e.dyn.parseAttrName( this.e.minvalue_attr);
       if ( pname !== null && pname.type == Pwr.eType_Float32) {
-	/** TODO
-	CdhrFloat ret = e.dyn.graph.getGdh().getObjectInfoFloat( pname.name);
-	if ( ret.evenSts()) {
-	  if ( ctx_popped)
-	    e.dyn.graph.ctxPush();
-	  return DynC.eValueInput_Error;
-	}
-	minval = ret.value;
-        **/
+	this.e.dyn.graph.getGdh().getObjectInfoFloat(pname.name,
+	    this.valueInputAction2, this);
+        return 1;
       }
       else 
-        minval = e.min_value;
+        this.minval = this.e.min_value;
     }
     else
-      minval = e.min_value;
+      this.minval = this.e.min_value;
 
-    if ( e.maxvalue_attr !== null) {
-      var pname = e.dyn.parseAttrName( e.maxvalue_attr);
+    if ( this.e.maxvalue_attr !== null) {
+      var pname = this.e.dyn.parseAttrName( this.e.maxvalue_attr);
       if ( pname === null || pname.name === "") 
-	maxval = e.max_value;
+	maxval = this.e.max_value;
       else {
 	if ( pname.type == Pwr.eType_Float32) {
-	  /** TODO
-	  CdhrFloat ret = e.dyn.graph.getGdh().getObjectInfoFloat( pname.name);
-	  if ( ret.evenSts()) {
-	    if ( ctx_popped)
-	      e.dyn.graph.ctxPush();
-	    return DynC.eValueInput_Error;
-	  }
-	  maxval = ret.value;
-	  **/
+	  this.e.dyn.graph.getGdh().getObjectInfoFloat(pname.name,
+	      this.valueInputAction3, this);
         }
 	else
-	  maxval = e.max_value;
+	  this.maxval = this.e.max_value;
       }
     }
     else
-      maxval = e.max_value;
+      this.maxval = this.e.max_value;
 
-    switch ( e.a_typeid) {
+    this.valueInputAction4();
+  }
+
+  this.valueInputAction2 = function(id, self, sts, value) {
+    self.minval = value;
+
+    if (self.e.maxvalue_attr !== null) {
+      var pname = self.e.dyn.parseAttrName( self.e.maxvalue_attr);
+      if ( pname === null || pname.name === "") 
+	self.maxval = self.e.max_value;
+      else {
+	if ( pname.type == Pwr.eType_Float32) {
+	  self.e.dyn.graph.getGdh().getObjectInfoFloat(pname.name,
+	      self.valueInputAction3, self);
+          return 1;
+        }
+	else
+	  self.maxval = self.e.max_value;
+      }
+    }
+    else
+      self.maxval = self.e.max_value;
+
+    self.valueInputAction4();
+  }
+
+  this.valueInputAction3 = function(id, self, sts, value) {
+    self.maxval = value;
+    self.valueInputAction4();
+  }
+
+  this.valueInputAction4 = function() {
+
+    switch ( this.e.a_typeid) {
     case Pwr.eType_Float32: {
-      var inputValue = parseFloat( str.trim());
-      if ( !(minval == 0 && maxval == 0) && inputValue < minval) {
-	if ( ctx_popped)
-	  e.dyn.graph.ctxPush();
+      var inputValue = parseFloat( this.inputStr.trim());
+      if (Number.isNaN(inputValue)) {
+	if ( this.ctx_popped)
+	  this.e.dyn.graph.ctxPush();
+        window.alert("Syntax error");
+	return DynC.eValueInput_SyntaxError;
+      }
+      if ( !(this.minval == 0 && this.maxval == 0) && inputValue < this.minval) {
+	if ( this.ctx_popped)
+	  this.e.dyn.graph.ctxPush();
+        window.alert("Min value exceeded");
 	return DynC.eValueInput_MinValueExceeded;
       }
-      if ( !(minval == 0 && maxval == 0) && inputValue > maxval) {
-	if ( ctx_popped)
-	  e.dyn.graph.ctxPush();
+      if ( !(this.minval == 0 && this.maxval == 0) && inputValue > this.maxval) {
+	if ( this.ctx_popped)
+	  this.e.dyn.graph.ctxPush();
+        window.alert("Max value exceeded");
 	return DynC.eValueInput_MaxValueExceeded;
       }
 		
-      var pname = e.dyn.parseAttrName(e.value_element.attribute);
+      var pname = this.e.dyn.parseAttrName(this.e.value_element.attribute);
       if ( pname === null || pname.name === "")
 	break;
 		    
+      var sts;
       switch ( pname.database) {
       case GraphIfc.eDatabase_Gdh:
-	sts = e.dyn.graph.getGdh().setObjectInfoFloat( pname.name, inputValue);
+	sts = this.e.dyn.graph.getGdh().setObjectInfoFloat( pname.name, inputValue);
 	break;
       case GraphIfc.eDatabase_Local:
-	sts = e.dyn.graph.getLdb().setObjectInfo( graph, pname.name, inputValue);
+	sts = this.e.dyn.graph.getLdb().setObjectInfo( graph, pname.name, inputValue);
 	break;
       default:
-	if ( ctx_popped)
-	  e.dyn.graph.ctxPush();
+	if ( this.ctx_popped)
+	  this.e.dyn.graph.ctxPush();
 	return DynC.eValueInput_Error;
       }
       if ( sts.evenSts()) {
 	console.log( "setObjectInfoError " + sts);
-	if ( ctx_popped)
-	  e.dyn.graph.ctxPush();
+	if ( this.ctx_popped)
+	  this.e.dyn.graph.ctxPush();
 	return DynC.eValueInput_Error;
       }
       break;
@@ -2173,44 +2207,59 @@ function Dyn( graph) {
     case Pwr.eType_UInt16:
     case Pwr.eType_Int8:
     case Pwr.eType_UInt8: {
-      var inputValue = parseInt( str.trim(), 10);
-      if ( !(minval == 0 && maxval == 0) && inputValue < minval) {
-	if ( ctx_popped)
-	  e.dyn.graph.ctxPush();
+      var inputValue = parseInt( this.inputStr.trim(), 10);
+      if (Number.isNaN(inputValue)) {
+	if ( this.ctx_popped)
+	  this.e.dyn.graph.ctxPush();
+        window.alert("Syntax error");
+	return DynC.eValueInput_SyntaxError;
+      }
+      if ( !(this.minval == 0 && this.maxval == 0) && inputValue < this.minval) {
+	if ( this.ctx_popped)
+	  this.e.dyn.graph.ctxPush();
+        window.alert("Min value exceeded");
 	return DynC.eValueInput_MinValueExceeded;
       }
-      if ( !(minval == 0 && maxval == 0) && inputValue > maxval ) {
-	if ( ctx_popped)
-	  e.dyn.graph.ctxPush();
+      if ( !(this.minval == 0 && this.maxval == 0) && inputValue > this.maxval ) {
+	if ( this.ctx_popped)
+	  this.e.dyn.graph.ctxPush();
+        window.alert("Max value exceeded");
 	return DynC.eValueInput_MaxValueExceeded;
       }
       
-      var pname = e.dyn.parseAttrName(e.value_element.attribute);
+      var pname = this.e.dyn.parseAttrName(this.e.value_element.attribute);
       if ( pname === null || pname.name === "")
 	break;
       
       switch ( pname.database) {
       case GraphIfc.eDatabase_Gdh:
-	sts = e.dyn.graph.getGdh().setObjectInfoInt( pname.name, inputValue);
+	sts = this.e.dyn.graph.getGdh().setObjectInfoInt( pname.name, inputValue);
 	break;
       case GraphIfc.eDatabase_Local:
-	sts = e.dyn.graph.getLdb().setObjectInfo( graph, pname.name, inputValue);
+	sts = this.e.dyn.graph.getLdb().setObjectInfo( graph, pname.name, inputValue);
 	break;
       default:
-	if ( ctx_popped)
-	  e.dyn.graph.ctxPush();
+	if ( this.ctx_popped)
+	  this.e.dyn.graph.ctxPush();
 	return DynC.eValueInput_Error;
       }
       if ( sts.evenSts()) {
 	console.log( "setObjectInfoError " + sts);
-	if ( ctx_popped)
-	  e.dyn.graph.ctxPush();
+	if ( this.ctx_popped)
+	  this.e.dyn.graph.ctxPush();
 	return DynC.eValueInput_Error;
       }		
       break;
     }
     case Pwr.eType_Boolean: {
-      var inputValueInt = parseInt( str.trim(), 10);
+      var inputValueInt = parseInt( this.inputStr.trim(), 10);
+      if (Number.isNaN(inputValueInt)) {
+	if ( this.ctx_popped)
+	  this.e.dyn.graph.ctxPush();
+        window.alert("Syntax error");
+	return DynC.eValueInput_SyntaxError;
+      }
+
       var inputValue;
       if ( inputValueInt === 0)
 	inputValue = false;
@@ -2221,58 +2270,58 @@ function Dyn( graph) {
 
       // valueElement.oldValueB = inputValue;
 
-      var pname = e.dyn.parseAttrName(e.value_element.attribute);
+      var pname = this.e.dyn.parseAttrName(this.e.value_element.attribute);
       if ( pname === null || pname.name === "")
 	break;
 		    
       switch ( pname.database) {
       case GraphIfc.eDatabase_Gdh:
-	sts = e.dyn.graph.getGdh().setObjectInfoBoolean( pname.name, inputValue);
+	sts = this.e.dyn.graph.getGdh().setObjectInfoBoolean( pname.name, inputValue);
 	break;
       case GraphIfc.eDatabase_Local:
-	sts = e.dyn.graph.getLdb().setObjectInfo( graph, pname.name, inputValue);
+	sts = this.e.dyn.graph.getLdb().setObjectInfo( graph, pname.name, inputValue);
 	break;
       default:
 	return DynC.eValueInput_Error;
       }
       if ( sts.evenSts()) {
 	console.log( "setObjectInfoError " + sts);
-	if ( ctx_popped)
-	  e.dyn.graph.ctxPush();
+	if ( this.ctx_popped)
+	  this.e.dyn.graph.ctxPush();
 	return DynC.eValueInput_Error;
       }
       break;
     }
     case Pwr.eType_String: {
-      // valueElement.oldValueS = str;
+      // valueElement.oldValueS = this.inputStr;
 
-      var pname = e.dyn.parseAttrName(e.value_element.attribute);
+      var pname = this.e.dyn.parseAttrName(this.e.value_element.attribute);
       if ( pname === null || pname.name === "")
 	break;
 		    
       switch ( pname.database) {
       case GraphIfc.eDatabase_Gdh:
-	sts = e.dyn.graph.getGdh().setObjectInfoString( pname.name, str);
+	sts = this.e.dyn.graph.getGdh().setObjectInfoString( pname.name, this.inputStr);
 	break;
       case GraphIfc.eDatabase_Local:
-	sts = e.dyn.graph.getLdb().setObjectInfo( graph, pname.name, str);
+	sts = this.e.dyn.graph.getLdb().setObjectInfo( graph, pname.name, this.inputStr);
 	break;
       default:
-	if ( ctx_popped)
-	  e.dyn.graph.ctxPush();
+	if ( this.ctx_popped)
+	  this.e.dyn.graph.ctxPush();
 	return DynC.eValueInput_Error;
       }
       if ( sts.evenSts()) {
 	console.log( "setObjectInfoError " + sts);
-	if ( ctx_popped)
-	  e.dyn.graph.ctxPush();
+	if ( this.ctx_popped)
+	  this.e.dyn.graph.ctxPush();
 	return DynC.eValueInput_Error;
       }
       break;
     }
     }
-    if ( ctx_popped)
-      e.dyn.graph.ctxPush();
+    if ( this.ctx_popped)
+      this.e.dyn.graph.ctxPush();
 
     return DynC.eValueInput_Success;
   };
@@ -3329,7 +3378,7 @@ function DynInvisible( dyn, instance) {
       return;
     }
 
-    if ( !this.a.sts || this.dyn.ignoreColor)
+    if ( !this.a.sts || this.dyn.ignoreInvisible)
       return;
     var value = this.dyn.getDig( this.a.p, this.a.typeid, this.a.bitmask, this.a.database);
 
@@ -3341,10 +3390,11 @@ function DynInvisible( dyn, instance) {
       value = !value;
 
     if ( !this.firstScan) {
-      if ( this.a.oldValue == value && !this.dyn.resetColor) {
+      if ( this.a.oldValue == value && !this.dyn.resetInvisible) {
 	// No change since last time
-	if ( !value)
-	  return;
+	if ( value)
+	  this.dyn.ignoreInvisible;
+	return;
       }
     }
     else
@@ -3355,9 +3405,13 @@ function DynInvisible( dyn, instance) {
 	o.setVisibility( Glow.eVis_Invisible);
       else
 	o.setVisibility( Glow.eVis_Dimmed);
+      this.dyn.ignoreColor = true;
+      this.dyn.ignoreInvisible = true;
     }
     else {
       o.setVisibility( Glow.eVis_Visible);
+      this.dyn.resetColor = true;
+      this.dyn.resetInvisible = true;
     }
     this.dyn.repaintNow = true;
     this.a.oldValue = value;
@@ -18729,7 +18783,8 @@ function Appl() {
 	      }
         					
 	      graphName = cli.getQualValue("cli_arg2").toLowerCase();
-	      if ( graphName.charAt(".pwg") == -1)
+
+	      if ( graphName.charAt(".pwg") == -1 && graphName[0] != '@')
 		graphName = graphName + ".pwg";
 
 	      var href;
