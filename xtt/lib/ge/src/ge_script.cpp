@@ -1615,8 +1615,10 @@ static int graph_setgraphattribute_func(void* filectx, ccm_sArg* arg_list,
   }
   
   grow_FreeSubGraphAttrInfo(grow_info_sub);
-  if (grow_info)
+  if (grow_info) {
+    grow_UpdateGraph(graph->grow->ctx, grow_info);
     grow_FreeGraphAttrInfo(grow_info);
+  }
 
   *return_int = GE__SUCCESS;
   *return_decl = CCM_DECL_INT;
