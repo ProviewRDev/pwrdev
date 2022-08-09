@@ -6,16 +6,19 @@
 typedef struct {
   FILE* value_fp;
   int interval_cnt;
+  pwr_tTime last_try;
 } io_sLocalDS18B20;
 
 typedef struct {
   FILE* value_fp;
   int interval_cnt;
+  pwr_tTime last_try;
 } io_sLocalAiDevice;
 
 typedef struct {
   FILE* value_fp;
   int interval_cnt;
+  pwr_tTime last_try;
 } io_sLocalAoDevice;
 
 #endif
