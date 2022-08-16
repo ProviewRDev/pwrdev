@@ -46,23 +46,29 @@
 
 static ldh_sMenuItem ldh_lMenuItem[100];
 
-static struct {
+static struct
+{
   pwr_tString32 Name;
   ldh_eUtility Value;
-} ldh_lUtility[]
-    = { { "__", ldh_eUtility__ }, { "Navigator", ldh_eUtility_Navigator },
-        { "Configurator", ldh_eUtility_Configurator }, { "-", ldh_eUtility_ } };
+} ldh_lUtility[] = {{"__", ldh_eUtility__},
+                    {"Navigator", ldh_eUtility_Navigator},
+                    {"Configurator", ldh_eUtility_Configurator},
+                    {"-", ldh_eUtility_}};
 
-static struct {
+static struct
+{
   pwr_tString32 Name;
   pwr_tChar Char;
   ldh_eMenuSet Value;
-} ldh_lMenuSet[] = { { "__", '\0', ldh_eMenuSet__ },
-  { "Attribute", 'a', ldh_eMenuSet_Attribute },
-  { "Class", 'c', ldh_eMenuSet_Class }, { "Many", 'm', ldh_eMenuSet_Many },
-  { "None", 'n', ldh_eMenuSet_None }, { "Object", 'o', ldh_eMenuSet_Object },
-  { "ObjectAttr", 'o', ldh_eMenuSet_ObjectAttr },
-  { "Array", 'a', ldh_eMenuSet_Array }, { "-", '\0', ldh_eMenuSet_ } };
+} ldh_lMenuSet[] = {{"__", '\0', ldh_eMenuSet__},
+                    {"Attribute", 'a', ldh_eMenuSet_Attribute},
+                    {"Class", 'c', ldh_eMenuSet_Class},
+                    {"Many", 'm', ldh_eMenuSet_Many},
+                    {"None", 'n', ldh_eMenuSet_None},
+                    {"Object", 'o', ldh_eMenuSet_Object},
+                    {"ObjectAttr", 'o', ldh_eMenuSet_ObjectAttr},
+                    {"Array", 'a', ldh_eMenuSet_Array},
+                    {"-", '\0', ldh_eMenuSet_}};
 
 wb_session::wb_session(wb_volume& v) : wb_volume(v)
 {
@@ -76,10 +82,7 @@ wb_session::wb_session(wb_session& s) : wb_volume(s.m_vrep), m_srep(s.m_srep)
     m_srep->ref();
 }
 
-wb_session::~wb_session()
-{
-  m_srep->unref();
-}
+wb_session::~wb_session() { m_srep->unref(); }
 
 wb_session& wb_session::operator=(const wb_session& x)
 {
@@ -104,7 +107,8 @@ wb_object wb_session::createObject(wb_cdef cdef, wb_destination d, wb_name name)
     throw wb_error(sts());
 
   wb_object parent;
-  switch (d.code()) {
+  switch (d.code())
+  {
   case ldh_eDest_IntoFirst:
   case ldh_eDest_IntoLast:
     parent = object(d.oid());
@@ -150,7 +154,8 @@ wb_object wb_session::copyObject(wb_object o, wb_destination d, wb_name name)
     throw wb_error(sts());
 
   wb_object parent;
-  switch (d.code()) {
+  switch (d.code())
+  {
   case ldh_eDest_IntoFirst:
   case ldh_eDest_IntoLast:
     parent = object(d.oid());
@@ -170,31 +175,37 @@ wb_object wb_session::copyObject(wb_object o, wb_destination d, wb_name name)
   if (evenSts())
     throw wb_error(sts());
 
-  if (m_vrep->vid() == o.vid()) {
+  if (m_vrep->vid() == o.vid())
+  {
     orep = m_vrep->copyObject(&m_sts, (wb_orep*)o, d, name);
     if (evenSts())
       throw wb_error(sts());
 
     orep->ref();
-  } else {
+  }
+  else
+  {
     wb_cdef c = cdef(o.cid());
 
     orep = m_vrep->createObject(&m_sts, c, d, name);
     orep->ref();
     wb_attribute rba(o.sts(), (wb_orep*)o, "RtBody");
-    if (rba) {
+    if (rba)
+    {
       void* p = rba.value();
       wb_attribute rban(m_sts, orep, "RtBody");
       writeAttribute(rban, p);
     }
     wb_attribute dba(o.sts(), (wb_orep*)o, "DevBody");
-    if (dba) {
+    if (dba)
+    {
       void* p = dba.value();
       wb_attribute dban(m_sts, orep, "DevBody");
       writeAttribute(dban, p);
     }
     wb_attribute sba(o.sts(), (wb_orep*)o, "SysBody");
-    if (sba) {
+    if (sba)
+    {
       void* p = sba.value();
       wb_attribute sban(m_sts, orep, "SysBody");
       writeAttribute(sban, p);
@@ -226,14 +237,16 @@ bool wb_session::moveObject(wb_object o, wb_destination d)
 
   // Check that object is not ancestor to destination
   wb_object dest = object(d.oid());
-  while (dest) {
+  while (dest)
+  {
     if (cdh_ObjidIsEqual(dest.oid(), o.oid()))
       throw wb_error(LDH__BADDEST);
     dest = dest.parent();
   }
 
   wb_object parent;
-  switch (d.code()) {
+  switch (d.code())
+  {
   case ldh_eDest_IntoFirst:
   case ldh_eDest_IntoLast:
     parent = object(d.oid());
@@ -297,11 +310,13 @@ bool wb_session::deleteObject(wb_object o)
   if (isReadonly())
     throw wb_error_str("ReadOnlySession");
 
-  if (!isLocal(o)) {
+  if (!isLocal(o))
+  {
     m_sts = LDH__OTHERVOLUME;
     return false;
   }
-  if (o.first()) {
+  if (o.first())
+  {
     m_sts = LDH__HAS_CHILD;
     return false;
   }
@@ -314,8 +329,10 @@ bool wb_session::deleteObject(wb_object o)
   m_srep->eventOldFamily(ep, o);
 
   sts = triggPostUnadopt(parent, o);
+  sts = triggPostDelete(o);
 
   bool rsts = m_vrep->deleteObject(&m_sts, (wb_orep*)o);
+
   m_srep->update();
   m_srep->eventSend(ep);
   return rsts;
@@ -326,7 +343,8 @@ bool wb_session::deleteFamily(wb_object o, bool storeix)
   if (isReadonly())
     throw wb_error_str("ReadOnlySession");
 
-  if (!isLocal(o)) {
+  if (!isLocal(o))
+  {
     m_sts = LDH__OTHERVOLUME;
     return false;
   }
@@ -339,6 +357,7 @@ bool wb_session::deleteFamily(wb_object o, bool storeix)
   m_srep->eventOldFamily(ep, o);
 
   sts = triggPostUnadopt(parent, o);
+  sts = triggPostDelete(o);
 
   if (storeix)
     m_srep->recix_add(o);
@@ -353,8 +372,7 @@ bool wb_session::writeAttribute(wb_attribute& a, void* p, size_t size)
   if (isReadonly())
     throw wb_error_str("ReadOnlySession");
 
-  bool sts = m_vrep->writeAttribute(
-      &m_sts, (wb_orep*)a, a.bix(), a.offset(), a.size(), p);
+  bool sts = m_vrep->writeAttribute(&m_sts, (wb_orep*)a, a.bix(), a.offset(), a.size(), p);
   m_srep->update();
   ldh_sEvent* ep = m_srep->eventStart(a.aoid(), ldh_eEvent_AttributeModified);
   m_srep->eventSend(ep);
@@ -366,8 +384,7 @@ bool wb_session::writeAttribute(wb_attribute& a, void* p)
   if (isReadonly())
     throw wb_error_str("ReadOnlySession");
 
-  bool sts = m_vrep->writeAttribute(
-      &m_sts, (wb_orep*)a, a.bix(), a.offset(), a.size(), p);
+  bool sts = m_vrep->writeAttribute(&m_sts, (wb_orep*)a, a.bix(), a.offset(), a.size(), p);
   m_srep->update();
 
   ldh_sEvent* ep = m_srep->eventStart(a.aoid(), ldh_eEvent_AttributeModified);
@@ -387,7 +404,8 @@ bool wb_session::clone(const char* vname, pwr_tVid vid, wb_vrepmem** vmem)
   pwr_tAttrRef* arp = (pwr_tAttrRef*)calloc(cnt + 1, sizeof(*arp));
 
   cnt = 0;
-  for (wb_object o = object(); ODD(o.sts()); o = o.after()) {
+  for (wb_object o = object(); ODD(o.sts()); o = o.after())
+  {
     arp[cnt++] = cdh_ObjidToAref(o.oid());
   }
   copyOset(arp, true, true, false, vid, vname, &mem);
@@ -404,30 +422,35 @@ bool wb_session::clone(const char* vname, pwr_tVid vid, wb_vrepmem** vmem)
   return true;
 }
 
-bool wb_session::copyOset(pwr_sAttrRef* arp, bool keepref, bool keepsym,
-    bool ignore_errors, pwr_tVid vvid, const char* vname, wb_vrepmem** vmem)
+bool wb_session::copyOset(pwr_sAttrRef* arp, bool keepref, bool keepsym, bool ignore_errors, pwr_tVid vvid,
+                          const char* vname, wb_vrepmem** vmem)
 {
   char name[32];
   pwr_tStatus sts;
   pwr_tVid vid;
   m_sts = LDH__SUCCESS;
 
-  if (!m_vrep->exportTreeIsImplemented()) {
+  if (!m_vrep->exportTreeIsImplemented())
+  {
     m_sts = LDH__NYI;
     return false;
   }
 
   // Avoid copying objects in plcprograms
   pwr_sAttrRef* ap = arp;
-  while (cdh_ObjidIsNotNull(ap->Objid)) {
+  while (cdh_ObjidIsNotNull(ap->Objid))
+  {
     wb_object o = object(ap->Objid);
     if (!o)
       return o.sts();
     o = o.parent();
-    while (o) {
+    while (o)
+    {
       pwr_sAttrRef* ap2 = arp;
-      while (cdh_ObjidIsNotNull(ap2->Objid)) {
-        if (o.cid() == pwr_cClass_plc) {
+      while (cdh_ObjidIsNotNull(ap2->Objid))
+      {
+        if (o.cid() == pwr_cClass_plc)
+        {
           m_sts = LDH__COPYPLCOBJECT;
           return false;
         }
@@ -440,7 +463,8 @@ bool wb_session::copyOset(pwr_sAttrRef* arp, bool keepref, bool keepsym,
 
   if (vvid)
     vid = vvid;
-  else {
+  else
+  {
     vid = m_vrep->erep()->nextVolatileVid(&m_sts, name);
     if (EVEN(m_sts))
       return false;
@@ -457,17 +481,21 @@ bool wb_session::copyOset(pwr_sAttrRef* arp, bool keepref, bool keepsym,
     mem->importIgnoreErrors();
 
   ap = arp;
-  while (cdh_ObjidIsNotNull(ap->Objid)) {
+  while (cdh_ObjidIsNotNull(ap->Objid))
+  {
     // Check selected object is not child to another selected object
     bool found = false;
     wb_object o = object(ap->Objid);
     if (!o)
       return o.sts();
     o = o.parent();
-    while (o) {
+    while (o)
+    {
       pwr_sAttrRef* ap2 = arp;
-      while (cdh_ObjidIsNotNull(ap2->Objid)) {
-        if (cdh_ObjidIsEqual(ap2->Objid, o.oid())) {
+      while (cdh_ObjidIsNotNull(ap2->Objid))
+      {
+        if (cdh_ObjidIsEqual(ap2->Objid, o.oid()))
+        {
           found = true;
           break;
         }
@@ -477,14 +505,16 @@ bool wb_session::copyOset(pwr_sAttrRef* arp, bool keepref, bool keepsym,
         break;
       o = o.parent();
     }
-    if (found) {
+    if (found)
+    {
       ap++;
       continue;
     }
 
     if (m_vrep->vid() == ap->Objid.vid)
       m_vrep->exportTree(*mem, ap->Objid);
-    else {
+    else
+    {
       // Other volume
       wb_vrep* vrep = m_vrep->erep()->volume(&sts, ap->Objid.vid);
       vrep->exportTree(*mem, ap->Objid);
@@ -495,13 +525,13 @@ bool wb_session::copyOset(pwr_sAttrRef* arp, bool keepref, bool keepsym,
   if (vmem)
     *vmem = mem;
 
-  m_vrep->set_object_import_cb(import_cb, (void *)this);
+  m_vrep->set_object_import_cb(import_cb, (void*)this);
   return mem->importTree(keepref, keepsym);
 }
 
-void wb_session::import_cb(wb_orep *o, wb_orep *os, void *data)
+void wb_session::import_cb(wb_orep* o, wb_orep* os, void* data)
 {
-  wb_session *ses = (wb_session *)data;
+  wb_session* ses = (wb_session*)data;
   wb_object object = wb_object(o);
   wb_object source;
   if (os)
@@ -527,9 +557,11 @@ bool wb_session::cutOset(pwr_sAttrRef* arp, bool keepref)
   // ldh_eEvent_ObjectTreeDeleted);
 
   pwr_sAttrRef* ap = arp;
-  while (cdh_ObjidIsNotNull(ap->Objid)) {
+  while (cdh_ObjidIsNotNull(ap->Objid))
+  {
     wb_object o = object(ap->Objid);
-    if (!o) {
+    if (!o)
+    {
       ap++;
       continue;
     }
@@ -547,8 +579,7 @@ bool wb_session::cutOset(pwr_sAttrRef* arp, bool keepref)
   return true;
 }
 
-bool wb_session::pasteOset(
-    pwr_tOid doid, ldh_eDest dest, bool keepoid, bool recycleix, char* buffer)
+bool wb_session::pasteOset(pwr_tOid doid, ldh_eDest dest, bool keepoid, bool recycleix, char* buffer)
 {
   if (isReadonly())
     throw wb_error_str("ReadOnlySession");
@@ -558,25 +589,30 @@ bool wb_session::pasteOset(
 
   wb_vrepmem* mem;
   // Get last buffer
-  if (!buffer) {
+  if (!buffer)
+  {
     mem = (wb_vrepmem*)m_vrep->erep()->bufferVolume(&m_sts);
     if (EVEN(m_sts))
       return false;
 
     wb_vrepmem* prev = NULL;
-    while (mem) {
+    while (mem)
+    {
       prev = mem;
       mem = (wb_vrepmem*)mem->next();
     }
     mem = prev;
-  } else {
+  }
+  else
+  {
     // Get specified buffer
     mem = (wb_vrepmem*)m_vrep->erep()->bufferVolume(&m_sts, buffer);
     if (EVEN(m_sts))
       return false;
   }
 
-  if (mem == m_vrep) {
+  if (mem == m_vrep)
+  {
     m_sts = LDH__PASTESELF;
     return false;
   }
@@ -584,7 +620,8 @@ bool wb_session::pasteOset(
   // Check that rootobjects are valid for this destination
   pwr_tStatus sts;
   wb_orep* orep = mem->object(&sts);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     orep->ref();
     validateDestination(d, orep->cid());
     if (evenSts())
@@ -596,7 +633,8 @@ bool wb_session::pasteOset(
 
   // Trigg ante adopt
   wb_object parent;
-  switch (dest) {
+  switch (dest)
+  {
   case ldh_eDest_IntoFirst:
   case ldh_eDest_IntoLast:
     parent = object(doid);
@@ -609,9 +647,11 @@ bool wb_session::pasteOset(
     throw wb_error(LDH__NODEST);
   }
 
-  if (parent) {
+  if (parent)
+  {
     wb_orep* orep = mem->object(&sts);
-    while (ODD(sts)) {
+    while (ODD(sts))
+    {
       orep->ref();
       m_sts = triggAnteAdopt(parent, orep->cid());
       if (evenSts())
@@ -626,14 +666,16 @@ bool wb_session::pasteOset(
   if (recycleix)
     recix = m_srep->recix();
   pwr_tOid* olist;
-  m_vrep->set_object_import_cb(import_cb, (void *)this);
+  m_vrep->set_object_import_cb(import_cb, (void*)this);
   mem->exportPaste(*m_vrep, doid, dest, keepoid, recix, &olist);
   m_srep->update();
   if (recycleix)
     m_srep->recix_clear();
 
-  if (parent) {
-    for (pwr_tOid* oidp = olist; cdh_ObjidIsNotNull(*oidp); oidp++) {
+  if (parent)
+  {
+    for (pwr_tOid* oidp = olist; cdh_ObjidIsNotNull(*oidp); oidp++)
+    {
       wb_object o = object(*oidp);
       triggPostAdopt(parent, o);
     }
@@ -661,22 +703,23 @@ pwr_tStatus wb_session::getMenu(ldh_sMenuCall* ip)
   int nItems = 0;
   wb_name cn;
 
-  for (i = 0; i < ip->SelectCount; i++) {
-    if (cdh_ObjidIsEqual(ip->Pointed.Objid, ip->Selected[i].Objid)
-        && ip->Pointed.Offset == ip->Selected[i].Offset
-        && ip->Pointed.Flags.m == ip->Selected[i].Flags.m) {
+  for (i = 0; i < ip->SelectCount; i++)
+  {
+    if (cdh_ObjidIsEqual(ip->Pointed.Objid, ip->Selected[i].Objid) &&
+        ip->Pointed.Offset == ip->Selected[i].Offset && ip->Pointed.Flags.m == ip->Selected[i].Flags.m)
+    {
       isSame = TRUE;
       break;
     }
   }
 
-  sprintf(MenuFolder, "%sP%cs%c%c",
-      ldh_lUtility[((wb_session*)ip->PointedSession)->utility()].Name,
-      ldh_lMenuSet[ip->PointedSet].Char, ldh_lMenuSet[ip->SelectedSet].Char,
-      (isSame ? 's' : 'n'));
+  sprintf(MenuFolder, "%sP%cs%c%c", ldh_lUtility[((wb_session*)ip->PointedSession)->utility()].Name,
+          ldh_lMenuSet[ip->PointedSet].Char, ldh_lMenuSet[ip->SelectedSet].Char, (isSame ? 's' : 'n'));
   /* Find generic menues of pointed object */
-  switch (ip->PointedSet) {
-  case ldh_eMenuSet_Object: {
+  switch (ip->PointedSet)
+  {
+  case ldh_eMenuSet_Object:
+  {
     sprintf(Menu, "pwrs:Class-$Object-%s-Pointed", MenuFolder);
 
     wb_cdrep* cdrep = m_vrep->merep()->cdrep(&sts, pwr_eClass_Object);
@@ -692,7 +735,8 @@ pwr_tStatus wb_session::getMenu(ldh_sMenuCall* ip)
     void* o_menu_body;
 
     wb_orep* o_menu = cdrep->menuFirst(&sts, o, &o_menu_body);
-    while (ODD(sts)) {
+    while (ODD(sts))
+    {
       o_menu->ref();
       getAllMenuItems(ip, &Item, cdrep, o_menu, o_menu_body, 0, &nItems, 0);
       wb_orep* prev = o_menu;
@@ -703,12 +747,12 @@ pwr_tStatus wb_session::getMenu(ldh_sMenuCall* ip)
     o->unref();
     break;
   }
-  case ldh_eMenuSet_ObjectAttr: {
+  case ldh_eMenuSet_ObjectAttr:
+  {
     char OMenuFolder[40];
 
-    sprintf(OMenuFolder, "%sP%cs%c%c",
-        ldh_lUtility[((wb_session*)ip->PointedSession)->utility()].Name, 'x',
-        'x', 'x');
+    sprintf(OMenuFolder, "%sP%cs%c%c", ldh_lUtility[((wb_session*)ip->PointedSession)->utility()].Name, 'x',
+            'x', 'x');
     sprintf(Menu, "pwrs:Class-$Object-%s-Pointed", OMenuFolder);
 
     wb_cdrep* cdrep = m_vrep->merep()->cdrep(&sts, pwr_eClass_Object);
@@ -724,7 +768,8 @@ pwr_tStatus wb_session::getMenu(ldh_sMenuCall* ip)
     void* o_menu_body;
 
     wb_orep* o_menu = cdrep->menuFirst(&sts, o, &o_menu_body);
-    while (ODD(sts)) {
+    while (ODD(sts))
+    {
       o_menu->ref();
       getAllMenuItems(ip, &Item, cdrep, o_menu, o_menu_body, 0, &nItems, 0);
       wb_orep* prev = o_menu;
@@ -736,7 +781,8 @@ pwr_tStatus wb_session::getMenu(ldh_sMenuCall* ip)
     break;
   }
   case ldh_eMenuSet_Attribute:
-  case ldh_eMenuSet_Array: {
+  case ldh_eMenuSet_Array:
+  {
     sprintf(Menu, "pwrs:Class-$Attribute-%s-Pointed", MenuFolder);
 
     wb_cdrep* cdrep = m_vrep->merep()->cdrep(&sts, pwr_eClass_Param);
@@ -752,7 +798,8 @@ pwr_tStatus wb_session::getMenu(ldh_sMenuCall* ip)
     void* o_menu_body;
 
     wb_orep* o_menu = cdrep->menuFirst(&sts, o, &o_menu_body);
-    while (ODD(sts)) {
+    while (ODD(sts))
+    {
       o_menu->ref();
       getAllMenuItems(ip, &Item, cdrep, o_menu, o_menu_body, 0, &nItems, 0);
       wb_orep* prev = o_menu;
@@ -763,7 +810,8 @@ pwr_tStatus wb_session::getMenu(ldh_sMenuCall* ip)
     o->unref();
     break;
   }
-  case ldh_eMenuSet_Class: {
+  case ldh_eMenuSet_Class:
+  {
     sprintf(Menu, "pwrs:Class-$Object-%s-Pointed", MenuFolder);
 
     wb_cdrep* cdrep = m_vrep->merep()->cdrep(&sts, pwr_eClass_Object);
@@ -779,7 +827,8 @@ pwr_tStatus wb_session::getMenu(ldh_sMenuCall* ip)
     void* o_menu_body;
 
     wb_orep* o_menu = cdrep->menuFirst(&sts, o, &o_menu_body);
-    while (ODD(sts)) {
+    while (ODD(sts))
+    {
       o_menu->ref();
       getAllMenuItems(ip, &Item, cdrep, o_menu, o_menu_body, 0, &nItems, 0);
       wb_orep* prev = o_menu;
@@ -794,12 +843,17 @@ pwr_tStatus wb_session::getMenu(ldh_sMenuCall* ip)
   }
   /* Find specific menues of pointed object */
 
-  switch (ip->PointedSet) {
+  switch (ip->PointedSet)
+  {
   case ldh_eMenuSet_Object:
-  case ldh_eMenuSet_ObjectAttr: {
-    if (ip->PointedSet == ldh_eMenuSet_Class) {
+  case ldh_eMenuSet_ObjectAttr:
+  {
+    if (ip->PointedSet == ldh_eMenuSet_Class)
+    {
       Class = cdh_ClassObjidToId(ip->Pointed.Objid);
-    } else {
+    }
+    else
+    {
       wb_attribute a = attribute(&ip->Pointed);
       if (!a)
         return sts;
@@ -807,19 +861,22 @@ pwr_tStatus wb_session::getMenu(ldh_sMenuCall* ip)
     }
 
     wb_cdrep* cdrep = m_vrep->merep()->cdrep(&sts, Class);
-    while (ODD(sts)) {
+    while (ODD(sts))
+    {
       cn = cdrep->longName();
       sprintf(Menu, "%s-%s-Pointed", cn.name(), MenuFolder);
 
       wb_orep* o = m_vrep->erep()->object(&sts, Menu);
-      if (ODD(sts)) {
+      if (ODD(sts))
+      {
         o->ref();
 
         Object = o->oid();
 
         void* o_menu_body;
         wb_orep* o_menu = cdrep->menuFirst(&sts, o, &o_menu_body);
-        while (ODD(sts)) {
+        while (ODD(sts))
+        {
           o_menu->ref();
           getAllMenuItems(ip, &Item, cdrep, o_menu, o_menu_body, 0, &nItems, 0);
           wb_orep* prev = o_menu;
@@ -830,7 +887,8 @@ pwr_tStatus wb_session::getMenu(ldh_sMenuCall* ip)
       }
       // Get menuitems for superclass
       wb_cdrep* super_cdrep = cdrep->super(&sts);
-      if (super_cdrep) {
+      if (super_cdrep)
+      {
         delete cdrep;
         cdrep = super_cdrep;
       }
@@ -841,14 +899,16 @@ pwr_tStatus wb_session::getMenu(ldh_sMenuCall* ip)
   default:;
   }
 
-  switch (ip->SelectedSet) {
+  switch (ip->SelectedSet)
+  {
   case ldh_eMenuSet_Attribute:
   case ldh_eMenuSet_Array:
   case ldh_eMenuSet_ObjectAttr:
     break;
   case ldh_eMenuSet_Class:
   case ldh_eMenuSet_Many:
-  case ldh_eMenuSet_Object: {
+  case ldh_eMenuSet_Object:
+  {
     if (ip->PointedSet != ldh_eMenuSet_Object)
       break;
 
@@ -859,14 +919,16 @@ pwr_tStatus wb_session::getMenu(ldh_sMenuCall* ip)
       return sts;
 
     wb_orep* o = m_vrep->erep()->object(&sts, Menu);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       o->ref();
 
       Object = o->oid();
 
       void* o_menu_body;
       wb_orep* o_menu = cdrep->menuFirst(&sts, o, &o_menu_body);
-      while (ODD(sts)) {
+      while (ODD(sts))
+      {
         o_menu->ref();
         getAllMenuItems(ip, &Item, cdrep, o_menu, o_menu_body, 0, &nItems, 0);
         wb_orep* prev = o_menu;
@@ -878,9 +940,12 @@ pwr_tStatus wb_session::getMenu(ldh_sMenuCall* ip)
     delete cdrep;
 
     /* Find specific menues for selected object(s) */
-    if (ip->PointedSet == ldh_eMenuSet_Class) {
+    if (ip->PointedSet == ldh_eMenuSet_Class)
+    {
       Class = cdh_ClassObjidToId(ip->Pointed.Objid);
-    } else {
+    }
+    else
+    {
       if (m_vrep->vid() == ip->Pointed.Objid.vid)
         o = m_vrep->object(&sts, ip->Pointed.Objid);
       else
@@ -894,19 +959,22 @@ pwr_tStatus wb_session::getMenu(ldh_sMenuCall* ip)
     }
 
     cdrep = m_vrep->merep()->cdrep(&sts, Class);
-    while (ODD(sts)) {
+    while (ODD(sts))
+    {
       cn = cdrep->longName();
       sprintf(Menu, "%s-%s-Selected", cn.name(), MenuFolder);
 
       o = m_vrep->erep()->object(&sts, Menu);
-      if (ODD(sts)) {
+      if (ODD(sts))
+      {
         o->ref();
 
         Object = o->oid();
 
         void* o_menu_body;
         wb_orep* o_menu = cdrep->menuFirst(&sts, o, &o_menu_body);
-        while (ODD(sts)) {
+        while (ODD(sts))
+        {
           o_menu->ref();
           getAllMenuItems(ip, &Item, cdrep, o_menu, o_menu_body, 0, &nItems, 0);
           wb_orep* prev = o_menu;
@@ -918,7 +986,8 @@ pwr_tStatus wb_session::getMenu(ldh_sMenuCall* ip)
 
       // Get menuitems for superclass
       wb_cdrep* super_cdrep = cdrep->super(&sts);
-      if (super_cdrep) {
+      if (super_cdrep)
+      {
         delete cdrep;
         cdrep = super_cdrep;
       }
@@ -937,9 +1006,8 @@ pwr_tStatus wb_session::getMenu(ldh_sMenuCall* ip)
   return LDH__SUCCESS;
 }
 
-void wb_session::getAllMenuItems(ldh_sMenuCall* ip, ldh_sMenuItem** Item,
-    wb_cdrep* cdrep, wb_orep* o, void* o_body, pwr_tUInt32 Level, int* nItems,
-    int AddSeparator)
+void wb_session::getAllMenuItems(ldh_sMenuCall* ip, ldh_sMenuItem** Item, wb_cdrep* cdrep, wb_orep* o,
+                                 void* o_body, pwr_tUInt32 Level, int* nItems, int AddSeparator)
 {
   pwr_sMenuButton* mbp;
   pwr_sMenuCascade* mcp;
@@ -950,21 +1018,26 @@ void wb_session::getAllMenuItems(ldh_sMenuCall* ip, ldh_sMenuItem** Item,
   Level++;
   memset(*Item, 0, sizeof(**Item));
 
-  if (AddSeparator) {
+  if (AddSeparator)
+  {
     (*Item)->Level = Level;
     (*Item)->Item = ldh_eMenuItem_Separator;
     (*Item)->MenuObject = pwr_cNObjid;
     (*Item)++;
     (*nItems)++;
-  } else if (o->cid() == pwr_eClass_MenuButton) {
+  }
+  else if (o->cid() == pwr_eClass_MenuButton)
+  {
     mbp = (pwr_sMenuButton*)o_body;
 
-    if (Level == 1) {
+    if (Level == 1)
+    {
       // Check if method is overridden, ie name already exist
-      for (int i = 0; i < *nItems; i++) {
-        if (ldh_lMenuItem[i].Level == Level
-            && streq(ldh_lMenuItem[i].Name, mbp->ButtonName)) {
-	  break;
+      for (int i = 0; i < *nItems; i++)
+      {
+        if (ldh_lMenuItem[i].Level == Level && streq(ldh_lMenuItem[i].Name, mbp->ButtonName))
+        {
+          break;
         }
       }
     }
@@ -974,12 +1047,14 @@ void wb_session::getAllMenuItems(ldh_sMenuCall* ip, ldh_sMenuItem** Item,
     (*Item)->MenuObject = o->oid();
 
     (*Item)->Flags.f.Sensitive = 0;
-    if (mbp->MethodName[0] != 0) {
+    if (mbp->MethodName[0] != 0)
+    {
       m_vrep->erep()->method(&sts, mbp->MethodName, &method);
       if (ODD(sts))
         (*Item)->Flags.f.Sensitive = 1;
     }
-    if ((*Item)->Flags.f.Sensitive == 1) {
+    if ((*Item)->Flags.f.Sensitive == 1)
+    {
       m_vrep->erep()->method(&sts, mbp->FilterName, &filter);
       if (ODD(sts))
         (*Item)->Flags.f.Sensitive = ((wb_tMethodMenuFilter)filter)(ip, mbp);
@@ -989,21 +1064,27 @@ void wb_session::getAllMenuItems(ldh_sMenuCall* ip, ldh_sMenuItem** Item,
     (*Item)->Method = method;
     (*Item)++;
     (*nItems)++;
-  } else if (o->cid() == pwr_eClass_MenuSeparator) {
+  }
+  else if (o->cid() == pwr_eClass_MenuSeparator)
+  {
     (*Item)->Level = Level;
     (*Item)->Item = ldh_eMenuItem_Separator;
     (*Item)->MenuObject = o->oid();
     (*Item)++;
     (*nItems)++;
-  } else if (o->cid() == pwr_eClass_MenuCascade) {
+  }
+  else if (o->cid() == pwr_eClass_MenuCascade)
+  {
     mcp = (pwr_sMenuCascade*)o_body;
 
-    if (Level == 1) {
+    if (Level == 1)
+    {
       // Check if method is overridden, ie name already exist
-      for (int i = 0; i < *nItems; i++) {
-        if (ldh_lMenuItem[i].Level == Level
-            && streq(ldh_lMenuItem[i].Name, mcp->ButtonName)) {
-	  break;
+      for (int i = 0; i < *nItems; i++)
+      {
+        if (ldh_lMenuItem[i].Level == Level && streq(ldh_lMenuItem[i].Name, mcp->ButtonName))
+        {
+          break;
         }
       }
     }
@@ -1018,7 +1099,8 @@ void wb_session::getAllMenuItems(ldh_sMenuCall* ip, ldh_sMenuItem** Item,
 
     void* child_body;
     wb_orep* child = cdrep->menuFirst(&sts, o, &child_body);
-    while (ODD(sts)) {
+    while (ODD(sts))
+    {
       child->ref();
       getAllMenuItems(ip, Item, cdrep, child, child_body, Level, nItems, 0);
       wb_orep* prev = child;
@@ -1049,8 +1131,10 @@ bool wb_session::validateDestination(wb_destination d, pwr_tCid cid)
   wb_object o = object(d.oid());
 
   // Get parent
-  if (o) {
-    switch (d.code()) {
+  if (o)
+  {
+    switch (d.code())
+    {
     case ldh_eDest_After:
     case ldh_eDest_Before:
       parent = o.parent();
@@ -1059,17 +1143,22 @@ bool wb_session::validateDestination(wb_destination d, pwr_tCid cid)
       parent = o;
     }
   }
-  if (!parent) {
+  if (!parent)
+  {
     // No parent, check if valid top object (for vrepmem all objects are valid
     // topobjects)
     wb_cdef c = cdef(cid);
-    if (!c.flags().b.TopObject && type() != ldh_eVolRep_Mem) {
+    if (!c.flags().b.TopObject && type() != ldh_eVolRep_Mem)
+    {
       m_sts = LDH__NOTOP;
       return false;
     }
-  } else {
+  }
+  else
+  {
     // Check if adoption is legal
-    if (parent.flags().b.NoAdopt) {
+    if (parent.flags().b.NoAdopt)
+    {
       m_sts = LDH__NOADOPT;
       return false;
     }
@@ -1084,7 +1173,8 @@ bool wb_session::castAttribute(pwr_sAttrRef* arp, pwr_tCid cid)
   if (!a)
     return a.sts();
 
-  if (!(a.flags() & PWR_MASK_CASTATTR)) {
+  if (!(a.flags() & PWR_MASK_CASTATTR))
+  {
     m_sts = 0;
     return false;
   }
@@ -1108,9 +1198,12 @@ bool wb_session::castAttribute(pwr_sAttrRef* arp, pwr_tCid cid)
   if (!cast_a)
     return cast_a.sts();
 
-  try {
+  try
+  {
     writeAttribute(cast_a, &castid);
-  } catch (wb_error& e) {
+  }
+  catch (wb_error& e)
+  {
     m_sts = e.sts();
     return false;
   }
@@ -1118,9 +1211,12 @@ bool wb_session::castAttribute(pwr_sAttrRef* arp, pwr_tCid cid)
   void* body = calloc(1, c.size(pwr_eBix_rt));
   c.attrTemplateBody(&m_sts, pwr_eBix_rt, body, a);
 
-  try {
+  try
+  {
     writeAttribute(a, body);
-  } catch (wb_error& e) {
+  }
+  catch (wb_error& e)
+  {
     m_sts = e.sts();
     return false;
   }
@@ -1134,7 +1230,8 @@ bool wb_session::disableAttribute(pwr_sAttrRef* arp, pwr_tDisableAttr disable)
   if (!a)
     return a.sts();
 
-  if (!(a.flags() & PWR_MASK_DISABLEATTR)) {
+  if (!(a.flags() & PWR_MASK_DISABLEATTR))
+  {
     m_sts = 0;
     return false;
   }
@@ -1144,9 +1241,12 @@ bool wb_session::disableAttribute(pwr_sAttrRef* arp, pwr_tDisableAttr disable)
   if (!dis_a)
     return dis_a.sts();
 
-  try {
+  try
+  {
     writeAttribute(dis_a, &disable);
-  } catch (wb_error& e) {
+  }
+  catch (wb_error& e)
+  {
     m_sts = e.sts();
     return false;
   }
@@ -1155,7 +1255,8 @@ bool wb_session::disableAttribute(pwr_sAttrRef* arp, pwr_tDisableAttr disable)
 
 bool wb_session::commit()
 {
-  if (!m_vrep->erep()->check_lock((char*)m_vrep->name(), m_vrep->dbtype())) {
+  if (!m_vrep->erep()->check_lock((char*)m_vrep->name(), m_vrep->dbtype()))
+  {
     m_sts = LDH__LOCKSTOLEN;
     return false;
   }
@@ -1168,7 +1269,8 @@ bool wb_session::commit()
   oid.vid = m_vrep->vid();
 
   wb_orep* orep = m_vrep->object(&m_sts, oid);
-  if (oddSts()) {
+  if (oddSts())
+  {
     orep->ref();
     wb_attribute modtime(m_sts, orep, "SysBody", "Modified");
     if (modtime.oddSts())

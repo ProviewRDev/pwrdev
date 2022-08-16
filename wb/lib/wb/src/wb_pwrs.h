@@ -94,6 +94,7 @@ typedef pwr_tStatus (*wb_tMethodAnteAdopt)(ldh_tSesContext, pwr_tOid, pwr_tCid);
 typedef pwr_tStatus (*wb_tMethodPostAdopt)(ldh_tSesContext, pwr_tOid, pwr_tOid, pwr_tCid);
 typedef pwr_tStatus (*wb_tMethodAnteUnadopt)(ldh_tSesContext, pwr_tOid, pwr_tOid, pwr_tCid);
 typedef pwr_tStatus (*wb_tMethodPostUnadopt)(ldh_tSesContext, pwr_tOid, pwr_tOid, pwr_tCid);
+typedef pwr_tStatus (*wb_tMethodPostDelete)(ldh_tSesContext, pwr_tOid);
 typedef pwr_tStatus (*wb_tMethodPostRename)(ldh_tSesContext, pwr_tOid);
 typedef pwr_tStatus (*wb_tMethodSyntaxCheck)(ldh_tSesContext, pwr_tAttrRef, int*, int*);
 // typedef pwr_tStatus (*wb_tMethodGetIoDeviceData)(
