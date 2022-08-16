@@ -196,72 +196,21 @@ static pwr_tStatus SyntaxCheck(ldh_tSesContext Session, pwr_tAttrRef Object, /* 
   return wsx_CheckIoDevice(Session, Object, ErrorCount, WarningCount, wsx_mCardOption_None);
 }
 
-//
-//  Get value.
-//
-
-// static pwr_tStatus GetIoDeviceData(pwr_tAttrRef Object, const char* Attr, char* Buf, int BufSize)
-// {
-//   pwr_tFileName datafile;
-//   pwr_tStatus sts;
-
-//   sprintf(datafile, "$pwrp_load/pwr_pn_%s.xml", cdh_ObjidToFnString(0, Object.Objid));
-//   dcli_translate_filename(datafile, datafile);
-
-//   ProfinetRuntimeData* prd = new ProfinetRuntimeData();
-//   // GsdmlDeviceData* data = new GsdmlDeviceData();
-//   prd->read_pwr_pn_xml(datafile, "");
-//   // sts = data->read(datafile);
-//   if (EVEN(sts))
-//   {
-//     delete prd;
-//     return sts;
-//   }
-
-//   sts = data->get_value(Attr, Buf, BufSize);
-
-//   delete prd;
-
-//   return sts;
-// }
-
-// static pwr_tStatus SetIoDeviceData(pwr_tAttrRef Object, const char* Attr, const char* Value)
-// {
-//   pwr_tFileName datafile;
-//   pwr_tStatus sts;
-
-//   sprintf(datafile, "$pwrp_load/pwr_pn_%s.xml", cdh_ObjidToFnString(0, Object.Objid));
-//   dcli_translate_filename(datafile, datafile);
-
-//   GsdmlDeviceData* data = new GsdmlDeviceData();
-//   sts = data->read(datafile);
-//   if (EVEN(sts))
-//   {
-//     delete data;
-//     return sts;
-//   }
-
-//   sts = data->modify_value(Attr, Value);
-//   if (ODD(sts))
-//     data->print(datafile);
-
-//   delete data;
-
-//   return sts;
-// }
-
 static pwr_tStatus PostCopy(ldh_tSesContext Session, pwr_tOid Object, pwr_tOid Source, pwr_tCid Class)
 {
   return pndevice_postcopy(Session, Object, Source, Class);
+}
+
+static pwr_tStatus PostDelete(ldh_tSesContext Session, pwr_tOid Object)
+{
+  return pndevice_postdelete(Session, Object);
 }
 
 /*----------------------------------------------------------------------------*\
   Every method to be exported to the workbench should be registred here.
 \*----------------------------------------------------------------------------*/
 
-pwr_dExport pwr_BindMethods(PnDevice) = {pwr_BindMethod(Configure), pwr_BindMethod(ConfigureFilter),
-                                         pwr_BindMethod(CopyDevice), pwr_BindMethod(CopyDeviceFilter),
-                                         pwr_BindMethod(SyntaxCheck),
-                                         /* pwr_BindMethod(GetIoDeviceData),*/
-                                         /* pwr_BindMethod(SetIoDeviceData), */
-                                         pwr_BindMethod(PostCopy), pwr_NullMethod};
+pwr_dExport pwr_BindMethods(PnDevice) = {pwr_BindMethod(Configure),   pwr_BindMethod(ConfigureFilter),
+                                         pwr_BindMethod(CopyDevice),  pwr_BindMethod(CopyDeviceFilter),
+                                         pwr_BindMethod(SyntaxCheck), pwr_BindMethod(PostDelete),
+                                         pwr_BindMethod(PostCopy),    pwr_NullMethod};

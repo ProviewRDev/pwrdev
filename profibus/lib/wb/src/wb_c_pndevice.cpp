@@ -118,7 +118,7 @@ static int create_channel(ldh_tSession ldhses, ChanItem const& chan, pwr_tOid ta
 
   pwr_tAttrRef chan_aref = cdh_ObjidToAref(chan_oid);
 
-  // Set Representation  
+  // Set Representation
   sts = set_attribute(ldhses, (void*)&chan.representation, sizeof(chan.representation), "Representation",
                       &chan_aref);
   if (EVEN(sts))
@@ -134,14 +134,16 @@ static int create_channel(ldh_tSession ldhses, ChanItem const& chan, pwr_tOid ta
   return sts;
 }
 
-
-static std::string generate_channel_object_name(GSDML::DataItem const* data_item, size_t start_index, unsigned int number, bool channel_name_from_id = false)
+static std::string generate_channel_object_name(GSDML::DataItem const* data_item, size_t start_index,
+                                                unsigned int number, bool channel_name_from_id = false)
 {
-  std::regex disallowed_characters_re(R"([^A-Za-z0-9_])"); // Match anything NOT in A-Z, a-z, 0-9 or _ i.e. all disallowed characters
+  std::regex disallowed_characters_re(
+      R"([^A-Za-z0-9_])"); // Match anything NOT in A-Z, a-z, 0-9 or _ i.e. all disallowed characters
   std::ostringstream name(std::ios_base::out);
   if (channel_name_from_id)
   {
-    name << (data_item->_TextId != "" ? "" : "Ch") << std::setw(2) << std::setfill('0') << start_index << (data_item->_TextId != "" ? "_" + data_item->_TextId : "");
+    name << (data_item->_TextId != "" ? "" : "Ch") << std::setw(2) << std::setfill('0') << start_index
+         << (data_item->_TextId != "" ? "_" + data_item->_TextId : "");
   }
   else
   {
@@ -151,13 +153,16 @@ static std::string generate_channel_object_name(GSDML::DataItem const* data_item
   std::string new_name;
   new_name = name.str();
   new_name.erase(std::remove(new_name.begin(), new_name.end(), ' '),
-                new_name.end());                           // Remove any whitespaces
-  new_name = std::regex_replace(new_name, disallowed_characters_re, "_"); // Replace all illegal characters with a '_'      
-  if (new_name.length() > 31) new_name.erase(31, std::string::npos); // We can only have 32 characters including null termination :(
-  
-  // In 999 out of 1000 cases we now have a unique name given the start_index and number within a sequence of bits for instance.
-  // In some cases though one can choose the same submodule more than once for some specific modules. One shouldn't do that but it is
-  // possible. If one does, the name will of course be a duplicate and the channel creation will fail. Should we care about this?
+                 new_name.end()); // Remove any whitespaces
+  new_name = std::regex_replace(new_name, disallowed_characters_re,
+                                "_"); // Replace all illegal characters with a '_'
+  if (new_name.length() > 31)
+    new_name.erase(31, std::string::npos); // We can only have 32 characters including null termination :(
+
+  // In 999 out of 1000 cases we now have a unique name given the start_index and number within a sequence of
+  // bits for instance. In some cases though one can choose the same submodule more than once for some
+  // specific modules. One shouldn't do that but it is possible. If one does, the name will of course be a
+  // duplicate and the channel creation will fail. Should we care about this?
 
   return new_name;
 }
@@ -166,7 +171,7 @@ static int pndevice_fill_io_vector_from_data_item(std::vector<ChanItem>& io_vect
                                                   GSDML::DataItem const* data_item, size_t const& start_index,
                                                   bool is_output = false)
 {
-  ChanItem ci;  
+  ChanItem ci;
 
   // If we have bits we fill with Di/Do
   if (data_item->_UseAsBits)
@@ -177,8 +182,8 @@ static int pndevice_fill_io_vector_from_data_item(std::vector<ChanItem>& io_vect
     switch (data_item->_DataType)
     {
     case GSDML::ValueDataType_Integer8:
-    case GSDML::ValueDataType_Unsigned8:    
-    case GSDML::ValueDataType_OctetString: 
+    case GSDML::ValueDataType_Unsigned8:
+    case GSDML::ValueDataType_OctetString:
       ci.representation = pwr_eDataRepEnum_Bit8;
       bits = 8;
       break;
@@ -227,14 +232,13 @@ static int pndevice_fill_io_vector_from_data_item(std::vector<ChanItem>& io_vect
       }
     }
     else // Add only configured bit items
-    {      
+    {
       for (auto const& bit_data_item : data_item->_BitDataItem)
       {
         // Add channel
         ci.number = bit_data_item._BitOffset;
-        ci.description = bit_data_item._Text
-                             ? *bit_data_item._Text
-                             : std::string(" Bit ") + std::to_string(ci.number);       
+        ci.description =
+            bit_data_item._Text ? *bit_data_item._Text : std::string(" Bit ") + std::to_string(ci.number);
         ci.name = generate_channel_object_name(data_item, start_index, ci.number);
 
         io_vector.push_back(ci);
@@ -287,18 +291,20 @@ static int pndevice_fill_io_vector_from_data_item(std::vector<ChanItem>& io_vect
 
     if (is_output)
     {
-      ci.cid = data_item->_DataType == GSDML::ValueDataType_OctetString ? pwr_cClass_ChanIo : pwr_cClass_ChanAo;
+      ci.cid =
+          data_item->_DataType == GSDML::ValueDataType_OctetString ? pwr_cClass_ChanIo : pwr_cClass_ChanAo;
     }
     else
     {
-      ci.cid = data_item->_DataType == GSDML::ValueDataType_OctetString ? pwr_cClass_ChanIi : pwr_cClass_ChanAi;
+      ci.cid =
+          data_item->_DataType == GSDML::ValueDataType_OctetString ? pwr_cClass_ChanIi : pwr_cClass_ChanAi;
     }
 
     ci.description = *data_item->_Text;
 
     // If this is octetstring we add one item for each byte
     if (data_item->_DataType == GSDML::ValueDataType_OctetString)
-    {      
+    {
       for (size_t byte = 0; byte < data_item->_Length; byte++)
       {
         ci.name = generate_channel_object_name(data_item, start_index, byte);
@@ -414,7 +420,7 @@ int pndevice_save_cb(void* sctx)
     }
   }
 
-  // Remove modules that isn't configured any more OR have a changed module class (i.e. one has chosen a
+  // Remove modules that isn't configured anymore OR have a changed module class (i.e. one has chosen a
   // custom derived PnModule in favor of the base class PnModule) One will loose all the connections but that
   // goes without saying...
   for (sts = ldh_GetChild(ctx->ldhses, ctx->aref.Objid, &module_oid); ODD(sts);)
@@ -457,11 +463,19 @@ int pndevice_save_cb(void* sctx)
 
     // Skip if if we have an oid (There's already an object in place, and we never remove existing configured
     // items) OR we do not have a module class, we need one to know what to create (The configurator forces
-    // one to select a module class). The DAP (slot 0) does not have a module class though, so we treat it differently
-    if (cdh_ObjidIsNotNull(slot.m_module_oid) || (slot.m_module_class == pwr_cNCid && slot.m_slot_number != 0))
+    // one to select a module class). The DAP (slot 0) does not have a module class though, so we treat it
+    // differently
+    if (cdh_ObjidIsNotNull(slot.m_module_oid) ||
+        (slot.m_module_class == pwr_cNCid && slot.m_slot_number != 0))
       continue;
 
-    // Create a fancy name like "M1" and so on and so forth...
+    // Special case for the DAP
+    if (slot.m_slot_number == 0)
+    {
+      slot.m_module_class = pwr_cClass_PnModule;
+    }
+
+    // Create a fancy name like "M1" and so on and so forth... DAP will be M0
     std::ostringstream module_name(std::ios_base::out);
     module_name << "M" << slot.m_slot_number;
 
@@ -497,12 +511,6 @@ int pndevice_save_cb(void* sctx)
 
     if (!created)
     {
-      // Special case for the DAP
-      if (slot.m_slot_number == 0)
-      {
-        slot.m_module_class = pwr_cClass_PnModule;
-      }
-
       // We are either at the beginning or at the end
       if (cdh_ObjidIsNull(last_object))
       {
@@ -534,8 +542,10 @@ int pndevice_save_cb(void* sctx)
     // Set both ModuleName and Description as a default. Again, slot 0 is treated a little different
     if (slot.m_slot_number == 0)
     {
-      std::string name = *ctx->attr->attrnav->gsdml->getDeviceAccessPointMap().at(slot.m_module_ID)->_ModuleInfo._Name;
-      std::string info = *ctx->attr->attrnav->gsdml->getDeviceAccessPointMap().at(slot.m_module_ID)->_ModuleInfo._InfoText;
+      std::string name =
+          *ctx->attr->attrnav->gsdml->getDeviceAccessPointMap().at(slot.m_module_ID)->_ModuleInfo._Name;
+      std::string info =
+          *ctx->attr->attrnav->gsdml->getDeviceAccessPointMap().at(slot.m_module_ID)->_ModuleInfo._InfoText;
       set_attribute(ctx->ldhses, (void*)name.c_str(), name.length(), "ModuleName", &module_aref);
       set_attribute(ctx->ldhses, (void*)info.c_str(), info.length(), "Description", &module_aref);
     }
@@ -705,14 +715,14 @@ int pndevice_save_cb(void* sctx)
 static pwr_tStatus generate_viewer_data(device_sCtx* ctx)
 {
   pwr_tOid controller_oid;
-  pwr_tCid controller_cid;  
+  pwr_tCid controller_cid;
   FILE* pnviewer_fp;
-  pwr_tFileName fname;  
+  pwr_tFileName fname;
   pwr_tStatus sts;
   pwr_tOid child_module_oid;
   char* ethernet_device;
   int size;
-  
+
   std::string device_text;
   std::string device_name;
   std::string ip_address;
@@ -730,14 +740,15 @@ static pwr_tStatus generate_viewer_data(device_sCtx* ctx)
   if (ODD(sts) && controller_cid == pwr_cClass_PnControllerSoftingPNAK)
   {
     // Extract ethernet device
-    sts = ldh_GetObjectPar(ctx->ldhses, controller_oid, "RtBody", "EthernetDevice", (char**)&ethernet_device, &size);
+    sts = ldh_GetObjectPar(ctx->ldhses, controller_oid, "RtBody", "EthernetDevice", (char**)&ethernet_device,
+                           &size);
     if (EVEN(sts))
       return sts;
     str_trim(ethernet_device, ethernet_device);
     str_ToLower(ethernet_device, ethernet_device);
     sprintf(fname, "$pwrp_load/pwr_pnviewer_%s.dat", ethernet_device);
     free(ethernet_device);
-    dcli_translate_filename(fname, fname);    
+    dcli_translate_filename(fname, fname);
 
     pnviewer_fp = fopen(fname, "w");
     if (!pnviewer_fp)
@@ -749,7 +760,8 @@ static pwr_tStatus generate_viewer_data(device_sCtx* ctx)
       sprintf(fname, "$pwrp_load/pwr_pn_%s.xml", cdh_ObjidToFnString(0, child_module_oid));
       dcli_translate_filename(fname, fname);
 
-      // We can ignore that the GSDML file will not match the second argument "" since we don't care right now...
+      // We can ignore that the GSDML file will not match the second argument "" since we don't care right
+      // now...
       if (profinet_rt_data.read_pwr_pn_xml(std::string(fname), ""))
       {
         device_name = profinet_rt_data.m_PnDevice->m_NetworkSettings.m_device_name;
@@ -765,9 +777,9 @@ static pwr_tStatus generate_viewer_data(device_sCtx* ctx)
         fclose(pnviewer_fp);
         return 0;
       }
-      
-      fprintf(pnviewer_fp, "\"%s\" \"%s\" \"%s\" \"%s\" %d %d\n", device_text.c_str(), device_name.c_str(), ip_address.c_str(), mac_address.c_str(),
-              vendor_id, device_id);
+
+      fprintf(pnviewer_fp, "\"%s\" \"%s\" \"%s\" \"%s\" %d %d\n", device_text.c_str(), device_name.c_str(),
+              ip_address.c_str(), mac_address.c_str(), vendor_id, device_id);
     }
     fclose(pnviewer_fp);
   }
@@ -866,8 +878,7 @@ pwr_tStatus pndevice_create_ctx(ldh_tSession ldhses, pwr_tAttrRef aref, void* ed
     strcpy(fname, gsdmlfile);
   free(gsdmlfile);
 
-  // TODO Load new parser data instead...
-
+  // Parse gsdml data...
   ctx->gsdml = new pn_gsdml();
   sts = ctx->gsdml->read(fname);
   if (EVEN(sts))
@@ -890,7 +901,8 @@ pwr_tStatus pndevice_create_ctx(ldh_tSession ldhses, pwr_tAttrRef aref, void* ed
 }
 
 /*
-  TODO Rewrite this so that we use the SlotNumber attribute instead. AND also introduce moduleID as an attribute.
+  TODO Rewrite this so that we use the SlotNumber attribute instead. AND also introduce moduleID as an
+  attribute.
 */
 pwr_tStatus pndevice_init(device_sCtx* ctx)
 {
@@ -963,7 +975,34 @@ pwr_tStatus pndevice_postcopy(ldh_tSesContext Session, pwr_tOid Object, pwr_tOid
     strcpy(soidstr, cdh_ObjidToFnString(0, Source));
     sprintf(cmd, "cp $pwrp_load/pwr_pn_%s.xml $pwrp_load/pwr_pn_%s.xml", soidstr,
             cdh_ObjidToFnString(0, Object));
-    system(cmd);    
+    system(cmd);
+  }
+
+  return PWRB__SUCCESS;
+}
+
+/*
+  Called when the user removes a PnDevice
+  We use it to remove the configuration file for this device.
+*/
+
+pwr_tStatus pndevice_postdelete(ldh_tSesContext Session, pwr_tOid Object)
+{
+  if (cdh_ObjidIsNotNull(Object))
+  {
+    std::string oid_string(cdh_ObjidToFnString(0, Object));
+    std::ostringstream pwr_pn_filename(std::ios_base::out);
+    std::ostringstream rm_cmd(std::ios_base::out);
+
+    pwr_pn_filename << "$pwrp_load/pwr_pn_" << oid_string << ".xml";
+    std::cout << "-- Delete " << pwr_pn_filename.str() << std::endl;
+    rm_cmd << "rm -f " << pwr_pn_filename.str();
+    if (system(rm_cmd.str().c_str()) != EXIT_SUCCESS)
+    {
+      std::ostringstream msg(std::ios_base::out);
+      msg << "Could not delete " << pwr_pn_filename.str() << "! You have to do it manually.";
+      MsgWindow::message('E', msg.str().c_str());
+    }
   }
 
   return PWRB__SUCCESS;
