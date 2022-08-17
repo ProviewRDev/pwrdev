@@ -42,197 +42,106 @@
 // Proview Viewer to show info for a device.
 //
 
-#include <stdlib.h>
-
-#include <fstream>
+#include <iostream>
 
 #include "co_dcli.h"
 #include "co_string.h"
+#include "co_pugixml.hpp"
 
-void parse_file(char* filename);
+void parse_file(char* filename, pugi::xml_node* output);
 
 int main(int argc, char* argv[])
 {
-  pwr_tFileName file_spec, found_file;
-
+  pwr_tFileName search_criteria, found_file;
   pwr_tStatus sts;
+  pugi::xml_document output;
+  pugi::xml_node pn_devices = output.append_child("ProfinetDevices");
 
   if (argc < 2 || streq(argv[1], "-h"))
   {
-    printf("\nUsage: pn_get_deviceid \"file-pattern\" > "
-           "profinet_deviceid.dat\n\n");
+    std::cout << std::endl << "Usage: pn_get_deviceid {file pattern} {output xml file}" << std::endl;
+    std::cout << "Example: \n\t pn_get_deviceid \"/data1/gsdml/GSDML*xml\" ~/profinet_devices.xml"
+              << std::endl;
+    std::cout << std::endl
+              << "Note: You do need the quotation marks. Otherwise the shell will expand the wildcard and "
+                 "thus overwrite whatever file is expanded as the second argument passed to this utility."
+              << std::endl;
     exit(0);
   }
 
-  dcli_translate_filename(file_spec, argv[1]);
+  dcli_translate_filename(search_criteria, argv[1]);
 
-  sts = dcli_search_file(file_spec, found_file, DCLI_DIR_SEARCH_INIT);
+  sts = dcli_search_file(search_criteria, found_file, DCLI_DIR_SEARCH_INIT);
   while (ODD(sts))
   {
-    printf("# Processing file: %s\n", found_file);
-    parse_file(found_file);
+    std::cout << "Processing file: " << found_file << std::endl;
+    parse_file(found_file, &pn_devices);
 
-    sts = dcli_search_file(file_spec, found_file, DCLI_DIR_SEARCH_NEXT);
+    sts = dcli_search_file(search_criteria, found_file, DCLI_DIR_SEARCH_NEXT);
   }
-  dcli_search_file(file_spec, found_file, DCLI_DIR_SEARCH_END);
+  dcli_search_file(search_criteria, found_file, DCLI_DIR_SEARCH_END);
+
+  output.save_file(argv[2]);
 }
 
-void parse_file(char* filename)
+void parse_file(char* filename, pugi::xml_node* output)
 {
-  std::ifstream fp;
   pwr_tFileName fname;
-  char line[1024];
-  unsigned int deviceid = 0;
-  unsigned int vendorid = 0;
-  char infotextid[500] = "";
-  char infotext[500] = "";
-  char family[500] = "";
 
   dcli_translate_filename(fname, filename);
 
-  fp.open(fname);
-  if (!fp)
+  pugi::xml_document input_doc;
+  pugi::xml_parse_result result = input_doc.load_file(fname);
+
+  if (result.status == pugi::status_ok)
   {
-    printf("# Unable to open file\n");
-    exit(0);
-  }
+    // Fetch references to certain nodes for quick reference/readability
+    pugi::xml_node DeviceIdentity =
+        input_doc.select_node("/ISO15745Profile/ProfileBody/DeviceIdentity").node();
+    pugi::xml_node Family =
+        input_doc.select_node("/ISO15745Profile/ProfileBody/DeviceFunction/Family").node();
+    pugi::xml_node TextList = input_doc
+                                  .select_node("/ISO15745Profile/ProfileBody/ApplicationProcess/"
+                                               "ExternalTextList/PrimaryLanguage")
+                                  .node();
 
-  int in_deviceid = 0;
-  int in_devicefunction = 0;
-  int in_text = 0;
-  int deviceid_found = 0;
-  int family_found = 0;
-  int vendorid_found = 0;
-  int infotextid_found = 0;
-  int infotext_found = 0;
-  while (fp.getline(line, sizeof(line)))
-  {
-    char* s;
+    // Create a variable set to populate for use with xpath expressions
+    pugi::xpath_variable_set vars;
+    vars.add("TextId", pugi::xpath_type_string);
+    vars.add("VendorID", pugi::xpath_type_string);
+    vars.add("DeviceID", pugi::xpath_type_string);
+    vars.set("VendorID", DeviceIdentity.attribute("VendorID").value());
+    vars.set("DeviceID", DeviceIdentity.attribute("DeviceID").value());
+    vars.set("InfoTextId", DeviceIdentity.child("InfoText").attribute("TextId").value());
 
-    if (!in_deviceid)
+    // Extract the device description
+    pugi::xml_node device_identity_infotext =
+        TextList.select_node("Text[@TextId = string($InfoTextId)]", &vars).node();
+
+    // Add Vendor
+    pugi::xml_node Vendor = output->select_node("Vendor[@ID = string($VendorID)]", &vars).node();
+    if (!Vendor)
     {
-      if ((s = strstr(line, "<DeviceIdentity")))
-        in_deviceid = 1;
+      Vendor = output->append_child("Vendor");
+      Vendor.append_attribute("ID") = DeviceIdentity.attribute("VendorID").value();
+      Vendor.append_attribute("Name") = DeviceIdentity.child("VendorName").attribute("Value").value();
     }
 
-    if (in_deviceid)
+    // Add Device
+    pugi::xml_node Device = Vendor.select_node("Device[@ID = string($DeviceID)]", &vars).node();
+    if (!Device)
     {
-      if (!deviceid_found)
-      {
-        if ((s = strstr(line, "DeviceID")))
-        {
-          for (s += 9; *s; s++)
-          {
-            if (*s == '\"')
-            {
-              sscanf(s + 3, "%x", &deviceid);
-              deviceid_found = 1;
-              break;
-            }
-          }
-        }
-      }
-      if (!vendorid_found)
-      {
-        if ((s = strstr(line, "VendorID")))
-        {
-          for (s += 9; *s; s++)
-          {
-            if (*s == '\"')
-            {
-              sscanf(s + 3, "%x", &vendorid);
-              vendorid_found = 1;
-              break;
-            }
-          }
-        }
-      }
-      if (!infotextid_found)
-      {
-        if ((s = strstr(line, "<InfoText")))
-        {
-          for (s += 16; *s; s++)
-          {
-            if (*s == '\"')
-            {
-              strncpy(infotextid, s + 1, sizeof(infotextid));
-              if ((s = strchr(infotextid, '\"')))
-                *s = 0;
-              infotextid_found = 1;
-              break;
-            }
-          }
-        }
-      }
-      if (strstr(line, "</DeviceIdentity>"))
-      {
-        in_deviceid = 0;
-
-        printf("%u %u\n", vendorid, deviceid);
-        if (!deviceid_found)
-          printf("# DeviceID not found\n");
-        if (!vendorid_found)
-          printf("# VendorID not found\n");
-        if (!infotextid_found)
-          printf("# TextId not found\n");
-        if (!(deviceid_found && vendorid_found && infotextid_found))
-          return;
-      }
-    }
-
-    if (!in_devicefunction)
-    {
-      if ((s = strstr(line, "<DeviceFunction")))
-        in_devicefunction = 1;
-    }
-
-    if (in_devicefunction)
-    {
-      if (!family_found)
-      {
-        if ((s = strstr(line, "ProductFamily")))
-        {
-          for (s += 14; *s; s++)
-          {
-            if (*s == '\"')
-            {
-              strncpy(family, s + 1, sizeof(family));
-              if ((s = strchr(family, '\"')))
-                *s = 0;
-              family_found = 1;
-              in_devicefunction = 0;
-              break;
-            }
-          }
-        }
-      }
-    }
-    if (infotextid_found && !infotext_found)
-    {
-      if (strstr(line, "<Text") && strstr(line, infotextid))
-        in_text = 1;
-
-      if (in_text)
-      {
-        if ((s = strstr(line, "Value")))
-        {
-          for (s += 6; *s; s++)
-          {
-            if (*s == '\"')
-            {
-              strncpy(infotext, s + 1, sizeof(infotext));
-              if ((s = strchr(infotext, '\"')))
-                *s = 0;
-              infotext_found = 1;
-              in_text = 0;
-              break;
-            }
-          }
-        }
-      }
+      Device = Vendor.append_child("Device");
+      Device.append_attribute("ID") = DeviceIdentity.attribute("DeviceID").value();
+      Device.append_attribute("Description") = device_identity_infotext.attribute("Value").value();
+      Device.append_attribute("Type") = Family.attribute("MainFamily").value();
+      Device.append_attribute("Name") = Family.attribute("ProductFamily").value();
     }
   }
-  printf("%s\n%s\n", family, infotext);
-
-  fp.close();
+  else
+  {
+    std::cerr << "Unable to open/parse file " << fname << std::endl;
+    std::cerr << "Correct any errors in the file and try again" << std::endl;
+    return;
+  }
 }
