@@ -45,8 +45,6 @@
 #include "flow_browapi.h"
 #include "cow_pn_gsdml_attr.h"
 
-#define pn_cModuleClassFile "$pwr_exe/pn_module_classes.dat"
-
 typedef enum
 {
   attrnav_mItemType_ = 0,
@@ -239,8 +237,6 @@ public:
 
   int virtual close(GsdmlAttrNav* attrnav, double x, double y, bool reopen_after_close = false) final;
   virtual int scan(GsdmlAttrNav* attrnav, void* p) { return 1; }
-
-  // virtual void update(GsdmlAttrNav* attrnav) {} //TODO What's this?
 };
 
 /*

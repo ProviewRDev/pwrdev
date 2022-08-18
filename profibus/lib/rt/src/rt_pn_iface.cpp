@@ -1923,9 +1923,7 @@ int handle_service_con(io_sAgentLocal* local, io_sAgent* ap)
         }
         }
       }
-      else if (pSdb->Instance ==
-               PN_SUPERVISOR) // We can never be supervisor as it stands today?
-                              // TODO Maybe we should implement it? PnViewer uses SUPERVISOR services
+      else if (pSdb->Instance == PN_SUPERVISOR) // Profinet Viewer                              
       {
         switch (pSdb->Service)
         {

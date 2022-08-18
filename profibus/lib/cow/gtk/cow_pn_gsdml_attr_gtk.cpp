@@ -586,9 +586,4 @@ GsdmlAttrGtk::GsdmlAttrGtk(GtkWidget* a_parent_wid, void* a_parent_ctx,
   }
 
   wow = new CoWowGtk(toplevel);
-
-  /*
-    TODO Make this just a check wether we had a missing file or a different GSDML conf file as base for our configuration.
-  */
-  //*a_sts = attrnav->open(data_filename); 
 }

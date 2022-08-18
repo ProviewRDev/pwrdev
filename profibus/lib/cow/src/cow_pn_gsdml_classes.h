@@ -51,7 +51,7 @@ typedef enum
   SubmoduleItemType_,
   SubmoduleItemType_Virtual,
   SubmoduleItemType_Port,
-  SubmoduleItemType_Interface,  
+  SubmoduleItemType_Interface,
   SubmoduleItemType_Submodule,
   SubmoduleItemType__
 } eSubmoduleItemType;
@@ -64,37 +64,36 @@ typedef enum
   ModuleItemType__
 } eModuleItemType;
 
-template<typename T>
-T reverse_type(const T in_type )
+template <typename T> T reverse_type(const T in_type)
 {
   T return_value;
-  char *type_to_convert = ( char* ) & in_type;
-  char *return_type = ( char* ) & return_value;
-  switch(sizeof(T))
+  char* type_to_convert = (char*)&in_type;
+  char* return_type = (char*)&return_value;
+  switch (sizeof(T))
   {
-    case 2:
-      return_type[0] = type_to_convert[1];
-      return_type[1] = type_to_convert[0];  
-      break;
-    case 4:
-      return_type[0] = type_to_convert[3];
-      return_type[1] = type_to_convert[2];
-      return_type[2] = type_to_convert[1];
-      return_type[3] = type_to_convert[0];
-      break;
-    case 8:
-      return_type[0] = type_to_convert[7];
-      return_type[1] = type_to_convert[6];
-      return_type[2] = type_to_convert[5];
-      return_type[3] = type_to_convert[4];
-      return_type[4] = type_to_convert[3];
-      return_type[5] = type_to_convert[2];
-      return_type[6] = type_to_convert[1];
-      return_type[7] = type_to_convert[0];
-      break;
-    default:
-      return_value = in_type;
-  }  
+  case 2:
+    return_type[0] = type_to_convert[1];
+    return_type[1] = type_to_convert[0];
+    break;
+  case 4:
+    return_type[0] = type_to_convert[3];
+    return_type[1] = type_to_convert[2];
+    return_type[2] = type_to_convert[1];
+    return_type[3] = type_to_convert[0];
+    break;
+  case 8:
+    return_type[0] = type_to_convert[7];
+    return_type[1] = type_to_convert[6];
+    return_type[2] = type_to_convert[5];
+    return_type[3] = type_to_convert[4];
+    return_type[4] = type_to_convert[3];
+    return_type[5] = type_to_convert[2];
+    return_type[6] = type_to_convert[1];
+    return_type[7] = type_to_convert[0];
+    break;
+  default:
+    return_value = in_type;
+  }
   return return_value;
 }
 
@@ -104,6 +103,7 @@ public:
   virtual ~Node() {}
   void setParent(Node* parent) { m_Parent = parent; };
   Node* getParent() const { return m_Parent; };
+
 protected:
   Node* m_Parent;
 };
@@ -120,8 +120,7 @@ protected:
   for (auto it = listname.begin(); it != listname.end(); ++it)
     ; // do something with it...
 */
-template <typename T> 
-class ValueList
+template <typename T> class ValueList
 {
 private:
   std::vector<std::pair<T, T>> listItems;
@@ -132,17 +131,17 @@ public:
   class iterator
   {
   public:
-    iterator(ValueList<T>& parent, bool is_end = false) : m_parent(parent) {
+    iterator(ValueList<T>& parent, bool is_end = false) : m_parent(parent)
+    {
       if (is_end)
         m_value = m_parent.max();
       else
-        m_value = m_parent.min();              
-    }    
-    ~iterator() = default;
-    bool operator!=(iterator const& rhs) {
-      return m_value <= rhs.m_value;      
+        m_value = m_parent.min();
     }
-    iterator& operator++() {
+    ~iterator() = default;
+    bool operator!=(iterator const& rhs) { return m_value <= rhs.m_value; }
+    iterator& operator++()
+    {
       while (!m_parent.inList(++m_value))
       {
         if (m_value >= m_parent.max())
@@ -154,17 +153,14 @@ public:
       }
       return *this;
     }
-    T value() {
-      return m_value;
-    }
+    T value() { return m_value; }
 
   private:
     T m_value;
     ValueList<T>& m_parent;
   };
 
-  ValueList(char const* input)
-    : m_empty(true)
+  ValueList(char const* input) : m_empty(true)
   {
     m_original_string = std::string(input);
     // Lets parse it...
@@ -194,10 +190,7 @@ public:
     }
   }
 
-  bool empty() const
-  {
-    return m_empty;
-  }
+  bool empty() const { return m_empty; }
 
   bool inList(T value) const
   {
@@ -215,11 +208,11 @@ public:
   }
 
   T min() const
-  {    
+  {
     T min = listItems[0].first;
     for (auto& range : listItems)
-        if (min >= range.first)  // Spec says that ranges like x..y must have the lesser item to the left of ".."
-          min = range.first;
+      if (min >= range.first) // Spec says that ranges like x..y must have the lesser item to the left of ".."
+        min = range.first;
     return min;
   }
 
@@ -227,29 +220,20 @@ public:
   {
     T max = listItems[0].second;
     for (auto& range : listItems)
-        if (max <= range.second)  // Spec says that ranges like x..y must have the lesser item to the left of ".."
-          max = range.second;
+      if (max <=
+          range.second) // Spec says that ranges like x..y must have the lesser item to the left of ".."
+        max = range.second;
     return max;
   }
 
-  std::string& as_string()
-  {
-    return m_original_string;
-  }
+  std::string& as_string() { return m_original_string; }
 
-  ValueList<T>::iterator begin()
-  {
-    return iterator(*this);
-  }
+  ValueList<T>::iterator begin() { return iterator(*this); }
 
-  ValueList<T>::iterator end()
-  {
-   return iterator(*this, true);
-  }
+  ValueList<T>::iterator end() { return iterator(*this, true); }
 
   std::vector<std::pair<T, T>>& getList() { return listItems; }
 };
-
 
 /*
   TokenList is for GSDML data in the format: token1;token2
@@ -307,6 +291,7 @@ public:
   // Elements
   std::vector<BitDataItem> _BitDataItem;
 };
+
 class ExtChannelDiagItem
 {
 public:
@@ -317,6 +302,7 @@ public:
   std::shared_ptr<std::string> _Help;
   std::vector<DataItem> _ExtChannelAddValue;
 };
+
 class ChannelDiagItem
 {
 public:
@@ -404,21 +390,24 @@ class Ref : public Node
 public:
   Ref(pugi::xml_node&&, Node* parent, pn_gsdml*);
   Ref(Ref&&) = default;
-  
-  // Attributes  
+
+  // Attributes
   eValueDataType _DataType; // "Bit"
   ushort _ByteOffset;
   ushort _BitOffset;
   ushort _BitLength;
   double _DefaultValue;
-  std::string _DefaultValueString; // This is an extra field for storing the original value unparsed. For instance when datatype is "VisibleString"
-  ValueList<double> _AllowedValues; // Using double here works for all available data types...use more memory though but it's fine...
+  std::string _DefaultValueString;  // This is an extra field for storing the original value unparsed. For
+                                    // instance when datatype is "VisibleString"
+  ValueList<double> _AllowedValues; // Using double here works for all available data types...use more memory
+                                    // though but it's fine...
   ushort _Length;
   bool _Changeable;
   bool _Visible;
   std::shared_ptr<std::string> _Text;
   std::shared_ptr<ValueItem> _ValueItem;
-  std::string _ID;  // i.e. "Diag:Load voltage". This is used to distinguish some values when we're not using menus. Otherwise this is implicitly stored as the reference for the map container
+  std::string _ID; // i.e. "Diag:Load voltage". This is used to distinguish some values when we're not using
+                   // menus. Otherwise this is implicitly stored as the reference for the map container
 };
 
 class MenuItem : public Node
@@ -426,9 +415,7 @@ class MenuItem : public Node
 public:
   MenuItem(pugi::xml_node&&, Node* parent, pn_gsdml*);
   MenuItem(MenuItem&&) = default;
-  void
-  linkMenuRefs(pugi::xml_node&,
-               std::unordered_map<std::string, std::shared_ptr<MenuItem>>&);
+  void linkMenuRefs(pugi::xml_node&, std::unordered_map<std::string, std::shared_ptr<MenuItem>>&);
 
   // ID is key in the parent map...
 
@@ -455,8 +442,7 @@ public:
   std::shared_ptr<std::string> _Name;
   std::vector<GSDML::Const> _Const;
   std::map<std::string, std::shared_ptr<Ref>> _Ref;
-  std::unordered_map<std::string, std::shared_ptr<MenuItem>>
-      _MenuLookupList; // For lookups only
+  std::unordered_map<std::string, std::shared_ptr<MenuItem>> _MenuLookupList; // For lookups only
   std::vector<std::shared_ptr<MenuItem>>
       _MenuList; // For the menu to be iterated over in the order they appear
 
@@ -521,21 +507,22 @@ class SubmoduleItem
 public:
   SubmoduleItem(pugi::xml_node&&, pn_gsdml*, eSubmoduleItemType = SubmoduleItemType_Submodule);
   SubmoduleItem(eSubmoduleItemType = SubmoduleItemType_Submodule);
-  SubmoduleItem(SubmoduleItem&&) = default;  
-  virtual ~SubmoduleItem() = default;  
-  
+  SubmoduleItem(SubmoduleItem&&) = default;
+  virtual ~SubmoduleItem() = default;
+
   uint _SubmoduleIdentNumber;
-  uint _SubslotNumber; // Some SubmoduleItems are fixed and thus have a SubslotNumber specified, some don't. But we keep it here for consistency
+  uint _SubslotNumber; // Some SubmoduleItems are fixed and thus have a SubslotNumber specified, some don't.
+                       // But we keep it here for consistency
   GSDML::ValueList<uint> _FixedInSubslots;
   GSDML::ValueList<uint> _Writeable_IM_Records;
-  bool _MayIssueProcessAlarm;  
+  bool _MayIssueProcessAlarm;
   std::shared_ptr<std::string> _Text; // Some SubmoduleItems have a TextId attribute and some don't...
   std::string _ID;
 
   // Elements
   IOData _IOData;
   std::vector<ParameterRecordDataItem> _RecordDataList;
-  ModuleInfo _ModuleInfo;    
+  ModuleInfo _ModuleInfo;
 
   // Type tag...
   eSubmoduleItemType _SubmoduleItemType;
@@ -548,8 +535,8 @@ public:
   VirtualSubmoduleItem(VirtualSubmoduleItem&&) = default;
 
   // No more known attributes specific to VirtualSubmoduleItem
-  
-  // No more known elements specific to VirtualSubmoduleItem  
+
+  // No more known elements specific to VirtualSubmoduleItem
 };
 
 class PortSubmoduleItem : public SubmoduleItem
@@ -557,7 +544,7 @@ class PortSubmoduleItem : public SubmoduleItem
 public:
   PortSubmoduleItem(pugi::xml_node&&, pn_gsdml* gsdml);
   PortSubmoduleItem(PortSubmoduleItem&&) = default;
-  
+
   // Attributes
   uint _MaxPortRxDelay;
   uint _MaxPortTxDelay;
@@ -583,7 +570,7 @@ public:
   RT_Class3Properties(pugi::xml_node&&, pn_gsdml* gsdml);
   RT_Class3Properties() : _StartupMode("Legacy") {}
   RT_Class3Properties(RT_Class3Properties&&) = default;
-  
+
   // Attributes
   TokenList _StartupMode; // i.e "Legacy;Advanced"
   std::string _ForwardingMode;
@@ -597,9 +584,9 @@ public:
   TimingProperties(pugi::xml_node&&, pn_gsdml* gsdml);
   TimingProperties() : _SendClock("8 16 32 64 128"), _ReductionRatioPow2("1 2 4 8 16 32 64 128 256 512") {}
   TimingProperties(TimingProperties&&) = default;
-  
+
   // Attributes
-  ValueList<uint> _SendClock; // i.e "8 16 32 64 128"
+  ValueList<uint> _SendClock;          // i.e "8 16 32 64 128"
   ValueList<uint> _ReductionRatioPow2; // i.e "1 2 4 8 16 32 64 128 256 512"
 };
 
@@ -607,11 +594,17 @@ class RT_Class3TimingProperties
 {
 public:
   RT_Class3TimingProperties(pugi::xml_node&&, pn_gsdml* gsdml);
-  RT_Class3TimingProperties() : _SendClock("8 12 16 20 24 28 32 36 40 44 48 52 56 60 64 68 72 76 80 84 88 92 96 100 104 108 112 116 120 124 128"), _ReductionRatioPow2("1 2 4 8 16") {}
+  RT_Class3TimingProperties()
+      : _SendClock("8 12 16 20 24 28 32 36 40 44 48 52 56 60 64 68 72 76 80 84 88 92 96 100 104 108 112 116 "
+                   "120 124 128"),
+        _ReductionRatioPow2("1 2 4 8 16")
+  {
+  }
   RT_Class3TimingProperties(RT_Class3TimingProperties&&) = default;
-  
+
   // Attributes
-  ValueList<uint> _SendClock; // i.e "8 12 16 20 24 28 32 36 40 44 48 52 56 60 64 68 72 76 80 84 88 92 96 100 104 108 112 116 120 124 128"
+  ValueList<uint> _SendClock; // i.e "8 12 16 20 24 28 32 36 40 44 48 52 56 60 64 68 72 76 80 84 88 92 96 100
+                              // 104 108 112 116 120 124 128"
   ValueList<uint> _ReductionRatioPow2; // i.e "1 2 4 8 16"
 };
 
@@ -619,7 +612,7 @@ class ApplicationRelations
 {
 public:
   ApplicationRelations(pugi::xml_node&&, pn_gsdml* gsdml);
-  ApplicationRelations() : _StartupMode("Legacy") {} 
+  ApplicationRelations() : _StartupMode("Legacy") {}
   ApplicationRelations(ApplicationRelations&&) = default;
 
   // Attributes
@@ -642,7 +635,8 @@ public:
   std::string _SupportedRole; // i.e "SyncSlave"
   uint _MaxLocalJitter;
   uint _T_PLL_MAX;
-  TokenList _SupportedSyncProtocols; // i.e "PTCP" Not really a list but since the name of the attribute is in plural one can just guess...
+  TokenList _SupportedSyncProtocols; // i.e "PTCP" Not really a list but since the name of the attribute is in
+                                     // plural one can just guess...
 };
 
 class MediaRedundancy
@@ -656,7 +650,6 @@ public:
   bool _AdditionalProtocolsSupported;
 };
 
-
 class InterfaceSubmoduleItem : public SubmoduleItem
 {
 public:
@@ -665,8 +658,8 @@ public:
   InterfaceSubmoduleItem(InterfaceSubmoduleItem&&) = default;
   // Attributes
   TokenList _SupportedRT_Classes; // i.e "RT_CLASS_1;RT_CLASS_3"
-  TokenList _SupportedProtocols; // i.e "SNMP;LLDP"
-  bool _DCP_HelloSupported;  
+  TokenList _SupportedProtocols;  // i.e "SNMP;LLDP"
+  bool _DCP_HelloSupported;
   bool _DelayMeasurementSupported;
 
   RT_Class3Properties _RT_Class3Properties;
@@ -681,18 +674,18 @@ public:
   SubmoduleItemRef(pugi::xml_node&&, pn_gsdml* gsdml);
   SubmoduleItemRef(SubmoduleItemRef&&) = default;
   std::shared_ptr<SubmoduleItem> _SubmoduleItemTarget;
-  GSDML::ValueList<uint> _AllowedInSubslots; // Duh ... allowed in 
-  GSDML::ValueList<uint> _UsedInSubslots; // Default if none selected
-  GSDML::ValueList<uint> _FixedInSubslots; // Must be in
+  GSDML::ValueList<uint> _AllowedInSubslots; // Duh ... allowed in
+  GSDML::ValueList<uint> _UsedInSubslots;    // Default if none selected
+  GSDML::ValueList<uint> _FixedInSubslots;   // Must be in
 };
 
 class ModuleItem
 {
 public:
-  ModuleItem(pugi::xml_node&&, pn_gsdml* gsdml, eModuleItemType = ModuleItemType_Module);  
+  ModuleItem(pugi::xml_node&&, pn_gsdml* gsdml, eModuleItemType = ModuleItemType_Module);
   ModuleItem(ModuleItem&&) = default;
   virtual ~ModuleItem() = default;
-  
+
   // Attributes
   uint _ModuleIdentNumber;
   ValueList<uint> _PhysicalSubslots;
@@ -700,11 +693,9 @@ public:
 
   // Elements
   ModuleInfo _ModuleInfo;
-  std::map<std::string, std::shared_ptr<SubmoduleItem>>
-      _VirtualSubmoduleList;
-  std::map<std::string, std::shared_ptr<SubmoduleItemRef>>
-      _UseableSubmodules;
-  
+  std::map<std::string, std::shared_ptr<SubmoduleItem>> _VirtualSubmoduleList;
+  std::map<std::string, std::shared_ptr<SubmoduleItemRef>> _UseableSubmodules;
+
   // Type tag...
   eModuleItemType _ModuleItemType;
 };
@@ -728,7 +719,7 @@ public:
   // Attributes
   uint _VendorID;
   uint _DeviceID;
-  
+
   // Simple Elements
   std::shared_ptr<std::string> _InfoText;
   std::string _VendorName;
@@ -774,19 +765,18 @@ public:
   ushort _NumberOfDeviceAccessAR;
   ushort _NumberOfSubmodules;
   bool _LLDP_NoD_Supported;
-  //ValueList<uint> _PhysicalSubslots;  Inherited
+  // ValueList<uint> _PhysicalSubslots;  Inherited
   uint _ResetToFactoryModes;
 
-
   // Sub elements
-  //ModuleInfo _ModuleInfo; Inherited
+  // ModuleInfo _ModuleInfo; Inherited
   CertificationInfo _CertificationInfo;
   std::vector<SubslotItem> _SubslotList;
   IOConfigData _IOConfigData;
   std::map<std::string, std::shared_ptr<ModuleItemRef>> _UseableModules;
-  //std::map<std::string, std::shared_ptr<SubmoduleItem>> _VirtualSubmoduleList; Inherited
+  // std::map<std::string, std::shared_ptr<SubmoduleItem>> _VirtualSubmoduleList; Inherited
   std::map<std::string, std::shared_ptr<SubmoduleItem>> _SystemDefinedSubmoduleList;
-  //std::map<std::string, std::shared_ptr<SubmoduleItemRef>> _UseableSubmodules; Inherited
+  // std::map<std::string, std::shared_ptr<SubmoduleItemRef>> _UseableSubmodules; Inherited
 };
 
 } // namespace GSDML
