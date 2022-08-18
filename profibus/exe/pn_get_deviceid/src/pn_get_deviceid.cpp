@@ -53,7 +53,7 @@
 #include "co_pugixml.hpp"
 
 void generate_vendors(char* filename, pugi::xml_node* output);
-void parse_file(char* filename, pugi::xml_node* output);
+void parse_gsdml(char* filename, pugi::xml_node* output);
 
 int main(int argc, char* argv[])
 {
@@ -102,7 +102,7 @@ int main(int argc, char* argv[])
   while (ODD(sts))
   {
     std::cout << "Processing file: " << found_file << std::endl;
-    parse_file(found_file, &pn_devices);
+    parse_gsdml(found_file, &pn_devices);
 
     sts = dcli_search_file(search_criteria, found_file, DCLI_DIR_SEARCH_NEXT);
   }
@@ -141,7 +141,7 @@ void generate_vendors(char* filename, pugi::xml_node* output)
   }
 }
 
-void parse_file(char* filename, pugi::xml_node* output)
+void parse_gsdml(char* filename, pugi::xml_node* output)
 {
   pwr_tFileName fname;
 
