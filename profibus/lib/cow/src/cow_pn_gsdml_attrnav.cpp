@@ -2441,12 +2441,25 @@ int ItemPnOutput::open_children_impl()
 
 ItemPnDataItem::ItemPnDataItem(GsdmlAttrNav* attrnav, const char* name, GSDML::DataItem const* data_item,
                                brow_tNode dest, flow_eDest dest_code)
-    : ItemPn(attrnav, attrnav_mItemType_Parent, name, "Infotext Output"), m_data_item(data_item)
+    : ItemPn(attrnav, attrnav_mItemType_Parent, name, "Data I/O"), m_data_item(data_item)
 {
-  if (m_data_item->_UseAsBits && m_data_item->_BitDataItem.size())
-    m_closed_annotation = attrnav->brow->pixmap_map;
+  if (m_data_item->_UseAsBits)
+  {
+    if (m_data_item->_BitDataItem.size())
+    {
+      m_closed_annotation = attrnav->brow->pixmap_map;
+    }
+    else
+    {
+      m_closed_annotation = attrnav->brow->pixmap_leaf;
+      m_type &= ~attrnav_mItemType_Parent; // Remove parent bit
+    }
+  }
   else
+  {
     m_closed_annotation = attrnav->brow->pixmap_leaf;
+    m_type &= ~attrnav_mItemType_Parent; // Remove parent bit
+  }
 
   brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_attr, dest, dest_code, (void*)this, 1,
                   &m_node);
@@ -2455,16 +2468,21 @@ ItemPnDataItem::ItemPnDataItem(GsdmlAttrNav* attrnav, const char* name, GSDML::D
 
   brow_SetAnnotation(m_node, 0, m_name.c_str(), m_name.length());
 
+  std::ostringstream annotation(m_data_item->_DataTypeString, std::ios_base::ate);
+
   if (m_data_item->_DataType == GSDML::ValueDataType_OctetString)
   {
-    std::ostringstream annotation(m_data_item->_DataTypeString, std::ios_base::ate);
     annotation << " (" << m_data_item->_Length << " octets)";
     brow_SetAnnotation(m_node, 1, annotation.str().c_str(), annotation.str().length());
   }
   else
   {
-    brow_SetAnnotation(m_node, 1, m_data_item->_DataTypeString.c_str(),
-                       m_data_item->_DataTypeString.length());
+    if (m_data_item->_UseAsBits && !m_data_item->_BitDataItem.size())
+    {
+      annotation << " (Implicitly as bits)";
+    }
+
+    brow_SetAnnotation(m_node, 1, annotation.str().c_str(), annotation.str().length());
   }
 }
 
