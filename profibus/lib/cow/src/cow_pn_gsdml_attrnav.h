@@ -133,7 +133,6 @@ public:
   void set_modified(bool value) { m_modified = value; }
   bool is_modified() { return m_modified; }
   int save();
-  // int open(const char* filename);
   void collapse();
   void expand_all();
   void redraw();
@@ -176,7 +175,6 @@ public:
   std::shared_ptr<GSDML::DeviceAccessPointItem> m_selected_device_item;
   int device_confirm_active;
 
-  // GsdmlDeviceData dev_data;
   std::shared_ptr<ProfinetRuntimeData> pn_runtime_data;
   int device_read;
   int viewio;
@@ -1094,7 +1092,6 @@ public:
 
   std::string to_string() override
   {
-    // T temp = interpreter.to_host_value(*this->m_value_p);
     T temp = interpreter.switch_value(*this->m_value_p);
     std::ostringstream result(std::ios_base::out);
     result.precision(12);
@@ -1368,7 +1365,6 @@ public:
     if (m_is_bit || m_is_bitarea)
     {
       *this->m_value_p &= ~m_mask; // Clear the bits
-      //*this->m_value_p |= (selected_item->value() << m_ref->_BitOffset);
       *this->m_value_p |= selected_item->value();
     }
     else

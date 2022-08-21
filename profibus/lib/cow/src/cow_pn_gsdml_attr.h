@@ -55,7 +55,8 @@ typedef struct
   int mask;
 } attr_sItem;
 
-typedef enum {
+typedef enum
+{
   attr_eOrderModuleType_Default,
   attr_eOrderModuleType_Name,
   attr_eOrderModuleType_Number
@@ -69,7 +70,6 @@ class GsdmlAttr
 public:
   void* parent_ctx;
   char name[80];
-  //pn_gsdml* gsdml;
   int edit_mode;
   GsdmlAttrNav* attrnav;
   int input_open;
@@ -81,7 +81,6 @@ public:
   int recall_idx;
   static char value_recall[30][160];
   int value_current_recall;
- // pwr_tFileName data_filename;
   CoWow* wow;
 
   GsdmlAttr(void* a_parent_ctx, void* a_object, int a_edit_mode);
@@ -95,7 +94,7 @@ public:
   void activate_ordermoduletype(attr_eOrderModuleType type);
   void activate_exit();
   void activate_help();
-  void activate_copy();  
+  void activate_copy();
   void activate_paste();
   void activate_print();
   void activate_viewio(int set);

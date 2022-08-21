@@ -41,8 +41,6 @@
 
 #include <iostream>
 
-//#include "pwr_baseclasses.h"
-
 #include "co_dcli.h"
 #include "co_math.h"
 #include "co_string.h"
@@ -50,35 +48,25 @@
 #include "cow_pn_gsdml.h"
 #include "rt_pb_msg.h"
 
-pn_gsdml::pn_gsdml()
-{
-  strcpy(m_gsdml_file, "");
-  //set_language("");
-}
+pn_gsdml::pn_gsdml() { strcpy(m_gsdml_file, ""); }
 
-pn_gsdml::~pn_gsdml()
-{
-}
-
-// void pn_gsdml::set_language(const char* lang)
-// {
-//   strncpy(current_lang, lang, sizeof(current_lang));
-// }
+pn_gsdml::~pn_gsdml() {}
 
 void pn_gsdml::_build_diagnostics()
 {
   for (pugi::xml_node& chanDiagItem : _xmlChannelDiagList->children("ChannelDiagItem"))
-    _channelDiagMap.emplace(std::make_pair(chanDiagItem.attribute("ErrorType").as_uint(), GSDML::ChannelDiagItem(std::move(chanDiagItem), this)));
+    _channelDiagMap.emplace(std::make_pair(chanDiagItem.attribute("ErrorType").as_uint(),
+                                           GSDML::ChannelDiagItem(std::move(chanDiagItem), this)));
 }
 
 int pn_gsdml::read(const char* filename)
 {
-  //strncpy(_filename, filename, sizeof(_filename));
   pwr_tFileName translated_filename;
 
   strncpy(m_gsdml_file, filename, sizeof(m_gsdml_file));
 
-  dcli_translate_filename(translated_filename, filename); // Expand env variablies such as $pwrp_cnf to the absolute path...
+  dcli_translate_filename(translated_filename,
+                          filename); // Expand env variablies such as $pwrp_cnf to the absolute path...
 
   _doc.reset(new pugi::xml_document);
 
@@ -88,165 +76,54 @@ int pn_gsdml::read(const char* filename)
     ExternalTextList - List of Text (We use PrimaryLanguage)
     Tags use attribute TextId to point out what Text tag to reference
   */
-  _xmlTextIds = std::make_shared<pugi::xml_node>(
-      _doc->select_node("/ISO15745Profile/ProfileBody/ApplicationProcess/"
-                        "ExternalTextList/PrimaryLanguage")
-          .node());
+  _xmlTextIds =
+      std::make_shared<pugi::xml_node>(_doc->select_node("/ISO15745Profile/ProfileBody/ApplicationProcess/"
+                                                         "ExternalTextList/PrimaryLanguage")
+                                           .node());
   _xmlCategoryList = std::make_shared<pugi::xml_node>(
-      _doc->select_node(
-              "/ISO15745Profile/ProfileBody/ApplicationProcess/CategoryList")
-          .node());
-  _xmlDeviceAccessPointList = std::make_shared<pugi::xml_node>(
-      _doc->select_node("/ISO15745Profile/ProfileBody/ApplicationProcess/"
-                        "DeviceAccessPointList")
-          .node());
+      _doc->select_node("/ISO15745Profile/ProfileBody/ApplicationProcess/CategoryList").node());
+  _xmlDeviceAccessPointList =
+      std::make_shared<pugi::xml_node>(_doc->select_node("/ISO15745Profile/ProfileBody/ApplicationProcess/"
+                                                         "DeviceAccessPointList")
+                                           .node());
   _xmlModuleList = std::make_shared<pugi::xml_node>(
-      _doc->select_node(
-              "/ISO15745Profile/ProfileBody/ApplicationProcess/ModuleList")
-          .node());
+      _doc->select_node("/ISO15745Profile/ProfileBody/ApplicationProcess/ModuleList").node());
   _xmlSubmoduleList = std::make_shared<pugi::xml_node>(
-      _doc->select_node(
-              "/ISO15745Profile/ProfileBody/ApplicationProcess/SubmoduleList")
-          .node());
+      _doc->select_node("/ISO15745Profile/ProfileBody/ApplicationProcess/SubmoduleList").node());
   _xmlValueList = std::make_shared<pugi::xml_node>(
-      _doc->select_node(
-              "/ISO15745Profile/ProfileBody/ApplicationProcess/ValueList")
-          .node());
+      _doc->select_node("/ISO15745Profile/ProfileBody/ApplicationProcess/ValueList").node());
   _xmlChannelDiagList = std::make_shared<pugi::xml_node>(
-      _doc->select_node(
-              "/ISO15745Profile/ProfileBody/ApplicationProcess/ChannelDiagList")
-          .node());  
+      _doc->select_node("/ISO15745Profile/ProfileBody/ApplicationProcess/ChannelDiagList").node());
 
   _build_textIdList();
   _build_valueList();
   _build_diagnostics();
-  //pugi::xml_node DAP = _doc->select_node("/ISO15745Profile/ProfileBody/ApplicationProcess/DeviceAccessPointList/DeviceAccessPointItem[@ID='DIM ST V4.1']").node();
-  //_build_moduleList(std::move(DAP));
   _build_submoduleList();
   _build_moduleList();
 
-  m_DeviceIdentity.reset(new GSDML::DeviceIdentity(_doc->select_node(
-              "/ISO15745Profile/ProfileBody/DeviceIdentity").node(), this));
-  m_DeviceFunction.reset(new GSDML::DeviceFunction(_doc->select_node(
-              "/ISO15745Profile/ProfileBody/DeviceFunction").node(), this));
+  m_DeviceIdentity.reset(new GSDML::DeviceIdentity(
+      _doc->select_node("/ISO15745Profile/ProfileBody/DeviceIdentity").node(), this));
+  m_DeviceFunction.reset(new GSDML::DeviceFunction(
+      _doc->select_node("/ISO15745Profile/ProfileBody/DeviceFunction").node(), this));
 
   _build_DAPs();
 
   return PB__SUCCESS;
 }
 
-
-
-
-
-// int pn_gsdml::set_default_values(gsdml_eTag id, void* data, unsigned int size)
-// {
-//   for (unsigned int i = 0; i < sizeof(attrlist) / sizeof(attrlist[0]); i++)
-//   {
-//     if (attrlist[i].id == id && !streq(attrlist[i].default_value, ""))
-//     {
-
-//       if (attrlist[i].offset + attrlist[i].size > size)
-//         continue;
-
-//       string_to_value(attrlist[i].type, attrlist[i].size,
-//                       attrlist[i].default_value,
-//                       (char*)data + attrlist[i].offset);
-//     }
-//   }
-//   return 1;
-// }
-
-// int pn_gsdml::data_to_ostring(unsigned char* data, int size, char* str,
-//                               int strsize)
-// {
-//   int len = 0;
-//   for (int i = 0; i < size; i++)
-//   {
-//     if (i == size - 1)
-//     {
-//       if (len + 5 >= strsize)
-//         return 0;
-//       len += sprintf(&str[i * 5], "0x%02hhx", data[i]);
-//     }
-//     else
-//     {
-//       if (len + 4 >= strsize)
-//         return 0;
-//       len += sprintf(&str[i * 5], "0x%02hhx,", data[i]);
-//     }
-//   }
-//   return 1;
-// }
-
-// int pn_gsdml::ostring_to_data(unsigned char** data, const char* str, int size,
-//                               int* rsize)
-// {
-//   char valstr[40];
-//   int valcnt;
-//   unsigned int val;
-//   const char *s, *t;
-//   int sts;
-
-//   *data = (unsigned char*)calloc(1, size);
-//   t = str;
-//   valcnt = 0;
-//   for (s = str;; s++)
-//   {
-//     if (valcnt > size)
-//     {
-//       printf("** Size error");
-//       break;
-//     }
-//     if (*s == ',' || *s == 0)
-//     {
-//       strncpy(valstr, t, s - t);
-//       valstr[s - t] = 0;
-//       str_trim(valstr, valstr);
-//       if (valstr[0] == '0' && valstr[1] == 'x')
-//         sts = sscanf(&valstr[2], "%x", &val);
-//       else
-//         sts = sscanf(valstr, "%d", &val);
-//       *(*data + valcnt++) = (unsigned char)val;
-//       if (sts != 1)
-//         printf("** GSDML-parser error, Syntax error in octet string, %s\n",
-//                str);
-
-//       t = s + 1;
-//     }
-//     if (*s == 0)
-//       break;
-//   }
-//   if (rsize)
-//     *rsize = valcnt;
-//   return 1;
-// }
-
-std::shared_ptr<std::string> pn_gsdml::_get_TextId(std::string&& textId)
-{
-  // std::string value =
-  //     _xmlTextIds->find_child_by_attribute("Text", "TextId", textId.c_str())
-  //         .attribute("Value")
-  //         .value();
-  return _textIdMap[textId];
-}
+std::shared_ptr<std::string> pn_gsdml::_get_TextId(std::string&& textId) { return _textIdMap[textId]; }
 
 std::shared_ptr<std::string> pn_gsdml::_get_CategoryTextRef(std::string&& ID)
 {
   std::string catTextId =
-      _xmlCategoryList
-          ->find_child_by_attribute("CategoryItem", "ID", ID.c_str())
-          .attribute("TextId")
-          .value();
+      _xmlCategoryList->find_child_by_attribute("CategoryItem", "ID", ID.c_str()).attribute("TextId").value();
   return _textIdMap[catTextId];
 }
 
 std::shared_ptr<std::string> pn_gsdml::_get_CategoryInfoTextRef(std::string&& ID)
 {
-  pugi::xml_node categoryItem = _xmlCategoryList->find_child_by_attribute(
-      "CategoryItem", "ID", ID.c_str());
-  std::string textId =
-      categoryItem.child("InfoText").attribute("TextId").value();
+  pugi::xml_node categoryItem = _xmlCategoryList->find_child_by_attribute("CategoryItem", "ID", ID.c_str());
+  std::string textId = categoryItem.child("InfoText").attribute("TextId").value();
   return _textIdMap[textId];
 }
 
@@ -260,7 +137,7 @@ void pn_gsdml::_build_moduleList(pugi::xml_node&& dataAccessPointItem)
     vars.set("ID", ID.c_str());
     pugi::xml_node result = _xmlModuleList->select_node("//ModuleItem[@ID = $ID]", &vars).node();
 
-    _moduleMap[std::move(ID)].reset(new GSDML::ModuleItem(std::move(result), this)); 
+    _moduleMap[std::move(ID)].reset(new GSDML::ModuleItem(std::move(result), this));
   }
 }
 
@@ -270,24 +147,24 @@ void pn_gsdml::_build_submoduleList()
   for (pugi::xml_node& submoduleItem : _xmlSubmoduleList->children("SubmoduleItem"))
   {
     std::string ID(submoduleItem.attribute("ID").value());
-    _submoduleMap[std::move(ID)].reset(new GSDML::SubmoduleItem(std::move(submoduleItem), this, GSDML::SubmoduleItemType_Submodule)); 
-  } 
+    _submoduleMap[std::move(ID)].reset(
+        new GSDML::SubmoduleItem(std::move(submoduleItem), this, GSDML::SubmoduleItemType_Submodule));
+  }
 
   for (pugi::xml_node& portSubmoduleItem : _xmlSubmoduleList->children("PortSubmoduleItem"))
   {
     std::string ID(portSubmoduleItem.attribute("ID").value());
-    _submoduleMap[std::move(ID)].reset(new GSDML::PortSubmoduleItem(std::move(portSubmoduleItem), this)); 
-  } 
+    _submoduleMap[std::move(ID)].reset(new GSDML::PortSubmoduleItem(std::move(portSubmoduleItem), this));
+  }
 }
 
 void pn_gsdml::_build_DAPs()
 {
   for (pugi::xml_node& deviceAccessPointItem : _xmlDeviceAccessPointList->children("DeviceAccessPointItem"))
   {
-    std::string ID(deviceAccessPointItem.attribute("ID").value());    
+    std::string ID(deviceAccessPointItem.attribute("ID").value());
     _deviceAccessPointMap[ID].reset(new GSDML::DeviceAccessPointItem(std::move(deviceAccessPointItem), this));
-   // _deviceAccessPointList.push_back(_deviceAccessPointMap[ID]); // Also push it into the backwards compatible list...
-  } 
+  }
 }
 
 void pn_gsdml::_build_moduleList()
@@ -296,36 +173,28 @@ void pn_gsdml::_build_moduleList()
   {
     std::string ID(moduleItem.attribute("ID").value());
     _moduleMap[ID].reset(new GSDML::ModuleItem(std::move(moduleItem), this));
-    //_moduleList.push_back(_moduleMap[ID]); // Also push it into the backwards compatible list...
-  } 
+  }
 }
 
 void pn_gsdml::_build_valueList()
 {
   for (pugi::xml_node& valueItem : _xmlValueList->children("ValueItem"))
   {
-    _valueMap[std::move(valueItem.attribute("ID").value())].reset(new GSDML::ValueItem(std::move(valueItem), this)); 
-  } 
+    _valueMap[std::move(valueItem.attribute("ID").value())].reset(
+        new GSDML::ValueItem(std::move(valueItem), this));
+  }
 }
 
 void pn_gsdml::_build_textIdList()
 {
   for (pugi::xml_node& text : _xmlTextIds->children("Text"))
   {
-    _textIdMap[std::move(text.attribute("TextId").value())].reset(new std::string(text.attribute("Value").as_string())); 
-  } 
+    _textIdMap[std::move(text.attribute("TextId").value())].reset(
+        new std::string(text.attribute("Value").as_string()));
+  }
 }
 
-  // std::map<ushort, GSDML::ChannelDiagItem> _channelDiagMap;
-  // std::map<std::string, std::shared_ptr<GSDML::ModuleItem>> _moduleList;
-  // std::map<std::string, std::shared_ptr<GSDML::ValueItem>> _valueMap;
-  // std::map<std::string, std::shared_ptr<std::string>> _textIdMap;
-  // std::map<std::string, std::shared_ptr<GSDML::DeviceAccessPointItem>> _deviceAccessPointList;
-
-std::unordered_map<ushort, GSDML::ChannelDiagItem>& pn_gsdml::getChannelDiagMap()
-{
-  return _channelDiagMap;
-}
+std::unordered_map<ushort, GSDML::ChannelDiagItem>& pn_gsdml::getChannelDiagMap() { return _channelDiagMap; }
 
 std::unordered_map<std::string, std::shared_ptr<GSDML::ModuleItem>>& pn_gsdml::getModuleMap()
 {
@@ -342,17 +211,10 @@ std::unordered_map<std::string, std::shared_ptr<GSDML::ValueItem>>& pn_gsdml::ge
   return _valueMap;
 }
 
-std::unordered_map<std::string, std::shared_ptr<std::string>>& pn_gsdml::getTextIdMap()
-{
-  return _textIdMap;
-}
+std::unordered_map<std::string, std::shared_ptr<std::string>>& pn_gsdml::getTextIdMap() { return _textIdMap; }
 
-std::unordered_map<std::string, std::shared_ptr<GSDML::DeviceAccessPointItem>>& pn_gsdml::getDeviceAccessPointMap()
+std::unordered_map<std::string, std::shared_ptr<GSDML::DeviceAccessPointItem>>&
+pn_gsdml::getDeviceAccessPointMap()
 {
   return _deviceAccessPointMap;
 }
-
-// std::vector<std::shared_ptr<GSDML::DeviceAccessPointItem>>& pn_gsdml::getDeviceAccessPointList()
-// {
-//   return _deviceAccessPointList;
-// }

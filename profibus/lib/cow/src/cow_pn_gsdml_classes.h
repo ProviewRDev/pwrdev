@@ -11,7 +11,6 @@
 #include <string>
 #include <map>
 #include <unordered_map>
-//#include <cstdint>
 #include "co_pugixml.hpp"
 
 class pn_gsdml;
@@ -746,7 +745,6 @@ public:
   // Attributes
   std::string _PNIO_Version;
   std::string _RequiredSchemaVersion;
-  // ID="DIM 1"
   GSDML::ValueList<uint> _PhysicalSlots;
   // _ModuleIdentNumber; Inherited
   ushort _MinDeviceInterval;

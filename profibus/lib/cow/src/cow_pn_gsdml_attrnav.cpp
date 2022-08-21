@@ -640,12 +640,6 @@ int GsdmlAttrNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
     brow_GetUserData(object, (void**)&item);
     item->close(attrnav, 0, 0);
 
-    // brow_SelectClear(attrnav->brow->ctx);
-    // brow_SetInverse(object, 1);
-    // brow_SelectInsert(attrnav->brow->ctx, object);
-    // attrnav->display_attr_help_text();
-    // if (!brow_IsVisible(attrnav->brow->ctx, object, flow_eVisible_Full))
-    //   brow_CenterObject(attrnav->brow->ctx, object, 0.25);
     free(node_list);
     break;
   }
@@ -816,7 +810,6 @@ void GsdmlAttrNav::device_update_change(void* ctx)
     if (slot.m_slot_number == 0)
     {
       slot.m_subslot_map.clear();
-      // slot.m_subslot_list.clear();
       slot.m_module_ident_number = attrnav->m_selected_device_item->_ModuleIdentNumber;
       slot.m_module_ID = new_dap_id;
       continue;
@@ -908,8 +901,6 @@ int GsdmlAttrNav::trace_connect_bc(brow_tObject object, char* name, char* attr, 
 {
   ItemPn* base_item;
   GsdmlAttrNav* attrnav;
-
-  // printf( "Connecting %s.%s\n", name, attr);
 
   if (streq(name, ""))
     return 1;
@@ -1073,8 +1064,6 @@ int GsdmlAttrNav::object_attr()
   if (m_selected_device_item)
   {
     // Loop through all physical slots
-    // for (auto it = m_selected_device_item->_PhysicalSlots.begin(); it !=
-    // m_selected_device_item->_PhysicalSlots.end(); ++it)
     for (auto& slot : pn_runtime_data->m_PnDevice->m_slot_list)
     {
       // The DAP is always in slot 0. It has an attribute "FixedInSlots" but is
@@ -1506,8 +1495,6 @@ int ItemPnDAPSelection::scan(GsdmlAttrNav* attrnav, void* value_p)
     {
       if (GsdmlAttrNav::device_check_change_ok(attrnav))
       {
-        // GsdmlAttrNav::device_update_change(attrnav);
-        // attrnav->collapse(); // Close all after change
         GsdmlAttrNav::device_changed_ok(attrnav, (void*)&m_old_value);
         return 1;
       }
@@ -1744,7 +1731,6 @@ ItemPnSubslot::ItemPnSubslot(GsdmlAttrNav* attrnav, const char* name, ProfinetSl
         if (submodule.second->_SubslotNumber == m_subslot_number)
         {
           attach_submodule(submodule.second);
-          // m_attached_submodule_item = submodule.second;
           break;
         }
       }
@@ -1777,7 +1763,6 @@ ItemPnSubslot::ItemPnSubslot(GsdmlAttrNav* attrnav, const char* name, ProfinetSl
                 submodule_item_ref.second->_UsedInSubslots.inList(m_subslot_number))
             {
               attach_submodule(submodule_item_ref.second->_SubmoduleItemTarget);
-              // m_attached_submodule_item = submodule_item.second->_SubmoduleItemTarget;
             }
           }
           else
@@ -2029,9 +2014,6 @@ int ItemPnDAP::open_children_impl()
     size_t subslot_number = 1;
     for (auto const& virtual_submodule_item : dap->_VirtualSubmoduleList)
     {
-      // m_slotdata->m_subslot_map[subslot_number].m_subslot_number =
-      // subslot_number;
-
       std::ostringstream subslot_name("Subslot ", std::ios_base::ate);
       subslot_name << subslot_number << " (" << *virtual_submodule_item.second->_ModuleInfo._Name << ")";
 
@@ -2097,7 +2079,6 @@ ItemPnNetwork::ItemPnNetwork(GsdmlAttrNav* attrnav, const char* name, brow_tNode
 
 int ItemPnNetwork::open_children_impl()
 {
-  //  void* value = (void*)0;
   ProfinetNetworkSettings& network_settings = m_attrnav->pn_runtime_data->m_PnDevice->m_NetworkSettings;
 
   new ItemPnDeviceNameInput(m_attrnav, "Device Name", &network_settings.m_device_name,

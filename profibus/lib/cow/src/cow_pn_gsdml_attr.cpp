@@ -54,8 +54,7 @@
 // Static member variables
 char GsdmlAttr::value_recall[30][160];
 
-void GsdmlAttr::gsdmlattr_message(void* attr, char severity,
-                                  const char* message)
+void GsdmlAttr::gsdmlattr_message(void* attr, char severity, const char* message)
 {
   ((GsdmlAttr*)attr)->message(severity, message);
 }
@@ -75,8 +74,8 @@ void GsdmlAttr::activate_exit()
   {
     if (edit_mode && attrnav->is_modified())
     {
-      wow->DisplayQuestion((void*)this, "Apply", "Do you want to apply changes",
-                           cmd_close_apply_cb, cmd_close_no_cb, 0);
+      wow->DisplayQuestion((void*)this, "Apply", "Do you want to apply changes", cmd_close_apply_cb,
+                           cmd_close_no_cb, 0);
     }
     else
       (close_cb)(parent_ctx);
@@ -85,19 +84,14 @@ void GsdmlAttr::activate_exit()
     delete this;
 }
 
-void GsdmlAttr::activate_ordermoduletype(attr_eOrderModuleType type)
-{
-  attrnav->set_order_moduletype(type);
-}
+void GsdmlAttr::activate_ordermoduletype(attr_eOrderModuleType type) { attrnav->set_order_moduletype(type); }
 
 void GsdmlAttr::activate_help()
 {
   int sts;
 
   if (help_cb)
-    sts = (help_cb)(
-        parent_ctx,
-        "pn_device_editor /helpfile=\"$pwr_exe/profibus_xtthelp.dat\"");
+    sts = (help_cb)(parent_ctx, "pn_device_editor /helpfile=\"$pwr_exe/profibus_xtthelp.dat\"");
 }
 
 void GsdmlAttr::activate_copy()
@@ -123,11 +117,10 @@ void GsdmlAttr::activate_copy()
   {
     message('E', "You can only copy slots!");
     return;
-  } 
+  }
 
   message('I', "Slot copied");
 }
-
 
 void GsdmlAttr::activate_paste()
 {
@@ -142,9 +135,11 @@ void GsdmlAttr::activate_paste()
   }
 
   if (item->m_type & attrnav_mItemType_Movable)
-  {    
-    // Copy assignment constructor of ProfinetSlot will invoke ProfinetSubslot copy constructor to deep copy the data
-    attrnav->pn_runtime_data->m_PnDevice->m_slot_list[item->m_slot_data->m_slot_number] = *ProfinetRuntimeData::m_paste_slotdata;
+  {
+    // Copy assignment constructor of ProfinetSlot will invoke ProfinetSubslot copy constructor to deep copy
+    // the data
+    attrnav->pn_runtime_data->m_PnDevice->m_slot_list[item->m_slot_data->m_slot_number] =
+        *ProfinetRuntimeData::m_paste_slotdata;
   }
   else
   {
@@ -264,24 +259,22 @@ void GsdmlAttr::activate_cmd_ca()
   {
     if (edit_mode && attrnav->is_modified())
     {
-      wow->DisplayQuestion((void*)this, "Cancel", "All changes will be lost. Are you sure?",
-                           cmd_close_no_cb, [](void* ctx, void* data) { /* NOOP */ }, 0);
+      wow->DisplayQuestion((void*)this, "Cancel", "All changes will be lost. Are you sure?", cmd_close_no_cb,
+                           [](void* ctx, void* data) { /* NOOP */ }, 0);
     }
     else
-    (close_cb)(parent_ctx);
+      (close_cb)(parent_ctx);
   }
 }
 
-GsdmlAttr::~GsdmlAttr() {
+GsdmlAttr::~GsdmlAttr()
+{
   if (wow)
     delete wow;
 }
 
-GsdmlAttr::GsdmlAttr(void* a_parent_ctx, void* a_object,
-                     int a_edit_mode)
-    : parent_ctx(a_parent_ctx), edit_mode(a_edit_mode),
-      input_open(0), object(a_object), close_cb(0), save_cb(0), help_cb(0),
-      client_data(0), recall_idx(-1), value_current_recall(0)
+GsdmlAttr::GsdmlAttr(void* a_parent_ctx, void* a_object, int a_edit_mode)
+    : parent_ctx(a_parent_ctx), edit_mode(a_edit_mode), input_open(0), object(a_object), close_cb(0),
+      save_cb(0), help_cb(0), client_data(0), recall_idx(-1), value_current_recall(0)
 {
-  //dcli_translate_filename(data_filename, a_data_filename);
 }
