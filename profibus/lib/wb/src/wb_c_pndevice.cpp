@@ -463,19 +463,11 @@ int pndevice_save_cb(void* sctx)
 
     // Skip if if we have an oid (There's already an object in place, and we never remove existing configured
     // items) OR we do not have a module class, we need one to know what to create (The configurator forces
-    // one to select a module class). The DAP (slot 0) does not have a module class though, so we treat it
-    // differently
-    if (cdh_ObjidIsNotNull(slot.m_module_oid) ||
-        (slot.m_module_class == pwr_cNCid && slot.m_slot_number != 0))
+    // one to select a module class). The DAP has no selection but is forced to be pwr_cClass_PnModule.
+    if (cdh_ObjidIsNotNull(slot.m_module_oid) || slot.m_module_class == pwr_cNCid )
       continue;
 
-    // Special case for the DAP
-    if (slot.m_slot_number == 0)
-    {
-      slot.m_module_class = pwr_cClass_PnModule;
-    }
-
-    // Create a fancy name like "M1" and so on and so forth... DAP will be M0
+    // Create a fancy name like "M0, M1" and so on and so forth...
     std::ostringstream module_name(std::ios_base::out);
     module_name << "M" << slot.m_slot_number;
 
@@ -540,7 +532,7 @@ int pndevice_save_cb(void* sctx)
     pwr_tAttrRef module_aref = cdh_ObjidToAref(slot.m_module_oid);
     set_attribute(ctx->ldhses, &slot.m_slot_number, sizeof(slot.m_slot_number), "Slot", &module_aref);
     // Set both ModuleName and Description as a default. Again, slot 0 is treated a little different
-    if (slot.m_slot_number == 0)
+    if (slot.m_is_dap)
     {
       std::string name =
           *ctx->attr->attrnav->gsdml->getDeviceAccessPointMap().at(slot.m_module_ID)->_ModuleInfo._Name;
@@ -576,7 +568,7 @@ int pndevice_save_cb(void* sctx)
     free(slot_number_p);
 
     auto& slot = ctx->attr->attrnav->pn_runtime_data->m_PnDevice->m_slot_list[slot_number];
-    if (slot.m_slot_number == 0) // DAP
+    if (slot.m_is_dap) // DAP
     {
       module_item = ctx->attr->attrnav->gsdml->getDeviceAccessPointMap().at(slot.m_module_ID);
     }

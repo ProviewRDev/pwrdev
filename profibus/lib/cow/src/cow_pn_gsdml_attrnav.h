@@ -275,8 +275,7 @@ public:
   void set_trace_value(void** p) override { *p = m_id; }
 };
 
-//! Item for a device aka DAP. A DAP can be considered just like a module only that it's always mounted in
-//! slot 0.
+//! Item for a device aka DAP. A DAP can be considered just like a module but with some extra fancy stuff
 // Therefore it makes use of the ItemPnModuleEnumValue for selecting what DAP to use...
 class ItemPnDAPSelection : public ItemPn
 {

@@ -50,7 +50,7 @@
 #include "rt_profinet.h"
 
 #define RUNTIME_PARSER_STRING_MAX_LENGTH sizeof(pwr_tString256)
-#define DAP_SLOT 0
+#define DAP_DEFAULT_SLOT 0
 #define SUBMODULE_INTERFACE 32768
 #define SUBMODULE_PORT_1 32769
 #define SUBMODULE_PORT_2 32770
@@ -157,6 +157,7 @@ public:
                          // modules/channels
   bool m_is_modified;    // Meta, never save. Indicates wether or not this slot had it's module updated before
                          // applyig/saving...
+  bool m_is_dap;
 
   // Runtime
   ushort m_rt_state;

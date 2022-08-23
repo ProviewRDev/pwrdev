@@ -73,6 +73,7 @@
 #include "cow_pn_gsdml_attrnav.h"
 
 #include "pwr_baseclasses.h"
+#include "pwr_profibusclasses.h"
 
 #define ATTRNAV__INPUT_SYNTAX 2
 //#define ATTRNAV__OBJNOTFOUND 4
@@ -807,7 +808,7 @@ void GsdmlAttrNav::device_update_change(void* ctx)
     slot.m_slot_number = slot_index++;
 
     // The DAP
-    if (slot.m_slot_number == 0)
+    if (slot.m_is_dap)
     {
       slot.m_subslot_map.clear();
       slot.m_module_ident_number = attrnav->m_selected_device_item->_ModuleIdentNumber;
@@ -839,7 +840,7 @@ pwr_tBoolean GsdmlAttrNav::device_check_change_ok(void* ctx)
   {
     // Skip the DAP itself and any "unconfigured" slots i.e. module ident number
     // is 0
-    if (slot.m_slot_number == 0 || slot.m_module_ident_number == 0)
+    if (slot.m_is_dap || slot.m_module_ident_number == 0)
       continue;
 
     // If we have no ID the slot is unused...
@@ -1063,24 +1064,47 @@ int GsdmlAttrNav::object_attr()
   // Have we chosen a DAP?
   if (m_selected_device_item)
   {
+    bool dap_inserted = false;
     // Loop through all physical slots
     for (auto& slot : pn_runtime_data->m_PnDevice->m_slot_list)
-    {
-      // The DAP is always in slot 0. It has an attribute "FixedInSlots" but is
-      // nevertheless always in slot 0...
-      if (slot.m_slot_number == DAP_SLOT)
+    {      
+      // Create a super awesome name for the slot.
+      std::ostringstream slot_string("Slot ", std::ios_base::ate);
+      slot_string << slot.m_slot_number;
+
+      // Check where to put the DAP. Default is slot 0. But if the DAP does say otherwise we follow that...
+      if (slot.m_slot_number == DAP_DEFAULT_SLOT &&
+          (m_selected_device_item->_FixedInSlots.empty() ||
+           m_selected_device_item->_FixedInSlots.inList(DAP_DEFAULT_SLOT)))
       {
-        new ItemPnDAP(this, "DAP", &slot, NULL, flow_eDest_IntoLast,
+        // Default placement
+        slot.m_is_dap = true;
+      }
+      else if (m_selected_device_item->_FixedInSlots.inList(slot.m_slot_number))
+      {
+        // Fixed position
+        // NOTE (TODO) When support for redundancy is added the DAP may appear in more than one slot. But we
+        // have no such support :/ But we need to be sure to only add the DAP once. The redundancy DAP is
+        // always placed in a slot below the main one.
+        slot.m_is_dap = true;
+      }
+
+      if (slot.m_is_dap && !dap_inserted)
+      {
+        dap_inserted = true;
+        slot_string << " (DAP)";
+        new ItemPnDAP(this, slot_string.str().c_str(), &slot, NULL, flow_eDest_IntoLast,
                       "Configure the DAP here. Some DAPs may let you select "
                       "what submodules goes where. Be sure to select according "
                       "to your hardware specification.");
         continue;
       }
+      else if (slot.m_is_dap && dap_inserted)
+      {
+        std::cerr << "Redundancy DAP not supported" << std::endl;
+      }
 
-      // Create a super awesome name for the slot.
-      std::ostringstream slot_string("Slot ", std::ios_base::ate);
-      slot_string << slot.m_slot_number;
-
+      slot.m_is_dap = false;
       new ItemPnSlot(this, slot_string.str().c_str(), &slot, NULL, flow_eDest_IntoLast,
                      "Select a module for this slot. Remember that some modules can only "
                      "go in specific slots. It all depends on the hardware device and how "
@@ -1411,7 +1435,7 @@ int ItemPnIDSelectValue::scan(GsdmlAttrNav* attrnav, void* id_p)
 
 ItemPnDAPSelection::ItemPnDAPSelection(GsdmlAttrNav* attrnav, const char* name, brow_tNode dest,
                                        flow_eDest dest_code, const char* infotext)
-    : ItemPn(attrnav, attrnav_mItemType_Traceable | attrnav_mItemType_Parent, name, "Choose DAP"),
+    : ItemPn(attrnav, attrnav_mItemType_Traceable | attrnav_mItemType_Parent, name, "Choose DAP (Device Access Point). The \"main\" module that connects to the network."),
       m_old_value("")
 {
   m_closed_annotation = attrnav->brow->pixmap_attrenum;
@@ -1985,6 +2009,7 @@ ItemPnDAP::ItemPnDAP(GsdmlAttrNav* attrnav, const char* name, ProfinetSlot* item
       m_slot_data(item_slotdata)
 {
   m_closed_annotation = attrnav->brow->pixmap_map;
+  item_slotdata->m_module_class = pwr_cClass_PnModule; // Force PnModule class
   brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_object, dest, dest_code, (void*)this,
                   1, &m_node);
 
