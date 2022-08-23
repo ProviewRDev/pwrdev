@@ -263,18 +263,18 @@ ParameterRecordDataItem::ParameterRecordDataItem(pugi::xml_node&& parameterRecor
   {
     std::string ID;
 
-    // Index using either ValueItemTarget, ID or TextID, order of preference ID > ValueItemTarget > TextId
+    // Index using either ValueItemTarget, ID or TextID, order of preference ID > TextId > ValueItemTarget
     if (!ref.attribute("ID").empty())
     {
       ID = ref.attribute("ID").as_string();
     }
-    else if (!ref.attribute("ValueItemTarget").empty())
+    else if (!ref.attribute("TextId").empty())
     {
-      ID = ref.attribute("ValueItemTarget").as_string();
+      ID = ref.attribute("TextId").as_string();
     }
     else
     {
-      ID = ref.attribute("TextId").as_string();
+      ID = ref.attribute("ValueItemTarget").as_string();
     }
 
     _Ref.emplace(std::make_pair(std::move(ID), std::make_shared<Ref>(Ref(std::move(ref), this, gsdml))));
