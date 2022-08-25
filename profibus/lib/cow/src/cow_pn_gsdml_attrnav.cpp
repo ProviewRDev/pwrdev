@@ -1768,17 +1768,17 @@ ItemPnSubslot::ItemPnSubslot(GsdmlAttrNav* attrnav, const char* name, ProfinetSl
       */
       for (auto const& submodule_item_ref : m_parent_module_item->_UseableSubmodules)
       {
+        // Some submodules are fixed just like modules can be. Check that first.
+        // A fixed subslot implies that it is NOT pluggable (selectable here).
+        if (submodule_item_ref.second->_FixedInSubslots.inList(m_subslot_number))
+        {
+          attach_submodule(submodule_item_ref.second->_SubmoduleItemTarget);
+          m_is_selectable = false;
+          break;
+        }
+
         if (submodule_item_ref.second->_AllowedInSubslots.inList(m_subslot_number))
         {
-          // First check if this is a fixed subslot
-          if (!submodule_item_ref.second->_FixedInSubslots.empty() &&
-              submodule_item_ref.second->_FixedInSubslots.inList(m_subslot_number))
-          {
-            attach_submodule(submodule_item_ref.second->_SubmoduleItemTarget);
-            m_is_selectable = false;
-            break;
-          }
-
           // If we have no data already selected pick the default subslot from the
           // start
           if (m_subslot_data->m_submodule_ID == "")
@@ -2010,6 +2010,8 @@ ItemPnDAP::ItemPnDAP(GsdmlAttrNav* attrnav, const char* name, ProfinetSlot* item
 {
   m_closed_annotation = attrnav->brow->pixmap_map;
   item_slotdata->m_module_class = pwr_cClass_PnModule; // Force PnModule class
+  item_slotdata->m_module_ID = attrnav->m_selected_device_item->_ID;
+  item_slotdata->m_module_ident_number = attrnav->m_selected_device_item->_ModuleIdentNumber;
   brow_CreateNode(attrnav->brow->ctx, m_name.c_str(), attrnav->brow->nc_object, dest, dest_code, (void*)this,
                   1, &m_node);
 
