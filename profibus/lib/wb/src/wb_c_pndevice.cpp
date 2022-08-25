@@ -135,19 +135,19 @@ static int create_channel(ldh_tSession ldhses, ChanItem const& chan, pwr_tOid ta
 }
 
 static std::string generate_channel_object_name(GSDML::DataItem const* data_item, size_t start_index,
-                                                unsigned int number, bool channel_name_from_id = false)
+                                                unsigned int number, int const& subslot_number, bool channel_name_from_id = false)
 {
   std::regex disallowed_characters_re(
       R"([^A-Za-z0-9_])"); // Match anything NOT in A-Z, a-z, 0-9 or _ i.e. all disallowed characters
   std::ostringstream name(std::ios_base::out);
   if (channel_name_from_id)
   {
-    name << (data_item->_TextId != "" ? "" : "Ch") << std::setw(2) << std::setfill('0') << start_index
+    name << "SS" << subslot_number << "_" << (data_item->_TextId != "" ? "" : "Ch") << std::setw(2) << std::setfill('0') << start_index
          << (data_item->_TextId != "" ? "_" + data_item->_TextId : "");
   }
   else
   {
-    name << (data_item->_Text ? *data_item->_Text : "Ch") << "_" << start_index << "_" << number;
+    name << "SS" << subslot_number << "_" << (data_item->_Text ? *data_item->_Text : "Ch") << "_" << start_index << "_" << number;
   }
 
   std::string new_name;
@@ -161,14 +161,13 @@ static std::string generate_channel_object_name(GSDML::DataItem const* data_item
 
   // In 999 out of 1000 cases we now have a unique name given the start_index and number within a sequence of
   // bits for instance. In some cases though one can choose the same submodule more than once for some
-  // specific modules. One shouldn't do that but it is possible. If one does, the name will of course be a
-  // duplicate and the channel creation will fail. Should we care about this?
+  // specific modules. 
 
   return new_name;
 }
 
 static int pndevice_fill_io_vector_from_data_item(std::vector<ChanItem>& io_vector,
-                                                  GSDML::DataItem const* data_item, size_t const& start_index,
+                                                  GSDML::DataItem const* data_item, size_t const& start_index, int const& subslot_number,
                                                   bool is_output = false)
 {
   ChanItem ci;
@@ -226,7 +225,7 @@ static int pndevice_fill_io_vector_from_data_item(std::vector<ChanItem>& io_vect
         // Add Channel
         ci.number = data_item->_DataType == GSDML::ValueDataType_OctetString ? number % 8 : number;
         ci.description = std::string("Bit ") + std::to_string(number); // Okay lots of overhead here...
-        ci.name = generate_channel_object_name(data_item, start_index, number);
+        ci.name = generate_channel_object_name(data_item, start_index, number, subslot_number);
 
         io_vector.push_back(ci);
       }
@@ -239,7 +238,7 @@ static int pndevice_fill_io_vector_from_data_item(std::vector<ChanItem>& io_vect
         ci.number = bit_data_item._BitOffset;
         ci.description =
             bit_data_item._Text ? *bit_data_item._Text : std::string(" Bit ") + std::to_string(ci.number);
-        ci.name = generate_channel_object_name(data_item, start_index, ci.number);
+        ci.name = generate_channel_object_name(data_item, start_index, ci.number, subslot_number);
 
         io_vector.push_back(ci);
       }
@@ -307,14 +306,14 @@ static int pndevice_fill_io_vector_from_data_item(std::vector<ChanItem>& io_vect
     {
       for (size_t byte = 0; byte < data_item->_Length; byte++)
       {
-        ci.name = generate_channel_object_name(data_item, start_index, byte);
+        ci.name = generate_channel_object_name(data_item, start_index, byte, subslot_number);
 
         io_vector.push_back(ci);
       }
     }
     else
     {
-      ci.name = generate_channel_object_name(data_item, start_index, ci.number, true);
+      ci.name = generate_channel_object_name(data_item, start_index, ci.number, subslot_number, true);
       io_vector.push_back(ci);
     }
   }
@@ -423,6 +422,8 @@ int pndevice_save_cb(void* sctx)
   // Remove modules that isn't configured anymore OR have a changed module class (i.e. one has chosen a
   // custom derived PnModule in favor of the base class PnModule) One will loose all the connections but that
   // goes without saying...
+  // TODO Mark updated slots in the configurator and check that status here. Useful when one for instance
+  // changes configuration for modules in the middle without changing the module class...
   for (sts = ldh_GetChild(ctx->ldhses, ctx->aref.Objid, &module_oid); ODD(sts);)
   {
     auto& slot_list = ctx->attr->attrnav->pn_runtime_data->m_PnDevice->m_slot_list;
@@ -464,7 +465,10 @@ int pndevice_save_cb(void* sctx)
     // Skip if if we have an oid (There's already an object in place, and we never remove existing configured
     // items) OR we do not have a module class, we need one to know what to create (The configurator forces
     // one to select a module class). The DAP has no selection but is forced to be pwr_cClass_PnModule.
-    if (cdh_ObjidIsNotNull(slot.m_module_oid) || slot.m_module_class == pwr_cNCid )
+
+    // TODO If we have slot.m_is_modified force an update of the module name and description since it could
+    // have changed
+    if (cdh_ObjidIsNotNull(slot.m_module_oid) || slot.m_module_class == pwr_cNCid)
       continue;
 
     // Create a fancy name like "M0, M1" and so on and so forth...
@@ -785,9 +789,11 @@ static int pndevice_populate_channel_vectors(device_sCtx* ctx, GSDML::IOData* io
   pwr_tStatus sts;
   size_t index = 0;
   // Do all inputs first
+  // TODO Incorporate subslot_number in the channel name since a module can have several submodules with the
+  // same Input/Output names.
   for (auto const& input_data_item : io_data->_Input._DataItem)
   {
-    sts = pndevice_fill_io_vector_from_data_item(input_vect, &input_data_item, index++);
+    sts = pndevice_fill_io_vector_from_data_item(input_vect, &input_data_item, index++, subslot_number);
 
     if (EVEN(sts))
       return sts;
@@ -796,7 +802,7 @@ static int pndevice_populate_channel_vectors(device_sCtx* ctx, GSDML::IOData* io
   // Output!
   for (auto const& output_data_item : io_data->_Output._DataItem)
   {
-    pndevice_fill_io_vector_from_data_item(output_vect, &output_data_item, index++, true);
+    pndevice_fill_io_vector_from_data_item(output_vect, &output_data_item, index++, subslot_number, true);
 
     if (EVEN(sts))
       return sts;

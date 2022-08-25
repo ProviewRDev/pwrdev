@@ -157,7 +157,7 @@ public:
                          // modules/channels
   bool m_is_modified;    // Meta, never save. Indicates wether or not this slot had it's module updated before
                          // applyig/saving...
-  bool m_is_dap;
+  bool m_is_dap = false;
 
   // Runtime
   ushort m_rt_state;
