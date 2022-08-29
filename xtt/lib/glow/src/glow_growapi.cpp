@@ -4281,6 +4281,10 @@ void grow_UpdateGraph(grow_tCtx ctx, grow_sAttrInfo* info)
   // Set changed dynamic
   info_p = info;
   while (info_p->info_type != grow_eInfoType_End) {
+    if (strcmp(info_p->name, "AntiAliasing") == 0) {
+      ctx->gdraw->set_anti_aliasing(ctx->anti_aliasing);
+    }
+
     switch (info_p->info_type) {
     default:;
     }
