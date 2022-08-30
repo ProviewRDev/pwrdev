@@ -72,6 +72,11 @@ int pn_gsdml::read(const char* filename)
 
   pugi::xml_parse_result result = _doc->load_file(translated_filename);
 
+  if (!result)
+  {
+    std::cerr << "Error reading GSDML file: " << result.description() << std::endl;
+  }
+
   /*
     ExternalTextList - List of Text (We use PrimaryLanguage)
     Tags use attribute TextId to point out what Text tag to reference
