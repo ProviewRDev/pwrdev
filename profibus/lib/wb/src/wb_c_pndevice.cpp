@@ -147,7 +147,11 @@ static std::string generate_channel_object_name(GSDML::DataItem const* data_item
   }
   else
   {
-    name << "SS" << subslot_number << "_" << (data_item->_Text ? *data_item->_Text : "Ch") << "_" << start_index << "_" << number;
+    // Make sure the text is no longer than 20 bytes. Because we will fill it with more info. And we are limited to 32 characters in these names :/
+    std::string temp_text = *data_item->_Text;
+    if (temp_text.length() > 20)
+      temp_text.erase(20, std::string::npos); // We can only have 32 characters including null termination :(
+    name << "SS" << subslot_number << "_" << (data_item->_Text ? temp_text : "Ch") << "_" << start_index << "_" << number;
   }
 
   std::string new_name;
