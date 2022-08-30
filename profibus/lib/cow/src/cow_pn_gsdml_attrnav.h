@@ -939,23 +939,27 @@ public:
   {
     new ItemPnEnumRTClass(
         m_attrnav, "RT_CLASS", m_interface_submodule,
-        &m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR_map[PROFINET_IO_CR_TYPE_INPUT].m_rt_class, m_node,
-        flow_eDest_IntoLast);
+        &m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR_map[PROFINET_IO_CR_TYPE_INPUT].m_rt_class,
+        m_node, flow_eDest_IntoLast);
 
     new ItemPnSendClock(
         m_attrnav, "Send Clock", m_interface_submodule->_ApplicationRelations,
-        &m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR_map[PROFINET_IO_CR_TYPE_INPUT].m_send_clock_factor,
+        &m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR_map[PROFINET_IO_CR_TYPE_INPUT]
+             .m_send_clock_factor,
         m_node, flow_eDest_IntoLast);
 
     ItemPnReductionRatio* iprr = new ItemPnReductionRatio(
         m_attrnav, "Reduction Ratio", m_interface_submodule->_ApplicationRelations,
-        &m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR_map[PROFINET_IO_CR_TYPE_INPUT].m_reduction_ratio,
+        &m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR_map[PROFINET_IO_CR_TYPE_INPUT]
+             .m_reduction_ratio,
         m_node, flow_eDest_IntoLast);
 
     new ItemPnPhaseInput(
         m_attrnav, "Phase",
-        &m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR_map[PROFINET_IO_CR_TYPE_INPUT].m_phase, iprr,
-        "Phase for this device. Phase cannot exceed your reduction ratio.", m_node, flow_eDest_IntoLast);
+        &m_attrnav->pn_runtime_data->m_PnDevice->m_IOCR_map[PROFINET_IO_CR_TYPE_INPUT]
+             .m_phase,
+        iprr, "Phase for this device. Phase cannot exceed your reduction ratio.", m_node,
+        flow_eDest_IntoLast);
 
     return 1;
   }

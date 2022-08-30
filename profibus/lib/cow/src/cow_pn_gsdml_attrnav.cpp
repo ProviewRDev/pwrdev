@@ -1082,7 +1082,7 @@ int GsdmlAttrNav::object_attr()
     bool dap_inserted = false;
     // Loop through all physical slots
     for (auto& slot : pn_runtime_data->m_PnDevice->m_slot_list)
-    {      
+    {
       // Create a super awesome name for the slot.
       std::ostringstream slot_string("Slot ", std::ios_base::ate);
       slot_string << slot.m_slot_number;
@@ -1232,6 +1232,39 @@ int GsdmlAttrNav::save()
           .m_ext_channel_diag_map[ext_diag_item.first]
           .m_name = *ext_diag_item.second._Name;
     }
+  }
+
+  // Find all APIs involved and populate a map with indexes to each
+  int api_index = 0;
+  for (auto const& slot : pn_runtime_data->m_PnDevice->m_slot_list)
+  {
+    for (auto const& subslot : slot.m_subslot_map)
+    {
+      // Add new API
+      if (!pn_runtime_data->m_PnDevice->m_API_map.count(subslot.second.m_api))
+      {
+        pn_runtime_data->m_PnDevice->m_API_map.emplace(subslot.second.m_api, std::move(ProfinetAPI()));
+        pn_runtime_data->m_PnDevice->m_API_map.at(subslot.second.m_api).m_index = api_index++;
+        pn_runtime_data->m_PnDevice->m_API_map.at(subslot.second.m_api).m_profile_id = subslot.second.m_api;
+      }
+
+      // Add the module to the api index
+      auto& api_ref_index = pn_runtime_data->m_PnDevice->m_API_map.at(subslot.second.m_api).m_module_ref;
+      auto slot_linked = std::find(api_ref_index.begin(), api_ref_index.end(), slot.m_slot_number);
+      if (slot_linked == api_ref_index.end() && subslot.second.m_submodule_ID != "")
+      {
+        std::cout << "Adding reference to module " << slot.m_slot_number
+                  << " for API: " << subslot.second.m_api << std::endl;
+        api_ref_index.push_back(slot.m_slot_number);
+      }
+    }
+  }
+
+  // Set up API references in the IOCRs (or the input rather since we copy the output after this)
+  for (auto const& api : pn_runtime_data->m_PnDevice->m_API_map)
+  {
+    pn_runtime_data->m_PnDevice->m_IOCR_map.at(PROFINET_IO_CR_TYPE_INPUT).m_api_refs[api.first] =
+        api.second.m_index;
   }
 
   // Make sure we copy INPUT_CR to OUTPUT_CR
@@ -1450,7 +1483,8 @@ int ItemPnIDSelectValue::scan(GsdmlAttrNav* attrnav, void* id_p)
 
 ItemPnDAPSelection::ItemPnDAPSelection(GsdmlAttrNav* attrnav, const char* name, brow_tNode dest,
                                        flow_eDest dest_code, const char* infotext)
-    : ItemPn(attrnav, attrnav_mItemType_Traceable | attrnav_mItemType_Parent, name, "Choose DAP (Device Access Point). The \"main\" module that connects to the network."),
+    : ItemPn(attrnav, attrnav_mItemType_Traceable | attrnav_mItemType_Parent, name,
+             "Choose DAP (Device Access Point). The \"main\" module that connects to the network."),
       m_old_value("")
 {
   m_closed_annotation = attrnav->brow->pixmap_attrenum;
@@ -2003,6 +2037,7 @@ void ItemPnSubslot::attach_submodule(std::shared_ptr<GSDML::SubmoduleItem> submo
     m_attached_submodule_item = submodule;
     m_subslot_data->m_submodule_ID = submodule->_ID;
     m_subslot_data->m_submodule_ident_number = submodule->_SubmoduleIdentNumber;
+    m_subslot_data->m_api = submodule->_API;
 
     m_subslot_data->m_io_input_length = calculate_input_length(&m_attached_submodule_item->_IOData._Input);
     m_subslot_data->m_io_output_length = calculate_output_length(&m_attached_submodule_item->_IOData._Output);
@@ -2010,6 +2045,7 @@ void ItemPnSubslot::attach_submodule(std::shared_ptr<GSDML::SubmoduleItem> submo
   else
   {
     m_attached_submodule_item.reset();
+    m_subslot_data->m_api = 0;
     m_subslot_data->m_submodule_ID = "";
     m_subslot_data->m_submodule_ident_number = 0;
     m_subslot_data->m_data_record_map.clear();

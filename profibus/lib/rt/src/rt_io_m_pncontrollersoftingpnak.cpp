@@ -157,39 +157,32 @@ static pwr_tStatus IoAgentRead(io_tCtx ctx, io_sAgent* ap)
 
     if (pn_device->m_rt_device_state == PNAK_DEVICE_STATE_CONNECTED)
     {
-      // The map index is the IOCR Type
-      for (auto& iocr : pn_device->m_IOCR_map)
+      auto& iocr = pn_device->m_IOCR_map.at(PROFINET_IO_CR_TYPE_INPUT);
+      //  TODO Implement iocrstate propagation to pn device. But as of now
+      //  the status_data doesn't change according to what the data frames says
+      //  in other words. It's showing normal operation even with all modules
+      //  pulled from an IO...
+      data_length = iocr.m_rt_io_data_length;
+      sts = pnak_get_iocr_data(0, iocr.m_rt_identifier, iocr.m_rt_io_data, &data_length, &ioxs, &status_data);
+      if (sts == PNAK_OK)
       {
-        if (iocr.first == PROFINET_IO_CR_TYPE_INPUT)
+        for (auto& slot : pn_device->m_slot_list)
         {
-          // TODO Implement iocrstate propagation to pn device. But as of now
-          // the status_data doesn't change according to what the data frames says
-          // in other words. It's showing normal operation even with all modules
-          // pulled from an IO...
-          data_length = iocr.second.m_rt_io_data_length;
-          sts = pnak_get_iocr_data(0, iocr.second.m_rt_identifier, iocr.second.m_rt_io_data, &data_length,
-                                   &ioxs, &status_data);
-          if (sts == PNAK_OK)
+          for (auto& subslot : slot.m_subslot_map)
           {
-            for (auto& slot : pn_device->m_slot_list)
+            if (subslot.second.m_rt_io_submodule_type == PROFINET_IO_SUBMODULE_TYPE_INPUT ||
+                subslot.second.m_rt_io_submodule_type == PROFINET_IO_SUBMODULE_TYPE_INPUT_AND_OUTPUT)
             {
-              for (auto& subslot : slot.m_subslot_map)
-              {
-                if (subslot.second.m_rt_io_submodule_type == PROFINET_IO_SUBMODULE_TYPE_INPUT ||
-                    subslot.second.m_rt_io_submodule_type == PROFINET_IO_SUBMODULE_TYPE_INPUT_AND_OUTPUT)
-                {
-                  io_datap = iocr.second.m_rt_io_data + subslot.second.m_rt_offset_io_in;
-                  clean_io_datap = iocr.second.m_rt_clean_io_data + subslot.second.m_rt_offset_clean_io_in;
-                  memcpy(clean_io_datap, io_datap, subslot.second.m_io_input_length);
-                }
-              }
+              io_datap = iocr.m_rt_io_data + subslot.second.m_rt_offset_io_in;
+              clean_io_datap = iocr.m_rt_clean_io_data + subslot.second.m_rt_offset_clean_io_in;
+              memcpy(clean_io_datap, io_datap, subslot.second.m_io_input_length);
             }
           }
-          else
-          {
-            printf("pnak_get_iocr_data failed!\n");
-          }
         }
+      }
+      else
+      {
+        printf("pnak_get_iocr_data failed!\n");
       }
     }
   }
@@ -232,36 +225,30 @@ static pwr_tStatus IoAgentWrite(io_tCtx ctx, io_sAgent* ap)
     if (pn_device->m_rt_device_state == PNAK_DEVICE_STATE_CONNECTED)
     {
       // The map index is the IOCR Type
-      for (auto& iocr : pn_device->m_IOCR_map)
+      auto& iocr = pn_device->m_IOCR_map.at(PROFINET_IO_CR_TYPE_OUTPUT);
+      data_length = iocr.m_rt_io_data_length;
+
+      memset(iocr.m_rt_io_data, PNAK_IOXS_STATUS_DATA_GOOD, data_length);
+
+      for (auto& slot : pn_device->m_slot_list)
       {
-        if (iocr.first == PROFINET_IO_CR_TYPE_OUTPUT)
+        for (auto& subslot : slot.m_subslot_map)
         {
-          data_length = iocr.second.m_rt_io_data_length;
-
-          memset(iocr.second.m_rt_io_data, PNAK_IOXS_STATUS_DATA_GOOD, data_length);
-
-          for (auto& slot : pn_device->m_slot_list)
+          if (subslot.second.m_rt_io_submodule_type == PROFINET_IO_SUBMODULE_TYPE_OUTPUT ||
+              subslot.second.m_rt_io_submodule_type == PROFINET_IO_SUBMODULE_TYPE_INPUT_AND_OUTPUT)
           {
-            for (auto& subslot : slot.m_subslot_map)
-            {
-              if (subslot.second.m_rt_io_submodule_type == PROFINET_IO_SUBMODULE_TYPE_OUTPUT ||
-                  subslot.second.m_rt_io_submodule_type == PROFINET_IO_SUBMODULE_TYPE_INPUT_AND_OUTPUT)
-              {
-                io_datap = iocr.second.m_rt_io_data + subslot.second.m_rt_offset_io_out;
-                clean_io_datap = iocr.second.m_rt_clean_io_data + subslot.second.m_rt_offset_clean_io_out;
-                memcpy(io_datap, clean_io_datap, subslot.second.m_io_output_length);
-              }
-            }
-          }
-          char ioxs = CYCLIC_DATA_STATUS_DATA_VALID | CYCLIC_DATA_STATUS_STATE_PRIMARY |
-                      CYCLIC_DATA_STATUS_STATE_RUN | CYCLIC_DATA_STATUS_NORMAL_OPERATION;
-          sts = pnak_set_iocr_data(0, iocr.second.m_rt_identifier, iocr.second.m_rt_io_data,
-                                   iocr.second.m_rt_io_data_length, ioxs);
-          if (sts != PNAK_OK)
-          {
-            printf("pnak_set_iocr_data failed!\n");
+            io_datap = iocr.m_rt_io_data + subslot.second.m_rt_offset_io_out;
+            clean_io_datap = iocr.m_rt_clean_io_data + subslot.second.m_rt_offset_clean_io_out;
+            memcpy(io_datap, clean_io_datap, subslot.second.m_io_output_length);
           }
         }
+      }
+      char ioxs = CYCLIC_DATA_STATUS_DATA_VALID | CYCLIC_DATA_STATUS_STATE_PRIMARY |
+                  CYCLIC_DATA_STATUS_STATE_RUN | CYCLIC_DATA_STATUS_NORMAL_OPERATION;
+      sts = pnak_set_iocr_data(0, iocr.m_rt_identifier, iocr.m_rt_io_data, iocr.m_rt_io_data_length, ioxs);
+      if (sts != PNAK_OK)
+      {
+        printf("pnak_set_iocr_data failed!\n");
       }
 
       // Check if we have a read request, if so pack it and send it. We only

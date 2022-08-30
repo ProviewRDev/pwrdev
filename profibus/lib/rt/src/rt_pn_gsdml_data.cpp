@@ -89,13 +89,44 @@ void ProfinetChannelDiag::build(pugi::xml_node&& p_channel_diag, uint p_error_ty
   }
 }
 
-ProfinetIOCR::ProfinetIOCR(pugi::xml_node&& p_IOCR)
+ProfinetAPI::ProfinetAPI(pugi::xml_node&& p_API)
+    : m_profile_id(p_API.attribute("ProfileID").as_uint()), m_index(p_API.attribute("RefIndex").as_uint())
+{
+  for (pugi::xml_node const& module_ref : p_API.children("Module"))
+  {
+    m_module_ref.push_back(module_ref.attribute("Slot").as_uint());
+  }
+}
+
+void ProfinetAPI::build(pugi::xml_node&& p_api) const
+{
+  // Attributes
+  p_api.append_attribute("ProfileID").set_value(m_profile_id);
+  p_api.append_attribute("RefIndex").set_value(m_index);
+
+  for (auto const& module : m_module_ref)
+  {
+    p_api.append_child("Module").append_attribute("Slot").set_value(module);
+  }
+}
+
+ProfinetIOCR::ProfinetIOCR(pugi::xml_node&& p_IOCR, pugi::xml_node&& p_APIs)
     : m_send_clock_factor(p_IOCR.attribute("SendClockFactor").as_uint()),
       m_reduction_ratio(p_IOCR.attribute("ReductionRatio").as_uint()),
-      m_phase(p_IOCR.attribute("Phase").as_uint()), m_api(p_IOCR.attribute("API").as_uint()),
-      m_rt_class(p_IOCR.attribute("RT_CLASS").as_string()),
+      m_phase(p_IOCR.attribute("Phase").as_uint()), m_rt_class(p_IOCR.attribute("RT_CLASS").as_string()),
       m_startup_mode(p_IOCR.attribute("StartupMode").as_string())
 {
+  // Find and connect the refs
+  for (auto const& api_ref : p_IOCR.child("APIs").children("Ref"))
+  {
+    for (auto const& api : p_APIs.children("API"))
+    {
+      if (api.attribute("RefIndex").as_uint() == api_ref.attribute("Index").as_uint())
+      {
+        m_api_refs[api.attribute("ProfileID").as_uint()] = api_ref.attribute("Index").as_uint();
+      }
+    }
+  }
 }
 
 void ProfinetIOCR::build(pugi::xml_node&& p_iocr, uint type) const
@@ -105,9 +136,15 @@ void ProfinetIOCR::build(pugi::xml_node&& p_iocr, uint type) const
   p_iocr.append_attribute("SendClockFactor").set_value(m_send_clock_factor);
   p_iocr.append_attribute("ReductionRatio").set_value(m_reduction_ratio);
   p_iocr.append_attribute("Phase").set_value(m_phase);
-  p_iocr.append_attribute("API").set_value(m_api);
   p_iocr.append_attribute("RT_CLASS").set_value(m_rt_class.c_str());
   p_iocr.append_attribute("StartupMode").set_value(m_startup_mode.c_str());
+
+  pugi::xml_node api_refs = p_iocr.append_child("APIs");
+  for (auto const& api : m_api_refs)
+  {
+    pugi::xml_node api_ref = api_refs.append_child("Ref");
+    api_ref.append_attribute("Index").set_value(api.second);
+  }
 }
 
 ProfinetDataRecord::ProfinetDataRecord(pugi::xml_node&& p_DataRecord)
@@ -322,9 +359,15 @@ ProfinetDevice::ProfinetDevice(pugi::xml_node&& p_pn_device)
       // version of the DAP instead?
       m_NetworkSettings(p_pn_device.child("NetworkSettings"))
 {
+  for (pugi::xml_node& api : p_pn_device.child("APIs").children("API"))
+  {
+    m_API_map.emplace(api.attribute("ProfileID").as_uint(), std::move(ProfinetAPI(std::move(api))));
+  }
+
   for (pugi::xml_node& iocr : p_pn_device.child("IOCRs").children("IOCR"))
   {
-    m_IOCR_map.emplace(iocr.attribute("Type").as_uint(), std::move(ProfinetIOCR(std::move(iocr))));
+    m_IOCR_map.emplace(iocr.attribute("Type").as_uint(),
+                       std::move(ProfinetIOCR(std::move(iocr), p_pn_device.child("APIs"))));
   }
 
   for (pugi::xml_node& slot : p_pn_device.children("Slot"))
@@ -353,6 +396,13 @@ void ProfinetDevice::build(pugi::xml_node&& p_pn_device) const
   for (auto const& slot : m_slot_list)
   {
     slot.build(p_pn_device.append_child("Slot"));
+  }
+
+  // API Section
+  pugi::xml_node apis = p_pn_device.append_child("APIs");
+  for (auto const& api : m_API_map)
+  {
+    api.second.build(apis.append_child("API"));
   }
 
   // IOCR Section

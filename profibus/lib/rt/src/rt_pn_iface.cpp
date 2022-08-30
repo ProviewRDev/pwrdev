@@ -425,8 +425,6 @@ void pack_download_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes, std::shared_ptr<Pr
   PN_U16 data_record_length = 0;
   PN_U16 total_data_length = 0;
   char* pData;
-  
-  std::map<int, PnApiData> api_map;
 
   static unsigned short phase = 1;
 
@@ -445,8 +443,9 @@ void pack_download_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes, std::shared_ptr<Pr
 
   /* Calculate length of service */
 
-  // Calculate number of IOCR's
+  // We put all API's under the same IOCR
   num_iocrs = pn_device->m_IOCR_map.size();
+  num_apis = pn_device->m_API_map.size();
 
   /* Calculate the rest */
   for (auto const& slot : pn_device->m_slot_list)
@@ -455,19 +454,11 @@ void pack_download_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes, std::shared_ptr<Pr
     if (slot.m_module_ID == "")
       continue;
 
-    // APIs are stored in the subslots. Why? APIs reference modules not submodules. TODO Look into...we can probably do this better...
     for (auto const& subslot : slot.m_subslot_map)
     {
-      // Count number of APIs we encounter and populate a map with indexes using
-      // that API
-      unsigned int api = subslot.second.m_api;
-      if (api_map.find(api) == api_map.end())
-      {
-        printf("Found new API\n");
-        api_map.emplace(api, api);
-        num_apis++;
-      }
-      api_map[api].module_index.emplace(num_modules);
+      // Skip unconfigured subslots...
+      if (subslot.second.m_submodule_ID == "")
+        continue;
 
       // Count data records and record total length
       for (auto const& data_record : subslot.second.m_data_record_map)
@@ -489,9 +480,9 @@ void pack_download_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes, std::shared_ptr<Pr
   unsigned char high_low_byte;
   unsigned char low_high_byte;
   unsigned char low_low_byte;
-  
+
   PN_U32 ar_property;
-  
+
   T_PN_IOCR* pIOCR;
   T_PN_REFERENCE* pAPIReference;
   T_PN_REFERENCE* pModuleReference;
@@ -525,10 +516,8 @@ void pack_download_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes, std::shared_ptr<Pr
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat-security"
-snprintf(pSDR->DeviceName, PN_MAX_DEVICE_NAME_LENGTH, pn_device->m_NetworkSettings.m_device_name.c_str());
+  snprintf(pSDR->DeviceName, PN_MAX_DEVICE_NAME_LENGTH, pn_device->m_NetworkSettings.m_device_name.c_str());
 #pragma GCC diagnostic pop
-  
-  
 
   // If this device is the controller itself (i.e. ProviewR) act accordingly
   if (pn_device->m_rt_device_ref == PN_DEVICE_REFERENCE_THIS_STATION)
@@ -538,7 +527,7 @@ snprintf(pSDR->DeviceName, PN_MAX_DEVICE_NAME_LENGTH, pn_device->m_NetworkSettin
     // This device make use of the interface name...
     snprintf(pSDR->InterfaceName, PN_MAX_INTERFACE_NAME_LENGTH, pn_device->m_rt_interface_name.c_str());
 #pragma GCC diagnostic pop
-    
+
     // pSDR->Flag = PN_SERVICE_DOWNLOAD_FLAG_ACTIVATE;
     // PN_SERVICE_DOWNLOAD_FLAG_FULL_APPLICATION_IDENT_SUPPORT
     // PN_SERVICE_DOWNLOAD_FLAG_DISABLE_DCP_HELLO
@@ -610,13 +599,13 @@ snprintf(pSDR->DeviceName, PN_MAX_DEVICE_NAME_LENGTH, pn_device->m_NetworkSettin
   pSDR->AlarmCRBlock.RTATimeoutFactorLowByte = 1;
   pSDR->AlarmCRBlock.RTARetryHighByte = 0;
   pSDR->AlarmCRBlock.RTARetryLowByte = 3;
-  
+
   PN_U32 alarm_properties = PROFINET_ALARM_CR_PRIORITY_DEFAULT | PROFINET_ALARM_CR_USE_DATA_RTA;
-  pSDR->AlarmCRBlock.PropertiesHighWordHighByte =  _PN_U32_HIGH_HIGH_BYTE(alarm_properties);
+  pSDR->AlarmCRBlock.PropertiesHighWordHighByte = _PN_U32_HIGH_HIGH_BYTE(alarm_properties);
   pSDR->AlarmCRBlock.PropertiesHighWordLowByte = _PN_U32_HIGH_LOW_BYTE(alarm_properties);
   pSDR->AlarmCRBlock.PropertiesLowWordHighByte = _PN_U32_LOW_HIGH_BYTE(alarm_properties);
   pSDR->AlarmCRBlock.PropertiesLowWordLowByte = _PN_U32_LOW_LOW_BYTE(alarm_properties);
-  
+
   pSDR->AlarmCRBlock.MaxAlarmLengthHighByte = _PN_U16_HIGH_BYTE(PROFINET_ALARM_DATA_MAX_LENGTH);
   pSDR->AlarmCRBlock.MaxAlarmLengthLowByte = _PN_U16_LOW_BYTE(PROFINET_ALARM_DATA_MAX_LENGTH);
   pSDR->AlarmCRBlock.TagHeaderHighHighByte = 0xC0;
@@ -648,7 +637,7 @@ snprintf(pSDR->DeviceName, PN_MAX_DEVICE_NAME_LENGTH, pn_device->m_NetworkSettin
       iocr.second.m_rt_properties |=
           PROFINET_IO_CR_RT_CLASS2; // RT_CLASS_2 even if device says CLASS_1. Things
                                     // stop working when we use CLASS_1 even if a device says it want
-                                    // CLASS_1...Might be a stack issue since our stack is pretty old now... 
+                                    // CLASS_1...Might be a stack issue since our stack is pretty old now...
 
     pIOCR->PropertiesHighWordHighByte = _PN_U32_HIGH_HIGH_BYTE(iocr.second.m_rt_properties);
     pIOCR->PropertiesHighWordLowByte = _PN_U32_HIGH_LOW_BYTE(iocr.second.m_rt_properties);
@@ -690,18 +679,20 @@ snprintf(pSDR->DeviceName, PN_MAX_DEVICE_NAME_LENGTH, pn_device->m_NetworkSettin
     pIOCR->MulticastAddr.MidLowByte = 0;             // Not supported (By stack) yet set to 0
     pIOCR->MulticastAddr.LowHighByte = 0;            // Not supported (By stack) yet set to 0
     pIOCR->MulticastAddr.LowLowByte = 0;             // Not supported (By stack) yet set to 0
-    pIOCR->NumberOfAPIsHighByte = _PN_U16_HIGH_BYTE(num_apis);
-    pIOCR->NumberOfAPIsLowByte = _PN_U16_LOW_BYTE(num_apis);
+    pIOCR->NumberOfAPIsHighByte = _PN_U16_HIGH_BYTE(iocr.second.m_api_refs.size());
+    pIOCR->NumberOfAPIsLowByte = _PN_U16_LOW_BYTE(iocr.second.m_api_refs.size());
 
     /* Fill references to API */
 
     pAPIReference = (T_PN_REFERENCE*)(pIOCR + 1);
-
-    for (const auto& cApi : api_map)
+    
+    //for (const auto& cApi : api_map)
+    for (auto const& api : iocr.second.m_api_refs)
     {
       total_data_length += sizeof(T_PN_REFERENCE);
-      pAPIReference->ReferenceHighByte = _PN_U16_HIGH_BYTE(cApi.second.api);
-      pAPIReference->ReferenceLowByte = _PN_U16_LOW_BYTE(cApi.second.api);
+
+      pAPIReference->ReferenceHighByte = _PN_U16_HIGH_BYTE(api.second);
+      pAPIReference->ReferenceLowByte = _PN_U16_LOW_BYTE(api.second);
       pAPIReference++;
     }
 
@@ -712,23 +703,24 @@ snprintf(pSDR->DeviceName, PN_MAX_DEVICE_NAME_LENGTH, pn_device->m_NetworkSettin
 
   T_PN_API* pAPI = (T_PN_API*)pIOCR;
 
-  for (const auto& cApi : api_map)
+  // for (const auto& cApi : api_map)
+  for (auto const& api : pn_device->m_API_map)
   {
     total_data_length += sizeof(T_PN_API);
     /* Fill data for API */
-    pAPI->APIHighWordHighByte = _PN_U32_HIGH_HIGH_BYTE(cApi.second.api);
-    pAPI->APIHighWordLowByte = _PN_U32_HIGH_LOW_BYTE(cApi.second.api);
-    pAPI->APILowWordHighByte = _PN_U32_LOW_HIGH_BYTE(cApi.second.api);
-    pAPI->APILowWordLowByte = _PN_U32_LOW_LOW_BYTE(cApi.second.api);
+    pAPI->APIHighWordHighByte = _PN_U32_HIGH_HIGH_BYTE(api.first);
+    pAPI->APIHighWordLowByte = _PN_U32_HIGH_LOW_BYTE(api.first);
+    pAPI->APILowWordHighByte = _PN_U32_LOW_HIGH_BYTE(api.first);
+    pAPI->APILowWordLowByte = _PN_U32_LOW_LOW_BYTE(api.first);
 
-    pAPI->NumberOfModulesHighByte = _PN_U16_HIGH_BYTE(cApi.second.module_index.size());
-    pAPI->NumberOfModulesLowByte = _PN_U16_LOW_BYTE(cApi.second.module_index.size());
+    pAPI->NumberOfModulesHighByte = _PN_U16_HIGH_BYTE(api.second.m_module_ref.size());
+    pAPI->NumberOfModulesLowByte = _PN_U16_LOW_BYTE(api.second.m_module_ref.size());
 
     /* Fill references to Modules */
 
     pModuleReference = (T_PN_REFERENCE*)(pAPI + 1);
 
-    for (unsigned int index : cApi.second.module_index)
+    for (unsigned int index : api.second.m_module_ref)
     {
       total_data_length += sizeof(T_PN_REFERENCE);
       pModuleReference->ReferenceHighByte = _PN_U16_HIGH_BYTE(index);
@@ -794,8 +786,9 @@ snprintf(pSDR->DeviceName, PN_MAX_DEVICE_NAME_LENGTH, pn_device->m_NetworkSettin
       /* Add number of datarecords */
       pDataRecordReference = (T_PN_REFERENCE*)(pSubModule + 1);
 
-      for (auto &data_record : subslot.second.m_data_record_map)
-      {
+      for (auto& data_record : subslot.second.m_data_record_map)
+      {        
+        (void)data_record; // Don't produce "Unused variable compiler warnings"
         total_data_length += sizeof(T_PN_REFERENCE);
         pDataRecordReference->ReferenceHighByte = _PN_U16_HIGH_BYTE(datarecord_ref_index);
         pDataRecordReference->ReferenceLowByte = _PN_U16_LOW_BYTE(datarecord_ref_index++);
@@ -824,8 +817,10 @@ snprintf(pSDR->DeviceName, PN_MAX_DEVICE_NAME_LENGTH, pn_device->m_NetworkSettin
         total_data_length += sizeof(T_PN_DATA_RECORD) + data_record.second.m_data_length;
         pDataRecord->VersionHighByte = pSDR->VersionHighByte;
         pDataRecord->VersionLowByte = pSDR->VersionLowByte;
-        pDataRecord->SequenceHighByte = _PN_U16_HIGH_BYTE(data_record.second.m_transfer_sequence);
-        pDataRecord->SequenceLowByte = _PN_U16_LOW_BYTE(data_record.second.m_transfer_sequence);
+        // pDataRecord->SequenceHighByte = _PN_U16_HIGH_BYTE(data_record.second.m_transfer_sequence);
+        // pDataRecord->SequenceLowByte = _PN_U16_LOW_BYTE(data_record.second.m_transfer_sequence);
+        pDataRecord->SequenceHighByte = _PN_U16_HIGH_BYTE(0); // TODO Broken? Stack won't handle anything else but 0 which is "auto" anyways.
+        pDataRecord->SequenceLowByte = _PN_U16_LOW_BYTE(0); // The order matters but the stack ought to handle that ... ??
         pDataRecord->APIHighWordHighByte = _PN_U32_HIGH_HIGH_BYTE(subslot.second.m_api);
         pDataRecord->APIHighWordLowByte = _PN_U32_HIGH_LOW_BYTE(subslot.second.m_api);
         pDataRecord->APILowWordHighByte = _PN_U32_LOW_HIGH_BYTE(subslot.second.m_api);
@@ -900,7 +895,7 @@ int unpack_get_los_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local)
       pDeviceInfo++;
       pn_device->m_NetworkSettings.m_device_name = std::string((char*)pDeviceInfo, name_length);
       local->device_list.push_back(pn_device);
-      
+
       pDeviceInfo = (T_PN_DEVICE_INFO*)((unsigned char*)pDeviceInfo + name_length);
     }
     return PNAK_OK;
@@ -1023,7 +1018,6 @@ int unpack_write_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local)
   io_sAgent* ap = local->args.ap;
   io_sRack* slave_list;
   pwr_sClass_PnDevice* sp;
-  // std::shared_ptr<ProfinetDevice> pn_dev;
   pwr_tUInt32 saved_counter;
   unsigned short device_ref = pSdb->DeviceRef;
 
@@ -1037,7 +1031,6 @@ int unpack_write_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local)
       if (local->device_list[i]->m_rt_device_ref == device_ref)
       {
         sp = (pwr_sClass_PnDevice*)slave_list->op;
-        // pn_dev = local->device_list[i];
         saved_counter = sp->WriteReq.response.counter;
         memset(&sp->WriteReq.response, 0, sizeof(pwr_sClass_PnWriteCon));
         sp->WriteReq.response.counter = saved_counter;
@@ -1133,8 +1126,6 @@ int unpack_get_alarm_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local
     unsigned short ii, jj;
 
     std::shared_ptr<ProfinetDevice> pn_device;
-    // std::vector<ProfinetChannelDiag>
-    // std::vector<GsdmlChannelDiag*> channel_diag_vector;
     std::unordered_map<uint, ProfinetChannelDiag>* device_channel_diag_map;
 
     pGAC = (T_PN_SERVICE_GET_ALARM_CON*)(pSdb + 1);
@@ -1165,10 +1156,7 @@ int unpack_get_alarm_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local
       {
         pn_device = local->device_list[ii];
         device_channel_diag_map = &local->device_list[ii]->m_channel_diag_map;
-        // local->device_list[ii]->m_channel_diag_map
-
-        // channel_diag_vector = local->device_list[ii]->channel_diag;
-
+        
         pn_device->m_rt_alarm_data.alarm_type = alarm_type;
         pn_device->m_rt_alarm_data.alarm_prio = alarm_prio;
         pn_device->m_rt_alarm_data.rem_alarms = remaining_alarms;
@@ -1187,21 +1175,22 @@ int unpack_get_alarm_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local
     if (ap)
     {
       /* Find corresponding device */
-      io_sRack* slave_list;
-      for (slave_list = ap->racklist, jj = 0; (slave_list != NULL) && jj < ii - 1;
-           slave_list = slave_list->next, jj++)
+      io_sRack* device_list;
+      for (device_list = ap->racklist, jj = 0; (device_list != NULL) && jj < ii - 1;
+           device_list = device_list->next, jj++)
       {
       }
-      if (slave_list)
+      if (device_list)
       {
         pwr_sClass_PnDevice* dev;
         pwr_sClass_PnAlarm* alarm;
-        dev = (pwr_sClass_PnDevice*)slave_list->op;
-        pwr_tObjid dev_objid = slave_list->Objid;
+        dev = (pwr_sClass_PnDevice*)device_list->op;
+        pwr_tObjid dev_objid = device_list->Objid;
 
-        int index = dev->AlarmBuffer.IndexNext++;
-        if (dev->AlarmBuffer.IndexNext >= dev->AlarmBuffer.BufferSize)
-          dev->AlarmBuffer.IndexNext = 0;
+        int index = dev->AlarmBuffer.CurrentIndex;
+        if (++index >= dev->AlarmBuffer.BufferSize)
+          index = 0;
+        dev->AlarmBuffer.CurrentIndex = index;
 
         alarm = &dev->AlarmBuffer.Alarms[index];
 
@@ -1226,40 +1215,32 @@ int unpack_get_alarm_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local
         // Low priority alarms goes as INFO
         // High priority alarms goes as WARNINGS
 
-        io_sCard* card_list;
+        io_sCard* module_list;
         pwr_sClass_PnModule* module = NULL;
         int selected_actions = 0;
 
-        // SlotNumber 0 indicates that the device itself generated the alarm
-        if (alarm->SlotNumber == 0)
+        // Find the module to check what action to take
+        for (module_list = device_list->cardlist; module_list != NULL; module_list = module_list->next)
         {
-          selected_actions = dev->AlarmActionSelect;
-        }
-        else
-        {
-          // Find the module to check what action to take
-          for (card_list = slave_list->cardlist; card_list != NULL; card_list = card_list->next)
+          module = (pwr_sClass_PnModule*)module_list->op;
+
+          if (module->Slot != alarm->SlotNumber)
+            continue;
+
+          // Check what actions to take
+          if (module->AlarmActionSelect)
           {
-            module = (pwr_sClass_PnModule*)card_list->op;
-
-            if (module->Slot != alarm->SlotNumber)
-              continue;
-
-            // Check what actions to take
-            if (module->AlarmActionSelect)
+            if (module->AlarmActionSelect & pwr_mPnModuleAlarmActionMask_INHERIT)
             {
-              if (module->AlarmActionSelect & pwr_mPnModuleAlarmActionMask_INHERIT)
-              {
-                selected_actions = dev->AlarmActionSelect;
-              }
-              if (module->AlarmActionSelect & pwr_mPnModuleAlarmActionMask_ALARM)
-              {
-                selected_actions |= pwr_mPnDeviceAlarmActionMask_ALARM;
-              }
-              if (module->AlarmActionSelect & pwr_mPnModuleAlarmActionMask_PROVIEW_LOG)
-              {
-                selected_actions |= pwr_mPnDeviceAlarmActionMask_PROVIEW_LOG;
-              }
+              selected_actions = dev->AlarmActionSelect;
+            }
+            if (module->AlarmActionSelect & pwr_mPnModuleAlarmActionMask_ALARM)
+            {
+              selected_actions |= pwr_mPnDeviceAlarmActionMask_ALARM;
+            }
+            if (module->AlarmActionSelect & pwr_mPnModuleAlarmActionMask_PROVIEW_LOG)
+            {
+              selected_actions |= pwr_mPnDeviceAlarmActionMask_PROVIEW_LOG;
             }
           }
         }
@@ -1287,9 +1268,6 @@ int unpack_get_alarm_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local
             snprintf(event_more_text, sizeof(event_more_text), "Data: %s", data_str);
             snprintf(event_text, sizeof(event_text), "PROFINET: Diagnostics from Slot: %d, Subslot: %d",
                      alarm->SlotNumber, alarm->SubslotNumber);
-
-            // for (GsdmlChannelDiag* channel_error_type : channel_diag_vector)
-            // {
 
             // TODO check host endianess
 
@@ -1339,6 +1317,7 @@ int unpack_get_alarm_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local
           }
           else if (alarm->Prio == pwr_ePnAlarmPrioEnum_High)
           {
+            // TODO Maybe use cdh_AttrValueToString to map our enums to text...
             // Default high prio
             snprintf(event_text, sizeof(event_text),
                      "PROFINET High Priority Alarm. Slot: %d, Subslot: %d, "
@@ -1681,12 +1660,13 @@ int unpack_download_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local)
       //   continue;
       // }
 
+      // TODO Debug...
       if (!pn_device->m_IOCR_map.count(type))
       {
         continue;
       }
 
-      pn_device->m_IOCR_map.at(type);
+      // pn_device->m_IOCR_map.at(PROFINET_DEFAULT_API).at(type);
       // iocr_data->type = _HIGH_LOW_BYTES_TO_PN_U16(pIOCRInfo->TypeHighByte, pIOCRInfo->TypeLowByte);
       pn_device->m_IOCR_map.at(type).m_rt_identifier =
           _HIGH_LOW_BYTES_TO_PN_U16(pIOCRInfo->IOCRIdentifierHighByte, pIOCRInfo->IOCRIdentifierLowByte);
@@ -1837,8 +1817,8 @@ int unpack_download_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local)
 
     T_PN_SERVICE_ERROR_CON* pErrorCon = (T_PN_SERVICE_ERROR_CON*)(pSdb + 1);
 
-    printf("channel %d: download.con [-] (%d)\r\n"
-           "            code       : %d (0x%02x)\r\n"
+    printf("channel %d: download.con  (device ref: %d)\r\n"
+           "            code       : %d (0x%02x) [local = 0, stack = 1, remote = 2]\r\n"
            "            detail     : %d (0x%02x)\r\n"
            "            add. detail: %d (0x%02x)\r\n"
            "            area       : %d (0x%02x)\r\n",
@@ -1923,7 +1903,7 @@ int handle_service_con(io_sAgentLocal* local, io_sAgent* ap)
         }
         }
       }
-      else if (pSdb->Instance == PN_SUPERVISOR) // Profinet Viewer                              
+      else if (pSdb->Instance == PN_SUPERVISOR) // Profinet Viewer
       {
         switch (pSdb->Service)
         {
@@ -2379,19 +2359,15 @@ void* handle_events(void* ptr)
       if (sts == PNAK_OK)
       {
         /* Loop through devices and calculate offset for io */
-        // for (jj = 0; jj < local->device_data[ii]->iocr_data.size(); jj++)
-        // for (int iocr = 0; iocr < 2; iocr++)
+
         for (auto& iocr : pn_device->m_IOCR_map)
         {
           offset_inputs = 0;
           offset_outputs = 0;
 
-          // type = local->device_data[ii]->iocr_data[jj]->type;
           for (auto& module_data : pn_device->m_slot_list)
-          // for (kk = 0; kk < local->device_data[ii]->module_data.size(); kk++)
           {
             for (auto& submodule_data : module_data.m_subslot_map)
-            // for (ll = 0; ll < local->device_data[ii]->module_data[kk]->submodule_data.size(); ll++)
             {
               if (iocr.first == PROFINET_IO_CR_TYPE_INPUT &&
                   (submodule_data.second.m_rt_io_submodule_type == PROFINET_IO_SUBMODULE_TYPE_INPUT ||
@@ -2410,29 +2386,10 @@ void* handle_events(void* ptr)
                 submodule_data.second.m_rt_offset_clean_io_out = offset_outputs;
                 offset_outputs += submodule_data.second.m_io_output_length;
               }
-              // PnSubmoduleData* submodule;
-              // submodule = local->device_data[ii]->module_data[kk]->submodule_data[ll];
-              // if ((type == PROFINET_IO_CR_TYPE_INPUT) &&
-              //     ((submodule->type == PROFINET_IO_SUBMODULE_TYPE_INPUT) ||
-              //      (submodule->type == PROFINET_IO_SUBMODULE_TYPE_INPUT_AND_OUTPUT)))
-              // {
-              //   submodule->offset_clean_io_in = offset_inputs;
-              //   offset_inputs += submodule->io_in_data_length;
-              // }
-              // else if ((type == PROFINET_IO_CR_TYPE_OUTPUT) &&
-              //          ((submodule->type == PROFINET_IO_SUBMODULE_TYPE_OUTPUT) ||
-              //           (submodule->type == PROFINET_IO_SUBMODULE_TYPE_INPUT_AND_OUTPUT)))
-              // {
-              //   submodule->offset_clean_io_out = offset_outputs;
-              //   offset_outputs += submodule->io_out_data_length;
-              // }
             }
           }
           iocr.second.m_rt_clean_io_data = (unsigned char*)calloc(1, offset_inputs + offset_outputs);
-          // local->device_data[ii]->iocr_data[jj]->clean_io_data =
-          //     (unsigned char*)calloc(1, offset_inputs + offset_outputs);
           iocr.second.m_rt_clean_io_data_length = offset_inputs + offset_outputs;
-          // local->device_data[ii]->iocr_data[jj]->clean_io_data_length = offset_inputs + offset_outputs;
         }
       }
       else

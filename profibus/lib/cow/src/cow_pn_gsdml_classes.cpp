@@ -11,7 +11,8 @@
 namespace GSDML
 {
 
-void parse_octet_string(std::string const& string_data, unsigned char* output_data, std::vector<unsigned char> &output_vector)
+void parse_octet_string(std::string const& string_data, unsigned char* output_data,
+                        std::vector<unsigned char>& output_vector)
 {
   // Lets parse it...
   std::istringstream buf(string_data, std::ios_base::in);
@@ -19,7 +20,6 @@ void parse_octet_string(std::string const& string_data, unsigned char* output_da
   std::string value;
   unsigned int byte;
   size_t pos = 0;
-  //unsigned char* data = static_cast<ParameterRecordDataItem*>(m_Parent)->getData() + _ByteOffset;
   while (getline(buf, value, ','))
   {
     std::istringstream val(value, std::ios_base::in);
@@ -136,7 +136,8 @@ Const::Const(pugi::xml_node&& xmlNode, Node* parent, pn_gsdml* gsdml)
 {
   setParent(parent);
   // Lets parse it...
-  parse_octet_string(xmlNode.attribute("Data").as_string(), static_cast<ParameterRecordDataItem*>(m_Parent)->getData() + _ByteOffset, _data);  
+  parse_octet_string(xmlNode.attribute("Data").as_string(),
+                     static_cast<ParameterRecordDataItem*>(m_Parent)->getData() + _ByteOffset, _data);
 }
 
 ModuleInfo::ModuleInfo(pugi::xml_node&& moduleInfo, pn_gsdml* gsdml)
@@ -423,8 +424,9 @@ SubmoduleItem::SubmoduleItem(pugi::xml_node&& submoduleItem, pn_gsdml* gsdml,
       _Writeable_IM_Records(submoduleItem.attribute("Writeable_IM_Records").as_string()),
       _MayIssueProcessAlarm(submoduleItem.attribute("MayIssueProcessAlarm").as_bool()),
       _Text(gsdml->_get_TextId(submoduleItem.attribute("TextId").value())),
-      _ID(submoduleItem.attribute("ID").as_string()), _IOData(submoduleItem.child("IOData"), gsdml),
-      _ModuleInfo(submoduleItem.child("ModuleInfo"), gsdml), _SubmoduleItemType(submoduleType)
+      _ID(submoduleItem.attribute("ID").as_string()), _API(submoduleItem.attribute("API").as_uint()),
+      _IOData(submoduleItem.child("IOData"), gsdml), _ModuleInfo(submoduleItem.child("ModuleInfo"), gsdml),
+      _SubmoduleItemType(submoduleType)
 {
   for (pugi::xml_node& parameterRecordDataItem :
        submoduleItem.child("RecordDataList").children("ParameterRecordDataItem"))

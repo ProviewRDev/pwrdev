@@ -519,6 +519,7 @@ public:
   bool _MayIssueProcessAlarm;
   std::shared_ptr<std::string> _Text; // Some SubmoduleItems have a TextId attribute and some don't...
   std::string _ID;
+  uint _API; // The Profile ID. Defaults to 0
 
   // Elements
   IOData _IOData;

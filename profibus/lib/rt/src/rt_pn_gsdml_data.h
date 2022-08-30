@@ -72,11 +72,27 @@ public:
   unsigned short m_transfer_sequence;
 };
 
+class ProfinetAPI
+{
+public:
+  ProfinetAPI() = default;
+  ProfinetAPI(pugi::xml_node&&);
+  ProfinetAPI(ProfinetAPI&&) = default;
+  ProfinetAPI(ProfinetAPI const&) = default;
+  ProfinetAPI& operator=(ProfinetAPI&) = default;
+  ~ProfinetAPI() = default;
+  void build(pugi::xml_node&&) const;
+
+  uint m_profile_id;
+  uint m_index;
+  std::vector<uint> m_module_ref;
+};
+
 class ProfinetIOCR
 {
 public:
   ProfinetIOCR() = default;
-  ProfinetIOCR(pugi::xml_node&&);
+  ProfinetIOCR(pugi::xml_node&& p_IOCR, pugi::xml_node&& p_APIs);
   ProfinetIOCR(ProfinetIOCR&&) = default;
   ProfinetIOCR(ProfinetIOCR const&) = default;
   ProfinetIOCR& operator=(ProfinetIOCR&) = default;
@@ -85,8 +101,8 @@ public:
 
   unsigned short m_send_clock_factor;
   unsigned short m_reduction_ratio;
-  unsigned int m_phase; // Phase can not be greater than reduction ratio and must be > 0.
-  unsigned int m_api;   // Check with the spec what to do with submodule items specifying a specific API...
+  unsigned int m_phase;            // Phase can not be greater than reduction ratio and must be > 0.
+  std::map<uint, uint> m_api_refs; // <api, api-index-reference>
   std::string m_rt_class;
   std::string m_startup_mode;
 
@@ -115,7 +131,7 @@ public:
   unsigned int m_submodule_ident_number;
   unsigned int m_io_input_length;
   unsigned int m_io_output_length;
-  unsigned int m_api = PROFINET_DEFAULT_API ; // Will default to 0.
+  unsigned int m_api = PROFINET_DEFAULT_API; // Will default to 0.
   std::string m_submodule_ID;
 
   // Elements
@@ -246,12 +262,14 @@ public:
   std::string m_DAP_ID;          // DAP ID to map what DAP to use from the GSDML
   unsigned short m_vendor_id;    // Part of DeviceIdentity
   unsigned short m_device_id;    // Part of DeviceIdentity
-  unsigned int m_instance;       // Used to make out the ObjectUUID for DCERPC together with vendor ID and device ID.
+  unsigned int
+      m_instance; // Used to make out the ObjectUUID for DCERPC together with vendor ID and device ID.
 
   // Elements
   ProfinetNetworkSettings m_NetworkSettings;
   std::vector<ProfinetSlot> m_slot_list;
-  std::map<uint, ProfinetIOCR> m_IOCR_map;
+  std::map<uint, ProfinetAPI> m_API_map;   // <api, ProfinetAPI>
+  std::map<uint, ProfinetIOCR> m_IOCR_map; // <iocr type, ProfinetIOCR>
   std::unordered_map<uint, ProfinetChannelDiag> m_channel_diag_map;
 
   // Runtime specifics
@@ -264,8 +282,8 @@ public:
   unsigned char m_rt_ipaddress[4];
   unsigned char m_rt_subnetmask[4];
   unsigned char m_rt_macaddress[6];
-  std::string m_rt_interface_name; // Used by the controller. Ignored by other devices...
-  std::string m_rt_version = "1.0";        // Who knows? According to manual set this to "1.0"
+  std::string m_rt_interface_name;  // Used by the controller. Ignored by other devices...
+  std::string m_rt_version = "1.0"; // Who knows? According to manual set this to "1.0"
 };
 
 class ProfinetRuntimeData
