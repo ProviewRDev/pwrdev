@@ -211,6 +211,21 @@ void create_parameter_value_class(GsdmlAttrNav* attrnav, const char* name, std::
                                           (std::string("String input. ") + infotext.str()).c_str(), node,
                                           flow_eDest_IntoLast, ref);
     break;
+  case GSDML::ValueDataType_OctetString:
+  {
+    // For this type we create as many uint8 input fields as required.
+    uint8_t* byte_data = (uint8_t*)data;
+    for (int byte = 0; byte < ref->_Length; byte++)
+    {
+      std::ostringstream byte_name(name, std::ios_base::ate);
+
+      byte_name << " (Byte " << byte << ")";
+      new ItemPnParameterInput<uint8_t>(attrnav, byte_name.str().c_str(), byte_data + byte,
+                                        (std::string("Unsigned8 value input. ") + infotext.str()).c_str(),
+                                        node, flow_eDest_IntoLast, ref);
+    }
+    break;
+  }
   default:
     std::cerr << "Unhandled GSDML Datatype for parameter Ref element in create_parameter_value_class()"
               << std::endl;
@@ -2344,6 +2359,13 @@ void ItemPnParameterRecordDataItem::set_default_data()
     {
       memcpy((char*)&m_data_record->m_data[ref.second->_ByteOffset], ref.second->_DefaultValueString.c_str(),
              ref.second->_DefaultValueString.length());
+      break;
+    }
+    case GSDML::ValueDataType_OctetString:
+    {
+      std::vector<unsigned char> dummy;
+      GSDML::parse_octet_string(ref.second->_DefaultValueString,
+                                (unsigned char*)&m_data_record->m_data[ref.second->_ByteOffset], dummy);
       break;
     }
     default:

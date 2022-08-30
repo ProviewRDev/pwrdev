@@ -18,6 +18,8 @@ class pn_gsdml;
 namespace GSDML
 {
 
+void parse_octet_string(std::string const& string_data, unsigned char* output_data, std::vector<unsigned char> &output_vector);
+
 typedef enum
 {
   ValueDataType_,

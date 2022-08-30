@@ -11,6 +11,25 @@
 namespace GSDML
 {
 
+void parse_octet_string(std::string const& string_data, unsigned char* output_data, std::vector<unsigned char> &output_vector)
+{
+  // Lets parse it...
+  std::istringstream buf(string_data, std::ios_base::in);
+
+  std::string value;
+  unsigned int byte;
+  size_t pos = 0;
+  //unsigned char* data = static_cast<ParameterRecordDataItem*>(m_Parent)->getData() + _ByteOffset;
+  while (getline(buf, value, ','))
+  {
+    std::istringstream val(value, std::ios_base::in);
+    val.seekg(2); // Skip the 0x part
+    val >> std::hex >> byte;
+    *(output_data + pos++) = byte;
+    output_vector.push_back(byte);
+  }
+}
+
 int string_to_value_datatype(char const* str, eValueDataType* type)
 {
   if (strcmp(str, "Bit") == 0)
@@ -117,20 +136,7 @@ Const::Const(pugi::xml_node&& xmlNode, Node* parent, pn_gsdml* gsdml)
 {
   setParent(parent);
   // Lets parse it...
-  std::istringstream buf(xmlNode.attribute("Data").as_string(), std::ios_base::in);
-
-  std::string value;
-  unsigned int byte;
-  size_t pos = 0;
-  unsigned char* data = static_cast<ParameterRecordDataItem*>(m_Parent)->getData() + _ByteOffset;
-  while (getline(buf, value, ','))
-  {
-    std::istringstream val(value, std::ios_base::in);
-    val.seekg(2); // Skip the 0x part
-    val >> std::hex >> byte;
-    *(data + pos++) = byte;
-    _data.push_back(byte);
-  }
+  parse_octet_string(xmlNode.attribute("Data").as_string(), static_cast<ParameterRecordDataItem*>(m_Parent)->getData() + _ByteOffset, _data);  
 }
 
 ModuleInfo::ModuleInfo(pugi::xml_node&& moduleInfo, pn_gsdml* gsdml)
