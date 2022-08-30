@@ -40,6 +40,7 @@
 #include "pwr_basecomponentclasses.h"
 #include "pwr_otherioclasses.h"
 #include "co_time.h"
+#include "co_dcli.h"
 #include "rt_io_base.h"
 #include "rt_io_card_init.h"
 #include "rt_io_card_close.h"
@@ -48,46 +49,62 @@
 #include "rt_io_msg.h"
 #include "rt_io_m_gpio.h"
 
-static pwr_tStatus IoCardInit(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+pwr_tStatus init_channels(io_tCtx ctx, io_sCard* cp)
 {
   int i;
   pwr_sClass_GPIO_Module* op = (pwr_sClass_GPIO_Module*)cp->op;
   FILE* fp;
   char str[80];
-  io_sLocalGPIO_Module* local;
+  io_sLocalGPIO_Module* local = (io_sLocalGPIO_Module*)cp->Local;
   char direction[20];
   char access[20];
   pwr_tStatus sts;
+  pwr_tTime ctime;
+  pwr_tTime time;
 
-  local = (io_sLocalGPIO_Module*)calloc(1, sizeof(io_sLocalGPIO_Module));
-  cp->Local = local;
+  time_GetTime(&time);
+  if (time_AdiffToFloat(&time, &local->last_try) < 5.0)
+    return IO__WAIT_RETRY;
 
-  for (i = 0; i < GPIO_MAX_CHANNELS; i++) {
+  local->last_try = time;
+  local->retry_cnt++;
+
+  for (i = 0; i < cp->ChanListSize; i++) {
     if (cp->chanlist[i].cop) {
       switch (cp->chanlist[i].ChanClass) {
       case pwr_cClass_ChanDi:
-        local->number[i] = ((pwr_sClass_ChanDi*)cp->chanlist[i].cop)->Number;
+	local->number[i] = ((pwr_sClass_ChanDi*)cp->chanlist[i].cop)->Number;
         strcpy(direction, "in");
         strcpy(access, "r+");
-        break;
+	break;
       case pwr_cClass_ChanDo:
-        local->number[i] = ((pwr_sClass_ChanDo*)cp->chanlist[i].cop)->Number;
+	local->number[i] = ((pwr_sClass_ChanDo*)cp->chanlist[i].cop)->Number;
         strcpy(direction, "out");
         strcpy(access, "w");
-        break;
-      default:;
+	break;
       }
+      sprintf(str, "/sys/class/gpio/gpio%u", local->number[i]);
+      sts = dcli_file_ctime(str, &ctime);
+      if (EVEN(sts)) {
+	op->Status = IO__FILE;
+	if (local->retry_cnt > local->max_retry) 
+	  return IO__INITFAIL;
+	return IO__FILE;
+      }
+    }
+  }
 
+  for (i = 0; i < cp->ChanListSize; i++) {
+    if (cp->chanlist[i].cop) {
       switch (cp->chanlist[i].ChanClass) {
       case pwr_cClass_ChanDi:
       case pwr_cClass_ChanDo:
         sprintf(str, "/sys/class/gpio/gpio%u/direction", local->number[i]);
         fp = fopen(str, "w");
         if (!fp) {
-          errh_Error("GPIO uable to open %s, %s, Id: %d", str, cp->Name,
+          errh_Info("GPIO Pending: unable to open %s, %s, Id: %d", str, cp->Name,
               local->number[i]);
-          sts = IO__INITFAIL;
+          sts = IO__FILE;
           op->Status = sts;
           return sts;
         }
@@ -97,9 +114,9 @@ static pwr_tStatus IoCardInit(
         sprintf(str, "/sys/class/gpio/gpio%u/value", local->number[i]);
         local->value_fp[i] = fopen(str, access);
         if (!local->value_fp[i]) {
-          errh_Error("GPIO Unable op open %s, '%s' Id: %d", str, cp->Name,
+          errh_Info("GPIO Pending: unable op open %s, '%s' Id: %d", str, cp->Name,
               local->number[i]);
-          sts = IO__INITFAIL;
+          sts = IO__FILE;
           op->Status = sts;
           return sts;
         }
@@ -108,8 +125,29 @@ static pwr_tStatus IoCardInit(
       }
     }
   }
-  errh_Info("Init of GPIO Module '%s'", cp->Name);
+  return IO__SUCCESS;
+}
 
+static pwr_tStatus IoCardInit(
+    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+{
+  pwr_sClass_GPIO_Module* op = (pwr_sClass_GPIO_Module*)cp->op;
+  io_sLocalGPIO_Module* local;
+  pwr_tStatus sts;
+
+  local = (io_sLocalGPIO_Module*)calloc(1, sizeof(io_sLocalGPIO_Module));
+  cp->Local = local;
+  local->max_retry = 40;
+
+  sts = init_channels(ctx, cp);
+  if (EVEN(sts)) {
+    errh_Info("GPIO ModuleDevice pending: unable op open %s", cp->Name);
+    op->Status = sts;
+    return IO__SUCCESS;
+  }
+  
+  errh_Info("Init of GPIO Module '%s'", cp->Name);
+  op->Status = IO__SUCCESS;
   return IO__SUCCESS;
 }
 
@@ -119,7 +157,7 @@ static pwr_tStatus IoCardClose(
   int i;
   io_sLocalGPIO_Module* local = (io_sLocalGPIO_Module*)cp->Local;
 
-  for (i = 0; i < GPIO_MAX_CHANNELS; i++) {
+  for (i = 0; i < cp->ChanListSize; i++) {
     if (cp->chanlist[i].cop) {
       switch (cp->chanlist[i].ChanClass) {
       case pwr_cClass_ChanDi:
@@ -142,6 +180,7 @@ static pwr_tStatus IoCardRead(
   pwr_sClass_GPIO_Module* op = (pwr_sClass_GPIO_Module*)cp->op;
   int i;
   char str[20];
+  pwr_tStatus sts;
 
   if (op->ScanInterval > 1) {
     local->has_read_method = 1;
@@ -154,7 +193,20 @@ static pwr_tStatus IoCardRead(
     local->interval_cnt++;
   }
 
-  for (i = 0; i < GPIO_MAX_CHANNELS; i++) {
+  if (op->Status == IO__FILE) {
+    sts = init_channels(ctx, cp);
+    if (sts == IO__WAIT_RETRY || sts == IO__FILE) 
+      return IO__SUCCESS;
+    else if (EVEN(sts)) {
+      op->Status = sts;
+      return sts;
+    } else {
+      op->Status = sts;
+      errh_Info("Init of GPIO Module '%s'", cp->Name);
+    }
+  }
+
+  for (i = 0; i < cp->ChanListSize; i++) {
     if (cp->chanlist[i].cop && cp->chanlist[i].vbp) {
       switch (cp->chanlist[i].ChanClass) {
       case pwr_cClass_ChanDi:
@@ -179,6 +231,7 @@ static pwr_tStatus IoCardWrite(
   io_sLocalGPIO_Module* local = (io_sLocalGPIO_Module*)cp->Local;
   pwr_sClass_GPIO_Module* op = (pwr_sClass_GPIO_Module*)cp->op;
   int i;
+  pwr_tStatus sts;
 
   if (op->ScanInterval > 1) {
     if (!local->has_read_method) {
@@ -193,7 +246,21 @@ static pwr_tStatus IoCardWrite(
       return IO__SUCCESS;
   }
 
-  for (i = 0; i < GPIO_MAX_CHANNELS; i++) {
+  if (op->Status == IO__FILE) {
+    sts = init_channels(ctx, cp);
+    if (sts == IO__WAIT_RETRY || sts == IO__FILE) 
+      return IO__SUCCESS;
+    else if (EVEN(sts)) {
+      op->Status = sts;
+      return sts;
+    }
+    else {
+      op->Status = sts;
+      errh_Info("Init of GPIO Module '%s'", cp->Name);
+    }
+  }
+
+  for (i = 0; i < cp->ChanListSize; i++) {
     if (cp->chanlist[i].cop && cp->chanlist[i].vbp) {
       switch (cp->chanlist[i].ChanClass) {
       case pwr_cClass_ChanDo:

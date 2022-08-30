@@ -191,7 +191,7 @@ static int open_device(
     break;
   }
 
-  tty_attributes.c_iflag &= ~(BRKINT | ICRNL | IMAXBEL);
+  tty_attributes.c_iflag &= ~(BRKINT | ICRNL | IMAXBEL | HUPCL | IXON);
   tty_attributes.c_oflag &= ~(OPOST | ONLCR);
   tty_attributes.c_lflag
       &= ~(ISIG | ICANON | IEXTEN | ECHO | ECHOE | ECHOK | ECHOCTL | ECHOKE);

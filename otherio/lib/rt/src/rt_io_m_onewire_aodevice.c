@@ -52,44 +52,62 @@
 #include "rt_io_msg.h"
 #include "rt_io_m_onewire.h"
 
+static pwr_tStatus open_file(io_sCard* cp)
+{
+  pwr_sClass_OneWire_AoDevice* op = (pwr_sClass_OneWire_AoDevice*)cp->op;
+  io_sLocalAoDevice* local = (io_sLocalAoDevice*)cp->Local;
+  char name[40];
+  pwr_tFileName fname, tmp;
+  int name_len;
+  char* s;
+  pwr_tTime time;
+
+  time_GetTime(&time);
+  if (time_AdiffToFloat(&time, &local->last_try) < 5.0)
+    return IO__WAIT_RETRY;
+
+  sprintf(name, "%x-%012x", op->Family, op->Super.Address);
+  name_len = strlen(name);
+  strncpy(fname, op->DataFile, sizeof(fname));
+
+  // Replace all '%s' with 'family-serialnumber'
+  s = fname;
+  while ((s = strstr(s, "%s"))) {
+    strncpy(tmp, s + 2, sizeof(tmp));
+    strcpy(s, name);
+    strncat(fname, tmp, sizeof(fname) - strlen(fname) - 1);
+  }
+  local->value_fp = fopen(fname, "r");
+  if (!local->value_fp) {
+    local->last_try = time;
+    return IO__FILE;
+  }
+  return IO__SUCCESS;
+}
+
 static pwr_tStatus IoCardInit(
     io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   pwr_sClass_OneWire_AoDevice* op = (pwr_sClass_OneWire_AoDevice*)cp->op;
   io_sLocalAoDevice* local;
   pwr_tStatus sts;
-  char name[40];
-  pwr_tFileName fname, tmp;
-  int name_len;
-  char* s;
 
   if (cp->chanlist[0].cop) {
     local = (io_sLocalAoDevice*)calloc(1, sizeof(io_sLocalAoDevice));
     cp->Local = local;
 
-    sprintf(name, "%x-%012x", op->Family, op->Super.Address);
-    name_len = strlen(name);
-    strncpy(fname, op->DataFile, sizeof(fname));
-
-    // Replace all '%s' with 'family-serialnumber'
-    s = fname;
-    while ((s = strstr(s, "%s"))) {
-      strncpy(tmp, s + 2, sizeof(tmp));
-      strcpy(s, name);
-      strncat(fname, tmp, sizeof(fname) - strlen(fname) - 1);
-    }
-    local->value_fp = fopen(fname, "w");
-    if (!local->value_fp) {
-      errh_Error("OneWire_AoDevice Unable op open %s, '%x'", cp->Name,
-          op->Super.Address);
-      sts = IO__INITFAIL;
-      op->Status = sts;
-      return sts;
-    }
-
     io_AoRangeToCoef(&cp->chanlist[0]);
 
-    errh_Info("Init of OneWire_AoDevice '%s'", cp->Name);
+    sts = open_file(cp);
+    if (EVEN(sts)) {
+      errh_Error("OneWire_AoDevice Unable op open %s, '%x'", cp->Name,
+          op->Super.Address);
+      op->Status = sts;
+    }
+    else {
+      errh_Info("Init of OneWire_AoDevice '%s'", cp->Name);
+      op->Status = IO__SUCCESS;
+    }
   }
   return IO__SUCCESS;
 }
@@ -98,8 +116,9 @@ static pwr_tStatus IoCardClose(
     io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sLocalAoDevice* local = (io_sLocalAoDevice*)cp->Local;
+  pwr_sClass_OneWire_AoDevice* op = (pwr_sClass_OneWire_AoDevice*)cp->op;
 
-  if (cp->chanlist[0].cop) {
+  if (cp->chanlist[0].cop && op->Status != IO__FILE) {
     fclose(local->value_fp);
   }
   free(cp->Local);
@@ -114,6 +133,22 @@ static pwr_tStatus IoCardWrite(
   char str[80];
   pwr_tUInt32 error_count = op->Super.ErrorCount;
   int num;
+  pwr_tStatus sts;
+
+  if (op->Status == IO__FILE) {
+    sts = open_file(cp);
+    if (sts == IO__WAIT_RETRY)
+      return IO__SUCCESS;	
+    else if (EVEN(sts)) {
+      op->Status = sts;
+      return IO__SUCCESS;
+    }
+    else {
+      errh_Error("OneWire_AoDevice File open %s, '%x'", cp->Name,
+          op->Super.Address);
+      op->Status = sts;
+    }	
+  }
 
   if (op->ScanInterval > 1) {
     if (local->interval_cnt != 0) {

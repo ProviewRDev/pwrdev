@@ -122,6 +122,8 @@ releasebuild    <I/O system is not built with this release>             /error
 dummybuild      <Archive for I/O system is not linked with this executable> /error
 searchstring    <Search string not found> 				/error
 nomqtt		<Not built with mqtt>					/error
+file		<Unable to open file>					/error
+wait_retry	<Wait for retry>					/info
 .end
 
 

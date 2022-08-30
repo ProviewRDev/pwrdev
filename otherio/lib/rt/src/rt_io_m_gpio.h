@@ -10,6 +10,9 @@ typedef struct {
   unsigned int number[GPIO_MAX_CHANNELS];
   int interval_cnt;
   int has_read_method;
+  int retry_cnt;
+  int max_retry;
+  pwr_tTime last_try;
 } io_sLocalGPIO_Module;
 
 #endif
