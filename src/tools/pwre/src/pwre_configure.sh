@@ -68,6 +68,12 @@ pwre_config_check_include()
             if test $incfound -eq 0; then
                 inc_array[$inc_cnt]=$incdir
                 inc_cnt=$((inc_cnt+1))
+
+                if test $1 == "rsvg"; then
+                    incdir=${incdir%/*}
+                    inc_array[$inc_cnt]=$incdir
+                    inc_cnt=$((inc_cnt+1))
+                fi
             fi
 
             found=1
