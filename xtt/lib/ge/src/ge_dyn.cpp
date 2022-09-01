@@ -166,7 +166,7 @@ static int check_format(char* format, int type)
   s++;
 
   while (*s) {
-    if (!(isdigit(*s) || *s == '.' || *s == '-' || *s == '+' || *s == '*'))
+    if (!(isdigit(*s) || *s == '.' || *s == '-' || *s == '+' || *s == '*' || *s == '#'))
       break;
     s++;
   }
@@ -12835,7 +12835,7 @@ int GeTable::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
       }
       break;
     default:
-      info.column_size[i] = 10;
+      info.column_size[i] = 14;
     }
 
     old_value[i] = (char*)calloc(elements[i], size[i]);
@@ -24330,7 +24330,7 @@ int GeAnalogTransparency::syntax_check(
 
 GeUnitConvert::GeUnitConvert(GeDyn* e_dyn)
     : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_UnitConvert, ge_mActionType1_No,
-		ge_mActionType2_No, ge_eDynPrio_UnitConvert), entity(0), db_unit(0), display_unit(0)
+		ge_mActionType2_No, ge_eDynPrio_UnitConvert), entity(graph_eUcEntity_General), db_unit(0), display_unit(0)
 {
 }
 
