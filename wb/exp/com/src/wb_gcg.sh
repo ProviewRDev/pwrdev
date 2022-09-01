@@ -193,7 +193,7 @@ CompileRtNode()
     $Libs \
     $ld_opt \
     $pwr_obj/pwr_msg_rt.o $pwr_obj/pwr_msg_co.o $pwr_obj/pwr_msg_rs.o \
-    -lrt -lpwr_remote -lpwr_nmps -lpwr_rt -lpwr_co -lrpcsvc -lpwr_msg_dummy -lpthread -lm
+    -lrt -lpwr_remote -lpwr_nmps -lpwr_rt -lpwr_co -ltirpc -lpwr_msg_dummy -lpthread -lm
   then
     echo "-- Plc program linked for $OsStr $say_linkdebug $OutFile"
     gcg_status=$gcg__success
@@ -350,7 +350,7 @@ if [ $OpSys -eq $OpSys_PPC_LINUX ]; then
   pwrp_gc="$pwrp_tmp"
 
 # Suppress all warnings, -x
-  cc_cmd="$cc -c -x c -Wall $cc_debug -D_REENTRANT -DOS_LINUX -I$pwr_inc -I$pwrp_inc -I$pwrp_tmp $PWR_EXT_INC"
+  cc_cmd="$cc -c -x c -Wall $cc_debug -D_REENTRANT -DOS_LINUX -I$pwr_inc -I$pwrp_inc -I$pwrp_tmp-I/usr/include/tirpc $PWR_EXT_INC"
 
   FileTypeStr="`echo $vFileType| cut -f $FileTypeIdx -d ,`"
 
@@ -363,7 +363,7 @@ elif [ $OpSys -eq $OpSys_X86_LINUX ]; then
 
 # Suppress all warnings, -x
   if [ $CurrentOpSys -eq $OpSys ]; then
-     cc_cmd="$cc -c -x c -Wall $cc_debug -D_REENTRANT -DOS_LINUX -I$pwr_inc -I$pwrp_inc -I$pwrp_tmp $PWR_EXT_INC"
+     cc_cmd="$cc -c -x c -Wall $cc_debug -D_REENTRANT -DOS_LINUX -I$pwr_inc -I$pwrp_inc -I$pwrp_tmp -I/usr/include/tirpc $PWR_EXT_INC"
 
      FileTypeStr="`echo $vFileType| cut -f $FileTypeIdx -d ,`"
 
@@ -379,7 +379,7 @@ elif [ $OpSys -eq $OpSys_X86_LINUX ]; then
       export pwrp_exe=$pwrp_root/bld/x86_linux/exe
       export pwrp_lib=$pwrp_root/bld/x86_linux/lib
       export pwrp_obj=$pwrp_root/bld/x86_linux/obj
-      cc_cmd="$cc -c -x c -Wall -m32 -fPIC $cc_debug -D_REENTRANT -DOS_LINUX -I$pwr_inc -I$pwrp_inc -I$pwrp_tmp $PWR_EXT_INC"
+      cc_cmd="$cc -c -x c -Wall -m32 -fPIC $cc_debug -D_REENTRANT -DOS_LINUX -I$pwr_inc -I$pwrp_inc -I$pwrp_tmp -I/usr/include/tirpc $PWR_EXT_INC"
       ldxx="g++ -m32 -fPIC"
 
       FileTypeStr="`echo $vFileType| cut -f $FileTypeIdx -d ,`"
@@ -399,7 +399,7 @@ elif [ $OpSys -eq $OpSys_X86_64_LINUX ]; then
 
 # Suppress all warnings, -x
   if [ $CurrentOpSys -eq $OpSys ]; then
-      cc_cmd="$cc -c -x c -Wall $cc_debug -D_REENTRANT -DOS_LINUX -I$pwr_inc -I$pwrp_inc -I$pwrp_tmp $PWR_EXT_INC"
+      cc_cmd="$cc -c -x c -Wall $cc_debug -D_REENTRANT -DOS_LINUX -I$pwr_inc -I$pwrp_inc -I$pwrp_tmp -I/usr/include/tirpc $PWR_EXT_INC"
 
       FileTypeStr="`echo $vFileType| cut -f $FileTypeIdx -d ,`"
 
@@ -415,7 +415,7 @@ elif [ $OpSys -eq $OpSys_X86_64_LINUX ]; then
       export pwrp_exe=$pwrp_root/bld/x86_64_linux/exe
       export pwrp_lib=$pwrp_root/bld/x86_64_linux/lib
       export pwrp_obj=$pwrp_root/bld/x86_64_linux/obj
-      cc_cmd="$cc -c -x c -Wall -m64 -fPIC $cc_debug -D_REENTRANT -DOS_LINUX -I$pwr_inc -I$pwrp_inc -I$pwrp_tmp $PWR_EXT_INC"
+      cc_cmd="$cc -c -x c -Wall -m64 -fPIC $cc_debug -D_REENTRANT -DOS_LINUX -I$pwr_inc -I$pwrp_inc -I$pwrp_tmp -I/usr/include/tirpc $PWR_EXT_INC"
       ldxx="g++ -m64 -fPIC"
 
       FileTypeStr="`echo $vFileType| cut -f $FileTypeIdx -d ,`"
@@ -434,7 +434,7 @@ elif [ $OpSys -eq $OpSys_ARM_LINUX ]; then
   pwrp_gc="$pwrp_tmp"
   
 # Suppress all warnings, -x
-  cc_cmd="$cc -c -x c -Wall $cc_debug -D_REENTRANT -DOS_LINUX -I$pwr_inc -I$pwrp_inc -I$pwrp_tmp $PWR_EXT_INC"
+  cc_cmd="$cc -c -x c -Wall $cc_debug -D_REENTRANT -DOS_LINUX -I$pwr_inc -I$pwrp_inc -I$pwrp_tmp -I/usr/include/tirpc $PWR_EXT_INC"
 
   FileTypeStr="`echo $vFileType| cut -f $FileTypeIdx -d ,`"
 

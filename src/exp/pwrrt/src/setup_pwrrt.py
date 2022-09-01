@@ -16,9 +16,9 @@ pwrrtmodule = Extension( name='pwrrt',
                          extra_link_args=['-O0'],
                          extra_objects=[pwr_obj + '/pwr_msg_co.o',
                                         pwr_obj + '/pwr_msg_rt.o'],
-                         include_dirs=[pwr_inc],
+                         include_dirs=[pwr_inc,'/usr/include/tirpc'],
                          library_dirs=[pwr_lib],
-                         libraries=['pwr_rt','pwr_co','pwr_msg_dummy','pthread',
+                         libraries=['pwr_rt','pwr_co','pwr_msg_dummy','pthread','tirpc',
                                     'rt', 'm', 'crypt'],
                          language='c++'                        
                        )

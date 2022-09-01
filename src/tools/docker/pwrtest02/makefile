@@ -17,7 +17,7 @@ demo_all : $(demo_modules)
 $(pwrp_exe)/wa_ldhtest : $(pwrp_appl)/wa_ldhtest.cpp
 	@ echo "Building wa_ldhtest"
 	. $(pwre_broot)/pwre_$(hw)_$(os).cnf; \
-	g++ -g -o $(target) $(source) -DOS_LINUX=1 -Wall -I$(pwr_inc) -I$(pwrp_inc) -L$(pwr_lib) \
+	g++ -g -o $(target) $(source) -DOS_LINUX=1 -Wall -I$(pwr_inc) -I$(pwrp_inc) -I/usr/include/tirpc -L$(pwr_lib) \
 	$(wb_msg_eobjs) $(rt_msg_eobjs) $(pwre_conf_libdir) \
 	$(pwr_obj)/rt_io_user.o $(pwr_obj)/wb_procom.o \
 	$(pwre_conf_libdir) $(pwre_conf_libpwrwbgtk) $(pwre_conf_libpwrxttgtk) \
