@@ -1350,9 +1350,9 @@ static attrnav_sEnumElement elem_ucpressure[]
 static attrnav_sEnumElement elem_ucspeed[]
     = { { graph_eUcSpeed_m_s, "m/s" },
 	{ graph_eUcSpeed_ft_min, "ft/min" },
-	{ graph_eUcSpeed_ft_s, "ft_s" },
+	{ graph_eUcSpeed_ft_s, "ft/s" },
 	{ graph_eUcSpeed_in_min, "in/min" },
-	{ graph_eUcSpeed_in_s, "in_s" },
+	{ graph_eUcSpeed_in_s, "in/s" },
 	{ graph_eUcSpeed_km_h, "km/h" },
 	{ graph_eUcSpeed_kn, "kn" },
 	{ graph_eUcSpeed_m_min, "m/min" },

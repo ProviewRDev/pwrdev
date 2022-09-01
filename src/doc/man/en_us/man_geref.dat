@@ -3450,8 +3450,9 @@ DigScript <t>Boolean   <t>Executes a script when signal gets high. <link>GeDynDi
 ScrollingText <t>Boolean <t>Display a scrolling text. <link>GeDynScrollingText
 DigTransparency <t>Boolean   <t>Shift transparency depending on the value of a <link>GeDynDigTransparency
 	  <t>		<t>digital signal.
-AnalogTransparency <t>Float32  <t>Set transparency depening on the value of an <link>GeDynAnalogTransparency
+AnalogTransparency <t>Float32  <t>Set transparency depending on the value of an <link>GeDynAnalogTransparency
 	  <t>		<t>analog signal.
+UnitConvert <t>Float32  <t>Convert value unit before displaying in value field. <link>GeDynUnitConvert
 
 
 <h2>Inherit
@@ -4069,6 +4070,38 @@ the value of the analog signal.
 AnalogTransparency.Attribute <t><t>Signal in the database of type Float32.
 AnalogTransparency.MinValue  <t><t>Signal value that corresponds to minimal transparency.
 AnalogTransparency.MaxValue  <t><t>Signal value that corresponds to maximal transparency.
+</topic>
+
+<topic>GeDynUnitConvert <style>function
+UnitConvert
+Unit conversion of a value displayed in a value field.
+UnitConvert should be combined with dynamic Value.
+
+Implemented entities and units
+
+<b>Entity <t>Units
+Acceleration <t>m/s2, ft/s2, in/s2
+Angle <t>Rad, degree, min, mrad, percent, sec
+Area <t>m2, a, ac, cm2, ha, km2, mm2, sq in, sq mi, sq ft, sq yd
+Energy <t>J, cal, kJ
+Force <t>N, kN, kp, MN, p
+Frequency <t>Hz, kHz, MHz, rad/min, rad/s, RPM
+General <t>1:1, Tera, Giga, Mega, Kilo, Hecto, Deca, Deci, Centi, Milli, Micro, Nano, Pico
+Length <t>m, cm, dm, ft, in, km, mi, mm, nm, NM, um, yd
+Mass <t>kg, g, hg, kt, lb, mg, oz, st, t, ug
+MassFlow <t>kg/s, g/min, g/s, kg/min, lb/min, lb/s, mg/min, oz/min, oz/s
+Power <t>W, hp, GW, kW, mW, MW, TW, uW
+Pressure <t>Pa, atm, b, kPa, lb/ft2, lb/in2, mb, mPa, mmHg, Mpa
+Speed <t>m/s, ft/min, ft/s, in/min, in/s, km/h, kn, m/min, mm/s, mi/h, yd/min, yd/s
+Temperature <t>K, C, F, R
+Time <t>s, d, h, min, ms, ns, us, wk, y
+Volume <t>m3, cm3, dm3, ft3, in3, mm3
+VolumeFlow <t>m3/s, cl/s, in3/min, in3/s, ft3/min, ft3/s, l/s, m3/min, mm3/s, yd3/min, yd3/s
+
+<b>Attribute <t><t>Description
+UnitConvert.Entity <t><t>Entity of value.
+UnitConvert.DbUnit  <t><t>Unit for value in the database.
+UnitConvert.DisplayUnit <t><t>Unit for value in display.
 </topic>
 
 </headerlevel>
