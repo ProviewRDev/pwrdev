@@ -424,7 +424,7 @@ else
     #Gtk
     echo "Mandatory :"
 
-    pwre_config_check_lib librpcsvc LIBRPCSVC lib lib 0 "/usr/lib/librpcsvc.so:/usr/lib/librpcsvc.a:/usr/lib/$hwpl-linux-$gnu/librpcsvc.a:/usr/lib64/librpcsvc.so:/usr/lib64/librpcsvc.a:/usr/lib64/libtirpc.so"
+    pwre_config_check_lib librpcsvc LIBRPCSVC lib lib 0 "/usr/lib/librpcsvc.so:/usr/lib/librpcsvc.a:/usr/lib/$hwpl-linux-$gnu/librpcsvc.a:/usr/lib/$hwpl-linux-$gnu/libtirpc.so:/usr/lib64/librpcsvc.so:/usr/lib64/librpcsvc.a:/usr/lib64/libtirpc.so"
     pwre_config_check_lib libasound LIBASOUND lib lib 0 "/usr/lib/libasound.so:/usr/lib/libasound.a:/usr/lib/$hwpl-linux-$gnu/libasound.so:/usr/lib64/libasound.so:/usr/lib64/libasound.a"
     pwre_config_check_lib libpthread LIBPTHREAD lib lib 0 "/usr/lib/libpthread.so:/usr/lib/libpthread.a:/usr/lib/$hwpl-linux-$gnu/libpthread.so:/usr/lib64/libpthread.so:/usr/lib64/libpthread.a"
     pwre_config_check_lib libm      LIBM     lib lib 0 "/usr/lib/libm.so:/usr/lib/libm.a:/usr/lib/$hwpl-linux-$gnu/libm.so:/usr/lib64/libm.so:/usr/lib64/libm.a"
@@ -436,6 +436,7 @@ else
     pwre_config_check_lib librt     LIBRT    lib lib 0 "/usr/lib/librt.so:/usr/lib/librt.a:/usr/lib/$hwpl-linux-$gnu/librt.so:/usr/lib64/librt.so:/usr/lib64/librt.a"
     pwre_config_check_lib libX11    LIBX11   lib lib 0 "/usr/lib/libX11.so:/usr/lib/$hwpl-linux-$gnu/libX11.so:/usr/lib64/libX11.so"
     pwre_config_check_include alsa  ALSA  1 "/usr/include/alsa/asoundlib.h"
+    pwre_config_check_include rpc  RPC  1 "/usr/include/rpc/rpc.h:/usr/include/tirpc/rpc"
 
     echo ""
     echo "Gui either Qt or Gtk :"
