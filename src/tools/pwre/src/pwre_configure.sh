@@ -371,6 +371,7 @@ if [ $pwre_hw == "hw_arm" ] && [ $ebuild -eq 1 ]; then
         pwre_config_check_include gtk   GTK   0 "/usr/local/include/gtk-3.0/gtk.h:/usr/local/include/gtk-3.0/gtk/gtk.h:/usr/include/gtk-3.0/gtk/gtk.h"
 #    fi
 
+    pwre_config_check_include rpc  RPC  1 "/usr/include/rpc/rpc.h:/usr/include/tirpc/rpc"
     pwre_config_check_include jni   JNI   1 $jdk/include/jni.h
     pwre_config_check_include jni   JNI   0 $jdk/include/linux/jni_md.h
 
