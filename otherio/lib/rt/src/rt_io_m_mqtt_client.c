@@ -135,7 +135,7 @@ static pwr_tStatus mqtt_error_to_sts(int err)
   return sts;
 }
 
-static int json_match(pwr_tCid chan_cid, const char *id, const char *msg, void *ovalue)
+static int json_match(pwr_tCid chan_cid, const char *id, const pwr_eDataRepEnum rep, const char *msg, void *ovalue)
 {
   char iname[80];
   char ivalue[80];
@@ -269,7 +269,10 @@ static int json_match(pwr_tCid chan_cid, const char *id, const char *msg, void *
       return 0;
     s2++;
 
-    n = sscanf(s2, "%d", (pwr_tInt32 *)ovalue);
+    if (rep == pwr_eDataRepEnum_Float32)
+      n = sscanf(s2, "%f", (pwr_tFloat32 *)ovalue);
+    else
+      n = sscanf(s2, "%d", (pwr_tInt32 *)ovalue);
     if (n > 0)
       return 1;
     return 0;
@@ -364,16 +367,16 @@ static void message_cb(struct mosquitto *mosq, void *obj,
 	      ident1[idx1] = 0;
 	      strncpy(ident2, id, idx2 + 1);
 	      strcpy(&ident2[idx2+1], &id[idx1+1]);
-	      sts = json_match(chanp->ChanClass, ident1, (char*)msg->payload, &value);
+	      sts = json_match(chanp->ChanClass, ident1, 0, (char*)msg->payload, &value);
 	      if (ODD(sts)) 
 		*(pwr_tBoolean *)chanp->vbp = 1;
 	      else {
-		sts = json_match(chanp->ChanClass, ident2, (char*)msg->payload, &value);
+		sts = json_match(chanp->ChanClass, ident2, 0, (char*)msg->payload, &value);
 		if (ODD(sts)) 
 		  *(pwr_tBoolean *)chanp->vbp = 0;
 	      }
 	    } else {
-	      sts = json_match(chanp->ChanClass, ((pwr_sClass_ChanDi *)chanp->cop)->Identity, (char*)msg->payload, &value);
+	      sts = json_match(chanp->ChanClass, ((pwr_sClass_ChanDi *)chanp->cop)->Identity, 0, (char*)msg->payload, &value);
 	      if (ODD(sts) && value) {
 		*(pwr_tBoolean *)chanp->vbp = 1;
 	      }
@@ -383,7 +386,7 @@ static void message_cb(struct mosquitto *mosq, void *obj,
 	  case pwr_cClass_ChanDo: {
 	    pwr_tBoolean value;
 
-	    sts = json_match(chanp->ChanClass, ((pwr_sClass_ChanDo *)chanp->cop)->Identity, (char*)msg->payload, &value);
+	    sts = json_match(chanp->ChanClass, ((pwr_sClass_ChanDo *)chanp->cop)->Identity, 0, (char*)msg->payload, &value);
 	    if (ODD(sts)) {
 	      if (*(pwr_tBoolean *)chanp->vbp != value) {
 		*(pwr_tBoolean *)chanp->vbp = value;
@@ -393,7 +396,7 @@ static void message_cb(struct mosquitto *mosq, void *obj,
 	  }
 	  case pwr_cClass_ChanIi: {
 	    pwr_tInt32 value;
-	    sts = json_match(chanp->ChanClass, ((pwr_sClass_ChanIi *)chanp->cop)->Identity, (char*)msg->payload, &value);
+	    sts = json_match(chanp->ChanClass, ((pwr_sClass_ChanIi *)chanp->cop)->Identity, 0, (char*)msg->payload, &value);
 	    if (ODD(sts)) {
 	      *(pwr_tInt32 *)chanp->vbp = value;
 	    }
@@ -403,11 +406,22 @@ static void message_cb(struct mosquitto *mosq, void *obj,
 	    pwr_tInt32 ivalue;
 	    pwr_tFloat32 fvalue;
 
-	    sts = json_match(chanp->ChanClass, ((pwr_sClass_ChanAi *)chanp->cop)->Identity, (char*)msg->payload, &ivalue);
-	    if (ODD(sts)) {
-	      ((pwr_sClass_Ai *)chanp->sop)->RawValue = ivalue;
-	      io_ConvertAi32((pwr_sClass_ChanAi *)chanp->cop, ivalue, &fvalue);
-	      *(pwr_tFloat32 *)chanp->vbp = fvalue;
+	    if (((pwr_sClass_ChanAi *)chanp->cop)->Representation == pwr_eDataRepEnum_Float32) {
+	      sts = json_match(chanp->ChanClass, ((pwr_sClass_ChanAi *)chanp->cop)->Identity, 
+		  ((pwr_sClass_ChanAi *)chanp->cop)->Representation, (char*)msg->payload, &fvalue);
+	      if (ODD(sts)) {
+		fvalue = ((pwr_sClass_ChanAi *)chanp->cop)->SensorPolyCoef0 + 
+                    ((pwr_sClass_ChanAi *)chanp->cop)->SensorPolyCoef1 * fvalue;
+		*(pwr_tFloat32 *)chanp->vbp = fvalue;
+	      }
+	    } else {
+	      sts = json_match(chanp->ChanClass, ((pwr_sClass_ChanAi *)chanp->cop)->Identity, ((pwr_sClass_ChanAi *)chanp->cop)->Representation, (char*)msg->payload, &ivalue);
+
+	      if (ODD(sts)) {
+		((pwr_sClass_Ai *)chanp->sop)->RawValue = ivalue;
+		io_ConvertAi32((pwr_sClass_ChanAi *)chanp->cop, ivalue, &fvalue);
+		*(pwr_tFloat32 *)chanp->vbp = fvalue;
+	      }
 	    }
 	    break;
 	  }

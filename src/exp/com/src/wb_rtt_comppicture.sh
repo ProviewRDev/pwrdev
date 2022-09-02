@@ -72,14 +72,14 @@ fi
 if [ $is_rttsys = "0" ]; then
   ar_name_pict=${pwrp_lib}/ra_rtt_${pgmname}_pict.a
 
-  cinc="-I$pwr_inc -I$pwrp_rttbld"
+  cinc="-I$pwr_inc -I$pwrp_rttbld -I/usr/include/tirpc"
   ${cc} -c -o $pwrp_obj/${name}.o $pwrp_rttbld/${name}.c ${cinc} ${cflags}
   ar rcU ${ar_name_pict} $pwrp_obj/${name}.o
 else
   ar_name_pict=${pwr_lib}/libpwr_dtt.a
   bld_dir=$pwre_broot/$pwre_os/$pwre_hw/bld/lib/dtt
 
-  cinc="-I$pwr_inc -I${bld_dir}"
+  cinc="-I$pwr_inc -I${bld_dir} -I/usr/include/tirpc"
   ${cc} -c -o ${bld_dir}/${name}.o \
      ${bld_dir}/${name}.c ${cinc} ${cflags}
   ar rcU ${ar_name_pict} ${bld_dir}/${name}.o

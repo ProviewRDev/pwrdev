@@ -182,11 +182,9 @@ int main(int argc, char* argv[])
 #elif defined OS_CYGWIN
   char os[] = "OS_CYGWIN";
 #endif
-#if defined OS_CYGWIN
+
   char cflags[] = "-I/usr/include/tirpc";
-#else
-  char cflags[] = "";
-#endif
+
   if (argc < 4) {
     usage();
     exit(1);
