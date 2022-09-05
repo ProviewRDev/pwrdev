@@ -141,7 +141,7 @@ public:
   // Runtime specifics
   ushort m_rt_io_submodule_type;
   ushort m_rt_state;
-  ushort m_rt_phys_ident_number;
+  uint m_rt_phys_ident_number;
 
   ushort m_rt_offset_io_in;
   ushort m_rt_offset_clean_io_in;
@@ -177,7 +177,7 @@ public:
 
   // Runtime
   ushort m_rt_state;
-  ushort m_rt_phys_ident_number;
+  uint m_rt_phys_ident_number;
 };
 
 class ProfinetExtChannelDiag

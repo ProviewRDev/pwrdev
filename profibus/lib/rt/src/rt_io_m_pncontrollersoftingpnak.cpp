@@ -161,7 +161,7 @@ static pwr_tStatus IoAgentRead(io_tCtx ctx, io_sAgent* ap)
       //  TODO Implement iocrstate propagation to pn device. But as of now
       //  the status_data doesn't change according to what the data frames says
       //  in other words. It's showing normal operation even with all modules
-      //  pulled from an IO...
+      //  pulled from an IO...The "problem" bit is not present at all :/
       data_length = iocr.m_rt_io_data_length;
       sts = pnak_get_iocr_data(0, iocr.m_rt_identifier, iocr.m_rt_io_data, &data_length, &ioxs, &status_data);
       if (sts == PNAK_OK)
