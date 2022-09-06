@@ -54,7 +54,7 @@ pwre_config_check_include()
             fi
 
             incdir=${file%/*}
-            if test $incdir == "/usr/include"; then
+            if test $incdir == "/usr/include" || test $incdir == "/usr/include/rpc"; then
                 incfound=1
             else
                 while [ $i -lt $inc_cnt ]; do
