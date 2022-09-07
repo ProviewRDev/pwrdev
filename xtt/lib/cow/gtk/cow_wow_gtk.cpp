@@ -114,6 +114,7 @@ void CoWowGtk::DisplayQuestion(void* ctx, const char* title, const char* text,
   GtkWidget* question_widget;
   GtkWidget* question_label;
   wow_t_question_cb* cbdata;
+  pwr_tFileName fname;
 
   cbdata = (wow_t_question_cb*)calloc(1, sizeof(*cbdata));
   cbdata->questionbox_ok = questionbox_ok;
@@ -132,9 +133,8 @@ void CoWowGtk::DisplayQuestion(void* ctx, const char* title, const char* text,
 
   question_label = gtk_label_new(translate_utf8(text));
 
-  GtkWidget* question_image = (GtkWidget*)g_object_new(GTK_TYPE_IMAGE, "stock",
-      "gtk-dialog-question", "icon-size", GTK_ICON_SIZE_DIALOG, "xalign",
-      0.5, "yalign", 1.0, NULL);
+  dcli_translate_filename(fname, "$pwr_exe/xtt_question.png");
+  GtkWidget* question_image = gtk_image_new_from_file(fname);
 
   GtkWidget* question_ok = gtk_button_new_with_label(translate_utf8("Yes"));
   gtk_widget_set_size_request(question_ok, 70, 28);
@@ -222,6 +222,7 @@ void CoWowGtk::CreateInputDialog(void* ctx, const char* title, const char* text,
   GtkWidget* inputdialog_widget;
   GtkWidget* inputdialog_label;
   wow_t_inputdialog_cb* cbdata;
+  pwr_tFileName fname;
 
   cbdata = (wow_t_inputdialog_cb*)calloc(1, sizeof(*cbdata));
   cbdata->inputdialogbox_ok = inputdialogbox_ok;
@@ -240,9 +241,8 @@ void CoWowGtk::CreateInputDialog(void* ctx, const char* title, const char* text,
 
   inputdialog_label = gtk_label_new(translate_utf8(text));
 
-  GtkWidget* inputdialog_image = (GtkWidget*)g_object_new(GTK_TYPE_IMAGE,
-      "stock", "gtk-dialog-question", "icon-size", GTK_ICON_SIZE_DIALOG,
-      "xalign", 0.5, "yalign", 1.0, NULL);
+  dcli_translate_filename(fname, "$pwr_exe/xtt_question.png");
+  GtkWidget* inputdialog_image = gtk_image_new_from_file(fname);
 
   GtkWidget* inputdialog_ok = gtk_button_new_with_label(translate_utf8("Yes"));
   gtk_widget_set_size_request(inputdialog_ok, 70, 28);
@@ -372,6 +372,7 @@ static void displaytext_close_cb(GtkWidget* w, gint arg1, gpointer data)
 void CoWowGtk::DisplayText(
     const char* title, const char* text, int width, int height)
 {
+  pwr_tFileName fname;
   GtkWidget* parent = m_parent;
   if (parent) {
     while (!GTK_IS_WINDOW(parent))
@@ -395,9 +396,8 @@ void CoWowGtk::DisplayText(
   GtkWidget* displaytext_label = gtk_label_new(textutf8);
   g_free(textutf8);
 
-  GtkWidget* displaytext_image = (GtkWidget*)g_object_new(GTK_TYPE_IMAGE,
-      "stock", "gtk-dialog-info", "icon-size", GTK_ICON_SIZE_DIALOG,
-      "xalign", 0.5, "yalign", 1.0, NULL);
+  dcli_translate_filename(fname, "$pwr_exe/xtt_info.png");
+  GtkWidget* displaytext_image = gtk_image_new_from_file(fname);
 
   GtkWidget* displaytext_close
       = gtk_button_new_with_label(CoWowGtk::translate_utf8("Close"));
@@ -1278,9 +1278,8 @@ int CoWowGtk::CreateModalDialog(const char* title, const char* text,
     image_w = gtk_image_new_from_file(fname);
   }
   if (!image) {
-    image_w = (GtkWidget*)g_object_new(GTK_TYPE_IMAGE, "stock",
-        "gtk-dialog-question", "icon-size", GTK_ICON_SIZE_DIALOG, "xalign",
-        0.5, "yalign", 1.0, NULL);
+    dcli_translate_filename(fname, "$pwr_exe/xtt_question.png");
+    image_w = gtk_image_new_from_file(fname);
   }
 
   gtk_window_set_modal(GTK_WINDOW(dialog_w), TRUE);
@@ -1386,9 +1385,8 @@ wow_sModalInputDialog* CoWowGtk::CreateModalInputDialog(const char* title,
     image_w = gtk_image_new_from_file(fname);
   }
   if (!image) {
-    image_w = (GtkWidget*)g_object_new(GTK_TYPE_IMAGE, "stock",
-        "gtk-dialog-question", "icon-size", GTK_ICON_SIZE_DIALOG, "xalign",
-        0.5, "yalign", 1.0, NULL);
+    dcli_translate_filename(fname, "$pwr_exe/xtt_question.png");
+    image_w = gtk_image_new_from_file(fname);
   }
 
   GtkWidget* textinput;

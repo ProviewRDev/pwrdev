@@ -3142,9 +3142,8 @@ GeGtk::GeGtk(void* x_parent_ctx, GtkWidget* x_parent_widget,
   india_text = gtk_entry_new();
   g_signal_connect(india_text, "activate", G_CALLBACK(activate_india_ok), this);
   india_label = gtk_label_new("Graph Name");
-  GtkWidget* india_image = (GtkWidget*)g_object_new(GTK_TYPE_IMAGE, "stock",
-      "gtk-dialog-question", "icon-size", GTK_ICON_SIZE_DIALOG, "xalign",
-      0.5, "yalign", 1.0, NULL);
+  dcli_translate_filename(fname, "$pwr_exe/xtt_question.png");
+  GtkWidget* india_image = gtk_image_new_from_file(fname);
   GtkWidget* india_ok = gtk_button_new_with_label("Ok");
   gtk_widget_set_size_request(india_ok, 70, 25);
   g_signal_connect(india_ok, "clicked", G_CALLBACK(activate_india_ok), this);
@@ -3181,9 +3180,8 @@ GeGtk::GeGtk(void* x_parent_ctx, GtkWidget* x_parent_widget,
   g_signal_connect(
       confirm_widget, "delete_event", G_CALLBACK(confirm_delete_event), this);
   confirm_label = gtk_label_new("Graph Name");
-  GtkWidget* confirm_image = (GtkWidget*)g_object_new(GTK_TYPE_IMAGE, "stock",
-      "gtk-dialog-warning", "icon-size", GTK_ICON_SIZE_DIALOG, "xalign",
-      0.5, "yalign", 1.0, NULL);
+  dcli_translate_filename(fname, "$pwr_exe/xtt_warning.png");
+  GtkWidget* confirm_image = gtk_image_new_from_file(fname);
 
   GtkWidget* confirm_ok = gtk_button_new_with_label("Ok");
   gtk_widget_set_size_request(confirm_ok, 70, 25);
@@ -3225,9 +3223,8 @@ GeGtk::GeGtk(void* x_parent_ctx, GtkWidget* x_parent_widget,
   g_signal_connect(
       yesnodia_widget, "delete_event", G_CALLBACK(yesnodia_delete_event), this);
   yesnodia_label = gtk_label_new("Graph Name");
-  GtkWidget* yesnodia_image = (GtkWidget*)g_object_new(GTK_TYPE_IMAGE, "stock",
-      "gtk-dialog-question", "icon-size", GTK_ICON_SIZE_DIALOG, "xalign",
-      0.5, "yalign", 1.0, NULL);
+  dcli_translate_filename(fname, "$pwr_exe/xtt_question.png");
+  GtkWidget* yesnodia_image = gtk_image_new_from_file(fname);
 
   GtkWidget* yesnodia_yes = gtk_button_new_with_label("Yes");
   gtk_widget_set_size_request(yesnodia_yes, 70, 25);

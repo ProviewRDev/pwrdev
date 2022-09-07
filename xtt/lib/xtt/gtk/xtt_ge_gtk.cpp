@@ -807,6 +807,8 @@ static gint confirm_delete_event(GtkWidget* w, GdkEvent* event, gpointer ge)
 
 void XttGeGtk::create_confirm_dialog()
 {
+  pwr_tFileName fname;
+
   if (confirm_widget) {
     g_object_set(confirm_widget, "visible", TRUE, NULL);
     return;
@@ -819,9 +821,8 @@ void XttGeGtk::create_confirm_dialog()
   g_signal_connect(
       confirm_widget, "delete_event", G_CALLBACK(confirm_delete_event), this);
   confirm_label = gtk_label_new("");
-  GtkWidget* confirm_image = (GtkWidget*)g_object_new(GTK_TYPE_IMAGE, "stock",
-      "gtk-dialog-question", "icon-size", GTK_ICON_SIZE_DIALOG, "xalign",
-      0.5, "yalign", 1.0, NULL);
+  dcli_translate_filename(fname, "$pwr_exe/xtt_question.png");
+  GtkWidget* confirm_image = gtk_image_new_from_file(fname);
 
   GtkWidget* confirm_ok
       = gtk_button_new_with_label(CoWowGtk::translate_utf8("Yes"));

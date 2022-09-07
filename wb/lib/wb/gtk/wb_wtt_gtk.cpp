@@ -3269,9 +3269,10 @@ void WttGtk::create_confirm_dialog()
       confirm_widget, "delete_event", G_CALLBACK(confirm_delete_event), this);
   confirm_label = gtk_label_new("");
   gtk_widget_set_name(confirm_widget, "confirmdialog");
-  GtkWidget* confirm_image = (GtkWidget*)g_object_new(GTK_TYPE_IMAGE, "stock",
-      "gtk-dialog-question", "icon-size", GTK_ICON_SIZE_DIALOG, "xalign",
-      0.5, "yalign", 1.0, NULL);
+
+  pwr_tFileName fname;
+  dcli_translate_filename(fname, "$pwr_exe/xtt_question.png");
+  GtkWidget* confirm_image = gtk_image_new_from_file(fname);
 
   GtkWidget* confirm_ok = gtk_button_new_with_label("Yes");
   gtk_widget_set_size_request(confirm_ok, 70, 25);
@@ -3335,9 +3336,10 @@ void WttGtk::create_input_dialog()
   g_signal_connect(
       india_text, "activate", G_CALLBACK(WttGtk::activate_india_ok), this);
   india_label = gtk_label_new("");
-  GtkWidget* india_image = (GtkWidget*)g_object_new(GTK_TYPE_IMAGE, "stock",
-      "gtk-dialog-question", "icon-size", GTK_ICON_SIZE_DIALOG, "xalign",
-      0.5, "yalign", 1.0, NULL);
+
+  pwr_tFileName fname;
+  dcli_translate_filename(fname, "$pwr_exe/xtt_question.png");
+  GtkWidget* india_image = gtk_image_new_from_file(fname);
 
   GtkWidget* india_ok = gtk_button_new_with_label("Ok");
   gtk_widget_set_size_request(india_ok, 70, 25);

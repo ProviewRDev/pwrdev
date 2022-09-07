@@ -1260,9 +1260,10 @@ void XttGtk::create_input_dialog()
   india_text = gtk_entry_new();
   g_signal_connect(india_text, "activate", G_CALLBACK(activate_india_ok), this);
   india_label = gtk_label_new("");
-  GtkWidget* india_image = (GtkWidget*)g_object_new(GTK_TYPE_IMAGE, "stock",
-      "gtk-dialog-question", "icon-size", GTK_ICON_SIZE_DIALOG, "xalign",
-      0.5, "yalign", 1.0, NULL);
+
+  pwr_tFileName fname;
+  dcli_translate_filename(fname, "$pwr_exe/xtt_question.png");
+  GtkWidget* india_image = gtk_image_new_from_file(fname);
 
   GtkWidget* india_ok
       = gtk_button_new_with_label(CoWowGtk::translate_utf8("Ok"));

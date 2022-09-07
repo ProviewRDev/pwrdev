@@ -573,9 +573,10 @@ int WNavGtk::continue_dialog(char* title, char* text)
   g_signal_connect(question_widget, "delete_event",
       G_CALLBACK(wnav_message_dialog_delete_event), this);
   GtkWidget* question_label = gtk_label_new(text);
-  GtkWidget* question_image = (GtkWidget*)g_object_new(GTK_TYPE_IMAGE, "stock",
-      "gtk-dialog-question", "icon-size", GTK_ICON_SIZE_DIALOG, "xalign",
-      0.5, "yalign", 1.0, NULL);
+
+  pwr_tFileName fname;
+  dcli_translate_filename(fname, "$pwr_exe/xtt_question.png");
+  GtkWidget* question_image = gtk_image_new_from_file(fname);
 
   GtkWidget* question_ok = gtk_button_new_with_label("Continue");
   gtk_widget_set_size_request(question_ok, 70, 25);
@@ -629,9 +630,10 @@ int WNavGtk::prompt_dialog(char* title, char* text, char** value)
       G_CALLBACK(wnav_message_dialog_delete_event), this);
   message_dialog_entry = gtk_entry_new();
   GtkWidget* india_label = gtk_label_new(text);
-  GtkWidget* india_image = (GtkWidget*)g_object_new(GTK_TYPE_IMAGE, "stock",
-      "gtk-dialog-question", "icon-size", GTK_ICON_SIZE_DIALOG, "xalign",
-      0.5, "yalign", 1.0, NULL);
+
+  pwr_tFileName fname;
+  dcli_translate_filename(fname, "$pwr_exe/xtt_question.png");
+  GtkWidget* india_image = gtk_image_new_from_file(fname);
 
   GtkWidget* india_ok = gtk_button_new_with_label("Ok");
   gtk_widget_set_size_request(india_ok, 70, 25);

@@ -263,6 +263,7 @@ CoXHelpGtk::CoXHelpGtk(GtkWidget* xa_parent_wid, void* xa_parent_ctx,
 {
   int sts;
   char title[80];
+  pwr_tFileName fname;
 
   strcpy(title, CoWowGtk::translate_utf8("Help"));
 
@@ -468,9 +469,8 @@ CoXHelpGtk::CoXHelpGtk(GtkWidget* xa_parent_wid, void* xa_parent_ctx,
       india_widget, "delete_event", G_CALLBACK(india_delete_event), this);
   india_text = gtk_entry_new();
   india_label = gtk_label_new("Graph Name");
-  GtkWidget* india_image = (GtkWidget*)g_object_new(GTK_TYPE_IMAGE, "stock",
-      "gtk-dialog-question", "icon-size", GTK_ICON_SIZE_DIALOG, "xalign",
-      0.5, "yalign", 1.0, NULL);
+  dcli_translate_filename(fname, "$pwr_exe/xtt_question.png");
+  GtkWidget* india_image = gtk_image_new_from_file(fname);
 
   GtkWidget* india_ok = gtk_button_new_with_label("Ok");
   gtk_widget_set_size_request(india_ok, 70, 25);

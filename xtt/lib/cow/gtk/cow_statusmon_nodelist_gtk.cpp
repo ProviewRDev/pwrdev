@@ -684,9 +684,10 @@ void NodelistGtk::create_add_input_dialog()
   add_india_label2 = gtk_label_new("");
   add_india_label3 = gtk_label_new("");
   add_india_label4 = gtk_label_new("");
-  GtkWidget* add_india_image = (GtkWidget*)g_object_new(GTK_TYPE_IMAGE, "stock",
-      "gtk-dialog-question", "icon-size", GTK_ICON_SIZE_DIALOG, "xalign",
-      0.5, "yalign", 0.4, NULL);
+
+  pwr_tFileName fname;
+  dcli_translate_filename(fname, "$pwr_exe/xtt_question.png");
+  GtkWidget* add_india_image = gtk_image_new_from_file(fname);
 
   GtkWidget* add_india_ok = gtk_button_new_with_label("Ok");
   gtk_widget_set_size_request(add_india_ok, 70, 25);
@@ -862,9 +863,10 @@ void NodelistGtk::create_mod_input_dialog()
   mod_india_label2 = gtk_label_new("");
   mod_india_label3 = gtk_label_new("");
   mod_india_label4 = gtk_label_new("");
-  GtkWidget* mod_india_image = (GtkWidget*)g_object_new(GTK_TYPE_IMAGE, "stock",
-      "gtk-dialog-question", "icon-size", GTK_ICON_SIZE_DIALOG, "xalign",
-      0.5, "yalign", 0.4, NULL);
+
+  pwr_tFileName fname;
+  dcli_translate_filename(fname, "$pwr_exe/xtt_question.png");
+  GtkWidget* mod_india_image = gtk_image_new_from_file(fname);
 
   GtkWidget* mod_india_ok = gtk_button_new_with_label("Ok");
   gtk_widget_set_size_request(mod_india_ok, 70, 25);
