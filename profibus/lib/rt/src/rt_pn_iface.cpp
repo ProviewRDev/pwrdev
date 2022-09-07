@@ -68,11 +68,30 @@
 
 #include <iostream>
 #include <sstream>
+#include <iomanip>
 
 // char file_vect[2][80] = {
 //     "pwr_pn_000_001_099_020_000000a2.xml",
 //     "pwr_pn_000_001_099_020_000000e5.xml",
 // };
+
+void print_error_con(T_PN_SERVICE_ERROR_CON* pErrorCon, uint32_t device_ref, std::string&& file, int line,
+                     std::string&& func)
+{
+  std::cerr << "Negative result in: " << std::dec << func << " (" << file << ":" << line << ")" << std::endl;
+  std::cerr << std::setw(30) << "Dec" << std::setw(8) << "Hex" << std::endl;
+  std::cerr << std::setw(24) << "Device Reference:" << std::setw(6) << device_ref << std::endl;
+  std::cerr << std::setw(24) << "Code:" << std::setw(6) << +pErrorCon->Code << std::setw(8) << std::hex
+            << std::showbase << +pErrorCon->Code << " [local = 0, stack = 1, remote = 2]" << std::endl;
+  std::cerr << std::setw(24) << "Detail:" << std::setw(6) << std::dec << +pErrorCon->Detail << std::setw(8)
+            << std::hex << std::showbase << +pErrorCon->Detail << std::endl;
+  std::cerr << std::setw(24) << "Additional Detail:" << std::setw(6) << std::dec
+            << +pErrorCon->AdditionalDetail << std::setw(8) << std::hex << std::showbase
+            << +pErrorCon->AdditionalDetail << std::endl;
+  std::cerr << std::setw(24) << "AreaCode:" << std::setw(6) << std::dec << +pErrorCon->AreaCode
+            << std::setw(8) << std::hex << std::showbase << +pErrorCon->AreaCode << std::endl
+            << std::endl;
+}
 
 void pack_set_ip_settings_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes, ProfinetDevice const* pn_device)
 {
@@ -903,15 +922,7 @@ int unpack_get_los_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local)
   else if (pSdb->Result == PNAK_RESULT_NEG)
   {
     T_PN_SERVICE_ERROR_CON* pErrorCon = (T_PN_SERVICE_ERROR_CON*)(pSdb + 1);
-
-    printf("channel %d: get_los.con [-] (%d)\r\n"
-           "            code       : %d (0x%02x)\r\n"
-           "            detail     : %d (0x%02x)\r\n"
-           "            add. detail: %d (0x%02x)\r\n"
-           "            area       : %d (0x%02x)\r\n",
-           0, pSdb->DeviceRef, pErrorCon->Code, pErrorCon->Code, pErrorCon->Detail, pErrorCon->Detail,
-           pErrorCon->AdditionalDetail, pErrorCon->AdditionalDetail, pErrorCon->AreaCode,
-           pErrorCon->AreaCode);
+    print_error_con(pErrorCon, pSdb->DeviceRef, __FILE__, __LINE__, "get_los_con()");
   }
 
   return -1;
@@ -1396,16 +1407,7 @@ int unpack_get_alarm_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local
   else if (pSdb->Result == PNAK_RESULT_NEG)
   {
     T_PN_SERVICE_ERROR_CON* pErrorCon = (T_PN_SERVICE_ERROR_CON*)(pSdb + 1);
-
-    std::cerr << "err: get_alarm_con() - device " << pSdb->DeviceRef << std::endl
-              << "Code: " << std::dec << pErrorCon->Code << " (" << std::hex << std::showbase
-              << pErrorCon->Code << ")" << std::endl
-              << "Detail: " << std::dec << pErrorCon->Detail << " (" << std::hex << std::showbase
-              << pErrorCon->Detail << ")" << std::endl
-              << "Additional Detail: " << std::dec << pErrorCon->AdditionalDetail << " (" << std::hex
-              << std::showbase << pErrorCon->AdditionalDetail << ")" << std::endl
-              << "AreaCode: " << std::dec << pErrorCon->AreaCode << " (" << std::hex << std::showbase
-              << pErrorCon->AreaCode << ")" << std::endl;
+    print_error_con(pErrorCon, pSdb->DeviceRef, __FILE__, __LINE__, "get_alarm_con()");
   }
 
   return -1;
@@ -1463,6 +1465,8 @@ int unpack_get_device_state_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal
         PN_U32 API =
             _HIGH_LOW_BYTES_TO_PN_U32(pDiffModuleAPI->APIHighWordHighByte, pDiffModuleAPI->APIHighWordLowByte,
                                       pDiffModuleAPI->APILowWordHighByte, pDiffModuleAPI->APILowWordLowByte);
+        (void)API;
+
         PN_U16 number_of_modules = _HIGH_LOW_BYTES_TO_PN_U16(pDiffModuleAPI->NumberOfModulesHighByte,
                                                              pDiffModuleAPI->NumberOfModulesLowByte);
 
@@ -1552,15 +1556,7 @@ int unpack_get_device_state_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal
   else if (pSdb->Result == PNAK_RESULT_NEG)
   {
     T_PN_SERVICE_ERROR_CON* pErrorCon = (T_PN_SERVICE_ERROR_CON*)(pSdb + 1);
-
-    printf("channel %d: get_device_state.con [-] (%d)\r\n"
-           "            code       : %d (0x%02x)\r\n"
-           "            detail     : %d (0x%02x)\r\n"
-           "            add. detail: %d (0x%02x)\r\n"
-           "            area       : %d (0x%02x)\r\n",
-           0, pSdb->DeviceRef, pErrorCon->Code, pErrorCon->Code, pErrorCon->Detail, pErrorCon->Detail,
-           pErrorCon->AdditionalDetail, pErrorCon->AdditionalDetail, pErrorCon->AreaCode,
-           pErrorCon->AreaCode);
+    print_error_con(pErrorCon, pSdb->DeviceRef, __FILE__, __LINE__, "get_device_state_con()");
   }
 
   return -1;
@@ -1577,13 +1573,11 @@ int unpack_download_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local)
     PN_U16 IOCRIndex;
     unsigned short device_ref, ii;
 
-    // std::shared_ptr<PnDeviceData> device;
     std::shared_ptr<ProfinetDevice> pn_device;
 
     device_ref = pSdb->DeviceRef;
 
     /* Find configured device */
-
     for (ii = 0; ii < local->device_list.size(); ii++)
     {
       if (local->device_list[ii]->m_rt_device_ref == device_ref)
@@ -1791,17 +1785,8 @@ int unpack_download_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local)
   }
   else if (pSdb->Result == PNAK_RESULT_NEG)
   {
-
     T_PN_SERVICE_ERROR_CON* pErrorCon = (T_PN_SERVICE_ERROR_CON*)(pSdb + 1);
-
-    printf("channel %d: download.con  (device ref: %d)\r\n"
-           "            code       : %d (0x%02x) [local = 0, stack = 1, remote = 2]\r\n"
-           "            detail     : %d (0x%02x)\r\n"
-           "            add. detail: %d (0x%02x)\r\n"
-           "            area       : %d (0x%02x)\r\n",
-           0, pSdb->DeviceRef, pErrorCon->Code, pErrorCon->Code, pErrorCon->Detail, pErrorCon->Detail,
-           pErrorCon->AdditionalDetail, pErrorCon->AdditionalDetail, pErrorCon->AreaCode,
-           pErrorCon->AreaCode);
+    print_error_con(pErrorCon, pSdb->DeviceRef, __FILE__, __LINE__, "download_con()");
   }
 
   return -1;
@@ -1897,15 +1882,7 @@ int handle_service_con(io_sAgentLocal* local, io_sAgent* ap)
           if (pSdb->Result == PNAK_RESULT_NEG)
           {
             T_PN_SERVICE_ERROR_CON* pErrorCon = (T_PN_SERVICE_ERROR_CON*)(pSdb + 1);
-
-            printf("channel %d: get_los.con [-] (%d)\r\n"
-                   "            code       : %d (0x%02x)\r\n"
-                   "            detail     : %d (0x%02x)\r\n"
-                   "            add. detail: %d (0x%02x)\r\n"
-                   "            area       : %d (0x%02x)\r\n",
-                   0, pSdb->DeviceRef, pErrorCon->Code, pErrorCon->Code, pErrorCon->Detail, pErrorCon->Detail,
-                   pErrorCon->AdditionalDetail, pErrorCon->AdditionalDetail, pErrorCon->AreaCode,
-                   pErrorCon->AreaCode);
+            print_error_con(pErrorCon, pSdb->DeviceRef, __FILE__, __LINE__, "handle_service_con()");
           }
           break;
         }

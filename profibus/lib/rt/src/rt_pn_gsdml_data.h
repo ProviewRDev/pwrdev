@@ -45,7 +45,6 @@
 #include <map>
 #include <iostream>
 
-#include "co_xml_parser.h"
 #include "co_pugixml.hpp"
 #include "rt_profinet.h"
 
