@@ -3,7 +3,6 @@ Version: 6.0.0-1
 Section: base
 Priority: optional
 Architecture: armhf
-Depends: 
 Depends: libc6 (>= 2.31-13+rpt2+rpi1+deb11u4),
  libgtk-3-0 (>= 3.24.24-4+rpt1+deb11u2),
  libasound2 (>= 1.2.4-1.1+rpt2),
