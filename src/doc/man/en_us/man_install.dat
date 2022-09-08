@@ -9,7 +9,7 @@
 
 
 <hr>
-2021-10-22
+2022-09-06
 Version 6.0.0
 <hr>
 </topic>
@@ -58,7 +58,7 @@ Architecture: amd64
 2. Open a terminal window and install dependency packages
 
 <c>> sudo apt-get update
-<c>> sudo apt-get install -y libgtk2.0-0 libasound2 \
+<c>> sudo apt-get install -y libgtk-3-0 libasound2 \
 <c>	libdb5.3 libdb5.3++ libsqlite3-0 librsvg2-2 g++  xterm libmariadb3 \
 <c>	librabbitmq4 libusb-1.0-0 libhdf5-openmpi-103 librabbitmq4 libmosquitto1 \
 <c>	libgstreamer1.0-0 libgstreamer-plugins-base1.0-0 openjdk-11-jdk \
@@ -112,7 +112,7 @@ desktop icon, or from a terminal window with
 2. Open a terminal window and install dependency packages
 
 <c>> sudo apt-get update
-<c>> sudo apt-get install -y libgtk2.0-0 libasound2 \
+<c>> sudo apt-get install -y libgtk-3-0 libasound2 \
 <c>	libdb5.3 libdb5.3++ libsqlite3-0 librsvg2-2 g++ xterm libmariadb3 \
 <c>	librabbitmq4 libmosquitto1 libusb-1.0-0 libhdf5-openmpi-103 \
 <c>	libgstreamer1.0-0 libgstreamer-plugins-base1.0-0 \
@@ -172,7 +172,7 @@ Architecture: amd64
 2. Open a terminal window and install dependency packages
 
 <c>> sudo apt-get update
-<c>> sudo apt-get install -y libgtk2.0-0 libasound2 \
+<c>> sudo apt-get install -y libgtk-3-0 libasound2 \
 <c>	libdb5.3 libdb5.3++ libsqlite3-0 librsvg2-2 g++  xterm libmariadb3 \
 <c>	librabbitmq4 libusb-1.0-0 libhdf5-openmpi-103 librabbitmq4 libmosquitto1\
 <c>	libgstreamer1.0-0 libgstreamer-plugins-base1.0-0 openjdk-11-jdk \
@@ -226,7 +226,7 @@ desktop icon, or from a terminal window with
 2. Open a terminal window and install 
 
 <c>> sudo apt-get update
-<c>> sudo apt-get install -y libgtk2.0-0 libasound2 \
+<c>> sudo apt-get install -y libgtk-3-0 libasound2 \
 <c>	libdb5.3 libdb5.3++ libsqlite3-0 librsvg2-2 g++ xterm libmariadb3 \
 <c>	librabbitmq4 libmosquitto1 libusb-1.0-0 libhdf5-openmpi-103 \
 <c>	libgstreamer1.0-0 libgstreamer-plugins-base1.0-0 \
@@ -278,7 +278,7 @@ Architecture: armhf
 2. Open a terminal window and install dependency packages
 
 <c>> sudo apt-get update
-<c>> sudo apt-get install -y libgtk2.0-0 libasound2 \
+<c>> sudo apt-get install -y libgtk-3-0 libasound2 \
 <c>	libdb5.3 libdb5.3++ libsqlite3-0 librsvg2-2 g++  xterm libmariadb3 \
 <c>	libusb-1.0-0 libhdf5-openmpi-103 librabbitmq4 libmosquitto1 \
 <c>	libgstreamer1.0-0 libgstreamer-plugins-base1.0-0 openjdk-11-jdk \
@@ -332,7 +332,7 @@ desktop icon, or from a terminal window with
 2. Open a terminal window and install 
 
 <c>> sudo apt-get update
-<c>> sudo apt-get install -y libgtk2.0-0 libasound2 \
+<c>> sudo apt-get install -y libgtk-3-0 libasound2 \
 <c>	libdb5.3 libdb5.3++ libsqlite3-0 librsvg2-2 g++ xterm libmariadb3 \
 <c>	libusb-1.0-0 libhdf5-openmpi-103 librabbitmq4 libmosquitto1 \
 <c>	libgstreamer1.0-0 libgstreamer-plugins-base1.0-0 \
@@ -388,7 +388,7 @@ In this example the development environment and demo project is installed.
 
 <c>> apt-get update
 <c>> apt-get install -y wget
-<c>> apt-get install -y libgtk2.0-0 libasound2 \
+<c>> apt-get install -y libgtk-3-0 libasound2 \
 <c>	libdb5.3 libdb5.3++ libsqlite3-0 librsvg2-2 g++  xterm libmariadb3 \
 <c>	librabbitmq4 libusb-1.0-0 libhdf5-openmpi-103 librabbitmq4 \
 <c>	libgstreamer1.0-0 libgstreamer-plugins-base1.0-0 openjdk-11-jdk \
@@ -446,7 +446,7 @@ In the XQuartz terminal, allow access from local host
 
 <c>> apt-get update
 <c>> apt-get install -y wget
-<c>> apt-get install -y libgtk2.0-0 libasound2 \
+<c>> apt-get install -y libgtk-3-0 libasound2 \
 <c>	libdb5.3 libdb5.3++ libsqlite3-0 librsvg2-2 g++  xterm libmariadb3 \
 <c>	librabbitmq4 libusb-1.0-0 libhdf5-openmpi-103 librabbitmq4 \
 <c>	libgstreamer1.0-0 libgstreamer-plugins-base1.0-0 openjdk-11-jdk \
