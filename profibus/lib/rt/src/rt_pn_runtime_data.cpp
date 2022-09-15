@@ -46,7 +46,7 @@
 #include "co_string.h"
 
 #include "rt_pb_msg.h"
-#include "rt_pn_gsdml_data.h"
+#include "rt_pn_runtime_data.h"
 
 #include "pwr_baseclasses.h"
 

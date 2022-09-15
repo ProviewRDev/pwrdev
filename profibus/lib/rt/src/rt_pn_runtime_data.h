@@ -45,6 +45,7 @@
 #include <map>
 #include <iostream>
 
+#include "pwr.h"
 #include "co_pugixml.hpp"
 #include "rt_profinet.h"
 
@@ -139,8 +140,8 @@ public:
 
   // Runtime specifics
   ushort m_rt_io_submodule_type;
-  ushort m_rt_state;
-  uint m_rt_phys_ident_number;
+  ushort m_rt_state {0};
+  uint m_rt_phys_ident_number {0};
 
   ushort m_rt_offset_io_in;
   ushort m_rt_offset_clean_io_in;
@@ -175,8 +176,8 @@ public:
   bool m_is_dap = false;
 
   // Runtime
-  ushort m_rt_state;
-  uint m_rt_phys_ident_number;
+  ushort m_rt_state {0};
+  uint m_rt_phys_ident_number {0};
 };
 
 class ProfinetExtChannelDiag
