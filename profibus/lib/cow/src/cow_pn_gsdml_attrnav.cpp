@@ -82,6 +82,9 @@
 
 static char null_str[] = "";
 
+// Declared in wb_c_pndevice.cpp and xtt_c_pndevice.cpp (different translation units)
+extern const char* NO_EDIT_STRING;
+
 /*
   Instantiates the correct template class depending on the type of value
   encountered in the GSDML file.
@@ -582,12 +585,6 @@ int GsdmlAttrNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
     brow_tNode* node_list;
     int node_count;
 
-    if (!attrnav->edit_mode)
-    {
-      attrnav->message('E', "Not in edit mode");
-      break;
-    }
-
     switch (event->object.object_type)
     {
     case flow_eObjectType_Node:
@@ -601,6 +598,12 @@ int GsdmlAttrNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
       {
         attrnav->message('E', "Select one slot");
         free(node_list);
+        break;
+      }
+
+      if (!attrnav->edit_mode)
+      {
+        attrnav->message('E', NO_EDIT_STRING);
         break;
       }
 
@@ -686,6 +689,7 @@ int GsdmlAttrNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
     break;
   }
   case flow_eEvent_MB1DoubleClick:
+  {
     switch (event->object.object_type)
     {
     case flow_eObjectType_Node:
@@ -695,15 +699,11 @@ int GsdmlAttrNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
     default:;
     }
     break;
+  }
   case flow_eEvent_MB1DoubleClickCtrl:
     break;
   case flow_eEvent_Radiobutton:
   {
-    if (!attrnav->edit_mode)
-    {
-      attrnav->message('E', "Not in edit mode");
-      break;
-    }
     switch (event->object.object_type)
     {
     case flow_eObjectType_Node:
@@ -1283,6 +1283,11 @@ int GsdmlAttrNav::save()
 
 int ItemPn::open_children(GsdmlAttrNav* attrnav, double x, double y)
 {
+  if (!(m_type & attrnav_mItemType_Parent))
+  {
+    return 1;
+  }
+
   double node_x, node_y;
 
   brow_GetNodePosition(m_node, &node_x, &node_y);
@@ -1307,6 +1312,11 @@ int ItemPn::open_children(GsdmlAttrNav* attrnav, double x, double y)
 
 void ItemPn::selected(GsdmlAttrNav* attrnav)
 {
+  if (!attrnav->edit_mode)
+  {
+    attrnav->message('E', NO_EDIT_STRING);
+    return;
+  }
 
   if (selected_impl(attrnav))
     attrnav->set_modified(true);
@@ -1314,6 +1324,12 @@ void ItemPn::selected(GsdmlAttrNav* attrnav)
 
 void ItemPn::value_changed(GsdmlAttrNav* attrnav, const char* value_str)
 {
+  if (!attrnav->edit_mode)
+  {
+    attrnav->message('E', NO_EDIT_STRING);
+    return;
+  }
+
   if (value_changed_impl(attrnav, value_str))
     attrnav->set_modified(true);
 }
@@ -1443,11 +1459,6 @@ ItemPnIDSelectValue::ItemPnIDSelectValue(GsdmlAttrNav* attrnav, const char* name
 bool ItemPnIDSelectValue::selected_impl(GsdmlAttrNav* attrnav)
 {
   int value;
-  if (!attrnav->edit_mode)
-  {
-    attrnav->message('E', "Not in edit mode");
-    return false;
-  }
 
   brow_GetRadiobutton(m_node, 0, &value);
 

@@ -52,6 +52,8 @@
 
 #include "xtt_c_pndevice.h"
 
+const char* NO_EDIT_STRING = "Not in development environment, can't edit.";
+
 static void get_subcid(pwr_tCid cid, std::vector<pwr_tCid>& v)
 {
   pwr_tCid subcid;

@@ -49,8 +49,8 @@ typedef struct
   void* editor_ctx;
 } xtt_pndevice_sCtx;
 
-pwr_tStatus xtt_pndevice_create_ctx(pwr_tAttrRef aref, void* editor_ctx,
-                                    xtt_pndevice_sCtx** ctxp, char const* pwr_pn_data_file);
+pwr_tStatus xtt_pndevice_create_ctx(pwr_tAttrRef aref, void* editor_ctx, xtt_pndevice_sCtx** ctxp,
+                                    char const* pwr_pn_data_file);
 int xtt_pndevice_help_cb(void* sctx, const char* text);
 void xtt_pndevice_close_cb(void* sctx);
 int xtt_pndevice_save_cb(void* sctx);

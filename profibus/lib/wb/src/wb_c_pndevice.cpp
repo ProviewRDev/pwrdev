@@ -67,6 +67,8 @@
 
 #include "wb_c_pndevice.h"
 
+const char* NO_EDIT_STRING = "Not in edit mode!";
+
 static pwr_tStatus generate_viewer_data(device_sCtx* ctx);
 
 class ChanItem
@@ -135,23 +137,26 @@ static int create_channel(ldh_tSession ldhses, ChanItem const& chan, pwr_tOid ta
 }
 
 static std::string generate_channel_object_name(GSDML::DataItem const* data_item, size_t start_index,
-                                                unsigned int number, int const& subslot_number, bool channel_name_from_id = false)
+                                                unsigned int number, int const& subslot_number,
+                                                bool channel_name_from_id = false)
 {
   std::regex disallowed_characters_re(
       R"([^A-Za-z0-9_])"); // Match anything NOT in A-Z, a-z, 0-9 or _ i.e. all disallowed characters
   std::ostringstream name(std::ios_base::out);
   if (channel_name_from_id)
   {
-    name << "SS" << subslot_number << "_" << (data_item->_TextId != "" ? "" : "Ch") << std::setw(2) << std::setfill('0') << start_index
-         << (data_item->_TextId != "" ? "_" + data_item->_TextId : "");
+    name << "SS" << subslot_number << "_" << (data_item->_TextId != "" ? "" : "Ch") << std::setw(2)
+         << std::setfill('0') << start_index << (data_item->_TextId != "" ? "_" + data_item->_TextId : "");
   }
   else
   {
-    // Make sure the text is no longer than 20 bytes. Because we will fill it with more info. And we are limited to 32 characters in these names :/
+    // Make sure the text is no longer than 20 bytes. Because we will fill it with more info. And we are
+    // limited to 32 characters in these names :/
     std::string temp_text = *data_item->_Text;
     if (temp_text.length() > 20)
       temp_text.erase(20, std::string::npos); // We can only have 32 characters including null termination :(
-    name << "SS" << subslot_number << "_" << (data_item->_Text ? temp_text : "Ch") << "_" << start_index << "_" << number;
+    name << "SS" << subslot_number << "_" << (data_item->_Text ? temp_text : "Ch") << "_" << start_index
+         << "_" << number;
   }
 
   std::string new_name;
@@ -165,14 +170,14 @@ static std::string generate_channel_object_name(GSDML::DataItem const* data_item
 
   // In 999 out of 1000 cases we now have a unique name given the start_index and number within a sequence of
   // bits for instance. In some cases though one can choose the same submodule more than once for some
-  // specific modules. 
+  // specific modules.
 
   return new_name;
 }
 
 static int pndevice_fill_io_vector_from_data_item(std::vector<ChanItem>& io_vector,
-                                                  GSDML::DataItem const* data_item, size_t const& start_index, int const& subslot_number,
-                                                  bool is_output = false)
+                                                  GSDML::DataItem const* data_item, size_t const& start_index,
+                                                  int const& subslot_number, bool is_output = false)
 {
   ChanItem ci;
 
