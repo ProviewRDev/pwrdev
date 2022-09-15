@@ -43,7 +43,7 @@
 
 #include "rt_io_base.h"
 #include "rt_io_pnak_locals.h"
-#include "rt_pn_gsdml_data.h"
+#include "rt_pn_runtime_data.h"
 
 class PnViewerPNAK
 {

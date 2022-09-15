@@ -32,7 +32,7 @@
 #include "rt_io_bus.h"
 #include "rt_io_msg.h"
 #include "rt_pb_msg.h"
-#include "rt_pn_gsdml_data.h"
+#include "rt_pn_runtime_data.h"
 #include "rt_io_pn_locals.h"
 
 /*----------------------------------------------------------------------------*\
