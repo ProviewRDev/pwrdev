@@ -58,3 +58,35 @@ dialog button {
   margin-right: 20px;
   min-width: 90px;
 }
+
+#ind_gray { 
+  background-color: #d5d5d5;
+}
+
+#ind_green { 
+  background-color: #50ff00;
+}
+
+#ind_yellow { 
+  background-color: yellow;
+}
+
+#ind_red { 
+  background-color: #ff6060;
+}
+
+#ind_darkgray { 
+  background-color: #656565;
+}
+
+#ind_darkgreen { 
+  background-color: #81bd00;
+}
+
+#ind_darkyellow { 
+  background-color: #e1c000;
+}
+
+#ind_darkred { 
+  background-color: #e10000;
+}
