@@ -617,8 +617,13 @@ void wb_merep::insertCattObject(
   int j;
 
   wb_cdrep* cd = cdrep(sts, adp->tid());
-  if (EVEN(*sts))
-    throw wb_error(*sts);
+  if (EVEN(*sts)) {
+    char msg[200];
+    wb_cdrep* cp = cdrep(sts, cid);
+    sprintf(msg, "Attribute type error, %s.%s", cp->name(), adp->name());
+    throw wb_error_str(msg);
+    //throw wb_error(*sts);
+  }
 
   // Find a tree node with free offsets
   key.subCid = adp->tid();

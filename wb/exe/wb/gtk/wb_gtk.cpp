@@ -36,6 +36,7 @@
 
 /* wb_gtk.cpp -- work bench */
 
+#include <iostream>
 #include <stdlib.h>
 #include <unistd.h>
 
@@ -95,13 +96,17 @@ int main(int argc, char* argv[])
     exit(0);
   }
 
-  gtk_init(&argc, &argv);
+  try {
+    gtk_init(&argc, &argv);
 
-  setlocale(LC_ALL, "en_US");
-  setlocale(LC_NUMERIC, "POSIX");
-  setlocale(LC_TIME, "en_US");
+    setlocale(LC_ALL, "en_US");
+    setlocale(LC_NUMERIC, "POSIX");
+    setlocale(LC_TIME, "en_US");
 
-  new WbGtk(argc, argv);
+    new WbGtk(argc, argv);
+  } catch(wb_error& e) {
+    std::cout << "** wb_error exception, " <<  e.what() << '\n';
+  }
 }
 
 WbGtk::WbGtk(int argc, char* argv[]) : mainwindow(0)
