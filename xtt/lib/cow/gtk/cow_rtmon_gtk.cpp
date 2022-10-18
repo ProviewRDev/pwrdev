@@ -270,6 +270,7 @@ RtMonGtk::RtMonGtk(void* rtmon_parent_ctx, GtkWidget* rtmon_parent_wid,
 
   timerid = g_timeout_add(1000, rtmon_scan, this);
 
+  nodelistnav->set_input_focus();
   *status = 1;
 }
 

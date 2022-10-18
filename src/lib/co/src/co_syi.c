@@ -54,6 +54,24 @@ char* syi_HostName(pwr_tStatus* status, char* ibuffer, int isize)
   return syi_NodeName(status, ibuffer, isize);
 }
 
+int syi_Busid(pwr_tStatus* sts)
+{
+  char *bus_str;
+  int bus;
+
+  bus_str = getenv("PWR_BUS_ID");
+  if (!bus_str) {
+    *sts = SYI__BUSID;
+    return -1;
+  }
+  if (sscanf(bus_str, "%d", &bus) != 1) {
+    *sts = SYI__BUSID;
+    return -1;
+  }
+  *sts = SYI__SUCCESS;
+  return bus;
+}
+
 char* syi_NodeName(pwr_tStatus* status, char* ibuffer, int isize)
 {
   char* cp;

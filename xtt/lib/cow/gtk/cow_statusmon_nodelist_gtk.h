@@ -61,19 +61,23 @@ public:
   GtkWidget* add_india_label2;
   GtkWidget* add_india_label3;
   GtkWidget* add_india_label4;
+  GtkWidget* add_india_label5;
   GtkWidget* add_india_text;
   GtkWidget* add_india_text2;
   GtkWidget* add_india_text3;
   GtkWidget* add_india_text4;
+  GtkWidget* add_india_text5;
   GtkWidget* mod_india_widget;
   GtkWidget* mod_india_label;
   GtkWidget* mod_india_label2;
   GtkWidget* mod_india_label3;
   GtkWidget* mod_india_label4;
+  GtkWidget* mod_india_label5;
   GtkWidget* mod_india_text;
   GtkWidget* mod_india_text2;
   GtkWidget* mod_india_text3;
   GtkWidget* mod_india_text4;
+  GtkWidget* mod_india_text5;
   CoWowFocusTimerGtk focustimer;
 
   void pop();
@@ -83,12 +87,14 @@ public:
   void create_add_input_dialog();
   void create_mod_input_dialog();
   void open_add_input_dialog(const char* text, const char* text2,
-      const char* text3, const char* text4, const char* title, const char* init_text,
-      void (*ok_cb)(Nodelist*, char*, char*, char*, char*));
+      const char* text3, const char* text4, const char* text5, const char* title, 
+      const char* init_text,
+      void (*ok_cb)(Nodelist*, char*, char*, char*, char*, char*));
   void open_mod_input_dialog(const char* text, const char* text2,
-      const char* text3, const char* text4, const char* title, const char* init_text,
-      const char* init_text2, const char* init_text3, const char* init_text4,
-      void (*ok_cb)(Nodelist*, char*, char*, char*, char*));
+      const char* text3, const char* text4, const char* text5,const char* title, 
+      const char* init_text, const char* init_text2, const char* init_text3, 
+      const char* init_text4, const char* init_text5,
+      void (*ok_cb)(Nodelist*, char*, char*, char*, char*, char*));
 
   static gboolean action_inputfocus(
       GtkWidget* w, GdkEvent* event, gpointer data);

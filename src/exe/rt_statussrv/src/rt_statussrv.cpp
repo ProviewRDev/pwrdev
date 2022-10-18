@@ -34,214 +34,126 @@
  * General Public License plus this exception.
  */
 
-#include <pthread.h>
+/* rt_statussrv.cpp -- Status Server, supply status information */
+
+#include "pwr.h"
+
+#ifndef pwr_cClass_StatusServerConfig
+#define pwr_cClass_StatusServerConfig 135136UL
+typedef struct {
+  pwr_tString80                       Description pwr_dAlignLW;
+  pwr_tStatus                         UserStatus[5] pwr_dAlignW;
+  pwr_tString80                       UserStatusStr[5] pwr_dAlignW;
+  pwr_tUInt32			      Connections;
+  pwr_tUInt32			      ErrorCount;
+} pwr_sClass_StatusServerConfig;
+#endif
+
+#include <stdio.h>
+#include <string.h>
+#include <errno.h>
+#include <sys/file.h>
+#include <sys/ioctl.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <sys/types.h>
 #include <unistd.h>
-#include <net/if.h>
-
+#include <sys/socket.h>
+#include <signal.h>
+#include <iostream>
 #include <fstream>
-
-#include "pwr_version.h"
-#include "pwr_baseclasses.h"
 
 #include "co_cdh.h"
 #include "co_dcli.h"
-#include "co_msg.h"
+#include "co_syi.h"
 #include "co_string.h"
+#include "pwr_version.h"
+#include "co_cdh.h"
 #include "co_time.h"
-
+#include "co_msg.h"
 #include "rt_aproc.h"
 #include "rt_gdh.h"
+#include "rt_thread.h"
 #include "rt_ini_event.h"
 #include "rt_pwr_msg.h"
 #include "rt_qcom_msg.h"
+#include "statussrv_net.h"
 
-#include "statussrv_Stub.h"
-#include "Service.nsmap"
+class status_server;
 
-// Application offset and size in nodeobject
-#define APPL_OFFSET 20
-#define APPL_SIZE 20
+
+static char rcv_buffer[65536];
+static status_server *statussrv_p = 0;
+
+#define MAX_CONNECTIONS 20
+
+
+typedef struct {
+  int idx;
+} sCondata;
+
+typedef struct {
+  pwr_tTime last_req_time;
+  thread_s t;
+  int c_socket;
+  struct sockaddr_in addr;
+  socklen_t addrlen;
+  int occupied;
+} sServerConnection;
 
 class status_server {
   public:
-  status_server() : m_grant_all(true), m_config(0), m_node(0), qid(qcom_cNQid)
+  status_server() : m_grant_all(true), m_config(0), m_node(0), m_qid(qcom_cNQid), m_sock(0)
   {
   }
+  pwr_tStatus init(int ignore_config);
+  void close_connection(int l_idx);
+  static void get_text(pwr_tStatus sts, char* buf, int size);
 
   bool m_grant_all;
   pwr_sClass_StatusServerConfig* m_config;
   pwr_sNode* m_node;
-  qcom_sQid qid;
-  char version[20];
-  pwr_tObjName m_appl[APPL_SIZE];
+  qcom_sQid m_qid;
+  char m_version[20];
+  pwr_tObjName m_appl[stssrv_cApplSize];
+  sServerConnection m_connections[MAX_CONNECTIONS];
+  int m_sock;
+  struct sockaddr_in m_loc_addr;
 };
 
-static status_server* statussrv;
-static void* statussrv_cyclic(void* arg);
-static struct soap* statussrv_soap = 0;
+static void* srv_connect(void* arg);
+static void signal_callback_handler(int signum)
+{
+  printf("Caught signal SIGPIPE %d\n", signum);
+}
 
 int main(int argc, char* argv[])
 {
-  struct soap soap;
-  int m, s; // Master and slave sockets
   pwr_tStatus sts;
-  pwr_tOid node_oid;
-  qcom_sQid qini;
-  qcom_sQattr qAttr;
   qcom_sQid qid = qcom_cNQid;
-  int restarts = 10;
   int ignore_config = 0;
+  status_server *srv;
+  pwr_tTime current_time;
+  int tmo = 2000;
+  char mp[2000];
+  qcom_sGet get;
 
   for (int i = 1; i < argc; i++) {
     if (streq(argv[i], "-i"))
       ignore_config = 1;
   }
 
-  sts = gdh_Init("status_server");
+  srv = new status_server();
+  statussrv_p = srv;
+  srv->m_qid = qid;
+
+  sts = srv->init(ignore_config);
   if (EVEN(sts)) {
-    exit(sts);
-  }
-
-  errh_Init("status_server", errh_eAnix_statussrv);
-  errh_SetStatus(PWR__SRVSTARTUP);
-
-  if (!qcom_Init(&sts, 0, "status_server")) {
-    errh_Fatal("qcom_Init, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
   }
-
-  qAttr.type = qcom_eQtype_private;
-  qAttr.quota = 100;
-  if (!qcom_CreateQ(&sts, &qid, &qAttr, "events")) {
-    errh_Fatal("qcom_CreateQ, %m", sts);
-    errh_SetStatus(PWR__SRVTERM);
-    exit(sts);
-  }
-
-  qini = qcom_cQini;
-  if (!qcom_Bind(&sts, &qid, &qini)) {
-    errh_Fatal("qcom_Bind(Qini), %m", sts);
-    errh_SetStatus(PWR__SRVTERM);
-    exit(-1);
-  }
-
-  statussrv = new status_server();
-  statussrv->qid = qid;
-
-  // Link to $Node object
-  sts = gdh_GetNodeObject(0, &node_oid);
-  if (EVEN(sts)) {
-    errh_SetStatus(sts);
-    exit(-1);
-  }
-
-  sts = gdh_ObjidToPointer(node_oid, (void**)&statussrv->m_node);
-  if (EVEN(sts)) {
-    errh_SetStatus(sts);
-    exit(-1);
-  }
-
-  // Get application names
-  for (int i = 0; i < APPL_SIZE; i++) {
-    if (cdh_ObjidIsNotNull(statussrv->m_node->ProcObject[i + APPL_OFFSET])) {
-      sts = gdh_ObjidToName(statussrv->m_node->ProcObject[i + APPL_OFFSET],
-          statussrv->m_appl[i], sizeof(statussrv->m_appl[0]), cdh_mName_object);
-      if (EVEN(sts))
-        strcpy(statussrv->m_appl[i], "");
-    } else
-      strcpy(statussrv->m_appl[i], "");
-  }
-
-  if (!ignore_config) {
-    // Get StatusServerConfig object
-    pwr_tOid config_oid;
-    sts = gdh_GetClassList(pwr_cClass_StatusServerConfig, &config_oid);
-    if (EVEN(sts)) {
-      // Not configured
-      errh_SetStatus(0);
-      exit(sts);
-    }
-
-    sts = gdh_ObjidToPointer(config_oid, (void**)&statussrv->m_config);
-    if (EVEN(sts)) {
-      errh_SetStatus(sts);
-      exit(sts);
-    }
-
-    aproc_RegisterObject(config_oid);
-  }
-
-  // Read version file
-
-  char buff[100];
-  pwr_tFileName fname;
-
-  dcli_translate_filename(fname, "$pwr_exe/rt_version.dat");
-
-  std::ifstream fp(fname);
-
-  if (fp) {
-    fp.getline(buff, sizeof(buff));
-    strcpy(statussrv->version, "V");
-    strcat(statussrv->version, &buff[9]);
-    fp.close();
-  } else
-    strcpy(statussrv->version, "");
-
-  // Create a cyclic tread to receive swap and terminate events
-  pthread_t thread;
-  sts = pthread_create(&thread, NULL, statussrv_cyclic, NULL);
 
   errh_SetStatus(PWR__SRUN);
-
-  soap_init(&soap);
-  statussrv_soap = &soap;
-
-  for (int i = 0; i < restarts + 1; i++) {
-    m = soap_bind(&soap, NULL, 18084, 100);
-    if (m < 0) {
-      if (i == restarts) {
-        soap_print_fault(&soap, stderr);
-        break;
-      }
-      printf("Soap bind failed, retrying...\n");
-      sleep(10);
-    } else {
-      // fprintf( stderr, "Socket connection successfull: master socket = %d\n",
-      // m);
-
-      for (int i = 1;; i++) {
-        s = soap_accept(&soap);
-        if (s < 0) {
-          soap_print_fault(&soap, stderr);
-          break;
-        }
-
-        // fprintf( stderr, "%d: request from IP=%lu.%lu.%lu.%lu socket=%d\n",
-        // i,
-        //	  (soap.ip>>24)&0xFF,(soap.ip>>16)&0xFF,(soap.ip>>8)&0xFF,soap.ip&0xFF,
-        // s);
-
-        if (soap_serve(&soap) != SOAP_OK) // Process RPC request
-          soap_print_fault(&soap, stderr);
-        soap_destroy(&soap); // Clean up class instances
-        soap_end(&soap); // Clean up everything and close socket
-      }
-    }
-  }
-
-  soap_done(&soap); // Close master socket and detach environment
-  return SOAP_OK;
-}
-
-static void* statussrv_cyclic(void* arg)
-{
-  pwr_tTime current_time;
-  int tmo = 2000;
-  char mp[2000];
-  qcom_sGet get;
-  pwr_tStatus sts;
 
   for (;;) {
     time_GetTime(&current_time);
@@ -249,7 +161,7 @@ static void* statussrv_cyclic(void* arg)
 
     get.maxSize = sizeof(mp);
     get.data = mp;
-    qcom_Get(&sts, &statussrv->qid, &get, tmo);
+    qcom_Get(&sts, &srv->m_qid, &get, tmo);
     if (sts == QCOM__TMO || sts == QCOM__QEMPTY) {
       // Do nothing...
     } else {
@@ -262,15 +174,13 @@ static void* statussrv_cyclic(void* arg)
       } else if (new_event.b.swapDone) {
         errh_SetStatus(PWR__SRUN);
       } else if (new_event.b.terminate) {
-        // if ( statussrv_soap)
-        //   soap_done( statussrv_soap);
         exit(0);
       }
     }
   }
 }
 
-void statussrv_GetText(pwr_tStatus sts, char* buf, int size)
+void status_server::get_text(pwr_tStatus sts, char* buf, int size)
 {
   if (sts == 0)
     strcpy(buf, "-");
@@ -278,430 +188,362 @@ void statussrv_GetText(pwr_tStatus sts, char* buf, int size)
     msg_GetText(sts, buf, size);
 }
 
-SOAP_FMAC5 int SOAP_FMAC6 __s0__GetStatus(struct soap* soap,
-    _s0__GetStatus* s0__GetStatus,
-    _s0__GetStatusResponse* s0__GetStatusResponse)
+pwr_tStatus status_server::init(int ignore_config)
 {
-  pwr_tTime current_time;
-  char msg[200];
-  char timstr[40];
+  pwr_tStatus sts;
+  pwr_tOid node_oid;
+  qcom_sQid qini;
+  qcom_sQattr qAttr;
+  qcom_sQid qid = qcom_cNQid;
+  pthread_t thread;
+  int i;
+  unsigned short port;
 
-  time_GetTime(&current_time);
 
-  if (s0__GetStatus->ClientRequestHandle) {
-    s0__GetStatusResponse->ClientRequestHandle = soap_new_std__string(soap, -1);
-    s0__GetStatusResponse->ClientRequestHandle->assign(
-        *s0__GetStatus->ClientRequestHandle);
+  sts = gdh_Init("status_server");
+  if (EVEN(sts)) {
+    exit(sts);
   }
 
-  if (!streq(statussrv->version, ""))
-    s0__GetStatusResponse->Version.assign(statussrv->version);
+  errh_Init("status_server", errh_eAnix_statussrv);
+  errh_SetStatus(PWR__SRVSTARTUP);
+
+  if (!qcom_Init(&sts, 0, "status_server")) {
+    errh_Fatal("qcom_Init, %m", sts);
+    return sts;
+  }
+
+  qAttr.type = qcom_eQtype_private;
+  qAttr.quota = 100;
+  if (!qcom_CreateQ(&sts, &qid, &qAttr, "events")) {
+    errh_Fatal("qcom_CreateQ, %m", sts);
+    return sts;
+  }
+  m_qid = qid;
+
+  qini = qcom_cQini;
+  if (!qcom_Bind(&sts, &qid, &qini)) {
+    errh_Fatal("qcom_Bind(Qini), %m", sts);
+    return sts;
+  }
+
+  // Link to $Node object
+  sts = gdh_GetNodeObject(0, &node_oid);
+  if (EVEN(sts))
+    return sts;
+
+  sts = gdh_ObjidToPointer(node_oid, (void**)&m_node);
+  if (EVEN(sts))
+    return sts;
+
+  // Get application names
+  for (int i = 0; i < stssrv_cApplSize; i++) {
+    if (cdh_ObjidIsNotNull(m_node->ProcObject[i + stssrv_cApplOffset])) {
+      sts = gdh_ObjidToName(m_node->ProcObject[i + stssrv_cApplOffset],
+          m_appl[i], sizeof(m_appl[0]), cdh_mName_object);
+      if (EVEN(sts))
+        strcpy(m_appl[i], "");
+    } else
+      strcpy(m_appl[i], "");
+  }
+
+  if (!ignore_config) {
+    // Get StatusServerConfig object
+    pwr_tOid config_oid;
+    sts = gdh_GetClassList(pwr_cClass_StatusServerConfig, &config_oid);
+    if (EVEN(sts)) {
+      // Not configured
+      return PWR__SRVNOTCONF;
+    }
+
+    sts = gdh_ObjidToPointer(config_oid, (void**)&m_config);
+    if (EVEN(sts))
+      return sts;
+
+    aproc_RegisterObject(config_oid);
+    m_config->Connections = 0;
+  }
   else
-    s0__GetStatusResponse->Version.assign(pwrv_cPwrVersionStr);
-  s0__GetStatusResponse->SystemStatus = statussrv->m_node->SystemStatus;
-  statussrv_GetText(statussrv->m_node->SystemStatus, msg, sizeof(msg));
-  s0__GetStatusResponse->SystemStatusStr.assign(msg);
-  s0__GetStatusResponse->Description = soap_new_std__string(soap, -1);
-  s0__GetStatusResponse->Description->assign(statussrv->m_node->Description);
-  time_AtoAscii(&statussrv->m_node->SystemTime, time_eFormat_DateAndTime,
-      timstr, sizeof(timstr));
-  s0__GetStatusResponse->SystemTime = soap_new_std__string(soap, -1);
-  s0__GetStatusResponse->SystemTime->assign(timstr);
-  time_AtoAscii(&statussrv->m_node->BootTime, time_eFormat_DateAndTime, timstr,
-      sizeof(timstr));
-  s0__GetStatusResponse->BootTime = soap_new_std__string(soap, -1);
-  s0__GetStatusResponse->BootTime->assign(timstr);
-  time_AtoAscii(&statussrv->m_node->RestartTime, time_eFormat_DateAndTime,
-      timstr, sizeof(timstr));
-  s0__GetStatusResponse->RestartTime = soap_new_std__string(soap, -1);
-  s0__GetStatusResponse->RestartTime->assign(timstr);
-  s0__GetStatusResponse->Restarts
-      = (int*)soap_malloc(soap, sizeof(s0__GetStatusResponse->Restarts));
-  *s0__GetStatusResponse->Restarts = statussrv->m_node->Restarts;
+    m_config = (pwr_sClass_StatusServerConfig *) calloc(1, sizeof(*m_config));
 
-  s0__GetStatusResponse->UserStatus1 = statussrv->m_config->UserStatus[0];
-  s0__GetStatusResponse->UserStatusStr1 = soap_new_std__string(soap, -1);
-  s0__GetStatusResponse->UserStatusStr1->assign(
-      statussrv->m_config->UserStatusStr[0]);
+  // Read version file
 
-  s0__GetStatusResponse->UserStatus2 = statussrv->m_config->UserStatus[1];
-  s0__GetStatusResponse->UserStatusStr2 = soap_new_std__string(soap, -1);
-  s0__GetStatusResponse->UserStatusStr2->assign(
-      statussrv->m_config->UserStatusStr[1]);
+  char buff[100];
+  pwr_tFileName fname;
 
-  s0__GetStatusResponse->UserStatus3 = statussrv->m_config->UserStatus[2];
-  s0__GetStatusResponse->UserStatusStr3 = soap_new_std__string(soap, -1);
-  s0__GetStatusResponse->UserStatusStr3->assign(
-      statussrv->m_config->UserStatusStr[2]);
+  dcli_translate_filename(fname, "$pwr_exe/rt_version.dat");
 
-  s0__GetStatusResponse->UserStatus4 = statussrv->m_config->UserStatus[3];
-  s0__GetStatusResponse->UserStatusStr4 = soap_new_std__string(soap, -1);
-  s0__GetStatusResponse->UserStatusStr4->assign(
-      statussrv->m_config->UserStatusStr[3]);
+  std::ifstream fp(fname);
 
-  s0__GetStatusResponse->UserStatus5 = statussrv->m_config->UserStatus[4];
-  s0__GetStatusResponse->UserStatusStr5 = soap_new_std__string(soap, -1);
-  s0__GetStatusResponse->UserStatusStr5->assign(
-      statussrv->m_config->UserStatusStr[4]);
-  return SOAP_OK;
+  if (fp) {
+    fp.getline(buff, sizeof(buff));
+    strcpy(m_version, "V");
+    strcat(m_version, &buff[9]);
+    fp.close();
+  } else
+    strcpy(m_version, "");
+
+  // Ignore SIGPIPE signal
+  signal(SIGPIPE, signal_callback_handler);
+
+  int bus = syi_Busid(&sts);
+  if (EVEN(sts)) {
+    errh_Error("Error creating port, %m", sts);
+    return 0;
+  }
+
+  port = 56000 + bus;
+
+  /* Create socket */
+  uid_t ruid;
+  ruid = getuid();
+  //printf("ruid: %d\n", ruid);
+
+  m_sock = socket(AF_INET, SOCK_STREAM, 0);
+  if (m_sock < 0) {
+    errh_Error("Error creating socket, %d", m_sock);
+    return 0;
+  }
+  setsockopt(m_sock, SOL_SOCKET, SO_REUSEADDR, NULL, 0);
+
+  m_loc_addr.sin_family = AF_INET;
+  m_loc_addr.sin_port = htons(port);
+  for (i = 0; i < 10; i++) {
+    sts = bind(m_sock, (struct sockaddr*)&m_loc_addr, sizeof(m_loc_addr));
+    if (sts == 0)
+      break;
+    perror("Status server, bind socket failure, retrying... ");
+    sleep(10);
+  }
+  if (sts != 0) {
+    printf("Status server, Bind socket failure, exiting\n");
+    errh_Error("Error bind socket to port, %d", m_sock);
+    return 0;
+  }
+
+  errh_Info("Status Server bind to port %d", port);
+
+  sts = listen(m_sock, 16);
+
+  /* Create a thread that listens for connections */
+  sts = pthread_create(&thread, NULL, srv_connect, (void*)0);
+  if (sts != 0)
+    return sts;
+
+  return PWR__SUCCESS;
 }
 
-SOAP_FMAC5 int SOAP_FMAC6 __s0__GetExtStatus(struct soap* soap,
-    _s0__GetExtStatus* s0__GetExtStatus,
-    _s0__GetExtStatusResponse* s0__GetExtStatusResponse)
+void status_server::close_connection(int l_idx)
 {
-  char msg[200];
+  pwr_tStatus sts;
 
-  if (s0__GetExtStatus->ClientRequestHandle)
-    s0__GetExtStatusResponse->ClientRequestHandle
-        = new std::string(*s0__GetExtStatus->ClientRequestHandle);
-
-  s0__GetExtStatusResponse->ServerSts1 = statussrv->m_node->ProcStatus[0];
-  statussrv_GetText(statussrv->m_node->ProcStatus[0], msg, sizeof(msg));
-  s0__GetExtStatusResponse->ServerSts1Str = std::string(msg);
-  s0__GetExtStatusResponse->ServerSts1Name.assign("rt_ini");
-
-  s0__GetExtStatusResponse->ServerSts2 = statussrv->m_node->ProcStatus[1];
-  statussrv_GetText(statussrv->m_node->ProcStatus[1], msg, sizeof(msg));
-  s0__GetExtStatusResponse->ServerSts2Str.assign(msg);
-  s0__GetExtStatusResponse->ServerSts2Name.assign("rt_qmon");
-
-  s0__GetExtStatusResponse->ServerSts3 = statussrv->m_node->ProcStatus[2];
-  statussrv_GetText(statussrv->m_node->ProcStatus[2], msg, sizeof(msg));
-  s0__GetExtStatusResponse->ServerSts3Str.assign(msg);
-  s0__GetExtStatusResponse->ServerSts3Name.assign("rt_neth");
-
-  s0__GetExtStatusResponse->ServerSts4 = statussrv->m_node->ProcStatus[3];
-  statussrv_GetText(statussrv->m_node->ProcStatus[3], msg, sizeof(msg));
-  s0__GetExtStatusResponse->ServerSts4Str.assign(msg);
-  s0__GetExtStatusResponse->ServerSts4Name.assign("rt_neth_acp");
-
-  s0__GetExtStatusResponse->ServerSts5 = statussrv->m_node->ProcStatus[4];
-  statussrv_GetText(statussrv->m_node->ProcStatus[4], msg, sizeof(msg));
-  s0__GetExtStatusResponse->ServerSts5Str.assign(msg);
-  s0__GetExtStatusResponse->ServerSts5Name.assign("rt_io");
-
-  s0__GetExtStatusResponse->ServerSts6 = statussrv->m_node->ProcStatus[5];
-  statussrv_GetText(statussrv->m_node->ProcStatus[5], msg, sizeof(msg));
-  s0__GetExtStatusResponse->ServerSts6Str.assign(msg);
-  s0__GetExtStatusResponse->ServerSts6Name.assign("rt_tmon");
-
-  s0__GetExtStatusResponse->ServerSts7 = statussrv->m_node->ProcStatus[6];
-  statussrv_GetText(statussrv->m_node->ProcStatus[6], msg, sizeof(msg));
-  s0__GetExtStatusResponse->ServerSts7Str.assign(msg);
-  s0__GetExtStatusResponse->ServerSts7Name.assign("rt_emon");
-
-  s0__GetExtStatusResponse->ServerSts8 = statussrv->m_node->ProcStatus[7];
-  statussrv_GetText(statussrv->m_node->ProcStatus[7], msg, sizeof(msg));
-  s0__GetExtStatusResponse->ServerSts8Str.assign(msg);
-  s0__GetExtStatusResponse->ServerSts8Name.assign("rt_alim");
-
-  s0__GetExtStatusResponse->ServerSts9 = statussrv->m_node->ProcStatus[8];
-  statussrv_GetText(statussrv->m_node->ProcStatus[8], msg, sizeof(msg));
-  s0__GetExtStatusResponse->ServerSts9Str.assign(msg);
-  s0__GetExtStatusResponse->ServerSts9Name.assign("rt_bck");
-
-  s0__GetExtStatusResponse->ServerSts10 = statussrv->m_node->ProcStatus[9];
-  statussrv_GetText(statussrv->m_node->ProcStatus[9], msg, sizeof(msg));
-  s0__GetExtStatusResponse->ServerSts10Str.assign(msg);
-  s0__GetExtStatusResponse->ServerSts10Name.assign("rt_linksup");
-
-  s0__GetExtStatusResponse->ServerSts11 = statussrv->m_node->ProcStatus[10];
-  statussrv_GetText(statussrv->m_node->ProcStatus[10], msg, sizeof(msg));
-  s0__GetExtStatusResponse->ServerSts11Str.assign(msg);
-  s0__GetExtStatusResponse->ServerSts11Name.assign("rt_trend");
-
-  s0__GetExtStatusResponse->ServerSts12 = statussrv->m_node->ProcStatus[11];
-  statussrv_GetText(statussrv->m_node->ProcStatus[11], msg, sizeof(msg));
-  s0__GetExtStatusResponse->ServerSts12Str.assign(msg);
-  s0__GetExtStatusResponse->ServerSts12Name.assign("rt_fast");
-
-  s0__GetExtStatusResponse->ServerSts13 = statussrv->m_node->ProcStatus[12];
-  statussrv_GetText(statussrv->m_node->ProcStatus[12], msg, sizeof(msg));
-  s0__GetExtStatusResponse->ServerSts13Str.assign(msg);
-  s0__GetExtStatusResponse->ServerSts13Name.assign("rt_elog");
-
-  s0__GetExtStatusResponse->ServerSts14 = statussrv->m_node->ProcStatus[13];
-  statussrv_GetText(statussrv->m_node->ProcStatus[13], msg, sizeof(msg));
-  s0__GetExtStatusResponse->ServerSts14Str.assign(msg);
-  s0__GetExtStatusResponse->ServerSts14Name.assign("rt_webmon");
-
-  s0__GetExtStatusResponse->ServerSts15 = statussrv->m_node->ProcStatus[14];
-  statussrv_GetText(statussrv->m_node->ProcStatus[14], msg, sizeof(msg));
-  s0__GetExtStatusResponse->ServerSts15Str.assign(msg);
-  s0__GetExtStatusResponse->ServerSts15Name.assign("rt_webmonmh");
-
-  s0__GetExtStatusResponse->ServerSts16 = statussrv->m_node->ProcStatus[15];
-  statussrv_GetText(statussrv->m_node->ProcStatus[15], msg, sizeof(msg));
-  s0__GetExtStatusResponse->ServerSts16Str.assign(msg);
-  s0__GetExtStatusResponse->ServerSts16Name.assign("sysmon");
-
-  s0__GetExtStatusResponse->ServerSts17 = statussrv->m_node->ProcStatus[16];
-  statussrv_GetText(statussrv->m_node->ProcStatus[16], msg, sizeof(msg));
-  s0__GetExtStatusResponse->ServerSts17Str.assign(msg);
-  s0__GetExtStatusResponse->ServerSts17Name.assign("plc");
-
-  s0__GetExtStatusResponse->ServerSts18 = statussrv->m_node->ProcStatus[17];
-  statussrv_GetText(statussrv->m_node->ProcStatus[17], msg, sizeof(msg));
-  s0__GetExtStatusResponse->ServerSts18Str.assign(msg);
-  s0__GetExtStatusResponse->ServerSts18Name.assign("rs_remote");
-
-  s0__GetExtStatusResponse->ServerSts19 = statussrv->m_node->ProcStatus[18];
-  statussrv_GetText(statussrv->m_node->ProcStatus[18], msg, sizeof(msg));
-  s0__GetExtStatusResponse->ServerSts19Str.assign(msg);
-  s0__GetExtStatusResponse->ServerSts19Name.assign("opc_server");
-
-  s0__GetExtStatusResponse->ServerSts20 = statussrv->m_node->ProcStatus[19];
-  statussrv_GetText(statussrv->m_node->ProcStatus[19], msg, sizeof(msg));
-  s0__GetExtStatusResponse->ServerSts20Str.assign(msg);
-  s0__GetExtStatusResponse->ServerSts20Name.assign("rt_statussrv");
-
-  s0__GetExtStatusResponse->ApplSts1 = statussrv->m_node->ProcStatus[20];
-  statussrv_GetText(statussrv->m_node->ProcStatus[20], msg, sizeof(msg));
-  s0__GetExtStatusResponse->ApplSts1Str.assign(msg);
-  s0__GetExtStatusResponse->ApplSts1Name.assign(statussrv->m_appl[0]);
-
-  s0__GetExtStatusResponse->ApplSts2 = statussrv->m_node->ProcStatus[21];
-  statussrv_GetText(statussrv->m_node->ProcStatus[21], msg, sizeof(msg));
-  s0__GetExtStatusResponse->ApplSts2Str.assign(msg);
-  s0__GetExtStatusResponse->ApplSts2Name.assign(statussrv->m_appl[1]);
-
-  s0__GetExtStatusResponse->ApplSts3 = statussrv->m_node->ProcStatus[22];
-  statussrv_GetText(statussrv->m_node->ProcStatus[22], msg, sizeof(msg));
-  s0__GetExtStatusResponse->ApplSts3Str.assign(msg);
-  s0__GetExtStatusResponse->ApplSts3Name.assign(statussrv->m_appl[2]);
-
-  s0__GetExtStatusResponse->ApplSts4 = statussrv->m_node->ProcStatus[23];
-  statussrv_GetText(statussrv->m_node->ProcStatus[23], msg, sizeof(msg));
-  s0__GetExtStatusResponse->ApplSts4Str.assign(msg);
-  s0__GetExtStatusResponse->ApplSts4Name.assign(statussrv->m_appl[3]);
-
-  s0__GetExtStatusResponse->ApplSts5 = statussrv->m_node->ProcStatus[24];
-  statussrv_GetText(statussrv->m_node->ProcStatus[24], msg, sizeof(msg));
-  s0__GetExtStatusResponse->ApplSts5Str.assign(msg);
-  s0__GetExtStatusResponse->ApplSts5Name.assign(statussrv->m_appl[4]);
-
-  s0__GetExtStatusResponse->ApplSts6 = statussrv->m_node->ProcStatus[25];
-  statussrv_GetText(statussrv->m_node->ProcStatus[25], msg, sizeof(msg));
-  s0__GetExtStatusResponse->ApplSts6Str.assign(msg);
-  s0__GetExtStatusResponse->ApplSts6Name.assign(statussrv->m_appl[5]);
-
-  s0__GetExtStatusResponse->ApplSts7 = statussrv->m_node->ProcStatus[26];
-  statussrv_GetText(statussrv->m_node->ProcStatus[26], msg, sizeof(msg));
-  s0__GetExtStatusResponse->ApplSts7Str.assign(msg);
-  s0__GetExtStatusResponse->ApplSts7Name.assign(statussrv->m_appl[6]);
-
-  s0__GetExtStatusResponse->ApplSts8 = statussrv->m_node->ProcStatus[27];
-  statussrv_GetText(statussrv->m_node->ProcStatus[27], msg, sizeof(msg));
-  s0__GetExtStatusResponse->ApplSts8Str.assign(msg);
-  s0__GetExtStatusResponse->ApplSts8Name.assign(statussrv->m_appl[7]);
-
-  s0__GetExtStatusResponse->ApplSts9 = statussrv->m_node->ProcStatus[28];
-  statussrv_GetText(statussrv->m_node->ProcStatus[28], msg, sizeof(msg));
-  s0__GetExtStatusResponse->ApplSts9Str.assign(msg);
-  s0__GetExtStatusResponse->ApplSts9Name.assign(statussrv->m_appl[8]);
-
-  s0__GetExtStatusResponse->ApplSts10 = statussrv->m_node->ProcStatus[29];
-  statussrv_GetText(statussrv->m_node->ProcStatus[29], msg, sizeof(msg));
-  s0__GetExtStatusResponse->ApplSts10Str.assign(msg);
-  s0__GetExtStatusResponse->ApplSts10Name.assign(statussrv->m_appl[9]);
-
-  s0__GetExtStatusResponse->ApplSts11 = statussrv->m_node->ProcStatus[30];
-  statussrv_GetText(statussrv->m_node->ProcStatus[30], msg, sizeof(msg));
-  s0__GetExtStatusResponse->ApplSts11Str.assign(msg);
-  s0__GetExtStatusResponse->ApplSts11Name.assign(statussrv->m_appl[10]);
-
-  s0__GetExtStatusResponse->ApplSts12 = statussrv->m_node->ProcStatus[31];
-  statussrv_GetText(statussrv->m_node->ProcStatus[31], msg, sizeof(msg));
-  s0__GetExtStatusResponse->ApplSts12Str.assign(msg);
-  s0__GetExtStatusResponse->ApplSts12Name.assign(statussrv->m_appl[11]);
-
-  s0__GetExtStatusResponse->ApplSts13 = statussrv->m_node->ProcStatus[32];
-  statussrv_GetText(statussrv->m_node->ProcStatus[32], msg, sizeof(msg));
-  s0__GetExtStatusResponse->ApplSts13Str.assign(msg);
-  s0__GetExtStatusResponse->ApplSts13Name.assign(statussrv->m_appl[12]);
-
-  s0__GetExtStatusResponse->ApplSts14 = statussrv->m_node->ProcStatus[33];
-  statussrv_GetText(statussrv->m_node->ProcStatus[33], msg, sizeof(msg));
-  s0__GetExtStatusResponse->ApplSts14Str.assign(msg);
-  s0__GetExtStatusResponse->ApplSts14Name.assign(statussrv->m_appl[13]);
-
-  s0__GetExtStatusResponse->ApplSts15 = statussrv->m_node->ProcStatus[34];
-  statussrv_GetText(statussrv->m_node->ProcStatus[34], msg, sizeof(msg));
-  s0__GetExtStatusResponse->ApplSts15Str.assign(msg);
-  s0__GetExtStatusResponse->ApplSts15Name.assign(statussrv->m_appl[14]);
-
-  s0__GetExtStatusResponse->ApplSts16 = statussrv->m_node->ProcStatus[35];
-  statussrv_GetText(statussrv->m_node->ProcStatus[35], msg, sizeof(msg));
-  s0__GetExtStatusResponse->ApplSts16Str.assign(msg);
-  s0__GetExtStatusResponse->ApplSts16Name.assign(statussrv->m_appl[15]);
-
-  s0__GetExtStatusResponse->ApplSts17 = statussrv->m_node->ProcStatus[36];
-  statussrv_GetText(statussrv->m_node->ProcStatus[36], msg, sizeof(msg));
-  s0__GetExtStatusResponse->ApplSts17Str.assign(msg);
-  s0__GetExtStatusResponse->ApplSts17Name.assign(statussrv->m_appl[16]);
-
-  s0__GetExtStatusResponse->ApplSts18 = statussrv->m_node->ProcStatus[37];
-  statussrv_GetText(statussrv->m_node->ProcStatus[37], msg, sizeof(msg));
-  s0__GetExtStatusResponse->ApplSts18Str.assign(msg);
-  s0__GetExtStatusResponse->ApplSts18Name.assign(statussrv->m_appl[17]);
-
-  s0__GetExtStatusResponse->ApplSts19 = statussrv->m_node->ProcStatus[38];
-  statussrv_GetText(statussrv->m_node->ProcStatus[38], msg, sizeof(msg));
-  s0__GetExtStatusResponse->ApplSts19Str.assign(msg);
-  s0__GetExtStatusResponse->ApplSts19Name.assign(statussrv->m_appl[18]);
-
-  s0__GetExtStatusResponse->ApplSts20 = statussrv->m_node->ProcStatus[39];
-  statussrv_GetText(statussrv->m_node->ProcStatus[39], msg, sizeof(msg));
-  s0__GetExtStatusResponse->ApplSts20Str.assign(msg);
-  s0__GetExtStatusResponse->ApplSts20Name.assign(statussrv->m_appl[19]);
-
-  return SOAP_OK;
+  sts = thread_Cancel(&m_connections[l_idx].t);
+  close(m_connections[l_idx].c_socket);
+  m_connections[l_idx].occupied = 0;
+  m_config->Connections--;
 }
 
-SOAP_FMAC5 int SOAP_FMAC6 __s0__Restart(struct soap* soap,
-    _s0__Restart* s0__Restart, _s0__RestartResponse* s0__RestartResponse)
+static void* srv_receive(void* data)
 {
-  pwr_tCmd cmd = "rt_ini -r &";
+  status_server *srv = statussrv_p;
+  int l_idx = ((sCondata*)data)->idx;
+  int c_socket = srv->m_connections[l_idx].c_socket;
+  ssize_t data_size;
+  stssrv_sRequest* rb;
+  unsigned char exception_code;
+  ssize_t ssts;
+  int size_of_msg;
 
-  if (s0__Restart->ClientRequestHandle) {
-    s0__RestartResponse->ClientRequestHandle = soap_new_std__string(soap, -1);
-    s0__RestartResponse->ClientRequestHandle->assign(
-        *s0__Restart->ClientRequestHandle);
+  free(data);
+  srv->m_config->Connections++;
+
+  while (1) {
+    size_of_msg = 0;
+
+    data_size = recv(c_socket, rcv_buffer, sizeof(stssrv_sRequest), 0);
+    if (data_size < 0) {
+      srv->m_config->ErrorCount++;
+      continue;
+    }    
+    if (data_size == 0) {
+      /* Disconnected */
+      srv->m_config->Connections--;
+      close(c_socket);
+      srv->m_connections[l_idx].occupied = 0;
+      errh_Error("Status server, Connection lost, %d", c_socket);
+      return 0;
+    }
+
+    while (data_size > 0) {
+      if (data_size < sizeof(stssrv_sRequest))
+        break;
+
+      rb = (stssrv_sRequest *)&rcv_buffer[size_of_msg];
+
+      if (rb->head.length == 0)
+        break;
+
+      size_of_msg += rb->head.length;
+      data_size -= rb->head.length;
+
+      time_GetTime(&srv->m_connections[l_idx].last_req_time);
+      exception_code = 0;
+
+      switch (rb->head.type) {
+      case stssrv_eMsgType_Status: {
+        stssrv_sRespondStatus msg;
+	
+	msg.head.length = sizeof(msg);
+	msg.head.version = stssrv_cVersion;
+	msg.head.type = stssrv_eMsgType_Status;
+	msg.head.id = rb->head.id;
+	msg.Sts = 1;
+	strncpy(msg.Version, srv->m_version, sizeof(msg.Version));
+	msg.SystemStatus = srv->m_node->SystemStatus;
+	srv->get_text(srv->m_node->SystemStatus, msg.SystemStatusStr, sizeof(msg.SystemStatusStr));
+	strncpy(msg.Description, srv->m_node->Description, sizeof(msg.Description));
+	time_AtoAscii(&srv->m_node->SystemTime, time_eFormat_DateAndTime,
+	    msg.SystemTime, sizeof(msg.SystemTime));
+	time_AtoAscii(&srv->m_node->BootTime, time_eFormat_DateAndTime,
+	    msg.BootTime, sizeof(msg.BootTime));
+	time_AtoAscii(&srv->m_node->RestartTime, time_eFormat_DateAndTime,
+	    msg.RestartTime, sizeof(msg.RestartTime));
+	msg.Restarts = srv->m_node->Restarts;
+	msg.UserStatus1 = srv->m_config->UserStatus[0];
+	strncpy(msg.UserStatus1Str, srv->m_config->UserStatusStr[0], sizeof(msg.UserStatus1Str));
+	msg.UserStatus2 = srv->m_config->UserStatus[1];
+	strncpy(msg.UserStatus2Str, srv->m_config->UserStatusStr[1], sizeof(msg.UserStatus2Str));
+	msg.UserStatus3 = srv->m_config->UserStatus[2];
+	strncpy(msg.UserStatus3Str, srv->m_config->UserStatusStr[2], sizeof(msg.UserStatus3Str));
+	msg.UserStatus4 = srv->m_config->UserStatus[3];
+	strncpy(msg.UserStatus4Str, srv->m_config->UserStatusStr[3], sizeof(msg.UserStatus4Str));	
+	msg.UserStatus5 = srv->m_config->UserStatus[4];
+	strncpy(msg.UserStatus5Str, srv->m_config->UserStatusStr[4], sizeof(msg.UserStatus5Str));	
+
+        ssts = send(c_socket, &msg, msg.head.length, MSG_DONTWAIT);
+        if (ssts < 0) {
+          srv->m_config->Connections--;
+          close(c_socket);
+          srv->m_connections[l_idx].occupied = 0;
+          errh_Error("Status server, connection lost, %d", c_socket);
+          return 0;
+        }
+        break;
+      }
+      case stssrv_eMsgType_ExtStatus: {
+        stssrv_sRespondExtStatus msg;
+	
+	msg.head.length = sizeof(msg);
+	msg.head.version = stssrv_cVersion;
+	msg.head.type = stssrv_eMsgType_ExtStatus;
+	msg.head.id = rb->head.id;
+
+	for (int i = 0; i < stssrv_cServerSize; i++) {
+	  msg.Server[i].Sts = srv->m_node->ProcStatus[i];
+	  srv->get_text(srv->m_node->ProcStatus[i], msg.Server[i].StsStr, sizeof(msg.Server[0].StsStr));
+	  errh_AnixName((errh_eAnix)(i + 1), msg.Server[i].Name);
+	}
+	for (int i = 0; i < stssrv_cPlcSize; i++) {
+	  msg.Plc[i].Sts = srv->m_node->ProcStatus[stssrv_cServerSize + i];
+	  srv->get_text(srv->m_node->ProcStatus[stssrv_cServerSize + i], msg.Plc[i].StsStr, sizeof(msg.Plc[0].StsStr));
+	  sprintf(msg.Plc[i].Name, "Plc%d", i+1);
+	}
+	for (int i = 0; i < stssrv_cApplSize; i++) {
+	  msg.Appl[i].Sts = srv->m_node->ProcStatus[stssrv_cApplOffset + i];
+	  srv->get_text(srv->m_node->ProcStatus[stssrv_cApplOffset + i], msg.Appl[i].StsStr, sizeof(msg.Appl[0].StsStr));
+	  strcpy(msg.Appl[i].Name, srv->m_appl[i]);
+	}
+        ssts = send(c_socket, &msg, msg.head.length, MSG_DONTWAIT);
+        if (ssts < 0) {
+          srv->m_config->Connections--;
+          close(c_socket);
+          srv->m_connections[l_idx].occupied = 0;
+          errh_Error("Status server, connection lost, %d", c_socket);
+          return 0;
+        }
+	break;
+      }
+      default:
+        exception_code = 1;
+      }
+
+      if (exception_code) {
+        errh_Error("Status sever, unknown message type received %d", rb->head.type);
+      }
+    }
   }
-  system(cmd);
-  return SOAP_OK;
 }
 
-SOAP_FMAC5 int SOAP_FMAC6 __s0__XttStart(struct soap* soap,
-    _s0__XttStart* s0__XttStart, _s0__XttStartResponse* s0__XttStartResponse)
+static void* srv_connect(void* arg)
 {
-  char lang[40] = "";
-  pwr_tOName opplace = "";
-  char display[80] = "";
-  char gui[40] = "";
-  char prog[] = "rt_xtt";
-  char sw_l[] = "-l";
-  char sw_d[] = "--display";
-  char sw_q[] = "-q";
-  char sw_c[] = "-c";
-  char sw_f[] = "-f";
-  char* argv[] = { prog, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+  status_server *srv = statussrv_p;
+  int sts;
+  struct sockaddr_in r_addr;
+  socklen_t r_addr_len;
+  int c_socket;
+  sCondata* condata;
+  int idx = 0;
+  int found;
+  int i;
 
-  if (s0__XttStart->ClientRequestHandle) {
-    s0__XttStartResponse->ClientRequestHandle = soap_new_std__string(soap, -1);
-    s0__XttStartResponse->ClientRequestHandle->assign(
-        *s0__XttStart->ClientRequestHandle);
+  while (1) {
+    /* Wait for client connect request */
+    r_addr_len = sizeof(r_addr);
+
+    c_socket = accept(srv->m_sock, (struct sockaddr*)&r_addr, &r_addr_len);
+    if (c_socket < 0) {
+      errh_Error(
+          "Status server, accept error, %d", srv->m_sock);
+      continue;
+    }
+
+    errh_Info("Status server, connection accepted, %d", c_socket);
+
+    /* Find next empty in connection list */
+    found = 0;
+    for (i = 0; i < MAX_CONNECTIONS; i++) {
+      if (!srv->m_connections[i].occupied) {
+        found = 1;
+        idx = i;
+        break;
+      }
+    }
+
+    if (!found) {
+      /* Remove the oldest connection */
+      int oldest_idx = 0;
+
+      for (i = 1; i < MAX_CONNECTIONS; i++) {
+        if (time_Acomp(&srv->m_connections[i].last_req_time,
+                &srv->m_connections[oldest_idx].last_req_time)
+            < 0)
+          oldest_idx = i;
+      }
+      srv->close_connection(oldest_idx);
+      errh_Info(
+          "Status server, connection closed, %d", srv->m_sock);
+      idx = oldest_idx;
+    }
+
+    srv->m_connections[idx].c_socket = c_socket;
+    srv->m_connections[idx].occupied = 1;
+    time_GetTime(&srv->m_connections[idx].last_req_time);
+    srv->m_connections[idx].addrlen = r_addr_len;
+    memcpy(&srv->m_connections[idx].addr, &r_addr, r_addr_len);
+
+    /* Create a thread for this connection */
+    condata = (sCondata*)malloc(sizeof(sCondata));
+    condata->idx = idx;
+
+    sts = pthread_create(
+        &srv->m_connections[idx].t, NULL, srv_receive, (void*)condata);
+    if (sts != 0) {
+      srv->m_connections[idx].occupied = 0;
+      errh_Error("Status server, error creating thread %d", srv->m_sock);
+      free(condata);
+      continue;
+    }
   }
-  if (s0__XttStart->Language)
-    strncpy(lang, s0__XttStart->Language->c_str(), sizeof(lang));
-
-  if (s0__XttStart->OpPlace)
-    strncpy(opplace, s0__XttStart->OpPlace->c_str(), sizeof(opplace));
-
-  if (s0__XttStart->Display)
-    strncpy(display, s0__XttStart->Display->c_str(), sizeof(display));
-
-  if (s0__XttStart->GUI)
-    strncpy(gui, s0__XttStart->GUI->c_str(), sizeof(gui));
-
-  if (streq(gui, "motif"))
-    strcpy(sw_d, "-d");
-
-  int i = 1;
-  if (!streq(opplace, ""))
-    argv[i++] = opplace;
-  argv[i++] = sw_q;
-  argv[i++] = sw_c;
-  if (!streq(display, "")) {
-    argv[i++] = sw_d;
-    argv[i++] = display;
-  }
-  if (!streq(lang, "")) {
-    argv[i++] = sw_l;
-    argv[i++] = lang;
-  }
-  if (!streq(gui, "")) {
-    argv[i++] = sw_f;
-    argv[i++] = gui;
-  }
-
-  pid_t pid = fork();
-  switch (pid) {
-  case -1:
-    printf("rt_statussrv: fork failed\n");
-    break;
-  case 0: {
-    // Child process
-
-    // Socket open after fork, close
-    soap->fclosesocket(soap, (SOAP_SOCKET)soap->master);
-
-    execvp("rt_xtt", argv);
-    break;
-  }
-  default:;
-  }
-  return SOAP_OK;
+  return NULL;
 }
 
-SOAP_FMAC5 int SOAP_FMAC6 __s0__RtMonStart(struct soap* soap,
-    _s0__RtMonStart* s0__RtMonStart,
-    _s0__RtMonStartResponse* s0__RtMonStartResponse)
-{
-  char lang[40] = "";
-  char display[80] = "";
-  char gui[40] = "";
-  char prog[] = "pwr_rtmon";
-  char sw_l[] = "-l";
-  char sw_d[] = "--display";
-  char sw_f[] = "-f";
-  char* argv[] = { prog, sw_d, 0, 0, 0, 0, 0 };
-
-  if (s0__RtMonStart->ClientRequestHandle) {
-    s0__RtMonStartResponse->ClientRequestHandle
-        = soap_new_std__string(soap, -1);
-    s0__RtMonStartResponse->ClientRequestHandle->assign(
-        *s0__RtMonStart->ClientRequestHandle);
-  }
-  if (s0__RtMonStart->Language)
-    strncpy(lang, s0__RtMonStart->Language->c_str(), sizeof(lang));
-
-  if (s0__RtMonStart->Display)
-    strncpy(display, s0__RtMonStart->Display->c_str(), sizeof(display));
-
-  if (s0__RtMonStart->GUI)
-    strncpy(gui, s0__RtMonStart->GUI->c_str(), sizeof(gui));
-
-  int i = 1;
-  if (!streq(display, "")) {
-    argv[i++] = sw_d;
-    argv[i++] = display;
-  }
-  if (!streq(lang, "")) {
-    argv[i++] = sw_l;
-    argv[i++] = lang;
-  }
-  if (!streq(gui, "")) {
-    argv[i++] = sw_f;
-    argv[i++] = gui;
-  }
-
-  pid_t pid = fork();
-  switch (pid) {
-  case -1:
-    printf("rt_statussrv: fork failed\n");
-    break;
-  case 0: {
-    // Child process
-
-    // Socket open after fork, close
-    soap->fclosesocket(soap, (SOAP_SOCKET)soap->master);
-
-    execvp("pwr_rtmon", argv);
-    break;
-  }
-  default:;
-  }
-  return SOAP_OK;
-}

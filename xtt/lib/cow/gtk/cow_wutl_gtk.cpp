@@ -50,7 +50,8 @@ GtkToolItem* wutl_tools_item(GtkToolbar *tools, const char *img, GCallback cb, c
   if (cb)
     g_signal_connect(item, "clicked", cb, ctx);
   if (disable_focus)
-    g_object_set(tools, "can-focus", FALSE, NULL);
+    gtk_widget_set_can_focus(GTK_WIDGET(item), FALSE);
+    //g_object_set(item, "can-focus", FALSE, NULL);
   gtk_toolbar_insert(tools, item, -1);
   if (tooltip) {
     if (translate)
@@ -72,7 +73,8 @@ GtkToolItem* wutl_tools_toggle_button(GtkToolbar *tools, const char *img, GCallb
   gtk_tool_button_set_icon_widget(GTK_TOOL_BUTTON(item), gtk_image_new_from_file(fname));
   g_signal_connect(item, "clicked", cb, ctx);
   if (disable_focus)
-    g_object_set(tools, "can-focus", FALSE, NULL);
+    gtk_widget_set_can_focus(GTK_WIDGET(item), FALSE);
+    //g_object_set(item, "can-focus", FALSE, NULL);
   gtk_toolbar_insert(tools, item, -1);
   if (translate)
     gtk_tool_item_set_tooltip_text(item, CoWowGtk::translate_utf8(tooltip));
