@@ -339,7 +339,7 @@ int main(int argc, char* argv[])
   }
 
   dcli_translate_filename(incdir, "$pwr_einc");
-  char cmd[1050];
+  char cmd[1070];
   switch (mtype) {
   case merge_eMtype_WbBase:
     snprintf(cmd, sizeof(cmd), "%s -c %s %s -I%s -D%s -o %s %s", pwre_cxx,
