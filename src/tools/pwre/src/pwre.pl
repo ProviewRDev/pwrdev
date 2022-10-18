@@ -1080,9 +1080,9 @@ sub build_module()
     }
     if ($lib == 1) {
       _build("jpwr", "rt", "src", "all");
-      _build("jpwr", "jopg", "src", "all");
-      _build("jpwr", "jop", "src", "all");
-      _build("jpwr", "rt_client", "src", "all");
+      #_build("jpwr", "jopg", "src", "all");
+      #_build("jpwr", "jop", "src", "all");
+      #_build("jpwr", "rt_client", "src", "all");
     }
     if ($exe == 1) {
       _build("exe", "jpwr_rt_gdh", "src", "all");
