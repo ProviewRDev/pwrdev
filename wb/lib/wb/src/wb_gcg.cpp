@@ -9937,7 +9937,7 @@ int gcg_comp_m37(gcg_ctx gcgctx, vldh_t_node node)
   pwr_tAName parname;
   pwr_tOName conn_obj;
   char conn_par[80];
-  vldh_t_node conn_node;
+  vldh_t_node conn_node = 0;
   unsigned long point = 0;
   char* wholeobject;
   pwr_sAttrRef pararef;
@@ -9974,6 +9974,8 @@ int gcg_comp_m37(gcg_ctx gcgctx, vldh_t_node node)
       strcat(parname, conn_par);
     }
   }
+  if (!conn_node)
+    return GSX__NEXTPAR;
 
   sts = ldh_GetObjectClass(ldhses, conn_node->ln.oid, &conn_cid);
   if (EVEN(sts)) {
