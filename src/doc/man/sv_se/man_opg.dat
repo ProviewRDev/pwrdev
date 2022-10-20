@@ -2684,7 +2684,9 @@ GetChild()		<LINK> getchild()
 GetParent()		<LINK> getparent()
 GetNextSibling()	<LINK> getnextsibling()
 GetClassList()		<LINK> getclasslist()
+GetClassListAttrRef()	<LINK> getclasslistattrref()
 GetNextObject()		<LINK> getnextobject()
+GetNextAttrRef()	<LINK> getnextattrref()
 GetObjectClass()	<LINK> getobjectclass()
 GetNodeObject()		<LINK> getnodeobject()
 GetRootList()		<LINK> getrootlist()
@@ -4007,7 +4009,9 @@ GetChild()	<t>Hämta barn till ett objekt.	<LINK> getchild()
 GetParent()	<t>Hämta föräder till ett objekt. <LINK> getparent()
 GetNextSibling()<t>Hämta syskon för ett objekt.	<LINK> getnextsibling()
 GetClassList()	<t>Hämta första instansen av en klass. <LINK> getclasslist()
+GetClassListAttrRef() <t>Hämta första attributinstansen av en klass. <LINK> getclasslistattrref()
 GetNextObject()	<t>Hämta nästa instans av en klass. <LINK> getnextobject()
+GetNextAttrRef() <t>Hämta nästa attributinstansen av en klass. <LINK> getnextattrref()
 GetObjectClass() <t>Hämta klassen för ett objekt. <LINK> getobjectclass()
 GetNodeObject()	<t>Hämta nod-objektet.	<LINK> getnodeobject()
 GetRootList()	<t>Hämta första objektet i rot-listan. <LINK> getrootlist()
@@ -4178,6 +4182,29 @@ string		<t>name		<t>namn på klassen.
 <c>  name = GetClassList("Dv");
 </TOPIC>
 
+<TOPIC> getclasslistattrref() <style> function
+GetClassListAttrRef()
+
+string GetClassListAttrRef( string class)
+
+<b>Beskrivning
+
+Hämta första objekt eller attribut-objekt av en viss klass. Nästa attribut-objekt
+av klassen kan hämtas med GetNextAttrRef().
+Returnerar namnet på det första objektet eller attribute-objektet. Om det inte finns
+någon instans, returneras en null-sträng.
+
+<b>Argument
+
+string		<t>name		<t>namn på klassen.
+
+<b>Exempel
+
+<c>  string name;
+
+<c>  name = GetClassListAttrRef("Dv");
+</TOPIC>
+
 <TOPIC> getnextobject() <style> function
 GetNextObject()
 
@@ -4201,6 +4228,33 @@ string		<t>name		<t>objektets namn.
 <c>  while ( name != "")
 <c>    printf("Di object found: %s", name);
 <c>    name = GetNextObject(name);
+<c>  endwhile
+</TOPIC>
+
+<TOPIC> getnextattrref() <style> function
+GetNextAttrRef()
+
+string GetNextAttrRef( string name)
+
+<b>Beskrivning
+
+Hämta nästa objekt eller attribut-objekt i klasslistan.
+Returnerar namnet på objektet eller attribute-objektet. Om det inte
+finns någon nästa objekt, returneras en null-sträng. 
+
+<b>Argument
+
+string		<t>classname	<t>namn på klassen.
+string		<t>name		<t>namn på attribut-objekt.
+
+<b>Exempel
+
+<c>  string name;
+
+<c>  name = GetClassListAttrRef("Di");
+<c>  while ( name != "")
+<c>    printf("Di object found: %s", name);
+<c>    name = GetNextAttrRef("Di", name);
 <c>  endwhile
 </TOPIC>
 

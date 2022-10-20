@@ -8249,6 +8249,36 @@ static int xnav_getclasslist_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
+static int xnav_getclasslistattrref_func(void* filectx, ccm_sArg* arg_list,
+    int arg_count, int* return_decl, ccm_tFloat* return_float,
+    ccm_tInt* return_int, char* return_string)
+{
+  int sts;
+  pwr_tAName name;
+  pwr_tClassId classid;
+  pwr_tAttrRef aref;
+
+  if (arg_count != 1)
+    return CCM__ARGMISM;
+
+  if (arg_list->value_decl != CCM_DECL_STRING)
+    return CCM__ARGMISM;
+
+  sts = gdh_ClassNameToId(arg_list->value_string, &classid);
+  if (ODD(sts)) {
+    sts = gdh_GetClassListAttrRef(classid, &aref);
+    if (ODD(sts))
+      sts = gdh_AttrrefToName(&aref, name, sizeof(name), cdh_mNName);
+  }
+  if (ODD(sts))
+    strcpy(return_string, name);
+  else
+    strcpy(return_string, "");
+  *return_decl = CCM_DECL_STRING;
+
+  return 1;
+}
+
 static int xnav_getrootlist_func(void* filectx, ccm_sArg* arg_list,
     int arg_count, int* return_decl, ccm_tFloat* return_float,
     ccm_tInt* return_int, char* return_string)
@@ -8317,6 +8347,46 @@ static int xnav_getnextobject_func(void* filectx, ccm_sArg* arg_list,
     sts = gdh_GetNextObject(objid, &next_objid);
     if (ODD(sts))
       sts = gdh_ObjidToName(next_objid, name, sizeof(name), cdh_mNName);
+  }
+  if (ODD(sts))
+    strcpy(return_string, name);
+  else
+    strcpy(return_string, "");
+  *return_decl = CCM_DECL_STRING;
+
+  return 1;
+}
+
+static int xnav_getnextattrref_func(void* filectx, ccm_sArg* arg_list,
+    int arg_count, int* return_decl, ccm_tFloat* return_float,
+    ccm_tInt* return_int, char* return_string)
+{
+  int sts;
+  pwr_tAName name;
+  pwr_tAttrRef aref;
+  pwr_tAttrRef next_aref;
+  pwr_tCid cid;
+  ccm_sArg* arg_p2;
+
+  if (arg_count != 2)
+    return CCM__ARGMISM;
+
+  arg_p2 = arg_list->next;
+
+  if (arg_list->value_decl != CCM_DECL_STRING)
+    return CCM__ARGMISM;
+
+  if (arg_p2->value_decl != CCM_DECL_STRING)
+    return CCM__ARGMISM;
+
+  sts = gdh_ClassNameToId(arg_list->value_string, &cid);
+  if (ODD(sts)) {
+    sts = gdh_NameToAttrref(pwr_cNOid, arg_p2->value_string, &aref);
+    if (ODD(sts)) {
+      sts = gdh_GetNextAttrRef(cid, &aref, &next_aref);
+      if (ODD(sts))
+	sts = gdh_AttrrefToName(&next_aref, name, sizeof(name), cdh_mNName);
+    }
   }
   if (ODD(sts))
     strcpy(return_string, name);
@@ -9026,6 +9096,9 @@ int XNav::readcmdfile(char* incommand, char* buffer, char *bufargs)
     sts = ccm_register_function("Xtt", "GetClassList", xnav_getclasslist_func);
     if (EVEN(sts))
       return sts;
+    sts = ccm_register_function("Xtt", "GetClassListAttrRef", xnav_getclasslistattrref_func);
+    if (EVEN(sts))
+      return sts;
     sts = ccm_register_function("Xtt", "GetRootList", xnav_getrootlist_func);
     if (EVEN(sts))
       return sts;
@@ -9035,6 +9108,10 @@ int XNav::readcmdfile(char* incommand, char* buffer, char *bufargs)
       return sts;
     sts = ccm_register_function(
         "Xtt", "GetNextObject", xnav_getnextobject_func);
+    if (EVEN(sts))
+      return sts;
+    sts = ccm_register_function(
+        "Xtt", "GetNextAttrRef", xnav_getnextattrref_func);
     if (EVEN(sts))
       return sts;
     sts = ccm_register_function(
