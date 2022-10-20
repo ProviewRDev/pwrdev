@@ -121,7 +121,8 @@ static void treePrintInorder(
   if (np->right != tp->null)
     treePrintInorder(tp, np->right, printNode);
 
-  printNode(np);
+  if (printNode)
+    printNode(np);
 
   if (np->left != tp->null)
     treePrintInorder(tp, np->left, printNode);
@@ -706,12 +707,12 @@ static void treeCheck(tree_sTable* tp, tree_sNode* np, int* count,
 
   treeCheck(tp, np->left, count, maxlevel, &hleft, level + 1, printKey);
   if (np->left != tp->null) {
-    if (np->left->parent != np) {
+    if (printKey && np->left->parent != np) {
       printf("leftLinkerror: Node key: %s not linked to parent key: %s\n",
           printKey(np->left), printKey(np));
     }
     comp = tp->compareFunc(tp, np, np->left);
-    if (comp < 1) {
+    if (printKey && comp < 1) {
       printf("leftLink sort error: Node key: %s not less than key: %s\n",
           printKey(np->left), printKey(np));
     }
@@ -720,18 +721,18 @@ static void treeCheck(tree_sTable* tp, tree_sNode* np, int* count,
   (*count)++;
   treeCheck(tp, np->right, count, maxlevel, &hright, level + 1, printKey);
   if (np->right != tp->null) {
-    if (np->right->parent != np) {
+    if (printKey && np->right->parent != np) {
       printf("rightLinkerror: Node key: %s not linked to parent key: %s\n",
           printKey(np->right), printKey(np));
     }
     comp = tp->compareFunc(tp, np, np->right);
-    if (comp > -1) {
+    if (printKey && comp > -1) {
       printf("rightLink sort error: Node key: %s not greater than key: %s\n",
           printKey(np->right), printKey(np));
     }
   }
 
-  if ((hright - hleft) != np->bal) {
+  if (printKey && (hright - hleft) != np->bal) {
     printf("balerror key: %s, level: %d, hr: %d, hl: %d, bal: %d\n",
         printKey(np), level, hright, hleft, np->bal);
   }
@@ -891,8 +892,10 @@ void tree_PrintTable(pwr_tStatus* sts, tree_sTable* tp,
   int maxlevel = 0;
   int hight = 0;
 
-  treePrintInorder(tp, tp->root, printNode);
-  treeCheck(tp, tp->root, &count, &maxlevel, &hight, 0, printKey);
+  if (printNode)
+    treePrintInorder(tp, tp->root, printNode);
+  if (printKey)
+    treeCheck(tp, tp->root, &count, &maxlevel, &hight, 0, printKey);
   printf("count: %d, maxlevel: %d, hight: %d\n", count, maxlevel, hight);
   printf("nNode.......: %d\n", tp->nNode);
   printf("nError......: %d\n", tp->nError);

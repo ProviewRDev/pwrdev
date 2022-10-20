@@ -59,6 +59,7 @@ typedef struct {
   tree_sNode n;
   merep_sClassAttrKey key;
   int numOffset;
+  int numIdx;
   pwr_tUInt32 offset[merep_cCattOffsetSize];
   pwr_tUInt32 flags[merep_cCattOffsetSize];
 } merep_sClassAttr;

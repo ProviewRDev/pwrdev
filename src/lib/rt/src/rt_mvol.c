@@ -807,6 +807,8 @@ static void insertCattObject(
 {
   gdb_sClassAttrKey key;
   gdb_sClassAttr* item;
+  gdb_sClassAttr* item0;
+  pool_tRef itemr;
   gdb_sClass* cp;
   int i, j;
 
@@ -818,14 +820,23 @@ static void insertCattObject(
   key.subCid = ap->tid;
   key.hostCid = cid;
   key.idx = 0;
-  item = ptree_Find(sts, gdbroot->catt_tt, &key);
-
-  while (ODD(*sts) && item->numOffset == gdb_cCattOffsetSize) {
-    key.idx++;
-    item = ptree_Find(sts, gdbroot->catt_tt, &key);
+  item0 = ptree_Find(sts, gdbroot->catt_tt, &key);
+  if (EVEN(*sts)) {
+    itemr = ptree_Insert(sts, gdbroot->catt_tt, &key);
+    item0 = (gdb_sClassAttr*)pool_Address(sts, gdbroot->pool, itemr);
   }
+  if (item0->numIdx == 0)
+    item = item0;
+  else {
+    key.idx = item0->numIdx;
+    item = ptree_Find(sts, gdbroot->catt_tt, &key);
+    if (EVEN(*sts))
+      pwr_ReturnVoid(sts, GDH__WEIRD);
+  }    
+
   if (!ap->flags.b.array) {
-    if (ODD(*sts)) {
+    if (item->numOffset < gdb_cCattOffsetSize) {
+
       /* Insert in found item */
       item->offset[item->numOffset] = offset + ap->offs;
       item->flags[item->numOffset++] = ap->flags;
@@ -834,7 +845,8 @@ static void insertCattObject(
 	ap->flags.b.disableattr = pap->flags.b.disableattr;
     } else {
       /* Insert a new item */
-      pool_tRef itemr;
+      key.idx++;
+      item0->numIdx = key.idx;
 
       itemr = ptree_Insert(sts, gdbroot->catt_tt, &key);
       item = (gdb_sClassAttr*)pool_Address(sts, gdbroot->pool, itemr);
@@ -843,7 +855,6 @@ static void insertCattObject(
       item->offset[item->numOffset] = offset + ap->offs;
       item->flags[item->numOffset++] = ap->flags;
     }
-
     /* Look for class attributes in this class */
     for (i = 0; i < cp->acount; i++) {
       if (cp->attr[i].flags.b.isclass && cdh_tidIsCid(cp->attr[i].tid)
@@ -856,7 +867,7 @@ static void insertCattObject(
   } else {
     /* Insert all offsets in the array */
     for (j = 0; j < ap->elem; j++) {
-      if (ODD(*sts) && item->numOffset < gdb_cCattOffsetSize) {
+      if (item->numOffset < gdb_cCattOffsetSize) {
         /* Insert in current item */
         item->offset[item->numOffset]
             = offset + ap->offs + j * (ap->size / ap->elem);
@@ -864,9 +875,8 @@ static void insertCattObject(
       } else {
         /* Insert a new item */
         pool_tRef itemr;
-
-        if (ODD(*sts))
-          key.idx++;
+	key.idx++;
+	item0->numIdx = key.idx;
         itemr = ptree_Insert(sts, gdbroot->catt_tt, &key);
         item = (gdb_sClassAttr*)pool_Address(sts, gdbroot->pool, itemr);
         if (item == NULL)
@@ -889,6 +899,30 @@ static void insertCattObject(
     }
   }
 }
+
+#if 0
+static char *printKey(ptree_sNode *key)
+{
+  static char txt[80];
+  sprintf(txt, "Key subCid %u hostCid %u idx %u\n", 
+     ((gdb_sClassAttrKey *)key)->subCid,
+     ((gdb_sClassAttrKey *)key)->hostCid,
+     ((gdb_sClassAttrKey *)key)->idx);
+  return txt;
+}
+static void printNode(ptree_sNode *node, pool_tRef ref)
+{
+  gdb_sClassAttr *n = (gdb_sClassAttr*)(node);
+
+  printf("Node \n");
+  printf("Key subCid %u hostCid %u idx %u\n", 
+     n->key.subCid,
+     n->key.hostCid,
+     n->key.idx);
+  printf("numOffs %d\n", n->numOffset);
+}
+ptree_PrintTable(sts, gdbroot->catt_tt, printNode, printKey);
+#endif
 
 void mvol_BuildCatt(pwr_tStatus* sts)
 {

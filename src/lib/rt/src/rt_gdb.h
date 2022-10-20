@@ -483,6 +483,7 @@ typedef struct {
   ptree_sNode n;
   gdb_sClassAttrKey key;
   int numOffset;
+  int numIdx;
   pwr_tUInt32 offset[gdb_cCattOffsetSize];
   pwr_mAdef flags[gdb_cCattOffsetSize];
 } gdb_sClassAttr;
