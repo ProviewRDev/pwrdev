@@ -240,6 +240,7 @@ SObject pwrb:Class
         Body SysBody
           Attr TypeRef = "pwrs:Type-$Boolean"
           Attr GraphName = "d1"
+          Attr Flags |= PWR_MASK_NOINVERT
           Attr Flags |= PWR_MASK_REDUTRANSFER
         EndBody
       EndObject
