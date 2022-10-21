@@ -13091,8 +13091,15 @@ int gcg_comp_m58(gcg_ctx gcgctx, vldh_t_node node)
         if (par_inverted)
           gcg_error_msg(gcgctx, GSX__INV, node);
 
-        if (output_bodydef.Par->Output.Info.Type == pwr_eType_DataRef)
+	
+        if (bodydef[i].Par->Input.Info.Type == pwr_eType_Void && 
+	  output_bodydef.Par->Output.Info.Type == pwr_eType_DataRef)
           strcpy(cast, "(pwr_tVoid *)");
+        else if (bodydef[i].Par->Input.Info.Type == pwr_eType_DataRef && 
+	  output_bodydef.Par->Output.Info.Type == pwr_eType_Void)
+          strcpy(cast, "(pwr_tDataRef *)");
+	else
+	  strcpy(cast, "");
         IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE],
             "%c%s->%sP = %s&%c%s->%s;\n", GCG_PREFIX_REF,
             vldh_IdToStr(0, node->ln.oid), bodydef[i].Par->Param.Info.PgmName,
