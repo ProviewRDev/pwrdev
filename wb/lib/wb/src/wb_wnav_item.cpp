@@ -3948,11 +3948,18 @@ int WItemEnumObject::update()
       value = (pwr_tAttrRef*)(buf + size * element);
     }
 
-    if (cdh_ObjidIsEqual(value->Objid, enum_aref.Objid)
-        && value->Offset == enum_aref.Offset && value->Size == enum_aref.Size)
-      brow_SetRadiobutton(node, 0, 1);
-    else
-      brow_SetRadiobutton(node, 0, 0);
+    if (value->Flags.b.Object && enum_aref.Flags.b.Object) {
+      if (cdh_ObjidIsEqual(value->Objid, enum_aref.Objid))
+	brow_SetRadiobutton(node, 0, 1);
+      else
+	brow_SetRadiobutton(node, 0, 0);
+    } else {
+      if (cdh_ObjidIsEqual(value->Objid, enum_aref.Objid)
+	  && value->Offset == enum_aref.Offset && value->Size == enum_aref.Size)
+	brow_SetRadiobutton(node, 0, 1);
+      else
+	brow_SetRadiobutton(node, 0, 0);
+    }
     if (!is_element)
       free((char*)value);
     else
@@ -3983,7 +3990,7 @@ int WItemEnumObject::set()
 {
   int sts;
   WItemAttr* item;
-  WItemEnum* sibling_item;
+  WItemEnumObject* sibling_item;
   brow_tNode parent, sibling;
   char* buf;
   int psize;
