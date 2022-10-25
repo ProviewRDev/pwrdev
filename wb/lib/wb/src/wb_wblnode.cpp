@@ -362,7 +362,9 @@ static wbl_sSym attr_flags[] = {
   { "pwr_mClassDef_IOCard", pwr_mClassDef_IOCard },
   { "pwr_mClassDef_HasCallBack", pwr_mClassDef_HasCallBack },
   { "pwr_mClassDef_RtReadOnly", pwr_mClassDef_RtReadOnly },
-  { "pwr_mClassDef_Internal", pwr_mClassDef_Internal }, { 0, 0 }
+  { "pwr_mClassDef_Internal", pwr_mClassDef_Internal },
+  { "pwr_mClassDef_Plc", pwr_mClassDef_Plc },
+  { "pwr_mClassDef_Obsolete", pwr_mClassDef_Obsolete }, { 0, 0 }
 };
 
 static int check_conversion_error(const char* attr);

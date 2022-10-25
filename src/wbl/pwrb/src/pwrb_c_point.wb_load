@@ -53,6 +53,7 @@ SObject pwrb:Class
   Object Point $ClassDef 180 
     Body SysBody
       Attr Flags |= pwr_mClassDef_DevOnly
+      Attr Flags |= pwr_mClassDef_Plc
       Attr Editor = pwr_eEditor_AttrEd
       Attr Method = pwr_eMethod_DevBodyOnly
     EndBody

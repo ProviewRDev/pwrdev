@@ -787,8 +787,10 @@ gdb_sClass* mvol_NameToClass(pwr_tStatus* sts, const char* name)
   for (ol = pool_Qsucc(NULL, gdbroot->pool, &cp->cid_lh); ol != &cp->cid_lh;
        ol = pool_Qsucc(NULL, gdbroot->pool, ol)) {
     op = pool_Qitem(ol, gdb_sObject, u.n.cid_ll);
-    pn->object[pn->nObject - 1].poid = op->g.oid;
-    op = hash_Search(sts, gdbroot->family_ht, &pn->object[pn->nObject - 1]);
+    pn->object[0].poid = op->g.oid;
+    op = hash_Search(sts, gdbroot->family_ht, &pn->object[0]);
+    if (op != NULL && op->g.cid == pwr_eClass_ClassHier)
+      continue;
     if (op != NULL)
       break;
   }

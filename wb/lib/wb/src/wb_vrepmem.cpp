@@ -2848,6 +2848,7 @@ bool wb_vrepmem::classeditorCheckMove(
     case pwr_eClass_ClassHier:
       switch (memo->m_cid) {
       case pwr_eClass_ClassDef:
+      case pwr_eClass_ClassHier:
         break;
       default:
         *sts = LDH__CLASSMISPLACED;
@@ -2879,15 +2880,35 @@ bool wb_vrepmem::classeditorCheckMove(
   }
 
   switch (memo->m_cid) {
-  case pwr_eClass_ClassHier:
+  case pwr_eClass_ClassHier: {
+    // Top object
+    if (!fth)
+      break;
+    if (fth->m_cid != pwr_eClass_ClassHier) {
+      *sts = LDH__CLASSMISPLACED;
+      return false;
+    }
+    if (fth->fth) {
+      *sts = LDH__CLASSMISPLACED;
+      return false;
+    }
+    break;
+  }
   case pwr_eClass_TypeHier: {
     // Top object
     if (fth) {
       *sts = LDH__CLASSMISPLACED;
       return false;
     }
+    break;
   }
-  case pwr_eClass_ClassDef:
+  case pwr_eClass_ClassDef: {
+    if (fth->m_cid != pwr_eClass_ClassHier) {
+      *sts = LDH__CLASSMISPLACED;
+      return false;
+    }
+    break;
+  }
   case pwr_eClass_TypeDef: {
     if (fth != memo->fth) {
       *sts = LDH__CLASSMISPLACED;

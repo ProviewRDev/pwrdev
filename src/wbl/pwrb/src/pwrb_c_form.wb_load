@@ -39,6 +39,8 @@ SObject pwrb:Class
 !/**
 !  @Version 1.0
 !  @Group Operator,NodeConfiguration
+!  <h2>Obsolete since V3.4
+!
 !  Configures a window to display a form.
 !  
 !  To display forms on a node the forms have to be
@@ -59,6 +61,7 @@ SObject pwrb:Class
     Body SysBody
       Attr Editor = pwr_eEditor_AttrEd
       Attr Method = pwr_eMethod_Standard
+      Attr Flags |= pwr_mClassDef_Obsolete
     EndBody
     Object RtBody $ObjBodyDef 1 
       Body SysBody

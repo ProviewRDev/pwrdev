@@ -233,5 +233,25 @@ SObject pwrs:Type
        Attr Value = 131072
      EndBody
     EndObject
+    !/**
+    !  Class is a plc function object.
+    !*/
+    Object Plc $Bit
+     Body SysBody
+       Attr PgmName = "Plc"
+       Attr Text = "Plc"
+       Attr Value = 262144
+     EndBody
+    EndObject
+    !/**
+    !  Class is obsolete.
+    !*/
+    Object Obsolete $Bit
+     Body SysBody
+       Attr PgmName = "Obsolete"
+       Attr Text = "Obsolete"
+       Attr Value = 524288
+     EndBody
+    EndObject
   EndObject
 EndSObject

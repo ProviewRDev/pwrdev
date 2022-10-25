@@ -49,6 +49,7 @@
 #include "wb_watt.h"
 #include "wb_wattnav.h"
 #include "wb_wnav_item.h"
+#include "wb_wnav_msg.h"
 
 void WAttNav::message(char sev, const char* text)
 {
@@ -622,6 +623,13 @@ int WAttNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
       case wnav_eItemType_Mask:
         ((WItemMask*)item)->set(!event->radiobutton.value);
         break;
+      case wnav_eItemType_EnumObject: {
+        int sts = ((WItemEnumObject*)item)->set();
+        if (sts == WNAV__NOCHILDREN)
+	  if (wattnav->advanced_user && wattnav->change_value_cb)
+	    (wattnav->change_value_cb)(wattnav->parent_ctx);
+        break;
+      }
       default:;
       }
       break;

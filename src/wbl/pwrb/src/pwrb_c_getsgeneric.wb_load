@@ -52,6 +52,7 @@ SObject pwrb:Class
       Attr Editor = pwr_eEditor_AttrEd
       Attr Method = pwr_eMethod_DevBodyOnly
       Attr PopEditor = 2
+      Attr Flags |= pwr_mClassDef_Plc
     EndBody
     Object DevBody $ObjBodyDef 2 
       Object ActualValue $Output 1 

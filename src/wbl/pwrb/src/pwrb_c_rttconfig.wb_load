@@ -48,6 +48,7 @@ SObject pwrb:Class
     Body SysBody
       Attr Editor = pwr_eEditor_AttrEd
       Attr Method = pwr_eMethod_Standard
+      Attr Flags |= pwr_mClassDef_Obsolete
     EndBody
     !
     ! Runtime Body
