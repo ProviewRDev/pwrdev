@@ -82,21 +82,29 @@ void Nodelist::find_node_cb(void* ctx, pwr_tOid oid)
 }
 
 void Nodelist::add_node_ok(
-    Nodelist* nodelist, char* node_name, char* address, char* description, char* opplace)
+    Nodelist* nodelist, char* node_name, char* address, char* busid, char* description, 
+    char* opplace)
 {
-  nodelist->nodelistnav->add_node(node_name, address, description, opplace);
+  int bus;
+  sscanf(busid, "%d", &bus);
+  nodelist->nodelistnav->add_node(node_name, address, bus, description, opplace);
 }
 
 void Nodelist::activate_add_node()
 {
   open_add_input_dialog(
-      "Node name", "Address", "Description", "Operatorplace", "Add Node", "", add_node_ok);
+      "Node name", "Address", "Busid", "Description", "Operatorplace", 
+      "Add Node", "", add_node_ok);
 }
 
 void Nodelist::mod_node_ok(
-    Nodelist* nodelist, char* node_name, char *address, char* description, char* opplace)
+    Nodelist* nodelist, char* node_name, char *address, char* busid, char* description, 
+    char* opplace)
 {
-  nodelist->nodelistnav->set_node_data(node_name, address, opplace, description);
+  int bus;
+  sscanf(busid, "%d", &bus);
+  nodelist->nodelistnav->set_node_data(nodelist->selected_idx, node_name, address,
+      bus, opplace, description);
 }
 
 void Nodelist::activate_modify_node()
@@ -104,6 +112,8 @@ void Nodelist::activate_modify_node()
   static char node_name[80];
   char title[100];
   char address[40];
+  int busid;
+  char busidstr[20];
   int sts;
   pwr_tOName opplace;
   char descr[80];
@@ -114,14 +124,18 @@ void Nodelist::activate_modify_node()
     return;
   }
 
-  sts = nodelistnav->get_selected_opplace(address, opplace, descr);
+  sts = nodelistnav->get_selected_node_idx(&selected_idx);
+  if (EVEN(sts))
+    return;
+  sts = nodelistnav->get_selected_opplace(address, &busid, opplace, descr);
   if (EVEN(sts))
     return;
 
+  sprintf(busidstr, "%d", busid); 
   sprintf(title, "Modify node %s", node_name);
 
-  open_mod_input_dialog("Node", "Address", "Description", "Operatorplace", title,
-      node_name, address, descr, opplace, mod_node_ok);
+  open_mod_input_dialog("Node", "Address", "Busid", "Description", "Operatorplace", title,
+			node_name, address, busidstr, descr, opplace, mod_node_ok);
 }
 
 void remove_node_ok(void* ctx, void* data)
@@ -157,7 +171,7 @@ void Nodelist::activate_open_xtt()
     nodelistnav->wow->DisplayError("Open Xtt", "Select a node");
     return;
   }
-  sts = nodelistnav->get_selected_opplace(address, 0, 0);
+  sts = nodelistnav->get_selected_opplace(address, 0, 0, 0);
 
   pwr_tCmd cmd;
   sprintf(cmd, "ssh pwrp@%s -X rt_xtt&", address);
@@ -177,7 +191,7 @@ void Nodelist::activate_open_opplace()
     nodelistnav->wow->DisplayError("Open Xtt", "Select a node");
     return;
   }
-  sts = nodelistnav->get_selected_opplace(address, opplace, 0);
+  sts = nodelistnav->get_selected_opplace(address, 0, opplace, 0);
 
   pwr_tCmd cmd;
   sprintf(cmd, "ssh pwrp@%s -X rt_xtt %s&", address, opplace);
@@ -198,7 +212,7 @@ void Nodelist::activate_open_rtmon()
     return;
   }
 
-  sts = nodelistnav->get_selected_opplace(address, 0, 0);
+  sts = nodelistnav->get_selected_opplace(address, 0, 0, 0);
 
   pwr_tCmd cmd;
   sprintf(cmd, "ssh pwrp@%s -X pwr_rtmon&", address);

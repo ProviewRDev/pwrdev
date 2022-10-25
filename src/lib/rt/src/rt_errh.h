@@ -84,6 +84,7 @@ typedef enum {
 #define errh_cAnix_SrvSize 40
 #define errh_cAnix_PlcSize 20
 
+
 /**
  * Application index
  */
@@ -218,6 +219,7 @@ typedef struct {
          errh-function is called.  */
 
 pwr_tStatus errh_Init(const char* programName, errh_eAnix anix);
+void errh_AnixName(errh_eAnix anix, char *name);
 void errh_SetStatus(pwr_tStatus sts);
 void errh_Interactive(void);
 char* errh_GetMsg(const pwr_tStatus sts, char* buf, int bufSize);

@@ -113,6 +113,47 @@ static unsigned int do_div(int*, unsigned int);
 static int skip_atoi(const char**);
 static char* number(char*, int, int, int, int, int);
 
+static char anix_name[40][32] = {
+  "rt_init",
+  "rt_qmon",
+  "rt_neth",
+  "rt_neth_acp",
+  "rt_io",
+  "rt_tmon",
+  "rt_emon",
+  "rt_alimserver",
+  "rt_bck",
+  "rt_linksup",
+  "rt_trend",
+  "rt_fast",
+  "rt_elog",
+  "rt_webmon",
+  "rt_webmonmh",
+  "rt_sysmon",
+  "plc",
+  "rs_remotehandler",
+  "opc_server",
+  "rt_statussrv",
+  "rt_post",
+  "rt_report",
+  "rt_sevhistmon",
+  "rt_sim",
+  "rt_powerlink",
+  "rt_videomgm",
+  "rt_redcom",
+  "rt_websocketserver",
+  "rt_maintsupserver",
+  "rt_mqttserver",
+};
+
+void errh_AnixName(errh_eAnix anix, char *name)
+{
+  if (anix > 0 && anix <= 40)
+    strcpy(name, anix_name[anix - 1]);
+  else
+    strcpy(name, "");
+}
+
 void errh_Interactive(void)
 {
   interactive = 1;

@@ -33,16 +33,16 @@
 !  combined work), being distributed under the terms of the GNU 
 !  General Public License plus this exception.
 !
-!  rt_syi_msg.msg -- System information
+!  rt_stssrv_msg.msg -- <short description>
 !
-!  Return codes from system information routines.
-!
-.facility       SYI,321 /prefix = SYI__	!  System information
+.facility       STSSRV,30 /prefix = STSSRV__
 
-success		<successful completion>					/succ
-nyi		<not yet implemented>					/error
-truncated	<buffer to small, information was truncated>		/error
-novar		<no such variable>					/error
-type		<type error>						/error
-busid		<bus is not defined>					/error
+success		<Successful completion>					/succ
+busid		<Bus id not defined>					/error
+conndown	<Connection is down>					/error
+connlost	<Connection is lost>					/error
 .end
+
+
+
+

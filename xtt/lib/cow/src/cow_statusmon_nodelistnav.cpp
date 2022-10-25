@@ -199,7 +199,7 @@ int NodelistNav::init_brow_cb(FlowCtx* fctx, void* client_data)
   nodelistnav->brow->create_nodeclasses();
 
   if (!streq(nodelistnav->nodename, "")) {
-    nodelistnav->add_node(nodelistnav->nodename, "", "", "");
+    nodelistnav->add_node(nodelistnav->nodename, "", 0, "", "");
     nodelistnav->node_list[0].item->open_children(nodelistnav, 0, 0);
   } else
     nodelistnav->read();
@@ -243,7 +243,7 @@ NodelistNavBrow::~NodelistNavBrow()
 void NodelistNav::read()
 {
   char line[400];
-  char line_part[4][256];
+  char line_part[5][256];
   int sts;
   FILE* fp;
   pwr_tFileName fname;
@@ -275,6 +275,8 @@ void NodelistNav::read()
       strncpy(node.opplace, line_part[2], sizeof(node.opplace));
     if (num >= 4)
       strncpy(node.description, line_part[3], sizeof(node.description));
+    if (num >= 5)
+      sscanf(line_part[4], "%d", &node.busid);
 
     node_list.push_back(node);
   }
@@ -284,7 +286,7 @@ void NodelistNav::read()
   brow_DeleteAll(brow->ctx);
 
   for (int i = 0; i < (int)node_list.size(); i++) {
-    item = new ItemNode(this, node_list[i].node_name, node_list[i].description,
+    item = new ItemNode(this, i, node_list[i].node_name, node_list[i].description,
         dest, flow_eDest_After);
     dest = item->node;
     node_list[i].item = item;
@@ -779,24 +781,47 @@ int NodelistNav::select_node(int idx)
 
 int NodelistNav::update_nodes()
 {
-  pwr_tStatus sts;
-  statussrv_sGetStatus response;
+  pwr_tStatus sts = 1;
+  stssrv_sRespondStatus *response;
+  stssrv_sRespondExtStatus *xdata;
+  stssrv_eMsgType type;
   int nodraw = 0;
   pwr_tStatus current_status = 0;
   char current_status_str[120];
-  pwr_tTime time1, time2;
+  pwr_tTime time1;
 
   for (int i = 0; i < (int)node_list.size(); i++) {
+    if (!node_list[i].cli) {
+      node_list[i].cli = new statussrv_client();
+      if (!streq(node_list[i].address, ""))
+	node_list[i].cli->set_address(node_list[i].address);
+      else
+	node_list[i].cli->set_address(node_list[i].node_name);
+      node_list[i].cli->set_busid(node_list[i].busid);
+      node_list[i].cli->server_connect();
+      node_list[i].connection_sts = node_list[i].cli->m_sts;
+    }
+
+    if (node_list[i].network_timeout) {
+      node_list[i].cli->server_connect();
+      node_list[i].network_timeout = 0;
+    }
 
     if (!connect && !first_scan && EVEN(node_list[i].connection_sts)
 	&& node_list[i].network_timeout)
       continue;
 
     time_GetTime(&time1);
+#if 0
     if (!streq(node_list[i].address, ""))
       sts = statussrv_GetStatus(node_list[i].address, &response);
     else
       sts = statussrv_GetStatus(node_list[i].node_name, &response);
+#endif
+    node_list[i].cli->send_request(stssrv_eMsgType_Status);
+    node_list[i].cli->receive(&type, (char **)&response);
+
+#if 0
     time_GetTime(&time2);
     pwr_tFloat32 df = time_AdiffToFloat(&time2, &time1);
       
@@ -807,6 +832,17 @@ int NodelistNav::update_nodes()
     }
     else
       node_list[i].network_timeout = 0;
+#endif
+
+    node_list[i].connection_sts = node_list[i].cli->m_sts;
+    if (EVEN(node_list[i].connection_sts)) {
+      node_list[i].network_timeout = 1;
+      strcpy(response->SystemStatusStr, "Network timeout");    
+      response->SystemStatus = PWR__SRVCONNECTION;
+      strcpy(response->SystemTime, ""); 
+      strcpy(response->BootTime, ""); 
+      strcpy(response->RestartTime, ""); 
+    }
 
     if (!first_scan && ODD(sts) && EVEN(node_list[i].connection_sts))
       message(sts, node_list[i].node_name, i, "Connection up to server");
@@ -816,13 +852,13 @@ int NodelistNav::update_nodes()
     node_list[i].connection_sts = sts;
 
     if (ODD(sts)) {
-      if (memcmp(&node_list[i].item->data.BootTime, &response.BootTime,
+      if (memcmp(&node_list[i].item->data.BootTime, response->BootTime,
               sizeof(pwr_tTime))
           && node_list[i].init_done) {
         // System restarted
         message(2, node_list[i].node_name, i, "Proview restarted");
       }
-      if (memcmp(&node_list[i].item->data.RestartTime, &response.RestartTime,
+      if (memcmp(&node_list[i].item->data.RestartTime, response->RestartTime,
               sizeof(pwr_tTime))
           && node_list[i].init_done) {
         // System restarted
@@ -831,39 +867,39 @@ int NodelistNav::update_nodes()
     }
 
     if (EVEN(sts)) {
-      current_status = response.SystemStatus;
-      strncpy(current_status_str, response.SystemStatusStr,
+      current_status = response->SystemStatus;
+      strncpy(current_status_str, response->SystemStatusStr,
           sizeof(current_status_str));
     } else {
       switch (mode) {
       case nodelist_eMode_SystemStatus:
-        current_status = response.SystemStatus;
-        strncpy(current_status_str, response.SystemStatusStr,
+        current_status = response->SystemStatus;
+        strncpy(current_status_str, response->SystemStatusStr,
             sizeof(current_status_str));
         break;
       case nodelist_eMode_Status1:
-        current_status = response.UserStatus[0];
-        strncpy(current_status_str, response.UserStatusStr[0],
+        current_status = response->UserStatus1;
+        strncpy(current_status_str, response->UserStatus1Str,
             sizeof(current_status_str));
         break;
       case nodelist_eMode_Status2:
-        current_status = response.UserStatus[1];
-        strncpy(current_status_str, response.UserStatusStr[1],
+        current_status = response->UserStatus2;
+        strncpy(current_status_str, response->UserStatus2Str,
             sizeof(current_status_str));
         break;
       case nodelist_eMode_Status3:
-        current_status = response.UserStatus[2];
-        strncpy(current_status_str, response.UserStatusStr[2],
+        current_status = response->UserStatus3;
+        strncpy(current_status_str, response->UserStatus3Str,
             sizeof(current_status_str));
         break;
       case nodelist_eMode_Status4:
-        current_status = response.UserStatus[3];
-        strncpy(current_status_str, response.UserStatusStr[3],
+        current_status = response->UserStatus4;
+        strncpy(current_status_str, response->UserStatus4Str,
             sizeof(current_status_str));
         break;
       case nodelist_eMode_Status5:
-        current_status = response.UserStatus[4];
-        strncpy(current_status_str, response.UserStatusStr[4],
+        current_status = response->UserStatus5;
+        strncpy(current_status_str, response->UserStatus5Str,
             sizeof(current_status_str));
         break;
       }
@@ -894,31 +930,38 @@ int NodelistNav::update_nodes()
     strncpy(node_list[i].item->data.CurrentStatusStr, current_status_str,
         sizeof(node_list[i].item->data.SystemStatusStr));
 
-    node_list[i].item->data.SystemStatus = response.SystemStatus;
-    strncpy(node_list[i].item->data.SystemStatusStr, response.SystemStatusStr,
+    node_list[i].item->data.SystemStatus = response->SystemStatus;
+    strncpy(node_list[i].item->data.SystemStatusStr, response->SystemStatusStr,
         sizeof(node_list[i].item->data.SystemStatusStr));
 
     if (ODD(sts)) {
-      if (!streq(node_list[i].item->data.Description, response.Description)
+      if (!streq(node_list[i].item->data.Description, response->Description)
           && view_node_descr == 0
           && streq(node_list[i].item->node_descr, ""))
-        brow_SetAnnotation(node_list[i].item->node, 1, response.Description,
-            strlen(response.Description));
+        brow_SetAnnotation(node_list[i].item->node, 1, response->Description,
+            strlen(response->Description));
 
-      strncpy(node_list[i].item->data.Description, response.Description,
+      strncpy(node_list[i].item->data.Description, response->Description,
           sizeof(node_list[i].item->data.Description));
-      strncpy(node_list[i].item->data.Version, response.Version,
+      strncpy(node_list[i].item->data.Version, response->Version,
           sizeof(node_list[i].item->data.Version));
-      node_list[i].item->data.SystemTime = response.SystemTime;
-      node_list[i].item->data.BootTime = response.BootTime;
-      node_list[i].item->data.RestartTime = response.RestartTime;
-      node_list[i].item->data.Restarts = response.Restarts;
+      
+      time_AsciiToA(response->SystemTime, &node_list[i].item->data.SystemTime);
+      time_AsciiToA(response->BootTime, &node_list[i].item->data.BootTime);
+      time_AsciiToA(response->RestartTime, &node_list[i].item->data.RestartTime);
+      node_list[i].item->data.Restarts = response->Restarts;
 
       if (!node_list[i].init_done)
         node_list[i].init_done = 1;
       if (node_list[i].item->syssts_open) {
+#if 0
         statussrv_GetExtStatus(
             node_list[i].node_name, &node_list[i].item->xdata);
+#endif
+	node_list[i].cli->send_request(stssrv_eMsgType_ExtStatus);
+	node_list[i].cli->receive(&type, (char**)&xdata);
+	if (ODD(node_list[i].cli->m_sts))
+	  memcpy(&node_list[i].item->xdata, xdata, sizeof(node_list[i].item->xdata));
       }
     }
   }
@@ -944,9 +987,9 @@ void NodelistNav::save()
     return;
 
   for (int i = 0; i < (int)node_list.size(); i++) {
-    fprintf(fp, "%s \"%s\" \"%s\" \"%s\"\n", node_list[i].node_name, 
+    fprintf(fp, "%s \"%s\" \"%s\" \"%s\" %d\n", node_list[i].node_name, 
 	node_list[i].address, node_list[i].opplace,
-	node_list[i].description);
+	node_list[i].description, node_list[i].busid);
   }
 
   fclose(fp);
@@ -972,7 +1015,32 @@ int NodelistNav::get_selected_node(char* name)
   return 1;
 }
 
-int NodelistNav::get_selected_opplace(char* address, char* opplace, char* descr)
+int NodelistNav::get_selected_node_idx(int* idx)
+{
+  brow_tNode* nodelist;
+  int node_count;
+  ItemNode* item;
+
+  brow_GetSelectedNodes(brow->ctx, &nodelist, &node_count);
+  if (node_count != 1)
+    return 0;
+
+  brow_GetUserData(nodelist[0], (void**)&item);
+  free(nodelist);
+
+  if (item->type != nodelistnav_eItemType_Node)
+    return 0;
+
+  for (int i = 0; i < node_list.size(); i++) {
+    if (item == node_list[i].item) {
+      *idx = i;
+      return 1;
+    }
+  }
+  return 0;
+}
+
+int NodelistNav::get_selected_opplace(char* address, int* busid, char* opplace, char* descr)
 {
   brow_tNode* nodelist;
   int node_count;
@@ -992,6 +1060,8 @@ int NodelistNav::get_selected_opplace(char* address, char* opplace, char* descr)
     if (node_list[i].item == item) {
       if (address)
         strcpy(address, node_list[i].address);
+      if (busid)
+	*busid = node_list[i].busid;
       if (opplace)
         strcpy(opplace, node_list[i].opplace);
       if (descr)
@@ -1002,22 +1072,19 @@ int NodelistNav::get_selected_opplace(char* address, char* opplace, char* descr)
   return 0;
 }
 
-int NodelistNav::set_node_data(char* node_name, char* address, 
+int NodelistNav::set_node_data(int idx, char* node_name, char* address, int busid,
     char* opplace, char* descr)
 {
-  for (int i = 0; i < (int)node_list.size(); i++) {
-    if (streq(node_list[i].node_name, node_name)) {
-      if (address)
-        strncpy(node_list[i].address, address, sizeof(node_list[i].address));
-      if (opplace)
-        strncpy(node_list[i].opplace, opplace, sizeof(node_list[i].opplace));
-      if (descr)
-        strncpy(
-            node_list[i].description, descr, sizeof(node_list[i].description));
-      return 1;
-    }
-  }
-  return 0;
+  if (idx >= node_list.size())
+    return 0;
+  if (address)
+    strncpy(node_list[idx].address, address, sizeof(node_list[idx].address));
+  node_list[idx].busid = busid;
+  if (opplace)
+    strncpy(node_list[idx].opplace, opplace, sizeof(node_list[idx].opplace));
+  if (descr)
+    strncpy(node_list[idx].description, descr, sizeof(node_list[idx].description));
+  return 1;
 }
 
 void NodelistNav::remove_node(char* name)
@@ -1035,7 +1102,8 @@ void NodelistNav::remove_node(char* name)
 }
 
 void NodelistNav::add_node(
-    const char* name, const char* address, const char* description, const char* opplace)
+    const char* name, const char* address, const int busid, const char* description, 
+    const char* opplace)
 {
   brow_tNode* nodelist;
   int node_count;
@@ -1063,6 +1131,7 @@ void NodelistNav::add_node(
 
     NodelistNode node(name);
     strncpy(node.address, address, sizeof(node.address));
+    node.busid = busid;
     strncpy(node.opplace, opplace, sizeof(node.opplace));
     strncpy(node.description, description, sizeof(node.description));
 
@@ -1078,7 +1147,7 @@ void NodelistNav::add_node(
     }
 
     item = new ItemNode(
-        this, name, node_list[idx].description, nodelist[0], flow_eDest_After);
+	 this, idx, name, node_list[idx].description, nodelist[0], flow_eDest_After);
     node_list[idx].item = item;
   } else {
     // Nothing selected, insert last
@@ -1087,7 +1156,7 @@ void NodelistNav::add_node(
     strcpy(node.description, description);
     node_list.push_back(node);
 
-    item = new ItemNode(this, name, node.description, 0, flow_eDest_IntoLast);
+    item = new ItemNode(this, node_list.size() - 1, name, node.description, 0, flow_eDest_IntoLast);
     node_list[node_list.size() - 1].item = item;
   }
 }
@@ -1166,9 +1235,9 @@ int ItemBase::close(NodelistNav* nodelistnav, double x, double y)
   return 1;
 }
 
-ItemNode::ItemNode(NodelistNav* item_nodelistnav, const char* item_name,
+ItemNode::ItemNode(NodelistNav* item_nodelistnav, int item_idx, const char* item_name,
     const char* item_node_descr, brow_tNode dest, flow_eDest dest_code)
-    : ItemBase(item_nodelistnav, item_name), syssts_open(0)
+    : ItemBase(item_nodelistnav, item_name), idx(item_idx), syssts_open(0)
 {
   type = nodelistnav_eItemType_Node;
   strcpy(name, item_name);
@@ -1329,6 +1398,8 @@ ItemAttrSysSts::ItemAttrSysSts(NodelistNav* item_nodelistnav,
 int ItemAttrSysSts::open_children(NodelistNav* nodelistnav, double x, double y)
 {
   double node_x, node_y;
+  stssrv_eMsgType type;
+  char *xdata;
 
   brow_GetNodePosition(node, &node_x, &node_y);
 
@@ -1346,164 +1417,164 @@ int ItemAttrSysSts::open_children(NodelistNav* nodelistnav, double x, double y)
     parent->syssts_open = 1;
     brow_SetNodraw(nodelistnav->brow->ctx);
 
-    new ItemAttrSts(nodelistnav, "Sys", "S1", parent->xdata.ServerStsStr[0],
-        &parent->xdata.ServerSts[0], parent->xdata.ServerStsName[0], this, node,
+    new ItemAttrSts(nodelistnav, "Sys", "S1", parent->xdata.Server[0].StsStr,
+        (int*)&parent->xdata.Server[0].Sts, parent->xdata.Server[0].Name, this, node,
         flow_eDest_IntoLast);
 
-    new ItemAttrSts(nodelistnav, "Sys", "S2", parent->xdata.ServerStsStr[1],
-        &parent->xdata.ServerSts[1], parent->xdata.ServerStsName[1], this, node,
+    new ItemAttrSts(nodelistnav, "Sys", "S2", parent->xdata.Server[1].StsStr,
+        (int*)&parent->xdata.Server[1].Sts, parent->xdata.Server[1].Name, this, node,
         flow_eDest_IntoLast);
 
-    new ItemAttrSts(nodelistnav, "Sys", "S3", parent->xdata.ServerStsStr[2],
-        &parent->xdata.ServerSts[2], parent->xdata.ServerStsName[2], this, node,
+    new ItemAttrSts(nodelistnav, "Sys", "S3", parent->xdata.Server[2].StsStr,
+        (int*)&parent->xdata.Server[2].Sts, parent->xdata.Server[2].Name, this, node,
         flow_eDest_IntoLast);
 
-    new ItemAttrSts(nodelistnav, "Sys", "S4", parent->xdata.ServerStsStr[3],
-        &parent->xdata.ServerSts[3], parent->xdata.ServerStsName[3], this, node,
+    new ItemAttrSts(nodelistnav, "Sys", "S4", parent->xdata.Server[3].StsStr,
+        (int*)&parent->xdata.Server[3].Sts, parent->xdata.Server[3].Name, this, node,
         flow_eDest_IntoLast);
 
-    new ItemAttrSts(nodelistnav, "Sys", "S5", parent->xdata.ServerStsStr[4],
-        &parent->xdata.ServerSts[4], parent->xdata.ServerStsName[4], this, node,
+    new ItemAttrSts(nodelistnav, "Sys", "S5", parent->xdata.Server[4].StsStr,
+        (int*)&parent->xdata.Server[4].Sts, parent->xdata.Server[4].Name, this, node,
         flow_eDest_IntoLast);
 
-    new ItemAttrSts(nodelistnav, "Sys", "S6", parent->xdata.ServerStsStr[5],
-        &parent->xdata.ServerSts[5], parent->xdata.ServerStsName[5], this, node,
+    new ItemAttrSts(nodelistnav, "Sys", "S6", parent->xdata.Server[5].StsStr,
+        (int*)&parent->xdata.Server[5].Sts, parent->xdata.Server[5].Name, this, node,
         flow_eDest_IntoLast);
 
-    new ItemAttrSts(nodelistnav, "Sys", "S7", parent->xdata.ServerStsStr[6],
-        &parent->xdata.ServerSts[6], parent->xdata.ServerStsName[6], this, node,
+    new ItemAttrSts(nodelistnav, "Sys", "S7", parent->xdata.Server[6].StsStr,
+        (int*)&parent->xdata.Server[6].Sts, parent->xdata.Server[6].Name, this, node,
         flow_eDest_IntoLast);
 
-    new ItemAttrSts(nodelistnav, "Sys", "S8", parent->xdata.ServerStsStr[7],
-        &parent->xdata.ServerSts[7], parent->xdata.ServerStsName[7], this, node,
+    new ItemAttrSts(nodelistnav, "Sys", "S8", parent->xdata.Server[7].StsStr,
+        (int*)&parent->xdata.Server[7].Sts, parent->xdata.Server[7].Name, this, node,
         flow_eDest_IntoLast);
 
-    new ItemAttrSts(nodelistnav, "Sys", "S9", parent->xdata.ServerStsStr[8],
-        &parent->xdata.ServerSts[8], parent->xdata.ServerStsName[8], this, node,
+    new ItemAttrSts(nodelistnav, "Sys", "S9", parent->xdata.Server[8].StsStr,
+        (int*)&parent->xdata.Server[8].Sts, parent->xdata.Server[8].Name, this, node,
         flow_eDest_IntoLast);
 
-    new ItemAttrSts(nodelistnav, "Sys", "S10", parent->xdata.ServerStsStr[9],
-        &parent->xdata.ServerSts[9], parent->xdata.ServerStsName[9], this, node,
+    new ItemAttrSts(nodelistnav, "Sys", "S10", parent->xdata.Server[9].StsStr,
+        (int*)&parent->xdata.Server[9].Sts, parent->xdata.Server[9].Name, this, node,
         flow_eDest_IntoLast);
 
-    new ItemAttrSts(nodelistnav, "Sys", "S11", parent->xdata.ServerStsStr[10],
-        &parent->xdata.ServerSts[10], parent->xdata.ServerStsName[10], this,
+    new ItemAttrSts(nodelistnav, "Sys", "S11", parent->xdata.Server[10].StsStr,
+        (int*)&parent->xdata.Server[10].Sts, parent->xdata.Server[10].Name, this,
         node, flow_eDest_IntoLast);
 
-    new ItemAttrSts(nodelistnav, "Sys", "S12", parent->xdata.ServerStsStr[11],
-        &parent->xdata.ServerSts[11], parent->xdata.ServerStsName[11], this,
+    new ItemAttrSts(nodelistnav, "Sys", "S12", parent->xdata.Server[11].StsStr,
+        (int*)&parent->xdata.Server[11].Sts, parent->xdata.Server[11].Name, this,
         node, flow_eDest_IntoLast);
 
-    new ItemAttrSts(nodelistnav, "Sys", "S13", parent->xdata.ServerStsStr[12],
-        &parent->xdata.ServerSts[12], parent->xdata.ServerStsName[12], this,
+    new ItemAttrSts(nodelistnav, "Sys", "S13", parent->xdata.Server[12].StsStr,
+        (int*)&parent->xdata.Server[12].Sts, parent->xdata.Server[12].Name, this,
         node, flow_eDest_IntoLast);
 
-    new ItemAttrSts(nodelistnav, "Sys", "S14", parent->xdata.ServerStsStr[13],
-        &parent->xdata.ServerSts[13], parent->xdata.ServerStsName[13], this,
+    new ItemAttrSts(nodelistnav, "Sys", "S14", parent->xdata.Server[13].StsStr,
+        (int*)&parent->xdata.Server[13].Sts, parent->xdata.Server[13].Name, this,
         node, flow_eDest_IntoLast);
 
-    new ItemAttrSts(nodelistnav, "Sys", "S15", parent->xdata.ServerStsStr[14],
-        &parent->xdata.ServerSts[14], parent->xdata.ServerStsName[14], this,
+    new ItemAttrSts(nodelistnav, "Sys", "S15", parent->xdata.Server[14].StsStr,
+        (int*)&parent->xdata.Server[14].Sts, parent->xdata.Server[14].Name, this,
         node, flow_eDest_IntoLast);
 
-    new ItemAttrSts(nodelistnav, "Sys", "S16", parent->xdata.ServerStsStr[15],
-        &parent->xdata.ServerSts[15], parent->xdata.ServerStsName[15], this,
+    new ItemAttrSts(nodelistnav, "Sys", "S16", parent->xdata.Server[15].StsStr,
+        (int*)&parent->xdata.Server[15].Sts, parent->xdata.Server[15].Name, this,
         node, flow_eDest_IntoLast);
 
-    new ItemAttrSts(nodelistnav, "Sys", "S17", parent->xdata.ServerStsStr[16],
-        &parent->xdata.ServerSts[16], parent->xdata.ServerStsName[16], this,
+    new ItemAttrSts(nodelistnav, "Sys", "S17", parent->xdata.Server[16].StsStr,
+        (int*)&parent->xdata.Server[16].Sts, parent->xdata.Server[16].Name, this,
         node, flow_eDest_IntoLast);
 
-    new ItemAttrSts(nodelistnav, "Sys", "S18", parent->xdata.ServerStsStr[17],
-        &parent->xdata.ServerSts[17], parent->xdata.ServerStsName[17], this,
+    new ItemAttrSts(nodelistnav, "Sys", "S18", parent->xdata.Server[17].StsStr,
+        (int*)&parent->xdata.Server[17].Sts, parent->xdata.Server[17].Name, this,
         node, flow_eDest_IntoLast);
 
-    new ItemAttrSts(nodelistnav, "Sys", "S19", parent->xdata.ServerStsStr[18],
-        &parent->xdata.ServerSts[18], parent->xdata.ServerStsName[18], this,
+    new ItemAttrSts(nodelistnav, "Sys", "S19", parent->xdata.Server[18].StsStr,
+        (int*)&parent->xdata.Server[18].Sts, parent->xdata.Server[18].Name, this,
         node, flow_eDest_IntoLast);
 
-    new ItemAttrSts(nodelistnav, "Sys", "S20", parent->xdata.ServerStsStr[19],
-        &parent->xdata.ServerSts[19], parent->xdata.ServerStsName[19], this,
+    new ItemAttrSts(nodelistnav, "Sys", "S20", parent->xdata.Server[19].StsStr,
+        (int*)&parent->xdata.Server[19].Sts, parent->xdata.Server[19].Name, this,
         node, flow_eDest_IntoLast);
 
-    new ItemAttrSts(nodelistnav, "Appl", "A1", parent->xdata.ApplStsStr[0],
-        &parent->xdata.ApplSts[0], parent->xdata.ApplStsName[0], this, node,
+    new ItemAttrSts(nodelistnav, "Appl", "A1", parent->xdata.Appl[0].StsStr,
+        (int*)&parent->xdata.Appl[0].Sts, parent->xdata.Appl[0].Name, this, node,
         flow_eDest_IntoLast);
 
-    new ItemAttrSts(nodelistnav, "Appl", "A2", parent->xdata.ApplStsStr[1],
-        &parent->xdata.ApplSts[1], parent->xdata.ApplStsName[1], this, node,
+    new ItemAttrSts(nodelistnav, "Appl", "A2", parent->xdata.Appl[1].StsStr,
+        (int*)&parent->xdata.Appl[1].Sts, parent->xdata.Appl[1].Name, this, node,
         flow_eDest_IntoLast);
 
-    new ItemAttrSts(nodelistnav, "Appl", "A3", parent->xdata.ApplStsStr[2],
-        &parent->xdata.ApplSts[2], parent->xdata.ApplStsName[2], this, node,
+    new ItemAttrSts(nodelistnav, "Appl", "A3", parent->xdata.Appl[2].StsStr,
+        (int*)&parent->xdata.Appl[2].Sts, parent->xdata.Appl[2].Name, this, node,
         flow_eDest_IntoLast);
 
-    new ItemAttrSts(nodelistnav, "Appl", "A4", parent->xdata.ApplStsStr[3],
-        &parent->xdata.ApplSts[3], parent->xdata.ApplStsName[3], this, node,
+    new ItemAttrSts(nodelistnav, "Appl", "A4", parent->xdata.Appl[3].StsStr,
+        (int*)&parent->xdata.Appl[3].Sts, parent->xdata.Appl[3].Name, this, node,
         flow_eDest_IntoLast);
 
-    new ItemAttrSts(nodelistnav, "Appl", "A5", parent->xdata.ApplStsStr[4],
-        &parent->xdata.ApplSts[4], parent->xdata.ApplStsName[4], this, node,
+    new ItemAttrSts(nodelistnav, "Appl", "A5", parent->xdata.Appl[4].StsStr,
+        (int*)&parent->xdata.Appl[4].Sts, parent->xdata.Appl[4].Name, this, node,
         flow_eDest_IntoLast);
 
-    new ItemAttrSts(nodelistnav, "Appl", "A6", parent->xdata.ApplStsStr[5],
-        &parent->xdata.ApplSts[5], parent->xdata.ApplStsName[5], this, node,
+    new ItemAttrSts(nodelistnav, "Appl", "A6", parent->xdata.Appl[5].StsStr,
+        (int*)&parent->xdata.Appl[5].Sts, parent->xdata.Appl[5].Name, this, node,
         flow_eDest_IntoLast);
 
-    new ItemAttrSts(nodelistnav, "Appl", "A7", parent->xdata.ApplStsStr[6],
-        &parent->xdata.ApplSts[6], parent->xdata.ApplStsName[6], this, node,
+    new ItemAttrSts(nodelistnav, "Appl", "A7", parent->xdata.Appl[6].StsStr,
+        (int*)&parent->xdata.Appl[6].Sts, parent->xdata.Appl[6].Name, this, node,
         flow_eDest_IntoLast);
 
-    new ItemAttrSts(nodelistnav, "Appl", "A8", parent->xdata.ApplStsStr[7],
-        &parent->xdata.ApplSts[7], parent->xdata.ApplStsName[7], this, node,
+    new ItemAttrSts(nodelistnav, "Appl", "A8", parent->xdata.Appl[7].StsStr,
+        (int*)&parent->xdata.Appl[7].Sts, parent->xdata.Appl[7].Name, this, node,
         flow_eDest_IntoLast);
 
-    new ItemAttrSts(nodelistnav, "Appl", "A9", parent->xdata.ApplStsStr[8],
-        &parent->xdata.ApplSts[8], parent->xdata.ApplStsName[8], this, node,
+    new ItemAttrSts(nodelistnav, "Appl", "A9", parent->xdata.Appl[8].StsStr,
+        (int*)&parent->xdata.Appl[8].Sts, parent->xdata.Appl[8].Name, this, node,
         flow_eDest_IntoLast);
 
-    new ItemAttrSts(nodelistnav, "Appl", "A10", parent->xdata.ApplStsStr[9],
-        &parent->xdata.ApplSts[9], parent->xdata.ApplStsName[9], this, node,
+    new ItemAttrSts(nodelistnav, "Appl", "A10", parent->xdata.Appl[9].StsStr,
+        (int*)&parent->xdata.Appl[9].Sts, parent->xdata.Appl[9].Name, this, node,
         flow_eDest_IntoLast);
 
-    new ItemAttrSts(nodelistnav, "Appl", "A11", parent->xdata.ApplStsStr[10],
-        &parent->xdata.ApplSts[10], parent->xdata.ApplStsName[10], this, node,
+    new ItemAttrSts(nodelistnav, "Appl", "A11", parent->xdata.Appl[10].StsStr,
+        (int*)&parent->xdata.Appl[10].Sts, parent->xdata.Appl[10].Name, this, node,
         flow_eDest_IntoLast);
 
-    new ItemAttrSts(nodelistnav, "Appl", "A12", parent->xdata.ApplStsStr[11],
-        &parent->xdata.ApplSts[11], parent->xdata.ApplStsName[11], this, node,
+    new ItemAttrSts(nodelistnav, "Appl", "A12", parent->xdata.Appl[11].StsStr,
+        (int*)&parent->xdata.Appl[11].Sts, parent->xdata.Appl[11].Name, this, node,
         flow_eDest_IntoLast);
 
-    new ItemAttrSts(nodelistnav, "Appl", "A13", parent->xdata.ApplStsStr[12],
-        &parent->xdata.ApplSts[12], parent->xdata.ApplStsName[12], this, node,
+    new ItemAttrSts(nodelistnav, "Appl", "A13", parent->xdata.Appl[12].StsStr,
+        (int*)&parent->xdata.Appl[12].Sts, parent->xdata.Appl[12].Name, this, node,
         flow_eDest_IntoLast);
 
-    new ItemAttrSts(nodelistnav, "Appl", "A14", parent->xdata.ApplStsStr[13],
-        &parent->xdata.ApplSts[13], parent->xdata.ApplStsName[13], this, node,
+    new ItemAttrSts(nodelistnav, "Appl", "A14", parent->xdata.Appl[13].StsStr,
+        (int*)&parent->xdata.Appl[13].Sts, parent->xdata.Appl[13].Name, this, node,
         flow_eDest_IntoLast);
 
-    new ItemAttrSts(nodelistnav, "Appl", "A15", parent->xdata.ApplStsStr[14],
-        &parent->xdata.ApplSts[14], parent->xdata.ApplStsName[14], this, node,
+    new ItemAttrSts(nodelistnav, "Appl", "A15", parent->xdata.Appl[14].StsStr,
+        (int*)&parent->xdata.Appl[14].Sts, parent->xdata.Appl[14].Name, this, node,
         flow_eDest_IntoLast);
 
-    new ItemAttrSts(nodelistnav, "A16", "A16", parent->xdata.ApplStsStr[15],
-        &parent->xdata.ApplSts[15], parent->xdata.ApplStsName[15], this, node,
+    new ItemAttrSts(nodelistnav, "A16", "A16", parent->xdata.Appl[15].StsStr,
+        (int*)&parent->xdata.Appl[15].Sts, parent->xdata.Appl[15].Name, this, node,
         flow_eDest_IntoLast);
 
-    new ItemAttrSts(nodelistnav, "Appl", "A17", parent->xdata.ApplStsStr[16],
-        &parent->xdata.ApplSts[16], parent->xdata.ApplStsName[16], this, node,
+    new ItemAttrSts(nodelistnav, "Appl", "A17", parent->xdata.Appl[16].StsStr,
+        (int*)&parent->xdata.Appl[16].Sts, parent->xdata.Appl[16].Name, this, node,
         flow_eDest_IntoLast);
 
-    new ItemAttrSts(nodelistnav, "Appl", "A18", parent->xdata.ApplStsStr[17],
-        &parent->xdata.ApplSts[17], parent->xdata.ApplStsName[17], this, node,
+    new ItemAttrSts(nodelistnav, "Appl", "A18", parent->xdata.Appl[17].StsStr,
+        (int*)&parent->xdata.Appl[17].Sts, parent->xdata.Appl[17].Name, this, node,
         flow_eDest_IntoLast);
 
-    new ItemAttrSts(nodelistnav, "Appl", "A19", parent->xdata.ApplStsStr[18],
-        &parent->xdata.ApplSts[18], parent->xdata.ApplStsName[18], this, node,
+    new ItemAttrSts(nodelistnav, "Appl", "A19", parent->xdata.Appl[18].StsStr,
+        (int*)&parent->xdata.Appl[18].Sts, parent->xdata.Appl[18].Name, this, node,
         flow_eDest_IntoLast);
 
-    new ItemAttrSts(nodelistnav, "Appl", "A20", parent->xdata.ApplStsStr[19],
-        &parent->xdata.ApplSts[19], parent->xdata.ApplStsName[19], this, node,
+    new ItemAttrSts(nodelistnav, "Appl", "A20", parent->xdata.Appl[19].StsStr,
+        (int*)&parent->xdata.Appl[19].Sts, parent->xdata.Appl[19].Name, this, node,
         flow_eDest_IntoLast);
 
     brow_SetOpen(node, 1);
@@ -1511,7 +1582,11 @@ int ItemAttrSysSts::open_children(NodelistNav* nodelistnav, double x, double y)
     brow_ResetNodraw(nodelistnav->brow->ctx);
     brow_Redraw(nodelistnav->brow->ctx, node_y);
 
-    statussrv_GetExtStatus(parent->name, &parent->xdata);
+    
+    nodelistnav->node_list[parent->idx].cli->send_request(stssrv_eMsgType_ExtStatus);
+    nodelistnav->node_list[parent->idx].cli->receive(&type, (char**)&xdata);
+    memcpy(&parent->xdata, xdata, sizeof(parent->xdata));
+
     nodelistnav->force_trace_scan();
   }
   return 1;

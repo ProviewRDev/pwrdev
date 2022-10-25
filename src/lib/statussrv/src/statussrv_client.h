@@ -34,49 +34,45 @@
  * General Public License plus this exception.
  */
 
-#ifndef statussrv_utl_h
-#define statussrv_utl_h
+#ifndef statussrv_client_h
+#define statussrv_client_h
 
-#include "pwr.h"
+#include <string.h>
+#include "statussrv_net.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+class statussrv_client {
+public:
+  pwr_tStatus m_sts;
+  unsigned short m_port;
+  int m_busid;
+  int m_sock;
+  unsigned int m_reconnect_limit;
+  char m_address[20];
+  unsigned int m_trans_id;
+  int m_expected_msgs;
+  int m_msgs_lost;
+  pwr_tTime m_last_try_connect_time;
+  pwr_tTime m_timeout_time;
+  unsigned int m_response_time;
+  float m_max_timeout;
+  int m_timeout;
+  statussrv_client() : m_port(3889), m_busid(0), m_sock(0), m_reconnect_limit(500), m_trans_id(0),
+		    m_expected_msgs(0), m_last_try_connect_time(pwr_cNTime),
+		    m_timeout_time(pwr_cNTime), m_response_time(500), m_max_timeout(2), 
+		    m_timeout(0) {
+    strcpy(m_address, "127.0.0.1");
+  }
+  int server_connect();
+  int send_request(stssrv_eMsgType type);
+  pwr_tStatus receive(stssrv_eMsgType *type, char **msg);
+  void set_busid(int busid) {
+    m_busid = busid;
+  }
+  void set_address(char *address) {
+    strncpy(m_address, address, sizeof(m_address));
+  }
+  static void get_port(pwr_tStatus *sts, unsigned short *port);
+};
 
-typedef struct {
-  char Version[20];
-  pwr_tStatus SystemStatus;
-  char SystemStatusStr[120];
-  pwr_tString80 Description;
-  pwr_tTime SystemTime;
-  pwr_tTime BootTime;
-  pwr_tTime RestartTime;
-  int Restarts;
-  pwr_tStatus UserStatus[5];
-  char UserStatusStr[5][120];
-} statussrv_sGetStatus;
-
-typedef struct {
-  pwr_tStatus ServerSts[20];
-  char ServerStsStr[20][120];
-  char ServerStsName[20][80];
-  pwr_tStatus ApplSts[20];
-  char ApplStsStr[20][120];
-  char ApplStsName[20][80];
-} statussrv_sGetExtStatus;
-
-pwr_tStatus statussrv_GetStatus(
-    const char* nodename, statussrv_sGetStatus* result);
-pwr_tStatus statussrv_GetExtStatus(
-    const char* nodename, statussrv_sGetExtStatus* result);
-pwr_tStatus statussrv_Restart(const char* nodename);
-pwr_tStatus statussrv_XttStart(const char* nodename, const char* opplace,
-    const char* lang, const char* display, const char* gui);
-pwr_tStatus statussrv_RtMonStart(const char* nodename, const char* lang,
-    const char* display, const char* gui);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

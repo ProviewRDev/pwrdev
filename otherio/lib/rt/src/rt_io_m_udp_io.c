@@ -132,7 +132,7 @@ pwr_tStatus udp_recv_data(
     if (sts < 0) {
       op->Status = IOM__UDP_DOWN;
       // close(local->socket);
-      errh_Error("Connection lost to modbus slave, %s", cp->Name);
+      errh_Error("UDP IO, Connection lost, %s", cp->Name);
       if (received)
         return IO__SUCCESS;
       else
@@ -142,7 +142,7 @@ pwr_tStatus udp_recv_data(
     if (!(FD_ISSET(local->socket, &fdw))) {
       op->Status = IOM__UDP_DOWN;
       // close(local->socket);
-      errh_Error("Connection down to modbus slave, %s", cp->Name);
+      errh_Error("UDP IO; Connection down, %s", cp->Name);
       if (received)
         return IO__SUCCESS;
       else
@@ -162,7 +162,7 @@ pwr_tStatus udp_recv_data(
     if (sts < 0) {
       op->Status = IOM__UDP_DOWN;
       // close(local->socket);
-      errh_Error("Connection lost to modbus slave, %s", cp->Name);
+      errh_Error("UDP IO, Connection lost, %s", cp->Name);
       if (received)
         return IO__SUCCESS;
       else

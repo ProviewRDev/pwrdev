@@ -42,12 +42,12 @@
 // Status is defined as int i xlib...
 
 #include <vector>
-#include "statussrv_utl.h"
 
 #include "rt_errh.h"
 
 #include "flow_browapi.h"
 #include "flow_browctx.h"
+#include "statussrv_client.h"
 
 class MsgWindow;
 
@@ -115,11 +115,12 @@ public:
 
 class ItemNode;
 class CoWow;
+class statussrv_client;
 
 class NodelistNode {
 public:
-  NodelistNode(const char* name) : item(0), connection_sts(0), init_done(0),
-    network_timeout(0)
+  NodelistNode(const char* name) : busid(0), item(0), connection_sts(0), init_done(0),
+    network_timeout(0), cli(0)
   {
     strncpy(node_name, name, sizeof(node_name));
     strcpy(address, "");
@@ -128,12 +129,14 @@ public:
   }
   char node_name[80];
   char address[40];
+  int busid;
   char description[80];
   pwr_tOName opplace;
   ItemNode* item;
   pwr_tStatus connection_sts;
   int init_done;
   int network_timeout;
+  statussrv_client *cli;
 };
 
 class NodelistNav {
@@ -184,10 +187,13 @@ public:
   int select_node(int idx);
   void remove_node(char* name);
   int get_selected_node(char* name);
-  int get_selected_opplace(char* address, char* opplace, char* descr);
-  int set_node_data(char* node_name, char *addess, char* opplace, char* descr);
+  int get_selected_node_idx(int* idx);
+  int get_selected_opplace(char* address, int* busid, char* opplace, char* descr);
+  int set_node_data(int idx, char* node_name, char *addess, int busid, char* opplace,
+      char* descr);
   void save();
-  void add_node(const char* name, const char* address, const char* description, const char* opplace);
+  void add_node(const char* name, const char* address, const int busid, 
+      const char* description, const char* opplace);
   void set_msgw_pop(int pop)
   {
     msgw_pop = pop;
@@ -219,11 +225,12 @@ public:
 
 class ItemNode : public ItemBase {
 public:
-  ItemNode(NodelistNav* item_nodelistnav, const char* item_name,
+  ItemNode(NodelistNav* item_nodelistnav, int item_idx,  const char* item_name,
       const char* item_node_descr, brow_tNode dest, flow_eDest dest_code);
 
+  int idx;
   NodeData data;
-  statussrv_sGetExtStatus xdata;
+  stssrv_sRespondExtStatus xdata;
   int syssts_open;
   char node_descr[80];
 

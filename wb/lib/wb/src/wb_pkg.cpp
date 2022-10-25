@@ -65,7 +65,7 @@ wb_pkg::wb_pkg(char* nodelist, bool distribute, bool config_only, bool check,
     int* new_files)
 {
   if (nodelist) {
-    char node_str[32][20];
+    char node_str[32][80];
     int num;
 
     str_ToLower(nodelist, nodelist);
