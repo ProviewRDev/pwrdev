@@ -141,7 +141,8 @@ int PalItemClassVolume::open(Pal* pal, double x, double y)
         if (EVEN(sts))
           return sts;
 
-        if (!(*flags & pwr_mClassDef_Internal))
+        if (!(*flags & pwr_mClassDef_Internal || *flags & pwr_mClassDef_Plc ||
+	      *flags & pwr_mClassDef_Obsolete))
           sts = pal->create_item(
               child, node, flow_eDest_IntoLast, (void**)&item, 0);
         free(flags);
@@ -470,7 +471,8 @@ int PalItemClassMenu::open(Pal* pal, double x, double y)
         if (EVEN(sts))
           return sts;
 
-        if (!(*flags & pwr_mClassDef_Internal))
+        if (!(*flags & pwr_mClassDef_Internal || *flags & pwr_mClassDef_Plc ||
+	      *flags & pwr_mClassDef_Obsolete))
           sts = pal->create_item(
               child, node, flow_eDest_IntoLast, (void**)&item, 0);
         free(flags);
