@@ -33,7 +33,7 @@
 !  combined work), being distributed under the terms of the GNU 
 !  General Public License plus this exception.
 !
-!  pwrb_c_volumereg.wb_load -- Defines the class VolumeReg.
+!  pwrb_c_userreg.wb_load -- Defines the class UserReg.
 !
 SObject pwrb:Class
   Object UserReg $ClassDef 429

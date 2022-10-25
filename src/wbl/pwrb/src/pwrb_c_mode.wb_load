@@ -68,9 +68,10 @@ SObject pwrb:Class
 !*/
   Object Mode $ClassDef 147 
     Body SysBody
-       Attr Editor = pwr_eEditor_PlcEd
-       Attr Method = pwr_eMethod_Connections
-       Attr PopEditor = pwr_ePopEditor_GMS
+      Attr Editor = pwr_eEditor_PlcEd
+      Attr Method = pwr_eMethod_Connections
+      Attr PopEditor = pwr_ePopEditor_GMS
+      Attr Flags |= pwr_mClassDef_Plc
     EndBody
     Object RtBody $ObjBodyDef 1 
       Body SysBody

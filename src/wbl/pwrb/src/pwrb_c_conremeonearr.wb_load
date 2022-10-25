@@ -39,6 +39,7 @@ SObject pwrb:Class
   Object ConReMeOneArr $ClassDef 61 
     Body SysBody
       Attr Flags |= pwr_mClassDef_DevOnly
+      Attr Flags |= pwr_mClassDef_Plc
     EndBody
     Object DevBody $ObjBodyDef 2 
       Object PlcConnection $Buffer 1 

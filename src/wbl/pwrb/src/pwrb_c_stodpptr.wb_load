@@ -50,6 +50,7 @@ SObject pwrb:Class
   Object StoDpPtr $ClassDef 513
     Body SysBody
       Attr Editor = pwr_eEditor_AttrEd
+      Attr Flags |= pwr_mClassDef_Plc
     EndBody
     Object RtBody $ObjBodyDef 1 
       Body SysBody

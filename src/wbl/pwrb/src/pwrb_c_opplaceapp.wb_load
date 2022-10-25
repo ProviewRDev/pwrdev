@@ -61,6 +61,7 @@ SObject pwrb:Class
 !*/
   Object OpPlaceApp $ClassDef 683 
     Body SysBody
+      Attr Flags |= pwr_mClassDef_Obsolete
       Attr Editor = pwr_eEditor_AttrEd
       Attr Method = pwr_eMethod_Standard
       Attr PopEditor = 1

@@ -39,6 +39,7 @@ SObject pwrb:Class
 !/**
 !  @Version 1.0
 !  @Group Operator,NodeConfiguration
+!  <h2>Obsolete since V3.4
 !  Configures an event printer for transcription of alarm
 !  respectively info messages.
 !  
@@ -49,6 +50,7 @@ SObject pwrb:Class
 !*/
   Object EventPrinter $ClassDef 115 
     Body SysBody
+      Attr Flags |= pwr_mClassDef_Obsolete
       Attr Editor = pwr_eEditor_AttrEd
       Attr Method = pwr_eMethod_Standard
     EndBody

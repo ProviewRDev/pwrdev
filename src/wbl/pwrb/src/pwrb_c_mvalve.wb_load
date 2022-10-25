@@ -96,9 +96,10 @@ SObject pwrb:Class
 !*/
   Object MValve $ClassDef 159 
     Body SysBody
-       Attr Editor = pwr_eEditor_PlcEd
-       Attr Method = pwr_eMethod_Connections
-       Attr PopEditor = 1
+      Attr Editor = pwr_eEditor_PlcEd
+      Attr Method = pwr_eMethod_Connections
+      Attr PopEditor = 1
+      Attr Flags |= pwr_mClassDef_Plc
     EndBody
     Object RtBody $ObjBodyDef 1 
       Body SysBody

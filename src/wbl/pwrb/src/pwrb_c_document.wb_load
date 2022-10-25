@@ -75,6 +75,7 @@ SObject pwrb:Class
   Object Document $ClassDef 94 
     Body SysBody
       Attr Flags |= pwr_mClassDef_DevOnly
+      Attr Flags |= pwr_mClassDef_Plc
       Attr Editor = pwr_eEditor_AttrEd
       Attr Method = pwr_eMethod_DrawingInfo
     EndBody

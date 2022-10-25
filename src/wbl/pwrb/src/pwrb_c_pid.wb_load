@@ -327,6 +327,7 @@ SObject         pwrb:Class
       Attr Editor = pwr_eEditor_PlcEd
       Attr Method = pwr_eMethod_Connections
       Attr PopEditor = pwr_ePopEditor_GMS
+      Attr Flags |= pwr_mClassDef_Plc
     EndBody
     Object RtBody $ObjBodyDef 1 
       Body SysBody

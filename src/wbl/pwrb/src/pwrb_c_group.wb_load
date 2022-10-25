@@ -41,6 +41,7 @@ SObject pwrb:Class
 !*/
   Object Group $ClassDef 133 
     Body SysBody
+      Attr Flags |= pwr_mClassDef_Obsolete
       Attr Editor = pwr_eEditor_AttrEd
       Attr Method = pwr_eMethod_Standard
     EndBody

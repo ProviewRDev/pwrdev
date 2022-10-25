@@ -38,6 +38,7 @@
 SObject pwrb:Class
   Object OpApplMsg $ClassDef 163 
     Body SysBody
+      Attr Flags |= pwr_mClassDef_Obsolete
       Attr Editor = pwr_eEditor_AttrEd
       Attr Method = pwr_eMethod_Standard
     EndBody

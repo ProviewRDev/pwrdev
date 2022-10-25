@@ -38,6 +38,7 @@
 SObject pwrb:Class
 !/**
 !  @Version 1.0
+!  <h2>Obsolete since V3.4
 !  Configures a queue assigned to receive Package Handler
 !  messages.
 !  
@@ -54,6 +55,7 @@ SObject pwrb:Class
 !*/
   Object Queue $ClassDef 185 
     Body SysBody
+      Attr Flags |= pwr_mClassDef_Obsolete
       Attr Editor = pwr_eEditor_AttrEd
       Attr Method = pwr_eMethod_Standard
     EndBody
