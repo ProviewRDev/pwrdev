@@ -162,7 +162,7 @@ Ubuntu
 
 <h1>System requirements
 
-Ubuntu version: 20.04 LTS
+Ubuntu version: 22.04 LTS
 Architecture: amd64
 
 <h1> Development environment pwr60
@@ -268,7 +268,7 @@ desktop icon, or from a terminal window with
 Raspberry Pi OS
 <h1>System requirements
 
-Raspberry Pi OS version: Debian 10 (Buster)
+Raspberry Pi OS version: Debian 11 (Bullseye)
 Architecture: armhf
 
 <h1> Development environment pwr60
