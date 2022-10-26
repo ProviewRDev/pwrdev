@@ -487,6 +487,18 @@ int XNav::attr_string_to_value(int type_id, char* value_str, void* buffer_ptr,
     }
     break;
   }
+  case xnav_eType_NetTime: {
+    pwr_tTime	time;
+    net_sTime   ntime;
+
+    sts = time_AsciiToA( value_str, &time);
+    if (EVEN(sts)) return XNAV__INPUT_SYNTAX;
+
+    ntime.tv_sec = time.tv_sec;
+    ntime.tv_nsec = time.tv_nsec;
+    memcpy( buffer_ptr, (char *) &ntime, sizeof(ntime));
+    break;
+  }
   }
   return 1;
 }
