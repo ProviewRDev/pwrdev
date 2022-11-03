@@ -435,6 +435,7 @@ typedef enum {
   ge_eSave_Invisible_dimmed = 901,
   ge_eSave_Invisible_instance = 902,
   ge_eSave_Invisible_instance_mask = 903,
+  ge_eSave_Invisible_dim_level = 904,
   ge_eSave_DigBorder_attribute = 1000,
   ge_eSave_DigBorder_color = 1001,
   ge_eSave_DigText_attribute = 1100,
@@ -1432,6 +1433,7 @@ class GeInvisible : public GeDynElem {
 public:
   pwr_tAName attribute; //!< Database reference for digital attribute.
   int dimmed; //!< Object is dimmed (not invisible)
+  double dim_level; //!< Transparency  for dimmed object
 
   pwr_tBoolean* p;
   pwr_tSubid subid;
