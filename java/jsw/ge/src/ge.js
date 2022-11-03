@@ -320,6 +320,7 @@ var DynC = {
   eSave_Invisible_dimmed     		: 901,
   eSave_Invisible_instance   		: 902,
   eSave_Invisible_instance_mask 	: 903,
+  eSave_Invisible_dim_level           	: 904,
   eSave_DigBorder_attribute  		: 1000,
   eSave_DigBorder_color      		: 1001,
   eSave_DigText_attribute    		: 1100,
@@ -3276,6 +3277,7 @@ function DynInvisible( dyn, instance) {
   this.a;
   this.attribute = null;
   this.dimmed = 0;
+  this.dim_level = 0;
   this.firstScan = true;
   this.cmd;
   this.command;
@@ -3288,19 +3290,24 @@ function DynInvisible( dyn, instance) {
     }
     var inst = this.dyn.instance_number(this.instance);
     var iname;
-    var inames = new Array(2);
+    var inames = new Array(3);
     if (inst == 1)
       iname = "Invisible";
     else
       iname = "Invisible" + inst.toString();
     inames[0] = iname + ".Attribute";
     inames[1] = iname + ".Dimmed";
+    inames[2] = iname + ".DimLevel";
     if (name === inames[0]) {
       this.attribute =  value;
       return 1;
     }
     else if (name === inames[1]) {
       this.dimmed =  value;
+      return 1;
+    }
+    else if (name === inames[2]) {
+      this.dim_level =  value;
       return 1;
     }
     return 0;
@@ -3314,13 +3321,14 @@ function DynInvisible( dyn, instance) {
     }
     var inst = this.dyn.instance_number(this.instance);
     var iname;
-    var inames = new Array(2);
+    var inames = new Array(3);
     if (inst == 1)
       iname = "Invisible";
     else
       iname = "Invisible" + inst.toString();
     inames[0] = iname + ".Attribute";
     inames[1] = iname + ".Dimmed";
+    inames[2] = iname + ".DimLevel";
     if (name === inames[0]) {
       ret.value = this.attribute;
       ret.decl = CcmC.K_DECL_STRING;
@@ -3329,6 +3337,11 @@ function DynInvisible( dyn, instance) {
     else if (name === inames[1]) {
       ret.value = this.dimmed;
       ret.decl = CcmC.K_DECL_INT;
+      return ret;
+    }
+    else if (name === inames[2]) {
+      ret.value = this.dim_level;
+      ret.decl = CcmC.K_DECL_FLOAT;
       return ret;
     }
     ret.sts = 0;
@@ -3403,8 +3416,11 @@ function DynInvisible( dyn, instance) {
     if ( value) {
       if ( this.dimmed === 0)
 	o.setVisibility( Glow.eVis_Invisible);
-      else
+      else {
 	o.setVisibility( Glow.eVis_Dimmed);
+	if (this.dim_level !== 0)
+	  o.setTransparency(this.dim_level);
+      }
       this.dyn.ignoreColor = true;
       this.dyn.ignoreInvisible = true;
     }
@@ -3412,6 +3428,8 @@ function DynInvisible( dyn, instance) {
       o.setVisibility( Glow.eVis_Visible);
       this.dyn.resetColor = true;
       this.dyn.resetInvisible = true;
+      if (this.dim_level !== 0)
+	o.setTransparency(0);
     }
     this.dyn.repaintNow = true;
     this.a.oldValue = value;
@@ -3439,6 +3457,9 @@ function DynInvisible( dyn, instance) {
 	break;
       case DynC.eSave_Invisible_dimmed: 
 	this.dimmed = parseInt(tokens[1], 10);
+	break;
+      case DynC.eSave_Invisible_dim_level: 
+	this.dim_level = parseFloat(tokens[1]);
 	break;
       case DynC.eSave_Invisible_instance: 
 	this.instance = parseInt(tokens[1], 10);
