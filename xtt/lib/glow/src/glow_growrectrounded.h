@@ -322,6 +322,7 @@ public:
   int disable_gradient; //!< Disable gradient, even if parent node has gradient.
   int fixposition; //!< Can't be moved.
   double transparency; //!< Border and fill color transparency.
+  int thin_shadow; //!< Shadow drawn with lines.
 
   //! Set user data.
   /*!

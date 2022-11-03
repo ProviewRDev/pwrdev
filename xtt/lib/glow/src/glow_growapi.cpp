@@ -1426,6 +1426,11 @@ int grow_GetObjectAttrInfo(
     attrinfo[i].maxlimit = 3;
     attrinfo[i++].size = sizeof(op->shadow_contrast);
 
+    strcpy(attrinfo[i].name, "thin_shadow");
+    attrinfo[i].value_p = &op->thin_shadow;
+    attrinfo[i].type = glow_eType_Boolean;
+    attrinfo[i++].size = sizeof(op->thin_shadow);
+
     strcpy(attrinfo[i].name, "relief");
     attrinfo[i].value_p = &op->relief;
     attrinfo[i].type = glow_eType_Relief;

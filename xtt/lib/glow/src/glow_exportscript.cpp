@@ -410,6 +410,8 @@ int GlowExportScript::rectrounded(GrowRectRounded* o)
     fp << "  SetObjectAttribute(id,\"gradient\"," << (int)o->gradient << ");" << '\n';
   if (!feq(o->transparency, 0.0))
     fp << "  SetObjectAttribute(id,\"transparency\"," << o->transparency << ");" << '\n';
+  if (!feq(o->transparency, 0.0))
+    fp << "  SetObjectAttribute(id,\"thin_shadow\"," << o->thin_shadow << ");" << '\n';
   if (o->disable_shadow != 0)
     fp << "  SetObjectAttribute(id,\"disable_shadow\"," << o->disable_shadow << ");" << '\n';
   if (o->disable_gradient != 0)
