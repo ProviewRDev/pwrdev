@@ -275,7 +275,7 @@ dcli_tCmdTable xnav_command_table[] = {
           "/CASE_SENSITIVE", "/WINDOW", "" } },
   { "SET", &xnav_set_func,
       { "dcli_arg1", "dcli_arg2", "/NAME", "/VALUE", "/BYPASS", "/PUBLICWRITE",
-          "/INDEX", "/SOURCE", "/OBJECT", "/CONTINUE", "/X0", "/Y0", "/X1",
+	"/INDEX", "/NEXT", "/SOURCE", "/OBJECT", "/CONTINUE", "/X0", "/Y0", "/X1",
           "/Y1", "/INSTANCE", "/ESCAPESTORE", "/FOCUS", "/INPUTEMPTY",
           "/ICONIFY", "/BELOW", "/ON", "/OFF", "" } },
   { "SETUP", &xnav_setup_func,
@@ -1017,15 +1017,22 @@ static int xnav_set_func(void* client_data, void* client_flag)
     int num;
     ApplListElem* elem;
 
-    if (EVEN(dcli_get_qualifier("/INDEX", idx_str, sizeof(idx_str)))) {
-      xnav->message('E', "Type syntax error");
-      return XNAV__HOLDCOMMAND;
+    if (ODD(dcli_get_qualifier("/NEXT", 0, 0))) {
+      idx = xnav->gbl.color_theme + 1;
+      if (idx > 16)
+	idx = 1;
     }
+    else {
+      if (EVEN(dcli_get_qualifier("/INDEX", idx_str, sizeof(idx_str)))) {
+	xnav->message('E', "Type syntax error");
+	return XNAV__HOLDCOMMAND;
+      }
 
-    num = sscanf(idx_str, "%d", &idx);
-    if (num != 1) {
-      xnav->message('E', "Type syntax error");
-      return XNAV__HOLDCOMMAND;
+      num = sscanf(idx_str, "%d", &idx);
+      if (num != 1) {
+	xnav->message('E', "Type syntax error");
+	return XNAV__HOLDCOMMAND;
+      }
     }
 
     idx = CoWow::SetColorTheme(idx);
