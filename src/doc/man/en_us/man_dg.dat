@@ -3502,7 +3502,11 @@ the server node, eg
 
 In the RemTrans object, Address[0] and Address[1] is used to address a sent message to the corresponding 
 RemTrans in the target node. Address[3] states the message delivery mode where 2 is persistent and other
-values not persistent.
+values not persistent. Address[2] is an option bitmask where bit 1 is KeepAll and bit 2 MsgOrder.
+
+KeepAll means that messages are requeued if the remtrans is occupied. By default they are discarded.
+If there are several remtrans objects on the same queue, the order for requeued messages might be changed 
+unless the MsgOrder bit is set. MsgOrder will set the prefetch count to 1.
 
 If a message should be recovered after a server failure, Durable should be set in the RemoteRabbitMQ
 object, and delivery mode in RemTrans.Address[3] should be set to 2 (persistent).
@@ -10223,6 +10227,7 @@ Global variables can also be deletet with the deletegbl statement.
 <c>int             i;
 <c>float           flow = 33.4;
 <c>string          str = "Hello";
+<c>float           width[5] = (1.20, 2.44, 4.81, 7.77, 9.20);
 <c>extern int      jakob[20];
 <c>global float    ferdinand = 1234;
 <c>...

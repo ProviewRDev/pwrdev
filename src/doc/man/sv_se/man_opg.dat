@@ -2810,6 +2810,7 @@ En extern variabel bör tas bort (med delete) när den inte längre används.
 <c>int             i;
 <c>float           flow = 33.4;
 <c>string          str = "Hello";
+<c>float           width[5] = (1.20, 2.44, 4.81, 7.77, 9.20);
 <c>extern int      jakob[20];
 <c>string          simon[];
 <c>global float	   ferdinand = 1234;
