@@ -891,7 +891,7 @@ pwr_tStatus time_AtoAscii(
 
   time_t sec = tp->tv_sec;
   tmpTm = localtime(&sec);
-  if (EVEN(time_TmToAscii(tmpTm, format, buf, bufsize)))
+  if (!tmpTm || EVEN(time_TmToAscii(tmpTm, format, buf, bufsize)))
     return TIME__RANGE;
 
   buflen = strlen(buf);
