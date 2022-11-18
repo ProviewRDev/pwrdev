@@ -1102,6 +1102,8 @@ palette PlcEditorPalette
       class Float64ToA	
       class Gray
       class Int64toI
+      class ISwap16
+      class ISwap32
       class ItoA
       class ItoInt64
       class ItoStr
