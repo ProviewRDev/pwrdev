@@ -44,6 +44,7 @@
 #include "wb_merep.h"
 #include "wb_volume.h"
 #include "wb_vrepmem.h"
+#include "wb_wsx.h"
 
 wb_volume::wb_volume() : wb_status(LDH__NOSUCHVOL), m_vrep(0)
 {
@@ -568,6 +569,11 @@ pwr_tStatus wb_volume::syntaxCheckObject(
   pwr_tStatus sts, csts;
   wb_object first, after;
   wb_attribute a(o.sts(), o);
+  if (!a) {
+    wsx_error_msg_object((ldh_tSesContext)this, a.sts(), o.oid(), errorcount,
+        warningcount);
+    return a.sts();
+  }
 
   sts = triggSyntaxCheck(a, errorcount, warningcount);
   if (EVEN(sts))
