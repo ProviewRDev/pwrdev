@@ -1008,7 +1008,7 @@ int sev_dbms::create_table(pwr_tStatus* sts, char* tablename, pwr_eType type,
     strcpy(readoptstr, "");
 
   sprintf(query, "create table %s ( %s"
-                 "%s, value %s not null%s)%s;",
+                 "%s, value %s not null%s)%s character set \'latin1\';",
       tablename, readoptstr, timeformatstr, pwrtype_to_type(type, size),
 	  timeindexstr, enginestr);
 
