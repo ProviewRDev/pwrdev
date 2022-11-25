@@ -1117,8 +1117,8 @@ int GrowWindow::set_source(char* source, char* new_owner)
   return sts;
 }
 
-int GrowWindow::export_script(GlowExportScript* es)
+int GrowWindow::export_script(GlowExportScript* es, void* o, void* m)
 {
-  return es->window(this);
+  return es->window(this, o, m);
 }
 

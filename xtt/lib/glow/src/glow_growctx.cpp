@@ -67,6 +67,7 @@
 #include "glow_exportflow.h"
 #include "glow_exportscript.h"
 #include "glow_dashboard.h"
+#include "glow_growscriptmodule.h"
 
 #include "glow_msg.h"
 
@@ -100,7 +101,7 @@ GrowCtx::GrowCtx(const char* ctx_name, double zoom_fact)
       mb3_action(glow_eMB3Action_PopupMenu), scale_equal(0), translate_on(0),
       input_focus_mark(glow_eInputFocusMark_Relief), background_disabled(0),
       redraw_callback(0), redraw_data(0), has_subwindows(-1), is_subwindow(0),
-      anti_aliasing(0), environment(glow_eEnv_Runtime),
+      anti_aliasing(0), window_resize(0), environment(glow_eEnv_Runtime),
       text_coding(glow_eTextCoding_ISO8859_1), recursive_trace(0),
       edit_set_mode(glow_eEditSetMode_None), dashboard(0), dash(0), 
       dash_cell_width(8), dash_cell_height(6), disable_subw_events(0)
@@ -2038,6 +2039,7 @@ void GrowCtx::save_grow(std::ofstream& fp, glow_eSaveMode mode)
   fp << int(glow_eSave_GrowCtx_recursive_trace) << FSPACE << recursive_trace
      << '\n';
   fp << int(glow_eSave_GrowCtx_anti_aliasing) << FSPACE << anti_aliasing << '\n';
+  fp << int(glow_eSave_GrowCtx_window_resize) << FSPACE << window_resize << '\n';
   fp << int(glow_eSave_GrowCtx_customcolors) << '\n';
   if (customcolors)
     customcolors->save(fp, mode);
@@ -2305,6 +2307,9 @@ void GrowCtx::open_grow(std::ifstream& fp)
       break;
     case glow_eSave_GrowCtx_anti_aliasing:
       fp >> anti_aliasing;
+      break;
+    case glow_eSave_GrowCtx_window_resize:
+      fp >> window_resize;
       break;
     case glow_eSave_GrowCtx_customcolors:
       if (!customcolors)
@@ -4578,6 +4583,10 @@ void GrowCtx::read_object(std::ifstream& fp, GlowArrayElem** o)
   }
   case glow_eSave_GrowDashCell: {
     n = new GrowDashCell(this, "");
+    break;
+  }
+  case glow_eSave_GrowScriptModule: {
+    n = new GrowScriptModule(this, "");
     break;
   }
   case glow_eSave_End:

@@ -733,7 +733,7 @@ public:
     return fill_drawtype;
   }
 
-  int export_script(GlowExportScript* es);
+  int export_script(GlowExportScript* es, void* o, void* m);
 
   glow_eDrawType get_border_color()
   {

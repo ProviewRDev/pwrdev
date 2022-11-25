@@ -56,37 +56,56 @@ class GrowImage;
 class GrowGroup;
 class GrowWindow;
 class GrowToolbar;
+class GrowScriptModule;
 
 class GlowExportScript {
 public:
   GlowExportScript(GrowCtx* glow_ctx) : ctx(glow_ctx)
   {
+    strcpy(ind,"");
+    strcpy(cind, "# ");
   }
   int export_script(char* filename,
 		    int (*userdata_cb)(void*, void*, std::ofstream&, char*));
-  int array(GlowArray* o);
-  int rect(GrowRect* o);
-  int rectrounded(GrowRectRounded* o);
-  int line(GrowLine* o);
-  int polyline(GrowPolyLine* o);
-  int conpoint(GrowConPoint* o);
-  int text(GrowText* o);
-  int annot(GrowSubAnnot* o);
-  int arc(GrowArc* o);
-  int node(GrowNode* o);
-  int bar(GrowBar* o);
-  int trend(GrowTrend* o);
-  int pie(GrowPie* o);
-  int axis(GrowAxis* o);
+  int array(GlowArray* o, void* e, void* m);
+  int rect(GrowRect* o, void* e, void* m);
+  int rectrounded(GrowRectRounded* o, void* e, void* m);
+  int line(GrowLine* o, void* e, void* m);
+  int polyline(GrowPolyLine* o, void* e, void* m);
+  int conpoint(GrowConPoint* o, void* e, void* m);
+  int text(GrowText* o, void* e, void* m);
+  int annot(GrowSubAnnot* o, void* e, void* m);
+  int arc(GrowArc* o, void* e, void* m);
+  int node(GrowNode* o, void* e, void* m);
+  int bar(GrowBar* o, void* e, void* m);
+  int trend(GrowTrend* o, void* e, void* m);
+  int pie(GrowPie* o, void* e, void* m);
+  int axis(GrowAxis* o, void* e, void* m);
   int point(GlowPoint* o, GlowTransform* trf);
-  int image(GrowImage* o);
-  int group(GrowGroup* o);
-  int toolbar(GrowToolbar* o);
-  int window(GrowWindow* o);
+  int image(GrowImage* o, void* e, void* m);
+  int group(GrowGroup* o, void* e, void* m);
+  int toolbar(GrowToolbar* o, void* e, void* m);
+  int window(GrowWindow* o, void* e, void* m);
+  int scriptmodule(GrowScriptModule* o, void* e, void* m);
+  GrowScriptModule* get_scriptmodule(GlowArrayElem *o, double *x, double *y);
+  int scriptmodule_count();
+  void ind_incr() {
+    if (strlen(ind) > 1)
+      strcat(cind, "  ");
+    strcat(ind, "  ");
+  }
+  void ind_decr() {
+    if (strlen(ind) >= 4)
+      cind[strlen(ind) - 2] = 0;
+    if (strlen(ind) >= 2)
+      ind[strlen(ind) - 2] = 0;
+  }
 
   std::ofstream fp;
   GrowCtx* ctx;
   int (*userdata_script_cb)(void*, void*, std::ofstream&, char*);
+  char ind[80];
+  char cind[80];
 };
 
 #endif

@@ -302,7 +302,7 @@ public:
     return 0;
   }
   virtual void export_flow(GlowExportFlow* ef){}
-  virtual int export_script(GlowExportScript* es)
+  virtual int export_script(GlowExportScript* es, void* o, void* m)
   {
     return 0;
   }

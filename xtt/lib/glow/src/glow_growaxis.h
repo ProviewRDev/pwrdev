@@ -281,7 +281,7 @@ public:
 
   glow_eVis get_visibility();
   void set_visibility(glow_eVis visibility);
-  int export_script(GlowExportScript* es);
+  int export_script(GlowExportScript* es, void* o, void* m);
 };
 
 /*@}*/

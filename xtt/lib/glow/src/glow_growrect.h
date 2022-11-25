@@ -678,7 +678,7 @@ public:
   void convert(glow_eConvert version);
 
   void export_flow(GlowExportFlow* ef);
-  int export_script(GlowExportScript* es);
+  int export_script(GlowExportScript* es, void* o, void* m);
 
   int get_fill()
   {

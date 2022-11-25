@@ -2034,7 +2034,7 @@ void GrowNode::set_colortheme_lightness()
   }
 }
 
-int GrowNode::export_script(GlowExportScript* es)
+int GrowNode::export_script(GlowExportScript* es, void* o, void* m)
 {
-  return es->node(this);
+  return es->node(this, o, m);
 }

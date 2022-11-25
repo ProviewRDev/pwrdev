@@ -302,7 +302,7 @@ public:
       glow_eDirection* direction);
   void set_input_focus(int focus, glow_eEvent event);
   int set_source(char* source, char* new_owner);
-  int export_script(GlowExportScript* es);
+  int export_script(GlowExportScript* es, void* o, void* m);
 
   static void v_value_changed_cb(void* o, double value);
   static void h_value_changed_cb(void* o, double value);

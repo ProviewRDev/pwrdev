@@ -566,9 +566,9 @@ void GrowBar::get_bar_info(glow_sBarInfo* info)
   info->bar_borderwidth = bar_borderwidth;
 }
 
-int GrowBar::export_script(GlowExportScript* es)
+int GrowBar::export_script(GlowExportScript* es, void* o, void* m)
 {
-  return es->bar(this);
+  return es->bar(this, o, m);
 }
 
 void GrowBar::convert(glow_eConvert version)

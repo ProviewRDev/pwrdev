@@ -1170,9 +1170,9 @@ void GrowRectRounded::flip(double x0, double y0, glow_eFlipDirection dir)
   }
 }
 
-int GrowRectRounded::export_script(GlowExportScript* es)
+int GrowRectRounded::export_script(GlowExportScript* es, void* o, void* m)
 {
-  return es->rectrounded(this);
+  return es->rectrounded(this, o, m);
 }
 
 void GrowRectRounded::convert(glow_eConvert version)

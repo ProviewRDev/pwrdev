@@ -1013,7 +1013,7 @@ void GrowAxis::set_visibility(glow_eVis visibility)
   draw();
 }
 
-int GrowAxis::export_script(GlowExportScript* es)
+int GrowAxis::export_script(GlowExportScript* es, void* o, void* m)
 {
-  return es->axis(this);
+  return es->axis(this, o, m);
 }

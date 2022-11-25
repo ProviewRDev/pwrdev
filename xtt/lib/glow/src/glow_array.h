@@ -255,7 +255,7 @@ public:
   void set_rootnode(void* node);
   void set_linetype(glow_eLineType type);
   void export_flow(GlowExportFlow* ef);
-  int export_script(GlowExportScript* es);
+  int export_script(GlowExportScript* es, void* o, void* m);
 
   friend class GlowNodeClass;
   friend class GlowCtx;

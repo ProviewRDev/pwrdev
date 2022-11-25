@@ -801,7 +801,7 @@ void GrowLine::export_flow(GlowExportFlow* ef)
 {
   ef->line(this);
 }
-int GrowLine::export_script(GlowExportScript* es)
+int GrowLine::export_script(GlowExportScript* es, void* o, void* m)
 {
-  return es->line(this);
+  return es->line(this, o, m);
 }

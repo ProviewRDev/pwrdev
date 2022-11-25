@@ -36,6 +36,7 @@
 
 #include "co_cdh.h"
 #include "co_string.h"
+#include "co_cnf.h"
 #include "co_msg.h"
 
 #include "rt_gdh_msg.h"
@@ -602,8 +603,16 @@ XttGe::XttGe(void* xg_parent_ctx, const char* xg_name, const char* xg_filename,
       width(xg_width), height(xg_height), options(xg_options), 
       color_theme(xg_color_theme), default_fill_color(glow_eDrawType_Line),
       default_border_color(glow_eDrawType_Line), default_text_color(glow_eDrawType_Line),
-      wow(0)
+      resize_restrictions_set(0), window_resize_delta(0.01), wow(0)
 {
+  char value_str[40];
+
   strcpy(filename, xg_filename);
   strcpy(name, xg_name);
+  if (cnf_get_value("graphWindowResizeDelta", value_str, sizeof(value_str))) {
+    float value;
+    int nr = sscanf(value_str, "%f", &value);
+    if (nr == 1)
+      window_resize_delta = value;
+  }
 }

@@ -1415,6 +1415,18 @@ static int graph_set_func(void* client_data, void* client_flag)
       graph->message('E', "No such mode");
       return GE__SYNTAX;
     }
+  } else if (str_NoCaseStrncmp(arg1_str, "MODE", strlen(arg1_str)) == 0) {
+    char arg2_str[80];
+
+    if (EVEN(dcli_get_qualifier("dcli_arg2", arg2_str, sizeof(arg2_str)))) {
+      graph->message('E', "Syntax error");
+      return GE__SYNTAX;
+    }
+    if (str_NoCaseStrncmp(arg2_str, "SCRIPTMODULE", strlen(arg1_str)) == 0) {
+      graph->mode_scriptmodule = 1;
+    } else if (str_NoCaseStrncmp(arg1_str, "NOSCRIPTMODULE", strlen(arg1_str)) == 0) {
+      graph->mode_scriptmodule = 0;
+    }
   } else {
     graph->message('E', "Syntax error");
     return GE__SYNTAX;

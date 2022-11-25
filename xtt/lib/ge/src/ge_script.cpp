@@ -51,6 +51,7 @@
 #include "ge_script.h"
 #include "ge_dyn.h"
 #include "ge_methods.h"
+#include "ge_graph_layout.h"
 #include "ge_msg.h"
 
 #include "rt_gdh.h"
@@ -4555,6 +4556,36 @@ static int graph_getwindowsize_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
+static int graph_getwindowdimension_func(void* filectx, ccm_sArg* arg_list,
+    int arg_count, int* return_decl, ccm_tFloat* return_float,
+    ccm_tInt* return_int, char* return_string)
+{
+  Graph* graph;
+  ccm_sArg* arg_p2;
+  int width, height;
+  grow_sAttributes attr;
+
+  if (arg_count !=  2)
+    return CCM__ARGMISM;
+
+  arg_p2 = arg_list->next;
+  if (arg_list->value_decl != CCM_DECL_FLOAT)
+    return CCM__ARGMISM;
+  if (arg_p2->value_decl != CCM_DECL_FLOAT)
+    return CCM__ARGMISM;
+
+  graph_get_stored_graph(&graph);
+
+  grow_GetWindowSize(graph->grow->ctx, &width, &height);
+  grow_GetAttributes(graph->grow->ctx, &attr, grow_eAttr_base_zoom_factor);
+  arg_list->value_float = width / attr.base_zoom_factor;
+  arg_list->value_returned = 1;
+  arg_p2->value_float = height / attr.base_zoom_factor;
+  arg_p2->value_returned = 1;
+
+  return 1;
+}
+
 static int graph_getui_env_func(void* filectx, ccm_sArg* arg_list,
     int arg_count, int* return_decl, ccm_tFloat* return_float,
     ccm_tInt* return_int, char* return_string)
@@ -4718,6 +4749,200 @@ static int graph_setdefaulttextcolor_func(void* filectx, ccm_sArg* arg_list,
     graph->set_current_colors_cb(graph->parent_ctx, fill_color, border_color, text_color);
   }
 
+  return 1;
+}
+
+static int graph_layout_func(void* filectx, ccm_sArg* arg_list,
+    int arg_count, int* return_decl, ccm_tFloat* return_float,
+    ccm_tInt* return_int, char* return_string)
+{
+  ccm_sArg* arg_p2; // Window height
+  ccm_sArg* arg_p3; // Prio array
+  ccm_sArg* arg_p4; // Top neighbour array
+  ccm_sArg* arg_p5; // Down neighbour array
+  ccm_sArg* arg_p6; // Left neighbour array
+  ccm_sArg* arg_p7; // Right neighbour array
+  ccm_sArg* arg_p8; // Preferred width
+  ccm_sArg* arg_p9; // Preferred height
+  ccm_sArg* arg_p10; // Fix width
+  ccm_sArg* arg_p11; // Fix height
+  ccm_sArg* arg_p12; // Calculated x coordinate
+  ccm_sArg* arg_p13; // Calculated y coordinate
+  ccm_sArg* arg_p14; // Calculated width
+  ccm_sArg* arg_p15; // Calculated height
+  //Graph* graph;
+  int decl, array, elements;
+  ccm_tInt *valp3;
+  ccm_tInt *valp4;
+  ccm_tInt *valp5;
+  ccm_tInt *valp6;
+  ccm_tInt *valp7;
+  ccm_tFloat *valp8;
+  ccm_tFloat *valp9;
+  ccm_tInt *valp10;
+  ccm_tInt *valp11;
+  ccm_tFloat *valp12;
+  ccm_tFloat *valp13;
+  ccm_tFloat *valp14;
+  ccm_tFloat *valp15;
+  pwr_tStatus sts;
+  float wwidth, wheight;
+  Graph* graph;
+
+  arg_p2 = arg_list->next;
+  arg_p3 = arg_p2->next;
+  arg_p4 = arg_p3->next;
+  arg_p5 = arg_p4->next;
+  arg_p6 = arg_p5->next;
+  arg_p7 = arg_p6->next;
+  arg_p8 = arg_p7->next;
+  arg_p9 = arg_p8->next;
+  arg_p10 = arg_p9->next;
+  arg_p11 = arg_p10->next;
+  arg_p12 = arg_p11->next;
+  arg_p13 = arg_p12->next;
+  arg_p14 = arg_p13->next;
+  arg_p15 = arg_p14->next;
+
+  if (arg_list->value_decl != CCM_DECL_FLOAT)
+    return CCM__ARGMISM;
+  if (arg_p2->value_decl != CCM_DECL_FLOAT)
+    return CCM__ARGMISM;
+  if (arg_p3->value_decl != CCM_DECL_INT)
+    return CCM__ARGMISM;
+  if (arg_p4->value_decl != CCM_DECL_INT)
+    return CCM__ARGMISM;
+  if (arg_p5->value_decl != CCM_DECL_INT)
+    return CCM__ARGMISM;
+  if (arg_p6->value_decl != CCM_DECL_INT)
+    return CCM__ARGMISM;
+  if (arg_p7->value_decl != CCM_DECL_INT)
+    return CCM__ARGMISM;
+  if (arg_p8->value_decl != CCM_DECL_FLOAT)
+    return CCM__ARGMISM;
+  if (arg_p9->value_decl != CCM_DECL_FLOAT)
+    return CCM__ARGMISM;
+  if (arg_p10->value_decl != CCM_DECL_INT)
+    return CCM__ARGMISM;
+  if (arg_p11->value_decl != CCM_DECL_INT)
+    return CCM__ARGMISM;
+  if (arg_p12->value_decl != CCM_DECL_FLOAT)
+    return CCM__ARGMISM;
+  if (arg_p13->value_decl != CCM_DECL_FLOAT)
+    return CCM__ARGMISM;
+  if (arg_p14->value_decl != CCM_DECL_FLOAT)
+    return CCM__ARGMISM;
+  if (arg_p15->value_decl != CCM_DECL_FLOAT)
+    return CCM__ARGMISM;
+
+  graph_get_stored_graph(&graph);
+
+  sts = ccm_ref_var((ccm_tFuncCtx)((ccm_tFileCtx)filectx)->funcctx, arg_p3->value_name, 
+      (void **)&valp3, &decl, &array, &elements);
+  if (EVEN(sts))
+    return sts;
+  if (decl != CCM_DECL_INT || !array)
+    return CCM__ARGMISM;
+  sts = ccm_ref_var((ccm_tFuncCtx)((ccm_tFileCtx)filectx)->funcctx, arg_p4->value_name, 
+      (void **)&valp4, &decl, &array, &elements);
+  if (EVEN(sts))
+    return sts;
+  if (decl != CCM_DECL_INT || !array)
+    return CCM__ARGMISM;
+  sts = ccm_ref_var((ccm_tFuncCtx)((ccm_tFileCtx)filectx)->funcctx, arg_p5->value_name, 
+      (void **)&valp5, &decl, &array, &elements);
+  if (EVEN(sts))
+    return sts;
+  if (decl != CCM_DECL_INT || !array)
+    return CCM__ARGMISM;
+  sts = ccm_ref_var((ccm_tFuncCtx)((ccm_tFileCtx)filectx)->funcctx, arg_p6->value_name, 
+      (void **)&valp6, &decl, &array, &elements);
+  if (EVEN(sts))
+    return sts;
+  if (decl != CCM_DECL_INT || !array)
+    return CCM__ARGMISM;
+  sts = ccm_ref_var((ccm_tFuncCtx)((ccm_tFileCtx)filectx)->funcctx, arg_p7->value_name, 
+      (void **)&valp7, &decl, &array, &elements);
+  if (EVEN(sts))
+    return sts;
+  if (decl != CCM_DECL_INT || !array)
+    return CCM__ARGMISM;
+  sts = ccm_ref_var((ccm_tFuncCtx)((ccm_tFileCtx)filectx)->funcctx, arg_p8->value_name, 
+      (void **)&valp8, &decl, &array, &elements);
+  if (EVEN(sts))
+    return sts;
+  if (decl != CCM_DECL_FLOAT || !array)
+    return CCM__ARGMISM;
+  sts = ccm_ref_var((ccm_tFuncCtx)((ccm_tFileCtx)filectx)->funcctx, arg_p9->value_name, 
+      (void **)&valp9, &decl, &array, &elements);
+  if (EVEN(sts))
+    return sts;
+  if (decl != CCM_DECL_FLOAT || !array)
+    return CCM__ARGMISM;
+  sts = ccm_ref_var((ccm_tFuncCtx)((ccm_tFileCtx)filectx)->funcctx, arg_p10->value_name, 
+      (void **)&valp10, &decl, &array, &elements);
+  if (EVEN(sts))
+    return sts;
+  if (decl != CCM_DECL_INT || !array)
+    return CCM__ARGMISM;
+  sts = ccm_ref_var((ccm_tFuncCtx)((ccm_tFileCtx)filectx)->funcctx, arg_p11->value_name, 
+      (void **)&valp11, &decl, &array, &elements);
+  if (EVEN(sts))
+    return sts;
+  if (decl != CCM_DECL_INT || !array)
+    return CCM__ARGMISM;
+  sts = ccm_ref_var((ccm_tFuncCtx)((ccm_tFileCtx)filectx)->funcctx, arg_p12->value_name, 
+      (void **)&valp12, &decl, &array, &elements);
+  if (EVEN(sts))
+    return sts;
+  if (decl != CCM_DECL_FLOAT || !array)
+    return CCM__ARGMISM;
+  sts = ccm_ref_var((ccm_tFuncCtx)((ccm_tFileCtx)filectx)->funcctx, arg_p13->value_name, 
+      (void **)&valp13, &decl, &array, &elements);
+  if (EVEN(sts))
+    return sts;
+  if (decl != CCM_DECL_FLOAT || !array)
+    return CCM__ARGMISM;
+  sts = ccm_ref_var((ccm_tFuncCtx)((ccm_tFileCtx)filectx)->funcctx, arg_p14->value_name, 
+      (void **)&valp14, &decl, &array, &elements);
+  if (EVEN(sts))
+    return sts;
+  if (decl != CCM_DECL_FLOAT || !array)
+    return CCM__ARGMISM;
+  sts = ccm_ref_var((ccm_tFuncCtx)((ccm_tFileCtx)filectx)->funcctx, arg_p15->value_name, 
+      (void **)&valp15, &decl, &array, &elements);
+  if (EVEN(sts))
+    return sts;
+  if (decl != CCM_DECL_FLOAT || !array)
+    return CCM__ARGMISM;
+
+  sts = graph_layout(graph, elements, arg_list->value_float, arg_p2->value_float, 
+      valp3, 
+      valp4, valp5, valp6, valp7, valp8, valp9, valp10, valp11, valp12, valp13, valp14, 
+      valp15, &wwidth, &wheight);
+
+  arg_list->value_float = wwidth;
+  arg_list->value_returned = 1;
+  arg_p2->value_float = wheight;
+  arg_p2->value_returned = 1;
+  return 1;
+}
+
+static int graph_setgraphoptions_func(void* filectx, ccm_sArg* arg_list,
+    int arg_count, int* return_decl, ccm_tFloat* return_float,
+    ccm_tInt* return_int, char* return_string)
+{
+  Graph* graph;
+
+  if (arg_count != 1)
+    return CCM__ARGMISM;
+
+  graph_get_stored_graph(&graph);
+
+  if (arg_list->value_decl != CCM_DECL_INT)
+    return CCM__ARGMISM;
+
+  graph->options = arg_list->value_int;
   return 1;
 }
 
@@ -5086,10 +5311,20 @@ int Graph::script_func_register(void)
       "Ge", "GetWindowSize", graph_getwindowsize_func);
   if (EVEN(sts))
     return sts;
+  sts = ccm_register_function(
+      "Ge", "GetWindowDimension", graph_getwindowdimension_func);
+  if (EVEN(sts))
+    return sts;
   sts = ccm_register_function("Ge", "GetUI_Env", graph_getui_env_func);
   if (EVEN(sts))
     return sts;
   sts = ccm_register_function("Ge", "GetGraphConfig", graph_getgraphconfig_func);
+  if (EVEN(sts))
+    return sts;
+  sts = ccm_register_function("Ge", "Layout", graph_layout_func);
+  if (EVEN(sts))
+    return sts;
+  sts = ccm_register_function("Ge", "SetGraphOptions", graph_setgraphoptions_func);
   if (EVEN(sts))
     return sts;
   
@@ -5397,6 +5632,9 @@ int Graph::script_func_register(void)
       glow_eDirection_Up, 0);
   sts = ccm_create_external_var("eDirection_Down", CCM_DECL_INT, 0,
       glow_eDirection_Down, 0);
+
+  sts = ccm_create_external_var("BORDER", CCM_DECL_INT, 0,
+      -1, 0);
 
   return 1;
 }

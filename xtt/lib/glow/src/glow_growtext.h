@@ -576,7 +576,7 @@ public:
   void convert(glow_eConvert version);
 
   void export_flow(GlowExportFlow* ef);
-  int export_script(GlowExportScript* es);
+  int export_script(GlowExportScript* es, void* o, void* m);
 
   glow_eDrawType get_text_color()
   {

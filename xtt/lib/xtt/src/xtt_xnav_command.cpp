@@ -223,8 +223,8 @@ dcli_tCmdTable xnav_command_table[] = {
           "/OBJID", "/FILE", "/LOCAL", "/INITSTEP", "/MAXOBJECTS", "/VOLUME",
           "/ALL", "/TYPE", "/OPTION", "/ENTRY", "/NEW", "/TITLE", "/WINDOW",
           "/ALARMVIEW", "/WIDTH", "/HEIGHT", "/XPOSITION", "/YPOSITION",
-          "/FULLSCREEN", "/MAXIMIZE", "/FULLMAXIMIZE", "/SORT", "/TEXT",
-          "/LAYOUT", "/GLOBAL", "/ALPHAORDER", "" } },
+	  "/FULLSCREEN", "/MAXIMIZE", "/FULLMAXIMIZE", "/SORT", 
+	  "/TEXT","/LAYOUT", "/GLOBAL", "/ALPHAORDER", "" } },
   { "OPEN", &xnav_open_func,
       { "dcli_arg1", "dcli_arg2", "/NAME", "/FILE", "/SCROLLBAR", "/WIDTH",
           "/HEIGHT", "/MENU", "/NAVIGATOR", "/CENTER", "/OBJECT", "/NEW",
@@ -235,7 +235,7 @@ dcli_tCmdTable xnav_command_table[] = {
           "/ICONIFY", "/HIDE", "/XPOSITION", "/YPOSITION", "/X0", "/Y0", "/X1",
           "/Y1", "/URL", "/CONTINOUS", "/CAMERAPOSITION", "/CAMERACONTROLPANEL",
           "/VIDEOCONTROLPANEL", "/VIDEOPROGRESSBAR", "/SCANTIME", "/KEYMAP",
-	  "" } },
+	  "/RESIZEFREE", "" } },
   { "CLOSE", &xnav_close_func,
       { "dcli_arg1", "dcli_arg2", "/NAME", "/OBJECT", "/INSTANCE",
           "/CLASSGRAPH", "/ALL", "/EXCEPT", "/MVEXCEPT", "/ICONIFY", "" } },
@@ -3033,6 +3033,8 @@ static int xnav_open_func(void* client_data, void* client_flag)
       options |= ge_mOptions_Iconify;
     if (ODD(dcli_get_qualifier("/HIDE", 0, 0)))
       options |= ge_mOptions_Invisible;
+    if (ODD(dcli_get_qualifier("/RESIZEFREE", 0, 0)))
+      options |= ge_mOptions_ResizeFree;
     if (ODD(dcli_get_qualifier("/MAIN", 0, 0)) && !xnav->op && !xnav->ge_main
         && !xnav->multiview_main) {
       options |= ge_mOptions_IsMain;

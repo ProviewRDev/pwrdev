@@ -1120,7 +1120,7 @@ void GrowArc::export_flow(GlowExportFlow* ef)
 {
   ef->arc(this);
 }
-int GrowArc::export_script(GlowExportScript* es)
+int GrowArc::export_script(GlowExportScript* es, void* o, void* m)
 {
-  return es->arc(this);
+  return es->arc(this, o, m);
 }

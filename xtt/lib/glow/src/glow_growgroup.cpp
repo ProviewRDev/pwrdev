@@ -300,7 +300,7 @@ int GrowGroup::clear()
   return 1;
 }
 
-int GrowGroup::export_script(GlowExportScript* es)
+int GrowGroup::export_script(GlowExportScript* es, void* o, void* m)
 {
-  return es->group(this);
+  return es->group(this, o, m);
 }
