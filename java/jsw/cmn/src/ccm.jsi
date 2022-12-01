@@ -3801,7 +3801,7 @@ function Ccm() {
     return ret;
   }
 
-  this.ref_var = function(funcctx, name, valuep, decl, array, elements) {
+  this.ref_var = function(funcctx, name) {
     var int_p;
     var float_p;
     var string_p;
@@ -3819,6 +3819,7 @@ function Ccm() {
       sts: CCM_.SUCCESS,
       varname: null,
       element: 0,
+      decl: 0,
       array: 0,
       valuep : 0};
 

@@ -4104,6 +4104,34 @@ function DynValue( dyn) {
     this.a.disconnect(this.dyn);
   };
 
+  this.month = function(str) {
+    if (str === "JAN")
+      return "01";
+    if (str === "FEB")
+      return "02";
+    if (str === "MAR")
+      return "03";
+    if (str === "APR")
+      return "04";
+    if (str === "MAY")
+      return "05";
+    if (str === "JUN")
+      return "06";
+    if (str === "JUL")
+      return "07";
+    if (str === "AUG")
+      return "08";
+    if (str === "SEP")
+      return "09";
+    if (str === "OCT")
+      return "10";
+    if (str === "NOV")
+      return "11";
+    if (str === "DEC")
+      return "12";
+    return str;
+  }
+
   this.scan = function( object) {
     if ( !this.a.sts)
       return;
@@ -4170,14 +4198,36 @@ function DynValue( dyn) {
 	return;
 
       if ( this.firstScan || !(value0 == this.oldValueS)) {
-	if ( this.cFormat !== null) {
-	  if ( this.a_typeid == Pwr.eType_String) {
+	switch ( this.a.typeid) {
+	case Pwr.eType_String: {
+	  if ( this.cFormat !== null) {
 	    var sb = this.cFormat.format( value0);
 	    object.setAnnotation( annot_num, sb);
 	  }
+	  break;
+	}
+	case Pwr.eType_Time: {
+	  var timstr;
+	  if (this.format === "%1t")
+	    timstr = value0.substring(12,20);
+	  else if (this.format === "%2t")
+	    timstr = value0.substring(12);
+	  else if (this.format === "%3t")
+	    timstr = value0.substring(9,11)+"-"+this.month(value0.substring(3,6))+
+               "-"+value0.substring(0,2)+value0.substring(11,20);
+	  else if (this.format === "%4t")
+	    timstr = value0.substring(0,11);
+	  else if (this.format === "%5t")
+	    timstr = value0.substring(9,11)+"-"+this.month(value0.substring(3,6))+
+                "-"+value0.substring(0,2);
 	  else
-	    // TODO time format
-	    object.setAnnotation( annot_num, value0);
+	    timstr = value0;
+	  
+	  object.setAnnotation( annot_num, timstr);
+	  break;
+	}
+	default:
+	  object.setAnnotation( annot_num, value0);
 	}
 	this.dyn.repaintNow = true;
 	this.oldValueS = value0;
@@ -17778,6 +17828,7 @@ function Graph( appl) {
   this.graphConfiguration = 0;
 
 #jsc_include gescript.jsi
+#jsc_include gelayout.jsi
 
   if ( typeof InstallTrigger !== 'undefined') {
     // Firefox is not os fast...
@@ -17819,18 +17870,19 @@ function Graph( appl) {
         var sg = buffer.substring(bix+17, idx);
 	width = parseInt(sg, 10);
         bix = idx + 1;
-        console.log("Height", buffer.substring(bix,18));
+        console.log("DefaultWidth", width);
       }
       if (buffer.substring(bix, bix+18) === "!** DefaultHeight:") {
         var idx = buffer.indexOf('\n', bix);
         var sg = buffer.substring(bix+18, idx);
 	height = parseInt(sg, 10);
         bix = idx + 1;
+        console.log("DefaultHeight", height);
       }
       if (width != 0 && height != 0) {
 	self.ctx.gdraw.canvas.width = width;
 	self.ctx.gdraw.canvas.height = height;
-      }         
+      }
       var aa = []
       if (buffer.substring(bix, bix+18) === "!** GetObjectAttr:") {
         var idx = buffer.indexOf('\n', bix);
@@ -19268,8 +19320,6 @@ window.addEventListener('resize', function(event) {
   var graph = graph_get_stored_graph();
   if (!graph)
     return;
-  console.log("Resize event", window.innerWidth, window.innerHeight, graph.ctx.x1 - graph.ctx.x0,
-    graph.ctx.y1 - graph.ctx.y0);
 
   var old_zx = graph.ctx.mw.zoom_factor_x;
   var old_zy = graph.ctx.mw.zoom_factor_y;
@@ -19283,7 +19333,6 @@ window.addEventListener('resize', function(event) {
     graph.ctx.mw.zoom_factor_y = graph.ctx.mw.zoom_factor_x;
   graph.ctx.gdraw.canvas.width = (graph.ctx.x1 - graph.ctx.x0) * graph.ctx.mw.zoom_factor_x;
   graph.ctx.gdraw.canvas.height = (graph.ctx.y1 - graph.ctx.y0) * graph.ctx.mw.zoom_factor_y;
-  console.log("Zoom", graph.ctx.mw.zoom_factor_x, graph.ctx.mw.zoom_factor_y);
   if (!graph.resized) {
     graph.resized = true;
     graph.windowInnerWidth = window.innerWidth;

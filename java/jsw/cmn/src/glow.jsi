@@ -4111,6 +4111,8 @@ function GlowArrayElem() {
   }
   this.storeBorders = function() {
   }
+  this.get_borders = function(t, g) {
+  }
 }
 
 function GrowNode( ctx) {
@@ -7032,6 +7034,48 @@ function GrowRectRounded( ctx) {
   };
   this.storeTransform = function() {
     this.trf.store();
+  };
+  this.get_borders = function( t, g) {
+    var ll_x, ur_x, ll_y, ur_y, x1, x2, y1, y2;
+
+    if ( t !== null) {
+      x1 = this.trf.x( t, this.ll.x, this.ll.y);
+      x2 = this.trf.x( t, this.ur.x, this.ur.y);
+      y1 = this.trf.y( t, this.ll.x, this.ll.y);
+      y2 = this.trf.y( t, this.ur.x, this.ur.y);
+    }
+    else {
+      x1 = this.trf.x( this.ll.x, this.ll.y);
+      x2 = this.trf.x( this.ur.x, this.ur.y);
+      y1 = this.trf.y( this.ll.x, this.ll.y);
+      y2 = this.trf.y( this.ur.x, this.ur.y);
+    }
+
+    ll_x = Math.min( x1, x2);
+    ur_x = Math.max( x1, x2);
+    ll_y = Math.min( y1, y2);
+    ur_y = Math.max( y1, y2);
+    
+    if ( ll_x < g.ll_x)
+      g.ll_x = ll_x;
+    if ( ur_x > g.ur_x)
+      g.ur_x = ur_x;
+    if ( ll_y < g.ll_y)
+      g.ll_y = ll_y;
+    if ( ur_y > g.ur_y)
+      g.ur_y = ur_y;
+    return g;
+  };
+
+  this.get_node_borders = function() { 
+    var g = new GlowGeometry();
+    g.ll_x = g.ll_y = 1e37;
+    g.ur_x = g.ur_y = -1e37;
+    this.get_borders( null, g);
+    this.x_left = g.ll_x;
+    this.x_right = g.ur_x;
+    this.y_low = g.ll_y;
+    this.y_high = g.ur_y;
   };
 }
 GrowRectRounded.prototype = Object.create(GlowArrayElem.prototype);
@@ -18732,6 +18776,10 @@ function GrowApi() {
     var cname = "pwr_colortheme" + theme.toString() + ".pwgc";
     ctx.customcolors.read_colorfile(ctx, cname);
     ctx.gdraw.push_customcolors(ctx.customcolors);
+  }
+  this.SetColorTheme = function(ctx) {
+    // TODO
+    this.UpdateColorTheme(ctx, 1);
   }
   this.SetObjectAttribute = function(o, name, value) {
     switch (o.type()) {
