@@ -509,9 +509,14 @@ reload_directorystructure()
   reload_continue "Pass change directory structure"
 
   machine=`eval uname -m`
-  if [ $machine != "x86_64" ]; then
+  if [ $machine == "x86_64" ]; then
+    machine="x86_64"
+  elif [ ${machine:0:3} == "arm" ]; then
+    machine="arm"
+  elif [ $machine == "aarch64" ]; then
+    machine="arm64"
+  else
     machine="x86"
-  fi
   platform=$machine"_linux"
 
 

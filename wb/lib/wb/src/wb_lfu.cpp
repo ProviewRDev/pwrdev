@@ -1377,11 +1377,12 @@ pwr_tStatus lfu_SaveDirectoryVolume(
 
           os = *os_ptr;
           if (!(os == pwr_mOpSys_CustomBuild || os == pwr_mOpSys_PPC_LINUX
-                  || os == pwr_mOpSys_X86_LINUX || os == pwr_mOpSys_X86_64_LINUX
-                  || os == pwr_mOpSys_ARM_LINUX || os == pwr_mOpSys_X86_64_MACOS
-                  || os == pwr_mOpSys_X86_64_FREEBSD
-                  || os == pwr_mOpSys_X86_64_OPENBSD
-                  || os == pwr_mOpSys_X86_CYGWIN)) {
+		  || os == pwr_mOpSys_X86_LINUX || os == pwr_mOpSys_X86_64_LINUX
+		  || os == pwr_mOpSys_ARM_LINUX || os == pwr_mOpSys_ARM64_LINUX 
+		  || os == pwr_mOpSys_X86_64_MACOS
+		  || os == pwr_mOpSys_X86_64_FREEBSD
+		  || os == pwr_mOpSys_X86_64_OPENBSD
+		  || os == pwr_mOpSys_X86_CYGWIN)) {
             char msg[200];
             sprintf(msg,
                 "Error in NodeConfig object '%s', OperatingSystem is not valid",

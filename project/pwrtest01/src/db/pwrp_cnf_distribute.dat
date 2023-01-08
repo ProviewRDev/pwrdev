@@ -1,5 +1,5 @@
 project pwrtest01
-node pwrtest01a 128 999 0 - -
+node pwrtest01a 8192 999 0 - -
 load pwrtest01a
 appl pwrtest01a W $pwrp_cnf/pwrtest01a/pwr_user2.dat:$pwra_db/pwr_user2.dat $pwra_db/pwr_user2.dat
 appl pwrtest01a W $pwrp_load/ld_appl_pwrtest01a_999.txt $pwrp_load/
@@ -25,7 +25,7 @@ appl pwrtest01a E $pwrp_exe/ra_status
 appl pwrtest01a E $pwrp_exe/ra_nethtest
 appl pwrtest01a E $pwrp_exe/ra_qcom2test
 appl pwrtest01a E $pwrp_exe/ra_testall_a.sh
-node pwrtest01b 128 999 0 - -
+node pwrtest01b 8192 999 0 - -
 load pwrtest01b
 appl pwrtest01b W $pwrp_cnf/pwrtest01b/pwr_user2.dat:$pwra_db/pwr_user2.dat $pwra_db/pwr_user2.dat
 appl pwrtest01b W $pwrp_load/ld_appl_pwrtest01b_999.txt $pwrp_load/
@@ -51,7 +51,7 @@ appl pwrtest01b E $pwrp_exe/ra_status
 appl pwrtest01b E $pwrp_exe/ra_qcom2test
 appl pwrtest01b E $pwrp_exe/ra_modbustcptest
 appl pwrtest01b E $pwrp_exe/ra_testall_b.sh
-node pwrtest01c 128 999 0 - -
+node pwrtest01c 8192 999 0 - -
 load pwrtest01c
 appl pwrtest01c W $pwrp_cnf/pwrtest01c/pwr_user2.dat:$pwra_db/pwr_user2.dat $pwra_db/pwr_user2.dat
 appl pwrtest01c W $pwrp_load/ld_appl_pwrtest01c_999.txt $pwrp_load/
@@ -90,20 +90,20 @@ appl pwrtest01c E $pwrp_exe/ra_ccmtest.rtt_com
 appl pwrtest01c E $pwrp_exe/ra_xttscripttest.rtt_com
 appl pwrtest01c E $pwrp_exe/ra_mqtttest.py
 appl pwrtest01c E $pwrp_exe/ra_testall_c.sh
-node pwrtest01d 128 999 0 - -
+node pwrtest01d 8192 999 0 - -
 load pwrtest01d
 appl pwrtest01d W $pwrp_cnf/pwrtest01d/pwr_user2.dat:$pwra_db/pwr_user2.dat $pwra_db/pwr_user2.dat
 appl pwrtest01d W $pwrp_cnf/pwrtest01d/authorized_keys:$pwra_db/authorized_keys /home/pwrp/.ssh/authorized_keys
 appl pwrtest01d E $pwrp_exe/ra_sevtest.py
 appl pwrtest01d E $pwrp_exe/ra_sev_mqtttest.py
 appl pwrtest01d E $pwrp_exe/ra_testall_d.sh
-node pwrtest01e 128 999 0 - -
+node pwrtest01e 8192 999 0 - -
 load pwrtest01e
 appl pwrtest01e W $pwrp_cnf/pwrtest01e/pwr_user2.dat:$pwra_db/pwr_user2.dat $pwra_db/pwr_user2.dat
 appl pwrtest01e W $pwrp_cnf/pwrtest01e/authorized_keys:$pwra_db/authorized_keys /home/pwrp/.ssh/authorized_keys
 appl pwrtest01e E $pwrp_exe/ra_sevtest_e.py
 appl pwrtest01e E $pwrp_exe/ra_testall_e.sh
-node pwrtest01f 128 999 0 - -
+node pwrtest01f 8192 999 0 - -
 load pwrtest01f
 appl pwrtest01f W $pwrp_cnf/pwrtest01f/pwr_user2.dat:$pwra_db/pwr_user2.dat $pwra_db/pwr_user2.dat
 appl pwrtest01f W $pwrp_load/ld_appl_pwrtest01f_999.txt $pwrp_load/
@@ -126,6 +126,7 @@ appl pwrtest01f S $pwrp_web/*.pdf
 appl pwrtest01f S $pwrp_web/*.pwg
 appl pwrtest01f S $pwrp_web/*.flw
 appl pwrtest01f E $pwrp_exe/ra_remotetest
+appl pwrtest01f E $pwrp_exe/ra_iotest
 appl pwrtest01f E $pwrp_exe/ra_testall_f.sh
 node copper-arrow 128 998 0 - -
 load copper-arrow

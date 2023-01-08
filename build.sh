@@ -61,6 +61,8 @@ unamestr=`eval uname`
 machine=`eval uname -m`
 if [ ${machine:0:3} == "arm" ]; then
   machine="arm"
+elif [ $machine == "aarch64" ]; then
+  machine="arm64"
 elif [ $machine == "amd64" ] || [ $machine == "x86_64" ]; then
   machine="x86_64"
 else

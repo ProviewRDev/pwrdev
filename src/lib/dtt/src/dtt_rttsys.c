@@ -960,6 +960,9 @@ int RTTSYS_SHOW_NODES(menu_ctx ctx, int event, char* parameter_ptr,
           case co_eHW_ARM:
             strcpy(menu_ptr->value_ptr, "ARM");
             break;
+          case co_eHW_ARM64:
+            strcpy(menu_ptr->value_ptr, "ARM64");
+            break;
           default:
             strcpy(menu_ptr->value_ptr, "Unknwn");
           }
@@ -1137,6 +1140,9 @@ int RTTSYS_SHOW_NODES(menu_ctx ctx, int event, char* parameter_ptr,
             break;
           case co_eHW_ARM:
             strcpy(menu_ptr->value_ptr, "ARM");
+            break;
+          case co_eHW_ARM64:
+            strcpy(menu_ptr->value_ptr, "ARM64");
             break;
           default:
             strcpy(menu_ptr->value_ptr, "Unknwn");
@@ -10762,6 +10768,9 @@ int RTTSYS_QCOM_NODES(menu_ctx ctx, int event, char* parameter_ptr,
             case co_eHW_ARM:
               strcpy(menu_ptr->value_ptr, "ARM");
               break;
+            case co_eHW_ARM64:
+              strcpy(menu_ptr->value_ptr, "ARM64");
+              break;
             default:
               strcpy(menu_ptr->value_ptr, "Unknwn");
             }
@@ -10945,6 +10954,9 @@ int RTTSYS_QCOM_NODES(menu_ctx ctx, int event, char* parameter_ptr,
               break;
             case co_eHW_ARM:
               strcpy(menu_ptr->value_ptr, "ARM");
+              break;
+            case co_eHW_ARM64:
+              strcpy(menu_ptr->value_ptr, "ARM64");
               break;
             default:
               strcpy(menu_ptr->value_ptr, "Unknwn");

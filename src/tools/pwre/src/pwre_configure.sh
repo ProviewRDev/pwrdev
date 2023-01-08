@@ -247,6 +247,9 @@ hwpl=i386
 if [ ${pwre_hw:3} == "arm" ]; then
     hwpl=arm
 fi
+if [ ${pwre_hw:3} == "arm64" ]; then
+    hwpl=aarch64
+fi
 if [ ${pwre_hw:3} == "x86_64" ]; then
     hwpl=x86_64
 fi
