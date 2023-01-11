@@ -76,9 +76,9 @@
 #include "pwr_profibusclasses.h"
 
 #define ATTRNAV__INPUT_SYNTAX 2
-//#define ATTRNAV__OBJNOTFOUND 4
+// #define ATTRNAV__OBJNOTFOUND 4
 #define ATTRNAV__STRINGTOLONG 6
-//#define ATTRNAV__ITEM_NOCREA 8
+// #define ATTRNAV__ITEM_NOCREA 8
 
 static char null_str[] = "";
 
@@ -1283,7 +1283,7 @@ int GsdmlAttrNav::save()
 
 int ItemPn::open_children(GsdmlAttrNav* attrnav, double x, double y)
 {
-  if (!(m_type & attrnav_mItemType_Parent))
+  if (!(m_type & (attrnav_mItemType_Parent | attrnav_mItemType_Selectable)))
   {
     return 1;
   }
