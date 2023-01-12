@@ -143,6 +143,10 @@ static pwr_tStatus PostCreate(ldh_tSesContext Session, pwr_tObjid Object,
   sts = ldh_CreateObject(
       Session, &oid, "Backup", cid, srv_oid, ldh_eDest_IntoLast);
 
+  sts = ldh_ClassNameToId(Session, &cid, "WebSocketServer");
+  sts = ldh_CreateObject(
+      Session, &oid, "WebSocketServer", cid, srv_oid, ldh_eDest_IntoLast);
+
   sts = ldh_ClassNameToId(Session, &cid, "StatusServerConfig");
   sts = ldh_CreateObject(
       Session, &oid, "StatusServer", cid, srv_oid, ldh_eDest_IntoLast);
@@ -150,10 +154,7 @@ static pwr_tStatus PostCreate(ldh_tSesContext Session, pwr_tObjid Object,
   sts = ldh_ClassNameToId(Session, &cid, "PlcProcess");
   sts = ldh_CreateObject(Session, &oid, "Plc", cid, Object, ldh_eDest_IntoLast);
 
-  // Web handler
-  sts = ldh_ClassNameToId(Session, &cid, "WebHandler");
-  sts = ldh_CreateObject(
-      Session, &oid, "WebHandler", cid, Object, ldh_eDest_IntoLast);
+  // WebSocketServer
 
   // IO
   cnf_get_value("defaultIO", name, sizeof(name));
