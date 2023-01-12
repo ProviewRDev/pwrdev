@@ -82,6 +82,26 @@ SObject pwrb:Class
 	  Attr Elements = 5
         EndBody
       EndObject
+      !/**
+      ! Number of connections.
+      !*/
+      Object Connections $Attribute 4
+        Body SysBody
+          Attr TypeRef = "pwrs:Type-$UInt32"
+	  Attr Flags |= PWR_MASK_STATE
+	  Attr Flags |= PWR_MASK_NOEDIT
+        EndBody
+      EndObject
+      !/**
+      ! Error counter.
+      !*/
+      Object ErrorCount $Attribute 5
+        Body SysBody
+          Attr TypeRef = "pwrs:Type-$UInt32"
+	  Attr Flags |= PWR_MASK_STATE
+	  Attr Flags |= PWR_MASK_NOEDIT
+        EndBody
+      EndObject
     EndObject
   EndObject
 EndSObject
