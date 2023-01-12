@@ -38,4 +38,15 @@
 
 export pwr_exe=$pwr_eexe
 export pwr_load=$pwr_eload
-wb -c $1
+
+str=$1
+
+if [[ $str != *".wb_load" ]]; then
+  str=$str".wb_load"
+fi
+
+if [[ $str != *"/"* ]]; then
+  str="./"$str
+fi
+
+wb -q -c $str
