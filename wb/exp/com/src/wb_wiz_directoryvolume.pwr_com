@@ -633,12 +633,21 @@ page_4:
   attr = name + ".Options";
   SetAttribute( attr, 1);
 
-  create object /dest="Build-pop"/class=BuildCopy /name="pwg" /first
-  name = "Build-pop-pwg";
+  create object /dest="Build-pop"/class=BuildCopy /name="pwg_exe" /first
+  name = "Build-pop-pwg_exe";
   attr = name + ".Source";
   SetAttribute( attr, "*.pwg");
   attr = name + ".Target";
-  SetAttribute( attr, "$pwrp_exe/,$pwrp_web/");
+  SetAttribute( attr, "$pwrp_exe/");
+
+  create object /dest="Build-pop"/class=BuildConvert /name="pwg_web" /last
+  name = "Build-pop-pwg_web";
+  attr = name + ".Source";
+  SetAttribute( attr, "*.pwg");
+  attr = name + ".Target";
+  SetAttribute( attr, "$pwrp_web/");
+  attr = name + ".Conversion";
+  SetAttribute( attr, 1);
 
   save/quiet
 
@@ -678,22 +687,22 @@ exit_now:
   delete dv_prd_qbus;
   delete dv_sim_qbus;
   delete pwr_wizard_title;
-  delete dv_volumes[40];
-  delete dv_cvol_sel[40];
-  delete dv_vol_class[40];
-  delete dv_volume_found[40];
+  delete dv_volumes[];
+  delete dv_cvol_sel[];
+  delete dv_vol_class[];
+  delete dv_volume_found[];
   delete dv_node_busid;
   delete dv_node_name;
   delete dv_node_ip;
   delete dv_node_description;
   delete dv_node_rootvolume;
-  delete dv_addvol[40];
-  delete dv_addvol_sel[40];
-  delete dv_addvol_occ[40];
+  delete dv_addvol[];
+  delete dv_addvol_sel[];
+  delete dv_addvol_occ[];
   delete dv_node_skip;
   delete dv_node_skip_inv;
   delete dv_node_disdistr;
-  delete dv_node_distr[15];
+  delete dv_node_distr[];
   delete dv_default_vname;
   delete dv_default_vid;
   delete dv_error_message;
