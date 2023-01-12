@@ -341,6 +341,8 @@ pwr_tStatus vldh_StrToId(char* instr, pwr_tObjid* objid);
 
 int vldh_check_node(vldh_t_wind wind, vldh_t_node node);
 
+int vldh_get_object_defname(ldh_tSesContext ldhses, pwr_tObjid Objdid,
+    unsigned long object_type, char* objname, char* name);
 #ifdef __cplusplus
 }
 #endif

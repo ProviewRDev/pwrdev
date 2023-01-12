@@ -102,6 +102,7 @@ static int generate_module_include()
     {"pwr_systemclasses.h", "", ""},
     {"pwr_baseclasses.h", "rt_plc_module.h", ""},
     {"pwr_nmpsclasses.h", "nmps.h", "nmps_plc_macro.h"},
+    {"pwr_dataqclasses.h", "dataq.h", "dataq_plc_macro.h"},
     {"pwr_remoteclasses.h", "", "remote_plc_macro.h"},
     {"pwr_basecomponentclasses.h", "rt_plc_bcomp.h", ""},
     {"pwr_tlogclasses.h", "", "tlog_plc_macro.h"},

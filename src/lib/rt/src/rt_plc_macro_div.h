@@ -262,3 +262,12 @@
     tmp |= (in >> 24) & 0xff; \
     o->ActVal = tmp; \
   }
+
+#define GetBus_generic_exec(tp, o, bus) { \
+  o->Out = *bus; \
+}
+
+#define CStoBus_generic_exec(tp, o, bus) { \
+  if (o->Cond) \
+    *bus = *o->InP; \
+}

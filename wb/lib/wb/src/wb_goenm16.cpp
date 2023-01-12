@@ -66,6 +66,7 @@
 
 #include "wb_foe_msg.h"
 #include "wb_goenm16.h"
+#include "pwr_dataqclasses.h"
 
 /*_Local variables_______________________________________________________*/
 
@@ -137,6 +138,7 @@ int goen_create_nodetype_m16(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid,
   double annot_height;
   int annot_rows;
   float classname_width;
+  flow_tObject cp;
   static int idx = 0;
 
   sts = ldh_ClassIdToName(ldhses, cid, name, sizeof(name), &size);
@@ -350,10 +352,11 @@ int goen_create_nodetype_m16(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid,
               f_height - f_yoffs,
               f_repeat * (i_inpoints_bottom + i_outpoints_bottom + 1),
               f_height + f_pinlength - f_yoffs, flow_eDrawType_Line, 2);
-          flow_AddConPoint(nc_pid,
+          flow_CreateConPoint(ctx,
               f_repeat * (i_inpoints_bottom + i_outpoints_bottom + 1),
               f_height + f_pinlength - f_yoffs, conpoint_nr++,
-              flow_eDirection_Up);
+	      flow_eDirection_Up, &cp);
+	  flow_NodeClassAdd(nc_pid, cp);
           i_inpoints_bottom++;
         } else if (bodydef[i].Par->Output.Graph.InputType != 1) {
           f_namelength
@@ -365,9 +368,10 @@ int goen_create_nodetype_m16(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid,
           flow_AddLine(nc_pid, f_width,
               f_repeat * (1.5 + i_outpoints) - f_yoffs, f_width + f_pinlength,
               f_repeat * (1.5 + i_outpoints) - f_yoffs, flow_eDrawType_Line, 2);
-          flow_AddConPoint(nc_pid, f_width + f_pinlength,
+          flow_CreateConPoint(ctx, f_width + f_pinlength,
               f_repeat * (i_outpoints + 1.5) - f_yoffs, conpoint_nr++,
-              flow_eDirection_Right);
+	      flow_eDirection_Right, &cp);
+	  flow_NodeClassAdd(nc_pid, cp);
           i_outpoints++;
         } else {
           flow_AddLine(nc_pid,
@@ -375,11 +379,27 @@ int goen_create_nodetype_m16(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid,
               -f_pinlength - f_yoffs,
               f_repeat * (i_inpoints_top + i_outpoints_top + 1), -f_yoffs,
               flow_eDrawType_Line, 2);
-          flow_AddConPoint(nc_pid,
+          flow_CreateConPoint(ctx,
               f_repeat * (i_inpoints_top + i_outpoints_top + 1),
-              -f_pinlength - f_yoffs, conpoint_nr++, flow_eDirection_Down);
+	      -f_pinlength - f_yoffs, conpoint_nr++, flow_eDirection_Down, &cp);
+	  flow_NodeClassAdd(nc_pid, cp);
           i_inpoints_top++;
         }
+	if (bodydef[i].Par->Output.Info.Type == pwr_eType_Float32)
+	  flow_SetTraceAttr(
+            cp, NULL, bodydef[i].ParName, flow_eTraceType_Float32, 0);
+	else if (bodydef[i].Par->Output.Info.Type == pwr_eType_Int32)
+	  flow_SetTraceAttr(
+            cp, NULL, bodydef[i].ParName, flow_eTraceType_Int32, 0);
+	else if (bodydef[i].Par->Output.Info.Type == pwr_eType_Boolean)
+	  flow_SetTraceAttr(
+            cp, NULL, bodydef[i].ParName, flow_eTraceType_Boolean, 0);
+	else if (bodydef[i].Par->Output.Info.Type == pwr_cClass_DataQBus) {
+	  char attr[80];
+	  strcpy(attr, bodydef[i].ParName);
+	  strcat(attr, ".Data");
+	  flow_SetTraceAttr(cp, NULL, attr, flow_eTraceType_DataRef, 0);
+	}
       }
       outpointmask <<= 1;
     }

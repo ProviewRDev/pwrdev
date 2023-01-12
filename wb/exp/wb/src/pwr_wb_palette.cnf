@@ -528,6 +528,7 @@ palette NavigatorPalette
     classvolume pwrs 
     classvolume pwrb
     classvolume NMps NMps
+    classvolume DataQ DataQ
     classvolume TLog TLog
     classvolume Profibus Profibus
     classvolume Remote Remote
@@ -605,6 +606,7 @@ palette ClassNavigatorPalette
     classvolume pwrs
     classvolume pwrb
     classvolume NMps NMps
+    classvolume DataQ DataQ
     classvolume TLog TLog
     classvolume Profibus Profibus
     classvolume Remote Remote
@@ -955,6 +957,30 @@ palette PlcEditorPalette
     class NMpsTrp
     class NMpsTrpFF
     class NMpsTrpRR
+  }
+  menu DataQ
+  {
+    class DataQFo
+    class DataQCurrentData
+    class DataQCurrentIdx
+    menu DataQBus
+    {
+      class DataQBusSplit
+      class DataQBusJoin
+    }
+    class QCreateData
+    class QOrder
+    menu QOrderBus
+    {
+      class QOrderBusSplit
+      class QOrderBusJoin
+      class GetQOrderBus
+      class CStoQOrderBus
+    }
+    class QTrp
+    class QTrpFF
+    class QTrpRR
+    class Reset_QSO
   }
   menu Other
   {

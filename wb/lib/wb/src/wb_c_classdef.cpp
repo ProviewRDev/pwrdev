@@ -34,17 +34,40 @@
  * General Public License plus this exception.
  */
 
-/* wb_c_classdef.c -- work bench methods of the ClassDef class. */
+/* wb_c_classdef.cpp -- work bench methods of the ClassDef class. */
 
 #undef Status
 
+#include <fstream>
+#include <vector>
+
 #include "pwr_baseclasses.h"
 
+#include "pwr_version.h"
 #include "co_string.h"
+#include "co_dcli.h"
+#include "co_time.h"
 
 #include "wb_pwrs.h"
 #include "wb_pwrs_msg.h"
 #include "wb_wnav.h"
+#include "wb_session.h"
+#include "wb_object.h"
+#include "wb_attribute.h"
+
+#define INPUT_MAX 32
+#define OUTPUT_MAX 32
+#define ATTR_MAX 32
+
+typedef struct {
+  pwr_tObjName 	Name;
+  pwr_tTid 	Type;
+  pwr_tUInt32 	Elements;
+  pwr_tMask 	Flags;
+  pwr_tUInt32 	Size;
+  pwr_tPgmName  PgmName;
+} sAdef;
+
 
 static pwr_tStatus AnteCreate(
     ldh_tSesContext Session, pwr_tObjid Father, pwr_tClassId Class)
@@ -78,24 +101,258 @@ static pwr_tStatus OpenObjectGraph(ldh_sMenuCall* ip)
   return PWRS__SUCCESS;
 }
 
-static pwr_tStatus ConfigFc(ldh_sMenuCall* ip)
+static pwr_tStatus config_fo(ldh_tSession ldhses, pwr_tOid classdef_oid, 
+			     int plcconnect, int plctemplate, int plcfo, int plcembedded)
 {
-  int sts;
+  pwr_tStatus sts;
   pwr_tOName name;
   pwr_tOName pname;
   pwr_tObjName oname;
   int size;
   pwr_tCid cid;
   pwr_tTid tid;
-  unsigned int flags;
+  pwr_tMask flags;
+  pwr_tMask *flagsp;
   pwr_tInt32 int_val;
   pwr_tObjid oid;
   pwr_tObjid coid;
+  char str[80];
+
+  sts = ldh_ObjidToName(ldhses, classdef_oid,
+      ldh_eName_Hierarchy, pname, sizeof(pname), &size);
+  if (EVEN(sts))
+    return sts;
+
+  sts = ldh_ObjidToName(ldhses, classdef_oid, ldh_eName_Object,
+      oname, sizeof(oname), &size);
+  if (EVEN(sts))
+    return sts;
+
+  // Set Plc bit in Flags
+  sts = ldh_GetObjectPar(ldhses, classdef_oid, "SysBody", "Flags",
+       (char**)&flagsp, &size);
+  if (EVEN(sts))
+    return sts;
+
+  flags = *flagsp;
+  flags |= pwr_mClassDef_Plc;
+
+  sts = ldh_SetObjectPar(ldhses, classdef_oid, "SysBody", "Flags",
+       (char*)&flags, sizeof(flags));
+  if (EVEN(sts))
+    return sts;
+
+  free(flagsp);
+
+  sts = ldh_CreateObject(ldhses, &oid, "RtBody",
+      pwr_eClass_ObjBodyDef, classdef_oid, ldh_eDest_IntoFirst);
+
+  if (plcconnect) {
+    // Create PlcConnect attribute
+    strcpy(name, pname);
+    strcat(name, "-");
+    strcat(name, "RtBody");
+    sts = ldh_NameToObjid(ldhses, &oid, name);
+    if (EVEN(sts))
+      return sts;
+
+    sts = ldh_CreateObject(ldhses, &coid, "PlcConnect",
+        pwr_eClass_Intern, oid, ldh_eDest_IntoLast);
+    if (ODD(sts)) {
+      tid = pwr_eType_AttrRef;
+
+      sts = ldh_SetObjectPar(ldhses, coid, "SysBody", "TypeRef",
+          (char*)&tid, sizeof(tid));
+      if (EVEN(sts))
+        return sts;
+    }
+    if (!plctemplate) {
+      // Create PlcConnectP attribute
+      sts = ldh_CreateObject(ldhses, &coid, "PlcConnectP",
+          pwr_eClass_Intern, oid, ldh_eDest_IntoLast);
+      if (ODD(sts)) {
+        tid = pwr_eType_Char;
+
+        sts = ldh_SetObjectPar(ldhses, coid, "SysBody", "TypeRef",
+            (char*)&tid, sizeof(tid));
+        if (EVEN(sts))
+          return sts;
+
+        flags = PWR_MASK_INVISIBLE | PWR_MASK_POINTER | PWR_MASK_PRIVATE;
+
+        sts = ldh_SetObjectPar(ldhses, coid, "SysBody", "Flags",
+            (char*)&flags, sizeof(flags));
+        if (EVEN(sts))
+          return sts;
+      }
+    }
+  }
+
+  if (plcfo) {
+    sts = ldh_CreateObject(ldhses, &oid, "DevBody",
+        pwr_eClass_ObjBodyDef, classdef_oid, ldh_eDest_IntoLast);
+    if (EVEN(sts)) {
+      // The object already exist
+    }
+
+    strcpy(name, pname);
+    strcat(name, "-");
+    strcat(name, "DevBody");
+    sts = ldh_NameToObjid(ldhses, &oid, name);
+    if (EVEN(sts))
+      return sts;
+
+    sts = ldh_CreateObject(ldhses, &oid, "PlcNode",
+        pwr_eClass_Buffer, oid, ldh_eDest_IntoLast);
+    if (ODD(sts)) {
+      cid = pwr_eClass_PlcNode;
+
+      sts = ldh_SetObjectPar(ldhses, oid, "SysBody", "Class",
+          (char*)&cid, sizeof(cid));
+      if (EVEN(sts))
+        return sts;
+    }
+
+    sts = ldh_CreateObject(ldhses, &oid, "GraphPlcNode",
+        pwr_eClass_GraphPlcNode, classdef_oid, ldh_eDest_IntoLast);
+    if (ODD(sts)) {
+      if (plctemplate) {
+        pwr_tCid scid[2];
+        scid[0] = pwr_cClass_windowplc;
+        scid[1] = 0;
+        int_val = 1;
+
+        sts = ldh_SetObjectPar(ldhses, oid, "SysBody", "subwindows",
+            (char*)&int_val, sizeof(int_val));
+        if (EVEN(sts))
+          return sts;
+
+        sts = ldh_SetObjectPar(ldhses, oid, "SysBody",
+            "subwindow_class[0]", (char*)scid, sizeof(scid));
+        if (EVEN(sts))
+          return sts;
+      }
+
+      int_val = 1;
+      sts = ldh_SetObjectPar(ldhses, oid, "SysBody",
+          "segname_annotation", (char*)&int_val, sizeof(int_val));
+      if (EVEN(sts))
+        return sts;
+
+      if (plctemplate)
+        int_val = 58;
+      else if (plcconnect)
+        int_val = 35;
+      else
+        int_val = 4;
+
+      sts = ldh_SetObjectPar(ldhses, oid, "SysBody", "compmethod",
+          (char*)&int_val, sizeof(int_val));
+      if (EVEN(sts))
+        return sts;
+
+      if (plcconnect) {
+        int_val = 10;
+        sts = ldh_SetObjectPar(ldhses, oid, "SysBody",
+            "connectmethod", (char*)&int_val, sizeof(int_val));
+        if (EVEN(sts))
+          return sts;
+      }
+
+      int_val = 2;
+      sts = ldh_SetObjectPar(ldhses, oid, "SysBody",
+          "executeordermethod", (char*)&int_val, sizeof(int_val));
+      if (EVEN(sts))
+        return sts;
+
+      oname[15] = 0;
+      sts = ldh_SetObjectPar(ldhses, oid, "SysBody", "objname",
+          oname, sizeof(pwr_tString16));
+      if (EVEN(sts))
+        return sts;
+
+      sts = ldh_SetObjectPar(ldhses, oid, "SysBody", "graphname",
+          oname, sizeof(pwr_tString16));
+      if (EVEN(sts))
+        return sts;
+    }
+  }
+
+  if (plcconnect) {
+    sts = ldh_CreateObject(ldhses, &oid, "RtXtt", pwr_eClass_RtMenu,
+        classdef_oid, ldh_eDest_IntoLast);
+    strcpy(name, pname);
+    strcat(name, "-");
+    strcat(name, "RtXtt");
+    sts = ldh_NameToObjid(ldhses, &oid, name);
+    if (EVEN(sts))
+      return sts;
+
+    sts = ldh_CreateObject(ldhses, &oid, "PlcConnect",
+        pwr_eClass_MenuRef, oid, ldh_eDest_IntoLast);
+    if (ODD(sts)) {
+      strcpy(str, "PlcConnect");
+
+      sts = ldh_SetObjectPar(ldhses, oid, "SysBody", "ButtonName",
+          str, sizeof(pwr_tString40));
+      if (EVEN(sts))
+        return sts;
+
+      sts = ldh_SetObjectPar(ldhses, oid, "SysBody", "RefAttribute",
+          str, sizeof(pwr_tString40));
+      if (EVEN(sts))
+        return sts;
+    }
+  }
+
+  if (plctemplate) {
+    sts = ldh_CreateObject(ldhses, &oid, "Code",
+        pwr_cClass_PlcTemplate, classdef_oid, ldh_eDest_IntoLast);
+  }
+
+  if (plcembedded) {
+    // Create PlcEmbed attribute
+    strcpy(name, pname);
+    strcat(name, "-");
+    strcat(name, "RtBody");
+    sts = ldh_NameToObjid(ldhses, &oid, name);
+    if (EVEN(sts))
+      return sts;
+
+    sts = ldh_CreateObject(ldhses, &coid, "PlcEmbed",
+        pwr_eClass_Param, oid, ldh_eDest_IntoLast);
+    if (ODD(sts)) {
+      tid = pwr_cClass_PlcEmbed;
+
+      sts = ldh_SetObjectPar(ldhses, coid, "SysBody", "TypeRef",
+          (char*)&tid, sizeof(tid));
+      if (EVEN(sts))
+        return sts;
+    }
+
+    // Create PostCreate callback
+    sts = ldh_CreateObject(ldhses, &oid, "PostCreate",
+        pwr_eClass_DbCallBack, classdef_oid, ldh_eDest_IntoLast);
+
+    strcpy(str, "PlcEmbed-PostCreate");
+    sts = ldh_SetObjectPar(ldhses, oid, "SysBody", "MethodName",
+        str, sizeof(pwr_tString40));
+    if (EVEN(sts))
+      return sts;
+
+    //
+  }
+  return PWRS__SUCCESS;
+}
+
+static pwr_tStatus ConfigFc(ldh_sMenuCall* ip)
+{
+  int sts;
+  pwr_tObjid oid;
   int plcconnect = 0;
   int plctemplate = 0;
   int plcfo = 0;
   int plcembedded = 0;
-  char str[80];
   pwr_sMenuButton mb;
 
   sts = ldh_GetChild(ip->PointedSession, ip->Pointed.Objid, &oid);
@@ -133,216 +390,1036 @@ static pwr_tStatus ConfigFc(ldh_sMenuCall* ip)
     plcfo = 1;
   }
 
-  sts = ldh_ObjidToName(ip->PointedSession, ip->Pointed.Objid,
-      ldh_eName_Hierarchy, pname, sizeof(pname), &size);
-  if (EVEN(sts))
-    return sts;
+  sts = config_fo(ip->PointedSession, ip->Pointed.Objid, plcconnect, plctemplate, plcfo,
+		  plcembedded);
+  return sts;
+}
 
-  sts = ldh_ObjidToName(ip->PointedSession, ip->Pointed.Objid, ldh_eName_Object,
-      oname, sizeof(oname), &size);
-  if (EVEN(sts))
-    return sts;
 
-  sts = ldh_CreateObject(ip->PointedSession, &oid, "RtBody",
-      pwr_eClass_ObjBodyDef, ip->Pointed.Objid, ldh_eDest_IntoFirst);
+static pwr_tStatus bus_code(wb_session *sp, wb_object o)
+{
+  pwr_tOName oname, nname;
+  pwr_tFileName fname;
+  pwr_tObjName lowname;
+  char timestr[40];
 
-  if (plcconnect) {
-    // Create PlcConnect attribute
-    strcpy(name, pname);
-    strcat(name, "-");
-    strcat(name, "RtBody");
-    sts = ldh_NameToObjid(ip->PointedSession, &oid, name);
-    if (EVEN(sts))
-      return sts;
+  time_AtoAscii(0, time_eFormat_DateAndTime, timestr, sizeof(timestr));
 
-    sts = ldh_CreateObject(ip->PointedSession, &coid, "PlcConnect",
-        pwr_eClass_Intern, oid, ldh_eDest_IntoLast);
-    if (ODD(sts)) {
-      tid = pwr_eType_AttrRef;
+  str_ToLower(lowname, o.name());
+  sprintf(fname, "$pwrp_inc/pwr_%s.h", lowname);
+  dcli_translate_filename(fname, fname);
 
-      sts = ldh_SetObjectPar(ip->PointedSession, coid, "SysBody", "TypeRef",
-          (char*)&tid, sizeof(tid));
-      if (EVEN(sts))
-        return sts;
+  std::ofstream fp(fname);
+
+  fp << 
+    "/*" << '\n' <<
+    " * File pwr_" << lowname << ".h" << '\n' << 
+    " *" << '\n' <<
+    " * Generated by wb ClassDef Bus method " << pwrv_cPwrVersionStr << " " << timestr << "." << '\n' <<
+    " * Do not edit this file." << '\n' << 
+    " *" << '\n' <<
+    " * Contains plc macros for bus " << o.name() << "." << '\n' <<
+    " */" << '\n' << 
+    '\n';
+
+  strcpy(oname, o.longName().name(cdh_mName_volumeStrict));
+
+  // Split
+  strcpy(nname, oname);
+  strcat(nname, "Split");
+  wb_object so = sp->object(nname);
+  if (so) {
+    std::vector<sAdef> a_bus;
+
+    wb_object rbo = o.first();
+    if (!rbo)
+      return rbo.sts();
+
+    for (wb_object ao = rbo.first(); ao; ao = ao.after()) {
+      sAdef adef;
+      strcpy(adef.Name, ao.name());
+      wb_attribute aa = sp->attribute(ao.oid(), "SysBody", "Type");
+      aa.value(&adef.Type);
+      aa = sp->attribute(ao.oid(), "SysBody", "Elements");
+      aa.value(&adef.Elements);
+      aa = sp->attribute(ao.oid(), "SysBody", "Flags");
+      aa.value(&adef.Flags);
+      aa = sp->attribute(ao.oid(), "SysBody", "Size");
+      aa.value(&adef.Size);
+      aa = sp->attribute(ao.oid(), "SysBody", "PgmName");
+      aa.value(&adef.PgmName);
+
+      a_bus.push_back(adef);
     }
-    if (!plctemplate) {
-      // Create PlcConnectP attribute
-      sts = ldh_CreateObject(ip->PointedSession, &coid, "PlcConnectP",
-          pwr_eClass_Intern, oid, ldh_eDest_IntoLast);
-      if (ODD(sts)) {
-        tid = pwr_eType_Char;
 
-        sts = ldh_SetObjectPar(ip->PointedSession, coid, "SysBody", "TypeRef",
-            (char*)&tid, sizeof(tid));
-        if (EVEN(sts))
-          return sts;
+    fp << "#define " << so.name() << "_exec(tp, o) { \\" << '\n';
+    int inputcount = 0;
+    for (int i = 0; i < a_bus.size(); i++) {
+      if (inputcount == INPUT_MAX)
+	break;
+      if (a_bus[i].Flags & pwr_mAdef_array)
+	fp << "  memcpy(o->" << a_bus[i].PgmName << 
+	  ", o->InP->" << a_bus[i].PgmName << 
+	  "," << a_bus[i].Size << "); \\" << '\n';
+      else {
+	switch (a_bus[i].Type) {
+	case pwr_eType_String:
+	  fp << "  strncpy(o->" << a_bus[i].PgmName << 
+	    ", o->InP->" << a_bus[i].PgmName << 
+	    ", sizeof(o->" << a_bus[i].PgmName << ")); \\" << '\n';
+	  break;
+	default:
+	  fp << "  o->" << a_bus[i].PgmName << " = o->InP->" <<
+	    a_bus[i].PgmName << "; \\" << '\n';
+	}
+      }
+      inputcount++;
+    }
+    fp << "}" << '\n' << '\n';
+  }
 
-        flags = PWR_MASK_INVISIBLE | PWR_MASK_POINTER | PWR_MASK_PRIVATE;
+  // Join
+  strcpy(nname, oname);
+  strcat(nname, "Join");
+  so = sp->object(nname);
+  if (so) {
+    std::vector<sAdef> a_bus;
 
-        sts = ldh_SetObjectPar(ip->PointedSession, coid, "SysBody", "Flags",
-            (char*)&flags, sizeof(flags));
-        if (EVEN(sts))
-          return sts;
+    wb_object rbo = o.first();
+    if (!rbo)
+      return rbo.sts();
+
+    for (wb_object ao = rbo.first(); ao; ao = ao.after()) {
+      sAdef adef;
+      strcpy(adef.Name, ao.name());
+      wb_attribute aa = sp->attribute(ao.oid(), "SysBody", "Type");
+      aa.value(&adef.Type);
+      aa = sp->attribute(ao.oid(), "SysBody", "Elements");
+      aa.value(&adef.Elements);
+      aa = sp->attribute(ao.oid(), "SysBody", "Flags");
+      aa.value(&adef.Flags);
+      aa = sp->attribute(ao.oid(), "SysBody", "Size");
+      aa.value(&adef.Size);
+      aa = sp->attribute(ao.oid(), "SysBody", "PgmName");
+      aa.value(&adef.PgmName);
+
+      a_bus.push_back(adef);
+    }
+
+    fp << "#define " << so.name() << "_exec(tp, o) { \\" << '\n';
+    for (int i = 0; i < a_bus.size(); i++) {
+      if (a_bus[i].Flags & pwr_mAdef_array)
+	fp << "  memcpy(o->Out." << a_bus[i].PgmName << 
+	  ", (char *)o->" << a_bus[i].PgmName << 
+	  "P," << a_bus[i].Size << "); \\" << '\n'; 
+      else {
+	switch (a_bus[i].Type) {
+	case pwr_eType_String:
+	  fp << "  strncpy(o->Out." << a_bus[i].PgmName << 
+	    ", (char *)o->" << a_bus[i].PgmName << 
+	    "P, sizeof(o->Out." << a_bus[i].PgmName << ")-1); \\" << '\n'; 
+	  break;
+	default:
+	  fp << "  o->Out." << a_bus[i].PgmName << 
+	    " = *o->" << a_bus[i].PgmName << "P; \\" << '\n';
+	}
       }
     }
+    fp << "}" << '\n' << '\n';
   }
 
-  if (plcfo) {
-    sts = ldh_CreateObject(ip->PointedSession, &oid, "DevBody",
-        pwr_eClass_ObjBodyDef, ip->Pointed.Objid, ldh_eDest_IntoLast);
-    if (EVEN(sts)) {
-      // The object already exist
+  // DataToBus
+  strcpy(nname, o.longName().name(cdh_mName_volume | cdh_mName_path));
+  strcat(nname, "-DataTo");
+  strcat(nname, o.name());
+  so = sp->object(nname);
+  if (so) {
+    std::vector<sAdef> a_bus;
+
+    wb_object rbo = o.first();
+    if (!rbo)
+      return rbo.sts();
+
+    for (wb_object ao = rbo.first(); ao; ao = ao.after()) {
+      sAdef adef;
+      strcpy(adef.Name, ao.name());
+      wb_attribute aa = sp->attribute(ao.oid(), "SysBody", "Type");
+      aa.value(&adef.Type);
+      aa = sp->attribute(ao.oid(), "SysBody", "Elements");
+      aa.value(&adef.Elements);
+      aa = sp->attribute(ao.oid(), "SysBody", "Flags");
+      aa.value(&adef.Flags);
+      aa = sp->attribute(ao.oid(), "SysBody", "Size");
+      aa.value(&adef.Size);
+      aa = sp->attribute(ao.oid(), "SysBody", "PgmName");
+      aa.value(&adef.PgmName);
+
+      a_bus.push_back(adef);
     }
 
-    strcpy(name, pname);
-    strcat(name, "-");
-    strcat(name, "DevBody");
-    sts = ldh_NameToObjid(ip->PointedSession, &oid, name);
-    if (EVEN(sts))
-      return sts;
-
-    sts = ldh_CreateObject(ip->PointedSession, &oid, "PlcNode",
-        pwr_eClass_Buffer, oid, ldh_eDest_IntoLast);
-    if (ODD(sts)) {
-      cid = pwr_eClass_PlcNode;
-
-      sts = ldh_SetObjectPar(ip->PointedSession, oid, "SysBody", "Class",
-          (char*)&cid, sizeof(cid));
-      if (EVEN(sts))
-        return sts;
-    }
-
-    sts = ldh_CreateObject(ip->PointedSession, &oid, "GraphPlcNode",
-        pwr_eClass_GraphPlcNode, ip->Pointed.Objid, ldh_eDest_IntoLast);
-    if (ODD(sts)) {
-      if (plctemplate) {
-        pwr_tCid scid[2];
-        scid[0] = pwr_cClass_windowplc;
-        scid[1] = 0;
-        int_val = 1;
-
-        sts = ldh_SetObjectPar(ip->PointedSession, oid, "SysBody", "subwindows",
-            (char*)&int_val, sizeof(int_val));
-        if (EVEN(sts))
-          return sts;
-
-        sts = ldh_SetObjectPar(ip->PointedSession, oid, "SysBody",
-            "subwindow_class[0]", (char*)scid, sizeof(scid));
-        if (EVEN(sts))
-          return sts;
+    fp << "#define " << so.name() << "_exec(tp, o) { \\" << '\n';
+    for (int i = 0; i < a_bus.size(); i++) {
+      if (a_bus[i].Flags & pwr_mAdef_array)
+	fp << "  memcpy(o->Out." << a_bus[i].PgmName << 
+	  ", (char *)((pwr_sClass_" << o.name() << " *)o->InP->Ptr)->" << 
+	  a_bus[i].PgmName << "," << a_bus[i].Size << "); \\" << '\n'; 
+      else {
+	switch (a_bus[i].Type) {
+	case pwr_eType_String:
+	  fp << "  strncpy(o->Out." << a_bus[i].PgmName << 
+	    ", (char *)((pwr_sClass_" << o.name() << " *)o->InP->Ptr)->" << 
+	    a_bus[i].PgmName << ", sizeof(o->Out." << a_bus[i].PgmName << ")); \\" << '\n'; 
+	  break;
+	default:
+	  fp << "  o->Out." << a_bus[i].PgmName << 
+	    " = ((pwr_sClass_" << o.name() << " *)o->InP->Ptr)->" << 
+	    a_bus[i].PgmName << "; \\" << '\n';
+	}
       }
-
-      int_val = 1;
-      sts = ldh_SetObjectPar(ip->PointedSession, oid, "SysBody",
-          "segname_annotation", (char*)&int_val, sizeof(int_val));
-      if (EVEN(sts))
-        return sts;
-
-      if (plctemplate)
-        int_val = 58;
-      else if (plcconnect)
-        int_val = 35;
-      else
-        int_val = 4;
-
-      sts = ldh_SetObjectPar(ip->PointedSession, oid, "SysBody", "compmethod",
-          (char*)&int_val, sizeof(int_val));
-      if (EVEN(sts))
-        return sts;
-
-      if (plcconnect) {
-        int_val = 10;
-        sts = ldh_SetObjectPar(ip->PointedSession, oid, "SysBody",
-            "connectmethod", (char*)&int_val, sizeof(int_val));
-        if (EVEN(sts))
-          return sts;
-      }
-
-      int_val = 2;
-      sts = ldh_SetObjectPar(ip->PointedSession, oid, "SysBody",
-          "executeordermethod", (char*)&int_val, sizeof(int_val));
-      if (EVEN(sts))
-        return sts;
-
-      oname[15] = 0;
-      sts = ldh_SetObjectPar(ip->PointedSession, oid, "SysBody", "objname",
-          oname, sizeof(pwr_tString16));
-      if (EVEN(sts))
-        return sts;
-
-      sts = ldh_SetObjectPar(ip->PointedSession, oid, "SysBody", "graphname",
-          oname, sizeof(pwr_tString16));
-      if (EVEN(sts))
-        return sts;
     }
+    fp << "}" << '\n' << '\n';
   }
+  fp.close();
 
-  if (plcconnect) {
-    sts = ldh_CreateObject(ip->PointedSession, &oid, "RtXtt", pwr_eClass_RtMenu,
-        ip->Pointed.Objid, ldh_eDest_IntoLast);
-    strcpy(name, pname);
-    strcat(name, "-");
-    strcat(name, "RtXtt");
-    sts = ldh_NameToObjid(ip->PointedSession, &oid, name);
-    if (EVEN(sts))
-      return sts;
-
-    sts = ldh_CreateObject(ip->PointedSession, &oid, "PlcConnect",
-        pwr_eClass_MenuRef, oid, ldh_eDest_IntoLast);
-    if (ODD(sts)) {
-      strcpy(str, "PlcConnect");
-
-      sts = ldh_SetObjectPar(ip->PointedSession, oid, "SysBody", "ButtonName",
-          str, sizeof(pwr_tString40));
-      if (EVEN(sts))
-        return sts;
-
-      sts = ldh_SetObjectPar(ip->PointedSession, oid, "SysBody", "RefAttribute",
-          str, sizeof(pwr_tString40));
-      if (EVEN(sts))
-        return sts;
-    }
-  }
-
-  if (plctemplate) {
-    sts = ldh_CreateObject(ip->PointedSession, &oid, "Code",
-        pwr_cClass_PlcTemplate, ip->Pointed.Objid, ldh_eDest_IntoLast);
-  }
-
-  if (plcembedded) {
-    // Create PlcEmbed attribute
-    strcpy(name, pname);
-    strcat(name, "-");
-    strcat(name, "RtBody");
-    sts = ldh_NameToObjid(ip->PointedSession, &oid, name);
-    if (EVEN(sts))
-      return sts;
-
-    sts = ldh_CreateObject(ip->PointedSession, &coid, "PlcEmbed",
-        pwr_eClass_Param, oid, ldh_eDest_IntoLast);
-    if (ODD(sts)) {
-      tid = pwr_cClass_PlcEmbed;
-
-      sts = ldh_SetObjectPar(ip->PointedSession, coid, "SysBody", "TypeRef",
-          (char*)&tid, sizeof(tid));
-      if (EVEN(sts))
-        return sts;
-    }
-
-    // Create PostCreate callback
-    sts = ldh_CreateObject(ip->PointedSession, &oid, "PostCreate",
-        pwr_eClass_DbCallBack, ip->Pointed.Objid, ldh_eDest_IntoLast);
-
-    strcpy(str, "PlcEmbed-PostCreate");
-    sts = ldh_SetObjectPar(ip->PointedSession, oid, "SysBody", "MethodName",
-        str, sizeof(pwr_tString40));
-    if (EVEN(sts))
-      return sts;
-
-    //
-  }
   return PWRS__SUCCESS;
 }
 
-pwr_dExport pwr_BindMethods($ClassDef) = { pwr_BindMethod(AnteCreate),
-  pwr_BindMethod(OpenObjectGraph), pwr_BindMethod(ConfigFc), pwr_NullMethod };
+static pwr_tStatus Bus(ldh_sMenuCall* ip)
+{
+  int sts = PWRS__SUCCESS;
+  pwr_tOName oname, nname;
+  pwr_tCid cid;
+  wb_session *sp = (wb_session*)ip->PointedSession;
+  pwr_tString80 arg[5];
+  wb_object o = sp->object(ip->Pointed.Objid);
+  if (!o)
+    return o.sts();
+
+  strcpy(oname, o.name());
+
+  wb_object menu = sp->object(ip->ItemList[ip->ChosenItem].MenuObject);
+  if (!menu)
+    return menu.sts();
+  wb_attribute mb_arg = sp->attribute(menu.oid(), "SysBody", "MethodArguments");
+  if (!mb_arg)
+    return mb_arg.sts();
+
+  mb_arg.value(&arg);
+
+  if (streq(arg[0], "")) {
+    printf("Split bus\n");
+    std::vector<sAdef> a_bus;
+
+    strcpy(nname, oname);
+    strcat(nname, "Split");
+
+    wb_object rbo = o.first();
+    if (!rbo)
+      return rbo.sts();
+
+    for (wb_object ao = rbo.first(); ao; ao = ao.after()) {
+      sAdef adef;
+      strcpy(adef.Name, ao.name());
+      wb_attribute aa = sp->attribute(ao.oid(), "SysBody", "TypeRef");
+      aa.value(&adef.Type);
+      aa = sp->attribute(ao.oid(), "SysBody", "Elements");
+      aa.value(&adef.Elements);
+      aa = sp->attribute(ao.oid(), "SysBody", "Flags");
+      aa.value(&adef.Flags);
+
+      a_bus.push_back(adef);
+    }
+    if (a_bus.size() > ATTR_MAX)
+      return PWRS__BUSATTRLIMIT;
+    
+    wb_cdef cdef = sp->cdef(pwr_eClass_ClassDef);
+    wb_destination dest = o.destination(ldh_eDest_After);
+    wb_object so;
+    try {
+      so = sp->createObject(cdef, dest, nname);
+      if (!so)
+	return so.sts();
+    } catch (wb_error& e) {
+      return e.sts();
+    }
+
+    sts = config_fo((ldh_tSession)sp, so.oid(), 0, 0, 1, 0);
+    if (EVEN(sts))
+      return sts;
+
+    wb_object rbso = so.first();
+    if (!rbso)
+      return rbso.sts();
+
+    cid = cdh_ClassObjidToId(o.oid());
+
+    dest = rbso.destination(ldh_eDest_IntoLast);
+    cdef = sp->cdef(pwr_eClass_Input);    
+
+    try {
+      wb_object ao = sp->createObject(cdef, dest, "In");
+      if (!ao)
+	return ao.sts();
+
+      wb_attribute aa = sp->attribute(ao.oid(), "SysBody", "TypeRef");
+      sp->writeAttribute(aa, &cid, sizeof(cid));
+
+      aa = sp->attribute(ao.oid(), "SysBody", "Flags");
+      pwr_tMask m = pwr_mAdef_class;
+      sp->writeAttribute(aa, &m, sizeof(m));
+
+      aa = sp->attribute(ao.oid(), "SysBody", "GraphName");
+      pwr_tObjName n = "In";
+      sp->writeAttribute(aa, n, sizeof(n));
+    } catch (wb_error& e) {
+      return e.sts();
+    }
+
+    cdef = sp->cdef(pwr_eClass_Output);
+
+    int outputcount = 0;
+    for (int i = 0; i < a_bus.size(); i++) {
+      if (outputcount == OUTPUT_MAX)
+	cdef = sp->cdef(pwr_eClass_Intern);
+	
+      try {
+	wb_object ao = sp->createObject(cdef, dest, a_bus[i].Name);
+	if (!ao)
+	  return ao.sts();
+
+	wb_attribute aa = sp->attribute(ao.oid(), "SysBody", "TypeRef");
+	sp->writeAttribute(aa, &a_bus[i].Type, sizeof(pwr_tTid));
+
+	aa = sp->attribute(ao.oid(), "SysBody", "GraphName");
+	pwr_tGraphName n;
+	strncpy(n, a_bus[i].Name, 6);
+	n[6] = 0;
+	sp->writeAttribute(aa, n, sizeof(pwr_tGraphName));
+
+	if (a_bus[i].Flags & pwr_mAdef_array) {
+	  aa = sp->attribute(ao.oid(), "SysBody", "Flags");
+	  pwr_tMask m = pwr_mAdef_array;
+	  sp->writeAttribute(aa, &m, sizeof(m));
+
+	  aa = sp->attribute(ao.oid(), "SysBody", "Elements");
+	  sp->writeAttribute(aa, &a_bus[i].Elements, sizeof(pwr_tMask));
+	}
+      } catch (wb_error& e) {
+	return e.sts();
+      }
+      outputcount++;
+    }
+
+    sts = bus_code(sp, o);
+    if (EVEN(sts))
+      return sts;
+  } else if (streq(arg[0], "CreateJoinBus")) {
+    printf("Join bus\n");
+    std::vector<sAdef> a_bus;
+
+    strcpy(nname, oname);
+    strcat(nname, "Join");
+    
+    wb_object rbo = o.first();
+    if (!rbo)
+      return rbo.sts();
+
+    for (wb_object ao = rbo.first(); ao; ao = ao.after()) {
+      sAdef adef;
+      strcpy(adef.Name, ao.name());
+      wb_attribute aa = sp->attribute(ao.oid(), "SysBody", "TypeRef");
+      aa.value(&adef.Type);
+      aa = sp->attribute(ao.oid(), "SysBody", "Elements");
+      aa.value(&adef.Elements);
+      aa = sp->attribute(ao.oid(), "SysBody", "Flags");
+      aa.value(&adef.Flags);
+
+      a_bus.push_back(adef);
+    }
+    if (a_bus.size() > ATTR_MAX)
+      return PWRS__BUSATTRLIMIT;
+
+    wb_cdef cdef = sp->cdef(pwr_eClass_ClassDef);
+    wb_destination dest = o.destination(ldh_eDest_After);
+    wb_object so;
+    try {
+      so = sp->createObject(cdef, dest, nname);
+      if (!so)
+	return so.sts();
+    } catch (wb_error& e) {
+      return e.sts();
+    }
+
+    sts = config_fo((ldh_tSession)sp, so.oid(), 0, 0, 1, 0);
+    if (EVEN(sts))
+      return sts;
+
+    wb_object rbso = so.first();
+    if (!rbso)
+      return rbso.sts();
+
+    cid = cdh_ClassObjidToId(o.oid());
+
+    dest = rbso.destination(ldh_eDest_IntoLast);
+    cdef = sp->cdef(pwr_eClass_Input);
+
+    wb_object ao;
+    int inputcount = 0;
+    for (int i = 0; i < a_bus.size(); i++) {
+      if (inputcount == INPUT_MAX)
+	break;
+      try {
+	ao = sp->createObject(cdef, dest, a_bus[i].Name);
+	if (!ao)
+	  return ao.sts();
+
+	wb_attribute aa = sp->attribute(ao.oid(), "SysBody", "TypeRef");
+	sp->writeAttribute(aa, &a_bus[i].Type, sizeof(pwr_tTid));
+
+	aa = sp->attribute(ao.oid(), "SysBody", "GraphName");
+	pwr_tGraphName n;
+	strncpy(n, a_bus[i].Name, 6);
+	n[6] = 0;
+	sp->writeAttribute(aa, n, sizeof(pwr_tGraphName));
+
+	if (a_bus[i].Flags & pwr_mAdef_array) {
+	  aa = sp->attribute(ao.oid(), "SysBody", "Flags");
+	  pwr_tMask m = pwr_mAdef_array;
+	  sp->writeAttribute(aa, &m, sizeof(m));
+
+	  aa = sp->attribute(ao.oid(), "SysBody", "Elements");
+	  sp->writeAttribute(aa, &a_bus[i].Elements, sizeof(pwr_tMask));
+	}
+      } catch (wb_error& e) {
+	return e.sts();
+      }
+      inputcount++;
+    }
+
+    cdef = sp->cdef(pwr_eClass_Output);    
+
+    try {
+      ao = sp->createObject(cdef, dest, "Out");
+      if (!ao)
+	return ao.sts();
+
+      wb_attribute aa = sp->attribute(ao.oid(), "SysBody", "TypeRef");
+      sp->writeAttribute(aa, &cid, sizeof(cid));
+
+      aa = sp->attribute(ao.oid(), "SysBody", "Flags");
+      pwr_tMask m = pwr_mAdef_class;
+      sp->writeAttribute(aa, &m, sizeof(m));
+
+      aa = sp->attribute(ao.oid(), "SysBody", "GraphName");
+      pwr_tObjName n = "Out";
+      sp->writeAttribute(aa, n, sizeof(n));
+    } catch (wb_error& e) {
+      return e.sts();
+    }
+
+    sts = bus_code(sp, o);
+    if (EVEN(sts))
+      return sts;
+  } else if (streq(arg[0], "CreateDataToBus")) {
+    printf("Data to bus\n");
+    std::vector<sAdef> a_bus;
+
+    strcpy(nname, "DataTo");
+    strcat(nname, o.name());
+    
+    wb_cdef cdef = sp->cdef(pwr_eClass_ClassDef);
+    wb_destination dest = o.destination(ldh_eDest_After);
+    wb_object so;
+    try {
+      so = sp->createObject(cdef, dest, nname);
+      if (!so)
+	return so.sts();
+    } catch (wb_error& e) {
+      return e.sts();
+    }
+
+    sts = config_fo((ldh_tSession)sp, so.oid(), 0, 0, 1, 0);
+    if (EVEN(sts))
+      return sts;
+
+    wb_object rbo = o.first();
+    if (!rbo)
+      return rbo.sts();
+
+    wb_object rbso = so.first();
+    if (!rbso)
+      return rbso.sts();
+
+    cid = cdh_ClassObjidToId(o.oid());
+
+    for (wb_object ao = rbo.first(); ao; ao = ao.after()) {
+      sAdef adef;
+      strcpy(adef.Name, ao.name());
+      wb_attribute aa = sp->attribute(ao.oid(), "SysBody", "TypeRef");
+      aa.value(&adef.Type);
+      aa = sp->attribute(ao.oid(), "SysBody", "Elements");
+      aa.value(&adef.Elements);
+      aa = sp->attribute(ao.oid(), "SysBody", "Flags");
+      aa.value(&adef.Flags);
+
+      a_bus.push_back(adef);
+    }
+
+    dest = rbso.destination(ldh_eDest_IntoLast);
+    cdef = sp->cdef(pwr_eClass_Input);
+
+    try {
+      wb_object ao = sp->createObject(cdef, dest, "In");
+      if (!ao)
+	return ao.sts();
+
+      wb_attribute aa = sp->attribute(ao.oid(), "SysBody", "TypeRef");
+      pwr_tTid type = pwr_eType_DataRef;
+      sp->writeAttribute(aa, &type, sizeof(pwr_tTid));
+
+      aa = sp->attribute(ao.oid(), "SysBody", "Flags");
+      pwr_tMask m = pwr_mAdef_noremove;
+      sp->writeAttribute(aa, &m, sizeof(m));
+    } catch (wb_error& e) {
+      return e.sts();
+    }
+
+    cdef = sp->cdef(pwr_eClass_Output);    
+
+    try {
+      wb_object ao = sp->createObject(cdef, dest, "Out");
+      if (!ao)
+	return ao.sts();
+
+      wb_attribute aa = sp->attribute(ao.oid(), "SysBody", "TypeRef");
+      sp->writeAttribute(aa, &cid, sizeof(cid));
+
+      aa = sp->attribute(ao.oid(), "SysBody", "Flags");
+      pwr_tMask m = pwr_mAdef_class;
+      sp->writeAttribute(aa, &m, sizeof(m));
+    } catch (wb_error& e) {
+      return e.sts();
+    }
+
+    // GraphPlcNode.GraphMethod
+    rbso = so.last();
+    if (!rbso)
+      return rbso.sts();
+
+    try {
+      wb_attribute aa = sp->attribute(rbso.oid(), "SysBody", "graphmethod");
+      pwr_tUInt32 value = 1;
+      sp->writeAttribute(aa, &value, sizeof(pwr_tUInt32));
+    } catch (wb_error& e) {
+      return e.sts();
+    }
+
+    sts = bus_code(sp, o);
+    if (EVEN(sts))
+      return sts;
+  } else if (streq(arg[0], "CreateGetBus")) {
+    printf("Get bus\n");
+    strcpy(nname, "Get");
+    strcat(nname, oname);
+    
+    wb_cdef cdef = sp->cdef(pwr_eClass_ClassDef);
+    wb_destination dest = o.destination(ldh_eDest_After);
+    wb_object so;
+    try {
+      so = sp->createObject(cdef, dest, nname);
+      if (!so)
+	return so.sts();
+    } catch (wb_error& e) {
+      return e.sts();
+    }
+
+    sts = config_fo((ldh_tSession)sp, so.oid(), 0, 0, 1, 0);
+    if (EVEN(sts))
+      return sts;
+
+    wb_object rbo = so.first();
+    if (!rbo)
+      return rbo.sts();
+
+    dest = rbo.destination(ldh_eDest_IntoLast);
+    cdef = sp->cdef(pwr_eClass_Output);    
+
+    try {
+      wb_object ao = sp->createObject(cdef, dest, "Out");
+      if (!ao)
+	return ao.sts();
+
+      cid = cdh_ClassObjidToId(o.oid());
+      wb_attribute aa = sp->attribute(ao.oid(), "SysBody", "TypeRef");
+      sp->writeAttribute(aa, &cid, sizeof(cid));
+
+      aa = sp->attribute(ao.oid(), "SysBody", "Flags");
+      pwr_tMask m = pwr_mAdef_class;
+      sp->writeAttribute(aa, &m, sizeof(m));
+
+      aa = sp->attribute(ao.oid(), "SysBody", "GraphName");
+      pwr_tObjName n = "Out";
+      sp->writeAttribute(aa, n, sizeof(n));
+    } catch (wb_error& e) {
+      return e.sts();
+    }
+
+    // DevBody
+    rbo = rbo.after();
+    if (!rbo)
+      return rbo.sts();
+
+    dest = rbo.destination(ldh_eDest_IntoFirst);
+    cdef = sp->cdef(pwr_eClass_Intern);
+
+    try {
+      wb_object ao = sp->createObject(cdef, dest, "ObjectSegments");
+      if (!ao)
+	return ao.sts();
+
+      wb_attribute aa = sp->attribute(ao.oid(), "SysBody", "TypeRef");
+      pwr_tTypeId type = pwr_eType_Int32;
+      sp->writeAttribute(aa, &type, sizeof(pwr_tTypeId));
+    } catch (wb_error& e) {
+      return e.sts();
+    }
+
+    try {
+      wb_object ao = sp->createObject(cdef, dest, "Object");
+      if (!ao)
+	return ao.sts();
+
+      wb_attribute aa = sp->attribute(ao.oid(), "SysBody", "TypeRef");
+      pwr_tTypeId type = pwr_eType_AttrRef;
+      sp->writeAttribute(aa, &type, sizeof(pwr_tTypeId));
+
+      aa = sp->attribute(ao.oid(), "SysBody", "NiNaAnnot");
+      pwr_tUInt32 value = 1;
+      sp->writeAttribute(aa, &value, sizeof(pwr_tUInt32));
+
+      aa = sp->attribute(ao.oid(), "SysBody", "NiNaSegments");
+      pwr_tBoolean bvalue = 1;
+      sp->writeAttribute(aa, &bvalue, sizeof(pwr_tBoolean));
+    } catch (wb_error& e) {
+      return e.sts();
+    }
+
+    // GraphPlcNode.CompMethod
+    rbo = rbo.after();
+    if (!rbo)
+      return rbo.sts();
+
+    try {
+      wb_attribute aa = sp->attribute(rbo.oid(), "SysBody", "graphmethod");
+      pwr_tUInt32 value = 7;
+      sp->writeAttribute(aa, &value, sizeof(pwr_tUInt32));
+
+      aa = sp->attribute(rbo.oid(), "SysBody", "compmethod");
+      value = 72;
+      sp->writeAttribute(aa, &value, sizeof(pwr_tUInt32));
+
+      aa = sp->attribute(rbo.oid(), "SysBody", "segname_annotation");
+      pwr_tBoolean bvalue = 0;
+      sp->writeAttribute(aa, &bvalue, sizeof(pwr_tBoolean));
+
+      aa = sp->attribute(rbo.oid(), "SysBody", "devbody_annotation");
+      bvalue = 1;
+      sp->writeAttribute(aa, &bvalue, sizeof(pwr_tBoolean));
+    } catch (wb_error& e) {
+      return e.sts();
+    }
+  } else if (streq(arg[0], "CreateCStoBus")) {
+    printf("CSto bus\n");
+    strcpy(nname, "CSto");
+    strcat(nname, oname);
+    
+    wb_cdef cdef = sp->cdef(pwr_eClass_ClassDef);
+    wb_destination dest = o.destination(ldh_eDest_After);
+    wb_object so;
+    try {
+      so = sp->createObject(cdef, dest, nname);
+      if (!so)
+	return so.sts();
+    } catch (wb_error& e) {
+      return e.sts();
+    }
+
+    sts = config_fo((ldh_tSession)sp, so.oid(), 0, 0, 1, 0);
+    if (EVEN(sts))
+      return sts;
+
+    wb_object rbo = so.first();
+    if (!rbo)
+      return rbo.sts();
+
+    dest = rbo.destination(ldh_eDest_IntoLast);
+    cdef = sp->cdef(pwr_eClass_Input);    
+
+    try {
+      wb_object ao = sp->createObject(cdef, dest, "In");
+      if (!ao)
+	return ao.sts();
+
+      cid = cdh_ClassObjidToId(o.oid());
+      wb_attribute aa = sp->attribute(ao.oid(), "SysBody", "TypeRef");
+      sp->writeAttribute(aa, &cid, sizeof(cid));
+
+      aa = sp->attribute(ao.oid(), "SysBody", "Flags");
+      pwr_tMask m = pwr_mAdef_class;
+      sp->writeAttribute(aa, &m, sizeof(m));
+
+      aa = sp->attribute(ao.oid(), "SysBody", "GraphName");
+      pwr_tObjName n = "In";
+      sp->writeAttribute(aa, n, sizeof(n));
+    } catch (wb_error& e) {
+      return e.sts();
+    }
+
+    try {
+      wb_object ao = sp->createObject(cdef, dest, "Cond");
+      if (!ao)
+	return ao.sts();
+
+      cid = cdh_ClassObjidToId(o.oid());
+      wb_attribute aa = sp->attribute(ao.oid(), "SysBody", "TypeRef");
+      pwr_tTypeId type = pwr_eType_Boolean;
+      sp->writeAttribute(aa, &type, sizeof(pwr_tTypeId));
+
+      aa = sp->attribute(ao.oid(), "SysBody", "GraphName");
+      pwr_tObjName n = "cond";
+      sp->writeAttribute(aa, n, sizeof(n));
+    } catch (wb_error& e) {
+      return e.sts();
+    }
+
+    // DevBody
+    rbo = rbo.after();
+    if (!rbo)
+      return rbo.sts();
+
+    dest = rbo.destination(ldh_eDest_IntoFirst);
+    cdef = sp->cdef(pwr_eClass_Intern);
+
+    try {
+      wb_object ao = sp->createObject(cdef, dest, "ObjectSegments");
+      if (!ao)
+	return ao.sts();
+
+      wb_attribute aa = sp->attribute(ao.oid(), "SysBody", "TypeRef");
+      pwr_tTypeId type = pwr_eType_Int32;
+      sp->writeAttribute(aa, &type, sizeof(pwr_tTypeId));
+    } catch (wb_error& e) {
+      return e.sts();
+    }
+
+    try {
+      wb_object ao = sp->createObject(cdef, dest, "Object");
+      if (!ao)
+	return ao.sts();
+
+      wb_attribute aa = sp->attribute(ao.oid(), "SysBody", "TypeRef");
+      pwr_tTypeId type = pwr_eType_AttrRef;
+      sp->writeAttribute(aa, &type, sizeof(pwr_tTypeId));
+
+      aa = sp->attribute(ao.oid(), "SysBody", "NiNaAnnot");
+      pwr_tUInt32 value = 1;
+      sp->writeAttribute(aa, &value, sizeof(pwr_tUInt32));
+
+      aa = sp->attribute(ao.oid(), "SysBody", "NiNaSegments");
+      pwr_tBoolean bvalue = 1;
+      sp->writeAttribute(aa, &bvalue, sizeof(pwr_tBoolean));
+    } catch (wb_error& e) {
+      return e.sts();
+    }
+
+    // GraphPlcNode.CompMethod
+    rbo = rbo.after();
+    if (!rbo)
+      return rbo.sts();
+
+    try {
+      wb_attribute aa = sp->attribute(rbo.oid(), "SysBody", "graphmethod");
+      pwr_tUInt32 value = 15;
+      sp->writeAttribute(aa, &value, sizeof(pwr_tUInt32));
+
+      aa = sp->attribute(rbo.oid(), "SysBody", "compmethod");
+      value = 73;
+      sp->writeAttribute(aa, &value, sizeof(pwr_tUInt32));
+
+      aa = sp->attribute(rbo.oid(), "SysBody", "segname_annotation");
+      pwr_tBoolean bvalue = 0;
+      sp->writeAttribute(aa, &bvalue, sizeof(pwr_tBoolean));
+
+      aa = sp->attribute(rbo.oid(), "SysBody", "devbody_annotation");
+      bvalue = 1;
+      sp->writeAttribute(aa, &bvalue, sizeof(pwr_tBoolean));
+    } catch (wb_error& e) {
+      return e.sts();
+    }
+  } else if (streq(arg[0], "Update")) {
+    int found;
+    pwr_tOName longname;
+    pwr_tOName lname;
+    std::vector<sAdef> a_bus;
+
+
+    printf("Update bus\n");
+
+    strcpy(longname, o.longName().name(cdh_mName_volumeStrict));
+
+    // Get bus attributes
+    wb_object rbo = o.first();
+    if (!rbo)
+      return rbo.sts();
+
+    for (wb_object ao = rbo.first(); ao; ao = ao.after()) {
+      sAdef adef;
+      strcpy(adef.Name, ao.name());
+      wb_attribute aa = sp->attribute(ao.oid(), "SysBody", "TypeRef");
+      aa.value(&adef.Type);
+      aa = sp->attribute(ao.oid(), "SysBody", "Elements");
+      aa.value(&adef.Elements);
+      aa = sp->attribute(ao.oid(), "SysBody", "Flags");
+      aa.value(&adef.Flags);
+
+      a_bus.push_back(adef);
+    }
+
+    // Check Split
+    strcpy(nname, oname);
+    strcat(nname, "Split");
+    strcpy(lname, longname);
+    strcat(lname, "Split");
+    wb_object so = sp->object(lname);
+    if (so) {
+      std::vector<sAdef> a_fo;
+
+      wb_object rbso = so.first();
+      if (!rbso)
+	return rbso.sts();
+
+      for (wb_object ao = rbso.first(); ao; ao = ao.after()) {
+	sAdef adef;
+	strcpy(adef.Name, ao.name());
+	wb_attribute aa = sp->attribute(ao.oid(), "SysBody", "TypeRef");
+	aa.value(&adef.Type);
+	aa = sp->attribute(ao.oid(), "SysBody", "Elements");
+	aa.value(&adef.Elements);
+	aa = sp->attribute(ao.oid(), "SysBody", "Flags");
+	aa.value(&adef.Flags);
+	
+	a_fo.push_back(adef);
+      }
+
+      wb_destination dest = rbso.destination(ldh_eDest_IntoLast);
+      wb_cdef cdef = sp->cdef(pwr_eClass_Output);    
+
+      wb_object ao;
+      // Create new or changed attributes
+      for (int i = 0; i < a_bus.size(); i++) {
+	found = 0;
+	for (int j = 1; j < a_fo.size(); j++) {
+	  if (streq(a_bus[i].Name, a_fo[j].Name)) {
+	    found = 1;
+	    wb_name wname = wb_name(a_fo[j].Name);
+	    ao = rbso.child(wname);
+	    if (!ao)
+	      return ao.sts();
+
+	    if (a_bus[i].Type != a_fo[j].Type) {
+	      wb_attribute aa = sp->attribute(ao.oid(), "SysBody", "TypeRef");
+	      sp->writeAttribute(aa, &a_bus[i].Type, sizeof(pwr_tTid));
+	    }
+	    if (a_bus[i].Elements != a_fo[j].Elements) {
+	    }
+	    break;
+	  }
+	}
+	if (!found) {
+	  // Create
+	  try {
+	    ao = sp->createObject(cdef, dest, a_bus[i].Name);
+	    if (!ao)
+	      return ao.sts();
+
+	    wb_attribute aa = sp->attribute(ao.oid(), "SysBody", "TypeRef");
+	    sp->writeAttribute(aa, &a_bus[i].Type, sizeof(pwr_tTid));
+	    
+	    aa = sp->attribute(ao.oid(), "SysBody", "GraphName");
+	    pwr_tGraphName n;
+	    strncpy(n, a_bus[i].Name, 6);
+	    n[6] = 0;
+	    sp->writeAttribute(aa, n, sizeof(pwr_tGraphName));
+	  } catch (wb_error& e) {
+	    return e.sts();
+	  }
+	}
+      }
+      // Remove other attributes
+      for (int j = 1; j < a_fo.size(); j++) {
+	found = 0;
+	for (int i = 0; i < a_bus.size(); i++) {
+	  if (streq(a_bus[i].Name, a_fo[j].Name)) {
+	    found = 1;
+	    break;
+	  }
+	}
+	if (!found) {
+	  // Delete attribute
+	  wb_name wname = wb_name(a_fo[j].Name);
+	  ao = rbso.child(wname);
+	  if (!ao)
+	    return ao.sts();
+
+	  sp->deleteObject(ao);
+	}
+      }
+
+      // Order attributes
+      wb_object first = rbso.first();
+      wb_object ob = first;
+      for (int i = 0; i < a_bus.size(); i++) {
+	for (wb_object oa = first.after(); oa; oa = oa.after()) {
+	  if (streq(a_bus[i].Name, oa.name())) {
+	    wb_destination dest = ob.destination(ldh_eDest_After);
+	    sp->moveObject(oa, dest);
+	    ob = oa;
+	    break;
+	  }
+	}
+      }
+    }
+
+    // Check Join
+    strcpy(nname, oname);
+    strcat(nname, "Join");
+    strcpy(lname, longname);
+    strcat(lname, "Join");
+    so = sp->object(lname);
+    if (so) {
+      std::vector<sAdef> a_fo;
+
+      wb_object rbso = so.first();
+      if (!rbso)
+	return rbso.sts();
+
+      for (wb_object ao = rbso.first(); ao; ao = ao.after()) {
+	sAdef adef;
+	strcpy(adef.Name, ao.name());
+	wb_attribute aa = sp->attribute(ao.oid(), "SysBody", "TypeRef");
+	aa.value(&adef.Type);
+	aa = sp->attribute(ao.oid(), "SysBody", "Elements");
+	aa.value(&adef.Elements);
+	aa = sp->attribute(ao.oid(), "SysBody", "Flags");
+	aa.value(&adef.Flags);
+	
+	a_fo.push_back(adef);
+      }
+
+      wb_object lc = rbso.last();
+      wb_destination dest = lc.destination(ldh_eDest_Before);
+      wb_cdef cdef = sp->cdef(pwr_eClass_Input);    
+
+      wb_object ao;
+      // Create new or changed attributes
+      for (int i = 0; i < a_bus.size(); i++) {
+	found = 0;
+	for (int j = 0; j < a_fo.size() - 1; j++) {
+	  if (streq(a_bus[i].Name, a_fo[j].Name)) {
+	    found = 1;
+	    wb_name wname = wb_name(a_fo[j].Name);
+	    ao = rbso.child(wname);
+	    if (!ao)
+	      return ao.sts();
+
+	    if (a_bus[i].Type != a_fo[j].Type) {
+	      wb_attribute aa = sp->attribute(ao.oid(), "SysBody", "TypeRef");
+	      sp->writeAttribute(aa, &a_bus[i].Type, sizeof(pwr_tTid));
+	    }
+	    if (a_bus[i].Elements != a_fo[j].Elements) {
+	    }
+	    break;
+	  }
+	}
+	if (!found) {
+	  // Create
+	  try {
+	    ao = sp->createObject(cdef, dest, a_bus[i].Name);
+	    if (!ao)
+	      return ao.sts();
+
+	    wb_attribute aa = sp->attribute(ao.oid(), "SysBody", "TypeRef");
+	    sp->writeAttribute(aa, &a_bus[i].Type, sizeof(pwr_tTid));
+	    
+	    aa = sp->attribute(ao.oid(), "SysBody", "GraphName");
+	    pwr_tGraphName n;
+	    strncpy(n, a_bus[i].Name, 6);
+	    n[6] = 0;
+	    sp->writeAttribute(aa, n, sizeof(pwr_tGraphName));
+
+	    if (a_bus[i].Flags & pwr_mAdef_array) {
+	      aa = sp->attribute(ao.oid(), "SysBody", "Flags");
+	      pwr_tMask m = pwr_mAdef_array;
+	      sp->writeAttribute(aa, &m, sizeof(m));
+
+	      aa = sp->attribute(ao.oid(), "SysBody", "Elements");
+	      sp->writeAttribute(aa, &a_bus[i].Elements, sizeof(pwr_tMask));
+	    }
+	  } catch (wb_error& e) {
+	    return e.sts();
+	  }
+	}
+      }
+      // Remove other attributes
+      for (int j = 0; j < a_fo.size() - 1; j++) {
+	found = 0;
+	for (int i = 0; i < a_bus.size(); i++) {
+	  if (streq(a_bus[i].Name, a_fo[j].Name)) {
+	    found = 1;
+	    break;
+	  }
+	}
+	if (!found) {
+	  // Delete attribute
+	  wb_name wname = wb_name(a_fo[j].Name);
+	  ao = rbso.child(wname);
+	  if (!ao)
+	    return ao.sts();
+
+	  sp->deleteObject(ao);
+	}
+      }
+
+      // Order attributes
+      wb_object ob = rbso;
+      for (int i = 0; i < a_bus.size(); i++) {
+	for (wb_object oa = rbso.first(); oa; oa = oa.after()) {
+	  if (streq(a_bus[i].Name, oa.name())) {
+	    if (i == 0)
+	      dest = ob.destination(ldh_eDest_IntoFirst);
+	    else
+	      dest = ob.destination(ldh_eDest_After);
+	    sp->moveObject(oa, dest);
+	    ob = oa;
+	    break;
+	  }
+	}
+      }
+    }
+
+    sts = bus_code(sp, o);
+    if (EVEN(sts))
+      return sts;
+  }
+  else
+    printf("Unknown method\n");
+
+  return PWRS__SUCCESS;
+}
+
+pwr_dExport pwr_BindMethods($ClassDef) = { 
+  pwr_BindMethod(AnteCreate),
+  pwr_BindMethod(OpenObjectGraph),
+  pwr_BindMethod(ConfigFc),
+  pwr_BindMethod(Bus),
+  pwr_NullMethod };

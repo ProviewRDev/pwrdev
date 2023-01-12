@@ -41,6 +41,7 @@
 #include <stdlib.h>
 
 #include "pwr_baseclasses.h"
+#include "pwr_dataqclasses.h"
 
 #include "co_dcli.h"
 #include "co_string.h"
@@ -111,6 +112,7 @@ int WGre::get_annot_width(flow_tNodeClass nodeclass, float* annot_width,
 //	Get the annotations that should be written in the graphics
 //	for a node.
 //
+
 int WGre::get_annotations(vldh_t_node node, char* annot_str, int* annot_nr,
     int* annot_count, int annot_max, int annot_size)
 {
@@ -157,7 +159,7 @@ int WGre::get_annotations(vldh_t_node node, char* annot_str, int* annot_nr,
     (*annot_count)++;
   }
 
-  if (node->ln.cid != pwr_cClass_order) {
+  if (!(node->ln.cid == pwr_cClass_order || node->ln.cid == pwr_cClass_QOrder)) {
     for (j = 0; j < 2; j++) {
       /* Look for annotations in some parameter in devbody or rtbody */
       if (j == 0) {

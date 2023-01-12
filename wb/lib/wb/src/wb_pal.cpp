@@ -363,6 +363,15 @@ PalItemClass::PalItemClass(Pal* pal, char* item_name, brow_tNode dest,
           case 3:
             pixmap = pal->pixmap_orderact;
             break;
+          case 4: {
+            switch (graphbody->graphindex) {
+	    case 50:
+	    case 51:
+	      pixmap = pal->pixmap_get;
+	      break;
+	    }
+	    break;
+	  }
           case 5:
             pixmap = pal->pixmap_order;
             break;

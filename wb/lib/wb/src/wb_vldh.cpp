@@ -56,9 +56,6 @@ static int vldh_get_con_defname(vldh_t_wind wind, char* name);
 static int vldh_get_node_defname(
     vldh_t_wind wind, unsigned long object_typ, char* objname, char* name);
 
-static int vldh_get_object_defname(ldh_tSesContext ldhses, pwr_tObjid Objdid,
-    unsigned long object_type, char* objname, char* name);
-
 static int vldh_node_load(vldh_t_wind wind, pwr_tObjid objdid);
 
 static void cnv_to_neted(vldh_t_node n);
@@ -258,7 +255,7 @@ static int vldh_get_node_defname(
 *
 **************************************************************************/
 
-static int vldh_get_object_defname(ldh_tSesContext ldhses, pwr_tObjid Objdid,
+int vldh_get_object_defname(ldh_tSesContext ldhses, pwr_tObjid Objdid,
     unsigned long object_type, char* objname, char* name)
 {
   int sts, size;
@@ -3621,6 +3618,17 @@ int vldh_node_update_spec(vldh_t_node node)
       return sts;
   }
   /**********************************************************
+   *	DataQCurrent and DataQCurrentIdx
+   *	Put cell objdid in the ldhobject.
+   **********************************************************/
+  else if ((node->ln.cid == vldh_eclass(ldhses, "DataQCurrentData"))
+      || (node->ln.cid == vldh_eclass(ldhses, "DataQCurrentIdx"))) {
+    sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "DataQFoObject",
+        (char*)&wind->lw.poid, sizeof(wind->lw.poid));
+    if (EVEN(sts))
+      return sts;
+  }
+  /**********************************************************
    *	SHOWPLCATTR
    *	Put plc attributes in the ldhobject.
    **********************************************************/
@@ -3963,6 +3971,17 @@ int vldh_node_create_spec(vldh_t_node node)
   else if ((node->ln.cid == vldh_eclass(ldhses, "CurrentData"))
       || (node->ln.cid == vldh_eclass(ldhses, "CurrentIndex"))) {
     sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "CellObject",
+        (char*)&wind->lw.poid, sizeof(wind->lw.poid));
+    if (EVEN(sts))
+      return sts;
+  }
+  /**********************************************************
+   *	DataQCurrentData and DataQCurrentIdx
+   *	Put cell objdid in the ldhobject.
+   **********************************************************/
+  else if ((node->ln.cid == vldh_eclass(ldhses, "DataQCurrentData"))
+      || (node->ln.cid == vldh_eclass(ldhses, "DataQCurrentIdx"))) {
+    sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "DataQFoObject",
         (char*)&wind->lw.poid, sizeof(wind->lw.poid));
     if (EVEN(sts))
       return sts;

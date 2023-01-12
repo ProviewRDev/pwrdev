@@ -1089,6 +1089,8 @@ int FlowDrawGtk::rect(FlowCtx* ctx, int x, int y, int width, int height,
   if (highlight) {
     if (gc_type == flow_eDrawType_LineGray)
       cairo_set_source(cr, gc_black);
+    else if (gc_type == flow_eDrawType_LineErase)
+      cairo_set_source(cr, gc_erase);
     else
       cairo_set_source(cr, gc_red);
   } else {
