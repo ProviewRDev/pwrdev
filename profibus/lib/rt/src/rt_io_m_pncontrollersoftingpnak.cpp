@@ -151,11 +151,11 @@ static pwr_tStatus IoAgentRead(io_tCtx ctx, io_sAgent* ap)
   for (device_list = ap->racklist, i = 1; device_list != NULL || i < local->device_list.size();
        device_list = device_list->next, i++)
   {
-    // pwr_sClass_PnDevice *device = (pwr_sClass_PnDevice*)(device_list->op);
+    pwr_sClass_PnDevice* pwr_device = (pwr_sClass_PnDevice*)(device_list->op);
 
     pn_device = local->device_list[i];
 
-    if (pn_device->m_rt_device_state == PNAK_DEVICE_STATE_CONNECTED)
+    if (pn_device->m_rt_device_state & PNAK_DEVICE_STATE_CONNECTED)
     {
       auto& iocr = pn_device->m_IOCR_map.at(PROFINET_IO_CR_TYPE_INPUT);
       //  TODO Implement iocrstate propagation to pn device. But as of now
@@ -166,12 +166,18 @@ static pwr_tStatus IoAgentRead(io_tCtx ctx, io_sAgent* ap)
       sts = pnak_get_iocr_data(0, iocr.m_rt_identifier, iocr.m_rt_io_data, &data_length, &ioxs, &status_data);
       if (sts == PNAK_OK)
       {
+        // Set the iocs status. If we have bad data, teh stack will give os zeroed inputs and
+        // the error counter will start increasing
+        if ((pwr_device->IOCS = ioxs) == 0x40)
+        {
+          pwr_device->Status = PB__DISABLED;
+        } // 0x40 == Bad, 0x80 == Good...
+
         for (auto& slot : pn_device->m_slot_list)
         {
           for (auto& subslot : slot.m_subslot_map)
           {
-            if (subslot.second.m_rt_io_submodule_type == PROFINET_IO_SUBMODULE_TYPE_INPUT ||
-                subslot.second.m_rt_io_submodule_type == PROFINET_IO_SUBMODULE_TYPE_INPUT_AND_OUTPUT)
+            if (subslot.second.m_rt_io_submodule_type & PROFINET_IO_SUBMODULE_TYPE_INPUT)
             {
               io_datap = iocr.m_rt_io_data + subslot.second.m_rt_offset_io_in;
               clean_io_datap = iocr.m_rt_clean_io_data + subslot.second.m_rt_offset_clean_io_in;
@@ -222,7 +228,7 @@ static pwr_tStatus IoAgentWrite(io_tCtx ctx, io_sAgent* ap)
     sp = (pwr_sClass_PnDevice*)device_list->op;
     pn_device = local->device_list[i]; // TODO Maybe we should map against certain names instead.
 
-    if (pn_device->m_rt_device_state == PNAK_DEVICE_STATE_CONNECTED)
+    if (pn_device->m_rt_device_state & PNAK_DEVICE_STATE_CONNECTED)
     {
       // The map index is the IOCR Type
       auto& iocr = pn_device->m_IOCR_map.at(PROFINET_IO_CR_TYPE_OUTPUT);

@@ -1380,6 +1380,37 @@ int unpack_get_alarm_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local
   return -1;
 }
 
+/* Returns the PnModule given from a device_reference and a slot_number */
+pwr_sClass_PnModule* get_pwr_pn_module(io_sAgent* ap, uint device_reference, uint slot_number)
+{
+  int i;
+
+  if (ap)
+  {
+    /* Find corresponding device */
+    io_sRack* slave_list;
+    for (slave_list = ap->racklist, i = 0; (slave_list != NULL) && i < device_reference - 1;
+         slave_list = slave_list->next, i++)
+    {
+    }
+
+    if (slave_list)
+    {
+      pwr_sClass_PnModule* module = NULL;
+
+      // Loop through the modules and return the corresponding module
+      io_sCard* module_list;
+      for (module_list = slave_list->cardlist; module_list != NULL; module_list = module_list->next)
+      {
+        module = (pwr_sClass_PnModule*)module_list->op;
+        if (module->Slot == slot_number)
+          return module;
+      }
+    }
+  }
+  return (pwr_sClass_PnModule*)0;
+}
+
 int unpack_get_device_state_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local, io_sAgent* ap)
 {
   if (pSdb->Result == PNAK_RESULT_POS)
@@ -1390,10 +1421,6 @@ int unpack_get_device_state_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal
     unsigned short device_ref, ii, jj;
 
     std::shared_ptr<ProfinetDevice> pn_device;
-    unsigned short save_first = TRUE;
-    unsigned short err_slot_number = 0;
-    unsigned short err_module_state = 0;
-    unsigned short phys_ident_number = 0;
 
     // Fetch a reference to the corresponding device
     device_ref = pSdb->DeviceRef;
@@ -1452,10 +1479,14 @@ int unpack_get_device_state_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal
           PN_U16 number_of_submodules = _HIGH_LOW_BYTES_TO_PN_U16(pDiffModuleSlot->NumberOfSubmodulesHighByte,
                                                                   pDiffModuleSlot->NumberOfSubmodulesLowByte);
 
-          // Update slot data
+          // Update "pwr" module data
+          // pwr_sClass_PnModule* module = get_pwr_pn_module(ap, device_ref, slot_number);
+          // module->State = module_state;
+          // module->RealIdentNumber = ident_number;
+
+          // Update "runtime" slot data
           ProfinetSlot& s = pn_device->m_slot_list.at(slot_number);
           s.m_rt_state = module_state;
-
           s.m_rt_phys_ident_number = ident_number;
 
           T_PN_DIFF_MODULE_SUBSLOT* pDiffModuleSubslot = (T_PN_DIFF_MODULE_SUBSLOT*)(pDiffModuleSlot + 1);
@@ -1494,27 +1525,47 @@ int unpack_get_device_state_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal
            slave_list = slave_list->next, jj++)
       {
       }
+
       if (slave_list)
       {
-        pwr_sClass_PnDevice* dev;
-        dev = (pwr_sClass_PnDevice*)slave_list->op;
+        pwr_sClass_PnDevice* dev = (pwr_sClass_PnDevice*)slave_list->op;
+        pwr_sClass_PnModule* module = NULL;
+
+        // Loop through the modules and update accordingly
+        io_sCard* module_list;
+        for (module_list = slave_list->cardlist; module_list != NULL; module_list = module_list->next)
+        {
+          module = (pwr_sClass_PnModule*)module_list->op;
+          ProfinetSlot& slot = pn_device->m_slot_list.at(module->Slot);
+          if (slot.m_rt_phys_ident_number == 0)
+          {
+            module->State = pwr_ePnModuleStateEnum_OK;
+            module->RealIdentNumber = 0;
+          }
+          else
+          {
+            module->State = slot.m_rt_state;
+            module->RealIdentNumber = slot.m_rt_phys_ident_number;
+          }          
+        }
+
         dev->NoDiffModules = pn_device->m_rt_number_of_diff_modules;
-        if (pn_device->m_rt_device_state == PNAK_DEVICE_STATE_CONNECTED)
+        if (pn_device->m_rt_device_state & PNAK_DEVICE_STATE_CONNECTED)
           dev->Status = PB__NORMAL;
         else
           dev->Status = PB__NOCONN;
-        if (!save_first)
-        {
-          dev->ErrSlotNumber = err_slot_number;
-          dev->ErrModuleState = err_module_state;
-          dev->PhysIdentNumber = phys_ident_number;
-        }
-        else
-        {
-          dev->ErrSlotNumber = 0;
-          dev->ErrModuleState = 0;
-          dev->PhysIdentNumber = 0;
-        }
+        // if (!save_first)
+        // {
+        //   dev->ErrSlotNumber = err_slot_number;
+        //   dev->ErrModuleState = err_module_state;
+        //   dev->PhysIdentNumber = phys_ident_number;
+        // }
+        // else
+        // {
+        //   dev->ErrSlotNumber = 0;
+        //   dev->ErrModuleState = 0;
+        //   dev->PhysIdentNumber = 0;
+        // }
       }
     }
 
@@ -1840,7 +1891,7 @@ void handle_device_state_changed(io_sAgentLocal* local, io_sAgent* ap)
             dev = (pwr_sClass_PnDevice*)slave_list->op;
             dev->State = dev_state.State[ii];
 
-            if (dev->State == PNAK_DEVICE_STATE_CONNECTED)
+            if (dev->State & PNAK_DEVICE_STATE_CONNECTED)
               dev->Status = PB__NORMAL;
             else
               dev->Status = PB__NOCONN;
@@ -1849,7 +1900,7 @@ void handle_device_state_changed(io_sAgentLocal* local, io_sAgent* ap)
           }
         }
 
-        if (dev_state.State[ii] == PNAK_DEVICE_STATE_CONNECTED)
+        if (dev_state.State[ii] & PNAK_DEVICE_STATE_CONNECTED)
         {
           pack_get_device_state_req(&local->service_req_res, local->device_list[ii]->m_rt_device_ref);
 
@@ -2197,18 +2248,18 @@ void* handle_events(void* ptr)
 
   /* Check state for all devices */
 
-  for (int device = 1; device < local->device_list.size(); device++)
-  {
-    //  for (ii = 0; ii < 1; ii++) {
-    pack_get_device_state_req(&local->service_req_res, local->device_list[device]->m_rt_device_ref);
+  // for (int device = 1; device < local->device_list.size(); device++)
+  // {
+  //   //  for (ii = 0; ii < 1; ii++) {
+  //   pack_get_device_state_req(&local->service_req_res, local->device_list[device]->m_rt_device_ref);
 
-    sts = pnak_send_service_req_res(0, &local->service_req_res);
+  //   sts = pnak_send_service_req_res(0, &local->service_req_res);
 
-    if (sts == PNAK_OK)
-    {
-      sts = wait_service_con(local, ap);
-    }
-  }
+  //   if (sts == PNAK_OK)
+  //   {
+  //     sts = wait_service_con(local, ap);
+  //   }
+  // }
 
   pthread_cond_signal(&local->cond);
   pthread_mutex_unlock(&local->mutex);
@@ -2224,10 +2275,13 @@ void* handle_events(void* ptr)
       PNAK_WAIT_OBJECT_SERVICE_CON
     */
 
+    // wait_object = PNAK_WAIT_OBJECTS_ALL & ~PNAK_WAIT_OBJECT_PROVIDER_DATA_UPDATED;
     wait_object = PNAK_WAIT_OBJECTS_ALL &
                   ~(PNAK_WAIT_OBJECT_PROVIDER_DATA_UPDATED | PNAK_WAIT_OBJECT_CONSUMER_DATA_CHANGED);
 
     sts = pnak_wait_for_multiple_objects(0, &wait_object, PNAK_INFINITE_TIMEOUT);
+
+    // std::cout << "Woke up: " << sts << " wo: " << wait_object << std::endl;
 
     if (sts == PNAK_OK)
     {
@@ -2285,8 +2339,17 @@ void* handle_events(void* ptr)
       }
       else if (wait_object & PNAK_WAIT_OBJECT_SERVICE_REQ_RES_HANDLED)
       {
-        std::cout << "Request/Response handled!" << std::endl;
+        // std::cout << "Request/Response handled!" << std::endl;
       }
+      // else if (wait_object & PNAK_WAIT_OBJECT_CONSUMER_DATA_CHANGED)
+      // {
+      //   sts =
+      //       pnak_get_iocr_data(0, iocr.m_rt_identifier, iocr.m_rt_io_data, &data_length, &ioxs,
+      //       &status_data);
+      //   if (sts == PNAK_OK)
+      //   {
+      //   }
+      // }
       else
         printf("Unknown service: %d\n", wait_object);
     }

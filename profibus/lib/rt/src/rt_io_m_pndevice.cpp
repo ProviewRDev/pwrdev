@@ -237,7 +237,7 @@ static pwr_tStatus IoRackRead(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
   /* The reading of the process image is now performed at the agent level,
   this eliminates the need for board specific code at the rack level.  */
 
-  if (sp->Status == PB__NORMAL)
+  if (sp->Status == PB__NORMAL && sp->IOCS == pwr_ePnIOCS_GOOD)
   {
     sp->ErrorCount = 0;
   }
@@ -287,36 +287,38 @@ static pwr_tStatus IoRackWrite(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
   /* The writing of the process image is now performed at the agent level,
   this eliminates the need for board specific code at the rack level.  */
 
-  if (sp->Status == PB__NORMAL)
-  {
-    sp->ErrorCount = 0;
-  }
-  else
-  {
-    if (local->start_cnt >= local->start_time)
-      sp->ErrorCount++;
-  }
+  // Do we really need the same logic in the write aswell???
+  // Removed for now...
+  // if (sp->Status == PB__NORMAL && sp->IOCS == pwr_ePnIOCS_GOOD)
+  // {
+  //   sp->ErrorCount = 0;
+  // }
+  // else
+  // {
+  //   if (local->start_cnt >= local->start_time)
+  //     sp->ErrorCount++;
+  // }
 
-  if (sp->ErrorCount == sp->ErrorHardLimit)
-  {
-    errh_Error("PROFINET: IO Error hard limit reached on device '%s', stall action %d", rp->Name,
-               sp->StallAction);
-    ctx->IOHandler->CardErrorHardLimit = 1;
-    ctx->IOHandler->ErrorHardLimitObject = cdh_ObjidToAref(rp->Objid);
-    sp->ErrorCount++;
-  }
-  else if (sp->ErrorCount == sp->ErrorSoftLimit)
-  {
-    errh_Error("PROFINET: IO Error soft limit reached on device '%s'", rp->Name);
-    ctx->IOHandler->CardErrorSoftLimit = 1;
-    ctx->IOHandler->ErrorSoftLimitObject = cdh_ObjidToAref(rp->Objid);
-    sp->ErrorCount++;
-  }
-  if (sp->ErrorCount > sp->ErrorHardLimit)
-  {
-    if (sp->StallAction == pwr_ePbStallAction_EmergencyBreak)
-      ctx->Node->EmergBreakTrue = 1;
-  }
+  // if (sp->ErrorCount == sp->ErrorHardLimit)
+  // {
+  //   errh_Error("PROFINET: IO Error hard limit reached on device '%s', stall action %d", rp->Name,
+  //              sp->StallAction);
+  //   ctx->IOHandler->CardErrorHardLimit = 1;
+  //   ctx->IOHandler->ErrorHardLimitObject = cdh_ObjidToAref(rp->Objid);
+  //   sp->ErrorCount++;
+  // }
+  // else if (sp->ErrorCount == sp->ErrorSoftLimit)
+  // {
+  //   errh_Error("PROFINET: IO Error soft limit reached on device '%s'", rp->Name);
+  //   ctx->IOHandler->CardErrorSoftLimit = 1;
+  //   ctx->IOHandler->ErrorSoftLimitObject = cdh_ObjidToAref(rp->Objid);
+  //   sp->ErrorCount++;
+  // }
+  // if (sp->ErrorCount > sp->ErrorHardLimit)
+  // {
+  //   if (sp->StallAction == pwr_ePbStallAction_EmergencyBreak)
+  //     ctx->Node->EmergBreakTrue = 1;
+  // }
 
   return IO__SUCCESS;
 }
