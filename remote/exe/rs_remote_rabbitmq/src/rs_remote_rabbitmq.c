@@ -295,6 +295,7 @@ unsigned int rmq_receive()
   struct timeval t = {0, 0};
   rabbit_header header;
   int msg_received = 0;
+  int restart = 0;
 
   if (rcv_remtrans && 
       rcv_remtrans->objp->Address[2] & rabbit_mOpt_KeepAll &&
@@ -332,30 +333,46 @@ unsigned int rmq_receive()
         if (frame.frame_type == AMQP_FRAME_METHOD) {
           switch (frame.payload.method.id) {
           case AMQP_BASIC_ACK_METHOD:
-            printf("Basic ack method called\n");
-            break;
+            errh_Error("Exception: Basic ack method called");
+	    return REM__EXCEPTION;
           case AMQP_BASIC_RETURN_METHOD:
-            printf("Basic return method called\n");
-            break;
+            errh_Error("Exception: Basic return method called");
+	    return REM__EXCEPTION;
           case AMQP_CHANNEL_CLOSE_METHOD:
-            printf("Channel close method called\n");
+	    restart = 1;
+            errh_Error("Exception: Channel close method called");
             break;
           case AMQP_CONNECTION_CLOSE_METHOD:
-            printf("Connection close method called\n");
+	    restart = 1;
+            errh_Error("Exception: Connection close method called");
             break;
           default:;
           }
         }
-        return REM__EXCEPTION;
       } else
         return REM__EXCEPTION;
+      break;
     }
+    case AMQP_STATUS_SOCKET_ERROR:
+      errh_Error("Exception: Socket error");
+      restart = 1;
+      break;
+    case AMQP_STATUS_CONNECTION_CLOSED:
+      errh_Error("Exception: Connection closed");
+      restart = 1;
+      break;
+    case AMQP_STATUS_TCP_ERROR:
+      errh_Error("Exception: TCP error");
+      return REM__EXCEPTION;
     }
-    // Reconnect...
-    rmq_close(1);
+    if (restart) {
+      // Reconnect...
+      rmq_close(1);
+      exit(0);
+    }
     return REM__EXCEPTION;
   default:
-    printf("Unknown Reply type: %d\n", ret.reply_type);
+    errh_Error("Unknown Reply type: %d", ret.reply_type);
   }
 
   if (debug)
