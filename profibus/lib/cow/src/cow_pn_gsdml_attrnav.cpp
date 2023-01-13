@@ -1234,7 +1234,8 @@ int GsdmlAttrNav::save()
     }
   }
 
-  // Find all APIs involved and populate a map with indexes to each
+  // Find all APIs involved and populate a map with indexes to each  
+  pn_runtime_data->m_PnDevice->m_API_map.clear();
   int api_index = 0;
   for (auto const& slot : pn_runtime_data->m_PnDevice->m_slot_list)
   {
@@ -1260,7 +1261,8 @@ int GsdmlAttrNav::save()
     }
   }
 
-  // Set up API references in the IOCRs (or the input rather since we copy the output after this)
+  // Set up API references in the IOCRs (or the input rather since we copy the output after this)  
+  pn_runtime_data->m_PnDevice->m_IOCR_map.at(PROFINET_IO_CR_TYPE_INPUT).m_api_refs.clear();
   for (auto const& api : pn_runtime_data->m_PnDevice->m_API_map)
   {
     pn_runtime_data->m_PnDevice->m_IOCR_map.at(PROFINET_IO_CR_TYPE_INPUT).m_api_refs[api.first] =
