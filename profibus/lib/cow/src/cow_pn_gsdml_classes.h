@@ -411,6 +411,20 @@ public:
                    // menus. Otherwise this is implicitly stored as the reference for the map container
 };
 
+class UnitDiagTypeItem : public Node
+{
+public:
+  UnitDiagTypeItem(pugi::xml_node&&, pn_gsdml*);
+  UnitDiagTypeItem(UnitDiagTypeItem&&) = default;
+  // Attributes
+  ushort _UserStructureIdentifier;
+
+  // Elements  
+  std::shared_ptr<std::string> _Name;
+  std::shared_ptr<std::string> _Help;
+  std::vector<std::shared_ptr<Ref>> _Ref;
+};
+
 class MenuItem : public Node
 {
 public:

@@ -614,4 +614,17 @@ ExtChannelDiagItem::ExtChannelDiagItem(pugi::xml_node&& extChannelDiagItem, pn_g
     _ExtChannelAddValue.push_back(DataItem(std::move(dataItem), gsdml));
 }
 
+UnitDiagTypeItem::UnitDiagTypeItem(pugi::xml_node&& unitDiagTypeItem, pn_gsdml* gsdml)
+    : _UserStructureIdentifier(unitDiagTypeItem.attribute("UserStructureIdentifier").as_uint()),
+      _Name(gsdml->_get_TextId(
+          std::move(std::string(unitDiagTypeItem.child("Name").attribute("TextId").value())))),
+      _Help(gsdml->_get_TextId(
+          std::move(std::string(unitDiagTypeItem.child("Help").attribute("TextId").value()))))
+{
+  for (pugi::xml_node& ref : unitDiagTypeItem.children("Ref"))
+  {  
+    _Ref.push_back(std::make_shared<Ref>(Ref(std::move(ref), this, gsdml)));    
+  }
+}
+
 } // namespace GSDML

@@ -57,6 +57,12 @@ void pn_gsdml::_build_diagnostics()
   for (pugi::xml_node& chanDiagItem : _xmlChannelDiagList->children("ChannelDiagItem"))
     _channelDiagMap.emplace(std::make_pair(chanDiagItem.attribute("ErrorType").as_uint(),
                                            GSDML::ChannelDiagItem(std::move(chanDiagItem), this)));
+
+  for (pugi::xml_node& unitDiagTypeItem : _xmlUnitDiagTypeList->children("UnitDiagTypeItem"))
+  {
+    _unitDiagTypeMap.emplace(std::make_pair(unitDiagTypeItem.attribute("UserStructureIdentifier").as_uint(),
+                                           GSDML::UnitDiagTypeItem(std::move(unitDiagTypeItem), this)));
+  }
 }
 
 int pn_gsdml::read(const char* filename)
@@ -99,6 +105,8 @@ int pn_gsdml::read(const char* filename)
       _doc->select_node("/ISO15745Profile/ProfileBody/ApplicationProcess/ValueList").node());
   _xmlChannelDiagList = std::make_shared<pugi::xml_node>(
       _doc->select_node("/ISO15745Profile/ProfileBody/ApplicationProcess/ChannelDiagList").node());
+  _xmlUnitDiagTypeList = std::make_shared<pugi::xml_node>(
+      _doc->select_node("/ISO15745Profile/ProfileBody/ApplicationProcess/UnitDiagTypeList").node());
 
   _build_textIdList();
   _build_valueList();

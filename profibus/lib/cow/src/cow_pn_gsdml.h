@@ -122,9 +122,11 @@ private:
   std::shared_ptr<pugi::xml_node> _xmlSubmoduleList;
   std::shared_ptr<pugi::xml_node> _xmlValueList;
   std::shared_ptr<pugi::xml_node> _xmlChannelDiagList;
+  std::shared_ptr<pugi::xml_node> _xmlUnitDiagTypeList;
 
   // "Dereferenced" data structures
   std::unordered_map<ushort, GSDML::ChannelDiagItem> _channelDiagMap;
+  std::unordered_map<ushort, GSDML::UnitDiagTypeItem> _unitDiagTypeMap;
   std::unordered_map<std::string, std::shared_ptr<GSDML::ModuleItem>> _moduleMap;
   std::unordered_map<std::string, std::shared_ptr<GSDML::SubmoduleItem>> _submoduleMap;
   std::unordered_map<std::string, std::shared_ptr<GSDML::ValueItem>> _valueMap;
