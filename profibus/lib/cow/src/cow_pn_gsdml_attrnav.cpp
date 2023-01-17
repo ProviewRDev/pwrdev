@@ -1234,6 +1234,23 @@ int GsdmlAttrNav::save()
     }
   }
 
+  for (auto const& unit_diag_item : gsdml->getUnitDiagTypeMap())
+  {
+    pn_runtime_data->m_PnDevice->m_unit_diag_type_map[unit_diag_item.first].m_name = *unit_diag_item.second._Name;
+    
+    // Not all unit diag type items do have a help item (it's optional)
+    if (unit_diag_item.second._Help)
+    {
+      pn_runtime_data->m_PnDevice->m_unit_diag_type_map[unit_diag_item.first].m_help = *unit_diag_item.second._Help;
+    }
+
+    for (auto const& ref : unit_diag_item.second._Ref)
+    {
+     // pn_runtime_data->m_PnDevice->m_unit_diag_type_map[unit_diag_item.first].m_ref_map.emplace(ref->_ByteOffset, std::move(ProfinetUnitDiagTypeRef()));      
+      pn_runtime_data->m_PnDevice->m_unit_diag_type_map[unit_diag_item.first].m_ref_map[ref->_ByteOffset].m_text = *ref->_Text;
+    }
+  }
+
   // Find all APIs involved and populate a map with indexes to each  
   pn_runtime_data->m_PnDevice->m_API_map.clear();
   int api_index = 0;
@@ -1254,8 +1271,8 @@ int GsdmlAttrNav::save()
       auto slot_linked = std::find(api_ref_index.begin(), api_ref_index.end(), slot.m_slot_number);
       if (slot_linked == api_ref_index.end() && subslot.second.m_submodule_ID != "")
       {
-        std::cout << "Adding reference to module " << slot.m_slot_number
-                  << " for API: " << subslot.second.m_api << std::endl;
+        // std::cout << "Adding reference to module " << slot.m_slot_number
+        //           << " for API: " << subslot.second.m_api << std::endl;
         api_ref_index.push_back(slot.m_slot_number);
       }
     }

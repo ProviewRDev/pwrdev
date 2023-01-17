@@ -52,6 +52,40 @@
 
 ProfinetSlot* ProfinetRuntimeData::m_paste_slotdata = 0;
 
+ProfinetUnitDiagTypeRef::ProfinetUnitDiagTypeRef(pugi::xml_node&& p_Ref)
+    : m_text(p_Ref.attribute("Text").as_string())
+{
+  
+}
+
+void ProfinetUnitDiagTypeRef::build(pugi::xml_node&& p_ref, uint p_byte_offset) const
+{
+  p_ref.append_attribute("Text").set_value(m_text.c_str());
+}
+
+ProfinetUnitDiagType::ProfinetUnitDiagType(pugi::xml_node&& p_UnitDiagType)
+    : m_name(p_UnitDiagType.attribute("Name").as_string()),
+      m_help(p_UnitDiagType.attribute("Help").as_string())
+{
+  for (pugi::xml_node& ref : p_UnitDiagType.children("Ref"))
+  {
+    m_ref_map.emplace(ref.attribute("ByteOffset").as_uint(), std::move(ProfinetUnitDiagTypeRef(std::move(ref))));
+  }
+}
+
+void ProfinetUnitDiagType::build(pugi::xml_node&& p_unit_diag_type, uint p_user_structure_identifier) const
+{
+  // Attributes
+  p_unit_diag_type.append_attribute("UserStructureIdentifier").set_value(p_user_structure_identifier);
+  p_unit_diag_type.append_attribute("Name").set_value(m_name.c_str());
+  p_unit_diag_type.append_attribute("Help").set_value(m_help.c_str());
+
+  for (auto const& ref : m_ref_map)
+  {
+    ref.second.build(p_unit_diag_type.append_child("Ref"), ref.first);
+  }
+}
+
 ProfinetExtChannelDiag::ProfinetExtChannelDiag(pugi::xml_node&& p_ExtChannelDiag)
     : m_name(p_ExtChannelDiag.attribute("Name").as_string()),
       m_help(p_ExtChannelDiag.attribute("Help").as_string())
@@ -375,7 +409,7 @@ ProfinetDevice::ProfinetDevice(pugi::xml_node&& p_pn_device)
     m_slot_list.push_back(ProfinetSlot(std::move(slot)));
   }
 
-  for (pugi::xml_node& channel_diag : p_pn_device.child("Diagnostics").children("ChannelDiag"))
+  for (pugi::xml_node& channel_diag : p_pn_device.child("ChannelDiagnostics").children("ChannelDiag"))
   {
     m_channel_diag_map.emplace(channel_diag.attribute("ErrorType").as_uint(),
                                std::move(ProfinetChannelDiag(std::move(channel_diag))));
@@ -412,11 +446,18 @@ void ProfinetDevice::build(pugi::xml_node&& p_pn_device) const
     iocr.second.build(iocrs.append_child("IOCR"), iocr.first);
   }
 
-  // Diagnostics section
-  pugi::xml_node diagnostics = p_pn_device.append_child("Diagnostics");
+  // ChannelDiagnostics section
+  pugi::xml_node channel_diagnostics = p_pn_device.append_child("ChannelDiagnostics");
   for (auto const& channel_diag : m_channel_diag_map)
   {
-    channel_diag.second.build(diagnostics.append_child("ChannelDiag"), channel_diag.first);
+    channel_diag.second.build(channel_diagnostics.append_child("ChannelDiag"), channel_diag.first);
+  }
+
+  // Unit Diagnostics section
+  pugi::xml_node unit_diagnostics = p_pn_device.append_child("UnitDiagnostics");
+  for (auto const& unit_diag_type : m_unit_diag_type_map)
+  {
+    unit_diag_type.second.build(unit_diagnostics.append_child("UnitDiagType"), unit_diag_type.first);
   }
 }
 

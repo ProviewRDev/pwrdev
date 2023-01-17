@@ -208,6 +208,7 @@ void pn_gsdml::_build_textIdList()
 }
 
 std::unordered_map<ushort, GSDML::ChannelDiagItem>& pn_gsdml::getChannelDiagMap() { return _channelDiagMap; }
+std::unordered_map<ushort, GSDML::UnitDiagTypeItem>& pn_gsdml::getUnitDiagTypeMap() { return _unitDiagTypeMap; }
 
 std::unordered_map<std::string, std::shared_ptr<GSDML::ModuleItem>>& pn_gsdml::getModuleMap()
 {

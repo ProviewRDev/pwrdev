@@ -391,11 +391,13 @@ int main(int argc, char* argv[])
           // Diagnostics, we can pretty much copy these as is. We might loose extended diagnostics but things
           // will still work. One could always reconfigure the device manually and everything is updated as it
           // should be.
-          auto new_diagnostics = pn_device.append_child("Diagnostics");
+          auto new_diagnostics = pn_device.append_child("ChannelDiagnostics");
           for (auto const& old_channeldiag : old_xml.child("PnDevice").children("ChannelDiag"))
           {
             new_diagnostics.append_copy(old_channeldiag);
           }
+
+          // TODO Add UnitDiagType diagnostics aswell....or skip?
 
           new_xml.save_file(pwr_pn_xml_filename);
         } // if "this is a valid and old xml file"

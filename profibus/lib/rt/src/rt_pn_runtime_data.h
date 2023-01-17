@@ -215,6 +215,41 @@ public:
   std::unordered_map<uint, ProfinetExtChannelDiag> m_ext_channel_diag_map;
 };
 
+class ProfinetUnitDiagTypeRef
+{
+public:
+  ProfinetUnitDiagTypeRef() = default;
+  ProfinetUnitDiagTypeRef(pugi::xml_node&&);
+  ProfinetUnitDiagTypeRef(ProfinetUnitDiagTypeRef&&) = default;
+  ProfinetUnitDiagTypeRef(ProfinetUnitDiagTypeRef const&) = default;
+  ~ProfinetUnitDiagTypeRef() = default;
+  void build(pugi::xml_node&&, uint p_byte_offset) const;
+
+  // Attributes    
+  //ushort m_data_type;
+  std::string m_text;  
+};
+
+class ProfinetUnitDiagType
+{
+public:
+  ProfinetUnitDiagType() = default;
+  ProfinetUnitDiagType(pugi::xml_node&&);
+  ProfinetUnitDiagType(ProfinetUnitDiagType&&) = default;
+  ProfinetUnitDiagType(ProfinetUnitDiagType const&) = default;
+  ~ProfinetUnitDiagType() = default;
+  void build(pugi::xml_node&&, uint p_user_structure_identifier) const;
+
+  // Attributes  
+  std::string m_name;
+  std::string m_help;
+
+  // Elements
+  // <Ref ByteOffset="1" DataType="Unsigned8" DefaultValue="0" TextId="Missing server module" ValueItemTarget="hidden" />
+  // <ByteOffset, ProfinetUnitDiagTypeRef>
+  std::unordered_map<uint, ProfinetUnitDiagTypeRef> m_ref_map;
+};
+
 class ProfinetNetworkSettings
 {
 public:
@@ -270,7 +305,8 @@ public:
   std::vector<ProfinetSlot> m_slot_list;
   std::map<uint, ProfinetAPI> m_API_map;   // <api, ProfinetAPI>
   std::map<uint, ProfinetIOCR> m_IOCR_map; // <iocr type, ProfinetIOCR>
-  std::unordered_map<uint, ProfinetChannelDiag> m_channel_diag_map;
+  std::unordered_map<uint, ProfinetChannelDiag> m_channel_diag_map; // <ErrorType, xxxxxxxxxxxxxxxxxxx>
+  std::unordered_map<uint, ProfinetUnitDiagType> m_unit_diag_type_map; // <UserStructureIdentifier, xxxxxxxxxxxxxxxxxx>
 
   // Runtime specifics
   unsigned short m_rt_device_state;

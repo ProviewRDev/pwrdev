@@ -75,6 +75,7 @@ public:
   
   // Our compiled lists
   std::unordered_map<ushort, GSDML::ChannelDiagItem>& getChannelDiagMap();
+  std::unordered_map<ushort, GSDML::UnitDiagTypeItem>& getUnitDiagTypeMap();
   std::unordered_map<std::string, std::shared_ptr<GSDML::ModuleItem>>& getModuleMap();
   std::unordered_map<std::string, std::shared_ptr<GSDML::SubmoduleItem>>& getSubmoduleMap();
   std::unordered_map<std::string, std::shared_ptr<GSDML::ValueItem>>& getValueMap();
