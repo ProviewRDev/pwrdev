@@ -55,7 +55,6 @@ ProfinetSlot* ProfinetRuntimeData::m_paste_slotdata = 0;
 ProfinetUnitDiagTypeRef::ProfinetUnitDiagTypeRef(pugi::xml_node&& p_Ref)
     : m_text(p_Ref.attribute("Text").as_string())
 {
-  
 }
 
 void ProfinetUnitDiagTypeRef::build(pugi::xml_node&& p_ref, uint p_byte_offset) const
@@ -69,7 +68,8 @@ ProfinetUnitDiagType::ProfinetUnitDiagType(pugi::xml_node&& p_UnitDiagType)
 {
   for (pugi::xml_node& ref : p_UnitDiagType.children("Ref"))
   {
-    m_ref_map.emplace(ref.attribute("ByteOffset").as_uint(), std::move(ProfinetUnitDiagTypeRef(std::move(ref))));
+    m_ref_map.emplace(ref.attribute("ByteOffset").as_uint(),
+                      std::move(ProfinetUnitDiagTypeRef(std::move(ref))));
   }
 }
 
@@ -388,9 +388,7 @@ ProfinetDevice::ProfinetDevice(pugi::xml_node&& p_pn_device)
       m_vendor_id(p_pn_device.attribute("VendorId").as_uint()),
       m_device_id(p_pn_device.attribute("DeviceId").as_uint()),
       m_instance(p_pn_device.attribute("Instance").as_uint()),
-      // m_version(p_pn_device.attribute("Version").as_string()), // TODO Why is this important???    It
-      // referes to the profile revision in the profile body of the GSDML. Maybe we should save the PNIO
-      // version of the DAP instead?
+      m_pwr_schema_version(p_pn_device.attribute("PwrSchemaVersion").as_uint()),
       m_NetworkSettings(p_pn_device.child("NetworkSettings"))
 {
   for (pugi::xml_node& api : p_pn_device.child("APIs").children("API"))
@@ -424,6 +422,7 @@ void ProfinetDevice::build(pugi::xml_node&& p_pn_device) const
   p_pn_device.append_attribute("VendorId").set_value(m_vendor_id);
   p_pn_device.append_attribute("DeviceId").set_value(m_device_id);
   p_pn_device.append_attribute("Instance").set_value(m_instance);
+  p_pn_device.append_attribute("PwrSchemaVersion").set_value(PWR_SCHEMA_VERSION);
 
   m_NetworkSettings.build(p_pn_device.append_child("NetworkSettings"));
 

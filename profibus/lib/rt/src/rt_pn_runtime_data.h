@@ -49,11 +49,11 @@
 #include "co_pugixml.hpp"
 #include "rt_profinet.h"
 
+// Increment this whenever the runtime xml changes (pwr_pn_XXXXXXXXXXXXXXX.xml files that is)
+#define PWR_SCHEMA_VERSION 1
+
 #define RUNTIME_PARSER_STRING_MAX_LENGTH sizeof(pwr_tString256)
 #define DAP_DEFAULT_SLOT 0
-#define SUBMODULE_INTERFACE 32768
-#define SUBMODULE_PORT_1 32769
-#define SUBMODULE_PORT_2 32770
 
 // New parser class
 class ProfinetDataRecord
@@ -140,8 +140,8 @@ public:
 
   // Runtime specifics
   ushort m_rt_io_submodule_type;
-  ushort m_rt_state {0};
-  uint m_rt_phys_ident_number {0};
+  ushort m_rt_state{0};
+  uint m_rt_phys_ident_number{0};
 
   ushort m_rt_offset_io_in;
   ushort m_rt_offset_clean_io_in;
@@ -176,8 +176,8 @@ public:
   bool m_is_dap = false;
 
   // Runtime
-  ushort m_rt_state {0};
-  uint m_rt_phys_ident_number {0};
+  ushort m_rt_state{0};
+  uint m_rt_phys_ident_number{0};
 };
 
 class ProfinetExtChannelDiag
@@ -225,9 +225,8 @@ public:
   ~ProfinetUnitDiagTypeRef() = default;
   void build(pugi::xml_node&&, uint p_byte_offset) const;
 
-  // Attributes    
-  //ushort m_data_type;
-  std::string m_text;  
+  // Attributes
+  std::string m_text;
 };
 
 class ProfinetUnitDiagType
@@ -240,13 +239,11 @@ public:
   ~ProfinetUnitDiagType() = default;
   void build(pugi::xml_node&&, uint p_user_structure_identifier) const;
 
-  // Attributes  
+  // Attributes
   std::string m_name;
   std::string m_help;
 
   // Elements
-  // <Ref ByteOffset="1" DataType="Unsigned8" DefaultValue="0" TextId="Missing server module" ValueItemTarget="hidden" />
-  // <ByteOffset, ProfinetUnitDiagTypeRef>
   std::unordered_map<uint, ProfinetUnitDiagTypeRef> m_ref_map;
 };
 
@@ -299,14 +296,16 @@ public:
   unsigned short m_device_id;    // Part of DeviceIdentity
   unsigned int
       m_instance; // Used to make out the ObjectUUID for DCERPC together with vendor ID and device ID.
+  unsigned short m_pwr_schema_version; // Internal version for our own xml runtime schema, for future use
 
   // Elements
   ProfinetNetworkSettings m_NetworkSettings;
   std::vector<ProfinetSlot> m_slot_list;
-  std::map<uint, ProfinetAPI> m_API_map;   // <api, ProfinetAPI>
-  std::map<uint, ProfinetIOCR> m_IOCR_map; // <iocr type, ProfinetIOCR>
+  std::map<uint, ProfinetAPI> m_API_map;                            // <api, ProfinetAPI>
+  std::map<uint, ProfinetIOCR> m_IOCR_map;                          // <iocr type, ProfinetIOCR>
   std::unordered_map<uint, ProfinetChannelDiag> m_channel_diag_map; // <ErrorType, xxxxxxxxxxxxxxxxxxx>
-  std::unordered_map<uint, ProfinetUnitDiagType> m_unit_diag_type_map; // <UserStructureIdentifier, xxxxxxxxxxxxxxxxxx>
+  std::unordered_map<uint, ProfinetUnitDiagType>
+      m_unit_diag_type_map; // <UserStructureIdentifier, xxxxxxxxxxxxxxxxxx>
 
   // Runtime specifics
   unsigned short m_rt_device_state;

@@ -1096,7 +1096,7 @@ int unpack_get_alarm_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local
         pwr_tUInt16 ChannelErrorType;
         pwr_tUInt16 ExtChannelErrorType;
         pwr_tUInt32 ExtChannelAddValue;
-      } * pn_data;
+      }* pn_data;
     } data;
 
     unsigned short ii, jj;
@@ -1546,7 +1546,7 @@ int unpack_get_device_state_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal
           {
             module->State = slot.m_rt_state;
             module->RealIdentNumber = slot.m_rt_phys_ident_number;
-          }          
+          }
         }
 
         dev->NoDiffModules = pn_device->m_rt_number_of_diff_modules;

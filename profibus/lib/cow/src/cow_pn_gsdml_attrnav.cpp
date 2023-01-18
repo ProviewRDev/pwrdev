@@ -1100,7 +1100,7 @@ int GsdmlAttrNav::object_attr()
         // Fixed position
         // NOTE (TODO) When support for redundancy is added the DAP may appear in more than one slot. But we
         // have no such support :/ But we need to be sure to only add the DAP once. The redundancy DAP is
-        // always placed in a slot below the main one.
+        // placed in a slot "higher" than the main one.
         slot.m_is_dap = true;
       }
 
@@ -1236,22 +1236,25 @@ int GsdmlAttrNav::save()
 
   for (auto const& unit_diag_item : gsdml->getUnitDiagTypeMap())
   {
-    pn_runtime_data->m_PnDevice->m_unit_diag_type_map[unit_diag_item.first].m_name = *unit_diag_item.second._Name;
-    
+    pn_runtime_data->m_PnDevice->m_unit_diag_type_map[unit_diag_item.first].m_name =
+        *unit_diag_item.second._Name;
+
     // Not all unit diag type items do have a help item (it's optional)
     if (unit_diag_item.second._Help)
     {
-      pn_runtime_data->m_PnDevice->m_unit_diag_type_map[unit_diag_item.first].m_help = *unit_diag_item.second._Help;
+      pn_runtime_data->m_PnDevice->m_unit_diag_type_map[unit_diag_item.first].m_help =
+          *unit_diag_item.second._Help;
     }
 
     for (auto const& ref : unit_diag_item.second._Ref)
     {
-     // pn_runtime_data->m_PnDevice->m_unit_diag_type_map[unit_diag_item.first].m_ref_map.emplace(ref->_ByteOffset, std::move(ProfinetUnitDiagTypeRef()));      
-      pn_runtime_data->m_PnDevice->m_unit_diag_type_map[unit_diag_item.first].m_ref_map[ref->_ByteOffset].m_text = *ref->_Text;
+      pn_runtime_data->m_PnDevice->m_unit_diag_type_map[unit_diag_item.first]
+          .m_ref_map[ref->_ByteOffset]
+          .m_text = *ref->_Text;
     }
   }
 
-  // Find all APIs involved and populate a map with indexes to each  
+  // Find all APIs involved and populate a map with indexes to each
   pn_runtime_data->m_PnDevice->m_API_map.clear();
   int api_index = 0;
   for (auto const& slot : pn_runtime_data->m_PnDevice->m_slot_list)
@@ -1278,7 +1281,7 @@ int GsdmlAttrNav::save()
     }
   }
 
-  // Set up API references in the IOCRs (or the input rather since we copy the output after this)  
+  // Set up API references in the IOCRs (or the input rather since we copy the output after this)
   pn_runtime_data->m_PnDevice->m_IOCR_map.at(PROFINET_IO_CR_TYPE_INPUT).m_api_refs.clear();
   for (auto const& api : pn_runtime_data->m_PnDevice->m_API_map)
   {
