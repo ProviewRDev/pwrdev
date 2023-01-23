@@ -68,6 +68,8 @@
 #include "pwr_baseclasses.h"
 #include "pwr_profibusclasses.h"
 
+#define PWR_SCHEMA_VERSION 1
+
 int main(int argc, char* argv[])
 {
   pwr_tFileName pwr_pn_xml_filename, pwr_pn_xml_filename_old;
@@ -182,10 +184,11 @@ int main(int argc, char* argv[])
               old_xml.child("PnDevice").attribute("Instance").as_string();
           pn_device.append_attribute("ModuleInfoName") =
               old_xml.child("PnDevice").attribute("DeviceText").as_string();
+          pn_device.append_attribute("PwrSchemaVersion") = PWR_SCHEMA_VERSION;
 
-          // Old xml used an index (which could reference invalid DAPs since the spec only says that IDs
-          // aren't allowed to change, the order in which they appear does not matter) Fetch the DAP from the
-          // corresponding index and replace with the more resilient ID.
+          // Old xml used an index (which could reference invalid DAPs). Fetch the DAP from
+          // the corresponding index and replace with the more resilient ID that according to
+          // spec ain't allowed to change for the sake of backwards compatibility.
           pugi::xpath_variable_set vars;
           vars.add("dap_index", pugi::xpath_type_number);
           vars.add("module_index", pugi::xpath_type_number);
