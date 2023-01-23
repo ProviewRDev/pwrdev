@@ -74,7 +74,7 @@ int main(int argc, char* argv[])
           << "Generated on " << std::put_time(std::localtime(&generation_time), "%F %T") << std::endl;
   output.prepend_child(pugi::node_comment).set_value(comment.str().c_str());
 
-  if (argc < 2 || streq(argv[1], "-h"))
+  if (argc < 2 || streq(argv[1], "--help"))
   {
     std::cout << std::endl
               << "Usage: pn_get_deviceid {file pattern} {manufacturer file provided by profibus foundation} "
