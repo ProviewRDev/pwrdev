@@ -1,6 +1,6 @@
 /*
  * ProviewR   Open Source Process Control.
- * Copyright (C) 2005-2022 SSAB EMEA AB.
+ * Copyright (C) 2005-2020 SSAB EMEA AB.
  *
  * This file is part of ProviewR.
  *
@@ -33,29 +33,11 @@
  * combined work), being distributed under the terms of the GNU
  * General Public License plus this exception.
  */
+#ifndef co_fs_util_h
+#define co_fs_util_h
 
-#ifndef pn_viewer_pnac_h
-#define pn_viewer_pnac_h
+#include "pwr.h"
 
-/* pn_viewer_pnac.h -- Profinet viewer PNAC interface */
-
-#include "pn_viewernav.h"
-
-#include "rt_io_base.h"
-#include "rt_io_pnak_locals.h"
-#include "rt_pn_gsdml_data.h"
-
-class PnViewerPNAC
-{
-public:
-  PnViewerPNAC(pwr_tStatus* sts, const char* dev_name);
-  ~PnViewerPNAC();
-
-  void fetch_devices(std::vector<PnDevice>& dev_vect);
-  void set_device_properties(unsigned char* macaddress,
-                             unsigned char* ipaddress, char* devname);
-  GsdmlDeviceData dev_data;
-  io_sAgentLocal* local;
-};
+void basename(char* _filepath, char** _basename);
 
 #endif

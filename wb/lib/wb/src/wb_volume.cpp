@@ -46,15 +46,14 @@
 #include "wb_vrepmem.h"
 #include "wb_wsx.h"
 
-wb_volume::wb_volume() : wb_status(LDH__NOSUCHVOL), m_vrep(0)
-{
-}
+wb_volume::wb_volume() : wb_status(LDH__NOSUCHVOL), m_vrep(0) {}
 
 wb_volume::wb_volume(wb_vrep* vrep) : wb_status(LDH__SUCCESS), m_vrep(vrep)
 {
   if (!m_vrep)
     m_sts = LDH__NOSUCHVOL;
-  else {
+  else
+  {
     m_vrep->ref();
   }
 }
@@ -85,10 +84,7 @@ wb_volume& wb_volume::operator=(const wb_volume& x)
   return *this;
 }
 
-wb_volume::operator bool() const
-{
-  return (m_vrep != 0);
-}
+wb_volume::operator bool() const { return (m_vrep != 0); }
 
 bool wb_volume::operator==(const wb_volume& v) const
 {
@@ -108,7 +104,8 @@ bool wb_volume::operator!=(const wb_volume& v) const
 
 wb_env wb_volume::env()
 {
-  if (!m_vrep) {
+  if (!m_vrep)
+  {
     wb_env e;
     return e;
   }
@@ -149,12 +146,17 @@ wb_object wb_volume::object(pwr_tOid oid) const
   pwr_tStatus sts;
   wb_orep* orep;
 
-  if (oid.vid == m_vrep->vid()) {
+  if (oid.vid == m_vrep->vid())
+  {
     // This volume
     orep = m_vrep->object(&sts, oid);
-  } else if (oid.vid < 65536) {
+  }
+  else if (oid.vid < 65536)
+  {
     orep = m_vrep->merep()->object(&sts, oid);
-  } else {
+  }
+  else
+  {
     // Other volume
     orep = m_vrep->erep()->object(&sts, oid);
   }
@@ -226,7 +228,8 @@ wb_cdef wb_volume::cdef(wb_object o)
   pwr_tStatus sts;
   wb_orep* orep = o;
   wb_cdrep* cdrep;
-  try {
+  try
+  {
     if (orep->vrep() == m_vrep)
       // Object in this volume
       cdrep = m_vrep->merep()->cdrep(&sts, *orep);
@@ -234,7 +237,9 @@ wb_cdef wb_volume::cdef(wb_object o)
       // Object in other volume, get class info from this volume's meta
       // environment
       cdrep = m_vrep->erep()->cdrep(&sts, *orep);
-  } catch (wb_error&) {
+  }
+  catch (wb_error&)
+  {
     return wb_cdef();
   }
   return wb_cdef(cdrep);
@@ -248,10 +253,7 @@ wb_cdef wb_volume::cdef(pwr_tCid cid)
   return wb_cdef(m_vrep->merep()->cdrep(&sts, cid));
 }
 
-wb_cdef wb_volume::cdef(pwr_tOid coid)
-{
-  return cdef(cdh_ClassObjidToId(coid));
-}
+wb_cdef wb_volume::cdef(pwr_tOid coid) { return cdef(cdh_ClassObjidToId(coid)); }
 
 wb_cdef wb_volume::cdef(wb_name n)
 {
@@ -261,8 +263,7 @@ wb_cdef wb_volume::cdef(wb_name n)
   return wb_cdef(m_vrep->merep()->cdrep(&sts, n));
 }
 
-wb_attribute wb_volume::attribute(
-    pwr_tOid oid, const char* bname, const char* aname) const
+wb_attribute wb_volume::attribute(pwr_tOid oid, const char* bname, const char* aname) const
 {
   pwr_tStatus sts;
   wb_orep* orep;
@@ -299,13 +300,16 @@ wb_attribute wb_volume::attribute(wb_name aname)
 
   wb_adrep* adrep = ((wb_cdrep*)cd)->adrep(&sts, aname.attributesAllTrue());
 
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     bool shadowed = false;
-    if (aname.hasSuper()) {
+    if (aname.hasSuper())
+    {
       // Check if shadowed
       wb_attrname an(aname.attributesAllTrue());
       wb_adrep* ad = ((wb_cdrep*)cd)->adrep(&sts, an.name(cdh_mName_attribute));
-      if (ODD(sts) && ad->offset() != adrep->offset()) {
+      if (ODD(sts) && ad->offset() != adrep->offset())
+      {
         shadowed = true;
         delete ad;
       }
@@ -313,8 +317,7 @@ wb_attribute wb_volume::attribute(wb_name aname)
 
     wb_attribute a;
     if (aname.hasAttrIndex(aname.attributes() - 1))
-      a = wb_attribute(
-          sts, (wb_orep*)o, adrep, aname.attrIndex(aname.attributes() - 1));
+      a = wb_attribute(sts, (wb_orep*)o, adrep, aname.attrIndex(aname.attributes() - 1));
     else
       a = wb_attribute(sts, (wb_orep*)o, adrep);
     a.setShadowed(shadowed);
@@ -381,14 +384,16 @@ wb_attribute wb_volume::attribute(const pwr_sAttrRef* arp) const
     return wb_attribute();
   orep->ref();
 
-  if (arp->Flags.b.Object) {
+  if (arp->Flags.b.Object)
+  {
     wb_attribute a(sts, orep);
     orep->unref();
     return a;
   }
 
   cdrep = new wb_cdrep(*orep);
-  if (EVEN(cdrep->sts())) {
+  if (EVEN(cdrep->sts()))
+  {
     orep->unref();
     return wb_attribute();
   }
@@ -398,15 +403,16 @@ wb_attribute wb_volume::attribute(const pwr_sAttrRef* arp) const
     bix = (pwr_eBix)(arp->Body & 7);
   bdrep = cdrep->bdrep(&sts, bix);
   delete cdrep;
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     orep->unref();
     return wb_attribute();
   }
 
   // Check if we shall reference the whole object
-  if ((arp->Size == 0 && arp->Offset == 0)
-      || (arp->Offset == 0 && arp->Size == bdrep->size()
-             && bdrep->nAttribute() != 1)) {
+  if ((arp->Size == 0 && arp->Offset == 0) ||
+      (arp->Offset == 0 && arp->Size == bdrep->size() && bdrep->nAttribute() != 1))
+  {
     wb_attribute a(sts, orep);
     orep->unref();
     delete bdrep;
@@ -415,34 +421,41 @@ wb_attribute wb_volume::attribute(const pwr_sAttrRef* arp) const
 
   // We need to find a matching attribute
   adrep = bdrep->adrep(&sts);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     bool newBody = false;
-    while (ODD(sts)) {
-      if (arp->Offset < (adrep->offset() + adrep->rsize())) {
-        if (arp->Size == 0 || adrep->size() == arp->Size) {
+    while (ODD(sts))
+    {
+      if (arp->Offset < (adrep->offset() + adrep->rsize()))
+      {
+        if (arp->Size == 0 || adrep->size() == arp->Size)
+        {
           // Attribute found
           idx = (adrep->nElement() > 1) ? -1 : 0;
           wb_attribute a(LDH__SUCCESS, orep, adrep, idx);
           if (arp->Flags.b.Shadowed)
             a.setShadowed(true);
-	  if (arp->Flags.b.DisableAttr)
-	    a.addFlagsDisableAttr();
+          if (arp->Flags.b.DisableAttr)
+            a.addFlagsDisableAttr();
           delete bdrep;
           orep->unref();
           return a;
-        } else if (adrep->flags() & PWR_MASK_ARRAY
-            && adrep->size() / adrep->nElement() == arp->Size) {
+        }
+        else if (adrep->flags() & PWR_MASK_ARRAY && adrep->size() / adrep->nElement() == arp->Size)
+        {
           // Attribute element found
-          idx = (arp->Offset - adrep->offset())
-              / (adrep->rsize() / adrep->nElement());
+          idx = (arp->Offset - adrep->offset()) / (adrep->rsize() / adrep->nElement());
           wb_attribute a(LDH__SUCCESS, orep, adrep, idx);
           delete bdrep;
           orep->unref();
           return a;
-        } else if (adrep->flags() & PWR_MASK_CLASS) {
+        }
+        else if (adrep->flags() & PWR_MASK_CLASS)
+        {
           // Continue to examine object attribute
           cdrep = m_vrep->merep()->cdrep(&sts, adrep->subClass());
-          if (EVEN(sts)) {
+          if (EVEN(sts))
+          {
             orep->unref();
             delete bdrep;
             return wb_attribute();
@@ -451,7 +464,8 @@ wb_attribute wb_volume::attribute(const pwr_sAttrRef* arp) const
           if (bdrep)
             delete bdrep;
           bdrep = cdrep->bdrep(&sts, pwr_eBix_rt);
-          if (EVEN(sts)) {
+          if (EVEN(sts))
+          {
             orep->unref();
             return wb_attribute();
           }
@@ -460,22 +474,26 @@ wb_attribute wb_volume::attribute(const pwr_sAttrRef* arp) const
           delete cdrep;
           old = adrep;
           adrep = bdrep->adrep(&sts);
-          if (EVEN(sts)) {
+          if (EVEN(sts))
+          {
             orep->unref();
             delete old;
             delete bdrep;
             return wb_attribute();
           }
-          if (old->flags() & PWR_MASK_ARRAY) {
-            idx = (arp->Offset - old->offset())
-                / (old->size() / old->nElement());
+          if (old->flags() & PWR_MASK_ARRAY)
+          {
+            idx = (arp->Offset - old->offset()) / (old->size() / old->nElement());
             adrep->add(old, idx);
-          } else
+          }
+          else
             adrep->add(old);
           delete old;
           newBody = true;
           break;
-        } else {
+        }
+        else
+        {
           // Missmatch
           delete bdrep;
           delete adrep;
@@ -506,7 +524,8 @@ pwr_tStatus wb_volume::syntaxCheck(int* errorcount, int* warningcount)
   pwr_tStatus sts = LDH__SUCCESS;
   pwr_tStatus osts = 0;
 
-  for (wb_object o = object(); o; o = o.after()) {
+  for (wb_object o = object(); o; o = o.after())
+  {
     if (o.cid() == pwr_eClass_LibHier)
       continue;
     osts = syntaxCheckObject(o, errorcount, warningcount);
@@ -516,8 +535,7 @@ pwr_tStatus wb_volume::syntaxCheck(int* errorcount, int* warningcount)
   return osts;
 }
 
-pwr_tStatus wb_volume::syntaxCheckAttr(
-    wb_attribute& a, int* errorcount, int* warningcount)
+pwr_tStatus wb_volume::syntaxCheckAttr(wb_attribute& a, int* errorcount, int* warningcount)
 {
   pwr_tStatus sts = LDH__SUCCESS;
   pwr_tStatus asts;
@@ -532,22 +550,28 @@ pwr_tStatus wb_volume::syntaxCheckAttr(
 
   wb_bdef bdef = cd.bdef(pwr_eBix_rt);
   wb_adef adef;
-  if (bdef) {
-    for (adef = bdef.adef(); adef; adef = adef.next()) {
+  if (bdef)
+  {
+    for (adef = bdef.adef(); adef; adef = adef.next())
+    {
       if (adef.flags() & PWR_MASK_SUPERCLASS)
         continue;
       if (!(adef.flags() & PWR_MASK_CLASS))
         continue;
 
-      if (adef.flags() & PWR_MASK_ARRAY) {
-        for (int i = 0; i < adef.nElement(); i++) {
+      if (adef.flags() & PWR_MASK_ARRAY)
+      {
+        for (int i = 0; i < adef.nElement(); i++)
+        {
           wb_attribute attr(a, -1, adef.name(), i);
 
           asts = syntaxCheckAttr(attr, errorcount, warningcount);
           if (EVEN(asts))
             sts = asts;
         }
-      } else {
+      }
+      else
+      {
         wb_attribute attr(a, 0, adef.name());
 
         if (adef.flags() & PWR_MASK_DISABLEATTR && attr.disabled())
@@ -563,8 +587,7 @@ pwr_tStatus wb_volume::syntaxCheckAttr(
   return sts;
 }
 
-pwr_tStatus wb_volume::syntaxCheckObject(
-    wb_object& o, int* errorcount, int* warningcount)
+pwr_tStatus wb_volume::syntaxCheckObject(wb_object& o, int* errorcount, int* warningcount)
 {
   pwr_tStatus sts, csts;
   wb_object first, after;
@@ -586,20 +609,26 @@ pwr_tStatus wb_volume::syntaxCheckObject(
 
   wb_bdef bdef = cd.bdef(pwr_eBix_rt);
   wb_adef adef;
-  if (bdef) {
-    for (adef = bdef.adef(); adef; adef = adef.next()) {
+  if (bdef)
+  {
+    for (adef = bdef.adef(); adef; adef = adef.next())
+    {
       if (!(adef.flags() & PWR_MASK_CLASS))
         continue;
 
-      if (adef.flags() & PWR_MASK_ARRAY) {
-        for (int i = 0; i < adef.nElement(); i++) {
+      if (adef.flags() & PWR_MASK_ARRAY)
+      {
+        for (int i = 0; i < adef.nElement(); i++)
+        {
           wb_attribute a(adef.sts(), o, adef, i);
 
           csts = syntaxCheckAttr(a, errorcount, warningcount);
           if (EVEN(csts))
             sts = csts;
         }
-      } else {
+      }
+      else
+      {
         wb_attribute a(adef.sts(), o, adef);
 
         if (adef.flags() & PWR_MASK_DISABLEATTR && a.disabled())
@@ -612,7 +641,8 @@ pwr_tStatus wb_volume::syntaxCheckObject(
     }
   }
 
-  for (wb_object c = o.first(); c; c = c.after()) {
+  for (wb_object c = o.first(); c; c = c.after())
+  {
     if (c.cid() == pwr_eClass_LibHier)
       continue;
     csts = syntaxCheckObject(c, errorcount, warningcount);
@@ -623,8 +653,7 @@ pwr_tStatus wb_volume::syntaxCheckObject(
   return sts;
 }
 
-pwr_tStatus wb_volume::triggSyntaxCheck(
-    wb_attribute& a, int* errorcount, int* warningcount)
+pwr_tStatus wb_volume::triggSyntaxCheck(wb_attribute& a, int* errorcount, int* warningcount)
 {
   pwr_tStatus sts;
   char methodName[80];
@@ -634,13 +663,14 @@ pwr_tStatus wb_volume::triggSyntaxCheck(
     return 0;
 
   // Call object method, or inherited method
-  for (wb_cdef cd = cdef(a.tid()); cd; cd = cd.super()) {
+  for (wb_cdef cd = cdef(a.tid()); cd; cd = cd.super())
+  {
     sprintf(methodName, "%s-SyntaxCheck", cd.name());
 
     m_vrep->erep()->method(&sts, methodName, &method);
-    if (ODD(sts)) {
-      sts = ((wb_tMethodSyntaxCheck)(method))(
-          (ldh_tSesContext)this, a.aref(), errorcount, warningcount);
+    if (ODD(sts))
+    {
+      sts = ((wb_tMethodSyntaxCheck)(method))((ldh_tSesContext)this, a.aref(), errorcount, warningcount);
       if (EVEN(sts))
         return sts;
       break;
@@ -710,8 +740,7 @@ pwr_tStatus wb_volume::triggAnteCreate(wb_object& father, pwr_tCid cid)
   return sts;
 }
 
-pwr_tStatus wb_volume::triggAnteMove(
-    wb_object& o, wb_object& father, wb_object& old_father)
+pwr_tStatus wb_volume::triggAnteMove(wb_object& o, wb_object& father, wb_object& old_father)
 {
   pwr_tStatus sts;
   char* methodName;
@@ -742,8 +771,7 @@ pwr_tStatus wb_volume::triggAnteMove(
   else
     old_foid = pwr_cNObjid;
 
-  sts = ((wb_tMethodAnteMove)(method))(
-      (ldh_tSesContext)this, o.oid(), foid, old_foid);
+  sts = ((wb_tMethodAnteMove)(method))((ldh_tSesContext)this, o.oid(), foid, old_foid);
   return sts;
 }
 
@@ -769,8 +797,7 @@ pwr_tStatus wb_volume::triggAnteUnadopt(wb_object& father, wb_object& o)
   if (EVEN(sts))
     return LDH__SUCCESS;
 
-  sts = ((wb_tMethodAnteUnadopt)(method))(
-      (ldh_tSesContext)this, father.oid(), o.oid(), o.cid());
+  sts = ((wb_tMethodAnteUnadopt)(method))((ldh_tSesContext)this, father.oid(), o.oid(), o.cid());
   return sts;
 }
 
@@ -796,8 +823,7 @@ pwr_tStatus wb_volume::triggPostAdopt(wb_object& father, wb_object& o)
   if (EVEN(sts))
     return LDH__SUCCESS;
 
-  sts = ((wb_tMethodPostAdopt)(method))(
-      (ldh_tSesContext)this, father.oid(), o.oid(), o.cid());
+  sts = ((wb_tMethodPostAdopt)(method))((ldh_tSesContext)this, father.oid(), o.oid(), o.cid());
   return sts;
 }
 
@@ -808,23 +834,25 @@ pwr_tStatus wb_volume::triggPostCreate(wb_object& o)
   wb_tMethod method;
 
   // Call object method, or inherited method
-  for (wb_cdef cd = cdef(o.cid()); cd; cd = cd.super()) {
+  for (wb_cdef cd = cdef(o.cid()); cd; cd = cd.super())
+  {
     wb_cdrep* cdrep = cd;
 
     cdrep->dbCallBack(&sts, ldh_eDbCallBack_PostCreate, &methodName, 0);
 
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       m_vrep->erep()->method(&sts, methodName, &method);
       if (EVEN(sts))
         return LDH__SUCCESS;
 
       wb_object father = o.parent();
-      if (father) {
-        sts = ((wb_tMethodPostCreate)(method))(
-            (ldh_tSesContext)this, o.oid(), father.oid(), father.cid());
-      } else
-        sts = ((wb_tMethodPostCreate)(method))(
-            (ldh_tSesContext)this, o.oid(), pwr_cNObjid, pwr_cNClassId);
+      if (father)
+      {
+        sts = ((wb_tMethodPostCreate)(method))((ldh_tSesContext)this, o.oid(), father.oid(), father.cid());
+      }
+      else
+        sts = ((wb_tMethodPostCreate)(method))((ldh_tSesContext)this, o.oid(), pwr_cNObjid, pwr_cNClassId);
       return sts;
     }
   }
@@ -852,12 +880,12 @@ pwr_tStatus wb_volume::triggPostMove(wb_object& o)
     return LDH__SUCCESS;
 
   wb_object father = o.parent();
-  if (father) {
-    sts = ((wb_tMethodPostMove)(method))(
-        (ldh_tSesContext)this, o.oid(), father.oid(), father.cid());
-  } else
-    sts = ((wb_tMethodPostMove)(method))(
-        (ldh_tSesContext)this, o.oid(), pwr_cNObjid, pwr_cNClassId);
+  if (father)
+  {
+    sts = ((wb_tMethodPostMove)(method))((ldh_tSesContext)this, o.oid(), father.oid(), father.cid());
+  }
+  else
+    sts = ((wb_tMethodPostMove)(method))((ldh_tSesContext)this, o.oid(), pwr_cNObjid, pwr_cNClassId);
   return sts;
 }
 
@@ -883,8 +911,30 @@ pwr_tStatus wb_volume::triggPostUnadopt(wb_object& father, wb_object& o)
   if (EVEN(sts))
     return LDH__SUCCESS;
 
-  sts = ((wb_tMethodPostUnadopt)(method))(
-      (ldh_tSesContext)this, father.oid(), o.oid(), o.cid());
+  sts = ((wb_tMethodPostUnadopt)(method))((ldh_tSesContext)this, father.oid(), o.oid(), o.cid());
+  return sts;
+}
+
+pwr_tStatus wb_volume::triggPostDelete(wb_object& o)
+{
+  pwr_tStatus sts;
+  char* methodName;
+  wb_tMethod method;
+
+  wb_cdrep* cdrep = m_vrep->merep()->cdrep(&sts, o.cid());
+  if (EVEN(sts))
+    return sts;
+
+  cdrep->dbCallBack(&sts, ldh_eDbCallBack_PostDelete, &methodName, 0);
+  delete cdrep;
+  if (EVEN(sts))
+    return LDH__SUCCESS;
+
+  m_vrep->erep()->method(&sts, methodName, &method);
+  if (EVEN(sts))
+    return LDH__SUCCESS;
+
+  sts = ((wb_tMethodPostDelete)(method))((ldh_tSesContext)this, o.oid());
   return sts;
 }
 
@@ -918,22 +968,24 @@ pwr_tStatus wb_volume::triggPostCopy(wb_object& o, wb_object& so)
   wb_tMethod method;
 
   // Call object method, or inherited method
-  for (wb_cdef cd = cdef(o.cid()); cd; cd = cd.super()) {
+  for (wb_cdef cd = cdef(o.cid()); cd; cd = cd.super())
+  {
     wb_cdrep* cdrep = cd;
 
     cdrep->dbCallBack(&sts, ldh_eDbCallBack_PostCopy, &methodName, 0);
 
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       m_vrep->erep()->method(&sts, methodName, &method);
       if (EVEN(sts))
         return LDH__SUCCESS;
 
-      if (so) {
-        sts = ((wb_tMethodPostCopy)(method))(
-            (ldh_tSesContext)this, o.oid(), so.oid(), so.cid());
-      } else
-        sts = ((wb_tMethodPostCopy)(method))(
-            (ldh_tSesContext)this, o.oid(), pwr_cNObjid, pwr_cNClassId);
+      if (so)
+      {
+        sts = ((wb_tMethodPostCopy)(method))((ldh_tSesContext)this, o.oid(), so.oid(), so.cid());
+      }
+      else
+        sts = ((wb_tMethodPostCopy)(method))((ldh_tSesContext)this, o.oid(), pwr_cNObjid, pwr_cNClassId);
       return sts;
     }
   }
@@ -959,10 +1011,12 @@ ldh_sRefInfo* wb_volume::refinfo(wb_object o, ldh_sRefInfo* rp)
   wb_adef asuper[20];
   int scnt = 0;
   asuper[scnt++] = b.adef();
-  if (asuper[scnt - 1] && asuper[scnt - 1].isSuperClass()) {
+  if (asuper[scnt - 1] && asuper[scnt - 1].isSuperClass())
+  {
     // Count rows
     rows = 0;
-    while (asuper[scnt - 1] && asuper[scnt - 1].isSuperClass()) {
+    while (asuper[scnt - 1] && asuper[scnt - 1].isSuperClass())
+    {
       wb_cdef subc = cdef(asuper[scnt - 1].subClass());
       wb_bdef subb = subc.bdef(pwr_eBix_rt);
       rows += subb.nAttribute() - 1;
@@ -971,22 +1025,28 @@ ldh_sRefInfo* wb_volume::refinfo(wb_object o, ldh_sRefInfo* rp)
     rows += b.nAttribute();
 
     int j = 0;
-    for (int i = scnt - 1; i >= 0; i--) {
-      for (wb_adef a = asuper[i]; a; a = a.next()) {
+    for (int i = scnt - 1; i >= 0; i--)
+    {
+      for (wb_adef a = asuper[i]; a; a = a.next())
+      {
         if (a && a.isSuperClass())
           continue;
 
-        switch (a.cid()) {
+        switch (a.cid())
+        {
         case pwr_eClass_Input:
         case pwr_eClass_Output:
         case pwr_eClass_Intern:
         case pwr_eClass_Param:
-          switch (a.type()) {
+          switch (a.type())
+          {
           case pwr_eType_Objid:
-            for (int i = 0; i < a.nElement(); i++) {
+            for (int i = 0; i < a.nElement(); i++)
+            {
               rp->ObjRef.Total++;
               oid = *(pwr_tOid*)(bp + a.offset() + i * a.size() / a.nElement());
-              if (cdh_ObjidIsNotNull(oid)) {
+              if (cdh_ObjidIsNotNull(oid))
+              {
                 rp->ObjRef.Used++;
                 wb_object otst = object(oid);
                 if (!otst)
@@ -995,11 +1055,12 @@ ldh_sRefInfo* wb_volume::refinfo(wb_object o, ldh_sRefInfo* rp)
             }
             break;
           case pwr_eType_AttrRef:
-            for (int i = 0; i < a.nElement(); i++) {
+            for (int i = 0; i < a.nElement(); i++)
+            {
               rp->ObjRef.Total++;
-              attrref = *(
-                  pwr_sAttrRef*)(bp + a.offset() + i * a.size() / a.nElement());
-              if (cdh_ObjidIsNotNull(attrref.Objid)) {
+              attrref = *(pwr_sAttrRef*)(bp + a.offset() + i * a.size() / a.nElement());
+              if (cdh_ObjidIsNotNull(attrref.Objid))
+              {
                 rp->ObjRef.Used++;
                 wb_object otst = object(attrref.Objid);
                 if (!otst)
@@ -1023,21 +1084,28 @@ ldh_sRefInfo* wb_volume::refinfo(wb_object o, ldh_sRefInfo* rp)
         // Something is wrong
         break;
     }
-  } else {
+  }
+  else
+  {
     rows = b.nAttribute();
 
-    for (wb_adef a = b.adef(); a; a = a.next()) {
-      switch (a.cid()) {
+    for (wb_adef a = b.adef(); a; a = a.next())
+    {
+      switch (a.cid())
+      {
       case pwr_eClass_Input:
       case pwr_eClass_Output:
       case pwr_eClass_Intern:
       case pwr_eClass_Param:
-        switch (a.type()) {
+        switch (a.type())
+        {
         case pwr_eType_Objid:
-          for (int i = 0; i < a.nElement(); i++) {
+          for (int i = 0; i < a.nElement(); i++)
+          {
             rp->ObjRef.Total++;
             oid = *(pwr_tOid*)(bp + a.offset() + i * a.size() / a.nElement());
-            if (cdh_ObjidIsNotNull(oid)) {
+            if (cdh_ObjidIsNotNull(oid))
+            {
               rp->ObjRef.Used++;
               wb_object otst = object(oid);
               if (!otst)
@@ -1046,11 +1114,12 @@ ldh_sRefInfo* wb_volume::refinfo(wb_object o, ldh_sRefInfo* rp)
           }
           break;
         case pwr_eType_AttrRef:
-          for (int i = 0; i < a.nElement(); i++) {
+          for (int i = 0; i < a.nElement(); i++)
+          {
             rp->ObjRef.Total++;
-            attrref = *(
-                pwr_sAttrRef*)(bp + a.offset() + i * a.size() / a.nElement());
-            if (cdh_ObjidIsNotNull(attrref.Objid)) {
+            attrref = *(pwr_sAttrRef*)(bp + a.offset() + i * a.size() / a.nElement());
+            if (cdh_ObjidIsNotNull(attrref.Objid))
+            {
               rp->ObjRef.Used++;
               wb_object otst = object(attrref.Objid);
               if (!otst)
@@ -1081,12 +1150,15 @@ void wb_volume::aref(pwr_tCid cid, pwr_sAttrRef* arp)
 
   // Look in classlist
   wb_orep* o = m_vrep->object(&m_sts, cid);
-  if (oddSts()) {
+  if (oddSts())
+  {
     o->ref();
     *arp = cdh_ObjidToAref(o->oid());
     o->unref();
     return;
-  } else {
+  }
+  else
+  {
     // Find attribute object
     pwr_tCid hostCid = 0;
     merep_sClassAttrKey key;
@@ -1095,10 +1167,11 @@ void wb_volume::aref(pwr_tCid cid, pwr_sAttrRef* arp)
     key.subCid = cid;
     key.hostCid = 0;
     key.idx = 0;
-    for (item = (merep_sClassAttr*)tree_FindSuccessor(&m_sts, catt_tt, &key);
-         item; item
-         = (merep_sClassAttr*)tree_FindSuccessor(&m_sts, catt_tt, &item->key)) {
-      if (item->key.subCid != cid) {
+    for (item = (merep_sClassAttr*)tree_FindSuccessor(&m_sts, catt_tt, &key); item;
+         item = (merep_sClassAttr*)tree_FindSuccessor(&m_sts, catt_tt, &item->key))
+    {
+      if (item->key.subCid != cid)
+      {
         m_sts = LDH__CLASSLIST;
         break;
       }
@@ -1109,7 +1182,8 @@ void wb_volume::aref(pwr_tCid cid, pwr_sAttrRef* arp)
       hostCid = item->key.hostCid;
 
       wb_orep* o = m_vrep->object(&m_sts, item->key.hostCid);
-      if (oddSts()) {
+      if (oddSts())
+      {
         o->ref();
 
         wb_cdrep* cd = m_vrep->merep()->cdrep(&m_sts, cid);
@@ -1118,10 +1192,12 @@ void wb_volume::aref(pwr_tCid cid, pwr_sAttrRef* arp)
 
         int bd_size;
         wb_bdrep* bd = cd->bdrep(&m_sts, pwr_eBix_rt);
-        if (oddSts()) {
+        if (oddSts())
+        {
           bd_size = bd->size();
           delete bd;
-        } else
+        }
+        else
           bd_size = 0;
         delete cd;
 
@@ -1131,13 +1207,14 @@ void wb_volume::aref(pwr_tCid cid, pwr_sAttrRef* arp)
         arp->Offset = item->offset[0];
         arp->Size = bd_size;
         arp->Body = cdh_cidToBid(cid, pwr_eBix_rt);
-	
+
         o->unref();
-	if (item->flags[0] & PWR_MASK_DISABLEATTR) {
-	  wb_attribute a = attribute(arp);
-	  if (a.disabled())
-	    continue;
-	}
+        if (item->flags[0] & PWR_MASK_DISABLEATTR)
+        {
+          wb_attribute a = attribute(arp);
+          if (a.disabled())
+            continue;
+        }
         return;
       }
     }
@@ -1162,18 +1239,22 @@ void wb_volume::nextAref(pwr_tCid cid, pwr_sAttrRef* arp, pwr_sAttrRef* oarp)
     return;
 
   wb_bdrep* bd = cd->bdrep(&m_sts, pwr_eBix_rt);
-  if (oddSts()) {
+  if (oddSts())
+  {
     bd_size = bd->size();
     delete bd;
-  } else
+  }
+  else
     bd_size = 0;
   delete cd;
 
   op->ref();
-  if (op->cid() == cid) {
+  if (op->cid() == cid)
+  {
     // Find next object in class list
     wb_orep* ol = m_vrep->next(&m_sts, op);
-    if (oddSts()) {
+    if (oddSts())
+    {
       *oarp = pwr_cNAttrRef;
       oarp->Objid = ol->oid();
       oarp->Flags.b.Object = 1;
@@ -1182,7 +1263,9 @@ void wb_volume::nextAref(pwr_tCid cid, pwr_sAttrRef* arp, pwr_sAttrRef* oarp)
       ol->unref();
       op->unref();
       return;
-    } else {
+    }
+    else
+    {
       // Find first attribute object
       merep_sClassAttrKey key;
       merep_sClassAttr* item;
@@ -1193,8 +1276,8 @@ void wb_volume::nextAref(pwr_tCid cid, pwr_sAttrRef* arp, pwr_sAttrRef* oarp)
       key.idx = 0;
       for (item = (merep_sClassAttr*)tree_FindSuccessor(&m_sts, catt_tt, &key);
            item && item->key.subCid == cid;
-           item = (merep_sClassAttr*)tree_FindSuccessor(
-               &m_sts, catt_tt, &item->key)) {
+           item = (merep_sClassAttr*)tree_FindSuccessor(&m_sts, catt_tt, &item->key))
+      {
         if (cd && item->key.hostCid == hostCid)
           // Same class with other index
           continue;
@@ -1202,7 +1285,8 @@ void wb_volume::nextAref(pwr_tCid cid, pwr_sAttrRef* arp, pwr_sAttrRef* oarp)
         hostCid = item->key.hostCid;
 
         wb_orep* ol = m_vrep->object(&m_sts, item->key.hostCid);
-        if (oddSts()) {
+        if (oddSts())
+        {
           ol->ref();
           *oarp = pwr_cNAttrRef;
           oarp->Objid = ol->oid();
@@ -1213,9 +1297,11 @@ void wb_volume::nextAref(pwr_tCid cid, pwr_sAttrRef* arp, pwr_sAttrRef* oarp)
           ol->unref();
           op->unref();
 
-          if (item->flags[0] & PWR_MASK_DISABLEATTR) {
+          if (item->flags[0] & PWR_MASK_DISABLEATTR)
+          {
             wb_attribute a = attribute(oarp);
-            if (a.disabled()) {
+            if (a.disabled())
+            {
               pwr_sAttrRef aref = *oarp;
               nextAref(cid, &aref, oarp);
             }
@@ -1238,26 +1324,31 @@ void wb_volume::nextAref(pwr_tCid cid, pwr_sAttrRef* arp, pwr_sAttrRef* oarp)
   key.hostCid = op->cid();
   key.idx = 0;
   for (item = (merep_sClassAttr*)tree_Find(&m_sts, catt_tt, &key);
-       item && item->key.subCid == cid && item->key.hostCid == op->cid(); item
-       = (merep_sClassAttr*)tree_FindSuccessor(&m_sts, catt_tt, &item->key)) {
+       item && item->key.subCid == cid && item->key.hostCid == op->cid();
+       item = (merep_sClassAttr*)tree_FindSuccessor(&m_sts, catt_tt, &item->key))
+  {
     // Find next offset
-    for (int i = 0; i < item->numOffset; i++) {
+    for (int i = 0; i < item->numOffset; i++)
+    {
       if (i == 0 && item->key.idx == 0)
         first_offset = item->offset[0];
-      if (item->offset[i] > arp->Offset) {
+      if (item->offset[i] > arp->Offset)
+      {
         *oarp = pwr_cNAttrRef;
         oarp->Objid = op->oid();
         oarp->Flags.b.ObjectAttr = 1;
-	if (item->flags[i] & PWR_MASK_DISABLEATTR)
-	  oarp->Flags.b.DisableAttr = 1;
+        if (item->flags[i] & PWR_MASK_DISABLEATTR)
+          oarp->Flags.b.DisableAttr = 1;
         oarp->Offset = item->offset[i];
         oarp->Size = bd_size;
         oarp->Body = cdh_cidToBid(cid, pwr_eBix_rt);
         op->unref();
 
-        if (item->flags[i] & PWR_MASK_DISABLEATTR) {
+        if (item->flags[i] & PWR_MASK_DISABLEATTR)
+        {
           wb_attribute a = attribute(oarp);
-          if (a.disabled()) {
+          if (a.disabled())
+          {
             pwr_sAttrRef aref = *oarp;
             nextAref(cid, &aref, oarp);
           }
@@ -1269,7 +1360,8 @@ void wb_volume::nextAref(pwr_tCid cid, pwr_sAttrRef* arp, pwr_sAttrRef* oarp)
 
   // Find first attribute in next object
   wb_orep* ol = m_vrep->next(&m_sts, op);
-  if (oddSts()) {
+  if (oddSts())
+  {
     ol->ref();
     *oarp = pwr_cNAttrRef;
     oarp->Objid = ol->oid();
@@ -1280,9 +1372,11 @@ void wb_volume::nextAref(pwr_tCid cid, pwr_sAttrRef* arp, pwr_sAttrRef* oarp)
     ol->unref();
     op->unref();
 
-    if (item->flags[0] & PWR_MASK_DISABLEATTR) {
+    if (item->flags[0] & PWR_MASK_DISABLEATTR)
+    {
       wb_attribute a = attribute(oarp);
-      if (a.disabled()) {
+      if (a.disabled())
+      {
         pwr_sAttrRef aref = *oarp;
         nextAref(cid, &aref, oarp);
       }
@@ -1295,29 +1389,32 @@ void wb_volume::nextAref(pwr_tCid cid, pwr_sAttrRef* arp, pwr_sAttrRef* oarp)
   key.subCid = cid;
   key.hostCid = op->cid();
   key.idx = 0;
-  for (item = (merep_sClassAttr*)tree_Find(&m_sts, catt_tt, &key);
-       item && item->key.subCid == cid; item
-       = (merep_sClassAttr*)tree_FindSuccessor(&m_sts, catt_tt, &item->key)) {
+  for (item = (merep_sClassAttr*)tree_Find(&m_sts, catt_tt, &key); item && item->key.subCid == cid;
+       item = (merep_sClassAttr*)tree_FindSuccessor(&m_sts, catt_tt, &item->key))
+  {
     if (item->key.hostCid == key.hostCid)
       continue;
 
     wb_orep* ol = m_vrep->object(&m_sts, item->key.hostCid);
-    if (oddSts()) {
+    if (oddSts())
+    {
       ol->ref();
       *oarp = pwr_cNAttrRef;
       oarp->Objid = ol->oid();
       oarp->Flags.b.ObjectAttr = 1;
       if (item->flags[0] & PWR_MASK_DISABLEATTR)
-	oarp->Flags.b.DisableAttr = 1;
+        oarp->Flags.b.DisableAttr = 1;
       oarp->Offset = item->offset[0];
       oarp->Size = bd_size;
       oarp->Body = cdh_cidToBid(cid, pwr_eBix_rt);
       ol->unref();
       op->unref();
 
-      if (item->flags[0] & PWR_MASK_DISABLEATTR) {
+      if (item->flags[0] & PWR_MASK_DISABLEATTR)
+      {
         wb_attribute a = attribute(oarp);
-        if (a.disabled()) {
+        if (a.disabled())
+        {
           pwr_sAttrRef aref = *oarp;
           nextAref(cid, &aref, oarp);
         }
@@ -1329,14 +1426,14 @@ void wb_volume::nextAref(pwr_tCid cid, pwr_sAttrRef* arp, pwr_sAttrRef* oarp)
   op->unref();
 }
 
-void wb_volume::nextTemplateAref(
-    pwr_tCid cid, pwr_sAttrRef* arp, pwr_sAttrRef* oarp)
+void wb_volume::nextTemplateAref(pwr_tCid cid, pwr_sAttrRef* arp, pwr_sAttrRef* oarp)
 {
   tree_sTable* catt_tt = m_vrep->merep()->buildCatt(&m_sts);
   int bd_size;
 
   wb_object o = object(arp->Objid);
-  if (!o) {
+  if (!o)
+  {
     m_sts = o.sts();
     return;
   }
@@ -1348,14 +1445,17 @@ void wb_volume::nextTemplateAref(
     return;
 
   wb_bdrep* bd = cd->bdrep(&m_sts, pwr_eBix_rt);
-  if (oddSts()) {
+  if (oddSts())
+  {
     bd_size = bd->size();
     delete bd;
-  } else
+  }
+  else
     bd_size = 0;
   delete cd;
 
-  if (cid == op->cid()) {
+  if (cid == op->cid())
+  {
     // Find attribute object
     pwr_tCid hostCid = 0;
     merep_sClassAttrKey key;
@@ -1364,10 +1464,11 @@ void wb_volume::nextTemplateAref(
     key.subCid = cid;
     key.hostCid = 0;
     key.idx = 0;
-    for (item = (merep_sClassAttr*)tree_FindSuccessor(&m_sts, catt_tt, &key);
-         item; item
-         = (merep_sClassAttr*)tree_FindSuccessor(&m_sts, catt_tt, &item->key)) {
-      if (item->key.subCid != cid) {
+    for (item = (merep_sClassAttr*)tree_FindSuccessor(&m_sts, catt_tt, &key); item;
+         item = (merep_sClassAttr*)tree_FindSuccessor(&m_sts, catt_tt, &item->key))
+    {
+      if (item->key.subCid != cid)
+      {
         m_sts = LDH__CLASSLIST;
         break;
       }
@@ -1378,7 +1479,8 @@ void wb_volume::nextTemplateAref(
       hostCid = item->key.hostCid;
 
       wb_object to = templateObject(item->key.hostCid);
-      if (to) {
+      if (to)
+      {
         wb_orep* o = to;
 
         wb_cdrep* cd = m_vrep->merep()->cdrep(&m_sts, cid);
@@ -1387,10 +1489,12 @@ void wb_volume::nextTemplateAref(
 
         int bd_size;
         wb_bdrep* bd = cd->bdrep(&m_sts, pwr_eBix_rt);
-        if (oddSts()) {
+        if (oddSts())
+        {
           bd_size = bd->size();
           delete bd;
-        } else
+        }
+        else
           bd_size = 0;
         delete cd;
 
@@ -1414,13 +1518,16 @@ void wb_volume::nextTemplateAref(
   key.hostCid = op->cid();
   key.idx = 0;
   for (item = (merep_sClassAttr*)tree_Find(&m_sts, catt_tt, &key);
-       item && item->key.subCid == cid && item->key.hostCid == op->cid(); item
-       = (merep_sClassAttr*)tree_FindSuccessor(&m_sts, catt_tt, &item->key)) {
+       item && item->key.subCid == cid && item->key.hostCid == op->cid();
+       item = (merep_sClassAttr*)tree_FindSuccessor(&m_sts, catt_tt, &item->key))
+  {
     // Find next offset
-    for (int i = 0; i < item->numOffset; i++) {
+    for (int i = 0; i < item->numOffset; i++)
+    {
       if (i == 0 && item->key.idx == 0)
         first_offset = item->offset[0];
-      if (item->offset[i] > arp->Offset) {
+      if (item->offset[i] > arp->Offset)
+      {
         *oarp = pwr_cNAttrRef;
         oarp->Objid = op->oid();
         oarp->Flags.b.ObjectAttr = 1;
@@ -1436,14 +1543,15 @@ void wb_volume::nextTemplateAref(
   key.subCid = cid;
   key.hostCid = op->cid();
   key.idx = 0;
-  for (item = (merep_sClassAttr*)tree_Find(&m_sts, catt_tt, &key);
-       item && item->key.subCid == cid; item
-       = (merep_sClassAttr*)tree_FindSuccessor(&m_sts, catt_tt, &item->key)) {
+  for (item = (merep_sClassAttr*)tree_Find(&m_sts, catt_tt, &key); item && item->key.subCid == cid;
+       item = (merep_sClassAttr*)tree_FindSuccessor(&m_sts, catt_tt, &item->key))
+  {
     if (item->key.hostCid == key.hostCid)
       continue;
 
     wb_object ol = templateObject(item->key.hostCid);
-    if (oddSts()) {
+    if (oddSts())
+    {
       *oarp = pwr_cNAttrRef;
       oarp->Objid = ol.oid();
       oarp->Flags.b.ObjectAttr = 1;
@@ -1468,7 +1576,8 @@ void wb_volume::aref(pwr_tCid cid, wb_object o, pwr_sAttrRef* arp)
   key.hostCid = o.cid();
   key.idx = 0;
   item = (merep_sClassAttr*)tree_Find(&m_sts, catt_tt, &key);
-  if (item == NULL) {
+  if (item == NULL)
+  {
     m_sts = LDH__CLASSLIST;
     return;
   }
@@ -1479,10 +1588,12 @@ void wb_volume::aref(pwr_tCid cid, wb_object o, pwr_sAttrRef* arp)
 
   int bd_size;
   wb_bdrep* bd = cd->bdrep(&m_sts, pwr_eBix_rt);
-  if (oddSts()) {
+  if (oddSts())
+  {
     bd_size = bd->size();
     delete bd;
-  } else
+  }
+  else
     bd_size = 0;
   delete cd;
 
@@ -1493,17 +1604,18 @@ void wb_volume::aref(pwr_tCid cid, wb_object o, pwr_sAttrRef* arp)
   arp->Size = bd_size;
   arp->Body = cdh_cidToBid(cid, pwr_eBix_rt);
 
-  if (item->flags[0] & PWR_MASK_DISABLEATTR) {
+  if (item->flags[0] & PWR_MASK_DISABLEATTR)
+  {
     wb_attribute a = attribute(arp);
-    if (a.disabled()) {
+    if (a.disabled())
+    {
       pwr_sAttrRef aref = *arp;
       nextObjectAref(cid, &aref, arp);
     }
   }
 }
 
-void wb_volume::nextObjectAref(
-    pwr_tCid cid, pwr_sAttrRef* arp, pwr_sAttrRef* oarp)
+void wb_volume::nextObjectAref(pwr_tCid cid, pwr_sAttrRef* arp, pwr_sAttrRef* oarp)
 {
   tree_sTable* catt_tt = m_vrep->merep()->catt_tt();
   int bd_size;
@@ -1518,10 +1630,12 @@ void wb_volume::nextObjectAref(
     return;
 
   wb_bdrep* bd = cd->bdrep(&m_sts, pwr_eBix_rt);
-  if (oddSts()) {
+  if (oddSts())
+  {
     bd_size = bd->size();
     delete bd;
-  } else
+  }
+  else
     bd_size = 0;
   delete cd;
 
@@ -1535,11 +1649,14 @@ void wb_volume::nextObjectAref(
   key.hostCid = op->cid();
   key.idx = 0;
   for (item = (merep_sClassAttr*)tree_Find(&m_sts, catt_tt, &key);
-       item && item->key.subCid == cid && item->key.hostCid == op->cid(); item
-       = (merep_sClassAttr*)tree_FindSuccessor(&m_sts, catt_tt, &item->key)) {
+       item && item->key.subCid == cid && item->key.hostCid == op->cid();
+       item = (merep_sClassAttr*)tree_FindSuccessor(&m_sts, catt_tt, &item->key))
+  {
     // Find next offset
-    for (int i = 0; i < item->numOffset; i++) {
-      if (item->offset[i] > arp->Offset) {
+    for (int i = 0; i < item->numOffset; i++)
+    {
+      if (item->offset[i] > arp->Offset)
+      {
         *oarp = pwr_cNAttrRef;
         oarp->Objid = op->oid();
         oarp->Flags.b.ObjectAttr = 1;
@@ -1547,7 +1664,8 @@ void wb_volume::nextObjectAref(
         oarp->Size = bd_size;
         oarp->Body = cdh_cidToBid(cid, pwr_eBix_rt);
 
-        if (item->flags[i] & PWR_MASK_DISABLEATTR) {
+        if (item->flags[i] & PWR_MASK_DISABLEATTR)
+        {
           wb_attribute a = attribute(oarp);
           if (a.disabled())
             continue;
@@ -1567,7 +1685,8 @@ bool wb_volume::isAncestor(wb_object& ancestor, wb_object& o)
     return false;
 
   wb_object p = o.parent();
-  while (p) {
+  while (p)
+  {
     if (p.oid().oix == ancestor.oid().oix)
       return true;
     p = p.parent();

@@ -39,6 +39,7 @@
 #include "pwr_profibusclasses.h"
 
 #include "co_cdh.h"
+#include "co_dcli.h"
 #include "rt_pb_msg.h"
 #include "rt_xnav_msg.h"
 
@@ -73,13 +74,14 @@ static pwr_tStatus ShowConfiguration(xmenu_sMenuCall* ip)
 
   sprintf(datafile, "$pwrp_load/pwr_pn_%s.xml",
           id_to_string(ip->Pointed.Objid));
+  dcli_translate_filename(datafile, datafile);
 
-  sts = xtt_pndevice_create_ctx(ip->Pointed, ip->EditorContext, &ctx);
+  sts = xtt_pndevice_create_ctx(ip->Pointed, ip->EditorContext, &ctx, datafile);
   if (EVEN(sts))
     return sts;
 
   ctx->attr = new GsdmlAttrGtk(CoXHelpGtk::get_widget(), ctx, 0, ctx->gsdml, 0,
-                               datafile, &sts);
+                               ctx->pwr_pn_data, &sts);
   if (sts == PB__CONFIGABORTED)
   {
     delete ctx->attr;

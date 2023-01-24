@@ -38,6 +38,8 @@
  * PnControllerSoftingPNAK class. */
 
 #include <string.h>
+#include <iostream>
+#include <sstream>
 
 #include "pwr_baseclasses.h"
 #include "pwr_profibusclasses.h"
@@ -49,23 +51,22 @@
 #include "wb_session.h"
 #include "wb_wsx.h"
 
+#include "cow_msgwindow.h"
+
 //
 //  Syntax check.
 //
 
-static pwr_tStatus SyntaxCheck(ldh_tSesContext Session,
-                               pwr_tAttrRef Object, /* current object */
-                               int* ErrorCount,  /* accumulated error count */
-                               int* WarningCount /* accumulated waring count */
-                               )
+static pwr_tStatus SyntaxCheck(ldh_tSesContext Session, pwr_tAttrRef Object, /* current object */
+                               int* ErrorCount,                              /* accumulated error count */
+                               int* WarningCount                             /* accumulated waring count */
+)
 {
-  return wsx_CheckIoDevice(Session, Object, ErrorCount, WarningCount,
-                           wsx_mCardOption_None);
+  return wsx_CheckIoDevice(Session, Object, ErrorCount, WarningCount, wsx_mCardOption_None);
 }
 
 //
-//  Every method to be exported to the workbench should be registred here.
+//  Every method to be exported to the workbench should be registered here.
 //
 
-pwr_dExport pwr_BindMethods(PnControllerSoftingPNAK) = {
-    pwr_BindMethod(SyntaxCheck), pwr_NullMethod};
+pwr_dExport pwr_BindMethods(PnControllerSoftingPNAK) = {pwr_BindMethod(SyntaxCheck), pwr_NullMethod};

@@ -54,9 +54,10 @@
 //
 GsdmlAttrNavGtk::GsdmlAttrNavGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid,
                                  const char* xn_name, pn_gsdml* xn_gsdml,
+                                 std::shared_ptr<ProfinetRuntimeData> pwr_pn_data,
                                  int xn_edit_mode, GtkWidget** w,
                                  pwr_tStatus* status)
-    : GsdmlAttrNav(xn_parent_ctx, xn_name, xn_gsdml, xn_edit_mode, status),
+    : GsdmlAttrNav(xn_parent_ctx, xn_name, xn_gsdml, xn_edit_mode, pwr_pn_data, status),
       parent_wid(xn_parent_wid)
 {
   form_widget = scrolledbrowwidgetgtk_new(init_brow_cb, this, &brow_widget);
@@ -64,8 +65,9 @@ GsdmlAttrNavGtk::GsdmlAttrNavGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid,
 
   *w = form_widget;
 
-  wow = new CoWowGtk(brow_widget);
-  trace_timerid = wow->timer_new();
+  m_wow = new CoWowGtk(brow_widget);
+  trace_timerid = m_wow->timer_new();  
+
   *status = 1;
 }
 
@@ -75,7 +77,7 @@ GsdmlAttrNavGtk::GsdmlAttrNavGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid,
 GsdmlAttrNavGtk::~GsdmlAttrNavGtk()
 {
   delete trace_timerid;
-  delete wow;
+  //delete m_wow;
   delete brow;
   gtk_widget_destroy(form_widget);
 }
@@ -94,39 +96,9 @@ void GsdmlAttrNavGtk::display_attr_help_text()
 
   brow_GetUserData(node_list[0], (void**)&base_item);
   free(node_list);
-
-  switch (base_item->type)
-  {
-  /*
-   * The following two item types could make use of the same info_text that the
-   * the base class does,
-   * but since they already contained references they were used instead...
-   */
-  case attrnav_eItemType_PnParValue:
-  case attrnav_eItemType_PnParEnum:
-  {
-    ItemPnParEnum* item = (ItemPnParEnum*)base_item;
-    gsdml_ValueItem* vi = 0;
-
-    if (item->value_ref)
-      vi = (gsdml_ValueItem*)item->value_ref->Body.ValueItemTarget.p;
-
-    // If we do have help available show it
-    if (vi && vi->Body.Help.p)
-      ((GsdmlAttrGtk*)parent_ctx)->attr_help_text((char*)vi->Body.Help.p);
-    else
-      ((GsdmlAttrGtk*)parent_ctx)->attr_help_text("");
-
-    break;
-  }
-  default:
-  {
-    // Do we have an associated info text string to show the user some more
-    // info?
-    if (base_item->info_text)
-      ((GsdmlAttrGtk*)parent_ctx)->attr_help_text(base_item->info_text);
-    else
-      ((GsdmlAttrGtk*)parent_ctx)->attr_help_text("");
-  }
-  }
+  
+  if (!base_item->m_infotext.empty())
+    ((GsdmlAttrGtk*)parent_ctx)->attr_help_text(base_item->m_infotext.c_str());
+  else
+    ((GsdmlAttrGtk*)parent_ctx)->attr_help_text("");
 }

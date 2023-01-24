@@ -5,7 +5,7 @@ link = $(ldxx) -L$(pwr_elib) $(elinkflags) $(domap) -o $(pwr_exe)/profinet_viewe
 	$(bld_dir)/profinet_viewer_gtk.o \
 	$(bld_dir)/pn_viewer_gtk.o $(bld_dir)/pn_viewernav_gtk.o \
 	$(bld_dir)/pn_viewer.o $(bld_dir)/pn_viewernav.o \
-	$(bld_dir)/pn_viewer_pnac.o\
+	$(bld_dir)/pn_viewer_pnak.o\
 	$(wb_msg_eobjs) $(rt_msg_eobjs) \
 	$(pwr_eobj)/rt_io_user.o \
 	$(pwre_conf_libdir) $(pwre_conf_libpwrxttgtk) $(pwre_conf_libpwrxtt) $(pwre_conf_libgtk) \

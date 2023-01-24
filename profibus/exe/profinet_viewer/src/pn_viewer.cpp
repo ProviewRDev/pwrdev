@@ -49,21 +49,20 @@
 
 #include "cow_xhelp.h"
 
-#include "pn_viewer_pnac.h"
+#include "pn_viewer_pnak.h"
 #include "pn_viewer.h"
 
 static int test = 0;
 
-PnViewer::PnViewer(void* v_parent_ctx, const char* v_name, const char* v_device,
-                   pwr_tStatus* status)
-    : parent_ctx(v_parent_ctx), viewernav(NULL), viewernavconf(NULL), wow(0),
-      input_open(0), pnet(0), close_cb(0)
+PnViewer::PnViewer(void* v_parent_ctx, const char* v_name, const char* v_device, pwr_tStatus* status)
+    : parent_ctx(v_parent_ctx), viewernav(NULL), viewernavconf(NULL), wow(0), input_open(0), pnet(0),
+      close_cb(0)
 {
   strcpy(name, v_name);
   strcpy(device, v_device);
 
   if (!test)
-    pnet = new PnViewerPNAC(status, device);
+    pnet = new PnViewerPNAK(status, device);
 }
 
 PnViewer::~PnViewer() { delete pnet; }
@@ -125,8 +124,7 @@ void PnViewer::filter(viewer_eFilterType filtertype)
       for (unsigned int j = 0; j < conf_vect.size(); j++)
       {
         if (streq(dev_vect[i].devname, conf_vect[j].devname) &&
-            dev_vect[i].vendorid == conf_vect[j].vendorid &&
-            dev_vect[i].deviceid == conf_vect[j].deviceid &&
+            dev_vect[i].vendorid == conf_vect[j].vendorid && dev_vect[i].deviceid == conf_vect[j].deviceid &&
             dev_vect[i].ipaddress[0] == conf_vect[j].ipaddress[0] &&
             dev_vect[i].ipaddress[1] == conf_vect[j].ipaddress[1] &&
             dev_vect[i].ipaddress[2] == conf_vect[j].ipaddress[2] &&
@@ -166,16 +164,14 @@ int PnViewer::fetch_config(std::vector<PnDevice>& vect)
 
   while (dcli_read_line(line, sizeof(line), fp))
   {
-    nr = dcli_parse(line, " ", "", (char*)elemv,
-                    sizeof(elemv) / sizeof(elemv[0]), sizeof(elemv[0]), 0);
+    nr = dcli_parse(line, " ", "", (char*)elemv, sizeof(elemv) / sizeof(elemv[0]), sizeof(elemv[0]), 0);
     if (nr != 6)
       continue;
 
     strncpy(pndevice.devname, elemv[1], sizeof(pndevice.devname));
 
-    sts = sscanf(elemv[2], "%hhu.%hhu.%hhu.%hhu", &pndevice.ipaddress[3],
-                 &pndevice.ipaddress[2], &pndevice.ipaddress[1],
-                 &pndevice.ipaddress[0]);
+    sts = sscanf(elemv[2], "%hhu.%hhu.%hhu.%hhu", &pndevice.ipaddress[3], &pndevice.ipaddress[2],
+                 &pndevice.ipaddress[1], &pndevice.ipaddress[0]);
     if (sts != 4)
     {
       printf("Not a valid IP address: %s\n", elemv[2]);
@@ -185,10 +181,9 @@ int PnViewer::fetch_config(std::vector<PnDevice>& vect)
       pndevice.ipaddress[3] = 0;
     }
 
-    sts = sscanf(elemv[3], "%hhx:%hhx:%hhx:%hhx:%hhx:%hhx",
-                 &pndevice.macaddress[5], &pndevice.macaddress[4],
-                 &pndevice.macaddress[3], &pndevice.macaddress[2],
-                 &pndevice.macaddress[1], &pndevice.macaddress[0]);
+    sts = sscanf(elemv[3], "%hhx:%hhx:%hhx:%hhx:%hhx:%hhx", &pndevice.macaddress[5], &pndevice.macaddress[4],
+                 &pndevice.macaddress[3], &pndevice.macaddress[2], &pndevice.macaddress[1],
+                 &pndevice.macaddress[0]);
     if (sts != 6)
     {
       printf("Not a valid MAC address: %s\n", elemv[3]);
@@ -213,8 +208,7 @@ int PnViewer::fetch_config(std::vector<PnDevice>& vect)
   return 1;
 }
 
-void PnViewer::set_device_properties(unsigned char* macaddress,
-                                     unsigned char* ipaddress, char* devname)
+void PnViewer::set_device_properties(unsigned char* macaddress, unsigned char* ipaddress, char* devname)
 {
   pnet->set_device_properties(macaddress, ipaddress, devname);
 }
@@ -245,10 +239,7 @@ void PnViewer::activate_update()
   }
 }
 
-void PnViewer::activate_filter(viewer_eFilterType filtertype)
-{
-  filter(filtertype);
-}
+void PnViewer::activate_filter(viewer_eFilterType filtertype) { filter(filtertype); }
 
 void PnViewer::activate_setdevice()
 {
@@ -287,8 +278,7 @@ void PnViewer::activate_close()
 
 void PnViewer::activate_help()
 {
-  CoXHelp::dhelp("profinet_viewer", 0, navh_eHelpFile_Other,
-                 "$pwr_lang/man_pb.dat", true);
+  CoXHelp::dhelp("profinet_viewer", 0, navh_eHelpFile_Other, "$pwr_lang/man_pb.dat", true);
 }
 
 #endif

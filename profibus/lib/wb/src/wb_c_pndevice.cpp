@@ -38,6 +38,10 @@
 
 #include <stdlib.h>
 #include <unistd.h>
+#include <algorithm>
+#include <regex>
+#include <stdexcept>
+#include <iomanip>
 
 #include "pwr_baseclasses.h"
 #include "pwr_profibusclasses.h"
@@ -45,6 +49,7 @@
 #include "co_dcli.h"
 #include "co_msg.h"
 #include "co_string.h"
+#include "co_fs_util.h"
 
 #include "rt_pb_msg.h"
 
@@ -62,39 +67,273 @@
 
 #include "wb_c_pndevice.h"
 
+const char* NO_EDIT_STRING = "Not in edit mode!";
+
 static pwr_tStatus generate_viewer_data(device_sCtx* ctx);
 
 class ChanItem
 {
 public:
-  ChanItem()
-      : subslot_number(0), representation(0), number(0), use_as_bit(0), cid(0)
-  {
-  }
+  ChanItem() : representation(0), number(0), index(0), use_as_bit(false), cid(0) {}
 
-  unsigned int subslot_number;
-  unsigned int representation;
+  // unsigned int subslot_number;
+  pwr_tEnum representation;
   unsigned int number;
-  unsigned int use_as_bit;
+  uint index;
+  bool use_as_bit;
   pwr_tCid cid;
-  char description[80];
+  std::string description;
+  std::string name;
 };
 
-static int pndevice_add_channels(device_sCtx* ctx,
-                                 gsdml_VirtualSubmoduleItem* vi,
-                                 int subslot_number,
-                                 std::vector<ChanItem>& input_vect,
-                                 std::vector<ChanItem>& output_vect);
-static int pndevice_check_io(device_sCtx* ctx, gsdml_VirtualSubmoduleList* vsl,
-                             std::vector<ChanItem>& input_vect,
-                             std::vector<ChanItem>& output_vect);
+static int pndevice_populate_channel_vectors(device_sCtx* ctx, GSDML::IOData* io_data, int subslot_number,
+                                             std::vector<ChanItem>& input_vect,
+                                             std::vector<ChanItem>& output_vect);
+
+// static int pndevice_check_io(device_sCtx* ctx,
+//                              std::map<std::string, std::shared_ptr<GSDML::SubmoduleItem>> const& vsl,
+//                              std::vector<ChanItem>& input_vect, std::vector<ChanItem>& output_vect);
+
+static int set_attribute(ldh_tSession p_ldhses, void* p_value, size_t p_length, const char* p_attribute_name,
+                         pwr_tAttrRef* p_aref)
+{
+  pwr_tStatus sts;
+  pwr_tAttrRef attribute_aref;
+  sts = ldh_ArefANameToAref(p_ldhses, p_aref, p_attribute_name, &attribute_aref);
+  if (EVEN(sts))
+    return sts;
+
+  sts = ldh_WriteAttribute(p_ldhses, &attribute_aref, p_value, p_length);
+
+  return sts;
+}
+
+static int create_channel(ldh_tSession ldhses, ChanItem const& chan, pwr_tOid target_oid,
+                          ldh_eDest destination)
+{
+  pwr_tStatus sts;
+  pwr_tOid chan_oid;
+  sts = ldh_CreateObject(ldhses, &chan_oid, chan.name.c_str(), chan.cid, target_oid, destination);
+
+  if (EVEN(sts))
+    return sts;
+
+  pwr_tAttrRef chan_aref = cdh_ObjidToAref(chan_oid);
+
+  // Set Representation
+  sts = set_attribute(ldhses, (void*)&chan.representation, sizeof(chan.representation), "Representation",
+                      &chan_aref);
+  if (EVEN(sts))
+    return sts;
+
+  sts = set_attribute(ldhses, (void*)&chan.number, sizeof(chan.number), "Number", &chan_aref);
+  if (EVEN(sts))
+    return sts;
+
+  sts = set_attribute(ldhses, (void*)chan.description.c_str(), sizeof(chan.description), "Description",
+                      &chan_aref);
+
+  return sts;
+}
+
+static std::string generate_channel_object_name(GSDML::DataItem const* data_item, size_t start_index,
+                                                unsigned int number, int const& subslot_number,
+                                                bool channel_name_from_id = false)
+{
+  std::regex disallowed_characters_re(
+      R"([^A-Za-z0-9_])"); // Match anything NOT in A-Z, a-z, 0-9 or _ i.e. all disallowed characters
+  std::ostringstream name(std::ios_base::out);
+  if (channel_name_from_id)
+  {
+    name << "SS" << subslot_number << "_" << (data_item->_TextId != "" ? "" : "Ch") << std::setw(2)
+         << std::setfill('0') << start_index << (data_item->_TextId != "" ? "_" + data_item->_TextId : "");
+  }
+  else
+  {
+    // Make sure the text is no longer than 20 bytes. Because we will fill it with more info. And we are
+    // limited to 32 characters in these names :/
+    std::string temp_text = *data_item->_Text;
+    if (temp_text.length() > 20)
+      temp_text.erase(20, std::string::npos); // We can only have 32 characters including null termination :(
+    name << "SS" << subslot_number << "_" << (data_item->_Text ? temp_text : "Ch") << "_" << start_index
+         << "_" << number;
+  }
+
+  std::string new_name;
+  new_name = name.str();
+  new_name.erase(std::remove(new_name.begin(), new_name.end(), ' '),
+                 new_name.end()); // Remove any whitespaces
+  new_name = std::regex_replace(new_name, disallowed_characters_re,
+                                "_"); // Replace all illegal characters with a '_'
+  if (new_name.length() > 31)
+    new_name.erase(31, std::string::npos); // We can only have 32 characters including null termination :(
+
+  // In 999 out of 1000 cases we now have a unique name given the start_index and number within a sequence of
+  // bits for instance. In some cases though one can choose the same submodule more than once for some
+  // specific modules.
+
+  return new_name;
+}
+
+static int pndevice_fill_io_vector_from_data_item(std::vector<ChanItem>& io_vector,
+                                                  GSDML::DataItem const* data_item, size_t const& start_index,
+                                                  int const& subslot_number, bool is_output = false)
+{
+  ChanItem ci;
+
+  // If we have bits we fill with Di/Do
+  if (data_item->_UseAsBits)
+  {
+    // Use as bits
+    unsigned int bits;
+
+    switch (data_item->_DataType)
+    {
+    case GSDML::ValueDataType_Integer8:
+    case GSDML::ValueDataType_Unsigned8:
+    case GSDML::ValueDataType_OctetString:
+      ci.representation = pwr_eDataRepEnum_Bit8;
+      bits = 8;
+      break;
+    case GSDML::ValueDataType_Integer16:
+    case GSDML::ValueDataType_Unsigned16:
+      ci.representation = pwr_eDataRepEnum_Bit16;
+      bits = 16;
+      break;
+    case GSDML::ValueDataType_Integer32:
+    case GSDML::ValueDataType_Unsigned32:
+      ci.representation = pwr_eDataRepEnum_Bit32;
+      bits = 32;
+      break;
+    case GSDML::ValueDataType_Integer64:
+    case GSDML::ValueDataType_Unsigned64:
+      ci.representation = pwr_eDataRepEnum_Bit64;
+      bits = 64;
+      break;
+    default:
+      bits = 0;
+    }
+
+    if (is_output)
+      ci.cid = pwr_cClass_ChanDo;
+    else
+      ci.cid = pwr_cClass_ChanDi;
+
+    ci.use_as_bit = true;
+
+    // For those sloppy suppliers of GSDML that do not provide this list :/
+    if (data_item->_BitDataItem.size() == 0)
+    {
+      // If this is a octetstring we multiply the biuts with length
+      if (data_item->_DataType == GSDML::ValueDataType_OctetString)
+        bits *= data_item->_Length;
+
+      // Add default bits
+      for (unsigned int number = 0; number < bits; number++)
+      {
+        // Add Channel
+        ci.number = data_item->_DataType == GSDML::ValueDataType_OctetString ? number % 8 : number;
+        ci.description = std::string("Bit ") + std::to_string(number); // Okay lots of overhead here...
+        ci.name = generate_channel_object_name(data_item, start_index, number, subslot_number);
+
+        io_vector.push_back(ci);
+      }
+    }
+    else // Add only configured bit items
+    {
+      for (auto const& bit_data_item : data_item->_BitDataItem)
+      {
+        // Add channel
+        ci.number = bit_data_item._BitOffset;
+        ci.description =
+            bit_data_item._Text ? *bit_data_item._Text : std::string(" Bit ") + std::to_string(ci.number);
+        ci.name = generate_channel_object_name(data_item, start_index, ci.number, subslot_number);
+
+        io_vector.push_back(ci);
+      }
+    }
+    return PB__SUCCESS;
+  }
+  else
+  {
+    switch (data_item->_DataType)
+    {
+    case GSDML::ValueDataType_Integer8:
+      ci.representation = pwr_eDataRepEnum_Int8;
+      break;
+    case GSDML::ValueDataType_Unsigned8:
+    case GSDML::ValueDataType_OctetString:
+      ci.representation = pwr_eDataRepEnum_UInt8;
+      break;
+    case GSDML::ValueDataType_Integer16:
+      ci.representation = pwr_eDataRepEnum_Int16;
+      break;
+    case GSDML::ValueDataType_Unsigned16:
+      ci.representation = pwr_eDataRepEnum_UInt16;
+      break;
+    case GSDML::ValueDataType_Integer32:
+      ci.representation = pwr_eDataRepEnum_Int32;
+      break;
+    case GSDML::ValueDataType_Unsigned32:
+      ci.representation = pwr_eDataRepEnum_UInt32;
+      break;
+    case GSDML::ValueDataType_Integer64:
+      ci.representation = pwr_eDataRepEnum_Int64;
+      break;
+    case GSDML::ValueDataType_Unsigned64:
+      ci.representation = pwr_eDataRepEnum_UInt64;
+      break;
+    case GSDML::ValueDataType_Float32:
+      ci.representation = pwr_eDataRepEnum_Float32;
+      break;
+    case GSDML::ValueDataType_Float64:
+      ci.representation = pwr_eDataRepEnum_Float64;
+      break;
+    default:
+      printf("GSDML-Error, Unhandled datatype, unable to create channel\n");
+      return PB__CREATECHAN;
+    }
+
+    ci.number = 0;
+    ci.use_as_bit = 0;
+
+    if (is_output)
+    {
+      ci.cid =
+          data_item->_DataType == GSDML::ValueDataType_OctetString ? pwr_cClass_ChanIo : pwr_cClass_ChanAo;
+    }
+    else
+    {
+      ci.cid =
+          data_item->_DataType == GSDML::ValueDataType_OctetString ? pwr_cClass_ChanIi : pwr_cClass_ChanAi;
+    }
+
+    ci.description = *data_item->_Text;
+
+    // If this is octetstring we add one item for each byte
+    if (data_item->_DataType == GSDML::ValueDataType_OctetString)
+    {
+      for (size_t byte = 0; byte < data_item->_Length; byte++)
+      {
+        ci.name = generate_channel_object_name(data_item, start_index, byte, subslot_number);
+
+        io_vector.push_back(ci);
+      }
+    }
+    else
+    {
+      ci.name = generate_channel_object_name(data_item, start_index, ci.number, subslot_number, true);
+      io_vector.push_back(ci);
+    }
+  }
+  return PB__SUCCESS;
+}
 
 /*----------------------------------------------------------------------------*\
   Configure the slave from gsd file.
 \*----------------------------------------------------------------------------*/
 
-static void get_subcid(ldh_tSession ldhses, pwr_tCid cid,
-                       std::vector<pwr_tCid>& v)
+static void get_subcid(ldh_tSession ldhses, pwr_tCid cid, std::vector<pwr_tCid>& v)
 {
   pwr_tCid subcid;
   pwr_tStatus sts;
@@ -120,6 +359,7 @@ int pndevice_help_cb(void* sctx, const char* text)
 void pndevice_close_cb(void* sctx)
 {
   device_sCtx* ctx = (device_sCtx*)sctx;
+  ctx->pwr_pn_data.reset(); // For clarity
   delete ctx->attr;
   delete ctx->gsdml;
   free((char*)ctx);
@@ -129,367 +369,339 @@ int pndevice_save_cb(void* sctx)
 {
   device_sCtx* ctx = (device_sCtx*)sctx;
   pwr_tStatus sts;
-  pwr_tOName name;
-  int size;
-  pwr_tOid oid;
-  pwr_tStatus rsts = PB__SUCCESS;
+  pwr_tOid module_oid;
 
   // Syntax check
-  if (ctx->attr->attrnav->device_num == 0)
+  if (ctx->attr->attrnav->pn_runtime_data->m_PnDevice->m_DAP_ID == "")
   {
     MsgWindow::message('E', "Device type not selected");
     return PB__SYNTAX;
   }
 
-  for (unsigned int i = 1; i < ctx->attr->attrnav->dev_data.slot_data.size();
-       i++)
-  {
-    if (ctx->attr->attrnav->dev_data.slot_data[i]->module_enum_number == 0 &&
-        ctx->attr->attrnav->dev_data.slot_data[i]->module_class != 0)
-    {
-      // Module class selected but not module type
-      char msg[20];
-
-      sprintf(msg, "Slot %d", i);
-      MsgWindow::message('E', "Module type not selected, ", msg);
-      rsts = PB__MODULETYPE;
-    }
-    if (ctx->attr->attrnav->dev_data.slot_data[i]->module_class == 0 &&
-        ctx->attr->attrnav->dev_data.slot_data[i]->module_enum_number != 0)
-    {
-      // Module type selected but not module class
-      char msg[20];
-
-      sprintf(msg, "Slot %d", i);
-      MsgWindow::message('E', "Module class not selected, ", msg);
-      rsts = PB__MODULECLASS;
-    }
-  }
-
-  // Save configuration
   ((WNav*)ctx->editor_ctx)->set_nodraw();
 
-  sts = ldh_ObjidToName(ctx->ldhses, ctx->aref.Objid, ldh_eName_Hierarchy, name,
-                        sizeof(name), &size);
-  if (EVEN(sts))
-    goto return_now;
+  // Reset all module object identities
+  for (auto& slot : ctx->attr->attrnav->pn_runtime_data->m_PnDevice->m_slot_list)
+    slot.m_module_oid = pwr_cNOid;
 
-  // Check that Slot attribute corresponds to the and module_oid
-  for (unsigned int i = 1; i < ctx->attr->attrnav->dev_data.slot_data.size();
-       i++)
-    ctx->attr->attrnav->dev_data.slot_data[i]->module_oid = pwr_cNOid;
-
-  for (sts = ldh_GetChild(ctx->ldhses, ctx->aref.Objid, &oid); ODD(sts);
-       sts = ldh_GetNextSibling(ctx->ldhses, oid, &oid))
+  // Check if we are indeed iterating over a pnmodule and that this module is "in use"
+  // If both things above are true we save the oid of the PnModule. And we only save each slot number once.
+  // If by some chance there's a duplicate slot_number only the first one is kept...
   {
-    unsigned int *slotnumberp, slotnumber;
-
-    sts = ldh_GetObjectPar(ctx->ldhses, oid, "RtBody", "Slot",
-                           (char**)&slotnumberp, &size);
-    if (EVEN(sts))
+    std::vector<size_t> traversed_slot_numbers;
+    int size = 0;
+    for (sts = ldh_GetChild(ctx->ldhses, ctx->aref.Objid, &module_oid); ODD(sts);
+         sts = ldh_GetNextSibling(ctx->ldhses, module_oid, &module_oid))
     {
-      MsgWindow::message('E', "Not a Profinet module object", msgw_ePop_Yes,
-                         oid);
-      continue;
-    }
-    slotnumber = *slotnumberp;
-    free(slotnumberp);
+      unsigned int *slot_number_p, slot_number;
+      sts = ldh_GetObjectPar(ctx->ldhses, module_oid, "RtBody", "Slot", (char**)&slot_number_p, &size);
+      slot_number = *slot_number_p;
+      free(slot_number_p);
 
-    if (slotnumber >= ctx->attr->attrnav->dev_data.slot_data.size())
-    {
-      MsgWindow::message('E', "Slot too large", msgw_ePop_Yes, oid);
-      continue;
-    }
+      if (std::find(traversed_slot_numbers.begin(), traversed_slot_numbers.end(), slot_number) !=
+          traversed_slot_numbers.end())
+        continue;
 
-    if (cdh_ObjidIsNotNull(
-            ctx->attr->attrnav->dev_data.slot_data[slotnumber]->module_oid))
-    {
-      MsgWindow::message('E', "Slot already used", msgw_ePop_Yes, oid);
-      continue;
-    }
-
-    if (ctx->attr->attrnav->dev_data.slot_data[slotnumber]->module_class ==
-        pwr_cNCid)
-      // Should be removed
-      continue;
-
-    ctx->attr->attrnav->dev_data.slot_data[slotnumber]->module_oid = oid;
-  }
-
-  // Remove modules that wasn't configured any more
-  pwr_tOid moid[100];
-  int mcnt;
-  int found;
-  mcnt = 0;
-  for (sts = ldh_GetChild(ctx->ldhses, ctx->aref.Objid, &oid); ODD(sts);
-       sts = ldh_GetNextSibling(ctx->ldhses, oid, &oid))
-  {
-    found = 0;
-    for (unsigned int i = 0; i < ctx->attr->attrnav->dev_data.slot_data.size();
-         i++)
-    {
-      if (cdh_ObjidIsEqual(
-              ctx->attr->attrnav->dev_data.slot_data[i]->module_oid, oid))
+      // We ignore this?? TODO Check into this...
+      if (EVEN(sts))
       {
-        found = 1;
-        break;
+        MsgWindow::message('E', "Not a Profinet module object", msgw_ePop_Yes, module_oid);
+        continue;
       }
-    }
-    if (!found)
-    {
-      moid[mcnt++] = oid;
-      if (mcnt > (int)(sizeof(moid) / sizeof(moid[0])))
-        break;
+
+      // This module is exceeding the allowed number of modules for the DAP.
+      if (slot_number >= ctx->attr->attrnav->pn_runtime_data->m_PnDevice->m_slot_list.size())
+      {
+        MsgWindow::message('E', "Slot number exceeds maximum slot list size", msgw_ePop_Yes, module_oid);
+        continue;
+      }
+
+      ProfinetSlot* slot = &ctx->attr->attrnav->pn_runtime_data->m_PnDevice->m_slot_list[slot_number];
+
+      // Now check if the module is indeed present in our configuration, if it isn't we don't update the oid
+      // (i.e. we mark it for removal)
+      if (slot->m_module_ID == "")
+        continue; // Leaving the oid untouched
+
+      ctx->attr->attrnav->pn_runtime_data->m_PnDevice->m_slot_list[slot_number].m_module_oid = module_oid;
+      traversed_slot_numbers.push_back(slot_number);
     }
   }
 
-  for (int i = 0; i < mcnt; i++)
-    sts = ldh_DeleteObjectTree(ctx->ldhses, moid[i], 0);
+  // Remove modules that isn't configured anymore OR have a changed module class (i.e. one has chosen a
+  // custom derived PnModule in favor of the base class PnModule) One will loose all the connections but that
+  // goes without saying...
+  // TODO Mark updated slots in the configurator and check that status here. Useful when one for instance
+  // changes configuration for modules in the middle without changing the module class...
+  for (sts = ldh_GetChild(ctx->ldhses, ctx->aref.Objid, &module_oid); ODD(sts);)
+  {
+    auto& slot_list = ctx->attr->attrnav->pn_runtime_data->m_PnDevice->m_slot_list;
+    // We want to find an object, if we do not find one we remove it. The predicate says we want
+    // the same oid to be present in the saved conf and that the module class hasn't changed...
+    pwr_tCid cid = pwr_cNCid;
+    ldh_GetObjectClass(ctx->ldhses, module_oid, &cid); // Ignore return...
+    auto result = std::find_if(
+        std::begin(slot_list), std::end(slot_list),
+        [&module_oid, &cid](auto& slot)
+        { return (cdh_ObjidIsEqual(slot.m_module_oid, module_oid) && (slot.m_module_class == cid)); });
+
+    // If we reached the end we didn't find a module matching our conf so this module has to go. It's either
+    // removed or one changed the module class
+    if (result == std::end(slot_list))
+    {
+      pwr_tOid purged_oid = module_oid;
+
+      // Find and clear the saved oid for the module we are about to remove
+      auto search_oid =
+          std::find_if(std::begin(slot_list), std::end(slot_list),
+                       [&module_oid](auto& slot) { return cdh_ObjidIsEqual(slot.m_module_oid, module_oid); });
+      if (search_oid != std::end(slot_list))
+        search_oid->m_module_oid = pwr_cNOid;
+
+      sts = ldh_GetNextSibling(ctx->ldhses, purged_oid, &module_oid);
+      sts = ldh_DeleteObjectTree(ctx->ldhses, purged_oid, 0);
+      continue;
+    }
+    sts = ldh_GetNextSibling(ctx->ldhses, module_oid, &module_oid);
+  }
 
   // Create new module objects
-  for (unsigned int i = 0; i < ctx->attr->attrnav->dev_data.slot_data.size();
-       i++)
+  pwr_tOid last_object = pwr_cNOid;
+  for (auto& slot : ctx->attr->attrnav->pn_runtime_data->m_PnDevice->m_slot_list)
   {
-    GsdmlSlotData* slot = ctx->attr->attrnav->dev_data.slot_data[i];
+    bool created = false;
 
-    if (cdh_ObjidIsNull(slot->module_oid) && slot->module_class != pwr_cNCid)
+    // Skip if if we have an oid (There's already an object in place, and we never remove existing configured
+    // items) OR we do not have a module class, we need one to know what to create (The configurator forces
+    // one to select a module class). The DAP has no selection but is forced to be pwr_cClass_PnModule.
+
+    // TODO If we have slot.m_is_modified force an update of the module name and description since it could
+    // have changed
+    if (cdh_ObjidIsNotNull(slot.m_module_oid) || slot.m_module_class == pwr_cNCid)
+      continue;
+
+    // Create a fancy name like "M0, M1" and so on and so forth...
+    std::ostringstream module_name(std::ios_base::out);
+    module_name << "M" << slot.m_slot_number;
+
+    // We need to insert the module in the correct place! Find out where to insert module
+    for (sts = ldh_GetChild(ctx->ldhses, ctx->aref.Objid, &module_oid); ODD(sts);
+         sts = ldh_GetNextSibling(ctx->ldhses, module_oid, &module_oid))
     {
-      char mname[20];
-      sprintf(mname, "M%d", i);
+      // Boiler plate for extracting the slot number ....... TODO refactor, second use here...
+      unsigned int *slot_number_p, slot_number;
+      int size;
+      sts = ldh_GetObjectPar(ctx->ldhses, module_oid, "RtBody", "Slot", (char**)&slot_number_p, &size);
+      slot_number = *slot_number_p;
+      free(slot_number_p);
 
-      if (i == 1)
-        sts = ldh_CreateObject(ctx->ldhses, &slot->module_oid, mname,
-                               slot->module_class, ctx->aref.Objid,
-                               ldh_eDest_IntoFirst);
-      else
+      if (slot.m_slot_number < slot_number)
       {
-        // Find sibling
-        pwr_tOid dest_oid = pwr_cNOid;
-        int dest_found = 0;
-        for (int j = i - 1; j > 0; j--)
+        sts = ldh_CreateObject(ctx->ldhses, &slot.m_module_oid, module_name.str().c_str(),
+                               slot.m_module_class, module_oid, ldh_eDest_Before);
+        if (EVEN(sts))
         {
-          if (cdh_ObjidIsNotNull(
-                  ctx->attr->attrnav->dev_data.slot_data[j]->module_oid))
-          {
-            dest_oid = ctx->attr->attrnav->dev_data.slot_data[j]->module_oid;
-            dest_found = 1;
-            break;
-          }
+          MsgWindow::message('E', "Error creating module object", module_name.str().c_str());
+          sts = 0;
+          ((WNav*)ctx->editor_ctx)->reset_nodraw();
+          return sts;
         }
-        if (!dest_found)
-          sts = ldh_CreateObject(ctx->ldhses, &slot->module_oid, mname,
-                                 slot->module_class, ctx->aref.Objid,
-                                 ldh_eDest_IntoFirst);
-        else
-          sts = ldh_CreateObject(ctx->ldhses, &slot->module_oid, mname,
-                                 slot->module_class, dest_oid, ldh_eDest_After);
+        created = true; // Set created, we won't create another item :D
+        break;
       }
-      if (EVEN(sts))
-      {
-        MsgWindow::message('E', "Error creating module object", mname);
-        sts = 0;
-        goto return_now;
-      }
-
-      pwr_tAttrRef aaref;
-      pwr_tAttrRef modulearef = cdh_ObjidToAref(slot->module_oid);
-
-      // Set Slot
-      pwr_tUInt32 slotnumber = i;
-      sts = ldh_ArefANameToAref(ctx->ldhses, &modulearef, "Slot", &aaref);
-      if (EVEN(sts))
-        goto return_now;
-
-      sts = ldh_WriteAttribute(ctx->ldhses, &aaref, &slotnumber,
-                               sizeof(slotnumber));
-      if (EVEN(sts))
-        goto return_now;
+      last_object = module_oid; // Update last object in case we reach the end
     }
-  }
 
-  for (unsigned int i = 0; i < ctx->attr->attrnav->dev_data.slot_data.size();
-       i++)
+    sts = PB__SUCCESS; // Reset the status once out of the loop...
+
+    if (!created)
+    {
+      // We are either at the beginning or at the end
+      if (cdh_ObjidIsNull(last_object))
+      {
+        sts = ldh_CreateObject(ctx->ldhses, &slot.m_module_oid, module_name.str().c_str(),
+                               slot.m_module_class, ctx->aref.Objid, ldh_eDest_IntoFirst);
+      }
+      else // All subsequent pnmodules created
+      {
+        sts = ldh_CreateObject(ctx->ldhses, &slot.m_module_oid, module_name.str().c_str(),
+                               slot.m_module_class, last_object, ldh_eDest_After);
+      }
+    }
+
+    // Did everything go as planned?
+    if (EVEN(sts))
+    {
+      MsgWindow::message('E', "Error creating module object", module_name.str().c_str());
+      sts = 0;
+      ((WNav*)ctx->editor_ctx)->reset_nodraw();
+      return sts;
+    }
+
+    // Save last object id so that we can continue creating objects from there...
+    last_object = slot.m_module_oid;
+
+    // Update slot number in our module object and set a name for the attribute ModuleName
+    pwr_tAttrRef module_aref = cdh_ObjidToAref(slot.m_module_oid);
+    set_attribute(ctx->ldhses, &slot.m_slot_number, sizeof(slot.m_slot_number), "Slot", &module_aref);
+    // Set both ModuleName and Description as a default. Again, slot 0 is treated a little different
+    if (slot.m_is_dap)
+    {
+      std::string name =
+          *ctx->attr->attrnav->gsdml->getDeviceAccessPointMap().at(slot.m_module_ID)->_ModuleInfo._Name;
+      std::string info =
+          *ctx->attr->attrnav->gsdml->getDeviceAccessPointMap().at(slot.m_module_ID)->_ModuleInfo._InfoText;
+      set_attribute(ctx->ldhses, (void*)name.c_str(), name.length(), "ModuleName", &module_aref);
+      set_attribute(ctx->ldhses, (void*)info.c_str(), info.length(), "Description", &module_aref);
+    }
+    else
+    {
+      std::string name = *ctx->attr->attrnav->gsdml->getModuleMap().at(slot.m_module_ID)->_ModuleInfo._Name;
+      set_attribute(ctx->ldhses, (void*)name.c_str(), name.length(), "ModuleName", &module_aref);
+      set_attribute(ctx->ldhses, (void*)name.c_str(), name.length(), "Description", &module_aref);
+    }
+
+  } // Done creating modules
+
+  // Now we create all the channel items! :D
+  // If we find channels already in place, we notify the user and skip this module. We don't want to enforce
+  // removal of channel items. The user is responsible of move/deleting them. This is for not loosing channel
+  // connection/configuration information. Go through all our PnModules
+  for (sts = ldh_GetChild(ctx->ldhses, ctx->aref.Objid, &module_oid); ODD(sts);
+       sts = ldh_GetNextSibling(ctx->ldhses, module_oid, &module_oid))
   {
-    GsdmlSlotData* slot = ctx->attr->attrnav->dev_data.slot_data[i];
+    pwr_tCid module_cid;
+    ldh_GetObjectClass(ctx->ldhses, module_oid, &module_cid);
+    std::shared_ptr<GSDML::ModuleItem> module_item;
 
-    if (i == 0)
+    unsigned int *slot_number_p, slot_number;
+    int size;
+    sts = ldh_GetObjectPar(ctx->ldhses, module_oid, "RtBody", "Slot", (char**)&slot_number_p, &size);
+    slot_number = *slot_number_p;
+    free(slot_number_p);
+
+    auto& slot = ctx->attr->attrnav->pn_runtime_data->m_PnDevice->m_slot_list[slot_number];
+    if (slot.m_is_dap) // DAP
+    {
+      module_item = ctx->attr->attrnav->gsdml->getDeviceAccessPointMap().at(slot.m_module_ID);
+    }
+    else
+    {
+      module_item = ctx->attr->attrnav->gsdml->getModuleMap().at(slot.m_module_ID);
+    }
+
+    // Check if we have children, if we do AND this slot was modified in the configurator we have to notify
+    // the user that he/she must move them temporary or remove them completely before ProviewR will create
+    // channels.
+    pwr_tOid chan_oid;
+    if (ODD(ldh_GetChild(ctx->ldhses, module_oid, &chan_oid)) && slot.m_is_modified)
+    {
+      std::ostringstream message(std::ios_base::out);
+      char object_name[200]; // Enough space? :D
+      int size;
+      ldh_ObjidToName(ctx->ldhses, module_oid, ldh_eName_Default, object_name, 200, &size);
+      message << "PnModule " << object_name
+              << " already have children. If ProviewR should handle creation of channel items please remove "
+                 "them first. Skipping module.";
+      MsgWindow::message('W', message.str().c_str());
+      slot.m_is_modified =
+          false; // Reset this flag so we won't get the message until we update the slot again.
+      continue;
+    }
+    else if (ODD(ldh_GetChild(ctx->ldhses, module_oid, &chan_oid)))
+    {
+      // Silently ignore the creation of channels for this slot
+      continue;
+    }
+
+    // Create
+    if (module_cid == pwr_cClass_PnModule)
     {
       std::vector<ChanItem> input_vect;
       std::vector<ChanItem> output_vect;
 
-      sts = pndevice_check_io(
-          ctx, ctx->attr->attrnav->device_item->VirtualSubmoduleList,
-          input_vect, output_vect);
-      if (sts == PB__CREATECHAN)
+      // Gather all IOData associated with the slot
+      GSDML::IOData* io_data;
+      for (auto const& subslot : slot.m_subslot_map)
       {
-        char msg[20];
-        sprintf(msg, "Slot %d", i);
-        MsgWindow::message('W', "Unexpected datatype, channel not created, ",
-                           msg);
-      }
-    }
-    else
-    {
-      if (slot->module_class == pwr_cClass_PnModule)
-      {
-        std::vector<ChanItem> input_vect;
-        std::vector<ChanItem> output_vect;
-        gsdml_UseableModules* um =
-            ctx->gsdml->ApplicationProcess->DeviceAccessPointList
-                ->DeviceAccessPointItem[ctx->attr->attrnav->device_num - 1]
-                ->UseableModules;
-
-        if (!um)
+        if (module_item->_VirtualSubmoduleList.count(subslot.second.m_submodule_ID))
+        {
+          io_data = &module_item->_VirtualSubmoduleList.at(subslot.second.m_submodule_ID)->_IOData;
+        }
+        else if (module_item->_UseableSubmodules.count(subslot.second.m_submodule_ID))
+        {
+          io_data = &module_item->_UseableSubmodules.at(subslot.second.m_submodule_ID)
+                         ->_SubmoduleItemTarget->_IOData;
+        }
+        else
+        {
           continue;
-        gsdml_ModuleItem* mi =
-            (gsdml_ModuleItem*)um->ModuleItemRef[slot->module_enum_number - 1]
-                ->Body.ModuleItemTarget.p;
-
-        sts = pndevice_check_io(ctx, mi->VirtualSubmoduleList, input_vect,
-                                output_vect);
-        if (sts == PB__CREATECHAN)
-        {
-          char msg[20];
-          sprintf(msg, "Slot %d", i);
-          MsgWindow::message('W', "Unexpected datatype, channel not created, ",
-                             msg);
         }
 
-        // Create the channels
-        if (EVEN(ldh_GetChild(ctx->ldhses, slot->module_oid, &oid)))
+        // Populate channel vectors with the data collected for this subslot
+        pndevice_populate_channel_vectors(ctx, io_data, subslot.first, input_vect, output_vect);
+      }
+
+      for (auto const& input_chan : input_vect)
+      {
+        sts = create_channel(ctx->ldhses, input_chan, module_oid, ldh_eDest_IntoLast);
+        if (EVEN(sts))
         {
-          unsigned int chan_cnt = 0;
-          for (unsigned int j = 0; j < input_vect.size(); j++)
-          {
-            char name[80];
-            sprintf(name, "Ch%02u", chan_cnt++);
-            sts = ldh_CreateObject(ctx->ldhses, &oid, name, input_vect[j].cid,
-                                   slot->module_oid, ldh_eDest_IntoLast);
-            if (EVEN(sts))
-              goto return_now;
-
-            pwr_tAttrRef aaref;
-            pwr_tAttrRef chanaref = cdh_ObjidToAref(oid);
-
-            // Set Representation
-            pwr_tEnum representation = input_vect[j].representation;
-            sts = ldh_ArefANameToAref(ctx->ldhses, &chanaref, "Representation",
-                                      &aaref);
-            if (EVEN(sts))
-              goto return_now;
-
-            sts = ldh_WriteAttribute(ctx->ldhses, &aaref, &representation,
-                                     sizeof(representation));
-            if (EVEN(sts))
-              goto return_now;
-
-            // Set Number
-            pwr_tUInt16 number = input_vect[j].number;
-            sts = ldh_ArefANameToAref(ctx->ldhses, &chanaref, "Number", &aaref);
-            if (EVEN(sts))
-              goto return_now;
-
-            sts = ldh_WriteAttribute(ctx->ldhses, &aaref, &number,
-                                     sizeof(number));
-            if (EVEN(sts))
-              goto return_now;
-
-            // Set Description
-            pwr_tString80 description;
-            strncpy(description, input_vect[j].description,
-                    sizeof(description));
-            sts = ldh_ArefANameToAref(ctx->ldhses, &chanaref, "Description",
-                                      &aaref);
-            if (EVEN(sts))
-              goto return_now;
-
-            sts = ldh_WriteAttribute(ctx->ldhses, &aaref, description,
-                                     sizeof(description));
-            if (EVEN(sts))
-              goto return_now;
-          }
-          for (unsigned int j = 0; j < output_vect.size(); j++)
-          {
-            char name[80];
-            sprintf(name, "Ch%02u", chan_cnt++);
-            sts = ldh_CreateObject(ctx->ldhses, &oid, name, output_vect[j].cid,
-                                   slot->module_oid, ldh_eDest_IntoLast);
-            if (EVEN(sts))
-              goto return_now;
-
-            pwr_tAttrRef aaref;
-            pwr_tAttrRef chanaref = cdh_ObjidToAref(oid);
-
-            // Set Representation
-            pwr_tEnum representation = output_vect[j].representation;
-            sts = ldh_ArefANameToAref(ctx->ldhses, &chanaref, "Representation",
-                                      &aaref);
-            if (EVEN(sts))
-              goto return_now;
-
-            sts = ldh_WriteAttribute(ctx->ldhses, &aaref, &representation,
-                                     sizeof(representation));
-            if (EVEN(sts))
-              goto return_now;
-
-            // Set Number
-            pwr_tUInt16 number = output_vect[j].number;
-            sts = ldh_ArefANameToAref(ctx->ldhses, &chanaref, "Number", &aaref);
-            if (EVEN(sts))
-              goto return_now;
-
-            sts = ldh_WriteAttribute(ctx->ldhses, &aaref, &number,
-                                     sizeof(number));
-            if (EVEN(sts))
-              goto return_now;
-
-            // Set Description
-            pwr_tString80 description;
-            strncpy(description, output_vect[j].description,
-                    sizeof(description));
-            sts = ldh_ArefANameToAref(ctx->ldhses, &chanaref, "Description",
-                                      &aaref);
-            if (EVEN(sts))
-              goto return_now;
-
-            sts = ldh_WriteAttribute(ctx->ldhses, &aaref, description,
-                                     sizeof(description));
-            if (EVEN(sts))
-              goto return_now;
-          }
+          ((WNav*)ctx->editor_ctx)->reset_nodraw();
+          return sts;
         }
       }
-      else
+      for (auto const& output_chan : output_vect)
       {
-        // Remove existing channels
-        std::vector<pwr_tOid> chanvect;
-        pwr_tCid cid;
-
-        for (sts = ldh_GetChild(ctx->ldhses, slot->module_oid, &oid); ODD(sts);
-             sts = ldh_GetNextSibling(ctx->ldhses, oid, &oid))
+        sts = create_channel(ctx->ldhses, output_chan, module_oid, ldh_eDest_IntoLast);
+        if (EVEN(sts))
         {
-          sts = ldh_GetObjectClass(ctx->ldhses, oid, &cid);
-          if (EVEN(sts))
-            goto return_now;
-
-          switch (cid)
-          {
-          case pwr_cClass_ChanDi:
-          case pwr_cClass_ChanDo:
-          case pwr_cClass_ChanAi:
-          case pwr_cClass_ChanAo:
-          case pwr_cClass_ChanIi:
-          case pwr_cClass_ChanIo:
-            chanvect.push_back(oid);
-            break;
-          default:;
-          }
+          ((WNav*)ctx->editor_ctx)->reset_nodraw();
+          return sts;
         }
-        for (unsigned int i = 0; i < chanvect.size(); i++)
+      }
+      slot.m_is_modified = false; // Reset this flag since we now have our channels and we ain't really in a
+                                  // modified state anymore...
+    }
+    else // This is NOT a PnModule, we then remove everything apparently
+    {
+      // Remove existing channels
+      std::vector<pwr_tOid> chanvect;
+      pwr_tCid cid;
+      pwr_tOid chan_oid;
+
+      for (sts = ldh_GetChild(ctx->ldhses, module_oid, &chan_oid); ODD(sts);
+           sts = ldh_GetNextSibling(ctx->ldhses, chan_oid, &chan_oid))
+      {
+        sts = ldh_GetObjectClass(ctx->ldhses, chan_oid, &cid);
+        if (EVEN(sts))
         {
-          sts = ldh_DeleteObject(ctx->ldhses, chanvect[i]);
-          if (EVEN(sts))
-            goto return_now;
+          ((WNav*)ctx->editor_ctx)->reset_nodraw();
+          return sts;
+        }
+
+        // Why not everything... :) TODO
+        switch (cid)
+        {
+        case pwr_cClass_ChanDi:
+        case pwr_cClass_ChanDo:
+        case pwr_cClass_ChanAi:
+        case pwr_cClass_ChanAo:
+        case pwr_cClass_ChanIi:
+        case pwr_cClass_ChanIo:
+          chanvect.push_back(chan_oid);
+          break;
+        default:;
+        }
+      }
+
+      for (unsigned int i = 0; i < chanvect.size(); i++)
+      {
+        sts = ldh_DeleteObject(ctx->ldhses, chanvect[i]);
+        if (EVEN(sts))
+        {
+          ((WNav*)ctx->editor_ctx)->reset_nodraw();
+          return sts;
         }
       }
     }
@@ -499,461 +711,117 @@ int pndevice_save_cb(void* sctx)
   // Data is device name, IP and MAC address
   sts = generate_viewer_data(ctx);
 
-  sts = rsts;
+  sts = PB__SUCCESS;
 
-return_now:
   ((WNav*)ctx->editor_ctx)->reset_nodraw();
   return sts;
 }
 
 static pwr_tStatus generate_viewer_data(device_sCtx* ctx)
 {
-  pwr_tOid controller;
-  pwr_tCid ccid;
-  FILE* fp;
-  FILE* ofp;
+  pwr_tOid controller_oid;
+  pwr_tCid controller_cid;
+  FILE* pnviewer_fp;
   pwr_tFileName fname;
-  char line[500];
-  char elemv[3][200];
-  int nr;
-  char device_text[200];
-  char device_name[80];
-  char ip_address[80];
-  char mac_address[80];
-  unsigned int vendor_id = 0;
-  unsigned int device_id = 0;
-  char* s;
   pwr_tStatus sts;
-  pwr_tOid oid;
+  pwr_tOid child_module_oid;
   char* ethernet_device;
   int size;
 
-  sts = ldh_GetParent(ctx->ldhses, ctx->aref.Objid, &controller);
+  std::string device_text;
+  std::string device_name;
+  std::string ip_address;
+  std::string mac_address;
+  unsigned int vendor_id = 0;
+  unsigned int device_id = 0;
+
+  ProfinetRuntimeData profinet_rt_data;
+
+  sts = ldh_GetParent(ctx->ldhses, ctx->aref.Objid, &controller_oid);
   if (EVEN(sts))
     return sts;
 
-  sts = ldh_GetObjectClass(ctx->ldhses, controller, &ccid);
-  if (ODD(sts) && ccid == pwr_cClass_PnControllerSoftingPNAK)
+  sts = ldh_GetObjectClass(ctx->ldhses, controller_oid, &controller_cid);
+  if (ODD(sts) && controller_cid == pwr_cClass_PnControllerSoftingPNAK)
   {
-    sts = ldh_GetObjectPar(ctx->ldhses, controller, "RtBody", "EthernetDevice",
-                           (char**)&ethernet_device, &size);
+    // Extract ethernet device
+    sts = ldh_GetObjectPar(ctx->ldhses, controller_oid, "RtBody", "EthernetDevice", (char**)&ethernet_device,
+                           &size);
     if (EVEN(sts))
       return sts;
-
     str_trim(ethernet_device, ethernet_device);
     str_ToLower(ethernet_device, ethernet_device);
     sprintf(fname, "$pwrp_load/pwr_pnviewer_%s.dat", ethernet_device);
     free(ethernet_device);
     dcli_translate_filename(fname, fname);
-    ofp = fopen(fname, "w");
-    if (!ofp)
+
+    pnviewer_fp = fopen(fname, "w");
+    if (!pnviewer_fp)
       return 0;
 
-    for (sts = ldh_GetChild(ctx->ldhses, controller, &oid); ODD(sts);
-         sts = ldh_GetNextSibling(ctx->ldhses, oid, &oid))
+    for (sts = ldh_GetChild(ctx->ldhses, controller_oid, &child_module_oid); ODD(sts);
+         sts = ldh_GetNextSibling(ctx->ldhses, child_module_oid, &child_module_oid))
     {
-      sprintf(fname, "$pwrp_load/pwr_pn_%s.xml", cdh_ObjidToFnString(0, oid));
+      sprintf(fname, "$pwrp_load/pwr_pn_%s.xml", cdh_ObjidToFnString(0, child_module_oid));
       dcli_translate_filename(fname, fname);
 
-      fp = fopen(fname, "r");
-      if (!fp)
+      // We can ignore that the GSDML file will not match the second argument "" since we don't care right
+      // now...
+      if (profinet_rt_data.read_pwr_pn_xml(std::string(fname), ""))
       {
-        fclose(ofp);
+        device_name = profinet_rt_data.m_PnDevice->m_NetworkSettings.m_device_name;
+        ip_address = profinet_rt_data.m_PnDevice->m_NetworkSettings.m_ip_address;
+        device_text = profinet_rt_data.m_PnDevice->m_moduleinfo_name;
+        mac_address = profinet_rt_data.m_PnDevice->m_NetworkSettings.m_mac_address;
+        vendor_id = profinet_rt_data.m_PnDevice->m_vendor_id;
+        device_id = profinet_rt_data.m_PnDevice->m_device_id;
+      }
+      else
+      {
+        MsgWindow::message('W', "Could not read pwr_pn xml file, creation of pwr_pnviewer xml file failed");
+        fclose(pnviewer_fp);
         return 0;
       }
 
-      while (dcli_read_line(line, sizeof(line), fp))
-      {
-        str_trim(line, line);
-        nr = dcli_parse(line, "=", "", (char*)elemv,
-                        sizeof(elemv) / sizeof(elemv[0]), sizeof(elemv[0]), 0);
-        if (nr != 2)
-          continue;
-
-        if (streq(elemv[0], "DeviceText"))
-        {
-          strncpy(device_text, elemv[1], sizeof(device_text));
-        }
-        else if (streq(elemv[0], "VendorId"))
-        {
-          sscanf(elemv[1], "%d", &vendor_id);
-        }
-        else if (streq(elemv[0], "DeviceId"))
-        {
-          sscanf(elemv[1], "%d", &device_id);
-        }
-        else if (streq(elemv[0], "DeviceName"))
-        {
-          strncpy(device_name, elemv[1], sizeof(device_name));
-        }
-        else if (streq(elemv[0], "IP_Address"))
-        {
-          strncpy(ip_address, elemv[1], sizeof(ip_address));
-        }
-        else if (streq(elemv[0], "MAC_Address"))
-        {
-          strncpy(mac_address, elemv[1], sizeof(mac_address));
-          if ((s = strchr(mac_address, '/')))
-            *s = 0;
-          str_trim(mac_address, mac_address);
-          break;
-        }
-      }
-      fclose(fp);
-
-      fprintf(ofp, "\"%s\" \"%s\" \"%s\" \"%s\" %d %d\n", device_text,
-              device_name, ip_address, mac_address, vendor_id, device_id);
+      fprintf(pnviewer_fp, "\"%s\" \"%s\" \"%s\" \"%s\" %d %d\n", device_text.c_str(), device_name.c_str(),
+              ip_address.c_str(), mac_address.c_str(), vendor_id, device_id);
     }
-    fclose(ofp);
+    fclose(pnviewer_fp);
   }
   return 1;
 }
 
-static int pndevice_check_io(device_sCtx* ctx, gsdml_VirtualSubmoduleList* vsl,
-                             std::vector<ChanItem>& input_vect,
-                             std::vector<ChanItem>& output_vect)
+static int pndevice_populate_channel_vectors(device_sCtx* ctx, GSDML::IOData* io_data, int subslot_number,
+                                             std::vector<ChanItem>& input_vect,
+                                             std::vector<ChanItem>& output_vect)
 {
-  int sts;
-
-  if (vsl)
+  pwr_tStatus sts;
+  size_t index = 0;
+  // Do all inputs first
+  // TODO Incorporate subslot_number in the channel name since a module can have several submodules with the
+  // same Input/Output names.
+  for (auto const& input_data_item : io_data->_Input._DataItem)
   {
-    unsigned int subslot_number = 0;
+    sts = pndevice_fill_io_vector_from_data_item(input_vect, &input_data_item, index++, subslot_number);
 
-    for (unsigned int i = 0; i < vsl->VirtualSubmoduleItem.size(); i++)
-    {
-      if (strcmp(vsl->VirtualSubmoduleItem[i]->Body.FixedInSubslots.str, "") ==
-          0)
-      {
-        // FixedInSubslots not supplied, default subslot number is 1
-
-        if (vsl->VirtualSubmoduleItem.size() == 1)
-          subslot_number = 1;
-        else
-          subslot_number++;
-
-        sts = pndevice_add_channels(ctx, vsl->VirtualSubmoduleItem[i],
-                                    subslot_number, input_vect, output_vect);
-        if (EVEN(sts))
-          return sts;
-      }
-      else
-      {
-        // FixedInSubslots supplied, create channels for all fixed subslots
-
-        gsdml_Valuelist* vl = new gsdml_Valuelist(
-            vsl->VirtualSubmoduleItem[i]->Body.FixedInSubslots.str);
-        gsdml_ValuelistIterator iter(vl);
-
-        for (unsigned int j = iter.begin(); j != iter.end(); j = iter.next())
-        {
-          subslot_number = j;
-
-          sts = pndevice_add_channels(ctx, vsl->VirtualSubmoduleItem[i],
-                                      subslot_number, input_vect, output_vect);
-          if (EVEN(sts))
-          {
-            delete vl;
-            return sts;
-          }
-        }
-        delete vl;
-      }
-    }
+    if (EVEN(sts))
+      return sts;
   }
+
+  // Output!
+  for (auto const& output_data_item : io_data->_Output._DataItem)
+  {
+    pndevice_fill_io_vector_from_data_item(output_vect, &output_data_item, index++, subslot_number, true);
+
+    if (EVEN(sts))
+      return sts;
+  }
+
   return PB__SUCCESS;
 }
 
-static int pndevice_add_channels(device_sCtx* ctx,
-                                 gsdml_VirtualSubmoduleItem* vi,
-                                 int subslot_number,
-                                 std::vector<ChanItem>& input_vect,
-                                 std::vector<ChanItem>& output_vect)
-{
-  // Find input data
-  if (vi->IOData && vi->IOData->Input)
-  {
-    for (unsigned int i = 0; i < vi->IOData->Input->DataItem.size(); i++)
-    {
-      gsdml_DataItem* di = vi->IOData->Input->DataItem[i];
-      gsdml_eValueDataType datatype;
-
-      ctx->attr->attrnav->gsdml->string_to_value_datatype(di->Body.DataType,
-                                                          &datatype);
-
-      if (!di->Body.UseAsBits)
-      {
-        unsigned int representation = 0;
-        int invalid_type = 0;
-
-        switch (datatype)
-        {
-        case gsdml_eValueDataType_Integer8:
-          representation = pwr_eDataRepEnum_Int8;
-          break;
-        case gsdml_eValueDataType_Unsigned8:
-          representation = pwr_eDataRepEnum_UInt8;
-          break;
-        case gsdml_eValueDataType_Integer16:
-          representation = pwr_eDataRepEnum_Int16;
-          break;
-        case gsdml_eValueDataType_Unsigned16:
-          representation = pwr_eDataRepEnum_UInt16;
-          break;
-        case gsdml_eValueDataType_Integer32:
-          representation = pwr_eDataRepEnum_Int32;
-          break;
-        case gsdml_eValueDataType_Unsigned32:
-          representation = pwr_eDataRepEnum_UInt32;
-          break;
-        case gsdml_eValueDataType_Integer64:
-          representation = pwr_eDataRepEnum_Int64;
-          break;
-        case gsdml_eValueDataType_Unsigned64:
-          representation = pwr_eDataRepEnum_UInt64;
-          break;
-        case gsdml_eValueDataType_Float32:
-          representation = pwr_eDataRepEnum_Float32;
-          break;
-        case gsdml_eValueDataType_Float64:
-          representation = pwr_eDataRepEnum_Float64;
-          break;
-        default:
-          invalid_type = 1;
-        }
-
-        if (invalid_type)
-          return PB__CREATECHAN;
-
-        ChanItem ci;
-        ci.subslot_number = subslot_number;
-        ci.number = 0;
-        ci.representation = representation;
-        ci.use_as_bit = 0;
-        ci.cid = pwr_cClass_ChanAi;
-        strncpy(ci.description, (char*)di->Body.TextId.p,
-                sizeof(ci.description));
-        ci.description[sizeof(ci.description) - 1] = 0;
-
-        input_vect.push_back(ci);
-      }
-      else
-      {
-        // Use as bits
-        unsigned int bits;
-        unsigned int representation = 0;
-
-        switch (datatype)
-        {
-        case gsdml_eValueDataType_Integer8:
-        case gsdml_eValueDataType_Unsigned8:
-          representation = pwr_eDataRepEnum_Bit8;
-          bits = 8;
-          break;
-        case gsdml_eValueDataType_Integer16:
-        case gsdml_eValueDataType_Unsigned16:
-          representation = pwr_eDataRepEnum_Bit16;
-          bits = 16;
-          break;
-        case gsdml_eValueDataType_Integer32:
-        case gsdml_eValueDataType_Unsigned32:
-          representation = pwr_eDataRepEnum_Bit32;
-          bits = 32;
-          break;
-        case gsdml_eValueDataType_Integer64:
-        case gsdml_eValueDataType_Unsigned64:
-          representation = pwr_eDataRepEnum_Bit64;
-          bits = 64;
-          break;
-        default:
-          bits = 0;
-        }
-        if (di->BitDataItem.size() == 0)
-        {
-          // Add all bits
-          for (unsigned int j = 0; j < bits; j++)
-          {
-            // Add Channel
-            ChanItem ci;
-            ci.subslot_number = subslot_number;
-            ci.number = j;
-            ci.representation = representation;
-            ci.use_as_bit = 1;
-            ci.cid = pwr_cClass_ChanDi;
-            strncpy(ci.description, (char*)di->Body.TextId.p,
-                    sizeof(ci.description));
-            ci.description[sizeof(ci.description) - 2] = 0;
-
-            input_vect.push_back(ci);
-          }
-        }
-        else
-        {
-          for (unsigned int j = 0; j < di->BitDataItem.size(); j++)
-          {
-            // Add channel
-            ChanItem ci;
-            ci.subslot_number = subslot_number;
-            ci.number = di->BitDataItem[j]->Body.BitOffset;
-            ci.representation = representation;
-            ci.use_as_bit = 1;
-            ci.cid = pwr_cClass_ChanDi;
-            strncpy(ci.description, (char*)di->BitDataItem[j]->Body.TextId.p,
-                    sizeof(ci.description));
-            ci.description[sizeof(ci.description) - 2] = 0;
-
-            input_vect.push_back(ci);
-          }
-        }
-      }
-    }
-  }
-
-  // Find output data
-  if (vi->IOData && vi->IOData->Output)
-  {
-    for (unsigned int i = 0; i < vi->IOData->Output->DataItem.size(); i++)
-    {
-      gsdml_DataItem* di = vi->IOData->Output->DataItem[i];
-      gsdml_eValueDataType datatype;
-
-      ctx->attr->attrnav->gsdml->string_to_value_datatype(di->Body.DataType,
-                                                          &datatype);
-
-      if (!di->Body.UseAsBits)
-      {
-        unsigned int representation = 0;
-        int invalid_type = 0;
-
-        switch (datatype)
-        {
-        case gsdml_eValueDataType_Integer8:
-          representation = pwr_eDataRepEnum_Int8;
-          break;
-        case gsdml_eValueDataType_Unsigned8:
-          representation = pwr_eDataRepEnum_UInt8;
-          break;
-        case gsdml_eValueDataType_Integer16:
-          representation = pwr_eDataRepEnum_Int16;
-          break;
-        case gsdml_eValueDataType_Unsigned16:
-          representation = pwr_eDataRepEnum_UInt16;
-          break;
-        case gsdml_eValueDataType_Integer32:
-          representation = pwr_eDataRepEnum_Int32;
-          break;
-        case gsdml_eValueDataType_Unsigned32:
-          representation = pwr_eDataRepEnum_UInt32;
-          break;
-        case gsdml_eValueDataType_Integer64:
-          representation = pwr_eDataRepEnum_Int64;
-          break;
-        case gsdml_eValueDataType_Unsigned64:
-          representation = pwr_eDataRepEnum_UInt64;
-          break;
-        case gsdml_eValueDataType_Float32:
-          representation = pwr_eDataRepEnum_Float32;
-          break;
-        case gsdml_eValueDataType_Float64:
-          representation = pwr_eDataRepEnum_Float64;
-          break;
-        default:
-          invalid_type = 1;
-        }
-
-        if (invalid_type)
-        {
-          printf("GSDML-Error, Invalid type, unable to create channel\n");
-          return 0;
-        }
-
-        ChanItem ci;
-        ci.subslot_number = subslot_number;
-        ci.number = 0;
-        ci.representation = representation;
-        ci.use_as_bit = 0;
-        ci.cid = pwr_cClass_ChanAo;
-        strncpy(ci.description, (char*)di->Body.TextId.p,
-                sizeof(ci.description));
-        ci.description[sizeof(ci.description) - 2] = 0;
-
-        output_vect.push_back(ci);
-      }
-      else
-      {
-        // Use as bits
-        unsigned int bits;
-        unsigned int representation = 0;
-
-        switch (datatype)
-        {
-        case gsdml_eValueDataType_Integer8:
-        case gsdml_eValueDataType_Unsigned8:
-          representation = pwr_eDataRepEnum_Bit8;
-          bits = 8;
-          break;
-        case gsdml_eValueDataType_Integer16:
-        case gsdml_eValueDataType_Unsigned16:
-          representation = pwr_eDataRepEnum_Bit16;
-          bits = 16;
-          break;
-        case gsdml_eValueDataType_Integer32:
-        case gsdml_eValueDataType_Unsigned32:
-          representation = pwr_eDataRepEnum_Bit32;
-          bits = 32;
-          break;
-        case gsdml_eValueDataType_Integer64:
-        case gsdml_eValueDataType_Unsigned64:
-          representation = pwr_eDataRepEnum_Bit64;
-          bits = 64;
-          break;
-        default:
-          bits = 0;
-        }
-        if (di->BitDataItem.size() == 0)
-        {
-          // Add all bits
-          for (unsigned int j = 0; j < bits; j++)
-          {
-            // Add Channel
-            ChanItem ci;
-            ci.subslot_number = subslot_number;
-            ci.number = j;
-            ci.representation = representation;
-            ci.use_as_bit = 1;
-            ci.cid = pwr_cClass_ChanDo;
-            strncpy(ci.description, (char*)di->Body.TextId.p,
-                    sizeof(ci.description));
-            ci.description[sizeof(ci.description) - 2] = 0;
-
-            output_vect.push_back(ci);
-          }
-        }
-        else
-        {
-          for (unsigned int j = 0; j < di->BitDataItem.size(); j++)
-          {
-            // Add channel
-            ChanItem ci;
-            ci.subslot_number = subslot_number;
-            ci.number = di->BitDataItem[j]->Body.BitOffset;
-            ci.representation = representation;
-            ci.use_as_bit = 1;
-            ci.cid = pwr_cClass_ChanDo;
-            strncpy(ci.description, (char*)di->BitDataItem[j]->Body.TextId.p,
-                    sizeof(ci.description));
-            ci.description[sizeof(ci.description) - 2] = 0;
-
-            output_vect.push_back(ci);
-          }
-        }
-      }
-    }
-  }
-  return PB__SUCCESS;
-}
-
-pwr_tStatus pndevice_create_ctx(ldh_tSession ldhses, pwr_tAttrRef aref,
-                                void* editor_ctx, device_sCtx** ctxp)
+pwr_tStatus pndevice_create_ctx(ldh_tSession ldhses, pwr_tAttrRef aref, void* editor_ctx, device_sCtx** ctxp,
+                                char const* pwr_pn_data_file)
 {
   pwr_tOName name;
   char* gsdmlfile;
@@ -965,13 +833,11 @@ pwr_tStatus pndevice_create_ctx(ldh_tSession ldhses, pwr_tAttrRef aref,
 
   sts = ldh_GetSessionInfo(ldhses, &Info);
 
-  sts = ldh_ObjidToName(ldhses, aref.Objid, ldh_eName_Hierarchy, name,
-                        sizeof(name), &size);
+  sts = ldh_ObjidToName(ldhses, aref.Objid, ldh_eName_Hierarchy, name, sizeof(name), &size);
   if (EVEN(sts))
     return sts;
 
-  sts = ldh_GetObjectPar(ldhses, aref.Objid, "RtBody", "GSDMLfile", &gsdmlfile,
-                         &size);
+  sts = ldh_GetObjectPar(ldhses, aref.Objid, "RtBody", "GSDMLfile", &gsdmlfile, &size);
   if (EVEN(sts))
     return sts;
   if (streq(gsdmlfile, ""))
@@ -984,16 +850,13 @@ pwr_tStatus pndevice_create_ctx(ldh_tSession ldhses, pwr_tAttrRef aref,
   ctx->ldhses = ldhses;
   ctx->aref = aref;
   ctx->editor_ctx = editor_ctx;
-  ctx->edit_mode = (ODD(sts) && Info.Access == ldh_eAccess_ReadWrite) &&
-                   ldh_LocalObject(ldhses, aref.Objid);
+  ctx->edit_mode = (ODD(sts) && Info.Access == ldh_eAccess_ReadWrite) && ldh_LocalObject(ldhses, aref.Objid);
 
   get_subcid(ctx->ldhses, pwr_cClass_PnModule, mcv);
-  ctx->mc =
-      (gsdml_sModuleClass*)calloc(mcv.size() + 2, sizeof(gsdml_sModuleClass));
+  ctx->mc = (gsdml_sModuleClass*)calloc(mcv.size() + 2, sizeof(gsdml_sModuleClass));
 
   ctx->mc[0].cid = pwr_cClass_PnModule;
-  sts = ldh_ObjidToName(ctx->ldhses, cdh_ClassIdToObjid(ctx->mc[0].cid),
-                        cdh_mName_object, ctx->mc[0].name,
+  sts = ldh_ObjidToName(ctx->ldhses, cdh_ClassIdToObjid(ctx->mc[0].cid), cdh_mName_object, ctx->mc[0].name,
                         sizeof(ctx->mc[0].name), &size);
   if (EVEN(sts))
   {
@@ -1004,8 +867,7 @@ pwr_tStatus pndevice_create_ctx(ldh_tSession ldhses, pwr_tAttrRef aref,
   for (int i = 1; i <= (int)mcv.size(); i++)
   {
     ctx->mc[i].cid = mcv[i - 1];
-    sts = ldh_ObjidToName(ctx->ldhses, cdh_ClassIdToObjid(ctx->mc[i].cid),
-                          cdh_mName_object, ctx->mc[i].name,
+    sts = ldh_ObjidToName(ctx->ldhses, cdh_ClassIdToObjid(ctx->mc[i].cid), cdh_mName_object, ctx->mc[i].name,
                           sizeof(ctx->mc[0].name), &size);
     if (EVEN(sts))
     {
@@ -1023,6 +885,7 @@ pwr_tStatus pndevice_create_ctx(ldh_tSession ldhses, pwr_tAttrRef aref,
     strcpy(fname, gsdmlfile);
   free(gsdmlfile);
 
+  // Parse gsdml data...
   ctx->gsdml = new pn_gsdml();
   sts = ctx->gsdml->read(fname);
   if (EVEN(sts))
@@ -1030,13 +893,24 @@ pwr_tStatus pndevice_create_ctx(ldh_tSession ldhses, pwr_tAttrRef aref,
     free(ctx);
     return sts;
   }
-  ctx->gsdml->build();
+  // ctx->gsdml->build();
   ctx->gsdml->set_classes(ctx->mc);
+
+  // Now load the pwr_pn data if any. If there is none a default constructed object is created to start
+  // working on
+  char* name_of_gsdml_file;
+  basename(fname, &name_of_gsdml_file); // We want only the actual filename not the path...
+  ctx->pwr_pn_data.reset(new ProfinetRuntimeData());
+  sts = ctx->pwr_pn_data->read_pwr_pn_xml(pwr_pn_data_file, name_of_gsdml_file);
 
   *ctxp = ctx;
   return 1;
 }
 
+/*
+  TODO Rewrite this so that we use the SlotNumber attribute instead. AND also introduce moduleID as an
+  attribute.
+*/
 pwr_tStatus pndevice_init(device_sCtx* ctx)
 {
   pwr_tOid module_oid;
@@ -1052,8 +926,7 @@ pwr_tStatus pndevice_init(device_sCtx* ctx)
   for (sts = ldh_GetChild(ctx->ldhses, ctx->aref.Objid, &module_oid); ODD(sts);
        sts = ldh_GetNextSibling(ctx->ldhses, module_oid, &module_oid))
   {
-    sts = ldh_ObjidToName(ctx->ldhses, module_oid, cdh_mName_object,
-                          module_name, sizeof(module_name), &size);
+    sts = ldh_ObjidToName(ctx->ldhses, module_oid, cdh_mName_object, module_name, sizeof(module_name), &size);
     if (EVEN(sts))
       return sts;
 
@@ -1062,12 +935,14 @@ pwr_tStatus pndevice_init(device_sCtx* ctx)
       corrupt = 1;
       continue;
     }
-    if (idx >= ctx->attr->attrnav->dev_data.slot_data.size())
+    // if (idx >= ctx->attr->attrnav->dev_data.slot_data.size())
+    if (idx >= ctx->attr->attrnav->pn_runtime_data->m_PnDevice->m_slot_list.size())
     {
       corrupt = 1;
       continue;
     }
-    ctx->attr->attrnav->dev_data.slot_data[idx]->module_oid = module_oid;
+    // ctx->attr->attrnav->dev_data.slot_data[idx]->module_oid = module_oid;
+    ctx->attr->attrnav->pn_runtime_data->m_PnDevice->m_slot_list[idx].m_module_oid = module_oid;
   }
 
   if (corrupt)
@@ -1076,40 +951,66 @@ pwr_tStatus pndevice_init(device_sCtx* ctx)
 
     // Not standard module names, get slot number from object order instead
     idx = 1;
-    for (sts = ldh_GetChild(ctx->ldhses, ctx->aref.Objid, &module_oid);
-         ODD(sts);
+    for (sts = ldh_GetChild(ctx->ldhses, ctx->aref.Objid, &module_oid); ODD(sts);
          sts = ldh_GetNextSibling(ctx->ldhses, module_oid, &module_oid))
     {
-      if (idx >= ctx->attr->attrnav->dev_data.slot_data.size())
+      // if (idx >= ctx->attr->attrnav->dev_data.slot_data.size())
+      if (idx >= ctx->attr->attrnav->pn_runtime_data->m_PnDevice->m_slot_list.size())
       {
         corrupt = 1;
         break;
       }
-      ctx->attr->attrnav->dev_data.slot_data[idx]->module_oid = module_oid;
+      // ctx->attr->attrnav->dev_data.slot_data[idx]->module_oid = module_oid;
+      ctx->attr->attrnav->pn_runtime_data->m_PnDevice->m_slot_list[idx].m_module_oid = module_oid;
       idx++;
     }
     if (corrupt)
-      ctx->attr->wow->DisplayError(
-          "Configuration corrupt",
-          "Configuration of module objects doesn't match device configuration");
+      ctx->attr->wow->DisplayError("Configuration corrupt",
+                                   "Configuration of module objects doesn't match device configuration");
   }
   return 1;
 }
 
-pwr_tStatus pndevice_postcopy(
-    ldh_tSesContext Session, pwr_tOid Object, pwr_tOid Source, pwr_tCid Class)
+pwr_tStatus pndevice_postcopy(ldh_tSesContext Session, pwr_tOid Object, pwr_tOid Source, pwr_tCid Class)
 {
   pwr_tCmd cmd;
   char soidstr[40];
 
-  if (cdh_ObjidIsNotNull(Source)) {
+  if (cdh_ObjidIsNotNull(Source))
+  {
     printf("-- Create $pwrp_load/pwr_pn_%s.xml\n", cdh_ObjidToFnString(0, Object));
-    strcpy( soidstr, cdh_ObjidToFnString(0, Source));
-    sprintf(cmd, "cp $pwrp_load/pwr_pn_%s.xml $pwrp_load/pwr_pn_%s.xml", 
-	    soidstr, cdh_ObjidToFnString(0, Object));
+    strcpy(soidstr, cdh_ObjidToFnString(0, Source));
+    sprintf(cmd, "cp $pwrp_load/pwr_pn_%s.xml $pwrp_load/pwr_pn_%s.xml", soidstr,
+            cdh_ObjidToFnString(0, Object));
     system(cmd);
   }
 
   return PWRB__SUCCESS;
 }
 
+/*
+  Called when the user removes a PnDevice
+  We use it to remove the configuration file for this device.
+*/
+
+pwr_tStatus pndevice_postdelete(ldh_tSesContext Session, pwr_tOid Object)
+{
+  if (cdh_ObjidIsNotNull(Object))
+  {
+    std::string oid_string(cdh_ObjidToFnString(0, Object));
+    std::ostringstream pwr_pn_filename(std::ios_base::out);
+    std::ostringstream rm_cmd(std::ios_base::out);
+
+    pwr_pn_filename << "$pwrp_load/pwr_pn_" << oid_string << ".xml";
+    std::cout << "-- Delete " << pwr_pn_filename.str() << std::endl;
+    rm_cmd << "rm -f " << pwr_pn_filename.str();
+    if (system(rm_cmd.str().c_str()) != EXIT_SUCCESS)
+    {
+      std::ostringstream msg(std::ios_base::out);
+      msg << "Could not delete " << pwr_pn_filename.str() << "! You have to do it manually.";
+      MsgWindow::message('E', msg.str().c_str());
+    }
+  }
+
+  return PWRB__SUCCESS;
+}

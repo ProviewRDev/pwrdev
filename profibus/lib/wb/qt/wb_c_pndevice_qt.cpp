@@ -70,7 +70,7 @@ static pwr_tStatus Configure(ldh_sMenuCall* ip)
   sprintf(datafile, "$pwrp_load/pwr_pn_%s.xml",
           id_to_string(ip->Pointed.Objid));
 
-  sts = pndevice_create_ctx(ip->PointedSession, ip->Pointed, ip->wnav, &ctx);
+  sts = pndevice_create_ctx(ip->PointedSession, ip->Pointed, ip->wnav, &ctx, datafile);
   if (EVEN(sts))
   {
     return sts;
