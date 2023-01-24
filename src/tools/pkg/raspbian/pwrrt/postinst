@@ -184,30 +184,27 @@ fi
 # Obsolete
 #ln -s /etc/init.d/gdhserver /etc/rc2.d/S91gdhserver
 
-# Create project
+# Check if project already exists
 new_project=0
 if [ ! -e $proot ]; then
   new_project=1
-
-  mkdir $proot
-  mkdir $proot/common
-  mkdir $proot/common/inc
-  mkdir $proot/common/load
-  mkdir $proot/common/log
-  mkdir $proot/common/loghist
-  mkdir $proot/common/db
-  mkdir $proot/common/web
-  mkdir $proot/$platform
-  mkdir $proot/$platform/exe
-  mkdir $proot/$platform/lib
-  mkdir $proot/$platform/obj
-  mkdir $proot/$platform/lis
-
-  chown -R pwrp $proot
-  chgrp -R pwrp $proot
-  chmod g+w $proot/common/log
-
 fi
+
+# Do this regardless. If they exists no harm will be done...except for the ownership that will always change to pwrp:pwrp which it should be anyways...this might actually help to "restore" broken installs :)
+mkdir -p $proot/common/inc
+mkdir -p $proot/common/cnf
+mkdir -p $proot/common/load
+mkdir -p $proot/common/log
+mkdir -p $proot/common/loghist
+mkdir -p $proot/common/db
+mkdir -p $proot/common/web
+mkdir -p $proot/$platform/exe
+mkdir -p $proot/$platform/lib
+mkdir -p $proot/$platform/obj
+mkdir -p $proot/$platform/lis
+chown -R pwrp $proot
+chgrp -R pwrp $proot
+chmod g+w $proot/common/log
 
 if [ ! -e $aroot/db ]; then
   mkdir -p $aroot/db

@@ -24,7 +24,7 @@
 MESSAGE="${4}"
 SENDMAIL=/usr/bin/msmtp
 
-${SENDMAIL} -t -- << EOF
+${SENDMAIL} -t --timeout=5 -- << EOF
 From: ${1}
 To: ${2}
 Subject: ${3}
