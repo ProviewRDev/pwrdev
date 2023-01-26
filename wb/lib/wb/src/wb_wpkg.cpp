@@ -56,15 +56,9 @@ void WPkg::message_cb(void* wpkg, char severity, const char* message)
   ((WPkg*)wpkg)->message(severity, message);
 }
 
-void WPkg::set_clock_cursor_cb(void* wpkg)
-{
-  ((WPkg*)wpkg)->set_clock_cursor();
-}
+void WPkg::set_clock_cursor_cb(void* wpkg) { ((WPkg*)wpkg)->set_clock_cursor(); }
 
-void WPkg::reset_cursor_cb(void* wpkg)
-{
-  ((WPkg*)wpkg)->reset_cursor();
-}
+void WPkg::reset_cursor_cb(void* wpkg) { ((WPkg*)wpkg)->reset_cursor(); }
 
 //
 //  Callbackfunctions from menu entries
@@ -78,14 +72,18 @@ void WPkg::activate_distribute()
   message(' ', "");
 
   sts = wpkgnav->get_select(&itemlist, &item_count);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     message('E', "Select a node or package");
     return;
   }
 
-  if (item_count > 1) {
-    for (int i = 0; i < item_count; i++) {
-      if (typeid(*itemlist[i]) != typeid(WItemPkgNode)) {
+  if (item_count > 1)
+  {
+    for (int i = 0; i < item_count; i++)
+    {
+      if (typeid(*itemlist[i]) != typeid(WItemPkgNode))
+      {
         message('E', "All selected items are not nodes");
         free(itemlist);
         return;
@@ -93,12 +91,15 @@ void WPkg::activate_distribute()
     }
 
     set_clock_cursor();
-    for (int i = 0; i < item_count; i++) {
-      try {
-        wb_pkg* pkg = new wb_pkg(((WItemPkgNode*)itemlist[i])->nodename);
-        delete pkg;
-      } catch (wb_error& e) {
-        message(' ', (char*)e.what().c_str());
+    for (int i = 0; i < item_count; i++)
+    {
+      try
+      {
+        wb_pkg pkg = wb_pkg(((WItemPkgNode*)itemlist[i])->nodename);
+      }
+      catch (wb_error& e)
+      {
+        message(' ', e.what().c_str());
         reset_cursor();
         free(itemlist);
         return;
@@ -106,39 +107,59 @@ void WPkg::activate_distribute()
       wpkgnav->refresh_node(itemlist[i]);
 
       char msg[80];
-      sprintf(msg, "Distribution successful to %s",
-          ((WItemPkgNode*)itemlist[i])->nodename);
+      sprintf(msg, "Distribution successful to %s", ((WItemPkgNode*)itemlist[i])->nodename);
       message('I', msg);
       flush();
     }
     reset_cursor();
     free(itemlist);
-  } else {
+  }
+  else
+  {
     // One is selected
-    if (typeid(*itemlist[0]) == typeid(WItemPkgNode)) {
+    if (typeid(*itemlist[0]) == typeid(WItemPkgNode))
+    {
       set_clock_cursor();
-      try {
-        wb_pkg* pkg = new wb_pkg(((WItemPkgNode*)itemlist[0])->nodename);
-        delete pkg;
-      } catch (wb_error& e) {
-        message(' ', (char*)e.what().c_str());
+      try
+      {
+        wb_pkg pkg = wb_pkg(((WItemPkgNode*)itemlist[0])->nodename);
       }
+      catch (wb_error& e)
+      {
+        message(' ', e.what().c_str());
+        reset_cursor();
+        free(itemlist);
+        return;
+      }
+
       wpkgnav->refresh_node(itemlist[0]);
 
       char msg[80];
-      sprintf(msg, "Distribution successful to %s",
-          ((WItemPkgNode*)itemlist[0])->nodename);
+      sprintf(msg, "Distribution successful to %s", ((WItemPkgNode*)itemlist[0])->nodename);
       message('I', msg);
       reset_cursor();
-    } else if (typeid(*itemlist[0]) == typeid(WItemPkgPackage)) {
+    }
+    else if (typeid(*itemlist[0]) == typeid(WItemPkgPackage))
+    {
       set_clock_cursor();
-      wb_pkg::copyPackage(((WItemPkgPackage*)itemlist[0])->packagename);
+      try
+      {
+        wb_pkg::copyPackage(((WItemPkgPackage*)itemlist[0])->packagename);
+      }
+      catch (const wb_error& e)
+      {
+        message(' ', e.what().c_str());
+        reset_cursor();
+        free(itemlist);
+        return;
+      }
       char msg[27 + sizeof(((WItemPkgPackage*)itemlist[0])->packagename) + 1];
-      sprintf(msg, "Distribution successful of %s",
-          ((WItemPkgPackage*)itemlist[0])->packagename);
+      sprintf(msg, "Distribution successful of %s", ((WItemPkgPackage*)itemlist[0])->packagename);
       message('I', msg);
       reset_cursor();
-    } else {
+    }
+    else
+    {
       message('E', "Select a node or package");
     }
   }
@@ -153,13 +174,16 @@ void WPkg::activate_createpkg()
   message(' ', "");
 
   sts = wpkgnav->get_select(&itemlist, &item_count);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     message('E', "Select a node");
     return;
   }
 
-  for (int i = 0; i < item_count; i++) {
-    if (typeid(*itemlist[i]) != typeid(WItemPkgNode)) {
+  for (int i = 0; i < item_count; i++)
+  {
+    if (typeid(*itemlist[i]) != typeid(WItemPkgNode))
+    {
       message('E', "All selected items are not nodes");
       free(itemlist);
       return;
@@ -167,11 +191,15 @@ void WPkg::activate_createpkg()
   }
 
   set_clock_cursor();
-  for (int i = 0; i < item_count; i++) {
-    try {
+  for (int i = 0; i < item_count; i++)
+  {
+    try
+    {
       wb_pkg* pkg = new wb_pkg(((WItemPkgNode*)itemlist[i])->nodename, false);
       delete pkg;
-    } catch (wb_error& e) {
+    }
+    catch (wb_error& e)
+    {
       message(' ', (char*)e.what().c_str());
       reset_cursor();
       free(itemlist);
@@ -180,8 +208,7 @@ void WPkg::activate_createpkg()
     wpkgnav->refresh_node(itemlist[i]);
 
     char msg[80];
-    sprintf(msg, "Package created for node %s",
-        ((WItemPkgNode*)itemlist[i])->nodename);
+    sprintf(msg, "Package created for node %s", ((WItemPkgNode*)itemlist[i])->nodename);
     message('I', msg);
     flush();
   }
@@ -198,13 +225,16 @@ void WPkg::activate_deletepkg()
   message(' ', "");
 
   sts = wpkgnav->get_select(&itemlist, &item_count);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     message('E', "Select a package");
     return;
   }
 
-  for (int i = 0; i < item_count; i++) {
-    if (typeid(*itemlist[i]) != typeid(WItemPkgPackage)) {
+  for (int i = 0; i < item_count; i++)
+  {
+    if (typeid(*itemlist[i]) != typeid(WItemPkgPackage))
+    {
       message('E', "All selected items are not packages");
       free(itemlist);
       return;
@@ -212,8 +242,7 @@ void WPkg::activate_deletepkg()
   }
   free(itemlist);
 
-  wow->DisplayQuestion(this, "Delete package",
-      "Do you want to delete selected packages", deletepkg_ok, 0, 0);
+  wow->DisplayQuestion(this, "Delete package", "Do you want to delete selected packages", deletepkg_ok, 0, 0);
 }
 
 void WPkg::deletepkg_ok(void* ctx, void* data)
@@ -225,13 +254,16 @@ void WPkg::deletepkg_ok(void* ctx, void* data)
   int sts;
 
   sts = wpkg->wpkgnav->get_select(&itemlist, &item_count);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     wpkg->message('E', "Select a package");
     return;
   }
 
-  for (int i = 0; i < item_count; i++) {
-    if (typeid(*itemlist[i]) != typeid(WItemPkgPackage)) {
+  for (int i = 0; i < item_count; i++)
+  {
+    if (typeid(*itemlist[i]) != typeid(WItemPkgPackage))
+    {
       wpkg->message('E', "All selected items are not packages");
       free(itemlist);
       return;
@@ -240,7 +272,8 @@ void WPkg::deletepkg_ok(void* ctx, void* data)
   WItemPkg* node_item = wpkg->wpkgnav->get_parent(itemlist[0]);
 
   wpkg->set_clock_cursor();
-  for (int i = 0; i < item_count; i++) {
+  for (int i = 0; i < item_count; i++)
+  {
     wpkg->wpkgnav->delete_package((WItemPkgPackage*)itemlist[i]);
   }
   wpkg->wpkgnav->refresh_node(node_item);
@@ -270,17 +303,17 @@ void WPkg::activate_zoom_out()
   wpkgnav->zoom(1.0 / 1.18);
 }
 
-void WPkg::activate_zoom_reset()
-{
-  wpkgnav->unzoom();
-}
+void WPkg::activate_zoom_reset() { wpkgnav->unzoom(); }
 
 void WPkg::activate_dmode_filediff(int set)
 {
-  if (set) {
+  if (set)
+  {
     display_mode |= wpkg_mDisplayMode_FileDiff;
     wpkgnav->set_display_mode(display_mode);
-  } else {
+  }
+  else
+  {
     display_mode &= ~wpkg_mDisplayMode_FileDiff;
     wpkgnav->set_display_mode(display_mode);
   }
@@ -288,10 +321,13 @@ void WPkg::activate_dmode_filediff(int set)
 
 void WPkg::activate_dmode_filetime(int set)
 {
-  if (set) {
+  if (set)
+  {
     display_mode |= wpkg_mDisplayMode_FileOrderTime;
     wpkgnav->set_display_mode(display_mode);
-  } else {
+  }
+  else
+  {
     display_mode &= ~wpkg_mDisplayMode_FileOrderTime;
     wpkgnav->set_display_mode(display_mode);
   }
@@ -299,20 +335,18 @@ void WPkg::activate_dmode_filetime(int set)
 
 void WPkg::activate_dmode_filepath(int set)
 {
-  if (set) {
+  if (set)
+  {
     display_mode |= wpkg_mDisplayMode_FilePath;
     wpkgnav->set_display_mode(display_mode);
-  } else {
+  }
+  else
+  {
     display_mode &= ~wpkg_mDisplayMode_FilePath;
     wpkgnav->set_display_mode(display_mode);
   }
 }
 
-WPkg::~WPkg()
-{
-}
+WPkg::~WPkg() {}
 
-WPkg::WPkg(void* wa_parent_ctx)
-    : parent_ctx(wa_parent_ctx), close_cb(0), display_mode(0)
-{
-}
+WPkg::WPkg(void* wa_parent_ctx) : parent_ctx(wa_parent_ctx), close_cb(0), display_mode(0) {}
