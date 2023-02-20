@@ -3495,6 +3495,9 @@ void AttrNav::object_type_to_str(
   case glow_eObjectType_GrowToolbar:
     strcpy(object_type_str, "Toolbar");
     break;
+  case glow_eObjectType_GrowScriptModule:
+    strcpy(object_type_str, "ScriptModule");
+    break;
   default:
     strcpy(object_type_str, "Unknown type");
   }

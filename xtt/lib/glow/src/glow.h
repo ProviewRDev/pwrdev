@@ -132,6 +132,12 @@ typedef enum {
 
 } glow_eSelectPolicy;
 
+//! Window resize restrictions
+typedef enum {
+  glow_eWindowResize_AspectRatio,
+  glow_eWindowResize_None
+} glow_eWindowResize;
+
 //! Action when MB3 is clicked
 typedef enum {
   glow_eMB3Action_No, //!< No action on MB3 click
@@ -234,7 +240,8 @@ typedef enum {
   glow_eObjectType_GrowBarChart,
   glow_eObjectType_GrowToolbar,
   glow_eObjectType_GrowBarArc,
-  glow_eObjectType_GrowDashCell
+  glow_eObjectType_GrowDashCell,
+  glow_eObjectType_GrowScriptModule
 } glow_eObjectType;
 
 //! Direction of a connection points, sliders etc
@@ -1332,6 +1339,7 @@ typedef enum {
   glow_eSave_GrowBarArc = 49,
   glow_eSave_GrowDashCell = 50,
   glow_eSave_GrowDashboard = 51,
+  glow_eSave_GrowScriptModule = 52,
   glow_eSave_End = 99,
   glow_eSave_Ctx_zoom_factor_x = 100,
   glow_eSave_Ctx_base_zoom_factor = 101,
@@ -1626,6 +1634,7 @@ typedef enum {
   glow_eSave_GrowCtx_dashboard = 2250,
   glow_eSave_GrowCtx_dash = 2251,
   glow_eSave_GrowCtx_anti_aliasing = 2252,
+  glow_eSave_GrowCtx_window_resize = 2253,
   glow_eSave_GrowSubAnnot_x_right = 2300,
   glow_eSave_GrowSubAnnot_x_left = 2301,
   glow_eSave_GrowSubAnnot_y_high = 2302,
@@ -1879,6 +1888,7 @@ typedef enum {
   glow_eSave_GrowRectRounded_disable_gradient = 3821,
   glow_eSave_GrowRectRounded_fixposition = 3822,
   glow_eSave_GrowRectRounded_transparency = 3823,
+  glow_eSave_GrowRectRounded_thin_shadow = 3824,
   glow_eSave_GrowConGlue_line_width_up = 3900,
   glow_eSave_GrowConGlue_line_width_down = 3901,
   glow_eSave_GrowConGlue_line_width_left = 3902,
@@ -2120,7 +2130,42 @@ typedef enum {
   glow_eSave_GrowDashCell_cell_rows = 5002,
   glow_eSave_GrowDashCell_cell_columns = 5003,
   glow_eSave_GrowDashboard_dash_columns = 5100,
-  glow_eSave_GrowDashboard_dash_rows = 5101
+  glow_eSave_GrowDashboard_dash_rows = 5101,
+  glow_eSave_GrowScriptModule_rect_part = 5200,
+  glow_eSave_GrowScriptModule_module_index = 5201,
+  glow_eSave_GrowScriptModule_vert_left_border = 5202,
+  glow_eSave_GrowScriptModule_vert_right_border = 5203,
+  glow_eSave_GrowScriptModule_vert_top_border = 5204,
+  glow_eSave_GrowScriptModule_vert_bottom_border = 5205,
+  glow_eSave_GrowScriptModule_vert_prio = 5206,
+  glow_eSave_GrowScriptModule_vert_left_module = 5207,
+  glow_eSave_GrowScriptModule_vert_right_module = 5208,
+  glow_eSave_GrowScriptModule_vert_top_module = 5209,
+  glow_eSave_GrowScriptModule_vert_bottom_module = 5210,
+  glow_eSave_GrowScriptModule_vert_width = 5211,
+  glow_eSave_GrowScriptModule_vert_height = 5212,
+  glow_eSave_GrowScriptModule_vert_fix_width = 5213,
+  glow_eSave_GrowScriptModule_vert_fix_height = 5214,
+  glow_eSave_GrowScriptModule_horiz_left_border = 5215,
+  glow_eSave_GrowScriptModule_horiz_right_border = 5216,
+  glow_eSave_GrowScriptModule_horiz_top_border = 5217,
+  glow_eSave_GrowScriptModule_horiz_bottom_border = 5218,
+  glow_eSave_GrowScriptModule_horiz_prio = 5219,
+  glow_eSave_GrowScriptModule_horiz_left_module = 5220,
+  glow_eSave_GrowScriptModule_horiz_right_module = 5221,
+  glow_eSave_GrowScriptModule_horiz_top_module = 5222,
+  glow_eSave_GrowScriptModule_horiz_bottom_module = 5223,
+  glow_eSave_GrowScriptModule_horiz_width = 5224,
+  glow_eSave_GrowScriptModule_horiz_height = 5225,
+  glow_eSave_GrowScriptModule_horiz_fix_width = 5226,
+  glow_eSave_GrowScriptModule_horiz_fix_height = 5227,
+  glow_eSave_GrowScriptModule_left_border_width = 5228,
+  glow_eSave_GrowScriptModule_right_border_width = 5229,
+  glow_eSave_GrowScriptModule_top_border_width = 5230,
+  glow_eSave_GrowScriptModule_bottom_border_width = 5231,
+  glow_eSave_GrowScriptModule_fill_module = 5232,
+  glow_eSave_GrowScriptModule_window_border_width = 5233,
+  glow_eSave_GrowScriptModule_window_switch_ratio = 5234
 } glow_eSave;
 
 //! Relative or absolute position for an annotation

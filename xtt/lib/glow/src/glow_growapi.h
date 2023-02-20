@@ -1342,6 +1342,12 @@ void grow_CreateGrowDashCell(grow_tCtx ctx, const char* name, double x, double y
     double width, double height, glow_eDrawType draw_type, void* user_data, 
     grow_tObject* cell);
 
+void grow_CreateGrowScriptModule(grow_tCtx ctx, const char* name, double x, double y,
+    double width, double height, glow_eDrawType draw_type, int line_width,
+    glow_mDisplayLevel display_level, int fill_rect,
+    int border, glow_eDrawType fill_draw_type, void* user_data,
+    grow_tObject* module);
+
 //! Save subgraph to file.
 /*!
   \param ctx		Grow ctx.
@@ -3409,6 +3415,7 @@ void grow_GetDashCellInfo(grow_tObject o, int *rows, int *columns);
 void grow_SetGraphBorders(grow_tCtx ctx, double x0, double y0, double x1, double y1);
 void grow_GetBorders(grow_tCtx ctx);
 void grow_DisableSubwindowEvents(grow_tCtx ctx, int disable);
+int grow_GetWindowResize(grow_tCtx ctx);
 
 /*@}*/
 #if defined __cplusplus

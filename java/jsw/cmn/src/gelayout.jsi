@@ -1,0 +1,320 @@
+/** GeLayout start **/
+  this.BORDER = -1;
+  this.ROW_MAX = 25;
+  this.VERT = 0;
+  this.HORIZ = 1;
+  this.MAX_PRIO = 20;
+  this.eMode_Runtime = 1;
+  this.mode = this.eMode_Runtime;
+
+  function sRowItem() {
+    this.idx;
+    this.size = 0;
+    this.coord = 0;
+  }
+
+  function sDirItem() {
+    this.pref_size = 0;
+    this.calc_size = 0;
+    this.calc_coord = 0;
+    this.fix_size = 0;
+  }
+  
+  function sItem() {
+    this.dir = new Array(2);
+    this.dir[0] = new sDirItem();
+    this.dir[1] = new sDirItem();
+    this.disabled = 0;
+    this.prio;
+  }
+
+  function sCtx() {
+    this.msize = 0;
+    this.row_cnt = [0, 0];
+    this.row_size = new Array(2);
+    this.row_idx = new Array(2);
+    this.wind_size = new Array(2);
+    this.calc_wind_size = new Array(2);
+    this.item;
+  }
+
+  this.next = function(ctx, dir, idx, row, a_next, a_prev) {
+    var orig_row;
+    var orig_row_size;
+    var sts;
+
+    ctx.row_idx[dir][row * ctx.msize + ctx.row_size[dir][row]].idx = idx;
+    ctx.row_size[dir][row]++;
+    orig_row = row;
+    orig_row_size = ctx.row_size[dir][row];
+    if (a_next[idx] == this.BORDER) {
+      return 1;
+    } else {
+      sts = this.next(ctx, dir, a_next[idx], row, a_next, a_prev);
+      if (EVEN(sts))
+	return sts;
+    }
+    for (var j = 0; j < ctx.msize; j++) {
+      if (a_prev[j] == idx && j != a_next[idx]) {
+	console.log("New row", ctx.row_cnt[dir], idx, j);
+	// New row, copy original row
+	if (ctx.row_cnt[dir] >= this.ROW_MAX - 1)
+	  return 0;
+	for (var k = 0; k < orig_row_size; k++)
+	  ctx.row_idx[dir][ctx.row_cnt[dir] * ctx.msize + k].idx = ctx.row_idx[dir][orig_row * ctx.msize + k].idx;
+	ctx.row_size[dir][ctx.row_cnt[dir]] = orig_row_size;
+	ctx.row_cnt[dir]++;
+	sts = this.next(ctx, dir, j, ctx.row_cnt[dir] - 1, a_next, a_prev);
+	if (EVEN(sts))
+	  return sts;
+      }
+    }
+    return 1;
+  }
+
+  this.disable = function(ctx, dir) {
+    // Check if disabled
+    for (var i = 0; i < ctx.row_cnt[dir]; i++) {
+      var total_size = 0;
+      for (var j = 0; j < ctx.row_size[dir][i]; j++) {
+        if ( !ctx.item[ctx.row_idx[dir][i * ctx.msize + j].idx].disabled)
+	  total_size += ctx.item[ctx.row_idx[dir][i * ctx.msize + j].idx].dir[dir].pref_size;
+      }
+      while (total_size > ctx.wind_size[dir]) {
+        var low_prio = 100;
+        var low_prio_idx = -1;
+
+        // Disable item with lowest prio      
+        for (var j = 0; j < ctx.row_size[dir][i]; j++) {
+	  if ( !ctx.item[ctx.row_idx[dir][i * ctx.msize + j].idx].disabled &&
+	       ctx.item[ctx.row_idx[dir][i * ctx.msize + j].idx].prio < low_prio) {
+	    low_prio_idx = ctx.row_idx[dir][i * ctx.msize + j].idx;
+	    low_prio = ctx.item[low_prio_idx].prio;
+	  }
+        }
+        if (low_prio_idx != -1 && low_prio != this.MAX_PRIO)
+	  ctx.item[low_prio_idx].disabled = 1;
+
+        total_size = 0;
+        for (var j = 0; j < ctx.row_size[dir][i]; j++) {
+	  if ( !ctx.item[ctx.row_idx[dir][i * ctx.msize + j].idx].disabled)
+	    total_size += ctx.item[ctx.row_idx[dir][i * ctx.msize + j].idx].dir[dir].pref_size;
+        }
+        if (low_prio == this.MAX_PRIO)
+	  break;
+      }
+    }
+  }
+
+  this.calculate = function(ctx, dir) {
+    // Calculate window size
+    ctx.calc_wind_size[dir] = 0;
+    for (var i = 0; i < ctx.row_cnt[dir]; i++) {
+      var total_size = 0;
+      for (var j = 0; j < ctx.row_size[dir][i]; j++) {
+	if ( !ctx.item[ctx.row_idx[dir][i * ctx.msize + j].idx].disabled)
+	  total_size += ctx.item[ctx.row_idx[dir][i * ctx.msize + j].idx].dir[dir].pref_size;
+      }
+      if (total_size > ctx.calc_wind_size[dir])
+	ctx.calc_wind_size[dir] = total_size;
+    }
+    if (ctx.wind_size[dir] > ctx.calc_wind_size[dir])
+      ctx.calc_wind_size[dir] = ctx.wind_size[dir];
+
+    for (var i = 0; i < ctx.row_cnt[dir]; i++) {
+      var total_size = 0;
+      for (var j = 0; j < ctx.row_size[dir][i]; j++) {
+	if ( !ctx.item[ctx.row_idx[dir][i * ctx.msize + j].idx].disabled)
+	  total_size += ctx.item[ctx.row_idx[dir][i * ctx.msize + j].idx].dir[dir].pref_size;
+      }
+
+      if (total_size > 0) {
+	// Spread space
+	var add_size;
+	var cnt = 0;
+	for (var j = 0; j < ctx.row_size[dir][i]; j++) {
+	  if ( !ctx.item[ctx.row_idx[dir][i * ctx.msize + j].idx].disabled &&
+	       !ctx.item[ctx.row_idx[dir][i * ctx.msize + j].idx].dir[dir].fix_size)
+	    cnt++;
+	}
+	if (cnt > 0)
+	  add_size = Math.max(0,(ctx.calc_wind_size[dir] - total_size) / cnt);
+	for (var j = 0; j < ctx.row_size[dir][i]; j++) {
+	  if ( !ctx.item[ctx.row_idx[dir][i * ctx.msize + j].idx].disabled) {
+	    if (ctx.item[ctx.row_idx[dir][i * ctx.msize + j].idx].dir[dir].fix_size)
+	      ctx.row_idx[dir][i * ctx.msize + j].size = 
+		ctx.item[ctx.row_idx[dir][i * ctx.msize + j].idx].dir[dir].pref_size;
+	    else
+	      ctx.row_idx[dir][i * ctx.msize + j].size = 
+		ctx.item[ctx.row_idx[dir][i * ctx.msize + j].idx].dir[dir].pref_size + add_size;
+	  }
+	}
+      }
+    }
+
+    // Adjust if size differs
+    var adjusted = 1;
+    var adjust_cnt = 0;
+    while (adjusted && adjust_cnt < 20) {
+      adjusted = 0;
+      adjust_cnt++;
+      for (var k = 0; k < ctx.msize; k++) {
+	var last_size = 0;
+	var last_rowitem;
+	if (!ctx.item[k].disabled) {
+	  for (var i = 0; i < ctx.row_cnt[dir]; i++) {
+	    for (var j = 0; j < ctx.row_size[dir][i]; j++) {
+	      if (ctx.row_idx[dir][i * ctx.msize + j].idx == k) {
+		if (last_size == 0) {
+		  last_rowitem = i * ctx.msize + j;
+		  last_size = ctx.row_idx[dir][last_rowitem].size;
+		} else {
+		  if (!(Math.abs(last_size - ctx.row_idx[dir][i * ctx.msize + j].size) < Number.MIN_VALUE)) {
+		    if (j == ctx.row_size[dir][i] - 1 && j != 0) {
+		      // Adjust previous
+		      ctx.row_idx[dir][i * ctx.msize + j - 1].size -= last_size - 
+			ctx.row_idx[dir][i * ctx.msize + j].size;
+		      ctx.row_idx[dir][i * ctx.msize + j].size = last_size;
+		    } else {
+		      // Adjust next
+		      ctx.row_idx[dir][i * ctx.msize + j + 1].size -= last_size - 
+			ctx.row_idx[dir][i * ctx.msize + j].size;
+		      ctx.row_idx[dir][i * ctx.msize + j].size = last_size;
+		    }
+		    adjusted = 1;
+		  }
+		}
+		if (ctx.item[k].dir[dir].calc_size < ctx.row_idx[dir][i * ctx.msize + j].size)
+		  ctx.item[k].dir[dir].calc_size = ctx.row_idx[dir][i * ctx.msize + j].size;
+	      }
+	    }
+	  }	
+	}
+      }
+    }
+  
+    for (var i = 0; i < ctx.row_cnt[dir]; i++) {
+      var coord = 0;
+      for (var j = 0; j < ctx.row_size[dir][i]; j++) {
+	if ( !ctx.item[ctx.row_idx[dir][i * ctx.msize + j].idx].disabled) {
+	  ctx.row_idx[dir][i * ctx.msize + j].coord = coord;
+	  if (coord > ctx.item[ctx.row_idx[dir][i * ctx.msize + j].idx].dir[dir].calc_coord)
+	    ctx.item[ctx.row_idx[dir][i * ctx.msize + j].idx].dir[dir].calc_coord = coord;
+	  coord += ctx.row_idx[dir][i * ctx.msize + j].size;
+	}
+      }
+    }
+
+    /***
+    console.log(dir == this.HORIZ ? "Horizontal" : "Vertical");
+    for (var i = 0; i < ctx.row_cnt[dir]; i++) {
+      console.log("Row ", i);
+      for (var j = 0; j < ctx.row_size[dir][i]; j++) {
+	if ( !ctx.item[ctx.row_idx[dir][i * ctx.msize + j].idx].disabled)
+	  console.log("Size ", ctx.row_idx[dir][i * ctx.msize + j].idx, ctx.row_idx[dir][i * ctx.msize + j].size,
+		      ctx.item[ctx.row_idx[dir][i * ctx.msize + j].idx].dir[dir].pref_size);
+	else
+	  console.log("Size", ctx.row_idx[dir][i * ctx.msize + j].idx, "disabled");
+      }
+    }
+
+    for (var k = 0; k < ctx.msize; k++) {
+      if (!ctx.item[k].disabled) {
+	console.log("Item", k, ctx.item[k].dir[dir].calc_coord, ctx.item[k].dir[dir].calc_size, ctx.item[k].dir[dir].pref_size); 
+      }
+      else
+	console.log("Item", k, "disabled");
+    }
+    ****/
+  }
+
+
+  this.layout = function(graph, mod_size, wind_width, wind_height, 
+			 prio, 
+			 top_neighbour, down_neighbour, left_neighbour,
+			 right_neighbour, pref_width, pref_height, 
+			 fix_width, fix_height, calc_x, calc_y, 
+			 calc_width, calc_height) {
+    var ret = {calc_wind_width : 0, calc_wind_height : 0}
+    var i;
+    var ctx;
+
+    // Create context
+    ctx = new sCtx();
+    ctx.row_idx[0] = new Array(mod_size * this.ROW_MAX);
+    ctx.row_idx[1] = new Array(mod_size * this.ROW_MAX);
+    for (i = 0; i < mod_size * this.ROW_MAX; i++) {
+      ctx.row_idx[0][i] = new sRowItem();
+      ctx.row_idx[1][i] = new sRowItem();
+    }
+    ctx.row_size[0] = new Array(this.ROW_MAX);
+    ctx.row_size[1] = new Array(this.ROW_MAX);
+    for (i = 0; i < this.ROW_MAX; i++) {
+      ctx.row_size[0][i] = 0;
+      ctx.row_size[1][i] = 0;
+    }
+    ctx.item = new Array(mod_size);
+    for (i = 0; i < mod_size; i++)
+      ctx.item[i] = new sItem();
+
+    // Insert data into context
+    ctx.msize = mod_size;
+    ctx.wind_size[this.VERT] = wind_height;
+    ctx.wind_size[this.HORIZ] = wind_width;
+    for (i = 0; i < ctx.msize; i++) {
+      ctx.item[i].dir[this.VERT].pref_size = pref_height[i];
+      ctx.item[i].dir[this.VERT].fix_size = fix_height[i];
+      ctx.item[i].dir[this.HORIZ].pref_size = pref_width[i];
+      ctx.item[i].dir[this.HORIZ].fix_size = fix_width[i];
+      ctx.item[i].prio = prio[i];
+    }
+
+    // Create rows
+    for (i = 0; i < ctx.msize; i++) {
+      if (top_neighbour[i] == this.BORDER) {
+	ctx.row_cnt[this.VERT]++;
+	this.next(ctx, this.VERT, i, ctx.row_cnt[this.VERT] - 1, down_neighbour, top_neighbour);
+      }
+      if (left_neighbour[i] == this.BORDER) {
+	ctx.row_cnt[this.HORIZ]++;
+	this.next(ctx, this.HORIZ, i, ctx.row_cnt[this.HORIZ] - 1, right_neighbour, left_neighbour);
+      }
+    }
+
+    // Disable
+    if (this.mode == graph.eMode_Runtime) {  
+      this.disable(ctx, this.VERT);
+      this.disable(ctx, this.HORIZ);
+    }
+
+    // Calculate module size
+    this.calculate(ctx, this.VERT);
+    this.calculate(ctx, this.HORIZ);
+
+    /***
+    for (i = 0; i < ctx.row_cnt[this.VERT]; i++) {
+      for (var j = 0; j < ctx.row_size[this.VERT][i]; j++)
+	console.log(ctx.row_idx[this.VERT][i * ctx.msize + j].idx.toString() + " ");
+      console.log("");
+    }
+    for (i = 0; i < ctx.row_cnt[this.HORIZ]; i++) {
+      for (var j = 0; j < ctx.row_size[this.HORIZ][i]; j++)
+	console.log(ctx.row_idx[this.HORIZ][i * ctx.msize + j].idx.toString() + " ");
+      console.log("");
+    }
+    ****/
+
+    // Result
+    for (i = 0; i < ctx.msize; i++) {
+      calc_x[i] = ctx.item[i].dir[this.HORIZ].calc_coord;
+      calc_y[i] = ctx.item[i].dir[this.VERT].calc_coord;
+      calc_width[i] = ctx.item[i].dir[this.HORIZ].calc_size;
+      calc_height[i] = ctx.item[i].dir[this.VERT].calc_size;
+    }
+    ret.calc_wind_width = ctx.calc_wind_size[this.HORIZ];
+    ret.calc_wind_height = ctx.calc_wind_size[this.VERT];
+
+    return ret;
+  }
+
+/** GeLayout end **/

@@ -571,7 +571,7 @@ void GrowToolbar::scale()
   }
 }
 
-int GrowToolbar::export_script(GlowExportScript* es)
+int GrowToolbar::export_script(GlowExportScript* es, void* o, void* m)
 {
-  return es->toolbar(this);
+  return es->toolbar(this, o, m);
 }

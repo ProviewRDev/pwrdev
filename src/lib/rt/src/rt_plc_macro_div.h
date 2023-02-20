@@ -240,3 +240,34 @@
   o->P62ms = (tp->before_scan.tv_nsec / 31250000) & 1 ? 1 : 0;                 \
   o->P31ms = (tp->before_scan.tv_nsec / 15625000) & 1 ? 1 : 0;                 \
   o->P15ms = (tp->before_scan.tv_nsec / 7812500) & 1 ? 1 : 0;
+
+/*_*
+  @aref iswap16 ISwap16
+*/
+#define ISwap16_exec(o, in) { \
+    unsigned int tmp;		\
+    tmp = (in << 8) & 0xff00ff00; \
+    tmp |= (in >> 8) & 0xff00ff; \
+    o->ActVal = tmp; \
+  }
+
+/*_*
+  @aref iswap32 ISwap32
+*/
+#define ISwap32_exec(o, in) { \
+    unsigned int tmp;		 \
+    tmp = (in << 24) & 0xff000000; \
+    tmp |= (in << 8) & 0xff0000; \
+    tmp |= (in >> 8) & 0xff00; \
+    tmp |= (in >> 24) & 0xff; \
+    o->ActVal = tmp; \
+  }
+
+#define GetBus_generic_exec(tp, o, bus) { \
+  o->Out = *bus; \
+}
+
+#define CStoBus_generic_exec(tp, o, bus) { \
+  if (o->Cond) \
+    *bus = *o->InP; \
+}

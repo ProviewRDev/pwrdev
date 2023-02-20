@@ -1089,6 +1089,8 @@ int FlowDrawGtk::rect(FlowCtx* ctx, int x, int y, int width, int height,
   if (highlight) {
     if (gc_type == flow_eDrawType_LineGray)
       cairo_set_source(cr, gc_black);
+    else if (gc_type == flow_eDrawType_LineErase)
+      cairo_set_source(cr, gc_erase);
     else
       cairo_set_source(cr, gc_red);
   } else {
@@ -1838,6 +1840,8 @@ int FlowDrawGtk::pixmap(FlowCtx* ctx, int x, int y,
 
   if (gc_type == flow_eDrawType_LineRed)
     cairo_set_source(cr, gc_red);
+  else if (gc_type == flow_eDrawType_LineGray)
+    cairo_set_source(cr, gc_gray);
   else
     cairo_set_source(cr, gc_black);
   cairo_mask_surface(cr, pms->pixmap[idx], x, y);
@@ -1860,7 +1864,12 @@ int FlowDrawGtk::pixmap_inverse(FlowCtx* ctx, int x, int y,
   draw_sPixmap* pms = (draw_sPixmap*)pixmaps;
   flow_sPixmapDataElem* pdata = (flow_sPixmapDataElem*)pixmap_data + idx;
 
-  cairo_set_source(cr, gc_black);
+  if (gc_type == flow_eDrawType_LineRed)
+    cairo_set_source(cr, gc_red);
+  else if (gc_type == flow_eDrawType_LineGray)
+    cairo_set_source(cr, gc_gray);
+  else
+    cairo_set_source(cr, gc_black);
   cairo_rectangle(cr, x, y, pdata->width, pdata->height);
   cairo_fill(cr);
 
@@ -1940,6 +1949,9 @@ int FlowDrawGtk::fill_rect(
     break;
   case flow_eDrawType_DarkGray:
     cairo_set_source(cr, gc_darkgray);
+    break;
+  case flow_eDrawType_LineGray:
+    cairo_set_source(cr, gc_gray);
     break;
   case flow_eDrawType_LineErase:
     cairo_set_source(cr, gc_erase);

@@ -35,6 +35,7 @@
  */
 
 #include <stdio.h>
+#include <iconv.h>
 
 #include "pwr.h"
 
@@ -46,6 +47,7 @@
 #include "co_string.h"
 #include "co_time.h"
 #include "co_tree.h"
+#include "co_cnv.h"
 
 #include "rt_cbuf.h"
 #include "rt_gdh.h"
@@ -96,7 +98,7 @@ static int gdh_StringToAttr( char *str_value, char *buffer_p, int buffer_size,
 	pwr_eType attrtype, int attrsize);
 static void  gdh_AttrToString( int type_id, void *value_ptr,
         char *str, int size, int *len, char *format);
-static void gdh_ConvertUTFstring( char *out, char *in);
+static void gdh_ConvertUTFstring(const char *out, char *in);
 static int gdh_JidToPointer( int id, void **p);
 static int gdh_JidStore( void *p, pwr_tRefId r, int *id);
 static int gdh_JidRemove( pwr_tRefId r);
@@ -2258,55 +2260,21 @@ static void gdh_AttrToString( int type_id, void *value_ptr,
   }
 }
 
-static void gdh_ConvertUTFstring( char *out, char *in)
+static void gdh_ConvertUTFstring(const char* utf, char *iso)
 {
-  char *s, *t;
+  static iconv_t cd = 0;
+  size_t utf_size = strlen(utf);
+  size_t iso_size = utf_size;
+  size_t iso_osize = iso_size;
+  char *isop = iso;
 
-  s = in;
-  t = out;
-  while ( *s)
-  {
-    if ( *s == -61)
-    {
-      if ( *(s+1) == -91)
-      {
-        *t = 'å';
-        s++;
-      }
-      else if ( *(s+1) == -92)
-      {
-        *t = 'ä';
-        s++;
-      }
-      else if ( *(s+1) == -74)
-      {
-        *t = 'ö';
-        s++;
-      }
-      else if ( *(s+1) == -123)
-      {
-        *t = 'Å';
-        s++;
-      }
-      else if ( *(s+1) == -124)
-      {
-        *t = 'Ä';
-        s++;
-      }
-      else if ( *(s+1) == -106)
-      {
-        *t = 'Ö';
-        s++;
-      }
-      else
-        *t = *s;
-    }
-    else
-     *t = *s;
-    s++;
-    t++;
-  }
-  *t = 0;
+  if (!cd)
+    cd = iconv_open("ISO8859-1", "UTF-8");
+
+  if (iconv(cd, (char **)&utf, &utf_size, &isop, &iso_size) == (size_t)(-1))
+    strcpy(iso, "");
+  else
+    iso[iso_osize - iso_size] = 0;
 }
 
 /*author: Jonas Nylund */

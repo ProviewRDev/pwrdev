@@ -166,6 +166,8 @@ static int ccm_getvar(ccm_tFuncCtx ctx, const char* name, int* decl,
     ccm_tFloat* value_float, ccm_tInt* value_int, char* value_string);
 static int ccm_setvar(ccm_tFuncCtx ctx, const char* name, int decl,
     ccm_tFloat value_float, ccm_tInt value_int, char* value_string);
+static int ccm_setvar_array(ccm_tFuncCtx funcctx, const char* name, int idx, int decl,
+    ccm_tFloat value_float, ccm_tInt value_int, char* value_string);
 static int ccm_createvar(const char* name, const char *namespc, int decl, ccm_tFloat value_float,
     ccm_tInt value_int, char* value_string, ccm_sIntvar** int_list,
     ccm_sFloatvar** float_list, ccm_sStringvar** string_list);
@@ -1922,8 +1924,23 @@ int ccm_operate_exec(ccm_tFuncCtx funcctx, ccm_sOperand* op, ccm_sOperand* next)
 
     switch (op->o_operator) {
     case K_ACTION_EQL:
-      sts = ccm_setvar(
-          funcctx, op->name, next_decl, next_float, next_int, next_string);
+      if (strchr(op->name,'[') && op->prev && op->prev->type == K_OPERAND_DECL && op->next->next) {
+	/* Initialize array */
+	ccm_sOperand *lp;
+	int idx = 0;
+	for (lp = op->next->next; lp; lp = lp->next) {
+	  if (!(lp->type == K_OPERAND_VALUE || lp->type == K_OPERAND_NAME))
+	    break;
+	  sts = ccm_setvar_array(
+              funcctx, op->name, idx, lp->value_decl, lp->value_float, lp->value_int, lp->value_string);
+	  if (EVEN(sts))
+	    return sts;
+	  idx++;
+	}
+      }
+      else 
+        sts = ccm_setvar(
+            funcctx, op->name, next_decl, next_float, next_int, next_string);
       if (EVEN(sts))
         return sts;
       break;
@@ -3540,6 +3557,19 @@ static int ccm_setvar(ccm_tFuncCtx funcctx, const char* name, int decl,
   if (!found)
     return CCM__VARNOTFOUND;
   return 1;
+}
+
+static int ccm_setvar_array(ccm_tFuncCtx funcctx, const char* name, int idx, int decl,
+    ccm_tFloat value_float, ccm_tInt value_int, char* value_string)
+{
+  char aname[80];
+  char *s;
+  
+  strcpy(aname, name);
+  if ((s = strchr(aname, '[')))
+    *s = 0;
+  sprintf(&aname[strlen(aname)], "[%d]", idx);
+  return ccm_setvar(funcctx, aname, decl, value_float, value_int, value_string);
 }
 
 int ccm_set_external_var(const char* name, int decl, ccm_tFloat value_float,

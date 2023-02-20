@@ -81,6 +81,8 @@ public:
   glow_eDrawType default_fill_color;
   glow_eDrawType default_border_color;
   glow_eDrawType default_text_color;
+  int resize_restrictions_set;
+  double window_resize_delta;
   CoWow* wow;
 
   XttGe(void* parent_ctx, const char* name, const char* filename, int scrollbar,

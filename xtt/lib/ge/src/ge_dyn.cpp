@@ -4052,7 +4052,7 @@ int GeDigFlash::syntax_check(
 GeInvisible::GeInvisible(GeDyn* e_dyn, ge_mInstance e_instance)
     : GeDynElem(e_dyn, ge_mDynType1_Invisible, ge_mDynType2_No,
           ge_mActionType1_No, ge_mActionType2_No, ge_eDynPrio_Invisible),
-      dimmed(0), bitmask(0)
+      dimmed(0), dim_level(0), bitmask(0)
 {
   strcpy(attribute, "");
   instance = e_instance;
@@ -4060,8 +4060,7 @@ GeInvisible::GeInvisible(GeDyn* e_dyn, ge_mInstance e_instance)
 
 GeInvisible::GeInvisible(const GeInvisible& x)
     : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-          x.prio),
-      dimmed(x.dimmed)
+	x.prio), dimmed(x.dimmed), dim_level(x.dim_level)
 {
   strcpy(attribute, x.attribute);
   instance = x.instance;
@@ -4082,6 +4081,13 @@ void GeInvisible::get_attributes(attr_sItem* attrinfo, int* item_count)
     attrinfo[i].value = &dimmed;
     attrinfo[i].type = glow_eType_Boolean;
     attrinfo[i++].size = sizeof(dimmed);
+
+    strcpy(attrinfo[i].name, "Invisible.DimLevel");
+    attrinfo[i].value = &dim_level;
+    attrinfo[i].type = glow_eType_Double;
+    attrinfo[i].minlimit = 0;
+    attrinfo[i].maxlimit = 1.0;
+    attrinfo[i++].size = sizeof(dim_level);
 
     strcpy(attrinfo[i].name, "Invisible.Instances");
     attrinfo[i].value = &instance_mask;
@@ -4105,6 +4111,13 @@ void GeInvisible::get_attributes(attr_sItem* attrinfo, int* item_count)
     attrinfo[i].value = &dimmed;
     attrinfo[i].type = glow_eType_Boolean;
     attrinfo[i++].size = sizeof(dimmed);
+
+    sprintf(attrinfo[i].name, "Invisible%d.DimLevel", inst);
+    attrinfo[i].value = &dim_level;
+    attrinfo[i].type = glow_eType_Double;
+    attrinfo[i].minlimit = 0;
+    attrinfo[i].maxlimit = 1.0;
+    attrinfo[i++].size = sizeof(dim_level);
   }
   *item_count = i;
 }
@@ -4138,6 +4151,7 @@ void GeInvisible::save(std::ofstream& fp)
   fp << int(ge_eSave_Invisible) << '\n';
   fp << int(ge_eSave_Invisible_attribute) << FSPACE << attribute << '\n';
   fp << int(ge_eSave_Invisible_dimmed) << FSPACE << dimmed << '\n';
+  fp << int(ge_eSave_Invisible_dim_level) << FSPACE << dim_level << '\n';
   fp << int(ge_eSave_Invisible_instance) << FSPACE << int(instance) << '\n';
   fp << int(ge_eSave_Invisible_instance_mask) << FSPACE << int(instance_mask)
      << '\n';
@@ -4169,6 +4183,9 @@ void GeInvisible::open(std::ifstream& fp)
       break;
     case ge_eSave_Invisible_dimmed:
       fp >> dimmed;
+      break;
+    case ge_eSave_Invisible_dim_level:
+      fp >> dim_level;
       break;
     case ge_eSave_Invisible_instance:
       fp >> tmp;
@@ -4293,9 +4310,14 @@ int GeInvisible::scan(grow_tObject object)
     grow_SetObjectVisibility(object, glow_eVis_Visible);
     dyn->reset_color = true;
     dyn->reset_invisible = true;
+    if (dim_level != 0)
+      grow_SetObjectTransparency(object, 0.0);
   } else {
-    if (dimmed)
+    if (dimmed) {
       grow_SetObjectVisibility(object, glow_eVis_Dimmed);
+      if (dim_level != 0)
+	grow_SetObjectTransparency(object, dim_level);
+    }
     else
       grow_SetObjectVisibility(object, glow_eVis_Invisible);
     dyn->ignore_color = true;
@@ -23945,7 +23967,7 @@ int GeSevHist::syntax_check(
 GeDigTransparency::GeDigTransparency(GeDyn* e_dyn)
       : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_DigTransparency,
       ge_mActionType1_No, ge_mActionType2_No, ge_eDynPrio_DigTransparency),
-      low_value(50), high_value(100)
+      low_value(0), high_value(0.5)
 {
   strcpy(attribute, "");
 }
@@ -23970,11 +23992,15 @@ void GeDigTransparency::get_attributes(attr_sItem* attrinfo, int* item_count)
   strcpy(attrinfo[i].name, "DigTransparency.LowValue");
   attrinfo[i].value = &low_value;
   attrinfo[i].type = glow_eType_Double;
+  attrinfo[i].minlimit = 0;
+  attrinfo[i].maxlimit = 1.0;
   attrinfo[i++].size = sizeof(low_value);
 
   strcpy(attrinfo[i].name, "DigTransparency.HighValue");
   attrinfo[i].value = &high_value;
   attrinfo[i].type = glow_eType_Double;
+  attrinfo[i].minlimit = 0;
+  attrinfo[i].maxlimit = 1.0;
   attrinfo[i++].size = sizeof(high_value);
 
   *item_count = i;

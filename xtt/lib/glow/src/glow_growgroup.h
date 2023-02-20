@@ -204,7 +204,7 @@ public:
   {
     return nc->a.find_by_name(name, element);
   }
-  int export_script(GlowExportScript* es);
+  int export_script(GlowExportScript* es, void* o, void* m);
 
   virtual int clear();
 };

@@ -605,9 +605,9 @@ void GrowPie::set_values(double* values)
     parent->draw();    
 }
 
-int GrowPie::export_script(GlowExportScript* es)
+int GrowPie::export_script(GlowExportScript* es, void* o, void* m)
 {
-  return es->pie(this);
+  return es->pie(this, o, m);
 }
 
 void GrowPie::convert(glow_eConvert version)

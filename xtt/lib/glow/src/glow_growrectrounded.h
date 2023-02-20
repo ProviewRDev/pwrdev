@@ -322,6 +322,7 @@ public:
   int disable_gradient; //!< Disable gradient, even if parent node has gradient.
   int fixposition; //!< Can't be moved.
   double transparency; //!< Border and fill color transparency.
+  int thin_shadow; //!< Shadow drawn with lines.
 
   //! Set user data.
   /*!
@@ -590,7 +591,7 @@ public:
   int get_annot_background(
       GlowTransform* t, void* node, glow_eDrawType* background);
 
-  int export_script(GlowExportScript* es);
+  int export_script(GlowExportScript* es, void* o, void* m);
 
   //! Export the object as a java shape.
   /*!

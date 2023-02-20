@@ -2504,7 +2504,7 @@ function Ccm() {
     var next_float;
     var next_string;
     var tmp_str;
-    var sts;
+    var sts = 0;
     var op_arg;
     var arg_list;
     var arg_p, a_p, next_arg;
@@ -2669,7 +2669,20 @@ function Ccm() {
 
       switch (op.o_operator) {
 	case CcmC.K_ACTION_EQL:
-	sts = this.setvar(
+	if (op.name.indexOf("[") && op.prev && op.prev != null && op.prev.type == CcmC.K_OPERAND_DECL &&
+            op.next.next != null) {
+	  var lp;
+	  var idx = 0;
+	  for (lp = op.next.next; lp; lp = lp.next) {
+            if (!(lp.type == CcmC.K_OPERAND_VALUE || lp.type == CcmC.K_OPERAND_NAME))
+              break;
+	    sts = this.setvar_array(funcctx, op.name, idx, lp.value_decl, lp.value_float, lp.value_int, 
+                lp.value_string);
+            idx++;
+          }
+	}
+	else
+	  sts = this.setvar(
 			 funcctx, op.name, next_decl, next_float, next_int, next_string);
 	if (EVEN(sts))
 	  return sts;
@@ -3788,7 +3801,7 @@ function Ccm() {
     return ret;
   }
 
-  this.ref_var = function(funcctx, name, valuep, decl, array, elements) {
+  this.ref_var = function(funcctx, name) {
     var int_p;
     var float_p;
     var string_p;
@@ -3806,6 +3819,7 @@ function Ccm() {
       sts: CCM_.SUCCESS,
       varname: null,
       element: 0,
+      decl: 0,
       array: 0,
       valuep : 0};
 
@@ -4410,6 +4424,17 @@ function Ccm() {
     if (!found)
       return CCM_.VARNOTFOUND;
     return 1;
+  }
+
+  this.setvar_array = function(funcctx, name, idx, decl, value_float, value_int, value_string) {
+    var s;
+    var aname;
+    if ((s = name.indexOf("[")) != -1)
+      aname = name.substring(0, s);
+    else
+      aname = name;
+    aname += "[" + idx + "]";
+    return this.setvar(funcctx, aname, decl, value_float, value_int, value_string);
   }
 
   this.set_external_var = function(name, decl, value_float, value_int, value_string) {

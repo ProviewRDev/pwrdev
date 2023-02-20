@@ -668,7 +668,7 @@ public:
     *c = (void*)ctx;
   } //!< Should be replace by get_ctx() !!
 
-  int export_script(GlowExportScript* es);
+  int export_script(GlowExportScript* es, void* o, void* m);
 
   //! Export the object as a java shape.
   /*!

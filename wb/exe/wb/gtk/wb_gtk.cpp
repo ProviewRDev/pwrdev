@@ -182,7 +182,15 @@ WbGtk::WbGtk(int argc, char* argv[]) : mainwindow(0)
           exit(0);
         }
         sw_classeditor = 1;
-        strcpy(filename, argv[i + 1]);
+	if (!strchr(argv[i + 1], '/')) {
+	  strcpy(filename, "$pwrp_db/");
+	  strcat(filename, argv[i + 1]);
+	  dcli_translate_filename(filename, filename);
+	}
+	else 
+	  strcpy(filename, argv[i + 1]);
+	if (!strchr(argv[i + 1], '.'))
+	  strcat(filename, ".wb_load");
         sw_projectvolume = 0;
         i++;
         break;

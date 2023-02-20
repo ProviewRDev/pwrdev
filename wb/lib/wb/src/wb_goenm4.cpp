@@ -74,7 +74,9 @@ typedef enum {
   goen_eGraphIndex_False = 46,
   goen_eGraphIndex_IOSimulFlag = 47,
   goen_eGraphIndex_YellowWarning = 48,
-  goen_eGraphIndex_RedWarning = 49
+  goen_eGraphIndex_RedWarning = 49,
+  goen_eGraphIndex_DataQCurrentData = 50,
+  goen_eGraphIndex_DataQCurrentIdx = 51
 } goen_eGraphIndex;
 
 static float f_pinlength = GOEN_F_PINLENGTH;
@@ -490,7 +492,9 @@ int goen_create_nodetype_m4(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid,
   case goen_eGraphIndex_FirstScan:
   case goen_eGraphIndex_IOSimulFlag:
   case goen_eGraphIndex_True:
-  case goen_eGraphIndex_False: {
+  case goen_eGraphIndex_False:
+  case goen_eGraphIndex_DataQCurrentData:
+  case goen_eGraphIndex_DataQCurrentIdx: {
     char text[80];
     int w = 0;
 
@@ -510,6 +514,14 @@ int goen_create_nodetype_m4(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid,
     case goen_eGraphIndex_False:
       w = 2;
       strcpy(text, "False");
+      break;
+    case goen_eGraphIndex_DataQCurrentData:
+      w = 4;
+      strcpy(text, "CurrentData");
+      break;
+    case goen_eGraphIndex_DataQCurrentIdx:
+      w = 4;
+      strcpy(text, "CurrentIdx");
       break;
     default:;
     }

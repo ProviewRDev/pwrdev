@@ -1005,9 +1005,9 @@ void GrowTrend::export_javabean(GlowTransform* t, void* node,
           shape_cnt, node_cnt, fp);
 }
 
-int GrowTrend::export_script(GlowExportScript* es)
+int GrowTrend::export_script(GlowExportScript* es, void* o, void* m)
 {
-  return es->trend(this);
+  return es->trend(this, o, m);
 }
 
 

@@ -207,7 +207,7 @@ page_4:
   endif
 
   if ( !rv_server_webhandler)
-    oname = nname + "-" + "WebHandler";
+    oname = nname + "-" + "WebSocketServer";
     delete tree/name='oname'/noconf/nolog
   endif
 

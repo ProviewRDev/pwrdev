@@ -216,6 +216,12 @@ int RtTrace::connect_bc(
   case flow_eTraceType_Float32:
     size = sizeof(pwr_tFloat32);
     break;
+  case flow_eTraceType_AttrRef:
+    size = sizeof(pwr_tAttrRef);
+    break;
+  case flow_eTraceType_DataRef:
+    size = sizeof(pwr_tDataRef);
+    break;
   default:
     size = sizeof(pwr_tInt32);
   }
@@ -288,7 +294,7 @@ int RtTrace::scan_bc(flow_tObject object, void* trace_p)
 {
   int highlight;
   int on;
-  char txt[80];
+  char txt[400];
   pwr_tSubid* subid_p;
   pwr_tStatus sts;
   pwr_tBoolean old;
@@ -315,6 +321,19 @@ int RtTrace::scan_bc(flow_tObject object, void* trace_p)
       break;
     case flow_eTraceType_Float32:
       sprintf(txt, "%f", *(float*)trace_p);
+      flow_SetAnnotation(object, 0, txt, strlen(txt));
+      break;
+    case flow_eTraceType_DataRef:
+      trace_p = (char *)trace_p + pwr_cAlignLW;
+    case flow_eTraceType_AttrRef:
+      if (((pwr_tAttrRef*)trace_p)->Objid.vid == 0)
+	strcpy(txt, "");
+      else {
+	sts = gdh_AttrrefToName((pwr_tAttrRef*)trace_p, txt, sizeof(txt), 
+	    cdh_mName_object);
+	if (EVEN(sts))
+	  strcpy(txt, "");
+      }
       flow_SetAnnotation(object, 0, txt, strlen(txt));
       break;
     default:

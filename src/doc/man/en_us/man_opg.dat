@@ -2933,7 +2933,9 @@ GetChild()		<LINK> getchild()
 GetParent()		<LINK> getparent()
 GetNextSibling()	<LINK> getnextsibling()
 GetClassList()		<LINK> getclasslist()
+GetClassListAttrRef()	<LINK> getclasslistattrref()
 GetNextObject()		<LINK> getnextobject()
+GetNextAttrRef()	<LINK> getnextattrref()
 GetObjectClass()	<LINK> getobjectclass()
 GetNodeObject()		<LINK> getnodeobject()
 GetRootList()		<LINK> getrootlist()
@@ -3059,6 +3061,7 @@ Global variables can also be deletet with the deletegbl statement.
 <c>int             i;
 <c>float           flow = 33.4;
 <c>string          str = "Hello";
+<c>float           width[5] = (1.20, 2.44, 4.81, 7.77, 9.20);
 <c>extern int      jakob[20];
 <c>string          simon[];
 <c>global float    ferdinand = 1234;
@@ -4269,7 +4272,9 @@ GetChild()	<t>Get object child.	<LINK> getchild()
 GetParent()	<t>Get object parent.	<LINK> getparent()
 GetNextSibling()<t>Get object sibling.	<LINK> getnextsibling()
 GetClassList()	<t>Get first instance of a class. <LINK> getclasslist()
+GetClassListAttrRef() <t>Get first attribute instance of a class. <LINK> getclasslistattrref()
 GetNextObject()	<t>Get next instance of a class. <LINK> getnextobject()
+GetNextAttrRef() <t>Get next attribute instance of a class. <LINK> getnextattrref()
 GetObjectClass() <t>Get class of an object. <LINK> getobjectclass()
 GetNodeObject()	<t>Get node object.	<LINK> getnodeobject()
 GetRootList()	<t>Get first object in root list. <LINK> getrootlist()
@@ -4438,6 +4443,29 @@ string		<t>name		<t>name of class.
 <c>  name = GetClassList("Dv");
 </TOPIC>
 
+<TOPIC> getclasslistattrref() <style> function
+GetClassListAttrRef()
+
+string GetClassListAttrRef( string class)
+
+<b>Description
+
+Get the first object or attribute object of a specified class. The next attribute 
+object of the class can be fetched whith GetNextAttrRef().
+Returns the name of the first object or attribute object. If no instances of the 
+class exist, a null-string is returned.
+
+<b>Arguments
+
+string		<t>name		<t>name of class.
+
+<b>Example
+
+<c>  string name;
+
+<c>  name = GetClassListAttrRef("Dv");
+</TOPIC>
+
 <TOPIC> getnextobject() <style> function
 GetNextObject()
 
@@ -4461,6 +4489,33 @@ string		<t>name		<t>name of object.
 <c>  while ( name != "")
 <c>    printf("Di object found: %s", name);
 <c>    name = GetNextObject(name);
+<c>  endwhile
+</TOPIC>
+
+<TOPIC> getnextattrref() <style> function
+GetNextAttrRef()
+
+string GetNextAttrRef( string name)
+
+<b>Description
+
+Get the next object or attribute object in a classlist.
+Returns the name of the attribute object. If no next object exists, 
+a null-string is returned.
+
+<b>Arguments
+
+string		<t>classname	<t>name of class.
+string		<t>name		<t>name of attribute object.
+
+<b>Example
+
+<c>  string name;
+
+<c>  name = GetClassListAttrRef("Di");
+<c>  while ( name != "")
+<c>    printf("Di object found: %s", name);
+<c>    name = GetNextAttrRef("Di", name);
 <c>  endwhile
 </TOPIC>
 

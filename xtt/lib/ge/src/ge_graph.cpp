@@ -171,7 +171,8 @@ Graph::Graph(void* xn_parent_ctx, const char* xn_name,
       default_access(xn_default_access), keep_mode(false), subgraph_dyn(0),
       was_subgraph(0), disable_log(1), pending_borders(0),
       color_theme(xn_color_theme), syntax_instance(0), connect_now(false),
-      dashboard(xn_dashboard)
+      dashboard(xn_dashboard), mode_scriptmodule(0), options(xn_options),
+      reconfigure_width(0), reconfigure_height(0)
 {
   str_StrncpyCutOff(name, xn_name, sizeof(name), 1);
   strcpy(default_path, xn_default_path);
@@ -2441,13 +2442,23 @@ static int graph_grow_cb(GlowCtx* ctx, glow_tEvent event)
 
       sprintf(name, "O%d", grow_IncrNextObjectNameNumber(graph->grow->ctx));
 
-      grow_CreateGrowRect(graph->grow->ctx, name, event->create_grow_object.x,
-          event->create_grow_object.y,
-          event->create_grow_object.x2 - event->create_grow_object.x,
-          event->create_grow_object.y2 - event->create_grow_object.y,
-          graph->get_border_drawtype(), graph->linewidth, 0,
-          glow_mDisplayLevel_1, graph->fill, graph->border, graph->shadow,
-          graph->get_fill_drawtype(), NULL, &r1);
+      if (!graph->mode_scriptmodule)
+        grow_CreateGrowRect(graph->grow->ctx, name, event->create_grow_object.x,
+            event->create_grow_object.y,
+            event->create_grow_object.x2 - event->create_grow_object.x,
+            event->create_grow_object.y2 - event->create_grow_object.y,
+            graph->get_border_drawtype(), graph->linewidth, 0,
+            glow_mDisplayLevel_1, graph->fill, graph->border, graph->shadow,
+            graph->get_fill_drawtype(), NULL, &r1);
+      else
+        grow_CreateGrowScriptModule(graph->grow->ctx, name, event->create_grow_object.x,
+            event->create_grow_object.y,
+            event->create_grow_object.x2 - event->create_grow_object.x,
+            event->create_grow_object.y2 - event->create_grow_object.y,
+            graph->get_border_drawtype(), graph->linewidth,
+            glow_mDisplayLevel_1, graph->fill, graph->border,
+            graph->get_fill_drawtype(), NULL, &r1);
+
       grow_SetModified(graph->grow->ctx, 1);
       if (!graph->keep_mode)
         grow_SetMode(graph->grow->ctx, grow_eMode_Edit);
@@ -3543,6 +3554,8 @@ void GraphGrow::grow_trace_setup()
       ctx, glow_eEvent_Open, glow_eEventType_CallBack, graph_grow_cb);
   grow_EnableEvent(
       ctx, glow_eEvent_Close, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(
+      ctx, glow_eEvent_Resized, glow_eEventType_CallBack, graph_grow_cb);
 
   grow_RegisterEventLogCallback(ctx, graph_eventlog_cb);
 }
@@ -4454,6 +4467,38 @@ static int graph_trace_grow_cb(GlowCtx* ctx, glow_tEvent event)
         return GLOW__NO_PROPAGATE;
       }
     }
+    break;
+  }
+  case glow_eEvent_Resized: {
+    if (graph->options & graph_mOption_ResizeReconfigure) {
+      char name[80];
+      int w, h;
+
+      grow_GetWindowSize(graph->grow->ctx, &w, &h);
+      if (graph->reconfigure_width == 0 && graph->reconfigure_height == 0) {
+	graph->reconfigure_width = w;
+	graph->reconfigure_height = h;
+	break;
+      }
+      if (abs(graph->reconfigure_width - w) > 50 || abs(graph->reconfigure_height - h) > 50) {
+	graph->get_name(name);
+	graph->trace_timer_remove();
+	grow_TraceClose(graph->grow->ctx);
+	graph->trace_started = 0;
+	graph->clear_all();
+	grow_SetNodraw(graph->grow->ctx);
+	graph->read_scriptfile(name);
+	grow_TraceInit(graph->grow->ctx, graph_trace_connect_bc,
+	    graph_trace_disconnect_bc, graph_trace_scan_bc, graph_trace_ctrl_bc);
+	grow_SetDefaultLayout(graph->grow->ctx);
+	grow_ResetNodraw(graph->grow->ctx);
+	graph->trace_started = 1;
+	graph->trace_scan(graph);
+	graph->reconfigure_width = w;
+	graph->reconfigure_height = h;
+      }
+    }
+
     break;
   }
   case glow_eEvent_Open:

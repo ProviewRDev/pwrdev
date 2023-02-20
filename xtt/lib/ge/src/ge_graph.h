@@ -111,7 +111,10 @@ typedef enum {
   graph_eMode_Runtime //!< Runtime mode.
 } graph_eMode;
 
-typedef enum { graph_mOption_IgnoreJournal = 1 << 0 } graph_mOption;
+typedef enum {
+  graph_mOption_IgnoreJournal = 1 << 0,
+  graph_mOption_ResizeReconfigure = 1 << 1
+} graph_mOption;
 
 //! Databases
 typedef enum {
@@ -583,6 +586,10 @@ public:
   char* syntax_instance; //!< Instance for syntax check of object graphs
   bool connect_now; //!< Don't delay trace connect
   int dashboard; //!< Graph is a dashboard.
+  int mode_scriptmodule; //!< Fix to create scriptmodules instead of rects
+  unsigned int options; //!< Graph options  
+  int reconfigure_width; //!< Window width at last reconfiguration
+  int reconfigure_height; //!< Window height at last reconfiguration
 
   //! Print to postscript file.
   /*! \param filename	Name of postscript file. */

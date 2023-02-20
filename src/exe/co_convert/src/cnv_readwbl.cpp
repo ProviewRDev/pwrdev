@@ -651,7 +651,7 @@ void CnvReadWbl::attribute_init()
   strcpy(attr_typeref_volume, "");
   strcpy(attr_pgmname, "");
   strcpy(attr_graphname, "");
-  strcpy(attr_elements, "");
+  strcpy(attr_elements, "1");
   attr_pointer = 0;
   attr_array = 0;
   attr_elem = 0;

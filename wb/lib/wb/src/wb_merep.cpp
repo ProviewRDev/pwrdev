@@ -614,6 +614,7 @@ void wb_merep::insertCattObject(
 {
   merep_sClassAttrKey key;
   merep_sClassAttr* item;
+  merep_sClassAttr* item0;
   int j;
 
   wb_cdrep* cd = cdrep(sts, adp->tid());
@@ -629,19 +630,26 @@ void wb_merep::insertCattObject(
   key.subCid = adp->tid();
   key.hostCid = cid;
   key.idx = 0;
-  item = (merep_sClassAttr*)tree_Find(sts, m_catt_tt, &key);
-
-  while (ODD(*sts) && item->numOffset == merep_cCattOffsetSize) {
-    key.idx++;
-    item = (merep_sClassAttr*)tree_Find(sts, m_catt_tt, &key);
+  item0 = (merep_sClassAttr*)tree_Find(sts, m_catt_tt, &key);
+  if (EVEN(*sts))
+    item0 = (merep_sClassAttr*)tree_Insert(sts, m_catt_tt, &key);
+  
+  if (item0->numIdx == 0)
+    item = item0;
+  else {
+    key.idx = item0->numIdx;
+    item = (merep_sClassAttr*)tree_Find(sts, m_catt_tt, &key);    
   }
+
   if (!(adp->flags() & PWR_MASK_ARRAY)) {
-    if (ODD(*sts)) {
+    if (item->numOffset < merep_cCattOffsetSize) {
       // Insert in found item
       item->offset[item->numOffset] = offset + adp->offset();
       item->flags[item->numOffset++] = adp->flags() | disableattr;
     } else {
       // Insert a new item
+      key.idx++;
+      item0->numIdx = key.idx;
       item = (merep_sClassAttr*)tree_Insert(sts, m_catt_tt, &key);
       item->offset[item->numOffset] = offset + adp->offset();
       item->flags[item->numOffset++] = adp->flags() | disableattr;
@@ -672,7 +680,7 @@ void wb_merep::insertCattObject(
     delete bd;
   } else {
     // Insert all offsets in the array
-    pwr_tStatus tsts = 0;
+    pwr_tStatus tsts = 1;
     for (j = 0; j < adp->nElement(); j++) {
       if (ODD(tsts) && item->numOffset < merep_cCattOffsetSize) {
         // Insert in current item
@@ -681,8 +689,8 @@ void wb_merep::insertCattObject(
         item->flags[item->numOffset++] = adp->flags();
       } else {
         // Insert a new item
-        if (ODD(tsts))
-          key.idx++;
+	key.idx++;
+	item0->numIdx = key.idx;
         item = (merep_sClassAttr*)tree_Insert(&tsts, m_catt_tt, &key);
         item->offset[item->numOffset]
             = offset + adp->offset() + j * adp->size() / adp->nElement();
@@ -713,6 +721,30 @@ void wb_merep::insertCattObject(
   delete cd;
   *sts = LDH__SUCCESS;
 }
+
+#if 0
+static char *printKey(tree_sNode *key)
+{
+  static char txt[80];
+  sprintf(txt, "Key subCid %u hostCid %u idx %u\n", 
+     ((merep_sClassAttrKey *)key)->subCid,
+     ((merep_sClassAttrKey *)key)->hostCid,
+     ((merep_sClassAttrKey *)key)->idx);
+  return txt;
+}
+static void printNode(tree_sNode *node)
+{
+  merep_sClassAttr *n = (merep_sClassAttr*)(node);
+
+  printf("Node \n");
+  printf("Key subCid %u hostCid %u idx %u\n", 
+     n->key.subCid,
+     n->key.hostCid,
+     n->key.idx);
+  printf("numOffs %d\n", n->numOffset);
+}
+tree_PrintTable(sts, m_catt_tt, printNode, printKey);
+#endif
 
 tree_sTable* wb_merep::buildCatt(pwr_tStatus* sts)
 {

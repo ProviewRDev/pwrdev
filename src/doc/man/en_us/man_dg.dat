@@ -3502,7 +3502,11 @@ the server node, eg
 
 In the RemTrans object, Address[0] and Address[1] is used to address a sent message to the corresponding 
 RemTrans in the target node. Address[3] states the message delivery mode where 2 is persistent and other
-values not persistent.
+values not persistent. Address[2] is an option bitmask where bit 1 is KeepAll and bit 2 MsgOrder.
+
+KeepAll means that messages are requeued if the remtrans is occupied. By default they are discarded.
+If there are several remtrans objects on the same queue, the order for requeued messages might be changed 
+unless the MsgOrder bit is set. MsgOrder will set the prefetch count to 1.
 
 If a message should be recovered after a server failure, Durable should be set in the RemoteRabbitMQ
 object, and delivery mode in RemTrans.Address[3] should be set to 2 (persistent).
@@ -6837,7 +6841,7 @@ File/Open/UserDatabase in the menu.
 See chapter Administration <link>adm_user
 
 You can also edit the database by commands in pwr_user, 
-Man kan även editera databasen med kommandon i pwr_user, see pwr_user in chapter Tools. <link>pwr_user
+Man kan ï¿½ven editera databasen med kommandon i pwr_user, see pwr_user in chapter Tools. <link>pwr_user
 </topic>
 
 </chapter>
@@ -10138,8 +10142,6 @@ PromptDialog()		<LINK> promptdialog()
 OpenGraph()		<LINK> opengraph()
 CloseGraph()		<LINK> closegraph()
 SetSubwindow()		<LINK> setsubwindow()
-GetIoDeviceData()	<LINK> getiodevicedata()
-SetIoDeviceData()	<LINK> setiodevicedata()
 GetVersion()		<LINK> getversion()
 get_pwr_config()	<LINK> get_pwr_config()
 get_node_name()		<LINK> get_node_name()
@@ -10223,6 +10225,7 @@ Global variables can also be deletet with the deletegbl statement.
 <c>int             i;
 <c>float           flow = 33.4;
 <c>string          str = "Hello";
+<c>float           width[5] = (1.20, 2.44, 4.81, 7.77, 9.20);
 <c>extern int      jakob[20];
 <c>global float    ferdinand = 1234;
 <c>...
@@ -11870,8 +11873,6 @@ PromptDialog()	<t>Open an input dialog. <LINK> promptdialog()
 OpenGraph()	<t>Open a Ge graph.	<LINK> opengraph()
 CloseGraph()	<t>Close a Ge graph.	<LINK> closegraph()
 SetSubwindow()	<t>Open a graph in a window object. <LINK> setsubwindow()
-GetIoDeviceData() <t>Get data from IO configuration. <LINK> getiodevicedata()
-SetIoDeviceData() <t>Set data in IO configuration. <LINK> setiodevicedata()
 GetVersion() <t>Get ProviewR version. <LINK> getversion()
 get_pwr_config() <t>Get configuration values. <LINK> get_pwr_config()
 get_node_name()	<t>Get node name. <LINK> get_node_name()
@@ -12235,78 +12236,6 @@ int		<t>modal	<t>Modal.
 <b>Example
 
 <c>  SetSubwindow( "pwr_wizard_frame", "Window1", "MyGraph", 1);
-
-</TOPIC>
-
-<TOPIC> getiodevicedata() <style> function
-GetIoDeviceData()
-
-int GetIoDeviceData( string object, string parameter, string value)
-
-<b>Description
-
-Get data from IO configuration.
-Returns status of operation, odd if success and even is error.
-
-This command uses methods and has to be executed in pwrs. It does not
-work in pwrc.
-
-The supported parameters for Profinet devices are
-
-NetworkSettings-DeviceName
-NetworkSettings-IP Address
-NetworkSettings-Subnet Mask
-NetworkSettings-MAC Address
-NetworkSettings-SendClock
-NetworkSettings-ReductionRatio
-NetworkSettings-Phase
-NetworkSettings-API
-
-<b>Argument
-
-string		<t>object	<t>Name device object.
-string		<t>parameter	<t>Parameter name for data.
-string		<t>value	<t>Returned parameter value.
-
-<b>Example
-
-<c>  sts = SetIoDeviceData( "Nodes-MyNode-PN-D1", "NetworkSettings-DeviceName", "ET200M-D1");
-
-</TOPIC>
-
-<TOPIC> setiodevicedata() <style> function
-SetIoDeviceData()
-
-int SetIoDeviceData( string object, string parameter, string value)
-
-<b>Description
-
-Set data to IO configuration.
-Returns status of operation, odd if success and even is error.
-
-This command uses methods and has to be executed in pwrs. It does not
-work in pwrc.
-
-The supported parameters for Profinet devices are
-
-NetworkSettings-DeviceName
-NetworkSettings-IP Address
-NetworkSettings-Subnet Mask
-NetworkSettings-MAC Address
-NetworkSettings-SendClock
-NetworkSettings-ReductionRatio
-NetworkSettings-Phase
-NetworkSettings-API
-
-<b>Argument
-
-string		<t>object	<t>Name device object.
-string		<t>parameter	<t>Parameter name for data.
-string		<t>value	<t>Value to set.
-
-<b>Example
-
-<c>  sts = SetIoDeviceData( "Nodes-MyNode-PN-D1", "NetworkSettings-DeviceName", "ET200M-D1");
 
 </TOPIC>
 

@@ -125,6 +125,46 @@ pwr_tStatus wsx_error_msg(ldh_tSesContext sesctx, pwr_tStatus sts,
   return WSX__SUCCESS;
 }
 
+pwr_tStatus wsx_error_msg_object(ldh_tSesContext sesctx, pwr_tStatus sts,
+    pwr_tOid oid, int* errorcount, int* warningcount)
+{
+  static char msg[256];
+  int status, size;
+  pwr_tOName name;
+  FILE* logfile;
+
+  logfile = NULL;
+
+  if (EVEN(sts)) {
+    msg_GetMsg(sts, msg, sizeof(msg));
+
+    if (logfile != NULL)
+      fprintf(logfile, "%s\n", msg);
+    else
+      printf("%s\n", msg);
+    if (cdh_ObjidIsNull(oid))
+      MsgWindow::message(co_error(sts), 0, 0);
+    else {
+      /* Get the full hierarchy name for the node */
+      status = ldh_ObjidToName(sesctx, oid, cdh_mName_pathStrict, name, 
+          sizeof(name), &size);
+      if (EVEN(status))
+        return status;
+
+      if (logfile != NULL)
+        fprintf(logfile, "        in object  %s\n", name);
+      else
+        printf("        in object  %s\n", name);
+      MsgWindow::message(co_error(sts), "   in object", name, oid);
+    }
+    if ((sts & 2) && !(sts & 1))
+      (*errorcount)++;
+    else if (!(sts & 2) && !(sts & 1))
+      (*warningcount)++;
+  }
+  return WSX__SUCCESS;
+}
+
 pwr_tStatus wsx_error_msg_str(ldh_tSesContext sesctx, const char* str,
     pwr_tAttrRef aref, int severity, int* errorcount, int* warningcount)
 {

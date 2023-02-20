@@ -4362,6 +4362,33 @@ arg_count) {
     return ret;
   }
 
+  this.getwindowdimension_func = function(self, filectx, arg_list, arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var arg_p2;
+    var graph;
+
+    if (arg_count != 2)
+      return CCM_.ARGMISM;
+
+    arg_p2 = arg_list.next;
+    if (arg_list.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p2.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    graph = graph_get_stored_graph();
+    arg_list.value_float = window.innerWidth / graph.ctx.mw.base_zoom_factor;
+    arg_list.value_returned = 1;
+    arg_p2.value_float = window.innerHeight / graph.ctx.mw.base_zoom_factor;
+    arg_p2.value_returned = 1;
+
+    return ret;
+  }
+
   this.getui_env_func = function(self, filectx, arg_list, arg_count) {
     var ret = new ccm_tSysFuncReturn();
 
@@ -4386,6 +4413,262 @@ arg_count) {
     return ret;
   }
 
+  this.layout_func = function(self, filectx, arg_list, arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var arg_p2;
+    var arg_p3;
+    var arg_p4;
+    var arg_p5;
+    var arg_p6;
+    var arg_p7;
+    var arg_p8;
+    var arg_p9;
+    var arg_p10;
+    var arg_p11;
+    var arg_p12;
+    var arg_p13;
+    var arg_p14;
+    var arg_p15;
+    var valp3;
+    var valp4;
+    var valp5;
+    var valp6;
+    var valp7;
+    var valp8;
+    var valp9;
+    var valp10;
+    var valp11;
+    var valp12;
+    var valp13;
+    var valp14;
+    var valp15;
+
+    if (arg_count != 15)
+      return CCM_.ARGMISM;
+
+    arg_p2 = arg_list.next;
+    arg_p3 = arg_p2.next;
+    arg_p4 = arg_p3.next;
+    arg_p5 = arg_p4.next;
+    arg_p6 = arg_p5.next;
+    arg_p7 = arg_p6.next;
+    arg_p8 = arg_p7.next;
+    arg_p9 = arg_p8.next;
+    arg_p10 = arg_p9.next;
+    arg_p11 = arg_p10.next;
+    arg_p12 = arg_p11.next;
+    arg_p13 = arg_p12.next;
+    arg_p14 = arg_p13.next;
+    arg_p15 = arg_p14.next;
+    if (arg_list.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p2.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p3.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p4.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p5.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p6.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p7.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p8.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p9.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p10.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p11.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p12.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p13.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p14.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p15.value_decl != CcmC.K_DECL_FLOAT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    graph = graph_get_stored_graph();
+
+    var ref = graph.ccm.ref_var(filectx.funcctx, arg_p3.value_name);
+    if (EVEN(ref.sts)) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (ref.decl != CcmC.K_DECL_INT || !ref.array)
+      return CCM_.ARGMISM;
+    valp3 = ref.valuep;
+
+    ref = graph.ccm.ref_var(filectx.funcctx, arg_p4.value_name);
+    if (EVEN(ref.sts)) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (ref.decl != CcmC.K_DECL_INT || !ref.array)
+      return CCM_.ARGMISM;
+    valp4 = ref.valuep;	
+
+    ref = graph.ccm.ref_var(filectx.funcctx, arg_p5.value_name);
+    if (EVEN(ref.sts)) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (ref.decl != CcmC.K_DECL_INT || !ref.array)
+      return CCM_.ARGMISM;
+    valp5 = ref.valuep;	
+
+    ref = graph.ccm.ref_var(filectx.funcctx, arg_p6.value_name);
+    if (EVEN(ref.sts)) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (ref.decl != CcmC.K_DECL_INT || !ref.array)
+      return CCM_.ARGMISM;
+    valp6 = ref.valuep;	
+
+    ref = graph.ccm.ref_var(filectx.funcctx, arg_p7.value_name);
+    if (EVEN(ref.sts)) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (ref.decl != CcmC.K_DECL_INT || !ref.array)
+      return CCM_.ARGMISM;
+    valp7 = ref.valuep;	
+
+    ref = graph.ccm.ref_var(filectx.funcctx, arg_p8.value_name);
+    if (EVEN(ref.sts)) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (ref.decl != CcmC.K_DECL_FLOAT || !ref.array)
+      return CCM_.ARGMISM;
+    valp8 = ref.valuep;	
+
+    ref = graph.ccm.ref_var(filectx.funcctx, arg_p9.value_name);
+    if (EVEN(ref.sts)) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (ref.decl != CcmC.K_DECL_FLOAT || !ref.array)
+      return CCM_.ARGMISM;
+    valp9 = ref.valuep;	
+
+    ref = graph.ccm.ref_var(filectx.funcctx, arg_p10.value_name);
+    if (EVEN(ref.sts)) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (ref.decl != CcmC.K_DECL_INT || !ref.array)
+      return CCM_.ARGMISM;
+    valp10 = ref.valuep;	
+
+    ref = graph.ccm.ref_var(filectx.funcctx, arg_p11.value_name);
+    if (EVEN(ref.sts)) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (ref.decl != CcmC.K_DECL_INT || !ref.array)
+      return CCM_.ARGMISM;
+    valp11 = ref.valuep;	
+
+    ref = graph.ccm.ref_var(filectx.funcctx, arg_p12.value_name);
+    if (EVEN(ref.sts)) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (ref.decl != CcmC.K_DECL_FLOAT || !ref.array)
+      return CCM_.ARGMISM;
+    valp12 = ref.valuep;	
+
+    ref = graph.ccm.ref_var(filectx.funcctx, arg_p13.value_name);
+    if (EVEN(ref.sts)) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (ref.decl != CcmC.K_DECL_FLOAT || !ref.array)
+      return CCM_.ARGMISM;
+    valp13 = ref.valuep;	
+
+    ref = graph.ccm.ref_var(filectx.funcctx, arg_p14.value_name);
+    if (EVEN(ref.sts)) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (ref.decl != CcmC.K_DECL_FLOAT || !ref.array)
+      return CCM_.ARGMISM;
+    valp14 = ref.valuep;	
+
+    ref = graph.ccm.ref_var(filectx.funcctx, arg_p15.value_name);
+    if (EVEN(ref.sts)) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (ref.decl != CcmC.K_DECL_FLOAT || !ref.array)
+      return CCM_.ARGMISM;
+    valp15 = ref.valuep;	
+
+    var lret = graph.layout(graph, valp3.length, arg_list.value_float, arg_p2.value_float, 
+      valp3, valp4, valp5, valp6, valp7, valp8, valp9, valp10, valp11, valp12, 
+      valp13, valp14, valp15);
+
+    arg_list.value_float = lret.calc_wind_width;
+    arg_list.value_returned = 1;
+    arg_p2.value_float = lret.calc_wind_height;
+    arg_p2.value_returned = 1;
+    return ret;
+  }
+
+  this.setgraphoptions_func = function(self, filectx, arg_list, arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+
+    if (arg_count != 1)
+      return CCM_.ARGMISM;
+
+    graph = graph_get_stored_graph();
+
+    if (arg_list.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    graph.options = arg_list.value_int;
+    return ret;
+  }
 
   this.script_func_register = function() {
     var sts;
@@ -4495,8 +4778,11 @@ arg_count) {
     this.ccm.register_function("Ge", "CreateToolbar", this.createtoolbar_func);
     this.ccm.register_function("Ge", "GetInstanceObject", this.getinstanceobject_func);
     this.ccm.register_function("Ge", "GetWindowSize", this.getwindowsize_func);
+    this.ccm.register_function("Ge", "GetWindowDimension", this.getwindowdimension_func);
     this.ccm.register_function("Ge", "GetUI_Env", this.getui_env_func);
     this.ccm.register_function("Ge", "GetGraphConfig", this.getgraphconfig_func);
+    this.ccm.register_function("Ge", "Layout", this.layout_func);
+    this.ccm.register_function("Ge", "SetGraphOptions", this.setgraphoptions_func);
   
     sts = this.ccm.create_external_var(
       "eUI_Env_Web", CcmC.K_DECL_INT, 0, Glow.eUI_Env_Web, 0);

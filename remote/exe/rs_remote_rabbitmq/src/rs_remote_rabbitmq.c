@@ -83,8 +83,15 @@ typedef struct {
   unsigned short int msg_id[2];
 } rabbit_header;
 
+typedef enum {
+  rabbit_mOpt_KeepAll = 1,
+  rabbit_mOpt_MsgOrder = 2
+} rabbit_mOpt;
+
 static rabbit_tCtx ctx = 0;
 static remnode_item rn;
+static remtrans_item *rcv_remtrans = 0;
+static int rcv_remtrans_locking = 0;
 static pwr_sClass_RemnodeRabbitMQ* rn_rmq;
 
 /*************************************************************************
@@ -134,7 +141,7 @@ void rmq_close(int destroy)
 *
 **************************************************************************
 **************************************************************************/
-int rmq_connect()
+int rmq_connect(int msg_order)
 {
   int sts;
   amqp_rpc_reply_t rep;
@@ -256,6 +263,11 @@ int rmq_connect()
     }
   }
 
+  if (msg_order) {
+    if (!amqp_basic_qos(ctx->conn, ctx->channel, 0, 1, 0))
+      errh_Error("amqp_basic_qos error\n");
+  }
+
   return 1;
 }
 
@@ -283,6 +295,16 @@ unsigned int rmq_receive()
   struct timeval t = {0, 0};
   rabbit_header header;
   int msg_received = 0;
+  int restart = 0;
+
+  if (rcv_remtrans && 
+      rcv_remtrans->objp->Address[2] & rabbit_mOpt_KeepAll &&
+      rcv_remtrans->objp->DataValid)
+    return 1;
+  if (rcv_remtrans_locking) {
+    rcv_remtrans = 0;
+    rcv_remtrans_locking = 0;
+  }  
 
   amqp_maybe_release_buffers(ctx->conn);
   ret = amqp_consume_message(ctx->conn, &envelope, &t, 0);
@@ -311,30 +333,46 @@ unsigned int rmq_receive()
         if (frame.frame_type == AMQP_FRAME_METHOD) {
           switch (frame.payload.method.id) {
           case AMQP_BASIC_ACK_METHOD:
-            printf("Basic ack method called\n");
-            break;
+            errh_Error("Exception: Basic ack method called");
+	    return REM__EXCEPTION;
           case AMQP_BASIC_RETURN_METHOD:
-            printf("Basic return method called\n");
-            break;
+            errh_Error("Exception: Basic return method called");
+	    return REM__EXCEPTION;
           case AMQP_CHANNEL_CLOSE_METHOD:
-            printf("Channel close method called\n");
+	    restart = 1;
+            errh_Error("Exception: Channel close method called");
             break;
           case AMQP_CONNECTION_CLOSE_METHOD:
-            printf("Connection close method called\n");
+	    restart = 1;
+            errh_Error("Exception: Connection close method called");
             break;
           default:;
           }
         }
-        return REM__EXCEPTION;
       } else
         return REM__EXCEPTION;
+      break;
     }
+    case AMQP_STATUS_SOCKET_ERROR:
+      errh_Error("Exception: Socket error");
+      restart = 1;
+      break;
+    case AMQP_STATUS_CONNECTION_CLOSED:
+      errh_Error("Exception: Connection closed");
+      restart = 1;
+      break;
+    case AMQP_STATUS_TCP_ERROR:
+      errh_Error("Exception: TCP error");
+      return REM__EXCEPTION;
     }
-    // Reconnect...
-    rmq_close(1);
+    if (restart) {
+      // Reconnect...
+      rmq_close(1);
+      exit(0);
+    }
     return REM__EXCEPTION;
   default:
-    printf("Unknown Reply type: %d\n", ret.reply_type);
+    errh_Error("Unknown Reply type: %d", ret.reply_type);
   }
 
   if (debug)
@@ -374,6 +412,16 @@ unsigned int rmq_receive()
       if (remtrans->objp->Address[0] == header.msg_id[0]
           && remtrans->objp->Address[1] == header.msg_id[1]
           && remtrans->objp->Direction == REMTRANS_IN) {
+	if (remtrans->objp->Address[2] & rabbit_mOpt_KeepAll && 
+	    remtrans->objp->DataValid) {
+	  /* Not ready, requeue the message */
+	  amqp_basic_nack(ctx->conn, ctx->channel, envelope.delivery_tag, 0, 1);
+	  if (!rcv_remtrans && !rcv_remtrans_locking) {
+	    rcv_remtrans_locking = 1;
+	    rcv_remtrans = remtrans;
+	  }
+	  return 1;
+	}
         search_remtrans = false;
         sts = RemTrans_Receive(remtrans,
             (char*)envelope.message.body.bytes + sizeof(rabbit_header),
@@ -489,6 +537,7 @@ int main(int argc, char* argv[])
   pwr_tStatus sts;
   int i;
   float time_since_scan = 0.0;
+  int msg_order = 0;
 
   /* Read arg number 2, should be id for this instance and id is our queue
    * number */
@@ -580,8 +629,25 @@ int main(int argc, char* argv[])
     remtrans = (remtrans_item*)remtrans->next;
   }
 
+  /* Find single receive remtrans */
+  remtrans = rn.remtrans;
+  i = 0;
+  while (remtrans) {
+    if (remtrans->objp->Direction == REMTRANS_IN) {
+      rcv_remtrans = remtrans;
+      i++;
+      if (rn_rmq->DisableHeader)
+	break;
+      if (remtrans->objp->Address[2] & rabbit_mOpt_MsgOrder)
+	msg_order = 1;
+    }
+    remtrans = (remtrans_item*)remtrans->next;
+  }
+  if (i != 1)
+    rcv_remtrans = 0;
+
   /* Connect to rabbitmq broker */
-  sts = rmq_connect();
+  sts = rmq_connect(msg_order);
   if (EVEN(sts)) {
     rmq_close(1);
     errh_Fatal("Process terminated, unable to connect to RabbitMQ, %s", id);

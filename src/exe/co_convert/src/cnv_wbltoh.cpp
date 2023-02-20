@@ -238,13 +238,16 @@ int CnvWblToH::body_exec()
     fp_struct << '\n'
               << "#ifndef pwr_cClass_" << cclass_name << '\n'
               << "#define pwr_cClass_" << cclass_name << " " << cid << "UL\n"
+	      << "#endif\n"
               << '\n';
     if (!ctx->common_structfile_only)
       fp_cstruc << '\n'
                 << "#ifndef pwr_cClass_" << cclass_name << '\n'
                 << "#define pwr_cClass_" << cclass_name << " " << cid << "UL\n"
+		<< "#endif\n"
                 << '\n';
     struct_cclass_written = 1;
+    struct_cclass_endwritten = 1;
   }
 
   if (streq(CnvCtx::low(ctx->rw->body_name), "rtbody")
@@ -493,10 +496,10 @@ int CnvWblToH::attribute_exec()
         if (!ctx->common_structfile_only)
           fp_cstruc << ' ';
       }
-      fp_struct << " *" << pgmname << "P[" << ctx->rw->attr_elements << "]"
+      fp_struct << " (*" << pgmname << "P)[" << ctx->rw->attr_elements << "]"
                 << alignstr << ";\n";
       if (!ctx->common_structfile_only)
-        fp_cstruc << " *" << pgmname << "P[" << ctx->rw->attr_elements << "]"
+        fp_cstruc << " (*" << pgmname << "P)[" << ctx->rw->attr_elements << "]"
                   << alignstr << ";\n";
     } else if (ctx->rw->attr_pointer) {
       fp_struct << "  " << type_name;

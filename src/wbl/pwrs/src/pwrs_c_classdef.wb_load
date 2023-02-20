@@ -264,6 +264,52 @@ SObject pwrs:Class
 	    EndBody
 	  EndObject
 	EndObject
+	Object Bus $MenuCascade
+	  Body SysBody
+	    Attr ButtonName = "Bus"
+	  EndBody
+          Object CreateSplitBus $MenuButton
+	    Body SysBody
+	      Attr ButtonName = "Create SplitBus"
+	      Attr MethodName = "$ClassDef-Bus"
+	    EndBody
+	  EndObject
+	  Object CreateJoinBus $MenuButton
+	    Body SysBody
+	      Attr ButtonName = "Create JoinBus"
+	      Attr MethodName = "$ClassDef-Bus"
+	      Attr MethodArguments[0] = "CreateJoinBus"
+	    EndBody
+	  EndObject
+	  Object DataToBus $MenuButton
+	    Body SysBody
+	      Attr ButtonName = "Create DataToBus"
+	      Attr MethodName = "$ClassDef-Bus"
+	      Attr MethodArguments[0] = "CreateDataToBus"
+	    EndBody
+	  EndObject
+	  Object CreateGetBus $MenuButton
+	    Body SysBody
+	      Attr ButtonName = "Create GetBus"
+	      Attr MethodName = "$ClassDef-Bus"
+	      Attr MethodArguments[0] = "CreateGetBus"
+	    EndBody
+	  EndObject
+	  Object CreateCStoBus $MenuButton
+	    Body SysBody
+	      Attr ButtonName = "Create CStoBus"
+	      Attr MethodName = "$ClassDef-Bus"
+	      Attr MethodArguments[0] = "CreateCStoBus"
+	    EndBody
+	  EndObject
+	  Object Update $MenuButton
+	    Body SysBody
+	      Attr ButtonName = "Update"
+	      Attr MethodName = "$ClassDef-Bus"
+	      Attr MethodArguments[0] = "Update"
+	    EndBody
+	  EndObject
+	EndObject
       EndObject
     EndObject
     Object ConfiguratorPosos $Menu
@@ -304,6 +350,52 @@ SObject pwrs:Class
 	      Attr ButtonName = "EmbeddedPlc"
 	      Attr MethodName = "$ClassDef-ConfigFc"
 	      Attr MethodArguments[0] = "EmbeddedPlc"
+	    EndBody
+	  EndObject
+	EndObject
+	Object Bus $MenuCascade
+	  Body SysBody
+	    Attr ButtonName = "Bus"
+	  EndBody
+          Object CreateSplitBus $MenuButton
+	    Body SysBody
+	      Attr ButtonName = "Create SplitBus"
+	      Attr MethodName = "$ClassDef-Bus"
+	    EndBody
+	  EndObject
+	  Object CreateJoinBus $MenuButton
+	    Body SysBody
+	      Attr ButtonName = "Create JoinBus"
+	      Attr MethodName = "$ClassDef-Bus"
+	      Attr MethodArguments[0] = "CreateJoinBus"
+	    EndBody
+	  EndObject
+	  Object DataToBus $MenuButton
+	    Body SysBody
+	      Attr ButtonName = "Create DataToBus"
+	      Attr MethodName = "$ClassDef-Bus"
+	      Attr MethodArguments[0] = "CreateDataToBus"
+	    EndBody
+	  EndObject
+	  Object CreateGetBus $MenuButton
+	    Body SysBody
+	      Attr ButtonName = "Create GetBus"
+	      Attr MethodName = "$ClassDef-Bus"
+	      Attr MethodArguments[0] = "CreateGetBus"
+	    EndBody
+	  EndObject
+	  Object CreateCStoBus $MenuButton
+	    Body SysBody
+	      Attr ButtonName = "Create CStoBus"
+	      Attr MethodName = "$ClassDef-Bus"
+	      Attr MethodArguments[0] = "CreateCStoBus"
+	    EndBody
+	  EndObject
+	  Object Update $MenuButton
+	    Body SysBody
+	      Attr ButtonName = "Update"
+	      Attr MethodName = "$ClassDef-Bus"
+	      Attr MethodArguments[0] = "Update"
 	    EndBody
 	  EndObject
 	EndObject

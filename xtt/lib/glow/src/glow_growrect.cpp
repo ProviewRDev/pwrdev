@@ -1176,7 +1176,7 @@ void GrowRect::export_flow(GlowExportFlow* ef)
 {
   ef->rect(this);
 }
-int GrowRect::export_script(GlowExportScript* es)
+int GrowRect::export_script(GlowExportScript* es, void* o, void* m)
 {
-  return es->rect(this);
+  return es->rect(this, o, m);
 }

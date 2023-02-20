@@ -47,35 +47,37 @@
 
 #define pwrs_cSmdVersionStr "V2.7.0"
 
-typedef struct {
+typedef struct
+{
   pwr_tObjName MethodName;
   pwr_tStatus (*Method)();
 } pwr_sMethodBinding;
 
-typedef struct {
+typedef struct
+{
   pwr_tObjName ClassName;
   pwr_sMethodBinding (*Methods)[];
 } pwr_sClassBinding;
 
 #define pwr_BindMethods(Class) pwr_sMethodBinding pwr_g##Class##_Methods[]
 #define pwr_BindClasses(Type) pwr_sClassBinding pwr_g##Type##_ClassMethods[]
-#define pwr_BindClass(Class)                                                   \
-  {                                                                            \
-    #Class, (pwr_sMethodBinding(*)[]) pwr_g##Class##_Methods                   \
+#define pwr_BindClass(Class)                                                                                 \
+  {                                                                                                          \
+#Class, (pwr_sMethodBinding(*)[])pwr_g##Class##_Methods                                                  \
   }
-#define pwr_BindMethod(Method)                                                 \
-  {                                                                            \
-    #Method, (pwr_tStatus(*)()) Method                                         \
-  }
-
-#define pwr_NullMethod                                                         \
-  {                                                                            \
-    "", NULL                                                                   \
+#define pwr_BindMethod(Method)                                                                               \
+  {                                                                                                          \
+#Method, (pwr_tStatus(*)())Method                                                                        \
   }
 
-#define pwr_NullClass                                                          \
-  {                                                                            \
-    "", NULL                                                                   \
+#define pwr_NullMethod                                                                                       \
+  {                                                                                                          \
+    "", NULL                                                                                                 \
+  }
+
+#define pwr_NullClass                                                                                        \
+  {                                                                                                          \
+    "", NULL                                                                                                 \
   }
 
 /*----------------------------------------------------------------------------*\
@@ -84,29 +86,21 @@ typedef struct {
 
 typedef pwr_tStatus (*wb_tMethodMenu)(ldh_sMenuCall*);
 typedef pwr_tStatus (*wb_tMethodMenuFilter)(ldh_sMenuCall*, pwr_sMenuButton*);
-typedef pwr_tStatus (*wb_tMethodAnteCreate)(
-    ldh_tSesContext, pwr_tOid, pwr_tCid);
-typedef pwr_tStatus (*wb_tMethodPostCreate)(
-    ldh_tSesContext, pwr_tOid, pwr_tOid, pwr_tCid);
-typedef pwr_tStatus (*wb_tMethodAnteMove)(
-    ldh_tSesContext, pwr_tOid, pwr_tOid, pwr_tOid);
-typedef pwr_tStatus (*wb_tMethodPostMove)(
-    ldh_tSesContext, pwr_tOid, pwr_tOid, pwr_tCid);
+typedef pwr_tStatus (*wb_tMethodAnteCreate)(ldh_tSesContext, pwr_tOid, pwr_tCid);
+typedef pwr_tStatus (*wb_tMethodPostCreate)(ldh_tSesContext, pwr_tOid, pwr_tOid, pwr_tCid);
+typedef pwr_tStatus (*wb_tMethodAnteMove)(ldh_tSesContext, pwr_tOid, pwr_tOid, pwr_tOid);
+typedef pwr_tStatus (*wb_tMethodPostMove)(ldh_tSesContext, pwr_tOid, pwr_tOid, pwr_tCid);
 typedef pwr_tStatus (*wb_tMethodAnteAdopt)(ldh_tSesContext, pwr_tOid, pwr_tCid);
-typedef pwr_tStatus (*wb_tMethodPostAdopt)(
-    ldh_tSesContext, pwr_tOid, pwr_tOid, pwr_tCid);
-typedef pwr_tStatus (*wb_tMethodAnteUnadopt)(
-    ldh_tSesContext, pwr_tOid, pwr_tOid, pwr_tCid);
-typedef pwr_tStatus (*wb_tMethodPostUnadopt)(
-    ldh_tSesContext, pwr_tOid, pwr_tOid, pwr_tCid);
+typedef pwr_tStatus (*wb_tMethodPostAdopt)(ldh_tSesContext, pwr_tOid, pwr_tOid, pwr_tCid);
+typedef pwr_tStatus (*wb_tMethodAnteUnadopt)(ldh_tSesContext, pwr_tOid, pwr_tOid, pwr_tCid);
+typedef pwr_tStatus (*wb_tMethodPostUnadopt)(ldh_tSesContext, pwr_tOid, pwr_tOid, pwr_tCid);
+typedef pwr_tStatus (*wb_tMethodPostDelete)(ldh_tSesContext, pwr_tOid);
 typedef pwr_tStatus (*wb_tMethodPostRename)(ldh_tSesContext, pwr_tOid);
-typedef pwr_tStatus (*wb_tMethodSyntaxCheck)(
-    ldh_tSesContext, pwr_tAttrRef, int*, int*);
-typedef pwr_tStatus (*wb_tMethodGetIoDeviceData)(
-    pwr_tAttrRef, const char*, char*, int);
-typedef pwr_tStatus (*wb_tMethodSetIoDeviceData)(
-    pwr_tAttrRef, const char*, const char*);
-typedef pwr_tStatus (*wb_tMethodPostCopy)(
-    ldh_tSesContext, pwr_tOid, pwr_tOid, pwr_tCid);
+typedef pwr_tStatus (*wb_tMethodSyntaxCheck)(ldh_tSesContext, pwr_tAttrRef, int*, int*);
+// typedef pwr_tStatus (*wb_tMethodGetIoDeviceData)(
+//     pwr_tAttrRef, const char*, char*, int);
+// typedef pwr_tStatus (*wb_tMethodSetIoDeviceData)(
+//     pwr_tAttrRef, const char*, const char*);
+typedef pwr_tStatus (*wb_tMethodPostCopy)(ldh_tSesContext, pwr_tOid, pwr_tOid, pwr_tCid);
 
 #endif

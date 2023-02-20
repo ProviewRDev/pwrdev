@@ -65,7 +65,7 @@ movebody	<a body object can only be moved within the same childhood> /error
 possecurity	<a Security object should be a child to a $Node object> /error
 securityalrex	<a security object already exist> /error
 nodealrex	<a node object already exist> /error
-
+busattrlimit    <max number of bus attributes exceeded> /error
 
 
 

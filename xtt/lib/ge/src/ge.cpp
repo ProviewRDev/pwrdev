@@ -1632,11 +1632,11 @@ typedef struct {
   int idx;
 } tThemes;
 
-static tThemes themes[] = { { "Standard", 0 }, { "Sand", 1 }, { "Maroon", 2 },
+static tThemes themes[] = { { "StandardLight", 15 }, { "Sand", 1 }, { "Maroon", 2 },
   { "Sienna", 3 }, { "DarkBlue", 4 }, { "Classic", 5 }, { "Midnight", 6 },
   { "PlayRoom", 7 }, { "NordicLight", 8 }, { "Contrast", 9 },
   { "AzureContrast", 10 }, { "OchreContrast", 11 }, { "Chesterfield", 12 },
-  { "TerraVerte", 13 }, { "Polar", 14 }, { "StandardLight", 15 }, 
+  { "TerraVerte", 13 }, { "Polar", 14 },
   { "StandardDark", 16 }, { "Custom", 100 } };
 
 static void ge_colortheme_selector_ok_cb(void* ctx, char* text, int ok_pressed)
@@ -1681,7 +1681,7 @@ void Ge::activate_colortheme_next()
     }
   }
   if (next_idx < 0)
-    next_idx = 0;
+    next_idx = themes[0].idx;
 
   graph->update_color_theme(next_idx);
 }

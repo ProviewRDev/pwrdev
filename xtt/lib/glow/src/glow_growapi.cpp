@@ -64,6 +64,7 @@
 #include "glow_growmenu.h"
 #include "glow_growtoolbar.h"
 #include "glow_growdashcell.h"
+#include "glow_growscriptmodule.h"
 #include "glow_dashboard.h"
 
 /*! \file glow_growapi.cpp
@@ -1219,6 +1220,21 @@ void grow_CreateGrowDashCell(grow_tCtx ctx, const char* name, double x, double y
   *cell = (grow_tObject)r1;
 }
 
+void grow_CreateGrowScriptModule(grow_tCtx ctx, const char* name, double x, double y,
+    double width, double height, glow_eDrawType draw_type, int line_width,
+    glow_mDisplayLevel display_level, int fill_rect,
+    int border, glow_eDrawType fill_draw_type, void* user_data,
+    grow_tObject* module)
+{
+  GrowScriptModule* r1;
+  r1 = new GrowScriptModule(ctx, name, x, y, width, height, draw_type, line_width,
+      display_level, fill_rect, border, fill_draw_type);
+  r1->set_user_data(user_data);
+  ctx->insert(r1);
+  ctx->nav_zoom();
+  *module = (grow_tObject)r1;
+}
+
 int grow_SaveSubGraph(grow_tCtx ctx, char* filename)
 {
   return ctx->save_subgraph(filename, glow_eSaveMode_SubGraph);
@@ -1425,6 +1441,11 @@ int grow_GetObjectAttrInfo(
     attrinfo[i].minlimit = 1;
     attrinfo[i].maxlimit = 3;
     attrinfo[i++].size = sizeof(op->shadow_contrast);
+
+    strcpy(attrinfo[i].name, "thin_shadow");
+    attrinfo[i].value_p = &op->thin_shadow;
+    attrinfo[i].type = glow_eType_Boolean;
+    attrinfo[i++].size = sizeof(op->thin_shadow);
 
     strcpy(attrinfo[i].name, "relief");
     attrinfo[i].value_p = &op->relief;
@@ -3262,6 +3283,190 @@ int grow_GetObjectAttrInfo(
     }
     break;
   }
+  case glow_eObjectType_GrowScriptModule: {
+    GrowScriptModule* op = (GrowScriptModule*)object;
+
+    strcpy(attrinfo[i].name, "Name");
+    attrinfo[i].value_p = &op->n_name;
+    attrinfo[i].type = glow_eType_String;
+    attrinfo[i].no_edit = 0;
+    attrinfo[i].no_edit = 0;
+    attrinfo[i].input_validation_cb = grow_name_validation_cb;
+    attrinfo[i].validation_ctx = (void*)op;
+    attrinfo[i++].size = sizeof(op->n_name);
+
+     strcpy(attrinfo[i].name, "ModuleIndex");
+    attrinfo[i].value_p = &op->module_index;
+    attrinfo[i].type = glow_eType_Int;
+    attrinfo[i++].size = sizeof(op->module_index);
+
+    strcpy(attrinfo[i].name, "VertLeftBorder");
+    attrinfo[i].value_p = &op->vert_left_border;
+    attrinfo[i].type = glow_eType_Int;
+    attrinfo[i++].size = sizeof(op->vert_left_border);
+
+    strcpy(attrinfo[i].name, "VertRightBorder");
+    attrinfo[i].value_p = &op->vert_right_border;
+    attrinfo[i].type = glow_eType_Int;
+    attrinfo[i++].size = sizeof(op->vert_right_border);
+
+    strcpy(attrinfo[i].name, "VertTopBorder");
+    attrinfo[i].value_p = &op->vert_top_border;
+    attrinfo[i].type = glow_eType_Int;
+    attrinfo[i++].size = sizeof(op->vert_top_border);
+
+    strcpy(attrinfo[i].name, "VertBottomBorder");
+    attrinfo[i].value_p = &op->vert_bottom_border;
+    attrinfo[i].type = glow_eType_Int;
+    attrinfo[i++].size = sizeof(op->vert_bottom_border);
+
+    strcpy(attrinfo[i].name, "VertPrio");
+    attrinfo[i].value_p = &op->vert_prio;
+    attrinfo[i].type = glow_eType_Int;
+    attrinfo[i++].size = sizeof(op->vert_prio);
+
+    strcpy(attrinfo[i].name, "VertLeftModule");
+    attrinfo[i].value_p = &op->vert_left_module;
+    attrinfo[i].type = glow_eType_Int;
+    attrinfo[i++].size = sizeof(op->vert_left_module);
+
+    strcpy(attrinfo[i].name, "VertRightModule");
+    attrinfo[i].value_p = &op->vert_right_module;
+    attrinfo[i].type = glow_eType_Int;
+    attrinfo[i++].size = sizeof(op->vert_right_module);
+
+    strcpy(attrinfo[i].name, "VertTopModule");
+    attrinfo[i].value_p = &op->vert_top_module;
+    attrinfo[i].type = glow_eType_Int;
+    attrinfo[i++].size = sizeof(op->vert_top_module);
+
+    strcpy(attrinfo[i].name, "VertBottomModule");
+    attrinfo[i].value_p = &op->vert_bottom_module;
+    attrinfo[i].type = glow_eType_Int;
+    attrinfo[i++].size = sizeof(op->vert_bottom_module);
+
+    strcpy(attrinfo[i].name, "VertWidth");
+    attrinfo[i].value_p = &op->vert_width;
+    attrinfo[i].type = glow_eType_Float;
+    attrinfo[i++].size = sizeof(op->vert_width);
+
+    strcpy(attrinfo[i].name, "VertHeight");
+    attrinfo[i].value_p = &op->vert_height;
+    attrinfo[i].type = glow_eType_Float;
+    attrinfo[i++].size = sizeof(op->vert_height);
+
+    strcpy(attrinfo[i].name, "VertFixWidth");
+    attrinfo[i].value_p = &op->vert_fix_width;
+    attrinfo[i].type = glow_eType_Int;
+    attrinfo[i++].size = sizeof(op->vert_fix_width);
+
+    strcpy(attrinfo[i].name, "VertFixHeight");
+    attrinfo[i].value_p = &op->vert_fix_height;
+    attrinfo[i].type = glow_eType_Int;
+    attrinfo[i++].size = sizeof(op->vert_fix_height);
+
+    strcpy(attrinfo[i].name, "HorizLeftBorder");
+    attrinfo[i].value_p = &op->horiz_left_border;
+    attrinfo[i].type = glow_eType_Int;
+    attrinfo[i++].size = sizeof(op->horiz_left_border);
+
+    strcpy(attrinfo[i].name, "HorizRightBorder");
+    attrinfo[i].value_p = &op->horiz_right_border;
+    attrinfo[i].type = glow_eType_Int;
+    attrinfo[i++].size = sizeof(op->horiz_right_border);
+
+    strcpy(attrinfo[i].name, "HorizTopBorder");
+    attrinfo[i].value_p = &op->horiz_top_border;
+    attrinfo[i].type = glow_eType_Int;
+    attrinfo[i++].size = sizeof(op->horiz_top_border);
+
+    strcpy(attrinfo[i].name, "HorizBottomBorder");
+    attrinfo[i].value_p = &op->horiz_bottom_border;
+    attrinfo[i].type = glow_eType_Int;
+    attrinfo[i++].size = sizeof(op->horiz_bottom_border);
+
+    strcpy(attrinfo[i].name, "HorizPrio");
+    attrinfo[i].value_p = &op->horiz_prio;
+    attrinfo[i].type = glow_eType_Int;
+    attrinfo[i++].size = sizeof(op->horiz_prio);
+
+    strcpy(attrinfo[i].name, "HorizLeftModule");
+    attrinfo[i].value_p = &op->horiz_left_module;
+    attrinfo[i].type = glow_eType_Int;
+    attrinfo[i++].size = sizeof(op->horiz_left_module);
+
+    strcpy(attrinfo[i].name, "HorizRightModule");
+    attrinfo[i].value_p = &op->horiz_right_module;
+    attrinfo[i].type = glow_eType_Int;
+    attrinfo[i++].size = sizeof(op->horiz_right_module);
+
+    strcpy(attrinfo[i].name, "HorizTopModule");
+    attrinfo[i].value_p = &op->horiz_top_module;
+    attrinfo[i].type = glow_eType_Int;
+    attrinfo[i++].size = sizeof(op->horiz_top_module);
+
+    strcpy(attrinfo[i].name, "HorizBottomModule");
+    attrinfo[i].value_p = &op->horiz_bottom_module;
+    attrinfo[i].type = glow_eType_Int;
+    attrinfo[i++].size = sizeof(op->horiz_bottom_module);
+
+    strcpy(attrinfo[i].name, "HorizWidth");
+    attrinfo[i].value_p = &op->horiz_width;
+    attrinfo[i].type = glow_eType_Float;
+    attrinfo[i++].size = sizeof(op->horiz_width);
+
+    strcpy(attrinfo[i].name, "HorizHeight");
+    attrinfo[i].value_p = &op->horiz_height;
+    attrinfo[i].type = glow_eType_Float;
+    attrinfo[i++].size = sizeof(op->horiz_height);
+
+    strcpy(attrinfo[i].name, "HorizFixWidth");
+    attrinfo[i].value_p = &op->horiz_fix_width;
+    attrinfo[i].type = glow_eType_Int;
+    attrinfo[i++].size = sizeof(op->horiz_fix_width);
+
+    strcpy(attrinfo[i].name, "HorizFixHeight");
+    attrinfo[i].value_p = &op->horiz_fix_height;
+    attrinfo[i].type = glow_eType_Int;
+    attrinfo[i++].size = sizeof(op->horiz_fix_height);
+
+    strcpy(attrinfo[i].name, "LeftBorderWidth");
+    attrinfo[i].value_p = &op->left_border_width;
+    attrinfo[i].type = glow_eType_Float;
+    attrinfo[i++].size = sizeof(op->left_border_width);
+
+    strcpy(attrinfo[i].name, "RightBorderWidth");
+    attrinfo[i].value_p = &op->right_border_width;
+    attrinfo[i].type = glow_eType_Float;
+    attrinfo[i++].size = sizeof(op->right_border_width);
+
+    strcpy(attrinfo[i].name, "TopBorderWidth");
+    attrinfo[i].value_p = &op->top_border_width;
+    attrinfo[i].type = glow_eType_Float;
+    attrinfo[i++].size = sizeof(op->top_border_width);
+
+    strcpy(attrinfo[i].name, "BottomBorderWidth");
+    attrinfo[i].value_p = &op->bottom_border_width;
+    attrinfo[i].type = glow_eType_Float;
+    attrinfo[i++].size = sizeof(op->bottom_border_width);
+
+    strcpy(attrinfo[i].name, "FillModule");
+    attrinfo[i].value_p = &op->fill_module;
+    attrinfo[i].type = glow_eType_Int;
+    attrinfo[i++].size = sizeof(op->fill_module);
+    if (op->module_index == 0) {
+      strcpy(attrinfo[i].name, "WindowBorderWidth");
+      attrinfo[i].value_p = &op->window_border_width;
+      attrinfo[i].type = glow_eType_Float;
+      attrinfo[i++].size = sizeof(op->window_border_width);
+
+      strcpy(attrinfo[i].name, "WindowSwitchRatio");
+      attrinfo[i].value_p = &op->window_switch_ratio;
+      attrinfo[i].type = glow_eType_Float;
+      attrinfo[i++].size = sizeof(op->window_switch_ratio);
+    }
+    break;
+  }
   case glow_eObjectType_NodeClass: {
     GlowNodeClass* op = (GlowNodeClass*)object;
 
@@ -3630,6 +3835,11 @@ int grow_GetGraphAttrInfo(grow_tCtx ctx, grow_sAttrInfo** info, int* attr_cnt)
   attrinfo[i].value_p = ctx->color_theme;
   attrinfo[i].type = glow_eType_String;
   attrinfo[i++].size = sizeof(ctx->color_theme);
+
+  strcpy(attrinfo[i].name, "WindowResize");
+  attrinfo[i].value_p = &ctx->window_resize;
+  attrinfo[i].type = glow_eType_Int;
+  attrinfo[i++].size = sizeof(ctx->window_resize);
 
   strcpy(attrinfo[i].name, "Dashboard");
   attrinfo[i].value_p = &ctx->dashboard;
@@ -6213,6 +6423,11 @@ void grow_GetBorders(grow_tCtx ctx)
 void grow_DisableSubwindowEvents(grow_tCtx ctx, int disable)
 {
   ((GrowCtx*)ctx)->disable_subw_events = disable;
+}
+
+int grow_GetWindowResize(grow_tCtx ctx)
+{
+  return ((GrowCtx*)ctx)->window_resize;
 }
 
 /*@}*/

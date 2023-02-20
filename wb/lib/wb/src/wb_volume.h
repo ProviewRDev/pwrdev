@@ -46,7 +46,8 @@
 class wb_env;
 class wb_object;
 
-class wb_volume : public wb_status {
+class wb_volume : public wb_status
+{
 protected:
   wb_vrep* m_vrep;
 
@@ -60,31 +61,16 @@ public:
   wb_volume& operator=(const wb_volume& v);
 
   operator bool() const;
-  operator wb_vrep*() const
-  {
-    return m_vrep;
-  }
+  operator wb_vrep*() const { return m_vrep; }
   bool operator==(const wb_volume& v) const;
   bool operator!=(const wb_volume& v) const;
 
   wb_env env();
 
-  pwr_tVid vid() const
-  {
-    return m_vrep->vid();
-  }
-  pwr_tCid cid() const
-  {
-    return m_vrep->cid();
-  }
-  const char* name() const
-  {
-    return m_vrep->name();
-  }
-  ldh_eVolRep type() const
-  {
-    return m_vrep->type();
-  }
+  pwr_tVid vid() const { return m_vrep->vid(); }
+  pwr_tCid cid() const { return m_vrep->cid(); }
+  const char* name() const { return m_vrep->name(); }
+  ldh_eVolRep type() const { return m_vrep->type(); }
 
   wb_volume next() const;
 
@@ -94,8 +80,7 @@ public:
   wb_object object(const char* name) const;
   wb_object templateObject(pwr_tCid cid) const;
 
-  wb_attribute attribute(
-      pwr_tOid oid, const char* bname, const char* aname) const;
+  wb_attribute attribute(pwr_tOid oid, const char* bname, const char* aname) const;
   wb_attribute attribute(pwr_tOid oid, const char* bname) const;
   wb_attribute attribute(wb_object o, wb_adef adef)
   {
@@ -137,29 +122,25 @@ public:
 
   bool isLocal(wb_object& o) const;
 
-  bool createSnapshot(
-      const char* fileName, const pwr_tTime* time, const int rtonly)
+  bool createSnapshot(const char* fileName, const pwr_tTime* time, const int rtonly)
   {
     return m_vrep->createSnapshot(fileName, time, rtonly);
   }
   bool exportTree(wb_volume& import, pwr_tOid oid);
 
   pwr_tStatus syntaxCheck(int* errorcount, int* warningcount);
-  pwr_tStatus syntaxCheckObject(
-      wb_object& o, int* errorcount, int* warningcount);
-  pwr_tStatus syntaxCheckAttr(
-      wb_attribute& a, int* errorcount, int* warningcount);
-  pwr_tStatus triggSyntaxCheck(
-      wb_attribute& o, int* errorcount, int* warningcount);
+  pwr_tStatus syntaxCheckObject(wb_object& o, int* errorcount, int* warningcount);
+  pwr_tStatus syntaxCheckAttr(wb_attribute& a, int* errorcount, int* warningcount);
+  pwr_tStatus triggSyntaxCheck(wb_attribute& o, int* errorcount, int* warningcount);
   pwr_tStatus triggAnteAdopt(wb_object& o, pwr_tCid cid);
   pwr_tStatus triggAnteCreate(wb_object& father, pwr_tCid cid);
-  pwr_tStatus triggAnteMove(
-      wb_object& o, wb_object& father, wb_object& old_father);
+  pwr_tStatus triggAnteMove(wb_object& o, wb_object& father, wb_object& old_father);
   pwr_tStatus triggAnteUnadopt(wb_object& father, wb_object& o);
   pwr_tStatus triggPostAdopt(wb_object& father, wb_object& o);
   pwr_tStatus triggPostCreate(wb_object& o);
   pwr_tStatus triggPostMove(wb_object& o);
   pwr_tStatus triggPostUnadopt(wb_object& father, wb_object& o);
+  pwr_tStatus triggPostDelete(wb_object& o);
   pwr_tStatus triggPostRename(wb_object& o);
   pwr_tStatus triggPostCopy(wb_object& o, wb_object& so);
 

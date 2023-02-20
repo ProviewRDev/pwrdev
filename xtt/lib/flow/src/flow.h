@@ -362,7 +362,10 @@ typedef enum {
   flow_eTraceType_Boolean,
   flow_eTraceType_Int32,
   flow_eTraceType_Float32,
-  flow_eTraceType_User
+  flow_eTraceType_User,
+  flow_eTraceType_String80,
+  flow_eTraceType_AttrRef,
+  flow_eTraceType_DataRef
 } flow_eTraceType;
 
 typedef enum { flow_eSaveMode_Edit, flow_eSaveMode_Trace } flow_eSaveMode;

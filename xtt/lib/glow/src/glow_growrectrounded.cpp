@@ -59,7 +59,8 @@ GrowRectRounded::GrowRectRounded(GrowCtx* glow_ctx, const char* name, double x,
       border(display_border), dynamic(0), dynamicsize(0), round_amount(15),
       shadow(display_shadow), shadow_width(5), relief(glow_eRelief_Up),
       shadow_contrast(2), disable_shadow(0), gradient(glow_eGradient_No),
-      gradient_contrast(4), disable_gradient(0), fixposition(0), transparency(0)
+      gradient_contrast(4), disable_gradient(0), fixposition(0), transparency(0),
+      thin_shadow(0)
 {
   strcpy(n_name, name);
   pzero.nav_zoom();
@@ -287,6 +288,7 @@ void GrowRectRounded::save(std::ofstream& fp, glow_eSaveMode mode)
   fp << int(glow_eSave_GrowRectRounded_fixposition) << FSPACE << fixposition
      << '\n';
   fp << int(glow_eSave_GrowRectRounded_transparency) << FSPACE << transparency << '\n';
+  fp << int(glow_eSave_GrowRectRounded_thin_shadow) << FSPACE << thin_shadow << '\n';
   fp << int(glow_eSave_GrowRectRounded_dynamicsize) << FSPACE << dynamicsize
      << '\n';
   fp << int(glow_eSave_GrowRectRounded_dynamic) << '\n';
@@ -391,6 +393,9 @@ void GrowRectRounded::open(std::ifstream& fp)
       break;
     case glow_eSave_GrowRectRounded_transparency:
       fp >> transparency;
+      break;
+    case glow_eSave_GrowRectRounded_thin_shadow:
+      fp >> thin_shadow;
       break;
     case glow_eSave_GrowRectRounded_dynamicsize:
       fp >> dynamicsize;
@@ -756,6 +761,10 @@ void GrowRectRounded::draw(GlowWind* w, GlowTransform* t, int highlight,
     int ish = int(shadow_width / 100 * MIN(ur_x - ll_x, ur_y - ll_y) + 0.5);
     int display_shadow
         = ((node && ((GrowNode*)node)->shadow) || shadow) && !disable_shadow;
+    if (thin_shadow) {
+      ish = int(shadow_width + 0.5);
+      display_shadow = 0;
+    }
     glow_eDrawType fillcolor = ctx->get_drawtype(fill_drawtype,
         glow_eDrawType_FillHighlight, highlight, (GrowNode*)colornode, 1);
     glow_eGradient grad = gradient;
@@ -807,6 +816,41 @@ void GrowRectRounded::draw(GlowWind* w, GlowTransform* t, int highlight,
         ctx->gdraw->gradient_fill_rectrounded(w, ll_x, ll_y, ur_x - ll_x,
             ur_y - ll_y, amount, fillcolor, f1, f2,
 	    ctx->gdraw->gradient_rotate(rotation, grad), transp);
+      }
+      if (thin_shadow) {
+	int idp = ish/2 + 1;
+	int drawtype_incr = shadow_contrast;
+	if (relief == glow_eRelief_Down)
+	  drawtype_incr = -shadow_contrast;
+	drawtype = ctx->shift_drawtype(
+	    fillcolor, -drawtype_incr + chot, (GrowNode*)colornode);
+
+	ctx->gdraw->line(
+	    w, ll_x + amount, ll_y + idp, ur_x - amount, ll_y + idp, drawtype, ish,
+            0, transp);
+	ctx->gdraw->line(
+            w, ll_x + idp, ll_y + amount, ll_x + idp, ur_y - amount, drawtype, ish, 0, transp);
+	ctx->gdraw->arc(w, ll_x + idp, ur_y - 2 * amount + idp, 2 * (amount - idp), 
+            2 * (amount - idp), 180, 30, drawtype, ish, 0, transp);
+	ctx->gdraw->arc(
+	    w, ll_x + idp, ll_y + idp, 2 * (amount - idp), 2 * (amount - idp), 
+            90, 90, drawtype, ish, 0, transp);
+	ctx->gdraw->arc(w, ur_x - 2 * amount + idp, ll_y + idp, 2 * (amount - idp), 
+	    2 * (amount - idp), 60, 30, drawtype, ish, 0, transp);
+
+	drawtype = ctx->shift_drawtype(
+	    fillcolor, drawtype_incr + chot, (GrowNode*)colornode);
+
+	ctx->gdraw->line(
+            w, ll_x + amount, ur_y - idp, ur_x - amount, ur_y - idp, drawtype, ish, 0, transp);
+	ctx->gdraw->line(
+            w, ur_x - idp, ll_y + amount, ur_x - idp, ur_y - amount, drawtype, ish, 0, transp);
+	ctx->gdraw->arc(w, ll_x + idp, ur_y - 2 * amount + idp, 2 * (amount - idp), 
+            2 * (amount - idp), 210, 60, drawtype, ish, 0, transp);
+	ctx->gdraw->arc(w, ur_x - 2 * amount + idp, ur_y - 2 * amount + idp, 2 * (amount - idp),
+	    2 * (amount - idp), 270, 90, drawtype, ish, 0, transp);
+	ctx->gdraw->arc(w, ur_x - 2 * amount + idp, ll_y + idp, 2 * (amount - idp), 
+	    2 * (amount - idp), 0, 30, drawtype, ish, 0, transp);
       }
     } else {
       int drawtype_incr = shadow_contrast;
@@ -1126,9 +1170,9 @@ void GrowRectRounded::flip(double x0, double y0, glow_eFlipDirection dir)
   }
 }
 
-int GrowRectRounded::export_script(GlowExportScript* es)
+int GrowRectRounded::export_script(GlowExportScript* es, void* o, void* m)
 {
-  return es->rectrounded(this);
+  return es->rectrounded(this, o, m);
 }
 
 void GrowRectRounded::convert(glow_eConvert version)

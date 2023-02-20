@@ -4,12 +4,8 @@ include $(pwre_dir_symbols)
 
 -include special.mk
 
-copy :        $(exe_dir)/profinet_vendorid.dat $(exe_dir)/profinet_deviceid.dat
+copy :        $(exe_dir)/profinet_devices.xml
 
-$(exe_dir)/profinet_vendorid.dat : profinet_vendorid.dat
-	@ $(log_h_h)
-	@ $(cp) $(cpflags) $(source) $(target)
-
-$(exe_dir)/profinet_deviceid.dat : profinet_deviceid.dat
+$(exe_dir)/profinet_devices.xml : profinet_devices.xml
 	@ $(log_h_h)
 	@ $(cp) $(cpflags) $(source) $(target)

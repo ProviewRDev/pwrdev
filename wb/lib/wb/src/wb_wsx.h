@@ -56,6 +56,9 @@ typedef enum {
 pwr_tStatus wsx_error_msg(ldh_tSesContext sesctx, pwr_tStatus sts,
     pwr_tAttrRef aref, int* errorcount, int* warningcount);
 
+pwr_tStatus wsx_error_msg_object(ldh_tSesContext sesctx, pwr_tStatus sts,
+    pwr_tOid oid, int* errorcount, int* warningcount);
+
 pwr_tStatus wsx_error_msg_str(ldh_tSesContext sesctx, const char* str,
     pwr_tAttrRef aref, int severity, int* errorcount, int* warningcount);
 

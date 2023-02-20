@@ -54,8 +54,7 @@
 // Static member variables
 char GsdmlAttr::value_recall[30][160];
 
-void GsdmlAttr::gsdmlattr_message(void* attr, char severity,
-                                  const char* message)
+void GsdmlAttr::gsdmlattr_message(void* attr, char severity, const char* message)
 {
   ((GsdmlAttr*)attr)->message(severity, message);
 }
@@ -75,8 +74,8 @@ void GsdmlAttr::activate_exit()
   {
     if (edit_mode && attrnav->is_modified())
     {
-      wow->DisplayQuestion((void*)this, "Apply", "Do you want to apply changes",
-                           cmd_close_apply_cb, cmd_close_no_cb, 0);
+      wow->DisplayQuestion((void*)this, "Apply", "Do you want to apply changes", cmd_close_apply_cb,
+                           cmd_close_no_cb, 0);
     }
     else
       (close_cb)(parent_ctx);
@@ -85,19 +84,14 @@ void GsdmlAttr::activate_exit()
     delete this;
 }
 
-void GsdmlAttr::activate_ordermoduletype(attr_eOrderModuleType type)
-{
-  attrnav->set_order_moduletype(type);
-}
+void GsdmlAttr::activate_ordermoduletype(attr_eOrderModuleType type) { attrnav->set_order_moduletype(type); }
 
 void GsdmlAttr::activate_help()
 {
   int sts;
 
   if (help_cb)
-    sts = (help_cb)(
-        parent_ctx,
-        "pn_device_editor /helpfile=\"$pwr_exe/profibus_xtthelp.dat\"");
+    sts = (help_cb)(parent_ctx, "pn_device_editor /helpfile=\"$pwr_exe/profibus_xtthelp.dat\"");
 }
 
 void GsdmlAttr::activate_copy()
@@ -108,41 +102,24 @@ void GsdmlAttr::activate_copy()
   sts = attrnav->get_select((ItemPn**)&item);
   if (EVEN(sts))
   {
-    message('E', "Select a module");
+    message('W', "Nothing selected");
     return;
   }
 
-  if (item->type != attrnav_eItemType_PnSlot)
+  if (item->m_type & attrnav_mItemType_Copyable)
   {
-    message('E', "Only slots can be copied");
+    // Save a static reference, enabling us to copy between different devices across different configurators.
+    // The slots themself will reset if they do not find the ID. I.e. you copy from an ET200SP to
+    // an ABB Frequency Converter :D It's stupid but still safe...
+    ProfinetRuntimeData::m_paste_slotdata = item->m_slot_data;
+  }
+  else
+  {
+    message('E', "You can only copy slots!");
     return;
   }
-
-  attrnav->dev_data.copy_slot(item->slotdata->slot_idx);
 
   message('I', "Slot copied");
-}
-
-void GsdmlAttr::activate_cut()
-{
-  ItemPnSlot* item;
-  int sts;
-
-  sts = attrnav->get_select((ItemPn**)&item);
-  if (EVEN(sts))
-  {
-    message('E', "Select a slot");
-    return;
-  }
-
-  if (item->type != attrnav_eItemType_PnSlot)
-  {
-    message('E', "Only slots can be cut");
-    return;
-  }
-
-  attrnav->dev_data.cut_slot(item->slotdata->slot_idx);
-  attrnav->redraw();
 }
 
 void GsdmlAttr::activate_paste()
@@ -157,13 +134,19 @@ void GsdmlAttr::activate_paste()
     return;
   }
 
-  if (item->type != attrnav_eItemType_PnSlot)
+  if (item->m_type & attrnav_mItemType_Movable)
+  {
+    // Copy assignment constructor of ProfinetSlot will invoke ProfinetSubslot copy constructor to deep copy
+    // the data
+    attrnav->pn_runtime_data->m_PnDevice->m_slot_list[item->m_slot_data->m_slot_number] =
+        *ProfinetRuntimeData::m_paste_slotdata;
+  }
+  else
   {
     message('E', "Select a slot");
     return;
   }
 
-  attrnav->dev_data.paste_slot(item->slotdata->slot_idx);
   attrnav->redraw();
 }
 
@@ -214,13 +197,13 @@ void GsdmlAttr::activate_cmd_ok()
 {
   int sts;
 
-  attrnav->save(data_filename);
+  attrnav->save();
 
   if (save_cb)
   {
     sts = (save_cb)(parent_ctx);
     if (EVEN(sts))
-      message('E', "Error saving profibus data");
+      message('E', "Error saving profinet runtime data");
     else if (close_cb)
       (close_cb)(parent_ctx);
   }
@@ -232,15 +215,15 @@ void GsdmlAttr::activate_cmd_apply()
 {
   int sts;
 
-  attrnav->save(data_filename);
+  attrnav->save();
 
   if (save_cb)
   {
     sts = (save_cb)(parent_ctx);
     if (EVEN(sts))
-      message('E', "Error saving profibus data");
+      message('E', "Error creating modules/channels.");
     else
-      attrnav->set_modified(0);
+      attrnav->set_modified(false);
   }
 }
 
@@ -249,13 +232,13 @@ void GsdmlAttr::cmd_close_apply_cb(void* ctx, void* data)
   GsdmlAttr* attr = (GsdmlAttr*)ctx;
   int sts;
 
-  attr->attrnav->save(attr->data_filename);
+  attr->attrnav->save();
 
   if (attr->save_cb)
   {
     sts = (attr->save_cb)(attr->parent_ctx);
     if (EVEN(sts))
-      attr->message('E', "Error saving profibus data");
+      attr->message('E', "Error saving profinet runtime data");
     else
       (attr->close_cb)(attr->parent_ctx);
   }
@@ -268,30 +251,30 @@ void GsdmlAttr::cmd_close_no_cb(void* ctx, void* data)
   (attr->close_cb)(attr->parent_ctx);
 }
 
+/* Activate command cancel */
+/* This cancels the configuration asking the user if that's really what he/she wants. */
 void GsdmlAttr::activate_cmd_ca()
 {
   if (close_cb)
   {
     if (edit_mode && attrnav->is_modified())
     {
-      wow->DisplayQuestion((void*)this, "Apply", "Do you want to apply changes",
-                           cmd_close_apply_cb, cmd_close_no_cb, 0);
+      wow->DisplayQuestion((void*)this, "Cancel", "All changes will be lost. Are you sure?", cmd_close_no_cb,
+                           [](void* ctx, void* data) { /* NOOP */ }, 0);
     }
     else
       (close_cb)(parent_ctx);
   }
 }
 
-GsdmlAttr::~GsdmlAttr() {
+GsdmlAttr::~GsdmlAttr()
+{
   if (wow)
     delete wow;
 }
 
-GsdmlAttr::GsdmlAttr(void* a_parent_ctx, void* a_object, pn_gsdml* a_gsdml,
-                     int a_edit_mode, const char* a_data_filename)
-    : parent_ctx(a_parent_ctx), gsdml(a_gsdml), edit_mode(a_edit_mode),
-      input_open(0), object(a_object), close_cb(0), save_cb(0), help_cb(0),
-      client_data(0), recall_idx(-1), value_current_recall(0)
+GsdmlAttr::GsdmlAttr(void* a_parent_ctx, void* a_object, int a_edit_mode)
+    : parent_ctx(a_parent_ctx), edit_mode(a_edit_mode), input_open(0), object(a_object), close_cb(0),
+      save_cb(0), help_cb(0), client_data(0), recall_idx(-1), value_current_recall(0)
 {
-  dcli_translate_filename(data_filename, a_data_filename);
 }

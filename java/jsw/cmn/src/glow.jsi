@@ -1443,6 +1443,7 @@ var Glow = {
   eSave_GrowRectRounded_disable_gradient : 3821,
   eSave_GrowRectRounded_fixposition  	: 3822,
   eSave_GrowRectRounded_transparency 	: 3823,
+  eSave_GrowRectRounded_thin_shadow 	: 3824,
   eSave_GrowConGlue_line_width_up 	: 3900,
   eSave_GrowConGlue_line_width_down 	: 3901,
   eSave_GrowConGlue_line_width_left 	: 3902,
@@ -4110,6 +4111,8 @@ function GlowArrayElem() {
   }
   this.storeBorders = function() {
   }
+  this.get_borders = function(t, g) {
+  }
 }
 
 function GrowNode( ctx) {
@@ -6540,6 +6543,7 @@ function GrowRectRounded( ctx) {
   this.dynamicsize = 0;    
   this.trf = new GlowTransform();
   this.round_amount = 15;
+  this.thin_shadow = 0;
   this.userdata = null;
 
   this.ll = new GlowPoint( this.ctx);
@@ -6646,6 +6650,9 @@ function GrowRectRounded( ctx) {
 	break;
       case Glow.eSave_GrowRectRounded_disable_gradient:
 	this.disable_gradient = parseInt(tokens[1], 10);
+	break;
+      case Glow.eSave_GrowRectRounded_thin_shadow:
+	this.thin_shadow = parseInt(tokens[1], 10);
 	break;
       case Glow.eSave_GrowRectRounded_dynamicsize:
 	this.dynamicsize = parseInt(tokens[1], 10);
@@ -6788,6 +6795,10 @@ function GrowRectRounded( ctx) {
 
       var ish = Math.floor( this.shadow_width / 100 * Math.min(ur_x - ll_x, ur_y - ll_y) + 0.5);
       var display_shadow = ((node !== null && node.shadow !== 0) || this.shadow !== 0) && this.disable_shadow === 0;
+      if (this.thin_shadow !== 0) {
+        ish = Math.floor(this.shadow_width  + 0.5);
+        display_shadow = 0;
+      }
       var fillcolor = GlowColor.get_drawtype( this.fill_drawtype, Glow.eDrawType_FillHighlight,
 					      highlight, colornode, 1, 0);
 
@@ -6834,6 +6845,37 @@ function GrowRectRounded( ctx) {
 	  this.ctx.gdraw.gradient_fill_rectrounded( ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, amount,
 	      fillcolor, fa1, fa2, this.ctx.gdraw.gradient_rotate( rotationa, grad), transp);	
 	}
+	if (this.thin_shadow !== 0) {
+	  var idp = ish/2 + 1;
+	  var drawtype_incr = this.shadow_contrast;
+	  if (this.relief == Glow.eRelief_Down)
+	    drawtype_incr = -this.shadow_contrast;
+	  drawtype = GlowColor.shift_drawtype(fillcolor, -drawtype_incr + chot, colornode);
+
+	  this.ctx.gdraw.line(ll_x + amount, ll_y + idp, ur_x - amount, ll_y + idp, drawtype, ish,
+              0, transp);
+ 	  this.ctx.gdraw.line(ll_x + idp, ll_y + amount, ll_x + idp, ur_y - amount, drawtype, ish, 
+              0, transp);
+	  this.ctx.gdraw.arc(ll_x + idp, ur_y - 2 * amount + idp, 2 * (amount - idp), 
+              2 * (amount - idp), 180, 30, drawtype, ish, 0, transp);
+	  this.ctx.gdraw.arc(ll_x + idp, ll_y + idp, 2 * (amount - idp), 2 * (amount - idp), 
+              90, 90, drawtype, ish, 0, transp);
+	  this.ctx.gdraw.arc(ur_x - 2 * amount + idp, ll_y + idp, 2 * (amount - idp), 
+	      2 * (amount - idp), 60, 30, drawtype, ish, 0, transp);
+
+	  drawtype = GlowColor.shift_drawtype(fillcolor, drawtype_incr + chot, colornode);
+
+	  this.ctx.gdraw.line(ll_x + amount, ur_y - idp, ur_x - amount, ur_y - idp, drawtype, ish, 
+              0, transp);
+	  this.ctx.gdraw.line(ur_x - idp, ll_y + amount, ur_x - idp, ur_y - amount, drawtype, ish, 
+              0, transp);
+	  this.ctx.gdraw.arc(ll_x + idp, ur_y - 2 * amount + idp, 2 * (amount - idp), 
+              2 * (amount - idp), 210, 60, drawtype, ish, 0, transp);
+	  this.ctx.gdraw.arc(ur_x - 2 * amount + idp, ur_y - 2 * amount + idp, 2 * (amount - idp),
+	      2 * (amount - idp), 270, 90, drawtype, ish, 0, transp);
+	  this.ctx.gdraw.arc(ur_x - 2 * amount + idp, ll_y + idp, 2 * (amount - idp), 
+	      2 * (amount - idp), 0, 30, drawtype, ish, 0, transp);
+        }
       }
       else {
 
@@ -6992,6 +7034,48 @@ function GrowRectRounded( ctx) {
   };
   this.storeTransform = function() {
     this.trf.store();
+  };
+  this.get_borders = function( t, g) {
+    var ll_x, ur_x, ll_y, ur_y, x1, x2, y1, y2;
+
+    if ( t !== null) {
+      x1 = this.trf.x( t, this.ll.x, this.ll.y);
+      x2 = this.trf.x( t, this.ur.x, this.ur.y);
+      y1 = this.trf.y( t, this.ll.x, this.ll.y);
+      y2 = this.trf.y( t, this.ur.x, this.ur.y);
+    }
+    else {
+      x1 = this.trf.x( this.ll.x, this.ll.y);
+      x2 = this.trf.x( this.ur.x, this.ur.y);
+      y1 = this.trf.y( this.ll.x, this.ll.y);
+      y2 = this.trf.y( this.ur.x, this.ur.y);
+    }
+
+    ll_x = Math.min( x1, x2);
+    ur_x = Math.max( x1, x2);
+    ll_y = Math.min( y1, y2);
+    ur_y = Math.max( y1, y2);
+    
+    if ( ll_x < g.ll_x)
+      g.ll_x = ll_x;
+    if ( ur_x > g.ur_x)
+      g.ur_x = ur_x;
+    if ( ll_y < g.ll_y)
+      g.ll_y = ll_y;
+    if ( ur_y > g.ur_y)
+      g.ur_y = ur_y;
+    return g;
+  };
+
+  this.get_node_borders = function() { 
+    var g = new GlowGeometry();
+    g.ll_x = g.ll_y = 1e37;
+    g.ur_x = g.ur_y = -1e37;
+    this.get_borders( null, g);
+    this.x_left = g.ll_x;
+    this.x_right = g.ur_x;
+    this.y_low = g.ll_y;
+    this.y_high = g.ur_y;
   };
 }
 GrowRectRounded.prototype = Object.create(GlowArrayElem.prototype);
@@ -18693,6 +18777,10 @@ function GrowApi() {
     ctx.customcolors.read_colorfile(ctx, cname);
     ctx.gdraw.push_customcolors(ctx.customcolors);
   }
+  this.SetColorTheme = function(ctx) {
+    // TODO
+    this.UpdateColorTheme(ctx, 1);
+  }
   this.SetObjectAttribute = function(o, name, value) {
     switch (o.type()) {
 
@@ -18796,6 +18884,10 @@ function GrowApi() {
       }
       else if (name === "transparency") {
 	o.transparency = value;
+	return 1;
+      }
+      else if (name === "thin_shadow") {
+	o.thin_shadow = value;
 	return 1;
       }
       else if (name === "disable_shadow") {

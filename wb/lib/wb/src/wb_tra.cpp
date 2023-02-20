@@ -99,6 +99,9 @@ static pwr_tStatus trace_get_attr_m6(WGre* gre, vldh_t_node node,
 static pwr_tStatus trace_get_attr_m7(WGre* gre, vldh_t_node node,
     char* debug_par, char* object_str, char* attr_str,
     flow_eTraceType* trace_type, int* inverted);
+static pwr_tStatus trace_get_attr_m8(WGre* gre, vldh_t_node node,
+    char* debug_par, char* object_str, char* attr_str,
+    flow_eTraceType* trace_type, int* inverted);
 static pwr_tStatus trace_get_attr_m9(WGre* gre, vldh_t_node node,
     char* debug_par, char* object_str, char* attr_str,
     flow_eTraceType* trace_type, int* inverted);
@@ -111,7 +114,7 @@ pwr_tStatus trace_get_attr_mno(WGre* gre, vldh_t_node node, char* debug_par,
 
 tra_tMethod trace_get_attr_m[TRA_MAX_TRACEMETHOD] = { trace_get_attr_m0,
   trace_get_attr_m1, trace_get_attr_m2, trace_get_attr_m3, trace_get_attr_m4,
-  trace_get_attr_m5, trace_get_attr_m6, trace_get_attr_m7, trace_get_attr_mno,
+  trace_get_attr_m5, trace_get_attr_m6, trace_get_attr_m7, trace_get_attr_m8,
   trace_get_attr_m9 };
 
 int trace_get_attributes(WGre* gre, vldh_t_node node, char* object_str,
@@ -748,6 +751,73 @@ pwr_tStatus trace_get_attr_con(WGre* gre, vldh_t_con con, const char* debug_par,
 
   par_type = bodydef[i].Par->Param.Info.Type;
   switch (par_type) {
+  case pwr_eType_Boolean:
+    *trace_type = flow_eTraceType_Boolean;
+    break;
+  case pwr_eType_Int32:
+    *trace_type = flow_eTraceType_Int32;
+    break;
+  case pwr_eType_Float32:
+    *trace_type = flow_eTraceType_Float32;
+    break;
+  default:
+    *trace_type = flow_eTraceType_Int32;
+    break;
+  }
+
+  return TRA__SUCCESS;
+}
+
+/*************************************************************************
+*
+* Name:		trace_getm8 ()
+*
+* Type		int
+*
+* Type		Parameter	IOGF	Description
+* tra_ctx	tractx		I	trace context
+* tra_t_tranode	*tranode_ptr    O	pointer to a tranode to fill up.
+* int		*nb_ptr		IO	irrelevant for this method
+*
+* Description:
+* In this method the parameter to trace is a child of the rtbody which name
+* is given by 'debugpar' in the graphplcnode, where the attribute can be in
+* a bus.
+**************************************************************************/
+
+static pwr_tStatus trace_get_attr_m8(WGre* gre, vldh_t_node node,
+    char* debug_par, char* object_str, char* attr_str,
+    flow_eTraceType* trace_type, int* inverted)
+{
+  pwr_tStatus sts;
+  int size;
+  pwr_tAName name;
+  pwr_tAttrRef aref;
+  pwr_tTid tid;
+
+  *inverted = 0;
+
+  /* Get the name of the object */
+  sts = ldh_ObjidToName(node->hn.wind->hw.ldhses, node->ln.oid,
+      ldh_eName_Hierarchy, name, sizeof(name), &size);
+  if (EVEN(sts))
+    return sts;
+
+  strcpy(object_str, name);
+  strcpy(attr_str, debug_par);
+
+  strcat(name, ".");
+  strcat(name, debug_par);
+
+  sts = ldh_NameToAttrRef(node->hn.wind->hw.ldhses, name, &aref);
+  if (EVEN(sts))
+    return sts;
+
+  sts = ldh_GetAttrRefTid(node->hn.wind->hw.ldhses, &aref, &tid);
+  if (EVEN(sts))
+    return sts;
+
+  switch (tid) {
   case pwr_eType_Boolean:
     *trace_type = flow_eTraceType_Boolean;
     break;

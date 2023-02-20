@@ -265,6 +265,9 @@ sub build_kernel # args: flavour
   _module("nmps");
   build_module("copy", $flavour);
   merge();
+  _module("dataq");
+  build_module("copy", $flavour);
+  merge();
   _module("remote");
   build_module("copy", $flavour);
   merge();
@@ -348,6 +351,9 @@ sub ebuild # args: pass flavour
     _module("nmps");
     _build("lib","nmps","src","copy");
     merge();
+    _module("dataq");
+    _build("lib","dataq","src","copy");
+    merge();
     _module("rt");
     _build("msg", "*", "src", "all");
     _build("lib", "rt", "src", "init");
@@ -395,6 +401,12 @@ sub ebuild # args: pass flavour
       merge();
       _module("nmps");
       _build("lib", "nmps", "src", "all");
+      merge();
+    }
+    if ($to_build{"dataq"}) {
+      merge();
+      _module("dataq");
+      _build("lib", "dataq", "src", "all");
       merge();
     }
     if ($to_build{"bcomp"}) {
@@ -608,6 +620,8 @@ sub import()
     merge();
     _module("nmps");
     merge();
+    _module("dataq");
+    merge();
     _module("opc");
     merge();
     _module("profibus");
@@ -634,6 +648,9 @@ sub build_all_modules()
 
   build_kernel($flavour);
   _module("nmps");
+  build_module($flavour);
+  merge();
+  _module("dataq");
   build_module($flavour);
   merge();
   _module("tlog");
@@ -719,6 +736,8 @@ sub clean_exe_all()
   _build("exe","*","src","clean_exe");
   _module("nmps");
   _build("exe","*","src","clean_exe");
+  _module("dataq");
+  _build("exe","*","src","clean_exe");
   _module("tlog");
   _build("exe","*","src","clean_exe");
   _module("remote");
@@ -743,6 +762,11 @@ sub build_all_wbl()
   my($load_dir) = $ENV{"pwr_load"};
   system("rm $load_dir/*.dbs");
   _build("wbl", "nmps", "src", "lib");
+  merge();
+  _module("dataq");
+  my($load_dir) = $ENV{"pwr_load"};
+  system("rm $load_dir/*.dbs");
+  _build("wbl", "dataq", "src", "lib");
   merge();
   _module("tlog");
   my($load_dir) = $ENV{"pwr_load"};
@@ -895,6 +919,8 @@ sub create_all_modules()
   create_module();
   _module("nmps");
   create_module();
+  _module("dataq");
+  create_module();
   _module("tlog");
   create_module();
   _module("remote");
@@ -971,6 +997,7 @@ sub build_module()
   my($einc) = $ENV{"pwr_einc"};
   my($remoteclasses) = $einc . "/pwr_remoteclasses.h";
   my($nmpsclasses) = $einc . "/pwr_nmpsclasses.h";
+  my($dataqclasses) = $einc . "/pwr_dataqclasses.h";
   my($profibusclasses) = $einc . "/pwr_profibussclasses.h";
   my($bcompclasses) = $einc . "/pwr_basecomponentsclasses.h";
   my($otherioclasses) = $einc . "/pwr_otherioclasses.h";
@@ -1016,6 +1043,12 @@ sub build_module()
         _build("wbl", "nmps", "src", "init");
         _build("wbl", "nmps", "src", "copy");
         merge("inc/pwr_nmpsclasses.h");
+      }
+      if (! -e $dataqclasses ) {
+        _module("dataq");
+        _build("wbl", "dataq", "src", "init");
+        _build("wbl", "dataq", "src", "copy");
+        merge("inc/pwr_dataqclasses.h");
       }
       if (! -e $remoteclasses ) {
         _module("remote");

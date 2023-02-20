@@ -1056,7 +1056,7 @@ void GrowText::export_flow(GlowExportFlow* ef)
   ef->text(this);
 }
 
-int GrowText::export_script(GlowExportScript* es)
+int GrowText::export_script(GlowExportScript* es, void* o, void* m)
 {
-  return es->text(this);
+  return es->text(this, o, m);
 }

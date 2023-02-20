@@ -173,7 +173,8 @@ typedef enum {
   ge_mOptions_IsMain = 1 << 6,
   ge_mOptions_HideCloseButton = 1 << 7,
   ge_mOptions_HideDecorations = 1 << 8,
-  ge_mOptions_Dialog = 1 << 9
+  ge_mOptions_Dialog = 1 << 9,
+  ge_mOptions_ResizeFree = 1 << 10
 } ge_mOptions;
 
 typedef enum {

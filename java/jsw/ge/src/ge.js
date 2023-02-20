@@ -320,6 +320,7 @@ var DynC = {
   eSave_Invisible_dimmed     		: 901,
   eSave_Invisible_instance   		: 902,
   eSave_Invisible_instance_mask 	: 903,
+  eSave_Invisible_dim_level           	: 904,
   eSave_DigBorder_attribute  		: 1000,
   eSave_DigBorder_color      		: 1001,
   eSave_DigText_attribute    		: 1100,
@@ -3276,6 +3277,7 @@ function DynInvisible( dyn, instance) {
   this.a;
   this.attribute = null;
   this.dimmed = 0;
+  this.dim_level = 0;
   this.firstScan = true;
   this.cmd;
   this.command;
@@ -3288,19 +3290,24 @@ function DynInvisible( dyn, instance) {
     }
     var inst = this.dyn.instance_number(this.instance);
     var iname;
-    var inames = new Array(2);
+    var inames = new Array(3);
     if (inst == 1)
       iname = "Invisible";
     else
       iname = "Invisible" + inst.toString();
     inames[0] = iname + ".Attribute";
     inames[1] = iname + ".Dimmed";
+    inames[2] = iname + ".DimLevel";
     if (name === inames[0]) {
       this.attribute =  value;
       return 1;
     }
     else if (name === inames[1]) {
       this.dimmed =  value;
+      return 1;
+    }
+    else if (name === inames[2]) {
+      this.dim_level =  value;
       return 1;
     }
     return 0;
@@ -3314,13 +3321,14 @@ function DynInvisible( dyn, instance) {
     }
     var inst = this.dyn.instance_number(this.instance);
     var iname;
-    var inames = new Array(2);
+    var inames = new Array(3);
     if (inst == 1)
       iname = "Invisible";
     else
       iname = "Invisible" + inst.toString();
     inames[0] = iname + ".Attribute";
     inames[1] = iname + ".Dimmed";
+    inames[2] = iname + ".DimLevel";
     if (name === inames[0]) {
       ret.value = this.attribute;
       ret.decl = CcmC.K_DECL_STRING;
@@ -3329,6 +3337,11 @@ function DynInvisible( dyn, instance) {
     else if (name === inames[1]) {
       ret.value = this.dimmed;
       ret.decl = CcmC.K_DECL_INT;
+      return ret;
+    }
+    else if (name === inames[2]) {
+      ret.value = this.dim_level;
+      ret.decl = CcmC.K_DECL_FLOAT;
       return ret;
     }
     ret.sts = 0;
@@ -3403,8 +3416,11 @@ function DynInvisible( dyn, instance) {
     if ( value) {
       if ( this.dimmed === 0)
 	o.setVisibility( Glow.eVis_Invisible);
-      else
+      else {
 	o.setVisibility( Glow.eVis_Dimmed);
+	if (this.dim_level !== 0)
+	  o.setTransparency(this.dim_level);
+      }
       this.dyn.ignoreColor = true;
       this.dyn.ignoreInvisible = true;
     }
@@ -3412,6 +3428,8 @@ function DynInvisible( dyn, instance) {
       o.setVisibility( Glow.eVis_Visible);
       this.dyn.resetColor = true;
       this.dyn.resetInvisible = true;
+      if (this.dim_level !== 0)
+	o.setTransparency(0);
     }
     this.dyn.repaintNow = true;
     this.a.oldValue = value;
@@ -3439,6 +3457,9 @@ function DynInvisible( dyn, instance) {
 	break;
       case DynC.eSave_Invisible_dimmed: 
 	this.dimmed = parseInt(tokens[1], 10);
+	break;
+      case DynC.eSave_Invisible_dim_level: 
+	this.dim_level = parseFloat(tokens[1]);
 	break;
       case DynC.eSave_Invisible_instance: 
 	this.instance = parseInt(tokens[1], 10);
@@ -4083,6 +4104,34 @@ function DynValue( dyn) {
     this.a.disconnect(this.dyn);
   };
 
+  this.month = function(str) {
+    if (str === "JAN")
+      return "01";
+    if (str === "FEB")
+      return "02";
+    if (str === "MAR")
+      return "03";
+    if (str === "APR")
+      return "04";
+    if (str === "MAY")
+      return "05";
+    if (str === "JUN")
+      return "06";
+    if (str === "JUL")
+      return "07";
+    if (str === "AUG")
+      return "08";
+    if (str === "SEP")
+      return "09";
+    if (str === "OCT")
+      return "10";
+    if (str === "NOV")
+      return "11";
+    if (str === "DEC")
+      return "12";
+    return str;
+  }
+
   this.scan = function( object) {
     if ( !this.a.sts)
       return;
@@ -4149,14 +4198,36 @@ function DynValue( dyn) {
 	return;
 
       if ( this.firstScan || !(value0 == this.oldValueS)) {
-	if ( this.cFormat !== null) {
-	  if ( this.a_typeid == Pwr.eType_String) {
+	switch ( this.a.typeid) {
+	case Pwr.eType_String: {
+	  if ( this.cFormat !== null) {
 	    var sb = this.cFormat.format( value0);
 	    object.setAnnotation( annot_num, sb);
 	  }
+	  break;
+	}
+	case Pwr.eType_Time: {
+	  var timstr;
+	  if (this.format === "%1t")
+	    timstr = value0.substring(12,20);
+	  else if (this.format === "%2t")
+	    timstr = value0.substring(12);
+	  else if (this.format === "%3t")
+	    timstr = value0.substring(9,11)+"-"+this.month(value0.substring(3,6))+
+               "-"+value0.substring(0,2)+value0.substring(11,20);
+	  else if (this.format === "%4t")
+	    timstr = value0.substring(0,11);
+	  else if (this.format === "%5t")
+	    timstr = value0.substring(9,11)+"-"+this.month(value0.substring(3,6))+
+                "-"+value0.substring(0,2);
 	  else
-	    // TODO time format
-	    object.setAnnotation( annot_num, value0);
+	    timstr = value0;
+	  
+	  object.setAnnotation( annot_num, timstr);
+	  break;
+	}
+	default:
+	  object.setAnnotation( annot_num, value0);
 	}
 	this.dyn.repaintNow = true;
 	this.oldValueS = value0;
@@ -17757,6 +17828,7 @@ function Graph( appl) {
   this.graphConfiguration = 0;
 
 #jsc_include gescript.jsi
+#jsc_include gelayout.jsi
 
   if ( typeof InstallTrigger !== 'undefined') {
     // Firefox is not os fast...
@@ -17798,18 +17870,19 @@ function Graph( appl) {
         var sg = buffer.substring(bix+17, idx);
 	width = parseInt(sg, 10);
         bix = idx + 1;
-        console.log("Height", buffer.substring(bix,18));
+        console.log("DefaultWidth", width);
       }
       if (buffer.substring(bix, bix+18) === "!** DefaultHeight:") {
         var idx = buffer.indexOf('\n', bix);
         var sg = buffer.substring(bix+18, idx);
 	height = parseInt(sg, 10);
         bix = idx + 1;
+        console.log("DefaultHeight", height);
       }
       if (width != 0 && height != 0) {
 	self.ctx.gdraw.canvas.width = width;
 	self.ctx.gdraw.canvas.height = height;
-      }         
+      }
       var aa = []
       if (buffer.substring(bix, bix+18) === "!** GetObjectAttr:") {
         var idx = buffer.indexOf('\n', bix);
@@ -19247,8 +19320,6 @@ window.addEventListener('resize', function(event) {
   var graph = graph_get_stored_graph();
   if (!graph)
     return;
-  console.log("Resize event", window.innerWidth, window.innerHeight, graph.ctx.x1 - graph.ctx.x0,
-    graph.ctx.y1 - graph.ctx.y0);
 
   var old_zx = graph.ctx.mw.zoom_factor_x;
   var old_zy = graph.ctx.mw.zoom_factor_y;
@@ -19262,7 +19333,6 @@ window.addEventListener('resize', function(event) {
     graph.ctx.mw.zoom_factor_y = graph.ctx.mw.zoom_factor_x;
   graph.ctx.gdraw.canvas.width = (graph.ctx.x1 - graph.ctx.x0) * graph.ctx.mw.zoom_factor_x;
   graph.ctx.gdraw.canvas.height = (graph.ctx.y1 - graph.ctx.y0) * graph.ctx.mw.zoom_factor_y;
-  console.log("Zoom", graph.ctx.mw.zoom_factor_x, graph.ctx.mw.zoom_factor_y);
   if (!graph.resized) {
     graph.resized = true;
     graph.windowInnerWidth = window.innerWidth;

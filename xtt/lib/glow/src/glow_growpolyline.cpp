@@ -1592,7 +1592,7 @@ void GrowPolyLine::convert(glow_eConvert version)
   }
 }
 
-int GrowPolyLine::export_script(GlowExportScript* es)
+int GrowPolyLine::export_script(GlowExportScript* es, void* o, void* m)
 {
-  return es->polyline(this);
+  return es->polyline(this, o, m);
 }

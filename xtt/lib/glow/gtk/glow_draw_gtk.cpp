@@ -185,7 +185,7 @@ static int draw_free_gc(GlowDrawGtk* draw_ctx)
   for (int i = 1; i < glow_eDrawCursor__; i++)
     g_object_unref(draw_ctx->cursors[i]);
 
-  for (int i = 0; i < glow_eDrawType_Color__; i++) {
+  for (int i = 0; i < glow_eDrawType_CustomColor__; i++) {
     if (draw_ctx->gcs[i]) {
       cairo_pattern_destroy(draw_ctx->gcs[i]);
       //printf("X Regular: %4d %llu\n", i, (unsigned long long)draw_ctx->gcs[i]);

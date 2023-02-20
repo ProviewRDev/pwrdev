@@ -223,8 +223,8 @@ dcli_tCmdTable xnav_command_table[] = {
           "/OBJID", "/FILE", "/LOCAL", "/INITSTEP", "/MAXOBJECTS", "/VOLUME",
           "/ALL", "/TYPE", "/OPTION", "/ENTRY", "/NEW", "/TITLE", "/WINDOW",
           "/ALARMVIEW", "/WIDTH", "/HEIGHT", "/XPOSITION", "/YPOSITION",
-          "/FULLSCREEN", "/MAXIMIZE", "/FULLMAXIMIZE", "/SORT", "/TEXT",
-          "/LAYOUT", "/GLOBAL", "/ALPHAORDER", "" } },
+	  "/FULLSCREEN", "/MAXIMIZE", "/FULLMAXIMIZE", "/SORT", 
+	  "/TEXT","/LAYOUT", "/GLOBAL", "/ALPHAORDER", "" } },
   { "OPEN", &xnav_open_func,
       { "dcli_arg1", "dcli_arg2", "/NAME", "/FILE", "/SCROLLBAR", "/WIDTH",
           "/HEIGHT", "/MENU", "/NAVIGATOR", "/CENTER", "/OBJECT", "/NEW",
@@ -235,7 +235,7 @@ dcli_tCmdTable xnav_command_table[] = {
           "/ICONIFY", "/HIDE", "/XPOSITION", "/YPOSITION", "/X0", "/Y0", "/X1",
           "/Y1", "/URL", "/CONTINOUS", "/CAMERAPOSITION", "/CAMERACONTROLPANEL",
           "/VIDEOCONTROLPANEL", "/VIDEOPROGRESSBAR", "/SCANTIME", "/KEYMAP",
-	  "" } },
+	  "/RESIZEFREE", "" } },
   { "CLOSE", &xnav_close_func,
       { "dcli_arg1", "dcli_arg2", "/NAME", "/OBJECT", "/INSTANCE",
           "/CLASSGRAPH", "/ALL", "/EXCEPT", "/MVEXCEPT", "/ICONIFY", "" } },
@@ -275,7 +275,7 @@ dcli_tCmdTable xnav_command_table[] = {
           "/CASE_SENSITIVE", "/WINDOW", "" } },
   { "SET", &xnav_set_func,
       { "dcli_arg1", "dcli_arg2", "/NAME", "/VALUE", "/BYPASS", "/PUBLICWRITE",
-          "/INDEX", "/SOURCE", "/OBJECT", "/CONTINUE", "/X0", "/Y0", "/X1",
+	"/INDEX", "/NEXT", "/SOURCE", "/OBJECT", "/CONTINUE", "/X0", "/Y0", "/X1",
           "/Y1", "/INSTANCE", "/ESCAPESTORE", "/FOCUS", "/INPUTEMPTY",
           "/ICONIFY", "/BELOW", "/ON", "/OFF", "" } },
   { "SETUP", &xnav_setup_func,
@@ -1017,15 +1017,22 @@ static int xnav_set_func(void* client_data, void* client_flag)
     int num;
     ApplListElem* elem;
 
-    if (EVEN(dcli_get_qualifier("/INDEX", idx_str, sizeof(idx_str)))) {
-      xnav->message('E', "Type syntax error");
-      return XNAV__HOLDCOMMAND;
+    if (ODD(dcli_get_qualifier("/NEXT", 0, 0))) {
+      idx = xnav->gbl.color_theme + 1;
+      if (idx > 16)
+	idx = 1;
     }
+    else {
+      if (EVEN(dcli_get_qualifier("/INDEX", idx_str, sizeof(idx_str)))) {
+	xnav->message('E', "Type syntax error");
+	return XNAV__HOLDCOMMAND;
+      }
 
-    num = sscanf(idx_str, "%d", &idx);
-    if (num != 1) {
-      xnav->message('E', "Type syntax error");
-      return XNAV__HOLDCOMMAND;
+      num = sscanf(idx_str, "%d", &idx);
+      if (num != 1) {
+	xnav->message('E', "Type syntax error");
+	return XNAV__HOLDCOMMAND;
+      }
     }
 
     idx = CoWow::SetColorTheme(idx);
@@ -3026,6 +3033,8 @@ static int xnav_open_func(void* client_data, void* client_flag)
       options |= ge_mOptions_Iconify;
     if (ODD(dcli_get_qualifier("/HIDE", 0, 0)))
       options |= ge_mOptions_Invisible;
+    if (ODD(dcli_get_qualifier("/RESIZEFREE", 0, 0)))
+      options |= ge_mOptions_ResizeFree;
     if (ODD(dcli_get_qualifier("/MAIN", 0, 0)) && !xnav->op && !xnav->ge_main
         && !xnav->multiview_main) {
       options |= ge_mOptions_IsMain;
@@ -8249,6 +8258,36 @@ static int xnav_getclasslist_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
+static int xnav_getclasslistattrref_func(void* filectx, ccm_sArg* arg_list,
+    int arg_count, int* return_decl, ccm_tFloat* return_float,
+    ccm_tInt* return_int, char* return_string)
+{
+  int sts;
+  pwr_tAName name;
+  pwr_tClassId classid;
+  pwr_tAttrRef aref;
+
+  if (arg_count != 1)
+    return CCM__ARGMISM;
+
+  if (arg_list->value_decl != CCM_DECL_STRING)
+    return CCM__ARGMISM;
+
+  sts = gdh_ClassNameToId(arg_list->value_string, &classid);
+  if (ODD(sts)) {
+    sts = gdh_GetClassListAttrRef(classid, &aref);
+    if (ODD(sts))
+      sts = gdh_AttrrefToName(&aref, name, sizeof(name), cdh_mNName);
+  }
+  if (ODD(sts))
+    strcpy(return_string, name);
+  else
+    strcpy(return_string, "");
+  *return_decl = CCM_DECL_STRING;
+
+  return 1;
+}
+
 static int xnav_getrootlist_func(void* filectx, ccm_sArg* arg_list,
     int arg_count, int* return_decl, ccm_tFloat* return_float,
     ccm_tInt* return_int, char* return_string)
@@ -8317,6 +8356,46 @@ static int xnav_getnextobject_func(void* filectx, ccm_sArg* arg_list,
     sts = gdh_GetNextObject(objid, &next_objid);
     if (ODD(sts))
       sts = gdh_ObjidToName(next_objid, name, sizeof(name), cdh_mNName);
+  }
+  if (ODD(sts))
+    strcpy(return_string, name);
+  else
+    strcpy(return_string, "");
+  *return_decl = CCM_DECL_STRING;
+
+  return 1;
+}
+
+static int xnav_getnextattrref_func(void* filectx, ccm_sArg* arg_list,
+    int arg_count, int* return_decl, ccm_tFloat* return_float,
+    ccm_tInt* return_int, char* return_string)
+{
+  int sts;
+  pwr_tAName name;
+  pwr_tAttrRef aref;
+  pwr_tAttrRef next_aref;
+  pwr_tCid cid;
+  ccm_sArg* arg_p2;
+
+  if (arg_count != 2)
+    return CCM__ARGMISM;
+
+  arg_p2 = arg_list->next;
+
+  if (arg_list->value_decl != CCM_DECL_STRING)
+    return CCM__ARGMISM;
+
+  if (arg_p2->value_decl != CCM_DECL_STRING)
+    return CCM__ARGMISM;
+
+  sts = gdh_ClassNameToId(arg_list->value_string, &cid);
+  if (ODD(sts)) {
+    sts = gdh_NameToAttrref(pwr_cNOid, arg_p2->value_string, &aref);
+    if (ODD(sts)) {
+      sts = gdh_GetNextAttrRef(cid, &aref, &next_aref);
+      if (ODD(sts))
+	sts = gdh_AttrrefToName(&next_aref, name, sizeof(name), cdh_mNName);
+    }
   }
   if (ODD(sts))
     strcpy(return_string, name);
@@ -9026,6 +9105,9 @@ int XNav::readcmdfile(char* incommand, char* buffer, char *bufargs)
     sts = ccm_register_function("Xtt", "GetClassList", xnav_getclasslist_func);
     if (EVEN(sts))
       return sts;
+    sts = ccm_register_function("Xtt", "GetClassListAttrRef", xnav_getclasslistattrref_func);
+    if (EVEN(sts))
+      return sts;
     sts = ccm_register_function("Xtt", "GetRootList", xnav_getrootlist_func);
     if (EVEN(sts))
       return sts;
@@ -9035,6 +9117,10 @@ int XNav::readcmdfile(char* incommand, char* buffer, char *bufargs)
       return sts;
     sts = ccm_register_function(
         "Xtt", "GetNextObject", xnav_getnextobject_func);
+    if (EVEN(sts))
+      return sts;
+    sts = ccm_register_function(
+        "Xtt", "GetNextAttrRef", xnav_getnextattrref_func);
     if (EVEN(sts))
       return sts;
     sts = ccm_register_function(

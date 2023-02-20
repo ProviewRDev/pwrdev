@@ -38,17 +38,6 @@
 
 #include "pwr.h"
 
-#ifndef pwr_cClass_StatusServerConfig
-#define pwr_cClass_StatusServerConfig 135136UL
-typedef struct {
-  pwr_tString80                       Description pwr_dAlignLW;
-  pwr_tStatus                         UserStatus[5] pwr_dAlignW;
-  pwr_tString80                       UserStatusStr[5] pwr_dAlignW;
-  pwr_tUInt32			      Connections;
-  pwr_tUInt32			      ErrorCount;
-} pwr_sClass_StatusServerConfig;
-#endif
-
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>

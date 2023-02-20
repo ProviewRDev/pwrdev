@@ -269,7 +269,7 @@ public:
   void export_javabean(GlowTransform* t, void* node, glow_eExportPass pass,
       int* shape_cnt, int node_cnt, int in_nc, std::ofstream& fp);
 
-  int export_script(GlowExportScript* es);
+  int export_script(GlowExportScript* es, void* o, void* m);
 
   //! Conversion between different versions of Glow
   /*!

@@ -1172,7 +1172,7 @@ public:
   }
   void set_colortheme_lightness();
 
-  int export_script(GlowExportScript* es);
+  int export_script(GlowExportScript* es, void* o, void* m);
 
   //! Destructor
   /*! Remove the object from the context and erase it from the screen.

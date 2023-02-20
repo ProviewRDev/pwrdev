@@ -107,6 +107,10 @@ int gsx_check_connection(WFoe* foe, vldh_t_node sourceobject,
   pwr_eType dest_type;
   pwr_tUInt32 source_pointer_flag;
   pwr_tUInt32 dest_pointer_flag;
+  pwr_tUInt32 source_array_flag;
+  pwr_tUInt32 dest_array_flag;
+  pwr_tUInt32 source_elements;
+  pwr_tUInt32 dest_elements;
   ldh_tSesContext ldhses;
   pwr_tClassId dest_class;
   pwr_tClassId source_class;
@@ -384,11 +388,17 @@ int gsx_check_connection(WFoe* foe, vldh_t_node sourceobject,
     source_type = bodydef[source_par_index].Par->Input.Info.Type;
     source_pointer_flag
         = PWR_MASK_POINTER & bodydef[source_par_index].Par->Input.Info.Flags;
+    source_array_flag
+        = PWR_MASK_ARRAY & bodydef[source_par_index].Par->Input.Info.Flags;
+    source_elements = bodydef[source_par_index].Par->Input.Info.Elements;
     break;
   case pwr_eClass_Output:
     source_type = bodydef[source_par_index].Par->Output.Info.Type;
     source_pointer_flag
         = PWR_MASK_POINTER & bodydef[source_par_index].Par->Output.Info.Flags;
+    source_array_flag
+        = PWR_MASK_ARRAY & bodydef[source_par_index].Par->Output.Info.Flags;
+    source_elements = bodydef[source_par_index].Par->Output.Info.Elements;
     break;
   default:
     printf("gsx_check_connection ... error ParClass not tested ");
@@ -413,11 +423,17 @@ int gsx_check_connection(WFoe* foe, vldh_t_node sourceobject,
     dest_type = bodydef[dest_par_index].Par->Input.Info.Type;
     dest_pointer_flag
         = PWR_MASK_POINTER & bodydef[dest_par_index].Par->Input.Info.Flags;
+    dest_array_flag
+        = PWR_MASK_ARRAY & bodydef[dest_par_index].Par->Input.Info.Flags;
+    dest_elements = bodydef[dest_par_index].Par->Input.Info.Elements;
     break;
   case pwr_eClass_Output:
     dest_type = bodydef[dest_par_index].Par->Output.Info.Type;
     dest_pointer_flag
         = PWR_MASK_POINTER & bodydef[dest_par_index].Par->Output.Info.Flags;
+    dest_array_flag
+        = PWR_MASK_ARRAY & bodydef[dest_par_index].Par->Output.Info.Flags;
+    dest_elements = bodydef[dest_par_index].Par->Output.Info.Elements;
     break;
   default:
     printf("gsx_check_connection ... error ParClass not tested ");
@@ -449,7 +465,14 @@ int gsx_check_connection(WFoe* foe, vldh_t_node sourceobject,
         /* Ok */
       } else
         return GSX__CONTYPE;
-    }
+    } else if (source_array_flag != dest_array_flag) {
+      if (!(dest_class == pwr_cClass_step || source_class == pwr_cClass_step ||
+	    dest_class == pwr_cClass_initstep || source_class == pwr_cClass_initstep ||
+	    dest_class == pwr_cClass_substep || source_class == pwr_cClass_substep ||
+	    dest_class == pwr_cClass_order || source_class == pwr_cClass_order))
+	return GSX__CONTYPE;
+    } else if (source_array_flag && source_elements != dest_elements)
+      return GSX__CONTYPE;
   }
   if (source_pointer_flag)
     *conclass = DATA_CONN;

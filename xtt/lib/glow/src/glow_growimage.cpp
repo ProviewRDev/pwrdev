@@ -1711,7 +1711,7 @@ void GrowImage::flip(double x0, double y0, glow_eFlipDirection dir)
   }
 }
 
-int GrowImage::export_script(GlowExportScript* es)
+int GrowImage::export_script(GlowExportScript* es, void* o, void* m)
 {
-  return es->image(this);
+  return es->image(this, o, m);
 }

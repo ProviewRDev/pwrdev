@@ -822,6 +822,14 @@ public:
       int text_size, glow_eFont font, double* width, double* height,
       double* descent);
 
+  //! Get the window size
+  /*!
+    \param width	Window width.
+    \param height	Window height.
+    \return		Returns 1 if size is configured, otherwise 0.
+  */
+  int get_window_size(double* width, double* height);
+
   //! Get the default window size
   /*!
     \param width	Window width in pixel.
@@ -1135,6 +1143,7 @@ public:
   int is_subwindow; //!< Is a subwindow context.
   char owner[256]; //!< Owner, used by application
   int anti_aliasing; //!< Use anti-aliasing
+  int window_resize; //!< Window resize restrictions, non or aspect ratio.
   glow_eEnv environment; //!< Environment Development or Runtime.
   glow_eTextCoding text_coding; //!< Text coding
   int recursive_trace; //!< Subgraph recursive trace

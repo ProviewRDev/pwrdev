@@ -56,8 +56,7 @@ public:
   GtkWidget* cmd_ok;
   GtkWidget* cmd_apply;
   GtkWidget* cmd_cancel;
-  GtkWidget* menubutton_copy;
-  GtkWidget* menubutton_cut;
+  GtkWidget* menubutton_copy;  
   GtkWidget* menubutton_paste;
   GtkWidget* menubutton_changevalue;
   GtkWidget* menubutton_viewio;
@@ -66,7 +65,7 @@ public:
   CoWowEntryGtk* cmd_entry;
 
   GsdmlAttrGtk(GtkWidget* a_parent_wid, void* a_parent_ctx, void* a_object,
-               pn_gsdml* a_gsdml, int a_edit_mode, const char* a_data_filename,
+               pn_gsdml* a_gsdml, int a_edit_mode, std::shared_ptr<ProfinetRuntimeData> pwr_pn_data,
                pwr_tStatus* a_sts);
   ~GsdmlAttrGtk();
 
@@ -89,7 +88,6 @@ public:
   static void activate_exit(GtkWidget* w, gpointer data);
   static void activate_help(GtkWidget* w, gpointer data);
   static void activate_copy(GtkWidget* w, gpointer data);
-  static void activate_cut(GtkWidget* w, gpointer data);
   static void activate_paste(GtkWidget* w, gpointer data);
   static void activate_viewio(GtkWidget* w, gpointer data);
   static void activate_zoom_in(GtkWidget* w, gpointer data);

@@ -44,6 +44,7 @@
 #include "pwr_systemclasses.h"
 #include "pwr_baseclasses.h"
 #include "pwr_nmpsclasses.h"
+#include "pwr_dataqclasses.h"
 
 #include "co_api.h"
 #include "co_msg.h"
@@ -67,6 +68,7 @@ extern "C" {
 #include "wb_log.h"
 #include "wb_trv.h"
 #include "wb_utl_api.h"
+#include "wb_vldh.h"
 #include "wb_vldh_msg.h"
 
 /*_Local procedues_______________________________________________________*/
@@ -220,6 +222,12 @@ int gcg_comp_m68(gcg_ctx gcgctx, vldh_t_node node);
 int gcg_comp_m69(gcg_ctx gcgctx, vldh_t_node node);
 int gcg_comp_m70(gcg_ctx gcgctx, vldh_t_node node);
 int gcg_comp_m71(gcg_ctx gcgctx, vldh_t_node node);
+int gcg_comp_m72(gcg_ctx gcgctx, vldh_t_node node);
+int gcg_comp_m73(gcg_ctx gcgctx, vldh_t_node node);
+int gcg_comp_m74(gcg_ctx gcgctx, vldh_t_node node);
+int gcg_comp_m75(gcg_ctx gcgctx, vldh_t_node node);
+int gcg_comp_m76(gcg_ctx gcgctx, vldh_t_node node);
+int gcg_comp_m77(gcg_ctx gcgctx, vldh_t_node node);
 
 gcg_tMethod gcg_comp_m[80]
     = { (gcg_tMethod)gcg_comp_m0, (gcg_tMethod)gcg_comp_m1, gcg_comp_m2,
@@ -236,7 +244,8 @@ gcg_tMethod gcg_comp_m[80]
         gcg_comp_m53, gcg_comp_m54, gcg_comp_m55, gcg_comp_m56, gcg_comp_m57,
         gcg_comp_m58, gcg_comp_m59, gcg_comp_m60, gcg_comp_m61, gcg_comp_m62,
         gcg_comp_m63, gcg_comp_m64, gcg_comp_m65, gcg_comp_m66, gcg_comp_m67,
-        gcg_comp_m68, gcg_comp_m69, gcg_comp_m70, gcg_comp_m71 };
+        gcg_comp_m68, gcg_comp_m69, gcg_comp_m70, gcg_comp_m71, gcg_comp_m72,
+        gcg_comp_m73, gcg_comp_m74, gcg_comp_m75, gcg_comp_m76, gcg_comp_m77};
 
 // static pwr_tStatus gcg_get_build_host(pwr_mOpSys os, char* buf, int bufsize);
 
@@ -2936,8 +2945,17 @@ int gcg_get_outputstring(gcg_ctx gcgctx, vldh_t_node output_node,
     /* Return the objdid as a string and the name of
       the parameter */
     strcpy(parstring, (output_bodydef->Par)->Param.Info.PgmName);
-    if (output_bodydef->Par->Output.Info.Flags & PWR_MASK_ARRAY)
-      strncat(parstring, "[0]", 80);
+    if (output_bodydef->Par->Output.Info.Flags & PWR_MASK_ARRAY) {
+      switch (output_node->ln.cid) {
+      case pwr_cClass_step:
+      case pwr_cClass_initstep:
+      case pwr_cClass_substep:
+      case pwr_cClass_order:
+	strncat(parstring, "[0]", 80);
+	break;
+      default: ;
+      }
+    }
 
     /* Convert objdid to ascii */
     *parattrref = cdh_ObjidToAref(output_node->ln.oid);
@@ -5787,7 +5805,7 @@ int gcg_comp_m5(gcg_ctx gcgctx, vldh_t_node node)
 *	'structname'_exec( tp, 'objpointer');
 *	ex: compl_exec( tp, Z80000811);
 *
-*	Prints iniatilization for timer and scantime if the object
+*	Prints initialization for timer and scantime if the object
 *	contain these functions.
 *
 **************************************************************************/
@@ -5871,6 +5889,11 @@ int gcg_comp_m4(gcg_ctx gcgctx, vldh_t_node node)
 
         if (output_bodydef.Par->Output.Info.Type == pwr_eType_DataRef)
           strcpy(cast, "(pwr_tVoid *)");
+	else if (bodydef[i].Par->Param.Info.Type == pwr_eType_DataRef &&
+		 output_bodydef.Par->Output.Info.Type == pwr_eType_Void)
+          strcpy(cast, "(pwr_tDataRef *)");
+	else
+	  strcpy(cast, "");
         IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE],
             "%c%s->%sP = %s&%c%s->%s;\n", GCG_PREFIX_REF,
             vldh_IdToStr(0, node->ln.oid), bodydef[i].Par->Param.Info.PgmName,
@@ -10685,6 +10708,10 @@ int gcg_comp_m41(gcg_ctx gcgctx, vldh_t_node node)
   char output_prefix;
   char output_par[80];
   char* name;
+  int cell_inputs = 2;
+
+  if (node->ln.cid == pwr_cClass_QCreateData)
+    cell_inputs = 1;
 
   sts = gcg_ref_insert(gcgctx, node->ln.oid, GCG_PREFIX_REF, node);
 
@@ -10734,7 +10761,7 @@ int gcg_comp_m41(gcg_ctx gcgctx, vldh_t_node node)
         if (par_inverted)
           gcg_error_msg(gcgctx, GSX__INV, node);
 
-        if (i >= 2) {
+        if (i >= cell_inputs) {
           IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE],
               "%c%s->%sP = &%c%s->%s;\n", GCG_PREFIX_REF,
               vldh_IdToStr(0, node->ln.oid), bodydef[i].Par->Param.Info.PgmName,
@@ -10957,9 +10984,7 @@ int gcg_comp_m42(gcg_ctx gcgctx, vldh_t_node node)
 *	Compile method for GetData
 *	Prints code for declaration and direkt link of a rtdbpointer.
 *
-*	Checks that the referenced object exists and that the referenced
-*	parameter exists in that objekt, and that the type of the parameter
-*	is correct.
+*	Checks that the referenced object exists.
 *	Prints declaration and direct link of pointer to referenced object.
 *
 * 	Initializes the Output to point att the referenced object
@@ -11068,7 +11093,7 @@ int gcg_comp_m44(gcg_ctx gcgctx, vldh_t_node node)
 
   ldhses = (node->hn.wind)->hw.ldhses;
 
-  /* Check that parent is an order object */
+  /* Check that parent is a cell object */
   refobjdid = node->hn.wind->lw.poid;
   sts = ldh_GetObjectClass((node->hn.wind)->hw.ldhses, refobjdid, &cid);
   if (EVEN(sts)) {
@@ -14947,7 +14972,7 @@ int gcg_comp_m70(gcg_ctx gcgctx, vldh_t_node node)
 
 /*************************************************************************
 *
-* Name:		gcg_comp_40()
+* Name:		gcg_comp_71()
 *
 * Type		void
 *
@@ -15129,6 +15154,1053 @@ int gcg_comp_m71(gcg_ctx gcgctx, vldh_t_node node)
     i++;
   }
   free((char*)bodydef);
+
+  return GSX__SUCCESS;
+}
+
+/*************************************************************************
+*
+* Name:		gcg_comp_m72()
+*
+* Type		void
+*
+* Type		Parameter	IOGF	Description
+* gcg_ctx	gcgctx		I	gcg context.
+* vldh_t_node	node		I	vldh node.
+*
+* Description:
+*	Compile method for BusGet.
+*
+*	Syntax control:
+*	Check that the referenced attribute exists.
+*
+*	Generating code:
+*	Declares and links a rtdb pointer to the referenced object.
+*	Prints an exec call.
+*
+**************************************************************************/
+
+int gcg_comp_m72(gcg_ctx gcgctx, vldh_t_node node)
+{
+  pwr_sAttrRef refattrref;
+  pwr_sAttrRef* refattrref_ptr;
+  ldh_tSesContext ldhses;
+  pwr_tClassId cid;
+  ldh_sParDef* bodydef;
+  int rows, sts;
+  char* name;
+  int size;
+
+  ldhses = (node->hn.wind)->hw.ldhses;
+
+  /* Get the attref of the referenced object stored in the
+    first parameter in devbody */
+
+  /* Get the devbody parameters for this class */
+  sts = ldh_GetObjectBodyDef(
+      ldhses, node->ln.cid, "DevBody", 1, &bodydef, &rows);
+  if (EVEN(sts))
+    return sts;
+
+  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", bodydef[0].ParName,
+      (char**)&refattrref_ptr, &size);
+  if (EVEN(sts))
+    return sts;
+  refattrref = *refattrref_ptr;
+  free((char*)refattrref_ptr);
+  free((char*)bodydef);
+
+  /* Check that this is objid of an existing object */
+  sts = ldh_GetAttrRefOrigTid(ldhses, &refattrref, &cid);
+  if (EVEN(sts)) {
+    gcg_error_msg(gcgctx, GSX__REFOBJ, node);
+    return GSX__NEXTNODE;
+  }
+  sts = ldh_GetObjectBodyDef(
+      ldhses, node->ln.cid, "RtBody", 1, &bodydef, &rows);
+  if (EVEN(sts))
+    return sts;
+
+  if (bodydef[0].Par->Output.TypeRef != cid) {
+    // No object
+    gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
+    return GSX__NEXTNODE;
+  }
+
+  free((char*)bodydef);
+
+
+  sts = gcg_replace_ref(gcgctx, &refattrref, node);
+  if (EVEN(sts))
+    return sts;
+
+  /* Insert object in ref list */
+  gcg_aref_insert(gcgctx, refattrref, GCG_PREFIX_REF, node);
+
+  sts = gcg_ref_insert(gcgctx, node->ln.oid, GCG_PREFIX_REF, node);
+
+  sts = gcg_get_structname(gcgctx, node->ln.oid, &name);
+  if (EVEN(sts))
+    return sts;
+
+  /* Print the execute command */
+  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE],
+      "GetBus_generic_exec( tp, %c%s, %c%s);\n", GCG_PREFIX_REF,
+      vldh_IdToStr(0, node->ln.oid), GCG_PREFIX_REF,
+      vldh_AttrRefToStr(0, refattrref));
+
+  return GSX__SUCCESS;
+}
+
+/*************************************************************************
+*
+* Name:		gcg_comp_m73()
+*
+* Type		void
+*
+* Type		Parameter	IOGF	Description
+* gcg_ctx	gcgctx		I	gcg context.
+* vldh_t_node	node		I	vldh node.
+*
+* Description:
+*	Compile method for a CStoBus.
+*	Prints code for declaration and direkt link of a rtdbpointer.
+*	Prints code for initialization of pointers in the object:
+*	'objpointer'->'pgmname'P = &'in';
+*	Z80000811->InP = &Z800005f5->ActualValue;
+*
+*	If a parameter is not connected or not visible the pointer
+*	will point to the own object:
+*
+*	'objpointer'->'pgmname'P = &'objpointer'->'pgmname';
+*	Z80000811->InP = &Z80000811->In;
+*
+*	Prints an exec call :
+*	'structname'_exec( tp, 'objpointer', 'buspointer');
+*	ex: bus_exec( tp, Z80000811, Z80000812);
+*
+*
+**************************************************************************/
+
+int gcg_comp_m73(gcg_ctx gcgctx, vldh_t_node node)
+{
+  unsigned long point;
+  unsigned long par_inverted;
+  vldh_t_node output_node;
+  unsigned long output_count;
+  unsigned long output_point;
+  ldh_sParDef* bodydef;
+  ldh_sParDef output_bodydef;
+  int rows, sts;
+  int i, output_found, first_par;
+  pwr_sAttrRef output_attrref;
+  int output_type;
+  char output_prefix;
+  char output_par[80];
+  char* name;
+  int size;
+  pwr_sAttrRef refattrref;
+  pwr_sAttrRef* refattrref_ptr;
+  ldh_tSesContext ldhses;
+  pwr_tClassId cid;
+
+  ldhses = (node->hn.wind)->hw.ldhses;
+
+  sts = gcg_ref_insert(gcgctx, node->ln.oid, GCG_PREFIX_REF, node);
+
+  /* Get name for this class */
+  sts = gcg_get_structname(gcgctx, node->ln.oid, &name);
+  if (EVEN(sts))
+    return sts;
+
+  /* Get the devbody parameters for this class */
+  sts = ldh_GetObjectBodyDef(
+      ldhses, node->ln.cid, "DevBody", 1, &bodydef, &rows);
+  if (EVEN(sts))
+    return sts;
+
+  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", bodydef[0].ParName,
+      (char**)&refattrref_ptr, &size);
+  if (EVEN(sts))
+    return sts;
+  refattrref = *refattrref_ptr;
+  free((char*)refattrref_ptr);
+  free((char*)bodydef);
+
+  /* Check that this is objid of an existing object */
+  sts = ldh_GetAttrRefOrigTid(ldhses, &refattrref, &cid);
+  if (EVEN(sts)) {
+    gcg_error_msg(gcgctx, GSX__REFOBJ, node);
+    return GSX__NEXTNODE;
+  }
+  sts = ldh_GetObjectBodyDef(
+      ldhses, node->ln.cid, "RtBody", 1, &bodydef, &rows);
+  if (EVEN(sts))
+    return sts;
+
+  if (bodydef[0].Par->Input.TypeRef != cid) {
+    // No object
+    gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
+    return GSX__NEXTNODE;
+  }
+
+  free((char*)bodydef);
+
+
+  sts = gcg_replace_ref(gcgctx, &refattrref, node);
+  if (EVEN(sts))
+    return sts;
+
+  /* Insert object in ref list */
+  gcg_aref_insert(gcgctx, refattrref, GCG_PREFIX_REF, node);
+
+  /* Print the execute command */
+  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "CStoBus_generic_exec( tp, %c%s, %c%s);\n",
+      GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid), GCG_PREFIX_REF,
+      vldh_AttrRefToStr(0, refattrref));
+
+  /* Get the runtime parameters for this class */
+  sts = ldh_GetObjectBodyDef(ldhses, node->ln.cid, "RtBody", 1, &bodydef, &rows);
+  if (EVEN(sts))
+    return sts;
+
+  i = 0;
+  first_par = 1;
+  while ((i < rows) && (bodydef[i].ParClass == pwr_eClass_Input)) {
+    /* Get the point for this parameter if there is one */
+    output_found = 0;
+    sts = gcg_get_inputpoint(node, i, &point, &par_inverted);
+    if (ODD(sts)) {
+      /* Look for an output connected to this point */
+      sts = gcg_get_output(node, point, &output_count, &output_node,
+          &output_point, &output_bodydef,
+          GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
+      if (EVEN(sts))
+        return sts;
+
+      if (output_count > 0) {
+        output_found = 1;
+        if (output_count > 1)
+          gcg_error_msg(gcgctx, GSX__CONOUTPUT, output_node);
+
+        sts = gcg_get_outputstring(gcgctx, output_node, &output_bodydef,
+            &output_attrref, &output_type, &output_prefix, output_par);
+        if (sts == GSX__NEXTPAR) {
+          i++;
+          continue;
+        }
+        if (EVEN(sts))
+          return sts;
+
+        if (par_inverted)
+          gcg_error_msg(gcgctx, GSX__INV, node);
+
+        IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE],
+            "%c%s->%sP = &%c%s->%s;\n", GCG_PREFIX_REF,
+            vldh_IdToStr(0, node->ln.oid), bodydef[i].Par->Param.Info.PgmName,
+            output_prefix,
+            output_type == GCG_OTYPE_OID ? vldh_IdToStr(1, output_attrref.Objid)
+                                         : vldh_AttrRefToStr(0, output_attrref),
+            output_par);
+      } else {
+        /* Point visible but not connected, errormessage */
+        gcg_error_msg(gcgctx, GSX__NOTCON, node);
+      }
+      first_par = 0;
+    }
+    if (!output_found) {
+      /* The point is not connected and will point to its
+         own object */
+
+      IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = &%c%s->%s;\n",
+          GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid),
+          bodydef[i].Par->Param.Info.PgmName, GCG_PREFIX_REF,
+          vldh_IdToStr(1, node->ln.oid), bodydef[i].Par->Param.Info.PgmName);
+    }
+    i++;
+  }
+  free((char*)bodydef);
+
+  gcg_timer_print(gcgctx, node->ln.oid);
+  gcg_scantime_print(gcgctx, node->ln.oid);
+
+  return GSX__SUCCESS;
+}
+
+/*************************************************************************
+*
+* Name:		gcg_comp_m74()
+*
+* Type		void
+*
+* Type		Parameter	IOGF	Description
+* gcg_ctx	gcgctx		I	gcg context.
+* vldh_t_node	node		I	vldh node.
+*
+* Description:
+*	Compile method for QOrder object.
+*
+*	Syntax control:
+*	Checks that the input pin is connected to a qcell.
+*	Checks that if the condition pin is connected order has
+*	a C attribute.
+*
+*	Code generation:
+*	An object is created for every attribute of the order and
+*	one object for the order itself. The orders are serially connected
+*	with the first attribute first and the order object last.
+*	Ex DSC order
+*       QCell - QDOrder - QSOrder - QCOrder - QOrder
+*
+*	Ex SOrder
+*	qcell_exec(Z800005da);
+*	QSOrder_exec(Z8000084a, Z800005da, Z800005f0->ActualValue);
+*	QOrder_exec(Z800005d5, Z8000084a);
+*
+*	Declares and links pointers to the order object and all suborder
+*	objects.
+*	Prints an exec call for every suborder.
+*	For a C suborder prints a setcond_exec call or a call for
+*	a subwidow condition.
+*	Prints an init and exec call for the order.
+*
+**************************************************************************/
+
+int gcg_comp_m74(gcg_ctx gcgctx, vldh_t_node node)
+{
+  ldh_tSesContext ldhses;
+  pwr_tClassId cid;
+  unsigned long point;
+  unsigned long par_inverted;
+  vldh_t_node output_node;
+  unsigned long output_count;
+  unsigned long output_point;
+  ldh_sParDef* bodydef;
+  ldh_sParDef* rbodydef;
+  ldh_sParDef output_bodydef;
+  int rows, rrows, sts;
+  int i, output_found;
+  int size;
+  pwr_sAttrRef output_attrref;
+  int output_type;
+  char output_prefix;
+  char output_par[80];
+  pwr_tObjid qcelloid;
+  pwr_tObjid nextoid;
+  pwr_tObjid statusoid;
+  int found, pincond_found;
+  char* parvalue;
+  pwr_tClassId suborderclass[6];
+  unsigned long subordercount;
+  unsigned long ldhsubordercount;
+  char* name;
+  char *sname;
+
+  char newsuborderchar[6];
+  pwr_tClassId newsuborderclass[6];
+  pwr_tClassId oldsuborderclass[6];
+  pwr_tObjid oldsuborderobjdid[6];
+  pwr_tObjid newsuborderobjdid[6];
+  unsigned long newsubordercount;
+  unsigned long oldsubordercount;
+  int newsuborderindex[6];
+  int count_ok, classdiff_ok, diffcount;
+  char graphname[2];
+  float* time_ptr;
+  pwr_tClassId subordercid;
+  pwr_tObjid suborderobjdid;
+  char segment_name[32];
+  char condstr[120] = "";
+
+  ldhses = (node->hn.wind)->hw.ldhses;
+  statusoid = node->ln.oid;
+
+  /* Check the present suborder objects and compare them with
+     the attributes in the order object */
+
+  oldsubordercount = 0;
+  sts = ldh_GetChild(ldhses, node->ln.oid, &nextoid);
+  while (ODD(sts)) {
+    /* Find out if this is a suborder and wich class */
+    sts = ldh_GetObjectClass(ldhses, nextoid, &subordercid);
+
+    if ((subordercid == pwr_cClass_QSOrder)
+	|| (subordercid == pwr_cClass_QLOrder)
+	|| (subordercid == pwr_cClass_QDOrder)
+	|| (subordercid == pwr_cClass_QPOrder)
+	|| (subordercid == pwr_cClass_QCOrder)) {
+      oldsuborderclass[oldsubordercount] = subordercid;
+      oldsuborderobjdid[oldsubordercount] = nextoid;
+      oldsubordercount++;
+    }
+
+    sts = ldh_GetNextSibling(ldhses, nextoid, &nextoid);
+  }
+
+  /* Check the attributes in the parent order node */
+  sts = ldh_GetObjectBodyDef(ldhses, node->ln.cid, "DevBody", 1, &bodydef, &rows);
+  if (EVEN(sts))
+    return sts;
+
+  newsubordercount = 0;
+  for (i = 0; i < rows - 2; i += 2) {
+    /* Get the parameter value */
+    sts = ldh_GetObjectPar(
+	ldhses, node->ln.oid, "DevBody", bodydef[i].ParName, &parvalue, &size);
+    if (EVEN(sts))
+      return sts;
+
+    if (*parvalue == 'S' || *parvalue == 's') {
+      newsuborderclass[newsubordercount] = pwr_cClass_QSOrder;
+      newsuborderchar[newsubordercount] = *parvalue;
+      newsuborderindex[newsubordercount] = i;
+      newsubordercount++;
+    } else if (*parvalue == 'L' || *parvalue == 'l') {
+      newsuborderclass[newsubordercount] = pwr_cClass_QLOrder;
+      newsuborderchar[newsubordercount] = *parvalue;
+      newsuborderindex[newsubordercount] = i;
+      newsubordercount++;
+    } else if (*parvalue == 'C' || *parvalue == 'c') {
+      newsuborderclass[newsubordercount] = pwr_cClass_QCOrder;
+      newsuborderchar[newsubordercount] = *parvalue;
+      newsuborderindex[newsubordercount] = i;
+      newsubordercount++;
+    } else if (*parvalue == 'D' || *parvalue == 'd') {
+      newsuborderclass[newsubordercount] = pwr_cClass_QDOrder;
+      newsuborderchar[newsubordercount] = *parvalue;
+      newsuborderindex[newsubordercount] = i;
+      newsubordercount++;
+    } else if (*parvalue == 'P' || *parvalue == 'p') {
+      newsuborderclass[newsubordercount] = pwr_cClass_QPOrder;
+      newsuborderchar[newsubordercount] = *parvalue;
+      newsuborderindex[newsubordercount] = i;
+      newsubordercount++;
+    }
+    free((char*)parvalue);
+  }
+
+  /* Compare old  and new suborders */
+  if (newsubordercount == oldsubordercount)
+    count_ok = 1;
+  else
+    count_ok = 0;
+  
+  classdiff_ok = 1;
+  diffcount = 0;
+  for (i = 0; i < (int)oldsubordercount; i++) {
+    if (newsuborderclass[i] != oldsuborderclass[i]) {
+      classdiff_ok = 0;
+      diffcount = i;
+      break;
+    } else
+      newsuborderobjdid[i] = oldsuborderobjdid[i];
+  }
+
+  if (!(classdiff_ok && count_ok)) {
+    /* Delete suborderobjects after the first difference */
+    for (i = diffcount; i < (int)oldsubordercount; i++) {
+      sts = ldh_DeleteObject(ldhses, oldsuborderobjdid[i]);
+      if (EVEN(sts))
+	return sts;
+    }
+    /* Create new suborderobjects starting with the first found
+       difference */
+    for (i = diffcount; i < (int)newsubordercount; i++) {
+      /* Get default segment name */
+      graphname[0] = newsuborderchar[i];
+      graphname[1] = '\0';
+      sts = vldh_get_object_defname(
+	  ldhses, node->ln.oid, OT_SUBORDER, graphname, segment_name);
+      if (EVEN(sts))
+	return sts;
+
+      /* Create the object i ldh */
+      sts = ldh_CreateObject(ldhses, &suborderobjdid, segment_name,
+	  newsuborderclass[i], node->ln.oid, ldh_eDest_IntoLast);
+      if (EVEN(sts))
+	return sts;
+      newsuborderobjdid[i] = suborderobjdid;
+    }
+  }
+
+  /* Move the time from parent to the children */
+  for (i = 0; i < (int)newsubordercount; i++) {
+    if (newsuborderclass[i] == pwr_cClass_QDOrder
+	|| newsuborderclass[i] == pwr_cClass_QLOrder) {
+      /* Move the time from the parent to the child */
+      sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody",
+	 bodydef[newsuborderindex[i] + 1].ParName, (char**)&time_ptr, &size);
+      if (EVEN(sts))
+	return sts;
+      sts = ldh_SetObjectPar(ldhses, newsuborderobjdid[i], "RtBody",
+          "TimerTime", (char*)time_ptr, size);
+      if (EVEN(sts))
+	return sts;
+      free((char*)time_ptr);
+    }
+  }
+
+  /* Get the qcell connected to conpoint 0 */
+  sts = ldh_GetObjectBodyDef(ldhses, node->ln.cid, "RtBody", 1, &rbodydef, &rrows);
+  if (EVEN(sts))
+    return sts;
+
+  sts = gcg_get_output(node, 0, &output_count, &output_node, &output_point,
+      &output_bodydef, GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
+  if (EVEN(sts))
+    return sts;
+
+  if (output_count > 0) {
+    output_found = 1;
+    if (output_count > 1)
+      gcg_error_msg(gcgctx, GSX__CONOUTPUT, node);
+
+    IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = &%c%s->%s;\n",
+        GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid),
+	rbodydef[0].Par->Param.Info.PgmName, GCG_PREFIX_REF,
+	vldh_IdToStr(1, output_node->ln.oid),
+	output_bodydef.Par->Param.Info.PgmName);
+#if 0
+    /* Check that is it a qcell */
+    sts = ldh_GetObjectClass(ldhses, output_node->ln.oid, &cid);
+    if (EVEN(sts))
+      return sts;
+
+    if (!(cid == pwr_cClass_step || cid == pwr_cClass_substep
+            || cid == pwr_cClass_ssbegin || cid == pwr_cClass_ssend
+            || cid == pwr_cClass_initstep)) {
+      gcg_error_msg(gcgctx, GSX__NOSTEP, node);
+      return GSX__NEXTNODE;
+    }
+#endif
+  } else {
+    /* Not connected */
+    gcg_error_msg(gcgctx, GSX__GNOTCON, node);
+    return GSX__NEXTNODE;
+  }
+
+  qcelloid = output_node->ln.oid;
+
+  sts = gcg_ref_insert(gcgctx, node->ln.oid, GCG_PREFIX_REF, node);
+
+  free((char*)rbodydef);
+
+  /* Get name for execute call */
+  sts = gcg_get_structname(gcgctx, node->ln.oid, &name);
+  if (EVEN(sts))
+    return sts;
+
+  /* Print the execute command */
+  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec(tp, %c%s);\n", name,
+      GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid));
+
+  /* Print the init command */
+  IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%s_init( %c%s);\n", name,
+      GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid));
+
+  /* Check if the condition pin is visible */
+  sts = gcg_get_inputpoint(node, 1, &point, &par_inverted);
+  pincond_found = 0;
+  if (ODD(sts)) {
+    /* Look for an output connected to this point */
+    sts = gcg_get_output(node, point, &output_count, &output_node,
+        &output_point, &output_bodydef,
+        GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
+    if (EVEN(sts))
+      return sts;
+
+    if (output_count > 0) {
+      pincond_found = 1;
+      if (output_count > 1)
+        gcg_error_msg(gcgctx, GSX__CONOUTPUT, node);
+
+      sts = gcg_get_outputstring(gcgctx, output_node, &output_bodydef,
+          &output_attrref, &output_type, &output_prefix, output_par);
+      if (sts == GSX__NEXTPAR)
+        return sts;
+      if (EVEN(sts))
+        return sts;
+
+      /* Get the objdid for the QCOrder */
+      found = 0;
+      sts = ldh_GetChild(ldhses, node->ln.oid, &nextoid);
+      while (ODD(sts)) {
+        /* Find out if this is a QCOrder */
+        sts = ldh_GetObjectClass(ldhses, nextoid, &cid);
+        if (EVEN(sts))
+          return sts;
+
+        if (cid == pwr_cClass_QCOrder) {
+          found = 1;
+          break;
+        }
+        sts = ldh_GetNextSibling(ldhses, nextoid, &nextoid);
+      }
+      if (!found) {
+        gcg_error_msg(gcgctx, GSX__NOCORDER, node);
+        return GSX__NEXTNODE;
+      }
+      /* Print the execute for a setcond command */
+      sprintf(condstr, "%s%c%s->%s",
+	  par_inverted ? "!" : "", output_prefix,
+          output_type == GCG_OTYPE_OID ? vldh_IdToStr(0, output_attrref.Objid)
+                                       : vldh_AttrRefToStr(0, output_attrref),
+          output_par);
+    } else {
+      /* Point visible but not connected, errormessage */
+      gcg_error_msg(gcgctx, GSX__NOTCON, node);
+    }
+  }
+
+  subordercount = 0;
+  for (i = 0; i < rows - 2; i += 2) {
+    /* Get the parameter value */
+    sts = ldh_GetObjectPar((node->hn.wind)->hw.ldhses, node->ln.oid, "DevBody",
+	bodydef[i].ParName, (char**)&parvalue, &size);
+    if (EVEN(sts))
+      return sts;
+
+    if (*parvalue == 'S' || *parvalue == 's') {
+      suborderclass[subordercount] = pwr_cClass_QSOrder;
+      subordercount++;
+    } else if (*parvalue == 'L' || *parvalue == 'l') {
+      suborderclass[subordercount] = pwr_cClass_QLOrder;
+      subordercount++;
+    } else if (*parvalue == 'C' || *parvalue == 'c') {
+      suborderclass[subordercount] = pwr_cClass_QCOrder;
+      subordercount++;
+    } else if (*parvalue == 'D' || *parvalue == 'd') {
+      suborderclass[subordercount] = pwr_cClass_QDOrder;
+      subordercount++;
+    } else if (*parvalue == 'P' || *parvalue == 'p') {
+      suborderclass[subordercount] = pwr_cClass_QPOrder;
+      subordercount++;
+    } else if (*parvalue != 0) {
+      /* This orderattribute is not allowed */
+      gcg_error_msg(gcgctx, GSX__ORDERATTR, node);
+    }
+    free((char*)parvalue);
+  }
+
+  /* Get the oid for order children of this node */
+  found = 0;
+  ldhsubordercount = 0;
+  sts = ldh_GetChild(ldhses, node->ln.oid, &nextoid);
+  while (ODD(sts)) {
+    /* Find out if this is a suborder */
+    sts = ldh_GetObjectClass(ldhses, nextoid, &cid);
+    if (EVEN(sts))
+      return sts;
+
+    if (cid == pwr_cClass_QSOrder || cid == pwr_cClass_QDOrder
+        || cid == pwr_cClass_QLOrder || cid == pwr_cClass_QCOrder
+        || cid == pwr_cClass_QPOrder) {
+      if (cid != suborderclass[ldhsubordercount]) {
+        return GSX__ORDERMISM;
+      }
+      if (cid == pwr_cClass_QSOrder) {
+	sts = gcg_check_grafcet_reset(gcgctx, node);
+	if (EVEN(sts) || sts == GSX__NEXTNODE)
+	  return sts;
+
+        sts = gcg_ref_insert(gcgctx, nextoid, GCG_PREFIX_REF, node);
+
+        /* Get name for execute call */
+        sts = gcg_get_structname(gcgctx, nextoid, &sname);
+        if (EVEN(sts))
+          return sts;
+
+        /* Print the execute command */
+        IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE],
+            "%s_exec( %c%s, %c%s, %c%s->ActualValue);\n", sname, GCG_PREFIX_REF,
+            vldh_IdToStr(0, nextoid), GCG_PREFIX_REF,
+            vldh_IdToStr(1, statusoid), GCG_PREFIX_REF,
+            vldh_AttrRefToStr(2, gcgctx->reset_object));
+        statusoid = nextoid;
+      } else if (cid == pwr_cClass_QLOrder) {
+        /* Get the time */
+
+        sts = gcg_ref_insert(gcgctx, nextoid, GCG_PREFIX_REF, node);
+
+        /* Print timer code */
+        gcg_timer_print(gcgctx, nextoid);
+
+        /* Get name for execute call */
+        sts = gcg_get_structname(gcgctx, nextoid, &sname);
+        if (EVEN(sts))
+          return sts;
+
+        /* Print the execute command */
+        IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( %c%s, %c%s);\n",
+            sname, GCG_PREFIX_REF, vldh_IdToStr(0, nextoid), GCG_PREFIX_REF,
+            vldh_IdToStr(1, statusoid));
+        statusoid = nextoid;
+      } else if (cid == pwr_cClass_QDOrder) {
+        /* Get the time */
+
+        sts = gcg_ref_insert(gcgctx, nextoid, GCG_PREFIX_REF, node);
+
+        /* Print timer code */
+        gcg_timer_print(gcgctx, nextoid);
+
+        /* Get name for execute call */
+        sts = gcg_get_structname(gcgctx, nextoid, &sname);
+        if (EVEN(sts))
+          return sts;
+
+        /* Print the execute command */
+        IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( %c%s, %c%s);\n",
+            sname, GCG_PREFIX_REF, vldh_IdToStr(0, nextoid), GCG_PREFIX_REF,
+            vldh_IdToStr(1, statusoid));
+        statusoid = nextoid;
+      } else if (cid == pwr_cClass_QPOrder) {
+        sts = gcg_ref_insert(gcgctx, nextoid, GCG_PREFIX_REF, node);
+
+        /* Get name for execute call */
+        sts = gcg_get_structname(gcgctx, nextoid, &sname);
+        if (EVEN(sts))
+          return sts;
+
+        /* Print the execute command */
+        IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( %c%s, %c%s);\n",
+            sname, GCG_PREFIX_REF, vldh_IdToStr(0, nextoid), GCG_PREFIX_REF,
+            vldh_IdToStr(1, statusoid));
+        statusoid = nextoid;
+      } else if (cid == pwr_cClass_QCOrder) {
+        sts = gcg_ref_insert(gcgctx, nextoid, GCG_PREFIX_REF, node);
+
+        /* Get name for execute call */
+        sts = gcg_get_structname(gcgctx, nextoid, &sname);
+        if (EVEN(sts))
+          return sts;
+
+        /* Print the execute command */
+        IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( %c%s, %c%s, %s);\n",
+            sname, GCG_PREFIX_REF, vldh_IdToStr(0, nextoid), GCG_PREFIX_REF,
+	    vldh_IdToStr(1, statusoid), condstr);
+        statusoid = nextoid;
+      }
+      ldhsubordercount++;
+    }
+    sts = ldh_GetNextSibling(ldhses, nextoid, &nextoid);
+  }
+
+  if (ldhsubordercount != subordercount)
+    return GSX__ORDERMISM;
+
+  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec2(tp, %c%s, %c%s->Status);\n", name,
+      GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid),
+      GCG_PREFIX_REF, vldh_IdToStr(1, statusoid));
+
+
+  free((char*)bodydef);
+
+  return GSX__SUCCESS;
+}
+
+/*************************************************************************
+*
+* Name:		gcg_comp_m75()
+*
+* Type		void
+*
+* Type		Parameter	IOGF	Description
+* gcg_ctx	gcgctx		I	gcg context.
+* vldh_t_node	node		I	vldh node.
+*
+* Description:
+*	Compile method for DataQ.
+*	Syntax control:
+*	Check if a subwindow exists.
+*
+*	Generating code:
+*	Identical to method 4 with the following addition:
+*	Prints an special init call and checks reset object.
+*
+**************************************************************************/
+
+int gcg_comp_m75(gcg_ctx gcgctx, vldh_t_node node)
+{
+  int sts, found, size;
+  char* windbuffer;
+  pwr_tObjid windowobjdid;
+  pwr_tClassId windclass;
+  ldh_tSesContext ldhses;
+  char* name;
+  pwr_tObjid* resobjid_ptr;
+  pwr_tAttrRef resattrref;
+  pwr_tClassId cid;
+  pwr_tUInt32* maxsize_ptr;
+  pwr_tUInt32* elements_ptr;
+  pwr_tAttrRef *connect_arp;
+
+  ldhses = (node->hn.wind)->hw.ldhses;
+
+  sts = ldh_GetObjectPar(gcgctx->ldhses, node->ln.oid, "RtBody", "PlcConnect",
+      (char**)&connect_arp, &size);
+  if (EVEN(sts)) {
+    gcg_error_msg(gcgctx, GSX__BADWIND, node);
+    return GSX__NEXTNODE;
+  }
+
+  if (cdh_ObjidIsNull(connect_arp->Objid)) {
+    free((char*)connect_arp);
+    gcg_error_msg(gcgctx, GSX__REFOBJ, node);
+    return GSX__NEXTNODE;
+  }
+
+  /* Check size */
+  sts = ldh_GetObjectPar(ldhses, connect_arp->Objid, "RtBody", "Config.MaxSize", 
+      (char**)&maxsize_ptr, &size);
+  if (EVEN(sts))
+    return sts;
+
+  sts = ldh_GetObjectPar(ldhses, connect_arp->Objid, "RtBody", "Intern.DataElements", 
+      (char**)&elements_ptr, &size);
+  if (EVEN(sts))
+    return sts;
+
+  if (*maxsize_ptr > *elements_ptr) {
+    free((char*)maxsize_ptr);
+    free((char*)elements_ptr);
+    gcg_error_msg(gcgctx, GSX__MAXSIZE, node);
+    return GSX__NEXTNODE;
+  }
+  free((char*)maxsize_ptr);
+  free((char*)elements_ptr);
+
+  sts = gcg_comp_m4(gcgctx, node);
+  if (EVEN(sts))
+    return sts;
+
+  /* Get name for this class */
+  sts = gcg_get_structname(gcgctx, node->ln.oid, &name);
+  if (EVEN(sts))
+    return sts;
+
+  /* Print the init command */
+  IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%s_init( %c%s);\n", name,
+      GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid));
+
+  /* Get the resetobject if there is one */
+  sts = ldh_GetObjectPar(ldhses, connect_arp->Objid, "RtBody", 
+      "Config.ResetObject", (char**)&resobjid_ptr, &size);
+  if (EVEN(sts))
+    return sts;
+
+  resattrref = cdh_ObjidToAref(*resobjid_ptr);
+  free((char*)resobjid_ptr);
+
+  if (cdh_ObjidIsNotNull(resattrref.Objid)) {
+    sts = gcg_replace_ref(gcgctx, &resattrref, node);
+    if (EVEN(sts))
+      return sts;
+
+    /* The reset object has to be a di, do or dv */
+    sts = ldh_GetAttrRefOrigTid(ldhses, &resattrref, &cid);
+    if (EVEN(sts)) {
+      gcg_error_msg(gcgctx, GSX__NORESET, node);
+      return GSX__NEXTNODE;
+    }
+
+    /* Check that the class of the reset object is correct */
+    if (!(cid == pwr_cClass_Di || cid == pwr_cClass_Dv || cid == pwr_cClass_Po
+            || cid == pwr_cClass_Do)) {
+      gcg_error_msg(gcgctx, GSX__CLASSRESET, node);
+      return GSX__NEXTNODE;
+    }
+
+    /* Insert reset object in ioread list */
+    gcg_ioread_insert(gcgctx, resattrref, GCG_PREFIX_REF);
+
+    /* Place the pointer to the resetobject in the cell */
+    IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE],
+        "%c%s->ResetObjectP = &%c%s->ActualValue;\n", GCG_PREFIX_REF,
+        vldh_IdToStr(0, node->ln.oid), GCG_PREFIX_REF,
+        vldh_AttrRefToStr(1, resattrref));
+  } else {
+    /* Inget resetobjekt f�r cellen */
+    IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->ResetObjectP = 0;\n",
+        GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid));
+  }
+
+  /* Print the function call to execute the subwindow */
+  /* Check first that there is a subwindow */
+  /* Get the first child to the plc */
+  sts = ldh_GetChild(ldhses, node->ln.oid, &windowobjdid);
+  found = 0;
+  while (ODD(sts)) {
+    /* Check if window */
+    sts = ldh_GetObjectBuffer(ldhses, windowobjdid, "DevBody", "PlcWindow",
+        (pwr_eClass*)&windclass, &windbuffer, &size);
+    free((char*)windbuffer);
+    if (ODD(sts)) {
+      found = 1;
+      break;
+    }
+    sts = ldh_GetNextSibling(ldhses, windowobjdid, &windowobjdid);
+  }
+
+  if (found) {
+    /* Get name for this class */
+    sts = gcg_get_structname(gcgctx, node->ln.oid, &name);
+    if (EVEN(sts))
+      return sts;
+
+    /* Print the execute command */
+    IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%sSubWind_exec( %c%s, ",
+        name, GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid));
+
+    /* Print the window execute command */
+    IF_PR fprintf(gcgctx->files[GCGM1_DECL_FILE],
+        "void %c%s_exec(plc_sThread *tp);", GCG_PREFIX_MOD,
+        vldh_IdToStr(0, windowobjdid));
+    IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%c%s_exec( tp)",
+        GCG_PREFIX_MOD, vldh_IdToStr(0, windowobjdid));
+    IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], ");\n");
+  }
+  free((char*)connect_arp);
+
+  return GSX__SUCCESS;
+}
+
+/*************************************************************************
+*
+* Name:		gcg_comp_m76()
+*
+* Type		void
+*
+* Type		Parameter	IOGF	Description
+* gcg_ctx	gcgctx		I	gcg context.
+* vldh_t_node	node		I	vldh node.
+*
+* Description:
+*	Compile method for DataQCurrentData and DataQCurrentIdx
+*	Syntax control:
+*	Checks that the parent is an DataQ object.
+*
+*	Generating code:
+*	Declares and links a pointer to the referenced cell object.
+*
+**************************************************************************/
+
+int gcg_comp_m76(gcg_ctx gcgctx, vldh_t_node node)
+{
+  pwr_tObjid refobjdid;
+  ldh_tSesContext ldhses;
+  pwr_tClassId cid;
+  int sts;
+
+  ldhses = (node->hn.wind)->hw.ldhses;
+
+  /* Check that parent is a DataQFo object */
+  refobjdid = node->hn.wind->lw.poid;
+  sts = ldh_GetObjectClass((node->hn.wind)->hw.ldhses, refobjdid, &cid);
+  if (EVEN(sts)) {
+    gcg_error_msg(gcgctx, GSX__BADWIND, node);
+    return GSX__NEXTNODE;
+  }
+
+  if (cid != pwr_cClass_DataQFo) {
+    gcg_error_msg(gcgctx, GSX__BADWIND, node);
+    return GSX__NEXTNODE;
+  }
+
+  /* Insert order ref list */
+  gcg_ref_insert(gcgctx, refobjdid, GCG_PREFIX_REF, node);
+
+  return GSX__SUCCESS;
+}
+
+/*************************************************************************
+*
+* Name:		gcg_comp_m77()
+*
+* Type		void
+*
+* Type		Parameter	IOGF	Description
+* gcg_ctx	gcgctx		I	gcg context.
+* vldh_t_node	node		I	vldh node.
+*
+* Description:
+*	Compile method for RESET_SO
+*	If the object is connected to an order it is called from
+*	the order method.
+*
+*	Syntax control:
+*	Checks that the referenced order exists, and that it is an
+*	s-order.
+*
+*	Generating code.
+*	Declares and links a rtdb pointer to the Sorder object.
+*	Prints an exec call.
+*	reset_so_exec( Z8000084a, Z800005d3->Status[0]);
+*
+**************************************************************************/
+
+int gcg_comp_m77(gcg_ctx gcgctx, vldh_t_node node)
+{
+  int sts;
+  int size;
+  pwr_tObjid next_objid;
+  pwr_tObjid refobjid;
+  pwr_tObjid* refobjid_ptr;
+  ldh_tSesContext ldhses;
+  pwr_tClassId cid;
+  int found;
+
+  ldhses = (node->hn.wind)->hw.ldhses;
+
+  /* Get the objid of the referenced io object stored in the
+    first parameter devbody */
+  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", "QOrderObject",
+      (char**)&refobjid_ptr, &size);
+  if (EVEN(sts))
+    return sts;
+
+  refobjid = *refobjid_ptr;
+  free((char*)refobjid_ptr);
+
+  /* Check that this is objid of an existing object */
+  sts = ldh_GetObjectClass((node->hn.wind)->hw.ldhses, refobjid, &cid);
+  if (EVEN(sts)) {
+    gcg_error_msg(gcgctx, GSX__REFOBJ, node);
+    return GSX__NEXTNODE;
+  }
+
+  /* Get the objid for the QSorder witch is a child of the order */
+  found = 0;
+  sts = ldh_GetChild(ldhses, refobjid, &next_objid);
+  while (ODD(sts)) {
+    /* Find out if this is a QSorder */
+    sts = ldh_GetObjectClass(ldhses, next_objid, &cid);
+    if (EVEN(sts))
+      return sts;
+
+    if (cid == pwr_cClass_QSOrder) {
+      found = 1;
+      break;
+    }
+    sts = ldh_GetNextSibling(ldhses, next_objid, &next_objid);
+  }
+  if (!found) {
+    gcg_error_msg(gcgctx, GSX__NOSORDER, node);
+    return GSX__NEXTNODE;
+  }
+
+  /* Insert sorder and reset_so object in ref list */
+
+  gcg_ref_insert(gcgctx, next_objid, GCG_PREFIX_REF, node);
+
+  sts = gcg_print_exec_macro(gcgctx, node, next_objid, GCG_PREFIX_REF);
+  if (EVEN(sts))
+    return sts;
+
+  sts = gcg_print_inputs(gcgctx, node, ", ", GCG_PRINT_ALLPAR, NULL, NULL);
+  if (EVEN(sts))
+    return sts;
+
+  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], ");\n");
 
   return GSX__SUCCESS;
 }
