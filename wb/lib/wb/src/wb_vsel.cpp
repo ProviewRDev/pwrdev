@@ -125,7 +125,9 @@ pwr_tStatus WVsel::load_volumelist()
       return sts;
 
     if (!all) {
-      if (cdh_isClassVolumeClass(classid)
+      if ((cdh_isClassVolumeClass(classid) && 
+	   (volume < cdh_cUserClassVolMin || volume > cdh_cUserClassVolMax)) 
+
           || classid == pwr_eClass_WorkBenchVolume || volume == ldh_cRtVolume) {
         sts = ldh_GetNextVolume(wbctx, volume, &volume);
         continue;
