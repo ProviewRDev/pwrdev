@@ -3622,7 +3622,8 @@ int vldh_node_update_spec(vldh_t_node node)
    *	Put cell objdid in the ldhobject.
    **********************************************************/
   else if ((node->ln.cid == vldh_eclass(ldhses, "DataQCurrentData"))
-      || (node->ln.cid == vldh_eclass(ldhses, "DataQCurrentIdx"))) {
+      || (node->ln.cid == vldh_eclass(ldhses, "DataQCurrentIdx"))
+      || (node->ln.cid == vldh_eclass(ldhses, "DataQCurrentBus"))) {
     sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "DataQFoObject",
         (char*)&wind->lw.poid, sizeof(wind->lw.poid));
     if (EVEN(sts))
@@ -3969,7 +3970,7 @@ int vldh_node_create_spec(vldh_t_node node)
    *	Put cell objdid in the ldhobject.
    **********************************************************/
   else if ((node->ln.cid == vldh_eclass(ldhses, "CurrentData"))
-      || (node->ln.cid == vldh_eclass(ldhses, "CurrentIndex"))) {
+       || (node->ln.cid == vldh_eclass(ldhses, "CurrentIndex"))) {
     sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "CellObject",
         (char*)&wind->lw.poid, sizeof(wind->lw.poid));
     if (EVEN(sts))
@@ -3980,7 +3981,8 @@ int vldh_node_create_spec(vldh_t_node node)
    *	Put cell objdid in the ldhobject.
    **********************************************************/
   else if ((node->ln.cid == vldh_eclass(ldhses, "DataQCurrentData"))
-      || (node->ln.cid == vldh_eclass(ldhses, "DataQCurrentIdx"))) {
+       || (node->ln.cid == vldh_eclass(ldhses, "DataQCurrentIdx"))
+       || (node->ln.cid == vldh_eclass(ldhses, "DataQCurrentBus"))) {
     sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "DataQFoObject",
         (char*)&wind->lw.poid, sizeof(wind->lw.poid));
     if (EVEN(sts))

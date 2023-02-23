@@ -188,6 +188,7 @@ bool wb_vrepced::deleteObject(pwr_tStatus* sts, wb_orep* orep)
   case pwr_eClass_Input:
   case pwr_eClass_Intern:
   case pwr_eClass_Output:
+  case pwr_eClass_TargetAttribute:
   case pwr_eClass_Buffer:
   case pwr_eClass_ObjXRef:
   case pwr_eClass_AttrXRef: {
@@ -213,6 +214,7 @@ bool wb_vrepced::deleteFamily(pwr_tStatus* sts, wb_orep* orep)
   case pwr_eClass_Input:
   case pwr_eClass_Intern:
   case pwr_eClass_Output:
+  case pwr_eClass_TargetAttribute:
   case pwr_eClass_Buffer:
   case pwr_eClass_ObjXRef:
   case pwr_eClass_AttrXRef: {
@@ -245,6 +247,7 @@ bool wb_vrepced::writeAttribute(pwr_tStatus* sts, wb_orep* o, pwr_eBix bix,
   switch (o->cid()) {
   case pwr_eClass_Param:
   case pwr_eClass_Intern:
+  case pwr_eClass_TargetAttribute:
     if (bix == pwr_eBix_sys && offset == offsetof(pwr_sParam, TypeRef)) {
       m_vrep->readAttribute(sts, o, pwr_eBix_sys, offsetof(pwr_sParam, TypeRef),
           sizeof(tid), &tid);
@@ -448,6 +451,7 @@ bool wb_vrepced::resetFlagsNewAttribute(
   case pwr_eClass_Input:
   case pwr_eClass_Output:
   case pwr_eClass_Intern:
+  case pwr_eClass_TargetAttribute:
   case pwr_eClass_Buffer:
     m_vrep->writeAttribute(sts, o, pwr_eBix_sys,
         offsetof(pwr_sParam, Info.Flags), sizeof(flags), &flags);
@@ -466,6 +470,7 @@ bool wb_vrepced::setFlagsNewAttribute(pwr_tStatus* sts, wb_orep* o)
   switch (o->cid()) {
   case pwr_eClass_Param:
   case pwr_eClass_Intern:
+  case pwr_eClass_TargetAttribute:
   case pwr_eClass_Buffer:
     m_vrep->readAttribute(sts, o, pwr_eBix_sys,
         offsetof(pwr_sParam, Info.Flags), sizeof(flags), &flags);
@@ -484,6 +489,7 @@ bool wb_vrepced::setFlagsNewAttribute(pwr_tStatus* sts, wb_orep* o)
   switch (o->cid()) {
   case pwr_eClass_Param:
   case pwr_eClass_Intern:
+  case pwr_eClass_TargetAttribute:
   case pwr_eClass_Buffer:
     m_vrep->writeAttribute(sts, o, pwr_eBix_sys,
         offsetof(pwr_sParam, Info.Flags), sizeof(flags), &flags);
@@ -505,6 +511,7 @@ bool wb_vrepced::setPgmName(pwr_tStatus* sts, wb_orep* o)
   case pwr_eClass_Input:
   case pwr_eClass_Output:
   case pwr_eClass_Intern:
+  case pwr_eClass_TargetAttribute:
   case pwr_eClass_ObjXRef:
   case pwr_eClass_AttrXRef:
   case pwr_eClass_Buffer:
@@ -706,6 +713,7 @@ bool wb_vrepced::classeditorCheck(ldh_eDest dest_code, wb_orep* dest,
       case pwr_eClass_Intern:
       case pwr_eClass_Input:
       case pwr_eClass_Output:
+      case pwr_eClass_TargetAttribute:
       case pwr_eClass_ObjXRef:
       case pwr_eClass_AttrXRef:
       case pwr_eClass_Buffer:
@@ -962,6 +970,7 @@ bool wb_vrepced::classeditorCheck(ldh_eDest dest_code, wb_orep* dest,
   case pwr_eClass_Input:
   case pwr_eClass_Output:
   case pwr_eClass_Intern:
+  case pwr_eClass_TargetAttribute:
   case pwr_eClass_ObjXRef:
   case pwr_eClass_AttrXRef:
   case pwr_eClass_Buffer: {
@@ -1070,6 +1079,7 @@ bool wb_vrepced::classeditorCheckMove(
       case pwr_eClass_Intern:
       case pwr_eClass_Input:
       case pwr_eClass_Output:
+      case pwr_eClass_TargetAttribute:
       case pwr_eClass_ObjXRef:
       case pwr_eClass_AttrXRef:
       case pwr_eClass_Buffer:
@@ -1156,6 +1166,7 @@ bool wb_vrepced::classeditorCheckMove(
   case pwr_eClass_Input:
   case pwr_eClass_Output:
   case pwr_eClass_Intern:
+  case pwr_eClass_TargetAttribute:
   case pwr_eClass_ObjXRef:
   case pwr_eClass_AttrXRef:
   case pwr_eClass_Buffer:
@@ -1269,7 +1280,8 @@ bool wb_vrepced::buildTemplate(pwr_tStatus* sts, wb_orep* co)
     case pwr_eClass_Param:
     case pwr_eClass_Input:
     case pwr_eClass_Output:
-    case pwr_eClass_Intern: {
+    case pwr_eClass_Intern:
+    case pwr_eClass_TargetAttribute: {
       m_vrep->readAttribute(sts, ao, pwr_eBix_sys,
           offsetof(pwr_sParam, TypeRef), sizeof(typeref), &typeref);
       if (EVEN(*sts))
@@ -1657,7 +1669,8 @@ bool wb_vrepced::buildClass(pwr_tStatus* sts, wb_orep* co)
         case pwr_eClass_Param:
         case pwr_eClass_Input:
         case pwr_eClass_Output:
-        case pwr_eClass_Intern: {
+        case pwr_eClass_Intern:
+        case pwr_eClass_TargetAttribute: {
           pwr_tTid typeref;
           pwr_tInt32 type;
           pwr_tUInt32 flags;
@@ -2673,7 +2686,8 @@ void wb_vrepced::printStructFile(bool hpp)
                 case pwr_eClass_Param:
                 case pwr_eClass_Intern:
                 case pwr_eClass_Input:
-                case pwr_eClass_Output: {
+                case pwr_eClass_Output:
+                case pwr_eClass_TargetAttribute: {
                   pwr_sIntern adef_body;
                   pwr_tObjName attr_pgmname;
                   pwr_tObjName attr_typeref_pgmname;

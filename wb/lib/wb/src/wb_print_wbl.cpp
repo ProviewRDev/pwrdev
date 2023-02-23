@@ -108,6 +108,7 @@ void wb_print_wbl::printAttribute(wb_volume& v,
     case pwr_eClass_Input:
     case pwr_eClass_Intern:
     case pwr_eClass_Output:
+    case pwr_eClass_TargetAttribute:
     case pwr_eClass_ObjXRef:
       printParameter(v, attr, tattr, adef);
       break;
@@ -482,6 +483,7 @@ void wb_print_wbl::printObject(wb_volume& v, wb_object& o, bool recursive)
     case pwr_eClass_Input:
     case pwr_eClass_Output:
     case pwr_eClass_Intern:
+    case pwr_eClass_TargetAttribute:
     case pwr_eClass_Buffer:
     case pwr_eClass_ObjXRef:
       uid.pwr = o.oid();

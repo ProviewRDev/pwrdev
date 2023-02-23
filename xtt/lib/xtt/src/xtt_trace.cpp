@@ -969,7 +969,8 @@ int RtTrace::flow_cb(FlowCtx* ctx, flow_tEvent event)
     break;
   }
   case flow_eEvent_MB1DoubleClickShiftCtrl: {
-    tractx->changevalue(event->object.object);
+    if (event->object.object)
+      tractx->changevalue(event->object.object);
     break;
   }
   case flow_eEvent_SelectClear:

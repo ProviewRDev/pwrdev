@@ -331,7 +331,7 @@ static pwr_tStatus qbck_data_handler(qbck_tCtx bckctx)
       /* Remove subscriptions */
       sts = gdh_DLUnrefObjectInfo(data_ptr->data_subid);
       if (EVEN(sts))
-        Log(DATAQ__MIRUNREF, sts);
+        Log(DATAQ__BCKUNREF, sts);
 
       /* Delete the data entry */
       next_ptr = data_ptr->next_ptr;

@@ -74,6 +74,7 @@ typedef struct pwr_s_ObjBodyDef pwr_sObjBodyDef;
 typedef struct pwr_s_Input pwr_sInput;
 typedef struct pwr_s_Output pwr_sOutput;
 typedef struct pwr_s_Intern pwr_sIntern;
+typedef struct pwr_s_TargetAttribute pwr_sTargetAttribute;
 typedef struct pwr_s_ObjXRef pwr_sObjXRef;
 typedef struct pwr_s_Point pwr_sPoint;
 typedef struct pwr_s_PlcProgram pwr_sPlcProgram;
@@ -316,6 +317,7 @@ typedef enum {
   pwr_eCix_BlockAttribute = 72,
   pwr_eCix_SubBlock = 73,
   pwr_eCix_MountDynObject = 74,
+  pwr_eCix_TargetAttribute = 75,
   pwr_eCix_
 } pwr_eCix;
 
@@ -394,6 +396,7 @@ typedef enum {
   pwr_eClass_BlockAttribute = pwr_ClassId(pwr_eCix_BlockAttribute),
   pwr_eClass_SubBlock = pwr_ClassId(pwr_eCix_SubBlock),
   pwr_eClass_MountDynObject = pwr_ClassId(pwr_eCix_MountDynObject),
+  pwr_eClass_TargetAttribute = pwr_ClassId(pwr_eCix_TargetAttribute),
   pwr_eClass_
 } pwr_eClass;
 
@@ -791,6 +794,14 @@ struct pwr_s_Output {
   pwr_sParGraph Graph pwr_dAlignW; /* Used by graphic editor.  */
 };
 
+struct pwr_s_TargetAttribute {
+  pwr_sParInfo Info pwr_dAlignLW;
+  pwr_tTypeId TypeRef pwr_dAlignW; /* Reference to the object defining
+                                      the type.  */
+  pwr_sAttrRef SourceAttr pwr_dAlignW; /* Source attribute reference.  */
+  pwr_tBoolean Feedback pwr_dAlignW;
+};
+
 struct pwr_s_AttrXRef {
   pwr_sParInfo Info pwr_dAlignLW;
   pwr_tXRef Identity pwr_dAlignW; /* A name to identify a cross
@@ -823,6 +834,7 @@ union pwr_u_ParDef {
   pwr_sInput Input;
   pwr_sOutput Output;
   pwr_sIntern Intern;
+  pwr_sTargetAttribute TargetAttribute;
   pwr_sObjXRef ObjXRef;
   pwr_sAttrXRef AttrXRef;
   pwr_sBuffer Buffer;

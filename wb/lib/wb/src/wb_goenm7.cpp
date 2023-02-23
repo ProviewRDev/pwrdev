@@ -50,6 +50,7 @@
 #include <string.h>
 
 #include "pwr_baseclasses.h"
+#include "pwr_dataqclasses.h"
 
 #include "wb_foe_msg.h"
 #include "wb_goenm7.h"
@@ -254,7 +255,7 @@ int goen_create_nodetype_m7(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid,
     default:
       strcpy(trace_attr, bodydef[inputs + interns].Par->Output.Info.PgmName);
     }
-    switch (bodydef[inputs + interns].Par->Output.Info.Type) {
+    switch ((int)bodydef[inputs + interns].Par->Output.Info.Type) {
     case pwr_eType_Float32:
       trace_type = flow_eTraceType_Float32;
       break;
@@ -263,6 +264,10 @@ int goen_create_nodetype_m7(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid,
       break;
     case pwr_eType_Boolean:
       trace_type = flow_eTraceType_Boolean;
+      break;
+    case pwr_cClass_QOrderBus:
+      trace_type = flow_eTraceType_DataRef;
+      strcat(trace_attr, ".Data");
       break;
     default:
       trace_type = flow_eTraceType_Int32;

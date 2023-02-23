@@ -39,43 +39,7 @@
 success 	<successful completion>				/succ
 exit		<rs_nmps_mirror has exited, Reason: >		/fatal
 nomemory	<unable to allocate dynamic memory>		/error
-convobject 	<Convert config Object not found>		/error
-noconvconfig 	<Conversion config object not found in mirqueue>	/error
-notlocal	<Remote queue objects without conversion not allowed> /error
-mirrorconfig 	<No mirror config object found>			/error
-convoutdataclass <Syntax error in convconfig object '%d',OutDataClass> /error
-convparent 	<Syntax error in convconfig object '%d',OutDataParent> /error
-convindataclass <Syntax error in convconfig object '%d',InDataClass> /error
-convcopysize 	<Syntax error in convconfig object '%d', CopySize> /error
-collectqueue	<Error in NMpsQueueMir object '%d', CollectQueue>	/error
-collectclass	<Error in class of CollectQueue, objid: '%d'> 	/error
-collectdl	<Error in direct link of collect queue> 		/error
-nocollect	<Collect queue not found for data object>	/error
-origdata	<Unable to get info of original data object>	/error
-datareconnect	<Reconnecting to existing data object '%s'>	/info
-datareconerr	<Mirror, error reconnection to existing object. Reason:> /error
-remqueuedown	<Connection to remote queue lost: "'%d'". Reason:> /error
-remqueuedown_c	<Connection to remote queue lost: "'%d'". Reason:> /error
-remqueueup	<Connection to remote queue up: '%d'>		/info
-mirrornoinit	<All mirrorqueues not yet initialized, retry later> /warn
-mirrorinit	<NMps mirror initiated>				/info
-origclass	<Error in class of original queue, objid: '%d'>	/error
 nodedown	<Remote node is down>				/error
-mircreadata	<Mirror, error creating data object. Reason:> 	/error
-mircreabck	<Mirror, error creating data backup object. Reason:> 	/error
-mirsetbck	<Mirror, unable to set data in data backup object. Reason:> 	/error
-mirdeldata	<Mirror, error deleting data object. Reason:> 	/error
-mirdelbck	<Mirror, error deleting data backup object. Reason:> 	/error
-mirsubdata	<Mirror, error getting subdata. Reason:> 	/error
-mirunref	<Mirror, error unrefering data object. Reason:>	/error
-mirparent	<Mirror, unable to find parent object. Reason:>	/error
-mirorigdata	<Mirror, error referencing original data object. Reason:> /error
-mirassbuff	<Mirror, error associate buffer. Reason:>	/error
-mirdata		<Mirror, error referencing data object. Reason:> /error
-mirorigqueue	<Mirror, error referencing original queue object. Reason:> /error
-mirqueue		<Mirror, error referencing queue object. Reason:> /error
-mirqueuerestart	<Mirror, restart of mirror queue>		/info
-datarestart	<Mirror, original object restarted: '%s'> 	/info
 fileread	<Backup, file read error during restore> 	/error
 bckversion	<Backup, version mismatch in backup file>	/error
 bckfilecorrupt	<Backup error during  restore, backupfile corrupt> /error
@@ -98,42 +62,7 @@ bckwrite	<NMps Backup, Write error on file '%s'>		/error
 filereopen	<Backup file reopened after write error>	/error
 bckconfig	<Unable to find NMpsBackupConfig object>	/error
 bckopen		<Unable to open Nmps backup file>		/error
-entrynotfound	<Entry in translist not found>			/error
-reqobject	<Unable to get pointer to DataRequest object> 	/error
-reqdisplayobject <Unable to find attr DisplayObject in a DataRequest object> /error
-reqsendremtrans	<Unable to get SendRemTrans in DataRequest object>	/error
-reqsendremtransbuf <Unable to get bufferobject of SendRemTrans> /error
-reqrcvremtrans	<Unable to get RcvRemTrans in DataRequest object> 	/error
-reqrcvremtransbuf <Unable to get bufferobject of RcvRemTrans>	/error
-reqinqueue	<Unable to find Queue in DataRequest object>		/error
-reqdataparent 	<Unable to get DataParent i DataRequest object>	/error
-reqdataclass 	<Error in DataClass of DataRequest object>		/error
-reqconvtable 	<Error while creating conversion table for DataRequest object> /error
-transconfig 	<Unable to find NMpsTransConfig object>		/error
-transqueuefull 	<Unable to insert data object, queue is full>	/error
-transqueuebusy 	<Unable to insert data object, queue is busy>	/error
-nowaitaccept 	<Nothing to accept>				/error
-transcreaobj 	<Unable to create object>			/error
-remtransbusy	<RemTrans object is busy>			/error
-transunexpect	<DataRequest trans answere with unexpected key received> /error
-sndnodata	<No data found to send>				/error
-sndnameint	<Data name is not in integer>			/error
-sndobject	<Unable to get pointer to DataRequest object> 	/error
-sndsendremtrans	<Unable to get SendRemTrans in DataSend object>	/error
-sndsendremtransbuf <Unable to get bufferobject of SendRemTrans> /error
-sndrcvremtrans	<Unable to get RcvRemTrans in DataSend object> 	/error
-sndrcvremtransbuf <Unable to get bufferobject of RcvRemTrans>	/error
-sndconvtable 	<Error while creating conversion table for DataSend object> /error
-rcvobject	<Unable to get pointer to DataRcv object> 	/error
-rcvdisplayobject <Unable to find attr DisplayObject in a DataRcv object> /error
-rcvsendremtrans	<Unable to get SendRemTrans in DataRcv object>	/error
-rcvsendremtransbuf <Unable to get bufferobject of SendRemTrans> /error
-rcvrcvremtrans	<Unable to get RcvRemTrans in DataRcv object> 	/error
-rcvrcvremtransbuf <Unable to get bufferobject of RcvRemTrans>	/error
-rcvinqueue	<Unable to find Queue in DataRcv object>		/error
-rcvdataparent 	<Unable to get DataParent i DataRcv object>	/error
-rcvdataclass 	<Error in DataClass of DataRcv object>		/error
-rcvconvtable 	<Error while creating conversion table for DataRcv object> /error
+srvconfig	<Server is no configured>			/error
 applqueue	<Error referencing queue object> 		/error
 applqueuelist	<List of queue is to large>			/error
 applsessmax	<Max number of application sessions exceeded>	/error
@@ -157,3 +86,8 @@ destnotpresent	<Data is not present in destination>		/error
 dataalrexist    <Data already exist in queue>			/error
 datanotfound    <Data not found in queue>			/error
 datasplit       <Data is split in several queues>		/error
+dataclass       <Existing data object has wrong class>		/error
+dataremoved	<Data object removed>				/error
+init		<Initialization error>				/error
+invalidname	<Invalid name>					/error
+sourcemismatch   <Source/Target mismatch>			/error

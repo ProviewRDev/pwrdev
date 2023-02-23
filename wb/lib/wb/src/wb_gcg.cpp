@@ -228,6 +228,7 @@ int gcg_comp_m74(gcg_ctx gcgctx, vldh_t_node node);
 int gcg_comp_m75(gcg_ctx gcgctx, vldh_t_node node);
 int gcg_comp_m76(gcg_ctx gcgctx, vldh_t_node node);
 int gcg_comp_m77(gcg_ctx gcgctx, vldh_t_node node);
+int gcg_comp_m78(gcg_ctx gcgctx, vldh_t_node node);
 
 gcg_tMethod gcg_comp_m[80]
     = { (gcg_tMethod)gcg_comp_m0, (gcg_tMethod)gcg_comp_m1, gcg_comp_m2,
@@ -245,7 +246,8 @@ gcg_tMethod gcg_comp_m[80]
         gcg_comp_m58, gcg_comp_m59, gcg_comp_m60, gcg_comp_m61, gcg_comp_m62,
         gcg_comp_m63, gcg_comp_m64, gcg_comp_m65, gcg_comp_m66, gcg_comp_m67,
         gcg_comp_m68, gcg_comp_m69, gcg_comp_m70, gcg_comp_m71, gcg_comp_m72,
-        gcg_comp_m73, gcg_comp_m74, gcg_comp_m75, gcg_comp_m76, gcg_comp_m77};
+        gcg_comp_m73, gcg_comp_m74, gcg_comp_m75, gcg_comp_m76, gcg_comp_m77,
+	gcg_comp_m78};
 
 // static pwr_tStatus gcg_get_build_host(pwr_mOpSys os, char* buf, int bufsize);
 
@@ -13453,16 +13455,20 @@ int gcg_comp_m60(gcg_ctx gcgctx, vldh_t_node node)
   if (segments == 0)
     segments = 1;
 
-  if (cdh_ObjidIsNotNull(arefp->Objid)) {
+  if (cdh_ObjidIsNotNull(aref.Objid)) {
     sts = gcg_replace_ref(gcgctx, &aref, node);
     if (EVEN(sts))
       return sts;
 
     sts = ldh_AttrRefToName(ldhses, &aref, ldh_eName_Aref, &name_p, &size);
-    if (ODD(sts)) {
-      utl_cut_segments(name, name_p, segments);
+    if (EVEN(sts)) {
+      gcg_error_msg(gcgctx, GSX__REFPAR, node);
+      return GSX__NEXTNODE;
     }
+    utl_cut_segments(name, name_p, segments);
   }
+  else
+    strcpy(name, "");
 
   /* Set the parameter value */
   name[79] = 0;
@@ -15753,7 +15759,7 @@ int gcg_comp_m74(gcg_ctx gcgctx, vldh_t_node node)
   }
 
   subordercount = 0;
-  for (i = 0; i < rows - 2; i += 2) {
+  for (i = 0; i < 12; i += 2) {
     /* Get the parameter value */
     sts = ldh_GetObjectPar((node->hn.wind)->hw.ldhses, node->ln.oid, "DevBody",
 	bodydef[i].ParName, (char**)&parvalue, &size);
@@ -15931,6 +15937,7 @@ int gcg_comp_m75(gcg_ctx gcgctx, vldh_t_node node)
   pwr_tAttrRef resattrref;
   pwr_tClassId cid;
   pwr_tUInt32* maxsize_ptr;
+  pwr_tEnum* function_ptr;
   pwr_tUInt32* elements_ptr;
   pwr_tAttrRef *connect_arp;
 
@@ -15955,18 +15962,26 @@ int gcg_comp_m75(gcg_ctx gcgctx, vldh_t_node node)
   if (EVEN(sts))
     return sts;
 
+  sts = ldh_GetObjectPar(ldhses, connect_arp->Objid, "RtBody", "Config.Function", 
+      (char**)&function_ptr, &size);
+  if (EVEN(sts))
+    return sts;
+
   sts = ldh_GetObjectPar(ldhses, connect_arp->Objid, "RtBody", "Intern.DataElements", 
       (char**)&elements_ptr, &size);
   if (EVEN(sts))
     return sts;
 
-  if (*maxsize_ptr > *elements_ptr) {
+  if (*function_ptr != pwr_eDataQFunctionEnum_EndQueue &&
+      *maxsize_ptr > *elements_ptr) {
     free((char*)maxsize_ptr);
+    free((char*)function_ptr);
     free((char*)elements_ptr);
     gcg_error_msg(gcgctx, GSX__MAXSIZE, node);
     return GSX__NEXTNODE;
   }
   free((char*)maxsize_ptr);
+  free((char*)function_ptr);
   free((char*)elements_ptr);
 
   sts = gcg_comp_m4(gcgctx, node);
@@ -16075,7 +16090,8 @@ int gcg_comp_m75(gcg_ctx gcgctx, vldh_t_node node)
 * vldh_t_node	node		I	vldh node.
 *
 * Description:
-*	Compile method for DataQCurrentData and DataQCurrentIdx
+*	Compile method for DataQCurrentData, DataQCurrentIdx and
+*	DataQCurrentBus.
 *	Syntax control:
 *	Checks that the parent is an DataQ object.
 *
@@ -16201,6 +16217,127 @@ int gcg_comp_m77(gcg_ctx gcgctx, vldh_t_node node)
     return sts;
 
   IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], ");\n");
+
+  return GSX__SUCCESS;
+}
+
+/*************************************************************************
+*
+* Name:		gcg_comp_m78()
+*
+* Type		void
+*
+* Type		Parameter	IOGF	Description
+* gcg_ctx	gcgctx		I	gcg context.
+* vldh_t_node	node		I	vldh node.
+*
+* Description:
+*	Compile method for RemoteDataQ.
+*
+*	Syntax control:
+*	Find and store connected DataQ object.
+*
+*	Generating code.
+*	Prints init and exec call.
+*
+**************************************************************************/
+
+int gcg_comp_m78(gcg_ctx gcgctx, vldh_t_node node)
+{
+  int sts;
+  ldh_tSesContext ldhses;
+  unsigned long point;
+  unsigned long par_inverted;
+  vldh_t_node output_node;
+  unsigned long output_count;
+  unsigned long output_point;
+  ldh_sParDef output_bodydef;
+  char *name;
+  pwr_tAName aname;
+  int size;
+  pwr_tAttrRef *output_connect_arp;
+  pwr_tAttrRef *connect_arp;
+  pwr_tAttrRef aref;
+
+  ldhses = (node->hn.wind)->hw.ldhses;
+
+  sts = gcg_ref_insert(gcgctx, node->ln.oid, GCG_PREFIX_REF, node);
+
+  // Find connected DataQ
+  sts = gcg_get_inputpoint(node, 0, &point, &par_inverted);
+  if (EVEN(sts)) 
+    return sts;
+
+  /* Look for an output connected to this point */
+  sts = gcg_get_output(node, point, &output_count, &output_node,
+      &output_point, &output_bodydef,
+      GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
+  if (EVEN(sts))
+    return sts;
+
+  if (output_count != 1) {
+    gcg_error_msg(gcgctx, GSX__CONOUTPUT, node);
+    return GSX__NEXTNODE;
+  }
+
+  sts = ldh_GetObjectPar(ldhses, output_node->ln.oid, "RtBody", "PlcConnect",
+      (char**)&output_connect_arp, &size);
+  if (EVEN(sts)) {
+    gcg_error_msg(gcgctx, GSX__CONOUTPUT, node);
+    return GSX__NEXTNODE;
+  }
+
+  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "RtBody", "PlcConnect",
+      (char**)&connect_arp, &size);
+  if (EVEN(sts)) {
+    gcg_error_msg(gcgctx, GSX__CONOUTPUT, node);
+    return GSX__NEXTNODE;
+  }
+
+  if (cdh_ObjidIsNull(output_connect_arp->Objid)) {
+    free((char*)connect_arp);
+    free((char*)output_connect_arp);
+    gcg_error_msg(gcgctx, GSX__REFOBJ, node);
+    return GSX__NEXTNODE;
+  }
+
+  if (cdh_ObjidIsNull(connect_arp->Objid)) {
+    free((char*)connect_arp);
+    free((char*)output_connect_arp);
+    gcg_error_msg(gcgctx, GSX__REFOBJ, node);
+    return GSX__NEXTNODE;
+  }
+
+  sts = ldh_AttrRefToName(ldhses, connect_arp,
+      cdh_mName_volumeStrict, &name, &size);
+  if (EVEN(sts))
+    return sts;
+
+  strcpy(aname, name);
+  strcat(aname, ".SourceDataQ");
+    
+  sts = ldh_NameToAttrRef(ldhses, aname, &aref);
+  if (EVEN(sts))
+    return sts;
+
+  sts = ldh_WriteAttribute(ldhses, &aref, (void*)output_connect_arp, sizeof(pwr_tAttrRef));
+  if (EVEN(sts))
+    return sts;
+
+  free((char*)connect_arp);
+  free((char*)output_connect_arp);
+  
+  sts = gcg_get_structname(gcgctx, node->ln.oid, &name);
+  if (EVEN(sts))
+    return sts;
+
+  /* Print the execute command */
+  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec(tp, %c%s);\n", name,
+      GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid));
+
+  /* Print the init command */
+  IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%s_init( %c%s);\n", name,
+      GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid));
 
   return GSX__SUCCESS;
 }

@@ -153,7 +153,7 @@ int CnvWblToXtthelp::class_exec()
   strcat(full_class_name, ctx->rw->class_name);
 
   // Add into index file
-  fp_xtthelp_index << "<B>" << ctx->rw->class_name << "<T><T> "
+  fp_xtthelp_index << ctx->rw->class_name << "<T><T> "
                    << ctx->rw->doc_summary << " <LINK> " << ctx->rw->class_name
                    << '\n';
 
@@ -192,16 +192,16 @@ int CnvWblToXtthelp::class_exec()
       if (str_StartsWith(CnvCtx::low(txt), "@image")) {
         char imagefile[80];
 
-        str_trim(imagefile, txt + 6);
+        str_trim(imagefile, txt + 7);
         fp_tmp << "<IMAGE> " << imagefile << '\n';
       } else if (str_StartsWith(CnvCtx::low(txt), "@b")) {
-        fp_tmp << "<B> " << txt + 2 << '\n';
+        fp_tmp << "<B> " << txt + 3 << '\n';
       } else if (str_StartsWith(CnvCtx::low(txt), "@h1")) {
-        fp_tmp << "<H1> " << txt + 3 << '\n';
+        fp_tmp << "<H1> " << txt + 4 << '\n';
       } else if (str_StartsWith(CnvCtx::low(txt), "@h2")) {
-        fp_tmp << "<H2> " << txt + 3 << '\n';
+        fp_tmp << "<H2> " << txt + 4 << '\n';
       } else if (str_StartsWith(CnvCtx::low(txt), "@i")) {
-        fp_tmp << "<i>" << txt + 2 << '\n';
+        fp_tmp << "<i> " << txt + 3 << '\n';
       } else
         fp_tmp << ctx->rw->doc_text[i] << '\n';
     }
@@ -420,7 +420,7 @@ int CnvWblToXtthelp::typedef_exec()
   strcat(full_class_name, ctx->rw->class_name);
 
   // Add into index file
-  fp_xtthelp_index << "<B>" << ctx->rw->class_name << "<T><T> "
+  fp_xtthelp_index << ctx->rw->class_name << "<T><T> "
                    << ctx->rw->doc_summary << " <LINK> " << ctx->rw->class_name
                    << '\n';
 
@@ -460,16 +460,16 @@ int CnvWblToXtthelp::typedef_exec()
       if (str_StartsWith(CnvCtx::low(txt), "@image")) {
         char imagefile[80];
 
-        str_trim(imagefile, txt + 6);
+        str_trim(imagefile, txt + 7);
         fp_tmp << "<IMAGE> " << imagefile << '\n';
       } else if (str_StartsWith(CnvCtx::low(txt), "@b")) {
-        fp_tmp << "<B> " << txt + 2 << '\n';
+        fp_tmp << "<B> " << txt + 3 << '\n';
       } else if (str_StartsWith(CnvCtx::low(txt), "@h1")) {
-        fp_tmp << "<H1> " << txt + 3 << '\n';
+        fp_tmp << "<H1> " << txt + 4 << '\n';
       } else if (str_StartsWith(CnvCtx::low(txt), "@h2")) {
-        fp_tmp << "<H2> " << txt + 3 << '\n';
+        fp_tmp << "<H2> " << txt + 4 << '\n';
       } else if (str_StartsWith(CnvCtx::low(txt), "@i")) {
-        fp_tmp << "<i>" << txt + 2 << '\n';
+        fp_tmp << "<i> " << txt + 3 << '\n';
       } else
         fp_tmp << ctx->rw->doc_text[i] << '\n';
     }

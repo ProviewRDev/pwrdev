@@ -56,6 +56,9 @@ wb_vrepref::wb_vrepref(wb_erep* erep, pwr_tVid vid)
   case ldh_cIoConnectVolume:
     strcpy(m_name, "$IoConnect");
     break;
+  case ldh_cSourceVolume:
+    strcpy(m_name, "$Source");
+    break;
   }
 }
 

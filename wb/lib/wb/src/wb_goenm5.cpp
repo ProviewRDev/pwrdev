@@ -51,6 +51,7 @@
 
 #include <string.h>
 
+#include "pwr_dataqclasses.h"
 #include "wb_foe_msg.h"
 #include "wb_goenm5.h"
 
@@ -122,6 +123,10 @@ int goen_create_nodetype_m5(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid,
   int size;
   int conpoint_num;
   int rows;
+  ldh_sParDef* bodydef;
+  flow_tObject cp;
+  char trace_attr[80];
+  int trace_type;
   static int idx = 0;
 
   sts = ldh_ClassIdToName(ldhses, cid, name, sizeof(name), &size);
@@ -212,10 +217,37 @@ int goen_create_nodetype_m5(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid,
   }
 
   if (outputpoints != 0) {
+    sts = ldh_GetObjectBodyDef(ldhses, cid, "RtBody", 1, &bodydef, &rows);
+    if (EVEN(sts))
+      return sts;
+
     flow_AddLine(nc, f_width, f_height / 2 - f_yoffs, f_width + f_pinlength,
         f_height / 2 - f_yoffs, flow_eDrawType_Line, 2);
-    flow_AddConPoint(nc, f_width + f_pinlength, f_height / 2 - f_yoffs,
-        conpoint_num++, flow_eDirection_Right);
+    flow_CreateConPoint(ctx, f_width + f_pinlength, f_height / 2 - f_yoffs,
+	conpoint_num++, flow_eDirection_Right, &cp);
+    flow_NodeClassAdd(nc, cp);
+
+    strcpy(trace_attr, bodydef[inputs + interns].Par->Output.Info.PgmName);
+
+    switch ((int)bodydef[inputs + interns].Par->Output.Info.Type) {
+    case pwr_eType_Float32:
+      trace_type = flow_eTraceType_Float32;
+      break;
+    case pwr_eType_Int32:
+      trace_type = flow_eTraceType_Int32;
+      break;
+    case pwr_eType_Boolean:
+      trace_type = flow_eTraceType_Boolean;
+      break;
+    case pwr_cClass_QOrderBus:
+      trace_type = flow_eTraceType_DataRef;
+      strcat(trace_attr, ".Data");
+      break;
+    default:
+      trace_type = flow_eTraceType_Int32;
+    }
+    flow_SetTraceAttr(cp, NULL, trace_attr, (flow_eTraceType)trace_type, 0);
+    free((char*)bodydef);
   }
 
   f_node_width = node_width;

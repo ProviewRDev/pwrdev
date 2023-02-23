@@ -425,6 +425,8 @@ void wb_erep::load(pwr_tStatus* sts, char* db)
     addExtern(sts, vrep);
     vrep = new wb_vrepref(this, ldh_cIoConnectVolume);
     addExtern(sts, vrep);
+    vrep = new wb_vrepref(this, ldh_cSourceVolume);
+    addExtern(sts, vrep);
     return;
   }
   loadCommonMeta(sts);
@@ -440,6 +442,8 @@ void wb_erep::load(pwr_tStatus* sts, char* db)
   vrep = new wb_vrepref(this, ldh_cPlcFoVolume);
   addExtern(sts, vrep);
   vrep = new wb_vrepref(this, ldh_cIoConnectVolume);
+  addExtern(sts, vrep);
+  vrep = new wb_vrepref(this, ldh_cSourceVolume);
   addExtern(sts, vrep);
 }
 
@@ -1306,6 +1310,9 @@ void wb_erep::setRefMerep(wb_merep* merep)
   vrepref = (wb_vrepref*)volume(&sts, ldh_cIoConnectVolume);
   if (ODD(sts))
     vrepref->setMerep(merep);
+  vrepref = (wb_vrepref*)volume(&sts, ldh_cSourceVolume);
+  if (ODD(sts))
+    vrepref->setMerep(merep);
 }
 
 void wb_erep::resetRefMerep()
@@ -1320,6 +1327,9 @@ void wb_erep::resetRefMerep()
   if (ODD(sts))
     vrepref->setMerep(m_merep);
   vrepref = (wb_vrepref*)volume(&sts, ldh_cIoConnectVolume);
+  if (ODD(sts))
+    vrepref->setMerep(m_merep);
+  vrepref = (wb_vrepref*)volume(&sts, ldh_cSourceVolume);
   if (ODD(sts))
     vrepref->setMerep(m_merep);
 }

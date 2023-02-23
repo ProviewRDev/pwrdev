@@ -265,6 +265,7 @@ int wb_bdrep::nAttribute()
     case pwr_eClass_Intern:
     case pwr_eClass_Input:
     case pwr_eClass_Output:
+    case pwr_eClass_TargetAttribute:
     case pwr_eClass_ObjXRef:
     case pwr_eClass_AttrXRef:
     case pwr_eClass_Buffer:

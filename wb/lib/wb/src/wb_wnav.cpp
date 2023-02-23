@@ -708,9 +708,19 @@ int WNav::set_attr_value(brow_tObject node, pwr_tObjid objid, char* value_str)
         ldhses, item->type_id, value_str, buff, sizeof(buff), item->size);
     if (EVEN(sts))
       message('E', "Input syntax error");
-    else
+    else {
+      if (item->type_id == pwr_eType_AttrRef &&
+	  item->classid == pwr_eClass_TargetAttribute) {
+	pwr_tCid cid;
+	sts = ldh_GetObjectClass(ldhses, ((pwr_tAttrRef*)buff)->Objid, &cid);
+	if (ODD(sts)) {
+	  ((pwr_tAttrRef*)buff)->Objid.vid = cdh_cSourceVolume;
+	  ((pwr_tAttrRef*)buff)->Objid.oix = cid;
+	}
+      }
       sts = ldh_SetObjectPar(
           ldhses, item->objid, item->body, item->attr, buff, item->size);
+    }
     return sts;
   }
   case wnav_eItemType_AttrArrayElem: {

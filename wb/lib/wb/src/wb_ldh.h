@@ -66,6 +66,7 @@ extern "C" {
 #define ldh_cUserDatabaseVolume                                                \
   (0 + ((pwr_tVolumeId)254 << 24) + (254 << 16) + (254 << 8) + 246)
 #define ldh_cRtVolume cdh_cRtVolume
+#define ldh_cSourceVolume cdh_cSourceVolume
 #define ldh_cVolatileVolMin                                                    \
   (0 + ((pwr_tVolumeId)254 << 24) + (254 << 16) + (254 << 8) + 0)
 #define ldh_cVolatileVolMax                                                    \

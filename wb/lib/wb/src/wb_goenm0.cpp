@@ -268,6 +268,9 @@ int goen_create_nodetype_m0(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid,
       else if (bodydef[i].Par->Output.Info.Type == pwr_eType_Boolean)
         flow_SetTraceAttr(
             cp, NULL, bodydef[i].ParName, flow_eTraceType_Boolean, 0);
+      else if (bodydef[i].Par->Output.Info.Type == pwr_eType_DataRef)
+        flow_SetTraceAttr(
+            cp, NULL, bodydef[i].ParName, flow_eTraceType_DataRef, 0);
       ipoints++;
     }
     pointmask <<= 1;

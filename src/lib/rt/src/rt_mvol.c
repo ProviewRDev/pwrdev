@@ -88,6 +88,9 @@ static pwr_tBoolean decodeAttribute(
     ENDIAN_SWAP_INTP(&up->Input.TypeRef);
     /* Skip the pwr_sGraph member for the moment */
     break;
+  case pwr_eClass_TargetAttribute:
+    ENDIAN_SWAP_INTP(&p->TypeRef);
+    break;
   case pwr_eClass_ObjXRef:
     ENDIAN_SWAP_INTP(&up->ObjXRef.XRefType);
     break;
@@ -732,6 +735,7 @@ gdb_sClass* mvol_LinkObject(
     case pwr_eClass_Input:
     case pwr_eClass_Output:
     case pwr_eClass_Intern:
+    case pwr_eClass_TargetAttribute:
     case pwr_eClass_ObjXRef:
     case pwr_eClass_AttrXRef:
     case pwr_eClass_Buffer:

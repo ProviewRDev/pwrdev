@@ -56,8 +56,7 @@
 #define QOrderBusSplit_exec(tp, o) { \
   o->Status = o->InP->Status; \
   o->New = o->InP->New; \
-  o->DataR = o->InP->DataR; \
-  o->DataW = o->InP->DataW; \
+  o->Data = o->InP->Data; \
   o->Front = o->InP->Front; \
   o->Back = o->InP->Back; \
 }
@@ -65,8 +64,7 @@
 #define QOrderBusJoin_exec(tp, o) { \
   o->Out.Status = *o->StatusP; \
   o->Out.New = *o->NewP; \
-  o->Out.DataR = *o->DataRP; \
-  o->Out.DataW = *o->DataWP; \
+  o->Out.Data = *o->DataP; \
   o->Out.Front = *o->FrontP; \
   o->Out.Back = *o->BackP; \
 }

@@ -135,6 +135,8 @@ static wbl_sSym classes[] = { { "pwr_eClass_ClassDef", pwr_eClass_ClassDef },
   { "pwr_eCix_Output", pwr_eCix_Output },
   { "pwr_eClass_Intern", pwr_eClass_Intern },
   { "pwr_eCix_Intern", pwr_eCix_Intern },
+  { "pwr_eClass_TargetAttribute", pwr_eClass_TargetAttribute },
+  { "pwr_eCix_TargetAttribute", pwr_eCix_TargetAttribute },
   { "pwr_eClass_Buffer", pwr_eClass_Buffer },
   { "pwr_eCix_Buffer", pwr_eCix_Buffer },
   { "pwr_eClass_ObjXRef", pwr_eClass_ObjXRef },
@@ -624,6 +626,7 @@ void wb_wblnode::build(bool recursive)
               case pwr_eClass_Input:
               case pwr_eClass_Output:
               case pwr_eClass_Intern:
+              case pwr_eClass_TargetAttribute:
               case pwr_eClass_Param:
                 if (attr->o->a.type == pwr_eType_AttrRef)
                   ((pwr_sClassDef*)o->rbody)->Flags.b.AttrRef = 1;
@@ -1695,6 +1698,7 @@ void wb_wblnode::registerNode(wb_vrepwbl* vol)
         } else if (first_child->getType() == wbl_eToken_Name
             && (streq(o->cname, "$Attribute") || streq(o->cname, "$Input")
                    || streq(o->cname, "$Output") || streq(o->cname, "$Intern")
+                   || streq(o->cname, "$TargetAttribute")
                    || streq(o->cname, "$ObjXRef")
                    || streq(o->cname, "$AttrXRef")
                    || streq(o->cname, "pwr_eClass_Param"))) {
@@ -2250,6 +2254,7 @@ bool wb_wblnode::docBlock(char** block, int* size) const
   case pwr_eClass_Intern:
   case pwr_eClass_Input:
   case pwr_eClass_Output:
+  case pwr_eClass_TargetAttribute:
   case pwr_eClass_ObjXRef:
   case pwr_eClass_AttrXRef:
     break;

@@ -419,7 +419,7 @@ wb_attribute wb_volume::attribute(const pwr_sAttrRef* arp) const
     bool newBody = false;
     while (ODD(sts)) {
       if (arp->Offset < (adrep->offset() + adrep->rsize())) {
-        if (arp->Size == 0 || adrep->size() == arp->Size) {
+        if (arp->Offset == adrep->offset() && (arp->Size == 0 || adrep->size() == arp->Size)) {
           // Attribute found
           idx = (adrep->nElement() > 1) ? -1 : 0;
           wb_attribute a(LDH__SUCCESS, orep, adrep, idx);
@@ -981,6 +981,7 @@ ldh_sRefInfo* wb_volume::refinfo(wb_object o, ldh_sRefInfo* rp)
         case pwr_eClass_Output:
         case pwr_eClass_Intern:
         case pwr_eClass_Param:
+        case pwr_eClass_TargetAttribute:
           switch (a.type()) {
           case pwr_eType_Objid:
             for (int i = 0; i < a.nElement(); i++) {
@@ -1032,6 +1033,7 @@ ldh_sRefInfo* wb_volume::refinfo(wb_object o, ldh_sRefInfo* rp)
       case pwr_eClass_Output:
       case pwr_eClass_Intern:
       case pwr_eClass_Param:
+      case pwr_eClass_TargetAttribute:
         switch (a.type()) {
         case pwr_eType_Objid:
           for (int i = 0; i < a.nElement(); i++) {

@@ -812,6 +812,7 @@ int CnvWblToH::cixstr_to_classid(char* cix_str, pwr_tClassId* cid)
     { "pwr_eCix_BlockAttribute", pwr_eCix_BlockAttribute },
     { "pwr_eCix_SubBlock", pwr_eCix_SubBlock }, 
     { "pwr_eCix_MountDynObject", pwr_eCix_MountDynObject }, 
+    { "pwr_eCix_TargetAttribute", pwr_eCix_TargetAttribute },
     { "", 0 } };
 
   found = 0;

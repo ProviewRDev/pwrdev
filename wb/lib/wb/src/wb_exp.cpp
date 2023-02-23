@@ -1864,7 +1864,8 @@ static pwr_tStatus gen_print_interns(exp_genctx genctx, vldh_t_node node)
         return sts;
 
       if (!(bodydef[j].ParClass == pwr_eClass_Intern
-              || bodydef[j].ParClass == pwr_eClass_Param))
+	    || bodydef[j].ParClass == pwr_eClass_Param
+	    || bodydef[j].ParClass == pwr_eClass_TargetAttribute))
         continue;
 
       if (bodydef[j].Par->Output.Info.Flags & PWR_MASK_POINTER)

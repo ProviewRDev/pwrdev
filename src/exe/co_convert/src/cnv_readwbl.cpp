@@ -189,6 +189,9 @@ int CnvReadWbl::read_wbl(char* filename)
           && streq(low(line_part[2]), "$param"))
         linetype = cread_eLine_Attribute;
       else if (streq(low(line_part[0]), "object") && nr > 2
+          && streq(low(line_part[2]), "$targetattribute"))
+        linetype = cread_eLine_TargetAttribute;
+      else if (streq(low(line_part[0]), "object") && nr > 2
           && streq(low(line_part[2]), "$objxref"))
         linetype = cread_eLine_ObjXRef;
       else if (streq(low(line_part[0]), "object") && nr > 2
@@ -376,6 +379,14 @@ int CnvReadWbl::read_wbl(char* filename)
         strcpy(attr_type, "Attribute");
         attribute_init();
         break;
+      case cread_eLine_TargetAttribute:
+        sts = object_close();
+        state |= cread_mState_TargetAttribute;
+        object_state = cread_mState_TargetAttribute;
+        strcpy(attr_name, line_part[1]);
+        strcpy(attr_type, "TargetAttribute");
+        attribute_init();
+        break;
       case cread_eLine_ObjXRef:
         sts = object_close();
         state |= cread_mState_ObjXRef;
@@ -397,6 +408,8 @@ int CnvReadWbl::read_wbl(char* filename)
           state &= ~cread_mState_Intern;
         else if (state & cread_mState_Attribute)
           state &= ~cread_mState_Attribute;
+        else if (state & cread_mState_TargetAttribute)
+          state &= ~cread_mState_TargetAttribute;
         else if (state & cread_mState_DParam)
           state &= ~cread_mState_DParam;
         else if (state & cread_mState_ObjXRef)
@@ -477,6 +490,7 @@ int CnvReadWbl::read_wbl(char* filename)
         case cread_mState_Output:
         case cread_mState_Intern:
         case cread_mState_Attribute:
+        case cread_mState_TargetAttribute:
         case cread_mState_ObjXRef:
         case cread_mState_Buffer:
           attribute_attr(attr_name, attr_value);
@@ -792,6 +806,7 @@ int CnvReadWbl::class_close()
   wblto->class_exec();
 
   doc_fresh = 0;
+  doc_init();
   return 1;
 }
 
@@ -1072,7 +1087,10 @@ int CnvReadWbl::doc_add(char* line)
   } else {
     if (doc_cnt > int(sizeof(doc_text) / sizeof(doc_text[0]) - 1))
       return 0;
-    strcpy(doc_text[doc_cnt], &line[1]);
+    if (strlen(line) > 2)
+      strcpy(doc_text[doc_cnt], &line[2]);
+    else
+      strcpy(doc_text[doc_cnt], "");
     doc_cnt++;
   }
   return 1;
@@ -1095,6 +1113,7 @@ int CnvReadWbl::object_close()
   case cread_mState_Output:
   case cread_mState_Intern:
   case cread_mState_Attribute:
+  case cread_mState_TargetAttribute:
   case cread_mState_ObjXRef:
   case cread_mState_Buffer:
   case cread_mState_DParam:

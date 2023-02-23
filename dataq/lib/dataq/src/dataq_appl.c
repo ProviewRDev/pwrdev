@@ -36,16 +36,17 @@
 
 /*************************************************************************
  *
-* 	PROGRAM		rs_dataq_appl
-*
-*       Modifierad
-*		971002	Claes Sjöfors	Skapad
-*
-*	Funktion:	Applikationsgränssnitt mot Dataq.
-**************************************************************************/
+ * 	PROGRAM		rs_dataq_appl
+ *
+ *       Modifierad
+ *		971002	Claes Sjöfors	Skapad
+ *
+ *	Funktion:	Applikationsgränssnitt mot Dataq.
+ **************************************************************************/
 
 /*_Include filer_________________________________________________________*/
 
+#include "pwr_baseclasses.h"
 #include "pwr_dataqclasses.h"
 
 #include "co_cdh.h"

@@ -61,6 +61,7 @@ typedef enum {
   cread_eLine_Output,
   cread_eLine_Intern,
   cread_eLine_Attribute,
+  cread_eLine_TargetAttribute,
   cread_eLine_ObjXRef,
   cread_eLine_Attr,
   cread_eLine_GraphPlcNode,
@@ -110,7 +111,8 @@ typedef enum {
   cread_mState_Type = 1 << 20,
   cread_mState_StringAttr = 1 << 21,
   cread_mState_Bit = 1 << 22,
-  cread_mState_Value = 1 << 23
+  cread_mState_Value = 1 << 23,
+  cread_mState_TargetAttribute = 1 << 24
 } cread_mState;
 
 #define cread_cTmpFile1 "classread1.tmp"

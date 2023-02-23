@@ -64,7 +64,8 @@ wb_adrep::wb_adrep(wb_orep& o)
 
   pwr_tStatus sts;
   switch (m_orep->cid()) {
-  case pwr_eClass_Param: {
+  case pwr_eClass_Param:
+  case pwr_eClass_TargetAttribute: {
     pwr_sParam attr;
 
     m_orep->vrep()->readBody(&sts, m_orep, pwr_eBix_sys, (void*)&attr);
@@ -344,6 +345,9 @@ void* wb_adrep::body(void* p)
   case pwr_eClass_Input:
   case pwr_eClass_Output:
     size = sizeof(pwr_sIntern);
+    break;
+  case pwr_eClass_TargetAttribute:
+    size = sizeof(pwr_sTargetAttribute);
     break;
   case pwr_eClass_ObjXRef:
     size = sizeof(pwr_sObjXRef);

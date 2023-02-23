@@ -37,7 +37,14 @@
 #ifndef rt_plc_utl_h
 #define rt_plc_utl_h
 
+#if defined __cplusplus
+extern "C" {
+#endif
+
 pwr_tStatus plc_UtlWaitForPlc();
 pwr_tBoolean plc_UtlIsStartedPlc();
 
+#if defined __cplusplus
+}
+#endif
 #endif

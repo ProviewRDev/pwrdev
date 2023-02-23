@@ -42,14 +42,24 @@
 
 #include "pwr_dataqclasses.h"
 
-void DataQFo_init(pwr_sClass_DataQFo* object);
-void DataQFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* object);
-void QTrp_exec(plc_sThread* tp, pwr_sClass_QTrp* object);
-void QTrpRR_exec(plc_sThread* tp, pwr_sClass_QTrpRR* object);
-void QTrpFF_exec(plc_sThread* tp, pwr_sClass_QTrpFF* object);
+void DataQFo_init(pwr_sClass_DataQFo* o);
+void DataQFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o);
+void RemoteDataQFo_init(pwr_sClass_RemoteDataQFo* o);
+void RemoteDataQFo_exec(plc_sThread* tp, pwr_sClass_RemoteDataQFo* o);
+void QDisplayFo_init(pwr_sClass_QDisplayFo* o);
+void QDisplayFo_exec(plc_sThread* tp, pwr_sClass_QDisplayFo* o);
+void QDisplayLinkFo_init(pwr_sClass_QDisplayLinkFo* o);
+void QDisplayLinkFo_exec(plc_sThread* tp, pwr_sClass_QDisplayLinkFo* o);
+void QTrp_exec(plc_sThread* tp, pwr_sClass_QTrp* o);
+void QTrpRR_exec(plc_sThread* tp, pwr_sClass_QTrpRR* o);
+void QTrpFF_exec(plc_sThread* tp, pwr_sClass_QTrpFF* o);
 void QOrder_init(pwr_sClass_QOrder* o);
 void QOrder_exec(plc_sThread* tp, pwr_sClass_QOrder* o);
 void QOrder_exec2(plc_sThread* tp, pwr_sClass_QOrder* o, pwr_tBoolean Status);
+void QRemoteOrder_init(pwr_sClass_QRemoteOrder* o);
+void QRemoteOrder_exec(plc_sThread* tp, pwr_sClass_QRemoteOrder* o);
+void QRemoteOrder_exec2(plc_sThread* tp, pwr_sClass_QRemoteOrder* o, pwr_tBoolean Status);
+void QTargetOrder_exec(plc_sThread* tp, pwr_sClass_QTargetOrder* o);
 void QCreateData_exec(plc_sThread* tp, pwr_sClass_QCreateData* o);
 
 

@@ -82,6 +82,8 @@ typedef enum {
   (0 + ((pwr_tVolumeId)254 << 24) + (254 << 16) + (254 << 8) + 249)
 #define cdh_cRtVolume                                                          \
   (0 + ((pwr_tVolumeId)254 << 24) + (254 << 16) + (254 << 8) + 245)
+#define cdh_cSourceVolume                                                      \
+  (0 + ((pwr_tVolumeId)254 << 24) + (254 << 16) + (254 << 8) + 244)
 
 //! Get volme identity for class identity.
 #define cdh_CidToVid(cid) ((cid) >> 16)

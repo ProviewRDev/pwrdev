@@ -463,6 +463,25 @@ void DataQFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
     if (co->Super.Config.Function == pwr_eDataQFunctionEnum_EndQueue) {
       switch (co->Super.Trp.InOpType) {
       case pwr_eQTrpOpEnum_ForwardUnit:
+	/* Wait for dataq_server to send feedback */
+	if (co->Super.Intern.RQStatus & pwr_mRemoteDataQStatusMask_NewFeedback &&
+	    co->Data[0].Data.Ptr)
+	  break;
+	if (co->Super.Intern.RQStatus & pwr_mRemoteDataQStatusMask_IsFeedbackTarget &&
+	    !co->Data[0].Data.Ptr) {
+	  co->Data[0].Data.Ptr = co->Super.Trp.InPtr;
+	  co->Data[0].Data.Aref = cdh_ObjidToAref(co->Super.Trp.InObjid);
+	  co->Data[0].Front = 1;
+	  co->Data[0].Back = 1;
+	  co->Data[0].Dlid = co->Super.Trp.InDlid;
+	  co->Super.Intern.RQStatus |= pwr_mRemoteDataQStatusMask_NewFeedback;
+	  break;
+	}
+	if (!(co->Super.Intern.RQStatus & pwr_mRemoteDataQStatusMask_NewFeedback) &&
+	    co->Data[0].Data.Ptr) {
+	  memset(&co->Data[0], 0, sizeof(pwr_sClass_DataQBus));
+	}
+
 	/* Remove inserted object */
 	sts = gdh_DLUnrefObjectInfo(co->Super.Trp.InDlid);
 	if (co->Super.Config.Options & pwr_mDataQOptionsMask_DeleteWhenRemove)
@@ -531,6 +550,11 @@ void DataQFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
     case pwr_eQTrpOpEnum_ForwardUnit:
       if (o->QueueFull)
 	break;
+      if (co->Super.Intern.RQStatus & pwr_mRemoteDataQStatusMask_NewData)
+	break;
+      if (co->Super.Intern.RQStatus & pwr_mRemoteDataQStatusMask_NewFeedback)
+	break;
+
       if (co->DataSize > 0) {
 #if defined OS_LINUX
         tmp_buf = malloc(co->DataSize * sizeof(*data_max));
@@ -559,6 +583,11 @@ void DataQFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
 	co->Super.Intern.QueueFull = o->QueueFull;
       }
       o->Data1 = co->Data[0];
+      if (co->Super.Intern.RQStatus & pwr_mRemoteDataQStatusMask_HasRemote)
+	co->Super.Intern.RQStatus |= pwr_mRemoteDataQStatusMask_NewData;
+      if (co->Super.Intern.RQStatus & pwr_mRemoteDataQStatusMask_IsFeedbackTarget) {
+	co->Super.Intern.RQStatus |= pwr_mRemoteDataQStatusMask_NewFeedback;
+      }
       break;
     case pwr_eQTrpOpEnum_ReverseBack:
       /* Insert at rear of object back of data */
@@ -2947,27 +2976,6 @@ trpff_return:
 
 void QOrder_init(pwr_sClass_QOrder* o)
 {
-  pwr_tStatus sts;
-
-  if (strcmp(o->DataAttrR, "") == 0)
-    o->AttrrefR.Offset = 0;
-  else {
-    sts = gdh_ClassAttrToAttrref(o->DataClass, o->DataAttrR, &o->AttrrefR);
-    if (EVEN(sts)) 
-      printf("** Error in DataAttrR\n");
-    o->Out.DataR.Aref.Size = o->AttrrefR.Size;
-    o->Out.DataR.Aref.Flags = o->AttrrefR.Flags;
-  }
-  if (strcmp(o->DataAttrW, "") == 0)
-    o->AttrrefW.Offset = 0;
-  else {
-    sts = gdh_ClassAttrToAttrref(o->DataClass, o->DataAttrW, &o->AttrrefW);
-    if (EVEN(sts)) 
-      printf("** Error in DataAttrW\n");
-
-    o->Out.DataW.Aref.Size = o->AttrrefW.Size;
-    o->Out.DataW.Aref.Flags = o->AttrrefW.Flags;
-  }
 }
 
 void QOrder_exec(plc_sThread* tp, pwr_sClass_QOrder* o)
@@ -2989,15 +2997,8 @@ void QOrder_exec(plc_sThread* tp, pwr_sClass_QOrder* o)
 
   o->Out.Front = o->InP->Front;
   o->Out.Back = o->InP->Back;
-  if (o->New) {
-    o->Out.DataR.Aref.Objid = o->InP->Data.Aref.Objid;
-    o->Out.DataR.Aref.Offset = o->InP->Data.Aref.Offset + o->AttrrefR.Offset;
-    o->Out.DataR.Aref.Body = o->InP->Data.Aref.Body;
-    o->Out.DataR.Ptr = (char *)o->InP->Data.Ptr + o->AttrrefR.Offset; 
-    o->Out.DataW.Aref.Objid = o->InP->Data.Aref.Objid;
-    o->Out.DataW.Aref.Offset = o->InP->Data.Aref.Offset + o->AttrrefW.Offset;
-    o->Out.DataW.Aref.Body = o->InP->Data.Aref.Body;
-    o->Out.DataW.Ptr = (char *)o->InP->Data.Ptr + o->AttrrefW.Offset; 
+  if (o->New) {    
+    o->Out.Data = o->InP->Data;
     o->Out.New = 1;
   }
   else
@@ -3006,7 +3007,127 @@ void QOrder_exec(plc_sThread* tp, pwr_sClass_QOrder* o)
 void QOrder_exec2(plc_sThread* tp, pwr_sClass_QOrder* o, pwr_tBoolean Status)
 {
   o->Out.Status = Status;
+  if (!Status && o->StatusOld) {
+    o->Out.New = 0;
+    o->Out.Data = pwr_cNDataRef;
+    o->Out.Back = 0;
+    o->Out.Front = 0;
+  }
+  o->StatusOld = o->Out.Status;
 }
+
+/*_*
+  RemoteDataQFo
+
+  @aref remotdataqfo RemoteDataQFo
+*/
+void RemoteDataQFo_init(pwr_sClass_RemoteDataQFo* o)
+{
+  pwr_tStatus sts;
+  pwr_tDlid dlid;
+
+  sts = gdh_DLRefObjectInfoAttrref(
+      &o->PlcConnect, (void**)&o->PlcConnectP, &dlid);
+  if (EVEN(sts)) {
+    o->PlcConnectP = 0;
+    return;
+  }
+}
+
+void RemoteDataQFo_exec(plc_sThread* tp, pwr_sClass_RemoteDataQFo* o)
+{
+  pwr_sClass_RemoteDataQ* co = (pwr_sClass_RemoteDataQ*)o->PlcConnectP;
+  if (!co)
+    return;
+
+  if (o->Feedback)
+    o->Feedback = 0;
+  else if (co->Feedback) {
+    o->Feedback = 1;
+    co->Feedback = 0;
+  }
+}
+
+/*_*
+  QRemoteOrder
+
+  @aref qremoteorder QRemoteOrder
+*/
+void QRemoteOrder_init(pwr_sClass_QRemoteOrder* o)
+{
+  QOrder_init((pwr_sClass_QOrder *)o);
+}
+
+void QRemoteOrder_exec(plc_sThread* tp, pwr_sClass_QRemoteOrder* o)
+{
+  QOrder_exec(tp, (pwr_sClass_QOrder *)o);
+}
+
+void QRemoteOrder_exec2(plc_sThread* tp, pwr_sClass_QRemoteOrder* o, pwr_tBoolean Status)
+{
+  QOrder_exec2(tp, (pwr_sClass_QOrder *)o, Status);
+  if (Status && !o->QRStatusOld)
+    o->QRStatus = 1;
+  if (!Status && o->QRStatusOld)
+    o->QRStatusReset = 1;
+  if (o->Feedback)
+    o->Feedback = 0;
+  else if (o->QRFeedback) {
+    o->Feedback = 1;
+    o->QRFeedback = 0;
+  }
+  o->QRStatusOld = Status;
+}
+
+/*_*
+  QTargetOrder
+
+  @aref qtargetorder QTargetOrder
+*/
+void QTargetOrder_exec(plc_sThread* tp, pwr_sClass_QTargetOrder* o)
+{
+  if (o->Out.New)
+    o->Out.New = 0;
+  else {
+    if (o->New) {
+      if (cdh_ObjidIsNotNull(o->DataObject))
+        gdh_DLUnrefObjectInfo(o->DataDlid);
+      o->Out.Data.Aref = cdh_ObjidToAref(o->DataObject);
+      pwr_tStatus sts = gdh_DLRefObjectInfoAttrref(&o->Out.Data.Aref, &o->Out.Data.Ptr, &o->DataDlid); 
+      if (EVEN(sts)) {
+	o->DataObject = pwr_cNOid;
+	o->Out.Data.Ptr = 0;
+	o->Out.Data.Aref.Objid = pwr_cNOid;
+      } else {
+	o->Out.New = 1;
+	o->Out.Status = 1;
+	o->Out.Front = 1;
+	o->Out.Back = 1;
+      }
+      o->New = 0;
+    }
+  }
+  if (o->QTStatusReset) {
+    o->QTStatusReset = 0;
+    o->QTFeedback = 1;
+  }
+  if (*o->FeedbackP && !o->FeedbackOld && !o->QTFeedback) {
+    o->QTFeedback = 1;
+  }
+  if (!o->QTFeedback && o->QTFeedbackOld) {
+    o->Out.Status = 0;
+    gdh_DLUnrefObjectInfo(o->DataDlid);
+    o->DataDlid = pwr_cNDlid;
+    o->DataObject = pwr_cNOid;
+    o->Out.Data.Ptr = 0;
+    o->Out.Data.Aref.Objid = pwr_cNOid;
+    o->Out.Front = 0;
+    o->Out.Back = 0;
+  }
+  o->FeedbackOld = *o->FeedbackP;
+  o->QTFeedbackOld = o->QTFeedback;
+}
+
 
 /*_*
   QCreateData

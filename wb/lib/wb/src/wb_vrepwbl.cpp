@@ -1068,6 +1068,8 @@ int wb_vrepwbl::nameToAttrRef(const char* name, pwr_sAttrRef* attrref)
       vid = ldh_cPlcFoVolume;
     else if (aname.volumeIsEqual("$IoConnect"))
       vid = ldh_cIoConnectVolume;
+    else if (aname.volumeIsEqual("$Source"))
+      vid = ldh_cSourceVolume;
 
     strcpy(cname, aname.segmentsAll());
     char* s = strchr(cname, '-');

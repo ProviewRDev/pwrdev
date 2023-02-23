@@ -915,6 +915,7 @@ bool mem_object::docBlock(char** block, int* size) const
   case pwr_eClass_Intern:
   case pwr_eClass_Input:
   case pwr_eClass_Output:
+  case pwr_eClass_TargetAttribute:
   case pwr_eClass_ObjXRef:
   case pwr_eClass_AttrXRef:
     break;
@@ -2236,7 +2237,6 @@ bool wb_vrepmem::commit(pwr_tStatus* sts)
     return false;
   }
 
-  printf("Print wbl\n");
   try {
     wb_volume vol(this);
 
@@ -2244,8 +2244,8 @@ bool wb_vrepmem::commit(pwr_tStatus* sts)
     wprint.printVolume(vol);
     if (wprint.getErrCnt() != 0) {
       char str[400];
-      sprintf(str, "Errors when saving volume: %d error%s found",
-          wprint.getErrCnt(), (wprint.getErrCnt() == 1) ? "" : "s");
+      sprintf(str, "Errors when saving volume: %d error%s found, see %s",
+	  wprint.getErrCnt(), (wprint.getErrCnt() == 1) ? "" : "s", m_filename);
       MsgWindow::message('E', str);
     }
     fp.close();
@@ -2299,6 +2299,7 @@ void wb_vrepmem::classeditorRenameObject(
   case pwr_eClass_Intern:
   case pwr_eClass_Input:
   case pwr_eClass_Output:
+  case pwr_eClass_TargetAttribute:
   case pwr_eClass_ObjXRef:
   case pwr_eClass_AttrXRef:
   case pwr_eClass_Buffer: {
@@ -2352,6 +2353,7 @@ void wb_vrepmem::classeditorDeleteObject(mem_object* memo)
   case pwr_eClass_Intern:
   case pwr_eClass_Input:
   case pwr_eClass_Output:
+  case pwr_eClass_TargetAttribute:
   case pwr_eClass_ObjXRef:
   case pwr_eClass_AttrXRef:
   case pwr_eClass_Buffer: {
@@ -2448,6 +2450,7 @@ void wb_vrepmem::classeditorCheckCommit()
           case pwr_eClass_Input:
           case pwr_eClass_Output:
           case pwr_eClass_Intern:
+	  case pwr_eClass_TargetAttribute:
           case pwr_eClass_Buffer:
           case pwr_eClass_ObjXRef:
           case pwr_eClass_AttrXRef: {
@@ -2511,6 +2514,7 @@ bool wb_vrepmem::classeditorCheck(ldh_eDest dest_code, mem_object* dest,
       case pwr_eClass_Intern:
       case pwr_eClass_Input:
       case pwr_eClass_Output:
+  case pwr_eClass_TargetAttribute:
       case pwr_eClass_ObjXRef:
       case pwr_eClass_AttrXRef:
       case pwr_eClass_Buffer:
@@ -2721,6 +2725,7 @@ bool wb_vrepmem::classeditorCheck(ldh_eDest dest_code, mem_object* dest,
   case pwr_eClass_Input:
   case pwr_eClass_Output:
   case pwr_eClass_Intern:
+  case pwr_eClass_TargetAttribute:
   case pwr_eClass_ObjXRef:
   case pwr_eClass_AttrXRef:
   case pwr_eClass_Buffer: {
@@ -2815,6 +2820,7 @@ bool wb_vrepmem::classeditorCheckMove(
       case pwr_eClass_Intern:
       case pwr_eClass_Input:
       case pwr_eClass_Output:
+      case pwr_eClass_TargetAttribute:
       case pwr_eClass_ObjXRef:
       case pwr_eClass_AttrXRef:
       case pwr_eClass_Buffer:
@@ -2921,6 +2927,7 @@ bool wb_vrepmem::classeditorCheckMove(
   case pwr_eClass_Input:
   case pwr_eClass_Output:
   case pwr_eClass_Intern:
+  case pwr_eClass_TargetAttribute:
   case pwr_eClass_ObjXRef:
   case pwr_eClass_AttrXRef:
   case pwr_eClass_Buffer:
@@ -2960,6 +2967,7 @@ void wb_vrepmem::classeditorCommit()
       for (mem_object* o3 = o2->fch; o3; o3 = o3->fws) {
         switch (o3->m_cid) {
         case pwr_eClass_Param:
+        case pwr_eClass_TargetAttribute:
           if (o3->m_created)
             ((pwr_sParam*)o3->rbody)->Info.Flags |= PWR_MASK_NEWATTRIBUTE;
           else

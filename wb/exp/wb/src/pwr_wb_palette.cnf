@@ -574,10 +574,11 @@ palette ClassNavigatorPalette
     class $GraphPlcNode
     class $Input
     class $Intern
-    class $ReferenceList
     class $ObjBodyDef
     class $ObjXRef
     class $Output
+    class $ReferenceList
+    class $TargetAttribute
     class PlcTemplate
   }
   menu Type
@@ -961,6 +962,7 @@ palette PlcEditorPalette
   menu DataQ
   {
     class DataQFo
+    class DataQCurrentBus
     class DataQCurrentData
     class DataQCurrentIdx
     menu DataQBus
@@ -968,8 +970,13 @@ palette PlcEditorPalette
       class DataQBusSplit
       class DataQBusJoin
     }
+    class RemoteDataQFo
     class QCreateData
+    class QDisplayFo
+    class QDisplayLinkFo
     class QOrder
+    class QRemoteOrder
+    class QTargetOrder
     menu QOrderBus
     {
       class QOrderBusSplit

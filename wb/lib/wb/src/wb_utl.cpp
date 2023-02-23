@@ -4766,7 +4766,11 @@ static int utl_print_class_full(
         break;
       }
       case pwr_eClass_Param: {
-        u_print(utlctx, " $Param		");
+        u_print(utlctx, " $Attribute		");
+        break;
+      }
+      case pwr_eClass_TargetAttribute: {
+        u_print(utlctx, " $TargetAttribute		");
         break;
       }
       case pwr_eClass_Buffer: {
