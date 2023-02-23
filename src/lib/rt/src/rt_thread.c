@@ -67,6 +67,10 @@
 #define __NR_sched_setattr 380
 #define __NR_sched_getattr 381
 #endif
+#ifdef __aarch64__
+#define __NR_sched_setattr 274
+#define __NR_sched_getattr 275
+#endif
 
 struct sched_attr {
   uint32_t size;

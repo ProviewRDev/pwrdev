@@ -491,7 +491,7 @@ pwrc_create_func()
   local proot
   local bname
   local pname
-  local platforms="x86_linux x86_64_linux arm_linux x86_64_macos"
+  local platforms="x86_linux x86_64_linux arm_linux arm64_linux x86_64_macos"
   let argc=$#
 
   cmd="project"
@@ -1614,6 +1614,8 @@ pwrc_parse ()
       machine="x86_64"
     elif [ ${machine:0:3} == "arm" ]; then
       machine="arm"
+    elif [ $machine == "aarch64" ]; then
+      machine="arm64"
     else
       machine="x86"
     fi

@@ -158,13 +158,11 @@ void WPkgGtk::activate_history(GtkWidget* w, gpointer data)
   strcpy(categories[2], "");
 
   strcpy(title, "Distributor History");
-  CoLogWGtk* logw
-      = new CoLogWGtk(wpkg, ((WPkgGtk*)wpkg)->toplevel, title, 1, &sts);
+  CoLogWGtk* logw = new CoLogWGtk(wpkg, ((WPkgGtk*)wpkg)->toplevel, title, 1, &sts);
   logw->show(categories, 0);
 }
 
-gboolean WPkgGtk::action_inputfocus(
-    GtkWidget* w, GdkEvent* event, gpointer data)
+gboolean WPkgGtk::action_inputfocus(GtkWidget* w, GdkEvent* event, gpointer data)
 {
   WPkgGtk* wpkg = (WPkgGtk*)data;
 
@@ -177,21 +175,14 @@ gboolean WPkgGtk::action_inputfocus(
   return FALSE;
 }
 
-void WPkgGtk::pop()
-{
-  gtk_window_present(GTK_WINDOW(toplevel));
-}
+void WPkgGtk::pop() { gtk_window_present(GTK_WINDOW(toplevel)); }
 
-void WPkgGtk::flush()
-{
-  gdk_display_flush(gtk_widget_get_display(toplevel));
-}
+void WPkgGtk::flush() { gdk_display_flush(gtk_widget_get_display(toplevel)); }
 
 void WPkgGtk::set_clock_cursor()
 {
   if (!clock_cursor)
-    clock_cursor = gdk_cursor_new_for_display(
-        gtk_widget_get_display(toplevel), GDK_WATCH);
+    clock_cursor = gdk_cursor_new_for_display(gtk_widget_get_display(toplevel), GDK_WATCH);
 
   gdk_window_set_cursor(gtk_widget_get_window(toplevel), clock_cursor);
   gdk_display_flush(gtk_widget_get_display(toplevel));
@@ -217,9 +208,7 @@ static gint delete_event(GtkWidget* w, GdkEvent* event, gpointer wpkg)
   return TRUE;
 }
 
-static void destroy_event(GtkWidget* w, gpointer data)
-{
-}
+static void destroy_event(GtkWidget* w, gpointer data) {}
 
 WPkgGtk::WPkgGtk(GtkWidget* wa_parent_wid, void* wa_parent_ctx)
     : WPkg(wa_parent_ctx), parent_wid(wa_parent_wid), clock_cursor(0)
@@ -228,35 +217,30 @@ WPkgGtk::WPkgGtk(GtkWidget* wa_parent_wid, void* wa_parent_ctx)
   const int window_height = 600;
   int sts;
 
-  toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height",
-      window_height, "default-width", window_width, "title", "Distributor",
-      NULL);
+  toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", window_height, "default-width",
+                                      window_width, "title", "Distributor", NULL);
 
   g_signal_connect(toplevel, "delete_event", G_CALLBACK(delete_event), this);
   g_signal_connect(toplevel, "destroy", G_CALLBACK(destroy_event), this);
-  g_signal_connect(
-      toplevel, "focus-in-event", G_CALLBACK(action_inputfocus), this);
+  g_signal_connect(toplevel, "focus-in-event", G_CALLBACK(action_inputfocus), this);
 
   int dark_theme = wutl_get_dark_theme(toplevel);
 
   CoWowGtk::SetWindowIcon(toplevel);
 
-  GtkAccelGroup* accel_g
-      = (GtkAccelGroup*)g_object_new(GTK_TYPE_ACCEL_GROUP, NULL);
+  GtkAccelGroup* accel_g = (GtkAccelGroup*)g_object_new(GTK_TYPE_ACCEL_GROUP, NULL);
   gtk_window_add_accel_group(GTK_WINDOW(toplevel), accel_g);
 
   GtkMenuBar* menu_bar = (GtkMenuBar*)g_object_new(GTK_TYPE_MENU_BAR, NULL);
 
   // File Entry
   GtkWidget* file_history = gtk_menu_item_new_with_mnemonic("_History");
-  g_signal_connect(
-      file_history, "activate", G_CALLBACK(WPkgGtk::activate_history), this);
+  g_signal_connect(file_history, "activate", G_CALLBACK(WPkgGtk::activate_history), this);
 
   GtkWidget* file_close = gtk_menu_item_new_with_mnemonic("_Close");
-  g_signal_connect(
-      file_close, "activate", G_CALLBACK(WPkgGtk::activate_exit), this);
-  gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w',
-      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+  g_signal_connect(file_close, "activate", G_CALLBACK(WPkgGtk::activate_exit), this);
+  gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w', GdkModifierType(GDK_CONTROL_MASK),
+                             GTK_ACCEL_VISIBLE);
 
   GtkMenu* file_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_history);
@@ -267,22 +251,16 @@ WPkgGtk::WPkgGtk(GtkWidget* wa_parent_wid, void* wa_parent_ctx)
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(file), GTK_WIDGET(file_menu));
 
   // Functions Entry
-  GtkWidget* functions_distribute
-      = gtk_menu_item_new_with_mnemonic("_Distribute");
-  g_signal_connect(functions_distribute, "activate",
-      G_CALLBACK(WPkgGtk::activate_distribute), this);
+  GtkWidget* functions_distribute = gtk_menu_item_new_with_mnemonic("_Distribute");
+  g_signal_connect(functions_distribute, "activate", G_CALLBACK(WPkgGtk::activate_distribute), this);
   gtk_widget_add_accelerator(functions_distribute, "activate", accel_g, 'd',
-      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+                             GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
 
-  GtkWidget* functions_createpkg
-      = gtk_menu_item_new_with_mnemonic("_Create Package");
-  g_signal_connect(functions_createpkg, "activate",
-      G_CALLBACK(WPkgGtk::activate_createpkg), this);
+  GtkWidget* functions_createpkg = gtk_menu_item_new_with_mnemonic("_Create Package");
+  g_signal_connect(functions_createpkg, "activate", G_CALLBACK(WPkgGtk::activate_createpkg), this);
 
-  GtkWidget* functions_deletepkg
-      = gtk_menu_item_new_with_mnemonic("D_elete Package");
-  g_signal_connect(functions_deletepkg, "activate",
-      G_CALLBACK(WPkgGtk::activate_deletepkg), this);
+  GtkWidget* functions_deletepkg = gtk_menu_item_new_with_mnemonic("D_elete Package");
+  g_signal_connect(functions_deletepkg, "activate", G_CALLBACK(WPkgGtk::activate_deletepkg), this);
 
   GtkMenu* functions_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(functions_menu), functions_distribute);
@@ -291,40 +269,28 @@ WPkgGtk::WPkgGtk(GtkWidget* wa_parent_wid, void* wa_parent_ctx)
 
   GtkWidget* functions = gtk_menu_item_new_with_mnemonic("F_unctions");
   gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), functions);
-  gtk_menu_item_set_submenu(
-      GTK_MENU_ITEM(functions), GTK_WIDGET(functions_menu));
+  gtk_menu_item_set_submenu(GTK_MENU_ITEM(functions), GTK_WIDGET(functions_menu));
 
   // View menu
   GtkWidget* view_zoom_in = gtk_menu_item_new_with_mnemonic("Zoom _In");
-  g_signal_connect(
-      view_zoom_in, "activate", G_CALLBACK(activate_zoom_in), this);
-  gtk_widget_add_accelerator(view_zoom_in, "activate", accel_g, 'i',
-      GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+  g_signal_connect(view_zoom_in, "activate", G_CALLBACK(activate_zoom_in), this);
+  gtk_widget_add_accelerator(view_zoom_in, "activate", accel_g, 'i', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
   GtkWidget* view_zoom_out = gtk_menu_item_new_with_mnemonic("Zoom _Out");
-  g_signal_connect(
-      view_zoom_out, "activate", G_CALLBACK(activate_zoom_out), this);
-  gtk_widget_add_accelerator(view_zoom_out, "activate", accel_g, 'o',
-      GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+  g_signal_connect(view_zoom_out, "activate", G_CALLBACK(activate_zoom_out), this);
+  gtk_widget_add_accelerator(view_zoom_out, "activate", accel_g, 'o', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
   GtkWidget* view_zoom_reset = gtk_menu_item_new_with_mnemonic("Zoom _Reset");
-  g_signal_connect(view_zoom_reset, "activate",
-      G_CALLBACK(activate_zoom_reset), this);
+  g_signal_connect(view_zoom_reset, "activate", G_CALLBACK(activate_zoom_reset), this);
 
-  GtkWidget* view_dmode_filediff
-      = gtk_check_menu_item_new_with_mnemonic("_Display File Differences");
-  g_signal_connect(view_dmode_filediff, "activate",
-      G_CALLBACK(WPkgGtk::activate_dmode_filediff), this);
+  GtkWidget* view_dmode_filediff = gtk_check_menu_item_new_with_mnemonic("_Display File Differences");
+  g_signal_connect(view_dmode_filediff, "activate", G_CALLBACK(WPkgGtk::activate_dmode_filediff), this);
 
-  GtkWidget* view_dmode_filetime
-      = gtk_check_menu_item_new_with_mnemonic("Display Files In _Time Order");
-  g_signal_connect(view_dmode_filetime, "activate",
-      G_CALLBACK(WPkgGtk::activate_dmode_filetime), this);
+  GtkWidget* view_dmode_filetime = gtk_check_menu_item_new_with_mnemonic("Display Files In _Time Order");
+  g_signal_connect(view_dmode_filetime, "activate", G_CALLBACK(WPkgGtk::activate_dmode_filetime), this);
 
-  GtkWidget* view_dmode_filepath
-      = gtk_check_menu_item_new_with_mnemonic("Display File _Path");
-  g_signal_connect(view_dmode_filepath, "activate",
-      G_CALLBACK(WPkgGtk::activate_dmode_filepath), this);
+  GtkWidget* view_dmode_filepath = gtk_check_menu_item_new_with_mnemonic("Display File _Path");
+  g_signal_connect(view_dmode_filepath, "activate", G_CALLBACK(WPkgGtk::activate_dmode_filepath), this);
 
   GtkMenu* view_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(view_menu), view_zoom_in);
@@ -340,10 +306,8 @@ WPkgGtk::WPkgGtk(GtkWidget* wa_parent_wid, void* wa_parent_ctx)
 
   // Menu Help
   GtkWidget* help_help = gtk_menu_item_new_with_mnemonic("_Help");
-  g_signal_connect(
-      help_help, "activate", G_CALLBACK(WPkgGtk::activate_help), this);
-  gtk_widget_add_accelerator(
-      help_help, "activate", accel_g, 'h', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+  g_signal_connect(help_help, "activate", G_CALLBACK(WPkgGtk::activate_help), this);
+  gtk_widget_add_accelerator(help_help, "activate", accel_g, 'h', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
   GtkMenu* help_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(help_menu), help_help);
@@ -355,27 +319,22 @@ WPkgGtk::WPkgGtk(GtkWidget* wa_parent_wid, void* wa_parent_ctx)
   // Toolbar
   GtkToolbar* tools = (GtkToolbar*)g_object_new(GTK_TYPE_TOOLBAR, NULL);
 
-  wutl_tools_item(tools, 
-      dark_theme ? "$pwr_exe/ico_send_d_30.png": "$pwr_exe/ico_send_l_30.png", 
-      G_CALLBACK(activate_distribute), "Distribute", this, 0, 0);
+  wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_send_d_30.png" : "$pwr_exe/ico_send_l_30.png",
+                  G_CALLBACK(activate_distribute), "Distribute", this, 0, 0);
 
-  wutl_tools_item(tools,
-      dark_theme ? "$pwr_exe/ico_zoomin_d_30.png": "$pwr_exe/ico_zoomin_l_30.png", 
-      G_CALLBACK(activate_zoom_in), "Zoom in", this, 1, 0);
+  wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_zoomin_d_30.png" : "$pwr_exe/ico_zoomin_l_30.png",
+                  G_CALLBACK(activate_zoom_in), "Zoom in", this, 1, 0);
 
-  wutl_tools_item(tools,
-      dark_theme ? "$pwr_exe/ico_zoomout_d_30.png": "$pwr_exe/ico_zoomout_l_30.png", 
-      G_CALLBACK(activate_zoom_out), "Zoom out", this, 1, 0);
+  wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_zoomout_d_30.png" : "$pwr_exe/ico_zoomout_l_30.png",
+                  G_CALLBACK(activate_zoom_out), "Zoom out", this, 1, 0);
 
-  wutl_tools_item(tools,
-      dark_theme ? "$pwr_exe/ico_zoomreset_d_30.png": "$pwr_exe/ico_zoomreset_l_30.png", 
-      G_CALLBACK(activate_zoom_reset), "Zoom reset", this, 1, 0);
+  wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_zoomreset_d_30.png" : "$pwr_exe/ico_zoomreset_l_30.png",
+                  G_CALLBACK(activate_zoom_reset), "Zoom reset", this, 1, 0);
 
   GtkWidget* vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 
   utility = ((WUtility*)parent_ctx)->utype;
-  wpkgnav = new WPkgNavGtk(
-      (void*)this, vbox, "Packages", utility, &brow_widget, &sts);
+  wpkgnav = new WPkgNavGtk((void*)this, vbox, "Packages", utility, &brow_widget, &sts);
   ((WPkgNav*)wpkgnav)->message_cb = message_cb;
   ((WPkgNav*)wpkgnav)->set_clock_cursor_cb = set_clock_cursor_cb;
   ((WPkgNav*)wpkgnav)->reset_cursor_cb = reset_cursor_cb;
@@ -397,7 +356,8 @@ WPkgGtk::WPkgGtk(GtkWidget* wa_parent_wid, void* wa_parent_ctx)
 
   wow = new CoWowGtk(toplevel);
 
-  if (utility == wb_eUtility_Wtt) {
+  if (utility == wb_eUtility_Wtt)
+  {
     ((Wtt*)parent_ctx)->register_utility((void*)this, wb_eUtility_Distributor);
   }
 }

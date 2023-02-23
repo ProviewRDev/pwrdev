@@ -26,6 +26,9 @@ else
     elif [ ${machine:0:3} == "arm" ]; then
 	machine="arm"
         opsys=512
+    elif [ $machine == "aarch64" ]; then
+        machine="arm64"
+        opsys=8192
     else
 	machine="x86"
         opsys=64

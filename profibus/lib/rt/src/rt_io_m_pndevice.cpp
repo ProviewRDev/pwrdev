@@ -32,7 +32,7 @@
 #include "rt_io_bus.h"
 #include "rt_io_msg.h"
 #include "rt_pb_msg.h"
-#include "rt_pn_gsdml_data.h"
+#include "rt_pn_runtime_data.h"
 #include "rt_io_pn_locals.h"
 
 /*----------------------------------------------------------------------------*\
@@ -80,7 +80,8 @@ static pwr_tStatus IoRackInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
   latent_input_count = 0;
   latent_output_count = 0;
 
-  while (cardp) {
+  while (cardp)
+  {
     local_card = (io_sPnCardLocal*)calloc(1, sizeof(*local_card));
     cardp->Local = local_card;
     local_card->input_area = ((io_sPnRackLocal*)(rp->Local))->inputs;
@@ -92,7 +93,8 @@ static pwr_tStatus IoRackInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
     while (ODD(gdh_GetSuperClass(cid, &cid, cardp->Objid)))
       ;
 
-    switch (cid) {
+    switch (cid)
+    {
       /* New style configuring (from v4.1.3) with Pb_Module objects or subclass.
         Loop all channels
         in the module and set channel size and offset. */
@@ -101,45 +103,35 @@ static pwr_tStatus IoRackInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
       mp = (pwr_sClass_PnModule*)cardp->op;
       mp->Status = PB__INITFAIL;
       cardp->offset = 0;
-      for (i = 0; i < cardp->ChanListSize; i++) {
+      for (i = 0; i < cardp->ChanListSize; i++)
+      {
         chanp = &cardp->chanlist[i];
 
-        if (chanp->ChanClass != pwr_cClass_ChanDi) {
+        if (chanp->ChanClass != pwr_cClass_ChanDi)
+        {
           input_counter += latent_input_count;
           latent_input_count = 0;
         }
 
-        if (chanp->ChanClass != pwr_cClass_ChanDo) {
+        if (chanp->ChanClass != pwr_cClass_ChanDo)
+        {
           output_counter += latent_output_count;
           latent_output_count = 0;
         }
 
-        switch (chanp->ChanClass) {
+        switch (chanp->ChanClass)
+        {
         case pwr_cClass_ChanDi:
           chan_di = (pwr_sClass_ChanDi*)chanp->cop;
-          if (chan_di->Number == 0) {
+          if (chan_di->Number == 0)
+          {
             input_counter += latent_input_count;
             latent_input_count = 0;
           }
           chanp->offset = input_counter;
           chanp->mask = 1 << chan_di->Number;
-          // TODO Check with the PROFINET specification what to do with boolean
-          // values greater than 8 bit integers.
-          // The data coming from an et200sp 16 DI module represented as
-          // unsigned16 and the channel value of a
-          // AI modules channel represented as integer16 are sent with different
-          // byte order. Maybe booleans can be
-          // considered Little Endian...
-          // More TODO: Check host endianess aswell and take action accordingly
-          if (chan_di->Representation == pwr_eDataRepEnum_Bit16
-              && op->ByteOrdering == pwr_eByteOrderingEnum_BigEndian)
-            chanp->mask = swap16(chanp->mask);
-          if (chan_di->Representation == pwr_eDataRepEnum_Bit32
-              && op->ByteOrdering == pwr_eByteOrderingEnum_BigEndian)
-            chanp->mask = swap32(chanp->mask);
           if (chan_di->Number == 0)
-            latent_input_count
-                = GetChanSize((pwr_eDataRepEnum)chan_di->Representation);
+            latent_input_count = GetChanSize((pwr_eDataRepEnum)chan_di->Representation);
           // printf("Di channel found in %s, Number %d, Offset %d\n",
           // cardp->Name, chan_di->Number, chanp->offset);
           break;
@@ -179,22 +171,19 @@ static pwr_tStatus IoRackInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
 
         case pwr_cClass_ChanDo:
           chan_do = (pwr_sClass_ChanDo*)chanp->cop;
-          if (chan_do->Number == 0) {
+          if (chan_do->Number == 0)
+          {
             output_counter += latent_output_count;
             latent_output_count = 0;
           }
           chanp->offset = output_counter;
           chan_size = GetChanSize((pwr_eDataRepEnum)chan_do->Representation);
           chanp->mask = 1 << chan_do->Number;
-          if (chan_do->Representation == pwr_eDataRepEnum_Bit16
-              && op->ByteOrdering == pwr_eByteOrderingEnum_BigEndian)
-            chanp->mask = swap16(chanp->mask);
-          if (chan_do->Representation == pwr_eDataRepEnum_Bit32
-              && op->ByteOrdering == pwr_eByteOrderingEnum_BigEndian)
-            chanp->mask = swap32(chanp->mask);
+
+          // Digital channels are byteswapped in their respective mask in rt_io_bus init method
+
           if (chan_do->Number == 0)
-            latent_output_count
-                = GetChanSize((pwr_eDataRepEnum)chan_do->Representation);
+            latent_output_count = GetChanSize((pwr_eDataRepEnum)chan_do->Representation);
           // printf("Do channel found in %s, Number %d, Offset %d\n",
           // cardp->Name, chan_do->Number, chanp->offset);
           break;
@@ -248,17 +237,20 @@ static pwr_tStatus IoRackRead(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
   /* The reading of the process image is now performed at the agent level,
   this eliminates the need for board specific code at the rack level.  */
 
-  if (sp->Status == PB__NORMAL) {
+  if (sp->Status == PB__NORMAL && sp->IOCS == pwr_ePnIOCS_GOOD)
+  {
     sp->ErrorCount = 0;
-  } else {
+  }
+  else
+  {
     if (local->start_cnt >= local->start_time)
       sp->ErrorCount++;
   }
 
   if (sp->ErrorCount == sp->ErrorHardLimit)
   {
-    errh_Error("PROFINET: IO Error hard limit reached on device '%s', stall action %d",
-               rp->Name, sp->StallAction);
+    errh_Error("PROFINET: IO Error hard limit reached on device '%s', stall action %d", rp->Name,
+               sp->StallAction);
     ctx->IOHandler->CardErrorHardLimit = 1;
     ctx->IOHandler->ErrorHardLimitObject = cdh_ObjidToAref(rp->Objid);
     sp->ErrorCount++;
@@ -270,12 +262,14 @@ static pwr_tStatus IoRackRead(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
     ctx->IOHandler->ErrorSoftLimitObject = cdh_ObjidToAref(rp->Objid);
     sp->ErrorCount++;
   }
-  if (sp->ErrorCount > sp->ErrorHardLimit) {
-    if (sp->StallAction == pwr_ePbStallAction_ResetInputs) {
+  if (sp->ErrorCount > sp->ErrorHardLimit)
+  {
+    if (sp->StallAction == pwr_ePbStallAction_ResetInputs)
+    {
       if (((io_sPnRackLocal*)(rp->Local))->bytes_of_input > 0)
-        memset(((io_sPnRackLocal*)(rp->Local))->inputs, 0,
-            ((io_sPnRackLocal*)(rp->Local))->bytes_of_input);
-    } else if (sp->StallAction == pwr_ePbStallAction_EmergencyBreak)
+        memset(((io_sPnRackLocal*)(rp->Local))->inputs, 0, ((io_sPnRackLocal*)(rp->Local))->bytes_of_input);
+    }
+    else if (sp->StallAction == pwr_ePbStallAction_EmergencyBreak)
       ctx->Node->EmergBreakTrue = 1;
   }
 
@@ -285,56 +279,17 @@ static pwr_tStatus IoRackRead(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
 /*----------------------------------------------------------------------------*\
    Write method for the Pb DP slave
 \*----------------------------------------------------------------------------*/
-static pwr_tStatus IoRackWrite(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
-{
-  pwr_sClass_PnDevice* sp = (pwr_sClass_PnDevice*)rp->op;
-  io_sPnRackLocal* local = (io_sPnRackLocal*)rp->Local;
-
-  /* The writing of the process image is now performed at the agent level,
-  this eliminates the need for board specific code at the rack level.  */
-
-  if (sp->Status == PB__NORMAL) {
-    sp->ErrorCount = 0;
-  } else {
-    if (local->start_cnt >= local->start_time)
-      sp->ErrorCount++;
-  }
-
-  if (sp->ErrorCount == sp->ErrorHardLimit)
-  {
-    errh_Error("PROFINET: IO Error hard limit reached on device '%s', stall action %d",
-               rp->Name, sp->StallAction);
-    ctx->IOHandler->CardErrorHardLimit = 1;
-    ctx->IOHandler->ErrorHardLimitObject = cdh_ObjidToAref(rp->Objid);
-    sp->ErrorCount++;
-  }
-  else if (sp->ErrorCount == sp->ErrorSoftLimit)
-  {
-    errh_Error("PROFINET: IO Error soft limit reached on device '%s'", rp->Name);
-    ctx->IOHandler->CardErrorSoftLimit = 1;
-    ctx->IOHandler->ErrorSoftLimitObject = cdh_ObjidToAref(rp->Objid);
-    sp->ErrorCount++;
-  }
-  if (sp->ErrorCount > sp->ErrorHardLimit) {
-    if (sp->StallAction == pwr_ePbStallAction_EmergencyBreak)
-      ctx->Node->EmergBreakTrue = 1;
-  }
-
-  return IO__SUCCESS;
-}
+static pwr_tStatus IoRackWrite(io_tCtx ctx, io_sAgent* ap, io_sRack* rp) { return IO__SUCCESS; }
 
 /*----------------------------------------------------------------------------*\
 
 \*----------------------------------------------------------------------------*/
-static pwr_tStatus IoRackClose(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
-{
-  return IO__SUCCESS;
-}
+static pwr_tStatus IoRackClose(io_tCtx ctx, io_sAgent* ap, io_sRack* rp) { return IO__SUCCESS; }
 
 /*----------------------------------------------------------------------------*\
   Every method to be exported to the workbench should be registred here.
 \*----------------------------------------------------------------------------*/
 
-pwr_dExport pwr_BindIoMethods(PnDevice) = { pwr_BindIoMethod(IoRackInit),
-  pwr_BindIoMethod(IoRackRead), pwr_BindIoMethod(IoRackWrite),
-  pwr_BindIoMethod(IoRackClose), pwr_NullMethod };
+pwr_dExport pwr_BindIoMethods(PnDevice) = {pwr_BindIoMethod(IoRackInit), pwr_BindIoMethod(IoRackRead),
+                                           pwr_BindIoMethod(IoRackWrite), pwr_BindIoMethod(IoRackClose),
+                                           pwr_NullMethod};

@@ -35,11 +35,14 @@
  */
 
 #include <sys/stat.h>
+#include <errno.h>
+#include <string>
 
 #include "pwr_names.h"
 
 #include "co_string.h"
 #include "co_time.h"
+#include "co_error.h"
 
 #include "rt_load.h"
 
@@ -61,23 +64,25 @@ static unsigned int pkg_random()
   return (unsigned int)((double)rand() / ((double)RAND_MAX + 1) * 999999);
 }
 
-wb_pkg::wb_pkg(char* nodelist, bool distribute, bool config_only, bool check,
-    int* new_files)
+wb_pkg::wb_pkg(char* nodelist, bool distribute, bool config_only, bool check, int* new_files)
 {
-  if (nodelist) {
+  if (nodelist)
+  {
     char node_str[32][80];
     int num;
 
     str_ToLower(nodelist, nodelist);
-    num = dcli_parse(nodelist, " 	,", "", (char*)node_str,
-        sizeof(node_str) / sizeof(node_str[0]), sizeof(node_str[0]), 0);
+    num = dcli_parse(nodelist, " 	,", "", (char*)node_str, sizeof(node_str) / sizeof(node_str[0]),
+                     sizeof(node_str[0]), 0);
     m_allnodes = false;
 
-    for (int i = 0; i < num; i++) {
+    for (int i = 0; i < num; i++)
+    {
       pkg_node n(node_str[i]);
       m_nodelist.push_back(n);
     }
-  } else
+  }
+  else
     m_allnodes = true;
 
   readConfig();
@@ -87,7 +92,8 @@ wb_pkg::wb_pkg(char* nodelist, bool distribute, bool config_only, bool check,
   for (unsigned int i = 0; i < m_nodelist.size(); i++)
     m_nodelist[i].checkNode();
 
-  if (check && new_files) {
+  if (check && new_files)
+  {
     *new_files = 0;
     for (unsigned int i = 0; i < m_nodelist.size(); i++)
       *new_files += m_nodelist[i].compareFiles();
@@ -108,17 +114,19 @@ void wb_pkg::readConfig()
   dcli_translate_filename(fname, pwr_cNameDistribute);
   std::ifstream is(fname);
 
-  while (is.getline(line, sizeof(line))) {
+  while (is.getline(line, sizeof(line)))
+  {
     str_trim(line, line);
     if (line[0] == '#' || line[0] == '!')
       continue;
 
-    num = dcli_parse(line, " 	", "", (char*)line_item,
-        sizeof(line_item) / sizeof(line_item[0]), sizeof(line_item[0]), 0);
+    num = dcli_parse(line, " 	", "", (char*)line_item, sizeof(line_item) / sizeof(line_item[0]),
+                     sizeof(line_item[0]), 0);
     if (!num)
       continue;
 
-    if (streq(cdh_Low(line_item[0]), "node")) {
+    if (streq(cdh_Low(line_item[0]), "node"))
+    {
       pwr_mOpSys opsys;
       int bus;
       pwr_tMask dstatus;
@@ -143,14 +151,18 @@ void wb_pkg::readConfig()
       strcpy(bootnode, line_item[5]);
       strcpy(custom_platform, line_item[6]);
 
-      if (m_allnodes) {
-        pkg_node node(
-            line_item[1], opsys, bus, dstatus, bootnode, custom_platform);
+      if (m_allnodes)
+      {
+        pkg_node node(line_item[1], opsys, bus, dstatus, bootnode, custom_platform);
         m_nodelist.push_back(node);
-      } else {
+      }
+      else
+      {
         bool found = false;
-        for (int i = 0; i < (int)m_nodelist.size(); i++) {
-          if (streq(m_nodelist[i].name(), cdh_Low(line_item[1]))) {
+        for (int i = 0; i < (int)m_nodelist.size(); i++)
+        {
+          if (streq(m_nodelist[i].name(), cdh_Low(line_item[1])))
+          {
             found = true;
             m_nodelist[i].setOpsys(opsys);
             m_nodelist[i].setBus(bus);
@@ -162,35 +174,50 @@ void wb_pkg::readConfig()
           }
         }
       }
-    } else if (streq(cdh_Low(line_item[0]), "appl")) {
+    }
+    else if (streq(cdh_Low(line_item[0]), "appl"))
+    {
       if (!(num == 4 || num == 5))
         throw wb_error_str("File corrupt " pwr_cNameDistribute);
 
       char severity = line_item[2][0];
-      try {
+      try
+      {
         pkg_node& n = getNode(line_item[1]);
-        if (num == 4) {
+        if (num == 4)
+        {
           pkg_pattern p(line_item[3], "", severity);
           n.push_back(p);
-        } else {
+        }
+        else
+        {
           pkg_pattern p(line_item[3], line_item[4], severity);
           n.push_back(p);
         }
-      } catch (wb_error&) {
+      }
+      catch (wb_error&)
+      {
         continue;
       }
-    } else if (streq(cdh_Low(line_item[0]), "depnode")) {
+    }
+    else if (streq(cdh_Low(line_item[0]), "depnode"))
+    {
       if (num != 4)
         throw wb_error_str("File corrupt " pwr_cNameDistribute);
 
-      try {
+      try
+      {
         pkg_node& n = getNode(line_item[1]);
         pkg_depnode dn(line_item[2], line_item[3]);
         n.depnodeAdd(dn);
-      } catch (wb_error&) {
+      }
+      catch (wb_error&)
+      {
         continue;
       }
-    } else if (streq(cdh_Low(line_item[0]), "load")) {
+    }
+    else if (streq(cdh_Low(line_item[0]), "load"))
+    {
       pwr_tVolumeId* vollist;
       pwr_tString40* volnamelist;
       int volcount;
@@ -203,7 +230,8 @@ void wb_pkg::readConfig()
       if (num != 2)
         throw wb_error_str("File corrupt " pwr_cNameDistribute);
 
-      try {
+      try
+      {
         pkg_node& n = getNode(line_item[1]);
 
         // Add ld_node file
@@ -222,19 +250,19 @@ void wb_pkg::readConfig()
         n.push_back(pboot);
 
         // Read bootfile, get plc and volumes
-	vollist = 0;
-	volnamelist = 0;
-        sts = lfu_ReadBootFile(fname, &date, systemname, systemgroup, &vollist,
-            &volnamelist, &volcount, &plclist, &plccount);
+        vollist = 0;
+        volnamelist = 0;
+        sts = lfu_ReadBootFile(fname, &date, systemname, systemgroup, &vollist, &volnamelist, &volcount,
+                               &plclist, &plccount);
         if (EVEN(sts))
           throw wb_error_str("Bootfile is corrupt");
 
         // Add plc
-        for (int j = 0; j < plccount; j++) {
+        for (int j = 0; j < plccount; j++)
+        {
           pwr_tFileName dir;
 
-          if (n.opsys() == pwr_mOpSys_CustomBuild
-              && !streq(n.customPlatform(), "-"))
+          if (n.opsys() == pwr_mOpSys_CustomBuild && !streq(n.customPlatform(), "-"))
             sprintf(dir, "$pwrp_root/bld/%s/exe/", n.customPlatform());
           else
             sprintf(dir, "$pwrp_root/bld/%s/exe/", cdh_OpSysToStr(n.opsys()));
@@ -245,13 +273,13 @@ void wb_pkg::readConfig()
         }
 
         // Add volumes
-        for (int j = 0; j < volcount; j++) {
+        for (int j = 0; j < volcount; j++)
+        {
           char dir[80];
 
-          if ((vollist[j] >= cdh_cManufactClassVolMin
-                  && vollist[j] <= cdh_cManufactClassVolMax)
-              || (vollist[j] >= cdh_cSystemClassVolMin
-                     && vollist[j] <= cdh_cSystemClassVolMax)) {
+          if ((vollist[j] >= cdh_cManufactClassVolMin && vollist[j] <= cdh_cManufactClassVolMax) ||
+              (vollist[j] >= cdh_cSystemClassVolMin && vollist[j] <= cdh_cSystemClassVolMax))
+          {
             // Base volume, skip
             continue;
           }
@@ -261,54 +289,55 @@ void wb_pkg::readConfig()
           n.checkVolume(fname);
 
           // Check if there are any rtt-files for Root or Sub Volumes
-          if (vollist[j] >= cdh_cUserVolMin && vollist[j] <= cdh_cUserVolMax) {
+          if (vollist[j] >= cdh_cUserVolMin && vollist[j] <= cdh_cUserVolMax)
+          {
             cdh_uVolumeId vid;
             vid.pwr = vollist[j];
 
             // RttCrr-file
             strcpy(dir, "$pwrp_load/");
-            sprintf(fname, "%s" pwr_cNameRttCrr, dir, vid.v.vid_3, vid.v.vid_2,
-                vid.v.vid_1, vid.v.vid_0);
+            sprintf(fname, "%s" pwr_cNameRttCrr, dir, vid.v.vid_3, vid.v.vid_2, vid.v.vid_1, vid.v.vid_0);
             pkg_pattern rttcrr(fname);
             n.push_back(rttcrr);
 
             // RttCrrObj-file
             strcpy(dir, "$pwrp_load/");
-            sprintf(fname, "%s" pwr_cNameRttCrrObj, dir, vid.v.vid_3,
-                vid.v.vid_2, vid.v.vid_1, vid.v.vid_0);
+            sprintf(fname, "%s" pwr_cNameRttCrrObj, dir, vid.v.vid_3, vid.v.vid_2, vid.v.vid_1, vid.v.vid_0);
             pkg_pattern rttcrrobj(fname);
             n.push_back(rttcrrobj);
 
             // RttCrrCode-file
             strcpy(dir, "$pwrp_load/");
-            sprintf(fname, "%s" pwr_cNameRttCrrCode, dir, vid.v.vid_3,
-                vid.v.vid_2, vid.v.vid_1, vid.v.vid_0);
+            sprintf(fname, "%s" pwr_cNameRttCrrCode, dir, vid.v.vid_3, vid.v.vid_2, vid.v.vid_1, vid.v.vid_0);
             pkg_pattern rttcrrcode(fname);
             n.push_back(rttcrrcode);
 
             // RttSignals
 
             strcpy(dir, "$pwrp_load/");
-            sprintf(fname, "%s" pwr_cNameRttSignals, dir, vid.v.vid_3,
-                vid.v.vid_2, vid.v.vid_1, vid.v.vid_0);
+            sprintf(fname, "%s" pwr_cNameRttSignals, dir, vid.v.vid_3, vid.v.vid_2, vid.v.vid_1, vid.v.vid_0);
             pkg_pattern rttsignals(fname);
             n.push_back(rttsignals);
           }
         }
 
-	if (volnamelist)
-	  free(volnamelist);
-	if (vollist)
-	  free(vollist);
-
-      } catch (wb_error& e) {
+        if (volnamelist)
+          free(volnamelist);
+        if (vollist)
+          free(vollist);
+      }
+      catch (wb_error& e)
+      {
         if (e.what() == std::string("No such node"))
           continue;
         throw wb_error_str(e.what());
       }
-    } else if (streq(cdh_Low(line_item[0]), "boot")) {
+    }
+    else if (streq(cdh_Low(line_item[0]), "boot"))
+    {
       // A Sev node, only node and bootfile
-      try {
+      try
+      {
         if (num != 2)
           throw wb_error_str("File corrupt " pwr_cNameDistribute);
 
@@ -322,7 +351,9 @@ void wb_pkg::readConfig()
         sprintf(fname, pwr_cNameBoot, load_cDirectory, n.name(), n.bus());
         pkg_pattern pboot(fname, "", 'E');
         n.push_back(pboot);
-      } catch (wb_error& e) {
+      }
+      catch (wb_error& e)
+      {
         if (e.what() == std::string("No such node"))
           continue;
         throw wb_error_str(e.what());
@@ -333,7 +364,8 @@ void wb_pkg::readConfig()
   is.close();
 
   // Check that all nodes are valid
-  for (int i = 0; i < (int)m_nodelist.size(); i++) {
+  for (int i = 0; i < (int)m_nodelist.size(); i++)
+  {
     if (!m_nodelist[i].valid())
       throw wb_error_str("Unknown node name");
   }
@@ -341,7 +373,8 @@ void wb_pkg::readConfig()
 
 pkg_node& wb_pkg::getNode(char* name)
 {
-  for (int i = 0; i < (int)m_nodelist.size(); i++) {
+  for (int i = 0; i < (int)m_nodelist.size(); i++)
+  {
     if (streq(m_nodelist[i].name(), cdh_Low(name)))
       return m_nodelist[i];
   }
@@ -349,8 +382,7 @@ pkg_node& wb_pkg::getNode(char* name)
 }
 
 pkg_node::pkg_node(char* name)
-    : m_opsys(pwr_mOpSys__), m_bus(0), m_dstatus(0), m_valid(false),
-      m_errors(0), m_warnings(0)
+    : m_opsys(pwr_mOpSys__), m_bus(0), m_dstatus(0), m_valid(false), m_errors(0), m_warnings(0)
 {
   strncpy(m_name, name, sizeof(m_name));
   strcpy(m_user, "pwrp");
@@ -358,17 +390,19 @@ pkg_node::pkg_node(char* name)
   strcpy(m_custom_platform, "-");
 }
 
-pkg_node::pkg_node(char* name, pwr_mOpSys opsys, int bus, pwr_tMask dstatus,
-    char* bootnode, char* custom_platform)
-    : m_opsys(opsys), m_bus(bus), m_dstatus(dstatus), m_valid(true),
-      m_errors(0), m_warnings(0)
+pkg_node::pkg_node(char* name, pwr_mOpSys opsys, int bus, pwr_tMask dstatus, char* bootnode,
+                   char* custom_platform)
+    : m_opsys(opsys), m_bus(bus), m_dstatus(dstatus), m_valid(true), m_errors(0), m_warnings(0)
 {
   char* s;
   strncpy(m_user, bootnode, sizeof(m_user));
-  if ((s = strchr(m_user, '@'))) {
+  if ((s = strchr(m_user, '@')))
+  {
     *s = 0;
     strncpy(m_bootnode, s + 1, sizeof(m_bootnode));
-  } else {
+  }
+  else
+  {
     strcpy(m_user, "pwrp");
     strcpy(m_bootnode, bootnode);
   }
@@ -380,10 +414,13 @@ void pkg_node::setBootnode(char* bootnode)
 {
   char* s;
   strncpy(m_user, bootnode, sizeof(m_user));
-  if ((s = strchr(m_user, '@'))) {
+  if ((s = strchr(m_user, '@')))
+  {
     *s = 0;
     strncpy(m_bootnode, s + 1, sizeof(m_bootnode));
-  } else {
+  }
+  else
+  {
     strcpy(m_user, "pwrp");
     strcpy(m_bootnode, bootnode);
   }
@@ -408,13 +445,14 @@ void pkg_node::checkNode()
   pwr_tFileName fname;
 
   sprintf(fname, pwr_cNameBoot, load_cDirectory, name(), bus());
-  sts = lfu_ReadBootFile(fname, &bootversion, systemname, systemgroup, &vollist,
-      &volnamelist, &volcount, &plclist, &plccount);
+  sts = lfu_ReadBootFile(fname, &bootversion, systemname, systemgroup, &vollist, &volnamelist, &volcount,
+                         &plclist, &plccount);
   if (EVEN(sts))
     throw wb_error_str("Bootfile is corrupt");
 
   // Check that bootversion is later than volume versions
-  for (int i = 0; i < volcount; i++) {
+  for (int i = 0; i < volcount; i++)
+  {
     pwr_tVid vol_vid;
     pwr_tCid vol_cid;
     pwr_tTime vol_time;
@@ -430,9 +468,9 @@ void pkg_node::checkNode()
     strcpy(vname, (char*)(volnamelist + i));
     sprintf(fname, "%s%s.dbs", dir, cdh_Low(vname));
 
-    sts = lfu_GetVolume(
-        fname, vol_name, &vol_vid, &vol_cid, &vol_time, &vol_dvversion);
-    if (EVEN(sts)) {
+    sts = lfu_GetVolume(fname, vol_name, &vol_vid, &vol_cid, &vol_time, &vol_dvversion);
+    if (EVEN(sts))
+    {
       char msg[280];
       sprintf(msg, "Loadfile not found: %s", fname);
       MsgWindow::message('E', msg, msgw_ePop_No);
@@ -440,7 +478,8 @@ void pkg_node::checkNode()
       continue;
     }
 
-    if (time_Acomp(&bootversion, &vol_time) == -1) {
+    if (time_Acomp(&bootversion, &vol_time) == -1)
+    {
       char msg[200];
       sprintf(msg, "Volume %s is built after node %s", vname, name());
       MsgWindow::message('E', msg, msgw_ePop_No);
@@ -462,26 +501,28 @@ void pkg_node::checkVolume(char* filename)
   pwr_tStatus sts;
   char fname[200];
 
-  sts = lfu_GetVolume(
-      filename, vol_name, &vol_vid, &vol_cid, &vol_time, &vol_dvversion);
+  sts = lfu_GetVolume(filename, vol_name, &vol_vid, &vol_cid, &vol_time, &vol_dvversion);
   if (EVEN(sts))
     throw wb_error(sts);
 
   found = false;
-  for (int i = 0; i < (int)m_volumelist.size(); i++) {
-    if (m_volumelist[i].m_vid == vol_vid) {
+  for (int i = 0; i < (int)m_volumelist.size(); i++)
+  {
+    if (m_volumelist[i].m_vid == vol_vid)
+    {
       found = true;
-      if (m_volumelist[i].m_time.tv_sec != vol_time.tv_sec) {
+      if (m_volumelist[i].m_time.tv_sec != vol_time.tv_sec)
+      {
         char msg[200];
-        sprintf(msg, "Version mismatch volume %s in %s", (volref + i)->name,
-            filename);
+        sprintf(msg, "Version mismatch volume %s in %s", (volref + i)->name, filename);
         MsgWindow::message('E', msg, msgw_ePop_No);
         m_errors++;
       }
       break;
     }
   }
-  if (!found) {
+  if (!found)
+  {
     pkg_volume vol(vol_name, filename, vol_vid, vol_time);
     m_volumelist.push_back(vol);
   }
@@ -494,9 +535,11 @@ void pkg_node::checkVolume(char* filename)
   if (EVEN(sts))
     throw wb_error(sts);
 
-  for (int i = 0; i < volref_cnt; i++) {
+  for (int i = 0; i < volref_cnt; i++)
+  {
     wb_erep::volumeNameToFilename(&sts, (volref + i)->name, fname);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       char msg[200];
       sprintf(msg, "Loadfile not found: %s", (volref + i)->name);
       MsgWindow::message('E', msg, msgw_ePop_No);
@@ -506,12 +549,15 @@ void pkg_node::checkVolume(char* filename)
 
     checkVolume(fname);
 
-    for (int j = 0; j < (int)m_volumelist.size(); j++) {
-      if (m_volumelist[j].m_vid == (volref + i)->vid) {
-        if (m_volumelist[j].m_time.tv_sec != (volref + i)->version.tv_sec) {
+    for (int j = 0; j < (int)m_volumelist.size(); j++)
+    {
+      if (m_volumelist[j].m_vid == (volref + i)->vid)
+      {
+        if (m_volumelist[j].m_time.tv_sec != (volref + i)->version.tv_sec)
+        {
           char msg[320];
-          sprintf(msg, "Version mismatch volume %s in %s and %s",
-              (volref + i)->name, filename, m_volumelist[j].m_filename);
+          sprintf(msg, "Version mismatch volume %s in %s and %s", (volref + i)->name, filename,
+                  m_volumelist[j].m_filename);
           MsgWindow::message('E', msg, msgw_ePop_No);
           m_errors++;
         }
@@ -537,10 +583,12 @@ int pkg_node::compareFiles()
   sprintf(fname, "$pwrp_load/pkg_v_%s.dat", m_name);
   dcli_translate_filename(fname, fname);
   std::ifstream ifv(fname);
-  if (ifv) {
+  if (ifv)
+  {
     ifv >> version;
     ifv.close();
-  } else
+  }
+  else
     // No previous package
     return false;
 
@@ -552,8 +600,7 @@ int pkg_node::compareFiles()
   if (artime_minute)
     sprintf(cmd, "tar -tvf $pwrp_load/%s > %s", pkg_name, "$pwrp_tmp/fl.tmp");
   else
-    sprintf(cmd, "tar --full-time -tvf $pwrp_load/%s > %s", pkg_name,
-        "$pwrp_tmp/fl.tmp");
+    sprintf(cmd, "tar --full-time -tvf $pwrp_load/%s > %s", pkg_name, "$pwrp_tmp/fl.tmp");
   system(cmd);
 
   dcli_translate_filename(fname, "$pwrp_tmp/fl.tmp");
@@ -566,9 +613,10 @@ int pkg_node::compareFiles()
   pwr_tFileName source;
   std::map<std::string, pwr_tTime> tarlist;
 
-  while (is.getline(line, sizeof(line))) {
-    num = dcli_parse(line, " 	", "", (char*)line_item,
-        sizeof(line_item) / sizeof(line_item[0]), sizeof(line_item[0]), 0);
+  while (is.getline(line, sizeof(line)))
+  {
+    num = dcli_parse(line, " 	", "", (char*)line_item, sizeof(line_item) / sizeof(line_item[0]),
+                     sizeof(line_item[0]), 0);
     if (num != 6)
       continue;
 
@@ -592,8 +640,10 @@ int pkg_node::compareFiles()
   }
 
   // Add volumes to pattern
-  for (int i = 0; i < (int)m_volumelist.size(); i++) {
-    if (!m_volumelist[i].m_isSystem) {
+  for (int i = 0; i < (int)m_volumelist.size(); i++)
+  {
+    if (!m_volumelist[i].m_isSystem)
+    {
       pkg_pattern vol(m_volumelist[i].m_filename, "$pwrp_load/", 'E');
       push_back(vol);
     }
@@ -604,9 +654,12 @@ int pkg_node::compareFiles()
 
   // Put all files in a single list
   m_filelist.clear();
-  for (int i = 0; i < (int)m_pattern.size(); i++) {
-    for (int j = 0; j < (int)m_pattern[i].m_filelist.size(); j++) {
-      try {
+  for (int i = 0; i < (int)m_pattern.size(); i++)
+  {
+    for (int j = 0; j < (int)m_pattern[i].m_filelist.size(); j++)
+    {
+      try
+      {
         pkg_file f = m_pattern[i].m_filelist[j];
 
         dcli_parse_filename(f.m_source, dev, dir, file, type, &version);
@@ -614,10 +667,13 @@ int pkg_node::compareFiles()
         strcat(f.m_arname, type);
 
         // Check that this name is unique
-        for (;;) {
+        for (;;)
+        {
           bool new_name = false;
-          for (int k = 0; k < (int)m_filelist.size(); k++) {
-            if (streq(m_filelist[k].m_arname, f.m_arname)) {
+          for (int k = 0; k < (int)m_filelist.size(); k++)
+          {
+            if (streq(m_filelist[k].m_arname, f.m_arname))
+            {
               strcat(f.m_arname, "x");
               new_name = true;
               break;
@@ -628,20 +684,24 @@ int pkg_node::compareFiles()
         }
 
         m_filelist.push_back(f);
-      } catch (wb_error& e) {
+      }
+      catch (wb_error& e)
+      {
         MsgWindow::message('W', e.what().c_str(), msgw_ePop_No);
         m_warnings++;
       }
     }
   }
 
-  for (int k = 0; k < (int)m_filelist.size(); k++) {
+  for (int k = 0; k < (int)m_filelist.size(); k++)
+  {
     std::string s(m_filelist[k].m_arname);
     pwr_tTime tar_time, src_time;
     pwr_tStatus sts;
 
     tar_time = tarlist[s];
-    if (tar_time.tv_sec == 0) {
+    if (tar_time.tv_sec == 0)
+    {
       printf("No such file: %s\n", m_filelist[k].m_arname);
       new_files++;
       continue;
@@ -655,22 +715,24 @@ int pkg_node::compareFiles()
     if (artime_minute)
       diff = 60;
 
-    if (ABS(tar_time.tv_sec - src_time.tv_sec) > diff) {
+    if (ABS(tar_time.tv_sec - src_time.tv_sec) > diff)
+    {
       printf("New file: %s\n", m_filelist[k].m_arname);
       new_files++;
     }
   }
 
-  if (m_errors) {
+  if (m_errors)
+  {
     char msg[200];
-    sprintf(msg, "Distribute errors node %s: %d errors, %d warnings", m_name,
-        m_errors, m_warnings);
+    sprintf(msg, "Distribute errors node %s: %d errors, %d warnings", m_name, m_errors, m_warnings);
     MsgWindow::message('E', msg, msgw_ePop_Yes);
     throw wb_error_str(msg);
-  } else if (m_warnings) {
+  }
+  else if (m_warnings)
+  {
     char msg[200];
-    sprintf(
-        msg, "Distribute warnings node %s: %d warnings", m_name, m_warnings);
+    sprintf(msg, "Distribute warnings node %s: %d warnings", m_name, m_warnings);
     MsgWindow::message('W', msg, msgw_ePop_Yes);
   }
 
@@ -692,8 +754,10 @@ void pkg_node::fetchFiles(bool distribute)
   sprintf(m_blddir, "%s/pkg_build", m_tmpdir);
 
   // Add volumes to pattern
-  for (int i = 0; i < (int)m_volumelist.size(); i++) {
-    if (!m_volumelist[i].m_isSystem) {
+  for (int i = 0; i < (int)m_volumelist.size(); i++)
+  {
+    if (!m_volumelist[i].m_isSystem)
+    {
       pkg_pattern vol(m_volumelist[i].m_filename, "$pwrp_load/", 'E');
       push_back(vol);
     }
@@ -704,9 +768,12 @@ void pkg_node::fetchFiles(bool distribute)
 
   // Put all files in a single list
   m_filelist.clear();
-  for (int i = 0; i < (int)m_pattern.size(); i++) {
-    for (int j = 0; j < (int)m_pattern[i].m_filelist.size(); j++) {
-      try {
+  for (int i = 0; i < (int)m_pattern.size(); i++)
+  {
+    for (int j = 0; j < (int)m_pattern[i].m_filelist.size(); j++)
+    {
+      try
+      {
         pkg_file f = m_pattern[i].m_filelist[j];
 
         dcli_parse_filename(f.m_source, dev, dir, file, type, &version);
@@ -714,10 +781,13 @@ void pkg_node::fetchFiles(bool distribute)
         strcat(f.m_arname, type);
 
         // Check that this name is unique
-        for (;;) {
+        for (;;)
+        {
           bool new_name = false;
-          for (int k = 0; k < (int)m_filelist.size(); k++) {
-            if (streq(m_filelist[k].m_arname, f.m_arname)) {
+          for (int k = 0; k < (int)m_filelist.size(); k++)
+          {
+            if (streq(m_filelist[k].m_arname, f.m_arname))
+            {
               strcat(f.m_arname, "x");
               new_name = true;
               break;
@@ -728,23 +798,26 @@ void pkg_node::fetchFiles(bool distribute)
         }
 
         m_filelist.push_back(f);
-      } catch (wb_error& e) {
+      }
+      catch (const wb_error& e)
+      {
         MsgWindow::message('W', e.what().c_str(), msgw_ePop_No);
         m_warnings++;
       }
     }
   }
 
-  if (m_errors) {
+  if (m_errors)
+  {
     char msg[200];
-    sprintf(msg, "Distribute errors node %s: %d errors, %d warnings", m_name,
-        m_errors, m_warnings);
+    sprintf(msg, "Distribute errors node %s: %d errors, %d warnings", m_name, m_errors, m_warnings);
     MsgWindow::message('E', msg, msgw_ePop_Yes);
     throw wb_error_str(msg);
-  } else if (m_warnings) {
+  }
+  else if (m_warnings)
+  {
     char msg[200];
-    sprintf(
-        msg, "Distribute warnings node %s: %d warnings", m_name, m_warnings);
+    sprintf(msg, "Distribute warnings node %s: %d warnings", m_name, m_warnings);
     MsgWindow::message('W', msg, msgw_ePop_Yes);
   }
 
@@ -752,11 +825,13 @@ void pkg_node::fetchFiles(bool distribute)
   sprintf(fname, "$pwrp_load/pkg_v_%s.dat", m_name);
   dcli_translate_filename(fname, fname);
   std::ifstream ifv(fname);
-  if (ifv) {
+  if (ifv)
+  {
     ifv >> version;
     ifv.close();
     version++;
-  } else
+  }
+  else
     version = 1;
 
   std::ofstream ofv(fname);
@@ -778,16 +853,13 @@ void pkg_node::fetchFiles(bool distribute)
      << "mkdir " << m_blddir << '\n';
 
   for (int i = 0; i < (int)m_filelist.size(); i++)
-    of << "cp --preserve=timestamps " << m_filelist[i].m_source << " "
-       << m_blddir << "/" << m_filelist[i].m_arname << '\n';
+    of << "cp --preserve=timestamps " << m_filelist[i].m_source << " " << m_blddir << "/"
+       << m_filelist[i].m_arname << '\n';
 
-  of << "cp $pwrp_tmp/pkg_unpack_" << m_name << ".sh " << m_tmpdir
-     << "/pkg_unpack.sh\n"
-     << "cp $pwrp_tmp/pwr_pkg_" << m_name << ".dat " << m_tmpdir
-     << "/pwr_pkg.dat\n"
+  of << "cp $pwrp_tmp/pkg_unpack_" << m_name << ".sh " << m_tmpdir << "/pkg_unpack.sh\n"
+     << "cp $pwrp_tmp/pwr_pkg_" << m_name << ".dat " << m_tmpdir << "/pwr_pkg.dat\n"
      << "cd " << m_tmpdir << '\n'
-     << "tar --atime-preserve -czf $pwrp_load/" << pkg_name
-     << " pwr_pkg.dat pkg_unpack.sh pkg_build\n"
+     << "tar --atime-preserve -czf $pwrp_load/" << pkg_name << " pwr_pkg.dat pkg_unpack.sh pkg_build\n"
      << "rm -r " << m_tmpdir << '\n';
 
   of.close();
@@ -815,8 +887,7 @@ void pkg_node::fetchFiles(bool distribute)
       << "fi\n";
 
   for (int i = 0; i < (int)m_filelist.size(); i++)
-    ofu << "mv /tmp/pkg_build/" << m_filelist[i].m_arname << " "
-        << m_filelist[i].m_target << '\n';
+    ofu << "mv /tmp/pkg_build/" << m_filelist[i].m_arname << " " << m_filelist[i].m_target << '\n';
 
   ofu << "mv pwr_pkg.dat $pwrp_load\n"
       << "rm -r /tmp/pkg_build\n";
@@ -838,8 +909,7 @@ void pkg_node::fetchFiles(bool distribute)
   ofd << "%Package: \n"
       << pkg_name << '\n'
       << "%Brief:\n"
-      << "ProviewR package " << m_name << " Version " << version << " "
-      << time_str << '\n'
+      << "ProviewR package " << m_name << " Version " << version << " " << time_str << '\n'
       << "%Description:\n"
       << "ProviewR package:	" << pkg_name << '\n'
       << "Node:		" << m_name << '\n'
@@ -847,10 +917,10 @@ void pkg_node::fetchFiles(bool distribute)
       << "Created:		" << time_str << '\n'
       << "%Files:\n";
 
-  for (int i = 0; i < (int)m_filelist.size(); i++) {
+  for (int i = 0; i < (int)m_filelist.size(); i++)
+  {
     char timestr[32];
-    time_AtoAscii(&m_filelist[i].m_date, time_eFormat_DateAndTime, timestr,
-        sizeof(timestr));
+    time_AtoAscii(&m_filelist[i].m_date, time_eFormat_DateAndTime, timestr, sizeof(timestr));
 
     ofd << m_filelist[i].m_target << " " << timestr << '\n';
   }
@@ -864,14 +934,23 @@ void pkg_node::fetchFiles(bool distribute)
 
   wb_log::log(wlog_eCategory_CreatePackage, m_name, pkg_name);
 
-  if (distribute) {
-    // Copy the package
-    copyPackage(pkg_name);
+  if (distribute)
+  {
+    char msg[200];
+    try
+    {
+      // Copy the package
+      copyPackage(pkg_name);
+      sprintf(msg, "Distribute package for node %s", m_name);
+      MsgWindow::message('I', msg, msgw_ePop_No);
+    }
+    catch (const co_error& e)
+    {
+      sprintf(msg, "Distribute error for node %s: %s", m_name, e.what().c_str());
+      MsgWindow::message('E', msg, msgw_ePop_Yes);
+      throw;
+    }
   }
-
-  char msg[200];
-  sprintf(msg, "Distribute package for node %s", m_name);
-  MsgWindow::message('I', msg, msgw_ePop_No);
 }
 
 void pkg_node::copyPackage(char* pkg_name)
@@ -879,48 +958,67 @@ void pkg_node::copyPackage(char* pkg_name)
   char pack_fname[200];
   char bootnodes[10][80];
   int bootnode_cnt;
+  int sts;
 
-  if (!streq(m_bootnode, "-")) {
-    bootnode_cnt = dcli_parse(m_bootnode, ",", "", (char*)bootnodes,
-        sizeof(bootnodes) / sizeof(bootnodes[0]), sizeof(bootnodes[0]), 0);
-  } else {
+  if (!streq(m_bootnode, "-"))
+  {
+    bootnode_cnt = dcli_parse(m_bootnode, ",", "", (char*)bootnodes, sizeof(bootnodes) / sizeof(bootnodes[0]),
+                              sizeof(bootnodes[0]), 0);
+  }
+  else
+  {
     // No bootnodes, copy to the node itself
     strcpy(bootnodes[0], m_name);
     bootnode_cnt = 1;
   }
 
-  for (int i = 0; i < bootnode_cnt; i++) {
+  for (int i = 0; i < bootnode_cnt; i++)
+  {
     sprintf(pack_fname, "$pwrp_tmp/pkg_pack_%s.sh", m_name);
     dcli_translate_filename(pack_fname, pack_fname);
     std::ofstream of(pack_fname);
-    if (m_dstatus & lfu_mDistrOpt_RSH) {
+    if (m_dstatus & lfu_mDistrOpt_RSH)
+    {
       // Use ftp and rsh
       of << "cd $pwrp_load\n"
-         << "ftp -vin " << bootnodes[i] << " << EOF &>$pwrp_tmp/ftp_"
-         << bootnodes[i] << ".log\n"
+         << "ftp -vin " << bootnodes[i] << " << EOF &>$pwrp_tmp/ftp_" << bootnodes[i] << ".log\n"
          << "user " << m_user << " pwrp\n"
          << "binary\n"
          << "put " << pkg_name << '\n'
          << "quit\n"
          << "EOF\n"
-         << "rsh -l " << m_user << " " << bootnodes[i]
-         << " \\$pwr_exe/pwr_pkg.sh -i " << pkg_name << '\n';
-    } else {
+         << "rsh -l " << m_user << " " << bootnodes[i] << " \\$pwr_exe/pwr_pkg.sh -i " << pkg_name << '\n';
+    }
+    else
+    {
       // Use scp and SSH
-      of << "cd $pwrp_load\n"
-         << "scp " << pkg_name << " " << m_user << "@" << bootnodes[i] << ":"
-         << '\n'
-         << "ssh " << m_user << "@" << bootnodes[i]
-         << " \\$pwr_exe/pwr_pkg.sh -i " << pkg_name << '\n';
+      of << "#!/bin/bash\n"
+         << "set -eu" << '\n'
+         << "cd $pwrp_load\n"
+         << "scp " << pkg_name << " " << m_user << "@" << bootnodes[i] << ":" << '\n'
+         << "ssh " << m_user << "@" << bootnodes[i] << " \\$pwr_exe/pwr_pkg.sh -i " << pkg_name << '\n';
     }
     of.close();
 
     // Execute the pack file
     char cmd[2 + sizeof(pack_fname) + 1];
     sprintf(cmd, ". %s", pack_fname);
-    system(cmd);
 
-    wb_log::log(wlog_eCategory_CopyPackage, m_name, pkg_name);
+    if ((sts = system(cmd)))
+    {
+      // For some reason errno is set to 0 (Success) when execution path is that from
+      // when you distribute a selected package. Even though it's the exact same script
+      // executing. If you choose a node errno is set appropriate to for instance
+      // resource not available which is the case when scp or ssh can't find a route to
+      // the host...
+      // TODO investigate why that is... Would be neat to use strerror instead of a
+      // general message like the one below...
+      throw co_error_str(std::string("Distribute command failed!"));
+    }
+    else
+    {
+      wb_log::log(wlog_eCategory_CopyPackage, m_name, pkg_name);
+    }
   }
 }
 
@@ -937,7 +1035,18 @@ void wb_pkg::copyPackage(char* pkg_name)
   // Find the node and get the bootnode(s)
   wb_pkg pkg(node_name, false, true);
   pkg_node n = pkg.getNode(node_name);
-  n.copyPackage(pkg_name);
+
+  try
+  {
+    n.copyPackage(pkg_name);
+  }
+  catch (const co_error& e)
+  {
+    char msg[200];
+    sprintf(msg, "Distribute error for node %s: %s", node_name, e.what().c_str());
+    MsgWindow::message('E', msg, msgw_ePop_Yes);
+    throw;
+  }
 }
 
 pkg_pattern::pkg_pattern(const char* source, const char* target, char severity)
@@ -971,19 +1080,23 @@ void pkg_pattern::fetchFiles()
   int version;
   char file_target[80];
 
-  if (strchr(m_source, ':')) {
+  if (strchr(m_source, ':'))
+  {
     // Source is a search path separated by colon
     char source[10][120];
     int num;
 
-    num = dcli_parse(m_source, ":", "", (char*)source,
-        sizeof(source) / sizeof(source[0]), sizeof(source[0]), 0);
+    num = dcli_parse(m_source, ":", "", (char*)source, sizeof(source) / sizeof(source[0]), sizeof(source[0]),
+                     0);
 
-    for (int i = 0; i < num; i++) {
+    for (int i = 0; i < num; i++)
+    {
       sts = dcli_search_file(source[i], found_file, DCLI_DIR_SEARCH_INIT);
       dcli_search_file(source[i], found_file, DCLI_DIR_SEARCH_END);
-      if (ODD(sts)) {
-        if (hasTarget()) {
+      if (ODD(sts))
+      {
+        if (hasTarget())
+        {
           dcli_parse_filename(m_target, dev, dir, file, type, &version);
           strcpy(file_target, dev);
           strcpy(file_target, dir);
@@ -991,7 +1104,9 @@ void pkg_pattern::fetchFiles()
             dcli_parse_filename(found_file, dev, dir, file, type, &version);
           strcat(file_target, file);
           strcat(file_target, type);
-        } else {
+        }
+        else
+        {
           dcli_parse_filename(source[0], dev, dir, file, type, &version);
           strcpy(file_target, dev);
           strcat(file_target, dir);
@@ -999,19 +1114,26 @@ void pkg_pattern::fetchFiles()
           strcat(file_target, file);
           strcat(file_target, type);
         }
-        try {
+        try
+        {
           pkg_file file(found_file, file_target);
           m_filelist.push_back(file);
-        } catch (wb_error& e) {
+        }
+        catch (wb_error& e)
+        {
           MsgWindow::message('W', e.what().c_str(), msgw_ePop_Yes);
         }
         break;
       }
     }
-  } else {
+  }
+  else
+  {
     sts = dcli_search_file(m_source, found_file, DCLI_DIR_SEARCH_INIT);
-    while (ODD(sts)) {
-      if (hasTarget()) {
+    while (ODD(sts))
+    {
+      if (hasTarget())
+      {
         dcli_parse_filename(m_target, dev, dir, file, type, &version);
         strcpy(file_target, dev);
         strcpy(file_target, dir);
@@ -1019,7 +1141,9 @@ void pkg_pattern::fetchFiles()
           dcli_parse_filename(found_file, dev, dir, file, type, &version);
         strcat(file_target, file);
         strcat(file_target, type);
-      } else {
+      }
+      else
+      {
         dcli_parse_filename(m_source, dev, dir, file, type, &version);
         strcpy(file_target, dev);
         strcat(file_target, dir);
@@ -1027,10 +1151,13 @@ void pkg_pattern::fetchFiles()
         strcat(file_target, file);
         strcat(file_target, type);
       }
-      try {
+      try
+      {
         pkg_file file(found_file, file_target);
         m_filelist.push_back(file);
-      } catch (wb_error& e) {
+      }
+      catch (wb_error& e)
+      {
         MsgWindow::message('W', e.what().c_str(), msgw_ePop_Yes);
       }
 
@@ -1038,12 +1165,14 @@ void pkg_pattern::fetchFiles()
     }
     dcli_search_file(m_source, found_file, DCLI_DIR_SEARCH_END);
   }
-  if (m_filelist.size() == 0 && m_severity != 'S') {
+  if (m_filelist.size() == 0 && m_severity != 'S')
+  {
     char msg[15 + sizeof(m_source) + 1];
     sprintf(msg, "No file found: %s", m_source);
     MsgWindow::message(m_severity, msg, msgw_ePop_No);
 
-    if (m_node) {
+    if (m_node)
+    {
       if (m_severity == 'E')
         m_node->incrErrors();
       else
@@ -1072,7 +1201,8 @@ pkg_file::pkg_file(char* source, char* target)
   struct stat info;
 
   int sts = stat(source, &info);
-  if (sts == -1) {
+  if (sts == -1)
+  {
     char msg[256];
     sprintf(msg, "Source file doesn't exist: %s", source);
     throw wb_error_str(msg);

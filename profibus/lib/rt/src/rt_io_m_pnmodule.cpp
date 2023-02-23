@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 SSAB Oxelösund AB.
+ * Copyright (C) 2010 SSAB Oxelï¿½sund AB.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -34,7 +34,7 @@
 #include "rt_pb_msg.h"
 #include "rt_profinet.h"
 #include "rt_pnak.h"
-#include "rt_pn_gsdml_data.h"
+#include "rt_pn_runtime_data.h"
 #include "rt_io_pn_locals.h"
 
 /*----------------------------------------------------------------------------*\

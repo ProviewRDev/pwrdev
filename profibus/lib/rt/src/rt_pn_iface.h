@@ -41,48 +41,58 @@
 
 #include "pwr.h"
 
-#include "rt_pn_gsdml_data.h"
+#include "rt_pn_runtime_data.h"
 
 #include "rt_io_pn_locals.h"
 
+#define _PN_U32_HIGH_WORD(U32) ((PN_U16)((U32) >> 16))
+#define _PN_U32_LOW_WORD(U32) ((PN_U16)(U32))
+
+#define _PN_U32_HIGH_HIGH_BYTE(U32) ((PN_U8)((U32) >> 24))
+#define _PN_U32_HIGH_LOW_BYTE(U32) ((PN_U8)((U32) >> 16))
+#define _PN_U32_LOW_HIGH_BYTE(U32) ((PN_U8)((U32) >> 8))
+#define _PN_U32_LOW_LOW_BYTE(U32) ((PN_U8)(U32))
+
+#define _PN_U16_HIGH_BYTE(U16) ((PN_U8)((U16) >> 8))
+#define _PN_U16_LOW_BYTE(U16) ((PN_U8)(U16))
+
+#define _HIGH_LOW_BYTES_TO_PN_U16(High, Low) ((PN_U16)((((PN_U16)(High)) << 8) + (Low)))
+#define _HIGH_LOW_BYTES_TO_PN_U32(hwhb, hwlb, lwhb, lwlb)                                                    \
+  ((PN_U32)((((PN_U32)(hwhb)) << 24) + (((PN_U32)(hwlb)) << 16) + (((PN_U32)(lwhb)) << 8) + (lwlb)))
+
 #define PN_MAX_MANU_SPEC_DIAGS 200
 
-void pack_set_ip_settings_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes,
-                              PnDeviceInfo* dev_info);
+void pack_set_ip_settings_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes, ProfinetDevice const* pn_device);
 
-void pack_set_device_name_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes,
-                              PnDeviceInfo* dev_info);
+void pack_set_device_name_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes, ProfinetDevice* pn_device);
 
 void pack_set_identification_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes);
 
-void pack_get_device_state_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes,
-                               unsigned short device_ref);
+void pack_get_device_state_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes, unsigned short device_ref);
 
-void pack_write_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes,
-                    unsigned short device_ref, pwr_sClass_PnWriteReq* wr_req);
+void pack_read_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes, unsigned short device_ref,
+                   pwr_sClass_PnReadReq* read_request);
+
+void pack_write_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes, unsigned short device_ref,
+                    pwr_sClass_PnWriteReq* wr_req);
 
 void pack_get_los_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes);
 
-void pack_get_alarm_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes,
-                        unsigned short ref);
+void pack_get_alarm_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes, unsigned short ref);
 
-void pack_alarm_ack_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes,
-                        unsigned short ref, unsigned short prio);
+void pack_alarm_ack_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes, unsigned short ref, unsigned short prio);
 
-void pack_download_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes,
-                       GsdmlDeviceData* dev_data, unsigned short device_ref);
+void pack_download_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes, std::shared_ptr<ProfinetDevice> pn_device);
 
 int unpack_write_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local);
+int unpack_read_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local);
 
 int unpack_get_los_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local);
 
-int unpack_get_alarm_con(T_PNAK_SERVICE_DESCRIPTION* pSdb,
-                         io_sAgentLocal* local, io_sAgent* ap);
-int unpack_get_device_state_con(T_PNAK_SERVICE_DESCRIPTION* pSdb,
-                                io_sAgentLocal* local, io_sAgent* ap);
+int unpack_get_alarm_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local, io_sAgent* ap);
+int unpack_get_device_state_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local, io_sAgent* ap);
 
-int unpack_download_con(T_PNAK_SERVICE_DESCRIPTION* pSdb,
-                        io_sAgentLocal* local);
+int unpack_download_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local);
 
 int handle_service_con(io_sAgentLocal* local, io_sAgent* ap);
 

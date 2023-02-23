@@ -44,6 +44,7 @@
 #include "co_dcli.h"
 #include "co_string.h"
 #include "co_time.h"
+#include "co_pugixml.hpp"
 
 #include "pn_viewernav.h"
 #include "rt_pb_msg.h"
@@ -88,27 +89,19 @@ void PnViewerNavBrow::create_nodeclasses()
 
   brow_CreateNodeClass(ctx, "ViewDevice", flow_eNodeGroup_Common, &nc_device);
   brow_AddAnnotPixmap(nc_device, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
-  brow_AddAnnot(nc_device, 1.4, 0.6, 0, flow_eDrawType_TextHelvetica, 2,
-                flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_device, 8, 0.6, 1, flow_eDrawType_TextHelvetica, 2,
-                flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_device, 20, 0.6, 2, flow_eDrawType_TextHelvetica, 2,
-                flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_device, 32, 0.6, 3, flow_eDrawType_TextHelvetica, 2,
-                flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_device, 1.4, 0.6, 0, flow_eDrawType_TextHelvetica, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_device, 8, 0.6, 1, flow_eDrawType_TextHelvetica, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_device, 20, 0.6, 2, flow_eDrawType_TextHelvetica, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_device, 32, 0.6, 3, flow_eDrawType_TextHelvetica, 2, flow_eAnnotType_OneLine, 1);
   brow_AddFrame(nc_device, 0, 0, 35, 0.83, flow_eDrawType_LineGray, -1, 1);
 
   brow_CreateNodeClass(ctx, "ViewAttr", flow_eNodeGroup_Common, &nc_attr);
   brow_AddAnnotPixmap(nc_attr, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
   brow_AddAnnotPixmap(nc_attr, 1, 1.0, 0.1, flow_eDrawType_Line, 2, 0);
-  brow_AddAnnot(nc_attr, 1.6, 0.6, 0, flow_eDrawType_TextHelvetica, 2,
-                flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_attr, 10, 0.6, 1, flow_eDrawType_TextHelvetica, 2,
-                flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_attr, 15, 0.6, 2, flow_eDrawType_TextHelvetica, 2,
-                flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_attr, 30, 0.6, 3, flow_eDrawType_TextHelvetica, 2,
-                flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_attr, 1.6, 0.6, 0, flow_eDrawType_TextHelvetica, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_attr, 10, 0.6, 1, flow_eDrawType_TextHelvetica, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_attr, 15, 0.6, 2, flow_eDrawType_TextHelvetica, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_attr, 30, 0.6, 3, flow_eDrawType_TextHelvetica, 2, flow_eAnnotType_OneLine, 1);
   brow_AddFrame(nc_attr, 0, 0, 35, 0.83, flow_eDrawType_LineGray, -1, 1);
 }
 
@@ -125,38 +118,22 @@ void PnViewerNavBrow::brow_setup()
   brow_SetAttributes(ctx, &brow_attr, mask);
   brow_SetCtxUserData(ctx, viewernav);
 
-  brow_EnableEvent(ctx, flow_eEvent_MB1Click, flow_eEventType_CallBack,
-                   PnViewerNav::brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_MB1DoubleClick, flow_eEventType_CallBack,
-                   PnViewerNav::brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_MB3Press, flow_eEventType_CallBack,
-                   PnViewerNav::brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_MB3Down, flow_eEventType_CallBack,
-                   PnViewerNav::brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_SelectClear, flow_eEventType_CallBack,
-                   PnViewerNav::brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_ObjectDeleted, flow_eEventType_CallBack,
-                   PnViewerNav::brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_Key_Up, flow_eEventType_CallBack,
-                   PnViewerNav::brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_Key_Down, flow_eEventType_CallBack,
-                   PnViewerNav::brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_Key_Left, flow_eEventType_CallBack,
-                   PnViewerNav::brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_Key_Right, flow_eEventType_CallBack,
-                   PnViewerNav::brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_Key_Return, flow_eEventType_CallBack,
-                   PnViewerNav::brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_Key_PF3, flow_eEventType_CallBack,
-                   PnViewerNav::brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_Key_PageUp, flow_eEventType_CallBack,
-                   PnViewerNav::brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_Key_PageDown, flow_eEventType_CallBack,
-                   PnViewerNav::brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_ScrollUp, flow_eEventType_CallBack,
-                   PnViewerNav::brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_ScrollDown, flow_eEventType_CallBack,
-                   PnViewerNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_MB1Click, flow_eEventType_CallBack, PnViewerNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_MB1DoubleClick, flow_eEventType_CallBack, PnViewerNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_MB3Press, flow_eEventType_CallBack, PnViewerNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_MB3Down, flow_eEventType_CallBack, PnViewerNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_SelectClear, flow_eEventType_CallBack, PnViewerNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_ObjectDeleted, flow_eEventType_CallBack, PnViewerNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_Up, flow_eEventType_CallBack, PnViewerNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_Down, flow_eEventType_CallBack, PnViewerNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_Left, flow_eEventType_CallBack, PnViewerNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_Right, flow_eEventType_CallBack, PnViewerNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_Return, flow_eEventType_CallBack, PnViewerNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_PF3, flow_eEventType_CallBack, PnViewerNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_PageUp, flow_eEventType_CallBack, PnViewerNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_PageDown, flow_eEventType_CallBack, PnViewerNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_ScrollUp, flow_eEventType_CallBack, PnViewerNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_ScrollDown, flow_eEventType_CallBack, PnViewerNav::brow_cb);
 }
 
 //
@@ -191,10 +168,7 @@ PnViewerNavBrow::~PnViewerNavBrow() { free_pixmaps(); }
 //
 //  Zoom
 //
-void PnViewerNav::zoom(double zoom_factor)
-{
-  brow_Zoom(brow->ctx, zoom_factor);
-}
+void PnViewerNav::zoom(double zoom_factor) { brow_Zoom(brow->ctx, zoom_factor); }
 
 //
 //  Return to base zoom factor
@@ -269,8 +243,7 @@ int PnViewerNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
     }
     else
     {
-      if (!brow_IsVisible(viewernav->brow->ctx, node_list[0],
-                          flow_eVisible_Partial))
+      if (!brow_IsVisible(viewernav->brow->ctx, node_list[0], flow_eVisible_Partial))
       {
         sts = brow_GetLastVisible(viewernav->brow->ctx, &object);
         if (EVEN(sts))
@@ -312,8 +285,7 @@ int PnViewerNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
     }
     else
     {
-      if (!brow_IsVisible(viewernav->brow->ctx, node_list[0],
-                          flow_eVisible_Partial))
+      if (!brow_IsVisible(viewernav->brow->ctx, node_list[0], flow_eVisible_Partial))
       {
         sts = brow_GetFirstVisible(viewernav->brow->ctx, &object);
         if (EVEN(sts))
@@ -501,8 +473,7 @@ int PnViewerNav::set_attr_value(char* value_str)
       unsigned char address[4];
       int num;
 
-      num = sscanf(value_str, "%hhu.%hhu.%hhu.%hhu", &address[3], &address[2],
-                   &address[1], &address[0]);
+      num = sscanf(value_str, "%hhu.%hhu.%hhu.%hhu", &address[3], &address[2], &address[1], &address[0]);
       if (num != 4)
         return PB__SYNTAX;
 
@@ -535,8 +506,7 @@ int PnViewerNav::set_attr_value(char* value_str)
         return 0;
 
       brow_GetUserData(parent, (void**)&pitem);
-      brow_SetAnnotation(pitem->node, 0, (char*)item->p,
-                         strlen((char*)item->p));
+      brow_SetAnnotation(pitem->node, 0, (char*)item->p, strlen((char*)item->p));
     }
     break;
   }
@@ -564,8 +534,8 @@ int PnViewerNav::check_attr_value()
   switch (base_item->type)
   {
   case viewitem_eItemType_DeviceAttr:
-    if (type == viewer_eType_Network && (streq(base_item->name, "DeviceName") ||
-                                         streq(base_item->name, "IP Address")))
+    if (type == viewer_eType_Network &&
+        (streq(base_item->name, "DeviceName") || streq(base_item->name, "IP Address")))
       return 1;
     else
       return PB__ATTRNOEDIT;
@@ -583,106 +553,80 @@ void PnViewerNav::set(std::vector<PnDevice>& dev_vect)
   for (unsigned int i = 0; i < dev_vect.size(); i++)
   {
     if (!dev_vect[i].hide)
-      new ItemDevice(this, "", dev_vect[i].ipaddress, dev_vect[i].macaddress,
-                     dev_vect[i].devname, dev_vect[i].vendorid,
-                     dev_vect[i].deviceid, 0, flow_eDest_IntoLast);
+      new ItemDevice(this, "", dev_vect[i].ipaddress, dev_vect[i].macaddress, dev_vect[i].devname,
+                     dev_vect[i].vendorid, dev_vect[i].deviceid, 0, flow_eDest_IntoLast);
   }
 
   brow_ResetNodraw(brow->ctx);
   brow_Redraw(brow->ctx, 0);
 }
 
-void PnViewerNav::vendorid_to_str(unsigned int vendorid, char* vendorid_str,
-                                  int size)
+void PnViewerNav::vendorid_to_str(unsigned int vendorid, char* vendorid_str, int size)
 {
   pwr_tFileName fname;
-  dcli_translate_filename(fname, "$pwr_exe/profinet_vendorid.dat");
-  std::ifstream fp;
-  char line[1024];
-  int found = 0;
-  unsigned int id;
-  int num;
-  char* s;
+  dcli_translate_filename(fname, "$pwr_exe/profinet_devices.xml");
 
-  fp.open(fname);
-  if (fp)
+  pugi::xml_document doc;
+
+  pugi::xml_parse_result parse_result = doc.load_file(fname);
+
+  if (parse_result.status == pugi::status_ok)
   {
-    while (fp.getline(line, sizeof(line)))
+    pugi::xml_node devices = doc.child("ProfinetDevices");
+    pugi::xpath_variable_set vars;
+    vars.add("VendorID", pugi::xpath_type_number);
+    vars.set("VendorID", static_cast<double>(vendorid));
+    pugi::xml_node vendor = devices.select_node("Vendor[@ID = number($VendorID)]", &vars).node();
+
+    if (vendor)
     {
-      num = sscanf(line, "%u", &id);
-      if (num != 1)
-        continue;
-
-      if (id == vendorid)
-      {
-        s = strchr(line, ' ');
-        strncpy(vendorid_str, s + 1, size);
-        vendorid_str[size - 1] = 0;
-        found = 1;
-        break;
-      }
+      strncpy(vendorid_str, vendor.attribute("Name").as_string(), size);
     }
-    fp.close();
-  }
-
-  if (!found)
-    sprintf(vendorid_str, "%d", vendorid);
-}
-
-void PnViewerNav::get_device_info(unsigned int vendorid, unsigned int deviceid,
-                                  char* info, int info_size, char* family,
-                                  int family_size)
-{
-  pwr_tFileName fname;
-  dcli_translate_filename(fname, "$pwr_exe/profinet_deviceid.dat");
-  std::ifstream fp;
-  char line[1024];
-  int found = 0;
-  unsigned int vid;
-  unsigned int did;
-  int num;
-
-  fp.open(fname);
-  if (fp)
-  {
-    while (fp.getline(line, sizeof(line)))
+    else
     {
-      if (strstr(line, "# Processing file:"))
-      {
-        if (!fp.getline(line, sizeof(line)))
-          break;
-
-        num = sscanf(line, "%u %u", &vid, &did);
-        if (num != 2)
-          continue;
-
-        if (!(vid == vendorid && did == deviceid))
-          continue;
-
-        if (!fp.getline(line, sizeof(line)))
-          break;
-
-        strncpy(family, line, family_size);
-        family[family_size - 1] = 0;
-
-        if (!fp.getline(line, sizeof(line)))
-          break;
-
-        strncpy(info, line, info_size);
-        info[info_size - 1] = 0;
-        found = 1;
-        break;
-      }
+      sprintf(vendorid_str, "%d", vendorid);
     }
-    fp.close();
   }
 }
 
-ItemDevice::ItemDevice(PnViewerNav* item_viewernav, const char* item_name,
-                       unsigned char* item_ipaddress,
-                       unsigned char* item_macaddress, char* item_devname,
-                       int vendorid, int deviceid, brow_tNode dest,
-                       flow_eDest dest_code)
+void PnViewerNav::get_device_info(unsigned int vendorid, unsigned int deviceid, char* info, int info_size,
+                                  char* family, int family_size)
+{
+  pwr_tFileName fname;
+  dcli_translate_filename(fname, "$pwr_exe/profinet_devices.xml");
+
+  pugi::xml_document doc;
+
+  pugi::xml_parse_result parse_result = doc.load_file(fname);
+
+  if (parse_result.status == pugi::status_ok)
+  {
+    pugi::xml_node devices = doc.child("ProfinetDevices");
+    pugi::xpath_variable_set vars;
+    vars.add("VendorID", pugi::xpath_type_number);
+    vars.add("DeviceID", pugi::xpath_type_number);
+    vars.set("VendorID", static_cast<double>(vendorid));
+    vars.set("DeviceID", static_cast<double>(deviceid));
+    pugi::xml_node device =
+        devices.select_node("Vendor[@ID = number($VendorID)]/Device[@ID = number($DeviceID)]", &vars).node();
+
+    if (device)
+    {
+      strncpy(info, device.attribute("Description").as_string(), info_size);
+      snprintf(family, family_size, "%s (%s)", device.attribute("Name").as_string(),
+               device.attribute("Type").as_string());
+    }
+    else
+    {
+      sprintf(info, "%s", "Unknown");
+      sprintf(family, "%s", "Unknown");
+    }
+  }
+}
+
+ItemDevice::ItemDevice(PnViewerNav* item_viewernav, const char* item_name, unsigned char* item_ipaddress,
+                       unsigned char* item_macaddress, char* item_devname, int vendorid, int deviceid,
+                       brow_tNode dest, flow_eDest dest_code)
     : viewernav(item_viewernav)
 {
   type = viewitem_eItemType_Device;
@@ -692,19 +636,16 @@ ItemDevice::ItemDevice(PnViewerNav* item_viewernav, const char* item_name,
   strncpy(devname, item_devname, sizeof(devname));
   memcpy(ipaddress, item_ipaddress, sizeof(ipaddress));
   memcpy(macaddress, item_macaddress, sizeof(macaddress));
-  sprintf(ipaddress_str, "%hhu.%hhu.%hhu.%hhu", item_ipaddress[3],
-          item_ipaddress[2], item_ipaddress[1], item_ipaddress[0]);
-  sprintf(macaddress_str, "%02hhX:%02hhX:%02hhX:%02hhX:%02hhX:%02hhX",
-          item_macaddress[5], item_macaddress[4], item_macaddress[3],
-          item_macaddress[2], item_macaddress[1], item_macaddress[0]);
+  sprintf(ipaddress_str, "%hhu.%hhu.%hhu.%hhu", item_ipaddress[3], item_ipaddress[2], item_ipaddress[1],
+          item_ipaddress[0]);
+  sprintf(macaddress_str, "%02hhX:%02hhX:%02hhX:%02hhX:%02hhX:%02hhX", item_macaddress[5], item_macaddress[4],
+          item_macaddress[3], item_macaddress[2], item_macaddress[1], item_macaddress[0]);
   sprintf(deviceid_str, "%d", deviceid);
   viewernav->vendorid_to_str(vendorid, vendorid_str, sizeof(vendorid_str));
-  viewernav->get_device_info(vendorid, deviceid, infotext, sizeof(infotext),
-                             family, sizeof(family));
+  viewernav->get_device_info(vendorid, deviceid, infotext, sizeof(infotext), family, sizeof(family));
 
-  brow_CreateNode(viewernav->brow->ctx, (char*)"Device",
-                  viewernav->brow->nc_device, dest, dest_code, (void*)this, 1,
-                  &node);
+  brow_CreateNode(viewernav->brow->ctx, (char*)"Device", viewernav->brow->nc_device, dest, dest_code,
+                  (void*)this, 1, &node);
 
   brow_SetAnnotation(node, 0, devname, strlen(devname));
   brow_SetAnnotation(node, 1, vendorid_str, strlen(vendorid_str));
@@ -737,20 +678,13 @@ int ItemDevice::open_children(PnViewerNav* viewernav)
     // Create some children
     brow_SetNodraw(viewernav->brow->ctx);
 
-    new ItemDeviceAttr(viewernav, "DeviceName", pwr_eType_String, devname, node,
-                       flow_eDest_IntoLast);
-    new ItemDeviceAttr(viewernav, "IP Address", pwr_eType_String, ipaddress_str,
-                       node, flow_eDest_IntoLast);
-    new ItemDeviceAttr(viewernav, "MAC Address", pwr_eType_String,
-                       macaddress_str, node, flow_eDest_IntoLast);
-    new ItemDeviceAttr(viewernav, "Vendor Id", pwr_eType_String, vendorid_str,
-                       node, flow_eDest_IntoLast);
-    new ItemDeviceAttr(viewernav, "Device Id", pwr_eType_String, deviceid_str,
-                       node, flow_eDest_IntoLast);
-    new ItemDeviceAttr(viewernav, "Family", pwr_eType_String, family, node,
-                       flow_eDest_IntoLast);
-    new ItemDeviceAttr(viewernav, "InfoText", pwr_eType_String, infotext, node,
-                       flow_eDest_IntoLast);
+    new ItemDeviceAttr(viewernav, "DeviceName", pwr_eType_String, devname, node, flow_eDest_IntoLast);
+    new ItemDeviceAttr(viewernav, "IP Address", pwr_eType_String, ipaddress_str, node, flow_eDest_IntoLast);
+    new ItemDeviceAttr(viewernav, "MAC Address", pwr_eType_String, macaddress_str, node, flow_eDest_IntoLast);
+    new ItemDeviceAttr(viewernav, "Vendor Id", pwr_eType_String, vendorid_str, node, flow_eDest_IntoLast);
+    new ItemDeviceAttr(viewernav, "Device Id", pwr_eType_String, deviceid_str, node, flow_eDest_IntoLast);
+    new ItemDeviceAttr(viewernav, "Family", pwr_eType_String, family, node, flow_eDest_IntoLast);
+    new ItemDeviceAttr(viewernav, "InfoText", pwr_eType_String, infotext, node, flow_eDest_IntoLast);
 
     brow_SetOpen(node, 1);
     brow_SetAnnotPixmap(node, 0, viewernav->brow->pixmap_openmap);
@@ -777,9 +711,8 @@ void ItemDevice::close(PnViewerNav* viewernav)
   }
 }
 
-ItemDeviceAttr::ItemDeviceAttr(PnViewerNav* viewernav, const char* item_name,
-                               pwr_eType item_attr_type, void* item_p,
-                               brow_tNode dest, flow_eDest dest_code)
+ItemDeviceAttr::ItemDeviceAttr(PnViewerNav* viewernav, const char* item_name, pwr_eType item_attr_type,
+                               void* item_p, brow_tNode dest, flow_eDest dest_code)
     : attr_type(item_attr_type), p(item_p)
 {
   char value[80];
@@ -787,9 +720,8 @@ ItemDeviceAttr::ItemDeviceAttr(PnViewerNav* viewernav, const char* item_name,
   type = viewitem_eItemType_DeviceAttr;
   strcpy(name, item_name);
 
-  brow_CreateNode(viewernav->brow->ctx, (char*)"DeviceAttr",
-                  viewernav->brow->nc_attr, dest, dest_code, (void*)this, 1,
-                  &node);
+  brow_CreateNode(viewernav->brow->ctx, (char*)"DeviceAttr", viewernav->brow->nc_attr, dest, dest_code,
+                  (void*)this, 1, &node);
 
   strncpy(value, (char*)p, sizeof(value));
 

@@ -204,7 +204,7 @@ static pwr_tBoolean dlinux_sfloat(char* p, gdb_sAttribute* ap)
 }
 
 #elif defined(OS_LINUX)                                                        \
-    && (defined(HW_X86) || defined(HW_X86_64) || defined(HW_ARM))
+  && (defined(HW_X86) || defined(HW_X86_64) || defined(HW_ARM) || defined(HW_ARM64))
 
 static pwr_tBoolean dlinux_sfloat(char* p, int size)
 {

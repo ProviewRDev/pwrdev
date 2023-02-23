@@ -58,8 +58,7 @@ public:
   QLabel* msg_label;
   QLabel* cmd_prompt;
   QTextEdit* help_text;
-  QAction* menubutton_copy;
-  QAction* menubutton_cut;
+  QAction* menubutton_copy;  
   QAction* menubutton_paste;
   QAction* menubutton_changevalue;
   CoWowFocusTimerQt focustimer;
@@ -94,8 +93,7 @@ public slots:
   void activate_ordermoduletype_number();
   void activate_exit();
   void activate_help();
-  void activate_copy();
-  void activate_cut();
+  void activate_copy();  
   void activate_paste();
   void activate_viewio(bool);
   void activate_zoom_in();

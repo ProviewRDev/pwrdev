@@ -39,7 +39,9 @@
 #include "pwr_profibusclasses.h"
 
 #include "co_cdh.h"
+#include "co_dcli.h"
 #include "co_string.h"
+#include "co_fs_util.h"
 
 #include "rt_pb_msg.h"
 #include "rt_xnav_msg.h"
@@ -50,13 +52,14 @@
 
 #include "xtt_c_pndevice.h"
 
+const char* NO_EDIT_STRING = "Not in development environment, can't edit.";
+
 static void get_subcid(pwr_tCid cid, std::vector<pwr_tCid>& v)
 {
   pwr_tCid subcid;
   pwr_tStatus sts;
 
-  for (sts = gdh_GetSubClassList(cid, &subcid); ODD(sts);
-       sts = gdh_GetNextSubClass(cid, subcid, &subcid))
+  for (sts = gdh_GetSubClassList(cid, &subcid); ODD(sts); sts = gdh_GetNextSubClass(cid, subcid, &subcid))
   {
     v.push_back(subcid);
     get_subcid(subcid, v);
@@ -83,11 +86,11 @@ void xtt_pndevice_close_cb(void* sctx)
 
 int xtt_pndevice_save_cb(void* sctx) { return 1; }
 
-pwr_tStatus xtt_pndevice_create_ctx(pwr_tAttrRef aref, void* editor_ctx,
-                                    xtt_pndevice_sCtx** ctxp)
+pwr_tStatus xtt_pndevice_create_ctx(pwr_tAttrRef aref, void* editor_ctx, xtt_pndevice_sCtx** ctxp,
+                                    char const* pwr_pn_data_file)
 {
   pwr_tOName name;
-  pwr_tString80 gsdmlfile;
+  pwr_tString256 gsdmlfile;
   int sts;
   pwr_tFileName fname;
   std::vector<pwr_tCid> mcv;
@@ -109,18 +112,16 @@ pwr_tStatus xtt_pndevice_create_ctx(pwr_tAttrRef aref, void* editor_ctx,
     return PB__GSDATTR;
   }
 
-  xtt_pndevice_sCtx* ctx =
-      (xtt_pndevice_sCtx*)calloc(1, sizeof(xtt_pndevice_sCtx));
+  xtt_pndevice_sCtx* ctx = (xtt_pndevice_sCtx*)calloc(1, sizeof(xtt_pndevice_sCtx));
   ctx->aref = aref;
   ctx->editor_ctx = editor_ctx;
 
   get_subcid(pwr_cClass_PnModule, mcv);
-  ctx->mc =
-      (gsdml_sModuleClass*)calloc(mcv.size() + 2, sizeof(gsdml_sModuleClass));
+  ctx->mc = (gsdml_sModuleClass*)calloc(mcv.size() + 2, sizeof(gsdml_sModuleClass));
 
   ctx->mc[0].cid = pwr_cClass_PnModule;
-  sts = gdh_ObjidToName(cdh_ClassIdToObjid(ctx->mc[0].cid), ctx->mc[0].name,
-                        sizeof(ctx->mc[0].name), cdh_mName_object);
+  sts = gdh_ObjidToName(cdh_ClassIdToObjid(ctx->mc[0].cid), ctx->mc[0].name, sizeof(ctx->mc[0].name),
+                        cdh_mName_object);
   if (EVEN(sts))
   {
     free(ctx);
@@ -130,8 +131,8 @@ pwr_tStatus xtt_pndevice_create_ctx(pwr_tAttrRef aref, void* editor_ctx,
   for (int i = 1; i <= (int)mcv.size(); i++)
   {
     ctx->mc[i].cid = mcv[i - 1];
-    sts = gdh_ObjidToName(cdh_ClassIdToObjid(ctx->mc[i].cid), ctx->mc[i].name,
-                          sizeof(ctx->mc[0].name), cdh_mName_object);
+    sts = gdh_ObjidToName(cdh_ClassIdToObjid(ctx->mc[i].cid), ctx->mc[i].name, sizeof(ctx->mc[0].name),
+                          cdh_mName_object);
     if (EVEN(sts))
     {
       free(ctx);
@@ -141,7 +142,7 @@ pwr_tStatus xtt_pndevice_create_ctx(pwr_tAttrRef aref, void* editor_ctx,
 
   if (strchr(gsdmlfile, '/') == 0)
   {
-    strcpy(fname, "$pwrp_exe/");
+    strcpy(fname, "$pwrp_cnf/");
     strcat(fname, gsdmlfile);
   }
   else
@@ -154,8 +155,15 @@ pwr_tStatus xtt_pndevice_create_ctx(pwr_tAttrRef aref, void* editor_ctx,
     free(ctx);
     return sts;
   }
-  ctx->gsdml->build();
+
   ctx->gsdml->set_classes(ctx->mc);
+
+  // Now load the pwr_pn data if any. If there is none a default constructed object is created to start
+  // working on
+  char* name_of_gsdml_file;
+  basename(fname, &name_of_gsdml_file); // We want only the actual filename not the path...
+  ctx->pwr_pn_data.reset(new ProfinetRuntimeData());
+  sts = ctx->pwr_pn_data->read_pwr_pn_xml(pwr_pn_data_file, name_of_gsdml_file);
 
   *ctxp = ctx;
   return 1;

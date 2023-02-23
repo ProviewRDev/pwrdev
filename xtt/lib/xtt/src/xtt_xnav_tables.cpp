@@ -318,6 +318,9 @@ int XNav::show_nethandler()
       case co_eHW_ARM:
         strcpy(t.elem[t.elem_cnt].fix_str, "ARM");
         break;
+      case co_eHW_ARM64:
+        strcpy(t.elem[t.elem_cnt].fix_str, "ARM64");
+        break;
       default:
         strcpy(t.elem[t.elem_cnt].fix_str, "-");
       }

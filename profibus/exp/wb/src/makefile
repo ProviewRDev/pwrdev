@@ -15,7 +15,7 @@ all : init copy lib | silent
 
 init : silent
 
-copy : $(exe_dir)/pb_module_classes.dat $(exe_dir)/pn_module_classes.dat | silent
+copy : $(exe_dir)/pb_module_classes.dat | silent
 
 lib : silent
 
@@ -31,9 +31,5 @@ silent :
 .SUFFIXES:
 
 $(exe_dir)/pb_module_classes.dat : pb_module_classes.dat
-	@ $(log_cp)
-	@ $(cp) $(cpflags) $(source) $(target)
-
-$(exe_dir)/pn_module_classes.dat : pn_module_classes.dat
 	@ $(log_cp)
 	@ $(cp) $(cpflags) $(source) $(target)

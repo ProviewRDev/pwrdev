@@ -43,13 +43,12 @@
 
 class CoWow;
 class CoWowFocusTimer;
-class PnViewerPNAC;
+class PnViewerPNAK;
 
 class PnViewer
 {
 public:
-  PnViewer(void* v_parent_ctx, const char* v_name, const char* v_device,
-           pwr_tStatus* status);
+  PnViewer(void* v_parent_ctx, const char* v_name, const char* v_device, pwr_tStatus* status);
   virtual ~PnViewer();
 
   virtual void message(char severity, const char* msg) {}
@@ -57,8 +56,7 @@ public:
   virtual void open_change_value() {}
 
   void update_devices();
-  void set_device_properties(unsigned char* macaddress,
-                             unsigned char* ipaddress, char* devname);
+  void set_device_properties(unsigned char* macaddress, unsigned char* ipaddress, char* devname);
   int fetch_config(std::vector<PnDevice>& vect);
   void filter(viewer_eFilterType filtertype);
   void activate_update();
@@ -80,7 +78,7 @@ public:
   int input_open;
   std::vector<PnDevice> dev_vect;
   std::vector<PnDevice> conf_vect;
-  PnViewerPNAC* pnet;
+  PnViewerPNAK* pnet;
   void (*close_cb)(void*);
 };
 

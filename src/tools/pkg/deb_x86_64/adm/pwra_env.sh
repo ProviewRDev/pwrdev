@@ -142,6 +142,8 @@ pwra_parse ()
       machine="x86_64"
     elif [ ${machine:0:3} == "arm" ]; then
       machine="arm"
+    elif [ $machine == "aarch64" ]; then
+      machine="arm64"
     else
       machine="x86"
     fi

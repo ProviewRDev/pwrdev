@@ -85,7 +85,8 @@ void GsdmlAttrGtk::change_value()
 {
   int sts;
   GtkWidget* text_w;
-  char* value;
+  //char* value;
+  std::string value;
 
   if (input_open)
   {
@@ -101,7 +102,7 @@ void GsdmlAttrGtk::change_value()
     return;
   }
 
-  sts = attrnav->check_attr_value(&value);
+  sts = attrnav->check_attr_value(value);
   if (EVEN(sts))
   {
     if (sts == PB__NOATTRSEL)
@@ -117,12 +118,11 @@ void GsdmlAttrGtk::change_value()
   message(' ', "");
   gtk_widget_grab_focus(cmd_input);
 
-  if (value)
+  if (!value.empty())
   {
     gint pos = 0;
     gtk_editable_delete_text(GTK_EDITABLE(cmd_input), 0, -1);
-    gtk_editable_insert_text(GTK_EDITABLE(cmd_input), value, strlen(value),
-                             &pos);
+    gtk_editable_insert_text(GTK_EDITABLE(cmd_input), value.c_str(), value.length(), &pos);
 
     // Select the text
     gtk_editable_set_position(GTK_EDITABLE(cmd_input), -1);
@@ -186,13 +186,6 @@ void GsdmlAttrGtk::activate_copy(GtkWidget* w, gpointer data)
   GsdmlAttr* attr = (GsdmlAttr*)data;
 
   attr->activate_copy();
-}
-
-void GsdmlAttrGtk::activate_cut(GtkWidget* w, gpointer data)
-{
-  GsdmlAttr* attr = (GsdmlAttr*)data;
-
-  attr->activate_cut();
 }
 
 void GsdmlAttrGtk::activate_paste(GtkWidget* w, gpointer data)
@@ -331,14 +324,14 @@ static void destroy_event(GtkWidget* w, gpointer data) {}
 
 GsdmlAttrGtk::GsdmlAttrGtk(GtkWidget* a_parent_wid, void* a_parent_ctx,
                            void* a_object, pn_gsdml* a_gsdml, int a_edit_mode,
-                           const char* a_data_filename, pwr_tStatus* a_sts)
-    : GsdmlAttr(a_parent_ctx, a_object, a_gsdml, a_edit_mode, a_data_filename)
+                           std::shared_ptr<ProfinetRuntimeData> pwr_pn_data, pwr_tStatus* a_sts)
+    : GsdmlAttr(a_parent_ctx, a_object, a_edit_mode)
 {
   int sts;
 
-  toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", 700,
-                                      "default-width", 700, "title",
-                                      "profinetConfigurator", NULL);
+  toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", 600,
+                                      "default-width", 800, "title",
+                                      "PROFINET Device Configurator", NULL);
 
   g_signal_connect(toplevel, "delete_event", G_CALLBACK(delete_event), this);
   g_signal_connect(toplevel, "destroy", G_CALLBACK(destroy_event), this);
@@ -383,11 +376,6 @@ GsdmlAttrGtk::GsdmlAttrGtk(GtkWidget* a_parent_wid, void* a_parent_ctx,
   gtk_widget_add_accelerator(menubutton_copy, "activate", accel_g, 'c',
       GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
 
-  menubutton_cut = gtk_menu_item_new_with_mnemonic("C_ut");
-  g_signal_connect(menubutton_cut, "activate", G_CALLBACK(activate_cut), this);
-  gtk_widget_add_accelerator(menubutton_cut, "activate", accel_g, 'x',
-      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
-
   menubutton_paste =
       gtk_menu_item_new_with_mnemonic("P_aste");
   g_signal_connect(menubutton_paste, "activate", G_CALLBACK(activate_paste),
@@ -404,8 +392,7 @@ GsdmlAttrGtk::GsdmlAttrGtk(GtkWidget* a_parent_wid, void* a_parent_ctx,
                    this);
 
   GtkMenu* edit_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
-  gtk_menu_shell_append(GTK_MENU_SHELL(edit_menu), menubutton_copy);
-  gtk_menu_shell_append(GTK_MENU_SHELL(edit_menu), menubutton_cut);
+  gtk_menu_shell_append(GTK_MENU_SHELL(edit_menu), menubutton_copy);  
   gtk_menu_shell_append(GTK_MENU_SHELL(edit_menu), menubutton_paste);
   gtk_menu_shell_append(GTK_MENU_SHELL(edit_menu), edit_collapse);
   gtk_menu_shell_append(GTK_MENU_SHELL(edit_menu), edit_expand_all);
@@ -521,7 +508,7 @@ GsdmlAttrGtk::GsdmlAttrGtk(GtkWidget* a_parent_wid, void* a_parent_ctx,
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(help), GTK_WIDGET(help_menu));
 
   // Navigator
-  attrnav = new GsdmlAttrNavGtk(this, vbox, "Plant", gsdml, edit_mode,
+  attrnav = new GsdmlAttrNavGtk(this, vbox, "Plant", a_gsdml, pwr_pn_data, edit_mode,
                                 &brow_widget, &sts);
   attrnav->message_cb = &GsdmlAttr::gsdmlattr_message;
   attrnav->change_value_cb = &GsdmlAttr::gsdmlattr_change_value_cb;
@@ -593,13 +580,10 @@ GsdmlAttrGtk::GsdmlAttrGtk(GtkWidget* a_parent_wid, void* a_parent_ctx,
   {
     gtk_widget_set_sensitive(cmd_ok, FALSE);
     gtk_widget_set_sensitive(cmd_apply, FALSE);
-    gtk_widget_set_sensitive(menubutton_copy, FALSE);
-    gtk_widget_set_sensitive(menubutton_cut, FALSE);
+    gtk_widget_set_sensitive(menubutton_copy, FALSE);    
     gtk_widget_set_sensitive(menubutton_paste, FALSE);
     gtk_widget_set_sensitive(menubutton_changevalue, FALSE);
   }
 
   wow = new CoWowGtk(toplevel);
-
-  *a_sts = attrnav->open(data_filename);
 }

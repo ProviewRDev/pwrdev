@@ -1,26 +1,26 @@
 project pwrdemo
-node aristotle 128 999 0 - -
-load aristotle
-appl aristotle W $pwrp_cnf/aristotle/pwr_user2.dat:$pwra_db/pwr_user2.dat $pwra_db/pwr_user2.dat
-appl aristotle W $pwrp_load/ld_appl_aristotle_999.txt $pwrp_load/
-appl aristotle W $pwrp_load/pwrp_alias.dat $pwrp_load/pwrp_alias.dat
-appl aristotle W $pwrp_inc/*.h
-appl aristotle W $pwrp_exe/*.pwg
-appl aristotle W $pwrp_load/aristotle/xtt_help.dat:$pwrp_load/xtt_help.dat $pwrp_load/xtt_help.dat
-appl aristotle W $pwrp_load/aristotle/b55/Rt_xtt:$pwrp_load/aristotle/Rt_xtt:$pwrp_load/Rt_xtt /home/b55/Rt_xtt
-appl aristotle S $pwrp_load/aristotle/pwrp/Rt_xtt /home/pwrp/Rt_xtt
-appl aristotle W $pwrp_load/aristotle/b55/xtt_setup.rtt_com:$pwrp_load/aristotle/xtt_setup.rtt_com:$pwrp_load/xtt_setup.rtt_com /home/b55/xtt_setup.rtt_com
-appl aristotle S $pwrp_load/aristotle/pwrp/xtt_setup.rtt_com /home/pwrp/xtt_setup.rtt_com
-appl aristotle W $pwrp_load/*.flw
-appl aristotle W $pwrp_cnf/aristotle/.rhosts:$pwra_db/.rhosts /home/pwrp/.rhosts
-appl aristotle W $pwrp_web/*.html
-appl aristotle S $pwrp_web/*.jar
-appl aristotle S $pwrp_web/*.gif
-appl aristotle S $pwrp_web/*.png
-appl aristotle S $pwrp_web/*.jpg
-appl aristotle S $pwrp_web/*.pdf
-appl aristotle S $pwrp_web/*.pwg
-appl aristotle S $pwrp_web/*.flw
+node raspberrypi 8192 999 0 - -
+load raspberrypi
+appl raspberrypi W $pwrp_cnf/raspberrypi/pwr_user2.dat:$pwra_db/pwr_user2.dat $pwra_db/pwr_user2.dat
+appl raspberrypi W $pwrp_load/ld_appl_raspberrypi_999.txt $pwrp_load/
+appl raspberrypi W $pwrp_load/pwrp_alias.dat $pwrp_load/pwrp_alias.dat
+appl raspberrypi W $pwrp_inc/*.h
+appl raspberrypi W $pwrp_exe/*.pwg
+appl raspberrypi W $pwrp_load/raspberrypi/xtt_help.dat:$pwrp_load/xtt_help.dat $pwrp_load/xtt_help.dat
+appl raspberrypi W $pwrp_load/raspberrypi/b55/Rt_xtt:$pwrp_load/raspberrypi/Rt_xtt:$pwrp_load/Rt_xtt /home/b55/Rt_xtt
+appl raspberrypi S $pwrp_load/raspberrypi/pwrp/Rt_xtt /home/pwrp/Rt_xtt
+appl raspberrypi W $pwrp_load/raspberrypi/b55/xtt_setup.rtt_com:$pwrp_load/raspberrypi/xtt_setup.rtt_com:$pwrp_load/xtt_setup.rtt_com /home/b55/xtt_setup.rtt_com
+appl raspberrypi S $pwrp_load/raspberrypi/pwrp/xtt_setup.rtt_com /home/pwrp/xtt_setup.rtt_com
+appl raspberrypi W $pwrp_load/*.flw
+appl raspberrypi W $pwrp_cnf/raspberrypi/.rhosts:$pwra_db/.rhosts /home/pwrp/.rhosts
+appl raspberrypi W $pwrp_web/*.html
+appl raspberrypi S $pwrp_web/*.jar
+appl raspberrypi S $pwrp_web/*.gif
+appl raspberrypi S $pwrp_web/*.png
+appl raspberrypi S $pwrp_web/*.jpg
+appl raspberrypi S $pwrp_web/*.pdf
+appl raspberrypi S $pwrp_web/*.pwg
+appl raspberrypi S $pwrp_web/*.flw
 builddir pop 2 ""
 buildcopy pop $pwrp_pop/*.pwg $pwrp_exe/
 buildcopy pop $pwrp_pop/*.pwg $pwrp_web/

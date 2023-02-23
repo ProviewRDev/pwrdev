@@ -44,6 +44,9 @@ let reload__loaddb=4
 let pass__continue=1
 let pass__execute=2
 
+OLD_PWR_VERSION="6.0"
+NEW_PWR_VERSION="6.1"
+
 if [ -e /usr/pwr46 ]; then
   v46_root="/usr/pwr46"
 fi
@@ -305,6 +308,24 @@ reload_cnvobjects()
   reload_status=$reload__success
 }
 
+reload_convert_volume_objects()
+{
+  reload_checkpass "convert_volume_objects" $start_pass
+  if [ $pass_status -ne $pass__execute ]; then
+    reload_status=$reload__success
+    return
+  fi
+
+  reload_continue "Pass convert objects in volumes"
+ 
+  for cdb in $databases; do
+     echo "-- Convert volume $cdb"
+     wb_cmd -q -v $cdb @$pwr_exe/upgrade.pwr_com
+  done
+
+  reload_status=$reload__success
+}
+
 reload_updateclasses()
 {
   reload_checkpass "updateclasses" $start_pass
@@ -312,7 +333,6 @@ reload_updateclasses()
     reload_status=$reload__success
     return
   fi
-
 
   reload_continue "Pass update classes"
 
@@ -509,9 +529,14 @@ reload_directorystructure()
   reload_continue "Pass change directory structure"
 
   machine=`eval uname -m`
-  if [ $machine != "x86_64" ]; then
+  if [ $machine == "x86_64" ]; then
+    machine="x86_64"
+  elif [ ${machine:0:3} == "arm" ]; then
+    machine="arm"
+  elif [ $machine == "aarch64" ]; then
+    machine="arm64"
+  else
     machine="x86"
-  fi
   platform=$machine"_linux"
 
 
@@ -597,7 +622,7 @@ reload_checkpass()
   wantedpass=$2
 
   pass_status=$pass__continue
-  for item in $passes; do
+  for item in ${passes[@]}; do
     if [ $item = $wantedpass ]; then
       pass_status=$pass__execute
     fi
@@ -633,26 +658,49 @@ reload_save_file()
   fi
 }
 
+reload_convert_pn_xml()
+{
+  reload_checkpass "convert_pn_xml" $start_pass
+  if [ $pass_status -ne $pass__execute ]; then
+    reload_status=$reload__success
+    return
+  fi
+
+  reload_continue "Pass convert profinet xml files for all PnDevice objects"
+ 
+  for cdb in $databases; do
+     echo "-- Processing volume $cdb"
+     $pwr_exe/wb_convert_pn_xml ${cdb}     
+  done
+
+  reload_status=$reload__success
+}
+
+#passes="savedirectory classvolumes renamedb loaddb compile createload buildnodes createpackage"
+passes=(updateclasses convert_volume_objects convert_pn_xml)
+passes_desc=("Update classes" "Convert objects in volumes" "Convert profinet runtime xml files")
+
 usage()
 {
-  cat << EOF
-
-  upgrade.sh  Upgrade from V5.6 to V5.7
-
-
-  Pass
-
-    savedirectory  Save directory volume.
-    classvolumes   Create loadfiles for classvolumes.
-    renamedb	   Rename old databases.
-    loaddb         Load databases.
-    compile        Compile all plcprograms in the database
-    createload     Create new loadfiles.
-    buildnodes     Build all nodes in the project.
-    createpackage  Create distribution packages for all nodes in the project.
-
-EOF
+  tput clear
+  echo
+  echo "upgrade.sh  Upgrade from ${OLD_PWR_VERSION} to ${NEW_PWR_VERSION}"
+  echo "Passes:"
+	echo "_____________________________________"
+  echo	
+  column --table -s '|' <(for index in ${!passes[@]}; do echo "${passes[${index}]}|${passes_desc[${index}]}"; done)	
 }
+
+# Saved the old passes for reference
+
+# savedirectory  Save directory volume.
+# classvolumes   Create loadfiles for classvolumes.
+# renamedb	   Rename old databases.
+# loaddb         Load databases.
+# compile        Compile all plcprograms in the database
+# createload     Create new loadfiles.
+# buildnodes     Build all nodes in the project.
+# createpackage  Create distribution packages for all nodes in the project.
 
 if [ "$1" = "help" ] || [ "$1" = "-h" ]; then
   usage
@@ -663,11 +711,6 @@ fi
 let reload_status=$reload__success
 let check_status=0
 let go=0
-
-#if [ -z "$1" ]; then
-#  usage
-#  exit
-#fi
 
 project=${pwrp_root##/*/}
 
@@ -687,17 +730,15 @@ for db in $tmp; do
   fi
 done
 
-passes="savedirectory classvolumes renamedb loaddb compile createload buildnodes createpackage"
-#echo "Pass: $passes"
 echo ""
-echo -n "Enter start pass [savedirectory] > "
+echo -n "Enter start pass [${passes[0]}] > "
 read start_pass
 
-if [ -z $start_pass ]; then
-  start_pass="savedirectory"
+if [ -z ${start_pass} ]; then
+  start_pass=${passes[0]}
 fi
 
-for cpass in $passes; do
+for cpass in ${passes[@]}; do
   reload_$cpass
   if [ $reload_status -ne $reload__success ]; then
     echo "Exiting due to error"
@@ -706,7 +747,7 @@ for cpass in $passes; do
 done
 
 echo ""
-echo "-- The upgrade procedure is now accomplished."
+echo "-- The upgrade procedure is now complete."
 echo ""
 
 reload_exit

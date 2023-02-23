@@ -37,6 +37,8 @@
 #ifndef wb_c_pndevice_h
 #define wb_c_pndevice_h
 
+#include <memory>
+
 #include "wb_ldh.h"
 
 #include "cow_pn_gsdml_attr.h"
@@ -46,6 +48,7 @@
 typedef struct
 {
   pn_gsdml* gsdml;
+  std::shared_ptr<ProfinetRuntimeData> pwr_pn_data;
   GsdmlAttr* attr;
   ldh_tSession ldhses;
   pwr_tAttrRef aref;
@@ -54,14 +57,13 @@ typedef struct
   int edit_mode;
 } device_sCtx;
 
-pwr_tStatus pndevice_create_ctx(ldh_tSession ldhses, pwr_tAttrRef aref,
-                                void* editor_ctx, device_sCtx** ctxp);
+pwr_tStatus pndevice_create_ctx(ldh_tSession ldhses, pwr_tAttrRef aref, void* editor_ctx, device_sCtx** ctxp,
+                                char const* pwr_pn_data_file);
 pwr_tStatus pndevice_init(device_sCtx* ctx);
 int pndevice_help_cb(void* sctx, const char* text);
 void pndevice_close_cb(void* sctx);
 int pndevice_save_cb(void* sctx);
-pwr_tStatus pndevice_postcopy( ldh_tSesContext Session, pwr_tOid Object, 
-    pwr_tOid Source, pwr_tCid Class);
-
+pwr_tStatus pndevice_postcopy(ldh_tSesContext Session, pwr_tOid Object, pwr_tOid Source, pwr_tCid Class);
+pwr_tStatus pndevice_postdelete(ldh_tSesContext Session, pwr_tOid Object);
 
 #endif
