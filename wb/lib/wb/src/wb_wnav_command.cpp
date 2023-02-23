@@ -131,7 +131,7 @@ dcli_tCmdTable wnav_command_table[] = {
       { "dcli_arg1", "dcli_arg2", "/NAME", "/CLASS", "/HIERARCHY", "/PARAMETER",
           "/OBJID", "/FILE", "/LOCAL", "/INITSTEP", "/MAXOBJECTS", "/VOLUME",
           "/ALL", "/TYPE", "/OPTION", "/TERMINAL", "/OUTPUT", "/FULL",
-          "/APPEND", "/EXACTORDER", "" } },
+	  "/APPEND", "/EXACTORDER", "/HEXADECIMAL", "" } },
   { "COMPILE", &wnav_compile_func,
       { "/MODIFIED", "/DEBUG", "/HIERARCHY", "/PLCPGM", "/WINDOW",
           "/FROM_PLCPGM", "/ALLPLCPGM", "/VOLALL", "/VOLUMES", "/PLCEMBED",
@@ -1674,6 +1674,7 @@ static int wnav_show_func(void* client_data, void* client_flag)
     pwr_tObjid objid;
     char msg[256];
     int size;
+    int hex = ODD(dcli_get_qualifier("/HEXADECIMAL", 0, 0));
 
     sts = wnav_wccm_get_ldhsession_cb(wnav, &wnav->ldhses);
     if (EVEN(sts))
@@ -1699,7 +1700,10 @@ static int wnav_show_func(void* client_data, void* client_flag)
       }
     }
 
-    sprintf(msg, "Objid %s, Name %s", cdh_ObjidToString(objid, 0), name_str);
+    if (hex)
+      sprintf(msg, "Objid %s_%08x, Name %s", vldh_VolumeIdToStr(objid.vid), objid.oix, name_str);
+    else
+      sprintf(msg, "Objid %s, Name %s", cdh_ObjidToString(objid, 0), name_str);
     wnav->message('I', msg);
     return WNAV__SUCCESS;
   } else if (str_NoCaseStrncmp(arg1_str, "MODULES", strlen(arg1_str)) == 0) {
