@@ -39,7 +39,7 @@ SObject pwrb:Type
 !/**
 !  @Version 1.0
 !  @Group Types
-!  Enumeration for yes/no.
+!  Enumeration for camera control.
 !*/
   Object CameraControlEnum $TypeDef 81
     Body SysBody

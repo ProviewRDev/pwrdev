@@ -248,6 +248,10 @@ $(web_dir)/%.png : %.png
 	@ $(log_h_h)
 	@ $(cp) $(cpflags) $(source) $(target)
 
+$(doc_dir)/%.png : %.png
+	@ $(log_h_h)
+	@ $(cp) $(cpflags) $(source) $(target)
+
 $(bld_dir)/%.pbm : %.pbm
 	@ $(log_h_h)
 	@ $(cp) $(cpflags) $(source) $(target)

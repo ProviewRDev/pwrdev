@@ -246,13 +246,17 @@ SObject pwrb:Class
       !  
       !  D = Delayed  The order to start the activity is delayed
       !               for a certain time counting from where the
-      !               step became active. AttrTime1, ....,
+      !               step became active. The corresponding AttrTime 
+      !               attribute specifies the delay time.
       !  
       !  L = Limited  The order starts the activity at once but
       !               its duration is limited to a certain time.
-      !               AttrTime1, ...., AttrTime6 specifies the
+      !               The corresponding AttrTime attribute specifies
+      !               the limit time.
+      !
       !  P = Pulse    If the activity shall continue during only
-      !               one program cycle the L-attribute is
+      !               one program cycle the L attribute is replaced
+      !               by a P attribute.
       !  
       !  C =          The order to start the activity is denied
       !  Condition    as long as the condition is not satisfied.
@@ -260,9 +264,8 @@ SObject pwrb:Class
       !  S = Stored   The order to start the activity is stored
       !               in such a way that the activity remains
       !               even then the step has become inactive. A
-      !               stored order is reset by means of the
-      !  
-      !  
+      !               stored order is reset by a Reset_SO object.
+      !               
       !  These attributes are sometimes named order-attributes.
       !  Everyone of these attributes defines a sub-object in
       !  rtdb. A sub-object with the name S is of the S-order

@@ -43,7 +43,7 @@ SObject pwrb:Class
 !  The NodeConfig object configures a redundance node.
 !
 ! @b See also
-!  @classlink NodeConfig pwrb_dnodeconfig.html
+!  @classlink NodeConfig pwrb_nodeconfig.html
 !*/
   Object RedundanceNodeConfig $ClassDef 689 
     Body SysBody
