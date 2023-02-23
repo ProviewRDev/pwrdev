@@ -389,9 +389,9 @@ WAttTextGtk::WAttTextGtk(GtkWidget* wa_parent_wid, void* wa_parent_ctx,
   g_signal_connect(button_cancel, "clicked", G_CALLBACK(activate_cancel), this);
 
   GtkWidget* hboxbuttons = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 40);
-  gtk_box_pack_start(GTK_BOX(hboxbuttons), button_ok, FALSE, FALSE, 0);
-  gtk_box_pack_start(GTK_BOX(hboxbuttons), button_apply, FALSE, FALSE, 0);
-  gtk_box_pack_end(GTK_BOX(hboxbuttons), button_cancel, FALSE, FALSE, 0);
+  gtk_box_pack_start(GTK_BOX(hboxbuttons), button_ok, FALSE, FALSE, 15);
+  gtk_box_pack_start(GTK_BOX(hboxbuttons), button_apply, FALSE, FALSE, 15);
+  gtk_box_pack_end(GTK_BOX(hboxbuttons), button_cancel, FALSE, FALSE, 15);
 
   msg_label = gtk_label_new("");
   gtk_widget_set_size_request(msg_label, -1, 25);
