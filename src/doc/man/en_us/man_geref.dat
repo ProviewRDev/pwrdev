@@ -3928,18 +3928,18 @@ DigFourShift
 
 Shift between four pages in the subgraph. The subgraph has to contain at least four pages.
 
-The object is connected to three digital signals in the database. If the value is 0 on all 
-signals, the first page is drawn. If the value is 1 on Attribute1, the second page is drawn,
-if Attribute2 is 1 the third page is drawn, and if Attribute3 is 1 the fourth page is drawn.
-If several attributes it set, higher page number has higher priority.
+The object is connected to three digital signals in the database. 
+If the value is 1 on Attribute1, the first page is drawn, if Attribute2 is 1 the second page 
+is drawn, and if Attribute3 is 1 the third page is drawn. If the value is 0 on all signals, 
+the last page is drawn. If several attributes it set, higher page number has higher priority.
 
 <b>Attribute <t><t>Description
 DigFourShift.Attribute1 <t><t>Signal in the database or type Boolean that shifts 
-                   <t><t>page. Activates drawing of the second page.
+                   <t><t>page. Activates drawing of the first page.
 DigFourShift.Attribute2 <t><t>Signal in the database or type Boolean that shifts 
-                   <t><t>page. Activates drawing of the third page.
+                   <t><t>page. Activates drawing of the second page.
 DigFourShift.Attribute3 <t><t>Signal in the database or type Boolean that shifts 
-                   <t><t>page. Activates drawing of the fouth page.
+                   <t><t>page. Activates drawing of the third page.
 </topic>
 
 <topic>GeDynScrollingText <style>function

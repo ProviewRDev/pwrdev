@@ -3836,18 +3836,18 @@ DigFourShift
 
 Shifta mellen fyra sidor i subgrafen. Subgrafen måste innehålla minst fyra sidor.
 
-Objektet kopplas till tre digitala signaler i databasen. Om värdet är 0 på alla signaler
-ritas den första sidan. Om värdet är 1 på Attribute1, ritas den andra sidan, om Attribute2
-är 1 ritas den tredje sidan, och om Attribute3 är 1 ritas den fjärde sidan. Om flera
-signaler är 1 samtidigt har högre sidnummer högre prioritet.
+Objektet kopplas till tre digitala signaler i databasen. Om värdet är 1 på Attribute1, ritas 
+den första sidan, om Attribute2 är 1 ritas den andra sidan, och om Attribute3 är 1 ritas den 
+tredje sidan. Om värdet är 0 på alla signaler ritas den sista sidan. 
+Om flera signaler är 1 samtidigt har högre sidnummer högre prioritet.
 
 <b>Attribut  <t><t>Beskrivning
 DigFourShift.Attribute1 <t><t>Signal i databasen som skiftar sida. Aktiverar ritning av
-                   <t><t>sida nummer 2.
+                   <t><t>första sidan.
 DigFourShift.Attribute2 <t><t>Signal i databasen som skiftar sida. Aktiverar ritning av
-                   <t><t>den tredje sidan.
+                   <t><t>andra sidan.
 DigFourShift.Attribute3 <t><t>Signal i databasen som skiftar sida. Aktiverar ritning av
-                   <t><t>den fjärde sidan.
+                   <t><t>tredje sidan.
 </topic>
 
 <topic>GeDynScrollingText <style>function
