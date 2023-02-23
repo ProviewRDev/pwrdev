@@ -538,49 +538,52 @@ int CnvWblToHtml::class_exec()
       << '\n'
       << "<HR>\n"
       << "<!-- ======== START OF CLASS DATA ======== -->\n"
-      << "<H2>\n"
-      << "Class " << ctx->rw->class_name << "</H2>\n"
-      << "<HR>\n"
-      << "<DL>\n";
+      << "<table id=\"dormw\">\n"
+      << "<tr id=\"dormw\">\n"
+      << "<th id=\"dormh\" colspan=\"2\">\n"
+      << "Class " << ctx->rw->class_name << "<img align=\"right\" src=\"../../pwr_logoorm.png\">\n"
+      << "</th>\n"
+      << "<tr>\n";
   if (ctx->rw->doc_fresh && !streq(ctx->rw->doc_author, "")) {
-    fp_html_clf << "<DT><B>" << Lng::translate("Author")
-                << "</B>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
-                << ctx->rw->doc_author << "<DT>\n";
+    fp_html_clf << "<tr id=\"dormw\">"
+		<< "<td id=\"dormw\">" << Lng::translate("Author") << "</td>\n"
+                << "<td id=\"dormw2\">" << ctx->rw->doc_author << "<td>\n"
+		<< "</tr>\n";
   }
   if (ctx->rw->doc_fresh && !streq(ctx->rw->doc_creator, "")) {
-    fp_html_clf << "<DT><B>" << Lng::translate("Creator")
-                << "</B>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" << ctx->rw->doc_creator
-                << "<DT>\n";
+    fp_html_clf << "<tr id=\"dormw\">"
+		<< "<td id=\"dormw\">" << Lng::translate("Creator") << "</td>\n"
+                << "<td id=\"dormw2\">" << ctx->rw->doc_creator << "<td>\n"
+		<< "</tr>\n";
   }
-
-  if (ctx->rw->doc_fresh && (!streq(ctx->rw->doc_version, "")
-                                || !streq(ctx->rw->class_version, ""))) {
-    fp_html_clf << "<DT><B>" << Lng::translate("Version")
-                << "</B>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-    if (!streq(ctx->rw->doc_version, ""))
-      fp_html_clf << ctx->rw->doc_version << "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-    if (!streq(ctx->rw->class_version, ""))
-      fp_html_clf << ctx->rw->class_version;
-    fp_html_clf << "<DT>\n";
+  if (ctx->rw->doc_fresh && !streq(ctx->rw->doc_version, "")) {
+    fp_html_clf << "<tr id=\"dormw\">"
+		<< "<td id=\"dormw\">" << Lng::translate("Version") << "</td>\n"
+                << "<td id=\"dormw2\">" << ctx->rw->doc_version << "<td>\n"
+		<< "</tr>\n";
+  }
+  if (ctx->rw->doc_fresh && !streq(ctx->rw->class_version, "")) {
+    fp_html_clf << "<tr id=\"dormw\">"
+		<< "<td id=\"dormw\">" << Lng::translate("Modified") << "</td>\n"
+                << "<td id=\"dormw2\">" << ctx->rw->class_version << "<td>\n"
+		<< "</tr>\n";
   }
   if (ctx->rw->doc_fresh && !streq(ctx->rw->doc_code, "")) {
     if (strstr(ctx->rw->doc_code, ".pdf") != 0) {
-      fp_html_clf
-          << "<DT><B>" << Lng::translate("Code")
-          << "</B>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <A HREF=\""
-          << ref_name << "\"><FONT size=\"-1\">PlcTemplate</FONT></A><DT>\n";
+      fp_html_clf << "<tr id=\"dormw\">"
+		  << "<td id=\"dormw\">" << Lng::translate("Code") << "</td>\n"
+		  << "<td id=\"dormw2\"><a href=\"" << ref_name << "\">PlcTemplate</a><td>\n"
+		  << "</tr>\n";
     } else {
-      fp_html_clf
-          << "<DT><B>" << Lng::translate("Code")
-          << "</B>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <A HREF=\""
-          << ref_name << "#" << low_class_name << "\"><FONT size=\"-1\">"
-          << ctx->rw->doc_code << "</FONT></A><DT>\n";
+      fp_html_clf << "<tr id=\"dormw\">"
+		  << "<td id=\"dormw\">" << Lng::translate("Code") << "</td>\n"
+		  << "<td id=\"dormw2\"><a href=\"" << ref_name << "#" << low_class_name << "\">" << ctx->rw->doc_code << "</a><td>\n"
+		  << "</tr>\n";
     }
   }
+  fp_html_clf << "</table>\n";
 
-  fp_html_clf << "<BR><DT><B>" << Lng::translate("Description")
-              << "</B><DT><BR>\n"
-              << "</DL><DIV ID=\"description\"><PRE>\n";
+  fp_html_clf << "<div id=\"description\"><pre>\n";
 
   if (ctx->rw->doc_fresh) {
     for (i = 0; i < ctx->rw->doc_cnt; i++) {
@@ -603,27 +606,29 @@ int CnvWblToHtml::class_exec()
         fp_html_clf << ctx->rw->doc_text[i] << '\n';
     }
   }
-  fp_html_clf << "</PRE>\n";
+  fp_html_clf << "</pre>\n";
 
-  for (i = 0; i < ctx->rw->doc_xlink_cnt; i++) {
-    fp_html_clf << "  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF=\""
-                << ctx->rw->doc_xlink_ref[i]
-                << "\" TARGET=\"_self\"><FONT size=\"-1\"> "
-                << ctx->rw->doc_xlink_text[i] << "</FONT></A><BR>\n";
+  if (ctx->rw->doc_xlink_cnt || ctx->rw->doc_clink_cnt ||
+      ctx->rw->doc_link_cnt ) {
+    fp_html_clf << "<ul>\n";
+    for (i = 0; i < ctx->rw->doc_xlink_cnt; i++) {
+      fp_html_clf << "<li><a id=\"desc\" href=\"" << ctx->rw->doc_xlink_ref[i]
+		  << "\" target=\"_self\">"
+		  << ctx->rw->doc_xlink_text[i] << "</a></li>\n";
+    }
+    for (i = 0; i < ctx->rw->doc_clink_cnt; i++) {
+      fp_html_clf << "<li><a id=\"desc\" href=\"" << ctx->rw->doc_clink_ref[i]
+		  << "\" target=\"_self\">"
+		  << ctx->rw->doc_clink_text[i] << "</a></li>\n";
+    }
+    for (i = 0; i < ctx->rw->doc_link_cnt; i++) {
+      fp_html_clf << "<li><a id=\"desc\" href=\"" << ctx->rw->doc_link_ref[i]
+		  << "\" target=\"_self\">"
+		  << ctx->rw->doc_link_text[i] << "</a></li>\n";
+    }
+    fp_html_clf << "</ul>\n";
   }
-  for (i = 0; i < ctx->rw->doc_clink_cnt; i++) {
-    fp_html_clf << "  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF=\""
-                << ctx->rw->doc_clink_ref[i]
-                << "\" TARGET=\"_self\"><FONT size=\"-1\"> "
-                << ctx->rw->doc_clink_text[i] << "</FONT></A><BR>\n";
-  }
-  for (i = 0; i < ctx->rw->doc_link_cnt; i++) {
-    fp_html_clf << "  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF=\""
-                << ctx->rw->doc_link_ref[i]
-                << "\" TARGET=\"_self\"><FONT size=\"-1\"> "
-                << ctx->rw->doc_link_text[i] << "</FONT></A><BR>\n";
-  }
-  fp_html_clf << "</DIV>\n";
+  fp_html_clf << "</div>\n";
   return 1;
 }
 
@@ -647,25 +652,22 @@ int CnvWblToHtml::body_exec()
   }
 
   fp_html_clf << "<!-- =========== BODY =========== -->\n"
-              << '\n'
-              << "<HR><BR>\n"
-              << "<A NAME=\"" << ctx->rw->body_name << "\"><!-- --></A>\n"
-              << "<TABLE BORDER=\"1\" CELLPADDING=\"3\" CELLSPACING=\"0\" "
-                 "WIDTH=\"100%\">\n"
-              << "<TR BGCOLOR=\"#CCCCFF\" CLASS=\"TableHeadingColor\">\n"
-              << "<TD COLSPAN=4><FONT SIZE=\"+2\">\n"
-              << "<B>" << ctx->rw->body_name << " attributes</B></FONT>"
-              << "<FONT SIZE=\"+1\"<B>&nbsp;&nbsp;&nbsp;&nbsp; <A HREF=\""
-              << struct_file << "#" << ctx->rw->class_name << "\">"
-              << struct_name << "</A></B></FONT></TD>\n"
-              << "</TR>\n";
+              << "<hr>\n"
+              << "<a name=\"" << ctx->rw->body_name << "\"><!-- --></a>\n"
+              << "<table id=\"dorm\">\n"
+              << "<tr id=\"dorm\">\n"
+              << "<th id=\"dorm\" colspan=\"4\">\n"
+              << ctx->rw->body_name << " attributes&nbsp;"
+	      << "<a href=\"" << struct_file << "#" << ctx->rw->class_name << "\">"
+              << struct_name << "</a></th>\n"
+              << "</tr>\n";
 
   return 1;
 }
 
 int CnvWblToHtml::body_close()
 {
-  fp_html_clf << "</TABLE>\n";
+  fp_html_clf << "</table>\n";
 
   return 1;
 }
@@ -676,22 +678,20 @@ int CnvWblToHtml::graphplcnode()
 
   fp_html_clf << "<!-- =========== GRAPHPLCNODE =========== -->\n"
               << '\n'
-              << "<HR><BR>\n"
-              << "<A NAME=\"GraphPlcNode\"><!-- --></A>\n"
-              << "<TABLE BORDER=\"1\" CELLPADDING=\"3\" CELLSPACING=\"0\" "
-                 "WIDTH=\"100%\">\n"
-              << "<TR BGCOLOR=\"#CCCCFF\" CLASS=\"TableHeadingColor\">\n"
-              << "<TD COLSPAN=2><FONT SIZE=\"+2\">\n"
-              << "<B>" << ctx->rw->graphplcnode_name << "</B></FONT></TD>\n"
-              << "</TR>\n";
+              << "<hr><br>\n"
+              << "<a name=\"GraphPlcNode\"><!-- --></a>\n"
+              << "<table id=\"dorm\">\n"
+              << "<tr id=\"dorm\">\n"
+	      << "<th id=\"dorm\" colspan=\"2\">" << ctx->rw->graphplcnode_name << "</th>\n"
+              << "</tr>\n";
 
   for (i = 0; i < ctx->rw->doc_cnt; i += 2) {
-    fp_html_clf << "<TR BGCOLOR=\"white\" CLASS=\"TableRowColor\">\n"
-                << "<TD><CODE><B>" << ctx->rw->doc_text[i]
-                << "</B></CODE></TD>\n"
-                << "<TD><CODE>" << ctx->rw->doc_text[i + 1] << "</CODE></TD>\n";
+    fp_html_clf << "<tr id=\"dorm\">\n"
+                << "<td id=\"dorm\">" << ctx->rw->doc_text[i] << "</td>\n"
+                << "<td id=\"dorm2\">" << ctx->rw->doc_text[i + 1] << "</td>\n"
+		<< "</tr>\n";
   }
-  fp_html_clf << "</TABLE>\n";
+  fp_html_clf << "</table>\n";
 
   return 1;
 }
@@ -702,21 +702,19 @@ int CnvWblToHtml::graphplccon()
 
   fp_html_clf << "<!-- =========== GRAPHPLCCON =========== -->\n"
               << '\n'
-              << "<HR><BR>\n"
-              << "<TABLE BORDER=\"1\" CELLPADDING=\"3\" CELLSPACING=\"0\" "
-                 "WIDTH=\"100%\">\n"
-              << "<TR BGCOLOR=\"#CCCCFF\" CLASS=\"TableHeadingColor\">\n"
-              << "<TD COLSPAN=2><FONT SIZE=\"+2\">\n"
-              << "<B>" << ctx->rw->graphplccon_name << "</B></FONT></TD>\n"
-              << "</TR>\n";
+              << "<hr><br>\n"
+              << "<table id=\"dorm\">\n"
+              << "<tr id=\"dorm\">\n"
+              << "<th id=\"dorm\" colspah=\"2\">" << ctx->rw->graphplccon_name << "</th>\n"
+              << "</tr>\n";
 
   for (i = 0; i < ctx->rw->doc_cnt; i += 2) {
-    fp_html_clf << "<TR BGCOLOR=\"white\" CLASS=\"TableRowColor\">\n"
-                << "<TD><CODE><B>" << ctx->rw->doc_text[i]
-                << "</B></CODE></TD>\n"
-                << "<TD><CODE>" << ctx->rw->doc_text[i + 1] << "</CODE></TD>\n";
+    fp_html_clf << "<tr id=\"dorm\">\n"
+                << "<td id=\"dorm\">" << ctx->rw->doc_text[i] << "</td>\n"
+                << "<td id=\"dorm2\">" << ctx->rw->doc_text[i + 1] << "</td>\n"
+		<< "/tr>\n";
   }
-  fp_html_clf << "</TABLE>\n";
+  fp_html_clf << "</table>\n";
 
   return 1;
 }
@@ -730,22 +728,20 @@ int CnvWblToHtml::template_exec()
 
   fp_html_clf << "<!-- =========== TEMPLATE =========== -->\n"
               << '\n'
-              << "<HR><BR>\n"
-              << "<A NAME=\"template\"><!-- --></A>\n"
-              << "<TABLE BORDER=\"1\" CELLPADDING=\"3\" CELLSPACING=\"0\" "
-                 "WIDTH=\"100%\">\n"
-              << "<TR BGCOLOR=\"#CCCCFF\" CLASS=\"TableHeadingColor\">\n"
-              << "<TD COLSPAN=2><FONT SIZE=\"+2\">\n"
-              << "<B>Template Object</B></FONT></TD>\n"
-              << "</TR>\n";
+              << "<hr><br>\n"
+              << "<a name=\"template\"><!-- --></a>\n"
+              << "<table id=\"dorm\">\n"
+              << "<tr id=\"dorm\">\n"
+              << "<th id=\"dorm\" colspan=\"2\">Template Object</th>\n"
+              << "</tr>\n";
 
   for (i = 0; i < ctx->rw->doc_cnt; i += 2) {
-    fp_html_clf << "<TR BGCOLOR=\"white\" CLASS=\"TableRowColor\">\n"
-                << "<TD><CODE><B>" << ctx->rw->doc_text[i]
-                << "</B></CODE></TD>\n"
-                << "<TD><CODE>" << ctx->rw->doc_text[i + 1] << "</CODE></TD>\n";
+    fp_html_clf << "<tr id=\"dorm\">\n"
+                << "<td id=\"dorm\">" << ctx->rw->doc_text[i] << "</td>\n"
+                << "<td id=\"dorm2\">" << ctx->rw->doc_text[i + 1] << "</td>\n"
+		<< "</tr>\n";
   }
-  fp_html_clf << "</TABLE>\n";
+  fp_html_clf << "</table>\n";
 
   return 1;
 }
@@ -828,30 +824,25 @@ int CnvWblToHtml::attribute_exec()
   // Summary
 
   fp_html_clf
-      << "<TR BGCOLOR=\"white\" CLASS=\"TableRowColor\">\n"
-      << "<TD ALIGN=\"right\" VALIGN=\"top\" WIDTH=\"1%\"><FONT SIZE=\"-1\">\n"
-      << "<A HREF=\"" << typeref_href << "\">";
+      << "<tr id=\"dorm\">\n"
+      << "<td id=\"dorm\"><a href=\"" << typeref_href << "\">";
 
   if (ctx->rw->attr_array && ctx->rw->attr_pointer)
-    fp_html_clf << "<CODE>Array of pointers to " << ctx->rw->attr_typeref
-                << "</CODE></FONT></A></TD>\n";
+    fp_html_clf << "Array of pointers to " << ctx->rw->attr_typeref << "</a></td>\n";
   else if (ctx->rw->attr_array)
-    fp_html_clf << "<CODE>Array of " << ctx->rw->attr_typeref
-                << "</CODE></FONT></A></TD>\n";
+    fp_html_clf << "Array of " << ctx->rw->attr_typeref << "</a></td>\n";
   else if (ctx->rw->attr_pointer)
-    fp_html_clf << "<CODE>Pointer to " << ctx->rw->attr_typeref
-                << "</CODE></FONT></A></TD>\n";
+    fp_html_clf << "Pointer to " << ctx->rw->attr_typeref << "</a></td>\n";
   else
-    fp_html_clf << "<CODE>" << ctx->rw->attr_typeref
-                << "</CODE></FONT></A></TD>\n";
+    fp_html_clf << ctx->rw->attr_typeref << "</a></td>\n";
 
-  fp_html_clf << "</A><TD><A HREF=\"#" << ctx->rw->attr_name << "\"><CODE><B>"
-              << ctx->rw->attr_name << "</B></CODE></A></TD>\n";
+  fp_html_clf << "<td id=\"dorm\"><a href=\"#" << ctx->rw->attr_name << "\">"
+              << ctx->rw->attr_name << "</a></td>\n";
   if (!streq(ctx->rw->attr_graphname, ""))
-    fp_html_clf << "<TD WIDTH=\"1%\">" << ctx->rw->attr_graphname << "</TD>\n";
+    fp_html_clf << "<td id=\"dorm\" width=\"1%\">" << ctx->rw->attr_graphname << "</td>\n";
   else
-    fp_html_clf << "<TD WIDTH=\"1%\">&nbsp;</TD>\n";
-  fp_html_clf << "<TD>";
+    fp_html_clf << "<td id=\"dorm\" width=\"1%\">&nbsp;</td>\n";
+  fp_html_clf << "<td id=\"dorm2\">";
   if (ctx->rw->doc_fresh) {
     if (streq(ctx->rw->doc_summary, "")) {
       for (i = 0; i < ctx->rw->doc_cnt; i++) {
@@ -859,78 +850,82 @@ int CnvWblToHtml::attribute_exec()
         if (str_StartsWith(CnvCtx::low(txt), "@image")) {
           continue;
         } else if (str_StartsWith(CnvCtx::low(txt), "@b")) {
-          fp_html_clf << "</PRE><B><FONT SIZE=\"3\">" << txt + 2
-                      << "</FONT></B><PRE><BR>\n";
+          fp_html_clf << "</pre><b><font size=\"3\">" << txt + 2
+                      << "</font></b><pre><br>\n";
         } else if (str_StartsWith(CnvCtx::low(txt), "@h1")) {
-          fp_html_clf << "<H3>" << txt + 3 << "</H3><BR>\n";
+          fp_html_clf << "<h3>" << txt + 3 << "</h3><br>\n";
         } else if (str_StartsWith(CnvCtx::low(txt), "@h2")) {
-          fp_html_clf << "<H4>" << txt + 3 << "</H4><BR>\n";
+          fp_html_clf << "<h4>" << txt + 3 << "</h4><br>\n";
         } else {
           fp_html_clf << ctx->rw->doc_text[i];
           if (i < ctx->rw->doc_cnt - 1)
-            fp_html_clf << "<BR>\n";
+            fp_html_clf << "<br>\n";
         }
       }
     } else
       fp_html_clf << ctx->rw->doc_summary << '\n';
   } else
-    fp_html_clf << "<BR>\n";
+    fp_html_clf << "<br>\n";
 
-  fp_html_clf << "</TD>\n";
+  fp_html_clf << "</td>\n";
 
   // Detail
 
-  fp_tmp << "<HR>\n"
-         << "<A NAME=\"" << ctx->rw->attr_name << "\"> <H3>"
-         << "<FONT SIZE=\"-1\">" << ctx->rw->attr_type << "</FONT> "
-         << ctx->rw->attr_name << "</H3></A>\n"
-         << "<DL><DT>\n";
+  fp_tmp << "<hr>\n"
+	 << "<table id=\"dormw\">\n"
+	 << "<tr id=\"dormw\">\n"
+	 << "<th id=\"dormw\" colspan=\"2\"><a name=\"" << ctx->rw->attr_name << "\"> "
+         << ctx->rw->attr_name << "&nbsp;" << ctx->rw->attr_type << "</a></th>\n"
+         << "</tr>\n";
 
+  fp_tmp << "<tr id=\"dormw\">\n"
+	 << "<td id=\"dormw\">" << Lng::translate("Class") << "</td>\n"
+         << "<td id=\"dormw2\"><a href=\"" << attrtype_href
+         << "\">" << ctx->rw->attr_type << "</a></td>\n"
+	 << "</tr>\n";
+
+  fp_tmp << "<tr id=\"dormw\">\n"
+	 << "<td id=\"dormw\">" << Lng::translate("Type") << "</td>\n";
+  
   if (ctx->rw->attr_array && ctx->rw->attr_pointer)
-    fp_tmp << "<CODE><B>" << Lng::translate("Type")
-           << "</B>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Array of pointers to <A "
-              "HREF=\""
-           << typeref_href << "\">" << ctx->rw->attr_typeref
-           << "</A></CODE><DT>\n";
+    fp_tmp << "<td id=\"dormw2\">Array of pointers to <a href=\""
+           << typeref_href << "\">" << ctx->rw->attr_typeref << "</a><td>\n";
   else if (ctx->rw->attr_array)
-    fp_tmp << "<CODE><B>" << Lng::translate("Type")
-           << "</B>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Array of <A HREF=\""
-           << typeref_href << "\">" << ctx->rw->attr_typeref
-           << "</A></CODE><DT>\n";
+    fp_tmp << "<td id=\"dormw2\">Array of <a href=\""
+           << typeref_href << "\">" << ctx->rw->attr_typeref << "</a><td>\n";
   else if (ctx->rw->attr_pointer)
-    fp_tmp << "<CODE><B>" << Lng::translate("Type")
-           << "</B>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Pointer to <A HREF=\""
-           << typeref_href << "\">" << ctx->rw->attr_typeref
-           << "</A></CODE><DT>\n";
+    fp_tmp << "<td id=\"dormw2\">Pointer to <a href=\""
+           << typeref_href << "\">" << ctx->rw->attr_typeref << "</a><td>\n";
   else
-    fp_tmp << "<CODE><B>" << Lng::translate("Type")
-           << "</B>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF=\""
-           << typeref_href << "\">" << ctx->rw->attr_typeref
-           << "</A></CODE><DT>\n";
+    fp_tmp << "<td id=\"dormw2\"><a href=\""
+           << typeref_href << "\">" << ctx->rw->attr_typeref << "</a><td>\n";
+  fp_tmp << "</tr>\n";
 
-  fp_tmp << "<DT><CODE><B><A HREF=\"" << attrtype_href
-         << "#Flags\">Flags</A></B>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
-         << ctx->rw->attr_flags << "</CODE><DT>\n";
+  fp_tmp << "<tr id=\"dormw\">\n"
+	 << "<td id=\"dormw\"><a href=\"" << attrtype_href
+         << "#Flags\">Flags</a></td>\n"
+	 << "<td id=\"dormw2\">" << ctx->rw->attr_flags << "</td>\n"
+	 << "</tr>\n";
 
   if (ctx->rw->attr_array)
-    fp_tmp << "<DT><CODE><B>Elements</B>&nbsp;&nbsp;" << ctx->rw->attr_elements
-           << "</CODE><DT>\n";
+    fp_tmp << "<tr id=\"dormw\">\n" 
+	   << "<td id=\"dormw\">Elements</td>\n"
+	   << "<td id=\"dormw2\">" << ctx->rw->attr_elements << "</td>\n"
+	   << "</tr>\n";
 
   if (!streq(ctx->rw->attr_graphname, ""))
-    fp_tmp << "<DT><CODE><B>GraphName</B>&nbsp;" << ctx->rw->attr_graphname
-           << "</CODE><DT>\n";
+    fp_tmp << "<tr id=\"dormw\">\n"
+	   << "<td id=\"dormw\">GraphName</td>\n"
+	   << "<td id=\"dormw2\">" << ctx->rw->attr_graphname << "</td\n"
+	   << "</tr>\n";
 
-  fp_tmp << "<DT><CODE><B>" << Lng::translate("Body")
-         << "</B>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" << ctx->rw->body_name
-         << "</CODE><DT>\n";
-  fp_tmp << "<DT><CODE><B>" << Lng::translate("Class")
-         << "</B>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF=\"" << attrtype_href
-         << "\">$" << ctx->rw->attr_type << "</A></CODE><DT>\n";
+  fp_tmp << "<tr id=\"dormw\">\n"
+         << "<td id=\"dormw\">" << Lng::translate("Body") << "</td>\n"
+         << "<td id=\"dormw2\">" << ctx->rw->body_name << "</td>\n"
+	 << "</tr>\n"
+	 << "</table>\n";
 
-  fp_tmp << "<BR>\n"
-         << "<CODE><B>" << Lng::translate("Description")
-         << "</B></CODE><DT></DL>\n"
-         << "<DIV ID=\"description\"><PRE>\n";
+  fp_tmp << "<div id=\"description\"><pre>\n";
 
   if (ctx->rw->doc_fresh) {
     for (i = 0; i < ctx->rw->doc_cnt; i++) {
@@ -939,7 +934,7 @@ int CnvWblToHtml::attribute_exec()
         char imagefile[80];
 
         str_trim(imagefile, txt + 6);
-        fp_tmp << "</PRE><IMG SRC=\"" << imagefile << "\"><PRE>\n";
+        fp_tmp << "</pre><IMG SRC=\"" << imagefile << "\"><PRE>\n";
       } else if (str_StartsWith(CnvCtx::low(txt), "@b")) {
         fp_tmp << "</PRE><B><FONT SIZE=\"3\">" << txt + 2
                << "</FONT></B><BR><PRE>\n";
@@ -951,7 +946,7 @@ int CnvWblToHtml::attribute_exec()
         fp_tmp << ctx->rw->doc_text[i] << '\n';
     }
   }
-  fp_tmp << "</PRE></DIV>\n";
+  fp_tmp << "</pre></div>\n";
 
   return 1;
 }
@@ -968,15 +963,12 @@ int CnvWblToHtml::bit_exec()
   // Summary
   char bitchar = _tolower(ctx->rw->typedef_typeref[0]);
 
-  fp_html_clf << "<TR BGCOLOR=\"white\" CLASS=\"TableRowColor\">\n"
-              << "<TD>\n"
-              << "<CODE><FONT SIZE=\"-1\">pwr_" << bitchar
-              << ctx->rw->typedef_name << "_" << ctx->rw->bit_pgmname
-              << "</FONT></CODE></TD>\n"
-              << "<TD ALIGN =\"right\" VALIGN=\"top\" WIDTH=\"1%\"><A HREF=\"#"
-              << ctx->rw->bit_name << "\"><CODE><B>" << ctx->rw->bit_text
-              << "</B></CODE></A></TD>\n"
-              << "<TD>";
+  fp_html_clf << "<tr id=\"dorm\">\n"
+              // << "<td id=\"dorm\">pwr_" << bitchar
+              // << ctx->rw->typedef_name << "_" << ctx->rw->bit_pgmname << "</td>\n"
+              << "<td id=\"dorm\"><a href=\"#" << ctx->rw->bit_name << "\">" 
+	      << ctx->rw->bit_text << "</a></td>\n"
+              << "<td id=\"dorm2\">";
   if (ctx->rw->doc_fresh) {
     if (streq(ctx->rw->doc_summary, "")) {
       for (i = 0; i < ctx->rw->doc_cnt; i++) {
@@ -1001,22 +993,28 @@ int CnvWblToHtml::bit_exec()
   } else
     fp_html_clf << "<BR>\n";
 
-  fp_html_clf << "</TD>\n";
+  fp_html_clf << "</td>\n";
 
   // Detail
 
-  fp_tmp << "<HR>\n"
-         << "<A NAME=\"" << ctx->rw->bit_name << "\"> <H3>"
-         << "<FONT SIZE=\"-1\">pwr_" << bitchar << ctx->rw->typedef_name << "_"
-         << ctx->rw->bit_pgmname << "</FONT>&nbsp;&nbsp;" << ctx->rw->bit_text
-         << "</H3></A>\n"
-         << "<DL><DT>\n"
-         << "<CODE><B>Value</B>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
-         << ctx->rw->bit_value << "</CODE><DT>\n";
+  fp_tmp << "<hr>\n"
+	 << "<table id=\"dormw\">\n"
+	 << "<tr id=\"dormw\">\n"
+	 << "<th id=\"dormw\" colspan=\"2\">"
+         << "<a name=\"" << ctx->rw->bit_name << "\">" << ctx->rw->bit_text
+         << "</a></th>\n"
+         << "<tr id=\"dormw\">\n"
+	 << "<td id=\"dormw\">Value</td>\n"
+         << "<td id=\"dormw2\">" << ctx->rw->bit_value << "</td>\n"
+         << "<tr id=\"dormw\">\n"
+	 << "</tr>\n" 
+	 << "<td id=\"dormw\">c-type</td>\n"
+         << "<td id=\"dormw2\">pwr_" << bitchar << ctx->rw->typedef_name << "_"
+         << ctx->rw->bit_pgmname << "</td>\n"
+	 << "</tr>\n" 
+	 << "</table>\n";
 
-  fp_tmp << "<BR>\n"
-         << "<CODE><B>Description</B></CODE><DT></DL>\n"
-         << "<DIV ID=\"description\"><PRE>\n";
+  fp_tmp << "<div id=\"description\"><pre>\n";
 
   if (ctx->rw->doc_fresh) {
     for (i = 0; i < ctx->rw->doc_cnt; i++) {
@@ -1037,7 +1035,7 @@ int CnvWblToHtml::bit_exec()
         fp_tmp << ctx->rw->doc_text[i] << '\n';
     }
   }
-  fp_tmp << "</PRE></DIV>\n";
+  fp_tmp << "</pre></div>\n";
 
   return 1;
 }
@@ -1109,7 +1107,7 @@ int CnvWblToHtml::typedef_exec()
     }
   }
 
-  // Create class html file
+  // Create typedef html file
 
   strcpy(fname, ctx->dir);
   strcat(fname, html_file_name);
@@ -1175,27 +1173,32 @@ int CnvWblToHtml::typedef_exec()
       << '\n'
       << "<HR>\n"
       << "<!-- ======== START OF CLASS DATA ======== -->\n"
-      << "<H2>\n"
-      << "Type " << ctx->rw->class_name << "</H2>\n"
-      << "<HR>\n"
-      << "<DL>\n";
+      << "<table id=\"dormw\">\n"
+      << "<tr id=\"dormw\">\n"
+      << "<th id=\"dormh\" colspan=\"2\">Type " << ctx->rw->class_name << "<img align=\"right\" src=\"../../pwr_logoorm.png\"></th>\n"
+      << "</tr>\n";
   if (ctx->rw->doc_fresh && !streq(ctx->rw->doc_author, "")) {
-    fp_html_clf << "<DT><B>Author</B>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
-                << ctx->rw->doc_author << "<DT>\n";
+    fp_html_clf << "<tr id=\"dormw\">\n"
+		<< "<td id=\"dormw\">Author</td>\n"
+		<< "<td id=\"dormw2\">" << ctx->rw->doc_author << "</td>\n"
+		<< "</tr>\n";
   }
 
   if (ctx->rw->doc_fresh && !streq(ctx->rw->doc_version, "")) {
-    fp_html_clf << "<DT><B>Version</B>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
-                << ctx->rw->doc_version << "<DT>\n";
+    fp_html_clf << "<tr id=\"dormw\">\n"
+		<< "<td id=\"dormw\">Version</td>\n"
+		<< "<td id=\"dormw2\">" << ctx->rw->doc_version << "</td>\n"
+		<< "</tr>\n";
   }
   if (ctx->rw->doc_fresh && !streq(ctx->rw->doc_code, "")) {
-    fp_html_clf
-        << "<DT><B>Code</B>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
-        << ctx->rw->doc_code << "<DT>\n";
+    fp_html_clf << "<tr id=\"dormw\">\n"
+		<< "<td id=\"dormw\">Code</td>\n"
+		<< "<td id=\"dormw2\">" << ctx->rw->doc_code << "</td>\n"
+		<< "</tr>\n";
   }
+  fp_html_clf << "</table>\n";
 
-  fp_html_clf << "<BR><DT><B>Description</B><DT><BR>\n"
-              << "</DL><DIV ID=\"description\"><PRE>\n";
+  fp_html_clf << "<div id=\"description\"><pre>\n";
 
   if (ctx->rw->doc_fresh) {
     for (i = 0; i < ctx->rw->doc_cnt; i++) {
@@ -1216,37 +1219,38 @@ int CnvWblToHtml::typedef_exec()
         fp_html_clf << ctx->rw->doc_text[i] << '\n';
     }
   }
-  fp_html_clf << "</PRE></DIV>\n";
+  fp_html_clf << "</pre>\n";
 
-  for (i = 0; i < ctx->rw->doc_link_cnt; i++) {
-    fp_html_clf << "  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF=\""
-                << ctx->rw->doc_link_ref[i]
-                << "\" TARGET=\"_self\"><FONT size=\"-1\"> "
-                << ctx->rw->doc_link_text[i] << "</FONT></A><BR>\n";
+  if (ctx->rw->doc_link_cnt || ctx->rw->doc_clink_cnt) {
+    fp_html_clf << "<ul>\n";
+    for (i = 0; i < ctx->rw->doc_link_cnt; i++) {
+      fp_html_clf << "<li><a id=\"desc\" href=\"" << ctx->rw->doc_link_ref[i]
+		  << "\" target=\"_self\">" << ctx->rw->doc_link_text[i] << "</li>\n";
+    }
+    for (i = 0; i < ctx->rw->doc_clink_cnt; i++) {
+      fp_html_clf << "<li><a id=\"desc\" href=\"" << ctx->rw->doc_clink_ref[i]
+		  << "\" target=\"_self\">" << ctx->rw->doc_clink_text[i] << "</li>\n";
+    }
+    fp_html_clf << "</ul>\n";
   }
-  for (i = 0; i < ctx->rw->doc_clink_cnt; i++) {
-    fp_html_clf << "  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF=\""
-                << ctx->rw->doc_clink_ref[i]
-                << "\" TARGET=\"_self\"><FONT size=\"-1\"> "
-                << ctx->rw->doc_clink_text[i] << "</FONT></A><BR>\n";
-  }
-  fp_html_clf << "</FONT>\n";
+  fp_html_clf << "</div>\n";
 
   if (streq(ctx->rw->typedef_typeref, "Mask")
       || streq(ctx->rw->typedef_typeref, "Enum")) {
     char bitchar = _tolower(ctx->rw->typedef_typeref[0]);
 
-    fp_html_clf << "<HR><BR>\n"
-                << "<A NAME=\"" << ctx->rw->typedef_name << "\"><!-- --></A>\n"
-                << "<TABLE BORDER=\"1\" CELLPADDING=\"3\" CELLSPACING=\"0\" "
-                   "WIDTH=\"100%\">\n"
-                << "<TR BGCOLOR=\"#CCCCFF\" CLASS=\"TableHeadingColor\">\n"
-                << "<TD COLSPAN=3><FONT SIZE=\"+2\">\n"
-                << "<B>" << ctx->rw->typedef_name << " elements</B></FONT>"
-                << "<FONT SIZE=\"+1\"<B>&nbsp;&nbsp;&nbsp;&nbsp; <A HREF=\""
+    fp_html_clf << "<hr><br>\n"
+                << "<a name=\"" << ctx->rw->typedef_name << "\"><!-- --></a>\n"
+                << "<table id=\"dorm\">\n"
+                << "<tr id=\"dorm\">\n"
+                << "<th id=\"dorm\" colspan=\"2\">" << ctx->rw->typedef_name 
+		<< " elements&nbsp;&nbsp; <a href=\""
                 << code_aref << "\">pwr_" << bitchar << ctx->rw->typedef_name
-                << "</A></B></FONT></TD>\n"
-                << "</TR>\n";
+                << "</a></th>\n"
+                << "</tr>\n";
+
+    fp_tmp << "<hr><br>\n"
+	   << "<a name=\"detail\"><h1>Elements detail</h1></a>\n";
   }
   return 1;
 }
@@ -1255,7 +1259,7 @@ int CnvWblToHtml::typedef_close()
 {
   if (streq(ctx->rw->typedef_typeref, "Mask")
       || streq(ctx->rw->typedef_typeref, "Enum")) {
-    fp_html_clf << "</TABLE>\n";
+    fp_html_clf << "</table>\n";
   }
 
   fp_tmp.close();

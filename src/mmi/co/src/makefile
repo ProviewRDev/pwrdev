@@ -4,6 +4,8 @@ include $(pwre_dir_symbols)
 
 -include special.mk
 
-copy : $(web_dir)/pwr_logohalf.png
+copy : $(web_dir)/pwr_logohalf.png $(doc_dir)/pwr_logoorm.png
 
 $(web_dir)/pwr_logohalf.png : pwr_logohalf.png
+
+$(doc_dir)/pwr_logoorm.png : pwr_logoorm.png

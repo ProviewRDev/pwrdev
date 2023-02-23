@@ -1,12 +1,12 @@
 
-a:link          {color: #1f7a0d;
-                font-weight: bold;
+a:link          {color: #003399;
+                font-weight: normal;
                 text-decoration: none}
-a:visited       {color: #1f7a0d;
-                font-weight: bold;
+a:visited       {color: #003399;
+                font-weight: normal;
                 text-decoration: none}
-a:active        {color: #CC3300;
-                font-weight: bold;
+a:active        {color: #cc3300;
+                font-weight: normal;
                 text-decoration: none}
 a:hover         {color: #cc3300
                 }
@@ -19,12 +19,6 @@ body            {background-color: #eeeeee;
                 text-align: left;
                 }
 
-table           {font-family: Arial, Verdana;
-                font-size: 10pt;
-                color: #000000;
-                text-align: left;
-                }
-
 p               {font-family: Arial, Verdana;
                 font-size: 10pt;
                 color: #000000;
@@ -33,16 +27,16 @@ p               {font-family: Arial, Verdana;
 
 
 h1              {font-family: 'Arial Black', Arial, Verdana;
-                color: #003399;
-                font-size: 24pt;
+                color: black;
+                font-size: 18pt;
                 font-weight: bold;
                 margin-top: 16px;
                 margin-bottom: 0px;
-                text-align: center;
+                text-align: left;
                 }
 
 h2              {font-family: 'Arial Black', Arial, Verdana;
-                font-size: 24pt;
+                font-size: 16pt;
                 font-weight: bold;
                 color: #000000;
                 margin-top: 5px;
@@ -79,11 +73,13 @@ h6              {font-family: Times New Roman, Times, Sabon;
                 margin-bottom: 0px}
 
 
+ul		{list-style: none;}
+
 li              {font-family: Arial, Verdana;
-                font-size: 100%}
+                font-size: 100%;}
 
 address         {font-family: Arial, Verdana;
-                font-size: 8pt;
+                font-size: 10pt;
                 font-style: normal;
                 margin-top: 0px;
                 margin-bottom: 0px}
@@ -91,9 +87,22 @@ address         {font-family: Arial, Verdana;
 div#description {
                 background-color: #ffffff;
 }
+a#desc:link {color: #003399;
+                margin-left: 35px;
+                font-size: 10pt;
+                font-weight: normal;
+                text-decoration: none}
+a#desc:visited {color: #003399;
+                font-weight: normal;
+                text-decoration: none}
+a#desc:active {color: #cc3300;
+                font-weight: normal;
+                text-decoration: none}
+a#desc:hover {color: #cc3300
+                }
 
 table#ctree     {font-family: Arial, Verdana;
-                font-size: 12pt;
+                font-size: 10pt;
                 text-align: left;
 		border: 1px solid black;
                 }
@@ -101,6 +110,88 @@ td#ctree        {border: 1px solid gray;
 		padding: 2px 10px 2px 10px;
 		width: 200px;
 		}
+
+table#dorm     {font-family: Arial, Verdana;
+                background-color: #ffffff;
+                font-size: 10pt;
+		border: 1px solid #555555;
+  		border-collapse: collapse;
+                }
+
+td#dorm2        {border: 1px solid #555555;
+                font-size: 10pt;
+		padding: 2px 10px 2px 10px;
+                min-width: 5px;
+  		text-align: left;
+		}
+
+td#dorm       {border: 1px solid #555555;
+                font-size: 10pt;
+		padding: 2px 10px 2px 10px;
+                min-width: 5px;
+                width: 45px;
+  		text-align: left;
+		}
+
+th#dorm        {border: 1px solid #555555;
+		background-color: #ffa776;
+                font-size: 14pt;
+		padding: 2px 10px 2px 10px;
+                width: 1000px;
+  		text-align: left;
+		}
+
+tr#dorm        {border: 1px solid #333333;
+                font-size: 10pt;
+		padding: 0px 10px 2px 10px;
+                width: 1000px;
+		}
+
+table#dormw    {font-family: Arial, Verdana;
+                background-color: #eeeeee;
+                font-size: 10pt;
+		border: 1px solid #eeeeee;
+  		border-collapse: collapse;
+                }
+
+td#dormw2        {border: 1px solid #eeeeee;
+                font-size: 10pt;
+		padding: 2px 10px 2px 10px;
+                min-width: 5px;
+  		text-align: left;
+		}
+
+td#dormw       {border: 1px solid #eeeeee;
+                font-size: 10pt;
+		padding: 2px 10px 2px 10px;
+                min-width: 5px;
+                width: 45px;
+  		text-align: left;
+		}
+
+th#dormw        {border: 1px solid #000000;
+		background-color: #ffa776;
+                font-size: 14pt;
+		padding: 2px 10px 2px 10px;
+                width: 1000px;
+  		text-align: left;
+		}
+
+tr#dormw        {border: 1px solid #eeeeee;
+		background-color: #eeeeee;
+                font-size: 10pt;
+		padding: 0px 10px 2px 10px;
+                width: 1000px;
+		}
+
+th#dormh       {border: 1px solid #000000;
+		background-color: #adbdff;
+                font-size: 18pt;
+		padding: 2px 10px 2px 10px;
+                width: 1000px;
+  		text-align: left;
+		}
+
 
 
 
