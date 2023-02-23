@@ -2537,8 +2537,11 @@ Volume Remote $ClassVolume 0.0.1.4
     !  @Summary Configures communication through a message queue using MQTT.
     !  Configures communication through a message queue using MQTT.
     ! 
-    !  To direct a message from a sending RemTrans to a recieving RemTrans set 
-    !  the same value (0 - 255) in Address[0] in both sending and receiving RemTrans.
+    !  To direct a message from a sending RemTrans to a receiving RemTrans, set 
+    !  same values in Address[0] and Address[1] in sending and receiving RemTrans.
+    ! 
+    !  To set retain for published messages, set Address[3] in the RemTrans
+    !  object to 1.
     ! 
     ! @b Object graph
     !  @image orm_remnodemqtt_og.png
@@ -2972,9 +2975,18 @@ Volume Remote $ClassVolume 0.0.1.4
     !  @Summary Configures communication through a message queue using RabbitMQ.
     !  Configures communication through a message queue using RabbitMQ.
     ! 
-    !  To direct a message from a sending RemTrans to a recieving RemTrans set 
-    !  same value (0 - 255) in Address[0] in both sending and receiving RemTrans.
+    !  To direct a message from a sending RemTrans to a receiving RemTrans, set 
+    !  same values in Address[0] and Address[1] in sending and receiving RemTrans.
     ! 
+    !  To set delivery mode to persistent, set Address[3] in the RemTrans object to 2.
+    !
+    !  By default, received messages are discared if the receiver is busy. To keep
+    !  the messages, set the first bit (KeepAll) in Address[2] in the RemTrans object.
+    !  If there are several receive remtrans objects for the queue, KeepAll can change
+    !  the order of the messages in the queue. If the order should be kept, also set 
+    !  the second bit (MsgOrder) in Address[2] in the RemTrans object. Note the MsgOrder 
+    !  will reduce the performance of the communication.
+    !
     ! @b Object graph
     !  @image orm_remnoderabbitmq_og.png
     ! 
@@ -5169,6 +5181,7 @@ Volume Remote $ClassVolume 0.0.1.4
         ! buffering mechanism.
         ! For a deeper description of delivery modes, consult the DMQ
         ! documentation.
+        !
         ! 3964R - VNET
         ! [0] - First 3 letters of Trans name / Task name in RAD50
         ! [1] - Next 3 letters of Trans name / Task name in RAD50
@@ -5197,6 +5210,18 @@ Volume Remote $ClassVolume 0.0.1.4
         ! [2] - Ascii number (decimal) for termination character #3
         ! [3] - Used to set the use of 7 or 8 bit character length. Set a value
         !       of 1 to use 7 bits and a value of 0 to use 8 bits.
+        !
+        ! MQTT
+        ! [0] - Message address
+        ! [1] - Message address
+        ! [3] - 1 specifies retain for published messages.
+        !
+        ! RabbitMQ
+        ! [0] - Message address
+        ! [1] - Message address
+        ! [2] - Delivery mode. 2 is persistent, otherwise transient.
+        ! [3] - First bit: keep all messages. Second bit: keep message order.
+        ! 
         !*/
         Object Address $Attribute 3 23-JAN-2018 17:01:41.00
           Body SysBody 01-JAN-1970 01:00:00.00
