@@ -5894,6 +5894,8 @@ int gcg_comp_m4(gcg_ctx gcgctx, vldh_t_node node)
 	else if (bodydef[i].Par->Param.Info.Type == pwr_eType_DataRef &&
 		 output_bodydef.Par->Output.Info.Type == pwr_eType_Void)
           strcpy(cast, "(pwr_tDataRef *)");
+	else if (node->ln.cid == pwr_cClass_curve && strcmp(bodydef[i].Par->Param.Info.PgmName, "Tab") == 0)
+	  strcpy(cast, "(pwr_tFloat32*)");
 	else
 	  strcpy(cast, "");
         IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE],

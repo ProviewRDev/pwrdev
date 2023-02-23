@@ -469,7 +469,9 @@ int gsx_check_connection(WFoe* foe, vldh_t_node sourceobject,
       if (!(dest_class == pwr_cClass_step || source_class == pwr_cClass_step ||
 	    dest_class == pwr_cClass_initstep || source_class == pwr_cClass_initstep ||
 	    dest_class == pwr_cClass_substep || source_class == pwr_cClass_substep ||
-	    dest_class == pwr_cClass_order || source_class == pwr_cClass_order))
+	    dest_class == pwr_cClass_order || source_class == pwr_cClass_order ||
+	    (dest_class == pwr_cClass_curve && source_class == pwr_cClass_table) || 
+	    (dest_class == pwr_cClass_table && source_class == pwr_cClass_curve)))
 	return GSX__CONTYPE;
     } else if (source_array_flag && source_elements != dest_elements)
       return GSX__CONTYPE;
