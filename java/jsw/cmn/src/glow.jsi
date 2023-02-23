@@ -7616,7 +7616,7 @@ function GrowArc( ctx) {
       rot = Math.floor( this.trf.rot( t));
     }
     
-    if ( rot % 90 !== 0  && Math.abs((this.ur.x - this.ll.x) - (this.ur.y - this.ll.y)) < Float.MIN_VALUE) {
+    if ( rot % 90 !== 0  && Math.abs((this.ur.x - this.ll.x) - (this.ur.y - this.ll.y)) < Number.MIN_VALUE) {
       var scale;
       var x_c;
       var y_c;
@@ -16196,7 +16196,7 @@ function GrowTable( ctx) {
       for ( var i = this.header_column; i < this.selected_cell_column; i++)
 	x += this.column_width[i] * this.ctx.mw.zoom_factor_x;
       y = t_ll_y + this.row_height * this.ctx.mw.zoom_factor_y * this.selected_cell_row;
-      this.ctx.gdraw.fill_rect( Math.floor(x), Math.floor(y), Math.floor(this.column_width[selected_cell_column] * this.ctx.mw.zoom_factor_x), 
+      this.ctx.gdraw.fill_rect( Math.floor(x), Math.floor(y), Math.floor(this.column_width[this.selected_cell_column] * this.ctx.mw.zoom_factor_x), 
 			   Math.floor(this.row_height * this.ctx.mw.zoom_factor_y), this.sel_drawtype);
     }
 

@@ -3710,7 +3710,7 @@ function DynDigText( dyn, instance) {
     this.a = new DynReference( this.dyn, this.attribute);
     this.a.connect(this.dyn);
     if ( !this.a.sts) {
-      console.log("DigText: " + attribute);
+      console.log("DigText: " + this.attribute);
       return 1;
     }
     this.high_text = object.getAnnotation(1);
@@ -10661,7 +10661,7 @@ function DynAnalogTransparency( dyn) {
     this.a = new DynReference( this.dyn, this.attribute);
     this.a.connect(this.dyn);
     if ( !this.a.sts) {
-      console.log("AnalogTransparency: " + attribute);
+      console.log("AnalogTransparency: " + this.attribute);
       return 1;
     }
 
@@ -12029,7 +12029,7 @@ function DynStatusColor( dyn) {
     this.a = new DynReference( this.dyn, this.attribute);
     this.a.connect(this.dyn);
     if ( !this.a.sts) {
-      console.log("StatusColor: " + attribute);
+      console.log("StatusColor: " + this.attribute);
       return 1;
     }
     return 1;
@@ -12701,7 +12701,7 @@ function DynFillLevel( dyn) {
     this.a = new DynReference( this.dyn, this.attribute);
     this.a.connect(this.dyn);
     if ( !this.a.sts) {
-      console.log("FillLevel: " + attribute);
+      console.log("FillLevel: " + this.attribute);
       return 1;
     }
 
@@ -14986,7 +14986,7 @@ function DynSlider( dyn) {
     this.a = new DynReference( this.dyn, this.attribute);
     this.a.connect(this.dyn);
     if ( !this.a.sts) {
-      console.log("FillLevel: " + attribute);
+      console.log("FillLevel: " + this.attribute);
       return 1;
     }
 
