@@ -3287,6 +3287,61 @@ Volume DataQ $ClassVolume 0.0.1.3
     ! @Group DataQ
     ! @Summary Base class for DataQ queues.
     ! Base class for DataQ queues.
+    !
+    ! Subclasses to DataQ are a queues or containers for data objects.
+    !
+    ! The queues contains a number of positions to store references to data objects.
+    ! The positions are numbered from 1. Every position contains a pointer to
+    ! the data object, objid for the object, two boolean that marks if the rear
+    ! or front is inside the cell, a boolean to select the data, and finally a 
+    ! directlink id.
+    ! 
+    ! The first inserted data object is always placed in position 1. When more
+    ! objects are inserted at the front end of the queue, they are inserted at
+    ! position 1 and the other data object are shifted downwards in the queue.
+    ! 
+    ! Data object can also be inserted at the rear end of the queue. In this case
+    ! it is positioned in the free position with lowest index.
+    ! 
+    ! Data objects can be inserted
+    ! 
+    ! 1. by a connected transport object (QTrp, QTrpRR or QTrpFF). A transport
+    !    object can insert an object at the front or rear end of the queue.
+    ! 2. by the externa control function. This is used by application programs or
+    !    for manual handling. An data object can be inserted at arbitrary position.
+    ! 
+    ! @b QOrders
+    ! The function object for DataQ has output pins for the first object, D1 (object 
+    ! with index 1) and for the last object, DL (object with highest index). These can be 
+    ! connected to QOrder or RemoteQOrder objects. The QOrder object works as an 
+    ! order object in GRAFCET. When an data object enters the position in the queue, the
+    ! order activity is set. By specifying order attributes the order activity can be
+    ! delayed, limited, affected by an external condition, or stored. The output or the
+    ! order is a bus of type contaning the order activity, reference to the data object,
+    ! the front and back flags and more. 
+    !
+    ! The RemoteQOrder can send the order activity to a TargetQOrder, located in a
+    ! remote node. It will also create a new data object in the remote node with 
+    ! appropriate data derived from the current data object. When the action is terminated
+    ! in the remote node, the target order can send back feedback data and a feedback 
+    ! trigger that can be used to direct the data object to other queues in the dataq 
+    ! sequence.
+    !
+    ! @b Subwindow
+    ! A subwindow to a DataQ object is used when the same operation should be
+    ! executed for all the data objects in the queue. The code of the subwindow will,
+    ! during one plc scan, be executed
+    ! 
+    ! - one time for initiation
+    ! - one time for each data object in the queue.
+    ! 
+    ! The data objects are refered to with the DataQCurrentData object. You can also use
+    ! the DataQCurrentIdx object, which gives the index of the current data object.
+    ! During the initiation phase, DataQCurrentData and DataQCurrentIdx is zero.
+    ! 
+    ! Since the subwindow is executed several times in the same plc scan, it should
+    ! not contain objects with state attributes.
+    !
     ! @b Plc coding
     ! For plc coding the function object DataQFo is used.
     ! @image orm_dataqfo_fo.png
@@ -3295,6 +3350,16 @@ Volume DataQ $ClassVolume 0.0.1.3
     ! 
     ! See also
     ! @classlink DataQFo dataq_dataqfo.html
+    ! @classlink DataQ1 dataq_dataq1.html
+    ! @classlink DataQ5 dataq_dataq5.html
+    ! @classlink DataQ30 dataq_dataq30.html
+    ! @classlink DataQ120 dataq_dataq120.html
+    ! @classlink QTrp dataq_qtrp.html
+    ! @classlink QTrpFF dataq_qtrpff.html
+    ! @classlink QTrpRR dataq_qtrprr.html
+    ! @classlink DataQCurrentData dataq_dataqcurrentdata.html
+    ! @classlink DataQCurrentIdx dataq_dataqcurrentidx.html
+    ! @classlink DataQCurrentBus dataq_dataqcurrentbus.html
     !*/
     Object DataQ $ClassDef 18 03-JAN-2023 10:28:18.24
       Body SysBody 19-DEC-2022 10:14:55.24
@@ -5095,7 +5160,7 @@ Volume DataQ $ClassVolume 0.0.1.3
     EndObject
     !/**
     ! @Version 1.0
-    ! @Code nmps_plc.c
+    ! @Code dataq_plc.c
     ! @Group DataQ,Plc
     ! @Summary Create data objects and insert to queue.
     ! 
@@ -5287,9 +5352,22 @@ Volume DataQ $ClassVolume 0.0.1.3
       EndObject
     EndObject
     !/**
+    ! @Summary Get a reference to the current data object in a DataQ subwindow.
     ! 
+    ! Get a reference the current data object in a DataQ subwindow. 
     ! @image orm_dataqcurrentdata_fo.png
     !
+    ! The object is used in a DataQ subwindow. 
+    ! 
+    ! In one plc scan, a queue subwindow is first executed with an initialization lap,
+    ! and then one lap for each data object in the queue. 
+    ! The output holds the data reference of the currently executed data object.
+    ! In the initialization lap, data reference is zero.
+    ! 
+    ! See also
+    ! @classlink DataQ dataq_dataq.html
+    ! @classlink DataQCurrentIdx dataq_dataqcurrentidx.html
+    ! @classlink DataQCurrentBus dataq_dataqcurrentbus.html
     !*/
     Object DataQCurrentData $ClassDef 33 11-JAN-2023 08:58:01.27
       Body SysBody 09-JAN-2023 16:15:13.28
@@ -5303,6 +5381,9 @@ Volume DataQ $ClassVolume 0.0.1.3
           Attr StructName = "DataQCurrentData"
           Attr NextAix = "_X2"
         EndBody
+        !/**
+        ! Data reference to the currently executed data object.
+        !*/
         Object DataCurrent $Output 1 09-JAN-2023 16:19:20.80
           Body SysBody 09-JAN-2023 16:30:49.43
             Attr PgmName = "DataCurrent"
@@ -5360,9 +5441,23 @@ Volume DataQ $ClassVolume 0.0.1.3
       EndObject
     EndObject
     !/**
+    ! @Version 1.0
+    ! @Group DataQ,Plc
+    ! @Summary Get the index of the current data object in a DataQ or subwindow.
     ! 
+    ! Get the index of the current data object in a DataQ or a subwindow.
     ! @image orm_dataqcurrentidx_fo.png
-    !
+    ! The object is used in a DataQ subwindow. 
+    ! 
+    ! In one plc scan, a queue subwindow is first executed with an initialization lap,
+    ! and then one lap for each data object in the queue. 
+    ! The output holds the index of the currently executed data object.
+    ! In the initialization lap, current index is zero.
+    ! 
+    ! See also
+    ! @classlink DataQ dataq_dataq.html
+    ! @classlink DataQCurrentData dataq_dataqcurrentdata.html
+    ! @classlink DataQCurrentBus dataq_dataqcurrentbus.html
     !*/
     Object DataQCurrentIdx $ClassDef 34 09-JAN-2023 16:16:53.63
       Body SysBody 09-JAN-2023 16:15:13.28
@@ -5376,6 +5471,9 @@ Volume DataQ $ClassVolume 0.0.1.3
           Attr StructName = "DataQCurrentIdx"
           Attr NextAix = "_X2"
         EndBody
+        !/**
+        ! Index for the currently executed data object.
+        !*/
         Object DataCurrentIdx $Output 1 10-JAN-2023 09:14:41.46
           Body SysBody 10-JAN-2023 09:14:47.51
             Attr PgmName = "DataCurrentIdx"
@@ -5433,9 +5531,24 @@ Volume DataQ $ClassVolume 0.0.1.3
       EndObject
     EndObject
     !/**
+    ! @Summary Get the QDataBus element for the current data object in a DataQ subwindow.
     ! 
+    ! Get the QDataBus element the current data object in a DataQ subwindow. 
     ! @image orm_dataqcurrentbus_fo.png
     !
+    ! The object is used in a DataQ subwindow. 
+    ! 
+    ! In one plc scan, a queue subwindow is first executed with an initialization lap,
+    ! and then one lap for each data object in the queue. 
+    ! The output holds the QDataBus element of the currently executed data object.
+    ! In the initialization lap, the data data reference in the the bus is zero.
+    ! 
+    ! See also
+    ! @classlink DataQ dataq_dataq.html
+    ! @classlink DataQBus dataq_dataqbus.html
+    ! @classlink DataQBusSplit dataq_dataqbussplit.html
+    ! @classlink DataQCurrentIdx dataq_dataqcurrentidx.html
+    ! @classlink DataQCurrentData dataq_dataqcurrentdata.html
     !*/
     Object DataQCurrentBus $ClassDef 35 12-JAN-2023 16:18:55.57
       Body SysBody 12-JAN-2023 16:18:37.85
@@ -5449,6 +5562,9 @@ Volume DataQ $ClassVolume 0.0.1.3
           Attr StructName = "DataQCurrentBus"
           Attr NextAix = "_X3"
         EndBody
+        !/**
+        ! DataQBus element for the currently executed data object.
+        !*/
         Object DataCurrent $Output 2 12-JAN-2023 16:18:37.85
           Body SysBody 12-JAN-2023 16:19:58.13
             Attr PgmName = "DataCurrent"
@@ -5505,6 +5621,16 @@ Volume DataQ $ClassVolume 0.0.1.3
         EndBody
       EndObject
     EndObject
+    !/**
+    ! @Version 1.0
+    ! @Group DataQ
+    ! @Summary Internal object containing configuration attributes for QDisplay.
+    !
+    ! Internal object containing configuration attributes for QDisplay.
+    !
+    ! See also
+    !  @classlink QDisplay dataq_qdisplay.html
+    !*/
     Object QDisplayConfig $ClassDef 39 16-JAN-2023 13:54:35.37
       Body SysBody 16-JAN-2023 13:54:25.29
         Attr Editor = 0
@@ -5516,6 +5642,9 @@ Volume DataQ $ClassVolume 0.0.1.3
           Attr StructName = "QDisplayConfig"
           Attr NextAix = "_X10"
         EndBody
+        !/**
+        ! Class of the data objects handled by the queue.
+        !*/
         Object DataClass $Attribute 2 16-JAN-2023 13:59:40.58
           Body SysBody 16-JAN-2023 13:59:40.58
             Attr PgmName = "DataClass"
@@ -5523,6 +5652,11 @@ Volume DataQ $ClassVolume 0.0.1.3
             Attr TypeRef = "pwrs:Type-$ClassId"
           EndBody
         EndObject
+        !/**
+        ! Specific functions
+        ! - 0 Normal function.
+        ! - 1 The data objects are stored in reverse order.
+        !*/
         Object Function $Attribute 3 16-JAN-2023 13:59:40.58
           Body SysBody 16-JAN-2023 13:59:40.58
             Attr PgmName = "Function"
@@ -5530,6 +5664,13 @@ Volume DataQ $ClassVolume 0.0.1.3
             Attr TypeRef = "pwrs:Type-$Int32"
           EndBody
         EndObject
+        !/**
+        ! If the selection function is shared with other QDisplay objects, there
+        ! has to be a specified order when the selection is moved between the different
+        ! QDisplay tables. The QDisplay objects connected to one QDisplayLink object are
+        ! numbered from 1 and upwards. The number for each QDisplay object has to
+        ! be unique and there should be no jumps in the enumeration.
+        !*/
         Object Number $Attribute 4 16-JAN-2023 13:59:40.58
           Body SysBody 16-JAN-2023 13:59:40.58
             Attr PgmName = "Number"
@@ -5537,6 +5678,9 @@ Volume DataQ $ClassVolume 0.0.1.3
             Attr TypeRef = "pwrs:Type-$Int32"
           EndBody
         EndObject
+        !/**
+        ! Size of the displayed table (number or rows). Largest size is 60.
+        !*/
         Object MaxSize $Attribute 5 16-JAN-2023 13:59:40.58
           Body SysBody 16-JAN-2023 13:59:40.58
             Attr PgmName = "MaxSize"
@@ -5544,6 +5688,12 @@ Volume DataQ $ClassVolume 0.0.1.3
             Attr TypeRef = "pwrs:Type-$Int32"
           EndBody
         EndObject
+        !/**
+        ! SelDirection changes the selection direction, i.e the function of
+        ! SelectNext/SelectPrevious and MoveForward/MoveBackward is reversed.
+        ! This is useful if several QDisplay objects are linked, and some 
+        ! displays their objects in normal order, other in reverse order.
+        !*/
         Object SelDirection $Attribute 6 16-JAN-2023 13:59:40.58
           Body SysBody 16-JAN-2023 13:59:40.58
             Attr PgmName = "SelDirection"
@@ -5551,6 +5701,11 @@ Volume DataQ $ClassVolume 0.0.1.3
             Attr TypeRef = "pwrs:Type-$Int32"
           EndBody
         EndObject
+        !/**
+        ! The names of attributes of type float in the data object, that
+        ! should be displayed in the table. Up to 5 float attributes can be specified.
+        ! The attribute in FloatAttr[0] is copied to F1, FloatAttr[1] to F2, etc.
+        !*/
         Object FloatAttr $Attribute 7 16-JAN-2023 13:59:40.58
           Body SysBody 16-JAN-2023 13:59:40.58
             Attr PgmName = "FloatAttr"
@@ -5560,6 +5715,11 @@ Volume DataQ $ClassVolume 0.0.1.3
             Attr TypeRef = "pwrs:Type-$String32"
           EndBody
         EndObject
+        !/**
+        ! The names of attributes of type boolean in the data object, that
+        ! should be displayed in the table. Up to 5 boolean attributes can be specified.
+        ! The attribute in BooleanAttr[0] is copied to B1, BooleanAttr[1] to B2, etc.
+        !*/
         Object BooleanAttr $Attribute 8 16-JAN-2023 13:59:40.58
           Body SysBody 16-JAN-2023 13:59:40.58
             Attr PgmName = "BooleanAttr"
@@ -5569,6 +5729,13 @@ Volume DataQ $ClassVolume 0.0.1.3
             Attr TypeRef = "pwrs:Type-$String32"
           EndBody
         EndObject
+        !/**
+        ! The names of attributes of type integer in the data object, that
+        ! should be displayed in the table. Up to 5 integer attributes can be specified.
+        ! The attribute in IntAttr[0] is copied to I1, IntAttr[1] to I2, etc.
+        ! If the attributes is of type Int16, add the suffix ##Int16 to the
+        ! attributename.
+        !*/
         Object IntAttr $Attribute 9 16-JAN-2023 13:59:40.58
           Body SysBody 16-JAN-2023 13:59:40.58
             Attr PgmName = "IntAttr"
@@ -5584,6 +5751,16 @@ Volume DataQ $ClassVolume 0.0.1.3
         EndBody
       EndObject
     EndObject
+    !/**
+    ! @Version 1.0
+    ! @Group DataQ
+    ! @Summary Internal object containing control attributes for QDisplay.
+    !
+    ! Internal object containing control attributes for QDisplay.
+    !
+    ! See also
+    !  @classlink QDisplay dataq_qdisplay.html
+    !*/
     Object QDisplayControl $ClassDef 41 16-JAN-2023 15:15:06.66
       Body SysBody 16-JAN-2023 15:14:58.98
         Attr Editor = 0
@@ -5636,6 +5813,16 @@ Volume DataQ $ClassVolume 0.0.1.3
         EndBody
       EndObject
     EndObject
+    !/**
+    ! @Version 1.0
+    ! @Group DataQ
+    ! @Summary Internal object containing internal attributes for QDisplay.
+    !
+    ! Internal object containing internal attributes for QDisplay.
+    !
+    ! See also
+    !  @classlink QDisplay dataq_qdisplay.html
+    !*/
     Object QDisplayIntern $ClassDef 40 16-JAN-2023 14:01:01.25
       Body SysBody 16-JAN-2023 14:00:50.56
         Attr Editor = 0
@@ -5713,6 +5900,64 @@ Volume DataQ $ClassVolume 0.0.1.3
         EndBody
       EndObject
     EndObject
+    !/**
+    ! @Version 1.0
+    ! @Code dataq_plc_display.c
+    ! @Group DataQ, Plc
+    ! @Summary Display contents of data object in DataQ queues.
+    !
+    ! QDisplay objects are used to display the content of data objects
+    ! that is stored i DataQ queues, in the process graphics. It also makes it 
+    ! possible for the operator to remove data objects from the queue, move 
+    ! dataobjects forward or backwards in the queue, or select a data object 
+    ! to gain more information about the object.
+    !
+    ! With the QDisplay object you can display a table of the data objects
+    ! in a cell, with the object name and some selected attributes. The 
+    ! QDisplay object contains a number or arrays where the values for the 
+    ! selected attributes are copied. The arrays can be displayed in a process
+    ! graph.
+    ! 
+    ! There is also a select function, where a data object is selected, and
+    ! the selected object is copied to a display object, i.e. a permanent object
+    ! of the same class as the data object. If the content of the display
+    ! object is viewed in the process graphics, it will always display the
+    ! content of the currently selected data object.
+    !
+    ! Several tables in the same process graph, can have a common select
+    ! function, by using the QDisplayLink object. One common QDisplayLink object
+    ! is connected to all the QDisplay, which will guarantee that at most
+    ! one data object is selected. In the QDisplayLink object there is also
+    ! functions to remove the selected data object, or to move the object
+    ! forward or backward in the queue.
+    !
+    ! The selection is done, either with a select button in each row of
+    ! the table, or with the SelectNext/SelectPrevious function in the
+    ! QDisplayLink object. With SelectNext/SelectPrevious the selection can
+    ! be performed with the function keys.
+    !
+    ! One table can display up to 10 queue objects. In the QDisplay object
+    ! there is room for 5 attributes of type float, 5 or type integer and
+    ! 5 of type boolean. There is also an array containing the objid of the 
+    ! data objects.
+    !
+    ! Maximum number of data objects displayed in one table is 60.
+    ! The connected queue objects can be of a subclass to DataQ.
+    ! A QDisplayLink object can link an unlimited number of QDisplay objects.
+    ! The select function is not connected to the select function of the
+    ! DataQ object.
+    ! 
+    ! @b Plc coding
+    ! For plc coding the function object QDisplayFo is used.
+    ! @image orm_qdisplayfo_fo.png
+    ! Create a function object in the plc editor and connect it to the current
+    ! object with the connect function.
+    !
+    ! @b See also
+    !  @classlink QDisplayFo dataq_qdisplayfo.html
+    !  @classlink QDisplayLink dataq_qdisplaylink.html
+    !  @classlink DataQ dataq_dataq.html
+    !*/
     Object QDisplay $ClassDef 37 16-JAN-2023 08:25:28.37
       Body SysBody 16-JAN-2023 08:25:21.11
         Attr Editor = 0
@@ -6081,6 +6326,16 @@ Volume DataQ $ClassVolume 0.0.1.3
         EndBody
       EndObject
     EndObject
+    !/**
+    ! @Version 1.0
+    ! @Group DataQ
+    ! @Summary Internal object containing control attributes for QDisplayLink.
+    !
+    ! Internal object containing control attributes for QDisplayLink.
+    !
+    ! See also
+    !  @classlink QDisplayLink dataq_qdisplaylink.html
+    !*/
     Object QDisplayLinkControl $ClassDef 43 17-JAN-2023 09:05:20.86
       Body SysBody 17-JAN-2023 09:05:08.04
         Attr Editor = 0
@@ -6092,6 +6347,9 @@ Volume DataQ $ClassVolume 0.0.1.3
           Attr StructName = "QDisplayLinkControl"
           Attr NextAix = "_X6"
         EndBody
+        !/**
+        ! Order to select the next data object.
+        !*/
         Object SelectNext $Attribute 1 17-JAN-2023 09:06:02.94
           Body SysBody 17-JAN-2023 09:06:27.11
             Attr PgmName = "SelectNext"
@@ -6100,6 +6358,9 @@ Volume DataQ $ClassVolume 0.0.1.3
             Attr TypeRef = "pwrs:Type-$Boolean"
           EndBody
         EndObject
+        !/**
+        ! Order to select the previous data object.
+        !*/
         Object SelectPrevious $Attribute 2 17-JAN-2023 09:06:50.08
           Body SysBody 17-JAN-2023 09:06:33.11
             Attr PgmName = "SelectPrevious"
@@ -6108,6 +6369,9 @@ Volume DataQ $ClassVolume 0.0.1.3
             Attr TypeRef = "pwrs:Type-$Boolean"
           EndBody
         EndObject
+        !/**
+        ! Order to move the selected data object forward.
+        !*/
         Object MoveForward $Attribute 3 17-JAN-2023 09:07:17.03
           Body SysBody 17-JAN-2023 09:07:09.72
             Attr PgmName = "MoveForward"
@@ -6116,6 +6380,9 @@ Volume DataQ $ClassVolume 0.0.1.3
             Attr TypeRef = "pwrs:Type-$Boolean"
           EndBody
         EndObject
+        !/**
+        ! Order to move the selected data object backward.
+        !*/
         Object MoveBackward $Attribute 4 17-JAN-2023 09:07:32.55
           Body SysBody 17-JAN-2023 09:07:21.84
             Attr PgmName = "MoveBackward"
@@ -6124,6 +6391,9 @@ Volume DataQ $ClassVolume 0.0.1.3
             Attr TypeRef = "pwrs:Type-$Boolean"
           EndBody
         EndObject
+        !/**
+        ! Order to remove the selected data object.
+        !*/
         Object Remove $Attribute 5 17-JAN-2023 09:07:44.41
           Body SysBody 17-JAN-2023 09:07:37.53
             Attr PgmName = "Remove"
@@ -6138,6 +6408,16 @@ Volume DataQ $ClassVolume 0.0.1.3
         EndBody
       EndObject
     EndObject
+    !/**
+    ! @Version 1.0
+    ! @Group DataQ
+    ! @Summary Internal object containing internal attributes for QDisplayLink.
+    !
+    ! Internal object containing internal attributes for QDisplayLink.
+    !
+    ! See also
+    !  @classlink QDisplayLink dataq_qdisplaylink.html
+    !*/
     Object QDisplayLinkIntern $ClassDef 44 17-JAN-2023 09:08:58.49
       Body SysBody 17-JAN-2023 09:08:04.77
         Attr Editor = 0

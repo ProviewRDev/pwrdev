@@ -1,17 +1,24 @@
 
-a:link          {color: #003399;
+:root {--classbg: #adbdff;  
+       --headerbg: #ffa776;
+       --bodybg: #f3f3f3;
+       --linkfg: #003399;
+       --linkactive: #882200;
+      }
+
+a:link          {color: var(--linkfg);
                 font-weight: normal;
                 text-decoration: none}
-a:visited       {color: #003399;
+a:visited       {color: var(--linkfg);
                 font-weight: normal;
                 text-decoration: none}
-a:active        {color: #cc3300;
+a:active        {color: var(--linkactive);
                 font-weight: normal;
                 text-decoration: none}
-a:hover         {color: #cc3300
+a:hover         {color: var(--linkactive)
                 }
                 
-body            {background-color: #eeeeee;
+body            {background-color: var(--bodybg);
                 font-family: Arial, Verdana;
                 font-size: 10t;
                 margin-top: 0px;
@@ -87,18 +94,18 @@ address         {font-family: Arial, Verdana;
 div#description {
                 background-color: #ffffff;
 }
-a#desc:link {color: #003399;
+a#desc:link {color: var(--linkfg);
                 margin-left: 35px;
                 font-size: 10pt;
                 font-weight: normal;
                 text-decoration: none}
-a#desc:visited {color: #003399;
+a#desc:visited {color: var(--linkfg);
                 font-weight: normal;
                 text-decoration: none}
-a#desc:active {color: #cc3300;
+a#desc:active {color: var(--linkactive);
                 font-weight: normal;
                 text-decoration: none}
-a#desc:hover {color: #cc3300
+a#desc:hover {color: var(--linkactive)
                 }
 
 table#ctree     {font-family: Arial, Verdana;
@@ -134,7 +141,7 @@ td#dorm       {border: 1px solid #555555;
 		}
 
 th#dorm        {border: 1px solid #555555;
-		background-color: #ffa776;
+		background-color: var(--headerbg);
                 font-size: 14pt;
 		padding: 2px 10px 2px 10px;
                 width: 1000px;
@@ -148,20 +155,20 @@ tr#dorm        {border: 1px solid #333333;
 		}
 
 table#dormw    {font-family: Arial, Verdana;
-                background-color: #eeeeee;
+                background-color: var(--bodybg);
                 font-size: 10pt;
-		border: 1px solid #eeeeee;
+		border: 1px solid var(--bodybg);
   		border-collapse: collapse;
                 }
 
-td#dormw2        {border: 1px solid #eeeeee;
+td#dormw2        {border: 1px solid var(--bodybg);
                 font-size: 10pt;
 		padding: 2px 10px 2px 10px;
                 min-width: 5px;
   		text-align: left;
 		}
 
-td#dormw       {border: 1px solid #eeeeee;
+td#dormw       {border: 1px solid var(--bodybg);
                 font-size: 10pt;
 		padding: 2px 10px 2px 10px;
                 min-width: 5px;
@@ -170,22 +177,22 @@ td#dormw       {border: 1px solid #eeeeee;
 		}
 
 th#dormw        {border: 1px solid #000000;
-		background-color: #ffa776;
+		background-color: var(--headerbg);
                 font-size: 14pt;
 		padding: 2px 10px 2px 10px;
                 width: 1000px;
   		text-align: left;
 		}
 
-tr#dormw        {border: 1px solid #eeeeee;
-		background-color: #eeeeee;
+tr#dormw        {border: 1px solid var(--bodybg);
+		background-color: var(--bodybg);
                 font-size: 10pt;
 		padding: 0px 10px 2px 10px;
                 width: 1000px;
 		}
 
 th#dormh       {border: 1px solid #000000;
-		background-color: #adbdff;
+		background-color: var(--classbg);
                 font-size: 18pt;
 		padding: 2px 10px 2px 10px;
                 width: 1000px;
