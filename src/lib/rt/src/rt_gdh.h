@@ -116,6 +116,16 @@ typedef struct {
 } gdh_sVolumeInfo;
 
 /**
+ * Class info
+ */
+typedef struct {
+  pwr_eEditor Editor;
+  pwr_mClassDef Flags; /**< Class flags */
+  pwr_eMethod Method;
+  pwr_ePopEditorEnum PopEditor;
+} gdh_sClassInfo;
+
+/**
  * Attribute flags
  */
 typedef enum {
@@ -264,6 +274,8 @@ pwr_tStatus gdh_GetNodeInfo(pwr_tNodeId nodidx, gdh_sNodeInfo* ip);
 
 pwr_tStatus gdh_GetNodeObject(pwr_tNodeId nodeIndex, pwr_tObjid* object);
 
+pwr_tStatus gdh_GetClassInfo(pwr_tCid cid, gdh_sClassInfo *info);
+
 pwr_tStatus gdh_GetObjectClass(pwr_tObjid object, pwr_tClassId* classid);
 
 pwr_tStatus gdh_GetObjectClassList(pwr_tCid cid, /**< The class identity. */
@@ -312,6 +324,8 @@ pwr_tStatus gdh_GetSubscriptionOldness(pwr_tSubid subid, pwr_tBoolean* isOld,
 pwr_tStatus gdh_GetSuperClass(pwr_tCid cid, pwr_tCid* supercid, pwr_tObjid oid);
 
 pwr_tStatus gdh_Init(const char* name);
+
+pwr_tBoolean gdh_IsInitialized();
 
 pwr_tStatus gdh_MountObjidToPointer(pwr_tObjid object, void** objectData);
 
@@ -454,7 +468,6 @@ pwr_tStatus gdh_GetLocalClassList(int cidcnt, pwr_tCid* cid, int attrobjects,
 pwr_tStatus gdh_CheckLocalObject(pwr_tOid oid);
 pwr_tStatus gdh_TidToType(pwr_tTid tid, pwr_eType *type);
 pwr_tStatus gdh_MountDynClients(void);
-
 
 /** @}*/
 

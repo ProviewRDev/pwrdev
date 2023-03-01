@@ -142,13 +142,13 @@ SObject pwrs:Class
       Object PopEditor pwr_eClass_Param
         Body SysBody
           Attr PgmName = "PopEditor"
-          Attr Type = pwr_eType_Int32
+          Attr Type = pwr_eType_Enum
           Attr Offset = 16
           Attr Size = 4
           Attr Flags = 0
           Attr Elements = 1
           Attr ParamIndex = 5
-          Attr TypeRef = pwr_eType_Int32
+          Attr TypeRef = pwr_eTypeDef_PopEditorEnum
         EndBody
       EndObject
       !/**

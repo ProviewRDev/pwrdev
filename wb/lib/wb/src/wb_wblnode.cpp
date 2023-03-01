@@ -115,6 +115,8 @@ static wbl_sSym datatypes[] = { { "pwr_eType_Boolean", pwr_eType_Boolean },
   { "pwr_eType_DataRef", pwr_eType_DataRef },
   { "pwr_eTix_DataRef", pwr_eTix_DataRef },
   { "pwr_eType_Void", pwr_eType_Void }, { "pwr_eTix_Void", pwr_eTix_Void },
+  { "pwr_eTypeDef_PopEditorEnum", pwr_eTypeDef_PopEditorEnum },
+  { "pwr_eTdix_PopEditorEnum", pwr_eTdix_PopEditorEnum },
   { 0, 0 } };
 
 /* System Classes */
@@ -315,9 +317,13 @@ static wbl_sSym editor[] = { { "pwr_eEditor_HiEd", pwr_eEditor_HiEd },
   { "pwr_eMethod_DevBodyWithChkb", pwr_eMethod_DevBodyWithChkb },
   { "pwr_eMethod_SysBody", pwr_eMethod_SysBody },
   { "pwr_eMethod_DevBodyConnections", pwr_eMethod_DevBodyConnections },
-  { "pwr_ePopEditor__", pwr_ePopEditor__ },
-  { "pwr_ePopEditor_GMS", pwr_ePopEditor_GMS },
-  { "pwr_ePopEditor_Opcom", pwr_ePopEditor_Opcom }, { 0, 0 } };
+  { "pwr_ePopEditorEnum_None", pwr_ePopEditorEnum_None },
+  { "pwr_ePopEditorEnum_GeGraph", pwr_ePopEditorEnum_GeGraph },
+  { "pwr_ePopEditorEnum_AttrEd", pwr_ePopEditorEnum_AttrEd },
+  { "pwr_ePopEditorEnum_GeScript", pwr_ePopEditorEnum_GeScript },
+  { "pwr_ePopEditorEnum_GeCurve", pwr_ePopEditorEnum_GeCurve },
+  { "pwr_ePopEditorEnum_GeGraphConf", pwr_ePopEditorEnum_GeGraphConf }, 
+  { 0, 0 } };
 
 static wbl_sSym attr_flags[] = {
   /* Bitmask for flags */

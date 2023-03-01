@@ -218,6 +218,7 @@ typedef enum {
   pwr_eTdix_AdefFlags = 15, /* Derived type */
   pwr_eTdix_ClassDefFlags = 16, /* Derived type */
   pwr_eTdix_ObjBodyDefFlags = 18, /* Derived type */
+  pwr_eTdix_PopEditorEnum = 29, /* Derived type */
   pwr_eTdix_
 } pwr_eTdix;
 
@@ -225,8 +226,8 @@ typedef enum {
   pwr_eTypeDef__ = pwr_TypeId(pwr_eTix__) | 1 << 11,
   pwr_eTypeDef_AdefFlags = pwr_TypeId(pwr_eTdix_AdefFlags) | 1 << 11,
   pwr_eTypeDef_ClassDefFlags = pwr_TypeId(pwr_eTdix_ClassDefFlags) | 1 << 11,
-  pwr_eTypeDef_ObjBodyDefFlags
-  = pwr_TypeId(pwr_eTdix_ObjBodyDefFlags) | 1 << 11,
+  pwr_eTypeDef_PopEditorEnum = pwr_TypeId(pwr_eTdix_PopEditorEnum) | 1 << 11,
+  pwr_eTypeDef_ObjBodyDefFlags = pwr_TypeId(pwr_eTdix_ObjBodyDefFlags) | 1 << 11,
   pwr_eTypeDef_ = pwr_TypeId(pwr_eTix_) | 1 << 11
 } pwr_eTypeDef;
 
@@ -453,11 +454,13 @@ struct pwr_s_Object {
 */
 
 typedef enum {
-  pwr_ePopEditor__ = 0,
-  pwr_ePopEditor_GMS,
-  pwr_ePopEditor_Opcom,
-  pwr_ePopEditor_
-} pwr_ePopEditor;
+  pwr_ePopEditorEnum_None = 0,
+  pwr_ePopEditorEnum_GeGraph = 1,
+  pwr_ePopEditorEnum_AttrEd = 2,
+  pwr_ePopEditorEnum_GeScript = 3,
+  pwr_ePopEditorEnum_GeCurve = 4,
+  pwr_ePopEditorEnum_GeGraphConf = 5
+} pwr_ePopEditorEnum;
 
 typedef enum {
   pwr_eVolumeAccess__ = 0,
@@ -571,7 +574,7 @@ struct pwr_s_ClassDef {
                                       editor.  */
   pwr_mClassDef Flags pwr_dAlignW;
   pwr_tUInt32 NumOfObjBodies pwr_dAlignW;
-  pwr_ePopEditor PopEditor pwr_dAlignW; /* What kind of object picture
+  pwr_ePopEditorEnum PopEditor pwr_dAlignW; /* What kind of object picture
                                             dispatcher to use.  */
   pwr_tInt32 Filler pwr_dAlignW; /* LongWord size alignment */
 };

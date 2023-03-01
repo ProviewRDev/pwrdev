@@ -80,7 +80,7 @@ SObject pwrb:Class
     Body SysBody
       Attr Editor = pwr_eEditor_PlcEd
       Attr Method = pwr_eMethod_Connections
-      Attr PopEditor = 2
+      Attr PopEditor = pwr_ePopEditorEnum_AttrEd
       Attr Flags |= pwr_mClassDef_Plc
     EndBody
     Object RtBody $ObjBodyDef 1 

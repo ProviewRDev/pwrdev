@@ -82,7 +82,7 @@ ge_com_sources := $(sort \
              $(foreach file, \
                $(foreach dir, \
                  $(source_dirs), \
-                 $(wildcard $(dir)/dash_c_*.ge_com) \
+                 $(wildcard $(dir)/*.ge_com) \
                ), $(notdir $(file)) \
              ) \
            )

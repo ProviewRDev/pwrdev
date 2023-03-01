@@ -53,7 +53,7 @@ SObject pwrb:Class
     Body SysBody
       Attr Editor = pwr_eEditor_AttrEd
       Attr Method = pwr_eMethod_Standard
-      Attr PopEditor = 1
+      Attr PopEditor = pwr_ePopEditorEnum_GeGraph
     EndBody
     Object RtBody $ObjBodyDef 1 
       Body SysBody

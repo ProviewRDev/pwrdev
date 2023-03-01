@@ -33,46 +33,84 @@
 !  combined work), being distributed under the terms of the GNU 
 !  General Public License plus this exception.
 !
-!  pwrb_c_sorder.wb_load -- Defines the class SOrder.
+!  pwrs_td_popeditorenum.wb_load -- Defines the type PopEditorEnum
 !
-SObject pwrb:Class
-  Object SOrder $ClassDef 208 
+SObject pwrs:Type
+!/**
+!  @Version 1.0
+!  @Code pwr_class.h
+!  @Group DerivedTypes,Types
+!  Pop editor enumeration. Derived from Enum.
+!
+! @b See also
+!  @classlink Enum pwrs_enum.html
+!*/
+  Object $PopEditorEnum $TypeDef 29
     Body SysBody
-      Attr Editor = pwr_eEditor_AttrEd
-      Attr Method = pwr_eMethod_Standard
-      Attr PopEditor = pwr_ePopEditorEnum_AttrEd
-      Attr Flags |= pwr_mClassDef_Plc
+      Attr Type = pwr_eType_Enum
+      Attr Size = 4
+      Attr TypeRef = "pwrs:Type-$Enum"
+      Attr Elements = 1
     EndBody
-    Object RtBody $ObjBodyDef 1 
-      Body SysBody
-        Attr StructName = "sorder"
-      EndBody
-      Object Status $Intern 1 
-        Body SysBody
-          Attr Flags |= PWR_MASK_ARRAY
-          Attr Flags |= PWR_MASK_STATE
-          Attr Flags |= PWR_MASK_NOEDIT
-          Attr Flags |= PWR_MASK_REDUTRANSFER
-	  Attr Elements = 2
-          Attr TypeRef = "pwrs:Type-$Boolean"
-        EndBody
-      EndObject
-      Object Reset $Intern 2 
-        Body SysBody
-          Attr Flags |= PWR_MASK_STATE
-          Attr Flags |= PWR_MASK_NOEDIT
-          Attr Flags |= PWR_MASK_REDUTRANSFER
-          Attr TypeRef = "pwrs:Type-$Boolean"
-        EndBody
-      EndObject
-      Object Old $Intern 3 
-        Body SysBody
-          Attr Flags |= PWR_MASK_STATE
-          Attr Flags |= PWR_MASK_NOEDIT
-          Attr Flags |= PWR_MASK_REDUTRANSFER
-          Attr TypeRef = "pwrs:Type-$Boolean"
-        EndBody
-      EndObject
+    !/**
+    !  None.
+    !*/
+    Object None $Value
+     Body SysBody
+       Attr PgmName = "None"
+       Attr Text = "None"
+       Attr Value = 0
+     EndBody
+    EndObject
+    !/**
+    !  Ge class graph.
+    !*/
+    Object GeGraph $Value
+     Body SysBody
+       Attr PgmName = "GeGraph"
+       Attr Text = "GeGraph"
+       Attr Value = 1
+     EndBody
+    EndObject
+    !/**
+    !  Attrbute editor.
+    !*/
+    Object AttrEd $Value
+     Body SysBody
+       Attr PgmName = "AttrEd"
+       Attr Text = "AttrEd"
+       Attr Value = 2
+     EndBody
+    EndObject
+    !/**
+    !  Ge script.
+    !*/
+    Object GeScript $Value
+     Body SysBody
+       Attr PgmName = "GeScript"
+       Attr Text = "GeScript"
+       Attr Value = 3
+     EndBody
+    EndObject
+    !/**
+    !  Ge curve.
+    !*/
+    Object GeCurve $Value
+     Body SysBody
+       Attr PgmName = "GeCurve"
+       Attr Text = "GeCurve"
+       Attr Value = 4
+     EndBody
+    EndObject
+    !/**
+    !  Ge graph configuration.
+    !*/
+    Object GeGraphConf $Value
+     Body SysBody
+       Attr PgmName = "GeGraphConf"
+       Attr Text = "GeGraphConf"
+       Attr Value = 5
+     EndBody
     EndObject
   EndObject
 EndSObject

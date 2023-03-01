@@ -10649,8 +10649,10 @@ pwr_tStatus XNav::get_instance_classgraph(
   pwr_tFileName found_file, fname, file_str;
   pwr_tAName aname;
   pwr_tEnum graph_conf;
+  gdh_sClassInfo info;
   int i;
   int is_baseclass = 0;
+  int is_script = 1;
   int found = 0;
 
   sts = gdh_NameToAttrref(pwr_cNObjid, instance_str, &aref);
@@ -10659,6 +10661,12 @@ pwr_tStatus XNav::get_instance_classgraph(
 
   sts = gdh_GetAttrRefTid(&aref, &cid);
   while (ODD(sts)) {
+    is_script = 0;
+
+    sts = gdh_GetClassInfo(cid, &info);
+    if (EVEN(sts)) 
+      return sts;
+
     // Try all superclasses
     sts = gdh_ObjidToName(
         cdh_ClassIdToObjid(cid), cname, sizeof(cname), cdh_mName_object);
@@ -10688,19 +10696,25 @@ pwr_tStatus XNav::get_instance_classgraph(
         strcat(fname, file_str);
       }
 
-      // Add any GraphConfiguration to filename
-      strcpy(aname, instance_str);
-      strcat(aname, ".GraphConfiguration");
-      sts = gdh_GetObjectInfo(aname, &graph_conf, sizeof(graph_conf));
-      if (ODD(sts)) {
-        if (graph_conf != 0) {
-          char gc[12];
-          sprintf(gc, "%d", graph_conf);
-          strcat(fname, gc);
-        }
+      if (info.PopEditor == pwr_ePopEditor_GeGraphConf) {
+	// Add any GraphConfiguration to filename
+	strcpy(aname, instance_str);
+	strcat(aname, ".GraphConfiguration");
+	sts = gdh_GetObjectInfo(aname, &graph_conf, sizeof(graph_conf));
+	if (ODD(sts)) {
+	  if (graph_conf != 0) {
+	    char gc[12];
+	    sprintf(gc, "%d", graph_conf);
+	    strcat(fname, gc);
+	  }
+	}
       }
-
-      strcat(fname, ".pwg");
+      if (info.PopEditor == pwr_ePopEditor_GeScript) {
+	is_script = 1;
+	strcat(fname, ".ge_com");
+      }
+      else
+	strcat(fname, ".pwg");
       sts = dcli_search_file(fname, found_file, DCLI_DIR_SEARCH_INIT);
       dcli_search_file(fname, found_file, DCLI_DIR_SEARCH_END);
       if (ODD(sts)) {
@@ -10718,7 +10732,12 @@ pwr_tStatus XNav::get_instance_classgraph(
   if (EVEN(sts))
     return XNAV__NOCLASSGRAPH;
 
-  strcpy(filename, fname);
+  if (is_script) {
+    strcpy(filename, "@");
+    strcat(filename, fname);
+  }
+  else
+    strcpy(filename, fname);
   return XNAV__SUCCESS;
 }
 

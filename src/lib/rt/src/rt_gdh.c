@@ -5617,3 +5617,44 @@ pwr_tStatus gdh_SetObjectInfoStr(const char* name, /**< Attribute name */
   lck_Unlock(lck_eLock_Str);
   return sts;
 }
+
+/**
+ * @brief Get class info.
+ * Returns information from $ClassDef object.
+ *
+ * @return pwr_tStatus
+ */
+pwr_tStatus gdh_GetClassInfo(pwr_tCid cid, gdh_sClassInfo *info)
+{
+  gdb_sClass* cp;
+  pwr_sClassDef *cdef;
+  pwr_tStatus sts = GDH__SUCCESS;
+  
+  gdh_ScopeLock
+  {
+    cp = hash_Search(&sts, gdbroot->cid_ht, &cid);
+    if (cp != NULL)
+      cdef = pool_Address(NULL, gdbroot->rtdb, cp->cbr);
+  }
+  gdh_ScopeUnlock;
+  if (cdef == NULL)
+    return sts;
+
+  info->Editor = cdef->Editor;
+  info->Flags = cdef->Flags;
+  info->Method = cdef->Method;
+  info->PopEditor = cdef->PopEditor;
+
+  return GDH__SUCCESS;
+}
+
+/**
+ * @brief Check if gdh is initialized.
+ * Returns TRUE if gdh is initialized, else FALSE.
+ *
+ * @return pwr_tBoolean
+ */
+pwr_tBoolean gdh_IsInitialized()
+{
+  return gdbroot == 0 ? 0 : 1;
+}
