@@ -10696,7 +10696,7 @@ pwr_tStatus XNav::get_instance_classgraph(
         strcat(fname, file_str);
       }
 
-      if (info.PopEditor == pwr_ePopEditor_GeGraphConf) {
+      if (info.PopEditor == pwr_ePopEditorEnum_GeGraphConf) {
 	// Add any GraphConfiguration to filename
 	strcpy(aname, instance_str);
 	strcat(aname, ".GraphConfiguration");
@@ -10709,7 +10709,7 @@ pwr_tStatus XNav::get_instance_classgraph(
 	  }
 	}
       }
-      if (info.PopEditor == pwr_ePopEditor_GeScript) {
+      if (info.PopEditor == pwr_ePopEditorEnum_GeScript) {
 	is_script = 1;
 	strcat(fname, ".ge_com");
       }
