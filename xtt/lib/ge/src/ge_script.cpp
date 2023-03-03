@@ -4593,7 +4593,10 @@ static int graph_getui_env_func(void* filectx, ccm_sArg* arg_list,
   if (arg_count !=  0)
     return CCM__ARGMISM;
 
-  *return_int = glow_eUI_Env_Xtt;
+  if (gdh_IsInitialized())
+    *return_int = glow_eUI_Env_Xtt;
+  else
+    *return_int = glow_eUI_Env_Development;    
   *return_decl = CCM_DECL_INT;
   return 1;
 }
@@ -4612,10 +4615,14 @@ static int graph_getgraphconfig_func(void* filectx, ccm_sArg* arg_list,
 
   graph_get_stored_graph(&graph);
 
-  strcpy(aname, graph->object_name[0]);
-  strcat(aname, ".GraphConfiguration");
-  sts = gdh_GetObjectInfo(aname, &value, sizeof(value));
-  if (EVEN(sts))
+  if (gdh_IsInitialized()) {
+    strcpy(aname, graph->object_name[0]);
+    strcat(aname, ".GraphConfiguration");
+    sts = gdh_GetObjectInfo(aname, &value, sizeof(value));
+    if (EVEN(sts))
+      value = 0;
+  }
+  else
     value = 0;
 
   *return_int = value;
@@ -4748,6 +4755,34 @@ static int graph_setdefaulttextcolor_func(void* filectx, ccm_sArg* arg_list,
     text_color = (glow_eDrawType)arg_list->value_int;
     graph->set_current_colors_cb(graph->parent_ctx, fill_color, border_color, text_color);
   }
+
+  return 1;
+}
+
+static int graph_translateobjectname_func(void* filectx, ccm_sArg* arg_list,
+    int arg_count, int* return_decl, ccm_tFloat* return_float,
+    ccm_tInt* return_int, char* return_string)
+{
+  ccm_sArg* arg_p2;
+  int inverted, type, size, elem;
+  graph_mParseOpt options = (graph_mParseOpt)0;
+  Graph* graph;
+  arg_p2 = arg_list->next;
+
+  if (arg_count != 2)
+    return CCM__ARGMISM;
+
+  if (arg_list->value_decl != CCM_DECL_STRING)
+    return CCM__ARGMISM;
+
+  if (arg_p2->value_decl != CCM_DECL_STRING)
+    return CCM__ARGMISM;
+
+  graph_get_stored_graph(&graph);
+
+  graph->parse_attr_name(arg_list->value_string, arg_p2->value_string, 
+      &inverted, &type, &size, &elem, options);
+  arg_p2->value_returned = 1;
 
   return 1;
 }
@@ -5327,11 +5362,16 @@ int Graph::script_func_register(void)
   sts = ccm_register_function("Ge", "SetGraphOptions", graph_setgraphoptions_func);
   if (EVEN(sts))
     return sts;
+  sts = ccm_register_function("Ge", "TranslateObjectName", graph_translateobjectname_func);
+  if (EVEN(sts))
+    return sts;
   
   sts = ccm_create_external_var(
       "eUI_Env_Web", CCM_DECL_INT, 0, glow_eUI_Env_Web, 0);
   sts = ccm_create_external_var(
       "eUI_Env_Xtt", CCM_DECL_INT, 0, glow_eUI_Env_Xtt, 0);
+  sts = ccm_create_external_var(
+      "eUI_Env_Development", CCM_DECL_INT, 0, glow_eUI_Env_Development, 0);
 
   sts = ccm_create_external_var(
       "eObjectType_Rect", CCM_DECL_INT, 0, glow_eObjectType_GrowRect, 0);

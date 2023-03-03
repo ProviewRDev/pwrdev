@@ -117,7 +117,8 @@ typedef enum {
 //! Type of Enviroment
 typedef enum {
   glow_eUI_Env_Web,
-  glow_eUI_Env_Xtt
+  glow_eUI_Env_Xtt,
+  glow_eUI_Env_Development
 } glow_eUI_Env;
 
 //! Policy when selecting an area with the select rectangle
