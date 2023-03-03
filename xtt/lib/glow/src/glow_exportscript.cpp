@@ -543,18 +543,24 @@ int GlowExportScript::export_script(char* filename,
   
   if (!streq(nc_name, ""))
     fp << ind << "SetGraphName(\"" << nc_name << "\");" << '\n';
-  if (ctx->x0 != 0)
-    fp << ind << "SetGraphAttribute(\"x0\"," 
-       << dtostr(ctx->x0 - vmdata[0].window_border_width) << ");" << '\n';
-  if (ctx->y0 != 0)
-    fp << ind << "SetGraphAttribute(\"y0\"," 
-       << dtostr(ctx->y0 - vmdata[0].window_border_width) << ");" << '\n';
   if (module_cnt) {    
+    if (ctx->x0 != 0)
+      fp << ind << "SetGraphAttribute(\"x0\"," 
+	 << dtostr(ctx->x0 - vmdata[0].window_border_width) << ");" << '\n';
+    if (ctx->y0 != 0)
+      fp << ind << "SetGraphAttribute(\"y0\"," 
+	 << dtostr(ctx->y0 - vmdata[0].window_border_width) << ");" << '\n';
     fp << ind << "x1 = wwidth + " << dtostr(ctx->x0 + vmdata[0].window_border_width) << ";" << '\n';
     fp << ind << "y1 = wheight + " << dtostr(ctx->y0 + vmdata[0].window_border_width) << ";" << '\n';
     fp << ind << "SetGraphAttribute(\"x1\",x1);" << '\n';
     fp << ind << "SetGraphAttribute(\"y1\",y1);" << '\n';
   } else {
+    if (ctx->x0 != 0)
+      fp << ind << "SetGraphAttribute(\"x0\"," 
+	 << dtostr(ctx->x0) << ");" << '\n';
+    if (ctx->y0 != 0)
+      fp << ind << "SetGraphAttribute(\"y0\"," 
+	 << dtostr(ctx->y0) << ");" << '\n';
     if (ctx->x1 != 0)
       fp << ind << "SetGraphAttribute(\"x1\"," << dtostr(ctx->x1) << ");" << '\n';
     if (ctx->y1 != 0)
