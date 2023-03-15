@@ -63,6 +63,7 @@
 #include "glow_growconglue.h"
 #include "glow_growmenu.h"
 #include "glow_growtoolbar.h"
+#include "glow_growlayer.h"
 #include "glow_growdashcell.h"
 #include "glow_growscriptmodule.h"
 #include "glow_dashboard.h"
@@ -1209,6 +1210,17 @@ void grow_CreateGrowMenu(grow_tCtx ctx, const char* name, glow_sMenuInfo* info,
   *menu = (grow_tObject)r1;
 }
 
+void grow_CreateGrowLayer(grow_tCtx ctx, const char* name, void* user_data,
+    grow_tObject* layer)
+{
+  GrowLayer* l1;
+  l1 = new GrowLayer(ctx, name);
+  ctx->a.insert(l1);
+  l1->set_user_data(user_data);
+  ctx->a.pop(l1);
+  *layer = (grow_tObject)l1;
+}
+
 void grow_CreateGrowDashCell(grow_tCtx ctx, const char* name, double x, double y,
     double width, double height, glow_eDrawType draw_type, void* user_data, grow_tObject* cell)
 {
@@ -1286,6 +1298,11 @@ void grow_SetNextObjectNameNumber(grow_tCtx ctx, int num)
   ctx->set_next_objectname_num(num);
 }
 
+int grow_IncrNextLayerNameNumber(grow_tCtx ctx)
+{
+  return ctx->incr_next_layername_num();
+}
+
 static int grow_name_validation_cb(void* ctx, void* value)
 {
   GlowArrayElem* op = (GlowArrayElem*)ctx;
@@ -1315,7 +1332,6 @@ int grow_GetObjectAttrInfo(
     strcpy(attrinfo[i].name, "Name");
     attrinfo[i].value_p = &op->n_name;
     attrinfo[i].type = glow_eType_String;
-    attrinfo[i].no_edit = 0;
     attrinfo[i].no_edit = 0;
     attrinfo[i].input_validation_cb = grow_name_validation_cb;
     attrinfo[i].validation_ctx = (void*)op;
@@ -1416,7 +1432,6 @@ int grow_GetObjectAttrInfo(
     attrinfo[i].value_p = &op->n_name;
     attrinfo[i].type = glow_eType_String;
     attrinfo[i].no_edit = 0;
-    attrinfo[i].no_edit = 0;
     attrinfo[i].input_validation_cb = grow_name_validation_cb;
     attrinfo[i].validation_ctx = (void*)op;
     attrinfo[i++].size = sizeof(op->n_name);
@@ -1507,7 +1522,6 @@ int grow_GetObjectAttrInfo(
     strcpy(attrinfo[i].name, "Name");
     attrinfo[i].value_p = &op->n_name;
     attrinfo[i].type = glow_eType_String;
-    attrinfo[i].no_edit = 0;
     attrinfo[i].no_edit = 0;
     attrinfo[i].input_validation_cb = grow_name_validation_cb;
     attrinfo[i].validation_ctx = (void*)op;
@@ -1623,7 +1637,6 @@ int grow_GetObjectAttrInfo(
     attrinfo[i].value_p = &op->n_name;
     attrinfo[i].type = glow_eType_String;
     attrinfo[i].no_edit = 0;
-    attrinfo[i].no_edit = 0;
     attrinfo[i].input_validation_cb = grow_name_validation_cb;
     attrinfo[i].validation_ctx = (void*)op;
     attrinfo[i++].size = sizeof(op->n_name);
@@ -1656,7 +1669,6 @@ int grow_GetObjectAttrInfo(
     strcpy(attrinfo[i].name, "Name");
     attrinfo[i].value_p = &op->n_name;
     attrinfo[i].type = glow_eType_String;
-    attrinfo[i].no_edit = 0;
     attrinfo[i].no_edit = 0;
     attrinfo[i].input_validation_cb = grow_name_validation_cb;
     attrinfo[i].validation_ctx = (void*)op;
@@ -1765,7 +1777,6 @@ int grow_GetObjectAttrInfo(
     attrinfo[i].value_p = &op->n_name;
     attrinfo[i].type = glow_eType_String;
     attrinfo[i].no_edit = 0;
-    attrinfo[i].no_edit = 0;
     attrinfo[i].input_validation_cb = grow_name_validation_cb;
     attrinfo[i].validation_ctx = (void*)op;
     attrinfo[i++].size = sizeof(op->n_name);
@@ -1788,7 +1799,6 @@ int grow_GetObjectAttrInfo(
     strcpy(attrinfo[i].name, "Name");
     attrinfo[i].value_p = &op->n_name;
     attrinfo[i].type = glow_eType_String;
-    attrinfo[i].no_edit = 0;
     attrinfo[i].no_edit = 0;
     attrinfo[i].input_validation_cb = grow_name_validation_cb;
     attrinfo[i].validation_ctx = (void*)op;
@@ -1835,7 +1845,6 @@ int grow_GetObjectAttrInfo(
     attrinfo[i].value_p = &op->n_name;
     attrinfo[i].type = glow_eType_String;
     attrinfo[i].no_edit = 0;
-    attrinfo[i].no_edit = 0;
     attrinfo[i].input_validation_cb = grow_name_validation_cb;
     attrinfo[i].validation_ctx = (void*)op;
     attrinfo[i++].size = sizeof(op->n_name);
@@ -1881,7 +1890,6 @@ int grow_GetObjectAttrInfo(
     attrinfo[i].value_p = &op->n_name;
     attrinfo[i].type = glow_eType_String;
     attrinfo[i].no_edit = 0;
-    attrinfo[i].no_edit = 0;
     attrinfo[i].input_validation_cb = grow_name_validation_cb;
     attrinfo[i].validation_ctx = (void*)op;
     attrinfo[i++].size = sizeof(op->n_name);
@@ -1919,7 +1927,6 @@ int grow_GetObjectAttrInfo(
     strcpy(attrinfo[i].name, "Name");
     attrinfo[i].value_p = &op->n_name;
     attrinfo[i].type = glow_eType_String;
-    attrinfo[i].no_edit = 0;
     attrinfo[i].no_edit = 0;
     attrinfo[i].input_validation_cb = grow_name_validation_cb;
     attrinfo[i].validation_ctx = (void*)op;
@@ -1991,7 +1998,6 @@ int grow_GetObjectAttrInfo(
     strcpy(attrinfo[i].name, "Name");
     attrinfo[i].value_p = &op->n_name;
     attrinfo[i].type = glow_eType_String;
-    attrinfo[i].no_edit = 0;
     attrinfo[i].no_edit = 0;
     attrinfo[i].input_validation_cb = grow_name_validation_cb;
     attrinfo[i].validation_ctx = (void*)op;
@@ -2092,7 +2098,6 @@ int grow_GetObjectAttrInfo(
     strcpy(attrinfo[i].name, "Name");
     attrinfo[i].value_p = &op->n_name;
     attrinfo[i].type = glow_eType_String;
-    attrinfo[i].no_edit = 0;
     attrinfo[i].no_edit = 0;
     attrinfo[i].input_validation_cb = grow_name_validation_cb;
     attrinfo[i].validation_ctx = (void*)op;
@@ -2226,7 +2231,6 @@ int grow_GetObjectAttrInfo(
     attrinfo[i].value_p = &op->n_name;
     attrinfo[i].type = glow_eType_String;
     attrinfo[i].no_edit = 0;
-    attrinfo[i].no_edit = 0;
     attrinfo[i].input_validation_cb = grow_name_validation_cb;
     attrinfo[i].validation_ctx = (void*)op;
     attrinfo[i++].size = sizeof(op->n_name);
@@ -2289,7 +2293,6 @@ int grow_GetObjectAttrInfo(
     strcpy(attrinfo[i].name, "Name");
     attrinfo[i].value_p = &op->n_name;
     attrinfo[i].type = glow_eType_String;
-    attrinfo[i].no_edit = 0;
     attrinfo[i].no_edit = 0;
     attrinfo[i].input_validation_cb = grow_name_validation_cb;
     attrinfo[i].validation_ctx = (void*)op;
@@ -2620,7 +2623,6 @@ int grow_GetObjectAttrInfo(
     attrinfo[i].value_p = &op->n_name;
     attrinfo[i].type = glow_eType_String;
     attrinfo[i].no_edit = 0;
-    attrinfo[i].no_edit = 0;
     attrinfo[i].input_validation_cb = grow_name_validation_cb;
     attrinfo[i].validation_ctx = (void*)op;
     attrinfo[i++].size = sizeof(op->n_name);
@@ -2707,7 +2709,6 @@ int grow_GetObjectAttrInfo(
     attrinfo[i].value_p = &op->n_name;
     attrinfo[i].type = glow_eType_String;
     attrinfo[i].no_edit = 0;
-    attrinfo[i].no_edit = 0;
     attrinfo[i].input_validation_cb = grow_name_validation_cb;
     attrinfo[i].validation_ctx = (void*)op;
     attrinfo[i++].size = sizeof(op->n_name);
@@ -2778,7 +2779,6 @@ int grow_GetObjectAttrInfo(
     strcpy(attrinfo[i].name, "Name");
     attrinfo[i].value_p = &op->n_name;
     attrinfo[i].type = glow_eType_String;
-    attrinfo[i].no_edit = 0;
     attrinfo[i].no_edit = 0;
     attrinfo[i].input_validation_cb = grow_name_validation_cb;
     attrinfo[i].validation_ctx = (void*)op;
@@ -2871,7 +2871,6 @@ int grow_GetObjectAttrInfo(
     strcpy(attrinfo[i].name, "Name");
     attrinfo[i].value_p = &op->n_name;
     attrinfo[i].type = glow_eType_String;
-    attrinfo[i].no_edit = 0;
     attrinfo[i].no_edit = 0;
     attrinfo[i].input_validation_cb = grow_name_validation_cb;
     attrinfo[i].validation_ctx = (void*)op;
@@ -2980,7 +2979,6 @@ int grow_GetObjectAttrInfo(
     strcpy(attrinfo[i].name, "Name");
     attrinfo[i].value_p = &op->n_name;
     attrinfo[i].type = glow_eType_String;
-    attrinfo[i].no_edit = 0;
     attrinfo[i].no_edit = 0;
     attrinfo[i].input_validation_cb = grow_name_validation_cb;
     attrinfo[i].validation_ctx = (void*)op;
@@ -3096,7 +3094,8 @@ int grow_GetObjectAttrInfo(
   }
   case glow_eObjectType_GrowNode:
   case glow_eObjectType_GrowGroup:
-  case glow_eObjectType_GrowToolbar: {
+  case glow_eObjectType_GrowToolbar:
+  case glow_eObjectType_GrowLayer: {
     GrowNode* op = (GrowNode*)object;
     char* dynamic;
     int dynsize;
@@ -3106,7 +3105,6 @@ int grow_GetObjectAttrInfo(
     strcpy(attrinfo[i].name, "Name");
     attrinfo[i].value_p = &op->n_name;
     attrinfo[i].type = glow_eType_String;
-    attrinfo[i].no_edit = 0;
     attrinfo[i].no_edit = 0;
     attrinfo[i].input_validation_cb = grow_name_validation_cb;
     attrinfo[i].validation_ctx = (void*)op;
@@ -3192,7 +3190,6 @@ int grow_GetObjectAttrInfo(
     strcpy(attrinfo[i].name, "Name");
     attrinfo[i].value_p = &op->n_name;
     attrinfo[i].type = glow_eType_String;
-    attrinfo[i].no_edit = 0;
     attrinfo[i].no_edit = 0;
     attrinfo[i].input_validation_cb = grow_name_validation_cb;
     attrinfo[i].validation_ctx = (void*)op;
@@ -3289,7 +3286,6 @@ int grow_GetObjectAttrInfo(
     strcpy(attrinfo[i].name, "Name");
     attrinfo[i].value_p = &op->n_name;
     attrinfo[i].type = glow_eType_String;
-    attrinfo[i].no_edit = 0;
     attrinfo[i].no_edit = 0;
     attrinfo[i].input_validation_cb = grow_name_validation_cb;
     attrinfo[i].validation_ctx = (void*)op;
@@ -3535,7 +3531,6 @@ int grow_GetObjectAttrInfo(
     strcpy(attrinfo[i].name, "Name");
     attrinfo[i].value_p = &op->n_name;
     attrinfo[i].type = glow_eType_String;
-    attrinfo[i].no_edit = 0;
     attrinfo[i].no_edit = 0;
     attrinfo[i].input_validation_cb = grow_name_validation_cb;
     attrinfo[i].validation_ctx = (void*)op;
@@ -6428,6 +6423,62 @@ void grow_DisableSubwindowEvents(grow_tCtx ctx, int disable)
 int grow_GetWindowResize(grow_tCtx ctx)
 {
   return ((GrowCtx*)ctx)->window_resize;
+}
+
+int grow_LayerIsActive(grow_tObject o)
+{
+  return ((GrowLayer*)o)->is_active();
+}
+
+void grow_LayerSetActive(grow_tObject o, int active)
+{
+  ((GrowLayer*)o)->set_active(active);
+}
+
+void grow_LayerResetActiveAll(grow_tCtx ctx)
+{
+  ((GrowCtx*)ctx)->layer_reset_active_all();
+}
+
+void grow_GetLayerObjectList(grow_tObject layer, grow_tObject** list, int* cnt)
+{
+  ((GrowLayer*)layer)->get_objectlist((GlowArrayElem***)list, cnt);
+}
+
+int grow_GetActiveLayer(grow_tCtx ctx, grow_tObject *layer)
+{
+  return ((GrowCtx*)ctx)->get_active_layer((GrowLayer**)layer);
+}
+
+int grow_MergeVisibleLayers(grow_tCtx ctx)
+{
+  return ((GrowCtx*)ctx)->merge_visible_layers();
+}
+
+int grow_MergeAllLayers(grow_tCtx ctx)
+{
+  return ((GrowCtx*)ctx)->merge_all_layers();
+}
+
+int grow_MoveSelectToLayer(grow_tCtx ctx)
+{
+  return ((GrowCtx*)ctx)->move_select_to_layer();
+}
+
+int grow_LayerGetNextObject(grow_tObject layer, grow_tObject object, 
+    grow_tObject* next)
+{
+  if (!(((GlowArrayElem*)layer)->type() == glow_eObjectType_GrowLayer))
+    return 0;
+  return ((GrowLayer*)layer)->get_next((GlowArrayElem*)object, 
+      (GlowArrayElem**)next);
+}
+
+int grow_LayerGetFirstObject(grow_tObject layer, grow_tObject* first)
+{
+  if (!(((GlowArrayElem*)layer)->type() == glow_eObjectType_GrowLayer))
+    return 0;
+  return ((GrowLayer*)layer)->get_first((GlowArrayElem**)first);
 }
 
 /*@}*/

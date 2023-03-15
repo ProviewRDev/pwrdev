@@ -109,6 +109,7 @@ public:
   CoWow* wow;
   void* open_dialog;
   Attr* objectnav;
+  Attr* layernav;
   void (*close_cb)(void*);
 
   Ge(void* parent_ctx, ldh_tSesContext ldhses, int exit_when_close,

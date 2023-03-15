@@ -184,7 +184,8 @@ int AttrGtk::reconfigure_attr()
 
   delete (AttrNav*)attrnav;
   attrnav = new AttrNavGtk(
-      this, pane, type, "Plant", itemlist, item_cnt, &brow_widget, &sts);
+      this, pane, type, "Plant", itemlist, item_cnt, 
+      &Attr::get_object_list_c, &brow_widget, &sts);
   gtk_paned_pack1(GTK_PANED(pane), GTK_WIDGET(brow_widget), TRUE, TRUE);
   gtk_widget_show_all(brow_widget);
 
@@ -375,8 +376,11 @@ void AttrGtk::action_text_inserted(
 }
 
 AttrGtk::AttrGtk(GtkWidget* a_parent_wid, void* a_parent_ctx, attr_eType a_type,
-    void* a_object, attr_sItem* itemlist, int item_cnt)
-    : Attr(a_parent_ctx, a_type, a_object, itemlist, item_cnt),
+    void* a_object, attr_sItem* itemlist, int item_cnt,
+    void (*xn_get_object_list_cb)(void*, unsigned int, grow_tObject**, int*, 
+    grow_tObject*, int))
+  : Attr(a_parent_ctx, a_type, a_object, itemlist, item_cnt,
+      xn_get_object_list_cb),
       parent_wid(a_parent_wid), msg_label(0), input_max_length(0)
 {
   int sts;
@@ -473,7 +477,8 @@ AttrGtk::AttrGtk(GtkWidget* a_parent_wid, void* a_parent_ctx, attr_eType a_type,
     pane = gtk_paned_new(GTK_ORIENTATION_VERTICAL);
 
     attrnav = new AttrNavGtk(
-        this, pane, type, "Plant", itemlist, item_cnt, &brow_widget, &sts);
+        this, pane, type, "Plant", itemlist, item_cnt, 
+	&Attr::get_object_list_c, &brow_widget, &sts);
     attrnav->message_cb = &Attr::message;
     attrnav->change_value_cb = &Attr::change_value_c;
     attrnav->get_subgraph_info_cb = &Attr::get_subgraph_info_c;
@@ -482,7 +487,7 @@ AttrGtk::AttrGtk(GtkWidget* a_parent_wid, void* a_parent_ctx, attr_eType a_type,
     attrnav->get_plant_select_cb = &Attr::get_plant_select_c;
     attrnav->get_current_colors_cb = &Attr::get_current_colors_c;
     attrnav->get_current_color_tone_cb = &Attr::get_current_color_tone_c;
-    attrnav->get_object_list_cb = &Attr::get_object_list_c;
+    //attrnav->get_object_list_cb = &Attr::get_object_list_c;
 
     GtkWidget* statusbar = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
     // msg_label = gtk_statusbar_new();
@@ -558,7 +563,7 @@ AttrGtk::AttrGtk(GtkWidget* a_parent_wid, void* a_parent_ctx, attr_eType a_type,
   } else {
     toplevel = parent_wid;
     attrnav = new AttrNavGtk(this, parent_wid, type, "Plant", itemlist,
-        item_cnt, &brow_widget, &sts);
+	item_cnt, &Attr::get_object_list_c, &brow_widget, &sts);
     attrnav->message_cb = &Attr::message;
     attrnav->change_value_cb = &Attr::change_value_c;
     attrnav->get_subgraph_info_cb = &Attr::get_subgraph_info_c;
@@ -567,7 +572,7 @@ AttrGtk::AttrGtk(GtkWidget* a_parent_wid, void* a_parent_ctx, attr_eType a_type,
     attrnav->get_plant_select_cb = &Attr::get_plant_select_c;
     attrnav->get_current_colors_cb = &Attr::get_current_colors_c;
     attrnav->get_current_color_tone_cb = &Attr::get_current_color_tone_c;
-    attrnav->get_object_list_cb = &Attr::get_object_list_c;
+    //attrnav->get_object_list_cb = &Attr::get_object_list_c;
     attrnav->set_inputfocus_cb = &Attr::set_inputfocus_c;
     attrnav->traverse_inputfocus_cb = &Attr::traverse_inputfocus_c;
   }

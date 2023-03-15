@@ -250,6 +250,8 @@ public:
   //! Not used.
   void set_hot(int on){}
 
+  virtual int get_hot(){return hot;}
+
   //! Insert object in select list, if it is inside the selection area.
   /*!
     \param ll_x		Lower left x coordinate of selection area.

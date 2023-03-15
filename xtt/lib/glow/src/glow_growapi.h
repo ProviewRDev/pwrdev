@@ -1337,6 +1337,9 @@ void grow_CreateGrowMenu(grow_tCtx ctx, const char* name, glow_sMenuInfo* info,
     glow_eDrawType disabled_text_color, glow_eFont text_font,
     grow_tObject parent, grow_tObject* menu);
 
+void grow_CreateGrowLayer(grow_tCtx ctx, const char* name, void* user_data,
+    grow_tObject* layer);
+
 //! Create a dash cell
 void grow_CreateGrowDashCell(grow_tCtx ctx, const char* name, double x, double y,
     double width, double height, glow_eDrawType draw_type, void* user_data, 
@@ -1432,6 +1435,15 @@ int grow_IncrNextObjectNameNumber(grow_tCtx ctx);
   Sets the number for next objectname.
 */
 void grow_SetNextObjectNameNumber(grow_tCtx ctx, int num);
+
+//! Get and increment next layername number.
+/*!
+  \param ctx	Grow context.
+  \return Next layername number.
+
+  Returns the number for next layername and increments the counter.
+*/
+int grow_IncrNextLayerNameNumber(grow_tCtx ctx);
 
 //! Get attributes for an object.
 /*!
@@ -3416,6 +3428,18 @@ void grow_SetGraphBorders(grow_tCtx ctx, double x0, double y0, double x1, double
 void grow_GetBorders(grow_tCtx ctx);
 void grow_DisableSubwindowEvents(grow_tCtx ctx, int disable);
 int grow_GetWindowResize(grow_tCtx ctx);
+int grow_LayerIsActive(grow_tObject o);
+void grow_LayerSetActive(grow_tObject o, int active);
+void grow_LayerResetActiveAll(grow_tCtx ctx);
+void grow_GetLayerObjectList(grow_tObject layer, grow_tObject** list, int* cnt);
+int grow_GetActiveLayer(grow_tCtx ctx, grow_tObject *layer);
+int grow_MergeVisibleLayers(grow_tCtx ctx);
+int grow_MergeAllLayers(grow_tCtx ctx);
+int grow_MoveSelectToLayer(grow_tCtx ctx);
+int grow_LayerGetNextObject(grow_tObject layer, grow_tObject object, 
+    grow_tObject* next);
+int grow_LayerGetFirstObject(grow_tObject layer, grow_tObject* first);
+
 
 /*@}*/
 #if defined __cplusplus

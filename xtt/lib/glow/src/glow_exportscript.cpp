@@ -52,6 +52,7 @@
 #include "glow_growpie.h"
 #include "glow_growaxis.h"
 #include "glow_growgroup.h"
+#include "glow_growlayer.h"
 #include "glow_growtoolbar.h"
 #include "glow_growimage.h"
 #include "glow_growwindow.h"
@@ -1588,6 +1589,37 @@ int GlowExportScript::group(GrowGroup* o, void* e, void* m)
 
   if (userdata_script_cb && o->user_data) 
     userdata_script_cb(o->user_data, o, fp, ind);
+  return 1;
+}
+
+int GlowExportScript::layer(GrowLayer* o, void* e, void* m)
+{
+  int sts;
+  int sumsts = 0;
+
+  fp << cind << "Layer " << o->n_name << '\n';
+  fp << ind << "id = CreateLayer();" << '\n';
+  fp << ind << "SetObjectAttribute(id,\"Name\",\"" << o->n_name << "\");" << '\n';
+  if (!feq(o->transparency, 0.0))
+    fp << ind << "SetObjectAttribute(id,\"Transparency\"," << o->transparency << ");" << '\n';
+
+  if (userdata_script_cb && o->user_data) 
+    userdata_script_cb(o->user_data, o, fp, ind);
+  fp << ind << "LayerSetActive(id, 1);" << '\n';
+
+  for (int i = 0; i < o->size(); i++) {
+    if (o->a[i]->type() != glow_eObjectType_Con) {
+      sts = o->a[i]->export_script(this, 0, m);
+      if (ODD(sts)) {
+	sumsts = sts;
+      }
+    }
+  }
+  if (EVEN(sumsts))
+    return 0;
+
+  fp << ind << "LayerResetActiveAll();" << '\n';
+  
   return 1;
 }
 

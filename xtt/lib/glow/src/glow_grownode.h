@@ -151,6 +151,7 @@ public:
     \param on	If 1, set highlight. If 0, reset highlight.
   */
   void set_highlight(int on);
+  int get_highlight() {return highlight;}
 
   //! Close trace
   /*! Calls the trace disconnect callback.
@@ -195,6 +196,7 @@ public:
   /*! Increase the linewith to mark that the cursor points at the node.
    */
   void set_hot(int on);
+  virtual int get_hot(){return hot;}
 
   char* dynamic; //!< Dynamic code.
   int dynamicsize; //!< Size of dynamic code.

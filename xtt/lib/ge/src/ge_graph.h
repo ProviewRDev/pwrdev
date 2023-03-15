@@ -1041,6 +1041,9 @@ public:
   void select_object(grow_tObject o);
   void add_select_object(grow_tObject o, int select);
 
+  //! Select layer.
+  void select_layer(grow_tObject o);
+
   //! Select next object. */
   void select_nextobject(glow_eDirection dir);
 
@@ -1510,6 +1513,11 @@ public:
       grow_tObject* object, double x, double y, int dynamic, int colortheme);
   void create_pie(grow_tObject* object, double x, double y, int colortheme);
   void create_barchart(grow_tObject* object, double x, double y);
+  void create_layer();
+  void delete_layer();
+  void merge_visible_layers();
+  void merge_all_layers();
+  void move_select_to_layer();
   void create_dashcell(grow_tObject* object, double x, double y, int colortheme);
   int create_dashcell_next(grow_tObject *object, int colortheme, int select, char *attr, 
       pwr_tTypeId atype);

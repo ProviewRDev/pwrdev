@@ -54,6 +54,7 @@ class GrowPie;
 class GrowAxis;
 class GrowImage;
 class GrowGroup;
+class GrowLayer;
 class GrowWindow;
 class GrowToolbar;
 class GrowScriptModule;
@@ -84,6 +85,7 @@ public:
   int point(GlowPoint* o, GlowTransform* trf);
   int image(GrowImage* o, void* e, void* m);
   int group(GrowGroup* o, void* e, void* m);
+  int layer(GrowLayer* o, void* e, void* m);
   int toolbar(GrowToolbar* o, void* e, void* m);
   int window(GrowWindow* o, void* e, void* m);
   int scriptmodule(GrowScriptModule* o, void* e, void* m);

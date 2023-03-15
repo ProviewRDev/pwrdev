@@ -289,5 +289,5 @@ void SubGraphsGtk::trace_scan(SubGraphsGtk* subgraphs)
 Attr* SubGraphsGtk::new_attr(void* object, attr_sItem* items, int num)
 {
   return new AttrGtk(
-      parent_wid, this, attr_eType_Attributes, object, items, num);
+      parent_wid, this, attr_eType_Attributes, object, items, num, 0);
 }

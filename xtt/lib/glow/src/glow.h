@@ -242,7 +242,8 @@ typedef enum {
   glow_eObjectType_GrowToolbar,
   glow_eObjectType_GrowBarArc,
   glow_eObjectType_GrowDashCell,
-  glow_eObjectType_GrowScriptModule
+  glow_eObjectType_GrowScriptModule,
+  glow_eObjectType_GrowLayer
 } glow_eObjectType;
 
 //! Direction of a connection points, sliders etc
@@ -1341,6 +1342,7 @@ typedef enum {
   glow_eSave_GrowDashCell = 50,
   glow_eSave_GrowDashboard = 51,
   glow_eSave_GrowScriptModule = 52,
+  glow_eSave_GrowLayer = 53,
   glow_eSave_End = 99,
   glow_eSave_Ctx_zoom_factor_x = 100,
   glow_eSave_Ctx_base_zoom_factor = 101,
@@ -1636,6 +1638,7 @@ typedef enum {
   glow_eSave_GrowCtx_dash = 2251,
   glow_eSave_GrowCtx_anti_aliasing = 2252,
   glow_eSave_GrowCtx_window_resize = 2253,
+  glow_eSave_GrowCtx_layername_cnt = 2254,
   glow_eSave_GrowSubAnnot_x_right = 2300,
   glow_eSave_GrowSubAnnot_x_left = 2301,
   glow_eSave_GrowSubAnnot_y_high = 2302,
@@ -2166,7 +2169,9 @@ typedef enum {
   glow_eSave_GrowScriptModule_bottom_border_width = 5231,
   glow_eSave_GrowScriptModule_fill_module = 5232,
   glow_eSave_GrowScriptModule_window_border_width = 5233,
-  glow_eSave_GrowScriptModule_window_switch_ratio = 5234
+  glow_eSave_GrowScriptModule_window_switch_ratio = 5234,
+  glow_eSave_GrowLayer_array_part = 5200,
+  glow_eSave_GrowLayer_grownode_part = 5201
 } glow_eSave;
 
 //! Relative or absolute position for an annotation

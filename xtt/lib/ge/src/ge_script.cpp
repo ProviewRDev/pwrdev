@@ -1153,6 +1153,28 @@ static int graph_setobjectname_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
+static int graph_setobjectvisibility_func(void* filectx, ccm_sArg* arg_list,
+    int arg_count, int* return_decl, ccm_tFloat* return_float,
+    ccm_tInt* return_int, char* return_string)
+{
+  ccm_sArg* arg_p2;
+
+  if (arg_count != 2)
+    return CCM__ARGMISM;
+
+  arg_p2 = arg_list->next;
+
+  if (arg_list->value_decl != CCM_DECL_INT)
+    return CCM__ARGMISM;
+  if (arg_p2->value_decl != CCM_DECL_INT)
+    return CCM__ARGMISM;
+
+  grow_SetObjectVisibility((grow_tObject)arg_list->value_int, 
+      (glow_eVis)arg_p2->value_int);
+  return 1;
+}
+
+
 static int graph_getobjectdyntype_func(void* filectx, ccm_sArg* arg_list,
     int arg_count, int* return_decl, ccm_tFloat* return_float,
     ccm_tInt* return_int, char* return_string)
@@ -1194,6 +1216,7 @@ static int graph_getobjectdyntype_func(void* filectx, ccm_sArg* arg_list,
   type = grow_GetObjectType(o);
   if (type == glow_eObjectType_GrowNode || type == glow_eObjectType_GrowSlider
       || type == glow_eObjectType_GrowGroup
+      || type == glow_eObjectType_GrowLayer
       || type == glow_eObjectType_GrowToolbar) {
     grow_GetUserData(o, (void**)&dyn);
     arg_p2->value_int = dyn->get_dyntype1(o);
@@ -1838,6 +1861,7 @@ static int graph_setobjectattribute_func(void* filectx, ccm_sArg* arg_list,
   if (type == glow_eObjectType_GrowNode 
       || type == glow_eObjectType_GrowSlider
       || type == glow_eObjectType_GrowGroup
+      || type == glow_eObjectType_GrowLayer
       || type == glow_eObjectType_GrowToolbar
       || type == glow_eObjectType_GrowTable
       || type == glow_eObjectType_GrowWindow
@@ -2194,6 +2218,7 @@ static int graph_getobjectattribute_func(void* filectx, ccm_sArg* arg_list,
   if (type == glow_eObjectType_GrowNode 
       || type == glow_eObjectType_GrowSlider
       || type == glow_eObjectType_GrowGroup
+      || type == glow_eObjectType_GrowLayer
       || type == glow_eObjectType_GrowToolbar
       || type == glow_eObjectType_GrowTable
       || type == glow_eObjectType_GrowWindow
@@ -3491,7 +3516,7 @@ static int graph_createobject_func(void* filectx, ccm_sArg* arg_list,
     return 1;
   }
 
-  sprintf(name, "O%d", grow_GetNextObjectNameNumber(graph->grow->ctx));
+  sprintf(name, "O%d", grow_IncrNextObjectNameNumber(graph->grow->ctx));
 
   if (!grow_IsSliderClass(nc))
     grow_CreateGrowNode(graph->grow->ctx, name, nc, x1, y1, NULL, &n1);
@@ -4464,6 +4489,35 @@ static int graph_createtoolbar_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
+static int graph_createlayer_func(void* filectx, ccm_sArg* arg_list,
+    int arg_count, int* return_decl, ccm_tFloat* return_float,
+    ccm_tInt* return_int, char* return_string)
+{
+  Graph* graph;
+  char name[80];
+  grow_tObject layer;
+    
+  if (arg_count != 0)
+    return CCM__ARGMISM;
+
+  graph_get_stored_graph(&graph);
+
+  sprintf(name, "Layer%d", grow_IncrNextLayerNameNumber(graph->grow->ctx));
+
+  grow_CreateGrowLayer(graph->grow->ctx, name, NULL, &layer);
+
+  GeDyn* dyn = new GeDyn(graph);
+  grow_SetUserData(layer, (void*)dyn);
+
+  graph->current_cmd_object = layer;
+
+  grow_SetModified(graph->grow->ctx, 1);
+
+  *return_int = (long int)graph->current_cmd_object;
+  *return_decl = CCM_DECL_INT;
+  return 1;
+}
+
 static int graph_getgraphname_func(void* filectx, ccm_sArg* arg_list,
     int arg_count, int* return_decl, ccm_tFloat* return_float,
     ccm_tInt* return_int, char* return_string)
@@ -4981,6 +5035,141 @@ static int graph_setgraphoptions_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
+static int graph_layersetactive_func(void* filectx, ccm_sArg* arg_list,
+    int arg_count, int* return_decl, ccm_tFloat* return_float,
+    ccm_tInt* return_int, char* return_string)
+{
+  ccm_sArg* arg_p2;
+  arg_p2 = arg_list->next;
+
+  if (arg_count != 2)
+    return CCM__ARGMISM;
+
+  if (arg_list->value_decl != CCM_DECL_INT)
+    return CCM__ARGMISM;
+
+  if (arg_p2->value_decl != CCM_DECL_INT)
+    return CCM__ARGMISM;
+
+  grow_LayerSetActive((grow_tObject)arg_list->value_int, arg_p2->value_int);
+
+  return 1;
+}
+
+static int graph_layerresetactiveall_func(void* filectx, ccm_sArg* arg_list,
+    int arg_count, int* return_decl, ccm_tFloat* return_float,
+    ccm_tInt* return_int, char* return_string)
+{
+  Graph* graph;
+
+  if (arg_count != 0)
+    return CCM__ARGMISM;
+
+  graph_get_stored_graph(&graph);
+
+  grow_LayerResetActiveAll(graph->grow->ctx);
+
+  return 1;
+}
+
+static int graph_layergetfirstobject_func(void* filectx, ccm_sArg* arg_list,
+    int arg_count, int* return_decl, ccm_tFloat* return_float,
+    ccm_tInt* return_int, char* return_string)
+{
+  grow_tObject first;
+  int sts;
+
+  if (arg_count != 1)
+    return CCM__ARGMISM;
+
+  if (arg_list->value_decl != CCM_DECL_INT)
+    return CCM__ARGMISM;
+
+  sts = grow_LayerGetFirstObject((grow_tObject)arg_list->value_int, &first);
+  if (ODD(sts))
+    *return_int = (long int)first;
+  else
+    *return_int = 0;
+  *return_decl = CCM_DECL_INT;
+
+  return 1;
+}
+
+static int graph_layergetnextobject_func(void* filectx, ccm_sArg* arg_list,
+    int arg_count, int* return_decl, ccm_tFloat* return_float,
+    ccm_tInt* return_int, char* return_string)
+{
+  grow_tObject next;
+  int sts;
+  ccm_sArg* arg_p2;
+
+  if (arg_count != 2)
+    return CCM__ARGMISM;
+
+  if (arg_list->value_decl != CCM_DECL_INT)
+    return CCM__ARGMISM;
+
+  arg_p2 = arg_list->next;
+  if (arg_p2->value_decl != CCM_DECL_INT)
+    return CCM__ARGMISM;
+
+  sts = grow_LayerGetNextObject((grow_tObject)arg_list->value_int,
+      (grow_tObject)arg_p2->value_int, &next);
+  if (ODD(sts))
+    *return_int = (long int)next;
+  else
+    *return_int = 0;
+  *return_decl = CCM_DECL_INT;
+
+  return 1;
+}
+
+static int graph_mergevisiblelayers_func(void* filectx, ccm_sArg* arg_list,
+    int arg_count, int* return_decl, ccm_tFloat* return_float,
+    ccm_tInt* return_int, char* return_string)
+{
+  Graph* graph;
+
+  if (arg_count != 0)
+    return CCM__ARGMISM;
+
+  graph_get_stored_graph(&graph);
+
+  grow_MergeVisibleLayers(graph->grow->ctx);
+  return 1;
+}
+
+static int graph_mergealllayers_func(void* filectx, ccm_sArg* arg_list,
+    int arg_count, int* return_decl, ccm_tFloat* return_float,
+    ccm_tInt* return_int, char* return_string)
+{
+  Graph* graph;
+
+  if (arg_count != 0)
+    return CCM__ARGMISM;
+
+  graph_get_stored_graph(&graph);
+
+  grow_MergeAllLayers(graph->grow->ctx);
+  return 1;
+}
+
+static int graph_moveselecttolayer_func(void* filectx, ccm_sArg* arg_list,
+    int arg_count, int* return_decl, ccm_tFloat* return_float,
+    ccm_tInt* return_int, char* return_string)
+{
+  Graph* graph;
+
+  if (arg_count != 0)
+    return CCM__ARGMISM;
+
+  graph_get_stored_graph(&graph);
+
+  grow_MoveSelectToLayer(graph->grow->ctx);
+  return 1;
+}
+
+
 int Graph::script_func_register(void)
 {
   int sts;
@@ -5187,6 +5376,10 @@ int Graph::script_func_register(void)
   if (EVEN(sts))
     return sts;
   sts = ccm_register_function(
+      "Ge", "SetObjectVisibility", graph_setobjectvisibility_func);
+  if (EVEN(sts))
+    return sts;
+  sts = ccm_register_function(
       "Ge", "FindObjectByName", graph_findobjectbyname_func);
   if (EVEN(sts))
     return sts;
@@ -5338,6 +5531,9 @@ int Graph::script_func_register(void)
   sts = ccm_register_function("Ge", "CreateToolbar", graph_createtoolbar_func);
   if (EVEN(sts))
     return sts;
+  sts = ccm_register_function("Ge", "CreateLayer", graph_createlayer_func);
+  if (EVEN(sts))
+    return sts;
   sts = ccm_register_function(
       "Ge", "GetInstanceObject", graph_getinstanceobject_func);
   if (EVEN(sts))
@@ -5363,6 +5559,29 @@ int Graph::script_func_register(void)
   if (EVEN(sts))
     return sts;
   sts = ccm_register_function("Ge", "TranslateObjectName", graph_translateobjectname_func);
+  if (EVEN(sts))
+    return sts;
+  sts = ccm_register_function("Ge", "LayerSetActive", graph_layersetactive_func);
+  if (EVEN(sts))
+    return sts;
+  sts = ccm_register_function("Ge", "LayerResetActiveAll", graph_layerresetactiveall_func);
+  if (EVEN(sts))
+    return sts;
+  sts = ccm_register_function("Ge", "MergeVisibleLayers", graph_mergevisiblelayers_func);
+  if (EVEN(sts))
+    return sts;
+  sts = ccm_register_function("Ge", "MergeAllLayers", graph_mergealllayers_func);
+  if (EVEN(sts))
+    return sts;
+  sts = ccm_register_function("Ge", "MoveSelectToLayer", graph_moveselecttolayer_func);
+  if (EVEN(sts))
+    return sts;
+  sts = ccm_register_function(
+      "Ge", "LayerGetFirstObject", graph_layergetfirstobject_func);
+  if (EVEN(sts))
+    return sts;
+  sts = ccm_register_function(
+      "Ge", "LayerGetNextObject", graph_layergetnextobject_func);
   if (EVEN(sts))
     return sts;
   
@@ -5423,6 +5642,8 @@ int Graph::script_func_register(void)
       glow_eObjectType_GrowBarChart, 0);
   sts = ccm_create_external_var("eObjectType_Toolbar", CCM_DECL_INT, 0,
       glow_eObjectType_GrowToolbar, 0);
+  sts = ccm_create_external_var("eObjectType_Layer", CCM_DECL_INT, 0,
+      glow_eObjectType_GrowLayer, 0);
 
   sts = ccm_create_external_var(
       "mDynType1_No", CCM_DECL_INT, 0, ge_mDynType1_No, 0);
@@ -5672,6 +5893,13 @@ int Graph::script_func_register(void)
       glow_eDirection_Up, 0);
   sts = ccm_create_external_var("eDirection_Down", CCM_DECL_INT, 0,
       glow_eDirection_Down, 0);
+
+  sts = ccm_create_external_var("eVis_Visible", CCM_DECL_INT, 0,
+      glow_eVis_Visible, 0);
+  sts = ccm_create_external_var("eVis_Visible", CCM_DECL_INT, 0,
+      glow_eVis_Invisible, 0);
+  sts = ccm_create_external_var("eVis_Dimmed", CCM_DECL_INT, 0,
+      glow_eVis_Dimmed, 0);
 
   sts = ccm_create_external_var("BORDER", CCM_DECL_INT, 0,
       -1, 0);
@@ -6028,6 +6256,7 @@ int gsc_SetObjectAttribute(Graph* graph, grow_tObject id, const char* aname, voi
   if (type == glow_eObjectType_GrowNode 
       || type == glow_eObjectType_GrowSlider
       || type == glow_eObjectType_GrowGroup
+      || type == glow_eObjectType_GrowLayer
       || type == glow_eObjectType_GrowToolbar
       || type == glow_eObjectType_GrowTable
       || type == glow_eObjectType_GrowWindow
@@ -6311,6 +6540,7 @@ int gsc_GetObjectAttribute(Graph* graph, grow_tObject id, const char* aname, voi
   if (type == glow_eObjectType_GrowNode 
       || type == glow_eObjectType_GrowSlider
       || type == glow_eObjectType_GrowGroup
+      || type == glow_eObjectType_GrowLayer
       || type == glow_eObjectType_GrowToolbar
       || type == glow_eObjectType_GrowTable
       || type == glow_eObjectType_GrowWindow

@@ -936,7 +936,7 @@ int KeyboardCtx::event_handler(glow_eEvent event, int x, int y, int w, int h)
       mw.window_height = height;
     }
 
-    draw(&mw, x, y, x + w, y + h);
+    draw_invalidated(&mw, x, y, x + w, y + h);
     break;
   default:;
   }

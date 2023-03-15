@@ -236,28 +236,32 @@ void GlowNode::open(std::ifstream& fp)
     case glow_eSave_Node_nc:
       fp.get();
       fp.getline(nc_name, sizeof(nc_name));
-      if (ctx->type() != glow_eCtxType_Grow
-          || (!(((GrowNode*)this)->type() == glow_eObjectType_GrowGroup ||
+      if (strcmp(nc_name, "__layer_class") == 0)
+	nc = new GlowNodeClass(ctx, "__layer_class");
+      else {
+        if (ctx->type() != glow_eCtxType_Grow
+            || (!(((GrowNode*)this)->type() == glow_eObjectType_GrowGroup ||
 		((GrowNode*)this)->type() == glow_eObjectType_GrowDashCell))) {
-        nc = (GlowNodeClass*)ctx->get_nodeclass_from_name(nc_name);
-        if (!nc && ctx->type() == glow_eCtxType_Grow) {
-          // If grow, load subgraph
-          sts = ctx->open_subgraph_from_name(nc_name, glow_eSaveMode_SubGraph);
-          if (ODD(sts)) {
-            nc = (GlowNodeClass*)ctx->get_nodeclass_from_name(nc_name);
-            if (nc)
-              nc->nc_extern = 1;
-          }
-        }
-        if (!nc)
-          std::cout << "GlowNode:nodeclass not found: " << nc_name << '\n';
+          nc = (GlowNodeClass*)ctx->get_nodeclass_from_name(nc_name);
+          if (!nc && ctx->type() == glow_eCtxType_Grow) {
+	    // If grow, load subgraph
+	    sts = ctx->open_subgraph_from_name(nc_name, glow_eSaveMode_SubGraph);
+	    if (ODD(sts)) {
+	      nc = (GlowNodeClass*)ctx->get_nodeclass_from_name(nc_name);
+	      if (nc)
+		nc->nc_extern = 1;
+	    }
+	  }
+	  if (!nc)
+	    std::cout << "GlowNode:nodeclass not found: " << nc_name << '\n';
 
-        if (nc && ctx->environment == glow_eEnv_Runtime
-            && nc->recursive_trace) {
-          // Create local copy of nodeclass
-          nc = new GlowNodeClass(*nc);
-          local_nc = 1;
-        }
+	  if (nc && ctx->environment == glow_eEnv_Runtime
+              && nc->recursive_trace) {
+	    // Create local copy of nodeclass
+	    nc = new GlowNodeClass(*nc);
+	    local_nc = 1;
+	  }
+	}
         nc_root = nc;
       }
       break;

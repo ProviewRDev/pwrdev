@@ -67,6 +67,7 @@
 #include "glow_exportflow.h"
 #include "glow_exportscript.h"
 #include "glow_dashboard.h"
+#include "glow_growlayer.h"
 #include "glow_growscriptmodule.h"
 
 #include "glow_msg.h"
@@ -85,7 +86,8 @@ public:
 
 GrowCtx::GrowCtx(const char* ctx_name, double zoom_fact)
     : GlowCtx(ctx_name, zoom_fact), edit_mode(grow_eMode_Edit),
-      conpoint_num_cnt(0), objectname_cnt(0), polyline_not_first(0),
+      conpoint_num_cnt(0), objectname_cnt(0), layername_cnt(1),
+      polyline_not_first(0),
       background_color(glow_eDrawType_LineErase), highlight_disabled(0),
       dynamic(0), dynamicsize(0), arg_cnt(0), x0(0), y0(0), x1(0), y1(0),
       path_cnt(0), dyn_type1(0), dyn_type2(0), dyn_action_type1(0),
@@ -205,10 +207,10 @@ int GrowCtx::subw_event_handler(glow_eEvent event, int x, int y, int w, int h)
     }
   }
 
-  for (i = a.a_size - 1; i >= 0; i--) {
-    if (a[i]->type() == glow_eObjectType_GrowWindow
-        || a[i]->type() == glow_eObjectType_GrowFolder
-        || a[i]->type() == glow_eObjectType_GrowTable) {
+  for (i = layer->a_size - 1; i >= 0; i--) {
+    if (layer->a[i]->type() == glow_eObjectType_GrowWindow
+        || layer->a[i]->type() == glow_eObjectType_GrowFolder
+        || layer->a[i]->type() == glow_eObjectType_GrowTable) {
       switch (event) {
       case glow_eEvent_Leave:
       case glow_eEvent_Enter:
@@ -226,18 +228,18 @@ int GrowCtx::subw_event_handler(glow_eEvent event, int x, int y, int w, int h)
       case glow_eEvent_Key_ShiftTab:
       case glow_eEvent_Key_Escape:
       case glow_eEvent_Key_Ascii:
-        sts = a[i]->event_handler(&mw, event, w, 0, 0, 0);
+        sts = layer->a[i]->event_handler(&mw, event, w, 0, 0, 0);
         if (sts) {
           return sts;
         }
       case glow_eEvent_MB1Click:
       case glow_eEvent_MB2Click:
       case glow_eEvent_MB3Click:
-        sts = a[i]->event_handler(&mw, event, x, y, fx, fy);
+        sts = layer->a[i]->event_handler(&mw, event, x, y, fx, fy);
         if (sts) {
           // Check if any menue is active
-          if (a.a_size
-              && a[a.a_size - 1]->type() == glow_eObjectType_GrowMenu) {
+          if (layer->a_size
+              && layer->a[layer->a_size - 1]->type() == glow_eObjectType_GrowMenu) {
             // Send backcall to reset menu
             if (event_callback[event] && sts != GLOW__NO_PROPAGATE
                 && event != event_move_node) {
@@ -256,7 +258,7 @@ int GrowCtx::subw_event_handler(glow_eEvent event, int x, int y, int w, int h)
           return sts;
         }
       default:
-        sts = a[i]->event_handler(&mw, event, x, y, fx, fy);
+        sts = layer->a[i]->event_handler(&mw, event, x, y, fx, fy);
         if (sts) {
           return sts;
         }
@@ -1371,6 +1373,7 @@ int GrowCtx::event_handler(glow_eEvent event, int x, int y, int w, int h)
       node_movement_active = 0;
       nav_zoom();
       gdraw->set_cursor(&mw, glow_eDrawCursor_CrossHair);
+      set_layer_borders();
     } else if (node_movement_active) {
       int move_x, move_y;
       double cursor_y, cursor_x;
@@ -1605,6 +1608,7 @@ int GrowCtx::event_handler(glow_eEvent event, int x, int y, int w, int h)
       case glow_eMoveRestriction_Disable:
         break;
       }
+      set_layer_borders();
     } else if (select_rect_active && edit_mode != grow_eMode_Scale) {
       glow_eSelectPolicy policy;
 
@@ -1712,6 +1716,7 @@ int GrowCtx::event_handler(glow_eEvent event, int x, int y, int w, int h)
           event_callback[select_rect_event](this, &e);
         }
       }
+      set_layer_borders();
     } else if (select_rect_active && edit_mode == grow_eMode_Scale) {
     } else if (con_create_active) {
       int ll_x, ll_y, ur_x, ur_y;
@@ -1800,6 +1805,7 @@ int GrowCtx::event_handler(glow_eEvent event, int x, int y, int w, int h)
         }
       }
       con_create_active = 0;
+      set_layer_borders();
     }
     break;
   case glow_eEvent_Enter:
@@ -1960,6 +1966,8 @@ void GrowCtx::save_grow(std::ofstream& fp, glow_eSaveMode mode)
   fp << int(glow_eSave_GrowCtx_conpoint_num_cnt) << FSPACE << conpoint_num_cnt
      << '\n';
   fp << int(glow_eSave_GrowCtx_objectname_cnt) << FSPACE << objectname_cnt
+     << '\n';
+  fp << int(glow_eSave_GrowCtx_layername_cnt) << FSPACE << layername_cnt
      << '\n';
   fp << int(glow_eSave_GrowCtx_name) << FSPACE << name << '\n';
   fp << int(glow_eSave_GrowCtx_background_color) << FSPACE
@@ -2124,6 +2132,9 @@ void GrowCtx::open_grow(std::ifstream& fp)
       break;
     case glow_eSave_GrowCtx_objectname_cnt:
       fp >> objectname_cnt;
+      break;
+    case glow_eSave_GrowCtx_layername_cnt:
+      fp >> layername_cnt;
       break;
     case glow_eSave_GrowCtx_name:
       fp.get();
@@ -2529,6 +2540,7 @@ void GrowCtx::clear_all(int keep_paste)
   int i;
   GlowArrayElem* element;
 
+  layer = &a;
   delete_all();
   version = GLOW_VERSION;
   conpoint_num_cnt = 0;
@@ -2623,6 +2635,20 @@ void GrowCtx::redraw_defered()
       draw(&navw, navw.defered_x_low, navw.defered_y_low, navw.defered_x_high,
           navw.defered_y_high);
   }
+}
+
+void GrowCtx::redraw()
+{
+  if (a.size() == 0)
+    return;
+
+  gdraw->get_window_size(&mw, &mw.window_width, &mw.window_height);
+  get_borders();
+  clear(&mw);
+  draw(&mw, mw.subwindow_x, mw.subwindow_y, mw.subwindow_x + mw.window_width,
+      mw.subwindow_y + mw.window_height);
+  nav_zoom();
+  change_scrollbar();
 }
 
 void GrowCtx::draw(GlowWind* w, int ll_x, int ll_y, int ur_x, int ur_y)
@@ -2984,7 +3010,8 @@ void GrowCtx::set_dynamic(char* code, int size)
 void GrowCtx::pop_select()
 {
   for (int i = 0; i < a_sel.size(); i++) {
-    a.pop(a_sel[i]);
+    if (layer->find(a_sel[i]))
+      layer->pop(a_sel[i]);
   }
   redraw();
 }
@@ -2992,7 +3019,8 @@ void GrowCtx::pop_select()
 void GrowCtx::push_select()
 {
   for (int i = 0; i < a_sel.size(); i++) {
-    a.push(a_sel[i]);
+    if (layer->find(a_sel[i]))
+      layer->push(a_sel[i]);
   }
   redraw();
 }
@@ -3949,7 +3977,9 @@ int GrowCtx::group_select(GlowArrayElem** group, char* last_group)
         || a_sel[i]->type() == glow_eObjectType_GrowFolder
         || a_sel[i]->type() == glow_eObjectType_GrowTable)
       return GLOW__GROUPCLASS;
-  }
+    else if (!layer->find(a_sel[i]))
+      return GLOW__OTHERLAYER;
+  } 
 
   strcpy(last_group, a_sel.get_last_group());
 
@@ -3957,10 +3987,10 @@ int GrowCtx::group_select(GlowArrayElem** group, char* last_group)
   sprintf(name, "Grp%d_", objectname_cnt++);
 
   // The objects i the group has to be in the same order as a
-  for (i = 0; i < a.size(); i++) {
+  for (i = 0; i < layer->size(); i++) {
     for (j = 0; j < a_sel.size(); j++) {
-      if (a[i] == a_sel[j]) {
-        a_group.insert(a[i]);
+      if (layer->a[i] == a_sel[j]) {
+        a_group.insert(layer->a[i]);
         break;
       }
     }
@@ -3972,10 +4002,10 @@ int GrowCtx::group_select(GlowArrayElem** group, char* last_group)
 
   // Remove objects
   for (i = 0; i < a_sel.size(); i++)
-    a.remove(a_sel.a[i]);
+    layer->remove(a_sel.a[i]);
   a_sel.clear();
 
-  a.insert(g1);
+  layer->insert(g1);
   *group = g1;
   return 1;
 }
@@ -4868,3 +4898,98 @@ void GrowCtx::get_dashboard_info(double* cell_width, double* cell_height,
   *columns = dash->dash_columns;
   *rows = dash->dash_rows;
 }
+
+int GrowCtx::get_active_layer(GrowLayer **layer)
+{
+  for (int i = 0; i < a.a_size; i++) {
+    if (a[i]->type() == glow_eObjectType_GrowLayer &&
+	((GrowLayer*)a[i])->is_active()) {
+      *layer = (GrowLayer*)a[i];
+      return 1;
+    }      
+  }
+  return 0;
+}
+
+int GrowCtx::merge_visible_layers()
+{
+  GrowLayer *target;
+  int found = 0;
+  char name[80];
+
+  // Merge to active layer
+  for (int i = 0; i < a.a_size; i++) {
+    if (a[i]->type() == glow_eObjectType_GrowLayer &&
+	((GrowLayer*)a[i])->is_active() &&
+	a[i]->get_visibility() == glow_eVis_Visible) {
+      target = (GrowLayer*)a[i];
+      found = 1;
+    }      
+  }
+
+  if (!found) {
+    // Merge to first layer
+    for (int i = 0; i < a.a_size; i++) {
+      if (a[i]->type() == glow_eObjectType_GrowLayer &&
+	  a[i]->get_visibility() == glow_eVis_Visible) {
+	target = (GrowLayer*)a[i];
+	found = 1;
+      }      
+    }
+  }
+  if (!found)
+    return 0;
+  
+  for (int i = 0; i < a.a_size; i++) {
+    if (a[i]->type() == glow_eObjectType_GrowLayer &&
+	a[i]->get_visibility() == glow_eVis_Visible &&
+	a[i] != target) {
+      target->merge(*(GlowArray*)((GrowLayer*)a[i]));
+      delete_object(a[i]);
+      i--;
+    }      
+  }
+  strcpy(name, "Merged");
+  strncat(name, target->n_name, sizeof(name));
+  strncpy(target->n_name, name, sizeof(target->n_name));
+  return 1;
+}
+
+int GrowCtx::merge_all_layers()
+{
+  for (int i = 0; i < a.a_size; i++) {
+    if (a[i]->type() == glow_eObjectType_GrowLayer) {
+      a.merge(*(GlowArray*)((GrowLayer*)a[i]));
+      delete_object(a[i]);
+      i--;
+    }      
+  }
+  return 1;
+}
+
+int GrowCtx::move_select_to_layer()
+{
+  for (int i = 0; i < a_sel.a_size; i++) {
+    if (a_sel[i]->type() == glow_eObjectType_GrowLayer)
+      continue;
+
+    remove(a_sel[i]);
+    insert(a_sel[i]);
+  }
+  return 1;
+}
+
+void GrowCtx::layer_reset_active_all()
+{
+  for (int i = 0; i < a.a_size; i++) {
+    if (a[i]->type() == glow_eObjectType_GrowLayer)
+      ((GrowLayer*)a[i])->set_active(0);
+  }
+}
+
+void GrowCtx::set_layer_borders() 
+{
+  if (layer != &a)
+    ((GrowLayer*)layer)->get_node_borders();
+}
+

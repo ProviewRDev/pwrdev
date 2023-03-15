@@ -75,6 +75,8 @@ class GeGtk : public Ge {
   GtkWidget* view_objectnav_w;
   GtkWidget* graph_list;
   GtkWidget* objectnav_w;
+  GtkWidget* layernav_w;
+  GtkWidget* vpaned3;
   GtkWidget* hpaned3;
   GdkAtom graph_atom;
   CoWowRecall* text_recall;
@@ -126,6 +128,11 @@ public:
   static void create_india_text(GtkWidget* w, gpointer gectx);
 
   static void activate_create_subgraph(GtkWidget* w, gpointer gectx);
+  static void activate_create_layer(GtkWidget* w, gpointer gectx);
+  static void activate_delete_layer(GtkWidget* w, gpointer gectx);
+  static void activate_merge_visible_layers(GtkWidget* w, gpointer gectx);
+  static void activate_merge_all_layers(GtkWidget* w, gpointer gectx);
+  static void activate_move_select_to_layer(GtkWidget* w, gpointer gectx);
   static void activate_change_text(GtkWidget* w, gpointer gectx);
   static void activate_search_object(GtkWidget* w, gpointer gectx);
   static void activate_preview_start(GtkWidget* w, gpointer gectx);

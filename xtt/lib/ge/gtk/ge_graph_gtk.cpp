@@ -131,7 +131,7 @@ Attr* GraphGtk::attr_new(void* parent_ctx, attr_eType type, void* object,
     attr_sItem* itemlist, int item_cnt)
 {
   AttrGtk* attr
-      = new AttrGtk(parent_wid, parent_ctx, type, object, itemlist, item_cnt);
+      = new AttrGtk(parent_wid, parent_ctx, type, object, itemlist, item_cnt, 0);
   return attr;
 }
 

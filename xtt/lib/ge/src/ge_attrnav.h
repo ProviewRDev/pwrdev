@@ -61,10 +61,15 @@ typedef enum {
 typedef enum {
   attr_eList_Objects,
   attr_eList_Group,
+  attr_eList_Layer,
   attr_eList_Select
 } attr_eList;
 
-typedef enum { attr_eType_Attributes, attr_eType_ObjectTree } attr_eType;
+typedef enum { 
+  attr_eType_Attributes, 
+  attr_eType_ObjectTree,
+  attr_eType_Layers
+} attr_eType;
 
 typedef enum {
   attr_eFilterType_No,
@@ -128,6 +133,8 @@ public:
   flow_sAnnotPixmap* pixmap_attr;
   flow_sAnnotPixmap* pixmap_attrarray;
   flow_sAnnotPixmap* pixmap_openattr;
+  flow_sAnnotPixmap* pixmap_view;
+  flow_sAnnotPixmap* pixmap_hide;
 
   void free_pixmaps();
   void allocate_pixmaps();
@@ -139,7 +146,9 @@ public:
 class AttrNav {
 public:
   AttrNav(void* xn_parent_ctx, attr_eType xn_type, const char* xn_name,
-      attr_sItem* xn_itemlist, int xn_item_cnt, pwr_tStatus* status);
+      attr_sItem* xn_itemlist, int xn_item_cnt,
+      void (*xn_get_object_list_cb)(void*, unsigned int, grow_tObject**, int*, 
+      grow_tObject*, int), pwr_tStatus* status);
   virtual ~AttrNav();
 
   void* parent_ctx;
@@ -174,7 +183,7 @@ public:
   void force_trace_scan();
   int object_attr();
   int object_tree();
-  void refresh_objects(unsigned int type);
+  void refresh_objects(unsigned int rtype);
   void object_open_check(
       AItemObject* item, grow_tObject* open_list, int* open_type, int open_cnt);
   brow_tObject gobject_to_bobject(grow_tObject gobject);

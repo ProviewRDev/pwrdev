@@ -476,6 +476,31 @@ void GeGtk::activate_create_subgraph(GtkWidget* w, gpointer gectx)
   ((Ge*)gectx)->graph->create_node_floating(0, 0);
 }
 
+void GeGtk::activate_create_layer(GtkWidget* w, gpointer gectx)
+{
+  ((Ge*)gectx)->graph->create_layer();
+}
+
+void GeGtk::activate_delete_layer(GtkWidget* w, gpointer gectx)
+{
+  ((Ge*)gectx)->graph->delete_layer();
+}
+
+void GeGtk::activate_merge_visible_layers(GtkWidget* w, gpointer gectx)
+{
+  ((Ge*)gectx)->graph->merge_visible_layers();
+}
+
+void GeGtk::activate_merge_all_layers(GtkWidget* w, gpointer gectx)
+{
+  ((Ge*)gectx)->graph->merge_all_layers();
+}
+
+void GeGtk::activate_move_select_to_layer(GtkWidget* w, gpointer gectx)
+{
+  ((Ge*)gectx)->graph->move_select_to_layer();
+}
+
 void GeGtk::activate_change_text(GtkWidget* w, gpointer gectx)
 {
   ((Ge*)gectx)->activate_change_text();
@@ -1296,7 +1321,7 @@ void GeGtk::activate_view_graphlist(GtkWidget* w, gpointer data)
   int objectnav_visible;
 
   g_object_get(((GeGtk*)ge)->hpaned3, "visible", &pane_visible, NULL);
-  g_object_get(((GeGtk*)ge)->objectnav_w, "visible", &objectnav_visible, NULL);
+  g_object_get(((GeGtk*)ge)->vpaned3, "visible", &objectnav_visible, NULL);
   int set = (int)gtk_check_menu_item_get_active(
       GTK_CHECK_MENU_ITEM(((GeGtk*)ge)->view_graphlist_w));
   if (w != ((GeGtk*)ge)->view_graphlist_w) {
@@ -1336,11 +1361,11 @@ void GeGtk::activate_view_objectnav(GtkWidget* w, gpointer data)
   if (set) {
     if (!pane_visible)
       g_object_set(((GeGtk*)ge)->hpaned3, "visible", TRUE, NULL);
-    g_object_set(((GeGtk*)ge)->objectnav_w, "visible", TRUE, NULL);
+    g_object_set(((GeGtk*)ge)->vpaned3, "visible", TRUE, NULL);
     ge->set_focus(ge->objectnav);
     ge->objectnav_mapped = 1;
   } else {
-    g_object_set(((GeGtk*)ge)->objectnav_w, "visible", FALSE, NULL);
+    g_object_set(((GeGtk*)ge)->vpaned3, "visible", FALSE, NULL);
     if (!graph_list_visible && pane_visible)
       g_object_set(((GeGtk*)ge)->hpaned3, "visible", FALSE, NULL);
     ge->set_focus(0);
@@ -1623,6 +1648,8 @@ GeGtk::~GeGtk()
     delete plantctx;
   if (objectnav)
     delete objectnav;
+  if (layernav)
+    delete layernav;
   gtk_widget_destroy(india_widget);
   gtk_widget_destroy(confirm_widget);
   gtk_widget_destroy(yesnodia_widget);
@@ -2276,6 +2303,43 @@ GeGtk::GeGtk(void* x_parent_ctx, GtkWidget* x_parent_widget,
   gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), functions);
   gtk_menu_item_set_submenu(
       GTK_MENU_ITEM(functions), GTK_WIDGET(functions_menu));
+
+  // Layers entry
+  GtkWidget* layers_create_layer
+      = gtk_menu_item_new_with_mnemonic("_Create Layer");
+  g_signal_connect(layers_create_layer, "activate",
+      G_CALLBACK(activate_create_layer), this);
+
+  GtkWidget* layers_delete_layer
+      = gtk_menu_item_new_with_mnemonic("_Delete Layer");
+  g_signal_connect(layers_delete_layer, "activate",
+      G_CALLBACK(activate_delete_layer), this);
+
+  GtkWidget* layers_merge_visible_layers
+      = gtk_menu_item_new_with_mnemonic("_Merge visible Layers");
+  g_signal_connect(layers_merge_visible_layers, "activate",
+      G_CALLBACK(activate_merge_visible_layers), this);
+
+  GtkWidget* layers_merge_all_layers
+      = gtk_menu_item_new_with_mnemonic("M_erge all Layers");
+  g_signal_connect(layers_merge_all_layers, "activate",
+      G_CALLBACK(activate_merge_all_layers), this);
+
+  GtkWidget* layers_move_select_to_layer
+      = gtk_menu_item_new_with_mnemonic("M_ove Selected to Layer");
+  g_signal_connect(layers_move_select_to_layer, "activate",
+      G_CALLBACK(activate_move_select_to_layer), this);
+
+  GtkMenu* layers_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
+  gtk_menu_shell_append(GTK_MENU_SHELL(layers_menu), layers_create_layer);
+  gtk_menu_shell_append(GTK_MENU_SHELL(layers_menu), layers_delete_layer);
+  gtk_menu_shell_append(GTK_MENU_SHELL(layers_menu), layers_move_select_to_layer);
+  gtk_menu_shell_append(GTK_MENU_SHELL(layers_menu), layers_merge_visible_layers);
+  gtk_menu_shell_append(GTK_MENU_SHELL(layers_menu), layers_merge_all_layers);
+
+  GtkWidget* layers = gtk_menu_item_new_with_mnemonic("_Layers");
+  gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), layers);
+  gtk_menu_item_set_submenu(GTK_MENU_ITEM(layers), GTK_WIDGET(layers_menu));
 
   // Menu Connections
   // Submenu Conpoint Direction
@@ -3058,7 +3122,10 @@ GeGtk::GeGtk(void* x_parent_ctx, GtkWidget* x_parent_widget,
   GtkWidget* hpaned2 = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
   hpaned3 = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
 
-  objectnav = new AttrGtk(hpaned3, this, attr_eType_ObjectTree, 0, 0, 0);
+  vpaned3 = gtk_paned_new(GTK_ORIENTATION_VERTICAL);
+
+  objectnav = new AttrGtk(vpaned3, this, attr_eType_ObjectTree, 0, 0, 0,
+      graph_get_object_list_cb);
   objectnav_w = ((AttrGtk*)objectnav)->brow_widget;
   objectnav->set_graph(graph);
   objectnav->close_cb = graph_attr_close_cb;
@@ -3072,18 +3139,45 @@ GeGtk::GeGtk(void* x_parent_ctx, GtkWidget* x_parent_widget,
   objectnav->get_plant_select_cb = graph_get_plant_select_cb;
   objectnav->get_current_colors_cb = graph_get_current_colors_cb;
   objectnav->get_current_color_tone_cb = graph_get_current_color_tone_cb;
-  objectnav->get_object_list_cb = graph_get_object_list_cb;
+  //objectnav->get_object_list_cb = graph_get_object_list_cb;
   objectnav->open_value_input_cb = objectnav_change_value_cb;
   objectnav->set_inputfocus_cb = set_focus_cb;
   objectnav->traverse_inputfocus_cb = traverse_focus;
 
+  layernav = new AttrGtk(vpaned3, this, attr_eType_Layers, 0, 0, 0,
+      graph_get_object_list_cb);
+  layernav_w = ((AttrGtk*)layernav)->brow_widget;
+  layernav->set_graph(graph);
+  layernav->close_cb = graph_attr_close_cb;
+  layernav->redraw_cb = graph_attr_redraw_cb;
+  layernav->get_subgraph_info_cb = graph_get_subgraph_info_cb;
+  layernav->get_dyn_info_cb = graph_get_dyn_info_cb;
+  layernav->reconfigure_attr_cb = graph_reconfigure_attr_cb;
+  layernav->store_cb = graph_attr_store_cb;
+  layernav->recall_cb = graph_attr_recall_cb;
+  layernav->set_data_cb = graph_attr_set_data_cb;
+  layernav->get_plant_select_cb = graph_get_plant_select_cb;
+  layernav->get_current_colors_cb = graph_get_current_colors_cb;
+  layernav->get_current_color_tone_cb = graph_get_current_color_tone_cb;
+  //layernav->get_object_list_cb = graph_get_object_list_cb;
+  layernav->open_value_input_cb = objectnav_change_value_cb;
+  layernav->set_inputfocus_cb = set_focus_cb;
+  layernav->traverse_inputfocus_cb = traverse_focus;
+
+  gtk_paned_pack1(GTK_PANED(vpaned3), objectnav_w, TRUE, TRUE);
+  gtk_paned_pack2(GTK_PANED(vpaned3), layernav_w, FALSE, TRUE);
+  gtk_paned_set_wide_handle(GTK_PANED(vpaned3), TRUE);
+  gtk_widget_show( vpaned3);
+
   gtk_paned_pack1(GTK_PANED(vpaned1), palbox, TRUE, TRUE);
   gtk_paned_pack2(GTK_PANED(vpaned1), colpal_main_widget, FALSE, TRUE);
+  gtk_paned_set_wide_handle(GTK_PANED(vpaned1), TRUE);
 
   ((GraphGtk*)graph)->create_navigator(vpaned1);
   gtk_paned_pack1(GTK_PANED(vpaned2), vpaned1, TRUE, TRUE);
   gtk_paned_pack2(
       GTK_PANED(vpaned2), ((GraphGtk*)graph)->nav_widget, FALSE, TRUE);
+  gtk_paned_set_wide_handle(GTK_PANED(vpaned2), TRUE);
   gtk_widget_show(((GraphGtk*)graph)->nav_widget);
 
   // Horizontal pane
@@ -3097,7 +3191,7 @@ GeGtk::GeGtk(void* x_parent_ctx, GtkWidget* x_parent_widget,
   graph_list = item_view->widget();
 
   gtk_paned_pack1(GTK_PANED(hpaned3), graph_list, FALSE, FALSE);
-  gtk_paned_pack2(GTK_PANED(hpaned3), objectnav_w, TRUE, TRUE);
+  gtk_paned_pack2(GTK_PANED(hpaned3), vpaned3, TRUE, TRUE);
   gtk_widget_show( hpaned3);
 
   gtk_paned_pack1(GTK_PANED(hpaned2), hpaned3, FALSE, FALSE);
@@ -3117,9 +3211,10 @@ GeGtk::GeGtk(void* x_parent_ctx, GtkWidget* x_parent_widget,
   gtk_widget_show_all(toplevel);
 
   g_object_set(graph_list, "visible", FALSE, NULL);
-  g_object_set(objectnav_w, "visible", FALSE, NULL);
+  g_object_set(vpaned3, "visible", FALSE, NULL);
   g_object_set(hpaned3, "visible", FALSE, NULL);
 
+  gtk_paned_set_position(GTK_PANED(vpaned3), window_height - 290);
   gtk_paned_set_position(GTK_PANED(hpaned2), 150);
   gtk_paned_set_position(GTK_PANED(hpaned), window_width - palette_width - 85);
   gtk_paned_set_position(GTK_PANED(vpaned1), window_height - 405);

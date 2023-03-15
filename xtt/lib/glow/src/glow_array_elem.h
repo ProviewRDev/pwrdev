@@ -154,6 +154,7 @@ public:
   }
   virtual void set_inverse(int on){}
   virtual void set_hot(int on){}
+  virtual int get_hot(){return 0;}
   virtual void select_region_insert(double ll_x, double ll_y, double ur_x,
       double ur_y, glow_eSelectPolicy select_policy){}
   virtual glow_eObjectType type()

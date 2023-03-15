@@ -1843,6 +1843,10 @@ void AttrNavBrow::free_pixmaps()
   brow_FreeAnnotPixmap(ctx, pixmap_map);
   brow_FreeAnnotPixmap(ctx, pixmap_openmap);
   brow_FreeAnnotPixmap(ctx, pixmap_attr);
+  brow_FreeAnnotPixmap(ctx, pixmap_attrarray);
+  brow_FreeAnnotPixmap(ctx, pixmap_openattr);
+  brow_FreeAnnotPixmap(ctx, pixmap_view);
+  brow_FreeAnnotPixmap(ctx, pixmap_hide);
 }
 
 //
@@ -1856,17 +1860,22 @@ void AttrNavBrow::allocate_pixmaps()
   brow_LoadPBM(ctx, "xnav_bitmap_attr", &pixmap_attr);
   brow_LoadPBM(ctx, "xnav_bitmap_attrarra", &pixmap_attrarray);
   brow_LoadPBM(ctx, "xnav_bitmap_openattr", &pixmap_openattr);
+  brow_LoadPBM(ctx, "xnav_bitmap_view", &pixmap_view);
+  brow_LoadPBM(ctx, "xnav_bitmap_hide", &pixmap_hide);
 }
 
 //
 // Create the navigator widget
 //
 AttrNav::AttrNav(void* xn_parent_ctx, attr_eType xn_type, const char* xn_name,
-    attr_sItem* xn_itemlist, int xn_item_cnt, pwr_tStatus* status)
+    attr_sItem* xn_itemlist, int xn_item_cnt, 
+    void (*xn_get_object_list_cb)(void*, unsigned int, grow_tObject**, int*, 
+    grow_tObject*, int), pwr_tStatus* status)
       : parent_ctx(xn_parent_ctx), type(xn_type), brow(0), itemlist(xn_itemlist),
       item_cnt(xn_item_cnt), trace_started(0), graph(0), last_selected(0),
       last_selected_id(0), filter_type(attr_eFilterType_No), message_cb(NULL),
-      get_object_list_cb(0), set_inputfocus_cb(0), traverse_inputfocus_cb(0)
+      get_object_list_cb(xn_get_object_list_cb), set_inputfocus_cb(0), 
+      traverse_inputfocus_cb(0)
 {
   strcpy(name, xn_name);
   *status = 1;
@@ -1953,12 +1962,18 @@ int AttrNav::set_attr_value(
     memcpy(item->value_p, buffer, item->size);
 
     if ((str_NoCaseStrcmp(item->name, "Subgraph") == 0
-            || str_NoCaseStrcmp(item->name, "AnalogColor.CommonAttribute") == 0)
+	 || str_NoCaseStrcmp(item->name, "AnalogColor.CommonAttribute") == 0)
         && reconfigure_attr_cb) {
-      if (type == attr_eType_Attributes)
+      switch(type) {
+      case attr_eType_Attributes:
         (reconfigure_attr_cb)(parent_ctx);
-      else
+	break;
+      case attr_eType_ObjectTree:
         refresh_objects(attr_mRefresh_Objects);
+	break;
+      default:
+	;
+      }
       return FLOW__DESTROYED;
     }
 
@@ -1979,6 +1994,8 @@ int AttrNav::set_attr_value(
           if (!streq(oitem->name, name)) {
             strcpy(oitem->name, name);
             brow_SetAnnotation(oitem->node, 0, name, strlen(name));
+	    if (grow_GetObjectType(oitem->id) == glow_eObjectType_GrowLayer)
+	      graph->refresh_objects(attr_mRefresh_Objects);
           }
         }
       }
@@ -2425,23 +2442,38 @@ static int attrnav_brow_cb(FlowCtx* ctx, flow_tEvent event)
 
       if (brow_FindSelectedObject(attrnav->brow->ctx, event->object.object)) {
         brow_SelectClear(attrnav->brow->ctx);
+	attrnav->graph->select_clear();
+        if (attrnav->type == attr_eType_Layers) {
+          brow_GetUserData(event->object.object, (void**)&item);
+          if (item->type == attrnav_eItemType_Object) {
+            attrnav->graph->select_layer(((AItemObject*)item)->id);
+          }
+        }
       } else {
         brow_SelectClear(attrnav->brow->ctx);
         brow_SetInverse(event->object.object, 1);
         brow_SelectInsert(attrnav->brow->ctx, event->object.object);
 
         attrnav->last_selected = event->object.object;
+
         if (attrnav->type == attr_eType_ObjectTree) {
           brow_GetUserData(event->object.object, (void**)&item);
           if (item->type == attrnav_eItemType_Object) {
             attrnav->graph->select_object(((AItemObject*)item)->id);
             attrnav->last_selected_id = ((AItemObject*)item)->id;
           }
+        } else if (attrnav->type == attr_eType_Layers) {
+          brow_GetUserData(event->object.object, (void**)&item);
+          if (item->type == attrnav_eItemType_Object) {
+            attrnav->graph->select_layer(((AItemObject*)item)->id);
+            attrnav->last_selected_id = ((AItemObject*)item)->id;
+          }
         }
       }
       break;
     default:
-      brow_SelectClear(attrnav->brow->ctx);
+      if (attrnav->type != attr_eType_Layers)
+	brow_SelectClear(attrnav->brow->ctx);
     }
     break;
   }
@@ -2641,8 +2673,22 @@ static int attrnav_brow_cb(FlowCtx* ctx, flow_tEvent event)
             ->open_children(attrnav, event->object.x, event->object.y);
         break;
       case attrnav_eItemType_Object:
-        ((AItemObject*)item)
-            ->open_attributes(attrnav, event->object.x, event->object.y);
+	printf("Double click %d\n", attrnav->type);
+	if (attrnav->type == attr_eType_Layers) {
+	  if (grow_GetObjectVisibility(((AItemObject*)item)->id) == glow_eVis_Invisible) {
+	    printf("Set visibile\n");
+	    grow_SetObjectVisibility(((AItemObject*)item)->id, glow_eVis_Visible);
+	    brow_SetAnnotPixmap(item->node, 0, attrnav->brow->pixmap_view);
+	  }
+	  else {
+	    printf("Set invisibile\n");
+	    grow_SetObjectVisibility(((AItemObject*)item)->id, glow_eVis_Invisible);
+	    brow_SetAnnotPixmap(item->node, 0, attrnav->brow->pixmap_hide);
+	  }
+	} else {
+	  ((AItemObject*)item)->open_attributes(attrnav, event->object.x, 
+	      event->object.y);
+	}
         break;
       default:;
       }
@@ -3071,7 +3117,7 @@ int AttrNav::object_tree()
   return ATTRNAV__SUCCESS;
 }
 
-void AttrNav::refresh_objects(unsigned int type)
+void AttrNav::refresh_objects(unsigned int rtype)
 {
   int i;
   grow_tObject* list;
@@ -3096,7 +3142,7 @@ void AttrNav::refresh_objects(unsigned int type)
   if (!get_object_list_cb)
     return;
 
-  if (type == attr_mRefresh_Objects) {
+  if (rtype == attr_mRefresh_Objects) {
     // Store open objects
     brow_tObject* blist;
     int blist_cnt;
@@ -3191,6 +3237,9 @@ void AttrNav::refresh_objects(unsigned int type)
     for (int i = list_cnt - 1; i >= 0; i--) {
       grow_GetObjectName(list[i], oname, sizeof(oname), glow_eName_Object);
       otype = grow_GetObjectType(list[i]);
+      if (type == attr_eType_Layers && 
+	  otype != glow_eObjectType_GrowLayer)
+	continue;	  
 
       switch (otype) {
       case glow_eObjectType_GrowNode:
@@ -3269,10 +3318,13 @@ void AttrNav::refresh_objects(unsigned int type)
 
     brow_ResetNodraw(brow->ctx);
     brow_Redraw(brow->ctx, 0);
-  } else if (type == attr_mRefresh_Select) {
+  } else if (rtype == attr_mRefresh_Select) {
     brow_tObject* blist;
     int blist_cnt;
     AItemObject* item;
+
+    if (type == attr_eType_Layers)
+      return;
 
     (get_object_list_cb)(parent_ctx, attr_eList_Select, &list, &list_cnt, 0, 0);
 
@@ -3498,6 +3550,9 @@ void AttrNav::object_type_to_str(
   case glow_eObjectType_GrowScriptModule:
     strcpy(object_type_str, "ScriptModule");
     break;
+  case glow_eObjectType_GrowLayer:
+    strcpy(object_type_str, "Layer");
+    break;
   default:
     strcpy(object_type_str, "Unknown type");
   }
@@ -3578,10 +3633,17 @@ int AttrNav::init_brow_cb(FlowCtx* fctx, void* client_data)
   attrnav->brow->create_nodeclasses();
 
   // Create the root item
-  if (attrnav->type == attr_eType_Attributes)
+  switch (attrnav->type) {
+  case attr_eType_Attributes:
     attrnav->object_attr();
-  else
+    break;
+  case attr_eType_ObjectTree:
+  case attr_eType_Layers:
     attrnav->object_tree();
+    break;
+  default:
+    return 0;
+  }
 
   sts = brow_TraceInit(ctx, attrnav_trace_connect_bc,
       attrnav_trace_disconnect_bc, attrnav_trace_scan_bc);
@@ -3929,10 +3991,18 @@ AItemObject::AItemObject(AttrNav* attrnav, char* item_name,
 
   AttrNav::object_type_to_str(object_type, object_type_str);
 
-  if (object_type == glow_eObjectType_GrowGroup)
-    brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_map);
-  else
-    brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_leaf);
+  if (attrnav->type == attr_eType_Layers) {
+    if (grow_GetObjectVisibility(id) == glow_eVis_Invisible)
+      brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_hide);
+    else
+      brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_view);
+  } else {
+    if (object_type == glow_eObjectType_GrowGroup ||
+	object_type == glow_eObjectType_GrowLayer)
+      brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_map);
+    else
+      brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_leaf);
+  }
   brow_SetAnnotation(node, 0, item_name, strlen(item_name));
   if (object_type == glow_eObjectType_GrowNode
       || object_type == glow_eObjectType_GrowSlider)
@@ -3967,7 +4037,8 @@ int AItemObject::open_children(AttrNav* attrnav, double x, double y)
 {
   double node_x, node_y;
 
-  if (!(object_type == glow_eObjectType_GrowGroup))
+  if (!(object_type == glow_eObjectType_GrowGroup ||
+	object_type == glow_eObjectType_GrowLayer))
     return 1;
 
   brow_GetNodePosition(node, &node_x, &node_y);
@@ -3991,12 +4062,24 @@ int AItemObject::open_children(AttrNav* attrnav, double x, double y)
     char ncname[80];
     grow_tNodeClass nc;
     glow_eObjectType otype;
+    attr_eList list_type;
 
     // Create some children
     brow_SetNodraw(attrnav->brow->ctx);
 
+    switch (object_type) {
+    case glow_eObjectType_GrowGroup:
+      list_type = attr_eList_Group;
+      break;
+    case glow_eObjectType_GrowLayer:
+      list_type = attr_eList_Layer;
+      break;
+    default:
+      return 1;
+    }
+
     (attrnav->get_object_list_cb)(
-        attrnav->parent_ctx, attr_eList_Group, &list, &list_cnt, &id, 1);
+        attrnav->parent_ctx, list_type, &list, &list_cnt, &id, 1);
 
     for (int i = list_cnt - 1; i >= 0; i--) {
       grow_GetObjectName(list[i], oname, sizeof(oname), glow_eName_Object);

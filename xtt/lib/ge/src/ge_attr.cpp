@@ -51,16 +51,21 @@ Attr::~Attr()
 }
 
 Attr::Attr(void* a_parent_ctx, attr_eType a_type, void* a_object,
-    attr_sItem* itemlist, int item_cnt)
+      attr_sItem* itemlist, int item_cnt,
+      void (*a_get_object_list_cb)(void*, unsigned int, grow_tObject**, int*, 
+      grow_tObject*, int))
     : parent_ctx(a_parent_ctx), type(a_type), embedded(0), input_open(0),
       object(a_object), close_cb(0), redraw_cb(0), get_subgraph_info_cb(0),
       get_dyn_info_cb(0), reconfigure_attr_cb(0), store_cb(0), recall_cb(0),
       set_data_cb(0), get_plant_select_cb(0), get_current_colors_cb(0),
-      get_current_color_tone_cb(0), open_value_input_cb(), set_inputfocus_cb(0),
+      get_current_color_tone_cb(0),
+      get_object_list_cb(a_get_object_list_cb), open_value_input_cb(),
+      set_inputfocus_cb(0),
       traverse_inputfocus_cb(0), client_data(0), recall_idx(-1),
       original_data(0)
 {
-  if (type == attr_eType_ObjectTree)
+  if (type == attr_eType_ObjectTree ||
+      type == attr_eType_Layers)
     embedded = 1;
 }
 

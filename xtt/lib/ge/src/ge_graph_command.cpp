@@ -609,7 +609,8 @@ static int graph_set_func(void* client_data, void* client_flag)
         return GE__SYNTAX;
       }
     }
-    if (value < 0 || value >= glow_eDrawType_CustomColor__) {
+    if (!((value >= 0 && value < glow_eDrawType_CustomColor__) ||
+	  value == glow_eDrawType_Inherit)) {
       graph->message('E', "Syntax error");
       return GE__SYNTAX;
     }
@@ -2769,6 +2770,7 @@ int Graph::command(char* input_str)
       return DCLI__SUCCESS;
     } else if (EVEN(sts))
       return sts;
+    refresh_objects(attr_mRefresh_Objects);
     return DCLI__SUCCESS;
   }
 
@@ -2810,6 +2812,8 @@ int Graph::command(char* input_str)
     message('E', "Undefined qualifier");
   else if (sts == DCLI__SYMBOL_AMBIG)
     message('E', "Ambiguous symbol abbrevation");
+
+  refresh_objects(attr_mRefresh_Objects);
 
   return sts;
 }

@@ -58,3 +58,4 @@ name_alrexist   <Name already exist>           			/error
 swapterminated  <Ctx is swapped>				/info
 buff_small	<Buffer is too small>				/error
 dash_full	<Dashboard is full>				/error
+otherlayer	<Object is in other layer>			/error

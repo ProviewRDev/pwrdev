@@ -178,10 +178,7 @@ public:
     \param element	Object to insert.
     \return		Returns 1 if success, 0 if object already is inserted.
   */
-  int insert(GlowArrayElem* element)
-  {
-    return a.insert(element);
-  }
+  int insert(GlowArrayElem* element);
 
   //! Remove an object.
   /*! \param element	Object to remove. */
@@ -195,13 +192,7 @@ public:
 
   //! Delete object. Object is removed and deletet.
   /*! \param element	Object to delete. */
-  void delete_object(GlowArrayElem* element)
-  {
-    remove(element);
-    select_remove(element);
-    move_remove(element);
-    delete element;
-  }
+  void delete_object(GlowArrayElem* element);
 
   //! Insert a nodeclass.
   /*!
@@ -701,6 +692,7 @@ public:
   void redraw_defered();
 
   int defered_redraw_active; //!< Defered redraw is active.
+  GlowArray *layer; //!< Pointer to current layer.
   GlowArray a_nc; //!< Array of nodeclasses.
   GlowArray a_cc; //!< Array of connection classes.
   GlowArray a; //!< Object array.
@@ -747,7 +739,7 @@ public:
   void select_region_insert(double ll_x, double ll_y, double ur_x, double ur_y,
       glow_eSelectPolicy policy)
   {
-    a.select_region_insert(ll_x, ll_y, ur_x, ur_y, policy);
+    layer->select_region_insert(ll_x, ll_y, ur_x, ur_y, policy);
   }
 
   int cursor_present; //!< Cursor in present in window.
@@ -791,7 +783,7 @@ public:
   */
   void conpoint_refcon_redraw(void* node, int conpoint)
   {
-    a.conpoint_refcon_redraw(node, conpoint);
+    layer->conpoint_refcon_redraw(node, conpoint);
   }
 
   //! Erase the reference connections for a specific node and connection point.
@@ -801,7 +793,7 @@ public:
   */
   void conpoint_refcon_erase(void* node, int conpoint)
   {
-    a.conpoint_refcon_erase(node, conpoint);
+    layer->conpoint_refcon_erase(node, conpoint);
   }
 
   //! Get object from name.
@@ -984,7 +976,7 @@ public:
   void move_widgets(int x, int y)
   {
     if (widget_cnt)
-      a.move_widgets(x, y);
+      layer->move_widgets(x, y);
   }
 
   int display_level; //!< Current display level.

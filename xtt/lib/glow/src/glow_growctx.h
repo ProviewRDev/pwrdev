@@ -62,6 +62,7 @@ typedef enum {
 
 class GrowGroup;
 class GrowDashboard;
+class GrowLayer;
 
 //! Extended class for the drawing window.
 /*! GlowCtx adds functions to GlowCtx for creation of Grow objects, background
@@ -116,6 +117,8 @@ public:
   void draw_invalidated(GlowWind* w, int ll_x, int ll_y, int ur_x, int ur_y);
 
   void erase(GlowWind* w, int ll_x, int ll_y, int ur_x, int ur_y);
+
+  void redraw();
 
   //! Draw a specified area of the window.
   /*! Interface with double arguments */
@@ -270,13 +273,24 @@ public:
     return objectname_cnt++;
   }
 
-  //! Set next objectname number.
+  //! Set next layername number.
   /*!
-    Set the number for next objectname.
+    Set the number for next layername.
   */
   void set_next_objectname_num(int num)
   {
     objectname_cnt = num;
+  }
+
+  //! Get and increment next layername number.
+  /*!
+    \return Next layername number.
+
+    Returns the number for next layername and increments the counter.
+  */
+  int incr_next_layername_num()
+  {
+    return layername_cnt++;
   }
 
   //! Clear the window.
@@ -981,19 +995,19 @@ public:
   //! Get previous object. */
   int get_previous_object(GlowArrayElem* object, GlowArrayElem** prev)
   {
-    return a.get_previous(object, prev);
+    return layer->get_previous(object, prev);
   }
 
   //! Get next object. */
   int get_next_object(GlowArrayElem* object, GlowArrayElem** next)
   {
-    return a.get_next(object, next);
+    return layer->get_next(object, next);
   }
 
   //! Get first object. */
   int get_first_object(GlowArrayElem** first)
   {
-    return a.get_first(first);
+    return layer->get_first(first);
   }
 
   //! Check if object is visible. */
@@ -1005,7 +1019,7 @@ public:
   //! Order object. */
   int order_object(GlowArrayElem* o, GlowArrayElem* dest, glow_eDest code)
   {
-    return a.move(o, dest, code);
+    return layer->move(o, dest, code);
   }
 
   void measure_window(double* ll_x, double* ll_y, double* ur_x, double* ur_y);
@@ -1015,7 +1029,7 @@ public:
 
   void pop(GlowArrayElem* element)
   {
-    a.pop(element);
+    layer->pop(element);
   }
   void set_text_coding(glow_eTextCoding coding);
   void set_edit_set_mode(glow_eEditSetMode mode)
@@ -1034,6 +1048,11 @@ public:
   {
     return dashboard;
   }
+  int get_active_layer(GrowLayer **layer);
+  int merge_visible_layers();
+  int merge_all_layers();
+  int move_select_to_layer();
+  void layer_reset_active_all();
   static void set_default_color_theme(char* theme);
 
   static int get_dimension(char* filename, int* width, int* heigth);
@@ -1043,6 +1062,8 @@ public:
   int conpoint_num_cnt; //!< Counter to get next number for when creating
   //! conpoints in a subgraph.
   int objectname_cnt; //!< Counter to get next number when creating new object
+  //! names.
+  int layername_cnt; //!< Counter to get next number when creating new layer
   //! names.
   int polyline_not_first; //!< Indicates that the first line is drawn for the
   //! current polyline.
@@ -1153,6 +1174,7 @@ public:
   double dash_cell_width; //!< Width of dashboard cell
   double dash_cell_height; //!< Height of dashboard cell
   int disable_subw_events; //!< Disable eventhandling in subwindows and tables
+  void set_layer_borders(); //!< Set borders of active layer
 };
 
 void grow_auto_scrolling(GrowCtx* ctx);

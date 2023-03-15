@@ -93,6 +93,12 @@ public:
   */
   void copy_from_common_objects(GlowArray& array);
 
+  //! Merge two arrays
+  /*!
+    \param array	Array to merge with.
+  */
+  void merge(GlowArray& array);
+
   //! Move all object from an array to this array.
   /*!
     \param array	Array to move object from.
@@ -119,7 +125,7 @@ public:
   /*!
     \param element	The element to remove.
   */
-  void remove(GlowArrayElem* element);
+  int remove(GlowArrayElem* element);
 
   //! Check if an object is in the array.
   /*!
@@ -142,6 +148,11 @@ public:
     a_size = 0;
   }
   void delete_all();
+  void get_objectlist(GlowArrayElem*** list, int* size)
+  {
+    *list = a;
+    *size = a_size;
+  }
 
   void zoom();
   void nav_zoom();
@@ -256,6 +267,7 @@ public:
   void set_linetype(glow_eLineType type);
   void export_flow(GlowExportFlow* ef);
   int export_script(GlowExportScript* es, void* o, void* m);
+  GlowArrayElem* get_node_from_name(char* name);
 
   friend class GlowNodeClass;
   friend class GlowCtx;

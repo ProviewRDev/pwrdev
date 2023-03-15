@@ -53,10 +53,13 @@
 //
 AttrNavGtk::AttrNavGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid,
     attr_eType xn_type, const char* xn_name, attr_sItem* xn_itemlist,
-    int xn_item_cnt, GtkWidget** w, pwr_tStatus* status)
+    int xn_item_cnt, 
+    void (*xn_get_object_list_cb)(void*, unsigned int, grow_tObject**, int*, 
+    grow_tObject*, int), GtkWidget** w, pwr_tStatus* status)
     : AttrNav(
-          xn_parent_ctx, xn_type, xn_name, xn_itemlist, xn_item_cnt, status),
-      parent_wid(xn_parent_wid), trace_timerid(0)
+	xn_parent_ctx, xn_type, xn_name, xn_itemlist, xn_item_cnt, 
+        xn_get_object_list_cb, status),
+        parent_wid(xn_parent_wid), trace_timerid(0)
 {
   form_widget
       = scrolledbrowwidgetgtk_new(AttrNav::init_brow_cb, this, &brow_widget);

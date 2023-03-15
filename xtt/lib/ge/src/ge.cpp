@@ -287,6 +287,8 @@ void Ge::clear_all()
   set_title();
   if (objectnav)
     objectnav->clear();
+  if (layernav)
+    layernav->clear();
 }
 
 void Ge::clear()
@@ -1104,7 +1106,8 @@ void Ge::refresh_objects_cb(void* ge_ctx, unsigned int type)
 {
   if (((Ge*)ge_ctx)->objectnav)
     ((Ge*)ge_ctx)->objectnav->refresh_objects(type);
-  ;
+  if (((Ge*)ge_ctx)->layernav)
+    ((Ge*)ge_ctx)->layernav->refresh_objects(type);
 }
 
 void Ge::close()
@@ -2437,7 +2440,7 @@ Ge::Ge(void* x_parent_ctx, ldh_tSesContext x_ldhses, int x_exit_when_close,
       exit_when_close(x_exit_when_close), prev_count(0), focused_component(0),
       prev_focused_component(0), recover_object(0), plant_mapped(0),
       subpalette_mapped(0), objectnav_mapped(0), options(x_options),
-      open_dialog(0), objectnav(0), close_cb(0)
+      open_dialog(0), objectnav(0), layernav(0), close_cb(0)
 {
   strcpy(name, "PwR Ge");
 

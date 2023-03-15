@@ -53,7 +53,9 @@
 class AttrGtk : public Attr {
 public:
   AttrGtk(GtkWidget* a_parent_wid, void* a_parent_ctx, attr_eType a_type,
-      void* a_object, attr_sItem* itemlist, int item_cnt);
+      void* a_object, attr_sItem* itemlist, int item_cnt,
+      void (*xn_get_object_list_cb)(void*, unsigned int, grow_tObject**, int*, 
+      grow_tObject*, int));
   GtkWidget* parent_wid;
   GtkWidget* brow_widget;
   GtkWidget* form_widget;

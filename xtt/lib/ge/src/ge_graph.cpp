@@ -1367,9 +1367,25 @@ void Graph::select_all_objects()
 
 void Graph::select_object(grow_tObject o)
 {
-  grow_SelectClear(grow->ctx);
-  grow_SetHighlight(o, 1);
-  grow_SelectInsert(grow->ctx, o);
+  if (grow_GetObjectType(o) == glow_eObjectType_GrowLayer) {
+    grow_SelectClear(grow->ctx);
+    grow_SetHighlight(o, 1);    
+    grow_SelectInsert(grow->ctx, o);
+  } else {
+    grow_SelectClear(grow->ctx);
+    grow_SetHighlight(o, 1);
+    grow_SelectInsert(grow->ctx, o);
+  }
+}
+
+void Graph::select_layer(grow_tObject o)
+{
+  if (grow_GetObjectType(o) == glow_eObjectType_GrowLayer) {
+    if (!grow_LayerIsActive(o))
+      grow_LayerSetActive(o, 1);
+    else
+      grow_LayerSetActive(o, 0);
+  }
 }
 
 void Graph::add_select_object(grow_tObject o, int select)
@@ -1471,7 +1487,8 @@ int Graph::get_attr_items(grow_tObject object, attr_sItem** itemlist,
   memset(items, 0, sizeof(items));
   if (grow_GetObjectType(object) == glow_eObjectType_GrowNode
       || grow_GetObjectType(object) == glow_eObjectType_GrowGroup
-      || grow_GetObjectType(object) == glow_eObjectType_GrowToolbar) {
+      || grow_GetObjectType(object) == glow_eObjectType_GrowToolbar
+      || grow_GetObjectType(object) == glow_eObjectType_GrowLayer) {
     GeDyn* dyn;
     char* transtab;
     grow_GetUserData(object, (void**)&dyn);
@@ -2178,6 +2195,9 @@ void Graph::graph_get_object_list_cb(void* g, unsigned int type,
     break;
   case attr_eList_Group:
     grow_GetGroupObjectList(*parent, list, list_cnt);
+    break;
+  case attr_eList_Layer:
+    grow_GetLayerObjectList(*parent, list, list_cnt);
     break;
   case attr_eList_Select:
     grow_GetSelectList(graph->grow->ctx, list, list_cnt);
@@ -2955,13 +2975,13 @@ static int graph_grow_cb(GlowCtx* ctx, glow_tEvent event)
       if (event->object.object_type == glow_eObjectType_NoObject)
         grow_SelectClear(graph->grow->ctx);
       else {
-        if (grow_FindSelectedObject(graph->grow->ctx, event->object.object)) {
-          grow_SelectClear(graph->grow->ctx);
-        } else {
-          grow_SelectClear(graph->grow->ctx);
-          grow_SetHighlight(event->object.object, 1);
-          grow_SelectInsert(graph->grow->ctx, event->object.object);
-        }
+	if (grow_FindSelectedObject(graph->grow->ctx, event->object.object)) {
+	  grow_SelectClear(graph->grow->ctx);
+	} else {
+	  grow_SelectClear(graph->grow->ctx);
+	  grow_SetHighlight(event->object.object, 1);
+	  grow_SelectInsert(graph->grow->ctx, event->object.object);
+	}
       }
 
       graph->refresh_objects(attr_mRefresh_Select);
@@ -6207,6 +6227,49 @@ void Graph::create_barchart(grow_tObject* object, double x, double y)
   dyn->update_elements();
   grow_SetUserData(*object, (void*)dyn);
   grow_Redraw(grow->ctx);
+}
+
+void Graph::create_layer()
+{
+  GeDyn* dyn;
+  grow_tObject layer;
+  char name[40];
+
+  sprintf(name, "Layer%d", grow_IncrNextLayerNameNumber(grow->ctx));
+
+  grow_CreateGrowLayer(grow->ctx, name, NULL, &layer);
+  dyn = new GeDyn(this);
+  grow_SetUserData(layer, (void*)dyn);
+  refresh_objects(attr_mRefresh_Objects);
+}
+
+void Graph::delete_layer()
+{
+  grow_tObject layer;
+  int sts;
+
+  sts = grow_GetActiveLayer(grow->ctx, &layer);
+  if (EVEN(sts))
+    message('E', "Select a Layer");
+
+  grow_DeleteObject(grow->ctx, layer);
+  refresh_objects(attr_mRefresh_Objects);
+}
+
+void Graph::merge_visible_layers()
+{
+  grow_MergeVisibleLayers(grow->ctx);
+  refresh_objects(attr_mRefresh_Objects);
+}
+void Graph::merge_all_layers()
+{
+  grow_MergeAllLayers(grow->ctx);
+  refresh_objects(attr_mRefresh_Objects);
+}
+void Graph::move_select_to_layer()
+{
+  grow_MoveSelectToLayer(grow->ctx);
+  refresh_objects(attr_mRefresh_Objects);
 }
 
 int Graph::create_dashcell_next(grow_tObject *o, int colortheme, int select, char *attr, pwr_tTypeId atype)

@@ -55,7 +55,9 @@ class AttrNav;
 class Attr {
 public:
   Attr(void* a_parent_ctx, attr_eType a_type, void* a_object,
-      attr_sItem* itemlist, int item_cnt);
+      attr_sItem* itemlist, int item_cnt, 
+      void (*a_get_object_list_cb)(void*, unsigned int, grow_tObject**, int*, 
+      grow_tObject*, int));
   void* parent_ctx;
   attr_eType type;
   int embedded;
