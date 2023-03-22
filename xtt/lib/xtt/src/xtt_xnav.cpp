@@ -866,7 +866,7 @@ void XNav::attrvalue_to_string(int type_id, pwr_tTid tid, void* value_ptr,
     objid = *(pwr_tObjid*)value_ptr;
     switch (conv) {
     case xnav_eConv_Identity:
-      cdh_OidToString(str, sizeof(str), objid, 1);
+      cdh_OidToString(str, size, objid, 1);
       *len = strlen(str);
       break;
     default:
@@ -890,7 +890,7 @@ void XNav::attrvalue_to_string(int type_id, pwr_tTid tid, void* value_ptr,
 
     switch (conv) {
     case xnav_eConv_Identity:
-      cdh_ArefToString(str, sizeof(str), attrref, 1);
+      cdh_ArefToString(str, size, attrref, 1);
       *len = strlen(str);
       break;
     default:
