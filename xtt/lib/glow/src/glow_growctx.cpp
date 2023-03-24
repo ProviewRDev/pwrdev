@@ -1609,6 +1609,7 @@ int GrowCtx::event_handler(glow_eEvent event, int x, int y, int w, int h)
         break;
       }
       set_layer_borders();
+      a_move.clear();
     } else if (select_rect_active && edit_mode != grow_eMode_Scale) {
       glow_eSelectPolicy policy;
 
@@ -1691,6 +1692,18 @@ int GrowCtx::event_handler(glow_eEvent event, int x, int y, int w, int h)
       } else {
         if (select_rect_event == event_region_select) {
           /* Insert selected objects to selectlist */
+	  if (event_callback[glow_eEvent_AnteRegionSelect]) {
+	    static glow_sEvent e;
+
+	    e.event = glow_eEvent_AnteRegionSelect;
+	    e.any.type = glow_eEventType_CallBack;
+	    e.any.x_pixel = x;
+	    e.any.y_pixel = y;
+	    e.any.x = select_area_ll_x;
+	    e.any.y = select_area_ll_y;
+	    e.create_grow_object.mode = edit_mode;
+	    event_callback[glow_eEvent_AnteRegionSelect](this, &e);
+	  }
 
           select_clear();
           select_region_insert(select_area_ll_x, select_area_ll_y,
@@ -1698,6 +1711,18 @@ int GrowCtx::event_handler(glow_eEvent event, int x, int y, int w, int h)
         }
         if (select_rect_event == event_region_add_select) {
           /* Add selected objects to selectlist */
+	  if (event_callback[glow_eEvent_AnteRegionAddSelect]) {
+	    static glow_sEvent e;
+
+	    e.event = glow_eEvent_AnteRegionAddSelect;
+	    e.any.type = glow_eEventType_CallBack;
+	    e.any.x_pixel = x;
+	    e.any.y_pixel = y;
+	    e.any.x = select_area_ll_x;
+	    e.any.y = select_area_ll_y;
+	    e.create_grow_object.mode = edit_mode;
+	    event_callback[glow_eEvent_AnteRegionAddSelect](this, &e);
+	  }
           select_region_insert(select_area_ll_x, select_area_ll_y,
               select_area_ur_x, select_area_ur_y, policy);
         }
@@ -4619,6 +4644,10 @@ void GrowCtx::read_object(std::ifstream& fp, GlowArrayElem** o)
     n = new GrowScriptModule(this, "");
     break;
   }
+  case glow_eSave_GrowLayer: {
+    n = new GrowLayer(this, "");
+    break;
+  }
   case glow_eSave_End:
     break;
   default:
@@ -4626,7 +4655,14 @@ void GrowCtx::read_object(std::ifstream& fp, GlowArrayElem** o)
   }
   if (n) {
     n->open(fp);
-    a.insert(n);
+    if (n->type() == glow_eObjectType_GrowLayer)
+      a.insert(n);
+    else {
+      if (layer == &a)
+	layer->insert(n);
+      else
+	((GrowLayer*)layer)->insert(n);
+    }
   }
   *o = n;
 }
@@ -4899,6 +4935,11 @@ void GrowCtx::get_dashboard_info(double* cell_width, double* cell_height,
   *rows = dash->dash_rows;
 }
 
+int GrowCtx::layer_active()
+{
+  return (layer == &a) ? 0 : 1;
+}
+
 int GrowCtx::get_active_layer(GrowLayer **layer)
 {
   for (int i = 0; i < a.a_size; i++) {
@@ -4955,6 +4996,24 @@ int GrowCtx::merge_visible_layers()
   return 1;
 }
 
+int GrowCtx::merge_visible_layers_to_bg()
+{
+  int found = 0;
+  
+  for (int i = 0; i < a.a_size; i++) {
+    if (a[i]->type() == glow_eObjectType_GrowLayer &&
+	a[i]->get_visibility() == glow_eVis_Visible) {
+      a.merge(*(GlowArray*)((GrowLayer*)a[i]));
+      delete_object(a[i]);
+      found = 1;
+      i--;
+    }      
+  }
+  if (!found)
+    return 0;
+  return 1;
+}
+
 int GrowCtx::merge_all_layers()
 {
   for (int i = 0; i < a.a_size; i++) {
@@ -4973,6 +5032,7 @@ int GrowCtx::move_select_to_layer()
     if (a_sel[i]->type() == glow_eObjectType_GrowLayer)
       continue;
 
+    a_sel.set_rootnode(0);
     remove(a_sel[i]);
     insert(a_sel[i]);
   }

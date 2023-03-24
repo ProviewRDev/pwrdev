@@ -116,6 +116,7 @@ void GlowArray::merge(GlowArray& array)
 {
   GlowArrayElem** a_tmp;
 
+  array.set_rootnode(0);
   if (allocated <= a_size + array.a_size) {
     allocated = a_size + array.a_size + alloc_incr;
     a_tmp = (GlowArrayElem**)calloc(allocated, sizeof(GlowArrayElem*));
@@ -937,7 +938,7 @@ void GlowArray::open(GrowCtx* ctx, std::ifstream& fp)
 
       //  Check if this NodeClass already is loaded
       n->get_object_name(name, sizeof(name), glow_eName_Object);
-      if (find_by_name(name, &element))
+      if (ODD(find_by_name(name, &element)))
         delete n;
       else
         insert(n);
@@ -953,7 +954,7 @@ void GlowArray::open(GrowCtx* ctx, std::ifstream& fp)
 
       //  Check if this ConClass already is loaded
       n->get_object_name(name, sizeof(name), glow_eName_Object);
-      if (find_by_name(name, &element))
+      if (ODD(find_by_name(name, &element)))
         delete n;
       else
         insert(n);
@@ -1318,7 +1319,7 @@ int GlowArray::find_by_name(const char* name, GlowArrayElem** element)
       }
     }
     if (!found)
-      return 0;
+      return GLOW__NOOBJ;
 
     if (group->type() == glow_eObjectType_GrowGroup)
       return ((GrowGroup*)group)->find_by_name(&name[len + 1], element);
@@ -1333,8 +1334,15 @@ int GlowArray::find_by_name(const char* name, GlowArrayElem** element)
         return 1;
       }
     }
+    // Search in layers
+    for (i = 0; i < a_size; i++) {
+      if (a[i]->type() == glow_eObjectType_GrowLayer) {
+	if (ODD(((GrowLayer*)a[i])->find_by_name(name, element)))
+	  return 1;
+      }
+    }
   }
-  return 0;
+  return GLOW__NOOBJ;
 }
 
 void GlowArray::set_highlight(int on)
@@ -1826,6 +1834,14 @@ int GlowArray::find_nc(GlowArrayElem* nc)
     if (a[i]->find_nc(nc))
       return 1;
   }
+  // Search in layers
+  for (int i = 0; i < a_size; i++) {
+    if (a[i]->type() == glow_eObjectType_GrowLayer) {
+      if (ODD((((GlowArray*)(GrowLayer*)a[i]))->find_nc(nc)))
+	return 1;
+    }
+  }
+
   return 0;
 }
 
@@ -1834,6 +1850,13 @@ int GlowArray::find_cc(GlowArrayElem* cc)
   for (int i = 0; i < a_size; i++) {
     if (a[i]->find_cc(cc))
       return 1;
+  }
+  // Search in layers
+  for (int i = 0; i < a_size; i++) {
+    if (a[i]->type() == glow_eObjectType_GrowLayer) {
+      if (ODD((((GlowArray*)(GrowLayer*)a[i]))->find_cc(cc)))
+	return 1;
+    }
   }
   return 0;
 }

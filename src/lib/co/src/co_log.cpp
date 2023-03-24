@@ -42,7 +42,7 @@
 
 static int LEVEL = 0;
 static FILE* FP = NULL;
-static int QUIET = 0;
+static int QUIET = 1;
 
 void log_setLevel(int level)
 {

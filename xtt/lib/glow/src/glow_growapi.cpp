@@ -829,6 +829,11 @@ int grow_GetObjectName(
   return ((GlowNode*)object)->get_object_name(name, size, ntype);
 }
 
+void grow_GetObjectParent(grow_tObject object, grow_tObject *parent)
+{
+  *(grow_tObject*)parent = ((GlowArrayElem*)object)->get_parent();
+}
+
 void grow_GetNodeClassName(grow_tNodeClass nodeclass, char* name, int size)
 {
   ((GlowNodeClass*)nodeclass)->get_object_name(name, size, glow_eName_Object);
@@ -6455,6 +6460,11 @@ int grow_MergeVisibleLayers(grow_tCtx ctx)
   return ((GrowCtx*)ctx)->merge_visible_layers();
 }
 
+int grow_MergeVisibleLayersToBg(grow_tCtx ctx)
+{
+  return ((GrowCtx*)ctx)->merge_visible_layers_to_bg();
+}
+
 int grow_MergeAllLayers(grow_tCtx ctx)
 {
   return ((GrowCtx*)ctx)->merge_all_layers();
@@ -6480,5 +6490,38 @@ int grow_LayerGetFirstObject(grow_tObject layer, grow_tObject* first)
     return 0;
   return ((GrowLayer*)layer)->get_first((GlowArrayElem**)first);
 }
+
+int grow_LayerInsert(grow_tObject layer, grow_tObject o)
+{
+  if (layer)
+    return ((GrowLayer *)layer)->insert((GlowArrayElem*)o);
+  else {
+    GrowCtx *ctx;
+    ((GlowArrayElem*)o)->get_ctx((void**)&ctx);
+    return ctx->a.insert((GlowArrayElem*)o);
+  }
+}
+
+int grow_LayerRemove(grow_tObject layer, grow_tObject o)
+{
+  if (layer)
+    return ((GrowLayer *)layer)->remove((GlowArrayElem*)o);
+  else {
+    GrowCtx *ctx;
+    ((GlowArrayElem*)o)->get_ctx((void**)&ctx);
+    return ctx->a.remove((GlowArrayElem*)o);
+  }
+}
+
+int grow_LayerIsEmpty(grow_tObject layer)
+{
+  return ((GrowLayer*)layer)->is_empty();
+}
+
+int grow_LayerActive(grow_tCtx ctx)
+{
+  return ((GrowCtx*)ctx)->layer_active();
+}
+
 
 /*@}*/

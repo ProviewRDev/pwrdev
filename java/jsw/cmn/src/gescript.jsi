@@ -4273,6 +4273,39 @@ arg_count) {
     return ret;
   }
 
+  this.createlayer_func = function(self, filectx, arg_list,
+				    arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var name;
+    var nc;
+    var n1;
+    var sts;
+    
+    if (arg_count != 0) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    graph = graph_get_stored_graph();
+
+    name =  "Layer" + graph.growapi.GetNextLayerNameNumber(graph.ctx).toString();
+
+    n1 = graph.growapi.CreateGrowLayer(graph.ctx, name, null);
+
+    var dyn = new Dyn(graph);
+    dyn.update_dyntype(n1);
+    dyn.update_elements();
+    n1.setUserData(dyn);
+
+    graph.current_cmd_object = n1;
+    graph.growapi.SetModified(graph.ctx, 1);
+
+    ret.return_int = graph.current_cmd_object;
+    ret.return_decl = CcmC.K_DECL_INT;
+    return ret;
+  }
+
   this.getgraphname_func = function(self, filectx, arg_list,
 				    arg_count) {
     var ret = new ccm_tSysFuncReturn();
@@ -4670,6 +4703,112 @@ arg_count) {
     return ret;
   }
 
+  this.layersetactive_func = function(self, filectx, arg_list, arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var arg_p2;
+    var graph;
+    var layer;
+
+    if (arg_count != 2)
+      return CCM_.ARGMISM;
+
+    arg_p2 = arg_list.next;
+
+    graph = graph_get_stored_graph();
+
+    if (arg_list.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+    if (arg_p2.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    layer = arg_list.value_int;
+    layer.set_active(arg_p2.value_int);
+    return ret;
+  }
+
+  this.layerresetactiveall_func = function(self, filectx, arg_list, arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var layer;
+
+    if (arg_count != 0)
+      return CCM_.ARGMISM;
+
+    graph = graph_get_stored_graph();
+    graph.growapi.LayerResetActiveAll(graph.ctx);
+    return ret;
+  }
+
+  this.layergetfirstobject_func = function(self, filectx, arg_list,
+					   arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var first;
+    var sts;
+
+    if (arg_count != 1) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    if (arg_list.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    graph = graph_get_stored_graph();
+
+    var rg = graph.growapi.LayerGetFirstObject(arg_list.value_int);
+    if (ODD(rg.sts))
+      ret.return_int = rg.element;
+    else
+      ret.return_int = 0;
+    ret.return_decl = CcmC.K_DECL_INT;
+
+    return ret;
+  }
+
+  this.layergetnextobject_func = function(self, filectx, arg_list,
+					  arg_count) {
+    var ret = new ccm_tSysFuncReturn();
+    var graph;
+    var next;
+    var sts;
+    var arg_p2;
+
+    if (arg_count != 2) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    if (arg_list.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    arg_p2 = arg_list.next;
+    if (arg_p2.value_decl != CcmC.K_DECL_INT) {
+      ret.sts = CCM_.ARGMISM;
+      return ret;
+    }
+
+    graph = graph_get_stored_graph();
+
+    var rg = graph.growapi.LayerGetNextObject(arg_list.value_int,
+				  arg_p2.value_int);
+    if (ODD(rg.sts))
+      ret.return_int = rg.element;
+    else
+      ret.return_int = 0;
+    ret.return_decl = CcmC.K_DECL_INT;
+
+    return ret;
+  }
+
   this.script_func_register = function() {
     var sts;
 
@@ -4776,6 +4915,7 @@ arg_count) {
     this.ccm.register_function("Ge", "CreateSevHist", this.createsevhist_func);
     this.ccm.register_function("Ge", "CreateWindow", this.createwindow_func);
     this.ccm.register_function("Ge", "CreateToolbar", this.createtoolbar_func);
+    this.ccm.register_function("Ge", "CreateLayer", this.createlayer_func);
     this.ccm.register_function("Ge", "GetInstanceObject", this.getinstanceobject_func);
     this.ccm.register_function("Ge", "GetWindowSize", this.getwindowsize_func);
     this.ccm.register_function("Ge", "GetWindowDimension", this.getwindowdimension_func);
@@ -4783,6 +4923,10 @@ arg_count) {
     this.ccm.register_function("Ge", "GetGraphConfig", this.getgraphconfig_func);
     this.ccm.register_function("Ge", "Layout", this.layout_func);
     this.ccm.register_function("Ge", "SetGraphOptions", this.setgraphoptions_func);
+    this.ccm.register_function("Ge", "LayerSetActive", this.layersetactive_func);
+    this.ccm.register_function("Ge", "LayerResetActiveAll", this.layerresetactiveall_func);
+    this.ccm.register_function("Ge", "LayerGetFirstObject", this.layergetfirstobject_func);
+    this.ccm.register_function("Ge", "LayerGetNextObject", this.layergetnextobject_func);
   
     sts = this.ccm.create_external_var(
       "eUI_Env_Web", CcmC.K_DECL_INT, 0, Glow.eUI_Env_Web, 0);

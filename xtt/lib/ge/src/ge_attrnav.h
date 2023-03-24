@@ -163,6 +163,7 @@ public:
   grow_tObject last_selected_id;
   attr_eFilterType filter_type;
   char filter_pattern[80];
+  int layer_highlighted;
   void (*message_cb)(void*, int, char, const char*);
   void (*change_value_cb)(void*);
   int (*get_subgraph_info_cb)(void*, char*, attr_sItem**, int*);
@@ -284,6 +285,7 @@ public:
   int open_children(AttrNav* attrnav, double x, double y);
   int open_attributes(AttrNav* attrnav, double x, double y);
   int close(AttrNav* attrnav, double x, double y);
+  int is_layer();
 };
 
 /*@}*/

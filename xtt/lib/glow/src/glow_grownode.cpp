@@ -1239,6 +1239,13 @@ void GrowNode::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
   }
 }
 
+void GrowNode::init_transform(double a11, double a12, double a13, double a21, 
+    double a22, double a23, double rotation)
+{
+  trf.init(a11, a12, a13, a21, a22, a23, rotation);
+  get_node_borders();
+}
+
 void GrowNode::set_transform(GlowTransform* t)
 {
   trf = *t * trf;

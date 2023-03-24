@@ -59,3 +59,4 @@ swapterminated  <Ctx is swapped>				/info
 buff_small	<Buffer is too small>				/error
 dash_full	<Dashboard is full>				/error
 otherlayer	<Object is in other layer>			/error
+noobj		<No such object is found>			/error

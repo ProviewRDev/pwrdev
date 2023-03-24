@@ -1048,8 +1048,10 @@ public:
   {
     return dashboard;
   }
+  int layer_active();
   int get_active_layer(GrowLayer **layer);
   int merge_visible_layers();
+  int merge_visible_layers_to_bg();
   int merge_all_layers();
   int move_select_to_layer();
   void layer_reset_active_all();

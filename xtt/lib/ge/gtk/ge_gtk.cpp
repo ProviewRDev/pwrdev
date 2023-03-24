@@ -491,6 +491,11 @@ void GeGtk::activate_merge_visible_layers(GtkWidget* w, gpointer gectx)
   ((Ge*)gectx)->graph->merge_visible_layers();
 }
 
+void GeGtk::activate_merge_visible_layers_to_bg(GtkWidget* w, gpointer gectx)
+{
+  ((Ge*)gectx)->graph->merge_visible_layers_to_bg();
+}
+
 void GeGtk::activate_merge_all_layers(GtkWidget* w, gpointer gectx)
 {
   ((Ge*)gectx)->graph->merge_all_layers();
@@ -2320,6 +2325,11 @@ GeGtk::GeGtk(void* x_parent_ctx, GtkWidget* x_parent_widget,
   g_signal_connect(layers_merge_visible_layers, "activate",
       G_CALLBACK(activate_merge_visible_layers), this);
 
+  GtkWidget* layers_merge_visible_layers_to_bg
+      = gtk_menu_item_new_with_mnemonic("_Merge visible Layers to Background");
+  g_signal_connect(layers_merge_visible_layers_to_bg, "activate",
+      G_CALLBACK(activate_merge_visible_layers_to_bg), this);
+
   GtkWidget* layers_merge_all_layers
       = gtk_menu_item_new_with_mnemonic("M_erge all Layers");
   g_signal_connect(layers_merge_all_layers, "activate",
@@ -2335,6 +2345,7 @@ GeGtk::GeGtk(void* x_parent_ctx, GtkWidget* x_parent_widget,
   gtk_menu_shell_append(GTK_MENU_SHELL(layers_menu), layers_delete_layer);
   gtk_menu_shell_append(GTK_MENU_SHELL(layers_menu), layers_move_select_to_layer);
   gtk_menu_shell_append(GTK_MENU_SHELL(layers_menu), layers_merge_visible_layers);
+  gtk_menu_shell_append(GTK_MENU_SHELL(layers_menu), layers_merge_visible_layers_to_bg);
   gtk_menu_shell_append(GTK_MENU_SHELL(layers_menu), layers_merge_all_layers);
 
   GtkWidget* layers = gtk_menu_item_new_with_mnemonic("_Layers");

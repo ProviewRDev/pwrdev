@@ -326,9 +326,12 @@ void Graph::delete_select()
   if (grow_GetPasteActive(grow->ctx))
     return;
 
+  grow_GetSelectList(grow->ctx, &sel_list, &sel_count);
+  if (sel_count == 0)
+    return;
+
   journal_store(journal_eAction_DeleteSelect, 0);
 
-  grow_GetSelectList(grow->ctx, &sel_list, &sel_count);
   while (sel_count) {
     grow_DeleteObject(grow->ctx, *sel_list);
     grow_GetSelectList(grow->ctx, &sel_list, &sel_count);
@@ -891,6 +894,11 @@ int Graph::get_conclass(glow_eDrawType drawtype, int linewidth,
   int sts;
   int r_amount;
 
+  if (grow_LayerActive(grow->ctx)) {
+    message('E', "Connections can't be created a layer");
+    return 1;
+  }
+
   if (corner != glow_eCorner_Rounded)
     r_amount = 0;
   else
@@ -1323,9 +1331,13 @@ glow_eDrawType Graph::get_text_drawtype()
   return text_color;
 }
 
-void Graph::select_clear()
+void Graph::select_clear(int jstore)
 {
+  if (jstore)
+    journal_store(journal_eAction_AnteSelectReset, 0);
   grow_SelectClear(grow->ctx);
+  if (jstore)
+    journal_store(journal_eAction_PostSelectReset, 0);
 }
 
 void Graph::select_all_cons()
@@ -1369,22 +1381,30 @@ void Graph::select_object(grow_tObject o)
 {
   if (grow_GetObjectType(o) == glow_eObjectType_GrowLayer) {
     grow_SelectClear(grow->ctx);
-    grow_SetHighlight(o, 1);    
+    grow_SetHighlight(o, 1);
     grow_SelectInsert(grow->ctx, o);
   } else {
+    journal_store(journal_eAction_AnteSelectObject, o);
+    journal_store(journal_eAction_AnteSelectObject, o);
     grow_SelectClear(grow->ctx);
     grow_SetHighlight(o, 1);
     grow_SelectInsert(grow->ctx, o);
+    journal_store(journal_eAction_PostSelectObject, o);
   }
 }
 
-void Graph::select_layer(grow_tObject o)
+void Graph::select_layer(grow_tObject o, int select)
 {
   if (grow_GetObjectType(o) == glow_eObjectType_GrowLayer) {
-    if (!grow_LayerIsActive(o))
+    if (select && !grow_LayerIsActive(o)) {
+      journal_store(journal_eAction_AnteActivateLayer, o);
       grow_LayerSetActive(o, 1);
-    else
+      journal_store(journal_eAction_PostActivateLayer, o);
+    }
+    else if (!select && grow_LayerIsActive(o)) {
       grow_LayerSetActive(o, 0);
+      journal_store(journal_eAction_InactivateLayer, o);
+    }
   }
 }
 
@@ -1397,6 +1417,7 @@ void Graph::add_select_object(grow_tObject o, int select)
     grow_SetHighlight(o, 0);
     grow_SelectRemove(grow->ctx, o);
   }
+  journal_store(journal_eAction_SelectObjectAdd, o);
 }
 
 void Graph::select_nextobject(glow_eDirection dir)
@@ -2380,7 +2401,9 @@ void Graph::reset_mode(bool select_clear, bool keep)
   grow_SetScaleEqual(grow->ctx, 0);
   keep_mode = keep;
   if (select_clear) {
+    journal_store(journal_eAction_AnteSelectReset, 0);
     grow_SelectClear(grow->ctx);
+    journal_store(journal_eAction_PostSelectReset, 0);
     refresh_objects(attr_mRefresh_Select);
   }
 }
@@ -2972,9 +2995,13 @@ static int graph_grow_cb(GlowCtx* ctx, glow_tEvent event)
     }
     case grow_eMode_Edit: {
       // Select
-      if (event->object.object_type == glow_eObjectType_NoObject)
+      if (event->object.object_type == glow_eObjectType_NoObject) {
+	graph->journal_store(journal_eAction_AnteSelectReset, 0);
         grow_SelectClear(graph->grow->ctx);
+	graph->journal_store(journal_eAction_PostSelectReset, 0);
+      }
       else {
+	graph->journal_store(journal_eAction_AnteSelectObject, event->object.object);
 	if (grow_FindSelectedObject(graph->grow->ctx, event->object.object)) {
 	  grow_SelectClear(graph->grow->ctx);
 	} else {
@@ -2982,6 +3009,7 @@ static int graph_grow_cb(GlowCtx* ctx, glow_tEvent event)
 	  grow_SetHighlight(event->object.object, 1);
 	  grow_SelectInsert(graph->grow->ctx, event->object.object);
 	}
+	graph->journal_store(journal_eAction_PostSelectObject, event->object.object);
       }
 
       graph->refresh_objects(attr_mRefresh_Select);
@@ -3010,18 +3038,26 @@ static int graph_grow_cb(GlowCtx* ctx, glow_tEvent event)
       }
 
       graph->refresh_objects(attr_mRefresh_Select);
+      graph->journal_store(journal_eAction_SelectObjectAdd, event->object.object);
     }
+    break;
+  case glow_eEvent_AnteRegionSelect:
+    graph->journal_store(journal_eAction_AnteSelectRegion, 0);
     break;
   case glow_eEvent_MB1Press:
     /* Select region */
     grow_SetSelectHighlight(graph->grow->ctx);
+    graph->journal_store(journal_eAction_PostSelectRegion, 0);
 
     graph->refresh_objects(attr_mRefresh_Select);
+    break;
+  case glow_eEvent_AnteRegionAddSelect:
+    graph->journal_store(journal_eAction_AnteSelectRegionAdd, 0);
     break;
   case glow_eEvent_MB1PressShift:
     /* Select region */
     grow_SetSelectHighlight(graph->grow->ctx);
-
+    graph->journal_store(journal_eAction_PostSelectRegionAdd, 0);
     graph->refresh_objects(attr_mRefresh_Select);
     break;
   case glow_eEvent_PasteSequenceStart: {
@@ -3448,6 +3484,10 @@ void GraphGrow::grow_setup()
       ctx, glow_eEvent_AnteUndo, glow_eEventType_CallBack, graph_grow_cb);
   grow_EnableEvent(
       ctx, glow_eEvent_PostUndo, glow_eEventType_CallBack, graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_AnteRegionSelect, glow_eEventType_CallBack,
+      graph_grow_cb);
+  grow_EnableEvent(ctx, glow_eEvent_AnteRegionAddSelect, glow_eEventType_CallBack,
+      graph_grow_cb);
 
   grow_RegisterUserDataCallbacks(ctx, graph_userdata_save_cb,
       graph_userdata_open_cb, graph_userdata_copy_cb);
@@ -6241,6 +6281,7 @@ void Graph::create_layer()
   dyn = new GeDyn(this);
   grow_SetUserData(layer, (void*)dyn);
   refresh_objects(attr_mRefresh_Objects);
+  journal_store(journal_eAction_CreateObject, layer);
 }
 
 void Graph::delete_layer()
@@ -6249,8 +6290,11 @@ void Graph::delete_layer()
   int sts;
 
   sts = grow_GetActiveLayer(grow->ctx, &layer);
-  if (EVEN(sts))
-    message('E', "Select a Layer");
+  if (EVEN(sts)) {
+    message('E', "No layer is active");
+    return;
+  }
+  journal_store(journal_eAction_DeleteObject, layer);
 
   grow_DeleteObject(grow->ctx, layer);
   refresh_objects(attr_mRefresh_Objects);
@@ -6261,6 +6305,11 @@ void Graph::merge_visible_layers()
   grow_MergeVisibleLayers(grow->ctx);
   refresh_objects(attr_mRefresh_Objects);
 }
+void Graph::merge_visible_layers_to_bg()
+{
+  grow_MergeVisibleLayersToBg(grow->ctx);
+  refresh_objects(attr_mRefresh_Objects);
+}
 void Graph::merge_all_layers()
 {
   grow_MergeAllLayers(grow->ctx);
@@ -6268,7 +6317,27 @@ void Graph::merge_all_layers()
 }
 void Graph::move_select_to_layer()
 {
+  grow_tObject layer;
+  int sts;
+  grow_tObject *list;
+  int list_cnt;
+
+  sts = grow_GetActiveLayer(grow->ctx, &layer);
+  if (EVEN(sts)) {
+    message('E', "No layer is active");
+    return;
+  }
+  grow_GetSelectList(grow->ctx, &list, &list_cnt);
+  for (int i = 0; i < list_cnt; i++) {
+    if (grow_GetObjectType(list[i]) == glow_eObjectType_GrowLayer) {
+      message('E', "Layer is selected. Unable to move layer.");
+      return;
+    }
+  }
+
+  journal_store(journal_eAction_AnteMoveToLayer, layer);
   grow_MoveSelectToLayer(grow->ctx);
+  journal_store(journal_eAction_PostMoveToLayer, layer);
   refresh_objects(attr_mRefresh_Objects);
 }
 

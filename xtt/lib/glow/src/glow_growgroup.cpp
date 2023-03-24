@@ -276,22 +276,6 @@ void GrowGroup::set_rootnode(void* node)
   nc->a.set_rootnode(node);
 }
 
-int GrowGroup::get_path(char* name, int size)
-{
-  if (parent) {
-    ((GrowGroup*)parent)->get_path(name, size);
-    if ((int)strlen(name) + (int)strlen(n_name) + 2 > size)
-      return GLOW__BUFF_SMALL;
-    strcat(name, "-");
-    strcat(name, n_name);
-  } else {
-    if ((int)strlen(n_name) + 1 > size)
-      return GLOW__BUFF_SMALL;
-    strncpy(name, n_name, size);
-  }
-  return GLOW__SUCCESS;
-}
-
 int GrowGroup::clear()
 {
   ctx->set_nodraw();

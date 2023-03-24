@@ -797,6 +797,8 @@ void grow_MeasureAnnotText(grow_tCtx ctx, char* text, glow_eDrawType draw_type,
 */
 glow_eNodeGroup grow_GetNodeGroup(grow_tNode node);
 
+void grow_GetObjectParent(grow_tObject object, grow_tObject *parent);
+
 //! Get the name of an object.
 /*!
   \param object	Object.
@@ -3434,11 +3436,16 @@ void grow_LayerResetActiveAll(grow_tCtx ctx);
 void grow_GetLayerObjectList(grow_tObject layer, grow_tObject** list, int* cnt);
 int grow_GetActiveLayer(grow_tCtx ctx, grow_tObject *layer);
 int grow_MergeVisibleLayers(grow_tCtx ctx);
+int grow_MergeVisibleLayersToBg(grow_tCtx ctx);
 int grow_MergeAllLayers(grow_tCtx ctx);
 int grow_MoveSelectToLayer(grow_tCtx ctx);
 int grow_LayerGetNextObject(grow_tObject layer, grow_tObject object, 
     grow_tObject* next);
 int grow_LayerGetFirstObject(grow_tObject layer, grow_tObject* first);
+int grow_LayerInsert(grow_tObject layer, grow_tObject o);
+int grow_LayerRemove(grow_tObject layer, grow_tObject o);
+int grow_LayerIsEmpty(grow_tObject layer);
+int grow_LayerActive(grow_tCtx ctx);
 
 
 /*@}*/

@@ -429,6 +429,8 @@ static int graph_open_func(void* client_data, void* client_flag)
   }
 
   // Assume that parent is Ge
+  ((Ge*)graph->parent_ctx)->clear();
+
   ((Ge*)graph->parent_ctx)->open(name);
   return GE__SUCCESS;
 }

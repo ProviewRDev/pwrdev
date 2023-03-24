@@ -71,6 +71,7 @@ public:
   }
   virtual int get_object_name(char* name, int size, glow_eName ntype);
   virtual void set_object_name(char* name);
+  virtual int get_path(char *path, int size);
 
   virtual void zoom(){}
   virtual void nav_zoom(){}

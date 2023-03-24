@@ -53,6 +53,14 @@ public:
   std::streampos end_pos;
 };
 
+class MoveObject {
+ public:
+  char name[80];
+  MoveObject() {
+    strcpy(name,"");
+  }
+};
+
 /* ge_journal.h -- Journal function */
 
 typedef enum {
@@ -74,7 +82,23 @@ typedef enum {
   journal_eAction_PostPaste,
   journal_eAction_AnteRename,
   journal_eAction_PostRename,
-  journal_eAction_No
+  journal_eAction_No,
+  journal_eAction_AnteActivateLayer,
+  journal_eAction_PostActivateLayer,
+  journal_eAction_InactivateLayer,
+  journal_eAction_SetLayerVisible,
+  journal_eAction_SetLayerInvisible,
+  journal_eAction_AnteMoveToLayer,
+  journal_eAction_PostMoveToLayer,
+  journal_eAction_AnteSelectObject,
+  journal_eAction_PostSelectObject,
+  journal_eAction_SelectObjectAdd,
+  journal_eAction_AnteSelectReset,
+  journal_eAction_PostSelectReset,
+  journal_eAction_AnteSelectRegion,
+  journal_eAction_PostSelectRegion,
+  journal_eAction_AnteSelectRegionAdd,
+  journal_eAction_PostSelectRegionAdd
 } journal_eAction;
 
 typedef enum {
@@ -87,6 +111,7 @@ typedef enum {
   journal_eStatus_AnteGroup
 } journal_eStatus;
 
+
 class GraphJournal {
 public:
   GraphJournal(Graph* g, int* sts);
@@ -95,6 +120,9 @@ public:
   int store(journal_eAction action, grow_tObject o);
   int undo();
   int redo();
+  void read_end();
+  void read_object(char *name, int size);
+  void read_size(int* size);
   void check_object_number(grow_tObject o);
   int open(const char* name);
   int clear(char* name = 0);
@@ -139,6 +167,46 @@ public:
   int store_redo_rename(grow_tObject o);
   int undo_rename();
   int redo_rename();
+  int store_undo_activate_layer(grow_tObject o);
+  int store_redo_activate_layer(grow_tObject o);
+  int undo_activate_layer();
+  int redo_activate_layer();
+  int store_undo_inactivate_layer(grow_tObject o);
+  int store_redo_inactivate_layer(grow_tObject o);
+  int undo_inactivate_layer();
+  int redo_inactivate_layer();
+  int store_undo_set_layer_visible(grow_tObject o);
+  int store_redo_set_layer_visible(grow_tObject o);
+  int undo_set_layer_visible();
+  int redo_set_layer_visible();
+  int store_undo_set_layer_invisible(grow_tObject o);
+  int store_redo_set_layer_invisible(grow_tObject o);
+  int undo_set_layer_invisible();
+  int redo_set_layer_invisible();
+  int store_undo_move_to_layer(grow_tObject o);
+  int store_redo_move_to_layer(grow_tObject o);
+  int undo_move_to_layer();
+  int redo_move_to_layer();
+  int store_undo_select_object(grow_tObject o);
+  int store_redo_select_object(grow_tObject o);
+  int undo_select_object();
+  int redo_select_object();
+  int store_undo_select_object_add(grow_tObject o);
+  int store_redo_select_object_add(grow_tObject o);
+  int undo_select_object_add();
+  int redo_select_object_add();
+  int store_undo_select_reset();
+  int store_redo_select_reset();
+  int undo_select_reset();
+  int redo_select_reset();
+  int store_undo_select_region();
+  int store_redo_select_region();
+  int undo_select_region();
+  int redo_select_region();
+  int store_undo_select_region_add();
+  int store_redo_select_region_add();
+  int undo_select_region_add();
+  int redo_select_region_add();
   static void print(char* fname);
   static char* tag_to_str(int tag);
   static char* action_to_str(int action);
@@ -153,6 +221,8 @@ public:
   char graphname[80];
   pwr_tFileName filename;
   char rename_name[80];
+  char active_layer[80];
+  std::vector<MoveObject> movelist;
 };
 
 #endif

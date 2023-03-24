@@ -131,6 +131,7 @@ public:
   static void activate_create_layer(GtkWidget* w, gpointer gectx);
   static void activate_delete_layer(GtkWidget* w, gpointer gectx);
   static void activate_merge_visible_layers(GtkWidget* w, gpointer gectx);
+  static void activate_merge_visible_layers_to_bg(GtkWidget* w, gpointer gectx);
   static void activate_merge_all_layers(GtkWidget* w, gpointer gectx);
   static void activate_move_select_to_layer(GtkWidget* w, gpointer gectx);
   static void activate_change_text(GtkWidget* w, gpointer gectx);

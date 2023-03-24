@@ -133,6 +133,8 @@ var Glow = {
   eObjectType_GrowToolbar   	: 45,
   eObjectType_GrowBarArc   	: 46,
   eObjectType_GrowDashCell   	: 47,
+  eObjectType_GrowScriptModule	: 48,
+  eObjectType_GrowLayer		: 49,
 
   eDirection_Center		: 0,
   eDirection_Right		: 1,
@@ -896,6 +898,8 @@ var Glow = {
   eSave_GrowBarArc		        : 49,
   eSave_GrowDashCell		        : 50,
   eSave_GrowDashboard		        : 51,
+  eSave_GrowScriptModule	        : 52,
+  eSave_GrowLayer		        : 53,
   eSave_End				: 99,
   eSave_Ctx_zoom_factor_x		: 100,
   eSave_Ctx_base_zoom_factor		: 101,
@@ -1190,6 +1194,8 @@ var Glow = {
   eSave_GrowCtx_dashboard	    	: 2250,
   eSave_GrowCtx_dash		    	: 2251,
   eSave_GrowCtx_anti_aliasing	    	: 2252,
+  eSave_GrowCtx_window_resize 		: 2253,
+  eSave_GrowCtx_layername_cnt 		: 2254,
   eSave_GrowSubAnnot_x_right		: 2300,
   eSave_GrowSubAnnot_x_left		: 2301,
   eSave_GrowSubAnnot_y_high		: 2302,
@@ -1686,6 +1692,8 @@ var Glow = {
   eSave_GrowDashCell_cell_columns 	: 5003,
   eSave_GrowDashboard_dash_columns 	: 5100,
   eSave_GrowDashboard_dash_rows	 	: 5101,
+  eSave_GrowLayer_array_part 		: 5300,
+  eSave_GrowLayer_grownode_part 	: 5301,
 
   ePosition_Absolute			: 0,
   ePosition_Relative			: 1,
@@ -2353,7 +2361,7 @@ function GlowArray( ctx) {
   };
   this.get_first = function() {
     var ret = {sts : 0, element : null}
-    if (this.length == 0)
+    if (this.a.length == 0)
       return ret;
     ret.element = this.a[0];
     ret.sts = 1;
@@ -2375,6 +2383,12 @@ function GlowArray( ctx) {
       if ( this.a[i] == elem) {
 	this.a.splice( i, 1);
 	return 1;
+      }
+    }
+    for ( var i = 0; i < this.a.length; i++) {
+      if (this.a[i].type() == Glow.eObjectType_GrowLayer) {
+        if (this.a[i].remove(elem) == 1)
+          return 1;
       }
     }
     return 0;
@@ -2440,6 +2454,12 @@ function GlowArray( ctx) {
       }
       case Glow.eSave_GrowGroup: {
 	o = new GrowGroup( this.ctx);
+	i = o.open( lines, i+1);
+	this.add( o);
+	break;
+      }
+      case Glow.eSave_GrowLayer: {
+	o = new GrowLayer( this.ctx);
 	i = o.open( lines, i+1);
 	this.add( o);
 	break;
@@ -4361,7 +4381,8 @@ function GrowNode( ctx) {
 	break;
       case Glow.eSave_Node_nc:
 	this.nc_name = tokens[1];
-	if ( this.type() != Glow.eObjectType_GrowGroup) {
+	if ( !(this.type() == Glow.eObjectType_GrowGroup ||
+	       this.type() == Glow.eObjectType_GrowLayer)) {
 	  this.nc = ctx.get_nodeclass_from_name( this.nc_name);
 	  this.nc_root = this.nc;
 	  if ( this.nc === null)
@@ -4834,6 +4855,9 @@ function GrowNode( ctx) {
     this.get_node_borders();
   };
     
+  this.initTransform = function(a11, a12, a13, a21, a22, a23, rotation) {
+    this.trf.init(a11, a12, a13, a21, a22, a23, rotation);
+  }
   this.storeTransform = function() {
     this.trf.store();
   };
@@ -5387,6 +5411,183 @@ function GrowGroup( ctx) {
 }
 
 GrowGroup.prototype = Object.create(GrowNode.prototype);
+
+function GrowLayer( ctx) {
+  GrowNode.call( this, ctx);
+  this.grownode_open = this.open;
+  this.hide = 0;
+  this.active = 0;
+  this.a = new GlowArray(ctx);
+  this.nc = new GlowNodeClass(ctx);
+  this.nc.nc_name = "__layer_class";
+
+  this.type = function() {
+    return Glow.eObjectType_GrowLayer;
+  };
+
+  this.open = function( lines, row) {
+    var end = false;
+    var i;
+
+    for ( i = row; i < lines.length; i++) {
+
+      var tokens = lines[i].split(' ');
+      var key = parseInt(tokens[0], 10);
+
+      if ( this.ctx.debug) console.log( "GrowLayer : " + lines[i]);
+
+      switch ( key) {
+      case Glow.eSave_GrowLayer: 
+	break;
+      case Glow.eSave_GrowLayer_array_part: 
+	i = this.a.open( lines, i+1);
+	break;
+      case Glow.eSave_GrowLayer_grownode_part: 
+	i = this.grownode_open( lines, i+1); 
+	break;
+      case Glow.eSave_End:
+	end = true;
+	break;
+      default:
+	console.log( "Syntax error in GrowLayer");
+	break;
+      }
+      if ( end)
+	break;
+    }
+		
+    return i;
+  };
+
+  this.tdraw = function( t, highlight, hot, node, colornode) {
+    if ( this.ctx.nodraw !== 0)
+      return;
+
+    if ( this.invisible !== 0)
+      return;
+  
+    for (var i = 0; i < this.a.size(); i++) 
+      this.a.get(i).tdraw( this.trf, 0, 0, this, this);
+  };
+
+  this.event_handler = function( event, fx, fy) {
+    var sts;
+
+    switch ( event.event) {
+    case Glow.eEvent_CursorMotion:		
+      for (var i = this.a.size() - 1; i >= 0; i--)
+         this.a.get(i).event_handler(event, fx, fy); 
+      break;
+    default:
+      for (var i = this.a.size() - 1; i >= 0; i--) {
+         sts = this.a.get(i).event_handler(event, fx, fy); 
+	 if ( sts != 0)
+           return sts;
+      }
+      break;
+    }
+    return 0;
+  };
+
+  this.get = function(idx) {
+    return this.a.get(idx);
+  };
+
+  this.set_active = function(act) {
+    for (var i = 0; i < this.ctx.a.size(); i++) {
+      if (this.ctx.a.get(i).type() == Glow.eObjectType_GrowLayer)
+        this.ctx.a.get(i).active = 0;
+    }
+
+    if (act) {
+      this.ctx.layer = this;
+      this.active = 1;
+    }
+    else
+      this.ctx.layer = this.ctx.a;  
+  };
+
+  this.add = function(elem) {
+    this.a.add(elem);
+  };
+  this.add = function( elem) {
+    this.a.add(elem);
+  };
+  this.get_first = function() {
+    return this.a.get_first();
+  };
+  this.get_next = function( elem) {
+    return this.a.get_next(elem);
+  };
+  this.remove = function( elem) {
+    return this.a.remove(elem);
+  };
+  this.size = function() {
+    return this.a.size();
+  };
+  this.get = function( idx) {
+    return this.a.get(idx);
+  };
+  this.clear = function() {
+    this.a.clear();
+  }
+  this.setFillColor = function(drawtype) {
+    this.a.setFillColor(drawtype);
+  }
+  this.resetFillColor = function() {
+    this.a.resetFillColor();
+  }
+  this.setBorderColor = function(drawtype) {
+    this.a.setBorderColor(drawtype);
+  }
+  this.resetBorderColor = function() {
+    this.a.resetBorderColor();
+  }
+  this.setOriginalFillColor = function(drawtype) {
+    this.a.setOriginalFillColor(drawtype);
+  }
+  this.setOriginalTextColor = function(drawtype) {
+    this.a.setOriginalTextColor(drawtype);
+  }
+  this.setOriginalBorderColor = function(drawtype) {
+    this.a.setOriginalBorderColor(drawtype);
+  }
+  this.setOriginalBackgroundColor = function(drawtype) {
+    this.a.setOriginalBackgroundColor(drawtype);
+  }
+  this.setLinewidth = function(linewidth) {
+    this.a.setLinewidth(linewidth);
+  }
+  this.setFill = function(fill) {
+    this.a.setFill(fill);
+  }
+  this.setBorder = function(border) {
+    this.a.setBorder(border);
+  }
+  this.setShadow = function(shadow) {
+    this.a.setShadow(shadow);
+  }
+  this.setGradient = function(gradient) {
+    this.setGradient(gradient);
+  }
+  this.setTransform = function(t) {
+    this.a.setTransform(t);
+  }
+  this.get_borders = function(t, g) {
+    this.a.get_borders(t, g);
+  }
+  this.get_object_list = function() {
+    return this.a;
+  };
+  this.get_next_object = function(object) {
+    return this.a.get_next(object);
+  };
+  this.get_first_object = function() {
+    return this.a.get_first();
+  };
+}
+
+GrowLayer.prototype = Object.create(GrowNode.prototype);
 
 function GrowDashCell( ctx) {
   GrowGroup.call( this, ctx);
@@ -17171,7 +17372,6 @@ function GrowCtx( ctx) {
   this.recursive_trace = 0;
   this.nodraw = 0;
   this.owner = "";
-  this.objectname_cnt = 0;
   this.dashboard = 0;
   this.customcolors = new GlowCustomColors();
   this.dash = new GrowDashboard(this);    
@@ -17181,6 +17381,9 @@ function GrowCtx( ctx) {
   this.a_sel = new GlowArray( this);
   this.modified = 0;
   this.objectname_cnt = 0;
+  this.layername_cnt = 0;
+  this.window_resize = 0;
+  this.layer = this.a;
 
   if ( ctx == null)
     this.gdraw = new GlowDraw(this);
@@ -17512,6 +17715,12 @@ function GrowCtx( ctx) {
 	break;
       case Glow.eSave_GrowCtx_anti_aliasing:
 	break;
+      case Glow.eSave_GrowCtx_window_resize:
+	this.window_resize = parseInt(tokens[1], 10);
+	break;
+      case Glow.eSave_GrowCtx_layername_cnt:
+	this.layername_cnt = parseInt(tokens[1], 10);
+	break;
       default:
 	console.log( "Syntax error in GrowCtx open_growctx", key);
 	break;
@@ -17815,6 +18024,7 @@ function GrowCtx( ctx) {
     for ( var i = 0; i < this.a.size(); i++) {
       if ( this.a.get(i).type() == Glow.eObjectType_GrowNode ||
 	   this.a.get(i).type() == Glow.eObjectType_GrowGroup ||
+	   this.a.get(i).type() == Glow.eObjectType_GrowLayer ||
 	   this.a.get(i).type() == Glow.eObjectType_GrowBar ||
 	   this.a.get(i).type() == Glow.eObjectType_GrowBarArc ||
 	   this.a.get(i).type() == Glow.eObjectType_GrowTrend ||
@@ -17836,6 +18046,14 @@ function GrowCtx( ctx) {
 		 this.a.get(i).nc.a.get(j).type() == Glow.eObjectType_GrowGroup) {
 	      this.appl.traceConnect( this.a.get(i).nc.a.get(j));
 	    }
+	  }				    
+	}
+	else if ( this.a.get(i).type() == Glow.eObjectType_GrowLayer) {
+	  for ( var j = 0; j < this.a.get(i).a.size(); j++) {
+	    if ( this.a.get(i).a.get(j).type() == Glow.eObjectType_GrowNode ||
+		 this.a.get(i).a.get(j).type() == Glow.eObjectType_GrowGroup) {
+	      this.appl.traceConnect( this.a.get(i).a.get(j));
+	    }
 	  }		
 		    
 	}
@@ -17855,6 +18073,7 @@ function GrowCtx( ctx) {
     for ( var i = 0; i < this.a.size(); i++) {
       if ( this.a.get(i).type() == Glow.eObjectType_GrowNode ||
 	   this.a.get(i).type() == Glow.eObjectType_GrowGroup ||
+	   this.a.get(i).type() == Glow.eObjectType_GrowLayer ||
 	   this.a.get(i).type() == Glow.eObjectType_GrowBar ||
 	   this.a.get(i).type() == Glow.eObjectType_GrowBarArc ||
 	   this.a.get(i).type() == Glow.eObjectType_GrowTrend ||
@@ -17876,6 +18095,14 @@ function GrowCtx( ctx) {
 	    }
 	  }				    
 	}
+	else if ( this.a.get(i).type() == Glow.eObjectType_GrowLayer) {
+	  for ( var j = 0; j < this.a.get(i).a.size(); j++) {
+	    if ( this.a.get(i).a.get(j).type() == Glow.eObjectType_GrowNode ||
+		 this.a.get(i).a.get(j).type() == Glow.eObjectType_GrowGroup) {
+	      this.appl.traceDisconnect( this.a.get(i).a.get(j));
+	    }
+	  }				    
+	}
 	else if ( this.a.get(i).type() == Glow.eObjectType_GrowWindow ||
 		  this.a.get(i).type() == Glow.eObjectType_GrowFolder) {
 	  this.a.get(i).traceDisconnect();
@@ -17890,6 +18117,7 @@ function GrowCtx( ctx) {
     for ( var i = 0; i < this.a.size(); i++) {
       if ( this.a.get(i).type() == Glow.eObjectType_GrowNode ||
 	   this.a.get(i).type() == Glow.eObjectType_GrowGroup ||
+	   this.a.get(i).type() == Glow.eObjectType_GrowLayer ||
 	   this.a.get(i).type() == Glow.eObjectType_GrowBar ||
 	   this.a.get(i).type() == Glow.eObjectType_GrowBarArc ||
 	   this.a.get(i).type() == Glow.eObjectType_GrowTrend ||
@@ -17909,8 +18137,15 @@ function GrowCtx( ctx) {
 		 this.a.get(i).nc.a.get(j).type() == Glow.eObjectType_GrowGroup) {
 	      this.appl.traceScan( this.a.get(i).nc.a.get(j));
 	    }
-	  }		
-		    
+	  }				    
+	}
+	else if ( this.a.get(i).type() == Glow.eObjectType_GrowLayer) {
+	  for ( var j = 0; j < this.a.get(i).a.size(); j++) {
+	    if ( this.a.get(i).a.get(j).type() == Glow.eObjectType_GrowNode ||
+		 this.a.get(i).a.get(j).type() == Glow.eObjectType_GrowGroup) {
+	      this.appl.traceScan( this.a.get(i).a.get(j));
+	    }
+	  }				    
 	}
 	else if ( this.a.get(i).type() == Glow.eObjectType_GrowWindow ||
 		  this.a.get(i).type() == Glow.eObjectType_GrowFolder) {
@@ -17949,7 +18184,7 @@ function GrowCtx( ctx) {
   };
 
   this.insert = function( e) {
-    this.a.add(e);
+    this.layer.add(e);
   };
 
   this.remove = function( e) {
@@ -18153,10 +18388,10 @@ function GrowCtx( ctx) {
     this.objectname_cnt++;
 
     // The objects in the group has to be in the same order as a
-    for (i = 0; i < this.a.size(); i++) {
+    for (i = 0; i < this.layer.size(); i++) {
       for (j = 0; j < this.a_sel.size(); j++) {
-        if (this.a.get(i) == this.a_sel.get(j)) {
-          a_group.add(this.a.get(i));
+        if (this.layer.get(i) == this.a_sel.get(j)) {
+          a_group.add(this.layer.get(i));
           break;
         }
       }
@@ -18172,10 +18407,10 @@ function GrowCtx( ctx) {
 
     // Remove objects
     for (i = 0; i < this.a_sel.size(); i++)
-      this.a.remove(this.a_sel.get(i));
+      this.layer.remove(this.a_sel.get(i));
     this.a_sel.clear();
 
-    this.a.add(g1);
+    this.layer.add(g1);
     g1.get_node_borders();
 
     ret.group = g1;
@@ -18223,6 +18458,10 @@ function GrowCtx( ctx) {
     return this.objectname_cnt++;
   }
 
+  this.incrNextLayerNameNum = function() {
+    return this.layername_cnt++;
+  }
+
   this.clear_all = function() {
     this.delete_all();
   }
@@ -18234,6 +18473,12 @@ function GrowCtx( ctx) {
   }
   this.set_name = function(name) {
     this.name = name;
+  }
+  this.layer_reset_active_all = function() {
+    for (var i = 0; i < this.a.size(); i++) {
+      if (this.a.get(i).type() == Glow.eObjectType_GrowLayer)
+        this.a.get(i).set_active(0);
+    }
   }
 }
 
@@ -18590,6 +18835,15 @@ function GrowApi() {
     ctx.insert(r1);
     return r1;
   }
+  this.CreateGrowLayer = function(ctx, name, user_data) {
+    var r1 = new GrowLayer(ctx);
+    var nc = new GlowNodeClass(ctx);
+    nc.nc_name = "__layer_class";
+    r1.construct(name, nc, 0, 0);
+    r1.setUserData(user_data);
+    ctx.a.add(r1);
+    return r1;
+  }
   this.SetBackgroundColor = function(ctx, color) {
     ctx.background_color = color;
   }
@@ -18628,7 +18882,6 @@ function GrowApi() {
     }
     return group.get_next_object(object);
   }
-
   this.GroupGetFirstObject = function(group) {
     if (!(group.type() == Glow.eObjectType_GrowGroup ||
 	  group.type() == Glow.eObjectType_GrowDashCell)) {
@@ -18636,6 +18889,20 @@ function GrowApi() {
       return ret;
     }
     return group.get_first_object();
+  }
+  this.LayerGetNextObject = function(layer, object) {
+    if (layer.type() != Glow.eObjectType_GrowLayer) {
+      var ret = {sts : 0, element : null}
+      return ret;
+    }
+    return layer.get_next_object(object);
+  }
+  this.LayerGetFirstObject = function(layer) {
+    if (layer.type() != Glow.eObjectType_GrowLayer) {
+      var ret = {sts : 0, element : null}
+      return ret;
+    }
+    return layer.get_first_object();
   }
   this.SetObjectName = function(o, name) {
     o.set_name(name);
@@ -18739,6 +19006,9 @@ function GrowApi() {
   this.GetNextObjectNameNumber = function(ctx) {
     return ctx.incrNextObjectNameNum();
   }
+  this.GetNextLayerNameNumber = function(ctx) {
+    return ctx.incrNextLayerNameNum();
+  }
   this.IsSliderClass = function(nc) {
     return nc.isSlider();
   }
@@ -18781,11 +19051,15 @@ function GrowApi() {
     // TODO
     this.UpdateColorTheme(ctx, 1);
   }
+  this.LayerResetActiveAll = function(ctx) {
+    ctx.layer_reset_active_all();
+  }
   this.SetObjectAttribute = function(o, name, value) {
     switch (o.type()) {
 
     case Glow.eObjectType_GrowNode:
     case Glow.eObjectType_GrowGroup:
+    case Glow.eObjectType_GrowLayer:
     case Glow.eObjectType_GrowToolbar:
       if (name === "Transparency") {
 	o.transparency = value;
@@ -19322,6 +19596,7 @@ function GrowApi() {
 
     case Glow.eObjectType_GrowNode:
     case Glow.eObjectType_GrowGroup:
+    case Glow.eObjectType_GrowLayer:
     case Glow.eObjectType_GrowToolbar:
       if (name === "Transparency") {
 	ret.value = o.transparency;

@@ -136,7 +136,6 @@ void GrowLayer::set_active(int act)
 
   if (act) {
     ctx->layer = this;
-    printf("Layer set %llu %llu\n", (unsigned long long)(GlowArray*)this, (unsigned long long)ctx->layer);
     active = 1;
   }
   else
@@ -326,6 +325,17 @@ int GrowLayer::insert(GlowArrayElem* element)
   int sts;
 
   sts = GlowArray::insert(element);
+  element->set_parent(this);
+  get_node_borders();
+  return sts;
+}
+
+int GrowLayer::remove(GlowArrayElem* element) 
+{
+  int sts;
+
+  sts = GlowArray::remove(element);
+  element->set_parent(0);
   get_node_borders();
   return sts;
 }

@@ -70,6 +70,8 @@ typedef void* glow_tImImage;
 typedef void* glow_tImData;
 typedef void* glow_tWidget;
 
+typedef char glow_tOName[80];
+
 //!  Types of glow variables, used when displaying varables in attribute
 //!  editors.
 typedef enum {
@@ -1248,6 +1250,8 @@ typedef enum {
   glow_eEvent_Signal, //!< Signal event.
   glow_eEvent_Open, //!< Open event.
   glow_eEvent_Close, //!< Close event.
+  glow_eEvent_AnteRegionSelect, //!< Before region select.
+  glow_eEvent_AnteRegionAddSelect, //!< Before region select add.
   glow_eEvent__
 } glow_eEvent;
 
@@ -2170,8 +2174,8 @@ typedef enum {
   glow_eSave_GrowScriptModule_fill_module = 5232,
   glow_eSave_GrowScriptModule_window_border_width = 5233,
   glow_eSave_GrowScriptModule_window_switch_ratio = 5234,
-  glow_eSave_GrowLayer_array_part = 5200,
-  glow_eSave_GrowLayer_grownode_part = 5201
+  glow_eSave_GrowLayer_array_part = 5300,
+  glow_eSave_GrowLayer_grownode_part = 5301
 } glow_eSave;
 
 //! Relative or absolute position for an annotation

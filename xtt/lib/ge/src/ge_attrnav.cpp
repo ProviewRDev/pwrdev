@@ -1873,7 +1873,8 @@ AttrNav::AttrNav(void* xn_parent_ctx, attr_eType xn_type, const char* xn_name,
     grow_tObject*, int), pwr_tStatus* status)
       : parent_ctx(xn_parent_ctx), type(xn_type), brow(0), itemlist(xn_itemlist),
       item_cnt(xn_item_cnt), trace_started(0), graph(0), last_selected(0),
-      last_selected_id(0), filter_type(attr_eFilterType_No), message_cb(NULL),
+      last_selected_id(0), filter_type(attr_eFilterType_No), 
+      layer_highlighted(0), message_cb(NULL),
       get_object_list_cb(xn_get_object_list_cb), set_inputfocus_cb(0), 
       traverse_inputfocus_cb(0)
 {
@@ -1994,7 +1995,7 @@ int AttrNav::set_attr_value(
           if (!streq(oitem->name, name)) {
             strcpy(oitem->name, name);
             brow_SetAnnotation(oitem->node, 0, name, strlen(name));
-	    if (grow_GetObjectType(oitem->id) == glow_eObjectType_GrowLayer)
+	    if (oitem->is_layer())
 	      graph->refresh_objects(attr_mRefresh_Objects);
           }
         }
@@ -2170,7 +2171,8 @@ static int attrnav_brow_cb(FlowCtx* ctx, flow_tEvent event)
           brow_GetUserData(current, (void**)&item);
           if (item->type == attrnav_eItemType_Object) {
             if (attrnav->type == attr_eType_ObjectTree)
-              attrnav->graph->add_select_object(((AItemObject*)item)->id, 0);
+	      if (!((AItemObject*)item)->is_layer())
+		attrnav->graph->add_select_object(((AItemObject*)item)->id, 0);
           }
           if (node_count)
             free(node_list);
@@ -2184,7 +2186,8 @@ static int attrnav_brow_cb(FlowCtx* ctx, flow_tEvent event)
         brow_GetUserData(object, (void**)&item);
         if (item->type == attrnav_eItemType_Object
             && attrnav->type == attr_eType_ObjectTree) {
-          attrnav->graph->add_select_object(((AItemObject*)item)->id, 1);
+	  if (!((AItemObject*)item)->is_layer())
+	    attrnav->graph->add_select_object(((AItemObject*)item)->id, 1);
           attrnav->last_selected_id = ((AItemObject*)item)->id;
         }
         if (!brow_IsVisible(attrnav->brow->ctx, object, flow_eVisible_Full))
@@ -2195,6 +2198,10 @@ static int attrnav_brow_cb(FlowCtx* ctx, flow_tEvent event)
       }
     } else {
       brow_SelectClear(attrnav->brow->ctx);
+      if (attrnav->layer_highlighted) {
+	grow_ResetHighlightAll(attrnav->graph->grow->ctx);
+	attrnav->layer_highlighted = 0;
+      }
       brow_SetInverse(object, 1);
       brow_SelectInsert(attrnav->brow->ctx, object);
     }
@@ -2207,9 +2214,12 @@ static int attrnav_brow_cb(FlowCtx* ctx, flow_tEvent event)
 
     attrnav->last_selected = object;
     if (item->type == attrnav_eItemType_Object) {
-      if (attrnav->type == attr_eType_ObjectTree)
-        attrnav->graph->select_object(((AItemObject*)item)->id);
-
+      if (attrnav->type == attr_eType_ObjectTree) {
+	if (((AItemObject*)item)->is_layer())
+	  attrnav->graph->select_clear();
+	else
+	  attrnav->graph->select_object(((AItemObject*)item)->id);
+      }
       attrnav->last_selected_id = ((AItemObject*)item)->id;
     } else {
       for (sts = brow_GetParent(attrnav->brow->ctx, object, &parent); ODD(sts);
@@ -2327,6 +2337,10 @@ static int attrnav_brow_cb(FlowCtx* ctx, flow_tEvent event)
       }
     } else {
       brow_SelectClear(attrnav->brow->ctx);
+      if (attrnav->layer_highlighted) {
+	grow_ResetHighlightAll(attrnav->graph->grow->ctx);
+	attrnav->layer_highlighted = 0;
+      }
       brow_SetInverse(object, 1);
       brow_SelectInsert(attrnav->brow->ctx, object);
     }
@@ -2339,9 +2353,12 @@ static int attrnav_brow_cb(FlowCtx* ctx, flow_tEvent event)
 
     attrnav->last_selected = object;
     if (item->type == attrnav_eItemType_Object) {
-      if (attrnav->type == attr_eType_ObjectTree)
-        attrnav->graph->select_object(((AItemObject*)item)->id);
-
+      if (attrnav->type == attr_eType_ObjectTree) {
+	if (((AItemObject*)item)->is_layer())
+	  attrnav->graph->select_clear();
+	else
+	  attrnav->graph->select_object(((AItemObject*)item)->id);
+      }
       attrnav->last_selected_id = ((AItemObject*)item)->id;
     } else {
       for (sts = brow_GetParent(attrnav->brow->ctx, object, &parent); ODD(sts);
@@ -2442,15 +2459,23 @@ static int attrnav_brow_cb(FlowCtx* ctx, flow_tEvent event)
 
       if (brow_FindSelectedObject(attrnav->brow->ctx, event->object.object)) {
         brow_SelectClear(attrnav->brow->ctx);
+	if (attrnav->layer_highlighted) {
+	  grow_ResetHighlightAll(attrnav->graph->grow->ctx);
+	  attrnav->layer_highlighted = 0;
+	}
 	attrnav->graph->select_clear();
         if (attrnav->type == attr_eType_Layers) {
           brow_GetUserData(event->object.object, (void**)&item);
           if (item->type == attrnav_eItemType_Object) {
-            attrnav->graph->select_layer(((AItemObject*)item)->id);
+            attrnav->graph->select_layer(((AItemObject*)item)->id, 0);
           }
         }
       } else {
         brow_SelectClear(attrnav->brow->ctx);
+	if (attrnav->layer_highlighted) {
+	  grow_ResetHighlightAll(attrnav->graph->grow->ctx);
+	  attrnav->layer_highlighted = 0;
+	}
         brow_SetInverse(event->object.object, 1);
         brow_SelectInsert(attrnav->brow->ctx, event->object.object);
 
@@ -2459,21 +2484,32 @@ static int attrnav_brow_cb(FlowCtx* ctx, flow_tEvent event)
         if (attrnav->type == attr_eType_ObjectTree) {
           brow_GetUserData(event->object.object, (void**)&item);
           if (item->type == attrnav_eItemType_Object) {
-            attrnav->graph->select_object(((AItemObject*)item)->id);
+	    if (((AItemObject*)item)->is_layer()) {
+	      attrnav->graph->select_clear(1);
+	      grow_SetHighlight(((AItemObject*)item)->id, 1);
+	      attrnav->layer_highlighted = 1;
+	    }
+	    else
+	      attrnav->graph->select_object(((AItemObject*)item)->id);
             attrnav->last_selected_id = ((AItemObject*)item)->id;
           }
         } else if (attrnav->type == attr_eType_Layers) {
           brow_GetUserData(event->object.object, (void**)&item);
           if (item->type == attrnav_eItemType_Object) {
-            attrnav->graph->select_layer(((AItemObject*)item)->id);
+            attrnav->graph->select_layer(((AItemObject*)item)->id, 1);
             attrnav->last_selected_id = ((AItemObject*)item)->id;
           }
         }
       }
       break;
     default:
-      if (attrnav->type != attr_eType_Layers)
+      if (attrnav->type != attr_eType_Layers) {
 	brow_SelectClear(attrnav->brow->ctx);
+	if (attrnav->layer_highlighted) {
+	  grow_ResetHighlightAll(attrnav->graph->grow->ctx);
+	  attrnav->layer_highlighted = 0;
+	}
+      }
     }
     break;
   }
@@ -2560,6 +2596,10 @@ static int attrnav_brow_cb(FlowCtx* ctx, flow_tEvent event)
     default:;
     }
     brow_SelectClear(attrnav->brow->ctx);
+    if (attrnav->layer_highlighted) {
+      grow_ResetHighlightAll(attrnav->graph->grow->ctx);
+      attrnav->layer_highlighted = 0;
+    }
     brow_SetInverse(object, 1);
     brow_SelectInsert(attrnav->brow->ctx, object);
     if (!brow_IsVisible(attrnav->brow->ctx, object, flow_eVisible_Full))
@@ -2673,17 +2713,18 @@ static int attrnav_brow_cb(FlowCtx* ctx, flow_tEvent event)
             ->open_children(attrnav, event->object.x, event->object.y);
         break;
       case attrnav_eItemType_Object:
-	printf("Double click %d\n", attrnav->type);
 	if (attrnav->type == attr_eType_Layers) {
 	  if (grow_GetObjectVisibility(((AItemObject*)item)->id) == glow_eVis_Invisible) {
-	    printf("Set visibile\n");
 	    grow_SetObjectVisibility(((AItemObject*)item)->id, glow_eVis_Visible);
 	    brow_SetAnnotPixmap(item->node, 0, attrnav->brow->pixmap_view);
+	    attrnav->graph->journal_store(journal_eAction_SetLayerVisible, 
+	        ((AItemObject*)item)->id);
 	  }
 	  else {
-	    printf("Set invisibile\n");
 	    grow_SetObjectVisibility(((AItemObject*)item)->id, glow_eVis_Invisible);
 	    brow_SetAnnotPixmap(item->node, 0, attrnav->brow->pixmap_hide);
+	    attrnav->graph->journal_store(journal_eAction_SetLayerInvisible, 
+	        ((AItemObject*)item)->id);
 	  }
 	} else {
 	  ((AItemObject*)item)->open_attributes(attrnav, event->object.x, 
@@ -2704,6 +2745,7 @@ static int attrnav_brow_cb(FlowCtx* ctx, flow_tEvent event)
       case attrnav_eItemType_Object:
         ((AItemObject*)item)
             ->open_children(attrnav, event->object.x, event->object.y);
+	attrnav->refresh_objects(attr_mRefresh_Select);
         break;
       default:;
       }
@@ -3275,17 +3317,18 @@ void AttrNav::refresh_objects(unsigned int rtype)
     }
 
     // Reselect
+
     brow_GetObjectList(brow->ctx, &blist, &blist_cnt);
     for (int i = 0; i < select_cnt; i++) {
       switch (select_type[i]) {
       case attrnav_eItemType_Object:
         for (int j = 0; j < blist_cnt; j++) {
           brow_GetUserData(blist[j], (void**)&item);
-          if (item->id == select_list[i]) {
-            brow_SetInverse(blist[j], 1);
-            brow_SelectInsert(brow->ctx, blist[j]);
-            break;
-          }
+	  if (item->id == select_list[i]) {
+	    brow_SetInverse(blist[j], 1);
+	    brow_SelectInsert(brow->ctx, blist[j]);
+	    break;
+	  }
         }
         break;
       case attrnav_eItemType_Local: {
@@ -3316,6 +3359,32 @@ void AttrNav::refresh_objects(unsigned int rtype)
       }
     }
 
+    // Mark layer active / visible
+    if (type == attr_eType_Layers) {
+      grow_tObject active_layer = 0;
+      grow_GetActiveLayer(graph->grow->ctx, &active_layer);
+
+      for (int i = 0; i < blist_cnt; i++) {
+	brow_GetUserData(blist[i], (void**)&item);
+	if (item->type == attrnav_eItemType_Object) {
+	  otype = grow_GetObjectType(item->id);
+	  if (otype == glow_eObjectType_GrowLayer) {
+	    if (grow_GetObjectVisibility(item->id) == glow_eVis_Invisible)
+	      brow_SetAnnotPixmap(item->node, 0, brow->pixmap_hide);
+	    else
+	      brow_SetAnnotPixmap(item->node, 0, brow->pixmap_view);
+	    if (item->id == active_layer) {
+	      brow_SetInverse(blist[i], 1);
+	      brow_SelectInsert(brow->ctx, blist[i]);
+	    } else {
+	      brow_SetInverse(blist[i], 0);
+	      brow_SelectRemove(brow->ctx, blist[i]);
+	    }
+	  }
+	}
+      }
+    }
+
     brow_ResetNodraw(brow->ctx);
     brow_Redraw(brow->ctx, 0);
   } else if (rtype == attr_mRefresh_Select) {
@@ -3329,6 +3398,10 @@ void AttrNav::refresh_objects(unsigned int rtype)
     (get_object_list_cb)(parent_ctx, attr_eList_Select, &list, &list_cnt, 0, 0);
 
     brow_SelectClear(brow->ctx);
+    if (layer_highlighted) {
+      grow_ResetHighlightAll(graph->grow->ctx);
+      layer_highlighted = 0;
+    }
     for (i = 0; i < list_cnt; i++) {
       brow_GetObjectList(brow->ctx, &blist, &blist_cnt);
       for (int j = 0; j < blist_cnt; j++) {
@@ -3997,9 +4070,14 @@ AItemObject::AItemObject(AttrNav* attrnav, char* item_name,
     else
       brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_view);
   } else {
-    if (object_type == glow_eObjectType_GrowGroup ||
-	object_type == glow_eObjectType_GrowLayer)
+    if (object_type == glow_eObjectType_GrowGroup)
       brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_map);
+    else if (object_type == glow_eObjectType_GrowLayer) {
+      if (grow_LayerIsEmpty(id))
+	brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_leaf);
+      else
+	brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_map);
+    }
     else
       brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_leaf);
   }
@@ -4023,8 +4101,12 @@ int AItemObject::close(AttrNav* attrnav, double x, double y)
     brow_CloseNode(attrnav->brow->ctx, node);
     if (brow_IsOpen(node) & attrnav_mOpen_Attributes)
       brow_RemoveAnnotPixmap(node, 1);
-    if (brow_IsOpen(node) & attrnav_mOpen_Children)
-      brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_map);
+    if (brow_IsOpen(node) & attrnav_mOpen_Children) {
+      if (is_layer() && grow_LayerIsEmpty(id))
+	brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_leaf);
+      else
+	brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_map);
+    }
     brow_ResetOpen(node, attrnav_mOpen_All);
     brow_ResetNodraw(attrnav->brow->ctx);
     brow_Redraw(attrnav->brow->ctx, node_y);
@@ -4049,9 +4131,12 @@ int AItemObject::open_children(AttrNav* attrnav, double x, double y)
     brow_CloseNode(attrnav->brow->ctx, node);
     if (brow_IsOpen(node) & attrnav_mOpen_Attributes)
       brow_RemoveAnnotPixmap(node, 1);
-    if (brow_IsOpen(node) & attrnav_mOpen_Children)
-      brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_map);
-
+    if (brow_IsOpen(node) & attrnav_mOpen_Children) {
+      if (is_layer() && grow_LayerIsEmpty(id))
+	brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_leaf);
+      else
+	brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_map);
+    }
     brow_ResetOpen(node, attrnav_mOpen_All);
     brow_ResetNodraw(attrnav->brow->ctx);
     brow_Redraw(attrnav->brow->ctx, node_y);
@@ -4107,6 +4192,11 @@ int AItemObject::open_children(AttrNav* attrnav, double x, double y)
   return 1;
 }
 
+int AItemObject::is_layer()
+{
+  return  (grow_GetObjectType(id) == glow_eObjectType_GrowLayer) ? 1 : 0;
+}
+
 int AItemObject::open_attributes(AttrNav* attrnav, double x, double y)
 {
   double node_x, node_y;
@@ -4119,9 +4209,12 @@ int AItemObject::open_attributes(AttrNav* attrnav, double x, double y)
     brow_CloseNode(attrnav->brow->ctx, node);
     if (brow_IsOpen(node) & attrnav_mOpen_Attributes)
       brow_RemoveAnnotPixmap(node, 1);
-    if (brow_IsOpen(node) & attrnav_mOpen_Children)
-      brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_map);
-
+    if (brow_IsOpen(node) & attrnav_mOpen_Children) {
+      if (is_layer() && grow_LayerIsEmpty(id))
+	brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_leaf);
+      else
+	brow_SetAnnotPixmap(node, 0, attrnav->brow->pixmap_map);
+    }
     brow_ResetOpen(node, attrnav_mOpen_All);
     brow_ResetNodraw(attrnav->brow->ctx);
     brow_Redraw(attrnav->brow->ctx, node_y);

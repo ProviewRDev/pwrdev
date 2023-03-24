@@ -4348,9 +4348,11 @@ int GeInvisible::export_script(grow_tObject o, std::ofstream& fp, char *indentat
     sprintf(&name[strlen(name)], "%d", instance_number(instance));
   if (!streq(attribute, ""))
     fp << indentation << "SetObjectAttribute(id,\"" << name << ".Attribute\",\"" << attribute << "\");" << '\n';
-  if (dimmed != 0) {
+  if (dimmed != 0)
     fp << indentation << "SetObjectAttribute(id,\"" << name << ".Dimmed\"," << dimmed << ");" << '\n';
-  }
+  if (dim_level != 0)
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".DimLevel\"," << dtostr(dim_level) << ");" << '\n';
+
   return 1;
 }
 

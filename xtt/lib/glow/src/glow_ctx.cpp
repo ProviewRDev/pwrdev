@@ -124,7 +124,7 @@ GlowCtx::~GlowCtx()
 
 int GlowCtx::insert(GlowArrayElem* element)
 {
-  if (layer == &a)    
+  if (layer == &a || element->type() == glow_eObjectType_GrowLayer)    
     return layer->insert(element);
   else
     return ((GrowLayer*)layer)->insert(element);

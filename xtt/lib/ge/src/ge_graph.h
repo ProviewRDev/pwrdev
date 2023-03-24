@@ -1027,7 +1027,7 @@ public:
   void set_gridsize(double gridsize);
 
   //! Clear selection.
-  void select_clear();
+  void select_clear(int jstore = 0);
   
   //! Select all connections.
   /*! Select all connection objects in the graph. */
@@ -1042,7 +1042,7 @@ public:
   void add_select_object(grow_tObject o, int select);
 
   //! Select layer.
-  void select_layer(grow_tObject o);
+  void select_layer(grow_tObject o, int select);
 
   //! Select next object. */
   void select_nextobject(glow_eDirection dir);
@@ -1516,6 +1516,7 @@ public:
   void create_layer();
   void delete_layer();
   void merge_visible_layers();
+  void merge_visible_layers_to_bg();
   void merge_all_layers();
   void move_select_to_layer();
   void create_dashcell(grow_tObject* object, double x, double y, int colortheme);

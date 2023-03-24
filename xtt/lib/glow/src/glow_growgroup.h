@@ -198,8 +198,6 @@ public:
     return nc->a.move(o, dest, code);
   }
 
-  int get_path(char* name, int size);
-
   int find_by_name(const char* name, GlowArrayElem** element)
   {
     return nc->a.find_by_name(name, element);

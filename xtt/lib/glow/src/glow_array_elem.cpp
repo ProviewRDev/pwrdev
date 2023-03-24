@@ -56,14 +56,20 @@ int GlowArrayElem::get_object_name(char* name, int size, glow_eName ntype)
     break;
   case glow_eName_Path:
     if (parent) {
-      sts = ((GrowGroup*)parent)->get_path(name, size);
+      sts = parent->get_path(name, size);
       if (EVEN(sts))
         return sts;
 
-      if ((int)strlen(name) + (int)strlen(n_name) + 2 > size)
-        return GLOW__BUFF_SMALL;
-      strcat(name, "-");
-      strcat(name, n_name);
+      if (strlen(name) == 0) {
+	if ((int)strlen(name) + (int)strlen(n_name) + 1 > size)
+	  return GLOW__BUFF_SMALL;
+	strcat(name, n_name);
+      } else {
+	if ((int)strlen(name) + (int)strlen(n_name) + 2 > size)
+	  return GLOW__BUFF_SMALL;
+	strcat(name, "-");
+	strcat(name, n_name);
+      }
     } else {
       if ((int)strlen(n_name) + 1 > size)
         return GLOW__BUFF_SMALL;
@@ -77,4 +83,20 @@ int GlowArrayElem::get_object_name(char* name, int size, glow_eName ntype)
 void GlowArrayElem::set_object_name(char* name)
 {
   strcpy(n_name, name);
+}
+
+int GlowArrayElem::get_path(char* name, int size)
+{
+  if (parent) {
+    parent->get_path(name, size);
+    if ((int)strlen(name) + (int)strlen(n_name) + 2 > size)
+      return GLOW__BUFF_SMALL;
+    strcat(name, "-");
+    strcat(name, n_name);
+  } else {
+    if ((int)strlen(n_name) + 1 > size)
+      return GLOW__BUFF_SMALL;
+    strncpy(name, n_name, size);
+  }
+  return GLOW__SUCCESS;
 }

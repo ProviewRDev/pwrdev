@@ -72,6 +72,7 @@ public:
   void open(std::ifstream& fp);
 
   int is_active() {return active;}
+  int is_empty() {return a_size == 0 ? 1 : 0;}
   void set_active(int act);
   void copy_from(GrowLayer& layer);
   int event_handler(GlowWind* w, glow_eEvent event, int x, int y, double fx, 
@@ -118,6 +119,10 @@ public:
   }
 
   int insert(GlowArrayElem* element);
+  int remove(GlowArrayElem* element);
+
+  void select_region_insert(double ll_x, double ll_y, double ur_x, double ur_y,
+      glow_eSelectPolicy select_policy) {}
 
   int export_script(GlowExportScript* es, void* o, void* m);
 
