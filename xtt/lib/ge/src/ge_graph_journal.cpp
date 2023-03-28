@@ -61,6 +61,7 @@
 #define journal_cTag_Redo 80000010
 #define journal_cTag_Object 80000011
 #define journal_cTag_Size 80000012
+#define journal_cTag_Layer 80000013
 #define journal_cTag_End 80009999
 
 static char* gname(const char* name)
@@ -591,6 +592,15 @@ int GraphJournal::store(journal_eAction action, grow_tObject o)
   case journal_eAction_SelectObjectAdd:
     store_redo_select_object_add(o);
     break;
+  case journal_eAction_MergeAllLayers:
+    store_redo_merge_all_layers();
+    break;
+  case journal_eAction_MergeVisibleLayersToBg:
+    store_redo_merge_visible_layers_to_bg();
+    break;
+  case journal_eAction_MergeVisibleLayers:
+    store_redo_merge_visible_layers();
+    break;
   default:;
   }
 
@@ -628,6 +638,15 @@ int GraphJournal::store(journal_eAction action, grow_tObject o)
     break;
   case journal_eAction_SelectObjectAdd:
     store_undo_select_object_add(o);
+    break;
+  case journal_eAction_MergeAllLayers:
+    store_undo_merge_all_layers();
+    break;
+  case journal_eAction_MergeVisibleLayersToBg:
+    store_undo_merge_visible_layers_to_bg();
+    break;
+  case journal_eAction_MergeVisibleLayers:
+    store_undo_merge_visible_layers();
     break;
   default:;
   }
@@ -748,6 +767,15 @@ int GraphJournal::undo()
     case journal_eAction_PostSelectRegionAdd:
       undo_select_region_add();
       break;
+    case journal_eAction_MergeAllLayers:
+      undo_merge_all_layers();
+      break;
+    case journal_eAction_MergeVisibleLayersToBg:
+      undo_merge_visible_layers_to_bg();
+      break;
+    case journal_eAction_MergeVisibleLayers:
+      undo_merge_visible_layers();
+      break;
     case journal_eAction_No:
       break;
     default:;
@@ -867,6 +895,15 @@ int GraphJournal::redo()
     case journal_eAction_AnteSelectRegionAdd:
     case journal_eAction_PostSelectRegionAdd:
       redo_select_region_add();
+      break;
+    case journal_eAction_MergeAllLayers:
+      redo_merge_all_layers();
+      break;
+    case journal_eAction_MergeVisibleLayersToBg:
+      redo_merge_visible_layers_to_bg();
+      break;
+    case journal_eAction_MergeVisibleLayers:
+      redo_merge_visible_layers();
       break;
     case journal_eAction_No:
       break;
@@ -2941,6 +2978,389 @@ int GraphJournal::store_redo_select_region_add()
   return GE__SUCCESS;
 }
 
+int GraphJournal::undo_merge_all_layers()
+{
+  char line[100];
+  int tag;
+  grow_tObject o;
+  grow_tObject layer;
+  int sts;
+  char name[80];
+  int object_cnt;
+
+  log_debug("undo_merge_all_layers\n");
+
+  grow_SetNodraw(graph->grow->ctx);
+  grow_SelectClear(graph->grow->ctx);
+
+  fp.getline(line, sizeof(line));
+  sscanf(line, "%d", &tag);
+  while (tag == journal_cTag_Layer) {
+    grow_ObjectRead(graph->grow->ctx, (std::ifstream&)fp, &layer);
+    if (!layer)
+      return GE__SUCCESS;
+
+    fp.get();
+    read_size(&object_cnt);
+
+    for (int i = 0; i < object_cnt; i++) {
+      read_object(name, sizeof(name));
+
+      sts = grow_FindObjectByName(graph->grow->ctx, name, &o);
+      if (EVEN(sts))
+	throw co_error(sts);
+
+      grow_SelectInsert(graph->grow->ctx, o);
+    }
+
+    grow_LayerSetActive(layer, 1);
+    grow_MoveSelectToLayer(graph->grow->ctx);
+    grow_LayerSetActive(layer, 0);
+    grow_SelectClear(graph->grow->ctx);
+
+    fp.getline(line, sizeof(line));
+    sscanf(line, "%d", &tag);
+  }
+  grow_ResetNodraw(graph->grow->ctx);
+  grow_Redraw(graph->grow->ctx);
+
+  if (tag != journal_cTag_End)
+    throw co_error(GE__JOURNAL_DISORDER);
+
+  graph->refresh_objects(attr_mRefresh_Objects);
+
+  return GE__SUCCESS;
+}
+
+int GraphJournal::store_undo_merge_all_layers()
+{
+  grow_tObject* list;
+  int list_count;
+  grow_tObject* layer_list;
+  int layer_list_count;
+  char name[80];
+
+  log_debug("store_undo_merge_all_layers\n");
+
+  grow_GetObjectList(graph->grow->ctx, &list, &list_count);
+
+  for (int i = 0; i < list_count; i++) {
+    if (grow_GetObjectType(list[i]) == glow_eObjectType_GrowLayer) {
+      fp << journal_cTag_Layer << '\n';
+      grow_LayerSave(list[i], 1, (std::ofstream&)fp, glow_eSaveMode_Edit);
+    
+      grow_GetLayerObjectList(list[i], &layer_list, &layer_list_count);
+      fp << journal_cTag_Size << '\n';
+      fp << layer_list_count << '\n';
+      for (int j = 0; j < layer_list_count; j++) {
+	fp << journal_cTag_Object << '\n';
+	grow_GetObjectName(layer_list[j], name, sizeof(name), glow_eName_Object);
+	fp << name << '\n';
+      }
+    }
+  }
+  fp << journal_cTag_End << '\n';
+
+  return GE__SUCCESS;
+}
+
+int GraphJournal::redo_merge_all_layers()
+{
+  log_debug("redo_merge_all_layers\n");
+
+  grow_MergeAllLayers(graph->grow->ctx);
+
+  read_end();
+
+  graph->refresh_objects(attr_mRefresh_Objects);
+
+  return GE__SUCCESS;
+}
+
+int GraphJournal::store_redo_merge_all_layers()
+{
+  log_debug("store_redo_merge_all_layers\n");
+
+  fp << journal_cTag_End << '\n';
+
+  return GE__SUCCESS;
+}
+
+int GraphJournal::undo_merge_visible_layers_to_bg()
+{
+  char line[100];
+  int tag;
+  grow_tObject o;
+  grow_tObject layer;
+  int sts;
+  char name[80];
+  int object_cnt;
+
+  log_debug("undo_merge_visible_layers_to_bg\n");
+
+  grow_SetNodraw(graph->grow->ctx);
+  grow_SelectClear(graph->grow->ctx);
+
+  fp.getline(line, sizeof(line));
+  sscanf(line, "%d", &tag);
+  while (tag == journal_cTag_Layer) {
+    grow_ObjectRead(graph->grow->ctx, (std::ifstream&)fp, &layer);
+    if (!layer)
+      return GE__SUCCESS;
+
+    fp.get();
+    read_size(&object_cnt);
+
+    for (int i = 0; i < object_cnt; i++) {
+      read_object(name, sizeof(name));
+
+      sts = grow_FindObjectByName(graph->grow->ctx, name, &o);
+      if (EVEN(sts))
+	throw co_error(sts);
+
+      grow_SelectInsert(graph->grow->ctx, o);
+    }
+
+    grow_LayerSetActive(layer, 1);
+    grow_MoveSelectToLayer(graph->grow->ctx);
+    grow_LayerSetActive(layer, 0);
+    grow_SelectClear(graph->grow->ctx);
+
+    fp.getline(line, sizeof(line));
+    sscanf(line, "%d", &tag);
+  }
+  grow_ResetNodraw(graph->grow->ctx);
+  grow_Redraw(graph->grow->ctx);
+
+  if (tag != journal_cTag_End)
+    throw co_error(GE__JOURNAL_DISORDER);
+
+  graph->refresh_objects(attr_mRefresh_Objects);
+
+  return GE__SUCCESS;
+}
+
+int GraphJournal::store_undo_merge_visible_layers_to_bg()
+{
+  grow_tObject* list;
+  int list_count;
+  grow_tObject* layer_list;
+  int layer_list_count;
+  char name[80];
+
+  log_debug("store_undo_merge_visible_layers_to_bg\n");
+
+  grow_GetObjectList(graph->grow->ctx, &list, &list_count);
+
+  for (int i = 0; i < list_count; i++) {
+    if (grow_GetObjectType(list[i]) == glow_eObjectType_GrowLayer &&
+	grow_GetObjectVisibility(list[i]) == glow_eVis_Visible) {
+      fp << journal_cTag_Layer << '\n';
+      grow_LayerSave(list[i], 1, (std::ofstream&)fp, glow_eSaveMode_Edit);
+
+      grow_GetLayerObjectList(list[i], &layer_list, &layer_list_count);
+      fp << journal_cTag_Size << '\n';
+      fp << layer_list_count << '\n';
+      for (int j = 0; j < layer_list_count; j++) {
+	fp << journal_cTag_Object << '\n';
+	grow_GetObjectName(layer_list[j], name, sizeof(name), glow_eName_Object);
+	fp << name << '\n';
+      }
+    }
+  }
+  fp << journal_cTag_End << '\n';
+
+  return GE__SUCCESS;
+}
+
+int GraphJournal::redo_merge_visible_layers_to_bg()
+{
+  log_debug("redo_merge_visible_layers_to_bg\n");
+
+  grow_MergeVisibleLayersToBg(graph->grow->ctx);
+
+  read_end();
+
+  graph->refresh_objects(attr_mRefresh_Objects);
+
+  return GE__SUCCESS;
+}
+
+int GraphJournal::store_redo_merge_visible_layers_to_bg()
+{
+  log_debug("store_redo_merge_visible_layers_to_bg\n");
+
+  fp << journal_cTag_End << '\n';
+
+  return GE__SUCCESS;
+}
+
+int GraphJournal::undo_merge_visible_layers()
+{
+  char line[100];
+  int tag;
+  grow_tObject o;
+  grow_tObject layer;
+  grow_tObject source_layer;
+  int sts;
+  char name[80];
+  char layer_name[100];
+  char path_name[200];
+  int object_cnt;
+  int active_layer;
+
+  log_debug("undo_merge_visible_layers\n");
+
+  grow_SetNodraw(graph->grow->ctx);
+  grow_SelectClear(graph->grow->ctx);
+
+  read_object(name, sizeof(name));
+  read_size(&active_layer);
+  snprintf(layer_name, sizeof(layer_name), "Merged%s", name);
+
+  sts = grow_FindObjectByName(graph->grow->ctx, layer_name, &source_layer);
+  if (EVEN(sts))
+    throw co_error(sts);
+
+  grow_SetObjectName(source_layer, name);
+  strcpy(layer_name, name);
+    
+  fp.getline(line, sizeof(line));
+  sscanf(line, "%d", &tag);
+  while (tag == journal_cTag_Layer) {
+    grow_ObjectRead(graph->grow->ctx, (std::ifstream&)fp, &layer);
+    if (!layer)
+      return GE__SUCCESS;
+
+    fp.get();
+    read_size(&object_cnt);
+
+    for (int i = 0; i < object_cnt; i++) {
+      read_object(name, sizeof(name));
+      snprintf(path_name, sizeof(path_name), "%s-%s", layer_name, name);
+      sts = grow_FindObjectByName(graph->grow->ctx, path_name, &o);
+      if (EVEN(sts))
+	throw co_error(sts);
+
+      grow_SelectInsert(graph->grow->ctx, o);
+    }
+
+    grow_LayerSetActive(layer, 1);
+    grow_MoveSelectToLayer(graph->grow->ctx);
+    grow_LayerSetActive(layer, 0);
+    grow_SelectClear(graph->grow->ctx);
+
+    fp.getline(line, sizeof(line));
+    sscanf(line, "%d", &tag);
+  }
+  grow_ResetNodraw(graph->grow->ctx);
+  grow_Redraw(graph->grow->ctx);
+
+  if (tag != journal_cTag_End)
+    throw co_error(GE__JOURNAL_DISORDER);
+
+  if (active_layer)
+    grow_LayerSetActive(source_layer, 1);
+
+  graph->refresh_objects(attr_mRefresh_Objects);
+
+  return GE__SUCCESS;
+}
+
+int GraphJournal::store_undo_merge_visible_layers()
+{
+  grow_tObject* list;
+  grow_tObject target;
+  int list_count;
+  grow_tObject* layer_list;
+  int layer_list_count;
+  char name[80];
+  int active_layer = 0;
+  int found = 0;
+
+  log_debug("store_undo_merge_visible_layers\n");
+
+  grow_GetObjectList(graph->grow->ctx, &list, &list_count);
+
+  // Merge to active layer
+  for (int i = 0; i < list_count; i++) {
+    if (grow_GetObjectType(list[i]) == glow_eObjectType_GrowLayer &&
+	grow_LayerIsActive(list[i]) &&
+	grow_GetObjectVisibility(list[i]) == glow_eVis_Visible) {
+      target = list[i];
+      active_layer = 1;
+      found = 1;
+      break;
+    }      
+  }
+
+  if (!found) {
+    // Merge to first layer
+    for (int i = 0; i < list_count; i++) {
+      if (grow_GetObjectType(list[i]) == glow_eObjectType_GrowLayer &&
+	  grow_GetObjectVisibility(list[i]) == glow_eVis_Visible) {
+	target = list[i];
+	found = 1;
+	break;
+      }
+    }
+  }
+  if (!found)
+    return 0;
+
+  grow_GetObjectName(target, name, sizeof(name), glow_eName_Object);
+  fp << journal_cTag_Object << '\n';
+  fp << name << '\n';
+  fp << journal_cTag_Size << '\n';
+  fp << active_layer << '\n';
+
+  for (int i = 0; i < list_count; i++) {
+    if (grow_GetObjectType(list[i]) == glow_eObjectType_GrowLayer &&
+	grow_GetObjectVisibility(list[i]) == glow_eVis_Visible) {
+      if (list[i] == target) {
+	continue;
+      } else {
+	fp << journal_cTag_Layer << '\n';
+	grow_LayerSave(list[i], 1, (std::ofstream&)fp, glow_eSaveMode_Edit);
+
+	grow_GetLayerObjectList(list[i], &layer_list, &layer_list_count);
+	fp << journal_cTag_Size << '\n';
+	fp << layer_list_count << '\n';
+	for (int j = 0; j < layer_list_count; j++) {
+	  fp << journal_cTag_Object << '\n';
+	  grow_GetObjectName(layer_list[j], name, sizeof(name), glow_eName_Object);
+	  fp << name << '\n';
+	}
+      }
+    }
+  }
+  fp << journal_cTag_End << '\n';
+
+  return GE__SUCCESS;
+}
+
+int GraphJournal::redo_merge_visible_layers()
+{
+  log_debug("redo_merge_visible_layers\n");
+
+  grow_MergeVisibleLayers(graph->grow->ctx);
+
+  read_end();
+
+  graph->refresh_objects(attr_mRefresh_Objects);
+
+  return GE__SUCCESS;
+}
+
+int GraphJournal::store_redo_merge_visible_layers()
+{
+  log_debug("store_redo_merge_visible_layers\n");
+
+  fp << journal_cTag_End << '\n';
+
+  return GE__SUCCESS;
+}
+
 
 void GraphJournal::check_object_number(grow_tObject o)
 {
@@ -3230,6 +3650,15 @@ char* GraphJournal::action_to_str(int action)
     break;
   case journal_eAction_PostSelectRegionAdd:
     strcpy(str, "PostSelectRegionAdd");
+    break;
+  case journal_eAction_MergeAllLayers:
+    strcpy(str, "MergeAllLayers");
+    break;
+  case journal_eAction_MergeVisibleLayersToBg:
+    strcpy(str, "MergeVisibleLayersToBg");
+    break;
+  case journal_eAction_MergeVisibleLayers:
+    strcpy(str, "MergeVisibleLayers");
     break;
   default:
     strcpy(str, "Undefined");

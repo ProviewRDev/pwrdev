@@ -91,6 +91,21 @@ void GrowLayer::save(std::ofstream& fp, glow_eSaveMode mode)
   fp << int(glow_eSave_End) << '\n';
 }
 
+void GrowLayer::save(int nochildren, std::ofstream& fp, glow_eSaveMode mode)
+{
+  int size;
+
+  if (nochildren) {
+    size = a_size;
+    a_size = 0;
+  }
+
+  save(fp, mode);
+
+  if (nochildren)
+    a_size = size;
+}
+
 void GrowLayer::open(std::ifstream& fp)
 {
   int type = 0;

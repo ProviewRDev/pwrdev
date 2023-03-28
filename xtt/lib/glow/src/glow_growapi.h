@@ -3446,7 +3446,8 @@ int grow_LayerInsert(grow_tObject layer, grow_tObject o);
 int grow_LayerRemove(grow_tObject layer, grow_tObject o);
 int grow_LayerIsEmpty(grow_tObject layer);
 int grow_LayerActive(grow_tCtx ctx);
-
+void grow_LayerSave(grow_tObject object, int nochildren, std::ofstream& fp, 
+    glow_eSaveMode mode);
 
 /*@}*/
 #if defined __cplusplus

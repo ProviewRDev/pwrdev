@@ -273,6 +273,8 @@ void Graph::pop_select()
 /*! \param scaley	Scale factor in y direction. */
 void Graph::scale(double scalex, double scaley)
 {
+  journal_store(journal_eAction_AntePropertiesSelect, 0);
+
   switch (grow_GetMoveRestrictions(grow->ctx)) {
   case glow_eMoveRestriction_Horizontal:
     grow_SetSelectScale(grow->ctx, scalex, 1, glow_eScaleType_UpperLeft);
@@ -283,6 +285,8 @@ void Graph::scale(double scalex, double scaley)
   default:
     grow_SetSelectScale(grow->ctx, scalex, scaley, glow_eScaleType_UpperLeft);
   }
+
+  journal_store(journal_eAction_PostPropertiesSelect, 0);
 }
 
 void Graph::set_move_restriction(glow_eMoveRestriction restriction)
@@ -456,6 +460,11 @@ void Graph::clear_all()
 {
   Attr* attrctx;
   int sts;
+
+  if (journal) {
+    delete journal;
+    journal = new GraphJournal(this, &sts);
+  }
 
   sts = attr_list.get_first((void**)&attrctx);
   while (sts) {
@@ -6302,16 +6311,22 @@ void Graph::delete_layer()
 
 void Graph::merge_visible_layers()
 {
+  journal_store(journal_eAction_MergeVisibleLayers, 0);
+
   grow_MergeVisibleLayers(grow->ctx);
   refresh_objects(attr_mRefresh_Objects);
 }
 void Graph::merge_visible_layers_to_bg()
 {
+  journal_store(journal_eAction_MergeVisibleLayersToBg, 0);
+
   grow_MergeVisibleLayersToBg(grow->ctx);
   refresh_objects(attr_mRefresh_Objects);
 }
 void Graph::merge_all_layers()
 {
+  journal_store(journal_eAction_MergeAllLayers, 0);
+
   grow_MergeAllLayers(grow->ctx);
   refresh_objects(attr_mRefresh_Objects);
 }

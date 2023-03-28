@@ -64,6 +64,7 @@ public:
     \param mode	Not used.
   */
   void save(std::ofstream& fp, glow_eSaveMode mode);
+  void save(int nochildren, std::ofstream& fp, glow_eSaveMode mode);
 
   //! Read the content of the object from file.
   /*!

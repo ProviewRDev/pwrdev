@@ -2570,6 +2570,7 @@ void GrowCtx::clear_all(int keep_paste)
   version = GLOW_VERSION;
   conpoint_num_cnt = 0;
   objectname_cnt = 0;
+  layername_cnt = 1;
   subgraph = 0;
   scantime = 0.5;
   fast_scantime = 0.5;
@@ -4965,6 +4966,7 @@ int GrowCtx::merge_visible_layers()
 	a[i]->get_visibility() == glow_eVis_Visible) {
       target = (GrowLayer*)a[i];
       found = 1;
+      break;
     }      
   }
 
@@ -4975,6 +4977,7 @@ int GrowCtx::merge_visible_layers()
 	  a[i]->get_visibility() == glow_eVis_Visible) {
 	target = (GrowLayer*)a[i];
 	found = 1;
+	break;
       }      
     }
   }
@@ -5003,6 +5006,7 @@ int GrowCtx::merge_visible_layers_to_bg()
   for (int i = 0; i < a.a_size; i++) {
     if (a[i]->type() == glow_eObjectType_GrowLayer &&
 	a[i]->get_visibility() == glow_eVis_Visible) {
+      ((GlowArray*)((GrowLayer*)a[i]))->set_parent(0);
       a.merge(*(GlowArray*)((GrowLayer*)a[i]));
       delete_object(a[i]);
       found = 1;
@@ -5018,6 +5022,7 @@ int GrowCtx::merge_all_layers()
 {
   for (int i = 0; i < a.a_size; i++) {
     if (a[i]->type() == glow_eObjectType_GrowLayer) {
+      ((GlowArray*)((GrowLayer*)a[i]))->set_parent(0);
       a.merge(*(GlowArray*)((GrowLayer*)a[i]));
       delete_object(a[i]);
       i--;

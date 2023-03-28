@@ -112,6 +112,9 @@ void GlowArray::copy_from_common_objects(GlowArray& array)
   }
 }
 
+//
+// NB! The caller has to change the parent for each element
+//
 void GlowArray::merge(GlowArray& array)
 {
   GlowArrayElem** a_tmp;
@@ -1288,6 +1291,11 @@ int GlowArray::find(GlowArrayElem* element)
   for (i = 0; i < a_size; i++) {
     if (a[i] == element)
       return 1;
+
+    if (a[i]->type() == glow_eObjectType_GrowLayer) {
+      if (((GrowLayer*)a[i])->find(element))
+	return 1; 	  
+    }
   }
   return 0;
 }

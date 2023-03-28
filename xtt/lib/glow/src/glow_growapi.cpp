@@ -6523,5 +6523,11 @@ int grow_LayerActive(grow_tCtx ctx)
   return ((GrowCtx*)ctx)->layer_active();
 }
 
+void grow_LayerSave(grow_tObject object, int nochildren, std::ofstream& fp, 
+    glow_eSaveMode mode)
+{
+  ((GrowLayer*)object)->save(nochildren, fp, mode);
+}
+
 
 /*@}*/

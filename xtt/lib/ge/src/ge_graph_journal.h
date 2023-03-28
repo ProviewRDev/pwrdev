@@ -98,7 +98,10 @@ typedef enum {
   journal_eAction_AnteSelectRegion,
   journal_eAction_PostSelectRegion,
   journal_eAction_AnteSelectRegionAdd,
-  journal_eAction_PostSelectRegionAdd
+  journal_eAction_PostSelectRegionAdd,
+  journal_eAction_MergeAllLayers,
+  journal_eAction_MergeVisibleLayersToBg,
+  journal_eAction_MergeVisibleLayers
 } journal_eAction;
 
 typedef enum {
@@ -207,6 +210,18 @@ public:
   int store_redo_select_region_add();
   int undo_select_region_add();
   int redo_select_region_add();
+  int store_undo_merge_all_layers();
+  int store_redo_merge_all_layers();
+  int undo_merge_all_layers();
+  int redo_merge_all_layers();
+  int store_undo_merge_visible_layers_to_bg();
+  int store_redo_merge_visible_layers_to_bg();
+  int undo_merge_visible_layers_to_bg();
+  int redo_merge_visible_layers_to_bg();
+  int store_undo_merge_visible_layers();
+  int store_redo_merge_visible_layers();
+  int undo_merge_visible_layers();
+  int redo_merge_visible_layers();
   static void print(char* fname);
   static char* tag_to_str(int tag);
   static char* action_to_str(int action);

@@ -83,6 +83,7 @@ public:
     return inverse;
   }
   void set_hot(int on){}
+  int get_hot(){return hot;}
   void select_region_insert(double ll_x, double ll_y, double ur_x, double ur_y,
       glow_eSelectPolicy select_policy);
   glow_eObjectType type()
