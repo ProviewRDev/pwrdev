@@ -97,5 +97,6 @@ xdrunexpect	<xdr unexpected message type>				/error
 tmo		<timeout>						/error
 notmntclean 	<object is not mount clean>				/warn
 iostalled	<IO stalled, cyclesup delay detected>			/fatal
+ouremoved	<Outunit removed>					/info
 
 .end

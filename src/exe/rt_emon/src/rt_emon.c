@@ -56,6 +56,7 @@
 #include "rt_mh_log.h"
 #include "rt_pwr_msg.h"
 #include "rt_qcom_msg.h"
+#include "rt_qdb_msg.h"
 #include "rt_redu.h"
 
 /* Local defines */
@@ -321,6 +322,7 @@ struct s_Outunit {
   pwr_tUInt32 syncedIdx; /*  */
   pwr_tUInt32 lastSentIdx; /* Last event sent to outunit */
   pwr_tTime lastSentTime; /* Time when last event is sent to outunit */
+  pwr_tUInt32 errorQuota;
   pwr_tBoolean check;
   pwr_tBoolean linkUp;
   pwr_mEventTypeMask selEventType;
@@ -1185,7 +1187,7 @@ static void cancelAlarm(sActive* ap, char* text)
   eventToOutunits(ep);
 }
 
-static void sendAlarmStatus(sOutunit* op)
+static pwr_tStatus sendAlarmStatus(sOutunit* op)
 {
   struct LstHead * al;
   sEvent* ep;
@@ -1289,21 +1291,40 @@ static void sendAlarmStatus(sOutunit* op)
   }
   sts = sendToOutunit(
       op, mh_eMsg_HandlerAlarmStatus, 0, op->outunit.oix, msg, msg_size);
+  if (sts == QDB__QUOTAEXCEEDED) {
+    op->errorQuota++;
+    if (op->errorQuota > 10) {
+      errh_Error("Aborting, outunit quota exceeded, oid: %s", cdh_ObjidToString(op->outunit,1));
+      outunitAborted(op);
+      free((char*)msg);
+      return MH__OUREMOVED;
+    }
+  }
+  else if (ODD(sts))
+    op->errorQuota = 0;
+  
   free((char*)msg);
+
+  return MH__SUCCESS;
 }
 
 static void checkOutunits()
 {
   sOutunit* op;
   struct LstHead * ol;
+  struct LstHead * ol_prev;
+  pwr_tStatus sts;
 
   LstForEach(ol, &l.outunit_l) {
     op = LstEntry(ol, sOutunit, outunit_l);
 
-    if (op->linkUp && op->type == mh_eOutunitType_Operator && op->ver >= 5)
+    if (op->linkUp && op->type == mh_eOutunitType_Operator && op->ver >= 5) {
       /* Set alarm status to operator */
-      sendAlarmStatus(op);
-    else {
+      ol_prev = ol->prev;
+      sts = sendAlarmStatus(op);
+      if (sts == MH__OUREMOVED)
+	ol = ol_prev;
+    } else {
       /* Send sync */
       if (op->linkUp && op->syncedIdx != op->eventIdx) {
         if (op->check) {
