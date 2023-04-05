@@ -10955,6 +10955,7 @@ int XNav::set_signal(pwr_tAttrRef* arp, xnav_eSetSignal type, int on)
     break;
   case pwr_cClass_ChanDi:
   case pwr_cClass_ChanDo:
+  case pwr_cClass_ChanD:
   case pwr_cClass_ChanAi:
   case pwr_cClass_ChanAo:
   case pwr_cClass_ChanIi:
@@ -10972,6 +10973,13 @@ int XNav::set_signal(pwr_tAttrRef* arp, xnav_eSetSignal type, int on)
       return XNAV__INVALIDOBJECT;
     break;
   case pwr_cClass_ChanDo:
+    if (!(type == xnav_eSetSignal_Invert || 
+	  type == xnav_eSetSignal_Test || 
+	  type == xnav_eSetSignal_TestValue || 
+	  type == xnav_eSetSignal_Conversion))
+      return XNAV__INVALIDOBJECT;
+    break;
+  case pwr_cClass_ChanD:
     if (!(type == xnav_eSetSignal_Invert || type == xnav_eSetSignal_Test
             || type == xnav_eSetSignal_TestValue))
       return XNAV__INVALIDOBJECT;
