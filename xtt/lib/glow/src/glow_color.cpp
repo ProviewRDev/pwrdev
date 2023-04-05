@@ -38,6 +38,8 @@
 #include <string.h>
 
 #include "glow_grownode.h"
+#include "glow_color.h"
+#include "glow_customcolors.h"
 
 typedef struct {
   double r;

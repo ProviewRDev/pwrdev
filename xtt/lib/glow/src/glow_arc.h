@@ -37,7 +37,11 @@
 #ifndef glow_arc_h
 #define glow_arc_h
 
-#include "glow_growctx.h"
+#include "glow.h"
+#include "glow_point.h"
+#include "glow_array_elem.h"
+
+class GrowCtx;
 
 /*! \file glow_arc.h
     \brief Contains the GlowArc class. */
@@ -79,7 +83,7 @@ public:
       double y2 = 0, int ang1 = 0, int ang2 = 0,
       glow_eDrawType d_type = glow_eDrawType_Line, int line_w = 1,
       int fill_arc = 0)
-      : ctx(glow_ctx), angle1(ang1), angle2(ang2), ll(glow_ctx, x1, y1),
+      : GlowArrayElem(glow_ctx), angle1(ang1), angle2(ang2), ll(glow_ctx, x1, y1),
         ur(glow_ctx, x2, y2), draw_type(d_type), line_width(line_w),
         fill(fill_arc)
   {
@@ -305,7 +309,6 @@ public:
   */
   void convert(glow_eConvert version);
 
-  GrowCtx* ctx; //!< Grow context.
   int angle1; //!< Start angle or arc from x-axis in degrees.
   int angle2; //!< Length of arc in degrees.
   GlowPoint ll; //!< Lower left corner of rectangle that surroundes the elipse

@@ -60,3 +60,4 @@ buff_small	<Buffer is too small>				/error
 dash_full	<Dashboard is full>				/error
 otherlayer	<Object is in other layer>			/error
 noobj		<No such object is found>			/error
+nolayer		<Object is not in a layer>			/error

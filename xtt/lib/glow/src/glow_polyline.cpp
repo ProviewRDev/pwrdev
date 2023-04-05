@@ -44,7 +44,7 @@
 GlowPolyLine::GlowPolyLine(GrowCtx* glow_ctx, glow_sPoint* pointarray,
     int point_cnt, glow_eDrawType d_type, int line_w, int fix_line_w,
     int line_fill, int closed)
-    : ctx(glow_ctx), a_points(10, 10), points(0), draw_type(d_type),
+    : GlowArrayElem(glow_ctx), a_points(10, 10), points(0), draw_type(d_type),
       line_width(line_w), fix_line_width(fix_line_w), fill(line_fill),
       closed_line(closed)
 {
@@ -62,7 +62,7 @@ GlowPolyLine::~GlowPolyLine()
   free((char*)points);
 }
 
-GlowPolyLine::GlowPolyLine(const GlowPolyLine& c)
+GlowPolyLine::GlowPolyLine(const GlowPolyLine& c) : GlowArrayElem(c)
 {
   memcpy((void *)this, (void *)&c, sizeof(c));
 

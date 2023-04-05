@@ -38,6 +38,7 @@
 
 #include "co_string.h"
 
+#include "glow_growctx.h"
 #include "glow_growtoolbar.h"
 #include "glow_draw.h"
 #include "glow_nodegroup.h"

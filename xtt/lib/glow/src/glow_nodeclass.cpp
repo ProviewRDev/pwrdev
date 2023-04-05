@@ -47,7 +47,7 @@
 
 GlowNodeClass::GlowNodeClass(
     GrowCtx* glow_ctx, const char* name, glow_eNodeGroup grp)
-    : ctx(glow_ctx), a(10, 10), group(grp), dynamic(0), dynamicsize(0),
+    : GlowArrayElem(glow_ctx), a(10, 10), group(grp), dynamic(0), dynamicsize(0),
       arg_cnt(0), nc_extern(0), dyn_type1(0), dyn_type2(0), dyn_action_type1(0),
       dyn_action_type2(0), no_con_obstacle(0), slider(0), animation_count(1),
       y0(0), y1(0), x0(0), x1(0), next_nc(0), prev_nc(0),
@@ -62,7 +62,7 @@ GlowNodeClass::GlowNodeClass(
   memset(argtype, 0, sizeof(argtype));
 }
 
-GlowNodeClass::GlowNodeClass(const GlowNodeClass& nc)
+GlowNodeClass::GlowNodeClass(const GlowNodeClass& nc) : GlowArrayElem(nc)
 {
   memcpy((void *)this, (void *)&nc, sizeof(nc));
 

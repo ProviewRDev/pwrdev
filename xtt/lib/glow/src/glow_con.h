@@ -170,7 +170,6 @@ public:
   double x_left;
   double y_high;
   double y_low;
-  GrowCtx* ctx;
   GlowConClass* cc;
   GlowNode* destination()
   {

@@ -47,9 +47,10 @@
 GlowNode::GlowNode(GrowCtx* glow_ctx, const char* name,
     GlowNodeClass* node_class, double x1, double y1, int nodraw,
     int rel_annot_pos)
-    : x_right(x1), x_left(x1), y_high(y1), y_low(y1),s_x_right(x1), s_x_left(x1), 
+  : GlowArrayElem(glow_ctx), x_right(x1), x_left(x1), y_high(y1), y_low(y1),
+      s_x_right(x1), s_x_left(x1), 
       s_y_high(y1), s_y_low(y1), obst_x_right(x1),
-      obst_x_left(x1), obst_y_high(y1), obst_y_low(y1), hot(0), ctx(glow_ctx),
+      obst_x_left(x1), obst_y_high(y1), obst_y_low(y1), hot(0),
       nc(node_class), nc_root(node_class), pos(glow_ctx, x1, y1),
       stored_pos(glow_ctx, x1, y1), highlight(0), inverse(0), local_nc(0),
       user_data(0), level(0), node_open(0), relative_annot_pos(rel_annot_pos),
@@ -406,6 +407,9 @@ void GlowNode::open(std::ifstream& fp)
 void GlowNode::select_region_insert(double ll_x, double ll_y, double ur_x,
     double ur_y, glow_eSelectPolicy select_policy)
 {
+  if (!in_active_layer())
+    return;
+
   if (select_policy == glow_eSelectPolicy_Surround
       || nc->group == glow_eNodeGroup_Document) {
     if (x_left > ll_x && x_right < ur_x && y_high < ur_y && y_low > ll_y)
@@ -493,4 +497,25 @@ void GlowNode::trace_close()
 
   if (nc->recursive_trace)
     nc->a.trace_close();
+}
+
+int GlowNode::in_vert_line(double x, double l_y, double u_y) {
+  return ((obst_x_left - ctx->draw_delta) < x
+     && (obst_x_right + ctx->draw_delta) > x
+      && (obst_y_low - ctx->draw_delta) < u_y
+      && (obst_y_high + ctx->draw_delta) > l_y);
+}
+
+int GlowNode::in_horiz_line(double y, double l_x, double u_x) {
+  return ((obst_x_left - ctx->draw_delta) < u_x
+      && (obst_x_right + ctx->draw_delta) > l_x
+      && (obst_y_low - ctx->draw_delta) < y
+      && (obst_y_high + ctx->draw_delta) > y);
+}
+
+int GlowNode::in_area(double ll_x, double ll_y, double ur_x, double ur_y){
+  return ((obst_x_left - ctx->draw_delta) < ur_x
+      && (obst_x_right + ctx->draw_delta) > ll_x
+      && (obst_y_low - ctx->draw_delta) < ur_y
+      && (obst_y_high + ctx->draw_delta) > ll_y);
 }

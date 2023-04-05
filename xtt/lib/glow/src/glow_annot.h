@@ -46,7 +46,7 @@ public:
       glow_eDrawType color_d_type = glow_eDrawType_Line, int t_size = 2,
       glow_eAnnotType a_type = glow_eAnnotType_OneLine, int rel_pos = 0,
       glow_mDisplayLevel display_lev = glow_mDisplayLevel_1)
-      : ctx(glow_ctx), number(annot_num), p(glow_ctx, x, y), draw_type(d_type),
+      : GlowArrayElem(glow_ctx), number(annot_num), p(glow_ctx, x, y), draw_type(d_type),
         text_size(t_size), annot_type(a_type), relative_pos(rel_pos),
         display_level(display_lev), color_drawtype(color_d_type),
         font(glow_eFont_Helvetica), protect(0){}
@@ -57,7 +57,6 @@ public:
     p.traverse(x, y);
   }
 
-  GrowCtx* ctx;
   int number;
   GlowPoint p;
   glow_eDrawType draw_type;

@@ -184,7 +184,6 @@ public:
     draw_type = drawtype;
   }
 
-  GrowCtx* ctx; //!< Glow context.
   GlowPoint p_dest; //!< Point of destination corner of arrow.
   GlowPoint p1; //!< Point of first corner.
   GlowPoint p2; //!< Point of second corner.

@@ -40,6 +40,8 @@
 #include "glow_node.h"
 
 class GlowExportScript;
+class GlowNodeClass;
+class GrowCtx;
 
 /*! \file glow_grownode.h
     \brief Contains the GrowNode class. */

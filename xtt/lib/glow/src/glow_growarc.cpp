@@ -41,6 +41,7 @@
 
 #include "co_string.h"
 
+#include "glow_growctx.h"
 #include "glow_growarc.h"
 #include "glow_grownode.h"
 #include "glow_draw.h"
@@ -511,6 +512,9 @@ void GrowArc::set_highlight(int on)
 void GrowArc::select_region_insert(double ll_x, double ll_y, double ur_x,
     double ur_y, glow_eSelectPolicy select_policy)
 {
+  if (!in_active_layer())
+    return;
+
   if (select_policy == glow_eSelectPolicy_Surround) {
     if (x_left > ll_x && x_right < ur_x && y_high < ur_y && y_low > ll_y)
       ctx->select_insert(this);

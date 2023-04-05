@@ -340,7 +340,7 @@ int ColPalCtx::event_handler(glow_eEvent event, int x, int y, int w, int h)
   switch (event) {
   case glow_eEvent_MB1Down: {
     sts = 0;
-    for (i = 0; i < a.a_size; i++) {
+    for (i = 0; i < a.size(); i++) {
       sts = a.a[i]->event_handler(&ctx->mw, event, x, y, fx, fy);
       if (sts == GLOW__NO_PROPAGATE)
         break;
@@ -370,7 +370,7 @@ int ColPalCtx::event_handler(glow_eEvent event, int x, int y, int w, int h)
   case glow_eEvent_MB1ClickShift:
   case glow_eEvent_MB2Click:
     sts = 0;
-    for (i = 0; i < a.a_size; i++) {
+    for (i = 0; i < a.size(); i++) {
       sts = a.a[i]->event_handler(&ctx->mw, event, x, y, fx, fy);
       if (sts == GLOW__NO_PROPAGATE)
         break;
@@ -504,7 +504,7 @@ int ColPalCtx::event_handler(glow_eEvent event, int x, int y, int w, int h)
 
   case glow_eEvent_MB1ClickShiftCtrl:
     sts = 0;
-    for (i = 0; i < a.a_size; i++) {
+    for (i = 0; i < a.size(); i++) {
       sts = a.a[i]->event_handler(&ctx->mw, event, x, y, fx, fy);
       if (sts == GLOW__NO_PROPAGATE)
         break;
@@ -570,7 +570,7 @@ int ColPalCtx::event_handler(glow_eEvent event, int x, int y, int w, int h)
 
   case glow_eEvent_MB1DoubleClick:
     sts = 0;
-    for (i = 0; i < a.a_size; i++) {
+    for (i = 0; i < a.size(); i++) {
       sts = a.a[i]->event_handler(&ctx->mw, event, x, y, fx, fy);
       if (sts == GLOW__NO_PROPAGATE)
         break;
@@ -633,7 +633,7 @@ int ColPalCtx::event_handler(glow_eEvent event, int x, int y, int w, int h)
     sts = 0;
 
     hot_found = 0;
-    for (i = 0; i < a.a_size; i++) {
+    for (i = 0; i < a.size(); i++) {
       sts = a.a[i]->event_handler(&ctx->mw, event, x, y, fx, fy);
       if (sts == GLOW__NO_PROPAGATE)
         break;

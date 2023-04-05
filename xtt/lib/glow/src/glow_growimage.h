@@ -305,7 +305,6 @@ public:
   glow_tPixmap clip_mask; //!< Clip mask if transparent GIF image.
   glow_tPixmap nav_clip_mask; //!< Clip mask in navigation window i transparent
   //! GIF image.
-  GrowCtx* ctx; //!< Pointer to Grow context.
   glow_mDisplayLevel
       display_level; //!< Display level when this object is visible.
   int current_width; //!< Current width of the image.

@@ -38,7 +38,10 @@
 #define glow_nodeclass_h
 
 #include "glow_point.h"
+#include "glow_array.h"
 #include "co_string.h"
+
+class GlowPoint;
 
 /*! \file glow_nodeclass.h
     \brief Contains the GlowNodeClass class. */
@@ -434,7 +437,6 @@ public:
     return this->ctx;
   }
 
-  GrowCtx* ctx; //!< Glow context.
   GlowArray a; //!< Array of nodeclass elements.
   glow_eNodeGroup group; //!< Group the nodeclass belongs to.
   char* dynamic; //!< Dynamic code.

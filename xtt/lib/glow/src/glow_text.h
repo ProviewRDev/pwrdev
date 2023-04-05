@@ -183,7 +183,6 @@ public:
     return glow_eObjectType_Text;
   }
 
-  GrowCtx* ctx; //!< Glow context.
   GlowPoint p; //!< Position point.
   char* text; //!< The text.
   glow_eDrawType draw_type; //!< Drawtype for the text.

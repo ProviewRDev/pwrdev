@@ -38,6 +38,7 @@
 
 #include "co_string.h"
 
+#include "glow_growctx.h"
 #include "glow_growlayer.h"
 #include "glow_draw.h"
 #include "glow_exportscript.h"
@@ -45,7 +46,8 @@
 #include "glow_msg.h"
 
 GrowLayer::GrowLayer(GrowCtx* glow_ctx, const char* name)
-  : GlowArray(50,50), GrowNode(glow_ctx, name, 0, 0, 0), hide(0), active(0)
+  : GrowNode(glow_ctx, name, 0, 0, 0), a(50,50), hide(0), active(0),
+    is_bg(0)
 {
   object_type = glow_eObjectType_GrowLayer;
   nc = new GlowNodeClass(ctx, "__layer_class");
@@ -58,7 +60,7 @@ GrowLayer::~GrowLayer()
 
   ctx->set_nodraw();
   // Delete Cons first
-  for (int i = 0; i < a_size; i++) {
+  for (int i = 0; i < a.a_size; i++) {
     if (a[i]->type() != glow_eObjectType_Con)
       continue;
     element = a[i];
@@ -68,7 +70,7 @@ GrowLayer::~GrowLayer()
     delete element;
     i--;
   }
-  for (int i = 0; i < a_size; i++) {
+  for (int i = 0; i < a.a_size; i++) {
     element = a[i];
     remove(element);
     ctx->select_remove(element);
@@ -78,14 +80,14 @@ GrowLayer::~GrowLayer()
     i--;
   }
   ctx->reset_nodraw();
-
+  ctx->redraw();
 }
 
 void GrowLayer::save(std::ofstream& fp, glow_eSaveMode mode)
 {
   fp << int(glow_eSave_GrowLayer) << '\n';
   fp << int(glow_eSave_GrowLayer_array_part) << '\n';
-  GlowArray::save(fp, mode);
+  a.save(fp, mode);
   fp << int(glow_eSave_GrowLayer_grownode_part) << '\n';
   GrowNode::save(fp, mode);
   fp << int(glow_eSave_End) << '\n';
@@ -96,14 +98,14 @@ void GrowLayer::save(int nochildren, std::ofstream& fp, glow_eSaveMode mode)
   int size;
 
   if (nochildren) {
-    size = a_size;
-    a_size = 0;
+    size = a.a_size;
+    a.a_size = 0;
   }
 
   save(fp, mode);
 
   if (nochildren)
-    a_size = size;
+    a.a_size = size;
 }
 
 void GrowLayer::open(std::ifstream& fp)
@@ -124,7 +126,7 @@ void GrowLayer::open(std::ifstream& fp)
     case glow_eSave_GrowLayer:
       break;
     case glow_eSave_GrowLayer_array_part:
-      GlowArray::open(ctx, fp);
+      a.open(ctx, fp);
       break;
     case glow_eSave_GrowLayer_grownode_part:
       GrowNode::open(fp);
@@ -139,6 +141,7 @@ void GrowLayer::open(std::ifstream& fp)
     if (end_found)
       break;
   }
+  a.set_parent(this);
   get_node_borders();
 }
 
@@ -148,6 +151,7 @@ void GrowLayer::set_active(int act)
     if (ctx->a[i]->type() == glow_eObjectType_GrowLayer)
       ((GrowLayer*)ctx->a[i])->active = 0;
   }
+  ctx->a.active = 0;
 
   if (act) {
     ctx->layer = this;
@@ -160,7 +164,15 @@ void GrowLayer::set_active(int act)
 
 void GrowLayer::copy_from(GrowLayer& layer)
 {
-  GlowArray::copy_from(layer);
+  copy_from(layer.a);
+}
+
+void GrowLayer::draw()
+{
+  if (is_bg)
+    ctx->redraw();
+  else
+    GrowNode::draw();
 }
 
 void GrowLayer::draw(GlowWind* w, int ll_x, int ll_y, int ur_x, int ur_y)
@@ -246,7 +258,7 @@ void GrowLayer::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
   }
   node = (void*)this;
 
-  for (int i = 0; i < a_size; i++) {
+  for (int i = 0; i < a.a_size; i++) {
     node_highlight = highlight || a[i]->get_highlight();
     a[i]->draw(w, &trf, node_highlight, a[i]->get_hot(), node, node);
   }
@@ -262,13 +274,13 @@ int GrowLayer::event_handler(GlowWind* w, glow_eEvent event, int x, int y,
 
   switch (event) {
   case glow_eEvent_CursorMotion: {
-    for (int i = a_size - 1; i >= 0; i--) {
+    for (int i = a.a_size - 1; i >= 0; i--) {
       sts = a[i]->event_handler(w, event, x, y, fx, fy);
     }
     break;
   }
   default:
-    for (int i = a_size - 1; i >= 0; i--) {
+    for (int i = a.a_size - 1; i >= 0; i--) {
       sts = a[i]->event_handler(w, event, x, y, fx, fy);
       if (sts)
 	return sts;
@@ -280,7 +292,7 @@ int GrowLayer::event_handler(GlowWind* w, glow_eEvent event, int x, int y,
 void GrowLayer::get_borders(GlowTransform* t, double* x1_right, double* x1_left,
     double* y1_high, double* y1_low)
 {
-    for (int i = 0; i < a_size; i++) {
+    for (int i = 0; i < a.a_size; i++) {
       a[i]->get_borders(&trf, x1_right, x1_left, y1_high, y1_low);
     }
 }
@@ -293,7 +305,7 @@ void GrowLayer::get_node_borders()
 #endif
   x_left = y_low = 1e37;
   x_right = y_high = -1e37;
-  for (int i = 0; i < a_size; i++) {
+  for (int i = 0; i < a.a_size; i++) {
     a[i]->get_borders(&trf, &x_right, &x_left, &y_high, &y_low);
   }
   x_left -= 1;
@@ -313,7 +325,7 @@ int GrowLayer::trace_scan()
       return sts;
   }
 
-  return GlowArray::trace_scan();
+  return a.trace_scan();
 }
 
 int GrowLayer::trace_init()
@@ -323,7 +335,7 @@ int GrowLayer::trace_init()
   //  if ( !streq( trace.data[0], ""))
   sts = ctx->trace_connect_func((void*)this, &trace);
 
-  GlowArray::trace_init();
+  a.trace_init();
   return sts;
 }
 
@@ -332,14 +344,14 @@ void GrowLayer::trace_close()
   if (trace.p)
     ctx->trace_disconnect_func((void*)this);
 
-  GlowArray::trace_close();
+  a.trace_close();
 }
 
 int GrowLayer::insert(GlowArrayElem* element) 
 {
   int sts;
 
-  sts = GlowArray::insert(element);
+  sts = a.insert(element);
   element->set_parent(this);
   get_node_borders();
   return sts;
@@ -349,14 +361,36 @@ int GrowLayer::remove(GlowArrayElem* element)
 {
   int sts;
 
-  sts = GlowArray::remove(element);
-  element->set_parent(0);
-  get_node_borders();
+  sts = a.remove(element);
+  if (ODD(sts)) {
+    element->set_parent(0);
+    element->set_rootnode(0);
+    if (!ctx->closing_down)
+      get_node_borders();
+  }
   return sts;
 }
 
 int GrowLayer::export_script(GlowExportScript* es, void* o, void* m)
 {
   return es->layer(this, o, m);
+}
+
+void GrowLayer::set_original_fill_color(glow_eDrawType drawtype) {
+  if (ctx->environment == glow_eEnv_Development)
+    return;
+  GrowNode::set_original_fill_color(drawtype);
+}
+
+void GrowLayer::set_original_border_color(glow_eDrawType drawtype) {
+  if (ctx->environment == glow_eEnv_Development)
+    return;
+  GrowNode::set_original_border_color(drawtype);
+}
+
+void GrowLayer::set_original_text_color(glow_eDrawType drawtype) {
+  if (ctx->environment == glow_eEnv_Development)
+    return;
+  GrowNode::set_original_text_color(drawtype);
 }
 

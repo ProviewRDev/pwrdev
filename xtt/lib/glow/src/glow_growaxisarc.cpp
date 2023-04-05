@@ -42,6 +42,7 @@
 #include "co_string.h"
 #include "co_time.h"
 
+#include "glow_growctx.h"
 #include "glow_growaxisarc.h"
 #include "glow_grownode.h"
 #include "glow_draw.h"

@@ -117,7 +117,6 @@ public:
   */
   void convert(glow_eConvert version);
 
-  GrowCtx* ctx; //!< Glow ctx.
   GlowPoint zero;
   glow_eConType con_type; //!< Connection type.
   glow_eCorner corner; //!< Type of corners, rounded or straight.

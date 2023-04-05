@@ -37,7 +37,10 @@
 #ifndef glow_node_h
 #define glow_node_h
 
-#include "glow_growctx.h"
+#include "glow_point.h"
+#include "glow_nodeclass.h"
+
+class GrowCtx;
 
 #define MAX_CONPOINTS 32
 
@@ -51,6 +54,8 @@
   are superseeded by this class
   and left undocumented.
 */
+
+class GlowNodeClass;
 
 class GlowNode : public GlowArrayElem {
 public:
@@ -176,7 +181,6 @@ public:
       obst_y_high; //!< High border of object used for routing of connections.
   double obst_y_low; //!< Low border of object used for routing of connections.
   int hot; //!< Object is hot.
-  GrowCtx* ctx; //!< Glow context.
   GlowNodeClass* nc; //!< Pointer to nodeclass.
   GlowNodeClass*
       nc_root; //!< Root nodeclass, i.e. the nodeclass of the first page.
@@ -210,13 +214,7 @@ public:
     \param ur_y		y coordinate for upper right corner of area.
     \return 		Returns 1 if object is inside the area, else 0.
   */
-  int in_area(double ll_x, double ll_y, double ur_x, double ur_y)
-  {
-    return ((obst_x_left - ctx->draw_delta) < ur_x
-        && (obst_x_right + ctx->draw_delta) > ll_x
-        && (obst_y_low - ctx->draw_delta) < ur_y
-        && (obst_y_high + ctx->draw_delta) > ll_y);
-  }
+  int in_area(double ll_x, double ll_y, double ur_x, double ur_y);
 
   //! Check if object is inside an area.
   /*!
@@ -239,13 +237,7 @@ public:
     \param u_y		y coordinate for upper endpoint of line.
     \return 		Returns 1 if object crosses the line, else 0.
   */
-  int in_vert_line(double x, double l_y, double u_y)
-  {
-    return ((obst_x_left - ctx->draw_delta) < x
-        && (obst_x_right + ctx->draw_delta) > x
-        && (obst_y_low - ctx->draw_delta) < u_y
-        && (obst_y_high + ctx->draw_delta) > l_y);
-  }
+  int in_vert_line(double x, double l_y, double u_y);
 
   //! Check if object crosses a horizontal line.
   /*!
@@ -254,13 +246,7 @@ public:
     \param u_x		x coordinate for upper endpoint of line.
     \return 		Returns 1 if object crosses the line, else 0.
   */
-  int in_horiz_line(double y, double l_x, double u_x)
-  {
-    return ((obst_x_left - ctx->draw_delta) < u_x
-        && (obst_x_right + ctx->draw_delta) > l_x
-        && (obst_y_low - ctx->draw_delta) < y
-        && (obst_y_high + ctx->draw_delta) > y);
-  }
+  int in_horiz_line(double y, double l_x, double u_x);
 
   //! Reconfigure reference connections for a connections point.
   /*!

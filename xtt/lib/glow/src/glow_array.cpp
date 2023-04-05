@@ -525,7 +525,7 @@ int GlowArray::insert(GlowArrayElem* element)
 {
   GlowArrayElem** a_tmp;
 
-  if (find(element))
+  if (find(element, 0))
     return 0;
 
   if (allocated <= a_size) {
@@ -547,7 +547,7 @@ int GlowArray::brow_insert(
   int idx, i, j, found;
   int destination_level = 0;
 
-  if (find(element))
+  if (find(element, 0))
     return 0;
 
   if (!destination) {
@@ -636,6 +636,7 @@ int GlowArray::move(
     GlowArrayElem* element, GlowArrayElem* destination, glow_eDest code)
 {
   int elem_idx, dest_idx, i, found;
+  int sts;
 
   found = 0;
   for (elem_idx = 0; elem_idx < a_size; elem_idx++) {
@@ -644,11 +645,19 @@ int GlowArray::move(
       break;
     }
   }
-  if (!found)
+  if (!found) {
+    for (elem_idx = 0; elem_idx < a_size; elem_idx++) {
+      if (a[elem_idx]->type() == glow_eObjectType_GrowLayer) {
+	sts = ((GrowLayer*)a[elem_idx])->move(element, destination, code);
+	if (ODD(sts))
+	  return sts;
+      }
+    }    
     return 0;
+  }
 
   if (!destination) {
-    // If no destinaion, move to first or last
+    // If no destination, move to first or last
     switch (code) {
     case glow_eDest_After:
       dest_idx = a_size - 1;
@@ -1284,7 +1293,7 @@ void GlowArray::nav_erase(GlowTransform* t, void* node)
   }
 }
 
-int GlowArray::find(GlowArrayElem* element)
+int GlowArray::find(GlowArrayElem* element, int deep)
 {
   int i;
 
@@ -1292,9 +1301,11 @@ int GlowArray::find(GlowArrayElem* element)
     if (a[i] == element)
       return 1;
 
-    if (a[i]->type() == glow_eObjectType_GrowLayer) {
-      if (((GrowLayer*)a[i])->find(element))
-	return 1; 	  
+    if (deep) {
+      if (a[i]->type() == glow_eObjectType_GrowLayer) {
+	if (((GrowLayer*)a[i])->find(element))
+	  return 1; 	  
+      }
     }
   }
   return 0;
@@ -1570,6 +1581,15 @@ int GlowArray::get_next(GlowArrayElem* element, GlowArrayElem** next)
       return 1;
     }
   }
+
+  // Search in layers
+  for (i = 0; i < a_size; i++) {
+    if (a[i]->type() == glow_eObjectType_GrowLayer) {
+      if (ODD(((GrowLayer*)a[i])->get_next(element, next)))
+	return 1;
+    }
+  }
+
   return GLOW__NOELEM;
 }
 
@@ -1585,6 +1605,15 @@ int GlowArray::get_previous(GlowArrayElem* element, GlowArrayElem** prev)
       return 1;
     }
   }
+
+  // Search in layers
+  for (i = 0; i < a_size; i++) {
+    if (a[i]->type() == glow_eObjectType_GrowLayer) {
+      if (ODD(((GrowLayer*)a[i])->get_previous(element, prev)))
+	return 1;
+    }
+  }
+  
   return GLOW__NOELEM;
 }
 
@@ -1845,7 +1874,7 @@ int GlowArray::find_nc(GlowArrayElem* nc)
   // Search in layers
   for (int i = 0; i < a_size; i++) {
     if (a[i]->type() == glow_eObjectType_GrowLayer) {
-      if (ODD((((GlowArray*)(GrowLayer*)a[i]))->find_nc(nc)))
+      if (ODD(((GrowLayer*)a[i])->find_nc(nc)))
 	return 1;
     }
   }
@@ -1862,7 +1891,7 @@ int GlowArray::find_cc(GlowArrayElem* cc)
   // Search in layers
   for (int i = 0; i < a_size; i++) {
     if (a[i]->type() == glow_eObjectType_GrowLayer) {
-      if (ODD((((GlowArray*)(GrowLayer*)a[i]))->find_cc(cc)))
+      if (ODD(((GrowLayer*)a[i])->find_cc(cc)))
 	return 1;
     }
   }

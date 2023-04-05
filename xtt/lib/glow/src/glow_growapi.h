@@ -3448,6 +3448,8 @@ int grow_LayerIsEmpty(grow_tObject layer);
 int grow_LayerActive(grow_tCtx ctx);
 void grow_LayerSave(grow_tObject object, int nochildren, std::ofstream& fp, 
     glow_eSaveMode mode);
+grow_tObject grow_GetBackgroundLayer(grow_tCtx ctx);
+int grow_FindLayerByName(grow_tCtx ctx, const char* name, grow_tObject* object);
 
 /*@}*/
 #if defined __cplusplus

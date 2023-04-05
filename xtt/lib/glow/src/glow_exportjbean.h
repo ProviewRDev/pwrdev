@@ -39,6 +39,7 @@
 
 #include "glow_nodeclass.h"
 
+class GlowCtx;
 class GlowNodeClass;
 
 class GlowExportJBean {

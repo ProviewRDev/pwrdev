@@ -132,7 +132,7 @@ public:
     \param element	Element to search for.
     \return		Returns 1 if the object is found, else 0.
   */
-  int find(GlowArrayElem* element);
+  int find(GlowArrayElem* element, int deep = 1);
 
   //! Find an object by name.
   /*!

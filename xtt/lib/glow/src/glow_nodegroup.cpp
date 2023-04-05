@@ -39,6 +39,7 @@
 #include <iostream>
 
 #include "glow_nodegroup.h"
+#include "glow_growctx.h"
 #include "glow_grownode.h"
 #include "glow_msg.h"
 

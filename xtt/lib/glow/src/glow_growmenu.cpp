@@ -65,10 +65,20 @@ GrowMenu::GrowMenu(GrowCtx* glow_ctx, const char* name,
 GrowMenu::~GrowMenu()
 {
   // Remove this as parent from any submenu
-  for (int i = 0; i < ctx->a.a_size; i++) {
+  for (int i = 0; i < ctx->a.size(); i++) {
     if (ctx->a[i]->type() == glow_eObjectType_GrowMenu) {
-      if (((GrowMenu*)ctx->a[i])->parent_menu == this)
+      if (((GrowMenu*)ctx->a[i])->parent_menu == this) 
         ((GrowMenu*)ctx->a[i])->parent_menu = 0;
+    }
+  }
+  for (int i = 0; i < ctx->a.size(); i++) {
+    if (ctx->a[i]->type() == glow_eObjectType_GrowLayer) {
+      for (int j = 0; j < ((GrowLayer*)ctx->a[i])->size(); j++) {
+	if (((GrowLayer*)ctx->a[i])->a[j]->type() == glow_eObjectType_GrowMenu) {
+	  if (((GrowMenu*)((GrowLayer*)ctx->a[i])->a[j])->parent_menu == this)
+	    ((GrowMenu*)((GrowLayer*)ctx->a[i])->a[j])->parent_menu = 0;
+	}
+      }
     }
   }
 

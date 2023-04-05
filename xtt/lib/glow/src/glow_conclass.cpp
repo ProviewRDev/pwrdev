@@ -46,7 +46,7 @@ GlowConClass::GlowConClass(GrowCtx* glow_ctx, const char* name,
     glow_eConType contype, glow_eCorner cornertype, glow_eDrawType d_type,
     int line_w, double arrow_w, double arrow_l, double round_corner_amnt,
     glow_eConGroup grp)
-    : ctx(glow_ctx), zero(glow_ctx, 0, 0), con_type(contype),
+    : GlowArrayElem(glow_ctx), zero(glow_ctx, 0, 0), con_type(contype),
       corner(cornertype), draw_type(d_type), line_width(line_w),
       arrow_width(arrow_w), arrow_length(arrow_l),
       round_corner_amount(round_corner_amnt), group(grp)

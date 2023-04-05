@@ -62,6 +62,7 @@
 #define journal_cTag_Object 80000011
 #define journal_cTag_Size 80000012
 #define journal_cTag_Layer 80000013
+#define journal_cTag_Target 80000014
 #define journal_cTag_End 80009999
 
 static char* gname(const char* name)
@@ -280,7 +281,8 @@ int GraphJournal::store(journal_eAction action, grow_tObject o)
       || action == journal_eAction_AnteSelectObject
       || action == journal_eAction_AnteSelectReset
       || action == journal_eAction_AnteSelectRegion
-      || action == journal_eAction_AnteSelectRegionAdd) {
+      || action == journal_eAction_AnteSelectRegionAdd
+      || action == journal_eAction_AnteOrderObject) {
     switch (status) {
     case journal_eStatus_Stored:
       break;
@@ -353,14 +355,18 @@ int GraphJournal::store(journal_eAction action, grow_tObject o)
       case journal_eAction_AnteMoveToLayer: {
 	grow_tObject *list;
 	int list_cnt;
+	grow_tObject prev;
 
 	movelist.clear();
 	grow_GetSelectList(graph->grow->ctx, &list, &list_cnt);
 	for (int i = 0; i < list_cnt; i++) {
 	  MoveObject mo;
-	  grow_GetObjectName(list[i], mo.name, sizeof(mo.name),
-	      glow_eName_Path);
-	  movelist.push_back(mo);
+
+	  sts = grow_GetPreviousObject(graph->grow->ctx, list[i], &prev);
+	  if (ODD(sts))
+	    grow_GetObjectName(prev, mo.name_prev, sizeof(mo.name_prev), glow_eName_Path);
+	  grow_GetObjectName(list[i], mo.name, sizeof(mo.name), glow_eName_Path);
+	  movelist.push_back(mo);	  
 	}
 	break;
       }
@@ -379,6 +385,22 @@ int GraphJournal::store(journal_eAction action, grow_tObject o)
 	      glow_eName_Path);
 	  movelist.push_back(mo);
 	}
+	break;
+      }
+      case journal_eAction_AnteOrderObject: {
+	grow_tObject prev;
+	MoveObject mo;
+
+	movelist.clear();
+
+	grow_GetObjectName(
+	    o, mo.name, sizeof(mo.name), glow_eName_Object);
+
+	sts = grow_GetPreviousObject(graph->grow->ctx, o, &prev);
+	if (ODD(sts))
+	  grow_GetObjectName(prev, mo.name_prev, sizeof(mo.name_prev), 
+	      glow_eName_Path);
+	movelist.push_back(mo);
 	break;
       }
       default:;
@@ -401,7 +423,8 @@ int GraphJournal::store(journal_eAction action, grow_tObject o)
       || action == journal_eAction_PostSelectObject
       || action == journal_eAction_PostSelectReset
       || action == journal_eAction_PostSelectRegion
-      || action == journal_eAction_PostSelectRegionAdd) {
+      || action == journal_eAction_PostSelectRegionAdd
+      || action == journal_eAction_PostOrderObject) {
     if (current_idx >= (int)poslist.size()) {
       std::cerr << "Journal file disorder\n";
       return GE__SUCCESS;
@@ -509,6 +532,17 @@ int GraphJournal::store(journal_eAction action, grow_tObject o)
 	fp << journal_cTag_Redo << " " << action << " " << status << " "
 	   << current_idx << '\n';
 	store_redo_select_region_add();
+	break;
+      case journal_eAction_PostOrderObject:
+	poslist[current_idx].undo_pos = fp.tellp();
+	fp << journal_cTag_Undo << " " << action << " " << status << " "
+	   << current_idx << '\n';
+	store_undo_order_object(o);
+
+	poslist[current_idx].redo_pos = fp.tellp();
+	fp << journal_cTag_Redo << " " << action << " " << status << " "
+	   << current_idx << '\n';
+	store_redo_order_object(o);
 	break;
 
       default:;
@@ -776,6 +810,10 @@ int GraphJournal::undo()
     case journal_eAction_MergeVisibleLayers:
       undo_merge_visible_layers();
       break;
+    case journal_eAction_AnteOrderObject:
+    case journal_eAction_PostOrderObject:
+      undo_order_object();
+      break;
     case journal_eAction_No:
       break;
     default:;
@@ -905,6 +943,10 @@ int GraphJournal::redo()
     case journal_eAction_MergeVisibleLayers:
       redo_merge_visible_layers();
       break;
+    case journal_eAction_AnteOrderObject:
+    case journal_eAction_PostOrderObject:
+      redo_order_object();
+      break;
     case journal_eAction_No:
       break;
     default:;
@@ -919,33 +961,33 @@ int GraphJournal::redo()
   return GE__SUCCESS;
 }
 
-void GraphJournal::read_end()
+void GraphJournal::read_tag(int tag)
 {
   char line[100];
-  int tag;
+  int val;
 
   fp.getline(line, sizeof(line));
   if (!fp)
     throw co_error(GE__JOURNAL_DISORDER);
 
-  sscanf(line, "%d", &tag);
+  sscanf(line, "%d", &val);
 
-  if (tag != journal_cTag_End)
+  if (val != tag)
     throw co_error(GE__JOURNAL_DISORDER);
 }
 
-void GraphJournal::read_object(char *name, int size)
+void GraphJournal::read_str(int tag, char *name, int size)
 {
   char line[100];
-  int tag;
+  int val;
 
   fp.getline(line, sizeof(line));
   if (!fp)
     throw co_error(GE__JOURNAL_DISORDER);
 
-  sscanf(line, "%d", &tag);
+  sscanf(line, "%d", &val);
 
-  if (tag != journal_cTag_Object)
+  if (val != tag)
     throw co_error(GE__JOURNAL_DISORDER);
 
   fp.getline(name, size);
@@ -953,26 +995,26 @@ void GraphJournal::read_object(char *name, int size)
     throw co_error(GE__JOURNAL_DISORDER);
 }
 
-void GraphJournal::read_size(int* size)
+void GraphJournal::read_int(int tag, int* value)
 {
   char line[100];
-  int tag;
+  int t;
   int num;
 
   fp.getline(line, sizeof(line));
   if (!fp)
     throw co_error(GE__JOURNAL_DISORDER);
 
-  sscanf(line, "%d", &tag);
+  sscanf(line, "%d", &t);
 
-  if (tag != journal_cTag_Size)
+  if (t != tag)
     throw co_error(GE__JOURNAL_DISORDER);
 
   fp.getline(line, sizeof(line));
   if (!fp)
     throw co_error(GE__JOURNAL_DISORDER);
 
-  num = sscanf(line, "%d", size);
+  num = sscanf(line, "%d", value);
   if (num != 1)
     throw co_error(GE__JOURNAL_DISORDER);
 }
@@ -983,31 +1025,60 @@ int GraphJournal::undo_delete_select()
   char line[100];
   int tag;
   char name_prev[80];
+  char name_layer[80];
   grow_tObject prev;
+  grow_tObject layer;
+  grow_tObject active_layer;
   int sts;
 
   log_debug("undo_delete_select\n");
 
   grow_SetNodraw(graph->grow->ctx);
 
+  sts = grow_GetActiveLayer(graph->grow->ctx, &active_layer);
+  if (EVEN(sts))
+    active_layer = 0;
+
   fp.getline(line, sizeof(line));
   sscanf(line, "%d", &tag);
-  while (tag == journal_cTag_Object) {
+  while ( tag == journal_cTag_Object) {
+    fp.getline(name_layer, sizeof(name_layer));
     fp.getline(name_prev, sizeof(name_prev));
+    
+    if (!streq(name_layer,"")) {
+      sts = grow_FindLayerByName(graph->grow->ctx, name_layer, &layer);
+      if (EVEN(sts)) {
+	grow_ResetNodraw(graph->grow->ctx);
+	grow_Redraw(graph->grow->ctx);
+	throw co_error(sts);
+      }
+    }
+    else
+      layer = grow_GetBackgroundLayer(graph->grow->ctx);
 
+    if (layer != active_layer)
+      grow_LayerSetActive(layer, 1);
+    
     grow_ObjectRead(graph->grow->ctx, (std::ifstream&)fp, &o);
-    if (!o)
+    if (!o) {
+      grow_ResetNodraw(graph->grow->ctx);
+      grow_Redraw(graph->grow->ctx);
       return GE__SUCCESS;
-
+    }
     if (streq(name_prev, "")) {
-      grow_OrderObject(graph->grow->ctx, o, 0, glow_eDest_After);
+      grow_OrderObject(graph->grow->ctx, o, 0, glow_eDest_Before);
     } else {
       sts = grow_FindObjectByName(graph->grow->ctx, name_prev, &prev);
       if (ODD(sts)) {
-        grow_OrderObject(graph->grow->ctx, o, prev, glow_eDest_Before);
+        grow_OrderObject(graph->grow->ctx, o, prev, glow_eDest_After);
       }
     }
 
+    if (active_layer == 0)
+      grow_LayerSetActive(layer, 0);
+    else if (layer != active_layer)
+      grow_LayerSetActive(active_layer, 1);
+ 
     fp.get();
     fp.getline(line, sizeof(line));
     sscanf(line, "%d", &tag);
@@ -1033,15 +1104,20 @@ int GraphJournal::store_undo_delete_select()
 
   grow_GetSelectList(graph->grow->ctx, &sel_list, &sel_count);
   for (int i = sel_count - 1; i >= 0; i--) {
+
+    sts = grow_GetObjectName(sel_list[i], name, sizeof(name), glow_eName_Layer);
     fp << journal_cTag_Object << '\n';
+    if (ODD(sts))
+      fp << name << '\n';
+    else
+      fp << '\n';    
 
     sts = grow_GetPreviousObject(graph->grow->ctx, sel_list[i], &prev);
     if (ODD(sts)) {
-      grow_GetObjectName(prev, name, sizeof(name), glow_eName_Object);
+      grow_GetObjectName(prev, name, sizeof(name), glow_eName_Path);
       fp << name << '\n';
     } else
-      fp << '\n';
-
+      fp << '\n';    
     grow_ObjectSave(sel_list[i], (std::ofstream&)fp, glow_eSaveMode_Edit);
   }
   fp << journal_cTag_End << '\n';
@@ -1058,7 +1134,7 @@ int GraphJournal::store_redo_delete_select()
 
   grow_GetSelectList(graph->grow->ctx, &sel_list, &sel_count);
   for (int i = 0; i < sel_count; i++) {
-    grow_GetObjectName(sel_list[i], name, sizeof(name), glow_eName_Object);
+    grow_GetObjectName(sel_list[i], name, sizeof(name), glow_eName_Path);
 
     fp << journal_cTag_Object << '\n';
     fp << name << '\n';
@@ -1104,11 +1180,25 @@ int GraphJournal::redo_delete_select()
 int GraphJournal::undo_delete_object()
 {
   grow_tObject o;
+  grow_tObject prev;
+  char name_prev[80];
+  int sts;
 
-  log_debug("undo_delete_select\n");
+  log_debug("undo_delete_object\n");
+
+  read_str(journal_cTag_Object, name_prev, sizeof(name_prev));
 
   grow_ObjectRead(graph->grow->ctx, (std::ifstream&)fp, &o);
   grow_Redraw(graph->grow->ctx);
+
+  if (streq(name_prev, "")) {
+    grow_OrderObject(graph->grow->ctx, o, 0, glow_eDest_Before);
+  } else {
+    sts = grow_FindObjectByName(graph->grow->ctx, name_prev, &prev);
+    if (ODD(sts)) {
+      grow_OrderObject(graph->grow->ctx, o, prev, glow_eDest_After);
+    }
+  }
 
   if (grow_GetObjectType(o) == glow_eObjectType_GrowLayer) 
     grow_LayerSetActive(o, 1);
@@ -1118,7 +1208,20 @@ int GraphJournal::undo_delete_object()
 
 int GraphJournal::store_undo_delete_object(grow_tObject o)
 {
+  grow_tObject prev;
+  char name[80];
+  int sts;
+
   log_debug("store_undo_delete_object\n");
+
+  fp << journal_cTag_Object << '\n';
+  sts = grow_GetPreviousObject(graph->grow->ctx, o, &prev);
+  if (ODD(sts)) {
+    grow_GetObjectName(prev, name, sizeof(name), glow_eName_Path);
+    fp << name << '\n';
+  }
+  else 
+    fp << '\n';
 
   grow_ObjectSave(o, (std::ofstream&)fp, glow_eSaveMode_Edit);
   return GE__SUCCESS;
@@ -1936,14 +2039,14 @@ int GraphJournal::undo_rename()
 
   log_debug("undo_rename\n");
 
-  read_object(name_new, sizeof(name_new));
-  read_object(name_old, sizeof(name_old));
+  read_str(journal_cTag_Object, name_new, sizeof(name_new));
+  read_str(journal_cTag_Object, name_old, sizeof(name_old));
 
   sts = grow_FindObjectByName(graph->grow->ctx, name_new, &o);
   if (ODD(sts))
     grow_SetObjectName(o, name_old);
 
-  read_end();
+  read_tag(journal_cTag_End);
 
   return GE__SUCCESS;
 }
@@ -1991,14 +2094,14 @@ int GraphJournal::redo_rename()
 
   log_debug("redo_rename\n");
 
-  read_object(name_new, sizeof(name_new));
-  read_object(name_old, sizeof(name_old));
+  read_str(journal_cTag_Object, name_new, sizeof(name_new));
+  read_str(journal_cTag_Object, name_old, sizeof(name_old));
 
   sts = grow_FindObjectByName(graph->grow->ctx, name_old, &o);
   if (ODD(sts))
     grow_SetObjectName(o, name_new);
 
-  read_end();
+  read_tag(journal_cTag_End);
 
   return GE__SUCCESS;
 }
@@ -2012,22 +2115,22 @@ int GraphJournal::undo_activate_layer()
 
   log_debug("undo_activate_layer\n");
   
-  read_object(new_layer, sizeof(new_layer));
-  read_object(old_layer, sizeof(old_layer));
+  read_str(journal_cTag_Object, new_layer, sizeof(new_layer));
+  read_str(journal_cTag_Object, old_layer, sizeof(old_layer));
 
   if (strcmp(old_layer, "") != 0) {
-    sts = grow_FindObjectByName(graph->grow->ctx, old_layer, &o);
+    sts = grow_FindLayerByName(graph->grow->ctx, old_layer, &o);
     if (ODD(sts)) {
       grow_LayerSetActive(o, 1);
       graph->refresh_objects(attr_mRefresh_Objects);
     }
   } else {
-    sts = grow_FindObjectByName(graph->grow->ctx, new_layer, &o);
+    sts = grow_FindLayerByName(graph->grow->ctx, new_layer, &o);
     if (ODD(sts))
       grow_LayerSetActive(o, 0);
   }
 
-  read_end();
+  read_tag(journal_cTag_End);
 
   return GE__SUCCESS;
 }
@@ -2058,16 +2161,16 @@ int GraphJournal::redo_activate_layer()
 
   log_debug("redo_activate_layer\n");
 
-  read_object(new_layer, sizeof(new_layer));
-  read_object(old_layer, sizeof(old_layer));
+  read_str(journal_cTag_Object, new_layer, sizeof(new_layer));
+  read_str(journal_cTag_Object, old_layer, sizeof(old_layer));
 
-  sts = grow_FindObjectByName(graph->grow->ctx, new_layer, &o);
+  sts = grow_FindLayerByName(graph->grow->ctx, new_layer, &o);
   if (ODD(sts)) {
     grow_LayerSetActive(o, 1);
     graph->refresh_objects(attr_mRefresh_Objects);
   }
 
-  read_end();
+  read_tag(journal_cTag_End);
 
   return GE__SUCCESS;
 }
@@ -2096,15 +2199,15 @@ int GraphJournal::undo_inactivate_layer()
 
   log_debug("undo_inactivate_layer\n");
 
-  read_object(layer, sizeof(layer));
+  read_str(journal_cTag_Object, layer, sizeof(layer));
 
-  sts = grow_FindObjectByName(graph->grow->ctx, layer, &o);
+  sts = grow_FindLayerByName(graph->grow->ctx, layer, &o);
   if (ODD(sts)) {
     grow_LayerSetActive(o, 1);
     graph->refresh_objects(attr_mRefresh_Objects);
   }
 
-  read_end();
+  read_tag(journal_cTag_End);
 
   return GE__SUCCESS;
 }
@@ -2132,15 +2235,15 @@ int GraphJournal::redo_inactivate_layer()
 
   log_debug("redo_inactivate_layer\n");
 
-  read_object(layer, sizeof(layer));
+  read_str(journal_cTag_Object, layer, sizeof(layer));
 
-  sts = grow_FindObjectByName(graph->grow->ctx, layer, &o);
+  sts = grow_FindLayerByName(graph->grow->ctx, layer, &o);
   if (ODD(sts)) {
     grow_LayerSetActive(o, 0);
     graph->refresh_objects(attr_mRefresh_Objects);
   }
 
-  read_end();
+  read_tag(journal_cTag_End);
 
   return GE__SUCCESS;
 }
@@ -2167,15 +2270,15 @@ int GraphJournal::undo_set_layer_visible()
 
   log_debug("undo_set_layer_visible\n");
 
-  read_object(layer, sizeof(layer));
+  read_str(journal_cTag_Object, layer, sizeof(layer));
 
-  sts = grow_FindObjectByName(graph->grow->ctx, layer, &o);
+  sts = grow_FindLayerByName(graph->grow->ctx, layer, &o);
   if (ODD(sts)) {
     grow_SetObjectVisibility(o, glow_eVis_Invisible);
     graph->refresh_objects(attr_mRefresh_Objects);
   }
 
-  read_end();
+  read_tag(journal_cTag_End);
 
   return GE__SUCCESS;
 }
@@ -2203,15 +2306,15 @@ int GraphJournal::redo_set_layer_visible()
 
   log_debug("redo_set_layer_visible\n");
 
-  read_object(layer, sizeof(layer));
+  read_str(journal_cTag_Object, layer, sizeof(layer));
 
-  sts = grow_FindObjectByName(graph->grow->ctx, layer, &o);
+  sts = grow_FindLayerByName(graph->grow->ctx, layer, &o);
   if (ODD(sts)) {
     grow_SetObjectVisibility(o, glow_eVis_Visible);
     graph->refresh_objects(attr_mRefresh_Objects);
   }
 
-  read_end();
+  read_tag(journal_cTag_End);
 
   return GE__SUCCESS;
 }
@@ -2238,15 +2341,15 @@ int GraphJournal::undo_set_layer_invisible()
 
   log_debug("undo_set_layer_invisible\n");
 
-  read_object(layer, sizeof(layer));
+  read_str(journal_cTag_Object, layer, sizeof(layer));
 
-  sts = grow_FindObjectByName(graph->grow->ctx, layer, &o);
+  sts = grow_FindLayerByName(graph->grow->ctx, layer, &o);
   if (ODD(sts)) {
     grow_SetObjectVisibility(o, glow_eVis_Visible);
     graph->refresh_objects(attr_mRefresh_Objects);
   }
 
-  read_end();
+  read_tag(journal_cTag_End);
 
   return GE__SUCCESS;
 }
@@ -2274,15 +2377,15 @@ int GraphJournal::redo_set_layer_invisible()
 
   log_debug("redo_set_layer_invisible\n");
 
-  read_object(layer, sizeof(layer));
+  read_str(journal_cTag_Object, layer, sizeof(layer));
 
-  sts = grow_FindObjectByName(graph->grow->ctx, layer, &o);
+  sts = grow_FindLayerByName(graph->grow->ctx, layer, &o);
   if (ODD(sts)) {
     grow_SetObjectVisibility(o, glow_eVis_Invisible);
     graph->refresh_objects(attr_mRefresh_Objects);
   }
 
-  read_end();
+  read_tag(journal_cTag_End);
 
   return GE__SUCCESS;
 }
@@ -2305,9 +2408,11 @@ int GraphJournal::undo_move_to_layer()
 {
   grow_tObject o;
   grow_tObject layer;
+  grow_tObject prev;
   int sts;
   char layername[80];
   char name[80];
+  char name_prev[80];
   char target[80];
   char oname[80];
   int object_cnt;
@@ -2317,16 +2422,19 @@ int GraphJournal::undo_move_to_layer()
 
   log_debug("undo_move_to_layer\n");
 
-  read_object(layername, sizeof(layername));
+  read_str(journal_cTag_Object, layername, sizeof(layername));
 
-  sts = grow_FindObjectByName(graph->grow->ctx, layername, &layer);
+  sts = grow_FindLayerByName(graph->grow->ctx, layername, &layer);
   if (EVEN(sts))
     throw co_error(sts);
 
-  read_size(&object_cnt);
+  read_int(journal_cTag_Size, &object_cnt);
 
   for (int i = 0; i < object_cnt; i++) {
-    read_object(name, sizeof(name));
+
+    read_str(journal_cTag_Target, name_prev, sizeof(name_prev));
+    read_str(journal_cTag_Object, name, sizeof(name));
+    to_layer = 0;
     strcpy(target, name);
     s = strrchr(target, '-');
     if (s) {
@@ -2342,25 +2450,38 @@ int GraphJournal::undo_move_to_layer()
     strcat(oname, s);
 
     if (to_layer) {
-      sts = grow_FindObjectByName(graph->grow->ctx, target, &targetlayer);
+      sts = grow_FindLayerByName(graph->grow->ctx, target, &targetlayer);
       if (EVEN(sts))
 	throw co_error(sts);
     }
+    else
+      targetlayer = grow_GetBackgroundLayer(graph->grow->ctx);
+
     sts = grow_FindObjectByName(graph->grow->ctx, oname, &o);
     if (EVEN(sts))
       throw co_error(sts);
 
     sts = grow_LayerRemove(layer, o);
-    if (EVEN(sts))
+    if (EVEN(sts)) 
       throw co_error(sts);
     sts = grow_LayerInsert(targetlayer, o);
     if (EVEN(sts))
       throw co_error(sts);
+
+    if (streq(name_prev, "")) {
+      grow_OrderObject(graph->grow->ctx, o, 0, glow_eDest_Before);
+    } else {
+      sts = grow_FindObjectByName(graph->grow->ctx, name_prev, &prev);
+      if (ODD(sts)) {
+	grow_OrderObject(graph->grow->ctx, o, prev, glow_eDest_After);
+      }
+    }
   }
 
-  read_end();
+  read_tag(journal_cTag_End);
 
   graph->refresh_objects(attr_mRefresh_Objects);
+  graph->refresh_objects(attr_mRefresh_Select);
 
   return GE__SUCCESS;
 }
@@ -2382,6 +2503,8 @@ int GraphJournal::store_undo_move_to_layer(grow_tObject o)
   fp << journal_cTag_Size << '\n';
   fp << movelist.size() << '\n';
   for (int i = 0; i < movelist.size(); i++) {
+    fp << journal_cTag_Target << '\n';
+    fp << movelist[i].name_prev << '\n';
     fp << journal_cTag_Object << '\n';
     fp << movelist[i].name << '\n';
   }
@@ -2401,16 +2524,16 @@ int GraphJournal::redo_move_to_layer()
 
   log_debug("redo_move_to_layer\n");
 
-  read_object(layername, sizeof(layername));
+  read_str(journal_cTag_Object, layername, sizeof(layername));
 
-  sts = grow_FindObjectByName(graph->grow->ctx, layername, &targetlayer);
+  sts = grow_FindLayerByName(graph->grow->ctx, layername, &targetlayer);
   if (EVEN(sts))
     throw co_error(sts);
 
-  read_size(&object_cnt);
+  read_int(journal_cTag_Size, &object_cnt);
 
   for (int i = 0; i < object_cnt; i++) {
-    read_object(name, sizeof(name));
+    read_str(journal_cTag_Object, name, sizeof(name));
 
     sts = grow_FindObjectByName(graph->grow->ctx, name, &o);
     if (EVEN(sts))
@@ -2425,7 +2548,7 @@ int GraphJournal::redo_move_to_layer()
       throw co_error(sts);
   }
 
-  read_end();
+  read_tag(journal_cTag_End);
 
   graph->refresh_objects(attr_mRefresh_Objects);
 
@@ -2470,7 +2593,7 @@ int GraphJournal::undo_select_object()
 
   log_debug("undo_select_object\n");
 
-  read_object(name, sizeof(name));
+  read_str(journal_cTag_Object, name, sizeof(name));
 
   sts = grow_FindObjectByName(graph->grow->ctx, name, &o);
   if (ODD(sts)) {
@@ -2478,10 +2601,10 @@ int GraphJournal::undo_select_object()
       // Unselect and select old ones
       grow_SelectClear(graph->grow->ctx);
 
-      read_size(&object_cnt);
+      read_int(journal_cTag_Size, &object_cnt);
 
       for (int i = 0; i < object_cnt; i++) {
-	read_object(name, sizeof(name));
+	read_str(journal_cTag_Object, name, sizeof(name));
 	
 	sts = grow_FindObjectByName(graph->grow->ctx, name, &o);
 	if (EVEN(sts))
@@ -2496,18 +2619,18 @@ int GraphJournal::undo_select_object()
       grow_SetHighlight(o, 1);
       grow_SelectInsert(graph->grow->ctx, o);
 
-      read_size(&object_cnt);
+      read_int(journal_cTag_Size, &object_cnt);
       for (int i = 0; i < object_cnt; i++)
-	read_object(name, sizeof(name));
+	read_str(journal_cTag_Object, name, sizeof(name));
     }
     graph->refresh_objects(attr_mRefresh_Select);
   } else {
-    read_size(&object_cnt);
+    read_int(journal_cTag_Size, &object_cnt);
     for (int i = 0; i < object_cnt; i++)
-      read_object(name, sizeof(name));
+      read_str(journal_cTag_Object, name, sizeof(name));
   }
 
-  read_end();
+  read_tag(journal_cTag_End);
 
   return GE__SUCCESS;
 }
@@ -2542,7 +2665,7 @@ int GraphJournal::redo_select_object()
 
   log_debug("redo_select_object\n");
 
-  read_object(name, sizeof(name));
+  read_str(journal_cTag_Object, name, sizeof(name));
 
   sts = grow_FindObjectByName(graph->grow->ctx, name, &o);
   if (ODD(sts)) {
@@ -2557,7 +2680,7 @@ int GraphJournal::redo_select_object()
     }
   }
 
-  read_end();
+  read_tag(journal_cTag_End);
 
   graph->refresh_objects(attr_mRefresh_Select);
 
@@ -2586,7 +2709,7 @@ int GraphJournal::undo_select_object_add()
 
   log_debug("undo_select_object_add\n");
 
-  read_object(name, sizeof(name));
+  read_str(journal_cTag_Object, name, sizeof(name));
 
   sts = grow_FindObjectByName(graph->grow->ctx, name, &o);
   if (ODD(sts)) {
@@ -2600,7 +2723,7 @@ int GraphJournal::undo_select_object_add()
     graph->refresh_objects(attr_mRefresh_Select);
   }
 
-  read_end();
+  read_tag(journal_cTag_End);
 
   return GE__SUCCESS;
 }
@@ -2628,7 +2751,7 @@ int GraphJournal::redo_select_object_add()
 
   log_debug("redo_select_object_add\n");
 
-  read_object(name, sizeof(name));
+  read_str(journal_cTag_Object, name, sizeof(name));
 
   sts = grow_FindObjectByName(graph->grow->ctx, name, &o);
   if (ODD(sts)) {
@@ -2642,7 +2765,7 @@ int GraphJournal::redo_select_object_add()
     graph->refresh_objects(attr_mRefresh_Select);
   }
 
-  read_end();
+  read_tag(journal_cTag_End);
 
   return GE__SUCCESS;
 }
@@ -2670,10 +2793,10 @@ int GraphJournal::undo_select_reset()
 
   log_debug("undo_select_reset\n");
 
-  read_size(&object_cnt);
+  read_int(journal_cTag_Size, &object_cnt);
 
   for (int i = 0; i < object_cnt; i++) {
-    read_object(name, sizeof(name));
+    read_str(journal_cTag_Object, name, sizeof(name));
 
     sts = grow_FindObjectByName(graph->grow->ctx, name, &o);
     if (EVEN(sts))
@@ -2683,7 +2806,7 @@ int GraphJournal::undo_select_reset()
     grow_SelectInsert(graph->grow->ctx, o);
   }
 
-  read_end();
+  read_tag(journal_cTag_End);
 
   graph->refresh_objects(attr_mRefresh_Select);
 
@@ -2712,7 +2835,7 @@ int GraphJournal::redo_select_reset()
 
   grow_SelectClear(graph->grow->ctx);
 
-  read_end();
+  read_tag(journal_cTag_End);
 
   graph->refresh_objects(attr_mRefresh_Select);
 
@@ -2739,10 +2862,10 @@ int GraphJournal::undo_select_region()
 
   grow_SelectClear(graph->grow->ctx);
 
-  read_size(&object_cnt);
+  read_int(journal_cTag_Size, &object_cnt);
 
   for (int i = 0; i < object_cnt; i++) {
-    read_object(name, sizeof(name));
+    read_str(journal_cTag_Object, name, sizeof(name));
 
     sts = grow_FindObjectByName(graph->grow->ctx, name, &o);
     if (EVEN(sts))
@@ -2752,7 +2875,7 @@ int GraphJournal::undo_select_region()
     grow_SelectInsert(graph->grow->ctx, o);
   }
 
-  read_end();
+  read_tag(journal_cTag_End);
 
   graph->refresh_objects(attr_mRefresh_Select);
 
@@ -2786,10 +2909,10 @@ int GraphJournal::redo_select_region()
 
   grow_SelectClear(graph->grow->ctx);
 
-  read_size(&object_cnt);
+  read_int(journal_cTag_Size, &object_cnt);
 
   for (int i = 0; i < object_cnt; i++) {
-    read_object(name, sizeof(name));
+    read_str(journal_cTag_Object, name, sizeof(name));
 
     sts = grow_FindObjectByName(graph->grow->ctx, name, &o);
     if (EVEN(sts))
@@ -2799,7 +2922,7 @@ int GraphJournal::redo_select_region()
     grow_SelectInsert(graph->grow->ctx, o);
   }
 
-  read_end();
+  read_tag(journal_cTag_End);
 
   graph->refresh_objects(attr_mRefresh_Select);
 
@@ -2839,10 +2962,10 @@ int GraphJournal::undo_select_region_add()
 
   log_debug("undo_select_region_add\n");
 
-  read_size(&object_cnt);
+  read_int(journal_cTag_Size, &object_cnt);
 
   for (int i = 0; i < object_cnt; i++) {
-    read_object(name, sizeof(name));
+    read_str(journal_cTag_Object, name, sizeof(name));
 
     sts = grow_FindObjectByName(graph->grow->ctx, name, &o);
     if (EVEN(sts))
@@ -2852,7 +2975,7 @@ int GraphJournal::undo_select_region_add()
     grow_SelectRemove(graph->grow->ctx, o);
   }
 
-  read_end();
+  read_tag(journal_cTag_End);
 
   graph->refresh_objects(attr_mRefresh_Select);
 
@@ -2913,10 +3036,10 @@ int GraphJournal::redo_select_region_add()
 
   log_debug("redo_select_region_add\n");
 
-  read_size(&object_cnt);
+  read_int(journal_cTag_Size, &object_cnt);
 
   for (int i = 0; i < object_cnt; i++) {
-    read_object(name, sizeof(name));
+    read_str(journal_cTag_Object, name, sizeof(name));
 
     sts = grow_FindObjectByName(graph->grow->ctx, name, &o);
     if (EVEN(sts))
@@ -2926,7 +3049,7 @@ int GraphJournal::redo_select_region_add()
     grow_SelectInsert(graph->grow->ctx, o);
   }
 
-  read_end();
+  read_tag(journal_cTag_End);
 
   graph->refresh_objects(attr_mRefresh_Select);
 
@@ -2984,7 +3107,9 @@ int GraphJournal::undo_merge_all_layers()
   int tag;
   grow_tObject o;
   grow_tObject layer;
+  grow_tObject prev;
   int sts;
+  char name_prev[80];
   char name[80];
   int object_cnt;
 
@@ -2995,16 +3120,30 @@ int GraphJournal::undo_merge_all_layers()
 
   fp.getline(line, sizeof(line));
   sscanf(line, "%d", &tag);
-  while (tag == journal_cTag_Layer) {
+  while (tag == journal_cTag_Target) {
+    fp.getline(name_prev, sizeof(name_prev));
+    if (!fp)
+      throw co_error(GE__JOURNAL_DISORDER);
+
+    read_tag(journal_cTag_Layer);
     grow_ObjectRead(graph->grow->ctx, (std::ifstream&)fp, &layer);
     if (!layer)
       return GE__SUCCESS;
 
+    if (streq(name_prev, "")) {
+      grow_OrderObject(graph->grow->ctx, layer, 0, glow_eDest_Before);
+    } else {
+      sts = grow_FindObjectByName(graph->grow->ctx, name_prev, &prev);
+      if (ODD(sts)) {
+	grow_OrderObject(graph->grow->ctx, layer, prev, glow_eDest_After);
+      }
+    }
+
     fp.get();
-    read_size(&object_cnt);
+    read_int(journal_cTag_Size, &object_cnt);
 
     for (int i = 0; i < object_cnt; i++) {
-      read_object(name, sizeof(name));
+      read_str(journal_cTag_Object, name, sizeof(name));
 
       sts = grow_FindObjectByName(graph->grow->ctx, name, &o);
       if (EVEN(sts))
@@ -3038,6 +3177,7 @@ int GraphJournal::store_undo_merge_all_layers()
   int list_count;
   grow_tObject* layer_list;
   int layer_list_count;
+  grow_tObject prev = 0;
   char name[80];
 
   log_debug("store_undo_merge_all_layers\n");
@@ -3046,6 +3186,13 @@ int GraphJournal::store_undo_merge_all_layers()
 
   for (int i = 0; i < list_count; i++) {
     if (grow_GetObjectType(list[i]) == glow_eObjectType_GrowLayer) {
+      fp << journal_cTag_Target << '\n';
+      if (prev == 0)
+	fp << '\n';
+      else {
+	grow_GetObjectName(prev, name, sizeof(name), glow_eName_Object);
+	fp << name << '\n';
+      }
       fp << journal_cTag_Layer << '\n';
       grow_LayerSave(list[i], 1, (std::ofstream&)fp, glow_eSaveMode_Edit);
     
@@ -3058,6 +3205,7 @@ int GraphJournal::store_undo_merge_all_layers()
 	fp << name << '\n';
       }
     }
+    prev = list[i];
   }
   fp << journal_cTag_End << '\n';
 
@@ -3070,7 +3218,7 @@ int GraphJournal::redo_merge_all_layers()
 
   grow_MergeAllLayers(graph->grow->ctx);
 
-  read_end();
+  read_tag(journal_cTag_End);
 
   graph->refresh_objects(attr_mRefresh_Objects);
 
@@ -3109,10 +3257,10 @@ int GraphJournal::undo_merge_visible_layers_to_bg()
       return GE__SUCCESS;
 
     fp.get();
-    read_size(&object_cnt);
+    read_int(journal_cTag_Size, &object_cnt);
 
     for (int i = 0; i < object_cnt; i++) {
-      read_object(name, sizeof(name));
+      read_str(journal_cTag_Object, name, sizeof(name));
 
       sts = grow_FindObjectByName(graph->grow->ctx, name, &o);
       if (EVEN(sts))
@@ -3179,7 +3327,7 @@ int GraphJournal::redo_merge_visible_layers_to_bg()
 
   grow_MergeVisibleLayersToBg(graph->grow->ctx);
 
-  read_end();
+  read_tag(journal_cTag_End);
 
   graph->refresh_objects(attr_mRefresh_Objects);
 
@@ -3214,8 +3362,8 @@ int GraphJournal::undo_merge_visible_layers()
   grow_SetNodraw(graph->grow->ctx);
   grow_SelectClear(graph->grow->ctx);
 
-  read_object(name, sizeof(name));
-  read_size(&active_layer);
+  read_str(journal_cTag_Object, name, sizeof(name));
+  read_int(journal_cTag_Size, &active_layer);
   snprintf(layer_name, sizeof(layer_name), "Merged%s", name);
 
   sts = grow_FindObjectByName(graph->grow->ctx, layer_name, &source_layer);
@@ -3233,10 +3381,10 @@ int GraphJournal::undo_merge_visible_layers()
       return GE__SUCCESS;
 
     fp.get();
-    read_size(&object_cnt);
+    read_int(journal_cTag_Size, &object_cnt);
 
     for (int i = 0; i < object_cnt; i++) {
-      read_object(name, sizeof(name));
+      read_str(journal_cTag_Object, name, sizeof(name));
       snprintf(path_name, sizeof(path_name), "%s-%s", layer_name, name);
       sts = grow_FindObjectByName(graph->grow->ctx, path_name, &o);
       if (EVEN(sts))
@@ -3345,7 +3493,7 @@ int GraphJournal::redo_merge_visible_layers()
 
   grow_MergeVisibleLayers(graph->grow->ctx);
 
-  read_end();
+  read_tag(journal_cTag_End);
 
   graph->refresh_objects(attr_mRefresh_Objects);
 
@@ -3361,6 +3509,119 @@ int GraphJournal::store_redo_merge_visible_layers()
   return GE__SUCCESS;
 }
 
+int GraphJournal::undo_order_object()
+{
+  grow_tObject o;
+  grow_tObject prev;
+  char name[80];
+  char name_prev[80];
+  int sts;
+
+  log_debug("undo_order_object\n");
+
+  read_str(journal_cTag_Object, name, sizeof(name));
+  read_str(journal_cTag_Object, name_prev, sizeof(name_prev));
+
+  sts = grow_FindObjectByName(graph->grow->ctx, name, &o);
+  if (EVEN(sts))
+    throw co_error(sts);
+ 
+  if (streq(name_prev, ""))
+    prev = 0;
+  else {
+    sts = grow_FindObjectByName(graph->grow->ctx, name_prev, &prev);
+    if (EVEN(sts))
+      throw co_error(sts);
+  }
+  if (prev == 0)
+    grow_OrderObject(graph->grow->ctx, o, prev, glow_eDest_Before);
+  else
+    grow_OrderObject(graph->grow->ctx, o, prev, glow_eDest_After);
+ 
+  read_tag(journal_cTag_End);
+
+  return GE__SUCCESS;
+}
+
+int GraphJournal::store_undo_order_object(grow_tObject o)
+{
+  char name[80];
+
+  log_debug("store_undo_order_object\n");
+
+  if (movelist.size() != 1)
+    throw co_error(GE__JOURNAL_DISORDER);
+
+  grow_GetObjectName(o, name, sizeof(name), glow_eName_Object);
+
+  fp << journal_cTag_Object << '\n';
+  fp << movelist[0].name << '\n';
+  fp << journal_cTag_Object << '\n';
+  fp << movelist[0].name_prev << '\n';
+  fp << journal_cTag_End << '\n';
+
+  return GE__SUCCESS;
+}
+
+int GraphJournal::store_redo_order_object(grow_tObject o)
+{
+  char name[80];
+  grow_tObject prev;
+  int sts;
+
+  log_debug("store_redo_order_object\n");
+
+  grow_GetObjectName(o, name, sizeof(name), glow_eName_Object);
+
+  fp << journal_cTag_Object << '\n';
+  fp << name << '\n';
+
+  fp << journal_cTag_Object << '\n';
+  sts = grow_GetPreviousObject(graph->grow->ctx, o, &prev);
+  if (ODD(sts)) {
+    grow_GetObjectName(prev, name, sizeof(name), glow_eName_Path);
+    fp << name << '\n';
+  }
+  else 
+    fp << '\n';
+  fp << journal_cTag_End << '\n';
+
+  return GE__SUCCESS;
+}
+
+int GraphJournal::redo_order_object()
+{
+  grow_tObject o;
+  grow_tObject prev;
+  char name[80];
+  char name_prev[80];
+  int sts;
+
+  log_debug("redo_order_object\n");
+
+  read_str(journal_cTag_Object, name, sizeof(name));
+  read_str(journal_cTag_Object, name_prev, sizeof(name_prev));
+
+  sts = grow_FindObjectByName(graph->grow->ctx, name, &o);
+  if (EVEN(sts))
+    throw co_error(sts);
+ 
+  if (streq(name_prev, ""))
+    prev = 0;
+  else {
+    sts = grow_FindObjectByName(graph->grow->ctx, name_prev, &prev);
+    if (EVEN(sts))
+      throw co_error(sts);
+  }
+  if (prev == 0)
+    grow_OrderObject(graph->grow->ctx, o, prev, glow_eDest_Before);
+  else
+    grow_OrderObject(graph->grow->ctx, o, prev, glow_eDest_After);
+
+  read_tag(journal_cTag_End);
+
+  return GE__SUCCESS;
+}
 
 void GraphJournal::check_object_number(grow_tObject o)
 {
@@ -3481,6 +3742,10 @@ int GraphJournal::restore(char* fname)
     case journal_eAction_AnteRename:
     case journal_eAction_PostRename:
       redo_rename();
+      break;
+    case journal_eAction_AnteOrderObject:
+    case journal_eAction_PostOrderObject:
+      redo_order_object();
       break;
     case journal_eAction_No:
       break;

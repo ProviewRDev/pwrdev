@@ -37,6 +37,7 @@
 #ifndef glow_growctx_h
 #define glow_growctx_h
 
+#include "glow_ctx.h"
 #include "glow_exportjbean.h"
 #include "glow_customcolors.h"
 
@@ -995,19 +996,19 @@ public:
   //! Get previous object. */
   int get_previous_object(GlowArrayElem* object, GlowArrayElem** prev)
   {
-    return layer->get_previous(object, prev);
+    return a.get_previous(object, prev);
   }
 
   //! Get next object. */
   int get_next_object(GlowArrayElem* object, GlowArrayElem** next)
   {
-    return layer->get_next(object, next);
+    return a.get_next(object, next);
   }
 
   //! Get first object. */
   int get_first_object(GlowArrayElem** first)
   {
-    return layer->get_first(first);
+    return a.get_first(first);
   }
 
   //! Check if object is visible. */
@@ -1019,7 +1020,7 @@ public:
   //! Order object. */
   int order_object(GlowArrayElem* o, GlowArrayElem* dest, glow_eDest code)
   {
-    return layer->move(o, dest, code);
+    return a.move(o, dest, code);
   }
 
   void measure_window(double* ll_x, double* ll_y, double* ur_x, double* ur_y);

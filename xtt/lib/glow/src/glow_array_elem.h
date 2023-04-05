@@ -48,6 +48,7 @@
 class GlowWind;
 class GlowExportFlow;
 class GlowExportScript;
+class GrowCtx;
 
 //! Base class for all drawing objects and components.
 /*! A GlowArrayElem object can be inserted in a GlowArray std::vector, which
@@ -57,18 +58,20 @@ class GlowExportScript;
 */
 class GlowArrayElem {
 public:
+  GrowCtx *ctx;
   char n_name[80];
   GlowArrayElem* parent;
 
+  GlowArrayElem(GrowCtx *gctx);
   GlowArrayElem();
+  GlowArrayElem(const GlowArrayElem& x);
+  GlowArrayElem& operator=(const GlowArrayElem& x);
   GlowArrayElem* get_parent()
   {
     return parent;
   }
-  void set_parent(GlowArrayElem* p)
-  {
-    parent = p;
-  }
+  void set_parent(GlowArrayElem* p);
+  int in_active_layer();
   virtual int get_object_name(char* name, int size, glow_eName ntype);
   virtual void set_object_name(char* name);
   virtual int get_path(char *path, int size);

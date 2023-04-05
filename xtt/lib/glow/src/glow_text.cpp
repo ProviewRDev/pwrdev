@@ -45,7 +45,7 @@
 GlowText::GlowText(GrowCtx* glow_ctx, const char* text1, double x, double y,
     glow_eDrawType d_type, glow_eDrawType color_d_type, int t_size,
     glow_mDisplayLevel display_lev)
-    : ctx(glow_ctx), p(glow_ctx, x, y), draw_type(d_type), text_size(t_size),
+    : GlowArrayElem(glow_ctx), p(glow_ctx, x, y), draw_type(d_type), text_size(t_size),
       display_level(display_lev), color_drawtype(color_d_type)
 {
   text = (char*)malloc(strlen(text1) + 1);

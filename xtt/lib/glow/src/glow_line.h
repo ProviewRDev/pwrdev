@@ -68,7 +68,7 @@ public:
   GlowLine(GrowCtx* glow_ctx, double x1 = 0, double y1 = 0, double x2 = 0,
       double y2 = 0, glow_eDrawType d_type = glow_eDrawType_Line,
       int line_w = 1, int fix_line_w = 0)
-      : ctx(glow_ctx), p1(glow_ctx, x1, y1), p2(glow_ctx, x2, y2),
+      : GlowArrayElem(glow_ctx), p1(glow_ctx, x1, y1), p2(glow_ctx, x2, y2),
         draw_type(d_type), line_width(line_w), fix_line_width(fix_line_w)
   {
   }
@@ -287,7 +287,6 @@ public:
   */
   void convert(glow_eConvert version);
 
-  GrowCtx* ctx; //!< Glow context.
   GlowPoint p1; //!< First endpoint of line.
   GlowPoint p2; //!< Second endpoint of line.
   glow_eDrawType draw_type; //!< Line color.

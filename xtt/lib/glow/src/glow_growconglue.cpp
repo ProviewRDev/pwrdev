@@ -160,7 +160,7 @@ void GrowConGlue::configure(GlowCon* con)
     }
   }
 
-  for (i = 0; i < ctx->a.a_size; i++) {
+  for (i = 0; i < ctx->a.size(); i++) {
     if (ctx->a.a[i]->type() == glow_eObjectType_Con) {
       if (((GlowCon*)ctx->a.a[i])->source() == this) {
         c = (GlowCon*)ctx->a.a[i];

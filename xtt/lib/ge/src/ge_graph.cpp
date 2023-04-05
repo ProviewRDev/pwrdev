@@ -903,11 +903,6 @@ int Graph::get_conclass(glow_eDrawType drawtype, int linewidth,
   int sts;
   int r_amount;
 
-  if (grow_LayerActive(grow->ctx)) {
-    message('E', "Connections can't be created a layer");
-    return 1;
-  }
-
   if (corner != glow_eCorner_Rounded)
     r_amount = 0;
   else
@@ -1369,19 +1364,24 @@ void Graph::select_all_cons()
 
 void Graph::select_all_objects()
 {
-  grow_tObject *objectlist, *object_p;
-  int object_cnt;
-  int i;
+  grow_tObject *olist, *llist;
+  int ocnt, lcnt;
 
   grow_SelectClear(grow->ctx);
-  grow_GetObjectList(grow->ctx, &objectlist, &object_cnt);
-  object_p = objectlist;
-  for (i = 0; i < object_cnt; i++) {
-    if (grow_GetObjectType(*object_p) != glow_eObjectType_Con) {
-      grow_SetHighlight(*object_p, 1);
-      grow_SelectInsert(grow->ctx, *object_p);
+  grow_GetObjectList(grow->ctx, &olist, &ocnt);
+  for (int i = 0; i < ocnt; i++) {
+    if (grow_GetObjectType(olist[i]) != glow_eObjectType_Con) {
+      if (grow_GetObjectType(olist[i]) == glow_eObjectType_GrowLayer) {
+	grow_GetLayerObjectList(olist[i], &llist, &lcnt);
+	for (int j = 0; j < lcnt; j++) {
+	  grow_SetHighlight(llist[j], 1);
+	  grow_SelectInsert(grow->ctx, llist[j]);
+	}
+      } else {
+	grow_SetHighlight(olist[i], 1);
+	grow_SelectInsert(grow->ctx, olist[i]);
+      }
     }
-    object_p++;
   }
   refresh_objects(attr_mRefresh_Select);
 }
@@ -1393,7 +1393,6 @@ void Graph::select_object(grow_tObject o)
     grow_SetHighlight(o, 1);
     grow_SelectInsert(grow->ctx, o);
   } else {
-    journal_store(journal_eAction_AnteSelectObject, o);
     journal_store(journal_eAction_AnteSelectObject, o);
     grow_SelectClear(grow->ctx);
     grow_SetHighlight(o, 1);
@@ -2442,6 +2441,11 @@ static int graph_grow_cb(GlowCtx* ctx, glow_tEvent event)
     grow_tConClass cc;
     grow_tCon con;
     char name[80];
+
+    if (grow_LayerActive(graph->grow->ctx)) {
+      graph->message('E', "Connections are only allowed in background layer");
+      return 1;
+    }
 
     if (!event->con_create.dest_object) {
       // Create a ConGlue object

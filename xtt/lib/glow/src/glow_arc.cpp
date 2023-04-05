@@ -38,8 +38,10 @@
 
 #include <iostream>
 
+#include "glow_growctx.h"
 #include "glow_arc.h"
 #include "glow_draw.h"
+
 
 void GlowArc::zoom()
 {

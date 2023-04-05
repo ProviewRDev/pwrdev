@@ -2416,16 +2416,30 @@ static int attrnav_brow_cb(FlowCtx* ctx, flow_tEvent event)
     if (parent != sel_parent)
       break;
 
-    if (parent == 0)
+    if (parent == 0) {
+      attrnav->graph->journal_store(journal_eAction_AnteOrderObject, 
+	  sel_item->id);
       grow_OrderObject(attrnav->graph->grow->ctx, sel_item->id, dest_item->id,
           glow_eDest_Before);
+      attrnav->graph->journal_store(journal_eAction_PostOrderObject, 
+	  sel_item->id);
+    }
     else {
       brow_GetUserData(parent, (void**)&parent_item);
       if (parent_item->type != attrnav_eItemType_Object)
         break;
 
-      grow_OrderGroupObject(
-          parent_item->id, sel_item->id, dest_item->id, glow_eDest_Before);
+      if (grow_GetObjectType(parent_item->id) == glow_eObjectType_GrowLayer) {
+	attrnav->graph->journal_store(journal_eAction_AnteOrderObject, 
+	    sel_item->id);
+	grow_OrderObject(attrnav->graph->grow->ctx, sel_item->id, 
+            dest_item->id, glow_eDest_Before);
+        attrnav->graph->journal_store(journal_eAction_PostOrderObject, 
+	    sel_item->id);
+      }
+      else
+	grow_OrderGroupObject(
+	    parent_item->id, sel_item->id, dest_item->id, glow_eDest_Before);
     }
     grow_DrawObject(sel_item->id);
     grow_DrawObject(dest_item->id);
@@ -3276,6 +3290,14 @@ void AttrNav::refresh_objects(unsigned int rtype)
     (get_object_list_cb)(
         parent_ctx, attr_eList_Objects, &list, &list_cnt, 0, 0);
 
+    if (type == attr_eType_Layers) {
+      grow_tObject layer = grow_GetBackgroundLayer(graph->grow->ctx);
+      grow_GetObjectName(layer, oname, sizeof(oname), glow_eName_Object);
+      otype = grow_GetObjectType(layer);
+      strcpy(ncname, "");
+      item = new AItemObject(
+          this, oname, otype, layer, ncname, NULL, flow_eDest_IntoLast);
+    }
     for (int i = list_cnt - 1; i >= 0; i--) {
       grow_GetObjectName(list[i], oname, sizeof(oname), glow_eName_Object);
       otype = grow_GetObjectType(list[i]);

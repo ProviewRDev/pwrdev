@@ -44,7 +44,7 @@
 
 GlowArrow::GlowArrow(GrowCtx* glow_ctx, double x1, double y1, double x2,
     double y2, double w, double l, glow_eDrawType d_type)
-    : ctx(glow_ctx), p_dest(glow_ctx, x2, y2), arrow_width(w), arrow_length(l),
+    : GlowArrayElem(glow_ctx), p_dest(glow_ctx, x2, y2), arrow_width(w), arrow_length(l),
       draw_type(d_type), line_width(1)
 {
   double p1_x, p1_y, p2_x, p2_y;

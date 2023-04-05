@@ -41,6 +41,7 @@
 #include "glow_array.h"
 #include "glow_tiptext.h"
 #include "glow_color.h"
+#include "glow_growlayer.h"
 
 /*! \file glow_ctx.h
     \brief Contains the GlowCtx class. */
@@ -427,7 +428,7 @@ public:
   */
   void get_objectlist(GlowArrayElem*** list, int* size)
   {
-    *list = a.a;
+    *list = a.a.a;
     *size = a.size();
   }
 
@@ -692,10 +693,10 @@ public:
   void redraw_defered();
 
   int defered_redraw_active; //!< Defered redraw is active.
-  GlowArray *layer; //!< Pointer to current layer.
+  GrowLayer *layer; //!< Pointer to current layer.
   GlowArray a_nc; //!< Array of nodeclasses.
   GlowArray a_cc; //!< Array of connection classes.
-  GlowArray a; //!< Object array.
+  GrowLayer a; //!< Object array.
   GlowArray a_sel; //!< List of selected objects.
   GlowArray a_paste; //!< List of objects in paste buffer.
   GlowArray a_move; //!< List of currently moved objects.
@@ -1025,6 +1026,7 @@ public:
   GlowCustomColors* customcolors; //!< Custom colors storage
   char color_theme[40]; //!< Custom color file.
   static char default_color_theme[40]; //!< Default custom color file.
+  int closing_down; //!< Ctx is closing down.
 
   //! Register scrollbar callback function
   /*!

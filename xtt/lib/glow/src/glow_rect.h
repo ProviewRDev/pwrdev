@@ -69,7 +69,7 @@ public:
       double h = 0, glow_eDrawType d_type = glow_eDrawType_Line, int line_w = 1,
       int fix_line_w = 0, glow_mDisplayLevel display_lev = glow_mDisplayLevel_1,
       int fill_rect = 0)
-      : ctx(glow_ctx), ll(glow_ctx, x, y), ur(glow_ctx, x + w, y + h),
+      : GlowArrayElem(glow_ctx), ll(glow_ctx, x, y), ur(glow_ctx, x + w, y + h),
         draw_type(d_type), line_width(line_w), fix_line_width(fix_line_w),
         display_level(display_lev), fill(fill_rect){}
 
@@ -178,8 +178,6 @@ public:
   {
     return glow_eObjectType_Rect;
   }
-
-  GrowCtx* ctx; //!< Glow context
 
   //! Get the width.
   /*!

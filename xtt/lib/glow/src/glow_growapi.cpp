@@ -6049,7 +6049,7 @@ int grow_GetNextObjectPosition(
 int grow_GetPreviousObject(
     grow_tCtx ctx, grow_tObject object, grow_tObject* prev)
 {
-  return ctx->get_next_object((GlowArrayElem*)object, (GlowArrayElem**)prev);
+  return ctx->get_previous_object((GlowArrayElem*)object, (GlowArrayElem**)prev);
 }
 
 int grow_GetNextObject(grow_tCtx ctx, grow_tObject object, grow_tObject* next)
@@ -6529,5 +6529,18 @@ void grow_LayerSave(grow_tObject object, int nochildren, std::ofstream& fp,
   ((GrowLayer*)object)->save(nochildren, fp, mode);
 }
 
+grow_tObject grow_GetBackgroundLayer(grow_tCtx ctx)
+{
+  return (grow_tObject)&((GrowCtx*)ctx)->a;  
+}
+
+int grow_FindLayerByName(grow_tCtx ctx, const char* name, grow_tObject* object)
+{
+  if (streq(name, "Background")) {
+    *object = grow_GetBackgroundLayer(ctx);
+    return 1;
+  }
+  return ctx->find_by_name(name, (GlowArrayElem**)object);
+}
 
 /*@}*/

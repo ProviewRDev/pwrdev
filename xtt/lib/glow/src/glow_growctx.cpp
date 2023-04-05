@@ -193,7 +193,7 @@ int GrowCtx::subw_event_handler(glow_eEvent event, int x, int y, int w, int h)
 
   if (has_subwindows == -1) {
     // Initialize
-    for (i = 0; i < a.a_size; i++) {
+    for (i = 0; i < a.size(); i++) {
       if (a[i]->type() == glow_eObjectType_GrowWindow
           || a[i]->type() == glow_eObjectType_GrowFolder
           || a[i]->type() == glow_eObjectType_GrowTable) {
@@ -207,7 +207,7 @@ int GrowCtx::subw_event_handler(glow_eEvent event, int x, int y, int w, int h)
     }
   }
 
-  for (i = layer->a_size - 1; i >= 0; i--) {
+  for (i = layer->size() - 1; i >= 0; i--) {
     if (layer->a[i]->type() == glow_eObjectType_GrowWindow
         || layer->a[i]->type() == glow_eObjectType_GrowFolder
         || layer->a[i]->type() == glow_eObjectType_GrowTable) {
@@ -238,8 +238,8 @@ int GrowCtx::subw_event_handler(glow_eEvent event, int x, int y, int w, int h)
         sts = layer->a[i]->event_handler(&mw, event, x, y, fx, fy);
         if (sts) {
           // Check if any menue is active
-          if (layer->a_size
-              && layer->a[layer->a_size - 1]->type() == glow_eObjectType_GrowMenu) {
+          if (layer->size()
+              && layer->a[layer->size() - 1]->type() == glow_eObjectType_GrowMenu) {
             // Send backcall to reset menu
             if (event_callback[event] && sts != GLOW__NO_PROPAGATE
                 && event != event_move_node) {
@@ -314,8 +314,8 @@ int GrowCtx::event_handler(glow_eEvent event, int x, int y, int w, int h)
   }
 
   // Check if any menue is active
-  if (a.a_size && a[a.a_size - 1]->type() == glow_eObjectType_GrowMenu) {
-    for (i = a.a_size - 1; i >= 0; i--) {
+  if (a.size() && a[a.size() - 1]->type() == glow_eObjectType_GrowMenu) {
+    for (i = a.size() - 1; i >= 0; i--) {
       if (a[i]->type() != glow_eObjectType_GrowMenu)
         break;
       switch (event) {
@@ -332,7 +332,7 @@ int GrowCtx::event_handler(glow_eEvent event, int x, int y, int w, int h)
     case glow_eEvent_MB1Up:
     case glow_eEvent_MB1Click:
     case glow_eEvent_Key_Return:
-      sts = a[a.a_size - 1]->event_handler(&mw, event, x, y, fx, fy);
+      sts = a[a.size() - 1]->event_handler(&mw, event, x, y, fx, fy);
       if (sts == GLOW__TERMINATED || sts == GLOW__DESTROYED)
         return sts;
       else if (sts)
@@ -363,8 +363,8 @@ int GrowCtx::event_handler(glow_eEvent event, int x, int y, int w, int h)
 
   if (event == event_create_con && edit_mode == grow_eMode_Edit) {
     sts = 0;
-    for (i = 0; i < a.a_size; i++) {
-      sts = a.a[a.a_size - i - 1]->event_handler(&mw, event, x, y, fx, fy);
+    for (i = 0; i < a.size(); i++) {
+      sts = a.a[a.size() - i - 1]->event_handler(&mw, event, x, y, fx, fy);
       if (sts)
         break;
     }
@@ -373,8 +373,10 @@ int GrowCtx::event_handler(glow_eEvent event, int x, int y, int w, int h)
     move_clear();
 
     sts = 0;
-    for (i = 0; i < a.a_size; i++) {
-      sts = a.a[a.a_size - i - 1]->event_handler(&mw, event, x, y, fx, fy);
+    for (i = 0; i < a.size(); i++) {
+      if (!a.is_active() && a.a[a.size() - i - 1]->type() != glow_eObjectType_GrowLayer)
+	continue;
+      sts = a.a[a.size() - i - 1]->event_handler(&mw, event, x, y, fx, fy);
       if (sts)
         break;
     }
@@ -467,8 +469,10 @@ int GrowCtx::event_handler(glow_eEvent event, int x, int y, int w, int h)
     move_clear();
 
     sts = 0;
-    for (i = 0; i < a.a_size; i++) {
-      sts = a.a[a.a_size - i - 1]->event_handler(&mw, event, x, y, fx, fy);
+    for (i = 0; i < a.size(); i++) {
+      if (!a.is_active() && a.a[a.size() - i - 1]->type() != glow_eObjectType_GrowLayer)
+	continue;
+      sts = a.a[a.size() - i - 1]->event_handler(&mw, event, x, y, fx, fy);
       if (sts)
         break;
     }
@@ -669,7 +673,9 @@ int GrowCtx::event_handler(glow_eEvent event, int x, int y, int w, int h)
   case glow_eEvent_ScrollDown:
     tiptext->remove();
     sts = 0;
-    for (i = 0; i < a.a_size; i++) {
+    for (i = 0; i < a.size(); i++) {
+      if (!a.is_active() && a.a[i]->type() != glow_eObjectType_GrowLayer)
+	continue;
       sts = a.a[i]->event_handler(&mw, event, x, y, fx, fy);
       if (sts == GLOW__NO_PROPAGATE)
         break;
@@ -799,8 +805,10 @@ int GrowCtx::event_handler(glow_eEvent event, int x, int y, int w, int h)
       }
       sts = 0;
       hot_found = (hot_mode == glow_eHotMode_Disabled);
-      for (i = 0; i < a.a_size; i++) {
-        sts = a.a[a.a_size - i - 1]->event_handler(&mw, event, x, y, fx, fy);
+      for (i = 0; i < a.size(); i++) {
+	if (!a.is_active() && a.a[a.size() - i - 1]->type() != glow_eObjectType_GrowLayer)
+	  continue;
+        sts = a.a[a.size() - i - 1]->event_handler(&mw, event, x, y, fx, fy);
       }
     }
     break;
@@ -990,8 +998,10 @@ int GrowCtx::event_handler(glow_eEvent event, int x, int y, int w, int h)
       con_create_last_x = x;
       con_create_last_y = y;
       hot_found = (hot_mode == glow_eHotMode_Disabled);
-      for (i = 0; i < a.a_size; i++) {
-        sts = a.a[a.a_size - i - 1]->event_handler(
+      for (i = 0; i < a.size(); i++) {
+	if (!a.is_active() && a.a[a.size() - i - 1]->type() != glow_eObjectType_GrowLayer)
+	  continue;
+        sts = a.a[a.size() - i - 1]->event_handler(
             &mw, glow_eEvent_CursorMotion, x, y, fx, fy);
       }
     } else if (select_rect_active && edit_mode != grow_eMode_Scale) {
@@ -1805,8 +1815,10 @@ int GrowCtx::event_handler(glow_eEvent event, int x, int y, int w, int h)
           polyline_not_first = 1;
       } else {
         /* Find the destination node */
-        for (i = 0; i < a.a_size; i++) {
-          sts = a.a[a.a_size - i - 1]->event_handler(&mw, event, x, y, fx, fy);
+        for (i = 0; i < a.size(); i++) {
+	  if (!a.is_active() && a.a[a.size() - i - 1]->type() != glow_eObjectType_GrowLayer)
+	    continue;
+          sts = a.a[a.size() - i - 1]->event_handler(&mw, event, x, y, fx, fy);
           if (sts)
             break;
         }
@@ -2377,6 +2389,10 @@ void GrowCtx::open_grow(std::ifstream& fp)
   }
   if (environment == glow_eEnv_Runtime)
     grid_on = 0;
+  if (environment == glow_eEnv_Development) {
+    layer = &a;
+    layer->set_active(1);
+  }
   if (gdraw) {
     set_background(background_color);
     gdraw->set_anti_aliasing(anti_aliasing);
@@ -2410,7 +2426,7 @@ int GrowCtx::save_subgraph(char* filename, glow_eSaveMode mode)
   fp << int(glow_eSave_NodeClass) << '\n';
   fp << int(glow_eSave_NodeClass_nc_name) << FSPACE << nc_name << '\n';
   fp << int(glow_eSave_NodeClass_a) << '\n';
-  a.save(fp, mode);
+  a.a.save(fp, mode);
   fp << int(glow_eSave_NodeClass_group) << FSPACE << int(glow_eNodeGroup_Common)
      << '\n';
   fp << int(glow_eSave_NodeClass_arg_cnt) << FSPACE << arg_cnt << '\n';
@@ -2706,13 +2722,18 @@ void GrowCtx::draw_invalidated(GlowWind* w, int ll_x, int ll_y, int ur_x, int ur
   if (redraw_callback)
     (redraw_callback)(redraw_data);
 
-  for (i = 0; i < a.a_size; i++) {
-    if (a.a[i]->type() == glow_eObjectType_Con)
-      a.a[i]->draw(w, ll_x, ll_y, ur_x, ur_y);
+  if (a.get_visibility() == glow_eVis_Visible) {
+    for (i = 0; i < a.size(); i++) {
+      if (a.a[i]->type() == glow_eObjectType_Con)
+	a.a[i]->draw(w, ll_x, ll_y, ur_x, ur_y);
+    }
   }
-  for (i = 0; i < a.a_size; i++) {
-    if (a.a[i]->type() != glow_eObjectType_Con)
-      a.a[i]->draw(w, ll_x, ll_y, ur_x, ur_y);
+  for (i = 0; i < a.size(); i++) {
+    if (a.a[i]->type() != glow_eObjectType_Con) {
+      if (a.get_visibility() == glow_eVis_Visible ||
+	  a.a[i]->type() == glow_eObjectType_GrowLayer)
+	a.a[i]->draw(w, ll_x, ll_y, ur_x, ur_y);
+    }
   }
   if (show_grid && w == &mw)
     draw_grid(w, ll_x, ll_y, ur_x, ur_y);
@@ -3843,7 +3864,7 @@ void GrowCtx::get_annotation_numbers(int** numbers, int* cnt)
 
   *cnt = 0;
   p = (int*)calloc(10, sizeof(int));
-  for (i = 0; i < a.a_size; i++) {
+  for (i = 0; i < a.size(); i++) {
     if (a.a[i]->type() == glow_eObjectType_GrowSubAnnot) {
       if (*cnt >= 10)
         break;
@@ -4170,7 +4191,7 @@ void GrowCtx::convert(glow_eConvert version)
 
 void GrowCtx::close_annotation_input_all()
 {
-  for (int i = 0; i < a.a_size; i++) {
+  for (int i = 0; i < a.size(); i++) {
     switch (a[i]->type()) {
     case glow_eObjectType_GrowNode:
       ((GrowNode*)a[i])->close_annotation_input();
@@ -4186,7 +4207,7 @@ void GrowCtx::close_annotation_input_all()
 
 void GrowCtx::reset_input_focus_all()
 {
-  for (int i = 0; i < a.a_size; i++) {
+  for (int i = 0; i < a.size(); i++) {
     switch (a[i]->type()) {
     case glow_eObjectType_GrowNode:
       ((GrowNode*)a[i])->set_input_focus(0, glow_eEvent_Null);
@@ -4722,7 +4743,7 @@ int GrowCtx::read_customcolor_file(char* name)
       set_background(background_color);
     }
 
-    for (int i = 0; i < a.a_size; i++) {
+    for (int i = 0; i < a.size(); i++) {
       if (a[i]->type() == glow_eObjectType_GrowWindow
           || a[i]->type() == glow_eObjectType_GrowFolder) {
         ((GrowWindow*)a[i])->window_ctx->read_customcolor_file(name);
@@ -4794,7 +4815,7 @@ void GrowCtx::set_text_coding(glow_eTextCoding coding)
   text_coding = coding;
 
   // Set for subwindow
-  for (int i = 0; i < a.a_size; i++) {
+  for (int i = 0; i < a.size(); i++) {
     if (a[i]->type() == glow_eObjectType_GrowWindow
         || a[i]->type() == glow_eObjectType_GrowFolder)
       ((GrowWindow*)a[i])->window_ctx->set_text_coding(coding);
@@ -4859,7 +4880,7 @@ int GrowCtx::signal_send(char* signalname)
   int sts = 0;
 
   // Make a signal event callback for all nodes
-  for (int i = 0; i < a.a_size; i++) {
+  for (int i = 0; i < a.size(); i++) {
     switch (a[i]->type()) {
     case glow_eObjectType_GrowNode:
     case glow_eObjectType_GrowGroup: {
@@ -4898,8 +4919,12 @@ int GrowCtx::find_by_name(const char* name, GlowArrayElem** element)
   const char* s;
   char wname[80];
 
-  if ((s = strchr(name, '.')) == 0)
-    return a.find_by_name(name, element);
+  if ((s = strchr(name, '.')) == 0) {
+    if (strncmp(name, "Background-", 11) == 0) 
+      return a.find_by_name(&name[11], element);
+    else
+      return a.find_by_name(name, element);
+  }
   else {
     // Find in subwindow
     GlowArrayElem* wind;
@@ -4943,7 +4968,11 @@ int GrowCtx::layer_active()
 
 int GrowCtx::get_active_layer(GrowLayer **layer)
 {
-  for (int i = 0; i < a.a_size; i++) {
+  if (a.is_active()) {
+    *layer = &a;
+    return 1;
+  }
+  for (int i = 0; i < a.size(); i++) {
     if (a[i]->type() == glow_eObjectType_GrowLayer &&
 	((GrowLayer*)a[i])->is_active()) {
       *layer = (GrowLayer*)a[i];
@@ -4960,7 +4989,7 @@ int GrowCtx::merge_visible_layers()
   char name[80];
 
   // Merge to active layer
-  for (int i = 0; i < a.a_size; i++) {
+  for (int i = 0; i < a.size(); i++) {
     if (a[i]->type() == glow_eObjectType_GrowLayer &&
 	((GrowLayer*)a[i])->is_active() &&
 	a[i]->get_visibility() == glow_eVis_Visible) {
@@ -4972,7 +5001,7 @@ int GrowCtx::merge_visible_layers()
 
   if (!found) {
     // Merge to first layer
-    for (int i = 0; i < a.a_size; i++) {
+    for (int i = 0; i < a.size(); i++) {
       if (a[i]->type() == glow_eObjectType_GrowLayer &&
 	  a[i]->get_visibility() == glow_eVis_Visible) {
 	target = (GrowLayer*)a[i];
@@ -4984,11 +5013,12 @@ int GrowCtx::merge_visible_layers()
   if (!found)
     return 0;
   
-  for (int i = 0; i < a.a_size; i++) {
+  for (int i = 0; i < a.size(); i++) {
     if (a[i]->type() == glow_eObjectType_GrowLayer &&
 	a[i]->get_visibility() == glow_eVis_Visible &&
 	a[i] != target) {
-      target->merge(*(GlowArray*)((GrowLayer*)a[i]));
+      ((GrowLayer*)a[i])->set_parent(target);
+      target->merge(((GrowLayer*)a[i])->a);
       delete_object(a[i]);
       i--;
     }      
@@ -5003,11 +5033,12 @@ int GrowCtx::merge_visible_layers_to_bg()
 {
   int found = 0;
   
-  for (int i = 0; i < a.a_size; i++) {
+  for (int i = 0; i < a.size(); i++) {
     if (a[i]->type() == glow_eObjectType_GrowLayer &&
 	a[i]->get_visibility() == glow_eVis_Visible) {
-      ((GlowArray*)((GrowLayer*)a[i]))->set_parent(0);
-      a.merge(*(GlowArray*)((GrowLayer*)a[i]));
+      ((GrowLayer*)a[i])->set_parent(0);
+      ((GrowLayer*)a[i])->set_rootnode(0);
+      a.merge(((GrowLayer*)a[i])->a);
       delete_object(a[i]);
       found = 1;
       i--;
@@ -5020,10 +5051,11 @@ int GrowCtx::merge_visible_layers_to_bg()
 
 int GrowCtx::merge_all_layers()
 {
-  for (int i = 0; i < a.a_size; i++) {
+  for (int i = 0; i < a.size(); i++) {
     if (a[i]->type() == glow_eObjectType_GrowLayer) {
-      ((GlowArray*)((GrowLayer*)a[i]))->set_parent(0);
-      a.merge(*(GlowArray*)((GrowLayer*)a[i]));
+      ((GrowLayer*)a[i])->set_parent(0);
+      ((GrowLayer*)a[i])->set_rootnode(0);
+      a.merge(((GrowLayer*)a[i])->a);
       delete_object(a[i]);
       i--;
     }      
@@ -5046,7 +5078,7 @@ int GrowCtx::move_select_to_layer()
 
 void GrowCtx::layer_reset_active_all()
 {
-  for (int i = 0; i < a.a_size; i++) {
+  for (int i = 0; i < a.size(); i++) {
     if (a[i]->type() == glow_eObjectType_GrowLayer)
       ((GrowLayer*)a[i])->set_active(0);
   }

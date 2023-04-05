@@ -47,10 +47,12 @@
 //! Class for handling a layer.
 /*! A GrowLayer container for objects.
 */
-class GrowLayer : public GlowArray, public GrowNode {
+class GrowLayer : public GrowNode {
 public:
+  GlowArray a;
   int hide;
   int active;
+  int is_bg;
 
   //! Noargs constructor.
   GrowLayer(){}
@@ -73,11 +75,13 @@ public:
   void open(std::ifstream& fp);
 
   int is_active() {return active;}
-  int is_empty() {return a_size == 0 ? 1 : 0;}
+  int is_empty() {return a.a_size == 0 ? 1 : 0;}
+  int is_background() {return is_bg;}
   void set_active(int act);
   void copy_from(GrowLayer& layer);
   int event_handler(GlowWind* w, glow_eEvent event, int x, int y, double fx, 
       double fy);
+  void draw();
   void draw(GlowWind* w, int ll_x, int ll_y, int ur_x, int ur_y);
   void draw(GlowWind* w, int* ll_x, int* ll_y, int* ur_x, int* ur_y);
   void draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
@@ -101,31 +105,110 @@ public:
    */
   void trace_close();
 
-  void set_original_fill_color(glow_eDrawType drawtype) {
-    if (ctx->environment == glow_eEnv_Development)
-      return;
-    GrowNode::set_original_fill_color(drawtype);
-  }
-
-  void set_original_border_color(glow_eDrawType drawtype) {
-    if (ctx->environment == glow_eEnv_Development)
-      return;
-    GrowNode::set_original_border_color(drawtype);
-  }
-
-  void set_original_text_color(glow_eDrawType drawtype) {
-    if (ctx->environment == glow_eEnv_Development)
-      return;
-    GrowNode::set_original_text_color(drawtype);
-  }
-
-  int insert(GlowArrayElem* element);
-  int remove(GlowArrayElem* element);
-
-  void select_region_insert(double ll_x, double ll_y, double ur_x, double ur_y,
-      glow_eSelectPolicy select_policy) {}
+  void set_original_fill_color(glow_eDrawType drawtype);
+  void set_original_border_color(glow_eDrawType drawtype);
+  void set_original_text_color(glow_eDrawType drawtype);
 
   int export_script(GlowExportScript* es, void* o, void* m);
+
+  GlowArrayElem* operator[](int idx) {return a[idx];}
+  void copy_from(const GlowArray& array) {a.copy_from(array);}
+  void copy_from_common_objects(GlowArray& array) {
+    a.copy_from_common_objects(array);}
+  void merge(GlowArray& array) {a.merge(array);}
+  void move_from(GlowArray& array) {a.move_from(array);}
+  int size() {return a.a_size;}
+  int insert(GlowArrayElem* element);
+  int remove(GlowArrayElem* element);
+  int find(GlowArrayElem* element) {return a.find(element);}
+  int find_by_name(const char* name, GlowArrayElem** element) {
+    return a.find_by_name(name,element);}
+  void clear() {a.clear();}
+  void delete_all() {a.delete_all();}
+  void get_objectlist(GlowArrayElem*** list, int* size) {a.get_objectlist(list,size);}
+  void zoom() {a.zoom();}
+  void nav_zoom() {a.nav_zoom();}
+  void print_zoom() {a.print_zoom();}
+  void print(void* pos, void* node) {a.print(pos,node);}
+  void draw_inverse(void* pos, int hot, void* node) {a.draw_inverse(pos,hot,node);}
+  void nav_draw(void* pos, int highlight, void* node) {a.nav_draw(pos,highlight,node);}
+  void nav_draw(GlowTransform* t, int highlight, void* node, void* colornode) 
+  {nav_draw(t,highlight,node,colornode);}
+  //void nav_erase(void* pos, void* node);
+  //void nav_erase(GlowTransform* t, void* node);
+  void traverse(int x, int y) {a.traverse(x,y);}
+  void get_borders(double* x_right, double* x_left, double* y_high, double* y_low) 
+  {a.get_borders(x_right,x_left,y_high,y_low);}
+  void get_borders(double pos_x, double pos_y, double* x_right, double* x_left,
+      double* y_high, double* y_low, void* node) {
+    a.get_borders(pos_x,pos_y,x_right,x_left,y_high,y_low,node);}
+  int event_handler(GlowWind* w, glow_eEvent event, int x, int y) {
+    return a.event_handler(w,event,x,y);}
+  int event_handler(GlowWind* w, glow_eEvent event, double fx, double fy) {
+    return a.event_handler(w,event,fx,fy);}
+  int event_handler(
+    GlowWind* w, void* pos, glow_eEvent event, int x, int y, void* node) {
+    return a.event_handler(w,pos,event,x,y,node);}
+  int event_handler(
+    GlowWind* w, void* pos, glow_eEvent event, int x, int y, int num) {
+    return a.event_handler(w,pos,event,x,y,num);}
+  void conpoint_select(void* pos, int x, int y, double* distance, void** cp) {
+    a.conpoint_select(pos,x,y,distance,cp);}
+  void conpoint_select(GlowTransform* t, int x, int y, double* distance,
+    void** cp, int* pix_x, int* pix_y) {
+    a.conpoint_select(t,x,y,distance,cp,pix_x,pix_y);}
+  //  int get_conpoint(int num, double* x, double* y, glow_eDirection* dir) {
+  //    return a.get_conpoint(num,x,y,dir);}
+  void set_highlight(int on) {a.set_highlight(on);}
+  void set_hot(int on) {a.set_hot(on);}
+  void select_region_insert(double ll_x, double ll_y, double ur_x, double ur_y,
+    glow_eSelectPolicy select_policy) {
+    a.select_region_insert(ll_x,ll_y,ur_x,ur_y,select_policy);}
+  void shift(void* pos, double delta_x, double delta_y, int highlight, int hot) {
+    a.shift(pos,delta_x,delta_y,highlight,hot);}
+  void move(double delta_x, double delta_y, int grid) {
+    a.move(delta_x,delta_y,grid);}
+  void move_noerase(int delta_x, int delta_y, int grid) {
+    a.move_noerase(delta_x,delta_y,grid);}
+  void conpoint_refcon_redraw(void* node, int conpoint) {
+    a.conpoint_refcon_redraw(node,conpoint);}
+  void conpoint_refcon_erase(void* node, int conpoint) {
+    a.conpoint_refcon_erase(node,conpoint);}
+  void set_inverse(int on) {a.set_inverse(on);}
+  void configure() {a.configure();}
+    int move(GlowArrayElem* element, GlowArrayElem* destination, glow_eDest code) {
+    return a.move(element,destination,code);}
+  int brow_insert(GlowArrayElem* element, GlowArrayElem* destination, 
+      glow_eDest code) {
+    return a.brow_insert(element,destination,code);}
+  void brow_remove(void* ctx, GlowArrayElem* element) {return a.brow_remove(ctx,element);}
+  void brow_close(void* ctx, GlowArrayElem* element) {return a.brow_close(ctx,element);}
+  int brow_get_parent(GlowArrayElem* element, GlowArrayElem** parent) {
+    return a.brow_get_parent(element,parent);}
+  int get_first(GlowArrayElem** first) {return a.get_first(first);}
+  int get_last(GlowArrayElem** last) {return a.get_last(last);}
+  int get_previous(GlowArrayElem* element, GlowArrayElem** prev) {
+    return a.get_previous(element,prev);}
+  int get_next(GlowArrayElem* element, GlowArrayElem** next) {
+    return a.get_next(element,next);}
+  int find_nc(GlowArrayElem* nc) {return a.find_nc(nc);}
+  int find_cc(GlowArrayElem* cc) {return a.find_cc(cc);}
+  void push(GlowArrayElem* element) {a.push(element);}
+  void pop(GlowArrayElem* element) {a.pop(element);}
+  void get_nodegroups(void* na) {a.get_nodegroups(na);}
+  void set_last_group(char* name) {a.set_last_group(name);}
+  char* get_last_group() {return a.get_last_group();}
+  void set_parent(GlowArrayElem* parent) {a.set_parent(parent);}
+  int get_background_object_limits(GlowTransform* t, glow_eTraceType type,
+      double x, double y, GlowArrayElem** background, double* min, double* max,
+      glow_eDirection* direction) {
+    return a.get_background_object_limits(t,type,x,y,background,min,max,direction);}
+  void flip(double x0, double y0, glow_eFlipDirection dir) {a.flip(x0,y0,dir);}
+  void convert(glow_eConvert version) {a.convert(version);}
+  void set_rootnode(void* node) {a.set_rootnode(node);}
+  void set_linetype(glow_eLineType type) {a.set_linetype(type);}
+  void export_flow(GlowExportFlow* ef) {a.export_flow(ef);}
+  GlowArrayElem* get_node_from_name(char* name) {return a.get_node_from_name(name);}
 
 };
 

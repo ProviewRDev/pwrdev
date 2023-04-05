@@ -34,6 +34,8 @@
  * General Public License plus this exception.
  */
 
+/* ge_journal.h -- Journal function */
+
 #ifndef ge_journal_h
 #define ge_journal_h
 
@@ -56,12 +58,12 @@ public:
 class MoveObject {
  public:
   char name[80];
+  char name_prev[80];
   MoveObject() {
     strcpy(name,"");
+    strcpy(name_prev,"");
   }
 };
-
-/* ge_journal.h -- Journal function */
 
 typedef enum {
   journal_eAction_DeleteObject,
@@ -101,7 +103,9 @@ typedef enum {
   journal_eAction_PostSelectRegionAdd,
   journal_eAction_MergeAllLayers,
   journal_eAction_MergeVisibleLayersToBg,
-  journal_eAction_MergeVisibleLayers
+  journal_eAction_MergeVisibleLayers,
+  journal_eAction_AnteOrderObject,
+  journal_eAction_PostOrderObject
 } journal_eAction;
 
 typedef enum {
@@ -123,9 +127,9 @@ public:
   int store(journal_eAction action, grow_tObject o);
   int undo();
   int redo();
-  void read_end();
-  void read_object(char *name, int size);
-  void read_size(int* size);
+  void read_tag(int tag);
+  void read_str(int tag, char *name, int size);
+  void read_int(int tag, int* size);
   void check_object_number(grow_tObject o);
   int open(const char* name);
   int clear(char* name = 0);
@@ -222,6 +226,10 @@ public:
   int store_redo_merge_visible_layers();
   int undo_merge_visible_layers();
   int redo_merge_visible_layers();
+  int store_undo_order_object(grow_tObject o);
+  int store_redo_order_object(grow_tObject o);
+  int undo_order_object();
+  int redo_order_object();
   static void print(char* fname);
   static char* tag_to_str(int tag);
   static char* action_to_str(int action);

@@ -1147,10 +1147,16 @@ void Ge::activate_new()
     int rv = create_modal_dialog("New",
         "Graph is not saved.\nDo you want to continue?", "Yes", "Cancel", NULL,
         NULL);
-    if (rv == wow_eModalDialogReturn_Button1)
+    if (rv == wow_eModalDialogReturn_Button1) {
       clear_all();
-  } else
+      if (layernav)
+	layernav->refresh_objects(attr_mRefresh_Objects);
+    }
+  } else {
     clear_all();
+    if (layernav)
+      layernav->refresh_objects(attr_mRefresh_Objects);
+  }
 }
 
 void Ge::activate_save()

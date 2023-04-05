@@ -59,10 +59,11 @@ extern "C" {
 
 GrowImage::GrowImage(GrowCtx* glow_ctx, const char* name, double x, double y,
     const char* imagefile, glow_mDisplayLevel display_lev)
-    : ll(glow_ctx, x, y), ur(glow_ctx, x + 1, y + 1), hot(0), pzero(glow_ctx),
+  : GlowArrayElem(glow_ctx), ll(glow_ctx, x, y), ur(glow_ctx, x + 1, y + 1), 
+      hot(0), pzero(glow_ctx),
       stored_pos(glow_ctx), highlight(0), inverse(0), user_data(NULL),
       dynamic(0), dynamicsize(0), image_data(0), image(0), original_image(0),
-      pixmap(0), nav_pixmap(0), clip_mask(0), nav_clip_mask(0), ctx(glow_ctx),
+      pixmap(0), nav_pixmap(0), clip_mask(0), nav_clip_mask(0),
       display_level(display_lev), color_tone(glow_eDrawTone_No),
       color_lightness(0), color_intensity(0), color_shift(0), color_inverse(0),
       current_color_tone(glow_eDrawTone_No), current_color_lightness(0),
@@ -645,6 +646,9 @@ void GrowImage::set_highlight(int on)
 void GrowImage::select_region_insert(double ll_x, double ll_y, double ur_x,
     double ur_y, glow_eSelectPolicy select_policy)
 {
+  if (!in_active_layer())
+    return;
+
   if (select_policy == glow_eSelectPolicy_Surround) {
     if (x_left > ll_x && x_right < ur_x && y_high < ur_y && y_low > ll_y)
       ctx->select_insert(this);

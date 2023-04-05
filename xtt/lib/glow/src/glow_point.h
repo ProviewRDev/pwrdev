@@ -38,8 +38,7 @@
 #define glow_point_h
 
 #include <ostream>
-
-#include "glow_ctx.h"
+#include "glow_array_elem.h"
 
 class GrowCtx;
 
@@ -64,7 +63,6 @@ public:
   {
     return glow_eObjectType_Point;
   }
-  GrowCtx* ctx;
   double x;
   double y;
   int z_x;

@@ -150,7 +150,7 @@ GlowCon::GlowCon( GrowCtx *glow_ctx, const char *name, GlowConClass *con_class,
 GlowCon::GlowCon(GrowCtx* glow_ctx, const char* name, GlowConClass* con_class,
     GlowNode* source, GlowNode* dest, int source_cp, int dest_cp, int nodraw,
     int point_num, double* x_vect, double* y_vect, int cborder, int cshadow)
-    : ctx(glow_ctx), cc(con_class), dest_node(dest), source_node(source),
+    : GlowArrayElem(glow_ctx), cc(con_class), dest_node(dest), source_node(source),
       dest_conpoint(dest_cp), source_conpoint(source_cp), p_num(point_num),
       l_num(0), a_num(0), arrow_num(0), ref_num(0), line_a(10, 10),
       arc_a(10, 10), arrow_a(1, 1), ref_a(4, 4), temporary_ref(0), hot(0),
@@ -474,6 +474,9 @@ void GlowCon::set_hot(int on)
 void GlowCon::select_region_insert(
     double ll_x, double ll_y, double ur_x, double ur_y)
 {
+  if (!in_active_layer())
+    return;
+
   if (ctx->select_policy == glow_eSelectPolicy_Surround) {
     if (x_left > ll_x && x_right < ur_x && y_high < ur_y && y_low > ll_y)
       ctx->select_insert(this);
