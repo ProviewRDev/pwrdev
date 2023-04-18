@@ -757,6 +757,7 @@ var DynC = {
   eSave_DigTransparency_attribute 	: 7700,
   eSave_DigTransparency_low_value 	: 7701,
   eSave_DigTransparency_high_value 	: 7702,
+  eSave_DigTransparency_smooth_transition : 7703,
   eSave_AnalogTransparency_attribute 	: 7800,
   eSave_AnalogTransparency_min_value 	: 7801,
   eSave_AnalogTransparency_max_value 	: 7802,
@@ -4414,7 +4415,7 @@ function DynValueInput( dyn) {
       return 1;
     }
     else if (name === "ValueInput.KeyboardType") {
-      this.keyboard_týpe = value;
+      this.keyboard_type = value;
       return 1;
     }
     return 0;
@@ -4462,7 +4463,7 @@ function DynValueInput( dyn) {
       return ret;
     }
     else if (name === "ValueInput.KeyboardType") {
-      ret.value = this.keyboard_týpe;
+      ret.value = this.keyboard_type;
       ret.decl = CcmC.K_DECL_INT;
       return ret;
     }
@@ -10475,7 +10476,9 @@ function DynDigTransparency(dyn) {
   this.attribute;
   this.low_value = 1.0;
   this.high_value = 0.5;
+  this.smooth_transition = 0;
   this.firstScan = true;
+  this.transition_cnt = 0;
 	
   this.setAttribute = function(o, name, value) {
     if (name === "DigTransparency.Attribute") {
@@ -10509,6 +10512,11 @@ function DynDigTransparency(dyn) {
       ret.decl = CcmC.K_DECL_FLOAT;
       return ret;
     }
+    else if (name === "DigTransparency.SmoothTransition") {
+      ret.value = this.smooth_transition;
+      ret.decl = CcmC.K_DECL_INT;
+      return ret;
+    }
     ret.sts = 0;
     return ret;
   }
@@ -10540,19 +10548,37 @@ function DynDigTransparency(dyn) {
       value = !value;
 
     if ( !this.firstScan) {
-      if ( this.a.oldValue == value)
+      if ( this.a.oldValue == value && !this.transition_cnt)
 	return;
     }
-    else
-      this.firstScan = false;
 	
-    if ( !value)
-      object.setTransparency(this.low_value);
-    else
-      object.setTransparency(this.high_value);
-
+    if ( !value) {
+      if (this.smooth_transition && !this.firstScan) {
+	this.transition_cnt++;
+	var sval = this.low_value + (this.high_value - this.low_value) * (5 - this.transition_cnt) / 5;
+	object.setTransparency(sval);	
+	if (this.transition_cnt == 5)
+	  this.transition_cnt = 0;
+      }
+      else 
+	object.setTransparency(this.low_value);
+    }
+    else {
+      if (this.smooth_transition && !this.firstScan) {
+	this.transition_cnt++;
+	var sval = this.low_value + (this.high_value - this.low_value) * this.transition_cnt / 5;
+	object.setTransparency(sval);	
+	if (this.transition_cnt == 5)
+	  this.transition_cnt = 0;
+      }
+      else
+	object.setTransparency(this.high_value);
+    }
     this.dyn.repaintNow = true;
     this.a.oldValue = value;
+
+    if (this.firstScan)
+      this.firstScan = false;
   };
 
   this.open = function( lines, row) {
@@ -10580,6 +10606,9 @@ function DynDigTransparency(dyn) {
 	break;
       case DynC.eSave_DigTransparency_high_value: 
 	this.high_value = parseFloat( tokens[1], 10);
+	break;
+      case DynC.eSave_DigTransparency_smooth_transition: 
+	this.smooth_transition = parseInt(tokens[1], 10);
 	break;
       case DynC.eSave_End:
 	end = true;

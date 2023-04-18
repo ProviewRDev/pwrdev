@@ -23969,7 +23969,7 @@ int GeSevHist::syntax_check(
 GeDigTransparency::GeDigTransparency(GeDyn* e_dyn)
       : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_DigTransparency,
       ge_mActionType1_No, ge_mActionType2_No, ge_eDynPrio_DigTransparency),
-      low_value(0), high_value(0.5)
+	low_value(0), high_value(0.5), smooth_transition(0), transition_cnt(0)
 {
   strcpy(attribute, "");
 }
@@ -23977,7 +23977,8 @@ GeDigTransparency::GeDigTransparency(GeDyn* e_dyn)
 GeDigTransparency::GeDigTransparency(const GeDigTransparency& x)
     : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
           x.prio),
-      low_value(x.low_value), high_value(x.high_value)
+      low_value(x.low_value), high_value(x.high_value), smooth_transition(x.smooth_transition),
+      transition_cnt(0)
 {
   strcpy(attribute, x.attribute);
 }
@@ -24004,6 +24005,11 @@ void GeDigTransparency::get_attributes(attr_sItem* attrinfo, int* item_count)
   attrinfo[i].minlimit = 0;
   attrinfo[i].maxlimit = 1.0;
   attrinfo[i++].size = sizeof(high_value);
+
+  strcpy(attrinfo[i].name, "DigTransparency.SmoothTransition");
+  attrinfo[i].value = &smooth_transition;
+  attrinfo[i].type = glow_eType_Boolean;
+  attrinfo[i++].size = sizeof(smooth_transition);
 
   *item_count = i;
 }
@@ -24033,6 +24039,7 @@ void GeDigTransparency::save(std::ofstream& fp)
   fp << int(ge_eSave_DigTransparency_attribute) << FSPACE << attribute << '\n';
   fp << int(ge_eSave_DigTransparency_low_value) << FSPACE << low_value << '\n';
   fp << int(ge_eSave_DigTransparency_high_value) << FSPACE << high_value << '\n';
+  fp << int(ge_eSave_DigTransparency_smooth_transition) << FSPACE << smooth_transition << '\n';
   fp << int(ge_eSave_End) << '\n';
 }
 
@@ -24063,6 +24070,9 @@ void GeDigTransparency::open(std::ifstream& fp)
       break;
     case ge_eSave_DigTransparency_high_value:
       fp >> high_value;
+      break;
+    case ge_eSave_DigTransparency_smooth_transition:
+      fp >> smooth_transition;
       break;
     case ge_eSave_End:
       end_found = 1;
@@ -24135,18 +24145,39 @@ int GeDigTransparency::scan(grow_tObject object)
     val = !val;
 
   if (!first_scan) {
-    if (old_value == val && !dyn->reset_color)
+    if (old_value == val && !dyn->reset_color && !transition_cnt)
       // No change since last time
       return 1;
-  } else
+  }
+
+  if (val) {
+    if (smooth_transition && !first_scan) {
+      transition_cnt++;
+      double sval = low_value + (high_value - low_value) * transition_cnt / 5;
+      grow_SetObjectTransparency(object, sval);	
+      if (transition_cnt == 5)
+	transition_cnt = 0;
+    }
+    else {
+      grow_SetObjectTransparency(object, high_value);
+    }
+  }
+  else {
+    if (smooth_transition && !first_scan) {
+      transition_cnt++;
+      double sval = low_value + (high_value - low_value) * (5 - transition_cnt) / 5;
+      grow_SetObjectTransparency(object, sval);	
+      if (transition_cnt == 5)
+	transition_cnt = 0;
+    }
+    else 
+      grow_SetObjectTransparency(object, low_value);
+  }
+  old_value = *p;
+
+  if (first_scan)
     first_scan = false;
 
-  if (*p)
-    grow_SetObjectTransparency(object, high_value);
-  else
-    grow_SetObjectTransparency(object, low_value);
-
-  old_value = *p;
   return 1;
 }
 

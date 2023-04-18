@@ -875,6 +875,7 @@ typedef enum {
   ge_eSave_DigTransparency_attribute = 7700,
   ge_eSave_DigTransparency_low_value = 7701,
   ge_eSave_DigTransparency_high_value = 7702,
+  ge_eSave_DigTransparency_smooth_transition = 7703,
   ge_eSave_AnalogTransparency_attribute = 7800,
   ge_eSave_AnalogTransparency_min_value = 7801,
   ge_eSave_AnalogTransparency_max_value = 7802,
@@ -2954,6 +2955,7 @@ public:
   pwr_tAName attribute;
   double low_value;
   double high_value;
+  unsigned int smooth_transition;
 
   pwr_tBoolean* p;
   pwr_tSubid subid;
@@ -2964,6 +2966,7 @@ public:
   pwr_tBoolean old_value;
   int a_typeid;
   unsigned int bitmask;
+  unsigned int transition_cnt;
 
   GeDigTransparency(GeDyn* e_dyn);
   GeDigTransparency(const GeDigTransparency& x);

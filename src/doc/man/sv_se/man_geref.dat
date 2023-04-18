@@ -3953,6 +3953,7 @@ DigTransparency.LowValue  <t><t>Transparans som sätts när signalen är låg. Ett v
 			<t><t>0 och 1.
 DigTransparency.HighValue  <t><t>Transparans som sätts när signalen är hög. Ett värde mellan 
 			<t><t>0 och 1.
+DigTransparency.SmoothTransition  <t><t>Gradvis övergång mellan högt och lågt värde.
 </topic>
 
 <topic>GeDynAnalogTransparency <style>function
