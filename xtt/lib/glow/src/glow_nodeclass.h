@@ -168,7 +168,7 @@ public:
     Call the draw function for each element.
   */
   void draw(GlowWind* w, GlowTransform* t, int highlight, int hot, void* node,
-      void* colornode);
+      void* colornode, void *transpnode);
 
   //! Erase the calling node.
   /*!

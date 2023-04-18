@@ -124,7 +124,7 @@ public:
     coordinates for the drawing.
   */
   void draw(GlowWind* w, GlowTransform* t, int highlight, int hot, void* node,
-      void* colornode);
+      void* colornode, void *transpnode);
 
   //! Redraw the background of the annotation
   /*!

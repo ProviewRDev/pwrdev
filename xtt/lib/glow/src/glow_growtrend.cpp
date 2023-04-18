@@ -447,7 +447,7 @@ void GrowTrend::draw(GlowWind* w, int ll_x, int ll_y, int ur_x, int ur_y)
       && x_left * w->zoom_factor_x - w->offset_x <= ur_x
       && y_high * w->zoom_factor_y - w->offset_y + 1 >= ll_y
       && y_low * w->zoom_factor_y - w->offset_y <= ur_y) {
-    draw(w, (GlowTransform*)NULL, highlight, hot, NULL, NULL);
+    draw(w, (GlowTransform*)NULL, highlight, hot, NULL, NULL, NULL);
   }
 }
 
@@ -486,7 +486,7 @@ void GrowTrend::draw(GlowWind* w, int* ll_x, int* ll_y, int* ur_x, int* ur_y)
 
   if (obj_ur_x >= *ll_x && obj_ll_x <= *ur_x && obj_ur_y >= *ll_y
       && obj_ll_y <= *ur_y) {
-    draw(w, (GlowTransform*)NULL, highlight, hot, NULL, NULL);
+    draw(w, (GlowTransform*)NULL, highlight, hot, NULL, NULL, NULL);
 
     // Increase the redraw area
     if (obj_ur_x > *ur_x)
@@ -525,7 +525,7 @@ void GrowTrend::set_highlight(int on)
   for the drawing.
 */
 void GrowTrend::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
-    void* node, void* colornode)
+    void* node, void* colornode, void *transpnode)
 {
   if (ctx->nodraw)
     return;
@@ -628,12 +628,12 @@ void GrowTrend::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
       GlowTransform tmp = *t * trf;
       for (i = 0; i < curve_cnt; i++) {
         if (curve[i])
-          curve[i]->draw(w, &tmp, highlight, hot, node, colornode);
+          curve[i]->draw(w, &tmp, highlight, hot, node, colornode, transpnode);
       }
     } else {
       for (i = 0; i < curve_cnt; i++) {
         if (curve[i])
-          curve[i]->draw(w, &trf, highlight, hot, node, colornode);
+          curve[i]->draw(w, &trf, highlight, hot, node, colornode, transpnode);
       }
     }
     for (i = 0; i < curve_cnt; i++) {
@@ -675,12 +675,12 @@ void GrowTrend::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
     GlowTransform tmp = *t * trf;
     for (i = 0; i < curve_cnt; i++) {
       if (curve[i])
-        curve[i]->draw(w, &tmp, highlight, hot, node, colornode);
+        curve[i]->draw(w, &tmp, highlight, hot, node, colornode, transpnode);
     }
   } else {
     for (i = 0; i < curve_cnt; i++) {
       if (curve[i])
-        curve[i]->draw(w, &trf, highlight, hot, node, colornode);
+        curve[i]->draw(w, &trf, highlight, hot, node, colornode, transpnode);
     }
   }
   ctx->gdraw->reset_clip_rectangle(w);
@@ -824,7 +824,7 @@ void GrowTrend::add_value(double value, int idx)
     draw();
   else
     parent->draw();
-  draw(&ctx->navw, (GlowTransform*)NULL, highlight, 0, NULL, NULL);
+  draw(&ctx->navw, (GlowTransform*)NULL, highlight, 0, NULL, NULL, NULL);
 }
 
 //! Moves object to alignment line or point.

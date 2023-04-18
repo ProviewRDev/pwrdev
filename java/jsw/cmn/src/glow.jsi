@@ -3193,9 +3193,9 @@ function GlowNodeClass( ctx) {
     return 0;
   };
 
-  this.tdraw = function( t, highlight, hot, node, colornode) {
+  this.tdraw = function( t, highlight, hot, node, colornode, transpnode) {
     for ( var i = 0; i < this.a.size(); i++) {
-      this.a.get(i).tdraw(t, highlight, hot, node, colornode);
+      this.a.get(i).tdraw(t, highlight, hot, node, colornode, transpnode);
     }
   };
 
@@ -3568,10 +3568,10 @@ function GlowCon( ctx) {
   };
 
   this.draw = function() {
-    this.tdraw(null, this.highlight, this.hot, null, null);
+    this.tdraw(null, this.highlight, this.hot, null, null, null);
   };
 
-  this.tdraw = function( t, highlight, hot, node, colornode) {
+  this.tdraw = function( t, highlight, hot, node, colornode, transpnode) {
     if ( this.ctx.nodraw != 0)
       return;
 
@@ -3651,7 +3651,7 @@ function GlowLine( ctx) {
     return i;
   };
 
-  this.tdraw = function( t, highlight, hot, node, colornode) {
+  this.tdraw = function( t, highlight, hot, node, colornode, transpnode) {
   };
 
 
@@ -3756,8 +3756,8 @@ function GlowLine( ctx) {
 
 function GlowArc( ctx) {
   this.ctx = ctx;
-  this.ll = new GlowPoint(ctx);
-  this.ur = new GlowPoint(ctx);
+  this.ll = new GlowPoint( ctx);
+  this.ur = new GlowPoint( ctx);
   this.draw_type;
   this.angle1;
   this.angle2;
@@ -3774,12 +3774,11 @@ function GlowArc( ctx) {
     var i;
 
     for ( i = row; i < lines.length; i++) {
-
       var tokens = lines[i].split(' ');
       var key = parseInt(tokens[0], 10);
-
-      if ( this.ctx.debug) console.log( "GlowCon : " + lines[i]);
-
+      
+      if ( this.ctx.debug) console.log( "GlowArc : " + lines[i]);
+      
       switch ( key) {
       case Glow.eSave_Arc: 
 	break;
@@ -3815,12 +3814,15 @@ function GlowArc( ctx) {
 	break;
 
     }
-
     return i;
   };
 
-  this.draw = function( highlight, hot) {
-    if ( this.ctx.nodraw != 0)
+  this.draw = function() {
+    this.tdraw( null, 0, 0, null, null, null);
+  };
+
+  this.tdraw = function( t, highlight, hot, node, colornode, transpnode) {
+    if ( this.ctx.nodraw !== 0)
       return;
 
     var ll_x, ll_y, ur_x, ur_y;
@@ -3836,10 +3838,11 @@ function GlowArc( ctx) {
     idx = Math.max( 0, idx);
     idx = Math.min( idx, Glow.DRAW_TYPE_SIZE-1);
     this.ctx.gdraw.arc( ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, this.angle1, this.angle2, this.draw_type, idx, highlight);
-  }
+  };
 
+  
   this.draw_shadow = function( border, shadow, highlight, hot) {
-    if ( this.ctx.nodraw != 0)
+    if ( this.ctx.nodraw !== 0)
       return;
 
     var ll_x, ll_y, ur_x, ur_y;
@@ -3852,17 +3855,17 @@ function GlowArc( ctx) {
     idx = Math.max( 0, idx);
     idx = Math.min( idx, Glow.DRAW_TYPE_SIZE-1);
     var ish = 1;
-    var offs = border;
+    var offs = this.border;
 
-    if ( shadow != 0 && idx > 2) {
-      if ( this.angle1 == 0) {
+    if ( this.shadow !== 0 && idx > 2) {
+      if ( this.angle1 === 0) {
 	this.ctx.gdraw.arc( ll_x + idx/2 - idx + offs,
 			    ll_y + idx/2 - idx + offs, 
 			    ur_x - ll_x + idx - offs*2, ur_y - ll_y + idx - offs*2, this.angle1 + 45, this.angle2 - 45,
 			    GlowColor.shift_drawtype( this.draw_type, -2, null), ish-1, highlight);
 	this.ctx.gdraw.arc( ll_x + idx/2 - idx + offs, 
 			    ll_y + idx/2 - idx + offs, 
-			    ur_x - ll_x + idx - offs*2, ur_y - ll_y + idx - offs*2, this.angle1, this.angle2 - 45,
+			    ur_x - ll_x + idx - offs*2, ur_y - ll_y + idx - offs*2, angle1, angle2 - 45,
 			    GlowColor.shift_drawtype( this.draw_type, 2, null), ish-1, highlight);
 	this.ctx.gdraw.arc( ll_x + idx/2 - offs, 
 			    ll_y + idx/2 - offs, 
@@ -3877,42 +3880,42 @@ function GlowArc( ctx) {
 	this.ctx.gdraw.arc( ll_x + idx/2 - idx + offs, 
 			    ll_y + idx/2 - idx + offs, 
 			    ur_x - ll_x + idx - offs*2, ur_y - ll_y + idx - offs*2, this.angle1, this.angle2,
-			    GlowColor.shift_drawtype( draw_type, -2, null), ish-1, highlight);
+			    GlowColor.shift_drawtype( this.draw_type, -2, null), ish-1, highlight);
 	this.ctx.gdraw.arc( ll_x + idx/2 - offs, 
 			    ll_y + idx/2 - offs, 
 			    Math.max( 0, ur_x - ll_x - idx + offs*2), Math.max( 0,  ur_y - ll_y - idx + offs*2), this.angle1, this.angle2,
-			    GlowColor.shift_drawtype( draw_type, 2, null), ish-1, highlight);
+			    GlowColor.shift_drawtype( this.draw_type, 2, null), ish-1, highlight);
       }
       else if ( this.angle1 == 180) {
 	this.ctx.gdraw.arc( ll_x + idx/2 - idx + offs, 
 			    ll_y + idx/2 - idx + offs, 
 			    ur_x - ll_x + idx - offs*2, ur_y - ll_y + idx - offs*2, this.angle1 + 45, this.angle2 - 45,
-			    GlowColor.shift_drawtype( draw_type, 2, null), ish-1, highlight);
+			    GlowColor.shift_drawtype( this.draw_type, 2, null), ish-1, highlight);
 	this.ctx.gdraw.arc( ll_x + idx/2 - idx + offs, 
 			    ll_y + idx/2 - idx + offs, 
 			    ur_x - ll_x + idx - offs*2, ur_y - ll_y + idx - offs*2, this.angle1, this.angle2 - 45,
-			    GlowColor.shift_drawtype( draw_type, -2, null), ish-1, highlight);
+			    GlowColor.shift_drawtype( this.draw_type, -2, null), ish-1, highlight);
 	this.ctx.gdraw.arc( ll_x + idx/2 - offs, 
 			    ll_y + idx/2 - offs, 
 			    Math.max( 0, ur_x - ll_x - idx + offs*2), Math.max( 0,  ur_y - ll_y - idx + offs*2), this.angle1 + 45, this.angle2 - 45,
-			    GlowColor.shift_drawtype( draw_type, -2, null), ish-1, highlight);
+			    GlowColor.shift_drawtype( this.draw_type, -2, null), ish-1, highlight);
 	this.ctx.gdraw.arc( ll_x + idx/2 - offs, 
 			    ll_y + idx/2 - offs, 
 			    Math.max( 0, ur_x - ll_x - idx + offs*2), Math.max( 0,  ur_y - ll_y - idx + offs*2), this.angle1, this.angle2 - 45,
-			    GlowColor.shift_drawtype( draw_type, 2, null), ish-1, highlight);
+			    GlowColor.shift_drawtype( this.draw_type, 2, null), ish-1, highlight);
       }
       else if ( this.angle1 == 270) {
 	this.ctx.gdraw.arc( ll_x + idx/2 - idx + offs, 
 			    ll_y + idx/2 - idx + offs, 
 			    ur_x - ll_x + idx - offs*2, ur_y - ll_y + idx - offs*2, this.angle1, this.angle2,
-			    GlowColor.shift_drawtype( draw_type, 2, null), ish-1, highlight);
+			    GlowColor.shift_drawtype( this.draw_type, 2, null), ish-1, highlight);
 	this.ctx.gdraw.arc( ll_x + idx/2 - offs, 
 			    ll_y + idx/2 - offs, 
 			    Math.max( 0, ur_x - ll_x - idx + offs*2), Math.max( 0,  ur_y - ll_y - idx + offs*2), this.angle1, this.angle2,
-			    GlowColor.shift_drawtype( draw_type, -2, null), ish-1, highlight);
+			    GlowColor.shift_drawtype( dthis.raw_type, -2, null), ish-1, highlight);
       }
     }
-    if ( border != 0) {
+    if ( border !== 0) {
       this.ctx.gdraw.arc( ll_x + idx/2 - idx, 
 			  ll_y + idx/2 - idx, 
 			  ur_x - ll_x + idx, ur_y - ll_y + idx, this.angle1, this.angle2,
@@ -3923,6 +3926,9 @@ function GlowArc( ctx) {
 			    Math.max( 0, ur_x - ll_x - idx), Math.max( 0,  ur_y - ll_y - idx), this.angle1, this.angle2,
 			    Glow.eDrawType_Line, 0, highlight);
     }
+  };
+  this.getName = function() {
+    return this.n_name;
   };
 }
 
@@ -4495,10 +4501,10 @@ function GrowNode( ctx) {
 
   this.draw = function() {
     if ( this.visible !== 0)
-      this.tdraw( null, this.highlight, this.hot, null, null);
+      this.tdraw( null, this.highlight, this.hot, null, null, null);
   };
 
-  this.tdraw = function( t, highlight, hot, node, colornode) {
+  this.tdraw = function( t, highlight, hot, node, colornode, transpnode) {
     if ( this.ctx.nodraw !== 0)
       return;
 
@@ -4524,10 +4530,10 @@ function GrowNode( ctx) {
       if ( t !== null) {
 	trf_tot = t.multiply( this.trf);
 
-	this.nc.tdraw( trf_tot, highlight, hot, this, this);
+	this.nc.tdraw( trf_tot, highlight, hot, this, this, transpnode);
       }
       else
-	this.nc.tdraw( this.trf, highlight, hot, node, node);
+	this.nc.tdraw( this.trf, highlight, hot, node, node, transpnode);
     }
     else {
       var x1, x2, y1, y2;
@@ -4590,10 +4596,10 @@ function GrowNode( ctx) {
 	trf_tot = t.multiply( this.trf);
 	
 	// If this node has a trace pointer, use colors for this node
-	this.nc.tdraw( trf_tot, highlight, hot, this, this);
+	this.nc.tdraw( trf_tot, highlight, hot, this, this, transpnode);
       }
       else
-	this.nc.tdraw( this.trf, highlight, hot, node, node);
+	this.nc.tdraw( this.trf, highlight, hot, node, node, transpnode);
       if ( (clip_sts & 1) !== 0)
 	this.ctx.gdraw.reset_clip_rectangle();
       
@@ -4642,10 +4648,10 @@ function GrowNode( ctx) {
 	trf_tot = t.multiply( this.trf);
 
 	// If this node has a trace pointer, use colors for this node
-	this.nc.tdraw( trf_tot, highlight, hot, this, this);
+	this.nc.tdraw( trf_tot, highlight, hot, this, this, transpnode);
       }
       else
-	this.nc.tdraw( this.trf, highlight, hot, node, node);
+	this.nc.tdraw( this.trf, highlight, hot, node, node, transpnode);
       if ( (clip_sts & 1) !== 0)
 	this.ctx.gdraw.reset_clip_rectangle();
 
@@ -5459,7 +5465,7 @@ function GrowLayer( ctx) {
     return i;
   };
 
-  this.tdraw = function( t, highlight, hot, node, colornode) {
+  this.tdraw = function( t, highlight, hot, node, colornode, transpnode) {
     if ( this.ctx.nodraw !== 0)
       return;
 
@@ -5467,7 +5473,7 @@ function GrowLayer( ctx) {
       return;
   
     for (var i = 0; i < this.a.size(); i++) 
-      this.a.get(i).tdraw( this.trf, 0, 0, this, this);
+      this.a.get(i).tdraw( this.trf, 0, 0, this, this, this);
   };
 
   this.event_handler = function( event, fx, fy) {
@@ -6276,10 +6282,10 @@ function GrowRect( ctx) {
 
   this.draw = function() {
     if ( this.visible !== 0)
-      this.tdraw( null, 0, 0, null, null);
+      this.tdraw( null, 0, 0, null, null, null);
   };
 
-  this.tdraw = function( t, highlight, hot, node, colornode) {
+  this.tdraw = function( t, highlight, hot, node, colornode, transpnode) {
     if ( this.ctx.nodraw !== 0)
       return;
 
@@ -6292,6 +6298,8 @@ function GrowRect( ctx) {
 
     if (colornode !== null && Number(colornode.transparency) > Number(this.transparency))
       transp = colornode.transparency;
+    if (transpnode !== null && Number(transpnode.transparency) > Number(transp))
+      transp = transpnode.transparency;
 
     if ( this.fixcolor !== 0)
       colornode = null;
@@ -6947,11 +6955,11 @@ function GrowRectRounded( ctx) {
   };
 
   this.draw = function() {
-    this.tdraw( null, 0, 0, null, null);
+    this.tdraw( null, 0, 0, null, null, null);
   };
 
 
-  this.tdraw = function( t, highlight, hot, node, colornode) {
+  this.tdraw = function( t, highlight, hot, node, colornode, transpnode) {
     if ( this.ctx.nodraw !== 0)
       return;
 
@@ -6962,6 +6970,8 @@ function GrowRectRounded( ctx) {
 
     if (colornode !== null && Number(colornode.transparency) > Number(this.transparency))
       transp = colornode.transparency;
+    if (transpnode !== null && Number(transpnode.transparency) > Number(transp))
+      transp = transpnode.transparency;
 
     if ( node !== null && node.line_width !== 0)
       idx = Math.floor( this.ctx.mw.zoom_factor_y / this.ctx.mw.base_zoom_factor * 
@@ -7425,11 +7435,11 @@ function GrowLine( ctx) {
   };
 
   this.draw = function() {
-    this.tdraw( null, 0, 0, null, null);
+    this.tdraw( null, 0, 0, null, null, null);
   };
 
 
-  this.tdraw = function( t, highlight, hot, node, colornode) {
+  this.tdraw = function( t, highlight, hot, node, colornode, transpnode) {
     if ( this.ctx.nodraw !== 0)
       return;
 
@@ -7443,6 +7453,8 @@ function GrowLine( ctx) {
 
     if (colornode !== null && Number(colornode.transparency) > Number(this.transparency))
       transp = colornode.transparency;
+    if (transpnode !== null && Number(transpnode.transparency) > Number(transp))
+      transp = transpnode.transparency;
 
     if ( node !== null && node.line_width !== 0)
       idx = Math.floor( this.ctx.mw.zoom_factor_y / this.ctx.mw.base_zoom_factor * 
@@ -7762,11 +7774,11 @@ function GrowArc( ctx) {
   };
 
   this.draw = function() {
-    this.tdraw( null, 0, 0, null, null);
+    this.tdraw( null, 0, 0, null, null, null);
   };
 
 
-  this.tdraw = function( t, highlight, hot, node, colornode) {
+  this.tdraw = function( t, highlight, hot, node, colornode, transpnode) {
     if ( this.ctx.nodraw !== 0)
       return;
 
@@ -7788,6 +7800,8 @@ function GrowArc( ctx) {
      
     if (colornode !== null && Number(colornode.transparency) > Number(this.transparency))
       transp = colornode.transparency;
+    if (transpnode !== null && Number(transpnode.transparency) > Number(transp))
+      transp = transpnode.transparency;
 
     if ( this.fixcolor !== 0)
       colornode = null;
@@ -8321,10 +8335,10 @@ function GrowText( ctx) {
   };
 
   this.draw = function() {
-    this.tdraw( null, 0, 0, null, null);
+    this.tdraw( null, 0, 0, null, null, null);
   };
 
-  this.tdraw = function( t, highlight, hot, node, colornode) {
+  this.tdraw = function( t, highlight, hot, node, colornode, transpnode) {
     if ( this.ctx.nodraw !== 0 || this.text === null)
       return;
 
@@ -8332,6 +8346,8 @@ function GrowText( ctx) {
 
     if (colornode !== null && Number(colornode.transparency) > Number(this.transparency))
       transp = colornode.transparency;
+    if (transpnode !== null && Number(transpnode.transparency) > Number(transp))
+      transp = transpnode.transparency;
 
     var x1, y1, rx1, ry1;
     var z_width, z_height, z_descent;
@@ -8621,10 +8637,10 @@ function GrowAnnot( ctx) {
   };
 
   this.draw = function() {
-    this.tdraw( null, 0, 0, null, null);
+    this.tdraw( null, 0, 0, null, null, null);
   };
 
-  this.tdraw = function( t, highlight, hot, node, colornode) {
+  this.tdraw = function( t, highlight, hot, node, colornode, transpnode) {
     var x1, y1;
     if ( this.ctx.nodraw !== 0)
       return;
@@ -9088,11 +9104,11 @@ function GrowPolyLine( ctx) {
   };
 
   this.draw = function() {
-    this.tdraw( null, 0, 0, null, null);
+    this.tdraw( null, 0, 0, null, null, null);
   };
 
 
-  this.tdraw = function( t, highlight, hot, node, colornode) {
+  this.tdraw = function( t, highlight, hot, node, colornode, transpnode) {
     if ( this.ctx.nodraw !== 0)
       return;
 
@@ -9116,6 +9132,8 @@ function GrowPolyLine( ctx) {
 
     if (colornode !== null && Number(colornode.transparency) > Number(this.transparency))
       transp = colornode.transparency;
+    if (transpnode !== null && Number(transpnode.transparency) > Number(transp))
+      transp = transpnode.transparency;
 
     if ( this.fixcolor !== 0)
       colornode = null;
@@ -9682,7 +9700,7 @@ function GlowConPoint( ctx) {
   this.draw = function() {
   };
 
-  this.tdraw = function( t, highlight, hot, node, colornode) {
+  this.tdraw = function( t, highlight, hot, node, colornode, transpnode) {
   };
 
   this.event_handler = function( event, fx, fy) {
@@ -9829,190 +9847,13 @@ function GrowConPoint( ctx) {
   this.draw = function() {
   };
 
-  this.tdraw = function( t, highlight, hot, node, colornode) {
+  this.tdraw = function( t, highlight, hot, node, colornode, transpnode) {
   };
 
   this.get_borders = function( t, g) {};
   this.get_background_object_limits = function( t, type, x, y, bo) { return 0;};
 }
 
-function GlowArc( ctx) {
-  this.ctx = ctx;
-  this.ll = new GlowPoint( ctx);
-  this.ur = new GlowPoint( ctx);
-  this.draw_type;
-  this.angle1;
-  this.angle2;
-  this.line_width;
-  this.display_level;
-  this.fill;
-
-  this.type = function() {
-    return Glow.eObjectType_Arc;
-  };
-
-  this.open = function( lines, row) {
-    var end = false;
-    var i;
-
-    for ( i = row; i < lines.length; i++) {
-      var tokens = lines[i].split(' ');
-      var key = parseInt(tokens[0], 10);
-      
-      if ( this.ctx.debug) console.log( "GlowArc : " + lines[i]);
-      
-      switch ( key) {
-      case Glow.eSave_Arc: 
-	break;
-      case Glow.eSave_Arc_draw_type: 
-	this.draw_type = parseInt(tokens[1], 10);
-	break;
-      case Glow.eSave_Arc_angle1: 
-	this.angle1 = parseInt(tokens[1], 10);
-	break;
-      case Glow.eSave_Arc_angle2: 
-	this.angle2 = parseInt(tokens[1], 10);
-	break;
-      case Glow.eSave_Arc_line_width:
-	this.line_width = parseInt(tokens[1], 10);
-	break;
-      case Glow.eSave_Arc_fill:
-	this.fill = parseInt(tokens[1], 10);
-	break;
-      case Glow.eSave_Arc_ll:
-	i = this.ll.open( lines, i+1);
-	break;
-      case Glow.eSave_Arc_ur:
-	i = this.ur.open( lines, i+1);
-	break;
-      case Glow.eSave_End:
-	end = true;
-	break;
-      default:
-	console.log( "Syntax error in GlowArc");
-	break;
-      }
-      if ( end)
-	break;
-
-    }
-    return i;
-  };
-
-  this.draw = function() {
-    this.tdraw( null, 0, 0, null, null);
-  };
-
-  this.tdraw = function( t, highlight, hot, node, colornode) {
-    if ( this.ctx.nodraw !== 0)
-      return;
-
-    var ll_x, ll_y, ur_x, ur_y;
-    ll_x = Math.floor(this.ll.x * this.ctx.mw.zoom_factor_x + 0.5) - this.ctx.mw.offset_x;
-    ll_y = Math.floor(this.ll.y * this.ctx.mw.zoom_factor_y + 0.5) - this.ctx.mw.offset_y;
-    ur_x = Math.floor(this.ur.x * this.ctx.mw.zoom_factor_x + 0.5) - this.ctx.mw.offset_x;
-    ur_y = Math.floor(this.ur.y * this.ctx.mw.zoom_factor_y + 0.5) - this.ctx.mw.offset_y;
-	
-    if ( ll_x == ur_x && ll_y == ur_y)
-      return;
-    var idx = Math.floor( this.ctx.mw.zoom_factor_y / this.ctx.mw.base_zoom_factor * this.line_width - 1);
-    idx += hot;
-    idx = Math.max( 0, idx);
-    idx = Math.min( idx, Glow.DRAW_TYPE_SIZE-1);
-    this.ctx.gdraw.arc( ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, this.angle1, this.angle2, this.draw_type, idx, highlight);
-  };
-
-  
-  this.draw_shadow = function( border, shadow, highlight, hot) {
-    if ( this.ctx.nodraw !== 0)
-      return;
-
-    var ll_x, ll_y, ur_x, ur_y;
-    ll_x = Math.floor(this.ll.x * this.ctx.mw.zoom_factor_x + 0.5) - this.ctx.mw.offset_x;
-    ll_y = Math.floor(this.ll.y * this.ctx.mw.zoom_factor_y + 0.5) - this.ctx.mw.offset_y;
-    ur_x = Math.floor(this.ur.x * this.ctx.mw.zoom_factor_x + 0.5) - this.ctx.mw.offset_x;
-    ur_y = Math.floor(this.ur.y * this.ctx.mw.zoom_factor_y + 0.5) - this.ctx.mw.offset_y;
-    var idx = Math.floor( this.ctx.mw.zoom_factor_y / this.ctx.mw.base_zoom_factor * this.line_width - 1);
-    idx += hot;
-    idx = Math.max( 0, idx);
-    idx = Math.min( idx, Glow.DRAW_TYPE_SIZE-1);
-    var ish = 1;
-    var offs = this.border;
-
-    if ( this.shadow !== 0 && idx > 2) {
-      if ( this.angle1 === 0) {
-	this.ctx.gdraw.arc( ll_x + idx/2 - idx + offs,
-			    ll_y + idx/2 - idx + offs, 
-			    ur_x - ll_x + idx - offs*2, ur_y - ll_y + idx - offs*2, this.angle1 + 45, this.angle2 - 45,
-			    GlowColor.shift_drawtype( this.draw_type, -2, null), ish-1, highlight);
-	this.ctx.gdraw.arc( ll_x + idx/2 - idx + offs, 
-			    ll_y + idx/2 - idx + offs, 
-			    ur_x - ll_x + idx - offs*2, ur_y - ll_y + idx - offs*2, angle1, angle2 - 45,
-			    GlowColor.shift_drawtype( this.draw_type, 2, null), ish-1, highlight);
-	this.ctx.gdraw.arc( ll_x + idx/2 - offs, 
-			    ll_y + idx/2 - offs, 
-			    Math.max( 0, ur_x - ll_x - idx + offs*2), Math.max( 0,  ur_y - ll_y - idx + offs*2), this.angle1 + 45, this.angle2 - 45,
-			    GlowColor.shift_drawtype( this.draw_type, 2, null), ish-1, highlight);
-	this.ctx.gdraw.arc( ll_x + idx/2 - offs, 
-			    ll_y + idx/2 - offs, 
-			    Math.max( 0, ur_x - ll_x - idx + offs*2), Math.max( 0,  ur_y - ll_y - idx + offs*2), this.angle1, this.angle2 - 45,
-			    GlowColor.shift_drawtype( this.draw_type, -2, null), ish-1, highlight);
-      }
-      else if ( this.angle1 == 90) {
-	this.ctx.gdraw.arc( ll_x + idx/2 - idx + offs, 
-			    ll_y + idx/2 - idx + offs, 
-			    ur_x - ll_x + idx - offs*2, ur_y - ll_y + idx - offs*2, this.angle1, this.angle2,
-			    GlowColor.shift_drawtype( this.draw_type, -2, null), ish-1, highlight);
-	this.ctx.gdraw.arc( ll_x + idx/2 - offs, 
-			    ll_y + idx/2 - offs, 
-			    Math.max( 0, ur_x - ll_x - idx + offs*2), Math.max( 0,  ur_y - ll_y - idx + offs*2), this.angle1, this.angle2,
-			    GlowColor.shift_drawtype( this.draw_type, 2, null), ish-1, highlight);
-      }
-      else if ( this.angle1 == 180) {
-	this.ctx.gdraw.arc( ll_x + idx/2 - idx + offs, 
-			    ll_y + idx/2 - idx + offs, 
-			    ur_x - ll_x + idx - offs*2, ur_y - ll_y + idx - offs*2, this.angle1 + 45, this.angle2 - 45,
-			    GlowColor.shift_drawtype( this.draw_type, 2, null), ish-1, highlight);
-	this.ctx.gdraw.arc( ll_x + idx/2 - idx + offs, 
-			    ll_y + idx/2 - idx + offs, 
-			    ur_x - ll_x + idx - offs*2, ur_y - ll_y + idx - offs*2, this.angle1, this.angle2 - 45,
-			    GlowColor.shift_drawtype( this.draw_type, -2, null), ish-1, highlight);
-	this.ctx.gdraw.arc( ll_x + idx/2 - offs, 
-			    ll_y + idx/2 - offs, 
-			    Math.max( 0, ur_x - ll_x - idx + offs*2), Math.max( 0,  ur_y - ll_y - idx + offs*2), this.angle1 + 45, this.angle2 - 45,
-			    GlowColor.shift_drawtype( this.draw_type, -2, null), ish-1, highlight);
-	this.ctx.gdraw.arc( ll_x + idx/2 - offs, 
-			    ll_y + idx/2 - offs, 
-			    Math.max( 0, ur_x - ll_x - idx + offs*2), Math.max( 0,  ur_y - ll_y - idx + offs*2), this.angle1, this.angle2 - 45,
-			    GlowColor.shift_drawtype( this.draw_type, 2, null), ish-1, highlight);
-      }
-      else if ( this.angle1 == 270) {
-	this.ctx.gdraw.arc( ll_x + idx/2 - idx + offs, 
-			    ll_y + idx/2 - idx + offs, 
-			    ur_x - ll_x + idx - offs*2, ur_y - ll_y + idx - offs*2, this.angle1, this.angle2,
-			    GlowColor.shift_drawtype( this.draw_type, 2, null), ish-1, highlight);
-	this.ctx.gdraw.arc( ll_x + idx/2 - offs, 
-			    ll_y + idx/2 - offs, 
-			    Math.max( 0, ur_x - ll_x - idx + offs*2), Math.max( 0,  ur_y - ll_y - idx + offs*2), this.angle1, this.angle2,
-			    GlowColor.shift_drawtype( dthis.raw_type, -2, null), ish-1, highlight);
-      }
-    }
-    if ( border !== 0) {
-      this.ctx.gdraw.arc( ll_x + idx/2 - idx, 
-			  ll_y + idx/2 - idx, 
-			  ur_x - ll_x + idx, ur_y - ll_y + idx, this.angle1, this.angle2,
-			  Glow.eDrawType_Line, 0, highlight);
-      if ( idx > 0)
-	this.ctx.gdraw.arc( ll_x + idx/2, 
-			    ll_y + idx/2, 
-			    Math.max( 0, ur_x - ll_x - idx), Math.max( 0,  ur_y - ll_y - idx), this.angle1, this.angle2,
-			    Glow.eDrawType_Line, 0, highlight);
-    }
-  };
-  this.getName = function() {
-    return this.n_name;
-  };
-}
 GrowConPoint.prototype = Object.create(GlowArrayElem.prototype);
 
 function GrowImage( ctx) {
@@ -10165,11 +10006,11 @@ function GrowImage( ctx) {
       this.ur.y = this.ll.y + this.image.naturalHeight / this.ctx.mw.zoom_factor_y;
     }
     if ( this.image.naturalWidth !== 0)
-      this.tdraw( null, 0, 0, null, null);
+      this.tdraw( null, 0, 0, null, null, null);
   };
 
 
-  this.tdraw = function( t, highlight, hot, node, colornode) {
+  this.tdraw = function( t, highlight, hot, node, colornode, transpnode) {
     if ( this.ctx.nodraw != 0)
       return;
 
@@ -10416,10 +10257,10 @@ function GrowConGlue( ctx) {
   };
 
   this.draw = function() {
-    this.tdraw(null, this.highlight, this.hot, null, null);
+    this.tdraw(null, this.highlight, this.hot, null, null, null);
   }
 
-  this.tdraw = function( t, highlight, hot, node, colornode) {
+  this.tdraw = function( t, highlight, hot, node, colornode, transpnode) {
     if ( this.ctx.nodraw != 0)
       return;
     var idx, idx_up, idx_down, idx_left, idx_right;
@@ -11134,7 +10975,7 @@ function GrowBar( ctx) {
     return i;
   };   
 
-  this.tdraw = function( t, highlight, hot, node, colornode) {
+  this.tdraw = function( t, highlight, hot, node, colornode, transpnode) {
     if ( this.ctx.nodraw !== 0)
       return;
 
@@ -11404,7 +11245,7 @@ function GrowBarArc( ctx) {
     return i;
   };   
 
-  this.tdraw = function( t, highlight, hot, node, colornode) {
+  this.tdraw = function( t, highlight, hot, node, colornode, transpnode) {
     if (this.ctx.nodraw !== 0)
       return;
 
@@ -11721,7 +11562,7 @@ function GrowTrend( ctx) {
     return i;
   };    
 
-  this.tdraw = function( t, highlight, hot, node, colornode) {
+  this.tdraw = function( t, highlight, hot, node, colornode, transpnode) {
     if ( this.ctx.nodraw !== 0)
       return;
     var i;
@@ -11796,7 +11637,7 @@ function GrowTrend( ctx) {
 	var tmp1 = t.multiply(this.trf);
 	for ( i = 0; i < this.curve_cnt; i++) {
 	  if ( curve[i] !== null)
-	    curve[i].tdraw( tmp1, highlight, hot, node, colornode);
+	    curve[i].tdraw( tmp1, highlight, hot, node, colornode, transpnode);
 	}
       }
       else {
@@ -11804,7 +11645,7 @@ function GrowTrend( ctx) {
 	  if ( this.curve[i] !== null) {
 	    //for ( var j = 0; j < 10; j++)
 	    //  console.log( "tdraw", i, this.curve[i].points[j].x, this.curve[i].points[j].y);
-	    this.curve[i].tdraw( this.trf, highlight, hot, node, colornode);
+	    this.curve[i].tdraw( this.trf, highlight, hot, node, colornode, transpnode);
 	  }
 	}
       }
@@ -11834,13 +11675,13 @@ function GrowTrend( ctx) {
       var tmp2 = t.multiply(this.trf);
       for ( i = 0; i < this.curve_cnt; i++) {
 	if ( this.curve[i] !== null)
-	  this.curve[i].tdraw( tmp2, highlight, hot, node, colornode);
+	  this.curve[i].tdraw( tmp2, highlight, hot, node, colornode, transpnode);
       }
     }
     else {
       for ( i = 0; i < this.curve_cnt; i++) {
 	if ( this.curve[i] !== null) {
-	  this.curve[i].tdraw( this.trf, highlight, hot, node, colornode);
+	  this.curve[i].tdraw( this.trf, highlight, hot, node, colornode, transpnode);
 	}
       }
     }
@@ -12417,14 +12258,14 @@ function GrowMenu( ctx) {
     this.text_color_disabled = text_color_disabled;
     this.font = text_font;
 
-    this.tdraw(null, 0, 0, null, null);
+    this.tdraw(null, 0, 0, null, null, null);
   };
 
   this.type = function() { 
     return Glow.eObjectType_GrowMenu;
   };
 
-  this.tdraw = function( t, highlight, hot, node, colornode) { 
+  this.tdraw = function( t, highlight, hot, node, colornode, transpnode) { 
     if ( this.ctx.nodraw != 0)
       return;
 
@@ -12700,7 +12541,7 @@ function GrowScrollBar( ctx) {
   };
 
 
-  this.tdraw = function( t, highlight, hot, node, colornode) {
+  this.tdraw = function( t, highlight, hot, node, colornode, transpnode) {
     if ( this.ctx.nodraw != 0)
       return;
 
@@ -13003,7 +12844,7 @@ function GrowWindow( ctx) {
     return i;   
   };
 
-  this.tdraw = function( t, highlight, hot, node, colornode) {
+  this.tdraw = function( t, highlight, hot, node, colornode, transpnode) {
     if ( this.ctx.nodraw != 0)
       return;
 
@@ -13041,7 +12882,7 @@ function GrowWindow( ctx) {
       else
 	this.v_scrollbar.set_position( dx2 - scrollbar_width, dy1 + this.y_low_offs, this.scrollbar_width, 
 				  dy2 - (dy1 + this.y_low_offs) - this.scrollbar_width);
-      this.v_scrollbar.tdraw( null, 0, 0, null, null);
+      this.v_scrollbar.tdraw( null, 0, 0, null, null, null);
 
     }
     if ( this.h_scrollbar !== null) {
@@ -13049,7 +12890,7 @@ function GrowWindow( ctx) {
 	this.h_scrollbar.set_position( dx1, dy2 - this.scrollbar_width, dx2 - dx1, this.scrollbar_width);
       else
 	this.h_scrollbar.set_position( dx1, dy2 - this.scrollbar_width, dx2 - dx1 - this.scrollbar_width, this.scrollbar_width);
-      this.h_scrollbar.tdraw( null, 0, 0, null, null);
+      this.h_scrollbar.tdraw( null, 0, 0, null, null, null);
     }
 
     ll_x = Math.floor( dx1 * this.ctx.mw.zoom_factor_x) - this.ctx.mw.offset_x;
@@ -13807,7 +13648,7 @@ function GrowFolder( ctx) {
     return i;
   };
 
-  this.tdraw = function( t, highlight, hot, node, colornode) {
+  this.tdraw = function( t, highlight, hot, node, colornode, transpnode) {
     if ( this.ctx.nodraw != 0)
       return;
 
@@ -14157,7 +13998,7 @@ function GrowAxis( ctx) {
     return i;
   };
 
-  this.tdraw = function( t, highlight, hot, node, colornode) {
+  this.tdraw = function( t, highlight, hot, node, colornode, transpnode) {
     if ( this.ctx.nodraw !== 0)
       return;
     var i;
@@ -14697,7 +14538,7 @@ function GrowAxisArc( ctx) {
     return i;
   };
 
-  this.tdraw = function( t, highlight, hot, node, colornode) {
+  this.tdraw = function( t, highlight, hot, node, colornode, transpnode) {
     if ( this.ctx.nodraw !== 0)
       return;
     var i;
@@ -15083,7 +14924,7 @@ function GrowPie( ctx) {
     return i;
   };
 
-  this.tdraw = function( t, highlight, hot, node, colornode) {
+  this.tdraw = function( t, highlight, hot, node, colornode, transpnode) {
     if ( this.ctx.nodraw !== 0)
       return;
 
@@ -15378,7 +15219,7 @@ function GrowBarChart( ctx) {
     return i;
   };
 
-  this.tdraw = function( t, highlight, hot, node, colornode) {
+  this.tdraw = function( t, highlight, hot, node, colornode, transpnode) {
     if ( this.ctx.nodraw != 0)
       return;
 
@@ -16139,9 +15980,9 @@ function GrowTable( ctx) {
 
 
   this.draw = function() {
-    this.tdraw( null, 0, 0, null, null);
+    this.tdraw( null, 0, 0, null, null, null);
   };
-  this.tdraw = function( t, highlight, hot, node, colornode) {
+  this.tdraw = function( t, highlight, hot, node, colornode, transpnode) {
     if ( this.ctx.nodraw != 0)
       return;
 
@@ -16187,7 +16028,7 @@ function GrowTable( ctx) {
       else
 	this.v_scrollbar.set_position( dx2 - this.scrollbar_width, dy1 + this.y_low_offs, this.scrollbar_width, 
 				  dy2 - (dy1 + this.y_low_offs) - this.scrollbar_width);
-      this.v_scrollbar.tdraw( null, 0, 0, null, null);
+      this.v_scrollbar.tdraw( null, 0, 0, null, null, null);
 
     }
     if ( this.h_scrollbar !== null) {
@@ -16197,7 +16038,7 @@ function GrowTable( ctx) {
       else
 	this.h_scrollbar.set_position( dx1 + this.x_left_offs, dy2 - this.scrollbar_width, 
 				  dx2 - (dx1 + this.x_left_offs) - this.scrollbar_width, this.scrollbar_width);
-      this.h_scrollbar.tdraw( null, 0, 0, null, null);
+      this.h_scrollbar.tdraw( null, 0, 0, null, null, null);
     }
 
     drawtype = GlowColor.get_drawtype( this.draw_type, Glow.eDrawType_LineHighlight,
@@ -17979,7 +17820,7 @@ function GrowCtx( ctx) {
   };
 
   this.draw = function() {
-    this.tdraw( null, 0, 0, null, null);
+    this.tdraw( null, 0, 0, null, null, null);
   };
 
   this.rdraw = function( ll_x, ll_y, ur_x, ur_y) {
@@ -17999,7 +17840,7 @@ function GrowCtx( ctx) {
     }
   };
 
-  this.tdraw = function( t, highlight, hot, color, colornode) {
+  this.tdraw = function( t, highlight, hot, color, colornode, transpnode) {
     var drawing = true;
     var i;
 

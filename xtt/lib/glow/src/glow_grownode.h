@@ -748,7 +748,7 @@ public:
     coordinates for the drawing.
   */
   void draw(GlowWind* w, GlowTransform* t, int highlight, int hot, void* node,
-      void* colornode);
+      void* colornode, void *transpnode);
 
   virtual void init_transform(double a11, double a12, double a13, double a21, 
       double a22, double a23, double rotation);

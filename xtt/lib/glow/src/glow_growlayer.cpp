@@ -197,10 +197,10 @@ void GrowLayer::draw(GlowWind* w, int ll_x, int ll_y, int ur_x, int ur_y)
       && x_left * w->zoom_factor_x - w->offset_x <= ur_x
       && y_high * w->zoom_factor_y - w->offset_y + 1 >= ll_y
       && y_low * w->zoom_factor_y - w->offset_y <= ur_y) {
-    draw(w, (GlowTransform*)NULL, highlight, hot, (void*)this, NULL);
+    draw(w, (GlowTransform*)NULL, highlight, hot, (void*)this, NULL, NULL);
   }
 #endif
-  draw(w, (GlowTransform*)NULL, highlight, hot, (void*)this, NULL);
+  draw(w, (GlowTransform*)NULL, highlight, hot, (void*)this, NULL, NULL);
 }
 
 void GrowLayer::draw(GlowWind* w, int* ll_x, int* ll_y, int* ur_x, int* ur_y)
@@ -240,11 +240,11 @@ void GrowLayer::draw(GlowWind* w, int* ll_x, int* ll_y, int* ur_x, int* ur_y)
       *ll_y = obj_ll_y;
   }
 #endif
-  draw(w, (GlowTransform*)NULL, highlight, hot, (void*)this, NULL);
+  draw(w, (GlowTransform*)NULL, highlight, hot, (void*)this, NULL, NULL);
 }
 
 void GrowLayer::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
-    void* node, void* colornode)
+    void* node, void* colornode, void *transpnode)
 {
   int node_highlight;
 
@@ -260,7 +260,7 @@ void GrowLayer::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
 
   for (int i = 0; i < a.a_size; i++) {
     node_highlight = highlight || a[i]->get_highlight();
-    a[i]->draw(w, &trf, node_highlight, a[i]->get_hot(), node, node);
+    a[i]->draw(w, &trf, node_highlight, a[i]->get_hot(), node, node, node);
   }
 }
 

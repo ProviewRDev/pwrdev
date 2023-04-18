@@ -114,7 +114,7 @@ public:
       double* y1_high, double* y1_low);
 
   void draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
-      void* node, void* colornode);
+      void* node, void* colornode, void *transpnode);
 
   int local_event_handler(glow_eEvent event, double x, double y);
 

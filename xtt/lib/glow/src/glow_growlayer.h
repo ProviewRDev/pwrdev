@@ -85,7 +85,7 @@ public:
   void draw(GlowWind* w, int ll_x, int ll_y, int ur_x, int ur_y);
   void draw(GlowWind* w, int* ll_x, int* ll_y, int* ur_x, int* ur_y);
   void draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
-      void* node, void* colornode);
+      void* node, void* colornode, void *transpnode);
   void get_borders(GlowTransform* t, double* x1_right, double* x1_left,
       double* y1_high, double* y1_low);
   void get_node_borders();

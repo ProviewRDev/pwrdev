@@ -326,7 +326,7 @@ public:
     coordinates for the drawing.
   */
   void draw(GlowWind* w, GlowTransform* t, int highlight, int hot, void* node,
-      void* colornode);
+      void* colornode, void *transpnode);
 
   //! Add a transform to the current transform.
   /*!

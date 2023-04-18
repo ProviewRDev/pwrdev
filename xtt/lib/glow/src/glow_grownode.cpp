@@ -973,7 +973,7 @@ void GrowNode::draw(GlowWind* w, int ll_x, int ll_y, int ur_x, int ur_y)
       && x_left * w->zoom_factor_x - w->offset_x <= ur_x
       && y_high * w->zoom_factor_y - w->offset_y + 1 >= ll_y
       && y_low * w->zoom_factor_y - w->offset_y <= ur_y) {
-    draw(w, (GlowTransform*)NULL, highlight, hot, (void*)this, NULL);
+    draw(w, (GlowTransform*)NULL, highlight, hot, (void*)this, NULL, NULL);
   }
 }
 
@@ -1000,7 +1000,7 @@ void GrowNode::draw(GlowWind* w, int* ll_x, int* ll_y, int* ur_x, int* ur_y)
 
   if (obj_ur_x >= *ll_x && obj_ll_x <= *ur_x && obj_ur_y >= *ll_y
       && obj_ll_y <= *ur_y) {
-    draw(w, (GlowTransform*)NULL, highlight, hot, (void*)this, NULL);
+    draw(w, (GlowTransform*)NULL, highlight, hot, (void*)this, NULL, NULL);
 
     // Increase the redraw area
     if (obj_ur_x > *ur_x)
@@ -1015,7 +1015,7 @@ void GrowNode::draw(GlowWind* w, int* ll_x, int* ll_y, int* ur_x, int* ur_y)
 }
 
 void GrowNode::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
-    void* node, void* colornode)
+    void* node, void* colornode, void *transpnode)
 {
   if (w == &ctx->navw) {
     if (ctx->no_nav)
@@ -1087,12 +1087,12 @@ void GrowNode::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
       GlowTransform trf_tot = *t * trf;
 
       if (!trace.p)
-        nc->draw(w, &trf_tot, highlight, hot, (void*)this, colornode);
+        nc->draw(w, &trf_tot, highlight, hot, (void*)this, colornode, transpnode);
       else
         // If this node has a trace pointer, use colors for this node
-        nc->draw(w, &trf_tot, highlight, hot, (void*)this, (void*)this);
+        nc->draw(w, &trf_tot, highlight, hot, (void*)this, (void*)this, transpnode);
     } else
-      nc->draw(w, &trf, highlight, hot, node, node);
+      nc->draw(w, &trf, highlight, hot, node, node, transpnode);
   } else {
     int x1, x2, y1, y2, x_level = 0, y_level = 0;
     int clip_sts = 0;
@@ -1153,12 +1153,12 @@ void GrowNode::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
       GlowTransform trf_tot = *t * trf;
 
       if (!trace.p)
-        nc->draw(w, &trf_tot, highlight, hot, (void*)this, colornode);
+        nc->draw(w, &trf_tot, highlight, hot, (void*)this, colornode, transpnode);
       else
         // If this node has a trace pointer, use colors for this node
-        nc->draw(w, &trf_tot, highlight, hot, (void*)this, (void*)this);
+        nc->draw(w, &trf_tot, highlight, hot, (void*)this, (void*)this, transpnode);
     } else
-      nc->draw(w, &trf, highlight, hot, node, node);
+      nc->draw(w, &trf, highlight, hot, node, node, transpnode);
     if (ODD(clip_sts))
       ctx->gdraw->reset_clip_rectangle(w);
 
@@ -1208,12 +1208,12 @@ void GrowNode::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
       GlowTransform trf_tot = *t * trf;
 
       if (!trace.p)
-        nc->draw(w, &trf_tot, highlight, hot, (void*)this, colornode);
+        nc->draw(w, &trf_tot, highlight, hot, (void*)this, colornode, transpnode);
       else
         // If this node has a trace pointer, use colors for this node
-        nc->draw(w, &trf_tot, highlight, hot, (void*)this, (void*)this);
+        nc->draw(w, &trf_tot, highlight, hot, (void*)this, (void*)this, transpnode);
     } else
-      nc->draw(w, &trf, highlight, hot, node, node);
+      nc->draw(w, &trf, highlight, hot, node, node, transpnode);
     if (ODD(clip_sts))
       ctx->gdraw->reset_clip_rectangle(w);
 
@@ -1292,11 +1292,11 @@ void GrowNode::set_annotation_input(
         nc->draw_annotation(&trf, highlight, hot, (void*)this, num);
       draw();
     }
-    nc->draw(&ctx->navw, &trf, highlight, 0, (void*)this, (void*)this);
+    nc->draw(&ctx->navw, &trf, highlight, 0, (void*)this, (void*)this, NULL);
   } else {
     root_node->draw();
     root_node->draw(
-        &ctx->navw, (GlowTransform*)NULL, root_node->highlight, 0, NULL, NULL);
+		    &ctx->navw, (GlowTransform*)NULL, root_node->highlight, 0, NULL, NULL, NULL);
   }
 }
 

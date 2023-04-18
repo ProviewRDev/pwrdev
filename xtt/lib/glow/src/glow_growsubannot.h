@@ -124,7 +124,7 @@ public:
     return this->ctx;
   }
   void draw(GlowWind* w, GlowTransform* t, int highlight, int hot, void* node,
-      void* colornode);
+      void* colornode, void *transpnode);
   void set_transform(GlowTransform* t);
   void set_transform_from_stored(GlowTransform* t)
   {

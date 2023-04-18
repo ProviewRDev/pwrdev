@@ -132,7 +132,7 @@ public:
   glow_eHorizDirection direction; //!< Direction, right or left
 
   void draw(GlowWind* w, GlowTransform* t, int highlight, int hot, void* node,
-      void* colornode);
+      void* colornode, void *transpnode);
 
   void draw();
 

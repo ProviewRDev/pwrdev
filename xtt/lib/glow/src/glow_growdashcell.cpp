@@ -199,7 +199,7 @@ void GrowDashCell::get_borders(GlowTransform* t, double* x1_right, double* x1_le
 }
 
 void GrowDashCell::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
-    void* node, void* colornode)
+    void* node, void* colornode, void *transpnode)
 {
   if (w == &ctx->navw) {
     if (ctx->no_nav)
@@ -209,7 +209,7 @@ void GrowDashCell::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
   if (node && !root_node && node != (void*)this)
     root_node = (GrowNode*)node;
 
-  GrowGroup::draw(w, t, highlight, hot, node, colornode);
+  GrowGroup::draw(w, t, highlight, hot, node, colornode, transpnode);
   if (!node)
     node = (void*)this;
   if (!colornode)
@@ -220,9 +220,9 @@ void GrowDashCell::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
 
   if (t) {
     GlowTransform t2 = *t * trf;
-    frame->draw(w, &t2, highlight, hot, node, colornode);
+    frame->draw(w, &t2, highlight, hot, node, colornode, transpnode);
   } else
-    frame->draw(w, &trf, highlight, hot, node, colornode);
+    frame->draw(w, &trf, highlight, hot, node, colornode, transpnode);
 
 }
 

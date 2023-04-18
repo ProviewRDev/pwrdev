@@ -68,11 +68,21 @@ GlowNodeGroup::~GlowNodeGroup()
 
 void GlowNodeGroup::ungroup(GlowTransform* t)
 {
+  GlowArrayElem *parent, *pp;
   a.set_transform(t);
 
   for (int i = 0; i < a.size(); i++) {
-    a[i]->set_parent(0);
-    ctx->insert(a[i]);
+    parent = a[i]->get_parent();
+    if (parent)
+      pp = parent->get_parent();
+    else {
+      pp = 0;
+      a[i]->set_parent(0);
+    }
+    if (pp && pp->type() == glow_eObjectType_GrowLayer)
+      ((GrowLayer*)pp)->insert(a[i]);
+    else
+      ctx->insert(a[i]);
     if (a[i]->type() == glow_eObjectType_GrowNode
         || a[i]->type() == glow_eObjectType_GrowGroup)
       ((GrowNode*)a[i])->ungroup();

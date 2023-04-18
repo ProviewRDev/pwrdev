@@ -157,7 +157,7 @@ public:
     coordinates for the drawing.
   */
   void draw(GlowWind* w, GlowTransform* t, int highlight, int hot, void* node,
-      void* colornode);
+      void* colornode, void *transpnode);
 
   //! Redraw the area inside the objects border.
   void draw();

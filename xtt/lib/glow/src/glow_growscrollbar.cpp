@@ -90,7 +90,7 @@ void GrowScrollBar::draw()
 }
 
 void GrowScrollBar::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
-    void* node, void* colornode)
+    void* node, void* colornode, void *transpnode)
 {
   if (!(display_level & ctx->display_level))
     return;

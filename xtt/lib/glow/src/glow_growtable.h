@@ -203,7 +203,7 @@ public:
     coordinates for the drawing.
   */
   void draw(GlowWind* w, GlowTransform* t, int highlight, int hot, void* node,
-      void* colornode);
+      void* colornode, void *transpnode);
   void draw_brief(GlowWind* w, GlowTransform* t, int highlight, int hot,
       void* node, void* colornode);
 

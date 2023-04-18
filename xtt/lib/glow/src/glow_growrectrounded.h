@@ -472,7 +472,7 @@ public:
     coordinates for the drawing.
   */
   virtual void draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
-      void* node, void* colornode);
+      void* node, void* colornode, void *transpnode);
 
   //! Redraw the area inside the objects border.
   void draw();

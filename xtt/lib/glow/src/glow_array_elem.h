@@ -116,7 +116,7 @@ public:
   virtual void draw(
       GlowWind* w, void* pos, int highlight, int hot, void* node){}
   virtual void draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
-      void* node, void* colornode){}
+      void* node, void* colornode, void *transpnode){}
   //virtual void erase(){}
   //virtual void erase(GlowWind* w, void* pos, int hot, void* node){}
   //virtual void erase(GlowWind* w, GlowTransform* t, int hot, void* node){}

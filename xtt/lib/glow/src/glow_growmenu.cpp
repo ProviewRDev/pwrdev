@@ -60,6 +60,48 @@ GrowMenu::GrowMenu(GrowCtx* glow_ctx, const char* name,
 {
   if (!nodraw)
     draw();
+
+
+  // Calculate size
+  int text_idx = int(trf.vertical_scale(0) * ctx->mw.zoom_factor_y
+          / ctx->mw.base_zoom_factor * (text_size + 4)
+      - 4);
+  double tsize = trf.vertical_scale(0) * ctx->mw.zoom_factor_y / ctx->mw.base_zoom_factor
+      * (8 + 2 * text_size);
+  text_idx = MIN(text_idx, DRAW_TYPE_SIZE - 1);
+  text_idx = MAX(0, text_idx);
+  int z_width, z_height = 0, z_descent;
+  int max_z_width = 0;
+  double tot_z_height = 0;
+  int i;
+  int pulldown_found = 0;
+  int ll_x, ll_y, ur_x, ur_y;
+  item_cnt = 0;
+  for (i = 0; i < (int)(sizeof(info.item) / sizeof(info.item[0])); i++) {
+    if (info.item[i].occupied) {
+      ctx->gdraw->get_text_extent(info.item[i].text, strlen(info.item[i].text),
+          text_drawtype, MAX(0, text_idx), font, &z_width, &z_height,
+          &z_descent, tsize, 0);
+      if (z_width > max_z_width)
+        max_z_width = z_width;
+      tot_z_height += int(1.6 * z_height);
+      if (info.item[i].type == glow_eMenuItem_PulldownMenu)
+        pulldown_found = 1;
+      item_cnt++;
+    }
+  }
+  if (item_cnt) {
+    int arrow_size = z_height * 4 / 5;
+    ll_x = int(ll.x * ctx->mw.zoom_factor_x) - ctx->mw.offset_x;
+    ll_y = int(ll.y * ctx->mw.zoom_factor_y) - ctx->mw.offset_y;
+    ur_x = ll_x + max_z_width + 15 + int(pulldown_found * arrow_size);
+    if (ur_x - ll_x < int(min_width * ctx->mw.zoom_factor_x))
+      ur_x = ll_x + int(min_width * ctx->mw.zoom_factor_x);
+    ur_y = ll_y + int(tot_z_height);
+    ur.posit_z(ur_x + ctx->mw.offset_x, ur_y + ctx->mw.offset_y);
+    get_node_borders();
+  }
+
 }
 
 GrowMenu::~GrowMenu()
@@ -111,7 +153,7 @@ void GrowMenu::draw(GlowWind* w, int ll_x, int ll_y, int ur_x, int ur_y)
       && x_left * w->zoom_factor_x - w->offset_x <= ur_x
       && y_high * w->zoom_factor_y - w->offset_y + 1 >= ll_y
       && y_low * w->zoom_factor_y - w->offset_y <= ur_y) {
-    draw(w, (GlowTransform*)NULL, highlight, hot, NULL, NULL);
+    draw(w, (GlowTransform*)NULL, highlight, hot, NULL, NULL, NULL);
   }
 }
 
@@ -138,7 +180,7 @@ void GrowMenu::draw(GlowWind* w, int* ll_x, int* ll_y, int* ur_x, int* ur_y)
 
   if (obj_ur_x >= *ll_x && obj_ll_x <= *ur_x && obj_ur_y >= *ll_y
       && obj_ll_y <= *ur_y) {
-    draw(w, (GlowTransform*)NULL, highlight, hot, NULL, NULL);
+    draw(w, (GlowTransform*)NULL, highlight, hot, NULL, NULL, NULL);
 
     // Increase the redraw area
     if (obj_ur_x > *ur_x)
@@ -153,7 +195,7 @@ void GrowMenu::draw(GlowWind* w, int* ll_x, int* ll_y, int* ur_x, int* ur_y)
 }
 
 void GrowMenu::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
-    void* node, void* colornode)
+    void* node, void* colornode, void *transpnode)
 {
   if (!(display_level & ctx->display_level))
     return;

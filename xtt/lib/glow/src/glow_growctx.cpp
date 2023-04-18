@@ -2867,7 +2867,7 @@ void GrowCtx::scale_select(double scale_x, double scale_y, glow_eScaleType type)
       int(ll_y * mw.zoom_factor_y) - mw.offset_y - DRAW_MP,
       int(ur_x * mw.zoom_factor_x) - mw.offset_x + DRAW_MP,
       int(ur_y * mw.zoom_factor_y) - mw.offset_y + DRAW_MP);
-  a_sel.draw(&navw, (GlowTransform*)NULL, 1, 0, NULL, NULL);
+  a_sel.draw(&navw, (GlowTransform*)NULL, 1, 0, NULL, NULL, NULL);
   for (int i = 0; i < a_sel.size(); i++)
     redraw_node_cons(a_sel[i]);
   redraw_defered();
@@ -2921,7 +2921,7 @@ void GrowCtx::rotate_select(double angle, glow_eRotationPoint type)
       ll_y * mw.zoom_factor_y - mw.offset_y - DRAW_MP,
       ur_x * mw.zoom_factor_x - mw.offset_x + DRAW_MP,
       ur_y * mw.zoom_factor_y - mw.offset_y + DRAW_MP);
-  a_sel.draw(&navw, (GlowTransform*)NULL, 1, 0, NULL, NULL);
+  a_sel.draw(&navw, (GlowTransform*)NULL, 1, 0, NULL, NULL, NULL);
   redraw_defered();
 }
 
@@ -2950,7 +2950,7 @@ void GrowCtx::flip_select(glow_eFlipDirection dir)
       ll_y * mw.zoom_factor_y - mw.offset_y - DRAW_MP,
       ur_x * mw.zoom_factor_x - mw.offset_x + DRAW_MP,
       ur_y * mw.zoom_factor_y - mw.offset_y + DRAW_MP);
-  a_sel.draw(&navw, (GlowTransform*)NULL, 1, 0, NULL, NULL);
+  a_sel.draw(&navw, (GlowTransform*)NULL, 1, 0, NULL, NULL, NULL);
   redraw_defered();
 }
 
@@ -4066,7 +4066,7 @@ int GrowCtx::ungroup_select()
   for (i = 0; i < a_sel.size(); i++) {
     if (a_sel[i]->type() == glow_eObjectType_GrowGroup) {
       group = (GrowGroup*)a_sel[i];
-      if (group->parent)
+      if (group->parent && group->parent->type() == glow_eObjectType_GrowGroup)
         return 0;
     }
   }

@@ -103,7 +103,7 @@ void GrowAnnot::open(std::ifstream& fp)
 }
 
 void GrowAnnot::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
-    void* node, void* colornode)
+    void* node, void* colornode, void *transpnode)
 {
   int x1, y1;
 

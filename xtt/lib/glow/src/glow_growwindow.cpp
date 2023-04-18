@@ -199,7 +199,7 @@ void GrowWindow::draw(GlowWind* w, int ll_x, int ll_y, int ur_x, int ur_y)
       && x_left * w->zoom_factor_x - w->offset_x <= ur_x
       && y_high * w->zoom_factor_y - w->offset_y >= ll_y
       && y_low * w->zoom_factor_y - w->offset_y <= ur_y) {
-    draw(w, (GlowTransform*)NULL, highlight, hot, NULL, NULL);
+    draw(w, (GlowTransform*)NULL, highlight, hot, NULL, NULL, NULL);
   }
 }
 
@@ -226,7 +226,7 @@ void GrowWindow::draw(GlowWind* w, int* ll_x, int* ll_y, int* ur_x, int* ur_y)
 
   if (obj_ur_x >= *ll_x && obj_ll_x <= *ur_x && obj_ur_y >= *ll_y
       && obj_ll_y <= *ur_y) {
-    draw(w, (GlowTransform*)NULL, highlight, hot, NULL, NULL);
+    draw(w, (GlowTransform*)NULL, highlight, hot, NULL, NULL, NULL);
 
     // Increase the redraw area
     if (obj_ur_x > *ur_x)
@@ -247,7 +247,7 @@ void GrowWindow::set_highlight(int on)
 }
 
 void GrowWindow::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
-    void* node, void* colornode)
+    void* node, void* colornode, void *transpnode)
 {
   if (w == &ctx->navw) {
     draw_brief(w, t, highlight, hot, node, colornode);
@@ -289,7 +289,7 @@ void GrowWindow::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
     else
       v_scrollbar->set_position(dx2 - scrollbar_width, dy1 + y_low_offs,
           scrollbar_width, dy2 - (dy1 + y_low_offs) - scrollbar_width);
-    v_scrollbar->draw(w, 0, 0, 0, 0, 0);
+    v_scrollbar->draw(w, 0, 0, 0, 0, 0, 0);
   }
   if (h_scrollbar) {
     if (!v_scrollbar)
@@ -298,7 +298,7 @@ void GrowWindow::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
     else
       h_scrollbar->set_position(dx1, dy2 - scrollbar_width,
           dx2 - dx1 - scrollbar_width, scrollbar_width);
-    h_scrollbar->draw(w, 0, 0, 0, 0, 0);
+    h_scrollbar->draw(w, 0, 0, 0, 0, 0, 0);
   }
   ll_x = int(dx1 * w->zoom_factor_x) - w->offset_x;
   ll_y = int((dy1 + y_low_offs) * w->zoom_factor_y) - w->offset_y;
@@ -1043,9 +1043,9 @@ void GrowWindow::draw_background()
   dy2 = MAX(dy1, dy2);
 
   if (v_scrollbar)
-    v_scrollbar->draw(&ctx->mw, 0, 0, 0, 0, 0);
+    v_scrollbar->draw(&ctx->mw, 0, 0, 0, 0, 0, 0);
   if (h_scrollbar)
-    h_scrollbar->draw(&ctx->mw, 0, 0, 0, 0, 0);
+    h_scrollbar->draw(&ctx->mw, 0, 0, 0, 0, 0, 0);
 
   ll_x = int(dx1 * ctx->mw.zoom_factor_x) - ctx->mw.offset_x;
   ll_y = int((dy1 + y_low_offs) * ctx->mw.zoom_factor_y) - ctx->mw.offset_y;

@@ -330,7 +330,7 @@ void GrowPolyLine::calculate_shadow(glow_sShadowInfo** s, int* num, int ish,
 }
 
 void GrowPolyLine::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
-    void* node, void* colornode)
+    void* node, void* colornode, void *transpnode)
 {
   if (w == &ctx->navw) {
     if (ctx->no_nav)
@@ -356,6 +356,8 @@ void GrowPolyLine::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
   double transp = transparency;
   if (colornode && ((GrowNode*)colornode)->transparency > transparency)
     transp = ((GrowNode*)colornode)->transparency;
+  if (transpnode && ((GrowNode*)transpnode)->transparency > transp)
+    transp = ((GrowNode*)transpnode)->transparency;
 
   if (fixcolor)
     colornode = 0;
@@ -1030,7 +1032,7 @@ void GrowPolyLine::draw(GlowWind* w, int ll_x, int ll_y, int ur_x, int ur_y)
       && x_left * w->zoom_factor_x - w->offset_x <= ur_x
       && y_high * w->zoom_factor_y - w->offset_y >= ll_y
       && y_low * w->zoom_factor_y - w->offset_y <= ur_y) {
-    draw(w, (GlowTransform*)NULL, highlight, hot, NULL, NULL);
+    draw(w, (GlowTransform*)NULL, highlight, hot, NULL, NULL, NULL);
   }
 }
 
@@ -1057,7 +1059,7 @@ void GrowPolyLine::draw(GlowWind* w, int* ll_x, int* ll_y, int* ur_x, int* ur_y)
 
   if (obj_ur_x >= *ll_x && obj_ll_x <= *ur_x && obj_ur_y >= *ll_y
       && obj_ll_y <= *ur_y) {
-    draw(w, (GlowTransform*)NULL, highlight, hot, NULL, NULL);
+    draw(w, (GlowTransform*)NULL, highlight, hot, NULL, NULL, NULL);
 
     // Increase the redraw area
     if (obj_ur_x > *ur_x)

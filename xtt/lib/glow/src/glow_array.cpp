@@ -1218,12 +1218,12 @@ void GlowArray::draw(GlowWind* w, void* pos, int highlight, int hot, void* node)
 }
 
 void GlowArray::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
-    void* node, void* colornode)
+    void* node, void* colornode, void *transpnode)
 {
   int i;
 
   for (i = 0; i < a_size; i++) {
-    a[i]->draw(w, t, highlight, hot, node, colornode);
+    a[i]->draw(w, t, highlight, hot, node, colornode, transpnode);
   }
 }
 
