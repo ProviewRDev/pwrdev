@@ -484,6 +484,11 @@ typedef pwr_tEnum pwr_tOpSysEnum; //!< Operating system enum.
 typedef pwr_tMask pwr_tOpSysMask; //!< Operating system Mask.
 
 /*_*
+  @aref popeidtorenum PopEditorEnum
+*/
+typedef pwr_tEnum pwr_tPopEditorEnum; //!< Pop editor enum.
+
+/*_*
   @aref reflistlfiltermask RefListFilterMask
 */
 typedef enum {
