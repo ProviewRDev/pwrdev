@@ -56,7 +56,7 @@ FlowTipText::~FlowTipText()
 
 void FlowTipText::draw_text(FlowArrayElem* e, char* text, int x, int y)
 {
-  int z_width, z_height;
+  double z_width, z_height;
   int row;
   char *s, *t;
 

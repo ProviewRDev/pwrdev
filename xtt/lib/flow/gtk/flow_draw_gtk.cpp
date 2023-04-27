@@ -2176,7 +2176,7 @@ void FlowDrawGtk::set_nav_cursor(FlowCtx* ctx, draw_eCursor cursor)
 }
 
 int FlowDrawGtk::get_text_extent(FlowCtx* ctx, const char* text, int len,
-    flow_eDrawType gc_type, int idx, int* width, int* height, double size)
+    flow_eDrawType gc_type, int idx, double* width, double* height, double size)
 {
   cairo_text_extents_t extents;
 
