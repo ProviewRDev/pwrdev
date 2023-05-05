@@ -2167,32 +2167,6 @@ logout <LINK> logout
 show user <LINK> show user
 </TOPIC>
 
-<TOPIC> show message <style> function
-Command   show message
-
-Öppna ett fönster med ett meddelande.
-
-<B>xtt> show message /text= [/title=]
-
-/text 	    <t>Meddelande.
-/title      <t>Titel på fönstret.
-</TOPIC>
-
-<TOPIC> show objectlist <style> function
-Command   show objectlist
-
-Öppna ett fönster med en lista på all objekt av en specific klass eller
-att antal specifika klasser. När ett objekt i listan aktiveras öppnas
-objektsbilden för objektet.
-
-<B>xtt> show objectlist /class= [/title=] [/sort]
-
-/class <t>Namn på en klass, eller flera klasser avgränsade med
-       <t>komma-tecken.
-/title <t>Titel på fönstret.
-/sort  <t>Objekten sorteras i alfabetisk ordning.
-</TOPIC>
-
 <TOPIC> logout <style> function
 Kommando   logout
 
@@ -2400,6 +2374,23 @@ Letar efter ett objektsnamn eller en sträng.
 <B>xtt> search /next
 </TOPIC>
 
+<TOPIC> plcscan <style> function
+Kommando   plcscan
+
+Sätt plc scan till eller från för alla plcprogram eller för
+utvalt eller specificerat program.
+
+System privileger krävs.
+
+<B>xtt> plcscan [/on] [/off] [/all] [/name=]
+
+/on   <t>Sätt scan till.
+/off  <t>Sätt scan från.
+/all  <t>Sätt scan till eller från för alla plcprogram.
+/name <t>Sätt scan till eller från för specificerat plcprogram eller
+      <t>fönster.
+</TOPIC>
+
 <TOPIC> read object <style> function
 Kommando   read object
 
@@ -2548,6 +2539,44 @@ Kommando   show eventlist
 Öppna händleslistan.
 
 <B>xtt> show eventlist
+</TOPIC>
+
+<TOPIC> show message <style> function
+Command   show message
+
+Öppna ett fönster med ett meddelande.
+
+<B>xtt> show message /text= [/title=]
+
+/text 	    <t>Meddelande.
+/title      <t>Titel på fönstret.
+</TOPIC>
+
+<TOPIC> show objectlist <style> function
+Command   show objectlist
+
+Öppna ett fönster med en lista på all objekt av en specific klass eller
+att antal specifika klasser. När ett objekt i listan aktiveras öppnas
+objektsbilden för objektet.
+
+<B>xtt> show objectlist /class= [/title=] [/sort]
+
+/class <t>Namn på en klass, eller flera klasser avgränsade med
+       <t>komma-tecken.
+/title <t>Titel på fönstret.
+/sort  <t>Objekten sorteras i alfabetisk ordning.
+</TOPIC>
+
+<TOPIC> show objid <style> function
+Kommando   show objid
+
+Visar objektsidentitet för ett objekt.
+Om namn inte är angivet, visas identiteten för utvalt objekt.
+
+<B>xtt> show objid [/name=] [/hexadecimal]
+
+/name <t>Namn på objektet.
+/hexadecimal  <t>Visar objektindex i hexadecimal form.
 </TOPIC>
 
 <TOPIC> show user <style> function

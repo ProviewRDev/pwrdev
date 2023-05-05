@@ -1660,6 +1660,7 @@ login       <t>User login			<LINK> login
 logout      <t>User logout			<LINK> logout
 logging     <t>Logg attributes to file		<LINK> logging
 open	    <t>Open various windows		<LINK> open
+plcscan	    <t>Set plc scan on or off		<LINK> plcscan
 read object <t>Read the content of an object from file <LINK> read object
 search	<t>Search for an object or a string 	<LINK> search
 set advanceduser<t>Set advanced user		<LINK> set advanceduser
@@ -2613,6 +2614,22 @@ Search for an objectname or a string.
 <B>xtt> search /next
 </TOPIC>
 
+<TOPIC> plcscan <style> function
+Command   plcscan
+
+Set plc scan on or off for all plc programs or for selected or
+specified program.
+
+System privilege is required.
+
+<B>xtt> plcscan [/on] [/off] [/all] [/name=]
+
+/on   <t>Set scan on.
+/off  <t>Set scan off.
+/all  <t>Set scan on or off for all plc programs.
+/name <t>Set scan on or off for specified plc program or window.
+</TOPIC>
+
 <TOPIC> read object <style> function
 Command   read object
 
@@ -2772,14 +2789,6 @@ Open the eventlist window.
 <B>xtt> show eventlist
 </TOPIC>
 
-<TOPIC> show user <style> function
-Command   show user
-
-Show the current user and his privileges.
-
-<B>xtt> show user
-</TOPIC>
-
 <TOPIC> show message <style> function
 Command   show message
 
@@ -2804,6 +2813,27 @@ activated, the object graph for the object is opened.
        <t>separated by comma.
 /title <t>Title of the list dialog.
 /sort  <t>The objects are sorted in alphabetical order.
+</TOPIC>
+
+<TOPIC> show objid <style> function
+Command   show objid
+
+Display object identity for an object.
+If name is not specified, the identity for the selected object
+is displayed.
+
+<B>xtt> show objid [/name=] [/hexadecimal]
+
+/name <t>The name of the object.
+/hexadecimal  <t>Displays the object index in hex.
+</TOPIC>
+
+<TOPIC> show user <style> function
+Command   show user
+
+Show the current user and his privileges.
+
+<B>xtt> show user
 </TOPIC>
 
 <TOPIC> sound <style> function

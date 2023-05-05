@@ -216,6 +216,7 @@ static int xnav_read_func(void* client_data, void* client_flag);
 static int xnav_wait_func(void* client_data, void* client_flag);
 static int xnav_oplog_func(void* client_data, void* client_flag);
 static int xnav_emit_func(void* client_data, void* client_flag);
+static int xnav_plcscan_func(void* client_data, void* client_flag);
 
 dcli_tCmdTable xnav_command_table[] = {
   { "SHOW", &xnav_show_func,
@@ -224,7 +225,7 @@ dcli_tCmdTable xnav_command_table[] = {
           "/ALL", "/TYPE", "/OPTION", "/ENTRY", "/NEW", "/TITLE", "/WINDOW",
           "/ALARMVIEW", "/WIDTH", "/HEIGHT", "/XPOSITION", "/YPOSITION",
 	  "/FULLSCREEN", "/MAXIMIZE", "/FULLMAXIMIZE", "/SORT", 
-	  "/TEXT","/LAYOUT", "/GLOBAL", "/ALPHAORDER", "" } },
+	  "/TEXT","/LAYOUT", "/GLOBAL", "/ALPHAORDER", "/HEXADECIMAL", "" } },
   { "OPEN", &xnav_open_func,
       { "dcli_arg1", "dcli_arg2", "/NAME", "/FILE", "/SCROLLBAR", "/WIDTH",
           "/HEIGHT", "/MENU", "/NAVIGATOR", "/CENTER", "/OBJECT", "/NEW",
@@ -313,6 +314,8 @@ dcli_tCmdTable xnav_command_table[] = {
       { "dcli_arg1", "/FILE", "/SPEED", "/PID", "/EVENT", "" } },
   { "EMIT", &xnav_emit_func,
       { "dcli_arg1", "/SIGNALNAME", "/GRAPH", "/INSTANCE", "" } },
+  { "PLCSCAN", &xnav_plcscan_func,
+      { "/ON", "/OFF", "/ALL", "/NAME", "" } },
   {
       "", NULL, { "" }
   }
@@ -1707,9 +1710,13 @@ static int xnav_show_func(void* client_data, void* client_flag)
     /* Command is "SHOW OBJID" */
     pwr_tOName name_str;
     pwr_tObjid objid;
-    char msg[220];
+    char msg[240];
+    int hex;
 
     IF_NOGDH_RETURN;
+
+    hex = ODD(dcli_get_qualifier("/HEXADECIMAL", 0, 0));
+
     if (ODD(dcli_get_qualifier("/NAME", name_str, sizeof(name_str)))) {
       sts = gdh_NameToObjid(name_str, &objid);
       if (EVEN(sts)) {
@@ -1730,7 +1737,11 @@ static int xnav_show_func(void* client_data, void* client_flag)
       }
     }
 
-    sprintf(msg, "Objid %s, Name %s", cdh_ObjidToString(objid, 0), name_str);
+    if (hex)
+      sprintf(msg, "Objid %s%08x, Name %s", cdh_VolumeIdToString(0, 0, objid.vid, 0, 1), 
+	  objid.oix, name_str);
+    else
+      sprintf(msg, "Objid %s, Name %s", cdh_ObjidToString(objid, 0), name_str);
     xnav->message('I', msg);
     return XNAV__SUCCESS;
   }
@@ -7953,6 +7964,135 @@ static int xnav_emit_func(void* client_data, void* client_flag)
   } else {
     xnav->message('E', "Syntax error");
     return XNAV__HOLDCOMMAND;
+  }
+  return XNAV__SUCCESS;
+}
+
+static int xnav_plcscan_func(void* client_data, void* client_flag)
+{
+  XNav* xnav = (XNav*)client_data;
+
+  int on, off, all;
+  pwr_tStatus sts;
+  pwr_tOid poid;
+  pwr_tOid woid;
+  pwr_tCid cid;
+  pwr_tAttrRef aref, scanoff_aref;
+  int is_attr;
+  pwr_tBoolean value;
+  pwr_tOName name_str;
+
+  if (!(xnav->priv & pwr_mPrv_System)) {
+    xnav->message('E', "Not authorized for this operation");
+    return XNAV__SUCCESS;
+  }
+
+  on = ODD(dcli_get_qualifier("/ON", 0, 0));
+  off = ODD(dcli_get_qualifier("/OFF", 0, 0));
+  all = ODD(dcli_get_qualifier("/ALL", 0, 0));
+
+  if ((on && off) || (!on && !off)) {
+    xnav->message('E', "Syntax error");
+    return XNAV__HOLDCOMMAND;
+  }
+
+  if (all) {
+
+    for (sts = gdh_GetClassList(pwr_cClass_plc, &poid); 
+	 ODD(sts);
+	 sts = gdh_GetNextObject(poid, &poid)) {
+      sts = gdh_GetChild(poid, &woid);
+      if (EVEN(sts))
+	continue;
+
+      sts = gdh_GetObjectClass(woid, &cid);
+      if (EVEN(sts))
+	return sts;
+      if (!(cid == pwr_cClass_windowplc || 
+	    cid == pwr_cClass_windowcond ||
+	    cid == pwr_cClass_windowsubstep ||
+	    cid == pwr_cClass_windoworderact))
+	continue;
+
+      aref = cdh_ObjidToAref(woid);
+      sts = gdh_ArefANameToAref(&aref, "ScanOff", &scanoff_aref);
+      if (EVEN(sts))
+	return sts;
+
+      if (on)
+	value = 0;
+      else if (off)
+	value = 1;
+
+      sts = gdh_SetObjectInfoAttrref(&scanoff_aref, &value, sizeof(value));
+      if (EVEN(sts))
+	return sts;
+    }
+    if (on)
+      xnav->message('I', "Plc scan set on for all programs");
+    else
+      xnav->message('I', "Plc scan set off for all programs");
+
+  }
+  else {
+    if (ODD(dcli_get_qualifier("/NAME", name_str, sizeof(name_str)))) {
+      sts = gdh_NameToObjid(name_str, &poid);
+      if (EVEN(sts)) {
+        xnav->message('E', "No such object");
+        return XNAV__HOLDCOMMAND;
+      }
+
+    } else {
+      sts = xnav->get_select(&aref, &is_attr);
+      if (EVEN(sts)) {
+	xnav->message('E', "Enter name or select object");
+	return XNAV__SUCCESS;
+      }
+      poid = aref.Objid;
+    }
+
+    sts = gdh_GetObjectClass(poid, &cid);
+    if (EVEN(sts))
+      return sts;
+
+    if (cid == pwr_cClass_plc) {
+      sts = gdh_GetChild(poid, &woid);
+      if (EVEN(sts))
+	return sts;
+    }
+    else
+      woid = poid;
+
+    sts = gdh_GetObjectClass(woid, &cid);
+    if (EVEN(sts))
+      return sts;
+    if (!(cid == pwr_cClass_windowplc || 
+	  cid == pwr_cClass_windowcond ||
+	  cid == pwr_cClass_windowsubstep ||
+	  cid == pwr_cClass_windoworderact)) {
+      xnav->message('E', "Object is not plcpgm or plc window");
+      return XNAV__HOLDCOMMAND;
+    }
+
+    aref = cdh_ObjidToAref(woid);
+    sts = gdh_ArefANameToAref(&aref, "ScanOff", &scanoff_aref);
+    if (EVEN(sts))
+      return sts;
+
+    if (on)
+      value = 0;
+    else if (off)
+      value = 1;
+
+    sts = gdh_SetObjectInfoAttrref(&scanoff_aref, &value, sizeof(value));
+    if (EVEN(sts))
+      return sts;
+
+    if (on)
+      xnav->message('I', "Plc scan set on");
+    else
+      xnav->message('I', "Plc scan set off");
+
   }
   return XNAV__SUCCESS;
 }
