@@ -1,0 +1,614 @@
+#include <cstdint>
+#include <sstream>
+#include <ctime>
+#include <unistd.h>
+#include <algorithm>
+#include <iostream>
+#include <vector>
+#include <map>
+
+#include "rt_errh.h"
+#include "rt_gdh.h"
+#include "rt_aproc.h"
+#include "rt_pwr_msg.h"
+#include "rt_qcom_msg.h"
+#include "rt_ini_event.h"
+#include "co_error.h"
+#include "co_cdh.h"
+#include "co_dcli.h"
+#include "co_string.h"
+#include "pwr_ssaboxclasses.h"
+
+#include "export_rtdb_pre_v61.h"
+#include "export_rtdb_cjson.h"
+#include "export_rtdb_avro.h"
+#include "export_rtdb_gdh.h"
+#include "export_rtdb_kafka.h"
+#include "export_rtdb_http.h"
+
+extern int exp_debug;
+int exp_debug = 0;
+
+static const char* default_schema_registry = "schema-registry-kafka.apps.se-oxd-ocp.ssab.com";
+static const char* default_config_file = "$pwrp_load/kafka_config.ini";
+static const char json_filename[] = "$pwrp_load/select.json";
+
+class rs_export_rtdb {
+public:
+  rs_export_rtdb() : m_confobj(0), m_confdlid(pwr_cNDlid), m_scantime(1), m_msg_idx(0), 
+		     m_frequency(0), m_batches(0), m_schema_id(0), m_anix(errh_eAnix_appl20),
+		     m_last_msg_err(0)
+  {
+    strcpy(m_schema_url, "");
+  }
+
+  pwr_tURL m_schema_url;
+  pwr_sClass_Ssab_ExportRtdbServer *m_confobj;
+  pwr_tDlid m_confdlid;
+  float m_scantime;
+  std::ostringstream m_json_string;
+  int m_msg_idx;
+  int m_frequency;
+  int m_batches;
+  uint32_t m_schema_id;
+  errh_eAnix m_anix;
+  int m_last_msg_err;
+
+  void get_confobj();
+  std::string to_utf8(std::string &str);
+  std::string fix_name(std::string key);
+  int gen_schema_main();
+  int scan();
+  char* read_file(const char *filename);
+  cJSON* parse_file(const char *filename);
+  int init(qcom_sQid* qid);
+  void open(int argc, char**argv);
+};
+
+struct asdf {
+  pwr_tAttrRef aref;
+  pwr_eType type;
+  uint32_t flags;
+  bool to_send;
+};
+typedef struct asdf asdfs;
+std::map<std::string, asdfs> arefs;
+
+void rs_export_rtdb::get_confobj() {
+  pwr_tStatus sts;
+  pwr_tOid confoid;
+
+  sts = gdh_GetClassList(pwr_cClass_Ssab_ExportRtdbServer, &confoid);
+  if (ODD(sts)) {
+    pwr_sAttrRef aref = cdh_ObjidToAref(confoid);
+    sts = gdh_DLRefObjectInfoAttrref(&aref, (void**)&m_confobj, &m_confdlid);
+    aproc_RegisterObject(confoid); 
+  }
+  if (EVEN(sts)) {
+    m_confobj = (pwr_sClass_Ssab_ExportRtdbServer*)calloc(1, sizeof(*m_confobj));
+    m_confobj->ScanTime = 1;
+    m_confobj->ServerConnection = pwr_eSsabDbServerConnection_Down;
+  }
+}
+
+// This function converts from latin1 encoding to utf8
+std::string rs_export_rtdb::to_utf8(std::string &str) {
+  std::string res = "";
+  for (int i = 0; i < str.size(); i++) {
+    unsigned char in = str[i];
+    if (in < 128) {
+      res += in;
+    } else {
+      res += 0xc2 + (in > 0xbf);
+      res += (in & 0x3f) + 0x80;
+    }
+  }
+  return res;
+}
+
+// This function replaces characters that are invalid in kafka with characters that are valid
+std::string rs_export_rtdb::fix_name(std::string key) {
+  std::string tmp(key);
+  int index = tmp.find_first_of(':');
+  tmp.erase(index, 1);
+  tmp.insert(index, "__");
+  std::replace(tmp.begin(), tmp.end(), '-', '_');
+  index = tmp.find_first_of('.');
+  tmp.erase(index, 1);
+  tmp.insert(index, "__");
+  std::replace(tmp.begin()+index, tmp.end(), '.', '_');
+  return tmp;
+}
+
+
+/*
+ * This function generates the kafka scheam JSON and sends it to kafka.
+ */
+int rs_export_rtdb::gen_schema_main() {
+  int res = 1;
+  m_json_string.str("");
+  if (m_batches > 1) {
+    m_json_string << "{";
+    m_json_string << "\"type\":\"record\",";
+    m_json_string << "\"name\":\"Parent\",";
+    m_json_string << "\"fields\":[";
+    m_json_string << "{";
+    m_json_string << "\"name\":\"events\",";
+    m_json_string << "\"type\": {";
+    m_json_string << "\"type\":\"array\",";
+    m_json_string << "\"items\":";
+  }
+  m_json_string << "{";
+  m_json_string << "\"type\":\"record\",";
+  m_json_string << "\"name\":\"Event\",";
+  m_json_string << "\"fields\":[";
+  m_json_string << "{\"name\":\"timestamp\",\"type\":{\"type\":\"long\",\"logicalType\":\"timestamp-millis\"}},";
+  m_json_string << "{\"name\":\"index\",\"type\":\"int\",\"default\":0},";
+
+  for (std::map<std::string, asdfs>::iterator it = arefs.begin(); it != arefs.end(); it++) {
+    std::string fixed = fix_name(it->first);
+    m_json_string << "{\"name\":\"" << to_utf8(fixed) << "\",\"type\":" << pwr_eType_to_str(it->second.type) << ",\"default\": null},";
+  }
+
+  std::string tmp = m_json_string.str();
+  tmp.erase(tmp.rfind(','));
+  tmp += "]}";
+  if (m_batches > 1) {
+    tmp += "}}]}";
+  }
+
+  std::string a("\""), b("\\\"");
+  int pos = 0;
+  while ((pos = tmp.find(a, pos)) != std::string::npos) {
+    tmp.replace(pos, a.length(), b);
+    pos += b.length();
+  }
+
+  tmp = "{\"schema\":\"" + tmp + "\"}";
+
+  try {
+    long res2;
+
+    std::string url = m_schema_url;
+    std::string path = "/subjects/";
+    path += kafka_get_topic();
+    path += "-value/versions";
+    for (int i = 0; i < 5; i++) {
+      res2 = http_request(url.c_str(), path.c_str(), tmp.c_str());
+      if (res2 > 0)
+	break;
+      fprintf(stderr, "ERROR, did not receive a valid schema id from kafka registry, retrying.\n");
+      sleep(3);
+    }
+    if (res2 <= 0) {
+      fprintf(stderr, "ERROR, did not receive a valid schema id from kafka registry, exiting.\n");
+      errh_SetStatus(PWR__SRVTERM);
+      res = 0;
+    } else {
+      m_schema_id = res2;
+      printf("schema_id: %d\n", m_schema_id);
+    }
+  } catch (std::runtime_error& e) {
+    std::cerr << "Error sending schema to registry " << e.what() << '\n';
+  }
+  if (exp_debug) {
+    pwr_tFileName fname;
+    dcli_translate_filename(fname, "$pwrp_log/avro_schema.json");
+    FILE* fp = fopen(fname, "w");
+    fprintf(fp, "%s", tmp.c_str());
+    fclose(fp);
+  }
+  return res;
+}
+
+int freqCounter = 0;
+int batch = 0;
+AvroEncoder avro_encoder = AvroEncoder();
+
+int rs_export_rtdb::scan() {
+  aproc_TimeStamp(m_scantime, m_scantime * 5); 
+
+  if (freqCounter % m_frequency != 0) {
+    freqCounter++;
+    return 0;
+  } else {
+    freqCounter -= m_frequency;
+  }
+
+  struct timeval start, end, elapsed;
+  gettimeofday(&start, NULL);
+
+  if (batch == 0) {
+    avro_encoder.clear();
+    avro_encoder.encodeBool(false);
+    uint32_t schema_id2 = htonl(m_schema_id);
+    avro_encoder.encodeFixed((uint8_t*)&schema_id2, sizeof(schema_id2));
+    if (m_batches > 1) {
+      avro_encoder.setItemCount(m_batches);
+    }
+  }
+  timeval tv;
+  gettimeofday(&tv, NULL);
+  uint64_t ms = (tv.tv_sec * (uint64_t)1000) + (tv.tv_usec / 1000);
+  avro_encoder.encodeLong(ms);
+  avro_encoder.encodeInt(m_msg_idx);
+
+  for (std::map<std::string, asdfs>::iterator it = arefs.begin(); it != arefs.end(); it++) {
+    if (!it->second.to_send) {
+      avro_encoder.encodeUnionIndex(0);
+      continue;
+    }
+    if (it->second.type == 0) {
+      fprintf(stderr, "%s has typeid 0\n", it->first.c_str());
+      continue;
+    }
+    void* value_ptr;
+    gdh_AttrRefToPointer(&it->second.aref, &value_ptr);
+    pwr_tStatus sts = encode_val(avro_encoder, it->second.type, it->second.flags & PWR_MASK_POINTER, &it->second.aref, value_ptr);
+    if (EVEN(sts)) return sts;
+  }
+
+  batch++;
+  if (batch == m_batches) {
+    if (m_batches > 1) {
+      avro_encoder.arrayEnd();
+    }
+    //fprintf(stderr, "Package size: %d bytes\n", avro_encoder.out.size());
+
+    send_kafka_key_val(avro_encoder.out.data(), avro_encoder.out.size());
+	
+    kafka_flush(1000);
+    batch -= m_batches;
+  }
+
+  gettimeofday(&end, NULL);
+  timersub(&end, &start, &elapsed);
+
+  if (exp_debug)
+    printf("\r%d %ld us", m_msg_idx, elapsed.tv_usec);
+
+  m_msg_idx++;
+
+  return 0;
+}
+
+/*
+ * This function just reads an entire file to a char array
+ */
+char* rs_export_rtdb::read_file(const char *filename) {
+  FILE *file = NULL;
+  long length = 0;
+  char *content = NULL;
+  size_t read_chars = 0;
+
+  /* open in read binary mode */
+  file = fopen(filename, "rb");
+  if (file == NULL) {
+    goto cleanup;
+  }
+
+  /* get the length */
+  if (fseek(file, 0, SEEK_END) != 0) {
+    goto cleanup;
+  }
+  length = ftell(file);
+  if (length < 0) {
+    goto cleanup;
+  }
+  if (fseek(file, 0, SEEK_SET) != 0) {
+    goto cleanup;
+  }
+
+  /* allocate content buffer */
+  content = (char*)malloc((size_t)length + sizeof(""));
+  if (content == NULL) {
+    goto cleanup;
+  }
+
+  /* read the file into memory */
+  read_chars = fread(content, sizeof(char), (size_t)length, file);
+  if ((long)read_chars != length) {
+    free(content);
+    content = NULL;
+    goto cleanup;
+  }
+  content[read_chars] = '\0';
+
+cleanup:
+  if (file != NULL) {
+    fclose(file);
+  }
+
+  return content;
+}
+
+cJSON* rs_export_rtdb::parse_file(const char *filename) {
+  cJSON *parsed = NULL;
+  char *content = read_file(filename);
+
+  parsed = cJSON_Parse(content);
+  if (content != NULL) {
+    free(content);
+  }
+
+  return parsed;
+}
+
+int rs_export_rtdb::init(qcom_sQid* qid) {
+  setbuf(stdout, NULL); //Disable stdout buffering
+
+  /*
+   * The code below is just copy-paste from the rt_appl
+   */
+  qcom_sQid qini;
+  qcom_sQattr qAttr;
+  pwr_tStatus sts;
+
+  if (!qcom_Init(&sts, 0, "rs_export_rtdb")) {
+    errh_Fatal("qcom_Init, %m", sts);
+    errh_SetStatus(PWR__SRVTERM);
+    exit(sts);
+  }
+
+  qAttr.type = qcom_eQtype_private;
+  qAttr.quota = 100;
+  if (!qcom_CreateQ(&sts, qid, &qAttr, "events")) {
+    errh_Fatal("qcom_CreateQ, %m", sts);
+    errh_SetStatus(PWR__SRVTERM);
+    exit(sts);
+  }
+
+  qini = qcom_cQini;
+  if (!qcom_Bind(&sts, qid, &qini)) {
+    errh_Fatal("qcom_Bind(Qini), %m", sts);
+    errh_SetStatus(PWR__SRVTERM);
+    exit(-1);
+  }
+  // End of copy-paste
+
+  // The code below parses the select.json file which tells which signals to sample and send to kafka
+  pwr_tFileName fname;
+  dcli_translate_filename(fname, json_filename);
+  cJSON *parsed = parse_file(fname);
+  if (parsed == NULL) {
+    const char *error_ptr = cJSON_GetErrorPtr();
+    if (error_ptr != NULL) {
+      fprintf(stderr, "Error before: %s\n", error_ptr);
+    }
+    cJSON_Delete(parsed);
+    errh_SetStatus(PWR__SRVTERM);
+    exit(1);
+  }
+
+  m_frequency = cJSON_GetObjectItemCaseSensitive(parsed, "frequency")->valueint;
+  m_batches = cJSON_GetObjectItemCaseSensitive(parsed, "batches")->valueint;
+  fprintf(stderr, "freq %d batches %d\n", m_frequency, m_batches);
+
+  const cJSON *item = NULL;
+  cJSON_ArrayForEach(item, cJSON_GetObjectItemCaseSensitive(parsed, "signals")) {
+    std::string name(cJSON_GetObjectItemCaseSensitive(item, "name")->valuestring);
+
+    asdfs a;
+    a.to_send = cJSON_GetObjectItemCaseSensitive(item, "enable")->valueint;
+    a.flags = cJSON_GetObjectItemCaseSensitive(item, "flags")->valueint;
+    a.type = (pwr_eType)cJSON_GetObjectItemCaseSensitive(item, "type")->valueint;
+
+    const cJSON *aref_json = cJSON_GetObjectItemCaseSensitive(item, "aref");
+    a.aref.Flags.m = cJSON_GetObjectItemCaseSensitive(aref_json, "Flags")->valueint;
+    a.aref.Size = cJSON_GetObjectItemCaseSensitive(aref_json, "Size")->valueint;
+    a.aref.Offset = cJSON_GetObjectItemCaseSensitive(aref_json, "Offset")->valueint;
+    a.aref.Body = cJSON_GetObjectItemCaseSensitive(aref_json, "Body")->valueint;
+
+    const cJSON *oid_json = cJSON_GetObjectItemCaseSensitive(aref_json, "Objid");
+    a.aref.Objid.oix = cJSON_GetObjectItemCaseSensitive(oid_json, "oix")->valueint;
+    a.aref.Objid.vid = cJSON_GetObjectItemCaseSensitive(oid_json, "vid")->valueint;
+
+    arefs[name] = a;
+  }
+
+  cJSON_Delete(parsed);
+
+  if (exp_debug) {
+    printf("Kafka topic: %s\n", kafka_get_topic());
+    printf("Generating Avro schema...\n");
+  }
+  return gen_schema_main();
+}
+
+void rs_export_rtdb::open(int argc, char**argv) {
+  kafka_open();
+
+  m_confobj->ServerConnection = pwr_eSsabDbServerConnection_Up;
+
+  // This is commented out because we don't want to register the app in Proview
+/*
+  pwr_tOid oid;
+  pwr_tStatus sts = gdh_NameToObjid("Noder-Node-MyAppl", &oid);
+  if (EVEN(sts)) {
+    fprintf(stderr, "Error fetching applet config object\n");
+    throw co_error(sts);
+  }
+  aproc_RegisterObject(oid);
+*/
+}
+
+
+static void usage() {
+  std::cout << "Usage: rs_export_rtdb -t <topic> -c <config-file> -s <schema-registry-url>\n\n"
+	    << "  Options\n"
+	    << "    -t Topic		pwr.<hostname>.mvp-test-1.v1\n"
+	    << "    -c Config file\n"
+	    << "    -s Schema registry URL\n"
+	    << "    -d Debug\n"
+	    << "    -a Anix\n"
+	    << "    -h Help\n\n"
+	    << "  Configuration files\n"
+	    << "    Kafka config file: $pwrp_load/kafka_config.ini\n"
+	    << "    Signal file generated by rs_export_gen: $pwrp_load/select.json\n"
+	    << "    Certificate specified in kafka_config.ini\n";
+}
+
+/*
+ * The entire main function is just copy-paste from the rt_appl example
+ */
+int main(int argc, char** argv) {
+  qcom_sQid qid = qcom_cNQid;
+  char topic[80] = "";
+  pwr_tFileName config_file = "";
+  pwr_tStatus sts;
+  rs_export_rtdb *exp = new rs_export_rtdb();
+
+  for (int i = 1; i < argc; i++) {
+    if (argv[i][0] == '-') {
+      int i_incr = 0;
+      for (int j = 1; argv[i][j] != 0 && argv[i][j] != ' '
+           && argv[i][j] != '	';
+           j++) {
+        switch (argv[i][j]) {
+        case 'd':
+          exp_debug = 1;
+          break;
+        case 'a':
+	  // Anix
+          if (i + 1 >= argc
+              || !(argv[i][j + 1] == ' ' || argv[i][j + 1] != '	')) {
+            usage();
+            exit(0);
+          }
+          sscanf(argv[i + 1], "%d", (int*)&exp->m_anix);
+          i++;
+          i_incr = 1;
+          break;
+        case 'h':
+          usage();
+          exit(0);
+        case 't':
+	  // Topic
+          if (i + 1 >= argc
+              || !(argv[i][j + 1] == ' ' || argv[i][j + 1] != '	')) {
+            usage();
+            exit(0);
+          }
+          strncpy(topic, argv[i + 1], sizeof(topic));
+          i++;
+          i_incr = 1;
+          break;
+        case 's':
+	  // Schema register URL
+          if (i + 1 >= argc
+              || !(argv[i][j + 1] == ' ' || argv[i][j + 1] != '	')) {
+            usage();
+            exit(0);
+          }
+          strncpy(exp->m_schema_url, argv[i + 1], sizeof(exp->m_schema_url));
+          i++;
+          i_incr = 1;
+          break;
+        case 'c':
+	  // Kafka config file
+          if (i + 1 >= argc
+              || !(argv[i][j + 1] == ' ' || argv[i][j + 1] != '	')) {
+            usage();
+            exit(0);
+          }
+          strncpy(config_file, argv[i + 1], sizeof(config_file));
+          i++;
+          i_incr = 1;
+          break;
+        case '-':
+          if (streq(argv[i], "--help")) {
+	    usage();
+	    exit(0);
+	  }
+          break;
+        default:
+          usage();
+          exit(0);
+        }
+        if (i_incr)
+          break;
+      }
+    }
+  }
+
+  errh_Init("rs_export_rtdb", errh_eAnix_appl20);
+  errh_SetStatus(PWR__SRVSTARTUP);
+
+  sts = gdh_Init("rs_export_rtdb");
+  if (EVEN(sts)) {
+    errh_Fatal("gdh_Init, %m", sts);
+    errh_SetStatus(PWR__SRVTERM);
+    exit(sts);
+  }
+
+  exp->get_confobj();
+
+  if (streq(config_file, ""))
+    strcpy(config_file, exp->m_confobj->KafkaConfigFile);
+  if (streq(config_file, ""))
+    strcpy(config_file, default_config_file);
+
+  if (streq(topic, ""))
+    strcpy(topic, exp->m_confobj->Topic);
+
+  if (streq(exp->m_schema_url, ""))
+    strcpy(exp->m_schema_url, exp->m_confobj->SchemaRegistryURL);
+  if (streq(exp->m_schema_url, ""))
+    strcpy(exp->m_schema_url, default_schema_registry);
+  exp->m_scantime = exp->m_confobj->ScanTime;
+  if (exp->m_scantime == 0)
+    exp->m_scantime = 1;
+      
+  kafka_init(exp->m_confobj, topic, config_file);
+
+  if (!exp->init(&qid)) {
+    errh_SetStatus(PWR__SRVTERM);
+    exit(0);
+  }
+
+  try {
+    exp->open(argc, argv);
+  } catch (co_error& e) {
+    errh_Error((char*)e.what().c_str());
+    errh_Fatal("rs_export_rtdb aborting");
+    errh_SetStatus(PWR__SRVTERM);
+    exit(0);
+  }
+
+  aproc_TimeStamp(1, 1);
+  errh_SetStatus(PWR__SRUN);
+
+  int tmo = 1000 * exp->m_scantime;
+  char mp[2000];
+  int swap = 0;
+  qcom_sGet get;
+  for (;;) {
+    get.maxSize = sizeof(mp);
+    get.data = mp;
+    qcom_Get(&sts, &qid, &get, tmo);
+    if (sts == QCOM__TMO || sts == QCOM__QEMPTY) {
+      if (!swap) {
+        exp->scan();
+      }
+    } else {
+      ini_mEvent new_event;
+      qcom_sEvent* ep = (qcom_sEvent*)get.data;
+
+      new_event.m = ep->mask;
+      if (new_event.b.oldPlcStop && !swap) {
+        errh_SetStatus(PWR__SRVRESTART);
+        swap = 1;
+        kafka_exit();
+      } else if (new_event.b.swapDone && swap) {
+        swap = 0;
+        exp->open(argc, argv);
+        errh_SetStatus(PWR__SRUN);
+      } else if (new_event.b.terminate) {
+        exit(0);
+      }
+    }
+  }
+
+  return 0;
+}
+
