@@ -629,6 +629,7 @@ public class GdhWebSocketServer
       }
 
       try {
+	  int err = 0;
 
 	  while ( true) {
 	      int c1 = in.read();
@@ -641,8 +642,20 @@ public class GdhWebSocketServer
 	      else if ( size == 127) {
 		  size = (in.read() << 24) + (in.read() << 16) + (in.read() << 8) + in.read();
 	      }
-	      if ( size < 0)
-		  continue;		      
+	      if ( size < 0) {
+		  if (err < 100) {
+		      err++;
+		      continue;
+		  }
+		  errh.error("DataStream failed");
+		  connectionOccupied[threadNumber] = false;
+		  cbInfoRemove(threadNumber);
+		  if (debug)
+		      cbInfoShow();
+		  threadCount--;
+		  setCurrentConnections(threadCount);
+		  return;
+	      }
 
 	      int[] key =  new int[4];		
 	      key[0] = in.read();
