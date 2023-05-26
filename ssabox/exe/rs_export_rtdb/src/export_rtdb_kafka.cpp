@@ -34,6 +34,8 @@
  * General Public License plus this exception.
  */
 
+#if defined PWRE_CONF_RDKAFKA
+
 #include <iostream>
 #include <unistd.h>
 #include <glib.h>
@@ -188,3 +190,5 @@ void kafka_flush(int tmo)
 {
   rd_kafka_flush(producer, tmo);
 }
+
+#endif
