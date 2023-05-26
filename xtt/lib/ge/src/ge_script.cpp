@@ -5896,7 +5896,7 @@ int Graph::script_func_register(void)
 
   sts = ccm_create_external_var("eVis_Visible", CCM_DECL_INT, 0,
       glow_eVis_Visible, 0);
-  sts = ccm_create_external_var("eVis_Visible", CCM_DECL_INT, 0,
+  sts = ccm_create_external_var("eVis_Invisible", CCM_DECL_INT, 0,
       glow_eVis_Invisible, 0);
   sts = ccm_create_external_var("eVis_Dimmed", CCM_DECL_INT, 0,
       glow_eVis_Dimmed, 0);

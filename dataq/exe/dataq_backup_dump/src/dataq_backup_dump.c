@@ -272,7 +272,9 @@ static pwr_tStatus qbck_check_file(qbck_tCtx bckctx, FILE* bckfile,
 
       switch (queueheader.class) {
       case pwr_cClass_DataQ1:
-      case pwr_cClass_DataQ30: {
+      case pwr_cClass_DataQ5:
+      case pwr_cClass_DataQ30:
+      case pwr_cClass_DataQ120: {
         pwr_sClass_DataQ1* queue_ptr;
         pwr_sClass_DataQBus* data_block_ptr;
 

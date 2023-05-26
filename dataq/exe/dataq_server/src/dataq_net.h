@@ -54,6 +54,7 @@ typedef enum {
   dataq_eMsgType_NodeUpR,
   dataq_eMsgType_RDataQInit,
   dataq_eMsgType_RDataQFeedback,
+  dataq_eMsgType_RDataQReset,
   dataq_eMsgType_RDataQ,
   dataq_eMsgType_ROrder,
   dataq_eMsgType_ROrderInit,
@@ -128,6 +129,18 @@ typedef struct {
 } dataq_sMsgRDataQInit;
 
 typedef struct {
+   pwr_tUInt32 Type;
+   pwr_tUInt32 Version;
+   pwr_tUInt32 FeedbackData;
+   pwr_tUInt32 FeedbackTrigger;
+   pwr_tAttrRef RDataQ;
+   pwr_tOName DataName;
+   pwr_tUInt32 TableVersion;
+   pwr_tUInt32 AttrNum;
+   int Data[1];
+} dataq_sMsgRDataQFeedback;
+
+typedef struct {
   pwr_tUInt32 Type;
   pwr_tUInt32 Version;
   pwr_tAttrRef RDataQ;
@@ -154,14 +167,8 @@ typedef struct {
 typedef struct {
   pwr_tUInt32 Type;
   pwr_tUInt32 Version;
-  pwr_tUInt32 FeedbackData;
-  pwr_tUInt32 FeedbackTrigger;
-  pwr_tAttrRef RDataQ;
-  pwr_tOName DataName;
-  pwr_tUInt32 TableVersion;
-  pwr_tUInt32 AttrNum;
-  int Data[1];
-} dataq_sMsgRDataQFeedback;
+  pwr_tAttrRef RemoteDataQ;
+} dataq_sMsgRDataQReset;
 
 
 #ifdef __cplusplus

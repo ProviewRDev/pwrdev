@@ -144,7 +144,9 @@ typedef struct {
 
 static pwr_tCid qbck_qcidlist[] = {
   pwr_cClass_DataQ1,
-  pwr_cClass_DataQ30
+  pwr_cClass_DataQ5,
+  pwr_cClass_DataQ30,
+  pwr_cClass_DataQ120
 };
 
 static pwr_tStatus qbck_data_handler(qbck_tCtx bckctx);
@@ -265,7 +267,9 @@ static pwr_tStatus qbck_data_handler(qbck_tCtx bckctx)
     offset += sizeof(*queueheader);
     switch (queueheader->class) {
     case pwr_cClass_DataQ1:
-    case pwr_cClass_DataQ30: {
+    case pwr_cClass_DataQ5:
+    case pwr_cClass_DataQ30:
+    case pwr_cClass_DataQ120: {
       pwr_sClass_DataQ1* queue_ptr;
       pwr_sClass_DataQBus* data_block_ptr;
 
@@ -616,7 +620,9 @@ static pwr_tStatus qbck_queuelist_add(qbck_tCtx bckctx, pwr_tOid objid,
   /* Check if backup should be done on this queue */
   switch (class) {
   case pwr_cClass_DataQ1:
+  case pwr_cClass_DataQ5:
   case pwr_cClass_DataQ30:
+  case pwr_cClass_DataQ120:
     if (!(((pwr_sClass_DataQ*)objectp)->Config.Options & pwr_mDataQOptionsMask_Backup))
       return DATAQ__SUCCESS;
     break;
@@ -651,7 +657,9 @@ static pwr_tStatus qbck_queuelist_add(qbck_tCtx bckctx, pwr_tOid objid,
 
   switch (queuelist_ptr->class) {
   case pwr_cClass_DataQ1:
+  case pwr_cClass_DataQ5:
   case pwr_cClass_DataQ30:
+  case pwr_cClass_DataQ120:
     queuelist_ptr->size
         = (char*)&(((pwr_sClass_DataQ1*)(queuelist_ptr->queue))->Data[0])
         - (char*)(queuelist_ptr->queue)
@@ -1686,7 +1694,9 @@ static pwr_tStatus qbck_read(qbck_tCtx bckctx, char* backupfile)
 
       switch (queueheader.class) {
       case pwr_cClass_DataQ1:
-      case pwr_cClass_DataQ30: {
+      case pwr_cClass_DataQ5:
+      case pwr_cClass_DataQ30:
+      case pwr_cClass_DataQ120: {
         pwr_sClass_DataQ1* queue_ptr;
         pwr_sClass_DataQ* object_ptr;
         pwr_sClass_DataQBus* data_block_ptr;
@@ -1834,7 +1844,9 @@ static pwr_tStatus qbck_read(qbck_tCtx bckctx, char* backupfile)
     /* Copy current function in queue object and reset reload bit */
     switch (clist_ptr->class) {
     case pwr_cClass_DataQ1:
+    case pwr_cClass_DataQ5:
     case pwr_cClass_DataQ30:
+    case pwr_cClass_DataQ120:
       ((pwr_sClass_DataQ*)clist_ptr->buffer)->Intern.ReloadDone = 0;
       ((pwr_sClass_DataQ*)clist_ptr->buffer)->Intern.MirrorRestart = 1;
       ((pwr_sClass_DataQ*)clist_ptr->buffer)->Config.Function
@@ -2023,7 +2035,9 @@ static pwr_tStatus qbck_queue_handler(qbck_tCtx bckctx)
   while (queue_ptr) {
     switch (queue_ptr->class) {
     case pwr_cClass_DataQ1:
+    case pwr_cClass_DataQ5:
     case pwr_cClass_DataQ30:
+    case pwr_cClass_DataQ120:
       if (((pwr_sClass_DataQ*)(queue_ptr->queue))->Intern.BackupNow) {
         backup_now = 1;
         queue_ptr->backup_now = 1;

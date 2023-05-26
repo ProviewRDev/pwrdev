@@ -190,6 +190,7 @@ class dataq_server {
   pwr_tStatus rdataq_init_msg(dataq_sMsgRDataQInit* mp, int size, pwr_tNid reply_nid);
   pwr_tStatus rdataq_feedback(dataq_sMsgRDataQFeedback* mp, int size, pwr_tNid reply_nid);
   pwr_tStatus rdataq(dataq_sMsgRDataQ* mp, int size, pwr_tNid reply_nid);
+  pwr_tStatus rdataq_reset(dataq_sMsgRDataQReset* mp, int size, pwr_tNid reply_nid);
   pwr_tStatus send_rorder_init(pwr_tNid nid);
   pwr_tStatus rorder_init_msg(dataq_sMsgROrderInit* mp, int size, pwr_tNid reply_nid);
   pwr_tStatus rorder(dataq_sMsgROrder* mp, int size, pwr_tNid reply_nid);

@@ -85,6 +85,7 @@ void DataQFo_init_time(pwr_sClass_DataQFo* o)
     data_index = (pwr_sClass_DataQBus*)&co->Data[0];
     data_index += co->DataSize - 1;
     memcpy(&co->Super.Trp.DataL, data_index, sizeof(*data_index));
+    o->Data1 = co->Data[0];
     memcpy(&o->DataLast, data_index, sizeof(*data_index));
   }
   co->Super.Intern.InitTime = 0;
@@ -175,8 +176,8 @@ void DataQFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
   if (co->Super.Config.MaxSize > NMPS_CELL_MAXSIZE)
     co->Super.Config.MaxSize = NMPS_CELL_MAXSIZE;
 
-  if (o->ResetObjectP) {
-    if (*o->ResetObjectP) {
+  if (o->ResetObjectP || co->Super.Intern.QReset) {
+    if ((o->ResetObjectP && *o->ResetObjectP) || co->Super.Intern.QReset) {
       data_index = (pwr_sClass_DataQBus*)&co->Data[0];
       for (i = 1; i <= co->DataSize; i++) {
         sts = gdh_DLUnrefObjectInfo(data_index->Dlid);
@@ -192,9 +193,14 @@ void DataQFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
       o->QueueFull = 0;
       co->Super.Intern.QueueFull = o->QueueFull;
       co->DataSize = 0;
+      if (!o->OldReset)
+	co->Super.Intern.RQReset = 1;
       if (co->Super.Config.Options & pwr_mDataQOptionsMask_Backup)
         co->Super.Intern.BackupNow = 1;
     }
+    if (o->ResetObjectP)
+      o->OldReset = *o->ResetObjectP;
+    co->Super.Intern.QReset = 0;
   }
   if ( co->Super.Config.Options & pwr_mDataQOptionsMask_CheckObjects) {
     data_index = &co->Data[0];
@@ -796,8 +802,8 @@ static void DataQStoreFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
   if (co->Super.Config.MaxSize > NMPS_CELL_MAXSIZE)
     co->Super.Config.MaxSize = NMPS_CELL_MAXSIZE;
 
-  if (o->ResetObjectP) {
-    if (*o->ResetObjectP) {
+  if (o->ResetObjectP || co->Super.Intern.QReset) {
+    if ((o->ResetObjectP && *o->ResetObjectP) || co->Super.Intern.QReset) {
       data_index = (pwr_sClass_DataQBus*)&co->Data[0];
       for (i = 1; i <= co->DataSize; i++) {
         sts = gdh_DLUnrefObjectInfo(data_index->Dlid);
@@ -809,13 +815,18 @@ static void DataQStoreFo_exec(plc_sThread* tp, pwr_sClass_DataQFo* o)
 	  sizeof(pwr_sClass_DataQBus));
       memset(&co->Super.Trp.DataL, 0, sizeof(pwr_sClass_DataQBus));
       memset(&o->DataLast, 0, sizeof(pwr_sClass_DataQBus));
-      memset(&co->Data[0], 0, sizeof(pwr_sClass_DataQBus));
+      memset(&o->Data1, 0, sizeof(pwr_sClass_DataQBus));
       o->QueueFull = 0;
       co->Super.Intern.QueueFull = o->QueueFull;
       co->DataSize = 0;
+      if (!o->OldReset)
+	co->Super.Intern.RQReset = 1;
       if (co->Super.Config.Options & pwr_mDataQOptionsMask_Backup)
         co->Super.Intern.BackupNow = 1;
     }
+    if (o->ResetObjectP)
+      o->OldReset = *o->ResetObjectP;
+    co->Super.Intern.QReset = 0;
   }
 
   if ( co->Super.Config.Options & pwr_mDataQOptionsMask_CheckObjects) {

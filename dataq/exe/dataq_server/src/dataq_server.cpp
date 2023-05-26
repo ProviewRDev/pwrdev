@@ -16,6 +16,7 @@
 #include "dataq_server.h"
 #include "dataq_net.h"
       
+static int debug = 0;
 
 unsigned int qsrv_data_converter::feedback_size()
 {
@@ -275,7 +276,8 @@ pwr_tStatus dataq_server::node_up_reply(pwr_tNid nid)
 
 pwr_tStatus dataq_server::rdataq_init_msg(dataq_sMsgRDataQInit* mp, int size, pwr_tNid reply_nid)
 {
-  printf("RDataQ_Init received %d\n", size);
+  if (debug)
+    printf("RDataQ_Init received %d\n", size);
 
   int tix;
   int found;
@@ -346,7 +348,8 @@ pwr_tStatus dataq_server::rdataq_feedback(dataq_sMsgRDataQFeedback* mp,
   char *op;
   unsigned int msize;
 
-  printf("RDataQFeedback received %d\n", size);
+  if (debug)
+    printf("RDataQFeedback received %d\n", size);
 
   // Find source RDataQ
   found = 0;
@@ -378,9 +381,34 @@ pwr_tStatus dataq_server::rdataq_feedback(dataq_sMsgRDataQFeedback* mp,
   return DATAQ__SUCCESS;
 }
 
+pwr_tStatus dataq_server::rdataq_reset(dataq_sMsgRDataQReset* mp, 
+    int size, pwr_tNid reply_nid)
+{
+  int found;
+
+  if (debug)
+    printf("RDataQReset received %d\n", size);
+
+  for (unsigned int i = 0; i < m_tdataq.size(); i++) {
+    if (cdh_ObjidIsEqual(mp->RemoteDataQ.Objid, m_tdataq[i].rdataq.Objid) &&
+	mp->RemoteDataQ.Offset == m_tdataq[i].rdataq.Offset) {
+      found = 1;
+      for (unsigned int j = 0; j < m_tdataq[i].targetq.size(); j++) {
+	m_tdataq[i].targetq[j].op->Super.Intern.QReset = 1;
+      }
+    }
+  }
+
+  return DATAQ__SUCCESS;
+}
+
+//
+// Remote dataq message received
+//
 pwr_tStatus dataq_server::rdataq(dataq_sMsgRDataQ* mp, int size, pwr_tNid reply_nid)
 {
-  printf("RDataQ received %d %s\n", size, mp->DataName);
+  if (debug)
+    printf("RDataQ received %d %s\n", size, mp->DataName);
 
   int tix;
   int qix;
@@ -457,13 +485,18 @@ pwr_tStatus dataq_server::rdataq(dataq_sMsgRDataQ* mp, int size, pwr_tNid reply_
   return DATAQ__SUCCESS;
 }
 
+//
+// Remote order init  message received
+//
+
 pwr_tStatus dataq_server::rorder_init_msg(dataq_sMsgROrderInit* mp, int size, pwr_tNid reply_nid)
 {
   int found;
   int tix;
   unsigned int msize;
 
-  printf("ROrderInit received %d\n", size);
+  if (debug)
+    printf("ROrderInit received %d\n", size);
 
   // Find target order
   found = 0;
@@ -499,7 +532,8 @@ pwr_tStatus dataq_server::rorder(dataq_sMsgROrder* mp, int size, pwr_tNid reply_
   char *op;
   unsigned int msize;
 
-  printf("ROrder received %d %s\n", size, mp->DataName);
+  if (debug)
+    printf("ROrder received %d %s\n", size, mp->DataName);
 
   // Find target order
   found = 0;
@@ -569,7 +603,8 @@ pwr_tStatus dataq_server::rorder_feedback(dataq_sMsgROrderFeedback* mp,
   char *op;
   unsigned int msize;
 
-  printf("ROrderFeedback received %d\n", size);
+  if (debug)
+    printf("ROrderFeedback received %d\n", size);
 
   // Find source order
   found = 0;
@@ -963,13 +998,13 @@ pwr_tStatus dataq_server::trans_handler()
 	msg->Type = dataq_eMsgType_RDataQFeedback;
 	msg->Version = dataq_cNetVersion;
 	msg->RDataQ = m_tdataq[i].rdataq;
-	msg->TableVersion = m_torder[i].dc.version;
+	msg->TableVersion = m_tdataq[i].dc.version;
 	if (m_tdataq[i].targetq[j].options & pwr_mTargetDataQOptionsMask_SendFeedback) {
 	  msg->FeedbackData = 1;
 	  strncpy(msg->DataName, dataname, sizeof(msg->DataName));
-	  msg->AttrNum = m_torder[i].dc.feedback_size();	
+	  msg->AttrNum = m_tdataq[i].dc.feedback_size();	
 	
-	  m_torder[i].dc.feedback_data_to_msg((char*)&msg->Data, targetp, &msize);
+	  m_tdataq[i].dc.feedback_data_to_msg((char*)&msg->Data, targetp, &msize);
 	}
 	if (m_tdataq[i].targetq[j].options & pwr_mTargetDataQOptionsMask_TriggerFeedback)
 	  msg->FeedbackTrigger = 1;
@@ -1060,6 +1095,42 @@ pwr_tStatus dataq_server::trans_handler()
           cdh_NodeIdToString(0, m_nodes[i].nid, 0, 0));
 
       m_rdataq[i].src_op->Super.Intern.RQStatus &= ~pwr_mRemoteDataQStatusMask_NewData;
+    }
+
+    if (m_rdataq[i].src_op->Super.Intern.RQReset) {
+      dataq_sMsgRDataQReset* msg;
+
+      // Send reset order to all remote queues
+
+      m_rdataq[i].src_op->Super.Intern.RQReset = 0;
+
+      tgt.nid = m_nodes[m_rdataq[i].node_idx].nid;
+      tgt.qix = dataq_cProcServer;
+
+      put.reply.nid = m_nodes[0].nid;
+      put.reply.qix = dataq_cProcServer;
+      put.type.b = (qcom_eBtype)dataq_cMsgClass;
+      put.type.s = (qcom_eStype)dataq_eMsgType_RDataQReset;
+      put.msg_id = m_msg_id++;
+      put.size = sizeof(dataq_sMsgRDataQReset) - sizeof(int) + 
+          m_rdataq[i].remoteq.size() * sizeof(pwr_tAttrRef);
+      msg = (dataq_sMsgRDataQReset*)qcom_Alloc(&lsts, put.size);
+      
+      msg->Type = dataq_eMsgType_RDataQReset;
+      msg->Version = dataq_cNetVersion;
+      msg->RemoteDataQ = m_rdataq[i].aref;
+
+      put.data = msg;
+      put.allocate = 0;
+
+      if (!qcom_Put(&sts, &tgt, &put)) {
+	qcom_Free(&sts, put.data);
+	errh_Info("No connection to %s (%s)", m_nodes[i].name,
+	    cdh_NodeIdToString(0, m_nodes[i].nid, 0, 0));
+      } else if (debug) {
+	printf("Remote DataQ reset sent %s (%s)", m_nodes[i].name,
+            cdh_NodeIdToString(0, m_nodes[i].nid, 0, 0));
+      }
     }
   }
 
@@ -1384,7 +1455,7 @@ pwr_tStatus dataq_server::mainloop()
 {
   pwr_tStatus sts;
   int tmo;
-  char mp[2000];
+  char mp[20000];
   qcom_sGet get;
   int swap = 0;
   qcom_sQid qid;
@@ -1410,7 +1481,8 @@ pwr_tStatus dataq_server::mainloop()
     } 
     switch ((int)get.type.b) {
     case dataq_cMsgClass:
-      printf("Message recevied %d\n", (int)get.type.s);
+      if (debug)
+	printf("Message recevied %d\n", (int)get.type.s);
       switch ((int)get.type.s) {
       case dataq_eMsgType_NodeUp:
         errh_Info("Node up %s", cdh_NodeIdToString(0, get.reply.nid, 0, 0));
@@ -1425,6 +1497,9 @@ pwr_tStatus dataq_server::mainloop()
         break;
       case dataq_eMsgType_RDataQFeedback:
         rdataq_feedback((dataq_sMsgRDataQFeedback*)mp, get.size, get.reply.nid);
+        break;
+      case dataq_eMsgType_RDataQReset:
+        rdataq_reset((dataq_sMsgRDataQReset*)mp, get.size, get.reply.nid);
         break;
       case dataq_eMsgType_RDataQ:
         rdataq((dataq_sMsgRDataQ*)mp, get.size, get.reply.nid);
@@ -1494,6 +1569,9 @@ dataq_server::~dataq_server()
 int main(int argc, char* argv[])
 {
   dataq_server srv;
+
+  if (argc > 1 && streq(argv[1], "-d"))
+    debug = 1;
 
   srv.init();
   srv.connect();

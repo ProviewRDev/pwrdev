@@ -93,29 +93,24 @@ void QDisplayFo_init(pwr_sClass_QDisplayFo* o)
   co = (pwr_sClass_QDisplay*)o->PlcConnectP;
 
   /* Get size of data objects */
-  for (;;) {
-    sts = gdh_ObjidToName(cdh_ClassIdToObjid(co->Config.DataClass), classname,
-        sizeof(classname), cdh_mName_volumeStrict);
-    if (EVEN(sts)) {
-      errh_CErrLog(DATAQ__DISPCLASS, errh_ErrArgMsg(sts), NULL);
-      break;
-    }
+  sts = gdh_ObjidToName(cdh_ClassIdToObjid(co->Config.DataClass), classname,
+      sizeof(classname), cdh_mName_volumeStrict);
+
+  if (ODD(sts)) {
     strcat(classname, "-RtBody");
     sts = gdh_NameToObjid(classname, &rtbody_objid);
-    if (EVEN(sts)) {
-      errh_CErrLog(DATAQ__DISPCLASS, errh_ErrArgMsg(sts), NULL);
-      break;
-    }
-
-    sts = gdh_ObjidToPointer(rtbody_objid, (void*)&bodyp);
-    if (EVEN(sts)) {
-      errh_CErrLog(DATAQ__DISPCLASS, errh_ErrArgMsg(sts), NULL);
-      break;
-    }
-
-    co->Intern.DataSize = bodyp->Size;
-    break;
   }
+
+  if (ODD(sts))
+    sts = gdh_ObjidToPointer(rtbody_objid, (void*)&bodyp);
+
+  if (EVEN(sts)) {
+    errh_CErrLog(DATAQ__DISPCLASS, errh_ErrArgMsg(sts), NULL);
+    co->Intern.DataSize = 0;
+    return;
+  }
+
+  co->Intern.DataSize = bodyp->Size;
 
   /* Get offset for the attributes */
   for (i = 0; i < 5; i++) {
@@ -202,6 +197,8 @@ void QDisplayFo_exec(plc_sThread* tp, pwr_sClass_QDisplayFo* o)
   pwr_sClass_QDisplay* co;
 
   co = (pwr_sClass_QDisplay*)o->PlcConnectP;
+  if (!co || !co->Intern.DataSize)
+    return;
 
   max_size = MIN(co->Config.MaxSize, DATAQ_DISP_SIZE);
   linkfo = (pwr_sClass_QDisplayLinkFo*)o->LinkP;

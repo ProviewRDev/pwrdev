@@ -11414,7 +11414,7 @@ int gcg_comp_m46(gcg_ctx gcgctx, vldh_t_node node)
         vldh_IdToStr(0, node->ln.oid), GCG_PREFIX_REF,
         vldh_AttrRefToStr(1, resattrref));
   } else {
-    /* Inget resetobjekt f�r cellen */
+    /* No reset object */
     IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->ResetObjectP = 0;\n",
         GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid));
   }
@@ -16036,7 +16036,7 @@ int gcg_comp_m75(gcg_ctx gcgctx, vldh_t_node node)
         vldh_IdToStr(0, node->ln.oid), GCG_PREFIX_REF,
         vldh_AttrRefToStr(1, resattrref));
   } else {
-    /* Inget resetobjekt f�r cellen */
+    /* No reset object */
     IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->ResetObjectP = 0;\n",
         GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid));
   }
