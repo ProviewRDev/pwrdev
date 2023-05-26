@@ -37,6 +37,8 @@
 #ifndef export_rtdb_http_h
 #define export_rtdb_http_h
 
-long http_request(const char* hostname, const char* path, const char* body);
+#include <string>
+
+long http_request(const char* hostname, const char* path, std::string body);
 
 #endif

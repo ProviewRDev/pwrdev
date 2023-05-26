@@ -185,7 +185,7 @@ std::string pwr_eType_to_str(pwr_eType tid) {
     str = "bytes";
   }
   if (MAKE_VALUES_OPTIONAL && str.size() > 0) {
-    return "[\"null\",\"" + str + "\"]";
+    return "[\\\"null\\\",\\\"" + str + "\\\"]";
   }
   return str;
 }

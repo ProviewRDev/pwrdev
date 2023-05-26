@@ -37,9 +37,9 @@
 #include "export_rtdb_avro.h"
 
 void AvroEncoder::encodeInt64(int64_t input) {
-  auto val = ((input << 1) ^ (input >> 63));
+  unsigned long long val = ((input << 1) ^ (input >> 63));
   const int mask = 0x7F;
-  auto v = val & mask;
+  unsigned long long v = val & mask;
   while (val >>= 7) {
     out.push_back(v | 0x80);
     v = val & mask;
@@ -48,9 +48,9 @@ void AvroEncoder::encodeInt64(int64_t input) {
 }
 
 void AvroEncoder::encodeInt32(int32_t input) {
-  auto val = ((input << 1) ^ (input >> 31));
+  unsigned int val = ((input << 1) ^ (input >> 31));
   const int mask = 0x7F;
-  auto v = val & mask;
+  unsigned int v = val & mask;
   while (val >>= 7) {
     out.push_back(v | 0x80);
     v = val & mask;

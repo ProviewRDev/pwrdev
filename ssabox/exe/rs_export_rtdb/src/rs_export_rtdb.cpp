@@ -70,6 +70,7 @@ struct asdf {
   pwr_eType type;
   uint32_t flags;
   bool to_send;
+  void *valp;
 };
 typedef struct asdf asdfs;
 std::map<std::string, asdfs> arefs;
@@ -106,9 +107,43 @@ std::string rs_export_rtdb::to_utf8(std::string &str) {
   return res;
 }
 
-// This function replaces characters that are invalid in kafka with characters that are valid
+// This function replaces characters that are invalid in kafka with 
+// characters that are valid
 std::string rs_export_rtdb::fix_name(std::string key) {
   std::string tmp(key);
+  if (isdigit(tmp[0]))
+    tmp.insert(0, "V");  
+  int index = tmp.find_first_of(':');
+  tmp.erase(index, 1);
+  tmp.insert(index, "___");
+  
+  index = 0;
+  for (;;) {
+    index = tmp.find("-", index);
+    if (index == std::string::npos)
+      break;
+    tmp.erase(index, 1);
+    tmp.insert(index, "__");
+  }
+  //std::replace(tmp.begin(), tmp.end(), '-', '_');
+  index = tmp.find_first_of('.');
+  tmp.erase(index, 1);
+  tmp.insert(index, "___");
+  for (;;) {
+    index = tmp.find(".", index);
+    if (index == std::string::npos)
+      break;
+    tmp.erase(index, 1);
+    tmp.insert(index, "__");
+  }
+  //std::replace(tmp.begin()+index, tmp.end(), '.', '_');
+  std::replace(tmp.begin()+index, tmp.end(), '[', '_');
+  std::replace(tmp.begin()+index, tmp.end(), ']', '_');
+  return tmp;
+#if 0
+  std::string tmp(key);
+  if (isdigit(tmp[0]))
+    tmp.insert(0, "V");  
   int index = tmp.find_first_of(':');
   tmp.erase(index, 1);
   tmp.insert(index, "__");
@@ -117,7 +152,10 @@ std::string rs_export_rtdb::fix_name(std::string key) {
   tmp.erase(index, 1);
   tmp.insert(index, "__");
   std::replace(tmp.begin()+index, tmp.end(), '.', '_');
+  std::replace(tmp.begin()+index, tmp.end(), '[', '_');
+  std::replace(tmp.begin()+index, tmp.end(), ']', '_');
   return tmp;
+#endif
 }
 
 
@@ -129,25 +167,25 @@ int rs_export_rtdb::gen_schema_main() {
   m_json_string.str("");
   if (m_batches > 1) {
     m_json_string << "{";
-    m_json_string << "\"type\":\"record\",";
-    m_json_string << "\"name\":\"Parent\",";
-    m_json_string << "\"fields\":[";
+    m_json_string << "\\\"type\\\":\\\"record\\\",";
+    m_json_string << "\\\"name\\\":\\\"Parent\\\",";
+    m_json_string << "\\\"fields\\\":[";
     m_json_string << "{";
-    m_json_string << "\"name\":\"events\",";
-    m_json_string << "\"type\": {";
-    m_json_string << "\"type\":\"array\",";
-    m_json_string << "\"items\":";
+    m_json_string << "\\\"name\\\":\\\"events\\\",";
+    m_json_string << "\\\"type\\\": {";
+    m_json_string << "\\\"type\\\":\\\"array\\\",";
+    m_json_string << "\\\"items\\\":";
   }
   m_json_string << "{";
-  m_json_string << "\"type\":\"record\",";
-  m_json_string << "\"name\":\"Event\",";
-  m_json_string << "\"fields\":[";
-  m_json_string << "{\"name\":\"timestamp\",\"type\":{\"type\":\"long\",\"logicalType\":\"timestamp-millis\"}},";
-  m_json_string << "{\"name\":\"index\",\"type\":\"int\",\"default\":0},";
+  m_json_string << "\\\"type\\\":\\\"record\\\",";
+  m_json_string << "\\\"name\\\":\\\"Event\\\",";
+  m_json_string << "\\\"fields\\\":[";
+  m_json_string << "{\\\"name\\\":\\\"timestamp\\\",\\\"type\\\":{\\\"type\\\":\\\"long\\\",\\\"logicalType\\\":\\\"timestamp-millis\\\"}},";
+  m_json_string << "{\\\"name\\\":\\\"index\\\",\\\"type\\\":\\\"int\\\",\\\"default\\\":0},";
 
   for (std::map<std::string, asdfs>::iterator it = arefs.begin(); it != arefs.end(); it++) {
     std::string fixed = fix_name(it->first);
-    m_json_string << "{\"name\":\"" << to_utf8(fixed) << "\",\"type\":" << pwr_eType_to_str(it->second.type) << ",\"default\": null},";
+    m_json_string << "{\\\"name\\\":\\\"" << to_utf8(fixed) << "\\\",\\\"type\\\":" << pwr_eType_to_str(it->second.type) << ",\\\"default\\\": null},";
   }
 
   std::string tmp = m_json_string.str();
@@ -157,14 +195,15 @@ int rs_export_rtdb::gen_schema_main() {
     tmp += "}}]}";
   }
 
-  std::string a("\""), b("\\\"");
-  int pos = 0;
-  while ((pos = tmp.find(a, pos)) != std::string::npos) {
-    tmp.replace(pos, a.length(), b);
-    pos += b.length();
-  }
-
   tmp = "{\"schema\":\"" + tmp + "\"}";
+
+  if (exp_debug) {
+    pwr_tFileName fname;
+    dcli_translate_filename(fname, "$pwrp_log/avro_schema.json");
+    FILE* fp = fopen(fname, "w");
+    fprintf(fp, "%s", tmp.c_str());
+    fclose(fp);
+  }
 
   try {
     long res2;
@@ -174,29 +213,26 @@ int rs_export_rtdb::gen_schema_main() {
     path += kafka_get_topic();
     path += "-value/versions";
     for (int i = 0; i < 5; i++) {
-      res2 = http_request(url.c_str(), path.c_str(), tmp.c_str());
+      res2 = http_request(url.c_str(), path.c_str(), tmp);
       if (res2 > 0)
 	break;
-      fprintf(stderr, "ERROR, did not receive a valid schema id from kafka registry, retrying.\n");
+      errh_Info("Did not receive a valid schema id from kafka registry, retrying.");
+      if (exp_debug)
+	printf("Did not receive a valid schema id from kafka registry, retrying.\n");
       sleep(3);
     }
     if (res2 <= 0) {
-      fprintf(stderr, "ERROR, did not receive a valid schema id from kafka registry, exiting.\n");
-      errh_SetStatus(PWR__SRVTERM);
+      errh_Fatal("Did not receive a valid schema id from kafka registry, exiting.");
+      if (exp_debug)
+	printf("Did not receive a valid schema id from kafka registry, exiting.");
       res = 0;
     } else {
       m_schema_id = res2;
-      printf("schema_id: %d\n", m_schema_id);
+      if (exp_debug)
+	printf("schema_id: %d\n", m_schema_id);
     }
   } catch (std::runtime_error& e) {
-    std::cerr << "Error sending schema to registry " << e.what() << '\n';
-  }
-  if (exp_debug) {
-    pwr_tFileName fname;
-    dcli_translate_filename(fname, "$pwrp_log/avro_schema.json");
-    FILE* fp = fopen(fname, "w");
-    fprintf(fp, "%s", tmp.c_str());
-    fclose(fp);
+    errh_Error("Error sending schema to registry: %s", e.what());
   }
   return res;
 }
@@ -242,10 +278,19 @@ int rs_export_rtdb::scan() {
       fprintf(stderr, "%s has typeid 0\n", it->first.c_str());
       continue;
     }
+#if 0
     void* value_ptr;
-    gdh_AttrRefToPointer(&it->second.aref, &value_ptr);
-    pwr_tStatus sts = encode_val(avro_encoder, it->second.type, it->second.flags & PWR_MASK_POINTER, &it->second.aref, value_ptr);
-    if (EVEN(sts)) return sts;
+    pwr_tStatus sts = gdh_AttrRefToPointer(&it->second.aref, &value_ptr);
+    if (EVEN(sts)) 
+      return sts;
+#endif
+    pwr_tStatus sts;
+
+    if (it->second.valp) {
+      sts = encode_val(avro_encoder, it->second.type, it->second.flags & PWR_MASK_POINTER, &it->second.aref, it->second.valp);
+      if (EVEN(sts)) 
+	return sts;
+    }
   }
 
   batch++;
@@ -347,7 +392,7 @@ int rs_export_rtdb::init(qcom_sQid* qid) {
   if (!qcom_Init(&sts, 0, "rs_export_rtdb")) {
     errh_Fatal("qcom_Init, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
-    exit(sts);
+    exit(1);
   }
 
   qAttr.type = qcom_eQtype_private;
@@ -355,26 +400,36 @@ int rs_export_rtdb::init(qcom_sQid* qid) {
   if (!qcom_CreateQ(&sts, qid, &qAttr, "events")) {
     errh_Fatal("qcom_CreateQ, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
-    exit(sts);
+    exit(1);
   }
 
   qini = qcom_cQini;
   if (!qcom_Bind(&sts, qid, &qini)) {
     errh_Fatal("qcom_Bind(Qini), %m", sts);
     errh_SetStatus(PWR__SRVTERM);
-    exit(-1);
+    exit(1);
   }
   // End of copy-paste
 
   // The code below parses the select.json file which tells which signals to sample and send to kafka
   pwr_tFileName fname;
+  pwr_tTime t;
+
   dcli_translate_filename(fname, json_filename);
+  sts = dcli_file_time(fname, &t);
+  if (EVEN(sts)) {
+    // Generate file
+    pwr_tCmd cmd = "rs_export_gen -f signals";
+    system(cmd);
+  }
+
   cJSON *parsed = parse_file(fname);
   if (parsed == NULL) {
     const char *error_ptr = cJSON_GetErrorPtr();
-    if (error_ptr != NULL) {
-      fprintf(stderr, "Error before: %s\n", error_ptr);
-    }
+    if (error_ptr != NULL)
+      errh_Fatal("JSON parse error before: %s", error_ptr);
+    else
+      errh_Fatal("JSON parse error");
     cJSON_Delete(parsed);
     errh_SetStatus(PWR__SRVTERM);
     exit(1);
@@ -382,7 +437,8 @@ int rs_export_rtdb::init(qcom_sQid* qid) {
 
   m_frequency = cJSON_GetObjectItemCaseSensitive(parsed, "frequency")->valueint;
   m_batches = cJSON_GetObjectItemCaseSensitive(parsed, "batches")->valueint;
-  fprintf(stderr, "freq %d batches %d\n", m_frequency, m_batches);
+  if (exp_debug)
+    fprintf(stderr, "freq %d batches %d\n", m_frequency, m_batches);
 
   const cJSON *item = NULL;
   cJSON_ArrayForEach(item, cJSON_GetObjectItemCaseSensitive(parsed, "signals")) {
@@ -402,6 +458,10 @@ int rs_export_rtdb::init(qcom_sQid* qid) {
     const cJSON *oid_json = cJSON_GetObjectItemCaseSensitive(aref_json, "Objid");
     a.aref.Objid.oix = cJSON_GetObjectItemCaseSensitive(oid_json, "oix")->valueint;
     a.aref.Objid.vid = cJSON_GetObjectItemCaseSensitive(oid_json, "vid")->valueint;
+
+    pwr_tStatus sts = gdh_AttrRefToPointer(&a.aref, &a.valp);
+    if (EVEN(sts)) 
+      a.valp = 0;
 
     arefs[name] = a;
   }
@@ -468,17 +528,21 @@ int main(int argc, char** argv) {
         case 'd':
           exp_debug = 1;
           break;
-        case 'a':
-	  // Anix
-          if (i + 1 >= argc
+        case 'a': {
+	  // Anix	  
+	  int num = sscanf(&argv[i][j+2], "%d", (int*)&exp->m_anix);
+	  if (num == 0) {
+	    if (i + 1 >= argc
               || !(argv[i][j + 1] == ' ' || argv[i][j + 1] != '	')) {
-            usage();
-            exit(0);
-          }
-          sscanf(argv[i + 1], "%d", (int*)&exp->m_anix);
-          i++;
-          i_incr = 1;
+	      usage();
+	      exit(0);
+	    }
+	    sscanf(argv[i + 1], "%d", (int*)&exp->m_anix);
+	    i++;
+	    i_incr = 1;
+	  }
           break;
+	}
         case 'h':
           usage();
           exit(0);
@@ -531,14 +595,14 @@ int main(int argc, char** argv) {
     }
   }
 
-  errh_Init("rs_export_rtdb", errh_eAnix_appl20);
+  errh_Init("rs_export_rtdb", exp->m_anix);
   errh_SetStatus(PWR__SRVSTARTUP);
 
   sts = gdh_Init("rs_export_rtdb");
   if (EVEN(sts)) {
     errh_Fatal("gdh_Init, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
-    exit(sts);
+    exit(1);
   }
 
   exp->get_confobj();
@@ -569,8 +633,7 @@ int main(int argc, char** argv) {
   try {
     exp->open(argc, argv);
   } catch (co_error& e) {
-    errh_Error((char*)e.what().c_str());
-    errh_Fatal("rs_export_rtdb aborting");
+    errh_Fatal("Open error, %s", e.what().c_str());
     errh_SetStatus(PWR__SRVTERM);
     exit(0);
   }

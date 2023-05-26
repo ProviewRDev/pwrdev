@@ -15,12 +15,14 @@
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 
+#include "pwr.h"
+#include "co_dcli.h"
 #include "export_rtdb_http.h"
 
 extern int exp_debug;
 static void sigpipe_handle(int x) {}
 
-long http_request(const char* hostname, const char* path, const char* body) {
+long http_request(const char* hostname, const char* path, std::string body) {
   signal(SIGPIPE, sigpipe_handle);
 
   SSLeay_add_ssl_algorithms();
@@ -68,30 +70,77 @@ long http_request(const char* hostname, const char* path, const char* body) {
   X509_free(server_cert);
 
   char host_header[512];
-  sprintf(host_header, "Host: %s\r\nUser-Agent: curl/7.68.0\r\nAccept: */*\r\nContent-Type: application/vnd.schemaregistry.v1+json\r\nContent-Length: %d\r\nExpect: 100-continue\r\n\r\n", hostname, (int)strlen(body));
-  char outbuf[strlen(body) + strlen(host_header) + 100];
-  sprintf(outbuf, "POST %s HTTP/1.1\r\n", path);
-  strcat(outbuf, host_header);
-  strcat(outbuf, body);
-  strcat(outbuf, "\r\n");
-  err = SSL_write(ssl, outbuf, strlen(outbuf));
-  shutdown(sd, 1);
+  sprintf(host_header, "Host: %s\r\nUser-Agent: curl/7.68.0\r\nAccept: */*\r\nContent-Type: application/vnd.schemaregistry.v1+json\r\nContent-Length: %d\r\nExpect: 100-continue\r\n\r\n", hostname, (int)body.size());
+  std::string outbuf = std::string("POST ") + path + " HTTP/1.1\r\n" + host_header + body + "\r\n";
+
+#if 0
+  // Test
+  pwr_tFileName fname;
+  dcli_translate_filename(fname, "$pwrp_log/http_schema.txt");
+  FILE* fp = fopen(fname, "w");
+  fprintf(fp, "%s", outbuf.c_str());
+  fclose(fp);
+  exit(0);
+  // End test
+#endif
+
+  err = SSL_write(ssl, outbuf.c_str(), outbuf.size());
+
+  // shutdown(sd, 1);
   if (exp_debug)
-    printf("(7) sent HTTP request with blength %d over encrypted channel:\n\n", (int)strlen(body));
+    printf("(7) sent HTTP request with blength %d over encrypted channel:\n\n", (int)body.size());
 
   char inbuf[4096];
-  err = SSL_read(ssl, inbuf, sizeof(inbuf) - 1);
-  inbuf[err] = '\0';
-  int http_code = atoi(inbuf + 9);
   uint32_t schema_id = 0;
+  int http_code;
+
+#if 0
+  int cnt = 0;
+  while (SSL_peek(ssl, inbuf, sizeof(inbuf) - 1) == 0) {
+    cnt++;
+    if (exp_debug)
+      printf("Wait for schema id reply %d...\n", cnt);
+    sleep(1);
+    if (cnt > 15) {
+      if (exp_debug)
+	printf("No reply received\n");
+      return 0;
+    }
+  }
+#endif
+  err = SSL_read(ssl, inbuf, sizeof(inbuf) - 1);
+  if (err < 0)
+    err = 0;
+  inbuf[err] = '\0';
+  http_code = atoi(inbuf + 9);
   char* res_body = strstr(inbuf, "{\"id\":");
+  schema_id = 0;
   if (res_body != NULL) {
     schema_id = atoi(res_body+6);
   }
   if (exp_debug)
     printf("(8) got back HTTP response %d %d: \"%s\"\n", err, http_code, inbuf);
 
-  printf("State %s\n", SSL_state_string_long(ssl));
+  if (exp_debug)
+    printf("SSL state: %s\n", SSL_state_string_long(ssl));
+
+  if (res_body == NULL) {
+    if (exp_debug)
+      printf("No id, read again\n");
+    err = SSL_read(ssl, inbuf, sizeof(inbuf) - 1);
+    if (err < 0)
+      err = 0;
+    inbuf[err] = '\0';
+    
+    schema_id = 0;
+    res_body = strstr(inbuf, "{\"id\":");
+    if (res_body != NULL) {
+      schema_id = atoi(res_body+6);
+    }
+    if (exp_debug)
+      printf("(8) got back HTTP response %d %d: \"%s\"\n", err, http_code, inbuf);
+  }
+
   //SSL_shutdown(ssl);
   close(sd);
   SSL_free(ssl);

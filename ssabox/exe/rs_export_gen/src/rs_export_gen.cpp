@@ -7,6 +7,7 @@
 #include <glib.h>
 
 #include "pwr.h"
+#include "pwr_systemclasses.h"
 #include "pwr_baseclasses.h"
 #include "rt_gdh.h"
 #include "rt_gdh_msg.h"
@@ -16,8 +17,15 @@
 #include "co_error.h"
 #include "co_string.h"
 
+typedef enum {
+  gen_eFilter_All,
+  gen_eFilter_Signals,
+  gen_eFilter_Redu,
+  gen_eFilter_SevHist
+} gen_eFilter;
+
 static char json_filename[] = "$pwrp_load/select.json";
-static int only_signals = 1;
+static gen_eFilter filter = gen_eFilter_Signals;
 
 std::vector<std::string> tmp_array;
 
@@ -34,7 +42,10 @@ void printObjectR(char* ap, char* aname, pwr_tAttrRef* arp, pwr_tCid cid) {
   for (int i = 0; i < rows; i++) {
     pwr_sParInfo pari = bd[i].attr->Param.Info;
 
-    if (only_signals && !(pari.Flags & PWR_MASK_CLASS) && strcmp(bd[i].attrName, "ActualValue") != 0)
+    if (filter == gen_eFilter_Signals && !(pari.Flags & PWR_MASK_CLASS) && strcmp(bd[i].attrName, "ActualValue") != 0)
+      continue;
+
+    if (filter == gen_eFilter_Redu && !(pari.Flags & PWR_MASK_REDUTRANSFER))
       continue;
 
     if (pari.Flags & PWR_MASK_RTVIRTUAL || (pari.Flags & PWR_MASK_PRIVATE && pari.Flags & PWR_MASK_POINTER) || pari.Type == pwr_eType_Void)
@@ -103,7 +114,24 @@ void printObject(pwr_tAttrRef* arp, char* aname) {
 
 void dfs_helper(pwr_tOid oid) {
   pwr_tOName name;
-  pwr_tStatus sts = gdh_ObjidToName(oid, name, sizeof(name), cdh_mName_volumeStrict);
+  pwr_tCid cid;
+  pwr_tStatus sts;
+  pwr_tBoolean local;
+
+  // Dismiss the security object, dynamic volumes and mounted remote objects
+  sts = gdh_GetObjectLocation(oid, &local);
+  if (EVEN(sts)) throw co_error(sts);
+
+  if (!local)
+    return;
+
+  sts = gdh_GetObjectClass(oid, &cid);
+  if (EVEN(sts)) throw co_error(sts);
+
+  if (cid == pwr_cClass_Security || cid == pwr_cClass_DynamicVolume)
+    return;
+
+  sts = gdh_ObjidToName(oid, name, sizeof(name), cdh_mName_volumeStrict);
   if (EVEN(sts)) throw co_error(sts);
 
   pwr_tAttrRef aref = cdh_ObjidToAref(oid);
@@ -119,8 +147,8 @@ void dfs_helper(pwr_tOid oid) {
 }
 
 void usage() {
-  printf("rs_export_gen\n\n"
-	 "-a Generate all attributes, else only signals\n\n");
+  printf("rs_export_gen [-f 'filter']\n\n"
+	 "-f Filter, 'all', 'signals' or 'redu'. Default 'signals'\n\n");
 }
 
 int main(int argc, char**argv) {
@@ -131,9 +159,21 @@ int main(int argc, char**argv) {
   }
 
 
-  if (argc > 1 && streq(argv[1], "-a"))
-    only_signals = 0;
-      
+  if (argc > 2 && streq(argv[1], "-f")) {
+    if (streq(argv[2], "all"))
+      filter = gen_eFilter_All;
+    else if (streq(argv[2], "signals"))
+      filter = gen_eFilter_Signals;
+    else if (streq(argv[2], "redu"))
+      filter = gen_eFilter_Redu;
+    else if (streq(argv[2], "sevhist"))
+      filter = gen_eFilter_SevHist;
+    else {
+      usage();
+      exit(0);
+    }
+  }
+    
   pwr_tFileName fname;
   dcli_translate_filename(fname, json_filename);
   errh_Interactive();
@@ -143,6 +183,7 @@ int main(int argc, char**argv) {
     fprintf(stderr, "gdh_Init failed\n");
     return sts;
   }
+  pwr_tOid oid;
 
   std::ostringstream json_string;
   json_string << "{\n";
@@ -150,10 +191,10 @@ int main(int argc, char**argv) {
   json_string << "  \"batches\": 1,\n";
   json_string << "  \"signals\": [\n";
 
-  pwr_tOid oid;
   sts = gdh_GetRootList(&oid);
   while (ODD(sts)) {
-    dfs_helper(oid);
+    if (oid.oix != 0x80000001)
+      dfs_helper(oid);
     sts = gdh_GetNextSibling(oid, &oid);
   }
   std::sort(std::begin(tmp_array), std::end(tmp_array));
@@ -172,7 +213,7 @@ int main(int argc, char**argv) {
   fputs(json_string.str().c_str(), fp);
   fclose(fp);
 
-  printf("%s generated with %d signals\n", fname, (int)tmp_array.size());
+  printf("%s generated with %d columns\n", fname, (int)tmp_array.size());
 
   return 0;
 }
