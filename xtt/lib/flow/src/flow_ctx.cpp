@@ -1,6 +1,6 @@
 /*
 * ProviewR   Open Source Process Control.
- * Copyright (C) 2005-2022 SSAB EMEA AB.
+ * Copyright (C) 2005-2023 SSAB EMEA AB.
 *
 * This file is part of ProviewR.
 *

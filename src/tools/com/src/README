@@ -14,16 +14,16 @@ Copyright text:
 
 Execute the replacement
 
-> ./replace_all.sh c
-> ./replace_all.sh cpp
-> ./replace_all.sh h
-> ./replace_all.sh hpp
-> ./replace_all.sh java
-> ./replace_all.sh sh
-> ./replace_all.sh pwr_com
-> ./replace_all.sh wb_load
-> ./replace_all.sh msg
-> ./replace_all.sh uil
+./replace_all.sh c
+./replace_all.sh cpp
+./replace_all.sh h
+./replace_all.sh hpp
+./replace_all.sh java
+./replace_all.sh sh
+./replace_all.sh pwr_com
+./replace_all.sh wb_load
+./replace_all.sh msg
+./replace_all.sh uil
 
 Change version in documentation
 -------------------------------
