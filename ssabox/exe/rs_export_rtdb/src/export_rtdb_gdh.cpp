@@ -34,6 +34,8 @@
  * General Public License plus this exception.
  */
 
+#if defined PWRE_CONF_RDKAFKA
+
 #include "pwr.h"
 #include "pwr_baseclasses.h"
 #include "rt_gdh.h"
@@ -189,3 +191,5 @@ std::string pwr_eType_to_str(pwr_eType tid) {
   }
   return str;
 }
+
+#endif

@@ -34,6 +34,8 @@
  * General Public License plus this exception.
  */
 
+#if defined PWRE_CONF_RDKAFKA
+
 #include "export_rtdb_avro.h"
 
 void AvroEncoder::encodeInt64(int64_t input) {
@@ -117,3 +119,5 @@ void AvroEncoder::encodeFixed(const uint8_t *bytes, size_t len) {
 void AvroEncoder::encodeUnionIndex(size_t e) {
   encodeInt64(e);
 }
+
+#endif
