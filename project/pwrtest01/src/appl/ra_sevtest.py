@@ -61,6 +61,9 @@ class Ctx:
             # Get Test01d-H1-Av1.ActualValue
             result = pwrrt.getSevItemData( 'localhost', '_O0.254.254.204:68', 'ActualValue',
                                             '00:02:00', 'now', 1000)
+            if result is None:
+                self.logger.vlog('E', "getSevItemData, None result")
+                return
             ser = pd.Series(result[1])
             mean = ser.mean()
             std = ser.std()
@@ -101,6 +104,10 @@ class Ctx:
         try:
             result = pwrrt.getSevItemsDataFrame( 'localhost', oidlist, attrlist, isobjectlist,
                                                  '00:02:00', 'now', 0.5, 1000)
+            if result is None:
+                self.logger.vlog('E', "getSevItemsDataFrame, None result")
+                return
+                
             columns = ('time', 'A1', 'A2')
             data = pd.DataFrame(data=result)
             data.columns = columns
@@ -155,6 +162,10 @@ class Ctx:
         try:
             result = pwrrt.getSevItemsDataFrameD( 'localhost', oidlist, attrlist, isobjectlist,
                                                  '00:02:00', 'now', 0.5, 1000)
+            if result is None:
+                self.logger.vlog('E', "getSevItemsDataFrameD, None result")
+                return
+
             columns = ('time', 'A1', 'A2')
             data = pd.DataFrame(data=result)
             data.columns = columns
