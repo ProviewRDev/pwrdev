@@ -168,9 +168,12 @@ class sev_node {
   public:
   sev_node() : is_server(0), connected(0), ctime(0), status(0)
   {
+    strcpy(name, "");
+    strcpy(realname, "");
   }
   pwr_tNid nid;
   char name[80];
+  char realname[80];
   int is_server;
   int connected;
   double ctime;

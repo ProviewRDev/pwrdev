@@ -143,8 +143,20 @@ int rt_sevhistmon::init()
     throw co_error(m_sts);
 
   sev_node myn;
+  pwr_tOid noid;
+  pwr_sNode *np;
   myn.nid = node.nid;
   strncpy(myn.name, node.name, sizeof(myn.name));
+  m_sts = gdh_GetNodeObject(myn.nid, &noid);
+  if (EVEN(m_sts))
+    throw co_error(m_sts);
+  m_sts = gdh_ObjidToPointer(noid, (void**)&np);
+  if (EVEN(m_sts))
+    throw co_error(m_sts);
+    
+  if (streq(np->OrigName, myn.name))
+    syi_NodeName(&m_sts, myn.realname, sizeof(myn.realname));
+
   m_nodes.push_back(myn);
 
   for (nid = qcom_cNNid; qcom_NextNode(&sts, &node, nid); nid = node.nid) {
@@ -203,7 +215,8 @@ int rt_sevhistmon::init_objects()
 
     bool found = false;
     for (unsigned int i = 0; i < m_nodes.size(); i++) {
-      if (str_NoCaseStrcmp(hs.nodename, m_nodes[i].name) == 0) {
+      if (str_NoCaseStrcmp(hs.nodename, m_nodes[i].name) == 0 ||
+	  str_NoCaseStrcmp(hs.nodename, m_nodes[i].realname) == 0) {
         hs.nid = m_nodes[i].nid;
         found = true;
         break;
@@ -1038,7 +1051,8 @@ int rt_sevhistmon::connect()
     for (unsigned int j = 0; j < m_hs.size(); j++) {
       if (m_hs[j].configerror)
         continue;
-      if (str_NoCaseStrcmp(m_nodes[i].name, m_hs[j].nodename) == 0) {
+      if (str_NoCaseStrcmp(m_nodes[i].name, m_hs[j].nodename) == 0 ||
+	  str_NoCaseStrcmp(m_nodes[i].realname, m_hs[j].nodename) == 0) {
         found = true;
         break;
       }
