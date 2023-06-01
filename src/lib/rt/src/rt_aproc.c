@@ -42,6 +42,10 @@
 
 static pwr_sNode* proc_np = 0;
 
+/*! \file rt_aproc.c
+    \brief Functions for \ref AProc.
+*/
+
 /**
  * @brief Register Application object.
  * The Application object is stored in the $Node object and be opened from the

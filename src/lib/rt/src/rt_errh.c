@@ -37,6 +37,10 @@
 /* rt_errh.c -- Logg errors and more.
   The routines in this module are the error logging package.  */
 
+/*! \file rt_errh.c
+    \brief Functions for \ref Errh.
+*/
+
 #include <errno.h>
 #include <fcntl.h>
 #include <limits.h>

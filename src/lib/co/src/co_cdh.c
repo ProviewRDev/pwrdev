@@ -52,8 +52,7 @@
 #include "co_time.h"
 
 /*! \file co_cdh.c
-    \brief Class definition handler.
-   Functions for class definitions.
+    \brief Functions for \ref Cdh.
 */
 /*! \addtogroup Cdh */
 /*@{*/

@@ -40,7 +40,8 @@
 #include "rt_errh.h"
 
 /*! \file rt_appl.h
-    \brief Contains the rt_appl class. */
+    \brief Include file for the rt_appl class. */
+
 /*! \addtogroup rt */
 /*! @{*/
 

@@ -50,6 +50,13 @@
 #include "co_time.h"
 #include "co_time_msg.h"
 
+/*! \file co_time.c
+    \brief Functions for \ref Time.
+*/
+
+/*! \addtogroup Time */
+/*@{*/
+
 #define assertAbs(p)                                                           \
   do {                                                                         \
     pwr_Assert(p->tv_nsec >= 0 && p->tv_nsec < 1000000000);                    \
@@ -2224,3 +2231,5 @@ pwr_tFloat32 time_AdiffToFloat(pwr_tTime* t, pwr_tTime* s)
   time_DToFloat(&f, &r);
   return f;
 }
+
+/*@}*/

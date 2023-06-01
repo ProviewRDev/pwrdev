@@ -34,6 +34,10 @@
  * General Public License plus this exception.
  */
 
+/*! \file rt_sevcli.c
+    \brief Functions for \ref SEVCLI.
+*/
+
 #include "co_cdh.h"
 #include "co_cnf.h"
 #include "co_string.h"

@@ -49,8 +49,9 @@
 /*! \file pwr.h
     \brief Basic type definitions.
    This include file contains the Proview basic type definitions.
-*/
-/*! \addtogroup Pwr */
+
+    \ingroup Pwr
+    \addtogroup Pwr */
 /*@{*/
 
 #if defined __cplusplus

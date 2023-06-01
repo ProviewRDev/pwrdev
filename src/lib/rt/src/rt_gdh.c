@@ -38,6 +38,10 @@
    This module contains the access routines to the Global Data
    Handler. Those routines are callable from application level.  */
 
+/*! \file rt_gdh.c
+    \brief Functions for \ref GDH.
+*/
+
 #include <stdlib.h>
 
 #include "co_array.h"

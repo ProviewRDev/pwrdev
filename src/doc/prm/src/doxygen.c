@@ -2,7 +2,7 @@
   \brief Contains group definitions for doxygen.
 */
 
-/*! \defgroup PRM Programmer's Reference Manual
+/*! \mainpage PRM Programmer's Reference Manual
 
 The Programmer's Referens Manual describes the interface to Proview for
 applications programs written in c and c++.
@@ -20,18 +20,19 @@ Is is assumed that the reader has programming skills and some understanding of
 the c programming language.
 
 This manual will give a description of the following API's
-- Gdh  The interface to the realtime database with objects, classes,
-subscriptions etc.
-- Mh   Sending alarms and messages from application programs.
-- QCom Using the Proview communication protocol.
-- Time Functions to convert and compare time values.
-- Cdh  Convert and compare object attributes.
-- Errh Print messages on system log.
-- Sevcli Storage environment client interface.
-- NMps Interface to NMps Cell objects.
-- AProc Application process interface.
-- Net  Network conversion functions.
-- rt_appl A base class for applications i c++.
+API       | Description
+--------- | -----------
+\ref GDH  | The interface to the realtime database with objects, classes,subscriptions etc.
+\ref MSGH | Sending alarms and messages from application programs.
+\ref QCOM | Using the Proview communication protocol.
+\ref Time | Functions to convert and compare time values.
+\ref Cdh  | Convert and compare object attributes.
+\ref Errh | Print messages on system log.
+\ref SEVCLI | Storage environment client interface.
+\ref NMpsAppl | Interface to NMps Cell objects.
+\ref AProc | Application process interface.
+\ref Net  | Network conversion functions.
+\ref rt_appl | A base class for applications i c++.
 
 Python API
 - <a href="../pwrrt.html">pwrrt Runtime API.</a>
@@ -66,7 +67,7 @@ Python API
 
   <h2>Function overview</h2>
   <h3>Attribute Functions</h3><h4> </h4>
-    <table border="1" cellspacing="0">
+    <table border="1" cellspacing="0" padding="20">
      <tr><td>gdh_GetAttributeCharacteristics()</td>
         <td>Get the characteristics of an attribute given its name and the class
   it belongs to.</td></tr>

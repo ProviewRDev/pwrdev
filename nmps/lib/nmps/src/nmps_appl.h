@@ -41,8 +41,7 @@
    NMps API.  */
 
 /*! \file nmps_appl.h
-    \brief Type definitions for NMps.
-   This include file contains the Proview NMps type definitions.
+    \brief Include file for \ref  NMpsAppl.
 */
 
 #if defined __cplusplus

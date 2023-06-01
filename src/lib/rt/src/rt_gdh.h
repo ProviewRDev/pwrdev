@@ -45,6 +45,10 @@
 extern "C" {
 #endif
 
+/*! \file rt_gdh.h
+    \brief Include file for \ref GDH.
+*/
+
 /*
  *@example gdh_examples.c
  */

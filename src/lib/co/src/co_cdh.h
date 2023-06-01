@@ -52,17 +52,16 @@ extern "C" {
 #endif
 
 /*! \file co_cdh.h
-    \brief Class definition handler.
-   This include file contains definitions and function prototypes
-   needed to use CDH.
+    \brief Include file for \ref Cdh.
 */
 
-/*! \defgroup Cdh_DS Cdh Data Structures
-    \ingroup Cdh
-*/
+/** \addtogroup Cdh */
+/** @{ */
 
-/*! \addtogroup Cdh_DS */
-/*@{*/
+
+/** \defgroup Cdh_DS Cdh Data Structures
+ *  @{
+ */
 
 #define cdh_cMaxVidGroup 255
 #define cdh_cMaxCix 4095
@@ -704,14 +703,11 @@ typedef struct {
   pwr_tBoolean hasIndex[20];
 } cdh_sParseName;
 
-/*@}*/
+/** @} */
 
-/*! \defgroup Cdh_FC Cdh Functions
-    \ingroup Cdh
-*/
-
-/*! \addtogroup Cdh_FC */
-/*@{*/
+/** \defgroup Cdh_FC Cdh Functions
+ * @{
+ */
 
 /*  Function prototypes to exported functions.  */
 
@@ -861,7 +857,8 @@ pwr_tUInt32 cdh_AttrSize(pwr_sParInfo* info);
 
 pwr_tUInt32 cdh_AttrElemSize(pwr_sParInfo* info);
 
-/*@}*/
+/** @}*/
+/** @}*/
 
 #ifdef __cplusplus
 }

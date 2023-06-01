@@ -39,6 +39,10 @@
 
 /* rt_sevcli.h -- Storage client */
 
+/*! \file rt_sevcli.h
+    \brief Include file for \ref SEVCLI.
+*/
+
 /** \addtogroup SEVCLI */
 /** @{*/
 
@@ -48,6 +52,10 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/** \defgroup SEVCLI_DS Sevcli Data Structures
+ *  @{
+ */
 
 /**
  * Sevcli context
@@ -108,6 +116,12 @@ typedef struct {
   pwr_tUInt32 EventStatus;
 } sevcli_sEvents;
 
+/** @} */
+
+/** \defgroup SEVCLI_FC Sevcli Functions
+ *  @{
+ */
+
 int sevcli_init(pwr_tStatus* sts, sevcli_tCtx* ctx);
 int sevcli_close(pwr_tStatus* sts, sevcli_tCtx ctx);
 void sevcli_set_servernid(sevcli_tCtx ctx, pwr_tNid nid);
@@ -132,10 +146,13 @@ int sevcli_get_events(pwr_tStatus* sts, sevcli_tCtx ctx, pwr_tOid oid,
 		      unsigned int maxevents, sevcli_sEvents **list, unsigned int* cnt);
 void sevcli_store_ctx(sevcli_tCtx ctx);
 sevcli_tCtx sevcli_get_stored_ctx(void);
-/** @}*/
 
 #ifdef __cplusplus
 }
 #endif
+
+/** @}*/
+/** @}*/
+
 
 #endif

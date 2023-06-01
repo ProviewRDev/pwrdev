@@ -37,6 +37,10 @@
 #ifndef rt_mh_appl_h
 #define rt_mh_appl_h
 
+/*! \file rt_mh_appl.h
+    \brief Include file for \ref MSGH.
+*/
+
 /** \addtogroup MSGH */
 /** @{ */
 #define RS_MH_APPL_VERSION "X2.3.1"

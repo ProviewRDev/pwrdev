@@ -34,8 +34,9 @@ $(clean_html) : clean_%.html : %.html
 	@ $(rm) $(rmflags) $(doc_dir)/prm/$*.html
 
 $(doc_dir)/prm/index.html : doxygen.c
+	echo "Here in prm"
 	@ $(log_doxy)
-	@ doxygen
+	doxygen
 #	@ if [ "`eval which pdflatex`" != "" ]; then \
 #	    ./repl.sh latex/*.tex; \
 #	    cd latex; \

@@ -36,6 +36,10 @@
 
 /* rt_mh_appl.c -- Runtime environment - Message Handler */
 
+/*! \file rt_mh_appl.c
+    \brief Function for \ref MSGH.
+*/
+
 #include <stdio.h>
 #include <string.h>
 

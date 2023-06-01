@@ -58,17 +58,15 @@ typedef pwr_tTime time_tOs;
 typedef pwr_tDeltaTime time_tOsDelta;
 
 /*! \file co_time.h
-    \brief Time function.
-   This include file contains definitions and function prototypes
-   needed to use time functions.
+    \brief Include file for \ref Time.
 */
 
-/*! \defgroup Time_DS Time Data Structures
-    \ingroup Time
-*/
+/** \addtogroup Time */
+/** @{ */
 
-/*! \addtogroup Time_DS */
-/*@{*/
+/** \defgroup Time_DS Time Data Structures
+ *  @{
+ */
 
 //! Time string format
 typedef enum {
@@ -130,14 +128,11 @@ int clock_gettime(clockid_t clockid, struct timespec* ts);
 int clock_getres(clockid_t clockid, struct timespec* tp);
 #endif
 
-/*@}*/
+/** @} */
 
-/*! \defgroup Time_FC Time Functions
-    \ingroup Time
-*/
-
-/*! \addtogroup Time_FC */
-/*@{*/
+/** \defgroup Time_FC Time Functions
+ * @{
+ */
 
 int time_IsNull(pwr_tTime* t1);
 pwr_tTime* time_Aabs(pwr_tTime*, pwr_tTime*);
@@ -202,7 +197,8 @@ int time_PeriodZoomOut(time_ePeriod* period);
 int time_PrintA(const char* format, pwr_tTime* ts);
 pwr_tFloat32 time_AdiffToFloat(pwr_tTime* t, pwr_tTime* s);
 
-/*@}*/
+/** @}*/
+/** @}*/
 
 #ifdef __cplusplus
 }

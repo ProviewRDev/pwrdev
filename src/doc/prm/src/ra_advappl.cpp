@@ -3,6 +3,9 @@
    This file is an example file, containing to example applications.
 */
 
+/*! \file ra_advappl.cpp
+    \brief Functions for the MyAppl class */
+
 /** \addtogroup rt */
 /** @{*/
 

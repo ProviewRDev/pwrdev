@@ -39,6 +39,10 @@
 
 /* rt_qcom.h -- Queue communication */
 
+/*! \file rt_qcom.h
+    \brief Include file for \ref QCOM.
+*/
+
 /** \addtogroup QCOM */
 /** @{ */
 

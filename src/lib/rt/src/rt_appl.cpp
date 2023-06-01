@@ -38,6 +38,10 @@
 // Example of a proview application program
 //
 
+/*! \file rt_appl.cpp
+    \brief Functions for the rt_appl class. */
+
+
 #include "rt_appl.h"
 #include "rt_gdh.h"
 #include "rt_aproc.h"

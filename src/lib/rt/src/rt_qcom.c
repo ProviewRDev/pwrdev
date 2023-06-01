@@ -34,6 +34,10 @@
  * General Public License plus this exception.
  */
 
+/*! \file rt_qcom.c
+    \brief Functions for \ref QCOM.
+*/
+
 #include <stdlib.h>
 #include <string.h>
 

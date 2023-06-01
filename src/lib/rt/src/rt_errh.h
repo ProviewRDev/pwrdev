@@ -44,6 +44,10 @@
 extern "C" {
 #endif
 
+/*! \file rt_errh.h
+    \brief Include file for \ref Errh.
+*/
+
 /** \addtogroup Errh */
 /** @{ */
 
@@ -62,6 +66,10 @@ extern "C" {
               : (EVEN(lsts) ? (errh_Bugcheck(lsts, (str)), (lsts)) : (lsts))), \
       a)
 #endif
+
+/** \defgroup Errh_DS Errh Data Structures
+ *  @{
+ */
 
 #define errh_SeveritySuccess(sts) (((sts)&7) == 3)
 #define errh_SeverityInfo(sts) (((sts)&7) == 1)
@@ -215,6 +223,12 @@ typedef struct {
   char str[LOG_MAX_MSG_SIZE];
 } errh_sMsg;
 
+/** @} */
+
+/** \defgroup Errh_FC Errh Functions
+ *  @{
+ */
+
 /* NOTE! errh_Init MUST always be called before any other
          errh-function is called.  */
 
@@ -245,10 +259,11 @@ void errh_SetAnix(errh_eAnix anix);
 void errh_SetName(char* name);
 errh_eSeverity errh_Severity(pwr_tStatus);
 
-/** @} */
-
 #if defined __cplusplus
 }
 #endif
 
 #endif
+
+/** @}*/
+/** @}*/

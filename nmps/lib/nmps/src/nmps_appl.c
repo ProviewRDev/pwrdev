@@ -44,6 +44,10 @@
 *	Funktion:	Applikationsgränssnitt mot Nmps.
 **************************************************************************/
 
+/*! \file nmps_appl.c
+    \brief Function for \ref  NMpsAppl.
+*/
+
 /*_Include filer_________________________________________________________*/
 
 #include "pwr_nmpsclasses.h"
