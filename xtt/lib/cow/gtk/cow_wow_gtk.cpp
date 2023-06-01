@@ -370,7 +370,8 @@ static void displaytext_close_cb(GtkWidget* w, gint arg1, gpointer data)
 }
 
 void CoWowGtk::DisplayText(
-    const char* title, const char* text, int width, int height)
+      const char* title, const char* text, int width, int height,
+      wow_eImage image)
 {
   pwr_tFileName fname;
   GtkWidget* parent = m_parent;
@@ -396,7 +397,23 @@ void CoWowGtk::DisplayText(
   GtkWidget* displaytext_label = gtk_label_new(textutf8);
   g_free(textutf8);
 
-  dcli_translate_filename(fname, "$pwr_exe/xtt_info.png");
+  switch(image) {
+  case wow_eImage_Question:
+    dcli_translate_filename(fname, "$pwr_exe/pwr_gtk_question.png");
+    break;
+  case wow_eImage_Info:
+    dcli_translate_filename(fname, "$pwr_exe/pwr_gtk_info.png");
+    break;
+  case wow_eImage_Warning:
+    dcli_translate_filename(fname, "$pwr_exe/pwr_gtk_warning.png");
+    break;
+  case wow_eImage_Error:
+    dcli_translate_filename(fname, "$pwr_exe/pwr_gtk_error.png");
+    break;
+  case wow_eImage_No:
+    dcli_translate_filename(fname, "$pwr_exe/xtt_info.png");
+    break;
+  }
   GtkWidget* displaytext_image = gtk_image_new_from_file(fname);
 
   GtkWidget* displaytext_close

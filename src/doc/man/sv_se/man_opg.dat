@@ -2747,6 +2747,7 @@ sin()	 		<link> sin()
 <h2>Diverse funktioner
 CutObjectName()		<LINK> cutobjectname()
 ConfirmDialog()		<LINK> confirmdialog()
+TextDialog()		<LINK> textdialog()
 MessageError()		<LINK> messageerror()
 MessageInfo()		<LINK> messageinfo()
 GetCurrentText()	<LINK> getcurrenttext()
@@ -4352,6 +4353,7 @@ GetNextSibling().
 Diverse funktioner
 CutObjectName()	<t>Klipp av ett objektsnamn. <LINK> cutobjectname()
 ConfirmDialog()	<t>Öppna en konfirmerings-dialog <LINK> confirmdialog()
+TextDialog()	<t>Öppna ett text info fönster. <LINK> textdialog()
 MessageError()	<t>Skriv ett felmeddelande. <LINK> messageerror()
 MessageInfo()	<t>Skriv ett informationsmeddelande. <LINK> messageinfo()
 GetCurrentText() <t>Hämta text för utvalt alternativ.	<LINK> getcurrenttext()
@@ -4419,6 +4421,28 @@ string		<t>text		<t>Konfirmerings text.
 <c>  else
 <c>    printf( "No is pressed\n");
 <c>  endif
+
+</TOPIC>
+
+<TOPIC> textdialog() <style> function
+TextDialog()
+
+int TextDialog( string title, string text, [int image])
+
+<b>Beskrivning
+
+Visa ett fönster med en text och en ikon som markerar fel, varning, 
+info eller fråga.
+
+<b>Arguments
+
+string		<t>title	<t>Titel.
+string		<t>text		<t>Text.
+int		<t>image	<t>Typ av ikon, 1 fel, 2 varning, 
+		<t>		<t>3 info, 4 fråga.
+<b>Exempel
+
+<c>  TextDialog( "Error", "Motor is already started", 1);
 
 </TOPIC>
 

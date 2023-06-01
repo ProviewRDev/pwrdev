@@ -71,6 +71,14 @@ typedef enum {
   wow_eModalDialogReturn_ReturnPressed
 } wow_eMotalDialogReturn;
 
+typedef enum {
+  wow_eImage_No,
+  wow_eImage_Error,
+  wow_eImage_Warning,
+  wow_eImage_Info,
+  wow_eImage_Question
+} wow_eImage;
+
 typedef enum { wow_ePixmap_No, wow_ePixmap_Graph, wow_ePixmap__ } wow_ePixmap;
 typedef enum {
   wow_eIconType_Rt,
@@ -134,7 +142,8 @@ public:
   virtual void DisplayError(const char* title, const char* text,
       lng_eCoding coding = lng_eCoding_ISO8859_1, int modal = 1);
   virtual void DisplayText(
-      const char* title, const char* text, int width = 0, int height = 0);
+      const char* title, const char* text, int width = 0, int height = 0,
+      wow_eImage image = wow_eImage_Info);
   virtual void CreateInputDialog(void* ctx, const char* title, const char* text,
       void (*inputdialogbox_ok)(void*, void*, char*),
       void (*inputdialogbox_cancel)(void*, void*), int input_length,

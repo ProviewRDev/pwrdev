@@ -151,7 +151,8 @@ void CoWow::DisplayError(const char* title, const char* text,
 }
 
 void CoWow::DisplayText(
-    const char* title, const char* text, int width, int height)
+    const char* title, const char* text, int width, int height, 
+    wow_eImage image)
 {
 }
 

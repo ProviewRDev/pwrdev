@@ -2997,6 +2997,7 @@ sin()	 		<link> sin()
 <h2>Miscellaneous functions
 CutObjectName()		<LINK> cutobjectname()
 ConfirmDialog()		<LINK> confirmdialog()
+TextDialog()		<LINK> textdialog()
 MessageError()		<LINK> messageerror()
 MessageInfo()		<LINK> messageinfo()
 GetCurrentText()	<LINK> getcurrenttext()
@@ -4614,13 +4615,14 @@ Miscellaneous functions
 
 <b>Function <t>Description
 CutObjectName()	<t>Cut off an object name. <LINK> cutobjectname()
-ConfirmDialog()	<t>Open a confirm dialog <LINK> confirmdialog()
+ConfirmDialog()	<t>Open a confirm dialog. <LINK> confirmdialog()
+TextDialog()	<t>Open text info window. <LINK> textdialog()
 MessageError()	<t>Print error message.	<LINK> messageerror()
 MessageInfo()	<t>Print info message.	<LINK> messageinfo()
 GetCurrentText() <t>Get selected text.	<LINK> getcurrenttext()
 GetCurrentObject() <t>Get selected object. <LINK> getcurrentobject()
-get_pwr_config() <t>Get configuration values <LINK> get_pwr_config()
-get_node_name() <t>Get node name <LINK> get_node_name()
+get_pwr_config() <t>Get configuration values. <LINK> get_pwr_config()
+get_node_name() <t>Get node name. <LINK> get_node_name()
 getmsg()	<t>Get status text. <LINK> getmsg()
 EVEN()		<t>Check if value is even. <LINK> EVEN()
 ODD()		<t>Check if value is odd. <LINK> ODD()
@@ -4681,6 +4683,26 @@ string		<t>text		<t>Confirm text.
 <c>  else
 <c>    printf( "No is pressed\n");
 <c>  endif
+
+<TOPIC> textdialog() <style> function
+TextDialog()
+
+int TextDialog( string title, string text, [int image])
+
+<b>Description
+
+Display a dialog with a text and an image of type error, warning, info
+or question.
+
+<b>Arguments
+
+string		<t>title	<t>Title.
+string		<t>text		<t>Text.
+int		<t>image	<t>Type of image, 1 error, 2 warning, 
+		<t>		<t>3 info, 4 question.
+<b>Example
+
+<c>  TextDialog( "Error", "Motor is already started", 1);
 
 </TOPIC>
 

@@ -8645,6 +8645,39 @@ static int xnav_confirmdialog_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
+static int xnav_textdialog_func(void* filectx, ccm_sArg* arg_list,
+    int arg_count, int* return_decl, ccm_tFloat* return_float,
+    ccm_tInt* return_int, char* return_string)
+{
+  XNav* xnav;
+  ccm_sArg* arg_p2;
+  ccm_sArg* arg_p3;
+  wow_eImage image;
+
+  if (!(arg_count == 2 || arg_count == 3))
+    return CCM__ARGMISM;
+
+  arg_p2 = arg_list->next;
+
+  if (arg_list->value_decl != CCM_DECL_STRING)
+    return CCM__ARGMISM;
+  if (arg_p2->value_decl != CCM_DECL_STRING)
+    return CCM__ARGMISM;
+  if (arg_count == 3) {
+    arg_p3 = arg_p2->next;
+    if (arg_p3->value_decl != CCM_DECL_INT)
+      return CCM__ARGMISM;
+    image = (wow_eImage)arg_p3->value_int;
+  }
+  else
+    image = wow_eImage_No;
+
+  xnav_get_stored_xnav(&xnav);
+  xnav->wow->DisplayText(arg_list->value_string, arg_p2->value_string,
+      0, 0, image);
+  return 1;
+}
+
 static int xnav_cutobjectname_func(void* filectx, ccm_sArg* arg_list,
     int arg_count, int* return_decl, ccm_tFloat* return_float,
     ccm_tInt* return_int, char* return_string)
@@ -9285,6 +9318,10 @@ int XNav::readcmdfile(char* incommand, char* buffer, char *bufargs)
       return sts;
     sts = ccm_register_function(
         "Xtt", "ConfirmDialog", xnav_confirmdialog_func);
+    if (EVEN(sts))
+      return sts;
+    sts = ccm_register_function(
+        "Xtt", "TextDialog", xnav_textdialog_func);
     if (EVEN(sts))
       return sts;
     sts = ccm_register_function("Xtt", "GetUser", xnav_getuser_func);

@@ -132,7 +132,8 @@ public:
   void DisplayError(const char* title, const char* text,
       lng_eCoding coding = lng_eCoding_ISO8859_1, int modal = 1);
   void DisplayText(
-      const char* title, const char* text, int width = 0, int height = 0);
+      const char* title, const char* text, int width = 0, int height = 0,
+      wow_eImage image = wow_eImage_Info);
   void CreateInputDialog(void* ctx, const char* title, const char* text,
       void (*inputdialogbox_ok)(void*, void*, char*),
       void (*inputdialogbox_cancel)(void*, void*), int input_length,
