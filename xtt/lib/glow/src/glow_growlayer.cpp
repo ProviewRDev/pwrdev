@@ -79,6 +79,7 @@ GrowLayer::~GrowLayer()
     delete element;
     i--;
   }
+  delete nc;
   ctx->reset_nodraw();
   ctx->redraw();
 }
