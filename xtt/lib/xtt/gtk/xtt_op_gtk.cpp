@@ -1026,16 +1026,27 @@ int OpGtk::configure(char* opplace_str)
   if (opplace_p->StartJavaProcess)
     start_jop = 1;
 
-  GdkDisplay* display = gtk_widget_get_display(toplevel);
-  GdkMonitor* monitor = gdk_display_get_primary_monitor(display);
-  if (monitor) 
-    gdk_monitor_get_geometry(monitor, &monitor_geometry);
-  else {
-    monitor_geometry.x = 0;
-    monitor_geometry.y = 0;
-    monitor_geometry.width = 1600;
-    monitor_geometry.height = 900;
+  GdkDisplay* display =
+      gtk_widget_get_display(toplevel); // It's pretty much safe to assume a valid pointer here.
+  GdkMonitor* display_monitor = (void*)0;
+  int numberOfMonitors = gdk_display_get_n_monitors(display);
+  int monitor = opplace_p->Monitor; // Get the monitor from the opplace-object (0 == Use Primary, 1 == Force
+                                    // first Monitor, 2 == Froce second monitor and so on ...)
+
+  if (monitor > numberOfMonitors || monitor < 0)
+    monitor = 0;    // Use primary if one have input a larger number than there are monitors...
+
+  if (monitor == 0) // Use primary
+  {
+    display_monitor = gdk_display_get_primary_monitor(display);
   }
+  else // Override primary
+  {
+    monitor = opplace_p->Monitor - 1;
+    display_monitor = gdk_display_get_monitor(display, monitor);
+  }
+
+  gdk_monitor_get_geometry(display_monitor, &monitor_geometry);
 
   // Examine Graph objects
   for (i = 0; i < sizeof(opplace_p->FastAvail) / sizeof(opplace_p->FastAvail[0]); i++)
