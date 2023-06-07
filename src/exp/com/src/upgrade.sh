@@ -537,6 +537,7 @@ reload_directorystructure()
     machine="arm64"
   else
     machine="x86"
+  fi
   platform=$machine"_linux"
 
 
