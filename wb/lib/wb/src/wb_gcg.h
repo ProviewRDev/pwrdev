@@ -83,6 +83,7 @@ extern "C" {
 #define GCG_PREFIX_IOCW 'X'
 #define GCG_PREFIX_MOD 'M'
 #define GCG_PREFIX_PROC 'P'
+#define GCG_PREFIX_DATA 'D'
 
 #define GCG_REFTYPE_REF 0
 #define GCG_REFTYPE_IOR 1

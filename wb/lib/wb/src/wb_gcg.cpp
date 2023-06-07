@@ -2344,7 +2344,8 @@ static int gcg_ref_insert(
   /* Check if the objdid already is inserted */
   found = 0;
   for (i = 0; i < (int)gcgctx->refcount; i++) {
-    if (cdh_ObjidIsEqual((gcgctx->ref + i)->objdid, objdid)) {
+    if (cdh_ObjidIsEqual((gcgctx->ref + i)->objdid, objdid) &&
+	(gcgctx->ref + i)->prefix == prefix) {
       found = 1;
       break;
     }
@@ -2392,7 +2393,8 @@ static int gcg_aref_insert(
   for (i = 0; i < (int)gcgctx->arefcount; i++) {
     if (cdh_ObjidIsEqual((gcgctx->aref + i)->attrref.Objid, attrref.Objid)
         && (gcgctx->aref + i)->attrref.Offset == attrref.Offset
-        && (gcgctx->aref + i)->attrref.Size == attrref.Size) {
+        && (gcgctx->aref + i)->attrref.Size == attrref.Size
+	&& (gcgctx->aref + i)->prefix == prefix) {
       found = 1;
       break;
     }
@@ -11047,13 +11049,13 @@ int gcg_comp_m43(gcg_ctx gcgctx, vldh_t_node node)
   }
 
   /* Insert object in ref list */
-  gcg_aref_insert(gcgctx, refattrref, GCG_PREFIX_REF, node);
+  gcg_aref_insert(gcgctx, refattrref, GCG_PREFIX_DATA, node);
 
   /* The Out parameter will contain the pointer to the
      referenced object */
   IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE],
       "%c%s->Out = (pwr_tVoid *)%c%s;\n", GCG_PREFIX_REF,
-      vldh_IdToStr(0, node->ln.oid), GCG_PREFIX_REF,
+      vldh_IdToStr(0, node->ln.oid), GCG_PREFIX_DATA,
       vldh_AttrRefToStr(0, refattrref));
 
   /* Put referenced object in rt body */
