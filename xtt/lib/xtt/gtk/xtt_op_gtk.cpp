@@ -663,6 +663,7 @@ OpGtk::OpGtk(void* op_parent_ctx, GtkWidget* op_parent_wid, char* opplace, pwr_t
   }
 
   gtk_window_resize(GTK_WINDOW(toplevel), monitor_geometry.width, OP_HEIGHT_MIN);
+  gtk_window_move(GTK_WINDOW(toplevel), monitor_geometry.x, monitor_geometry.y);
 
   wow = new CoWowGtk(toplevel);
   sup_timerid = wow->timer_new();
