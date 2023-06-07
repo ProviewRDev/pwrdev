@@ -1029,7 +1029,7 @@ int OpGtk::configure(char* opplace_str)
 
   GdkDisplay* display =
       gtk_widget_get_display(toplevel); // It's pretty much safe to assume a valid pointer here.
-  GdkMonitor* display_monitor = (void*)0;
+  GdkMonitor* display_monitor = (GdkMonitor*)0;
   int numberOfMonitors = gdk_display_get_n_monitors(display);
   int monitor = opplace_p->Monitor; // Get the monitor from the opplace-object (0 == Use Primary, 1 == Force
                                     // first Monitor, 2 == Froce second monitor and so on ...)
