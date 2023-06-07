@@ -894,25 +894,30 @@ void GrowWindow::new_ctx(bool is_updating_attributes)
   bool copied;
   int no_file = streq(file_name, "_no_") ? 1 : 0; // No initial graph
 
-  if (strchr(file_name, '/') == 0) {
-    if (file_name[0] == '@') {
-      strcpy(fname, "@");
-      strcat(fname, "$pwrp_exe/");
-      strcat(fname, &file_name[1]);
+  for (int i = 0; i < ctx->path_cnt; i++) {
+
+    if (strchr(file_name, '/') == 0) {
+      if (file_name[0] == '@') {
+	strcpy(fname, "@");
+	strcat(fname, ctx->path[i]);
+	strcat(fname, &file_name[1]);
+      }
+      else {
+	strcpy(fname, ctx->path[i]);
+	strcat(fname, file_name);
+      }
+    } else
+      strcpy(fname, file_name);
+    if (!strchr(fname, '.')) {
+      if (fname[0] == '@')
+	strcat(fname, ".ge_com");
+      else
+	strcat(fname, ".pwg");
     }
-    else {
-      strcpy(fname, "$pwrp_exe/");
-      strcat(fname, file_name);
-    }
-  } else
-    strcpy(fname, file_name);
-  if (!strchr(fname, '.')) {
-    if (fname[0] == '@')
-      strcat(fname, ".ge_com");
-    else
-      strcat(fname, ".pwg");
+    dcli_translate_filename(fname, fname);
+    if (check_file(fname))
+      break;
   }
-  dcli_translate_filename(fname, fname);
 
   window_ctx
       = new GrowCtx("WindowComponent", ctx->mw.zoom_factor_x * window_scale);
