@@ -83,6 +83,7 @@ static int graph_customcolor_func(void* client_data, void* client_flag);
 static int graph_search_func(void* client_data, void* client_flag);
 static int graph_filter_func(void* client_data, void* client_flag);
 static int graph_check_func(void* client_data, void* client_flag);
+static int graph_nop_func(void* client_data, void* client_flag);
 
 dcli_tCmdTable graph_command_table[] = { { "SHOW", &graph_show_func,
                                              { "dcli_arg1", "dcli_arg2", "" } },
@@ -116,6 +117,7 @@ dcli_tCmdTable graph_command_table[] = { { "SHOW", &graph_show_func,
   { "FILTER", &graph_filter_func,
       { "dcli_arg", "/RESET", "/TYPE", "/PATTERN", "" } },
   { "CHECK", &graph_check_func, { "dcli_arg", "/INSTANCE", "" } },
+  { "EDIT", &graph_nop_func, { "" } },
   { "", NULL, { "" } }
 };
 
@@ -2715,6 +2717,12 @@ static int graph_replace_func(void* client_data, void* client_flag)
     graph->message('E', "Syntax error");
     return GE__SYNTAX;
   }
+  return GE__SUCCESS;
+}
+
+static int graph_nop_func(void* client_data, void* client_flag)
+{
+  // No operation, for compatibility with wb commands
   return GE__SUCCESS;
 }
 
