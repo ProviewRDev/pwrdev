@@ -61,7 +61,7 @@ void pn_gsdml::_build_diagnostics()
   for (pugi::xml_node& unitDiagTypeItem : _xmlUnitDiagTypeList->children("UnitDiagTypeItem"))
   {
     _unitDiagTypeMap.emplace(std::make_pair(unitDiagTypeItem.attribute("UserStructureIdentifier").as_uint(),
-                                           GSDML::UnitDiagTypeItem(std::move(unitDiagTypeItem), this)));
+                                            GSDML::UnitDiagTypeItem(std::move(unitDiagTypeItem), this)));
   }
 }
 
@@ -124,20 +124,33 @@ int pn_gsdml::read(const char* filename)
   return PB__SUCCESS;
 }
 
-std::shared_ptr<std::string> pn_gsdml::_get_TextId(std::string&& textId) { return _textIdMap[textId]; }
+std::shared_ptr<std::string> pn_gsdml::_get_TextId(std::string&& textId)
+{
+  if (_textIdMap.count(textId))
+    return _textIdMap[textId];
+  else
+    return std::make_shared<std::string>("No Text");
+}
 
 std::shared_ptr<std::string> pn_gsdml::_get_CategoryTextRef(std::string&& ID)
 {
   std::string catTextId =
       _xmlCategoryList->find_child_by_attribute("CategoryItem", "ID", ID.c_str()).attribute("TextId").value();
-  return _textIdMap[catTextId];
+  if (_textIdMap.count(catTextId))
+    return _textIdMap[catTextId];
+  else
+    return std::make_shared<std::string>("No Category");
 }
 
 std::shared_ptr<std::string> pn_gsdml::_get_CategoryInfoTextRef(std::string&& ID)
 {
   pugi::xml_node categoryItem = _xmlCategoryList->find_child_by_attribute("CategoryItem", "ID", ID.c_str());
   std::string textId = categoryItem.child("InfoText").attribute("TextId").value();
-  return _textIdMap[textId];
+
+  if (_textIdMap.count(textId))
+    return _textIdMap[textId];
+  else
+    return std::make_shared<std::string>("No Category Info");
 }
 
 void pn_gsdml::_build_moduleList(pugi::xml_node&& dataAccessPointItem)
@@ -208,7 +221,10 @@ void pn_gsdml::_build_textIdList()
 }
 
 std::unordered_map<ushort, GSDML::ChannelDiagItem>& pn_gsdml::getChannelDiagMap() { return _channelDiagMap; }
-std::unordered_map<ushort, GSDML::UnitDiagTypeItem>& pn_gsdml::getUnitDiagTypeMap() { return _unitDiagTypeMap; }
+std::unordered_map<ushort, GSDML::UnitDiagTypeItem>& pn_gsdml::getUnitDiagTypeMap()
+{
+  return _unitDiagTypeMap;
+}
 
 std::unordered_map<std::string, std::shared_ptr<GSDML::ModuleItem>>& pn_gsdml::getModuleMap()
 {
