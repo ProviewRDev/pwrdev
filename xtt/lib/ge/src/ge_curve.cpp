@@ -41,6 +41,7 @@
 #include "co_cnf.h"
 #include "co_dcli.h"
 #include "co_string.h"
+#include "co_error.h"
 
 #include "rt_gdh.h"
 #include "rt_gdh_msg.h"
@@ -1619,7 +1620,7 @@ int GeCurve::read_file(char* filename)
   fp = fopen(fname, "r");
   if (!fp) {
     fprintf(stderr, "Error! Cannot open curve file: '%s'!\n", fname);
-    return 0;
+    throw co_error(GE__NOFILE);
   }
 
   // Attribute names in first line

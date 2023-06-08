@@ -10498,10 +10498,15 @@ void XNav::open_rttlog(char* name, char* filename)
       basewidget = multiview_main->get_widget();
   }
 
-  GeCurve* c
+  try {
+   GeCurve* c
       = gecurve_new(name, filename, NULL, 0, 0, gbl.color_theme, basewidget);
-  c->setup(curve_mEnable_CurveType | curve_mEnable_CurveTypeSquare
+
+   c->setup(curve_mEnable_CurveType | curve_mEnable_CurveTypeSquare
       | curve_mEnable_FillCurve);
+  } catch (co_error& e) {
+    message('E', (char*)e.what().c_str());
+  }
 }
 
 int XNav::search(char* search_str, int regexp)
