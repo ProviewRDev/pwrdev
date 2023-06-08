@@ -565,6 +565,13 @@ DeviceAccessPointItem::DeviceAccessPointItem(pugi::xml_node&& deviceAccessPointI
       _CertificationInfo(deviceAccessPointItem.child("CertificationInfo"), gsdml),
       _IOConfigData(deviceAccessPointItem.child("IOConfigData"), gsdml)
 {
+  if (_RequiredSchemaVersion.empty())
+  {
+    // Set default schema version if the optional element RequiredSchemaVersion is missing
+    // Introduced in GSDML V2.0
+    _RequiredSchemaVersion = "V1.0";
+  }
+
   for (pugi::xml_node& subslotItem : deviceAccessPointItem.child("SubslotList").children("SubslotItem"))
   {
     _SubslotList.push_back(SubslotItem(std::move(subslotItem), gsdml));
@@ -622,8 +629,8 @@ UnitDiagTypeItem::UnitDiagTypeItem(pugi::xml_node&& unitDiagTypeItem, pn_gsdml* 
           std::move(std::string(unitDiagTypeItem.child("Help").attribute("TextId").value()))))
 {
   for (pugi::xml_node& ref : unitDiagTypeItem.children("Ref"))
-  {  
-    _Ref.push_back(std::make_shared<Ref>(Ref(std::move(ref), this, gsdml)));    
+  {
+    _Ref.push_back(std::make_shared<Ref>(Ref(std::move(ref), this, gsdml)));
   }
 }
 
