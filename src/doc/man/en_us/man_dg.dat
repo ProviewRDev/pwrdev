@@ -3009,7 +3009,7 @@ There are seven different types of alarms the can be used to address alarms to d
 categories of receivers.
 
 Alarm 	    <t><t>Ordinary alarm for plant operators.
-MaintenanceAlarm <t><t>Alarm for maintenance personell.
+MaintenanceAlarm <t><t>Alarm for maintenance personnel.
 SystemAlarm <t><t>Alarms for system manager.
 UserAlarm1-4 <t><t>User defined alarm types.
 
