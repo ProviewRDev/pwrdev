@@ -1,5 +1,5 @@
 
-from distutils.core import setup, Extension
+from setuptools import setup, Extension
 import os
 
 pwr_lib = os.environ['pwr_lib']
