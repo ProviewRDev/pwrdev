@@ -15,6 +15,7 @@ fi
 
 aroot="/usr/pwrp/adm"
 
+
 echo "Change owner of files to pwrp"
 chown -R pwrp /usr/pwr$ver
 chgrp -R pwrp /usr/pwr$ver
@@ -33,3 +34,8 @@ chgrp -R pwrp /usr/pwr$ver
 
 # Change group to pwrp
 chmod a+w /usr/pwr$ver/$pwre_target/exp/load/*.dbs
+
+
+
+
+
