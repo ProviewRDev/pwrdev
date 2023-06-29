@@ -359,7 +359,12 @@ echo "export pwrp_db=/dev/null" >> $cfile
 echo "export PWRE_CONF_LOCKDBS=$lockdbs" >> $cfile
 echo "export PWRE_CONF_PARALLEL=$parallel" >> $cfile
 
-if [ $pwre_hw == "hw_arm" ] && [ $ebuild -eq 1 ]; then
+let is_arm=0
+if [ $pwre_hw == "hw_arm" ] || [ $pwre_hw == "hw_arm64" ]; then
+  is_arm=1
+fi
+
+if [ $is_arm -eq 1 ] && [ $ebuild -eq 1 ]; then
     echo "Arm ebuild"
 
 #    if [ $pwre_conf_qt -eq 1 ]; then
@@ -375,6 +380,7 @@ if [ $pwre_hw == "hw_arm" ] && [ $ebuild -eq 1 ]; then
 #    fi
 
     pwre_config_check_include rpc  RPC  1 "/usr/include/rpc/rpc.h:/usr/include/tirpc/rpc"
+    pwre_config_check_include hdf5  HDF5   1 ""
     pwre_config_check_include jni   JNI   1 $jdk/include/jni.h
     pwre_config_check_include jni   JNI   0 $jdk/include/linux/jni_md.h
 
@@ -422,7 +428,7 @@ if [ $pwre_hw == "hw_arm" ] && [ $ebuild -eq 1 ]; then
     echo "export pwre_conf_incdirgtk=\"$conf_incdirgtk\"" >> $cfile
     echo "export pwre_conf_incdirqt=\"$conf_incdirqt\"" >> $cfile
     echo "export pwre_conf_incdirgst=\"$conf_incdirgst\"" >> $cfile
-    echo "export pwre_conf_dtt_platform=\"arm_linux\"" >> $cfile
+    echo "export pwre_conf_dtt_platform=\"${pwre_hw:3}_${pwre_os:3}\"" >> $cfile
 else
 
     if [ $pwre_hw == "hw_arm" ]; then
@@ -500,7 +506,7 @@ else
     pwre_config_check_include powerlink EPL 1 "$epl/Include/Epl.h"
     pwre_config_check_include powerlinkuser EPLU 0 "$epl/Examples/X86/Generic/powerlink_user_lib/EplCfg.h"
     pwre_config_check_include rsvg  RSVG  1 "/usr/include/librsvg-2/librsvg/rsvg.h:/usr/include/librsvg-2.0/librsvg/rsvg.h"
-    pwre_config_check_include pydev   PYDEV   0 "/usr/include/python3.6m/pymath.h:/usr/include/python3.7m/pymath.h:/usr/include/python3.8/pymath.h:/usr/include/python3.9/pymath.h:/usr/include/python3.10/pymath.h"
+    pwre_config_check_include pydev   PYDEV   0 "/usr/include/python3.6m/pymath.h:/usr/include/python3.7m/pymath.h:/usr/include/python3.8/pymath.h:/usr/include/python3.9/pymath.h:/usr/include/python3.10/pymath.h:/usr/include/python3.11/pymath.h"
     pwre_config_check_tool android ANDROID "/usr/local/android-sdk-linux/tools/android"
 
 

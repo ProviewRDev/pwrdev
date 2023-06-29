@@ -23,6 +23,7 @@ lib :
 
 exe : $(bld_dir)/control_pwrrt $(bld_dir)/control_pwr $(bld_dir)/control_pwrdemo
 rpi : $(bld_dir)/control_pwrrpi
+rpi64 : $(bld_dir)/control_pwrrpi64
 
 clean :
 
@@ -51,4 +52,9 @@ $(bld_dir)/control_pwrdemo : ../pwrdemo/control
 $(bld_dir)/control_pwrrpi : ../pwrrpi/control
 	@ echo "build $(target)"
 	@ ../pwrrpi/build.sh
+	@ cp $(source) $(target)
+
+$(bld_dir)/control_pwrrpi64 : ../pwrrpi64/control
+	@ echo "build $(target)"
+	@ ../pwrrpi64/build.sh
 	@ cp $(source) $(target)

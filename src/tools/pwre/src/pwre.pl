@@ -394,13 +394,13 @@ sub ebuild # args: pass flavour
     _module("sev");
     merge();
     _module("rt");
-    _build("exe", "rt*", "src", "all");
+#    _build("exe", "rt*", "src", "all");
 #    _build("exe", "co*", $flavour, "all");
-    _build("exe", "pwr_user", "src", "all");
+#    _build("exe", "pwr_user", "src", "all");
     if ($to_build{"nmps"}) {
       merge();
       _module("nmps");
-      _build("lib", "nmps", "src", "all");
+      _build("lib", "nmps", "src", "init copy lib");
       merge();
     }
     if ($to_build{"dataq"}) {
@@ -446,7 +446,7 @@ sub ebuild # args: pass flavour
     if ($to_build{"remote"}) {
       _module("remote");
       _build("lib", "remote", "src", "all");
-      _build("exe", "*", "src", "all");
+#      _build("exe", "*", "src", "all");
       merge();
     }
     if ($to_build{"opc"}) {
@@ -457,18 +457,18 @@ sub ebuild # args: pass flavour
     }
     if ($to_build{"tlog"}) {
       _module("tlog");
-      _build("lib", "tlog", "src", "all");
+#      _build("lib", "tlog", "src", "all");
       merge();
     }
     if ($to_build{"java"}) {
       _module("java");
-      _build("exe", "jpwr_rt_gdh", "src", "all");
+#      _build("exe", "jpwr_rt_gdh", "src", "all");
       merge();
     }
     if ($to_build{"sev"}) {
       _module("sev");
       _build("lib", "sev", "src", "all");
-      _build("exe", "sev_server", "src", "all");
+#      _build("exe", "sev_server", "src", "all");
       merge();
     }
     if ($to_build{"abb"}) {
