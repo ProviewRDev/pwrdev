@@ -52,18 +52,30 @@ $(doc_dir)/prm/index.html : doxygen.c
 
 $(doc_dir)/pwrrt.html : $(pwre_croot)/src/exp/pwrrt/src/pwrrtmodule.c
 	@ $(log_doxy)
-	@ cd $(doc_dir); \
-	  export PYTHONPATH=$(pwr_eexe); \
-	  $(python) -m pydoc -w pwrrt
+	@ if [ -e $(pwr_eexe)/pwrrt.so ]; then \
+	    cd $(doc_dir); \
+	    export PYTHONPATH=$(pwr_eexe); \
+	    $(python) -m pydoc -w pwrrt; \
+	  else \
+	     echo "Module pwrrt doesn't exist"; \
+	  fi
 
 $(doc_dir)/pwrwb.html : $(pwre_croot)/wb/exp/pwrwb/src/pwrwbmodule.cpp
 	@ $(log_doxy)
-	@ cd $(doc_dir); \
-	  export PYTHONPATH=$(pwr_eexe); \
-	  $(python) -m pydoc -w pwrwb
+	@ if [ -e $(pwr_eexe)/pwrwb.so ]; then \
+	    cd $(doc_dir); \
+	    export PYTHONPATH=$(pwr_eexe); \
+	    $(python) -m pydoc -w pwrwb; \
+	  else \
+	     echo "Module pwrwb doesn't exist"; \
+	  fi
 
 $(doc_dir)/pwrtest.html : $(pwre_croot)/test/exp/pwrtest/src/pwrtestmodule.cpp
 	@ $(log_doxy)
-	@ cd $(doc_dir); \
-	  export PYTHONPATH=$(pwr_eexe); \
-	  $(python) -m pydoc -w pwrtest
+	@ if [ -e $(pwr_eexe)/pwrtest.so ]; then \
+	    cd $(doc_dir); \
+	    export PYTHONPATH=$(pwr_eexe); \
+	    $(python) -m pydoc -w pwrtest; \
+	  else \
+	     echo "Module pwrtest doesn't exist"; \
+	  fi
