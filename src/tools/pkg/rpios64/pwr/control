@@ -1,0 +1,24 @@
+Package: pwr61
+Version: 6.1.0-1
+Section: base
+Priority: optional
+Architecture: arm64
+Depends: libc6 (>= 2.31-13+rpt2+rpi1+deb11u4),
+ libgtk-3-0 (>= 3.24.24-4+rpt1+deb11u2),
+ libasound2 (>= 1.2.4-1.1+rpt2),
+ libdb5.3 (>= 5.3.28+dfsg1-0.8),
+ libdb5.3++ (>= 5.3.28+dfsg1-0.8),
+ libsqlite3-0 (>= 3.34.1-3),
+ librsvg2-2 (>= 2.50.3+dfsg-1),
+ g++ (>= 4:10.2.1-1),
+ libmariadb3 (>= 1:10.5.15-0+deb11u1),
+ librabbitmq4 (>= 0.10.0-1), 
+ libhdf5-openmpi-103 (>= 1.10.6+repack-4+deb11u1), 
+ libusb-1.0-0 (>= 2:1.0.24-3),
+ xterm,
+ xfonts-100dpi,
+ util-linux
+Replaces: pwr50,pwr51,pwr52,pwr53,pwr54,pwr55,pwr56,pwr57,pwr58,pwr59,pwr60
+Maintainer: Proview <postmaster@proview.se>
+Description: Proview development and runtime environment package
+ 6.1.0-1 Base release

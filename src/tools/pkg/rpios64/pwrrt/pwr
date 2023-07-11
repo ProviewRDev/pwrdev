@@ -1,0 +1,110 @@
+#!/bin/sh
+
+### BEGIN INIT INFO
+# Provides:        pwr
+# Required-Start:  $network $syslog
+# Required-Stop:   $network $syslog
+# Default-Start:   2 3 4 5
+# Default-Stop:
+# Short-Description: Start ProviewR Runtime Environment
+### END INIT INFO
+
+. /etc/pwrp_profile
+. /lib/lsb/init-functions
+
+DAEMON=$pwr_exe/rt_ini
+PIDFILE=/run/pwr/pwr.pid
+
+test -x $DAEMON || exit 5
+
+LOCKFILE=/run/lock/pwrdate
+
+RUNASUSER=pwrp
+UGID=$(getent passwd $RUNASUSER | cut -f 3,4 -d:) || true
+
+case $1 in
+	start)
+		echo ""
+		log_daemon_msg "Starting ProviewR Runtime" "rt_ini"
+		if [ -z "$UGID" ]; then
+			log_failure_msg "user \"$RUNASUSER\" does not exist"
+			exit 1
+		fi
+		(
+#			flock -w 180 10
+			start-stop-daemon --start --oknodo --pidfile $PIDFILE --startas $DAEMON -- -D
+			sleep 5
+		)
+#		) 10>$LOCKFILE
+		log_end_msg $?
+  		;;
+	stop)
+		echo ""
+		log_daemon_msg "Stopping ProviewR Runtime" "rt_ini"
+
+		# Store PID of rt_ini before sending SIGTERM
+		PID=0
+		if [ -e $PIDFILE ]; then
+			read PID < $PIDFILE
+		else
+			echo ""
+			log_daemon_msg "No pidfile present. Did you start ProviewR as a system service?" "rt_ini"
+		fi
+
+		rt_ini -s &>/dev/null
+		# Sleep until process is gone
+		while kill -0 $PID &>/dev/null; do
+			sleep 1
+		done
+
+		# Did we manage to bring everything down correct? Check to see if there are IPCs still left for the process
+		if [ ! -z $PID ]; then
+			ipcs -p | grep $PID &>/dev/null
+			if [ $? -eq 0 ]; then
+				echo ""
+				log_daemon_msg "IPC objects still present (abnormal termination of ProviewR?) running kill script" "rt_ini"
+				. $pwr_exe/pwr_stop.sh &>/dev/null
+			fi
+		fi
+
+		# Check for the presence of pwr_* tmp files. If there are any something must have gone wrong in the closing of rt_ini
+		ls -1 /tmp/pwr_*_$PWR_BUS_ID &>/dev/null
+		if [ $? -eq 0 ]; then
+			echo "\n"
+			log_daemon_msg "Temporary files still present (abnormal termination of ProviewR?) running kill script" "rt_ini"
+			. $pwr_exe/pwr_stop.sh &>/dev/null
+		fi
+
+		log_end_msg $?
+		rm -f $LOCKFILE
+  		;;
+	restart)
+		$0 stop && sleep 2 && $0 start
+  		;;
+	try-restart)
+		if $0 status >/dev/null; then
+			$0 restart
+		else
+			exit 0
+		fi
+		;;
+	reload)
+		PID=0
+		if [ -e $PIDFILE ]; then
+			read PID < $PIDFILE
+		else
+			echo ""
+			log_daemon_msg "No pidfile present, ProviewR doesn't seem to be running or you are running ProviewR as a standard user with -P" "rt_ini"
+			exit 1
+		fi
+
+		rt_ini -r &>/dev/null
+		;;
+	status)
+		status_of_proc $DAEMON "ProviewR Runtime"
+		;;
+	*)
+		echo "Usage: $0 {start|stop|restart|try-restart|reload|status}"
+		exit 2
+		;;
+esac
