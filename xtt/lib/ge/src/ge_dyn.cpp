@@ -12541,7 +12541,7 @@ void GeTable::set_attribute(
   if (*cnt == 0) {
     char msg[200];
 
-    strncpy(attribute[0], attr_name, sizeof(attribute));
+    strncpy(attribute[0], attr_name, sizeof(attribute[0]));
     snprintf(msg, sizeof(msg), "Column1.Attribute = %s", attr_name);
     msg[sizeof(msg) - 1] = 0;
     dyn->graph->message('I', msg);

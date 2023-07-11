@@ -822,14 +822,14 @@ int wb_vrepwbl::getAttrInfoRec(wb_attrname* attr, pwr_eBix bix, pwr_tCid cid,
     if (bix != pwr_eBix_sys)
       return 0;
     IF_ATTR(Description, pwr_eType_String, 1, level)
-    else IF_ATTR(NextOix, pwr_eType_ObjectIx, 1, level) else IF_ATTR(
-        RtVersion, pwr_eType_UInt32, 1, level) else IF_ATTR(RtCreTime,
-        pwr_eType_Time, 1, level) else IF_ATTR(RtCreator, pwr_eType_String, 1,
-        level) else IF_ATTR(RtCardinality, pwr_eType_UInt32, 1,
-        level) else IF_ATTR(RtBodySize, pwr_eType_UInt32, 1,
-        level) else IF_ATTR(NextCix, pwr_eType_ObjectIx, 1,
-        level) else if (attr->attributeIsEqual("NextTix", level))
-    {
+    else IF_ATTR(NextOix, pwr_eType_ObjectIx, 1, level) 
+    else IF_ATTR(RtVersion, pwr_eType_UInt32, 1, level)
+    else IF_ATTR(RtCreTime,pwr_eType_Time, 1, level)
+    else IF_ATTR(RtCreator, pwr_eType_String, 1, level)
+    else IF_ATTR(RtCardinality, pwr_eType_UInt32, 1,level)
+    else IF_ATTR(RtBodySize, pwr_eType_UInt32, 1, level)
+    else IF_ATTR(NextCix, pwr_eType_ObjectIx, 1, level)
+    else if (attr->attributeIsEqual("NextTix", level)) {
       if (attr->hasAttrIndex()) {
         *size = sizeof(o.NextTix[0]);
         *offset = (unsigned long)&o.NextTix - (unsigned long)&o
@@ -845,7 +845,8 @@ int wb_vrepwbl::getAttrInfoRec(wb_attrname* attr, pwr_eBix bix, pwr_tCid cid,
         *flags = 0;
       }
     }
-    else IF_ATTR(DvVersion, pwr_eType_UInt32, 1, level) return 1;
+    else IF_ATTR(DvVersion, pwr_eType_UInt32, 1, level)
+    return 1;
   }
   case pwr_eClass_ClassHier:
   case pwr_eClass_TypeHier:
@@ -856,9 +857,11 @@ int wb_vrepwbl::getAttrInfoRec(wb_attrname* attr, pwr_eBix bix, pwr_tCid cid,
     if (bix != pwr_eBix_sys)
       return 0;
     IF_ATTR(StructName, pwr_eType_String, 1, level)
-    else IF_ATTR(NumOfParams, pwr_eType_UInt32, 1, level) else IF_ATTR(Size,
-        pwr_eType_UInt32, 1, level) else IF_ATTR(NextAix, pwr_eType_ObjectIx, 1,
-        level) else IF_ATTR(Flags, pwr_eType_Mask, 1, level) return 1;
+    else IF_ATTR(NumOfParams, pwr_eType_UInt32, 1, level) 
+    else IF_ATTR(Size, pwr_eType_UInt32, 1, level) 
+    else IF_ATTR(NextAix, pwr_eType_ObjectIx, 1, level) 
+    else IF_ATTR(Flags, pwr_eType_Mask, 1, level)
+    return 1;
   }
   case pwr_eClass_Param: {
     pwr_sParam o;
@@ -907,9 +910,10 @@ int wb_vrepwbl::getAttrInfoRec(wb_attrname* attr, pwr_eBix bix, pwr_tCid cid,
       *tid = *type = pwr_eType_UInt32;
       *elements = 1;
       *flags = 0;
-    } else
-      IF_ATTR(Filler, pwr_eType_Int32, 1, level)
-    else IF_ATTR(TypeRef, pwr_eType_TypeId, 1, level) return 1;
+    }
+    else IF_ATTR(Filler, pwr_eType_Int32, 1, level)
+    else IF_ATTR(TypeRef, pwr_eType_TypeId, 1, level) 
+    return 1;
   }
   default: {
     // Search type in this volume

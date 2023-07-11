@@ -1308,7 +1308,7 @@ static pwr_tStatus OpenGraphFilter(xmenu_sMenuCall* ip)
         return sts;
 
       if (classid == pwr_cClass_XttGraph) {
-        if (ip->Caller == xmenu_mUtility_Ge && ip->Arg) {
+        if (ip->Caller == xmenu_mUtility_Ge) {
           // Check that graph is not the same as caller
           sts = gdh_AttrrefToName(
               &defgraph, name, sizeof(name), cdh_mName_volumeStrict);

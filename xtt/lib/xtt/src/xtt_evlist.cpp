@@ -1495,7 +1495,7 @@ ItemAlarm::ItemAlarm(EvList* item_evlist, const char* item_name,
     strcpy(alias, "");
   if (item_eventsound)
     eventsound = *item_eventsound;
-  if (eventmoretext && item_eventmoretext)
+  if (item_eventmoretext)
     strncpy(eventmoretext, item_eventmoretext, sizeof(eventmoretext));
   else
     strcpy(eventmoretext, "");

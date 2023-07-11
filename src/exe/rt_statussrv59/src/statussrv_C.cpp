@@ -7,6 +7,9 @@
 
 #include "statussrv_H.h"
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wregister"
+
 SOAP_SOURCE_STAMP("@(#) statussrv_C.cpp ver 2.7.9d 2007-06-29 12:20:02 GMT")
 
 #ifndef WITH_NOGLOBAL

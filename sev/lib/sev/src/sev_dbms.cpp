@@ -1528,7 +1528,7 @@ int sev_dbms::write_value(pwr_tStatus* sts, int item_idx, int attr_idx,
           break;
 	}
         case pwr_eType_Float64: {
-	  pwr_tFloat32 f;
+	  pwr_tFloat64 f;
 	  memcpy(&f, buf, sizeof(f));
           if ((feqf(m_items[item_idx].deadband, 0.0f)
                   && !memcmp(&f, m_items[item_idx].old_value,

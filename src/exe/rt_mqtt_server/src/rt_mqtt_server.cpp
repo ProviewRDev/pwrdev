@@ -840,7 +840,7 @@ static void message_cb(struct mosquitto *mosq, void *obj,
 
 	if (debug) {
 	  char txt[100];
-	  strncat(txt, rmsg, 100);
+	  strncat(txt, rmsg,99);
 	  txt[99] = 0;
 	  printf("history %d %s...\n", rc, txt);
 	}
@@ -1147,7 +1147,7 @@ static void message_cb(struct mosquitto *mosq, void *obj,
 
 	if (debug) {
 	  char txt[100];
-	  strncat(txt, rmsg, 100);
+	  strncat(txt, rmsg, 99);
 	  txt[99] = 0;
 	  printf("eventhist %d %s...\n", rc, txt);
 	}

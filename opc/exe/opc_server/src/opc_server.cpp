@@ -38,6 +38,9 @@
  * General Public License plus this exception.
  */
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wregister"
+
 #include <pthread.h>
 
 #include <map>

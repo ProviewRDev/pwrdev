@@ -2286,8 +2286,7 @@ void GlowDrawGtk::pop_background()
   if (erase_stack_cnt == 0)
     return;
   erase_stack_cnt--;
-  if (erase_stack != 0)
-    gc_erase = erase_stack[erase_stack_cnt - 1];
+  gc_erase = erase_stack[erase_stack_cnt - 1];
 }
 
 void GlowDrawGtk::set_background(GlowWind* wind, glow_eDrawType drawtype,
@@ -2622,7 +2621,7 @@ int GlowDrawGtk::print(char* filename, double x0, double x1, int end)
     rgb = rgb_row;
     for (i = 0; i < width; i++) {
       if (!colorimage) {
-        if (n_channels >= 4 && !(rgb + 3))
+        if (n_channels >= 4 && *(rgb + 3) == 0)
           grey = 255;
         else
           grey = (int)((0.0 + *rgb + *(rgb + 1) + *(rgb + 2)) / 3 + 0.5);
@@ -2635,7 +2634,7 @@ int GlowDrawGtk::print(char* filename, double x0, double x1, int end)
           ps->fp << endl;
         }
       } else {
-        if (n_channels >= 4 && !(rgb + 3))
+        if (n_channels >= 4 && *(rgb + 3) == 0)
           red = blue = green = 255;
         else {
           red = *rgb;

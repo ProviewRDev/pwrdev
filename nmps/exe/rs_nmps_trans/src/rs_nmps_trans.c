@@ -292,15 +292,17 @@ static int nmpstrans_connect_alarm()
   mh_eEvent AbortEventType = mh_eEvent_Alarm;
   mh_eEventPrio AbortEventPrio = mh_eEventPrio_A;
   pwr_tUInt32 NoOfActMessages;
+  pwr_tString80 AbortEventName = "AbortEventName";
+  pwr_tString80 AbortEventText = "AbortEventText";
 
   if (alarm_connected)
     /* We are already connected */
     return NMPS__SUCCESS;
 
-  sts = mh_ApplConnect(pwr_cNObjid, 0, "AbortEventName", AbortEventType,
+  sts = mh_ApplConnect(pwr_cNObjid, 0, AbortEventName, AbortEventType,
       AbortEventPrio,
       mh_mEventFlags_Bell | mh_mEventFlags_Ack | mh_mEventFlags_Return,
-      "AbortEventText", &NoOfActMessages);
+      AbortEventText, &NoOfActMessages);
   if (EVEN(sts))
     return sts;
 

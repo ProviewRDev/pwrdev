@@ -34,9 +34,8 @@ $(clean_html) : clean_%.html : %.html
 	@ $(rm) $(rmflags) $(doc_dir)/prm/$*.html
 
 $(doc_dir)/prm/index.html : doxygen.c
-	echo "Here in prm"
 	@ $(log_doxy)
-	doxygen
+	@ doxygen
 #	@ if [ "`eval which pdflatex`" != "" ]; then \
 #	    ./repl.sh latex/*.tex; \
 #	    cd latex; \
@@ -57,7 +56,7 @@ $(doc_dir)/pwrrt.html : $(pwre_croot)/src/exp/pwrrt/src/pwrrtmodule.c
 	    export PYTHONPATH=$(pwr_eexe); \
 	    $(python) -m pydoc -w pwrrt; \
 	  else \
-	     echo "Module pwrrt doesn't exist"; \
+	     echo "-- Module pwrrt doesn't exist"; \
 	  fi
 
 $(doc_dir)/pwrwb.html : $(pwre_croot)/wb/exp/pwrwb/src/pwrwbmodule.cpp
@@ -67,7 +66,7 @@ $(doc_dir)/pwrwb.html : $(pwre_croot)/wb/exp/pwrwb/src/pwrwbmodule.cpp
 	    export PYTHONPATH=$(pwr_eexe); \
 	    $(python) -m pydoc -w pwrwb; \
 	  else \
-	     echo "Module pwrwb doesn't exist"; \
+	     echo "-- Module pwrwb doesn't exist"; \
 	  fi
 
 $(doc_dir)/pwrtest.html : $(pwre_croot)/test/exp/pwrtest/src/pwrtestmodule.cpp
@@ -77,5 +76,5 @@ $(doc_dir)/pwrtest.html : $(pwre_croot)/test/exp/pwrtest/src/pwrtestmodule.cpp
 	    export PYTHONPATH=$(pwr_eexe); \
 	    $(python) -m pydoc -w pwrtest; \
 	  else \
-	     echo "Module pwrtest doesn't exist"; \
+	     echo "-- Module pwrtest doesn't exist"; \
 	  fi

@@ -60,6 +60,9 @@ On Mac OS X with gcc (GCC) 3.1 20020420 (prerelease) you MUST compile with
 when locally allocated data exceeds 64K.
 
 */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wregister"
+#pragma GCC diagnostic ignored "-Waddress"
 
 #ifdef AS400
 # pragma convert(819)	/* EBCDIC to ASCII */

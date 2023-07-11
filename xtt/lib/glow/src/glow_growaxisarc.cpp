@@ -661,7 +661,7 @@ void GrowAxisArc::set_conf(double max_val, double min_val, int no_of_lines,
   longquotient = long_quot;
   valuequotient = value_quot;
   trf.rotation = rot;
-  if (format)
+  if (value_format)
     strcpy(format, value_format);
 
   configure();

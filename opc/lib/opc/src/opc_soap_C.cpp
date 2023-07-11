@@ -7,6 +7,9 @@
 
 #include "opc_soap_H.h"
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wregister"
+
 SOAP_SOURCE_STAMP("@(#) opc_soap_C.cpp ver 2.7.9d 2007-03-30 08:43:57 GMT")
 
 #ifndef WITH_NOGLOBAL

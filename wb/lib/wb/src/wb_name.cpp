@@ -100,11 +100,14 @@ wb_name::operator bool() const
   return oddSts();
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Winfinite-recursion"
 std::ostream& operator<<(std::ostream& os, const wb_name& name)
 {
-  os << (name.c_str());
+  os << name.c_str();
   return os;
 }
+#pragma GCC diagnostic pop
 
 bool wb_name::hasVolume() const
 {

@@ -128,15 +128,17 @@ static int rtt_appl_connect_alarm()
 {
   int sts;
   pwr_tUInt32 NoOfActMessages;
+  pwr_tString80 AbortEventName = "AbortEventName";
+  pwr_tString80 AbortEventText = "AbortEventText";
 
   if (rtt_appl_alarm_connected)
     /* We are already connected */
     return RTT__SUCCESS;
 
-  sts = mh_ApplConnect(pwr_cNObjid, 0, "AbortEventName", mh_eEvent_Info,
+  sts = mh_ApplConnect(pwr_cNObjid, 0, AbortEventName, mh_eEvent_Info,
       mh_eEventPrio_D,
       mh_mEventFlags_Bell | mh_mEventFlags_Ack | mh_mEventFlags_Return,
-      "AbortEventText", &NoOfActMessages);
+      AbortEventText, &NoOfActMessages);
   if (EVEN(sts))
     return sts;
 

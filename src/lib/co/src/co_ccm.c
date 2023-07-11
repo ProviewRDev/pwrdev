@@ -2031,7 +2031,7 @@ int ccm_operate_exec(ccm_tFuncCtx funcctx, ccm_sOperand* op, ccm_sOperand* next)
         case K_DECL_STRING:
           sprintf(next->result_string + strlen(next->result_string),
               ccm_cIntFormat, op->result_int);
-          strncat(next->result_string, next_string, K_STRING_SIZE);
+          strncat(next->result_string, next_string, K_STRING_SIZE-1);
           next->result_string[K_STRING_SIZE - 1] = 0;
           next->result_decl = K_DECL_STRING;
           break;
@@ -2050,7 +2050,7 @@ int ccm_operate_exec(ccm_tFuncCtx funcctx, ccm_sOperand* op, ccm_sOperand* next)
         case K_DECL_STRING:
           ccm_float_to_string(tmp_str, op->result_float);
           strcpy(next->result_string, tmp_str);
-          strncat(next->result_string, next_string, K_STRING_SIZE);
+          strncat(next->result_string, next_string, K_STRING_SIZE-1);
           next->result_string[K_STRING_SIZE - 1] = 0;
           next->result_decl = K_DECL_STRING;
           break;
@@ -2067,13 +2067,13 @@ int ccm_operate_exec(ccm_tFuncCtx funcctx, ccm_sOperand* op, ccm_sOperand* next)
         case K_DECL_FLOAT:
           strcpy(next->result_string, op->result_string);
           ccm_float_to_string(tmp_str, next_float);
-          strncat(next->result_string, tmp_str, K_STRING_SIZE);
+          strncat(next->result_string, tmp_str, K_STRING_SIZE-1);
           next->result_string[K_STRING_SIZE - 1] = 0;
           next->result_decl = K_DECL_STRING;
           break;
         case K_DECL_STRING:
           strcpy(next->result_string, op->result_string);
-          strncat(next->result_string, next_string, K_STRING_SIZE);
+          strncat(next->result_string, next_string, K_STRING_SIZE-1);
           next->result_string[K_STRING_SIZE - 1] = 0;
           next->result_decl = K_DECL_STRING;
           break;
@@ -2096,7 +2096,7 @@ int ccm_operate_exec(ccm_tFuncCtx funcctx, ccm_sOperand* op, ccm_sOperand* next)
         case K_DECL_STRING:
           sprintf(next->result_string + strlen(next->result_string),
               ccm_cIntFormat, op->result_int);
-          strncat(next->result_string, next_string, K_STRING_SIZE);
+          strncat(next->result_string, next_string, K_STRING_SIZE-1);
           next->result_string[K_STRING_SIZE - 1] = 0;
           next->result_decl = K_DECL_STRING;
           break;
@@ -2115,7 +2115,7 @@ int ccm_operate_exec(ccm_tFuncCtx funcctx, ccm_sOperand* op, ccm_sOperand* next)
         case K_DECL_STRING:
           ccm_float_to_string(tmp_str, op->result_float);
           strcpy(next->result_string, tmp_str);
-          strncat(next->result_string, next_string, K_STRING_SIZE);
+          strncat(next->result_string, next_string, K_STRING_SIZE-1);
           next->result_string[K_STRING_SIZE - 1] = 0;
           next->result_decl = K_DECL_STRING;
           break;
@@ -2132,13 +2132,13 @@ int ccm_operate_exec(ccm_tFuncCtx funcctx, ccm_sOperand* op, ccm_sOperand* next)
         case K_DECL_FLOAT:
           strcpy(next->result_string, op->result_string);
           ccm_float_to_string(tmp_str, next_float);
-          strncat(next->result_string, tmp_str, K_STRING_SIZE);
+          strncat(next->result_string, tmp_str, K_STRING_SIZE-1);
           next->result_string[K_STRING_SIZE - 1] = 0;
           next->result_decl = K_DECL_STRING;
           break;
         case K_DECL_STRING:
           strcpy(next->result_string, op->result_string);
-          strncat(next->result_string, next_string, K_STRING_SIZE);
+          strncat(next->result_string, next_string, K_STRING_SIZE-1);
           next->result_string[K_STRING_SIZE - 1] = 0;
           next->result_decl = K_DECL_STRING;
           break;
