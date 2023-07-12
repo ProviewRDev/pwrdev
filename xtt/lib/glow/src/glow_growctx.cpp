@@ -5024,7 +5024,7 @@ int GrowCtx::merge_visible_layers()
     }      
   }
   strcpy(name, "Merged");
-  strncat(name, target->n_name, sizeof(name));
+  strncat(name, target->n_name, sizeof(name)-1);
   strncpy(target->n_name, name, sizeof(target->n_name));
   return 1;
 }
