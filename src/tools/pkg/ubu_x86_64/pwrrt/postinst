@@ -12,6 +12,7 @@ if [ "$1" = "configure" ]; then
 fi
 # End automatically added section
 
+platform="x86_64_linux"
 proot="/pwrp"
 aroot="/usr/pwrp/adm"
 

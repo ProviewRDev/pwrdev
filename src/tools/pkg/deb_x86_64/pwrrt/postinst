@@ -192,10 +192,10 @@ mkdir -p $proot/common/log
 mkdir -p $proot/common/loghist
 mkdir -p $proot/common/db
 mkdir -p $proot/common/web
-mkdir -p $proot/x86_64_linux/exe
-mkdir -p $proot/x86_64_linux/lib
-mkdir -p $proot/x86_64_linux/obj
-mkdir -p $proot/x86_64_linux/lis
+mkdir -p $proot/$platform/exe
+mkdir -p $proot/$platform/lib
+mkdir -p $proot/$platform/obj
+mkdir -p $proot/$platform/lis
 chown -R pwrp $proot
 chgrp -R pwrp $proot
 chmod g+w $proot/common/log

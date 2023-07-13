@@ -1,4 +1,4 @@
-platform="arm_linux"
+platform="arm64_linux"
 bus_id=""
 if [ -e /etc/proview.cnf ]; then
   bus_id=`eval cat /etc/proview.cnf | grep "\\bqcomBusId\\b" | awk '{print $2}'`
