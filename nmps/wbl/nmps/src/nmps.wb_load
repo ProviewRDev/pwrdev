@@ -854,8 +854,6 @@ Volume NMps $ClassVolume 0.0.1.1
     !  NMpsStoreCell objects. The CellDispMir object does not support the Remove,
     !  and Move functions in the CellDisp object.
     ! 
-    !  @image orm_celldispmir_fo.gif
-    ! 
     !  With the CellDispMir object you can display a table of the data objects
     !  in a cell, with the object name, and some selected attributes. The 
     !  CellDispMir object contains a number or arrays the values for the selected 

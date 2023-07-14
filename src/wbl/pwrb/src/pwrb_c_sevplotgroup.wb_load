@@ -49,9 +49,6 @@ SObject pwrb:Class
 !  Up to 20 graphs from storage objects can be displayed.
 !  The graphs brought together, in reality the measured quantities,
 !  may be sampled by different frequencies.
-!
-! @b Object graph
-!  @image orm_sevplotgroup_og.gif
 !*/
   Object SevPlotGroup $ClassDef 698 
     Body SysBody

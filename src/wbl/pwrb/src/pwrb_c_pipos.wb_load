@@ -43,7 +43,7 @@ SObject pwrb:Class
 !  @Summary Translates a pulse counter value into an engineering value
 !  Translates a pulse counter value into an engineering
 !  value, e.g. position, volume etc.
-!  @image orm_pipos_fo.gif
+!  @image orm_pipos_fo.png
 !
 !  Suppose the engineering value is a position. The actual
 !  position is then calculated at every scanning by means
@@ -59,6 +59,7 @@ SObject pwrb:Class
 !  @image orm_en1-163.gif
 !  How to carry out the calibrations is described below
 !  under Calibration.
+!  @image orm_en1-162.gif
 !*/
   Object PiPos $ClassDef 175 
     Body SysBody

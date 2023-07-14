@@ -43,7 +43,7 @@ SObject pwrb:Class
 !  @Summary Cosine function
 !  Sin calculates the cosine of the input, where the input is given
 !  in radians.
-!  @image orm_cos_fo.gif
+!  @image orm_cos_fo.png
 !  The output ActVal is calculated as
 !
 !  ActVal = FactorVal * cos( FactorIn * In)

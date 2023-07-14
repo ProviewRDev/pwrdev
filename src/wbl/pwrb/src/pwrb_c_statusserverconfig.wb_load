@@ -40,9 +40,6 @@ SObject pwrb:Class
 ! @Group Supervision,NodeConfiguration
 ! @Summary Status Server configuration
 ! Configuration object for the Status Server.
-!
-! @b Object graph
-!  @image orm_statusserverconfig_og.gif
 !*/
   Object StatusServerConfig $ClassDef 508
     Body SysBody

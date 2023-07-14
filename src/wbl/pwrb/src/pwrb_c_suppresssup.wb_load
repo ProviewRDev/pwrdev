@@ -41,7 +41,7 @@ SObject pwrb:Class
 !  @Code rt_plc_macro_io.h
 !  @Summary Object to suppress alarms.
 !  Object to suppress alarm.
-!  @image orm_suppresssup_fo.gif
+!  @image orm_suppresssup_fo.png
 !
 !*/
   Object SuppressSup $ClassDef 690 

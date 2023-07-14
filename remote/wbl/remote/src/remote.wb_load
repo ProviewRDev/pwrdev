@@ -1492,9 +1492,6 @@ Volume Remote $ClassVolume 0.0.1.4
     !  @Summary Configures communication to a remote system using Siemens 3964R on a serial line.
     !  Configures communication to a remote system using Siemens 3964R on a serial line..
     ! 
-    ! @b Object graph
-    !  @image orm_remnode3964r_og.gif
-    ! 
     ! @b See also
     !  @classlink RemoteConfig remote_remoteconfig.html
     !  @classlink RemTrans remote_remtrans.html
@@ -1758,9 +1755,6 @@ Volume Remote $ClassVolume 0.0.1.4
     !  DECnet address is used for addressing.
     !  On Linux systems, we have to use raw sockets to gain access to low level
     !  ethernet frames and the device's MAC address for addressing.
-    ! 
-    ! @b Object graph
-    !  @image orm_remnodealcm_og.gif
     ! 
     ! @b See also
     !  @classlink RemoteConfig remote_remoteconfig.html
@@ -2105,9 +2099,6 @@ Volume Remote $ClassVolume 0.0.1.4
     !  @Summary Configures communication to a remote system using Modbus on a serial line.
     !  Configures communication to a remote system using Modbus on a serial line.
     ! 
-    ! @b Object graph
-    !  @image orm_remnodemodbus_og.gif
-    ! 
     ! @b See also
     !  @classlink RemoteConfig remote_remoteconfig.html
     !  @classlink RemTrans remote_remtrans.html
@@ -2352,9 +2343,6 @@ Volume Remote $ClassVolume 0.0.1.4
     !  @Summary Configures communication through a message queue using BEA MessageQ.
     !  Configures communication through a message queue using BEA MessageQ as a client.
     ! 
-    ! @b Object graph
-    !  @image orm_remnodemq_og.gif
-    ! 
     ! @b See also
     !  @classlink RemoteConfig remote_remoteconfig.html
     !  @classlink RemTrans remote_remtrans.html
@@ -2542,9 +2530,6 @@ Volume Remote $ClassVolume 0.0.1.4
     ! 
     !  To set retain for published messages, set Address[3] in the RemTrans
     !  object to 1.
-    ! 
-    ! @b Object graph
-    !  @image orm_remnodemqtt_og.png
     ! 
     ! @b See also
     !  @classlink RemoteConfig remote_remoteconfig.html
@@ -2987,9 +2972,6 @@ Volume Remote $ClassVolume 0.0.1.4
     !  the second bit (MsgOrder) in Address[2] in the RemTrans object. Note the MsgOrder 
     !  will reduce the performance of the communication.
     ! 
-    ! @b Object graph
-    !  @image orm_remnoderabbitmq_og.png
-    ! 
     ! @b See also
     !  @classlink RemoteConfig remote_remoteconfig.html
     !  @classlink RemTrans remote_remtrans.html
@@ -3268,9 +3250,6 @@ Volume Remote $ClassVolume 0.0.1.4
     !  @Summary Configures communication to a remote system using Siemens RK512 on a serial line.
     !  Configures communication to a remote system using Siemens RK512 on a serial line..
     ! 
-    ! @b Object graph
-    !  @image orm_remnoderk512_og.gif
-    ! 
     ! @b See also
     !  @classlink RemoteConfig remote_remoteconfig.html
     !  @classlink RemTrans remote_remtrans.html
@@ -3528,9 +3507,6 @@ Volume Remote $ClassVolume 0.0.1.4
     !  @Group Servers,NodeConfiguration
     !  @Summary Configures communication to a remote system using a serial line.
     !  Configures communication to a remote system using a serial line.
-    ! 
-    ! @b Object graph
-    !  @image orm_remnodeserial_og.gif
     ! 
     ! @b See also
     !  @classlink RemoteConfig remote_remoteconfig.html
@@ -3797,9 +3773,6 @@ Volume Remote $ClassVolume 0.0.1.4
     !  @Group Servers,NodeConfiguration
     !  @Summary Configures communication to a remote using the TCP/ip protocol.
     !  Configures communication to a remote using the TCP/ip protocol.
-    ! 
-    ! @b Object graph
-    !  @image orm_remnodetcp_og.gif
     ! 
     ! @b See also
     !  @classlink RemoteConfig remote_remoteconfig.html
@@ -4110,9 +4083,6 @@ Volume Remote $ClassVolume 0.0.1.4
     !  @Group Servers,NodeConfiguration
     !  @Summary Configures communication to a remote using the UDP/ip protocol.
     !  Configures communication to a remote using the UDP/ip protocol.
-    ! 
-    ! @b Object graph
-    !  @image orm_remnodeudp_og.gif
     ! 
     ! @b See also
     !  @classlink RemoteConfig remote_remoteconfig.html
@@ -4606,9 +4576,6 @@ Volume Remote $ClassVolume 0.0.1.4
     !  Address[0] - defines whether the message should be sent as a persistent message or not.
     !               1 means that the message will be sent as a persistent message. 0 not.
     ! 
-    ! @b Object graph
-    !  @image orm_remnodewmq_og.gif
-    ! 
     ! @b See also
     !  @classlink RemoteConfig remote_remoteconfig.html
     !  @classlink RemTrans remote_remtrans.html
@@ -4790,9 +4757,6 @@ Volume Remote $ClassVolume 0.0.1.4
     !  @Group Servers,NodeConfiguration
     !  @Summary Configures the remotehandler.
     !  Configures the remotehandler.
-    ! 
-    ! @b Object graph
-    !  @image orm_remoteconfig_og.gif
     ! 
     ! @b See also
     !  @classlink RemNode ssab_remnode.html

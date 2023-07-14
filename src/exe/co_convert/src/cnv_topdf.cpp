@@ -241,6 +241,7 @@ int CnvPdfObj::print_image()
   int sts;
   int width, height;
   char c;
+  int len;
 
   if (strchr(text, '/') != 0)
     dcli_translate_filename(fname, text);
@@ -265,13 +266,23 @@ int CnvPdfObj::print_image()
       dcli_translate_filename(fname, fname);
 
       sts = cnv_get_image(fname, &image, &pixmap);
-      if (EVEN(sts))
+      if (EVEN(sts)) {
         return 0;
+      }
     }
   }
 
   width = cnv_image_width(image);
   height = cnv_image_height(image);
+
+  sprintf(fname, "/tmp/pwr_cnv_%08u.jpg", dcli_random());
+  cnv_print_image(image, fname);
+
+  std::ifstream fimgcnt(fname);
+  len = 1;
+  while (fimgcnt.get(c)) 
+    len++;
+  fimgcnt.close();
 
   topdf->fp[topdf->cf] << number + topdf->v_outline.size()
           + topdf->v_pages.size() + topdf->v_content.size()
@@ -284,14 +295,11 @@ int CnvPdfObj::print_image()
                        << "     /ColorSpace /DeviceRGB\n"
                        << "     /BitsPerComponent 8\n"
                        << "     /Filter /DCTDecode\n"
-                       << "     /Length " << length << '\n'
+                       << "     /Length " << len << '\n'
                        << "  >>\n"
                        << "stream\n";
 
   start = (int)topdf->fp[topdf->cf].tellp();
-
-  sprintf(fname, "/tmp/pwr_cnv_%08u.jpg", dcli_random());
-  cnv_print_image(image, fname);
 
   std::ifstream fimg(fname);
   while (fimg.get(c))
@@ -301,7 +309,6 @@ int CnvPdfObj::print_image()
   length = (int)topdf->fp[topdf->cf].tellp() - start;
   topdf->fp[topdf->cf] << "endstream\n"
                        << "endobj\n";
-
   cnv_free_image(image, pixmap);
   fimg.close();
   sprintf(cmd, "rm -f %s", fname);
@@ -816,8 +823,10 @@ int CnvToPdf::print_image(const char* filename)
       dcli_translate_filename(fname, fname);
 
       sts = cnv_get_image(fname, &image, &pixmap);
-      if (EVEN(sts))
+      if (EVEN(sts)) {
+	printf("** Missing image %s\n", fname);
         return 0;
+      }
     }
   }
 

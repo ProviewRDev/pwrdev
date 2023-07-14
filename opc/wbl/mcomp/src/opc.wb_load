@@ -1209,9 +1209,6 @@ Volume Opc $ClassVolume 0.0.250.9
     ! 
     !  The object reside in an ExternalVolume browsing an OPC server and is 
     !  created dynamically by the OPC client process.
-    ! 
-    !  @b Object Graph
-    !  @image orm_opc_unsignedlong_og.gif
     !*/
     Object Opc_UnsignedLong $ClassDef 11 01-MAR-2007 16:55:43.95
       Body SysBody 01-MAR-2007 16:50:27.27

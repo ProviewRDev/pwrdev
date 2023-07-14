@@ -43,7 +43,7 @@ SObject pwrb:Class
 !  @Summary Convert an absolute time to second, minute, hour, month, day of month etc.
 !  Convert an absolute time to seconds, minutes, hours, month, year, day of month, 
 !  day of week and day of year.
-!  @image orm_localtime_fo.gif
+!  @image orm_localtime_fo.png
 !
 !  The available outputs are:
 !

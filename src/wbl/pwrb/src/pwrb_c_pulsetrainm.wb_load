@@ -51,7 +51,7 @@ SObject pwrb:Class
 !
 !  @image orm_pulsetrainm_fo.png
 !
-!  @image orm_pulsetrainm_ex.png
+!  @image orm_pulsetrain_ex.png
 !  Pulse train with cycletime 2 s
 !*/
   Object PulseTrainM $ClassDef 721 

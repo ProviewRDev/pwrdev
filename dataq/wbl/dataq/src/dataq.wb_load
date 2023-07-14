@@ -711,9 +711,6 @@ Volume DataQ $ClassVolume 0.0.1.3
     ! @Summary Configures the dataq server.
     ! Configures the dataq server.
     ! 
-    ! @b Object graph
-    ! @image orm_dataqserver_og.png
-    ! 
     ! See also
     ! @classlink DataQ dataq_dataq.html
     !*/

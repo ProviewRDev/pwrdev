@@ -42,7 +42,7 @@ SObject pwrb:Class
 !  @Group Plc,PlcConversion
 !  @Summary Convert analog value to integer
 !  Convert analog value to integer.
-!  @image orm_dtoi_fo.gif
+!  @image orm_dtoi_fo.png
 !
 !  The DtoI object converts a digital value (pwr_tBoolean) to
 !  an integer (pwr_tInt32) stored in ActVal.

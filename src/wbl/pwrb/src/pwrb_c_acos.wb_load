@@ -42,7 +42,7 @@ SObject pwrb:Class
 !  @Group Plc,PlcArithm
 !  @Summary Arc cosine function.
 !  ACos calculates the arc cosine of the input.
-!  @image orm_acos_fo.gif
+!  @image orm_acos_fo.png
 !  The input should be in the range  -1 / FactorIn to 1 / FactorIn, otherwise 
 !  the output is undefined. 
 !  The result is in radians between -PI / 2 * FactorVal and PI / 2 * FactorVal.

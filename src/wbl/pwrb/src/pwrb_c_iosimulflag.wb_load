@@ -47,7 +47,7 @@ SObject pwrb:Class
 !  mode without IO. This object makes it possible to fetch
 !  this flag from function object code.
 !
-!  @image orm_iosimulflag_fo.gif
+!  @image orm_iosimulflag_fo.png
 !*/
   Object IOSimulFlag $ClassDef 674 
     Body SysBody
