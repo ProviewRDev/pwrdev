@@ -15,7 +15,7 @@ fi
 
 proot=$pwre_croot/project/pwrdemo
 pkgroot=$pwre_broot/$pwre_target/bld/pkg/pwrdemo$ver
-pkgsrc=$pwre_sroot/tools/pkg/raspbian/pwrdemo
+pkgsrc=$pwre_sroot/tools/pkg/rpios64/pwrdemo
 
 echo "-- Building pwrdemo$ver"
 
