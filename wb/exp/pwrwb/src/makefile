@@ -43,7 +43,7 @@ $(exe_dir)/pwrwb.so : pwrwbmodule.cpp
 	    elif [ "$(pwre_hw)" = "hw_x86" ]; then \
 	      mv $(bld_dir)/lib.linux-i686*-3*/pwrwb.cpython-3*-linux-gnu.so $(pwr_exe)/pwrwb.so; \
 	    elif [ "$(pwre_hw)" = "hw_arm" ]; then \
-	      mv $(bld_dir)/lib.linux-armv*-3*/pwrwb.cpython-3*-linux-gnueabihf.so $(pwr_exe)/pwrwb.so; \
+	      mv $(bld_dir)/lib.linux-a*-3*/pwrwb.cpython-3*-linux-gnueabihf.so $(pwr_exe)/pwrwb.so; \
 	    elif [ "$(pwre_hw)" = "hw_arm64" ]; then \
 	      mv $(bld_dir)/lib.linux-aarch64*-3*/pwrwb.cpython-3*-linux-gnu.so $(pwr_exe)/pwrwb.so; \
 	    fi;\
