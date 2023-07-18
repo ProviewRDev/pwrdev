@@ -1,28 +1,27 @@
 #!/bin/bash
 
-release="ubuntu:22.04"
-release_name="ubu"
-buildversion="31-AUG-2022 12:00:00"
+release="lpenz/rpios-bookworm-arm64"
+release_name="rpi"
+buildversion="26-MAY-2023 12:00:00"
 tz="Europe/Stockholm"
-build_rpi=1
-gitrepo="-b develop http://git:git@10.255.164.96/x6-0-0/pwr/.git"
+build_rpi=0
+gitrepo="-b develop http://git:git@192.168.0.105/pwr/.git"
 install_update="apt-get update"
 install_git="apt-get install -y git make"
 install_videodummy="apt-get install -y xserver-xorg-video-dummy"
 install_build="apt-get install -y libgtk-3-dev doxygen gcc g++ make libasound2-dev \
-	libdb5.3-dev libdb5.3++-dev openjdk-11-jdk libmariadb-dev \
+	libdb5.3-dev libdb5.3++-dev openjdk-17-jdk default-libmysqlclient-dev \
 	libsqlite3-dev libhdf5-openmpi-dev librabbitmq-dev libmosquitto-dev libusb-1.0.0-dev \
-	librsvg2-dev libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev libpython3-dev libtirpc-dev \
-	python3 python3-setuptools libcap-dev xfonts-100dpi"
-install_rpi="apt-get install -y gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf \
-        gcc-aarch64-linux-gnu g++-aarch64-linux-gnu"
+        librsvg2-dev libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev libpython3-dev \
+        python3 python3-setuptools libcap-dev xfonts-100dpi"
+install_rpi=""
 install_sev="apt-get install -y default-mysql-server"
 install_web="apt-get install -y nginx"
 install_remote="apt-get install -y socat"
 install_pwr="apt-get install -y libgtk-3-0 libasound2 \
 	libdb5.3 libdb5.3++ libsqlite3-0 librsvg2-2 g++  xterm libmariadb3 \
 	librabbitmq4 libusb-1.0-0 libhdf5-openmpi-103 librabbitmq4 libmosquitto1 \
-	libgstreamer1.0-0 libgstreamer-plugins-base1.0-0 openjdk-11-jdk \
+	libgstreamer1.0-0 libgstreamer-plugins-base1.0-0 openjdk-17-jdk \
 	xterm xfonts-100dpi sudo procps libpython3-dev python3"
 install_pwrrt="apt-get install -y libgtk-3-0 libasound2 \
 	libdb5.3 libdb5.3++ libsqlite3-0 librsvg2-2 g++ xterm libmariadb3 \
@@ -30,17 +29,16 @@ install_pwrrt="apt-get install -y libgtk-3-0 libasound2 \
 	libgstreamer1.0-0 libgstreamer-plugins-base1.0-0 \
 	xterm xfonts-100dpi sudo procps python3 python3-pandas python3-seaborn \
 	python3-statsmodels python3-sklearn python3-paho-mqtt mosquitto mosquitto-clients \
-	openjdk-11-jre"
+	openjdk-17-jre"
 install_pkg="dpkg -i"
-jdk_dir=/usr/lib/jvm/java-11-openjdk-amd64
+jdk_dir=/usr/lib/jvm/java-17-openjdk-arm64
 ver="6.1.0-1"
 sver="61"
-arch="amd64"
+arch="arm64"
 pkg_pwr="pwr"$sver"_"$ver"_"$arch".deb"
 pkg_pwrdemo="pwrdemo"$sver"_"$ver"_"$arch".deb"
 pkg_pwrrt="pwrrt_"$ver"_"$arch".deb"
 pkg_pwrrpi="pwrrpi"$sver"_"$ver"_"$arch".deb"
-pkg_pwrrpi64="pwrrpi64"$sver"_"$ver"_"$arch".deb"
 img_pwrbuild="pwrbuild_"$release_name":v1"
 img_pwrdev="pwrdev_"$release_name":v1"
 img_pwrrt="pwrrt_"$release_name":v1"
@@ -125,20 +123,18 @@ if [ $start -le 2 ] && [ $end -ge 2 ]; then
     ./
   docker container create --name tmp pwr:v1
   docker container cp tmp:/pwr/build.log ./log/
-  docker container cp tmp:/pwr/rls/os_linux/hw_x86_64/exp/lis/build.tlog ./log/
-  docker container cp tmp:/pwr/rls/os_linux/hw_x86_64/bld/pkg/$pkg_pwr ./pkg/
-  docker container cp tmp:/pwr/rls/os_linux/hw_x86_64/bld/pkg/$pkg_pwrdemo ./pkg/
-  docker container cp tmp:/pwr/rls/os_linux/hw_x86_64/bld/pkg/$pkg_pwrrt ./pkg/
-  docker container cp tmp:/pwr/rls/os_linux/hw_x86_64/bld/pkg/$pkg_pwrrpi ./pkg/
-  docker container cp tmp:/pwr/rls/os_linux/hw_x86_64/bld/pkg/$pkg_pwrrpi64 ./pkg/
-  docker container cp tmp:/pwr/rls/os_linux/hw_x86_64/bld/project/pwrtest01/bld/common/load/pwrp_pkg_pwrtest01a_0001.tgz ./data/
-  docker container cp tmp:/pwr/rls/os_linux/hw_x86_64/bld/project/pwrtest01/bld/common/load/pwrp_pkg_pwrtest01b_0001.tgz ./data/
-  docker container cp tmp:/pwr/rls/os_linux/hw_x86_64/bld/project/pwrtest01/bld/common/load/pwrp_pkg_pwrtest01c_0001.tgz ./data/
-  docker container cp tmp:/pwr/rls/os_linux/hw_x86_64/bld/project/pwrtest01/bld/common/load/pwrp_pkg_pwrtest01d_0001.tgz ./data/
-  docker container cp tmp:/pwr/rls/os_linux/hw_x86_64/bld/project/pwrtest01/bld/common/load/pwrp_pkg_pwrtest01e_0001.tgz ./data/
-  docker container cp tmp:/pwr/rls/os_linux/hw_x86_64/bld/project/pwrtest01/bld/common/load/pwrp_pkg_pwrtest01f_0001.tgz ./data/
-  docker container cp tmp:/pwr/rls/os_linux/hw_x86_64/bld/project/pwrtest02/bld/common/load/pwrtest02.tar.gz ./data/
-  docker container cp tmp:/pwr/rls/os_linux/hw_x86_64/bld/project/pwrtest03/bld/common/load/pwrp_pkg_pwrtest03a_0001.tgz ./data/
+  docker container cp tmp:/pwr/rls/os_linux/hw_arm64/exp/lis/build.tlog ./log/
+  docker container cp tmp:/pwr/rls/os_linux/hw_arm64/bld/pkg/$pkg_pwr ./pkg/
+  docker container cp tmp:/pwr/rls/os_linux/hw_arm64/bld/pkg/$pkg_pwrdemo ./pkg/
+  docker container cp tmp:/pwr/rls/os_linux/hw_arm64/bld/pkg/$pkg_pwrrt ./pkg/
+  docker container cp tmp:/pwr/rls/os_linux/hw_arm64/bld/project/pwrtest01/bld/common/load/pwrp_pkg_pwrtest01a_0001.tgz ./data/
+  docker container cp tmp:/pwr/rls/os_linux/hw_arm64/bld/project/pwrtest01/bld/common/load/pwrp_pkg_pwrtest01b_0001.tgz ./data/
+  docker container cp tmp:/pwr/rls/os_linux/hw_arm64/bld/project/pwrtest01/bld/common/load/pwrp_pkg_pwrtest01c_0001.tgz ./data/
+  docker container cp tmp:/pwr/rls/os_linux/hw_arm64/bld/project/pwrtest01/bld/common/load/pwrp_pkg_pwrtest01d_0001.tgz ./data/
+  docker container cp tmp:/pwr/rls/os_linux/hw_arm64/bld/project/pwrtest01/bld/common/load/pwrp_pkg_pwrtest01e_0001.tgz ./data/
+  docker container cp tmp:/pwr/rls/os_linux/hw_arm64/bld/project/pwrtest01/bld/common/load/pwrp_pkg_pwrtest01f_0001.tgz ./data/
+  docker container cp tmp:/pwr/rls/os_linux/hw_arm64/bld/project/pwrtest02/bld/common/load/pwrtest02.tar.gz ./data/
+  docker container cp tmp:/pwr/rls/os_linux/hw_arm64/bld/project/pwrtest03/bld/common/load/pwrp_pkg_pwrtest03a_0001.tgz ./data/
   docker container rm tmp
   docker image rm pwr:v1
 fi
@@ -298,7 +294,7 @@ if [ $start -le 11 ] && [ $end -ge 11 ]; then
 fi
 
 # Image pwrtest03a
-if [ $start -le 12 ] && [ $end -ge 12 ]; then
+if [ $start -le 12 ] && [ $end -ge 11 ]; then
   docker image build -t $img_pwrtest03a -f pwrtest03/Dockerfile.pwrtest03a \
     --build-arg RELEASE=$img_pwrrt \
     --build-arg INSTALL_WEB="$install_web" \
@@ -308,7 +304,7 @@ if [ $start -le 12 ] && [ $end -ge 12 ]; then
 fi
 
 # Image pwrdemoi
-if [ $start -le 13 ] && [ $end -ge 13 ]; then
+if [ $start -le 13 ] && [ $end -ge 12 ]; then
   docker image build -t $img_pwrdemoi -f pwrdemo/Dockerfile.pwrdemoi \
     --build-arg RELEASE=$img_pwrdev \
     --build-arg INSTALL_WEB="$install_web" \

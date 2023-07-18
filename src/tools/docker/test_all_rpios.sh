@@ -1,39 +1,39 @@
 #!/bin/bash
 
-release="jsurf/rpi-raspbian"
+release="lpenz/rpios-bookworm-armhf"
 release_name="rpi"
-buildversion="01-NOV-2021 12:00:00"
+buildversion="26-MAY-2023 12:00:00"
 tz="Europe/Stockholm"
 build_rpi=0
-gitrepo="-b develop http://192.168.0.175/git/x5-7-2/pwr/.git"
+gitrepo="-b develop http://git:git@192.168.0.105/pwr/.git"
 install_update="apt-get update"
 install_git="apt-get install -y git make"
 install_videodummy="apt-get install -y xserver-xorg-video-dummy"
-install_build="apt-get install -y libgtk2.0-dev doxygen gcc g++ make libasound2-dev \
-	libdb5.3-dev libdb5.3++-dev openjdk-11-jdk default-libmysqlclient-dev \
+install_build="apt-get install -y libgtk-3-dev doxygen gcc g++ make libasound2-dev \
+	libdb5.3-dev libdb5.3++-dev openjdk-17-jdk default-libmysqlclient-dev \
 	libsqlite3-dev libhdf5-openmpi-dev librabbitmq-dev libmosquitto-dev libusb-1.0.0-dev \
         librsvg2-dev libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev libpython3-dev \
-        python3 libcap-dev xfonts-100dpi"
+        python3 python3-setuptools libcap-dev xfonts-100dpi"
 install_rpi=""
 install_sev="apt-get install -y default-mysql-server"
 install_web="apt-get install -y nginx"
 install_remote="apt-get install -y socat"
-install_pwr="apt-get install -y libgtk2.0-0 libasound2 \
+install_pwr="apt-get install -y libgtk-3-0 libasound2 \
 	libdb5.3 libdb5.3++ libsqlite3-0 librsvg2-2 g++  xterm libmariadb3 \
 	librabbitmq4 libusb-1.0-0 libhdf5-openmpi-103 librabbitmq4 libmosquitto1 \
-	libgstreamer1.0-0 libgstreamer-plugins-base1.0-0 openjdk-11-jdk \
+	libgstreamer1.0-0 libgstreamer-plugins-base1.0-0 openjdk-17-jdk \
 	xterm xfonts-100dpi sudo procps libpython3-dev python3"
-install_pwrrt="apt-get install -y libgtk2.0-0 libasound2 \
+install_pwrrt="apt-get install -y libgtk-3-0 libasound2 \
 	libdb5.3 libdb5.3++ libsqlite3-0 librsvg2-2 g++ xterm libmariadb3 \
 	librabbitmq4 libmosquitto1 libusb-1.0-0 libhdf5-openmpi-103 \
 	libgstreamer1.0-0 libgstreamer-plugins-base1.0-0 \
 	xterm xfonts-100dpi sudo procps python3 python3-pandas python3-seaborn \
 	python3-statsmodels python3-sklearn python3-paho-mqtt mosquitto mosquitto-clients \
-	openjdk-11-jre"
+	openjdk-17-jre"
 install_pkg="dpkg -i"
-jdk_dir=/usr/lib/jvm/java-11-openjdk-armhf
-ver="5.9.0-2"
-sver="59"
+jdk_dir=/usr/lib/jvm/java-17-openjdk-armhf
+ver="6.1.0-1"
+sver="61"
 arch="armhf"
 pkg_pwr="pwr"$sver"_"$ver"_"$arch".deb"
 pkg_pwrdemo="pwrdemo"$sver"_"$ver"_"$arch".deb"
@@ -119,6 +119,7 @@ if [ $start -le 2 ] && [ $end -ge 2 ]; then
     --build-arg GITREPO="$gitrepo" \
     --build-arg JDK_DIR=$jdk_dir \
     --build-arg TZ=$tz \
+    --build-arg ARCH=$arch \
     ./
   docker container create --name tmp pwr:v1
   docker container cp tmp:/pwr/build.log ./log/
