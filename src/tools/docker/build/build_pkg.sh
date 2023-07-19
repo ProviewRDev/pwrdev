@@ -20,6 +20,8 @@ unamestr=`eval uname`
 machine=`eval uname -m`
 if [ ${machine:0:3} == "arm" ]; then
   machine="arm"
+elif [ $machine == "aarch64" ]; then 
+  machine="arm64"
 elif [ $machine == "amd64" ] || [ $machine == "x86_64" ]; then
   machine="x86_64"
 else
@@ -46,6 +48,10 @@ release=${release:6:6}
 if [ "$release" == "Debian" ]; then
   if [ $machine == "x86" ]; then
     pkgname="deb"
+  elif [ $machine == "arm" ]; then
+    pkgname="raspbian"
+  elif [ $machine == "arm64" ]; then
+    pkgname="rpios64"
   else
     pkgname="deb_"$machine
   fi
@@ -64,6 +70,7 @@ fi
 
 pwre init $ename
 pwre build tools/pkg $pkgname
-if [ $release == "Debian" ] || [ $release == "Ubuntu" ]; then
+if [ $pkgname == "deb_"$machine ] || [ $pkgname == "ubu_"$machine ]; then
   pwre build tools/pkg $pkgname src rpi
+  pwre build tools/pkg $pkgname src rpi64
 fi

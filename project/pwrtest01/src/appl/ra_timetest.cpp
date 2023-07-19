@@ -784,7 +784,7 @@ void ra_timetest::AtoAscii(void)
     {{1587558870,220000000}, time_eFormat_FileDateAndTime, "20200422_143430", TIME__SUCCESS},
     {{1587558870,220000000}, time_eFormat_FileDate, "20200422", TIME__SUCCESS},
     {{1587558870,220000000}, time_eFormat_TimeAndDate, "14:34:30 22/04/20", TIME__SUCCESS},
-#ifdef __x86_64__
+#if defined(__x86_64__) || defined(__aarch64__)
     {{2537701200,0}, time_eFormat_DateAndTime, "01-JUN-2050 15:00:00.00", TIME__SUCCESS},
     {{2537701200,0}, time_eFormat_Time, "15:00:00.00", TIME__SUCCESS},
     {{2537701200,0}, time_eFormat_ComprDateAndTime, "50-06-01 15:00:00.00", TIME__SUCCESS},
@@ -836,7 +836,7 @@ void ra_timetest::AsciiToA(void)
     {"01-JAN-1970 01:00:00.00", pwr_cNTime, TIME__SUCCESS},
     {"22-APR-2020 14:34:30.22", {1587558870,220000000}, TIME__SUCCESS},
     {"22-apr-2020 14:34:30.22", {1587558870,220000000}, TIME__SUCCESS},
-#ifdef __x86_64__
+#if defined(__x86_64__) || defined(__aarch64__)
     {"01-JUN-2050 15:00:00.00", {2537701200,0}, TIME__SUCCESS},
 #else
     {"01-JUN-2050 15:00:00.00", {2537701200,0}, TIME__RANGE},

@@ -56,7 +56,7 @@ fi
 pwre add $ename $root/src $root/rls/os_$os/hw_$hw $root/rls $btype $os arm "$desc"
 pwre init $ename
 
-export jdk=/usr/lib/jvm/java-11-openjdk-amd64
+export jdk=/usr/lib/jvm/java-17-openjdk-amd64
 
 export pwre_cc=arm-linux-gnueabihf-gcc
 export pwre_cxx=arm-linux-gnueabihf-g++
@@ -67,3 +67,20 @@ pwre configure --ebuild
 pwre create all
 pwre import rt
 pwre ebuild rt
+
+ename=$ver$hw"rpi64"
+pwre add $ename $root/src $root/rls/os_$os/hw_$hw $root/rls $btype $os arm64 "$desc"
+pwre init $ename
+
+export jdk=/usr/lib/jvm/java-17-openjdk-amd64
+
+export pwre_cc=aarch64-linux-gnu-gcc
+export pwre_cxx=aarch64-linux-gnu-g++
+export pwre_ar=aarch64-linux-gnu-ar
+export pwre_host_exe=$pwre_broot/os_$os/hw_$hw/exp/exe
+
+pwre configure --ebuild
+pwre create all
+pwre import rt
+pwre ebuild rt
+
