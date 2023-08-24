@@ -261,7 +261,7 @@ int main(int argc, char* argv[])
               {
                 vars.set("module_index", old_slot.attribute("ModuleEnumNumber").as_double());
                 pugi::xml_node module_ref =
-                    DAP.select_node("//UseableModules/ModuleItemRef[number($module_index)]", &vars).node();
+                    DAP.select_node("UseableModules/ModuleItemRef[number($module_index)]", &vars).node();
                 module_id = module_ref.attribute("ModuleItemTarget").as_string();
 
                 // Save the ModuleID for reference later
