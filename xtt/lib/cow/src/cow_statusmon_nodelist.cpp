@@ -363,7 +363,7 @@ int Nodelist::open_graph(char *name, int width, int height)
 	&nodelist_ge_is_authorized_cb, 0, &nodelist_ge_extern_connect_cb);
     gectx->close_cb = nodelist_ge_close_cb;
 
-    ApplListElem e;
+    NlApplListElem e;
     strcpy(e.name,name);
     e.gectx = gectx;
     appl.add(e);

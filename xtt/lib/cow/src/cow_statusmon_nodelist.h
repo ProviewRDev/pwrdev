@@ -47,23 +47,23 @@ class CoWow;
 class MsgWindow;
 class CowGe;
 
-class ApplListElem {
+class NlApplListElem {
  public:
   char name[80];
   CowGe* gectx;
 
-  ApplListElem() : gectx(0) {
+  NlApplListElem() : gectx(0) {
     strcpy(name, "");
   }
-  ApplListElem(const ApplListElem& x) : gectx(x.gectx) {
+  NlApplListElem(const NlApplListElem& x) : gectx(x.gectx) {
     strcpy(name, x.name);
   }
 };
 
-class ApplList {
+class NlApplList {
  public:
-  std::vector<ApplListElem> list;
-  void add(ApplListElem& e) {
+  std::vector<NlApplListElem> list;
+  void add(NlApplListElem& e) {
     list.push_back(e);
   }
   CowGe* find(char *name) {
@@ -115,7 +115,7 @@ public:
   int scriptmode;
   int verify;
   int ccm_func_registred;
-  ApplList appl;
+  NlApplList appl;
 
   virtual void pop()
   {
