@@ -65,7 +65,8 @@ GrowGroup::~GrowGroup()
 {
   ctx->set_defered_redraw();
   ctx->delete_node_cons(this);
-  draw();
+  if (!ctx->nodraw)
+    draw();
   ctx->redraw_defered();
   if (hot)
     ctx->gdraw->set_cursor(&ctx->mw, glow_eDrawCursor_Normal);

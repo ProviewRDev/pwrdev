@@ -124,6 +124,9 @@ GrowCtx::GrowCtx(const char* ctx_name, double zoom_fact)
 
 GrowCtx::~GrowCtx()
 {
+  closing_down = 1;
+  set_nodraw();
+
   if (inputfocus_object)
     register_inputfocus(inputfocus_object, 0);
 
