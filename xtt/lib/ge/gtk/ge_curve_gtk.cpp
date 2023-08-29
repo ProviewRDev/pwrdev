@@ -565,33 +565,34 @@ void GeCurveGtk::enable(unsigned int mask)
 void GeCurveGtk::setup(unsigned int mask)
 {
   g_object_set(
-      menu_new, "visible", mask & curve_mEnable_New, NULL);
+      menu_new, "visible", mask & curve_mEnable_New ? TRUE : FALSE, NULL);
   g_object_set(
-      menu_save, "visible", mask & curve_mEnable_Save, NULL);
+      menu_save, "visible", mask & curve_mEnable_Save ? TRUE : FALSE, NULL);
   g_object_set(
-      menu_open, "visible", mask & curve_mEnable_Open, NULL);
+      menu_open, "visible", mask & curve_mEnable_Open ? TRUE : FALSE, NULL);
   g_object_set(menu_snapshot, "visible",
-      mask & curve_mEnable_Snapshot, NULL);
+      mask & curve_mEnable_Snapshot ? TRUE : FALSE, NULL);
   g_object_set(tools_snapshot, "visible",
-      mask & curve_mEnable_Snapshot, NULL);
+      mask & curve_mEnable_Snapshot ? TRUE : FALSE, NULL);
+  
   g_object_set(
-      menu_export, "visible", mask & curve_mEnable_Export, NULL);
+      menu_export, "visible", mask & curve_mEnable_Export ? TRUE : FALSE, NULL);
   g_object_set(sea_timebox, "visible",
-      mask & curve_mEnable_Timebox, NULL);
+      mask & curve_mEnable_Timebox ? TRUE : FALSE, NULL);
   g_object_set(
-      tools_add, "visible", mask & curve_mEnable_Add, NULL);
+      tools_add, "visible", mask & curve_mEnable_Add ? TRUE : FALSE, NULL);
   g_object_set(tools_curvetype_line, "visible",
-      mask & curve_mEnable_CurveType, NULL);
+      mask & curve_mEnable_CurveType ? TRUE : FALSE, NULL);
   g_object_set(tools_curvetype_points, "visible",
-      mask & curve_mEnable_CurveType, NULL);
+      mask & curve_mEnable_CurveType ? TRUE : FALSE, NULL);
   g_object_set(tools_curvetype_linepoints, "visible",
-      mask & curve_mEnable_CurveType, NULL);
+      mask & curve_mEnable_CurveType ? TRUE : FALSE, NULL);
   g_object_set(tools_curvetype_square, "visible",
-      mask & curve_mEnable_CurveType, NULL);
+      mask & curve_mEnable_CurveType ? TRUE : FALSE, NULL);
   g_object_set(tools_curve_fill, "visible",
-      mask & curve_mEnable_CurveType, NULL);
+      mask & curve_mEnable_CurveType ? TRUE : FALSE, NULL);
   g_object_set(tools_curve_digsplit, "visible",
-      mask & curve_mEnable_DigitalSplit, NULL);
+      mask & curve_mEnable_DigitalSplit ? TRUE : FALSE, NULL);
   layout_mask = mask;
 }
 
