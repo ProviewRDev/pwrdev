@@ -2179,13 +2179,15 @@ int FlowDrawGtk::get_text_extent(FlowCtx* ctx, const char* text, int len,
     flow_eDrawType gc_type, int idx, double* width, double* height, double size)
 {
   cairo_text_extents_t extents;
+  gsize len1;
 
   size *= DRAW_TSCALE;
 
   char* textutf8 = 0;
   if (ctx->text_coding != flow_eTextCoding_UTF_8) {
-    textutf8 = g_convert(text, -1, "UTF-8", "ISO8859-1", NULL, NULL, NULL);
+    textutf8 = g_convert(text, len, "UTF-8", "ISO8859-1", NULL, &len1, NULL);
     text = textutf8;
+    len = len1;
   }
 
   cairo_t *cr = get_cairo(1);
