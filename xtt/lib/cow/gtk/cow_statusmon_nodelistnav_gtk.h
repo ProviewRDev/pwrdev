@@ -50,7 +50,7 @@ public:
   NodelistNavGtk(void* ev_parent_ctx, GtkWidget* nodelistnav_parent_wid,
       MsgWindow* nodelistnav_msg_window, char* nodelistnav_msg_nodename,
       int nodelistnav_mode, int nodelistnav_view_node_descr,
-      int nodelist_msgw_pop, GtkWidget** w);
+      int nodelist_msgw_pop, char *nodelist_conf_file, GtkWidget** w);
   ~NodelistNavGtk();
 
   GtkWidget* parent_wid;

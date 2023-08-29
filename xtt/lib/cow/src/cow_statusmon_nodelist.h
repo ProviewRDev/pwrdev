@@ -45,6 +45,51 @@
 
 class CoWow;
 class MsgWindow;
+class CowGe;
+
+class ApplListElem {
+ public:
+  char name[80];
+  CowGe* gectx;
+
+  ApplListElem() : gectx(0) {
+    strcpy(name, "");
+  }
+  ApplListElem(const ApplListElem& x) : gectx(x.gectx) {
+    strcpy(name, x.name);
+  }
+};
+
+class ApplList {
+ public:
+  std::vector<ApplListElem> list;
+  void add(ApplListElem& e) {
+    list.push_back(e);
+  }
+  CowGe* find(char *name) {
+    for (int i = 0; i < list.size(); i++) {
+      if (strcmp(list[i].name, name) == 0)
+	return list[i].gectx;
+    }
+    return 0;
+  }
+  void remove(char* name) {
+    for (int i = 0; i < list.size(); i++) {
+      if (strcmp(list[i].name, name) == 0) {
+	list.erase(list.begin() + i);
+	return;
+      }
+    }
+  }
+  void remove(CowGe* gectx) {
+    for (int i = 0; i < list.size(); i++) {
+      if (gectx == list[i].gectx) {
+	list.erase(list.begin() + i);
+	return;
+      }
+    }
+  }
+};
 
 class Nodelist {
 public:
@@ -66,6 +111,11 @@ public:
   int mode;
   int view_node_descr;
   int selected_idx;
+  CowGe *map_gectx;
+  int scriptmode;
+  int verify;
+  int ccm_func_registred;
+  ApplList appl;
 
   virtual void pop()
   {
@@ -97,6 +147,21 @@ public:
   {
     nodelistnav->scantime = int(scantime * 1000);
   }
+
+  virtual CowGe* ge_new(const char* name, const char* filename,
+      int scrollbar, int menu, int navigator, int width, int height, int x, int y,
+      double scan_time, const char* object_name, int use_default_access,
+      unsigned int access, unsigned int options, void* basewidget,
+      double* borders, int color_theme, int dashboard,
+      int (*command_cb)(void*, char*, char*, char *, void*),
+      int (*get_current_objects_cb)(void*, pwr_sAttrRef**, int**),
+      int (*is_authorized_cb)(void*, unsigned int),
+      void (*keyboard_cb)(void*, void*, int, int),
+      int (*extern_connect_cb)(void*, char*, void**, pwr_tRefId*))
+  {
+    return 0;
+  }
+
   void activate_help();
   void activate_add_node();
   void activate_modify_node();
@@ -104,6 +169,7 @@ public:
   void activate_open_xtt();
   void activate_open_opplace();
   void activate_open_rtmon();
+  void activate_open_map();
   void activate_save();
   void activate_reconnect();
   static void find_node_cb(void* ctx, pwr_tOid oid);
@@ -113,6 +179,11 @@ public:
   static void mod_node_ok(
       Nodelist* nodelist, char* node_name, char *address, char* busid, char* description, 
       char* opplace);
+
+  void message(char severity, const char *msg);
+  int command(char* input_str);
+  int readcmdfile(char* incommand, char *script);
+  int open_graph(char *name, int width, int height);
 };
 
 #endif

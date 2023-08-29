@@ -143,7 +143,8 @@ class NodelistNav {
 public:
   NodelistNav(void* ev_parent_ctx, MsgWindow* nodelistnav_msg_window,
       char* nodelistnav_nodename, int nodelistnav_mode,
-      int nodelistnav_view_node_descr, int nodelistnav_msgw_pop);
+      int nodelistnav_view_node_descr, int nodelistnav_msgw_pop,
+      char *nodelist_conf_file);
   virtual ~NodelistNav();
 
   void* parent_ctx;
@@ -157,7 +158,7 @@ public:
   CoWow* wow;
   MsgWindow* msg_window;
   char nodename[40];
-  static const char config_file[40];
+  static pwr_tFileName config_file;
   int msgw_pop;
   int mode;
   int view_node_descr;
@@ -184,6 +185,7 @@ public:
   int update_nodes();
   void force_trace_scan();
   void message(pwr_tStatus sts, const char* node, int idx, const char* text);
+  int select_node(char *name);
   int select_node(int idx);
   void remove_node(char* name);
   int get_selected_node(char* name);

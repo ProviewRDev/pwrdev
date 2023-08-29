@@ -47,14 +47,23 @@
 #include "rt_xnav_msg.h"
 
 #include "cow_statusmon_nodelist.h"
+#include "cow_ge.h"
 #include "cow_wow.h"
 #include "cow_xhelp.h"
+
+static int nodelist_ge_is_authorized_cb(void* xnav, unsigned int access);
+static int nodelist_ge_command_cb(void* ctx, char* command, char* script, 
+    char *scriptargs, void* caller);
+static void nodelist_ge_close_cb(void* xnl, void* ctx);
+static int nodelist_ge_extern_connect_cb(void* xnl, char* name, void** p, pwr_tRefId* id);
+
 
 Nodelist::Nodelist(void* nodelist_parent_ctx, const char* nodelist_name,
     int nodelist_mode, int nodelist_view_node_descr, pwr_tStatus* status)
     : parent_ctx(nodelist_parent_ctx), nodelistnav(NULL), nodelist_displayed(0),
       help_cb(0), close_cb(0), mode(nodelist_mode),
-      view_node_descr(nodelist_view_node_descr)
+      view_node_descr(nodelist_view_node_descr), map_gectx(0), scriptmode(0), verify(0),
+      ccm_func_registred(0)
 {
   strcpy(remote_gui, "");
   *status = 1;
@@ -221,6 +230,94 @@ void Nodelist::activate_open_rtmon()
 
 }
 
+void Nodelist::activate_open_map()
+{
+  if (map_gectx) {
+    map_gectx->pop();
+  } else {
+    char name[80] = "Map";
+    char filename[80] = "$pwrp_exe/statusmon_map.pwg";
+    int width = 0;
+    int height = 0;
+    int x = 0;
+    int y = 0;
+    double scantime = 0.5;
+
+    map_gectx = ge_new(name, filename, 0, 0, 0, width,
+        height, x, y, scantime, 0, 0, ~0,
+	0, 0, 0, 0, 0, 
+        &nodelist_ge_command_cb, 0, 
+	&nodelist_ge_is_authorized_cb, 0, &nodelist_ge_extern_connect_cb);
+    map_gectx->close_cb = nodelist_ge_close_cb;
+#if 0
+    gectx->help_cb = xnav_ge_help_cb;
+    gectx->display_in_xnav_cb = xnav_ge_display_in_xnav_cb;
+    gectx->popup_menu_cb = xnav_popup_menu_cb;
+    gectx->call_method_cb = xnav_call_method_cb;
+    gectx->sound_cb = xnav_ge_sound_cb;
+    gectx->eventlog_cb = xnav_ge_eventlog_cb;
+    gectx->namechanged_cb = xnav_ge_namechanged_cb;
+    gectx->get_select_cb = xnav_ge_get_select_cb;
+#endif
+  }
+}
+
+static int nodelist_ge_is_authorized_cb(void* xnav, unsigned int access)
+{
+  return 1;
+}
+
+static int nodelist_ge_command_cb(
+    void* ctx, char* command, char* script, char *scriptargs, void* caller)
+{
+  Nodelist* nl = (Nodelist*)ctx;
+
+  nl->command(command);
+  return 1;
+}
+
+static void nodelist_ge_close_cb(void* xnl, void* ctx)
+{
+  Nodelist* nl = (Nodelist*)xnl;
+  CowGe* gectx = (CowGe*)ctx;
+
+  if (gectx == nl->map_gectx)
+    nl->map_gectx = 0;
+  else
+    nl->appl.remove(gectx);
+}
+
+static int nodelist_ge_extern_connect_cb(void* xnl, char* name, void** p, pwr_tRefId* id)
+{
+  Nodelist* nl = (Nodelist*)xnl;
+  char node[160];
+  char attr[80];
+  char *s;
+
+  strncpy(node, name, sizeof(node));
+  s = strchr(node, '.');
+  if (!s)
+    return 0;
+  *s = 0;  
+  strncpy(attr, s+1, sizeof(attr));
+  
+  for (int i = 0; i < (int)nl->nodelistnav->node_list.size(); i++) {
+    if (streq(node, nl->nodelistnav->node_list[i].node_name)) {
+      if (streq(attr, "SystemStatus"))
+	*p = &nl->nodelistnav->node_list[i].item->data.SystemStatus;
+      if (streq(attr, "CurrentStatus"))
+	*p = &nl->nodelistnav->node_list[i].item->data.CurrentStatus;
+      else if (streq(attr, "Description"))
+	*p = &nl->nodelistnav->node_list[i].description;
+      *id = pwr_cNRefId;
+      return 1;
+    }
+  }
+
+  printf("Name: %s\n", name);
+  return 0;
+}
+
 void Nodelist::activate_save()
 {
   nodelistnav->save();
@@ -229,4 +326,47 @@ void Nodelist::activate_save()
 void Nodelist::activate_reconnect()
 {
   nodelistnav->reconnect();
+}
+
+void Nodelist::message(char severity, const char *msg)
+{
+  printf("SMON-%c, %s\n", severity, msg);
+}
+
+int Nodelist::open_graph(char *name, int width, int height)
+{
+  CowGe *gectx;
+
+  if ((gectx = appl.find(name)) ) {
+    gectx->pop();
+  } else {
+    pwr_tFileName fname;
+    int width = 0;
+    int height = 0;
+    int x = 0;
+    int y = 0;
+    double scantime = 0.5;
+
+    if (strchr(name, '/'))
+      strcpy(fname, name);
+    else {
+      strcpy(fname, "$pwrp_exe/");
+      strcat(fname, name);
+    }
+    if (strchr(name, ','))
+      strcat(fname, ".pwg");
+	
+    gectx = ge_new(name, fname, 0, 0, 0, width,
+        height, x, y, scantime, 0, 0, ~0,
+	0, 0, 0, 0, 0, 
+        &nodelist_ge_command_cb, 0, 
+	&nodelist_ge_is_authorized_cb, 0, &nodelist_ge_extern_connect_cb);
+    gectx->close_cb = nodelist_ge_close_cb;
+
+    ApplListElem e;
+    strcpy(e.name,name);
+    e.gectx = gectx;
+    appl.add(e);
+  }
+  return 1;
 }

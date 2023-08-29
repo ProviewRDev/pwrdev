@@ -164,20 +164,6 @@ struct s_trace_node {
 };
 
 typedef enum {
-  ge_mOptions_FullScreen = 1 << 0,
-  ge_mOptions_Maximize = 1 << 1,
-  ge_mOptions_FullMaximize = 1 << 2,
-  ge_mOptions_Iconify = 1 << 3,
-  ge_mOptions_Invisible = 1 << 4,
-  ge_mOptions_Embedded = 1 << 5,
-  ge_mOptions_IsMain = 1 << 6,
-  ge_mOptions_HideCloseButton = 1 << 7,
-  ge_mOptions_HideDecorations = 1 << 8,
-  ge_mOptions_Dialog = 1 << 9,
-  ge_mOptions_ResizeFree = 1 << 10
-} ge_mOptions;
-
-typedef enum {
   xnav_eSetSignal_Conversion,
   xnav_eSetSignal_Invert,
   xnav_eSetSignal_Test,

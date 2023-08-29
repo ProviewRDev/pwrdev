@@ -524,6 +524,7 @@ public:
   void (*refresh_objects_cb)(void*, unsigned int);
   void (*resize_cb)(void*, int, int);
   int (*get_rtplant_select_cb)(void*, char* attr_name, int size, pwr_tTypeId *type);
+  int (*extern_connect_cb)(void*, char* name, void** p, pwr_tRefId *id);
   int linewidth; //!< Selected linewidth.
   glow_eLineType linetype; //!< Selected linetype.
   int textsize; //!< Selected text size.

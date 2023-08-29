@@ -52,10 +52,10 @@
 NodelistNavGtk::NodelistNavGtk(void* nodelist_parent_ctx,
     GtkWidget* nodelist_parent_wid, MsgWindow* nodelist_msg_window,
     char* nodelist_nodename, int nodelist_mode, int nodelist_view_node_descr,
-    int nodelist_msgw_pop, GtkWidget** w)
+    int nodelist_msgw_pop, char *nodelist_conf_file, GtkWidget** w)
     : NodelistNav(nodelist_parent_ctx, nodelist_msg_window, nodelist_nodename,
-          nodelist_mode, nodelist_view_node_descr, nodelist_msgw_pop),
-      parent_wid(nodelist_parent_wid), clock_cursor(0)
+      nodelist_mode, nodelist_view_node_descr, nodelist_msgw_pop, 
+      nodelist_conf_file), parent_wid(nodelist_parent_wid), clock_cursor(0)
 {
   form_widget = scrolledbrowwidgetgtk_new(init_brow_cb, this, &brow_widget);
 

@@ -51,7 +51,7 @@
 #include "cow_statusmon_nodelistnav.h"
 #include "cow_wow.h"
 
-const char NodelistNav::config_file[40] = "$HOME/rt_statusmon.dat";
+pwr_tFileName NodelistNav::config_file = "$HOME/rt_statusmon.dat";
 
 //
 //  Free pixmaps
@@ -216,7 +216,7 @@ int NodelistNav::init_brow_cb(FlowCtx* fctx, void* client_data)
 NodelistNav::NodelistNav(void* nodelist_parent_ctx,
     MsgWindow* nodelistnav_msg_window, char* nodelistnav_nodename,
     int nodelistnav_mode, int nodelistnav_view_node_descr,
-    int nodelistnav_msgw_pop)
+    int nodelistnav_msgw_pop, char *nodelistnav_conf_file)
     : parent_ctx(nodelist_parent_ctx), nodelist_size(0), trace_started(0),
       scantime(4000), first_scan(1), msg_window(nodelistnav_msg_window),
       msgw_pop(nodelistnav_msgw_pop), mode(nodelistnav_mode),
@@ -226,6 +226,8 @@ NodelistNav::NodelistNav(void* nodelist_parent_ctx,
     strcpy(nodename, nodelistnav_nodename);
   else
     strcpy(nodename, "");
+  if (nodelistnav_conf_file && strcmp(nodelistnav_conf_file, "") != 0)
+    strncpy(config_file, nodelistnav_conf_file, sizeof(config_file));
 }
 
 //
@@ -763,6 +765,15 @@ void NodelistNav::message(
     beep();
 }
 
+int NodelistNav::select_node(char *name)
+{
+  for (int i = 0; i < node_list.size(); i++) {
+    if (streq(name, node_list[i].node_name))
+      return select_node(i);
+  }
+  return 0;
+}
+
 int NodelistNav::select_node(int idx)
 {
   if (idx >= (int)node_list.size())
@@ -1152,6 +1163,8 @@ void NodelistNav::add_node(
   } else {
     // Nothing selected, insert last
     NodelistNode node(name);
+    strncpy(node.address, address, sizeof(node.address));
+    node.busid = busid;
     strcpy(node.opplace, opplace);
     strcpy(node.description, description);
     node_list.push_back(node);

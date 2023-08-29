@@ -34,8 +34,8 @@
  * General Public License plus this exception.
  */
 
-#ifndef xtt_ge_h
-#define xtt_ge_h
+#ifndef cow_ge_h
+#define cow_ge_h
 
 #include "glow.h"
 
@@ -60,7 +60,7 @@ typedef enum {
   ge_mOptions_ResizeFree = 1 << 10
 } ge_mOptions;
 
-class XttGe : XttUtility {
+class CowGe : XttUtility {
 public:
   void* parent_ctx;
   pwr_tAName name;
@@ -88,6 +88,7 @@ public:
   void (*keyboard_cb)(void*, void*, int, int);
   void (*namechanged_cb)(void*, void*, char*);
   int (*get_select_cb)(void*, char*, pwr_tTypeId*);
+  int (*extern_connect_cb)(void*, char*, void**, pwr_tRefId*);
   int width;
   int height;
   unsigned int options;
@@ -99,15 +100,16 @@ public:
   double window_resize_delta;
   CoWow* wow;
 
-  XttGe(void* parent_ctx, const char* name, const char* filename, int scrollbar,
+  CowGe(void* parent_ctx, const char* name, const char* filename, int scrollbar,
       int menu, int navigator, int width, int height, int x, int y,
       double scan_time, const char* object_name, int use_default_access,
       unsigned int access, unsigned int options, int color_theme,
       int (*xg_command_cb)(void*, char*, char*, char *, void*),
       int (*xg_get_current_objects_cb)(void*, pwr_sAttrRef**, int**),
       int (*xg_is_authorized_cb)(void*, unsigned int),
-      void (*xg_keyboard_cb)(void*, void*, int, int));
-  virtual ~XttGe();
+      void (*xg_keyboard_cb)(void*, void*, int, int),
+      int (*xg_extern_connect_cb)(void*, char*, void**, pwr_tRefId*));
+  virtual ~CowGe();
 
   virtual void pop()
   {
@@ -188,6 +190,8 @@ public:
       void* ge_ctx, pwr_sAttrRef** alist, int** is_alist);
   static int ge_get_rtplant_select_cb(
       void* ge_ctx, char* attr_name, int size, pwr_tTypeId *type);
+  static int ge_extern_connect_cb(
+      void* ge_ctx, char* name, void** p, pwr_tRefId *id);
   static void ge_eventlog_cb(void* ge_ctx, void* value, unsigned int size);
   static void ge_keyboard_cb(void* ge_ctx, int action, int type);
   static void message_cb(void* ctx, char severity, const char* msg);

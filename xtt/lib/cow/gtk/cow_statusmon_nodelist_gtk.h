@@ -47,7 +47,8 @@ class NodelistGtk : public Nodelist {
 public:
   NodelistGtk(void* nodelist_parent_ctx, GtkWidget* nodelist_parent_wid,
       const char* nodelist_name, int nodelist_mode,
-      int nodelist_view_node_descr, int msgw_pop, pwr_tStatus* status);
+      int nodelist_view_node_descr, int msgw_pop, char *nodelist_conf_file,
+      pwr_tStatus* status);
   ~NodelistGtk();
 
   GtkWidget* parent_wid;
@@ -95,6 +96,16 @@ public:
       const char* init_text, const char* init_text2, const char* init_text3, 
       const char* init_text4, const char* init_text5,
       void (*ok_cb)(Nodelist*, char*, char*, char*, char*, char*));
+  CowGe* ge_new(const char* name, const char* filename,
+      int scrollbar, int menu, int navigator, int width, int height, int x, int y,
+      double scan_time, const char* object_name, int use_default_access,
+      unsigned int access, unsigned int options, void* basewidget,
+      double* borders, int color_theme, int dashboard,
+      int (*command_cb)(void*, char*, char*, char *, void*),
+      int (*get_current_objects_cb)(void*, pwr_sAttrRef**, int**),
+      int (*is_authorized_cb)(void*, unsigned int),
+      void (*keyboard_cb)(void*, void*, int, int),
+      int (*extern_connect_cb)(void*, char*, void**, pwr_tRefId*));
 
   static gboolean action_inputfocus(
       GtkWidget* w, GdkEvent* event, gpointer data);
@@ -105,6 +116,7 @@ public:
   static void activate_open_xtt(GtkWidget* w, gpointer data);
   static void activate_open_opplace(GtkWidget* w, gpointer data);
   static void activate_open_rtmon(GtkWidget* w, gpointer data);
+  static void activate_open_map(GtkWidget* w, gpointer data);
   static void activate_save(GtkWidget* w, gpointer data);
   static void activate_reconnect(GtkWidget* w, gpointer data);
   static void activate_show_events(GtkWidget* w, gpointer data);

@@ -47,6 +47,7 @@
 #include "cow_msgwindow_gtk.h"
 #include "cow_statusmon_nodelist_gtk.h"
 #include "cow_statusmon_nodelistnav_gtk.h"
+#include "cow_ge_gtk.h"
 #include "cow_wutl_gtk.h"
 
 static gint delete_event(GtkWidget* w, GdkEvent* event, gpointer data)
@@ -62,7 +63,7 @@ static void destroy_event(GtkWidget* w, gpointer data)
 NodelistGtk::NodelistGtk(void* nodelist_parent_ctx,
     GtkWidget* nodelist_parent_wid, const char* nodelist_name,
     int nodelist_mode, int nodelist_view_node_descr, int msgw_pop,
-    pwr_tStatus* status)
+    char *nodelist_conf_file, pwr_tStatus* status)
     : Nodelist(nodelist_parent_ctx, nodelist_name, nodelist_mode,
           nodelist_view_node_descr, status),
       parent_wid(nodelist_parent_wid), clock_cursor(0), add_india_widget(0),
@@ -129,6 +130,11 @@ NodelistGtk::NodelistGtk(void* nodelist_parent_ctx,
   g_signal_connect(
       file_open_rtmon, "activate", G_CALLBACK(activate_open_rtmon), this);
 
+  GtkWidget* file_open_map = gtk_menu_item_new_with_mnemonic(
+      CoWowGtk::translate_utf8("O_pen Map"));
+  g_signal_connect(
+      file_open_map, "activate", G_CALLBACK(activate_open_map), this);
+
   GtkWidget* file_save = gtk_menu_item_new_with_mnemonic(
       CoWowGtk::translate_utf8("_Save Configuration"));
   g_signal_connect(file_save, "activate", G_CALLBACK(activate_save), this);
@@ -147,6 +153,7 @@ NodelistGtk::NodelistGtk(void* nodelist_parent_ctx,
   gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_open_xtt);
   gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_open_opplace);
   gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_open_rtmon);
+  gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_open_map);
   gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_close);
 
   GtkWidget* file
@@ -295,7 +302,7 @@ NodelistGtk::NodelistGtk(void* nodelist_parent_ctx,
   msg_window->msg('I', "Status Montitor started");
 
   nodelistnav = new NodelistNavGtk(this, vbox, msg_window, 0, mode,
-      view_node_descr, msgw_pop, &nodelistnav_widget);
+      view_node_descr, msgw_pop, nodelist_conf_file, &nodelistnav_widget);
 
   // Toolbar
   GtkToolbar* tools = (GtkToolbar*)g_object_new(GTK_TYPE_TOOLBAR, NULL);
@@ -335,6 +342,9 @@ NodelistGtk::NodelistGtk(void* nodelist_parent_ctx,
 
     wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_refresh_d_30.png" : "$pwr_exe/ico_refresh_l_30.png", G_CALLBACK(activate_reconnect), 
       "Reconnect", this, 1, 1);
+
+    wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_earth_d_30.png" : "$pwr_exe/ico_earth_l_30.png", G_CALLBACK(activate_open_map), 
+      "Map", this, 1, 1);
 
   gtk_box_pack_start(GTK_BOX(vbox), GTK_WIDGET(menu_bar), FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(vbox), GTK_WIDGET(tools), FALSE, FALSE, 0);
@@ -451,6 +461,13 @@ void NodelistGtk::activate_open_rtmon(GtkWidget* w, gpointer data)
   Nodelist* nodelist = (Nodelist*)data;
 
   nodelist->activate_open_rtmon();
+}
+
+void NodelistGtk::activate_open_map(GtkWidget* w, gpointer data)
+{
+  Nodelist* nodelist = (Nodelist*)data;
+
+  nodelist->activate_open_map();
 }
 
 void NodelistGtk::activate_save(GtkWidget* w, gpointer data)
@@ -948,3 +965,22 @@ void NodelistGtk::create_mod_input_dialog()
   gtk_widget_show_all(mod_india_widget);
   g_object_set(mod_india_widget, "visible", FALSE, NULL);
 }
+
+CowGe* NodelistGtk::ge_new(const char* name, const char* filename,
+    int scrollbar, int menu, int navigator, int width, int height, int x, int y,
+    double scan_time, const char* object_name, int use_default_access,
+    unsigned int access, unsigned int options, void* basewidget,
+    double* borders, int color_theme, int dashboard,
+    int (*command_cb)(void*, char*, char*, char *, void*),
+    int (*get_current_objects_cb)(void*, pwr_sAttrRef**, int**),
+    int (*is_authorized_cb)(void*, unsigned int),
+    void (*keyboard_cb)(void*, void*, int, int),
+    int (*extern_connect_cb)(void*, char*, void**, pwr_tRefId*))
+{
+  return new CowGeGtk(parent_wid, this, name, filename, scrollbar, menu,
+      navigator, width, height, x, y, scan_time, object_name,
+      use_default_access, access, options, basewidget, borders, color_theme,
+      dashboard, command_cb, get_current_objects_cb, is_authorized_cb, keyboard_cb,
+      extern_connect_cb);
+}
+

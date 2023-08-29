@@ -153,7 +153,8 @@ Graph::Graph(void* xn_parent_ctx, const char* xn_name,
       get_current_objects_cb(NULL), popup_menu_cb(NULL), call_method_cb(NULL),
       sound_cb(0), create_modal_dialog_cb(0), eventlog_cb(0),
       update_colorpalette_cb(0), keyboard_cb(xn_keyboard_cb),
-      refresh_objects_cb(0), resize_cb(0), get_rtplant_select_cb(NULL), 
+      refresh_objects_cb(0), resize_cb(0), get_rtplant_select_cb(NULL),
+      extern_connect_cb(0),
       linewidth(1), linetype(glow_eLineType_Solid),
       textsize(2), textbold(0), textfont(glow_eFont_Helvetica), border_color(1),
       fill_color(1), fill(0), border(1), shadow(0), grid_size_x(1),
@@ -5798,6 +5799,12 @@ int Graph::ref_object_info(glow_eCycle cycle, char* name, void** data,
   pwr_tAName aname;
   pwr_tStatus sts;
 
+  if (strncmp(name, "$extern.", 8) == 0) {
+    if (extern_connect_cb)
+      return (extern_connect_cb)(parent_ctx, &name[8], data, subid);
+    else
+      return 0;
+  }
   if (name[0] == '&') {
     sts = get_reference_name(name, aname);
     if (EVEN(sts))

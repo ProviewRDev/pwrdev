@@ -44,6 +44,7 @@
 #include "cow_msgwindow.h"
 #include "cow_statusmon_nodelist_gtk.h"
 #include "cow_xhelp_gtk.h"
+#include "rt_gdh.h"
 
 static void usage()
 {
@@ -66,7 +67,9 @@ int main(int argc, char* argv[])
   int sts;
   int mode = nodelist_eMode_SystemStatus;
   int view_descr = 0;
+  int init_gdh = 0;
   char language[20] = "";
+  pwr_tFileName conf_file = "";
 
   if (argc > 1) {
     for (int i = 1; i < argc; i++) {
@@ -98,12 +101,26 @@ int main(int argc, char* argv[])
         i++;
       } else if (streq(argv[i], "-e")) {
         view_descr = 1;
+      } else if (streq(argv[i], "-g")) {
+        init_gdh = 1;
+      } else if (streq(argv[i], "-c")) {
+        if (argc == i) {
+          usage();
+          exit(0);
+        }
+        strncpy(conf_file, argv[i + 1], sizeof(conf_file));
       }
     }
   }
 
   gtk_init(&argc, &argv);
 
+  if (init_gdh) {
+    sts = gdh_Init("rt_statusmon");
+    if (EVEN(sts)) {
+      printf("** Unable to initialize gdh\n");
+    }
+  }
   setlocale(LC_NUMERIC, "POSIX");
   setlocale(LC_TIME, "en_US");
 
@@ -111,7 +128,8 @@ int main(int argc, char* argv[])
   CoXHelp::set_default(xhelp);
 
   Nodelist* nl = new NodelistGtk(
-      0, 0, "Status Monitor", mode, view_descr, msgw_ePop_No, &sts);
+      0, 0, "Status Monitor", mode, view_descr, msgw_ePop_No, 
+      conf_file, &sts);
   nl->close_cb = statusmon_close;
   nl->set_scantime(3);
 
