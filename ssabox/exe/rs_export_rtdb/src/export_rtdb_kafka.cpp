@@ -129,10 +129,14 @@ static void dr_msg_cb(rd_kafka_t *kafka_handle, const rd_kafka_message_t *rkmess
 
 static void set_default_topic() {
   char hostname[HOST_NAME_MAX];
+  char ver[20];
+
+  sprintf(ver, "%d", KAFKA_VER);
   gethostname(hostname, HOST_NAME_MAX);
   strcpy(topic, "pwr.");
   strcat(topic, hostname);
-  strcat(topic, ".mvp-test-1.v1");
+  strcat(topic, ".rtdb.v");
+  strcat(topic, ver);
 }
 
 char* kafka_get_topic() {

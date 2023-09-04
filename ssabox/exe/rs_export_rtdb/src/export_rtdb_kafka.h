@@ -37,6 +37,8 @@
 #ifndef export_rtdb_kafka_h
 #define export_rtdb_kafka_h
 
+#define KAFKA_VER 1
+
 int send_kafka_key_val(void* val, int val_len);
 char* kafka_get_topic();
 void kafka_init(pwr_sClass_Ssab_ExportRtdbServer *a_confobj, char *a_topic, char* a_config_file);
