@@ -359,7 +359,7 @@ static void growwidgetgtk_realize(GtkWidget* widget)
       | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_KEY_PRESS_MASK
       | GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK
       | GDK_BUTTON_MOTION_MASK | GDK_ENTER_NOTIFY_MASK | GDK_LEAVE_NOTIFY_MASK
-      | GDK_STRUCTURE_MASK;
+      | GDK_STRUCTURE_MASK | GDK_SCROLL_MASK;
   attr.visual = gtk_widget_get_visual(widget);
 
   attr_mask = GDK_WA_X | GDK_WA_Y | GDK_WA_VISUAL;
