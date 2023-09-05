@@ -5136,7 +5136,7 @@ GeValue::GeValue(const GeValue& x)
     : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
           x.prio),
       zero_blank(x.zero_blank), decimals_decr(x.decimals_decr),
-      update_open(x.update_open)
+      update_open(x.update_open), convert_element(0)
 {
   strcpy(attribute, x.attribute);
   strcpy(format, x.format);
