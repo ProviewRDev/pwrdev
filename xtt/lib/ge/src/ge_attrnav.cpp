@@ -2477,7 +2477,8 @@ static int attrnav_brow_cb(FlowCtx* ctx, flow_tEvent event)
 	  grow_ResetHighlightAll(attrnav->graph->grow->ctx);
 	  attrnav->layer_highlighted = 0;
 	}
-	attrnav->graph->select_clear();
+        if (attrnav->type == attr_eType_Layers || attrnav->type == attr_eType_ObjectTree)
+	  attrnav->graph->select_clear();
         if (attrnav->type == attr_eType_Layers) {
           brow_GetUserData(event->object.object, (void**)&item);
           if (item->type == attrnav_eItemType_Object) {
@@ -2486,7 +2487,7 @@ static int attrnav_brow_cb(FlowCtx* ctx, flow_tEvent event)
         }
       } else {
         brow_SelectClear(attrnav->brow->ctx);
-	if (attrnav->layer_highlighted) {
+	if (attrnav->type == attr_eType_Layers && attrnav->layer_highlighted) {
 	  grow_ResetHighlightAll(attrnav->graph->grow->ctx);
 	  attrnav->layer_highlighted = 0;
 	}
