@@ -6314,6 +6314,12 @@ void Graph::delete_layer()
     message('E', "No layer is active");
     return;
   }
+
+  if (layer == grow_GetBackgroundLayer(grow->ctx)) {
+    message('E', "Can't delete background layer");
+    return;
+  }
+
   journal_store(journal_eAction_DeleteObject, layer);
 
   grow_DeleteObject(grow->ctx, layer);
