@@ -131,9 +131,11 @@ void GrowAnnot::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
     return;
   idx = MIN(idx, DRAW_TYPE_SIZE - 1);
 
-  double transp = 0;
+  double transp = 0;  
   if (colornode)
     transp = ((GrowNode*)colornode)->transparency;
+  if (transpnode && ((GrowNode*)transpnode)->transparency > transp)
+    transp = ((GrowNode*)transpnode)->transparency;
 
   glow_eFont lfont;
   glow_eDrawType ldraw_type;
