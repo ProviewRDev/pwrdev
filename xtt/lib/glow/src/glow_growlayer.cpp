@@ -270,7 +270,7 @@ int GrowLayer::event_handler(GlowWind* w, glow_eEvent event, int x, int y,
 {
   int sts;
 
-  if ((ctx->environment == glow_eEnv_Development && !active) || invisible)
+  if ((ctx->environment == glow_eEnv_Development && !active) || invisible || dimmed)
     return 0;
 
   switch (event) {
