@@ -2060,11 +2060,6 @@ void GrowCtx::save_grow(std::ofstream& fp, glow_eSaveMode mode)
      << '\n';
   fp << int(glow_eSave_GrowCtx_slider) << FSPACE << slider << '\n';
   fp << int(glow_eSave_GrowCtx_subgraph) << FSPACE << subgraph << '\n';
-  fp << int(glow_eSave_GrowCtx_java_name) << FSPACE << java_name << '\n';
-  fp << int(glow_eSave_GrowCtx_is_javaapplet) << FSPACE << is_javaapplet
-     << '\n';
-  fp << int(glow_eSave_GrowCtx_is_javaapplication) << FSPACE
-     << is_javaapplication << '\n';
   fp << int(glow_eSave_GrowCtx_next_subgraph) << FSPACE << next_subgraph
      << '\n';
   fp << int(glow_eSave_GrowCtx_animation_count) << FSPACE << animation_count
@@ -2298,9 +2293,11 @@ void GrowCtx::open_grow(std::ifstream& fp)
       break;
     case glow_eSave_GrowCtx_is_javaapplet:
       fp >> is_javaapplet;
+      is_javaapplet = 0;
       break;
     case glow_eSave_GrowCtx_is_javaapplication:
       fp >> is_javaapplication;
+      is_javaapplication = 0;
       break;
     case glow_eSave_GrowCtx_next_subgraph:
       fp.get();
@@ -2969,36 +2966,8 @@ void GrowCtx::set_background(glow_eDrawType color)
     if (!no_nav)
       gdraw->set_background(&navw, color, 0);
   }
-#if 0
-  if (enable_bg_pixmap && !streq(background_image, "")) {
-    glow_tPixmap pixmap = 0;
-    glow_tImImage image = 0;
-    int sts;
-    int width, height;
-
-    if (!background_tiled && !(mw.window_width == 0 || mw.window_height == 0)) {
-      sts = grow_image_to_pixmap(this, background_image, mw.window_width,
-          mw.window_height, &pixmap, &image, &width, &height);
-      if (EVEN(sts))
-        gdraw->set_background(&mw, color, 0, 0, 0, 0);
-      else
-        gdraw->set_background(&mw, color, pixmap, image, width, height);
-    } else if (background_tiled) {
-      sts = grow_image_to_pixmap(
-          this, background_image, 0, 0, &pixmap, &image, &width, &height);
-      if (EVEN(sts))
-        gdraw->set_background(&mw, color, 0, 0, 0, 0);
-      else
-        gdraw->set_background(&mw, color, pixmap, image, width, height);
-    } else
-      gdraw->set_background(&mw, color, 0, 0, 0, 0);
-  } else {
-    gdraw->set_background(&mw, color, 0, 0, 0, 0);
-    if (!no_nav)
-      gdraw->set_background(&navw, color, 0, 0, 0, 0);
-  }
-#endif
   background_color = color;
+  redraw();
 }
 
 int GrowCtx::get_background_image_size(int* width, int* height)

@@ -3776,30 +3776,10 @@ int grow_GetGraphAttrInfo(grow_tCtx ctx, grow_sAttrInfo** info, int* attr_cnt)
   attrinfo[i].type = glow_eType_Double;
   attrinfo[i++].size = sizeof(ctx->animation_scantime);
 
-  strcpy(attrinfo[i].name, "JavaWidth");
-  attrinfo[i].value_p = &ctx->java_width;
-  attrinfo[i].type = glow_eType_Int;
-  attrinfo[i++].size = sizeof(ctx->java_width);
-
-  strcpy(attrinfo[i].name, "IsJavaApplet");
-  attrinfo[i].value_p = &ctx->is_javaapplet;
-  attrinfo[i].type = glow_eType_Boolean;
-  attrinfo[i++].size = sizeof(ctx->is_javaapplet);
-
-  strcpy(attrinfo[i].name, "IsJavaFrame");
-  attrinfo[i].value_p = &ctx->is_javaapplication;
-  attrinfo[i].type = glow_eType_Boolean;
-  attrinfo[i++].size = sizeof(ctx->is_javaapplication);
-
   strcpy(attrinfo[i].name, "BackgroundImage");
   attrinfo[i].value_p = &ctx->background_image;
   attrinfo[i].type = glow_eType_String;
   attrinfo[i++].size = sizeof(ctx->background_image);
-
-  strcpy(attrinfo[i].name, "BackgroundTiled");
-  attrinfo[i].value_p = &ctx->background_tiled;
-  attrinfo[i].type = glow_eType_Boolean;
-  attrinfo[i++].size = sizeof(ctx->background_tiled);
 
   strcpy(attrinfo[i].name, "MB3Action");
   attrinfo[i].value_p = &ctx->mb3_action;
@@ -3825,11 +3805,6 @@ int grow_GetGraphAttrInfo(grow_tCtx ctx, grow_sAttrInfo** info, int* attr_cnt)
   attrinfo[i].value_p = &ctx->tiptext_size;
   attrinfo[i].type = glow_eType_TextSize;
   attrinfo[i++].size = sizeof(ctx->tiptext_size);
-
-  strcpy(attrinfo[i].name, "AppMotion");
-  attrinfo[i].value_p = &ctx->app_motion;
-  attrinfo[i].type = glow_eType_AppMotion;
-  attrinfo[i++].size = sizeof(ctx->app_motion);
 
   strcpy(attrinfo[i].name, "ColorTheme");
   attrinfo[i].value_p = ctx->color_theme;
