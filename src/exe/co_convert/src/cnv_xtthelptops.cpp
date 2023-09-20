@@ -222,7 +222,7 @@ void* CnvXtthelpToPs::insert(navh_eItemType item_type, const char* text1,
     return NULL;
   }
   case navh_eItemType_PageBreak: {
-    tops->print_pagebreak(1);
+    tops->print_pagebreak(0);
     return NULL;
   }
   case navh_eItemType_Help:
