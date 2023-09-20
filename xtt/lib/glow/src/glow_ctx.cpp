@@ -2205,12 +2205,7 @@ void GlowCtx::draw_grid(GlowWind* w, int ll_x, int ll_y, int ur_x, int ur_y)
 void GlowCtx::set_show_grid(int show)
 {
   show_grid = show;
-  if (show_grid)
-    draw_grid(&mw, 0, 0, mw.window_width, mw.window_height);
-  else {
-    clear(&mw);
-    draw(&mw, 0, 0, mw.window_width, mw.window_height);
-  }
+  draw(&mw, 0, 0, mw.window_width, mw.window_height);
 }
 
 void GlowCtx::set_colortheme_lightness(int lightness)
