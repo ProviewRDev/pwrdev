@@ -55,6 +55,7 @@
 #include "xtt_op_gtk.h"
 
 #define OP_HEIGHT_MIN 75
+#define OP_WIDTH_DEFAULT 1900
 #define OP_HEIGHT_INC 20
 #define OP_HEIGHT_STATUSBAR 30
 
@@ -108,7 +109,7 @@ OpGtk::OpGtk(void* op_parent_ctx, GtkWidget* op_parent_wid, char* opplace, pwr_t
   memset(appl_buttons, 0, sizeof(appl_buttons));
 
   toplevel =
-      (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", OP_HEIGHT_MIN, "default-width", 1100, NULL);
+      (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", OP_HEIGHT_MIN, "default-width", OP_WIDTH_DEFAULT , NULL);
 
   int dark_theme = CoWowGtk::GetDarkTheme(toplevel);
 
@@ -663,7 +664,9 @@ OpGtk::OpGtk(void* op_parent_ctx, GtkWidget* op_parent_wid, char* opplace, pwr_t
   }
 
   gtk_window_resize(GTK_WINDOW(toplevel), monitor_geometry.width, OP_HEIGHT_MIN);
-  gtk_window_move(GTK_WINDOW(toplevel), monitor_geometry.x, monitor_geometry.y);
+  if (monitor_geometry.width != OP_WIDTH_DEFAULT || 
+      monitor_geometry.x != 0 || monitor_geometry.y != 0)
+    gtk_window_move(GTK_WINDOW(toplevel), monitor_geometry.x, monitor_geometry.y);
 
   wow = new CoWowGtk(toplevel);
   sup_timerid = wow->timer_new();
@@ -1047,7 +1050,13 @@ int OpGtk::configure(char* opplace_str)
     display_monitor = gdk_display_get_monitor(display, monitor);
   }
 
-  gdk_monitor_get_geometry(display_monitor, &monitor_geometry);
+  if (display_monitor)
+    gdk_monitor_get_geometry(display_monitor, &monitor_geometry);
+  else {
+    monitor_geometry.width = OP_WIDTH_DEFAULT;
+    monitor_geometry.x = 0;
+    monitor_geometry.y = 0;
+  }
 
   // Examine Graph objects
   for (i = 0; i < sizeof(opplace_p->FastAvail) / sizeof(opplace_p->FastAvail[0]); i++)
