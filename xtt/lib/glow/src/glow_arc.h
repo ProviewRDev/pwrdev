@@ -140,6 +140,8 @@ public:
   */
   void draw(GlowWind* w, void* pos, int highlight, int hot, void* node);
 
+  void draw();
+
   //! Draw border and shadow of the arc.
   /*!
     \param border	Draw border.

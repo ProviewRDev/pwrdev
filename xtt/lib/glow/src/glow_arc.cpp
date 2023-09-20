@@ -353,6 +353,20 @@ void GlowArc::move(void* pos, double x1, double y1, double x2, double y2,
   draw(&ctx->navw, pos, highlight, 0, NULL);
 }
 
+void GlowArc::draw()
+{
+  ctx->draw(&ctx->mw,
+      ll.x * ctx->mw.zoom_factor_x - ctx->mw.offset_x - DRAW_MP,
+      ll.y * ctx->mw.zoom_factor_y - ctx->mw.offset_y - DRAW_MP,
+      ur.x * ctx->mw.zoom_factor_x - ctx->mw.offset_x + DRAW_MP,
+      ur.y * ctx->mw.zoom_factor_y - ctx->mw.offset_y + DRAW_MP);
+  ctx->draw(&ctx->navw,
+      ll.x * ctx->navw.zoom_factor_x - ctx->navw.offset_x - 1,
+      ll.y * ctx->navw.zoom_factor_y - ctx->navw.offset_y - 1,
+      ur.x * ctx->navw.zoom_factor_x - ctx->navw.offset_x + 1,
+      ur.y * ctx->navw.zoom_factor_y - ctx->navw.offset_y + 1);
+}
+
 void GlowArc::move_noerase(void* pos, double x1, double y1, double x2,
     double y2, int ang1, int ang2, int highlight, int hot)
 {
@@ -364,24 +378,26 @@ void GlowArc::move_noerase(void* pos, double x1, double y1, double x2,
   angle2 = ang2;
   zoom();
   nav_zoom();
-  draw(&ctx->mw, pos, highlight, hot, NULL);
-  draw(&ctx->navw, pos, highlight, 0, NULL);
+  draw();
+  //draw(&ctx->mw, pos, highlight, hot, NULL);
+  //draw(&ctx->navw, pos, highlight, 0, NULL);
 }
 
 void GlowArc::shift(
     void* pos, double delta_x, double delta_y, int highlight, int hot)
 {
-  erase(&ctx->mw, pos, hot, NULL);
-  erase(&ctx->navw, pos, 0, NULL);
+  //erase(&ctx->mw, pos, hot, NULL);
+  //erase(&ctx->navw, pos, 0, NULL);
+  draw();
   ll.x += delta_x;
   ll.y += delta_y;
   ur.x += delta_x;
   ur.y += delta_y;
   zoom();
   nav_zoom();
-
-  draw(&ctx->mw, pos, highlight, hot, NULL);
-  draw(&ctx->navw, pos, highlight, 0, NULL);
+  draw();
+  //draw(&ctx->mw, pos, highlight, hot, NULL);
+  //draw(&ctx->navw, pos, highlight, 0, NULL);
 }
 
 void GlowArc::export_javabean(GlowTransform* t, void* node,

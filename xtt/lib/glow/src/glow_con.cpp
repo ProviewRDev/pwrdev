@@ -386,8 +386,7 @@ GlowCon::GlowCon(GrowCtx* glow_ctx, const char* name, GlowConClass* con_class,
     source_ref_cnt = source->refcon_cnt[source_cp]++;
     dest_ref_cnt = dest->refcon_cnt[dest_cp]++;
     nav_zoom();
-    ref_a.draw(&ctx->mw, &cc->zero, highlight, hot, NULL);
-    ref_a.draw(&ctx->navw, &cc->zero, highlight, 0, NULL);
+    ref_a.draw();
   }
   ctx->reset_nodraw();
 
@@ -442,19 +441,22 @@ GlowCon::GlowCon(const GlowCon& c, GlowNode* source, GlowNode* dest)
   line_a.copy_from(c.line_a);
   arc_a.copy_from(c.arc_a);
   arrow_a.copy_from(c.arrow_a);
-  ref_a.copy_from(c.ref_a);
-  if (ref_a.size() > 0) {
-    sprintf(((GlowText*)ref_a[1])->text, "R%d", ctx->refcon_cnt);
-    sprintf(((GlowText*)ref_a[3])->text, "R%d", ctx->refcon_cnt++);
+  if (cc->con_type == glow_eConType_Reference) {
+    ref_a.copy_from(c.ref_a);
+    if (ref_a.size() > 0) {
+      sprintf(((GlowText*)ref_a[1])->text, "R%d", ctx->refcon_cnt);
+      sprintf(((GlowText*)ref_a[3])->text, "R%d", ctx->refcon_cnt++);
+    }
   }
+  else
+    ref_a.a_size = 0;
 }
 
 void GlowCon::set_highlight(int on)
 {
   highlight = on;
   if (temporary_ref || cc->con_type == glow_eConType_Reference) {
-    ref_a.draw(&ctx->mw, &cc->zero, highlight, hot, NULL);
-    ref_a.draw(&ctx->navw, &cc->zero, highlight, 0, NULL);
+    ref_a.draw();
   } else
     draw();
 }
@@ -464,8 +466,7 @@ void GlowCon::set_hot(int on)
   if (hot != on) {
     hot = on;
     if (temporary_ref || cc->con_type == glow_eConType_Reference) {
-      ref_a.draw(&ctx->mw, &cc->zero, highlight, hot, NULL);
-      ref_a.draw(&ctx->navw, &cc->zero, highlight, 0, NULL);
+      ref_a.draw();
     } else
       draw();
   }
@@ -3042,7 +3043,7 @@ int GlowCon::event_handler(GlowWind* w, glow_eEvent event, int x, int y)
       ctx->gdraw->set_cursor(w, glow_eDrawCursor_CrossHair);
       hot = 1;
       if (temporary_ref || cc->con_type == glow_eConType_Reference)
-        ref_a.draw(w, &cc->zero, highlight, hot, NULL);
+        ref_a.draw();
       else {
         draw();
       }
@@ -3055,7 +3056,7 @@ int GlowCon::event_handler(GlowWind* w, glow_eEvent event, int x, int y)
       hot = 0;
 
       if (temporary_ref || cc->con_type == glow_eConType_Reference)
-        ref_a.draw(w, &cc->zero, highlight, hot, NULL);
+        ref_a.draw();
       else
         draw();
     }
@@ -3610,7 +3611,7 @@ void GlowCon::change_conclass(GlowConClass* conclass)
 
   // Draw
   if (temporary_ref || cc->con_type == glow_eConType_Reference)
-    ref_a.draw(&ctx->mw, &cc->zero, highlight, hot, NULL);
+    ref_a.draw();
   else
     draw();
   ctx->redraw_defered();

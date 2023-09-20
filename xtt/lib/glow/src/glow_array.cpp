@@ -1208,6 +1208,12 @@ void GlowArray::open(GrowCtx* ctx, std::ifstream& fp)
   }
 }
 
+void GlowArray::draw()
+{
+  for (int i = 0; i < a_size; i++)
+    a[i]->draw();
+}
+
 void GlowArray::draw(GlowWind* w, void* pos, int highlight, int hot, void* node)
 {
   int i;

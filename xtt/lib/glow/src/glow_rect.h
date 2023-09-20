@@ -123,6 +123,8 @@ public:
   */
   void draw(GlowWind* w, void* pos, int highlight, int hot, void* node);
 
+  void draw();
+
   //! Erase the object.
   /*!
     \param pos		Position of object. Should be zero.

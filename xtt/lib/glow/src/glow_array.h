@@ -160,6 +160,7 @@ public:
   void print(void* pos, void* node);
   void save(std::ofstream& fp, glow_eSaveMode mode);
   void open(GrowCtx* ctx, std::ifstream& fp);
+  void draw();
   void draw(GlowWind* w, void* pos, int highlight, int hot, void* node);
   //void erase(GlowWind* w, void* pos, int hot, void* node);
   void draw(GlowWind* w, GlowTransform* t, int highlight, int hot, void* node,

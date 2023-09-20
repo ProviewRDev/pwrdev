@@ -125,6 +125,8 @@ public:
   */
   void draw(GlowWind* w, void* pos, int highlight, int hot, void* node);
 
+  void draw();
+
   void draw_border(void* pos, int highlight, int hot, void* node);
 
   //! Draw border and shadow of the line.

@@ -323,6 +323,20 @@ void GlowLine::move(void* pos, double x1, double y1, double x2, double y2,
   draw(&ctx->navw, pos, highlight, 0, NULL);
 }
 
+void GlowLine::draw()
+{
+  ctx->draw(&ctx->mw,
+      p1.x * ctx->mw.zoom_factor_x - ctx->mw.offset_x - DRAW_MP,
+      p1.y * ctx->mw.zoom_factor_y - ctx->mw.offset_y - DRAW_MP,
+      p2.x * ctx->mw.zoom_factor_x - ctx->mw.offset_x + DRAW_MP,
+      p2.y * ctx->mw.zoom_factor_y - ctx->mw.offset_y + DRAW_MP);
+  ctx->draw(&ctx->navw,
+      p1.x * ctx->navw.zoom_factor_x - ctx->navw.offset_x - 1,
+      p1.y * ctx->navw.zoom_factor_y - ctx->navw.offset_y - 1,
+      p2.x * ctx->navw.zoom_factor_x - ctx->navw.offset_x + 1,
+      p2.y * ctx->navw.zoom_factor_y - ctx->navw.offset_y + 1);
+}
+
 void GlowLine::move_noerase(void* pos, double x1, double y1, double x2,
     double y2, int highlight, int hot)
 {
@@ -332,24 +346,26 @@ void GlowLine::move_noerase(void* pos, double x1, double y1, double x2,
   p2.y = y2;
   zoom();
   nav_zoom();
-  draw(&ctx->mw, pos, highlight, hot, NULL);
-  draw(&ctx->navw, pos, highlight, 0, NULL);
+  draw();
+  //draw(&ctx->mw, pos, highlight, hot, NULL);
+  //draw(&ctx->navw, pos, highlight, 0, NULL);
 }
 
 void GlowLine::shift(
     void* pos, double delta_x, double delta_y, int highlight, int hot)
 {
-  erase(&ctx->mw, pos, hot, NULL);
-  erase(&ctx->navw, pos, 0, NULL);
+  //erase(&ctx->mw, pos, hot, NULL);
+  //erase(&ctx->navw, pos, 0, NULL);
+  draw();
   p1.x += delta_x;
   p1.y += delta_y;
   p2.x += delta_x;
   p2.y += delta_y;
   zoom();
   nav_zoom();
-
-  draw(&ctx->mw, pos, highlight, hot, NULL);
-  draw(&ctx->navw, pos, highlight, 0, NULL);
+  draw();
+  //draw(&ctx->mw, pos, highlight, hot, NULL);
+  //draw(&ctx->navw, pos, highlight, 0, NULL);
 }
 
 void GlowLine::export_javabean(GlowTransform* t, void* node,

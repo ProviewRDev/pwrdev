@@ -130,6 +130,20 @@ void GlowRect::open(std::ifstream& fp)
   }
 }
 
+void GlowRect::draw()
+{
+  ctx->draw(&ctx->mw,
+      ll.x * ctx->mw.zoom_factor_x - ctx->mw.offset_x - DRAW_MP,
+      ll.y * ctx->mw.zoom_factor_y - ctx->mw.offset_y - DRAW_MP,
+      ur.x * ctx->mw.zoom_factor_x - ctx->mw.offset_x + DRAW_MP,
+      ur.y * ctx->mw.zoom_factor_y - ctx->mw.offset_y + DRAW_MP);
+  ctx->draw(&ctx->navw,
+      ll.x * ctx->navw.zoom_factor_x - ctx->navw.offset_x - 1,
+      ll.y * ctx->navw.zoom_factor_y - ctx->navw.offset_y - 1,
+      ur.x * ctx->navw.zoom_factor_x - ctx->navw.offset_x + 1,
+      ur.y * ctx->navw.zoom_factor_y - ctx->navw.offset_y + 1);
+}
+
 void GlowRect::draw(GlowWind* w, void* pos, int highlight, int hot, void* node)
 {
   if (!(display_level & ctx->display_level))
