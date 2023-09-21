@@ -185,7 +185,7 @@ int goen_create_nodetype_m14(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid,
   f_height = (MAX(inputpoints, outputpoints) + 2) * f_repeat
       + (floor(code_height / GOEN_F_GRID) + 1) * GOEN_F_GRID;
   f_width = MAX(f_strlength * (2 + node_width), f_defwidth);
-  f_width = MAX(f_width, code_width + f_strlength * 2);
+  f_width = MAX(f_width, code_width + f_strlength * 3);
   f_namepos = f_width / 2.0 - strlen(graphbody->graphname) * f_strlength / 2.0;
 
   flow_CreateNodeClass(ctx, name, flow_eNodeGroup_Common, &nc_pid);

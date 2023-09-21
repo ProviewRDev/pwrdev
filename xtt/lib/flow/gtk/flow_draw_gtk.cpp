@@ -2183,9 +2183,16 @@ int FlowDrawGtk::get_text_extent(FlowCtx* ctx, const char* text, int len,
 
   size *= DRAW_TSCALE;
 
+  char* t = (char*)malloc(len+1);
+  strncpy(t, text, len);
+  text = t;
+
   char* textutf8 = 0;
   if (ctx->text_coding != flow_eTextCoding_UTF_8) {
+    char c = ((char *)text)[len];
+    ((char *)text)[len] = 0;
     textutf8 = g_convert(text, len, "UTF-8", "ISO8859-1", NULL, &len1, NULL);
+    ((char *)text)[len] = c;
     text = textutf8;
     len = len1;
   }
@@ -2206,6 +2213,7 @@ int FlowDrawGtk::get_text_extent(FlowCtx* ctx, const char* text, int len,
 
   if (textutf8)
     g_free(textutf8);
+  free(t);
 
   return 1;
 }
