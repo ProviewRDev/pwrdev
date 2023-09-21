@@ -38,7 +38,20 @@
 SObject pwrs:Class
 !/**
 !  @Group PlantConfiguration,NodeConfiguration
-!  Mount a volume.
+!  Mount an object or volume.
+!
+!  The object that should be mounted is inserted into the Object
+!  attribute. If the object reside in the same project, or in a volume
+!  that is loaded in the development environment, it can be specified
+!  by name. Also specify the volume in the name, eg VolFurnish:H1-H2.
+!  If the object reside in another project and the volume is not loaded,
+!  it has to be specified by identity. Select the object in the configurator
+!  and use command 'show objid' to get the identity.
+!
+!  For operator stations, it's common to name and place the mount object 
+!  so that the path of objects will be the same in the mounting volume 
+!  as in the mounted volume. Otherwise for example Ge graphs will not
+!  work for both volumes.
 !*/
   Object $MountObject $ClassDef pwr_eCix_MountObject
     Body SysBody
@@ -50,11 +63,17 @@ SObject pwrs:Class
       Body SysBody
         Attr StructName = "MountObject"
       EndBody
+      !/**
+      !  Optional description.
+      !*/
       Object Description $Attribute 1
         Body SysBody
           Attr TypeRef = "pwrs:Type-$String80"
         EndBody
       EndObject
+      !/**
+      !  Object to be mounted.
+      !*/
       Object Object $Attribute 2
         Body SysBody
           Attr TypeRef = "pwrs:Type-$Objid"

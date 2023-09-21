@@ -36,13 +36,16 @@ Introduction <link>geref_intro
 Glossary <link>geref_term
 Working with the editor <link>geref_work
 Windows <link>geref_windows
+Color Themes <link>geref_colorthemes
 Objects <link>geref_objects
 SubGraphs <link>geref_subgraph
+Groups <link>geref_groups
+Images <link>geref_images
 Dynamics <link>geref_dynamic
 Actions <link>geref_action
 Create a SubGraph <link>geref_create_subgraph
 Groups <link>geref_groups
-GIF and JPEG images <link>geref_images
+Images <link>geref_images
 Connections <link>geref_connections
 Edit <link>geref_edit
 Test <link>geref_testing
@@ -73,7 +76,7 @@ environment.
 <topic>geref_term
 Glossary
 <h2>Graph
-A picture consists of a graph.
+A window from where the operator can supervise and control the process.
 <h2>Subgraf
 A collection of base objects can be stored as a subgraph. A subgraph works as a kind of class
 or pattern, and in a graph you can create instances of the subgraph, that is subgraph objects.
@@ -184,27 +187,27 @@ is removed, it can be added with the border button.
 
 <h1>Border width
 The width of the border can be changed with the LineWidth menu in the tool panel. Select
-the rectangle and set desired line width. The line width in pixels, and a width between 1
-and 8 pixel can be selected.
+the rectangle and set desired line width from the tool panel. The unit of the line width 
+is pixel, and a width between 1 and 8 can be set.
 
 <image> geg_fig7.png
 <b>Fig Rectangle with broader border
 
 <h1>Border color
 Also the color of the border can be modified. Select the rectangle, activate 'Border' in the 
-color palette and click on the wanted color.
+color palette and click on the desired color.
 
 <image> geg_fig8.png
 <b>Fig Modified border color
 
 <h1>3D
-With the 3D button in the tool panel, a frame with relief effect is draw on the rectangle.
+With the 3D button in the tool panel, a frame with relief effect is drawn on the rectangle.
 <image> geg_fig9.png
 <b>Fig Rectangle with 3D
 
 The width of the relief can be changed with the attribute shadow_width. Open the object 
-editor by doubleclicking on the rectangle, and insert a new value in shadow_width. The unit
-of shadow_width is in percentage of the width or height (the smallest).
+editor by double clicking on the rectangle, and insert a new value in shadow_width. The unit
+of shadow_width is in percentage of the width or height of the rectangle (the smallest).
 
 <image> geg_fig10.png
 <b>Fig Width 3 % to the left and 15 % to the right
@@ -214,9 +217,9 @@ value to 3 the shade will be darker and the light border will be lighter. Valid 
 1 - 3.
 
 Whether the relief is outwards or inwards depends on the attribute relief. With Up the 
-relief is outwards, ie the upper border is light and the lower dark. With Down the upper is
-dark and the lower is light, which gives the effect of an inward relief. You will get the
-greatest relief effect if the relief is drawn with the same color as the background.
+relief is outwards, ie the upper border is light and the lower dark. With Down the upper 
+border is dark and the lower is light, which gives the effect of an inward relief. You will 
+get the greatest relief effect if the relief is drawn with the same color as the background.
 
 <image> geg_fig11.png
 <b>Fig Relief Up to the left and Down to the right
@@ -237,9 +240,27 @@ Horizontal Tube2 is shown that is suitable for cylindric items.
 The contrast of the gradient can be affected by the gradient_contrast attribute in the 
 object editor. The contrast can have a value between 0 and 10.
 
+Gradients with two different colors can be created by using the object background color.
+- Draw the rectangle with a fill color.
+- Attach a gradient to the rectangle.
+- Open the object editor and set bgcolor_gradient to 1.
+- Set the background color by selecting the rectangle and click with Shift+Ctrl MB1 
+  on a color in the color palette.
+Now the gradient will be drawn from the fill color to the background color.
+
+<image> geg_fig174.png
+<b>Fig Gradient between two colors
+
+<h1>Set transparency
+Transparency of an object is set from the object editor. Transparency is a value between 0
+and 1, where 0 is no transparency, and 1 is full transparency.
+
+<image> geg_fig175.png 
+<b>Fig Rectangle with transparency set to 0.5 
+
 <h1>Draw a square
-To draw a square you press Ctrl+E (Scale equal) before you draw the rectangle. Reset Equal
-scale by right clicking in the work area.
+To draw a square with equal width and height you press Ctrl+E (Scale equal) before you draw 
+the rectangle. Reset Equal scale by right clicking in the work area.
 
 <h1>Draw several rectangles
 If you are going to draw several rectangles you can press the Shift key when clicking on the 
@@ -262,7 +283,7 @@ The line width is changed by selecting the line and choose a width in the Linewi
 <image> geg_fig15.png
 <b>Fig Linewidth set to 8
 
-<h1>Färg
+<h1>Color
 The color is changed by selecting the line, clicking on Border in the color palette, and 
 clicking on the desired color.
 <image> geg_fig16.png
@@ -278,7 +299,7 @@ the desired type in the Linetype menu.
 <h1>Horizontal and vertical lines
 To draw a horizontal line you press Ctrl+H (MoveRestrictions Horizontal) before you draw the
 line. A vertical line is drawn by first pressing Ctrl+G (MoveRestrictions Vertical). 
-MoveRestrictions is reset by right clicking in the work area.
+MoveRestrictions are reset by right clicking in the work area.
 
 <h1>Draw several lines
 If you will draw several lines you can press the Shift key when clicking on the line button 
@@ -428,7 +449,7 @@ By right clicking in the work area the select list is emptied.
 
 <h1>Delete an object
 To delete an object you select the object and press the Delete key. You can also delete an
-object by doubleclicking with MB2 on the object. With doubleclick MB2 in some empty space in 
+object by double clicking with MB2 on the object. With doubleclick MB2 in some empty space in 
 the work area you delete all selected objects.
 
 <h1>Move an object
@@ -468,8 +489,8 @@ There is also a button in the tool panel to double the size of an object, and on
 to half the size.
 
 <h1>Rotate an object
-An object can be rotated with the rotation button in the tool panel. It rotates the 
-selected objects in steps of 90 degrees.
+An object can be rotated with the rotation button in the tool panel. Selected objects will
+be rotated in steps of 90 degrees.
 
 I you want another rotation angle you activate Edit/Rotate in in the menu. Note that
 rectangles and ellipses only can be rotated in steps of 90 degrees, and to rotate texts
@@ -477,7 +498,7 @@ the Adjustment attribute for the text has to be set to Center.
 
 <h1>Mirror
 There are two buttons in the tool panel to mirror, one for horizontal mirroring an one for
-vertical mirroring. The mirroring it executed on the select objects.
+vertical mirroring. The mirroring it executed on the selected objects.
 
 <image> geg_fig27.png
 <b>Fig Horizontal mirroring
@@ -721,6 +742,8 @@ TabbedWindow <link>geg_specialobjects_tabbedwindow
 Slider <link>geg_specialobjects_slider
 Trend <link>geg_specialobjects_trend
 Bar <link>geg_specialobjects_bar
+BarArc <link>geg_specialobjects_bararc
+Pie <link>geg_specialobjects_pie
 XYCurve <link>geg_specialobjects_xycurve
 FastCurve <link>geg_specialobjects_fastcurve
 Axis <link>geg_specialobjects_axis
@@ -928,6 +951,50 @@ min and max value for the range of the signal.
 Note that a bar also can be accomplished by a rectangle that is grouped and provided with
 FillLevel dynamics. The difference is that the bar object has a border line with separate
 color between the bar and the background.
+</topic>
+
+<topic> geg_specialobjects_bararc
+BarArc
+A bar arc is a bar in a circular shape. It is found under the Analog map in the subgraph
+palette.
+
+<image> geg_fig176.png
+<b>Fig BarArc
+
+In addition to the linear bar properties, also the bar width, the start angel and the 
+extension angle can be specified.
+
+<image> geg_fig177.png
+<b>Fig BarArc object attributes
+</topic>
+
+<topic> geg_specialobjects_pie
+Pie
+The pie chart can be divided in up to 12 sectors with different color, each sector
+connected to an analog signal that specifies the size of the sector.
+
+<image> geg_fig178.png
+<b>Fig Pie
+
+In addition to the linear bar properties, also the bar width, the start angel and the 
+extension angle can be specified.
+
+<image> geg_fig179.png
+<b>Fig Pie object attributes
+</topic>
+
+<topic> geg_specialobjects_barchart
+BarChart
+The pie chart can be divided in up to 12 sectors with different color, each sector
+connected to an analog signal that specifies the size of the sector.
+<image> geg_fig178.png
+<b>Fig Pie
+
+In the example above with four segments, the four first segments are connected to 
+signals, and Pie.Sectors is set to 4.
+
+<image> geg_fig179.png
+<b>Fig Pie object attributes
 </topic>
 
 <topic> geg_specialobjects_trend
@@ -1444,13 +1511,14 @@ If you only want the pushbutton to be insensitive for click and dimmed, you set
 Invisible.Dimmed to 1.
 
 <image> geg_fig105.png
-<b>Fig Invisible.Dimmed is set for dimmed dynamic
+<b>Fig Invisible.Dimmed and DimLevel configured
 
 When H1-Dv2 goes high the pushbutton is no longer sensitive for mouse clicks. This is marked
-by the drawing the button dimmed.
+by the drawing the button dimmed. In addition it's possible to set a transparency level on the
+dimmed button by setting Invisible.DimLevel to a value between 1 and 0.
 
 <image> geg_fig106.png
-<b>Fig The pushbutton in dimmed state to the left
+<b>Fig The pushbutton in original and dimmed state, and with DimLevel 0.5 to the right
 </topic>
 
 <topic> geg_dynamic_text
@@ -2175,6 +2243,133 @@ to change the color of an image object, you should use a dynamic type that chang
 tone, e.g. DigTone.
 </topic>
 
+<topic> geg_customcolors
+Custom  colors
+The standard color palette contains 300 colors, but sometimes the tone you desire isn't
+found there. Then you can use the custom colors. These are found below the standard palette,
+and are displayed by increasing the color palette window, or by scrolling down.
+
+<image>geg_fig182.png
+<b>Fig Custom color palette
+
+Create a custom color by double clicking on an empty entry in the custom color palette. 
+
+<image> geg_fig183.png
+<b>Fig Color selection
+
+Now the Color selection dialog is opened. Either you can select one of the predefined colors, 
+or you can press the '+' button to select a more specific color.
+
+<image> geg_fig184.png
+<b>Fig Color selection
+
+Select the color hue with the slider to the left, and click in color area to select brightness 
+and saturation. The bottom slider for transparency is not implemented yet. Press the Select 
+button to insert the color into the custom color palette. The color can now be used as fill, 
+border or text color.
+</topic>
+
+<topic> geg_colorthemes
+Color themes
+The operator can select a color theme in the operator environment, and by drawing a graph with
+color theme colors, also the process grapics will follow the color themes. The color theme loads
+a set of color into the custom color palette, and each color is used for a specific purpose. The
+first color for example should be used as background color. To follow the color theme, you should
+also use the subgraphs under ColorTheme in the subgraph palette. These are drawn with color theme
+colors.
+
+This is the way to create a simple graph with color theme colors.
+
+Set ColorTheme in File/Graph Attributes to $default.
+
+Select a color theme in File/ColorTheme/Select, for example Sand. Now the custom color palette
+is filled with the Sand color theme colors.
+
+<image> geg_fig185.png
+<b>Fig Sand colors loaded
+
+The first custom color should be the background color. By hovering over a color with the cursor,
+the pupose of the color is written below the custom color palette. Click on the color to set
+the fill color, and activate Function/Set background color.
+
+To create a button, select a button under ColorTheme, for example 
+ColorTheme/Pushbuttons/ButtonSmallToggle. Connect and enter a text, eg 'Start' or 'Stop'.
+
+Create indicators from ColorTheme/Indicators, eg IndSquareGreen or IndSquareRed.
+
+Draw texts by setting the fifth color in the custom color palette, 'Text/Lines on background', as
+text color. Then create the text objects.
+
+Draw the delimiter line between the push buttons and indicators by setting the fourth color,
+'Delimiter line', as border color, and draw the line.
+
+<image> geg_fig186.png
+<b>Fig Simple graph with color theme
+
+With File/ColorTheme/Next (Ctrl+Alt+T) the colortheme is switched and we can examine how the 
+graph look for the other themes.
+
+<image> geg_fig187.png
+<b>Fig Simple graph with different themes
+</topic>
+
+<topic> geg_objecttree
+Object tree
+The object tree displays the graphical objects in the graph in a tree structure. It is opened
+from View/View Object Tree. Objects can be selected with click MB1 or with the Arrow up and down
+keys. The properties for an object is opened by clicking on the leaf or with the arrow right key.
+It is often a convinient way set set properties of objects, especially when there is a set of
+similar objects, or for objects inside a group.
+
+<image> geg_fig188.png
+<b>Fig Object tree
+</topic>
+
+<topic> geg_layers
+Layers
+The graphical objects can be created in layers. This is a way to structure the graph and to 
+simplify the editing. It's is only possible to edit objects in the currently active layer. Thus
+there is no risk that objects in other layers accidently is moved or modified. 
+
+A layer is created from 'Layers/Create layer' in the menu. When a layer is created it is
+visible in the layer list below the object tree. When you want to create or edit objects in a
+layer, you make the layer active by selecting it in the layer list. By clicking on the eye symbol
+the layer can be set invisible or visible.
+
+The layer is also displayed in the object tree. It will be the parent of all the objects in the
+layer. Also the properties for the layer can be displayed and editor from the object tree. 
+By clicking on the leaf or map, or with the Arrow right key, the properties for the layer are 
+displayed. By clicking with Shift + Click MB1 on the map, the objects in the layer are displayed.
+
+As an example we will create the simple graph above with layers, and put the buttons, texts and
+indicators in different layers.
+
+We create a layer from 'Layers/Create layer' in the menu, open the properties for the layer in the
+object tree, and change the name to 'Buttons'. Then we select the Buttons layer in the layer list to 
+make it active. The two buttons that we now create will be inserted into the Buttons layer.
+
+<image> geg_fig189.png
+<b>Fig Buttons layer
+
+In the same way we create the Texts layer with the texts, and the Indicators layer with the 
+indicators. Note how objects that doesn't belong to the ative layer are insensible, and how layers
+can be hidden by clicking on the eye symbol in the layer list.
+
+The delimiter line is created in the background layer that is the default layer. Objects in the 
+background layer are displayed on the top level in the object tree.
+
+<image> geg_fig190.png
+<b>Fig Layers
+
+It's also possible to set dynamics on a layer. By setting invisible dynamics with dimmed on the
+Buttons layer, all buttons in the layer will be dimmed and insensitive when the connected signal 
+is set.
+
+<image> geg_fig191.png
+<b>Fig Layer with dynamics
+
+</topic>
+
 <topic> geg_createsubgraph
 Draw a subgraph
 A subgraph is constructed by drawing base objects in the working area and then save these as a
@@ -2279,18 +2474,52 @@ folder there are subgraphs that is created within the project. Other folder cont
 that comes with ProviewR.
 
 <h1>The color palette
+The color palette contains 300 colors in 10 rowss with 30 colors in each row. In the first 
+row there are back, white and intense signal colors, and a collection of gray tones. Then 
+follows a row with the gray  scale and after that 8 rows with different color tones: yellowgreen, 
+yellow, orange, violet, blue, seablue and green. Within each color group the 10 first has low 
+saturation, the 10 middle medium saturation and the 10 last high saturation.
 
-In the color palette there are 300 colors. Here you choose fill color, border color and text
-color. The fill color is selected with MB1 and displayed in the left field of the top row of
-the palette, bordercolor is selected with MB2 and displayed in the middle field, and text color
-is selected with Shift MB1 and displayed in the right field.
+The three buttons above the palette displays the current fill, border and text colors. New
+objects will be created with these colors. To set a new current fill color, set the palette in 
+fill color mode by pressing the Fill button and select a color in the palette. To set a fill 
+color on an existing object, select the object, make sure the palette is in fill color mode, 
+and select the desired color. In the same way the palette can be set in border or text mode by
+pressing the Border and Text buttons, and the border and text colors of object can be handled.
 
-The palette is parted in rows with 30 colors in each row. In the first row there are back, white
-and intense signal colors, and a collection of gray tones. Then follows a row with the gray 
-scale and after that 8 rows with different color tones: yellowgreen, yellow, orange, violet,
-blue, seablue and green. Within each color group the 10 first has low saturation, the 10
-middle colors a little higher saturation and the 10 last high saturation.
+Object also have a background color, and this is handled differently from the other colors. To
+set the background color of an object, select the object and click with Ctrl+Shift MB1 on the 
+desired color in the palette.
 
+To set the background color of the graph, set the desired color as current fill color, and 
+activate 'Functions/Set background color' in the menu.
+
+<h2>Custom colors
+In addition to the predefined colors there are space for 90 custom defined colors below the 
+predefined colors. To set a custom color, enter the color selector by double clicking on an
+entry in the custom color palette. Press the '+' button to specify a more specific color than
+the prdefined ones. Select the color hue with the slider to the left, and click in color area 
+to select brightness and saturation. The bottom slider for transparency is not implemented yet. 
+Press the Select button to insert the color into the custom color palette. The color can now 
+be used as fill, border or text color.
+
+<image> geg_fig184.png
+<b>Fig Color selection
+
+To use a custom color palette in another graph, save the palette from 'File/CustomColors/Save'
+in the menu. The palette is stored in a pwgc file in $pwrp_pop. Load the file into another graph
+by activating 'File/CustomColor/Load' and select the file.
+
+It's also possible to use a common color file for several graphs in a project. If a color-file 
+is specified in ColorTheme in Graph attributes, this file will be loaded automatically when the 
+graph is opened. When a color is adjusted and stored, it will affect all object drawn with this 
+color in all graphs with this color-file. In this way the colors in the graphs can easily be 
+adjusted.
+
+For graphs drawn with color themes, the custom color palette is used for the theme colors and 
+can not be used for custom colors.
+
+<h2>Color tones
 Beneath the color palette there is also a color tone palette in which you can select a color
 ton for subgraph objects.
 
@@ -2333,6 +2562,150 @@ can connect this in the same way with Shift/Ctrl/Doubleclick MB1.
 </chapter>
 
 <chapter>
+<topic> geref_colorthemes
+Color Themes
+
+Colorthemes provides a number of color combinations for the operator environment, to satisfy
+the operators preferences and adapt to the brightness of the external environment. The operator
+can select a color theme from the menu in the operator window, and will affect the appearence 
+of the tools and graph in the ProviewR base system.
+
+<image> geg_fig192.png
+<b>Fig Color theme selection
+
+<image> geg_fig193.png
+<b>Fig Operator window with sand color theme
+
+<image> geg_fig194.png
+<b>Fig Color themes Standard and Sand
+
+<image> geg_fig195.png
+<b>Fig Color themes Marron and Sienna
+
+<image> geg_fig196.png
+<b>Fig Color themes DarkBlue and Classic
+
+<image> geg_fig197.png
+<b>Fig Color themes Midnight and Playroom
+
+<image> geg_fig198.png
+<b>Fig Color themes NordicLight and Contrast
+
+<image> geg_fig199.png
+<b>Fig Color themes AzurContrast and OchreConstrast
+
+<image> geg_fig200.png
+<b>Fig Color themes Chesterfield and TerraVerte
+
+<image> geg_fig201.png
+<b>Fig Color theme Polar
+
+The color themes can also be used when drawing graphs in a project. These graphs will follow 
+the  appearance of the color theme selected by the operator, but it requires that specific 
+colors in in the custom color palette is used when drawing different objects. A color theme is
+loaded from File/ColorTheme/Select in the Ge menu. The colors for the theme is then loaded into
+the custom colors palette. Every color in the custom color palette is adjusted for a specific 
+purpose. The first color for example is the background color for the graph, and the fifth 
+color should be set on texts on the background. By placing the cursor on a color in the 
+palette, the purpose of this color will be written in a field below the palette.
+
+The color theme has support for specific elements in a graph. In the example below the 
+background color is lightgreen. The dark green lines are called delimiter areas. In this case 
+it is rectangles the divides the graph into different sections. It's also possible to use if 
+for larger areas with text and indicators. At the top there is a menu bar with pulldown menues,
+and below this a gradient to make a shadow below the menu. Object graphs should contain a 
+method toolbar positions below the menu. Other elements are bars, axises, buttons, indicators,
+texts on the background, and texts on a delimiter area, sliders, value fields and input fields,
+tables, diagrams etc.
+
+For more complex elements that are are not suited for a change of fill color, as the gray 
+actuator and valve below, the dynamic ColorThemeLightness can be used to adapt the lightness 
+of these elements to the lightness of the theme.
+
+<image> geg_fig202.png
+<b>Fig Graph drawn with color theme colors 
+
+Description of color theme colors
+
+    Name <t><t>Description
+1   Background <t><t>Should be set as background color for the graph. Light 
+    <t><t>green in the example above.
+2   Background gradient <t><t>Can be used for gradients to the background color, 
+    <t><t>eg the gradient under the menu above.
+3   Delimiter area <t><t>Color of delimiter areas. The dark green areas.
+4   Delimiter lines <t><t>Color of lines that divides the background, eg the line 
+    <t><t>under Mode above.
+5   Text/Lines on background <t><t>Color of texts and lines on the background.
+6   Input field fill color <t><t>Fill color for ValueInput  objects.
+7   Input field border color <t><t>Border color for ValueInput objects.
+8   Input field text color <t><t>Text color for ValueInput objects.
+
+
+16  Indicator border color <t><t>Should be set as border color on indicators.
+17  Indicator low color <t><t>Low color for indicator
+18  Indicator on delimiter low color <t><t>Low color for an indicator on a delimiter area.
+19  Slider color <t><t>Color for sliders.
+20  Slider background color <t><t>Color for slider background.
+21  Value field fill color <t><t>Fill color for Value objects.
+22  Value field border color <t><t>Border color for Value objects.
+23  Value field text color <t><t>Text color for Value objects.
+
+31  Limit switch high color <t><t>Color for limit switch when it's high.
+32  Limit switch low color <t><t>Color for limit switch when it's low.
+33  Limit switch border color <t><t>Color for limit switch border.
+34  Text/Lines on delimiter <t><t>Color for text or lines on a delimiter area.
+35  Button active color <t><t>Color to indicate that a button is active.
+36  Button fill color <t><t>Fill color for buttons.
+37  Button border color <t><t>Border color for buttons
+38  Button text color <t><t>Text color for buttons
+39  Button insensitive text color <t><t>Text color set when button is set insensitive
+    <t><t> by Invisible dynamics.
+40  Button insensitive border color <t><t>Border color when button is set insensitive 
+    <t><t>by Invisible dynamics.
+
+46  Symbol fill color <t><t>Color that can be used component symbols.
+47  Symbol border color <t><t>Color for symbol border. 
+48  Symbol low color <t><t>Color when symbols is low.
+49  Symbol empty color <t><t>Color that can be used to indicate that a valve in closed 
+    <t><t>or empty.
+50  -
+
+51  Bar bar color <t><t>Color for the value part of a bar object.
+52  Bar background color <t><t>Color for background part of a bar object.
+53  Bar bar limit color <t><t>Color for edge of bar.
+54  Bar background area <t><t>Color used for surrounding area for bar objects. 
+    <t><t>Dark green in the example above.
+55  Bar background lines <t><t>Color for lines on the surrounding area for bar 
+    <t><t>objects.
+
+61  Menu fill color <t><t>Fill color for menu bars and menus.
+62  Menu text color <t><t>Color for menu texts.
+63  Toolbar fill color <t><t>Color for method toolbar in object graphs
+64  Toolbar border color <t><t>Border color for method toolbar.
+65  Toolbar text color <t><t>Text color for method toolbar.
+66  Diagram fill color <t><t>Fill color for diagrams.
+67  Diagram border color <t><t>Border color for diagrams.
+68  Diagram curve color <t><t>Default curve color for diagram.
+69  Axis border color <t><t>Color for axis objects.
+
+<image> geg_fig203.png
+<b>Fig Examples of some color theme colors
+
+<h2> Custom color theme
+The color theme selector contains an entry with name Custom. To create a custom theme, load 
+a color theme into the custom color palette, double click on the colors to open the color
+selector and modify the colors. When the desired color are modified, save the theme from
+/File/CustomColors/Save with name 'pwr_colortheme100'. The color theme is stored in the file
+$pwrp_pop/pwr_colorthem100.pwgc. Copy this file to $pwrp_exe and make sure it is distributed
+to the operator stations. 
+
+To set the custom color theme in the operator environment, open the color theme selector from 
+'Functions/View/Color theme' in the operator window menu, and select 'Custom'.
+
+</topic>
+</chapter>
+
+<chapter>
 <topic>geref_objects
 Objects
 
@@ -2361,6 +2734,8 @@ BarChart 	<link>geref_barchart
 Pie 		<link>geref_pie
 Trend	 	<link>geref_trend
 FastCurve 	<link>geref_fastcurve
+DsTrend 	<link>geref_dstrend
+DsTrendCurve 	<link>geref_dstrendcurve
 Axis 		<link>geref_axis
 AxisArc 	<link>geref_axisarc
 Window		<link>geref_windowobject
@@ -2862,7 +3237,7 @@ FastCurve.CurveColor2   <t><t>Color for curve 2.
 FastCurve.CurveFillColor2 <t><t>Fill color for curve 2.
 </topic>
 
-<topic>geref_dstren <style>function
+<topic>geref_dstrend <style>function
 DsTrend
 <image> geref_fig21.png
 
@@ -2895,6 +3270,40 @@ DsTrend.MinValue2     <t><t>Minimum value in range for curve 2.
 DsTrend.CurveColor2   <t><t>Color for curve 2.
 DsTrend.CurveFillColor2 <t><t>Fill color for curve 2.
 DsTrend.Direction <t><t>Direction of curve movement, Right or Left.
+</topic>
+
+<topic>geref_dstrendcurve <style>function
+DsTrendCurve
+<image> geg_fig180.png
+
+The DsTrendCurve displays one or two curves configured with a DsTrendCurve object.
+
+<h2>Attributes
+<b>Attribute            <t><t>Description
+DsTrendCurve.Object    <t><t>Database object of class DsTrendCurve.
+DsTrendCurve.MinValueAttr1 <t><t>Attribute for minimum value of curve 1. Optional.
+DsTrendCurve.MaxValueAttr1 <t><t>Attribute for maximum value of curve 1. Optional.
+DsTrendCurve.MinValueAttr2 <t><t>Attribute for minimum value of curve 2. Optional.
+DsTrendCurve.MaxValueAttr2 <t><t>Attribute for maximum value of curve 2. Optional.
+DsTrendCurve.HoldAttr	<t><t>Attribute to hold updating of the curve. Optional.
+DsTrendCurve.Mark1Attr	<t><t>Attribute for marker 1. Optional.
+DsTrendCurve.Mark2Attr	<t><t>Attribute for marker 2. Optional.
+DsTrendCurve.Mark1Color	<t><t>Marker 1 color.
+DsTrendCurve.Mark2Color	<t><t>Marker 2 color.
+DsTrendCurve.NoOfPoints    <t><t>Number of points in the curve.
+DsTrendCurve.CurveLineWidth <t><t>Line width.
+DsTrendCurve.FillCurve     <t><t>Fill the area between the curve and the x-axis.
+DsTrendCurve.HorizontalLines <t><t>Number of horizontal lines in the diagram.
+DsTrendCurve.VerticalLines <t><t>Number of vertical lines.
+DsTrendCurve.MaxValue1     <t><t>Maximum value in range for curve 1.
+DsTrendCurve.MinValue1     <t><t>Minimum value in range for curve 1.
+DsTrendCurve.CurveColor1   <t><t>Color for curve 1.
+DsTrendCurve.CurveFillColor1 <t><t>Fill color for curve 1.
+DsTrendCurve.MaxValue2     <t><t>Maximum value in range for curve 2.
+DsTrendCurve.MinValue2     <t><t>Minimum value in range for curve 2.
+DsTrendCurve.CurveColor2   <t><t>Color for curve 2.
+DsTrendCurve.CurveFillColor2 <t><t>Fill color for curve 2.
+DsTrendCurve.Direction <t><t>Direction of curve movement, Right or Left.
 </topic>
 
 <topic>geref_axis <style>function
@@ -3418,18 +3827,19 @@ Tone      <t>-          <t>States that dynamics that changes the color of the co
           <t>           <t>should change the color tone instead of the fill color.
 DigLowColor <t>Boolean  <t>Set the specified fill color when the signal is low. <link>GeDynDigLowColor
 DigColor  <t>Boolean    <t>Set the specified fill color when the signal is high. <link>GeDynDigColor
-DigError  <t>Boolean    <t>Set red fill color when the signal is high. <link>GeDynDigError
-DigWarning <t>Boolean   <t>Set yellow fill color when the signal is high. <link>GeDynDigWarning
-DigFlash  <t>Boolean    <t>Flash with specified color when the signal is high. <link>GeDynDigFlash
 AnalogColor <t>Float32 Int32 <t>Set specified fill color when the signal <link>GeDynAnalogColor
           <t>            <t>goes beyond or below the specified limit.
 StatusColor <t>Status   <t>Set fill color dependent on a status signal severity. <link>GeDynStatusColor
+DigError  <t>Boolean    <t>Set red fill color when the signal is high. <link>GeDynDigError
+DigWarning <t>Boolean   <t>Set yellow fill color when the signal is high. <link>GeDynDigWarning
+DigFlash  <t>Boolean    <t>Flash with specified color when the signal is high. <link>GeDynDigFlash
 FillLevel <t>Float32    <t>Changes partly the fill color of the component. The level <link>GeDynFillLevel
           <t>           <t>for the borderline of the colored part is determined by
           <t>           <t>the value of the signal.
 Invisible <t>Boolean String <t>Make the component invisible when the signal is high, <link>GeDynInvisible
           <t>           <t>or when the string is empty.
 DigBorder <t>Boolean    <t>Set specified border color when the signal is low. <link>GeDynDigBorder
+DigBackgroundColor <t>Boolean <t>Set specified background color color when signal is high. <link>GeDynDigBackgroundColor
 TimeoutColor <t>Boolean <t>Set specified color when at subscription timeout. <link>GeDynTimeoutColor
 DigTextColor <t>Boolean <t>Set specified text color when the signal is high. <link>GeDynDigTextColor
 DigText   <t>Boolean    <t>Set specified text when the signal is low. <link>GeDynDigText
@@ -3448,11 +3858,15 @@ SliderBackground <t>-   <t>Indicates that the subgraph is background to a slider
 DigCommand <t>Boolean   <t>Executes a command when signal gets high. <link>GeDynDigCommand
 DigScript <t>Boolean   <t>Executes a script when signal gets high. <link>GeDynDigScript
 ScrollingText <t>Boolean <t>Display a scrolling text. <link>GeDynScrollingText
+DigSound <t>Boolean <t>Play a sound. <link>GeDynDigSound
 DigTransparency <t>Boolean   <t>Shift transparency depending on the value of a <link>GeDynDigTransparency
 	  <t>		<t>digital signal.
 AnalogTransparency <t>Float32  <t>Set transparency depending on the value of an <link>GeDynAnalogTransparency
 	  <t>		<t>analog signal.
+ColorThemeLightness <t>-  <t>Adapt lightness of component to color theme. <link>GeDynColorThemeLightness
+DigSwap   <t>Boolean  <t>Update all subscriptions in the graph. <link>GeDynDigSwap
 UnitConvert <t>Float32  <t>Convert value unit before displaying in value field. <link>GeDynUnitConvert
+HostObject <t>Object  <t>Complex component dynamics. <link>GeDynHostObject
 
 
 <h2>Inherit
@@ -3578,7 +3992,7 @@ AnalogColor.CommonAttribute <t><t>The same attribute is used for all instances.
 AnalogColor.Limit     <t><t>Limit value.
 AnalogColor.LimitType <t><t>Type of limit. Can be GreaterThan, GreaterEqual, 
                       <t><t>LessThan, LessEqual or Equal.
-AnalogColor.Instances <t><t>States the number of instances that is created.
+AnalogColor.Instances <t><t>Instance mask where instances can be added or removed.
 AnalogColor2.Color    <t><t>Fill color for instance number 2.
 AnalogColor2.Limit    <t><t>Limit for instance number 2.
 AnalogColor2.LimitType <t><t>Type of limit for instance number 2.
@@ -3602,6 +4016,7 @@ Fatal           <t>Flashing red.
 StatusColor.Attribute <t><t>Signal in the database of type Status. The color of the component
                       <t><t>is set from the severity of the status value.
 StatusColor.NoStatusColor <t><t>Color when the status value is 0.
+StatusColor.UseColorTheme <t><t>When set to 1, color theme colors will be used. 
 </topic>
 
 <topic>GeDynDigWarning <style>function
@@ -3615,6 +4030,8 @@ drawn with yellow fill color, if the value is 0, it is drawn with the normal fil
 <b>Attribute <t><t>Description
 DigWarning.Attribute <t><t>Signal in the database of type Boolean that should 
                      <t><t>influence the object.
+DigWarning.UseColorTheme <t><t>When set to 1, color theme colors will be used. 
+
 </topic>
 
 <topic>GeDynDigError <style>function
@@ -3628,21 +4045,24 @@ drawn with red fill color, if the value is 0, it is drawn with the normal fill c
 <b>Attribute <t><t>Description
 DigError.Attribute <t><t>Signal in the database of type Boolean that should 
   <t><t>influence the object.
+DigError.UseColorTheme <t><t>When set to 1, color theme colors will be used. 
 </topic>
 
 <topic>GeDynDigFlash <style>function
 DigFlash
 
-Flash with specified fill color when the signal is high.
+Flash with specified colors when the signal is high.
 
 DigFlash changes the color of the object every cycle. The color is shifted between the 
-specified color and original color, or the color the object receives from other color dynamics.
+colors specified in Color and Color2. When the signal is low, the object is drawn with the
+original color.
 
 The flash frequency is determined by the cycle time of the cycle of the object.
 
 <b>Attribute <t><t>Description
 DigFlash.Attribute <t><t>Signal in the database that should influence the object.
-DigFlash.Color     <t><t>Fillcolor.
+DigFlash.Color     <t><t>First flash color.
+DigFlash.Color2    <t><t>Second flash color.
 </topic>
 
 <topic>GeDynFillLevel <style>function
@@ -3670,6 +4090,8 @@ FillLevel.MinValue <t><t>Min value. When the signal value equals
 FillLevel.MaxValue <t><t>Max value. When the signal value equals 
                    <t><t>MaxValue, the whole object is drawn with 
                    <t><t>original color.
+FillLevel.MinValueAttr <t><t>Signal for minimum value.
+FillLevel.MaxValueAttr <t><t>Signal for maximum value.
 </topic>
 
 <topic>GeDynInvisible <style>function
@@ -3686,6 +4108,9 @@ Attribute you then write $cmd('command'), for example
 Invisible.Attribute <t><t>Signal in the database of type Boolean that should 
                     <t><t>influence the object.
 Invisible.Dimmed <t><t>1 dims the object, 0 makes the object invisible.
+Invisible.DimLevel <t><t>A transparency value between 0 and 1 to add
+		<t><t>transparency to the dimmed appearance.
+Invisible.Instances <t><t>Instance mask where instances can be added or removed.
 </topic>
 
 <topic>GeDynDigBorder <style>function
@@ -3701,6 +4126,34 @@ is stated from the object editor.
 DigBorder.Attribute <t><t>Signal in the database of type Boolean the should influence 
                     <t><t>the component.
 DigBorder.LowColor  <t><t>Border color of the component when the signal is 0.
+</topic>
+
+<topic>GeDynDigBackgroundColor <style>function
+DigBackgroundColor
+
+The DigBackgroundColor dynamics makes it possible to set dynamics on the background color.
+DigBackgroundColor works analogous with DigColor, but will changes the background color 
+instead of the fill color. The DigBackgroundColor has several instances and thus can be 
+connected to several digital signals, and change between several colors.
+DigBackground color makes it possible to modify the color of two parts of a subgraph or 
+group independently of each other. In the example below, the gray rectangle is drawn with 
+fixed gray color, the left circle has the fill color, and the right background color. 
+Drawing a circle with background color is achieved by setting the fill_eq_background 
+property of the circle.
+
+<image> geg_fig208.png
+<b>Fig Background color dynamics
+ 
+When setting dynamic DigColor and DigBackgroundColor to the group, the DigColor dynamic 
+will affect the left circle drawn with fill color, and the DigBackgroundColor dynamics 
+will affect the right circle drawn with background color.
+
+<b>Attribute <t><t>Description
+DigBackgroundColor.Attribute <t><t>Signal in the database of type Boolean the should influence 
+                    <t><t>the component.
+DigBackgroundColor.Color  <t><t>Background color of the component when the signal is 1.
+DigBackgroundColor.Instances <t><t>Instance mask where instances can be added or removed.
+
 </topic>
 
 <topic>GeDynTimeoutColor <style>function
@@ -3740,12 +4193,21 @@ DigText
 Shift between two texts.
 
 The object is connected to a digital signal in the database. If the value is 1, the original 
-text is written, if the value is 0, the text in LowText is written. DigText operates on 
-annotation 1. 
+text is written, if the value is 0, the text in LowText is written. 
+
+With serveral instances, the object can be connected to further signals, and further texts
+can be displayed. For instance 2 and upwards, the specified HighText is written when the
+corresponding signal is high.
+
+DigText operates on annotation 1. 
 
 <b>Attribute <t><t>Description
-DigText.Attribute <t><t>Signal in the database of type Boolean the shift the text.
+DigText.Attribute <t><t>Signal in the database of type Boolean.
 DigText.LowText   <t><t>Text to write when the signal is low.
+DigText.Instances <t><t>Instance mask where instances can be added or removed.
+DigText2.Attribute <t><t>Signal in the database of type Boolean.
+DigText2.HighText   <t><t>Text to write when the signal is high.
+
 </topic>
 
 <topic>GeDynAnalogText <style>function
@@ -3785,18 +4247,23 @@ with the corresponding number.
 Value.Attribute <t><t>Signal in the database or arbitrary type, that is written out in 
                 <t><t>the text field.
 Value.Format    <t><t>Format in c-printf syntax.
-Value.Instances <t><t>States the instances that is created.
+Value.ZeroBlank <t><t>When value is zero, the value field is blank.
+Value.DecimalsAttr <t><t>Integer signal for number of decimals.
+Value.DecimalsDecrease <t><t>The number of decimals will be decremented
+		<t><t>the specified amount.
+Value.Instances <t><t>Instance mask where instances can be added or removed.
 
 <h2>Format
 For the following attributes types, some additional format strings are defined.
 
 <b>pwr_tTime
-%t<t>Date and time. Ex 24-MAY-2007 11:33:43.91
-%1t<t>Only time, no hundredth. Ex 11:33:43
-%2t<t>Only time, with hundredth. Ex 11:33:43:91
-%3t<t>Compressed date and time. Ex 07-05-24 11:33:43
-%4t<t>Date only. Ex 24-MAY-2007
-%5t<t>Compressed date. Ex 07-05-24
+%t<t>Date and time. Eg 24-MAY-2007 11:33:43.91
+%1t<t>Only time, no hundredth. Eg 11:33:43
+%2t<t>Only time, with hundredth. Eg 11:33:43:91
+%3t<t>Compressed date and time. Eg 07-05-24 11:33:43
+%4t<t>Date only. Eg 24-MAY-2007
+%5t<t>Compressed date. Eg 07-05-24
+%6t<t>Time and date. Eg 01:00:00 30/01/87
 
 <b>pwr_tDeltaTime
 %t<t>Time with hundredth. Ex 1:23:45.43
@@ -3811,20 +4278,20 @@ For the following attributes types, some additional format strings are defined.
 %1o<t>Path and object name.
 %2o<t>Volume, path and object name.
 
-<b>pwr_tAttrRef
+<b>pwr_tAttrRef and pwr_tDataRef
 %o<t>Object name (last segment) and attribute name.
 %1o<t>Path, object name and attribute name.
 %2o<t>Volume, path, object name and attribute name.
 
 <b>pwr_tStatus and pwr_tNetStatus
 %m<t>The status value will be converted to the corresponding string.
-  <t> Ex "GDH-E-NOSUCHOBJ, No such object".
-%1m<t>Only the text part of the string is displayed. Ex "No such object".
+  <t> Eg "GDH-E-NOSUCHOBJ, No such object".
+%1m<t>Only the text part of the string is displayed. Eg "No such object".
 
 <b>pwr_tMask
 %d<t>The mask is displayed as an UInt32.
 %b<t>The mask is displayed as a 32-bit binary value.
-%16b<t>The mask is displayed as a 16-bit binary value. Ex 001111100011001.
+%16b<t>The mask is displayed as a 16-bit binary value. Eg 001111100011001.
 
 
 </topic>
@@ -3879,8 +4346,8 @@ Move.XAttribute <t><t>Signal in the database of type Float32. Gives movement in
                 <t><t>x direction.
 Move.YAttribute <t><t>Signal in the database or type Float32. Gives movement in 
                 <t><t>y direction.
-Move.Factor     <t><t>Conversion factor from entity for XAttribute and 
-                <t><t>YAttribute to entity for Ge coordinate.
+Move.XFactor    <t><t>Conversion factor for XAttribute.
+Move.YFactor    <t><t>Conversion factor for YAttribute.
 Move.XOffset    <t><t>Value for XAttribute that corresponds to the start 
                 <t><t>position for the object.
 Move.YOffset    <t><t>Value for YAttribute that corresponds to the start 
@@ -3889,24 +4356,10 @@ Move.ScaleXAttribute <t><t>Signal in the datbase of type Float32. Gives scaling 
                 <t><t>x direction.
 Move.ScaleYAttribute <t><t>Signal in the database of type Float32. Gives scaling in 
                 <t><t>y direction.
-Move.ScaleFactor <t><t>Conversion factor from entity for ScaleXAttribute
-                <t><t>and ScaleYAttribute to scale factor.
-</topic>
-
-<topic>GeDynAnalogShift <style>function
-AnalogShift
-
-Shift between several pages in the subgraph. The subgraph has to contain at least two pages.
-
-The object is connected to an analog signal in the database. The value of the analog attribute
-determines the index for the page to display. Value 0 displays the first page, value 1 the
-second etc.
-
-<b>Attribute <t><t>Description
-AnalogShift.Attribute <t><t>Signal in the database of type Float32 or Int32 that shifts 
-                      <t><t>page of the subgraphs. The value determines which 
-                      <t><t>page is to be displayed. Value 0 displays the first 
-                      <t><t>page.
+Move.ScaleXFactor <t><t>Conversion factor for ScaleXAttribute.
+Move.ScaleYFactor <t><t>Conversion factor for ScaleYAttribute.
+Move.ScaleType  <t><t>Type of scale. From where the scale emanates, the center or
+                <t><t>on of the corners.
 </topic>
 
 <topic>GeDynDigShift <style>function
@@ -3942,18 +4395,20 @@ DigFourShift.Attribute3 <t><t>Signal in the database or type Boolean that shifts
                    <t><t>page. Activates drawing of the third page.
 </topic>
 
-<topic>GeDynScrollingText <style>function
-ScrollingText
+<topic>GeDynAnalogShift <style>function
+AnalogShift
 
-Display a scrolling text.
+Shift between several pages in the subgraph. The subgraph has to contain at least two pages.
 
-The object is connected to a string attribute in the database, and the text in the 
-attribute is displayed.
+The object is connected to an analog signal in the database. The value of the analog attribute
+determines the index for the page to display. Value 0 displays the first page, value 1 the
+second etc.
 
 <b>Attribute <t><t>Description
-ScrollingText.Attribute <t><t>Attribute in the database or type String.
-ScrollingText.Direction <t><t>Scrolling direction, right, left, up or down.
-ScrollingText.Speed.    <t><t>Scrolling speed.
+AnalogShift.Attribute <t><t>Signal in the database of type Float32 or Int32 that shifts 
+                      <t><t>page of the subgraphs. The value determines which 
+                      <t><t>page is to be displayed. Value 0 displays the first 
+                      <t><t>page.
 </topic>
 
 <topic>GeDynAnimation <style>function
@@ -3999,8 +4454,10 @@ Animation.Sequence  <t><t>Animation sequence. Can be Cyclic, ForwBack
 <topic>GeDynVideo <style>function
 Video
 
-Displays a gif-file that is continuously updated by a web camera.
-Video has no attribues.
+Displays an image file that is continuously updated by a web camera.
+Also other image files can be used. When the file is modified, the image is redrawn.
+
+Video has no attributes.
 </topic>
 
 <topic>GeDynDigCommand <style>function
@@ -4020,8 +4477,8 @@ DigCommand.Attribute <t><t>Signal in the database of type boolean that should
 DigCommand.Level  <t><t>If Level is 0, the command is executed when the signal changes
                   <t><t>from 0 to 1. If Level is 1, the command is executed cyclically 
                   <t><t>when the signal is high.
-DigCommand.Command <t><t>Xtt command that is executed.
-DigCommand.Instance <t><t>States the number of instances that is created.
+DigCommand.Command <t><t>Xtt command that will be executed.
+DigCommand.Instances <t><t>Instance mask where instances can be added or removed.
 DigCommand2.Attribute <t><t>Signal for instance number 2.
 DigCommand2.Level <t><t>Command for instance number 2.
 DigCommand2.Command <t><t>Command for instance number 2.
@@ -4043,7 +4500,43 @@ DigScript.Arguments <t><t>Arguments that can be used as p1-p9 in the script. The
 DigScript.Level    <t><t>If level is 0, the script is executed when the signal changes
                    <t><t>from 0 to 1. If level is 1, the script is executed cyclically 
                    <t><t>when the signal is high.
-DigScript.Script <t><t>Xtt script that is executed.
+DigScript.Script <t><t>Xtt script that will be executed.
+</topic>
+
+<topic>GeDynScrollingText <style>function
+ScrollingText
+
+Display a scrolling text.
+
+The object is connected to a string attribute in the database, and the text in the 
+attribute is displayed.
+
+<b>Attribute <t><t>Description
+ScrollingText.Attribute <t><t>Attribute in the database or type String.
+ScrollingText.Direction <t><t>Scrolling direction, right, left, up or down.
+ScrollingText.Speed     <t><t>Scrolling speed.
+ScrollingText.Bounce    <t><t>The text will bounce at the borders.
+</topic>
+
+<topic>GeDynDigSound <style>function
+DigSound
+Play a sound when the signal goes from low to high, or when the signal is high.
+
+The object is connected to a digital signal in the database. The sound is played either
+once on positive edge of the signal, or cyclically when the signal is high. Also a 
+sound object of class Sound or SoundSequence has to be specified.
+
+
+<b>Attribute <t><t>Description
+DigSound.Attribute <t><t>Signal in the database of type boolean that should 
+                   <t><t>influence the component.
+DigSound.SoundObject <t><t>Sound object of class Sound or SoundSequence.
+DigSound.Level    <t><t>If level is 0, the sound is played when the signal changes
+                   <t><t>from 0 to 1. If level is 1, the sound is played cyclically 
+                   <t><t>when the signal is high.
+DigSound.Interval <t><t>Cycle time for cyclic play.
+DigSound.Instances <t><t>Instance mask where instances can be added or removed.
+
 </topic>
 
 <topic>GeDynDigTransparency <style>function
@@ -4071,6 +4564,34 @@ the value of the analog signal.
 AnalogTransparency.Attribute <t><t>Signal in the database of type Float32.
 AnalogTransparency.MinValue  <t><t>Signal value that corresponds to minimal transparency.
 AnalogTransparency.MaxValue  <t><t>Signal value that corresponds to maximal transparency.
+</topic>
+
+<topic>GeDynColorThemeLightness <style>function
+ColorThemeLightness
+
+A color theme has a lightness property that is negative for dark themes and positive for 
+light themes. The theme Midnight has for example lightness -5 while NordicLight has 1. 
+Adding dynamic ColorThemeLightness to an object will increase or decrease the lightness of
+the object dependent on the colortheme lightness value.
+
+The ColorThemeLightness dynamic has no properties.
+</topic>
+
+<topic>GeDynDigSwap <style>function
+DigSwap
+
+DigSwap will disconnect all subscriptions in the graph and reconnect them again. This is 
+useful when subscriptions by reference is used with the &() syntax, eg 
+&(H1-Plate.Ref).Length##Float32. In this example H1-Plate.Ref is an attribute reference 
+that points to an object containing the Length attribute. If the reference in H1-Plate.Ref
+is changed, the subscriptions has to be reconnected to the new reference, and this is done
+by DigSwap. DigSwap is connected to a digital signal that will activate the swap.
+
+<b>Attribute <t><t>Description
+DigSwap.Attribute <t><t>Signal in the database of type Boolean that
+ <t><t>will trigger the swap.
+DigSwap.ResetValue <t><t>When a trigger is detected the connected signal is reset by
+ <t><t>the DigSwap function.
 </topic>
 
 <topic>GeDynUnitConvert <style>function
@@ -4105,6 +4626,41 @@ UnitConvert.DbUnit  <t><t>Unit for value in the database.
 UnitConvert.DisplayUnit <t><t>Unit for value in display.
 </topic>
 
+<topic>GeDynHostObject <style>function
+HostObject
+HostObject is a dynamic that is used for subgraphs that is connected to components. 
+Components often contains several values that should affect the subgraph, and with 
+HostObject it is possible to program a complex dynamic that only requires that the user
+makes one single connection to the component object.
+
+<b>Attribute <t><t>Description
+HostObject.Object <t><t>Name of a database object.
+
+The dynamic is programmed in graph attributes for the subgraph. Here subgraph is set to
+1 and DynType1 is set to HostObject. HostObject.DynType1, HostObject.DynType2 and
+HostObject.Action can now be used to set dynamics on the subgraph. The components that
+will be connected to each intance is denoted '$hostobject'. 
+
+<image> geg_fig205.png
+<b>Fig Subgraph with default dynamics HostObject
+
+<b>Recursive dynamics
+By default subgraphs inside other subgraphs can not contain dynamics, but by setting
+RecursiveDynamics in graph attributes for the subgraph to 1, it is possible to use other
+subgraphs as indicators and pushbuttons, and to use '$hostobject' to connect to the 
+component object.
+
+In the example below, the three indicators are subgraphs of type pwr_indsquare. They are
+connected to attributes in the component object with $hostobject syntax.
+
+<image> geg_fig207.png
+<b>Fig Subgraph with recursive dynamics containing other subgraphs
+ 
+<image> geg_fig206.png
+<b>Fig Properties for indicator
+ 
+</topic>
+
 </headerlevel>
 <pagebreak>
 
@@ -4128,16 +4684,17 @@ Command   <t>-          <t>Execute an xtt command with Click MB1. <link>GeDynCom
 CommandDoubleClick <t>- <t>Execute an xtt command with Doubleclick MB1. <link>GeDynCommandDoubleClick
 Script    <t>-          <t>Execute an xtt script with Click MB1, or when graph is opened or closed. <link>GeDynScript
 Confirm   <t>-          <t>Confirm before the action is executed. <link>GeDynConfirm
-IncrAnalog <t>Float32   <t>Increase or decrease an analog value. <link>GeDynIncrAnalog
-RadioButton <t>Boolean  <t>Action for radio buttons. <link>GeDynRadioButton
-Slider    <t>Float32 Int32 <t>Reserved for slider subgraphs.
-ValueInput <t>Arbitrary <t>Input field. <link>GeDynValueInput
-ToolTip   <t>-          <t>Display a tooltip text. <link>GeDynToolTip
 Help      <t>-          <t>Display a help text with Click MB1. <link>GeDynHelp
 OpenGraph <t>-          <t>Open a graph with Click MB1. <link>GeDynOpenGraph
+CloseGraph <t>-          <t>Close the current graph. <link>GeDynCloseGraph
 OpenURL   <t>-          <t>Open an URL in a suitable web browser on Click MB1. <link>GeDynOpenURL
-PulldownMenu <t>- 	<t>Action for pulldown menus. <link>GeDynPulldownMenu
+IncrAnalog <t>Float32   <t>Increase or decrease an analog value. <link>GeDynIncrAnalog
+RadioButton <t>Boolean  <t>Action for radio buttons. <link>GeDynRadioButton
+ValueInput <t>Arbitrary <t>Input field. <link>GeDynValueInput
+ToolTip   <t>-          <t>Display a tooltip text. <link>GeDynToolTip
+InputFocus <t>-         <t>Set input focus. <link>GeDynInputFocus
 OptionMenu <t>-		<t>Action for option menus. <link>GeDynOptionMenu
+PulldownMenu <t>- 	<t>Action for pulldown menus. <link>GeDynPulldownMenu
 MethodPulldownMenu <t>- <t>Action for pulldown menus for object methods. <link>GeDynMethodPulldownMenu
 EmitSignal <t>- 	<t>Emit a signal. <link>GeDynEmitSignal
 CatchSignal <t>- 	<t>Catch a signal. <link>GeDynCatchSignal
@@ -4151,7 +4708,7 @@ An popup menu is opend by clicking MB3. The popup menu contains the methods for 
 specified in RefObject (Se chapter Methods in the Xtt manual).
 
 <b>Attribute <t><t>Description
-PopupMenu.RefObject <t><t>Object in the database, which methods are displayed and 
+PopupMenu.ReferenceObject <t><t>Object in the database, which methods are displayed and 
                     <t><t>activated from the popup menu.
 </topic>
 
@@ -4165,7 +4722,7 @@ SetDig can exist in several instances, and then sets the value of several signal
 <b>Attribute <t><t>Description
 SetDig.Attribute <t><t>Signal in the database that is set to 1 with
                  <t><t>Click MB1 on the object.
-SetDig.Instances <t><t>States the number of instances that is created.
+SetDig.Instances <t><t>Instance mask where instances can be added or removed.
 </topic>
 
 <topic>GeDynResetDig <style>function
@@ -4178,7 +4735,7 @@ ResetDig can exist in several instances, and then sets the value of several sign
 <b>Attribute <t><t>Description
 ResetDig.Attribute <t><t>Signal in the database of type Boolean that is set to 0
                    <t><t>with Click MB1 on the object.
-ResetDig.Instances <t><t>States the number of instances that is created.
+ResetDig.Instances <t><t>Instance mask where instances can be added or removed.
 </topic>
 
 <topic>GeDynToggleDig <style>function
@@ -4213,6 +4770,7 @@ SetValue.Attribute <t><t>Signal in the database of type Float32, Int32,
                    <t><t>UInt32, Int16, UInt16, Int8, UInt8 or String,
                    <t><t>that it set with Click MB1 on the object.
 SetValue.Value     <t><t>The value that is set.
+SetValue.Instances <t><t>Instance mask where instances can be added or removed.
 </topic>
 
 <topic>GeDynCommand <style>function
@@ -4314,6 +4872,20 @@ extern variables to the instance object name. Supply the instance object as argu
 set the namespace with set_namespace(p1). 
 </topic>
 
+<topic>GeDynConfirm <style>function
+Confirm
+
+Confirm requires a confirmation from the user before an action is executed. A dialog box with
+specified text, Ok and Cancel buttons, is displayed before any other action element is executed.
+
+<b>Attribute  <t><t>Desciption
+Confirm.Text <t><t>Text displayed in the confirm window.
+Confirm.OnSet <t><t>Used with action ToggleDig when only set of value to 1 should be confirmed. 
+              <t><t>Set of value to 0 is executed without confirm.
+Confirm.OnReset <t><t>Used with action ToggleDig when only set of value to 0 should be confirmed.
+              <t><t>Set of value to 1 is executed without confirm.
+</topic>
+
 <topic>GeDynHelp <style>function
 Help
 
@@ -4333,6 +4905,14 @@ Open another graph via a XttGraph object by clicking MB1 on the object.
 OpenGraph.GraphObject <t><t>Object of class XttGraph.
 </topic>
 
+<topic>GeDynCloseGraph <style>function
+CloseGraph
+
+Close the current graph.
+
+CloseGraph has no attributes.
+</topic>
+
 <topic>GeDynOpenURL <style>function
 OpenURL
 
@@ -4340,20 +4920,6 @@ Open an URL in a suitable webbrowser by clicking MB1 on the object.
 
 <b>Attribute <t><t>Description
 OpenURL.URL <t><t>An URL
-</topic>
-
-<topic>GeDynConfirm <style>function
-Confirm
-
-Confirm requires a confirmation from the user before an action is executed. A dialog box with
-specified text, Ok and Cancel buttons, is displayed before any other action element is executed.
-
-<b>Attribute  <t><t>Desciption
-Confirm.Text <t><t>Text displayed in the confirm window.
-Confirm.OnSet <t><t>Used with action ToggleDig when only set of value to 1 should be confirmed. 
-              <t><t>Set of value to 0 is executed without confirm.
-Confirm.OnReset <t><t>Used with action ToggleDig when only set of value to 0 should be confirmed.
-              <t><t>Set of value to 1 is executed without confirm.
 </topic>
 
 <topic>GeDynIncrAnalog <style>function
@@ -4412,6 +4978,8 @@ ValueInput.MaxValueAttr <t><t>Signal for maximum input value.
 ValueInput.KeyboardType <t><t>Type of virtual keyboard that is opened when the field 
                       <t><t>has input focus. Requires that VirtualKeyboards is enbled for the
                       <t><t>operator place.
+ValueInput.UpdateOpen <t><t>Update the field if the database value is changed also
+                      <t><t>when the field is open.
 </topic>
 
 <topic>GeDynToolTip <style>function
@@ -4562,14 +5130,13 @@ Only the configured methods are displayed in the menu.
 
 <b>Attribute <t><t>Description
 MethodPulldownMenu.Object <t><t>Object which methods are diplayed in the menu.
-MethodPulldownMenu.HelpMenu <t><t>The menu is a help menu and only the help methods
-                          <t><t>Help and Help Class is shown in the menu.
+MethodPulldownMenu.MenuType <t><t>Type of menu. Object, Help or Simulate.
 </topic>
 
 <topic>GeDynEmitSignal <style>function
 EmitSignal
 
-Action to emit a signal.
+Action to emit a signal. The signal is emitted on Click MB1.
 
 <b>Attribute <t><t>Description
 EmitSignal.SignalName <t><t>Signal name.
@@ -4732,35 +5299,25 @@ handled from the object editor with 'Functions/Recall' and 'Functions/Recall pre
 
 <chapter>
 <topic>geref_images
-GIF and JPEG images
+Images
 
-GIF and JPEG-images are here called images.
+An image is an object that reads an image from an image file of type png, jpg or gif.
 
 <h2>Create an image
-You create an image in the same way as a subgraph. GIF and JPEG images are found under the
-'Images' folder, and under the 'Local/Images' folder. If you want to read a specific GIF of
-JPEG file you copy it to $pwrp_pop. The file is then found under the 'Local/Images' folder. By
-selecting it and clicking MB2 in the work area you create the image object.
+You create an image in the same way as a subgraph. png, jpg and gif images are found under the
+'Images' folder, and under the 'Local/Images' folder. If you want to read a specific image
+file you copy it to $pwrp_pop. The file is then found under the 'Local/Images' folder. By
+selecting the image and clicking MB2 in the work area you create the image object.
 
 An image can be scaled and rotated in steps of 90 degrees. Functions for color tone, lightness,
 intensity and color shift also applies to images.
 
-<h2>Dynamik
+<h2>Dynamics
 To put dynamics behind an image, you first have to make a subgraph of the image, or let it be
 a member of a group. If you want to change the color dynamically, you should use a dynamic
 type that changes the color tone, e.g. DigTone. Change of fill color of an image will have no
 effect.
 
-<h2>Transparency
-If you have an image of a symbol that is not rectangular, e.g. a round indicator, you want the
-area outside the indicator to be transparent.
-
-The GIF-format supports transparency. By choosing the transparency color (R: 255, G: 0, B: 255) 
-the transparency will also work in Ge.
-
-Java doesn't support transparency of GIF-files. Though the Ge image class will insert 
-transparency in pixel that has (R:255, G:255, B:255) i.e. white. This though can imply that
-white areas of the image are viewed as transparent.
 </topic>
 </chapter>
 
@@ -4774,7 +5331,7 @@ is closest to the cursor when you press or release the mouse is selected.
 
 Connections are characterized by type, line width, 3D and color.
 
-<h2>Typ
+<h2>Type
 Type is selected from the menu under 'Connections'.
 
 <b>Straight
@@ -4994,20 +5551,16 @@ Scantime    <t>Cycle time in seconds for update objects that runs with
 FastScantime <t>Cycle time in seconds for update objects that runs with 
             <t>the fast cycle.
 AnmationScantime <t>Cycle time in second for animations in the graph.
-JavaWidth   <t>Width in pixels that the graph is scaled to when exported to java.
-IsJavaApplet <t>The graph is exported as a java applet when exported.
-IsJavaFrame <t>The graph is exported as a java frame when exported.
 BackgroundImage <t>Name of a gif or jpeg image for the background image.
-BackgroundTiled <t>The background image is tiled, not scaled.
-DoubleBuffered <t>The graph is double buffered, i.e. it is first drawn
-            <t>in a pixmap in memory that is then copied to the sreen.
-            <t>Should be used if the graph contains mobile objects or animations.
 MB3Action   <t>Action for right click in the graph. 
 Translate   <t>All dynamic and static texts are translated.
 BitmapFonts <t>Bitmap fonts are used instead of scalalbe fonts.
 HotIndication <t>How sensitive objects are marked when they are hot.
 TooltipTextsize <t>Size of text in tooltip.
-AppMotion   <t>Action for motion event in Android app.
+ColorTheme  <t>Color theme file. '$default' denotes the colortheme 
+            <t>choosen by the operator.
+WindowResize <t>-
+Dashboard   <t>Graph is a dashboard.
 
 <h1>Object and hierarchy graphs
 This chapter describes how to create Ge graphs that displays the content of an object of a 
@@ -5082,6 +5635,22 @@ Example of a command to open a trend from a plotgroup in the hierarchy
 <topic>geref_testing
 Testing
 
+<h1>Xtt
+By starting xtt in the development environment, you can easily test the graph. The only 
+requirement is that the .pwg file for the graph is present on $pwrp_exe. Use the build button 
+in the Ge editor tools panel to copy the graph to $pwrp_exe. 
+
+A graph is opened with the command
+
+<c>xtt> open graph 'graphname' [/width=][/height=][/scrollbar][/navigator]
+
+All the available graphs are listed with command
+
+<c>xtt> show graph
+
+A graph can be opened from the list by clicking on the graph icon, or selecting a graph and 
+pressing key arrow right.
+
 <h1>Preview
 There is a function to test the graph immediately in the editor. One requirement is that you
 have to start the ProviewR runtime environment on the development station, to be able to find 
@@ -5089,18 +5658,6 @@ signals that occurs in the graph. From 'View/Preview' in the menu, the editor co
 database and starts executing the dynamic of the graph. Preview is closed with 'View/Preview 
 close' and then you can continue to edit the graph.
 
-<h1>Xtt
-By starting xtt in the development environment or in an operator/process station, you can also
-easily test the graph. The only requirement is that the .pwg file for the graph is present on
-$pwrp_exe. You open a Ge graph with the command
-
-<c>xtt> open graph 'graphname' [/width=][/height=][/scrollbar][/navigator]
-
-With the command
-
-<c>xtt> show graph
-
-all the available graphs are listed.
 </topic>
 </chapter>
 
@@ -6383,6 +6940,7 @@ Reload <t><t>Read current graph from file. <link>Reload()
 SaveGraph <t><t>Save the current graph. <link>SaveGraph()
 ScaleObject <t><t>Scale an object. <link>ScaleObject()
 SelectAdd <t><t>Add an object to select list. <link>SelectAdd()
+SelectClear <t><t>Clear select list. <link>SelectClear()
 SetBackgroundColor <t><t>Set graph background color. <link>SetBackgroundColor()
 SetColorTheme <t><t>Set color theme. <link>SetColorTheme()
 SetCurrentObject <t><t>Set CurrentObject. <link>SetCurrentObject()
@@ -6410,7 +6968,7 @@ SetSelectTextSize <t><t>Set text size on selected objects. <link>SetSelectTextSi
 
 <h2>Input and output
 <b>Function <t>Description
-ask <t>Print a question an read an answere.
+ask <t>Print a question and read an answere.
 say <t>Print a text.
 printf <t>Formatted print.
 scanf  <t>Formatted read.
@@ -7969,6 +8527,15 @@ int          <t>objectid   <t>Object identity.
  
 <c> id = GetCurrentObject();
 <c> SelectAdd( id);
+</topic>
+
+<topic>SelectClear() <style>function
+SelectClear()
+int SelectClear()
+
+<h2>Description
+
+Clear the list of selected objects.
 </topic>
 
 <topic>SetBackgroundColor() <style>function
