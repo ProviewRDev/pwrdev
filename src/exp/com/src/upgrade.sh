@@ -678,8 +678,8 @@ reload_convert_pn_xml()
 }
 
 #passes="savedirectory classvolumes renamedb loaddb compile createload buildnodes createpackage"
-passes=(updateclasses convert_volume_objects convert_pn_xml)
-passes_desc=("Update classes" "Convert objects in volumes" "Convert profinet runtime xml files")
+passes=(classvolumes updateclasses convert_volume_objects convert_pn_xml)
+passes_desc=("Create loadfiles for classvolumes" "Update classes" "Convert objects in volumes" "Convert profinet runtime xml files")
 
 usage()
 {
