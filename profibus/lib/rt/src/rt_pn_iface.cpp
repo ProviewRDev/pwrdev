@@ -537,21 +537,33 @@ void pack_download_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes, std::shared_ptr<Pr
     // Check if advanced startup and act accordingly
     ar_property = PROFINET_AR_PROPERTY_STATE_PRIMARY | PROFINET_AR_PROPERTY_PARAMETER_SERVER_CM;
 
-    if (pn_device->m_IOCR_map.at(PROFINET_IO_CR_TYPE_INPUT).m_startup_mode == "Advanced")
-    {
-      ar_property |= PROFINET_AR_PROPERTY_STARTUP_MODE_ADVANCED;
-    }
-    else
-    {
-      ar_property |= PROFINET_AR_PROPERTY_STARTUP_MODE_LEGACY;
-    }
+    ar_property |= PROFINET_AR_PROPERTY_STARTUP_MODE_LEGACY;
+
+    // "Temporary" removed due to issues with larger write requests (issues with fragmentation and corrupt
+    // messages) when using advanced startup mode if
+    // (pn_device->m_IOCR_map.at(PROFINET_IO_CR_TYPE_INPUT).m_startup_mode == "Advanced")
+    // {
+    //   ar_property |= PROFINET_AR_PROPERTY_STARTUP_MODE_ADVANCED;
+    // }
+    // else
+    // {
+    //   ar_property |= PROFINET_AR_PROPERTY_STARTUP_MODE_LEGACY;
+    // }
 
     pSDR->AdditionalFlag = 0;
+
+    // PN_SERVICE_DOWNLOAD_ADD_FLAG_ENABLE_MULTIPLE_WRITE is also available but does not do anything in
+    // Advanced mode and as far as legacy goes we kinda want to have the many small write requests for now.
+
     if (pn_device->m_NetworkSettings.m_skip_ip_assignment)
       pSDR->AdditionalFlag |= PN_SERVICE_DOWNLOAD_ADD_FLAG_SKIP_IP_ASSIGNMENT;
 
     if (pn_device->m_IOCR_map.at(PROFINET_IO_CR_TYPE_INPUT).m_rt_class == "RT_CLASS_3")
       pSDR->AdditionalFlag |= PN_SERVICE_DOWNLOAD_ADD_FLAG_ENABLE_IRT;
+
+    // Use multiple writes instead of larger single writes as this has been seen to cause some problems on
+    // some devices with large configurations.
+    // pSDR->AdditionalFlag |= PN_SERVICE_DOWNLOAD_ADD_FLAG_ENABLE_MULTIPLE_WRITE;
 
     pSDR->InstanceHighByte = _PN_U16_HIGH_BYTE(pn_device->m_instance);
     pSDR->InstanceLowByte = _PN_U16_LOW_BYTE(pn_device->m_instance);
