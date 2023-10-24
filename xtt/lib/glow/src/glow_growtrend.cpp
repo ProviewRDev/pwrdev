@@ -559,6 +559,12 @@ void GrowTrend::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
   idx = MIN(idx, DRAW_TYPE_SIZE - 1);
   int x1, y1, x2, y2, ll_x, ll_y, ur_x, ur_y;
 
+  double transp = transparency;  
+  if (colornode && ((GrowNode*)colornode)->transparency > transparency)
+    transp = ((GrowNode*)colornode)->transparency;
+  if (transpnode && ((GrowNode*)transpnode)->transparency > transp)
+    transp = ((GrowNode*)transpnode)->transparency;
+
   if (!t) {
     x1 = int(trf.x(ll.x, ll.y) * w->zoom_factor_x) - w->offset_x;
     y1 = int(trf.y(ll.x, ll.y) * w->zoom_factor_y) - w->offset_y;
@@ -593,7 +599,7 @@ void GrowTrend::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
       }
       if (ur_x > w->subwindow_x + w->window_width)
         width -= ur_x - (w->subwindow_x + w->window_width);
-      ctx->gdraw->fill_rect(w, x, ll_y, width, ur_y - ll_y, drawtype);
+      ctx->gdraw->fill_rect(w, x, ll_y, width, ur_y - ll_y, drawtype, transp);
     } else {
       glow_eDrawType f1, f2;
       double rotation;
@@ -612,7 +618,7 @@ void GrowTrend::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
         f1 = GlowColor::shift_drawtype(drawtype, gradient_contrast / 2, 0);
       }
       ctx->gdraw->gradient_fill_rect(w, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y,
-          drawtype, f1, f2, ctx->gdraw->gradient_rotate(rotation, grad), transparency);
+          drawtype, f1, f2, ctx->gdraw->gradient_rotate(rotation, grad), transp);
     }
   }
   drawtype = ctx->get_drawtype(draw_type, glow_eDrawType_LineHighlight,
@@ -645,7 +651,7 @@ void GrowTrend::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
 
   for (i = 0; i < vertical_lines; i++) {
     int x = int(ll_x + double(ur_x - ll_x) / (vertical_lines + 1) * (i + 1));
-    ctx->gdraw->line(w, x, ll_y, x, ur_y, drawtype, 0, 0);
+    ctx->gdraw->line(w, x, ll_y, x, ur_y, drawtype, 0, 0, transp);
   }
 
   for (i = 0; i < horizontal_lines; i++) {
@@ -658,11 +664,11 @@ void GrowTrend::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
     }
     if (ur_x > w->subwindow_x + w->window_width)
       width -= ur_x - (w->subwindow_x + w->window_width);
-    ctx->gdraw->line(w, x, y, x + width, y, drawtype, 0, 0);
+    ctx->gdraw->line(w, x, y, x + width, y, drawtype, 0, 0, transp);
   }
 
   if (border)
-    ctx->gdraw->rect(w, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, drawtype, idx, 0);
+    ctx->gdraw->rect(w, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, drawtype, idx, 0, transp);
 
   if (fill_curve) {
     for (i = 0; i < curve_cnt; i++) {
@@ -686,8 +692,8 @@ void GrowTrend::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
   ctx->gdraw->reset_clip_rectangle(w);
 
   if (fill_curve) {
-    ctx->gdraw->line(w, ll_x, ll_y, ll_x, ur_y, drawtype, idx, 0);
-    ctx->gdraw->line(w, ur_x, ll_y, ur_x, ur_y, drawtype, idx, 0);
+    ctx->gdraw->line(w, ll_x, ll_y, ll_x, ur_y, drawtype, idx, 0, transp);
+    ctx->gdraw->line(w, ur_x, ll_y, ur_x, ur_y, drawtype, idx, 0, transp);
 
     for (i = 0; i < curve_cnt; i++) {
       if (curve[i])
@@ -704,7 +710,7 @@ void GrowTrend::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
       drawtype = mark1_color;
       if (drawtype == glow_eDrawType_Inherit)
         drawtype = glow_eDrawType_ColorYellow;
-      ctx->gdraw->line(w, xm, ll_y, xm, ur_y, drawtype, idx, 0);
+      ctx->gdraw->line(w, xm, ll_y, xm, ur_y, drawtype, idx, 0, transp);
     }
   }
   if (display_x_mark2) {
@@ -717,7 +723,7 @@ void GrowTrend::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
       drawtype = mark2_color;
       if (drawtype == glow_eDrawType_Inherit)
         drawtype = glow_eDrawType_ColorRed;
-      ctx->gdraw->line(w, xm, ll_y, xm, ur_y, drawtype, idx, 0);
+      ctx->gdraw->line(w, xm, ll_y, xm, ur_y, drawtype, idx, 0, transp);
     }
   }
   if (display_y_mark1) {
@@ -730,7 +736,7 @@ void GrowTrend::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
       drawtype = mark1_color;
       if (drawtype == glow_eDrawType_Inherit)
         drawtype = glow_eDrawType_ColorYellow;
-      ctx->gdraw->line(w, ll_x, ym, ur_x, ym, drawtype, idx, 0);
+      ctx->gdraw->line(w, ll_x, ym, ur_x, ym, drawtype, idx, 0, transp);
     }
   }
   if (display_y_mark2) {
@@ -743,7 +749,7 @@ void GrowTrend::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
       drawtype = mark2_color;
       if (drawtype == glow_eDrawType_Inherit)
         drawtype = glow_eDrawType_ColorRed;
-      ctx->gdraw->line(w, ll_x, ym, ur_x, ym, drawtype, idx, 0);
+      ctx->gdraw->line(w, ll_x, ym, ur_x, ym, drawtype, idx, 0, transp);
     }
   }
 }

@@ -269,6 +269,13 @@ void GrowBar::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
   idx = MIN(idx, DRAW_TYPE_SIZE - 1);
   int x1, y1, x2, y2, ll_x, ll_y, ur_x, ur_y;
 
+  double transp = transparency;  
+  if (colornode && ((GrowNode*)colornode)->transparency > transparency)
+    transp = ((GrowNode*)colornode)->transparency;
+  if (transpnode && ((GrowNode*)transpnode)->transparency > transp)
+    transp = ((GrowNode*)transpnode)->transparency;
+
+
   if (!t) {
     x1 = int(trf.x(ll.x, ll.y) * w->zoom_factor_x) - w->offset_x;
     y1 = int(trf.y(ll.x, ll.y) * w->zoom_factor_y) - w->offset_y;
@@ -290,7 +297,7 @@ void GrowBar::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
         highlight, (GrowNode*)colornode, 1);
 
     if (grad == glow_eGradient_No)
-      ctx->gdraw->fill_rect(w, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, drawtype);
+      ctx->gdraw->fill_rect(w, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, drawtype, transp);
     else {
       glow_eDrawType f1, f2;
       double rotation;
@@ -309,7 +316,7 @@ void GrowBar::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
         f1 = GlowColor::shift_drawtype(drawtype, gradient_contrast / 2, 0);
       }
       ctx->gdraw->gradient_fill_rect(w, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y,
-          drawtype, f1, f2, ctx->gdraw->gradient_rotate(rotation, grad), transparency);
+          drawtype, f1, f2, ctx->gdraw->gradient_rotate(rotation, grad), transp);
     }
   }
   drawtype = ctx->get_drawtype(draw_type, glow_eDrawType_LineHighlight,
@@ -374,7 +381,7 @@ void GrowBar::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
       dt = bar_drawtype;
 
     if (grad == glow_eGradient_No)
-      ctx->gdraw->fill_rect(w, x0, y0, width, height, dt);
+      ctx->gdraw->fill_rect(w, x0, y0, width, height, dt, transp);
     else {
       glow_eDrawType f1, f2;
       double rotation;
@@ -393,7 +400,7 @@ void GrowBar::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
         f1 = GlowColor::shift_drawtype(dt, gradient_contrast / 2, 0);
       }
       ctx->gdraw->gradient_fill_rect(w, x0, y0, width, height, dt, f1, f2,
-          ctx->gdraw->gradient_rotate(rotation, grad), transparency);
+          ctx->gdraw->gradient_rotate(rotation, grad), transp);
     }
 
     dt = drawtype;
@@ -403,7 +410,7 @@ void GrowBar::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
   }
 
   if (border) {
-    ctx->gdraw->rect(w, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, drawtype, idx, 0);
+    ctx->gdraw->rect(w, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, drawtype, idx, 0, transp);
   }
 }
 

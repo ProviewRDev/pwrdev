@@ -294,6 +294,12 @@ void GrowAxis::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
   if ((node && ((GrowNode*)node)->invisible) || invisible)
     return;
 
+  double transp = transparency;  
+  if (colornode && ((GrowNode*)colornode)->transparency > transparency)
+    transp = ((GrowNode*)colornode)->transparency;
+  if (transpnode && ((GrowNode*)transpnode)->transparency > transp)
+    transp = ((GrowNode*)transpnode)->transparency;
+
   idx = MAX(0, idx);
   idx = MIN(idx, DRAW_TYPE_SIZE - 1);
   int x1, y1, x2, y2, ll_x, ll_y, ur_x, ur_y;
@@ -322,7 +328,7 @@ void GrowAxis::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
   if (45 >= rotation || rotation > 315) {
     // Vertical line to the right and values to the left
 
-    ctx->gdraw->line(w, ur_x, ll_y, ur_x, ur_y, drawtype, idx, 0);
+    ctx->gdraw->line(w, ur_x, ll_y, ur_x, ur_y, drawtype, idx, 0, transp);
 
     // Calculate max value text width
     if (draw_text) {
@@ -348,10 +354,10 @@ void GrowAxis::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
     for (i = 0; i < lines; i++) {
       y = int(ll_y + double(ur_y - ll_y) / (lines - 1) * i);
       if (i % longquotient == 0)
-        ctx->gdraw->line(w, ur_x - line_length, y, ur_x, y, drawtype, idx, 0);
+        ctx->gdraw->line(w, ur_x - line_length, y, ur_x, y, drawtype, idx, 0, transp);
       else
         ctx->gdraw->line(
-            w, ur_x - int(2.0 / 3 * line_length), y, ur_x, y, drawtype, idx, 0);
+            w, ur_x - int(2.0 / 3 * line_length), y, ur_x, y, drawtype, idx, 0, transp);
       if (draw_text) {
         format_text(text, format, max_value - i * increment);
 
@@ -365,14 +371,14 @@ void GrowAxis::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
             y_text = y + (z_height - z_descent) / 2;
           ctx->gdraw->text(w, ll_x, y_text, text, strlen(text), text_drawtype,
               text_color_drawtype, text_idx, highlight, 0, glow_eFont_Helvetica,
-              tsize, 0);
+              tsize, 0, transp);
         }
       }
     }
   } else if (45 < rotation && rotation <= 135) {
     // Horizontal line at bottom and values to the top
 
-    ctx->gdraw->line(w, ll_x, ur_y, ur_x, ur_y, drawtype, idx, 0);
+    ctx->gdraw->line(w, ll_x, ur_y, ur_x, ur_y, drawtype, idx, 0, transp);
 
     // Calculate max value text height
     if (draw_text) {
@@ -389,10 +395,10 @@ void GrowAxis::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
     for (i = 0; i < lines; i++) {
       x = int(ll_x + double(ur_x - ll_x) / (lines - 1) * (lines - 1 - i));
       if (i % longquotient == 0)
-        ctx->gdraw->line(w, x, ur_y - line_length, x, ur_y, drawtype, idx, 0);
+        ctx->gdraw->line(w, x, ur_y - line_length, x, ur_y, drawtype, idx, 0, transp);
       else
         ctx->gdraw->line(
-            w, x, ur_y - int(2.0 / 3 * line_length), x, ur_y, drawtype, idx, 0);
+            w, x, ur_y - int(2.0 / 3 * line_length), x, ur_y, drawtype, idx, 0, transp);
 
       if (draw_text && i % valuequotient == 0) {
         format_text(text, format, max_value - i * increment);
@@ -409,14 +415,14 @@ void GrowAxis::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
             x_text = x - (z_width) / 2;
           ctx->gdraw->text(w, x_text, ll_y + z_height - z_descent, text,
               strlen(text), text_drawtype, text_color_drawtype, text_idx,
-              highlight, 0, glow_eFont_Helvetica, tsize, 0);
+              highlight, 0, glow_eFont_Helvetica, tsize, 0, transp);
         }
       }
     }
   } else if (135 < rotation && rotation <= 225) {
     // Vertical line to the left and values to the right
 
-    ctx->gdraw->line(w, ll_x, ll_y, ll_x, ur_y, drawtype, idx, 0);
+    ctx->gdraw->line(w, ll_x, ll_y, ll_x, ur_y, drawtype, idx, 0, transp);
 
     // Calculate max value text width
     if (draw_text) {
@@ -442,10 +448,10 @@ void GrowAxis::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
     for (i = 0; i < lines; i++) {
       y = int(ll_y + double(ur_y - ll_y) / (lines - 1) * (lines - 1 - i));
       if (i % longquotient == 0)
-        ctx->gdraw->line(w, ll_x, y, ll_x + line_length, y, drawtype, idx, 0);
+        ctx->gdraw->line(w, ll_x, y, ll_x + line_length, y, drawtype, idx, 0, transp);
       else
         ctx->gdraw->line(
-            w, ll_x, y, ll_x + int(2.0 / 3 * line_length), y, drawtype, idx, 0);
+            w, ll_x, y, ll_x + int(2.0 / 3 * line_length), y, drawtype, idx, 0, transp);
       format_text(text, format, max_value - i * increment);
 
       if (draw_text && text_idx >= 0 && max_z_width < ur_x - ll_x
@@ -458,13 +464,13 @@ void GrowAxis::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
           y_text = y + (z_height - z_descent) / 2;
         ctx->gdraw->text(w, x_text, y_text, text, strlen(text), text_drawtype,
             text_color_drawtype, text_idx, highlight, 0, glow_eFont_Helvetica,
-            tsize, 0);
+            tsize, 0, transp);
       }
     }
   } else { // if ( 225 < rotation && rotation <= 315)
     // Horizontal line at top and values at the bottom
 
-    ctx->gdraw->line(w, ll_x, ll_y, ur_x, ll_y, drawtype, idx, 0);
+    ctx->gdraw->line(w, ll_x, ll_y, ur_x, ll_y, drawtype, idx, 0, transp);
 
     // Calculate max value text height
     if (draw_text) {
@@ -481,10 +487,10 @@ void GrowAxis::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
     for (i = 0; i < lines; i++) {
       x = int(ll_x + double(ur_x - ll_x) / (lines - 1) * i);
       if (i % longquotient == 0)
-        ctx->gdraw->line(w, x, ll_y, x, ll_y + line_length, drawtype, idx, 0);
+        ctx->gdraw->line(w, x, ll_y, x, ll_y + line_length, drawtype, idx, 0, transp);
       else
         ctx->gdraw->line(
-            w, x, ll_y, x, ll_y + int(2.0 / 3 * line_length), drawtype, idx, 0);
+            w, x, ll_y, x, ll_y + int(2.0 / 3 * line_length), drawtype, idx, 0, transp);
       if (draw_text && i % valuequotient == 0) {
         format_text(text, format, max_value - i * increment);
         ctx->gdraw->get_text_extent(text, strlen(text), text_drawtype,
@@ -500,7 +506,7 @@ void GrowAxis::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
             x_text = x - (z_width) / 2;
           ctx->gdraw->text(w, x_text, ur_y, text, strlen(text), text_drawtype,
               text_color_drawtype, text_idx, highlight, 0, glow_eFont_Helvetica,
-              tsize, 0);
+              tsize, 0, transp);
         }
       }
     }

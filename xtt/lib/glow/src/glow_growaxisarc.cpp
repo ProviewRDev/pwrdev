@@ -291,6 +291,12 @@ void GrowAxisArc::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
   idx = MIN(idx, DRAW_TYPE_SIZE - 1);
   int x1, y1, x2, y2, ll_x, ll_y, ur_x, ur_y, xt, yt;
 
+  double transp = transparency;  
+  if (colornode && ((GrowNode*)colornode)->transparency > transparency)
+    transp = ((GrowNode*)colornode)->transparency;
+  if (transpnode && ((GrowNode*)transpnode)->transparency > transp)
+    transp = ((GrowNode*)transpnode)->transparency;
+
   if (!t) {
     x1 = int(trf.x(ll.x, ll.y) * w->zoom_factor_x) - w->offset_x;
     y1 = int(trf.y(ll.x, ll.y) * w->zoom_factor_y) - w->offset_y;
@@ -314,7 +320,7 @@ void GrowAxisArc::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
 
   // Lines inwards
   ctx->gdraw->arc(w, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y,
-      angle1 - (int)rotation, angle2, drawtype, idx, 0);
+      angle1 - (int)rotation, angle2, drawtype, idx, 0, transp);
 
   if (lines == 1)
     return;
@@ -351,7 +357,7 @@ void GrowAxisArc::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
     xt = int(((double)ur_x - ll_x) / 2 * (cos1 * (1.0 - linelength) + 1)
         + ll_x - cos1 * z_width / 2);
 
-    ctx->gdraw->line(w, x1, y1, x2, y2, drawtype, idx, 0);
+    ctx->gdraw->line(w, x1, y1, x2, y2, drawtype, idx, 0, transp);
     if (draw_text) {
       if (text_idx >= 0 && i % valuequotient == 0
           && !(angle2 == 360 && ((increment > 0 && i == lines - 1)
@@ -373,7 +379,7 @@ void GrowAxisArc::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
         }
         ctx->gdraw->text(w, xt, yt, text, strlen(text), text_drawtype,
             text_color_drawtype, text_idx, highlight, 0, glow_eFont_Helvetica,
-            tsize, 0);
+            tsize, 0, transp);
       }
     }
   }
