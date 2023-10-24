@@ -470,6 +470,7 @@ int gsx_check_connection(WFoe* foe, vldh_t_node sourceobject,
 	    dest_class == pwr_cClass_initstep || source_class == pwr_cClass_initstep ||
 	    dest_class == pwr_cClass_substep || source_class == pwr_cClass_substep ||
 	    dest_class == pwr_cClass_order || source_class == pwr_cClass_order ||
+	    dest_class == pwr_cClass_OrderAct || source_class == pwr_cClass_OrderAct ||
 	    (dest_class == pwr_cClass_curve && source_class == pwr_cClass_table) || 
 	    (dest_class == pwr_cClass_table && source_class == pwr_cClass_curve)))
 	return GSX__CONTYPE;
