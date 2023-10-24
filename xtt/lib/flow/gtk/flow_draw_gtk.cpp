@@ -1633,6 +1633,8 @@ int FlowDrawGtk::text(FlowCtx* ctx, int x, int y, char* text, int len,
   if (gc_type == flow_eDrawType_TextHelveticaErase ||
       gc_type == flow_eDrawType_TextHelveticaEraseBold)
     cairo_set_source(cr, gc_erase);
+  else if (highlight)
+    cairo_set_source(cr, gc_red);
   else
     cairo_set_source(cr, gc_black);
 
