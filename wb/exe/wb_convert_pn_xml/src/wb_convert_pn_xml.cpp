@@ -137,6 +137,7 @@ int main(int argc, char* argv[])
         }
         else
         {
+          new_xml.reset();
           std::cout << "Found PnDevice <" << pwr_pn_device_attr.longName().c_str()
                     << "> with old configuration details..." << std::endl;
           std::cout << "Creating backup " << pwr_pn_xml_filename_old << std::endl;
@@ -149,6 +150,8 @@ int main(int argc, char* argv[])
           gsdml_attr.value(&gsdml_filename);
           if (gsdml_attr.evenSts())
           {
+            std::cerr << "Error reading GSDMLfile from PnDevice " << pwr_pn_device_attr.name()
+                      << ". Reconfigure this device manually!" << std::endl;
             continue;
           }
 
@@ -414,8 +417,9 @@ int main(int argc, char* argv[])
         continue;
       }
     }
-    catch (wb_error&)
+    catch (wb_error& e)
     {
+      std::cerr << "An error occured during iteration of the PnDevices: " << e.what() << std::endl;
       continue;
     }
   } // for (session.aref(cid, &aref); session.oddSts(); session.nextAref(cid, &aref, &aref))
