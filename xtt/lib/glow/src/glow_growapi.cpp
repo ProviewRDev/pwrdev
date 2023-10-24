@@ -4916,8 +4916,16 @@ void grow_GetSubGraphTraceColor(
 void grow_GetObjectClassTraceColor(
     grow_tObject object, glow_eDrawType* color, glow_eDrawType* color2)
 {
-  *color = ((GrowNode*)object)->nc->dyn_color[0];
-  *color2 = ((GrowNode*)object)->nc->dyn_color[1];
+  if (((GlowArrayElem*)object)->type() == glow_eObjectType_GrowNode
+      || ((GlowArrayElem*)object)->type() == glow_eObjectType_GrowSlider
+      || ((GlowArrayElem*)object)->type() == glow_eObjectType_GrowGroup) {
+    *color = ((GrowNode*)object)->nc->dyn_color[0];
+    *color2 = ((GrowNode*)object)->nc->dyn_color[1];
+  }
+  else {
+    *color = glow_eDrawType_ColorRed;
+    *color2 = glow_eDrawType_ColorRed;
+  }
 }
 
 void grow_GetObjectClassDynAttr(grow_tObject object, int* attr1, int* attr2)
