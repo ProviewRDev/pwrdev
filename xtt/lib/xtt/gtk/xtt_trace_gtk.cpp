@@ -579,11 +579,15 @@ RtTraceGtk::RtTraceGtk(void* tr_parent_ctx, GtkWidget* tr_parent_wid,
   GtkWidget* mode_view = gtk_radio_menu_item_new_with_mnemonic(
       mode_group, CoWowGtk::translate_utf8("V_iew"));
   mode_group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(mode_view));
+  gtk_widget_add_accelerator(mode_view, "activate", accel_g, 'y',
+      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
   g_signal_connect(mode_view, "activate", G_CALLBACK(activate_view), this);
 
   GtkWidget* mode_trace = gtk_radio_menu_item_new_with_mnemonic(
       mode_group, CoWowGtk::translate_utf8("_Trace"));
   mode_group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(mode_trace));
+  gtk_widget_add_accelerator(mode_trace, "activate", accel_g, 't',
+      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
   g_signal_connect(mode_trace, "activate", G_CALLBACK(activate_trace), this);
 
   GtkWidget* mode_simulate = gtk_radio_menu_item_new_with_mnemonic(
