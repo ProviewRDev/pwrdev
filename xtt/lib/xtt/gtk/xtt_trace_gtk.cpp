@@ -516,6 +516,8 @@ RtTraceGtk::RtTraceGtk(void* tr_parent_ctx, GtkWidget* tr_parent_wid,
     = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("Zoom _reset"));
   g_signal_connect(
       view_zoom_reset, "activate", G_CALLBACK(activate_zoomreset), this);
+  gtk_widget_add_accelerator(view_zoom_reset, "activate", accel_g, 'b',
+      GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
   // Submenu ScanTime
   GSList* view_sc_group = NULL;
@@ -651,17 +653,6 @@ RtTraceGtk::RtTraceGtk(void* tr_parent_ctx, GtkWidget* tr_parent_wid,
 
   wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_crossref_d_30.png" : "$pwr_exe/ico_crossref_l_30.png", G_CALLBACK(activate_show_cross), 
       "Show Crossreferences", this, 0, 1);
-
-#if 0
-  wutl_tools_item(tools, "$pwr_exe/ge_zoom_in.png", G_CALLBACK(activate_zoomin), 
-      "Zoom in", this, 0, 1);
-
-  wutl_tools_item(tools, "$pwr_exe/ge_zoom_out.png", G_CALLBACK(activate_zoomout), 
-      "Zoom out", this, 0, 1);
-
-  wutl_tools_item(tools, "$pwr_exe/ge_zoom_reset.png", G_CALLBACK(activate_zoomreset), 
-      "Zoom reset", this, 0, 1);
-#endif
 
     wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_zoomin_d_30.png" : "$pwr_exe/ico_zoomin_l_30.png", G_CALLBACK(activate_zoomin), 
       "Zoom in", this, 0, 1);

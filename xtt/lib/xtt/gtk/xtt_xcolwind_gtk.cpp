@@ -767,6 +767,8 @@ XColWindGtk::XColWindGtk(GtkWidget* xa_parent_wid, void* xa_parent_ctx,
     = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("Zoom _reset"));
   g_signal_connect(
       view_zoom_reset, "activate", G_CALLBACK(activate_zoomreset), this);
+  gtk_widget_add_accelerator(view_zoom_reset, "activate", accel_g, 'b',
+      GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
   // Submenu ScanTime
   GSList* view_sc_group = NULL;

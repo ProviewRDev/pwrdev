@@ -1722,6 +1722,8 @@ pwr_tStatus WFoeGtk::create_window(int x_top, int y_top, int width_adb,
   GtkWidget* view_zoom_reset = gtk_menu_item_new_with_mnemonic("Zoom _Reset");
   g_signal_connect(view_zoom_reset, "activate",
       G_CALLBACK(activate_unzoom), this);
+  gtk_widget_add_accelerator(view_zoom_reset, "activate", accel_g, 'b',
+      GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
   GtkWidget* view_zoom = gtk_menu_item_new_with_mnemonic("_Zoom");
   GtkMenu* view_zoom_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
