@@ -1048,6 +1048,8 @@ static int xnav_set_func(void* client_data, void* client_flag)
       for (elem = xnav->appl.root; elem; elem = elem->next) {
         if (elem->type == applist_eType_Graph)
           ((XttGe*)elem->ctx)->update_color_theme(idx);
+        else if (elem->type == applist_eType_Dashboard)
+          ((XttGe*)elem->ctx)->update_color_theme(idx);
         else if (elem->type == applist_eType_SevHist)
           ((XttSevHist*)elem->ctx)->update_color_theme(idx);
         else if (elem->type == applist_eType_Trend)
@@ -5150,7 +5152,6 @@ static int xnav_open_func(void* client_data, void* client_flag)
     }
     strcpy(cmd, "xdg-open ");
     strcat(cmd, arg2_str);
-    strcat(cmd, " &");
     sts = system(cmd);
     if (sts != 0) {
       sprintf(msg, "Error from xdg-open %d", sts >> 8);
