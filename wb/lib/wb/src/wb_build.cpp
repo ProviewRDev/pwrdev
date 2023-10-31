@@ -1209,16 +1209,7 @@ void wb_build::webgraph(pwr_tOid oid)
   pwr_tTime dest_time, src_time;
   int check_hierarchy = cdh_ObjidIsNotNull(m_hierarchy);
   int hierarchy_found = 0;
-  int is_frame, is_applet;
-  char jname[80];
-  pwr_tStatus fsts;
-  int jexport;
-  int found;
-  pwr_tFileName found_file, file_spec;
-  pwr_tFileName graph_name, dir;
-  char dev[80], type[80];
-  int version;
-  pwr_tString80 appletsignature = "";
+  pwr_tFileName graph_name;
   char* s;
 
   wb_object o = m_session.object(oid);
@@ -1254,151 +1245,50 @@ void wb_build::webgraph(pwr_tOid oid)
     return;
   }
 
-  if (isupper(java_name[0])) {
-    str_ToLower(java_name, java_name);
-    java_name[0] = toupper(java_name[0]);
+  // Copy from $pwrp_pop to $pwrp_web
 
-    // Get the .pwg file for this javaname
-    strcpy(graph_name, cdh_Low(java_name));
-    sprintf(name, "$pwrp_pop/%s.pwg", graph_name);
+  strcpy(graph_name, cdh_Low(java_name));
 
-    dcli_translate_filename(name, name);
-    m_sts = dcli_file_time(name, &src_time);
-    if (evenSts()) {
-      // Search in all pwg files
-      found = 0;
-      strcpy(file_spec, "$pwrp_pop/*.pwg");
-      for (fsts = dcli_search_file(file_spec, found_file, DCLI_DIR_SEARCH_INIT);
-           ODD(fsts); fsts
-           = dcli_search_file(file_spec, found_file, DCLI_DIR_SEARCH_NEXT)) {
-        fsts = grow_IsJava(found_file, &is_frame, &is_applet, jname);
-        if (EVEN(fsts))
-          continue;
+  str_ToLower(graph_name, graph_name);
 
-        if (is_frame && streq(jname, java_name)) {
-          dcli_parse_filename(found_file, dev, dir, graph_name, type, &version);
-          strcpy(name, found_file);
-          found = 1;
-          break;
-        }
-      }
-      dcli_search_file(file_spec, found_file, DCLI_DIR_SEARCH_END);
+  strcpy(src_fname, "$pwrp_pop/");
+  strcat(src_fname, graph_name);
 
-      if (!found) {
-        char msg[200];
-        sprintf(msg, "Graph for %s not found", java_name);
-        MsgWindow::message('E', msg, msgw_ePop_Yes, oid);
-        m_sts = PWRB__NOBUILT;
-        return;
-      }
-    }
+  if (strstr(src_fname, ".pwg") == 0)
+    strcat(src_fname, ".pwg");
 
-    m_sts = dcli_file_time(name, &src_time);
-    if (evenSts())
-      return;
-
-    // Check exported java frame
-    jexport = 0;
-    sprintf(dest_fname, "$pwrp_pop/%s.java", java_name);
-    dcli_translate_filename(dest_fname, dest_fname);
-    fsts = dcli_file_time(dest_fname, &dest_time);
-    if (opt.force || EVEN(fsts) || time_Acomp(&src_time, &dest_time) == 1)
-      jexport = 1;
-
-    if (jexport) {
-      if (!m_wnav) {
-        sprintf(cmd,
-            "Build:    WebGraph  Unable to export java in this environment %s",
-            java_name);
-        MsgWindow::message('W', cmd, msgw_ePop_No, oid);
-      } else {
-        // Get signature from OpPlaceWeb
-        for (wb_object p = o.parent(); p.oddSts(); p = p.parent()) {
-          if (p.cid() == pwr_cClass_OpPlaceWeb) {
-            wb_attribute a
-                = m_session.attribute(p.oid(), "RtBody", "AppletSignature");
-            if (!a) {
-              m_sts = a.sts();
-              return;
-            }
-
-            a.value(appletsignature);
-            if (!a) {
-              m_sts = a.sts();
-              return;
-            }
-            str_trim(appletsignature, appletsignature);
-            break;
-          }
-        }
-
-        Ge* gectx = m_wnav->ge_new(graph_name, 1);
-        if (streq(appletsignature, ""))
-          strcpy(cmd, "export java");
-        else
-          sprintf(cmd, "export java /signature=\"%s\"", appletsignature);
-        m_sts = gectx->command(cmd);
-        if (evenSts()) {
-          msg_GetMsg(m_sts, cmd, sizeof(cmd));
-          MsgWindow::message('E', cmd, msgw_ePop_Yes, oid);
-          m_sts = PWRB__NOBUILT;
-          delete gectx;
-          return;
-        }
-        delete gectx;
-
-        sprintf(cmd, "Build:    WebGraph  Export java %s", java_name);
-        MsgWindow::message('I', cmd, msgw_ePop_No, oid);
-
-        m_sts = PWRB__SUCCESS;
-      }
-    }
-  } else {
-    // Copy from $pwrp_pop to $pwrp_web
-
-    strcpy(graph_name, cdh_Low(java_name));
-
-    str_ToLower(graph_name, graph_name);
-
-    strcpy(src_fname, "$pwrp_pop/");
-    strcat(src_fname, graph_name);
-
-    if (strstr(src_fname, ".pwg") == 0)
-      strcat(src_fname, ".pwg");
-
-    dcli_translate_filename(src_fname, src_fname);
-    m_sts = dcli_file_time(src_fname, &src_time);
-    if (evenSts()) {
-      m_sts = PWRB__NOBUILT;
-      return;
-    }
-
-    strcpy(dest_fname, "$pwrp_web/");
-    strcat(dest_fname, graph_name);
-
-    if (strstr(dest_fname, ".pwg") == 0)
-      strcat(dest_fname, ".pwg");
-
-    dcli_translate_filename(dest_fname, dest_fname);
-    m_sts = dcli_file_time(dest_fname, &dest_time);
-    if (!opt.nocopy
-        && (opt.force || evenSts() || src_time.tv_sec > dest_time.tv_sec)) {
-      sprintf(cmd, "cp %s %s", src_fname, dest_fname);
-      system(cmd);
-      sprintf(
-          cmd, "Build:    WebGraph copy $pwrp_pop/%s -> $pwrp_web", graph_name);
-      MsgWindow::message('I', cmd, msgw_ePop_No, oid);
-
-      strcpy(name, graph_name);
-      if ((s = strrchr(name, '.')))
-        *s = 0;
-
-      wb_revision::check_add_file(src_fname);
-      wb_log::log(wlog_eCategory_GeBuild, name, 0);
-      m_sts = PWRB__SUCCESS;
-    } else
-      m_sts = PWRB__NOBUILT;
+  dcli_translate_filename(src_fname, src_fname);
+  m_sts = dcli_file_time(src_fname, &src_time);
+  if (evenSts()) {
+    m_sts = PWRB__NOBUILT;
+    return;
   }
+
+  strcpy(dest_fname, "$pwrp_web/");
+  strcat(dest_fname, graph_name);
+
+  if (strstr(dest_fname, ".pwg") == 0)
+    strcat(dest_fname, ".pwg");
+
+  dcli_translate_filename(dest_fname, dest_fname);
+  m_sts = dcli_file_time(dest_fname, &dest_time);
+  if (!opt.nocopy
+      && (opt.force || evenSts() || src_time.tv_sec > dest_time.tv_sec)) {
+    sprintf(cmd, "cp %s %s", src_fname, dest_fname);
+    system(cmd);
+    sprintf(
+	cmd, "Build:    WebGraph copy $pwrp_pop/%s -> $pwrp_web", graph_name);
+    MsgWindow::message('I', cmd, msgw_ePop_No, oid);
+
+    strcpy(name, graph_name);
+    if ((s = strrchr(name, '.')))
+      *s = 0;
+
+    wb_revision::check_add_file(src_fname);
+    wb_log::log(wlog_eCategory_GeBuild, name, 0);
+    m_sts = PWRB__SUCCESS;
+  } else
+    m_sts = PWRB__NOBUILT;
 }
 
 void wb_build::appgraph(pwr_tOid oid)
