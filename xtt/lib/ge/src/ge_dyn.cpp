@@ -23050,8 +23050,10 @@ int GeDsTrendCurve::scan(grow_tObject object)
 	  grow_AddTrendValue(object, double(value), i);
         }
 
-	if (size > 2)
+	if (size > 2) {
 	  grow_ResetNodraw(dyn->graph->grow->ctx);
+	  grow_Redraw(dyn->graph->grow->ctx);
+	}
       }
     }
   }
