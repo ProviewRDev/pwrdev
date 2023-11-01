@@ -36,14 +36,16 @@ Terminologi <link>geref_term
 Arbeta med editorn <link>geref_work
 Fönster <link>geref_windows
 Objekt <link>geref_objects
+Färgteman <link>geref_colorthemes
 SubGraf <link>geref_subgraph
+Grupper <link>geref_groups
+Bilder <link>geref_images
 Dynamik <link>geref_dynamic
 Aktion <link>geref_action
 Skapa en SubGraf <link>geref_create_subgraph
-Grupper <link>geref_groups
-GIF och JPEG bilder <link>geref_images
 Kopplingar <link>geref_connections
 Editera <link>geref_edit
+Dashboard <link>geref_dashboard
 Testa <link>geref_testing
 Utvecklingsmiljö <link>geref_development
 Kommandon <link>geref_command
@@ -74,7 +76,7 @@ Terminologi
 
 Här förklaras några termer som används i manualen.
 <h2>Graf
-En bild består av en graf.
+En bild från vilken operatören kan övervaka och kontrollera processen..
 <h2>Subgraf
 En samling basobjekt kan sparas som en subgraf. En subgraf fungerar som en slags klass eller 
 mall, och i en graf kan man skapa instanser av subgrafen, subgraf-objekt. Lagrade subgrafer 
@@ -239,6 +241,24 @@ Horizontal Tube2 som lämpare sig för cylindriska föremål.
 
 Kontrasten på gradienten kan påverkas med gradient_contrast attributet i objekts-editorn.
 Kontrasten kan ha ett värde mellan 0 och 10.
+
+Gradienter med två olika färger kan skapas genom att använda objektets bakgrundsfärg.
+- Rita en rektangel med fyllnadsfärg.
+- Sätt gradient på rektangeln.
+- Öppna objektseditorn och set bgcolor_gradient till 1.
+- Set bakgrundsfärg på objektet genom att välja ut rektangeln coh klicka med 
+  Shift+Ctlr MB1 på en färg i färgpaletten.
+Nu ritas gradienten från fyllnadsfärgen till bakgrundsfärgen på objektet.
+
+<image> geg_fig174.png
+<b>Fig Gradient mellan två färger
+
+<h1>Sätt transparens
+Transparensen på ett objekt sätts från objektseditorn. Transparency är ett värde mellan 0
+och 1, där 0 är ingen transparens, och 1 är full transparens.
+
+<image> geg_fig175.png 
+<b>Fig Rektangel med transparens satt till 0.5
 
 <h1>Rita en kvadrat
 För att rita en kvadrat trycker man Ctrl+E (Scale equal) innan man ritar rektangeln. 
@@ -721,6 +741,8 @@ TabbedWindow <link>geg_specialobjects_tabbedwindow
 Slider <link>geg_specialobjects_slider
 Trend <link>geg_specialobjects_trend
 Bar <link>geg_specialobjects_bar
+BarArc <link>geg_specialobjects_bararc
+Pie <link>geg_specialobjects_pie
 XYCurve <link>geg_specialobjects_xycurve
 FastCurve <link>geg_specialobjects_fastcurve
 Axis <link>geg_specialobjects_axis
@@ -924,6 +946,51 @@ de attribut i databas-objekt som innehåller min och max-värde för signalens områ
 Notera att en stapel även kan åstadkommas med en rektangel som är grupperad och försedd med
 dynamiken FillLevel. Enda skillnaden är att bar-objektet har en avgränsnings-linje med 
 separat färg i mellan stapeln och bakgrunden.
+</topic>
+
+<topic> geg_specialobjects_bararc
+Cirkulär stapel
+En BarArc är en stapel med cirkulär form. Den återfinns i Analog/BarArc i
+subgraf-paletten.
+
+<image> geg_fig176.png
+<b>Fig Cirkulär stapel
+
+Utöver egenskaperna för en linjär stapel, kan även stapelbredd, startvinkel och 
+utbredningsvinkel anges.
+
+<image> geg_fig177.png
+<b>Fig Attribut för ett bararc-objekt
+</topic>
+
+<topic> geg_specialobjects_pie
+Tårtdiagram
+Tårtdiagrammet är uppdelat i 12 sektorer med olika färger, där varje sektor kopplas
+till en analog signal som bestämmer storleken på sektorn.
+
+<image> geg_fig178.png
+<b>Fig Tårtdiagram
+
+I exemplet ovan med fyra sektorer är de fyra första sektorerna kopplade till
+signaler, och Pie.Sectors är satt till 4. 
+
+<image> geg_fig179.png
+<b>Fig Attribut för ett pie-objekt
+</topic>
+
+<topic> geg_specialobjects_barchart
+Stapeldiagram
+Stapeldiagrammet kan delas upp i 12 segment med olika färg, där varje segment
+kopplas till en vektor av analoga signaler som anger storleken på segmenten.
+<image> geg_fig213.png
+<b>Fig BarChart
+
+I exemplet ovan med 100 staplar och 4 segment är de första fyra segmenten kopplade
+till vektorer med 100 element. BarChart.Bars är satt till 100 och Barchart.Segments
+är satt till 4.
+
+<image> geg_fig214.png
+<b>Fig Pie object attributes
 </topic>
 
 <topic> geg_specialobjects_trend
@@ -1437,13 +1504,14 @@ Om man endast vill göra trycknappen okänslig för klick och dimmad, sätter man In
 till 1.
 
 <image> geg_fig105.png
-<b>Fig Invisible.Dimmed satt för dimmad dynamik
+<b>Fig Invisible.Dimmed och Invisible.DimLevel är konfigurerad
 
 När H1-Dv2 blir hög är trycknappen inte lägre känslig för musklick. Det markeras genom att
-den ritas dimmad.
+den ritas dimmad. Det är också möjligt att sätta en transparens-nivå på den dimmade knappen
+genom att sätta Invisible.DimLevel till ett värde mellan 1 och 0.
 
 <image> geg_fig106.png
-<b>Fig Trycknappen i dimmat läge till vänster
+<b>Fig Trycknappen ursprungligt och dimmat läge, och med DimLevel 0.5 till höger
 </topic>
 
 <topic> geg_dynamic_text
@@ -2159,6 +2227,133 @@ grupp eller subgraf, och ange dynamik för gruppen eller subgrafen. Om man dynami
 DigTone.
 </topic>
 
+<topic> geg_customcolors
+Custom  colors
+I färgpaletten finns 300 färger men ibland går det inte att hitta den färgton man söker där. 
+Då kan man använda custom colors. De återfinns under standardpaletten och visas genom att 
+öka storleken på färgpalettfönstret, eller genom att skrolla ner.
+<image>geg_fig182.png
+<b>Fig Custom color palett
+
+Skapa en custom color genom att dubbelklicka på ett tomt fält i custom color-paletten.
+
+<image> geg_fig183.png
+<b>Fig Val av färg
+
+Nu öppnas färgvals dialogen. Antingen kan man välja en av de fördefinierade färgerna, eller
+kan man trycka på '+' knappen för att välja en mer specifik färg.
+
+<image> geg_fig184.png
+<b>Fig Val av färg
+
+Välj valör med dragregeln till vänster, och klicka i färgytan för att välja ljushet och 
+mättnad. Den undre dragregeln för transparens är inte implementerad ännu. Tryck på 
+Select-knappen för att lägga in för lägga in färgen i paletten. Färgen kan nu användas som
+fyllnads, kant eller text-färg.
+</topic>
+
+<topic> geg_colorthemes
+Färgteman
+Operatören kan välja ett färgtema i operatörsmiljön, och genom att rita en graf med 
+färgtema-färger kommer även processbilder att anpassas till det valda färgtemat. Färgtemat
+laddar en uppsättning färger i custom color paletten, och varje färg används för ett specifikt
+ändamål Den första förgen ska till exempel användas som bakgrundsfärg. För att följa färgtemat
+ska man även änvända subgraferna under ColorTheme i subgrafspaletten. Dessa är ritade med färger
+från färgtemapaletten.
+
+Här följer en beskrivning av hur man skapar en enkel graf med färgtema.
+
+Sätt ColorThem i File/Graph Attributes till $default.
+
+Välj ett färgtema i File/ColorTheme/Select, till exempel Sand. Nu fylls custom color paletten 
+med färger från det valda färgtemat.
+
+<image> geg_fig185.png
+<b>Fig Färger för Sand färgtema laddade
+
+Den första custom color färgen ska vara bakgrundsfärg. Genom att sätta markören över en färg i
+paletten skrivs ändamålet för färgen under custom color plaletten. Klicka på färgen för att
+sätta fyllnadsfärg, och aktivera Functions/Set background color.
+
+För att skapa en tryck-knapp, välj en knapp under ColorTheme, till exempel
+ColorTheme/Pushbuttons/ButtonSmallToggle. Koppla och lätt in en text, t ex 'Start' eller 'Stopp'.
+
+Skapa indikatorer från ColorTheme/Indicators, t ex IndSquareGreen eller IndSquareRed.
+
+Skriv texter genom att sätta den femte färgen i custom color paletten, 'Text/Lines on background' 
+som textfärg. Skapa sedan ett textobjekt.
+
+Rita avgränsningslinjer mellan tryck-knapparna och indikatorerna genom att sätta den fjärde färgen,
+'Delimiter line', som kantfärg, och rita linjen.
+
+<image> geg_fig186.png
+<b>Fig Enkel graf med färgtema
+
+Med File/ColorTheme/Next (Ctrl+Alt+T) byts färgtema och man kan se hur grafen fungerar för andra
+färgteman.
+
+<image> geg_fig187.png
+<b>Fig Enkel graf med olika teman
+</topic>
+
+<topic> geg_objecttree
+Objektträd
+
+Objektträdet visar de grafiska objeken i en graf i en trädstruktur. Det öppnas från
+View/View Object Tree. Objekt kan väljas ut med klick MB1 eller med Pil upp och ner tangenterna.
+Egenskaperna för ett objekt öppnas genom att klicka på lövet eller med pil höger tangenten.
+Det här är ofta ett enkelt sätt att sätta egenskaper för objekt, särskilt om det är en uppsättning
+linkande objekt, eller för objekt i en grupp.
+
+<image> geg_fig188.png
+<b>Fig Objektsträd
+</topic>
+
+<topic> geg_layers
+Lager
+De grafiska objekten kan skapas i lager. Det är ett sätt att strukturera grafen och att förenkla
+editeringen. Det är endast möjligt att editera objekt i det lager som för närvarande är aktivt. 
+Därigenom finns det ingen risk att objekt i andra lager av misstag flyttas eller ändras.
+
+Ett lager skapas från 'Layers/Create layer' i menyn. När ett lager har skapats visas det i 
+lagerlistan under objektträdet. När man vill skapa eller editera objekt i ett lager, gör man lagret
+aktivt genom att välja ut det i lagerlistan. Genom att klicka på ögon-symbolen kan lagret göras
+osynligt eller synligt.
+
+Lagret visas också i objektträdet. Det kommer att vara förälder till all objekt i lagret. Även 
+egenskaper för lagret kan visas och editeras i objektträdet. Genom att klicka på lövet eller mappen,
+eller med Pil höger tangenten, visas egenskaperna för lagret. Genom att klicka med Shift + Klick MB1
+på mappen, visas objekten i lagret.
+
+Som exempel kommer vi att skapa den enkla grafen ovan med lager, och lägga knappar, texter och 
+indikatorer i olika lager.
+
+Vi skapar ett lager från 'Layers/Create layer' i menyn, öppnar egenskaprena för lagret i objektträdet,
+och ändrar namnet till 'Buttons'. Sedan väljer vi ut Buttons-lagret i lagerlistan för att göra det
+aktivt. De två knapparna vi nu skapar kommer att läggas i Button-lagret.
+
+<image> geg_fig189.png
+<b>Fig Buttons layer
+
+På samma sätt skapar vi Text-lagret med texter, och Indicator-lagret med indikatorer. Notera hur 
+objekt som inte tillhör det aktiva lagret är okänsliga, och hur lager kan göras synliga resp osynliga
+med ögon-symbolen i lagerlistan.
+
+Ávgränsningslinjen är skapad in bakgrundslagret. Objekt i bakgrundslagret visas på översta nivån i
+objektträdet.
+
+<image> geg_fig190.png
+<b>Fig Lager
+
+Det är också möjlig att sätta dynamik på ett lager. Genom att sätta Invisible dynamik med Dimmed
+på Buttons-lagret, blir alla knapparna in lagret dimmade och okänsliga när den kopplade signalen är
+satt.
+
+<image> geg_fig191.png
+<b>Fig Lager med dynamik
+
+</topic>
+
 <topic> geg_createsubgraph
 Rita en subgraf
 En subgraf tillverkas genom att man ritar basobjekt i arbetsarean och sedan sparar dessa som 
@@ -2265,7 +2460,52 @@ subgrafer som har skapats inom projektet. Övriga mappar innehåller subgrafer som
 ProviewR.
 
 <h1>Färg-paletten
+Färg-paletten innehåller 300 förger i 10 rader med 30 färger i varje kolumn. I första rader
+finns svart, vit och intensiva färger, och en samling gråtoner. Sedan följer en rad med 
+gråskala, och efter den 8 rader med olika färgton, gulgrön, gul, orange, violett, blå, blågrön
+och grön. Inom varje färggrupp har de 10 första låg mättnad, de 10 mellersta medium mättnad,
+och de 10 sista hög mättnad.
 
+Det tre kanpparna över paletten visar de nuvarande fyllnads, kant och text-färgerna. Nya objekt
+kommer att skapas med dessa färger. För att ange en ny fyllnadsfärg, sätt paletten i 
+fyllnadsfärgs-mod genom att trycka på Fill-knappen och välj en färg i paletten. För att sätta
+fyllnadsfärg på ett existerande objekt, välj ut objektet, se till att paletten är i 
+fyllnadsfärgs-mod, och välj önskad färg. På samma sätt kan paletten sättas i kantfärgs eller
+textfärgs-mod genom att trycka på Border resp Text knappen, och kant och text-färger kan 
+hanteras. 
+
+Objekt har även en bakgrundsfärg, och den hanteras på ett sätt som avviker från övriga färger.
+För att sätta bakgrundsfärg på ett objekt, välj ut objektet och klicka med Ctrl+Shift MB1 på
+den önskade färgen i paletten.
+
+För att sätta bakgrundsfärg på grafen, sätt den önkade färgen som nuvarande fyllnadsfärg, och
+aktivare 'Functions/Set background color' i menyn.
+
+<h2>Custom colors
+Utöver de fördefinierade färgerna finns även utrymme för 90 användardefinierade färger 
+(custom colors) under de fördefinerade färgerna. För att sätta en custom color, öppna 
+färg-väljaren genom att dubbelklicka på ett fält i custom color paletten. Tryck på '+' knappen
+för att ange en mer specifik färg en de fördefinierade. Välj valör med dragregeln till vänster,
+och klicka i färgytan för att välja ljushet och mättnad. Den undre dragregeln för transparens 
+är inte implementerad ännu. Tryck på Select-knappen för att lägga in för lägga in färgen i 
+paletten. Färgen kan nu användas som fyllnads, kant eller text-färg.
+
+<image> geg_fig184.png
+<b>Fig Färgväljaren
+
+För att exportera custom color paletten till en annan graf, spara paletten från 
+'File/CustomColors/Save' i meny. Paletten sparas på en pwgc-fil in $pwrp_pop. Ladda in filen
+i en annan graf genom att aktivera 'File/CustomColor/Load' och välj ut filen.
+
+Det är också möjlig att använda en gemensam färg-fil för flera grafer i ett projekt. Om en
+färg-fil anges i ColorTheme i Graph attributes, kommer färgfilen att laddas automatiskt när 
+grafen öppnas. När en färg ändras och sparas, kommer den att påverka alla objekt som är ritade
+med färgen i alla grafer med denna färg-fil. På detta sätt kan färger i graferna enkelt ändras.
+
+För grafer ritade med färgteman, används custom color paletten för tema färger och kan inte
+användas som användardefinierade färger.
+
+<h2>Color tones
 I färgpaletten finns plats för 300 olika färg-nyanser. Här väljer man fyllnadsfärg, kantfärg 
 och text -färg. Fyllnadsfärgen väljs med MB1 och visas i det vänstra fältet överst i 
 paletten, kantfärg väljs med MB2 och visas i mitten fältet, och textfärgen väljs med 
@@ -2319,6 +2559,150 @@ signal, kopplas detta på samma sätt med Shift/Ctrl/DubbelKlick MB1.
 </chapter>
 
 <chapter>
+
+<topic> geref_colorthemes
+Färgteman
+
+Färgteman tillhandahåller ett antal färgkombinationer för operatörsmiljön, för att tillgodose
+operatörernas preferenser och kunna anpassa ljusheten av miljön till omgivningen. Operatören
+kan välja ett färgtema från menyn i operatörsfönstret, vilket kommer att påverka utseendet på
+alla vertyg och grafer i ProviewR's bassystem.
+
+<image> geg_fig192.png
+<b>Fig Val av färgtema
+
+<image> geg_fig193.png
+<b>Fig Operatörsfönstret i färgtema Sand.
+
+<image> geg_fig194.png
+<b>Fig Färgteman Standard och Sand
+
+<image> geg_fig195.png
+<b>Fig Färgteman Marron och Sienna
+
+<image> geg_fig196.png
+<b>Fig Färgteman DarkBlue och Classic
+
+<image> geg_fig197.png
+<b>Fig Färgteman Midnight och Playroom
+
+<image> geg_fig198.png
+<b>Fig Färgteman NordicLight och Contrast
+
+<image> geg_fig199.png
+<b>Fig Färgteman AzurContrast och OchreConstrast
+
+<image> geg_fig200.png
+<b>Fig Färgteman Chesterfield och TerraVerte
+
+<image> geg_fig201.png
+<b>Fig Färgtema Polar
+
+Färgtema kan även användas för att rita grafer i ett projekt. Dessa grafer kommer att följa
+utseendet för et färgtema som är operatören har valt, men det krävs att speciella färger i 
+custom color paletten används när de olika objekten i bilden ritas. Ett färgtema laddas från
+File/ColorTheme/Select i Ge menyn. Färgerna för demat läggs då in i custom color paletten.
+Varje färg i custom color paletten är anpassad för ett specifikt ändamål. Den första färgen
+t ex är bakgrundsfärgen för grafen, och den femte färgen ska användas för texter på bakgrunden.
+När man placerar markören på en färg i paletten skrivs ändamålet för färgen ut i ett fält under
+paletten. 
+
+Färgtema stödjer färgsättningen av specifika element i en graf. I exemplet nedan är 
+bakgrundsfärgen ljusgrön. De mörkgröna linjerna kallas avgränsningsfält, 'delimiter area'. I det här fallet är
+de rektanglar som indelar grafen i olika sektioner. De kan även användas fpr större områden med
+text och indikatorer. Längs upp finns en meny, och under den en gradient för makera en skugga 
+under menyn. Objektbilder bör innehålla en 'method toolbar' placerad under menyn. Andra element är
+staplar, skalor, knappar, indikatorer, texter på bakgrunden och texter på avgränsningsfält, tabeller,
+diagram etc.
+
+För större och med komplexa element som inte är anpassade för en föränding av fyllnadsfärgen, som
+ställdonet och ventilen nedan, kan dynamiken ColorThemeLightness användas för att anpassa ljusheten
+av dessa element till ljusheten hos färgtemat.
+
+<image> geg_fig202.png
+<b>Fig Graf ritade med färger från färgtemat
+
+Beskrivning av färgtema färger
+
+    Namn <t><t>Beskrivning
+1   Background <t><t>Ska sättas som bakgrundsfärg för grafen. Ljusgrön 
+    <t><t>i exemplet ovan.
+2   Background gradient <t><t>Kan användas som gradient till bakgrundsfärgen, 
+    <t><t>t ex gradienten under menyn i exemplet ovan.
+3   Delimiter area <t><t>Färg på avgränsningytor. De mörkgröna områdena.
+4   Delimiter lines <t><t>Fäg på linjer som delar upp bakgrunden, t ex linjen
+    <t><t>under Mode ovan.
+5   Text/Lines on background <t><t>Färg på texter och linjer på bakgrunden.
+6   Input field fill color <t><t>Fyllnadsfärg på ValueInput-objekt.
+7   Input field border color <t><t>Kantfärg på ValueInput-objekt.
+8   Input field text color <t><t>Textfärg på ValueInput-objekt.
+
+16  Indicator border color <t><t>Ska sättas som kantfärg på indikatorer.
+17  Indicator low color <t><t>Färg när signalen är låg för indikatorer.
+18  Indicator on delimiter low color <t><t>Färg när signalen är låg för en 
+    <t><t>indikator på en avgränsningsyta.
+19  Slider color <t><t>Färg på dragreglar.
+20  Slider background color <t><t>Färg på bakgrund för dragreglar.
+21  Value field fill color <t><t>Fyllnadsfärg för Value-objekt.
+22  Value field border color <t><t>Kantfärg för Value-objekt.
+23  Value field text color <t><t>Textfärg för Value-objekt.
+
+31  Limit switch high color <t><t>Färg för gränsläge när signalen är hög.
+32  Limit switch low color <t><t>Färg för gränsläge när signalen är låg.
+33  Limit switch border color <t><t>Kantfärg för gränsläge.
+34  Text/Lines on delimiter <t><t>Färg på texter eller linjer på avgränsningsytor.
+35  Button active color <t><t>Färg för att markera att en knapp är aktiv.
+36  Button fill color <t><t>Fyllnadsfärg för knappar.
+37  Button border color <t><t>Kantfärg för knappar.
+38  Button text color <t><t>Textfärg för knappar.
+39  Button insensitive text color <t><t>Textfärg när en knapp är satt okänslig
+    <t><t>av Invisible-dynamik.
+40  Button insensitive border color <t><t>Kantfärg när en knapp är satt känslig
+    <t><t>av Invisible-dynamik.
+
+46  Symbol fill color <t><t>Fyllnadsfärg för komponenters symboler.
+47  Symbol border color <t><t>Kantfärg för symboler. 
+48  Symbol low color <t><t>Färg när symbolen är låg.
+49  Symbol empty color <t><t>Färg för att markera att en ventil är stängd
+    <t><t>eller tom.
+50  -
+
+51  Bar bar color <t><t>Färg för stapel-delen i ett stapel-objekt.
+52  Bar background color <t><t>Färg för bakgrunds-delen in ett stapel-objekt.
+53  Bar bar limit color <t><t>Färg för kanten i ett stapel-objekt.
+54  Bar background area <t><t>Färg för omgivande ytor för stapel-objekt.
+Color used for surrounding area for bar objects. 
+    <t><t>Mörkgrönt i exemplet ovan.
+55  Bar background lines <t><t>Färg för linjer på omgivande ytor för
+    <t><t>stapel-objekt.
+
+61  Menu fill color <t><t>Fyllnadsfärg för menyer.
+62  Menu text color <t><t>Textfärg för menyer.
+63  Toolbar fill color <t><t>Fyllnadsfärg för metod-panelen i objektbilder.
+64  Toolbar border color <t><t>Kantfärg för metod-panelen.
+65  Toolbar text color <t><t>Textfärg för metod-panelen.
+66  Diagram fill color <t><t>Fyllnadsfärg för diagram.
+67  Diagram border color <t><t>Kantfärg för diagram.
+68  Diagram curve color <t><t>Default kurvfärg för diagram.
+69  Axis border color <t><t>Färg för Axis-objekt.
+
+<image> geg_fig203.png
+<b>Fig Exempel på temafärger
+
+<h2> Custom color theme
+Färgtema-väljaren har ett Custom alternativ. För att skapa ett eget färgtema, ladda ett färgtema
+i custom color paletten, dubbelklicka på färger för att öppna färgväljaren och ändra färgerna.
+När de önskade färgerna är modifierade, spara temat från /FileCustomColors/Save med namnet 
+'pwr_colortheme100'. Färgtemat sparas i filen $pwrp_pop/pwr_colortheme100.pwgc. Kopiera den här 
+filen till $pwrp_exe och se också till att den distribueras till operatörsstationen.
+
+För att välja Custom temat i operatörsmiljön, öppna färgtemaväljaren från 'Functions/View/Color theme'
+i opertörsfönstrets meny, och välj 'Custom'.
+
+</topic>
+</chapter>
+
+<chapter>
 <topic>geref_objects
 Objekt
 
@@ -2347,6 +2731,8 @@ Stapeldiagram 	<link>geref_barchart
 Cirkeldiagram 	<link>geref_pie
 Trendkurva 	<link>geref_trend
 Fastkurva 	<link>geref_fastcurve
+DsTrend 	<link>geref_dstrend
+DsTrendCurve 	<link>geref_dstrendcurve
 Axis 		<link>geref_axis
 AxisArc 	<link>geref_axisarc
 Window		<link>geref_windowobject
@@ -2838,6 +3224,75 @@ FastCurve.MaxValue2     <t><t>Maxvärde för signalområdet för kurva 2.
 FastCurve.MinValue2     <t><t>Minvärde för signalområdet för kurva 2.
 FastCurve.CurveColor2   <t><t>Färg på kurva 2.
 FastCurve.CurveFillColor2 <t><t>Fyllnadsfärg på kurva 2.
+</topic>
+
+<topic>geref_dstrend <style>function
+DsTrend
+<image> geref_fig21.png
+
+DsTrend visar en eller två kurvor configurerade med DsTrend-objekt.
+
+<h2>Attribut
+<b>Attribut             <t><t>Beskrivning
+DsTrend.Object1         <t><t>Databas-objekt av class DsTrend för kurva 1.
+DsTrend.Object2         <t><t>Databas-objekt av class DsTrend för kurva 2. Optional.
+DsTrend.MinValueAttr1	<t><t>Attribut för minvärde för kurva 1. Optional.
+DsTrend.MaxValueAttr1	<t><t>Attribut för maxvärde för kurva 1. Optional.
+DsTrend.MinValueAttr2	<t><t>Attribut för minvärde för kurva 2. Optional.
+DsTrend.MaxValueAttr2	<t><t>Attribut för maxvärde för kurva 2. Optional.
+DsTrend.HoldAttr	<t><t>Attribut för att stoppa uppdateringen av kurvan. Optional.
+DsTrend.Mark1Attr	<t><t>Attribut för markör 1. Optional.
+DsTrend.Mark2Attr	<t><t>Attribut för markör 2. Optional.
+DsTrend.Mark1Color	<t><t>Färg på markör 1.
+DsTrend.Mark2Color	<t><t>Färg på markör 2.
+DsTrend.NoOfPoints    <t><t>Antal punkter i kurvan.
+DsTrend.CurveLineWidth <t><t>Linjebredd.
+DsTrend.FillCurve     <t><t>Fyll ytan mellan kurvan och x-axeln.
+DsTrend.HorizontalLines <t><t>Antal horisontella linjer i diagrammet.
+DsTrend.VerticalLines <t><t>Antal vertikala linjer.
+DsTrend.MaxValue1     <t><t>Maxvärde för området för kurva 1.
+DsTrend.MinValue1     <t><t>Minvärde för området för kurva 1.
+DsTrend.CurveColor1   <t><t>Färg på kurva 1.
+DsTrend.CurveFillColor1 <t><t>Fyllnadsfärg för kurva 1.
+DsTrend.MaxValue2     <t><t>Maxvärde för området för kurva 2.
+DsTrend.MinValue2     <t><t>Minvärde för området för kurva 2.
+DsTrend.CurveColor2   <t><t>Förg på kurva 2.
+DsTrend.CurveFillColor2 <t><t>Fyllnadsfärg för kurva 2.
+DsTrend.Direction <t><t>Riktning för kurvans rörelse, höger eller vänster.
+</topic>
+
+<topic>geref_dstrendcurve <style>function
+DsTrendCurve
+<image> geg_fig180.png
+
+DsTrendCurve visar en eller två kurvor konfigurerade med ett DsTrendCurve-objekt.
+
+<h2>Attribut
+<b>Attribut             <t><t>Beskrivning
+DsTrendCurve.Object     <t><t>Databas-objekt av klass DsTrendCurve.
+DsTrendCurve.MinValueAttr1 <t><t>Attribute för minvärde för kurva 1. Optional.
+DsTrendCurve.MaxValueAttr1 <t><t>Attribute for maxvärde för kurva 1. Optional.
+DsTrendCurve.MinValueAttr2 <t><t>Attribute for minvärde för kurva 2. Optional.
+DsTrendCurve.MaxValueAttr2 <t><t>Attribute for maxvärde för kurva 2. Optional.
+DsTrendCurve.HoldAttr	<t><t>Attribut för att stoppa uppdateringen av kurvan. Optional.
+DsTrendCurve.Mark1Attr	<t><t>Attribut för markör 1. Optional.
+DsTrendCurve.Mark2Attr	<t><t>Attribut för markör 2. Optional.
+DsTrendCurve.Mark1Color	<t><t>Färg på markör 1.
+DsTrendCurve.Mark2Color	<t><t>Färg på markör 2.
+DsTrendCurve.NoOfPoints    <t><t>Antal punker i kurvan.
+DsTrendCurve.CurveLineWidth <t><t>Linjebredd.
+DsTrendCurve.FillCurve     <t><t>Fyll området mellan kurvan och x-axeln.
+DsTrendCurve.HorizontalLines <t><t>Antal horisonetlla linjer i diagrammet.
+DsTrendCurve.VerticalLines <t><t>Antal vertikala linjer.
+DsTrendCurve.MaxValue1     <t><t>Maxvärde för området för kurva 1.
+DsTrendCurve.MinValue1     <t><t>Minvärde för området för kurva 1.
+DsTrendCurve.CurveColor1   <t><t>Färg på kurva 1.
+DsTrendCurve.CurveFillColor1 <t><t>Fyllnadsfärg på kurva 1.
+DsTrendCurve.MaxValue2     <t><t>Maxvärde för området för kurva 2.
+DsTrendCurve.MinValue2     <t><t>Minvärde för området för kurva 2.
+DsTrendCurve.CurveColor2   <t><t>Färg på kurva 2.
+DsTrendCurve.CurveFillColor2 <t><t>Fyllnadsfärg för kurva 2.
+DsTrendCurve.Direction <t><t>Rikting för kurvans rörelse, höger eller vänster.
 </topic>
 
 <topic>geref_axis <style>function
@@ -3345,16 +3800,17 @@ Tone      <t>-          <t>Anger att dynamik som ändrar färg på komponenten
           <t>           <t>ska ändra färgton i stället för fyllnadsfärgen.
 DigLowColor <t>Boolean  <t>Sätter angiven fyllnadsfärg när signalen är låg. <link>GeDynDigLowColor
 DigColor  <t>Boolean    <t>Sätter angiven fyllnadsfärg när signalen är hög. <link>GeDynDigColor
-DigError  <t>Boolean    <t>Sätter röd fyllnadsfärg vid hög signal. <link>GeDynDigError
-DigWarning <t>Boolean   <t>Sätter gul fyllnadsfärg vid hög signal. <link>GeDynDigWarning
-DigFlash  <t>Boolean    <t>Blinkar med angiven färg vid hög signal. <link>GeDynDigFlash
 AnalogColor <t>Float32 Int32 <t>Sätter angiven fyllnadsfärg när signalen <link>GeDynAnalogColor
           <t>           <t>över- eller underskrider ett angivet värde.
 StatusColor <t>Status   <t>Sätter fyllnadsfärg efter ett status värde. <link>GeDynStatusColor
+DigError  <t>Boolean    <t>Sätter röd fyllnadsfärg vid hög signal. <link>GeDynDigError
+DigWarning <t>Boolean   <t>Sätter gul fyllnadsfärg vid hög signal. <link>GeDynDigWarning
+DigFlash  <t>Boolean    <t>Blinkar med angiven färg vid hög signal. <link>GeDynDigFlash
 FillLevel <t>Float32    <t>Ändrar fyllnadsfärgen på en del av komponenten. Nivån <link>GeDynFillLevel
           <t>           <t>som avgränsar den färgade delen bestäms av värdet på signalen.
 Invisible <t>Boolean String <t>Gör komponenten osynlig vid hög signal, eller vid tom sträng. <link>GeDynInvisible
 DigBorder <t>Boolean    <t>Sätter angiven kantfärgen vid låg signal. <link>GeDynDigBorder
+DigBackgroundColor <t>Boolean <t>Sätter angiven bakgrundsfärg när signalen är hög. <link>GeDynDigBackgroundColor
 TimeoutColor <t>Boolean <t>Sätter angiven färg vid timeout på prenumerationen. <link>GeDynTimeoutColor
 DigTextColor <t>Boolean <t>Sätter angiven textfärg vid hög signal. <link>GeDynDigTextColor
 DigText   <t>Boolean    <t>Sätter angiven text vid låg signal. <link>GeDynDigText
@@ -3371,10 +3827,15 @@ Animation <t>Boolean    <t>Olika typer av animering. <link>GeDynAnimation
 Video     <t>-          <t>Kontinuerlig uppdatering av en blidfil. <link>GeDynVideo
 SliderBackground <t>-   <t>Markerar att subgrafen är bakgrund till en slider-komponent. <link>GeDynSliderBackground
 DigCommand <t>Boolean   <t>Exekverar ett kommando när signalen blir hög. <link>GeDynDigCommand
-DigScript <t>Boolean   <t>Exekverar ett script när signalen blir hög. <link>GeDynDigScript
+DigScript <t>Boolean    <t>Exekverar ett script när signalen blir hög. <link>GeDynDigScript
 ScrollingText <t>Boolean   <t>Visar en rullande text. <link>GeDynScrollingText
+DigSound <t>Boolean     <t>Spela upp ett ljud. <link>GeDynDigSound
 DigTransparency <t>Boolean   <t>Skiftar transparens beroende på en digital signal. <link>GeDynDigTransparency
 AnalogTransparency <t>Float32  <t>Skiftar transparens beroende på en analog signal. <link>GeDynAnalogTransparency
+ColorThemeLightness <t>-  <t>Anpassa ljusheten hos en komponent till färgtemat. <link>GeDynColorThemeLightness
+DigSwap   <t>Boolean  <t>Starta om alla prenumerationer i en graf. <link>GeDynDigSwap
+UnitConvert <t>Float32  <t>Konvertera värdets enhet före visning. <link>GeDynUnitConvert
+HostObject <t>Object  <t>Dynamik för komplexa komponenter. <link>GeDynHostObject
 
 <h2>Inherit
 För en instans av en subgraph betyder det att dynamiken ärvs från subgrafs-klassen, dvs den 
@@ -3496,7 +3957,7 @@ AnalogColor.CommonAttribute <t><t>Samma attribut används av alla instanser.
 AnalogColor.Limit     <t><t>Gränsvärde.
 AnalogColor.LimitType <t><t>Typ av gränsvärde. Kan vara GreaterThan, 
                       <t><t>GreaterEqual, LessThan, LessEqual eller Equal.
-AnalogColor.Instances <t><t>Anger vilka instanser som ska skapas.
+AnalogColor.Instances <t><t>Mask för instanser, där instanser kan skapas och tas bort.
 AnalogColor2.Color    <t><t>Fyllnadsfärg för instans 2.
 AnalogColor2.Limit    <t><t>Gränsvärde för instans 2.
 AnalogColor2.LimitType <t><t>Typ av gränsvärde för instans 2.
@@ -3520,6 +3981,7 @@ Fatal           <t>Blinkande röd.
 StatusColor.Attribute <t><t>Signal i rtdb av typen Status. Färgen på komponenten
                       <t><t>sätt utgående från den kategori statusvärdet tillhör. 
 StatusColor.NoStatusColor <t><t>Färg om statusvärdet är 0.
+StatusColor.UseColorTheme <t><t>Använd färgtemats färger.
 </topic>
 
 <topic>GeDynDigWarning <style>function
@@ -3533,6 +3995,7 @@ fyllnadsfärg, om värdet är 0 ritas det med den normala fyllnadsfärgen.
 <b>Attribut <t><t>Beskrivning
 DigWarning.Attribute <t><t>Signal i rtdb av typen Boolean som ska 
                 <t><t>påverka objektet.
+DigWarning.UseColorTheme <t><t>Använd färgtemats färger.
 </topic>
 
 <topic>GeDynDigError <style>function
@@ -3546,22 +4009,24 @@ fyllnadsfärg, om värdet är 0 ritas det med den normala fyllnadsfärgen.
 <b>Attribut <t><t>Beskrivning
 DigError.Attribute <t><t>Signal i rtdb av typen Boolean som ska 
                    <t><t>påverka objektet.
+DigError.UseColorTheme <t><t>Använd färgtemats färger.
 </topic>
 
 <topic>GeDynDigFlash <style>function
 DigFlash
 
-Blinkar med angiven fyllnadsfärg vid hög signal.
+Blinkar med angivna färger vid hög signal.
 
-DigFlash ändrar färg på objektet varje cykel. Färgen skiftas mellan angiven färg och 
-ursprunglig färg, eller den färg som objektet får av övrig färg-dynamik. 
+DigFlash ändrar färg på objektet varje cykel. Färgen skiftas mellan de två angivna 
+förgerna i Color och Color2.
 
 Blink-frekvensen bestäms av cykeltiden för den cykel som objektet går på.
 
 <b>Attribut <t><t>Beskrivning
 DigFlash.Attribute <t><t>Signal i rtdb av typen Boolean som ska 
                    <t><t>påverka objektet.
-DigFlash.Color     <t><t>Fyllnadsfärg.
+DigFlash.Color     <t><t>Första blinkande färg.
+DigFlash.Color2    <t><t>Andra blinkande färg.
 </topic>
 
 <topic>GeDynFillLevel <style>function
@@ -3587,6 +4052,8 @@ FillLevel.MinValue <t><t>Minvärde. När värdet på Attribute är lika med
                    <t><t>MinValue, ritas hela objektet med bakgrundsfärgen.
 FillLevel.MaxValue <t><t>Maxvärde. När värdet på Attribute är lika med 
                    <t><t>MaxValue, ritas hela objektet med ursprungsfärgen.
+FillLevel.MinValueAttr <t><t>Signal för minvärde.
+FillLevel.MaxValueAttr <t><t>Signal för maxvärde.
 </topic>
 
 <topic>GeDynInvisible <style>function
@@ -3604,6 +4071,9 @@ $cmd('command') , t ex
 Invisible.Attribute <t><t>Signal i rtdb av typen Boolean som ska 
                  <t><t>påverka objektet. 
 Invisible.Dimmed <t><t>1 dimmar objektet, 0 gör objektet osynligt.
+Invisible.DimLevel <t><t>Ett transparensvärde mellan 0 och 1 för att addera transparens
+		<t><t>till det dimmade utseendet.
+Invisible.Instances <t><t>Mask för instanser, där instanser kan skapas och tas bort.
 </topic>
 
 <topic>GeDynDigBorder <style>function
@@ -3618,6 +4088,33 @@ normala kantfärgen, om värdet är 0 ritas det med DigBorder.Color som anges i obj
 DigBorder.Attribute <t><t>Signal i rtdb av typen Boolean som ska 
                     <t><t>påverka komponenten.
 DigBorder.LowColor  <t><t>Kantfärg på komponenten om signalen är 0.
+</topic>
+
+<topic>GeDynDigBackgroundColor <style>function
+DigBackgroundColor
+
+DigBackgroundColor gör det möjligt att sätta dynamik på ett objekts bakgrundsfärg.
+DigBackgroundColor fungerar analogt med DigColor, men kommer att ändra bakgrundsfärgen
+istället för fyllnadsfärgen. DigBackgroundColor har flera instanser och kan därmed
+kopplas till flera digitala signaler, och alternera mellan flera färger.
+Med DigBackgroundColor kan man modifiera färgen på två olika delar av en subgraf eller
+grupp oberoende av varandra. I exemplet nedan är den grå rektangeln ritad med en fix grå
+färg, den vänstra cirkeln med fyllnadsfärgen, och den högra med bakgrundsfärgen.
+Att rita en cirkel med bakgrundsfärgen åstadkoms genom att sätta fill_eq_background i
+egenskaperna för cirkeln.
+
+<image> geg_fig208.png
+<b>Fig Dynamik med bakgrundsfärg
+ 
+När man sätter DigColor och DigBackgroundColor dynamik på gruppen, kommer DigColor
+dynamiken att påverka den vänstra cirkeln ritatd med fyllnadsfärg, och DigBackgroundColor
+dynamiken den högra cirkeln ritad med bakgrundsfärg.
+
+<b>Attribute <t><t>Description
+DigBackgroundColor.Attribute <t><t>Signal i databasen av typ Boolean.
+DigBackgroundColor.Color  <t><t>Bakgrundsfärg när signalen är 1.
+DigBackgroundColor.Instances <t><t>Mask för instanser, där instanser kan skapas och tas bort.
+
 </topic>
 
 <topic>GeDynTimeoutColor <style>function
@@ -3656,11 +4153,20 @@ DigText
 
 Skifta mellan två texter.
 
-Objektet kopplas till en digital signal i rtdb. Om värdet är 1 skrivs original-texten ut, om värdet är 0 skrivs texten i LowText ut. DigText opererar på textfält 1.
+Objektet kopplas till en digital signal i rtdb. Om värdet är 1 skrivs original-texten ut, om 
+värdet är 0 skrivs texten i LowText ut. 
+
+Med flera instanser kan objektet kopplas till fler signaler, och fler texter kan visas. För
+instans 2 och uppåt, visas den angivna HighText när motsvarande signal är hög.
+
+DigText opererar på textfält 1.
 
 <b>Attribut <t><t>Beskrivning
 DigText.Attribute <t><t>Signal i rtdb av typen Boolean som skiftar text.
 DigText.LowText   <t><t>Text som skrivs ut när signalen är låg.
+DigText.Instances <t><t>Mask för instanser, där instanser kan skapas och tas bort.
+DigText2.Attribute <t><t>Signal i rtdb av typen Boolean.
+DigText2.HighText   <t><t>Text som skrivs ut när signalen är hög.
 </topic>
 
 <topic>GeDynAnalogText <style>function
@@ -3699,7 +4205,10 @@ number).
 Value.Attribute <t><t>Signal i rtdb av av valfri typ, som ska visas i 
                 <t><t>textfältet.
 Value.Format    <t><t>Format i c-printf syntax.
-Value.Instances <t><t>Anger vilka instanser som ska skapas.
+Value.ZeroBlank <t><t>När värdet är noll är textfältet blankt.
+Value.DecimalsAttr <t><t>Heltalssignal som anger antal decimaler.
+Value.DecimalsDecrease <t><t>Antalet decimaler kommer att minskas med angivet värde.
+Value.Instances <t><t>Mask för instanser, där instanser kan skapas och tas bort.
 
 <h2>Format
 För följande attribut typer finns ytterligare format definierade.
@@ -3711,6 +4220,7 @@ För följande attribut typer finns ytterligare format definierade.
 %3t<t>Komprimerad datum och tid. Ex 07-05-24 11:33:43
 %4t<t>Enbart datum. Ex 24-MAY-2007
 %5t<t>Komprimerat datum. Ex 07-05-24
+%6t<t>Tid och datum. Ex 01:00:00 30/01/87
 
 <b>pwr_tDeltaTime
 %t<t>Tid med hundradelar. Ex 1:23:45.43
@@ -3725,7 +4235,7 @@ För följande attribut typer finns ytterligare format definierade.
 %1o<t>Hierarki och objektsnamn.
 %2o<t>Volym, hierarki och objektsnamn.
 
-<b>pwr_tAttrRef
+<b>pwr_tAttrRef och pwr_tDataRef
 %o<t>Objektsnamn (sista segmentet) och attributnamn.
 %1o<t>Hierarki, objektsnamn och attributnamn.
 %2o<t>Volym, hieraki, objektsnamn och attributnamn .
@@ -3791,8 +4301,10 @@ Move.XAttribute <t><t>Signal i rtdb av typen Float32. Ger förflytting i
                 <t><t>x-led.
 Move.YAttribute <t><t>Signal i rtdb av typen Float32. Ger förflytting i 
                 <t><t>y-led.
-Move.Factor     <t><t>Omräkningsfaktor från storhet för XAttribute och 
-                <t><t>YAttribute till storhet för Ge -koordinater.
+Move.XFactor     <t><t>Omräkningsfaktor från storhet för XAttribute 
+                <t><t>till storhet för Ge-koordinater i x-led.
+Move.YFactor     <t><t>Omräkningsfaktor från storhet för YAttribute
+                <t><t>till storhet för Ge-koordinater i y-led.
 Move.XOffset    <t><t>Värde för XAttribute som motsvarar utgångs-
                 <t><t>positionen för objektet.
 Move.YOffset    <t><t>Värde för YAttribute som motsvarar utgångs-
@@ -3801,8 +4313,10 @@ Move.ScaleXAttribute <t><t>Signal i rtdb av typen Float32. Ger skalning i
                 <t><t>x-led.
 Move.ScaleYAttribute <t><t>Signal i rtdb av typen Float32. Ger skalning i 
                 <t><t>y-led.
-Move.ScaleFactor <t><t>Omräkningsfaktor från storhet för ScaleXAttribute
-                <t><t>och ScaleYAttribute till skalfaktor.
+Move.ScaleXFactor <t><t>Omräkningsfaktor från storhet för ScaleXAttribute
+                <t><t>till skalfaktor i x-led.
+Move.ScaleYFactor <t><t>Omräkningsfaktor från storhet för ScaleYAttribute
+                <t><t>till skalfaktor i y-led.
 </topic>
 
 <topic>GeDynAnalogShift <style>function
@@ -3919,7 +4433,7 @@ DigCommand.Attribute <t><t>Signal i databasen av typ boolean som ska påverka kom
 DigCommand.Level  <t><t>Om Level är 0, exekveras kommandot när signalen ändras från 0 till 1.
                   <t><t>Om level är 1, exekveras kommandot cykliskt när signalen är hög.
 DigCommand.Command <t><t>Xtt kommando som exekveras när signalen går från 0 till 1.
-DigCommand.Instance <t><t>Anger vilka instanser som ska skapas.
+DigCommand.Instances <t><t>Mask för instanser, där instanser kan skapas och tas bort.
 DigCommand2.Attribute <t><t>Signal för instans nr 2.
 DigCommand2.Level <t><t>Level for instans nr 2.
 DigCommand2.Command <t><t>Kommando för instans nr 2.
@@ -4025,7 +4539,7 @@ SetDig kan finnas i flera instanser, och sätter då värdet på flera signaler.
 <b>Attribut <t><t>Beskrivning
 SetDig.Attribute <t><t>Signal i rtdb av typen Boolean som sätts till 1 vid 
                  <t><t>Klick MB1 på objektet.
-SetDig.Instances <t><t>Anger vilka instanser som ska skapas.
+SetDig.Instances <t><t>Mask för instanser, där instanser kan skapas och tas bort.
 </topic>
 
 <topic>GeDynResetDig <style>function
@@ -4038,7 +4552,7 @@ ResetDig kan finnas i flera instanser, och sätter då värdet på flera signaler ti
 <b>Attribut <t><t>Beskrivning
 ResetDig.Attribute <t><t>Signal i rtdb av typen Boolean som sätts till 0 
                    <t><t>vid Klick MB1 på objektet.
-ResetDig.Instances <t><t>Anger vilka instanser som ska skapas.
+ResetDig.Instances <t><t>Mask för instanser, där instanser kan skapas och tas bort.
 </topic>
 
 <topic>GeDynToggleDig <style>function
@@ -4047,7 +4561,7 @@ ToggleDig
 Togglar värdet på en digital signal vid Klick MB1 på objektet.
 
 <b>Attribut <t><t>Beskrivning
-SetDig.Attribute <t><t>Signal i rtdb av typen Boolean som togglas vid 
+ToggleDig.Attribute <t><t>Signal i rtdb av typen Boolean som togglas vid 
                  <t><t>Klick MB1 på objektet.
 </topic>
 
@@ -4073,6 +4587,7 @@ SetValue.Attribute <t><t>Signal i rtdb av typen Float32, Int32,
                    <t><t>UInt32, Int16, UInt16, Int8, UInt8 eller String,
                    <t><t>som sätt vid Klick MB1 på objektet.
 SetValue.Value     <t><t>Värdet som sätts.
+SetValue.Instances <t><t>Mask för instanser, där instanser kan skapas och tas bort.
 </topic>
 
 <topic>GeDynCommand <style>function
@@ -4950,6 +5465,40 @@ Mode-objekt kan t ex bli
 Exempel på kommando för att öppna en trendkurvor från en plotgrupp inom hierakin
 
 <c>open trend $object-Plot
+</topic>
+</chapter>
+
+<chapter>
+<topic>geref_dashboard
+Dashboard
+
+Ett dashboard (instrumentbräda) är en förenklad graf med ett mycket begränsat antal
+byggstenar. Byggstenarna kallas för celler och kan visa värden i form av indikatorer,
+staplar, trendkurvor, givare etc.
+
+<image> opg_fig43.png
+
+Ett dashboard kan skapas in Ge editorn eller i operatörsmiljön. Byggstenarna och hur
+man skapar ett dashboard i operatörsmiljön är beskrivet i Operatörshandboken.
+
+I Ge editorn skapar man ett dashboard på följande vis.
+
+- Open Graph Attributes and set Dashboard to 1.
+- Open Graph Attributes again and set the size of the dashboard in DashRows and DashColumns.
+- Dash cells are drawn with colortheme colors, thus select a colortheme from
+  File/Colortheme/Select in the menu.
+- Set the background color to the first color in the custom color palette.
+- If the dashboard should follow the color theme selected by the operator, set ColorTheme
+  in Graph Attributes to $default.
+- Create a DashCell from Other/DashCell in the subgraph palette.
+- Double click on the cell to set properties and size, and connect the cell to a signal.
+- Save and build the dashboard.
+
+Ett dashboard sparas i en pwd-fil på $pwrp_pop, som kopieras till $pwrp_exe när den byggs.
+Filen ska distribueras till operatörstationen.
+
+Ett dashboared kan öppnas från Functions/Dashboard/Open i Xtt-menyn, eller med kommandot
+'open dashboard'.
 </topic>
 </chapter>
 
@@ -6229,6 +6778,7 @@ RotateSelected <t><t>Roterar utvalda objekt. <link>RotateSelected()
 SaveGraph <t><t>Spara innevarande graph. <link>SaveGraph()
 ScaleObject <t><t>Skala ett objekt. <link>ScaleObject()
 SelectAdd <t><t>Addera objekt till utvalslistan. <link>SelectAdd()
+SelectClear <t><t>Töm listan av utvalda objekt. <link>SelectClear()
 SetBackgroundColor <t><t>Sätt bakgrundsfärg i aktuell graph. <link>SetBackgroundColor()
 SetColorTheme <t><t>Sätt färgtema. <link>SetColorTheme()
 SetCurrentObject <t><t>Sätt CurrentObject. <link>SetCurrentObject()
@@ -6242,6 +6792,7 @@ SetObjectAttribute <t><t>Sätt värde på ett attribut för ett objekt. <link>SetObj
 SetObjectBackgroundColor <t><t>Sätt bakgrundsfärg på ett objekt. <link>SetObjectBackgroundColor()
 SetObjectBorder <t><t>Sätt kant på ett objekt. <link>SetObjectBorder()
 SetObjectBorderColor <t><t>Sätt kantfärg på ett objekt. <link>SetObjectBorderColor()
+SetObjectClass <t><t>Ändar subgraf för ett objekt. <link>SetObjectClass()
 SetObjectFill <t><t>Sätt fyllnad på ett objekt. <link>SetObjectFill()
 SetObjectFillColor <t><t>Sätt fyllnadsfärg på ett objekt. <link>SetObjectFillColor()
 SetObjectGradient <t><t>Sätt gradient på ett objekt. <link>SetObjectGradient()
@@ -6421,7 +6972,6 @@ mActionType1_MethodToolbar
 mActionType1_MethodPulldownMenu
 mActionType1_Script
 
-
 <h2>Fonter <bookmark> fonts
 eFont_Helvetica
 eFont_Times
@@ -6450,6 +7000,41 @@ eDrawType_CustomColor2 = 314
 eDrawType_CustomColor3 = 318
 ...
 eDrawType_CustomColor90 = 666
+
+<h2>Access <bookmark> access
+mAccess_RtRead
+mAccess_RtWrite
+mAccess_System
+mAccess_Maintenance
+mAccess_Process
+mAccess_Instrument
+mAccess_Operator1
+mAccess_Operator2
+mAccess_Operator3
+mAccess_Operator4
+mAccess_Operator5
+mAccess_Operator6
+mAccess_Operator7
+mAccess_Operator8
+mAccess_Operator9
+mAccess_Operator10
+mAccess_RtEventsAck
+mAccess_RtPlc
+mAccess_RtNavigator
+mAccess_DevRead
+mAccess_DevPlc
+mAccess_DevConfig
+mAccess_DevClass
+mAccess_RtEventsBlock
+mAccess_Administrator
+mAccess_SevRead
+mAccess_SevAdmin
+mAccess_AllRt
+mAccess_RtDefault
+mAccess_AllOperators
+mAccess_AllSev
+mAccess_AllPwr
+mAccess_Default
 
 </topic>
 
@@ -6483,6 +7068,8 @@ int CreateArc(float x1, float y1, float x2, float y2, int angle1, int angle2)
 
 <h2>Beskrivning
 Skapa ett Arc objekt.
+Färg, fyllnad, kant och andra egenskaper hämtas från
+aktuella inställningar i editorn.
 
 <h2>Argument
 
@@ -6734,7 +7321,6 @@ float  <t>x2    <t>X koordinat för nedre högra hörnet om objektet
                 <t><t>ska skalas. Optional.
 float  <t>y2    <t>Y koordinat för nedre högra hörnet om objektet
                 <t><t>ska skalas. Optional.
-int    <t>colortheme <t>1 om färgtema färger ska användas, annars 0. Optional.
 
 Returnerar id för det skapade objektet.
 
@@ -7059,6 +7645,20 @@ int <t>oid     <t>Objektsidentitet.
 <c> DeleteObject( oid);
 </topic>
 
+<topic>GetCurrentObject() <style>function
+GetCurrentObject()
+int GetCurrentObject()
+
+<h2>Beskrivning
+
+Returnerar identiteten för det senast skapade objektet.
+
+<b>Exempel
+<c> int id;
+ 
+<c> id = GetCurrentObject();
+</topic>
+
 <topic>GetFirstObject() <style>function
 GetFirstObject()
 int GetFirstObject()
@@ -7079,6 +7679,8 @@ Returnerar en integer med objektsidentiteten.
 <c> endwhile
 </topic>
 
+<topic>GetGraphName() <style>function
+GetGraphName()
 string GetGraphName()
 
 <h2>Beskrivning
@@ -7150,11 +7752,11 @@ int GetObjectBorder( int oid)
 <h2>Beskrivning
 Hämtar kant för ett objekt.
 
+Returnerar värdet på kant, 0 eller 1.
+
 <h2>Argument
 
 int <t>oid     <t>Objektets identitet.
-
-Returnerar värdet på kant, 0 eller 1.
 
 <b>Exempel
 <c> int oid;
@@ -7296,7 +7898,8 @@ Hämtar gradienten för ett objekt.
 
 int <t>oid     <t>Objektets identitet.
 
-Returnerar värdet på gradienten, dvs typen av gradient. Värdet 0 innebär ingen gradient.
+Returnerar värdet på gradienten, dvs typen av gradient. Värdet 0 innebär 
+ingen gradient.
 
 <b>Exempel
 <c> int oid;
@@ -7314,9 +7917,9 @@ Hämtar namnet på ett objekt.
 
 <h2>Argument
 
-Returnerar namnet.
-
 int <t>oid     <t>Objektets identitet.
+
+Returnerar namnet.
 
 <b>Exempel
 <c> int oid;
@@ -7449,6 +8052,7 @@ float <t>blue     <t>Returnerar värde på blå.
 
 Färger i standardpaletten finns definierade med eDrawType_Color1 - eDrawType_Color300, 
 och färger i custom color paletten med eDrawType_CustomColor1 - eDrawType_CustomColor90.
+
 Motsvarande färgindex kan också användas, för standardpaletten 0 - 299, och för
 custom color paletten 310 - 669. För custom color ligger grundfärgen på var fjärde index, 
 dvs 310, 314, 318, ... 666.
@@ -7482,6 +8086,7 @@ Returnerar text-bredden i width argumentet, och om argumentet height och descent
 
 string <t>text     <t>Text vars storlek ska beräknas.
 int    <t>textsize <t>Textstorleksindex (0-5)).
+int    <t>font     <t>Text font.
 int    <t>bold     <t>Fet (1) eller normal (0) text.
 float  <t>width    <t>Textens bredd returneras i denna variabel.
 float  <t>height   <t>Höjden på texten returneras i denna variabel.
@@ -7588,28 +8193,11 @@ float <t>ur_y  <t>Returnerad y koordinat för övre högra.
 <c> MeasureObject( oid, ll_x, ll_y, ur_x, ur_y);
 </topic>
 
-<topic>OpenGraph() <style>function
-OpenGraph()
-void OpenGraph(string name)
-
-<h2>Beskrivning
-Öppna en graph.
-
-<h2>Argument
-
-string <t>name     <t>Namn på grafen.
-
-<b>Exempel
- 
-<c> OpenGraph("overview");
-</topic>
-
 <topic>MoveAbsObject() <style>function
 MoveAbsObject()
 void MoveAbsObject( int oid, float x, float y)
 
 <h2>Beskrivning
-
 Flytta ett objekt till koordinaterna x och y.
 
 <h2>Argument
@@ -7642,6 +8230,22 @@ float <t>dy <t>Avstånd att flytta i y-led.
 <c> MoveObject( oid, 0.5, 0.5);
 </topic>
 
+<topic>OpenGraph() <style>function
+OpenGraph()
+void OpenGraph(string name)
+
+<h2>Beskrivning
+Öppna en graph.
+
+<h2>Argument
+
+string <t>name     <t>Namn på grafen.
+
+<b>Exempel
+ 
+<c> OpenGraph("overview");
+</topic>
+
 <topic>PolyLineAdd() <style>function
 PolyLineAdd()
 int PolyLineAdd(int id, float x, float y)
@@ -7661,6 +8265,23 @@ float <t>y     <t>Y koordinat för slutpunkten.
 <c> id = CreatePolyLine(2.0, 2.0, 3.0, 3.0);
 <c> PolyLineAdd(id, 4.0, 2.0);
 <c> PolyLineAdd(id, 5.0, 3.0);
+</topic>
+
+<topic>Reload() <style>function
+Reload()
+void Reload()
+
+<h2>Beskrivning
+
+Läser nuvarande graf från fil.
+
+<b>Exampel
+<c> # Update subgraph pwr_roundind
+<c> SetExtern("pwr_roundind");
+<c> save
+<c> Reload();
+<c> SetIntern("pwr_roundind");
+<c> save
 </topic>
 
 <topic>RotateSelected() <style>function
@@ -7690,23 +8311,6 @@ int <t>rotationpoint     <t>Rotationspunkt. Default-värde center.
 <c> RotateSelected(90.0);
 </topic>
 
-<topic>Reload() <style>function
-Reload()
-void Reload()
-
-<h2>Beskrivning
-
-Läser nuvarande graf från fil.
-
-<b>Exempel
-<c> # Update subgraph pwr_roundind
-<c> SetExtern("pwr_roundind");
-<c> save
-<c> Reload();
-<c> SetIntern("pwr_roundind");
-<c> save
-</topic>
-
 <topic>SaveGraph() <style>function
 SaveGraph()
 void SaveGraph([string name])
@@ -7721,6 +8325,25 @@ string <t>name     <t>Namn på grafen. Optional.
 <b>Exempel
  
 <c> SaveGraph();
+</topic>
+
+<topic>ScaleObject() <style>function
+ScaleObject()
+void ScaleObject( int oid, float scalex, float scaley)
+
+<h2>Beskrivning
+
+Skala ett objekt.
+
+<h2>Argument
+
+int <t>oid <t>Objektsidentitet.
+float <t>scalex <t>Skalfaktor i x-led.
+float <t>scaley <t>Skalfaktor i y-led.
+
+<b>Exempel
+
+<c> ScaleObject( oid, 1.5, 1.5);
 </topic>
 
 <topic>SelectAdd() <style>function
@@ -7742,55 +8365,13 @@ int          <t>objectid   <t>Objektsidentitet.
 <c> SelectAdd( id);
 </topic>
 
-<topic>GetCurrentObject() <style>function
-GetCurrentObject()
-int GetCurrentObject()
+<topic>SelectClear() <style>function
+SelectClear()
+int SelectClear()
 
-<h2>Beskrivning
+<h2>Description
 
-Returnerar identiteten på senast skapade objekt.
-
-<b>Exempel
-<c> int id;
- 
-<c> id = GetCurrentObject();
-</topic>
-
-<topic>Reload() <style>function
-Reload()
-void Reload()
-
-<h2>Beskrivning
-
-Läser nuvarande graf från fil.
-
-<b>Exempel
-<c> SetExtern("pwr_roundind");
-<c> save
-
-<c> Reload();
-
-<c> SetIntern("pwr_roundind");
-<c> save
-</topic>
-
-<topic>ScaleObject() <style>function
-ScaleObject()
-void ScaleObject( int oid, float scalex, float scaley)
-
-<h2>Beskrivning
-
-Skala ett objekt.
-
-<h2>Argument
-
-int <t>oid <t>Objektsidentitet.
-float <t>scalex <t>Skalfaktor i x-led.
-float <t>scaley <t>Skalfaktor i y-led.
-
-<b>Exempel
-
-<c> ScaleObject( oid, 1.5, 1.5);
+Töm listan på utvalda objekt.
 </topic>
 
 <topic>SetBackgroundColor() <style>function
@@ -7816,8 +8397,8 @@ void SetColorTheme(int colortheme)
 <h2>Beskrivning
 Sätt färgtema för aktuell graph.
 I runtime måste även ColorTheme i GraphAttributes sättas till
-$default. 
-
+$default. I det här fallet ska SetColorTheme() anropas utan
+argument. 
 
 <h2>Argument
 
@@ -7848,7 +8429,7 @@ int <t>oid <t>Objektsidentitet.
 
 <topic>SetDraw() <style>function
 SetDraw()
-void SetDraw( int draw)
+void SetDraw( int on)
 
 <h2>Beskrivning
 
@@ -7856,10 +8437,9 @@ Sätter ritning på skärmen till (1) eller från (0).
 
 <h2>Argument
 
-int <t>draw <t>1 innebär att ritning sätts till, och 0 att ritning sätts från.
+int <t>on <t>1 innebär att ritning sätts till, och 0 att ritning sätts från.
 
 <b>Exempel
-
 <c>  SetDraw(0);
 
 <c>  for ( i = 0; i < 10000; i++)
@@ -8044,6 +8624,29 @@ int <t>color   <t>Kantfärg.
 <c> SetObjectBorderColor( oid, eDrawType_CustomColor1);
 </topic>
 
+<topic>SetObjectClass() <style>function
+SetObjectClass()
+void SetObjectClass( int oid, string subgraph)
+
+<h2>Beskrivning
+Byt ut subgrafen för ett objekt.
+
+<h2>Argument
+
+int <t>oid     <t>Objektsidentitet.
+string <t>subgraph    <t>Namn på subgrafen.
+
+<b>Exempel
+ 
+<c> int oid;
+<c> string class;
+
+<c> class = GetObjectClass( oid)
+<c> if ( class == "pwr_indsquare")
+<c>   SetObjectClass( oid, "pwr_indround");
+<c> endif
+</topic>
+
 <topic>SetObjectFill() <style>function
 SetObjectFill()
 void SetObjectFill( int oid, int fill)
@@ -8146,7 +8749,6 @@ float <t>transparency <t>Grad av transparens. Ett värde mellan 0.0 och 1.0.
 <c> SetObjectTransparency( oid, 0.5);
 </topic>
 
-
 <topic>SetRgbColor() <style>function
 void SetRgbColor()
 void SetRgbColor( int color, float red, float green, float blue)
@@ -8164,6 +8766,7 @@ float <t>red     <t>Värde på blå.
 
 Färger i standardpaletten finns definierade med eDrawType_Color1 - eDrawType_Color300, 
 och färger i custom color paletten med eDrawType_CustomColor1 - eDrawType_CustomColor90.
+
 Motsvarande färgindex kan också användas, för standardpaletten 0 - 299, och för
 custom color paletten 310 - 669. För custom color ligger grundfärgen på var fjärde index, 
 dvs 310, 314, 318, ... 666.

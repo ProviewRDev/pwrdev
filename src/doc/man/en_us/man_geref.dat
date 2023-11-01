@@ -44,10 +44,9 @@ Images <link>geref_images
 Dynamics <link>geref_dynamic
 Actions <link>geref_action
 Create a SubGraph <link>geref_create_subgraph
-Groups <link>geref_groups
-Images <link>geref_images
 Connections <link>geref_connections
 Edit <link>geref_edit
+Dashboard <link>geref_dashboard
 Test <link>geref_testing
 Development environment <link>geref_development
 Commands <link>geref_command
@@ -744,6 +743,7 @@ Trend <link>geg_specialobjects_trend
 Bar <link>geg_specialobjects_bar
 BarArc <link>geg_specialobjects_bararc
 Pie <link>geg_specialobjects_pie
+BarChart <link>geg_specialobjects_barchart
 XYCurve <link>geg_specialobjects_xycurve
 FastCurve <link>geg_specialobjects_fastcurve
 Axis <link>geg_specialobjects_axis
@@ -985,16 +985,17 @@ extension angle can be specified.
 
 <topic> geg_specialobjects_barchart
 BarChart
-The pie chart can be divided in up to 12 sectors with different color, each sector
-connected to an analog signal that specifies the size of the sector.
-<image> geg_fig178.png
-<b>Fig Pie
+The bars of the bar chart can be divided in up to 12 segments with different color, 
+each segment is connected to an analog array that specifies the size of the segments.
+<image> geg_fig213.png
+<b>Fig BarChart
 
-In the example above with four segments, the four first segments are connected to 
-signals, and Pie.Sectors is set to 4.
+In the example above with hundred bars and four segments, the four first segments 
+are connected to arrays of size 100. BarChart.Bars is set to 100 and
+BarChart.Segments is set to 4.
 
-<image> geg_fig179.png
-<b>Fig Pie object attributes
+<image> geg_fig214.png
+<b>Fig BarChart object attributes
 </topic>
 
 <topic> geg_specialobjects_trend
@@ -1511,7 +1512,7 @@ If you only want the pushbutton to be insensitive for click and dimmed, you set
 Invisible.Dimmed to 1.
 
 <image> geg_fig105.png
-<b>Fig Invisible.Dimmed and DimLevel configured
+<b>Fig Invisible.Dimmed and Invisible.DimLevel configured
 
 When H1-Dv2 goes high the pushbutton is no longer sensitive for mouse clicks. This is marked
 by the drawing the button dimmed. In addition it's possible to set a transparency level on the
@@ -2290,7 +2291,7 @@ is filled with the Sand color theme colors.
 
 The first custom color should be the background color. By hovering over a color with the cursor,
 the pupose of the color is written below the custom color palette. Click on the color to set
-the fill color, and activate Function/Set background color.
+the fill color, and activate Functions/Set background color.
 
 To create a button, select a button under ColorTheme, for example 
 ColorTheme/Pushbuttons/ButtonSmallToggle. Connect and enter a text, eg 'Start' or 'Stop'.
@@ -2328,7 +2329,7 @@ similar objects, or for objects inside a group.
 <topic> geg_layers
 Layers
 The graphical objects can be created in layers. This is a way to structure the graph and to 
-simplify the editing. It's is only possible to edit objects in the currently active layer. Thus
+simplify the editing. It's only possible to edit objects in the currently active layer. Thus
 there is no risk that objects in other layers accidently is moved or modified. 
 
 A layer is created from 'Layers/Create layer' in the menu. When a layer is created it is
@@ -2352,7 +2353,7 @@ make it active. The two buttons that we now create will be inserted into the But
 <b>Fig Buttons layer
 
 In the same way we create the Texts layer with the texts, and the Indicators layer with the 
-indicators. Note how objects that doesn't belong to the ative layer are insensible, and how layers
+indicators. Note how objects that doesn't belong to the active layer are insensible, and how layers
 can be hidden by clicking on the eye symbol in the layer list.
 
 The delimiter line is created in the background layer that is the default layer. Objects in the 
@@ -2474,7 +2475,7 @@ folder there are subgraphs that is created within the project. Other folder cont
 that comes with ProviewR.
 
 <h1>The color palette
-The color palette contains 300 colors in 10 rowss with 30 colors in each row. In the first 
+The color palette contains 300 colors in 10 rows with 30 colors in each row. In the first 
 row there are back, white and intense signal colors, and a collection of gray tones. Then 
 follows a row with the gray  scale and after that 8 rows with different color tones: yellowgreen, 
 yellow, orange, violet, blue, seablue and green. Within each color group the 10 first has low 
@@ -2498,7 +2499,7 @@ activate 'Functions/Set background color' in the menu.
 In addition to the predefined colors there are space for 90 custom defined colors below the 
 predefined colors. To set a custom color, enter the color selector by double clicking on an
 entry in the custom color palette. Press the '+' button to specify a more specific color than
-the prdefined ones. Select the color hue with the slider to the left, and click in color area 
+the predefined ones. Select the color hue with the slider to the left, and click in color area 
 to select brightness and saturation. The bottom slider for transparency is not implemented yet. 
 Press the Select button to insert the color into the custom color palette. The color can now 
 be used as fill, border or text color.
@@ -2510,10 +2511,10 @@ To use a custom color palette in another graph, save the palette from 'File/Cust
 in the menu. The palette is stored in a pwgc file in $pwrp_pop. Load the file into another graph
 by activating 'File/CustomColor/Load' and select the file.
 
-It's also possible to use a common color file for several graphs in a project. If a color-file 
+It's also possible to use a common color file for several graphs in a project. If a color file 
 is specified in ColorTheme in Graph attributes, this file will be loaded automatically when the 
 graph is opened. When a color is adjusted and stored, it will affect all object drawn with this 
-color in all graphs with this color-file. In this way the colors in the graphs can easily be 
+color in all graphs with this color file. In this way the colors in the graphs can easily be 
 adjusted.
 
 For graphs drawn with color themes, the custom color palette is used for the theme colors and 
@@ -2602,7 +2603,7 @@ of the tools and graph in the ProviewR base system.
 
 The color themes can also be used when drawing graphs in a project. These graphs will follow 
 the  appearance of the color theme selected by the operator, but it requires that specific 
-colors in in the custom color palette is used when drawing different objects. A color theme is
+colors in the custom color palette is used when drawing different objects. A color theme is
 loaded from File/ColorTheme/Select in the Ge menu. The colors for the theme is then loaded into
 the custom colors palette. Every color in the custom color palette is adjusted for a specific 
 purpose. The first color for example is the background color for the graph, and the fifth 
@@ -2611,10 +2612,10 @@ palette, the purpose of this color will be written in a field below the palette.
 
 The color theme has support for specific elements in a graph. In the example below the 
 background color is lightgreen. The dark green lines are called delimiter areas. In this case 
-it is rectangles the divides the graph into different sections. It's also possible to use if 
-for larger areas with text and indicators. At the top there is a menu bar with pulldown menues,
+it is rectangles the divides the graph into different sections. It can also be used for 
+larger areas with text and indicators. At the top there is a menu bar with pulldown menues,
 and below this a gradient to make a shadow below the menu. Object graphs should contain a 
-method toolbar positions below the menu. Other elements are bars, axises, buttons, indicators,
+method toolbar positioned below the menu. Other elements are bars, axises, buttons, indicators,
 texts on the background, and texts on a delimiter area, sliders, value fields and input fields,
 tables, diagrams etc.
 
@@ -3839,7 +3840,7 @@ FillLevel <t>Float32    <t>Changes partly the fill color of the component. The l
 Invisible <t>Boolean String <t>Make the component invisible when the signal is high, <link>GeDynInvisible
           <t>           <t>or when the string is empty.
 DigBorder <t>Boolean    <t>Set specified border color when the signal is low. <link>GeDynDigBorder
-DigBackgroundColor <t>Boolean <t>Set specified background color color when signal is high. <link>GeDynDigBackgroundColor
+DigBackgroundColor <t>Boolean <t>Set specified background color when signal is high. <link>GeDynDigBackgroundColor
 TimeoutColor <t>Boolean <t>Set specified color when at subscription timeout. <link>GeDynTimeoutColor
 DigTextColor <t>Boolean <t>Set specified text color when the signal is high. <link>GeDynDigTextColor
 DigText   <t>Boolean    <t>Set specified text when the signal is low. <link>GeDynDigText
@@ -3864,7 +3865,7 @@ DigTransparency <t>Boolean   <t>Shift transparency depending on the value of a <
 AnalogTransparency <t>Float32  <t>Set transparency depending on the value of an <link>GeDynAnalogTransparency
 	  <t>		<t>analog signal.
 ColorThemeLightness <t>-  <t>Adapt lightness of component to color theme. <link>GeDynColorThemeLightness
-DigSwap   <t>Boolean  <t>Update all subscriptions in the graph. <link>GeDynDigSwap
+DigSwap   <t>Boolean  <t>Restart all subscriptions in the graph. <link>GeDynDigSwap
 UnitConvert <t>Float32  <t>Convert value unit before displaying in value field. <link>GeDynUnitConvert
 HostObject <t>Object  <t>Complex component dynamics. <link>GeDynHostObject
 
@@ -4744,7 +4745,7 @@ ToggleDig
 Toggle the value of a digital signal by clicking MB1 on the object.
 
 <b>Attribute <t><t>Description
-SetDig.Attribute <t><t>Signal in the database of type Boolean that is toggled with
+ToggleDig.Attribute <t><t>Signal in the database of type Boolean that is toggled with
                  <t><t>Click MB1 on the object.
 </topic>
 
@@ -5628,6 +5629,42 @@ could be
 Example of a command to open a trend from a plotgroup in the hierarchy
 
 <c>open trend $object-Plot
+
+</topic>
+</chapter>
+
+<chapter>
+<topic>geref_dashboard
+Dashboard
+
+The dashboard is a simplified graph with a very limited number of building blocks. The 
+building blocks are called dashcells that can display values in the shape of indicators, 
+value fields, bars, trends, gauges etc.
+
+<image> opg_fig43.png
+
+The dashboard can be created in the Ge editor, or in the operator environment. The building
+blocks and how to create a dashbord in the operator environment is described in Operator's 
+Guide.
+
+In the Ge editor, a dashbord is created in the following way.
+
+- Open Graph Attributes and set Dashboard to 1.
+- Open Graph Attributes again and set the size of the dashboard in DashRows and DashColumns.
+- Dash cells are drawn with colortheme colors, thus select a colortheme from
+  File/Colortheme/Select in the menu.
+- Set the background color to the first color in the custom color palette.
+- If the dashboard should follow the color theme selected by the operator, set ColorTheme
+  in Graph Attributes to $default.
+- Create a DashCell from Other/DashCell in the subgraph palette.
+- Double click on the cell to set properties and size, and connect the cell to a signal.
+- Save and build the dashboard.
+
+The dashboard is saved in a pwd file on $pwrp_pop, that is copied to $pwrp_exe when it's
+built. This file should be distributed to the operator station.
+
+The dashboard can be opened from Functions/Dashboard/Open i the Xtt menu, or with the 
+command 'open dashboard'.
 </topic>
 </chapter>
 
@@ -6935,8 +6972,8 @@ MoveAbsObject <t><t>Move an object to a position. <link>MoveAbsObject()
 MoveObject <t><t>Move an object a distance. <link>MoveObject()
 OpenGraph <t><t>Open a graph. <link>OpenGraph()
 PolyLineAdd <t><t>Add a segment to a PolyLine.<link>PolyLineAdd()
-RotateSelected <t><t>Rotate selected objects. <link>RotateSelected()
 Reload <t><t>Read current graph from file. <link>Reload()
+RotateSelected <t><t>Rotate selected objects. <link>RotateSelected()
 SaveGraph <t><t>Save the current graph. <link>SaveGraph()
 ScaleObject <t><t>Scale an object. <link>ScaleObject()
 SelectAdd <t><t>Add an object to select list. <link>SelectAdd()
@@ -7230,7 +7267,7 @@ int CreateArc(float x1, float y1, float x2, float y2, int angle1, int angle2)
 
 <h2>Description
 Create an arc.
-Color, fill, border and other properties are fetch from
+Color, fill, border and other properties are fetched from
 the current editor settings.
 
 <h2>Argument
@@ -8259,7 +8296,6 @@ float  <t>descent  <t>The descent is returned in this variable.
 <c> GetTextExtent("This is a text", 3, eFont_LucidaSans, 1, width);
 </topic>
 
-
 <topic>GroupGetFirstObject() <style>function
 GroupGetFirstObject()
 int GroupGetFirstObject( int group)
@@ -8297,7 +8333,6 @@ GroupGetNextObject()
 int GroupGetNextObject( int group, int oid)
 
 <h2>Description
-
 Get the next object in a group, The first object is fetched with 
 GroupGetFirstObject() and the other objects with GroupGetNextObject().
 
@@ -8356,28 +8391,11 @@ float <t>ur_y  <t>Returned y coordinate for upper right.
 <c> MeasureObject( oid, ll_x, ll_y, ur_x, ur_y);
 </topic>
 
-<topic>OpenGraph() <style>function
-OpenGraph()
-void OpenGraph(string name)
-
-<h2>Description
-Open a graph.
-
-<h2>Argument
-
-string <t>name     <t>Name of graph.
-
-<b>Example
- 
-<c> OpenGraph("overview");
-</topic>
-
 <topic>MoveAbsObject() <style>function
 MoveAbsObject()
 void MoveAbsObject( int oid, float x, float y)
 
 <h2>Description
-
 Move an object to coordinates x and y.
 
 <h2>Argument
@@ -8410,6 +8428,22 @@ float <t>dy <t>Distance to move in y direction.
 <c> MoveObject( oid, 0.5, 0.5);
 </topic>
 
+<topic>OpenGraph() <style>function
+OpenGraph()
+void OpenGraph(string name)
+
+<h2>Description
+Open a graph.
+
+<h2>Argument
+
+string <t>name     <t>Name of graph.
+
+<b>Example
+ 
+<c> OpenGraph("overview");
+</topic>
+
 <topic>PolyLineAdd() <style>function
 PolyLineAdd()
 int PolyLineAdd(int id, float x, float y)
@@ -8429,6 +8463,23 @@ float <t>y     <t>Y coordinate for end point.
 <c> id = CreatePolyLine(2.0, 2.0, 3.0, 3.0);
 <c> PolyLineAdd(id, 4.0, 2.0);
 <c> PolyLineAdd(id, 5.0, 3.0);
+</topic>
+
+<topic>Reload() <style>function
+Reload()
+void Reload()
+
+<h2>Description
+
+Reads the current graph from file.
+
+<b>Example
+<c> # Update subgraph pwr_roundind
+<c> SetExtern("pwr_roundind");
+<c> save
+<c> Reload();
+<c> SetIntern("pwr_roundind");
+<c> save
 </topic>
 
 <topic>RotateSelected() <style>function
@@ -8456,23 +8507,6 @@ int <t>rotationpoint     <t>Rotation point. Default center.
 
 <c> SelectAdd(id);
 <c> RotateSelected(90.0);
-</topic>
-
-<topic>Reload() <style>function
-Reload()
-void Reload()
-
-<h2>Description
-
-Reads the current graph from file.
-
-<b>Example
-<c> # Update subgraph pwr_roundind
-<c> SetExtern("pwr_roundind");
-<c> save
-<c> Reload();
-<c> SetIntern("pwr_roundind");
-<c> save
 </topic>
 
 <topic>SaveGraph() <style>function
@@ -8943,9 +8977,6 @@ on every fourth index, ie 310, 314, 318, ... 666.
 <c> SetRgbColor( eDrawType_CustomColor1, red, green, blue);
 </topic>
 
-<c> SetObjectTextColor( oid, eDrawType_CustomColor5);
-</topic>
-
 <topic>SetSelectTextBold() <style>function
 void SetSelectTextBold()
 void SetSelectTextBold(int font)
@@ -9019,7 +9050,6 @@ Example
 
 
 <c>  ! Draw a rectangle  
-
 <c>  set fill
 <c>  set shadow
 <c>  set linewidth 1

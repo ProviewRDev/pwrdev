@@ -3775,6 +3775,17 @@ file is automatically included when you compile the plc-code. The structures loo
 <c>  pwr_tInt16    err_code;
 <c>} a_d_Data;
 
+By default the gcc compiler will align elements in data stuctures on 32 or 64-bit boundaries. When 
+creating data structure for communications, this will cause confusion as different compilers and 
+platforms have different alignment rules. To avoid this use attribute packed when declaring the 
+stucture.
+
+<c>typedef struct {
+<c>  pwr_tUInt32   Id;
+<c>  pwr_tInt32    func_no;
+<c>  pwr_tInt16    err_code;
+<c>} __attribute__((__packed__)) a_d_Data;
+
 <h2>The plc code
 
 I have a plc program named Comm. In this program I have placed one RemTransSend-object and one

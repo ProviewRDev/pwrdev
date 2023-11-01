@@ -3737,6 +3737,17 @@ här filen inkluderas automatiskt vid kompilering av plc-koden. Data-strukturen s
 <c>  pwr_tInt16    err_code;
 <c>} a_d_Data;
 
+För att optimera läs och skrivning kommer gcc kompilatorn normalt att placera element i 
+data-strukturer på 32 eller 64-bit ordgräns. När man skapar strukturer för kommunikation kommer 
+det att skapa oreda då olika kompilatorer och plattformar har olika regler för alignment. För att 
+undvika detta, använd 'attribute packed' vid deklarationen av data-strukturen.
+
+<c>typedef struct {
+<c>  pwr_tUInt32   Id;
+<c>  pwr_tInt32    func_no;
+<c>  pwr_tInt16    err_code;
+<c>} __attribute__((__packed__)) a_d_Data;
+
 <h2>Plc-koden
 
 Koden ligger i ett PlcPgm med namnet Comm. I programmet finns ett RemTransSend-objekt och
