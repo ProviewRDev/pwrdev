@@ -130,6 +130,24 @@ static pwr_tStatus IoRackInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
           }
           chanp->offset = input_counter;
           chanp->mask = 1 << chan_di->Number;
+
+          // Byte swap depending on architecture
+#if (pwr_dHost_byteOrder == pwr_dLittleEndian)
+          if (chan_di->Representation == pwr_eDataRepEnum_Bit16 &&
+              op->ByteOrdering == pwr_eByteOrderingEnum_BigEndian)
+            chanp->mask = swap16(chanp->mask);
+          if (chan_di->Representation == pwr_eDataRepEnum_Bit32 &&
+              op->ByteOrdering == pwr_eByteOrderingEnum_BigEndian)
+            chanp->mask = swap32(chanp->mask);
+#elif (pwr_dHost_byteOrder == pwr_dBigEndian)
+          if (chan_di->Representation == pwr_eDataRepEnum_Bit16 &&
+              op->ByteOrdering == pwr_eByteOrderingEnum_LittleEndian)
+            chanp->mask = swap16(chanp->mask);
+          if (chan_di->Representation == pwr_eDataRepEnum_Bit32 &&
+              op->ByteOrdering == pwr_eByteOrderingEnum_LittleEndian)
+            chanp->mask = swap32(chanp->mask);
+#endif
+
           if (chan_di->Number == 0)
             latent_input_count = GetChanSize((pwr_eDataRepEnum)chan_di->Representation);
           // printf("Di channel found in %s, Number %d, Offset %d\n",
@@ -180,7 +198,22 @@ static pwr_tStatus IoRackInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
           chan_size = GetChanSize((pwr_eDataRepEnum)chan_do->Representation);
           chanp->mask = 1 << chan_do->Number;
 
-          // Digital channels are byteswapped in their respective mask in rt_io_bus init method
+          // Byte swap depending on architecture
+#if (pwr_dHost_byteOrder == pwr_dLittleEndian)
+          if (chan_di->Representation == pwr_eDataRepEnum_Bit16 &&
+              op->ByteOrdering == pwr_eByteOrderingEnum_BigEndian)
+            chanp->mask = swap16(chanp->mask);
+          if (chan_di->Representation == pwr_eDataRepEnum_Bit32 &&
+              op->ByteOrdering == pwr_eByteOrderingEnum_BigEndian)
+            chanp->mask = swap32(chanp->mask);
+#elif (pwr_dHost_byteOrder == pwr_dBigEndian)
+          if (chan_di->Representation == pwr_eDataRepEnum_Bit16 &&
+              op->ByteOrdering == pwr_eByteOrderingEnum_LittleEndian)
+            chanp->mask = swap16(chanp->mask);
+          if (chan_di->Representation == pwr_eDataRepEnum_Bit32 &&
+              op->ByteOrdering == pwr_eByteOrderingEnum_LittleEndian)
+            chanp->mask = swap32(chanp->mask);
+#endif
 
           if (chan_do->Number == 0)
             latent_output_count = GetChanSize((pwr_eDataRepEnum)chan_do->Representation);
