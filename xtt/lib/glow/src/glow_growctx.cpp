@@ -3218,8 +3218,9 @@ void GrowCtx::set_select_scale(
     double scale_x, double scale_y, glow_eScaleType type)
 {
   for (int i = 0; i < a_sel.size(); i++) {
-    ((GrowText*)a_sel[i])->store_transform();
-    ((GrowText*)a_sel[i])->set_scale(scale_x, scale_y, 0, 0, type);
+    a_sel[i]->store_transform();
+    a_sel[i]->store_borders();
+    a_sel[i]->set_scale(scale_x, scale_y, 0, 0, type);
   }
 }
 
