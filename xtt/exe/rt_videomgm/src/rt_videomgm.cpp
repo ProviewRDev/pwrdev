@@ -114,7 +114,7 @@ int XttVideoMgmAimetis::check_session()
 
 int XttVideoMgmAimetis::authorize(char* user, char* password)
 {
-  char cmd[430];
+  char cmd[440];
   pwr_tFileName fname;
   int sts;
 
@@ -355,7 +355,7 @@ int XttVideoMgmAimetis::get_cameras()
 
 int XttVideoMgmAimetis::get_camera_image(int idx, const char* jpgfile)
 {
-  char cmd[540];
+  char cmd[550];
   pwr_tFileName fname;
   char* decoding_table;
   static char encoding_table[] = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I',
