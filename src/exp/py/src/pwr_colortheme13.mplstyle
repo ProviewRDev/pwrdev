@@ -1,0 +1,38 @@
+# Colortheme TerraVerte
+
+patch.linewidth: 0.5
+patch.facecolor: 348ABD  # blue
+patch.edgecolor: EEEEEE
+patch.antialiased: True
+
+font.size: 10.0
+text.color: 000000
+
+axes.facecolor: 130B0B # Diagram fill color
+axes.edgecolor: 000000 # Diagram border color
+axes.linewidth: 1
+axes.grid: True
+axes.titlesize: x-large
+axes.labelsize: large
+axes.labelcolor: 000000
+axes.axisbelow: True       # grid/ticks are below elements (e.g., lines, text)
+
+# Curve colors
+# Lightgreen, lightblue, seablue, orange, violett, yellowgreen, red, yellow
+axes.prop_cycle: cycler('color', ['DAF791', 'ACD6F6', '3CFFFF', 'FFBB6B', 'FF86FF', 'C4F903', 'FF8888', 'FFFF69'])
+
+xtick.color: 000000
+xtick.direction: out
+
+ytick.color: 000000
+ytick.direction: out
+
+grid.color: 4A4747
+grid.linestyle: -    # solid line
+
+figure.facecolor: F1F8E8 # Background color
+figure.edgecolor: 0.50
+
+legend.facecolor: F1F8E8
+#savefig.facecolor: black
+#savefig.edgecolor: black

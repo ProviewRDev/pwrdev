@@ -21,6 +21,15 @@ py_sources := $(sort \
              ) \
            )
 
+mplstyle_sources := $(sort \
+             $(foreach file, \
+               $(foreach dir, \
+                 $(source_dirs), \
+                 $(wildcard $(dir)/*.mplstyle) \
+               ), $(notdir $(file)) \
+             ) \
+           )
+
 png_sources := $(sort \
              $(foreach file, \
                $(foreach dir, \
@@ -31,8 +40,10 @@ png_sources := $(sort \
            )
 
 export_py := $(patsubst %.py, $(exe_dir)/%.py, $(py_sources))
+export_mplstyle := $(patsubst %.mplstyle, $(load_dir)/%.mplstyle, $(mplstyle_sources))
 export_png := $(patsubst %.png, $(exe_dir)/%.png, $(png_sources))
 clean_py := $(patsubst %.py, clean_%.py, $(py_sources))
+clean_mplstyle := $(patsubst %.mplstyle, clean_%.mplstyle, $(mplstyle_sources))
 clean_png := $(patsubst %.png, clean_%.png, $(png_sources))
 
 
@@ -43,7 +54,7 @@ all : init copy | silent
 
 init : silent
 
-copy : $(export_py) $(export_png) | silent
+copy : $(export_py) $(export_mplstyle) $(export_png) | silent
 
 lib : silent
 
@@ -51,12 +62,16 @@ exe : silent
 
 clean :
 
-realclean : clean $(clean_py) $(clean_png)
+realclean : clean $(clean_py) $(clean_mplstyle) $(clean_png)
 
 silent :
 	@ :
 
 $(export_py) : $(exe_dir)/%.py : %.py
+	@ $(log_exp)
+	@ $(cp) $(cpflags) $(source) $(target)
+
+$(export_mplstyle) : $(load_dir)/%.mplstyle : %.mplstyle
 	@ $(log_exp)
 	@ $(cp) $(cpflags) $(source) $(target)
 
@@ -66,6 +81,9 @@ $(export_png) : $(exe_dir)/%.png : %.png
 
 $(clean_py) : clean_%.py : %.py
 	@ rm $(exe_dir)/$*.py
+
+$(clean_mplstyle) : clean_%.mplstyle : %.mplstyle
+	@ rm $(load_dir)/$*.mplstyle
 
 $(clean_png) : clean_%.png : %.png
 	@ rm $(exe_dir)/$*.png

@@ -1,0 +1,38 @@
+# Colortheme StandardDark
+
+patch.linewidth: 0.5
+patch.facecolor: 348ABD  # blue
+patch.edgecolor: EEEEEE
+patch.antialiased: True
+
+font.size: 10.0
+text.color: F0F1F0
+
+axes.facecolor: 000000 # Diagram fill color
+axes.edgecolor: F0F1F0 # Diagram border color
+axes.linewidth: 1
+axes.grid: True
+axes.titlesize: x-large
+axes.labelsize: large
+axes.labelcolor: F0F1F0
+axes.axisbelow: True       # grid/ticks are below elements (e.g., lines, text)
+
+# Curve colors
+# Lightblue, yellow, green, orange, violett, yellowgreen, red, seablue
+axes.prop_cycle: cycler('color', ['9DB6FF', 'FFFF69', '93FF65', 'FFBB6B', 'FF86FF', 'C4F903', 'FF8888', '3CFFFF'])
+
+xtick.color: F0F1F0
+xtick.direction: out
+
+ytick.color: F0F1F0
+ytick.direction: out
+
+grid.color: 3E3F56
+grid.linestyle: -    # solid line
+
+figure.facecolor: 393939 # Background color
+figure.edgecolor: 0.50
+
+legend.facecolor: 393939
+#savefig.facecolor: black
+#savefig.edgecolor: black

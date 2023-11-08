@@ -41,6 +41,7 @@
 from tkinter import *
 import tkinter.filedialog
 import tkinter.messagebox
+from tkinter import ttk
 import sys
 import math
 import time
@@ -78,18 +79,18 @@ class ValueDialog:
 
         self.top.title(title)
 
-        label = Label(top, text=text)
+        label = ttk.Label(top, text=text, style='Pwr.TLabel')
         label.grid(column=0, row=0, padx=10, pady=5, sticky=W)
 
-        self.entry = Entry(top, width=15)
+        self.entry = ttk.Entry(top, width=15, style='Pwr.TEntry')
         self.entry.grid(column=1, row=0, padx=10, pady=5, sticky=W)
         self.entry.focus()
         self.rename_ok_cb = rename_ok_cb
 
-        button = Button(top, text="Ok", command=self.ok_cb, width=10)
+        button = ttk.Button(top, text="Ok", command=self.ok_cb, width=10, style='Pwr.TButton')
         button.grid(column=0, row=1, padx=10, pady=5, sticky=W)
     
-        button = Button(top, text="Cancel", command=self.cancel_cb, width=10)
+        button = ttk.Button(top, text="Cancel", command=self.cancel_cb, width=10, style='Pwr.TButton')
         button.grid(column=1, row=1, padx=10, pady=5, sticky=W)
     
         self.top.bind('<Return>', self.ok_cb)
@@ -119,7 +120,8 @@ class SelectDialog:
         for item in itemlist:
             self.listbox.insert(END, item)
             
-        button = Button(self.window, text='Ok', command=self.ok_cb, bg=buttoncolor).grid(row=1, column=0)
+        button = ttk.Button(self.window, text='Ok', command=self.ok_cb, style='Pwr.TButton')
+        button.grid(row=1, column=0)
 
     def ok_cb(self): 
         idx = self.listbox.curselection()
@@ -149,73 +151,70 @@ class LinRegModel:
         main.set_icon(self.lrwindow)
 
         # Create menu
-        menubar = Menu(self.lrwindow, bg=buttoncolor)
-        filemenu = Menu(menubar, bg=buttoncolor)
+        menubar = Menu(self.lrwindow, bg=menucolor, fg=menufgcolor,
+                        activebackground=menuactivecolor, activeforeground=menufgcolor)
+        filemenu = Menu(menubar, bg=menucolor, fg=menufgcolor,
+                        activebackground=menuactivecolor, activeforeground=menufgcolor)
         filemenu.add_command(label='Create Model', command=self.create_action_cb)
         filemenu.add_command(label='Apply Model', command=self.open_action_cb)
         filemenu.add_command(label='Save Model', command=self.save_action_cb)
         menubar.add_cascade(label='File', menu=filemenu)
-        helpmenu = Menu(menubar, bg=buttoncolor)
+        helpmenu = Menu(menubar, bg=menucolor, fg=menufgcolor,
+                        activebackground=menuactivecolor, activeforeground=menufgcolor)
         helpmenu.add_command(label='Help', command=self.help_action_cb)
         menubar.add_cascade(label='Help', menu=helpmenu)
 
         self.lrwindow.config(menu=menubar)
 
-        self.lr_argframe = Frame(self.lrwindow, bg=bgcolor)
+        self.lr_argframe = ttk.Frame(self.lrwindow, style='Pwr.TFrame')
         if self.type == self.TYPE_RIDGE_REGRESSION:
             # Solver options list
             list = ['auto', 'svd', 'cholesky', 'lsqr', 'sparse_cg', 'sag', 'saga']
             self.solver = StringVar()
             self.solver.set('auto')
-            label = Label(self.lr_argframe, text='Solver')
+            label = ttk.Label(self.lr_argframe, text='Solver', style='Pwr.TLabel')
             label.grid(column=0, row=0, padx=0, pady=5, sticky=W)
-            label.config(bg=bgcolor)
             optmenu = OptionMenu(self.lr_argframe, self.solver, *list)
             optmenu.grid(column=1, row=0, padx=20, pady=5, sticky=W)
-            optmenu.config(bg=bgcolor)
+            optmenu.config(highlightthickness=0, bg=menucolor, fg=menufgcolor,
+                        activebackground=menuactivecolor, activeforeground=menufgcolor)
+            optmenu['menu'].config(bg=menucolor, fg=menufgcolor,
+                        activebackground=menuactivecolor, activeforeground=menufgcolor)
 
             # Max iter entry
             self.maxiter = IntVar()
-            label = Label(self.lr_argframe, text='Max Iterations')
+            label = ttk.Label(self.lr_argframe, text='Max Iterations', style='Pwr.TLabel')
             label.grid(column=0, row=1, padx=0, pady=5, sticky=W)
-            label.config(bg=bgcolor)
-            entry = Entry(self.lr_argframe, textvariable=self.maxiter, width=8)
+            entry = ttk.Entry(self.lr_argframe, textvariable=self.maxiter, width=8, style='Pwr.TEntry')
             self.maxiter.set(1000)
             entry.grid(column=1, row=1, padx=20, pady=5, sticky=W)
-            entry.config(bg=bgcolor)
 
             # alpha entry
-            label = Label(self.lr_argframe, text='Alpha')
+            label = ttk.Label(self.lr_argframe, text='Alpha', style='Pwr.TLabel')
             label.grid(column=0, row=2, padx=0, pady=5, sticky=W)
-            label.config(bg=bgcolor)
             self.alpha = DoubleVar()
-            entry = Entry(self.lr_argframe, textvariable=self.alpha, width=8)
+            entry = ttk.Entry(self.lr_argframe, textvariable=self.alpha, width=8, style='Pwr.TEntry')
             self.alpha.set(1.0)
             entry.grid(column=1, row=2, padx=20, pady=5, sticky=W)
-            entry.config(bg=bgcolor)
 
             self.lr_argframe.pack(side=TOP, fill=X)
 
         elif self.type == self.TYPE_LASSO_REGRESSION:
             # Max iter entry
             self.maxiter = IntVar()
-            label = Label(self.lr_argframe, text='Max Iterations')
+            label = ttk.Label(self.lr_argframe, text='Max Iterations', style='Pwr.TLabel')
             label.grid(column=0, row=1, padx=0, pady=5, sticky=W)
-            label.config(bg=bgcolor)
-            entry = Entry(self.lr_argframe, textvariable=self.maxiter, width=8)
+            entry = ttk.Entry(self.lr_argframe, textvariable=self.maxiter, width=8, style='Pwr.TEntry')
             self.maxiter.set(20000)
             entry.grid(column=1, row=1, padx=20, pady=5, sticky=W)
-            entry.config(bg=bgcolor)
 
             # alpha entry
-            label = Label(self.lr_argframe, text='Alpha')
+            label = ttk.Label(self.lr_argframe, text='Alpha', style='Pwr.TLabel')
             label.grid(column=0, row=2, padx=0, pady=5, sticky=W)
-            label.config(bg=bgcolor)
             self.alpha = DoubleVar()
-            entry = Entry(self.lr_argframe, textvariable=self.alpha, width=8)
+            entry = ttk.Entry(self.lr_argframe, textvariable=self.alpha, width=8, style='Pwr.TEntry')
             self.alpha.set(1.0)
             entry.grid(column=1, row=2, padx=20, pady=5, sticky=W)
-            entry.config(bg=bgcolor)
 
             self.lr_argframe.pack(side=TOP, fill=X)
 
@@ -409,29 +408,29 @@ class LinRegModel:
         # Get difference between actual value and model
         diff = self.wdata.wd[self.wdata.wdcol[0]] - res
 
-        self.lr_wframe = Frame(plotwind, bg=bgcolor)
+        self.lr_wframe = ttk.Frame(plotwind, style='Pwr.TFrame')
 
         score = r2_score(res, self.wdata.wd[self.wdata.wdcol[0]])
-        label = Label(self.lr_wframe, text='Score', bg=bgcolor)
+        label = ttk.Label(self.lr_wframe, text='Score', style='Pwr.TLabel')
         label.grid(column=0, row=0, padx=20, pady=5, sticky=W)
-        label = Label(self.lr_wframe, text=str(score), bg=bgcolor)
+        label = ttk.Label(self.lr_wframe, text=str(score), style='Pwr.TLabel')
         label.grid(column=1, row=0, padx=20, pady=5, sticky=W)
 
         # Draw linreg coefficients
         msg = 'Intercept'
-        label = Label(self.lr_wframe, text=msg, bg=bgcolor)
+        label = ttk.Label(self.lr_wframe, text=msg, style='Pwr.TLabel')
         label.grid(column=0, row=1, padx=20, pady=5, sticky=W)
         msg = str(coeff[0])
-        label = Label(self.lr_wframe, text=msg, bg=bgcolor)
+        label = ttk.Label(self.lr_wframe, text=msg, style='Pwr.TLabel')
         label.grid(column=1, row=1, padx=20, pady=5, sticky=W)
 
         i = 0
         for name in self.wdata.wdname:
             if i != 0:
-                label = Label(self.lr_wframe, text=name, bg=bgcolor)
+                label = ttk.Label(self.lr_wframe, text=name, style='Pwr.TLabel')
                 label.grid(column=0, row=i+1, padx=20, pady=5, sticky=W)
                 msg = str(coeff[i])
-                label = Label(self.lr_wframe, text=msg, bg=bgcolor)
+                label = ttk.Label(self.lr_wframe, text=msg, style='Pwr.TLabel')
                 label.grid(column=1, row=i+1, padx=20, pady=5, sticky=W)
             i += 1
 
@@ -454,7 +453,7 @@ class LinRegModel:
         plt.plot(self.wdata.wdtime, diff, label='Diff')
         plt.legend(loc='center left', bbox_to_anchor=(1, 0.5));
 
-        self.lr_pframe = Frame(plotwind, bg=bgcolor)
+        self.lr_pframe = ttk.Frame(plotwind, style='Pwr.TFrame')
         canvas = FigureCanvasTkAgg(fig, master=self.lr_pframe)
         plot_widget = canvas.get_tk_widget()
         plot_widget.grid(column=0, row=0)
@@ -488,14 +487,17 @@ class MLPModel:
         main.set_icon(self.lrwindow)
 
         # Create menu
-        menubar = Menu(self.lrwindow, bg=buttoncolor)
-        filemenu = Menu(menubar, bg=buttoncolor)
+        menubar = Menu(self.lrwindow, bg=menucolor, fg=menufgcolor,
+                       activebackground=menuactivecolor, activeforeground=menufgcolor)
+        filemenu = Menu(menubar, bg=menucolor, fg=menufgcolor,
+                       activebackground=menuactivecolor, activeforeground=menufgcolor)
         filemenu.add_command(label='Create Model', command=self.create_action_cb)
         filemenu.add_command(label='Apply Model', command=self.open_action_cb)
         filemenu.add_command(label='Save Model', command=self.save_action_cb)
         filemenu.add_command(label='Export Model', command=self.export_action_cb)
         menubar.add_cascade(label='File', menu=filemenu)
-        helpmenu = Menu(menubar, bg=buttoncolor)
+        helpmenu = Menu(menubar, bg=menucolor, fg=menufgcolor,
+                       activebackground=menuactivecolor, activeforeground=menufgcolor)
         helpmenu.add_command(label='Help', command=self.help_action_cb)
         menubar.add_cascade(label='Help', menu=helpmenu)
 
@@ -505,151 +507,143 @@ class MLPModel:
         list = ['No', 'MinMax', 'Standard']
         self.scaleropt = StringVar()
         self.scaleropt.set('No')
-        label = Label(self.lrwindow, text='Scaler')
+        label = ttk.Label(self.lrwindow, text='Scaler', style='Pwr.TLabel')
         label.grid(column=0, row=0, padx=0, pady=5, sticky=W)
-        label.config(bg=bgcolor)
         optmenu = OptionMenu(self.lrwindow, self.scaleropt, *list)
         optmenu.grid(column=1, row=0, padx=20, pady=5, sticky=W)
-        optmenu.config(bg=bgcolor)
+        optmenu.config(highlightthickness=0, bg=menucolor, fg=menufgcolor,
+                       activebackground=menuactivecolor, activeforeground=menufgcolor)
+        optmenu['menu'].config(bg=menucolor, fg=menufgcolor,
+                       activebackground=menuactivecolor, activeforeground=menufgcolor)
 
         # Solver options list
         list = ['adam', 'lbfgs', 'sgd']
         self.solver = StringVar()
         self.solver.set('adam')
-        label = Label(self.lrwindow, text='Solver')
+        label = ttk.Label(self.lrwindow, text='Solver', style='Pwr.TLabel')
         label.grid(column=0, row=1, padx=0, pady=5, sticky=W)
-        label.config(bg=bgcolor)
         optmenu = OptionMenu(self.lrwindow, self.solver, *list)
         optmenu.grid(column=1, row=1, padx=20, pady=5, sticky=W)
-        optmenu.config(bg=bgcolor)
+        optmenu.config(highlightthickness=0, bg=menucolor, fg=menufgcolor,
+                       activebackground=menuactivecolor, activeforeground=menufgcolor)
+        optmenu['menu'].config(bg=menucolor, fg=menufgcolor,
+                       activebackground=menuactivecolor, activeforeground=menufgcolor)
 
         # Activation options list
         list = ['identity', 'logistic', 'tanh', 'relu']
         self.activation = StringVar()
         self.activation.set('tanh')
-        label = Label(self.lrwindow, text='Activation')
+        label = ttk.Label(self.lrwindow, text='Activation', style='Pwr.TLabel')
         label.grid(column=0, row=2, padx=0, pady=5, sticky=W)
-        label.config(bg=bgcolor)
         optmenu = OptionMenu(self.lrwindow, self.activation, *list)
         optmenu.grid(column=1, row=2, padx=20, pady=5, sticky=W)
-        optmenu.config(bg=bgcolor)
+        optmenu.config(highlightthickness=0, bg=menucolor, fg=menufgcolor,
+                       activebackground=menuactivecolor, activeforeground=menufgcolor)
+        optmenu['menu'].config(bg=menucolor, fg=menufgcolor,
+                       activebackground=menuactivecolor, activeforeground=menufgcolor)
 
         # Max iter entry
         self.maxiter = IntVar()
-        label = Label(self.lrwindow, text='Max Iterations')
+        label = ttk.Label(self.lrwindow, text='Max Iterations', style='Pwr.TLabel')
         label.grid(column=0, row=3, padx=0, pady=5, sticky=W)
-        label.config(bg=bgcolor)
-        entry = Entry(self.lrwindow, textvariable=self.maxiter, width=8)
+        entry = ttk.Entry(self.lrwindow, textvariable=self.maxiter, width=8, style='Pwr.TEntry')
         self.maxiter.set(20000)
         entry.grid(column=1, row=3, padx=20, pady=5, sticky=W)
-        entry.config(bg=bgcolor)
 
         # Hidden layer sizes entry
-        label = Label(self.lrwindow, text='Hidden Layer Sizes')
+        label = ttk.Label(self.lrwindow, text='Hidden Layer Sizes', style='Pwr.TLabel')
         label.grid(column=0, row=4, padx=0, pady=5, sticky=W)
-        label.config(bg=bgcolor)
 
         self.layersize1 = IntVar()
-        entry = Entry(self.lrwindow, textvariable=self.layersize1, width=4)
+        entry = ttk.Entry(self.lrwindow, textvariable=self.layersize1, width=4, style='Pwr.TEntry')
         self.layersize1.set(20)
         entry.grid(column=1, row=4, padx=20, pady=5, sticky=W)
-        entry.config(bg=bgcolor)
 
         self.layersize2 = IntVar()
-        entry = Entry(self.lrwindow, textvariable=self.layersize2, width=4)
+        entry = ttk.Entry(self.lrwindow, textvariable=self.layersize2, width=4, style='Pwr.TEntry')
         self.layersize2.set(20)
         entry.grid(column=2, row=4, padx=20, pady=5, sticky=W)
-        entry.config(bg=bgcolor)
 
         self.layersize3 = IntVar()
-        entry = Entry(self.lrwindow, textvariable=self.layersize3, width=4)
+        entry = ttk.Entry(self.lrwindow, textvariable=self.layersize3, width=4, style='Pwr.TEntry')
         self.layersize3.set(20)
         entry.grid(column=3, row=4, padx=20, pady=5, sticky=W)
-        entry.config(bg=bgcolor)
 
         self.layersize4 = IntVar()
-        entry = Entry(self.lrwindow, textvariable=self.layersize4, width=4)
+        entry = ttk.Entry(self.lrwindow, textvariable=self.layersize4, width=4, style='Pwr.TEntry')
         self.layersize4.set(0)
         entry.grid(column=4, row=4, padx=20, pady=5, sticky=W)
-        entry.config(bg=bgcolor)
 
         self.layersize5 = IntVar()
-        entry = Entry(self.lrwindow, textvariable=self.layersize5, width=4)
+        entry = ttk.Entry(self.lrwindow, textvariable=self.layersize5, width=4, style='Pwr.TEntry')
         self.layersize5.set(0)
         entry.grid(column=5, row=4, padx=20, pady=5, sticky=W)
-        entry.config(bg=bgcolor)
 
         # alpha entry
-        label = Label(self.lrwindow, text='Alpha')
+        label = ttk.Label(self.lrwindow, text='Alpha', style='Pwr.TLabel')
         label.grid(column=0, row=5, padx=0, pady=5, sticky=W)
-        label.config(bg=bgcolor)
         self.alpha = DoubleVar()
-        entry = Entry(self.lrwindow, textvariable=self.alpha, width=8)
+        entry = ttk.Entry(self.lrwindow, textvariable=self.alpha, width=8, style='Pwr.TEntry')
         self.alpha.set(0.0001)
         entry.grid(column=1, row=5, padx=20, pady=5, sticky=W)
-        entry.config(bg=bgcolor)
 
         # beta_1 entry
-        label = Label(self.lrwindow, text='Beta1')
+        label = ttk.Label(self.lrwindow, text='Beta1', style='Pwr.TLabel')
         label.grid(column=0, row=6, padx=0, pady=5, sticky=W)
-        label.config(bg=bgcolor)
         self.beta1 = DoubleVar()
-        entry = Entry(self.lrwindow, textvariable=self.beta1, width=8)
+        entry = ttk.Entry(self.lrwindow, textvariable=self.beta1, width=8, style='Pwr.TEntry')
         self.beta1.set(0.9)
         entry.grid(column=1, row=6, padx=20, pady=5, sticky=W)
-        entry.config(bg=bgcolor)
 
         # beta_2 entry
-        label = Label(self.lrwindow, text='Beta2')
+        label = ttk.Label(self.lrwindow, text='Beta2', style='Pwr.TLabel')
         label.grid(column=0, row=7, padx=0, pady=5, sticky=W)
-        label.config(bg=bgcolor)
         self.beta2 = DoubleVar()
-        entry = Entry(self.lrwindow, textvariable=self.beta2, width=8)
+        entry = ttk.Entry(self.lrwindow, textvariable=self.beta2, width=8, style='Pwr.TEntry')
         self.beta2.set(0.999)
         entry.grid(column=1, row=7, padx=20, pady=5, sticky=W)
-        entry.config(bg=bgcolor)
 
         # Learning rate options list
         list = ['constant', 'invscaling', 'adaptive']
         self.learningrate = StringVar()
         self.learningrate.set('constant')
-        label = Label(self.lrwindow, text='Learning rate')
+        label = ttk.Label(self.lrwindow, text='Learning rate', style='Pwr.TLabel')
         label.grid(column=0, row=8, padx=0, pady=5, sticky=W)
-        label.config(bg=bgcolor)
         optmenu = OptionMenu(self.lrwindow, self.learningrate, *list)
         optmenu.grid(column=1, row=8, padx=20, pady=5, sticky=W)
-        optmenu.config(bg=bgcolor)
+        optmenu.config(highlightthickness=0, bg=menucolor, fg=menufgcolor,
+                       activebackground=menuactivecolor, activeforeground=menufgcolor)
+        optmenu['menu'].config(bg=menucolor, fg=menufgcolor,
+                       activebackground=menuactivecolor, activeforeground=menufgcolor)
 
         # learning rate init entry
-        label = Label(self.lrwindow, text='Initial learning rate')
+        label = ttk.Label(self.lrwindow, text='Initial learning rate', style='Pwr.TLabel')
         label.grid(column=0, row=9, padx=0, pady=5, sticky=W)
-        label.config(bg=bgcolor)
         self.learningrateinit = DoubleVar()
-        entry = Entry(self.lrwindow, textvariable=self.learningrateinit, width=8)
+        entry = ttk.Entry(self.lrwindow, textvariable=self.learningrateinit, width=8, style='Pwr.TEntry')
         self.learningrateinit.set(0.001)
         entry.grid(column=1, row=9, padx=20, pady=5, sticky=W)
-        entry.config(bg=bgcolor)
 
         # tolerance entry
-        label = Label(self.lrwindow, text='Tolerance')
+        label = ttk.Label(self.lrwindow, text='Tolerance', style='Pwr.TLabel')
         label.grid(column=0, row=10, padx=0, pady=5, sticky=W)
-        label.config(bg=bgcolor)
         self.tol = DoubleVar()
-        entry = Entry(self.lrwindow, textvariable=self.tol, width=8)
+        entry = ttk.Entry(self.lrwindow, textvariable=self.tol, width=8, style='Pwr.TEntry')
         self.tol.set(0.0001)
         entry.grid(column=1, row=10, padx=20, pady=5, sticky=W)
-        entry.config(bg=bgcolor)
 
         # Verbose options list
         list = ['True', 'False']
         self.verbose = StringVar()
         self.verbose.set('True')
-        label = Label(self.lrwindow, text='Verbose')
+        label = ttk.Label(self.lrwindow, text='Verbose', style='Pwr.TLabel')
         label.grid(column=0, row=11, padx=0, pady=5, sticky=W)
-        label.config(bg=bgcolor)
         optmenu = OptionMenu(self.lrwindow, self.verbose, *list)
         optmenu.grid(column=1, row=11, padx=20, pady=5, sticky=W)
-        optmenu.config(bg=bgcolor)
+        optmenu.config(highlightthickness=0, bg=menucolor, fg=menufgcolor,
+                       activebackground=menuactivecolor, activeforeground=menufgcolor)
+        optmenu['menu'].config(bg=menucolor, fg=menufgcolor,
+                       activebackground=menuactivecolor, activeforeground=menufgcolor)
 
 
     # Save menu callback
@@ -1091,20 +1085,20 @@ class WdWindow:
         dia.title('Statistics')
         main.set_icon(dia)
 
-        l = Label(dia, text='Column', bg=bgcolor)
+        l = ttk.Label(dia, text='Column', style='Pwr.TLabel')
         l.grid(column=0, row=0, padx=20, pady=5, sticky=W)
-        l = Label(dia, text='Mean', bg=bgcolor)
+        l = ttk.Label(dia, text='Mean', style='Pwr.TLabel')
         l.grid(column=1, row=0, padx=20, pady=5, sticky=W)
-        l = Label(dia, text='Std', bg=bgcolor)
+        l = ttk.Label(dia, text='Std', style='Pwr.TLabel')
         l.grid(column=2, row=0, padx=20, pady=5, sticky=W)
 
         i = 0
         for col in self.wdata.wdcol:
-            l = Label(dia, text=col, bg=bgcolor)
+            l = ttk.Label(dia, text=col, style='Pwr.TLabel')
             l.grid(column=0, row=i+1, padx=20, pady=5, sticky=W)
-            l = Label(dia, text=str(mean[i]), bg=bgcolor)
+            l = ttk.Label(dia, text=str(mean[i]), style='Pwr.TLabel')
             l.grid(column=1, row=i+1, padx=20, pady=5, sticky=W)
-            l = Label(dia, text=str(std[i]), bg=bgcolor)
+            l = ttk.Label(dia, text=str(std[i]), style='Pwr.TLabel')
             l.grid(column=2, row=i+1, padx=20, pady=5, sticky=W)
             i += 1
 
@@ -1185,25 +1179,25 @@ class WdWindow:
         self.clipdia.title('Clip')
         main.set_icon(self.clipdia)
 
-        defaultmin = StringVar()
-        minlabel = Label(self.clipdia, text='Min', bg=bgcolor)
+        self.defaultmin = StringVar()
+        minlabel = ttk.Label(self.clipdia, text='Min', style='Pwr.TLabel')
         minlabel.grid(column=0, row=0, padx=20, pady=5, sticky=W)
-        self.minentry = Entry(self.clipdia, textvariable=defaultmin, bg=bgcolor)
-        defaultmin.set(str(0))
+        self.minentry = ttk.Entry(self.clipdia, textvariable=self.defaultmin, style='Pwr.TEntry')
+        self.defaultmin.set(str(0))
         self.minentry.grid(column=1, row=0, padx=20, pady=5, sticky=W)
 
         # Max entry
-        defaultmax = StringVar()
-        maxlabel = Label(self.clipdia, text='Max', bg=bgcolor)
+        self.defaultmax = StringVar()
+        maxlabel = ttk.Label(self.clipdia, text='Max', style='Pwr.TLabel')
         maxlabel.grid(column=0, row=1, padx=20, pady=5, sticky=W)
-        self.maxentry = Entry(self.clipdia, textvariable=defaultmax, bg=bgcolor)
-        defaultmax.set(str(self.wdata.rows()))
+        self.maxentry = ttk.Entry(self.clipdia, textvariable=self.defaultmax, style='Pwr.TEntry')
+        self.defaultmax.set(str(self.wdata.rows()))
         self.maxentry.grid(column=1, row=1, padx=20, pady=5, sticky=W)
 
-        readdatabutton = Button(self.clipdia, text="Apply", command=self.clip_action_ok_cb, bg=buttoncolor);
+        readdatabutton = ttk.Button(self.clipdia, text="Apply", command=self.clip_action_ok_cb, style='Pwr.TButton');
         readdatabutton.grid(column=0, row=2, padx=60, pady=20, sticky=W)
 
-        readdatabutton = Button(self.clipdia, text="Cancel", command=self.clip_action_cancel_cb, bg=buttoncolor);
+        readdatabutton = ttk.Button(self.clipdia, text="Cancel", command=self.clip_action_cancel_cb, style='Pwr.TButton');
         readdatabutton.grid(column=1, row=2, padx=60, pady=20, sticky=W)
 
     def clip_action_cancel_cb(self):
@@ -1326,62 +1320,62 @@ class WdWindow:
         self.sel_scale = IntVar()
         self.sel_filter = IntVar()
 
-        checkbox = Checkbutton(self.add_dia, text='Norm', variable=self.sel_norm,
-                               highlightthickness=0, bg=bgcolor)
+        checkbox = ttk.Checkbutton(self.add_dia, text='Norm', variable=self.sel_norm,
+                               style='Pwr.TCheckbutton')
         checkbox.grid(column=0, row=0, padx=20, pady=5, sticky=W)
 
-        checkbox = Checkbutton(self.add_dia, text='Scale', variable=self.sel_scale,
-                               highlightthickness=0, bg=bgcolor)
+        checkbox = ttk.Checkbutton(self.add_dia, text='Scale', variable=self.sel_scale,
+                               style='Pwr.TCheckbutton')
         checkbox.grid(column=0, row=1, padx=20, pady=5, sticky=W)
 
-        checkbox = Checkbutton(self.add_dia, text='Square', variable=self.sel_square,
-                               highlightthickness=0, bg=bgcolor)
+        checkbox = ttk.Checkbutton(self.add_dia, text='Square', variable=self.sel_square,
+                               style='Pwr.TCheckbutton')
         checkbox.grid(column=0, row=2, padx=20, pady=5, sticky=W)
 
-        checkbox = Checkbutton(self.add_dia, text='Squareroot', variable=self.sel_sqrt,
-                               highlightthickness=0, bg=bgcolor)
+        checkbox = ttk.Checkbutton(self.add_dia, text='Squareroot', variable=self.sel_sqrt,
+                               style='Pwr.TCheckbutton')
         checkbox.grid(column=0, row=3, padx=20, pady=5, sticky=W)
 
-        checkbox = Checkbutton(self.add_dia, text='Exp', variable=self.sel_exp,
-                               highlightthickness=0, bg=bgcolor)
+        checkbox = ttk.Checkbutton(self.add_dia, text='Exp', variable=self.sel_exp,
+                               style='Pwr.TCheckbutton')
         checkbox.grid(column=0, row=4, padx=20, pady=5, sticky=W)
 
-        checkbox = Checkbutton(self.add_dia, text='Log', variable=self.sel_log,
-                               highlightthickness=0, bg=bgcolor)
+        checkbox = ttk.Checkbutton(self.add_dia, text='Log', variable=self.sel_log,
+                               style='Pwr.TCheckbutton')
         checkbox.grid(column=0, row=5, padx=20, pady=5, sticky=W)
 
-        checkbox = Checkbutton(self.add_dia, text='Integral', variable=self.sel_integral,
-                               highlightthickness=0, bg=bgcolor)
+        checkbox = ttk.Checkbutton(self.add_dia, text='Integral', variable=self.sel_integral,
+                               style='Pwr.TCheckbutton')
         checkbox.grid(column=0, row=6, padx=20, pady=5, sticky=W)
 
-        checkbox = Checkbutton(self.add_dia, text='Derivate', variable=self.sel_derivate,
-                               highlightthickness=0, bg=bgcolor)
+        checkbox = ttk.Checkbutton(self.add_dia, text='Derivate', variable=self.sel_derivate,
+                               style='Pwr.TCheckbutton')
         checkbox.grid(column=0, row=7, padx=20, pady=5, sticky=W)
 
-        checkbox = Checkbutton(self.add_dia, text='Curve', variable=self.sel_curve,
-                               highlightthickness=0, bg=bgcolor)
+        checkbox = ttk.Checkbutton(self.add_dia, text='Curve', variable=self.sel_curve,
+                               style='Pwr.TCheckbutton')
         checkbox.grid(column=0, row=8, padx=20, pady=5, sticky=W)
-        self.curveentry = Entry(self.add_dia, bg=bgcolor)
+        self.curveentry = ttk.Entry(self.add_dia, style='Pwr.TEntry')
         self.curveentry.grid(column=1, row=8, padx=20, pady=5, sticky=W)
-        button = Button(self.add_dia, text="Browse", command=self.addcol_action_curve_cb, bg=buttoncolor) 
+        button = ttk.Button(self.add_dia, text="Browse", command=self.addcol_action_curve_cb, style='Pwr.TButton') 
         button.grid(column=2, row=8, padx=20, pady=5, sticky=W)
 
-        checkbox = Checkbutton(self.add_dia, text='Shift', variable=self.sel_shift,
-                               highlightthickness=0, bg=bgcolor)
+        checkbox = ttk.Checkbutton(self.add_dia, text='Shift', variable=self.sel_shift,
+                               style='Pwr.TCheckbutton')
         checkbox.grid(column=0, row=9, padx=20, pady=5, sticky=W)
-        self.shiftentry = Entry(self.add_dia, bg=bgcolor)
+        self.shiftentry = ttk.Entry(self.add_dia, style='Pwr.TEntry')
         self.shiftentry.grid(column=1, row=9, padx=20, pady=5, sticky=W)
 
-        checkbox = Checkbutton(self.add_dia, text='Filter', variable=self.sel_filter,
-                               highlightthickness=0, bg=bgcolor)
+        checkbox = ttk.Checkbutton(self.add_dia, text='Filter', variable=self.sel_filter,
+                               style='Pwr.TCheckbutton')
         checkbox.grid(column=0, row=9, padx=20, pady=5, sticky=W)
-        self.filterentry = Entry(self.add_dia, bg=bgcolor)
+        self.filterentry = ttk.Entry(self.add_dia, style='Pwr.TEntry')
         self.filterentry.grid(column=1, row=9, padx=20, pady=5, sticky=W)
 
-        button = Button(self.add_dia, text="Apply", command=self.addcol_action_ok_cb, bg=buttoncolor);
+        button = ttk.Button(self.add_dia, text="Apply", command=self.addcol_action_ok_cb, style='Pwr.TButton');
         button.grid(column=0, row=10, padx=60, pady=20, sticky=W)
 
-        button = Button(self.add_dia, text="Cancel", command=self.addcol_action_cancel_cb, bg=buttoncolor);
+        button = ttk.Button(self.add_dia, text="Cancel", command=self.addcol_action_cancel_cb, style='Pwr.TButton');
         button.grid(column=1, row=10, padx=60, pady=20, sticky=W)
 
     # Add column callback
@@ -1414,96 +1408,96 @@ class WdWindow:
         self.sel_mshift = IntVar()
         self.sel_scale = IntVar()
         self.sel_filter = IntVar()
-        checkbox = Checkbutton(self.add_dia, text='Copy', variable=self.sel_copy,
-                               highlightthickness=0, bg=bgcolor)
+        checkbox = ttk.Checkbutton(self.add_dia, text='Copy', variable=self.sel_copy,
+                               style='Pwr.TCheckbutton')
         checkbox.grid(column=0, row=0, padx=20, pady=5, sticky=W)
         
-        checkbox = Checkbutton(self.add_dia, text='Norm', variable=self.sel_norm,
-                               highlightthickness=0, bg=bgcolor)
+        checkbox = ttk.Checkbutton(self.add_dia, text='Norm', variable=self.sel_norm,
+                               style='Pwr.TCheckbutton')
         checkbox.grid(column=0, row=1, padx=20, pady=5, sticky=W)
 
-        checkbox = Checkbutton(self.add_dia, text='Scale', variable=self.sel_scale,
-                               highlightthickness=0, bg=bgcolor)
+        checkbox = ttk.Checkbutton(self.add_dia, text='Scale', variable=self.sel_scale,
+                               style='Pwr.TCheckbutton')
         checkbox.grid(column=0, row=2, padx=20, pady=5, sticky=W)
 
-        checkbox = Checkbutton(self.add_dia, text='Square', variable=self.sel_square,
-                               highlightthickness=0, bg=bgcolor)
+        checkbox = ttk.Checkbutton(self.add_dia, text='Square', variable=self.sel_square,
+                               style='Pwr.TCheckbutton')
         checkbox.grid(column=0, row=3, padx=20, pady=5, sticky=W)
 
-        checkbox = Checkbutton(self.add_dia, text='Squareroot', variable=self.sel_sqrt,
-                               highlightthickness=0, bg=bgcolor)
+        checkbox = ttk.Checkbutton(self.add_dia, text='Squareroot', variable=self.sel_sqrt,
+                               style='Pwr.TCheckbutton')
         checkbox.grid(column=0, row=4, padx=20, pady=5, sticky=W)
 
-        checkbox = Checkbutton(self.add_dia, text='Exp', variable=self.sel_exp,
-                               highlightthickness=0, bg=bgcolor)
+        checkbox = ttk.Checkbutton(self.add_dia, text='Exp', variable=self.sel_exp,
+                               style='Pwr.TCheckbutton')
         checkbox.grid(column=0, row=5, padx=20, pady=5, sticky=W)
 
-        checkbox = Checkbutton(self.add_dia, text='Log', variable=self.sel_log,
-                               highlightthickness=0, bg=bgcolor)
+        checkbox = ttk.Checkbutton(self.add_dia, text='Log', variable=self.sel_log,
+                               style='Pwr.TCheckbutton')
         checkbox.grid(column=0, row=6, padx=20, pady=5, sticky=W)
 
-        checkbox = Checkbutton(self.add_dia, text='Integral', variable=self.sel_integral,
-                               highlightthickness=0, bg=bgcolor)
+        checkbox = ttk.Checkbutton(self.add_dia, text='Integral', variable=self.sel_integral,
+                               style='Pwr.TCheckbutton')
         checkbox.grid(column=0, row=7, padx=20, pady=5, sticky=W)
 
-        checkbox = Checkbutton(self.add_dia, text='Derivate', variable=self.sel_derivate,
-                               highlightthickness=0, bg=bgcolor)
+        checkbox = ttk.Checkbutton(self.add_dia, text='Derivate', variable=self.sel_derivate,
+                               style='Pwr.TCheckbutton')
         checkbox.grid(column=0, row=8, padx=20, pady=5, sticky=W)
 
-        checkbox = Checkbutton(self.add_dia, text='Add', variable=self.sel_add,
-                               highlightthickness=0, bg=bgcolor)
+        checkbox = ttk.Checkbutton(self.add_dia, text='Add', variable=self.sel_add,
+                               style='Pwr.TCheckbutton')
         checkbox.grid(column=0, row=9, padx=20, pady=5, sticky=W)
 
-        checkbox = Checkbutton(self.add_dia, text='Sub', variable=self.sel_sub,
-                               highlightthickness=0, bg=bgcolor)
+        checkbox = ttk.Checkbutton(self.add_dia, text='Sub', variable=self.sel_sub,
+                               style='Pwr.TCheckbutton')
         checkbox.grid(column=0, row=10, padx=20, pady=5, sticky=W)
 
-        checkbox = Checkbutton(self.add_dia, text='Multiply', variable=self.sel_mul,
-                               highlightthickness=0, bg=bgcolor)
+        checkbox = ttk.Checkbutton(self.add_dia, text='Multiply', variable=self.sel_mul,
+                               style='Pwr.TCheckbutton')
         checkbox.grid(column=0, row=11, padx=20, pady=5, sticky=W)
 
-        checkbox = Checkbutton(self.add_dia, text='Divide', variable=self.sel_div,
-                               highlightthickness=0, bg=bgcolor)
+        checkbox = ttk.Checkbutton(self.add_dia, text='Divide', variable=self.sel_div,
+                               style='Pwr.TCheckbutton')
         checkbox.grid(column=0, row=12, padx=20, pady=5, sticky=W)
 
-        checkbox = Checkbutton(self.add_dia, text='Curve', variable=self.sel_curve,
-                               highlightthickness=0, bg=bgcolor)
+        checkbox = ttk.Checkbutton(self.add_dia, text='Curve', variable=self.sel_curve,
+                               style='Pwr.TCheckbutton')
         checkbox.grid(column=0, row=13, padx=20, pady=5, sticky=W)
-        self.curveentry = Entry(self.add_dia, bg=bgcolor)
+        self.curveentry = ttk.Entry(self.add_dia, style='Pwr.TEntry')
         self.curveentry.grid(column=1, row=13, padx=20, pady=5, sticky=W)
-        button = Button(self.add_dia, text="Browse", command=self.addcol_action_curve_cb, bg=buttoncolor) 
+        button = ttk.Button(self.add_dia, text="Browse", command=self.addcol_action_curve_cb, style='Pwr.TButton') 
         button.grid(column=2, row=13, padx=20, pady=5, sticky=W)
 
-        checkbox = Checkbutton(self.add_dia, text='Constant', variable=self.sel_constant,
-                               highlightthickness=0, bg=bgcolor)
+        checkbox = ttk.Checkbutton(self.add_dia, text='Constant', variable=self.sel_constant,
+                               style='Pwr.TCheckbutton')
         checkbox.grid(column=0, row=14, padx=20, pady=5, sticky=W)
-        self.constantentry = Entry(self.add_dia, bg=bgcolor)
+        self.constantentry = ttk.Entry(self.add_dia, style='Pwr.TEntry')
         self.constantentry.grid(column=1, row=14, padx=20, pady=5, sticky=W)
 
-        checkbox = Checkbutton(self.add_dia, text='Shift', variable=self.sel_shift,
-                               highlightthickness=0, bg=bgcolor)
+        checkbox = ttk.Checkbutton(self.add_dia, text='Shift', variable=self.sel_shift,
+                               style='Pwr.TCheckbutton')
         checkbox.grid(column=0, row=15, padx=20, pady=5, sticky=W)
-        self.shiftentry = Entry(self.add_dia, bg=bgcolor)
+        self.shiftentry = ttk.Entry(self.add_dia, style='Pwr.TEntry')
         self.shiftentry.grid(column=1, row=15, padx=20, pady=5, sticky=W)
         
-        checkbox = Checkbutton(self.add_dia, text='MShift', variable=self.sel_mshift,
-                               highlightthickness=0, bg=bgcolor)
+        checkbox = ttk.Checkbutton(self.add_dia, text='MShift', variable=self.sel_mshift,
+                               style='Pwr.TCheckbutton')
         checkbox.grid(column=0, row=16, padx=20, pady=5, sticky=W)
-        self.mshiftentry = Entry(self.add_dia, bg=bgcolor)
+        self.mshiftentry = ttk.Entry(self.add_dia, style='Pwr.TEntry')
         self.mshiftentry.grid(column=1, row=16, padx=20, pady=5, sticky=W)
-        self.mshiftnumentry = Entry(self.add_dia, bg=bgcolor)
+        self.mshiftnumentry = ttk.Entry(self.add_dia, style='Pwr.TEntry')
         self.mshiftnumentry.grid(column=2, row=16, padx=20, pady=5, sticky=W)
         
-        checkbox = Checkbutton(self.add_dia, text='Filter', variable=self.sel_filter,
-                               highlightthickness=0, bg=bgcolor)
+        checkbox = ttk.Checkbutton(self.add_dia, text='Filter', variable=self.sel_filter,
+                               style='Pwr.TCheckbutton')
         checkbox.grid(column=0, row=15, padx=20, pady=5, sticky=W)
-        self.filterentry = Entry(self.add_dia, bg=bgcolor)
+        self.filterentry = ttk.Entry(self.add_dia, style='Pwr.TEntry')
         self.filterentry.grid(column=1, row=15, padx=20, pady=5, sticky=W)
         
-        button = Button(self.add_dia, text="Apply", command=self.addcol_action_ok_cb, bg=buttoncolor);
+        button = ttk.Button(self.add_dia, text="Apply", command=self.addcol_action_ok_cb, style='Pwr.TButton');
         button.grid(column=0, row=17, padx=60, pady=20, sticky=W)
 
-        button = Button(self.add_dia, text="Cancel", command=self.addcol_action_cancel_cb, bg=buttoncolor);
+        button = ttk.Button(self.add_dia, text="Cancel", command=self.addcol_action_cancel_cb, style='Pwr.TButton');
         button.grid(column=1, row=17, padx=60, pady=20, sticky=W)
 
     def addcol_action_curve_cb(self):
@@ -1781,8 +1775,10 @@ class WdWindow:
     def create_datamenu(self):
 
         # Create menu
-        menubar = Menu(self.window, bg=buttoncolor)
-        filemenu = Menu(menubar, bg=buttoncolor)
+        menubar = Menu(self.window, bg=menucolor, fg=menufgcolor,
+                       activebackground=menuactivecolor, activeforeground=menufgcolor)
+        filemenu = Menu(menubar, bg=menucolor, fg=menufgcolor,
+                        activebackground=menuactivecolor, activeforeground=menufgcolor)
         filemenu.add_command(label='New', command=self.new_action_cb, accelerator='Ctrl+N')
         filemenu.add_command(label='Open', command=self.open_action_cb, accelerator='Ctrl+O')
         filemenu.add_command(label='Import from server', command=self.fetch_sev_cb)
@@ -1797,7 +1793,8 @@ class WdWindow:
         filemenu.add_command(label='Close', command=self.close_action_cb, accelerator='Ctrl+W')
         menubar.add_cascade(label='File', menu=filemenu)
 
-        editmenu = Menu(menubar, bg=buttoncolor)
+        editmenu = Menu(menubar, bg=menucolor, fg=menufgcolor,
+                        activebackground=menuactivecolor, activeforeground=menufgcolor)
         editmenu.add_command(label='Move up', command=self.moveup_action_cb)
         editmenu.add_command(label='Move down', command=self.movedown_action_cb)
         editmenu.add_command(label='Convert column', command=self.convcolumn_action_cb)
@@ -1808,7 +1805,9 @@ class WdWindow:
         editmenu.add_command(label='Multiply', command=self.multiply_action_cb)
         menubar.add_cascade(label='Edit', menu=editmenu)
         
-        viewmenu = Menu(menubar, bg=buttoncolor)
+        viewmenu = Menu(menubar, bg=menucolor, fg=menufgcolor,
+                        activebackground=menuactivecolor, activeforeground=menufgcolor)
+
         viewmenu.add_command(label='Plot common', command=self.plot_action_cb)
         viewmenu.add_command(label='Plot separate', command=self.indplot_action_cb)
         viewmenu.add_command(label='Scatterplot', command=self.scatter_action_cb)
@@ -1819,14 +1818,16 @@ class WdWindow:
         viewmenu.add_command(label='Statistics', command=self.stat_action_cb)
         menubar.add_cascade(label='View', menu=viewmenu)
 
-        functionmenu = Menu(menubar, bg=buttoncolor)
+        functionmenu = Menu(menubar, bg=menucolor, fg=menufgcolor,
+                            activebackground=menuactivecolor, activeforeground=menufgcolor)
         functionmenu.add_command(label='Linear regression', command=self.regrcoef_action_cb)
         functionmenu.add_command(label='Ridge regression', command=self.ridgeregr_action_cb)
         functionmenu.add_command(label='Lasso regression', command=self.lassoregr_action_cb)
         functionmenu.add_command(label='MLP regressor', command=self.mlp_action_cb)
         menubar.add_cascade(label='Functions', menu=functionmenu)
         
-        helpmenu = Menu(menubar, bg=buttoncolor)
+        helpmenu = Menu(menubar, bg=menucolor, fg=menufgcolor,
+                        activebackground=menuactivecolor, activeforeground=menufgcolor)
         helpmenu.add_command(label='Help', command=self.help_action_cb)
         menubar.add_cascade(label='Help', menu=helpmenu)
         self.window.config(menu=menubar)
@@ -1836,56 +1837,56 @@ class WdWindow:
     
     def create_toolbar(self):
     
-        self.toolbar = Frame(self.window, bg=bgcolor, bd=1, relief=RAISED)
+        self.toolbar = ttk.Frame(self.window, style='PwrTool.TFrame')
 
         self.toolbar_plot_img = PhotoImage(file=pwr_exe+"/mvtoolbar_plot.png")
-        button = Button(self.toolbar, image=self.toolbar_plot_img, command=self.plot_action_cb, bg=buttoncolor)
-        wow.Tooltip(button, text='Plot common')
+        button = ttk.Button(self.toolbar, image=self.toolbar_plot_img, command=self.plot_action_cb, style='Pwr.TButton')
+        wow.Tooltip(button, text='Plot common', bg=bgcolor)
         button.pack(side=LEFT, padx=2, pady=2)
 
         self.toolbar_indplot_img = PhotoImage(file=pwr_exe+"/mvtoolbar_indplot.png")
-        button = Button(self.toolbar, image=self.toolbar_indplot_img, command=self.indplot_action_cb, bg=buttoncolor)
-        wow.Tooltip(button, text='Plot separate')
+        button = ttk.Button(self.toolbar, image=self.toolbar_indplot_img, command=self.indplot_action_cb, style='Pwr.TButton')
+        wow.Tooltip(button, text='Plot separate', bg=bgcolor)
         button.pack(side=LEFT, padx=2, pady=2)
 
         self.toolbar_scatterplot_img = PhotoImage(file=pwr_exe+"/mvtoolbar_scatterplot.png")
-        button = Button(self.toolbar, image=self.toolbar_scatterplot_img, command=self.scatter_action_cb, bg=buttoncolor)
-        wow.Tooltip(button, text='Scatterplot')
+        button = ttk.Button(self.toolbar, image=self.toolbar_scatterplot_img, command=self.scatter_action_cb, style='Pwr.TButton')
+        wow.Tooltip(button, text='Scatterplot', bg=bgcolor)
         button.pack(side=LEFT, padx=2, pady=2)
 
         self.toolbar_lrplot_img = PhotoImage(file=pwr_exe+"/mvtoolbar_lrplot.png")
-        button = Button(self.toolbar, image=self.toolbar_lrplot_img, command=self.regr_action_cb, bg=buttoncolor)
-        wow.Tooltip(button, text='Linear regression plot')
+        button = ttk.Button(self.toolbar, image=self.toolbar_lrplot_img, command=self.regr_action_cb, style='Pwr.TButton')
+        wow.Tooltip(button, text='Linear regression plot', bg=bgcolor)
         button.pack(side=LEFT, padx=2, pady=2)
 
         self.toolbar_corr2plot_img = PhotoImage(file=pwr_exe+"/mvtoolbar_corr2plot.png")
-        button = Button(self.toolbar, image=self.toolbar_corr2plot_img, command=self.corr2_action_cb, bg=buttoncolor)
-        wow.Tooltip(button, text='Correlation plot')
+        button = ttk.Button(self.toolbar, image=self.toolbar_corr2plot_img, command=self.corr2_action_cb, style='Pwr.TButton')
+        wow.Tooltip(button, text='Correlation plot', bg=bgcolor)
         button.pack(side=LEFT, padx=2, pady=2)
 
         self.toolbar_up_img = PhotoImage(file=pwr_exe+"/mvtoolbar_up.png")
-        button = Button(self.toolbar, image=self.toolbar_up_img, command=self.moveup_action_cb, bg=buttoncolor)
-        wow.Tooltip(button, text='Move item up')
+        button = ttk.Button(self.toolbar, image=self.toolbar_up_img, command=self.moveup_action_cb, style='Pwr.TButton')
+        wow.Tooltip(button, text='Move item up', bg=bgcolor)
         button.pack(side=LEFT, padx=2, pady=2)
 
         self.toolbar_down_img = PhotoImage(file=pwr_exe+"/mvtoolbar_down.png")
-        button = Button(self.toolbar, image=self.toolbar_down_img, command=self.movedown_action_cb, bg=buttoncolor)
-        wow.Tooltip(button, text='Move item down')
+        button = ttk.Button(self.toolbar, image=self.toolbar_down_img, command=self.movedown_action_cb, style='Pwr.TButton')
+        wow.Tooltip(button, text='Move item down', bg=bgcolor)
         button.pack(side=LEFT, padx=2, pady=2)
 
         self.toolbar_conv_img = PhotoImage(file=pwr_exe+"/mvtoolbar_conv.png")
-        button = Button(self.toolbar, image=self.toolbar_conv_img, command=self.convcolumn_action_cb, bg=buttoncolor)
-        wow.Tooltip(button, text='Convert item')
+        button = ttk.Button(self.toolbar, image=self.toolbar_conv_img, command=self.convcolumn_action_cb, style='Pwr.TButton')
+        wow.Tooltip(button, text='Convert item', bg=bgcolor)
         button.pack(side=LEFT, padx=2, pady=2)
 
         self.toolbar_add_img = PhotoImage(file=pwr_exe+"/mvtoolbar_add.png")
-        button = Button(self.toolbar, image=self.toolbar_add_img, command=self.addcolumn_action_cb, bg=buttoncolor)
-        wow.Tooltip(button, text='Add item')
+        button = ttk.Button(self.toolbar, image=self.toolbar_add_img, command=self.addcolumn_action_cb, style='Pwr.TButton')
+        wow.Tooltip(button, text='Add item', bg=bgcolor)
         button.pack(side=LEFT, padx=2, pady=2)
 
         self.toolbar_delete_img = PhotoImage(file=pwr_exe+"/mvtoolbar_delete.png")
-        button = Button(self.toolbar, image=self.toolbar_delete_img, command=self.deletecolumn_action_cb, bg=buttoncolor)
-        wow.Tooltip(button, text='Delete item')
+        button = ttk.Button(self.toolbar, image=self.toolbar_delete_img, command=self.deletecolumn_action_cb, style='Pwr.TButton')
+        wow.Tooltip(button, text='Delete item', bg=bgcolor)
         button.pack(side=LEFT, padx=2, pady=2)
 
         self.toolbar.pack(side=TOP, fill=X)
@@ -1896,16 +1897,15 @@ class WdWindow:
         if 'startframe' in globals():    
             startframe.pack_forget()
             startframe.destroy()
-        self.dataframe = Frame(self.window, bg=bgcolor)
+        self.dataframe = ttk.Frame(self.window, style='Pwr.TFrame')
 
         # Create dataset label
         if self.wdata.wdcol != None:
             dataset_text = "Dataset " + str(self.wdata.columns()) + " X " + str(self.wdata.rows())
         else:
             dataset_text = ""
-        dataset_label = Label(self.dataframe, text=dataset_text, anchor=NW);
+        dataset_label = ttk.Label(self.dataframe, text=dataset_text, anchor=NW, style='Pwr.TLabel');
         dataset_label.grid(column=0, row=0, padx=40, pady=10, sticky='ew') 
-        dataset_label.config(bg=bgcolor)
 
         if self.wdata.wdcol != None:
             i = 0
@@ -1913,8 +1913,8 @@ class WdWindow:
             for name in self.wdata.wdcol:
                 self.datasel[i] = IntVar()
                 text = self.wdata.wdcol[i] + ' ' + self.wdata.wdname[i]
-                item_checkbox = Checkbutton(self.dataframe, text=text, variable=self.datasel[i], highlightthickness=0,
-                                            bg=bgcolor)
+                item_checkbox = ttk.Checkbutton(self.dataframe, text=text,
+                    variable=self.datasel[i], style='Pwr.TCheckbutton')
                 item_checkbox.grid(column=0, row=i+1, padx=20, pady=5, sticky=W)
                 i = i + 1
 
@@ -1960,8 +1960,8 @@ class FetchSev:
             self.itemframe.pack_forget()
             self.itemframe.destroy()
 
-        self.filterframe = Frame(self.fswindow, bg=bgcolor)
-        defaultserver = StringVar()
+        self.filterframe = ttk.Frame(self.fswindow, style='Pwr.TFrame')
+        self.defaultserver = StringVar()
 
         # Server entry
         # Read last server from file
@@ -1972,24 +1972,20 @@ class FetchSev:
         except IOError:
             srv = ''
 
-        serverlabel = Label(self.filterframe, text='Sev server')
+        serverlabel = ttk.Label(self.filterframe, text='Sev server', style='Pwr.TLabel')
         serverlabel.grid(column=0, row=0, padx=20, pady=5, sticky=W)
-        serverlabel.config(bg=bgcolor)
-        self.serverentry = Entry(self.filterframe, textvariable=defaultserver)
-        defaultserver.set(srv)
+        self.serverentry = ttk.Entry(self.filterframe, textvariable=self.defaultserver, style='Pwr.TEntry')
+        self.defaultserver.set(srv)
         self.serverentry.grid(column=1, row=0, padx=20, pady=5, sticky=W)
-        self.serverentry.config(bg=bgcolor)
 
         # Filter entry
-        filterlabel = Label(self.filterframe, text='Item Filter')
+        filterlabel = ttk.Label(self.filterframe, text='Item Filter', style='Pwr.TLabel')
         filterlabel.grid(column=0, row=1, padx=20, pady=5, sticky=W)
-        filterlabel.config(bg=bgcolor)
-        self.filterentry = Entry(self.filterframe)
+        self.filterentry = ttk.Entry(self.filterframe, style='Pwr.TEntry')
         self.filterentry.grid(column=1, row=1, padx=20, pady=5, sticky=W)
-        self.filterentry.config(bg=bgcolor)
 
         # Fetch items button
-        filterbutton = Button(self.filterframe, text='Fetch Items', command=self.fetchitems_cb, bg=buttoncolor)
+        filterbutton = ttk.Button(self.filterframe, text='Fetch Items', command=self.fetchitems_cb, style='Pwr.TButton')
         filterbutton.grid(column=1, row=2, padx=20, pady=5, sticky=W)
         self.filterframe.pack(side=LEFT, fill=X)
 
@@ -2021,7 +2017,7 @@ class FetchSev:
             tkinter.messagebox.showerror("Error", str(e))
             return
 
-        self.itemframe = Frame(self.fswindow, bg=bgcolor)
+        self.itemframe = ttk.Frame(self.fswindow, style='Pwr.TFrame')
 
         # Scrollbars
         scrollbar = Scrollbar(self.itemframe, orient=VERTICAL)
@@ -2031,60 +2027,52 @@ class FetchSev:
         self.canvas.pack(expand=1, side=LEFT, fill=BOTH)
         self.canvas.xview("moveto", 0)
         self.canvas.yview("moveto", 0)
-        self.iteminnerframe = Frame(self.canvas, bg=bgcolor)
+        self.iteminnerframe = ttk.Frame(self.canvas, style='Pwr.TFrame')
         self.iteminnerframe.bind('<Configure>', self.on_configure)
         self.canvas.create_window(0, 0, window=self.iteminnerframe, anchor=NW)
 
         row = 0
 
-        valframe = Frame(self.iteminnerframe, bg=bgcolor)
+        valframe = ttk.Frame(self.iteminnerframe, style='Pwr.TFrame')
 
         # From entry
-        defaultfrom = StringVar()
-        fromlabel = Label(valframe, text='From')
+        self.defaultfrom = StringVar()
+        fromlabel = ttk.Label(valframe, text='From', style='Pwr.TLabel')
         fromlabel.grid(column=0, row=row, padx=0, pady=5, sticky=W)
-        fromlabel.config(bg=bgcolor)
-        self.fromentry = Entry(valframe, textvariable=defaultfrom)
-        defaultfrom.set('00:05:00')
+        self.fromentry = ttk.Entry(valframe, textvariable=self.defaultfrom, style='Pwr.TEntry')
+        self.defaultfrom.set('00:05:00')
         self.fromentry.grid(column=1, row=row, padx=20, pady=5, sticky=W)
-        self.fromentry.config(bg=bgcolor)
         row += 1
 
         # To entry
-        defaultto = StringVar()
-        tolabel = Label(valframe, text='To')
+        self.defaultto = StringVar()
+        tolabel = ttk.Label(valframe, text='To', style='Pwr.TLabel')
         tolabel.grid(column=0, row=row, padx=0, pady=5, sticky=W)
-        tolabel.config(bg=bgcolor)
-        self.toentry = Entry(valframe, textvariable=defaultto)
-        defaultto.set('now')
+        self.toentry = ttk.Entry(valframe, textvariable=self.defaultto, style='Pwr.TEntry')
+        self.defaultto.set('now')
         self.toentry.grid(column=1, row=row, padx=20, pady=5, sticky=W)
-        self.toentry.config(bg=bgcolor)
         row += 1
 
         # Interval entry
-        defaultinterval = StringVar()
-        intervallabel = Label(valframe, text='Interval')
+        self.defaultinterval = StringVar()
+        intervallabel = ttk.Label(valframe, text='Interval', style='Pwr.TLabel')
         intervallabel.grid(column=0, row=row, padx=0, pady=5, sticky=W)
-        intervallabel.config(bg=bgcolor)
-        self.intervalentry = Entry(valframe, textvariable=defaultinterval)
-        defaultinterval.set('1.0')
+        self.intervalentry = ttk.Entry(valframe, textvariable=self.defaultinterval, style='Pwr.TEntry')
+        self.defaultinterval.set('1.0')
         self.intervalentry.grid(column=1, row=row, padx=20, pady=5, sticky=W)
-        self.intervalentry.config(bg=bgcolor)
         row += 1
 
         # Max rows
-        defaultmax = StringVar()
-        maxlabel = Label(valframe, text='Max')
+        self.defaultmax = StringVar()
+        maxlabel = ttk.Label(valframe, text='Max', style='Pwr.TLabel')
         maxlabel.grid(column=0, row=row, padx=0, pady=5, sticky=W)
-        maxlabel.config(bg=bgcolor)
-        self.maxentry = Entry(valframe, textvariable=defaultmax)
-        defaultmax.set('500')
+        self.maxentry = ttk.Entry(valframe, textvariable=self.defaultmax, style='Pwr.TEntry')
+        self.defaultmax.set('500')
         self.maxentry.grid(column=1, row=row, padx=20, pady=5, sticky=W)
-        self.maxentry.config(bg=bgcolor)
         row += 1
 
 
-        readdatabutton = Button(valframe, text="Read DataSet", command=self.readdata_cb, bg=buttoncolor);
+        readdatabutton = ttk.Button(valframe, text="Read DataSet", command=self.readdata_cb, style='Pwr.TButton');
         readdatabutton.grid(column=0, row=row, padx=0, pady=20, sticky=W)
         row += 1
 
@@ -2100,8 +2088,8 @@ class FetchSev:
                 text = item[0] + "." + item[6]
             else:
                 text = item[0]
-            item_checkbox = Checkbutton(self.iteminnerframe, text=text, variable=self.sel[i], highlightthickness=0,
-                                        bg=bgcolor)
+            item_checkbox = ttk.Checkbutton(self.iteminnerframe, text=text, variable=self.sel[i],
+                                            style='Pwr.TCheckbutton')
             item_checkbox.grid(column=0, row=i+row, padx=20, pady=5, sticky=W)
             i = i + 1
 
@@ -2183,37 +2171,53 @@ class FetchSev:
 file = ''
 formula = ''
 try:
-    opts, args = getopt.getopt(sys.argv[1:], "f:r:", ["--file","--formula"])
+    opts, args = getopt.getopt(sys.argv[1:], "f:r:c:", ["--file","--formula","--colortheme"])
 except getopt.GetoptError:
-    print('sev_analyse.py [-f <file> -r <formula>]')
+    print('sev_analyse.py [-f <file> -r <formula>] -c <colortheme>')
     sys.exit(2)
 
+colortheme = 15
 for opt, arg in opts:
     if opt == "-h":
-        print('sev_analyse.py [-f <file> [-f <formula>]]')
+        print('sev_analyse.py [-f <file>] [-r <formula>] [-c <colortheme>]')
     if opt in ("-f", "--file"):
         file = arg
     if opt in ("-r", "--formula"):
         formula = arg
+    if opt in ("-c", "--colortheme"):
+        colortheme = int(arg)
         
 pwr_exe = os.environ.get('pwr_exe')
 home = os.environ.get('HOME')
+colortheme = wow.colortheme(colortheme)
 bgcolor = 'white'
-buttoncolor = '#F0F0F0'
+fgcolor = 'black'
+menucolor = '#F0F0F0'
+menufgcolor = '#000000'
+menuactivecolor='#DDDDDD'
+
 
 class MvMain:
 
     def __init__(self):
         global window
         global main
+        global bgcolor
+        global fgcolor
+        global menucolor
+        global menufgcolor
+        global menuactivecolor
 
         self.applist = []
         
         # Create window
         main = self
         window = Tk()
+        wow.plotstyle(colortheme)
+        bgcolor, fgcolor, menucolor, menufgcolor, menuactivecolor = wow.style(colortheme)
         window.withdraw()
         wdwindow = WdWindow()
+        
         if file != '':
             wdwindow.read_file(file)
             if formula != '':
@@ -2236,7 +2240,6 @@ class MvMain:
         icon = PhotoImage(file=pwr_exe + '/pwr_icon16.png')
         window.tk.call('wm', 'iconphoto', w._w, icon)
 
-            
 MvMain()
 window.mainloop()
 

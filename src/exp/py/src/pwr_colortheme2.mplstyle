@@ -1,0 +1,38 @@
+# Colortheme Maroon
+
+patch.linewidth: 0.5
+patch.facecolor: 348ABD  # blue
+patch.edgecolor: EEEEEE
+patch.antialiased: True
+
+font.size: 10.0
+text.color: 000000
+
+axes.facecolor: 130B0B # Diagram fill color
+axes.edgecolor: 471800 # Diagram border color
+axes.linewidth: 1
+axes.grid: True
+axes.titlesize: x-large
+axes.labelsize: large
+axes.labelcolor: 000000
+axes.axisbelow: True       # grid/ticks are below elements (e.g., lines, text)
+
+# Curve colors
+# Red, lightblue, green, orange, violett, yellowgreen, yellow, seablue
+axes.prop_cycle: cycler('color', ['FFC1DC', 'ACD6F6', '93FF65', 'FFBB6B', 'FF86FF', 'C4F903', 'FFFF69', '3CFFFF'])
+
+xtick.color: 000000
+xtick.direction: out
+
+ytick.color: 000000
+ytick.direction: out
+
+grid.color: 6E6E6E
+grid.linestyle: -    # solid line
+
+figure.facecolor: DBC3C3 # Background color
+figure.edgecolor: 0.50
+
+legend.facecolor: AAAAAA
+#savefig.facecolor: black
+#savefig.edgecolor: black

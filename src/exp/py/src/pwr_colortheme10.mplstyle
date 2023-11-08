@@ -1,0 +1,38 @@
+# Colortheme AzureContrast
+
+patch.linewidth: 0.5
+patch.facecolor: 348ABD  # blue
+patch.edgecolor: EEEEEE
+patch.antialiased: True
+
+font.size: 10.0
+text.color: 000000
+
+axes.facecolor: 000000 # Diagram fill color
+axes.edgecolor: 000000 # Diagram border color
+axes.linewidth: 1
+axes.grid: True
+axes.titlesize: x-large
+axes.labelsize: large
+axes.labelcolor: 000000
+axes.axisbelow: True       # grid/ticks are below elements (e.g., lines, text)
+
+# Curve colors
+# Yellowgreen, lightblue, green, orange, violett, yellow, red, seablue
+axes.prop_cycle: cycler('color', ['D6FC21', 'ACD6F6', '93FF65', 'FFBB6B', 'FF86FF', 'FFFF69', 'FF8888', '3CFFFF'])
+
+xtick.color: 000000
+xtick.direction: out
+
+ytick.color: 000000
+ytick.direction: out
+
+grid.color: 5E5656
+grid.linestyle: -    # solid line
+
+figure.facecolor: A5D0FB # Background color
+figure.edgecolor: 0.50
+
+legend.facecolor: A5D0FB
+#savefig.facecolor: black
+#savefig.edgecolor: black

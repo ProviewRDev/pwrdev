@@ -2596,11 +2596,13 @@ static int xnav_show_func(void* client_data, void* client_flag)
 	brow_Redraw(xnav->brow->ctx, 0);
       }
       else if (str_NoCaseStrncmp(arg2_str, "ANALYSER", strlen(arg2_str)) == 0) {
-	pwr_tCmd cmd = "sev_analyse.py&";
+	pwr_tCmd cmd;
+	sprintf(cmd, "sev_analyse.py -c %d &", xnav->gbl.color_theme);
 	system(cmd);
       }
       else if (str_NoCaseStrncmp(arg2_str, "EVENTS", strlen(arg2_str)) == 0) {
-	pwr_tCmd cmd = "sev_eva.py&";
+	pwr_tCmd cmd;
+	sprintf(cmd, "sev_eva.py -c %d &", xnav->gbl.color_theme);
 	system(cmd);
       }
       else {

@@ -1,0 +1,38 @@
+# Colortheme Sienna
+
+patch.linewidth: 0.5
+patch.facecolor: 348ABD  # blue
+patch.edgecolor: EEEEEE
+patch.antialiased: True
+
+font.size: 10.0
+text.color: FFCAAB
+
+axes.facecolor: 130B0B # Diagram fill color
+axes.edgecolor: FFCAAB # Diagram border color
+axes.linewidth: 1
+axes.grid: True
+axes.titlesize: x-large
+axes.labelsize: large
+axes.labelcolor: FFCAAB
+axes.axisbelow: True       # grid/ticks are below elements (e.g., lines, text)
+
+# Curve colors
+# Yellow, lightblue, green, orange, violett, yellowgreen, red, seablue
+axes.prop_cycle: cycler('color', ['FED412', 'ACD6F6', '93FF65', 'FFBB6B', 'FF86FF', 'C4F903', 'FF8888', '3CFFFF'])
+
+xtick.color: FFCAAB
+xtick.direction: out
+
+ytick.color: FFCAAB
+ytick.direction: out
+
+grid.color: 4A4747
+grid.linestyle: -    # solid line
+
+figure.facecolor: 641F00 # Background color
+figure.edgecolor: 0.50
+
+legend.facecolor: 641F00
+#savefig.facecolor: black
+#savefig.edgecolor: black

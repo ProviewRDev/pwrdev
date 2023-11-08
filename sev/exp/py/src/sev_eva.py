@@ -41,7 +41,7 @@
 from tkinter import *
 import tkinter.filedialog
 import tkinter.messagebox
-import tkinter.ttk
+from tkinter import ttk
 import sys
 import math
 import time
@@ -260,9 +260,8 @@ class FilterDialog:
         row = 0
         
         # EventType entry
-        eventtypelabel = Label(top, text='EventType')
+        eventtypelabel = ttk.Label(top, text='EventType', style='Pwr.TLabel')
         eventtypelabel.grid(column=0, row=row, padx=0, pady=5, sticky=W)
-        eventtypelabel.config(bg=bgcolor)
 
         typeframe = Frame(top, bg=bgcolor)
         typeframe.grid(column=1, row=row, padx=20, pady=5, sticky=W)
@@ -272,97 +271,79 @@ class FilterDialog:
             self.typesel[i] = IntVar()
             i += 1
         # Ack
-        checkbox = Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_Ack),
-                               variable=self.typesel[0], highlightthickness=0,
-                               bg=bgcolor)
+        checkbox = ttk.Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_Ack),
+                               variable=self.typesel[0], style='Pwr.TCheckbutton')
         checkbox.grid(column=0, row=0, padx=20, pady=5, sticky=W)
         # Block
-        checkbox = Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_Block),
-                               variable=self.typesel[1], highlightthickness=0,
-                               bg=bgcolor)
+        checkbox = ttk.Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_Block),
+                               variable=self.typesel[1], style='Pwr.TCheckbutton')
         checkbox.grid(column=1, row=0, padx=20, pady=5, sticky=W)
         # Cancel
-        checkbox = Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_Cancel),
-                               variable=self.typesel[2], highlightthickness=0,
-                               bg=bgcolor)
+        checkbox = ttk.Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_Cancel),
+                               variable=self.typesel[2], style='Pwr.TCheckbutton')
         checkbox.grid(column=2, row=0, padx=20, pady=5, sticky=W)
         # CancelBlock
-        checkbox = Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_CancelBlock),
-                               variable=self.typesel[3], highlightthickness=0,
-                               bg=bgcolor)
+        checkbox = ttk.Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_CancelBlock),
+                               variable=self.typesel[3], style='Pwr.TCheckbutton')
         checkbox.grid(column=3, row=0, padx=20, pady=5, sticky=W)
         # Missing
-        checkbox = Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_Missing),
-                               variable=self.typesel[4], highlightthickness=0,
-                               bg=bgcolor)
+        checkbox = ttk.Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_Missing),
+                               variable=self.typesel[4], style='Pwr.TCheckbutton')
         checkbox.grid(column=4, row=0, padx=20, pady=5, sticky=W)
         # Reblock
-        checkbox = Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_Reblock),
-                               variable=self.typesel[5], highlightthickness=0,
-                               bg=bgcolor)
+        checkbox = ttk.Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_Reblock),
+                               variable=self.typesel[5], style='Pwr.TCheckbutton')
         checkbox.grid(column=0, row=1, padx=20, pady=5, sticky=W)
         # Return
-        checkbox = Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_Return),
-                               variable=self.typesel[6], highlightthickness=0,
-                               bg=bgcolor)
+        checkbox = ttk.Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_Return),
+                               variable=self.typesel[6], style='Pwr.TCheckbutton')
         checkbox.grid(column=1, row=1, padx=20, pady=5, sticky=W)
         # Unblock
-        checkbox = Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_Unblock),
-                               variable=self.typesel[7], highlightthickness=0,
-                               bg=bgcolor)
+        checkbox = ttk.Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_Unblock),
+                               variable=self.typesel[7], style='Pwr.TCheckbutton')
         checkbox.grid(column=2, row=1, padx=20, pady=5, sticky=W)
         # Info
-        checkbox = Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_Info),
-                               variable=self.typesel[16], highlightthickness=0,
-                               bg=bgcolor)
+        checkbox = ttk.Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_Info),
+                               variable=self.typesel[16], style='Pwr.TCheckbutton')
         checkbox.grid(column=3, row=1, padx=20, pady=5, sticky=W)
         # InfoSuccess
-        checkbox = Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_InfoSuccess),
-                               variable=self.typesel[8], highlightthickness=0,
-                               bg=bgcolor)
+        checkbox = ttk.Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_InfoSuccess),
+                               variable=self.typesel[8], style='Pwr.TCheckbutton')
         checkbox.grid(column=4, row=1, padx=20, pady=5, sticky=W)
         # Alarm
-        checkbox = Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_Alarm),
-                               variable=self.typesel[9], highlightthickness=0,
-                               bg=bgcolor)
+        checkbox = ttk.Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_Alarm),
+                               variable=self.typesel[9], style='Pwr.TCheckbutton')
         checkbox.grid(column=0, row=2, padx=20, pady=5, sticky=W)
         # MantenanceAlarm
-        checkbox = Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_MaintenanceAlarm),
-                               variable=self.typesel[10], highlightthickness=0,
-                               bg=bgcolor)
+        checkbox = ttk.Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_MaintenanceAlarm),
+                               variable=self.typesel[10], style='Pwr.TCheckbutton')
         checkbox.grid(column=1, row=2, padx=20, pady=5, sticky=W)
         # SystemAlarm
-        checkbox = Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_SystemAlarm),
-                               variable=self.typesel[11], highlightthickness=0,
-                               bg=bgcolor)
+        checkbox = ttk.Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_SystemAlarm),
+                               variable=self.typesel[11], style='Pwr.TCheckbutton')
         checkbox.grid(column=2, row=2, padx=20, pady=5, sticky=W)
         # UserAlarm1
-        checkbox = Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_UserAlarm1),
-                               variable=self.typesel[12], highlightthickness=0,
-                               bg=bgcolor)
+        checkbox = ttk.Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_UserAlarm1),
+                               variable=self.typesel[12], style='Pwr.TCheckbutton')
         checkbox.grid(column=3, row=2, padx=20, pady=5, sticky=W)
         # UserAlarm2
-        checkbox = Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_UserAlarm2),
-                               variable=self.typesel[13], highlightthickness=0,
-                               bg=bgcolor)
+        checkbox = ttk.Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_UserAlarm2),
+                               variable=self.typesel[13], style='Pwr.TCheckbutton')
         checkbox.grid(column=4, row=2, padx=20, pady=5, sticky=W)
         # UserAlarm3
-        checkbox = Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_UserAlarm3),
-                               variable=self.typesel[14], highlightthickness=0,
-                               bg=bgcolor)
+        checkbox = ttk.Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_UserAlarm3),
+                               variable=self.typesel[14], style='Pwr.TCheckbutton')
         checkbox.grid(column=0, row=3, padx=20, pady=5, sticky=W)
         # UserAlarm4
-        checkbox = Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_UserAlarm4),
-                               variable=self.typesel[15], highlightthickness=0,
-                               bg=bgcolor)
+        checkbox = ttk.Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_UserAlarm4),
+                               variable=self.typesel[15], style='Pwr.TCheckbutton')
         checkbox.grid(column=1, row=3, padx=20, pady=5, sticky=W)
         row += 4
 
         
         # EventPrio entry
-        eventpriolabel = Label(top, text='EventPrio')
+        eventpriolabel = ttk.Label(top, text='EventPrio', style='Pwr.TLabel')
         eventpriolabel.grid(column=0, row=row, padx=0, pady=5, sticky=W)
-        eventpriolabel.config(bg=bgcolor)
 
         prioframe = Frame(top, bg=bgcolor)
         prioframe.grid(column=1, row=row, padx=20, pady=5, sticky=W)
@@ -370,54 +351,46 @@ class FilterDialog:
         i = 0
         self.priosel = [None] * 4
         self.priosel[i] = IntVar()
-        checkbox = Checkbutton(prioframe, text=Ev.eventprio_to_str(Ev.eEventPrio_A),
-                               variable=self.priosel[0], highlightthickness=0,
-                               bg=bgcolor)
+        checkbox = ttk.Checkbutton(prioframe, text=Ev.eventprio_to_str(Ev.eEventPrio_A),
+                               variable=self.priosel[0], style='Pwr.TCheckbutton')
         checkbox.grid(column=0, row=0, padx=20, pady=5, sticky=W)
         i += 1
         self.priosel[i] = IntVar()
-        checkbox = Checkbutton(prioframe, text=Ev.eventprio_to_str(Ev.eEventPrio_B),
-                               variable=self.priosel[1], highlightthickness=0,
-                               bg=bgcolor)
+        checkbox = ttk.Checkbutton(prioframe, text=Ev.eventprio_to_str(Ev.eEventPrio_B),
+                               variable=self.priosel[1], style='Pwr.TCheckbutton')
         checkbox.grid(column=1, row=0, padx=20, pady=5, sticky=W)
         i += 1
         self.priosel[i] = IntVar()
-        checkbox = Checkbutton(prioframe, text=Ev.eventprio_to_str(Ev.eEventPrio_C),
-                               variable=self.priosel[2], highlightthickness=0,
-                               bg=bgcolor)
+        checkbox = ttk.Checkbutton(prioframe, text=Ev.eventprio_to_str(Ev.eEventPrio_C),
+                               variable=self.priosel[2], style='Pwr.TCheckbutton')
         checkbox.grid(column=2, row=0, padx=20, pady=5, sticky=W)
         i += 1
         self.priosel[i] = IntVar()
-        checkbox = Checkbutton(prioframe, text=Ev.eventprio_to_str(Ev.eEventPrio_D),
-                               variable=self.priosel[3], highlightthickness=0,
-                               bg=bgcolor)
+        checkbox = ttk.Checkbutton(prioframe, text=Ev.eventprio_to_str(Ev.eEventPrio_D),
+                               variable=self.priosel[3], style='Pwr.TCheckbutton')
         checkbox.grid(column=3, row=0, padx=20, pady=5, sticky=W)
         i += 1
 
         # EventText
         defaulteventtext = StringVar()
-        eventtextlabel = Label(top, text='EventText')
+        eventtextlabel = ttk.Label(top, text='EventText', style='Pwr.TLabel')
         eventtextlabel.grid(column=0, row=row, padx=0, pady=5, sticky=W)
-        eventtextlabel.config(bg=bgcolor)
-        self.eventtextentry = Entry(top, textvariable=defaulteventtext)
+        self.eventtextentry = ttk.Entry(top, textvariable=defaulteventtext, style='Pwr.TEntry')
         self.eventtextentry.grid(column=1, row=row, padx=20, pady=5, sticky=W)
-        self.eventtextentry.config(bg=bgcolor)
         row += 1
 
         # EventName
         defaulteventname = StringVar()
-        eventnamelabel = Label(top, text='EventName')
+        eventnamelabel = ttk.Label(top, text='EventName', style='Pwr.TLabel')
         eventnamelabel.grid(column=0, row=row, padx=0, pady=5, sticky=W)
-        eventnamelabel.config(bg=bgcolor)
-        self.eventnameentry = Entry(top, textvariable=defaulteventname)
+        self.eventnameentry = ttk.Entry(top, textvariable=defaulteventname, style='Pwr.TEntry')
         self.eventnameentry.grid(column=1, row=row, padx=20, pady=5, sticky=W)
-        self.eventnameentry.config(bg=bgcolor)
         row += 1
 
-        button = Button(top, text="Ok", command=self.ok_cb, width=10)
+        button = ttk.Button(top, text="Ok", command=self.ok_cb, width=10, style='Pwr.TButton')
         button.grid(column=0, row=row, padx=10, pady=5, sticky=W)
     
-        button = Button(top, text="Cancel", command=self.cancel_cb, width=10)
+        button = ttk.Button(top, text="Cancel", command=self.cancel_cb, width=10, style='Pwr.TButton')
         button.grid(column=1, row=row, padx=10, pady=5, sticky=W)
     
 
@@ -452,20 +425,20 @@ class ValueDialog:
 
         self.top.title(title)
 
-        label = Label(top, text=text)
+        label = ttk.Label(top, text=text, style='Pwr.TLabel')
         label.grid(column=0, row=0, padx=10, pady=5, sticky=W)
 
-        defaultvalue = StringVar()
-        self.entry = Entry(top, width=25, textvariable=defaultvalue)
+        self.defaultvalue = StringVar()
+        self.entry = ttk.Entry(top, width=25, textvariable=self.defaultvalue, style='Pwr.TEntry')
+        self.defaultvalue.set(defaultstr)
         self.entry.grid(column=1, row=0, padx=10, pady=5, sticky=W)
-        defaultvalue.set(defaultstr)
         self.entry.focus()
         self.value_cb = value_cb
 
-        button = Button(top, text="Ok", command=self.ok_cb, width=10)
+        button = ttk.Button(top, text="Ok", command=self.ok_cb, width=10, style='Pwr.TButton')
         button.grid(column=0, row=1, padx=10, pady=5, sticky=W)
     
-        button = Button(top, text="Cancel", command=self.cancel_cb, width=10)
+        button = ttk.Button(top, text="Cancel", command=self.cancel_cb, width=10, style='Pwr.TButton')
         button.grid(column=1, row=1, padx=10, pady=5, sticky=W)
 
         self.top.bind('<Return>', self.ok_cb)
@@ -494,7 +467,7 @@ class SelectDialog:
         for item in itemlist:
             self.listbox.insert(END, item)
             
-        button = Button(self.window, text='Ok', command=self.ok_cb, bg=buttoncolor).grid(row=1, column=0)
+        button = ttk.Button(self.window, text='Ok', command=self.ok_cb, style='Pwr.TButton').grid(row=1, column=0)
 
     def ok_cb(self): 
         idx = self.listbox.curselection()
@@ -687,40 +660,39 @@ class TrendHistogram:
         self.trenddia.title('TrendHistogram')
         main.set_icon(self.trenddia)
 
-        defaultmin = StringVar()
-        minlabel = Label(self.trenddia, text='From', bg=bgcolor)
+        self.defaultmin = StringVar()
+        minlabel = ttk.Label(self.trenddia, text='From', style='Pwr.TLabel')
         minlabel.grid(column=0, row=0, padx=20, pady=5, sticky=W)
-        self.minentry = Entry(self.trenddia, textvariable=defaultmin, width=25, bg=bgcolor)
-        defaultmin.set(str(self.wdata.wd['Time'][0]))
+        self.minentry = ttk.Entry(self.trenddia, textvariable=self.defaultmin, width=25, style='Pwr.TEntry')
+        self.defaultmin.set(str(self.wdata.wd['Time'][0]))
         self.minentry.grid(column=1, row=0, padx=20, pady=5, sticky=W)
 
         # Max entry
-        defaultmax = StringVar()
-        maxlabel = Label(self.trenddia, text='To', bg=bgcolor)
+        self.defaultmax = StringVar()
+        maxlabel = ttk.Label(self.trenddia, text='To', style='Pwr.TLabel')
         maxlabel.grid(column=0, row=1, padx=20, pady=5, sticky=W)
-        self.maxentry = Entry(self.trenddia, textvariable=defaultmax, width=25, bg=bgcolor)
-        defaultmax.set(str(self.wdata.wd['Time'][len(self.wdata.wd)-1]))
+        self.maxentry = ttk.Entry(self.trenddia, textvariable=self.defaultmax, width=25, style='Pwr.TEntry')
+        self.defaultmax.set(str(self.wdata.wd['Time'][len(self.wdata.wd)-1]))
         self.maxentry.grid(column=1, row=1, padx=20, pady=5, sticky=W)
 
         # Bins
-        defaultbins = StringVar()
-        binslabel = Label(self.trenddia, text='Number of bins', bg=bgcolor)
+        self.defaultbins = StringVar()
+        binslabel = ttk.Label(self.trenddia, text='Number of bins', style='Pwr.TLabel')
         binslabel.grid(column=0, row=2, padx=20, pady=5, sticky=W)
-        self.binsentry = Entry(self.trenddia, textvariable=defaultbins, width=25, bg=bgcolor)
-        defaultbins.set(str(100))
+        self.binsentry = ttk.Entry(self.trenddia, textvariable=self.defaultbins, width=25, style='Pwr.TEntry')
+        self.defaultbins.set(str(100))
         self.binsentry.grid(column=1, row=2, padx=20, pady=5, sticky=W)
 
         # All events
         self.all_events = IntVar()
-        checkbox = Checkbutton(self.trenddia, text='All events',
-                               variable=self.all_events, highlightthickness=0,
-                               bg=bgcolor)
+        checkbox = ttk.Checkbutton(self.trenddia, text='All events',
+                               variable=self.all_events, style='Pwr.TCheckbutton')
         checkbox.grid(column=0, row=3, padx=20, pady=5, sticky=W)
 
-        readdatabutton = Button(self.trenddia, text="Apply", command=self.trend_action_ok_cb, bg=buttoncolor);
+        readdatabutton = ttk.Button(self.trenddia, text="Apply", command=self.trend_action_ok_cb, style='Pwr.TButton');
         readdatabutton.grid(column=0, row=4, padx=60, pady=20, sticky=W)
 
-        readdatabutton = Button(self.trenddia, text="Cancel", command=self.trend_action_cancel_cb, bg=buttoncolor);
+        readdatabutton = ttk.Button(self.trenddia, text="Cancel", command=self.trend_action_cancel_cb, style='Pwr.TButton');
         readdatabutton.grid(column=1, row=4, padx=60, pady=20, sticky=W)
 
     def trend_action_cancel_cb(self):
@@ -806,14 +778,14 @@ class FrequencyHistogram:
         axdisplay = plt.axes([0.580, 0.01, 0.1, 0.05])
         axname = plt.axes([0.700, 0.01, 0.1, 0.05])
         axtext = plt.axes([0.825, 0.01, 0.1, 0.05])
-        bprev = matplotlib.widgets.Button(axprev, 'Previous')
+        bprev = matplotlib.widgets.Button(axprev, 'Previous', color=bgcolor, hovercolor=bgcolor)
         bprev.on_clicked(self.bprev_cb)
-        bnext = matplotlib.widgets.Button(axnext, 'Next')
+        bnext = matplotlib.widgets.Button(axnext, 'Next', color=bgcolor, hovercolor=bgcolor)
         bnext.on_clicked(self.bnext_cb)
         bdisplay = matplotlib.widgets.Button(axdisplay, 'Display', color=bgcolor, hovercolor=bgcolor)
-        bname = matplotlib.widgets.Button(axname, 'Name')
+        bname = matplotlib.widgets.Button(axname, 'Name', color=bgcolor, hovercolor=bgcolor)
         bname.on_clicked(self.bname_cb)
-        btext = matplotlib.widgets.Button(axtext, 'Text')
+        btext = matplotlib.widgets.Button(axtext, 'Text', color=bgcolor, hovercolor=bgcolor)
         btext.on_clicked(self.btext_cb)
         axrows = plt.axes([0.25, 0.01, 0.1, 0.05])
         self.brows = matplotlib.widgets.Button(axrows, '', color=bgcolor, hovercolor=bgcolor)
@@ -1114,7 +1086,7 @@ class WdWindow:
         dia.geometry("1145x700")
         main.set_icon(dia)
 
-        tree = tkinter.ttk.Treeview(dia)
+        tree = ttk.Treeview(dia, style='Pwr.Treeview')
         tree.pack(expand=1, anchor=W, side=LEFT, fill=BOTH)
 
         tree["columns"] = ("Frequency", "Type", "Prio", "Text", "Name", "SupObject")
@@ -1134,7 +1106,7 @@ class WdWindow:
         tree.heading("#4", text="Name", anchor=W)
         tree.heading("#5", text="SupObject", anchor=W)
 
-        scroll = tkinter.ttk.Scrollbar(dia, orient="vertical", command=tree.yview)
+        scroll = ttk.Scrollbar(dia, orient="vertical", command=tree.yview)
         scroll.pack(anchor=E, expand=1, side=RIGHT, fill=Y)
 
         i = 0
@@ -1254,25 +1226,25 @@ class WdWindow:
         self.clipdia.title('Clip')
         main.set_icon(self.clipdia)
 
-        defaultmin = StringVar()
-        minlabel = Label(self.clipdia, text='From', bg=bgcolor)
+        self.defaultmin = StringVar()
+        minlabel = ttk.Label(self.clipdia, text='From', style='Pwr.TLabel')
         minlabel.grid(column=0, row=0, padx=20, pady=5, sticky=W)
-        self.minentry = Entry(self.clipdia, textvariable=defaultmin, width=25, bg=bgcolor)
-        defaultmin.set(str(self.wdata.wd['Time'][len(self.wdata.wd)-1]))
+        self.minentry = ttk.Entry(self.clipdia, textvariable=self.defaultmin, width=25, style='Pwr.TEntry')
+        self.defaultmin.set(str(self.wdata.wd['Time'][len(self.wdata.wd)-1]))
         self.minentry.grid(column=1, row=0, padx=20, pady=5, sticky=W)
 
         # Max entry
-        defaultmax = StringVar()
-        maxlabel = Label(self.clipdia, text='To', bg=bgcolor)
+        self.defaultmax = StringVar()
+        maxlabel = ttk.Label(self.clipdia, text='To', style='Pwr.TLabel')
         maxlabel.grid(column=0, row=1, padx=20, pady=5, sticky=W)
-        self.maxentry = Entry(self.clipdia, textvariable=defaultmax, width=25, bg=bgcolor)
-        defaultmax.set(str(self.wdata.wd['Time'][0]))
+        self.maxentry = ttk.Entry(self.clipdia, textvariable=self.defaultmax, width=25, style='Pwr.TEntry')
+        self.defaultmax.set(str(self.wdata.wd['Time'][0]))
         self.maxentry.grid(column=1, row=1, padx=20, pady=5, sticky=W)
 
-        readdatabutton = Button(self.clipdia, text="Apply", command=self.clip_action_ok_cb, bg=buttoncolor);
+        readdatabutton = ttk.Button(self.clipdia, text="Apply", command=self.clip_action_ok_cb, style='Pwr.TButton');
         readdatabutton.grid(column=0, row=2, padx=60, pady=20, sticky=W)
 
-        readdatabutton = Button(self.clipdia, text="Cancel", command=self.clip_action_cancel_cb, bg=buttoncolor);
+        readdatabutton = ttk.Button(self.clipdia, text="Cancel", command=self.clip_action_cancel_cb, style='Pwr.TButton');
         readdatabutton.grid(column=1, row=2, padx=60, pady=20, sticky=W)
 
     def clip_action_cancel_cb(self):
@@ -1535,8 +1507,10 @@ class WdWindow:
     def create_datamenu(self):
 
         # Create menu
-        menubar = Menu(self.window, bg=buttoncolor)
-        filemenu = Menu(menubar, bg=buttoncolor)
+        menubar = Menu(self.window, bg=menucolor, fg=menufgcolor,
+                        activebackground=menuactivecolor, activeforeground=menufgcolor)
+        filemenu = Menu(menubar, bg=menucolor, fg=menufgcolor,
+                        activebackground=menuactivecolor, activeforeground=menufgcolor)
         filemenu.add_command(label='New', command=self.new_action_cb, accelerator='Ctrl+N')
         filemenu.add_command(label='Open', command=self.open_action_cb, accelerator='Ctrl+O')
         filemenu.add_command(label='Import from server', command=self.fetch_sev_cb)
@@ -1547,7 +1521,8 @@ class WdWindow:
         filemenu.add_command(label='Close', command=self.close_action_cb, accelerator='Ctrl+W')
         menubar.add_cascade(label='File', menu=filemenu)
 
-        editmenu = Menu(menubar, bg=buttoncolor)
+        editmenu = Menu(menubar, bg=menucolor, fg=menufgcolor,
+                        activebackground=menuactivecolor, activeforeground=menufgcolor)
         editmenu.add_command(label='Search', command=self.search_action_cb, accelerator='Ctrl+F')
         editmenu.add_command(label='Search Next', command=self.searchnext_action_cb, accelerator='Ctrl+G')
         editmenu.add_command(label='Search Previous', command=self.searchprev_action_cb, accelerator='Shift+Ctrl+G')
@@ -1559,7 +1534,8 @@ class WdWindow:
         editmenu.add_command(label='Previous', command=self.previous_action_cb)
         menubar.add_cascade(label='Edit', menu=editmenu)
         
-        viewmenu = Menu(menubar, bg=buttoncolor)
+        viewmenu = Menu(menubar, bg=menucolor, fg=menufgcolor,
+                        activebackground=menuactivecolor, activeforeground=menufgcolor)
         viewmenu.add_command(label='Event frequency table', command=self.frequency_table_action_cb)
         viewmenu.add_command(label='Event frequency histogram', command=self.frequency_histogram_action_cb)
         viewmenu.add_command(label='Trend histogram', command=self.trend_histogram_action_cb)
@@ -1567,7 +1543,8 @@ class WdWindow:
         viewmenu.add_command(label='Number of not returned alarms plot', command=self.alarmplot_notret_action_cb)
         menubar.add_cascade(label='View', menu=viewmenu)
 
-        helpmenu = Menu(menubar, bg=buttoncolor)
+        helpmenu = Menu(menubar, bg=menucolor, fg=menufgcolor,
+                        activebackground=menuactivecolor, activeforeground=menufgcolor)
         helpmenu.add_command(label='Help', command=self.help_action_cb)
         menubar.add_cascade(label='Help', menu=helpmenu)
         self.window.config(menu=menubar)
@@ -1583,43 +1560,43 @@ class WdWindow:
         self.toolbar = Frame(self.window, bg=bgcolor, bd=1, relief=RAISED)
 
         self.toolbar_revert_img = PhotoImage(file=pwr_exe+"/evatoolbar_revert.png")
-        button = Button(self.toolbar, image=self.toolbar_revert_img, command=self.revert_action_cb, bg=buttoncolor)
-        wow.Tooltip(button, text='Revert')
+        button = ttk.Button(self.toolbar, image=self.toolbar_revert_img, command=self.revert_action_cb, style='Pwr.TButton')
+        wow.Tooltip(button, text='Revert', bg=bgcolor)
         button.pack(side=LEFT, padx=2, pady=2)
 
         self.toolbar_prev_img = PhotoImage(file=pwr_exe+"/evatoolbar_prev.png")
-        button = Button(self.toolbar, image=self.toolbar_prev_img, command=self.previous_action_cb, bg=buttoncolor)
-        wow.Tooltip(button, text='Back')
+        button = ttk.Button(self.toolbar, image=self.toolbar_prev_img, command=self.previous_action_cb, style='Pwr.TButton')
+        wow.Tooltip(button, text='Back', bg=bgcolor)
         button.pack(side=LEFT, padx=2, pady=2)
 
         self.toolbar_crop_img = PhotoImage(file=pwr_exe+"/evatoolbar_crop.png")
-        button = Button(self.toolbar, image=self.toolbar_crop_img, command=self.clip_select_action_cb, bg=buttoncolor)
-        wow.Tooltip(button, text='Crop not selected')
+        button = ttk.Button(self.toolbar, image=self.toolbar_crop_img, command=self.clip_select_action_cb, style='Pwr.TButton')
+        wow.Tooltip(button, text='Crop not selected', bg=bgcolor)
         button.pack(side=LEFT, padx=2, pady=2)
 
         self.toolbar_filter_img = PhotoImage(file=pwr_exe+"/evatoolbar_filter.png")
-        button = Button(self.toolbar, image=self.toolbar_filter_img, command=self.filter_action_cb, bg=buttoncolor)
-        wow.Tooltip(button, text='Filter')
+        button = ttk.Button(self.toolbar, image=self.toolbar_filter_img, command=self.filter_action_cb, style='Pwr.TButton')
+        wow.Tooltip(button, text='Filter', bg=bgcolor)
         button.pack(side=LEFT, padx=2, pady=2)
 
         self.toolbar_filteralarms_img = PhotoImage(file=pwr_exe+"/evatoolbar_filteralarms.png")
-        button = Button(self.toolbar, image=self.toolbar_filteralarms_img, command=self.filteralarms_action_cb, bg=buttoncolor)
-        wow.Tooltip(button, text='Alarm and info message filter')
+        button = ttk.Button(self.toolbar, image=self.toolbar_filteralarms_img, command=self.filteralarms_action_cb, style='Pwr.TButton')
+        wow.Tooltip(button, text='Alarm and info message filter', bg=bgcolor)
         button.pack(side=LEFT, padx=2, pady=2)
 
         self.toolbar_filtersup_img = PhotoImage(file=pwr_exe+"/evatoolbar_filtersup.png")
-        button = Button(self.toolbar, image=self.toolbar_filtersup_img, command=self.filteronsupobject_action_cb, bg=buttoncolor)
-        wow.Tooltip(button, text='SupObject filter')
+        button = ttk.Button(self.toolbar, image=self.toolbar_filtersup_img, command=self.filteronsupobject_action_cb, style='Pwr.TButton')
+        wow.Tooltip(button, text='SupObject filter', bg=bgcolor)
         button.pack(side=LEFT, padx=2, pady=2)
 
         self.toolbar_plot_img = PhotoImage(file=pwr_exe+"/evatoolbar_plot.png")
-        button = Button(self.toolbar, image=self.toolbar_plot_img, command=self.alarmplot_notret_action_cb, bg=buttoncolor)
-        wow.Tooltip(button, text='Number of not returned alarms plot')
+        button = ttk.Button(self.toolbar, image=self.toolbar_plot_img, command=self.alarmplot_notret_action_cb, style='Pwr.TButton')
+        wow.Tooltip(button, text='Number of not returned alarms plot', bg=bgcolor)
         button.pack(side=LEFT, padx=2, pady=2)
 
         self.toolbar_frequencyplot_img = PhotoImage(file=pwr_exe+"/evatoolbar_frequencyplot.png")
-        button = Button(self.toolbar, image=self.toolbar_frequencyplot_img, command=self.frequency_histogram_action_cb, bg=buttoncolor)
-        wow.Tooltip(button, text='Event frequency histogram')
+        button = ttk.Button(self.toolbar, image=self.toolbar_frequencyplot_img, command=self.frequency_histogram_action_cb, style='Pwr.TButton')
+        wow.Tooltip(button, text='Event frequency histogram', bg=bgcolor)
         button.pack(side=LEFT, padx=2, pady=2)
 
         self.toolbar.pack(side=TOP, fill=X)
@@ -1635,8 +1612,8 @@ class WdWindow:
             startframe.destroy()
         self.dataframe = Frame(self.window, bg=bgcolor)
 
-        rowslabel = Label(self.dataframe, text='Dataset ' + str(len(self.wdata.wd)) + ' rows',
-                          bg=bgcolor)
+        rowslabel = ttk.Label(self.dataframe, text='Dataset ' + str(len(self.wdata.wd)) + ' rows',
+                              style='Pwr.TLabel')
         rowslabel.pack()
 
         self.img_evred = PhotoImage(file=pwr_exe+"/eva_evred.png")
@@ -1659,7 +1636,7 @@ class WdWindow:
         self.img_evunblock = PhotoImage(file=pwr_exe+"/eva_evunblock.png")
         self.img_evnone = PhotoImage(file=pwr_exe+"/eva_evnone.png")
 
-        self.tree = tkinter.ttk.Treeview(self.dataframe)
+        self.tree = ttk.Treeview(self.dataframe, style='Pwr.Treeview')
         self.tree.pack(expand=1, anchor=W, side=LEFT, fill=BOTH)
 
         self.tree["columns"] = ("Type", "Prio", "Text", "Name", "SupObject", "Id", "Status")
@@ -1682,7 +1659,7 @@ class WdWindow:
         self.tree.heading("#6", text="Id", anchor=W)
         self.tree.heading("#7", text="Status", anchor=W)
 
-        scroll = tkinter.ttk.Scrollbar(self.dataframe, orient="vertical", command=self.tree.yview)
+        scroll = ttk.Scrollbar(self.dataframe, orient="vertical", command=self.tree.yview)
         scroll.pack(anchor=E, expand=1, side=RIGHT, fill=Y)
 
         j = 0
@@ -1789,7 +1766,7 @@ class FetchSev:
             self.itemframe.destroy()
 
         self.filterframe = Frame(self.fswindow, bg=bgcolor)
-        defaultserver = StringVar()
+        self.defaultserver = StringVar()
 
         # Server entry
         # Read last server from file
@@ -1800,24 +1777,20 @@ class FetchSev:
         except IOError:
             srv = ''
 
-        serverlabel = Label(self.filterframe, text='Sev server')
+        serverlabel = ttk.Label(self.filterframe, text='Sev server', style='Pwr.TLabel')
         serverlabel.grid(column=0, row=0, padx=20, pady=5, sticky=W)
-        serverlabel.config(bg=bgcolor)
-        self.serverentry = Entry(self.filterframe, textvariable=defaultserver)
-        defaultserver.set(srv)
+        self.serverentry = ttk.Entry(self.filterframe, textvariable=self.defaultserver, style='Pwr.TEntry')
+        self.defaultserver.set(srv)
         self.serverentry.grid(column=1, row=0, padx=20, pady=5, sticky=W)
-        self.serverentry.config(bg=bgcolor)
 
         # Filter entry
-        filterlabel = Label(self.filterframe, text='Item Filter')
+        filterlabel = ttk.Label(self.filterframe, text='Item Filter', style='Pwr.TLabel')
         filterlabel.grid(column=0, row=1, padx=20, pady=5, sticky=W)
-        filterlabel.config(bg=bgcolor)
-        self.filterentry = Entry(self.filterframe)
+        self.filterentry = ttk.Entry(self.filterframe, style='Pwr.TEntry')
         self.filterentry.grid(column=1, row=1, padx=20, pady=5, sticky=W)
-        self.filterentry.config(bg=bgcolor)
 
         # Fetch items button
-        filterbutton = Button(self.filterframe, text='Fetch Items', command=self.fetchitems_cb, bg=buttoncolor)
+        filterbutton = ttk.Button(self.filterframe, text='Fetch Items', command=self.fetchitems_cb, style='Pwr.TButton')
         filterbutton.grid(column=1, row=2, padx=20, pady=5, sticky=W)
         self.filterframe.pack(side=LEFT, fill=X)
 
@@ -1852,7 +1825,7 @@ class FetchSev:
         self.itemframe = Frame(self.fswindow, bg=bgcolor)
 
         # Scrollbars
-        scrollbar = Scrollbar(self.itemframe, orient=VERTICAL)
+        scrollbar = ttk.Scrollbar(self.itemframe, orient=VERTICAL)
         self.canvas = Canvas(self.itemframe, bd= 0, bg=bgcolor, yscrollcommand=scrollbar.set)
         scrollbar.config(command=self.canvas.yview)
         scrollbar.pack(side=RIGHT, fill=Y)
@@ -1868,31 +1841,27 @@ class FetchSev:
         valframe = Frame(self.iteminnerframe, bg=bgcolor)
 
         # From entry
-        defaultfrom = StringVar()
-        fromlabel = Label(valframe, text='From')
+        self.defaultfrom = StringVar()
+        fromlabel = ttk.Label(valframe, text='From', style='Pwr.TLabel')
         fromlabel.grid(column=0, row=row, padx=0, pady=5, sticky=W)
-        fromlabel.config(bg=bgcolor)
-        self.fromentry = Entry(valframe, textvariable=defaultfrom)
-        defaultfrom.set('00:05:00')
+        self.fromentry = ttk.Entry(valframe, textvariable=self.defaultfrom, style='Pwr.TEntry')
+        self.defaultfrom.set('00:05:00')
         self.fromentry.grid(column=1, row=row, padx=20, pady=5, sticky=W)
-        self.fromentry.config(bg=bgcolor)
         row += 1
 
         # To entry
-        defaultto = StringVar()
-        tolabel = Label(valframe, text='To')
+        self.defaultto = StringVar()
+        tolabel = ttk.Label(valframe, text='To', style='Pwr.TLabel')
         tolabel.grid(column=0, row=row, padx=0, pady=5, sticky=W)
-        tolabel.config(bg=bgcolor)
-        self.toentry = Entry(valframe, textvariable=defaultto)
-        defaultto.set('now')
+        self.toentry = ttk.Entry(valframe, textvariable=self.defaultto, style='Pwr.TEntry')
+        self.defaultto.set('now')
+        self.toentry.configure()
         self.toentry.grid(column=1, row=row, padx=20, pady=5, sticky=W)
-        self.toentry.config(bg=bgcolor)
         row += 1
 
         # EventType entry
-        eventtypelabel = Label(valframe, text='EventType')
+        eventtypelabel = ttk.Label(valframe, text='EventType', style='Pwr.TLabel')
         eventtypelabel.grid(column=0, row=row, padx=0, pady=5, sticky=W)
-        eventtypelabel.config(bg=bgcolor)
 
         typeframe = Frame(valframe, bg=bgcolor)
         typeframe.grid(column=1, row=row, padx=20, pady=5, sticky=W)
@@ -1902,97 +1871,79 @@ class FetchSev:
             self.typesel[i] = IntVar()
             i += 1
         # Ack
-        checkbox = Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_Ack),
-                               variable=self.typesel[0], highlightthickness=0,
-                               bg=bgcolor)
+        checkbox = ttk.Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_Ack),
+                               variable=self.typesel[0], style='Pwr.TCheckbutton')
         checkbox.grid(column=0, row=0, padx=20, pady=5, sticky=W)
         # Block
-        checkbox = Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_Block),
-                               variable=self.typesel[1], highlightthickness=0,
-                               bg=bgcolor)
+        checkbox = ttk.Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_Block),
+                               variable=self.typesel[1], style='Pwr.TCheckbutton')
         checkbox.grid(column=1, row=0, padx=20, pady=5, sticky=W)
         # Cancel
-        checkbox = Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_Cancel),
-                               variable=self.typesel[2], highlightthickness=0,
-                               bg=bgcolor)
+        checkbox = ttk.Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_Cancel),
+                               variable=self.typesel[2], style='Pwr.TCheckbutton')
         checkbox.grid(column=2, row=0, padx=20, pady=5, sticky=W)
         # CancelBlock
-        checkbox = Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_CancelBlock),
-                               variable=self.typesel[3], highlightthickness=0,
-                               bg=bgcolor)
+        checkbox = ttk.Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_CancelBlock),
+                               variable=self.typesel[3], style='Pwr.TCheckbutton')
         checkbox.grid(column=3, row=0, padx=20, pady=5, sticky=W)
         # Missing
-        checkbox = Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_Missing),
-                               variable=self.typesel[4], highlightthickness=0,
-                               bg=bgcolor)
+        checkbox = ttk.Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_Missing),
+                               variable=self.typesel[4], style='Pwr.TCheckbutton')
         checkbox.grid(column=4, row=0, padx=20, pady=5, sticky=W)
         # Reblock
-        checkbox = Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_Reblock),
-                               variable=self.typesel[5], highlightthickness=0,
-                               bg=bgcolor)
+        checkbox = ttk.Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_Reblock),
+                               variable=self.typesel[5], style='Pwr.TCheckbutton')
         checkbox.grid(column=0, row=1, padx=20, pady=5, sticky=W)
         # Return
-        checkbox = Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_Return),
-                               variable=self.typesel[6], highlightthickness=0,
-                               bg=bgcolor)
+        checkbox = ttk.Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_Return),
+                               variable=self.typesel[6], style='Pwr.TCheckbutton')
         checkbox.grid(column=1, row=1, padx=20, pady=5, sticky=W)
         # Unblock
-        checkbox = Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_Unblock),
-                               variable=self.typesel[7], highlightthickness=0,
-                               bg=bgcolor)
+        checkbox = ttk.Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_Unblock),
+                               variable=self.typesel[7], style='Pwr.TCheckbutton')
         checkbox.grid(column=2, row=1, padx=20, pady=5, sticky=W)
         # Info
-        checkbox = Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_Info),
-                               variable=self.typesel[16], highlightthickness=0,
-                               bg=bgcolor)
+        checkbox = ttk.Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_Info),
+                               variable=self.typesel[16], style='Pwr.TCheckbutton')
         checkbox.grid(column=3, row=1, padx=20, pady=5, sticky=W)
         # InfoSuccess
-        checkbox = Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_InfoSuccess),
-                               variable=self.typesel[8], highlightthickness=0,
-                               bg=bgcolor)
+        checkbox = ttk.Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_InfoSuccess),
+                               variable=self.typesel[8], style='Pwr.TCheckbutton')
         checkbox.grid(column=4, row=1, padx=20, pady=5, sticky=W)
         # Alarm
-        checkbox = Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_Alarm),
-                               variable=self.typesel[9], highlightthickness=0,
-                               bg=bgcolor)
+        checkbox = ttk.Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_Alarm),
+                               variable=self.typesel[9], style='Pwr.TCheckbutton')
         checkbox.grid(column=0, row=2, padx=20, pady=5, sticky=W)
         # MantenanceAlarm
-        checkbox = Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_MaintenanceAlarm),
-                               variable=self.typesel[10], highlightthickness=0,
-                               bg=bgcolor)
+        checkbox = ttk.Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_MaintenanceAlarm),
+                               variable=self.typesel[10], style='Pwr.TCheckbutton')
         checkbox.grid(column=1, row=2, padx=20, pady=5, sticky=W)
         # SystemAlarm
-        checkbox = Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_SystemAlarm),
-                               variable=self.typesel[11], highlightthickness=0,
-                               bg=bgcolor)
+        checkbox = ttk.Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_SystemAlarm),
+                               variable=self.typesel[11], style='Pwr.TCheckbutton')
         checkbox.grid(column=2, row=2, padx=20, pady=5, sticky=W)
         # UserAlarm1
-        checkbox = Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_UserAlarm1),
-                               variable=self.typesel[12], highlightthickness=0,
-                               bg=bgcolor)
+        checkbox = ttk.Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_UserAlarm1),
+                               variable=self.typesel[12], style='Pwr.TCheckbutton')
         checkbox.grid(column=3, row=2, padx=20, pady=5, sticky=W)
         # UserAlarm2
-        checkbox = Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_UserAlarm2),
-                               variable=self.typesel[13], highlightthickness=0,
-                               bg=bgcolor)
+        checkbox = ttk.Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_UserAlarm2),
+                               variable=self.typesel[13], style='Pwr.TCheckbutton')
         checkbox.grid(column=4, row=2, padx=20, pady=5, sticky=W)
         # UserAlarm3
-        checkbox = Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_UserAlarm3),
-                               variable=self.typesel[14], highlightthickness=0,
-                               bg=bgcolor)
+        checkbox = ttk.Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_UserAlarm3),
+                               variable=self.typesel[14], style='Pwr.TCheckbutton')
         checkbox.grid(column=0, row=3, padx=20, pady=5, sticky=W)
         # UserAlarm4
-        checkbox = Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_UserAlarm4),
-                               variable=self.typesel[15], highlightthickness=0,
-                               bg=bgcolor)
+        checkbox = ttk.Checkbutton(typeframe, text=Ev.eventtype_to_str(Ev.eEvent_UserAlarm4),
+                               variable=self.typesel[15], style='Pwr.TCheckbutton')
         checkbox.grid(column=1, row=3, padx=20, pady=5, sticky=W)
         row += 4
 
         
         # EventPrio entry
-        eventpriolabel = Label(valframe, text='EventPrio')
+        eventpriolabel = ttk.Label(valframe, text='EventPrio', style='Pwr.TLabel')
         eventpriolabel.grid(column=0, row=row, padx=0, pady=5, sticky=W)
-        eventpriolabel.config(bg=bgcolor)
 
         prioframe = Frame(valframe, bg=bgcolor)
         prioframe.grid(column=1, row=row, padx=20, pady=5, sticky=W)
@@ -2000,43 +1951,37 @@ class FetchSev:
         i = 0
         self.priosel = [None] * 4
         self.priosel[i] = IntVar()
-        checkbox = Checkbutton(prioframe, text=Ev.eventprio_to_str(Ev.eEventPrio_A),
-                               variable=self.priosel[0], highlightthickness=0,
-                               bg=bgcolor)
+        checkbox = ttk.Checkbutton(prioframe, text=Ev.eventprio_to_str(Ev.eEventPrio_A),
+                               variable=self.priosel[0], style='Pwr.TCheckbutton')
         checkbox.grid(column=0, row=0, padx=20, pady=5, sticky=W)
         i += 1
         self.priosel[i] = IntVar()
-        checkbox = Checkbutton(prioframe, text=Ev.eventprio_to_str(Ev.eEventPrio_B),
-                               variable=self.priosel[1], highlightthickness=0,
-                               bg=bgcolor)
+        checkbox = ttk.Checkbutton(prioframe, text=Ev.eventprio_to_str(Ev.eEventPrio_B),
+                               variable=self.priosel[1], style='Pwr.TCheckbutton')
         checkbox.grid(column=1, row=0, padx=20, pady=5, sticky=W)
         i += 1
         self.priosel[i] = IntVar()
-        checkbox = Checkbutton(prioframe, text=Ev.eventprio_to_str(Ev.eEventPrio_C),
-                               variable=self.priosel[2], highlightthickness=0,
-                               bg=bgcolor)
+        checkbox = ttk.Checkbutton(prioframe, text=Ev.eventprio_to_str(Ev.eEventPrio_C),
+                               variable=self.priosel[2], style='Pwr.TCheckbutton')
         checkbox.grid(column=2, row=0, padx=20, pady=5, sticky=W)
         i += 1
         self.priosel[i] = IntVar()
-        checkbox = Checkbutton(prioframe, text=Ev.eventprio_to_str(Ev.eEventPrio_D),
-                               variable=self.priosel[3], highlightthickness=0,
-                               bg=bgcolor)
+        checkbox = ttk.Checkbutton(prioframe, text=Ev.eventprio_to_str(Ev.eEventPrio_D),
+                               variable=self.priosel[3], style='Pwr.TCheckbutton')
         checkbox.grid(column=3, row=0, padx=20, pady=5, sticky=W)
         i += 1
 
         # Max rows
-        defaultmax = StringVar()
-        maxlabel = Label(valframe, text='Max')
+        self.defaultmax = StringVar()
+        maxlabel = ttk.Label(valframe, text='Max', style='Pwr.TLabel')
         maxlabel.grid(column=0, row=row, padx=0, pady=5, sticky=W)
-        maxlabel.config(bg=bgcolor)
-        self.maxentry = Entry(valframe, textvariable=defaultmax)
-        defaultmax.set('500')
+        self.maxentry = ttk.Entry(valframe, textvariable=self.defaultmax, style='Pwr.TEntry')
+        self.defaultmax.set('500')
         self.maxentry.grid(column=1, row=row, padx=20, pady=5, sticky=W)
-        self.maxentry.config(bg=bgcolor)
         row += 1
 
 
-        readdatabutton = Button(valframe, text="Read DataSet", command=self.readdata_cb, bg=buttoncolor);
+        readdatabutton = ttk.Button(valframe, text="Read DataSet", command=self.readdata_cb, style='Pwr.TButton');
         readdatabutton.grid(column=0, row=row, padx=0, pady=20, sticky=W)
         row += 1
 
@@ -2048,8 +1993,7 @@ class FetchSev:
         for item in self.items:
             self.sel[i] = IntVar()
             text = item[0]
-            item_checkbox = Checkbutton(self.iteminnerframe, text=text, variable=self.sel[i], highlightthickness=0,
-                                        bg=bgcolor)
+            item_checkbox = ttk.Checkbutton(self.iteminnerframe, text=text, variable=self.sel[i], style='Pwr.TCheckbutton')
             item_checkbox.grid(column=0, row=i+row, padx=20, pady=5, sticky=W)
             i = i + 1
 
@@ -2132,33 +2076,47 @@ class FetchSev:
     
 file = ''
 try:
-    opts, args = getopt.getopt(sys.argv[1:], "f:r:", ["--file"])
+    opts, args = getopt.getopt(sys.argv[1:], "f:c:", ["--file","--colortheme"])
 except getopt.GetoptError:
     print('sev_eva.py [-f <file>]')
     sys.exit(2)
 
+colortheme = 15
 for opt, arg in opts:
     if opt == "-h":
-        print('sev_eva.py [-f <file>]')
+        print('sev_eva.py [-f <file>] [-c <colortheme>')
     if opt in ("-f", "--file"):
         file = arg
+    if opt in ("-c", "--colortheme"):
+        colortheme = int(arg)
         
 pwr_exe = os.environ.get('pwr_exe')
+colortheme = wow.colortheme(colortheme)
 home = os.environ.get('HOME')
 bgcolor = 'white'
-buttoncolor = '#F0F0F0'
+fgcolor = 'black'
+menucolor = '#F0F0F0'
+menufgcolor = '#000000'
+menuactivecolor='#DDDDDD'
 
 class MvMain:
 
     def __init__(self):
         global window
         global main
+        global bgcolor
+        global fgcolor
+        global menucolor
+        global menufgcolor
+        global menuactivecolor
 
         self.applist = []
         
         # Create window
         main = self
         window = Tk()
+        wow.plotstyle(colortheme)
+        bgcolor, fgcolor, menucolor, menufgcolor, menuactivecolor = wow.style(colortheme)
         window.withdraw()
         wdwindow = WdWindow()
         if file != '':

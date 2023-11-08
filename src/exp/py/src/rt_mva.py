@@ -255,7 +255,7 @@ class WData:
             plotdata = self.wd[cols]
         else:
             plotdata = self.wd
-        ax = plotdata.plot()
+        ax = plotdata.plot(figsize=(15,10))
         ax.legend(loc='center left', bbox_to_anchor=(1, 0.5));
         ax.get_figure().canvas.set_window_title('Plot ' + self.name)
 
@@ -285,11 +285,11 @@ class WData:
         layo = ccnt * 100 + 10
 
         j = 0
-        fig = plt.figure()
+        fig = plt.figure(figsize=(15,10))
         fig.canvas.set_window_title('Plot ' + self.name)
         while j < ccnt:
             plt.subplot(layo+j+1)
-            plt.plot(self.wdtime, plotdata[cols[j]])
+            plt.plot(self.wdtime, plotdata[cols[j]], label=cols[j])
             plt.legend(loc='center left', bbox_to_anchor=(1, 0.5));
             j = j + 1
 
@@ -313,7 +313,7 @@ class WData:
         
         ax = plotdata.plot()
         ax.clear()
-        pd.tools.plotting.scatter_matrix(plotdata, diagonal="kde", ax=ax)
+        pd.plotting.scatter_matrix(plotdata, diagonal="kde", ax=ax)
         ax.get_figure().canvas.set_window_title('Scatterplot ' + self.name)
         plt.tight_layout()
         plt.show()
