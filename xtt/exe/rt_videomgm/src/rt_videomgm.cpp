@@ -121,7 +121,7 @@ int XttVideoMgmAimetis::authorize(char* user, char* password)
   sprintf(fname, "/tmp/videomgm%d.txt", ++m_fix);
 
   sprintf(cmd,
-      "curl -s -S \"%s/Session\" -X POST -H \"Content-type: application/json\" \
+      "curl -k -s -S \"%s/Session\" -X POST -H \"Content-type: application/json\" \
 -d \"{'user':'%s','pwd':'%s'}\" > %s",
       m_addr, user, password, fname);
 
@@ -169,7 +169,7 @@ int XttVideoMgmAimetis::get_panels()
 
   sprintf(fname, "/tmp/videomgm%d.txt", ++m_fix);
 
-  sprintf(cmd, "curl -s -S \"%s/Panel\" -H \"authtoken :%s\" > %s", m_addr,
+  sprintf(cmd, "curl -k -s -S \"%s/Panel\" -H \"authtoken:%s\" > %s", m_addr,
       m_auth_token, fname);
 
   if (log)
@@ -275,7 +275,7 @@ int XttVideoMgmAimetis::get_cameras()
 
   sprintf(fname, "/tmp/videomgm%d.txt", ++m_fix);
 
-  sprintf(cmd, "curl -s -S \"%s/Camera\" -H \"authtoken :%s\" > %s", m_addr,
+  sprintf(cmd, "curl -k -s -S \"%s/Camera\" -H \"authtoken:%s\" > %s", m_addr,
       m_auth_token, fname);
 
   if (log)
@@ -368,7 +368,7 @@ int XttVideoMgmAimetis::get_camera_image(int idx, const char* jpgfile)
 
   sprintf(fname, "/tmp/videomgm%d.txt", ++m_fix);
 
-  sprintf(cmd, "curl -s -S \"%s/Camera/%s/Jpeg\" -H \"authtoken :%s\" > %s",
+  sprintf(cmd, "curl -k -s -S \"%s/Camera/%s/Jpeg\" -H \"authtoken:%s\" > %s",
       m_addr, m_camera[idx].id, m_auth_token, fname);
 
   if (log)
@@ -466,7 +466,7 @@ int XttVideoMgmAimetis::assign_camera(
   sprintf(fname, "/tmp/videomgm%d.txt", ++m_fix);
 
   sprintf(cmd,
-      "curl -s -S \"%s/Panel/%s/Cell/%d/Camera/%s\" -H \"authtoken :%s\" > %s",
+      "curl -k -s -S \"%s/Panel/%s/Cell/%d/Camera/%s\" -H \"authtoken:%s\" > %s",
       m_addr, m_panel[panel_idx].id, cell_idx, m_camera[camera_idx].id,
       m_auth_token, fname);
 
@@ -520,7 +520,7 @@ int XttVideoMgmAimetis::set_camera_fullscreen(int camera_idx)
   sprintf(fname, "/tmp/videomgm%d.txt", ++m_fix);
 
   sprintf(cmd,
-      "curl -s -S \"%s/Camera/%s/Fullscreen\" -H \"authtoken :%s\" > %s",
+      "curl -k -s -S \"%s/Camera/%s/Fullscreen\" -H \"authtoken:%s\" > %s",
       m_addr, m_camera[camera_idx].id, m_auth_token, fname);
 
   if (log)
@@ -575,7 +575,7 @@ int XttVideoMgmAimetis::display_panel(int panel_idx)
   sprintf(fname, "/tmp/videomgm%d.txt", ++m_fix);
 
   sprintf(cmd,
-      "curl -s -S \"%s/Panel/%s/Show\" -X GET -H \"authtoken: %s\" > %s",
+      "curl -k -s -S \"%s/Panel/%s/Show\" -X GET -H \"authtoken:%s\" > %s",
       m_addr, m_panel[panel_idx].id, m_auth_token, fname);
 
   if (log)
@@ -670,8 +670,8 @@ int XttVideoMgmAimetis::create_panel(char* name)
 
   sprintf(fname, "/tmp/videomgm%d.txt", ++m_fix);
 
-  sprintf(cmd, "curl -s -S \"%s/Panel\" -X POST -H \"authtoken: %s\" "
-               "-H \"Content-Type: application/json\" -d "
+  sprintf(cmd, "curl -k -s -S \"%s/Panel\" -X POST -H \"authtoken:%s\" "
+               "-H \"Content-Type:application/json\" -d "
                "\"{'PanelName':'%s','PanelWidth':%d,'PanelHeight':%d,'Cells':[",
       m_addr, m_auth_token, name, m_panel[pix].width, m_panel[pix].height);
 
@@ -755,7 +755,7 @@ int XttVideoMgmAimetis::delete_panel(char* name)
 
   sprintf(fname, "/tmp/videomgm%d.txt", ++m_fix);
 
-  sprintf(cmd, "curl -s -S \"%s/Panel/%s\" -X DELETE -H \"authtoken: %s\" > %s",
+  sprintf(cmd, "curl -k -s -S \"%s/Panel/%s\" -X DELETE -H \"authtoken:%s\" > %s",
       m_addr, m_panel[pix].id, m_auth_token, fname);
 
   if (log)
