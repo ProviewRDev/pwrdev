@@ -353,6 +353,8 @@ int main(int argc, char* argv[])
   qcom_sQid my_q = qcom_cNQid;
   pwr_tOid oid;
 
+  tmlog = 0;
+
   errh_Init("pwr_redcom", errh_eAnix_redcom);
   errh_SetStatus(PWR__SRVSTARTUP);
 
@@ -1493,11 +1495,14 @@ static void check_state(sLink* lp, sIseg* sp)
   case pwr_eRedundancyState_Init:
     switch (l.nodep->RedundancyState) {
     case pwr_eRedundancyState_Init:
-      if (l.default_redundancy_state == pwr_eRedundancyState_Active)
+      if (l.default_redundancy_state == pwr_eRedundancyState_Active) {
         state_change_request(lp, sp, pwr_eRedundancyState_Active);
-      else
+        timelog(1, "redcom state to Active, remote is Init");
+      }
+      else {
         state_change_request(lp, sp, pwr_eRedundancyState_Passive);
-      timelog(1, "redcom state to Active, remote is Init");
+        timelog(1, "redcom state to Passive, remote is Init");
+      }
       break;
     }
     break;
@@ -2250,6 +2255,11 @@ static void* cyclic_thread()
   pwr_tDeltaTime dt;
   pwr_tTime current;
   pwr_tFloat32 ftime;
+  pwr_tFloat32 set_active_time;
+
+  set_active_time = l.config->StartupSetActiveTime;
+  if (set_active_time == 0)
+    set_active_time = 5;
 
   time_FloatToD(&dt, l.config->CycleTime);
 
@@ -2265,7 +2275,7 @@ static void* cyclic_thread()
         time_GetTimeMonotonic(&current);
         time_Adiff(&dt, &current, &l.pending_set_active_time);
         ftime = time_DToFloat(0, &dt);
-        if (ftime > 5) {
+        if (ftime > set_active_time) {
           l.config->SetActive = 1;
           l.pending_set_active = 0;
           timelog(1, "Pending set active timed out");

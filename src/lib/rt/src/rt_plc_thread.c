@@ -606,8 +606,14 @@ static void scan(plc_sThread* tp)
     time_GetTime(&tp->before_scan_abs);
 
     sts = plc_redu_receive(tp, tp->i_scan_time);
-    if (EVEN(sts))
-      return;
+    if (EVEN(sts)) {
+      if (!(tp->redu_state_old == pwr_eRedundancyState_Init)) {
+	tp->redu_state_old = tp->pp->Node->RedundancyState;
+	return;
+      }
+    }
+    else
+      tp->redu_state_old = tp->pp->Node->RedundancyState;
 
     time_Aadd(NULL, &tp->sync_time, &tp->scan_time);
     time_GetTimeMonotonic(&tp->after_scan);
@@ -624,7 +630,6 @@ static void scan(plc_sThread* tp)
     tp->one_before_scan = tp->before_scan;
     tp->ActualScanTime = tp->f_scan_time;
 
-    tp->redu_state_old = tp->pp->Node->RedundancyState;
 
     tp->one_before_scan = tp->before_scan;
     tp->one_before_scan_abs = tp->before_scan_abs;
@@ -692,7 +697,9 @@ static void scan(plc_sThread* tp)
     /* Execute all the PLC code */
     tp->exec(0, tp);
 
-    if (pp->IOHandler->IOReadWriteFlag) {
+    if (pp->IOHandler->IOReadWriteFlag &&
+	(!tp->redu || 
+	 tp->pp->Node->RedundancyState == pwr_eRedundancyState_Active)) {
       sts = io_write(tp->plc_io_ctx);
       if (EVEN(sts)) {
         pp->IOHandler->IOReadWriteFlag = FALSE;

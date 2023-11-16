@@ -103,6 +103,14 @@ SObject pwrb:Class
         EndBody
       EndObject
       !/**
+      !  Time after startup when node is set to active
+      !*/
+      Object StartupSetActiveTime $Attribute 11 
+        Body SysBody
+          Attr TypeRef = "pwrs:Type-$Float32"
+        EndBody
+      EndObject
+      !/**
       !  Force state.
       !  At force state the state can only be changed from Active/Passive 
       !  buttons in object graph. It will not automatically be changed by 
@@ -184,6 +192,7 @@ SObject pwrb:Class
 	Attr CycleTime = 0.005
 	Attr LinkTimeout = 0.200
 	Attr StartupTimeout = 5.0
+	Attr StartupSetActiveTime = 5.0
 	Attr FailoverReason = 15
       EndBody
     EndObject
