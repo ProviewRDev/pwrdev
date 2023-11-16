@@ -1068,10 +1068,6 @@ void wb_build::xttgraph(pwr_tOid oid)
   pwr_tTime dest_time, src_time;
   int check_hierarchy = cdh_ObjidIsNotNull(m_hierarchy);
   int hierarchy_found = 0;
-  int is_frame, is_applet;
-  char java_name[80];
-  pwr_tStatus fsts;
-  int jexport;
   char* s;
 
   wb_object o = m_session.object(oid);
@@ -1135,63 +1131,8 @@ void wb_build::xttgraph(pwr_tOid oid)
       wb_revision::check_add_file(src_fname);
       wb_log::log(wlog_eCategory_GeBuild, name, 0);
       m_sts = PWRB__SUCCESS;
-    } else
+    } else {
       m_sts = PWRB__NOBUILT;
-
-    jexport = 0;
-    fsts = grow_IsJava(src_fname, &is_frame, &is_applet, java_name);
-    if (EVEN(fsts)) {
-      m_sts = fsts;
-      return;
-    }
-    if ((is_frame || is_applet) && streq(java_name, "")) {
-      // Java name is not yet set, use the default java name
-      strcpy(java_name, action);
-      if ((s = strchr(java_name, '.')) != 0)
-        *s = 0;
-      java_name[0] = _toupper(java_name[0]);
-    }
-    if (is_frame) {
-      // Check exported java frame
-      sprintf(dest_fname, "$pwrp_pop/%s.java", java_name);
-      dcli_translate_filename(dest_fname, dest_fname);
-      fsts = dcli_file_time(dest_fname, &dest_time);
-      if (opt.force || EVEN(fsts) || time_Acomp(&src_time, &dest_time) == 1)
-        jexport = 1;
-    }
-    if (is_applet) {
-      // Check exported java applet
-      sprintf(dest_fname, "$pwrp_pop/%s_A.java", java_name);
-      dcli_translate_filename(dest_fname, dest_fname);
-      fsts = dcli_file_time(dest_fname, &dest_time);
-      if (opt.force || EVEN(fsts) || time_Acomp(&src_time, &dest_time) == 1)
-        jexport = 1;
-    }
-    if (jexport) {
-      if (!m_wnav) {
-        sprintf(cmd,
-            "Build:    XttGraph  Unable to export java in this environment %s",
-            action);
-        MsgWindow::message('W', cmd, msgw_ePop_No, oid);
-      } else {
-        Ge* gectx = m_wnav->ge_new(action, 1);
-        strcpy(cmd, "export java");
-        m_sts = gectx->command(cmd);
-        if (evenSts()) {
-          msg_GetMsg(m_sts, cmd, sizeof(cmd));
-          MsgWindow::message('E', cmd, msgw_ePop_Yes, oid);
-          m_sts = PWRB__NOBUILT;
-          delete gectx;
-          return;
-        }
-
-        sprintf(cmd, "Build:    XttGraph  Export java %s", action);
-        MsgWindow::message('I', cmd, msgw_ePop_No, oid);
-
-        delete gectx;
-
-        m_sts = PWRB__SUCCESS;
-      }
     }
   }
   else
