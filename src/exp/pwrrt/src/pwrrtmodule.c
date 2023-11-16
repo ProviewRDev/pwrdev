@@ -246,12 +246,16 @@ print t.fullName()\n\
 PyDoc_STRVAR(aref_value_doc,"\
 value()\n--\n\n\
 Get the value of an attribute.\n\n\
+Implemented for attributes and array of attributes of type \n\
+Boolean, Int8, UInt8, Int16, UInt16, Int32, UInt32, Int64, UInt64, Float32, Float64,\n\
+Enum, Mask, Status, NetStatus, String, Text, Time, DeltaTime, Objid and AttrRef.\n\n\
 Returns\n\
 -------\n\
-Returns the value of the attribute.\n\n\
+Returns the value of the attribute.\n\
+For arrays, a Tuple with the values are returned\n\n\
 Example\n\
 -------\n\
-a = pwrrt.object('H1-Dv1.ActualValue')\n\
+a = pwrrt.attribute('H1-Dv1.ActualValue')\n\
 print a.value()\n\
 ");
 
@@ -261,6 +265,11 @@ Set the value of an attribute.\n\
 Set is only permitted if a user with RtWrite or System privileges\n\
 is logged in, or if the attribute is an attribute with public write\n\
 permissions. In this case the public write argument should be set to 1.\n\n\
+Implemented for attributes and array of attributes of type \n\
+Boolean, Int8, UInt8, Int16, UInt16, Int32, UInt32, Int64, UInt64, Float32, Float64,\n\
+Enum, Mask, Status, NetStatus, String, Text, Time, DeltaTime, Objid and AttrRef.\n\n\
+Arrays are set with Lists or Tuples. The size of the List or Tuple has to match\n\
+the size of the array.\n\n\
 Arguments\n\
 ---------\n\
 value         Arbitrary type\n\
@@ -271,7 +280,9 @@ Example\n\
 -------\n\
 pwrrt.login('pwrp', 'somepassword')\n\
 a = pwrrt.attribute('H1-H2-Dv1.ActualValue')\n\
-a.setValue(1)\n\
+a.setValue(1)\n\n\
+a2 = pwrrt.attribute('H1-H2-A1.TempArray')\n\
+a2.setValue([21.0,23.3,23.3,22.3,22.0])\n\
 ");
 
 PyDoc_STRVAR(aref_subscribe_doc,"\
@@ -536,14 +547,22 @@ ProviewR subscription. See pwrrt.subscribe()\n\
 PyDoc_STRVAR(sub_value_doc,"\
 value()\n--\n\n\
 Get the value of the subscribed attribute.\n\n\
+Implemented for attributes and array of attributes of type \n\
+Boolean, Int8, UInt8, Int16, UInt16, Int32, UInt32, Int64, UInt64, Float32, Float64,\n\
+Enum, Mask, Status, NetStatus, String, Text, Time, DeltaTime, Objid and AttrRef.\n\n\
 Returns\n\
 -------\n\
 Returns the subscription value.\n\
+For arrays a Tuple of the values are returned.\n\
 ");
 
 PyDoc_STRVAR(sub_setValue_doc,"\
 setValue(value)\n--\n\n\
-Set the value of the subscribed attribute.\n\n\
+Set the value of the subscribed attribute.\n\
+Only subscriptions to local attributes can be set.\n\n\
+Implemented for attributes of type \n\
+Boolean, Int8, UInt8, Int16, UInt16, Int32, UInt32, Int64, UInt64, Float32, Float64,\n\
+Enum, Mask, Status, NetStatus, String, Text, Time, DeltaTime, Objid and AttrRef.\n\n\
 Arguments\n\
 ---------\n\
 value   Arbitrary type\n\
@@ -896,6 +915,9 @@ static PyTypeObject OidType = {
 typedef struct {
   PyObject_HEAD
   pwr_tAttrRef aref;
+  pwr_tTypeId  type;
+  unsigned int size;
+  unsigned int elements;
   pwr_tStatus sts;
 } ArefObject;
 
@@ -910,6 +932,8 @@ static PyObject *Aref_tid(ArefObject *self, PyObject *args);
 static PyObject *Aref_value(ArefObject *self, PyObject *args);
 static PyObject *Aref_setValue(ArefObject *self, PyObject *args);
 static PyObject *Aref_subscribe(ArefObject *self, PyObject *args);
+
+static int init_aref(ArefObject *self, pwr_tAttrRef *aref);
 
 static PyMethodDef Aref_methods[] = {
     { "name", (PyCFunction) Aref_name, METH_VARARGS, aref_name_doc },
@@ -1175,6 +1199,7 @@ typedef struct {
   PyObject_HEAD
   pwr_eType type;
   unsigned int size;
+  unsigned int elements;
   void *p;
   pwr_tRefId refid;
   pwr_tStatus sts;
@@ -1672,7 +1697,7 @@ Oid_attribute(OidObject *self, PyObject *args)
 
   aref_object = (ArefObject *)Aref_new(&ArefType, 0, 0);
   if (aref_object != NULL)
-    aref_object->aref = oaref;
+    init_aref(aref_object, &oaref);
 
   return (PyObject *)aref_object;
 }
@@ -1688,6 +1713,7 @@ Aref_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
   self = (ArefObject *)type->tp_alloc(type, 0);
   if (self != NULL) {
     self->aref = pwr_cNAttrRef;
+    self->elements = 0;
     self->sts = GDH__SUCCESS;
   }
   return (PyObject *)self;
@@ -1703,7 +1729,8 @@ Aref_str(PyObject *self)
   aref = &((ArefObject *)self)->aref;
 
   sts = gdh_AttrrefToName(aref, name, sizeof(name), 
-			  cdh_mName_path | cdh_mName_object | cdh_mName_attribute);
+			  cdh_mName_path | cdh_mName_object | cdh_mName_attribute |
+			  cdh_mName_index);
   if ( EVEN(sts))
     strcpy( name, "Unknown");
 
@@ -1776,6 +1803,28 @@ Aref_init(ArefObject *self, PyObject *args, PyObject *kwds)
       self->sts = sts;
       return -1;
     }
+    sts = gdh_GetAttributeCharAttrref(&self->aref, &self->type, &self->size, 0, &self->elements);
+    if ( EVEN(sts)) {
+      set_error(sts);
+      self->sts = sts;
+      return -1;
+    }
+  }
+
+  return 0;
+}
+
+static int
+init_aref(ArefObject *self, pwr_tAttrRef *aref)
+{
+  self->aref = *aref;
+
+  pwr_tStatus sts;
+  sts = gdh_GetAttributeCharAttrref(&self->aref, &self->type, &self->size, 0, &self->elements);
+  if ( EVEN(sts)) {
+    set_error(sts);
+    self->sts = sts;
+    return -1;
   }
 
   return 0;
@@ -1857,129 +1906,329 @@ Aref_value(ArefObject *self, PyObject *args)
 
   pwr_tStatus sts;
   char *buf;
-  pwr_eType atype;
-  unsigned int asize;
-
-  sts = gdh_GetAttributeCharAttrref(&self->aref, &atype, &asize, 0, 0);
-  if (EVEN(sts)) return NULL;
 
   buf = malloc(self->aref.Size);
   sts = gdh_GetObjectInfoAttrref( &self->aref, buf, self->aref.Size);
   if (EVEN(sts))
     return set_error(sts);
 
-  switch ( atype) {
+  switch ((pwr_eType)self->type) {
   case pwr_eType_Boolean: {
-    pwr_tBoolean value = *(pwr_tBoolean *)buf;
-    free(buf);
-    return Py_BuildValue("i", value);
+    if (!self->aref.Flags.b.Array) {
+      pwr_tBoolean value = *(pwr_tBoolean *)buf;
+      free(buf);
+      return Py_BuildValue("i", value);
+    } else {
+      PyObject *result;
+      result = PyTuple_New(self->elements);
+
+      for (unsigned int i = 0; i < self->elements; i++) {
+	pwr_tBoolean value = ((pwr_tBoolean *)buf)[i];
+	PyTuple_SetItem(result, i,  Py_BuildValue("i", value));
+      }    
+      free(buf);
+      return result;
+    }
   }
   case pwr_eType_Int8: {
-    pwr_tInt8 value = *(pwr_tInt8 *)buf;
-    free(buf);
-    return Py_BuildValue("b", value);
+    if (!self->aref.Flags.b.Array) {
+      pwr_tInt8 value = *(pwr_tInt8 *)buf;
+      free(buf);
+      return Py_BuildValue("b", value);
+    } else {
+      PyObject *result;
+      result = PyTuple_New(self->elements);
+
+      for (unsigned int i = 0; i < self->elements; i++) {
+	pwr_tInt8 value = ((pwr_tInt8 *)buf)[i];
+	PyTuple_SetItem(result, i,  Py_BuildValue("b", value));
+      }    
+      free(buf);
+      return result;
+    }
   }
   case pwr_eType_UInt8: {
-    pwr_tUInt8 value = *(pwr_tUInt8 *)buf;
-    free(buf);
-    return Py_BuildValue("B", value);
+    if (!self->aref.Flags.b.Array) {
+      pwr_tUInt8 value = *(pwr_tUInt8 *)buf;
+      free(buf);
+      return Py_BuildValue("B", value);
+    } else {
+      PyObject *result;
+      result = PyTuple_New(self->elements);
+
+      for (unsigned int i = 0; i < self->elements; i++) {
+	pwr_tUInt8 value = ((pwr_tUInt8 *)buf)[i];
+	PyTuple_SetItem(result, i,  Py_BuildValue("B", value));
+      }    
+      free(buf);
+      return result;
+    }
   }
   case pwr_eType_Int16: {
-    pwr_tInt16 value = *(pwr_tInt16 *)buf;
-    free(buf);
-    return Py_BuildValue("h", value);
+    if (!self->aref.Flags.b.Array) {
+      pwr_tInt16 value = *(pwr_tInt16 *)buf;
+      free(buf);
+      return Py_BuildValue("h", value);
+    } else {
+      PyObject *result;
+      result = PyTuple_New(self->elements);
+
+      for (unsigned int i = 0; i < self->elements; i++) {
+	pwr_tInt16 value = ((pwr_tInt16 *)buf)[i];
+	PyTuple_SetItem(result, i,  Py_BuildValue("h", value));
+      }    
+      free(buf);
+      return result;
+    }
   }
   case pwr_eType_UInt16: {
-    pwr_tUInt16 value = *(pwr_tUInt16 *)buf;
-    free(buf);
-    return Py_BuildValue("H", value);
+    if (!self->aref.Flags.b.Array) {
+      pwr_tUInt16 value = *(pwr_tUInt16 *)buf;
+      free(buf);
+      return Py_BuildValue("H", value);
+    } else {
+      PyObject *result;
+      result = PyTuple_New(self->elements);
+
+      for (unsigned int i = 0; i < self->elements; i++) {
+	pwr_tUInt16 value = ((pwr_tUInt16 *)buf)[i];
+	PyTuple_SetItem(result, i,  Py_BuildValue("H", value));
+      }    
+      free(buf);
+      return result;
+    }
   }
   case pwr_eType_Int32:
   case pwr_eType_Enum: {
-    pwr_tInt32 value = *(pwr_tInt32 *)buf;
-    free(buf);
-    return Py_BuildValue("i", value);
+    if (!self->aref.Flags.b.Array) {
+      pwr_tInt32 value = *(pwr_tInt32 *)buf;
+      free(buf);
+      return Py_BuildValue("i", value);
+    } else {
+      PyObject *result;
+      result = PyTuple_New(self->elements);
+
+      for (unsigned int i = 0; i < self->elements; i++) {
+	pwr_tInt32 value = ((pwr_tInt32 *)buf)[i];
+	PyTuple_SetItem(result, i,  Py_BuildValue("i", value));
+      }    
+      free(buf);
+      return result;
+    }
   }
   case pwr_eType_UInt32:
   case pwr_eType_Mask:
   case pwr_eType_Status:
   case pwr_eType_NetStatus: {
-    pwr_tUInt32 value = *(pwr_tUInt32 *)buf;
-    return Py_BuildValue("I", value);
+    if (!self->aref.Flags.b.Array) {
+      pwr_tUInt32 value = *(pwr_tUInt32 *)buf;
+      free(buf);
+      return Py_BuildValue("I", value);
+    } else {
+      PyObject *result;
+      result = PyTuple_New(self->elements);
+
+      for (unsigned int i = 0; i < self->elements; i++) {
+	pwr_tUInt32 value = ((pwr_tUInt32 *)buf)[i];
+	PyTuple_SetItem(result, i, Py_BuildValue("I", value));
+      }    
+      free(buf);
+      return result;
+    }
   }
   case pwr_eType_Int64: {
     char format[2];
-    pwr_tInt64 value = *(pwr_tInt64 *)buf;
-    free(buf);
 #if defined HW_X86_64
     strcpy( format, "l");
 #else
     strcpy( format, "L");
 #endif
+    if (!self->aref.Flags.b.Array) {
+      pwr_tInt64 value = *(pwr_tInt64 *)buf;
+      free(buf);
     return Py_BuildValue(format, value);
+    } else {
+      PyObject *result;
+      result = PyTuple_New(self->elements);
+
+      for (unsigned int i = 0; i < self->elements; i++) {
+	pwr_tInt64 value = ((pwr_tInt64 *)buf)[i];
+	PyTuple_SetItem(result, i, Py_BuildValue(format, value));
+      }    
+      free(buf);
+      return result;
+    }
   }
   case pwr_eType_UInt64: {
     char format[2];
-    pwr_tUInt64 value = *(pwr_tUInt64 *)buf;
-    free(buf);
 #if defined HW_X86_64
     strcpy( format, "k");
 #else
     strcpy( format, "K");
 #endif
-    return Py_BuildValue(format, value);
+    if (!self->aref.Flags.b.Array) {
+      pwr_tUInt64 value = *(pwr_tUInt64 *)buf;
+      free(buf);
+      return Py_BuildValue(format, value);
+    } else {
+      PyObject *result;
+      result = PyTuple_New(self->elements);
+
+      for (unsigned int i = 0; i < self->elements; i++) {
+	pwr_tUInt64 value = ((pwr_tUInt64 *)buf)[i];
+	PyTuple_SetItem(result, i, Py_BuildValue(format, value));
+      }    
+      free(buf);
+      return result;
+    }
+
   }
   case pwr_eType_Float32: {
-    pwr_tFloat32 value = *(pwr_tFloat32 *)buf;
-    free(buf);
-    return Py_BuildValue("f", value);
+    if (!self->aref.Flags.b.Array) {
+      pwr_tFloat32 value = *(pwr_tFloat32 *)buf;
+      free(buf);
+      return Py_BuildValue("f", value);
+    } else {
+      PyObject *result;
+      result = PyTuple_New(self->elements);
+
+      for (unsigned int i = 0; i < self->elements; i++) {
+	pwr_tFloat32 value = ((pwr_tFloat32 *)buf)[i];
+	PyTuple_SetItem(result, i, Py_BuildValue("f", value));
+      }    
+      free(buf);
+      return result;
+    }
   }
   case pwr_eType_Float64: {
-    pwr_tFloat64 value = *(pwr_tFloat64 *)buf;
-    free(buf);
-    return Py_BuildValue("d", value);
+    if (!self->aref.Flags.b.Array) {
+      pwr_tFloat64 value = *(pwr_tFloat64 *)buf;
+      free(buf);
+      return Py_BuildValue("d", value);
+    } else {
+      PyObject *result;
+      result = PyTuple_New(self->elements);
+
+      for (unsigned int i = 0; i < self->elements; i++) {
+	pwr_tFloat64 value = ((pwr_tFloat64 *)buf)[i];
+	PyTuple_SetItem(result, i, Py_BuildValue("d", value));
+      }    
+      free(buf);
+      return result;
+    }
   }
   case pwr_eType_String:
   case pwr_eType_Text:
   case pwr_eType_ProString: {
-    char *utf8buf = cnv_iso8859_to_utf8(buf, strlen(buf)+1);
-    PyObject *ret = Py_BuildValue("s", utf8buf);
-    free(buf);
-    return ret;
+    if (!self->aref.Flags.b.Array) {
+      char *utf8buf = cnv_iso8859_to_utf8(buf, strlen(buf)+1);
+      PyObject *ret = Py_BuildValue("s", utf8buf);
+      free(buf);
+      return ret;
+    } else {
+      int elemsize = self->aref.Size/self->elements;
+      PyObject *result;
+      result = PyTuple_New(self->elements);
+
+      for (unsigned int i = 0; i < self->elements; i++) {
+	char *utf8buf = cnv_iso8859_to_utf8(buf+i*elemsize, strlen(buf+i*elemsize)+1);
+	PyTuple_SetItem(result, i, Py_BuildValue("s", utf8buf));
+      }    
+      free(buf);
+      return result;
+    }
   }
   case pwr_eType_Time: {
     char timstr[30];
 
-    time_AtoAscii((pwr_tTime *)buf, time_eFormat_DateAndTime, timstr, sizeof(timstr));
-    free(buf);
-    return Py_BuildValue("s", timstr);
+    if (!self->aref.Flags.b.Array) {
+      time_AtoAscii((pwr_tTime *)buf, time_eFormat_DateAndTime, timstr, sizeof(timstr));
+      free(buf);
+      char *utf8buf = cnv_iso8859_to_utf8(timstr, strlen(timstr)+1);
+      return Py_BuildValue("s", utf8buf);
+    } else {
+      PyObject *result;
+      result = PyTuple_New(self->elements);
+
+      for (unsigned int i = 0; i < self->elements; i++) {
+	time_AtoAscii(&((pwr_tTime *)buf)[i], time_eFormat_DateAndTime, timstr, sizeof(timstr));
+	char *utf8buf = cnv_iso8859_to_utf8(timstr, strlen(timstr)+1);
+	PyTuple_SetItem(result, i, Py_BuildValue("s", utf8buf));
+      }    
+      free(buf);
+      return result;
+    }
   }
   case pwr_eType_DeltaTime: {
     char timstr[30];
 
-    time_DtoAscii((pwr_tDeltaTime *)buf, 1, timstr, sizeof(timstr));
-    free(buf);
-    return Py_BuildValue("s", timstr);
+    if (!self->aref.Flags.b.Array) {
+      time_DtoAscii((pwr_tDeltaTime *)buf, 1, timstr, sizeof(timstr));
+      free(buf);
+      return Py_BuildValue("s", timstr);
+    } else {
+      PyObject *result;
+      result = PyTuple_New(self->elements);
+
+      for (unsigned int i = 0; i < self->elements; i++) {
+	time_DtoAscii(&((pwr_tDeltaTime *)buf)[i], 1, timstr, sizeof(timstr));
+	char *utf8buf = cnv_iso8859_to_utf8(timstr, strlen(timstr)+1);
+	PyTuple_SetItem(result, i, Py_BuildValue("s", utf8buf));
+      }    
+      free(buf);
+      return result;
+    }
   }
   case pwr_eType_Objid: {    
-    pwr_tOid value = *(pwr_tOid *)buf;
-    free(buf);
+    if (!self->aref.Flags.b.Array) {
+      pwr_tOid value = *(pwr_tOid *)buf;
+      free(buf);
 
-    OidObject *oido = (OidObject *)Oid_new(&OidType, 0, 0);
-    if ( oido != NULL)
-      oido->oid = value;
+      OidObject *oido = (OidObject *)Oid_new(&OidType, 0, 0);
+      if ( oido != NULL)
+	oido->oid = value;
 
-    return (PyObject *)oido;
+      return (PyObject *)oido;
+    } else {
+      PyObject *result;
+      result = PyTuple_New(self->elements);
+
+      for (unsigned int i = 0; i < self->elements; i++) {
+	pwr_tOid value = ((pwr_tOid *)buf)[i];
+	OidObject *oido = (OidObject *)Oid_new(&OidType, 0, 0);
+	if ( oido != NULL)
+	  oido->oid = value;
+	PyTuple_SetItem(result, i, (PyObject *)oido);
+      }    
+      free(buf);
+      return result;
+    }
   }
   case pwr_eType_AttrRef: {    
-    pwr_tAttrRef value = *(pwr_tAttrRef *)buf;
-    free(buf);
+    if (!self->aref.Flags.b.Array) {
+      pwr_tAttrRef value = *(pwr_tAttrRef *)buf;
+      free(buf);
 
-    ArefObject *arefo = (ArefObject *)Aref_new(&ArefType, 0, 0);
-    if ( arefo != NULL)
-      arefo->aref = value;
+      ArefObject *arefo = (ArefObject *)Aref_new(&ArefType, 0, 0);
+      if ( arefo != NULL)
+	init_aref(arefo, &value);
 
-    return (PyObject *)arefo;
+      return (PyObject *)arefo;
+    } else {
+      PyObject *result;
+      result = PyTuple_New(self->elements);
+
+      for (unsigned int i = 0; i < self->elements; i++) {
+	pwr_tAttrRef value = ((pwr_tAttrRef *)buf)[i];
+	ArefObject *arefo = (ArefObject *)Aref_new(&ArefType, 0, 0);
+	if ( arefo != NULL)
+	  init_aref(arefo, &value);
+	PyTuple_SetItem(result, i, (PyObject *)arefo);
+      }    
+      free(buf);
+      return result;
+    }
+    
   }
   default:
     return set_error(GDH__NYI);
@@ -1994,140 +2243,786 @@ Aref_setValue(ArefObject *self, PyObject *args)
 
   pwr_tStatus sts;
   char *buf;
-  pwr_eType atype;
-  unsigned int asize;
   int publicwrite = 0;
   unsigned int aflags;
 
-  sts = gdh_GetAttributeCharAttrref(&self->aref, &atype, &asize, 0, 0);
-  if (EVEN(sts)) return NULL;
+  //sts = gdh_GetAttributeCharAttrref(&self->aref, &atype, &asize, 0, 0);
+  //if (EVEN(sts)) return NULL;
 
   buf = malloc(self->aref.Size);
 
-  switch ( atype) {
+  switch ( (pwr_eType)self->type) {
   case pwr_eType_Boolean: {
-    unsigned int value;
-    if ( !PyArg_ParseTuple(args, "I|I", &value, &publicwrite))
-      goto error_return;
-    if ( value == 1)
-      *(pwr_tBoolean *)buf = 1;
-    else if ( value == 0)
-      *(pwr_tBoolean *)buf = 0;
-    else
-      goto error_return;
+    if (!self->aref.Flags.b.Array) {
+      unsigned int value;
+      if ( !PyArg_ParseTuple(args, "I|I", &value, &publicwrite))
+	goto error_return;
+      if ( value == 1)
+	*(pwr_tBoolean *)buf = 1;
+      else if ( value == 0)
+	*(pwr_tBoolean *)buf = 0;
+      else
+	goto error_return;
+    } else {
+      unsigned int tsize;
+      PyObject *tvalue;
 
+      if ( !PyArg_ParseTuple(args, "O|I", &tvalue, &publicwrite))
+	goto error_return;
+
+      if (PyTuple_Check(tvalue)) {
+	tsize = PyTuple_Size(tvalue);
+	if (tsize != self->elements)
+	  return set_error(GDH__ARGCOUNT);
+
+	for (unsigned int i = 0; i < tsize; i++) {
+	  PyObject *telem;
+
+	  telem = PyTuple_GetItem(tvalue, i);
+	  unsigned int value = PyLong_AsLong(telem);
+	  if (value == 1)
+	    ((pwr_tBoolean *)buf)[i] = 1;
+	  else if (value == 0)
+	    ((pwr_tBoolean *)buf)[i] = 0;
+	  else
+	    goto error_return;
+	}	  
+      }
+      else if (PyList_Check(tvalue)) {
+	tsize = PyList_Size(tvalue);
+	if (tsize != self->elements)
+	  return set_error(GDH__ARGCOUNT);
+
+	for (unsigned int i = 0; i < tsize; i++) {
+	  PyObject *telem;
+
+	  telem = PyList_GetItem(tvalue, i);
+	  unsigned int value = PyLong_AsLong(telem);
+	  if (value == 1)
+	    ((pwr_tBoolean *)buf)[i] = 1;
+	  else if (value == 0)
+	    ((pwr_tBoolean *)buf)[i] = 0;
+	  else
+	    goto error_return;
+	}	  
+      }
+      else
+	return set_error(GDH__ARGCOUNT);
+    } 
     break;
   }
   case pwr_eType_Int8: {
-    if ( !PyArg_ParseTuple(args, "b|I", buf, &publicwrite))
-      goto error_return;
+    if (!self->aref.Flags.b.Array) {
+      if ( !PyArg_ParseTuple(args, "b|I", buf, &publicwrite))
+	goto error_return;
+    } else {
+      unsigned int tsize;
+      PyObject *tvalue;
+
+      if ( !PyArg_ParseTuple(args, "O|I", &tvalue, &publicwrite))
+	goto error_return;
+
+      if (PyTuple_Check(tvalue)) {
+	tsize = PyTuple_Size(tvalue);
+	if (tsize != self->elements)
+	  return set_error(GDH__ARGCOUNT);
+
+	for (unsigned int i = 0; i < tsize; i++) {
+	  PyObject *telem;
+
+	  telem = PyTuple_GetItem(tvalue, i);
+	  ((pwr_tInt8*)buf)[i] = (pwr_tInt8) PyLong_AsLong(telem);
+	}	  
+      }
+      else if (PyList_Check(tvalue)) {
+	tsize = PyList_Size(tvalue);
+	if (tsize != self->elements)
+	  return set_error(GDH__ARGCOUNT);
+
+	for (unsigned int i = 0; i < tsize; i++) {
+	  PyObject *telem;
+
+	  telem = PyList_GetItem(tvalue, i);
+	  ((pwr_tInt8*)buf)[i] = (pwr_tInt8) PyLong_AsLong(telem);
+	}	  
+      }
+      else
+	return set_error(GDH__ARGCOUNT);
+    } 
     break;
   }
   case pwr_eType_UInt8: {
-    if ( !PyArg_ParseTuple(args, "B|I", buf, &publicwrite))
-      goto error_return;
+    if (!self->aref.Flags.b.Array) {
+      if ( !PyArg_ParseTuple(args, "B|I", buf, &publicwrite))
+	goto error_return;
+    } else {
+      unsigned int tsize;
+      PyObject *tvalue;
+
+      if ( !PyArg_ParseTuple(args, "O|I", &tvalue, &publicwrite))
+	goto error_return;
+
+      if (PyTuple_Check(tvalue)) {
+	tsize = PyTuple_Size(tvalue);
+	if (tsize != self->elements)
+	  return set_error(GDH__ARGCOUNT);
+
+	for (unsigned int i = 0; i < tsize; i++) {
+	  PyObject *telem;
+
+	  telem = PyTuple_GetItem(tvalue, i);
+	  ((pwr_tUInt8*)buf)[i] = (pwr_tUInt8) PyLong_AsLong(telem);
+	}	  
+      }
+      else if (PyList_Check(tvalue)) {
+	tsize = PyList_Size(tvalue);
+	if (tsize != self->elements)
+	  return set_error(GDH__ARGCOUNT);
+
+	for (unsigned int i = 0; i < tsize; i++) {
+	  PyObject *telem;
+
+	  telem = PyList_GetItem(tvalue, i);
+	  ((pwr_tUInt8*)buf)[i] = (pwr_tUInt8) PyLong_AsLong(telem);
+	}	  
+      }
+      else
+	return set_error(GDH__ARGCOUNT);
+    } 
     break;
   }
   case pwr_eType_Int16: {
-    if ( !PyArg_ParseTuple(args, "h|I", buf, &publicwrite))
-      goto error_return;
+    if (!self->aref.Flags.b.Array) {
+      if ( !PyArg_ParseTuple(args, "h|I", buf, &publicwrite))
+	goto error_return;
+    } else {
+      unsigned int tsize;
+      PyObject *tvalue;
+
+      if ( !PyArg_ParseTuple(args, "O|I", &tvalue, &publicwrite))
+	goto error_return;
+
+      if (PyTuple_Check(tvalue)) {
+	tsize = PyTuple_Size(tvalue);
+	if (tsize != self->elements)
+	  return set_error(GDH__ARGCOUNT);
+
+	for (unsigned int i = 0; i < tsize; i++) {
+	  PyObject *telem;
+
+	  telem = PyTuple_GetItem(tvalue, i);
+	  ((pwr_tInt16*)buf)[i] = (pwr_tInt16) PyLong_AsLong(telem);
+	}	  
+      }
+      else if (PyList_Check(tvalue)) {
+	tsize = PyList_Size(tvalue);
+	if (tsize != self->elements)
+	  return set_error(GDH__ARGCOUNT);
+
+	for (unsigned int i = 0; i < tsize; i++) {
+	  PyObject *telem;
+
+	  telem = PyList_GetItem(tvalue, i);
+	  ((pwr_tInt16*)buf)[i] = (pwr_tInt16) PyLong_AsLong(telem);
+	}	  
+      }
+      else
+	return set_error(GDH__ARGCOUNT);
+    } 
     break;
   }
   case pwr_eType_UInt16: {
-    if ( !PyArg_ParseTuple(args, "H|I", buf, &publicwrite))
-      goto error_return;
+    if (!self->aref.Flags.b.Array) {
+      if ( !PyArg_ParseTuple(args, "H|I", buf, &publicwrite))
+	goto error_return;
+    } else {
+      unsigned int tsize;
+      PyObject *tvalue;
+
+      if ( !PyArg_ParseTuple(args, "O|I", &tvalue, &publicwrite))
+	goto error_return;
+
+      if (PyTuple_Check(tvalue)) {
+	tsize = PyTuple_Size(tvalue);
+	if (tsize != self->elements)
+	  return set_error(GDH__ARGCOUNT);
+
+	for (unsigned int i = 0; i < tsize; i++) {
+	  PyObject *telem;
+
+	  telem = PyTuple_GetItem(tvalue, i);
+	  ((pwr_tUInt16*)buf)[i] = (pwr_tUInt16) PyLong_AsLong(telem);
+	}	  
+      }
+      else if (PyList_Check(tvalue)) {
+	tsize = PyList_Size(tvalue);
+	if (tsize != self->elements)
+	  return set_error(GDH__ARGCOUNT);
+
+	for (unsigned int i = 0; i < tsize; i++) {
+	  PyObject *telem;
+
+	  telem = PyList_GetItem(tvalue, i);
+	  ((pwr_tUInt16*)buf)[i] = (pwr_tUInt16) PyLong_AsLong(telem);
+	}	  
+      }
+      else
+	return set_error(GDH__ARGCOUNT);
+    } 
     break;
   }
   case pwr_eType_Int32:
   case pwr_eType_Enum: {
-    if ( !PyArg_ParseTuple(args, "i|I", buf, &publicwrite))
-      goto error_return;
+    if (!self->aref.Flags.b.Array) {
+      if ( !PyArg_ParseTuple(args, "i|I", buf, &publicwrite))
+	goto error_return;
+    } else {
+      unsigned int tsize;
+      PyObject *tvalue;
+
+      if ( !PyArg_ParseTuple(args, "O|I", &tvalue, &publicwrite))
+	goto error_return;
+
+      if (PyTuple_Check(tvalue)) {
+	tsize = PyTuple_Size(tvalue);
+	if (tsize != self->elements)
+	  return set_error(GDH__ARGCOUNT);
+
+	for (unsigned int i = 0; i < tsize; i++) {
+	  PyObject *telem;
+
+	  telem = PyTuple_GetItem(tvalue, i);
+	  ((pwr_tInt32*)buf)[i] = (pwr_tInt32) PyLong_AsLong(telem);
+	}	  
+      }
+      else if (PyList_Check(tvalue)) {
+	tsize = PyList_Size(tvalue);
+	if (tsize != self->elements)
+	  return set_error(GDH__ARGCOUNT);
+
+	for (unsigned int i = 0; i < tsize; i++) {
+	  PyObject *telem;
+
+	  telem = PyList_GetItem(tvalue, i);
+	  ((pwr_tInt32*)buf)[i] = (pwr_tInt32) PyLong_AsLong(telem);
+	}	  
+      }
+      else
+	return set_error(GDH__ARGCOUNT);
+    } 
     break;
   }
   case pwr_eType_UInt32:
   case pwr_eType_Mask:
   case pwr_eType_Status:
   case pwr_eType_NetStatus: {
-    if ( !PyArg_ParseTuple(args, "I|I", buf, &publicwrite))
-      goto error_return;
+    if (!self->aref.Flags.b.Array) {
+      if ( !PyArg_ParseTuple(args, "I|I", buf, &publicwrite))
+	goto error_return;
+    } else {
+      unsigned int tsize;
+      PyObject *tvalue;
+
+      if ( !PyArg_ParseTuple(args, "O|I", &tvalue, &publicwrite))
+	goto error_return;
+
+      if (PyTuple_Check(tvalue)) {
+	tsize = PyTuple_Size(tvalue);
+	if (tsize != self->elements)
+	  return set_error(GDH__ARGCOUNT);
+
+	for (unsigned int i = 0; i < tsize; i++) {
+	  PyObject *telem;
+
+	  telem = PyTuple_GetItem(tvalue, i);
+	  ((pwr_tUInt32*)buf)[i] = (pwr_tUInt32) PyLong_AsLong(telem);
+	}	  
+      }
+      else if (PyList_Check(tvalue)) {
+	tsize = PyList_Size(tvalue);
+	if (tsize != self->elements)
+	  return set_error(GDH__ARGCOUNT);
+
+	for (unsigned int i = 0; i < tsize; i++) {
+	  PyObject *telem;
+
+	  telem = PyList_GetItem(tvalue, i);
+	  ((pwr_tUInt32*)buf)[i] = (pwr_tUInt32) PyLong_AsLong(telem);
+	}	  
+      }
+      else
+	return set_error(GDH__ARGCOUNT);
+    } 
     break;
   }
   case pwr_eType_Int64: {
+    if (!self->aref.Flags.b.Array) {
 #if defined HW_X86_64
-    char format[] = "l|I";
+      char format[] = "l|I";
 #else
-    char format[] = "L|I";
+      char format[] = "L|I";
 #endif
-    if ( !PyArg_ParseTuple(args, format, buf, &publicwrite))
-      goto error_return;
+      if ( !PyArg_ParseTuple(args, format, buf, &publicwrite))
+	goto error_return;
+    } else {
+      unsigned int tsize;
+      PyObject *tvalue;
+
+      if ( !PyArg_ParseTuple(args, "O|I", &tvalue, &publicwrite))
+	goto error_return;
+
+      if (PyTuple_Check(tvalue)) {
+	tsize = PyTuple_Size(tvalue);
+	if (tsize != self->elements)
+	  return set_error(GDH__ARGCOUNT);
+
+	for (unsigned int i = 0; i < tsize; i++) {
+	  PyObject *telem;
+
+	  telem = PyTuple_GetItem(tvalue, i);
+	  ((pwr_tInt64*)buf)[i] = (pwr_tInt64) PyLong_AsLong(telem);
+	}	  
+      }
+      else if (PyList_Check(tvalue)) {
+	tsize = PyList_Size(tvalue);
+	if (tsize != self->elements)
+	  return set_error(GDH__ARGCOUNT);
+
+	for (unsigned int i = 0; i < tsize; i++) {
+	  PyObject *telem;
+
+	  telem = PyList_GetItem(tvalue, i);
+	  ((pwr_tInt64*)buf)[i] = (pwr_tInt64) PyLong_AsLong(telem);
+	}	  
+      }
+      else
+	return set_error(GDH__ARGCOUNT);
+    } 
     break;
   }
   case pwr_eType_UInt64: {
+    if (!self->aref.Flags.b.Array) {
 #if defined HW_X86_64
-    char format[] = "k|I";
+      char format[] = "k|I";
 #else
-    char format[] = "K|I";
+      char format[] = "K|I";
 #endif
-    if ( !PyArg_ParseTuple(args, format, buf, &publicwrite))
-      goto error_return;
+      if ( !PyArg_ParseTuple(args, format, buf, &publicwrite))
+	goto error_return;
+    } else {
+      unsigned int tsize;
+      PyObject *tvalue;
+
+      if ( !PyArg_ParseTuple(args, "O|I", &tvalue, &publicwrite))
+	goto error_return;
+
+      if (PyTuple_Check(tvalue)) {
+	tsize = PyTuple_Size(tvalue);
+	if (tsize != self->elements)
+	  return set_error(GDH__ARGCOUNT);
+
+	for (unsigned int i = 0; i < tsize; i++) {
+	  PyObject *telem;
+
+	  telem = PyTuple_GetItem(tvalue, i);
+	  ((pwr_tUInt64*)buf)[i] = (pwr_tUInt64) PyLong_AsLong(telem);
+	}	  
+      }
+      else if (PyList_Check(tvalue)) {
+	tsize = PyList_Size(tvalue);
+	if (tsize != self->elements)
+	  return set_error(GDH__ARGCOUNT);
+
+	for (unsigned int i = 0; i < tsize; i++) {
+	  PyObject *telem;
+
+	  telem = PyList_GetItem(tvalue, i);
+	  ((pwr_tUInt64*)buf)[i] = (pwr_tUInt64) PyLong_AsLong(telem);
+	}	  
+      }
+      else
+	return set_error(GDH__ARGCOUNT);
+    } 
     break;
   }
   case pwr_eType_Float32: {
-    if ( !PyArg_ParseTuple(args, "f|I", buf, &publicwrite))
-      goto error_return;
+    if (!self->aref.Flags.b.Array) {
+      if ( !PyArg_ParseTuple(args, "f|I", buf, &publicwrite))
+	goto error_return;
+    } else {
+      unsigned int tsize;
+      PyObject *tvalue;
+
+      if ( !PyArg_ParseTuple(args, "O|I", &tvalue, &publicwrite))
+	goto error_return;
+
+      if (PyTuple_Check(tvalue)) {
+	tsize = PyTuple_Size(tvalue);
+	if (tsize != self->elements)
+	  return set_error(GDH__ARGCOUNT);
+
+	for (unsigned int i = 0; i < tsize; i++) {
+	  PyObject *telem;
+
+	  telem = PyTuple_GetItem(tvalue, i);
+	  ((pwr_tFloat32*)buf)[i] = (pwr_tFloat32) PyFloat_AsDouble(telem);
+	}	  
+      }
+      else if (PyList_Check(tvalue)) {
+	tsize = PyList_Size(tvalue);
+	if (tsize != self->elements)
+	  return set_error(GDH__ARGCOUNT);
+
+	for (unsigned int i = 0; i < tsize; i++) {
+	  PyObject *telem;
+
+	  telem = PyList_GetItem(tvalue, i);
+	  ((pwr_tFloat32*)buf)[i] = (pwr_tFloat32) PyFloat_AsDouble(telem);
+	}	  
+      }
+      else
+	return set_error(GDH__ARGCOUNT);
+    } 
     break;
   }
   case pwr_eType_Float64: {
-    if ( !PyArg_ParseTuple(args, "d|I", buf, &publicwrite))
-      goto error_return;
+    if (!self->aref.Flags.b.Array) {
+      if ( !PyArg_ParseTuple(args, "d|I", buf, &publicwrite))
+	goto error_return;
+    } else {
+      unsigned int tsize;
+      PyObject *tvalue;
+
+      if ( !PyArg_ParseTuple(args, "O|I", &tvalue, &publicwrite))
+	goto error_return;
+
+      if (PyTuple_Check(tvalue)) {
+	tsize = PyTuple_Size(tvalue);
+	if (tsize != self->elements)
+	  return set_error(GDH__ARGCOUNT);
+
+	for (unsigned int i = 0; i < tsize; i++) {
+	  PyObject *telem;
+
+	  telem = PyTuple_GetItem(tvalue, i);
+	  ((pwr_tFloat64*)buf)[i] = (pwr_tFloat64) PyFloat_AsDouble(telem);
+	}	  
+      }
+      else if (PyList_Check(tvalue)) {
+	tsize = PyList_Size(tvalue);
+	if (tsize != self->elements)
+	  return set_error(GDH__ARGCOUNT);
+
+	for (unsigned int i = 0; i < tsize; i++) {
+	  PyObject *telem;
+
+	  telem = PyList_GetItem(tvalue, i);
+	  ((pwr_tFloat64*)buf)[i] = (pwr_tFloat64) PyFloat_AsDouble(telem);
+	}	  
+      }
+      else
+	return set_error(GDH__ARGCOUNT);
+    } 
     break;
   }
   case pwr_eType_String: {
-    char *utf8value = 0, *value;
-    if ( !PyArg_ParseTuple(args, "s|I", &utf8value, &publicwrite))
-      goto error_return;
+    if (!self->aref.Flags.b.Array) {
+      char *utf8value = 0, *value;
 
-    value = cnv_utf8_to_iso8859(utf8value, strlen(utf8value)+1);
-    strncpy( buf, value, self->aref.Size);
-    buf[self->aref.Size-1] = 0;
+      if ( !PyArg_ParseTuple(args, "s|I", &utf8value, &publicwrite))
+	goto error_return;
+
+      value = cnv_utf8_to_iso8859(utf8value, strlen(utf8value)+1);
+      strncpy( buf, value, self->aref.Size);
+      buf[self->aref.Size-1] = 0;
+    } else {
+      unsigned int tsize;
+      PyObject *tvalue;
+      int elemsize = self->size/self->elements;
+
+      if ( !PyArg_ParseTuple(args, "O|I", &tvalue, &publicwrite))
+	goto error_return;
+
+      if (PyTuple_Check(tvalue)) {
+	tsize = PyTuple_Size(tvalue);
+	if (tsize != self->elements)
+	  return set_error(GDH__ARGCOUNT);
+
+	for (unsigned int i = 0; i < tsize; i++) {
+	  PyObject *telem, *tstr;
+	  char utf8str[500];
+
+	  telem = PyTuple_GetItem(tvalue, i);
+
+	  tstr = PyUnicode_AsEncodedString(telem, "UTF-8", "strict");
+	  if (tstr != NULL) {
+	    strncpy(utf8str, PyBytes_AS_STRING(tstr), sizeof(utf8str));
+	    Py_DECREF(tstr);
+	    strncpy(&buf[elemsize*i], cnv_utf8_to_iso8859(utf8str, strlen(utf8str)+1), elemsize);
+	    
+	  } else {
+	    return set_error(GDH__BADARG);
+	  }
+	}	  
+      }
+      else if (PyList_Check(tvalue)) {
+	tsize = PyList_Size(tvalue);
+	if (tsize != self->elements)
+	  return set_error(GDH__ARGCOUNT);
+
+	for (unsigned int i = 0; i < tsize; i++) {
+	  PyObject *telem, *tstr;
+	  char utf8str[500];
+
+	  telem = PyList_GetItem(tvalue, i);
+	  tstr = PyUnicode_AsEncodedString(telem, "UTF-8", "strict");
+	  if (tstr != NULL) {
+	    strncpy(utf8str, PyBytes_AS_STRING(tstr), sizeof(utf8str));
+	    Py_DECREF(tstr);
+	    strncpy(&buf[elemsize*i], cnv_utf8_to_iso8859(utf8str, strlen(utf8str)+1), elemsize);
+	    
+	  } else {
+	    return set_error(GDH__BADARG);
+	  }
+	}	  
+      }
+      else
+	return set_error(GDH__ARGCOUNT);
+    } 
     break;
   }
   case pwr_eType_Time: {
-    char *value = 0;
-    if ( !PyArg_ParseTuple(args, "s", &value))
-      goto error_return;
+    if (!self->aref.Flags.b.Array) {
+      char *value = 0;
+      if ( !PyArg_ParseTuple(args, "s", &value))
+	goto error_return;
 
-    time_AsciiToA(value, (pwr_tTime *)buf);
+      time_AsciiToA(value, (pwr_tTime *)buf);
+    } else {
+      unsigned int tsize;
+      PyObject *tvalue;
+
+      if ( !PyArg_ParseTuple(args, "O|I", &tvalue, &publicwrite))
+	goto error_return;
+
+      if (PyTuple_Check(tvalue)) {
+	tsize = PyTuple_Size(tvalue);
+	if (tsize != self->elements)
+	  return set_error(GDH__ARGCOUNT);
+
+	for (unsigned int i = 0; i < tsize; i++) {
+	  PyObject *telem, *tstr;
+	  char utf8str[40];
+
+	  telem = PyTuple_GetItem(tvalue, i);
+
+	  tstr = PyUnicode_AsEncodedString(telem, "UTF-8", "strict");
+	  if (tstr != NULL) {
+	    strncpy(utf8str, PyBytes_AS_STRING(tstr), sizeof(utf8str));
+	    Py_DECREF(tstr);
+	    time_AsciiToA(cnv_utf8_to_iso8859(utf8str, strlen(utf8str)+1), &((pwr_tTime *)buf)[i]);
+	  } else {
+	    return set_error(GDH__BADARG);
+	  }
+	}	  
+      }
+      else if (PyList_Check(tvalue)) {
+	tsize = PyList_Size(tvalue);
+	if (tsize != self->elements)
+	  return set_error(GDH__ARGCOUNT);
+
+	for (unsigned int i = 0; i < tsize; i++) {
+	  PyObject *telem, *tstr;
+	  char utf8str[40];
+
+	  telem = PyList_GetItem(tvalue, i);
+	  tstr = PyUnicode_AsEncodedString(telem, "UTF-8", "strict");
+	  if (tstr != NULL) {
+	    strncpy(utf8str, PyBytes_AS_STRING(tstr), sizeof(utf8str));
+	    Py_DECREF(tstr);
+	    time_AsciiToA(cnv_utf8_to_iso8859(utf8str, strlen(utf8str)+1), &((pwr_tTime *)buf)[i]);
+	  } else {
+	    return set_error(GDH__BADARG);
+	  }
+	}	  
+      }
+      else
+	return set_error(GDH__ARGCOUNT);
+    } 
     break;
   }
   case pwr_eType_DeltaTime: {
-    char *value = 0;
-    if ( !PyArg_ParseTuple(args, "s", &value))
-      goto error_return;
+    if (!self->aref.Flags.b.Array) {
+      char *value = 0;
+      if ( !PyArg_ParseTuple(args, "s", &value))
+	goto error_return;
 
-    time_AsciiToD(value, (pwr_tDeltaTime *)buf);
+      time_AsciiToD(value, (pwr_tDeltaTime *)buf);
+    } else {
+      unsigned int tsize;
+      PyObject *tvalue;
+
+      if ( !PyArg_ParseTuple(args, "O|I", &tvalue, &publicwrite))
+	goto error_return;
+
+      if (PyTuple_Check(tvalue)) {
+	tsize = PyTuple_Size(tvalue);
+	if (tsize != self->elements)
+	  return set_error(GDH__ARGCOUNT);
+
+	for (unsigned int i = 0; i < tsize; i++) {
+	  PyObject *telem, *tstr;
+	  char utf8str[40];
+
+	  telem = PyTuple_GetItem(tvalue, i);
+
+	  tstr = PyUnicode_AsEncodedString(telem, "UTF-8", "strict");
+	  if (tstr != NULL) {
+	    strncpy(utf8str, PyBytes_AS_STRING(tstr), sizeof(utf8str));
+	    Py_DECREF(tstr);
+	    time_AsciiToD(utf8str, &((pwr_tDeltaTime *)buf)[i]);
+	  } else {
+	    return set_error(GDH__BADARG);
+	  }
+	}	  
+      }
+      else if (PyList_Check(tvalue)) {
+	tsize = PyList_Size(tvalue);
+	if (tsize != self->elements)
+	  return set_error(GDH__ARGCOUNT);
+
+	for (unsigned int i = 0; i < tsize; i++) {
+	  PyObject *telem, *tstr;
+	  char utf8str[40];
+
+	  telem = PyList_GetItem(tvalue, i);
+	  tstr = PyUnicode_AsEncodedString(telem, "UTF-8", "strict");
+	  if (tstr != NULL) {
+	    strncpy(utf8str, PyBytes_AS_STRING(tstr), sizeof(utf8str));
+	    Py_DECREF(tstr);
+	    time_AsciiToD(utf8str, &((pwr_tDeltaTime *)buf)[i]);
+	  } else {
+	    return set_error(GDH__BADARG);
+	  }
+	}	  
+      }
+      else
+	return set_error(GDH__ARGCOUNT);
+    } 
     break;
   }
   case pwr_eType_Objid: {
-    OidObject *o;
-    pwr_tOid oid;
+    if (!self->aref.Flags.b.Array) {
+      OidObject *o;
+      pwr_tOid oid;
 
-    if ( !PyArg_ParseTuple(args, "O", &o))
-      goto error_return;
+      if ( !PyArg_ParseTuple(args, "O", &o))
+	goto error_return;
 
-    oid = o->oid;
-    memcpy(buf, &oid, sizeof(oid));
+      if (!PyObject_IsInstance((PyObject *)o, (PyObject *)&OidType))
+	return set_error(GDH__BADARG);
+
+      oid = o->oid;
+      memcpy(buf, &oid, sizeof(oid));
+    } else {
+      unsigned int tsize;
+      PyObject *tvalue;
+
+      if ( !PyArg_ParseTuple(args, "O|I", &tvalue, &publicwrite))
+	goto error_return;
+
+      if (PyTuple_Check(tvalue)) {
+	tsize = PyTuple_Size(tvalue);
+	if (tsize != self->elements)
+	  return set_error(GDH__ARGCOUNT);
+
+	for (unsigned int i = 0; i < tsize; i++) {
+	  PyObject *telem;
+
+	  telem = PyTuple_GetItem(tvalue, i);
+
+	  if (!PyObject_IsInstance(telem, (PyObject *)&OidType))
+	    return set_error(GDH__BADARG);
+
+	  memcpy(&((pwr_tOid*)buf)[i], &((OidObject *)telem)->oid, sizeof(pwr_tOid));
+	}	  
+      }
+      else if (PyList_Check(tvalue)) {
+	tsize = PyList_Size(tvalue);
+	if (tsize != self->elements)
+	  return set_error(GDH__ARGCOUNT);
+
+	for (unsigned int i = 0; i < tsize; i++) {
+	  PyObject *telem;
+
+	  telem = PyList_GetItem(tvalue, i);
+
+	  if (!PyObject_IsInstance(telem, (PyObject *)&OidType))
+	    return set_error(GDH__BADARG);
+
+	  memcpy(&((pwr_tOid*)buf)[i], &((OidObject *)telem)->oid, sizeof(pwr_tOid));
+	}	  
+      }
+      else
+	return set_error(GDH__ARGCOUNT);
+    } 
     break;
   }
   case pwr_eType_AttrRef: {
-    ArefObject *a;
-    pwr_tAttrRef aref;
+    if (!self->aref.Flags.b.Array) {
+      ArefObject *a;
+      pwr_tAttrRef aref;
 
-    if ( !PyArg_ParseTuple(args, "O", &a))
-      goto error_return;
+      if ( !PyArg_ParseTuple(args, "O", &a))
+	goto error_return;
 
-    aref = a->aref;
-    memcpy(buf, &aref, sizeof(aref));
+      if (!PyObject_IsInstance((PyObject *)a, (PyObject *)&ArefType))
+	return set_error(GDH__BADARG);
+
+      aref = a->aref;
+      memcpy(buf, &aref, sizeof(aref));
+    } else {
+      unsigned int tsize;
+      PyObject *tvalue;
+
+      if ( !PyArg_ParseTuple(args, "O|I", &tvalue, &publicwrite))
+	goto error_return;
+
+      if (PyTuple_Check(tvalue)) {
+	tsize = PyTuple_Size(tvalue);
+	if (tsize != self->elements)
+	  return set_error(GDH__ARGCOUNT);
+
+	for (unsigned int i = 0; i < tsize; i++) {
+	  PyObject *telem;
+
+	  telem = PyTuple_GetItem(tvalue, i);
+
+	  if (!PyObject_IsInstance(telem, (PyObject *)&ArefType))
+	    return set_error(GDH__BADARG);
+
+	  memcpy(&((pwr_tAttrRef*)buf)[i], &((ArefObject *)telem)->aref, sizeof(pwr_tAttrRef));
+	}	  
+      }
+      else if (PyList_Check(tvalue)) {
+	tsize = PyList_Size(tvalue);
+	if (tsize != self->elements)
+	  return set_error(GDH__ARGCOUNT);
+
+	for (unsigned int i = 0; i < tsize; i++) {
+	  PyObject *telem;
+
+	  telem = PyList_GetItem(tvalue, i);
+
+	  if (!PyObject_IsInstance(telem, (PyObject *)&ArefType))
+	    return set_error(GDH__BADARG);
+
+	  memcpy(&((pwr_tAttrRef*)buf)[i], &((ArefObject *)telem)->aref, sizeof(pwr_tAttrRef));
+	}	  
+      }
+      else
+	return set_error(GDH__ARGCOUNT);
+    } 
     break;
   }
   default:
@@ -2178,7 +3073,7 @@ Aref_subscribe(ArefObject *self, PyObject *args)
   if ( sub == NULL)
     return NULL;
 
-  sts = gdh_GetAttributeCharAttrref(&self->aref, &sub->type, &sub->size, 0, 0);
+  sts = gdh_GetAttributeCharAttrref(&self->aref, &sub->type, &sub->size, 0, &sub->elements);
   if (EVEN(sts)) 
     return set_error(sts);
   
@@ -2395,7 +3290,7 @@ Cid_attrObject(CidObject *self, PyObject *args)
 
   instance = (ArefObject *)Aref_new(&ArefType, 0, 0);
   if (instance != NULL) {
-    instance->aref = aref;
+    init_aref(instance, &aref);
   }
 
   return (PyObject *)instance;
@@ -2417,7 +3312,7 @@ Cid_nextAttrObject(CidObject *self, PyObject *args)
 
   next = (ArefObject *)Aref_new(&ArefType, 0, 0);
   if (next != NULL) {
-    next->aref = next_aref;
+    init_aref(next, &next_aref);
   }
 
   return (PyObject *)next;
@@ -2445,7 +3340,7 @@ Cid_attrObjects(PyObject *s)
 	sts = gdh_GetNextAttrRef( self->cid, &aref, &aref)) {
     object = (ArefObject *)Aref_new(&ArefType, 0, 0);
     if (object != NULL) {
-      object->aref = aref;
+      init_aref(object, &aref);
       PyTuple_SetItem(result, cnt, (PyObject *)object);
       cnt++;
     }    
@@ -2693,6 +3588,7 @@ Sub_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
   if (self != NULL) {
     self->type = 0;
     self->size = 0;
+    self->elements = 0;
     self->p = 0;
     self->refid = pwr_cNRefId;
   }
@@ -2719,12 +3615,13 @@ Sub_init(SubObject *self, PyObject *args, PyObject *kwds)
   char *name, *utf8name;
   pwr_eType atype;
   unsigned int asize;
+  unsigned int aelements;
 
   if (! PyArg_ParseTuple(args, "s", &utf8name))
     return -1;
 
   name = cnv_utf8_to_iso8859(utf8name, strlen(utf8name)+1);
-  sts = gdh_GetAttributeCharacteristics(name, &atype, &asize, 0, 0);
+  sts = gdh_GetAttributeCharacteristics(name, &atype, &asize, 0, &aelements);
   if (EVEN(sts)) {
     self->sts = sts;
     self->p = 0;
@@ -2740,6 +3637,7 @@ Sub_init(SubObject *self, PyObject *args, PyObject *kwds)
   
   self->type = atype;
   self->size = asize;
+  self->elements = aelements;
   return 0;
 }
 
@@ -2751,92 +3649,286 @@ Sub_value(SubObject *self, PyObject *args)
 
   switch ( self->type) {
   case pwr_eType_Boolean: {
-    pwr_tBoolean value = *(pwr_tBoolean *)self->p;
-    return Py_BuildValue("i", value);
+    if (self->elements < 2) {
+      pwr_tBoolean value = *(pwr_tBoolean *)self->p;
+      return Py_BuildValue("i", value);
+    } else {
+      PyObject *result;
+      result = PyTuple_New(self->elements);
+
+      for (unsigned int i = 0; i < self->elements; i++) {
+	pwr_tBoolean value = ((pwr_tBoolean *)self->p)[i];
+	PyTuple_SetItem(result, i,  Py_BuildValue("i", value));
+      }    
+      return result;
+    }
   }
   case pwr_eType_Int8: {
-    pwr_tInt8 value = *(pwr_tInt8 *)self->p;
-    return Py_BuildValue("b", value);
+    if (self->elements < 2) {
+      pwr_tInt8 value = *(pwr_tInt8 *)self->p;
+      return Py_BuildValue("b", value);
+    } else {
+      PyObject *result;
+      result = PyTuple_New(self->elements);
+
+      for (unsigned int i = 0; i < self->elements; i++) {
+	pwr_tInt8 value = ((pwr_tInt8 *)self->p)[i];
+	PyTuple_SetItem(result, i,  Py_BuildValue("b", value));
+      }    
+      return result;
+    }
   }
   case pwr_eType_UInt8: {
-    pwr_tUInt8 value = *(pwr_tUInt8 *)self->p;
-    return Py_BuildValue("B", value);
+    if (self->elements < 2) {
+      pwr_tUInt8 value = *(pwr_tUInt8 *)self->p;
+      return Py_BuildValue("B", value);
+    } else {
+      PyObject *result;
+      result = PyTuple_New(self->elements);
+
+      for (unsigned int i = 0; i < self->elements; i++) {
+	pwr_tUInt8 value = ((pwr_tUInt8 *)self->p)[i];
+	PyTuple_SetItem(result, i,  Py_BuildValue("B", value));
+      }    
+      return result;
+    }
   }
   case pwr_eType_Int16: {
-    pwr_tInt16 value = *(pwr_tInt16 *)self->p;
-    return Py_BuildValue("h", value);
+    if (self->elements < 2) {
+      pwr_tInt16 value = *(pwr_tInt16 *)self->p;
+      return Py_BuildValue("h", value);
+    } else {
+      PyObject *result;
+      result = PyTuple_New(self->elements);
+
+      for (unsigned int i = 0; i < self->elements; i++) {
+	pwr_tInt16 value = ((pwr_tInt16 *)self->p)[i];
+	PyTuple_SetItem(result, i,  Py_BuildValue("h", value));
+      }    
+      return result;
+    }
   }
   case pwr_eType_UInt16: {
-    pwr_tUInt16 value = *(pwr_tUInt16 *)self->p;
-    return Py_BuildValue("H", value);
+    if (self->elements < 2) {
+      pwr_tUInt16 value = *(pwr_tUInt16 *)self->p;
+      return Py_BuildValue("H", value);
+    } else {
+      PyObject *result;
+      result = PyTuple_New(self->elements);
+
+      for (unsigned int i = 0; i < self->elements; i++) {
+	pwr_tUInt16 value = ((pwr_tUInt16 *)self->p)[i];
+	PyTuple_SetItem(result, i,  Py_BuildValue("H", value));
+      }    
+      return result;
+    }
   }
-  case pwr_eType_Int32: {
-    pwr_tInt32 value = *(pwr_tInt32 *)self->p;
-    return Py_BuildValue("i", value);
+  case pwr_eType_Int32:
+  case pwr_eType_Enum: {
+    if (self->elements < 2) {
+      pwr_tInt32 value = *(pwr_tInt32 *)self->p;
+      return Py_BuildValue("i", value);
+    } else {
+      PyObject *result;
+      result = PyTuple_New(self->elements);
+
+      for (unsigned int i = 0; i < self->elements; i++) {
+	pwr_tInt32 value = ((pwr_tInt32 *)self->p)[i];
+	PyTuple_SetItem(result, i,  Py_BuildValue("i", value));
+      }    
+      return result;
+    }
   }
-  case pwr_eType_UInt32: {
-    pwr_tUInt32 value = *(pwr_tUInt32 *)self->p;
-    return Py_BuildValue("I", value);
+  case pwr_eType_UInt32:
+  case pwr_eType_Mask:
+  case pwr_eType_Status:
+  case pwr_eType_NetStatus: {
+    if (self->elements < 2) {
+      pwr_tUInt32 value = *(pwr_tUInt32 *)self->p;
+      return Py_BuildValue("I", value);
+    } else {
+      PyObject *result;
+      result = PyTuple_New(self->elements);
+
+      for (unsigned int i = 0; i < self->elements; i++) {
+	pwr_tUInt32 value = ((pwr_tUInt32 *)self->p)[i];
+	PyTuple_SetItem(result, i,  Py_BuildValue("I", value));
+      }    
+      return result;
+    }
   }
   case pwr_eType_Int64: {
     char format[2];
-    pwr_tInt64 value = *(pwr_tInt64 *)self->p;
 #if defined HW_X86_64
     strcpy( format, "l");
 #else
     strcpy( format, "L");
 #endif
-    return Py_BuildValue(format, value);
+    if (self->elements < 2) {
+      pwr_tInt64 value = *(pwr_tInt64 *)self->p;
+      return Py_BuildValue(format, value);
+    } else {
+      PyObject *result;
+      result = PyTuple_New(self->elements);
+
+      for (unsigned int i = 0; i < self->elements; i++) {
+	pwr_tInt64 value = ((pwr_tInt64 *)self->p)[i];
+	PyTuple_SetItem(result, i,  Py_BuildValue(format, value));
+      }    
+      return result;
+    }
   }
   case pwr_eType_UInt64: {
     char format[2];
-    pwr_tUInt64 value = *(pwr_tUInt64 *)self->p;
 #if defined HW_X86_64
     strcpy( format, "k");
 #else
     strcpy( format, "K");
 #endif
-    return Py_BuildValue(format, value);
+    if (self->elements < 2) {
+      pwr_tUInt64 value = *(pwr_tUInt64 *)self->p;
+      return Py_BuildValue(format, value);
+    } else {
+      PyObject *result;
+      result = PyTuple_New(self->elements);
+
+      for (unsigned int i = 0; i < self->elements; i++) {
+	pwr_tUInt64 value = ((pwr_tUInt64 *)self->p)[i];
+	PyTuple_SetItem(result, i,  Py_BuildValue(format, value));
+      }    
+      return result;
+    }
   }
   case pwr_eType_Float32: {
-    pwr_tFloat32 value = *(pwr_tFloat32 *)self->p;
-    return Py_BuildValue("f", value);
+    if (self->elements < 2) {
+      pwr_tFloat32 value = *(pwr_tFloat32 *)self->p;
+      return Py_BuildValue("f", value);
+    } else {
+      PyObject *result;
+      result = PyTuple_New(self->elements);
+
+      for (unsigned int i = 0; i < self->elements; i++) {
+	pwr_tFloat32 value = ((pwr_tFloat32 *)self->p)[i];
+	PyTuple_SetItem(result, i,  Py_BuildValue("f", value));
+      }    
+      return result;
+    }
   }
   case pwr_eType_Float64: {
-    pwr_tFloat64 value = *(pwr_tFloat64 *)self->p;
-    return Py_BuildValue("d", value);
+    if (self->elements < 2) {
+      pwr_tFloat64 value = *(pwr_tFloat64 *)self->p;
+      return Py_BuildValue("d", value);
+    } else {
+      PyObject *result;
+      result = PyTuple_New(self->elements);
+
+      for (unsigned int i = 0; i < self->elements; i++) {
+	pwr_tFloat64 value = ((pwr_tFloat64 *)self->p)[i];
+	PyTuple_SetItem(result, i,  Py_BuildValue("d", value));
+      }    
+      return result;
+    }
   }
   case pwr_eType_String:
-    return Py_BuildValue("s", self->p);
+  case pwr_eType_Text: {
+    if (self->elements < 2) {
+      char *utfstr = cnv_iso8859_to_utf8(self->p, strlen(self->p)+1);
+      return Py_BuildValue("s", utfstr);
+    } else {
+      PyObject *result;
+      int elemsize = self->size/self->elements;
+
+      result = PyTuple_New(self->elements);
+
+      for (unsigned int i = 0; i < self->elements; i++) {
+	char *utfstr = cnv_iso8859_to_utf8((char *)self->p + elemsize*i, 
+	    strlen((char *)self->p + elemsize*i)+1);
+	PyTuple_SetItem(result, i,  Py_BuildValue("s", utfstr));
+      }    
+      return result;
+    }
+  }
   case pwr_eType_Time: {
     char timstr[30];
+    if (self->elements < 2) {
+      time_AtoAscii((pwr_tTime *)self->p, time_eFormat_DateAndTime, timstr, sizeof(timstr));
+      return Py_BuildValue("s", timstr);
+    } else {
+      PyObject *result;
 
-    time_AtoAscii((pwr_tTime *)self->p, time_eFormat_DateAndTime, timstr, sizeof(timstr));
-    return Py_BuildValue("s", timstr);
+      result = PyTuple_New(self->elements);
+
+      for (unsigned int i = 0; i < self->elements; i++) {
+	time_AtoAscii(&((pwr_tTime *)self->p)[i], time_eFormat_DateAndTime, timstr, sizeof(timstr));
+	PyTuple_SetItem(result, i,  Py_BuildValue("s", timstr));
+      }    
+      return result;
+    }
   }
   case pwr_eType_DeltaTime: {
     char timstr[30];
+    if (self->elements < 2) {
+      time_DtoAscii((pwr_tDeltaTime *)self->p, 1, timstr, sizeof(timstr));
+      return Py_BuildValue("s", timstr);
+    } else {
+      PyObject *result;
 
-    time_DtoAscii((pwr_tDeltaTime *)self->p, 1, timstr, sizeof(timstr));
-    return Py_BuildValue("s", timstr);
+      result = PyTuple_New(self->elements);
+
+      for (unsigned int i = 0; i < self->elements; i++) {
+	time_DtoAscii(&((pwr_tDeltaTime *)self->p)[i], 1, timstr, sizeof(timstr));
+	PyTuple_SetItem(result, i,  Py_BuildValue("s", timstr));
+      }    
+      return result;
+    }
   }
   case pwr_eType_Objid: {    
-    pwr_tOid value = *(pwr_tOid *)self->p;
+    if (self->elements < 2) {
+      pwr_tOid value = *(pwr_tOid *)self->p;
 
-    OidObject *oido = (OidObject *)Oid_new(&OidType, 0, 0);
-    if ( oido != NULL)
-      oido->oid = value;
+      OidObject *oido = (OidObject *)Oid_new(&OidType, 0, 0);
+      if ( oido != NULL)
+	oido->oid = value;
 
-    return (PyObject *)oido;
+      return (PyObject *)oido;
+    } else {
+      PyObject *result;
+
+      result = PyTuple_New(self->elements);
+
+      for (unsigned int i = 0; i < self->elements; i++) {
+	OidObject *oido = (OidObject *)Oid_new(&OidType, 0, 0);
+	if ( oido != NULL)
+	  oido->oid = ((pwr_tOid *)self->p)[i];
+
+	PyTuple_SetItem(result, i, (PyObject *)oido);
+      }    
+      return result;
+    }
   }
   case pwr_eType_AttrRef: {    
-    pwr_tAttrRef value = *(pwr_tAttrRef *)self->p;
+    if (self->elements < 2) {
+      pwr_tAttrRef value = *(pwr_tAttrRef *)self->p;
 
-    ArefObject *arefo = (ArefObject *)Aref_new(&ArefType, 0, 0);
-    if ( arefo != NULL)
-      arefo->aref = value;
+      ArefObject *arefo = (ArefObject *)Aref_new(&ArefType, 0, 0);
+      if ( arefo != NULL)
+	init_aref(arefo, &value);
 
-    return (PyObject *)arefo;
+      return (PyObject *)arefo;
+    } else {
+      PyObject *result;
+
+      result = PyTuple_New(self->elements);
+
+      for (unsigned int i = 0; i < self->elements; i++) {
+	ArefObject *arefo = (ArefObject *)Aref_new(&ArefType, 0, 0);
+	if ( arefo != NULL)
+	  init_aref(arefo, &((pwr_tAttrRef *)self->p)[i]);
+
+	PyTuple_SetItem(result, i, (PyObject *)arefo);
+      }    
+      return result;
+    }
   }
   default:
     return set_error(GDH__BADOBJTYPE);
@@ -2932,7 +4024,8 @@ Sub_setValue(SubObject *self, PyObject *args)
       goto error_return;
     break;
   }
-  case pwr_eType_String: {
+  case pwr_eType_String:
+  case pwr_eType_Text: {
     char *value, *utf8value = 0;
     if ( !PyArg_ParseTuple(args, "s", &utf8value))
       goto error_return;
