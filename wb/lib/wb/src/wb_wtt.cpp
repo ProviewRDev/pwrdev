@@ -980,7 +980,7 @@ void Wtt::activate_revisions()
     set_focus_default();
   if (!focused_wnav->gbl.enable_revisions) {
     focused_wnav->wow->DisplayError("Revisions",
-        "Revision is not enabled.\nEnable revisions in Tools/Settings.");
+        "Revision is not enabled.\nEnable revisions in Options/Settings.");
     return;
   }
 
