@@ -64,7 +64,8 @@ GrowTable::GrowTable(GrowCtx* glow_ctx, const char* name, double x, double y,
       header_text_color(glow_eDrawType_Line), header_row_height(0.8),
       row_height(0.6), value_size(0), cell_value(0), selected_cell_row(-1),
       selected_cell_column(-1), select_drawtype(glow_eDrawType_Inherit),
-      input_focus(0), options(glow_mTableOptions_No), font(glow_eFont_Helvetica)
+      input_focus(0), header_text_bold(0), options(glow_mTableOptions_No), 
+      font(glow_eFont_Helvetica)
 {
   for (int i = 0; i < TABLE_MAX_COL; i++) {
     strcpy(header_text[i], "");
