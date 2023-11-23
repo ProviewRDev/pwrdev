@@ -973,6 +973,7 @@ palette PlcEditorPalette
     class RemoteDataQFo
     class QCreateData
     class QDisplayFo
+    class QDisplayFixFo
     class QDisplayLinkFo
     class QOrder
     class QRemoteOrder

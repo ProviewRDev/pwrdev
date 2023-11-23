@@ -50,6 +50,8 @@ void QDisplayFo_init(pwr_sClass_QDisplayFo* o);
 void QDisplayFo_exec(plc_sThread* tp, pwr_sClass_QDisplayFo* o);
 void QDisplayLinkFo_init(pwr_sClass_QDisplayLinkFo* o);
 void QDisplayLinkFo_exec(plc_sThread* tp, pwr_sClass_QDisplayLinkFo* o);
+void QDisplayFixFo_init(pwr_sClass_QDisplayFixFo* o);
+void QDisplayFixFo_exec(plc_sThread* tp, pwr_sClass_QDisplayFixFo* o);
 void QTrp_exec(plc_sThread* tp, pwr_sClass_QTrp* o);
 void QTrpRR_exec(plc_sThread* tp, pwr_sClass_QTrpRR* o);
 void QTrpFF_exec(plc_sThread* tp, pwr_sClass_QTrpFF* o);
