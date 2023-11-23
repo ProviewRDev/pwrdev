@@ -100,6 +100,7 @@ fi
 echo "pwra_db $pwra_db"
 cp $pwre_croot/src/tools/pkg/deb/adm/* $pwra_db/
 echo "VolPwrDemo	0.254.254.200	pwrdemo" >> $pwra_db/pwr_volumelist.dat
+echo "CVolPwrDemo	0.0.249.200	pwrdemo" >> $pwra_db/pwr_volumelist.dat
 echo "%base V0.0.0 $pwre_broot" > $pwra_db/pwr_projectlist.dat
 echo "pwrdemo	V0.0.0	$pwrp_root	Demo-pwrdemo	\"\"" >> $pwra_db/pwr_projectlist.dat
 
@@ -119,6 +120,11 @@ cat > initdir.pwr_com <<EOF
 EOF
 
 wb_cmd @initdir
+
+echo "*"
+echo "* Build class volume cvolpwrdemo"
+echo "*"
+wb_cmd build classvolume cvolpwrdemo
 
 echo "*"
 echo "* Load volpwrdemo"

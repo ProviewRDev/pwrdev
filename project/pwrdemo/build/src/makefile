@@ -35,4 +35,6 @@ clean_project:
 	@ if [ -e $(pwre_croot)/project/pwrdemo/bld ]; then rm $(pwre_croot)/project/pwrdemo/bld; fi
 	@ if [ -e $(pwre_croot)/project/pwrdemo/src/db/volpwrdemo.db ]; then rm -r $(pwre_croot)/project/pwrdemo/src/db/volpwrdemo.db; fi
 	@ if [ -e $(pwre_croot)/project/pwrdemo/src/db/volpwrdemo.db.lock ]; then rm -r $(pwre_croot)/project/pwrdemo/src/db/volpwrdemo.db.lock; fi
+	@ if [ -e $(pwre_croot)/project/pwrdemo/src/db/directory.wb_load.lock ]; then rm -r $(pwre_croot)/project/pwrdemo/src/db/directory.wb_load.lock; fi
+	@ if [ -e $(pwre_croot)/project/pwrdemo/src/db/cvolpwrdemo.wb_load.lock ]; then rm -r $(pwre_croot)/project/pwrdemo/src/db/cvolpwrdemo.wb_load.lock; fi
 	@ if [ -e $(release_root)/bld/project/pwrdemo/bld ]; then rm -r $(release_root)/bld/project/pwrdemo/bld; fi

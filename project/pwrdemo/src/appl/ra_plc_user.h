@@ -6,4 +6,8 @@
 #include "pwr_inorclasses.h"
 #include "pwr_siemensclasses.h"
 #include "pwr_miscellaneousclasses.h"
+#include "pwr_dataqclasses.h"
 #include "misc.h" 
+#include "dataq.h"
+#include "pwr_cvolpwrdemoclasses.h"
+
