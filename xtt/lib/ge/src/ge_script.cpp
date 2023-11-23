@@ -620,6 +620,9 @@ static int graph_setobjectfill_func(void* filectx, ccm_sArg* arg_list,
   if (arg_p2->value_decl != CCM_DECL_INT)
     return CCM__ARGMISM;
 
+  if (arg_list->value_int == 0)
+    return CCM__INVARG;
+
   graph_get_stored_graph(&graph);
 
   grow_SetObjectFill((grow_tObject)arg_list->value_int, arg_p2->value_int);
@@ -637,6 +640,9 @@ static int graph_getobjectborder_func(void* filectx, ccm_sArg* arg_list,
 
   if (arg_list->value_decl != CCM_DECL_INT)
     return CCM__ARGMISM;
+
+  if (arg_list->value_int == 0)
+    return CCM__INVARG;
 
   graph_get_stored_graph(&graph);
 
@@ -662,6 +668,9 @@ static int graph_setobjectborder_func(void* filectx, ccm_sArg* arg_list,
   if (arg_p2->value_decl != CCM_DECL_INT)
     return CCM__ARGMISM;
 
+  if (arg_list->value_int == 0)
+    return CCM__INVARG;
+
   graph_get_stored_graph(&graph);
 
   grow_SetObjectBorder((grow_tObject)arg_list->value_int, arg_p2->value_int);
@@ -679,6 +688,9 @@ static int graph_getobjectgradient_func(void* filectx, ccm_sArg* arg_list,
 
   if (arg_list->value_decl != CCM_DECL_INT)
     return CCM__ARGMISM;
+
+  if (arg_list->value_int == 0)
+    return CCM__INVARG;
 
   graph_get_stored_graph(&graph);
 
@@ -704,6 +716,9 @@ static int graph_setobjectgradient_func(void* filectx, ccm_sArg* arg_list,
   if (arg_p2->value_decl != CCM_DECL_INT)
     return CCM__ARGMISM;
 
+  if (arg_list->value_int == 0)
+    return CCM__INVARG;
+
   graph_get_stored_graph(&graph);
 
   grow_SetObjectGradient(
@@ -722,6 +737,9 @@ static int graph_getobjecttransparency_func(void* filectx, ccm_sArg* arg_list,
 
   if (arg_list->value_decl != CCM_DECL_INT)
     return CCM__ARGMISM;
+
+  if (arg_list->value_int == 0)
+    return CCM__INVARG;
 
   graph_get_stored_graph(&graph);
 
@@ -747,6 +765,9 @@ static int graph_setobjecttransparency_func(void* filectx, ccm_sArg* arg_list,
   if (arg_p2->value_decl != CCM_DECL_FLOAT)
     return CCM__ARGMISM;
 
+  if (arg_list->value_int == 0)
+    return CCM__INVARG;
+
   graph_get_stored_graph(&graph);
 
   grow_SetObjectTransparency(
@@ -765,6 +786,9 @@ static int graph_getobjectfillcolor_func(void* filectx, ccm_sArg* arg_list,
 
   if (arg_list->value_decl != CCM_DECL_INT)
     return CCM__ARGMISM;
+
+  if (arg_list->value_int == 0)
+    return CCM__INVARG;
 
   graph_get_stored_graph(&graph);
 
@@ -791,6 +815,9 @@ static int graph_setobjectfillcolor_func(void* filectx, ccm_sArg* arg_list,
   if (arg_p2->value_decl != CCM_DECL_INT)
     return CCM__ARGMISM;
 
+  if (arg_list->value_int == 0)
+    return CCM__INVARG;
+
   graph_get_stored_graph(&graph);
 
   grow_SetObjectOriginalFillColor(
@@ -809,6 +836,9 @@ static int graph_getobjectbordercolor_func(void* filectx, ccm_sArg* arg_list,
 
   if (arg_list->value_decl != CCM_DECL_INT)
     return CCM__ARGMISM;
+
+  if (arg_list->value_int == 0)
+    return CCM__INVARG;
 
   graph_get_stored_graph(&graph);
 
@@ -835,6 +865,9 @@ static int graph_setobjectbordercolor_func(void* filectx, ccm_sArg* arg_list,
   if (arg_p2->value_decl != CCM_DECL_INT)
     return CCM__ARGMISM;
 
+  if (arg_list->value_int == 0)
+    return CCM__INVARG;
+
   graph_get_stored_graph(&graph);
 
   grow_SetObjectOriginalBorderColor(
@@ -853,6 +886,9 @@ static int graph_getobjecttextcolor_func(void* filectx, ccm_sArg* arg_list,
 
   if (arg_list->value_decl != CCM_DECL_INT)
     return CCM__ARGMISM;
+
+  if (arg_list->value_int == 0)
+    return CCM__INVARG;
 
   graph_get_stored_graph(&graph);
 
@@ -879,6 +915,9 @@ static int graph_setobjecttextcolor_func(void* filectx, ccm_sArg* arg_list,
   if (arg_p2->value_decl != CCM_DECL_INT)
     return CCM__ARGMISM;
 
+  if (arg_list->value_int == 0)
+    return CCM__INVARG;
+
   graph_get_stored_graph(&graph);
 
   grow_SetObjectOriginalTextColor(
@@ -902,6 +941,9 @@ static int graph_setobjectbackgroundcolor_func(void* filectx,
     return CCM__ARGMISM;
   if (arg_p2->value_decl != CCM_DECL_INT)
     return CCM__ARGMISM;
+
+  if (arg_list->value_int == 0)
+    return CCM__INVARG;
 
   graph_get_stored_graph(&graph);
 
@@ -927,6 +969,9 @@ static int graph_setobjectlinewidth_func(void* filectx,
   if (arg_p2->value_decl != CCM_DECL_INT)
     return CCM__ARGMISM;
 
+  if (arg_list->value_int == 0)
+    return CCM__INVARG;
+
   graph_get_stored_graph(&graph);
 
   grow_SetObjectLinewidth(
@@ -951,6 +996,9 @@ static int graph_setobjectlinetype_func(void* filectx,
   if (arg_p2->value_decl != CCM_DECL_INT)
     return CCM__ARGMISM;
 
+  if (arg_list->value_int == 0)
+    return CCM__INVARG;
+
   graph_get_stored_graph(&graph);
 
   grow_SetObjectLinetype(
@@ -969,6 +1017,9 @@ static int graph_getobjectshadow_func(void* filectx, ccm_sArg* arg_list,
 
   if (arg_list->value_decl != CCM_DECL_INT)
     return CCM__ARGMISM;
+
+  if (arg_list->value_int == 0)
+    return CCM__INVARG;
 
   graph_get_stored_graph(&graph);
 
@@ -994,6 +1045,9 @@ static int graph_setobjectshadow_func(void* filectx, ccm_sArg* arg_list,
   if (arg_p2->value_decl != CCM_DECL_INT)
     return CCM__ARGMISM;
 
+  if (arg_list->value_int == 0)
+    return CCM__INVARG;
+
   graph_get_stored_graph(&graph);
 
   grow_SetObjectShadow((grow_tObject)arg_list->value_int, arg_p2->value_int);
@@ -1017,6 +1071,9 @@ static int graph_setobjecttextsize_func(void* filectx, ccm_sArg* arg_list,
     return CCM__ARGMISM;
   if (arg_p2->value_decl != CCM_DECL_INT)
     return CCM__ARGMISM;
+
+  if (arg_list->value_int == 0)
+    return CCM__INVARG;
 
   graph_get_stored_graph(&graph);
 
@@ -1043,6 +1100,9 @@ static int graph_setobjecttextbold_func(void* filectx, ccm_sArg* arg_list,
   if (arg_p2->value_decl != CCM_DECL_INT)
     return CCM__ARGMISM;
 
+  if (arg_list->value_int == 0)
+    return CCM__INVARG;
+
   graph_get_stored_graph(&graph);
 
   grow_SetObjectTextBold(
@@ -1066,6 +1126,9 @@ static int graph_setobjecttextfont_func(void* filectx, ccm_sArg* arg_list,
     return CCM__ARGMISM;
   if (arg_p2->value_decl != CCM_DECL_INT)
     return CCM__ARGMISM;
+
+  if (arg_list->value_int == 0)
+    return CCM__INVARG;
 
   graph_get_stored_graph(&graph);
 
@@ -1105,6 +1168,9 @@ static int graph_getobjectname_func(void* filectx, ccm_sArg* arg_list,
 
   if (arg_list->value_decl != CCM_DECL_INT)
     return CCM__ARGMISM;
+
+  if (arg_list->value_int == 0)
+    return CCM__INVARG;
 
   graph_get_stored_graph(&graph);
 
@@ -1147,6 +1213,9 @@ static int graph_setobjectname_func(void* filectx, ccm_sArg* arg_list,
   if (arg_p2->value_decl != CCM_DECL_STRING)
     return CCM__ARGMISM;
 
+  if (arg_list->value_int == 0)
+    return CCM__INVARG;
+
   graph_get_stored_graph(&graph);
 
   grow_SetObjectName((grow_tObject)arg_list->value_int, arg_p2->value_string);
@@ -1168,6 +1237,9 @@ static int graph_setobjectvisibility_func(void* filectx, ccm_sArg* arg_list,
     return CCM__ARGMISM;
   if (arg_p2->value_decl != CCM_DECL_INT)
     return CCM__ARGMISM;
+
+  if (arg_list->value_int == 0)
+    return CCM__INVARG;
 
   grow_SetObjectVisibility((grow_tObject)arg_list->value_int, 
       (glow_eVis)arg_p2->value_int);
@@ -1209,6 +1281,9 @@ static int graph_getobjectdyntype_func(void* filectx, ccm_sArg* arg_list,
     return CCM__ARGMISM;
   if (arg_count > 4 && arg_p5->value_decl != CCM_DECL_INT)
     return CCM__ARGMISM;
+
+  if (arg_list->value_int == 0)
+    return CCM__INVARG;
 
   o = (grow_tObject)arg_list->value_int;
   graph_get_stored_graph(&graph);
@@ -1267,6 +1342,9 @@ static int graph_getobjecttext_func(void* filectx, ccm_sArg* arg_list,
   if (arg_list->value_decl != CCM_DECL_INT)
     return CCM__ARGMISM;
 
+  if (arg_list->value_int == 0)
+    return CCM__INVARG;
+
   o = (grow_tObject)arg_list->value_int;
   graph_get_stored_graph(&graph);
 
@@ -1299,6 +1377,9 @@ static int graph_setobjecttext_func(void* filectx, ccm_sArg* arg_list,
     return CCM__ARGMISM;
   if (arg_p2->value_decl != CCM_DECL_STRING)
     return CCM__ARGMISM;
+
+  if (arg_list->value_int == 0)
+    return CCM__INVARG;
 
   o = (grow_tObject)arg_list->value_int;
   graph_get_stored_graph(&graph);
@@ -1345,6 +1426,9 @@ static int graph_setobjecttransform_func(void* filectx, ccm_sArg* arg_list,
     return CCM__ARGMISM;
   if (arg_p8->value_decl != CCM_DECL_FLOAT)
     return CCM__ARGMISM;
+
+  if (arg_list->value_int == 0)
+    return CCM__INVARG;
 
   o = (grow_tObject)arg_list->value_int;
   graph_get_stored_graph(&graph);
@@ -1848,6 +1932,9 @@ static int graph_setobjectattribute_func(void* filectx, ccm_sArg* arg_list,
     return CCM__ARGMISM;
   if (arg_p2->value_decl != CCM_DECL_STRING)
     return CCM__ARGMISM;
+
+  if (arg_list->value_int == 0)
+    return CCM__INVARG;
 
   o = (grow_tObject)arg_list->value_int;
   if (!o) {
@@ -2644,6 +2731,10 @@ static int graph_deleteobject_func(void* filectx, ccm_sArg* arg_list,
 
   if (arg_list->value_decl != CCM_DECL_INT)
     return CCM__ARGMISM;
+
+  if (arg_list->value_int == 0)
+    return CCM__INVARG;
+
   graph_get_stored_graph(&graph);
 
   grow_DeleteObject(graph->grow->ctx, (grow_tObject)arg_list->value_int);
@@ -2670,6 +2761,9 @@ static int graph_setobjectclass_func(void* filectx, ccm_sArg* arg_list,
     return CCM__ARGMISM;
   if (arg_p2->value_decl != CCM_DECL_STRING)
     return CCM__ARGMISM;
+
+  if (arg_list->value_int == 0)
+    return CCM__INVARG;
 
   graph_get_stored_graph(&graph);
 
@@ -4489,6 +4583,84 @@ static int graph_createtoolbar_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
+static int graph_createtable_func(void* filectx, ccm_sArg* arg_list,
+    int arg_count, int* return_decl, ccm_tFloat* return_float,
+    ccm_tInt* return_int, char* return_string)
+{
+  Graph* graph;
+  ccm_sArg* arg_p2;
+  ccm_sArg* arg_p3;
+  ccm_sArg* arg_p4;
+  ccm_sArg* arg_p5;
+  
+  double x1, y1, x2, y2;
+  grow_tNode n1;
+  int scale_x, scale_y;
+  double sx, sy;
+  double ll_x, ll_y, ur_x, ur_y;
+    
+  if (arg_count < 3 || arg_count > 5)
+    return CCM__ARGMISM;
+
+  arg_p2 = arg_list->next;
+  arg_p3 = arg_p2->next;
+
+  if (arg_list->value_decl != CCM_DECL_STRING)
+    return CCM__ARGMISM;
+  if (arg_p2->value_decl != CCM_DECL_FLOAT)
+    return CCM__ARGMISM;
+  if (arg_p3->value_decl != CCM_DECL_FLOAT)
+    return CCM__ARGMISM;
+
+  x1 = arg_p2->value_float;
+  y1 = arg_p3->value_float;
+
+  if (arg_count >= 4) {
+    arg_p4 = arg_p3->next;
+    if (arg_p4->value_decl != CCM_DECL_FLOAT)
+      return CCM__ARGMISM;
+    scale_x = 1;
+    x2 = arg_p4->value_float;
+  }
+  else
+    scale_x = 0;
+
+  if (arg_count == 5) {
+    arg_p5 = arg_p4->next;
+    if (arg_p5->value_decl != CCM_DECL_FLOAT)
+      return CCM__ARGMISM;
+    scale_y = 1;
+    y2 = arg_p5->value_float;    
+  }
+  else
+    scale_y = 0;
+
+  graph_get_stored_graph(&graph);
+
+  graph->create_table(&n1, x1, y1);
+
+  if (scale_x || scale_y) {
+    grow_MeasureNode(n1, &ll_x, &ll_y, &ur_x, &ur_y);
+    if (scale_x)
+      sx = (x2 - x1) / (ur_x - ll_x);
+    else
+      sx = 1;
+    if (scale_y)
+      sy = (y2 - y1) / (ur_y - ll_y);
+    else
+      sy = 1;
+    grow_StoreTransform(n1);
+    grow_SetObjectScale(n1, sx, sy, x1, y1, glow_eScaleType_LowerLeft);
+  }
+  graph->current_cmd_object = n1;
+
+  grow_SetModified(graph->grow->ctx, 1);
+
+  *return_int = (long int)graph->current_cmd_object;
+  *return_decl = CCM_DECL_INT;
+  return 1;
+}
+
 static int graph_createlayer_func(void* filectx, ccm_sArg* arg_list,
     int arg_count, int* return_decl, ccm_tFloat* return_float,
     ccm_tInt* return_int, char* return_string)
@@ -5529,6 +5701,9 @@ int Graph::script_func_register(void)
   if (EVEN(sts))
     return sts;
   sts = ccm_register_function("Ge", "CreateToolbar", graph_createtoolbar_func);
+  if (EVEN(sts))
+    return sts;
+  sts = ccm_register_function("Ge", "CreateTable", graph_createtable_func);
   if (EVEN(sts))
     return sts;
   sts = ccm_register_function("Ge", "CreateLayer", graph_createlayer_func);
