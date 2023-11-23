@@ -8905,6 +8905,7 @@ Anropa byggmetoden för en node, en volym eller ett objekt.
 
 <B>wtt> build node /name= [/force][/debug][/manual][/crossreference]
 <B>wtt> build volume /name= [/force][/debug][/manual][/crossreference]
+<B>wtt> build classvolume /name= [/force][/debug][/manual][/crossreference]
 <B>wtt> build object /name= [/force][/debug][/manual][/crossreference]
 
 /name	<t>Nodnamn, volymsnamn eller objektsnamn.

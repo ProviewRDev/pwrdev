@@ -9022,6 +9022,7 @@ Call the build method for a node, a volume or an object.
 
 <B>wtt> build node /name= [/force][/debug][/manual][/crossreference]
 <B>wtt> build volume /name= [/force][/debug][/manual][/crossreference]
+<B>wtt> build classvolume /name= [/force][/debug][/manual][/crossreference]
 <B>wtt> build object /name= [/force][/debug][/manual][/crossreference]
 
 /name	<t>Node name, volume name or object name.

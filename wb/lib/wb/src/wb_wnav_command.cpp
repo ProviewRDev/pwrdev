@@ -5318,6 +5318,31 @@ static int wnav_build_func(void* client_data, void* client_flag)
     wnav->message(' ', wnav_get_message(build.sts()));
     command_sts = build.sts();
   }
+  else if (str_NoCaseStrncmp(arg1_str, "CLASSVOLUME", strlen(arg1_str)) == 0)
+  {
+    // Build current volume
+    pwr_tCmd cmd;
+    char namestr[80];
+
+    if (EVEN(dcli_get_qualifier("/NAME", namestr, sizeof(namestr))))
+    {
+      if (EVEN(dcli_get_qualifier("dcli_arg2", namestr, sizeof(namestr))))
+      {
+        wnav->message('E', "Syntax error");
+        return WNAV__SYNTAX;
+      }
+    }
+    strcpy(namestr, cdh_Low(namestr));
+    // Create h-file
+    sprintf(cmd, "co_convert -so -d $pwrp_inc $pwrp_db/%s.wb_load", namestr);
+    system(cmd);
+    // Create hpp-file
+    sprintf(cmd, "co_convert -po -d $pwrp_inc $pwrp_db/%s.wb_load", namestr);
+    system(cmd);
+    // Create dbs-file
+    sprintf(cmd, "create snapshot /file=\"$pwrp_db/%s.wb_load\" /out=\"$pwrp_load/%s.dbs\"", namestr, namestr);
+    sts = wnav->command(cmd);
+  }
   else if (str_NoCaseStrncmp(arg1_str, "OBJECT", strlen(arg1_str)) == 0)
   {
     char namestr[80];
