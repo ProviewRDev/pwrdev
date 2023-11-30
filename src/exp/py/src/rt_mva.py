@@ -416,7 +416,7 @@ class WData:
         cols = list(self.wd)
         cols[cix[0]-1],cols[cix[0]] = cols[cix[0]],cols[cix[0]-1]
         self.wdname[cix[0]-1],self.wdname[cix[0]] = self.wdname[cix[0]],self.wdname[cix[0]-1]
-        self.wd = self.wd.ix[:,cols]
+        self.wd = self.wd.loc[:,cols]
         self.wd.columns = self.wdcol
 
     def movedown(self, mask):
@@ -438,7 +438,7 @@ class WData:
         cols = list(self.wd)
         cols[cix[0]],cols[cix[0]+1] = cols[cix[0]+1],cols[cix[0]]
         self.wdname[cix[0]],self.wdname[cix[0]+1] = self.wdname[cix[0]+1],self.wdname[cix[0]]
-        self.wd = self.wd.ix[:,cols]
+        self.wd = self.wd.loc[:,cols]
         self.wd.columns = self.wdcol
 
     def delete_columns(self, mask):
