@@ -2000,7 +2000,7 @@ void CompMPC_MLP_Fo_exec(plc_sThread* tp, pwr_sClass_CompMPC_MLP_Fo* o)
 
   if (((mlp_tCtx)o->ModelP)->outlist == 0) {
     ((mlp_tCtx)o->ModelP)->outlist_size = co->Steps * lroundf(co->NoOfShiftValues / tp->f_scan_time);
-    ((mlp_tCtx)o->ModelP)->outlist = (pwr_tFloat32 *)calloc(((mlp_tCtx)o->ModelP)->outlist_size, sizeof(pwr_tFloat32));
+    ((mlp_tCtx)o->ModelP)->outlist = (pwr_tFloat32 *)calloc(MAX(((mlp_tCtx)o->ModelP)->outlist_size, 1), sizeof(pwr_tFloat32));
   }
 
   co->ProcValue = o->ProcValue = *o->ProcValueP;
