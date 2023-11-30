@@ -27,8 +27,10 @@ or with the command 'open graph pwrdemo' in the Xtt navigator.
 <topic>demo_process
 Application examples
 
-<b>Level Control<link>Proc_LevelControl
+<b>Level ControlPID<link>Proc_LevelControlPID
+<b>Level ControlMPC<link>Proc_LevelControlMPC
 <b>Temperature Control<link>Proc_TemperatureControl
+<b>DataQueues<link>Proc_DataQueues
 </topic>
 <topic>demo_ge
 Ge demo
@@ -699,10 +701,19 @@ Modify the range with the increment or decrement buttons, or enter new
 values for the min and max values.
 </topic>
 
-<topic>Proc_LevelControl
-Level Control
+<topic>Proc_LevelControlPID
+Level Control PID
 
 The level in the tank is controlled by a PID controller.
+
+Press the 'Start' button to fill the tank. Enter a setpoint between 0 and 1
+into the valueinputfield or with the slider.
+</topic>
+
+<topic>Proc_LevelControlMPC
+Level Control MPC
+
+The level in the tank is controlled by a MPC controller.
 
 Press the 'Start' button to fill the tank. Enter a setpoint between 0 and 1
 into the valueinputfield or with the slider.
@@ -717,6 +728,21 @@ the valueinputfield or with the slider.
 The upper trend shows the measured temperature (orange) and the setvalue (green).
 The lower curve shows the output from the PID controller (yellow), and the
 number of burning burners (blue).
+</topic>
+
+<topic>Proc_DataQueues
+DataQueues
+
+The graph shows a heating roller bed with a furnish for heating of plates, 
+and a cooling rooler bed for cooling the plates.
+
+Plate objects are created for each plate and inserted into the heating
+data queue where the position and temperature of the plates are calculated.
+When they reach the end of the rooler be they are passed to the cooling data
+queue.
+
+Press the 'Start' button to start the sequence. Modify the furnish temperature
+and roller bed speed with the sliders.
 </topic>
 
 <topic> Ge_ColorThemes

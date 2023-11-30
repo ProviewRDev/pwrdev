@@ -52,7 +52,7 @@
 
 #define BEEP putchar('\7');
 
-#define GOBJ_MAX_METHOD 36
+#define GOBJ_MAX_METHOD 37
 
 typedef int (*gobj_tMethod)(WFoe*, vldh_t_node, unsigned long);
 
@@ -93,6 +93,7 @@ int gobj_get_object_m33(WFoe* foe, vldh_t_node node, unsigned long index);
 int gobj_get_object_m34(WFoe* foe, vldh_t_node node, unsigned long index);
 int gobj_get_object_m35(WFoe* foe, vldh_t_node node, unsigned long index);
 int gobj_get_object_m36(WFoe* foe, vldh_t_node node, unsigned long index);
+int gobj_get_object_m37(WFoe* foe, vldh_t_node node, unsigned long index);
 
 gobj_tMethod gobj_get_object_m[40] = {
   gobj_get_object_m0, gobj_get_object_m1, gobj_get_object_m2,
@@ -107,7 +108,7 @@ gobj_tMethod gobj_get_object_m[40] = {
   gobj_get_object_m27, gobj_get_object_m28, gobj_get_object_m29,
   gobj_get_object_m30, gobj_get_object_m31, gobj_get_object_m32,
   gobj_get_object_m33, gobj_get_object_m34, gobj_get_object_m35,
-  gobj_get_object_m36,
+  gobj_get_object_m36, gobj_get_object_m37,
 };
 
 static pwr_tAttrRef gobj_selected_aref;
@@ -3236,6 +3237,58 @@ int gobj_get_object_m36(WFoe* foe, vldh_t_node node, unsigned long index)
     return sts;
 
   foe->gre->node_update(node);
+
+  return FOE__SUCCESS;
+}
+
+//
+//	Connect method for a Function object without temlate plc code.
+//
+int gobj_get_object_m37(WFoe* foe, vldh_t_node node, unsigned long index)
+{
+  ldh_tSesContext ldhses;
+  int sts;
+  vldh_t_plc plc;
+  pwr_sAttrRef attrref;
+  pwr_sAttrRef nattrref;
+  int is_attr;
+  char* aname;
+  int size;
+  char msg[450];
+
+  /* Get the selected object in the navigator */
+  plc = (node->hn.wind)->hw.plc;
+  ldhses = (node->hn.wind)->hw.ldhses;
+
+  sts = gobj_get_select(foe, &attrref, &is_attr);
+  if (EVEN(sts) || is_attr == 1) {
+    foe->message("Select an object in the navigator");
+    BEEP;
+    return sts;
+  }
+
+  /* Set the PlcConnect attribute in the current object */
+  sts = ldh_SetObjectPar(ldhses, node->ln.oid, "RtBody", "PlcConnect",
+      (char*)&attrref, sizeof(attrref));
+  if (EVEN(sts)) {
+    foe->message("No PlcConnect attribute in object");
+    BEEP;
+    return sts;
+  }
+
+  /* Set the PlcConnect attribute in the connected object */
+  nattrref = cdh_ObjidToAref(node->ln.oid);
+  sts = ldh_SetObjectPar(ldhses, attrref.Objid, "RtBody", "PlcConnect",
+      (char*)&nattrref, sizeof(nattrref));
+
+  foe->gre->node_update(node);
+
+  sts = ldh_AttrRefToName(ldhses, &attrref, cdh_mNName, &aname, &size);
+  if (EVEN(sts))
+    return sts;
+
+  sprintf(msg, "Connected to: %s", aname);
+  foe->message(msg);
 
   return FOE__SUCCESS;
 }

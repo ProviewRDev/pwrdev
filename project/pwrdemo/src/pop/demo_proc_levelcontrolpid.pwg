@@ -17,7 +17,7 @@
 111 -0.15
 116 0
 117 0
-118 129
+118 130
 119 103
 120 1
 121 Claes context
@@ -5894,20 +5894,16 @@ pwr_exe:
 2727 0
 2728 303
 2729 9999
-2733 0
+2733 0.7
 2730 0
 2721
 1
 100 0
 105 0
-101 16384
+101 0
 106 0
 102 33619967
 103 0
-63
-6300 BaseTempSensor /helpfile="$pwr_lang/basecomponent_xtthelp.dat"
-6400 
-99
 99
 99
 27
@@ -6040,7 +6036,7 @@ pwr_exe:
 102 33619967
 103 0
 63
-6300 Proc_LevelControl
+6300 Proc_LevelControlPID
 6400 
 99
 99
