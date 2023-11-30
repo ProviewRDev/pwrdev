@@ -46,7 +46,9 @@ static void tiptext_timer_cb(FlowCtx* ctx)
   ctx->tiptext->timer_id = 0;
   ctx->tiptext->active = true;
 
-  ctx->tiptext->draw();
+  ctx->draw(ctx->tiptext->text_x - 1, ctx->tiptext->text_y - 1, 
+      ctx->tiptext->text_x + ctx->tiptext->text_width + 1, 
+      ctx->tiptext->text_y + ctx->tiptext->text_height + 1);
 }
 FlowTipText::~FlowTipText()
 {
@@ -150,10 +152,7 @@ void FlowTipText::remove_text(FlowArrayElem* e)
 
   if (active) {
     active = false;
-    ctx->fdraw->fill_rect(ctx, text_x, text_y, text_width + 1, text_height + 1,
-        flow_eDrawType_LineErase);
-    ctx->draw(
-        text_x, text_y, text_x + text_width + 1, text_y + text_height + 1);
+    ctx->draw(text_x -1 , text_y - 1, text_x + text_width + 1, text_y + text_height + 1);
   }
 }
 
