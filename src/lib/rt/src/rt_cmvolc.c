@@ -390,6 +390,7 @@ void cmvolc_GetNonExistingClass(pwr_tStatus* sts, gdb_sObject* op, pwr_tCid cid)
     classdef.Method = gcp->cb.Method;
     classdef.Flags = (pwr_mClassDef)gcp->cb.Flags;
     classdef.NumOfObjBodies = gcp->cb.NumOfObjBodies;
+    classdef.PopEditor = gcp->cb.PopEditor;
 
     gcp_time = net_NetTimeToTime(&gcp->time);
     cop = createObject(sts, vp, &gcp->co, &gcp_time, gcp->dbsFlags, &classdef,
