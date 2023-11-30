@@ -328,6 +328,12 @@ def style(colortheme):
     #print(ttk.Style().theme_names())
     #style.theme_use('classic')
     style.configure('.', background=bg, foreground=fg)
+    style.configure('TEntry', fieldbackground=entrybg, foreground=entryfg,
+                        bordercolor=entryborder, insertcolor=entryfg)
+    style.map('TButton', foreground=[('active',activefg)],
+                  background=[('active', activebg)])
+    style.map('TMenubutton', foreground=[('active', menufg)],
+                  background=[('active', menuactive)])
     style.configure('PwrTool.TFrame', background=bg, border=1, relief=RAISED)
     style.configure('Pwr.TFrame', background=bg)
     style.configure('Pwr.TLabel', background=bg, foreground=fg)
