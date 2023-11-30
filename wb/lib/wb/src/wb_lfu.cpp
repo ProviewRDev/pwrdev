@@ -2645,6 +2645,9 @@ pwr_tStatus lfu_SaveDirectoryVolume(
               if (bop->SystemModules & pwr_mBuildOptionsMask_SimulArchive)
                 sprintf(&str[strlen(str)], "-lpwr_simul ");
 
+              if (bop->SystemModules & pwr_mBuildOptionsMask_DataQArchive)
+                sprintf(&str[strlen(str)], "-lpwr_dataq ");
+
               sprintf(&str[strlen(str)], "-lpwr_rt ");
 
               if (bop->SystemModules & pwr_mBuildOptionsMask_SoftingPNAK)

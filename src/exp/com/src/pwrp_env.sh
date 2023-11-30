@@ -657,6 +657,7 @@ Edit file \$pwrp_cnf/xtt_help.dat to write this description.
 <include> \$pwr_lang/remote_xtthelp.dat
 <include> \$pwr_lang/nmps_xtthelp.dat
 <include> \$pwr_lang/ssabox_xtthelp.dat
+<include> \$pwr_lang/dataq_xtthelp.dat
 
 EOF
 

@@ -112,6 +112,16 @@ SObject pwrb:Type
      EndBody
     EndObject
     !/**
+    !  DataQ archive.
+    !*/
+    Object DataQArchive $Bit
+     Body SysBody
+       Attr PgmName = "DataQArchive"
+       Attr Text = "DataQArchive"
+       Attr Value = 64
+     EndBody
+    EndObject
+    !/**
     !  Softing PNAK Profinet stack.
     !*/
     Object SoftingPNAK $Bit
