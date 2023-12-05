@@ -151,7 +151,7 @@ OpGtk::OpGtk(void* op_parent_ctx, GtkWidget* op_parent_wid, char* opplace, pwr_t
   gtk_label_set_use_markup(GTK_LABEL(balarm_label), TRUE);
 
   aalarm_box[0] = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-  GtkWidget* aalarm_bbox1 = gtk_fixed_new();
+  GtkWidget* aalarm_bbox1 = gtk_grid_new();
   GtkWidget* ebox1 = gtk_event_box_new();
   gtk_container_add(GTK_CONTAINER(ebox1), aalarm_label[0]);
   gtk_widget_set_name(ebox1, "opaalarm1");
@@ -159,9 +159,9 @@ OpGtk::OpGtk(void* op_parent_ctx, GtkWidget* op_parent_wid, char* opplace, pwr_t
   gtk_widget_set_size_request(aalarm_active_box[0], 20, 20);
   gtk_container_add(GTK_CONTAINER(aalarm_active_box[0]), aalarm_active[0]);
   aalarm_info[0] = image_button("$pwr_exe/xtt_alarm_info.png");
-  gtk_fixed_put(GTK_FIXED(aalarm_bbox1), aalarm_active_box[0], 0, 0);
-  gtk_fixed_put(GTK_FIXED(aalarm_bbox1), aalarm_info[0], 21, 0);
-  gtk_fixed_put(GTK_FIXED(aalarm_bbox1), gtk_label_new(""), 43, 0);
+  gtk_grid_attach(GTK_GRID(aalarm_bbox1), aalarm_active_box[0], 0, 0, 1, 1);
+  gtk_grid_attach(GTK_GRID(aalarm_bbox1), aalarm_info[0], 1, 0, 1, 1);
+  gtk_grid_attach(GTK_GRID(aalarm_bbox1), gtk_label_new(""), 2, 0, 1, 1);
   gtk_box_pack_start(GTK_BOX(aalarm_box[0]), aalarm_bbox1, FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(aalarm_box[0]), ebox1, TRUE, TRUE, 0);
   gtk_widget_set_size_request(aalarm_label[0], -1, 20);
@@ -170,7 +170,7 @@ OpGtk::OpGtk(void* op_parent_ctx, GtkWidget* op_parent_wid, char* opplace, pwr_t
   g_signal_connect(aalarm_info[0], "clicked", G_CALLBACK(activate_info), this);
 
   aalarm_box[1] = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-  GtkWidget* aalarm_bbox2 = gtk_fixed_new();
+  GtkWidget* aalarm_bbox2 = gtk_grid_new();
   GtkWidget* ebox2 = gtk_event_box_new();
   gtk_container_add(GTK_CONTAINER(ebox2), aalarm_label[1]);
   gtk_widget_set_name(ebox2, "opaalarm2");
@@ -178,9 +178,9 @@ OpGtk::OpGtk(void* op_parent_ctx, GtkWidget* op_parent_wid, char* opplace, pwr_t
   gtk_widget_set_size_request(aalarm_active_box[1], 20, 20);
   gtk_container_add(GTK_CONTAINER(aalarm_active_box[1]), aalarm_active[1]);
   aalarm_info[1] = image_button("$pwr_exe/xtt_alarm_info.png");
-  gtk_fixed_put(GTK_FIXED(aalarm_bbox2), aalarm_active_box[1], 0, 0);
-  gtk_fixed_put(GTK_FIXED(aalarm_bbox2), aalarm_info[1], 21, 0);
-  gtk_fixed_put(GTK_FIXED(aalarm_bbox2), gtk_label_new(""), 43, 0);
+  gtk_grid_attach(GTK_GRID(aalarm_bbox2), aalarm_active_box[1], 0, 0, 1, 1);
+  gtk_grid_attach(GTK_GRID(aalarm_bbox2), aalarm_info[1], 1, 0, 1, 1);
+  gtk_grid_attach(GTK_GRID(aalarm_bbox2), gtk_label_new(""), 2, 0, 1, 1);
   gtk_box_pack_start(GTK_BOX(aalarm_box[1]), aalarm_bbox2, FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(aalarm_box[1]), ebox2, TRUE, TRUE, 0);
   gtk_widget_set_size_request(aalarm_label[1], -1, 20);
@@ -189,7 +189,7 @@ OpGtk::OpGtk(void* op_parent_ctx, GtkWidget* op_parent_wid, char* opplace, pwr_t
   g_signal_connect(aalarm_info[1], "clicked", G_CALLBACK(activate_info), this);
 
   aalarm_box[2] = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-  GtkWidget* aalarm_bbox3 = gtk_fixed_new();
+  GtkWidget* aalarm_bbox3 = gtk_grid_new();
   GtkWidget* ebox3 = gtk_event_box_new();
   gtk_container_add(GTK_CONTAINER(ebox3), aalarm_label[2]);
   gtk_widget_set_name(ebox3, "opaalarm3");
@@ -197,9 +197,9 @@ OpGtk::OpGtk(void* op_parent_ctx, GtkWidget* op_parent_wid, char* opplace, pwr_t
   gtk_widget_set_size_request(aalarm_active_box[2], 20, 20);
   gtk_container_add(GTK_CONTAINER(aalarm_active_box[2]), aalarm_active[2]);
   aalarm_info[2] = image_button("$pwr_exe/xtt_alarm_info.png");
-  gtk_fixed_put(GTK_FIXED(aalarm_bbox3), aalarm_active_box[2], 0, 0);
-  gtk_fixed_put(GTK_FIXED(aalarm_bbox3), aalarm_info[2], 21, 0);
-  gtk_fixed_put(GTK_FIXED(aalarm_bbox3), gtk_label_new(""), 43, 0);
+  gtk_grid_attach(GTK_GRID(aalarm_bbox3), aalarm_active_box[2], 0, 0, 1, 1);
+  gtk_grid_attach(GTK_GRID(aalarm_bbox3), aalarm_info[2], 1, 0, 1, 1);
+  gtk_grid_attach(GTK_GRID(aalarm_bbox3), gtk_label_new(""), 2, 0, 1, 1);
   gtk_box_pack_start(GTK_BOX(aalarm_box[2]), aalarm_bbox3, FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(aalarm_box[2]), ebox3, TRUE, TRUE, 0);
   gtk_widget_set_size_request(aalarm_label[2], -1, 20);
@@ -208,7 +208,7 @@ OpGtk::OpGtk(void* op_parent_ctx, GtkWidget* op_parent_wid, char* opplace, pwr_t
   g_signal_connect(aalarm_info[2], "clicked", G_CALLBACK(activate_info), this);
 
   aalarm_box[3] = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-  GtkWidget* aalarm_bbox4 = gtk_fixed_new();
+  GtkWidget* aalarm_bbox4 = gtk_grid_new();
   GtkWidget* ebox4 = gtk_event_box_new();
   gtk_container_add(GTK_CONTAINER(ebox4), aalarm_label[3]);
   gtk_widget_set_name(ebox4, "opaalarm4");
@@ -216,9 +216,9 @@ OpGtk::OpGtk(void* op_parent_ctx, GtkWidget* op_parent_wid, char* opplace, pwr_t
   gtk_widget_set_size_request(aalarm_active_box[3], 20, 20);
   gtk_container_add(GTK_CONTAINER(aalarm_active_box[3]), aalarm_active[3]);
   aalarm_info[3] = image_button("$pwr_exe/xtt_alarm_info.png");
-  gtk_fixed_put(GTK_FIXED(aalarm_bbox4), aalarm_active_box[3], 0, 0);
-  gtk_fixed_put(GTK_FIXED(aalarm_bbox4), aalarm_info[3], 21, 0);
-  gtk_fixed_put(GTK_FIXED(aalarm_bbox4), gtk_label_new(""), 43, 0);
+  gtk_grid_attach(GTK_GRID(aalarm_bbox4), aalarm_active_box[3], 0, 0, 1, 1);
+  gtk_grid_attach(GTK_GRID(aalarm_bbox4), aalarm_info[3], 1, 0, 1, 1);
+  gtk_grid_attach(GTK_GRID(aalarm_bbox4), gtk_label_new(""), 2, 0, 1, 1);
   gtk_box_pack_start(GTK_BOX(aalarm_box[3]), aalarm_bbox4, FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(aalarm_box[3]), ebox4, TRUE, TRUE, 0);
   gtk_widget_set_size_request(aalarm_label[3], -1, 20);
@@ -227,7 +227,7 @@ OpGtk::OpGtk(void* op_parent_ctx, GtkWidget* op_parent_wid, char* opplace, pwr_t
   g_signal_connect(aalarm_info[3], "clicked", G_CALLBACK(activate_info), this);
 
   aalarm_box[4] = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-  GtkWidget* aalarm_bbox5 = gtk_fixed_new();
+  GtkWidget* aalarm_bbox5 = gtk_grid_new();
   GtkWidget* ebox5 = gtk_event_box_new();
   gtk_container_add(GTK_CONTAINER(ebox5), aalarm_label[4]);
   gtk_widget_set_name(ebox5, "opaalarm4");
@@ -235,9 +235,9 @@ OpGtk::OpGtk(void* op_parent_ctx, GtkWidget* op_parent_wid, char* opplace, pwr_t
   gtk_widget_set_size_request(aalarm_active_box[4], 20, 20);
   gtk_container_add(GTK_CONTAINER(aalarm_active_box[4]), aalarm_active[4]);
   aalarm_info[4] = image_button("$pwr_exe/xtt_alarm_info.png");
-  gtk_fixed_put(GTK_FIXED(aalarm_bbox5), aalarm_active_box[4], 0, 0);
-  gtk_fixed_put(GTK_FIXED(aalarm_bbox5), aalarm_info[4], 21, 0);
-  gtk_fixed_put(GTK_FIXED(aalarm_bbox5), gtk_label_new(""), 43, 0);
+  gtk_grid_attach(GTK_GRID(aalarm_bbox5), aalarm_active_box[4], 0, 0, 1, 1);
+  gtk_grid_attach(GTK_GRID(aalarm_bbox5), aalarm_info[4], 1, 0, 1, 1);
+  gtk_grid_attach(GTK_GRID(aalarm_bbox5), gtk_label_new(""), 2, 0, 1, 1);
   gtk_box_pack_start(GTK_BOX(aalarm_box[4]), aalarm_bbox5, FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(aalarm_box[4]), ebox5, TRUE, TRUE, 0);
   gtk_widget_set_size_request(aalarm_label[4], -1, 20);
@@ -260,10 +260,10 @@ OpGtk::OpGtk(void* op_parent_ctx, GtkWidget* op_parent_wid, char* opplace, pwr_t
   balarm_info = image_button("$pwr_exe/xtt_alarm_info.png");
 
   balarm_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-  GtkWidget* balarm_bbox = gtk_fixed_new();
-  gtk_fixed_put(GTK_FIXED(balarm_bbox), balarm_active_box, 0, 0);
-  gtk_fixed_put(GTK_FIXED(balarm_bbox), balarm_info, 21, 0);
-  gtk_fixed_put(GTK_FIXED(balarm_bbox), gtk_label_new(""), 43, 0);
+  GtkWidget* balarm_bbox = gtk_grid_new();
+  gtk_grid_attach(GTK_GRID(balarm_bbox), balarm_active_box, 0, 0, 1, 1);
+  gtk_grid_attach(GTK_GRID(balarm_bbox), balarm_info, 1, 0, 1, 1);
+  gtk_grid_attach(GTK_GRID(balarm_bbox), gtk_label_new(""), 2, 0, 1, 1);
   gtk_box_pack_start(GTK_BOX(balarm_box), balarm_bbox, FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(balarm_box), balarm_ebox, TRUE, TRUE, 0);
   gtk_widget_set_name(balarm_ebox, "opbalarm");
@@ -624,8 +624,9 @@ OpGtk::OpGtk(void* op_parent_ctx, GtkWidget* op_parent_wid, char* opplace, pwr_t
   gtk_box_pack_start(GTK_BOX(hbox_conf), gtk_separator_new(GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 2);
   gtk_box_pack_start(GTK_BOX(hbox_conf), appl_form, TRUE, TRUE, 0);
 
+  //gtk_widget_set_direction(vbox_ala, GTK_TEXT_DIR_LTR); 
   GtkWidget* pane = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
-  gtk_paned_pack1(GTK_PANED(pane), vbox_ala, TRUE, TRUE);
+  gtk_paned_pack1(GTK_PANED(pane), vbox_ala, TRUE, FALSE);
   gtk_paned_pack2(GTK_PANED(pane), hbox_conf, FALSE, TRUE);
 
   GtkWidget* vbox_conf = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
