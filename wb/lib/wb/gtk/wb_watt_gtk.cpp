@@ -98,13 +98,16 @@ void WAttGtk::change_value(int set_focus)
     g_object_set(text_w, "visible", TRUE, NULL);
 
     int h = gdk_window_get_height(gtk_widget_get_window(pane));
-    gtk_paned_set_position(GTK_PANED(pane), h - 170);
+    gtk_paned_set_position(GTK_PANED(pane), h - 270);
     gtk_widget_grab_focus(cmd_scrolledtextview);
     input_max_length = input_size;
     input_multiline = 1;
   } else {
     text_w = cmd_input;
     g_object_set(text_w, "visible", TRUE, "max-length", input_size, NULL);
+
+    int h = gdk_window_get_height(gtk_widget_get_window(pane));
+    gtk_paned_set_position(GTK_PANED(pane), h - 170);
     gtk_widget_grab_focus(cmd_input);
     input_multiline = 0;
   }

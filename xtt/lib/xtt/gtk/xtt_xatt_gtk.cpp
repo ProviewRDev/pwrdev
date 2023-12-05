@@ -99,14 +99,18 @@ void XAttGtk::change_value(int set_focus)
 
     int h;
     h = gdk_window_get_height(gtk_widget_get_window(pane));
-    gtk_paned_set_position(GTK_PANED(pane), h - 170);
+    gtk_paned_set_position(GTK_PANED(pane), h - 270);
     if (set_focus)
       gtk_widget_grab_focus(cmd_scrolledtextview);
     input_max_length = input_size - 1;
     input_multiline = 1;
   } else {
     text_w = cmd_input;
+
+    int h;
     g_object_set(text_w, "visible", TRUE, "max-length", input_size - 1, NULL);
+    h = gdk_window_get_height(gtk_widget_get_window(pane));
+    gtk_paned_set_position(GTK_PANED(pane), h - 170);
     if (set_focus)
       gtk_widget_grab_focus(cmd_input);
     input_multiline = 0;
