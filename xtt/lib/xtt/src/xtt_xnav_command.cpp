@@ -6929,9 +6929,9 @@ static int xnav_logging_func(void* client_data, void* client_flag)
 
     if (ODD(dcli_get_qualifier("/TYPE", str, sizeof(str)))) {
       if (str_NoCaseStrncmp(str, "EVENT", strlen(str)) == 0)
-        logg_type = xtt_LoggType_Mod;
+        logg_type = xtt_eLoggType_Mod;
       else if (str_NoCaseStrncmp(str, "CONTINOUS", strlen(str)) == 0)
-        logg_type = xtt_LoggType_Cont;
+        logg_type = xtt_eLoggType_Cont;
     } else
       logg_type = 0;
 

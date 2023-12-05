@@ -48,7 +48,7 @@
 #define RTT_BUFFER_DEFSIZE 100
 #define RTT_LOGG_LINE_DEFSIZE 512
 
-typedef enum { xtt_LoggType_Cont = 1, xtt_LoggType_Mod = 2 } xtt_LoggType;
+typedef enum { xtt_eLoggType_Cont = 1, xtt_eLoggType_Mod = 2 } xtt_eLoggType;
 typedef enum { 
   xtt_eLoggFormat_Std, 
   xtt_eLoggFormat_Py

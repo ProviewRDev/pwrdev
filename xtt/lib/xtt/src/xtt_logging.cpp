@@ -102,7 +102,7 @@ static int logccm_getd_func(void* filectx, ccm_sArg* arg_list, int arg_count,
 
 XttLogging::XttLogging()
     : xnav(0), index(0), active(0), intern(0), stop_logg(0),
-      logg_type(xtt_LoggType_Cont), logg_priority(0), logg_format(xtt_eLoggFormat_Std), 
+      logg_type(xtt_eLoggType_Cont), logg_priority(0), logg_format(xtt_eLoggFormat_Std), 
       condition_ptr(0), logg_time(200), logg_file(0), line_size(10000), parameter_count(0),
       print_shortname(0), buffer_size(100), wanted_buffer_size(100),
       buffer_count(0), buffer_ptr(0), cond_ccm_ctx(0)
@@ -393,9 +393,9 @@ int XttLogging::show_entry(char* buff, int* buff_cnt)
   else
     (*buff_cnt) += sprintf(buff + *buff_cnt, "       NOT ACTIVE\n");
 
-  if (logg_type == xtt_LoggType_Mod)
+  if (logg_type == xtt_eLoggType_Mod)
     (*buff_cnt) += sprintf(buff + *buff_cnt, "   Type:      Event\n");
-  else if (logg_type == xtt_LoggType_Cont)
+  else if (logg_type == xtt_eLoggType_Cont)
     (*buff_cnt) += sprintf(buff + *buff_cnt, "   Type:      Cont\n");
 
   (*buff_cnt)
@@ -504,9 +504,9 @@ int XttLogging::store(char* filename)
   else
     fprintf(outfile, "logging set/entry=current/noshortname\n");
 
-  if (logg_type == xtt_LoggType_Mod)
+  if (logg_type == xtt_eLoggType_Mod)
     fprintf(outfile, "logging set/entry=current/type=event\n");
-  else if (logg_type == xtt_LoggType_Cont)
+  else if (logg_type == xtt_eLoggType_Cont)
     fprintf(outfile, "logging set/entry=current/type=cont\n");
 
   if (logg_format == xtt_eLoggFormat_Std)
@@ -847,7 +847,7 @@ static void* xtt_logproc(void* arg)
       &logg->starttime, time_eFormat_DateAndTime, time_str, sizeof(time_str));
 
   switch (logg->logg_type) {
-  case xtt_LoggType_Cont:
+  case xtt_eLoggType_Cont:
     switch (logg->logg_format) {
     case xtt_eLoggFormat_Py:
       if (logg->logg_file)
@@ -917,7 +917,7 @@ static void* xtt_logproc(void* arg)
     }
     break;
 
-  case xtt_LoggType_Mod:
+  case xtt_eLoggType_Mod:
     if (logg->logg_file)
       fprintf(logg->logg_file, "RTT LOGGING STARTED AT %s\n", time_str);
     for (i = 0; i < RTT_LOGG_MAXPAR; i++) {
@@ -967,7 +967,7 @@ static void* xtt_logproc(void* arg)
 
     time_GetTime(&time);
     switch (logg->logg_type) {
-    case xtt_LoggType_Cont:
+    case xtt_eLoggType_Cont:
       /* Convert time to seconds since start */
       time_Adiff(&timediff, &time, &logg->starttime);
       time_float = time_DToFloat(NULL, &timediff);
@@ -1190,7 +1190,7 @@ static void* xtt_logproc(void* arg)
 
       break;
 
-    case xtt_LoggType_Mod:
+    case xtt_eLoggType_Mod:
       /* Write only if value is changed */
       for (i = 0; i < RTT_LOGG_MAXPAR; i++) {
         if (logg->parameterstr[i][0] != 0) {

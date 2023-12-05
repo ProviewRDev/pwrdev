@@ -66,6 +66,123 @@
 
 static char null_str[] = "";
 
+static xnav_sEnumElement elem_yes_no[] = {
+  { 0, "No" },
+  { 1, "Yes" },
+  { 0, "" }
+};
+static xnav_sEnumElement elem_on_off[] = {
+  { 0, "Off" },
+  { 1, "On" },
+  { 0, "" }
+};
+static xnav_sEnumElement elem_color_theme[] = {
+  { 0, "Standard" },
+  { 1, "Sand" },
+  { 2, "Maroon" },
+  { 3, "Sienna" },
+  { 4, "DarkBlue" },
+  { 5, "Classic" },
+  { 6, "Midnight" },
+  { 7, "Playroom" },
+  { 8, "NordicLight" },
+  { 9, "Contrast" },
+  { 10, "AzureContrast" },
+  { 11, "OchreContrast" },
+  { 12, "Chesterfield" },
+  { 13, "TerraVerte" },
+  { 14, "Polar" },
+  { 15, "StandardLight" },
+  { 16, "StandardDark" },
+  { 100, "Custom" },
+  { 0, "" }
+};
+static xnav_sEnumElement elem_logg_active[] = {
+  { 0, "Off" },
+  { 1, "Active" },
+  { 0, "" }
+};
+static xnav_sEnumElement elem_logg_format[] = {
+  { (unsigned int)xtt_eLoggFormat_Std, "Space separated" },
+  { (unsigned int)xtt_eLoggFormat_Py, "Comma separated" },
+  { 0, "" }
+};
+static xnav_sEnumElement elem_logg_type[] = {
+  { (unsigned int)xtt_eLoggType_Cont, "Continuous" },
+  { (unsigned int)xtt_eLoggType_Mod, "Event" },
+  { 0, "" }
+};
+
+xnav_sEnum xnav_enum_types[] = {
+  { (unsigned int)xnav_eType_YesNo, (xnav_sEnumElement*)&elem_yes_no},
+  { (unsigned int)xnav_eType_OnOff, (xnav_sEnumElement*)&elem_on_off},
+  { (unsigned int)xnav_eType_ColorTheme, (xnav_sEnumElement*)&elem_color_theme},
+  { (unsigned int)xnav_eType_LoggActive, (xnav_sEnumElement*)&elem_logg_active},
+  { (unsigned int)xnav_eType_LoggFormat, (xnav_sEnumElement*)&elem_logg_format},
+  { (unsigned int)xnav_eType_LoggType, (xnav_sEnumElement*)&elem_logg_type},
+  { 0, NULL }
+};
+
+int XNav::string_to_local_enum(int type_id, char* str, pwr_tEnum* enumval)
+{
+  xnav_sEnumElement* elem_p;
+  xnav_sEnum* enum_p;
+  int found = 0;
+
+  for (enum_p = xnav_enum_types; enum_p->elements; enum_p++) {
+    if (enum_p->num == (unsigned int)type_id) {
+      found = 1;
+      break;
+    }
+  }
+  if (!found)
+    return 1;
+
+  elem_p = enum_p->elements;
+  for (; elem_p->name[0] != 0; elem_p++) {
+    if (str_NoCaseStrcmp(elem_p->name, str) == 0) {
+      *enumval = elem_p->num;
+      return 1;
+    }
+  }
+  return 0;
+}
+
+int XNav::local_enum_to_string(
+    int type_id, pwr_tEnum enumval, char* str, int strsize)
+{
+  xnav_sEnumElement* elem_p;
+  xnav_sEnum* enum_p;
+  int found = 0;
+
+  for (enum_p = xnav_enum_types; enum_p->elements; enum_p++) {
+    if (enum_p->num == (unsigned int)type_id) {
+      found = 1;
+      break;
+    }
+  }
+  if (!found)
+    return 1;
+
+  elem_p = enum_p->elements;
+  for (; elem_p->name[0] != 0; elem_p++) {
+    if (enumval == (int)elem_p->num) {
+      strncpy(str, elem_p->name, strsize);
+      return 1;
+    }
+  }
+  return 0;
+}
+
+int XNav::is_local_enum(int type_id)
+{
+  for (xnav_sEnum *enum_p = xnav_enum_types; enum_p->elements; enum_p++) {
+    if (enum_p->num == (unsigned int)type_id)
+      return 1;
+  }
+  return 0;
+}
+
 //
 //  Get trace attribute
 //
@@ -1039,6 +1156,12 @@ void XNav::attrvalue_to_string(int type_id, pwr_tTid tid, void* value_ptr,
     else
       *len = sprintf(str, "Down");
     break;
+  }
+  default: {
+    sts = local_enum_to_string(type_id, *(pwr_tEnum *)value_ptr, str, 40);
+    if (EVEN(sts))
+      strcpy(str, "Undefined");
+    *len = strlen(str);
   }
   }
 }
@@ -2315,6 +2438,11 @@ int XNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
 
       // if even sts continue
       case xnav_eItemType_Local:
+	if (xnav->is_local_enum(((ItemLocal *)item)->type_id)) {
+	  sts = item->open_children(xnav->brow, 0, 0);
+	  if (ODD(sts))
+	    break;
+	}
         if (xnav->gbl.advanced_user && xnav->change_value_cb)
           (xnav->change_value_cb)(xnav->parent_ctx);
         break;
@@ -2326,6 +2454,13 @@ int XNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
           }
           ((ItemEnum*)item)->set_value();
         }
+        break;
+      case xnav_eItemType_LocalEnum:
+	if (((ItemLocalEnum *)item)->nochange) {
+	  xnav->message('E', "Attribute can't be changed");
+	  break;
+	}
+	((ItemLocalEnum*)item)->set_value(xnav->brow);
         break;
       case xnav_eItemType_Mask:
         if (xnav->gbl.advanced_user) {
@@ -2526,6 +2661,14 @@ int XNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
             break;
           }
           ((ItemMask*)item)->set_value(!event->radiobutton.value);
+          break;
+        case xnav_eItemType_LocalEnum:
+	  if (((ItemLocalEnum *)item)->nochange) {
+	    xnav->message('E', "Attribute can't be changed");
+	    break;
+	  }
+          if (!event->radiobutton.value)
+            ((ItemLocalEnum*)item)->set_value(xnav->brow);
           break;
         default:;
         }
@@ -2905,6 +3048,25 @@ int XNav::trace_scan_bc(brow_tObject object, void* p)
       item->first_scan = 0;
     break;
   }
+  case xnav_eItemType_LocalEnum: {
+    ItemLocalEnum* item;
+
+    item = (ItemLocalEnum*)base_item;
+    if (!item->first_scan) {
+      if (item->old_value == *(int*)p)
+        // No change since last time
+        return 1;
+    } else
+      item->first_scan = 0;
+
+    if (*(int*)p == item->num)
+      brow_SetRadiobutton(item->node, 0, 1);
+    else
+      brow_SetRadiobutton(item->node, 0, 0);
+
+    item->old_value = *(int*)p;
+    break;
+  }
   default:;
   }
   return 1;
@@ -2982,6 +3144,10 @@ int XNav::trace_connect_bc(
     ItemTable* item = (ItemTable*)base_item;
 
     *p = (void*)item;
+    break;
+  }
+  case xnav_eItemType_LocalEnum: {
+    *p = ((ItemLocalEnum *)base_item)->value_p;
     break;
   }
   default:;
@@ -3317,38 +3483,38 @@ int XNav::setup()
   new ItemLocal(brow, "Scantime", "setup_scantime", pwr_eType_Float64,
       sizeof(gbl.scantime), 0.010, 10, 0, (void*)&gbl.scantime, NULL,
       flow_eDest_IntoLast);
-  new ItemLocal(brow, "AlarmBeep", "setup_alarmbeep", pwr_eType_Boolean,
+  new ItemLocal(brow, "AlarmBeep", "setup_alarmbeep", xnav_eType_YesNo,
       sizeof(gbl.AlarmBeep), 0, 1, 0, (void*)&gbl.AlarmBeep, NULL,
       flow_eDest_IntoLast);
-  new ItemLocal(brow, "AlarmReturn", "setup_alarmreturn", pwr_eType_Boolean,
+  new ItemLocal(brow, "AlarmReturn", "setup_alarmreturn", xnav_eType_YesNo,
       sizeof(gbl.AlarmReturn), 0, 1, 0, (void*)&gbl.AlarmReturn, NULL,
       flow_eDest_IntoLast);
-  new ItemLocal(brow, "AlarmAck", "setup_alarmack", pwr_eType_Boolean,
+  new ItemLocal(brow, "AlarmAck", "setup_alarmack", xnav_eType_YesNo,
       sizeof(gbl.AlarmAck), 0, 1, 0, (void*)&gbl.AlarmAck, NULL,
       flow_eDest_IntoLast);
   new ItemLocal(brow, "HideOperatorWindow", "setup_hideopwind",
-      pwr_eType_Boolean, sizeof(gbl.hide_opwind), 0, 1, 0,
+      xnav_eType_YesNo, sizeof(gbl.hide_opwind), 0, 1, 0,
       (void*)&gbl.hide_opwind, NULL, flow_eDest_IntoLast);
-  new ItemLocal(brow, "HideStatusBar", "setup_hidestatusbar", pwr_eType_Boolean,
+  new ItemLocal(brow, "HideStatusBar", "setup_hidestatusbar", xnav_eType_YesNo,
       sizeof(gbl.hide_statusbar), 0, 1, 0, (void*)&gbl.hide_statusbar, NULL,
       flow_eDest_IntoLast);
   new ItemLocal(brow, "SetupScript", "setup_setupscript", pwr_eType_String,
       sizeof(gbl.setupscript), 0, 0, 0, (void*)gbl.setupscript, NULL,
       flow_eDest_IntoLast);
-  new ItemLocal(brow, "Verify", "setup_verify", pwr_eType_Int32,
+  new ItemLocal(brow, "Verify", "setup_verify", xnav_eType_YesNo,
       sizeof(gbl.verify), 0, 1, 0, (void*)&gbl.verify, NULL,
       flow_eDest_IntoLast);
-  new ItemLocal(brow, "AdvancedUser", "setup_advanceduser", pwr_eType_Int32,
+  new ItemLocal(brow, "AdvancedUser", "setup_advanceduser", xnav_eType_YesNo,
       sizeof(gbl.advanced_user), 0, 1, 0, (void*)&gbl.advanced_user, NULL,
       flow_eDest_IntoLast);
-  new ItemLocal(brow, "ShowTrueDb", "setup_truedb", pwr_eType_Int32,
+  new ItemLocal(brow, "ShowTrueDb", "setup_truedb", xnav_eType_YesNo,
       sizeof(gbl.show_truedb), 0, 1, 0, (void*)&gbl.show_truedb, NULL,
       flow_eDest_IntoLast);
-  new ItemLocal(brow, "ShowAllAttributes", "setup_allattr", pwr_eType_Int32,
+  new ItemLocal(brow, "ShowAllAttributes", "setup_allattr", xnav_eType_YesNo,
       sizeof(gbl.show_truedb), 0, 1, 0, (void*)&gbl.show_allattr, NULL,
       flow_eDest_IntoLast);
-  new ItemLocal(brow, "ColorTheme", "setup_colortheme", pwr_eType_Int32,
-      sizeof(gbl.color_theme), 0, 20, 0, (void*)&gbl.color_theme, NULL,
+  new ItemLocal(brow, "ColorTheme", "setup_colortheme", xnav_eType_ColorTheme,
+      sizeof(gbl.color_theme), 0, 100, 0, (void*)&gbl.color_theme, NULL,
       flow_eDest_IntoLast);
 
   brow_ResetNodraw(brow->ctx);
@@ -3373,8 +3539,8 @@ int XNav::show_logging(int index)
   brow_SetNodraw(brow->ctx);
   new ItemHeader(brow, "Title", title, NULL, flow_eDest_IntoLast);
 
-  new ItemLocal(brow, Lng::translate("Active"), "logg_Active",
-      pwr_eType_Boolean, sizeof(logg[0].active), 0, 0, 1,
+  new ItemLocal(brow, Lng::translate("State"), "logg_Active",
+      xnav_eType_LoggActive, sizeof(logg[0].active), 0, 0, 1,
       (void*)&logg[index].active, NULL, flow_eDest_IntoLast);
 
   sprintf(command, "logging set/insert/entry=%d", entry);
@@ -3412,20 +3578,20 @@ int XNav::show_logging(int index)
   new ItemLocal(brow, Lng::translate("Log file "), "logg_File",
       pwr_eType_String, sizeof(logg[0].logg_filename), 0, 0, 0,
       (void*)logg[index].logg_filename, NULL, flow_eDest_IntoLast);
-  new ItemLocal(brow, Lng::translate("Type"), "logg_Type", pwr_eType_Int32,
+  new ItemLocal(brow, Lng::translate("Type"), "logg_Type", xnav_eType_LoggType,
       sizeof(logg[0].logg_type), 0, 0, 0, (void*)&logg[index].logg_type, NULL,
       flow_eDest_IntoLast);
-  new ItemLocal(brow, Lng::translate("Format"), "logg_Format", pwr_eType_Int32,
+  new ItemLocal(brow, Lng::translate("Format"), "logg_Format", xnav_eType_LoggFormat,
       sizeof(logg[0].logg_type), 0, 0, 0, (void*)&logg[index].logg_format, NULL,
       flow_eDest_IntoLast);
   new ItemLocal(brow, Lng::translate("BufferSize"), "logg_BufferSize",
       pwr_eType_Int32, sizeof(logg[0].wanted_buffer_size), 0, 0, 0,
       (void*)&logg[index].wanted_buffer_size, NULL, flow_eDest_IntoLast);
   new ItemLocal(brow, Lng::translate("FullBufferStop"), "logg_BufferStop",
-      pwr_eType_Boolean, sizeof(logg[0].intern), 0, 0, 0,
+      xnav_eType_YesNo, sizeof(logg[0].intern), 0, 0, 0,
       (void*)&logg[index].intern, NULL, flow_eDest_IntoLast);
   new ItemLocal(brow, Lng::translate("ShortName"), "logg_ShortName",
-      pwr_eType_Boolean, sizeof(logg[0].print_shortname), 0, 0, 0,
+      xnav_eType_YesNo, sizeof(logg[0].print_shortname), 0, 0, 0,
       (void*)&logg[index].print_shortname, NULL, flow_eDest_IntoLast);
   new ItemLocal(brow, Lng::translate("Condition"), "logg_CondPar",
       pwr_eType_String, sizeof(logg[0].conditionstr), 0, 0, 0,

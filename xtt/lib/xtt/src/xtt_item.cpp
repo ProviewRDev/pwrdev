@@ -1935,6 +1935,109 @@ ItemLocal::ItemLocal(XNavBrow* brow, const char* item_name, const char* attr,
   brow_SetTraceAttr(node, attr, "", flow_eTraceType_User);
 }
 
+int ItemLocal::open_children(XNavBrow* brow, double x, double y)
+{
+  double node_x, node_y;
+
+  brow_GetNodePosition(node, &node_x, &node_y);
+
+  if (brow_IsOpen(node)) {
+    // Close
+    brow_SetNodraw(brow->ctx);
+    brow_CloseNode(brow->ctx, node);
+    if (brow_IsOpen(node) & xnav_mOpen_Attributes)
+      brow_RemoveAnnotPixmap(node, 1);
+    if (brow_IsOpen(node) & xnav_mOpen_Children)
+      brow_SetAnnotPixmap(node, 0, brow->pixmap_attrarray);
+    brow_ResetOpen(node, xnav_mOpen_All);
+    brow_ResetNodraw(brow->ctx);
+    brow_Redraw(brow->ctx, node_y);
+  } else {
+    xnav_sEnumElement* elem_p = NULL;
+    xnav_sEnum* enum_p;
+    int found;
+
+    found = 0;
+    for (enum_p = xnav_enum_types; enum_p->elements; enum_p++) {
+      if (enum_p->num == (unsigned int)type_id) {
+        elem_p = enum_p->elements;
+        found = 1;
+        break;
+      }
+    }
+    if (found) {
+      // Create some children
+      brow_SetNodraw(brow->ctx);
+
+      for (; elem_p->name[0] != 0; elem_p++) {
+        new ItemLocalEnum(brow, elem_p->name, elem_p->num, type_id,
+	    nochange, this->value_p, node, flow_eDest_IntoLast);
+      }
+    } 
+
+    brow_SetOpen(node, xnav_mOpen_Children);
+    brow_SetAnnotPixmap(node, 0, brow->pixmap_openmap);
+    brow_ResetNodraw(brow->ctx);
+    brow_Redraw(brow->ctx, node_y);
+  }
+  return 1;
+}
+
+void ItemLocal::close(XNavBrow* brow, double x, double y)
+{
+  double node_x, node_y;
+
+  brow_GetNodePosition(node, &node_x, &node_y);
+
+  if (brow_IsOpen(node)) {
+    // Close
+    brow_SetNodraw(brow->ctx);
+    brow_CloseNode(brow->ctx, node);
+    if (brow_IsOpen(node) & xnav_mOpen_Attributes)
+      brow_RemoveAnnotPixmap(node, 1);
+    if (brow_IsOpen(node) & xnav_mOpen_Children)
+      brow_SetAnnotPixmap(node, 0, brow->pixmap_attrarray);
+    brow_ResetOpen(node, xnav_mOpen_All);
+    brow_ResetNodraw(brow->ctx);
+    brow_Redraw(brow->ctx, node_y);
+  }
+}
+
+ItemLocalEnum::ItemLocalEnum(XNavBrow* brow, char* item_name, int item_num,
+    int item_type_id, int item_nochange, void* attr_value_p, brow_tNode dest, 
+    flow_eDest dest_code)
+  : Item(pwr_cNObjid, 0), num(item_num), type_id(item_type_id),
+    value_p(attr_value_p), first_scan(1), nochange(item_nochange)
+{
+  type = xnav_eItemType_LocalEnum;
+
+  strcpy(name, item_name);
+
+  brow_CreateNode(brow->ctx, item_name, brow->nc_enum, dest,
+      dest_code, (void*)this, 1, &node);
+
+  brow_SetAnnotPixmap(node, 0, brow->pixmap_attr);
+  brow_SetAnnotation(node, 0, item_name, strlen(item_name));
+  if (*(int*)value_p == num)
+    brow_SetRadiobutton(node, 0, 1);
+  else
+    brow_SetRadiobutton(node, 0, 0);
+  brow_SetTraceAttr(node, name, "", flow_eTraceType_User);
+}
+
+int ItemLocalEnum::set_value(XNavBrow* brow)
+{
+  if (type_id == xnav_eType_ColorTheme) {
+    pwr_tCmd cmd;
+    XNav* xnav = (XNav*)brow->userdata;
+    sprintf(cmd, "set colortheme/index=%d\n", num);
+    xnav->command(cmd);
+  }
+  else
+    *((pwr_tEnum *)value_p) = num;
+  return 1;
+}
+
 ItemObjectStruct::ItemObjectStruct(XNavBrow* brow, char* item_name, char* attr,
     int attr_type, int attr_size, int attr_nochange, void* attr_value_p,
     pwr_tObjid attr_objid, pwr_tRefId attr_subid, brow_tNode dest,

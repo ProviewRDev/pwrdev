@@ -102,7 +102,13 @@ typedef enum {
   xnav_eType_Empty = 10001,
   xnav_eType_FixStr = 10002,
   xnav_eType_ShortTime = 10003,
-  xnav_eType_NetTime = 10004
+  xnav_eType_NetTime = 10004,
+  xnav_eType_YesNo = 10005,
+  xnav_eType_OnOff = 10006,
+  xnav_eType_ColorTheme = 10007,
+  xnav_eType_LoggActive = 10008,
+  xnav_eType_LoggFormat = 10009,
+  xnav_eType_LoggType = 10010
 } xnav_eType;
 
 typedef enum {
@@ -169,6 +175,18 @@ typedef enum {
   xnav_eSetSignal_Test,
   xnav_eSetSignal_TestValue
 } xnav_eSetSignal;
+
+typedef struct {
+  unsigned int num;
+  char name[40];
+} xnav_sEnumElement;
+
+typedef struct {
+  unsigned int num;
+  xnav_sEnumElement* elements;
+} xnav_sEnum;
+
+extern xnav_sEnum xnav_enum_types[];
 
 class XNav;
 
@@ -440,6 +458,9 @@ public:
   {
   }
 
+  static int string_to_local_enum(int type_id, char* str, pwr_tEnum* enumval);
+  static int local_enum_to_string(int type_id, pwr_tEnum enumval, char* str, int strsize);
+  static int is_local_enum(int type_id);
   void start_trace(pwr_tObjid Objid, char* object_str);
   void start_trace_selected();
   void show_crossref();

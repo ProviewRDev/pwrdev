@@ -73,7 +73,8 @@ typedef enum {
   xnav_eItemType_SubBlock,
   xnav_eItemType_BlockAttr,
   xnav_eItemType_BlockAttrArray,
-  xnav_eItemType_BlockAttrArrayElem
+  xnav_eItemType_BlockAttrArrayElem,
+  xnav_eItemType_LocalEnum
 } xnav_eItemType;
 
 typedef enum {
@@ -345,6 +346,8 @@ public:
       int attr_type, int attr_size, double attr_min_limit,
       double attr_max_limit, int attr_nochange, void* attr_value_p,
       brow_tNode dest, flow_eDest dest_code);
+  int open_children(XNavBrow* brow, double x, double y);
+  void close(XNavBrow* brow, double x, double y);
   void* value_p;
   char old_value[80];
   int first_scan;
@@ -352,6 +355,34 @@ public:
   int size;
   double min_limit;
   double max_limit;
+  int nochange;
+};
+
+//! Item for a local enum attribute.
+class ItemLocalEnum : public Item {
+public:
+  ItemLocalEnum(XNavBrow* brow, char* item_name, int item_num, int item_type_id,
+      int item_nochange, void* attr_value_p, brow_tNode dest, flow_eDest dest_code);
+  int set_value(XNavBrow* brow);
+  int num;
+  int type_id;
+  void* value_p;
+  int old_value;
+  int first_scan;
+  int nochange;
+};
+
+//! Item for a local mask attribute.
+class ItemLocalMask : public Item {
+public:
+  ItemLocalMask(XNavBrow* brow, char* item_name, unsigned int item_mask,
+      int item_type_id, int item_nochange, void* attr_value_p, brow_tNode dest,
+      flow_eDest dest_code);
+  unsigned int mask;
+  int type_id;
+  void* value_p;
+  int old_value;
+  int first_scan;
   int nochange;
 };
 
