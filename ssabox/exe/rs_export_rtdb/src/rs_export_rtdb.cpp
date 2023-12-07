@@ -71,7 +71,7 @@
 extern int exp_debug;
 int exp_debug = 0;
 
-static const char* default_schema_registry = "schema-registry-kafka.apps.se-oxd-ocp.ssab.com";
+static const char* default_schema_registry = "saal-schema-registry-confluent-api.apps.se-oxd-dc-ocp.ssab.com";
 static const char* default_config_file = "$pwrp_load/kafka_config.ini";
 static const char json_filename[] = "$pwrp_load/select.json";
 
@@ -105,6 +105,7 @@ public:
   cJSON* parse_file(const char *filename);
   int init(qcom_sQid* qid);
   void open(int argc, char**argv);
+  void close();
 };
 
 struct asdf {
@@ -112,6 +113,8 @@ struct asdf {
   pwr_eType type;
   uint32_t flags;
   bool to_send;
+  pwr_tStatus sts;
+  pwr_tRefId dlid;
   void *valp;
 };
 typedef struct asdf asdfs;
@@ -281,6 +284,8 @@ int rs_export_rtdb::gen_schema_main() {
 
 int freqCounter = 0;
 int batch = 0;
+int izero[8] = {0,0,0,0,0,0,0,0};
+
 AvroEncoder avro_encoder = AvroEncoder();
 
 int rs_export_rtdb::scan() {
@@ -333,6 +338,11 @@ int rs_export_rtdb::scan() {
       if (EVEN(sts)) 
 	return sts;
     }
+    else {
+      sts = encode_val(avro_encoder, it->second.type, 0, &it->second.aref, (void *)izero);
+      if (EVEN(sts)) 
+	return sts;
+    }
   }
 
   batch++;
@@ -345,6 +355,7 @@ int rs_export_rtdb::scan() {
     send_kafka_key_val(avro_encoder.out.data(), avro_encoder.out.size());
 	
     kafka_flush(1000);
+
     batch -= m_batches;
   }
 
@@ -501,10 +512,13 @@ int rs_export_rtdb::init(qcom_sQid* qid) {
     a.aref.Objid.oix = cJSON_GetObjectItemCaseSensitive(oid_json, "oix")->valueint;
     a.aref.Objid.vid = cJSON_GetObjectItemCaseSensitive(oid_json, "vid")->valueint;
 
-    pwr_tStatus sts = gdh_AttrRefToPointer(&a.aref, &a.valp);
-    if (EVEN(sts)) 
+    a.sts = gdh_NameToAttrref(pwr_cNOid, name.c_str(), &a.aref);
+    if (ODD(a.sts))
+      a.sts = gdh_DLRefObjectInfoAttrref(&a.aref, &a.valp, &a.dlid);
+    if (EVEN(a.sts)) {
       a.valp = 0;
-
+      errh_Error("Attribute link error, %m, %s", sts, name.c_str());
+    }
     arefs[name] = a;
   }
 
@@ -534,6 +548,16 @@ void rs_export_rtdb::open(int argc, char**argv) {
 */
 }
 
+void rs_export_rtdb::close() {
+  for (std::map<std::string, asdfs>::iterator it = arefs.begin(); it != arefs.end(); it++) {
+    if (ODD(it->second.sts))
+      gdh_DLUnrefObjectInfo(it->second.dlid);
+  }
+  arefs.clear();
+
+  if (!(m_confdlid.nid == 0 && m_confdlid.rix== 0))
+    gdh_DLUnrefObjectInfo(m_confdlid);
+}
 
 static void usage() {
   std::cout << "Usage: rs_export_rtdb -t <topic> -c <config-file> -s <schema-registry-url>\n\n"
@@ -709,6 +733,7 @@ int main(int argc, char** argv) {
         exp->open(argc, argv);
         errh_SetStatus(PWR__SRUN);
       } else if (new_event.b.terminate) {
+	exp->close();
         exit(0);
       }
     }

@@ -46,13 +46,26 @@
 
 const bool MAKE_VALUES_OPTIONAL = true;
 
+// This function converts from latin1 encoding to utf8
+static std::string to_utf8(char *s) {
+  std::string res = "";
+  std::string str(s);
+  for (int i = 0; i < str.size(); i++) {
+    unsigned char in = str[i];
+    if (in < 128) {
+      res += in;
+    } else {
+      res += 0xc2 + (in > 0xbf);
+      res += (in & 0x3f) + 0x80;
+    }
+  }
+  return res;
+}
+
 template<typename T>
-T attr_to_val(bool is_ptr, pwr_sAttrRef* aref, void* val) {
+T attr_to_val(pwr_sAttrRef* aref, void* val) {
   T a;
-  if (is_ptr)
-    gdh_GetObjectInfoAttrref(aref, &a, sizeof(a));
-  else
-    a = *(T*)val;
+  a = *(T*)val;
   return a;
 }
 
@@ -60,71 +73,101 @@ int encode_val(AvroEncoder &enc, pwr_eType type_id, bool is_ptr, pwr_sAttrRef* a
   if (MAKE_VALUES_OPTIONAL && type_id < pwr_eType_Void) {
     enc.encodeUnionIndex(1);
   }
-  if (type_id == pwr_eType_Boolean) {
-    pwr_tBoolean a = attr_to_val<pwr_tBoolean>(is_ptr, aref, val);
+  switch(type_id) {
+  case pwr_eType_Boolean: {
+    pwr_tBoolean a = attr_to_val<pwr_tBoolean>(aref, val);
     enc.encodeBool(a ? true : false);
-  } else if (type_id == pwr_eType_Float32) {
-    enc.encodeFloat(attr_to_val<pwr_tFloat32>(is_ptr, aref, val));
-  } else if (type_id == pwr_eType_Float64) {
-    enc.encodeDouble(attr_to_val<pwr_tFloat64>(is_ptr, aref, val));
-  } else if (type_id == pwr_eType_Char) {
-    enc.encodeInt(attr_to_val<pwr_tChar>(is_ptr, aref, val));
-  } else if (type_id == pwr_eType_Int8) {
-    enc.encodeInt(attr_to_val<pwr_tInt8>(is_ptr, aref, val));
-  } else if (type_id == pwr_eType_Int16) {
-    enc.encodeInt(attr_to_val<pwr_tInt16>(is_ptr, aref, val));
-  } else if (type_id == pwr_eType_Int32) {
-    enc.encodeInt(attr_to_val<pwr_tInt32>(is_ptr, aref, val));
-  } else if (type_id == pwr_eType_Int64) {
-    enc.encodeLong(attr_to_val<pwr_tInt64>(is_ptr, aref, val));
-  } else if (type_id == pwr_eType_UInt8) {
-    enc.encodeInt(attr_to_val<pwr_tUInt8>(is_ptr, aref, val));
-  } else if (type_id == pwr_eType_UInt16) {
-    enc.encodeInt(attr_to_val<pwr_tUInt16>(is_ptr, aref, val));
-  } else if (type_id == pwr_eType_UInt32 || type_id == pwr_eType_Mask || type_id == pwr_eType_DisableAttr || type_id == pwr_eType_Enum || type_id == pwr_eType_NetStatus || type_id == pwr_eType_Status) {
-    enc.encodeInt(attr_to_val<pwr_tUInt32>(is_ptr, aref, val));
-  } else if (type_id == pwr_eType_UInt64) {
-    enc.encodeLong(attr_to_val<pwr_tUInt64>(is_ptr, aref, val));
-  } else if (type_id == pwr_eType_String) {
+    break;
+  }
+  case pwr_eType_Float32: {
+    enc.encodeFloat(attr_to_val<pwr_tFloat32>(aref, val));
+    break;
+  }
+  case pwr_eType_Float64: {
+    enc.encodeDouble(attr_to_val<pwr_tFloat64>(aref, val));
+    break;
+  }
+  case pwr_eType_Char: {
+    enc.encodeInt(attr_to_val<pwr_tChar>(aref, val));
+    break;
+  }
+  case pwr_eType_Int8: {
+    enc.encodeInt(attr_to_val<pwr_tInt8>(aref, val));
+    break;
+  }
+  case pwr_eType_Int16: {
+    enc.encodeInt(attr_to_val<pwr_tInt16>(aref, val));
+    break;
+  }
+  case pwr_eType_Int32: {
+    enc.encodeInt(attr_to_val<pwr_tInt32>(aref, val));
+    break;
+  }
+  case pwr_eType_Int64: {
+    enc.encodeLong(attr_to_val<pwr_tInt64>(aref, val));
+    break;
+  }
+  case pwr_eType_UInt8: {
+    enc.encodeInt(attr_to_val<pwr_tUInt8>(aref, val));
+    break;
+  }
+  case pwr_eType_UInt16: {
+    enc.encodeInt(attr_to_val<pwr_tUInt16>(aref, val));
+    break;
+  }
+  case pwr_eType_UInt32:
+  case pwr_eType_Mask:
+  case pwr_eType_DisableAttr:
+  case pwr_eType_Enum:
+  case pwr_eType_NetStatus:
+  case pwr_eType_Status: {
+    enc.encodeInt(attr_to_val<pwr_tUInt32>(aref, val));
+    break;
+  }
+  case pwr_eType_UInt64: {
+    enc.encodeLong(attr_to_val<pwr_tUInt64>(aref, val));
+    break;
+  }
+  case pwr_eType_String: {
     pwr_tString80 a;
-    if (is_ptr)
-      gdh_GetObjectInfoAttrref(aref, &a, sizeof(a));
-    else
-      strcpy(a, *(pwr_tString80*)val);
-    enc.encodeString(std::string(a));
-  } else if (type_id == pwr_eType_Text) {
-    pwr_tString80 a;
-    if (is_ptr)
-      gdh_GetObjectInfoAttrref(aref, &a, sizeof(a));
-    else
-      strcpy(a, *(pwr_tText*)val);
-    pwr_tString80 str;
+    strcpy(a, *(pwr_tString80*)val);
+    a[79] = 0;
+    enc.encodeString(to_utf8(a));
+    break;
+  }
+  case pwr_eType_Text: {
+    pwr_tString256 a;
+    strcpy(a, *(pwr_tText*)val);
+    pwr_tString256 str;
     char* s;
     char* t;
     for (s = (char*)a, t = str; *s != 10 && *s != 0; s++, t++) {
       *t = *s;
     }
     *t = 0;
-    enc.encodeString(std::string(str));
-  } else if (type_id == pwr_eType_Objid) {
-    pwr_tObjid a = attr_to_val<pwr_tObjid>(is_ptr, aref, val);
+    str[255] = 0;
+    enc.encodeString(to_utf8(str));
+    break;
+  }
+  case pwr_eType_Objid: {
+    pwr_tObjid a = attr_to_val<pwr_tObjid>(aref, val);
     enc.encodeBytes((uint8_t*)&a, sizeof(a));
-  } else if (type_id == pwr_eType_AttrRef) {
+    break;
+  }
+  case pwr_eType_AttrRef: {
     pwr_sAttrRef attrref;
-    if (is_ptr)
-      gdh_GetObjectInfoAttrref(aref, &attrref, sizeof(attrref));
-    else
-      attrref = *(pwr_sAttrRef*)val;
+    attrref = *(pwr_sAttrRef*)val;
     enc.encodeBytes((uint8_t*)&attrref, sizeof(attrref));
-  } else if (type_id == pwr_eType_DataRef) {
+    break;
+  }
+  case pwr_eType_DataRef: {
     pwr_tDataRef dataref;
-    if (is_ptr)
-      gdh_GetObjectInfoAttrref(aref, &dataref, sizeof(dataref));
-    else
-      dataref = *(pwr_tDataRef*)val;
+    dataref = *(pwr_tDataRef*)val;
     enc.encodeBytes((uint8_t*)&dataref, sizeof(dataref));
-  } else if (type_id == pwr_eType_Time) {
-    pwr_tTime a = attr_to_val<pwr_tTime>(is_ptr, aref, val);
+    break;
+  }
+  case pwr_eType_Time: {
+    pwr_tTime a = attr_to_val<pwr_tTime>(aref, val);
     uint8_t tmp[sizeof(a.tv_sec)+sizeof(a.tv_nsec)];
     for (int i = 0; i < sizeof(a.tv_sec); i++) {
       tmp[i] = ((a.tv_sec >> (8*i)) & 0xFF);
@@ -133,8 +176,10 @@ int encode_val(AvroEncoder &enc, pwr_eType type_id, bool is_ptr, pwr_sAttrRef* a
       tmp[i+sizeof(a.tv_sec)] = ((a.tv_nsec >> (8*i)) & 0xFF);
     }
     enc.encodeBytes(tmp, sizeof(a.tv_sec)+sizeof(a.tv_nsec));
-  } else if (type_id == pwr_eType_DeltaTime) {
-    pwr_tDeltaTime a = attr_to_val<pwr_tDeltaTime>(is_ptr, aref, val);
+    break;
+  }
+  case pwr_eType_DeltaTime: {
+    pwr_tDeltaTime a = attr_to_val<pwr_tDeltaTime>(aref, val);
     uint8_t tmp[sizeof(a.tv_sec)+sizeof(a.tv_nsec)];
     for (int i = 0; i < sizeof(a.tv_sec); i++) {
       tmp[i] = ((a.tv_sec >> (8*i)) & 0xFF);
@@ -143,22 +188,35 @@ int encode_val(AvroEncoder &enc, pwr_eType type_id, bool is_ptr, pwr_sAttrRef* a
       tmp[i+sizeof(a.tv_sec)] = ((a.tv_nsec >> (8*i)) & 0xFF);
     }
     enc.encodeBytes(tmp, sizeof(a.tv_sec)+sizeof(a.tv_nsec));
-  } else if (type_id == pwr_eType_ObjectIx) {
-    pwr_tObjectIx a = attr_to_val<pwr_tObjectIx>(is_ptr, aref, val);
+    break;
+  }
+  case pwr_eType_ObjectIx: {
+    pwr_tObjectIx a = attr_to_val<pwr_tObjectIx>(aref, val);
     enc.encodeBytes((uint8_t*)&a, sizeof(a));
-  } else if (type_id == pwr_eType_ClassId) {
-    pwr_tClassId a = attr_to_val<pwr_tClassId>(is_ptr, aref, val);
+    break;
+  }
+  case pwr_eType_ClassId: {
+    pwr_tClassId a = attr_to_val<pwr_tClassId>(aref, val);
     enc.encodeBytes((uint8_t*)&a, sizeof(a));
-  } else if (type_id == pwr_eType_TypeId || type_id == pwr_eType_CastId) {
-    pwr_tTypeId a = attr_to_val<pwr_tTypeId>(is_ptr, aref, val);
+    break;
+  }
+  case pwr_eType_TypeId:
+  case pwr_eType_CastId: {
+    pwr_tTypeId a = attr_to_val<pwr_tTypeId>(aref, val);
     enc.encodeBytes((uint8_t*)&a, sizeof(a));
-  } else if (type_id == pwr_eType_VolumeId) {
-    pwr_tVolumeId a = attr_to_val<pwr_tVolumeId>(is_ptr, aref, val);
+    break;
+  }
+  case pwr_eType_VolumeId: {
+    pwr_tVolumeId a = attr_to_val<pwr_tVolumeId>(aref, val);
     enc.encodeBytes((uint8_t*)&a, sizeof(a));
-  } else if (type_id == pwr_eType_RefId) {
-    pwr_tSubid a = attr_to_val<pwr_tSubid>(is_ptr, aref, val);
+    break;
+  }
+  case pwr_eType_RefId: {
+    pwr_tSubid a = attr_to_val<pwr_tSubid>(aref, val);
     enc.encodeBytes((uint8_t*)&a, sizeof(a));
-  } else {
+    break;
+  }
+  default:
     fprintf(stderr, "Not handling type %d\n", type_id);
     return GDH__CONVERT;
   }
@@ -166,25 +224,58 @@ int encode_val(AvroEncoder &enc, pwr_eType type_id, bool is_ptr, pwr_sAttrRef* a
 }
 
 std::string pwr_eType_to_str(pwr_eType tid) {
-  std::string str = "";
-  if (tid == pwr_eType_Boolean) {
+  std::string str;
+  switch (tid) {
+  case pwr_eType_Boolean:
     str = "boolean";
-  } else if (tid == pwr_eType_Float32) {
+    break;
+  case pwr_eType_Float32:
     str =  "float";
-  } else if (tid == pwr_eType_Float64) {
+    break;
+  case pwr_eType_Float64:
     str = "double";
-  } else if (tid == pwr_eType_Char) {
+    break;
+  case pwr_eType_Char:
     str = "bytes";
-  } else if (tid == pwr_eType_Int8 || tid == pwr_eType_Int16 || tid == pwr_eType_Int32 || tid == pwr_eType_UInt8 || tid == pwr_eType_UInt16 || tid == pwr_eType_UInt32 || tid == pwr_eType_Mask || tid == pwr_eType_DisableAttr || tid == pwr_eType_Enum || tid == pwr_eType_NetStatus || tid == pwr_eType_Status) {
+    break;
+  case pwr_eType_Int8:
+  case pwr_eType_Int16:
+  case pwr_eType_Int32:
+  case pwr_eType_UInt8:
+  case pwr_eType_UInt16:
+  case pwr_eType_UInt32:
+  case pwr_eType_Mask:
+  case pwr_eType_DisableAttr:
+  case pwr_eType_Enum:
+  case pwr_eType_NetStatus:
+  case pwr_eType_Status:
     str = "int";
-  } else if (tid == pwr_eType_Int64 || tid == pwr_eType_UInt64) {
+    break;
+  case pwr_eType_Int64:
+  case pwr_eType_UInt64:
     str = "long";
-  } else if (tid == pwr_eType_String || tid == pwr_eType_Text) {
+    break;
+  case pwr_eType_String:
+  case pwr_eType_Text:
     str = "string";
-  } else if (tid == pwr_eType_Objid || tid == pwr_eType_AttrRef || tid == pwr_eType_DataRef || tid == pwr_eType_ObjectIx || tid == pwr_eType_ClassId || tid == pwr_eType_TypeId || tid == pwr_eType_CastId || tid == pwr_eType_VolumeId || tid == pwr_eType_RefId) {
+    break;
+  case pwr_eType_Objid:
+  case pwr_eType_AttrRef:
+  case pwr_eType_DataRef:
+  case pwr_eType_ObjectIx:
+  case pwr_eType_ClassId:
+  case pwr_eType_TypeId:
+  case pwr_eType_CastId:
+  case pwr_eType_VolumeId:
+  case pwr_eType_RefId:
     str = "bytes";
-  } else if (tid == pwr_eType_Time || tid == pwr_eType_DeltaTime) {
+    break;
+  case pwr_eType_Time:
+  case pwr_eType_DeltaTime:
     str = "bytes";
+    break;
+  default:
+    str = "";
   }
   if (MAKE_VALUES_OPTIONAL && str.size() > 0) {
     return "[\\\"null\\\",\\\"" + str + "\\\"]";
