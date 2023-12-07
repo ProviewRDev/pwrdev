@@ -137,6 +137,7 @@ public:
   int show_attrxref;
   int build_force;
   int build_debug;
+  int build_syntax;
   int build_crossref;
   int build_crossref_sim;
   int build_crossref_graph;

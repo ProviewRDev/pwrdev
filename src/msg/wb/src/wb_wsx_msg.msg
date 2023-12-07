@@ -64,3 +64,5 @@ aicount		<Max number of Ai objects exceeded>			/error
 aocount		<Max number of Ao objects exceeded>			/error
 avcount		<Max number of Av objects exceeded>			/error
 cocount		<Max number of Co objects exceeded>			/error
+errors		<Syntax errors>						/error
+warnings	<Syntax warnings>					/warn

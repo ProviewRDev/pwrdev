@@ -51,6 +51,7 @@
 
 #include "wb_foe_msg.h"
 #include "wb_pwrb_msg.h"
+#include "wb_wsx_msg.h"
 #include "wb_utl_api.h"
 #include "wb_build.h"
 #include "wb_env.h"
@@ -702,6 +703,20 @@ void wb_build::rootvolume(pwr_tVid vid)
   char msg[80];
 
   wb_log::push();
+
+  if (opt.syntax) {
+    int errorcount, warningcount;
+
+    m_sts = ldh_SyntaxCheck((ldh_tSession*)&m_session, &errorcount, &warningcount);
+    if (evenSts())
+      return;
+    if (errorcount) {
+      m_sts = WSX__ERRORS;
+      return;
+    }
+    if (warningcount)
+      m_sts = WSX__WARNINGS;
+  }
 
   if (!opt.manual) {
     // Build all plcpgm

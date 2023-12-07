@@ -89,6 +89,7 @@ public:
   GtkWidget* show_attrxref_w;
   GtkWidget* build_force_w;
   GtkWidget* build_debug_w;
+  GtkWidget* build_syntax_w;
   GtkWidget* build_crossref_w;
   GtkWidget* build_crossrefsim_w;
   GtkWidget* build_crossrefgraph_w;

@@ -251,8 +251,8 @@ int Wtt::save_settings()
 
   fp << "endif\n";
 
-  wnav->save_settnings(fp);
-  wnavnode->save_settnings(fp);
+  wnav->save_settings(fp);
+  wnavnode->save_settings(fp);
   fp.close();
 
   return 1;

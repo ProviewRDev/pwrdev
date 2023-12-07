@@ -2194,6 +2194,9 @@ int WNav::setup()
   new WItemLocal(this, "Build.Debug", "setup_build_debug", pwr_eType_Int32,
       sizeof(gbl.build.debug), 0, 1, (void*)&gbl.build.debug, NULL,
       flow_eDest_IntoLast);
+  new WItemLocal(this, "Build.Syntax", "setup_build_syntax", pwr_eType_Int32,
+      sizeof(gbl.build.syntax), 0, 1, (void*)&gbl.build.syntax, NULL,
+      flow_eDest_IntoLast);
   new WItemLocal(this, "Build.CrossReferences", "setup_build_cross",
       pwr_eType_Int32, sizeof(gbl.build.crossref), 0, 1,
       (void*)&gbl.build.crossref, NULL, flow_eDest_IntoLast);
@@ -2250,7 +2253,7 @@ int WNavGbl::symbolfile_exec(void* wnav)
 
 void WNav::set_options(int ena_comment, int ena_revisions, int sh_class,
     int sh_alias, int sh_descrip, int sh_objref, int sh_objxref, int sh_attrref,
-    int sh_attrxref, int bu_force, int bu_debug, int bu_crossref,
+    int sh_attrxref, int bu_force, int bu_debug, int bu_syntax, int bu_crossref,
     int bu_crossrefsim, int bu_crossrefgraph, int bu_manual, int bu_nocopy,
     int col_theme)
 {
@@ -2265,6 +2268,7 @@ void WNav::set_options(int ena_comment, int ena_revisions, int sh_class,
   gbl.show_attrxref = sh_attrxref;
   gbl.build.force = bu_force;
   gbl.build.debug = bu_debug;
+  gbl.build.syntax = bu_syntax;
   gbl.build.crossref = bu_crossref;
   gbl.build.crossref_sim = bu_crossrefsim;
   gbl.build.crossref_graph = bu_crossrefgraph;
@@ -2277,7 +2281,7 @@ void WNav::set_options(int ena_comment, int ena_revisions, int sh_class,
 
 void WNav::get_options(int* ena_comment, int* ena_revisions, int* sh_class,
     int* sh_alias, int* sh_descrip, int* sh_objref, int* sh_objxref,
-    int* sh_attrref, int* sh_attrxref, int* bu_force, int* bu_debug,
+    int* sh_attrref, int* sh_attrxref, int* bu_force, int* bu_debug, int* bu_syntax,
     int* bu_crossref, int* bu_crossrefsim, int* bu_crossrefgraph,
     int* bu_manual, int* bu_nocopy, int *col_theme)
 {
@@ -2292,6 +2296,7 @@ void WNav::get_options(int* ena_comment, int* ena_revisions, int* sh_class,
   *sh_attrxref = gbl.show_attrxref;
   *bu_force = gbl.build.force;
   *bu_debug = gbl.build.debug;
+  *bu_syntax = gbl.build.syntax;
   *bu_crossref = gbl.build.crossref;
   *bu_crossrefsim = gbl.build.crossref_sim;
   *bu_crossrefgraph = gbl.build.crossref_graph;
@@ -2300,7 +2305,7 @@ void WNav::get_options(int* ena_comment, int* ena_revisions, int* sh_class,
   *col_theme = gbl.color_theme;
 }
 
-int WNav::save_settnings(std::ofstream& fp)
+int WNav::save_settings(std::ofstream& fp)
 {
   if (window_type == wnav_eWindowType_W1)
     fp << "if ( IsW1())\n";
@@ -2384,6 +2389,11 @@ int WNav::save_settnings(std::ofstream& fp)
     fp << "  set builddebug /local\n";
   else
     fp << "  set nobuilddebug /local\n";
+
+  if (gbl.build.syntax)
+    fp << "  set buildsyntax /local\n";
+  else
+    fp << "  set nobuildsyntax /local\n";
 
   if (gbl.build.nocopy)
     fp << "  set buildnocopy /local\n";

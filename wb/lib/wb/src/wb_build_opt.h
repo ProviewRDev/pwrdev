@@ -41,7 +41,7 @@ class wb_build_opt {
 public:
   wb_build_opt()
       : force(0), debug(0), crossref(0), crossref_sim(0), crossref_graph(0),
-        manual(0), nocopy(0)
+      manual(0), nocopy(0), syntax(0)
   {
   }
   int force;
@@ -51,6 +51,7 @@ public:
   int crossref_graph;
   int manual;
   int nocopy;
+  int syntax;
 };
 
 #endif

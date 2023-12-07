@@ -1953,6 +1953,7 @@ void WttGtk::update_options_form()
       GTK_TOGGLE_BUTTON(show_attrxref_w), show_attrxref);
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(build_force_w), build_force);
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(build_debug_w), build_debug);
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(build_syntax_w), build_syntax);
   gtk_toggle_button_set_active(
       GTK_TOGGLE_BUTTON(build_crossref_w), build_crossref);
   gtk_toggle_button_set_active(
@@ -2006,6 +2007,8 @@ void WttGtk::set_options()
       = (int)gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(build_force_w));
   build_debug
       = (int)gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(build_debug_w));
+  build_syntax
+      = (int)gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(build_syntax_w));
   build_crossref
       = (int)gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(build_crossref_w));
   build_crossref_sim = (int)gtk_toggle_button_get_active(
@@ -2023,11 +2026,11 @@ void WttGtk::set_options()
 
   wnav->set_options(enable_comment, enable_revisions, show_class, show_alias,
       show_descrip, show_objref, show_objxref, show_attrref, show_attrxref,
-      build_force, build_debug, build_crossref, build_crossref_sim,
+      build_force, build_debug, build_syntax, build_crossref, build_crossref_sim,
       build_crossref_graph, build_manual, build_nocopy, color_theme);
   wnavnode->set_options(enable_comment, enable_revisions, show_class,
       show_alias, show_descrip, show_objref, show_objxref, show_attrref,
-      show_attrxref, build_force, build_debug, build_crossref,
+      show_attrxref, build_force, build_debug, build_syntax, build_crossref,
       build_crossref_sim, build_crossref_graph, build_manual, build_nocopy,
       color_theme);
 }
@@ -3044,7 +3047,7 @@ WttGtk::WttGtk(void* wt_parent_ctx, GtkWidget* wt_parent_wid,
 
   wnav->get_options(&enable_comment, &enable_revisions, &show_class,
       &show_alias, &show_descrip, &show_objref, &show_objxref, &show_attrref,
-      &show_attrxref, &build_force, &build_debug, &build_crossref,
+      &show_attrxref, &build_force, &build_debug, &build_syntax, &build_crossref,
       &build_crossref_sim, &build_crossref_graph, &build_manual, &build_nocopy,
       &color_theme);
 
@@ -3149,9 +3152,13 @@ void WttGtk::create_options_dialog()
 
   GtkWidget* hier_label = gtk_label_new("Hierarchy");
   enable_comment_w = gtk_check_button_new_with_label("Enable Comment");
+  gtk_widget_set_tooltip_text(enable_comment_w, CoWowGtk::convert_utf8("Promp for comment before save or build"));
   enable_revisions_w = gtk_check_button_new_with_label("Enable Revisions");
+  gtk_widget_set_tooltip_text(enable_revisions_w, CoWowGtk::convert_utf8("Initiate repository for version control"));
   show_plant_w = gtk_check_button_new_with_label("Plant Configuration");
+  gtk_widget_set_tooltip_text(show_plant_w, CoWowGtk::convert_utf8("Show plant hierarchy"));
   show_node_w = gtk_check_button_new_with_label("Node Configuration");
+  gtk_widget_set_tooltip_text(show_node_w, CoWowGtk::convert_utf8("Show node hierarchy"));
 
   GtkWidget* hier_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start(GTK_BOX(hier_vbox), hier_label, FALSE, FALSE, 15);
@@ -3162,13 +3169,20 @@ void WttGtk::create_options_dialog()
 
   GtkWidget* entry_label = gtk_label_new("Entry");
   show_class_w = gtk_check_button_new_with_label("Class");
+  gtk_widget_set_tooltip_text(show_class_w, CoWowGtk::convert_utf8("Display object class"));
   show_alias_w = gtk_check_button_new_with_label("Alias");
+  gtk_widget_set_tooltip_text(show_alias_w, CoWowGtk::convert_utf8("Display object alias"));
   show_descrip_w = gtk_check_button_new_with_label("Description");
+  gtk_widget_set_tooltip_text(show_descrip_w, CoWowGtk::convert_utf8("Display object description"));
   show_objref_w = gtk_check_button_new_with_label("Object Reference");
+  gtk_widget_set_tooltip_text(show_objref_w, CoWowGtk::convert_utf8("Display object references"));
   show_objxref_w = gtk_check_button_new_with_label("Object Cross Reference");
+  gtk_widget_set_tooltip_text(show_objxref_w, CoWowGtk::convert_utf8("Display object cross references"));
   show_attrref_w = gtk_check_button_new_with_label("Attribute Reference");
+  gtk_widget_set_tooltip_text(show_attrref_w, CoWowGtk::convert_utf8("Display attribute references"));
   show_attrxref_w
       = gtk_check_button_new_with_label("Attribute Cross Reference");
+  gtk_widget_set_tooltip_text(show_attrxref_w, CoWowGtk::convert_utf8("Display attribute cross references"));
 
   GtkWidget* entry_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start(GTK_BOX(entry_vbox), entry_label, FALSE, FALSE, 15);
@@ -3182,17 +3196,27 @@ void WttGtk::create_options_dialog()
 
   GtkWidget* build_label = gtk_label_new("Build");
   build_force_w = gtk_check_button_new_with_label("Force");
+  gtk_widget_set_tooltip_text(build_force_w, CoWowGtk::convert_utf8("Rebuild all targets"));
   build_debug_w = gtk_check_button_new_with_label("Debug");
+  gtk_widget_set_tooltip_text(build_debug_w, CoWowGtk::convert_utf8("Build with debug"));
+  build_syntax_w = gtk_check_button_new_with_label("Syntax");
+  gtk_widget_set_tooltip_text(build_syntax_w, CoWowGtk::convert_utf8("Check syntax before building"));  
   build_crossref_w = gtk_check_button_new_with_label("Crossreference");
+  gtk_widget_set_tooltip_text(build_crossref_w, CoWowGtk::convert_utf8("Create cross reference files"));
   build_crossrefsim_w = gtk_check_button_new_with_label("      Simulation");
+  gtk_widget_set_tooltip_text(build_crossrefsim_w, CoWowGtk::convert_utf8("Add simulate objects to cross references"));
   build_crossrefgraph_w = gtk_check_button_new_with_label("      Graph");
+  gtk_widget_set_tooltip_text(build_crossrefgraph_w, CoWowGtk::convert_utf8("Add cross references in Ge graphs"));
   build_manual_w = gtk_check_button_new_with_label("Manual");
-  build_nocopy_w = gtk_check_button_new_with_label("Disable Copy");
+  gtk_widget_set_tooltip_text(build_manual_w, CoWowGtk::convert_utf8("Don't build deeper levels"));
+  build_nocopy_w = gtk_check_button_new_with_label("Disable copy");
+  gtk_widget_set_tooltip_text(build_nocopy_w, CoWowGtk::convert_utf8("Don't copy any files"));
 
   GtkWidget* build_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start(GTK_BOX(build_vbox), build_label, FALSE, FALSE, 15);
   gtk_box_pack_start(GTK_BOX(build_vbox), build_force_w, FALSE, FALSE, 7);
   gtk_box_pack_start(GTK_BOX(build_vbox), build_debug_w, FALSE, FALSE, 7);
+  gtk_box_pack_start(GTK_BOX(build_vbox), build_syntax_w, FALSE, FALSE, 7);
   gtk_box_pack_start(GTK_BOX(build_vbox), build_crossref_w, FALSE, FALSE, 7);
   gtk_box_pack_start(GTK_BOX(build_vbox), build_crossrefsim_w, FALSE, FALSE, 7);
   gtk_box_pack_start(
@@ -3202,7 +3226,9 @@ void WttGtk::create_options_dialog()
 
   GtkWidget* view_label = gtk_label_new("View");
   dark_theme_w = gtk_check_button_new_with_label("Dark theme");
+  gtk_widget_set_tooltip_text(dark_theme_w, CoWowGtk::convert_utf8("Set dark color theme"));
   light_theme_w = gtk_check_button_new_with_label("Light Theme");
+  gtk_widget_set_tooltip_text(light_theme_w, CoWowGtk::convert_utf8("Set light color theme"));
 
   GtkWidget* view_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start(GTK_BOX(view_vbox), view_label, FALSE, FALSE, 15);

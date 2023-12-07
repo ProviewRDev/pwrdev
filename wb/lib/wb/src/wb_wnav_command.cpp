@@ -220,8 +220,8 @@ dcli_tCmdTable wnav_command_table[] = {
   { "RELEASE", &wnav_release_func, { "dcli_arg1", "dcli_arg2", "" } },
   { "BUILD", &wnav_build_func,
       { "dcli_arg1", "dcli_arg2", "/FORCE", "/DEBUG", "/CROSSREFERENCE",
-          "/MANUAL", "/NAME", "/WINDOW", "/NODE", "/EXPORT", "/NOCLASSVOLUMES",
-          "/FLOWFILES", "" } },
+	"/MANUAL", "/SYNTAX", "/NAME", "/WINDOW", "/NODE", "/EXPORT", 
+	"/NOCLASSVOLUMES", "/FLOWFILES", "" } },
   { "CHECK", &wnav_check_func,
       { "dcli_arg1", "/VOLUME", "/NAME", "/NODE", "" } },
   { "UPDATE", &wnav_update_func, { "dcli_arg1", "" } },
@@ -1082,6 +1082,20 @@ static int wnav_set_func(void* client_data, void* client_flag)
       (wnav->gbl_command_cb)(wnav->parent_ctx, "SET NOBUILDDEBUG");
     else
       wnav->gbl.build.debug = 0;
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "BUILDSYNTAX", strlen(arg1_str)) == 0)
+  {
+    if (EVEN(dcli_get_qualifier("/LOCAL", 0, 0)))
+      (wnav->gbl_command_cb)(wnav->parent_ctx, "SET BUILDSYNTAX");
+    else
+      wnav->gbl.build.syntax = 1;
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "NOBUILDSYNTAX", strlen(arg1_str)) == 0)
+  {
+    if (EVEN(dcli_get_qualifier("/LOCAL", 0, 0)))
+      (wnav->gbl_command_cb)(wnav->parent_ctx, "SET NOBUILDSYNTAX");
+    else
+      wnav->gbl.build.syntax = 0;
   }
   else if (str_NoCaseStrncmp(arg1_str, "BUILDCROSSREF", strlen(arg1_str)) == 0)
   {
@@ -5252,6 +5266,7 @@ static int wnav_build_func(void* client_data, void* client_flag)
     build.opt.debug = ODD(dcli_get_qualifier("/DEBUG", 0, 0));
     build.opt.crossref = ODD(dcli_get_qualifier("/CROSSREFERENCE", 0, 0));
     build.opt.manual = ODD(dcli_get_qualifier("/MANUAL", 0, 0));
+    build.opt.syntax = ODD(dcli_get_qualifier("/SYNTAX", 0, 0));
 
     build.node(vp->p1, node_type, volumelist, volumecount);
     wnav->message(' ', wnav_get_message(build.sts()));
@@ -5287,6 +5302,7 @@ static int wnav_build_func(void* client_data, void* client_flag)
     build.opt.debug = ODD(dcli_get_qualifier("/DEBUG", 0, 0));
     build.opt.crossref = ODD(dcli_get_qualifier("/CROSSREFERENCE", 0, 0));
     build.opt.manual = ODD(dcli_get_qualifier("/MANUAL", 0, 0));
+    build.opt.syntax = ODD(dcli_get_qualifier("/SYNTAX", 0, 0));
 
     build.cnf(nodestr, volumelist, volumecount);
     wnav->message(' ', wnav_get_message(build.sts()));
@@ -5313,6 +5329,7 @@ static int wnav_build_func(void* client_data, void* client_flag)
     build.opt.debug = ODD(dcli_get_qualifier("/DEBUG", 0, 0));
     build.opt.crossref = ODD(dcli_get_qualifier("/CROSSREFERENCE", 0, 0));
     build.opt.manual = ODD(dcli_get_qualifier("/MANUAL", 0, 0));
+    build.opt.syntax = ODD(dcli_get_qualifier("/SYNTAX", 0, 0));
 
     build.volume();
     wnav->message(' ', wnav_get_message(build.sts()));
