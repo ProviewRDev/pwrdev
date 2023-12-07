@@ -50,7 +50,106 @@
 #include "wb_wnav_item.h"
 #include "wb_wnav_msg.h"
 
+static wnav_sEnumElement elem_yes_no[] = {
+  { 0, "No" },
+  { 1, "Yes" },
+  { 0, "" }
+};
+static wnav_sEnumElement elem_on_off[] = {
+  { 0, "Off" },
+  { 1, "On" },
+  { 0, "" }
+};
+static wnav_sEnumElement elem_color_theme[] = {
+  { 0, "Standard" },
+  { 1, "Sand" },
+  { 2, "Maroon" },
+  { 3, "Sienna" },
+  { 4, "DarkBlue" },
+  { 5, "Classic" },
+  { 6, "Midnight" },
+  { 7, "Playroom" },
+  { 8, "NordicLight" },
+  { 9, "Contrast" },
+  { 10, "AzureContrast" },
+  { 11, "OchreContrast" },
+  { 12, "Chesterfield" },
+  { 13, "TerraVerte" },
+  { 14, "Polar" },
+  { 15, "StandardLight" },
+  { 16, "StandardDark" },
+  { 100, "Custom" },
+  { 0, "" }
+};
+
+wnav_sEnum wnav_enum_types[] = {
+  { (unsigned int)wnav_eType_YesNo, (wnav_sEnumElement*)&elem_yes_no},
+  { (unsigned int)wnav_eType_OnOff, (wnav_sEnumElement*)&elem_on_off},
+  { (unsigned int)wnav_eType_ColorTheme, (wnav_sEnumElement*)&elem_color_theme},
+  { 0, NULL }
+};
+
 static char null_str[] = "";
+
+int WNav::string_to_local_enum(int type_id, char* str, pwr_tEnum* enumval)
+{
+  wnav_sEnumElement* elem_p;
+  wnav_sEnum* enum_p;
+  int found = 0;
+
+  for (enum_p = wnav_enum_types; enum_p->elements; enum_p++) {
+    if (enum_p->num == (unsigned int)type_id) {
+      found = 1;
+      break;
+    }
+  }
+  if (!found)
+    return 1;
+
+  elem_p = enum_p->elements;
+  for (; elem_p->name[0] != 0; elem_p++) {
+    if (str_NoCaseStrcmp(elem_p->name, str) == 0) {
+      *enumval = elem_p->num;
+      return 1;
+    }
+  }
+  return 0;
+}
+
+int WNav::local_enum_to_string(
+    int type_id, pwr_tEnum enumval, char* str, int strsize)
+{
+  wnav_sEnumElement* elem_p;
+  wnav_sEnum* enum_p;
+  int found = 0;
+
+  for (enum_p = wnav_enum_types; enum_p->elements; enum_p++) {
+    if (enum_p->num == (unsigned int)type_id) {
+      found = 1;
+      break;
+    }
+  }
+  if (!found)
+    return 1;
+
+  elem_p = enum_p->elements;
+  for (; elem_p->name[0] != 0; elem_p++) {
+    if (enumval == (int)elem_p->num) {
+      strncpy(str, elem_p->name, strsize);
+      return 1;
+    }
+  }
+  return 0;
+}
+
+int WNav::is_local_enum(int type_id)
+{
+  for (wnav_sEnum *enum_p = wnav_enum_types; enum_p->elements; enum_p++) {
+    if (enum_p->num == (unsigned int)type_id)
+      return 1;
+  }
+  return 0;
+}
 
 //
 // Convert attribute string to value
@@ -556,9 +655,11 @@ void wnav_attrvalue_to_string(
     break;
   }
   default:
-    strcpy(str, "");
+    sts = WNav::local_enum_to_string(type_id, *(pwr_tEnum *)value_ptr, str, 40);
+    if (EVEN(sts))
+      strcpy(str, "Undefined");
+    *len = strlen(str);
     *buff = str;
-    *len = 0;
   }
 }
 
@@ -1365,6 +1466,11 @@ int WNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
         (wnav->change_value_cb)(wnav->parent_ctx);
       break;
     case wnav_eItemType_Local:
+      if (wnav->is_local_enum(((WItemLocal *)item)->type_id)) {
+	sts = ((WItemLocal *)item)->open_children(wnav, 0, 0);
+	if (ODD(sts))
+	  break;
+      }
       if (wnav->gbl.advanced_user && wnav->change_value_cb)
         (wnav->change_value_cb)(wnav->parent_ctx);
       break;
@@ -1414,6 +1520,13 @@ int WNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
       }
       break;
     }
+    case wnav_eItemType_LocalEnum:
+      if (((WItemLocalEnum *)item)->nochange) {
+	wnav->message('E', "Attribute can't be changed");
+	break;
+      }
+      ((WItemLocalEnum*)item)->set_value(wnav);
+      break;
     default:;
     }
     free(node_list);
@@ -1472,6 +1585,9 @@ int WNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
       break;
     case wnav_eItemType_Menu:
       ((WItemMenu*)item)->close(wnav, 0, 0);
+      break;
+    case wnav_eItemType_Local:
+      ((WItemLocal*)item)->close(wnav, 0, 0);
       break;
     default:;
     }
@@ -1540,6 +1656,10 @@ int WNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
       case wnav_eItemType_AttrArrayElem:
         ((WItemAttrArrayElem*)item)
             ->open_children(event->object.x, event->object.y);
+        break;
+      case wnav_eItemType_Local:
+        ((WItemLocal*)item)
+	     ->open_children(wnav, event->object.x, event->object.y);
         break;
       default:;
       }
@@ -1914,6 +2034,14 @@ int WNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
           if (wnav->gbl.advanced_user && wnav->change_value_cb)
             (wnav->change_value_cb)(wnav->parent_ctx);
         break;
+      case wnav_eItemType_LocalEnum:
+	if (((WItemLocalEnum *)item)->nochange) {
+	  wnav->message('E', "Attribute can't be changed");
+	  break;
+	}
+	if (!event->radiobutton.value)
+	  ((WItemLocalEnum*)item)->set_value(wnav);
+	break;
       default:;
       }
       break;
@@ -1970,6 +2098,25 @@ int WNav::trace_scan_bc(brow_tObject object, void* p)
     memcpy(item->old_value, p, MIN(item->size, (int)sizeof(item->old_value)));
     break;
   }
+  case wnav_eItemType_LocalEnum: {
+    WItemLocalEnum* item;
+
+    item = (WItemLocalEnum*)base_item;
+    if (!item->first_scan) {
+      if (item->old_value == *(int*)p)
+        // No change since last time
+        return 1;
+    } else
+      item->first_scan = 0;
+
+    if (*(int*)p == item->num)
+      brow_SetRadiobutton(item->node, 0, 1);
+    else
+      brow_SetRadiobutton(item->node, 0, 0);
+
+    item->old_value = *(int*)p;
+    break;
+  }
   default:;
   }
   return 1;
@@ -1990,6 +2137,10 @@ int WNav::trace_connect_bc(
 
     item = (WItemLocal*)base_item;
     *p = item->value_p;
+    break;
+  }
+  case wnav_eItemType_LocalEnum: {
+    *p = ((WItemLocalEnum *)base_item)->value_p;
     break;
   }
   default:;
@@ -2148,69 +2299,72 @@ int WNav::setup()
   new WItemLocal(this, "SymbolFilename", "setup_symbolfilename",
       pwr_eType_String, sizeof(gbl.symbolfilename), 0, 0,
       (void*)gbl.symbolfilename, NULL, flow_eDest_IntoLast);
-  new WItemLocal(this, "Verify", "setup_verify", pwr_eType_Int32,
+  new WItemLocal(this, "Verify", "setup_verify", wnav_eType_YesNo,
       sizeof(gbl.verify), 0, 1, (void*)&gbl.verify, NULL, flow_eDest_IntoLast);
-  new WItemLocal(this, "EnableComment", "setup_comment", pwr_eType_Int32,
+  new WItemLocal(this, "EnableComment", "setup_comment", wnav_eType_YesNo,
       sizeof(gbl.enable_comment), 0, 1, (void*)&gbl.enable_comment, NULL,
       flow_eDest_IntoLast);
-  new WItemLocal(this, "EnableRevisions", "setup_revisions", pwr_eType_Int32,
+  new WItemLocal(this, "EnableRevisions", "setup_revisions", wnav_eType_YesNo,
       sizeof(gbl.enable_revisions), 0, 1, (void*)&gbl.enable_revisions, NULL,
       flow_eDest_IntoLast);
-  new WItemLocal(this, "AdvancedUser", "setup_advanceduser", pwr_eType_Int32,
+  new WItemLocal(this, "AdvancedUser", "setup_advanceduser", wnav_eType_YesNo,
       sizeof(gbl.advanced_user), 0, 1, (void*)&gbl.advanced_user, NULL,
       flow_eDest_IntoLast);
-  new WItemLocal(this, "AllToplevel", "setup_alltoplevel", pwr_eType_Int32,
+  new WItemLocal(this, "AllToplevel", "setup_alltoplevel", wnav_eType_YesNo,
       sizeof(gbl.all_toplevel), 0, 1, (void*)&gbl.all_toplevel, NULL,
       flow_eDest_IntoLast);
-  new WItemLocal(this, "Bypass", "setup_bypass", pwr_eType_Int32,
+  new WItemLocal(this, "Bypass", "setup_bypass", wnav_eType_YesNo,
       sizeof(gbl.bypass), 0, 1, (void*)&gbl.bypass, NULL, flow_eDest_IntoLast);
-  new WItemLocal(this, "ShowClass", "setup_show_class", pwr_eType_Int32,
+  new WItemLocal(this, "ShowClass", "setup_show_class", wnav_eType_YesNo,
       sizeof(gbl.show_class), 0, 1, (void*)&gbl.show_class, NULL,
       flow_eDest_IntoLast);
-  new WItemLocal(this, "ShowAlias", "setup_show_alias", pwr_eType_Int32,
+  new WItemLocal(this, "ShowAlias", "setup_show_alias", wnav_eType_YesNo,
       sizeof(gbl.show_alias), 0, 1, (void*)&gbl.show_alias, NULL,
       flow_eDest_IntoLast);
-  new WItemLocal(this, "ShowDescription", "setup_show_descrip", pwr_eType_Int32,
+  new WItemLocal(this, "ShowDescription", "setup_show_descrip", wnav_eType_YesNo,
       sizeof(gbl.show_descrip), 0, 1, (void*)&gbl.show_descrip, NULL,
       flow_eDest_IntoLast);
-  new WItemLocal(this, "ShowAttrRef", "setup_show_attrref", pwr_eType_Int32,
+  new WItemLocal(this, "ShowAttrRef", "setup_show_attrref", wnav_eType_YesNo,
       sizeof(gbl.show_attrref), 0, 1, (void*)&gbl.show_attrref, NULL,
       flow_eDest_IntoLast);
-  new WItemLocal(this, "ShowAttrXRef", "setup_show_attrxref", pwr_eType_Int32,
+  new WItemLocal(this, "ShowAttrXRef", "setup_show_attrxref", wnav_eType_YesNo,
       sizeof(gbl.show_attrxref), 0, 1, (void*)&gbl.show_attrxref, NULL,
       flow_eDest_IntoLast);
-  new WItemLocal(this, "ShowObjectRef", "setup_show_objref", pwr_eType_Int32,
+  new WItemLocal(this, "ShowObjectRef", "setup_show_objref", wnav_eType_YesNo,
       sizeof(gbl.show_objref), 0, 1, (void*)&gbl.show_objref, NULL,
       flow_eDest_IntoLast);
-  new WItemLocal(this, "ShowObjXRef", "setup_show_objxref", pwr_eType_Int32,
+  new WItemLocal(this, "ShowObjXRef", "setup_show_objxref", wnav_eType_YesNo,
       sizeof(gbl.show_objxref), 0, 1, (void*)&gbl.show_objxref, NULL,
       flow_eDest_IntoLast);
-  new WItemLocal(this, "ShowTrueDb", "setup_show_truedb", pwr_eType_Int32,
+  new WItemLocal(this, "ShowTrueDb", "setup_show_truedb", wnav_eType_YesNo,
       sizeof(gbl.show_truedb), 0, 1, (void*)&gbl.show_truedb, NULL,
       flow_eDest_IntoLast);
-  new WItemLocal(this, "Build.Force", "setup_build_force", pwr_eType_Int32,
+  new WItemLocal(this, "Build.Force", "setup_build_force", wnav_eType_YesNo,
       sizeof(gbl.build.force), 0, 1, (void*)&gbl.build.force, NULL,
       flow_eDest_IntoLast);
-  new WItemLocal(this, "Build.Debug", "setup_build_debug", pwr_eType_Int32,
+  new WItemLocal(this, "Build.Debug", "setup_build_debug", wnav_eType_YesNo,
       sizeof(gbl.build.debug), 0, 1, (void*)&gbl.build.debug, NULL,
       flow_eDest_IntoLast);
-  new WItemLocal(this, "Build.Syntax", "setup_build_syntax", pwr_eType_Int32,
+  new WItemLocal(this, "Build.Syntax", "setup_build_syntax", wnav_eType_YesNo,
       sizeof(gbl.build.syntax), 0, 1, (void*)&gbl.build.syntax, NULL,
       flow_eDest_IntoLast);
   new WItemLocal(this, "Build.CrossReferences", "setup_build_cross",
-      pwr_eType_Int32, sizeof(gbl.build.crossref), 0, 1,
+      wnav_eType_YesNo, sizeof(gbl.build.crossref), 0, 1,
       (void*)&gbl.build.crossref, NULL, flow_eDest_IntoLast);
   new WItemLocal(this, "Build.CrossReferences.Graph", "setup_build_cross_graph",
-      pwr_eType_Int32, sizeof(gbl.build.crossref_graph), 0, 1,
+      wnav_eType_YesNo, sizeof(gbl.build.crossref_graph), 0, 1,
       (void*)&gbl.build.crossref_graph, NULL, flow_eDest_IntoLast);
   new WItemLocal(this, "Build.CrossReferences.Sim", "setup_build_cross_sim",
-      pwr_eType_Int32, sizeof(gbl.build.crossref_sim), 0, 1,
+      wnav_eType_YesNo, sizeof(gbl.build.crossref_sim), 0, 1,
       (void*)&gbl.build.crossref_sim, NULL, flow_eDest_IntoLast);
-  new WItemLocal(this, "Build.Manual", "setup_build_manual", pwr_eType_Int32,
+  new WItemLocal(this, "Build.Manual", "setup_build_manual", wnav_eType_YesNo,
       sizeof(gbl.build.manual), 0, 1, (void*)&gbl.build.manual, NULL,
       flow_eDest_IntoLast);
-  new WItemLocal(this, "Build.NoCopy", "setup_build_nocopy", pwr_eType_Int32,
+  new WItemLocal(this, "Build.NoCopy", "setup_build_nocopy", wnav_eType_YesNo,
       sizeof(gbl.build.nocopy), 0, 1, (void*)&gbl.build.nocopy, NULL,
+      flow_eDest_IntoLast);
+  new WItemLocal(this, "ColorTheme", "setup_color_theme", wnav_eType_ColorTheme,
+      sizeof(gbl.color_theme), 0, 1, (void*)&gbl.color_theme, NULL,
       flow_eDest_IntoLast);
 
   brow_ResetNodraw(brow->ctx);

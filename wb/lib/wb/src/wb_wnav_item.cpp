@@ -1011,7 +1011,10 @@ WItemLocal::WItemLocal(WNav* wnav, const char* item_name, const char* attr,
   brow_CreateNode(wnav->brow->ctx, item_name, wnav->brow->nc_attr, dest,
       dest_code, (void*)this, 1, &node);
 
-  brow_SetAnnotPixmap(node, 0, wnav->brow->pixmap_attr);
+  if (wnav->is_local_enum(type_id))
+    brow_SetAnnotPixmap(node, 0, wnav->brow->pixmap_attrarray);
+  else
+    brow_SetAnnotPixmap(node, 0, wnav->brow->pixmap_attr);
 
   brow_SetAnnotation(node, 0, item_name, strlen(item_name));
   brow_SetTraceAttr(node, attr, "", flow_eTraceType_User);
@@ -1020,6 +1023,109 @@ WItemLocal::WItemLocal(WNav* wnav, const char* item_name, const char* attr,
 WItemLocal::~WItemLocal()
 {
 }
+
+int WItemLocal::open_children(WNav* wnav, double x, double y)
+{
+  double node_x, node_y;
+
+  brow_GetNodePosition(node, &node_x, &node_y);
+
+  if (brow_IsOpen(node)) {
+    // Close
+    brow_SetNodraw(wnav->brow->ctx);
+    brow_CloseNode(wnav->brow->ctx, node);
+    if (brow_IsOpen(node) & wnav_mOpen_Attributes)
+      brow_RemoveAnnotPixmap(node, 1);
+    if (brow_IsOpen(node) & wnav_mOpen_Children)
+      brow_SetAnnotPixmap(node, 0, wnav->brow->pixmap_attrarray);
+    brow_ResetOpen(node, wnav_mOpen_All);
+    brow_ResetNodraw(wnav->brow->ctx);
+    brow_Redraw(wnav->brow->ctx, node_y);
+  } else {
+    wnav_sEnumElement* elem_p = NULL;
+    wnav_sEnum* enum_p;
+    int found;
+
+    found = 0;
+    for (enum_p = wnav_enum_types; enum_p->elements; enum_p++) {
+      if (enum_p->num == (unsigned int)type_id) {
+        elem_p = enum_p->elements;
+        found = 1;
+        break;
+      }
+    }
+    if (found) {
+      // Create some children
+      brow_SetNodraw(wnav->brow->ctx);
+
+      for (; elem_p->name[0] != 0; elem_p++) {
+        new WItemLocalEnum(wnav, elem_p->name, elem_p->num, type_id,
+	    0, this->value_p, node, flow_eDest_IntoLast);
+      }
+    } 
+
+    brow_SetOpen(node, wnav_mOpen_Children);
+    brow_SetAnnotPixmap(node, 0, wnav->brow->pixmap_openmap);
+    brow_ResetNodraw(wnav->brow->ctx);
+    brow_Redraw(wnav->brow->ctx, node_y);
+  }
+  return 1;
+}
+
+void WItemLocal::close(WNav* wnav, double x, double y)
+{
+  double node_x, node_y;
+
+  brow_GetNodePosition(node, &node_x, &node_y);
+
+  if (brow_IsOpen(node)) {
+    // Close
+    brow_SetNodraw(wnav->brow->ctx);
+    brow_CloseNode(wnav->brow->ctx, node);
+    if (brow_IsOpen(node) & wnav_mOpen_Attributes)
+      brow_RemoveAnnotPixmap(node, 1);
+    if (brow_IsOpen(node) & wnav_mOpen_Children)
+      brow_SetAnnotPixmap(node, 0, wnav->brow->pixmap_attrarray);
+    brow_ResetOpen(node, wnav_mOpen_All);
+    brow_ResetNodraw(wnav->brow->ctx);
+    brow_Redraw(wnav->brow->ctx, node_y);
+  }
+}
+
+WItemLocalEnum::WItemLocalEnum(WNav* wnav, char* item_name, int item_num,
+    int item_type_id, int item_nochange, void* attr_value_p, brow_tNode dest, 
+    flow_eDest dest_code)
+  : WItem(pwr_cNObjid, 0), num(item_num), type_id(item_type_id),
+    value_p(attr_value_p), first_scan(1), nochange(item_nochange)
+{
+  type = wnav_eItemType_LocalEnum;
+
+  strcpy(name, item_name);
+
+  brow_CreateNode(wnav->brow->ctx, item_name, wnav->brow->nc_enum, dest,
+      dest_code, (void*)this, 1, &node);
+
+  brow_SetAnnotPixmap(node, 0, wnav->brow->pixmap_attr);
+  brow_SetAnnotation(node, 0, item_name, strlen(item_name));
+  if (*(int*)value_p == num)
+    brow_SetRadiobutton(node, 0, 1);
+  else
+    brow_SetRadiobutton(node, 0, 0);
+  brow_SetTraceAttr(node, name, "", flow_eTraceType_User);
+}
+
+int WItemLocalEnum::set_value(WNav* wnav)
+{
+  if (type_id == wnav_eType_ColorTheme) {
+    pwr_tCmd cmd;
+    sprintf(cmd, "set colortheme/index=%d\n", num);
+    wnav->command(cmd);
+  }
+  else
+    *((pwr_tEnum *)value_p) = num;
+  return 1;
+}
+
 
 WItemText::WItemText(WNavBrow* brow, const char* item_name, char* text,
     brow_tNode dest, flow_eDest dest_code)

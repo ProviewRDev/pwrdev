@@ -1929,8 +1929,11 @@ ItemLocal::ItemLocal(XNavBrow* brow, const char* item_name, const char* attr,
   brow_CreateNode(brow->ctx, item_name, brow->nc_attr, dest, dest_code,
       (void*)this, 1, &node);
 
-  brow_SetAnnotPixmap(node, 0, brow->pixmap_attr);
 
+  if (XNav::is_local_enum(type_id))
+    brow_SetAnnotPixmap(node, 0, brow->pixmap_attrarray);
+  else
+    brow_SetAnnotPixmap(node, 0, brow->pixmap_attr);
   brow_SetAnnotation(node, 0, item_name, strlen(item_name));
   brow_SetTraceAttr(node, attr, "", flow_eTraceType_User);
 }

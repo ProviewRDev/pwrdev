@@ -64,7 +64,8 @@ typedef enum {
   wnav_eItemType_Crossref,
   wnav_eItemType_DocBlock,
   wnav_eItemType_ObjectModTime,
-  wnav_eItemType_EnumObject
+  wnav_eItemType_EnumObject,
+  wnav_eItemType_LocalEnum
 } wnav_eItemType;
 
 typedef enum {
@@ -139,6 +140,8 @@ public:
       int attr_size, double attr_min_limit, double attr_max_limit,
       void* attr_value_p, brow_tNode dest, flow_eDest dest_code);
   virtual ~WItemLocal();
+  int open_children(WNav* wnav, double x, double y);
+  void close(WNav* wnav, double x, double y);
   void* value_p;
   char old_value[80];
   int first_scan;
@@ -146,6 +149,20 @@ public:
   int size;
   double min_limit;
   double max_limit;
+};
+
+//! Item for a local enum attribute.
+class WItemLocalEnum : public WItem {
+public:
+  WItemLocalEnum(WNav* wnav, char* item_name, int item_num, int item_type_id,
+      int item_nochange, void* attr_value_p, brow_tNode dest, flow_eDest dest_code);
+  int set_value(WNav* wnav);
+  int num;
+  int type_id;
+  void* value_p;
+  int old_value;
+  int first_scan;
+  int nochange;
 };
 
 class WItemText : public WItem {

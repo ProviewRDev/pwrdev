@@ -49,7 +49,7 @@
 #include "wb_watttext.h"
 #include "wb_wnav_brow.h"
 
-#define wnav_cVersion "X3.3a"
+#define wnav_cVersion "X6.1.1"
 #define wnav_cScriptDescKey "!** Description"
 #define wnav_cScriptInvisKey "!** Invisible"
 #define wnav_cInitFile "pwrp_login:wtt_init"
@@ -74,7 +74,10 @@ typedef enum {
   wnav_eType_GdbNodeFlags = 10000,
   wnav_eType_Empty = 10001,
   wnav_eType_FixStr = 10002,
-  wnav_eType_ShortTime = 10003
+  wnav_eType_ShortTime = 10003,
+  wnav_eType_YesNo = 10004,
+  wnav_eType_OnOff = 10005,
+  wnav_eType_ColorTheme = 10006
 } wnav_eType;
 
 typedef enum {
@@ -118,6 +121,19 @@ typedef enum {
   applist_eType_Graph,
   applist_eType_Attr
 } applist_eType;
+
+typedef struct {
+  unsigned int num;
+  char name[40];
+} wnav_sEnumElement;
+
+typedef struct {
+  unsigned int num;
+  wnav_sEnumElement* elements;
+} wnav_sEnum;
+
+
+extern wnav_sEnum wnav_enum_types[];
 
 class Ge;
 class WGe;
@@ -371,6 +387,9 @@ public:
   static int trace_disconnect_bc(brow_tObject object);
   static int trace_scan_bc(brow_tObject object, void* p);
   static void foe_get_build_options_cb(void* ctx, wb_build_opt** opt);
+  static int string_to_local_enum(int type_id, char* str, pwr_tEnum* enumval);
+  static int local_enum_to_string(int type_id, pwr_tEnum enumval, char* str, int strsize);
+  static int is_local_enum(int type_id);
 
   int create_object_item(pwr_tObjid objid, brow_tNode dest,
       flow_eDest dest_code, void** item, int is_root);
