@@ -805,6 +805,9 @@ public:
   /*! Background color is set to a default color. */
   void set_default_background_color();
 
+  //! Initialize a graph with a color theme.
+  void colortheme_init(int ct);
+
   //! Display gridpoints.
   /*! \param show	1 gridpoints are displayed, 0 gridpoints are hidden. */
   void set_show_grid(int show);
@@ -823,6 +826,9 @@ public:
 
   //! Get custom colors.
   void* get_custom_colors();
+
+  //! Check if custom colors are empty.
+  int custom_colors_is_empty();
 
   //! Set name of the grow context.
   /*! \param name	Grow context name. */

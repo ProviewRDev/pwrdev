@@ -201,6 +201,7 @@ public:
   static void activate_export_script(GtkWidget* w, gpointer gectx);
   static void activate_colortheme_select(GtkWidget* w, gpointer gectx);
   static void activate_colortheme_next(GtkWidget* w, gpointer gectx);
+  static void activate_colortheme_previous(GtkWidget* w, gpointer gectx);
   static void activate_customcolors_read(GtkWidget* w, gpointer gectx);
   static void activate_customcolors_write(GtkWidget* w, gpointer gectx);
   static void activate_import_graph(GtkWidget* w, gpointer gectx);
@@ -234,6 +235,7 @@ public:
   static void activate_gradient_vertright(GtkWidget* w, gpointer gectx);
   static void activate_gradient_diaglowerright(GtkWidget* w, gpointer gectx);
   static void activate_gradient_combo(GtkWidget* w, gpointer gectx);
+  static void activate_colortheme_init(GtkWidget* w, gpointer gectx);
   static void activate_reset_mode(GtkWidget* w, gpointer gectx);
   static void activate_scale(GtkWidget* w, gpointer gectx);
   static void activate_scale_double(GtkWidget* w, gpointer gectx);

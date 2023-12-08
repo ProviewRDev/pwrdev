@@ -933,6 +933,11 @@ void GeGtk::activate_colortheme_next(GtkWidget* w, gpointer gectx)
   ((Ge*)gectx)->activate_colortheme_next();
 }
 
+void GeGtk::activate_colortheme_previous(GtkWidget* w, gpointer gectx)
+{
+  ((Ge*)gectx)->activate_colortheme_previous();
+}
+
 void GeGtk::activate_customcolors_read(GtkWidget* w, gpointer gectx)
 {
   ((Ge*)gectx)->activate_customcolors_read();
@@ -1136,6 +1141,11 @@ void GeGtk::activate_gradient_combo(GtkWidget* w, gpointer gectx)
     return;
 
   ((Ge*)gectx)->activate_gradient((glow_eGradient)grad_combo_table[active].idx);
+}
+
+void GeGtk::activate_colortheme_init(GtkWidget* w, gpointer gectx)
+{
+  ((Ge*)gectx)->activate_colortheme_init(1);
 }
 
 void GeGtk::activate_reset_mode(GtkWidget* w, gpointer gectx)
@@ -2859,16 +2869,27 @@ GeGtk::GeGtk(void* x_parent_ctx, GtkWidget* x_parent_widget,
   // Linetype combobox
   GtkTreeIter linetype_iter;
   GtkListStore *linetype_liststore;
+  GdkPixbuf *pixbuf;
 
-  linetype_liststore = gtk_list_store_new(1, G_TYPE_STRING);
-  for (int i = 0; i < sizeof(linetype_combo_table)/sizeof(linetype_combo_table[0]); i++)
-    gtk_list_store_insert_with_values(linetype_liststore, &linetype_iter, i, 0, CoWowGtk::convert_utf8(linetype_combo_table[i].text), -1);
+  linetype_liststore = gtk_list_store_new(2, G_TYPE_STRING, GDK_TYPE_PIXBUF);
+  //linetype_liststore = gtk_list_store_new(1, G_TYPE_STRING);
+  for (int i = 0; i < sizeof(linetype_combo_table)/sizeof(linetype_combo_table[0]); i++) {
+    dcli_translate_filename(fname, linetype_combo_table[i].image);
+    pixbuf = gdk_pixbuf_new_from_file(fname, NULL);
+    if (pixbuf)
+      gtk_list_store_insert_with_values(linetype_liststore, &linetype_iter, i, 0, 
+          CoWowGtk::convert_utf8(linetype_combo_table[i].text), 1, pixbuf, -1);
+  }
   GtkWidget *linetype_combo = gtk_combo_box_new_with_model(GTK_TREE_MODEL(linetype_liststore));
 
   GtkCellRenderer *linetype_combocell = gtk_cell_renderer_text_new();
   gtk_cell_layout_pack_start(GTK_CELL_LAYOUT(linetype_combo), linetype_combocell, TRUE);
   gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(linetype_combo), linetype_combocell,
       "text", 0, NULL);
+  linetype_combocell = gtk_cell_renderer_pixbuf_new();
+  gtk_cell_layout_pack_start(GTK_CELL_LAYOUT(linetype_combo), linetype_combocell, TRUE);
+  gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(linetype_combo), linetype_combocell,
+      "pixbuf", 1, NULL);
   g_signal_connect(
       linetype_combo, "changed", G_CALLBACK(activate_linetype_combo), this);
   GtkToolItem *linetype_combo_tool = gtk_tool_item_new();
@@ -3002,7 +3023,6 @@ GeGtk::GeGtk(void* x_parent_ctx, GtkWidget* x_parent_widget,
   // Gradient option menu
   GtkTreeIter iter;
   GtkListStore *grad_liststore;
-  GdkPixbuf *pixbuf;
 
   grad_liststore = gtk_list_store_new(2, G_TYPE_STRING, GDK_TYPE_PIXBUF);
   for (int i = 0; i < sizeof(grad_combo_table)/sizeof(grad_combo_table[0]); i++) {
@@ -3043,6 +3063,16 @@ GeGtk::GeGtk(void* x_parent_ctx, GtkWidget* x_parent_widget,
 
   wutl_tools_item(tools2, "$pwr_exe/ge_gradient_diaglowerright.png", G_CALLBACK(activate_gradient_diaglowerright), 
       "Set diagonal gradient on selected object", this, 0, 0);
+
+  // Color theme
+  wutl_tools_item(tools2, "$pwr_exe/ge_colortheme_prev.png", G_CALLBACK(activate_colortheme_previous), 
+      "Previous color theme", this, 0, 0);
+
+  wutl_tools_item(tools2, "$pwr_exe/ge_colortheme.png", G_CALLBACK(activate_colortheme_init), 
+      "Initialize color theme", this, 0, 0);
+
+  wutl_tools_item(tools2, "$pwr_exe/ge_colortheme_next.png", G_CALLBACK(activate_colortheme_next), 
+      "Next color theme", this, 0, 0);
 
   // Statusbar and cmd input
   GtkWidget* statusbar = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);

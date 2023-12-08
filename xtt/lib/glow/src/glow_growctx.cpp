@@ -2681,8 +2681,12 @@ void GrowCtx::redraw_defered()
 
 void GrowCtx::redraw()
 {
-  if (a.size() == 0)
+  if (a.size() == 0) {
+    //gdraw->get_window_size(&mw, &mw.window_width, &mw.window_height);
+    draw(&mw, mw.subwindow_x, mw.subwindow_y, mw.subwindow_x + mw.window_width,
+        mw.subwindow_y + mw.window_height);
     return;
+  }
 
   gdraw->get_window_size(&mw, &mw.window_width, &mw.window_height);
   get_borders();
@@ -4698,6 +4702,14 @@ void GrowCtx::reset_custom_colors()
   for (int i = glow_eDrawType_CustomColor1; i < glow_eDrawType_CustomColor__;
        i += 4)
     gdraw->update_color((glow_eDrawType)i);
+}
+
+int GrowCtx::custom_colors_is_empty()
+{
+  if (customcolors)
+    return customcolors->is_empty();
+
+  return 1;
 }
 
 int GrowCtx::read_customcolor_file(char* name)

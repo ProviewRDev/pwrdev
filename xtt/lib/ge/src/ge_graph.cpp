@@ -474,6 +474,8 @@ void Graph::clear_all()
     sts = attr_list.get_first((void**)&attrctx);
   }
   grow_New(grow->ctx);
+  color_theme = 0;
+  set_default_background_color();
 }
 
 //
@@ -1287,9 +1289,20 @@ void* Graph::get_custom_colors()
   return grow_GetCustomColors(grow->ctx);
 }
 
+int Graph::custom_colors_is_empty()
+{
+  return grow_CustomColorsIsEmpty(grow->ctx);
+}
+
 void Graph::set_default_background_color()
 {
   grow_SetBackgroundColor(grow->ctx, glow_eDrawType_Color32);
+}
+
+void Graph::colortheme_init(int ct)
+{
+  update_color_theme(ct);
+  grow_SetBackgroundColor(grow->ctx, glow_eDrawType_CustomColor1);
 }
 
 void Graph::set_show_grid(int show)

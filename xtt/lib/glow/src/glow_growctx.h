@@ -1040,6 +1040,7 @@ public:
   int set_custom_color(
       glow_eDrawType color, double red, double green, double blue);
   void reset_custom_colors();
+  int custom_colors_is_empty();
   int read_customcolor_file(char* name);
   int write_customcolor_file(char* name);
   int check_object_name(char* name);

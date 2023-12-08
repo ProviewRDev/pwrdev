@@ -75,6 +75,7 @@ public:
   {
     is_default_colortheme = isdefault;
   }
+  int is_empty();
   static int get_colortheme_colors(char* file, double** colorvect, int* size);
 
   int colors_size;

@@ -253,6 +253,7 @@ public:
   void activate_open(int dashboard);
   void activate_colortheme_select();
   void activate_colortheme_next();
+  void activate_colortheme_previous();
   void activate_customcolors_read();
   void activate_customcolors_write();
   void activate_subgraphs();
@@ -309,6 +310,7 @@ public:
   void activate_condir_down();
   void activate_background_color();
   void activate_gradient(glow_eGradient gradient);
+  void activate_colortheme_init(int colortheme);
   void activate_help();
   void activate_help_subgraph();
   void activate_india_ok(char* value);
@@ -333,6 +335,8 @@ public:
   static void delete_no_cb(Ge* gectx);
   static void recover_dynprop_yes_cb(Ge* gectx);
   static void recover_dynprop_no_cb(Ge* gectx);
+  static void colortheme_init_yes_cb(Ge* gectx);
+  static void colortheme_init_no_cb(Ge* gectx);
   static void exit_save_cb(Ge* gectx);
   static void exit_nosave_cb(Ge* gectx);
   static void export_javabean(Ge* gectx, char* name);

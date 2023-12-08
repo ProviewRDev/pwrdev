@@ -6178,6 +6178,11 @@ void* grow_GetCustomColors(grow_tCtx ctx)
   return (void*)ctx->get_custom_colors();
 }
 
+int grow_CustomColorsIsEmpty(grow_tCtx ctx)
+{
+  return ctx->custom_colors_is_empty();
+}
+
 int grow_GetColorThemeColors(char* file, double** colors, int* size)
 {
   return GlowCustomColors::get_colortheme_colors(file, colors, size);

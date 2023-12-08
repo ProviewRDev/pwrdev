@@ -61,6 +61,8 @@
 #include "wb_nav.h"
 #include "wb_revision.h"
 
+static char null_str[] = "";
+
 void Ge::set_title()
 {
   char title[110];
@@ -1679,6 +1681,7 @@ void Ge::activate_colortheme_select()
 
 void Ge::activate_colortheme_next()
 {
+  message(' ', null_str);
   int next_idx = -1;
   for (unsigned int i = 0; i < sizeof(themes) / sizeof(themes[0]); i++) {
     if (themes[i].idx == graph->color_theme) {
@@ -1689,10 +1692,33 @@ void Ge::activate_colortheme_next()
       break;
     }
   }
-  if (next_idx < 0)
-    next_idx = themes[0].idx;
+  if (next_idx < 0) {
+    message('E', "No color theme is active");
+    return;
+  }
 
   graph->update_color_theme(next_idx);
+}
+
+void Ge::activate_colortheme_previous()
+{
+  message(' ', null_str);
+  int prev_idx = -1;
+  for (int i = sizeof(themes) / sizeof(themes[0]) - 1; i >= 0 ; i--) {
+    if (themes[i].idx == graph->color_theme) {
+      if (i == 0)
+        prev_idx = themes[sizeof(themes) / sizeof(themes[0]) - 1].idx;
+      else
+        prev_idx = themes[i - 1].idx;
+      break;
+    }
+  }
+  if (prev_idx < 0) {
+    message('E', "No color theme is active");
+    return;
+  }
+
+  graph->update_color_theme(prev_idx);
 }
 
 void Ge::activate_customcolors_read()
@@ -2033,6 +2059,26 @@ void Ge::activate_background_color()
 void Ge::activate_gradient(glow_eGradient gradient)
 {
   graph->set_select_gradient(gradient);
+}
+
+void Ge::colortheme_init_yes_cb(Ge* gectx)
+{
+  gectx->graph->colortheme_init(1);
+}
+
+void Ge::colortheme_init_no_cb(Ge* gectx)
+{
+}
+
+void Ge::activate_colortheme_init(int colortheme)
+{
+  message(' ', null_str);
+
+  if (graph->custom_colors_is_empty())
+    graph->colortheme_init(colortheme);
+  else
+    open_yesnodia("Custom colors is not empty.\nDo you want to overwrite custom colors?", "Colortheme initialize",
+        colortheme_init_yes_cb, colortheme_init_no_cb);
 }
 
 void Ge::activate_help()

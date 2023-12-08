@@ -102,6 +102,14 @@ void GlowCustomColors::reset_colors()
     colors[i][0] = colors[i][1] = colors[i][2] = 1;
 }
 
+int GlowCustomColors::is_empty()
+{
+  for (int i = 0; i < colors_size; i++)
+    if (colors[i][0] != 1 || colors[i][1] != 1 || colors[i][2] != 1)
+      return 0;
+  return 1;
+}
+
 void GlowCustomColors::save(std::ofstream& fp, glow_eSaveMode mode)
 {
   fp << int(glow_eSave_CustomColors) << '\n';
