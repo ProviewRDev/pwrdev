@@ -2774,11 +2774,25 @@ static int graph_grow_cb(GlowCtx* ctx, glow_tEvent event)
             0);
 
         graph->journal_store(journal_eAction_CreateObject, t1);
+      } else if (streq(sub_name, "pwrct_fastcurve")) {
+        grow_tObject t1;
+        graph->create_trend(&t1, event->create_grow_object.x,
+	    event->create_grow_object.y, (unsigned int)ge_mDynType1_FastCurve, 0,
+            1);
+
+        graph->journal_store(journal_eAction_CreateObject, t1);
       } else if (streq(sub_name, "pwr_dstrend")) {
         grow_tObject t1;
         graph->create_trend(&t1, event->create_grow_object.x,
 	    event->create_grow_object.y, 0, (unsigned int)ge_mDynType2_DsTrend,
 	    0);
+
+        graph->journal_store(journal_eAction_CreateObject, t1);
+      } else if (streq(sub_name, "pwrct_dstrend")) {
+        grow_tObject t1;
+        graph->create_trend(&t1, event->create_grow_object.x,
+	    event->create_grow_object.y, 0, (unsigned int)ge_mDynType2_DsTrend,
+	    1);
 
         graph->journal_store(journal_eAction_CreateObject, t1);
       } else if (streq(sub_name, "pwr_dstrendcurve")) {
@@ -2788,10 +2802,23 @@ static int graph_grow_cb(GlowCtx* ctx, glow_tEvent event)
 	    0);
 
         graph->journal_store(journal_eAction_CreateObject, t1);
+      } else if (streq(sub_name, "pwrct_dstrendcurve")) {
+        grow_tObject t1;
+        graph->create_trend(&t1, event->create_grow_object.x,
+	    event->create_grow_object.y, 0, (unsigned int)ge_mDynType2_DsTrendCurve,
+	    1);
+
+        graph->journal_store(journal_eAction_CreateObject, t1);
       } else if (streq(sub_name, "pwr_xycurve")) {
         grow_tObject t1;
         graph->create_xycurve(&t1, event->create_grow_object.x,
 	    event->create_grow_object.y, (unsigned int)ge_mDynType1_XY_Curve, 0, 0);
+
+        graph->journal_store(journal_eAction_CreateObject, t1);
+      } else if (streq(sub_name, "pwrct_xycurve")) {
+        grow_tObject t1;
+        graph->create_xycurve(&t1, event->create_grow_object.x,
+	    event->create_grow_object.y, (unsigned int)ge_mDynType1_XY_Curve, 0, 1);
 
         graph->journal_store(journal_eAction_CreateObject, t1);
       } else if (streq(sub_name, "pwr_sevhist")) {
@@ -2800,15 +2827,15 @@ static int graph_grow_cb(GlowCtx* ctx, glow_tEvent event)
 	    event->create_grow_object.y, 0, (unsigned int)ge_mDynType2_SevHist, 0);
 
         graph->journal_store(journal_eAction_CreateObject, t1);
+      } else if (streq(sub_name, "pwrct_sevhist")) {
+        grow_tObject t1;
+        graph->create_xycurve(&t1, event->create_grow_object.x,
+	    event->create_grow_object.y, 0, (unsigned int)ge_mDynType2_SevHist, 1);
+
+        graph->journal_store(journal_eAction_CreateObject, t1);
       } else if (streq(sub_name, "pwr_bar")) {
         grow_tObject t1;
         graph->create_bar(
-            &t1, event->create_grow_object.x, event->create_grow_object.y, 0);
-
-        graph->journal_store(journal_eAction_CreateObject, t1);
-      } else if (streq(sub_name, "pwr_bararc")) {
-        grow_tObject t1;
-        graph->create_bararc(
             &t1, event->create_grow_object.x, event->create_grow_object.y, 0);
 
         graph->journal_store(journal_eAction_CreateObject, t1);
@@ -2818,22 +2845,52 @@ static int graph_grow_cb(GlowCtx* ctx, glow_tEvent event)
             &t1, event->create_grow_object.x, event->create_grow_object.y, 1);
 
         graph->journal_store(journal_eAction_CreateObject, t1);
+      } else if (streq(sub_name, "pwr_bararc")) {
+        grow_tObject t1;
+        graph->create_bararc(
+            &t1, event->create_grow_object.x, event->create_grow_object.y, 0);
+
+        graph->journal_store(journal_eAction_CreateObject, t1);
+      } else if (streq(sub_name, "pwrct_bararc")) {
+        grow_tObject t1;
+        graph->create_bararc(
+            &t1, event->create_grow_object.x, event->create_grow_object.y, 1);
+
+        graph->journal_store(journal_eAction_CreateObject, t1);
       } else if (streq(sub_name, "pwr_window")) {
         grow_tObject t1;
         graph->create_window(
-            &t1, event->create_grow_object.x, event->create_grow_object.y);
+	    &t1, event->create_grow_object.x, event->create_grow_object.y, 0);
+
+        graph->journal_store(journal_eAction_CreateObject, t1);
+      } else if (streq(sub_name, "pwrct_window")) {
+        grow_tObject t1;
+        graph->create_window(
+	    &t1, event->create_grow_object.x, event->create_grow_object.y, 1);
 
         graph->journal_store(journal_eAction_CreateObject, t1);
       } else if (streq(sub_name, "pwr_table")) {
         grow_tObject t1;
         graph->create_table(
-            &t1, event->create_grow_object.x, event->create_grow_object.y);
+	    &t1, event->create_grow_object.x, event->create_grow_object.y, 0);
+
+        graph->journal_store(journal_eAction_CreateObject, t1);
+      } else if (streq(sub_name, "pwrct_table")) {
+        grow_tObject t1;
+        graph->create_table(
+	    &t1, event->create_grow_object.x, event->create_grow_object.y, 1);
 
         graph->journal_store(journal_eAction_CreateObject, t1);
       } else if (streq(sub_name, "pwr_folder")) {
         grow_tObject t1;
         graph->create_folder(
-            &t1, event->create_grow_object.x, event->create_grow_object.y);
+	    &t1, event->create_grow_object.x, event->create_grow_object.y, 0);
+
+        graph->journal_store(journal_eAction_CreateObject, t1);
+      } else if (streq(sub_name, "pwr_ctfolder")) {
+        grow_tObject t1;
+        graph->create_folder(
+	    &t1, event->create_grow_object.x, event->create_grow_object.y, 1);
 
         graph->journal_store(journal_eAction_CreateObject, t1);
       } else if (streq(sub_name, "pwr_axis")) {
@@ -2872,10 +2929,18 @@ static int graph_grow_cb(GlowCtx* ctx, glow_tEvent event)
         grow_tObject t1;
         graph->create_pie(
 	    &t1, event->create_grow_object.x, event->create_grow_object.y, 0);
+      } else if (streq(sub_name, "pwrct_pie")) {
+        grow_tObject t1;
+        graph->create_pie(
+	    &t1, event->create_grow_object.x, event->create_grow_object.y, 1);
       } else if (streq(sub_name, "pwr_barchart")) {
         grow_tObject t1;
         graph->create_barchart(
-            &t1, event->create_grow_object.x, event->create_grow_object.y);
+	    &t1, event->create_grow_object.x, event->create_grow_object.y, 0);
+      } else if (streq(sub_name, "pwrct_barchart")) {
+        grow_tObject t1;
+        graph->create_barchart(
+	    &t1, event->create_grow_object.x, event->create_grow_object.y, 1);
       } else if (streq(sub_name, "pwr_methodtoolbar")) {
         grow_tObject t1;
         graph->create_toolbar(
@@ -6025,20 +6090,22 @@ void Graph::create_bar(grow_tObject* object, double x, double y, int colortheme)
   double height = 5;
   GeDyn* dyn;
   glow_sBarInfo info;
-  glow_eDrawType backgroundcolor, barcolor, barbordercolor;
+  glow_eDrawType backgroundcolor, barcolor, barbordercolor, bordercolor;
 
   if (colortheme) {
     backgroundcolor = glow_eCtColor_BarBackgroundColor;
     barcolor = glow_eCtColor_BarBarColor;
     barbordercolor = glow_eCtColor_BarBarLimitColor;
+    bordercolor = glow_eCtColor_IndicatorBorderColor;
   } else {
     backgroundcolor = glow_eDrawType_Color40;
     barcolor = glow_eDrawType_Color147;
     barbordercolor = glow_eDrawType_Color145;
+    bordercolor = glow_eDrawType_Line;
   }
 
   grow_CreateGrowBar(grow->ctx, get_next_object_name("O", ""), x, y, width,
-      height, glow_eDrawType_Line, 1, glow_mDisplayLevel_1, 1, 1,
+      height, bordercolor, 1, glow_mDisplayLevel_1, 1, 1,
       backgroundcolor, NULL, object);
   dyn = new GeDyn(this);
   dyn->dyn_type1 = dyn->total_dyn_type1 = ge_mDynType1_Bar;
@@ -6061,20 +6128,22 @@ void Graph::create_bararc(grow_tObject* object, double x, double y, int colorthe
   double bar_width = 1;
   GeDyn* dyn;
   glow_sBarInfo info;
-  glow_eDrawType backgroundcolor, barcolor, barbordercolor;
+  glow_eDrawType backgroundcolor, barcolor, barbordercolor, bordercolor;
 
   if (colortheme) {
     backgroundcolor = glow_eCtColor_BarBackgroundColor;
     barcolor = glow_eCtColor_BarBarColor;
     barbordercolor = glow_eCtColor_BarBarLimitColor;
+    bordercolor = glow_eCtColor_IndicatorBorderColor;
   } else {
     backgroundcolor = glow_eDrawType_Color40;
     barcolor = glow_eDrawType_Color147;
     barbordercolor = glow_eDrawType_Color145;
+    bordercolor = glow_eDrawType_Line;
   }
 
   grow_CreateGrowBarArc(grow->ctx, get_next_object_name("O", ""), x, y, x + width,
-			y + height, 0, 360, bar_width, glow_eDrawType_Line, 1, 1,
+			y + height, 0, 360, bar_width, bordercolor, 1, 1,
 			backgroundcolor, NULL, object);
   dyn = new GeDyn(this);
   dyn->dyn_type1 = dyn->total_dyn_type1 = ge_mDynType1_Bar;
@@ -6090,14 +6159,21 @@ void Graph::create_bararc(grow_tObject* object, double x, double y, int colorthe
   grow_Redraw(grow->ctx);
 }
 
-void Graph::create_window(grow_tObject* object, double x, double y)
+void Graph::create_window(grow_tObject* object, double x, double y, int colortheme)
 {
   double width = 8;
   double height = 6;
   GeDyn* dyn;
+  glow_eDrawType bordercolor;
+
+  if (colortheme) {
+    bordercolor = glow_eCtColor_IndicatorBorderColor;
+  } else {
+    bordercolor = glow_eDrawType_Line;
+  }
 
   grow_CreateGrowWindow(grow->ctx, get_next_object_name("O", ""), x, y, width,
-      height, glow_eDrawType_Line, 1, glow_mDisplayLevel_1, NULL, object);
+      height, bordercolor, 1, glow_mDisplayLevel_1, NULL, object);
   dyn = new GeDyn(this);
   dyn->update_elements();
   grow_SetUserData(*object, (void*)dyn);
@@ -6105,15 +6181,30 @@ void Graph::create_window(grow_tObject* object, double x, double y)
   grow_Redraw(grow->ctx);
 }
 
-void Graph::create_table(grow_tObject* object, double x, double y)
+void Graph::create_table(grow_tObject* object, double x, double y, int colortheme)
 {
   double width = 8;
   double height = 6;
   GeDyn* dyn;
+  glow_eDrawType fillcolor, bordercolor, textcolor;
+
+  if (colortheme) {
+    fillcolor = glow_eCtColor_TableFillcolor;
+    bordercolor = glow_eCtColor_TableBordercolor;
+    textcolor = glow_eCtColor_TableTextcolor;
+  } else {
+    fillcolor = glow_eDrawType_Color33;
+    bordercolor = glow_eDrawType_Line;
+    textcolor = glow_eDrawType_Color145;
+  }
 
   grow_CreateGrowTable(grow->ctx, get_next_object_name("O", ""), x, y, width,
-      height, glow_eDrawType_Line, 1, 1, glow_eDrawType_Color33,
-      glow_mDisplayLevel_1, NULL, object);
+      height, bordercolor, 1, 1, fillcolor, glow_mDisplayLevel_1, NULL, object);
+
+  if (colortheme) {
+    grow_SetObjectOriginalTextColor(*object, textcolor);
+  }
+
   dyn = new GeDyn(this);
   dyn->dyn_type1 = dyn->total_dyn_type1 = ge_mDynType1_Table;
   dyn->update_elements();
@@ -6122,15 +6213,31 @@ void Graph::create_table(grow_tObject* object, double x, double y)
   grow_Redraw(grow->ctx);
 }
 
-void Graph::create_folder(grow_tObject* object, double x, double y)
+void Graph::create_folder(grow_tObject* object, double x, double y, int colortheme)
 {
   double width = 8;
   double height = 6;
   GeDyn* dyn;
+  glow_eDrawType bordercolor, selectedcolor, unselectedcolor, textcolor;
+
+  if (colortheme) {
+    bordercolor = glow_eCtColor_IndicatorBorderColor;
+    selectedcolor = glow_eCtColor_ButtonFillcolor;
+    unselectedcolor = glow_eCtColor_ButtonActiveFillcolor;
+    textcolor = glow_eCtColor_ButtonTextcolor;
+  } else {
+    bordercolor = glow_eDrawType_Line;
+    selectedcolor = glow_eDrawType_Color22;
+    unselectedcolor = glow_eDrawType_Color25;
+  }
 
   grow_CreateGrowFolder(grow->ctx, get_next_object_name("O", ""), x, y, width,
       height, glow_eDrawType_Line, 1, glow_eDrawType_Color22,
       glow_eDrawType_Color25, glow_mDisplayLevel_1, NULL, object);
+
+  if (colortheme)
+    grow_SetObjectOriginalTextColor(*object, textcolor);
+
   dyn = new GeDyn(this);
   dyn->update_elements();
   grow_SetUserData(*object, (void*)dyn);
@@ -6253,7 +6360,7 @@ void Graph::create_pie(grow_tObject* object, double x, double y, int colortheme)
 
   if (colortheme) {
     backgroundcolor = glow_eCtColor_BarBackgroundColor;
-    bordercolor = glow_eDrawType_Line;
+    bordercolor = glow_eCtColor_IndicatorBorderColor;
     color[0] = glow_eCtColor_BlueIndicator;
     color[1] = glow_eCtColor_OrangeIndicator;
     color[2] = glow_eCtColor_GreenIndicator;
@@ -6278,7 +6385,7 @@ void Graph::create_pie(grow_tObject* object, double x, double y, int colortheme)
   grow_Redraw(grow->ctx);
 }
 
-void Graph::create_barchart(grow_tObject* object, double x, double y)
+void Graph::create_barchart(grow_tObject* object, double x, double y, int colortheme)
 {
   GeDyn* dyn;
   double width = 7;
@@ -6288,13 +6395,30 @@ void Graph::create_barchart(grow_tObject* object, double x, double y)
     glow_eDrawType_Color265, glow_eDrawType_Color295, glow_eDrawType_Color105,
     glow_eDrawType_Color135, glow_eDrawType_Color165, glow_eDrawType_Color195,
     glow_eDrawType_Color225 };
+  glow_eDrawType fcolor, bcolor, linecolor;
+
+  if (colortheme) {
+    color[0] = glow_eCtColor_BlueIndicator;
+    color[1] = glow_eCtColor_OrangeIndicator;
+    color[2] = glow_eCtColor_GreenIndicator;
+    color[3] = glow_eCtColor_MagentaIndicator;
+    color[4] = glow_eCtColor_YellowIndicator;
+    color[5] = glow_eCtColor_RedIndicator;
+    fcolor = glow_eCtColor_DiagramFillcolor;
+    bcolor = glow_eCtColor_DiagramBordercolor;
+    linecolor = glow_eCtColor_DiagramBordercolor;
+  } else {
+    fcolor = glow_eDrawType_Color40;
+    bcolor = glow_eDrawType_Line;
+    linecolor = glow_eDrawType_Color37;
+  }
 
   grow_CreateGrowBarChart(grow->ctx, get_next_object_name("O", ""), x, y, width,
-      height, glow_eDrawType_Line, 1, 1, 0, glow_eDrawType_Color40, NULL,
+      height, bcolor, 1, 1, 0, fcolor, NULL,
       object);
 
   grow_SetBarChartConf(
-      *object, 12, 10, 0, 100, 4, 4, glow_eDrawType_Color37, color);
+      *object, 12, 10, 0, 100, 4, 4, linecolor, color);
   dyn = new GeDyn(this);
   dyn->dyn_type1 = dyn->total_dyn_type1 = ge_mDynType1_BarChart;
   dyn->update_elements();

@@ -658,11 +658,19 @@ menu ColorTheme
   menu Analog
   {
     subgraph 	Axis			pwrct_axis.component 		27
-    subgraph 	DynamicAxis		pwrct_dynamicaxis.component 	27
     subgraph 	AxisArc			pwrct_axisarc.component 	250
-    subgraph 	DynamicAxisArc		pwrct_dynamicaxisarc.component 	250
     subgraph    Bar			pwrct_bar.component		26
+    subgraph 	BarArc			pwrct_bararc.component 		253
+    subgraph 	BarChart		pwrct_barchart.component 	25
+    subgraph 	DynamicAxis		pwrct_dynamicaxis.component 	27
+    subgraph 	DynamicAxisArc		pwrct_dynamicaxisarc.component 	250
+    subgraph 	DsTrend 		pwrct_dstrend.component 	25
+    subgraph 	DsTrendCurve 		pwrct_dstrendcurve.component 	25
+    subgraph 	FastCurve 		pwrct_fastcurve.component 	25
+    subgraph 	Pie			pwrct_pie.component 		6
     subgraph    Trend			pwrct_trend.component		25
+    subgraph 	SevHist 		pwrct_sevhist.component 	25
+    subgraph 	XYCurve 		pwrct_xycurve.component 	25
   }
   menu Values
   {
@@ -721,6 +729,11 @@ menu ColorTheme
   {
     subgraph 	MenuBar2		pwr_exe:pwrct_menubar2.pwsg 		32
     subgraph 	PulldownMenu2		pwr_exe:pwrct_pulldownmenu2.pwsg 	33
+    subgraph 	OptionMenu		pwr_exe:pwrct_optionmenu.pwsg 		31
+    subgraph 	Window			pwrct_window.component 			29
+    subgraph 	Smiley	 		pwr_exe:pwrct_smiley.pwsg 		79
+    subgraph 	Table			pwrct_table.component 			30
+    subgraph 	TabbedWindow		pwrct_folder.component 			35
   }
 }
 localsubgraphs Ssab ssab_exe:*.pwsg

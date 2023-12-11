@@ -1482,7 +1482,7 @@ public:
     \param x		x coordinate for object.
     \param y		y coordinate for object.
   */
-  void create_window(grow_tObject* object, double x, double y);
+  void create_window(grow_tObject* object, double x, double y, int colortheme);
 
   //! Create a table object.
   /*!
@@ -1490,7 +1490,7 @@ public:
     \param x		x coordinate for object.
     \param y		y coordinate for object.
   */
-  void create_table(grow_tObject* object, double x, double y);
+  void create_table(grow_tObject* object, double x, double y, int colortheme);
 
   //! Create a folder object.
   /*!
@@ -1498,7 +1498,7 @@ public:
     \param x		x coordinate for object.
     \param y		y coordinate for object.
   */
-  void create_folder(grow_tObject* object, double x, double y);
+  void create_folder(grow_tObject* object, double x, double y, int colortheme);
 
   //! Create a toolbar object.
   /*!
@@ -1519,7 +1519,7 @@ public:
   void create_axisarc(
       grow_tObject* object, double x, double y, int dynamic, int colortheme);
   void create_pie(grow_tObject* object, double x, double y, int colortheme);
-  void create_barchart(grow_tObject* object, double x, double y);
+  void create_barchart(grow_tObject* object, double x, double y, int colortheme);
   void create_layer();
   void delete_layer();
   void merge_visible_layers();

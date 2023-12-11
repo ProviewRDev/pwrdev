@@ -4471,7 +4471,7 @@ static int graph_createwindow_func(void* filectx, ccm_sArg* arg_list,
 
   graph_get_stored_graph(&graph);
 
-  graph->create_window(&n1, x1, y1);
+  graph->create_window(&n1, x1, y1, colortheme);
 
   if (scale_x || scale_y) {
     grow_MeasureNode(n1, &ll_x, &ll_y, &ur_x, &ur_y);
@@ -4592,14 +4592,16 @@ static int graph_createtable_func(void* filectx, ccm_sArg* arg_list,
   ccm_sArg* arg_p3;
   ccm_sArg* arg_p4;
   ccm_sArg* arg_p5;
+  ccm_sArg* arg_p6;
   
   double x1, y1, x2, y2;
   grow_tNode n1;
   int scale_x, scale_y;
   double sx, sy;
   double ll_x, ll_y, ur_x, ur_y;
+  int colortheme;
     
-  if (arg_count < 3 || arg_count > 5)
+  if (arg_count < 3 || arg_count > 6)
     return CCM__ARGMISM;
 
   arg_p2 = arg_list->next;
@@ -4625,7 +4627,7 @@ static int graph_createtable_func(void* filectx, ccm_sArg* arg_list,
   else
     scale_x = 0;
 
-  if (arg_count == 5) {
+  if (arg_count >= 5) {
     arg_p5 = arg_p4->next;
     if (arg_p5->value_decl != CCM_DECL_FLOAT)
       return CCM__ARGMISM;
@@ -4635,9 +4637,18 @@ static int graph_createtable_func(void* filectx, ccm_sArg* arg_list,
   else
     scale_y = 0;
 
+  if (arg_count >= 6) {
+    arg_p6 = arg_p5->next;
+    if (arg_p6->value_decl != CCM_DECL_INT)
+      return CCM__ARGMISM;
+    colortheme = arg_p6->value_int;
+  }
+  else
+    colortheme = 0;
+
   graph_get_stored_graph(&graph);
 
-  graph->create_table(&n1, x1, y1);
+  graph->create_table(&n1, x1, y1, colortheme);
 
   if (scale_x || scale_y) {
     grow_MeasureNode(n1, &ll_x, &ll_y, &ur_x, &ur_y);
