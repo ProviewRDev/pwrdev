@@ -1233,6 +1233,13 @@ XttGtk::XttGtk(int argc, char* argv[], int* return_sts)
     xnav->gbl.advanced_user = 0;
     g_object_set(tools_advuser, "visible", FALSE, NULL);
   }
+
+  if (!streq(graph, "")) {
+    pwr_tCmd cmd;
+    sprintf(cmd, "open graph %s", graph);
+    xnav->command(cmd);
+  }
+
   xtt_mainloop();
 }
 

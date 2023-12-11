@@ -65,6 +65,7 @@ public:
   int op_close_button;
   int no_advanceduser;
   int network_optimized;
+  char graph[80];
 
   Xtt(int* argc, char** argv[], int* return_sts);
   virtual ~Xtt();

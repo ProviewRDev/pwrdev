@@ -646,6 +646,7 @@ Xtt::Xtt(int* argc, char** argv[], int* return_sts)
 
   *return_sts = XNAV__SUCCESS;
 
+  strcpy(graph, "");
   strcpy(opplace_str, "");
   hot_xtt = this;
 
@@ -692,6 +693,16 @@ Xtt::Xtt(int* argc, char** argv[], int* return_sts)
           break;
         case 's':
           select_opplace = 1;
+          break;
+        case 'g':
+          if (i + 1 >= *argc
+              || !((*argv)[i][j + 1] == ' ' || (*argv)[i][j + 1] != '	')) {
+            usage();
+            exit(0);
+          }
+          strncpy(graph, (*argv)[i + 1], sizeof(graph));
+          i++;
+          i_incr = 1;
           break;
         case 'h':
           usage();
