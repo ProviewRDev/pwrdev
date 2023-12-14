@@ -672,6 +672,65 @@ menu ColorTheme
     subgraph 	SevHist 		pwrct_sevhist.component 	25
     subgraph 	XYCurve 		pwrct_xycurve.component 	25
   }
+  menu Process
+  {
+    subgraph	Actuator	pwr_exe:pwr_actuator.pwsg		57
+    subgraph	BaseDamper	pwr_exe:pwr_basedamper.pwsg		245
+    subgraph	BaseDamper2	pwr_exe:pwr_basedamper2.pwsg		245
+    subgraph	BaseValve	pwr_exe:pwr_basevalve.pwsg		56
+    subgraph	BaseValve2	pwr_exe:pwr_basevalve2.pwsg		56
+    subgraph	Base3WayValve	pwr_exe:pwr_base3wayvalve.pwsg		246
+    subgraph	Base3WayValve2	pwr_exe:pwr_base3wayvalve2.pwsg		246
+    subgraph 	Burner		pwr_exe:pwr_burner.pwsg 		59
+    subgraph	Damper		pwr_exe:pwrct_damper.pwsg		98
+    subgraph	DamperAnim	pwr_exe:pwrct_damperanim.pwsg		98
+    subgraph	DamperAnim2	pwr_exe:pwrct_damperanim2.pwsg		98
+    subgraph	DamperControl	pwr_exe:pwrct_dampercontrol.pwsg	104
+    subgraph	DamperControl2	pwr_exe:pwrct_dampercontrol2.pwsg	104
+    subgraph 	ElHeater1	pwr_exe:pwrct_elheater1.pwsg	       179
+    subgraph 	ElHeater2	pwr_exe:pwrct_elheater2.pwsg	       179
+    subgraph 	ElHeater3	pwr_exe:pwr_elheater3.pwsg	       247
+    subgraph	Fan		pwr_exe:pwr_fan.pwsg			69
+    subgraph	Fan2		pwr_exe:pwrct_fan2.pwsg			71
+    subgraph	Fan3		pwr_exe:pwr_fan3.pwsg			70
+    subgraph	FanAnim		pwr_exe:pwrct_fananim.pwsg		69
+    subgraph	FanAnim2	pwr_exe:pwr_fananim2.pwsg		71
+    subgraph	FanAnim3	pwr_exe:pwrct_fananim3.pwsg		71
+    subgraph	HandWheel	pwr_exe:pwr_handwheel.pwsg		58
+    subgraph	LimitSwitch	pwr_exe:pwr_limitswitch.pwsg	       248
+    subgraph	MDamper		pwr_exe:pwr_mdamper.pwsg		55
+    subgraph	MDamper2	pwr_exe:pwr_mdamper2.pwsg		55
+    subgraph 	Motor		pwr_exe:pwrct_motor.pwsg 		23
+    subgraph 	Motor2		pwr_exe:pwr_motor2.pwsg 		65
+    subgraph 	MotorAnim	pwr_exe:pwrct_motoranim.pwsg 		23
+    subgraph 	MotorMan	pwr_exe:pwrct_motorman.pwsg 		23
+    subgraph	MValve		pwr_exe:pwr_mvalve.pwsg			55
+    subgraph	M3WayValve	pwr_exe:pwr_m3wayvalve.pwsg		55
+    subgraph 	Padlock		pwr_exe:pwr_padlock.pwsg 		39
+    subgraph 	PadlockAnim 	pwr_exe:pwr_padlockanim.pwsg		39
+    subgraph 	PIDController 	pwr_exe:pwrct_pidcontroller.pwsg	5
+    subgraph	Pump2		pwr_exe:pwrct_pump2.pwsg		72
+    subgraph	Pump3		pwr_exe:pwr_pump3.pwsg			73
+    subgraph 	PumpAnim 	pwr_exe:pwrct_pumpanim.pwsg		97
+    subgraph	PumpAnim2	pwr_exe:pwrct_pumpanim2.pwsg		72
+    subgraph 	Thermometer	pwr_exe:pwr_thermometer.pwsg 		28
+    subgraph	Rod		pwr_exe:pwr_rod.pwsg			67
+    subgraph	RodCouplingAnim	pwr_exe:pwr_rodcouplinganim.pwsg	68
+    subgraph 	ScrewAnim	pwr_exe:pwr_screw.pwsg 			46
+    subgraph 	SpeedSwitch	pwr_exe:pwrct_speedswitch.pwsg 		24
+    subgraph 	Switch		pwr_exe:pwrct_switch.pwsg 		16
+    subgraph 	StopWatch	pwr_exe:pwr_stopwatch.pwsg 		47
+    subgraph 	Valve	 	pwr_exe:pwrct_valve.pwsg 		1
+    subgraph 	ValveAnim 	pwr_exe:pwrct_valveanim.pwsg		1
+    subgraph 	ValveAnim2 	pwr_exe:pwrct_valveanim2.pwsg		1
+    subgraph 	ValveManuel	pwr_exe:pwrct_valvemanuel.pwsg 		4
+    subgraph 	ValveControl	pwr_exe:pwrct_valvecontrol.pwsg 		2
+    subgraph 	ValveControl2	pwr_exe:pwrct_valvecontrol2.pwsg 		53
+    subgraph 	Valve3Way	pwr_exe:pwr_valve3way.pwsg 		99
+    subgraph 	Valve3Way2	pwr_exe:pwrct_valve3way2.pwsg 		99
+    subgraph 	Valve3WayControl pwr_exe:pwrct_valve3waycontrol.pwsg 	103
+    subgraph 	Valve3WayControl2 pwr_exe:pwrct_valve3waycontrol2.pwsg 	103
+  }
   menu Values
   {
     subgraph 	ValueSmall		pwr_exe:pwrct_valuesmall.pwsg 		50
@@ -727,6 +786,16 @@ menu ColorTheme
   }
   menu Other
   {
+    subgraph	Needle			pwr_exe:pwrct_needle.pwsg		40
+    subgraph	Needle2			pwr_exe:pwrct_needle2.pwsg		40
+    subgraph 	Pc			pwr_exe:pwrct_pc.pwsg 			44
+    subgraph 	Pulpet			pwr_exe:pwrct_pulpet.pwsg 		45
+    subgraph 	Rack			pwr_exe:pwrct_rack.pwsg 		43
+    subgraph 	Terminal		pwr_exe:pwrct_terminal.pwsg 		42
+    subgraph 	Camera			pwr_exe:pwrct_camera.pwsg 		249
+    subgraph 	VideoCamera		pwr_exe:pwrct_videocamera.pwsg 		41
+    subgraph 	ConGlue			pwr_conglue.component 			10
+    subgraph 	DashCell		pwr_dashcell.component 			8
     subgraph 	MenuBar2		pwr_exe:pwrct_menubar2.pwsg 		32
     subgraph 	PulldownMenu2		pwr_exe:pwrct_pulldownmenu2.pwsg 	33
     subgraph 	OptionMenu		pwr_exe:pwrct_optionmenu.pwsg 		31
