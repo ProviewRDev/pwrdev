@@ -1178,6 +1178,7 @@ public:
   double dash_cell_width; //!< Width of dashboard cell
   double dash_cell_height; //!< Height of dashboard cell
   int disable_subw_events; //!< Disable eventhandling in subwindows and tables
+  int current_color_theme; //!< Current color theme index
   void set_layer_borders(); //!< Set borders of active layer
 };
 

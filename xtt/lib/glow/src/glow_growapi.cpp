@@ -6218,6 +6218,16 @@ void grow_SetColorThemeIsDefault(grow_tCtx ctx, int isdefault)
   ((GlowCtx*)ctx)->set_colortheme_is_default(isdefault);
 }
 
+void grow_SetCurrentColorTheme(grow_tCtx ctx, int ct)
+{
+  ((GrowCtx*)ctx)->current_color_theme = ct;
+}
+
+int grow_GetCurrentColorTheme(grow_tCtx ctx)
+{
+  return ((GrowCtx*)ctx)->current_color_theme;  
+}
+
 void grow_SetObjectColorThemeLightness(grow_tObject o)
 {
   ((GlowArrayElem*)o)->set_colortheme_lightness();

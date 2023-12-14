@@ -1000,6 +1000,8 @@ typedef enum {
 #define glow_eCtColor_ValuefieldFillcolor glow_eDrawType_CustomColor21
 #define glow_eCtColor_ValuefieldBordercolor glow_eDrawType_CustomColor22
 #define glow_eCtColor_ValuefieldTextcolor glow_eDrawType_CustomColor23
+#define glow_eCtColor_FolderActiveColor glow_eDrawType_CustomColor24
+#define glow_eCtColor_FolderInactiveColor glow_eDrawType_CustomColor25
 #define glow_eCtColor_GreenIndicator glow_eDrawType_CustomColor26
 #define glow_eCtColor_GreenCurve glow_eDrawType_CustomColor27
 #define glow_eCtColor_GreenBar glow_eDrawType_CustomColor28
@@ -1647,6 +1649,7 @@ typedef enum {
   glow_eSave_GrowCtx_anti_aliasing = 2252,
   glow_eSave_GrowCtx_window_resize = 2253,
   glow_eSave_GrowCtx_layername_cnt = 2254,
+  glow_eSave_GrowCtx_current_color_theme = 2255,
   glow_eSave_GrowSubAnnot_x_right = 2300,
   glow_eSave_GrowSubAnnot_x_left = 2301,
   glow_eSave_GrowSubAnnot_y_high = 2302,

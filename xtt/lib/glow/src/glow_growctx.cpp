@@ -106,7 +106,7 @@ GrowCtx::GrowCtx(const char* ctx_name, double zoom_fact)
       anti_aliasing(0), window_resize(0), environment(glow_eEnv_Runtime),
       text_coding(glow_eTextCoding_ISO8859_1), recursive_trace(0),
       edit_set_mode(glow_eEditSetMode_None), dashboard(0), dash(0), 
-      dash_cell_width(8), dash_cell_height(6), disable_subw_events(0)
+      dash_cell_width(8), dash_cell_height(6), disable_subw_events(0), current_color_theme(0)
 {
   ctx_type = glow_eCtxType_Grow;
   strcpy(name, "");
@@ -2086,6 +2086,7 @@ void GrowCtx::save_grow(std::ofstream& fp, glow_eSaveMode mode)
   fp << int(glow_eSave_GrowCtx_customcolors) << '\n';
   if (customcolors)
     customcolors->save(fp, mode);
+  fp << int(glow_eSave_GrowCtx_current_color_theme) << FSPACE << current_color_theme << '\n';
   fp << int(glow_eSave_GrowCtx_dashboard) << FSPACE << dashboard << '\n';
   fp << int(glow_eSave_GrowCtx_dash) << '\n';
   dash->save(fp, mode);
@@ -2365,6 +2366,9 @@ void GrowCtx::open_grow(std::ifstream& fp)
       else
         gdraw->reset_customcolors(customcolors);
       customcolors->open(fp);
+      break;
+    case glow_eSave_GrowCtx_current_color_theme:
+      fp >> current_color_theme;
       break;
     case glow_eSave_GrowCtx_dashboard:
       fp >> dashboard;
@@ -4729,8 +4733,9 @@ int GrowCtx::read_customcolor_file(char* name)
     }
 
     for (int i = 0; i < a.size(); i++) {
-      if (a[i]->type() == glow_eObjectType_GrowWindow
-          || a[i]->type() == glow_eObjectType_GrowFolder) {
+      if ((a[i]->type() == glow_eObjectType_GrowWindow
+	   || a[i]->type() == glow_eObjectType_GrowFolder) 
+	  && ((GrowWindow*)a[i])->window_ctx != 0) {
         ((GrowWindow*)a[i])->window_ctx->read_customcolor_file(name);
       }
     }

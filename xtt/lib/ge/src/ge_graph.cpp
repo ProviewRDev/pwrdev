@@ -630,6 +630,7 @@ int Graph::open(char* filename)
   grid = grow_attr.grid_on;
 
   was_subgraph = is_subgraph();
+  color_theme = grow_GetCurrentColorTheme(grow->ctx);
 
   refresh_objects(attr_mRefresh_Objects);
 
@@ -756,6 +757,7 @@ void Graph::update_color_theme(int ct)
     return;
 
   grow_SetDefaultColorTheme(color_theme_file);
+  grow_SetCurrentColorTheme(grow->ctx, ct);
 
   color_theme = ct;
 
@@ -2887,7 +2889,7 @@ static int graph_grow_cb(GlowCtx* ctx, glow_tEvent event)
 	    &t1, event->create_grow_object.x, event->create_grow_object.y, 0);
 
         graph->journal_store(journal_eAction_CreateObject, t1);
-      } else if (streq(sub_name, "pwr_ctfolder")) {
+      } else if (streq(sub_name, "pwrct_folder")) {
         grow_tObject t1;
         graph->create_folder(
 	    &t1, event->create_grow_object.x, event->create_grow_object.y, 1);
@@ -6222,9 +6224,9 @@ void Graph::create_folder(grow_tObject* object, double x, double y, int colorthe
 
   if (colortheme) {
     bordercolor = glow_eCtColor_IndicatorBorderColor;
-    selectedcolor = glow_eCtColor_ButtonFillcolor;
-    unselectedcolor = glow_eCtColor_ButtonActiveFillcolor;
-    textcolor = glow_eCtColor_ButtonTextcolor;
+    selectedcolor = glow_eCtColor_FolderActiveColor;
+    unselectedcolor = glow_eCtColor_FolderInactiveColor;
+    textcolor = glow_eCtColor_BackgroundTextAndLines;
   } else {
     bordercolor = glow_eDrawType_Line;
     selectedcolor = glow_eDrawType_Color22;
@@ -6232,8 +6234,8 @@ void Graph::create_folder(grow_tObject* object, double x, double y, int colorthe
   }
 
   grow_CreateGrowFolder(grow->ctx, get_next_object_name("O", ""), x, y, width,
-      height, glow_eDrawType_Line, 1, glow_eDrawType_Color22,
-      glow_eDrawType_Color25, glow_mDisplayLevel_1, NULL, object);
+      height, bordercolor, 1, selectedcolor,
+      unselectedcolor, glow_mDisplayLevel_1, NULL, object);
 
   if (colortheme)
     grow_SetObjectOriginalTextColor(*object, textcolor);

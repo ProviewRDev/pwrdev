@@ -3392,6 +3392,8 @@ void grow_SetDefaultColorTheme(char* theme);
 void grow_SetColorThemeLightness(grow_tCtx ctx, int lighness);
 void grow_SetColorThemeIsDefault(grow_tCtx ctx, int isdefault);
 void grow_SetObjectColorThemeLightness(grow_tObject o);
+void grow_SetCurrentColorTheme(grow_tCtx ctx, int ct);
+int grow_GetCurrentColorTheme(grow_tCtx ctx);
 void grow_PrintRgbColors(grow_tCtx ctx);
 int grow_SetRgbColor(
     grow_tCtx ctx, glow_eDrawType color, double r, double g, double b);
