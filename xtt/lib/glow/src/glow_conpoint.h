@@ -66,7 +66,6 @@ public:
   {
     return glow_eObjectType_ConPoint;
   }
-  GrowCtx* ctx;
   int number;
   GlowPoint p;
   glow_eDirection direction;

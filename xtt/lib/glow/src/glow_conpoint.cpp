@@ -44,7 +44,7 @@
 
 GlowConPoint::GlowConPoint(
     GrowCtx* glow_ctx, double x, double y, int cp_num, glow_eDirection d)
-    : ctx(glow_ctx), number(cp_num), p(glow_ctx, x, y), direction(d),
+  : GlowArrayElem(glow_ctx), number(cp_num), p(glow_ctx, x, y), direction(d),
       trace_attr_type(glow_eTraceType_Boolean)
 {
   strcpy(trace_attribute, "");
