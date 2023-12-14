@@ -173,7 +173,7 @@ void GlowCustomColors::open(std::ifstream& fp)
 
 int GlowCustomColors::write_colorfile(char* name)
 {
-  char path_name[120];
+  pwr_tFileName path_name;
   std::ofstream fp;
 
   if (strchr(name, '/') == 0) {
@@ -181,9 +181,12 @@ int GlowCustomColors::write_colorfile(char* name)
       sprintf(path_name, "$pwrp_exe/%s.pwgc", name);
     else
       sprintf(path_name, "$pwrp_exe/%s", name);
-  } else if (!strstr(name, ".pwgc"))
-    sprintf(path_name, "%s.pwgc", name);
-
+  } else {
+    if (!strstr(name, ".pwgc"))
+      sprintf(path_name, "%s.pwgc", name);
+    else
+      strcpy(path_name, name);
+  }
   dcli_translate_filename(path_name, path_name);
   fp.open(path_name);
   if (!fp)
@@ -197,8 +200,8 @@ int GlowCustomColors::write_colorfile(char* name)
 
 int GlowCustomColors::read_colorfile(GrowCtx* ctx, char* name)
 {
-  char filename[120];
-  char path_name[120];
+  pwr_tFileName filename;
+  pwr_tFileName path_name;
   std::ifstream fp;
 
   strcpy(filename, name);
