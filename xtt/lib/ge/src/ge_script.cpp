@@ -1812,6 +1812,8 @@ static int graph_getgraphattribute_func(void* filectx, ccm_sArg* arg_list,
     break;
   case glow_eType_String:
     strncpy(arg_p2->value_string, (char*)grow_info_p->value_p, grow_info_p->size);
+    arg_p2->value_returned = 1;
+    arg_p2->value_decl = CCM_DECL_STRING;
     break;
   case glow_eType_TraceColor:
     grow_info_p->type = glow_eType_Color;
