@@ -730,6 +730,17 @@ public:
     \param version	Version to convert to.
   */
   void convert(glow_eConvert version);
+
+  int get_fill()
+  {
+    return fill;
+  }
+
+  int get_border()
+  {
+    return border;
+  }
+
   glow_eDrawType get_fill_color()
   {
     return fill_drawtype;
