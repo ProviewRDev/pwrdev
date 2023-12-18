@@ -338,7 +338,7 @@ menu Ventilation
     subgraph 	Compressor 	pwr_exe:sis032231_compressor.pwsg	151
     subgraph 	CompressorAggr 	pwr_exe:sis032231_compressor_aggr.pwsg	154
     subgraph 	CoolingMediumTank pwr_exe:sis032231_coolingmediumtank.pwsg 155
-    subgraph 	CoolingTower 	pwr_exe:sis032231_coolingTower.pwsg	156
+    subgraph 	CoolingTower 	pwr_exe:sis032231_coolingtower.pwsg	156
     subgraph 	DryingFilter 	pwr_exe:sis032231_dryingfilter.pwsg	157
     subgraph 	EvaporativeCondenser pwr_exe:sis032231_evaporativecondenser.pwsg 158
     subgraph 	Evaporator 	pwr_exe:sis032231_evaporator.pwsg	159
@@ -346,7 +346,7 @@ menu Ventilation
     subgraph 	Fan 		pwr_exe:sis032231_fan.pwsg		160
     subgraph 	FluidCooledCondenser pwr_exe:sis032231_fluidcooledcondenser.pwsg 162
     subgraph 	HeatingExchanger pwr_exe:sis032231_heatingexchanger.pwsg 125
-    subgraph 	HeagingExchanger2 pwr_exe:sis032231_heatingexchanger2.pwsg 126
+    subgraph 	HeatingExchanger2 pwr_exe:sis032231_heatingexchanger2.pwsg 126
     subgraph 	SightGlass 	pwr_exe:sis032231_sightglass.pwsg	163
     subgraph 	Tank 		pwr_exe:sis032231_tank.pwsg	47
   }
@@ -693,7 +693,7 @@ menu ColorTheme
     subgraph	Fan		pwr_exe:pwr_fan.pwsg			69
     subgraph	Fan2		pwr_exe:pwrct_fan2.pwsg			71
     subgraph	Fan3		pwr_exe:pwr_fan3.pwsg			70
-    subgraph	FanAnim		pwr_exe:pwrct_fananim.pwsg		69
+    subgraph	FanAnim		pwr_exe:pwr_fananim.pwsg		69
     subgraph	FanAnim2	pwr_exe:pwr_fananim2.pwsg		71
     subgraph	FanAnim3	pwr_exe:pwrct_fananim3.pwsg		71
     subgraph	HandWheel	pwr_exe:pwr_handwheel.pwsg		58
@@ -724,12 +724,31 @@ menu ColorTheme
     subgraph 	ValveAnim 	pwr_exe:pwrct_valveanim.pwsg		1
     subgraph 	ValveAnim2 	pwr_exe:pwrct_valveanim2.pwsg		1
     subgraph 	ValveManuel	pwr_exe:pwrct_valvemanuel.pwsg 		4
-    subgraph 	ValveControl	pwr_exe:pwrct_valvecontrol.pwsg 		2
-    subgraph 	ValveControl2	pwr_exe:pwrct_valvecontrol2.pwsg 		53
+    subgraph 	ValveControl	pwr_exe:pwrct_valvecontrol.pwsg 	2
+    subgraph 	ValveControl2	pwr_exe:pwrct_valvecontrol2.pwsg 	53
     subgraph 	Valve3Way	pwr_exe:pwr_valve3way.pwsg 		99
     subgraph 	Valve3Way2	pwr_exe:pwrct_valve3way2.pwsg 		99
     subgraph 	Valve3WayControl pwr_exe:pwrct_valve3waycontrol.pwsg 	103
     subgraph 	Valve3WayControl2 pwr_exe:pwrct_valve3waycontrol2.pwsg 	103
+  }
+  menu Electric
+  {
+    subgraph 	Contactor	pwr_exe:pwrct_contactor.pwsg 		60
+    subgraph 	Contactor2	pwr_exe:pwr_contactor2.pwsg 		61
+    subgraph 	ControlSwitch	pwr_exe:pwr_controlswitch.pwsg 		62
+    subgraph 	Fuse		pwr_exe:pwrct_fuse.pwsg 		63
+    subgraph 	Fuse2		pwr_exe:pwrct_fuse2.pwsg 		64
+    subgraph 	Fuse3		pwr_exe:pwr_fuse3.pwsg 			64
+    subgraph 	EmergencyStop	pwr_exe:pwrct_emergencystop.pwsg 	34
+    subgraph 	OverloadRelay	pwr_exe:pwr_overloadrelay.pwsg 		66
+    subgraph 	OverloadRelay2	pwr_exe:pwrct_overloadrelay2.pwsg 	244
+    subgraph	ManSwitch	pwr_exe:pwrct_manswitch.pwsg		74
+    subgraph	ManSwitch2	pwr_exe:pwr_manswitch2.pwsg		76
+    subgraph	ManSwitch3	pwr_exe:pwr_manswitch3.pwsg		75
+    subgraph	MiniCircuitBreaker pwr_exe:pwr_minicircuitbreaker.pwsg	241
+    subgraph	MiniCircuitBreaker2 pwr_exe:pwr_minicircuitbreaker2.pwsg 242
+    subgraph	MiniCircuitBreaker3 pwr_exe:pwr_minicircuitbreaker3.pwsg 243
+    subgraph	FrequencyConverter pwr_exe:pwrct_frequencyconverter.pwsg  77  
   }
   menu Values
   {
@@ -783,6 +802,221 @@ menu ColorTheme
     subgraph 	Slider4 		pwr_exe:pwrct_slider4.pwsg 		37
     subgraph 	SliderBackground1_3 	pwr_exe:pwrct_sliderbackground1_3.pwsg 	38
     subgraph 	SliderBackground1_4 	pwr_exe:pwrct_sliderbackground1_4.pwsg 	38
+  }
+  menu Hydraulics
+  {
+    subgraph 	CheckValve	pwr_exe:pwrct_checkvalve.pwsg		13
+    subgraph 	DirectValve	pwr_exe:pwrct_directvalve.pwsg 		54
+    subgraph 	Filter	 	pwr_exe:pwrct_filter.pwsg 		15
+    subgraph 	Lake	 	pwr_exe:pwrct_lake.pwsg			14
+    subgraph 	Pool	 	pwr_exe:pwrct_pool.pwsg			14
+    subgraph 	PressureSwitch	pwr_exe:pwrct_pressureswitch.pwsg 	16
+    subgraph 	PressureGauge	pwr_exe:pwrct_pressuregauge.pwsg 	18
+    subgraph 	Pump	 	pwr_exe:pwrct_hydraulicpump.pwsg 	17
+    subgraph 	ReleaseValve	pwr_exe:pwrct_releasevalve.pwsg 	19
+    subgraph 	Tank	 	pwr_exe:pwrct_tank.pwsg			14
+    subgraph 	Tank2	 	pwr_exe:pwrct_tank2.pwsg		14
+  }
+  menu Ventilation
+  {
+    subgraph 	3WayValve	pwr_exe:sis032260ct_3wayvalve.pwsg	99
+    subgraph 	3WayValve2	pwr_exe:sis032260ct_3wayvalve2.pwsg	99
+    subgraph 	3WayValveActuator pwr_exe:sis032260ct_3wayvalve_actuator.pwsg	103
+    subgraph 	3WayValveSensing pwr_exe:sis032260ct_3wayvalve_sensing.pwsg	103
+    subgraph 	4WayValve	pwr_exe:sis032260ct_4wayvalve.pwsg	105
+    subgraph 	Actuator	pwr_exe:sis032260ct_actuator.pwsg		106
+    subgraph 	ActuatorDia	pwr_exe:sis032260ct_actuator_dia.pwsg	107
+    subgraph 	ActuatorFailClose pwr_exe:sis032260ct_actuator_failclose.pwsg	108
+    subgraph 	ActuatorFailKeep pwr_exe:sis032260ct_actuator_failkeep.pwsg	240
+    subgraph 	ActuatorFailOpen pwr_exe:sis032260ct_actuator_failopen.pwsg	109
+    subgraph 	ActuatorMotor pwr_exe:sis032260ct_actuator_motor.pwsg	110
+    subgraph 	ActuatorPiston  pwr_exe:sis032260ct_actuator_piston.pwsg	114
+    subgraph 	ActuatorSensing pwr_exe:sis032260ct_actuator_sensing.pwsg	111
+    subgraph 	ActuatorSpring  pwr_exe:sis032260ct_actuator_spring.pwsg	112
+    subgraph 	ActuatorSolenoid pwr_exe:sis032260ct_actuator_solenoid.pwsg 113
+    subgraph 	ActuatorWithMan pwr_exe:sis032260ct_actuator_withman.pwsg	115
+    subgraph 	AirCoolerHeater pwr_exe:sis032260ct_aircoolerheater.pwsg	116
+    subgraph 	AirCooler 	pwr_exe:sis032260ct_aircooler.pwsg	100
+    subgraph 	AirDamper 	pwr_exe:sis032260ct_airdamper.pwsg	98
+    subgraph 	AirFilter 	pwr_exe:sis032260ct_airfilter.pwsg	117
+    subgraph 	AirGrill 	pwr_exe:sis032260ct_airgrill.pwsg		118
+    subgraph 	AirHeater	pwr_exe:sis032260ct_airheater.pwsg	101
+    subgraph 	AirPurgingDevice pwr_exe:sis032260ct_airpurgingdevice.pwsg 119
+    subgraph 	AuxiliaryUnitMan pwr_exe:sis032260ct_auxiliaryunit_man.pwsg 120
+    subgraph 	DrawOffPoint 	pwr_exe:sis032260ct_drawoffpoint.pwsg	121
+    subgraph 	Fan 		pwr_exe:sis032260ct_fan.pwsg		71
+    subgraph 	FireDamper 	pwr_exe:sis032260ct_firedamper.pwsg	124
+    subgraph 	Gully 		pwr_exe:sis032260ct_gully.pwsg		122
+    subgraph 	GullyWithTrap 	pwr_exe:sis032260ct_gullywithtrap.pwsg	123
+    subgraph 	HeatingExchanger pwr_exe:sis032260ct_heatingexchanger.pwsg	125
+    subgraph 	HeatingExchanger2 pwr_exe:sis032260ct_heatingexchanger2.pwsg	126
+    subgraph 	Humidifier 	pwr_exe:sis032260ct_humidifier.pwsg	127
+    subgraph 	Hydrant 	pwr_exe:sis032260ct_hydrant.pwsg		128
+    subgraph 	IndicatingGauge	pwr_exe:sis032260ct_indicatinggauge.pwsg	18
+    subgraph 	MeasuringInstrument pwr_exe:sis032260ct_measuringinstrument.pwsg	47
+    subgraph 	MeasuringPoint pwr_exe:sis032260ct_measuringpoint.pwsg	47
+    subgraph 	NoReturnValve 	pwr_exe:sis032260ct_noreturnvalve.pwsg	129
+    subgraph 	PressureSource 	pwr_exe:sis032260ct_pressuresource.pwsg	130
+    subgraph 	Pump 		pwr_exe:sis032260ct_pump.pwsg		131
+    subgraph 	Recorder 	pwr_exe:sis032260ct_recorder.pwsg		132
+    subgraph 	RestrictionUnit pwr_exe:sis032260ct_restrictionunit.pwsg	133
+    subgraph 	SafetyValve 	pwr_exe:sis032260ct_safetyvalve.pwsg	134
+    subgraph 	Separator 	pwr_exe:sis032260ct_separator.pwsg	135
+    subgraph 	Shower 		pwr_exe:sis032260ct_shower.pwsg		136
+    subgraph 	SignalConverter	pwr_exe:sis032260ct_signalconverter.pwsg	47
+    subgraph 	Silencer 	pwr_exe:sis032260ct_silencer.pwsg		137
+    subgraph 	SprinklerHead 	pwr_exe:sis032260ct_sprinklerhead.pwsg	138
+    subgraph 	SteamTrap 	pwr_exe:sis032260ct_steamtrap.pwsg	139
+    subgraph 	Strainer 	pwr_exe:sis032260ct_strainer.pwsg		140
+    subgraph 	Thermometer 	pwr_exe:sis032260ct_thermometer.pwsg	141
+    subgraph 	Transmitter 	pwr_exe:sis032260ct_transmitter.pwsg	142
+    subgraph 	Trap 		pwr_exe:sis032260ct_trap.pwsg		143
+    subgraph 	VacuumBreaker 	pwr_exe:sis032260ct_vacuumbreaker.pwsg	144
+    subgraph 	Valve 		pwr_exe:sis032260ct_valve.pwsg		1
+    subgraph 	Valve2 		pwr_exe:sis032260ct_valve2.pwsg		145
+    subgraph 	ValveActuator	pwr_exe:sis032260ct_valve_actuator.pwsg	53
+    subgraph 	ValveDia 	pwr_exe:sis032260ct_valve_dia.pwsg	2
+    subgraph 	ValveElectric 	pwr_exe:sis032260ct_valve_el.pwsg		146
+    subgraph 	ValveHand 	pwr_exe:sis032260ct_valve_hand.pwsg	4
+    subgraph 	ValvePiston 	pwr_exe:sis032260ct_valve_piston.pwsg	147
+    subgraph 	ValveSensing 	pwr_exe:sis032260ct_valve_sensing.pwsg	148
+    subgraph 	ValveSolenoid	pwr_exe:sis032260ct_valve_solenoid.pwsg	149
+    menu Cooling
+    {
+      subgraph 	AircooledCondenser pwr_exe:sis032231ct_aircooledcondenser.pwsg 150
+      subgraph 	Compressor2Step pwr_exe:sis032231ct_compressor2step.pwsg	152
+      subgraph 	Compressor2StepAggr pwr_exe:sis032231ct_compressor2step_aggr.pwsg	153
+      subgraph 	Compressor 	pwr_exe:sis032231ct_compressor.pwsg	151
+      subgraph 	CompressorAggr 	pwr_exe:sis032231ct_compressor_aggr.pwsg	154
+      subgraph 	CoolingMediumTank pwr_exe:sis032231ct_coolingmediumtank.pwsg 155
+      subgraph 	CoolingTower 	pwr_exe:sis032231ct_coolingtower.pwsg	156
+      subgraph 	DryingFilter 	pwr_exe:sis032231ct_dryingfilter.pwsg	157
+      subgraph 	EvaporativeCondenser pwr_exe:sis032231ct_evaporativecondenser.pwsg 158
+      subgraph 	Evaporator 	pwr_exe:sis032231ct_evaporator.pwsg	159
+      subgraph 	FanCondenser 	pwr_exe:sis032231ct_fancondenser.pwsg	161
+      subgraph 	Fan 		pwr_exe:sis032231ct_fan.pwsg		160
+      subgraph 	FluidCooledCondenser pwr_exe:sis032231ct_fluidcooledcondenser.pwsg 162
+      subgraph 	HeatingExchanger pwr_exe:sis032231ct_heatingexchanger.pwsg 125
+      subgraph 	HeatingExchanger2 pwr_exe:sis032231ct_heatingexchanger2.pwsg 126
+      subgraph 	SightGlass 	pwr_exe:sis032231ct_sightglass.pwsg	163
+      subgraph 	Tank 		pwr_exe:sis032231ct_tank.pwsg	47
+    }
+    subgraph 	ElHeater	pwr_exe:pwrct_elheater.pwsg		101
+  }
+  menu CircuitDiagram
+  {
+    menu Contacts
+    {
+      subgraph 	2WayContact	pwr_exe:ssg5271ct_2waycontact.pwsg		164
+      subgraph 	BreakContact	pwr_exe:ssg5271ct_breakcontact.pwsg		165
+      subgraph 	BreakContactDelayedClose pwr_exe:ssg5271ct_breakcontact_dc.pwsg	166
+      subgraph 	BreakContactDelayedOpen	pwr_exe:ssg5271ct_breakcontact_do.pwsg	167
+      subgraph 	ChangeOverBrakeContact	pwr_exe:ssg5271ct_cobreakcontact.pwsg	181
+      subgraph 	MakeContact	pwr_exe:ssg5271ct_makecontact.pwsg		182
+      subgraph 	MakeContactDelayedClose	pwr_exe:ssg5271ct_makecontact_dc.pwsg	168
+      subgraph 	MakeContactDelayedOpen pwr_exe:ssg5271ct_makecontact_do.pwsg	169
+    }
+    menu Earth
+    {
+      subgraph 	Chassis		pwr_exe:ssg5271ct_chassis.pwsg			170
+      subgraph 	Earth		pwr_exe:ssg5271ct_earth.pwsg			171
+      subgraph 	Equipotentiality pwr_exe:ssg5271ct_equipotentiality.pwsg		172
+      subgraph 	NoiselessEarth	pwr_exe:ssg5271ct_noiseless_earth.pwsg		173
+      subgraph 	ProtectiveEarch	pwr_exe:ssg5271ct_protective_earth.pwsg		174
+    }
+    menu Electric
+    {
+      subgraph 	Accumulator	pwr_exe:ssg5271ct_accumulator.pwsg		175
+      subgraph 	Capacitor	pwr_exe:ssg5271ct_capacitor.pwsg			176
+      subgraph 	Diode		pwr_exe:ssg5271ct_diod.pwsg			177
+      subgraph 	LED 		pwr_exe:ssg5271ct_diod_le.pwsg			178
+      subgraph 	Resistor	pwr_exe:ssg5271ct_resistor.pwsg			179
+      subgraph 	TriodThyristor	pwr_exe:ssg5271ct_triodthyristor.pwsg		180
+    }
+    menu FunctionSymbols
+    {
+      subgraph 	Adder 		pwr_exe:ssg5271ct_adder.pwsg	183
+      subgraph 	And 		pwr_exe:ssg5271ct_and.pwsg	184
+      subgraph 	Controller 	pwr_exe:ssg5271ct_controller.pwsg	185
+      subgraph 	Delay 		pwr_exe:ssg5271ct_delay.pwsg	186
+      subgraph 	Division 	pwr_exe:ssg5271ct_division.pwsg	187
+      subgraph 	ExclusiveOr 	pwr_exe:ssg5271ct_exclusiveor.pwsg 188
+      subgraph 	Filter 		pwr_exe:ssg5271ct_filter.pwsg	189
+      subgraph 	Invert 		pwr_exe:ssg5271ct_invert.pwsg	47
+      subgraph 	Max 		pwr_exe:ssg5271ct_max.pwsg	190
+      subgraph 	Min 		pwr_exe:ssg5271ct_min.pwsg	191
+      subgraph 	Multiplication 	pwr_exe:ssg5271ct_multiplication.pwsg 192
+      subgraph 	Negator 	pwr_exe:ssg5271ct_negator.pwsg	193
+      subgraph 	Or 		pwr_exe:ssg5271ct_or.pwsg		194
+      subgraph 	Pulse 		pwr_exe:ssg5271ct_pulse.pwsg	195
+      subgraph 	RampDown	pwr_exe:ssg5271ct_rampdown.pwsg	196
+      subgraph 	RampUp 		pwr_exe:ssg5271ct_rampup.pwsg	197
+      subgraph 	Root 		pwr_exe:ssg5271ct_root.pwsg	198
+      subgraph 	RS 		pwr_exe:ssg5271ct_rs.pwsg		199
+    }
+    menu Fuses/FuseSwitches
+    {
+      subgraph 	CircuitBreakerAuto pwr_exe:ssg5271ct_circuitbreaker_auto.pwsg	200
+      subgraph 	Fuse		pwr_exe:ssg5271ct_fuse.pwsg			201
+      subgraph 	FuseDisconnector pwr_exe:ssg5271ct_fuse_disconnector.pwsg		202
+      subgraph 	FuseSupplySide	pwr_exe:ssg5271ct_fuse_supplyside.pwsg		203
+      subgraph 	FuseSwitch	pwr_exe:ssg5271ct_fuse_switch.pwsg		204
+      subgraph 	FuseSwitchDisconnector pwr_exe:ssg5271ct_fuse_switchdisconnector.pwsg 205
+    }
+    menu Machines/Converters
+    {
+      subgraph 	Converter	pwr_exe:ssg5271ct_converter.pwsg			206
+      subgraph 	ConverterAcAc	pwr_exe:ssg5271ct_converter_ac_ac.pwsg		207
+      subgraph 	ConverterAcDc	pwr_exe:ssg5271ct_converter_ac_dc.pwsg		208
+      subgraph 	ConverterDcAc	pwr_exe:ssg5271ct_converter_dc_ac.pwsg		209
+      subgraph 	ConverterDcDc	pwr_exe:ssg5271ct_converter_dc_dc.pwsg		210
+      subgraph 	Machine		pwr_exe:ssg5271ct_machine.pwsg			211
+      subgraph 	MachineAc	pwr_exe:ssg5271ct_machine_ac.pwsg			212
+      subgraph 	MachineDc	pwr_exe:ssg5271ct_machine_dc.pwsg			213
+    }
+    menu SignallingDevices
+    {
+      subgraph 	Bell		pwr_exe:ssg5271ct_bell.pwsg			214
+      subgraph 	Horn		pwr_exe:ssg5271ct_horn.pwsg			215
+      subgraph 	Lamp		pwr_exe:ssg5271ct_lamp.pwsg			216
+      subgraph 	Siren		pwr_exe:ssg5271ct_siren.pwsg			217
+    }
+    menu Switches
+    {
+      subgraph 	AuxContactThermal pwr_exe:ssg5271ct_auxcontact_thermal.pwsg	218
+      subgraph 	BreakContactThermal pwr_exe:ssg5271ct_breakcontact_thermal.pwsg	219
+      subgraph 	CircuitBreaker	pwr_exe:ssg5271ct_circuitbreaker.pwsg		220
+      subgraph 	CircuitBreakerRem	pwr_exe:ssg5271ct_circuitbreaker_rem.pwsg 221
+      subgraph 	CircuitBreakerRemFuse	pwr_exe:ssg5271ct_circuitbreaker_fuserem.pwsg 222
+      subgraph 	Disconnector	pwr_exe:ssg5271ct_disconnector.pwsg		223
+      subgraph 	EmergencyControlSwitch	pwr_exe:ssg5271ct_emergcontrolswitch.pwsg	224
+      subgraph 	ManSwitchBreak	pwr_exe:ssg5271ct_manswitchbreak.pwsg		225
+      subgraph 	ManSwitchBreakNoReturn pwr_exe:ssg5271ct_manswitchbreak_noret.pwsg 226
+      subgraph 	ManSwitchMake	pwr_exe:ssg5271ct_manswitchmake.pwsg		227
+      subgraph 	ManSwitchMakeNoReturn pwr_exe:ssg5271ct_manswitchmake_noret.pwsg	228
+      subgraph 	MechanicalLimitSwitchBreak pwr_exe:ssg5271ct_mlimitswitchbreak.pwsg 229
+      subgraph 	MechanicalLimitSwitchMake pwr_exe:ssg5271ct_mlimitswitchmake.pwsg	230
+      subgraph 	Photocell	pwr_exe:ssg5271ct_photocell.pwsg			231
+      subgraph 	ProximitySwitchBreak pwr_exe:ssg5271ct_proxswitchbreak.pwsg	232
+      subgraph 	ProximitySwitchMake pwr_exe:ssg5271ct_proxswitchmake.pwsg		233
+      subgraph 	Switch		pwr_exe:ssg5271ct_switch.pwsg			182
+      subgraph 	SwitchDisconnector pwr_exe:ssg5271ct_switchdisconnector.pwsg	234
+    }
+    menu Transformers
+    {
+      subgraph 	CurrentTransformer pwr_exe:ssg5271ct_currenttransformer.pwsg	235
+      subgraph 	CurrentTransformer2 pwr_exe:ssg5271ct_currenttransformer2.pwsg	236
+      subgraph 	VoltageTransformer pwr_exe:ssg5271ct_voltagetransformer.pwsg	237
+      subgraph 	VoltageTransformer2 pwr_exe:ssg5271ct_voltagetransformer2.pwsg	238
+      subgraph 	VoltageTransformer2Windings pwr_exe:ssg5271ct_voltagetransformer2wnd.pwsg 239
+    }
+  }
+  menu Grafcet
+  {
+    subgraph 	InitStep 	pwr_exe:pwrct_initstep.pwsg		5
+    subgraph 	Step 		pwr_exe:pwrct_step.pwsg			5
+    subgraph 	Trans	 	pwr_exe:pwrct_trans.pwsg		9
+    subgraph 	Order	 	pwr_exe:pwrct_order.pwsg		8
   }
   menu Other
   {
