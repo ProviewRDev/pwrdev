@@ -4056,8 +4056,7 @@ void grow_UpdateObject(grow_tCtx ctx, grow_tObject object, grow_sAttrInfo* info)
     ((GrowConPoint*)object)->draw();
     break;
   case glow_eObjectType_GrowSubAnnot:
-    ((GrowSubAnnot*)object)->text.text_size
-        = ((GrowSubAnnot*)object)->text_size;
+    ((GrowSubAnnot*)object)->set_textsize(((GrowSubAnnot*)object)->text_size);
     sprintf(((GrowSubAnnot*)object)->text.text, "A%d",
         ((GrowSubAnnot*)object)->number);
     ((GrowSubAnnot*)object)->move(0, 0, 0);

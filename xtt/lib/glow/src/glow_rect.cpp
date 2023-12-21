@@ -265,23 +265,20 @@ void GlowRect::move(void* pos, double x, double y, int highlight, int hot)
 
   width = ur.x - ll.x;
   height = ur.y - ll.y;
-  erase(&ctx->mw, pos, hot, NULL);
-  erase(&ctx->navw, pos, 0, NULL);
+  draw();
   ll.x = x;
   ll.y = y;
   ur.x = x + width;
   ur.y = y + height;
   zoom();
   nav_zoom();
-  draw(&ctx->mw, pos, highlight, hot, NULL);
-  draw(&ctx->navw, pos, highlight, 0, NULL);
+  draw();
 }
 
 void GlowRect::shift(
     void* pos, double delta_x, double delta_y, int highlight, int hot)
 {
-  erase(&ctx->mw, pos, hot, NULL);
-  erase(&ctx->navw, pos, 0, NULL);
+  draw();
   ll.x += delta_x;
   ll.y += delta_y;
   ur.x += delta_x;
@@ -289,6 +286,5 @@ void GlowRect::shift(
   zoom();
   nav_zoom();
 
-  draw(&ctx->mw, pos, highlight, hot, NULL);
-  draw(&ctx->navw, pos, highlight, 0, NULL);
+  draw();
 }

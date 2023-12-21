@@ -177,26 +177,17 @@ void GlowText::get_borders(double pos_x, double pos_y, double* x_right,
 
 void GlowText::move(void* pos, double x, double y, int highlight, int hot)
 {
-  erase(&ctx->mw, pos, hot, NULL);
-  erase(&ctx->navw, pos, 0, NULL);
   p.x = x;
   p.y = y;
   zoom();
   nav_zoom();
-  draw(&ctx->mw, pos, highlight, hot, NULL);
-  draw(&ctx->navw, pos, highlight, 0, NULL);
 }
 
 void GlowText::shift(
     void* pos, double delta_x, double delta_y, int highlight, int hot)
 {
-  erase(&ctx->mw, pos, hot, NULL);
-  erase(&ctx->navw, pos, 0, NULL);
   p.x += delta_x;
   p.y += delta_y;
   zoom();
   nav_zoom();
-
-  draw(&ctx->mw, pos, highlight, hot, NULL);
-  draw(&ctx->navw, pos, highlight, 0, NULL);
 }

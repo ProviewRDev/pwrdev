@@ -149,6 +149,7 @@ public:
     draw();
   }
   void draw();
+  void set_textsize(int tsize);
   void set_textbold(int bold);
   void export_flow(GlowExportFlow* ef);
 };
