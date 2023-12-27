@@ -1038,6 +1038,149 @@ menu ColorTheme
     subgraph 	Table			pwrct_table.component 			30
     subgraph 	TabbedWindow		pwrct_folder.component 			35
   }
+  menu Components
+  {
+    menu BaseComponent
+    {
+      menu CDamper
+      {
+        subgraph    CDamper 	pwr_exe:bcompct_cdamper.pwsg 	        104
+        subgraph    CDamperNoMode pwr_exe:bcompct_cdampernomode.pwsg        104
+        subgraph    ActuatorModeIndicator pwr_exe:bcompct_actuatormodeindicator.pwsg 48
+      }
+      menu CValve
+      {
+        subgraph    CValve 		pwr_exe:bcompct_cvalve.pwsg 	53
+        subgraph    CValveNoMode 	pwr_exe:bcompct_cvalvenomode.pwsg	53
+        subgraph    ActuatorModeIndicator pwr_exe:bcompct_actuatormodeindicator.pwsg 48
+      }
+      menu C3WayValve
+      {
+        subgraph    C3WayValve 	pwr_exe:bcompct_c3wayvalve.pwsg 	       103
+        subgraph    C3WayValveNoMode pwr_exe:bcompct_c3wayvalvenomode.pwsg 103
+        subgraph    ActuatorModeIndicator pwr_exe:bcompct_actuatormodeindicator.pwsg 48
+      }
+      menu FanAggr
+      {
+        subgraph  FanAggr 	pwr_exe:bcompct_fanaggr.pwsg 		71
+        subgraph  FanAggrNoMode pwr_exe:bcompct_fanaggrnomode.pwsg 	71
+        subgraph  ModeIndicator pwr_exe:bcompct_modeindicator.pwsg 48
+      }
+      subgraph    Filter 	pwr_exe:bcompct_filter.pwsg 		15
+      subgraph    FlowSensor 	pwr_exe:bcompct_flowsensor.pwsg 		16
+      menu FcPPO3MotorAggr
+      {
+        subgraph  FcPPO3MotorAggr pwr_exe:bcompct_basefcppo3motoraggr.pwsg 	23
+        subgraph  FcPPO3MotorAggrNoMode pwr_exe:bcompct_basefcppo3motoraggrnomode.pwsg 23
+        subgraph  ModeIndicator  pwr_exe:bcompct_modeindicator.pwsg 48
+      }
+      menu FcPPO3FanAggr
+      {
+        subgraph  FcPPO3FanAggr   pwr_exe:bcompct_basefcppo3fanaggr.pwsg    71
+        subgraph  FcPPO3FanAggrNoMode pwr_exe:bcompct_basefcppo3fanaggrnomode.pwsg 71
+        subgraph  ModeIndicator pwr_exe:bcompct_modeindicator.pwsg 48
+      }
+      menu FcPPO3PumpAggr
+      {
+        subgraph  FcPPO3PumpAggr  pwr_exe:bcompct_basefcppo3pumpaggr.pwsg   72
+        subgraph  FcPPO3PumpAggrNoMode pwr_exe:bcompct_basefcppo3pumpaggrnomode.pwsg 72
+        subgraph  ModeIndicator   pwr_exe:bcompct_modeindicator.pwsg 48
+      }
+      menu FcPPO5MotorAttr
+      {
+        subgraph  FcPPO5MotorAggr pwr_exe:bcompct_basefcppo5motoraggr.pwsg 	23
+        subgraph  FcPPO5MotorAggrNoMode pwr_exe:bcompct_basefcppo5motoraggrnomode.pwsg 23
+        subgraph  ModeIndicator   pwr_exe:bcompct_modeindicator.pwsg 48
+      }
+      menu FcPPO5FanAggr
+      {
+        subgraph  FcPPO5FanAggr   pwr_exe:bcompct_basefcppo5fanaggr.pwsg    71
+        subgraph  FcPPO5FanAggrNoMode pwr_exe:bcompct_basefcppo5fanaggrnomode.pwsg 71
+        subgraph  ModeIndicator   pwr_exe:bcompct_modeindicator.pwsg 48
+      }
+      menu FcPPO5PumpAggr
+      {
+        subgraph  FcPPO5PumpAggr   pwr_exe:bcompct_basefcppo5pumpaggr.pwsg   72
+        subgraph  FcPPO5PumpAggrNoMode pwr_exe:bcompct_basefcppo5pumpaggrnomode.pwsg 72
+        subgraph  ModeIndicator   pwr_exe:bcompct_modeindicator.pwsg 48
+      }
+      subgraph    LevelSensor 	pwr_exe:bcompct_levelsensor.pwsg 		16
+      subgraph    LevelSwitch 	pwr_exe:bcompct_levelswitch.pwsg 		16
+      menu MDamper
+      {
+        subgraph    MDamper 	pwr_exe:bcompct_mdamper.pwsg 		98
+        subgraph    MDamperNoMode pwr_exe:bcompct_mdampernomode.pwsg 	98
+        subgraph    ModeIndicator pwr_exe:bcompct_modeindicator.pwsg 	48
+      }
+      menu ManValve
+      {
+        subgraph    ManValve 	pwr_exe:bcompct_manvalve.pwsg 		4
+        subgraph    ManValveNoSwitches pwr_exe:bcompct_manvalvenoswitches.pwsg 4
+        subgraph    ManValveSwitchClosed pwr_exe:bcompct_manvalveswitchclosed.pwsg 4
+        subgraph    ManValveSwitchOpen pwr_exe:bcompct_manvalveswitchopen.pwsg 4
+        subgraph    ManValveTwoSwitches pwr_exe:bcompct_manvalvetwoswitches.pwsg 4
+      }
+      menu MotorAggr
+      {
+        subgraph    MotorAggr 	pwr_exe:bcompct_motoraggr.pwsg 		23
+        subgraph    MotorAggrNoMode pwr_exe:bcompct_motoraggrnomode.pwsg 	23
+        subgraph    ModeIndicator   pwr_exe:bcompct_modeindicator.pwsg 	48
+      }
+      subgraph    MotorIncrDecrAggr pwr_exe:bcompct_motorincrdecraggr.pwsg 	23
+      menu MValve
+      {
+        subgraph    MValve 	pwr_exe:bcompct_mvalve.pwsg 		1
+        subgraph    MValveNoMode pwr_exe:bcompct_mvalvenomode.pwsg 	1
+        subgraph    MValveNoSwitches pwr_exe:bcompct_mvalvenoswitches.pwsg 	1
+        subgraph    ModeIndicator pwr_exe:bcompct_modeindicator.pwsg 	48
+      }
+      menu M3WayValve
+      {
+        subgraph    M3WayValve 	pwr_exe:bcompct_m3wayvalve.pwsg 		99
+        subgraph    M3WayValveNoMode pwr_exe:bcompct_m3wayvalvenomode.pwsg 	99
+        subgraph    ModeIndicator pwr_exe:bcompct_modeindicator.pwsg 	48
+      }
+      subgraph    PressureSensor pwr_exe:bcompct_pressuresensor.pwsg 	16
+      subgraph    PressureSwitch pwr_exe:bcompct_pressureswitch.pwsg 	16
+      menu PumpAggr
+      {
+        subgraph    PumpAggr 	pwr_exe:bcompct_pumpaggr.pwsg 		72
+        subgraph    PumpAggrNoMode pwr_exe:bcompct_pumpaggrnomode.pwsg 		72
+        subgraph    ModeIndicator   pwr_exe:bcompct_modeindicator.pwsg 	48
+      }
+      subgraph    Sensor 	pwr_exe:bcompct_sensor.pwsg 		16
+      subgraph    SupSwitch 	pwr_exe:bcompct_supswitch.pwsg 		16
+      subgraph    ValveIncrDecr	pwr_exe:bcompct_valveincrdecr.pwsg 	53
+      subgraph    TempSensor 	pwr_exe:bcompct_tempsensor.pwsg 		16
+      subgraph    TempSwitch 	pwr_exe:bcompct_tempswitch.pwsg 		16
+    }
+    menu ABB
+    {
+      subgraph	ABB_ACS800FanAggr  pwr_exe:mcompct_abb_acs800fanaggr.pwsg 71
+      subgraph	ABB_ACS800MotorAggr  pwr_exe:mcompct_abb_acs800motoraggr.pwsg 23
+      subgraph	ABB_ACS800PumpAggr  pwr_exe:mcompct_abb_acs800pumpaggr.pwsg 72
+      subgraph	ABB_ACS880	pwr_exe:mcomp_abb_acs880.pwsg 		5
+      subgraph	ABB_ACS880FanAggr  pwr_exe:mcompct_abb_acs880fanaggr.pwsg 71
+      subgraph	ABB_ACS880MotorAggr  pwr_exe:mcompct_abb_acs880motoraggr.pwsg 23
+      subgraph	ABB_ACS880PumpAggr  pwr_exe:mcompct_abb_acs880pumpaggr.pwsg 72
+    }
+    menu OtherManufacturer
+    {
+      subgraph	Eurotherm_EPower  pwr_exe:mcomp_eurotherm_epower.pwsg 180
+      subgraph	Eurotherm_EPowerAggr  pwr_exe:mcomp_eurotherm_epoweraggr.pwsg 144
+      subgraph	Eurotherm_TC3001  pwr_exe:mcomp_eurotherm_tc3001.pwsg 180
+      subgraph	Eurotherm_TC3001Aggr  pwr_exe:mcomp_eurotherm_tc3001aggr.pwsg 144
+      subgraph	Janitza_UMG96S		pwr_exe:mcomp_janitza_umg96s1.pwsg 47	
+      subgraph	Janitza_UMG96S_Large	pwr_exe:mcomp_janitza_umg96s2.pwsg 6		
+    }
+    menu Profibus
+    {
+      subgraph	Pb_DP_Slave  pwr_exe:mcompct_pb_dp_slave.pwsg		5
+      subgraph	PnDevice  pwr_exe:mcompct_pndevice.pwsg		5
+    }
+  }
+}
+
 }
 localsubgraphs Ssab ssab_exe:*.pwsg
 menu Local
