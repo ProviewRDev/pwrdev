@@ -320,11 +320,13 @@ int WPkgNav::root_objects()
   char line_item[6][80];
   int num;
   int sts;
+  int line_cnt = 0;
 
   dcli_translate_filename(fname, pwr_cNameDistribute);
   std::ifstream is(fname);
 
   while (is.getline(line, sizeof(line))) {
+    line_cnt++;
     str_trim(line, line);
     if (line[0] == '#' || line[0] == '!')
       continue;
@@ -340,19 +342,19 @@ int WPkgNav::root_objects()
       int dstatus;
 
       if (!(num == 5 || num == 6))
-        throw wb_error_str("File corrupt " pwr_cNameDistribute);
+        throw wb_error_str("File corrupt " pwr_cNameDistribute ", line ", line_cnt);
 
       sts = sscanf(line_item[2], "%d", (int*)&opsys);
       if (sts != 1)
-        throw wb_error_str("File corrupt " pwr_cNameDistribute);
+        throw wb_error_str("File corrupt " pwr_cNameDistribute ", line ", line_cnt);
 
       sts = sscanf(line_item[3], "%d", &bus);
       if (sts != 1)
-        throw wb_error_str("File corrupt " pwr_cNameDistribute);
+        throw wb_error_str("File corrupt " pwr_cNameDistribute ", line ", line_cnt);
 
       sts = sscanf(line_item[4], "%d", &dstatus);
       if (sts != 1)
-        throw wb_error_str("File corrupt " pwr_cNameDistribute);
+        throw wb_error_str("File corrupt " pwr_cNameDistribute ", line ", line_cnt);
 
       new WItemPkgNode(
           brow, line_item[1], line_item[1], bus, opsys, 0, flow_eDest_IntoLast);

@@ -108,6 +108,7 @@ void wb_pkg::readConfig()
   char fname[260];
   char line[200];
   char line_item[7][80];
+  int line_cnt = 0;
   int num;
   int sts;
 
@@ -116,6 +117,7 @@ void wb_pkg::readConfig()
 
   while (is.getline(line, sizeof(line)))
   {
+    line_cnt++;
     str_trim(line, line);
     if (line[0] == '#' || line[0] == '!')
       continue;
@@ -134,19 +136,19 @@ void wb_pkg::readConfig()
       pwr_tString80 custom_platform;
 
       if (num != 7)
-        throw wb_error_str("File corrupt " pwr_cNameDistribute);
+        throw wb_error_str("File corrupt " pwr_cNameDistribute ", line ", line_cnt);
 
       sts = sscanf(line_item[2], "%d", (int*)&opsys);
       if (sts != 1)
-        throw wb_error_str("File corrupt " pwr_cNameDistribute);
+        throw wb_error_str("File corrupt " pwr_cNameDistribute ", line ", line_cnt);
 
       sts = sscanf(line_item[3], "%d", &bus);
       if (sts != 1)
-        throw wb_error_str("File corrupt " pwr_cNameDistribute);
+        throw wb_error_str("File corrupt " pwr_cNameDistribute ", line ", line_cnt);
 
       sts = sscanf(line_item[4], "%d", (int*)&dstatus);
       if (sts != 1)
-        throw wb_error_str("File corrupt " pwr_cNameDistribute);
+        throw wb_error_str("File corrupt " pwr_cNameDistribute ", line ", line_cnt);
 
       strcpy(bootnode, line_item[5]);
       strcpy(custom_platform, line_item[6]);
@@ -178,7 +180,7 @@ void wb_pkg::readConfig()
     else if (streq(cdh_Low(line_item[0]), "appl"))
     {
       if (!(num == 4 || num == 5))
-        throw wb_error_str("File corrupt " pwr_cNameDistribute);
+        throw wb_error_str("File corrupt " pwr_cNameDistribute ", line ", line_cnt);
 
       char severity = line_item[2][0];
       try
@@ -203,7 +205,7 @@ void wb_pkg::readConfig()
     else if (streq(cdh_Low(line_item[0]), "depnode"))
     {
       if (num != 4)
-        throw wb_error_str("File corrupt " pwr_cNameDistribute);
+        throw wb_error_str("File corrupt " pwr_cNameDistribute ", line ", line_cnt);
 
       try
       {
@@ -228,7 +230,7 @@ void wb_pkg::readConfig()
       pwr_tTime date;
 
       if (num != 2)
-        throw wb_error_str("File corrupt " pwr_cNameDistribute);
+        throw wb_error_str("File corrupt " pwr_cNameDistribute ", line ", line_cnt);
 
       try
       {
@@ -339,7 +341,7 @@ void wb_pkg::readConfig()
       try
       {
         if (num != 2)
-          throw wb_error_str("File corrupt " pwr_cNameDistribute);
+          throw wb_error_str("File corrupt " pwr_cNameDistribute ", line ", line_cnt);
 
         pkg_node& n = getNode(line_item[1]);
         // Add ld_node file

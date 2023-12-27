@@ -587,6 +587,7 @@ void WbExpWNav::show_export_import()
   int sts;
   char tag[20];
   ItemExp* first_item = 0;
+  int line_cnt = 0;
 
   brow_SetNodraw(brow->ctx);
   brow_DeleteAll(brow->ctx);
@@ -595,6 +596,7 @@ void WbExpWNav::show_export_import()
   std::ifstream is(fname);
 
   while (is.getline(line, sizeof(line))) {
+    line_cnt++;
     str_trim(line, line);
     if (line[0] == '#' || line[0] == '!')
       continue;
@@ -611,7 +613,7 @@ void WbExpWNav::show_export_import()
 
     if (streq(cdh_Low(line_item[0]), tag)) {
       if (num != 4) {
-        printf("File corrupt " pwr_cNameDistribute);
+        printf("File corrupt " pwr_cNameDistribute ", line %d", line_cnt);
         continue;
       }
 
@@ -677,6 +679,7 @@ void WbExpWNav::show_builddir()
   pwr_tFileName found_file;
   int num;
   int sts;
+  int line_cnt = 0;
 
   list_free();
 
@@ -684,6 +687,7 @@ void WbExpWNav::show_builddir()
   std::ifstream is(fname);
 
   while (is.getline(line, sizeof(line))) {
+    line_cnt++;
     str_trim(line, line);
     if (line[0] == '#' || line[0] == '!')
       continue;
@@ -695,7 +699,7 @@ void WbExpWNav::show_builddir()
 
     if (streq(cdh_Low(line_item[0]), "builddir")) {
       if (num != 4) {
-        printf("File corrupt " pwr_cNameDistribute);
+        printf("File corrupt " pwr_cNameDistribute ", line %d", line_cnt);
         continue;
       }
 
@@ -707,7 +711,7 @@ void WbExpWNav::show_builddir()
     else if (streq(cdh_Low(line_item[0]), "buildcopy")) {
       int dir_update = 0;
       if (num != 4) {
-        printf("File corrupt " pwr_cNameDistribute);
+        printf("File corrupt " pwr_cNameDistribute ", line %d", line_cnt);
         continue;
       }
 
@@ -744,7 +748,7 @@ void WbExpWNav::show_builddir()
 
         ExpWDir* dir = dir_find(line_item[1]);
         if (!dir) {
-          printf("File corrupt " pwr_cNameDistribute);
+          printf("File corrupt " pwr_cNameDistribute ", line %d", line_cnt);
           continue;
         }
 
@@ -765,12 +769,12 @@ void WbExpWNav::show_builddir()
       pwr_tFileConvertEnum conversion;
 
       if (num != 5) {
-        printf("File corrupt " pwr_cNameDistribute);
+        printf("File corrupt " pwr_cNameDistribute ", line %d", line_cnt);
         continue;
       }
 
       if (sscanf(line_item[2], "%d", &conversion) != 1) {
-	printf("File corrupt " pwr_cNameDistribute);
+	printf("File corrupt " pwr_cNameDistribute ", line %d", line_cnt);
 	continue;
       }
 
@@ -807,7 +811,7 @@ void WbExpWNav::show_builddir()
 
         ExpWDir* dir = dir_find(line_item[1]);
         if (!dir) {
-          printf("File corrupt " pwr_cNameDistribute);
+          printf("File corrupt " pwr_cNameDistribute ", line %d", line_cnt);
           continue;
         }
 
@@ -825,13 +829,13 @@ void WbExpWNav::show_builddir()
 
     } else if (streq(cdh_Low(line_item[0]), "buildmake")) {
       if (num != 4) {
-        printf("File corrupt " pwr_cNameDistribute);
+        printf("File corrupt " pwr_cNameDistribute ", line %d", line_cnt);
         continue;
       }
 
       ExpWDir* dir = dir_find(line_item[1]);
       if (!dir) {
-        printf("File corrupt " pwr_cNameDistribute);
+        printf("File corrupt " pwr_cNameDistribute ", line %d", line_cnt);
         continue;
       }
 
@@ -839,13 +843,13 @@ void WbExpWNav::show_builddir()
       dir->update = 1;
     } else if (streq(cdh_Low(line_item[0]), "buildexec")) {
       if (num != 4) {
-        printf("File corrupt " pwr_cNameDistribute);
+        printf("File corrupt " pwr_cNameDistribute ", line %d", line_cnt);
         continue;
       }
 
       ExpWDir* dir = dir_find(line_item[1]);
       if (!dir) {
-        printf("File corrupt " pwr_cNameDistribute);
+        printf("File corrupt " pwr_cNameDistribute ", line %d", line_cnt);
         continue;
       }
 

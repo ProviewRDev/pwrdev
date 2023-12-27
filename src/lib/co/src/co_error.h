@@ -52,6 +52,7 @@ class co_error_str : public co_error {
 public:
   co_error_str(std::string str);
   co_error_str(pwr_tStatus sts, std::string str);
+  co_error_str(std::string str, int line_cnt);
   std::string what() const;
 };
 

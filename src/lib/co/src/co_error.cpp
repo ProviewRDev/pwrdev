@@ -52,6 +52,11 @@ co_error_str::co_error_str(std::string str) : m_error_str(str)
 {
 }
 
+co_error_str::co_error_str(std::string str, int line_cnt)
+{
+  m_error_str = str + std::to_string(line_cnt);
+}
+
 co_error_str::co_error_str(pwr_tStatus sts, std::string str)
     : co_error(sts), m_error_str(str)
 {

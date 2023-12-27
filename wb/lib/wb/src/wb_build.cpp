@@ -1745,6 +1745,7 @@ void wb_build::directories(char* dir, bld_ePass pass)
   int sts;
   char cmd[800];
   pwr_tMask current_options = 0;
+  int line_cnt = 0;
 
   dcli_translate_filename(fname, pwr_cNameDistribute);
   std::ifstream is(fname);
@@ -1752,6 +1753,8 @@ void wb_build::directories(char* dir, bld_ePass pass)
   m_sts = PWRB__NOBUILT;
 
   while (is.getline(line, sizeof(line))) {
+    line_cnt++;
+
     str_trim(line, line);
     if (line[0] == '#' || line[0] == '!')
       continue;
@@ -1766,12 +1769,12 @@ void wb_build::directories(char* dir, bld_ePass pass)
 
     if (streq(cdh_Low(line_item[0]), "builddir")) {
       if (num != 4) {
-        printf("File corrupt " pwr_cNameDistribute);
+        printf("File corrupt " pwr_cNameDistribute ", line %d", line_cnt);
         continue;
       }
       int sts = sscanf(line_item[2], "%d", &current_options);
       if (sts != 1) {
-        printf("File corrupt " pwr_cNameDistribute);
+        printf("File corrupt " pwr_cNameDistribute ", line %d", line_cnt);
         current_options = 0;
       }
       if (!((pass == bld_ePass_BeforeNode
@@ -1782,7 +1785,7 @@ void wb_build::directories(char* dir, bld_ePass pass)
         wb_log::log(wlog_eCategory_DirectoryBuild, line_item[1], 0);
     } else if (streq(cdh_Low(line_item[0]), "buildcopy")) {
       if (num != 4) {
-        printf("File corrupt " pwr_cNameDistribute);
+        printf("File corrupt " pwr_cNameDistribute ", line %d", line_cnt);
         continue;
       }
 
@@ -1857,12 +1860,12 @@ void wb_build::directories(char* dir, bld_ePass pass)
       pwr_tFileConvertEnum conversion;
 
       if (num != 5) {
-        printf("File corrupt " pwr_cNameDistribute);
+        printf("File corrupt " pwr_cNameDistribute ", line %d", line_cnt);
         continue;
       }
 
       if (sscanf(line_item[2], "%d", &conversion) != 1) {
-        printf("File corrupt " pwr_cNameDistribute);
+        printf("File corrupt " pwr_cNameDistribute ", line %d", line_cnt);
         continue;
       }
 
@@ -1944,7 +1947,7 @@ void wb_build::directories(char* dir, bld_ePass pass)
       dcli_search_file(line_item[2], found_file, DCLI_DIR_SEARCH_END);
     } else if (streq(cdh_Low(line_item[0]), "buildmake")) {
       if (num != 4) {
-        printf("File corrupt " pwr_cNameDistribute);
+        printf("File corrupt " pwr_cNameDistribute ", line %d", line_cnt);
         continue;
       }
 
@@ -1994,7 +1997,7 @@ void wb_build::directories(char* dir, bld_ePass pass)
       // wb_log::log( wlog_eCategory_GeBuild, name, 0);
     } else if (streq(cdh_Low(line_item[0]), "buildexec")) {
       if (num != 4) {
-        printf("File corrupt " pwr_cNameDistribute);
+        printf("File corrupt " pwr_cNameDistribute ", line %d", line_cnt);
         continue;
       }
 
@@ -2030,6 +2033,7 @@ void wb_build::export_import_files(int type, bld_ePass pass)
   char cmd[550];
   char tag[20];
   pwr_tMask current_options = 0;
+  int line_cnt = 0;
 
   if (type == bld_eType_Export)
     strcpy(tag, "export");
@@ -2042,6 +2046,7 @@ void wb_build::export_import_files(int type, bld_ePass pass)
   m_sts = PWRB__NOBUILT;
 
   while (is.getline(line, sizeof(line))) {
+    line_cnt++;
     str_trim(line, line);
     if (line[0] == '#' || line[0] == '!')
       continue;
@@ -2053,13 +2058,13 @@ void wb_build::export_import_files(int type, bld_ePass pass)
 
     if (streq(cdh_Low(line_item[0]), tag)) {
       if (num != 4) {
-        printf("File corrupt " pwr_cNameDistribute);
+        printf("File corrupt " pwr_cNameDistribute ", line %d", line_cnt);
         continue;
       }
 
       sts = sscanf(line_item[1], "%d", &current_options);
       if (sts != 1) {
-        printf("File corrupt " pwr_cNameDistribute);
+        printf("File corrupt " pwr_cNameDistribute ", line %d", line_cnt);
         current_options = 0;
       }
 
