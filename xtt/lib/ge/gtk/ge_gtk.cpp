@@ -997,6 +997,11 @@ void GeGtk::activate_subgraphs(GtkWidget* w, gpointer gectx)
   ((Ge*)gectx)->activate_subgraphs();
 }
 
+void GeGtk::activate_subgraphs_reload(GtkWidget* w, gpointer gectx)
+{
+  ((Ge*)gectx)->activate_subgraphs_reload();
+}
+
 void GeGtk::activate_rect(GtkWidget* w, gpointer gectx)
 {
   GdkEvent* e = gtk_get_current_event();
@@ -1803,12 +1808,29 @@ GeGtk::GeGtk(void* x_parent_ctx, GtkWidget* x_parent_widget,
   gtk_menu_item_set_submenu(
       GTK_MENU_ITEM(file_customcolors), GTK_WIDGET(file_customcolors_menu));
 
-  GtkWidget* file_subgraphs
+  // Submenu subgraphs
+  GtkWidget* file_subgraphs_loaded
       = gtk_menu_item_new_with_mnemonic("_Loaded Subgraphs...");
   g_signal_connect(
-      file_subgraphs, "activate", G_CALLBACK(activate_subgraphs), this);
-  gtk_widget_add_accelerator(file_subgraphs, "activate", accel_g, 'l',
+      file_subgraphs_loaded, "activate", G_CALLBACK(activate_subgraphs), this);
+  gtk_widget_add_accelerator(file_subgraphs_loaded, "activate", accel_g, 'l',
       GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+
+  GtkWidget* file_subgraphs_reload
+      = gtk_menu_item_new_with_mnemonic("_Reload all subgraphs");
+  g_signal_connect(
+      file_subgraphs_reload, "activate", G_CALLBACK(activate_subgraphs_reload), this);
+
+  GtkWidget* file_subgraphs
+      = gtk_menu_item_new_with_mnemonic("Subgraphs");
+  GtkMenu* file_subgraphs_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
+  gtk_menu_shell_append(
+      GTK_MENU_SHELL(file_subgraphs_menu), file_subgraphs_loaded);
+  gtk_menu_shell_append(
+      GTK_MENU_SHELL(file_subgraphs_menu), file_subgraphs_reload);
+
+  gtk_menu_item_set_submenu(
+      GTK_MENU_ITEM(file_subgraphs), GTK_WIDGET(file_subgraphs_menu));
 
   // Submenu export
   GtkWidget* file_export_java = gtk_menu_item_new_with_mnemonic("_Java");

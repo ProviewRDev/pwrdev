@@ -257,6 +257,7 @@ public:
   void activate_customcolors_read();
   void activate_customcolors_write();
   void activate_subgraphs();
+  void activate_subgraphs_reload();
   void activate_reset_mode();
   void activate_rect(bool keep);
   void activate_rectrounded(bool keep);

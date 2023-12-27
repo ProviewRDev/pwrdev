@@ -1767,6 +1767,21 @@ void Ge::activate_subgraphs()
   subgraphs_new();
 }
 
+void Ge::activate_subgraphs_reload()
+{
+  char name[80];
+
+  if (graph->is_modified()) {
+    wow->DisplayError("Subgraph reload error", "Graph is not saved");
+    return;
+  }
+  graph->get_name(name);
+  graph->set_subgraph_extern_all(1);
+  save(name);
+  open_graph(name, 0);
+  graph->set_subgraph_extern_all(0);
+}
+
 void Ge::activate_reset_mode()
 {
   graph->reset_mode(false, false);

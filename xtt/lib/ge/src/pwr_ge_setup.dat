@@ -1180,8 +1180,6 @@ menu ColorTheme
     }
   }
 }
-
-}
 localsubgraphs Ssab ssab_exe:*.pwsg
 menu Local
 {

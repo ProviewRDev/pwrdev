@@ -1597,6 +1597,7 @@ public:
       grow_tObject* list, int list_cnt, int* error_cnt, int* warning_cnt);
   void syntax_msg(int severity, grow_tObject object, const char* msg);
   int check_ldh_object(char* name, pwr_eType* type);
+  void set_subgraph_extern_all(int sg_extern);
   void disable_subwindow_events(int disable) 
   {
     grow_DisableSubwindowEvents(grow->ctx, disable);

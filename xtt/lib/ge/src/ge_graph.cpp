@@ -6998,6 +6998,17 @@ int Graph::check_ldh_object(char* name, pwr_eType* type)
   return 1;
 }
 
+void Graph::set_subgraph_extern_all(int sg_extern)
+{
+  grow_tObject* objectlist;
+  int object_cnt;
+
+  grow_GetNodeClassList(grow->ctx, &objectlist, &object_cnt);
+  for (int i = 0; i < object_cnt; i++) {
+    grow_SetNodeClassExtern(objectlist[i], sg_extern);
+  }
+}
+
 void GraphApplList::insert(void* key, void* ctx)
 {
   GraphApplList* appl_p = new GraphApplList(key, ctx);

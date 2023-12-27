@@ -1372,6 +1372,8 @@ static int graph_set_func(void* client_data, void* client_flag)
       || str_NoCaseStrcmp(arg1_str, "NOBUILDMANUAL") == 0
       || str_NoCaseStrcmp(arg1_str, "BUILDDEBUG") == 0
       || str_NoCaseStrcmp(arg1_str, "NOBUILDDEBUG") == 0
+      || str_NoCaseStrcmp(arg1_str, "BUILDSYNTAX") == 0
+      || str_NoCaseStrcmp(arg1_str, "NOBUILDSYNTAX") == 0
       || str_NoCaseStrcmp(arg1_str, "BUILDNOCOPY") == 0
       || str_NoCaseStrcmp(arg1_str, "NOBUILDNOCOPY") == 0
       || str_NoCaseStrcmp(arg1_str, "ENABLEREVISIONS") == 0

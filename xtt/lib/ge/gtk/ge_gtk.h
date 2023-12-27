@@ -213,6 +213,7 @@ public:
   static void activate_open(GtkWidget* w, gpointer gectx);
   static void activate_opendashboard(GtkWidget* w, gpointer gectx);
   static void activate_subgraphs(GtkWidget* w, gpointer gectx);
+  static void activate_subgraphs_reload(GtkWidget* w, gpointer gectx);
   static void activate_rect(GtkWidget* w, gpointer gectx);
   static void activate_rectrounded(GtkWidget* w, gpointer gectx);
   static void activate_line(GtkWidget* w, gpointer gectx);
