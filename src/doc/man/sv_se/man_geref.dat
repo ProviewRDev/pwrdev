@@ -6747,6 +6747,7 @@ DashInsertObject <t><t>Addera ett object till en DashCell.<link>DashInsertObject
 DeleteObject <t><t>Ta bort ett objekt.<link>DeleteObject()
 GetCurrentObject <t><t>Returnerar identiteten för senast skapade objekt.<link>GetCurrentObject()
 GetFirstObject <t><t>Hämta första objekt. <link>GetFirstObject()
+GetGraphAttribute <t><t>Hämta ett attributvärde för aktuell graf. <link>GetGraphAttribute()
 GetGraphName <t><t>Hämta name på nuvarande graf. <link>GetGraphName()
 GetNextObject <t><t>Hämta nästa objekt. <link>GetNextObject()
 GetObjectAttribute <t><t>Hämta ett attributvärde för ett objekt. <link>GetObjectAttribute()
@@ -6787,6 +6788,7 @@ SetExtern <t><t>Sätt en subgraf extern. <link>SetExtern()
 SetExternAll <t><t>Sätt alla subgrafer extern. <link>SetExternAll()
 SetIntern <t><t>Sätt en subgraf intern. <link>SetIntern()
 SetInternAll <t><t>Sätt alla subgrafer intern. <link>SetInternAll()
+SetGraphAttribute <t><t>Sätt ett attributvärde för aktuell graf. <link>SetGraphAttribute()
 SetGraphName <t><t>Sätt namn på aktuell graph. <link>SetGraphName()
 SetObjectAttribute <t><t>Sätt värde på ett attribut för ett objekt. <link>SetObjectAttribute()
 SetObjectBackgroundColor <t><t>Sätt bakgrundsfärg på ett objekt. <link>SetObjectBackgroundColor()
@@ -7679,6 +7681,31 @@ Returnerar en integer med objektsidentiteten.
 <c> endwhile
 </topic>
 
+<topic>GetGraphAttribute() <style>function
+GetGraphAttribute()
+int GetGraphAttribute( string attribute, (arbitrary type) value)
+
+<h2>Beskrivning
+Hämtar värde på ett attribut för aktuell graf. Attributet namnges på
+samma sätt som i attributeditorn för grafen.
+
+<h2>Argument
+
+string <t>attribut <t>Attributnamn.
+(arbitrary type) <t>value <t>Hämtat värde på attributet.
+
+Returnerar status för operationen.
+
+<b>Exempel
+<c> int sts;
+<c> float scantime;
+ 
+<c> sts = GetGraphAttribute( oid, "Scantime", scantime);
+<c> if ( !(sts & 1))
+<c>   printf( "Couldn't get scan time\n");
+<c> endif
+</topic>
+
 <topic>GetGraphName() <style>function
 GetGraphName()
 string GetGraphName()
@@ -8515,6 +8542,30 @@ Sätter alla subgrafer intern.
 <b>Exempel
  
 <c> SetInternAll();
+</topic>
+
+<topic>SetGraphAttribute() <style>function
+SetGraphAttribute()
+int SetGraphAttribute( string attribute, (arbitrary type) value)
+
+<h2>Beskrivning
+Sätter värde på ett attribut i aktuell graf. Attributet namnges på
+samma sätt som i attributeditorn för grafen.
+
+Citationstecken i strängar kan sättas med \", och ny rad i
+attribut med flera rade med \\n.
+
+<h2>Argument
+
+string <t>attribut <t>Attributnamn.
+(arbitrary type) <t>Värde på attributet.
+
+Returnerar status för operationen.
+
+<b>Exempel
+<c> int sts;
+ 
+<c> sts = SetObjectAttribute( "Scantime", 0.2);
 </topic>
 
 <topic>SetGraphName() <style>function

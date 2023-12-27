@@ -6946,6 +6946,7 @@ DashInsertObject <t><t>Insert an object into a DashCell.<link>DashInsertObject()
 DeleteObject <t><t>Delete an object.<link>DeleteObject()
 GetCurrentObject <t><t>Returns the identity of the last created object.<link>GetCurrentObject()
 GetFirstObject <t><t>Get the first object. <link>GetFirstObject()
+GetGraphAttribute <t><t>Get an attribute value of a graph. <link>GetGraphAttribute()
 GetGraphName <t><t>Get name of current graph. <link>GetGraphName()
 GetNextObject <t><t>Get the next object. <link>GetNextObject()
 GetObjectAttribute <t><t>Get an attribute value of an object. <link>GetObjectAttribute()
@@ -6986,6 +6987,7 @@ SetExtern <t><t>Set subgraph extern. <link>SetExtern()
 SetExternAll <t><t>Set all subgraphs extern. <link>SetExternAll()
 SetIntern <t><t>Set subgraph intern. <link>SetIntern()
 SetInternAll <t><t>Set all subgraph intern. <link>SetInternAll()
+SetGraphAttribute <t><t>Set an attribute value of a graph. <link>SetGraphAttribute()
 SetGraphName <t><t>Set name of current graph. <link>SetGraphName()
 SetObjectAttribute <t><t>Set an attribute value of an object. <link>SetObjectAttribute()
 SetObjectBackgroundColor <t><t>Set background color of an object. <link>SetObjectBackgroundColor()
@@ -7877,6 +7879,31 @@ Returns an integer with the object identity.
 <c> endwhile
 </topic>
 
+<topic>GetGraphAttribute() <style>function
+GetGraphAttribute()
+int GetGraphAttribute( string attribute, (arbitrary type) value)
+
+<h2>Description
+Returns the value of an attribute of the current graph. The attribute name is the same
+as in the graph attributes editor.
+
+<h2>Argument
+
+string <t>attribut <t>Attribute name.
+(arbitrary type) <t>value <t>Fetched attribute value
+
+Returns the status of the operation.
+
+<b>Example
+<c> int sts;
+<c> float scantime;
+ 
+<c> sts = GetGraphAttribute( oid, "Scantime", scantime);
+<c> if ( !(sts & 1))
+<c>   printf( "Couldn't get scan time\n");
+<c> endif
+</topic>
+
 <topic>GetGraphName() <style>function
 GetGraphName()
 string GetGraphName()
@@ -8713,6 +8740,30 @@ Set all subgraphs intern.
 <b>Example
  
 <c> SetInternAll();
+</topic>
+
+<topic>SetGraphAttribute() <style>function
+SetGraphAttribute()
+int SetGraphAttribute( string attribute, (arbitrary type) value)
+
+<h2>Description
+Set the value of an attribute in the current graph. The attribute name is the
+same as in the graph attributes editor.
+
+Quotation marks inside a string can be set with \", and new line in
+attributes with several lines with \\n.
+
+<h2>Argument
+
+string <t>attribut <t>Attribute name.
+(arbitrary type) <t>value <t>Attribute value.
+
+Returns the status of the operation.
+
+<b>Example
+<c> int sts;
+ 
+<c> sts = SetObjectAttribute( "Scantime", 0.2);
 </topic>
 
 <topic>SetGraphName() <style>function
