@@ -51,7 +51,7 @@ SObject pwrs:Class
 !  associated with the same node.
 !
 ! @b Object graph
-!  @image orm_node_og.gif
+!  @image orm_node_og.png
 !*/
   Object $Node $ClassDef pwr_eCix_Node
     Body SysBody

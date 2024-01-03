@@ -42,7 +42,7 @@ SObject pwrb:Class
 !  Object to display a curve of points with x and y coordinates.
 !
 ! @b Object Graph
-! @image orm_xycurve_og.gif
+! @image orm_xycurve_og.png
 !
 !  The object contains 
 !  To view a curve in a Ge graph, use a XYCurve component, and set

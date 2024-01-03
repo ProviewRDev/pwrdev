@@ -52,7 +52,7 @@ SObject pwrb:Class
 !  @image orm_sound.gif
 !
 !  @b Object graph
-!  @image orm_sound_og.gif
+!  @image orm_sound_og.png
 !*/
   Object Sound $ClassDef 438
     Body SysBody

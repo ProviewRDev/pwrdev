@@ -49,6 +49,9 @@ SObject pwrb:Class
 ! @b Hints  
 !  ChanIi objects are configured below a suitable Io-card or module 
 !  object.
+!
+! @b Object graph
+!  @image orm_chanii_og.png
 !*/
   Object ChanIi $ClassDef 322
     Body SysBody

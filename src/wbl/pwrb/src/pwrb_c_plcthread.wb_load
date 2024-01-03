@@ -45,7 +45,7 @@ SObject pwrb:Class
 ! plc thread and updated periodically.
 !
 ! @b Object graph
-!  @image orm_plcthread_og.gif
+!  @image orm_plcthread_og.png
 !*/
   Object PlcThread $ClassDef 261 
     Body SysBody

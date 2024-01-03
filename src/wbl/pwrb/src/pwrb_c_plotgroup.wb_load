@@ -73,7 +73,7 @@ SObject pwrb:Class
 !  Configuration of PlotGroup Objects 
 !
 ! @b Object graph
-!  @image orm_plotgroup_og.gif
+!  @image orm_plotgroup_og.png
 !*/
   Object PlotGroup $ClassDef 178 
     Body SysBody

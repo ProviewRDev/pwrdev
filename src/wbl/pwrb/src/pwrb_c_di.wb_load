@@ -67,7 +67,7 @@ SObject pwrb:Class
 !  object.
 !
 ! @b Object graph
-!  @image orm_di_og.gif
+!  @image orm_di_og.png
 !*/
   Object Di $ClassDef 86 
     Body SysBody

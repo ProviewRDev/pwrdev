@@ -53,7 +53,7 @@ SObject pwrb:Class
 !  object representing a process node.
 !
 ! @b Object graph
-!  @image orm_backup_conf_og.gif
+!  @image orm_backup_conf_og.png
 !
 ! @b See Also
 !  @classlink Backup pwrb_backup.html

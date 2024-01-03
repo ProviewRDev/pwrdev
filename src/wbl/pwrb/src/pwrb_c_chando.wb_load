@@ -67,7 +67,7 @@ SObject pwrb:Class
 !  recommended.
 !
 ! @b Object graph
-!  @image orm_chando_og.gif
+!  @image orm_chando_og.png
 !*/
   Object ChanDo $ClassDef 34 
     Body SysBody

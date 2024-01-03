@@ -53,6 +53,9 @@ SObject pwrb:Class
 !  object.
 !  Rack and card objects to different I/O systems are
 !  documented separately.
+!
+! @b Object graph
+!  @image orm_chanio_og.png
 !*/
   Object ChanIo $ClassDef 323
     Body SysBody

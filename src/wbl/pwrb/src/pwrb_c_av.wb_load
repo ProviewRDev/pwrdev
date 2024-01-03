@@ -52,7 +52,7 @@ SObject pwrb:Class
 !  target environment, for example by means of StoAv.
 !
 ! @b Object graph
-!  @image orm_av_og.gif
+!  @image orm_av_og.png
 !*/
   Object Av $ClassDef 19 
     Body SysBody

@@ -58,7 +58,7 @@ SObject pwrb:Class
 !  DsTrendConf object, it will execute with 1 Hz.
 !
 ! @b Object graph
-!  @image orm_dstrendconf_og.gif
+!  @image orm_dstrendconf_og.png
 !  
 ! @b See Also
 !  @classlink DsTrend pwrb_dstrend.html

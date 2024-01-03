@@ -75,7 +75,7 @@ SObject pwrb:Class
 !  recommended.
 !
 ! @b Object graph
-!  @image orm_chanao_og.gif
+!  @image orm_chanao_og.png
 !*/
   Object ChanAo $ClassDef 30 
     Body SysBody

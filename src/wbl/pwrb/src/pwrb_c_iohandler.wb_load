@@ -57,7 +57,7 @@ SObject pwrb:Class
 !  attributes will then be assigned the default values.
 !
 ! @b Object graph
-!  @image orm_iohandler_og.gif
+!  @image orm_iohandler_og.png
 !*/
   Object IOHandler $ClassDef 138 
     Body SysBody

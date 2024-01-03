@@ -316,7 +316,7 @@ SObject         pwrb:Class
 !  Ratio Control 
 !
 ! @b Object graph
-!  @image orm_pid_og.gif
+!  @image orm_pid_og.png
 !
 ! @b See also
 !  @classlink Mode pwrb_mode.html

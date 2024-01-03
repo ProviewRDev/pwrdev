@@ -51,6 +51,9 @@ SObject pwrb:Class
 !  
 !  The sampling rate is specified the the ScanTime attribute.
 !
+!  @b Object graph
+!  @image orm_dstrendcurve_og.png
+!
 !  @b Storage buffers
 !  Storage buffers has to be supplied by the user, one buffer for the time axis data, and
 !  one for each configured attribute. Object of type CircBuffer has to be used, eg 

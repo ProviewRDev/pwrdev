@@ -61,7 +61,7 @@ SObject pwrb:Class
 !  MessageHandler object as well.
 !
 ! @b Object graph
-!  @image orm_messagehandler_og.gif
+!  @image orm_messagehandler_og.png
 !*/
   Object MessageHandler $ClassDef 146 
     Body SysBody

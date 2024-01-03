@@ -42,7 +42,7 @@ SObject pwrb:Class
 !  Definition of a sound sequence.
 !
 !  @b Object graph
-!  @image orm_soundsequence_og.gif
+!  @image orm_soundsequence_og.png
 !*/
   Object SoundSequence $ClassDef 439
     Body SysBody

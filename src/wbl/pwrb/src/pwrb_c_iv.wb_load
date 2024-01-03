@@ -48,6 +48,9 @@ SObject pwrb:Class
 ! @b Hints
 !  Put the object below a $PlantHier object in the
 !  development environment.
+!
+! @b Object graph
+!  @image orm_iv_og.png
 !*/
   Object Iv $ClassDef 326 
     Body SysBody

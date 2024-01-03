@@ -43,7 +43,7 @@ SObject pwrb:Class
 !  Configures the plc process.
 !
 ! @b Object graph
-!  @image orm_plcprocess_og.gif
+!  @image orm_plcprocess_og.png
 !*/
   Object PlcProcess $ClassDef 279
     Body SysBody

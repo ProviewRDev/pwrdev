@@ -54,7 +54,7 @@ SObject pwrb:Class
 !  the target environment, for example by means of StoDv.
 !
 ! @b Object graph
-!  @image orm_dv_og.gif
+!  @image orm_dv_og.png
 !*/
   Object Dv $ClassDef 111 
     Body SysBody

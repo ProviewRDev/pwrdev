@@ -52,7 +52,7 @@ SObject pwrb:Class
 !  object.
 !
 ! @b Object graph
-!  @image orm_do_og.gif
+!  @image orm_do_og.png
 !*/
   Object Do $ClassDef 93 
     Body SysBody

@@ -87,7 +87,7 @@ SObject pwrb:Class
 !  recommended.
 !
 ! @b Object graph
-!  @image orm_chanai_og.gif
+!  @image orm_chanai_og.png
 !
 ! @b See also  
 !  @classlink ChanAit pwrb_chanait.html
