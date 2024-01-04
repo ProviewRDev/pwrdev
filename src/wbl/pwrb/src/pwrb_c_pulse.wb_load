@@ -51,7 +51,7 @@ SObject pwrb:Class
 !  propagating a pulse, the pulse is extended, as the
 !  pulse period, TimerTime, is counted from the last
 !  leading edge of the input signal.
-!  @image orm_en1-182.gif
+!  @image orm_pulse_fig1.png
 !
 ! @b Hints
 !  If a reset function is needed instead of a pulse with a

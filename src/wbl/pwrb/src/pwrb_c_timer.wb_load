@@ -49,7 +49,7 @@ SObject pwrb:Class
 !   - TRUE the output is set.
 !   - FALSE the timer is started. After the time TimerTime
 !     the output will be reset.
-!  @image orm_en1-231.gif
+!  @image orm_timer_fig1.png
 !
 !  Compare with the Wait object.
 !*/

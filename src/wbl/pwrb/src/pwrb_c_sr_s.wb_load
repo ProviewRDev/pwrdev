@@ -54,7 +54,7 @@ SObject pwrb:Class
 !   - SR_S flip_flop TRUE ( = Set)
 !   - SR_R flip_flop FALSE ( = Reset)
 !
-!  @image orm_en1-204.gif
+!  @image orm_sr_s_fig1.png
 ! @b See also
 !  @classlink SR_R pwrb_sr_r.html
 !*/

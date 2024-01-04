@@ -48,7 +48,7 @@ SObject pwrb:Class
 !  the time TimerTime expires and if the input still
 !  remains TRUE the output is set. It is cleared as soon
 !  as the input becomes FALSE.
-!  @image orm_en1-245.gif
+!  @image orm_wait_fig1.png
 !
 ! @b See also
 !  @classlink Waith pwrb_waith.html
