@@ -46,6 +46,29 @@ extern "C" {
 #include "cnv_wbltoh.h"
 #include "cnv_readsrc.h"
 
+static char *i_txt(char *in)
+{
+  static char str[500];
+  char *s, *t;
+
+  for (s = in, t = str; *s; s++) {
+    if (*s == '<') {
+      strcpy(t, "&lt;");
+      t += 4;	     
+    }
+    else if (*s == '>') {
+      strcpy(t, "&gt;");
+      t += 4;	     
+    }
+    else {
+      *t = *s;
+      t++;
+    }
+  }
+  *t = 0;
+  return str;
+}
+
 int CnvWblToHtml::init(char* first)
 {
   pwr_tFileName fname;
@@ -601,7 +624,7 @@ int CnvWblToHtml::class_exec()
       } else if (str_StartsWith(CnvCtx::low(txt), "@h2")) {
         fp_html_clf << "</PRE><H4>" << txt + 3 << "</H4><BR><PRE>\n";
       } else if (str_StartsWith(CnvCtx::low(txt), "@i")) {
-        fp_html_clf << txt + 2 << '\n';
+	fp_html_clf << i_txt(txt + 2) << '\n';
       } else
         fp_html_clf << ctx->rw->doc_text[i] << '\n';
     }
