@@ -660,6 +660,9 @@ GeDyn::GeDyn(const GeDyn& x)
     case ge_mActionType1_EmitSignal:
       e = new GeEmitSignal((const GeEmitSignal&)*elem);
       break;
+    case ge_mActionType1_ContextMenu:
+      e = new GeContextMenu((const GeContextMenu&)*elem);
+      break;
     default:;
     }
     switch (elem->action_type2) {
@@ -956,6 +959,9 @@ void GeDyn::open(std::ifstream& fp)
       break;
     case ge_eSave_EmitSignal:
       e = (GeDynElem*)new GeEmitSignal(this);
+      break;
+    case ge_eSave_ContextMenu:
+      e = (GeDynElem*)new GeContextMenu(this);
       break;
     case ge_eSave_End:
       end_found = 1;
@@ -1757,6 +1763,9 @@ GeDynElem* GeDyn::create_action1_element(int mask, int instance)
   case ge_mActionType1_EmitSignal:
     e = (GeDynElem*)new GeEmitSignal(this);
     break;
+  case ge_mActionType1_ContextMenu:
+    e = (GeDynElem*)new GeContextMenu(this);
+    break;
   default:;
   }
   return e;
@@ -2010,6 +2019,9 @@ GeDynElem* GeDyn::copy_element(GeDynElem& x)
       break;
     case ge_mActionType1_EmitSignal:
       e = (GeDynElem*)new GeEmitSignal((GeEmitSignal&)x);
+      break;
+    case ge_mActionType1_ContextMenu:
+      e = (GeDynElem*)new GeContextMenu((GeContextMenu&)x);
       break;
     default:;
     }
@@ -17344,6 +17356,346 @@ int GePopupMenu::syntax_check(
         dyn->graph->syntax_msg('W', object, msg);
         (*warning_cnt)++;
       }
+    }
+  }
+  return 1;
+}
+
+GeContextMenu::GeContextMenu(GeDyn* e_dyn)
+    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_No,
+          ge_mActionType1_ContextMenu, ge_mActionType2_No, ge_eDynPrio_ContextMenu)
+{
+  for (int i = 0; i < int(sizeof(mdata.item_text)/sizeof(mdata.item_text[0])); i++) {
+    strcpy(mdata.item_text[i], "");
+    strcpy(mdata.item_action[i], "");
+  }
+}
+
+GeContextMenu::GeContextMenu(const GeContextMenu& x)
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
+          x.prio)
+{
+  for (int i = 0; i < int(sizeof(mdata.item_text)/sizeof(mdata.item_text[0])); i++) {
+    strcpy(mdata.item_text[i], x.mdata.item_text[i]);
+    strcpy(mdata.item_action[i], x.mdata.item_action[i]);
+  }
+}
+
+void GeContextMenu::get_attributes(attr_sItem* attrinfo, int* item_count)
+{
+  int i = *item_count;
+
+  strcpy(attrinfo[i].name, "ContextMenu.ItemText[0]");
+  attrinfo[i].value = mdata.item_text[0];
+  attrinfo[i].type = glow_eType_String;
+  attrinfo[i++].size = sizeof(mdata.item_text[0]);
+  strcpy(attrinfo[i].name, "ContextMenu.ItemAction[0]");
+  attrinfo[i].value = mdata.item_action[0];
+  attrinfo[i].type = glow_eType_String;
+  attrinfo[i++].size = sizeof(mdata.item_action[0]);
+
+  strcpy(attrinfo[i].name, "ContextMenu.ItemText[1]");
+  attrinfo[i].value = mdata.item_text[1];
+  attrinfo[i].type = glow_eType_String;
+  attrinfo[i++].size = sizeof(mdata.item_text[0]);
+  strcpy(attrinfo[i].name, "ContextMenu.ItemAction[1]");
+  attrinfo[i].value = mdata.item_action[1];
+  attrinfo[i].type = glow_eType_String;
+  attrinfo[i++].size = sizeof(mdata.item_action[0]);
+
+  strcpy(attrinfo[i].name, "ContextMenu.ItemText[2]");
+  attrinfo[i].value = mdata.item_text[2];
+  attrinfo[i].type = glow_eType_String;
+  attrinfo[i++].size = sizeof(mdata.item_text[0]);
+  strcpy(attrinfo[i].name, "ContextMenu.ItemAction[2]");
+  attrinfo[i].value = mdata.item_action[2];
+  attrinfo[i].type = glow_eType_String;
+  attrinfo[i++].size = sizeof(mdata.item_action[0]);
+
+  strcpy(attrinfo[i].name, "ContextMenu.ItemText[3]");
+  attrinfo[i].value = mdata.item_text[3];
+  attrinfo[i].type = glow_eType_String;
+  attrinfo[i++].size = sizeof(mdata.item_text[0]);
+  strcpy(attrinfo[i].name, "ContextMenu.ItemAction[3]");
+  attrinfo[i].value = mdata.item_action[3];
+  attrinfo[i].type = glow_eType_String;
+  attrinfo[i++].size = sizeof(mdata.item_action[0]);
+
+  strcpy(attrinfo[i].name, "ContextMenu.ItemText[4]");
+  attrinfo[i].value = mdata.item_text[4];
+  attrinfo[i].type = glow_eType_String;
+  attrinfo[i++].size = sizeof(mdata.item_text[0]);
+  strcpy(attrinfo[i].name, "ContextMenu.ItemAction[4]");
+  attrinfo[i].value = mdata.item_action[4];
+  attrinfo[i].type = glow_eType_String;
+  attrinfo[i++].size = sizeof(mdata.item_action[0]);
+
+  strcpy(attrinfo[i].name, "ContextMenu.ItemText[5]");
+  attrinfo[i].value = mdata.item_text[5];
+  attrinfo[i].type = glow_eType_String;
+  attrinfo[i++].size = sizeof(mdata.item_text[0]);
+  strcpy(attrinfo[i].name, "ContextMenu.ItemAction[5]");
+  attrinfo[i].value = mdata.item_action[5];
+  attrinfo[i].type = glow_eType_String;
+  attrinfo[i++].size = sizeof(mdata.item_action[0]);
+
+  strcpy(attrinfo[i].name, "ContextMenu.ItemText[6]");
+  attrinfo[i].value = mdata.item_text[6];
+  attrinfo[i].type = glow_eType_String;
+  attrinfo[i++].size = sizeof(mdata.item_text[0]);
+  strcpy(attrinfo[i].name, "ContextMenu.ItemAction[6]");
+  attrinfo[i].value = mdata.item_action[6];
+  attrinfo[i].type = glow_eType_String;
+  attrinfo[i++].size = sizeof(mdata.item_action[0]);
+
+  strcpy(attrinfo[i].name, "ContextMenu.ItemText[7]");
+  attrinfo[i].value = mdata.item_text[7];
+  attrinfo[i].type = glow_eType_String;
+  attrinfo[i++].size = sizeof(mdata.item_text[0]);
+  strcpy(attrinfo[i].name, "ContextMenu.ItemAction[7]");
+  attrinfo[i].value = mdata.item_action[7];
+  attrinfo[i].type = glow_eType_String;
+  attrinfo[i++].size = sizeof(mdata.item_action[0]);
+
+  strcpy(attrinfo[i].name, "ContextMenu.ItemText[8]");
+  attrinfo[i].value = mdata.item_text[8];
+  attrinfo[i].type = glow_eType_String;
+  attrinfo[i++].size = sizeof(mdata.item_text[0]);
+  strcpy(attrinfo[i].name, "ContextMenu.ItemAction[8]");
+  attrinfo[i].value = mdata.item_action[8];
+  attrinfo[i].type = glow_eType_String;
+  attrinfo[i++].size = sizeof(mdata.item_action[0]);
+
+  strcpy(attrinfo[i].name, "ContextMenu.ItemText[9]");
+  attrinfo[i].value = mdata.item_text[9];
+  attrinfo[i].type = glow_eType_String;
+  attrinfo[i++].size = sizeof(mdata.item_text[0]);
+  strcpy(attrinfo[i].name, "ContextMenu.ItemAction[9]");
+  attrinfo[i].value = mdata.item_action[9];
+  attrinfo[i].type = glow_eType_String;
+  attrinfo[i++].size = sizeof(mdata.item_action[0]);
+
+  dyn->display_access = true;
+  *item_count = i;
+}
+
+void GeContextMenu::set_attribute(
+    grow_tObject object, const char* attr_name, int* cnt)
+{
+}
+
+void GeContextMenu::replace_attribute(char* from, char* to, int* cnt, int strict)
+{
+  GeDyn::replace_attribute(
+      mdata.item_text[0], sizeof(mdata.item_text[0]), from, to, cnt, strict);
+  GeDyn::replace_attribute(
+      mdata.item_text[1], sizeof(mdata.item_text[0]), from, to, cnt, strict);
+  GeDyn::replace_attribute(
+      mdata.item_text[2], sizeof(mdata.item_text[0]), from, to, cnt, strict);
+  GeDyn::replace_attribute(
+      mdata.item_text[3], sizeof(mdata.item_text[0]), from, to, cnt, strict);
+  GeDyn::replace_attribute(
+      mdata.item_text[4], sizeof(mdata.item_text[0]), from, to, cnt, strict);
+  GeDyn::replace_attribute(
+      mdata.item_action[0], sizeof(mdata.item_action[0]), from, to, cnt, strict);
+  GeDyn::replace_attribute(
+      mdata.item_action[1], sizeof(mdata.item_action[0]), from, to, cnt, strict);
+  GeDyn::replace_attribute(
+      mdata.item_action[2], sizeof(mdata.item_action[0]), from, to, cnt, strict);
+  GeDyn::replace_attribute(
+      mdata.item_action[3], sizeof(mdata.item_action[0]), from, to, cnt, strict);
+  GeDyn::replace_attribute(
+      mdata.item_action[4], sizeof(mdata.item_action[0]), from, to, cnt, strict);
+}
+
+void GeContextMenu::save(std::ofstream& fp)
+{
+  fp << int(ge_eSave_ContextMenu) << '\n';
+  fp << int(ge_eSave_ContextMenu_item_text1) << FSPACE << mdata.item_text[0] << '\n';
+  fp << int(ge_eSave_ContextMenu_item_text2) << FSPACE << mdata.item_text[1] << '\n';
+  fp << int(ge_eSave_ContextMenu_item_text3) << FSPACE << mdata.item_text[2] << '\n';
+  fp << int(ge_eSave_ContextMenu_item_text4) << FSPACE << mdata.item_text[3] << '\n';
+  fp << int(ge_eSave_ContextMenu_item_text5) << FSPACE << mdata.item_text[4] << '\n';
+  fp << int(ge_eSave_ContextMenu_item_text6) << FSPACE << mdata.item_text[5] << '\n';
+  fp << int(ge_eSave_ContextMenu_item_text7) << FSPACE << mdata.item_text[6] << '\n';
+  fp << int(ge_eSave_ContextMenu_item_text8) << FSPACE << mdata.item_text[7] << '\n';
+  fp << int(ge_eSave_ContextMenu_item_text9) << FSPACE << mdata.item_text[8] << '\n';
+  fp << int(ge_eSave_ContextMenu_item_text10) << FSPACE << mdata.item_text[9] << '\n';
+  fp << int(ge_eSave_ContextMenu_item_action1) << FSPACE << mdata.item_action[0] << '\n';
+  fp << int(ge_eSave_ContextMenu_item_action2) << FSPACE << mdata.item_action[1] << '\n';
+  fp << int(ge_eSave_ContextMenu_item_action3) << FSPACE << mdata.item_action[2] << '\n';
+  fp << int(ge_eSave_ContextMenu_item_action4) << FSPACE << mdata.item_action[3] << '\n';
+  fp << int(ge_eSave_ContextMenu_item_action5) << FSPACE << mdata.item_action[4] << '\n';
+  fp << int(ge_eSave_ContextMenu_item_action6) << FSPACE << mdata.item_action[5] << '\n';
+  fp << int(ge_eSave_ContextMenu_item_action7) << FSPACE << mdata.item_action[6] << '\n';
+  fp << int(ge_eSave_ContextMenu_item_action8) << FSPACE << mdata.item_action[7] << '\n';
+  fp << int(ge_eSave_ContextMenu_item_action9) << FSPACE << mdata.item_action[8] << '\n';
+  fp << int(ge_eSave_ContextMenu_item_action10) << FSPACE << mdata.item_action[9] << '\n';
+  fp << int(ge_eSave_End) << '\n';
+}
+
+void GeContextMenu::open(std::ifstream& fp)
+{
+  int type = 0;
+  int end_found = 0;
+  char dummy[40];
+
+  for (;;) {
+    if (!fp.good()) {
+      fp.clear();
+      fp.getline(dummy, sizeof(dummy));
+      printf("** Read error GeContextMenu: \"%d %s\"\n", type, dummy);
+    }
+
+    fp >> type;
+
+    switch (type) {
+    case ge_eSave_ContextMenu:
+      break;
+    case ge_eSave_ContextMenu_item_text1:
+      fp.get();
+      fp.getline(mdata.item_text[0], sizeof(mdata.item_text[0]));
+      break;
+    case ge_eSave_ContextMenu_item_text2:
+      fp.get();
+      fp.getline(mdata.item_text[1], sizeof(mdata.item_text[0]));
+      break;
+    case ge_eSave_ContextMenu_item_text3:
+      fp.get();
+      fp.getline(mdata.item_text[2], sizeof(mdata.item_text[0]));
+      break;
+    case ge_eSave_ContextMenu_item_text4:
+      fp.get();
+      fp.getline(mdata.item_text[3], sizeof(mdata.item_text[0]));
+      break;
+    case ge_eSave_ContextMenu_item_text5:
+      fp.get();
+      fp.getline(mdata.item_text[4], sizeof(mdata.item_text[0]));
+      break;
+    case ge_eSave_ContextMenu_item_text6:
+      fp.get();
+      fp.getline(mdata.item_text[5], sizeof(mdata.item_text[0]));
+      break;
+    case ge_eSave_ContextMenu_item_text7:
+      fp.get();
+      fp.getline(mdata.item_text[6], sizeof(mdata.item_text[0]));
+      break;
+    case ge_eSave_ContextMenu_item_text8:
+      fp.get();
+      fp.getline(mdata.item_text[7], sizeof(mdata.item_text[0]));
+      break;
+    case ge_eSave_ContextMenu_item_text9:
+      fp.get();
+      fp.getline(mdata.item_text[8], sizeof(mdata.item_text[0]));
+      break;
+    case ge_eSave_ContextMenu_item_text10:
+      fp.get();
+      fp.getline(mdata.item_text[9], sizeof(mdata.item_text[0]));
+      break;
+    case ge_eSave_ContextMenu_item_action1:
+      fp.get();
+      fp.getline(mdata.item_action[0], sizeof(mdata.item_action[0]));
+      break;
+    case ge_eSave_ContextMenu_item_action2:
+      fp.get();
+      fp.getline(mdata.item_action[1], sizeof(mdata.item_action[0]));
+      break;
+    case ge_eSave_ContextMenu_item_action3:
+      fp.get();
+      fp.getline(mdata.item_action[2], sizeof(mdata.item_action[0]));
+      break;
+    case ge_eSave_ContextMenu_item_action4:
+      fp.get();
+      fp.getline(mdata.item_action[3], sizeof(mdata.item_action[0]));
+      break;
+    case ge_eSave_ContextMenu_item_action5:
+      fp.get();
+      fp.getline(mdata.item_action[4], sizeof(mdata.item_action[0]));
+      break;
+    case ge_eSave_ContextMenu_item_action6:
+      fp.get();
+      fp.getline(mdata.item_action[5], sizeof(mdata.item_action[0]));
+      break;
+    case ge_eSave_ContextMenu_item_action7:
+      fp.get();
+      fp.getline(mdata.item_action[6], sizeof(mdata.item_action[0]));
+      break;
+    case ge_eSave_ContextMenu_item_action8:
+      fp.get();
+      fp.getline(mdata.item_action[7], sizeof(mdata.item_action[0]));
+      break;
+    case ge_eSave_ContextMenu_item_action9:
+      fp.get();
+      fp.getline(mdata.item_action[8], sizeof(mdata.item_action[0]));
+      break;
+    case ge_eSave_ContextMenu_item_action10:
+      fp.get();
+      fp.getline(mdata.item_action[9], sizeof(mdata.item_action[0]));
+      break;
+    case ge_eSave_End:
+      end_found = 1;
+      break;
+    default:
+      std::cout << "GeContextMenu:open syntax error\n";
+      fp.getline(dummy, sizeof(dummy));
+    }
+    if (end_found)
+      break;
+  }
+}
+
+int GeContextMenu::action(grow_tObject object, glow_tEvent event)
+{
+  if (!dyn->graph->is_authorized(dyn->access))
+    return 1;
+
+  switch (event->event) {
+  case glow_eEvent_MB3Press: {
+    char name[80];
+    int x, y;
+
+    if (dyn->graph->context_menu_cb) {
+      // Display context menu
+      grow_GetName(dyn->graph->grow->ctx, name);
+
+      dyn->graph->popup_position(
+          event->any.x_pixel + 8, event->any.y_pixel, &x, &y);
+      (dyn->graph->context_menu_cb)(dyn->graph->parent_ctx, (void *)&mdata, 
+	  xmenu_mUtility_Ge, name, x, y);
+    }
+    break;
+  }
+  default:;
+  }
+  return 1;
+}
+
+int GeContextMenu::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  for (int i = 0; i < int(sizeof(mdata.item_text)/sizeof(mdata.item_text[0])); i++) {
+    if (!streq(mdata.item_text[i], "")) {
+      fp << indentation << "SetObjectAttribute(id,\"" << prefix << 
+	"ContextMenu.ItemText[" << i << "]\",\"" << mdata.item_text[i] << 
+	"\");" << '\n';
+      fp << indentation << "SetObjectAttribute(id,\"" << prefix << 
+	"ContextMenu.ItemAction[" << i << "]\",\"" << mdata.item_action[i] << 
+	"\");" << '\n';
+    }
+  }
+  return 1;
+}
+
+int GeContextMenu::syntax_check(
+    grow_tObject object, int* error_cnt, int* warning_cnt)
+{
+  if (streq(mdata.item_text[0], "")) {
+    dyn->graph->syntax_msg('W', object, "ContextMenu.ItemText is missing");
+    (*warning_cnt)++;
+  }
+  for (int i = 0; i < int(sizeof(mdata.item_text)/sizeof(mdata.item_text[0])); i++) {
+    if (!streq(mdata.item_text[i], "") && streq(mdata.item_action[i], "")) {
+      dyn->graph->syntax_msg('W', object, "ContextMenu.ItemAction is missing");
+      (*warning_cnt)++;
     }
   }
   return 1;

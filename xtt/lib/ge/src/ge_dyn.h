@@ -201,6 +201,7 @@ typedef enum {
   ge_eDynPrio_DigScript,
   ge_eDynPrio_CatchSignal,
   ge_eDynPrio_EmitSignal,
+  ge_eDynPrio_ContextMenu,
 
   // This should always be last
   ge_eDynPrio_Script = 9998,
@@ -294,7 +295,8 @@ typedef enum {
   ge_mActionType1_MethodPulldownMenu = 1 << 23,
   ge_mActionType1_Script = 1 << 24,
   ge_mActionType1_CatchSignal = 1 << 25,
-  ge_mActionType1_EmitSignal = 1 << 26
+  ge_mActionType1_EmitSignal = 1 << 26,
+  ge_mActionType1_ContextMenu = 1 << 27
 } ge_mActionType1;
 
 typedef enum { ge_mActionType2_No = 0 } ge_mActionType2;
@@ -413,6 +415,7 @@ typedef enum {
   ge_eSave_DigTransparency = 77,
   ge_eSave_AnalogTransparency = 78,
   ge_eSave_UnitConvert = 79,
+  ge_eSave_ContextMenu = 80,
   ge_eSave_End = 99,
   ge_eSave_Dyn_dyn_type1 = 100,
   ge_eSave_Dyn_action_type1 = 101,
@@ -881,7 +884,27 @@ typedef enum {
   ge_eSave_AnalogTransparency_max_value = 7802,
   ge_eSave_UnitConvert_entity = 7900,
   ge_eSave_UnitConvert_db_unit = 7901,
-  ge_eSave_UnitConvert_display_unit = 7902
+  ge_eSave_UnitConvert_display_unit = 7902,
+  ge_eSave_ContextMenu_item_text1 = 8000,
+  ge_eSave_ContextMenu_item_text2 = 8001,
+  ge_eSave_ContextMenu_item_text3 = 8002,
+  ge_eSave_ContextMenu_item_text4 = 8003,
+  ge_eSave_ContextMenu_item_text5 = 8004,
+  ge_eSave_ContextMenu_item_text6 = 8005,
+  ge_eSave_ContextMenu_item_text7 = 8006,
+  ge_eSave_ContextMenu_item_text8 = 8007,
+  ge_eSave_ContextMenu_item_text9 = 8008,
+  ge_eSave_ContextMenu_item_text10 = 8009,
+  ge_eSave_ContextMenu_item_action1 = 8010,
+  ge_eSave_ContextMenu_item_action2 = 8011,
+  ge_eSave_ContextMenu_item_action3 = 8012,
+  ge_eSave_ContextMenu_item_action4 = 8013,
+  ge_eSave_ContextMenu_item_action5 = 8014,
+  ge_eSave_ContextMenu_item_action6 = 8015,
+  ge_eSave_ContextMenu_item_action7 = 8016,
+  ge_eSave_ContextMenu_item_action8 = 8017,
+  ge_eSave_ContextMenu_item_action9 = 8018,
+  ge_eSave_ContextMenu_item_action10 = 8019
 } ge_eSave;
 
 class GeDynElem;
@@ -2171,6 +2194,23 @@ public:
   int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int export_java(
       grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
+};
+
+//! Display the context menu.
+class GeContextMenu : public GeDynElem {
+public:
+  ge_sContextMenuData mdata;
+
+  GeContextMenu(GeDyn* e_dyn);
+  GeContextMenu(const GeContextMenu& x);
+  void get_attributes(attr_sItem* attrinfo, int* item_count);
+  void save(std::ofstream& fp);
+  void open(std::ifstream& fp);
+  int action(grow_tObject object, glow_tEvent event);
+  void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
+  void replace_attribute(char* from, char* to, int* cnt, int strict);
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 

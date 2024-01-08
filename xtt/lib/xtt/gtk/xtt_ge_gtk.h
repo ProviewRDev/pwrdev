@@ -96,6 +96,8 @@ public:
   void iconify(int val);
   void set_below(int val);
   void menu_setup(int edit);
+  void get_context_menu(void* mdata,
+      xmenu_mUtility caller, unsigned int priv, char* arg, int x, int y);
 
   static void ge_change_value_cb(void* ge_ctx, void* value_object, char* text);
   static void confirm_cb(void* ge_ctx, void* confirm_object, char* text);
@@ -125,6 +127,7 @@ public:
   static void activate_zoom_out(GtkWidget* w, gpointer data);
   static void activate_zoom_reset(GtkWidget* w, gpointer data);
   static void activate_help(GtkWidget* w, gpointer data);
+  static void activate_context_menu_button(GtkWidget* w, gpointer data);
   static void create_graph_form(GtkWidget* w, gpointer data);
   static void create_message_dia(GtkWidget* w, gpointer data);
   static void create_menu(GtkWidget* w, gpointer data);

@@ -203,6 +203,11 @@ typedef enum {
 } graph_eTrace;
 
 typedef struct {
+  char item_text[10][40];
+  char item_action[10][120];
+} ge_sContextMenuData;
+
+typedef struct {
   pwr_tFloat32* pres_max_limit_p;
   pwr_tFloat32* pres_min_limit_p;
   pwr_tFloat32 pres_max_limit_old;
@@ -513,6 +518,8 @@ public:
   int (*get_current_objects_cb)(void*, pwr_sAttrRef**, int**);
   void (*popup_menu_cb)(
       void*, pwr_sAttrRef, unsigned long, unsigned long, char*, int x, int y);
+  void (*context_menu_cb)(
+      void*, void*, unsigned long, char*, int x, int y);
   int (*call_method_cb)(
       void*, char*, char*, pwr_sAttrRef, unsigned long, unsigned long, char*);
   int (*sound_cb)(void*, pwr_tAttrRef*);
