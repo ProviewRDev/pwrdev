@@ -713,7 +713,7 @@
  som man bör dokumentera sin fläkt med. Objektet innehåller inga signaler.
  
  @b Objektbild
- @image orm_basefan_og.gif
+ @image orm_basefan_og.png
 
  <attr>Super 
   Superklass, klicka på länk Component för mer beskrivning om objektattributet. 
@@ -732,7 +732,7 @@
  som man bör dokumentera sin pump med. Objektet innehåller inga signaler.
  
  @b Objektbild
- @image orm_basepump_og.gif
+ @image orm_basepump_og.png
 
  <attr>Super 
   Superklass, klicka på länk Component för mer beskrivning om objektattributet. 
@@ -754,7 +754,7 @@
  (välja bort).
  
  @b Objektbild
- @image orm_basemotor_og.gif
+ @image orm_basemotor_og.png
 
  @b Motor med analog temperaturövervakning
  @image orm_basemotor_example1_og.gif
@@ -873,7 +873,7 @@
  (välja bort).
  
  @b Objektbild
- @image orm_baseelheater_og.gif
+ @image orm_baseelheater_og.png
 
  Bilden ovan visar en konfiguration där elementet har en temperatursensor som larmar för HH (hög hög)
  temp, indikatorn blir gul vid larmgräns H (hög).
@@ -1024,7 +1024,7 @@
  Knappar i bilden kan även konfigureras att visa Till/Från.
  
  @b Objektsbild
- @image orm_compmoded_og.gif
+ @image orm_compmoded_og.png
 
  Knappar Auto/Man växlar mod i fjärrstyrning och Start/stoppknappar används för att
  manuellt styra driften i fjärrstyrning (från bild, ej lokalt vid driften).
@@ -1073,7 +1073,7 @@
  -OnOff         Väljer knappar i objektsbild med text Till/Från
 
  @b Styrning av mod från objektsbild
- @image orm_compmoded_og.gif
+ @image orm_compmoded_og.png
   
  Bilden visar en konfiguration (default) där objektets alla funktioner används.
  Operatören väljer manuell eller auto mod via knapparna Man/Auto. I auto styrs
@@ -1355,7 +1355,7 @@
  Det finns inte någon inbyggd larmhantering i objektet.
 
  @b Objektsbild
- @image orm_compmodedm_og.gif
+ @image orm_compmodedm_og.png
 
  Knappar Auto/Man växlar mod i fjärrstyrning och Öppna/Stäng knappar används för att
  manuellt styra driften i fjärrstyrning (från bild, ej lokalt vid driften).
@@ -1383,7 +1383,7 @@
  -4 Ingång LocalOrder från funktionsobjektet och LocalMode.
 
  @b Styrning av mod från objektsbild
- @image orm_compmodedm_og.gif
+ @image orm_compmodedm_og.png
  
  Bilden ovan visar en konfiguration där nästa alla objektets funktioner används. 
  Operatören väljer manuell eller auto mod via knapparna Man/Auto. I auto styrs 
@@ -1524,7 +1524,7 @@
  Används bl.a i objektet BaseValveIncrDecr (motorventil) och BaseMotorIncDecrAggr (motoraggregat).
  
  @b Objektsbild
- @image orm_compmoded2_og.gif
+ @image orm_compmoded2_og.png
 
  Knappar Auto/Man växlar mod i fjärrstyrning och Öka/Minska/stoppknappar används för att
  manuellt styra driften i fjärrstyrning (från bild, ej lokalt vid driften).
@@ -1584,7 +1584,7 @@
  funktion.
 
  @b Styrning av mod från objektsbild
- @image orm_compmoded2_og.gif
+ @image orm_compmoded2_og.png
  
  Bilden ovan visar en konfiguration (default) där objektets alla funktioner används. Operatören
  väljer manuell eller auto mod via knapparna Man/Auto. I auto styrs utgångarna av
@@ -1956,7 +1956,7 @@
  med funktionen att musknapp måste hållas inne hela tiden (fjäderretur).
  
  @b Objektsbild
- @image orm_compmoded2m_og.gif
+ @image orm_compmoded2m_og.png
 
  Knappar Auto/Man växlar mod i fjärrstyrning och Öka/Minska/stoppknappar används för att
  manuellt styra driften i fjärrstyrning (från bild, ej lokalt vid driften).
@@ -1989,7 +1989,7 @@
  -OpenClose    Väljer knappar i objektsbild med text Öppna/Stäng 
  
  @b Styrning av mod från objektsbild
- @image orm_compmoded2m_og.gif
+ @image orm_compmoded2m_og.png
  
  Bilden ovan visar en konfiguration (default) där objektets alla funktioner används.
  Operatören väljer manuell eller auto mod via knapparna Man/Auto. I auto styrs utgångarna av
@@ -2151,7 +2151,7 @@
  Närbesläktat objekt utan digital signal och utan start/stopp knappar heter BaseCompModeAM.
 
  @b Objektsbild
- @image orm_compmodea_og.gif
+ @image orm_compmodea_og.png
 
  Knappar Auto/Man växlar mod i fjärrstyrning och Start/Stopp knappar används för att
  manuellt styra driften i fjärrstyrning (från bild, ej lokalt vid driften).
@@ -2202,7 +2202,7 @@
  -OnOff        Väljer knappar i objektsbild med text Till/Från
 
  @b Styrning av mod från objektsbild
- @image orm_compmodea_og.gif
+ @image orm_compmodea_og.png
  
  Bilden ovan visar en konfiguration där nästan objektets alla funktioner används. Operatören
  väljer manuell eller auto mod via knapparna Man/Auto. I auto styrs utgångarna av
@@ -2499,7 +2499,7 @@
    BaseCompModeA.
  
  @b Objektsbild
- @image orm_compmodeam_og.gif
+ @image orm_compmodeam_og.png
 
  Knappar Auto/Man växlar mod och inmatningsfältets värde används i manuell mod
  som referenssignal för driften i fjärrstyrning.
@@ -2533,7 +2533,7 @@
   inte andra moder eller refernsutgången på något sätt.
 
  @b Styrning av mod från objektsbild
- @image orm_compmodeam_og.gif
+ @image orm_compmodeam_og.png
  
  Bilden ovan visar en konfiguration där objektets alla funktioner används. Operatören
  väljer manuell eller auto mod via knapparna Man/Auto. I auto styrs utgången av
@@ -2670,7 +2670,7 @@
 @image orm_en1-141.gif
 
 @b Objektsbild regulator
-@image orm_pid_og.gif
+@image orm_pid_og.png
 
 Inmatningsfältet Set (gröna) används för att manuellt ändra börvärdet för regulatorn. Detta gäller
 under förutsättningen att INGET mod objekt är associerat (skrivs över).
@@ -2679,7 +2679,7 @@ under förutsättningen att INGET mod objekt är associerat (skrivs över).
    mod mm.
 
 @b Objektsbild för regulatorns modobjekt
-@image orm_mode_og.gif
+@image orm_mode_og.png
 
 @h1 Bra att veta
 I normalfallet används Pidobjekt tillsammans med ett Modeobjekt. Gäller även
@@ -3432,7 +3432,7 @@ successiva programcykler. I detta fall talar man om PID-algoritmens 'velocity'
 eller 'incremental form'. 
 
 @b Objektsbild
- @image orm_mode_og.gif
+ @image orm_mode_og.png
 
 @b Plc kod
 För PLC programmering används funktionsobjektet CompModePid.
@@ -3793,7 +3793,7 @@ Referens till objektet i planthierarkin.
  Objektets metoder (menyval) öppnas med höger musknapp.
     
  @b Objektbild
- @image orm_basesensor_og.gif
+ @image orm_basesensor_og.png
 
  @b Exempel på en objektsymbol typ sensor (FO1) i en bild.
  @image orm_base_sensor_objectsymbol.gif
@@ -3954,7 +3954,7 @@ Referens till objektet i planthierarkin.
  Objektets metoder (menyval) öppnas med höger musknapp.
 
  @b Objektbild
- @image orm_basetempsensor_og.gif
+ @image orm_basetempsensor_og.png
 
  @b Exempel på en objektsymbol typ sensor (FO1) i en bild.
  @image orm_base_sensor_objectsymbol.gif
@@ -4027,7 +4027,7 @@ Referens till objektet i planthierarkin.
  Objektets metoder (menyval) öppnas med höger musknapp.
 
  @b Objektbild
- @image orm_baseflowsensor_og.gif
+ @image orm_baseflowsensor_og.png
 
  @b Exempel på en objektsymbol typ sensor (FO1) i en bild.
  @image orm_base_sensor_objectsymbol.gif
@@ -4099,7 +4099,7 @@ Referens till objektet i planthierarkin.
  Objektets metoder (menyval) öppnas med höger musknapp.
 
  @b Objektbild
- @image orm_basepressuresensor_og.gif
+ @image orm_basepressuresensor_og.png
 
  @b Exempel på en objektsymbol typ sensor (FO1) i en bild.
  @image orm_base_sensor_objectsymbol.gif
@@ -4172,7 +4172,7 @@ Referens till objektet i planthierarkin.
  Objektets metoder (menyval) öppnas med höger musknapp.
 
  @b Objektbild
- @image orm_baselevelsensor_og.gif
+ @image orm_baselevelsensor_og.png
 
  @b Exempel på en objektsymbol typ sensor (FO1) i en bild.
  @image orm_base_sensor_objectsymbol.gif
@@ -4249,7 +4249,7 @@ Referens till objektet i planthierarkin.
  Objektets metoder (menyval) öppnas med höger musknapp.
     
  @b Objektbild
- @image orm_basepositsensor_og.gif
+ @image orm_basepositsensor_og.png
 
  Mått/mätenheten kan visas i bild bredvid mätvärdet Position och ställs in via Ai
  signalen attribut "Value.Unit".
@@ -4420,7 +4420,7 @@ Referens till objektet i planthierarkin.
  Objektets metoder (menyval) öppnas med höger musknapp.
 
  @b Objektbild
- @image orm_basesupswitch_og.gif
+ @image orm_basesupswitch_og.png
 
  @h1 Konfiguration
  @b Signal
@@ -4529,7 +4529,7 @@ Referens till objektet i planthierarkin.
  Objektets metoder (menyval) öppnas med höger musknapp.
 
  @b Objektbild
- @image orm_basetempswitch_og.gif
+ @image orm_basetempswitch_og.png
 
  @h1 Konfiguration
  @b Signal
@@ -4588,7 +4588,7 @@ Referens till objektet i planthierarkin.
  Objektets metoder (menyval) öppnas med höger musknapp.
 
  @b Objektbild
- @image orm_basepressureswitch_og.gif
+ @image orm_basepressureswitch_og.png
 
  @h1 Konfiguration
  @b Signal
@@ -4647,7 +4647,7 @@ Referens till objektet i planthierarkin.
  Objektets metoder (menyval) öppnas med höger musknapp.
 
  @b Objektbild
- @image orm_baselevelswitch_og.gif
+ @image orm_baselevelswitch_og.png
 
  @h1 Konfiguration
  @b Signal
@@ -4700,7 +4700,7 @@ Referens till objektet i planthierarkin.
  Objektets metoder (menyval) öppnas med höger musknapp.
 
  @b Objektbild
- @image orm_basefilter_og.gif
+ @image orm_basefilter_og.png
 
  @h1 Konfigurering
  BaseFilter objektet hanterar 2 olika alternativ:
@@ -4796,7 +4796,7 @@ Referens till objektet i planthierarkin.
  som man bör dokumentera sin ventil med.
  
  @b Objektbild
- @image orm_basevalve_og.gif
+ @image orm_basevalve_og.png
 
  <attr> Description
   @summary Textfält synlig i XTT som beskriver objektet lite mer än namnet på objektet
@@ -4825,7 +4825,7 @@ Referens till objektet i planthierarkin.
  som man bör dokumentera sin ventil med.
  
  @b Objektbild
- @image orm_base3wayvalve_og.gif
+ @image orm_base3wayvalve_og.png
 
  <attr>Super 
  Superklass, klicka på länk BaseValve för mer beskrivning om objektattributet. 
@@ -4844,7 +4844,7 @@ Referens till objektet i planthierarkin.
  som man bör dokumentera sitt spjäll med.
  
  @b Objektbild
- @image orm_basedamper_og.gif
+ @image orm_basedamper_og.png
 
  <attr> Description
   @summary Textfält synlig i XTT som beskriver objektet lite mer än namnet på objektet
@@ -4876,7 +4876,7 @@ Referens till objektet i planthierarkin.
  Används bl.a i objekt BaseCValve, BaseC3WayValve.
  
  @b Objektsbild
- @image orm_baseactuatora_og.gif
+ @image orm_baseactuatora_og.png
 
  Skalan och staplar "Position" "Order" "Manual" följer inställningar i attributen PresMaxLimit,
  PresMinLimit i Order attributet (Ao signalen). Dessa attribut går att ändra tillfälligt online
@@ -5066,7 +5066,7 @@ Referens till objektet i planthierarkin.
  i objekt BaseValveIncrDecr.
  
  @b Objektsbild
- @image orm_baseactuatorincrdecr_og.gif
+ @image orm_baseactuatorincrdecr_og.png
 
  @b Mod
  Dom olika moder Auto/Manuell/lokal som kan förekomma hanteras utav mod objektet
@@ -5302,7 +5302,7 @@ Referens till objektet i planthierarkin.
     Objektets metoder (menyval) öppnas med höger musknapp.
  
  @b Objektsbild
- @image orm_basevalveincrdecr_og.gif
+ @image orm_basevalveincrdecr_og.png
 
  @b Mod
  Dom olika moder Auto/Manuell/lokal som kan förekomma hanteras utav mod objektet
@@ -5478,7 +5478,7 @@ Referens till objektet i planthierarkin.
     Objektets metoder (menyval) öppnas med höger musknapp.
  
  @b Objektsbild
- @image orm_basecvalve_og.gif
+ @image orm_basecvalve_og.png
 
  Skalan och staplar "Position" "Order" "Manual" följer inställningar i objekt BaseActuatorA
  attributen PresMaxLimit, PresMinLimit i Order attributet (Ao signalen). Dessa attribut går
@@ -5641,7 +5641,7 @@ Referens till objektet i planthierarkin.
     Objektets metoder (menyval) öppnas med höger musknapp.
  
  @b Objektsbild
- @image orm_basec3wayvalve_og.gif
+ @image orm_basec3wayvalve_og.png
 
  Skalan och staplar "Position" "Order" "Manual" följer inställningar i objekt BaseActuatorA
  attributen PresMaxLimit, PresMinLimit i Order attributet (Ao signalen). Dessa attribut går
@@ -5722,7 +5722,7 @@ Referens till objektet i planthierarkin.
     Objektets metoder (menyval) öppnas med höger musknapp.
  
  @b Objektsbild
- @image orm_basecvalve_og.gif
+ @image orm_basecvalve_og.png
 
  Skalan och staplar "Position" "Order" "Manual" följer inställningar i objekt BaseActuatorA
  attributen PresMaxLimit, PresMinLimit i Order attributet (Ao signalen). Dessa attribut går
@@ -5860,7 +5860,7 @@ Referens till objektet i planthierarkin.
  Det finns ingen grafisk objektsymbol för detta objekt (endast i objektsbilden).
 
  @b Objektsbild
-  @image orm_basepropvalve_og.gif
+  @image orm_basepropvalve_og.png
 
  Dynamik för objektsymbol i objektsbilden ovan:
  
@@ -6009,7 +6009,7 @@ Referens till objektet i planthierarkin.
     Objektets metoder (menyval) öppnas med höger musknapp.
  
  @b Objektsbild
- @image orm_basemvalve_og.gif
+ @image orm_basemvalve_og.png
 
  @b Mod
  Dom olika moder Auto/Manuell/lokal som kan förekomma hanteras utav mod objektet
@@ -6197,7 +6197,7 @@ Referens till objektet i planthierarkin.
     Objektets metoder (menyval) öppnas med höger musknapp.
  
  @b Objektsbild
- @image orm_basem3wayvalve_og.gif
+ @image orm_basem3wayvalve_og.png
 
  @b Mod
  Dom olika moder Auto/Manuell/lokal som kan förekomma hanteras utav mod objektet
@@ -6274,7 +6274,7 @@ Referens till objektet i planthierarkin.
     Objektets metoder (menyval) öppnas med höger musknapp.
  
  @b Objektsbild
- @image orm_basemdamper_og.gif
+ @image orm_basemdamper_og.png
 
  @b Mod
  Dom olika moder Auto/Manuell/lokal som kan förekomma hanteras utav mod objektet
@@ -6337,12 +6337,12 @@ Referens till objektet i planthierarkin.
  Det finns ingen grafisk symbol för detta objekt
   
  @b Objektsbild
- @image orm_basedirvalve_og.gif
+ @image orm_basedirvalve_og.png
 
  Bilden visar när man manuellt beordrat öka, dvs utgången OrderIncr är 1.
 
  @b Ingen mod styrning
- @image orm_basedirvalve_example1_og.gif
+ @image orm_basedirvalve_example1_og.png
  
  Bilden ovan visar en konfiguration där ventilen inte har någon mod styrning (inga knappar i bilden).
  Dvs ingångar ExtOrderIncr, ExtOrderDecr i funktionsobjektet styr.
@@ -6486,7 +6486,7 @@ Referens till objektet i planthierarkin.
     Objektets metoder (menyval) öppnas med höger musknapp.
  
  @b Objektsbild
- @image orm_basemanvalve_og.gif
+ @image orm_basemanvalve_og.png
 
  Om ventilen inte har några gränslägen kan man manuellt i objektbilden sätta öppen eller stängt
  läge. För att välja denna funktion ska attribut OpIndication ställas till 1, dessutom ska
@@ -6611,7 +6611,7 @@ Referens till objektet i planthierarkin.
  Detta påverkar inte larmutgången Tripped i PLC funktionsobjektet.
  
  @b Objektbild
- @image orm_basecircuitbreaker_og.gif
+ @image orm_basecircuitbreaker_og.png
 
  Indikatorn Tripped (normalt grön) i bilden blir röd när brytaren är frånslagen, röda knappen
  trycks in och den grön går utåt, brytarens kontaktsymbol intar öppet läge.
@@ -6716,7 +6716,7 @@ Referens till objektet i planthierarkin.
  Detta påverkar inte utgången On i PLC funktionsobjektet.
  
  @b Objektbild
- @image orm_basesafetyswitch_og.gif
+ @image orm_basesafetyswitch_og.png
 
  Indikatorn On (normalt grön) i bilden blir grå när brytaren är frånslagen, vredet vrids över
  till 0-läget och ett rött hänglås visas, brytarens kontaktsymbol intar öppet läge.
@@ -6817,7 +6817,7 @@ Referens till objektet i planthierarkin.
  att detta INTE påverkar larmutgången Overload i PLC funktionsobjektet.
  
  @b Objektbild
- @image orm_baseoverloadrelay_og.gif
+ @image orm_baseoverloadrelay_og.png
 
  Indikatorn Overload blir röd när skyddet löser ut.
 
@@ -6930,7 +6930,7 @@ Referens till objektet i planthierarkin.
  funktionsobjektet. Vill man ha larm i alternativ 2 och 3 ovan får man programmera det själv.
  
  @b Objektbild
- @image orm_basecontactor_og.gif
+ @image orm_basecontactor_og.png
  
  Indikatorer:
 
@@ -7275,7 +7275,7 @@ Referens till objektet i planthierarkin.
  backup på får man själv lägga in i PLC programmet eller i objektet , se exempel nedan.
  
  @b Objektbild
- @image orm_runtimecounter_og.gif
+ @image orm_runtimecounter_og.png
  
  Bilden visar den totala, tripp och förra tripptidräkningen.
  
@@ -7470,7 +7470,7 @@ Referens till objektet i planthierarkin.
  Objektets metoder (menyval) öppnas med höger musknapp.
 
  @b Objektsbild
- @image orm_basemotoraggr_og.gif
+ @image orm_basemotoraggr_og.png
 
  Indikatorer:
  
@@ -7854,7 +7854,7 @@ Referens till objektet i planthierarkin.
  Objektets metoder (menyval) öppnas med höger musknapp.
 
  @b Objektsbild
- @image orm_basefanaggr_og.gif
+ @image orm_basefanaggr_og.png
 
  Indikatorer:
  
@@ -7977,7 +7977,7 @@ Referens till objektet i planthierarkin.
  Objektets metoder (menyval) öppnas med höger musknapp.
 
  @b Objektsbild
- @image orm_basepumpaggr_og.gif
+ @image orm_basepumpaggr_og.png
 
  Indikatorer:
  
@@ -8110,7 +8110,7 @@ Referens till objektet i planthierarkin.
  Objektets metoder (menyval) öppnas med höger musknapp.
 
  @b Objektsbild
- @image orm_basemotorincrdecraggr_og.gif
+ @image orm_basemotorincrdecraggr_og.png
 
  Indikatorer:
  
@@ -8552,7 +8552,7 @@ Referens till objektet i planthierarkin.
  Objektets metoder (menyval) öppnas med höger musknapp.
 
  @b Objektsbild
- @image orm_basefcppo5motoraggr_og.gif
+ @image orm_basefcppo5motoraggr_og.png
 
  Indikatorer:
  
@@ -9068,7 +9068,7 @@ Referens till objektet i planthierarkin.
  Objektets metoder (menyval) öppnas med höger musknapp.
 
  @b Objektsbild
- @image orm_basefcppo5fanaggr_og.gif
+ @image orm_basefcppo5fanaggr_og.png
 
  Indikatorer:
  
@@ -9208,7 +9208,7 @@ Referens till objektet i planthierarkin.
  Objektets metoder (menyval) öppnas med höger musknapp.
 
  @b Objektsbild
- @image orm_basefcppo5pumpaggr_og.gif
+ @image orm_basefcppo5pumpaggr_og.png
 
  Indikatorer:
  
@@ -9312,7 +9312,7 @@ Referens till objektet i planthierarkin.
  Det finns ingen symbol för detta objekt.
 
  @b Objektsbild
- @image orm_basefcppo5_og.gif
+ @image orm_basefcppo5_og.png
 
  Indikatorer:
  
@@ -10103,7 +10103,7 @@ Referens till objektet i planthierarkin.
  Objektets metoder (menyval) öppnas med höger musknapp.
 
  @b Objektsbild
- @image orm_basefcppo3motoraggr_og.gif
+ @image orm_basefcppo3motoraggr_og.png
 
  Indikatorer:
  
@@ -10617,7 +10617,7 @@ Referens till objektet i planthierarkin.
  Objektets metoder (menyval) öppnas med höger musknapp.
 
  @b Objektsbild
- @image orm_basefcppo3fanaggr_og.gif
+ @image orm_basefcppo3fanaggr_og.png
 
  Indikatorer:
  
@@ -10758,7 +10758,7 @@ Referens till objektet i planthierarkin.
  Objektets metoder (menyval) öppnas med höger musknapp.
 
  @b Objektsbild
- @image orm_basefcppo3pumpaggr_og.gif
+ @image orm_basefcppo3pumpaggr_og.png
 
  Indikatorer:
  
@@ -10863,7 +10863,7 @@ Referens till objektet i planthierarkin.
  Det finns ingen symbol för detta objekt.
 
  @b Objektsbild
- @image orm_basefcppo3_og.gif
+ @image orm_basefcppo3_og.png
 
  Indikatorer:
  

@@ -40,7 +40,7 @@ SObject pwrb:Class
 !  @Version 1.0
 !  @Group Plc,PlcEdit
 !  @Summary Red warning triangle
-!  Red warning triangle.
+!  Yellow warning triangle.
 !*/
   Object YellowWarning $ClassDef 676 
     Body SysBody

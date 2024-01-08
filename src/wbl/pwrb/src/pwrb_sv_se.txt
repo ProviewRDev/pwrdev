@@ -252,7 +252,7 @@ Placera i utvecklingsmiljön objektet under $PlantHier objekt så att det kommer
 att tillhöra samma målnod som dess associerade kanalobjekt. 
 
 @b Objeksbild
-@image orm_ai_og.gif
+@image orm_ai_og.png
 
 <attr>Description 
 Valfri text för att beskriva vilken fysisk signal som representeras; t.ex. 
@@ -609,7 +609,7 @@ Placera i utvecklingsmiljön objektet under $PlantHier objekt så att det
 kommer att tillhöra samma målnod som dess associerade kanalobjekt. 
 
 @b Objektsbild
- @image orm_ao_og.gif
+ @image orm_ao_og.png
 
 <attr>Description 
 Valfri text för beskriva vilken fysisk signal som representeras; t.ex. 
@@ -1067,7 +1067,7 @@ Placera i utvecklingsmiljön objektet under $ PlantHier objekt.
 Objektet tilldelas initialt värde (? 0 ) i målnoden, t.ex. med hjälp av StoAv.
 
 @b Objektsbild
- @image orm_av_og.gif
+ @image orm_av_og.png
 
 <attr>Description 
 Valfri beskrivande text för att beskriva vad storheten representerar eller vad 
@@ -1240,7 +1240,7 @@ menas med snabbt resp. långsamt anges av CycleFast resp. CycleSlow .
 Backup_Conf konfigureras direkt under aktuellt $Node objekt 
 
 @b Objektsbild
-@image orm_backup_conf_og.gif
+@image orm_backup_conf_og.png
 
 @b Se även 
 
@@ -1728,7 +1728,7 @@ För att skapa kortobjekt med tillhörande kanalobjekt används lämpligen
 funktionen 'Configure Card' i "Utility Window". 
 
 @b Objektsbild
-@image orm_chanai_og.gif
+@image orm_chanai_og.png
 
 @b Se även
 
@@ -1832,7 +1832,7 @@ För att skapa kortobjekt med tillhörande kanalobjekt används lämpligen
 funktionen 'Configure Card' i "Utility Window". 
 
 @b Objektsbild
-  @image orm_chanao_og.gif
+  @image orm_chanao_og.png
 
 <attr>Description 
 Valfri text för att beskriva kanalen eller dess användning. 
@@ -2012,7 +2012,7 @@ För att skapa kortobjekt med tillhörande kanalobjekt används lämpligen
 funktionen 'Configure Card' i "Utility Window". 
 
 @b Objeksbild
- @image orm_chandi_og.gif
+ @image orm_chandi_og.png
 
 <attr>Description 
 Valfri text för att beskriva kanalen eller dess användning. 
@@ -2088,7 +2088,7 @@ För att skapa kortobjekt med tillhörande kanalobjekt används lämpligen
 funktionen 'Configure Card' i "Utility Window". 
 
 @b Objektsbild
- @image orm_chando_og.gif
+ @image orm_chando_og.png
 
 <attr>Description 
 Valfri text för att beskriva kanalen eller dess användning. 
@@ -2175,6 +2175,9 @@ Heltals-värdet lagras som en 32-bitars signed integer.
 @b Tips 
 ChanIi objekt konfigureras under lämpligt Ii kort eller modul objekt. 
 
+@b Objeksbild
+ @image orm_chanii_og.png
+
 <attr>Description 
 Valfri text för att beskriva kanalen eller dess användning. 
 </attr>
@@ -2215,6 +2218,9 @@ baseras på.
 @b Tips 
 ChanIo objekt konfigureras direkt under lämpligt Io kort eller modul objekt. 
 Rack- och kortobjekt för olika I/O system är separat dokumenterade. 
+
+@b Objeksbild
+ @image orm_chanio_og.png
 
 <attr>Description 
 Valfri text för att beskriva kanalen eller dess användning. 
@@ -3735,7 +3741,7 @@ Placera objektet i utvecklingsmiljön under $PlantHier objekt så att det kommer
 att tillhöra samma målnod som dess associerade kanalobjekt. 
 
 @b Objektsbild
- @image orm_di_og.gif
+ @image orm_di_og.png
 
 <attr>Description 
 Valfri text för att beskriva vilken fysisk signal som representeras; t.ex. 
@@ -3973,7 +3979,7 @@ Placera i utvecklingsmiljön objektet under $ PlantHier objekt så att det
 kommer att tillhöra samma målnod som dess associerade kanalobjekt. 
 
 @b Objektsbild
- @image orm_do_og.gif
+ @image orm_do_og.png
 
 <attr>Description 
 Valfri text för att beskriva vilken fysisk signal som representeras; t.ex. 
@@ -4621,7 +4627,7 @@ startas i noden.
 @image orm_en1-68.gif
   
 @b Object graph
- @image orm_dsfastconf_og.gif
+ @image orm_dsfastconf_og.png
  
 @b Se även 
 
@@ -4980,6 +4986,9 @@ signalobjekt.
 @image orm_en1-70.gif
 Configuration of a DsTrend Object 
 
+@b Objektsbild
+ @image orm_dstrend_og.png
+
 <attr>Description 
 Valfri text. 
 </attr>
@@ -5097,7 +5106,7 @@ Om ett Ds_Trend jobb laddas till nod som saknar DsTrendConf objekt kommer
 det att exekvera med 1 Hz. 
 
 @b Objektsbild
- @image orm_dstrendconf_og.gif
+ @image orm_dstrendconf_og.png
 
 @b Se även 
 
@@ -5691,7 +5700,7 @@ Objektet tilldelas initialt värde (? FALSE ) i målnoden, t.ex. med hjälp av
 StoDv.
 
 @b Objektsbild
- @image orm_dv_og.gif
+ @image orm_dv_og.png
 
 <attr>Description 
 Valfri beskrivande text för att beskriva vad storheten representerar eller vad 
@@ -6051,6 +6060,7 @@ Sann första varvet efter start eller omstart.
 #
 <class> Form
 @Summary Konfigurerar fönster för visning av formulär. 
+@h2 Föråldrad sedan V3.4
 Konfigurerar fönster för visning av formulär. 
 
 För att på bildskärm kunna visa formulär krävs att de knyts till Form-objekt 
@@ -7437,7 +7447,7 @@ Placera objektet i utvecklingsmiljön under $PlantHier objekt så att det kommer
 att tillhöra samma målnod som dess associerade kanalobjekt. 
 
 @b Objektsbild
- @image orm_ii_og.gif
+ @image orm_ii_og.png
 
 <attr>Description 
 Valfri text för att beskriva vilken fysisk signal som representeras; t.ex. 
@@ -7755,7 +7765,7 @@ Placera i utvecklingsmiljön objektet under $PlantHier objekt så att det
 kommer att tillhöra samma målnod som dess associerade kanalobjekt. 
 
 @b Objektsbild
- @image orm_io_og.gif
+ @image orm_io_og.png
 
 <attr>Description 
 Valfri text för att beskriva vilken fysisk signal som representeras; t.ex. 
@@ -7834,7 +7844,7 @@ nodens realtidsmiljö att skapa ett. Attributen kommer då att innehåller
 defaultvärden. 
 
 @b Objektsbild
- @image orm_iohandler_og.gif
+ @image orm_iohandler_og.png
 
 <attr>CycleTimeBus 
 Anger, i sekunder, med vilken cykeltid Ai och Ao signaler anslutna till lokalt 
@@ -7969,7 +7979,7 @@ Konfigurerar beräknad heltals-storhet under 'Plant Configuration'. Värdet
 Placera i utvecklingsmiljön objektet under $PlantHier objekt. 
 
 @b Objektsbild
- @image orm_iv_og.gif
+ @image orm_iv_og.png
 
 <attr>Description 
 Valfri beskrivande text för att beskriva vad storheten representerar eller vad 
@@ -8632,7 +8642,7 @@ För information om meddelandehanteraren hänvisas till ProviewR
 Designer's Guide . 
 
 @b Objektsbild
- @image orm_messagehandler_og.gif
+ @image orm_messagehandler_og.png
 
 <attr>OutunitServer 
 </attr>
@@ -8747,7 +8757,7 @@ successiva programcykler. I detta fall talar man om PID-algoritmens 'velocity'
 eller 'incremental form'. 
 
 @b Objektsbild
- @image orm_mode_og.gif
+ @image orm_mode_og.png
 
 <attr>XSetVal 
 Externt börvärde (= Set point Val ue). Attributet används enbart i läge 
@@ -10615,7 +10625,7 @@ med noll.
 Ratio Control 
 
 @b Objektsbild
- @image orm_pid_og.gif
+ @image orm_pid_og.png
 
 @b Se även
 
@@ -11366,7 +11376,7 @@ processen som startar alla trådarna. Övriga attribut är utdata från
 plc tråden och uppdateras periodiskt.
 
 @b Objektsbild
-  @image orm_plcthread_og.gif
+  @image orm_plcthread_og.png
 
 <attr>Description
 Beskrivning av plc-tråden.
@@ -11502,6 +11512,9 @@ Användarna 'Host' och 'Process', enligt figur nedan, kommer att se samma
 listor men genom att gruppera PlotGroup-objekten i separata hierarkier kan
 konstruktören indikera vilka som är avsedda för 'Host' resp 'Process'
 @image orm_en1-170.gif
+
+@b Objektsbild
+ @image orm_plotgroup_og.png
 
 <attr>Description 
 Valfri text för att t.ex beskriva kurvgruppen. 
@@ -12070,7 +12083,7 @@ TimerTime.
 Om insignalen triggar ett Pulse-objekt som redan håller på med en puls, 
 kommer den pågående pulsen att förlängas, eftersom pulslängden, TimerTime , 
 räknas från insignalens senaste positiva flank. 
-@image orm_en1-182.gif
+@image orm_pulse_fig1.png
 
 @b Tips 
 
@@ -12542,6 +12555,7 @@ Beskrivning av objektet.
 #
 <class> RttConfig
 @Summary Konfigurering av rtt och xtt.
+@h2 Föråldrad sedan V4.7.0
 Konfigurering av rtt och xtt.
 </class>
 
@@ -12943,7 +12957,7 @@ odefinierat. Därför finns två versioner av vippan:
 
 SR_S vippan blir TRUE ( = S et) då båda ingångarna är satta 
 SR_R vippan blir FALSE ( = R eset) då båda ingångarna är satta 
-@image orm_en1-204.gif
+@image orm_sr_s_fig1.png
  
 @b Se även
 
@@ -12985,7 +12999,7 @@ odefinierat. Därför finns två versioner av vippan:
 
 SR_S vippan blir TRUE ( = S et) då båda ingångarna är satta 
 SR_R vippan blir FALSE ( = R eset) då båda ingångarna är satta 
-@image orm_en1-204.gif
+@image orm_sr_s_fig1.png
  
 @b Se även
 
@@ -14365,7 +14379,7 @@ Då insignalen blir:
 
 TRUE blir utgången också TRUE. 
 FALSE startas timern. Efter tiden TimerTime blir utgången också FALSE. 
-@image orm_en1-231.gif
+@image orm_timer_fig1.png
  
 Jämför funktionen hos Wait-objekt. 
 
@@ -14602,8 +14616,8 @@ Ej implementerad funktion. Anger operatörens behörighet att initiera
 #
 <class> User
 @Summary Konfigurerar operatörsstations användarkategori. 
+@h2 Föråldrad sedan V4.7.0
 Konfigurerar operatörsstations användarkategori. 
-
 
 Konfigurerar en användarkategori under ett OpPlace-objekt. User-objektet 
 och OpPlace-objektet bildar ett par om deras respektive OpNumber har samma 
@@ -15001,7 +15015,7 @@ Länkas in i timerkön vid positiv flank på insignalen.
 Då fördröjningen TimerTime löpt ut, och om insignalen fortfarande är TRUE 
 blir utgången TRUE. Utgången blir FALSE då insignalen blir FALSE. 
 
-@image orm_en1-245.gif
+@image orm_wait_fig1.png
  
 @b Se även
 
@@ -16525,7 +16539,7 @@ Analog ingång i radianer.
 </attr>
 <attr>FactorIn
 Faktor som multipliceras med In före beräkningen av sinus värdet. Om
-ingånsvärdet är i grader, ska FactorIn vara 180 / PI.
+ingångsvärdet är i grader, ska FactorIn vara 180 / PI.
 </attr>
 <attr>FactorVal
 Faktor som multipliceras med det beräknade sinus värdet.
@@ -16541,7 +16555,7 @@ Beräknat värde (FactorVal * sin( FactorIn * In))
 <class> Cos
 @Summary Cosinus funktion
 Sin beräknar cosinus av ingången, där ingångsvärdet ges i radianer.
-@image orm_cos_fo.gif
+@image orm_cos_fo.png
 Utgången ActVal beräknas enligt
 
 ActVal = FactorVal * cos( FactorIn * In)
@@ -16624,7 +16638,7 @@ Beräknat värde (FactorVal * asin( FactorIn * In))
 <class> ACos
 @Summary Arccosinus funktion
 Sin beräknar arccosinus av ingången, där ingångsvärdet.
-@image orm_acos_fo.gif
+@image orm_acos_fo.png
 Ingångsvärdet ska vara i området -1 / FactorIn till 1 / FactorIn, annars
 är resultatet odefinierat.
 Resultatet ar i radianer mellan -PI / 2 * FactorVal och PI / 2 * FactorVal.
