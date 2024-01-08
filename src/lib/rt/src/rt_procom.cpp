@@ -1133,7 +1133,7 @@ void rt_procom::provideObjects(pwr_tStatus sts, std::vector<procom_obj>& ovect)
     }
     g.size = ovect[i].body_size;
 
-    rsp->g[0] = g;
+    rsp->g[i] = g;
   }
 
   if (m_getmsg->type.s == (qcom_eStype)net_eMsg_oidToObject) {

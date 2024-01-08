@@ -1327,7 +1327,8 @@ char* opc_provider::name_to_objectname(char* name)
     if (t - n >= (int)sizeof(n) - 1)
       break;
 
-    if (*s == '[' || *s == ']' || *s == '-' || *s == '/' || *s == '.')
+    if (*s == '[' || *s == ']' || *s == '-' || *s == '/' || *s == '.' 
+	|| *s == ' ')
       *t = '$';
     else
       *t = *s;
