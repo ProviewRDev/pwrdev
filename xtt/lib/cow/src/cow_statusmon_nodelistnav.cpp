@@ -1083,10 +1083,37 @@ int NodelistNav::get_selected_opplace(char* address, int* busid, char* opplace, 
   return 0;
 }
 
+int NodelistNav::get_node(char* name, int* idx)
+{
+  for (int i = 0; i < node_list.size(); i++) {
+    if (str_NoCaseStrcmp(name, node_list[i].node_name) == 0) {
+      *idx = i;
+      return 1;
+    }
+  }
+  return 0;
+}
+
+int NodelistNav::get_node_data(int idx, char* node_name, char* address, int* busid,
+    char* opplace, char* descr)
+{
+  if (idx >= node_list.size() || idx < 0)
+    return 0;
+  if (address)
+    strcpy(address, node_list[idx].address);
+  if (busid)
+    *busid = node_list[idx].busid;
+  if (opplace)
+    strcpy(opplace, node_list[idx].opplace);
+  if (descr)
+    strcpy(descr, node_list[idx].description);
+  return 1;
+}
+
 int NodelistNav::set_node_data(int idx, char* node_name, char* address, int busid,
     char* opplace, char* descr)
 {
-  if (idx >= node_list.size())
+  if (idx >= node_list.size() || idx < 0)
     return 0;
   if (address)
     strncpy(node_list[idx].address, address, sizeof(node_list[idx].address));

@@ -99,6 +99,7 @@ public:
   int resize_restrictions_set;
   double window_resize_delta;
   CoWow* wow;
+  void *contextmenudata;
 
   CowGe(void* parent_ctx, const char* name, const char* filename, int scrollbar,
       int menu, int navigator, int width, int height, int x, int y,
@@ -134,6 +135,10 @@ public:
   {
   }
   virtual void set_below(int val)
+  {
+  }
+  virtual void get_context_menu(void* mdata,
+      unsigned int caller, unsigned int priv, char* arg, int x, int y)
   {
   }
 
@@ -182,6 +187,8 @@ public:
   static void ge_display_in_xnav_cb(void* ge_ctx, pwr_sAttrRef* arp);
   static void ge_popup_menu_cb(void* ge_ctx, pwr_sAttrRef attrref,
       unsigned long item_type, unsigned long utility, char* arg, int x, int y);
+  static void ge_context_menu_cb(void* ge_ctx, void* menudata,
+      unsigned long utility, char* arg, int x, int y);
   static int ge_call_method_cb(void* ge_ctx, char* method, char* filter,
       pwr_sAttrRef attrref, unsigned long item_type, unsigned long utility,
       char* arg);

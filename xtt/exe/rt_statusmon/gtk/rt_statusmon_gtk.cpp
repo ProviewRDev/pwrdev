@@ -68,6 +68,7 @@ int main(int argc, char* argv[])
   int mode = nodelist_eMode_SystemStatus;
   int view_descr = 0;
   int init_gdh = 0;
+  int open_map = 0;
   char language[20] = "";
   pwr_tFileName conf_file = "";
 
@@ -103,6 +104,8 @@ int main(int argc, char* argv[])
         view_descr = 1;
       } else if (streq(argv[i], "-g")) {
         init_gdh = 1;
+      } else if (streq(argv[i], "-o")) {
+        open_map = 1;
       } else if (streq(argv[i], "-c")) {
         if (argc == i) {
           usage();
@@ -132,6 +135,8 @@ int main(int argc, char* argv[])
       conf_file, &sts);
   nl->close_cb = statusmon_close;
   nl->set_scantime(3);
+  if (open_map)
+    nl->activate_open_map();
 
   gtk_main();
   return (0);

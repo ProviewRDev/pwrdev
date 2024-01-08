@@ -56,6 +56,9 @@ public:
   GtkWidget* toplevel;
   GtkWidget* form_nodelist;
   GtkWidget* nodelistnav_widget;
+  GtkWidget* msg_label;
+  GtkWidget* cmd_prompt;
+  GtkWidget* cmd_input;
   GdkCursor* clock_cursor;
   GtkWidget* add_india_widget;
   GtkWidget* add_india_label;
@@ -80,8 +83,11 @@ public:
   GtkWidget* mod_india_text4;
   GtkWidget* mod_india_text5;
   CoWowFocusTimerGtk focustimer;
+  CoWowRecall* cmd_recall;
+  CoWowEntryGtk* recall_entry;
 
   void pop();
+  void message(char severity, const char* message);
   void set_clock_cursor();
   void reset_cursor();
   void free_cursor();
@@ -106,9 +112,11 @@ public:
       int (*is_authorized_cb)(void*, unsigned int),
       void (*keyboard_cb)(void*, void*, int, int),
       int (*extern_connect_cb)(void*, char*, void**, pwr_tRefId*));
+  void set_prompt(const char* prompt);
 
   static gboolean action_inputfocus(
       GtkWidget* w, GdkEvent* event, gpointer data);
+  static void valchanged_cmd_input(GtkWidget* w, gpointer data);
   static void activate_exit(GtkWidget* w, gpointer data);
   static void activate_add_node(GtkWidget* w, gpointer data);
   static void activate_modify_node(GtkWidget* w, gpointer data);
@@ -119,6 +127,7 @@ public:
   static void activate_open_map(GtkWidget* w, gpointer data);
   static void activate_save(GtkWidget* w, gpointer data);
   static void activate_reconnect(GtkWidget* w, gpointer data);
+  static void activate_command(GtkWidget* w, gpointer data);
   static void activate_show_events(GtkWidget* w, gpointer data);
   static void activate_pop_events(GtkWidget* w, gpointer data);
   static void activate_gui_qt(GtkWidget* w, gpointer data);

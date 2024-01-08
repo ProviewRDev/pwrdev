@@ -41,6 +41,7 @@
 #include "co_cdh.h"
 #include "co_dcli.h"
 #include "co_time.h"
+#include "co_string.h"
 #include "rt_gdh.h"
 #include "rt_xnav_msg.h"
 
@@ -49,6 +50,38 @@
 #include "cow_statusmon_nodelistnav_gtk.h"
 #include "cow_ge_gtk.h"
 #include "cow_wutl_gtk.h"
+
+void NodelistGtk::valchanged_cmd_input(GtkWidget* w, gpointer data)
+{
+  NodelistGtk* nl = (NodelistGtk*)data;
+  int sts;
+  char *text, *textutf8;
+
+  textutf8 = gtk_editable_get_chars(GTK_EDITABLE(w), 0, -1);
+  text = g_convert(textutf8, -1, "ISO8859-1", "UTF-8", NULL, NULL, NULL);
+  g_free(textutf8);
+
+  if (nl->command_open) {
+    sts = nl->command(text);
+    g_object_set(w, "visible", FALSE, NULL);
+    nl->set_prompt("");
+    nl->command_open = 0;
+    //nl->set_focus(nl->focused_component);
+  }
+  g_free(text);
+}
+
+void NodelistGtk::set_prompt(const char* prompt)
+{
+  if (streq(prompt, "")) {
+    g_object_set(cmd_prompt, "visible", FALSE, NULL);
+    g_object_set(msg_label, "visible", TRUE, NULL);
+  } else {
+    g_object_set(msg_label, "visible", FALSE, NULL);
+    g_object_set(cmd_prompt, "visible", TRUE, NULL);
+    gtk_label_set_text(GTK_LABEL(cmd_prompt), prompt);
+  }
+}
 
 static gint delete_event(GtkWidget* w, GdkEvent* event, gpointer data)
 {
@@ -144,6 +177,12 @@ NodelistGtk::NodelistGtk(void* nodelist_parent_ctx,
   g_signal_connect(
       file_reconnect, "activate", G_CALLBACK(activate_reconnect), this);
 
+  GtkWidget* file_command = gtk_menu_item_new_with_mnemonic("_Command");
+  g_signal_connect(
+      file_command, "activate", G_CALLBACK(activate_command), this);
+  gtk_widget_add_accelerator(file_command, "activate", accel_g, 'b',
+      GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+
   GtkMenu* file_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_save);
   gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_reconnect);
@@ -154,6 +193,7 @@ NodelistGtk::NodelistGtk(void* nodelist_parent_ctx,
   gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_open_opplace);
   gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_open_rtmon);
   gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_open_map);
+  gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_command);
   gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_close);
 
   GtkWidget* file
@@ -346,13 +386,39 @@ NodelistGtk::NodelistGtk(void* nodelist_parent_ctx,
     wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_earth_d_30.png" : "$pwr_exe/ico_earth_l_30.png", G_CALLBACK(activate_open_map), 
       "Map", this, 1, 1);
 
+
+  // Statusbar and cmd input
+  GtkWidget* statusbar = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+  msg_label = gtk_label_new("");
+  gtk_widget_set_size_request(msg_label, -1, 25);
+  cmd_prompt = gtk_label_new("smon > ");
+  gtk_widget_set_size_request(cmd_prompt, -1, 25);
+
+  cmd_recall = new CoWowRecall();
+  recall_entry = new CoWowEntryGtk(cmd_recall);
+  cmd_input = recall_entry->widget();
+
+  gtk_widget_set_size_request(cmd_input, -1, 25);
+  g_signal_connect(
+      cmd_input, "activate", G_CALLBACK(valchanged_cmd_input), this);
+
+  gtk_box_pack_start(GTK_BOX(statusbar), msg_label, FALSE, FALSE, 0);
+  gtk_box_pack_start(GTK_BOX(statusbar), cmd_prompt, FALSE, FALSE, 0);
+  gtk_box_pack_end(GTK_BOX(statusbar), cmd_input, TRUE, TRUE, 0);
+  gtk_widget_show_all(statusbar);
+
   gtk_box_pack_start(GTK_BOX(vbox), GTK_WIDGET(menu_bar), FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(vbox), GTK_WIDGET(tools), FALSE, FALSE, 0);
-  gtk_box_pack_end(
+  gtk_box_pack_start(
       GTK_BOX(vbox), GTK_WIDGET(nodelistnav_widget), TRUE, TRUE, 0);
+  gtk_box_pack_end(
+      GTK_BOX(vbox), GTK_WIDGET(statusbar), FALSE, FALSE, 0);
 
   gtk_container_add(GTK_CONTAINER(toplevel), vbox);
   gtk_widget_show_all(toplevel);
+
+  g_object_set(cmd_prompt, "visible", FALSE, NULL);
+  g_object_set(cmd_input, "visible", FALSE, NULL);
 
   wow = new CoWowGtk(toplevel);
   nodelistnav->set_input_focus();
@@ -373,6 +439,14 @@ NodelistGtk::~NodelistGtk()
 void NodelistGtk::pop()
 {
   gtk_window_present(GTK_WINDOW(toplevel));
+}
+
+void NodelistGtk::message(char severity, const char* message)
+{
+  char* messageutf8
+      = g_convert(message, -1, "UTF-8", "ISO8859-1", NULL, NULL, NULL);
+  gtk_label_set_text(GTK_LABEL(msg_label), messageutf8);
+  g_free(messageutf8);
 }
 
 void NodelistGtk::set_clock_cursor()
@@ -482,6 +556,29 @@ void NodelistGtk::activate_reconnect(GtkWidget* w, gpointer data)
   Nodelist* nodelist = (Nodelist*)data;
 
   nodelist->activate_reconnect();
+}
+
+void NodelistGtk::activate_command(GtkWidget* w, gpointer data)
+{
+  NodelistGtk* nodelist = (NodelistGtk*)data;
+
+  if (nodelist->command_open) {
+    g_object_set(nodelist->cmd_input, "visible", FALSE, NULL);
+    nodelist->set_prompt("");
+    nodelist->command_open = 0;
+    return;
+  }
+
+  g_object_set(nodelist->msg_label, "visible", FALSE, NULL);
+  g_object_set(nodelist->cmd_input, "visible", TRUE, NULL);
+  nodelist->message(' ', "");
+
+  gtk_widget_grab_focus(nodelist->cmd_input);
+
+  gtk_editable_delete_text(GTK_EDITABLE(nodelist->cmd_input), 0, -1);
+  nodelist->set_prompt("smon >        ");
+  nodelist->recall_entry->set_recall_buffer(nodelist->cmd_recall);
+  nodelist->command_open = 1;
 }
 
 void NodelistGtk::activate_show_events(GtkWidget* w, gpointer data)

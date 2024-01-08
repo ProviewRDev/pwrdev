@@ -44,17 +44,131 @@
 #include "co_dcli.h"
 #include "co_dcli_msg.h"
 #include "co_string.h"
+#include "cow_xhelp.h"
 #include "cow_statusmon_nodelist.h"
 
 static int nodelist_select_func(void* client_data, void* client_flag);
 static int nodelist_open_func(void* client_data, void* client_flag);
+static int nodelist_help_func(void* client_data, void* client_flag);
 
 dcli_tCmdTable nodelist_command_table[] = { 
   { "SELECT", &nodelist_select_func, { "dcli_arg1", "/NODE", "" } },
   { "OPEN", &nodelist_open_func, { "dcli_arg1", "dcli_arg2",
-      "/WIDTH", "/HEIGHT", "" } },
+      "/WIDTH", "/HEIGHT", "/NODE", "/FILE", "" } },
+  { "HELP", &nodelist_help_func,
+      { "dcli_arg1", "dcli_arg2", "dcli_arg3", "dcli_arg4", "/HELPFILE",
+          "/POPNAVIGATOR", "/BOOKMARK", "/INDEX", "/BASE", "/RETURNCOMMAND",
+          "/WIDTH", "/HEIGHT", "/VERSION", "/STRICT", "" } },
   { "", NULL, { "" } }
 };
+
+static int nodelist_help_func(void* client_data, void* client_flag)
+{
+  Nodelist* nodelist = (Nodelist*)client_data;
+  int sts;
+  char arg_str[80];
+  char file_str[80];
+  char bookmark_str[80];
+  char key[80];
+  char return_str[80];
+  int pop;
+  int width, height;
+  int nr;
+
+  if (ODD(dcli_get_qualifier("/INDEX", file_str, sizeof(file_str)))) {
+    if (ODD(dcli_get_qualifier("/HELPFILE", file_str, sizeof(file_str)))) {
+      sts = CoXHelp::dhelp_index(navh_eHelpFile_Other, file_str);
+      if (EVEN(sts))
+        nodelist->message('E', "Unable to find file");
+    } else {
+      if (ODD(dcli_get_qualifier("/BASE", 0, 0)))
+        sts = CoXHelp::dhelp_index(navh_eHelpFile_Base, NULL);
+      else
+        sts = CoXHelp::dhelp_index(navh_eHelpFile_Project, NULL);
+    }
+    return 1;
+  }
+
+  if (ODD(dcli_get_qualifier("/VERSION", 0, 0))) {
+    sts = CoXHelp::dhelp("version", "", navh_eHelpFile_Other,
+        "$pwr_load/xtt_version_help.dat", 0);
+    if (EVEN(sts))
+      nodelist->message('E', "No help on this subject");
+    return sts;
+  }
+
+  int strict = ODD(dcli_get_qualifier("/STRICT", 0, 0));
+
+  if (EVEN(dcli_get_qualifier("dcli_arg1", arg_str, sizeof(arg_str)))) {
+    sts = CoXHelp::dhelp("help command", "", navh_eHelpFile_Base, NULL, strict);
+    return 1;
+  }
+  if (EVEN(dcli_get_qualifier("/BOOKMARK", bookmark_str, sizeof(bookmark_str))))
+    strcpy(bookmark_str, "");
+
+  strcpy(key, arg_str);
+  if (ODD(dcli_get_qualifier("dcli_arg2", arg_str, sizeof(arg_str)))) {
+    strcat(key, " ");
+    strcat(key, arg_str);
+    if (ODD(dcli_get_qualifier("dcli_arg3", arg_str, sizeof(arg_str)))) {
+      strcat(key, " ");
+      strcat(key, arg_str);
+      if (ODD(dcli_get_qualifier("dcli_arg3", arg_str, sizeof(arg_str)))) {
+        strcat(key, " ");
+        strcat(key, arg_str);
+        if (ODD(dcli_get_qualifier("dcli_arg4", arg_str, sizeof(arg_str)))) {
+          strcat(key, " ");
+          strcat(key, arg_str);
+        }
+      }
+    }
+  }
+  if (!ODD(
+          dcli_get_qualifier("/RETURNCOMMAND", return_str, sizeof(return_str))))
+    strcpy(return_str, "");
+
+  if (ODD(dcli_get_qualifier("/WIDTH", arg_str, sizeof(arg_str)))) {
+    // convert to integer
+    nr = sscanf(arg_str, "%d", &width);
+    if (nr != 1) {
+      nodelist->message('E', "Width syntax error");
+      return DCLI__SYNTAX;
+    }
+  } else
+    width = 0;
+
+  if (ODD(dcli_get_qualifier("/HEIGHT", arg_str, sizeof(arg_str)))) {
+    // convert to integer
+    nr = sscanf(arg_str, "%d", &height);
+    if (nr != 1) {
+      nodelist->message('E', "Height syntax error");
+      return DCLI__SYNTAX;
+    }
+  } else
+    height = 0;
+
+  pop = ODD(dcli_get_qualifier("/POPNAVIGATOR", 0, 0));
+
+  if (ODD(dcli_get_qualifier("/HELPFILE", file_str, sizeof(file_str)))) {
+    sts = CoXHelp::dhelp(
+        key, bookmark_str, navh_eHelpFile_Other, file_str, strict);
+    if (EVEN(sts))
+      nodelist->message('E', "No help on this subject");
+  } else if (ODD(dcli_get_qualifier("/BASE", 0, 0))) {
+    sts = CoXHelp::dhelp(key, bookmark_str, navh_eHelpFile_Base, 0, strict);
+    if (EVEN(sts))
+      nodelist->message('E', "No help on this subject");
+  } else {
+    sts = CoXHelp::dhelp(key, bookmark_str, navh_eHelpFile_Project, 0, strict);
+    if (EVEN(sts)) {
+      sts = CoXHelp::dhelp(key, bookmark_str, navh_eHelpFile_Base, 0, strict);
+      if (EVEN(sts))
+        nodelist->message('E', "No help on this subject");
+    }
+  }
+
+  return 1;
+}
 
 static int nodelist_select_func(void* client_data, void* client_flag)
 {
@@ -130,6 +244,104 @@ static int nodelist_open_func(void* client_data, void* client_flag)
     if (EVEN(sts))
       nl->message('E', "Open graph error");
 
+  } else if (str_NoCaseStrncmp(arg1_str, "XTT", strlen(arg1_str)) == 0) {
+    // Command is "OPEN XTT"
+    char node_str[80];
+    char address[80];
+    int nix;
+    int sts;
+
+    if (EVEN(dcli_get_qualifier("/NODE", node_str, sizeof(node_str)))) {
+      nl->message('E', "Node is missing");
+      return DCLI__QUAL_NODEF;
+    }
+    sts = nl->nodelistnav->get_node(node_str, &nix);
+    if (EVEN(sts)) {
+      nl->message('E', "No such node");
+      return DCLI__SUCCESS;
+    }
+
+    sts = nl->nodelistnav->get_node_data(nix, 0, address, 0, 0, 0);
+    if (EVEN(sts))
+      return sts;
+
+    pwr_tCmd cmd;
+    sprintf(cmd, "ssh pwrp@%s -X rt_xtt&", address);
+    printf("cmd %s\n", cmd);
+    system(cmd);
+    
+  } else if (str_NoCaseStrncmp(arg1_str, "OPPLACE", strlen(arg1_str)) == 0) {
+    // Command is "OPEN OPPLACE"
+    char node_str[80];
+    char address[80];
+    pwr_tOName opplace;
+    int nix;
+    int sts;
+
+    if (EVEN(dcli_get_qualifier("/NODE", node_str, sizeof(node_str)))) {
+      nl->message('E', "Node is missing");
+      return DCLI__QUAL_NODEF;
+    }
+    sts = nl->nodelistnav->get_node(node_str, &nix);
+    if (EVEN(sts)) {
+      nl->message('E', "No such node");
+      return DCLI__SUCCESS;
+    }
+
+    sts = nl->nodelistnav->get_node_data(nix, 0, address, 0, opplace, 0);
+    if (EVEN(sts))
+      return sts;
+
+    pwr_tCmd cmd;
+    sprintf(cmd, "ssh pwrp@%s -X rt_xtt %s&", address, opplace);
+    printf("cmd %s\n", cmd);
+    system(cmd);
+    
+  } else if (str_NoCaseStrncmp(arg1_str, "RTMONITOR", strlen(arg1_str)) == 0) {
+    // Command is "OPEN RTMONITOR"
+    char node_str[80];
+    char address[80];
+    int nix;
+    int sts;
+
+    if (EVEN(dcli_get_qualifier("/NODE", node_str, sizeof(node_str)))) {
+      nl->message('E', "Node is missing");
+      return DCLI__QUAL_NODEF;
+    }
+    sts = nl->nodelistnav->get_node(node_str, &nix);
+    if (EVEN(sts)) {
+      nl->message('E', "No such node");
+      return DCLI__SUCCESS;
+    }
+
+    sts = nl->nodelistnav->get_node_data(nix, 0, address, 0, 0, 0);
+    if (EVEN(sts))
+      return sts;
+
+    pwr_tCmd cmd;
+    sprintf(cmd, "ssh pwrp@%s -X pwr_rtmon&", address);
+    printf("cmd %s\n", cmd);
+    system(cmd);
+    
+  } else if (str_NoCaseStrncmp(arg1_str, "FILE", strlen(arg1_str)) == 0) {
+    pwr_tCmd cmd;
+    int sts;
+    char msg[80];
+    pwr_tFileName file_str;
+
+    if (EVEN(dcli_get_qualifier("/FILE", file_str, sizeof(file_str)))) {
+      if (EVEN(dcli_get_qualifier("dcli_arg2", file_str, sizeof(file_str)))) {
+	nl->message('E', "File is missing");
+	return DCLI__QUAL_NODEF;
+      }
+    }
+    strcpy(cmd, "xdg-open ");
+    strcat(cmd, file_str);
+    sts = system(cmd);
+    if (sts != 0) {
+      sprintf(msg, "Error from xdg-open %d", sts >> 8);
+      nl->message('E', msg);
+    }
   } else {
     nl->message('E', "Unknown qualifier");
     return DCLI__QUAL_NODEF;

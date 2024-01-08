@@ -191,6 +191,9 @@ public:
   int get_selected_node(char* name);
   int get_selected_node_idx(int* idx);
   int get_selected_opplace(char* address, int* busid, char* opplace, char* descr);
+  int get_node(char* name, int* idx);
+  int get_node_data(int idx, char* node_name, char* address, int* busid,
+			       char* opplace, char* descr);
   int set_node_data(int idx, char* node_name, char *addess, int busid, char* opplace,
       char* descr);
   void save();
@@ -200,7 +203,6 @@ public:
   {
     msgw_pop = pop;
   }
-
   static void attrvalue_to_string(int type_id, void* value_ptr, char* str,
       int size, int* len, char* format);
   static int init_brow_cb(FlowCtx* fctx, void* client_data);

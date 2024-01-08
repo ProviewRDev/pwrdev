@@ -51,6 +51,39 @@ typedef void* Widget;
 
 #include "cow_ge_gtk.h"
 
+void CowGeGtk::get_context_menu(void* mdata,
+    unsigned int caller, unsigned int priv, char* arg, int x, int y)
+{
+  GtkWidget* popup;
+  ge_sContextMenuData *menudata = (ge_sContextMenuData *)mdata;
+  GtkWidget *mb;
+
+  popup = (GtkWidget*)g_object_new(GTK_TYPE_MENU, NULL);
+  contextmenudata = menudata;
+
+  for (int i = 0; i < int(sizeof(menudata->item_text)/sizeof(menudata->item_text[0])); i++) {
+    if (streq(menudata->item_text[i], ""))
+      break;
+    mb = gtk_menu_item_new_with_label(CoWowGtk::translate_utf8(menudata->item_text[i]));
+    g_object_set_data((GObject*)mb, "userdata", (gpointer)((long int)i));
+    g_signal_connect(mb, "activate", G_CALLBACK(activate_context_menu_button),
+        this);
+    gtk_menu_shell_append(GTK_MENU_SHELL(popup), mb);
+    gtk_widget_show(mb);
+  }
+
+  //popupmenu_x = x;
+  //popupmenu_y = y;
+
+  GdkEvent ev;
+  memset(&ev, 0, sizeof(ev));
+  ev.button.x = x;
+  ev.button.y = y;
+  ev.type = GDK_BUTTON_PRESS;
+  ev.any.window = gtk_widget_get_window(grow_widget);
+  gtk_menu_popup_at_pointer(GTK_MENU(popup), &ev);
+}
+
 gboolean CowGeGtk::action_inputfocus(
     GtkWidget* w, GdkEvent* event, gpointer data)
 {
@@ -333,6 +366,20 @@ void CowGeGtk::activate_help(GtkWidget* w, gpointer data)
   CowGe* ge = (CowGe*)data;
 
   ge->activate_help();
+}
+
+void CowGeGtk::activate_context_menu_button(GtkWidget* w, gpointer data)
+{
+  CowGe* ge = (CowGe*)data;
+  int idx;
+  ge_sContextMenuData *menudata = (ge_sContextMenuData *)ge->contextmenudata;
+
+  idx = (int)(unsigned long)g_object_get_data((GObject*)w, "userdata");
+
+  printf("Here in context menu button %s\n", menudata->item_action[idx]);
+
+  if (ge->command_cb)
+    (ge->command_cb)(ge->parent_ctx, menudata->item_action[idx], 0, 0, ge);
 }
 
 void CowGeGtk::action_resize(
@@ -703,6 +750,7 @@ CowGeGtk::CowGeGtk(GtkWidget* xg_parent_wid, void* xg_parent_ctx,
   graph->is_authorized_cb = &ge_is_authorized_cb;
   graph->get_current_objects_cb = &ge_get_current_objects_cb;
   graph->popup_menu_cb = &ge_popup_menu_cb;
+  graph->context_menu_cb = &ge_context_menu_cb;
   graph->call_method_cb = &ge_call_method_cb;
   graph->sound_cb = &ge_sound_cb;
   graph->eventlog_cb = &ge_eventlog_cb;

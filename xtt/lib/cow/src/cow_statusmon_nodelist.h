@@ -116,6 +116,7 @@ public:
   int verify;
   int ccm_func_registred;
   NlApplList appl;
+  int command_open;
 
   virtual void pop()
   {
@@ -180,7 +181,7 @@ public:
       Nodelist* nodelist, char* node_name, char *address, char* busid, char* description, 
       char* opplace);
 
-  void message(char severity, const char *msg);
+  virtual void message(char severity, const char *msg);
   int command(char* input_str);
   int readcmdfile(char* incommand, char *script);
   int open_graph(char *name, int width, int height);
