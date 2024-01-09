@@ -845,7 +845,7 @@ int NodelistNav::update_nodes()
       node_list[i].network_timeout = 0;
 #endif
 
-    node_list[i].connection_sts = node_list[i].cli->m_sts;
+    sts = node_list[i].cli->m_sts;
     if (EVEN(node_list[i].connection_sts)) {
       node_list[i].network_timeout = 1;
       strcpy(response->SystemStatusStr, "Network timeout");    
