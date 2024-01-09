@@ -40,7 +40,7 @@ SObject pwrb:Class
 !  @Version 1.0
 !  @Group Operator,NodeConfiguration
 !  @Summary Configuration of rtt and xtt.
-!  <h2>Obsolete from V4.7.0
+!  @h2 Obsolete from V4.7.0
 !
 !  Configuration of rtt and xtt.
 !*/

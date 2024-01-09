@@ -39,7 +39,7 @@ SObject pwrb:Class
 !/**
 !  @Version 1.0
 !  @Group Operator,NodeConfiguration
-!  <h2>Obsolete since V3.4
+!  @h2 Obsolete since V3.4
 !
 !  Configures a window to display a form.
 !  

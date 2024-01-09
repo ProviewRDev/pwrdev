@@ -38,7 +38,7 @@
 SObject pwrb:Class
 !/**
 !  @Version 1.0
-!  <h2>Obsolete since V3.4
+!  @h2 Obsolete since V3.4
 !  Configures a queue assigned to receive Package Handler
 !  messages.
 !  
