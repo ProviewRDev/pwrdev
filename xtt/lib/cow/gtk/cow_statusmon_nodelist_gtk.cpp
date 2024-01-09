@@ -95,10 +95,10 @@ static void destroy_event(GtkWidget* w, gpointer data)
 
 NodelistGtk::NodelistGtk(void* nodelist_parent_ctx,
     GtkWidget* nodelist_parent_wid, const char* nodelist_name,
-    int nodelist_mode, int nodelist_view_node_descr, int msgw_pop,
+    int nodelist_mode, nl_mLayout nodelist_layout, int msgw_pop,
     char *nodelist_conf_file, pwr_tStatus* status)
     : Nodelist(nodelist_parent_ctx, nodelist_name, nodelist_mode,
-          nodelist_view_node_descr, status),
+          nodelist_layout, status),
       parent_wid(nodelist_parent_wid), clock_cursor(0), add_india_widget(0),
       mod_india_widget(0)
 {
@@ -191,7 +191,8 @@ NodelistGtk::NodelistGtk(void* nodelist_parent_ctx,
   gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_remove_node);
   gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_open_xtt);
   gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_open_opplace);
-  gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_open_rtmon);
+  if (!(layout & nl_mLayout_hide_rtmon))
+    gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_open_rtmon);
   gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_open_map);
   gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_command);
   gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_close);
@@ -342,7 +343,7 @@ NodelistGtk::NodelistGtk(void* nodelist_parent_ctx,
   msg_window->msg('I', "Status Montitor started");
 
   nodelistnav = new NodelistNavGtk(this, vbox, msg_window, 0, mode,
-      view_node_descr, msgw_pop, nodelist_conf_file, &nodelistnav_widget);
+      layout, msgw_pop, nodelist_conf_file, &nodelistnav_widget);
 
   // Toolbar
   GtkToolbar* tools = (GtkToolbar*)g_object_new(GTK_TYPE_TOOLBAR, NULL);
@@ -367,23 +368,25 @@ NodelistGtk::NodelistGtk(void* nodelist_parent_ctx,
       dark_theme ? "$pwr_exe/ico_opplace_d_30.png" : "$pwr_exe/ico_opplace_l_30.png", 
       G_CALLBACK(activate_open_opplace), "Start Operatorplace on selected node", this, 1, 1);
 
-  wutl_tools_item(tools, 
-      dark_theme ? "$pwr_exe/ico_runtime_monitor_d_30.png" : "$pwr_exe/ico_runtime_monitor_l_30.png", 
-      G_CALLBACK(activate_open_rtmon), "Start Runtime Monitor on selected node", this, 1, 1);
+  if (!(layout & nl_mLayout_hide_rtmon)) {
+    wutl_tools_item(tools, 
+        dark_theme ? "$pwr_exe/ico_runtime_monitor_d_30.png" : "$pwr_exe/ico_runtime_monitor_l_30.png", 
+        G_CALLBACK(activate_open_rtmon), "Start Runtime Monitor on selected node", this, 1, 1);
+  }
 
-    wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_zoomin_d_30.png" : "$pwr_exe/ico_zoomin_l_30.png", G_CALLBACK(activate_zoom_in), 
+  wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_zoomin_d_30.png" : "$pwr_exe/ico_zoomin_l_30.png", G_CALLBACK(activate_zoom_in), 
       "Zoom in", this, 1, 1);
 
-    wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_zoomout_d_30.png" : "$pwr_exe/ico_zoomout_l_30.png", G_CALLBACK(activate_zoom_out), 
+  wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_zoomout_d_30.png" : "$pwr_exe/ico_zoomout_l_30.png", G_CALLBACK(activate_zoom_out), 
       "Zoom out", this, 1, 1);
 
-    wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_zoomreset_d_30.png" : "$pwr_exe/ico_zoomreset_l_30.png", G_CALLBACK(activate_zoom_reset), 
+  wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_zoomreset_d_30.png" : "$pwr_exe/ico_zoomreset_l_30.png", G_CALLBACK(activate_zoom_reset), 
       "Zoom reset", this, 1, 1);
 
-    wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_refresh_d_30.png" : "$pwr_exe/ico_refresh_l_30.png", G_CALLBACK(activate_reconnect), 
+  wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_refresh_d_30.png" : "$pwr_exe/ico_refresh_l_30.png", G_CALLBACK(activate_reconnect), 
       "Reconnect", this, 1, 1);
 
-    wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_earth_d_30.png" : "$pwr_exe/ico_earth_l_30.png", G_CALLBACK(activate_open_map), 
+  wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_earth_d_30.png" : "$pwr_exe/ico_earth_l_30.png", G_CALLBACK(activate_open_map), 
       "Map", this, 1, 1);
 
 

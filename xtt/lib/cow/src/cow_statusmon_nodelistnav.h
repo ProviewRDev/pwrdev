@@ -52,6 +52,11 @@
 class MsgWindow;
 
 typedef enum {
+  nl_mLayout_view_node_descr = 1 << 0,
+  nl_mLayout_hide_rtmon = 1 << 1
+} nl_mLayout;
+
+typedef enum {
   nodelist_eMode_SystemStatus,
   nodelist_eMode_Status1,
   nodelist_eMode_Status2,
@@ -143,7 +148,7 @@ class NodelistNav {
 public:
   NodelistNav(void* ev_parent_ctx, MsgWindow* nodelistnav_msg_window,
       char* nodelistnav_nodename, int nodelistnav_mode,
-      int nodelistnav_view_node_descr, int nodelistnav_msgw_pop,
+      nl_mLayout nodelistnav_layout, int nodelistnav_msgw_pop,
       char *nodelist_conf_file);
   virtual ~NodelistNav();
 
@@ -161,7 +166,7 @@ public:
   static pwr_tFileName config_file;
   int msgw_pop;
   int mode;
-  int view_node_descr;
+  nl_mLayout layout;
   int connect;
 
   virtual void set_input_focus()

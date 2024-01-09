@@ -59,10 +59,10 @@ static int nodelist_ge_extern_connect_cb(void* xnl, char* name, void** p, pwr_tR
 
 
 Nodelist::Nodelist(void* nodelist_parent_ctx, const char* nodelist_name,
-    int nodelist_mode, int nodelist_view_node_descr, pwr_tStatus* status)
+    int nodelist_mode, nl_mLayout nodelist_layout, pwr_tStatus* status)
     : parent_ctx(nodelist_parent_ctx), nodelistnav(NULL), nodelist_displayed(0),
       help_cb(0), close_cb(0), mode(nodelist_mode),
-      view_node_descr(nodelist_view_node_descr), map_gectx(0), scriptmode(0), verify(0),
+      layout(nodelist_layout), map_gectx(0), scriptmode(0), verify(0),
       ccm_func_registred(0), command_open(0)
 {
   strcpy(remote_gui, "");

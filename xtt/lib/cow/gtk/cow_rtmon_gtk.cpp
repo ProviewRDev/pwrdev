@@ -175,7 +175,7 @@ RtMonGtk::RtMonGtk(void* rtmon_parent_ctx, GtkWidget* rtmon_parent_wid,
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(help), GTK_WIDGET(help_menu));
 
   nodelistnav = new NodelistNavGtk(this, vbox, 0, nodename,
-      nodelist_eMode_SystemStatus, 0, 0, 0, &nodelistnav_widget);
+      nodelist_eMode_SystemStatus, (nl_mLayout)0, 0, 0, &nodelistnav_widget);
 
   // Toolbar
   GtkToolbar* tools = (GtkToolbar*)g_object_new(GTK_TYPE_TOOLBAR, NULL);

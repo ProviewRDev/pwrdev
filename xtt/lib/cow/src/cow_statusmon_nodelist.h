@@ -94,7 +94,7 @@ class NlApplList {
 class Nodelist {
 public:
   Nodelist(void* nodelist_parent_ctx, const char* nodelist_name,
-      int nodelist_mode, int nodelist_view_node_descr, pwr_tStatus* status);
+      int nodelist_mode, nl_mLayout nodelist_layout, pwr_tStatus* status);
   virtual ~Nodelist();
 
   void* parent_ctx;
@@ -109,7 +109,7 @@ public:
   MsgWindow* msg_window;
   char remote_gui[20];
   int mode;
-  int view_node_descr;
+  nl_mLayout layout;
   int selected_idx;
   CowGe *map_gectx;
   int scriptmode;

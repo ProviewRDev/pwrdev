@@ -47,7 +47,7 @@ class NodelistGtk : public Nodelist {
 public:
   NodelistGtk(void* nodelist_parent_ctx, GtkWidget* nodelist_parent_wid,
       const char* nodelist_name, int nodelist_mode,
-      int nodelist_view_node_descr, int msgw_pop, char *nodelist_conf_file,
+      nl_mLayout nodelist_layout, int msgw_pop, char *nodelist_conf_file,
       pwr_tStatus* status);
   ~NodelistGtk();
 

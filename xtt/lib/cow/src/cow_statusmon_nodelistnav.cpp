@@ -215,12 +215,12 @@ int NodelistNav::init_brow_cb(FlowCtx* fctx, void* client_data)
 
 NodelistNav::NodelistNav(void* nodelist_parent_ctx,
     MsgWindow* nodelistnav_msg_window, char* nodelistnav_nodename,
-    int nodelistnav_mode, int nodelistnav_view_node_descr,
+    int nodelistnav_mode, nl_mLayout nodelistnav_layout,
     int nodelistnav_msgw_pop, char *nodelistnav_conf_file)
     : parent_ctx(nodelist_parent_ctx), nodelist_size(0), trace_started(0),
       scantime(4000), first_scan(1), msg_window(nodelistnav_msg_window),
       msgw_pop(nodelistnav_msgw_pop), mode(nodelistnav_mode),
-      view_node_descr(nodelistnav_view_node_descr)
+      layout(nodelistnav_layout)
 {
   if (nodelistnav_nodename)
     strcpy(nodename, nodelistnav_nodename);
@@ -947,7 +947,7 @@ int NodelistNav::update_nodes()
 
     if (ODD(sts)) {
       if (!streq(node_list[i].item->data.Description, response->Description)
-          && view_node_descr == 0
+          && !(layout & nl_mLayout_view_node_descr)
           && streq(node_list[i].item->node_descr, ""))
         brow_SetAnnotation(node_list[i].item->node, 1, response->Description,
             strlen(response->Description));
@@ -1288,7 +1288,7 @@ ItemNode::ItemNode(NodelistNav* item_nodelistnav, int item_idx, const char* item
       dest, dest_code, (void*)this, 1, &node);
 
   brow_SetAnnotation(node, 0, name, strlen(name));
-  if (nodelistnav->view_node_descr || !streq(node_descr, ""))
+  if ((nodelistnav->layout & nl_mLayout_view_node_descr) || !streq(node_descr, ""))
     brow_SetAnnotation(node, 1, node_descr, strlen(node_descr));
   else
     brow_SetAnnotation(node, 1, data.Description, strlen(data.Description));

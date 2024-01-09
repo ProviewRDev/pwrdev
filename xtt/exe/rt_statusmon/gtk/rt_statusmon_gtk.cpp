@@ -50,10 +50,13 @@ static void usage()
 {
   printf("\n\
   Proview Status Monitor\n\n\
-  rt_statusmon [-m 'n'][-e]\n\n\
-  -m 'n'  Mode display UserStatus 'n', where 1 <= n <= 5.\n\
-  -e      Show node description from setup file.\n\
-  -l      Language, e.g. en_us, sv_se, de_de.\n\n\
+  rt_statusmon [-m 'n'][-c 'file'][-e][-t][-o]\n\n\
+  -m 'n'    Mode display UserStatus 'n', where 1 <= n <= 5.\n\
+  -c 'file' Configuration file. Default $HOME/rt_statusmon.dat.\n\
+  -e        Show node description from setup file.\n\
+  -t        Hide Open Runtime Monitor button.\n\
+  -o        Open map at startup.\n\
+  -l        Language, e.g. en_us, sv_se, de_de.\n\n\
   $HOME/rt_statusmon.dat : setup file with requested nodes\n\n");
 }
 
@@ -66,11 +69,11 @@ int main(int argc, char* argv[])
 {
   int sts;
   int mode = nodelist_eMode_SystemStatus;
-  int view_descr = 0;
   int init_gdh = 0;
   int open_map = 0;
   char language[20] = "";
   pwr_tFileName conf_file = "";
+  nl_mLayout layout = (nl_mLayout)0;
 
   if (argc > 1) {
     for (int i = 1; i < argc; i++) {
@@ -101,7 +104,9 @@ int main(int argc, char* argv[])
         }
         i++;
       } else if (streq(argv[i], "-e")) {
-        view_descr = 1;
+        layout = (nl_mLayout)(layout | nl_mLayout_view_node_descr);
+      } else if (streq(argv[i], "-t")) {
+        layout = (nl_mLayout)(layout | nl_mLayout_hide_rtmon);
       } else if (streq(argv[i], "-g")) {
         init_gdh = 1;
       } else if (streq(argv[i], "-o")) {
@@ -131,7 +136,7 @@ int main(int argc, char* argv[])
   CoXHelp::set_default(xhelp);
 
   Nodelist* nl = new NodelistGtk(
-      0, 0, "Status Monitor", mode, view_descr, msgw_ePop_No, 
+      0, 0, "Status Monitor", mode, layout, msgw_ePop_No, 
       conf_file, &sts);
   nl->close_cb = statusmon_close;
   nl->set_scantime(3);
