@@ -235,30 +235,10 @@ void Nodelist::activate_open_map()
   if (map_gectx) {
     map_gectx->pop();
   } else {
-    char name[80] = "Map";
-    char filename[80] = "$pwrp_exe/statusmon_map.pwg";
-    int width = 0;
-    int height = 0;
-    int x = 0;
-    int y = 0;
-    double scantime = 0.5;
+    pwr_tCmd cmd;
 
-    map_gectx = ge_new(name, filename, 0, 0, 0, width,
-        height, x, y, scantime, 0, 0, ~0,
-	0, 0, 0, 0, 0, 
-        &nodelist_ge_command_cb, 0, 
-	&nodelist_ge_is_authorized_cb, 0, &nodelist_ge_extern_connect_cb);
-    map_gectx->close_cb = nodelist_ge_close_cb;
-#if 0
-    gectx->help_cb = xnav_ge_help_cb;
-    gectx->display_in_xnav_cb = xnav_ge_display_in_xnav_cb;
-    gectx->popup_menu_cb = xnav_popup_menu_cb;
-    gectx->call_method_cb = xnav_call_method_cb;
-    gectx->sound_cb = xnav_ge_sound_cb;
-    gectx->eventlog_cb = xnav_ge_eventlog_cb;
-    gectx->namechanged_cb = xnav_ge_namechanged_cb;
-    gectx->get_select_cb = xnav_ge_get_select_cb;
-#endif
+    sprintf(cmd, "open graph statusmon_map /title=Map");
+    command(cmd);
   }
 }
 
@@ -333,7 +313,7 @@ void Nodelist::message(char severity, const char *msg)
   printf("SMON-%c, %s\n", severity, msg);
 }
 
-int Nodelist::open_graph(char *name, int width, int height)
+int Nodelist::open_graph(char *name, char *title, int width, int height)
 {
   CowGe *gectx;
 
@@ -347,6 +327,8 @@ int Nodelist::open_graph(char *name, int width, int height)
     int y = 0;
     double scantime = 0.5;
 
+    if (!title)
+      title = name;
     if (strchr(name, '/'))
       strcpy(fname, name);
     else {
@@ -356,7 +338,7 @@ int Nodelist::open_graph(char *name, int width, int height)
     if (strchr(name, ','))
       strcat(fname, ".pwg");
 	
-    gectx = ge_new(name, fname, 0, 0, 0, width,
+    gectx = ge_new(title, fname, 0, 0, 0, width,
         height, x, y, scantime, 0, 0, ~0,
 	0, 0, 0, 0, 0, 
         &nodelist_ge_command_cb, 0, 

@@ -54,7 +54,7 @@ static int nodelist_help_func(void* client_data, void* client_flag);
 dcli_tCmdTable nodelist_command_table[] = { 
   { "SELECT", &nodelist_select_func, { "dcli_arg1", "/NODE", "" } },
   { "OPEN", &nodelist_open_func, { "dcli_arg1", "dcli_arg2",
-      "/WIDTH", "/HEIGHT", "/NODE", "/FILE", "" } },
+      "/WIDTH", "/HEIGHT", "/TITLE", "/NODE", "/FILE", "" } },
   { "HELP", &nodelist_help_func,
       { "dcli_arg1", "dcli_arg2", "dcli_arg3", "dcli_arg4", "/HELPFILE",
           "/POPNAVIGATOR", "/BOOKMARK", "/INDEX", "/BASE", "/RETURNCOMMAND",
@@ -217,6 +217,8 @@ static int nodelist_open_func(void* client_data, void* client_flag)
     int sts;
     int nr;
     char tmp_str[80];
+    char title_str[80];
+    char *title_p;
     int width;
     int height;
 
@@ -240,7 +242,12 @@ static int nodelist_open_func(void* client_data, void* client_flag)
     } else
       height = 0;
 
-    sts = nl->open_graph(graph_str, width, height);   
+    if (ODD(dcli_get_qualifier("/TITLE", title_str, sizeof(title_str)))) {
+      title_p = title_str;
+    } else
+      title_p = 0;
+
+    sts = nl->open_graph(graph_str, title_p, width, height);   
     if (EVEN(sts))
       nl->message('E', "Open graph error");
 

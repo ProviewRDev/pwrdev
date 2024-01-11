@@ -184,7 +184,7 @@ public:
   virtual void message(char severity, const char *msg);
   int command(char* input_str);
   int readcmdfile(char* incommand, char *script);
-  int open_graph(char *name, int width, int height);
+  int open_graph(char *name, char *title, int width, int height);
 };
 
 #endif
