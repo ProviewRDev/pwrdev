@@ -173,17 +173,15 @@ void Nodelist::activate_open_xtt()
 {
   char node_name[80];
   int sts;
-  char address[40];
 
   sts = nodelistnav->get_selected_node(node_name);
   if (EVEN(sts)) {
     nodelistnav->wow->DisplayError("Open Xtt", "Select a node");
     return;
   }
-  sts = nodelistnav->get_selected_opplace(address, 0, 0, 0);
 
   pwr_tCmd cmd;
-  sprintf(cmd, "ssh pwrp@%s -X rt_xtt&", address);
+  sprintf(cmd, "ssh pwrp@%s -X rt_xtt&", node_name);
   printf("cmd %s\n", cmd);
   system(cmd);
 }
@@ -193,27 +191,24 @@ void Nodelist::activate_open_opplace()
   int sts;
   char node_name[80];
   pwr_tOName opplace;
-  char address[40];
 
   sts = nodelistnav->get_selected_node(node_name);
   if (EVEN(sts)) {
     nodelistnav->wow->DisplayError("Open Xtt", "Select a node");
     return;
   }
-  sts = nodelistnav->get_selected_opplace(address, 0, opplace, 0);
+  sts = nodelistnav->get_selected_opplace(0, 0, opplace, 0);
 
   pwr_tCmd cmd;
-  sprintf(cmd, "ssh pwrp@%s -X rt_xtt %s&", address, opplace);
+  sprintf(cmd, "ssh pwrp@%s -X rt_xtt %s&", node_name, opplace);
   printf("cmd %s\n", cmd);
   system(cmd);
-
 }
 
 void Nodelist::activate_open_rtmon()
 {
   char node_name[80];
   int sts;
-  char address[40];
 
   sts = nodelistnav->get_selected_node(node_name);
   if (EVEN(sts)) {
@@ -221,13 +216,10 @@ void Nodelist::activate_open_rtmon()
     return;
   }
 
-  sts = nodelistnav->get_selected_opplace(address, 0, 0, 0);
-
   pwr_tCmd cmd;
-  sprintf(cmd, "ssh pwrp@%s -X pwr_rtmon&", address);
+  sprintf(cmd, "ssh pwrp@%s -X pwr_rtmon&", node_name);
   printf("cmd %s\n", cmd);
   system(cmd);
-
 }
 
 void Nodelist::activate_open_map()

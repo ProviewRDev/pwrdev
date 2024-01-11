@@ -254,7 +254,7 @@ static int nodelist_open_func(void* client_data, void* client_flag)
   } else if (str_NoCaseStrncmp(arg1_str, "XTT", strlen(arg1_str)) == 0) {
     // Command is "OPEN XTT"
     char node_str[80];
-    char address[80];
+    char node_name[80];
     int nix;
     int sts;
 
@@ -268,19 +268,19 @@ static int nodelist_open_func(void* client_data, void* client_flag)
       return DCLI__SUCCESS;
     }
 
-    sts = nl->nodelistnav->get_node_data(nix, 0, address, 0, 0, 0);
+    sts = nl->nodelistnav->get_node_data(nix, node_name, 0, 0, 0, 0);
     if (EVEN(sts))
       return sts;
 
     pwr_tCmd cmd;
-    sprintf(cmd, "ssh pwrp@%s -X rt_xtt&", address);
+    sprintf(cmd, "ssh pwrp@%s -X rt_xtt&", node_name);
     printf("cmd %s\n", cmd);
     system(cmd);
     
   } else if (str_NoCaseStrncmp(arg1_str, "OPPLACE", strlen(arg1_str)) == 0) {
     // Command is "OPEN OPPLACE"
     char node_str[80];
-    char address[80];
+    char node_name[80];
     pwr_tOName opplace;
     int nix;
     int sts;
@@ -295,19 +295,19 @@ static int nodelist_open_func(void* client_data, void* client_flag)
       return DCLI__SUCCESS;
     }
 
-    sts = nl->nodelistnav->get_node_data(nix, 0, address, 0, opplace, 0);
+    sts = nl->nodelistnav->get_node_data(nix, node_name, 0, 0, opplace, 0);
     if (EVEN(sts))
       return sts;
 
     pwr_tCmd cmd;
-    sprintf(cmd, "ssh pwrp@%s -X rt_xtt %s&", address, opplace);
+    sprintf(cmd, "ssh pwrp@%s -X rt_xtt %s&", node_name, opplace);
     printf("cmd %s\n", cmd);
     system(cmd);
     
   } else if (str_NoCaseStrncmp(arg1_str, "RTMONITOR", strlen(arg1_str)) == 0) {
     // Command is "OPEN RTMONITOR"
     char node_str[80];
-    char address[80];
+    char node_name[80];
     int nix;
     int sts;
 
@@ -321,15 +321,15 @@ static int nodelist_open_func(void* client_data, void* client_flag)
       return DCLI__SUCCESS;
     }
 
-    sts = nl->nodelistnav->get_node_data(nix, 0, address, 0, 0, 0);
+    sts = nl->nodelistnav->get_node_data(nix, node_name, 0, 0, 0, 0);
     if (EVEN(sts))
       return sts;
 
     pwr_tCmd cmd;
-    sprintf(cmd, "ssh pwrp@%s -X pwr_rtmon&", address);
+    sprintf(cmd, "ssh pwrp@%s -X pwr_rtmon&", node_name);
     printf("cmd %s\n", cmd);
     system(cmd);
-    
+
   } else if (str_NoCaseStrncmp(arg1_str, "FILE", strlen(arg1_str)) == 0) {
     pwr_tCmd cmd;
     int sts;

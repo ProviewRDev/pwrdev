@@ -1099,6 +1099,8 @@ int NodelistNav::get_node_data(int idx, char* node_name, char* address, int* bus
 {
   if (idx >= node_list.size() || idx < 0)
     return 0;
+  if (node_name)
+    strcpy(node_name, node_list[idx].node_name);
   if (address)
     strcpy(address, node_list[idx].address);
   if (busid)
