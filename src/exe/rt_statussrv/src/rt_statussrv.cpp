@@ -108,6 +108,7 @@ class status_server {
   sServerConnection m_connections[MAX_CONNECTIONS];
   int m_sock;
   struct sockaddr_in m_loc_addr;
+  thread_sMutex thread_mutex;
 };
 
 static void* srv_connect(void* arg);
@@ -274,6 +275,12 @@ pwr_tStatus status_server::init(int ignore_config)
 
   // Ignore SIGPIPE signal
   signal(SIGPIPE, signal_callback_handler);
+
+  sts = thread_MutexInit(&thread_mutex);
+  if (EVEN(sts)) {
+    errh_Error("Error creating mutex, %m", sts);
+    return 0;
+  }
 
   int bus = syi_Busid(&sts);
   if (EVEN(sts)) {
@@ -490,6 +497,7 @@ static void* srv_connect(void* arg)
 
     /* Find next empty in connection list */
     found = 0;
+    thread_MutexLock(&srv->thread_mutex);
     for (i = 0; i < MAX_CONNECTIONS; i++) {
       if (!srv->m_connections[i].occupied) {
         found = 1;
@@ -519,6 +527,7 @@ static void* srv_connect(void* arg)
     time_GetTime(&srv->m_connections[idx].last_req_time);
     srv->m_connections[idx].addrlen = r_addr_len;
     memcpy(&srv->m_connections[idx].addr, &r_addr, r_addr_len);
+    thread_MutexUnlock(&srv->thread_mutex);
 
     /* Create a thread for this connection */
     condata = (sCondata*)malloc(sizeof(sCondata));
