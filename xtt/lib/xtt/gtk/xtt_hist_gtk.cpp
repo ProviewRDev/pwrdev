@@ -324,6 +324,9 @@ HistGtk::HistGtk(void* hist_parent_ctx, GtkWidget* hist_parent_wid,
   GtkWidget* sea_type_label
       = gtk_label_new(CoWowGtk::translate_utf8("Event type"));
   gtk_widget_set_size_request(sea_type_label, 120, -1);
+  GtkWidget* sea_type_label2
+      = gtk_label_new(CoWowGtk::translate_utf8(""));
+  gtk_widget_set_size_request(sea_type_label2, 120, -1);
   //gtk_misc_set_alignment(GTK_MISC(sea_type_label), 0.0, 0.5);
 
   info_toggle_w
@@ -368,16 +371,18 @@ HistGtk::HistGtk(void* hist_parent_ctx, GtkWidget* hist_parent_wid,
   gtk_box_pack_start(GTK_BOX(sea_typebox), alarm_toggle_w, FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(sea_typebox), mnt_alarm_toggle_w, FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(sea_typebox), sys_alarm_toggle_w, FALSE, FALSE, 0);
+  GtkWidget* sea_typebox2 = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+  gtk_box_pack_start(GTK_BOX(sea_typebox2), sea_type_label2, FALSE, FALSE, 0);
   gtk_box_pack_start(
-      GTK_BOX(sea_typebox), user_alarm1_toggle_w, FALSE, FALSE, 0);
+      GTK_BOX(sea_typebox2), user_alarm1_toggle_w, FALSE, FALSE, 0);
   gtk_box_pack_start(
-      GTK_BOX(sea_typebox), user_alarm2_toggle_w, FALSE, FALSE, 0);
+      GTK_BOX(sea_typebox2), user_alarm2_toggle_w, FALSE, FALSE, 0);
   gtk_box_pack_start(
-      GTK_BOX(sea_typebox), user_alarm3_toggle_w, FALSE, FALSE, 0);
+      GTK_BOX(sea_typebox2), user_alarm3_toggle_w, FALSE, FALSE, 0);
   gtk_box_pack_start(
-      GTK_BOX(sea_typebox), user_alarm4_toggle_w, FALSE, FALSE, 0);
-  gtk_box_pack_start(GTK_BOX(sea_typebox), ret_toggle_w, FALSE, FALSE, 0);
-  gtk_box_pack_start(GTK_BOX(sea_typebox), ack_toggle_w, FALSE, FALSE, 0);
+      GTK_BOX(sea_typebox2), user_alarm4_toggle_w, FALSE, FALSE, 0);
+  gtk_box_pack_start(GTK_BOX(sea_typebox2), ret_toggle_w, FALSE, FALSE, 0);
+  gtk_box_pack_start(GTK_BOX(sea_typebox2), ack_toggle_w, FALSE, FALSE, 0);
 
   // Event priority box
   GtkWidget* sea_prio_label
@@ -481,6 +486,7 @@ HistGtk::HistGtk(void* hist_parent_ctx, GtkWidget* hist_parent_wid,
   search_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start(GTK_BOX(search_vbox), sea_timebox, FALSE, FALSE, 5);
   gtk_box_pack_start(GTK_BOX(search_vbox), sea_typebox, FALSE, FALSE, 5);
+  gtk_box_pack_start(GTK_BOX(search_vbox), sea_typebox2, FALSE, FALSE, 5);
   gtk_box_pack_start(GTK_BOX(search_vbox), sea_priobox, FALSE, FALSE, 5);
   gtk_box_pack_start(GTK_BOX(search_vbox), sea_eventnamebox, FALSE, FALSE, 5);
   gtk_box_pack_start(GTK_BOX(search_vbox), sea_eventtextbox, FALSE, FALSE, 5);
