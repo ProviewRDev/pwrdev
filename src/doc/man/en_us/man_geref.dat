@@ -4699,13 +4699,14 @@ PulldownMenu <t>- 	<t>Action for pulldown menus. <link>GeDynPulldownMenu
 MethodPulldownMenu <t>- <t>Action for pulldown menus for object methods. <link>GeDynMethodPulldownMenu
 EmitSignal <t>- 	<t>Emit a signal. <link>GeDynEmitSignal
 CatchSignal <t>- 	<t>Catch a signal. <link>GeDynCatchSignal
+ContextMenu <t>- 	<t>Open en popup menu. <link>GeDynContextMenu
 </topic>
 
 <headerlevel>
 <topic>GeDynPopupMenu <style>function
 PopupMenu 
 
-An popup menu is opend by clicking MB3. The popup menu contains the methods for the object
+An popup menu is opened by clicking MB3. The popup menu contains the methods for the object
 specified in RefObject (Se chapter Methods in the Xtt manual).
 
 <b>Attribute <t><t>Description
@@ -5156,6 +5157,22 @@ current object is executed.
 <b>Attribute <t><t>Description
 CatchSignal.SignalName <t><t>Signal name.
                        
+</topic>
+
+<topic>GeDynContextMenu <style>function
+ContextMenu 
+
+An popup menu is opened by clicking MB3. The popup menu can contain up to 10 menu items.
+For each item an Xtt command can be specified that will be executed when the item is 
+activated.
+
+<b>Attribute <t><t>Description
+ContextMenu.ItemText[0] <t><t>Text of first menu item.
+ContextMenu.ItemAction[0] <t><t>Xtt command to execute when the menu item is activated.
+ContextMenu.ItemText[1] <t><t>Text of second menu item.
+ContextMenu.ItemAction[1] <t><t>Xtt command to execute when the menu item is activated.
+...
+
 </topic>
 
 </headerlevel>

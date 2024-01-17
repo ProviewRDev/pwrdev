@@ -4504,17 +4504,21 @@ Command   <t>-          <t>Exekverar ett xtt-kommando vid Klick MB1. <link>GeDyn
 CommandDoubleClick <t>- <t>Exekverar ett xtt-kommando vid Dubbelklick MB1. <link>GeDynCommandDoubleClick
 Script    <t>-          <t>Exekverar ett xtt-script vid Klick MB1, eller när grafen öppnas eller stängs. <link>GeDynScript
 Confirm   <t>-          <t>Verifiering innan aktionen utförs. <link>GeDynConfirm
-IncrAnalog <t>Float32   <t>Öka eller minska ett analogt värde. <link>GeDynIncrAnalog
-RadioButton <t>Boolean  <t>Radio-knapps uppförande hos komponenten. <link>GeDynRadioButton
-Slider    <t>Float32 Int32 <t>Reserverad för slider subgrafer.
-ValueInput <t>Valfri    <t>Inmatning. <link>GeDynValueInput
-ToolTip   <t>-          <t>Visning av tooltip text. <link>GeDynToolTip
 Help      <t>-          <t>Visar en hjälptext vid Klick MB1. <link>GeDynHelp
 OpenGraph <t>-          <t>Öppnar en graf vid Klick MB1. <link>GeDynOpenGraph
 OpenURL   <t>-          <t>Öppnar en URL i en lämplig web-läsare vid Klick <link>GeDynOpenURL
           <t>           <t>MB1.
-PulldownMenu <t>- 	<t>Aktion för rullgardings menyer. <link>GeDynPulldownMenu
+IncrAnalog <t>Float32   <t>Öka eller minska ett analogt värde. <link>GeDynIncrAnalog
+RadioButton <t>Boolean  <t>Radio-knapps uppförande hos komponenten. <link>GeDynRadioButton
+ValueInput <t>Valfri    <t>Inmatning. <link>GeDynValueInput
+ToolTip   <t>-          <t>Visning av tooltip text. <link>GeDynToolTip
+InputFocus <t>-         <t>Sätt input fokus. <link>GeDynInputFocus
 OptionMenu <t>-		<t>Aktion för option menyer. <link>GeDynOptionMenu
+PulldownMenu <t>- 	<t>Aktion för rullgardingsmenyer. <link>GeDynPulldownMenu
+MethodPulldownMenu <t>- <t>Aktion for rullgardingsmenyer med objeksmetoder. <link>GeDynMethodPulldownMenu
+EmitSignal <t>- 	<t>Emittera en signal. <link>GeDynEmitSignal
+CatchSignal <t>- 	<t>Fånga en signal. <link>GeDynCatchSignal
+ContextMenu <t>- 	<t>Öppna en popupmeny. <link>GeDynContextMenu
 </topic>
 
 <headerlevel>
@@ -4955,6 +4959,21 @@ det aktuella objektet.
 <b>Attribut <t><t>Beskrivning
 CatchSignal.SignalName <t><t>Signalnamn.
                        
+</topic>
+
+<topic>GeDynContextMenu <style>function
+ContextMenu 
+
+En popup-meny öppnas med MB3. Popup-menyn kan innehållat up till 10 menualternativ. För varje
+alternativ kan ett Xtt-kommando specificeras som exekveras när alternativet aktiveras.
+
+<b>Attribut <t><t>Beskrivning
+ContextMenu.ItemText[0] <t><t>Text på första menyalternativet.
+ContextMenu.ItemAction[0] <t><t>Xtt-kommando som exekveras när menyalternativet aktiveras.
+ContextMenu.ItemText[1] <t><t>Text på andra menyalternativet.
+ContextMenu.ItemAction[1] <t><t>Xtt-kommando som exekveras när menyalternativet aktiveras.
+...
+
 </topic>
 
 </headerlevel>

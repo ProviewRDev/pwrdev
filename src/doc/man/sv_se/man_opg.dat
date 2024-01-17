@@ -862,7 +862,7 @@ Ctrl+V, och sedan aktivera Functions/Collect/Show visas dessa attribut gemensamt
 Om man vill spara samlingsbilden till en senare session, görs det med 'save' kommandot.
 För att spara en samlingsbild under namnet 'mycollection' skriver man kommandot
 
-<c>> save/collect mycollection
+<c>> store/collect mycollection
 
 <image> opg_fig15.png
 <b>Fig Samlingsbild som lagras med namnet 'mycollection'
@@ -1602,6 +1602,18 @@ visar status for noden i form av en färgmarkering och status-texten.
 <image> opg_fig38.png
 <b>Fig Status monitorn
 
+Kommandot för att starta statusmonitor är
+
+<c>> rt_statusmon [-l 'language'][-c 'config-file'][-m 'status-index'][-e][-t][-o][-g]
+
+<c>-l  Språk, en_us, sv_se, de_de eller fr_fr.
+<c>-m  Visa en användardefinierad status istället för systemstatus.
+<c>-c  Konfigurationsfil. Default $HOME/rt_statusmon.dat.
+<c>-e  Visa nod-beskrivning från konfigurationsfilen.
+<c>-t  Dölj knappar för att starta runtimemonitorn i verktygspanelen och menyn.
+<c>-o  Öppna kartbild vid start.
+<c>-g  Koppla inte upp mot ProviewR runtime.
+
 <h1>Addera och ta bort noder
 En nod adderas till statusmonitorn från File/Add Node i meny, eller från plus-tecknet
 i verktygspanelen. En dialog öppnas där nodens namn anges. Man kan även ange en
@@ -1634,6 +1646,59 @@ operatörsplatsen på noden, om situation kräver detta.
 
 <image> opg_fig40.png
 <b>Fig Status for processer på noden
+
+Om en kartbild är ritad över anläggningen, kan denna öppnas från jordgloben i vertygspanelen.
+Indikatorer kommer att visa status på varje nod, och en popup-meny kan konfigureras till
+att öppna operatörsplats och runtime-navigator.
+
+<image> opg_fig54.png
+<b>Fig Kartbild
+
+<h1>Kommandon
+Statusmonitorn har en kommando-rad som öppnas med Ctrl+B. Kommandona kan framför allt användas
+i popup-menyer i kart-grafen.
+
+Följande kommandon är definierade
+
+<b>help
+Visa hjälptexten för ett ämne.
+
+<c>help 'topic'
+
+Se Xtt's hjälp-kommand för mer information.
+
+<b>select node
+Välj ut en nod i nodlistan.
+
+<c>select node /node=
+
+<c>/node   <t>Nodnamn.
+
+<b>open graph
+Öppna en Ge graf.
+
+<c>open graph 'graph'
+
+<b>open opplace
+Öppna operatörsplats för specificerad nod.
+
+<c>open opplace /node=
+
+<c>/node   <t>Nodnamn.
+
+<b>open xtt
+Öppna runtimenavigator för specificerad nod.
+
+<c>open xtt /node=
+
+<c>/node   <t>Nodnamn.
+
+<b>open rtmon
+Öppna runtime montor för specificerad nod.
+
+<c>open rtmon /node=
+
+<c>/node   <t>Nodnamn.
 
 </topic>
 </chapter>

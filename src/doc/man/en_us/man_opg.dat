@@ -792,7 +792,7 @@ By clicking on the arrow in the first row, you return to the previous page.
 
 </topic>
 </chapter>
-
+14
 <chapter>
 <topic> opg_navigator
 Navigator
@@ -870,10 +870,7 @@ and then activating Functions/Collect/Show these attributes are viewed on one pa
 A collection view can be saved to a later session by the 'save' command. To save a 
 collection view with the name 'mycollection' you write the command
 
-<c>> save/collect mycollection
-
-<image> opg_fig15.png
-<b>Fig A collection view stored with the name 'mycollection'
+<c>> store/collect mycollection
 
 The name can be found in the 'Store' map, and can also be restored by the command
 
@@ -881,6 +878,10 @@ The name can be found in the 'Store' map, and can also be restored by the comman
 
 <h2>Collection window
 A collection view can be copied to a separate window with Functions/Collect/Copy To Window.
+
+<image> opg_fig15.png
+<b>Fig Separate collection window
+
 Also an empty window can be created from Functions/Collect/New Window. New attributes are 
 added to the window by selecting the attribute in the runtime navigator, then selecting the
 collection window and activating Edit/Insert (Ctrl+V). With Shift+ArrowUp and 
@@ -1609,21 +1610,97 @@ Status Monitor
 
 The Status Monitor is a tool to supervise and handle process- and operator
 stations. You add nodes that you want to supervise and the statusmonitor views
-status for the node, with color indication and status text.
+status for the node, with color indication and status information.
+
+By default the SystemStatus is displayed for the nodes, but with the -m option
+another status assigned by the application can be displayed instead.
 
 <image> opg_fig38.png
 <b>Fig The Status Monitor
 
+The command to start the status monitor is
+
+<c>> rt_statusmon [-l 'language'][-c 'config-file'][-m 'status-index'][-e][-t][-o][-g]
+
+<c>-l  Language, en_us, sv_se, de_de or fr_fr.
+<c>-m  Display a user defined status insteadad of system status.
+<c>-c  Configuration file. Default $HOME/rt_statusmon.dat.
+<c>-e  Show node description from setup file.
+<c>-t  Hide buttons to start Runtime Monitor in toolbar and menu.
+<c>-o  Open map at start.
+<c>-g  Don't connect to ProviewR runtime.
+
 <h1>Add and remove nodes
+Nodes are added and removed to the list with the '+' and '-' buttons in the tool bar. 
+When adding a node the nodename, ip address, bus id, description and operator place 
+should be specified.
 
 <image> opg_fig41.png
-<b>Fig Adding of a node
+<b>Fig Add node
+
+More information is displayed by opening a node by clicking on the map.
 
 <image> opg_fig39.png
 <b>Fig Node info
 
+By opening the SystemStatus map, the status for the individual processes are 
+displayed.
+
 <image> opg_fig40.png
 <b>Fig Process status for a node
+
+If a map is drawn over the plant, this can be opened from the globe in the toolbar.
+Indicators will show the status of each node, and a popup menues can be configured to
+open oeratorplace and xtt.
+
+<image> opg_fig54.png
+<b>Fig Map
+
+<h1>Commands
+The status monitor contains a command line that is opened with Ctrl+B. The commands can
+be used for map popup menues in particular.
+
+The following commands are defined
+
+<b>help
+Display the help text for a topic.
+
+<c>help 'topic'
+
+For qualifiers, see the Xtt help command
+
+<b>select node
+Select a node in the node list.
+
+<c>select node /node=
+
+<c>/node   <t>Name of the node to select.
+
+<b>open graph
+Open a Ge graph.
+
+<c>open graph 'graph'
+
+<b>open opplace
+Open operator place for specified node.
+
+<c>open opplace /node=
+
+<c>/node   <t>Name of node.
+
+<b>open xtt
+Open runtime navigator for specified node.
+
+<c>open xtt /node=
+
+<c>/node   <t>Name of node.
+
+<b>open rtmon
+Open runtime monitor for specified node.
+
+<c>open rtmon /node=
+
+<c>/node   <t>Name of node.
 
 </topic>
 </chapter>
