@@ -6,15 +6,15 @@
 <h1> Operator's Guide
 
 <hr>
-2018-03-29
-Version 6.0.0
+2024-01-17
+Version 6.1.2
 <hr>
 </topic>
 
 <topic> __DocumentInfoPage
 
 
-Copyright 2005-2022 SSAB EMEA AB
+Copyright 2005-2024 SSAB EMEA AB
 
 Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.2
@@ -162,7 +162,7 @@ triangle with the letter T.
 If you click on the symbol the object graph of the object is opened. From the object graph
 you can see the properties of the object. The most interesting for a temperature sensor is
 of course the measured temperature, that is viewed both in figures and as a bar 
-(thermometer), see 'Fig Object graph for temperature sensor' below. The temperature sensor
+(thermometer), see 'Fig Object graph for a temperature sensor' below. The temperature sensor
 object also contains four alarm limits, highhigh, high, low and lowlow. The level of the
 alarm limits can be set from the graph, and also a hysteresis on the limits. With check
 boxes you can also disable the alarm limits.

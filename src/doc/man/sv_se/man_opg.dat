@@ -6,15 +6,15 @@
 <h1> Handbok för Operatörer
 
 <hr>
-2018-03-29
-Version 6.0.0	
+2024-01-17
+Version 6.1.2	
 <hr>
 </topic>
 
 <topic> __DocumentInfoPage
 
 
-Copyright (C) 2005-2022 SSAB EMEA AB
+Copyright (C) 2005-2024 SSAB EMEA AB
 
 Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.2
@@ -865,7 +865,7 @@ För att spara en samlingsbild under namnet 'mycollection' skriver man kommandot
 <c>> store/collect mycollection
 
 <image> opg_fig15.png
-<b>Fig Samlingsbild som lagras med namnet 'mycollection'
+<b>Fig Separat samlingsbild
 
 Bilden kommer att återfinnas under 'Store' mappen, och kan även återskapas med kommandot
 
