@@ -117,6 +117,7 @@ browwidget * {
   margin: 0px;
   padding: 3px;
 }
+
 #opnodebutton0 { border-style:solid; border-width: 1px; border-color: #202020;}
 #opnodeind0 { border-style:solid; border-width: 1px; border-color: black;}
 #opnodeind0_red { background-color: #ff5050; border-style:solid; border-width: 1px; border-color: black;}
@@ -124,3 +125,123 @@ browwidget * {
 #opnodeind0_yellow { background-color: yellow; border-style: solid; border-width: 1px; border-color: black;}
 #opnodeind0_black { background-color: black;}
 #opnodeind0_gray { background-color: #505050; border-style: solid; border-width: 1px; border-color: black;}
+
+#opnodebutton1 { border-style:solid; border-width: 1px; border-color: #202020;}
+#opnodeind1 { border-style:solid; border-width: 1px; border-color: black;}
+#opnodeind1_red { background-color: #ff5050; border-style:solid; border-width: 1px; border-color: black;}
+#opnodeind1_green { background-color: #50ff00; border-style: solid; border-width: 1px; border-color: black;}
+#opnodeind1_yellow { background-color: yellow; border-style: solid; border-width: 1px; border-color: black;}
+#opnodeind1_black { background-color: black;}
+#opnodeind1_gray { background-color: #505050; border-style: solid; border-width: 1px; border-color: black;}
+
+#opnodebutton2 { border-style:solid; border-width: 1px; border-color: #202020;}
+#opnodeind2 { border-style:solid; border-width: 1px; border-color: black;}
+#opnodeind2_red { background-color: #ff5050; border-style:solid; border-width: 1px; border-color: black;}
+#opnodeind2_green { background-color: #50ff00; border-style: solid; border-width: 1px; border-color: black;}
+#opnodeind2_yellow { background-color: yellow; border-style: solid; border-width: 1px; border-color: black;}
+#opnodeind2_black { background-color: black;}
+#opnodeind2_gray { background-color: #505050; border-style: solid; border-width: 1px; border-color: black;}
+
+#opnodebutton3 { border-style:solid; border-width: 1px; border-color: #202020;}
+#opnodeind3 { border-style:solid; border-width: 1px; border-color: black;}
+#opnodeind3_red { background-color: #ff5050; border-style:solid; border-width: 1px; border-color: black;}
+#opnodeind3_green { background-color: #50ff00; border-style: solid; border-width: 1px; border-color: black;}
+#opnodeind3_yellow { background-color: yellow; border-style: solid; border-width: 1px; border-color: black;}
+#opnodeind3_black { background-color: black;}
+#opnodeind3_gray { background-color: #505050; border-style: solid; border-width: 1px; border-color: black;}
+
+#opnodebutton4 { border-style:solid; border-width: 1px; border-color: #202020;}
+#opnodeind4 { border-style:solid; border-width: 1px; border-color: black;}
+#opnodeind4_red { background-color: #ff5050; border-style:solid; border-width: 1px; border-color: black;}
+#opnodeind4_green { background-color: #50ff00; border-style: solid; border-width: 1px; border-color: black;}
+#opnodeind4_yellow { background-color: yellow; border-style: solid; border-width: 1px; border-color: black;}
+#opnodeind4_black { background-color: black;}
+#opnodeind4_gray { background-color: #505050; border-style: solid; border-width: 1px; border-color: black;}
+
+#opnodebutton5 { border-style:solid; border-width: 1px; border-color: #202020;}
+#opnodeind5 { border-style:solid; border-width: 1px; border-color: black;}
+#opnodeind5_red { background-color: #ff5050; border-style:solid; border-width: 1px; border-color: black;}
+#opnodeind5_green { background-color: #50ff00; border-style: solid; border-width: 1px; border-color: black;}
+#opnodeind5_yellow { background-color: yellow; border-style: solid; border-width: 1px; border-color: black;}
+#opnodeind5_black { background-color: black;}
+#opnodeind5_gray { background-color: #505050; border-style: solid; border-width: 1px; border-color: black;}
+
+#opnodebutton6 { border-style:solid; border-width: 1px; border-color: #202020;}
+#opnodeind6 { border-style:solid; border-width: 1px; border-color: black;}
+#opnodeind6_red { background-color: #ff5050; border-style:solid; border-width: 1px; border-color: black;}
+#opnodeind6_green { background-color: #50ff00; border-style: solid; border-width: 1px; border-color: black;}
+#opnodeind6_yellow { background-color: yellow; border-style: solid; border-width: 1px; border-color: black;}
+#opnodeind6_black { background-color: black;}
+#opnodeind6_gray { background-color: #505050; border-style: solid; border-width: 1px; border-color: black;}
+
+#opnodebutton7 { border-style:solid; border-width: 1px; border-color: #202020;}
+#opnodeind7 { border-style:solid; border-width: 1px; border-color: black;}
+#opnodeind7_red { background-color: #ff5050; border-style:solid; border-width: 1px; border-color: black;}
+#opnodeind7_green { background-color: #50ff00; border-style: solid; border-width: 1px; border-color: black;}
+#opnodeind7_yellow { background-color: yellow; border-style: solid; border-width: 1px; border-color: black;}
+#opnodeind7_black { background-color: black;}
+#opnodeind7_gray { background-color: #505050; border-style: solid; border-width: 1px; border-color: black;}
+
+#opnodebutton8 { border-style:solid; border-width: 1px; border-color: #202020;}
+#opnodeind8 { border-style:solid; border-width: 1px; border-color: black;}
+#opnodeind8_red { background-color: #ff5050; border-style:solid; border-width: 1px; border-color: black;}
+#opnodeind8_green { background-color: #50ff00; border-style: solid; border-width: 1px; border-color: black;}
+#opnodeind8_yellow { background-color: yellow; border-style: solid; border-width: 1px; border-color: black;}
+#opnodeind8_black { background-color: black;}
+#opnodeind8_gray { background-color: #505050; border-style: solid; border-width: 1px; border-color: black;}
+
+#opnodebutton9 { border-style:solid; border-width: 1px; border-color: #202020;}
+#opnodeind9 { border-style:solid; border-width: 1px; border-color: black;}
+#opnodeind9_red { background-color: #ff5050; border-style:solid; border-width: 1px; border-color: black;}
+#opnodeind9_green { background-color: #50ff00; border-style: solid; border-width: 1px; border-color: black;}
+#opnodeind9_yellow { background-color: yellow; border-style: solid; border-width: 1px; border-color: black;}
+#opnodeind9_black { background-color: black;}
+#opnodeind9_gray { background-color: #505050; border-style: solid; border-width: 1px; border-color: black;}
+
+#opnodebutton10 { border-style:solid; border-width: 1px; border-color: #202020;}
+#opnodeind10 { border-style:solid; border-width: 1px; border-color: black;}
+#opnodeind10_red { background-color: #ff5050; border-style:solid; border-width: 1px; border-color: black;}
+#opnodeind10_green { background-color: #50ff00; border-style: solid; border-width: 1px; border-color: black;}
+#opnodeind10_yellow { background-color: yellow; border-style: solid; border-width: 1px; border-color: black;}
+#opnodeind10_black { background-color: black;}
+#opnodeind10_gray { background-color: #505050; border-style: solid; border-width: 1px; border-color: black;}
+
+#opnodebutton11 { border-style:solid; border-width: 1px; border-color: #202020;}
+#opnodeind11 { border-style:solid; border-width: 1px; border-color: black;}
+#opnodeind11_red { background-color: #ff5050; border-style:solid; border-width: 1px; border-color: black;}
+#opnodeind11_green { background-color: #50ff00; border-style: solid; border-width: 1px; border-color: black;}
+#opnodeind11_yellow { background-color: yellow; border-style: solid; border-width: 1px; border-color: black;}
+#opnodeind11_black { background-color: black;}
+#opnodeind11_gray { background-color: #505050; border-style: solid; border-width: 1px; border-color: black;}
+
+#opnodebutton12 { border-style:solid; border-width: 1px; border-color: #202020;}
+#opnodeind12 { border-style:solid; border-width: 1px; border-color: black;}
+#opnodeind12_red { background-color: #ff5050; border-style:solid; border-width: 1px; border-color: black;}
+#opnodeind12_green { background-color: #50ff00; border-style: solid; border-width: 1px; border-color: black;}
+#opnodeind12_yellow { background-color: yellow; border-style: solid; border-width: 1px; border-color: black;}
+#opnodeind12_black { background-color: black;}
+#opnodeind12_gray { background-color: #505050; border-style: solid; border-width: 1px; border-color: black;}
+
+#opnodebutton13 { border-style:solid; border-width: 1px; border-color: #202020;}
+#opnodeind13 { border-style:solid; border-width: 1px; border-color: black;}
+#opnodeind13_red { background-color: #ff5050; border-style:solid; border-width: 1px; border-color: black;}
+#opnodeind13_green { background-color: #50ff00; border-style: solid; border-width: 1px; border-color: black;}
+#opnodeind13_yellow { background-color: yellow; border-style: solid; border-width: 1px; border-color: black;}
+#opnodeind13_black { background-color: black;}
+#opnodeind13_gray { background-color: #505050; border-style: solid; border-width: 1px; border-color: black;}
+
+#opnodebutton14 { border-style:solid; border-width: 1px; border-color: #202020;}
+#opnodeind14 { border-style:solid; border-width: 1px; border-color: black;}
+#opnodeind14_red { background-color: #ff5050; border-style:solid; border-width: 1px; border-color: black;}
+#opnodeind14_green { background-color: #50ff00; border-style: solid; border-width: 1px; border-color: black;}
+#opnodeind14_yellow { background-color: yellow; border-style: solid; border-width: 1px; border-color: black;}
+#opnodeind14_black { background-color: black;}
+#opnodeind14_gray { background-color: #505050; border-style: solid; border-width: 1px; border-color: black;}
+
+#opnodebutton15 { border-style:solid; border-width: 1px; border-color: #202020;}
+#opnodeind15 { border-style:solid; border-width: 1px; border-color: black;}
+#opnodeind15_red { background-color: #ff5050; border-style:solid; border-width: 1px; border-color: black;}
+#opnodeind15_green { background-color: #50ff00; border-style: solid; border-width: 1px; border-color: black;}
+#opnodeind15_yellow { background-color: yellow; border-style: solid; border-width: 1px; border-color: black;}
+#opnodeind15_black { background-color: black;}
+#opnodeind15_gray { background-color: #505050; border-style: solid; border-width: 1px; border-color: black;}
