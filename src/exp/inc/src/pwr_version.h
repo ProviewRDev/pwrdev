@@ -1,6 +1,6 @@
 /*
  * ProviewR   Open Source Process Control.
- * Copyright (C) 2005-2023 SSAB EMEA AB.
+ * Copyright (C) 2005-2024 SSAB EMEA AB.
  *
  * This file is part of ProviewR.
  *
@@ -76,13 +76,13 @@
   ((pwr_tVersion)((a << 24) + (b << 16) + (c << 8) + d))
 #endif
 
-#define pwrv_cBuildTimeStr "26-MAY-2023 12:00:00"
+#define pwrv_cBuildTimeStr "17-JAN-2024 12:00:00"
 
-#define pwrv_cPwrVersionStr "V6.1.0"
-#define pwrv_cPwrVersion SET_VERSION('V', 6, 1, 0)
+#define pwrv_cPwrVersionStr "V6.1.2"
+#define pwrv_cPwrVersion SET_VERSION('V', 6, 1, 2)
 
 #define pwrv_cWbdbVersionShortStr "V61"
-#define pwrv_cPwrCopyright "Copyright (C) 2005-2023 SSAB EMEA AB"
+#define pwrv_cPwrCopyright "Copyright (C) 2005-2024 SSAB EMEA AB"
 
 #if (pwr_dHost_byteOrder == pwr_dLittleEndian)
 #define PWRV_VERSION_MAJOR (0xFF & (pwrv_cPwrVersion >> 8))
