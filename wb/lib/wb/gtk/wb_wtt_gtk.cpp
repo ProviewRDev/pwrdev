@@ -1,6 +1,6 @@
 /*
  * ProviewR   Open Source Process Control.
- * Copyright (C) 2005-2023 SSAB EMEA AB.
+ * Copyright (C) 2005-2024 SSAB EMEA AB.
  *
  * This file is part of ProviewR.
  *
@@ -1058,7 +1058,7 @@ void WttGtk::activate_statusmon(GtkWidget* w, gpointer data)
   pwr_tStatus sts;
 
   Nodelist* nl = new NodelistGtk(wtt, ((WttGtk*)wtt)->toplevel,
-      "Supervision Center", nodelist_eMode_SystemStatus, 0, 0, 0, &sts);
+      "Supervision Center", nodelist_eMode_SystemStatus, (nl_mLayout)0, 0, 0, &sts);
   nl->set_scantime(3);
   nl->help_cb = wtt_help_cb;
 }
