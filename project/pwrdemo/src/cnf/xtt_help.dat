@@ -733,15 +733,16 @@ number of burning burners (blue).
 <topic>Proc_DataQueues
 DataQueues
 
-The graph shows a heating roller bed with a furnish for heating of plates, 
-and a cooling rooler bed for cooling the plates.
+The graph shows a heating roller bed with a furnace for heating of plates, 
+and a cooling rooler bed for cooling the plates. A painting machine is
+placed on the cooling rooler bed.
 
 Plate objects are created for each plate and inserted into the heating
 data queue where the position and temperature of the plates are calculated.
 When they reach the end of the rooler be they are passed to the cooling data
 queue.
 
-Press the 'Start' button to start the sequence. Modify the furnish temperature
+Press the 'Start' button to start the sequence. Modify the furnace temperature
 and roller bed speed with the sliders.
 </topic>
 

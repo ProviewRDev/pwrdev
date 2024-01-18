@@ -9032,3 +9032,27 @@
  2 27-NOV-2023 14:22:55.69 23533   DirectoryBuild  claes       pop
  2 27-NOV-2023 14:22:55.69 23533   DirectoryBuild  claes       pwr_exe
  2 27-NOV-2023 14:22:55.69 23533   DirectoryBuild  claes       pwrp_load
+1  18-JAN-2024 08:58:08.49 2244877 WbLogin      claes       pwrp
+1  18-JAN-2024 10:55:12.12 2260695 WbLogin      claes       pwrp
+1  18-JAN-2024 10:56:20.70 2260695 ConfigSave   claes       VolPwrDemo
+1  18-JAN-2024 10:57:10.63 2260695 PlcSave      claes       VolPwrDemo:Demo-Process-DataQueues-Plc-W
+1  18-JAN-2024 10:58:09.25 2260695 PlcBuild     claes       VolPwrDemo:Demo-Process-DataQueues-Plc-W
+1  18-JAN-2024 10:58:09.39 2260695 PlcBuild     claes       VolPwrDemo:Demo-Process-DataQueues-Plc-W-DataQFo2-W
+1  18-JAN-2024 10:58:09.54 2260695 PlcBuild     claes       VolPwrDemo:Demo-Process-DataQueues-Plc-W-DataQFo3-W
+1  18-JAN-2024 10:58:09.68 2260695 PlcBuild     claes       VolPwrDemo:Demo-Process-DataQueues-Plc-W-DataQFo7-W
+1  18-JAN-2024 10:58:09.90 2260695 PlcBuild     claes       VolPwrDemo:Demo-Process-DataQueues-Sim-W
+ 2 18-JAN-2024 10:58:13.79 2260695 DirectoryBuild  claes       appl
+ 3 18-JAN-2024 10:58:14.13 2260695 GeBuild      claes       demo_proc_dataqueues_l
+ 2 18-JAN-2024 10:58:14.74 2260695 VolumeBuild  claes       VolPwrDemo
+ 2 18-JAN-2024 10:58:15.15 2260695 DirectoryBuild  claes       pop
+ 2 18-JAN-2024 10:58:15.18 2260695 DirectoryBuild  claes       pwr_exe
+ 2 18-JAN-2024 10:58:15.18 2260695 DirectoryBuild  claes       pwrp_load
+1  18-JAN-2024 10:59:04.55 2261367 WbLogin      claes       pwrp
+1  18-JAN-2024 10:59:49.20 2261479 WbLogin      claes       pwrp
+1  18-JAN-2024 10:59:52.81 2261479 ConfigSave   claes       directory
+1  18-JAN-2024 11:00:00.69 2261539 WbLogin      claes       pwrp
+ 2 18-JAN-2024 11:00:03.98 2261539 DirectoryBuild  claes       appl
+ 2 18-JAN-2024 11:00:04.64 2261539 NodeBuild    claes       DemoNode
+ 2 18-JAN-2024 11:00:04.64 2261539 DirectoryBuild  claes       pop
+ 2 18-JAN-2024 11:00:04.65 2261539 DirectoryBuild  claes       pwr_exe
+ 2 18-JAN-2024 11:00:04.65 2261539 DirectoryBuild  claes       pwrp_load
