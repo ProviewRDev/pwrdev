@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <office:document xmlns:officeooo="http://openoffice.org/2009/office" xmlns:css3t="http://www.w3.org/TR/css3-text/" xmlns:grddl="http://www.w3.org/2003/g/data-view#" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:formx="urn:openoffice:names:experimental:ooxml-odf-interop:xmlns:form:1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:chart="urn:oasis:names:tc:opendocument:xmlns:chart:1.0" xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:oooc="http://openoffice.org/2004/calc" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:ooow="http://openoffice.org/2004/writer" xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rpt="http://openoffice.org/2005/report" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:config="urn:oasis:names:tc:opendocument:xmlns:config:1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" xmlns:ooo="http://openoffice.org/2004/office" xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:dr3d="urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0" xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0" xmlns:of="urn:oasis:names:tc:opendocument:xmlns:of:1.2" xmlns:calcext="urn:org:documentfoundation:names:experimental:calc:xmlns:calcext:1.0" xmlns:tableooo="http://openoffice.org/2009/table" xmlns:drawooo="http://openoffice.org/2010/draw" xmlns:loext="urn:org:documentfoundation:names:experimental:office:xmlns:loext:1.0" xmlns:dom="http://www.w3.org/2001/xml-events" xmlns:field="urn:openoffice:names:experimental:ooo-ms-interop:xmlns:field:1.0" xmlns:math="http://www.w3.org/1998/Math/MathML" xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0" xmlns:script="urn:oasis:names:tc:opendocument:xmlns:script:1.0" xmlns:xforms="http://www.w3.org/2002/xforms" office:version="1.3" office:mimetype="application/vnd.oasis.opendocument.text">
- <office:meta><meta:generator>LibreOffice/7.0.4.2$Linux_X86_64 LibreOffice_project/00$Build-2</meta:generator><meta:creation-date>2007-06-04T07:08:33</meta:creation-date><dc:date>2023-06-01T08:29:57.163484113</dc:date><dc:language>en-US</dc:language><meta:editing-cycles>243</meta:editing-cycles><meta:editing-duration>P30DT11H58M3S</meta:editing-duration><meta:document-statistic meta:table-count="7" meta:image-count="3" meta:object-count="0" meta:page-count="15" meta:paragraph-count="213" meta:word-count="2582" meta:character-count="15235" meta:non-whitespace-character-count="12730"/><meta:user-defined meta:name="Info 1"/><meta:user-defined meta:name="Info 2"/><meta:user-defined meta:name="Info 3"/><meta:user-defined meta:name="Info 4"/></office:meta>
+ <office:meta><meta:generator>LibreOffice/7.0.4.2$Linux_X86_64 LibreOffice_project/00$Build-2</meta:generator><meta:creation-date>2007-06-04T07:08:33</meta:creation-date><dc:date>2024-01-19T13:16:39.937793211</dc:date><dc:language>en-US</dc:language><meta:editing-cycles>263</meta:editing-cycles><meta:editing-duration>P30DT13H57M48S</meta:editing-duration><meta:document-statistic meta:table-count="15" meta:image-count="8" meta:object-count="0" meta:page-count="20" meta:paragraph-count="359" meta:word-count="3508" meta:character-count="20856" meta:non-whitespace-character-count="17567"/><meta:user-defined meta:name="Info 1"/><meta:user-defined meta:name="Info 2"/><meta:user-defined meta:name="Info 3"/><meta:user-defined meta:name="Info 4"/></office:meta>
  <office:settings>
   <config:config-item-set config:name="ooo:view-settings">
-   <config:config-item config:name="ViewAreaTop" config:type="long">413895</config:config-item>
+   <config:config-item config:name="ViewAreaTop" config:type="long">566360</config:config-item>
    <config:config-item config:name="ViewAreaLeft" config:type="long">0</config:config-item>
-   <config:config-item config:name="ViewAreaWidth" config:type="long">24389</config:config-item>
-   <config:config-item config:name="ViewAreaHeight" config:type="long">16014</config:config-item>
+   <config:config-item config:name="ViewAreaWidth" config:type="long">29335</config:config-item>
+   <config:config-item config:name="ViewAreaHeight" config:type="long">15071</config:config-item>
    <config:config-item config:name="ShowRedlineChanges" config:type="boolean">true</config:config-item>
    <config:config-item config:name="InBrowseMode" config:type="boolean">false</config:config-item>
    <config:config-item-map-indexed config:name="Views">
     <config:config-item-map-entry>
      <config:config-item config:name="ViewId" config:type="string">view2</config:config-item>
-     <config:config-item config:name="ViewLeft" config:type="long">3695</config:config-item>
-     <config:config-item config:name="ViewTop" config:type="long">425295</config:config-item>
+     <config:config-item config:name="ViewLeft" config:type="long">6168</config:config-item>
+     <config:config-item config:name="ViewTop" config:type="long">570876</config:config-item>
      <config:config-item config:name="VisibleLeft" config:type="long">0</config:config-item>
-     <config:config-item config:name="VisibleTop" config:type="long">413895</config:config-item>
-     <config:config-item config:name="VisibleRight" config:type="long">24388</config:config-item>
-     <config:config-item config:name="VisibleBottom" config:type="long">429907</config:config-item>
+     <config:config-item config:name="VisibleTop" config:type="long">566360</config:config-item>
+     <config:config-item config:name="VisibleRight" config:type="long">29333</config:config-item>
+     <config:config-item config:name="VisibleBottom" config:type="long">581429</config:config-item>
      <config:config-item config:name="ZoomType" config:type="short">0</config:config-item>
      <config:config-item config:name="ViewLayoutColumns" config:type="short">0</config:config-item>
      <config:config-item config:name="ViewLayoutBookMode" config:type="boolean">false</config:config-item>
@@ -85,7 +85,7 @@
    <config:config-item config:name="ChartAutoUpdate" config:type="boolean">true</config:config-item>
    <config:config-item config:name="PrinterSetup" config:type="base64Binary"/>
    <config:config-item config:name="AddParaTableSpacingAtStart" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="Rsid" config:type="int">10596549</config:config-item>
+   <config:config-item config:name="Rsid" config:type="int">11643397</config:config-item>
    <config:config-item config:name="EmbeddedDatabaseName" config:type="string"/>
    <config:config-item config:name="FieldAutoUpdate" config:type="boolean">true</config:config-item>
    <config:config-item config:name="OutlineLevelYieldsNumbering" config:type="boolean">false</config:config-item>
@@ -264,6 +264,10 @@
   </style:style>
   <style:style style:name="heading_20_4" style:display-name="heading 4" style:family="paragraph" style:parent-style-name="Heading" style:next-style-name="Text_20_body">
    <style:text-properties fo:font-size="11.5pt" fo:font-style="italic" fo:font-weight="bold" style:font-size-complex="11.5pt" style:font-style-complex="italic" style:font-weight-complex="bold"/>
+  </style:style>
+  <style:style style:name="Title" style:family="paragraph" style:parent-style-name="Heading" style:next-style-name="Text_20_body" style:class="chapter">
+   <style:paragraph-properties fo:text-align="center" style:justify-single-word="false"/>
+   <style:text-properties fo:font-size="28pt" fo:font-weight="bold" style:font-size-asian="28pt" style:font-weight-asian="bold" style:font-size-complex="28pt" style:font-weight-complex="bold"/>
   </style:style>
   <style:style style:name="Numbering_20_Symbols" style:display-name="Numbering Symbols" style:family="text"/>
   <style:style style:name="Bullet_20_Symbols" style:display-name="Bullet Symbols" style:family="text">
@@ -606,6 +610,102 @@
   <style:style style:name="Table7.C2" style:family="table-cell">
    <style:table-cell-properties fo:padding="0.049cm" fo:border-left="0.05pt solid #000000" fo:border-right="0.05pt solid #000000" fo:border-top="none" fo:border-bottom="0.05pt solid #000000" style:writing-mode="page"/>
   </style:style>
+  <style:style style:name="Tabell1" style:family="table">
+   <style:table-properties style:width="16.999cm" table:align="margins"/>
+  </style:style>
+  <style:style style:name="Tabell1.A" style:family="table-column">
+   <style:table-column-properties style:column-width="3.704cm" style:rel-column-width="14280*"/>
+  </style:style>
+  <style:style style:name="Tabell1.B" style:family="table-column">
+   <style:table-column-properties style:column-width="13.294cm" style:rel-column-width="51255*"/>
+  </style:style>
+  <style:style style:name="Tabell1.A1" style:family="table-cell">
+   <style:table-cell-properties style:writing-mode="page"/>
+  </style:style>
+  <style:style style:name="Tabell2" style:family="table">
+   <style:table-properties style:width="16.999cm" table:align="margins"/>
+  </style:style>
+  <style:style style:name="Tabell2.A" style:family="table-column">
+   <style:table-column-properties style:column-width="3.704cm" style:rel-column-width="14280*"/>
+  </style:style>
+  <style:style style:name="Tabell2.B" style:family="table-column">
+   <style:table-column-properties style:column-width="13.294cm" style:rel-column-width="51255*"/>
+  </style:style>
+  <style:style style:name="Tabell2.A1" style:family="table-cell">
+   <style:table-cell-properties fo:padding="0cm" fo:border="none" style:writing-mode="page"/>
+  </style:style>
+  <style:style style:name="Tabell3" style:family="table">
+   <style:table-properties style:width="16.999cm" table:align="margins"/>
+  </style:style>
+  <style:style style:name="Tabell3.A" style:family="table-column">
+   <style:table-column-properties style:column-width="3.704cm" style:rel-column-width="14280*"/>
+  </style:style>
+  <style:style style:name="Tabell3.B" style:family="table-column">
+   <style:table-column-properties style:column-width="13.294cm" style:rel-column-width="51255*"/>
+  </style:style>
+  <style:style style:name="Tabell3.A1" style:family="table-cell">
+   <style:table-cell-properties style:writing-mode="page"/>
+  </style:style>
+  <style:style style:name="Tabell4" style:family="table">
+   <style:table-properties style:width="16.999cm" table:align="margins"/>
+  </style:style>
+  <style:style style:name="Tabell4.A" style:family="table-column">
+   <style:table-column-properties style:column-width="3.704cm" style:rel-column-width="14280*"/>
+  </style:style>
+  <style:style style:name="Tabell4.B" style:family="table-column">
+   <style:table-column-properties style:column-width="13.294cm" style:rel-column-width="51255*"/>
+  </style:style>
+  <style:style style:name="Tabell4.A1" style:family="table-cell">
+   <style:table-cell-properties style:writing-mode="page"/>
+  </style:style>
+  <style:style style:name="Tabell5" style:family="table">
+   <style:table-properties style:width="16.999cm" table:align="margins"/>
+  </style:style>
+  <style:style style:name="Tabell5.A" style:family="table-column">
+   <style:table-column-properties style:column-width="3.704cm" style:rel-column-width="14280*"/>
+  </style:style>
+  <style:style style:name="Tabell5.B" style:family="table-column">
+   <style:table-column-properties style:column-width="13.294cm" style:rel-column-width="51255*"/>
+  </style:style>
+  <style:style style:name="Tabell5.A1" style:family="table-cell">
+   <style:table-cell-properties fo:padding="0cm" fo:border="none" style:writing-mode="page"/>
+  </style:style>
+  <style:style style:name="Tabell6" style:family="table">
+   <style:table-properties style:width="16.974cm" table:align="right"/>
+  </style:style>
+  <style:style style:name="Tabell6.A" style:family="table-column">
+   <style:table-column-properties style:column-width="3.681cm"/>
+  </style:style>
+  <style:style style:name="Tabell6.B" style:family="table-column">
+   <style:table-column-properties style:column-width="13.293cm"/>
+  </style:style>
+  <style:style style:name="Tabell6.A1" style:family="table-cell">
+   <style:table-cell-properties fo:padding="0cm" fo:border="none" style:writing-mode="page"/>
+  </style:style>
+  <style:style style:name="Tabell7" style:family="table">
+   <style:table-properties style:width="16.974cm" table:align="right"/>
+  </style:style>
+  <style:style style:name="Tabell7.A" style:family="table-column">
+   <style:table-column-properties style:column-width="3.681cm"/>
+  </style:style>
+  <style:style style:name="Tabell7.B" style:family="table-column">
+   <style:table-column-properties style:column-width="13.293cm"/>
+  </style:style>
+  <style:style style:name="Tabell7.A1" style:family="table-cell">
+   <style:table-cell-properties fo:padding="0cm" fo:border="none" style:writing-mode="page"/>
+  </style:style>
+  <style:style style:name="Tabell8" style:family="table">
+   <style:table-properties style:width="16.974cm" table:align="right"/>
+  </style:style>
+  <style:style style:name="Tabell8.A" style:family="table-column">
+   <style:table-column-properties style:column-width="3.681cm"/>
+  </style:style>
+  <style:style style:name="Tabell8.B" style:family="table-column">
+   <style:table-column-properties style:column-width="13.293cm"/>
+  </style:style>
+  <style:style style:name="Tabell8.A1" style:family="table-cell">
+   <style:table-cell-properties fo:padding="0cm" fo:border="none" style:writing-mode="page"/>
+  </style:style>
   <style:style style:name="P1" style:family="paragraph" style:parent-style-name="Standard">
    <style:text-properties fo:font-size="32pt" fo:font-weight="bold" style:font-size-asian="32pt" style:font-weight-asian="bold" style:font-size-complex="32pt" style:font-weight-complex="bold"/>
   </style:style>
@@ -662,312 +762,432 @@
    <style:text-properties officeooo:paragraph-rsid="0081ed80"/>
   </style:style>
   <style:style style:name="P18" style:family="paragraph" style:parent-style-name="Text_20_body">
-   <style:text-properties officeooo:paragraph-rsid="00820c58"/>
-  </style:style>
-  <style:style style:name="P19" style:family="paragraph" style:parent-style-name="Text_20_body">
    <style:text-properties officeooo:rsid="0077a065" officeooo:paragraph-rsid="0077a065"/>
   </style:style>
-  <style:style style:name="P20" style:family="paragraph" style:parent-style-name="Text_20_body">
+  <style:style style:name="P19" style:family="paragraph" style:parent-style-name="Text_20_body">
    <style:text-properties officeooo:rsid="0079a013" officeooo:paragraph-rsid="0079a013"/>
   </style:style>
-  <style:style style:name="P21" style:family="paragraph" style:parent-style-name="Text_20_body">
+  <style:style style:name="P20" style:family="paragraph" style:parent-style-name="Text_20_body">
    <style:text-properties officeooo:rsid="0079d335"/>
   </style:style>
-  <style:style style:name="P22" style:family="paragraph" style:parent-style-name="Text_20_body">
+  <style:style style:name="P21" style:family="paragraph" style:parent-style-name="Text_20_body">
    <style:text-properties officeooo:rsid="0079d335" officeooo:paragraph-rsid="0079d335"/>
   </style:style>
-  <style:style style:name="P23" style:family="paragraph" style:parent-style-name="Text_20_body">
+  <style:style style:name="P22" style:family="paragraph" style:parent-style-name="Text_20_body">
    <style:text-properties officeooo:rsid="007bfdfb" officeooo:paragraph-rsid="007bfdfb"/>
   </style:style>
-  <style:style style:name="P24" style:family="paragraph" style:parent-style-name="Text_20_body">
+  <style:style style:name="P23" style:family="paragraph" style:parent-style-name="Text_20_body">
    <style:text-properties officeooo:rsid="007bfdfb" officeooo:paragraph-rsid="007ef2b4"/>
   </style:style>
-  <style:style style:name="P25" style:family="paragraph" style:parent-style-name="Text_20_body">
+  <style:style style:name="P24" style:family="paragraph" style:parent-style-name="Text_20_body">
    <style:text-properties officeooo:rsid="007ff9b3"/>
   </style:style>
-  <style:style style:name="P26" style:family="paragraph" style:parent-style-name="Text_20_body">
+  <style:style style:name="P25" style:family="paragraph" style:parent-style-name="Text_20_body">
    <style:text-properties officeooo:rsid="0064bc69" officeooo:paragraph-rsid="0064bc69"/>
   </style:style>
-  <style:style style:name="P27" style:family="paragraph" style:parent-style-name="Text_20_body">
+  <style:style style:name="P26" style:family="paragraph" style:parent-style-name="Text_20_body">
    <style:text-properties officeooo:rsid="0066ae6d" officeooo:paragraph-rsid="0066ae6d"/>
   </style:style>
-  <style:style style:name="P28" style:family="paragraph" style:parent-style-name="Text_20_body">
+  <style:style style:name="P27" style:family="paragraph" style:parent-style-name="Text_20_body">
    <style:text-properties officeooo:rsid="00684bc0" officeooo:paragraph-rsid="00684bc0"/>
   </style:style>
-  <style:style style:name="P29" style:family="paragraph" style:parent-style-name="Text_20_body">
+  <style:style style:name="P28" style:family="paragraph" style:parent-style-name="Text_20_body">
    <style:text-properties officeooo:rsid="0069ea5e" officeooo:paragraph-rsid="0069ea5e"/>
   </style:style>
-  <style:style style:name="P30" style:family="paragraph" style:parent-style-name="Text_20_body">
+  <style:style style:name="P29" style:family="paragraph" style:parent-style-name="Text_20_body">
    <style:text-properties officeooo:rsid="006ae57e"/>
   </style:style>
-  <style:style style:name="P31" style:family="paragraph" style:parent-style-name="Text_20_body">
+  <style:style style:name="P30" style:family="paragraph" style:parent-style-name="Text_20_body">
    <style:text-properties officeooo:rsid="006ae57e" officeooo:paragraph-rsid="006ae57e"/>
   </style:style>
-  <style:style style:name="P32" style:family="paragraph" style:parent-style-name="Text_20_body">
+  <style:style style:name="P31" style:family="paragraph" style:parent-style-name="Text_20_body">
    <style:text-properties officeooo:rsid="006c5c20" officeooo:paragraph-rsid="006c5c20"/>
   </style:style>
-  <style:style style:name="P33" style:family="paragraph" style:parent-style-name="Text_20_body">
+  <style:style style:name="P32" style:family="paragraph" style:parent-style-name="Text_20_body">
    <style:text-properties officeooo:rsid="007dc4b6" officeooo:paragraph-rsid="007dc4b6"/>
   </style:style>
-  <style:style style:name="P34" style:family="paragraph" style:parent-style-name="Text_20_body">
+  <style:style style:name="P33" style:family="paragraph" style:parent-style-name="Text_20_body">
    <style:text-properties officeooo:rsid="00704237" officeooo:paragraph-rsid="00704237"/>
   </style:style>
-  <style:style style:name="P35" style:family="paragraph" style:parent-style-name="Text_20_body">
+  <style:style style:name="P34" style:family="paragraph" style:parent-style-name="Text_20_body">
    <style:text-properties officeooo:paragraph-rsid="00895fbc"/>
   </style:style>
-  <style:style style:name="P36" style:family="paragraph" style:parent-style-name="Text_20_body">
+  <style:style style:name="P35" style:family="paragraph" style:parent-style-name="Text_20_body">
    <style:text-properties officeooo:paragraph-rsid="00918ee4"/>
   </style:style>
-  <style:style style:name="P37" style:family="paragraph" style:parent-style-name="Text_20_body">
+  <style:style style:name="P36" style:family="paragraph" style:parent-style-name="Text_20_body">
    <style:text-properties officeooo:rsid="00895fbc" officeooo:paragraph-rsid="00895fbc"/>
   </style:style>
-  <style:style style:name="P38" style:family="paragraph" style:parent-style-name="Text_20_body">
+  <style:style style:name="P37" style:family="paragraph" style:parent-style-name="Text_20_body">
    <style:text-properties officeooo:rsid="008adf59" officeooo:paragraph-rsid="008adf59"/>
   </style:style>
-  <style:style style:name="P39" style:family="paragraph" style:parent-style-name="Text_20_body">
+  <style:style style:name="P38" style:family="paragraph" style:parent-style-name="Text_20_body">
    <style:text-properties officeooo:rsid="008df6b0" officeooo:paragraph-rsid="008df6b0"/>
   </style:style>
-  <style:style style:name="P40" style:family="paragraph" style:parent-style-name="Text_20_body">
-   <style:text-properties officeooo:rsid="0094356e" officeooo:paragraph-rsid="0094356e"/>
-  </style:style>
-  <style:style style:name="P41" style:family="paragraph" style:parent-style-name="Text_20_body">
+  <style:style style:name="P39" style:family="paragraph" style:parent-style-name="Text_20_body">
    <style:text-properties officeooo:rsid="00964d98" officeooo:paragraph-rsid="00964d98"/>
   </style:style>
-  <style:style style:name="P42" style:family="paragraph" style:parent-style-name="Text_20_body">
-   <style:text-properties officeooo:paragraph-rsid="0064bc69"/>
-  </style:style>
-  <style:style style:name="P43" style:family="paragraph" style:parent-style-name="Text_20_body">
+  <style:style style:name="P40" style:family="paragraph" style:parent-style-name="Text_20_body">
    <style:text-properties officeooo:rsid="0099a89a" officeooo:paragraph-rsid="0099a89a"/>
   </style:style>
+  <style:style style:name="P41" style:family="paragraph" style:parent-style-name="Text_20_body">
+   <style:text-properties officeooo:rsid="0099a89a" officeooo:paragraph-rsid="009fa725"/>
+  </style:style>
+  <style:style style:name="P42" style:family="paragraph" style:parent-style-name="Text_20_body">
+   <style:text-properties officeooo:rsid="0099a89a" officeooo:paragraph-rsid="00a24792"/>
+  </style:style>
+  <style:style style:name="P43" style:family="paragraph" style:parent-style-name="Text_20_body">
+   <style:text-properties officeooo:rsid="009b96e9" officeooo:paragraph-rsid="009fc2e1"/>
+  </style:style>
   <style:style style:name="P44" style:family="paragraph" style:parent-style-name="Text_20_body">
-   <style:text-properties officeooo:rsid="009b96e9" officeooo:paragraph-rsid="009d1ffb"/>
+   <style:text-properties officeooo:rsid="009d1ffb" officeooo:paragraph-rsid="009fa725"/>
   </style:style>
   <style:style style:name="P45" style:family="paragraph" style:parent-style-name="Text_20_body">
-   <style:text-properties officeooo:paragraph-rsid="009d1ffb"/>
+   <style:text-properties officeooo:paragraph-rsid="009fa725"/>
   </style:style>
-  <style:style style:name="P46" style:family="paragraph" style:parent-style-name="Contents_20_2">
+  <style:style style:name="P46" style:family="paragraph" style:parent-style-name="Text_20_body">
+   <style:text-properties officeooo:paragraph-rsid="00a24792"/>
+  </style:style>
+  <style:style style:name="P47" style:family="paragraph" style:parent-style-name="Text_20_body">
+   <style:text-properties officeooo:rsid="00a24792" officeooo:paragraph-rsid="00a24792"/>
+  </style:style>
+  <style:style style:name="P48" style:family="paragraph" style:parent-style-name="Text_20_body">
+   <style:text-properties officeooo:rsid="00a3c483" officeooo:paragraph-rsid="00a3c483"/>
+  </style:style>
+  <style:style style:name="P49" style:family="paragraph" style:parent-style-name="Text_20_body">
+   <style:text-properties officeooo:paragraph-rsid="0064bc69"/>
+  </style:style>
+  <style:style style:name="P50" style:family="paragraph" style:parent-style-name="Text_20_body">
+   <style:text-properties officeooo:rsid="00a29aa5" officeooo:paragraph-rsid="00a29aa5"/>
+  </style:style>
+  <style:style style:name="P51" style:family="paragraph" style:parent-style-name="Text_20_body">
+   <style:text-properties officeooo:rsid="00a6a7b9" officeooo:paragraph-rsid="00a6a7b9"/>
+  </style:style>
+  <style:style style:name="P52" style:family="paragraph" style:parent-style-name="Text_20_body">
+   <style:text-properties officeooo:rsid="00a56041" officeooo:paragraph-rsid="00a56041"/>
+  </style:style>
+  <style:style style:name="P53" style:family="paragraph" style:parent-style-name="Text_20_body">
+   <style:text-properties officeooo:rsid="00a56041" officeooo:paragraph-rsid="00a6a7b9"/>
+  </style:style>
+  <style:style style:name="P54" style:family="paragraph" style:parent-style-name="Text_20_body">
+   <style:text-properties officeooo:rsid="00a56041" officeooo:paragraph-rsid="00ac5e1a"/>
+  </style:style>
+  <style:style style:name="P55" style:family="paragraph" style:parent-style-name="Text_20_body">
+   <style:text-properties officeooo:rsid="00a944f2" officeooo:paragraph-rsid="00a944f2"/>
+  </style:style>
+  <style:style style:name="P56" style:family="paragraph" style:parent-style-name="Text_20_body">
+   <style:text-properties officeooo:rsid="00a944f2" officeooo:paragraph-rsid="00aadeef"/>
+  </style:style>
+  <style:style style:name="P57" style:family="paragraph" style:parent-style-name="Text_20_body">
+   <style:text-properties officeooo:rsid="00a944f2" officeooo:paragraph-rsid="00ac45c2"/>
+  </style:style>
+  <style:style style:name="P58" style:family="paragraph" style:parent-style-name="Text_20_body">
+   <style:text-properties officeooo:rsid="00ac5e1a" officeooo:paragraph-rsid="00ac5e1a"/>
+  </style:style>
+  <style:style style:name="P59" style:family="paragraph" style:parent-style-name="Text_20_body">
+   <style:text-properties officeooo:rsid="00acf56d" officeooo:paragraph-rsid="00acf56d"/>
+  </style:style>
+  <style:style style:name="P60" style:family="paragraph" style:parent-style-name="Text_20_body">
+   <style:text-properties officeooo:rsid="00ae3478" officeooo:paragraph-rsid="00ae3478"/>
+  </style:style>
+  <style:style style:name="P61" style:family="paragraph" style:parent-style-name="Text_20_body">
+   <style:text-properties officeooo:rsid="00aef358" officeooo:paragraph-rsid="00aef358"/>
+  </style:style>
+  <style:style style:name="P62" style:family="paragraph" style:parent-style-name="Text_20_body">
+   <style:text-properties fo:font-weight="bold" officeooo:rsid="00aef358" officeooo:paragraph-rsid="00aef358" style:font-weight-asian="bold" style:font-weight-complex="bold"/>
+  </style:style>
+  <style:style style:name="P63" style:family="paragraph" style:parent-style-name="Text_20_body">
+   <style:text-properties officeooo:rsid="00adb2a6" officeooo:paragraph-rsid="00a6a7b9"/>
+  </style:style>
+  <style:style style:name="P64" style:family="paragraph" style:parent-style-name="Contents_20_2">
    <style:paragraph-properties>
     <style:tab-stops>
      <style:tab-stop style:position="16.499cm" style:type="right" style:leader-style="dotted" style:leader-text="."/>
     </style:tab-stops>
    </style:paragraph-properties>
   </style:style>
-  <style:style style:name="P47" style:family="paragraph" style:parent-style-name="Contents_20_1">
+  <style:style style:name="P65" style:family="paragraph" style:parent-style-name="Contents_20_1">
    <style:paragraph-properties>
     <style:tab-stops>
      <style:tab-stop style:position="16.999cm" style:type="right" style:leader-style="dotted" style:leader-text="."/>
     </style:tab-stops>
    </style:paragraph-properties>
   </style:style>
-  <style:style style:name="P48" style:family="paragraph" style:parent-style-name="Table_20_Contents">
+  <style:style style:name="P66" style:family="paragraph" style:parent-style-name="Table_20_Contents">
    <style:text-properties officeooo:paragraph-rsid="0079a013"/>
   </style:style>
-  <style:style style:name="P49" style:family="paragraph" style:parent-style-name="Table_20_Contents">
+  <style:style style:name="P67" style:family="paragraph" style:parent-style-name="Table_20_Contents">
    <style:text-properties officeooo:paragraph-rsid="007bfdfb"/>
   </style:style>
-  <style:style style:name="P50" style:family="paragraph" style:parent-style-name="Table_20_Contents">
+  <style:style style:name="P68" style:family="paragraph" style:parent-style-name="Table_20_Contents">
    <style:text-properties officeooo:paragraph-rsid="007ef2b4"/>
   </style:style>
-  <style:style style:name="P51" style:family="paragraph" style:parent-style-name="Table_20_Contents">
+  <style:style style:name="P69" style:family="paragraph" style:parent-style-name="Table_20_Contents">
    <style:text-properties officeooo:rsid="0079a013" officeooo:paragraph-rsid="0079a013"/>
   </style:style>
-  <style:style style:name="P52" style:family="paragraph" style:parent-style-name="Table_20_Contents">
+  <style:style style:name="P70" style:family="paragraph" style:parent-style-name="Table_20_Contents">
    <style:text-properties officeooo:rsid="0079d335" officeooo:paragraph-rsid="0079d335"/>
   </style:style>
-  <style:style style:name="P53" style:family="paragraph" style:parent-style-name="Table_20_Contents">
+  <style:style style:name="P71" style:family="paragraph" style:parent-style-name="Table_20_Contents">
    <style:text-properties officeooo:rsid="007bfdfb" officeooo:paragraph-rsid="007bfdfb"/>
   </style:style>
-  <style:style style:name="P54" style:family="paragraph" style:parent-style-name="Table_20_Contents">
+  <style:style style:name="P72" style:family="paragraph" style:parent-style-name="Table_20_Contents">
    <style:text-properties officeooo:rsid="007ef2b4" officeooo:paragraph-rsid="007ef2b4"/>
   </style:style>
-  <style:style style:name="P55" style:family="paragraph" style:parent-style-name="Table_20_Contents">
+  <style:style style:name="P73" style:family="paragraph" style:parent-style-name="Table_20_Contents">
    <style:text-properties officeooo:paragraph-rsid="008c5c56"/>
   </style:style>
-  <style:style style:name="P56" style:family="paragraph" style:parent-style-name="Table_20_Contents">
+  <style:style style:name="P74" style:family="paragraph" style:parent-style-name="Table_20_Contents">
    <style:text-properties officeooo:paragraph-rsid="00918ee4"/>
   </style:style>
-  <style:style style:name="P57" style:family="paragraph" style:parent-style-name="Table_20_Contents">
+  <style:style style:name="P75" style:family="paragraph" style:parent-style-name="Table_20_Contents">
    <style:text-properties officeooo:rsid="00895fbc" officeooo:paragraph-rsid="00895fbc"/>
   </style:style>
-  <style:style style:name="P58" style:family="paragraph" style:parent-style-name="Table_20_Contents">
+  <style:style style:name="P76" style:family="paragraph" style:parent-style-name="Table_20_Contents">
    <style:text-properties officeooo:rsid="008c5c56" officeooo:paragraph-rsid="008c5c56"/>
   </style:style>
-  <style:style style:name="P59" style:family="paragraph" style:parent-style-name="Table_20_Contents">
+  <style:style style:name="P77" style:family="paragraph" style:parent-style-name="Table_20_Contents">
    <style:text-properties officeooo:rsid="008ccedb" officeooo:paragraph-rsid="008ccedb"/>
   </style:style>
-  <style:style style:name="P60" style:family="paragraph" style:parent-style-name="Table_20_Contents">
+  <style:style style:name="P78" style:family="paragraph" style:parent-style-name="Table_20_Contents">
    <style:text-properties officeooo:rsid="008fe66e" officeooo:paragraph-rsid="008fe66e"/>
   </style:style>
-  <style:style style:name="P61" style:family="paragraph" style:parent-style-name="Table_20_Contents">
+  <style:style style:name="P79" style:family="paragraph" style:parent-style-name="Table_20_Contents">
    <style:text-properties officeooo:rsid="0092ef97" officeooo:paragraph-rsid="0092ef97"/>
   </style:style>
-  <style:style style:name="P62" style:family="paragraph" style:parent-style-name="Table_20_Contents">
+  <style:style style:name="P80" style:family="paragraph" style:parent-style-name="Table_20_Contents">
    <style:text-properties officeooo:rsid="00918ee4" officeooo:paragraph-rsid="00918ee4"/>
   </style:style>
-  <style:style style:name="P63" style:family="paragraph" style:parent-style-name="Table_20_Contents">
-   <style:text-properties officeooo:rsid="009d1ffb" officeooo:paragraph-rsid="009d1ffb"/>
+  <style:style style:name="P81" style:family="paragraph" style:parent-style-name="Table_20_Contents">
+   <style:text-properties officeooo:rsid="009d1ffb" officeooo:paragraph-rsid="009fa725"/>
   </style:style>
-  <style:style style:name="P64" style:family="paragraph" style:parent-style-name="Code">
+  <style:style style:name="P82" style:family="paragraph" style:parent-style-name="Table_20_Contents">
+   <style:text-properties officeooo:rsid="009fa725" officeooo:paragraph-rsid="009fa725"/>
+  </style:style>
+  <style:style style:name="P83" style:family="paragraph" style:parent-style-name="Table_20_Contents">
+   <style:text-properties officeooo:rsid="00a7464d" officeooo:paragraph-rsid="00a7464d"/>
+  </style:style>
+  <style:style style:name="P84" style:family="paragraph" style:parent-style-name="Table_20_Contents">
+   <style:text-properties officeooo:rsid="00a7464d" officeooo:paragraph-rsid="00a944f2"/>
+  </style:style>
+  <style:style style:name="P85" style:family="paragraph" style:parent-style-name="Table_20_Contents">
+   <style:text-properties officeooo:rsid="00a7464d" officeooo:paragraph-rsid="00aadeef"/>
+  </style:style>
+  <style:style style:name="P86" style:family="paragraph" style:parent-style-name="Table_20_Contents">
+   <style:text-properties officeooo:rsid="00a7464d" officeooo:paragraph-rsid="00ac45c2"/>
+  </style:style>
+  <style:style style:name="P87" style:family="paragraph" style:parent-style-name="Table_20_Contents">
+   <style:text-properties officeooo:rsid="00a7464d" officeooo:paragraph-rsid="00ac5e1a"/>
+  </style:style>
+  <style:style style:name="P88" style:family="paragraph" style:parent-style-name="Table_20_Contents">
+   <style:text-properties officeooo:rsid="00a7464d" officeooo:paragraph-rsid="00acf56d"/>
+  </style:style>
+  <style:style style:name="P89" style:family="paragraph" style:parent-style-name="Table_20_Contents">
+   <style:text-properties officeooo:rsid="00a944f2" officeooo:paragraph-rsid="00a944f2"/>
+  </style:style>
+  <style:style style:name="P90" style:family="paragraph" style:parent-style-name="Table_20_Contents">
+   <style:text-properties officeooo:rsid="00a944f2" officeooo:paragraph-rsid="00aadeef"/>
+  </style:style>
+  <style:style style:name="P91" style:family="paragraph" style:parent-style-name="Table_20_Contents">
+   <style:text-properties officeooo:rsid="00a944f2" officeooo:paragraph-rsid="00ac45c2"/>
+  </style:style>
+  <style:style style:name="P92" style:family="paragraph" style:parent-style-name="Table_20_Contents">
+   <style:text-properties officeooo:rsid="00aadeef" officeooo:paragraph-rsid="00ac45c2"/>
+  </style:style>
+  <style:style style:name="P93" style:family="paragraph" style:parent-style-name="Table_20_Contents">
+   <style:text-properties officeooo:rsid="00ac45c2" officeooo:paragraph-rsid="00ac45c2"/>
+  </style:style>
+  <style:style style:name="P94" style:family="paragraph" style:parent-style-name="Table_20_Contents">
+   <style:text-properties officeooo:rsid="00ac5e1a" officeooo:paragraph-rsid="00ac5e1a"/>
+  </style:style>
+  <style:style style:name="P95" style:family="paragraph" style:parent-style-name="Table_20_Contents">
+   <style:text-properties officeooo:rsid="00ac9892" officeooo:paragraph-rsid="00ac9892"/>
+  </style:style>
+  <style:style style:name="P96" style:family="paragraph" style:parent-style-name="Table_20_Contents">
+   <style:text-properties officeooo:rsid="00acf56d" officeooo:paragraph-rsid="00acf56d"/>
+  </style:style>
+  <style:style style:name="P97" style:family="paragraph" style:parent-style-name="Code">
    <style:text-properties officeooo:paragraph-rsid="0077a065"/>
   </style:style>
-  <style:style style:name="P65" style:family="paragraph" style:parent-style-name="Code">
+  <style:style style:name="P98" style:family="paragraph" style:parent-style-name="Code">
    <style:text-properties officeooo:rsid="0077a065"/>
   </style:style>
-  <style:style style:name="P66" style:family="paragraph" style:parent-style-name="Code">
+  <style:style style:name="P99" style:family="paragraph" style:parent-style-name="Code">
    <style:text-properties officeooo:rsid="0077a065" officeooo:paragraph-rsid="0077a065"/>
   </style:style>
-  <style:style style:name="P67" style:family="paragraph" style:parent-style-name="Code">
+  <style:style style:name="P100" style:family="paragraph" style:parent-style-name="Code">
    <style:text-properties officeooo:rsid="0079d335"/>
   </style:style>
-  <style:style style:name="P68" style:family="paragraph" style:parent-style-name="Code">
+  <style:style style:name="P101" style:family="paragraph" style:parent-style-name="Code">
    <style:text-properties officeooo:rsid="007b58cb" officeooo:paragraph-rsid="007b58cb"/>
   </style:style>
-  <style:style style:name="P69" style:family="paragraph" style:parent-style-name="Code">
+  <style:style style:name="P102" style:family="paragraph" style:parent-style-name="Code">
    <style:text-properties officeooo:rsid="0069ea5e"/>
   </style:style>
-  <style:style style:name="P70" style:family="paragraph" style:parent-style-name="Contents_20_3">
+  <style:style style:name="P103" style:family="paragraph" style:parent-style-name="Contents_20_3">
    <style:paragraph-properties>
     <style:tab-stops>
      <style:tab-stop style:position="16cm" style:type="right" style:leader-style="dotted" style:leader-text="."/>
     </style:tab-stops>
    </style:paragraph-properties>
   </style:style>
-  <style:style style:name="P71" style:family="paragraph" style:parent-style-name="Contents_20_4">
+  <style:style style:name="P104" style:family="paragraph" style:parent-style-name="Contents_20_4">
    <style:paragraph-properties>
     <style:tab-stops>
      <style:tab-stop style:position="15.501cm" style:type="right" style:leader-style="dotted" style:leader-text="."/>
     </style:tab-stops>
    </style:paragraph-properties>
   </style:style>
-  <style:style style:name="P72" style:family="paragraph" style:parent-style-name="Heading_20_1">
+  <style:style style:name="P105" style:family="paragraph" style:parent-style-name="Heading_20_1">
    <style:text-properties officeooo:rsid="0077a065" officeooo:paragraph-rsid="0077a065"/>
   </style:style>
-  <style:style style:name="P73" style:family="paragraph" style:parent-style-name="Heading_20_1">
+  <style:style style:name="P106" style:family="paragraph" style:parent-style-name="Heading_20_1">
    <style:text-properties officeooo:rsid="00600b0e" officeooo:paragraph-rsid="007bfdfb"/>
   </style:style>
-  <style:style style:name="P74" style:family="paragraph" style:parent-style-name="Heading_20_1">
+  <style:style style:name="P107" style:family="paragraph" style:parent-style-name="Heading_20_1">
    <style:text-properties officeooo:rsid="0081ed80"/>
   </style:style>
-  <style:style style:name="P75" style:family="paragraph" style:parent-style-name="Heading_20_2">
+  <style:style style:name="P108" style:family="paragraph" style:parent-style-name="Heading_20_2">
    <style:text-properties officeooo:rsid="007bfdfb"/>
   </style:style>
-  <style:style style:name="P76" style:family="paragraph" style:parent-style-name="Heading_20_2">
+  <style:style style:name="P109" style:family="paragraph" style:parent-style-name="Heading_20_2">
    <style:text-properties officeooo:paragraph-rsid="007d4533"/>
   </style:style>
-  <style:style style:name="P77" style:family="paragraph" style:parent-style-name="Heading_20_2">
+  <style:style style:name="P110" style:family="paragraph" style:parent-style-name="Heading_20_2">
    <style:text-properties officeooo:rsid="0061a4df" officeooo:paragraph-rsid="0064bc69"/>
   </style:style>
-  <style:style style:name="P78" style:family="paragraph" style:parent-style-name="Heading_20_2">
+  <style:style style:name="P111" style:family="paragraph" style:parent-style-name="Heading_20_2">
    <style:text-properties officeooo:rsid="00895fbc"/>
   </style:style>
-  <style:style style:name="P79" style:family="paragraph" style:parent-style-name="Heading_20_2">
+  <style:style style:name="P112" style:family="paragraph" style:parent-style-name="Heading_20_2">
    <style:text-properties officeooo:rsid="008a6761"/>
   </style:style>
-  <style:style style:name="P80" style:family="paragraph" style:parent-style-name="Heading_20_2">
-   <style:text-properties officeooo:rsid="008df6b0"/>
-  </style:style>
-  <style:style style:name="P81" style:family="paragraph" style:parent-style-name="Heading_20_2">
+  <style:style style:name="P113" style:family="paragraph" style:parent-style-name="Heading_20_2">
    <style:text-properties officeooo:rsid="00820c58"/>
   </style:style>
-  <style:style style:name="P82" style:family="paragraph" style:parent-style-name="Heading_20_3">
+  <style:style style:name="P114" style:family="paragraph" style:parent-style-name="Heading_20_2">
+   <style:text-properties officeooo:paragraph-rsid="00ac5e1a"/>
+  </style:style>
+  <style:style style:name="P115" style:family="paragraph" style:parent-style-name="Heading_20_3">
    <style:text-properties officeooo:rsid="0066ae6d"/>
   </style:style>
-  <style:style style:name="P83" style:family="paragraph" style:parent-style-name="Heading_20_3">
+  <style:style style:name="P116" style:family="paragraph" style:parent-style-name="Heading_20_3">
    <style:text-properties officeooo:rsid="006c5c20"/>
   </style:style>
-  <style:style style:name="P84" style:family="paragraph" style:parent-style-name="Heading_20_3">
+  <style:style style:name="P117" style:family="paragraph" style:parent-style-name="Heading_20_3">
    <style:text-properties officeooo:rsid="006d582a"/>
   </style:style>
-  <style:style style:name="P85" style:family="paragraph" style:parent-style-name="Heading_20_3">
+  <style:style style:name="P118" style:family="paragraph" style:parent-style-name="Heading_20_3">
    <style:text-properties officeooo:rsid="00704237"/>
   </style:style>
-  <style:style style:name="P86" style:family="paragraph" style:parent-style-name="Heading_20_4">
+  <style:style style:name="P119" style:family="paragraph" style:parent-style-name="Heading_20_3">
+   <style:text-properties officeooo:paragraph-rsid="009fa725"/>
+  </style:style>
+  <style:style style:name="P120" style:family="paragraph" style:parent-style-name="Heading_20_3">
+   <style:text-properties officeooo:paragraph-rsid="00a944f2"/>
+  </style:style>
+  <style:style style:name="P121" style:family="paragraph" style:parent-style-name="Heading_20_3">
+   <style:text-properties officeooo:paragraph-rsid="00aadeef"/>
+  </style:style>
+  <style:style style:name="P122" style:family="paragraph" style:parent-style-name="Heading_20_3">
+   <style:text-properties officeooo:paragraph-rsid="00ac45c2"/>
+  </style:style>
+  <style:style style:name="P123" style:family="paragraph" style:parent-style-name="Heading_20_3">
+   <style:text-properties officeooo:paragraph-rsid="00ac5e1a"/>
+  </style:style>
+  <style:style style:name="P124" style:family="paragraph" style:parent-style-name="Heading_20_3">
+   <style:text-properties officeooo:rsid="00adb2a6" officeooo:paragraph-rsid="00adb2a6"/>
+  </style:style>
+  <style:style style:name="P125" style:family="paragraph" style:parent-style-name="Heading_20_3">
+   <style:text-properties officeooo:rsid="00a56041" officeooo:paragraph-rsid="00ac5e1a"/>
+  </style:style>
+  <style:style style:name="P126" style:family="paragraph" style:parent-style-name="Heading_20_3">
+   <style:text-properties officeooo:rsid="00a944f2" officeooo:paragraph-rsid="00aadeef"/>
+  </style:style>
+  <style:style style:name="P127" style:family="paragraph" style:parent-style-name="Heading_20_4">
    <style:text-properties officeooo:rsid="007389a4"/>
   </style:style>
-  <style:style style:name="P87" style:family="paragraph" style:parent-style-name="Heading_20_4">
+  <style:style style:name="P128" style:family="paragraph" style:parent-style-name="Heading_20_4">
    <style:text-properties officeooo:rsid="00758e80"/>
   </style:style>
-  <style:style style:name="P88" style:family="paragraph" style:parent-style-name="Heading_20_1">
+  <style:style style:name="P129" style:family="paragraph" style:parent-style-name="Heading_20_1">
    <style:text-properties officeooo:rsid="0077a065" officeooo:paragraph-rsid="0077a065"/>
   </style:style>
-  <style:style style:name="P89" style:family="paragraph" style:parent-style-name="Heading_20_1">
+  <style:style style:name="P130" style:family="paragraph" style:parent-style-name="Heading_20_1">
    <style:text-properties officeooo:rsid="00600b0e" officeooo:paragraph-rsid="007bfdfb"/>
   </style:style>
-  <style:style style:name="P90" style:family="paragraph" style:parent-style-name="Heading_20_1">
+  <style:style style:name="P131" style:family="paragraph" style:parent-style-name="Heading_20_1">
    <style:text-properties officeooo:rsid="0081ed80"/>
   </style:style>
-  <style:style style:name="P91" style:family="paragraph" style:parent-style-name="Heading_20_1">
+  <style:style style:name="P132" style:family="paragraph" style:parent-style-name="Heading_20_1">
    <style:paragraph-properties fo:break-before="page"/>
   </style:style>
-  <style:style style:name="P92" style:family="paragraph" style:parent-style-name="Heading_20_2">
+  <style:style style:name="P133" style:family="paragraph" style:parent-style-name="Heading_20_2">
    <style:text-properties officeooo:rsid="007bfdfb"/>
   </style:style>
-  <style:style style:name="P93" style:family="paragraph" style:parent-style-name="Heading_20_2">
+  <style:style style:name="P134" style:family="paragraph" style:parent-style-name="Heading_20_2">
    <style:text-properties officeooo:paragraph-rsid="007d4533"/>
   </style:style>
-  <style:style style:name="P94" style:family="paragraph" style:parent-style-name="Heading_20_2">
+  <style:style style:name="P135" style:family="paragraph" style:parent-style-name="Heading_20_2">
    <style:text-properties officeooo:rsid="0061a4df" officeooo:paragraph-rsid="0064bc69"/>
   </style:style>
-  <style:style style:name="P95" style:family="paragraph" style:parent-style-name="Heading_20_2">
+  <style:style style:name="P136" style:family="paragraph" style:parent-style-name="Heading_20_2">
    <style:text-properties officeooo:rsid="00895fbc"/>
   </style:style>
-  <style:style style:name="P96" style:family="paragraph" style:parent-style-name="Heading_20_2">
+  <style:style style:name="P137" style:family="paragraph" style:parent-style-name="Heading_20_2">
    <style:text-properties officeooo:rsid="008a6761"/>
   </style:style>
-  <style:style style:name="P97" style:family="paragraph" style:parent-style-name="Heading_20_2">
-   <style:text-properties officeooo:rsid="008df6b0"/>
+  <style:style style:name="P138" style:family="paragraph" style:parent-style-name="Heading_20_2">
+   <style:text-properties officeooo:rsid="00820c58"/>
   </style:style>
-  <style:style style:name="P98" style:family="paragraph" style:parent-style-name="Heading_20_3">
+  <style:style style:name="P139" style:family="paragraph" style:parent-style-name="Heading_20_2">
+   <style:text-properties officeooo:paragraph-rsid="00ac5e1a"/>
+  </style:style>
+  <style:style style:name="P140" style:family="paragraph" style:parent-style-name="Heading_20_3">
    <style:text-properties officeooo:rsid="0066ae6d"/>
   </style:style>
-  <style:style style:name="P99" style:family="paragraph" style:parent-style-name="Heading_20_3">
+  <style:style style:name="P141" style:family="paragraph" style:parent-style-name="Heading_20_3">
    <style:text-properties officeooo:rsid="006c5c20"/>
   </style:style>
-  <style:style style:name="P100" style:family="paragraph" style:parent-style-name="Heading_20_3">
+  <style:style style:name="P142" style:family="paragraph" style:parent-style-name="Heading_20_3">
    <style:text-properties officeooo:rsid="006d582a"/>
   </style:style>
-  <style:style style:name="P101" style:family="paragraph" style:parent-style-name="Heading_20_3">
+  <style:style style:name="P143" style:family="paragraph" style:parent-style-name="Heading_20_3">
    <style:text-properties officeooo:rsid="00704237"/>
   </style:style>
-  <style:style style:name="P102" style:family="paragraph" style:parent-style-name="Heading_20_3">
-   <style:text-properties officeooo:rsid="0099a89a"/>
-  </style:style>
-  <style:style style:name="P103" style:family="paragraph" style:parent-style-name="Heading_20_3">
+  <style:style style:name="P144" style:family="paragraph" style:parent-style-name="Heading_20_3">
    <style:text-properties officeooo:paragraph-rsid="009fa725"/>
   </style:style>
-  <style:style style:name="P104" style:family="paragraph" style:parent-style-name="Heading_20_4">
+  <style:style style:name="P145" style:family="paragraph" style:parent-style-name="Heading_20_3">
+   <style:text-properties officeooo:rsid="00adb2a6" officeooo:paragraph-rsid="00adb2a6"/>
+  </style:style>
+  <style:style style:name="P146" style:family="paragraph" style:parent-style-name="Heading_20_3">
+   <style:text-properties officeooo:rsid="00a56041" officeooo:paragraph-rsid="00ac5e1a"/>
+  </style:style>
+  <style:style style:name="P147" style:family="paragraph" style:parent-style-name="Heading_20_3">
+   <style:text-properties officeooo:paragraph-rsid="00a944f2"/>
+  </style:style>
+  <style:style style:name="P148" style:family="paragraph" style:parent-style-name="Heading_20_3">
+   <style:text-properties officeooo:rsid="00a944f2" officeooo:paragraph-rsid="00aadeef"/>
+  </style:style>
+  <style:style style:name="P149" style:family="paragraph" style:parent-style-name="Heading_20_3">
+   <style:text-properties officeooo:paragraph-rsid="00ac45c2"/>
+  </style:style>
+  <style:style style:name="P150" style:family="paragraph" style:parent-style-name="Heading_20_4">
    <style:text-properties officeooo:rsid="007389a4"/>
   </style:style>
-  <style:style style:name="P105" style:family="paragraph" style:parent-style-name="Heading_20_4">
+  <style:style style:name="P151" style:family="paragraph" style:parent-style-name="Heading_20_4">
    <style:text-properties officeooo:rsid="00758e80"/>
   </style:style>
-  <style:style style:name="P106" style:family="paragraph" style:parent-style-name="Table_20_Contents">
-   <style:text-properties officeooo:rsid="009d1ffb" officeooo:paragraph-rsid="009fa725"/>
-  </style:style>
-  <style:style style:name="P107" style:family="paragraph" style:parent-style-name="Table_20_Contents">
-   <style:text-properties officeooo:rsid="009fa725" officeooo:paragraph-rsid="009fa725"/>
-  </style:style>
-  <style:style style:name="P108" style:family="paragraph" style:parent-style-name="Text_20_body" style:list-style-name="L1"/>
-  <style:style style:name="P109" style:family="paragraph" style:parent-style-name="Text_20_body" style:list-style-name="L2">
+  <style:style style:name="P152" style:family="paragraph" style:parent-style-name="Text_20_body" style:list-style-name="L1"/>
+  <style:style style:name="P153" style:family="paragraph" style:parent-style-name="Text_20_body" style:list-style-name="L2">
    <style:text-properties officeooo:paragraph-rsid="0064bc69"/>
   </style:style>
-  <style:style style:name="P110" style:family="paragraph" style:parent-style-name="Text_20_body" style:list-style-name="L2">
+  <style:style style:name="P154" style:family="paragraph" style:parent-style-name="Text_20_body" style:list-style-name="L2">
    <style:text-properties officeooo:rsid="0064bc69" officeooo:paragraph-rsid="0064bc69"/>
   </style:style>
-  <style:style style:name="P111" style:family="paragraph" style:parent-style-name="Text_20_body" style:list-style-name="L2">
+  <style:style style:name="P155" style:family="paragraph" style:parent-style-name="Text_20_body" style:list-style-name="L2">
    <style:text-properties officeooo:rsid="0066ae6d" officeooo:paragraph-rsid="0066ae6d"/>
-  </style:style>
-  <style:style style:name="P112" style:family="paragraph" style:parent-style-name="Text_20_body">
-   <style:text-properties officeooo:rsid="009d1ffb" officeooo:paragraph-rsid="009fa725"/>
-  </style:style>
-  <style:style style:name="P113" style:family="paragraph" style:parent-style-name="Text_20_body">
-   <style:text-properties officeooo:rsid="0099a89a" officeooo:paragraph-rsid="009fa725"/>
-  </style:style>
-  <style:style style:name="P114" style:family="paragraph" style:parent-style-name="Text_20_body">
-   <style:text-properties officeooo:rsid="009b96e9" officeooo:paragraph-rsid="009fc2e1"/>
-  </style:style>
-  <style:style style:name="P115" style:family="paragraph" style:parent-style-name="Text_20_body">
-   <style:text-properties officeooo:paragraph-rsid="009fa725"/>
   </style:style>
   <style:style style:name="T1" style:family="text">
    <style:text-properties fo:font-size="32pt" fo:font-weight="bold" officeooo:rsid="00600b0e" style:font-size-asian="32pt" style:font-weight-asian="bold" style:font-size-complex="32pt" style:font-weight-complex="bold"/>
@@ -1140,11 +1360,62 @@
   <style:style style:name="T57" style:family="text">
    <style:text-properties officeooo:rsid="009fc2e1"/>
   </style:style>
+  <style:style style:name="T58" style:family="text">
+   <style:text-properties officeooo:rsid="00a24792"/>
+  </style:style>
+  <style:style style:name="T59" style:family="text">
+   <style:text-properties officeooo:rsid="00a29aa5"/>
+  </style:style>
+  <style:style style:name="T60" style:family="text">
+   <style:text-properties officeooo:rsid="00a2e42d"/>
+  </style:style>
+  <style:style style:name="T61" style:family="text">
+   <style:text-properties officeooo:rsid="00a3c483"/>
+  </style:style>
+  <style:style style:name="T62" style:family="text">
+   <style:text-properties officeooo:rsid="00a4c0aa"/>
+  </style:style>
+  <style:style style:name="T63" style:family="text">
+   <style:text-properties officeooo:rsid="00a56041"/>
+  </style:style>
+  <style:style style:name="T64" style:family="text">
+   <style:text-properties officeooo:rsid="00a6a7b9"/>
+  </style:style>
+  <style:style style:name="T65" style:family="text">
+   <style:text-properties officeooo:rsid="00a7464d"/>
+  </style:style>
+  <style:style style:name="T66" style:family="text">
+   <style:text-properties officeooo:rsid="00a944f2"/>
+  </style:style>
+  <style:style style:name="T67" style:family="text">
+   <style:text-properties officeooo:rsid="00aadeef"/>
+  </style:style>
+  <style:style style:name="T68" style:family="text">
+   <style:text-properties officeooo:rsid="00ac45c2"/>
+  </style:style>
+  <style:style style:name="T69" style:family="text">
+   <style:text-properties officeooo:rsid="00ac5e1a"/>
+  </style:style>
+  <style:style style:name="T70" style:family="text">
+   <style:text-properties officeooo:rsid="00ac9892"/>
+  </style:style>
+  <style:style style:name="T71" style:family="text">
+   <style:text-properties officeooo:rsid="00acf56d"/>
+  </style:style>
+  <style:style style:name="T72" style:family="text">
+   <style:text-properties officeooo:rsid="00adb2a6"/>
+  </style:style>
+  <style:style style:name="T73" style:family="text">
+   <style:text-properties officeooo:rsid="00aef358"/>
+  </style:style>
+  <style:style style:name="T74" style:family="text">
+   <style:text-properties officeooo:rsid="00b1aa05"/>
+  </style:style>
   <style:style style:name="fr1" style:family="graphic" style:parent-style-name="Graphics">
-   <style:graphic-properties style:vertical-pos="top" style:vertical-rel="paragraph" style:horizontal-pos="center" style:horizontal-rel="paragraph" style:mirror="none" fo:clip="rect(0cm, 0cm, 0cm, 0cm)" draw:luminance="0%" draw:contrast="0%" draw:red="0%" draw:green="0%" draw:blue="0%" draw:gamma="100%" draw:color-inversion="false" draw:image-opacity="100%" draw:color-mode="standard"/>
+   <style:graphic-properties style:run-through="foreground" style:wrap="none" style:vertical-pos="from-top" style:vertical-rel="paragraph" style:horizontal-pos="from-left" style:horizontal-rel="paragraph" style:mirror="none" fo:clip="rect(0cm, 0cm, 0cm, 0cm)" draw:luminance="0%" draw:contrast="0%" draw:red="0%" draw:green="0%" draw:blue="0%" draw:gamma="100%" draw:color-inversion="false" draw:image-opacity="100%" draw:color-mode="standard"/>
   </style:style>
   <style:style style:name="fr2" style:family="graphic" style:parent-style-name="Graphics">
-   <style:graphic-properties style:run-through="foreground" style:wrap="none" style:vertical-pos="from-top" style:vertical-rel="paragraph" style:horizontal-pos="from-left" style:horizontal-rel="paragraph" style:mirror="none" fo:clip="rect(0cm, 0cm, 0cm, 0cm)" draw:luminance="0%" draw:contrast="0%" draw:red="0%" draw:green="0%" draw:blue="0%" draw:gamma="100%" draw:color-inversion="false" draw:image-opacity="100%" draw:color-mode="standard"/>
+   <style:graphic-properties style:vertical-pos="top" style:vertical-rel="paragraph" style:horizontal-pos="center" style:horizontal-rel="paragraph" style:mirror="none" fo:clip="rect(0cm, 0cm, 0cm, 0cm)" draw:luminance="0%" draw:contrast="0%" draw:red="0%" draw:green="0%" draw:blue="0%" draw:gamma="100%" draw:color-inversion="false" draw:image-opacity="100%" draw:color-mode="standard"/>
   </style:style>
   <style:style style:name="fr3" style:family="graphic" style:parent-style-name="Graphics">
    <style:graphic-properties style:vertical-pos="from-top" style:vertical-rel="paragraph" style:horizontal-pos="from-left" style:horizontal-rel="paragraph" style:mirror="none" fo:clip="rect(0cm, 0cm, 0cm, 0cm)" draw:luminance="0%" draw:contrast="0%" draw:red="0%" draw:green="0%" draw:blue="0%" draw:gamma="100%" draw:color-inversion="false" draw:image-opacity="100%" draw:color-mode="standard"/>
@@ -3415,11 +3686,11 @@
    <text:p text:style-name="P2"/>
    <text:p text:style-name="P2"/>
    <text:p text:style-name="P2"/>
-   <text:p text:style-name="P2">201<text:span text:style-name="T13">6</text:span>-<text:span text:style-name="T10">0</text:span><text:span text:style-name="T13">9</text:span>-<text:span text:style-name="T13">22</text:span></text:p>
+   <text:p text:style-name="P2">20<text:span text:style-name="T74">24</text:span>-<text:span text:style-name="T10">0</text:span><text:span text:style-name="T74">1</text:span>-<text:span text:style-name="T74">19</text:span></text:p>
    <text:p text:style-name="P2"><text:soft-page-break/></text:p>
    <text:p text:style-name="P5"/>
    <text:p text:style-name="P3"/>
-   <text:p text:style-name="P4"><text:tab/>Copyright <text:span text:style-name="T11">© 2005-20</text:span><text:span text:style-name="T52">23</text:span><text:span text:style-name="T11"> </text:span>SSAB <text:span text:style-name="T12">EMEA </text:span>AB</text:p>
+   <text:p text:style-name="P4"><text:tab/>Copyright <text:span text:style-name="T11">© 2005-20</text:span><text:span text:style-name="T52">2</text:span><text:span text:style-name="T74">4</text:span><text:span text:style-name="T11"> </text:span>SSAB <text:span text:style-name="T12">EMEA </text:span>AB</text:p>
    <text:p text:style-name="P3"><text:tab/></text:p>
    <text:p text:style-name="P3"><text:tab/>Permission is granted to copy, distribute and/or modify this document </text:p>
    <text:p text:style-name="P3"><text:s text:c="6"/><text:tab/>under the terms of the GNU Free Documentation License, Version 1.2</text:p>
@@ -3494,29 +3765,29 @@
      <text:index-title text:style-name="Sect1" text:name="Table of Contents1_Head">
       <text:p text:style-name="Contents_20_Heading">Table of Contents</text:p>
      </text:index-title>
-     <text:p text:style-name="P47">About this Guide<text:tab/>4</text:p>
-     <text:p text:style-name="P47">Introduction<text:tab/>5</text:p>
-     <text:p text:style-name="P47">Common resources<text:tab/>6</text:p>
-     <text:p text:style-name="P46">Double linked lists<text:tab/>6</text:p>
-     <text:p text:style-name="P46">FIFO queue<text:tab/>7</text:p>
-     <text:p text:style-name="P46">Binary tree<text:tab/>7</text:p>
-     <text:p text:style-name="P46">Hash table<text:tab/>7</text:p>
-     <text:p text:style-name="P47">Communication<text:tab/>8</text:p>
-     <text:p text:style-name="P46">QCom monitor rt_qmon<text:tab/>8</text:p>
-     <text:p text:style-name="P70">Exported messages<text:tab/>8</text:p>
-     <text:p text:style-name="P70">Imported messages<text:tab/>8</text:p>
-     <text:p text:style-name="P70">qcom_Put()<text:tab/>9</text:p>
-     <text:p text:style-name="P70">Export queue<text:tab/>9</text:p>
-     <text:p text:style-name="P70">Export thread<text:tab/>9</text:p>
-     <text:p text:style-name="P70">Segment size<text:tab/>10</text:p>
-     <text:p text:style-name="P70">Link thread<text:tab/>10</text:p>
-     <text:p text:style-name="P71">Export segments<text:tab/>10</text:p>
-     <text:p text:style-name="P71">Import segments<text:tab/>10</text:p>
-     <text:p text:style-name="P47">Event and alarm handling<text:tab/>11</text:p>
-     <text:p text:style-name="P46">Supervision objects<text:tab/>11</text:p>
-     <text:p text:style-name="P46">Agents<text:tab/>11</text:p>
-     <text:p text:style-name="P46">Alarms and events<text:tab/>12</text:p>
-     <text:p text:style-name="P46">Event monitor rt_emon<text:tab/>12</text:p>
+     <text:p text:style-name="P65">About this Guide<text:tab/>4</text:p>
+     <text:p text:style-name="P65">Introduction<text:tab/>5</text:p>
+     <text:p text:style-name="P65">Common resources<text:tab/>6</text:p>
+     <text:p text:style-name="P64">Double linked lists<text:tab/>6</text:p>
+     <text:p text:style-name="P64">FIFO queue<text:tab/>7</text:p>
+     <text:p text:style-name="P64">Binary tree<text:tab/>7</text:p>
+     <text:p text:style-name="P64">Hash table<text:tab/>7</text:p>
+     <text:p text:style-name="P65">Communication<text:tab/>8</text:p>
+     <text:p text:style-name="P64">QCom monitor rt_qmon<text:tab/>8</text:p>
+     <text:p text:style-name="P103">Exported messages<text:tab/>8</text:p>
+     <text:p text:style-name="P103">Imported messages<text:tab/>8</text:p>
+     <text:p text:style-name="P103">qcom_Put()<text:tab/>9</text:p>
+     <text:p text:style-name="P103">Export queue<text:tab/>9</text:p>
+     <text:p text:style-name="P103">Export thread<text:tab/>9</text:p>
+     <text:p text:style-name="P103">Segment size<text:tab/>10</text:p>
+     <text:p text:style-name="P103">Link thread<text:tab/>10</text:p>
+     <text:p text:style-name="P104">Export segments<text:tab/>10</text:p>
+     <text:p text:style-name="P104">Import segments<text:tab/>10</text:p>
+     <text:p text:style-name="P65">Event and alarm handling<text:tab/>11</text:p>
+     <text:p text:style-name="P64">Supervision objects<text:tab/>11</text:p>
+     <text:p text:style-name="P64">Agents<text:tab/>11</text:p>
+     <text:p text:style-name="P64">Alarms and events<text:tab/>12</text:p>
+     <text:p text:style-name="P64">Event monitor rt_emon<text:tab/>12</text:p>
     </text:index-body>
    </text:table-of-content>
    <text:p text:style-name="P3"/>
@@ -3524,37 +3795,37 @@
    <text:p text:style-name="P7"><text:span text:style-name="T4">The </text:span><text:span text:style-name="T7">Proview</text:span><text:span text:style-name="T9">R</text:span><text:span text:style-name="T7"> </text:span><text:span text:style-name="T8">Internals</text:span> <text:span text:style-name="T7"><text:s/></text:span><text:span text:style-name="T4">is intended for </text:span><text:span text:style-name="T5">Proview</text:span><text:span text:style-name="T6">R</text:span><text:span text:style-name="T5"> developers and </text:span><text:span text:style-name="T4">persons who </text:span><text:span text:style-name="T5">want to have an insig</text:span><text:span text:style-name="T6">ht</text:span><text:span text:style-name="T5"> in the internal processes of Proview</text:span><text:span text:style-name="T6">R</text:span><text:span text:style-name="T5">.</text:span></text:p>
    <text:h text:style-name="Heading_20_1" text:outline-level="1" text:is-list-header="true"><text:bookmark-start text:name="__RefHeading___Toc1621_1355508096"/>Introduction<text:bookmark-end text:name="__RefHeading___Toc1621_1355508096"/></text:h>
    <text:p text:style-name="Text_20_body">The Proview <text:span text:style-name="T13">Internals describes the function of a number of different processes.</text:span></text:p>
-   <text:list xml:id="list2421561807" text:style-name="L1">
+   <text:list xml:id="list99724192" text:style-name="L1">
     <text:list-item>
-     <text:p text:style-name="P108"><text:span text:style-name="T13">Communication between processes and nodes</text:span>.</text:p>
+     <text:p text:style-name="P152"><text:span text:style-name="T13">Communication between processes and nodes</text:span>.</text:p>
     </text:list-item>
     <text:list-item>
-     <text:p text:style-name="P108"><text:span text:style-name="T13">Alarm and event handling</text:span>.</text:p>
+     <text:p text:style-name="P152"><text:span text:style-name="T13">Alarm and event handling</text:span>.</text:p>
     </text:list-item>
     <text:list-item>
-     <text:p text:style-name="P108"><text:span text:style-name="T13">Real time database</text:span>.</text:p>
+     <text:p text:style-name="P152"><text:span text:style-name="T13">Real time database</text:span>.</text:p>
     </text:list-item>
     <text:list-item>
-     <text:p text:style-name="P108"><text:span text:style-name="T13">Nethandler</text:span>.</text:p>
+     <text:p text:style-name="P152"><text:span text:style-name="T13">Nethandler</text:span>.</text:p>
     </text:list-item>
     <text:list-item>
-     <text:p text:style-name="P108"><text:span text:style-name="T13">PLC program</text:span>.</text:p>
-     <text:p text:style-name="P108"/>
+     <text:p text:style-name="P152"><text:span text:style-name="T13">PLC program</text:span>.</text:p>
+     <text:p text:style-name="P152"/>
     </text:list-item>
    </text:list>
    <text:p text:style-name="Text_20_body"/>
    <text:p text:style-name="Text_20_body"/>
-   <text:h text:style-name="P72" text:outline-level="1" text:is-list-header="true"><text:bookmark-start text:name="__RefHeading___Toc1623_1355508096"/>Common resources<text:bookmark-end text:name="__RefHeading___Toc1623_1355508096"/></text:h>
+   <text:h text:style-name="P105" text:outline-level="1" text:is-list-header="true"><text:bookmark-start text:name="__RefHeading___Toc1623_1355508096"/>Common resources<text:bookmark-end text:name="__RefHeading___Toc1623_1355508096"/></text:h>
    <text:h text:style-name="Heading_20_2" text:outline-level="2"><text:bookmark-start text:name="__RefHeading___Toc1625_1355508096"/><text:span text:style-name="T38">D</text:span><text:span text:style-name="T31">ouble linked lists</text:span><text:bookmark-end text:name="__RefHeading___Toc1625_1355508096"/></text:h>
-   <text:p text:style-name="P19">Lst is a module that handles double linked lists. Data structures that should be linked contains a list_sEntry struct with a forward pointer, a backward pointer, and a pointer to the start of the data structure. The forward and backward pointers points the the lst_sEntry structs in other data items.</text:p>
-   <text:p text:style-name="P65">struct lst_sEntry {</text:p>
+   <text:p text:style-name="P18">Lst is a module that handles double linked lists. Data structures that should be linked contains a list_sEntry struct with a forward pointer, a backward pointer, and a pointer to the start of the data structure. The forward and backward pointers points the the lst_sEntry structs in other data items.</text:p>
+   <text:p text:style-name="P98">struct lst_sEntry {</text:p>
    <text:p text:style-name="Code"><text:span text:style-name="T31"><text:s text:c="2"/>lst_sEntry </text:span><text:span text:style-name="T18">flink; <text:s/>/* Forward pointer */</text:span></text:p>
    <text:p text:style-name="Code"><text:span text:style-name="T31"><text:s text:c="2"/>lst_sEntry </text:span><text:span text:style-name="T18">blink; <text:s/>/* Backward pointer */</text:span></text:p>
-   <text:p text:style-name="P64"><text:span text:style-name="T31"><text:s text:c="2"/>void </text:span><text:span text:style-name="T18">item; <text:s text:c="8"/>/* Pointer to data structure */</text:span></text:p>
-   <text:p text:style-name="P66">}</text:p>
-   <text:p text:style-name="P19"/>
-   <text:p text:style-name="P19">The Lst list is a circular list so the last item always points to the first item.</text:p>
-   <text:p text:style-name="P20"><draw:frame draw:style-name="fr2" draw:name="graphics3" text:anchor-type="paragraph" svg:x="0.196cm" svg:y="0cm" svg:width="13.293cm" svg:height="6.625cm" draw:z-index="1"><draw:image draw:mime-type="image/png">
+   <text:p text:style-name="P97"><text:span text:style-name="T31"><text:s text:c="2"/>void </text:span><text:span text:style-name="T18">item; <text:s text:c="8"/>/* Pointer to data structure */</text:span></text:p>
+   <text:p text:style-name="P99">}</text:p>
+   <text:p text:style-name="P18"/>
+   <text:p text:style-name="P18">The Lst list is a circular list so the last item always points to the first item.</text:p>
+   <text:p text:style-name="P19"><draw:frame draw:style-name="fr1" draw:name="graphics3" text:anchor-type="paragraph" svg:x="0.196cm" svg:y="0cm" svg:width="13.293cm" svg:height="6.625cm" draw:z-index="1"><draw:image draw:mime-type="image/png">
       <office:binary-data>iVBORw0KGgoAAAANSUhEUgAAAmkAAAE9CAIAAADf5GL5AABJY0lEQVR4nO3dCVwN+/8/8KQo
        ylohSVHJkkTkSilEkSV79n1JskaIcGmxXFtd2Zfs3ez7rizZKrLvS4SKQquW//s7c2+//iFN
        zZw55/R6PjzOY85pzPnUe+bz+nzOMqOUk5OjAAAAAIWmJHYDAAAAZAyyEwAAgBtkJwAAADfI
@@ -3911,190 +4182,190 @@
    <table:table table:name="Table1" table:style-name="Table1">
     <table:table-column table:style-name="Table1.A"/>
     <table:table-column table:style-name="Table1.B"/>
-    <table:table-row table:style-name="TableLine94412996465904">
+    <table:table-row table:style-name="TableLine94796534241488">
      <table:table-cell table:style-name="Table1.A1" office:value-type="string">
-      <text:p text:style-name="P51">lst_Init( mx, entry, item)</text:p>
+      <text:p text:style-name="P69">lst_Init( mx, entry, item)</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table1.B1" office:value-type="string">
-      <text:p text:style-name="P51">Initialize an entry.</text:p>
+      <text:p text:style-name="P69">Initialize an entry.</text:p>
      </table:table-cell>
     </table:table-row>
-    <table:table-row table:style-name="TableLine94412996846400">
+    <table:table-row table:style-name="TableLine94796534621680">
      <table:table-cell table:style-name="Table1.A2" office:value-type="string">
-      <text:p text:style-name="P51">lst_InsertSucc()</text:p>
+      <text:p text:style-name="P69">lst_InsertSucc()</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table1.B2" office:value-type="string">
-      <text:p text:style-name="P48"><text:span text:style-name="T32">Insert a</text:span><text:span text:style-name="T33">n item after the specified entry.</text:span></text:p>
+      <text:p text:style-name="P66"><text:span text:style-name="T32">Insert a</text:span><text:span text:style-name="T33">n item after the specified entry.</text:span></text:p>
      </table:table-cell>
     </table:table-row>
-    <table:table-row table:style-name="TableLine94412996862224">
+    <table:table-row table:style-name="TableLine94796534631744">
      <table:table-cell table:style-name="Table1.A2" office:value-type="string">
-      <text:p text:style-name="P52">lst_InsertPred()</text:p>
+      <text:p text:style-name="P70">lst_InsertPred()</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table1.B2" office:value-type="string">
-      <text:p text:style-name="P52">Insert an item before the specified entry.</text:p>
+      <text:p text:style-name="P70">Insert an item before the specified entry.</text:p>
      </table:table-cell>
     </table:table-row>
-    <table:table-row table:style-name="TableLine94412996862880">
+    <table:table-row table:style-name="TableLine94796534632400">
      <table:table-cell table:style-name="Table1.A2" office:value-type="string">
-      <text:p text:style-name="P52">lst_Succ()</text:p>
+      <text:p text:style-name="P70">lst_Succ()</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table1.B2" office:value-type="string">
-      <text:p text:style-name="P52">Get the item after the specified entry.</text:p>
+      <text:p text:style-name="P70">Get the item after the specified entry.</text:p>
      </table:table-cell>
     </table:table-row>
-    <table:table-row table:style-name="TableLine94412996863536">
+    <table:table-row table:style-name="TableLine94796534633056">
      <table:table-cell table:style-name="Table1.A2" office:value-type="string">
-      <text:p text:style-name="P52">lst_Pred()</text:p>
+      <text:p text:style-name="P70">lst_Pred()</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table1.B2" office:value-type="string">
-      <text:p text:style-name="P52">Get the item before the specified entry.</text:p>
+      <text:p text:style-name="P70">Get the item before the specified entry.</text:p>
      </table:table-cell>
     </table:table-row>
-    <table:table-row table:style-name="TableLine94412996864352">
+    <table:table-row table:style-name="TableLine94796534633872">
      <table:table-cell table:style-name="Table1.A2" office:value-type="string">
-      <text:p text:style-name="P52">lst_Remove()</text:p>
+      <text:p text:style-name="P70">lst_Remove()</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table1.B2" office:value-type="string">
-      <text:p text:style-name="P52">Remove the specified entry.</text:p>
+      <text:p text:style-name="P70">Remove the specified entry.</text:p>
      </table:table-cell>
     </table:table-row>
    </table:table>
-   <text:p text:style-name="P19"/>
-   <text:p text:style-name="P22">A typical loop through all items in a list looks like this <text:s text:c="2"/></text:p>
-   <text:p text:style-name="P67">lst_sEntry *entry, *start_entry;</text:p>
-   <text:p text:style-name="P67">void *item;</text:p>
-   <text:p text:style-name="P68"><text:soft-page-break/></text:p>
-   <text:p text:style-name="P67">for (item = lst_Succ(NULL, start_entry, &amp;entry);</text:p>
-   <text:p text:style-name="P67"><text:s text:c="5"/>entry != start_entry; </text:p>
-   <text:p text:style-name="P67"><text:s text:c="5"/>item = lst_Succ(NULL, entry, &amp;entry)) {</text:p>
-   <text:p text:style-name="P67"><text:s text:c="2"/>...</text:p>
-   <text:p text:style-name="P67">}</text:p>
-   <text:p text:style-name="P21"/>
-   <text:p text:style-name="P22">Note that, as it is a circular list, the loop continues until the current entry equals the start_entry.</text:p>
-   <text:h text:style-name="P75" text:outline-level="2"><text:bookmark-start text:name="__RefHeading___Toc1627_1355508096"/>FIFO queue<text:bookmark-end text:name="__RefHeading___Toc1627_1355508096"/></text:h>
-   <text:p text:style-name="P23">Que is a FIFO queue that contains a Lst linked list, a condition and a mutex. With que_Put() and item is put on the queue and with que_Get() the oldest item is fetched. If the queue is empty when que_Get() is called, it will wait until an item is put on the queue, or until a specified timeout time has elapsed. As and Lst list is used internally, an item has to contain a lst_sEntry.</text:p>
-   <text:p text:style-name="P23"/>
+   <text:p text:style-name="P18"/>
+   <text:p text:style-name="P21">A typical loop through all items in a list looks like this <text:s text:c="2"/></text:p>
+   <text:p text:style-name="P100">lst_sEntry *entry, *start_entry;</text:p>
+   <text:p text:style-name="P100">void *item;</text:p>
+   <text:p text:style-name="P101"><text:soft-page-break/></text:p>
+   <text:p text:style-name="P100">for (item = lst_Succ(NULL, start_entry, &amp;entry);</text:p>
+   <text:p text:style-name="P100"><text:s text:c="5"/>entry != start_entry; </text:p>
+   <text:p text:style-name="P100"><text:s text:c="5"/>item = lst_Succ(NULL, entry, &amp;entry)) {</text:p>
+   <text:p text:style-name="P100"><text:s text:c="2"/>...</text:p>
+   <text:p text:style-name="P100">}</text:p>
+   <text:p text:style-name="P20"/>
+   <text:p text:style-name="P21">Note that, as it is a circular list, the loop continues until the current entry equals the start_entry.</text:p>
+   <text:h text:style-name="P108" text:outline-level="2"><text:bookmark-start text:name="__RefHeading___Toc1627_1355508096"/>FIFO queue<text:bookmark-end text:name="__RefHeading___Toc1627_1355508096"/></text:h>
+   <text:p text:style-name="P22">Que is a FIFO queue that contains a Lst linked list, a condition and a mutex. With que_Put() and item is put on the queue and with que_Get() the oldest item is fetched. If the queue is empty when que_Get() is called, it will wait until an item is put on the queue, or until a specified timeout time has elapsed. As and Lst list is used internally, an item has to contain a lst_sEntry.</text:p>
+   <text:p text:style-name="P22"/>
    <table:table table:name="Table2" table:style-name="Table2">
     <table:table-column table:style-name="Table2.A"/>
     <table:table-column table:style-name="Table2.B"/>
-    <table:table-row table:style-name="TableLine94412996770576">
+    <table:table-row table:style-name="TableLine94796534545552">
      <table:table-cell table:style-name="Table2.A1" office:value-type="string">
-      <text:p text:style-name="P53">que_Init()</text:p>
+      <text:p text:style-name="P71">que_Init()</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table2.B1" office:value-type="string">
-      <text:p text:style-name="P49"><text:span text:style-name="T32">Initialize an </text:span><text:span text:style-name="T34">queue</text:span><text:span text:style-name="T32">.</text:span></text:p>
+      <text:p text:style-name="P67"><text:span text:style-name="T32">Initialize an </text:span><text:span text:style-name="T34">queue</text:span><text:span text:style-name="T32">.</text:span></text:p>
      </table:table-cell>
     </table:table-row>
-    <table:table-row table:style-name="TableLine94412996630336">
+    <table:table-row table:style-name="TableLine94796534658288">
      <table:table-cell table:style-name="Table2.A2" office:value-type="string">
-      <text:p text:style-name="P49"><text:span text:style-name="T34">que_Put</text:span><text:span text:style-name="T32">()</text:span></text:p>
+      <text:p text:style-name="P67"><text:span text:style-name="T34">que_Put</text:span><text:span text:style-name="T32">()</text:span></text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table2.B2" office:value-type="string">
-      <text:p text:style-name="P49"><text:span text:style-name="T34">Put an item on the queue</text:span><text:span text:style-name="T33">.</text:span></text:p>
+      <text:p text:style-name="P67"><text:span text:style-name="T34">Put an item on the queue</text:span><text:span text:style-name="T33">.</text:span></text:p>
      </table:table-cell>
     </table:table-row>
-    <table:table-row table:style-name="TableLine94412996729520">
+    <table:table-row table:style-name="TableLine94796534659552">
      <table:table-cell table:style-name="Table2.A2" office:value-type="string">
-      <text:p text:style-name="P49"><text:span text:style-name="T34">que_Get</text:span><text:span text:style-name="T33">()</text:span></text:p>
+      <text:p text:style-name="P67"><text:span text:style-name="T34">que_Get</text:span><text:span text:style-name="T33">()</text:span></text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table2.B2" office:value-type="string">
-      <text:p text:style-name="P49"><text:span text:style-name="T34">Fetch the oldest item on the queue, or wait </text:span><text:span text:style-name="T35">with timeout </text:span><text:span text:style-name="T34">until an item in put on the queue</text:span><text:span text:style-name="T33">.</text:span></text:p>
+      <text:p text:style-name="P67"><text:span text:style-name="T34">Fetch the oldest item on the queue, or wait </text:span><text:span text:style-name="T35">with timeout </text:span><text:span text:style-name="T34">until an item in put on the queue</text:span><text:span text:style-name="T33">.</text:span></text:p>
      </table:table-cell>
     </table:table-row>
    </table:table>
-   <text:h text:style-name="P76" text:outline-level="2"><text:bookmark-start text:name="__RefHeading___Toc1629_1355508096"/><text:span text:style-name="T38">B</text:span><text:span text:style-name="T35">inary tree</text:span><text:bookmark-end text:name="__RefHeading___Toc1629_1355508096"/></text:h>
-   <text:p text:style-name="P16"><text:span text:style-name="T36">A binary tree stores data structures with a key. A </text:span><text:span text:style-name="T37">key compare function </text:span><text:span text:style-name="T36">is supplied </text:span><text:span text:style-name="T37">in the tree_CreateTable() call</text:span><text:span text:style-name="T36">.</text:span></text:p>
-   <text:p text:style-name="P24"/>
+   <text:h text:style-name="P109" text:outline-level="2"><text:bookmark-start text:name="__RefHeading___Toc1629_1355508096"/><text:span text:style-name="T38">B</text:span><text:span text:style-name="T35">inary tree</text:span><text:bookmark-end text:name="__RefHeading___Toc1629_1355508096"/></text:h>
+   <text:p text:style-name="P16"><text:span text:style-name="T36">A binary tree </text:span><text:span text:style-name="T58">is a tree where each node can have <text:s/>two children. Data structures are stored in the tree with a key. </text:span><text:span text:style-name="T36">A </text:span><text:span text:style-name="T37">key compare function </text:span><text:span text:style-name="T36">is supplied </text:span><text:span text:style-name="T37">in the tree_CreateTable() call</text:span><text:span text:style-name="T36">.</text:span></text:p>
+   <text:p text:style-name="P23"/>
    <table:table table:name="Table3" table:style-name="Table3">
     <table:table-column table:style-name="Table3.A"/>
     <table:table-column table:style-name="Table3.B"/>
-    <table:table-row table:style-name="TableLine94412996876832">
+    <table:table-row table:style-name="TableLine94796534648368">
      <table:table-cell table:style-name="Table3.A1" office:value-type="string">
-      <text:p text:style-name="P50"><text:span text:style-name="T36">tree</text:span><text:span text:style-name="T34">_</text:span><text:span text:style-name="T36">CreateTable()</text:span></text:p>
+      <text:p text:style-name="P68"><text:span text:style-name="T36">tree</text:span><text:span text:style-name="T34">_</text:span><text:span text:style-name="T36">CreateTable()</text:span></text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table3.B1" office:value-type="string">
-      <text:p text:style-name="P54">Create a table for a tree.</text:p>
+      <text:p text:style-name="P72">Create a table for a tree.</text:p>
      </table:table-cell>
     </table:table-row>
-    <table:table-row table:style-name="TableLine94412996904752">
+    <table:table-row table:style-name="TableLine94796534678768">
      <table:table-cell table:style-name="Table3.A2" office:value-type="string">
-      <text:p text:style-name="P54">tree_DeleteTable()</text:p>
+      <text:p text:style-name="P72">tree_DeleteTable()</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table3.B2" office:value-type="string">
-      <text:p text:style-name="P50"><text:span text:style-name="T36">Delete table</text:span><text:span text:style-name="T33">.</text:span></text:p>
+      <text:p text:style-name="P68"><text:span text:style-name="T36">Delete table</text:span><text:span text:style-name="T33">.</text:span></text:p>
      </table:table-cell>
     </table:table-row>
-    <table:table-row table:style-name="TableLine94412996906192">
+    <table:table-row table:style-name="TableLine94796534680208">
      <table:table-cell table:style-name="Table3.A2" office:value-type="string">
-      <text:p text:style-name="P54">tree_Insert()</text:p>
+      <text:p text:style-name="P72">tree_Insert()</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table3.B2" office:value-type="string">
-      <text:p text:style-name="P50"><text:span text:style-name="T36">Insert data for a specific key</text:span><text:span text:style-name="T33">.</text:span></text:p>
+      <text:p text:style-name="P68"><text:span text:style-name="T36">Insert data for a specific key</text:span><text:span text:style-name="T33">.</text:span></text:p>
      </table:table-cell>
     </table:table-row>
-    <table:table-row table:style-name="TableLine94412996906848">
+    <table:table-row table:style-name="TableLine94796534680864">
      <table:table-cell table:style-name="Table3.A2" office:value-type="string">
-      <text:p text:style-name="P54">tree_Remove()</text:p>
+      <text:p text:style-name="P72">tree_Remove()</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table3.B2" office:value-type="string">
-      <text:p text:style-name="P50"><text:span text:style-name="T36">Remove data for a specific key</text:span><text:span text:style-name="T33">.</text:span></text:p>
+      <text:p text:style-name="P68"><text:span text:style-name="T36">Remove data for a specific key</text:span><text:span text:style-name="T33">.</text:span></text:p>
      </table:table-cell>
     </table:table-row>
-    <table:table-row table:style-name="TableLine94412996907504">
+    <table:table-row table:style-name="TableLine94796534681520">
      <table:table-cell table:style-name="Table3.A2" office:value-type="string">
-      <text:p text:style-name="P54">tree_Find()</text:p>
+      <text:p text:style-name="P72">tree_Find()</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table3.B2" office:value-type="string">
-      <text:p text:style-name="P50"><text:span text:style-name="T36">Find the data for a specific key</text:span><text:span text:style-name="T33">.</text:span></text:p>
+      <text:p text:style-name="P68"><text:span text:style-name="T36">Find the data for a specific key</text:span><text:span text:style-name="T33">.</text:span></text:p>
      </table:table-cell>
     </table:table-row>
-    <table:table-row table:style-name="TableLine94412996908320">
+    <table:table-row table:style-name="TableLine94796534682336">
      <table:table-cell table:style-name="Table3.A2" office:value-type="string">
-      <text:p text:style-name="P54">tree_FindPredecessor()</text:p>
+      <text:p text:style-name="P72">tree_FindPredecessor()</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table3.B2" office:value-type="string">
-      <text:p text:style-name="P54">Find the predecessor to the specified key.</text:p>
+      <text:p text:style-name="P72">Find the predecessor to the specified key.</text:p>
      </table:table-cell>
     </table:table-row>
-    <table:table-row table:style-name="TableLine94412996909088">
+    <table:table-row table:style-name="TableLine94796534683104">
      <table:table-cell table:style-name="Table3.A2" office:value-type="string">
-      <text:p text:style-name="P54">tree_FindSuccessor()</text:p>
+      <text:p text:style-name="P72">tree_FindSuccessor()</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table3.B2" office:value-type="string">
-      <text:p text:style-name="P54">Find the successor to the specified key.</text:p>
+      <text:p text:style-name="P72">Find the successor to the specified key.</text:p>
      </table:table-cell>
     </table:table-row>
    </table:table>
    <text:h text:style-name="Heading_20_2" text:outline-level="2"><text:bookmark-start text:name="__RefHeading___Toc1631_1355508096"/><text:span text:style-name="T38">H</text:span><text:span text:style-name="T37">ash table</text:span><text:bookmark-end text:name="__RefHeading___Toc1631_1355508096"/></text:h>
-   <text:p text:style-name="P25"/>
-   <text:h text:style-name="P73" text:outline-level="1"><text:bookmark-start text:name="__RefHeading___Toc1633_1355508096"/>Communication<text:bookmark-end text:name="__RefHeading___Toc1633_1355508096"/></text:h>
-   <text:h text:style-name="P77" text:outline-level="2"><text:bookmark-start text:name="__RefHeading___Toc1635_1355508096"/>QCom monitor rt_qmon<text:bookmark-end text:name="__RefHeading___Toc1635_1355508096"/></text:h>
-   <text:p text:style-name="P26">rt_qmon handles all messages between nodes. The different types of messages are</text:p>
-   <text:list xml:id="list4089553210" text:style-name="L2">
+   <text:p text:style-name="P24"/>
+   <text:h text:style-name="P106" text:outline-level="1"><text:bookmark-start text:name="__RefHeading___Toc1633_1355508096"/>Communication<text:bookmark-end text:name="__RefHeading___Toc1633_1355508096"/></text:h>
+   <text:h text:style-name="P110" text:outline-level="2"><text:bookmark-start text:name="__RefHeading___Toc1635_1355508096"/>QCom monitor rt_qmon<text:bookmark-end text:name="__RefHeading___Toc1635_1355508096"/></text:h>
+   <text:p text:style-name="P25">rt_qmon handles all messages between nodes. The different types of messages are</text:p>
+   <text:list xml:id="list2364248916" text:style-name="L2">
     <text:list-item>
-     <text:p text:style-name="P110">Alarms and events, This is communication between the event monitor and outunits, such as the alarm window in rt_xtt, or the event log.</text:p>
+     <text:p text:style-name="P154">Alarms and events, This is communication between the event monitor and outunits, such as the alarm window in rt_xtt, or the event log.</text:p>
     </text:list-item>
     <text:list-item>
-     <text:p text:style-name="P110">Nethandler communication. When processes requests information about objects or volumes in other nodes. </text:p>
+     <text:p text:style-name="P154">Nethandler communication. When processes requests information about objects or volumes in other nodes. </text:p>
     </text:list-item>
     <text:list-item>
-     <text:p text:style-name="P109"><text:span text:style-name="T14">Sub</text:span><text:span text:style-name="T20">s</text:span><text:span text:style-name="T14">criptions. </text:span><text:span text:style-name="T15">Messages with values that are updated cyclically, eg values displayed in a graph.</text:span></text:p>
+     <text:p text:style-name="P153"><text:span text:style-name="T14">Sub</text:span><text:span text:style-name="T20">s</text:span><text:span text:style-name="T14">criptions. </text:span><text:span text:style-name="T15">Messages with values that are updated cyclically, eg values displayed in a graph.</text:span></text:p>
     </text:list-item>
     <text:list-item>
-     <text:p text:style-name="P111">Historical data. Values sent cyclically to the storage server, or data requested from the storage server.</text:p>
+     <text:p text:style-name="P155">Historical data. Values sent cyclically to the storage server, or data requested from the storage server.</text:p>
     </text:list-item>
    </text:list>
-   <text:p text:style-name="P27"/>
-   <text:h text:style-name="P82" text:outline-level="3"><text:bookmark-start text:name="__RefHeading___Toc1637_1355508096"/>Exported messages<text:bookmark-end text:name="__RefHeading___Toc1637_1355508096"/></text:h>
+   <text:p text:style-name="P26"/>
+   <text:h text:style-name="P115" text:outline-level="3"><text:bookmark-start text:name="__RefHeading___Toc1637_1355508096"/>Exported messages<text:bookmark-end text:name="__RefHeading___Toc1637_1355508096"/></text:h>
    <text:p text:style-name="P9"><text:span text:style-name="T15">Messages sent from on</text:span><text:span text:style-name="T16">e</text:span><text:span text:style-name="T15"> process to another makes a call to qcom_Put(). For communication with local processes, </text:span><text:span text:style-name="T50">ie processes on the same node, </text:span><text:span text:style-name="T15">the message is directly inserted in</text:span><text:span text:style-name="T50">to</text:span><text:span text:style-name="T15"> the receive queue. For processes on remote nodes they are inserted into the export queue and handled by the export thread in rt_qmon. The export thread divides the message into segments of usually 8192 bytes, and the segments are marked as first, middle or last segment. The segments </text:span></text:p>
    <text:p text:style-name="P9"><text:span text:style-name="T15">are placed in the link queue for the target node, and received by the link thread for this node. The link thread has a filter that removes old messages with the same message id. This assures that cyclic messages as subscriptions are not overflowing the thread queues as old one are removed when new with the corresponding data arrives. Segments that passes the filter are sent to the ethernet driver as an UDP message. The link thread waits for an ack for the last sent message before the next is sent. </text:span><text:span text:style-name="T16">If no ack is received within the timeout time, the segment is resent, and the timeout time is doubled. </text:span><text:span text:style-name="T50">It continues to be doubled until a specific time is exceeded, </text:span><text:span text:style-name="T51">and </text:span><text:span text:style-name="T50">the link will be disconnected.</text:span><text:span text:style-name="T16"> The ethernet driver is dividing the segments into packets of the RTO size, usually 1500 bytes.</text:span></text:p>
-   <text:p text:style-name="P41">The initial timeout time is called MinResendTime and can be configured in the NodeConfig object. The default value is 50 ms. If no ack is received the MinResendTime will be doubled until the timeout time exceeds MaxResendTime, also configurable in the NodeConfig object. The default value is 10 s. Thus if no ack is received, the link is disconnected after 23 s.</text:p>
-   <text:p text:style-name="P41">Also the segment size can be configured in the NodeConfig object. </text:p>
+   <text:p text:style-name="P39">The initial timeout time is called MinResendTime and can be configured in the NodeConfig object. The default value is 50 ms. If no ack is received the MinResendTime will be doubled until the timeout time exceeds MaxResendTime, also configurable in the NodeConfig object. The default value is 10 s. Thus if no ack is received, the link is disconnected after 23 s.</text:p>
+   <text:p text:style-name="P39">Also the segment size can be configured in the NodeConfig object. </text:p>
    <text:h text:style-name="Heading_20_3" text:outline-level="3"><text:bookmark-start text:name="__RefHeading___Toc1639_1355508096"/><text:span text:style-name="T16">Imported messages</text:span><text:span text:style-name="T15"> </text:span><text:bookmark-end text:name="__RefHeading___Toc1639_1355508096"/></text:h>
-   <text:p text:style-name="P28">rt_qmon creates an UDP port to which QCom segments from other nodes are directed. The port number is 55000 + the QCom bus number. </text:p>
-   <text:p text:style-name="P28">The import thread receives the segments from the ethernet driver, and inserts them into the link <text:soft-page-break/>queue for the sending node. This is actually the same as the link queue for exported messages, so the link queue contains both export and import segments. The segments are received by the link thread, and reassembled to a message. If it is an ack message, the corresponding export segment is removed, otherwise an ack is sent back, and the message is forwarded to the target queue, and from there received by the target process.</text:p>
-   <text:p text:style-name="P8"><draw:frame draw:style-name="fr1" draw:name="graphics2" text:anchor-type="paragraph" svg:width="15.824cm" svg:height="10.16cm" draw:z-index="0"><draw:image draw:mime-type="image/png">
+   <text:p text:style-name="P27">rt_qmon creates an UDP port to which QCom segments from other nodes are directed. The port number is 55000 + the QCom bus number. </text:p>
+   <text:p text:style-name="P27">The import thread receives the segments from the ethernet driver, and inserts them into the link <text:soft-page-break/>queue for the sending node. This is actually the same as the link queue for exported messages, so the link queue contains both export and import segments. The segments are received by the link thread, and reassembled to a message. If it is an ack message, the corresponding export segment is removed, otherwise an ack is sent back, and the message is forwarded to the target queue, and from there received by the target process.</text:p>
+   <text:p text:style-name="P8"><draw:frame draw:style-name="fr2" draw:name="graphics2" text:anchor-type="paragraph" svg:width="15.824cm" svg:height="10.16cm" draw:z-index="0"><draw:image draw:mime-type="image/png">
       <office:binary-data>iVBORw0KGgoAAAANSUhEUgAAAm8AAAGQCAIAAAB3eBCOAACYoklEQVR4nOydeVxN2/vHt+Zk
        aECEiMxTyXBNITKLUpIxMoUMGUOGyJQx8zyETJUhFJcirouSIWPGEBFN0ly/zz3re/fv3FNS
        nVOnU8/7j/Nae521115777Wez/PsYW2FrKwsjiAIgiAIMVCQdgMIgiAIQuYhNSUIgiAIcSE1
@@ -4823,289 +5094,1031 @@
       </office:binary-data>
      </draw:image>
     </draw:frame></text:p>
-   <text:h text:style-name="P83" text:outline-level="3"><text:bookmark-start text:name="__RefHeading___Toc1641_1355508096"/>qcom_Put()<text:bookmark-end text:name="__RefHeading___Toc1641_1355508096"/></text:h>
-   <text:p text:style-name="P29">To send a qcom message qcom_Put() is called with the following data.</text:p>
-   <text:p text:style-name="P69">typedef struct {</text:p>
-   <text:p text:style-name="P69"><text:s text:c="2"/>qcom_sQid<text:tab/> <text:s text:c="3"/>reply; <text:s text:c="4"/>/* Reply queue */</text:p>
-   <text:p text:style-name="P69"><text:s text:c="2"/>qcom_sType <text:s text:c="3"/>type; <text:s text:c="5"/>/* Message type b, and s */</text:p>
-   <text:p text:style-name="P69"><text:s text:c="2"/>unsigned int <text:s/>msg_id; <text:s text:c="3"/>/* Message identity */</text:p>
-   <text:p text:style-name="P69"><text:s text:c="2"/>unsigned int <text:s/>prio; <text:s text:c="5"/>/* Priority */</text:p>
-   <text:p text:style-name="P69"><text:s text:c="2"/>unsigned int <text:s/>allocate; <text:s/>/* Data buffer should be allocated in the pool */</text:p>
-   <text:p text:style-name="P69"><text:s text:c="2"/>unsigned int <text:s/>size; <text:s text:c="5"/>/* Data size */</text:p>
+   <text:h text:style-name="P116" text:outline-level="3"><text:bookmark-start text:name="__RefHeading___Toc1641_1355508096"/>qcom_Put()<text:bookmark-end text:name="__RefHeading___Toc1641_1355508096"/></text:h>
+   <text:p text:style-name="P28">To send a qcom message qcom_Put() is called with the following data.</text:p>
+   <text:p text:style-name="P102">typedef struct {</text:p>
+   <text:p text:style-name="P102"><text:s text:c="2"/>qcom_sQid<text:tab/> <text:s text:c="3"/>reply; <text:s text:c="4"/>/* Reply queue */</text:p>
+   <text:p text:style-name="P102"><text:s text:c="2"/>qcom_sType <text:s text:c="3"/>type; <text:s text:c="5"/>/* Message type b, and s */</text:p>
+   <text:p text:style-name="P102"><text:s text:c="2"/>unsigned int <text:s/>msg_id; <text:s text:c="3"/>/* Message identity */</text:p>
+   <text:p text:style-name="P102"><text:s text:c="2"/>unsigned int <text:s/>prio; <text:s text:c="5"/>/* Priority */</text:p>
+   <text:p text:style-name="P102"><text:s text:c="2"/>unsigned int <text:s/>allocate; <text:s/>/* Data buffer should be allocated in the pool */</text:p>
+   <text:p text:style-name="P102"><text:s text:c="2"/>unsigned int <text:s/>size; <text:s text:c="5"/>/* Data size */</text:p>
    <text:p text:style-name="Code"><text:span text:style-name="T17"><text:s text:c="2"/>void <text:s text:c="8"/></text:span><text:span text:style-name="T19"><text:s/>*data; <text:s text:c="5"/>/* Data */ </text:span></text:p>
-   <text:p text:style-name="P69">} qcom_sPut;</text:p>
-   <text:p text:style-name="P30"/>
-   <text:p text:style-name="P31">The data pointer points to the message. <text:span text:style-name="T50">The message should be allocated in </text:span>the QCom pool. <text:span text:style-name="T50">If </text:span><text:s/><text:span text:style-name="T50">&apos;</text:span>allocate<text:span text:style-name="T50">&apos;</text:span> is <text:span text:style-name="T50">0, this should be done by the caller. If &apos;allocate&apos; is 1, qcom_Put() will allocate and copy the message to the QCom pool.</text:span></text:p>
-   <text:p text:style-name="P32">size is the size in bytes of the message.</text:p>
-   <text:p text:style-name="P32">msg_id is set for cyclic messages as subscriptions and alarmstatus, and will cause old messages in the link queue with the same msg_id to be removed. </text:p>
-   <text:p text:style-name="P32">prio is not yet implemented.</text:p>
-   <text:h text:style-name="P83" text:outline-level="3"><text:bookmark-start text:name="__RefHeading___Toc1643_1355508096"/><text:soft-page-break/>Export queue<text:bookmark-end text:name="__RefHeading___Toc1643_1355508096"/></text:h>
+   <text:p text:style-name="P102">} qcom_sPut;</text:p>
+   <text:p text:style-name="P29"/>
+   <text:p text:style-name="P30">The data pointer points to the message. <text:span text:style-name="T50">The message should be allocated in </text:span>the QCom pool. <text:span text:style-name="T50">If </text:span><text:s/><text:span text:style-name="T50">&apos;</text:span>allocate<text:span text:style-name="T50">&apos;</text:span> is <text:span text:style-name="T50">0, this should be done by the caller. If &apos;allocate&apos; is 1, qcom_Put() will allocate and copy the message to the QCom pool.</text:span></text:p>
+   <text:p text:style-name="P31">size is the size in bytes of the message.</text:p>
+   <text:p text:style-name="P31">msg_id is set for cyclic messages as subscriptions and alarmstatus, and will cause old messages in the link queue with the same msg_id to be removed. </text:p>
+   <text:p text:style-name="P31">prio is not yet implemented.</text:p>
+   <text:h text:style-name="P116" text:outline-level="3"><text:bookmark-start text:name="__RefHeading___Toc1643_1355508096"/><text:soft-page-break/>Export queue<text:bookmark-end text:name="__RefHeading___Toc1643_1355508096"/></text:h>
    <text:p text:style-name="P10"><text:span text:style-name="T21">The export queue </text:span><text:span text:style-name="T22">is created by rt_ini at runtime startup in qdb_BuildDb(). All messages addressed to remote nodes are inserted to this queue, and received by the export thread in rt_qmon.</text:span></text:p>
-   <text:h text:style-name="P84" text:outline-level="3"><text:bookmark-start text:name="__RefHeading___Toc1645_1355508096"/>Export thread<text:bookmark-end text:name="__RefHeading___Toc1645_1355508096"/></text:h>
+   <text:h text:style-name="P117" text:outline-level="3"><text:bookmark-start text:name="__RefHeading___Toc1645_1355508096"/>Export thread<text:bookmark-end text:name="__RefHeading___Toc1645_1355508096"/></text:h>
    <text:p text:style-name="P11"><text:span text:style-name="T22">The export thread receives messages from the export queue. The messages are divided in segments with the configured segment size. </text:span><text:span text:style-name="T23">The d</text:span><text:span text:style-name="T22">efault size is 8192. </text:span><text:span text:style-name="T23">The messages itself is still stored in the qcom pool and is kept there until the last segment is sent and acknowledged. </text:span><text:span text:style-name="T24">For each segment, a </text:span><text:span text:style-name="T24">segment item is created with the segment size and a pointer to the segment data in the pool. </text:span><text:span text:style-name="T23">The segment </text:span><text:span text:style-name="T24">items for one</text:span><text:span text:style-name="T23"> message are linked in an Lst list, ie they are linked pointers to next and previous. </text:span><text:span text:style-name="T24">Finally the segment items are inserted into the link queue for target node.</text:span></text:p>
-   <text:p text:style-name="P33">A broadcast message should be sent to all connected nodes, and segment items are created for each link and inserted into the link queues.</text:p>
-   <text:h text:style-name="P85" text:outline-level="3"><text:bookmark-start text:name="__RefHeading___Toc1647_1355508096"/>Segment size<text:bookmark-end text:name="__RefHeading___Toc1647_1355508096"/></text:h>
+   <text:p text:style-name="P32">A broadcast message should be sent to all connected nodes, and segment items are created for each link and inserted into the link queues.</text:p>
+   <text:h text:style-name="P118" text:outline-level="3"><text:bookmark-start text:name="__RefHeading___Toc1647_1355508096"/>Segment size<text:bookmark-end text:name="__RefHeading___Toc1647_1355508096"/></text:h>
    <text:p text:style-name="P12"><text:span text:style-name="T24">A segment will be fragmented into ethernet packets by the ethernet driver. The size of these packets, RTO, </text:span><text:span text:style-name="T25">are</text:span><text:span text:style-name="T24"> usually 1500 bytes. The segment size is configurable and a full segment with the default size, 8192 will result in 6 packets. If a packet is lost, the segment is not delivered and all packets has to be sent again. Thus for networks with few losses, larger segment sizes can be used, <text:s/></text:span><text:span text:style-name="T25">while</text:span><text:span text:style-name="T24"> for networks with frequent losses smaller segment sizes are preferred. <text:s/></text:span></text:p>
-   <text:h text:style-name="P85" text:outline-level="3"><text:bookmark-start text:name="__RefHeading___Toc1649_1355508096"/>Link thread<text:bookmark-end text:name="__RefHeading___Toc1649_1355508096"/></text:h>
-   <text:p text:style-name="P34">The link thread reads the segment items from the link queue. This contains both items for outgoing message from the export thread, <text:s/>and for ingoing messages from the import thread. </text:p>
-   <text:h text:style-name="P86" text:outline-level="4"><text:bookmark-start text:name="__RefHeading___Toc1651_1355508096"/>Export segments<text:bookmark-end text:name="__RefHeading___Toc1651_1355508096"/></text:h>
+   <text:h text:style-name="P118" text:outline-level="3"><text:bookmark-start text:name="__RefHeading___Toc1649_1355508096"/>Link thread<text:bookmark-end text:name="__RefHeading___Toc1649_1355508096"/></text:h>
+   <text:p text:style-name="P33">The link thread reads the segment items from the link queue. This contains both items for outgoing message from the export thread, <text:s/>and for ingoing messages from the import thread. </text:p>
+   <text:h text:style-name="P127" text:outline-level="4"><text:bookmark-start text:name="__RefHeading___Toc1651_1355508096"/>Export segments<text:bookmark-end text:name="__RefHeading___Toc1651_1355508096"/></text:h>
    <text:p text:style-name="P13"><text:span text:style-name="T26">The link thread contains two linked lists, a send list and a window list. An export segment </text:span><text:span text:style-name="T28">received from the link queue </text:span><text:span text:style-name="T26">is first inserted into the send list, that contains segments that has not yet been sent. When the link is ready to send a new segment, the first segment in the send list </text:span><text:span text:style-name="T28">is moved </text:span><text:span text:style-name="T26">to the window list, </text:span><text:span text:style-name="T27">and this segment is sent to the ethernet <text:s/>driver. </text:span><text:span text:style-name="T28">Thus the window list contain segments that are send but yet not acked.</text:span><text:span text:style-name="T27"> A timeout time is set on the segment, and if this time expires and the segment is still present in the window list, it&apos;s sent again. The timeout time </text:span><text:span text:style-name="T28">is</text:span><text:span text:style-name="T27"> fetched from MinResendTime </text:span><text:span text:style-name="T28">and</text:span><text:span text:style-name="T27"> is 50 ms by default. If the first ack is not received</text:span><text:span text:style-name="T28"> within the timeout time</text:span><text:span text:style-name="T27">, the time is doubled, and this continues until the MaxResendTime is reached (10 s by default). If still no ack it received the link is taken down. When an ack is received, the corresponding segment is freed and removed from the window list, and the first segment in the send list is moved to the window list. Currently the number of segments in the window list is limited to one. </text:span><text:span text:style-name="T28">When the last segment in a message is freed, the message is also freed from the QCom pool.</text:span></text:p>
-   <text:h text:style-name="P87" text:outline-level="4"><text:bookmark-start text:name="__RefHeading___Toc1653_1355508096"/>Import segments<text:bookmark-end text:name="__RefHeading___Toc1653_1355508096"/></text:h>
+   <text:h text:style-name="P128" text:outline-level="4"><text:bookmark-start text:name="__RefHeading___Toc1653_1355508096"/>Import segments<text:bookmark-end text:name="__RefHeading___Toc1653_1355508096"/></text:h>
    <text:p text:style-name="P14"><text:span text:style-name="T29">Import segments from the import thread are also received </text:span><text:span text:style-name="T30">by the link thread </text:span><text:span text:style-name="T29">from the link queue. If the segment is an ack, the corresponding export segment is </text:span><text:span text:style-name="T30">found in the window list and freed. Otherwise if the segments are reassembled to a message. The message is allocated in the qcom pool when the first segment arrives and the content of this, and the following segments are copied to the message until the last segment arrives. When the message is complete it is put on the receiver queue </text:span><text:soft-page-break/><text:span text:style-name="T30">stated in the message header.</text:span></text:p>
-   <text:h text:style-name="P74" text:outline-level="1"><text:bookmark-start text:name="__RefHeading___Toc1655_1355508096"/>Event and alarm handling<text:bookmark-end text:name="__RefHeading___Toc1655_1355508096"/></text:h>
+   <text:h text:style-name="P107" text:outline-level="1"><text:bookmark-start text:name="__RefHeading___Toc1655_1355508096"/>Event and alarm handling<text:bookmark-end text:name="__RefHeading___Toc1655_1355508096"/></text:h>
    <text:p text:style-name="P17"><text:span text:style-name="T39">Event and alarm are triggered either from a set of supervising objects or from a function call in an application. The supervising objects </text:span><text:span text:style-name="T42">are scanned by an agent for</text:span><text:span text:style-name="T39"> alarm condition, and when an alarm condition occurs, a detect flag is set in the object. </text:span><text:span text:style-name="T42">The agent used depends on where the supervision object is located</text:span><text:span text:style-name="T39">. Supervising objects in the plc code is scanned by the plc program, object under an I/O object is scanned by the io_comm process, and other object are scanned by the event monitor.</text:span></text:p>
    <text:p text:style-name="P17"><text:span text:style-name="T39">When the detect flag is set, messages are sent to outunits by the event monitor. An outunit can be an alarm or event window, </text:span><text:span text:style-name="T40">or an event logging process. </text:span></text:p>
-   <text:h text:style-name="P78" text:outline-level="2"><text:bookmark-start text:name="__RefHeading___Toc1657_1355508096"/>Supervision objects<text:bookmark-end text:name="__RefHeading___Toc1657_1355508096"/></text:h>
-   <text:p text:style-name="P35"><text:span text:style-name="T44">The supervision obje</text:span><text:span text:style-name="T45">cts are</text:span></text:p>
+   <text:h text:style-name="P111" text:outline-level="2"><text:bookmark-start text:name="__RefHeading___Toc1657_1355508096"/>Supervision objects<text:bookmark-end text:name="__RefHeading___Toc1657_1355508096"/></text:h>
+   <text:p text:style-name="P34"><text:span text:style-name="T44">The supervision obje</text:span><text:span text:style-name="T45">cts are</text:span></text:p>
    <table:table table:name="Table4" table:style-name="Table4">
     <table:table-column table:style-name="Table4.A"/>
     <table:table-column table:style-name="Table4.B"/>
-    <table:table-row table:style-name="TableLine94412996998400">
+    <table:table-row table:style-name="TableLine94796534778080">
      <table:table-cell table:style-name="Table4.A1" office:value-type="string">
-      <text:p text:style-name="P57">DSup</text:p>
+      <text:p text:style-name="P75">DSup</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table4.B1" office:value-type="string">
-      <text:p text:style-name="P57">Supervision of a digital signal. A Dsup object can be placed in <text:s/>a plc program or in the plant hierarchy.</text:p>
+      <text:p text:style-name="P75">Supervision of a digital signal. A Dsup object can be placed in <text:s/>a plc program or in the plant hierarchy.</text:p>
      </table:table-cell>
     </table:table-row>
-    <table:table-row table:style-name="TableLine94412997083072">
+    <table:table-row table:style-name="TableLine94796534751440">
      <table:table-cell table:style-name="Table4.A2" office:value-type="string">
-      <text:p text:style-name="P57">DSupComp</text:p>
+      <text:p text:style-name="P75">DSupComp</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table4.B2" office:value-type="string">
-      <text:p text:style-name="P57">Supervision of a digital signal for components. The object is divided in a main and function object, where the main object is placed in the main object of the component, and the function object in the plc code. <text:span text:style-name="T56">This makes it possible to adjust any property of the DSupComp in each instance.</text:span></text:p>
+      <text:p text:style-name="P75">Supervision of a digital signal for components. The object is divided in a main and function object, where the main object is placed in the main object of the component, and the function object in the plc code. <text:span text:style-name="T56">This makes it possible to adjust any property of the DSupComp in each instance.</text:span></text:p>
      </table:table-cell>
     </table:table-row>
-    <table:table-row table:style-name="TableLine94412997084640">
+    <table:table-row table:style-name="TableLine94796534760272">
      <table:table-cell table:style-name="Table4.A2" office:value-type="string">
-      <text:p text:style-name="P57">ASup</text:p>
+      <text:p text:style-name="P75">ASup</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table4.B2" office:value-type="string">
-      <text:p text:style-name="P57">Supervision of an analog signal. An ASup object can be placed in a plc program or in the plant hierarchy.</text:p>
+      <text:p text:style-name="P75">Supervision of an analog signal. An ASup object can be placed in a plc program or in the plant hierarchy.</text:p>
      </table:table-cell>
     </table:table-row>
-    <table:table-row table:style-name="TableLine94412997085296">
+    <table:table-row table:style-name="TableLine94796534776704">
      <table:table-cell table:style-name="Table4.A2" office:value-type="string">
-      <text:p text:style-name="P57">ASupComp</text:p>
+      <text:p text:style-name="P75">ASupComp</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table4.B2" office:value-type="string">
-      <text:p text:style-name="P57">Supervision of analog singl<text:span text:style-name="T56">e</text:span> for components.</text:p>
+      <text:p text:style-name="P75">Supervision of analog singl<text:span text:style-name="T56">e</text:span> for components.</text:p>
      </table:table-cell>
     </table:table-row>
-    <table:table-row table:style-name="TableLine94412997085952">
+    <table:table-row table:style-name="TableLine94796534766560">
      <table:table-cell table:style-name="Table4.A2" office:value-type="string">
-      <text:p text:style-name="P57">SystemSup</text:p>
+      <text:p text:style-name="P75">SystemSup</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table4.B2" office:value-type="string">
-      <text:p text:style-name="P57">Supervision of system functions. All SystemSup objects are placed in an array in the MessageHandler object.</text:p>
+      <text:p text:style-name="P75">Supervision of system functions. All SystemSup objects are placed in an array in the MessageHandler object.</text:p>
      </table:table-cell>
     </table:table-row>
-    <table:table-row table:style-name="TableLine94412997086768">
+    <table:table-row table:style-name="TableLine94796534769040">
      <table:table-cell table:style-name="Table4.A2" office:value-type="string">
-      <text:p text:style-name="P57">CycleSup</text:p>
+      <text:p text:style-name="P75">CycleSup</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table4.B2" office:value-type="string">
-      <text:p text:style-name="P57">Supervision of cyclic processes, eg plc threads.</text:p>
+      <text:p text:style-name="P75">Supervision of cyclic processes, eg plc threads.</text:p>
      </table:table-cell>
     </table:table-row>
-    <table:table-row table:style-name="TableLine94412997087536">
+    <table:table-row table:style-name="TableLine94796534842240">
      <table:table-cell table:style-name="Table4.A2" office:value-type="string">
-      <text:p text:style-name="P57">LinkSup</text:p>
+      <text:p text:style-name="P75">LinkSup</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table4.B2" office:value-type="string">
-      <text:p text:style-name="P57">Supervision of network links.</text:p>
+      <text:p text:style-name="P75">Supervision of network links.</text:p>
      </table:table-cell>
     </table:table-row>
    </table:table>
-   <text:p text:style-name="P37"/>
-   <text:h text:style-name="P79" text:outline-level="2"><text:bookmark-start text:name="__RefHeading___Toc1659_1355508096"/>Agents<text:bookmark-end text:name="__RefHeading___Toc1659_1355508096"/></text:h>
-   <text:p text:style-name="P38">An agent scans supervision objects and detects when the alarm condition occurs and when it returns. It timestamps these events, and sets some flags in the object to indicate the current state for the event monitor. The communication with the event monitor is made with the following attributes in the supervision object.</text:p>
+   <text:p text:style-name="P36"/>
+   <text:h text:style-name="P112" text:outline-level="2"><text:bookmark-start text:name="__RefHeading___Toc1659_1355508096"/>Agents<text:bookmark-end text:name="__RefHeading___Toc1659_1355508096"/></text:h>
+   <text:p text:style-name="P37">An agent scans supervision objects and detects when the alarm condition occurs and when it returns. It timestamps these events, and sets some flags in the object to indicate the current state for the event monitor. The communication with the event monitor is made with the following attributes in the supervision object.</text:p>
    <table:table table:name="Table5" table:style-name="Table5">
     <table:table-column table:style-name="Table5.A"/>
     <table:table-column table:style-name="Table5.B"/>
-    <table:table-row table:style-name="TableLine94412997072560">
+    <table:table-row table:style-name="TableLine94796534846624">
      <table:table-cell table:style-name="Table5.A1" office:value-type="string">
-      <text:p text:style-name="P58">AlarmCheck</text:p>
+      <text:p text:style-name="P76">AlarmCheck</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table5.B1" office:value-type="string">
-      <text:p text:style-name="P58">Set by the event monitor when an object should be checked for alarm condition. Taken down by the agent when an alarm condition is detected and the delay time has elapsed.</text:p>
+      <text:p text:style-name="P76">Set by the event monitor when an object should be checked for alarm condition. Taken down by the agent when an alarm condition is detected and the delay time has elapsed.</text:p>
      </table:table-cell>
     </table:table-row>
-    <table:table-row table:style-name="TableLine94412997109680">
+    <table:table-row table:style-name="TableLine94796534869808">
      <table:table-cell table:style-name="Table5.A2" office:value-type="string">
-      <text:p text:style-name="P58">DetectCheck</text:p>
+      <text:p text:style-name="P76">DetectCheck</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table5.B2" office:value-type="string">
-      <text:p text:style-name="P58">Also set by the event monitor when an object should be checked for alarm condition. Taken down by the agent when by the agent when an alarm condition is <text:soft-page-break/>detected.</text:p>
+      <text:p text:style-name="P76">Also set by the event monitor when an object should be checked for alarm condition. Taken down by the agent when by the agent when an alarm condition is <text:soft-page-break/>detected.</text:p>
      </table:table-cell>
     </table:table-row>
-    <table:table-row table:style-name="TableLine94412997111120">
+    <table:table-row table:style-name="TableLine94796534871248">
      <table:table-cell table:style-name="Table5.A2" office:value-type="string">
-      <text:p text:style-name="P58">DetectSend</text:p>
+      <text:p text:style-name="P76">DetectSend</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table5.B2" office:value-type="string">
-      <text:p text:style-name="P55"><text:span text:style-name="T46">Set by the agent to indicate alarm condition. </text:span><text:span text:style-name="T47">Taken down by the event monitor when the alarm is handled.</text:span></text:p>
+      <text:p text:style-name="P73"><text:span text:style-name="T46">Set by the agent to indicate alarm condition. </text:span><text:span text:style-name="T47">Taken down by the event monitor when the alarm is handled.</text:span></text:p>
      </table:table-cell>
     </table:table-row>
-    <table:table-row table:style-name="TableLine94412997111776">
+    <table:table-row table:style-name="TableLine94796534871904">
      <table:table-cell table:style-name="Table5.A2" office:value-type="string">
-      <text:p text:style-name="P58">DetectTime</text:p>
+      <text:p text:style-name="P76">DetectTime</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table5.B2" office:value-type="string">
-      <text:p text:style-name="P58">Time for alarm condition is detected.</text:p>
+      <text:p text:style-name="P76">Time for alarm condition is detected.</text:p>
      </table:table-cell>
     </table:table-row>
-    <table:table-row table:style-name="TableLine94412997112432">
+    <table:table-row table:style-name="TableLine94796534872560">
      <table:table-cell table:style-name="Table5.A2" office:value-type="string">
-      <text:p text:style-name="P58">ReturnCheck</text:p>
+      <text:p text:style-name="P76">ReturnCheck</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table5.B2" office:value-type="string">
-      <text:p text:style-name="P58">Set by the agent to indicate that it should check for return event.Taken down by the agent when the return event has occurred.</text:p>
+      <text:p text:style-name="P76">Set by the agent to indicate that it should check for return event.Taken down by the agent when the return event has occurred.</text:p>
      </table:table-cell>
     </table:table-row>
-    <table:table-row table:style-name="TableLine94412997113248">
+    <table:table-row table:style-name="TableLine94796534873376">
      <table:table-cell table:style-name="Table5.A2" office:value-type="string">
-      <text:p text:style-name="P58">ReturnSend</text:p>
+      <text:p text:style-name="P76">ReturnSend</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table5.B2" office:value-type="string">
-      <text:p text:style-name="P55"><text:span text:style-name="T46">Set by the agent </text:span><text:span text:style-name="T47">to message to the event monitor that a return has occurred. Reset </text:span><text:span text:style-name="T47">by the event monitor when the return is handled.</text:span></text:p>
+      <text:p text:style-name="P73"><text:span text:style-name="T46">Set by the agent </text:span><text:span text:style-name="T47">to message to the event monitor that a return has occurred. Reset by the event monitor when the return is handled.</text:span></text:p>
      </table:table-cell>
     </table:table-row>
-    <table:table-row table:style-name="TableLine94412997114016">
+    <table:table-row table:style-name="TableLine94796534874144">
      <table:table-cell table:style-name="Table5.A2" office:value-type="string">
-      <text:p text:style-name="P59">ReturnTime</text:p>
+      <text:p text:style-name="P77">ReturnTime</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table5.B2" office:value-type="string">
-      <text:p text:style-name="P59">Time when the return is detected.</text:p>
+      <text:p text:style-name="P77">Time when the return is detected.</text:p>
      </table:table-cell>
     </table:table-row>
-    <table:table-row table:style-name="TableLine94412997114832">
+    <table:table-row table:style-name="TableLine94796534874960">
      <table:table-cell table:style-name="Table5.A2" office:value-type="string">
-      <text:p text:style-name="P60">AlarmStatus</text:p>
+      <text:p text:style-name="P78">AlarmStatus</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table5.B2" office:value-type="string">
-      <text:p text:style-name="P60">The two last bits indicates it the alarm is not returned (1), not acknowledge (2) or blocked (4).</text:p>
+      <text:p text:style-name="P78">The two last bits indicates it the alarm is not returned (1), not acknowledge (2) or blocked (4).</text:p>
      </table:table-cell>
     </table:table-row>
-    <table:table-row table:style-name="TableLine94412997115648">
+    <table:table-row table:style-name="TableLine94796534875776">
      <table:table-cell table:style-name="Table5.A2" office:value-type="string">
-      <text:p text:style-name="P60">AckTime</text:p>
+      <text:p text:style-name="P78">AckTime</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table5.B2" office:value-type="string">
-      <text:p text:style-name="P60">Time set by the event monitor when the alarm is acknowledged.</text:p>
+      <text:p text:style-name="P78">Time set by the event monitor when the alarm is acknowledged.</text:p>
      </table:table-cell>
     </table:table-row>
    </table:table>
-   <text:p text:style-name="P39"/>
-   <text:p text:style-name="P39">In short, the event monitor sets AlarmCheck and DetectCheck when it&apos;s ready to receive a new alarm. And the agent responds with DetectSend when the alarm is detected, and ReturnSend when the return is detected. When the alarm is return and acknowledged, AlarmCheck and DetectCheck is set again.</text:p>
-   <text:p text:style-name="P39">The agent is also counting down the time for the delay time.</text:p>
-   <text:p text:style-name="P36"><text:span text:style-name="T42">The agent used depends on where the supervision object is located</text:span><text:span text:style-name="T39">. </text:span></text:p>
+   <text:p text:style-name="P38"/>
+   <text:p text:style-name="P38">In short, the event monitor sets AlarmCheck and DetectCheck when it&apos;s ready to receive a new alarm. And the agent responds with DetectSend when the alarm is detected, and ReturnSend when the return is detected. When the alarm is return and acknowledged, AlarmCheck and DetectCheck is set again.</text:p>
+   <text:p text:style-name="P38">The agent is also counting down the time for the delay time.</text:p>
+   <text:p text:style-name="P35"><text:span text:style-name="T42">The agent used depends on where the supervision object is located</text:span><text:span text:style-name="T39">. </text:span></text:p>
    <table:table table:name="Table6" table:style-name="Table6">
     <table:table-column table:style-name="Table6.A"/>
     <table:table-column table:style-name="Table6.B"/>
-    <table:table-row table:style-name="TableLine94412997118192">
+    <table:table-row table:style-name="TableLine94796534878576">
      <table:table-cell table:style-name="Table6.A1" office:value-type="string">
-      <text:p text:style-name="P56"><text:span text:style-name="T48">Plc </text:span><text:span text:style-name="T49">program</text:span></text:p>
+      <text:p text:style-name="P74"><text:span text:style-name="T48">Plc </text:span><text:span text:style-name="T49">program</text:span></text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table6.B1" office:value-type="string">
-      <text:p text:style-name="P61">The plc program scans the DSup, DSupComp, ASup and ASupComp objects with function objects in the plc code.</text:p>
+      <text:p text:style-name="P79">The plc program scans the DSup, DSupComp, ASup and ASupComp objects with function objects in the plc code.</text:p>
      </table:table-cell>
     </table:table-row>
-    <table:table-row table:style-name="TableLine94412997126304">
+    <table:table-row table:style-name="TableLine94796534887392">
      <table:table-cell table:style-name="Table6.A2" office:value-type="string">
-      <text:p text:style-name="P62">rt_io_comm</text:p>
+      <text:p text:style-name="P80">rt_io_comm</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table6.B2" office:value-type="string">
-      <text:p text:style-name="P61">Scans supervision object placed under an I/O object.</text:p>
+      <text:p text:style-name="P79">Scans supervision object placed under an I/O object.</text:p>
      </table:table-cell>
     </table:table-row>
-    <table:table-row table:style-name="TableLine94412997127744">
+    <table:table-row table:style-name="TableLine94796534888832">
      <table:table-cell table:style-name="Table6.A2" office:value-type="string">
-      <text:p text:style-name="P56"><text:span text:style-name="T48">rt_</text:span><text:span text:style-name="T49">linksup</text:span></text:p>
+      <text:p text:style-name="P74"><text:span text:style-name="T48">rt_</text:span><text:span text:style-name="T49">linksup</text:span></text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table6.B2" office:value-type="string">
-      <text:p text:style-name="P61">Handles NodeLinkSup objects.</text:p>
+      <text:p text:style-name="P79">Handles NodeLinkSup objects.</text:p>
      </table:table-cell>
     </table:table-row>
-    <table:table-row table:style-name="TableLine94412997128400">
+    <table:table-row table:style-name="TableLine94796534889488">
      <table:table-cell table:style-name="Table6.A2" office:value-type="string">
-      <text:p text:style-name="P61">rt_emon</text:p>
+      <text:p text:style-name="P79">rt_emon</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table6.B2" office:value-type="string">
-      <text:p text:style-name="P61">Handles DSup and ASup objects not handled by any other agent, and SystemSup objects.</text:p>
+      <text:p text:style-name="P79">Handles DSup and ASup objects not handled by any other agent, and SystemSup objects.</text:p>
      </table:table-cell>
     </table:table-row>
    </table:table>
-   <text:h text:style-name="P103" text:outline-level="3">Applications</text:h>
-   <text:p text:style-name="P114">Applications uses the mh_appl API to connect to the event monitor and send alarm. <text:span text:style-name="T54">The API contains </text:span><text:span text:style-name="T57">a number of function, and each function</text:span><text:span text:style-name="T54"> call results </text:span><text:span text:style-name="T55">in a QCom message to the event monitor.</text:span></text:p>
+   <text:h text:style-name="P119" text:outline-level="3">Applications</text:h>
+   <text:p text:style-name="P43">Applications uses the mh_appl API to connect to the event monitor and send alarm. <text:span text:style-name="T54">The API contains </text:span><text:span text:style-name="T57">a number of function, and each function</text:span><text:span text:style-name="T54"> call results </text:span><text:span text:style-name="T55">in a QCom message to the event monitor.</text:span></text:p>
    <table:table table:name="Table7" table:style-name="Table7">
     <table:table-column table:style-name="Table7.A"/>
     <table:table-column table:style-name="Table7.B"/>
     <table:table-column table:style-name="Table7.C"/>
     <table:table-row table:style-name="Table7.1">
      <table:table-cell table:style-name="Table7.A1" office:value-type="string">
-      <text:p text:style-name="P112">mh_ApplConnect()</text:p>
+      <text:p text:style-name="P44">mh_ApplConnect()</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table7.A1" office:value-type="string">
-      <text:p text:style-name="P106">Connect to event monitor.</text:p>
+      <text:p text:style-name="P81">Connect to event monitor.</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table7.C1" office:value-type="string">
-      <text:p text:style-name="P107">mh_eMsg_ApplConnect</text:p>
+      <text:p text:style-name="P82">mh_eMsg_ApplConnect</text:p>
      </table:table-cell>
     </table:table-row>
-    <table:table-row table:style-name="TableLine94413002532864">
+    <table:table-row table:style-name="TableLine94796534908672">
      <table:table-cell table:style-name="Table7.A2" office:value-type="string">
-      <text:p text:style-name="P112">mh_ApplDisconnect()</text:p>
+      <text:p text:style-name="P44">mh_ApplDisconnect()</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table7.A2" office:value-type="string">
-      <text:p text:style-name="P106">Disconnect.</text:p>
+      <text:p text:style-name="P81">Disconnect.</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table7.C2" office:value-type="string">
-      <text:p text:style-name="P107">mh_eMsg_ApplDisconnect</text:p>
+      <text:p text:style-name="P82">mh_eMsg_ApplDisconnect</text:p>
      </table:table-cell>
     </table:table-row>
-    <table:table-row table:style-name="TableLine94413027546496">
+    <table:table-row table:style-name="TableLine94796534910672">
      <table:table-cell table:style-name="Table7.A2" office:value-type="string">
-      <text:p text:style-name="P106">mh_ApplMessage()</text:p>
+      <text:p text:style-name="P81">mh_ApplMessage()</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table7.A2" office:value-type="string">
-      <text:p text:style-name="P106">Send an alarm message.</text:p>
+      <text:p text:style-name="P81">Send an alarm message.</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table7.C2" office:value-type="string">
-      <text:p text:style-name="P107">mh_eMsgAppMessage</text:p>
+      <text:p text:style-name="P82">mh_eMsgAppMessage</text:p>
      </table:table-cell>
     </table:table-row>
-    <table:table-row table:style-name="TableLine94413000725152">
+    <table:table-row table:style-name="TableLine94796534911488">
      <table:table-cell table:style-name="Table7.A2" office:value-type="string">
-      <text:p text:style-name="P106">mh_ApplReturn()</text:p>
+      <text:p text:style-name="P81">mh_ApplReturn()</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table7.A2" office:value-type="string">
-      <text:p text:style-name="P106">Send return event for an alarm message.</text:p>
+      <text:p text:style-name="P81">Send return event for an alarm message.</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table7.C2" office:value-type="string">
-      <text:p text:style-name="P107">mh_eMsg_ApplReturn</text:p>
+      <text:p text:style-name="P82">mh_eMsg_ApplReturn</text:p>
      </table:table-cell>
     </table:table-row>
-    <table:table-row table:style-name="TableLine94413002273392">
+    <table:table-row table:style-name="TableLine94796534912352">
      <table:table-cell table:style-name="Table7.A2" office:value-type="string">
-      <text:p text:style-name="P106">mh_ApplGetMsgInfo()</text:p>
+      <text:p text:style-name="P81">mh_ApplGetMsgInfo()</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table7.A2" office:value-type="string">
-      <text:p text:style-name="P106">Get info about active messages.</text:p>
+      <text:p text:style-name="P81">Get info about active messages.</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table7.C2" office:value-type="string">
-      <text:p text:style-name="P107">mh_eMsg_ApplGetMsgInfo</text:p>
+      <text:p text:style-name="P82">mh_eMsg_ApplGetMsgInfo</text:p>
      </table:table-cell>
     </table:table-row>
    </table:table>
-   <text:p text:style-name="P115"/>
-   <text:p text:style-name="P113"/>
-   <text:h text:style-name="P80" text:outline-level="2"><text:soft-page-break/><text:span text:style-name="T40">Event monitor rt_emon</text:span></text:h>
-   <text:p text:style-name="P43">The event monitor detects alarms and events in the system, and communicates these to outunits. </text:p>
-   <text:p text:style-name="P43">The source of alarm and events are supervision objects or applications processes. </text:p>
-   <text:h text:style-name="P102" text:outline-level="3"/>
-   <text:p text:style-name="P18"/>
-   <text:p text:style-name="P18"><text:span text:style-name="T40">The event monitor identifies all supervision objects of class DSup, CompDSup, ASup, CompASup, CycleSup, </text:span><text:span text:style-name="T43">NodeLinkSup</text:span><text:span text:style-name="T40"> or System</text:span><text:span text:style-name="T41">Sup and </text:span><text:span text:style-name="T53">inserts them into an active list that is scanned every second</text:span></text:p>
+   <text:p text:style-name="P45"/>
+   <text:p text:style-name="P41"/>
+   <text:h text:style-name="P113" text:outline-level="2"><text:soft-page-break/>Event monitor rt_emon</text:h>
+   <text:p text:style-name="P40">The event monitor detects alarms and events in the system, and communicates these to outunits. </text:p>
+   <text:p text:style-name="P42">The source of alarm and events are supervision objects or applications processes. </text:p>
+   <text:p text:style-name="P46"><text:span text:style-name="T40">The event monitor identifies all supervision objects of class DSup, CompDSup, ASup, CompASup, CycleSup, </text:span><text:span text:style-name="T43">NodeLinkSup</text:span><text:span text:style-name="T40"> or System</text:span><text:span text:style-name="T41">Sup and </text:span><text:span text:style-name="T53">inserts them into an active list that is scanned every second</text:span></text:p>
+   <text:p text:style-name="P46"/>
+   <text:h text:style-name="Heading_20_1" text:outline-level="1">Flow</text:h>
+   <text:p text:style-name="P47">Flow is a flow chart editor <text:span text:style-name="T59">used in the plc editor and plc trace to program and troubleshoot plc code. </text:span><text:span text:style-name="T60">The flow chart consists of nodes that is connected with other node by connections. The nodes can have different shapes and are built by simple buildings blocks as rectangles, arcs, lines and texts. Also connections can have different shapes, they can be straight or routed, with sharp or rounded cor</text:span><text:span text:style-name="T61">ners. </text:span></text:p>
+   <text:p text:style-name="P48">The flow chart editor is <text:span text:style-name="T62">embedded</text:span> in a <text:span text:style-name="T63">Gtk widget and there is also a </text:span><text:span text:style-name="T62"><text:s/>navigation widget where </text:span><text:span text:style-name="T63">the current work area is displayed and with the ability to scroll and zoom.</text:span></text:p>
+   <text:h text:style-name="Heading_20_3" text:outline-level="3">History</text:h>
+   <text:p text:style-name="P50">In the first versions of Proview<text:span text:style-name="T64">R</text:span>, a flow chart editor provided by Digital <text:span text:style-name="T60">calle</text:span>d Neted was used in the plc editor. <text:span text:style-name="T60">This was not available on Linux and replaced by Flow in V3.</text:span><text:span text:style-name="T62">3</text:span><text:span text:style-name="T60">. Flow was developed by CS in 1999.</text:span></text:p>
+   <text:h text:style-name="Heading_20_2" text:outline-level="2">Basic classes</text:h>
+   <text:h text:style-name="P124" text:outline-level="3">Array element</text:h>
+   <text:p text:style-name="P58"><text:span text:style-name="T72">Class FlowArrayElement. </text:span>Base class for an object that is an element of a<text:span text:style-name="T72">n array of class FlowArray</text:span>. Contains virtual function<text:span text:style-name="T72">s</text:span> for drawing, moving, zooming etc.</text:p>
+   <text:h text:style-name="Heading_20_3" text:outline-level="3">Array</text:h>
+   <text:p text:style-name="P58"><text:span text:style-name="T72">Class FlowArray. </text:span>An array <text:span text:style-name="T72">class</text:span> containing graphic elements as <text:s/>nodes, connections, rectangles, arcs, lines etc. Each element has to be a subclass to FlowArrayElem.</text:p>
+   <text:h text:style-name="P125" text:outline-level="3">Point</text:h>
+   <text:p text:style-name="P54"><text:span text:style-name="T72">Class FlowPoint. </text:span>A point with x and y coordinates without any graphical representation. It also contains the coordinates in pixels for the work area and the navigation window.</text:p>
+   <text:h text:style-name="P114" text:outline-level="2">Basic <text:span text:style-name="T68">node and connection </text:span>building blocks</text:h>
+   <text:h text:style-name="P124" text:outline-level="3">Rectangle</text:h>
+   <text:p text:style-name="P63">A rectangle of class FlowRect.</text:p>
+   <text:p text:style-name="P63"><draw:frame draw:style-name="fr1" draw:name="Bild1" text:anchor-type="paragraph" svg:x="0.213cm" svg:y="0cm" svg:width="8.149cm" svg:height="2.858cm" draw:z-index="3"><draw:image draw:mime-type="image/png">
+      <office:binary-data>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
+      </office:binary-data>
+     </draw:image>
+    </draw:frame></text:p>
+   <table:table table:name="Tabell1" table:style-name="Tabell1">
+    <table:table-column table:style-name="Tabell1.A"/>
+    <table:table-column table:style-name="Tabell1.B"/>
+    <text:soft-page-break/>
+    <table:table-row table:style-name="TableLine94796534928464">
+     <table:table-cell table:style-name="Tabell1.A1" office:value-type="string">
+      <text:p text:style-name="P83">ll</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Tabell1.A1" office:value-type="string">
+      <text:p text:style-name="P83">Point with coordinates for lower left corner.</text:p>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row table:style-name="TableLine94796534923072">
+     <table:table-cell table:style-name="Tabell1.A1" office:value-type="string">
+      <text:p text:style-name="P83">ur</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Tabell1.A1" office:value-type="string">
+      <text:p text:style-name="P83">Point with coordinates for upper right corner.</text:p>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row table:style-name="TableLine94796534928176">
+     <table:table-cell table:style-name="Tabell1.A1" office:value-type="string">
+      <text:p text:style-name="P83">draw_type</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Tabell1.A1" office:value-type="string">
+      <text:p text:style-name="P83">Border line color.</text:p>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row table:style-name="TableLine94796534931888">
+     <table:table-cell table:style-name="Tabell1.A1" office:value-type="string">
+      <text:p text:style-name="P83">line_width</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Tabell1.A1" office:value-type="string">
+      <text:p text:style-name="P83">Width of border line.</text:p>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row table:style-name="TableLine94796534934880">
+     <table:table-cell table:style-name="Tabell1.A1" office:value-type="string">
+      <text:p text:style-name="P83">display_level</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Tabell1.A1" office:value-type="string">
+      <text:p text:style-name="P83">Display level <text:span text:style-name="T68">set by the application. Controls wether the is visible or not.</text:span></text:p>
+     </table:table-cell>
+    </table:table-row>
+   </table:table>
+   <text:p text:style-name="P53"/>
+   <text:p text:style-name="P52"/>
+   <text:h text:style-name="Heading_20_3" text:outline-level="3">Arc</text:h>
+   <text:p text:style-name="P51">A circle or ellipse segme<text:span text:style-name="T65">nt </text:span><text:span text:style-name="T72">of class FlowArc.</text:span></text:p>
+   <text:p text:style-name="P51"><draw:frame draw:style-name="fr1" draw:name="Bild2" text:anchor-type="paragraph" svg:x="0.355cm" svg:y="0.115cm" svg:width="7.223cm" svg:height="5.689cm" draw:z-index="4"><draw:image draw:mime-type="image/png">
+      <office:binary-data>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
+       iOW/6btgRT3d3acAAAAASUVORK5CYII=
+      </office:binary-data>
+     </draw:image>
+    </draw:frame></text:p>
+   <table:table table:name="Tabell2" table:style-name="Tabell2">
+    <table:table-column table:style-name="Tabell2.A"/>
+    <table:table-column table:style-name="Tabell2.B"/>
+    <table:table-row table:style-name="TableLine94796534947888">
+     <table:table-cell table:style-name="Tabell2.A1" office:value-type="string">
+      <text:p text:style-name="P83">ll</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Tabell2.A1" office:value-type="string">
+      <text:p text:style-name="P83">FlowPoint with coordinates for lower left corner of the full circle or ellipse.</text:p>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row table:style-name="TableLine94796535343776">
+     <table:table-cell table:style-name="Tabell2.A1" office:value-type="string">
+      <text:p text:style-name="P83">ur</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Tabell2.A1" office:value-type="string">
+      <text:p text:style-name="P83">FlowPoint with coordinates for upper right corner of full circle or ellipse.</text:p>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row table:style-name="TableLine94796535344368">
+     <table:table-cell table:style-name="Tabell2.A1" office:value-type="string">
+      <text:p text:style-name="P83">angle1</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Tabell2.A1" office:value-type="string">
+      <text:p text:style-name="P83">Start angle in degrees.</text:p>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row table:style-name="TableLine94796535345024">
+     <table:table-cell table:style-name="Tabell2.A1" office:value-type="string">
+      <text:p text:style-name="P83">angle2</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Tabell2.A1" office:value-type="string">
+      <text:p text:style-name="P83">Extension angle in degrees.</text:p>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row table:style-name="TableLine94796535345680">
+     <table:table-cell table:style-name="Tabell2.A1" office:value-type="string">
+      <text:p text:style-name="P83">draw_type</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Tabell2.A1" office:value-type="string">
+      <text:p text:style-name="P83">Border line color.</text:p>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row table:style-name="TableLine94796535346496">
+     <table:table-cell table:style-name="Tabell2.A1" office:value-type="string">
+      <text:p text:style-name="P83">line_width</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Tabell2.A1" office:value-type="string">
+      <text:p text:style-name="P83">Width of border line.</text:p>
+     </table:table-cell>
+    </table:table-row>
+   </table:table>
+   <text:h text:style-name="P120" text:outline-level="3">Line</text:h>
+   <text:p text:style-name="P55">A straight line. <text:span text:style-name="T72">Class FlowCon.</text:span></text:p>
+   <text:p text:style-name="P55"><draw:frame draw:style-name="fr1" draw:name="Bild3" text:anchor-type="paragraph" svg:x="0.254cm" svg:y="0.115cm" svg:width="5.768cm" svg:height="2.672cm" draw:z-index="5"><draw:image draw:mime-type="image/png">
+      <office:binary-data>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
+       AAAASUVORK5CYII=
+      </office:binary-data>
+     </draw:image>
+    </draw:frame></text:p>
+   <table:table table:name="Tabell3" table:style-name="Tabell3">
+    <table:table-column table:style-name="Tabell3.A"/>
+    <table:table-column table:style-name="Tabell3.B"/>
+    <table:table-row table:style-name="TableLine94796534769328">
+     <table:table-cell table:style-name="Tabell3.A1" office:value-type="string">
+      <text:p text:style-name="P89">p1</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Tabell3.A1" office:value-type="string">
+      <text:p text:style-name="P84">FlowPoint with coordinates for <text:span text:style-name="T66">start point</text:span>.</text:p>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row table:style-name="TableLine94796535456832">
+     <table:table-cell table:style-name="Tabell3.A1" office:value-type="string">
+      <text:p text:style-name="P89">p2</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Tabell3.A1" office:value-type="string">
+      <text:p text:style-name="P84">FlowPoint with coordinates for <text:span text:style-name="T66">end point</text:span>.</text:p>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row table:style-name="TableLine94796535457536">
+     <table:table-cell table:style-name="Tabell3.A1" office:value-type="string">
+      <text:p text:style-name="P84">draw_type</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Tabell3.A1" office:value-type="string">
+      <text:p text:style-name="P84"><text:span text:style-name="T66">L</text:span>ine color.</text:p>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row table:style-name="TableLine94796535458192">
+     <table:table-cell table:style-name="Tabell3.A1" office:value-type="string">
+      <text:p text:style-name="P84">line_width</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Tabell3.A1" office:value-type="string">
+      <text:p text:style-name="P84">Width of border line.</text:p>
+     </table:table-cell>
+    </table:table-row>
+   </table:table>
+   <text:h text:style-name="P126" text:outline-level="3">Text</text:h>
+   <text:p text:style-name="P56">A single line text. <text:span text:style-name="T72">Class FlowText.</text:span></text:p>
+   <table:table table:name="Tabell4" table:style-name="Tabell4">
+    <table:table-column table:style-name="Tabell4.A"/>
+    <table:table-column table:style-name="Tabell4.B"/>
+    <table:table-row table:style-name="TableLine94796535358640">
+     <table:table-cell table:style-name="Tabell4.A1" office:value-type="string">
+      <text:p text:style-name="P90">p</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Tabell4.A1" office:value-type="string">
+      <text:p text:style-name="P85">FlowPoint with coordinates for <text:span text:style-name="T66">start point</text:span>.</text:p>
+     </table:table-cell>
+    </table:table-row>
+    <text:soft-page-break/>
+    <table:table-row table:style-name="TableLine94796535470832">
+     <table:table-cell table:style-name="Tabell4.A1" office:value-type="string">
+      <text:p text:style-name="P90">text</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Tabell4.A1" office:value-type="string">
+      <text:p text:style-name="P85"><text:span text:style-name="T66">Text string</text:span>.</text:p>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row table:style-name="TableLine94796535471536">
+     <table:table-cell table:style-name="Tabell4.A1" office:value-type="string">
+      <text:p text:style-name="P85">draw_type</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Tabell4.A1" office:value-type="string">
+      <text:p text:style-name="P85"><text:span text:style-name="T66">Text</text:span> color.</text:p>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row table:style-name="TableLine94796535472192">
+     <table:table-cell table:style-name="Tabell4.A1" office:value-type="string">
+      <text:p text:style-name="P90">text_size</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Tabell4.A1" office:value-type="string">
+      <text:p text:style-name="P85"><text:span text:style-name="T66">Size of text</text:span>.</text:p>
+     </table:table-cell>
+    </table:table-row>
+   </table:table>
+   <text:h text:style-name="P122" text:outline-level="3"><text:span text:style-name="T67">Annot</text:span><text:span text:style-name="T72">ation</text:span></text:h>
+   <text:p text:style-name="P57">A <text:span text:style-name="T67">text at a specific position in a node that can be individual for each node. The text string is stored an array in in the FlowNode object that has space for 10 annotations. Number specifies the index in this array. </text:span><text:span text:style-name="T72">Class FlowAnnot.</text:span></text:p>
+   <table:table table:name="Tabell5" table:style-name="Tabell5">
+    <table:table-column table:style-name="Tabell5.A"/>
+    <table:table-column table:style-name="Tabell5.B"/>
+    <table:table-row table:style-name="TableLine94796535461680">
+     <table:table-cell table:style-name="Tabell5.A1" office:value-type="string">
+      <text:p text:style-name="P91">p</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Tabell5.A1" office:value-type="string">
+      <text:p text:style-name="P86">FlowPoint with coordinates for <text:span text:style-name="T66">start point</text:span>.</text:p>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row table:style-name="TableLine94796535491536">
+     <table:table-cell table:style-name="Tabell5.A1" office:value-type="string">
+      <text:p text:style-name="P92">number</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Tabell5.A1" office:value-type="string">
+      <text:p text:style-name="P86"><text:span text:style-name="T67">Index in the annotation array of the node</text:span>.</text:p>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row table:style-name="TableLine94796535492240">
+     <table:table-cell table:style-name="Tabell5.A1" office:value-type="string">
+      <text:p text:style-name="P86">draw_type</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Tabell5.A1" office:value-type="string">
+      <text:p text:style-name="P86"><text:span text:style-name="T66">Text</text:span> color.</text:p>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row table:style-name="TableLine94796535492896">
+     <table:table-cell table:style-name="Tabell5.A1" office:value-type="string">
+      <text:p text:style-name="P91">text_size</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Tabell5.A1" office:value-type="string">
+      <text:p text:style-name="P86"><text:span text:style-name="T66">Size of text</text:span>.</text:p>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row table:style-name="TableLine94796535493552">
+     <table:table-cell table:style-name="Tabell5.A1" office:value-type="string">
+      <text:p text:style-name="P92">annot_type</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Tabell5.A1" office:value-type="string">
+      <text:p text:style-name="P92">Type of annotation. <text:span text:style-name="T68">OneLine, MultiLine or HelpText.</text:span></text:p>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row table:style-name="TableLine94796535494368">
+     <table:table-cell table:style-name="Tabell5.A1" office:value-type="string">
+      <text:p text:style-name="P93">relative_pos</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Tabell5.A1" office:value-type="string">
+      <text:p text:style-name="P93">1 of the coordinates are relative to previous annotation. Only used in Brow.</text:p>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row table:style-name="TableLine94796535495136">
+     <table:table-cell table:style-name="Tabell5.A1" office:value-type="string">
+      <text:p text:style-name="P93">display_level</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Tabell5.A1" office:value-type="string">
+      <text:p text:style-name="P93">Display level set by the application. Controls whether the object is visible or not.</text:p>
+     </table:table-cell>
+    </table:table-row>
+   </table:table>
+   <text:h text:style-name="P124" text:outline-level="3">Connection point</text:h>
+   <text:p text:style-name="P57">A <text:span text:style-name="T68">point in a node where a connections can be connected</text:span><text:span text:style-name="T67">. </text:span><text:span text:style-name="T72">Class FlowConPoint.</text:span></text:p>
+   <text:p text:style-name="P57"><draw:frame draw:style-name="fr1" draw:name="Bild4" text:anchor-type="paragraph" svg:x="0.268cm" svg:y="0.161cm" svg:width="5.741cm" svg:height="2.646cm" draw:z-index="6"><draw:image draw:mime-type="image/png">
+      <office:binary-data>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
+       r7Th7hc3zzEAAAAASUVORK5CYII=
+      </office:binary-data>
+     </draw:image>
+    </draw:frame></text:p>
+   <table:table table:name="Tabell6" table:style-name="Tabell6">
+    <table:table-column table:style-name="Tabell6.A"/>
+    <table:table-column table:style-name="Tabell6.B"/>
+    <table:table-row table:style-name="TableLine94796535501392">
+     <table:table-cell table:style-name="Tabell6.A1" office:value-type="string">
+      <text:p text:style-name="P91">p</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Tabell6.A1" office:value-type="string">
+      <text:p text:style-name="P86">FlowPoint with coordinates for <text:span text:style-name="T68">connection </text:span><text:span text:style-name="T66">point</text:span>.</text:p>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row table:style-name="TableLine94796535603408">
+     <table:table-cell table:style-name="Tabell6.A1" office:value-type="string">
+      <text:p text:style-name="P92">number</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Tabell6.A1" office:value-type="string">
+      <text:p text:style-name="P86"><text:span text:style-name="T68">Unique number of connection point within the node</text:span>.</text:p>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row table:style-name="TableLine94796535604112">
+     <table:table-cell table:style-name="Tabell6.A1" office:value-type="string">
+      <text:p text:style-name="P93">direction</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Tabell6.A1" office:value-type="string">
+      <text:p text:style-name="P86"><text:span text:style-name="T68">Direction in witch the connected connection is drawn</text:span>.</text:p>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row table:style-name="TableLine94796535604768">
+     <table:table-cell table:style-name="Tabell6.A1" office:value-type="string">
+      <text:p text:style-name="P91">text_size</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Tabell6.A1" office:value-type="string">
+      <text:p text:style-name="P86"><text:span text:style-name="T66">Size of text</text:span>.</text:p>
+     </table:table-cell>
+    </table:table-row>
+   </table:table>
+   <text:h text:style-name="Heading_20_2" text:outline-level="2">Node<text:span text:style-name="T69">s</text:span> <text:span text:style-name="T69">and connections</text:span></text:h>
+   <text:h text:style-name="Heading_20_3" text:outline-level="3">Node</text:h>
+   <text:p text:style-name="P58"><text:span text:style-name="T72">R</text:span>epresents a node in the flow chart diagram. The graphic layout of the node is described by a class object that contains the graphic elements of the node. <text:span text:style-name="T72">Class FlowNode.</text:span></text:p>
+   <text:p text:style-name="P58"><draw:frame draw:style-name="fr1" draw:name="Bild5" text:anchor-type="paragraph" svg:x="0.116cm" svg:y="0.093cm" svg:width="4.524cm" svg:height="4.207cm" draw:z-index="7"><draw:image draw:mime-type="image/png">
+      <office:binary-data>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
+      </office:binary-data>
+     </draw:image>
+    </draw:frame></text:p>
+   <table:table table:name="Tabell7" table:style-name="Tabell7">
+    <table:table-column table:style-name="Tabell7.A"/>
+    <table:table-column table:style-name="Tabell7.B"/>
+    <table:table-row table:style-name="TableLine94796535506832">
+     <table:table-cell table:style-name="Tabell7.A1" office:value-type="string">
+      <text:p text:style-name="P94">nc</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Tabell7.A1" office:value-type="string">
+      <text:p text:style-name="P94">Pointer to node class.</text:p>
+     </table:table-cell>
+    </table:table-row>
+    <text:soft-page-break/>
+    <table:table-row table:style-name="TableLine94796535753360">
+     <table:table-cell table:style-name="Tabell7.A1" office:value-type="string">
+      <text:p text:style-name="P94">pos</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Tabell7.A1" office:value-type="string">
+      <text:p text:style-name="P94">FlowPoint for node position.</text:p>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row table:style-name="TableLine94796535754064">
+     <table:table-cell table:style-name="Tabell7.A1" office:value-type="string">
+      <text:p text:style-name="P96">x_right</text:p>
+      <text:p text:style-name="P96">x_left</text:p>
+      <text:p text:style-name="P96">y_high</text:p>
+      <text:p text:style-name="P96">y_low</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Tabell7.A1" office:value-type="string">
+      <text:p text:style-name="P96">Node borders. Note that y_high means high y coordinate and is lower border in the drawing, while y_low is upper border.</text:p>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row table:style-name="TableLine94796535754720">
+     <table:table-cell table:style-name="Tabell7.A1" office:value-type="string">
+      <text:p text:style-name="P94">n_name</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Tabell7.A1" office:value-type="string">
+      <text:p text:style-name="P87"><text:span text:style-name="T69">Node name</text:span>.</text:p>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row table:style-name="TableLine94796535755376">
+     <table:table-cell table:style-name="Tabell7.A1" office:value-type="string">
+      <text:p text:style-name="P94">hot</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Tabell7.A1" office:value-type="string">
+      <text:p text:style-name="P94">Cursor is placed on the node. <text:span text:style-name="T70">The node is drawn with increased line width and the cursor is changed to cross cursor.</text:span></text:p>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row table:style-name="TableLine94796535756192">
+     <table:table-cell table:style-name="Tabell7.A1" office:value-type="string">
+      <text:p text:style-name="P95">highlight</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Tabell7.A1" office:value-type="string">
+      <text:p text:style-name="P95">The node is highlighted and drawn with red color.</text:p>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row table:style-name="TableLine94796535756960">
+     <table:table-cell table:style-name="Tabell7.A1" office:value-type="string">
+      <text:p text:style-name="P95">dimmed</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Tabell7.A1" office:value-type="string">
+      <text:p text:style-name="P95">The node is dimmed and drawn with gray instead of black.</text:p>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row table:style-name="TableLine94796535757776">
+     <table:table-cell table:style-name="Tabell7.A1" office:value-type="string">
+      <text:p text:style-name="P95">inverse</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Tabell7.A1" office:value-type="string">
+      <text:p text:style-name="P95">The node is drawn with white on a black background.</text:p>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row table:style-name="TableLine94796535758592">
+     <table:table-cell table:style-name="Tabell7.A1" office:value-type="string">
+      <text:p text:style-name="P95">annotv</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Tabell7.A1" office:value-type="string">
+      <text:p text:style-name="P95">Array for annotation strings.</text:p>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row table:style-name="TableLine94796535759600">
+     <table:table-cell table:style-name="Tabell7.A1" office:value-type="string">
+      <text:p text:style-name="P95">annotvsize</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Tabell7.A1" office:value-type="string">
+      <text:p text:style-name="P95">Array with the length of the strings in annov.</text:p>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row table:style-name="TableLine94796535760416">
+     <table:table-cell table:style-name="Tabell7.A1" office:value-type="string">
+      <text:p text:style-name="P95">annotpixmapv</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Tabell7.A1" office:value-type="string">
+      <text:p text:style-name="P95">Array for pixmap annotations. Used in brow.</text:p>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row table:style-name="TableLine94796535761232">
+     <table:table-cell table:style-name="Tabell7.A1" office:value-type="string">
+      <text:p text:style-name="P95">trace_object</text:p>
+      <text:p text:style-name="P95">trace_attribute</text:p>
+      <text:p text:style-name="P95">trace_type</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Tabell7.A1" office:value-type="string">
+      <text:p text:style-name="P95">Attributes where the application can store trace information.</text:p>
+     </table:table-cell>
+    </table:table-row>
+   </table:table>
+   <text:h text:style-name="P124" text:outline-level="3">Node class</text:h>
+   <text:p text:style-name="P59">Contains an array with graphic elements for the drawing of a node. <text:span text:style-name="T72">Class FlowNodeClass.</text:span></text:p>
+   <text:p text:style-name="P59"/>
+   <table:table table:name="Tabell8" table:style-name="Tabell8">
+    <table:table-column table:style-name="Tabell8.A"/>
+    <table:table-column table:style-name="Tabell8.B"/>
+    <table:table-row table:style-name="TableLine94796535613680">
+     <table:table-cell table:style-name="Tabell8.A1" office:value-type="string">
+      <text:p text:style-name="P96">a</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Tabell8.A1" office:value-type="string">
+      <text:p text:style-name="P88">Flow<text:span text:style-name="T71">Array w</text:span><text:span text:style-name="T72">i</text:span><text:span text:style-name="T71">th graphic elements</text:span>.</text:p>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row table:style-name="TableLine94796535771424">
+     <table:table-cell table:style-name="Tabell8.A1" office:value-type="string">
+      <text:p text:style-name="P96">nc_name</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Tabell8.A1" office:value-type="string">
+      <text:p text:style-name="P96">Node class name.</text:p>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row table:style-name="TableLine94796535772128">
+     <table:table-cell table:style-name="Tabell8.A1" office:value-type="string">
+      <text:p text:style-name="P96">group</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Tabell8.A1" office:value-type="string">
+      <text:p text:style-name="P88"><text:span text:style-name="T71">Node class group</text:span>.</text:p>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row table:style-name="TableLine94796535772784">
+     <table:table-cell table:style-name="Tabell8.A1" office:value-type="string">
+      <text:p text:style-name="P96">no_con_obstacle</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Tabell8.A1" office:value-type="string">
+      <text:p text:style-name="P96">Nodes of this class will not affect the drawing of routed connections.</text:p>
+     </table:table-cell>
+    </table:table-row>
+   </table:table>
+   <text:h text:style-name="P124" text:outline-level="3">Connection</text:h>
+   <text:p text:style-name="P60">A connection is drawn between two connection points. The appearance of the connection is described in a class object, <text:span text:style-name="T73">FlowConClass. The class for the connections is FlowClass.</text:span></text:p>
+   <text:h text:style-name="Heading_20_4" text:outline-level="4">Connection types</text:h>
+   <text:p text:style-name="P62">Straight</text:p>
+   <text:p text:style-name="P61">A straight line between the connections points.</text:p>
+   <text:p text:style-name="P62">StraightOneArrow</text:p>
+   <text:p text:style-name="P61">A straight line with one arrow.</text:p>
+   <text:p text:style-name="P62">Routed</text:p>
+   <text:p text:style-name="P61">A calculated path from the source connection point to the destination connection point, consisting of vertical and horizontal lines connected with 90 decrees arcs. The path is avoiding crossing any nodes, except nodes that has the no_con_obstacle property set, and avoiding to overlap other connections.</text:p>
+   <text:p text:style-name="P62">Reference</text:p>
+   <text:p text:style-name="P61">Used when the routing of a connections fails. It is drawn with a rectangle with number at the source and destination connection points.</text:p>
+   <text:p text:style-name="P62">StepConv</text:p>
+   <text:p text:style-name="P61"><text:soft-page-break/>Connection in a Grafcet sequence where several trans objects converges to one step object.</text:p>
+   <text:p text:style-name="P62">StepDiv</text:p>
+   <text:p text:style-name="P61">Connection in a Grafcet sequence where the step object diverges to several trans objects.</text:p>
+   <text:p text:style-name="P62">TransDiv</text:p>
+   <text:p text:style-name="P61">Connection in a Grafcet sequence where a trans object diverges to several step objects.</text:p>
+   <text:p text:style-name="P62">TransConv</text:p>
+   <text:p text:style-name="P61">Connection in a Grafcet sequence where several step objects converges to one trans object.</text:p>
+   <text:p text:style-name="P61"/>
+   <text:p text:style-name="P61"/>
+   <text:p text:style-name="P60"/>
+   <text:p text:style-name="P60"/>
   </office:text>
  </office:body>
 </office:document>

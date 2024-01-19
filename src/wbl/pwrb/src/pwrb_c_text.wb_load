@@ -59,7 +59,7 @@ SObject pwrb:Class
 !  A well-done PLC program ought to contain not only objects necessary 
 !  to the computer execution but also objects whose purpose are to make 
 !  the program more easy to understand to later readers. See figure below. 
-!  @image orm_en1-82.gif
+!  @image orm_header_fig1.png
 !  Title, Head and Text Objects Make the Program Easy to Read.
 !*/
   Object Text $ClassDef 237 

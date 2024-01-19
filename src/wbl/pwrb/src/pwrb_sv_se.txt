@@ -11012,7 +11012,7 @@ begrgänsning vid tvångsstyrning.
 <class> PiPos
 @Summary Översätter pulsräknarvärde till ingenjörsvärde
 Översätter pulsräknarvärde till ingenjörsvärde (position, volym etc.). 
-@image orm_pipos_fo.gif
+@image orm_pipos_fo.png
 
 Antag att ingenjörsvärdet är en position. Den aktuell positionen, ActVal , 
 beräknas vid varje exekvering med hjälp av den linjära ekvationen 

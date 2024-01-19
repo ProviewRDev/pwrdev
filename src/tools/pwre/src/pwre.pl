@@ -1166,13 +1166,13 @@ sub build_module()
       _build("exp", "*", "src", "lib");
     }
     if ($exe == 1) {
+      _build("doc", "orm", "src", "copy");
       _build("wbl", "*", "src", "lib");
       _build("wbl", "*", "src", "exe");
       _build("exe", "*", "src", "all");
       _build("exe", "*", $flavour, "all");
       _build("exp", "*", "src", "exe");
       _build("doc", "dsh", "src", "copy");
-      _build("doc", "orm", "src", "copy");
     }
   }
 }

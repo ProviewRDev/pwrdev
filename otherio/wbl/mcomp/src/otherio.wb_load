@@ -8991,7 +8991,7 @@ Volume OtherIO $ClassVolume 0.0.250.10
     !  Below the Epl_CN object a special EPL module object is used containing
     !  the channels in the Io attribute of class ABB_ACS880_Epl_IoModule.
     ! 
-    !  @image orm_abb_acs880_epl_example1.gif
+    !  @image orm_otherio_epl_example14.gif
     ! 
     !  The Epl_CN object is used when ProviewR act as a managing node. In circuits where
     !  ProviewR acts as a controlled node the Epl_CNServer object is used instead.
