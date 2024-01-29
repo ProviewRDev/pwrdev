@@ -117,7 +117,6 @@ void XttGeGtk::set_size(int width, int height)
 {
   int default_width;
   int default_height;
-  GdkGeometry geometry;
   double rd = window_resize_delta;
 
   default_width = width + 20;
@@ -132,12 +131,13 @@ void XttGeGtk::set_size(int width, int height)
   //gtk_window_resize(GTK_WINDOW(toplevel), default_width, default_height);
 
   // This condition is due to a bug in Reflection X 11.0.5...
-
+#if 0
   if (!((XNav*)parent_ctx)->gbl.no_graph_ratio) {
     // Note, equal min and max aspect will cause recursive resize on LXDE
     if (!resize_restrictions_set) {
       if (!(options & ge_mOptions_ResizeFree)) {
 	if (grow_GetWindowResize(graph->grow->ctx) == 0) {
+	  GdkGeometry geometry;
 	  geometry.min_aspect = gdouble(default_width) / default_height * (1.0 - rd);
 	  geometry.max_aspect = gdouble(default_width) / default_height * (1.0 + rd);
 	  gtk_window_set_geometry_hints(
@@ -147,7 +147,8 @@ void XttGeGtk::set_size(int width, int height)
       resize_restrictions_set = 1;
     }
   }
-  gtk_window_resize(GTK_WINDOW(toplevel), default_width, default_height);
+#endif
+  gtk_window_set_default_size(GTK_WINDOW(toplevel), default_width, default_height);
 }
 
 void XttGeGtk::menu_setup(int edit)

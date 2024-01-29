@@ -993,7 +993,17 @@ void GlowDrawGtk::invalidate(GlowWind *wind, int x, int y, int width, int height
   rect.y = y;
   rect.width = width;
   rect.height = height;
-  gdk_window_invalidate_rect(w->window, &rect, FALSE);
+
+#if 0
+  if (wind->window == ctx->mw.window)
+    g_idle_add((GSourceFunc)gtk_widget_queue_draw, (void*)m_wind.toplevel);
+  else
+    g_idle_add((GSourceFunc)gtk_widget_queue_draw, (void*)nav_wind.toplevel);
+#endif
+  if (w == ctx->mw.window)
+    gtk_widget_queue_draw_area(m_wind.toplevel, x, y, width, height);
+  else
+    gtk_widget_queue_draw_area(nav_wind.toplevel, x, y, width, height);
 }
 
 cairo_t* GlowDrawGtk::get_cairo(GlowWind* wind, int create)
