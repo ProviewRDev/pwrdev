@@ -1196,6 +1196,7 @@ var Glow = {
   eSave_GrowCtx_anti_aliasing	    	: 2252,
   eSave_GrowCtx_window_resize 		: 2253,
   eSave_GrowCtx_layername_cnt 		: 2254,
+  eSave_GrowCtx_current_color_theme 	: 2255,
   eSave_GrowSubAnnot_x_right		: 2300,
   eSave_GrowSubAnnot_x_left		: 2301,
   eSave_GrowSubAnnot_y_high		: 2302,
@@ -17224,6 +17225,7 @@ function GrowCtx( ctx) {
   this.objectname_cnt = 0;
   this.layername_cnt = 0;
   this.window_resize = 0;
+  this.current_color_theme = 0;
   this.layer = this.a;
 
   if ( ctx == null)
@@ -17561,6 +17563,9 @@ function GrowCtx( ctx) {
 	break;
       case Glow.eSave_GrowCtx_layername_cnt:
 	this.layername_cnt = parseInt(tokens[1], 10);
+	break;
+      case Glow.eSave_GrowCtx_current_color_theme:
+	this.current_color_theme = parseInt(tokens[1], 10);
 	break;
       default:
 	console.log( "Syntax error in GrowCtx open_growctx", key);
