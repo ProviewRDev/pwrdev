@@ -200,17 +200,17 @@ static pwr_tStatus IoRackInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
 
           // Byte swap depending on architecture
 #if (pwr_dHost_byteOrder == pwr_dLittleEndian)
-          if (chan_di->Representation == pwr_eDataRepEnum_Bit16 &&
+          if (chan_do->Representation == pwr_eDataRepEnum_Bit16 &&
               op->ByteOrdering == pwr_eByteOrderingEnum_BigEndian)
             chanp->mask = swap16(chanp->mask);
-          if (chan_di->Representation == pwr_eDataRepEnum_Bit32 &&
+          if (chan_do->Representation == pwr_eDataRepEnum_Bit32 &&
               op->ByteOrdering == pwr_eByteOrderingEnum_BigEndian)
             chanp->mask = swap32(chanp->mask);
 #elif (pwr_dHost_byteOrder == pwr_dBigEndian)
-          if (chan_di->Representation == pwr_eDataRepEnum_Bit16 &&
+          if (chan_do->Representation == pwr_eDataRepEnum_Bit16 &&
               op->ByteOrdering == pwr_eByteOrderingEnum_LittleEndian)
             chanp->mask = swap16(chanp->mask);
-          if (chan_di->Representation == pwr_eDataRepEnum_Bit32 &&
+          if (chan_do->Representation == pwr_eDataRepEnum_Bit32 &&
               op->ByteOrdering == pwr_eByteOrderingEnum_LittleEndian)
             chanp->mask = swap32(chanp->mask);
 #endif
