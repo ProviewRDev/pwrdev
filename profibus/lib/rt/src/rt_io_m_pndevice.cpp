@@ -244,58 +244,62 @@ static pwr_tStatus IoRackInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
           // cardp->Name, chan_io->Number, chanp->offset);
           break;
 
-	case pwr_cClass_ChanBi: {
-	  pwr_sClass_ChanBi* chan_bi = (pwr_sClass_ChanBi*)chanp->cop;
-	  if (!chanp->sop || !chan_bi->Size)
-	    continue;
+        case pwr_cClass_ChanBi:
+        {
+          pwr_sClass_ChanBi* chan_bi = (pwr_sClass_ChanBi*)chanp->cop;
+          if (!chanp->sop || !chan_bi->Size)
+            continue;
 
-	  chanp->offset = input_counter;
-	  chanp->size = chan_bi->Size;
-	  chanp->mask = 0;
-	  input_counter += chan_bi->Size;
-	  if (chanp->SigType == pwr_eType_Float32)
-	    io_BiRangeToCoef(chanp);
-	  
-	  break;
-	}
+          chanp->offset = input_counter;
+          chanp->size = chan_bi->Size;
+          chanp->mask = 0;
+          input_counter += chan_bi->Size;
+          if (chanp->SigType == pwr_eType_Float32)
+            io_BiRangeToCoef(chanp);
 
-	case pwr_cClass_ChanBo: {
-	  pwr_sClass_ChanBo* chan_bo = (pwr_sClass_ChanBo*)chanp->cop;
-	  if (!chanp->sop || !chan_bo->Size)
-	    continue;
+          break;
+        }
 
-	  chanp->offset = output_counter;
-	  chanp->size = chan_bo->Size;
-	  chanp->mask = 0;
-	  output_counter += chan_bo->Size;
-	  if (chanp->SigType == pwr_eType_Float32)
-	    io_BoRangeToCoef(chanp);
-	  break;
-	}
+        case pwr_cClass_ChanBo:
+        {
+          pwr_sClass_ChanBo* chan_bo = (pwr_sClass_ChanBo*)chanp->cop;
+          if (!chanp->sop || !chan_bo->Size)
+            continue;
 
-	case pwr_cClass_ChanBiBlob: {
-	  pwr_sClass_ChanBiBlob* chan_bi = (pwr_sClass_ChanBiBlob*)chanp->cop;
-	  if (!chanp->sop || !chan_bi->Size)
-	    continue;
+          chanp->offset = output_counter;
+          chanp->size = chan_bo->Size;
+          chanp->mask = 0;
+          output_counter += chan_bo->Size;
+          if (chanp->SigType == pwr_eType_Float32)
+            io_BoRangeToCoef(chanp);
+          break;
+        }
 
-	  chanp->offset = input_counter;
-	  chanp->size = chan_bi->Size;
-	  chanp->mask = 0;
-	  input_counter += chan_bi->Size;
-	  break;
-	}
+        case pwr_cClass_ChanBiBlob:
+        {
+          pwr_sClass_ChanBiBlob* chan_bi = (pwr_sClass_ChanBiBlob*)chanp->cop;
+          if (!chanp->sop || !chan_bi->Size)
+            continue;
 
-	case pwr_cClass_ChanBoBlob: {
-	  pwr_sClass_ChanBoBlob* chan_bo = (pwr_sClass_ChanBoBlob*)chanp->cop;
-	  if (!chanp->sop || !chan_bo->Size)
-	    continue;
+          chanp->offset = input_counter;
+          chanp->size = chan_bi->Size;
+          chanp->mask = 0;
+          input_counter += chan_bi->Size;
+          break;
+        }
 
-	  chanp->offset = output_counter;
-	  chanp->size = chan_bo->Size;
-	  chanp->mask = 0;
-	  output_counter += chan_bo->Size;
-	  break;
-	}
+        case pwr_cClass_ChanBoBlob:
+        {
+          pwr_sClass_ChanBoBlob* chan_bo = (pwr_sClass_ChanBoBlob*)chanp->cop;
+          if (!chanp->sop || !chan_bo->Size)
+            continue;
+
+          chanp->offset = output_counter;
+          chanp->size = chan_bo->Size;
+          chanp->mask = 0;
+          output_counter += chan_bo->Size;
+          break;
+        }
         }
       }
 
