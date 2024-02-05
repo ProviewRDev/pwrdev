@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # ProviewR   Open Source Process Control.
-# Copyright (C) 2005-2024 SSAB EMEA AB.
+# Copyright (C) 2005-2021 SSAB EMEA AB.
 #
 # This file is part of ProviewR.
 #
@@ -347,8 +347,29 @@ pkg_remove_func ()
   rm $pwrp_load/pwr_pkg.dat
 }
 
+usage ()
+{
+  cat <<EOF 
+    usage: pwr_pkg [-i pkg] [-l [pkg]] [-b [pkg]] [-r]
+
+    pwr_pkg -i 'pkg'      Install package 'pkg'
+    pwr_pkg -r            Remove currently installed package
+    pwr_pkg -lp ['pkg']   List installed package, or package 'pkg'
+    pwr_pkg -la ['pkg']   List installed package, or package 'pkg', all info
+    pwr_pkg -lf ['pkg']   List files in installed package, or package 'pkg'
+    pwr_pkg -l            List all packages
+
+EOF
+}
+
 force="no"
-while [ -n "$(echo $1 | grep '-')" ]; do
+
+if [ "$1" == "" ]; then
+  usage
+  exit 1
+fi
+
+while [ "${1:0:1}" == "-" ]; do
 
   OPTARG=$2
   case $1 in
@@ -370,18 +391,9 @@ while [ -n "$(echo $1 | grep '-')" ]; do
 
     -l ) pkg_dirbrief_func "$OPTARG";;
 
-    * ) cat <<EOF 
-    usage: pwr_pkg [-i pkg] [-l [pkg]] [-b [pkg]] [-r]
-
-    pwr_pkg -i 'pkg'      Install package 'pkg'
-    pwr_pkg -r            Remove currently installed package
-    pwr_pkg -lp ['pkg']   List installed package, or package 'pkg'
-    pwr_pkg -la ['pkg']   List installed package, or package 'pkg', all info
-    pwr_pkg -lf ['pkg']   List files in installed package, or package 'pkg'
-    pwr_pkg -l            List all packages
-
-EOF
-         exit 1
+    * ) usage
+        exit 1
+	;;
   esac
   shift
 done
