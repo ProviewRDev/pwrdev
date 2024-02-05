@@ -2,10 +2,10 @@
 
 release="ubuntu:22.04"
 release_name="ubu"
-buildversion="31-AUG-2022 12:00:00"
+buildversion="18-JAN-2024 12:00:00"
 tz="Europe/Stockholm"
 build_rpi=1
-gitrepo="-b develop http://git:git@10.255.164.96/x6-0-0/pwr/.git"
+gitrepo="-b develop http://git:git@192.168.0.105/pwr/.git"
 install_update="apt-get update"
 install_git="apt-get install -y git make"
 install_videodummy="apt-get install -y xserver-xorg-video-dummy"
@@ -33,7 +33,7 @@ install_pwrrt="apt-get install -y libgtk-3-0 libasound2 \
 	openjdk-11-jre"
 install_pkg="dpkg -i"
 jdk_dir=/usr/lib/jvm/java-11-openjdk-amd64
-ver="6.1.0-1"
+ver="6.1.2-1"
 sver="61"
 arch="amd64"
 pkg_pwr="pwr"$sver"_"$ver"_"$arch".deb"
@@ -56,8 +56,16 @@ caps="--security-opt seccomp=unconfined \
 
 if [ "$1" == "-h" ] || [ "$1" == "--help" ]; then
   echo ""
-  echo "Build from repo: $gitrepo"
-  echo "Version:         $ver"
+  echo "  Build from repo: $gitrepo"
+  echo "  Version:         $ver"
+  echo ""
+  echo "  test_all_deb.sh start-pass end-pass"
+  echo "  test_all_deb.sh [-h][--clean]"
+  echo ""
+  echo "  -h      Show help"
+  echo "  --clean Clean log, package and data directories"
+  echo ""
+  echo "  Passes"
   echo ""
   echo "1:  Create build image"
   echo "2:  Build ProviewR" 
@@ -72,6 +80,55 @@ if [ "$1" == "-h" ] || [ "$1" == "--help" ]; then
   echo "11: pwrtest01f remote and IO tests"
   echo "12: pwrtest03a interactive operator test image" 
   echo "13: Demo interactive test image" 
+  exit
+fi
+
+if [ "$1" == "--clean" ]; then
+  if [ -e "pkg" ]; then
+    rm -r pkg
+  fi
+  if [ -e "data" ]; then
+    rm -r data
+  fi
+  if [ -e "log" ]; then
+    rm -r log
+  fi
+  mkdir pkg
+  mkdir data
+  mkdir log
+  echo "W 01-JAN-1970 00:00:00.00 rt-Aproc, Not yet executed" > log/aproc.tlog
+  echo "W 01-JAN-1970 00:00:00.00 build-xtt, Not yet executed" > log/build.tlog
+  echo "W 01-JAN-1970 00:00:00.00 co-Ccm, Not yet executed" > log/ccm.tlog
+  echo "W 01-JAN-1970 00:00:00.00 co-Cdh, Not yet executed" > log/cdh.tlog
+  echo "W 01-JAN-1970 00:00:00.00 rt-Errh, Not yet executed" > log/errh.tlog
+  echo "W 01-JAN-1970 00:00:00.00 rt-Gdh, Not yet executed" > log/gdh.tlog
+  echo "W 01-JAN-1970 00:00:00.00 rt-io, Not yet executed" > log/io.tlog
+  echo "W 01-JAN-1970 00:00:00.00 wb_test-Ldh, Not yet executed" > log/ldh.tlog
+  echo "W 01-JAN-1970 00:00:00.00 rt-MhAppl, Not yet executed" > log/mhappl.tlog
+  echo "W 01-JAN-1970 00:00:00.00 rt-Mh, Not yet executed" > log/mh.tlog
+  echo "W 01-JAN-1970 00:00:00.00 rt-io-ModbusTCP, Not yet executed" > log/modbustcp.tlog
+  echo "W 01-JAN-1970 00:00:00.00 rt-mqtt_server, Not yet executed" > log/mqtt_server.tlog
+  echo "W 01-JAN-1970 00:00:00.00 rt-Neth, Not yet executed" > log/neth.tlog
+  echo "W 01-JAN-1970 00:00:00.00 rt-NetTime, Not yet executed" > log/nettime.tlog
+  echo "W 01-JAN-1970 00:00:00.00 rt-Plc, Not yet executed" > log/plc.tlog
+  echo "W 01-JAN-1970 00:00:00.00 pwrdemo-Status, Not yet executed" > log/pwrdemo_status.tlog
+  echo "W 01-JAN-1970 00:00:00.00 rt-pwrrt, Not yet executed" > log/pwrrt.tlog
+  echo "W 01-JAN-1970 00:00:00.00 wb_build-ClassVolume, Not yet executed" > log/pwrtest02_classvolume.tlog
+  echo "W 01-JAN-1970 00:00:00.00 wb_build-RootVolume, Not yet executed" > log/pwrtest02_rootvolume.tlog
+  echo "W 01-JAN-1970 00:00:00.00 wb_test-pwrwb, Not yet executed" > log/pwrwb.tlog
+  echo "W 01-JAN-1970 00:00:00.00 rt-Qcom2a, Not yet executed" > log/qcom2a.tlog
+  echo "W 01-JAN-1970 00:00:00.00 rt-Qcom2b, Not yet executed" > log/qcom2b.tlog
+  echo "W 01-JAN-1970 00:00:00.00 rt-Qcom, Not yet executed" > log/qcom.tlog
+  echo "W 01-JAN-1970 00:00:00.00 rt-QmonClient, Not yet executed" > log/qmonc.tlog
+  echo "W 01-JAN-1970 00:00:00.00 rt-Qmon, Not yet executed" > log/qmon.tlog
+  echo "W 01-JAN-1970 00:00:00.00 rt_Remote, Not yet executed" > log/remote.tlog
+  echo "W 01-JAN-1970 00:00:00.00 sev-hdf5, Not yet executed" > log/sev_hdf5.tlog
+  echo "W 01-JAN-1970 00:00:00.00 sev-mariadb, Not yet executed" > log/sev_mariadb.tlog
+  echo "W 01-JAN-1970 00:00:00.00 sev-mqtt_server, Not yet executed" > log/sev_mqtt_server.tlog
+  echo "W 01-JAN-1970 00:00:00.00 sev-sqlite, Not yet executed" > log/sev_sqlite.tlog
+  echo "W 01-JAN-1970 00:00:00.00 co-Time, Not yet executed" > log/time.tlog
+  echo "W 01-JAN-1970 00:00:00.00 op-XttScript, Not yet executed" > log/xttscript.tlog
+  echo "-- Directories cleaned"
   exit
 fi
 
