@@ -675,9 +675,20 @@ RtTraceGtk::RtTraceGtk(void* tr_parent_ctx, GtkWidget* tr_parent_wid,
   gtk_paned_pack1(GTK_PANED(paned), flow_scrolled, TRUE, TRUE);
   gtk_paned_pack2(GTK_PANED(paned), nav_widget, FALSE, TRUE);
 
+  GtkWidget* vbox1 = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+  gtk_box_pack_start(GTK_BOX(vbox1), GTK_WIDGET(menu_bar), FALSE, FALSE, 0);
+  gtk_box_pack_start(GTK_BOX(vbox1), GTK_WIDGET(tools), FALSE, FALSE, 0);
+
+  pwr_tFileName fname;
+  dcli_translate_filename(fname, "$pwr_exe/pwr_logohalf2y.png");
+  GtkWidget* xtt_image = gtk_image_new_from_file(fname);
+
+  GtkWidget* hbox1 = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+  gtk_box_pack_start(GTK_BOX(hbox1), GTK_WIDGET(vbox1), TRUE, TRUE, 0);
+  gtk_box_pack_end(GTK_BOX(hbox1), GTK_WIDGET(xtt_image), FALSE, FALSE, 0);
+
   GtkWidget* vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-  gtk_box_pack_start(GTK_BOX(vbox), GTK_WIDGET(menu_bar), FALSE, FALSE, 0);
-  gtk_box_pack_start(GTK_BOX(vbox), GTK_WIDGET(tools), FALSE, FALSE, 0);
+  gtk_box_pack_start(GTK_BOX(vbox), GTK_WIDGET(hbox1), FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(vbox), GTK_WIDGET(paned), TRUE, TRUE, 0);
 
   gtk_container_add(GTK_CONTAINER(toplevel), vbox);
