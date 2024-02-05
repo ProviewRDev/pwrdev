@@ -161,11 +161,24 @@ static pwr_tStatus PostCreate(
   pwr_tOid toid;
   pwr_tStatus sts;
   int cnt = 0;
+  pwr_tBoolean is_default;
+  wb_session* sp = (wb_session*)Session;
 
   sts = ldh_GetClassList(Session, pwr_cClass_PlcThread, &oid);
   while (ODD(sts)) {
     cnt++;
     toid = oid;
+    
+    wb_attribute a = sp->attribute(toid, "DevBody", "IsDefault");
+    if (!a)
+      return a.sts();
+
+    a.value(&is_default);
+    if (!a)
+      return a.sts();
+    if (is_default)
+      break;
+
     sts = ldh_GetNextObject(Session, oid, &oid);
   }
 

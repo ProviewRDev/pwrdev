@@ -424,6 +424,18 @@ SObject pwrb:Class
         EndBody
       EndObject
     EndObject
+    Object DevBody $ObjBodyDef 2 
+      !/**
+      !  @Summary Inserted as default thread in PlcPgm objects.
+      !  If IsDefault is set, this thread will be inserted as default thread in 
+      !  PlcPgm objects when they are created.
+      !*/
+      Object IsDefault $Attribute 1
+        Body SysBody
+          Attr TypeRef = "pwrs:Type-$Boolean"
+        EndBody
+      EndObject
+    EndObject
     Object Template PlcThread
       Body RtBody
         Attr IoProcess = 1

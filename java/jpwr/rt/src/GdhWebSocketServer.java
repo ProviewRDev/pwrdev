@@ -2433,6 +2433,7 @@ public class GdhWebSocketServer
 				      else
 					  button.url = "";
 				      button.name = "";
+				      button.object = "";
 				      v.add( button);
 				      break;
 				  }

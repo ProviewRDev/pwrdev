@@ -122,6 +122,7 @@ var DynC = {
   mDynType2_SevHist	        : 1 << 12,
   mDynType2_DigTransparency     : 1 << 13,
   mDynType2_AnalogTransparency	: 1 << 14,
+  mDynType2_UnitConvert		: 1 << 15,
 
   mActionType1_No		: 0,
   mActionType1_Inherit		: 1 << 0,
@@ -151,6 +152,7 @@ var DynC = {
   mActionType1_Script	      	: 1 << 24,
   mActionType1_CatchSignal     	: 1 << 25,
   mActionType1_EmitSignal     	: 1 << 26,
+  mActionType1_ContextMenu     	: 1 << 27,
 
   mActionType2_No	       	: 0,
     
@@ -185,46 +187,48 @@ var DynC = {
   eDynPrio_DsTrend			: 27,
   eDynPrio_DsTrendCurve			: 28,
   eDynPrio_SevHist			: 29,
-  eDynPrio_DigTransparency	      	: 30,
-  eDynPrio_AnalogTransparency	       	: 31,
-  eDynPrio_AnalogText			: 32,
-  eDynPrio_Table			: 33,
-  eDynPrio_SliderBackground	       	: 34,
-  eDynPrio_Video			: 35,
-  eDynPrio_StatusColor	       		: 36,
-  eDynPrio_PopupMenu			: 37,
-  eDynPrio_Confirm			: 38,
-  eDynPrio_SetDig			: 39,
-  eDynPrio_ResetDig			: 40,
-  eDynPrio_ToggleDig			: 41,
-  eDynPrio_StoDig			: 42,
-  eDynPrio_Help				: 43,
-  eDynPrio_OpenGraph			: 44,
-  eDynPrio_OpenURL			: 45,
-  eDynPrio_CommandDoubleClick	       	: 46,
-  eDynPrio_IncrAnalog			: 47,
-  eDynPrio_RadioButton	       		: 48,
-  eDynPrio_Slider			: 49,
-  eDynPrio_TipText			: 50,
-  eDynPrio_PulldownMenu	       		: 51,
-  eDynPrio_OptionMenu			: 52,
-  eDynPrio_InputFocus			: 53,
-  eDynPrio_DigCommand			: 54,
-  eDynPrio_SetValue			: 55,
-  eDynPrio_Pie				: 56,
-  eDynPrio_BarChart			: 57,
-  eDynPrio_Axis				: 58,
-  eDynPrio_MethodToolbar	       	: 59,
-  eDynPrio_MethodPulldownMenu	       	: 60,
-  eDynPrio_ScrollingText	       	: 61,
-  eDynPrio_ColorThemeLightness       	: 62,
-  eDynPrio_DigSwap		       	: 63,
-  eDynPrio_DigScript		       	: 64,
-  eDynPrio_CatchSignal           	: 65,
-  eDynPrio_EmitSignal     	       	: 66,
+  eDynPrio_UnitConvert			: 30,
+  eDynPrio_DigTransparency	      	: 31,
+  eDynPrio_AnalogTransparency	       	: 32,
+  eDynPrio_AnalogText			: 33,
+  eDynPrio_Table			: 34,
+  eDynPrio_SliderBackground	       	: 35,
+  eDynPrio_Video			: 36,
+  eDynPrio_StatusColor	       		: 37,
+  eDynPrio_PopupMenu			: 38,
+  eDynPrio_Confirm			: 39,
+  eDynPrio_SetDig			: 40,
+  eDynPrio_ResetDig			: 41,
+  eDynPrio_ToggleDig			: 42,
+  eDynPrio_StoDig			: 43,
+  eDynPrio_Help				: 44,
+  eDynPrio_OpenGraph			: 45,
+  eDynPrio_OpenURL			: 46,
+  eDynPrio_CommandDoubleClick	       	: 47,
+  eDynPrio_IncrAnalog			: 48,
+  eDynPrio_RadioButton	       		: 49,
+  eDynPrio_Slider			: 50,
+  eDynPrio_TipText			: 51,
+  eDynPrio_PulldownMenu	       		: 52,
+  eDynPrio_OptionMenu			: 53,
+  eDynPrio_InputFocus			: 54,
+  eDynPrio_DigCommand			: 55,
+  eDynPrio_SetValue			: 56,
+  eDynPrio_Pie				: 57,
+  eDynPrio_BarChart			: 58,
+  eDynPrio_Axis				: 59,
+  eDynPrio_MethodToolbar	       	: 60,
+  eDynPrio_MethodPulldownMenu	       	: 61,
+  eDynPrio_ScrollingText	       	: 62,
+  eDynPrio_ColorThemeLightness       	: 63,
+  eDynPrio_DigSwap		       	: 64,
+  eDynPrio_DigScript		       	: 65,
+  eDynPrio_CatchSignal           	: 66,
+  eDynPrio_EmitSignal     	       	: 67,
+  eDynPrio_ContextMenu     	       	: 68,
   eDynPrio_Script  			: 9998,
   eDynPrio_Command  			: 9999,
-  eDynPrio_CloseGraph 		: 10000,
+  eDynPrio_CloseGraph 			: 10000,
 
   eSave_Dyn		       		: 1,
   eSave_DigLowColor	       		: 2,
@@ -298,6 +302,8 @@ var DynC = {
   eSave_SevHist			       	: 76,
   eSave_DigTransparency	            	: 77,
   eSave_AnalogTransparency            	: 78,
+  eSave_UnitConvert	            	: 79,
+  eSave_ContextMenu	            	: 80,
   eSave_End		       		: 99,
   eSave_Dyn_dyn_type1	       		: 100,
   eSave_Dyn_action_type1      	: 101,
@@ -761,6 +767,29 @@ var DynC = {
   eSave_AnalogTransparency_attribute 	: 7800,
   eSave_AnalogTransparency_min_value 	: 7801,
   eSave_AnalogTransparency_max_value 	: 7802,
+  eSave_UnitConvert_entity 		: 7900,
+  eSave_UnitConvert_db_unit 		: 7901,
+  eSave_UnitConvert_display_unit 	: 7902,
+  eSave_ContextMenu_item_text1 		: 8000,
+  eSave_ContextMenu_item_text2 		: 8001,
+  eSave_ContextMenu_item_text3 		: 8002,
+  eSave_ContextMenu_item_text4 		: 8003,
+  eSave_ContextMenu_item_text5 		: 8004,
+  eSave_ContextMenu_item_text6 		: 8005,
+  eSave_ContextMenu_item_text7 		: 8006,
+  eSave_ContextMenu_item_text8 		: 8007,
+  eSave_ContextMenu_item_text9 		: 8008,
+  eSave_ContextMenu_item_text10 	: 8009,
+  eSave_ContextMenu_item_action1 	: 8010,
+  eSave_ContextMenu_item_action2 	: 8011,
+  eSave_ContextMenu_item_action3 	: 8012,
+  eSave_ContextMenu_item_action4 	: 8013,
+  eSave_ContextMenu_item_action5 	: 8014,
+  eSave_ContextMenu_item_action6 	: 8015,
+  eSave_ContextMenu_item_action7	: 8016,
+  eSave_ContextMenu_item_action8 	: 8017,
+  eSave_ContextMenu_item_action9 	: 8018,
+  eSave_ContextMenu_item_action10 	: 8019,
 
   eAnimSequence_Inherit      	: 0,
   eAnimSequence_Cycle		: 1,
@@ -999,6 +1028,9 @@ function Dyn( graph) {
     case DynC.mActionType1_EmitSignal:
       e = new DynEmitSignal(this);
       break;
+    case DynC.mActionType1_ContextMenu:
+      e = new DynContextMenu(this);
+      break;
     default:;
     }
     return e;
@@ -1157,6 +1189,9 @@ function Dyn( graph) {
       break;
     case DynC.mDynType2_AnalogTransparency:
       e = new DynAnalogTransparency(this);
+      break;
+    case DynC.mDynType2_UnitConvert:
+      e = new DynUnitConvert(this);
       break;
     default:;
     }
@@ -1724,6 +1759,9 @@ function Dyn( graph) {
       case DynC.eSave_AnalogTransparency: 
 	elem = new DynAnalogTransparency(this); 
 	break;
+      case DynC.eSave_UnitConvert: 
+	elem = new DynUnitConvert(this); 
+	break;
       case DynC.eSave_FillLevel: 
 	elem = new DynFillLevel(this); 
 	break;
@@ -1840,6 +1878,9 @@ function Dyn( graph) {
 	break;
       case DynC.eSave_EmitSignal: 
 	elem = new DynEmitSignal(this); 
+	break;
+      case DynC.eSave_ContextMenu: 
+	elem = new DynContextMenu(this); 
 	break;
       case DynC.eSave_End:
 	end = true;
@@ -17775,7 +17816,7 @@ function DynPopupMenu( dyn) {
       var tokens = lines[i].split(' ');
       var key = parseInt(tokens[0], 10);
 
-      if ( this.dyn.debug) console.log( "DynResetDig : " + lines[i]);
+      if ( this.dyn.debug) console.log( "DynPopupMenu : " + lines[i]);
 
       elem = null;
 
@@ -17799,9 +17840,616 @@ function DynPopupMenu( dyn) {
     }
     
     return i;
-  };
-  
+  };  
 }
+
+function DynContextMenu( dyn) {
+  this.dyn = dyn;
+  this.dyn_type1 = 0;
+  this.dyn_type2 = 0;
+  this.action_type1 = DynC.mActionType1_ContextMenu;
+  this.action_type2 = 0;
+  this.prio = DynC.eDynPrio_ContextMenu;
+  this.instance_mask = 0;
+  this.instance = 0;
+
+  this.item_text = new Array(10);
+  this.item_action = new Array(10);
+
+  this.setAttribute = function(o, name, value) {
+    if (name === "ContextMenu.ItemText[0]") {
+      this.item_text[0] = value;
+      return 1;
+    }
+    else if (name === "ContextMenu.ItemText[1]") {
+      this.item_text[1] = value;
+      return 1;
+    }
+    else if (name === "ContextMenu.ItemText[2]") {
+      this.item_text[2] = value;
+      return 1;
+    }
+    else if (name === "ContextMenu.ItemText[3]") {
+      this.item_text[3] = value;
+      return 1;
+    }
+    else if (name === "ContextMenu.ItemText[4]") {
+      this.item_text[4] = value;
+      return 1;
+    }
+    else if (name === "ContextMenu.ItemText[5]") {
+      this.item_text[5] = value;
+      return 1;
+    }
+    else if (name === "ContextMenu.ItemText[6]") {
+      this.item_text[6] = value;
+      return 1;
+    }
+    else if (name === "ContextMenu.ItemText[7]") {
+      this.item_text[7] = value;
+      return 1;
+    }
+    else if (name === "ContextMenu.ItemText[8]") {
+      this.item_text[8] = value;
+      return 1;
+    }
+    else if (name === "ContextMenu.ItemText[9]") {
+      this.item_text[9] = value;
+      return 1;
+    }
+    else if (name === "ContextMenu.ItemAction[0]") {
+      this.item_action[0] = value;
+      return 1;
+    }
+    else if (name === "ContextMenu.ItemAction[1]") {
+      this.item_action[1] = value;
+      return 1;
+    }
+    else if (name === "ContextMenu.ItemAction[2]") {
+      this.item_action[2] = value;
+      return 1;
+    }
+    else if (name === "ContextMenu.ItemAction[3]") {
+      this.item_action[3] = value;
+      return 1;
+    }
+    else if (name === "ContextMenu.ItemAction[4]") {
+      this.item_action[4] = value;
+      return 1;
+    }
+    else if (name === "ContextMenu.ItemAction[5]") {
+      this.item_action[5] = value;
+      return 1;
+    }
+    else if (name === "ContextMenu.ItemAction[6]") {
+      this.item_action[6] = value;
+      return 1;
+    }
+    else if (name === "ContextMenu.ItemAction[7]") {
+      this.item_action[7] = value;
+      return 1;
+    }
+    else if (name === "ContextMenu.ItemAction[8]") {
+      this.item_action[8] = value;
+      return 1;
+    }
+    else if (name === "ContextMenu.ItemAction[9]") {
+      this.item_action[9] = value;
+      return 1;
+    }
+    return 0;
+  }
+  this.getAttribute = function(o, name, value) {
+    var ret = new ge_tValueReturn();
+    if (name === "ContextMenu.ItemText[0]") {
+      ret.value = this.item_text[0];
+      ret.decl = CcmC.K_DECL_STRING;
+      return ret;
+    }
+    else if (name === "ContextMenu.ItemText[1]") {
+      ret.value = this.item_text[1];
+      ret.decl = CcmC.K_DECL_STRING;
+      return ret;
+    }
+    else if (name === "ContextMenu.ItemText[2]") {
+      ret.value = this.item_text[2];
+      ret.decl = CcmC.K_DECL_STRING;
+      return ret;
+    }
+    else if (name === "ContextMenu.ItemText[3]") {
+      ret.value = this.item_text[3];
+      ret.decl = CcmC.K_DECL_STRING;
+      return ret;
+    }
+    else if (name === "ContextMenu.ItemText[4]") {
+      ret.value = this.item_text[4];
+      ret.decl = CcmC.K_DECL_STRING;
+      return ret;
+    }
+    else if (name === "ContextMenu.ItemText[5]") {
+      ret.value = this.item_text[5];
+      ret.decl = CcmC.K_DECL_STRING;
+      return ret;
+    }
+    else if (name === "ContextMenu.ItemText[6]") {
+      ret.value = this.item_text[6];
+      ret.decl = CcmC.K_DECL_STRING;
+      return ret;
+    }
+    else if (name === "ContextMenu.ItemText[7]") {
+      ret.value = this.item_text[7];
+      ret.decl = CcmC.K_DECL_STRING;
+      return ret;
+    }
+    else if (name === "ContextMenu.ItemText[8]") {
+      ret.value = this.item_text[8];
+      ret.decl = CcmC.K_DECL_STRING;
+      return ret;
+    }
+    else if (name === "ContextMenu.ItemText[9]") {
+      ret.value = this.item_text[9];
+      ret.decl = CcmC.K_DECL_STRING;
+      return ret;
+    }
+    else if (name === "ContextMenu.ItemAction[0]") {
+      ret.value = this.item_action[0];
+      ret.decl = CcmC.K_DECL_STRING;
+      return ret;
+    }
+    else if (name === "ContextMenu.ItemAction[1]") {
+      ret.value = this.item_action[1];
+      ret.decl = CcmC.K_DECL_STRING;
+      return ret;
+    }
+    else if (name === "ContextMenu.ItemAction[2]") {
+      ret.value = this.item_action[2];
+      ret.decl = CcmC.K_DECL_STRING;
+      return ret;
+    }
+    else if (name === "ContextMenu.ItemAction[3]") {
+      ret.value = this.item_action[3];
+      ret.decl = CcmC.K_DECL_STRING;
+      return ret;
+    }
+    else if (name === "ContextMenu.ItemAction[4]") {
+      ret.value = this.item_action[4];
+      ret.decl = CcmC.K_DECL_STRING;
+      return ret;
+    }
+    else if (name === "ContextMenu.ItemAction[5]") {
+      ret.value = this.item_action[5];
+      ret.decl = CcmC.K_DECL_STRING;
+      return ret;
+    }
+    else if (name === "ContextMenu.ItemAction[6]") {
+      ret.value = this.item_action[6];
+      ret.decl = CcmC.K_DECL_STRING;
+      return ret;
+    }
+    else if (name === "ContextMenu.ItemAction[7]") {
+      ret.value = this.item_action[7];
+      ret.decl = CcmC.K_DECL_STRING;
+      return ret;
+    }
+    else if (name === "ContextMenu.ItemAction[8]") {
+      ret.value = this.item_action[8];
+      ret.decl = CcmC.K_DECL_STRING;
+      return ret;
+    }
+    else if (name === "ContextMenu.ItemAction[9]") {
+      ret.value = this.item_action[9];
+      ret.decl = CcmC.K_DECL_STRING;
+      return ret;
+    }
+    ret.sts = 0;
+    return ret;
+  }
+
+  this.connect = function( o) {
+    return 1;
+  };
+  this.disconnect = function() {
+  };
+  this.scan = function( o) {
+    return 1;
+  };
+  this.action = function( object, e) {
+    if ( !this.dyn.graph.isAuthorized( this.dyn.access))
+		return 1;
+
+    switch ( e.event) {
+    case Glow.eEvent_MB3Press:
+      // TODO
+      //this.dyn.graph.openPopupMenu( ref_object, e.x, e.y);
+      break;
+    }
+    return 1;
+  };
+
+  this.open = function( lines, row) {
+    var end = false;
+    var i;
+    var elem;
+
+    for ( i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(' ');
+      var key = parseInt(tokens[0], 10);
+
+      if ( this.dyn.debug) console.log( "DynContextMenu : " + lines[i]);
+
+      elem = null;
+
+      switch ( key) {
+      case DynC.eSave_ContextMenu: 
+	break;
+      case DynC.eSave_ContextMenu_item_text1: 
+	if ( tokens.length > 1)
+	  this.item_text[0] = tokens[1];
+	break;
+      case DynC.eSave_ContextMenu_item_text2: 
+	if ( tokens.length > 1)
+	  this.item_text[1] = tokens[1];
+	break;
+      case DynC.eSave_ContextMenu_item_text3: 
+	if ( tokens.length > 1)
+	  this.item_text[2] = tokens[1];
+	break;
+      case DynC.eSave_ContextMenu_item_text4: 
+	if ( tokens.length > 1)
+	  this.item_text[3] = tokens[1];
+	break;
+      case DynC.eSave_ContextMenu_item_text5: 
+	if ( tokens.length > 1)
+	  this.item_text[4] = tokens[1];
+	break;
+      case DynC.eSave_ContextMenu_item_text6: 
+	if ( tokens.length > 1)
+	  this.item_text[5] = tokens[1];
+	break;
+      case DynC.eSave_ContextMenu_item_text7: 
+	if ( tokens.length > 1)
+	  this.item_text[6] = tokens[1];
+	break;
+      case DynC.eSave_ContextMenu_item_text8: 
+	if ( tokens.length > 1)
+	  this.item_text[7] = tokens[1];
+	break;
+      case DynC.eSave_ContextMenu_item_text9: 
+	if ( tokens.length > 1)
+	  this.item_text[8] = tokens[1];
+	break;
+      case DynC.eSave_ContextMenu_item_text10: 
+	if ( tokens.length > 1)
+	  this.item_text[9] = tokens[1];
+	break;
+      case DynC.eSave_ContextMenu_item_action1: 
+	if ( tokens.length > 1)
+	  this.item_action[0] = tokens[1];
+	break;
+      case DynC.eSave_ContextMenu_item_action2: 
+	if ( tokens.length > 1)
+	  this.item_action[1] = tokens[1];
+	break;
+      case DynC.eSave_ContextMenu_item_action3: 
+	if ( tokens.length > 1)
+	  this.item_action[2] = tokens[1];
+	break;
+      case DynC.eSave_ContextMenu_item_action4: 
+	if ( tokens.length > 1)
+	  this.item_action[3] = tokens[1];
+	break;
+      case DynC.eSave_ContextMenu_item_action5: 
+	if ( tokens.length > 1)
+	  this.item_action[4] = tokens[1];
+	break;
+      case DynC.eSave_ContextMenu_item_action6: 
+	if ( tokens.length > 1)
+	  this.item_action[5] = tokens[1];
+	break;
+      case DynC.eSave_ContextMenu_item_action7: 
+	if ( tokens.length > 1)
+	  this.item_action[6] = tokens[1];
+	break;
+      case DynC.eSave_ContextMenu_item_action8: 
+	if ( tokens.length > 1)
+	  this.item_action[7] = tokens[1];
+	break;
+      case DynC.eSave_ContextMenu_item_action9: 
+	if ( tokens.length > 1)
+	  this.item_action[8] = tokens[1];
+	break;
+      case DynC.eSave_ContextMenu_item_action10: 
+	if ( tokens.length > 1)
+	  this.item_action[9] = tokens[1];
+	break;
+      case DynC.eSave_End:
+	end = true;
+	break;
+      default:
+	console.log( "Syntax error in DynContextMenu");
+	break;
+      }
+      
+      if ( end)
+	break;
+    }
+    
+    return i;
+  };  
+}
+
+function DynUnitConvert( dyn) {
+  this.dyn = dyn;
+  this.dyn_type1 = 0;
+  this.dyn_type2 = DynC.mDynType2_UnitConvert;
+  this.action_type1 = 0;
+  this.action_type2 = 0;
+  this.prio = DynC.eDynPrio_UnitConvert;
+  this.instance_mask = 0;
+  this.instance = 0;
+
+  this.entity;
+  this.db_unit;
+  this.display_unit;
+
+  this.setAttribute = function(o, name, value) {
+    if (name === "UnitConvert.Entity") {
+      this.entity = value;
+      return 1;
+    }
+    else if (name === "UnitConvert.DbUnit") {
+      this.db_unit = value;
+      return 1;
+    }
+    else if (name === "UnitConvert.DisplayUnit") {
+      this.display_unit = value;
+      return 1;
+    }
+    return 0;
+  }
+  this.getAttribute = function(o, name, value) {
+    var ret = new ge_tValueReturn();
+    if (name === "UnitConvert.Entity") {
+      ret.value = this.entity;
+      ret.decl = CcmC.K_DECL_INT;
+      return ret;
+    }
+    else if (name === "UnitConvert.DbUnit") {
+      ret.value = this.db_unit;
+      ret.decl = CcmC.K_DECL_INT;
+      return ret;
+    }
+    else if (name === "UnitConvert.DisplayUnit") {
+      ret.value = this.display_unit;
+      ret.decl = CcmC.K_DECL_INT;
+      return ret;
+    }
+    ret.sts = 0;
+    return ret;
+  }
+
+  this.connect = function( o) {
+    return 1;
+  };
+  this.disconnect = function() {
+  };
+  this.scan = function( o) {
+    return 1;
+  };
+  this.action = function( object, e) {
+    return 1;
+  };
+
+  this.open = function( lines, row) {
+    var end = false;
+    var i;
+    var elem;
+
+    for ( i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(' ');
+      var key = parseInt(tokens[0], 10);
+
+      if ( this.dyn.debug) console.log( "DynUnitConvert : " + lines[i]);
+
+      elem = null;
+
+      switch ( key) {
+      case DynC.eSave_UnitConvert: 
+	break;
+      case DynC.eSave_UnitConvert_entity:
+	this.entity = parseInt(tokens[1], 10);
+	break;
+      case DynC.eSave_UnitConvert_db_unit:
+	this.db_unit = parseInt(tokens[1], 10);
+	break;
+      case DynC.eSave_UnitConvert_display_unit:
+	this.display_unit = parseInt(tokens[1], 10);
+	break;
+      case DynC.eSave_End:
+	end = true;
+	break;
+      default:
+	console.log( "Syntax error in DynUnitConvert");
+	break;
+      }
+      
+      if ( end)
+	break;
+    }
+    
+    return i;
+  };  
+}
+
+function DynCatchSignal( dyn) {
+  this.dyn = dyn;
+  this.dyn_type1 = 0;
+  this.dyn_type2 = 0;
+  this.action_type1 = DynC.mActionType1_CatchSignal;
+  this.action_type2 = 0;
+  this.prio = DynC.eDynPrio_CatchSignal;
+  this.instance_mask = 0;
+  this.instance = 0;
+
+  this.signal_name;
+
+  this.setAttribute = function(o, name, value) {
+    if (name === "CatchSignal.SignalName") {
+      this.signal_name = value;
+      return 1;
+    }
+    return 0;
+  }
+  this.getAttribute = function(o, name, value) {
+    var ret = new ge_tValueReturn();
+    if (name === "CatchSignal.SignalName") {
+      ret.value = this.signal_name;
+      ret.decl = CcmC.K_DECL_STRING;
+      return ret;
+    }
+    ret.sts = 0;
+    return ret;
+  }
+
+  this.connect = function( o) {
+    return 1;
+  };
+  this.disconnect = function() {
+  };
+  this.scan = function( o) {
+    return 1;
+  };
+  this.action = function( object, e) {
+    return 1;
+  };
+
+  this.open = function( lines, row) {
+    var end = false;
+    var i;
+    var elem;
+
+    for ( i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(' ');
+      var key = parseInt(tokens[0], 10);
+
+      if ( this.dyn.debug) console.log( "DynCatchSignal : " + lines[i]);
+
+      elem = null;
+
+      switch ( key) {
+      case DynC.eSave_CatchSignal: 
+	break;
+      case DynC.eSave_CatchSignal_signal_name:
+	if ( tokens.length > 1)
+	  this.signal_name = tokens[1];
+	break;
+      case DynC.eSave_End:
+	end = true;
+	break;
+      default:
+	console.log( "Syntax error in DynCatchSignal");
+	break;
+      }
+      
+      if ( end)
+	break;
+    }
+    
+    return i;
+  };  
+}
+
+function DynEmitSignal( dyn) {
+  this.dyn = dyn;
+  this.dyn_type1 = 0;
+  this.dyn_type2 = 0;
+  this.action_type1 = DynC.mActionType1_EmitSignal;
+  this.action_type2 = 0;
+  this.prio = DynC.eDynPrio_EmitSignal;
+  this.instance_mask = 0;
+  this.instance = 0;
+
+  this.signal_name;
+  this.global;
+
+  this.setAttribute = function(o, name, value) {
+    if (name === "EmitSignal.SignalName") {
+      this.signal_name = value;
+      return 1;
+    }
+    else if (name === "EmitSignal.global") {
+      this.global = value;
+      return 1;
+    }
+    return 0;
+  }
+  this.getAttribute = function(o, name, value) {
+    var ret = new ge_tValueReturn();
+    if (name === "EmitSignal.SignalName") {
+      ret.value = this.signal_name;
+      ret.decl = CcmC.K_DECL_STRING;
+      return ret;
+    }
+    else if (name === "EmitSignal.Global") {
+      ret.value = this.global;
+      ret.decl = CcmC.K_DECL_INT;
+      return ret;
+    }
+    ret.sts = 0;
+    return ret;
+  }
+
+  this.connect = function( o) {
+    return 1;
+  };
+  this.disconnect = function() {
+  };
+  this.scan = function( o) {
+    return 1;
+  };
+  this.action = function( object, e) {
+    return 1;
+  };
+
+  this.open = function( lines, row) {
+    var end = false;
+    var i;
+    var elem;
+
+    for ( i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(' ');
+      var key = parseInt(tokens[0], 10);
+
+      if ( this.dyn.debug) console.log( "DynEmitSignal : " + lines[i]);
+
+      elem = null;
+
+      switch ( key) {
+      case DynC.eSave_EmitSignal: 
+	break;
+      case DynC.eSave_EmitSignal_signal_name:
+	if ( tokens.length > 1)
+	  this.signal_name = tokens[1];
+	break;
+      case DynC.eSave_EmitSignal_global:
+	this.global = parseInt(tokens[1], 10);
+	break;
+      case DynC.eSave_End:
+	end = true;
+	break;
+      default:
+	console.log( "Syntax error in DynEmitSignal");
+	break;
+      }
+      
+      if ( end)
+	break;
+    }
+    
+    return i;
+  };  
+}
+
 
 var GraphIfc = {
   eDatabase_Gdh 	: 0,
