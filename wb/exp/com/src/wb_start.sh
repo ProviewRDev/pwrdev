@@ -46,5 +46,5 @@ elif [ "`eval locale -a | grep -i "^en_US$"`" != "" ]; then
   export LC_TIME="en_US"
 fi
 export LC_NUMERIC="POSIX"
-
+export NO_AT_BRIDGE=1
 wb $username $password $volume $4 $5 $6 $7
