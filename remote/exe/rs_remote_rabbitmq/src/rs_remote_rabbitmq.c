@@ -172,8 +172,8 @@ int rmq_connect(int msg_order)
     }
   }
 
-  rep = amqp_login(ctx->conn, "/", 0, 131072, 0, AMQP_SASL_METHOD_PLAIN,
-      ctx->op->User, ctx->op->Password);
+  rep = amqp_login(ctx->conn, "/", 0, 131072, ctx->op->Heartbeat, 
+      AMQP_SASL_METHOD_PLAIN, ctx->op->User, ctx->op->Password);
   if (rep.reply_type != AMQP_RESPONSE_NORMAL) {
     if (rep.reply_type == AMQP_RESPONSE_LIBRARY_EXCEPTION) {
       errh_Error("Login failure, not authorized? %d library_error %d %s", rep.reply_type, 
