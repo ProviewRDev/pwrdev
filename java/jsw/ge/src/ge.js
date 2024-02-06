@@ -13,7 +13,7 @@ if ( !Object.create) {
 #jsc_include gdh.jsi
 #jsc_include glow.jsi
 #jsc_include ccm.jsi
-
+#jsc_include geunitconv.jsi
 
 var GE_ = {
   NOATTR : 154304650,
@@ -2132,8 +2132,8 @@ function Dyn( graph) {
     this.ctx_popped = this.e.dyn.graph.ctxPop( object.dyn.object.ctx);	
 
     var sts = null;
-    var minval = 0;
-    var maxval = 0;
+    this.minval = 0;
+    this.maxval = 0;
     if ( this.e.minvalue_attr !== null) {
 
       var pname = this.e.dyn.parseAttrName( this.e.minvalue_attr);
@@ -2151,7 +2151,7 @@ function Dyn( graph) {
     if ( this.e.maxvalue_attr !== null) {
       var pname = this.e.dyn.parseAttrName( this.e.maxvalue_attr);
       if ( pname === null || pname.name === "") 
-	maxval = this.e.max_value;
+	this.maxval = this.e.max_value;
       else {
 	if ( pname.type == Pwr.eType_Float32) {
 	  this.e.dyn.graph.getGdh().getObjectInfoFloat(pname.name,
@@ -2219,6 +2219,11 @@ function Dyn( graph) {
 	return DynC.eValueInput_MaxValueExceeded;
       }
 		
+      if (this.e.value_element != null && this.e.value_element.convert_element != null)
+        inputValue = uc_convert(this.e.value_element.convert_element.entity,
+				this.e.value_element.convert_element.display_unit,
+				this.e.value_element.convert_element.db_unit, inputValue);
+
       var pname = this.e.dyn.parseAttrName(this.e.value_element.attribute);
       if ( pname === null || pname.name === "")
 	break;
@@ -3985,6 +3990,7 @@ function DynValue( dyn) {
   this.oldValueI;
   this.oldValueS;
   this.cFormat =  null;
+  this.convert_element = null;
 
   this.setAttribute = function(o, name, value) {
     var inst = this.dyn.instance_number(this.instance);
@@ -4139,6 +4145,15 @@ function DynValue( dyn) {
       console.log("Value: " + this.attribute);
       return 1;
     }
+
+    this.convert_element = null;
+    for ( var j = 0; j < this.dyn.elements.length; j++) {
+      if ( this.dyn.elements[j].dyn_type2 == DynC.mDynType2_UnitConvert) {
+	this.convert_element = this.dyn.elements[j];
+	break;
+      }
+    }
+
     return 1;
   };
 
@@ -4185,6 +4200,10 @@ function DynValue( dyn) {
       var value0 = this.a.get_ref_value(this.dyn);
       if ( typeof value0 == 'undefined')
 	return;
+
+      if (this.convert_element != null)
+        value0 = uc_convert(this.convert_element.entity, this.convert_element.db_unit, 
+		       this.convert_element.display_unit, value0);
 
       if ( value0 != this.oldValueF  || this.firstScan) {
 	if ( this.cFormat !== null) {

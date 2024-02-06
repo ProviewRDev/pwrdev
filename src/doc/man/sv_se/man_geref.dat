@@ -4481,6 +4481,100 @@ AnalogTransparency.MinValue  <t><t>Signalvärde som motsvarar minimal transparans
 AnalogTransparency.MaxValue  <t><t>Signalvärde som motsvarar maximal transparans.
 </topic>
 
+<topic>GeDynColorThemeLightness <style>function
+ColorThemeLightness
+
+Ett färgtema har ljushets-egenskap som är negativt för mörka teman och positivt för ljusa
+teman. Midnight har t ex ljushet -5 medan NordicLight har 1.
+Genom add addera ColorThemeLightness till dynamiken för ett objekt, kommer ljusheten att
+öka eller minska beroende på ljusheten för det aktuella färgtemat. 
+
+ColorThemeLightness har inga egenskaper.
+</topic>
+
+<topic>GeDynDigSwap <style>function
+DigSwap
+
+DigSwap kommer att koppla ner alla prenumerationer i grafen och koppla upp dem igen. Det
+är andvändbart när prenumerationer via referens har används med &() syntax, t ex
+&(H1-Plate.Ref).Length##Float32. I det här exemplet är H1-Plate.Ref en attributreferens
+som pekar på ett objekt som innehåller attributet Lengh. Om referensen in H1-Plate.Ref
+ändras måste prenumerationerna kopplas om till den nya referensen, och det görs av DigSwap.
+DigSwap kopplas till en digital signal som aktiverar omkopplingen. 
+
+<b>Attribut <t><t>Beskrivning
+DigSwap.Attribute <t><t>Signal i databasen av typ Boolean som ska trigga omkopplingen.
+DigSwap.ResetValue <t><t>När trigg-signalen har upptäcks återställs den av DigSwap-funktionen.
+</topic>
+
+<topic>GeDynUnitConvert <style>function
+UnitConvert
+Enhets-konvertering av ett värde som visas i ett value-fält.
+UnitConvert ska kombineras med dynamiken Value och är implementerat för attribut av typen
+Float32. När det är kombinerat med ValueInput ska min och maxgränser i konverterad enhet.
+
+Implementerade storheter och enheter
+
+<b>Storhet <t>Enheter
+Acceleration <t>m/s2, ft/s2, in/s2
+Vinkel <t>Rad, degree, min, mrad, percent, sec
+Area <t>m2, a, ac, cm2, ha, km2, mm2, sq in, sq mi, sq ft, sq yd
+Energi <t>J, cal, kJ
+Kraft <t>N, kN, kp, MN, p
+Frekvens <t>Hz, kHz, MHz, rad/min, rad/s, RPM
+Allmänt <t>1:1, Tera, Giga, Mega, Kilo, Hecto, Deca, Deci, Centi, Milli, Micro, Nano, Pico
+Längd <t>m, cm, dm, ft, in, km, mi, mm, nm, NM, um, yd
+Massa <t>kg, g, hg, kt, lb, mg, oz, st, t, ug
+Massflöde <t>kg/s, g/min, g/s, kg/min, lb/min, lb/s, mg/min, oz/min, oz/s
+Effekt <t>W, hp, GW, kW, mW, MW, TW, uW
+Tryck <t>Pa, atm, b, kPa, lb/ft2, lb/in2, mb, mPa, mmHg, Mpa
+Hastighet <t>m/s, ft/min, ft/s, in/min, in/s, km/h, kn, m/min, mm/s, mi/h, yd/min, yd/s
+Temperatur <t>K, C, F, R
+Tid <t>s, d, h, min, ms, ns, us, wk, y
+Volum <t>m3, cm3, dm3, ft3, in3, mm3
+Volumsflöde <t>m3/s, cl/s, in3/min, in3/s, ft3/min, ft3/s, l/s, m3/min, mm3/s, yd3/min, yd3/s
+
+<b>Attribut <t><t>Beskrivning
+UnitConvert.Entity <t><t>Storhet på värdet.
+UnitConvert.DbUnit  <t><t>Enhet på värdet i databasen.
+UnitConvert.DisplayUnit <t><t>Enhet på värdet som ska visas i bild.
+</topic>
+
+<topic>GeDynHostObject <style>function
+HostObject
+HostObject is a dynamic that is used for subgraphs that is connected to components. 
+Components often contains several values that should affect the subgraph, and with 
+HostObject it is possible to program a complex dynamic that only requires that the user
+makes one single connection to the component object.
+
+<b>Attribute <t><t>Description
+HostObject.Object <t><t>Name of a database object.
+
+The dynamic is programmed in graph attributes for the subgraph. Here subgraph is set to
+1 and DynType1 is set to HostObject. HostObject.DynType1, HostObject.DynType2 and
+HostObject.Action can now be used to set dynamics on the subgraph. The components that
+will be connected to each intance is denoted '$hostobject'. 
+
+<image> geg_fig205.png
+<b>Fig Subgraph with default dynamics HostObject
+
+<b>Recursive dynamics
+By default subgraphs inside other subgraphs can not contain dynamics, but by setting
+RecursiveDynamics in graph attributes for the subgraph to 1, it is possible to use other
+subgraphs as indicators and pushbuttons, and to use '$hostobject' to connect to the 
+component object.
+
+In the example below, the three indicators are subgraphs of type pwr_indsquare. They are
+connected to attributes in the component object with $hostobject syntax.
+
+<image> geg_fig207.png
+<b>Fig Subgraph with recursive dynamics containing other subgraphs
+ 
+<image> geg_fig206.png
+<b>Fig Properties for indicator
+ 
+</topic>
+
 </headerlevel>
 <pagebreak>
 
@@ -5502,16 +5596,17 @@ man skapar ett dashboard i operatörsmiljön är beskrivet i Operatörshandboken.
 
 I Ge editorn skapar man ett dashboard på följande vis.
 
-- Open Graph Attributes and set Dashboard to 1.
-- Open Graph Attributes again and set the size of the dashboard in DashRows and DashColumns.
-- Dash cells are drawn with colortheme colors, thus select a colortheme from
-  File/Colortheme/Select in the menu.
-- Set the background color to the first color in the custom color palette.
-- If the dashboard should follow the color theme selected by the operator, set ColorTheme
-  in Graph Attributes to $default.
-- Create a DashCell from Other/DashCell in the subgraph palette.
-- Double click on the cell to set properties and size, and connect the cell to a signal.
-- Save and build the dashboard.
+- Öppna Graph Attributes och sätt Dashboard till 1.
+- Öppna Graph Attributes igen och sätt storleken dashboardet i DashRows och DashColumns.
+- Dash celler ritas med färgtema-färger. Välj därför ett färgtema i File/Colortheme/Select 
+  i menyn.
+- Sätt bakgrundsfärgen till den första färgen i custom color paletten.
+- Om dashboardet ska följa det färgtema som är valt av operatören, sätt ColorTheme i
+  Graph Attributes till $default.
+- Skapa en DashCell från Other/DashCell i subgraf-paletten.
+- Dubbelklicka på en cell och sätt egenskaper och storlek. Koppla också cellen till en
+  signal.
+- Spara och bygg dashboardet.
 
 Ett dashboard sparas i en pwd-fil på $pwrp_pop, som kopieras till $pwrp_exe när den byggs.
 Filen ska distribueras till operatörstationen.

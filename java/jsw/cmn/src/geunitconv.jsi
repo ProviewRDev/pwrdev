@@ -1,0 +1,193 @@
+/** Start UnitConv **/
+
+var UnitConvC = {
+  eUcEntity_Acceleration	: 0,
+  eUcEntity_Angle	: 1,
+  eUcEntity_Area	: 2,
+  eUcEntity_Energy	: 3,
+  eUcEntity_Force	: 4,
+  eUcEntity_Frequency	: 5,
+  eUcEntity_General	: 6,
+  eUcEntity_Length	: 7,
+  eUcEntity_Mass	: 8,
+  eUcEntity_MassFlow	: 9,
+  eUcEntity_Power	: 10,
+  eUcEntity_Pressure	: 11,
+  eUcEntity_Speed	: 12,
+  eUcEntity_Temperature	: 13,
+  eUcEntity_Time	: 14,
+  eUcEntity_Volume	: 15,
+  eUcEntity_VolumeFlow	: 16,
+
+  eAttrType_UcEntity : 1018,
+  eAttrType_UcAcceleration : 1019,
+  eAttrType_UcAngle : 1020,
+  eAttrType_UcArea : 1021,
+  eAttrType_UcEnergy : 1022,
+  eAttrType_UcForce : 1023,
+  eAttrType_UcFrequency : 1024,
+  eAttrType_UcGeneral : 1025,
+  eAttrType_UcLength : 1026,
+  eAttrType_UcMass : 1027,
+  eAttrType_UcMassFlow : 1028,
+  eAttrType_UcPower : 1029,
+  eAttrType_UcPressure : 1030,
+  eAttrType_UcSpeed : 1031,
+  eAttrType_UcTemperature : 1032,
+  eAttrType_UcTime : 1033,
+  eAttrType_UcVolume : 1034,
+  eAttrType_UcVolumeFlow : 1035,
+};
+
+const uc_acceleration_size = 3;
+const uc_acceleration_a1 = [1.0,    3.280839895, 39.37007874];
+
+const uc_angle_size = 6;
+const uc_angle_a1 = [1.0,   180.0/Math.PI,  3437.74677,1e3,   15.91549430, 4.84813681e-6];
+
+const uc_area_size = 11;
+const uc_area_a1 = [1.0,  1.0e-2,  2.471053e-4,1.0e4, 1.0e-4, 1.0e-6, 
+	1.0e6, 1550.0031,  0.38610e-6, 10.763915,  1.19599];
+
+const uc_energy_size = 3;
+const uc_energy_a1 = [1.0,  0.2389029576, 1e-3];
+
+const uc_force_size = 5;
+const uc_force_a1 = [1.0,  1e-3, 0.101971621297, 1e-6, 101.971621297];
+
+const uc_frequency_size = 6;
+const uc_frequency_a1 = [1.0,  1e-3, 1e-6, 376.99112, 6.2831853, 60.0];
+
+const uc_general_size = 13;
+const uc_general_a1 = [1,      1e-12,  1e-9, 1e-6,  1e-3,  1e-2,   1e-1,   1e1,   1e2,    1e3,    1e6,    1e9,    1e12];
+
+const uc_length_size = 12;
+const uc_length_a1 = [1.0,      1.0e2,    1.0e1,    3.28083989, 39.3700787,   1.0e-3,    6.21371e-4, 1.0e3,    1.0e9,     5.39957e-4, 1.0e6,    1.0936133];
+
+const uc_mass_size = 10;
+const uc_mass_a1 = [1.0,   1e3,  1e1,  1e-6,  2.20462262,   1e6,  35.27396194, 0.1574730444, 1e-3,     1e9];
+
+const uc_massflow_size = 10;
+const uc_massflow_a1 = [1.0,    6e4,   1e3,  60,     132.27746521, 2.204244201,6e7,    1e6,   2116.43944337, 35.273990722];
+
+const uc_power_size = 8;
+const uc_power_a1 = [1.0, 1e-9, 1.34410220895e-3, 1e-3, 1e3, 1e-6, 1e6, 1e-12];
+
+const uc_pressure_size = 10;
+const uc_pressure_a1 = [1.0,  9.869232667e-6, 1e-5, 1e-3, 2.088543427e-2, 1.45037738007e-4, 1e-2, 7.50061561e-3, 1e3, 1e-6];
+
+const uc_speed_size = 12;
+const uc_speed_a1 = [1.0,         1.96850393e2,3.28083989, 2362.2047244,39.37007874,3.6,         1.9438444,  60,         1e3,        2.23693629, 65.617979, 1.093613298];
+
+const uc_temperature_size = 4;
+const uc_temperature_a0 = [0,          -273.15,     -459.67,  0];
+
+const uc_temperature_a1 = [1.0,         1.0,    1.8,   1.8];
+
+const uc_time_size = 9;
+const uc_time_a1 = [1.0,         1.157407e-5, 2.77778e-4, 1.6666667e-2,1e3,       1e9,        1e6,      1.653439e-6, 3.1709792e-8];
+
+const uc_volume_size = 6;
+const uc_volume_a1 = [1.0,         1e6,        1e3,         3.5314645e1, 6.10237440e4, 1e9];
+
+const uc_volumeflow_size = 11;
+const uc_volumeflow_a1 = [1.0,         1e5,        3.661424929e6, 6.102374321e4, 2.118879972e3,35.31466621,1e3, 60,     1e9,   78.477036028, 1.30795060046];
+
+const uc_attrtype = [
+  UnitConvC.eAttrType_UcAcceleration,
+  UnitConvC.eAttrType_UcAngle,
+  UnitConvC.eAttrType_UcArea,
+  UnitConvC.eAttrType_UcEnergy,
+  UnitConvC.eAttrType_UcForce,
+  UnitConvC.eAttrType_UcFrequency,
+  UnitConvC.eAttrType_UcGeneral,
+  UnitConvC.eAttrType_UcLength,
+  UnitConvC.eAttrType_UcMass,
+  UnitConvC.eAttrType_UcMassFlow,
+  UnitConvC.eAttrType_UcPower,
+  UnitConvC.eAttrType_UcPressure,
+  UnitConvC.eAttrType_UcSpeed,
+  UnitConvC.eAttrType_UcTemperature,
+  UnitConvC.eAttrType_UcTime,
+  UnitConvC.eAttrType_UcVolume,
+  UnitConvC.eAttrType_UcVolumeFlow];
+
+function uc_entity_to_attrtype(entity) {
+  return uc_attrtype[entity];
+};
+
+function uc_convert(entity, from, to, value) {
+  switch (entity) {
+  case UnitConvC.eUcEntity_Acceleration:
+    if (from >= uc_acceleration_size || to >= uc_acceleration_size)
+      return 0;
+    return value * uc_acceleration_a1[to]/uc_acceleration_a1[from];
+  case UnitConvC.eUcEntity_Angle:
+    if (from >= uc_angle_size || to >= uc_angle_size)
+      return 0;
+    return value * uc_angle_a1[to]/uc_angle_a1[from];
+  case UnitConvC.eUcEntity_Area:
+    if (from >= uc_area_size || to >= uc_area_size)
+      return 0;
+    return value * uc_area_a1[to]/uc_area_a1[from];
+  case UnitConvC.eUcEntity_Energy:
+    if (from >= uc_energy_size || to >= uc_energy_size)
+      return 0;
+    return value * uc_energy_a1[to]/uc_energy_a1[from];
+  case UnitConvC.eUcEntity_Force:
+    if (from >= uc_force_size || to >= uc_force_size)
+      return 0;
+    return value * uc_force_a1[to]/uc_force_a1[from];
+  case UnitConvC.eUcEntity_Frequency:
+    if (from >= uc_frequency_size || to >= uc_frequency_size)
+      return 0;
+    return value * uc_frequency_a1[to]/uc_frequency_a1[from];
+  case UnitConvC.eUcEntity_General:
+    if (from >= uc_general_size || to >= uc_general_size)
+      return 0;
+    return value * uc_general_a1[to]/uc_general_a1[from];
+  case UnitConvC.eUcEntity_Length:
+    if (from >= uc_length_size || to >= uc_length_size)
+      return 0;
+    return value * uc_length_a1[to]/uc_length_a1[from];
+  case UnitConvC.eUcEntity_Mass:
+    if (from >= uc_mass_size || to >= uc_mass_size)
+      return 0;
+    return value * uc_mass_a1[to]/uc_mass_a1[from];
+  case UnitConvC.eUcEntity_MassFlow:
+    if (from >= uc_massflow_size || to >= uc_massflow_size)
+      return 0;
+    return value * uc_massflow_a1[to]/uc_massflow_a1[from];
+  case UnitConvC.eUcEntity_Power:
+    if (from >= uc_power_size || to >= uc_power_size)
+      return 0;
+    return value * uc_power_a1[to]/uc_power_a1[from];
+  case UnitConvC.eUcEntity_Pressure:
+    if (from >= uc_pressure_size || to >= uc_pressure_size)
+      return 0;
+    return value * uc_pressure_a1[to]/uc_pressure_a1[from];
+  case UnitConvC.eUcEntity_Temperature:
+    if (from >= uc_temperature_size || to >= uc_temperature_size)
+      return 0;
+    return uc_temperature_a0[to] + (value - uc_temperature_a0[from])* uc_temperature_a1[to]/uc_temperature_a1[from];
+  case UnitConvC.eUcEntity_Speed:
+    if (from >= uc_speed_size || to >= uc_speed_size)
+      return 0;
+    return value * uc_speed_a1[to]/uc_speed_a1[from];
+  case UnitConvC.eUcEntity_Time:
+    if (from >= uc_time_size || to >= uc_time_size)
+      return 0;
+    return value * uc_time_a1[to]/uc_time_a1[from];
+  case UnitConvC.eUcEntity_Volume:
+    if (from >= uc_volume_size || to >= uc_volume_size)
+      return 0;
+    return value * uc_volume_a1[to]/uc_volume_a1[from];
+  case UnitConvC.eUcEntity_VolumeFlow:
+    if (from >= uc_volumeflow_size || to >= uc_volumeflow_size)
+      return 0;
+    return value * uc_volumeflow_a1[to]/uc_volumeflow_a1[from];
+  }
+  return 0;
+};
+
+/** End UnitConv **/

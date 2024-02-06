@@ -4598,7 +4598,9 @@ DigSwap.ResetValue <t><t>When a trigger is detected the connected signal is rese
 <topic>GeDynUnitConvert <style>function
 UnitConvert
 Unit conversion of a value displayed in a value field.
-UnitConvert should be combined with dynamic Value.
+UnitConvert should be combined with dynamic Value and is implemented for attributes of type 
+Float32. When combined with ValueInput, minimum and maximum input limits should be set in the 
+converted unit.
 
 Implemented entities and units
 
