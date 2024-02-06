@@ -1458,6 +1458,13 @@ int FlowCtx::event_handler_nav(flow_eEvent event, int x, int y)
     change_scrollbar();
     break;
   case flow_eEvent_MB1Press:
+    if (auto_scrolling_active) {
+      if (node_movement_paste_active)
+	event_handler(flow_eEvent_MB1Click, node_move_last_x, node_move_last_y, 0, 0);
+      else
+	auto_scrolling_stop();
+    }
+
     if (nav_rect_ll_x < x && x < nav_rect_ur_x && nav_rect_ll_y < y
         && y < nav_rect_ur_y) {
       nav_rect_movement_active = 1;
@@ -1467,6 +1474,13 @@ int FlowCtx::event_handler_nav(flow_eEvent event, int x, int y)
     break;
 
   case flow_eEvent_MB2Press:
+    if (auto_scrolling_active) {
+      if (node_movement_paste_active)
+	event_handler(flow_eEvent_MB1Click, node_move_last_x, node_move_last_y, 0, 0);
+      else
+	auto_scrolling_stop();
+    }
+
     if (nav_rect_ll_x < x && x < nav_rect_ur_x && nav_rect_ll_y < y
         && y < nav_rect_ur_y) {
       nav_rect_zoom_active = 1;
