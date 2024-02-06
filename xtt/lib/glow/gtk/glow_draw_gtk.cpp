@@ -1256,6 +1256,9 @@ int GlowDrawGtk::arc(GlowWind* wind, int x, int y, int width, int height,
   if (highlight && ctx->type() == glow_eCtxType_Grow)
     gc_type = glow_eDrawType_LineHighlight;
 
+  if (angle2 > 360)
+    angle2 = 360;
+
   if (angle1 >= 360)
     angle1 = angle1 - angle1 / 360 * 360;
   else if (angle1 < 0)
@@ -1314,6 +1317,9 @@ int GlowDrawGtk::fill_arc(GlowWind* wind, int x, int y, int width, int height,
   cairo_matrix_t matrix;
   cairo_t *cr = get_cairo(wind);
   cairo_pattern_t *pat = 0;
+
+  if (angle2 > 360)
+    angle2 = 360;
 
   if (angle1 >= 360)
     angle1 = angle1 - angle1 / 360 * 360;
