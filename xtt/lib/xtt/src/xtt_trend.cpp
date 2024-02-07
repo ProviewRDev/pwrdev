@@ -617,7 +617,8 @@ void XttTrend::trend_scan(void* data)
     int write_buffer;
     int idx;
     int values;
-    unsigned int size = 1;
+    unsigned int size[XTT_TREND_MAX];
+
     int trend_buff_size = (int)sizeof(trend->trend_p[0]->DataBuffer)
         / sizeof(trend->trend_p[0]->DataBuffer[0]);
 
@@ -647,8 +648,9 @@ void XttTrend::trend_scan(void* data)
 	  if (idx < 0)
 	    idx += trend_buff_size;
           trend->gcd->y_data[i][0] = trend->trend_p[i]->DataBuffer[idx];
+	  size[i] = 1;
         }
-        trend->curve->points_added(&size);
+        trend->curve->points_added(size);
       }
     }
   } else if (trend->trend_tid == pwr_cClass_DsTrendCurve) {
