@@ -98,6 +98,7 @@ public:
   void menu_setup(int edit);
   void get_context_menu(void* mdata,
       xmenu_mUtility caller, unsigned int priv, char* arg, int x, int y);
+  void set_aspect_ratio(int width, int height);
 
   static void ge_change_value_cb(void* ge_ctx, void* value_object, char* text);
   static void confirm_cb(void* ge_ctx, void* confirm_object, char* text);

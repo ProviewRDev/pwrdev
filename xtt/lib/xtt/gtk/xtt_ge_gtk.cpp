@@ -43,6 +43,7 @@ typedef void* Widget;
 #include "rt_gdh_msg.h"
 #include "co_cdh.h"
 #include "co_string.h"
+#include "co_cnf.h"
 
 #include "glow_growapi.h"
 
@@ -113,6 +114,28 @@ void XttGeGtk::set_below(int val)
   gtk_window_set_keep_below(GTK_WINDOW(toplevel), val);
 }
 
+void XttGeGtk::set_aspect_ratio(int width, int height) {
+  static float rd = 0.0;
+  static int rd_read = 0;
+
+  if (!rd_read) {
+    char str[80];
+    if (cnf_get_value("geAspectRatioDelta", str, sizeof(str))) {
+      sscanf(str, "%f", &rd);
+    }
+    if (width < 300 || height < 300)
+      rd *= 2;
+
+    rd_read = 1;
+  }
+
+  GdkGeometry geometry;
+  geometry.min_aspect = gdouble(width) / height * (1.0 - rd);
+  geometry.max_aspect = gdouble(width) / height * (1.0 + rd);
+  gtk_window_set_geometry_hints(
+      GTK_WINDOW(toplevel), GTK_WIDGET(toplevel), &geometry, GDK_HINT_ASPECT);
+}
+
 void XttGeGtk::set_size(int width, int height)
 {
   int default_width;
@@ -135,13 +158,8 @@ void XttGeGtk::set_size(int width, int height)
     // Note, equal min and max aspect will cause recursive resize on LXDE
     if (!resize_restrictions_set) {
       if (!(options & ge_mOptions_ResizeFree)) {
-	if (grow_GetWindowResize(graph->grow->ctx) == 0) {
-	  GdkGeometry geometry;
-	  geometry.min_aspect = gdouble(default_width) / default_height * (1.0 - rd);
-	  geometry.max_aspect = gdouble(default_width) / default_height * (1.0 + rd);
-	  gtk_window_set_geometry_hints(
-            GTK_WINDOW(toplevel), GTK_WIDGET(toplevel), &geometry, GDK_HINT_ASPECT);
-	}
+	if (grow_GetWindowResize(graph->grow->ctx) == 0)
+	  set_aspect_ratio(default_width, default_height);
       }
       resize_restrictions_set = 1;
     }
@@ -530,21 +548,11 @@ XttGeGtk::XttGeGtk(GtkWidget* xg_parent_wid, void* xg_parent_ctx,
         window_height, "default-width", window_width, "title", titleutf8, NULL);
     g_free(titleutf8);
 
-    float rd = 0.05;
-    if (window_width < 300 || window_height < 300)
-      rd = 0.2;
-
     if (options & ge_mOptions_ResizeFree)
       resize_restrictions_set = 1;
-#if 0
-    if (!(options & ge_mOptions_ResizeFree)) {
-      GdkGeometry geometry;
-      geometry.min_aspect = gdouble(window_width) / window_height * (1.0 - rd);
-      geometry.max_aspect = gdouble(window_width) / window_height * (1.0 + rd);
-      gtk_window_set_geometry_hints(
-          GTK_WINDOW(toplevel), GTK_WIDGET(toplevel), &geometry, GDK_HINT_ASPECT);
-    }
-#endif
+
+    if (!(options & ge_mOptions_ResizeFree))
+      set_aspect_ratio(window_width, window_height);
 
     if (options & ge_mOptions_HideDecorations)
       gtk_window_set_decorated(GTK_WINDOW(toplevel), FALSE);
