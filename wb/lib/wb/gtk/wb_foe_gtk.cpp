@@ -507,7 +507,14 @@ void WFoeGtk::activate_palette_con(GtkWidget* w, gpointer data)
     g_object_set(((WFoeGtk*)foe)->widgets.con_palette, "visible", TRUE, NULL);
   else
     g_object_set(((WFoeGtk*)foe)->widgets.con_palette, "visible", FALSE, NULL);
+
   foe->con_palette_managed = set;
+
+  if (set && foe->function == EDIT)
+    gtk_toggle_tool_button_set_active(GTK_TOGGLE_TOOL_BUTTON(foe->widgets.tools_confeedback),
+        FALSE);
+  gtk_widget_set_sensitive(GTK_WIDGET(foe->widgets.tools_confeedback), set ? FALSE : TRUE);
+
   foe->con_palctx->set_inputfocus(set);
 }
 
