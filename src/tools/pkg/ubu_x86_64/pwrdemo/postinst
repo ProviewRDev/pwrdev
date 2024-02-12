@@ -28,6 +28,12 @@ if [ -e $aroot/db/pwr_volumelist.dat ]; then
   if [ "$ptst" = "" ]; then
     echo "	 VolPwrDemo 0.254.254.200 pwrdemo" >> $aroot/db/pwr_volumelist.dat
   fi
+  set +e
+  ptst=`eval grep "'\bCVolPwrDemo\b'" $aroot/db/pwr_volumelist.dat | grep "\bpwrdemo\b"`
+  set -e
+  if [ "$ptst" = "" ]; then
+    echo "	 CVolPwrDemo 0.0.249.200 pwrdemo" >> $aroot/db/pwr_volumelist.dat
+  fi
 fi
 
 # Insert base in projectlist
