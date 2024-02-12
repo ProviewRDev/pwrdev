@@ -106,7 +106,7 @@ static pwr_tStatus IoCardRead(
   if ( slave->ByteOrderingLE)
     byteorder = pwr_eByteOrderingEnum_LittleEndian;
 
-  if (slave->Status == MB__NORMAL) {
+  if (slave->Status == MB__NORMAL || ((io_sRackLocal*)rp->Local)->reset_inputs) {
     io_bus_card_read(ctx, rp, cp, slave->Inputs, NULL,
         byteorder, pwr_eFloatRepEnum_FloatIntel);
   }

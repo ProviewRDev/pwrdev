@@ -100,6 +100,7 @@ typedef struct {
   pwr_tTime last_try_connect_time;
   pwr_tTime timeout_time;
   int timeout;
+  int reset_inputs;
 } io_sRackLocal;
 
 typedef struct {

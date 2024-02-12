@@ -918,8 +918,19 @@ static pwr_tStatus IoRackRead(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
     }
 
     if (sp->ErrorCount > sp->ErrorLimit) {
-      memset(&sp->Inputs, 0, local->input_size);
-    }
+      switch(sp->StallAction) {
+      case pwr_eStallActionEnum_EmergencyBreak:
+	ctx->Node->EmergBreakTrue = 1;
+	break;
+      case pwr_eStallActionEnum_ResetInputs:
+	memset(&sp->Inputs, 0, local->input_size);
+	local->reset_inputs = 1;
+	break;
+      default:;
+      }
+    } else
+      local->reset_inputs = 0;
+    
   } else {
     sp->ErrorCount = 0;
     if (sp->Status != MB__CONNDOWN)
