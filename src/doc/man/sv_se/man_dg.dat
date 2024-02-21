@@ -481,7 +481,7 @@ Trafikljuset ska kunna arbeta i två olika moder:
   - Blinkande: trafikljusen blinkar gult.
 
 <image> dg_fig1.gif
-<b>Trafikljusen i en korsning
+<b>Fig Trafikljusen i en korsning
 
 Arbetsmoden för trafikljuset bestäms av en operatör via en operatörsstation, eller av en
 underhållstekniker som påverkar ett vred. Underhållsteknikern kan ändra mod endast om 
@@ -492,7 +492,7 @@ operatören resp underhållsteknikern, för att kunna övervaka och styra systemet. 
 implementeras som processbilder på operatörsstationen eller med hårdvara.
 
 <image> dg_fig2.gif
-<b>Trafikljus, kontrollpanel
+<b>Fig Trafikljus, kontrollpanel
 </topic>
 
 <topic> io_specification
@@ -554,7 +554,7 @@ operatörsstationen. De är rotvolymer så vi kan välja lediga volymsidentiteter i 
 operatörsstationen, och går in i volymsmod i administratören för att registrera volymerna.
 
 <image> dg_fig11.gif
-<b>Registrering av volymer
+<b>Fig Registrering av volymer
 
 <h2>Användare
 Eric är utvecklare vid trafikavdelningen, Carl är operatör och Lisa är underhållstekniker.
@@ -563,13 +563,13 @@ systemgrupp för all projekt, och låter dem dela användare. Vi tilldelar Eric utv
 privilegier, Carl operatörspriviligier och Lisa underhållspriviligier.
 
 <image> dg_fig4.gif
-<b>Skapade användare
+<b>Fig Skapade användare
 
 <h2>Skapa projekt
 Vi skapar projektet med hierarkinamnet traffic-trafficcross1
 
 <image> dg_fig10.gif
-<b>Skapat projekt
+<b>Fig Skapat projekt
 
 <h1>Konfigurera projektet
 Projektet har en direktoryvolym där noder och volymer i projektet ska konfigureras. I det
@@ -589,7 +589,7 @@ Notera också systemobjektet med attributet SystemGroup som tilldelas värdet
 "trafficdepartment". Detta ger användarna eric, carl och lisa tillgång till projektet. 
 
 <image>dg_fig5.gif
-<b>Directory volymen
+<b>Fig Directory volymen
 </topic>
 
 <topic> plant_configuration
@@ -613,7 +613,7 @@ Figuren nedan visar hur en anläggninghierarki har konfigurerats. Vi ser hur sign
 på olika nivåer, och också hur Plc program är konfigurerade i anläggningshierarkin.
 
 <image> dg_fig3.gif
-<b>Exempel på anläggningshierarki
+<b>Fig Exempel på anläggningshierarki
 
 Vi väljer att kalla vår anläggning TrafficCross1 och bestämmer följande struktur:
 
@@ -643,7 +643,7 @@ Reset          <t>Dv <t>Ett värde för att återställa programmet i utgångsläge.
 
 <bookmark> plant_example
 <image> dg_fig6.gif
-<b>Anläggningshierarkin för korsningen
+<b>Fig Anläggningshierarkin för korsningen
 
 På översta nivån finns ett anläggningsobjekt, TrafficCross1 av klassen $PlantHier. Vi 
 använder andra objekt av klassen $PlantHier för att gruppera objekten. Vi skapar också ett
@@ -656,7 +656,7 @@ blir tillgänglig på operatörsstationen. Vi har monterat det översta $PlantHier o
 'TrafficCross1' med ett MountObject med samma namn.
 
 <image> dg_fig14.gif
-<b>Anläggningshierarkin i operatörsvolymen
+<b>Fig Anläggningshierarkin i operatörsvolymen
 </topic>
 
 <topic> node_configuration
@@ -682,19 +682,19 @@ ett rack i nod objektet, korten under rack objektet, och kanalerna under respekt
 objekt.
 
 <image> dg_fig7.gif
-<b>Nodehierarkin i processtationen
+<b>Fig Nodehierarkin i processtationen
 
 Vi konfigurerar även PLC programmet med ett PlcProcess objekt, och under detta ett
 PlcThread objekt för varje tidbas. Vi nöjer oss med en tidbas på 100 ms. 
 
 <image> dg_fig12.gif
-<b>Konfigurering av tidbaser i PLC programmet
+<b>Fig Konfigurering av tidbaser i PLC programmet
 
 Varje objekt har att antal attribut som måste datasätta. För att ge en inblick i hur detta
 går till visar vi några attribut i PlcProcess objektet.
 
 <image> dg_fig13.gif
-<b>Ändring av värden på attribut
+<b>Fig Ändring av värden på attribut
 
 <h2>Operatörsstation
 Operatörsstationens nodhierarki konfigureras i volymen för denna VolOpTrafficCross1. Under
@@ -703,7 +703,7 @@ ett User objekt som definierar en användare. Under OpPlace objektet finns även e
 objekt för operatörsplatsens processbild.
 
 <image> dg_fig8.gif
-<b>Nodhierarkin i operatörsvolymen
+<b>Fig Nodhierarkin i operatörsvolymen
 
 <h1> Koppla kanaler till signaler
 När både anläggnings- och nodehierarkin är konfigurerad, är det dags att koppla ihop logiska
@@ -716,10 +716,10 @@ och kanal 0 på Di-kortet. Eftersom Di-signalen ServiceSwitch representerar omkop
 Di-kanalen Di4-00 representerar kanalen, måste vi göra en koppling även mellan dessa objekt.
 
 <image> dg_fig15.gif
-<b>Koppling mellan signal och kanal
+<b>Fig Koppling mellan signal och kanal
 
 <image> dg_fig9.gif
-<b>Att koppla en signal till en kanal
+<b>Fig Att koppla en signal till en kanal
 </topic>
 
 <topic>plcprogram
@@ -730,7 +730,7 @@ Innan vi börjar editera kopplar vi PlcPgm objektet till ett PlcThread objekt i n
 Detta avgör vilken tidbas som PLC programmet kommer att exekvera med.
 
 <image> dg_fig16.gif
-<b>Den grafiska PLC editorn
+<b>Fig Den grafiska PLC editorn
 
 Vi kommer att använde GRAFCET för att skapa programmet för trafikljusen. Det finns två sätt
 att lösa problemet med de två arbets moderna normal och blinkande:
@@ -749,7 +749,7 @@ utgångssignal, som tänder en lampa. På så sätt styr PLC programmet de logiska si
 är kopplade till de fysiska kanalerna.
 
 <image>dg_fig17.gif
-<b>Sekvens för blinkande ljus
+<b>Fig Sekvens för blinkande ljus
 
 Figuren ovan visar sekvensen som exekveras när ljusen ska blinka gult.
 
@@ -757,7 +757,7 @@ Startvillkoret för sekvensen är inverterat jämfört med startvillkoret för sekven
 normal arbetsmod. Det medför att de två sekvenserna inte kommera att exekvera samtidigt.
 
 <image>dg_fig18.gif
-<b>Normal sekvens
+<b>Fig Normal sekvens
 
 Programmet för den normala arbetsmoden bygger på att trafikljusen följer sekvensen:
 
@@ -778,7 +778,7 @@ lampa tänds, osv. När steg 8 har varit aktivt en viss tid, flyttas aktiviteten t
 initsteget igen och sekvensen börjar om, så längs startvillkoret är uppfyllt.
 
 <image> dg_fig19.gif
-<b>Trigg signaler
+<b>Fig Triggsignaler
 
 Programmet ovan visar logiken för att styra olika arbetsmoder.
 
@@ -800,7 +800,7 @@ Processbilder används ofta som gränssnitt mellan operatören och processen. Proce
 skapas i den grafiska editorn.
 
 <image> dg_fig20.gif
-<b>Grafisk editor
+<b>Fig Grafisk editor
 
 Processbilder kan innehålla dynamik, som kopplas till de logiska signalerna, t ex
 
@@ -816,7 +816,7 @@ I vårt exempel väljer vi att rita en processbild som visar vägkorsningen, där tr
 Skapa processbilder.
 
 <image>dg_fig21.gif
-<b>Processbild för korsningen
+<b>Fig Processbild för korsningen
 </topic>
 </chapter>
 
@@ -859,7 +859,7 @@ användarna är operatörer och har operatörspriviliger i runtime. De här användarn
 för många applikationer, och vi nöjer oss tills vidare med dessa. 
 
 <image> dg_fig23.gif
-<b>Användare som följer med vid installationen
+<b>Fig Användare som följer med vid installationen
 
 Notera att om man bygger ProviewR från källkoden, måste man skapa användare innan man kan 
 gå vidare och skapa ett projekt.
@@ -1081,8 +1081,8 @@ man det objekt som ska monteras.
 <h1>Konfigurering av nodhierarkin
 I nodhierarkin definieras noderna i ProviewR systemet.
 
-<b>Nodhierakin
 <image> dg_fig44.gif
+<b>Fig Nodhierakin
 
 <h2>$NodeHier objekt
 $NodeHier objektet används för att gruppera objekt i nodhierarkin. Objektet kan användas för
@@ -1125,8 +1125,8 @@ ChanIi <t>Heltals ingång.
 ChanIo <t>Heltals utgång.
 ChanCo <t>Pulsgivaringång.
 
-<b>I/O konfigurering
 <image> dg_fig43.gif
+<b>Fig I/O konfigurering
 
 <b>Distribuerat I/O
 Som exempel på distribuerat I/O tar vi profibus. Här utnyttjas alla fyra nivåerna. På datorns
@@ -1205,8 +1205,8 @@ händelser från de inringade objekten anger vi 'A-C' som ett alternativ i SelectL
 innebär att kommer att ta emot händelser från det övervakade objektet C, och från alla
 övervakade objekt under C.
 
-<b>SelectList example 1
 <image> dg_fig41.gif
+<b>Fig Selectlist exempel 1
 
 Ett annat exempel:
 Vi betraktar figuren nedan, som visar anläggningen TrafficCross1. Om vi vill ta emot alla
@@ -1215,8 +1215,8 @@ hanterar två trafikljus, TrafficLightNS och TrafficLightWE. Låt oss säga att vi 
 ha händelser från TrafficLightNS. I det fallet anger vi 'TrafficCross1-TrafficLightNS' 
 istället för TrafficCross1.
 
-<b>Selectlist example 2
 <image> dg_fig42.gif
+<b>Fig Selectlist exempel 2
 
 Om man vill ta emot händelser från CycleSup objekt som övervakar plctrådarna, måste man även
 ange namnet på $Node-objektet.
@@ -1227,8 +1227,8 @@ upp till 15 tryckknappar. Oanvända tryckknappar visas ej i Operator Window.
 
 Se OpPlace i Objektshandboken <classlink>opplace,"",$pwr_lang/pwrb_xtthelp.dat
 
-<b>Operator Window
 <image> dg_fig45.png
+<b>Fig Operatörsfönstret
 
 <h2>XttGraph objekt
 XttGraph objekt används främst för att visa processbilder. I objektet pekar man ut den graf
@@ -1254,7 +1254,7 @@ där den andra cellen innehåller en larmlista. De olika larmlistorna visar larm f
 delar av anläggningen, specificerade av AlarmView objekt. En multiview konfigureras med
 ett XttMultiView objekt. Action-vektorn innehåller specifikationerna för varje cell.
 
-Det är också möjlig att byta ut en graf eller kurve i en cell med xtt-kommandot 
+Det är också möjlig att byta ut en graf eller kurva i en cell med xtt-kommandot 
 'set subwindow'.
 
 <image> dg_fig115.png
@@ -1425,6 +1425,9 @@ Fil för att ange bibliotek som länkas med plc-programmet.
 
 Fil för att sätta initialvärden vid ProviewR uppstart.
 <c>pwrp_alias.dat
+
+Fil med hjälptexter
+<c>xtt_help.dat
 
 Alla ovanstående filer beskrivs närmare längre fram.
 </topic>
@@ -1825,7 +1828,7 @@ ett tomt dokument objekt. Programmet består av funktionsobjekt och Grafcet sekve
 
 Programmering med funktionsblock görs i ett horisontellt nät av noder och förbindningar, från
 vänster till höger i dokumentet. Värden på signaler och attribut hämtas upp på den vänstra
-sidan av nätet, och värden överförs med förbindningar från utgångs pinnar till ingångs
+sidan av nätet, och värden överförs med förbindningar från utgångspinnar till ingångs-
 pinnar på funktionsblocken. Funktionsblocken opererar på signalvärdena och i den högra
 sidan av nätet lagras värdena i signaler eller attribut.
 
@@ -1839,12 +1842,12 @@ kan samverka med varandra och kombineras till ett nät.
 
 PLCeditorn består av
 - en arbetsarea.
-- en palett med Grafcet objekt och funktionsblock, och en palette med förbindningar.
+- en palett med Grafcet objekt och funktionsblock, och en palett med förbindningar.
 - ett navigationsfönster, från vilket arbetsarean kan skrollas och zoomas.
 
 
-<b>Plc editorn
 <image> dg_fig46.gif
+<b>Fig Plc editorn
 
 Ett funktionsobjekt skapas genom att man väljer en klass i paletten, och klickar med MB2
 (mittenknappen) i arbetsarean.
@@ -1901,8 +1904,8 @@ att utföras ända tills initsteget blir inaktivt. Steg 1 (Step1) blir aktivt, när
 
 En Grafcet sekvens är alltid en sluten sekvens.
 
-<b>En enkel rak Grafcet sekvens
 <image> dg_fig47.gif
+<b>Fig En enkel rak Grafcet sekvens
 
 <h2>Förgrenad sekvens
 
@@ -1910,8 +1913,8 @@ En rak sekvens är den enklaste varianten av sekvenser. Ibland behöver man altern
 i programmet, till exempel om man har en maskin som kan tillverka tre olika produkter. På de
 ställen som produktionen skiljer sig åt, lägger man in alternativa grenar.
 
-<b>Aternativ förgrening
 <image> dg_fig48.gif
+<b>Fig Aternativ förgrening
 
 Exemplet ovan visar sekvensen för en maskin som kan producera tre produkter, röd, grön och 
 blå. Vid förgreningen, punkt 1 i figuren, väljer man önskad gren beroende på den produkt
@@ -1925,8 +1928,8 @@ Ibland behöver man starta flera parallella arbetsmoment samtidigt. Det ska vara 
 olika momenten att kunna arbeta oberoende av varandra. För att åstadkomma detta, använder man
 parallella sekvenser.
 
-<b>Parallell sekvens
 <image> dg_fig49.gif
+<b>Fig Parallell sekvens
 
 Exemplet i figuren ovan visar sekvensen för två maskiner som borrar två hål samtidigt, 
 oberoende av varandra. När övergångsvillkoret före parallellförgreningen (punkt 1 i figuren),
@@ -1963,14 +1966,14 @@ Ett övergångsvillkor används för att överföra aktiviteten mellan två steg. Aktiv
 överförs från det övre till det undre steget (se figur nedan). Ett logiskt villkor, t ex 
 en digital signal, som kopplas till Trans objektet, avgör när överföringen sker.
 
-<b>Exempel på övergångsvillkor
 <image>dg_fig52.gif
+<b>Fig Exempel på övergångsvillkor
 
 <h2>Order
 Det är möjlig att koppla en eller flera order till varje steg.
 
-<b>Exempel på order
 <image>dg_fig53.gif
+<b>Fig Exempel på order
 
 Normalt är orderns utgång aktiv när ingången är aktiv, men för varje order finns ett antal
 attribut, som påverkar utgångens funktion:
@@ -1985,16 +1988,16 @@ Dessa funktioner beskrivs i detalj i ProviewR Objekt handbok. Principen är att m
 namnet på attributet (stor bokstav) och eventuell tid i objektseditorn. I figuren nedan
 visas hur man fördröjer orderns aktivitet i 10 sekunder.
 
-<b>Attribut för DOrder
 <image>dg_fig54.gif
+<b>Fig Attribut för DOrder
 
 De valda attributen skriv ut i ordersymbolen.
 
 Figuren nedan visar hur man kan använda en order med fördröjning för att göra ett steg
 aktivt en viss tid.
 
-<b>En fördröjd övergång
 <image>dg_fig55.gif
+<b>Fig Fördröjd övergång
 
 Notera att man måste använda en feedback förbindning för att ansluta den fördröjda ordern
 till övergångsvillkoret. Annars blir exekveringsordningen tvetydig.
@@ -2005,8 +2008,8 @@ Se feedback koppling <link>plceditor_refman, feedback_connection
 När man skapar komplexa Grafcet program, är det ofta en fördel att använda underfönster,
 och i dessa placera subsekvenser. På det här sättet får man en bättre layout på programmet.
 
-<b>Subsekvens
 <image>dg_fig56.gif
+<b>Fig Subsekvens
 
 I figuren ovan visas subsekvensen för ett SubStep. En subsekvens startar alltid med ett
 SsBegin objekt och slutar med ett SsEnd objekt. En subsekvens kan i sin tur innehålla
@@ -2026,8 +2029,8 @@ Hämtnings- och lagringsblock används för att läsa och skriva värden. Det finns h
 och lagringsblock för varje typ av signal. I figuren nedan visas ett antal av dessa block.
 De återfinns under 'Signal' mappen i paletten.
 
-<b>Block för att hämta och lagra värden
 <image>dg_fig57.gif
+<b>Fig Block för att hämta och lagra värden
 
 För att läsa signalvärden används block som GetAi, GetIi, GetDi eller GetAo. När man vill
 sätta ett värde i en signal, används block som StoAv, StoDo, SetDv eller ResDo.
@@ -2053,8 +2056,8 @@ Det finns ett antal block tillgängliga för logisk programmering. t ex och-grind 
 eller-grind (Or), inverterare och timer. För logisk programmering används digitala signaler.
 Objekten är placerade under mappen 'Logic' i paletten.
 
-<b>Logiska block
 <image> dg_fig58.gif
+<b>Fig Logiska block
 
 I figuren ovan ses en och-grind (And1). För objektet gäller följande:
 
@@ -2070,8 +2073,8 @@ I figuren ovan ses en och-grind (And1). För objektet gäller följande:
 
 Och-grindens attribut ändras från objektseditorn.
 
-<b>Och-grindens attribut
 <image> dg_fig60.gif
+<b>Fig Och-grindens attribut
 
 De andra objekten under 'Logic' mappen har liknande attribut, se ProviewR Objekt handbok.
 
@@ -2080,8 +2083,8 @@ De andra objekten under 'Logic' mappen har liknande attribut, se ProviewR Objekt
 Mappen 'Analog' i paletten innehåller ett antal objekt för att hantera analoga signaler,
 t ex filter, additionsblock och integratorer.
 
-<b>Aritmetiskt beräkningsblock
 <image> dg_fig61.gif
+<b>Fig Aritmetiskt beräkningsblock
 
 Här beskrivs inte funktionen hos objekten, men det kan vara lämpligt att kommentera
 användningen av aritmetiska block. Blocken används för beräkning av användardefinierade
@@ -2110,8 +2113,8 @@ Supervisory), som finns under mappen 'Logic' i paletten.
 Signal eller ett attributet som ska övervakas, hämtas med ett Get-objekt som förbinds med
 DSup objektet. Utgångar på logiska block kan kopplas direkt till DSup objektet.
 
-<b>Digital övervakning
 <image> dg_fig62.gif
+<b>Fig Digital övervakning
 
 Figuren ovan visar övervakningen av en Dv signal.
 
@@ -2175,7 +2178,7 @@ Anropa funktioner från plc programmet
 Den funktions-blocks programmering som plc-programmet utgörs av har sina begränsningar, och
 vissa saker kan göras mycket enklare och snyggare med c-kod. För detta finns funktionsblocken
 CArithm och DataArithm där man kan lägga in en viss mängd c-kod, men antal tecken är 1023 
-(8191 för DataArithmL), och ibland räcker det inte till. Då har man två möjligheter, att 
+(8191 för DataArithmL), och ibland räcker det inte till. Man har då två möjligheter, att 
 skriva en fristående applikation, vilket finns beskrivet i kapitlet Applikationsprogrammering,
 eller att anropa en c-funktion från en CArithm eller DataArithm. Fördelen med att anropa en 
 funktion är att all initiering och knytning till objekt sköts av plc-programmet. Dessutom 
@@ -2248,7 +2251,7 @@ Anropet av funktionen sker från ett CArithm, DataArithm, AArithm eller DArithm o
 Vid kompileringen skapades objektsmodulen $pwrp_obj/ra_myfunction.o. Denna måste länkas med
 när plcprogrammet byggs, och det sker genom att skapa ett BuildOptions objekt i directory
 volymen under NodeConfig objektet. Lägg in namnet på objektsmodulen i ObjectModule vektorn.
-När direktory volymen sparas genereras en opt-fil på $pwrp_exe som inkludeas av länkaren
+När direktory volymen sparas genereras en opt-fil på $pwrp_exe som inkluderas av länkaren
 när noden byggs.
 
 <image> dg_fig116.png
@@ -2265,14 +2268,14 @@ stega sig fram i koden.
 Först bygger man plc-programmet med debug genom att från konfiguratören öppna Options/Setting 
 i menyn och aktivera Build/Debug, och sedan bygga noden.
 
-Därefter man startar ProviewR runtime och knyter upp debuggern, gdb, mot plcprocessen genom 
+Därefter startar man ProviewR runtime och knyter upp debuggern, gdb, mot plcprocessen genom 
 att skicka med pid för processen till gdb med -p. pid kan man se med 'ps x'
 
 <c>> ps x
 <c>...
 <c>5473 pts/0    Sl     0:18 plc_mynode_0999_plc
 
-5473 är pid för plcprogrammet och vi startar debuggern, sätter en brytpunkt i funktionen
+5473 är pid för plcprogrammet. Vi startar debuggern, sätter en brytpunkt i funktionen
 och låter programmet exekvera vidare
 
 <c>> gdb -p 5473 plc_mynode_0999_plc

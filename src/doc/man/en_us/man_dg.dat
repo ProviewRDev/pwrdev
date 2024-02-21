@@ -1426,6 +1426,9 @@ File to decide which libraries to link with the plc-program.
 File to control setting of initial values when starting ProviewR.
 <c>pwrp_alias.dat
 
+File with help texts
+<c>xtt_help.dat
+
 All the above files are further described below.
 </topic>
 
