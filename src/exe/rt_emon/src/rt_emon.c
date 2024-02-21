@@ -1293,7 +1293,7 @@ static pwr_tStatus sendAlarmStatus(sOutunit* op)
       op, mh_eMsg_HandlerAlarmStatus, 0, op->outunit.oix, msg, msg_size);
   if (sts == QDB__QUOTAEXCEEDED) {
     op->errorQuota++;
-    if (op->errorQuota > 10) {
+    if (op->errorQuota > 50) {
       errh_Error("Aborting, outunit quota exceeded, oid: %s", cdh_ObjidToString(op->outunit,1));
       outunitAborted(op);
       free((char*)msg);
