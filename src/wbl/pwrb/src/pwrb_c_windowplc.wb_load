@@ -89,6 +89,20 @@ SObject pwrb:Class
 	  Attr Flags |= PWR_MASK_NOEDIT
         EndBody
       EndObject
+      Object ExecTime $Attribute 4 
+        Body SysBody
+          Attr TypeRef = "pwrs:Type-$Float32"
+	  Attr Flags |= PWR_MASK_STATE
+	  Attr Flags |= PWR_MASK_NOEDIT
+        EndBody
+      EndObject
+      Object MaxExecTime $Attribute 5 
+        Body SysBody
+          Attr TypeRef = "pwrs:Type-$Float32"
+	  Attr Flags |= PWR_MASK_STATE
+	  Attr Flags |= PWR_MASK_NOEDIT
+        EndBody
+      EndObject
     EndObject
     Object DevBody $ObjBodyDef 2 
       !/**

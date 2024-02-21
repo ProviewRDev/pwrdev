@@ -5486,6 +5486,9 @@ int gcg_comp_m1(vldh_t_wind wind, unsigned long codetype,
   if (node_count > 0)
     free((char*)nodelist);
 
+  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec2( %c%s);\n", name,
+      GCG_PREFIX_REF, vldh_IdToStr(0, wind->lw.oid));
+
   if (gcgctx->current_cmanager)
     gcg_reset_cmanager(gcgctx);
 

@@ -45,7 +45,16 @@
 */
 #define windowplc_exec(object)                                                 \
   if (object->ScanOff)                                                         \
-    return;
+    return;                                                                    \
+  pwr_tTime wplc_exec_start, wplc_exec_end;                                    \
+  time_GetTimeMonotonic(&wplc_exec_start)
+
+
+#define windowplc_exec2(object)                                                \
+  time_GetTimeMonotonic(&wplc_exec_end);                                       \
+  object->ExecTime = time_AdiffToFloat(&wplc_exec_end, &wplc_exec_start);      \
+  if (object->ExecTime > object->MaxExecTime)                                  \
+    object->MaxExecTime = object->ExecTime;   
 
 /*_*
   @aref windowcond WindowCond
@@ -54,6 +63,8 @@
   if (object->ScanOff)                                                         \
     return;
 
+#define windowcond2_exec(object)
+
 /*_*
   @aref windoworderact WindowOrderact
 */
@@ -61,12 +72,16 @@
   if (object->ScanOff)                                                         \
     return;
 
+#define windoworderact2_exec(object)
+
 /*_*
   @aref windowsubstep WindowSubstep
 */
 #define windowsubstep_exec(object)                                             \
   if (object->ScanOff)                                                         \
     return;
+
+#define windowsubstep2_exec(object)
 
 /*_*
   @aref scantime ScanTime
