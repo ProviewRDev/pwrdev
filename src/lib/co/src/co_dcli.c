@@ -405,6 +405,25 @@ int dcli_get_qualifier(const char* qualifier, char* value, size_t size)
   return DCLI__SUCCESS;
 }
 
+int dcli_set_qualifier(const char* qualifier, char* value)
+{
+  int i = 0;
+
+  while (dcli_qual_str[i][0][0] != '\0') {
+    if (str_NoCaseStrcmp(qualifier, (char*)dcli_qual_str[i]) == 0) {
+      /* Hit */
+      if (strlen(value) > sizeof(dcli_qual_str[0][0]) - 1)
+	return DCLI__TOOLONG;
+      strcpy(dcli_qual_str[i][1], value);
+      return DCLI__SUCCESS;
+    }
+    i++;
+  }
+  strncpy(dcli_qual_str[i][0], qualifier, sizeof(dcli_qual_str[0][0]));
+  strncpy(dcli_qual_str[i][1], value, sizeof(dcli_qual_str[0][1]));
+  return DCLI__SUCCESS;
+}
+
 /*************************************************************************
 *
 * Name:		dcli_store_symbols()

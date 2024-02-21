@@ -65,6 +65,7 @@ int dcli_parse(const char* string, const char* parse_char,
 int dcli_cli(dcli_tCmdTable* command_table, const char* string, void* userdata1,
     void* userdata2);
 int dcli_get_qualifier(const char* qualifier, char* value, size_t size);
+  int dcli_set_qualifier(const char* qualifier, char* value);
 int dcli_store_symbols(char* filename);
 int dcli_replace_symbol(char* command, char* newcommand, int newsize);
 int dcli_get_symbol(char* key, char* value);

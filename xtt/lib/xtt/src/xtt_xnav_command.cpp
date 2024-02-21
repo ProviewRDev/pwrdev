@@ -217,6 +217,7 @@ static int xnav_wait_func(void* client_data, void* client_flag);
 static int xnav_oplog_func(void* client_data, void* client_flag);
 static int xnav_emit_func(void* client_data, void* client_flag);
 static int xnav_plcscan_func(void* client_data, void* client_flag);
+static int xnav_graph_func(void* client_data, void* client_flag);
 
 dcli_tCmdTable xnav_command_table[] = {
   { "SHOW", &xnav_show_func,
@@ -316,6 +317,15 @@ dcli_tCmdTable xnav_command_table[] = {
       { "dcli_arg1", "/SIGNALNAME", "/GRAPH", "/INSTANCE", "" } },
   { "PLCSCAN", &xnav_plcscan_func,
       { "/ON", "/OFF", "/ALL", "/NAME", "" } },
+  { "GRAPH", &xnav_graph_func,
+      { "dcli_arg1", "/NAME", "/FILE", "/SCROLLBAR", "/WIDTH",
+          "/HEIGHT", "/OBJECT",
+          "/INSTANCE", "/FOCUS", "/INPUTEMPTY", "/MAIN", "/ENTRY",
+          "/TITLE", "/ACCESS", "/DASHBOARD", "/CLASSGRAPH", "/PARENT", "/PWINDOW",
+          "/PINSTANCE", "/BYPASS", "/CLOSEBUTTON", "/TARGET", "/TRIGGER",
+          "/TYPE", "/FTYPE", "/FULLSCREEN", "/MAXIMIZE", "/FULLMAXIMIZE",
+          "/ICONIFY", "/HIDE", "/XPOSITION", "/YPOSITION", "/X0", "/Y0", "/X1",
+          "/Y1", "/RESIZEFREE", "" } },
   {
       "", NULL, { "" }
   }
@@ -3011,6 +3021,21 @@ static void xnav_dashboard_open_cb(void* ctx, char* text, int ok_pressed)
   sprintf(cmd, "open graph %s/dash/menu", text);
 
   xnav->command(cmd);
+}
+
+static int xnav_graph_func(void* client_data, void* client_flag)
+{
+  char arg1_str[80];
+  int arg1_sts;
+
+  arg1_sts = dcli_get_qualifier("dcli_arg1", arg1_str, sizeof(arg1_str));
+  if (ODD(arg1_sts))
+    dcli_set_qualifier("dcli_arg2", arg1_str);
+
+  dcli_set_qualifier("dcli_arg1", (char*)"GRAPH");
+
+  xnav_open_func(client_data, client_flag);
+  return XNAV__SUCCESS;
 }
 
 static int xnav_open_func(void* client_data, void* client_flag)
