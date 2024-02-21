@@ -77,7 +77,8 @@ char* CnvPwgToXtthelp::fname_to_topic(char* fname)
 CnvPwgToXtthelp::CnvPwgToXtthelp(CnvCtx* cnv_ctx) : ctx(cnv_ctx)
 {
   // Get files
-  static pwr_tFileName filenames[10] = { "$pwre_croot/xtt/lib/ge/src/pwr_*.pwg",
+  static pwr_tFileName filenames[10] = { 
+    "$pwre_croot/xtt/exp/ge/src/pwr_*.pwg",
     "$pwre_croot/xtt/exp/ge/src/pwrct_*.pwg",
     "$pwre_croot/xtt/mmi/sis/src/sis*.pwg",
     "$pwre_croot/xtt/mmi/ssg/src/ssg*.pwg",
