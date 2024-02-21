@@ -12,6 +12,8 @@
 !
 ! Subgraph with two pages, fan off (page 1) and fan on (page 2).
 ! Annotation for display of manual or local mode.
+! The object is by default drawn with colortheme colors.
+!
 ! <image> pwr_fan2_ags.gif
 !
 ! <h1>Default dynamics

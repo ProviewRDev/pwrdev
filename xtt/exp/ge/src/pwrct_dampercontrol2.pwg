@@ -12,6 +12,8 @@
 ! damper closed (page 2) and damper open (page 3).
 ! Annotation for display of manual or local mode.
 !
+! The object is by default drawn with colortheme colors.
+!
 ! <image> pwr_dampercontrol2_ags.gif
 !
 ! <h1>Default dynamics

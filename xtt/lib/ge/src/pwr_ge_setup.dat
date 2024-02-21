@@ -685,6 +685,7 @@ menu ColorTheme
     subgraph	Damper		pwr_exe:pwrct_damper.pwsg		98
     subgraph	DamperAnim	pwr_exe:pwrct_damperanim.pwsg		98
     subgraph	DamperAnim2	pwr_exe:pwrct_damperanim2.pwsg		98
+    subgraph	DamperAnim11	pwr_exe:pwrct_damperanim11.pwsg		98
     subgraph	DamperControl	pwr_exe:pwrct_dampercontrol.pwsg	104
     subgraph	DamperControl2	pwr_exe:pwrct_dampercontrol2.pwsg	104
     subgraph 	ElHeater1	pwr_exe:pwrct_elheater1.pwsg	       179
@@ -695,7 +696,10 @@ menu ColorTheme
     subgraph	Fan3		pwr_exe:pwr_fan3.pwsg			70
     subgraph	FanAnim		pwr_exe:pwr_fananim.pwsg		69
     subgraph	FanAnim2	pwr_exe:pwr_fananim2.pwsg		71
+    subgraph	FanAnim11	pwr_exe:pwrct_fananim11.pwsg		71
     subgraph	FanAnim3	pwr_exe:pwrct_fananim3.pwsg		71
+    subgraph	FanAnim4	pwr_exe:pwr_fananim4.pwsg		69
+    subgraph	FanAnim5	pwr_exe:pwrct_fananim5.pwsg		70
     subgraph	HandWheel	pwr_exe:pwr_handwheel.pwsg		58
     subgraph	LimitSwitch	pwr_exe:pwr_limitswitch.pwsg	       248
     subgraph	MDamper		pwr_exe:pwr_mdamper.pwsg		55
@@ -713,6 +717,7 @@ menu ColorTheme
     subgraph	Pump3		pwr_exe:pwr_pump3.pwsg			73
     subgraph 	PumpAnim 	pwr_exe:pwrct_pumpanim.pwsg		97
     subgraph	PumpAnim2	pwr_exe:pwrct_pumpanim2.pwsg		72
+    subgraph	PumpAnim11	pwr_exe:pwrct_pumpanim11.pwsg		72
     subgraph 	Thermometer	pwr_exe:pwr_thermometer.pwsg 		28
     subgraph	Rod		pwr_exe:pwr_rod.pwsg			67
     subgraph	RodCouplingAnim	pwr_exe:pwr_rodcouplinganim.pwsg	68
@@ -723,6 +728,7 @@ menu ColorTheme
     subgraph 	Valve	 	pwr_exe:pwrct_valve.pwsg 		1
     subgraph 	ValveAnim 	pwr_exe:pwrct_valveanim.pwsg		1
     subgraph 	ValveAnim2 	pwr_exe:pwrct_valveanim2.pwsg		1
+    subgraph 	ValveAnim11 	pwr_exe:pwrct_valveanim11.pwsg		1
     subgraph 	ValveManuel	pwr_exe:pwrct_valvemanuel.pwsg 		4
     subgraph 	ValveControl	pwr_exe:pwrct_valvecontrol.pwsg 	2
     subgraph 	ValveControl2	pwr_exe:pwrct_valvecontrol2.pwsg 	53
@@ -777,12 +783,14 @@ menu ColorTheme
     subgraph 	IndSquareGreenBg 	pwr_exe:pwrct_indsquaregreenbg.pwsg 	48
     subgraph 	IndSquareRedBg 		pwr_exe:pwrct_indsquareredbg.pwsg 	48
     subgraph 	IndSquareYellowBg 	pwr_exe:pwrct_indsquareyellowbg.pwsg 	48
+    subgraph 	IndSquareAnim2	 	pwr_exe:pwrct_indsquareanim2.pwsg 	48
     subgraph 	IndRoundGreen 		pwr_exe:pwrct_indroundgreen.pwsg 	47
     subgraph 	IndRoundRed 		pwr_exe:pwrct_indroundred.pwsg 		47
     subgraph 	IndRoundYellow 		pwr_exe:pwrct_indroundyellow.pwsg 	47
     subgraph 	IndRoundGreenBg 	pwr_exe:pwrct_indroundgreenbg.pwsg 	47
     subgraph 	IndRoundRedBg 		pwr_exe:pwrct_indroundredbg.pwsg 	47
     subgraph 	IndRoundYellowBg 	pwr_exe:pwrct_indroundyellowbg.pwsg 	47
+    subgraph 	IndRoundAnim2	 	pwr_exe:pwrct_indroundanim2.pwsg 	48
   }
   menu Pushbuttons
   {

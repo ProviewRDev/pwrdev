@@ -10,6 +10,7 @@
 ! <h1>Description
 ! Three way control valve.
 ! Annotation for display of manual or local mode.
+! The object is by default drawn with colortheme colors.
 !
 ! <h1>Default dynamics
 ! DigLowColor <link>GeDynDigLowColor, ,$pwr_lang/man_geref.dat

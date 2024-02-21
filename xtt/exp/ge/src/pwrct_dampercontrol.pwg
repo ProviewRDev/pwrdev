@@ -11,6 +11,8 @@
 ! Control damper.
 ! Annotation to display manual or local mode.
 !
+! The object is by default drawn with colortheme colors.
+!
 ! <h1>Default dynamics
 ! DigLowColor <link>GeDynDigLowColor, ,$pwr_lang/man_geref.dat
 ! DigError <link>GeDynError, ,$pwr_lang/man_geref.dat

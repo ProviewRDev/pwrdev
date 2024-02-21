@@ -9,6 +9,7 @@
 !
 ! <h1>Description
 ! Pump.
+! The object is by default drawn with colortheme colors.
 !
 ! Subgraph with two pages, pump off (page 1) and
 ! pump on (page 2).

@@ -9,6 +9,7 @@
 !
 ! <h1>Description
 ! Contactor.
+! The object is by default drawn with colortheme colors.
 !
 ! Subgraph with two pages, contactor off (page 1) and
 ! on (page 2).

@@ -9,6 +9,7 @@
 !
 ! <h1>Description
 ! Animated damper with annotation for local or manual mode.
+! The object is by default drawn with colortheme colors.
 !
 ! Subgraph with seven pages, where the damper is rotated from open
 ! to closed position.

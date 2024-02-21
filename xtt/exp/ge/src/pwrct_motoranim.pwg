@@ -9,6 +9,7 @@
 !
 ! <h1>Description
 ! Animation electric motor.
+! The object is by default drawn with colortheme colors.
 !
 ! Subgraph with nine pages, with an rotating animation.
 ! <image> pwr_motoranim_ags.gif

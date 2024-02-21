@@ -9,6 +9,7 @@
 !
 ! <h1>Description
 ! Manual valve.
+! The object is by default drawn with colortheme colors.
 !
 ! <h1>Default dynamics
 ! DigLowColor <link>GeDynDigLowColor, ,$pwr_lang/man_geref.dat

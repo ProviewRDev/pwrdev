@@ -9,6 +9,7 @@
 !
 ! <h1>Description
 ! Animated fan.
+! The object is by default drawn with colortheme colors.
 !
 ! Subgraph with six pages.
 ! <image> pwr_fananim3_ags.gif

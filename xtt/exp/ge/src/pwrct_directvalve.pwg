@@ -9,6 +9,7 @@
 !
 ! <h1>Description
 ! Directional valve.
+! The object is by default drawn with colortheme colors.
 !
 ! Subgraph with three pages.
 ! <image> pwr_directvalve_ags.gif

@@ -14,6 +14,8 @@
 ! first regulatable port closed (page 2) and second regulatable port
 ! closed (page 3).
 ! Annotation for display of manual and local mode.
+! The object is by default drawn with colortheme colors.
+!
 ! <image> pwr_valve3way2_ags.gif
 !
 ! <h1>Default dynamics

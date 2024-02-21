@@ -9,6 +9,7 @@
 !
 ! <h1>Description
 ! Animated pump.
+! The object is by default drawn with colortheme colors.
 !
 ! Subgraph with six pages.
 ! <image> pwr_pumpanim_ags.gif

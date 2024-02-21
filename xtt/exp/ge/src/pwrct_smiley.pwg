@@ -11,6 +11,7 @@
 ! Smiley.
 !
 ! Subgraph with six pages, diplaying different mental states.
+! The object is by default drawn with colortheme colors.
 ! <image> pwr_smiley_ags.gif
 !
 ! <h1>Default dynamics

@@ -9,6 +9,7 @@
 !
 ! <h1>Description
 ! Overload Relay.
+! The object is by default drawn with colortheme colors.
 !
 ! Subgraph with two pages, overload relay not tripped (page 1) and
 ! tripped (page 2).

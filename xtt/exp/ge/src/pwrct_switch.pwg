@@ -12,6 +12,7 @@
 ! Annotation where the type of switch or sensor can be displayed,
 ! e.g. T (temperature), P (pressure), F (flow), L (level), S (speed) 
 ! or X (other)
+! The object is by default drawn with colortheme colors.
 !
 ! <h1>Default dynamics
 ! DigLowColor <link>GeDynDigLowColor, ,$pwr_lang/man_geref.dat
