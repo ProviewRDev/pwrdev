@@ -5550,8 +5550,9 @@ int gcg_comp_m1(vldh_t_wind wind, unsigned long codetype,
           } else if (EVEN(sts)) {
             gcg_wind_msg(gcgctx, sts, wind, 1);
             (*errorcount)++;
-          } else
-            gcg_wind_msg(gcgctx, GSX__CCSUCC, wind, 0);
+          } else {
+            // gcg_wind_msg(gcgctx, GSX__CCSUCC, wind, 0);
+	  }
         }
       }
     }
