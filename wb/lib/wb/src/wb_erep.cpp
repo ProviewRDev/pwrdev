@@ -667,7 +667,7 @@ void wb_erep::loadMeta(pwr_tStatus* status, char* db)
               MsgWindow::message(
                   'I', "Unable to open volume snapshot file", vname);
             else
-              MsgWindow::message('E', "Unable to open volume snapshot file",
+              MsgWindow::message('W', "Unable to open volume snapshot file",
                   vname, e.what().c_str());
           }
         } else {

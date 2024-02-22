@@ -1072,9 +1072,9 @@ pwr_tStatus lfu_SaveDirectoryVolume(
                         lfu_creadb_qb_yes, NULL, (void*)data);
                 } else {
                   char msg[200];
-                  sprintf(msg, "Error, Volume '%s' is not yet created.",
+                  sprintf(msg, "Warning, Volume '%s' is not yet created.",
                       volume_name);
-                  MsgWindow::message('E', msg, msgw_ePop_Default);
+                  MsgWindow::message('W', msg, msgw_ePop_Default);
                 }
               }
             }
