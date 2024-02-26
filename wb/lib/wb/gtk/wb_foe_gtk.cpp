@@ -770,15 +770,21 @@ void WFoeGtk::activate_view_togg(GtkWidget* w, gpointer data)
 
 void WFoeGtk::activate_edit_togg(GtkWidget* w, gpointer data)
 {
-  WFoe* foe = (WFoe*)data;
+  WFoeGtk* foe = (WFoeGtk*)data;
+  int set;
 
-  if (w != ((WFoeGtk*)foe)->widgets.edit_togg)
+  if (w != ((WFoeGtk*)foe)->widgets.edit_togg) {
+    set = (int)gtk_toggle_tool_button_get_active(GTK_TOGGLE_TOOL_BUTTON(w));
     gtk_check_menu_item_set_active(
-        GTK_CHECK_MENU_ITEM(((WFoeGtk*)foe)->widgets.edit_togg), TRUE);
-  int set = (int)gtk_check_menu_item_get_active(
-      GTK_CHECK_MENU_ITEM(((WFoeGtk*)foe)->widgets.edit_togg));
-
-  foe->activate_edit_togg(set);
+	GTK_CHECK_MENU_ITEM(((WFoeGtk*)foe)->widgets.edit_togg), set ? TRUE : FALSE);
+  }
+  else {
+    set = (int)gtk_check_menu_item_get_active(
+        GTK_CHECK_MENU_ITEM(((WFoeGtk*)foe)->widgets.edit_togg));
+    gtk_toggle_tool_button_set_active(GTK_TOGGLE_TOOL_BUTTON(foe->widgets.tools_edit),
+	set ? TRUE : FALSE);
+  }
+  ((WFoe*)foe)->activate_edit_togg(set);
 }
 
 //
@@ -1853,13 +1859,13 @@ pwr_tStatus WFoeGtk::create_window(int x_top, int y_top, int width_adb,
       dark_theme ? "$pwr_exe/ico_print_d_30.png" : "$pwr_exe/ico_print_l_30.png", 
       G_CALLBACK(activate_print), "Print documents", this, 1, 0);
 
-  wutl_tools_item(tools, 
+  widgets.tools_edit = wutl_tools_toggle_button(tools, 
       dark_theme ? "$pwr_exe/ico_edit_d_30.png" : "$pwr_exe/ico_edit_l_30.png", 
       G_CALLBACK(activate_edit_togg), "Set edit mode", this, 1, 0);
 
-  wutl_tools_item(tools,
-      dark_theme ? "$pwr_exe/ico_noedit_d_30.png" : "$pwr_exe/ico_noedit_l_30.png", 
-      G_CALLBACK(activate_view_togg), "Set view mode", this, 1, 0);
+  //wutl_tools_item(tools,
+  //    dark_theme ? "$pwr_exe/ico_noedit_d_30.png" : "$pwr_exe/ico_noedit_l_30.png", 
+  //    G_CALLBACK(activate_view_togg), "Set view mode", this, 1, 0);
 
   widgets.tools_build = wutl_tools_item(tools, 
       dark_theme ? "$pwr_exe/ico_build_d_30.png" : "$pwr_exe/ico_build_l_30.png", 

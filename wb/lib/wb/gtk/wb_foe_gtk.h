@@ -100,6 +100,7 @@ struct s_widgets {
   GtkToolItem* tools_document;
   GtkToolItem* tools_document_landscape;
   GtkToolItem* tools_confeedback;
+  GtkToolItem* tools_edit;
   GtkWidget* lockconpoint;
   GtkWidget* move_right;
   GtkWidget* move_left;
