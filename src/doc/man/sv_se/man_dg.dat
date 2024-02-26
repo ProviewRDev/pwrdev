@@ -1197,29 +1197,29 @@ Föjande attribut måste ges ett värde:
   operatören har att påverka systemet från processbilder.
 - MaxNumberOfEvents anger antalet händelser som operatörens händelselista kan innehålla
   samtidigt.
-- SelectList anger vilka hierakier i anläggninghierakin, som operatören vill ta emot larm
-  och händelser ifrån.
+- EventSelectList anger vilka hierakier i anläggninghierakin, som operatören vill ta emot 
+  larm och händelser ifrån.
 
 Om vi betraktar figuren nedan, som illustrerar anläggningen A, och antar att vi ta emot
-händelser från de inringade objekten anger vi 'A-C' som ett alternativ i SelectList. Det
-innebär att kommer att ta emot händelser från det övervakade objektet C, och från alla
+händelser från de inringade objekten anger vi 'A-C' som ett alternativ i EventSelectList. 
+Det innebär att kommer att ta emot händelser från det övervakade objektet C, och från alla
 övervakade objekt under C.
 
 <image> dg_fig41.gif
-<b>Fig Selectlist exempel 1
+<b>Fig EventSelectList exempel 1
 
 Ett annat exempel:
 Vi betraktar figuren nedan, som visar anläggningen TrafficCross1. Om vi vill ta emot alla
-händelser från TrafficCross1, lägger vi in 'TrafficCross1' i SelectList. TrafficCross1
+händelser från TrafficCross1, lägger vi in 'TrafficCross1' i EventSelectList. TrafficCross1
 hanterar två trafikljus, TrafficLightNS och TrafficLightWE. Låt oss säga att vi enbart vill
 ha händelser från TrafficLightNS. I det fallet anger vi 'TrafficCross1-TrafficLightNS' 
 istället för TrafficCross1.
 
 <image> dg_fig42.gif
-<b>Fig Selectlist exempel 2
+<b>Fig EventSelectList exempel 2
 
 Om man vill ta emot händelser från CycleSup objekt som övervakar plctrådarna, måste man även
-ange namnet på $Node-objektet.
+ange namnet på $Node-objektet i EventSelectList.
 
 I FastAvail specificerar man XttGraph objekt som ska kunna startas från tryckknappar i 
 'Operator window'. NoFastAvail specificerar antalet tryckknappar som används. Man kan ha 
@@ -1233,7 +1233,8 @@ Se OpPlace i Objektshandboken <classlink>opplace,"",$pwr_lang/pwrb_xtthelp.dat
 <h2>XttGraph objekt
 XttGraph objekt används främst för att visa processbilder. I objektet pekar man ut den graf
 som ska visas. Objekten refereras i OpPlace objektets FastAvail attribut, och i attributet
-DefGraph som bl a finns i $PlantHier och signal objekt.
+DefGraph som bl a finns i $PlantHier och signal objekt och som gör det möjligt att öppna 
+grafen från objektets popupmeny.
 
 När objektet refereras i FastAvail kan man även utnyttja möjligheten att exekvera 
 xtt-kommandon mha XttGraph objektet. Man kan t ex via ett kommando sätta en viss signal
@@ -1296,7 +1297,7 @@ kataloger inom projektet. Variablerna är definierade med
 
 <c> $pwrp_<directory>
 
-Till exempel $pwrp_exe för katalogen <project_root>/bld/x86_linux/exe.
+Till exempel $pwrp_exe för katalogen <project_root>/bld/x86_64_linux/exe.
 </topic>
 
 <topic> source_tree
@@ -1361,8 +1362,7 @@ använder klasserna. Om rotvolymer heter VolMyProject kallas klassvolymen CVolMyP
 <topic> project_pop
 $pwrp_pop
 Det här är katalogen där processbilderna skapade med ge-editorn sparas (filtyp .pwg). 
-Färdiga filer kopieras till exe-katalogen i byggträdet ($pwrp_exe). Även xtt-hälpfiler
-utvecklas här och kopieras till $pwrp_exe katalogen.
+Färdiga filer kopieras till exe-katalogen i byggträdet ($pwrp_exe).
 
 Bilder som har ett motsvarande XttGraph objekt i nodhierarkin i rotvolymen, kommer
 automatiskt att bli kopierade till $pwrp_exe katalogen när volymen byggs.
@@ -1375,7 +1375,7 @@ ska länkas med plc-programmet.
 
 En fil av speciellt intressen som ska finnas här är
 
-<c>ra_plc_user.h-file
+<c>ra_plc_user.h
 
 Den här filen kommer att inkluderas när plc-koden kompileras. Den är dock inkluderad från
 en katalog i byggträdet (<project_root>/bld/common/inc).
@@ -1528,7 +1528,7 @@ gammal loggningen ska rensas bort.
 
 <topic> project_tmp
 $pwrp_tmp
-Katalog för temporär-filer. De här filerna skapas vid vissa operatoner, till exempel när
+Katalog för temporär-filer. De här filerna skapas vid vissa operationer, till exempel när
 ett plc-program kompileras i debug-mod. Då lagras källkods-filerna här för att sedan kunna 
 användas av debuggern.
 </topic>
@@ -1542,13 +1542,10 @@ letas alltid efter i denna katalog. Om man har andra header-filer som inkluderas
 inkluderas i ra_plc_user.h. Källkoden till include-filerna ska ligga i källkodsträden och
 kopieras därifrån till $pwrp_inc.
 
-Header-filer för användarklasser skapas här när man bygger en klassvolym. Om man dokumenterar
-klasserna, kommera även en hjälp-fil att skapas. Filerna namnges:
+Header-filer för användarklasser skapas här när man bygger en klassvolym. Filerna namnges:
 
 <c>pwr_<classvoumename>classes.h
 <c>pwr_<classvoumename>classes.hpp
-<c><classvoumename>_xtthelp.dat
-<c><classvolumename>.html
 
 </topic>
 
@@ -1629,7 +1626,7 @@ En typisk Rt_xtt fil kan se ut så här:
 </topic>
 <topic> file_xtt_setup
 xtt_setup.rtt_com
-Den här filen läses in vid start av rt_xtt. Filen läses från den katalog man startar rt_xtt från,
+Den här filen läses in vid start av rt_xtt. Filen läses från den katalog man startar rt_xtt från.
 Med hjälp av den kan man konfigurera egna menyer och koppla menyalternativ till att utföra
 speciella kommandon.
 
@@ -1693,7 +1690,7 @@ En typisk ld_appl-fil kan se ut så här:
 <c>pwr_remlog,       , noload, norun, , 5, debug, ""
 <c>#pwr_sysmon,       , noload, norun, , 5, debug, ""
 <c>#pwr_elog,       , noload, norun, , 5, debug, ""
-<c>pwr_webmon,       , noload, norun, , 5, debug, ""
+<c>pwr_websocketserver,       , noload, norun, , 5, debug, ""
 <c>pwr_webmonmh,       , noload, norun, , 5, debug, ""
 <c>pwr_webmonelog,       , noload, norun, , 5, debug, ""
 <c>#pwr_opc_server,       , noload, norun, , 5, debug, ""
@@ -1705,8 +1702,8 @@ En typisk ld_appl-fil kan se ut så här:
 '#' teckenet innebär att raden är bortkommenterad. Nästan alla ProviewR's systemprocesser är
 bortkommenterade eftersom vi vill att de ska starta (de är markerade med 'norun'). Om vi tar 
 bort #-tecknet kommer denna systemprocess ej att startas. I ovanstående exempel har 
-vi inte något web-gränssnitt och startar därför inte de processer som hanterar detta 
-(pwr_webmon, pwr_webmonmh och pwr_webmonelog).
+vi inte något web-gränssnitt och startar därför inte de processen som hanterar detta 
+(pwr_websocketserver).
 
 På den sista raden finns en applikation som tillhör projektet och ska startas vid ProviewR start.
 Prioriteten är satt till 12 som är något under prioriteten för ProviewR's systemprocesser som
@@ -1783,19 +1780,39 @@ En konfigurations-fil för definition av diverse parametrar både i utvecklings-, 
 lagrings-miljön. På en utvecklings-station gäller definitionerna alla projekt på noden.
 
 <b>Parametrar i utvecklings-miljön
-mysqlSocket <t><t>mysql socket för volymer med mysql databas. Default värde
+mysqlSocket <t><t>mysql socket för volymer med mysql databas. Defaultvärde
 		<t><t>"/var/run/mysqld/mysqld.sock".
 mysqlServer <t><t>Server node för mysql.
 defaultProjectRoot <t><t>Default rot-katalog för projekt när nya projekt skapas. 
-	 	<t><t>Default värde "/usr/local/pwrp".
-defaultProductionBus <t><t>Default produktionsbuss när nya projekt skapas.
-	 	<t><t>Default värde 1.
-defaultSimulationBus <t><t>Default simuleringsbuss när nya projekt skapas.
-	 	<t><t>Default värde 999.
+	 	<t><t>Defaultvärde "/usr/local/pwrp".
+defaultProductionQBus <t><t>Default produktionsbuss när nya projekt skapas.
+	 	<t><t>Defaultvärde 1.
+defaultSimulationQBus <t><t>Default simuleringsbuss när nya projekt skapas.
+	 	<t><t>Defaultvärde 999.
 defaultSystemGroup <t><t>Default systemgrupp när nya projekt skapas.
-	 	<t><t>Default värde "Common".
+	 	<t><t>Defaultvärde "Common".
 defaultNodeHierRoot <t><t>Default namn på översta objektet i node-hierarkin när nya
-		<t><t>projekt skapas. Default värde "Nodes".
+		<t><t>projekt skapas. Defaultvärde "Nodes".
+defaultSecurity <t><t>Default namn Security objektet.
+		<t><t>Defaultvärde "Security".
+defaultXttPriv <t><t>Defaultvärde på XttPriv i Security-objektet.
+		<t><t>Defaultvärde "Security".
+defaultOpPlaces <t><t>Default namn på map för OpPlace-objekt i node-hierarkin.
+		<t><t>Defaultvärde "OpPlaces".
+defaultServers <t><t>Default namn på map för server-objekt i node-hierarkin.
+		<t><t>Defaultvärde "Servers".
+defaultIO <t><t>Default namn på map för IO-objekt i node-hierarkin.
+		<t><t>Defaultvärde "IO".
+defaultApplications <t><t>Default namn på map för applicationsobjekt i node-hierarkin.
+		<t><t>Defaultvärde "Applications".
+defaultOpOp <t><t>Default namn på OpPlace-objekt för operatörer i node-hierarkin.
+		<t><t>Defaultvärde "Op".
+defaultOpMaintenance <t><t>Default namn på OpPlace-objekt för underhåll i node-hierarkin.
+		<t><t>Defaultvärde "Maintenance".
+defaultOpDefault <t><t>Default namn på default OpPlace-objekt i node-hierarkin.
+		<t><t>Defaultvärde "OpDefault".
+defaultWebBrowser <t><t>Default namn på WebBrowser-objekt i node-hierarkin.
+		<t><t>Defaultvärde "WebBrowser".
 qcomBusId <t><t>QCom bus identitet för simulering.
 
 <b>Parameterar i runtime-miljön
@@ -1805,8 +1822,8 @@ webDirectory <t><t>Katalog där web-filer placeras och läses av webservern.
 
 <b>Parameterar i lagrings-miljön
 sevDatabaseType <t><t>Databastyp, mysql eller sqlite.
-sevXttDefaultPriv <t><t>Default priviligier för access av sev-databasen från sev_xtt.
 sevMysqlEngine <t><t>Mysql engine för tabeller som skapas, innodb eller myisam.
+sevTimeout <t><t>Timeout tid i sekunder för hämtning av historisk data från sev server.
 
 </topic>
 
@@ -7253,7 +7270,7 @@ och String80 anges, och i GraphName anges texten vid utgångspinnen i funktionsob
 $Input, $Intern och $Output måste ligga i följande ordning under RtBody: $Input först, sedan 
 $Intern och därefter $Output.
 
-<b>Default värden
+<b>Defaultvärden
 Defaultvärden på attribut kan anges i Template objektet.
 
 Om man vill ange vilka in och utgångar som ska visas som default, finns det en mask i

@@ -1208,7 +1208,7 @@ select list. This choice means that we will be receiving events from the supervi
 and from all supervised objects that have C as their parent.
 
 <image> dg_fig41.gif
-<b>Fig SelectList example 1
+<b>Fig EventSelectList example 1
 
 Another example:
 
@@ -1222,7 +1222,7 @@ instead of TrafficCross1.
 <b>Fig EventSelectlist example 2
 
 If you want to receive messages from the CycleSup object that supervises the plc threads, you 
-must also state the hierarchy name of the $Node object.
+must also state the hierarchy name of the $Node object in EventSelectList.
 
 In FastAvail you specify the complete hierarchy name of the XttGraph object, which will be 
 possible to start from the graphics buttons of the Operator Window. You can have 0 - 25 push 
@@ -1238,7 +1238,7 @@ In order to be able to show plant graphics that are unique to the project in the
 station, you must configure XttGraph objects. These objects define, for instance, what the 
 files with the plant graphics are called. The objects are referred to in the FastAvail 
 attribute of the OpPlace object, and in the DefGraph attribute that is found in $PlantHier and 
-signal objects.
+signal objects and makes it possible to open the graph from the popup menu for the object.
 
 When the object is referred to in a FastAvail you can use the possibility to execute a Xtt command
 from the XttGraph object. In this way, you can set a signal from a pushbutton in the operator
@@ -1298,7 +1298,7 @@ All directories have an environment variable defined, so it will be easy to reac
 directories in the project. These variables are always defined as:
 <c> $pwrp_<directory>
 
-For example $pwrp_exe for the directory <project_root>/bld/x86_linux/exe.
+For example $pwrp_exe for the directory <project_root>/bld/x86_64_linux/exe.
 </topic>
 
 <topic> source_tree
@@ -1376,8 +1376,10 @@ $pwrp_appl
 This is the directory where you should keep source codes for your own applications belonging
 to the project and also for codes that you want to link with the plc-program.
 
-One file of special interest that should be kept here is the 
-<c>ra_plc_user.h-file
+One file of special interest that should be kept here is
+
+<c>ra_plc_user.h
+
 This file will by default be included when you compile the plc-code. It is however included
 from a directory in the build-tree (<project_root>/bld/common/inc).
 
@@ -1545,13 +1547,11 @@ will always be searched in this directory. If you have other header-files to inc
 them in this one.
 The master for all these include files should be kept in the source tree and copied here.
 
-Header-files for userclasses will be created here when you build a classvolume. If you have
-documented your classes, a help-file will also be created. The files are named:
+Header-files for userclasses will be created here when you build a classvolume. The files are 
+named:
 
 <c>pwr_<classvoumename>classes.h
 <c>pwr_<classvoumename>classes.hpp
-<c><classvoumename>_xtthelp.dat
-<c><classvolumename>.html
 
 </topic>
 
@@ -1697,9 +1697,7 @@ A typical ld_appl-file can look like this:
 <c>pwr_remlog,       , noload, norun, , 5, debug, ""
 <c>#pwr_sysmon,       , noload, norun, , 5, debug, ""
 <c>#pwr_elog,       , noload, norun, , 5, debug, ""
-<c>pwr_webmon,       , noload, norun, , 5, debug, ""
-<c>pwr_webmonmh,       , noload, norun, , 5, debug, ""
-<c>pwr_webmonelog,       , noload, norun, , 5, debug, ""
+<c>pwr_websocketserver,       , noload, norun, , 5, debug, ""
 <c>#pwr_opc_server,       , noload, norun, , 5, debug, ""
 <c>#pwr_sevhistmon,       , noload, norun, , 5, debug, ""
 <c>#pwr_sev_server,       , noload, norun, , 5, debug, ""
@@ -1709,7 +1707,7 @@ A typical ld_appl-file can look like this:
 The sharp sign means that those lines are commented away. Almost all of the ProviewR kernel applications
 are commented away since we want those to start. If I take away the hash sign then this kernel 
 application will not be started. For example in this case I have no web-interface so I don't 
-want the web-applications to start (pwr_webmon).
+want the web server to start (pwr_websockerserver).
 
 If I use Nmps-cells and want the content of the cells to be backed up I take away the sharp sign
 on rs_nmps_bck.
@@ -1795,14 +1793,34 @@ mysqlSocket <t><t>mysql socket for volumes with mysql database. Default value
 mysqlServer <t><t>mysql server node.
 defaultProjectRoot <t><t>The default path to projects when creating new projects.
 	 	<t><t>Default value "/usr/local/pwrp".
-defaultProductionBus <t><t>The default production bus when creating new projects.
+defaultProductionQBus <t><t>The default production bus when creating new projects.
 	 	<t><t>Default value 1.
-defaultSimulationBus <t><t>The default simulation bus when creating new projects.
+defaultSimulationQBus <t><t>The default simulation bus when creating new projects.
 	 	<t><t>Default value 999.
 defaultSystemGroup <t><t>The default system group when creating new projects.
 	 	<t><t>Default value "Common".
 defaultNodeHierRoot <t><t>Default name of the top level object in the node hierarchy when
 		<t><t>creating new projects. Default value "Nodes".
+defaultSecurity <t><t>Default name of the Security object.
+		<t><t>Default value "Security".
+defaultXttPriv <t><t>Default value of XttPriv in the Security object.
+		<t><t>Default value "Security".
+defaultOpPlaces <t><t>Default name of map for OpPlace objects in the node hierarchy.
+		<t><t>Default value "OpPlaces".
+defaultServers <t><t>Default name of map for server objects in the node hierarchy.
+		<t><t>Default value "Servers".
+defaultIO <t><t>Default name of map for IO objects in the node hierarchy.
+		<t><t>Default value "IO".
+defaultApplications <t><t>Default name of map for application objects in the node hierarchy.
+		<t><t>Default value "Applications".
+defaultOpOp <t><t>Default name of OpPlace object för operators in the node hierarchy.
+		<t><t>Default value "Op".
+defaultOpMaintenance <t><t>Default name of OpPlace object for maintenance in the node hierarchy.
+		<t><t>Default value "Maintenance".
+defaultOpDefault <t><t>Default name of default OpPlace object in the node hierarchy.
+		<t><t>Default value "OpDefault".
+defaultWebBrowser <t><t>Default name of WebBrowser object in the node hierarchy.
+		<t><t>Default value "WebBrowser".
 qcomBusId <t><t>QCom bus identity for simulation.
 
 <b>Parameters in the  runtime environment
@@ -8099,7 +8117,7 @@ A link to the documentation is made with a WebLink object pointing at the URL
 If you want to be able to show the c struct for the classes, you convert the h-file with
 co_convert
 
-<c>co_convert -cv $pwrp_web/ $pwrp_inc/'volymsnamn'classes.h
+<c>co_convert -cv $pwrp_web/ $pwrp_inc/'volymename'classes.h
 
 If you also want to be able to display the code of plc-objects, you have to add aref tags
 in the c or h file of the code, and convert it with
