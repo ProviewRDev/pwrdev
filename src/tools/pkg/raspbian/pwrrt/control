@@ -1,5 +1,5 @@
 Package: pwrrt
-Version: 6.1.2-1
+Version: 6.1.3-1
 Section: base
 Priority: optional
 Architecture: armhf
@@ -17,4 +17,4 @@ Depends: libc6 (>= 2.31-13+rpt2+rpi1+deb11u4),
 Replaces: pwr50,pwr51,pwr52,pwr53,pwr54,pwr55,pwr56,pwr57,pwr58,pwr59,pwr60
 Maintainer: Proview <postmaster@proview.se>
 Description:
- 6.1.2-1 Base release
+ 6.1.3-1 Base release
