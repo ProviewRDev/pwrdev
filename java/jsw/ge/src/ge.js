@@ -6594,7 +6594,7 @@ function DynDigBackgroundColor( dyn, instance) {
 	this.instance_mask = parseInt(tokens[1], 10);
 	break;
       case DynC.eSave_End:
-	end_ = true;
+	end = true;
 	break;
       default:
 	console.log( "Syntax error in DynDigBackgroundColor");
