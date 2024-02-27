@@ -47,7 +47,7 @@ SObject pwrb:Type
       Attr PgmName = "ThreadOptionsMask"
     EndBody
     !/**
-    !  When the execution time exeeds the scantime
+    !  When the execution time exceeds the scantime
     !  the next scan is always executed.
     !*/
     Object OverExecScanAlways $Bit
@@ -58,7 +58,7 @@ SObject pwrb:Type
      EndBody
     EndObject
     !/**
-    !  When the execution time exeeds the scantime ten times in
+    !  When the execution time exceeds the scantime ten times in
     !  a row, one scan is skipped.
     !*/
     Object OverExecScanSingle $Bit
