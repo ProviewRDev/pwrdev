@@ -63,7 +63,7 @@
   if (object->ScanOff)                                                         \
     return;
 
-#define windowcond2_exec(object)
+#define windowcond_exec2(object)
 
 /*_*
   @aref windoworderact WindowOrderact
@@ -72,7 +72,7 @@
   if (object->ScanOff)                                                         \
     return;
 
-#define windoworderact2_exec(object)
+#define windoworderact_exec2(object)
 
 /*_*
   @aref windowsubstep WindowSubstep
@@ -81,7 +81,7 @@
   if (object->ScanOff)                                                         \
     return;
 
-#define windowsubstep2_exec(object)
+#define windowsubstep_exec2(object)
 
 /*_*
   @aref scantime ScanTime
