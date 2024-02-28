@@ -31,7 +31,7 @@ build_project :
 	@ $(pwre_croot)/project/pwrtest03/build_from_git.sh
 
 clean_project:
-	@ echo "Cleaing project"
+	@ echo "Cleaning project"
 	@ if [ -e $(pwre_croot)/project/pwrtest03/bld ]; then rm $(pwre_croot)/project/pwrtest03/bld; fi
 	@ if [ -e $(pwre_croot)/project/pwrtest03/src/db/volpwrtest03a.db ]; then rm -r $(pwre_croot)/project/pwrtest03/src/db/volpwrtest03a.db; fi
 	@ if [ -e $(pwre_croot)/project/pwrtest03/src/db/volpwrtest03a.db.lock ]; then rm -r $(pwre_croot)/project/pwrtest03/src/db/volpwrtest03a.db.lock; fi
