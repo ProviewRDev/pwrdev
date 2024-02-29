@@ -34,9 +34,16 @@
  * General Public License plus this exception.
  */
 
+#ifndef remote_h
+#define remote_h
+
 #include <stdbool.h>
 
 #include "co_math.h"
+
+#if defined __cplusplus
+extern "C" {
+#endif
 
 #define doomsday false
 
@@ -230,3 +237,8 @@ typedef struct {
 } remnode_item;
 
 pwr_tStatus remote_logg(int identity, char* str, int size);
+
+#if defined __cplusplus
+}
+#endif
+#endif
