@@ -47,7 +47,7 @@ SObject pwrb:Class
 !  SigValue and RawValue belong to the Ao object. The card polynomial
 !  is defined in a card object, the Emerg attributes in a $Node object,
 !  and the rest in the ChanAo object
-!  @image orm_en1-33.gif
+!  @image orm_en1-33.png
 !  Attributes Used in Ao-signal Conversion
 !  
 !  If EmergBreakTrue = TRUE and EmergBreakSelect = 2 then

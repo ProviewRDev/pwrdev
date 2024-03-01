@@ -181,7 +181,7 @@ SObject         pwrb:Class
 !  OptFlow) once / 10 minutes e.g., or direct by an operator. 
 !  Starts with the control signal 0 at pump start. 
 !
-!  @image orm_en1-151.gif
+!  @image orm_en1-151.png
 !  Speed Control of a Pump 
 !
 !  A solution in principle to control the pump is shown in figure 3-36 
@@ -228,7 +228,7 @@ SObject         pwrb:Class
 !
 ! @b Alternate Controllers with Tracking 
 ! 
-!  @image orm_en1-155.gif
+!  @image orm_en1-155.png
 !  Shunt Control 
 !
 !  Through shunt control by the heat exchanger, the TT1-temperature in the
@@ -280,7 +280,7 @@ SObject         pwrb:Class
 !  Diagram Temperature Control. TT is the temperature transmitter, FT the flow
 !  transmitters, and FIC the flow controllers. TIC is a temperature controller 
 !
-!  @image orm_en1-157.gif
+!  @image orm_en1-157.png
 !  Block Diagram Temperature Control 
 !
 !  All the Pid objects have Inverse set to TRUE. Forced control with average
@@ -304,7 +304,7 @@ SObject         pwrb:Class
 !  mixing is to be kept constant and independent of the FT2-flow. FT is the flow
 !  transmitter and FIC the flow controller. 
 !
-!  @image orm_en1-160.gif
+!  @image orm_en1-160.png
 !  Addition of a Reagent 
 !
 !  An implementation is shown in figure See Ratio Control. The control can be made
