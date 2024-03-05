@@ -102,6 +102,7 @@ static attrnav_sEnumElement elem_dyn_type2[] = {
   { (unsigned int)ge_mDynType2_DigTransparency, "DigTransparency" },
   { (unsigned int)ge_mDynType2_AnalogTransparency, "AnalogTransparency" },
   { (unsigned int)ge_mDynType2_UnitConvert, "UnitConvert" },
+  { (unsigned int)ge_mDynType2_DigLowShift, "DigLowShift" },
   { 0, "" }
 };
 
