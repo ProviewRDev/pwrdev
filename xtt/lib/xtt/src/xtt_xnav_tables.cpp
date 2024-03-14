@@ -2035,10 +2035,13 @@ int XNav::show_plcpgm()
   int sts;
   pwr_tObjid objid;
   pwr_sClass_PlcThread* object_ptr;
-  pwr_tObjid thread_objid;
+  pwr_tOid thread_objid;
   pwr_tOName namebuf;
   pwr_tObjid parent;
   pwr_tCid cid;
+  pwr_tOid window_oid;
+  int window_found;
+  pwr_sClass_windowplc *window_ptr;
 
   brow_pop();
   brow_SetNodraw(brow->ctx);
@@ -2049,6 +2052,8 @@ int XNav::show_plcpgm()
   strcpy(th.title[th.table_cnt++], "");
   strcpy(th.title[th.table_cnt++], "");
   strcpy(th.title[th.table_cnt++], "PlcThread");
+  strcpy(th.title[th.table_cnt++], "ExecTime");
+  strcpy(th.title[th.table_cnt++], "MaxTime");
   strcpy(th.title[th.table_cnt++], "Description");
   new ItemTableHeader(brow, this, "Title", &th, NULL, flow_eDest_IntoLast);
 
@@ -2075,6 +2080,23 @@ int XNav::show_plcpgm()
     if (EVEN(sts))
       return sts;
 
+    // Get window
+    window_found = 0;
+    for (sts = gdh_GetChild(objid, &window_oid); 
+	 ODD(sts); 
+	 sts = gdh_GetNextSibling(window_oid, &window_oid)) {
+      sts = gdh_GetObjectClass(window_oid, &cid);
+      if (EVEN(sts))
+	return sts;
+      if (cid == pwr_cClass_windowplc) {
+	sts = gdh_ObjidToPointer(window_oid, (void**)&window_ptr);
+	if (EVEN(sts))
+      return sts;
+	window_found = 1;
+	break;
+      }
+    }
+
     t.elem_cnt = 0;
 
     // Object name
@@ -2100,6 +2122,24 @@ int XNav::show_plcpgm()
     } else
       strcpy(t.elem[t.elem_cnt].fix_str, "-");
     t.elem[t.elem_cnt++].type_id = xnav_eType_FixStr;
+
+    // ExecTime and MaxExecTime
+    if (window_found) {
+      t.elem[t.elem_cnt].value_p = &window_ptr->ExecTime;
+      t.elem[t.elem_cnt].type_id = pwr_eType_Float32;
+      t.elem[t.elem_cnt].size = sizeof(pwr_tFloat32);
+      strcpy(t.elem[t.elem_cnt++].format, "%8.6f");
+
+      t.elem[t.elem_cnt].value_p = &window_ptr->MaxExecTime;
+      t.elem[t.elem_cnt].type_id = pwr_eType_Float32;
+      t.elem[t.elem_cnt].size = sizeof(pwr_tFloat32);
+      strcpy(t.elem[t.elem_cnt++].format, "%8.6f");
+    } else {
+      strcpy(t.elem[t.elem_cnt].fix_str, "-");
+      t.elem[t.elem_cnt++].type_id = xnav_eType_FixStr;
+      strcpy(t.elem[t.elem_cnt].fix_str, "-");
+      t.elem[t.elem_cnt++].type_id = xnav_eType_FixStr;
+    }
 
     // Description
     strcpy(t.elem[t.elem_cnt].fix_str, object_ptr->Description);
