@@ -174,7 +174,7 @@ fördröjningen.
 1. Med MaxCount = 1 och ScanTime = 20 ms är den maximala fördröjningen
    100 * 1 * 1 / 50 secunder.    
 
-   om fördröjningstiden Tim = 1, är ActVal(t) = In(t-50), cvs insingalen
+   om fördröjningstiden Tim = 1, är ActVal(t) = In(t-50), dvs insignalen
    är fördröjd 50 exekverings cykler.
 
 2. Om MaxCount = 1 och ScanTime = 1 sekund representerar varje register en
