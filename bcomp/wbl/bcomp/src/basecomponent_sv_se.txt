@@ -2801,7 +2801,7 @@ a Pump).
   1 gång / 10 min eller direkt av operatör. 
 - Börja med styrsignalen 0 vid pumpstart. 
  
-@image orm_en1-151.gif
+@image orm_en1-151.png
 Speed Control of a Pump 
 
 En principlösning för styrning av den varvtalsreglerade pumpen visas i figuren
@@ -2853,7 +2853,7 @@ bestämer aktuellt driftfall.
 
 @h2 Alternativa regulatorer med följning 
  
-@image orm_en1-155.gif
+@image orm_en1-155.png
 Shunt Control 
 
 Genom shuntreglering över värmeväxlaren, skall TT1-temperaturen hållas 
@@ -2909,7 +2909,7 @@ för förbränningsluftregleringen, visas i figuren nedan. TT avser en temperatur
 transmitter, FT flödes transmittrar och FIC flödesregulatorer. TIC är en 
 temperatur regulator 
  
-@image orm_en1-157.gif
+@image orm_en1-157.png
 Block Diagram for Temperature Control 
 
 Alla Pid-objekt har Inverse satt till TRUE. Lösningen bör kompletteras med 
@@ -2934,7 +2934,7 @@ Figuren nedan (Addition of a Reagent) visar tillsats av en reagens.
 Blandningsförhållandet ska hållas konstant oberoende av FT2-flödet. FT är 
 flödestransmittern och FIC flödesregulatorn. 
 
-@image orm_en1-160.gif 
+@image orm_en1-160.png 
 Addition of a Reagent 
 
 En realisering visas i figuren nedan (Ratio Control). Regleringen kan ske i 
@@ -6051,7 +6051,7 @@ Referens till objektet i planthierarkin.
 
  @b Plc kod
  För PLC programmering används funktionsobjektet BaseMValveFo.
- @image orm_basemvalvefo_fo.gif
+ @image orm_basemvalvefo_fo.png
  
  Skapa ett funktionsobjekt i PLC editorn och koppla till objektet i planthierarkin.
  
@@ -6122,7 +6122,7 @@ Referens till objektet i planthierarkin.
  @Author cs/je
  @summary PLC funktionsobjekt för BaseMValve
  Funktionsobjekt för BaseMValve 
- @image orm_basemvalvefo_fo.gif
+ @image orm_basemvalvefo_fo.png
  
  Skapa ett funktionsobjekt i PLC editorn och koppla till objektet baseMValve
  i planthierarkin.
@@ -6226,7 +6226,7 @@ Referens till objektet i planthierarkin.
 
  @b Plc kod
  För PLC programmering används funktionsobjektet BaseMValveFo.
- @image orm_basemvalvefo_fo.gif
+ @image orm_basemvalvefo_fo.png
  
  Skapa ett funktionsobjekt i PLC editorn och koppla till objektet i planthierarkin.
  
@@ -6303,7 +6303,7 @@ Referens till objektet i planthierarkin.
 
  @b Plc kod
  För PLC programmering används funktionsobjektet BaseMValveFo.
- @image orm_basemvalvefo_fo.gif
+ @image orm_basemvalvefo_fo.png
  
  Skapa ett funktionsobjekt i PLC editorn och koppla till objektet i planthierarkin.
  
@@ -6377,7 +6377,7 @@ Referens till objektet i planthierarkin.
  
  @b Plc kod
  För PLC programmering används funktionsobjektet BaseDirValve.
- @image orm_basedirvalvefo_fo.gif
+ @image orm_basedirvalvefo_fo.png
  
  Skapa ett funktionsobjekt i PLC editorn och koppla till objektet i planthierarkin.
 
@@ -6426,7 +6426,7 @@ Referens till objektet i planthierarkin.
  @Author cs/je
  @summary PLC funktionsobjekt för BaseDirValve
  Funktionsobjekt för BaseDirValve 
- @image orm_basedirvalvefo_fo.gif
+ @image orm_basedirvalvefo_fo.png
  
  Skapa ett funktionsobjekt i PLC editorn och koppla till objektet baseDirValve
  i planthierarkin.
@@ -6526,7 +6526,7 @@ Referens till objektet i planthierarkin.
 
  @b Plc kod
  För PLC programmering används funktionsobjektet BaseManValveFo.
- @image orm_basemanvalvefo_fo.gif
+ @image orm_basemanvalvefo_fo.png
  
  Skapa ett funktionsobjekt i PLC editorn och koppla till objektet i planthierarkin.
  
@@ -6579,7 +6579,7 @@ Referens till objektet i planthierarkin.
  @Author cs/je
  @summary PLC funktionsobjekt för BaseManValve
  Funktionsobjekt för BaseManValve 
- @image orm_basemanvalvefo_fo.gif
+ @image orm_basemanvalvefo_fo.png
  
  Skapa ett funktionsobjekt i PLC editorn och koppla till objektet BaseManValve
  i planthierarkin.
