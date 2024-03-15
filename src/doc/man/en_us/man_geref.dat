@@ -1631,8 +1631,8 @@ unlocked. This can be achieved by using subgraphs with two pages or more.
 
 One example of an subgraph with several pages is Smiley.
 
-Subgraphs with several pages are handled by the dynamic types DigShift, AnalogShift and
-Animation.
+Subgraphs with several pages are handled by the dynamic types DigShift, DigLowShift, 
+AnalogShift and Animation.
 
 <image> geg_fig116.png
 <b>Fig Example of an subgraph with several pages
@@ -3850,6 +3850,7 @@ Value     <t>Arbitrary  <t>Write the value of an attribute. <link>GeDynValue
 Rotate    <t>Float32 Int32 <t>Rotate the component. <link>GeDynRotate
 Move      <t>Float32 Int32 <t>Move and scale the component is x and y direction. <link>GeDynMove
 DigShift  <t>Boolean    <t>Shift between two pages in the subgraph (first and last page). <link>GeDynDigShift
+DigLowShift  <t>Boolean    <t>Shift between two pages in the subgraph (first and last page). <link>GeDynDigLowShift
 DigFourShift <t>Boolean <t>Shift between four pages in the subgraph. <link>GeDynDigFourShift
 AnalogShift <t>Float32 Int32 <t>Shift between different pages in the subgraph. The value <link>GeDynAnalogShift
           <t>           <t>of the signal determines the page number.
@@ -4375,6 +4376,21 @@ drawn with the first page, if the value is 1, it is drawn with the last page.
 DigShift.Attribute <t><t>Signal in the database or type Boolean that shifts 
                    <t><t>page. When the value is 0, the first page 
                    <t><t>is displayed, when value is 1 the last page.
+</topic>
+
+<topic>GeDynDigLowShift <style>function
+DigLowShift
+
+Shift between two pages in the subgraph. The subgraph has to contain at least two pages.
+Equal to DigShift but will show last page on low signal instead of high.
+
+The object is connected to a digital signal in the database. If the value is 0, the object is 
+drawn with the last page, if the value is 1, it is drawn with the first page.
+
+<b>Attribute <t><t>Description
+DigLowShift.Attribute <t><t>Signal in the database or type Boolean that shifts 
+                   <t><t>page. When the value is 0, the last page 
+                   <t><t>is displayed, when value is 1 the first page.
 </topic>
 
 <topic>GeDynDigFourShift <style>function
@@ -5858,7 +5874,7 @@ in all graphs of the project.
 <c>!
 <c>! Replace a subgraph
 <c>!
-<c>function int process( string graph)
+<c>function int process(string graph)
 <c>  int sts;
 <c>  printf( "Processing graph %s\n", graph);
 <c>  open 'graph'
@@ -6950,8 +6966,9 @@ CreateBarArc <t><t>Create a BarArc object.<link>CreateBarArc()
 CreateDsTrend <t><t>Create a DsTrend object.<link>CreateDsTrend()
 CreateDsTrendCurve <t><t>Create a DsTrendCurve object.<link>CreateDsTrendCurve()
 CreateFastCurve <t><t>Create a FastCurve object.<link>CreateFastCurve()
-CreateLine <t><t>Create a Line object.<link>CreateLine()
 CreateImage <t><t>Create an Image object.<link>CreateImage()
+CreateLayer <t><t>Create a Layer.<link>CreateLayer()
+CreateLine <t><t>Create a Line object.<link>CreateLine()
 CreateObject <t><t>Create a subgraph object.<link>CreateObject()
 CreatePie <t><t>Create a Pie object.<link>CreatePie()
 CreatePolyLine <t><t>Create a PolyLine object.<link>CreatePolyLine()
@@ -6959,15 +6976,20 @@ CreateRectangle <t><t>Create a Rectangle object.<link>CreateRectangle()
 CreateRecRounded <t><t>Create a rounded rectangle object.<link>CreateRectRounded()
 CreateSevHist <t><t>Create a SevHist object.<link>CreateSevHist()
 CreateText <t><t>Create a Text object.<link>CreateText()
+CreateToolbar <t><t>Create a MethodsToolbar object.<link>CreateToolbar()
 CreateTrend <t><t>Create a Trend object.<link>CreateTrend()
+CreateWindow <t><t>Create a Window object.<link>CreateWindow()
 CreateXYCurve <t><t>Create an XYCurve object.<link>CreateXYCurve()
 DashInsertObject <t><t>Insert an object into a DashCell.<link>DashInsertObject()
 DeleteObject <t><t>Delete an object.<link>DeleteObject()
 GetCurrentObject <t><t>Returns the identity of the last created object.<link>GetCurrentObject()
 GetFirstObject <t><t>Get the first object. <link>GetFirstObject()
 GetGraphAttribute <t><t>Get an attribute value of a graph. <link>GetGraphAttribute()
+GetGraphConfig <t><t>Get value of GraphConfiguration attribute. <link>GetGraphConfig()
 GetGraphName <t><t>Get name of current graph. <link>GetGraphName()
+GetInstanceObject <t><t>Get the instance object of the graph. <link>GetInstanceObject()
 GetNextObject <t><t>Get the next object. <link>GetNextObject()
+GetModified <t><t>Check if graph is modified. <link>GetModified()
 GetObjectAttribute <t><t>Get an attribute value of an object. <link>GetObjectAttribute()
 GetObjectBorder <t><t>Get object border. <link>GetObjectBorder()
 GetObjectBorderColor <t><t>Get the border color of an object. <link>GetObjectBorderColor()
@@ -6984,12 +7006,23 @@ GetObjectTransparency <t><t>Get object transparency. <link>GetObjectTransparency
 GetObjectType <t><t>Get object type. <link>GetObjectType()
 GetRgbColor <t><t>Get rgb values of a color. <link>GetRgbColor()
 GetTextExtent <t><t>Calculate the extent of a text. <link>GetTextExtent()
+GetUI_Env <t><t>Get UI environment. <link>GetUI_Env()
+GetWindowSize <t><t>Get size in pixels of the current window. <link>GetWindowSize()
+GetWindowDimension <t><t>Get size in Ge units of the current window. <link>GetWindowDimension()
 GroupGetFirstObject <t><t>Get first object in a group. <link>GroupGetFirstObject()
 GroupGetNextObject <t><t>Get next object in a group. <link>GroupGetNextObject()
 GroupSelected <t><t>Group the selected objects. <link>GroupSelected()
+LayerGetFirstObject <t><t>Get first object in a layer. <link>LayerGetFirstObject()
+LayerGetNextObject <t><t>Get next object in a layer. <link>LayerGetNextObject()
+LayerResetActiveAll <t><t>Set all layers inactive. <link>LayerResetActiveAll()
+LayerSetActive <t><t>Set a layer active or inactive. <link>LayerSetActive()
+Layout <t><t>Calculate a layout. <link>Layout()
 MeasureObject <t><t>Get object extent. <link>MeasureObject()
+MergeVisibleLayers <t><t>Merge visible layers. <link>MergeVisibleLayers()
+MergeAllLayers <t><t>Merge all layers. <link>MergeAllLayers()
 MoveAbsObject <t><t>Move an object to a position. <link>MoveAbsObject()
 MoveObject <t><t>Move an object a distance. <link>MoveObject()
+MoveSelectToLayer <t><t>Move selected objects to active layer. <link>MoveSelectToLayer()
 OpenGraph <t><t>Open a graph. <link>OpenGraph()
 PolyLineAdd <t><t>Add a segment to a PolyLine.<link>PolyLineAdd()
 Reload <t><t>Read current graph from file. <link>Reload()
@@ -7008,6 +7041,7 @@ SetIntern <t><t>Set subgraph intern. <link>SetIntern()
 SetInternAll <t><t>Set all subgraph intern. <link>SetInternAll()
 SetGraphAttribute <t><t>Set an attribute value of a graph. <link>SetGraphAttribute()
 SetGraphName <t><t>Set name of current graph. <link>SetGraphName()
+SetGraphOptions <t><t>Set options for the current graph. <link>SetGraphOptions()
 SetObjectAttribute <t><t>Set an attribute value of an object. <link>SetObjectAttribute()
 SetObjectBackgroundColor <t><t>Set background color of an object. <link>SetObjectBackgroundColor()
 SetObjectBorder <t><t>Set object border. <link>SetObjectBorder()
@@ -7023,6 +7057,7 @@ SetRgbColor <t><t>Set rgb values of a color. <link>SetRgbColor()
 SetSelectTextBold <t><t>Set text bold on selected objects. <link>SetSelectTextBold()
 SetSelectTextFont <t><t>Set text font on selected objects. <link>SetSelectTextFont()
 SetSelectTextSize <t><t>Set text size on selected objects. <link>SetSelectTextSize()
+TranslateObjectName <t><t>Translate Ge syntax name to database name. <link>TranslateObjectName()
 
 <h2>Input and output
 <b>Function <t>Description
@@ -7828,6 +7863,108 @@ Returns the id of the created object.
 <c> SetObjectAttribute(id, "XY_Curve.UpdateAttr", "H1-Update.ActualValue##Boolean");
 </topic>
 
+<topic>CreateWindow() <style>function
+CreateWindow()
+int CreateWindow(float x1, float y1 [,float x2, float y2, int colortheme])
+
+<h2>Description
+Create a Window object.
+
+<h2>Argument
+
+float  <t>x1    <t>X coordinate of upper left corner.
+float  <t>y1    <t>Y coordinate of upper left corner.
+float  <t>x2    <t>X coordinate of lower right corner if the object 
+                <t><t>should be scaled. Optional.
+float  <t>y2    <t>Y coordinate of lower right corner if the object 
+                <t><t>should be scaled. Optional.
+int    <t>colortheme <t>1 if colortheme colors should be used, else 0. Optional.
+
+Returns the id of the created object.
+
+<b>Example
+ 
+<c> int id;
+<c>
+<c> id = CreateWindow(2.0, 2.0, 7.0, 5.0, 1);
+<c> SetObjectAttribute(id, "Window.FileName", "subwindow.pwg");
+</topic>
+
+<topic>CreateToolbar() <style>function
+CreateToolbar()
+int CreateToolbar(string name, float x1, float y1 [,float x2, float y2])
+
+<h2>Description
+Create a MethodToolbar object.
+
+<h2>Argument
+
+string <t>name  <t>Object name.
+float  <t>x1    <t>X coordinate of upper left corner.
+float  <t>y1    <t>Y coordinate of upper left corner.
+float  <t>x2    <t>X coordinate of lower right corner if the object 
+                <t><t>should be scaled. Optional.
+float  <t>y2    <t>Y coordinate of lower right corner if the object 
+                <t><t>should be scaled. Optional.
+
+Returns the id of the created object.
+
+<b>Example
+ 
+<c> int id;
+<c>
+<c> id = CreateToolbar("T1", 2.0, 2.0, 7.0, 5.0);
+</topic>
+
+<topic>CreateTable() <style>function
+CreateTable()
+int CreateTable(string name, float x1, float y1 [,float x2, float y2, int colortheme])
+
+<h2>Description
+Create a Table object.
+
+<h2>Argument
+
+string <t>name  <t>Object name.
+float  <t>x1    <t>X coordinate of upper left corner.
+float  <t>y1    <t>Y coordinate of upper left corner.
+float  <t>x2    <t>X coordinate of lower right corner if the object 
+                <t><t>should be scaled. Optional.
+float  <t>y2    <t>Y coordinate of lower right corner if the object 
+                <t><t>should be scaled. Optional.
+int    <t>colortheme <t>1 if colortheme colors should be used, else 0. Optional.
+
+Returns the id of the created object.
+
+<b>Example
+ 
+<c> int id;
+<c>
+<c> id = CreateTable("T1", 2.0, 2.0, 7.0, 5.0, 1);
+<c> SetObjectAttribute(id, "Table.Columns", 2);
+<c> SetObjectAttribute(id, "Table.Rows", 20);
+<c> SetObjectAttribute(id, "Column1.Attribute", "H1-Array1.Value##Float32#100");
+<c> SetObjectAttribute(id, "Column1.Format", "%6.2f");
+<c> SetObjectAttribute(id, "Column2.Attribute", "H1-Array2.Value##Float32#100");
+<c> SetObjectAttribute(id, "Column2.Format", "%6.2f");
+</topic>
+
+<topic>CreateLayer() <style>function
+CreateLayer()
+int CreateLayer()
+
+<h2>Description
+Create a Layer.
+
+Returns the id of the created object.
+
+<b>Example
+ 
+<c> int id;
+<c>
+<c> id = CreateLayer();
+</topic>
+
 <topic>DashInsertObject() <style>function
 DashInsertObject()
 void DashInsertObject(int dashoid, int oid)
@@ -7849,7 +7986,7 @@ int <t>oid     <t>Object identity.
 
 <topic>DeleteObject() <style>function
 DeleteObject()
-void DeleteObject( int oid)
+void DeleteObject(int oid)
 
 <h2>Description
 Delete an object.
@@ -7861,7 +7998,7 @@ int <t>oid     <t>Object identity.
 <b>Example
 <c> int oid;
  
-<c> DeleteObject( oid);
+<c> DeleteObject(oid);
 </topic>
 
 <topic>GetCurrentObject() <style>function
@@ -7894,13 +8031,13 @@ Returns an integer with the object identity.
 <c> oid = GetFirstObject();
 <c> while ( oid != 0)
 <c>   ...
-<c>   oid = GetNextObject( oid)
+<c>   oid = GetNextObject(oid)
 <c> endwhile
 </topic>
 
 <topic>GetGraphAttribute() <style>function
 GetGraphAttribute()
-int GetGraphAttribute( string attribute, (arbitrary type) value)
+int GetGraphAttribute(string attribute, (arbitrary type) value)
 
 <h2>Description
 Returns the value of an attribute of the current graph. The attribute name is the same
@@ -7923,6 +8060,25 @@ Returns the status of the operation.
 <c> endif
 </topic>
 
+<topic>GetGraphConfig() <style>function
+GetGraphConfig()
+int GetGraphConfig()
+
+<h2>Description
+Fetches the value of the GraphConfiguration attribute of
+the current instance object.
+
+Only implemented in Xtt environment. Returns 0 in other
+environments.
+
+Returns the configuration.
+
+<b>Example
+<c> int conf;
+ 
+<c> conf = GetGraphConfig();
+</topic>
+
 <topic>GetGraphName() <style>function
 GetGraphName()
 string GetGraphName()
@@ -7938,9 +8094,37 @@ Returns a string with the name.
 <c> name = GetGraphName();
 </topic>
 
+<topic>GetInstanceObject() <style>function
+GetGraphName()
+string GetInstanceObject()
+
+<h2>Description
+Fetches the instance object for an object graph.
+
+Returns a string with the name.
+
+<b>Example
+<c> string name;
+ 
+<c> name = GetInstanceObject();
+</topic>
+
+<topic>GetNextObject() <style>function
+GetModified()
+int GetModified()
+
+<h2>Description
+Returns 1 if the graph is modified, else 0.
+
+<b>Example
+<c> int mod;
+ 
+<c> mod = GetModified();
+</topic>
+
 <topic>GetNextObject() <style>function
 GetNextObject()
-int GetNextObject( int oid)
+int GetNextObject(int oid)
 
 <h2>Description
 Fetches the identity for the next object in a graph. The first object
@@ -7964,7 +8148,7 @@ Returns an integer with the object identity.
 
 <topic>GetObjectAttribute() <style>function
 GetObjectAttribute()
-int GetObjectAttribute( int oid, string attribute, (arbitrary type) value)
+int GetObjectAttribute(int oid, string attribute, (arbitrary type) value)
 
 <h2>Description
 Returns the value of an attribute of en object. The attribute name is the same
@@ -7991,7 +8175,7 @@ Returns the status of the operation.
 
 <topic>GetObjectBorder() <style>function
 GetObjectBorder()
-int GetObjectBorder( int oid)
+int GetObjectBorder(int oid)
 
 <h2>Description
 Get the border property of an object.
@@ -8011,7 +8195,7 @@ int <t>oid     <t>Object identity.
 
 <topic>GetObjectBorderColor() <style>function
 GetObjectBorderColor()
-int GetObjectBorderColor( int oid)
+int GetObjectBorderColor(int oid)
 
 <h2>Description
 Get the border color of an object.
@@ -8034,7 +8218,7 @@ Returns the border color.
 
 <topic>GetObjectClass() <style>function
 GetObjectClass()
-string GetObjectClass( int oid)
+string GetObjectClass(int oid)
 
 <h2>Description
 Get the name of the subgraph of an object.
@@ -8057,7 +8241,7 @@ Returns the name.
 
 <topic>GetObjectDynType() <style>function
 GetObjectDynType()
-int GetObjectDynType( int oid, int dyntype1, int dyntype2, int actiontype1, int actiontype2)
+int GetObjectDynType(int oid, int dyntype1, int dyntype2, int actiontype1, int actiontype2)
 
 <h2>Description
 Get the dynamic type and action type of an object.
@@ -8090,7 +8274,7 @@ See Predefined variables for dyntype and actiontype values. <link> gecmd_variabl
 
 <topic>GetObjectFill() <style>function
 GetObjectFill()
-int GetObjectFill( int oid)
+int GetObjectFill(int oid)
 
 <h2>Description
 Get the fill property of an object.
@@ -8110,7 +8294,7 @@ Returns the fill value, 0 or 1.
 
 <topic>GetObjectFillColor() <style>function
 GetObjectFillColor()
-int GetObjectFillColor( int oid)
+int GetObjectFillColor(int oid)
 
 <h2>Description
 Get the fill color of an object.
@@ -8133,7 +8317,7 @@ Returns the fill color.
 
 <topic>GetObjectGradient() <style>function
 GetObjectGradient()
-int GetObjectGradient( int oid)
+int GetObjectGradient(int oid)
 
 <h2>Description
 Get the gradient of an object.
@@ -8154,7 +8338,7 @@ means no gradient.
 
 <topic>GetObjectName() <style>function
 GetObjectName()
-string GetObjectName( int oid)
+string GetObjectName(int oid)
 
 <h2>Description
 Get the object name.
@@ -8174,7 +8358,7 @@ Returns the name.
 
 <topic>GetObjectShadow() <style>function
 GetObjectShadow()
-int GetObjectShadow( int oid)
+int GetObjectShadow(int oid)
 
 <h2>Description
 Get the shadow property of an object.
@@ -8194,7 +8378,7 @@ Returns the shadow, 0 or 1.
 
 <topic>GetObjectText() <style>function
 GetObjectText()
-string GetObjectText( int oid)
+string GetObjectText(int oid)
 
 <h2>Description
 Fetches the text of a text object.
@@ -8214,7 +8398,7 @@ Returns the text.
 
 <topic>GetObjectTextColor() <style>function
 GetObjectTextColor()
-int GetObjectTextColor( int oid)
+int GetObjectTextColor(int oid)
 
 <h2>Description
 Get the text color of an object.
@@ -8237,7 +8421,7 @@ Returns the text color.
 
 <topic>GetObjectTransparency() <style>function
 GetObjectTransparency()
-float GetObjectTransparency( int oid)
+float GetObjectTransparency(int oid)
 
 <h2>Description
 Get the level of transparency of an object.
@@ -8257,7 +8441,7 @@ Returns the tranparency. A float value in the range 0.0 - 1.0.
 
 <topic>GetObjectType() <style>function
 GetObjectType()
-int GetObjectType( int oid)
+int GetObjectType(int oid)
 
 <h2>Description
 Get the type of an object.
@@ -8281,7 +8465,7 @@ See Predefined variables for object type values.<link> gecmd_variables,objecttyp
 
 <topic>GetRgbColor() <style>function
 void GetRgbColor()
-void GetRgbColor( int color, float red, float green, float blue)
+void GetRgbColor(int color, float red, float green, float blue)
 
 <h2>Description
 Fetches rgb values for a color. The color is stated with color index of with color
@@ -8317,7 +8501,7 @@ on every fourth index, ie 310, 314, 318, ... 666.
 
 <topic>GetTextExtent() <style>function
 GetTextExtent()
-int GetTextExtent( string text, int textsize, int font, int bold, float width [, 
+int GetTextExtent(string text, int textsize, int font, int bold, float width [, 
 float height, float descent])
 
 <h2>Description
@@ -8342,9 +8526,64 @@ float  <t>descent  <t>The descent is returned in this variable.
 <c> GetTextExtent("This is a text", 3, eFont_LucidaSans, 1, width);
 </topic>
 
+<topic>GetUI_Env() <style>function
+GetUI_Env()
+int GetUI_Env()
+
+<h2>Description
+Get the current environment. The environment can be eUI_Env_Web, 
+eUI_Env_Xtt or eUI_Env_Development.
+
+returns the environment.
+
+<b>Example
+<c> int env
+ 
+<c> env = GetUI_Env();
+<c> if (env == eUI_Env_Web)
+<c> ...
+
+</topic>
+
+<topic>GetWindowSize() <style>function
+GetWindowSize()
+string GetWindowSize(float width, float height)
+
+<h2>Description
+Fetches the size in pixel of the current window.
+
+<h2>Attributes
+float  <t>width    <t>The window width is returned in this variable.
+float  <t>height   <t>The window height is returned in this variable.
+
+<b>Example
+<c> float width;
+<c> float height;
+ 
+<c> name = GetWidowSize(width, height);
+</topic>
+
+<topic>GetWindowDimension() <style>function
+GetWindowDimension()
+string GetWindowDimension(float width, float height)
+
+<h2>Description
+Fetches the size of the current window.
+
+<h2>Attributes
+float  <t>width    <t>The window width is returned in this variable.
+float  <t>height   <t>The window height is returned in this variable.
+
+<b>Example
+<c> float width;
+<c> float height;
+ 
+<c> name = GetWidowDimension(width, height);
+</topic>
+
 <topic>GroupGetFirstObject() <style>function
 GroupGetFirstObject()
-int GroupGetFirstObject( int group)
+int GroupGetFirstObject(int group)
 
 <h2>Description
 Get the first object in a group. Other objects can be fetched with 
@@ -8376,7 +8615,7 @@ Returns in integer with the object identity.
 
 <topic>GroupGetNextObject() <style>function
 GroupGetNextObject()
-int GroupGetNextObject( int group, int oid)
+int GroupGetNextObject(int group, int oid)
 
 <h2>Description
 Get the next object in a group, The first object is fetched with 
@@ -8411,9 +8650,112 @@ Returns an integer with the group identity.
 <c> gid = GroupSelected();
 </topic>
 
+<topic>LayerGetFirstObject() <style>function
+LayerGetFirstObject()
+int LayerGetFirstObject(int lid)
+
+<h2>Description
+
+Get the first object in a layer.
+
+<h2>Argument
+
+int <t>lid  <t>Layer identity.
+
+Returns the id of the first object.
+
+<b>Example
+
+<c> int lid;
+<c> int oid;
+ 
+<c> oid = LayerGetFirstObject(lid);
+<c> while (oid)
+<c>   ...
+<c>   oid = LayerGetNextObject(lid, oid);
+<c> endwhile
+</topic>
+
+<topic>LayerGetNextdObject() <style>function
+LayerGetNextdObject()
+int LayerGetNextObject(int lid, int oid)
+
+<h2>Description
+
+Get the next object in a layer.
+
+<h2>Argument
+
+int <t>lid  <t>Layer identity.
+int <t>oid  <t>Object identity.
+
+Returns the id of the next object.
+</topic>
+
+<topic>LayerSetActive() <style>function
+LayerSetActive()
+void LayerSetActive(int id, int active)
+
+<h2>Description
+
+Set a layer active or inactive.
+
+<h2>Argument
+
+int <t>oid     <t>Layer identity.
+int <t>active  <t>1 will set layer active, 0 inactive.
+
+<b>Example
+
+<c> int id;
+ 
+<c> LayerSetActive(id, 1);
+</topic>
+
+<topic>LayerResetActiveAll() <style>function
+LayerResetActive()
+void LayerResetActive()
+
+<h2>Description
+
+Set all layers inactive.
+
+</topic>
+
+<topic>Layout() <style>function
+Layout()
+void Layout(float width, float height, int prio[], int top[], 
+fint down[], int left[], int right[], float pref_width, fload pref_height,
+float fix_width, float fix_height, float calc_x, float, calc_y, 
+float calc_width, float calc_height)
+
+<h2>Description
+Calculates the layout for the modules of the current window.
+
+<h2>Argument
+
+float  <t>width <t>Window width
+float  <t>height <t>Window height
+int  <t>prio <t>Prio array
+int  <t>top_neighbour <t>Top neighbour array
+int  <t>down_neighbour <t>Down neighbour array
+int  <t>left <t>Left neighbour array
+int  <t>right <t>Right neighbour array
+float  <t>pref_width <t>Preferred width
+float  <t>pref_height <t>Preferred height
+int  <t>fix_width <t>Fix width
+int  <t>fix_height <t>Fix height
+float  <t>calc_x <t>Calculated x coordinate
+float  <t>calc_y <t>Calculated y coordinate
+float  <t>calc_width <t>Calculated width
+float  <t>calc_heigh <t>Calculated height
+
+</topic>
+
+
 <topic>MeasureObject() <style>function
 MeasureObject()
-void MeasureObject( int oid, float ll_x, float ll_y, float ur_x, float ur_y)
+void MeasureObject(int oid, float ll_x, float ll_y, float ur_x, float ur_y)
 
 <h2>Description
 Get the extention of an object.
@@ -8437,9 +8779,29 @@ float <t>ur_y  <t>Returned y coordinate for upper right.
 <c> MeasureObject( oid, ll_x, ll_y, ur_x, ur_y);
 </topic>
 
+<topic>MergeAllLayers() <style>function
+MergeAllLayers()
+void MergeAllLayers()
+
+<h2>Description
+
+Merge all layers.
+
+</topic>
+
+<topic>MergeVisibleLayers() <style>function
+MergeVisibleLayers()
+void MergeVisibleLayers()
+
+<h2>Description
+
+Merge visible layers.
+
+</topic>
+
 <topic>MoveAbsObject() <style>function
 MoveAbsObject()
-void MoveAbsObject( int oid, float x, float y)
+void MoveAbsObject(int oid, float x, float y)
 
 <h2>Description
 Move an object to coordinates x and y.
@@ -8457,7 +8819,7 @@ float <t>y <t>y coordinate.
 
 <topic>MoveObject() <style>function
 MoveObject()
-void MoveObject( int oid, float dx, float dy)
+void MoveObject(int oid, float dx, float dy)
 
 <h2>Description
 
@@ -8472,6 +8834,15 @@ float <t>dy <t>Distance to move in y direction.
 <b>Example
 
 <c> MoveObject( oid, 0.5, 0.5);
+</topic>
+
+<topic>MoveSelectToLayer() <style>function
+MoveSelectToLayer()
+void MoveSelectToLayer()
+
+<h2>Description
+
+Move the selected objects to the active layer.
 </topic>
 
 <topic>OpenGraph() <style>function
@@ -8573,7 +8944,7 @@ string <t>name     <t>Name of graph. Optional.
 
 <topic>ScaleObject() <style>function
 ScaleObject()
-void ScaleObject( int oid, float scalex, float scaley)
+void ScaleObject(int oid, float scalex, float scaley)
 
 <h2>Description
 
@@ -8592,7 +8963,7 @@ float <t>scaley <t>Scale factor in y direction.
 
 <topic>SelectAdd() <style>function
 SelectAdd()
-int SelectAdd( int objectid)
+int SelectAdd(int objectid)
 
 <h2>Description
 
@@ -8656,7 +9027,7 @@ int <t>colortheme     <t>Color theme index. Optional.
 
 <topic>SetCurrentObject() <style>function
 SetCurrentObject()
-void SetCurrentObject( int oid)
+void SetCurrentObject(int oid)
 
 <h2>Description
 
@@ -8671,9 +9042,22 @@ int <t>oid <t>Object identity.
 <c> SetCurrentObject( oid);
 </topic>
 
+<topic>SetGraphOptions() <style>function
+SetGraphOptions()
+int SetGraphOptions(int options)
+
+<h2>Description
+
+Set graph options. 
+
+<h2>Argument
+
+int    <t>options       <t>Graph options.
+</topic>
+
 <topic>SetDraw() <style>function
 SetDraw()
-int SetDraw( int on)
+int SetDraw(int on)
 
 <h2>Description
 
@@ -8703,7 +9087,7 @@ int    <t>on       <t>If 0, drawing is turned off. If 1, drawing is turned on.
 
 <topic>SetExtern() <style>function
 SetExtern()
-int SetExtern( string name)
+int SetExtern(string name)
 
 <h2>Description
 
@@ -8733,7 +9117,7 @@ Set all subgraphs extern.
 
 <topic>SetIntern() <style>function
 SetIntern()
-int SetIntern( string name)
+int SetIntern(string name)
 
 <h2>Description
 
@@ -8763,7 +9147,7 @@ Set all subgraphs intern.
 
 <topic>SetGraphAttribute() <style>function
 SetGraphAttribute()
-int SetGraphAttribute( string attribute, (arbitrary type) value)
+int SetGraphAttribute(string attribute, (arbitrary type) value)
 
 <h2>Description
 Set the value of an attribute in the current graph. The attribute name is the
@@ -8804,7 +9188,7 @@ string    <t>name       <t>Name of the graph.
 
 <topic>SetObjectAttribute() <style>function
 SetObjectAttribute()
-int SetObjectAttribute( int oid, string attribute, (arbitrary type) value)
+int SetObjectAttribute(int oid, string attribute, (arbitrary type) value)
 
 <h2>Description
 Set the value of an attribute in an object. The attribute name is the
@@ -8843,7 +9227,7 @@ Script attribute with several lines and strings with quotes.
 
 <topic>SetObjectBackgroundColor() <style>function
 SetObjectBackgroundColor()
-void SetObjectBackgroundColor( int oid, int color)
+void SetObjectBackgroundColor(int oid, int color)
 
 <h2>Description
 Set the background color of an object.
@@ -8860,7 +9244,7 @@ int <t>color   <t>Background color.
 
 <topic>SetObjectBorder() <style>function
 SetObjectBorder()
-void SetObjectBorder( int oid, int border)
+void SetObjectBorder(int oid, int border)
 
 <h2>Description
 Set the border property of an object.
@@ -8877,7 +9261,7 @@ int <t>border  <t>border property. 1 will display the border, 0 will not.
 
 <topic>SetObjectBorderColor() <style>function
 SetObjectBorderColor()
-void SetObjectBorderColor( int oid, int color)
+void SetObjectBorderColor(int oid, int color)
 
 <h2>Description
 Set the border color of an object.
@@ -8894,7 +9278,7 @@ int <t>color   <t>Border color.
 
 <topic>SetObjectClass() <style>function
 SetObjectClass()
-void SetObjectClass( int oid, string subgraph)
+void SetObjectClass(int oid, string subgraph)
 
 <h2>Description
 Replace the subgraph of an object.
@@ -8917,7 +9301,7 @@ string <t>subgraph    <t>The name of the new subgraph.
 
 <topic>SetObjectFill() <style>function
 SetObjectFill()
-void SetObjectFill( int oid, int fill)
+void SetObjectFill(int oid, int fill)
 
 <h2>Description
 Set the fill property of an object.
@@ -8934,7 +9318,7 @@ int <t>fill    <t>Fill property. 1 will draw with fill, 0 will not.
 
 <topic>SetObjectFillColor() <style>function
 SetObjectFillColor()
-void SetObjectFillColor( int oid, int color)
+void SetObjectFillColor(int oid, int color)
 
 <h2>Description
 Set the fill color of an object.
@@ -8951,7 +9335,7 @@ int <t>color   <t>Fill color.
 
 <topic>SetObjectGradient() <style>function
 SetObjectGradient()
-void SetObjectGradient( int oid, int gradient)
+void SetObjectGradient(int oid, int gradient)
 
 <h2>Description
 Set the gradient property of an object.
@@ -8968,7 +9352,7 @@ int <t>gradient <t>Gradient property. 0 means no gradient.
 
 <topic>SetObjectShadow() <style>function
 SetObjectShadow()
-void SetObjectShadow( int oid, int shadow)
+void SetObjectShadow(int oid, int shadow)
 
 <h2>Description
 Set the shadow property of an object.
@@ -8985,7 +9369,7 @@ int <t>shadow  <t>Shadow property, 1 will draw the object with shadow, 0 will no
 
 <topic>SetObjectTextColor() <style>function
 SetObjectTextColor()
-void SetObjectTextColor( int oid, int color)
+void SetObjectTextColor(int oid, int color)
 
 <h2>Description
 Set the text color of an object.
@@ -9002,7 +9386,7 @@ int <t>color   <t>Text color.
 
 <topic>SetObjectTransparency() <style>function
 SetObjectTransparency()
-void SetObjectTransparency( int oid, float transparency)
+void SetObjectTransparency(int oid, float transparency)
 
 <h2>Description
 Set the level of transparency of an object.
@@ -9014,12 +9398,12 @@ float <t>transparency <t>Level of transparency. A value in the range 0.0 - 1.0.
 
 <b>Example
  
-<c> SetObjectTransparency( oid, 0.5);
+<c> SetObjectTransparency(oid, 0.5);
 </topic>
 
 <topic>SetRgbColor() <style>function
 void SetRgbColor()
-void SetRgbColor( int color, float red, float green, float blue)
+void SetRgbColor(int color, float red, float green, float blue)
 
 <h2>Description
 Set rgb values for a color in the custom palette. The color is stated with color index of 
@@ -9084,6 +9468,28 @@ int <t>font     <t>Text font.
 
 <c> SelectAdd(id);
 <c> SetSelectTextFont(eFont_LucidaSans);
+
+</topic>
+
+<topic>TranslateObjectName() <style>function
+void TranslateObjectName()
+void TranslateObjectName(string ing, string out)
+
+<h2>Description
+Translate an object or attribute name with Ge connection syntax
+to database name.
+
+<h2>Argument
+
+string <t>in     <t>Name with Ge connection syntax.
+string <t>out    <t>Database name.
+
+<b>Example
+
+<c> string in;
+<c> string out;
+
+<c> TranslateObjectName(in, out);
 
 </topic>
 

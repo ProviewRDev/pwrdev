@@ -154,6 +154,7 @@ typedef enum {
   ge_eDynPrio_Move,
   ge_eDynPrio_AnalogShift,
   ge_eDynPrio_DigShift,
+  ge_eDynPrio_DigLowShift,
   ge_eDynPrio_DigFourShift,
   ge_eDynPrio_Animation,
   ge_eDynPrio_Bar,
@@ -263,7 +264,8 @@ typedef enum {
   ge_mDynType2_SevHist = 1 << 12,
   ge_mDynType2_DigTransparency = 1 << 13,
   ge_mDynType2_AnalogTransparency = 1 << 14,
-  ge_mDynType2_UnitConvert = 1 << 15
+  ge_mDynType2_UnitConvert = 1 << 15,
+  ge_mDynType2_DigLowShift = 1 << 16
 } ge_mDynType2;
 
 //! Action types.
@@ -416,6 +418,7 @@ typedef enum {
   ge_eSave_AnalogTransparency = 78,
   ge_eSave_UnitConvert = 79,
   ge_eSave_ContextMenu = 80,
+  ge_eSave_DigLowShift = 81,
   ge_eSave_End = 99,
   ge_eSave_Dyn_dyn_type1 = 100,
   ge_eSave_Dyn_action_type1 = 101,
@@ -904,7 +907,8 @@ typedef enum {
   ge_eSave_ContextMenu_item_action7 = 8016,
   ge_eSave_ContextMenu_item_action8 = 8017,
   ge_eSave_ContextMenu_item_action9 = 8018,
-  ge_eSave_ContextMenu_item_action10 = 8019
+  ge_eSave_ContextMenu_item_action10 = 8019,
+  ge_eSave_DigLowShift_attribute = 8100,
 } ge_eSave;
 
 class GeDynElem;
@@ -1850,6 +1854,35 @@ public:
   int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int export_java(
       grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
+};
+
+//! Shift between two pages in the subgraph (first and last).
+class GeDigLowShift : public GeDynElem {
+public:
+  pwr_tAName attribute;
+
+  pwr_tBoolean* p;
+  pwr_tSubid subid;
+  int size;
+  graph_eDatabase db;
+  int inverted;
+  bool first_scan;
+  pwr_tBoolean old_value;
+  int a_typeid;
+  unsigned int bitmask;
+
+  GeDigLowShift(GeDyn* e_dyn);
+  GeDigLowShift(const GeDigLowShift& x);
+  void get_attributes(attr_sItem* attrinfo, int* item_count);
+  void save(std::ofstream& fp);
+  void open(std::ifstream& fp);
+  int connect(grow_tObject object, glow_sTraceData* trace_data, bool now);
+  int disconnect(grow_tObject object);
+  int scan(grow_tObject object);
+  void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
+  void replace_attribute(char* from, char* to, int* cnt, int strict);
+  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 

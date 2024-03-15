@@ -546,6 +546,13 @@ pwr_tBoolean net_Connect(pwr_tStatus* status, qcom_sAid* aid, qcom_sQid* qid,
     pthread_mutexattr_destroy(&mattr);
   }
 
+  qcom_sQattr lattr;
+  if (!attr) {
+    lattr.type = qcom_eQtype_private;
+    lattr.quota = 5000;
+    attr = &lattr;
+  }
+
   NET_LOCK;
   if (!qcom_Init(sts, aid, name))
     ok = FALSE;

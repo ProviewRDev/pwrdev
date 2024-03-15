@@ -2794,6 +2794,8 @@ static int graph_setobjectclass_func(void* filectx, ccm_sArg* arg_list,
   }
 
   sts = grow_SetObjectClass((grow_tNode)arg_list->value_int, nc);
+  if (ODD(sts))
+    grow_SetModified(graph->grow->ctx, 1);
   *return_int = sts;
   *return_decl = CCM_DECL_INT;
   return 1;
@@ -5354,6 +5356,26 @@ static int graph_moveselecttolayer_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
+static int graph_getmodified_func(void* filectx, ccm_sArg* arg_list,
+    int arg_count, int* return_decl, ccm_tFloat* return_float,
+    ccm_tInt* return_int, char* return_string)
+{
+  Graph* graph;
+
+  if (arg_count != 0)
+    return CCM__ARGMISM;
+
+  graph_get_stored_graph(&graph);
+
+  if (grow_GetModified(graph->grow->ctx))
+    *return_int = 1;
+  else
+    *return_int = 0;
+  *return_decl = CCM_DECL_INT;
+
+  return 1;
+}
+
 
 int Graph::script_func_register(void)
 {
@@ -5770,6 +5792,10 @@ int Graph::script_func_register(void)
     return sts;
   sts = ccm_register_function(
       "Ge", "LayerGetNextObject", graph_layergetnextobject_func);
+  if (EVEN(sts))
+    return sts;
+  sts = ccm_register_function(
+      "Ge", "GetModified", graph_getmodified_func);
   if (EVEN(sts))
     return sts;
   

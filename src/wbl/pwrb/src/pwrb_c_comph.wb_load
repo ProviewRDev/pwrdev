@@ -48,7 +48,7 @@ SObject pwrb:Class
 !  Both the input signal and the limit can be either
 !  constants, defined by the Attribute Editor, or ordinary
 !  analog signals.
-!  @image orm_en1-37.gif
+!  @image orm_en1-37.png
 !  The output is TRUE when the input signal is greater
 !  than the high limit i.e. Lim. The hysteresis is taken
 !  into account when the output signal is to be FALSE. The

@@ -1622,7 +1622,8 @@ Det här kan man åstadkomma genom att använda subgrafer med två eller flera sidor
 
 Ett exempel på en subgraf med flera sidor är Smiley.
 
-Subgrafer med flera sidor hanteras av dynamiktyperna DigShift, AnalogShift och Animation.
+Subgrafer med flera sidor hanteras av dynamiktyperna DigShift, DigLowShift, AnalogShift 
+och Animation.
 
 <image> geg_fig116.png
 <b>Fig Exempel på subgraf med flera sidor
@@ -3820,6 +3821,7 @@ Value     <t>Valfri     <t>Skriver ut värdet av ett attribut. <link>GeDynValue
 Rotate    <t>Float32 Int32 <t>Roterar komponenten. <link>GeDynRotate
 Move      <t>Float32 Int32 <t>Flyttar och skalar komponenten i x- och y-led. <link>GeDynMove
 DigShift  <t>Boolean    <t>Skiftar mellan två sidor i subgrafen (första och sista sidan). <link>GeDynDigShift
+DigLowShift  <t>Boolean    <t>Skiftar mellan två sidor i subgrafen (första och sista sidan). <link>GeDynDigLowShift
 DigFourShift <t>Boolean <t>Skiftar mellan fyra sidor i subgrafen. <link>GeDynDigFourShift
 AnalogShift <t>Float32 Int32 <t>Skiftar mellan olika sidor i subgrafen. Värdet <link>GeDynAnalogShift
           <t>           <t>på signalen bestämmer sidnr.
@@ -4343,6 +4345,19 @@ sidan, om värdet är 1 ritas det med sista sidan.
 <b>Attribut <t><t>Beskrivning
 DigShift.Attribute <t><t>Signal i rtdb av typen Boolean som skiftar sida. 
                    <t><t>Vid 0 visas första sidan, vid 1 visas sista sidan.
+</topic>
+
+<topic>GeDynDigLowShift <style>function
+DigLowShift
+Skifta två sidor i subgrafen. Subgrafen måste innehålla minst två sidor.
+Samma funktion som DigShift men visar sista sidan på låg signal istället för hög.
+
+Objektet kopplas till en digital signal i rtdb. Om värdet är 0 ritas objektet med sista 
+sidan, om värdet är 1 ritas det med första sidan.
+
+<b>Attribut <t><t>Beskrivning
+DigShift.Attribute <t><t>Signal i rtdb av typen Boolean som skiftar sida. 
+                   <t><t>Vid 0 visas sista sidan, vid 1 visas första sidan.
 </topic>
 
 <topic>GeDynDigFourShift <style>function
@@ -6847,6 +6862,7 @@ CreateDsTrend <t><t>Skapa ett DsTrend objekt.<link>CreateDsTrend()
 CreateDsTrendCurve <t><t>Skapa ett DsTrendCurve objekt.<link>CreateDsTrendCurve()
 CreateFastCurve <t><t>Skapa ett FastCurve objekt.<link>CreateFastCurve()
 CreateImage <t><t>Skapa ett Image objekt.<link>CreateImage()
+CreateLayer <t><t>Create a Layer.<link>CreateLayer()
 CreateLine <t><t>Skapa ett Line objekt.<link>CreateLine()
 CreateObject <t><t>Skapa ett subgraph objekt.<link>CreateObject()
 CreatePie <t><t>Skapa ett Pie objekt.<link>CreatePie()
@@ -6855,15 +6871,20 @@ CreateRectangle <t><t>Skapa ett Rectangle objekt.<link>CreateRectangle()
 CreateRecRounded <t><t>Skapa ett rounded recangle objekt.<link>CreateRectRounded()
 CreateSevHist <t><t>Skapa ett SevHist objekt.<link>CreateSevHist()
 CreateText <t><t>Skapa ett Text objekt.<link>CreateText()
+CreateToolbar <t><t>Skapa ett MethodsToolbar objekt.<link>CreateToolbar()
 CreateTrend <t><t>Skapa ett Trend objekt.<link>CreateTrend()
+CreateWindow <t><t>Skapa ett Window objekt.<link>CreateWindow()
 CreateXYCurve <t><t>Skapa ett XYCurve objekt.<link>CreateXYCurve()
 DashInsertObject <t><t>Addera ett object till en DashCell.<link>DashInsertObject()
 DeleteObject <t><t>Ta bort ett objekt.<link>DeleteObject()
 GetCurrentObject <t><t>Returnerar identiteten för senast skapade objekt.<link>GetCurrentObject()
 GetFirstObject <t><t>Hämta första objekt. <link>GetFirstObject()
 GetGraphAttribute <t><t>Hämta ett attributvärde för aktuell graf. <link>GetGraphAttribute()
+GetGraphConfig <t><t>Hämta värdet på GraphConfiguration attributet. <link>GetGraphConfig()
 GetGraphName <t><t>Hämta name på nuvarande graf. <link>GetGraphName()
+GetInstanceObject <t><t>Hämta instans-objekt för grafen. <link>GetInstanceObject()
 GetNextObject <t><t>Hämta nästa objekt. <link>GetNextObject()
+GetModified <t><t>Se om grafen är ändrad. <link>GetModified()
 GetObjectAttribute <t><t>Hämta ett attributvärde för ett objekt. <link>GetObjectAttribute()
 GetObjectBorder <t><t>Hämta kant för ett objekt. <link>GetObjectBorder()
 GetObjectBorderColor <t><t>Hämta kantfärg för ett objekt. <link>GetObjectBorderColor()
@@ -6880,12 +6901,23 @@ GetObjectTransparency <t><t>Hämta transparens för ett objekt. <link>GetObjectTra
 GetObjectType <t><t>Hämta typ för ett objekt. <link>GetObjectType()
 GetRgbColor <t><t>Hämta rgb-värden för en färg. <link>GetRgbColor()
 GetTextExtent <t><t>Beräkna storleken på en text. <link>GetTextExtent()
+GetUI_Env <t><t>Hämta UI omgivning. <link>GetUI_Env()
+GetWindowSize <t><t>Hämta storleken i pixel på fönstret. <link>GetWindowSize()
+GetWindowDimension <t><t>Hämta storleken i Ge-enhet på fönstret. <link>GetWindowDimension()
 GroupGetFirstObject <t><t>Hämta första objektet i en grupp. <link>GroupGetFirstObject()
 GroupGetNextObject <t><t>Hämta nästa objekt i en grupp. <link>GroupGetNextObject()
 GroupSelected <t><t>Gruppera utvalda objekt. <link>GroupSelected()
+LayerGetFirstObject <t><t>Hämta första objektet i ett lager. <link>LayerGetFirstObject()
+LayerGetNextObject <t><t>Hämta nästa objekt i ett lager. <link>LayerGetNextObject()
+LayerResetActiveAll <t><t>Sätt alla lager inaktiva. <link>LayerResetActiveAll()
+LayerSetActive <t><t>Sätt ett lager aktivt eller inaktivt. <link>LayerSetActive()
+Layout <t><t>Beräkna en layout. <link>Layout()
 MeasureObject <t><t>Hämta ett objekts utbredning. <link>MeasureObject()
+MergeVisibleLayers <t><t>Slå ihop synliga lager. <link>MergeVisibleLayers()
+MergeAllLayers <t><t>Slå ihop alla lager. <link>MergeAllLayers()
 MoveAbsObject <t><t>Flytta ett objekt till en position. <link>MoveAbsObject()
 MoveObject <t><t>Flytta ett objekt ett visst avstånd. <link>MoveObject()
+MoveSelectToLayer <t><t>Flytta utvalda objekt till aktivt lager. <link>MoveSelectToLayer()
 OpenGraph <t><t>Öppna en graph. <link>OpenGraph()
 PolyLineAdd <t><t>Addera ett segment till en PolyLine.<link>PolyLineAdd()
 Reload <t><t>Läs in innevarande graph från fil. <link>Reload()
@@ -6904,11 +6936,12 @@ SetIntern <t><t>Sätt en subgraf intern. <link>SetIntern()
 SetInternAll <t><t>Sätt alla subgrafer intern. <link>SetInternAll()
 SetGraphAttribute <t><t>Sätt ett attributvärde för aktuell graf. <link>SetGraphAttribute()
 SetGraphName <t><t>Sätt namn på aktuell graph. <link>SetGraphName()
+SetGraphOptions <t><t>Sätt options för grafen. <link>SetGraphOptions()
 SetObjectAttribute <t><t>Sätt värde på ett attribut för ett objekt. <link>SetObjectAttribute()
 SetObjectBackgroundColor <t><t>Sätt bakgrundsfärg på ett objekt. <link>SetObjectBackgroundColor()
 SetObjectBorder <t><t>Sätt kant på ett objekt. <link>SetObjectBorder()
 SetObjectBorderColor <t><t>Sätt kantfärg på ett objekt. <link>SetObjectBorderColor()
-SetObjectClass <t><t>Ändar subgraf för ett objekt. <link>SetObjectClass()
+SetObjectClass <t><t>Ändra subgraf för ett objekt. <link>SetObjectClass()
 SetObjectFill <t><t>Sätt fyllnad på ett objekt. <link>SetObjectFill()
 SetObjectFillColor <t><t>Sätt fyllnadsfärg på ett objekt. <link>SetObjectFillColor()
 SetObjectGradient <t><t>Sätt gradient på ett objekt. <link>SetObjectGradient()
@@ -6919,6 +6952,7 @@ SetRgbColor <t><t>Sätt rgb-värden för en färg. <link>SetRgbColor()
 SetSelectTextBold <t><t>Sätt fet text på utvalda objekt. <link>SetSelectTextBold()
 SetSelectTextFont <t><t>Sätt typsnitt på utvalda objekt. <link>SetSelectTextFont()
 SetSelectTextSize <t><t>Sätt textstorlek på utvalda objekt. <link>SetSelectTextSize()
+TranslateObjectName <t><t>Översätt ett namn med Ge syntax till databas-namn. <link>TranslateObjectName()
 
 <h2>In och utmatning
 <b>Funktion <t>Beskrivning

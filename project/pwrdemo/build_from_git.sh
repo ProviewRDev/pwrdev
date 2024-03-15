@@ -154,6 +154,11 @@ echo "*"
 echo "* Build node"
 echo "*"
 wb_cmd -v volpwrdemo build node DemoNode /force
+echo "*"
+echo "* Copy pwr_web"
+echo "*"
+cp $pwr_eweb/* $pwrp_web/
+
 exit
 
 echo "*"
@@ -211,10 +216,3 @@ echo "* Copy trace files"
 echo "*"
 cp $pwrp_load/*.flw $pwrp_web/
 
-echo "*"
-echo "* Copy jar files"
-echo "*"
-cp $pwr_lib/pwr_rt_client.jar $pwrp_web/
-cp $pwr_lib/pwr_jop.jar $pwrp_web/
-cp $pwr_lib/pwr_jopg.jar $pwrp_web/
-cp $pwr_load/../web/* $pwrp_web/

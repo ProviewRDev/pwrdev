@@ -47,7 +47,7 @@ SObject pwrb:Class
 !  Both the input signal and the limit can be either
 !  constants, defined by the Attribute Editor, or ordinary
 !  analog signals.
-!  @image orm_en1-39.gif
+!  @image orm_en1-39.png
 !  The output is TRUE when the input signal is less than
 !  the low limit, i.e. Lim.
 !  

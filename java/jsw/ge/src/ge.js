@@ -123,6 +123,7 @@ var DynC = {
   mDynType2_DigTransparency     : 1 << 13,
   mDynType2_AnalogTransparency	: 1 << 14,
   mDynType2_UnitConvert		: 1 << 15,
+  mDynType2_DigLowShift		: 1 << 16,
 
   mActionType1_No		: 0,
   mActionType1_Inherit		: 1 << 0,
@@ -178,54 +179,55 @@ var DynC = {
   eDynPrio_Move			: 18,
   eDynPrio_AnalogShift	       	: 19,
   eDynPrio_DigShift			: 20,
-  eDynPrio_DigFourShift	       	: 21,
-  eDynPrio_Animation			: 22,
-  eDynPrio_Bar			: 23,
-  eDynPrio_Trend			: 24,
-  eDynPrio_FastCurve			: 25,
-  eDynPrio_XY_Curve			: 26,
-  eDynPrio_DsTrend			: 27,
-  eDynPrio_DsTrendCurve			: 28,
-  eDynPrio_SevHist			: 29,
-  eDynPrio_UnitConvert			: 30,
-  eDynPrio_DigTransparency	      	: 31,
-  eDynPrio_AnalogTransparency	       	: 32,
-  eDynPrio_AnalogText			: 33,
-  eDynPrio_Table			: 34,
-  eDynPrio_SliderBackground	       	: 35,
-  eDynPrio_Video			: 36,
-  eDynPrio_StatusColor	       		: 37,
-  eDynPrio_PopupMenu			: 38,
-  eDynPrio_Confirm			: 39,
-  eDynPrio_SetDig			: 40,
-  eDynPrio_ResetDig			: 41,
-  eDynPrio_ToggleDig			: 42,
-  eDynPrio_StoDig			: 43,
-  eDynPrio_Help				: 44,
-  eDynPrio_OpenGraph			: 45,
-  eDynPrio_OpenURL			: 46,
-  eDynPrio_CommandDoubleClick	       	: 47,
-  eDynPrio_IncrAnalog			: 48,
-  eDynPrio_RadioButton	       		: 49,
-  eDynPrio_Slider			: 50,
-  eDynPrio_TipText			: 51,
-  eDynPrio_PulldownMenu	       		: 52,
-  eDynPrio_OptionMenu			: 53,
-  eDynPrio_InputFocus			: 54,
-  eDynPrio_DigCommand			: 55,
-  eDynPrio_SetValue			: 56,
-  eDynPrio_Pie				: 57,
-  eDynPrio_BarChart			: 58,
-  eDynPrio_Axis				: 59,
-  eDynPrio_MethodToolbar	       	: 60,
-  eDynPrio_MethodPulldownMenu	       	: 61,
-  eDynPrio_ScrollingText	       	: 62,
-  eDynPrio_ColorThemeLightness       	: 63,
-  eDynPrio_DigSwap		       	: 64,
-  eDynPrio_DigScript		       	: 65,
-  eDynPrio_CatchSignal           	: 66,
-  eDynPrio_EmitSignal     	       	: 67,
-  eDynPrio_ContextMenu     	       	: 68,
+  eDynPrio_DigLowShift			: 21,
+  eDynPrio_DigFourShift	       	: 22,
+  eDynPrio_Animation			: 23,
+  eDynPrio_Bar			: 24,
+  eDynPrio_Trend			: 25,
+  eDynPrio_FastCurve			: 26,
+  eDynPrio_XY_Curve			: 27,
+  eDynPrio_DsTrend			: 28,
+  eDynPrio_DsTrendCurve			: 29,
+  eDynPrio_SevHist			: 20,
+  eDynPrio_UnitConvert			: 31,
+  eDynPrio_DigTransparency	      	: 32,
+  eDynPrio_AnalogTransparency	       	: 33,
+  eDynPrio_AnalogText			: 34,
+  eDynPrio_Table			: 35,
+  eDynPrio_SliderBackground	       	: 36,
+  eDynPrio_Video			: 37,
+  eDynPrio_StatusColor	       		: 38,
+  eDynPrio_PopupMenu			: 39,
+  eDynPrio_Confirm			: 40,
+  eDynPrio_SetDig			: 41,
+  eDynPrio_ResetDig			: 42,
+  eDynPrio_ToggleDig			: 43,
+  eDynPrio_StoDig			: 44,
+  eDynPrio_Help				: 45,
+  eDynPrio_OpenGraph			: 46,
+  eDynPrio_OpenURL			: 47,
+  eDynPrio_CommandDoubleClick	       	: 48,
+  eDynPrio_IncrAnalog			: 49,
+  eDynPrio_RadioButton	       		: 50,
+  eDynPrio_Slider			: 51,
+  eDynPrio_TipText			: 52,
+  eDynPrio_PulldownMenu	       		: 53,
+  eDynPrio_OptionMenu			: 54,
+  eDynPrio_InputFocus			: 55,
+  eDynPrio_DigCommand			: 56,
+  eDynPrio_SetValue			: 57,
+  eDynPrio_Pie				: 58,
+  eDynPrio_BarChart			: 59,
+  eDynPrio_Axis				: 60,
+  eDynPrio_MethodToolbar	       	: 61,
+  eDynPrio_MethodPulldownMenu	       	: 62,
+  eDynPrio_ScrollingText	       	: 63,
+  eDynPrio_ColorThemeLightness       	: 64,
+  eDynPrio_DigSwap		       	: 65,
+  eDynPrio_DigScript		       	: 66,
+  eDynPrio_CatchSignal           	: 67,
+  eDynPrio_EmitSignal     	       	: 68,
+  eDynPrio_ContextMenu     	       	: 69,
   eDynPrio_Script  			: 9998,
   eDynPrio_Command  			: 9999,
   eDynPrio_CloseGraph 			: 10000,
@@ -304,6 +306,7 @@ var DynC = {
   eSave_AnalogTransparency            	: 78,
   eSave_UnitConvert	            	: 79,
   eSave_ContextMenu	            	: 80,
+  eSave_DigLowShift	            	: 81,
   eSave_End		       		: 99,
   eSave_Dyn_dyn_type1	       		: 100,
   eSave_Dyn_action_type1      	: 101,
@@ -790,6 +793,7 @@ var DynC = {
   eSave_ContextMenu_item_action8 	: 8017,
   eSave_ContextMenu_item_action9 	: 8018,
   eSave_ContextMenu_item_action10 	: 8019,
+  eSave_DigLowShift_attribute		: 8100,
 
   eAnimSequence_Inherit      	: 0,
   eAnimSequence_Cycle		: 1,
@@ -1192,6 +1196,9 @@ function Dyn( graph) {
       break;
     case DynC.mDynType2_UnitConvert:
       e = new DynUnitConvert(this);
+      break;
+    case DynC.mDynType2_DigLowShift:
+      e = new DynDigLowShift(this);
       break;
     default:;
     }
@@ -1761,6 +1768,9 @@ function Dyn( graph) {
 	break;
       case DynC.eSave_UnitConvert: 
 	elem = new DynUnitConvert(this); 
+	break;
+      case DynC.eSave_DigLowShift: 
+	elem = new DynDigLowShift(this); 
 	break;
       case DynC.eSave_FillLevel: 
 	elem = new DynFillLevel(this); 
@@ -5929,6 +5939,119 @@ function DynDigShift( dyn) {
   };
 }
 
+function DynDigLowShift( dyn) {
+  this.dyn = dyn;
+  this.dyn_type1 = 0;
+  this.dyn_type2 = DynC.mDynType2_DigLowShift;
+  this.action_type1 = 0;
+  this.action_type2 = 0;
+  this.prio = DynC.eDynPrio_DigLowShift;
+  this.instance_mask = 0;
+  this.instance = 0;
+
+  this.a;
+  this.attribute;
+  this.firstScan = true;
+
+  this.setAttribute = function(o, name, value) {
+    if (name === "DigLowShift.Attribute") {
+      this.attribute = value;
+      return 1;
+    }
+    return 0;
+  }
+  this.getAttribute = function(o, name) {
+    var ret = new ge_tValueReturn();
+    if (name === "DigLowShift.Attribute") {
+      ret.value = this.attribute;
+      ret.decl = CcmC.K_DECL_STRING;
+      return ret;
+    }
+    ret.sts = 0;
+    return ret;
+  }
+
+  this.connect = function( object) {
+
+    this.a = new DynReference( this.dyn, this.attribute);
+    this.a.connect(this.dyn);
+    if ( !this.a.sts) {
+      console.log("DigLowShift: " + this.attribute);
+      return 1;
+    }
+
+    return 1;
+  };
+
+  this.disconnect = function() {
+    this.a.disconnect(this.dyn);
+  };
+
+	
+  this.scan = function( object) {
+    if ( !this.a.sts)
+      return;
+    var value = this.dyn.getDig( this.a.p, this.a.typeid, this.a.bitmask, this.a.database);
+
+    if ( this.a.inverted)
+      value = !value;
+
+    if ( !this.firstScan) {
+      if ( this.a.oldValue == value)
+	return;
+    }
+    else
+      this.firstScan = false;
+	
+    if ( value) {
+      object.set_root_nodeclass();
+    }
+    else {
+      object.set_last_nodeclass();
+    }
+    this.a.oldValue = value;
+  };
+
+  this.open = function( lines, row) {
+    var end = false;
+    var i;
+    var elem;
+
+    for ( i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(' ');
+      var key = parseInt(tokens[0], 10);
+
+      if ( this.dyn.debug) console.log( "DynDigLowShift : " + lines[i]);
+
+      elem = null;
+
+      switch ( key) {
+      case DynC.eSave_DigLowShift: 
+	break;
+      case DynC.eSave_DigLowShift_attribute: 
+	if ( tokens.length > 1)
+	  this.attribute = tokens[1];
+	break;
+      case DynC.eSave_End:
+	end = true;
+	break;
+      default:
+	console.log( "Syntax error in DynDigLowShift");
+	break;
+      }
+
+      if ( end)
+	break;
+    }
+		
+    return i;
+  };
+
+  this.action = function( object, e) {
+    return 1;
+  };
+}
+
 function DynDigFourShift( dyn) {
   this.dyn = dyn;
   this.dyn_type1 = 0;
@@ -6594,7 +6717,7 @@ function DynDigBackgroundColor( dyn, instance) {
 	this.instance_mask = parseInt(tokens[1], 10);
 	break;
       case DynC.eSave_End:
-	end_ = true;
+	end = true;
 	break;
       default:
 	console.log( "Syntax error in DynDigBackgroundColor");

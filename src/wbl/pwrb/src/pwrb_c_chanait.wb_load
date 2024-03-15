@@ -54,7 +54,7 @@ SObject pwrb:Class
 !  -- filter function f, is determined by FilterType in Ai object
 !
 !  The table t is defined in one of the following ways:
-!  @image orm_en1-32.gif
+!  @image orm_en1-32.png
 !  
 !  - Direct input of NoOfCoordinates pairs of numbers (InValue,O
 !    arranged in order of increasing InValue. The first

@@ -1221,9 +1221,9 @@ public class GdhWebSocketServer
 		      switch( asub.typeId) {
 		      case Pwr.eType_Boolean:
 			  if ( asub.elements <= 1)
-			      refsize += 8 + 1;
+			      refsize += 8 + 4;
 			  else
-			      refsize += 8 + asub.elements * 1;
+			      refsize += 8 + asub.elements * 4;
 			  cnt++;
 			  break;
 		      case Pwr.eType_Float32:

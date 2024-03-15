@@ -579,6 +579,9 @@ GeDyn::GeDyn(const GeDyn& x)
     case ge_mDynType2_UnitConvert:
       e = new GeUnitConvert((const GeUnitConvert&)*elem);
       break;
+    case ge_mDynType2_DigLowShift:
+      e = new GeDigLowShift((const GeDigLowShift&)*elem);
+      break;
     default:;
     }
     switch (elem->action_type1) {
@@ -881,6 +884,9 @@ void GeDyn::open(std::ifstream& fp)
       break;
     case ge_eSave_UnitConvert:
       e = (GeDynElem*)new GeUnitConvert(this);
+      break;
+    case ge_eSave_DigLowShift:
+      e = (GeDynElem*)new GeDigLowShift(this);
       break;
     case ge_eSave_DigCommand:
       e = (GeDynElem*)new GeDigCommand(this);
@@ -1931,6 +1937,9 @@ GeDynElem* GeDyn::create_dyn2_element(int mask, int instance)
   case ge_mDynType2_UnitConvert:
     e = (GeDynElem*)new GeUnitConvert(this);
     break;
+  case ge_mDynType2_DigLowShift:
+    e = (GeDynElem*)new GeDigLowShift(this);
+    break;
   default:;
   }
   return e;
@@ -2169,6 +2178,9 @@ GeDynElem* GeDyn::copy_element(GeDynElem& x)
       break;
     case ge_mDynType2_UnitConvert:
       e = (GeDynElem*)new GeUnitConvert((GeUnitConvert&)x);
+      break;
+    case ge_mDynType2_DigLowShift:
+      e = (GeDynElem*)new GeDigLowShift((GeDigLowShift&)x);
       break;
     default:;
     }
@@ -8535,6 +8547,189 @@ int GeDigShift::syntax_check(
   graph_eDatabase databases[]
       = { graph_eDatabase_Ccm, graph_eDatabase_Gdh, graph_eDatabase__ };
   dyn->syntax_check_attribute(object, "DigShift.Attribute", attribute, 0, types,
+      databases, error_cnt, warning_cnt);
+
+  return 1;
+}
+
+GeDigLowShift::GeDigLowShift(GeDyn* e_dyn)
+    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_DigLowShift,
+          ge_mActionType1_No, ge_mActionType2_No, ge_eDynPrio_DigLowShift)
+{
+  strcpy(attribute, "");
+}
+
+GeDigLowShift::GeDigLowShift(const GeDigLowShift& x)
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
+          x.prio)
+{
+  strcpy(attribute, x.attribute);
+}
+
+void GeDigLowShift::get_attributes(attr_sItem* attrinfo, int* item_count)
+{
+  int i = *item_count;
+
+  strcpy(attrinfo[i].name, "DigLowShift.Attribute");
+  attrinfo[i].value = attribute;
+  attrinfo[i].type = glow_eType_String;
+  attrinfo[i++].size = sizeof(attribute);
+
+  *item_count = i;
+}
+
+void GeDigLowShift::set_attribute(
+    grow_tObject object, const char* attr_name, int* cnt)
+{
+  (*cnt)--;
+  if (*cnt == 0) {
+    char msg[200];
+
+    strncpy(attribute, attr_name, sizeof(attribute));
+    snprintf(msg, sizeof(msg), "DigLowShift.Attribute = %s", attr_name);
+    msg[sizeof(msg) - 1] = 0;
+    dyn->graph->message('I', msg);
+  }
+}
+
+void GeDigLowShift::replace_attribute(char* from, char* to, int* cnt, int strict)
+{
+  GeDyn::replace_attribute(attribute, sizeof(attribute), from, to, cnt, strict);
+}
+
+void GeDigLowShift::save(std::ofstream& fp)
+{
+  fp << int(ge_eSave_DigLowShift) << '\n';
+  fp << int(ge_eSave_DigLowShift_attribute) << FSPACE << attribute << '\n';
+  fp << int(ge_eSave_End) << '\n';
+}
+
+void GeDigLowShift::open(std::ifstream& fp)
+{
+  int type = 0;
+  int end_found = 0;
+  char dummy[40];
+
+  for (;;) {
+    if (!fp.good()) {
+      fp.clear();
+      fp.getline(dummy, sizeof(dummy));
+      printf("** Read error GeDigLowShift: \"%d %s\"\n", type, dummy);
+    }
+
+    fp >> type;
+
+    switch (type) {
+    case ge_eSave_DigLowShift:
+      break;
+    case ge_eSave_DigLowShift_attribute:
+      fp.get();
+      fp.getline(attribute, sizeof(attribute));
+      break;
+    case ge_eSave_End:
+      end_found = 1;
+      break;
+    default:
+      std::cout << "GeDigLowShift:open syntax error\n";
+      fp.getline(dummy, sizeof(dummy));
+    }
+    if (end_found)
+      break;
+  }
+}
+
+int GeDigLowShift::connect(
+    grow_tObject object, glow_sTraceData* trace_data, bool now)
+{
+  int attr_type, attr_size;
+  pwr_tAName parsed_name;
+  int sts;
+
+  size = 4;
+  p = 0;
+  db = dyn->parse_attr_name(
+      attribute, parsed_name, &inverted, &attr_type, &attr_size);
+  if (streq(parsed_name, ""))
+    return 1;
+
+  get_bit(parsed_name, attr_type, &bitmask);
+  a_typeid = attr_type;
+
+  switch (db) {
+  case graph_eDatabase_Gdh:
+    sts = dyn->graph->ref_object_info(
+        dyn->cycle, parsed_name, (void**)&p, &subid, size, object, now);
+    if (EVEN(sts))
+      return sts;
+    break;
+  case graph_eDatabase_Ccm:
+    sts = dyn->graph->ccm_ref_variable(parsed_name, attr_type, (void**)&p);
+    if (EVEN(sts))
+      return sts;
+    break;
+  default:;
+  }
+
+  trace_data->p = &pdummy;
+  first_scan = true;
+  return 1;
+}
+
+int GeDigLowShift::disconnect(grow_tObject object)
+{
+  if (p && db == graph_eDatabase_Gdh)
+    gdh_UnrefObjectInfo(subid);
+  p = 0;
+  return 1;
+}
+
+int GeDigLowShift::scan(grow_tObject object)
+{
+  if (!p)
+    return 1;
+
+  pwr_tBoolean val;
+
+  if (!get_dig(&val, p, a_typeid, bitmask))
+    return 1;
+
+  if (inverted)
+    val = !val;
+
+  if (!first_scan) {
+    if (old_value == val) {
+      // No change since last time
+      return 1;
+    }
+  } else
+    first_scan = false;
+
+  if (val) {
+    grow_SetObjectFirstNodeClass(object);
+  } else {
+    grow_SetObjectLastNodeClass(object);
+  }
+  old_value = val;
+
+  return 1;
+}
+
+int GeDigLowShift::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+{
+  if (!streq(attribute, ""))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigLowShift.Attribute\",\"" << attribute << "\");" << '\n';
+  return 1;
+}
+
+int GeDigLowShift::syntax_check(
+    grow_tObject object, int* error_cnt, int* warning_cnt)
+{
+  int types[] = { pwr_eType_Boolean, pwr_eType_Int32, pwr_eType_UInt32,
+    pwr_eType_Int64, pwr_eType_UInt64, graph_eType_Bit, pwr_eType_Float32,
+    pwr_eType_Float64, pwr_eType_String, 0 };
+  graph_eDatabase databases[]
+      = { graph_eDatabase_Ccm, graph_eDatabase_Gdh, graph_eDatabase__ };
+  dyn->syntax_check_attribute(object, "DigLowShift.Attribute", attribute, 0, types,
       databases, error_cnt, warning_cnt);
 
   return 1;
@@ -15122,6 +15317,9 @@ int GeTimeoutColor::scan(grow_tObject object)
         break;
       case ge_mDynType2_DigSwap:
         subid = ((GeDigSwap*)elem)->subid;
+        break;
+      case ge_mDynType2_DigLowShift:
+        subid = ((GeDigLowShift*)elem)->subid;
         break;
       default:;
       }
