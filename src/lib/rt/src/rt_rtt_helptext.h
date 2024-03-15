@@ -113,6 +113,8 @@ help\n\
 page\n\
 plcscan /on /off /hierarchy= /all\n\
 print /file= /tsize= /psize= /append /text=\n\
+qcom connect /node=\n\
+qcom disconnect /node=\n\
 quit\n\
 say /text=\n\
 search 'string'\n\
@@ -982,6 +984,14 @@ For more information about the rtt script syntax use command 'HELP SCRIPT'\n\
       "\
 List of the help subjects in rtt.\n\n\
 To display the help text for a subject, select a subject and press return.\n\
+" },
+  { 1, "QCOM CONNECT", "", "\
+QCom connect to node.\n\n\
+pwr_rtt> qcom connect /node=\n\
+" },
+  { 1, "QCOM DISCONNECT", "", "\
+QCom disconnect to node.\n\n\
+pwr_rtt> qcom disconnect /node=\n\
 " },
   {
       0, "", "", ""
