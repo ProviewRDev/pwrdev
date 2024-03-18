@@ -62,7 +62,8 @@ GrowArc::GrowArc(GrowCtx* glow_ctx, const char* name, double x1, double y1,
       relief(glow_eRelief_Up), shadow_contrast(2), disable_shadow(0),
       fixcolor(0), gradient(glow_eGradient_No), gradient_contrast(4),
       disable_gradient(0), fixposition(0), fill_eq_light(0), fill_eq_shadow(0),
-      fill_eq_background(0), transparency(0)
+      fill_eq_background(0), border_eq_light(0), border_eq_shadow(0),
+      transparency(0)
 {
   strcpy(n_name, name);
   pzero.nav_zoom();
@@ -283,6 +284,10 @@ void GrowArc::save(std::ofstream& fp, glow_eSaveMode mode)
      << '\n';
   fp << int(glow_eSave_GrowArc_fill_eq_background) << FSPACE
      << fill_eq_background << '\n';
+  fp << int(glow_eSave_GrowArc_border_eq_light) << FSPACE << border_eq_light
+     << '\n';
+  fp << int(glow_eSave_GrowArc_border_eq_shadow) << FSPACE << border_eq_shadow
+     << '\n';
   fp << int(glow_eSave_GrowArc_transparency) << FSPACE << transparency << '\n';
   fp << int(glow_eSave_GrowArc_dynamicsize) << FSPACE << dynamicsize << '\n';
   fp << int(glow_eSave_GrowArc_dynamic) << '\n';
@@ -397,6 +402,12 @@ void GrowArc::open(std::ifstream& fp)
       break;
     case glow_eSave_GrowArc_fill_eq_background:
       fp >> fill_eq_background;
+      break;
+    case glow_eSave_GrowArc_border_eq_light:
+      fp >> border_eq_light;
+      break;
+    case glow_eSave_GrowArc_border_eq_shadow:
+      fp >> border_eq_shadow;
       break;
     case glow_eSave_GrowArc_transparency:
       fp >> transparency;
@@ -898,6 +909,12 @@ void GrowArc::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
   if (border || !fill) {
     drawtype = ctx->get_drawtype(draw_type, glow_eDrawType_LineHighlight,
         highlight, (GrowNode*)colornode, 0);
+    if (border_eq_light)
+      drawtype = ctx->shift_drawtype(
+          drawtype, -shadow_contrast + chot, (GrowNode*)colornode);
+    else if (border_eq_shadow)
+      drawtype = ctx->shift_drawtype(
+          drawtype, shadow_contrast + chot, (GrowNode*)colornode);
     ctx->gdraw->arc(w, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, angle1 - rot,
 	angle2, drawtype, idx, 0, transp);
   }

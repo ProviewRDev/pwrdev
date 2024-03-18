@@ -62,6 +62,7 @@ GrowPolyLine::GrowPolyLine(GrowCtx* glow_ctx, const char* name,
       shadow_width(5), relief(glow_eRelief_Up), shadow_contrast(2),
       disable_shadow(0), fill_eq_light(0), fill_eq_shadow(0),
       fill_eq_bglight(0), fill_eq_bgshadow(0), fill_eq_background(0),
+      border_eq_light(0), border_eq_shadow(0),
       fixcolor(0), fixposition(0), gradient(glow_eGradient_No),
       gradient_contrast(4), disable_gradient(0), round(0.5), curvetype(ctype),
       transparency(0)
@@ -502,6 +503,12 @@ void GrowPolyLine::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
   if (border || !(fill || (display_shadow && !feq(shadow_width, 0.0)))) {
     drawtype = ctx->get_drawtype(draw_type, glow_eDrawType_LineHighlight,
         highlight, (GrowNode*)colornode, 0);
+    if (border_eq_light)
+      drawtype = ctx->shift_drawtype(
+          drawtype, -shadow_contrast + chot, (GrowNode*)colornode);
+    else if (border_eq_shadow)
+      drawtype = ctx->shift_drawtype(
+          drawtype, shadow_contrast + chot, (GrowNode*)colornode);
     switch (curvetype) {
     case glow_eCurveType_Line:
     case glow_eCurveType_Square:
@@ -858,6 +865,10 @@ void GrowPolyLine::save(std::ofstream& fp, glow_eSaveMode mode)
      << disable_gradient << '\n';
   fp << int(glow_eSave_GrowPolyLine_fill_eq_background) << FSPACE
      << fill_eq_background << '\n';
+  fp << int(glow_eSave_GrowPolyLine_border_eq_light) << FSPACE << border_eq_light
+     << '\n';
+  fp << int(glow_eSave_GrowPolyLine_border_eq_shadow) << FSPACE << border_eq_shadow
+     << '\n';
   fp << int(glow_eSave_GrowPolyLine_transparency) << FSPACE << transparency << '\n';
   fp << int(glow_eSave_End) << '\n';
 }
@@ -995,6 +1006,12 @@ void GrowPolyLine::open(std::ifstream& fp)
       break;
     case glow_eSave_GrowPolyLine_fill_eq_background:
       fp >> fill_eq_background;
+      break;
+    case glow_eSave_GrowPolyLine_border_eq_light:
+      fp >> border_eq_light;
+      break;
+    case glow_eSave_GrowPolyLine_border_eq_shadow:
+      fp >> border_eq_shadow;
       break;
     case glow_eSave_GrowPolyLine_transparency:
       fp >> transparency;

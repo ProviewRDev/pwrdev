@@ -441,6 +441,8 @@ public:
   int fill_eq_bglight; //!< Fill is drawn with background light shadow color.
   int fill_eq_bgshadow; //!< Fill is drawn with background dark shadow color.
   int fill_eq_background; //!< Fill is drawn with background color.
+  int border_eq_light; //!< Border is drawn with light shadow color.
+  int border_eq_shadow; //!< Border is drawn with dark shadow color.
   int fixcolor; //!< Color independent of node color.
   int fixposition; //!< Can't be moved.
   glow_eGradient gradient; //!< Type of gradient.

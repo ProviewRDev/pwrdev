@@ -1610,6 +1610,16 @@ int grow_GetObjectAttrInfo(
     attrinfo[i].type = glow_eType_Boolean;
     attrinfo[i++].size = sizeof(op->fill_eq_bgshadow);
 
+    strcpy(attrinfo[i].name, "border_eq_light");
+    attrinfo[i].value_p = &op->border_eq_light;
+    attrinfo[i].type = glow_eType_Boolean;
+    attrinfo[i++].size = sizeof(op->border_eq_light);
+
+    strcpy(attrinfo[i].name, "border_eq_shadow");
+    attrinfo[i].value_p = &op->border_eq_shadow;
+    attrinfo[i].type = glow_eType_Boolean;
+    attrinfo[i++].size = sizeof(op->border_eq_shadow);
+
     strcpy(attrinfo[i].name, "fixcolor");
     attrinfo[i].value_p = &op->fixcolor;
     attrinfo[i].type = glow_eType_Boolean;
@@ -1761,6 +1771,16 @@ int grow_GetObjectAttrInfo(
     attrinfo[i].value_p = &op->fill_eq_background;
     attrinfo[i].type = glow_eType_Boolean;
     attrinfo[i++].size = sizeof(op->fill_eq_background);
+
+    strcpy(attrinfo[i].name, "border_eq_light");
+    attrinfo[i].value_p = &op->border_eq_light;
+    attrinfo[i].type = glow_eType_Boolean;
+    attrinfo[i++].size = sizeof(op->border_eq_light);
+
+    strcpy(attrinfo[i].name, "border_eq_shadow");
+    attrinfo[i].value_p = &op->border_eq_shadow;
+    attrinfo[i].type = glow_eType_Boolean;
+    attrinfo[i++].size = sizeof(op->border_eq_shadow);
 
     strcpy(attrinfo[i].name, "Dynamic");
     op->get_dynamic(&dynamic, &dynsize);

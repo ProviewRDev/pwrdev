@@ -320,6 +320,8 @@ public:
   int fill_eq_light; //!< Fill is drawn with light shadow color.
   int fill_eq_shadow; //!< Fill is drawn with dark shadow color.
   int fill_eq_background; //!< Background color is fill color.
+  int border_eq_light; //!< Border is drawn with light shadow color.
+  int border_eq_shadow; //!< Border is drawn with dark shadow color.
   double transparency; //!< Border and fill color transparency.
 
   //! Set user data.
