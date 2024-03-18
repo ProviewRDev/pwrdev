@@ -687,6 +687,7 @@ static void loadPBM(const char *filename, PBM* img)
 
   int size = img->height * (img->width / 8 + 1);
   img->data = new unsigned char[size];
+  memset(img->data, 0, size);
 
   for (int i = 0; i < size; i++) {
     int c = fgetc(f);

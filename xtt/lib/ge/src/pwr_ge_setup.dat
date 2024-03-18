@@ -791,6 +791,8 @@ menu ColorTheme
     subgraph 	IndRoundRedBg 		pwr_exe:pwrct_indroundredbg.pwsg 	47
     subgraph 	IndRoundYellowBg 	pwr_exe:pwrct_indroundyellowbg.pwsg 	47
     subgraph 	IndRoundAnim2	 	pwr_exe:pwrct_indroundanim2.pwsg 	48
+    subgraph 	IndBusyAnim	 	pwr_exe:pwrct_indbusyanim.pwsg 		254
+    subgraph 	IndRunningAnim	 	pwr_exe:pwrct_indrunninganim.pwsg 	255
   }
   menu Pushbuttons
   {
