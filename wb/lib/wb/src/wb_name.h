@@ -37,8 +37,11 @@
 #ifndef wb_name_h
 #define wb_name_h
 
+#include <iostream>
 #include "wb_nrep.h"
 #include "wb_ldh_msg.h"
+
+using namespace std;
 
 /* Describe the format of a namestring.
 
@@ -208,6 +211,9 @@ private:
   void check() const;
 };
 
-std::ostream& operator<<(std::ostream& os, const wb_name& name);
+inline ostream& operator<< (ostream& os, const wb_name& name)
+{
+  return os << name.c_str();
+}
 
 #endif
