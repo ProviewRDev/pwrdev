@@ -348,6 +348,10 @@ void SubPaletteBrow::allocate_pixmaps()
   brow_LoadPBM(ctx, "ge_bitmap_bararc253", &pixmaps[idx++]);
   brow_LoadPBM(ctx, "ge_bitmap_ind254", &pixmaps[idx++]);
   brow_LoadPBM(ctx, "ge_bitmap_ind255", &pixmaps[idx++]);
+  brow_LoadPBM(ctx, "ge_bitmap_ind256", &pixmaps[idx++]);
+  brow_LoadPBM(ctx, "ge_bitmap_ind257", &pixmaps[idx++]);
+  brow_LoadPBM(ctx, "ge_bitmap_ind258", &pixmaps[idx++]);
+  brow_LoadPBM(ctx, "ge_bitmap_ind259", &pixmaps[idx++]);
 }
 
 //
