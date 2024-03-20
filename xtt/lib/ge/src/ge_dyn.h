@@ -59,10 +59,11 @@
 //! Types of animation sequences.
 typedef enum {
   ge_eAnimSequence_Inherit, //!< Inherit from nodeclass.
-  ge_eAnimSequence_Cycle, //!< Cyclic animation.
+  ge_eAnimSequence_Cycle, //!< Cyclic animation. First page is low value page.
   ge_eAnimSequence_Dig, //!< Animation between two resct positions.
-  ge_eAnimSequence_ForwBack //!< Animation first in forward directon and then in
+  ge_eAnimSequence_ForwBack, //!< Animation first in forward directon and then in
   //! backward, and so on.
+  ge_eAnimSequence_CycleLast //!< Cyclic animation. Last page is low value page.
 } ge_eAnimSequence;
 
 //! Values for a limit type.

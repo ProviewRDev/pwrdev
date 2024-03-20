@@ -896,6 +896,10 @@ public:
   void export_javabean(GlowTransform* t, void* node, glow_eExportPass pass,
       int* shape_cnt, int node_cnt, int in_nc, std::ofstream& fp);
 
+  //! Get next page to the current page.
+  /*! \return Returns 1 if there is a next page, else 0. */
+  int get_next_nodeclass(GlowNodeClass** next);
+  
   //! Set next page to the current page.
   /*! \return Returns 1 if there is a next page, else 0. */
   int set_next_nodeclass();

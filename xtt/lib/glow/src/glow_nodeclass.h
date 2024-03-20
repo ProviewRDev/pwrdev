@@ -338,6 +338,13 @@ public:
     return prev_nc != 0;
   }
 
+  //! Check if this is the last page
+  /*! \return 1 if this is the last page, else 0 */
+  int is_last()
+  {
+    return next_nc == 0;
+  }
+
   //! Get number of pages.
   /*! \return Number of pages for this nodeclass. */
   int get_pages();

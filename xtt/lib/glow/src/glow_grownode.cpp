@@ -1440,6 +1440,15 @@ void GrowNode::export_javabean(GlowTransform* t, void* node,
       line_width, rot, shadow, gradient, pass, shape_cnt, node_cnt, in_nc, fp);
 }
 
+int GrowNode::get_next_nodeclass(GlowNodeClass** next)
+{
+  if (next)
+    *next = (GlowNodeClass*)nc->next_nc;
+  if (nc->next_nc)
+    return 1;
+  return 0;
+}
+
 int GrowNode::set_next_nodeclass()
 {
   if (nc->next_nc) {

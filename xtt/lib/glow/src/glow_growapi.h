@@ -2757,6 +2757,13 @@ char* grow_ColorToName(glow_eDrawType drawtype);
 */
 char* grow_ColorToneToName(glow_eDrawType drawtype);
 
+//! Get next page to the current page for an object.
+/*!
+  \param object	Object to get page for.
+  \return		Returns 1 if there is a next page, else 0.
+*/
+  int grow_GetObjectNextNodeClass(grow_tObject object, grow_tNodeClass* next);
+
 //! Set next page to the current page for an object.
 /*!
   \param object	Object to set page for.
@@ -2824,6 +2831,14 @@ int grow_GetShowGrid(grow_tCtx ctx);
   page.
 */
 int grow_IsNextNodeClass(grow_tNodeClass nodeclass);
+
+//! Check if a nodeclass is the last page.
+/*!
+  \param nodeclass	Nodeclass to check.
+  \return 		1 if the nodeclass is the last page, else 0
+  page.
+*/
+int grow_IsLastNodeClass(grow_tNodeClass nodeclass);
 
 //! Get number of pages in a nodeclass.
 /*!

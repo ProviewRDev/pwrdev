@@ -10132,6 +10132,11 @@ int GeAnimation::scan(grow_tObject object)
         grow_SetObjectLastNodeClass(object);
       old_value = val;
     }
+    else if (sequence == ge_eAnimSequence_CycleLast) {
+      if (!val)
+	grow_SetObjectLastNodeClass(object);
+      old_value = val;
+    }
   }
 
   if (sequence == ge_eAnimSequence_Dig) {
@@ -10188,18 +10193,29 @@ int GeAnimation::scan(grow_tObject object)
         // Shift nodeclass
         if (animation_direction == 1) {
           // Shift forward
+	  if (sequence == ge_eAnimSequence_CycleLast) {
+	    grow_tNodeClass next_nc;
 
-          sts = grow_SetObjectNextNodeClass(object);
-          if (EVEN(sts)) {
-            if (sequence == ge_eAnimSequence_Cycle) {
+ 	    sts = grow_GetObjectNextNodeClass(object, &next_nc);
+	    if (EVEN(sts) || grow_IsLastNodeClass(next_nc)) {
               // Start from the beginning again
-              grow_SetObjectNodeClassByIndex(object, 1);
-            } else {
-              // Change direction
-              animation_direction = 2;
-              sts = grow_SetObjectPrevNodeClass(object);
-            }
-          }
+	      grow_SetObjectFirstNodeClass(object);
+	    }
+	    else
+	      sts = grow_SetObjectNextNodeClass(object);
+	  } else {
+	    sts = grow_SetObjectNextNodeClass(object);
+	    if (EVEN(sts)) {
+	      if (sequence == ge_eAnimSequence_Cycle) {
+		// Start from the beginning again
+		grow_SetObjectNodeClassByIndex(object, 1);
+	      } else {
+		// Change direction
+		animation_direction = 2;
+		sts = grow_SetObjectPrevNodeClass(object);
+	      }
+	    }
+	  }
           animation_count = 0;
         } else {
           // Shift backward
@@ -10217,7 +10233,10 @@ int GeAnimation::scan(grow_tObject object)
       if (animation_direction != 0) {
         // Stop and reset animation
         animation_direction = 0;
-        grow_SetObjectFirstNodeClass(object);
+	if (sequence == ge_eAnimSequence_CycleLast)
+	  grow_SetObjectLastNodeClass(object);
+	else
+	  grow_SetObjectFirstNodeClass(object);
       }
     }
   }

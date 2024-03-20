@@ -1074,7 +1074,8 @@ static attrnav_sEnumElement elem_anim_sequence[]
     = { { (unsigned int)ge_eAnimSequence_Inherit, "Inherit" },
         { (unsigned int)ge_eAnimSequence_Cycle, "Cyclic" },
         { (unsigned int)ge_eAnimSequence_Dig, "Dig" },
-        { (unsigned int)ge_eAnimSequence_ForwBack, "ForwBack" }, { 0, "" } };
+        { (unsigned int)ge_eAnimSequence_ForwBack, "ForwBack" }, 
+        { (unsigned int)ge_eAnimSequence_CycleLast, "CyclicLast" }, { 0, "" } };
 
 static attrnav_sEnumElement elem_limit_type[]
     = { { (unsigned int)ge_eLimitType_Gt, "GreaterThan" },

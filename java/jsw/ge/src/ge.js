@@ -799,6 +799,7 @@ var DynC = {
   eAnimSequence_Cycle		: 1,
   eAnimSequence_Dig		: 2,
   eAnimSequence_ForwBack	: 3,
+  eAnimSequence_CycleLast      	: 4,
 
   eLimitType_Gt		: 0,
   eLimitType_Lt		: 1,
@@ -6892,6 +6893,8 @@ function DynAnimation( dyn) {
 	this.sequence = DynC.eAnimSequence_Dig;
       else if (value === "ForwBack")
 	this.sequence = DynC.eAnimSequence_ForwBack;
+      else if (value === "CyclicLast")
+	this.sequence = DynC.eAnimSequence_CycleLast;
       else
         this.sequence = value;
       return 1;
@@ -6953,6 +6956,11 @@ function DynAnimation( dyn) {
 	  object.set_last_nodeclass();
 	this.a.oldValue = value;
       }
+      else if ( this.sequence == DynC.eAnimSequence_CycleLast) {
+	if ( !value)
+	  object.set_last_nodeclass();
+	this.a.oldValue = value;
+      }
     }
 
     if ( this.sequence == DynC.eAnimSequence_Dig) {
@@ -6975,14 +6983,23 @@ function DynAnimation( dyn) {
 	  // Shift nodeclass
 	  if ( this.animation_direction == 1) {
 	    // Shift forward
+	    if (sequence == ge_eAnimSequence_CycleLast) {
 
-	    sts = object.set_next_nodeclass();
-	    if ( (sts & 1) == 0) {
-	      // End of animation
+ 	      next_nc = object.get_next_nodeclass();
+	      if (next_nc != null && next_nc.is_last() == 1)
+                // Start from the beginning again
+	        object.set_first_nodeclass();
+	      else
+	        object.set_next_nodeclsas();
+	    } else {
+	      sts = object.set_next_nodeclass();
+	      if ( (sts & 1) == 0) {
+	        // End of animation
+	        this.animation_count = 0;
+	        this.animation_direction = 0;
+	      }
 	      this.animation_count = 0;
-	      this.animation_direction = 0;
 	    }
-	    this.animation_count = 0;
 	  }
 	  else {
 	    // Shift backward
@@ -7044,7 +7061,10 @@ function DynAnimation( dyn) {
 	if ( this.animation_direction != 0) {
 	  // Stop and reset animation
 	  this.animation_direction = 0;
-	  object.set_first_nodeclass();
+	  if ( this.sequence ==  == DynC.eAnimSequence_CycleLast)
+	    object.set_last_nodeclass();
+	  else
+	    object.set_first_nodeclass();
 	}
       }
     }

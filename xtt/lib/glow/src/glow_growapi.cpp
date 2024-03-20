@@ -1506,6 +1506,11 @@ int grow_GetObjectAttrInfo(
     attrinfo[i].type = glow_eType_Boolean;
     attrinfo[i++].size = sizeof(op->fixposition);
 
+    strcpy(attrinfo[i].name, "fixcolor");
+    attrinfo[i].value_p = &op->fixcolor;
+    attrinfo[i].type = glow_eType_Boolean;
+    attrinfo[i++].size = sizeof(op->fixcolor);
+
     strcpy(attrinfo[i].name, "Dynamic");
     op->get_dynamic(&dynamic, &dynsize);
     attrinfo[i].value_p = malloc(1024);
@@ -5498,6 +5503,11 @@ char* grow_ColorToneToName(glow_eDrawType drawtype)
   return GlowColor::colortone_to_name(drawtype);
 }
 
+int grow_GetObjectNextNodeClass(grow_tObject object, grow_tNodeClass* next)
+{
+  return ((GrowNode*)object)->get_next_nodeclass((GlowNodeClass**)next);
+}
+
 int grow_SetObjectNextNodeClass(grow_tObject object)
 {
   return ((GrowNode*)object)->set_next_nodeclass();
@@ -5549,6 +5559,11 @@ int grow_GetShowGrid(grow_tCtx ctx)
 int grow_IsNextNodeClass(grow_tNodeClass nodeclass)
 {
   return ((GlowNodeClass*)nodeclass)->is_next();
+}
+
+int grow_IsLastNodeClass(grow_tNodeClass nodeclass)
+{
+  return ((GlowNodeClass*)nodeclass)->is_last();
 }
 
 int grow_GetNodeClassPages(grow_tNodeClass nodeclass)

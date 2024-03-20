@@ -1235,6 +1235,8 @@ var Glow = {
   eSave_GrowArc_fill_eq_light 		: 2425,
   eSave_GrowArc_fill_eq_shadow		: 2426,
   eSave_GrowArc_transparency 		: 2427,
+  eSave_GrowArc_border_eq_light 	: 2428,
+  eSave_GrowArc_border_eq_shadow	: 2429,
   eSave_PolyLine_draw_type		: 2500,
   eSave_PolyLine_line_width		: 2501,
   eSave_PolyLine_a_points		: 2502,
@@ -1271,6 +1273,8 @@ var Glow = {
   eSave_GrowPolyLine_fill_eq_background : 2628,
   eSave_GrowPolyLine_background_drawtype : 2629,
   eSave_GrowPolyLine_transparency 	: 2630,
+  eSave_GrowPolyLine_border_eq_light   	: 2631,
+  eSave_GrowPolyLine_border_eq_shadow  	: 2632,
   eSave_GrowNode_node_part		: 2700,
   eSave_GrowNode_dynamic		: 2701,
   eSave_GrowNode_dynamicsize		: 2702,
@@ -1451,6 +1455,7 @@ var Glow = {
   eSave_GrowRectRounded_fixposition  	: 3822,
   eSave_GrowRectRounded_transparency 	: 3823,
   eSave_GrowRectRounded_thin_shadow 	: 3824,
+  eSave_GrowRectRounded_fixcolor  	: 3825,
   eSave_GrowConGlue_line_width_up 	: 3900,
   eSave_GrowConGlue_line_width_down 	: 3901,
   eSave_GrowConGlue_line_width_left 	: 3902,
@@ -3267,6 +3272,13 @@ function GlowNodeClass( ctx) {
     return null;
   };
 
+  this.is_last = function() {
+    if (this.next_nc == null)
+      return 1;
+    else
+      return 0;
+  };
+
   this.getName = function() {
     return this.nc_name;
   };
@@ -4873,6 +4885,10 @@ function GrowNode( ctx) {
   };
   this.transformIsStored = function() {
     return this.trf.is_stored();
+  };
+
+  this.get_next_nodeclass = function() {
+    return this.nc.next_nc;
   };
 
   this.set_next_nodeclass = function() {
@@ -6747,6 +6763,7 @@ function GrowRectRounded( ctx) {
   this.relief = Glow.eRelief_Up;
   this.disable_shadow = 0
   this.fixposition = 0
+  this.fixcolor = 0
   this.gradient = 0 
   this.gradient_contrast = 4;
   this.disable_gradient = Glow.eGradient_No;
@@ -6864,6 +6881,9 @@ function GrowRectRounded( ctx) {
       case Glow.eSave_GrowRectRounded_thin_shadow:
 	this.thin_shadow = parseInt(tokens[1], 10);
 	break;
+      case Glow.eSave_GrowRectRounded_fixcolor:
+	this.fixcolor = parseInt(tokens[1], 10);
+	break;
       case Glow.eSave_GrowRectRounded_dynamicsize:
 	this.dynamicsize = parseInt(tokens[1], 10);
 	break;
@@ -6973,6 +6993,9 @@ function GrowRectRounded( ctx) {
       transp = colornode.transparency;
     if (transpnode !== null && Number(transpnode.transparency) > Number(transp))
       transp = transpnode.transparency;
+
+    if ( this.fixcolor !== 0)
+      colornode = null;
 
     if ( node !== null && node.line_width !== 0)
       idx = Math.floor( this.ctx.mw.zoom_factor_y / this.ctx.mw.base_zoom_factor * 
@@ -7560,6 +7583,8 @@ function GrowArc( ctx) {
   this.fill_eq_background = 0;
   this.fill_eq_light = 0;
   this.fill_eq_shadow = 0;
+  this.border_eq_light = 0;
+  this.border_eq_shadow = 0;
   this.transparency = 0;
   this.dynamicsize = 0;
   this.trf = new GlowTransform();
@@ -7680,6 +7705,12 @@ function GrowArc( ctx) {
 	break;
       case Glow.eSave_GrowArc_fill_eq_shadow:
 	this.fill_eq_shadow = parseInt(tokens[1], 10);
+	break;
+      case Glow.eSave_GrowArc_border_eq_light:
+	this.border_eq_light = parseInt(tokens[1], 10);
+	break;
+      case Glow.eSave_GrowArc_border_eq_shadow:
+	this.border_eq_shadow = parseInt(tokens[1], 10);
 	break;
       case Glow.eSave_GrowArc_transparency:
 	this.transparency = parseFloat(tokens[1], 10);
@@ -7967,6 +7998,12 @@ function GrowArc( ctx) {
     if ( this.border !== 0 || this.fill === 0) {
       drawtype = GlowColor.get_drawtype( this.draw_type, Glow.eDrawType_LineHighlight,
 					 highlight, colornode, 0, 0);
+      if (this.border_eq_light !== 0)
+	drawtype = GlowColor.shift_drawtype( drawtype, -this.shadow_contrast + chot, 
+					     colornode);
+      else if (this.border_eq_shadow !== 0)
+	drawtype = GlowColor.shift_drawtype( drawtype, this.shadow_contrast + chot, 
+					     colornode);
       this.ctx.gdraw.arc( ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, 
 		     this.angle1 - rot, this.angle2, drawtype, idx, 0, transp);
     }    
@@ -8860,6 +8897,8 @@ function GrowPolyLine( ctx) {
   this.fill_eq_bglight = 0;
   this.fill_eq_bgshadow = 0;
   this.fill_eq_background = 0;
+  this.border_eq_light = 0;
+  this.border_eq_shadow = 0;
   this.transparency = 0;
   this.dynamicsize = 0;
   this.trf = new GlowTransform();
@@ -9023,6 +9062,12 @@ function GrowPolyLine( ctx) {
 	break;
       case Glow.eSave_GrowPolyLine_fill_eq_background:
 	this.fill_eq_background = parseInt(tokens[1], 10);
+	break;
+      case Glow.eSave_GrowPolyLine_border_eq_light:
+	this.border_eq_light = parseInt(tokens[1], 10);
+	break;
+      case Glow.eSave_GrowPolyLine_border_eq_shadow:
+	this.border_eq_shadow = parseInt(tokens[1], 10);
 	break;
       case Glow.eSave_GrowPolyLine_transparency:
 	this.transparency = parseFloat(tokens[1], 10);
@@ -9259,6 +9304,12 @@ function GrowPolyLine( ctx) {
     if ( this.border !== 0 || !(this.fill !== 0 || (display_shadow && this.shadow_width !== 0))) {
       drawtype = GlowColor.get_drawtype( this.draw_type, Glow.eDrawType_LineHighlight,
 					 highlight, colornode, 0, 0);
+      if (this.border_eq_light !== 0)
+	drawtype = GlowColor.shift_drawtype( drawtype, -this.shadow_contrast + chot, 
+					     colornode);
+      else if (this.border_eq_shadow !== 0)
+	drawtype = GlowColor.shift_drawtype( drawtype, this.shadow_contrast + chot, 
+					     colornode);
       this.ctx.gdraw.polyline( this.points, this.a_points.size(), drawtype, idx, 0, transp);
     }
   };
