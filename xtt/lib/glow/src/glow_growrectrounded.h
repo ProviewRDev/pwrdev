@@ -325,6 +325,7 @@ public:
   int fixposition; //!< Can't be moved.
   double transparency; //!< Border and fill color transparency.
   int thin_shadow; //!< Shadow drawn with lines.
+  int fixcolor; //!< Color independent of node color.
 
   //! Set user data.
   /*!

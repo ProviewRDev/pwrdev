@@ -60,7 +60,7 @@ GrowRectRounded::GrowRectRounded(GrowCtx* glow_ctx, const char* name, double x,
       shadow(display_shadow), shadow_width(5), relief(glow_eRelief_Up),
       shadow_contrast(2), disable_shadow(0), gradient(glow_eGradient_No),
       gradient_contrast(4), disable_gradient(0), fixposition(0), transparency(0),
-      thin_shadow(0)
+      thin_shadow(0), fixcolor(0)
 {
   strcpy(n_name, name);
   pzero.nav_zoom();
@@ -289,6 +289,8 @@ void GrowRectRounded::save(std::ofstream& fp, glow_eSaveMode mode)
      << '\n';
   fp << int(glow_eSave_GrowRectRounded_transparency) << FSPACE << transparency << '\n';
   fp << int(glow_eSave_GrowRectRounded_thin_shadow) << FSPACE << thin_shadow << '\n';
+  fp << int(glow_eSave_GrowRectRounded_fixcolor) << FSPACE << fixcolor
+     << '\n';
   fp << int(glow_eSave_GrowRectRounded_dynamicsize) << FSPACE << dynamicsize
      << '\n';
   fp << int(glow_eSave_GrowRectRounded_dynamic) << '\n';
@@ -396,6 +398,9 @@ void GrowRectRounded::open(std::ifstream& fp)
       break;
     case glow_eSave_GrowRectRounded_thin_shadow:
       fp >> thin_shadow;
+      break;
+    case glow_eSave_GrowRectRounded_fixcolor:
+      fp >> fixcolor;
       break;
     case glow_eSave_GrowRectRounded_dynamicsize:
       fp >> dynamicsize;
@@ -725,6 +730,9 @@ void GrowRectRounded::draw(GlowWind* w, GlowTransform* t, int highlight,
     transp = ((GrowNode*)colornode)->transparency;
   if (transpnode && ((GrowNode*)transpnode)->transparency > transp)
     transp = ((GrowNode*)transpnode)->transparency;
+
+  if (fixcolor)
+    colornode = 0;
 
   if (fix_line_width) {
     idx = line_width;
