@@ -334,6 +334,9 @@ elif [ $new_project -eq 1 ]; then
   changes=1
 fi
 
+# Update service files for systemd
+systemctl daemon-reload
+
 echo ""
 echo "***********************************************************"
 echo "  Don't forget to do this :"
