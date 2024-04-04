@@ -28,4 +28,7 @@ project/pwrtest03/src/login/initvol.pwr_com
 *.gjl
 *.wb_dmp.*
 
+# Ignore python setuptools folders created
+*.egg-info/
+
 .env
