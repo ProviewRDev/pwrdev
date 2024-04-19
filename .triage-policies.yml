@@ -11,23 +11,23 @@ resource_rules:
               - Needs Triage
         - name: New Issues
           conditions:
-          date:
-            attribute: created_at
-            condition: newer_than
-            interval_type: days
-            interval: 7
-          state: opened
+            date:
+              attribute: created_at
+              condition: newer_than
+              interval_type: days
+              interval: 7
+            state: opened
           actions:
             labels:
               - New
         - name: Not New Issues
           conditions:
-          date:
-            attribute: created_at
-            condition: older_than
-            interval_type: days
-            interval: 7
-          state: opened
+            date:
+              attribute: created_at
+              condition: older_than
+              interval_type: days
+              interval: 7
+            state: opened
           actions:
             remove_labels:
               - New
