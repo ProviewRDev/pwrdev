@@ -15,7 +15,7 @@ resource_rules:
               attribute: created_at
               condition: newer_than
               interval_type: days
-              interval: 7
+              interval: 8
             state: opened
           actions:
             labels:
@@ -26,11 +26,38 @@ resource_rules:
               attribute: created_at
               condition: older_than
               interval_type: days
-              interval: 7
+              interval: 8
             state: opened
           actions:
             remove_labels:
               - New
+        - name: Stale Issues
+          conditions:
+            date:
+              attribute: updated_at
+              condition: older_than
+              interval_type: months
+              interval: 12
+            state: opened
+          actions:
+            labels:
+              - Stale
+            comment: |
+              This issue haven't had any updates for 12 months and will be marked stale. Please update this issue to keep it alive, otherwise it will be automatically closed in 3 months.
+        - name: Auto Close Issues
+          conditions:
+            date:
+              attribute: updated_at
+              condition: older_than
+              interval_type: months
+              interval: 15
+            state: opened
+          actions:
+            labels:
+              - Stale
+            comment: |
+              Closing this issue due to no updates in the past 15 months.
+
 
 
 
