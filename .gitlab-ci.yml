@@ -13,6 +13,8 @@ dry-run:triage:
     when: manual
     except:
         - schedules
+    tags:
+        - docker
 
 policy:run:
     stage: run
@@ -22,6 +24,8 @@ policy:run:
     when: manual
     except:
         - schedules
+    tags:
+        - docker
 
 schedule:policyrun:
     stage: run
@@ -30,3 +34,5 @@ schedule:policyrun:
         - gitlab-triage --token $API_TOKEN --source projects --source-id $CI_PROJECT_PATH
     only:
         - schedules
+    tags:
+        - docker
