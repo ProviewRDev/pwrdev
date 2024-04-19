@@ -1,0 +1,6 @@
+resource_rules:
+    issues:
+      rules:
+        - name: find all open issues - any label (simple - should be lots)
+          conditions:
+           state: opened
