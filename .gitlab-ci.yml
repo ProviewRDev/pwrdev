@@ -1,4 +1,4 @@
-image: ruby:2.7
+image: se-oxd-docker-registry.ssab.com/ssab/gitlab-triage-bot:v1
 
 stages:
     - triage
@@ -6,8 +6,7 @@ stages:
 
 dry-run:triage:
     stage: triage
-    script:
-        - gem install gitlab-triage
+    script:        
         - gitlab-triage --help
         - gitlab-triage --dry-run --token $API_TOKEN --source projects --source-id $CI_PROJECT_PATH
     when: manual
@@ -18,8 +17,7 @@ dry-run:triage:
 
 policy:run:
     stage: run
-    script:
-        - gem install gitlab-triage
+    script:        
         - gitlab-triage --token $API_TOKEN --source projects --source-id $CI_PROJECT_PATH
     when: manual
     except:
@@ -29,8 +27,7 @@ policy:run:
 
 schedule:policyrun:
     stage: run
-    script:
-        - gem install gitlab-triage
+    script:        
         - gitlab-triage --token $API_TOKEN --source projects --source-id $CI_PROJECT_PATH
     only:
         - schedules
