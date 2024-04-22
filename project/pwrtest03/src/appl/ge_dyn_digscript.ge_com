@@ -40,13 +40,13 @@ main()
 
   xm = x0 + 1;
   ym = y0 + 1;
-  id = CreateText("DigScript", xm, ym, 4, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("DigScript", xm, ym, 4, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
 # Script SetSubwindow
   ym += 3.5;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Switch between blue and orange graph", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Switch between blue and orange graph", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   ym += 1;
   x1 = xm;

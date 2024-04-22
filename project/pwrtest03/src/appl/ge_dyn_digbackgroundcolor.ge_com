@@ -44,7 +44,7 @@ main()
 
   xm = x0 + 1;
   ym = y0 + 1;
-  id = CreateText("DigBackgroundColor", xm, ym, 4, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("DigBackgroundColor", xm, ym, 4, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
 # Green/White
   ym += 1.5;

@@ -46,13 +46,13 @@ main()
 
   xm = x0 + 1;
   ym = y0 + 1;
-  id = CreateText("Script", xm, ym, 4, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Script", xm, ym, 4, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
 # Set blue logo
   ym += 1.5;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Display blue graph", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Display blue graph", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   ym += 0.0;
   x1 = xm;
@@ -75,7 +75,7 @@ main()
   xm = x0 + 1;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Display orange graph", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Display orange graph", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   ym += 0.0;
   x1 = xm;

@@ -194,9 +194,8 @@ var Glow = {
   eFont_Helvetica		: 0,
   eFont_Times			: 1,
   eFont_NewCenturySchoolbook 	: 2,
-  eFont_Courier			: 3,
-  eFont_LucidaSans		: 4,
-  eFont__			: 5,
+  eFont_Courier			: 3,  
+  eFont__			: 4,
   eFont_No 			: 9999,
 
   eRelief_Up			: 0,
@@ -16746,10 +16745,7 @@ function GlowDraw( ctx) {
       break;
     case Glow.eFont_Courier:
       fontname = "Courier";
-      break;
-    case Glow.eFont_LucidaSans:
-      fontname = "Arial";
-      break;
+      break;    
     default:
       fontname = "Arial";
     }

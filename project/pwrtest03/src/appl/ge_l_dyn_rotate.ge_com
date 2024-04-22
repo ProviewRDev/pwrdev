@@ -47,13 +47,13 @@ main()
 
   xm = x0 + 1;
   ym = y0 + 1;
-  id = CreateText("Rotate", xm, ym, 4, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Rotate", xm, ym, 4, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
 # Integer
   ym += 1.5;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Angle", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Angle", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   ym += 0.0;
   x1 = xm + 0.2;
@@ -84,7 +84,7 @@ main()
   ym += 12;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Factor 2 and 0.25", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Factor 2 and 0.25", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   x1 = xm;
   ym += 1;
@@ -116,7 +116,7 @@ main()
   ym += 12;
   x2 = xm;
   y2 = ym;
-  id = CreateText("x0, y0", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("x0, y0", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   ym -= 1;
   x1 = xm - 5;

@@ -47,13 +47,13 @@ main()
 
   xm = x0 + 1;
   ym = y0 + 1;
-  id = CreateText("Value", xm, ym, 4, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Value", xm, ym, 4, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
 # Integer
   ym += 1.5;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Integer", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Integer", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   ym += 0.0;
   x1 = xm + 0.2;
@@ -85,7 +85,7 @@ main()
   ym += 2.6;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Float %6.2f", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Float %6.2f", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   ym += 0.0;
   x1 = xm + 0.2;
@@ -117,7 +117,7 @@ main()
   ym += 2.6;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Boolean", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Boolean", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   ym += 0.0;
   x1 = xm + 0.2;
@@ -145,7 +145,7 @@ main()
   ym += 2.6;
   x2 = xm;
   y2 = ym;
-  id = CreateText("String", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("String", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   ym += 0.0;
   x1 = xm + 0.2;
@@ -162,7 +162,7 @@ main()
   ym += 2.6;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Float DecimalsAttr and DecimalsDecrease", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Float DecimalsAttr and DecimalsDecrease", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   ym += 0.0;
   x1 = xm + 0.2;
@@ -336,7 +336,7 @@ main()
   ym += 2.6;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Integer ZeroBlank", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Integer ZeroBlank", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   ym += 0.0;
   x1 = xm + 0.2;
@@ -369,7 +369,7 @@ main()
   ym += 2.6;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Float ZeroBlank", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Float ZeroBlank", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   ym += 0.0;
   x1 = xm + 0.2;
@@ -403,7 +403,7 @@ main()
   xm = 15;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Time formats", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Time formats", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
 # %t
 
@@ -420,7 +420,7 @@ main()
 
   x1 += 10.5;
   y1 += 0.6;
-  id = CreateText("DD-MMM-YYYY hh:mm:ss.hh", x1, y1, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("DD-MMM-YYYY hh:mm:ss.hh", x1, y1, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
 # %1t
 
@@ -437,7 +437,7 @@ main()
 
   x1 += 10.5;
   y1 += 0.6;
-  id = CreateText("hh:mm:ss", x1, y1, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("hh:mm:ss", x1, y1, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
 # %2t
 
@@ -454,7 +454,7 @@ main()
 
   x1 += 10.5;
   y1 += 0.6;
-  id = CreateText("hh:mm:ss.hh", x1, y1, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("hh:mm:ss.hh", x1, y1, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
 # %3t
 
@@ -471,7 +471,7 @@ main()
 
   x1 += 10.5;
   y1 += 0.6;
-  id = CreateText("YY-MM-DD hh:mm:ss", x1, y1, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("YY-MM-DD hh:mm:ss", x1, y1, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
 # %4t
 
@@ -488,7 +488,7 @@ main()
 
   x1 += 10.5;
   y1 += 0.6;
-  id = CreateText("DD-MMM-YYYY", x1, y1, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("DD-MMM-YYYY", x1, y1, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
 # %5t
 
@@ -505,13 +505,13 @@ main()
 
   x1 += 10.5;
   y1 += 0.6;
-  id = CreateText("YY-MM-DD", x1, y1, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("YY-MM-DD", x1, y1, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
 # DeltaTime formats
   ym += 2.5;
   x2 = xm;
   y2 = ym;
-  id = CreateText("DeltaTime formats", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("DeltaTime formats", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
 # %t
 
@@ -528,7 +528,7 @@ main()
 
   x1 += 10.5;
   y1 += 0.6;
-  id = CreateText("DD hh:mm:ss.hh", x1, y1, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("DD hh:mm:ss.hh", x1, y1, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
 # %1t
 
@@ -545,13 +545,13 @@ main()
 
   x1 += 10.5;
   y1 += 0.6;
-  id = CreateText("DD hh:mm:ss", x1, y1, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("DD hh:mm:ss", x1, y1, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
 # Objid formats
   ym += 2.5;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Objid formats", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Objid formats", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
 # %o
 
@@ -568,7 +568,7 @@ main()
 
   x1 += 10.5;
   y1 += 0.6;
-  id = CreateText("object", x1, y1, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("object", x1, y1, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
 # %1o
 
@@ -585,7 +585,7 @@ main()
 
   x1 += 10.5;
   y1 += 0.6;
-  id = CreateText("path-object", x1, y1, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("path-object", x1, y1, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
 # %2o
 
@@ -602,13 +602,13 @@ main()
 
   x1 += 12.5;
   y1 += 0.6;
-  id = CreateText("volume:path-object", x1, y1, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("volume:path-object", x1, y1, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
 # AttrRef formats
   ym += 2.5;
   x2 = xm;
   y2 = ym;
-  id = CreateText("AttrRef formats", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("AttrRef formats", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
 # %o
 
@@ -625,7 +625,7 @@ main()
 
   x1 += 10.5;
   y1 += 0.6;
-  id = CreateText("object.attr", x1, y1, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("object.attr", x1, y1, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
 # %1o
 
@@ -642,7 +642,7 @@ main()
 
   x1 += 12.5;
   y1 += 0.6;
-  id = CreateText("path-object.attr", x1, y1, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("path-object.attr", x1, y1, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
 # %2o
 
@@ -659,13 +659,13 @@ main()
 
   x1 += 16.5;
   y1 += 0.6;
-  id = CreateText("volume:path-object.attr", x1, y1, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("volume:path-object.attr", x1, y1, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
 # Status formats
   ym += 2.5;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Status formats", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Status formats", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
 # %m
 
@@ -682,7 +682,7 @@ main()
 
   x1 += 20.5;
   y1 += 0.6;
-  id = CreateText("info, text", x1, y1, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("info, text", x1, y1, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
 # %1m
 
@@ -699,13 +699,13 @@ main()
 
   x1 += 12.5;
   y1 += 0.6;
-  id = CreateText("text", x1, y1, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("text", x1, y1, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
 # Enum formats
   ym += 2.5;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Enum formats", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Enum formats", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
 # %d
 
@@ -722,7 +722,7 @@ main()
 
   x1 += 6.5;
   y1 += 0.6;
-  id = CreateText("integer", x1, y1, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("integer", x1, y1, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
 # %s
 
@@ -739,13 +739,13 @@ main()
 
   x1 += 6.5;
   y1 += 0.6;
-  id = CreateText("0-14 text, 15-16 integer", x1, y1, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("0-14 text, 15-16 integer", x1, y1, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
 # Mask formats
   ym += 2.5;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Mask formats", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Mask formats", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
 # %d
 
@@ -762,7 +762,7 @@ main()
 
   x1 += 6.5;
   y1 += 0.6;
-  id = CreateText("integer", x1, y1, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("integer", x1, y1, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
 # %b
 
@@ -779,7 +779,7 @@ main()
 
   x1 += 16.5;
   y1 += 0.6;
-  id = CreateText("32 bits", x1, y1, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("32 bits", x1, y1, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
 # %16b
 
@@ -796,7 +796,7 @@ main()
 
   x1 += 8.5;
   y1 += 0.6;
-  id = CreateText("16 bits", x1, y1, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("16 bits", x1, y1, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   SetGraphAttribute("x1", 30.0);
   SetGraphAttribute("y1", 40.0);

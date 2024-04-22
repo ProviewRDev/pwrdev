@@ -20,10 +20,10 @@ string object, string text, float min_value, float max_value)
   gw = gx2 - gx1;
   gh = gy2 - gy1;
 
-  GetTextExtent(title, 3, eFont_LucidaSans, 0, twidth);
+  GetTextExtent(title, 3, eFont_Helvetica, 0, twidth);
   x2 = (gx1 + gx2)/2 - twidth/2;
   y2 = gy1 + 1;
-  id = CreateText(title, x2, y2, 3, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText(title, x2, y2, 3, eFont_Helvetica, 0, eDrawType_CustomColor5);
   DashInsertObject(g, id);
 
   if (time_range == 0)

@@ -39,13 +39,13 @@ main()
 
   xm = x0 + 1;
   ym = y0 + 1;
-  id = CreateText("EmitSignal / CatchSignal", xm, ym, 4, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("EmitSignal / CatchSignal", xm, ym, 4, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
 # Signal S1
   ym += 1.5;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Signal S1", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Signal S1", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   x1 = xm;
   y1 = ym + 0.7;
@@ -59,7 +59,7 @@ main()
   
   x2 = xm + 7;
   y2 = ym;
-  id = CreateText("Catch S1", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Catch S1", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   x1 = xm + 7;
   y1 = ym + 0.6;
@@ -101,7 +101,7 @@ main()
   ym += 3;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Signal S2", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Signal S2", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   x1 = xm;
   y1 = ym + 0.7;
@@ -115,7 +115,7 @@ main()
   
   x2 = xm + 7;
   y2 = ym;
-  id = CreateText("Catch S2", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Catch S2", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   x1 = xm + 7;
   y1 = ym + 0.6;
@@ -157,7 +157,7 @@ main()
   ym += 3.;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Signal S3, Global", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Signal S3, Global", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   x1 = xm;
   y1 = ym + 0.7;
@@ -172,7 +172,7 @@ main()
   
   x2 = xm + 7;
   y2 = ym;
-  id = CreateText("Catch S3", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Catch S3", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   x1 = xm + 7;
   y1 = ym + 0.6;
@@ -214,7 +214,7 @@ main()
   ym += 3;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Signal S4, Global", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Signal S4, Global", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   x1 = xm;
   y1 = ym + 0.7;
@@ -229,7 +229,7 @@ main()
   
   x2 = xm + 7;
   y2 = ym;
-  id = CreateText("Catch S4", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Catch S4", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   x1 = xm + 7;
   y1 = ym + 0.6;

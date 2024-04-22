@@ -5222,9 +5222,7 @@ arg_count) {
     sts = this.ccm.create_external_var("eFont_NewCenturySchoolbook", CcmC.K_DECL_INT, 0,
       Glow.eFont_NewCenturySchoolbook, 0);
     sts = this.ccm.create_external_var("eFont_Courier", CcmC.K_DECL_INT, 0,
-      Glow.eFont_Courier, 0);
-    sts = this.ccm.create_external_var("eFont_LucidaSans", CcmC.K_DECL_INT, 0,
-      Glow.eFont_LucidaSans, 0);
+      Glow.eFont_Courier, 0);    
 
     sts = this.ccm.create_external_var("eDirection_Center", CcmC.K_DECL_INT, 0,
       Glow.eDirection_Center, 0);

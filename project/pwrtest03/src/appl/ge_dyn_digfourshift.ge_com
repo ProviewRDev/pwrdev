@@ -43,14 +43,14 @@ main()
 
   xm = x0 + 1;
   ym = y0 + 1;
-  id = CreateText("DigFourShift", xm, ym, 4, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("DigFourShift", xm, ym, 4, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
 # Traffic light
 
   ym += 3.5;
   x2 = xm;
   y2 = ym;
-  id = CreateText("FourShift", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("FourShift", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   y1 = ym + 0.5;
   x1 = xm;
@@ -99,7 +99,7 @@ main()
   ym += 3.5;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Red/Green/Black", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Red/Green/Black", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   y1 = ym + 0.5;
   x1 = xm;
@@ -140,7 +140,7 @@ main()
   ym += 3.5;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Red/Yellow/Black", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Red/Yellow/Black", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   y1 = ym + 0.5;
   x1 = xm;
@@ -182,7 +182,7 @@ main()
   ym += 3.5;
   x2 = xm;
   y2 = ym;
-  id = CreateText("Red/Yellow/Black", x2, y2, 2, eFont_LucidaSans, 0, eDrawType_CustomColor5);
+  id = CreateText("Red/Yellow/Black", x2, y2, 2, eFont_Helvetica, 0, eDrawType_CustomColor5);
 
   y1 = ym + 0.5;
   x1 = xm;
