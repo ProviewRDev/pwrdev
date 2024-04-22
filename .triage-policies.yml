@@ -1,11 +1,10 @@
 resource_rules:
     issues:
       rules:
-        - name: Unlabeled Issues
+        - name: Unlabeled Issues (Ignoring New and Unassigned)
           conditions:
-            state: opened
-            labels:
-              - None
+            ruby: resource["labels"].reject { |label| label == "New" || label == "Unassigned" }.empty?
+            state: opened            
           actions:
             labels:
               - Needs Triage
