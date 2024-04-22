@@ -31,6 +31,21 @@ resource_rules:
           actions:
             remove_labels:
               - New
+        - name: No Longer Stale Issues
+          conditions:
+            date:
+              attribute: updated_at
+              condition: newer_than
+              interval_type: months
+              interval: 12
+            state: opened
+            labels:
+              - Stale
+          actions:
+            remove_labels:
+              - Stale
+            comment: |
+              Removing label Stale as this has had updates.
         - name: Stale Issues
           conditions:
             date:
@@ -50,13 +65,16 @@ resource_rules:
               attribute: updated_at
               condition: older_than
               interval_type: months
-              interval: 15
+              interval: 3
             state: opened
-          actions:
             labels:
               - Stale
+          actions:
+            status: close
+            remove_labels:
+              - Stale
             comment: |
-              Closing this issue due to no updates in the past 15 months.
+              Closing this issue due to being stale for 3 months.
 
 
 
