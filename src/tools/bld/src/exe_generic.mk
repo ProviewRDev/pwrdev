@@ -143,7 +143,7 @@ exe : $(l_targets) $(objects) $(export_flv_obj) $(export_exe) | silent
 dirs : $(bld_dir)$(dir_ext)
 
 $(bld_dir)$(dir_ext) :
-	@ $(mkdir) $(mkdirflags) $(basename $@)
+	@ $(mkdir) -p $(mkdirflags) $(basename $@)
 
 clean : clean_exe clean_bld
 

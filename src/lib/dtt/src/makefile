@@ -126,7 +126,7 @@ $(inc_dir)/dtt_appl_rttsys_m.rh : $(bld_dir)/dtt_appl_rttsys_m.rh
 	@ cp $(source) $(target)
 
 $(bld_dir)$(dir_ext) :
-	@ $(mkdir) $(mkdirflags) $(basename $@)/
+	@ $(mkdir) -p $(mkdirflags) $(basename $@)/
 
 clean : clean_bld clean_lib
 

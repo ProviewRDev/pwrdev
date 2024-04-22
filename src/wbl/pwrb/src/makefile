@@ -172,7 +172,7 @@ clean_wbl :
 	  fi
 
 $(bld_dir)$(dir_ext) :
-	@ $(mkdir) $(mkdirflags) $(basename $@)
+	@ $(mkdir) -p $(mkdirflags) $(basename $@)
 
 -include $(bld_dir)/pwrb.d_h_wbl
 -include $(bld_dir)/pwrb.d_hpp_wbl

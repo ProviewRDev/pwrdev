@@ -101,7 +101,7 @@ exe : silent
 dirs : $(bld_dir)$(dir_ext) | silent
 
 $(bld_dir)$(dir_ext) :
-	@ $(mkdir) $(mkdirflags) $(basename $@)/
+	@ $(mkdir) -p $(mkdirflags) $(basename $@)/
 
 clean : clean_bld clean_lib
 

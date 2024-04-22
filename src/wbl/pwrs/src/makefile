@@ -151,7 +151,7 @@ clean_systemclasses :
 
 $(bld_dir)$(dir_ext) :
 	@ $(log_mkdir)
-	@ $(mkdir) $(mkdirflags) $(basename $@)
+	@ $(mkdir) -p $(mkdirflags) $(basename $@)
 
 -include $(bld_dir)/pwrs.d_h_wbl
 -include $(bld_dir)/pwrs.d_hpp_wbl

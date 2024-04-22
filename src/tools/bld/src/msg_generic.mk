@@ -54,7 +54,7 @@ dirs : $(bld_dir)$(dir_ext) | silent
 
 $(bld_dir)$(dir_ext) :
 	@ $(log_mkdir) $<
-	@ $(mkdir) $(mkdirflags) $(basename $@)
+	@ $(mkdir) -p $(mkdirflags) $(basename $@)
 
 clean :
 

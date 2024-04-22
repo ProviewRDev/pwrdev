@@ -89,7 +89,7 @@ log_xtthelp	= echo "I $(time)  build-$(pwre_bmodule), Generate xtthelp files $(n
 .SUFFIXES:
 
 $(bld_dir)$(dir_ext) :
-	@ $(mkdir) $(mkdirflags) $(basename $@)
+	@ $(mkdir) -p $(mkdirflags) $(basename $@)
 
 $(load_dir)/%.dbs : %.wb_load
 	@ $(log_load)

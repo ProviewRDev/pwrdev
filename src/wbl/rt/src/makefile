@@ -50,6 +50,6 @@ clean_wbl :
 	  fi
 
 $(bld_dir)$(dir_ext) :
-	@ $(mkdir) $(mkdirflags) $(basename $@)
+	@ $(mkdir) -p $(mkdirflags) $(basename $@)
 
 -include $(bld_dir)/rt.d_wbl

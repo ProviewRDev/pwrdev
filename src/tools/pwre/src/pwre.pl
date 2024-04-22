@@ -1416,8 +1416,11 @@ sub tags()
 
 #
 # _build()
-#
-sub _build() # args: branch, subbranch, flavour, phase
+# args: branch, subbranch, flavour, phase
+# Ex:
+# _build("lib", "*", "src", "copy");
+# _build("lib", "*", $flavour, "copy");
+sub _build() 
 {
   my($branch) = $_[0];
   if (!defined($branch)) {
@@ -1441,7 +1444,7 @@ sub _build() # args: branch, subbranch, flavour, phase
 
   my($grepstr) = $ENV{"pwre_target"};
 
-  my($globstr) = $ENV{"pwre_sroot"} . "/$branch";
+  my($globstr) = $ENV{"pwre_sroot"} . "/$branch"; # Ex. /pwr_source/profibus/lib
   my(@dirs1) = glob($globstr);
   my($dir1);
   my(@dirs2);
@@ -1458,8 +1461,8 @@ sub _build() # args: branch, subbranch, flavour, phase
   $cpu_count = $cpu_count * 2;
 
   foreach $dir1 (@dirs1) {
-    $globstr1 = "$dir1" . "/$subbranch/$flavour";
-    @dirs2 = glob($globstr1);
+    $globstr1 = "$dir1" . "/$subbranch/$flavour"; # Ex. /pwr_source/profibus/lib/*/src
+    @dirs2 = glob($globstr1); # Ex. /pwr_source/profibus/lib/{cow/rt/wb/xtt}/src
     foreach $dir2 (@dirs2) {
       if (! -d $dir2) {
         next;
@@ -1472,18 +1475,20 @@ sub _build() # args: branch, subbranch, flavour, phase
       } else {
         $makefile = $ENV{"pwre_croot"} . "/src/tools/bld/src/generic_makefile";
       }
-
+      
       if ($parallel eq "1" && (($branch eq "lib" && $subbranch ne "dtt") || $branch eq "wbl")) {
         # All libraries and wbl files can be compiled in parallel
-        if (system("make -f $makefile -j$cpu_count -l$cpu_count @_")) {
-	  _log("F", $branch, $subbranch, "Fatal error, build terminated");
-	  exit 1;
-	}
-      } else {
+        # Example: make -f /src/tools/bld/src/generic_makefile -j14 -l14 exe      
+        if (system("make -B -f $makefile -j$cpu_count -l$cpu_count @_")) {
+	        _log("F", $branch, $subbranch, "Fatal error, build terminated");
+	        exit 1;
+	      }
+      } 
+      else {
         if (system("make -f $makefile @_")) {
-	  _log("F", $branch, $subbranch, "Fatal error, build terminated");
-	  exit 1;
-	}
+	        _log("F", $branch, $subbranch, "Fatal error, build terminated");
+	        exit 1;
+	      }
       }
     }
   }
