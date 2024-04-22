@@ -7061,7 +7061,7 @@ function DynAnimation( dyn) {
 	if ( this.animation_direction != 0) {
 	  // Stop and reset animation
 	  this.animation_direction = 0;
-	  if ( this.sequence ==  == DynC.eAnimSequence_CycleLast)
+	  if ( this.sequence == DynC.eAnimSequence_CycleLast)
 	    object.set_last_nodeclass();
 	  else
 	    object.set_first_nodeclass();
