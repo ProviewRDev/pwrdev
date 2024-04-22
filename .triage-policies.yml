@@ -1,3 +1,5 @@
+# Documentation at: https://gitlab.com/gitlab-org/ruby/gems/gitlab-triage
+
 resource_rules:
     issues:
       rules:
