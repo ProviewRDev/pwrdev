@@ -75,6 +75,25 @@ resource_rules:
               - Stale
             comment: |
               Closing this issue due to being stale for 3 months.
+        - name: Unassigned
+          conditions:            
+            state: opened
+            ruby: resource["assignees"].length == 0            
+          actions:            
+            labels:
+              - Unassigned
+        - name: Assigned
+          conditions:            
+            state: opened
+            ruby: resource["assignees"].length > 0
+          actions:            
+            remove_labels:
+              - Unassigned
+            
+
+
+
+        
 
 
 
