@@ -31,6 +31,7 @@ export pwrp_cnf=$pwrp_root/common/cnf
 export pwrp_load=$pwrp_root/common/load
 export pwrp_log=$pwrp_root/common/log
 export pwrp_db=$pwrp_root/common/db
+export pwrp_tmp=/tmp
 if [ "$web_dir" != "" ]; then
   export pwrp_web=$web_dir
 else
