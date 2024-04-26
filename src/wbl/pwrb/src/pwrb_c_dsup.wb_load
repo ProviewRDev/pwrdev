@@ -217,6 +217,18 @@ SObject pwrb:Class
           Attr GraphName = "blk"
         EndBody
       EndObject
+      !/**
+      !  Bla bla bla
+      !*/
+      Object ActiveNotAcked $Output 40 
+        Body SysBody
+          Attr PgmName = "ActiveNotAcked"
+          Attr TypeRef = "pwrs:Type-$Boolean"
+          Attr Flags |= PWR_MASK_STATE 
+          Attr Flags |= PWR_MASK_NOEDIT 
+          Attr GraphName = "ana"
+        EndBody
+      EndObject      
       ! ++
       ! Sup struct
       !
@@ -725,7 +737,7 @@ SObject pwrb:Class
         Attr object_type = 99
         Attr parameters[0] = 2
         Attr parameters[1] = 0
-        Attr parameters[2] = 3
+        Attr parameters[2] = 4
         Attr parameters[3] = 0
         Attr subwindows = 0
         Attr graphmethod = 9
