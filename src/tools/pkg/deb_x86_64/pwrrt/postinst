@@ -185,6 +185,7 @@ if [ ! -e $proot ]; then
 fi
 
 # Do this regardless. If they exists no harm will be done...except for the ownership that will always change to pwrp:pwrp which it should be anyways...this might actually help to "restore" broken installs :)
+mkdir -p $proot/common/doc
 mkdir -p $proot/common/inc
 mkdir -p $proot/common/cnf
 mkdir -p $proot/common/load
