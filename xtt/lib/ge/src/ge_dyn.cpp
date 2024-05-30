@@ -62,23 +62,23 @@
 #define xmenu_eItemType_AttrObject 2
 #define xmenu_eItemType_Attribute 3
 #define glow_cJBean_Offset 2
-//#define glow_cJBean_SizeCorr 2
+// #define glow_cJBean_SizeCorr 2
 
 static int pdummy;
 
-static char *dtostr(double f)
+static char* dtostr(double f)
 {
   static char str[30];
   sprintf(str, "%g", f);
-  if (strchr(str, '.') == 0  && strchr(str,'e') == 0)
+  if (strchr(str, '.') == 0 && strchr(str, 'e') == 0)
     strcat(str, ".");
   return str;
 }
 
-static int get_dig(
-    pwr_tBoolean* val, pwr_tBoolean* p, int a_typeid, unsigned int bitmask)
+static int get_dig(pwr_tBoolean* val, pwr_tBoolean* p, int a_typeid, unsigned int bitmask)
 {
-  switch (a_typeid) {
+  switch (a_typeid)
+  {
   case pwr_eType_Boolean:
     *val = *p;
     break;
@@ -115,15 +115,18 @@ static int get_dig(
 
 static int get_bit(char* parsed_name, int attr_type, unsigned int* bitmask)
 {
-  if (attr_type == graph_eType_Bit) {
+  if (attr_type == graph_eType_Bit)
+  {
     // Get bit number from parsed name
     char* s;
     int bitnum;
 
-    if ((s = strrchr(parsed_name, '['))) {
+    if ((s = strrchr(parsed_name, '[')))
+    {
       sscanf(s + 1, "%d", &bitnum);
       *s = 0;
-      if (bitnum >= 0 && bitnum < 32) {
+      if (bitnum >= 0 && bitnum < 32)
+      {
         *bitmask = 1 << bitnum;
         return 1;
       }
@@ -137,7 +140,8 @@ static int instance_number(unsigned int instance)
 {
   int inst = 1;
   unsigned int m = instance;
-  while (m > 1) {
+  while (m > 1)
+  {
     m = m >> 1;
     inst++;
   }
@@ -148,9 +152,10 @@ static int instance_number(unsigned int instance)
 static unsigned int instance_highest(unsigned int instance_mask)
 {
   unsigned int m = 1 << 31;
-  while (m > 1) {
+  while (m > 1)
+  {
     if (m & instance_mask)
-      return m;    
+      return m;
     m = m >> 1;
   }
   return 0;
@@ -165,7 +170,8 @@ static int check_format(char* format, int type)
     return 0;
   s++;
 
-  while (*s) {
+  while (*s)
+  {
     if (!(isdigit(*s) || *s == '.' || *s == '-' || *s == '+' || *s == '*' || *s == '#'))
       break;
     s++;
@@ -173,17 +179,15 @@ static int check_format(char* format, int type)
   if (*s == 0)
     return 0;
 
-  switch (type) {
+  switch (type)
+  {
   case pwr_eType_Float32:
-    if (*s == 'f' || *s == 'F' || *s == 'g' || *s == 'G' || *s == 'e'
-        || *s == 'E')
+    if (*s == 'f' || *s == 'F' || *s == 'g' || *s == 'G' || *s == 'e' || *s == 'E')
       return 1;
     break;
   case pwr_eType_Float64:
-    if (*s == 'f' || *s == 'F' || *s == 'g' || *s == 'G' || *s == 'e'
-        || *s == 'E'
-        || (*s == 'l' && (*(s + 1) == 'f' || *(s + 1) == 'F' || *(s + 1) == 'g'
-                             || *(s + 1) == 'G')))
+    if (*s == 'f' || *s == 'F' || *s == 'g' || *s == 'G' || *s == 'e' || *s == 'E' ||
+        (*s == 'l' && (*(s + 1) == 'f' || *(s + 1) == 'F' || *(s + 1) == 'g' || *(s + 1) == 'G')))
       return 1;
     break;
   case pwr_eType_String:
@@ -194,57 +198,53 @@ static int check_format(char* format, int type)
       return 1;
     break;
   case pwr_eType_Int64:
-    if (*s == 'd' || *s == 'i' || *s == 'o' || *s == 'x' || *s == 'X'
-        || (*s == 'l' && (*(s + 1) == 'd' || *(s + 1) == 'i' || *(s + 1) == 'o'
-                             || *(s + 1) == 'x' || *(s + 1) == 'X'))
-        || (*s == 'l' && *(s + 1) == 'l'
-               && (*(s + 2) == 'd' || *(s + 2) == 'i' || *(s + 2) == 'o'
-                      || *(s + 2) == 'x' || *(s + 2) == 'X')))
+    if (*s == 'd' || *s == 'i' || *s == 'o' || *s == 'x' || *s == 'X' ||
+        (*s == 'l' &&
+         (*(s + 1) == 'd' || *(s + 1) == 'i' || *(s + 1) == 'o' || *(s + 1) == 'x' || *(s + 1) == 'X')) ||
+        (*s == 'l' && *(s + 1) == 'l' &&
+         (*(s + 2) == 'd' || *(s + 2) == 'i' || *(s + 2) == 'o' || *(s + 2) == 'x' || *(s + 2) == 'X')))
       return 1;
     break;
   case pwr_eType_Int32:
-    if (*s == 'd' || *s == 'i' || *s == 'o' || *s == 'x' || *s == 'X'
-        || (*s == 'l' && (*(s + 1) == 'd' || *(s + 1) == 'i' || *(s + 1) == 'o'
-                             || *(s + 1) == 'x' || *(s + 1) == 'X')))
+    if (*s == 'd' || *s == 'i' || *s == 'o' || *s == 'x' || *s == 'X' ||
+        (*s == 'l' &&
+         (*(s + 1) == 'd' || *(s + 1) == 'i' || *(s + 1) == 'o' || *(s + 1) == 'x' || *(s + 1) == 'X')))
       return 1;
     break;
   case pwr_eType_Int16:
-    if (*s == 'd' || *s == 'i' || *s == 'o' || *s == 'x' || *s == 'X'
-        || (*s == 'h' && (*(s + 1) == 'd' || *(s + 1) == 'i' || *(s + 1) == 'o'
-                             || *(s + 1) == 'x' || *(s + 1) == 'X')))
+    if (*s == 'd' || *s == 'i' || *s == 'o' || *s == 'x' || *s == 'X' ||
+        (*s == 'h' &&
+         (*(s + 1) == 'd' || *(s + 1) == 'i' || *(s + 1) == 'o' || *(s + 1) == 'x' || *(s + 1) == 'X')))
       return 1;
     break;
   case pwr_eType_Int8:
-    if (*s == 'd' || *s == 'i' || *s == 'o' || *s == 'x' || *s == 'X'
-        || *s == 'c')
+    if (*s == 'd' || *s == 'i' || *s == 'o' || *s == 'x' || *s == 'X' || *s == 'c')
       return 1;
     break;
   case pwr_eType_UInt64:
-    if (*s == 'd' || *s == 'u' || *s == 'o' || *s == 'x' || *s == 'X'
-        || (*s == 'l' && (*(s + 1) == 'd' || *(s + 1) == 'u' || *(s + 1) == 'o'
-                             || *(s + 1) == 'x' || *(s + 1) == 'X'))
-        || (*s == 'l' && *(s + 1) == 'l'
-               && (*(s + 2) == 'd' || *(s + 2) == 'u' || *(s + 2) == 'o'
-                      || *(s + 2) == 'x' || *(s + 2) == 'X')))
+    if (*s == 'd' || *s == 'u' || *s == 'o' || *s == 'x' || *s == 'X' ||
+        (*s == 'l' &&
+         (*(s + 1) == 'd' || *(s + 1) == 'u' || *(s + 1) == 'o' || *(s + 1) == 'x' || *(s + 1) == 'X')) ||
+        (*s == 'l' && *(s + 1) == 'l' &&
+         (*(s + 2) == 'd' || *(s + 2) == 'u' || *(s + 2) == 'o' || *(s + 2) == 'x' || *(s + 2) == 'X')))
       return 1;
     break;
   case pwr_eType_Boolean:
   case pwr_eType_UInt32:
-    if (*s == 'd' || *s == 'u' || *s == 'o' || *s == 'x' || *s == 'X'
-        || (*s == 'l' && (*(s + 1) == 'd' || *(s + 1) == 'u' || *(s + 1) == 'o'
-                             || *(s + 1) == 'x' || *(s + 1) == 'X')))
+    if (*s == 'd' || *s == 'u' || *s == 'o' || *s == 'x' || *s == 'X' ||
+        (*s == 'l' &&
+         (*(s + 1) == 'd' || *(s + 1) == 'u' || *(s + 1) == 'o' || *(s + 1) == 'x' || *(s + 1) == 'X')))
       return 1;
     break;
   case pwr_eType_UInt16:
-    if (*s == 'd' || *s == 'u' || *s == 'o' || *s == 'x' || *s == 'X'
-        || (*s == 'h' && (*(s + 1) == 'd' || *(s + 1) == 'u' || *(s + 1) == 'o'
-                             || *(s + 1) == 'x' || *(s + 1) == 'X')))
+    if (*s == 'd' || *s == 'u' || *s == 'o' || *s == 'x' || *s == 'X' ||
+        (*s == 'h' &&
+         (*(s + 1) == 'd' || *(s + 1) == 'u' || *(s + 1) == 'o' || *(s + 1) == 'x' || *(s + 1) == 'X')))
       return 1;
     break;
   case pwr_eType_Char:
   case pwr_eType_UInt8:
-    if (*s == 'd' || *s == 'u' || *s == 'o' || *s == 'x' || *s == 'X'
-        || *s == 'c')
+    if (*s == 'd' || *s == 'u' || *s == 'o' || *s == 'x' || *s == 'X' || *s == 'c')
       return 1;
     break;
   case pwr_eType_Time:
@@ -260,22 +260,19 @@ static int check_format(char* format, int type)
     break;
   case pwr_eType_Status:
   case pwr_eType_NetStatus:
-    if (*s == 'm' || *s == 'd' || *s == 'u' || str_StartsWith(s, "hd")
-        || str_StartsWith(s, "hu"))
+    if (*s == 'm' || *s == 'd' || *s == 'u' || str_StartsWith(s, "hd") || str_StartsWith(s, "hu"))
       return 1;
     break;
   case pwr_eType_Enum:
-    if (*s == 's' || *s == 'd' || *s == 'u' || *s == 'o' || *s == 'x'
-        || *s == 'X'
-        || (*s == 'l' && (*(s + 1) == 'd' || *(s + 1) == 'u' || *(s + 1) == 'o'
-                             || *(s + 1) == 'x' || *(s + 1) == 'X')))
+    if (*s == 's' || *s == 'd' || *s == 'u' || *s == 'o' || *s == 'x' || *s == 'X' ||
+        (*s == 'l' &&
+         (*(s + 1) == 'd' || *(s + 1) == 'u' || *(s + 1) == 'o' || *(s + 1) == 'x' || *(s + 1) == 'X')))
       return 1;
     break;
   case pwr_eType_Mask:
-    if (*s == 'b' || *s == 'd' || *s == 'u' || *s == 'o' || *s == 'x'
-        || *s == 'X'
-        || (*s == 'l' && (*(s + 1) == 'd' || *(s + 1) == 'u' || *(s + 1) == 'o'
-                             || *(s + 1) == 'x' || *(s + 1) == 'X')))
+    if (*s == 'b' || *s == 'd' || *s == 'u' || *s == 'o' || *s == 'x' || *s == 'X' ||
+        (*s == 'l' &&
+         (*(s + 1) == 'd' || *(s + 1) == 'u' || *(s + 1) == 'o' || *(s + 1) == 'x' || *(s + 1) == 'X')))
       return 1;
     break;
   default:;
@@ -283,11 +280,12 @@ static int check_format(char* format, int type)
   return 0;
 }
 
-static void set_curve_default_color(
-    int instance, glow_eDrawType* curve_color, glow_eDrawType* fill_color)
+static void set_curve_default_color(int instance, glow_eDrawType* curve_color, glow_eDrawType* fill_color)
 {
-  if (*curve_color == glow_eDrawType_Inherit) {
-    switch (instance) {
+  if (*curve_color == glow_eDrawType_Inherit)
+  {
+    switch (instance)
+    {
     case ge_mInstance_1:
       *curve_color = glow_eDrawType_Color145; // OrangeHigh5
       break;
@@ -315,8 +313,10 @@ static void set_curve_default_color(
     default:;
     }
   }
-  if (*fill_color == glow_eDrawType_Inherit) {
-    switch (instance) {
+  if (*fill_color == glow_eDrawType_Inherit)
+  {
+    switch (instance)
+    {
     case ge_mInstance_1:
       *fill_color = glow_eDrawType_Color139; // OrangeMedium9
       break;
@@ -363,15 +363,12 @@ static int dyn_get_typeid(char* format)
 }
 
 GeDyn::GeDyn(Graph* d_graph, ge_eDynAttr d_attr_editor)
-    : elements(0), graph(d_graph), ignore_color(false), reset_color(false),
-      ignore_bgcolor(false), reset_bgcolor(false), ignore_invisible(false),
-      reset_invisible(false), dyn_type1(ge_mDynType1_Inherit),
-      dyn_type2(ge_mDynType2_No), total_dyn_type1(ge_mDynType1_Inherit),
-      total_dyn_type2(ge_mDynType2_No), action_type1(ge_mActionType1_Inherit),
-      action_type2(ge_mActionType2_No),
-      total_action_type1(ge_mActionType1_Inherit),
-      total_action_type2(ge_mActionType2_No), access(glow_mAccess_RtDefault),
-      cycle(glow_eCycle_Inherit), attr_editor(d_attr_editor)
+    : elements(0), graph(d_graph), ignore_color(false), reset_color(false), ignore_bgcolor(false),
+      reset_bgcolor(false), ignore_invisible(false), reset_invisible(false), dyn_type1(ge_mDynType1_Inherit),
+      dyn_type2(ge_mDynType2_No), total_dyn_type1(ge_mDynType1_Inherit), total_dyn_type2(ge_mDynType2_No),
+      action_type1(ge_mActionType1_Inherit), action_type2(ge_mActionType2_No),
+      total_action_type1(ge_mActionType1_Inherit), total_action_type2(ge_mActionType2_No),
+      access(glow_mAccess_RtDefault), cycle(glow_eCycle_Inherit), attr_editor(d_attr_editor)
 {
   strcpy(recursive_hostobject, "");
 }
@@ -383,7 +380,8 @@ char* GeDyn::cmd_cnv(char* instr)
   char* in;
   char* out = outstr;
 
-  for (in = instr; *in != 0; in++) {
+  for (in = instr; *in != 0; in++)
+  {
     if (*in == '"')
       *out++ = '\\';
     *out++ = *in;
@@ -396,15 +394,15 @@ int GeDyn::instance_to_number(int instance)
 {
   int inst = 1;
   unsigned int m = instance;
-  while (m > 1) {
+  while (m > 1)
+  {
     m = m >> 1;
     inst++;
   }
   return inst;
 }
 
-void GeDyn::replace_attribute(
-    char* attribute, int attr_size, char* from, char* to, int* cnt, int strict)
+void GeDyn::replace_attribute(char* attribute, int attr_size, char* from, char* to, int* cnt, int strict)
 {
   char str[200];
   char tmp[200];
@@ -415,7 +413,8 @@ void GeDyn::replace_attribute(
   if (!strict)
     str_ToLower(str, str);
   s = strstr(str, from);
-  if (s) {
+  if (s)
+  {
     offs = (int)(s - str);
     strcpy(tmp, &attribute[offs] + strlen(from));
     strncpy(&attribute[offs], to, attr_size - offs);
@@ -427,20 +426,20 @@ void GeDyn::replace_attribute(
 }
 
 GeDyn::GeDyn(const GeDyn& x)
-    : elements(0), graph(x.graph), dyn_type1(x.dyn_type1),
-      dyn_type2(x.dyn_type2), total_dyn_type1(x.total_dyn_type1),
-      total_dyn_type2(x.total_dyn_type2), action_type1(x.action_type1),
+    : elements(0), graph(x.graph), dyn_type1(x.dyn_type1), dyn_type2(x.dyn_type2),
+      total_dyn_type1(x.total_dyn_type1), total_dyn_type2(x.total_dyn_type2), action_type1(x.action_type1),
       action_type2(x.action_type2), total_action_type1(x.total_action_type1),
-      total_action_type2(x.total_action_type2), access(x.access),
-      cycle(x.cycle), attr_editor(x.attr_editor)
+      total_action_type2(x.total_action_type2), access(x.access), cycle(x.cycle), attr_editor(x.attr_editor)
 {
   GeDynElem *elem, *e;
 
   strcpy(recursive_hostobject, x.recursive_hostobject);
 
-  for (elem = x.elements; elem; elem = elem->next) {
+  for (elem = x.elements; elem; elem = elem->next)
+  {
     e = 0;
-    switch (elem->dyn_type1) {
+    switch (elem->dyn_type1)
+    {
     case ge_mDynType1_DigLowColor:
       e = new GeDigLowColor((const GeDigLowColor&)*elem);
       break;
@@ -530,7 +529,8 @@ GeDyn::GeDyn(const GeDyn& x)
       break;
     default:;
     }
-    switch (elem->dyn_type2) {
+    switch (elem->dyn_type2)
+    {
     case ge_mDynType2_Axis:
       e = new GeAxis((const GeAxis&)*elem);
       break;
@@ -584,7 +584,8 @@ GeDyn::GeDyn(const GeDyn& x)
       break;
     default:;
     }
-    switch (elem->action_type1) {
+    switch (elem->action_type1)
+    {
     case ge_mActionType1_PopupMenu:
       e = new GePopupMenu((const GePopupMenu&)*elem);
       break;
@@ -668,7 +669,8 @@ GeDyn::GeDyn(const GeDyn& x)
       break;
     default:;
     }
-    switch (elem->action_type2) {
+    switch (elem->action_type2)
+    {
     default:;
     }
     if (e)
@@ -682,7 +684,8 @@ GeDyn::~GeDyn()
 {
   GeDynElem *elem, *next;
 
-  for (elem = elements; elem; elem = next) {
+  for (elem = elements; elem; elem = next)
+  {
     next = elem->next;
     delete elem;
   }
@@ -698,7 +701,8 @@ void GeDyn::save(std::ofstream& fp)
   fp << int(ge_eSave_Dyn_access) << FSPACE << int(access) << '\n';
   fp << int(ge_eSave_Dyn_cycle) << FSPACE << int(cycle) << '\n';
 
-  for (GeDynElem* elem = elements; elem; elem = elem->next) {
+  for (GeDynElem* elem = elements; elem; elem = elem->next)
+  {
     elem->save(fp);
   }
   fp << int(ge_eSave_End) << '\n';
@@ -713,8 +717,10 @@ void GeDyn::open(std::ifstream& fp)
   GeDynElem* e;
   int errcnt = 0;
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeDyn: \"%d %s\"\n", type, dummy);
@@ -723,7 +729,8 @@ void GeDyn::open(std::ifstream& fp)
     fp >> type;
 
     e = 0;
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_Dyn:
       break;
     case ge_eSave_Dyn_dyn_type1:
@@ -979,7 +986,8 @@ void GeDyn::open(std::ifstream& fp)
       if (errcnt > 20)
         exit(0);
     }
-    if (e) {
+    if (e)
+    {
       insert_element(e);
       e->open(fp);
     }
@@ -998,19 +1006,20 @@ void GeDyn::update_dyntype(grow_tObject object)
 
 ge_mDynType1 GeDyn::get_dyntype1(grow_tObject object)
 {
-  if (object && dyn_type1 & ge_mDynType1_Inherit) {
-    if (grow_GetObjectType(object) == glow_eObjectType_GrowNode
-        || grow_GetObjectType(object) == glow_eObjectType_GrowSlider
-        || grow_GetObjectType(object) == glow_eObjectType_GrowGroup) {
+  if (object && dyn_type1 & ge_mDynType1_Inherit)
+  {
+    if (grow_GetObjectType(object) == glow_eObjectType_GrowNode ||
+        grow_GetObjectType(object) == glow_eObjectType_GrowSlider ||
+        grow_GetObjectType(object) == glow_eObjectType_GrowGroup)
+    {
       int inherit_dyn_type1;
       int inherit_dyn_type2;
       int inherit_action_type1;
       int inherit_action_type2;
 
-      grow_GetObjectClassDynType(object, &inherit_dyn_type1, &inherit_dyn_type2,
-          &inherit_action_type1, &inherit_action_type2);
-      return (ge_mDynType1)(
-          (dyn_type1 & ~ge_mDynType1_Inherit) | inherit_dyn_type1);
+      grow_GetObjectClassDynType(object, &inherit_dyn_type1, &inherit_dyn_type2, &inherit_action_type1,
+                                 &inherit_action_type2);
+      return (ge_mDynType1)((dyn_type1 & ~ge_mDynType1_Inherit) | inherit_dyn_type1);
     }
   }
   return dyn_type1;
@@ -1018,17 +1027,19 @@ ge_mDynType1 GeDyn::get_dyntype1(grow_tObject object)
 
 ge_mDynType2 GeDyn::get_dyntype2(grow_tObject object)
 {
-  if (object && dyn_type1 & ge_mDynType1_Inherit) {
-    if (grow_GetObjectType(object) == glow_eObjectType_GrowNode
-        || grow_GetObjectType(object) == glow_eObjectType_GrowSlider
-        || grow_GetObjectType(object) == glow_eObjectType_GrowGroup) {
+  if (object && dyn_type1 & ge_mDynType1_Inherit)
+  {
+    if (grow_GetObjectType(object) == glow_eObjectType_GrowNode ||
+        grow_GetObjectType(object) == glow_eObjectType_GrowSlider ||
+        grow_GetObjectType(object) == glow_eObjectType_GrowGroup)
+    {
       int inherit_dyn_type1;
       int inherit_dyn_type2;
       int inherit_action_type1;
       int inherit_action_type2;
 
-      grow_GetObjectClassDynType(object, &inherit_dyn_type1, &inherit_dyn_type2,
-          &inherit_action_type1, &inherit_action_type2);
+      grow_GetObjectClassDynType(object, &inherit_dyn_type1, &inherit_dyn_type2, &inherit_action_type1,
+                                 &inherit_action_type2);
       return (ge_mDynType2)(dyn_type2 | inherit_dyn_type2);
     }
   }
@@ -1037,19 +1048,20 @@ ge_mDynType2 GeDyn::get_dyntype2(grow_tObject object)
 
 ge_mActionType1 GeDyn::get_actiontype1(grow_tObject object)
 {
-  if (object && action_type1 & ge_mActionType1_Inherit) {
-    if (grow_GetObjectType(object) == glow_eObjectType_GrowNode
-        || grow_GetObjectType(object) == glow_eObjectType_GrowSlider
-        || grow_GetObjectType(object) == glow_eObjectType_GrowGroup) {
+  if (object && action_type1 & ge_mActionType1_Inherit)
+  {
+    if (grow_GetObjectType(object) == glow_eObjectType_GrowNode ||
+        grow_GetObjectType(object) == glow_eObjectType_GrowSlider ||
+        grow_GetObjectType(object) == glow_eObjectType_GrowGroup)
+    {
       int inherit_dyn_type1;
       int inherit_dyn_type2;
       int inherit_action_type1;
       int inherit_action_type2;
 
-      grow_GetObjectClassDynType(object, &inherit_dyn_type1, &inherit_dyn_type2,
-          &inherit_action_type1, &inherit_action_type2);
-      return (ge_mActionType1)(
-          (action_type1 & ~ge_mActionType1_Inherit) | inherit_action_type1);
+      grow_GetObjectClassDynType(object, &inherit_dyn_type1, &inherit_dyn_type2, &inherit_action_type1,
+                                 &inherit_action_type2);
+      return (ge_mActionType1)((action_type1 & ~ge_mActionType1_Inherit) | inherit_action_type1);
     }
   }
   return action_type1;
@@ -1057,17 +1069,19 @@ ge_mActionType1 GeDyn::get_actiontype1(grow_tObject object)
 
 ge_mActionType2 GeDyn::get_actiontype2(grow_tObject object)
 {
-  if (object && action_type1 & ge_mActionType1_Inherit) {
-    if (grow_GetObjectType(object) == glow_eObjectType_GrowNode
-        || grow_GetObjectType(object) == glow_eObjectType_GrowSlider
-        || grow_GetObjectType(object) == glow_eObjectType_GrowGroup) {
+  if (object && action_type1 & ge_mActionType1_Inherit)
+  {
+    if (grow_GetObjectType(object) == glow_eObjectType_GrowNode ||
+        grow_GetObjectType(object) == glow_eObjectType_GrowSlider ||
+        grow_GetObjectType(object) == glow_eObjectType_GrowGroup)
+    {
       int inherit_dyn_type1;
       int inherit_dyn_type2;
       int inherit_action_type1;
       int inherit_action_type2;
 
-      grow_GetObjectClassDynType(object, &inherit_dyn_type1, &inherit_dyn_type2,
-          &inherit_action_type1, &inherit_action_type2);
+      grow_GetObjectClassDynType(object, &inherit_dyn_type1, &inherit_dyn_type2, &inherit_action_type1,
+                                 &inherit_action_type2);
       return (ge_mActionType2)(action_type2 | inherit_action_type2);
     }
   }
@@ -1082,7 +1096,8 @@ void GeDyn::unset_inherit(grow_tObject object)
 
 glow_eDrawType GeDyn::get_color1(grow_tObject object, glow_eDrawType color)
 {
-  if (color == glow_eDrawType_Inherit) {
+  if (color == glow_eDrawType_Inherit)
+  {
     glow_eDrawType color1;
     glow_eDrawType color2;
 
@@ -1094,7 +1109,8 @@ glow_eDrawType GeDyn::get_color1(grow_tObject object, glow_eDrawType color)
 
 glow_eDrawType GeDyn::get_color2(grow_tObject object, glow_eDrawType color)
 {
-  if (color == glow_eDrawType_Inherit) {
+  if (color == glow_eDrawType_Inherit)
+  {
     glow_eDrawType color1;
     glow_eDrawType color2;
 
@@ -1104,8 +1120,7 @@ glow_eDrawType GeDyn::get_color2(grow_tObject object, glow_eDrawType color)
   return color;
 }
 
-void GeDyn::get_attributes(
-    grow_tObject object, attr_sItem* itemlist, int* item_count)
+void GeDyn::get_attributes(grow_tObject object, attr_sItem* itemlist, int* item_count)
 {
   attr_sItem* attrinfo;
   int i;
@@ -1125,14 +1140,16 @@ void GeDyn::get_attributes(
   for (GeDynElem* elem = elements; elem; elem = elem->next)
     elem->get_attributes(itemlist, &i);
 
-  if (display_access) {
+  if (display_access)
+  {
     strcpy(attrinfo[i].name, "Access");
     attrinfo[i].value = &access;
     attrinfo[i].type = glow_eType_Access;
     attrinfo[i++].size = sizeof(access);
   }
 
-  if (attr_editor != ge_eDynAttr_Menu) {
+  if (attr_editor != ge_eDynAttr_Menu)
+  {
     strcpy(attrinfo[i].name, "Cycle");
     attrinfo[i].value = &cycle;
     attrinfo[i].type = glow_eType_Cycle;
@@ -1144,22 +1161,21 @@ void GeDyn::get_attributes(
       attrinfo[i].type = ge_eAttrType_DynTypeTone;
     else
       attrinfo[i].type = ge_eAttrType_DynType1;
-    if (total_dyn_type1 & ge_mDynType1_Bar
-        || total_dyn_type1 & ge_mDynType1_Trend
-        || total_dyn_type1 & ge_mDynType1_Table
-        || total_dyn_type1 & ge_mDynType1_FastCurve
-        || total_dyn_type1 & ge_mDynType1_XY_Curve)
+    if (total_dyn_type1 & ge_mDynType1_Bar || total_dyn_type1 & ge_mDynType1_Trend ||
+        total_dyn_type1 & ge_mDynType1_Table || total_dyn_type1 & ge_mDynType1_FastCurve ||
+        total_dyn_type1 & ge_mDynType1_XY_Curve)
       attrinfo[i].noedit = 1;
-    attrinfo[i].mask = ~(ge_mDynType1_Bar | ge_mDynType1_Trend
-        | ge_mDynType1_Table | ge_mDynType1_FastCurve | ge_mDynType1_XY_Curve
-        | ge_mDynType1_SliderBackground);
+    attrinfo[i].mask = ~(ge_mDynType1_Bar | ge_mDynType1_Trend | ge_mDynType1_Table | ge_mDynType1_FastCurve |
+                         ge_mDynType1_XY_Curve | ge_mDynType1_SliderBackground);
     attrinfo[i++].size = sizeof(dyn_type1);
 
     strcpy(attrinfo[i].name, "DynType2");
     attrinfo[i].value = &dyn_type2;
     attrinfo[i].type = ge_eAttrType_DynType2;
     attrinfo[i++].size = sizeof(dyn_type2);
-  } else {
+  }
+  else
+  {
     strcpy(attrinfo[i].name, "DynType1");
     attrinfo[i].value = &dyn_type1;
     attrinfo[i].type = ge_eAttrType_DynType1;
@@ -1179,7 +1195,7 @@ void GeDyn::get_attributes(
 void GeDyn::get_transtab(grow_tObject object, char** tt)
 {
   int sts;
-  static char transtab[][32] = { "SubGraph", "SubGraph", "Dynamic", "", "" };
+  static char transtab[][32] = {"SubGraph", "SubGraph", "Dynamic", "", ""};
 
   total_dyn_type1 = get_dyntype1(object);
   total_dyn_type2 = get_dyntype2(object);
@@ -1188,7 +1204,8 @@ void GeDyn::get_transtab(grow_tObject object, char** tt)
 
   update_elements();
   *tt = 0;
-  for (GeDynElem* elem = elements; elem; elem = elem->next) {
+  for (GeDynElem* elem = elements; elem; elem = elem->next)
+  {
     sts = elem->get_transtab(tt);
     if (!sts)
       return;
@@ -1197,8 +1214,7 @@ void GeDyn::get_transtab(grow_tObject object, char** tt)
     *tt = (char*)transtab;
 }
 
-void GeDyn::set_attribute(
-    grow_tObject object, const char* attr_name, int second)
+void GeDyn::set_attribute(grow_tObject object, const char* attr_name, int second)
 {
   int cnt = second + 1;
 
@@ -1209,7 +1225,8 @@ void GeDyn::set_attribute(
 
   update_elements();
 
-  for (GeDynElem* elem = elements; elem; elem = elem->next) {
+  for (GeDynElem* elem = elements; elem; elem = elem->next)
+  {
     elem->set_attribute(object, attr_name, &cnt);
     if (!cnt)
       break;
@@ -1235,7 +1252,8 @@ void GeDyn::set_color(grow_tObject object, glow_eDrawType color)
 
   update_elements();
 
-  for (GeDynElem* elem = elements; elem; elem = elem->next) {
+  for (GeDynElem* elem = elements; elem; elem = elem->next)
+  {
     sts = elem->set_color(object, color);
     if (sts)
       break;
@@ -1244,13 +1262,9 @@ void GeDyn::set_color(grow_tObject object, glow_eDrawType color)
     graph->message('E', "No color to set for this object");
 }
 
-void GeDyn::set_access(glow_mAccess acc)
-{
-  access = acc;
-}
+void GeDyn::set_access(glow_mAccess acc) { access = acc; }
 
-void GeDyn::set_dyn(ge_mDynType1 type1, ge_mDynType2 type2,
-    ge_mActionType1 action1, ge_mActionType2 action2)
+void GeDyn::set_dyn(ge_mDynType1 type1, ge_mDynType2 type2, ge_mActionType1 action1, ge_mActionType2 action2)
 {
   dyn_type1 = type1;
   dyn_type2 = type2;
@@ -1261,10 +1275,11 @@ void GeDyn::set_dyn(ge_mDynType1 type1, ge_mDynType2 type2,
 
 void GeDyn::set_command(const char* cmd)
 {
-  for (GeDynElem* elem = elements; elem; elem = elem->next) {
-    if (elem->action_type1 == ge_mActionType1_Command) {
-      strncpy(((GeCommand*)elem)->command, cmd,
-          sizeof(((GeCommand*)elem)->command));
+  for (GeDynElem* elem = elements; elem; elem = elem->next)
+  {
+    if (elem->action_type1 == ge_mActionType1_Command)
+    {
+      strncpy(((GeCommand*)elem)->command, cmd, sizeof(((GeCommand*)elem)->command));
       ((GeCommand*)elem)->command[sizeof(((GeCommand*)elem)->command) - 1] = 0;
       break;
     }
@@ -1273,10 +1288,11 @@ void GeDyn::set_command(const char* cmd)
 
 void GeDyn::set_hostobject(char* hostobject)
 {
-  for (GeDynElem* elem = elements; elem; elem = elem->next) {
-    if (elem->dyn_type1 == ge_mDynType1_HostObject) {
-      strncpy(((GeHostObject*)elem)->hostobject, hostobject,
-          sizeof(((GeHostObject*)elem)->hostobject));
+  for (GeDynElem* elem = elements; elem; elem = elem->next)
+  {
+    if (elem->dyn_type1 == ge_mDynType1_HostObject)
+    {
+      strncpy(((GeHostObject*)elem)->hostobject, hostobject, sizeof(((GeHostObject*)elem)->hostobject));
       break;
     }
   }
@@ -1286,8 +1302,10 @@ void GeDyn::get_hostobject(char* hostobject)
 {
   bool found = false;
 
-  for (GeDynElem* elem = elements; elem; elem = elem->next) {
-    if (elem->dyn_type1 == ge_mDynType1_HostObject) {
+  for (GeDynElem* elem = elements; elem; elem = elem->next)
+  {
+    if (elem->dyn_type1 == ge_mDynType1_HostObject)
+    {
       strcpy(hostobject, ((GeHostObject*)elem)->hostobject);
       found = true;
       break;
@@ -1303,7 +1321,8 @@ char* GeDyn::printstr(char* str)
   char *s, *t;
   static char res[256];
 
-  for (s = str, t = res; *s; s++, t++) {
+  for (s = str, t = res; *s; s++, t++)
+  {
     if (*s == '"')
       *t++ = '\\';
     *t = *s;
@@ -1312,14 +1331,14 @@ char* GeDyn::printstr(char* str)
   return res;
 }
 
-graph_eDatabase GeDyn::parse_attr_name(char* name, char* parsed_name,
-    int* inverted, int* type, int* size, int* elem, graph_mParseOpt options)
+graph_eDatabase GeDyn::parse_attr_name(char* name, char* parsed_name, int* inverted, int* type, int* size,
+                                       int* elem, graph_mParseOpt options)
 {
   char* s;
 
-  if ((total_dyn_type1 & ge_mDynType1_HostObject
-          || !streq(recursive_hostobject, ""))
-      && (s = strstr(name, "$hostobject"))) {
+  if ((total_dyn_type1 & ge_mDynType1_HostObject || !streq(recursive_hostobject, "")) &&
+      (s = strstr(name, "$hostobject")))
+  {
     // Replace string $hostobject with host object
     pwr_tAName hostobject;
     pwr_tAName n;
@@ -1329,21 +1348,23 @@ graph_eDatabase GeDyn::parse_attr_name(char* name, char* parsed_name,
     strcpy(&n[s - name], hostobject);
     strcat(n, s + strlen("$hostobject"));
 
-    return graph->parse_attr_name(
-        n, parsed_name, inverted, type, size, elem, options);
+    return graph->parse_attr_name(n, parsed_name, inverted, type, size, elem, options);
   }
-  return graph->parse_attr_name(
-      name, parsed_name, inverted, type, size, elem, options);
+  return graph->parse_attr_name(name, parsed_name, inverted, type, size, elem, options);
 }
-void GeDyn::set_value_input(
-    const char* format, double min_value, double max_value)
+void GeDyn::set_value_input(const char* format, double min_value, double max_value)
 {
-  for (GeDynElem* elem = elements; elem; elem = elem->next) {
-    if (elem->action_type1 == ge_mActionType1_ValueInput) {
+  for (GeDynElem* elem = elements; elem; elem = elem->next)
+  {
+    if (elem->action_type1 == ge_mActionType1_ValueInput)
+    {
       GeValueInput* e = (GeValueInput*)elem;
-      if (!e->value_element) {
-        for (GeDynElem* elem2 = elements; elem2; elem2 = elem2->next) {
-          if (elem2->dyn_type1 == ge_mDynType1_Value) {
+      if (!e->value_element)
+      {
+        for (GeDynElem* elem2 = elements; elem2; elem2 = elem2->next)
+        {
+          if (elem2->dyn_type1 == ge_mDynType1_Value)
+          {
             e->value_element = (GeValue*)elem2;
             e->annot_typeid = e->value_element->annot_typeid;
             e->annot_size = e->value_element->annot_size;
@@ -1363,7 +1384,8 @@ void GeDyn::set_value_input(
 
 int GeDyn::get_attr_typeid()
 {
-  for (GeDynElem* elem = elements; elem; elem = elem->next) {
+  for (GeDynElem* elem = elements; elem; elem = elem->next)
+  {
     if (elem->dyn_type1 == ge_mDynType1_Value)
       return ((GeValue*)elem)->annot_typeid;
   }
@@ -1372,7 +1394,8 @@ int GeDyn::get_attr_typeid()
 
 int* GeDyn::ref_slider_disabled()
 {
-  for (GeDynElem* elem = elements; elem; elem = elem->next) {
+  for (GeDynElem* elem = elements; elem; elem = elem->next)
+  {
     if (elem->action_type1 == ge_mActionType1_Slider)
       return &((GeSlider*)elem)->slider_disabled;
   }
@@ -1381,7 +1404,8 @@ int* GeDyn::ref_slider_disabled()
 
 int GeDyn::get_slider_disabled()
 {
-  for (GeDynElem* elem = elements; elem; elem = elem->next) {
+  for (GeDynElem* elem = elements; elem; elem = elem->next)
+  {
     if (elem->action_type1 == ge_mActionType1_Slider)
       return ((GeSlider*)elem)->slider_disabled;
   }
@@ -1390,7 +1414,8 @@ int GeDyn::get_slider_disabled()
 
 int* GeDyn::ref_trend_hold()
 {
-  for (GeDynElem* elem = elements; elem; elem = elem->next) {
+  for (GeDynElem* elem = elements; elem; elem = elem->next)
+  {
     if (elem->dyn_type1 == ge_mDynType1_Trend)
       return &((GeTrend*)elem)->trend_hold;
   }
@@ -1399,7 +1424,8 @@ int* GeDyn::ref_trend_hold()
 
 double* GeDyn::ref_trend_scantime()
 {
-  for (GeDynElem* elem = elements; elem; elem = elem->next) {
+  for (GeDynElem* elem = elements; elem; elem = elem->next)
+  {
     if (elem->dyn_type1 == ge_mDynType1_Trend)
       return &((GeTrend*)elem)->scan_time;
   }
@@ -1408,7 +1434,8 @@ double* GeDyn::ref_trend_scantime()
 
 void* GeDyn::get_p()
 {
-  for (GeDynElem* elem = elements; elem; elem = elem->next) {
+  for (GeDynElem* elem = elements; elem; elem = elem->next)
+  {
     if (elem->dyn_type1 == ge_mDynType1_DigLowColor)
       return ((GeDigLowColor*)elem)->p;
     else if (elem->dyn_type1 == ge_mDynType1_Value)
@@ -1419,8 +1446,10 @@ void* GeDyn::get_p()
 
 void GeDyn::set_p(grow_tObject object, void* p)
 {
-  for (GeDynElem* elem = elements; elem; elem = elem->next) {
-    if (elem->dyn_type1 == ge_mDynType1_Value) {
+  for (GeDynElem* elem = elements; elem; elem = elem->next)
+  {
+    if (elem->dyn_type1 == ge_mDynType1_Value)
+    {
       glow_sTraceData* data;
       grow_GetTraceAttr(object, &data);
       data->p = p;
@@ -1428,7 +1457,9 @@ void GeDyn::set_p(grow_tObject object, void* p)
 
       ((GeValue*)elem)->p = p;
       break;
-    } else if (elem->dyn_type1 == ge_mDynType1_DigLowColor) {
+    }
+    else if (elem->dyn_type1 == ge_mDynType1_DigLowColor)
+    {
       glow_sTraceData* data;
       grow_GetTraceAttr(object, &data);
       data->p = p;
@@ -1453,11 +1484,13 @@ void GeDyn::update_elements()
   // Remove
   prev = 0;
   elem = elements;
-  while (elem) {
-    if ((elem->dyn_type1 && !(elem->dyn_type1 & total_dyn_type1))
-        || (elem->action_type1 && !(elem->action_type1 & total_action_type1))
-        || (elem->dyn_type2 && !(elem->dyn_type2 & total_dyn_type2))
-        || (elem->action_type2 && !(elem->action_type2 & total_action_type2))) {
+  while (elem)
+  {
+    if ((elem->dyn_type1 && !(elem->dyn_type1 & total_dyn_type1)) ||
+        (elem->action_type1 && !(elem->action_type1 & total_action_type1)) ||
+        (elem->dyn_type2 && !(elem->dyn_type2 & total_dyn_type2)) ||
+        (elem->action_type2 && !(elem->action_type2 & total_action_type2)))
+    {
       // Type is not valid, remove element
       if (!prev)
         elements = elem->next;
@@ -1466,15 +1499,19 @@ void GeDyn::update_elements()
       next = elem->next;
       delete elem;
       elem = next;
-    } else if (elem->instance != ge_mInstance_1) {
+    }
+    else if (elem->instance != ge_mInstance_1)
+    {
       // Check if instance is valid
       GeDynElem* mask_elem = elem;
-      while (mask_elem) {
+      while (mask_elem)
+      {
         if (mask_elem->instance == ge_mInstance_1)
           break;
         mask_elem = mask_elem->next;
       }
-      if (mask_elem && !(mask_elem->instance_mask & elem->instance)) {
+      if (mask_elem && !(mask_elem->instance_mask & elem->instance))
+      {
         // Instance is not valid, remove element
         if (!prev)
           elements = elem->next;
@@ -1483,11 +1520,15 @@ void GeDyn::update_elements()
         next = elem->next;
         delete elem;
         elem = next;
-      } else {
+      }
+      else
+      {
         prev = elem;
         elem = elem->next;
       }
-    } else {
+    }
+    else
+    {
       prev = elem;
       elem = elem->next;
     }
@@ -1502,27 +1543,35 @@ void GeDyn::update_elements()
   GeDynElem* i_elem;
 
   mask = 1;
-  for (int i = 0; i < 32; i++) {
-    if (mask & total_dyn_type1) {
+  for (int i = 0; i < 32; i++)
+  {
+    if (mask & total_dyn_type1)
+    {
       found = false;
-      for (elem = elements; elem; elem = elem->next) {
-        if (elem->dyn_type1 == mask && elem->instance == ge_mInstance_1) {
+      for (elem = elements; elem; elem = elem->next)
+      {
+        if (elem->dyn_type1 == mask && elem->instance == ge_mInstance_1)
+        {
           found = true;
 
-          if (elem->instance_mask > ge_mInstance_1) {
+          if (elem->instance_mask > ge_mInstance_1)
+          {
             // Check instance
             i_mask = ge_mInstance_1;
-            for (int j = 0; j < 32; j++) {
+            for (int j = 0; j < 32; j++)
+            {
               i_found = false;
-              for (i_elem = elements; i_elem; i_elem = i_elem->next) {
-                if (i_elem->dyn_type1 == mask
-                    && i_elem->instance & elem->instance_mask
-                    && i_elem->instance == i_mask) {
+              for (i_elem = elements; i_elem; i_elem = i_elem->next)
+              {
+                if (i_elem->dyn_type1 == mask && i_elem->instance & elem->instance_mask &&
+                    i_elem->instance == i_mask)
+                {
                   i_found = true;
                   break;
                 }
               }
-              if (!i_found && i_mask & elem->instance_mask) {
+              if (!i_found && i_mask & elem->instance_mask)
+              {
                 e = create_dyn1_element(mask, i_mask);
                 if (e)
                   insert_element(e);
@@ -1533,7 +1582,8 @@ void GeDyn::update_elements()
           break;
         }
       }
-      if (!found) {
+      if (!found)
+      {
         // Create this element
         e = create_dyn1_element(mask, ge_mInstance_1);
         if (e)
@@ -1544,27 +1594,35 @@ void GeDyn::update_elements()
   }
 
   mask = 1;
-  for (int i = 0; i < 32; i++) {
-    if (mask & total_dyn_type2) {
+  for (int i = 0; i < 32; i++)
+  {
+    if (mask & total_dyn_type2)
+    {
       found = false;
-      for (elem = elements; elem; elem = elem->next) {
-        if (elem->dyn_type2 == mask && elem->instance == ge_mInstance_1) {
+      for (elem = elements; elem; elem = elem->next)
+      {
+        if (elem->dyn_type2 == mask && elem->instance == ge_mInstance_1)
+        {
           found = true;
 
-          if (elem->instance_mask > ge_mInstance_1) {
+          if (elem->instance_mask > ge_mInstance_1)
+          {
             // Check instance
             i_mask = ge_mInstance_1;
-            for (int j = 0; j < 32; j++) {
+            for (int j = 0; j < 32; j++)
+            {
               i_found = false;
-              for (i_elem = elements; i_elem; i_elem = i_elem->next) {
-                if (i_elem->dyn_type2 == mask
-                    && i_elem->instance & elem->instance_mask
-                    && i_elem->instance == i_mask) {
+              for (i_elem = elements; i_elem; i_elem = i_elem->next)
+              {
+                if (i_elem->dyn_type2 == mask && i_elem->instance & elem->instance_mask &&
+                    i_elem->instance == i_mask)
+                {
                   i_found = true;
                   break;
                 }
               }
-              if (!i_found && i_mask & elem->instance_mask) {
+              if (!i_found && i_mask & elem->instance_mask)
+              {
                 e = create_dyn2_element(mask, i_mask);
                 if (e)
                   insert_element(e);
@@ -1575,7 +1633,8 @@ void GeDyn::update_elements()
           break;
         }
       }
-      if (!found) {
+      if (!found)
+      {
         // Create this element
         e = create_dyn2_element(mask, ge_mInstance_1);
         if (e)
@@ -1586,27 +1645,35 @@ void GeDyn::update_elements()
   }
 
   mask = 1;
-  for (int i = 0; i < 32; i++) {
-    if (mask & total_action_type1) {
+  for (int i = 0; i < 32; i++)
+  {
+    if (mask & total_action_type1)
+    {
       found = false;
-      for (elem = elements; elem; elem = elem->next) {
-        if (elem->action_type1 == mask && elem->instance == ge_mInstance_1) {
+      for (elem = elements; elem; elem = elem->next)
+      {
+        if (elem->action_type1 == mask && elem->instance == ge_mInstance_1)
+        {
           found = true;
 
-          if (elem->instance_mask > ge_mInstance_1) {
+          if (elem->instance_mask > ge_mInstance_1)
+          {
             // Check instance
             i_mask = ge_mInstance_1;
-            for (int j = 0; j < 32; j++) {
+            for (int j = 0; j < 32; j++)
+            {
               i_found = false;
-              for (i_elem = elements; i_elem; i_elem = i_elem->next) {
-                if (i_elem->action_type1 == mask
-                    && i_elem->instance & elem->instance_mask
-                    && i_elem->instance == i_mask) {
+              for (i_elem = elements; i_elem; i_elem = i_elem->next)
+              {
+                if (i_elem->action_type1 == mask && i_elem->instance & elem->instance_mask &&
+                    i_elem->instance == i_mask)
+                {
                   i_found = true;
                   break;
                 }
               }
-              if (!i_found && i_mask & elem->instance_mask) {
+              if (!i_found && i_mask & elem->instance_mask)
+              {
                 e = create_action1_element(mask, i_mask);
                 if (e)
                   insert_element(e);
@@ -1617,7 +1684,8 @@ void GeDyn::update_elements()
           break;
         }
       }
-      if (!found) {
+      if (!found)
+      {
         // Create this element
         e = create_action1_element(mask, ge_mInstance_1);
         if (e)
@@ -1628,27 +1696,35 @@ void GeDyn::update_elements()
   }
 
   mask = 1;
-  for (int i = 0; i < 32; i++) {
-    if (mask & total_action_type2) {
+  for (int i = 0; i < 32; i++)
+  {
+    if (mask & total_action_type2)
+    {
       found = false;
-      for (elem = elements; elem; elem = elem->next) {
-        if (elem->action_type2 == mask && elem->instance == ge_mInstance_1) {
+      for (elem = elements; elem; elem = elem->next)
+      {
+        if (elem->action_type2 == mask && elem->instance == ge_mInstance_1)
+        {
           found = true;
 
-          if (elem->instance_mask > ge_mInstance_1) {
+          if (elem->instance_mask > ge_mInstance_1)
+          {
             // Check instance
             i_mask = ge_mInstance_1;
-            for (int j = 0; j < 32; j++) {
+            for (int j = 0; j < 32; j++)
+            {
               i_found = false;
-              for (i_elem = elements; i_elem; i_elem = i_elem->next) {
-                if (i_elem->action_type2 == mask
-                    && i_elem->instance & elem->instance_mask
-                    && i_elem->instance == i_mask) {
+              for (i_elem = elements; i_elem; i_elem = i_elem->next)
+              {
+                if (i_elem->action_type2 == mask && i_elem->instance & elem->instance_mask &&
+                    i_elem->instance == i_mask)
+                {
                   i_found = true;
                   break;
                 }
               }
-              if (!i_found && i_mask & elem->instance_mask) {
+              if (!i_found && i_mask & elem->instance_mask)
+              {
                 e = create_action2_element(mask, i_mask);
                 if (e)
                   insert_element(e);
@@ -1659,7 +1735,8 @@ void GeDyn::update_elements()
           break;
         }
       }
-      if (!found) {
+      if (!found)
+      {
         // Create this element
         e = create_action2_element(mask, ge_mInstance_1);
         if (e)
@@ -1670,11 +1747,15 @@ void GeDyn::update_elements()
   }
 
   // Update PulldownMenu items
-  for (elem = elements; elem; elem = elem->next) {
-    if (elem->action_type1 == ge_mActionType1_PulldownMenu) {
+  for (elem = elements; elem; elem = elem->next)
+  {
+    if (elem->action_type1 == ge_mActionType1_PulldownMenu)
+    {
       GePulldownMenu* pm = (GePulldownMenu*)elem;
-      for (int i = 0; i < 32; i++) {
-        if (pm->items_dyn[i]) {
+      for (int i = 0; i < 32; i++)
+      {
+        if (pm->items_dyn[i])
+        {
           pm->items_dyn[i]->total_dyn_type1 = pm->items_dyn[i]->dyn_type1;
           pm->items_dyn[i]->total_dyn_type2 = pm->items_dyn[i]->dyn_type2;
           pm->items_dyn[i]->total_action_type1 = pm->items_dyn[i]->action_type1;
@@ -1690,7 +1771,8 @@ GeDynElem* GeDyn::create_action1_element(int mask, int instance)
 {
   GeDynElem* e = 0;
 
-  switch (mask) {
+  switch (mask)
+  {
   case ge_mActionType1_PopupMenu:
     e = (GeDynElem*)new GePopupMenu(this);
     break;
@@ -1781,7 +1863,8 @@ GeDynElem* GeDyn::create_action2_element(int mask, int instance)
 {
   GeDynElem* e = 0;
 
-  switch (mask) {
+  switch (mask)
+  {
   default:;
   }
   return e;
@@ -1791,7 +1874,8 @@ GeDynElem* GeDyn::create_dyn1_element(int mask, int instance)
 {
   GeDynElem* e = 0;
 
-  switch (mask) {
+  switch (mask)
+  {
   case ge_mDynType1_DigLowColor:
     e = (GeDynElem*)new GeDigLowColor(this);
     break;
@@ -1888,7 +1972,8 @@ GeDynElem* GeDyn::create_dyn2_element(int mask, int instance)
 {
   GeDynElem* e = 0;
 
-  switch (mask) {
+  switch (mask)
+  {
   case ge_mDynType2_Axis:
     e = (GeDynElem*)new GeAxis(this);
     break;
@@ -1949,8 +2034,10 @@ GeDynElem* GeDyn::copy_element(GeDynElem& x)
 {
   GeDynElem* e = 0;
 
-  if (x.action_type1) {
-    switch (x.action_type1) {
+  if (x.action_type1)
+  {
+    switch (x.action_type1)
+    {
     case ge_mActionType1_PopupMenu:
       e = (GeDynElem*)new GePopupMenu((GePopupMenu&)x);
       break;
@@ -2034,12 +2121,18 @@ GeDynElem* GeDyn::copy_element(GeDynElem& x)
       break;
     default:;
     }
-  } else if (x.action_type2) {
-    switch (x.action_type2) {
+  }
+  else if (x.action_type2)
+  {
+    switch (x.action_type2)
+    {
     default:;
     }
-  } else if (x.dyn_type1) {
-    switch (x.dyn_type1) {
+  }
+  else if (x.dyn_type1)
+  {
+    switch (x.dyn_type1)
+    {
     case ge_mDynType1_DigLowColor:
       e = (GeDynElem*)new GeDigLowColor((GeDigLowColor&)x);
       break;
@@ -2129,8 +2222,11 @@ GeDynElem* GeDyn::copy_element(GeDynElem& x)
       break;
     default:;
     }
-  } else if (x.dyn_type2) {
-    switch (x.dyn_type2) {
+  }
+  else if (x.dyn_type2)
+  {
+    switch (x.dyn_type2)
+    {
     case ge_mDynType2_Axis:
       e = (GeDynElem*)new GeAxis((GeAxis&)x);
       break;
@@ -2198,19 +2294,22 @@ void GeDyn::insert_element(GeDynElem* e)
   e->dyn = this;
   elem = elements;
   prev = 0;
-  while (elem) {
+  while (elem)
+  {
     if (elem->prio > e->prio)
       break;
-    if (elem->prio == e->prio
-        && (unsigned int)elem->instance < (unsigned int)e->instance)
+    if (elem->prio == e->prio && (unsigned int)elem->instance < (unsigned int)e->instance)
       break;
     prev = elem;
     elem = elem->next;
   }
-  if (prev) {
+  if (prev)
+  {
     e->next = prev->next;
     prev->next = e;
-  } else {
+  }
+  else
+  {
     e->next = elements;
     elements = e;
   }
@@ -2224,17 +2323,17 @@ void GeDyn::merge(GeDyn& x)
   dyn_type1 = (ge_mDynType1)(dyn_type1 | x.dyn_type1);
   total_dyn_type1 = (ge_mDynType1)(total_dyn_type1 | x.total_dyn_type1);
   action_type1 = (ge_mActionType1)(action_type1 | x.action_type1);
-  total_action_type1
-      = (ge_mActionType1)(total_action_type1 | x.total_action_type1);
+  total_action_type1 = (ge_mActionType1)(total_action_type1 | x.total_action_type1);
 
-  for (xelem = x.elements; xelem; xelem = xelem->next) {
+  for (xelem = x.elements; xelem; xelem = xelem->next)
+  {
     prev = 0;
-    for (elem = elements; elem; elem = elem->next) {
-      if (elem->dyn_type1 == xelem->dyn_type1
-          && elem->dyn_type2 == xelem->dyn_type2
-          && elem->action_type1 == xelem->action_type1
-          && elem->action_type2 == xelem->action_type2
-          && elem->instance == xelem->instance) {
+    for (elem = elements; elem; elem = elem->next)
+    {
+      if (elem->dyn_type1 == xelem->dyn_type1 && elem->dyn_type2 == xelem->dyn_type2 &&
+          elem->action_type1 == xelem->action_type1 && elem->action_type2 == xelem->action_type2 &&
+          elem->instance == xelem->instance)
+      {
         // Element exists in both, use element in x, i.e. remove current element
         if (!prev)
           elements = elem->next;
@@ -2268,17 +2367,18 @@ int GeDyn::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
   int inherit_action_type1;
   int inherit_action_type2;
 
-  if (grow_GetObjectType(object) == glow_eObjectType_GrowBar
-      || grow_GetObjectType(object) == glow_eObjectType_GrowBarArc
-      || grow_GetObjectType(object) == glow_eObjectType_GrowTable
-      || grow_GetObjectType(object) == glow_eObjectType_GrowWindow
-      || grow_GetObjectType(object) == glow_eObjectType_GrowXYCurve
-      || grow_GetObjectType(object) == glow_eObjectType_GrowTrend
-      || grow_GetObjectType(object) == glow_eObjectType_GrowPie
-      || grow_GetObjectType(object) == glow_eObjectType_GrowBarChart
-      || grow_GetObjectType(object) == glow_eObjectType_GrowAxis
-      || grow_GetObjectType(object) == glow_eObjectType_GrowAxisArc
-      || grow_GetObjectType(object) == glow_eObjectType_GrowToolbar) {
+  if (grow_GetObjectType(object) == glow_eObjectType_GrowBar ||
+      grow_GetObjectType(object) == glow_eObjectType_GrowBarArc ||
+      grow_GetObjectType(object) == glow_eObjectType_GrowTable ||
+      grow_GetObjectType(object) == glow_eObjectType_GrowWindow ||
+      grow_GetObjectType(object) == glow_eObjectType_GrowXYCurve ||
+      grow_GetObjectType(object) == glow_eObjectType_GrowTrend ||
+      grow_GetObjectType(object) == glow_eObjectType_GrowPie ||
+      grow_GetObjectType(object) == glow_eObjectType_GrowBarChart ||
+      grow_GetObjectType(object) == glow_eObjectType_GrowAxis ||
+      grow_GetObjectType(object) == glow_eObjectType_GrowAxisArc ||
+      grow_GetObjectType(object) == glow_eObjectType_GrowToolbar)
+  {
     if (cycle == glow_eCycle_Inherit)
       cycle = glow_eCycle_Slow;
     if (dyn_type1 & ge_mDynType1_Inherit)
@@ -2287,22 +2387,28 @@ int GeDyn::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
       action_type1 = ge_mActionType1(action_type1 & ~ge_mActionType1_Inherit);
   }
 
-  if (dyn_type1 & ge_mDynType1_Inherit) {
-    grow_GetObjectClassDynType(object, &inherit_dyn_type1, &inherit_dyn_type2,
-        &inherit_action_type1, &inherit_action_type2);
+  if (dyn_type1 & ge_mDynType1_Inherit)
+  {
+    grow_GetObjectClassDynType(object, &inherit_dyn_type1, &inherit_dyn_type2, &inherit_action_type1,
+                               &inherit_action_type2);
     total_dyn_type1 = ge_mDynType1(dyn_type1 | inherit_dyn_type1);
     total_dyn_type2 = ge_mDynType2(dyn_type2 | inherit_dyn_type2);
-  } else {
+  }
+  else
+  {
     total_dyn_type1 = dyn_type1;
     total_dyn_type2 = dyn_type2;
   }
 
-  if (action_type1 & ge_mActionType1_Inherit) {
-    grow_GetObjectClassDynType(object, &inherit_dyn_type1, &inherit_dyn_type2,
-        &inherit_action_type1, &inherit_action_type2);
+  if (action_type1 & ge_mActionType1_Inherit)
+  {
+    grow_GetObjectClassDynType(object, &inherit_dyn_type1, &inherit_dyn_type2, &inherit_action_type1,
+                               &inherit_action_type2);
     total_action_type1 = ge_mActionType1(action_type1 | inherit_action_type1);
     total_action_type2 = ge_mActionType2(action_type2 | inherit_action_type2);
-  } else {
+  }
+  else
+  {
     total_action_type1 = action_type1;
     total_action_type2 = action_type2;
   }
@@ -2328,10 +2434,11 @@ int GeDyn::scan(grow_tObject object)
   ignore_invisible = false;
   reset_text_a1 = false;
   ignore_text_a1 = false;
-  for (GeDynElem* elem = elements; elem; elem = elem->next) {
+  for (GeDynElem* elem = elements; elem; elem = elem->next)
+  {
     sts = elem->scan(object);
-    if (sts == GE__NO_PROPAGATE || sts == GLOW__TERMINATED
-        || sts == GLOW__SUBTERMINATED || sts == GLOW__SWAPTERMINATED)
+    if (sts == GE__NO_PROPAGATE || sts == GLOW__TERMINATED || sts == GLOW__SUBTERMINATED ||
+        sts == GLOW__SWAPTERMINATED)
       return sts;
   }
   return 1;
@@ -2341,10 +2448,11 @@ int GeDyn::action(grow_tObject object, glow_tEvent event)
 {
   int sts;
 
-  for (GeDynElem* elem = elements; elem; elem = elem->next) {
+  for (GeDynElem* elem = elements; elem; elem = elem->next)
+  {
     sts = elem->action(object, event);
-    if (sts == GE__NO_PROPAGATE || sts == GLOW__TERMINATED
-        || sts == GLOW__SUBTERMINATED || sts == GLOW__SWAPTERMINATED)
+    if (sts == GE__NO_PROPAGATE || sts == GLOW__TERMINATED || sts == GLOW__SUBTERMINATED ||
+        sts == GLOW__SWAPTERMINATED)
       return sts;
   }
   return 1;
@@ -2354,18 +2462,17 @@ int GeDyn::confirmed_action(grow_tObject object, glow_tEvent event)
 {
   int sts;
 
-  total_action_type1
-      = (ge_mActionType1)(total_action_type1 & ~ge_mActionType1_Confirm);
+  total_action_type1 = (ge_mActionType1)(total_action_type1 & ~ge_mActionType1_Confirm);
 
-  for (GeDynElem* elem = elements; elem; elem = elem->next) {
+  for (GeDynElem* elem = elements; elem; elem = elem->next)
+  {
     sts = elem->action(object, event);
-    if (sts == GE__NO_PROPAGATE || sts == GLOW__TERMINATED
-        || sts == GLOW__SUBTERMINATED || sts == GLOW__SWAPTERMINATED)
+    if (sts == GE__NO_PROPAGATE || sts == GLOW__TERMINATED || sts == GLOW__SUBTERMINATED ||
+        sts == GLOW__SWAPTERMINATED)
       return sts;
   }
 
-  total_action_type1
-      = (ge_mActionType1)(total_action_type1 | ge_mActionType1_Confirm);
+  total_action_type1 = (ge_mActionType1)(total_action_type1 | ge_mActionType1_Confirm);
   return 1;
 }
 
@@ -2376,7 +2483,7 @@ int GeDyn::change_value(grow_tObject object, char* text)
   return 1;
 }
 
-int GeDyn::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GeDyn::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
   if (dyn_type1 != ge_mDynType1_Inherit)
     fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DynType1\"," << dyn_type1 << ");" << '\n';
@@ -2385,12 +2492,13 @@ int GeDyn::export_script(grow_tObject o, std::ofstream& fp, char *indentation, c
   if (action_type1 != ge_mActionType1_Inherit)
     fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Action\"," << action_type1 << ");" << '\n';
   if (action_type2 != ge_mActionType2_No)
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "ActionType2\"," << action_type2 << ");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "ActionType2\"," << action_type2 << ");"
+       << '\n';
   if (access != glow_mAccess_RtDefault)
     fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Access\"," << access << ");" << '\n';
   if (cycle != glow_eCycle_Inherit)
     fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Cycle\"," << cycle << ");" << '\n';
-  
+
   for (GeDynElem* elem = elements; elem; elem = elem->next)
     elem->export_script(o, fp, indentation, prefix);
 
@@ -2402,12 +2510,13 @@ void GeDyn::export_java(grow_tObject object, std::ofstream& fp, char* var_name)
   int inherit_dyn_type1, inherit_action_type1;
   int inherit_dyn_type2, inherit_action_type2;
 
-  if (grow_GetObjectType(object) == glow_eObjectType_GrowBar
-      || grow_GetObjectType(object) == glow_eObjectType_GrowBarArc
-      || grow_GetObjectType(object) == glow_eObjectType_GrowTable
-      || grow_GetObjectType(object) == glow_eObjectType_GrowWindow
-      || grow_GetObjectType(object) == glow_eObjectType_GrowXYCurve
-      || grow_GetObjectType(object) == glow_eObjectType_GrowTrend) {
+  if (grow_GetObjectType(object) == glow_eObjectType_GrowBar ||
+      grow_GetObjectType(object) == glow_eObjectType_GrowBarArc ||
+      grow_GetObjectType(object) == glow_eObjectType_GrowTable ||
+      grow_GetObjectType(object) == glow_eObjectType_GrowWindow ||
+      grow_GetObjectType(object) == glow_eObjectType_GrowXYCurve ||
+      grow_GetObjectType(object) == glow_eObjectType_GrowTrend)
+  {
     if (cycle == glow_eCycle_Inherit)
       cycle = glow_eCycle_Slow;
     if (dyn_type1 & ge_mDynType1_Inherit)
@@ -2416,39 +2525,44 @@ void GeDyn::export_java(grow_tObject object, std::ofstream& fp, char* var_name)
       action_type1 = ge_mActionType1(action_type1 & ~ge_mActionType1_Inherit);
   }
 
-  if (dyn_type1 & ge_mDynType1_Inherit) {
-    grow_GetObjectClassDynType(object, &inherit_dyn_type1, &inherit_dyn_type2,
-        &inherit_action_type1, &inherit_action_type2);
+  if (dyn_type1 & ge_mDynType1_Inherit)
+  {
+    grow_GetObjectClassDynType(object, &inherit_dyn_type1, &inherit_dyn_type2, &inherit_action_type1,
+                               &inherit_action_type2);
     total_dyn_type1 = ge_mDynType1(dyn_type1 | inherit_dyn_type1);
     total_dyn_type2 = ge_mDynType2(dyn_type2 | inherit_dyn_type2);
-  } else {
+  }
+  else
+  {
     total_dyn_type1 = dyn_type1;
     total_dyn_type2 = dyn_type2;
   }
 
-  if (action_type1 & ge_mActionType1_Inherit) {
-    grow_GetObjectClassDynType(object, &inherit_dyn_type1, &inherit_dyn_type2,
-        &inherit_action_type1, &inherit_action_type2);
-    total_action_type1 = ge_mActionType1(
-        (action_type1 | inherit_action_type1) & ~ge_mActionType1_Inherit);
+  if (action_type1 & ge_mActionType1_Inherit)
+  {
+    grow_GetObjectClassDynType(object, &inherit_dyn_type1, &inherit_dyn_type2, &inherit_action_type1,
+                               &inherit_action_type2);
+    total_action_type1 = ge_mActionType1((action_type1 | inherit_action_type1) & ~ge_mActionType1_Inherit);
     total_action_type2 = ge_mActionType2(action_type2 | inherit_action_type2);
-  } else {
+  }
+  else
+  {
     total_action_type1 = action_type1;
     total_action_type2 = action_type2;
   }
 
-  fp << "    " << var_name << ".dd.setDynType1(" << total_dyn_type1 << ");"
-     << '\n'
-     << "    " << var_name << ".dd.setActionType1(" << total_action_type1
-     << ");\n";
+  fp << "    " << var_name << ".dd.setDynType1(" << total_dyn_type1 << ");" << '\n'
+     << "    " << var_name << ".dd.setActionType1(" << total_action_type1 << ");\n";
   if (total_action_type1)
     fp << "    " << var_name << ".dd.setAccess(" << access << ");\n";
 
-  if (elements) {
+  if (elements)
+  {
     fp << "    " << var_name << ".dd.setElements(new GeDynElemIfc[] {\n";
     bool first = true;
     int sts = 0;
-    for (GeDynElem* elem = elements; elem; elem = elem->next) {
+    for (GeDynElem* elem = elements; elem; elem = elem->next)
+    {
       sts = elem->export_java(object, fp, first, var_name);
       if (sts)
         first = false;
@@ -2457,16 +2571,15 @@ void GeDyn::export_java(grow_tObject object, std::ofstream& fp, char* var_name)
   }
 }
 
-void GeDyn::export_java_object(
-    grow_tObject object, std::ofstream& fp, char* var_name)
+void GeDyn::export_java_object(grow_tObject object, std::ofstream& fp, char* var_name)
 {
-  fp << "    new GeDyn(" << var_name << "," << dyn_type1 << "," << action_type1
-     << "," << access << ","
+  fp << "    new GeDyn(" << var_name << "," << dyn_type1 << "," << action_type1 << "," << access << ","
      << "new GeDynElemIfc[] {\n";
 
   bool first = true;
   int sts = 0;
-  for (GeDynElem* elem = elements; elem; elem = elem->next) {
+  for (GeDynElem* elem = elements; elem; elem = elem->next)
+  {
     sts = elem->export_java(object, fp, first, var_name);
     if (sts)
       first = false;
@@ -2478,7 +2591,8 @@ int GeDyn::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
   int sts;
 
-  for (GeDynElem* elem = elements; elem; elem = elem->next) {
+  for (GeDynElem* elem = elements; elem; elem = elem->next)
+  {
     sts = elem->syntax_check(object, error_cnt, warning_cnt);
     if (EVEN(sts))
       return sts;
@@ -2486,9 +2600,8 @@ int GeDyn::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
   return 1;
 }
 
-void GeDyn::syntax_check_attribute(grow_tObject object, const char* text,
-    char* attribute, int optional, int* types, graph_eDatabase* databases,
-    int* error_cnt, int* warning_cnt)
+void GeDyn::syntax_check_attribute(grow_tObject object, const char* text, char* attribute, int optional,
+                                   int* types, graph_eDatabase* databases, int* error_cnt, int* warning_cnt)
 {
   int attr_type, attr_size;
   pwr_tAName parsed_name;
@@ -2497,18 +2610,19 @@ void GeDyn::syntax_check_attribute(grow_tObject object, const char* text,
   graph_eDatabase db;
   int inverted;
   unsigned int bitmask;
-  static pwr_eType equiv_int_types[] = { pwr_eType_Boolean, pwr_eType_Int32,
-    pwr_eType_UInt32, pwr_eType_Enum, pwr_eType_Mask, pwr_eType_DisableAttr,
-    pwr_eType_Status, (pwr_eType)graph_eType_Bit };
+  static pwr_eType equiv_int_types[] = {
+      pwr_eType_Boolean, pwr_eType_Int32,       pwr_eType_UInt32, pwr_eType_Enum,
+      pwr_eType_Mask,    pwr_eType_DisableAttr, pwr_eType_Status, (pwr_eType)graph_eType_Bit};
 
-  if (strstr(attribute, "$node") || strstr(attribute, "$NODE")
-      || strstr(attribute, "$header") || strstr(attribute, "$HEADER"))
+  if (strstr(attribute, "$node") || strstr(attribute, "$NODE") || strstr(attribute, "$header") ||
+      strstr(attribute, "$HEADER"))
     return;
 
-  db = parse_attr_name(
-      attribute, parsed_name, &inverted, &attr_type, &attr_size);
-  if (streq(parsed_name, "")) {
-    if (!optional) {
+  db = parse_attr_name(attribute, parsed_name, &inverted, &attr_type, &attr_size);
+  if (streq(parsed_name, ""))
+  {
+    if (!optional)
+    {
       char msg[200];
       sprintf(msg, "%s is missing", text);
       graph->syntax_msg('E', object, msg);
@@ -2517,14 +2631,16 @@ void GeDyn::syntax_check_attribute(grow_tObject object, const char* text,
     return;
   }
 
-  if (parsed_name[0] == '&' && parsed_name[1] == '(') {
+  if (parsed_name[0] == '&' && parsed_name[1] == '(')
+  {
     // Can't check references
     pwr_tAName refname;
     char* s;
 
     strcpy(refname, &parsed_name[2]);
     s = strchr(refname, ')');
-    if (!s) {
+    if (!s)
+    {
       graph->syntax_msg('E', object, "Syntax error in reference");
       (*error_cnt)++;
       return;
@@ -2532,14 +2648,16 @@ void GeDyn::syntax_check_attribute(grow_tObject object, const char* text,
     *s = 0;
 
     sts = graph->check_ldh_object(refname, &a_type);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       char msg[420];
       sprintf(msg, "%s \"%s\" not found", text, refname);
       graph->syntax_msg('W', object, msg);
       (*warning_cnt)++;
     }
 
-    if (!(a_type == pwr_eType_Objid || a_type == pwr_eType_AttrRef)) {
+    if (!(a_type == pwr_eType_Objid || a_type == pwr_eType_AttrRef))
+    {
       char msg[300];
       sprintf(msg, "%s reference type should be Objid or AttrRef", text);
       graph->syntax_msg('E', object, msg);
@@ -2548,9 +2666,11 @@ void GeDyn::syntax_check_attribute(grow_tObject object, const char* text,
     return;
   }
 
-  if (attr_type == graph_eType_Bit) {
+  if (attr_type == graph_eType_Bit)
+  {
     sts = get_bit(parsed_name, attr_type, &bitmask);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       graph->syntax_msg('E', object, "Bit number out of range");
       (*error_cnt)++;
     }
@@ -2558,13 +2678,16 @@ void GeDyn::syntax_check_attribute(grow_tObject object, const char* text,
 
   // Check type
   int found = 0;
-  for (int i = 0; types[i] != 0; i++) {
-    if (types[i] == attr_type) {
+  for (int i = 0; types[i] != 0; i++)
+  {
+    if (types[i] == attr_type)
+    {
       found = 1;
       break;
     }
   }
-  if (!found) {
+  if (!found)
+  {
     char msg[200];
     sprintf(msg, "%s type not supported", text);
     graph->syntax_msg('E', object, msg);
@@ -2573,43 +2696,53 @@ void GeDyn::syntax_check_attribute(grow_tObject object, const char* text,
 
   // Check database
   found = 0;
-  for (int i = 0; databases[i] != graph_eDatabase__; i++) {
-    if (databases[i] == db) {
+  for (int i = 0; databases[i] != graph_eDatabase__; i++)
+  {
+    if (databases[i] == db)
+    {
       found = 1;
       break;
     }
   }
-  if (!found) {
+  if (!found)
+  {
     char msg[200];
     sprintf(msg, "%s database not supported", text);
     graph->syntax_msg('E', object, msg);
     (*error_cnt)++;
   }
 
-  switch (db) {
+  switch (db)
+  {
   case graph_eDatabase_Local:
     break;
   case graph_eDatabase_Gdh:
-    if (!streq(parsed_name, "")) {
+    if (!streq(parsed_name, ""))
+    {
       sts = graph->check_ldh_object(parsed_name, &a_type);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         char msg[420];
         sprintf(msg, "%s \"%s\" not found", text, parsed_name);
         graph->syntax_msg('W', object, msg);
         (*warning_cnt)++;
-      } else {
-        if (a_type != (pwr_eType)attr_type) {
+      }
+      else
+      {
+        if (a_type != (pwr_eType)attr_type)
+        {
           // Allow some equivalent types
           int eq1 = 0;
           int eq2 = 0;
-          for (unsigned int i = 0;
-               i < sizeof(equiv_int_types) / sizeof(equiv_int_types[0]); i++) {
+          for (unsigned int i = 0; i < sizeof(equiv_int_types) / sizeof(equiv_int_types[0]); i++)
+          {
             if (a_type == equiv_int_types[i])
               eq1 = 1;
             if ((pwr_eType)attr_type == equiv_int_types[i])
               eq2 = 1;
           }
-          if (!(eq1 && eq2)) {
+          if (!(eq1 && eq2))
+          {
             char msg[430];
             sprintf(msg, "%s type is not correct \"%s\"", text, parsed_name);
             graph->syntax_msg('E', object, msg);
@@ -2624,31 +2757,26 @@ void GeDyn::syntax_check_attribute(grow_tObject object, const char* text,
   return;
 }
 
-int GeDynElem::disconnect(grow_tObject object)
-{
-  return 1;
-}
+int GeDynElem::disconnect(grow_tObject object) { return 1; }
 
 int GeDynElem::get_transtab(char** tt)
 {
-  static char transtab[][32] = { "SubGraph", "SubGraph", "Dynamic", "", "" };
+  static char transtab[][32] = {"SubGraph", "SubGraph", "Dynamic", "", ""};
 
   *tt = (char*)transtab;
   return 1;
 }
 
 GeDigLowColor::GeDigLowColor(GeDyn* e_dyn)
-    : GeDynElem(e_dyn, ge_mDynType1_DigLowColor, ge_mDynType2_No,
-          ge_mActionType1_No, ge_mActionType2_No, ge_eDynPrio_DigLowColor),
+    : GeDynElem(e_dyn, ge_mDynType1_DigLowColor, ge_mDynType2_No, ge_mActionType1_No, ge_mActionType2_No,
+                ge_eDynPrio_DigLowColor),
       color(glow_eDrawType_Inherit), bitmask(0)
 {
   strcpy(attribute, "");
 }
 
 GeDigLowColor::GeDigLowColor(const GeDigLowColor& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-          x.prio),
-      color(x.color)
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio), color(x.color)
 {
   strcpy(attribute, x.attribute);
 }
@@ -2657,7 +2785,8 @@ void GeDigLowColor::get_attributes(attr_sItem* attrinfo, int* item_count)
 {
   int i = *item_count;
 
-  if (dyn->total_dyn_type1 & ge_mDynType1_Tone) {
+  if (dyn->total_dyn_type1 & ge_mDynType1_Tone)
+  {
     strcpy(attrinfo[i].name, "DigLowTone.Attribute");
     attrinfo[i].value = attribute;
     attrinfo[i].type = glow_eType_String;
@@ -2667,7 +2796,9 @@ void GeDigLowColor::get_attributes(attr_sItem* attrinfo, int* item_count)
     attrinfo[i].value = &color;
     attrinfo[i].type = glow_eType_ToneOrColor;
     attrinfo[i++].size = sizeof(color);
-  } else {
+  }
+  else
+  {
     strcpy(attrinfo[i].name, "DigLowColor.Attribute");
     attrinfo[i].value = attribute;
     attrinfo[i].type = glow_eType_String;
@@ -2681,11 +2812,11 @@ void GeDigLowColor::get_attributes(attr_sItem* attrinfo, int* item_count)
   *item_count = i;
 }
 
-void GeDigLowColor::set_attribute(
-    grow_tObject object, const char* attr_name, int* cnt)
+void GeDigLowColor::set_attribute(grow_tObject object, const char* attr_name, int* cnt)
 {
   (*cnt)--;
-  if (*cnt == 0) {
+  if (*cnt == 0)
+  {
     char msg[200];
 
     strncpy(attribute, attr_name, sizeof(attribute));
@@ -2698,8 +2829,7 @@ void GeDigLowColor::set_attribute(
   }
 }
 
-void GeDigLowColor::replace_attribute(
-    char* from, char* to, int* cnt, int strict)
+void GeDigLowColor::replace_attribute(char* from, char* to, int* cnt, int strict)
 {
   GeDyn::replace_attribute(attribute, sizeof(attribute), from, to, cnt, strict);
 }
@@ -2708,14 +2838,15 @@ int GeDigLowColor::set_color(grow_tObject object, glow_eDrawType color)
 {
   char msg[200];
 
-  if (dyn->total_dyn_type1 & ge_mDynType1_Tone) {
+  if (dyn->total_dyn_type1 & ge_mDynType1_Tone)
+  {
     this->color = glow_eDrawType(color / 30);
-    snprintf(msg, sizeof(msg), "DigLowTone.Tone = %s",
-        grow_ColorToneToName(this->color));
-  } else {
+    snprintf(msg, sizeof(msg), "DigLowTone.Tone = %s", grow_ColorToneToName(this->color));
+  }
+  else
+  {
     this->color = color;
-    snprintf(msg, sizeof(msg), "DigLowColor.Color = %s",
-        grow_ColorToName(this->color));
+    snprintf(msg, sizeof(msg), "DigLowColor.Color = %s", grow_ColorToName(this->color));
   }
   msg[sizeof(msg) - 1] = 0;
   dyn->graph->message('I', msg);
@@ -2737,8 +2868,10 @@ void GeDigLowColor::open(std::ifstream& fp)
   int tmp;
   char dummy[40];
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeDigLowColor: \"%d %s\"\n", type, dummy);
@@ -2746,7 +2879,8 @@ void GeDigLowColor::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_DigLowColor:
       break;
     case ge_eSave_DigLowColor_attribute:
@@ -2769,15 +2903,15 @@ void GeDigLowColor::open(std::ifstream& fp)
   }
 }
 
-int GeDigLowColor::connect(
-    grow_tObject object, glow_sTraceData* trace_data, bool now)
+int GeDigLowColor::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
 {
   int attr_type, attr_size;
   pwr_tAName parsed_name;
   int sts;
 
   color = dyn->get_color1(object, color);
-  if (color < 0 || color >= glow_eDrawType__) {
+  if (color < 0 || color >= glow_eDrawType__)
+  {
     printf("** Color out of range, %s\n", attribute);
     p = 0;
     return 0;
@@ -2785,22 +2919,20 @@ int GeDigLowColor::connect(
 
   size = 4;
   p = 0;
-  db = dyn->parse_attr_name(
-      attribute, parsed_name, &inverted, &attr_type, &attr_size);
+  db = dyn->parse_attr_name(attribute, parsed_name, &inverted, &attr_type, &attr_size);
   if (streq(parsed_name, ""))
     return 1;
 
   a_typeid = attr_type;
   get_bit(parsed_name, attr_type, &bitmask);
 
-  switch (db) {
+  switch (db)
+  {
   case graph_eDatabase_Local:
-    p = (pwr_tBoolean*)dyn->graph->localdb_ref_or_create(
-        parsed_name, attr_type);
+    p = (pwr_tBoolean*)dyn->graph->localdb_ref_or_create(parsed_name, attr_type);
     break;
   case graph_eDatabase_Gdh:
-    sts = dyn->graph->ref_object_info(
-        dyn->cycle, parsed_name, (void**)&p, &subid, size, object, now);
+    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&p, &subid, size, object, now);
     if (EVEN(sts))
       return sts;
     break;
@@ -2833,25 +2965,33 @@ int GeDigLowColor::scan(grow_tObject object)
   if (inverted)
     val = !val;
 
-  if (!first_scan) {
+  if (!first_scan)
+  {
     if (old_value == val && !dyn->reset_color)
       // No change since last time
       return 1;
-  } else
+  }
+  else
     first_scan = false;
 
-  if (dyn->total_dyn_type1 & ge_mDynType1_Tone) {
-    if (!val) {
+  if (dyn->total_dyn_type1 & ge_mDynType1_Tone)
+  {
+    if (!val)
+    {
       if (color >= (glow_eDrawType)glow_eDrawTone__)
         grow_SetObjectFillColor(object, color);
       else
         grow_SetObjectColorTone(object, (glow_eDrawTone)color);
-    } else {
+    }
+    else
+    {
       if (color >= (glow_eDrawType)glow_eDrawTone__)
         grow_ResetObjectFillColor(object);
       grow_ResetObjectColorTone(object);
     }
-  } else {
+  }
+  else
+  {
     if (!val)
       grow_SetObjectFillColor(object, color);
     else
@@ -2864,31 +3004,31 @@ int GeDigLowColor::scan(grow_tObject object)
 
 void GeDigLowColor::reset(grow_tObject object)
 {
-  if (dyn->total_dyn_type1 & ge_mDynType1_Tone) {
+  if (dyn->total_dyn_type1 & ge_mDynType1_Tone)
+  {
     if (color >= (glow_eDrawType)glow_eDrawTone__)
       grow_SetObjectFillColor(object, color);
     else
       grow_SetObjectColorTone(object, (glow_eDrawTone)color);
-  } else
+  }
+  else
     grow_SetObjectFillColor(object, color);
 
   old_value = 0;
 }
 
-int GeDigLowColor::export_java(
-    grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeDigLowColor::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
   glow_eDrawType jcolor = dyn->get_color1(object, color);
   if (first)
     fp << "      ";
   else
     fp << "      ,";
-  fp << "new GeDynDigLowColor(" << var_name << ".dd, \"" << attribute << "\","
-     << jcolor << ")\n";
+  fp << "new GeDynDigLowColor(" << var_name << ".dd, \"" << attribute << "\"," << jcolor << ")\n";
   return 1;
 }
 
-int GeDigLowColor::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GeDigLowColor::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
   char name[80];
   if (dyn->total_dyn_type1 & ge_mDynType1_Tone)
@@ -2897,8 +3037,10 @@ int GeDigLowColor::export_script(grow_tObject o, std::ofstream& fp, char *indent
     sprintf(name, "%sDigLowColor", prefix);
 
   if (!streq(attribute, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << name << ".Attribute\",\"" << attribute << "\");" << '\n';
-  if (color != glow_eDrawType_Inherit) {
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".Attribute\",\"" << attribute << "\");"
+       << '\n';
+  if (color != glow_eDrawType_Inherit)
+  {
     if (dyn->total_dyn_type1 & ge_mDynType1_Tone)
       fp << indentation << "SetObjectAttribute(id,\"" << name << ".Tone\"," << (int)color << ");" << '\n';
     else
@@ -2907,29 +3049,27 @@ int GeDigLowColor::export_script(grow_tObject o, std::ofstream& fp, char *indent
   return 1;
 }
 
-int GeDigLowColor::syntax_check(
-    grow_tObject object, int* error_cnt, int* warning_cnt)
+int GeDigLowColor::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
   glow_eDrawType tcolor = dyn->get_color1(object, color);
-  if (tcolor < 0 || tcolor >= glow_eDrawType__) {
+  if (tcolor < 0 || tcolor >= glow_eDrawType__)
+  {
     dyn->graph->syntax_msg('E', object, "Color out or range");
     (*error_cnt)++;
   }
 
-  int types[] = { pwr_eType_Boolean, pwr_eType_Int32, pwr_eType_UInt32,
-    pwr_eType_Int64, pwr_eType_UInt64, graph_eType_Bit, pwr_eType_Float32,
-    pwr_eType_Float64, pwr_eType_String, 0 };
-  graph_eDatabase databases[]
-      = { graph_eDatabase_Local, graph_eDatabase_Gdh, graph_eDatabase__ };
-  dyn->syntax_check_attribute(object, "DigLowColor.Attribute", attribute, 0,
-      types, databases, error_cnt, warning_cnt);
+  int types[] = {pwr_eType_Boolean, pwr_eType_Int32,   pwr_eType_UInt32,  pwr_eType_Int64,  pwr_eType_UInt64,
+                 graph_eType_Bit,   pwr_eType_Float32, pwr_eType_Float64, pwr_eType_String, 0};
+  graph_eDatabase databases[] = {graph_eDatabase_Local, graph_eDatabase_Gdh, graph_eDatabase__};
+  dyn->syntax_check_attribute(object, "DigLowColor.Attribute", attribute, 0, types, databases, error_cnt,
+                              warning_cnt);
 
   return 1;
 }
 
 GeDigColor::GeDigColor(GeDyn* e_dyn, ge_mInstance e_instance)
-    : GeDynElem(e_dyn, ge_mDynType1_DigColor, ge_mDynType2_No,
-          ge_mActionType1_No, ge_mActionType2_No, ge_eDynPrio_DigColor),
+    : GeDynElem(e_dyn, ge_mDynType1_DigColor, ge_mDynType2_No, ge_mActionType1_No, ge_mActionType2_No,
+                ge_eDynPrio_DigColor),
       color(glow_eDrawType_Inherit), bitmask(0)
 {
   strcpy(attribute, "");
@@ -2937,9 +3077,7 @@ GeDigColor::GeDigColor(GeDyn* e_dyn, ge_mInstance e_instance)
 }
 
 GeDigColor::GeDigColor(const GeDigColor& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-          x.prio),
-      color(x.color)
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio), color(x.color)
 {
   strcpy(attribute, x.attribute);
   instance = x.instance;
@@ -2950,8 +3088,10 @@ void GeDigColor::get_attributes(attr_sItem* attrinfo, int* item_count)
 {
   int i = *item_count;
 
-  if (dyn->total_dyn_type1 & ge_mDynType1_Tone) {
-    if (instance == ge_mInstance_1) {
+  if (dyn->total_dyn_type1 & ge_mDynType1_Tone)
+  {
+    if (instance == ge_mInstance_1)
+    {
       strcpy(attrinfo[i].name, "DigTone.Attribute");
       attrinfo[i].value = attribute;
       attrinfo[i].type = glow_eType_String;
@@ -2966,11 +3106,14 @@ void GeDigColor::get_attributes(attr_sItem* attrinfo, int* item_count)
       attrinfo[i].value = &instance_mask;
       attrinfo[i].type = ge_eAttrType_InstanceMask;
       attrinfo[i++].size = sizeof(instance_mask);
-    } else {
+    }
+    else
+    {
       // Get instance number
       int inst = 1;
       unsigned int m = instance;
-      while (m > 1) {
+      while (m > 1)
+      {
         m = m >> 1;
         inst++;
       }
@@ -2985,8 +3128,11 @@ void GeDigColor::get_attributes(attr_sItem* attrinfo, int* item_count)
       attrinfo[i].type = glow_eType_ToneOrColor;
       attrinfo[i++].size = sizeof(color);
     }
-  } else {
-    if (instance == ge_mInstance_1) {
+  }
+  else
+  {
+    if (instance == ge_mInstance_1)
+    {
       strcpy(attrinfo[i].name, "DigColor.Attribute");
       attrinfo[i].value = attribute;
       attrinfo[i].type = glow_eType_String;
@@ -3001,11 +3147,14 @@ void GeDigColor::get_attributes(attr_sItem* attrinfo, int* item_count)
       attrinfo[i].value = &instance_mask;
       attrinfo[i].type = ge_eAttrType_InstanceMask;
       attrinfo[i++].size = sizeof(instance_mask);
-    } else {
+    }
+    else
+    {
       // Get instance number
       int inst = 1;
       unsigned int m = instance;
-      while (m > 1) {
+      while (m > 1)
+      {
         m = m >> 1;
         inst++;
       }
@@ -3024,26 +3173,29 @@ void GeDigColor::get_attributes(attr_sItem* attrinfo, int* item_count)
   *item_count = i;
 }
 
-void GeDigColor::set_attribute(
-    grow_tObject object, const char* attr_name, int* cnt)
+void GeDigColor::set_attribute(grow_tObject object, const char* attr_name, int* cnt)
 {
   (*cnt)--;
-  if (*cnt == 0) {
+  if (*cnt == 0)
+  {
     char msg[200];
 
     strncpy(attribute, attr_name, sizeof(attribute));
-    if (instance == ge_mInstance_1) {
+    if (instance == ge_mInstance_1)
+    {
       if (dyn->total_dyn_type1 & ge_mDynType1_Tone)
         snprintf(msg, sizeof(msg), "DigTone.Attribute = %s", attr_name);
       else
         snprintf(msg, sizeof(msg), "DigColor.Attribute = %s", attr_name);
-    } else {
+    }
+    else
+    {
       if (dyn->total_dyn_type1 & ge_mDynType1_Tone)
-        snprintf(msg, sizeof(msg), "DigTone%d.Attribute = %s",
-            GeDyn::instance_to_number(instance), attr_name);
+        snprintf(msg, sizeof(msg), "DigTone%d.Attribute = %s", GeDyn::instance_to_number(instance),
+                 attr_name);
       else
-        snprintf(msg, sizeof(msg), "DigColor%d.Attribute = %s",
-            GeDyn::instance_to_number(instance), attr_name);
+        snprintf(msg, sizeof(msg), "DigColor%d.Attribute = %s", GeDyn::instance_to_number(instance),
+                 attr_name);
     }
     msg[sizeof(msg) - 1] = 0;
     dyn->graph->message('I', msg);
@@ -3059,23 +3211,23 @@ int GeDigColor::set_color(grow_tObject object, glow_eDrawType color)
 {
   char msg[200];
 
-  if (dyn->total_dyn_type1 & ge_mDynType1_Tone) {
+  if (dyn->total_dyn_type1 & ge_mDynType1_Tone)
+  {
     this->color = glow_eDrawType(color / 30);
     if (instance == ge_mInstance_1)
-      snprintf(msg, sizeof(msg), "DigTone.Tone = %s",
-          grow_ColorToneToName(this->color));
+      snprintf(msg, sizeof(msg), "DigTone.Tone = %s", grow_ColorToneToName(this->color));
     else
-      snprintf(msg, sizeof(msg), "DigTone%d.Tone = %s",
-          GeDyn::instance_to_number(instance),
-          grow_ColorToneToName(this->color));
-  } else {
+      snprintf(msg, sizeof(msg), "DigTone%d.Tone = %s", GeDyn::instance_to_number(instance),
+               grow_ColorToneToName(this->color));
+  }
+  else
+  {
     this->color = color;
     if (instance == ge_mInstance_1)
-      snprintf(msg, sizeof(msg), "DigColor.Color = %s",
-          grow_ColorToName(this->color));
+      snprintf(msg, sizeof(msg), "DigColor.Color = %s", grow_ColorToName(this->color));
     else
-      snprintf(msg, sizeof(msg), "DigColor%d.Color = %s",
-          GeDyn::instance_to_number(instance), grow_ColorToName(this->color));
+      snprintf(msg, sizeof(msg), "DigColor%d.Color = %s", GeDyn::instance_to_number(instance),
+               grow_ColorToName(this->color));
   }
   msg[sizeof(msg) - 1] = 0;
   dyn->graph->message('I', msg);
@@ -3088,8 +3240,7 @@ void GeDigColor::save(std::ofstream& fp)
   fp << int(ge_eSave_DigColor_attribute) << FSPACE << attribute << '\n';
   fp << int(ge_eSave_DigColor_color) << FSPACE << int(color) << '\n';
   fp << int(ge_eSave_DigColor_instance) << FSPACE << int(instance) << '\n';
-  fp << int(ge_eSave_DigColor_instance_mask) << FSPACE << int(instance_mask)
-     << '\n';
+  fp << int(ge_eSave_DigColor_instance_mask) << FSPACE << int(instance_mask) << '\n';
   fp << int(ge_eSave_End) << '\n';
 }
 
@@ -3100,8 +3251,10 @@ void GeDigColor::open(std::ifstream& fp)
   int tmp;
   char dummy[40];
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeDigColor: \"%d %s\"\n", type, dummy);
@@ -3109,7 +3262,8 @@ void GeDigColor::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_DigColor:
       break;
     case ge_eSave_DigColor_attribute:
@@ -3140,15 +3294,15 @@ void GeDigColor::open(std::ifstream& fp)
   }
 }
 
-int GeDigColor::connect(
-    grow_tObject object, glow_sTraceData* trace_data, bool now)
+int GeDigColor::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
 {
   int attr_type, attr_size;
   pwr_tAName parsed_name;
   int sts;
 
   color = dyn->get_color2(object, color);
-  if (color < 0 || color >= glow_eDrawType__) {
+  if (color < 0 || color >= glow_eDrawType__)
+  {
     printf("** Color out of range, %s\n", attribute);
     p = 0;
     return 0;
@@ -3156,21 +3310,19 @@ int GeDigColor::connect(
 
   size = 4;
   p = 0;
-  db = dyn->parse_attr_name(
-      attribute, parsed_name, &inverted, &attr_type, &attr_size);
+  db = dyn->parse_attr_name(attribute, parsed_name, &inverted, &attr_type, &attr_size);
   if (streq(parsed_name, ""))
     return 1;
 
   get_bit(parsed_name, attr_type, &bitmask);
 
-  switch (db) {
+  switch (db)
+  {
   case graph_eDatabase_Local:
-    p = (pwr_tBoolean*)dyn->graph->localdb_ref_or_create(
-        parsed_name, attr_type);
+    p = (pwr_tBoolean*)dyn->graph->localdb_ref_or_create(parsed_name, attr_type);
     break;
   case graph_eDatabase_Gdh:
-    sts = dyn->graph->ref_object_info(
-	dyn->cycle, parsed_name, (void**)&p, &subid, size, object, now);
+    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&p, &subid, size, object, now);
     if (EVEN(sts))
       return sts;
     break;
@@ -3204,36 +3356,50 @@ int GeDigColor::scan(grow_tObject object)
   if (inverted)
     val = !val;
 
-  if (!first_scan) {
-    if (old_value == val && !dyn->reset_color) {
+  if (!first_scan)
+  {
+    if (old_value == val && !dyn->reset_color)
+    {
       // No change since last time
       if (val)
         dyn->ignore_color = true;
       return 1;
     }
-  } else
+  }
+  else
     first_scan = false;
 
-  if (dyn->total_dyn_type1 & ge_mDynType1_Tone) {
-    if (val) {
-      if (color >= (glow_eDrawType)glow_eDrawTone__) {
+  if (dyn->total_dyn_type1 & ge_mDynType1_Tone)
+  {
+    if (val)
+    {
+      if (color >= (glow_eDrawType)glow_eDrawTone__)
+      {
         if (dyn->reset_color)
           grow_ResetObjectFillColor(object); // Previous color might be a tone
         grow_SetObjectFillColor(object, color);
-      } else
+      }
+      else
         grow_SetObjectColorTone(object, (glow_eDrawTone)color);
       dyn->ignore_color = true;
-    } else {
+    }
+    else
+    {
       if (color >= (glow_eDrawType)glow_eDrawTone__)
         grow_ResetObjectFillColor(object);
       grow_ResetObjectColorTone(object);
       dyn->reset_color = true;
     }
-  } else {
-    if (val) {
+  }
+  else
+  {
+    if (val)
+    {
       grow_SetObjectFillColor(object, color);
       dyn->ignore_color = true;
-    } else {
+    }
+    else
+    {
       grow_ResetObjectFillColor(object);
       dyn->reset_color = true;
     }
@@ -3245,17 +3411,19 @@ int GeDigColor::scan(grow_tObject object)
 
 void GeDigColor::reset(grow_tObject object)
 {
-  if (dyn->total_dyn_type1 & ge_mDynType1_Tone) {
+  if (dyn->total_dyn_type1 & ge_mDynType1_Tone)
+  {
     if (color >= (glow_eDrawType)glow_eDrawTone__)
       grow_ResetObjectFillColor(object);
     grow_ResetObjectColorTone(object);
-  } else
+  }
+  else
     grow_ResetObjectFillColor(object);
 
   old_value = 0;
 }
 
-int GeDigColor::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GeDigColor::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
   char name[80];
   if (dyn->total_dyn_type1 & ge_mDynType1_Tone)
@@ -3264,20 +3432,26 @@ int GeDigColor::export_script(grow_tObject o, std::ofstream& fp, char *indentati
     sprintf(name, "%sDigColor", prefix);
 
   // Find first instance and print instance mask
-  for (GeDynElem *elem = dyn->elements; elem; elem = elem->next) {
-    if (elem->dyn_type1 == ge_mDynType1_DigColor && elem->instance == ge_mInstance_1) {
-      if (instance ==  instance_highest(elem->instance_mask)) {
-	if (elem->instance_mask != 1)
-	  fp << indentation << "SetObjectAttribute(id,\"" << name << ".Instances\"," << elem->instance_mask << ");" << '\n';
-	break;
+  for (GeDynElem* elem = dyn->elements; elem; elem = elem->next)
+  {
+    if (elem->dyn_type1 == ge_mDynType1_DigColor && elem->instance == ge_mInstance_1)
+    {
+      if (instance == instance_highest(elem->instance_mask))
+      {
+        if (elem->instance_mask != 1)
+          fp << indentation << "SetObjectAttribute(id,\"" << name << ".Instances\"," << elem->instance_mask
+             << ");" << '\n';
+        break;
       }
     }
   }
   if (instance != ge_mInstance_1)
     sprintf(&name[strlen(name)], "%d", instance_number(instance));
   if (!streq(attribute, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << name << ".Attribute\",\"" << attribute << "\");" << '\n';
-  if (color != glow_eDrawType_Inherit) {
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".Attribute\",\"" << attribute << "\");"
+       << '\n';
+  if (color != glow_eDrawType_Inherit)
+  {
     if (dyn->total_dyn_type1 & ge_mDynType1_Tone)
       fp << indentation << "SetObjectAttribute(id,\"" << name << ".Tone\"," << (int)color << ");" << '\n';
     else
@@ -3286,21 +3460,18 @@ int GeDigColor::export_script(grow_tObject o, std::ofstream& fp, char *indentati
   return 1;
 }
 
-int GeDigColor::export_java(
-    grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeDigColor::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
   glow_eDrawType jcolor = dyn->get_color2(object, color);
   if (first)
     fp << "      ";
   else
     fp << "      ,";
-  fp << "new GeDynDigColor(" << var_name << ".dd, \"" << attribute << "\","
-     << jcolor << ")\n";
+  fp << "new GeDynDigColor(" << var_name << ".dd, \"" << attribute << "\"," << jcolor << ")\n";
   return 1;
 }
 
-int GeDigColor::syntax_check(
-    grow_tObject object, int* error_cnt, int* warning_cnt)
+int GeDigColor::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
   char name[40];
 
@@ -3310,33 +3481,30 @@ int GeDigColor::syntax_check(
     sprintf(name, "DigColor%d.Attribute", GeDyn::instance_to_number(instance));
 
   glow_eDrawType tcolor = dyn->get_color1(object, color);
-  if (tcolor < 0 || tcolor >= glow_eDrawType__) {
+  if (tcolor < 0 || tcolor >= glow_eDrawType__)
+  {
     dyn->graph->syntax_msg('E', object, "Color out or range");
     (*error_cnt)++;
   }
 
-  int types[] = { pwr_eType_Boolean, pwr_eType_Int32, pwr_eType_UInt32,
-    pwr_eType_Int64, pwr_eType_UInt64, graph_eType_Bit, pwr_eType_Float32,
-    pwr_eType_Float64, pwr_eType_String, 0 };
-  graph_eDatabase databases[]
-      = { graph_eDatabase_Local, graph_eDatabase_Gdh, graph_eDatabase__ };
-  dyn->syntax_check_attribute(
-      object, name, attribute, 0, types, databases, error_cnt, warning_cnt);
+  int types[] = {pwr_eType_Boolean, pwr_eType_Int32,   pwr_eType_UInt32,  pwr_eType_Int64,  pwr_eType_UInt64,
+                 graph_eType_Bit,   pwr_eType_Float32, pwr_eType_Float64, pwr_eType_String, 0};
+  graph_eDatabase databases[] = {graph_eDatabase_Local, graph_eDatabase_Gdh, graph_eDatabase__};
+  dyn->syntax_check_attribute(object, name, attribute, 0, types, databases, error_cnt, warning_cnt);
 
   return 1;
 }
 
 GeDigWarning::GeDigWarning(GeDyn* e_dyn)
-    : GeDynElem(e_dyn, ge_mDynType1_DigWarning, ge_mDynType2_No,
-          ge_mActionType1_No, ge_mActionType2_No, ge_eDynPrio_DigWarning),
+    : GeDynElem(e_dyn, ge_mDynType1_DigWarning, ge_mDynType2_No, ge_mActionType1_No, ge_mActionType2_No,
+                ge_eDynPrio_DigWarning),
       use_colortheme(0), bitmask(0)
 {
   strcpy(attribute, "");
 }
 
 GeDigWarning::GeDigWarning(const GeDigWarning& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-          x.prio),
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio),
       use_colortheme(x.use_colortheme)
 {
   strcpy(attribute, x.attribute);
@@ -3359,11 +3527,11 @@ void GeDigWarning::get_attributes(attr_sItem* attrinfo, int* item_count)
   *item_count = i;
 }
 
-void GeDigWarning::set_attribute(
-    grow_tObject object, const char* attr_name, int* cnt)
+void GeDigWarning::set_attribute(grow_tObject object, const char* attr_name, int* cnt)
 {
   (*cnt)--;
-  if (*cnt == 0) {
+  if (*cnt == 0)
+  {
     char msg[200];
 
     strncpy(attribute, attr_name, sizeof(attribute));
@@ -3382,8 +3550,7 @@ void GeDigWarning::save(std::ofstream& fp)
 {
   fp << int(ge_eSave_DigWarning) << '\n';
   fp << int(ge_eSave_DigWarning_attribute) << FSPACE << attribute << '\n';
-  fp << int(ge_eSave_DigWarning_use_colortheme) << FSPACE << use_colortheme
-     << '\n';
+  fp << int(ge_eSave_DigWarning_use_colortheme) << FSPACE << use_colortheme << '\n';
   fp << int(ge_eSave_End) << '\n';
 }
 
@@ -3393,8 +3560,10 @@ void GeDigWarning::open(std::ifstream& fp)
   int end_found = 0;
   char dummy[40];
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeDigWarning: \"%d %s\"\n", type, dummy);
@@ -3402,7 +3571,8 @@ void GeDigWarning::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_DigWarning:
       break;
     case ge_eSave_DigWarning_attribute:
@@ -3424,8 +3594,7 @@ void GeDigWarning::open(std::ifstream& fp)
   }
 }
 
-int GeDigWarning::connect(
-    grow_tObject object, glow_sTraceData* trace_data, bool now)
+int GeDigWarning::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
 {
   int attr_type, attr_size;
   pwr_tAName parsed_name;
@@ -3433,16 +3602,14 @@ int GeDigWarning::connect(
 
   size = 4;
   p = 0;
-  db = dyn->parse_attr_name(
-      attribute, parsed_name, &inverted, &attr_type, &attr_size);
+  db = dyn->parse_attr_name(attribute, parsed_name, &inverted, &attr_type, &attr_size);
   if (streq(parsed_name, ""))
     return 1;
 
   a_typeid = attr_type;
   get_bit(parsed_name, attr_type, &bitmask);
 
-  sts = dyn->graph->ref_object_info(
-      dyn->cycle, parsed_name, (void**)&p, &subid, size, object, now);
+  sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&p, &subid, size, object, now);
   if (EVEN(sts))
     return sts;
 
@@ -3472,31 +3639,42 @@ int GeDigWarning::scan(grow_tObject object)
   if (inverted)
     val = !val;
 
-  if (!first_scan) {
-    if (old_value == val && !dyn->reset_color) {
+  if (!first_scan)
+  {
+    if (old_value == val && !dyn->reset_color)
+    {
       // No change since last time
       if (val)
         dyn->ignore_color = true;
       return 1;
     }
-  } else
+  }
+  else
     first_scan = false;
 
-  if (dyn->total_dyn_type1 & ge_mDynType1_Tone) {
-    if (val) {
+  if (dyn->total_dyn_type1 & ge_mDynType1_Tone)
+  {
+    if (val)
+    {
       grow_SetObjectColorTone(object, glow_eDrawTone_Yellow);
       dyn->ignore_color = true;
-    } else {
+    }
+    else
+    {
       grow_ResetObjectColorTone(object);
       dyn->reset_color = true;
     }
-  } else {
-    if (val) {
-      grow_SetObjectFillColor(object, use_colortheme
-              ? glow_eDrawType_CustomColor41
-              : glow_eDrawType_ColorYellow);
+  }
+  else
+  {
+    if (val)
+    {
+      grow_SetObjectFillColor(object,
+                              use_colortheme ? glow_eDrawType_CustomColor41 : glow_eDrawType_ColorYellow);
       dyn->ignore_color = true;
-    } else {
+    }
+    else
+    {
       grow_ResetObjectFillColor(object);
       dyn->reset_color = true;
     }
@@ -3506,53 +3684,49 @@ int GeDigWarning::scan(grow_tObject object)
   return 1;
 }
 
-int GeDigWarning::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GeDigWarning::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
   if (!streq(attribute, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigWarning.Attribute\",\"" << attribute << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigWarning.Attribute\",\"" << attribute
+       << "\");" << '\n';
   if (use_colortheme != 0)
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigWarning.UseColorTheme\"," << use_colortheme << ");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigWarning.UseColorTheme\","
+       << use_colortheme << ");" << '\n';
   return 1;
 }
 
-int GeDigWarning::export_java(
-    grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeDigWarning::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
   if (first)
     fp << "      ";
   else
     fp << "      ,";
-  fp << "new GeDynDigWarning(" << var_name << ".dd, \"" << attribute << "\")"
-     << '\n';
+  fp << "new GeDynDigWarning(" << var_name << ".dd, \"" << attribute << "\")" << '\n';
   return 1;
 }
 
-int GeDigWarning::syntax_check(
-    grow_tObject object, int* error_cnt, int* warning_cnt)
+int GeDigWarning::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
-  int types[] = { pwr_eType_Boolean, pwr_eType_Int32, pwr_eType_UInt32,
-    pwr_eType_Int64, pwr_eType_UInt64, graph_eType_Bit, pwr_eType_Float32,
-    pwr_eType_Float64, pwr_eType_String, 0 };
-  graph_eDatabase databases[]
-      = { graph_eDatabase_Local, graph_eDatabase_Gdh, graph_eDatabase__ };
+  int types[] = {pwr_eType_Boolean, pwr_eType_Int32,   pwr_eType_UInt32,  pwr_eType_Int64,  pwr_eType_UInt64,
+                 graph_eType_Bit,   pwr_eType_Float32, pwr_eType_Float64, pwr_eType_String, 0};
+  graph_eDatabase databases[] = {graph_eDatabase_Local, graph_eDatabase_Gdh, graph_eDatabase__};
 
-  dyn->syntax_check_attribute(object, "DigWarning.Attribute", attribute, 0,
-      types, databases, error_cnt, warning_cnt);
+  dyn->syntax_check_attribute(object, "DigWarning.Attribute", attribute, 0, types, databases, error_cnt,
+                              warning_cnt);
 
   return 1;
 }
 
 GeDigError::GeDigError(GeDyn* e_dyn)
-    : GeDynElem(e_dyn, ge_mDynType1_DigError, ge_mDynType2_No,
-          ge_mActionType1_No, ge_mActionType2_No, ge_eDynPrio_DigError),
+    : GeDynElem(e_dyn, ge_mDynType1_DigError, ge_mDynType2_No, ge_mActionType1_No, ge_mActionType2_No,
+                ge_eDynPrio_DigError),
       use_colortheme(0), bitmask(0)
 {
   strcpy(attribute, "");
 }
 
 GeDigError::GeDigError(const GeDigError& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-          x.prio),
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio),
       use_colortheme(x.use_colortheme)
 {
   strcpy(attribute, x.attribute);
@@ -3575,11 +3749,11 @@ void GeDigError::get_attributes(attr_sItem* attrinfo, int* item_count)
   *item_count = i;
 }
 
-void GeDigError::set_attribute(
-    grow_tObject object, const char* attr_name, int* cnt)
+void GeDigError::set_attribute(grow_tObject object, const char* attr_name, int* cnt)
 {
   (*cnt)--;
-  if (*cnt == 0) {
+  if (*cnt == 0)
+  {
     char msg[200];
 
     strncpy(attribute, attr_name, sizeof(attribute));
@@ -3598,8 +3772,7 @@ void GeDigError::save(std::ofstream& fp)
 {
   fp << int(ge_eSave_DigError) << '\n';
   fp << int(ge_eSave_DigError_attribute) << FSPACE << attribute << '\n';
-  fp << int(ge_eSave_DigError_use_colortheme) << FSPACE << use_colortheme
-     << '\n';
+  fp << int(ge_eSave_DigError_use_colortheme) << FSPACE << use_colortheme << '\n';
   fp << int(ge_eSave_End) << '\n';
 }
 
@@ -3609,8 +3782,10 @@ void GeDigError::open(std::ifstream& fp)
   int end_found = 0;
   char dummy[40];
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeDigError: \"%d %s\"\n", type, dummy);
@@ -3618,7 +3793,8 @@ void GeDigError::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_DigError:
       break;
     case ge_eSave_DigError_attribute:
@@ -3640,8 +3816,7 @@ void GeDigError::open(std::ifstream& fp)
   }
 }
 
-int GeDigError::connect(
-    grow_tObject object, glow_sTraceData* trace_data, bool now)
+int GeDigError::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
 {
   int attr_type, attr_size;
   pwr_tAName parsed_name;
@@ -3649,16 +3824,14 @@ int GeDigError::connect(
 
   size = 4;
   p = 0;
-  db = dyn->parse_attr_name(
-      attribute, parsed_name, &inverted, &attr_type, &attr_size);
+  db = dyn->parse_attr_name(attribute, parsed_name, &inverted, &attr_type, &attr_size);
   if (streq(parsed_name, ""))
     return 1;
 
   a_typeid = attr_type;
   get_bit(parsed_name, attr_type, &bitmask);
 
-  sts = dyn->graph->ref_object_info(
-      dyn->cycle, parsed_name, (void**)&p, &subid, size, object, now);
+  sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&p, &subid, size, object, now);
   if (EVEN(sts))
     return sts;
 
@@ -3688,31 +3861,42 @@ int GeDigError::scan(grow_tObject object)
   if (inverted)
     val = !val;
 
-  if (!first_scan) {
-    if (old_value == val && !dyn->reset_color) {
+  if (!first_scan)
+  {
+    if (old_value == val && !dyn->reset_color)
+    {
       // No change since last time
       if (val)
         dyn->ignore_color = true;
       return 1;
     }
-  } else
+  }
+  else
     first_scan = false;
 
-  if (dyn->total_dyn_type1 & ge_mDynType1_Tone) {
-    if (val) {
+  if (dyn->total_dyn_type1 & ge_mDynType1_Tone)
+  {
+    if (val)
+    {
       grow_SetObjectColorTone(object, glow_eDrawTone_Red);
       dyn->ignore_color = true;
-    } else {
+    }
+    else
+    {
       grow_ResetObjectColorTone(object);
       dyn->reset_color = true;
     }
-  } else {
-    if (val) {
-      grow_SetObjectFillColor(object, use_colortheme
-              ? glow_eDrawType_CustomColor11
-              : glow_eDrawType_ColorRed);
+  }
+  else
+  {
+    if (val)
+    {
+      grow_SetObjectFillColor(object,
+                              use_colortheme ? glow_eDrawType_CustomColor11 : glow_eDrawType_ColorRed);
       dyn->ignore_color = true;
-    } else {
+    }
+    else
+    {
       grow_ResetObjectFillColor(object);
       dyn->reset_color = true;
     }
@@ -3722,54 +3906,50 @@ int GeDigError::scan(grow_tObject object)
   return 1;
 }
 
-int GeDigError::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GeDigError::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
   if (!streq(attribute, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigError.Attribute\",\"" << attribute << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigError.Attribute\",\"" << attribute
+       << "\");" << '\n';
   if (use_colortheme != 0)
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigError.UseColorTheme\"," << use_colortheme << ");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigError.UseColorTheme\"," << use_colortheme
+       << ");" << '\n';
   return 1;
 }
 
-int GeDigError::export_java(
-    grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeDigError::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
   if (first)
     fp << "      ";
   else
     fp << "      ,";
-  fp << "new GeDynDigError(" << var_name << ".dd, \"" << attribute << "\")"
-     << '\n';
+  fp << "new GeDynDigError(" << var_name << ".dd, \"" << attribute << "\")" << '\n';
   return 1;
 }
 
-int GeDigError::syntax_check(
-    grow_tObject object, int* error_cnt, int* warning_cnt)
+int GeDigError::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
-  int types[] = { pwr_eType_Boolean, pwr_eType_Int32, pwr_eType_UInt32,
-    pwr_eType_Int64, pwr_eType_UInt64, graph_eType_Bit, pwr_eType_Float32,
-    pwr_eType_Float64, pwr_eType_String, 0 };
-  graph_eDatabase databases[]
-      = { graph_eDatabase_Local, graph_eDatabase_Gdh, graph_eDatabase__ };
+  int types[] = {pwr_eType_Boolean, pwr_eType_Int32,   pwr_eType_UInt32,  pwr_eType_Int64,  pwr_eType_UInt64,
+                 graph_eType_Bit,   pwr_eType_Float32, pwr_eType_Float64, pwr_eType_String, 0};
+  graph_eDatabase databases[] = {graph_eDatabase_Local, graph_eDatabase_Gdh, graph_eDatabase__};
 
-  dyn->syntax_check_attribute(object, "DigError.Attribute", attribute, 0, types,
-      databases, error_cnt, warning_cnt);
+  dyn->syntax_check_attribute(object, "DigError.Attribute", attribute, 0, types, databases, error_cnt,
+                              warning_cnt);
 
   return 1;
 }
 
 GeDigFlash::GeDigFlash(GeDyn* e_dyn)
-    : GeDynElem(e_dyn, ge_mDynType1_DigFlash, ge_mDynType2_No,
-          ge_mActionType1_No, ge_mActionType2_No, ge_eDynPrio_DigFlash),
+    : GeDynElem(e_dyn, ge_mDynType1_DigFlash, ge_mDynType2_No, ge_mActionType1_No, ge_mActionType2_No,
+                ge_eDynPrio_DigFlash),
       color(glow_eDrawType_Inherit), color2(glow_eDrawType_Inherit), on(true)
 {
   strcpy(attribute, "");
 }
 
 GeDigFlash::GeDigFlash(const GeDigFlash& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-          x.prio),
-      color(x.color), color2(x.color2), on(x.on)
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio), color(x.color),
+      color2(x.color2), on(x.on)
 {
   strcpy(attribute, x.attribute);
 }
@@ -3778,7 +3958,8 @@ void GeDigFlash::get_attributes(attr_sItem* attrinfo, int* item_count)
 {
   int i = *item_count;
 
-  if (dyn->total_dyn_type1 & ge_mDynType1_Tone) {
+  if (dyn->total_dyn_type1 & ge_mDynType1_Tone)
+  {
     strcpy(attrinfo[i].name, "DigFlash.Attribute");
     attrinfo[i].value = attribute;
     attrinfo[i].type = glow_eType_String;
@@ -3793,7 +3974,9 @@ void GeDigFlash::get_attributes(attr_sItem* attrinfo, int* item_count)
     attrinfo[i].value = &color2;
     attrinfo[i].type = glow_eType_ToneOrColor;
     attrinfo[i++].size = sizeof(color2);
-  } else {
+  }
+  else
+  {
     strcpy(attrinfo[i].name, "DigFlash.Attribute");
     attrinfo[i].value = attribute;
     attrinfo[i].type = glow_eType_String;
@@ -3812,11 +3995,11 @@ void GeDigFlash::get_attributes(attr_sItem* attrinfo, int* item_count)
   *item_count = i;
 }
 
-void GeDigFlash::set_attribute(
-    grow_tObject object, const char* attr_name, int* cnt)
+void GeDigFlash::set_attribute(grow_tObject object, const char* attr_name, int* cnt)
 {
   (*cnt)--;
-  if (*cnt == 0) {
+  if (*cnt == 0)
+  {
     char msg[200];
 
     strncpy(attribute, attr_name, sizeof(attribute));
@@ -3835,14 +4018,15 @@ int GeDigFlash::set_color(grow_tObject object, glow_eDrawType color)
 {
   char msg[200];
 
-  if (dyn->total_dyn_type1 & ge_mDynType1_Tone) {
+  if (dyn->total_dyn_type1 & ge_mDynType1_Tone)
+  {
     this->color = glow_eDrawType(color / 30);
-    snprintf(msg, sizeof(msg), "DigFlash.Tone = %s",
-        grow_ColorToneToName(this->color));
-  } else {
+    snprintf(msg, sizeof(msg), "DigFlash.Tone = %s", grow_ColorToneToName(this->color));
+  }
+  else
+  {
     this->color = color;
-    snprintf(
-        msg, sizeof(msg), "DigFlash.Color = %s", grow_ColorToName(this->color));
+    snprintf(msg, sizeof(msg), "DigFlash.Color = %s", grow_ColorToName(this->color));
   }
   msg[sizeof(msg) - 1] = 0;
   dyn->graph->message('I', msg);
@@ -3865,8 +4049,10 @@ void GeDigFlash::open(std::ifstream& fp)
   int tmp;
   char dummy[40];
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeDigFlash: \"%d %s\"\n", type, dummy);
@@ -3874,7 +4060,8 @@ void GeDigFlash::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_DigFlash:
       break;
     case ge_eSave_DigFlash_attribute:
@@ -3901,15 +4088,15 @@ void GeDigFlash::open(std::ifstream& fp)
   }
 }
 
-int GeDigFlash::connect(
-    grow_tObject object, glow_sTraceData* trace_data, bool now)
+int GeDigFlash::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
 {
   int attr_type, attr_size;
   pwr_tAName parsed_name;
   int sts;
 
   color = dyn->get_color1(object, color);
-  if (color < 0 || color >= glow_eDrawType__) {
+  if (color < 0 || color >= glow_eDrawType__)
+  {
     printf("** Color out of range, %s\n", attribute);
     p = 0;
     return 0;
@@ -3917,8 +4104,7 @@ int GeDigFlash::connect(
 
   size = 4;
   p = 0;
-  db = dyn->parse_attr_name(
-      attribute, parsed_name, &inverted, &attr_type, &attr_size);
+  db = dyn->parse_attr_name(attribute, parsed_name, &inverted, &attr_type, &attr_size);
   if (streq(parsed_name, ""))
     return 1;
 
@@ -3926,8 +4112,7 @@ int GeDigFlash::connect(
 
   a_typeid = attr_type;
 
-  sts = dyn->graph->ref_object_info(
-      dyn->cycle, parsed_name, (void**)&p, &subid, size, object, now);
+  sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&p, &subid, size, object, now);
   if (EVEN(sts))
     return sts;
 
@@ -3957,30 +4142,41 @@ int GeDigFlash::scan(grow_tObject object)
   if (inverted)
     val = !val;
 
-  if (!first_scan) {
-    if (old_value == val && !dyn->reset_color) {
+  if (!first_scan)
+  {
+    if (old_value == val && !dyn->reset_color)
+    {
       // No change since last time
       if (!val)
         return 1;
     }
-  } else
+  }
+  else
     first_scan = false;
 
-  if (dyn->total_dyn_type1 & ge_mDynType1_Tone) {
-    if (val) {
-      if (on) {
+  if (dyn->total_dyn_type1 & ge_mDynType1_Tone)
+  {
+    if (val)
+    {
+      if (on)
+      {
         if (color >= (glow_eDrawType)glow_eDrawTone__)
           grow_SetObjectFillColor(object, color);
         else
           grow_SetObjectColorTone(object, (glow_eDrawTone)color);
         dyn->ignore_color = true;
-      } else {
-        if (color2 == glow_eDrawType_Inherit) {
+      }
+      else
+      {
+        if (color2 == glow_eDrawType_Inherit)
+        {
           if (color >= (glow_eDrawType)glow_eDrawTone__)
             grow_ResetObjectFillColor(object);
           grow_ResetObjectColorTone(object);
           dyn->reset_color = true;
-        } else {
+        }
+        else
+        {
           if (color >= (glow_eDrawType)glow_eDrawTone__)
             grow_SetObjectFillColor(object, color2);
           else
@@ -3989,28 +4185,41 @@ int GeDigFlash::scan(grow_tObject object)
         }
       }
       on = on ? false : true;
-    } else {
+    }
+    else
+    {
       if (color >= (glow_eDrawType)glow_eDrawTone__)
         grow_ResetObjectFillColor(object);
       grow_ResetObjectColorTone(object);
       dyn->reset_color = true;
     }
-  } else {
-    if (val) {
-      if (on) {
+  }
+  else
+  {
+    if (val)
+    {
+      if (on)
+      {
         grow_SetObjectFillColor(object, color);
         dyn->ignore_color = true;
-      } else {
-        if (color2 == glow_eDrawType_Inherit) {
+      }
+      else
+      {
+        if (color2 == glow_eDrawType_Inherit)
+        {
           grow_ResetObjectFillColor(object);
           dyn->reset_color = true;
-        } else {
+        }
+        else
+        {
           grow_SetObjectFillColor(object, color2);
           dyn->ignore_color = true;
         }
       }
       on = on ? false : true;
-    } else {
+    }
+    else
+    {
       grow_ResetObjectFillColor(object);
       dyn->reset_color = true;
     }
@@ -4020,26 +4229,33 @@ int GeDigFlash::scan(grow_tObject object)
   return 1;
 }
 
-int GeDigFlash::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GeDigFlash::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
   if (!streq(attribute, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigFlash.Attribute\",\"" << attribute << "\");" << '\n';
-  if (dyn->total_dyn_type1 & ge_mDynType1_Tone) {
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigFlash.Attribute\",\"" << attribute
+       << "\");" << '\n';
+  if (dyn->total_dyn_type1 & ge_mDynType1_Tone)
+  {
     if (color != glow_eDrawType_Inherit)
-      fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigFlash.Tone\"," << color << ");" << '\n';
+      fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigFlash.Tone\"," << color << ");"
+         << '\n';
     if (color2 != glow_eDrawType_Inherit)
-      fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigFlash.Tone2\"," << color2 << ");" << '\n';
-  } else {
+      fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigFlash.Tone2\"," << color2 << ");"
+         << '\n';
+  }
+  else
+  {
     if (color != glow_eDrawType_Inherit)
-      fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigFlash.Color\"," << color << ");" << '\n';
+      fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigFlash.Color\"," << color << ");"
+         << '\n';
     if (color2 != glow_eDrawType_Inherit)
-      fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigFlash.Color2\"," << color2 << ");" << '\n';
+      fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigFlash.Color2\"," << color2 << ");"
+         << '\n';
   }
   return 1;
 }
 
-int GeDigFlash::export_java(
-    grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeDigFlash::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
   glow_eDrawType jcolor = dyn->get_color1(object, color);
 
@@ -4047,35 +4263,33 @@ int GeDigFlash::export_java(
     fp << "      ";
   else
     fp << "      ,";
-  fp << "new GeDynDigFlash(" << var_name << ".dd, \"" << attribute << "\","
-     << jcolor << "," << color2 << ")\n";
+  fp << "new GeDynDigFlash(" << var_name << ".dd, \"" << attribute << "\"," << jcolor << "," << color2
+     << ")\n";
   return 1;
 }
 
-int GeDigFlash::syntax_check(
-    grow_tObject object, int* error_cnt, int* warning_cnt)
+int GeDigFlash::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
   glow_eDrawType tcolor = dyn->get_color1(object, color);
-  if (tcolor < 0 || tcolor >= glow_eDrawType__) {
+  if (tcolor < 0 || tcolor >= glow_eDrawType__)
+  {
     dyn->graph->syntax_msg('E', object, "Color out or range");
     (*error_cnt)++;
   }
 
-  int types[] = { pwr_eType_Boolean, pwr_eType_Int32, pwr_eType_UInt32,
-    pwr_eType_Int64, pwr_eType_UInt64, graph_eType_Bit, pwr_eType_Float32,
-    pwr_eType_Float64, pwr_eType_String, 0 };
-  graph_eDatabase databases[]
-      = { graph_eDatabase_Local, graph_eDatabase_Gdh, graph_eDatabase__ };
+  int types[] = {pwr_eType_Boolean, pwr_eType_Int32,   pwr_eType_UInt32,  pwr_eType_Int64,  pwr_eType_UInt64,
+                 graph_eType_Bit,   pwr_eType_Float32, pwr_eType_Float64, pwr_eType_String, 0};
+  graph_eDatabase databases[] = {graph_eDatabase_Local, graph_eDatabase_Gdh, graph_eDatabase__};
 
-  dyn->syntax_check_attribute(object, "DigFlash.Attribute", attribute, 0, types,
-      databases, error_cnt, warning_cnt);
+  dyn->syntax_check_attribute(object, "DigFlash.Attribute", attribute, 0, types, databases, error_cnt,
+                              warning_cnt);
 
   return 1;
 }
 
 GeInvisible::GeInvisible(GeDyn* e_dyn, ge_mInstance e_instance)
-    : GeDynElem(e_dyn, ge_mDynType1_Invisible, ge_mDynType2_No,
-          ge_mActionType1_No, ge_mActionType2_No, ge_eDynPrio_Invisible),
+    : GeDynElem(e_dyn, ge_mDynType1_Invisible, ge_mDynType2_No, ge_mActionType1_No, ge_mActionType2_No,
+                ge_eDynPrio_Invisible),
       dimmed(0), dim_level(0), bitmask(0)
 {
   strcpy(attribute, "");
@@ -4083,8 +4297,8 @@ GeInvisible::GeInvisible(GeDyn* e_dyn, ge_mInstance e_instance)
 }
 
 GeInvisible::GeInvisible(const GeInvisible& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-	x.prio), dimmed(x.dimmed), dim_level(x.dim_level)
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio), dimmed(x.dimmed),
+      dim_level(x.dim_level)
 {
   strcpy(attribute, x.attribute);
   instance = x.instance;
@@ -4095,7 +4309,8 @@ void GeInvisible::get_attributes(attr_sItem* attrinfo, int* item_count)
 {
   int i = *item_count;
 
-  if (instance == ge_mInstance_1) {
+  if (instance == ge_mInstance_1)
+  {
     strcpy(attrinfo[i].name, "Invisible.Attribute");
     attrinfo[i].value = attribute;
     attrinfo[i].type = glow_eType_String;
@@ -4117,11 +4332,14 @@ void GeInvisible::get_attributes(attr_sItem* attrinfo, int* item_count)
     attrinfo[i].value = &instance_mask;
     attrinfo[i].type = ge_eAttrType_InstanceMask;
     attrinfo[i++].size = sizeof(instance_mask);
-  } else {
+  }
+  else
+  {
     // Get instance number
     int inst = 1;
     unsigned int m = instance;
-    while (m > 1) {
+    while (m > 1)
+    {
       m = m >> 1;
       inst++;
     }
@@ -4146,19 +4364,19 @@ void GeInvisible::get_attributes(attr_sItem* attrinfo, int* item_count)
   *item_count = i;
 }
 
-void GeInvisible::set_attribute(
-    grow_tObject object, const char* attr_name, int* cnt)
+void GeInvisible::set_attribute(grow_tObject object, const char* attr_name, int* cnt)
 {
   (*cnt)--;
-  if (*cnt == 0) {
+  if (*cnt == 0)
+  {
     char msg[200];
 
     strncpy(attribute, attr_name, sizeof(attribute));
     if (instance == ge_mInstance_1)
       snprintf(msg, sizeof(msg), "Invisible.Attribute = %s", attr_name);
     else
-      snprintf(msg, sizeof(msg), "Invisible%d.Attribute = %s",
-          GeDyn::instance_to_number(instance), attr_name);
+      snprintf(msg, sizeof(msg), "Invisible%d.Attribute = %s", GeDyn::instance_to_number(instance),
+               attr_name);
 
     msg[sizeof(msg) - 1] = 0;
     dyn->graph->message('I', msg);
@@ -4177,8 +4395,7 @@ void GeInvisible::save(std::ofstream& fp)
   fp << int(ge_eSave_Invisible_dimmed) << FSPACE << dimmed << '\n';
   fp << int(ge_eSave_Invisible_dim_level) << FSPACE << dim_level << '\n';
   fp << int(ge_eSave_Invisible_instance) << FSPACE << int(instance) << '\n';
-  fp << int(ge_eSave_Invisible_instance_mask) << FSPACE << int(instance_mask)
-     << '\n';
+  fp << int(ge_eSave_Invisible_instance_mask) << FSPACE << int(instance_mask) << '\n';
   fp << int(ge_eSave_End) << '\n';
 }
 
@@ -4189,8 +4406,10 @@ void GeInvisible::open(std::ifstream& fp)
   int end_found = 0;
   char dummy[40];
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeInvisible: \"%d %s\"\n", type, dummy);
@@ -4198,7 +4417,8 @@ void GeInvisible::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_Invisible:
       break;
     case ge_eSave_Invisible_attribute:
@@ -4231,8 +4451,7 @@ void GeInvisible::open(std::ifstream& fp)
   }
 }
 
-int GeInvisible::connect(
-    grow_tObject object, glow_sTraceData* trace_data, bool now)
+int GeInvisible::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
 {
   int attr_type, attr_size;
   pwr_tAName parsed_name;
@@ -4240,14 +4459,14 @@ int GeInvisible::connect(
 
   size = 4;
   p = 0;
-  db = dyn->parse_attr_name(
-      attribute, parsed_name, &inverted, &attr_type, &attr_size);
+  db = dyn->parse_attr_name(attribute, parsed_name, &inverted, &attr_type, &attr_size);
   if (streq(parsed_name, ""))
     return 1;
 
   get_bit(parsed_name, attr_type, &bitmask);
 
-  if (str_NoCaseStrncmp(parsed_name, "$cmd(", 5) == 0) {
+  if (str_NoCaseStrncmp(parsed_name, "$cmd(", 5) == 0)
+  {
     char cmd[400], command[400];
     char* s;
     pwr_tStatus sts;
@@ -4268,17 +4487,18 @@ int GeInvisible::connect(
       p = &val_true;
     db = graph_eDatabase_User;
     a_typeid = pwr_eType_Boolean;
-  } else {
-    switch (db) {
+  }
+  else
+  {
+    switch (db)
+    {
     case graph_eDatabase_Gdh:
-      sts = dyn->graph->ref_object_info(
-          dyn->cycle, parsed_name, (void**)&p, &subid, size, object, now);
+      sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&p, &subid, size, object, now);
       if (EVEN(sts))
         return sts;
       break;
     case graph_eDatabase_Local:
-      p = (pwr_tBoolean*)dyn->graph->localdb_ref_or_create(
-          parsed_name, attr_type);
+      p = (pwr_tBoolean*)dyn->graph->localdb_ref_or_create(parsed_name, attr_type);
       break;
     case graph_eDatabase_Ccm:
       sts = dyn->graph->ccm_ref_variable(parsed_name, attr_type, (void**)&p);
@@ -4320,27 +4540,34 @@ int GeInvisible::scan(grow_tObject object)
   if (inverted)
     val = !val;
 
-  if (!first_scan) {
-    if (old_value == val && !dyn->reset_invisible) {
+  if (!first_scan)
+  {
+    if (old_value == val && !dyn->reset_invisible)
+    {
       // No change since last time
       if (val)
         dyn->ignore_invisible = true;
       return 1;
     }
-  } else
+  }
+  else
     first_scan = false;
 
-  if (!val) {
+  if (!val)
+  {
     grow_SetObjectVisibility(object, glow_eVis_Visible);
     dyn->reset_color = true;
     dyn->reset_invisible = true;
     if (dim_level != 0)
       grow_SetObjectTransparency(object, 0.0);
-  } else {
-    if (dimmed) {
+  }
+  else
+  {
+    if (dimmed)
+    {
       grow_SetObjectVisibility(object, glow_eVis_Dimmed);
       if (dim_level != 0)
-	grow_SetObjectTransparency(object, dim_level);
+        grow_SetObjectTransparency(object, dim_level);
     }
     else
       grow_SetObjectVisibility(object, glow_eVis_Invisible);
@@ -4352,73 +4579,73 @@ int GeInvisible::scan(grow_tObject object)
   return 1;
 }
 
-int GeInvisible::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GeInvisible::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
   char name[80];
 
   sprintf(name, "%sInvisible", prefix);
 
   // Find first instance and print instance mask
-  for (GeDynElem *elem = dyn->elements; elem; elem = elem->next) {
-    if (elem->dyn_type1 == ge_mDynType1_Invisible && elem->instance == ge_mInstance_1) {
-      if (instance ==  instance_highest(elem->instance_mask)) {
-	if (elem->instance_mask != 1)
-	  fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Invisible.Instances\"," << elem->instance_mask << ");" << '\n';
-	break;
+  for (GeDynElem* elem = dyn->elements; elem; elem = elem->next)
+  {
+    if (elem->dyn_type1 == ge_mDynType1_Invisible && elem->instance == ge_mInstance_1)
+    {
+      if (instance == instance_highest(elem->instance_mask))
+      {
+        if (elem->instance_mask != 1)
+          fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Invisible.Instances\","
+             << elem->instance_mask << ");" << '\n';
+        break;
       }
     }
   }
   if (instance != ge_mInstance_1)
     sprintf(&name[strlen(name)], "%d", instance_number(instance));
   if (!streq(attribute, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << name << ".Attribute\",\"" << attribute << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".Attribute\",\"" << attribute << "\");"
+       << '\n';
   if (dimmed != 0)
     fp << indentation << "SetObjectAttribute(id,\"" << name << ".Dimmed\"," << dimmed << ");" << '\n';
   if (dim_level != 0)
-    fp << indentation << "SetObjectAttribute(id,\"" << name << ".DimLevel\"," << dtostr(dim_level) << ");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".DimLevel\"," << dtostr(dim_level) << ");"
+       << '\n';
 
   return 1;
 }
 
-int GeInvisible::export_java(
-    grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeInvisible::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
   if (first)
     fp << "      ";
   else
     fp << "      ,";
-  fp << "new GeDynInvisible(" << var_name << ".dd, \""
-     << GeDyn::printstr(attribute) << "\"," << dimmed << ")\n";
+  fp << "new GeDynInvisible(" << var_name << ".dd, \"" << GeDyn::printstr(attribute) << "\"," << dimmed
+     << ")\n";
   return 1;
 }
 
-int GeInvisible::syntax_check(
-    grow_tObject object, int* error_cnt, int* warning_cnt)
+int GeInvisible::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
-  int types[] = { pwr_eType_Boolean, pwr_eType_Int32, pwr_eType_UInt32,
-    pwr_eType_Int64, pwr_eType_UInt64, graph_eType_Bit, pwr_eType_Float32,
-    pwr_eType_Float64, pwr_eType_String, 0 };
-  graph_eDatabase databases[]
-      = { graph_eDatabase_Local, graph_eDatabase_Gdh, graph_eDatabase__ };
+  int types[] = {pwr_eType_Boolean, pwr_eType_Int32,   pwr_eType_UInt32,  pwr_eType_Int64,  pwr_eType_UInt64,
+                 graph_eType_Bit,   pwr_eType_Float32, pwr_eType_Float64, pwr_eType_String, 0};
+  graph_eDatabase databases[] = {graph_eDatabase_Local, graph_eDatabase_Gdh, graph_eDatabase__};
 
-  dyn->syntax_check_attribute(object, "Invisible.Attribute", attribute, 0,
-      types, databases, error_cnt, warning_cnt);
+  dyn->syntax_check_attribute(object, "Invisible.Attribute", attribute, 0, types, databases, error_cnt,
+                              warning_cnt);
 
   return 1;
 }
 
 GeDigTextColor::GeDigTextColor(GeDyn* e_dyn)
-    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_DigTextColor,
-          ge_mActionType1_No, ge_mActionType2_No, ge_eDynPrio_DigTextColor),
+    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_DigTextColor, ge_mActionType1_No, ge_mActionType2_No,
+                ge_eDynPrio_DigTextColor),
       color(glow_eDrawType_Inherit)
 {
   strcpy(attribute, "");
 }
 
 GeDigTextColor::GeDigTextColor(const GeDigTextColor& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-          x.prio),
-      color(x.color)
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio), color(x.color)
 {
   strcpy(attribute, x.attribute);
 }
@@ -4440,11 +4667,11 @@ void GeDigTextColor::get_attributes(attr_sItem* attrinfo, int* item_count)
   *item_count = i;
 }
 
-void GeDigTextColor::set_attribute(
-    grow_tObject object, const char* attr_name, int* cnt)
+void GeDigTextColor::set_attribute(grow_tObject object, const char* attr_name, int* cnt)
 {
   (*cnt)--;
-  if (*cnt == 0) {
+  if (*cnt == 0)
+  {
     char msg[200];
 
     strncpy(attribute, attr_name, sizeof(attribute));
@@ -4454,8 +4681,7 @@ void GeDigTextColor::set_attribute(
   }
 }
 
-void GeDigTextColor::replace_attribute(
-    char* from, char* to, int* cnt, int strict)
+void GeDigTextColor::replace_attribute(char* from, char* to, int* cnt, int strict)
 {
   GeDyn::replace_attribute(attribute, sizeof(attribute), from, to, cnt, strict);
 }
@@ -4475,8 +4701,10 @@ void GeDigTextColor::open(std::ifstream& fp)
   int tmp;
   char dummy[40];
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeDigTextColor: \"%d %s\"\n", type, dummy);
@@ -4484,7 +4712,8 @@ void GeDigTextColor::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_DigTextColor:
       break;
     case ge_eSave_DigTextColor_attribute:
@@ -4507,15 +4736,15 @@ void GeDigTextColor::open(std::ifstream& fp)
   }
 }
 
-int GeDigTextColor::connect(
-    grow_tObject object, glow_sTraceData* trace_data, bool now)
+int GeDigTextColor::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
 {
   int attr_type, attr_size;
   pwr_tAName parsed_name;
   int sts;
 
   color = dyn->get_color1(object, color);
-  if (color < 0 || color >= glow_eDrawType__) {
+  if (color < 0 || color >= glow_eDrawType__)
+  {
     printf("** Color out of range, %s\n", attribute);
     p = 0;
     return 0;
@@ -4523,16 +4752,14 @@ int GeDigTextColor::connect(
 
   size = 4;
   p = 0;
-  db = dyn->parse_attr_name(
-      attribute, parsed_name, &inverted, &attr_type, &attr_size);
+  db = dyn->parse_attr_name(attribute, parsed_name, &inverted, &attr_type, &attr_size);
   if (streq(parsed_name, ""))
     return 1;
 
   get_bit(parsed_name, attr_type, &bitmask);
   a_typeid = attr_type;
 
-  sts = dyn->graph->ref_object_info(
-      dyn->cycle, parsed_name, (void**)&p, &subid, size, object, now);
+  sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&p, &subid, size, object, now);
   if (EVEN(sts))
     return sts;
 
@@ -4562,71 +4789,74 @@ int GeDigTextColor::scan(grow_tObject object)
   if (inverted)
     val = !val;
 
-  if (!first_scan) {
-    if (old_value == val) {
+  if (!first_scan)
+  {
+    if (old_value == val)
+    {
       // No change since last time
       return 1;
     }
-  } else
+  }
+  else
     first_scan = false;
 
-  if (val) {
+  if (val)
+  {
     grow_SetObjectTextColor(object, color);
-  } else {
+  }
+  else
+  {
     grow_ResetObjectTextColor(object);
   }
   old_value = val;
   return 1;
 }
 
-int GeDigTextColor::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GeDigTextColor::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
   if (!streq(attribute, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigTextColor.Attribute\",\"" << attribute << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigTextColor.Attribute\",\"" << attribute
+       << "\");" << '\n';
   if (color != glow_eDrawType_Inherit)
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigTextColor.Color\"," << color << ");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigTextColor.Color\"," << color << ");"
+       << '\n';
   return 1;
 }
 
-int GeDigTextColor::export_java(
-    grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeDigTextColor::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
   return 1;
 }
 
-int GeDigTextColor::syntax_check(
-    grow_tObject object, int* error_cnt, int* warning_cnt)
+int GeDigTextColor::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
   glow_eDrawType tcolor = dyn->get_color1(object, color);
-  if (tcolor < 0 || tcolor >= glow_eDrawType__) {
+  if (tcolor < 0 || tcolor >= glow_eDrawType__)
+  {
     dyn->graph->syntax_msg('E', object, "Color out or range");
     (*error_cnt)++;
   }
 
-  int types[] = { pwr_eType_Boolean, pwr_eType_Int32, pwr_eType_UInt32,
-    pwr_eType_Int64, pwr_eType_UInt64, graph_eType_Bit, pwr_eType_Float32,
-    pwr_eType_Float64, pwr_eType_String, 0 };
-  graph_eDatabase databases[]
-      = { graph_eDatabase_Local, graph_eDatabase_Gdh, graph_eDatabase__ };
+  int types[] = {pwr_eType_Boolean, pwr_eType_Int32,   pwr_eType_UInt32,  pwr_eType_Int64,  pwr_eType_UInt64,
+                 graph_eType_Bit,   pwr_eType_Float32, pwr_eType_Float64, pwr_eType_String, 0};
+  graph_eDatabase databases[] = {graph_eDatabase_Local, graph_eDatabase_Gdh, graph_eDatabase__};
 
-  dyn->syntax_check_attribute(object, "DigTextColor.Attribute", attribute, 0,
-      types, databases, error_cnt, warning_cnt);
+  dyn->syntax_check_attribute(object, "DigTextColor.Attribute", attribute, 0, types, databases, error_cnt,
+                              warning_cnt);
 
   return 1;
 }
 
 GeDigBorder::GeDigBorder(GeDyn* e_dyn)
-    : GeDynElem(e_dyn, ge_mDynType1_DigBorder, ge_mDynType2_No,
-          ge_mActionType1_No, ge_mActionType2_No, ge_eDynPrio_DigBorder),
+    : GeDynElem(e_dyn, ge_mDynType1_DigBorder, ge_mDynType2_No, ge_mActionType1_No, ge_mActionType2_No,
+                ge_eDynPrio_DigBorder),
       color(glow_eDrawType_Inherit)
 {
   strcpy(attribute, "");
 }
 
 GeDigBorder::GeDigBorder(const GeDigBorder& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-          x.prio),
-      color(x.color)
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio), color(x.color)
 {
   strcpy(attribute, x.attribute);
 }
@@ -4648,11 +4878,11 @@ void GeDigBorder::get_attributes(attr_sItem* attrinfo, int* item_count)
   *item_count = i;
 }
 
-void GeDigBorder::set_attribute(
-    grow_tObject object, const char* attr_name, int* cnt)
+void GeDigBorder::set_attribute(grow_tObject object, const char* attr_name, int* cnt)
 {
   (*cnt)--;
-  if (*cnt == 0) {
+  if (*cnt == 0)
+  {
     char msg[200];
 
     strncpy(attribute, attr_name, sizeof(attribute));
@@ -4682,8 +4912,10 @@ void GeDigBorder::open(std::ifstream& fp)
   int tmp;
   char dummy[40];
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeDigBorder: \"%d %s\"\n", type, dummy);
@@ -4691,7 +4923,8 @@ void GeDigBorder::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_DigBorder:
       break;
     case ge_eSave_DigBorder_attribute:
@@ -4714,15 +4947,15 @@ void GeDigBorder::open(std::ifstream& fp)
   }
 }
 
-int GeDigBorder::connect(
-    grow_tObject object, glow_sTraceData* trace_data, bool now)
+int GeDigBorder::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
 {
   int attr_type, attr_size;
   pwr_tAName parsed_name;
   int sts;
 
   color = dyn->get_color1(object, color);
-  if (color < 0 || color >= glow_eDrawType__) {
+  if (color < 0 || color >= glow_eDrawType__)
+  {
     printf("** Color out of range, %s\n", attribute);
     p = 0;
     return 0;
@@ -4730,16 +4963,14 @@ int GeDigBorder::connect(
 
   size = 4;
   p = 0;
-  db = dyn->parse_attr_name(
-      attribute, parsed_name, &inverted, &attr_type, &attr_size);
+  db = dyn->parse_attr_name(attribute, parsed_name, &inverted, &attr_type, &attr_size);
   if (streq(parsed_name, ""))
     return 1;
 
   get_bit(parsed_name, attr_type, &bitmask);
   a_typeid = attr_type;
 
-  sts = dyn->graph->ref_object_info(
-      dyn->cycle, parsed_name, (void**)&p, &subid, size, object, now);
+  sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&p, &subid, size, object, now);
   if (EVEN(sts))
     return sts;
 
@@ -4769,34 +5000,41 @@ int GeDigBorder::scan(grow_tObject object)
   if (inverted)
     val = !val;
 
-  if (!first_scan) {
-    if (old_value == val) {
+  if (!first_scan)
+  {
+    if (old_value == val)
+    {
       // No change since last time
       return 1;
     }
-  } else
+  }
+  else
     first_scan = false;
 
-  if (!val) {
+  if (!val)
+  {
     grow_SetObjectBorderColor(object, color);
-  } else {
+  }
+  else
+  {
     grow_ResetObjectBorderColor(object);
   }
   old_value = val;
   return 1;
 }
 
-int GeDigBorder::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GeDigBorder::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
   if (!streq(attribute, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigBorder.Attribute\",\"" << attribute << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigBorder.Attribute\",\"" << attribute
+       << "\");" << '\n';
   if (color != glow_eDrawType_Inherit)
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigBorder.LowColor\"," << color << ");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigBorder.LowColor\"," << color << ");"
+       << '\n';
   return 1;
 }
 
-int GeDigBorder::export_java(
-    grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeDigBorder::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
   glow_eDrawType jcolor = dyn->get_color1(object, color);
 
@@ -4804,35 +5042,32 @@ int GeDigBorder::export_java(
     fp << "      ";
   else
     fp << "      ,";
-  fp << "new GeDynDigBorder(" << var_name << ".dd, \"" << attribute << "\","
-     << jcolor << ")\n";
+  fp << "new GeDynDigBorder(" << var_name << ".dd, \"" << attribute << "\"," << jcolor << ")\n";
   return 1;
 }
 
-int GeDigBorder::syntax_check(
-    grow_tObject object, int* error_cnt, int* warning_cnt)
+int GeDigBorder::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
   glow_eDrawType tcolor = dyn->get_color1(object, color);
-  if (tcolor < 0 || tcolor >= glow_eDrawType__) {
+  if (tcolor < 0 || tcolor >= glow_eDrawType__)
+  {
     dyn->graph->syntax_msg('E', object, "Color out or range");
     (*error_cnt)++;
   }
 
-  int types[] = { pwr_eType_Boolean, pwr_eType_Int32, pwr_eType_UInt32,
-    pwr_eType_Int64, pwr_eType_UInt64, graph_eType_Bit, pwr_eType_Float32,
-    pwr_eType_Float64, pwr_eType_String, 0 };
-  graph_eDatabase databases[]
-      = { graph_eDatabase_Local, graph_eDatabase_Gdh, graph_eDatabase__ };
+  int types[] = {pwr_eType_Boolean, pwr_eType_Int32,   pwr_eType_UInt32,  pwr_eType_Int64,  pwr_eType_UInt64,
+                 graph_eType_Bit,   pwr_eType_Float32, pwr_eType_Float64, pwr_eType_String, 0};
+  graph_eDatabase databases[] = {graph_eDatabase_Local, graph_eDatabase_Gdh, graph_eDatabase__};
 
-  dyn->syntax_check_attribute(object, "DigBorder.Attribute", attribute, 0,
-      types, databases, error_cnt, warning_cnt);
+  dyn->syntax_check_attribute(object, "DigBorder.Attribute", attribute, 0, types, databases, error_cnt,
+                              warning_cnt);
 
   return 1;
 }
 
 GeDigText::GeDigText(GeDyn* e_dyn, ge_mInstance e_instance)
-    : GeDynElem(e_dyn, ge_mDynType1_DigText, ge_mDynType2_No,
-          ge_mActionType1_No, ge_mActionType2_No, ge_eDynPrio_DigText)
+    : GeDynElem(e_dyn, ge_mDynType1_DigText, ge_mDynType2_No, ge_mActionType1_No, ge_mActionType2_No,
+                ge_eDynPrio_DigText)
 {
   strcpy(attribute, "");
   strcpy(low_text, "");
@@ -4840,8 +5075,7 @@ GeDigText::GeDigText(GeDyn* e_dyn, ge_mInstance e_instance)
 }
 
 GeDigText::GeDigText(const GeDigText& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-          x.prio)
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio)
 {
   strcpy(attribute, x.attribute);
   strcpy(low_text, x.low_text);
@@ -4853,7 +5087,8 @@ void GeDigText::get_attributes(attr_sItem* attrinfo, int* item_count)
 {
   int i = *item_count;
 
-  if (instance == ge_mInstance_1) {
+  if (instance == ge_mInstance_1)
+  {
     strcpy(attrinfo[i].name, "DigText.Attribute");
     attrinfo[i].value = attribute;
     attrinfo[i].type = glow_eType_String;
@@ -4868,11 +5103,14 @@ void GeDigText::get_attributes(attr_sItem* attrinfo, int* item_count)
     attrinfo[i].value = &instance_mask;
     attrinfo[i].type = ge_eAttrType_InstanceMask;
     attrinfo[i++].size = sizeof(instance_mask);
-  } else {
+  }
+  else
+  {
     // Get instance number
     int inst = 1;
     unsigned int m = instance;
-    while (m > 1) {
+    while (m > 1)
+    {
       m = m >> 1;
       inst++;
     }
@@ -4893,26 +5131,27 @@ void GeDigText::get_attributes(attr_sItem* attrinfo, int* item_count)
 
 int GeDigText::get_transtab(char** tt)
 {
-  static char transtab[][32]
-      = { "SubGraph", "SubGraph", "A1", "Text", "Dynamic", "", "" };
+  static char transtab[][32] = {"SubGraph", "SubGraph", "A1", "Text", "Dynamic", "", ""};
 
   *tt = (char*)transtab;
   return 0;
 }
 
-void GeDigText::set_attribute(
-    grow_tObject object, const char* attr_name, int* cnt)
+void GeDigText::set_attribute(grow_tObject object, const char* attr_name, int* cnt)
 {
   (*cnt)--;
-  if (*cnt == 0) {
+  if (*cnt == 0)
+  {
     char msg[200];
 
     strncpy(attribute, attr_name, sizeof(attribute));
-    if (instance == ge_mInstance_1) {
+    if (instance == ge_mInstance_1)
+    {
       snprintf(msg, sizeof(msg), "DigText.Attribute = %s", attr_name);
-    } else {
-      snprintf(msg, sizeof(msg), "DigText%d.Attribute = %s",
-          GeDyn::instance_to_number(instance), attr_name);
+    }
+    else
+    {
+      snprintf(msg, sizeof(msg), "DigText%d.Attribute = %s", GeDyn::instance_to_number(instance), attr_name);
     }
     msg[sizeof(msg) - 1] = 0;
     dyn->graph->message('I', msg);
@@ -4930,8 +5169,7 @@ void GeDigText::save(std::ofstream& fp)
   fp << int(ge_eSave_DigText_attribute) << FSPACE << attribute << '\n';
   fp << int(ge_eSave_DigText_low_text) << FSPACE << low_text << '\n';
   fp << int(ge_eSave_DigText_instance) << FSPACE << int(instance) << '\n';
-  fp << int(ge_eSave_DigText_instance_mask) << FSPACE << int(instance_mask)
-     << '\n';
+  fp << int(ge_eSave_DigText_instance_mask) << FSPACE << int(instance_mask) << '\n';
   fp << int(ge_eSave_End) << '\n';
 }
 
@@ -4942,8 +5180,10 @@ void GeDigText::open(std::ifstream& fp)
   int tmp;
   char dummy[40];
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeDigText: \"%d %s\"\n", type, dummy);
@@ -4951,7 +5191,8 @@ void GeDigText::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_DigText:
       break;
     case ge_eSave_DigText_attribute:
@@ -4982,8 +5223,7 @@ void GeDigText::open(std::ifstream& fp)
   }
 }
 
-int GeDigText::connect(
-    grow_tObject object, glow_sTraceData* trace_data, bool now)
+int GeDigText::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
 {
   int attr_type, attr_size;
   pwr_tAName parsed_name;
@@ -4991,16 +5231,14 @@ int GeDigText::connect(
 
   size = 4;
   p = 0;
-  db = dyn->parse_attr_name(
-      attribute, parsed_name, &inverted, &attr_type, &attr_size);
+  db = dyn->parse_attr_name(attribute, parsed_name, &inverted, &attr_type, &attr_size);
   if (streq(parsed_name, ""))
     return 1;
 
   get_bit(parsed_name, attr_type, &bitmask);
   a_typeid = attr_type;
 
-  sts = dyn->graph->ref_object_info(
-      dyn->cycle, parsed_name, (void**)&p, &subid, size, object, now);
+  sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&p, &subid, size, object, now);
   if (EVEN(sts))
     return sts;
 
@@ -5031,38 +5269,53 @@ int GeDigText::scan(grow_tObject object)
   if (inverted)
     val = !val;
 
-  if (instance == ge_mInstance_1) {
+  if (instance == ge_mInstance_1)
+  {
     // Write low_text on low signal
-    if (!first_scan) {
-      if (old_value == val && !dyn->reset_text_a1) {
+    if (!first_scan)
+    {
+      if (old_value == val && !dyn->reset_text_a1)
+      {
         // No change since last time
         return 1;
       }
-    } else
+    }
+    else
       first_scan = false;
 
-    if (!val) {
+    if (!val)
+    {
       grow_SetAnnotation(object, 1, low_text, strlen(low_text));
       dyn->reset_text_a1 = true;
-    } else {
+    }
+    else
+    {
       grow_SetAnnotation(object, 1, high_text, strlen(high_text));
     }
-  } else {
+  }
+  else
+  {
     // Instance > 1, write low_text on high signal
-    if (!first_scan) {
-      if (old_value == val && !dyn->reset_text_a1) {
+    if (!first_scan)
+    {
+      if (old_value == val && !dyn->reset_text_a1)
+      {
         // No change since last time
         if (val)
           dyn->ignore_text_a1 = true;
         return 1;
       }
-    } else
+    }
+    else
       first_scan = false;
 
-    if (val) {
+    if (val)
+    {
       grow_SetAnnotation(object, 1, low_text, strlen(low_text));
       dyn->ignore_text_a1 = true;
-    } else {
+    }
+    else
+    {
       grow_SetAnnotation(object, 1, high_text, strlen(high_text));
       dyn->reset_text_a1 = true;
     }
@@ -5071,83 +5324,88 @@ int GeDigText::scan(grow_tObject object)
   return 1;
 }
 
-int GeDigText::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GeDigText::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
   char name[80];
 
   sprintf(name, "%sDigText", prefix);
 
   // Find first instance and print instance mask
-  for (GeDynElem *elem = dyn->elements; elem; elem = elem->next) {
-    if (elem->dyn_type1 == ge_mDynType1_DigText && elem->instance == ge_mInstance_1) {
-      if (instance ==  instance_highest(elem->instance_mask)) {
-	if (elem->instance_mask != 1)
-	  fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigText.Instances\"," << elem->instance_mask << ");" << '\n';
-	break;
+  for (GeDynElem* elem = dyn->elements; elem; elem = elem->next)
+  {
+    if (elem->dyn_type1 == ge_mDynType1_DigText && elem->instance == ge_mInstance_1)
+    {
+      if (instance == instance_highest(elem->instance_mask))
+      {
+        if (elem->instance_mask != 1)
+          fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigText.Instances\","
+             << elem->instance_mask << ");" << '\n';
+        break;
       }
     }
   }
   if (instance != ge_mInstance_1)
     sprintf(&name[strlen(name)], "%d", instance_number(instance));
   if (!streq(attribute, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << name << ".Attribute\",\"" << attribute << "\");" << '\n';
-  if (!streq(low_text, "")) {
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".Attribute\",\"" << attribute << "\");"
+       << '\n';
+  if (!streq(low_text, ""))
+  {
     if (instance == ge_mInstance_1)
-      fp << indentation << "SetObjectAttribute(id,\"" << name << ".LowText\",\"" << low_text << "\");" << '\n';
+      fp << indentation << "SetObjectAttribute(id,\"" << name << ".LowText\",\"" << low_text << "\");"
+         << '\n';
     else
-      fp << indentation << "SetObjectAttribute(id,\"" << name << ".HighText\",\"" << low_text << "\");" << '\n';
+      fp << indentation << "SetObjectAttribute(id,\"" << name << ".HighText\",\"" << low_text << "\");"
+         << '\n';
   }
   return 1;
 }
 
-int GeDigText::export_java(
-    grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeDigText::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
   if (first)
     fp << "      ";
   else
     fp << "      ,";
-  fp << "new GeDynDigText(" << var_name << ".dd, \"" << attribute << "\",\""
-     << low_text << "\")\n";
+  fp << "new GeDynDigText(" << var_name << ".dd, \"" << attribute << "\",\"" << low_text << "\")\n";
   return 1;
 }
 
-int GeDigText::syntax_check(
-    grow_tObject object, int* error_cnt, int* warning_cnt)
+int GeDigText::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
   int sts;
 
   sts = grow_CheckObjectAnnotation(object, 1);
-  if (EVEN(sts)) {
-    dyn->graph->syntax_msg(
-        'E', object, "DigText, no annotation number 1 for this object");
+  if (EVEN(sts))
+  {
+    dyn->graph->syntax_msg('E', object, "DigText, no annotation number 1 for this object");
     (*error_cnt)++;
-  } else if (instance_mask == ge_mInstance_1) {
+  }
+  else if (instance_mask == ge_mInstance_1)
+  {
     grow_GetAnnotation(object, 1, high_text, sizeof(high_text));
-    if (streq(high_text, "") && streq(low_text, "")) {
-      dyn->graph->syntax_msg(
-          'E', object, "DigText, low and high text is missing");
+    if (streq(high_text, "") && streq(low_text, ""))
+    {
+      dyn->graph->syntax_msg('E', object, "DigText, low and high text is missing");
       (*error_cnt)++;
     }
   }
 
-  int types[] = { pwr_eType_Boolean, pwr_eType_Int32, pwr_eType_UInt32,
-    pwr_eType_Int64, pwr_eType_UInt64, graph_eType_Bit, pwr_eType_Float32,
-    pwr_eType_Float64, pwr_eType_String, 0 };
-  graph_eDatabase databases[]
-      = { graph_eDatabase_Local, graph_eDatabase_Gdh, graph_eDatabase__ };
+  int types[] = {pwr_eType_Boolean, pwr_eType_Int32,   pwr_eType_UInt32,  pwr_eType_Int64,  pwr_eType_UInt64,
+                 graph_eType_Bit,   pwr_eType_Float32, pwr_eType_Float64, pwr_eType_String, 0};
+  graph_eDatabase databases[] = {graph_eDatabase_Local, graph_eDatabase_Gdh, graph_eDatabase__};
 
-  dyn->syntax_check_attribute(object, "DigText.Attribute", attribute, 0, types,
-      databases, error_cnt, warning_cnt);
+  dyn->syntax_check_attribute(object, "DigText.Attribute", attribute, 0, types, databases, error_cnt,
+                              warning_cnt);
 
   return 1;
 }
 
 GeValue::GeValue(GeDyn* e_dyn, ge_mInstance e_instance)
-    : GeDynElem(e_dyn, ge_mDynType1_Value, ge_mDynType2_No, ge_mActionType1_No,
-          ge_mActionType2_No, ge_eDynPrio_Value),
-      zero_blank(0), decimals_decr(0), annot_typeid(0), annot_size(0), tid(0),
-      update_open(0), convert_element(0)
+    : GeDynElem(e_dyn, ge_mDynType1_Value, ge_mDynType2_No, ge_mActionType1_No, ge_mActionType2_No,
+                ge_eDynPrio_Value),
+      zero_blank(0), decimals_decr(0), annot_typeid(0), annot_size(0), tid(0), update_open(0),
+      convert_element(0)
 {
   strcpy(attribute, "");
   strcpy(format, "");
@@ -5157,10 +5415,8 @@ GeValue::GeValue(GeDyn* e_dyn, ge_mInstance e_instance)
 }
 
 GeValue::GeValue(const GeValue& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-          x.prio),
-      zero_blank(x.zero_blank), decimals_decr(x.decimals_decr),
-      update_open(x.update_open), convert_element(0)
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio),
+      zero_blank(x.zero_blank), decimals_decr(x.decimals_decr), update_open(x.update_open), convert_element(0)
 {
   strcpy(attribute, x.attribute);
   strcpy(format, x.format);
@@ -5174,7 +5430,8 @@ void GeValue::get_attributes(attr_sItem* attrinfo, int* item_count)
 {
   int i = *item_count;
 
-  if (instance == ge_mInstance_1) {
+  if (instance == ge_mInstance_1)
+  {
     strcpy(attrinfo[i].name, "Value.Attribute");
     attrinfo[i].value = attribute;
     attrinfo[i].type = glow_eType_String;
@@ -5204,11 +5461,14 @@ void GeValue::get_attributes(attr_sItem* attrinfo, int* item_count)
     attrinfo[i].value = &instance_mask;
     attrinfo[i].type = ge_eAttrType_InstanceMask;
     attrinfo[i++].size = sizeof(instance_mask);
-  } else {
+  }
+  else
+  {
     // Get instance number
     int inst = 1;
     unsigned int m = instance;
-    while (m > 1) {
+    while (m > 1)
+    {
       m = m >> 1;
       inst++;
     }
@@ -5243,21 +5503,21 @@ void GeValue::get_attributes(attr_sItem* attrinfo, int* item_count)
 
 int GeValue::get_transtab(char** tt)
 {
-  static char transtab[][32]
-      = { "SubGraph", "SubGraph", "A1", "", "Dynamic", "", "" };
+  static char transtab[][32] = {"SubGraph", "SubGraph", "A1", "", "Dynamic", "", ""};
 
   *tt = (char*)transtab;
   return 0;
 }
 
-void GeValue::set_attribute(
-    grow_tObject object, const char* attr_name, int* cnt)
+void GeValue::set_attribute(grow_tObject object, const char* attr_name, int* cnt)
 {
   (*cnt)--;
-  if (*cnt == 0) {
+  if (*cnt == 0)
+  {
     char msg[200];
 
-    if (instance == ge_mInstance_1) {
+    if (instance == ge_mInstance_1)
+    {
       strncpy(attribute, attr_name, sizeof(attribute));
       snprintf(msg, sizeof(msg), "Value.Attribute = %s", attr_name);
       msg[sizeof(msg) - 1] = 0;
@@ -5269,8 +5529,7 @@ void GeValue::set_attribute(
 void GeValue::replace_attribute(char* from, char* to, int* cnt, int strict)
 {
   GeDyn::replace_attribute(attribute, sizeof(attribute), from, to, cnt, strict);
-  GeDyn::replace_attribute(
-      decimals_attr, sizeof(decimals_attr), from, to, cnt, strict);
+  GeDyn::replace_attribute(decimals_attr, sizeof(decimals_attr), from, to, cnt, strict);
 }
 
 void GeValue::save(std::ofstream& fp)
@@ -5279,8 +5538,7 @@ void GeValue::save(std::ofstream& fp)
   fp << int(ge_eSave_Value_attribute) << FSPACE << attribute << '\n';
   fp << int(ge_eSave_Value_format) << FSPACE << format << '\n';
   fp << int(ge_eSave_Value_instance) << FSPACE << int(instance) << '\n';
-  fp << int(ge_eSave_Value_instance_mask) << FSPACE << int(instance_mask)
-     << '\n';
+  fp << int(ge_eSave_Value_instance_mask) << FSPACE << int(instance_mask) << '\n';
   fp << int(ge_eSave_Value_zero_blank) << FSPACE << int(zero_blank) << '\n';
   fp << int(ge_eSave_Value_decimals_attr) << FSPACE << decimals_attr << '\n';
   fp << int(ge_eSave_Value_decimals_decr) << FSPACE << decimals_decr << '\n';
@@ -5294,8 +5552,10 @@ void GeValue::open(std::ifstream& fp)
   char dummy[40];
   int tmp;
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeValue: \"%d %s\"\n", type, dummy);
@@ -5303,7 +5563,8 @@ void GeValue::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_Value:
       break;
     case ge_eSave_Value_attribute:
@@ -5354,7 +5615,8 @@ static int read_decimals(GeDyn* dyn, char* attr, int decr, char* format)
   pwr_tInt32 decimals;
 
   dyn->parse_attr_name(attr, parsed_name, &inverted, &attr_type, &attr_size);
-  switch (attr_type) {
+  switch (attr_type)
+  {
   case pwr_eType_Int32:
   case pwr_eType_UInt32:
   case pwr_eType_Enum:
@@ -5378,7 +5640,8 @@ static int read_decimals(GeDyn* dyn, char* attr, int decr, char* format)
   s = strchr(format, 'f');
   if (s == 0)
     sprintf(format, "%%.%df", decimals);
-  else {
+  else
+  {
     if (*(s - 2) != '.')
       sprintf(format, "%%.%df", decimals);
     else
@@ -5395,29 +5658,33 @@ int GeValue::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
   int inverted;
 
   p = 0;
-  db = dyn->parse_attr_name(
-      attribute, parsed_name, &inverted, &attr_type, &attr_size);
+  db = dyn->parse_attr_name(attribute, parsed_name, &inverted, &attr_type, &attr_size);
   if (streq(parsed_name, ""))
     return 1;
 
   size = attr_size;
-  switch (db) {
+  switch (db)
+  {
   case graph_eDatabase_Gdh:
     if (attr_type == pwr_eType__)
       printf("Warning GeValue::connect, type is missing in  %s\n", attribute);
 
-    switch (attr_type) {
+    switch (attr_type)
+    {
     case pwr_eType_Enum:
-    case pwr_eType_Mask: {
+    case pwr_eType_Mask:
+    {
       // Get attribute tid
       pwr_sAttrRef ar;
       pwr_tAName aname;
 
-      if (parsed_name[0] == '&') {
+      if (parsed_name[0] == '&')
+      {
         sts = dyn->graph->get_reference_name(parsed_name, aname);
         if (EVEN(sts))
           return sts;
-      } else
+      }
+      else
         strcpy(aname, parsed_name);
 
       sts = gdh_NameToAttrref(pwr_cNObjid, aname, &ar);
@@ -5429,8 +5696,7 @@ int GeValue::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
     default:;
     }
 
-    sts = dyn->graph->ref_object_info(
-        dyn->cycle, parsed_name, &p, &subid, attr_size, object, now);
+    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, &p, &subid, attr_size, object, now);
     if (EVEN(sts))
       return sts;
     if (attr_type != 0)
@@ -5438,12 +5704,12 @@ int GeValue::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
     else
       annot_typeid = dyn_get_typeid(format);
 
-    if (!check_format(format, annot_typeid)) {
+    if (!check_format(format, annot_typeid))
+    {
       char name[80];
 
       grow_GetObjectName(object, name, sizeof(name), glow_eName_Object);
-      printf("** GeValue: Suspicious format \"%s\" (%s, %s)\n", format, name,
-          attribute);
+      printf("** GeValue: Suspicious format \"%s\" (%s, %s)\n", format, name, attribute);
     }
     break;
   case graph_eDatabase_Local:
@@ -5470,12 +5736,15 @@ int GeValue::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
   default:;
   }
 
-  if (!streq(decimals_attr, "")) {
+  if (!streq(decimals_attr, ""))
+  {
     read_decimals(dyn, decimals_attr, decimals_decr, format);
   }
 
-  for (GeDynElem* elem = dyn->elements; elem; elem = elem->next) {
-    if (elem->dyn_type2 == ge_mDynType2_UnitConvert) {
+  for (GeDynElem* elem = dyn->elements; elem; elem = elem->next)
+  {
+    if (elem->dyn_type2 == ge_mDynType2_UnitConvert)
+    {
       convert_element = (GeUnitConvert*)elem;
       break;
     }
@@ -5490,7 +5759,8 @@ int GeValue::disconnect(grow_tObject object)
 {
   int annot_num = GeDyn::instance_to_number(instance);
 
-  if (grow_AnnotationInputIsOpen(object, annot_num)) {
+  if (grow_AnnotationInputIsOpen(object, annot_num))
+  {
     grow_CloseAnnotationInput(object, annot_num);
     grow_SetObjectInputFocus(object, 0, glow_eEvent_Null);
   }
@@ -5509,7 +5779,8 @@ int GeValue::scan(grow_tObject object)
   if (!p)
     return 1;
 
-  if (db == graph_eDatabase_Gdh && annot_typeid == pwr_eType_NetStatus) {
+  if (db == graph_eDatabase_Gdh && annot_typeid == pwr_eType_NetStatus)
+  {
     pwr_tTime t;
     pwr_tStatus sts;
     pwr_tBoolean old;
@@ -5519,49 +5790,61 @@ int GeValue::scan(grow_tObject object)
       *(pwr_tNetStatus*)p = PWR__NETTIMEOUT;
   }
 
-  switch (annot_typeid) {
-  case pwr_eType_Float32: {
+  switch (annot_typeid)
+  {
+  case pwr_eType_Float32:
+  {
     pwr_tFloat32 val = *(pwr_tFloat32*)p;
     if (convert_element)
-      val = uc_convert((graph_eUcEntity)convert_element->entity, convert_element->db_unit, 
-		       convert_element->display_unit, val);
+      val = uc_convert((graph_eUcEntity)convert_element->entity, convert_element->db_unit,
+                       convert_element->display_unit, val);
 
-    if (!first_scan) {
+    if (!first_scan)
+    {
       if (memcmp(&old_value, &val, size) == 0)
         // No change since last time
         return 1;
-    } else
+    }
+    else
       first_scan = false;
 
-    if (zero_blank && fabsf(val) < FLT_EPSILON) {
+    if (zero_blank && fabsf(val) < FLT_EPSILON)
+    {
       buf[0] = 0;
       len = 0;
-    } else
+    }
+    else
       len = sprintf(buf, format, val);
     memcpy(&old_value, &val, MIN(size, (int)sizeof(old_value)));
     break;
   }
   case pwr_eType_Int32:
-  case pwr_eType_UInt32: {
+  case pwr_eType_UInt32:
+  {
     pwr_tInt32 val = *(pwr_tInt32*)p;
 
-    if (!first_scan) {
+    if (!first_scan)
+    {
       if (memcmp(&old_value, &val, size) == 0)
         // No change since last time
         return 1;
-    } else
+    }
+    else
       first_scan = false;
 
-    if (zero_blank && val == 0) {
+    if (zero_blank && val == 0)
+    {
       buf[0] = 0;
       len = 0;
-    } else
+    }
+    else
       len = sprintf(buf, format, val);
     memcpy(&old_value, &val, MIN(size, (int)sizeof(old_value)));
     break;
   }
   case pwr_eType_NetStatus:
-    if (db == graph_eDatabase_Gdh) {
+    if (db == graph_eDatabase_Gdh)
+    {
       pwr_tTime t;
       pwr_tStatus sts;
       pwr_tBoolean old;
@@ -5571,22 +5854,27 @@ int GeValue::scan(grow_tObject object)
         *(pwr_tNetStatus*)p = PWR__NETTIMEOUT;
     }
   // No break
-  case pwr_eType_Status: {
+  case pwr_eType_Status:
+  {
     pwr_tStatus val = *(pwr_tStatus*)p;
 
-    if (!first_scan) {
+    if (!first_scan)
+    {
       if (memcmp(&old_value, &val, size) == 0)
         // No change since last time
         return 1;
-    } else
+    }
+    else
       first_scan = false;
 
-    if (val == 0) {
+    if (val == 0)
+    {
       strcpy(buf, "");
       len = 0;
       break;
     }
-    switch (format[1]) {
+    switch (format[1])
+    {
     case '1':
       // Format %1m: Write only the text
       msg_GetText(val, buf, sizeof(buf));
@@ -5594,40 +5882,48 @@ int GeValue::scan(grow_tObject object)
     default:
       msg_GetMsg(val, buf, sizeof(buf));
     }
-    if (zero_blank && val == 0) {
+    if (zero_blank && val == 0)
+    {
       buf[0] = 0;
       len = 0;
-    } else
+    }
+    else
       len = strlen(buf);
     memcpy(&old_value, &val, MIN(size, (int)sizeof(old_value)));
     break;
   }
   case pwr_eType_String:
   case pwr_eType_Text:
-    if (!first_scan) {
+    if (!first_scan)
+    {
       if (strncmp(old_value, (char*)p, size) == 0)
         // No change since last time
         return 1;
-    } else
+    }
+    else
       first_scan = false;
 
     memcpy(&old_value, p, MIN(size, (int)sizeof(old_value)));
 
     len = snprintf(buf, sizeof(buf), format, (char*)p);
     break;
-  case pwr_eType_Objid: {
+  case pwr_eType_Objid:
+  {
     int sts;
     char name[120];
     pwr_tObjid objid = *(pwr_tObjid*)p;
 
-    if (!first_scan) {
+    if (!first_scan)
+    {
       if (memcmp(&old_value, &objid, size) == 0)
         // No change since last time
         return 1;
-    } else
+    }
+    else
       first_scan = false;
 
-    switch (format[1]) {
+    switch (format[1])
+    {
     case '1':
       // Format %1o, write path
       sts = gdh_ObjidToName(objid, name, sizeof(name), cdh_mName_pathStrict);
@@ -5642,43 +5938,47 @@ int GeValue::scan(grow_tObject object)
     if (EVEN(sts))
       strcpy(name, "");
 
-    if (zero_blank && cdh_ObjidIsNull(objid)) {
+    if (zero_blank && cdh_ObjidIsNull(objid))
+    {
       buf[0] = 0;
       len = 0;
-    } else
+    }
+    else
       len = snprintf(buf, sizeof(buf), "%s", name);
     memcpy(&old_value, &objid, MIN(size, (int)sizeof(old_value)));
     break;
   }
-  case pwr_eType_AttrRef: {
+  case pwr_eType_AttrRef:
+  {
     int sts;
     char name[120];
     pwr_sAttrRef aref = *(pwr_sAttrRef*)p;
 
-    if (!first_scan) {
+    if (!first_scan)
+    {
       if (memcmp(&old_value, &aref, size) == 0)
         // No change since last time
         return 1;
-    } else
+    }
+    else
       first_scan = false;
 
     if (cdh_ObjidIsNull(aref.Objid))
       strcpy(name, "");
-    else {
-      switch (format[1]) {
+    else
+    {
+      switch (format[1])
+      {
       case '1':
         // Format %1o, write path
-        sts = gdh_AttrrefToName(
-            &aref, name, sizeof(name), cdh_mName_pathStrict);
+        sts = gdh_AttrrefToName(&aref, name, sizeof(name), cdh_mName_pathStrict);
         break;
       case '2':
         // Format %2o, write volume and path
-        sts = gdh_AttrrefToName(
-            &aref, name, sizeof(name), cdh_mName_volumeStrict);
+        sts = gdh_AttrrefToName(&aref, name, sizeof(name), cdh_mName_volumeStrict);
         break;
       default:
-        sts = gdh_AttrrefToName(
-            &aref, name, sizeof(name), cdh_mName_object | cdh_mName_attribute);
+        sts = gdh_AttrrefToName(&aref, name, sizeof(name), cdh_mName_object | cdh_mName_attribute);
       }
       if (EVEN(sts))
         strcpy(name, "");
@@ -5687,35 +5987,37 @@ int GeValue::scan(grow_tObject object)
     memcpy(&old_value, &aref, MIN(size, (int)sizeof(old_value)));
     break;
   }
-  case pwr_eType_DataRef: {
+  case pwr_eType_DataRef:
+  {
     int sts;
     char name[120];
     pwr_tDataRef dataref = *(pwr_tDataRef*)p;
 
-    if (!first_scan) {
+    if (!first_scan)
+    {
       if (memcmp(&old_value, &dataref, size) == 0)
         // No change since last time
         return 1;
-    } else
+    }
+    else
       first_scan = false;
 
     if (cdh_ObjidIsNull(dataref.Aref.Objid))
       strcpy(name, "");
-    else {
-      switch (format[1]) {
+    else
+    {
+      switch (format[1])
+      {
       case '1':
         // Format %1o, write path
-        sts = gdh_AttrrefToName(
-            &dataref.Aref, name, sizeof(name), cdh_mName_pathStrict);
+        sts = gdh_AttrrefToName(&dataref.Aref, name, sizeof(name), cdh_mName_pathStrict);
         break;
       case '2':
         // Format %2o, write volume and path
-        sts = gdh_AttrrefToName(
-            &dataref.Aref, name, sizeof(name), cdh_mName_volumeStrict);
+        sts = gdh_AttrrefToName(&dataref.Aref, name, sizeof(name), cdh_mName_volumeStrict);
         break;
       default:
-        sts = gdh_AttrrefToName(&dataref.Aref, name, sizeof(name),
-            cdh_mName_object | cdh_mName_attribute);
+        sts = gdh_AttrrefToName(&dataref.Aref, name, sizeof(name), cdh_mName_object | cdh_mName_attribute);
       }
       if (EVEN(sts))
         strcpy(name, "");
@@ -5724,14 +6026,17 @@ int GeValue::scan(grow_tObject object)
     memcpy(&old_value, &dataref, MIN(size, (int)sizeof(old_value)));
     break;
   }
-  case pwr_eType_VolumeId: {
+  case pwr_eType_VolumeId:
+  {
     pwr_tVolumeId vid = *(pwr_tVolumeId*)p;
 
-    if (!first_scan) {
+    if (!first_scan)
+    {
       if (memcmp(&old_value, &vid, size) == 0)
         // No change since last time
         return 1;
-    } else
+    }
+    else
       first_scan = false;
 
     *buf = 0;
@@ -5740,14 +6045,17 @@ int GeValue::scan(grow_tObject object)
     memcpy(&old_value, &vid, sizeof(vid));
     break;
   }
-  case graph_eType_NodeId: {
+  case graph_eType_NodeId:
+  {
     pwr_tNodeId nid = *(pwr_tNodeId*)p;
 
-    if (!first_scan) {
+    if (!first_scan)
+    {
       if (memcmp(&old_value, &nid, size) == 0)
         // No change since last time
         return 1;
-    } else
+    }
+    else
       first_scan = false;
 
     *buf = 0;
@@ -5759,19 +6067,23 @@ int GeValue::scan(grow_tObject object)
     memcpy(&old_value, &nid, sizeof(nid));
     break;
   }
-  case pwr_eType_Time: {
+  case pwr_eType_Time:
+  {
     int sts;
     char timstr[40];
     pwr_tTime val = *(pwr_tTime*)p;
 
-    if (!first_scan) {
+    if (!first_scan)
+    {
       if (memcmp(&old_value, &val, size) == 0)
         // No change since last time
         return 1;
-    } else
+    }
+    else
       first_scan = false;
 
-    switch (format[1]) {
+    switch (format[1])
+    {
     case '1':
       // Format %1t, only time, no hundredth
       sts = time_AtoAscii(&val, time_eFormat_Time, timstr, sizeof(timstr));
@@ -5783,55 +6095,56 @@ int GeValue::scan(grow_tObject object)
       break;
     case '3':
       // Format %3t, compressed date and time, no hundredth
-      sts = time_AtoAscii(
-          &val, time_eFormat_ComprDateAndTime, timstr, sizeof(timstr));
+      sts = time_AtoAscii(&val, time_eFormat_ComprDateAndTime, timstr, sizeof(timstr));
       timstr[17] = 0;
       break;
     case '4':
       // Format %4t, date only
-      sts = time_AtoAscii(
-          &val, time_eFormat_DateAndTime, timstr, sizeof(timstr));
+      sts = time_AtoAscii(&val, time_eFormat_DateAndTime, timstr, sizeof(timstr));
       timstr[11] = 0;
       break;
     case '5':
       // Format %5t, compressed date only
-      sts = time_AtoAscii(
-          &val, time_eFormat_ComprDateAndTime, timstr, sizeof(timstr));
+      sts = time_AtoAscii(&val, time_eFormat_ComprDateAndTime, timstr, sizeof(timstr));
       timstr[8] = 0;
       break;
     case '6':
       // Format %6t, 01:00:00 30/01/87
-      sts = time_AtoAscii(
-          &val, time_eFormat_TimeAndDate, timstr, sizeof(timstr));
+      sts = time_AtoAscii(&val, time_eFormat_TimeAndDate, timstr, sizeof(timstr));
       timstr[17] = 0;
       break;
     default:
-      sts = time_AtoAscii(
-          &val, time_eFormat_DateAndTime, timstr, sizeof(timstr));
+      sts = time_AtoAscii(&val, time_eFormat_DateAndTime, timstr, sizeof(timstr));
     }
     if (EVEN(sts))
       strcpy(timstr, "-");
-    if (zero_blank && val.tv_sec == 0 && val.tv_nsec == 0) {
+    if (zero_blank && val.tv_sec == 0 && val.tv_nsec == 0)
+    {
       buf[0] = 0;
       len = 0;
-    } else
+    }
+    else
       len = sprintf(buf, "%s", timstr);
     memcpy(&old_value, &val, MIN(size, (int)sizeof(old_value)));
     break;
   }
-  case pwr_eType_DeltaTime: {
+  case pwr_eType_DeltaTime:
+  {
     int sts;
     char timstr[40];
     pwr_tDeltaTime val = *(pwr_tDeltaTime*)p;
 
-    if (!first_scan) {
+    if (!first_scan)
+    {
       if (memcmp(&old_value, &val, size) == 0)
         // No change since last time
         return 1;
-    } else
+    }
+    else
       first_scan = false;
 
-    switch (format[1]) {
+    switch (format[1])
+    {
     case '1':
       // Format %1t, only time, no hundredth
       sts = time_DtoAscii(&val, 0, timstr, sizeof(timstr));
@@ -5841,28 +6154,35 @@ int GeValue::scan(grow_tObject object)
     }
     if (EVEN(sts))
       strcpy(timstr, "-");
-    if (zero_blank && val.tv_sec == 0 && val.tv_nsec == 0) {
+    if (zero_blank && val.tv_sec == 0 && val.tv_nsec == 0)
+    {
       buf[0] = 0;
       len = 0;
-    } else
+    }
+    else
       len = sprintf(buf, "%s", timstr);
     memcpy(&old_value, &val, MIN(size, (int)sizeof(old_value)));
     break;
   }
-  case pwr_eType_Enum: {
+  case pwr_eType_Enum:
+  {
     int sts;
     bool converted = false;
     pwr_tInt32 val = *(pwr_tInt32*)p;
 
-    if (!first_scan) {
+    if (!first_scan)
+    {
       if (memcmp(&old_value, &val, size) == 0)
         // No change since last time
         return 1;
-    } else
+    }
+    else
       first_scan = false;
 
-    switch (format[strlen(format) - 1]) {
-    case 's': {
+    switch (format[strlen(format) - 1])
+    {
+    case 's':
+    {
       // Format %s, convert enum to string
       gdh_sValueDef* valuedef;
       int rows;
@@ -5871,8 +6191,10 @@ int GeValue::scan(grow_tObject object)
       if (EVEN(sts))
         break;
 
-      for (int i = 0; i < rows; i++) {
-        if (valuedef[i].Value->Value == val) {
+      for (int i = 0; i < rows; i++)
+      {
+        if (valuedef[i].Value->Value == val)
+        {
           strcpy(buf, valuedef[i].Value->Text);
           len = strlen(buf);
           converted = true;
@@ -5884,9 +6206,9 @@ int GeValue::scan(grow_tObject object)
     }
     default:;
     }
-    if (!converted) {
-      sts = cdh_AttrValueToString(
-          (pwr_eType)annot_typeid, &val, buf, sizeof(buf));
+    if (!converted)
+    {
+      sts = cdh_AttrValueToString((pwr_eType)annot_typeid, &val, buf, sizeof(buf));
       if (EVEN(sts))
         sprintf(buf, "Invalid type");
       len = strlen(buf);
@@ -5894,17 +6216,21 @@ int GeValue::scan(grow_tObject object)
     memcpy(&old_value, &val, MIN(size, (int)sizeof(old_value)));
     break;
   }
-  case pwr_eType_Mask: {
+  case pwr_eType_Mask:
+  {
     pwr_tUInt32 val = *(pwr_tUInt32*)p;
 
-    if (!first_scan) {
+    if (!first_scan)
+    {
       if (memcmp(&old_value, &val, size) == 0)
         // No change since last time
         return 1;
-    } else
+    }
+    else
       first_scan = false;
 
-    switch (format[strlen(format) - 1]) {
+    switch (format[strlen(format) - 1])
+    {
     case 'b':
       if (str_StartsWith(&format[1], "16"))
         cdh_MaskToBinaryString(val, 16, buf);
@@ -5912,10 +6238,10 @@ int GeValue::scan(grow_tObject object)
         cdh_MaskToBinaryString(val, 32, buf);
       len = strlen(buf);
       break;
-    default: {
+    default:
+    {
       int sts;
-      sts = cdh_AttrValueToString(
-          (pwr_eType)annot_typeid, &val, buf, sizeof(buf));
+      sts = cdh_AttrValueToString((pwr_eType)annot_typeid, &val, buf, sizeof(buf));
       if (EVEN(sts))
         sprintf(buf, "Invalid type");
       len = strlen(buf);
@@ -5924,14 +6250,17 @@ int GeValue::scan(grow_tObject object)
     memcpy(&old_value, &val, MIN(size, (int)sizeof(old_value)));
     break;
   }
-  default: {
+  default:
+  {
     int sts;
 
-    if (!first_scan) {
+    if (!first_scan)
+    {
       if (memcmp(&old_value, p, size) == 0)
         // No change since last time
         return 1;
-    } else
+    }
+    else
       first_scan = false;
 
     memcpy(&old_value, p, MIN(size, (int)sizeof(old_value)));
@@ -5960,47 +6289,52 @@ void GeValue::reset(grow_tObject object)
   memset(&old_value, 0, sizeof(old_value));
 }
 
-int GeValue::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GeValue::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
   char name[80];
 
   sprintf(name, "%sValue", prefix);
 
   // Find first instance and print instance mask
-  for (GeDynElem *elem = dyn->elements; elem; elem = elem->next) {
-    if (elem->dyn_type1 == ge_mDynType1_Value && elem->instance == ge_mInstance_1) {
-      if (instance ==  instance_highest(elem->instance_mask)) {
-	if (elem->instance_mask != 1)
-	  fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Value.Instances\"," << elem->instance_mask << ");" << '\n';
-	break;
+  for (GeDynElem* elem = dyn->elements; elem; elem = elem->next)
+  {
+    if (elem->dyn_type1 == ge_mDynType1_Value && elem->instance == ge_mInstance_1)
+    {
+      if (instance == instance_highest(elem->instance_mask))
+      {
+        if (elem->instance_mask != 1)
+          fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Value.Instances\","
+             << elem->instance_mask << ");" << '\n';
+        break;
       }
     }
   }
   if (instance != ge_mInstance_1)
     sprintf(&name[strlen(name)], "%d", instance_number(instance));
   if (!streq(attribute, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << name << ".Attribute\",\"" << attribute << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".Attribute\",\"" << attribute << "\");"
+       << '\n';
   if (!streq(format, ""))
     fp << indentation << "SetObjectAttribute(id,\"" << name << ".Format\",\"" << format << "\");" << '\n';
   if (zero_blank != 0)
     fp << indentation << "SetObjectAttribute(id,\"" << name << ".ZeroBlank\"," << zero_blank << ");" << '\n';
   if (!streq(decimals_attr, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << name << ".DecimalsAttr\",\"" << decimals_attr << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".DecimalsAttr\",\"" << decimals_attr << "\");"
+       << '\n';
   if (decimals_decr != 0)
-    fp << indentation << "SetObjectAttribute(id,\"" << name << ".DecimalsDecrease\"," << decimals_decr << ");" << '\n';
-  
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".DecimalsDecrease\"," << decimals_decr << ");"
+       << '\n';
+
   return 1;
 }
 
-int GeValue::export_java(
-    grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeValue::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
   if (first)
     fp << "      ";
   else
     fp << "      ,";
-  fp << "new GeDynValue(" << var_name << ".dd, \"" << attribute << "\",\""
-     << format << "\")\n";
+  fp << "new GeDynValue(" << var_name << ".dd, \"" << attribute << "\",\"" << format << "\")\n";
   return 1;
 }
 
@@ -6021,7 +6355,8 @@ int GeValue::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
     sprintf(name, "Value[%d]", annot_num);
 
   sts = grow_CheckObjectAnnotation(object, annot_num);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     char msg[200];
 
     sprintf(msg, "%s, no annotation number %d", name, annot_num);
@@ -6029,30 +6364,37 @@ int GeValue::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
     (*error_cnt)++;
   }
 
-  int types[] = { pwr_eType_Boolean, pwr_eType_Int32, pwr_eType_UInt32,
-    pwr_eType_Int64, pwr_eType_UInt64, graph_eType_Bit, pwr_eType_Float32,
-    pwr_eType_Float64, pwr_eType_String, pwr_eType_NetStatus, pwr_eType_Status,
-    pwr_eType_Text, pwr_eType_Objid, pwr_eType_AttrRef, pwr_eType_DataRef,
-    pwr_eType_Time, pwr_eType_DeltaTime, pwr_eType_Enum, pwr_eType_Mask,
-    pwr_eType_Char, pwr_eType_Int8, pwr_eType_Int16, pwr_eType_UInt8,
-    pwr_eType_UInt16, pwr_eType_ProString, 0 };
-  graph_eDatabase databases[] = { graph_eDatabase_Local, graph_eDatabase_Gdh,
-    graph_eDatabase_User, graph_eDatabase_Ccm, graph_eDatabase__ };
+  int types[] = {pwr_eType_Boolean,   pwr_eType_Int32,
+                 pwr_eType_UInt32,    pwr_eType_Int64,
+                 pwr_eType_UInt64,    graph_eType_Bit,
+                 pwr_eType_Float32,   pwr_eType_Float64,
+                 pwr_eType_String,    pwr_eType_NetStatus,
+                 pwr_eType_Status,    pwr_eType_Text,
+                 pwr_eType_Objid,     pwr_eType_AttrRef,
+                 pwr_eType_DataRef,   pwr_eType_Time,
+                 pwr_eType_DeltaTime, pwr_eType_Enum,
+                 pwr_eType_Mask,      pwr_eType_Char,
+                 pwr_eType_Int8,      pwr_eType_Int16,
+                 pwr_eType_UInt8,     pwr_eType_UInt16,
+                 pwr_eType_ProString, 0};
+  graph_eDatabase databases[] = {graph_eDatabase_Local, graph_eDatabase_Gdh, graph_eDatabase_User,
+                                 graph_eDatabase_Ccm, graph_eDatabase__};
 
   sprintf(atext, "%s.Attribute", name);
-  dyn->syntax_check_attribute(
-      object, atext, attribute, 0, types, databases, error_cnt, warning_cnt);
+  dyn->syntax_check_attribute(object, atext, attribute, 0, types, databases, error_cnt, warning_cnt);
 
-  dyn->parse_attr_name(
-      attribute, parsed_name, &inverted, &attr_type, &attr_size);
+  dyn->parse_attr_name(attribute, parsed_name, &inverted, &attr_type, &attr_size);
 
-  if (streq(format, "")) {
+  if (streq(format, ""))
+  {
     char msg[200];
 
     sprintf(msg, "%s.Format, format is missing", name);
     dyn->graph->syntax_msg('E', object, msg);
     (*error_cnt)++;
-  } else if (!check_format(format, attr_type)) {
+  }
+  else if (!check_format(format, attr_type))
+  {
     char msg[200];
 
     sprintf(msg, "%s.Format, erroneous format \"%s\"", name, format);
@@ -6064,23 +6406,19 @@ int GeValue::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 }
 
 GeValueInput::GeValueInput(GeDyn* e_dyn)
-    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_No,
-          ge_mActionType1_ValueInput, ge_mActionType2_No,
-          ge_eDynPrio_ValueInput),
-      min_value(0), max_value(0), clear(0), popup(0), unselect(0),
-      escape_store(0), keyboard_type(graph_eKeyboard_Standard), update_open(0),
-      value_element(0)
+    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_No, ge_mActionType1_ValueInput, ge_mActionType2_No,
+                ge_eDynPrio_ValueInput),
+      min_value(0), max_value(0), clear(0), popup(0), unselect(0), escape_store(0),
+      keyboard_type(graph_eKeyboard_Standard), update_open(0), value_element(0)
 {
   strcpy(minvalue_attr, "");
   strcpy(maxvalue_attr, "");
 }
 
 GeValueInput::GeValueInput(const GeValueInput& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-          x.prio),
-      min_value(x.min_value), max_value(x.max_value), clear(x.clear),
-      popup(x.popup), unselect(x.unselect), escape_store(x.escape_store),
-      keyboard_type(x.keyboard_type), update_open(x.update_open)
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio),
+      min_value(x.min_value), max_value(x.max_value), clear(x.clear), popup(x.popup), unselect(x.unselect),
+      escape_store(x.escape_store), keyboard_type(x.keyboard_type), update_open(x.update_open)
 {
   strcpy(minvalue_attr, x.minvalue_attr);
   strcpy(maxvalue_attr, x.maxvalue_attr);
@@ -6146,10 +6484,8 @@ void GeValueInput::get_attributes(attr_sItem* attrinfo, int* item_count)
 
 void GeValueInput::replace_attribute(char* from, char* to, int* cnt, int strict)
 {
-  GeDyn::replace_attribute(
-      minvalue_attr, sizeof(minvalue_attr), from, to, cnt, strict);
-  GeDyn::replace_attribute(
-      maxvalue_attr, sizeof(maxvalue_attr), from, to, cnt, strict);
+  GeDyn::replace_attribute(minvalue_attr, sizeof(minvalue_attr), from, to, cnt, strict);
+  GeDyn::replace_attribute(maxvalue_attr, sizeof(maxvalue_attr), from, to, cnt, strict);
 }
 
 void GeValueInput::save(std::ofstream& fp)
@@ -6160,13 +6496,10 @@ void GeValueInput::save(std::ofstream& fp)
   fp << int(ge_eSave_ValueInput_clear) << FSPACE << clear << '\n';
   fp << int(ge_eSave_ValueInput_popup) << FSPACE << popup << '\n';
   fp << int(ge_eSave_ValueInput_unselect) << FSPACE << unselect << '\n';
-  fp << int(ge_eSave_ValueInput_minvalue_attr) << FSPACE << minvalue_attr
-     << '\n';
-  fp << int(ge_eSave_ValueInput_maxvalue_attr) << FSPACE << maxvalue_attr
-     << '\n';
+  fp << int(ge_eSave_ValueInput_minvalue_attr) << FSPACE << minvalue_attr << '\n';
+  fp << int(ge_eSave_ValueInput_maxvalue_attr) << FSPACE << maxvalue_attr << '\n';
   fp << int(ge_eSave_ValueInput_escape_store) << FSPACE << escape_store << '\n';
-  fp << int(ge_eSave_ValueInput_keyboard_type) << FSPACE << (int)keyboard_type
-     << '\n';
+  fp << int(ge_eSave_ValueInput_keyboard_type) << FSPACE << (int)keyboard_type << '\n';
   fp << int(ge_eSave_ValueInput_update_open) << FSPACE << update_open << '\n';
   fp << int(ge_eSave_End) << '\n';
 }
@@ -6178,8 +6511,10 @@ void GeValueInput::open(std::ifstream& fp)
   char dummy[40];
   int tmp;
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeValueInput: \"%d %s\"\n", type, dummy);
@@ -6187,7 +6522,8 @@ void GeValueInput::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_ValueInput:
       break;
     case ge_eSave_ValueInput_min_value:
@@ -6235,14 +6571,15 @@ void GeValueInput::open(std::ifstream& fp)
   }
 }
 
-int GeValueInput::connect(
-    grow_tObject object, glow_sTraceData* trace_data, bool now)
+int GeValueInput::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
 {
   // Get the Value element
   annot_typeid = annot_size = 0;
   value_element = 0;
-  for (GeDynElem* elem = dyn->elements; elem; elem = elem->next) {
-    if (elem->dyn_type1 == ge_mDynType1_Value) {
+  for (GeDynElem* elem = dyn->elements; elem; elem = elem->next)
+  {
+    if (elem->dyn_type1 == ge_mDynType1_Value)
+    {
       value_element = (GeValue*)elem;
       annot_typeid = value_element->annot_typeid;
       annot_size = value_element->annot_size;
@@ -6254,10 +6591,7 @@ int GeValueInput::connect(
   return 1;
 }
 
-int GeValueInput::disconnect(grow_tObject object)
-{
-  return 1;
-}
+int GeValueInput::disconnect(grow_tObject object) { return 1; }
 
 int GeValueInput::action(grow_tObject object, glow_tEvent event)
 {
@@ -6266,21 +6600,25 @@ int GeValueInput::action(grow_tObject object, glow_tEvent event)
   if (!value_element)
     return 1;
 
-  switch (event->event) {
+  switch (event->event)
+  {
   case glow_eEvent_MB1Down:
     grow_SetClickSensitivity(dyn->graph->grow->ctx, glow_mSensitivity_MB1Click);
     break;
   case glow_eEvent_MB1Click:
-    if (!(dyn->total_action_type1 & ge_mActionType1_InputFocus)) {
+    if (!(dyn->total_action_type1 & ge_mActionType1_InputFocus))
+    {
       grow_SetObjectInputFocus(object, 1, event->event);
       dyn->graph->set_inputfocus(1);
     }
     break;
-  case glow_eEvent_AnnotationInput: {
+  case glow_eEvent_AnnotationInput:
+  {
     int sts;
 
     sts = change_value(object, event->annot_input.text);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       grow_CloseAnnotationInput(object, 1);
       grow_SetObjectInputFocus(object, 0, event->event);
       if (dyn->total_action_type1 & ge_mActionType1_InputFocus)
@@ -6289,9 +6627,12 @@ int GeValueInput::action(grow_tObject object, glow_tEvent event)
     }
     break;
   }
-  case glow_eEvent_InputFocusGained: {
-    if (!popup) {
-      if (!grow_AnnotationInputIsOpen(object, 1)) {
+  case glow_eEvent_InputFocusGained:
+  {
+    if (!popup)
+    {
+      if (!grow_AnnotationInputIsOpen(object, 1))
+      {
         // grow_CloseAnnotationInputAll( dyn->graph->grow->ctx);
 
         if (clear)
@@ -6301,10 +6642,12 @@ int GeValueInput::action(grow_tObject object, glow_tEvent event)
           grow_SetAnnotationSelection(object, 0);
       }
       if (dyn->graph->keyboard_cb)
-        (dyn->graph->keyboard_cb)(
-            dyn->graph->parent_ctx, keyboard_mAction_Open, keyboard_type);
-    } else {
-      if (dyn->graph->change_value_cb) {
+        (dyn->graph->keyboard_cb)(dyn->graph->parent_ctx, keyboard_mAction_Open, keyboard_type);
+    }
+    else
+    {
+      if (dyn->graph->change_value_cb)
+      {
         char str[80] = "";
 
         if (!clear)
@@ -6314,8 +6657,10 @@ int GeValueInput::action(grow_tObject object, glow_tEvent event)
     }
     break;
   }
-  case glow_eEvent_InputFocusLost: {
-    if (escape_store) {
+  case glow_eEvent_InputFocusLost:
+  {
+    if (escape_store)
+    {
       pwr_tStatus sts;
       char str[200];
 
@@ -6326,19 +6671,19 @@ int GeValueInput::action(grow_tObject object, glow_tEvent event)
     value_element->first_scan = 1;
 
     if (dyn->graph->keyboard_cb)
-      (dyn->graph->keyboard_cb)(
-          dyn->graph->parent_ctx, keyboard_mAction_Close, 0);
+      (dyn->graph->keyboard_cb)(dyn->graph->parent_ctx, keyboard_mAction_Close, 0);
 
     break;
   }
   case glow_eEvent_Key_Escape:
-    if (grow_AnnotationInputIsOpen(object, 1)) {
+    if (grow_AnnotationInputIsOpen(object, 1))
+    {
       grow_CloseAnnotationInputAll(dyn->graph->grow->ctx);
       grow_SetObjectInputFocus(object, 0, event->event);
 
       if (dyn->graph->keyboard_cb)
         (dyn->graph->keyboard_cb)(dyn->graph->parent_ctx,
-            keyboard_mAction_Close | keyboard_mAction_ResetInput, 0);
+                                  keyboard_mAction_Close | keyboard_mAction_ResetInput, 0);
     }
     break;
   default:;
@@ -6355,12 +6700,12 @@ int GeValueInput::change_value(grow_tObject object, char* text)
   int attr_type, attr_size;
   graph_eDatabase db;
 
-  db = dyn->parse_attr_name(
-      value_element->attribute, parsed_name, &inverted, &attr_type, &attr_size);
+  db = dyn->parse_attr_name(value_element->attribute, parsed_name, &inverted, &attr_type, &attr_size);
   if (parsed_name[0] == '&')
     dyn->graph->get_reference_name(parsed_name, parsed_name);
 
-  if (!annot_size) {
+  if (!annot_size)
+  {
     pwr_sAttrRef ar;
     pwr_tTypeId a_type_id;
     unsigned int a_size;
@@ -6370,26 +6715,25 @@ int GeValueInput::change_value(grow_tObject object, char* text)
     sts = gdh_NameToAttrref(pwr_cNObjid, parsed_name, &ar);
     if (EVEN(sts))
       return sts;
-    sts = gdh_GetAttributeCharAttrref(
-        &ar, &a_type_id, &a_size, &a_offset, &a_dim);
+    sts = gdh_GetAttributeCharAttrref(&ar, &a_type_id, &a_size, &a_offset, &a_dim);
     if (EVEN(sts))
       return sts;
     annot_typeid = a_type_id;
     annot_size = a_size;
   }
   if (value_element->zero_blank && streq(text, ""))
-    sts = graph_attr_string_to_value(
-        annot_typeid, "0", (void*)&buf, sizeof(buf), sizeof(buf));
-  else {
+    sts = graph_attr_string_to_value(annot_typeid, "0", (void*)&buf, sizeof(buf), sizeof(buf));
+  else
+  {
     if (annot_typeid == pwr_eType_String)
-      sts = graph_attr_string_to_value(
-          annot_typeid, text, (void*)&buf, sizeof(buf), annot_size);
+      sts = graph_attr_string_to_value(annot_typeid, text, (void*)&buf, sizeof(buf), annot_size);
     else
-      sts = graph_attr_string_to_value(
-          annot_typeid, text, (void*)&buf, sizeof(buf), sizeof(buf));
+      sts = graph_attr_string_to_value(annot_typeid, text, (void*)&buf, sizeof(buf), sizeof(buf));
   }
-  if (EVEN(sts)) {
-    if (dyn->graph->message_dialog_cb) {
+  if (EVEN(sts))
+  {
+    if (dyn->graph->message_dialog_cb)
+    {
       char msg[80];
       if (sts == GE__STRINGTOLONG)
         strcpy(msg, "Input string too long");
@@ -6402,12 +6746,13 @@ int GeValueInput::change_value(grow_tObject object, char* text)
     return sts;
   }
 
-  if (!streq(minvalue_attr, "")) {
+  if (!streq(minvalue_attr, ""))
+  {
     pwr_tAName pname;
 
-    dyn->parse_attr_name(
-        minvalue_attr, pname, &inverted, &attr_type, &attr_size);
-    if (attr_type == pwr_eType_Float32) {
+    dyn->parse_attr_name(minvalue_attr, pname, &inverted, &attr_type, &attr_size);
+    if (attr_type == pwr_eType_Float32)
+    {
       pwr_tFloat32 minval;
 
       sts = gdh_GetObjectInfo(pname, &minval, sizeof(minval));
@@ -6416,12 +6761,13 @@ int GeValueInput::change_value(grow_tObject object, char* text)
       min_value = minval;
     }
   }
-  if (!streq(maxvalue_attr, "")) {
+  if (!streq(maxvalue_attr, ""))
+  {
     pwr_tAName pname;
 
-    dyn->parse_attr_name(
-        maxvalue_attr, pname, &inverted, &attr_type, &attr_size);
-    if (attr_type == pwr_eType_Float32) {
+    dyn->parse_attr_name(maxvalue_attr, pname, &inverted, &attr_type, &attr_size);
+    if (attr_type == pwr_eType_Float32)
+    {
       pwr_tFloat32 maxval;
 
       sts = gdh_GetObjectInfo(pname, &maxval, sizeof(maxval));
@@ -6431,11 +6777,13 @@ int GeValueInput::change_value(grow_tObject object, char* text)
     }
   }
 
-  if (!(feq(max_value, 0.0) && feq(min_value, 0.0))) {
+  if (!(feq(max_value, 0.0) && feq(min_value, 0.0)))
+  {
     // Max value is supplied
     int max_exceeded = 0;
 
-    switch (annot_typeid) {
+    switch (annot_typeid)
+    {
     case pwr_eType_Float32:
       if (double(*(pwr_tFloat32*)buf) > max_value)
         max_exceeded = 1;
@@ -6477,22 +6825,22 @@ int GeValueInput::change_value(grow_tObject object, char* text)
         max_exceeded = 1;
       break;
     case pwr_eType_DeltaTime:
-      if (feq(double(((pwr_tDeltaTime*)buf)->tv_sec), max_value)
-          && ((pwr_tDeltaTime*)buf)->tv_nsec > 0)
+      if (feq(double(((pwr_tDeltaTime*)buf)->tv_sec), max_value) && ((pwr_tDeltaTime*)buf)->tv_nsec > 0)
         max_exceeded = 1;
       else if (double(((pwr_tDeltaTime*)buf)->tv_sec) > max_value)
         max_exceeded = 1;
       break;
     }
-    if (max_exceeded) {
+    if (max_exceeded)
+    {
       if (dyn->graph->message_dialog_cb)
-        (dyn->graph->message_dialog_cb)(
-            dyn->graph->parent_ctx, "Maxvalue exceeded");
+        (dyn->graph->message_dialog_cb)(dyn->graph->parent_ctx, "Maxvalue exceeded");
       return 0;
     }
 
     int min_exceeded = 0;
-    switch (annot_typeid) {
+    switch (annot_typeid)
+    {
     case pwr_eType_Float32:
       if (double(*(pwr_tFloat32*)buf) < min_value)
         min_exceeded = 1;
@@ -6538,20 +6886,21 @@ int GeValueInput::change_value(grow_tObject object, char* text)
         min_exceeded = 1;
       break;
     }
-    if (min_exceeded) {
+    if (min_exceeded)
+    {
       if (dyn->graph->message_dialog_cb)
-        (dyn->graph->message_dialog_cb)(
-            dyn->graph->parent_ctx, "Value below minvalue");
+        (dyn->graph->message_dialog_cb)(dyn->graph->parent_ctx, "Value below minvalue");
       return 0;
     }
   }
 
-  if (annot_typeid == pwr_eType_Float32 && value_element->convert_element) {
-    pwr_tFloat32 val = *(pwr_tFloat32 *)buf;
-    val = uc_convert((graph_eUcEntity)value_element->convert_element->entity, 
-		     value_element->convert_element->display_unit, 
-		     value_element->convert_element->db_unit, val);
-    *(pwr_tFloat32 *)buf = val;
+  if (annot_typeid == pwr_eType_Float32 && value_element->convert_element)
+  {
+    pwr_tFloat32 val = *(pwr_tFloat32*)buf;
+    val = uc_convert((graph_eUcEntity)value_element->convert_element->entity,
+                     value_element->convert_element->display_unit, value_element->convert_element->db_unit,
+                     val);
+    *(pwr_tFloat32*)buf = val;
   }
   if (db == graph_eDatabase_Local)
     sts = dyn->graph->localdb_set_value(parsed_name, &buf, annot_size);
@@ -6564,41 +6913,50 @@ int GeValueInput::change_value(grow_tObject object, char* text)
   return 1;
 }
 
-int GeValueInput::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GeValueInput::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
   if (min_value != 0)
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "ValueInput.MinValue\"," << dtostr(min_value) << ");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "ValueInput.MinValue\"," << dtostr(min_value)
+       << ");" << '\n';
   if (max_value != 0)
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "ValueInput.MaxValue\"," << dtostr(max_value) << ");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "ValueInput.MaxValue\"," << dtostr(max_value)
+       << ");" << '\n';
   if (clear != 0)
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "ValueInput.Clear\"," << clear << ");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "ValueInput.Clear\"," << clear << ");"
+       << '\n';
   if (popup != 0)
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "ValueInput.Popup\"," << popup << ");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "ValueInput.Popup\"," << popup << ");"
+       << '\n';
   if (unselect != 0)
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "ValueInput.Unselect\"," << unselect << ");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "ValueInput.Unselect\"," << unselect << ");"
+       << '\n';
   if (escape_store != 0)
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "ValueInput.EscapeStore\"," << escape_store << ");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "ValueInput.EscapeStore\"," << escape_store
+       << ");" << '\n';
   if (!streq(minvalue_attr, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "ValueInput.MinValueAttr\",\"" << minvalue_attr << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "ValueInput.MinValueAttr\",\""
+       << minvalue_attr << "\");" << '\n';
   if (!streq(maxvalue_attr, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "ValueInput.MaxValueAttr\",\"" << maxvalue_attr << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "ValueInput.MaxValueAttr\",\""
+       << maxvalue_attr << "\");" << '\n';
   if (keyboard_type != graph_eKeyboard_Standard)
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "ValueInput.KeyboardType\"," << keyboard_type << ");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "ValueInput.KeyboardType\"," << keyboard_type
+       << ");" << '\n';
   if (update_open != 0)
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "ValueInput.UpdateOpen\"," << update_open << ");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "ValueInput.UpdateOpen\"," << update_open
+       << ");" << '\n';
   return 1;
 }
 
-int GeValueInput::export_java(
-    grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeValueInput::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
   int class_dyn_type1, class_action_type1;
   int class_dyn_type2, class_action_type2;
 
   // Check that nodeclass is a valueinput, otherwise this will not be a
   // GeTextField
-  grow_GetObjectClassDynType(object, &class_dyn_type1, &class_dyn_type2,
-      &class_action_type1, &class_action_type2);
+  grow_GetObjectClassDynType(object, &class_dyn_type1, &class_dyn_type2, &class_action_type1,
+                             &class_action_type2);
   if (!(class_action_type1 & ge_mActionType1_ValueInput))
     return 1;
 
@@ -6606,8 +6964,7 @@ int GeValueInput::export_java(
     fp << "      ";
   else
     fp << "      ,";
-  fp << "new GeDynValueInput(" << var_name << ".dd, " << min_value << ","
-     << max_value << ",";
+  fp << "new GeDynValueInput(" << var_name << ".dd, " << min_value << "," << max_value << ",";
   if (streq(minvalue_attr, ""))
     fp << "null,";
   else
@@ -6619,39 +6976,34 @@ int GeValueInput::export_java(
   return 1;
 }
 
-int GeValueInput::syntax_check(
-    grow_tObject object, int* error_cnt, int* warning_cnt)
+int GeValueInput::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
-  int types[]
-      = { pwr_eType_Int8, pwr_eType_Int16, pwr_eType_Int32, pwr_eType_Int64,
-          pwr_eType_UInt8, pwr_eType_UInt16, pwr_eType_UInt32, pwr_eType_UInt64,
-          pwr_eType_Float32, pwr_eType_Float64, pwr_eType_DeltaTime, 0 };
-  graph_eDatabase databases[] = { graph_eDatabase_Gdh, graph_eDatabase__ };
+  int types[] = {pwr_eType_Int8,    pwr_eType_Int16,   pwr_eType_Int32,     pwr_eType_Int64,
+                 pwr_eType_UInt8,   pwr_eType_UInt16,  pwr_eType_UInt32,    pwr_eType_UInt64,
+                 pwr_eType_Float32, pwr_eType_Float64, pwr_eType_DeltaTime, 0};
+  graph_eDatabase databases[] = {graph_eDatabase_Gdh, graph_eDatabase__};
 
-  dyn->syntax_check_attribute(object, "ValueInput.MinValueAttr", minvalue_attr,
-      1, types, databases, error_cnt, warning_cnt);
-  dyn->syntax_check_attribute(object, "ValueInput.MaxValueAttr", maxvalue_attr,
-      1, types, databases, error_cnt, warning_cnt);
+  dyn->syntax_check_attribute(object, "ValueInput.MinValueAttr", minvalue_attr, 1, types, databases,
+                              error_cnt, warning_cnt);
+  dyn->syntax_check_attribute(object, "ValueInput.MaxValueAttr", maxvalue_attr, 1, types, databases,
+                              error_cnt, warning_cnt);
   return 1;
 }
 
 GeAnalogColor::GeAnalogColor(GeDyn* e_dyn, ge_mInstance e_instance)
-    : GeDynElem(e_dyn, ge_mDynType1_AnalogColor, ge_mDynType2_No,
-          ge_mActionType1_No, ge_mActionType2_No, ge_eDynPrio_AnalogColor),
-      limit(0), limit_type(ge_eLimitType_Gt), color(glow_eDrawType_Inherit),
-      border(0), common_attr(1), old_state(false), p(0), old_value(FLT_INI),
-      e(0)
+    : GeDynElem(e_dyn, ge_mDynType1_AnalogColor, ge_mDynType2_No, ge_mActionType1_No, ge_mActionType2_No,
+                ge_eDynPrio_AnalogColor),
+      limit(0), limit_type(ge_eLimitType_Gt), color(glow_eDrawType_Inherit), border(0), common_attr(1),
+      old_state(false), p(0), old_value(FLT_INI), e(0)
 {
   strcpy(attribute, "");
   instance = e_instance;
 }
 
 GeAnalogColor::GeAnalogColor(const GeAnalogColor& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-          x.prio),
-      limit(x.limit), limit_type(x.limit_type), color(x.color),
-      border(x.border), common_attr(x.common_attr), old_state(false), p(0),
-      old_value(FLT_INI), e(0)
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio), limit(x.limit),
+      limit_type(x.limit_type), color(x.color), border(x.border), common_attr(x.common_attr),
+      old_state(false), p(0), old_value(FLT_INI), e(0)
 {
   strcpy(attribute, x.attribute);
   instance = x.instance;
@@ -6668,10 +7020,12 @@ void GeAnalogColor::get_attributes(attr_sItem* attrinfo, int* item_count)
   // Get attribute for instance 1
   if (instance == ge_mInstance_1)
     e = this;
-  else {
-    for (elem = dyn->elements; elem; elem = elem->next) {
-      if (elem->dyn_type1 == ge_mDynType1_AnalogColor
-          && elem->instance == ge_mInstance_1) {
+  else
+  {
+    for (elem = dyn->elements; elem; elem = elem->next)
+    {
+      if (elem->dyn_type1 == ge_mDynType1_AnalogColor && elem->instance == ge_mInstance_1)
+      {
         found = true;
         break;
       }
@@ -6682,8 +7036,10 @@ void GeAnalogColor::get_attributes(attr_sItem* attrinfo, int* item_count)
     e = (GeAnalogColor*)elem;
   }
 
-  if (dyn->total_dyn_type1 & ge_mDynType1_Tone) {
-    if (instance == ge_mInstance_1) {
+  if (dyn->total_dyn_type1 & ge_mDynType1_Tone)
+  {
+    if (instance == ge_mInstance_1)
+    {
       strcpy(attrinfo[i].name, "AnalogTone.Limit");
       attrinfo[i].value = &limit;
       attrinfo[i].type = glow_eType_Double;
@@ -6718,16 +7074,20 @@ void GeAnalogColor::get_attributes(attr_sItem* attrinfo, int* item_count)
       attrinfo[i].value = &instance_mask;
       attrinfo[i].type = ge_eAttrType_InstanceMask;
       attrinfo[i++].size = sizeof(instance_mask);
-    } else {
+    }
+    else
+    {
       // Get instance number
       int inst = 1;
       unsigned int m = instance;
-      while (m > 1) {
+      while (m > 1)
+      {
         m = m >> 1;
         inst++;
       }
 
-      if (!e->common_attr) {
+      if (!e->common_attr)
+      {
         strcpy(attrinfo[i].name, "AnalogTone.Attribute");
         attrinfo[i].value = attribute;
         attrinfo[i].type = glow_eType_String;
@@ -6749,8 +7109,11 @@ void GeAnalogColor::get_attributes(attr_sItem* attrinfo, int* item_count)
       attrinfo[i].type = ge_eAttrType_LimitType;
       attrinfo[i++].size = sizeof(limit_type);
     }
-  } else {
-    if (instance == ge_mInstance_1) {
+  }
+  else
+  {
+    if (instance == ge_mInstance_1)
+    {
       strcpy(attrinfo[i].name, "AnalogColor.Limit");
       attrinfo[i].value = &limit;
       attrinfo[i].type = glow_eType_Double;
@@ -6785,17 +7148,21 @@ void GeAnalogColor::get_attributes(attr_sItem* attrinfo, int* item_count)
       attrinfo[i].value = &instance_mask;
       attrinfo[i].type = ge_eAttrType_InstanceMask;
       attrinfo[i++].size = sizeof(instance_mask);
-    } else {
+    }
+    else
+    {
       // Get instance number
       int inst = 1;
       unsigned int m = instance;
-      while (m > 1) {
+      while (m > 1)
+      {
         m = m >> 1;
         inst++;
       }
 
-      if (!e->common_attr) {
-	sprintf(attrinfo[i].name, "AnalogColor%d.Attribute", inst);
+      if (!e->common_attr)
+      {
+        sprintf(attrinfo[i].name, "AnalogColor%d.Attribute", inst);
         attrinfo[i].value = attribute;
         attrinfo[i].type = glow_eType_String;
         attrinfo[i++].size = sizeof(attribute);
@@ -6824,11 +7191,11 @@ void GeAnalogColor::get_attributes(attr_sItem* attrinfo, int* item_count)
   *item_count = i;
 }
 
-void GeAnalogColor::set_attribute(
-    grow_tObject object, const char* attr_name, int* cnt)
+void GeAnalogColor::set_attribute(grow_tObject object, const char* attr_name, int* cnt)
 {
   (*cnt)--;
-  if (*cnt == 0) {
+  if (*cnt == 0)
+  {
     GeDynElem* elem;
     GeAnalogColor* e;
     bool found = false;
@@ -6836,10 +7203,12 @@ void GeAnalogColor::set_attribute(
     // Set attribute for instance 1
     if (instance == ge_mInstance_1)
       e = this;
-    else {
-      for (elem = dyn->elements; elem; elem = elem->next) {
-        if (elem->dyn_type1 == ge_mDynType1_AnalogColor
-            && elem->instance == ge_mInstance_1) {
+    else
+    {
+      for (elem = dyn->elements; elem; elem = elem->next)
+      {
+        if (elem->dyn_type1 == ge_mDynType1_AnalogColor && elem->instance == ge_mInstance_1)
+        {
           found = true;
           break;
         }
@@ -6861,8 +7230,7 @@ void GeAnalogColor::set_attribute(
   }
 }
 
-void GeAnalogColor::replace_attribute(
-    char* from, char* to, int* cnt, int strict)
+void GeAnalogColor::replace_attribute(char* from, char* to, int* cnt, int strict)
 {
   GeDynElem* elem;
   GeAnalogColor* e;
@@ -6871,10 +7239,12 @@ void GeAnalogColor::replace_attribute(
   // Get instance 1
   if (instance == ge_mInstance_1)
     e = this;
-  else {
-    for (elem = dyn->elements; elem; elem = elem->next) {
-      if (elem->dyn_type1 == ge_mDynType1_AnalogColor
-          && elem->instance == ge_mInstance_1) {
+  else
+  {
+    for (elem = dyn->elements; elem; elem = elem->next)
+    {
+      if (elem->dyn_type1 == ge_mDynType1_AnalogColor && elem->instance == ge_mInstance_1)
+      {
         found = true;
         break;
       }
@@ -6884,36 +7254,36 @@ void GeAnalogColor::replace_attribute(
     e = (GeAnalogColor*)elem;
   }
 
-  if (e->common_attr) {
+  if (e->common_attr)
+  {
     if (instance == ge_mInstance_1)
-      GeDyn::replace_attribute(
-          attribute, sizeof(attribute), from, to, cnt, strict);
-  } else
-    GeDyn::replace_attribute(
-        attribute, sizeof(attribute), from, to, cnt, strict);
+      GeDyn::replace_attribute(attribute, sizeof(attribute), from, to, cnt, strict);
+  }
+  else
+    GeDyn::replace_attribute(attribute, sizeof(attribute), from, to, cnt, strict);
 }
 
 int GeAnalogColor::set_color(grow_tObject object, glow_eDrawType color)
 {
   char msg[200];
 
-  if (dyn->total_dyn_type1 & ge_mDynType1_Tone) {
+  if (dyn->total_dyn_type1 & ge_mDynType1_Tone)
+  {
     this->color = glow_eDrawType(color / 30);
     if (instance == ge_mInstance_1)
-      snprintf(msg, sizeof(msg), "AnalogTone.Tone = %s",
-          grow_ColorToneToName(this->color));
+      snprintf(msg, sizeof(msg), "AnalogTone.Tone = %s", grow_ColorToneToName(this->color));
     else
-      snprintf(msg, sizeof(msg), "AnalogTone%d.Tone = %s",
-          GeDyn::instance_to_number(instance),
-          grow_ColorToneToName(this->color));
-  } else {
+      snprintf(msg, sizeof(msg), "AnalogTone%d.Tone = %s", GeDyn::instance_to_number(instance),
+               grow_ColorToneToName(this->color));
+  }
+  else
+  {
     this->color = color;
     if (instance == ge_mInstance_1)
-      snprintf(msg, sizeof(msg), "AnalogColor.Color = %s",
-          grow_ColorToName(this->color));
+      snprintf(msg, sizeof(msg), "AnalogColor.Color = %s", grow_ColorToName(this->color));
     else
-      snprintf(msg, sizeof(msg), "AnalogColor%d.Color = %s",
-          GeDyn::instance_to_number(instance), grow_ColorToName(this->color));
+      snprintf(msg, sizeof(msg), "AnalogColor%d.Color = %s", GeDyn::instance_to_number(instance),
+               grow_ColorToName(this->color));
   }
   msg[sizeof(msg) - 1] = 0;
   dyn->graph->message('I', msg);
@@ -6927,12 +7297,10 @@ void GeAnalogColor::save(std::ofstream& fp)
   fp.precision(9);
   fp << int(ge_eSave_AnalogColor_limit) << FSPACE << limit << '\n';
   fp.precision(6);
-  fp << int(ge_eSave_AnalogColor_limit_type) << FSPACE << (int)limit_type
-     << '\n';
+  fp << int(ge_eSave_AnalogColor_limit_type) << FSPACE << (int)limit_type << '\n';
   fp << int(ge_eSave_AnalogColor_color) << FSPACE << (int)color << '\n';
   fp << int(ge_eSave_AnalogColor_instance) << FSPACE << int(instance) << '\n';
-  fp << int(ge_eSave_AnalogColor_instance_mask) << FSPACE << int(instance_mask)
-     << '\n';
+  fp << int(ge_eSave_AnalogColor_instance_mask) << FSPACE << int(instance_mask) << '\n';
   fp << int(ge_eSave_AnalogColor_border) << FSPACE << border << '\n';
   fp << int(ge_eSave_AnalogColor_common_attr) << FSPACE << common_attr << '\n';
   fp << int(ge_eSave_End) << '\n';
@@ -6945,8 +7313,10 @@ void GeAnalogColor::open(std::ifstream& fp)
   char dummy[40];
   int tmp;
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeAnalogcolor: \"%d %s\"\n", type, dummy);
@@ -6954,7 +7324,8 @@ void GeAnalogColor::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_AnalogColor:
       break;
     case ge_eSave_AnalogColor_attribute:
@@ -6999,8 +7370,7 @@ void GeAnalogColor::open(std::ifstream& fp)
   }
 }
 
-int GeAnalogColor::connect(
-    grow_tObject object, glow_sTraceData* trace_data, bool now)
+int GeAnalogColor::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
 {
   pwr_tAName parsed_name;
   int inverted;
@@ -7009,7 +7379,8 @@ int GeAnalogColor::connect(
   GeDynElem* elem;
 
   color = dyn->get_color1(object, color);
-  if (color < 0 || color >= glow_eDrawType__) {
+  if (color < 0 || color >= glow_eDrawType__)
+  {
     printf("** Color out of range, %s\n", attribute);
     return 0;
   }
@@ -7017,10 +7388,12 @@ int GeAnalogColor::connect(
   // Get instance 1
   if (instance == ge_mInstance_1)
     e = this;
-  else {
-    for (elem = dyn->elements; elem; elem = elem->next) {
-      if (elem->dyn_type1 == ge_mDynType1_AnalogColor
-          && elem->instance == ge_mInstance_1) {
+  else
+  {
+    for (elem = dyn->elements; elem; elem = elem->next)
+    {
+      if (elem->dyn_type1 == ge_mDynType1_AnalogColor && elem->instance == ge_mInstance_1)
+      {
         found = true;
         break;
       }
@@ -7030,13 +7403,15 @@ int GeAnalogColor::connect(
     e = (GeAnalogColor*)elem;
   }
 
-  if (!e->common_attr || instance == ge_mInstance_1) {
+  if (!e->common_attr || instance == ge_mInstance_1)
+  {
     size = 4;
     db = dyn->parse_attr_name(attribute, parsed_name, &inverted, &type, &size);
     if (streq(parsed_name, ""))
       return 1;
 
-    switch (type) {
+    switch (type)
+    {
     case pwr_eType_Float32:
     case pwr_eType_Int32:
     case pwr_eType_UInt32:
@@ -7045,13 +7420,14 @@ int GeAnalogColor::connect(
       return 1;
     }
 
-    sts = dyn->graph->ref_object_info(
-        dyn->cycle, parsed_name, (void**)&p, &subid, size, object, now);
+    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&p, &subid, size, object, now);
     if (EVEN(sts))
       return sts;
 
     trace_data->p = &pdummy;
-  } else {
+  }
+  else
+  {
     type = e->type;
     size = e->size;
     p = e->p;
@@ -7062,8 +7438,7 @@ int GeAnalogColor::connect(
 
 int GeAnalogColor::disconnect(grow_tObject object)
 {
-  if ((!e->common_attr || instance == ge_mInstance_1) && p
-      && db == graph_eDatabase_Gdh)
+  if ((!e->common_attr || instance == ge_mInstance_1) && p && db == graph_eDatabase_Gdh)
     gdh_UnrefObjectInfo(subid);
   p = 0;
   return 1;
@@ -7071,7 +7446,8 @@ int GeAnalogColor::disconnect(grow_tObject object)
 
 int GeAnalogColor::scan(grow_tObject object)
 {
-  if (!p && instance != ge_mInstance_1) {
+  if (!p && instance != ge_mInstance_1)
+  {
     p = e->p;
     type = e->type;
     size = e->size;
@@ -7081,20 +7457,26 @@ int GeAnalogColor::scan(grow_tObject object)
 
   bool state = false;
 
-  switch (type) {
-  case pwr_eType_Float32: {
+  switch (type)
+  {
+  case pwr_eType_Float32:
+  {
     pwr_tFloat32 val = *(pwr_tFloat32*)p;
-    if (!first_scan) {
-      if (!dyn->reset_color && fabs(old_value - val) < FLT_EPSILON) {
+    if (!first_scan)
+    {
+      if (!dyn->reset_color && fabs(old_value - val) < FLT_EPSILON)
+      {
         // No change since last time
         if (old_state)
           dyn->ignore_color = true;
         return 1;
       }
-    } else
+    }
+    else
       first_scan = false;
 
-    switch (limit_type) {
+    switch (limit_type)
+    {
     case ge_eLimitType_Gt:
       state = val > limit;
       break;
@@ -7116,20 +7498,25 @@ int GeAnalogColor::scan(grow_tObject object)
     break;
   }
   case pwr_eType_Int32:
-  case pwr_eType_UInt32: {
+  case pwr_eType_UInt32:
+  {
     pwr_tInt32 val = *(pwr_tInt32*)p;
 
-    if (!first_scan) {
-      if (!dyn->reset_color && memcmp(&old_value, &val, size) == 0) {
+    if (!first_scan)
+    {
+      if (!dyn->reset_color && memcmp(&old_value, &val, size) == 0)
+      {
         // No change since last time
         if (old_state)
           dyn->ignore_color = true;
         return 1;
       }
-    } else
+    }
+    else
       first_scan = false;
 
-    switch (limit_type) {
+    switch (limit_type)
+    {
     case ge_eLimitType_Gt:
       state = val > limit;
       break;
@@ -7156,33 +7543,46 @@ int GeAnalogColor::scan(grow_tObject object)
   bool set_color = false;
   bool reset_color = false;
 
-  if (first_scan || state != old_state || dyn->reset_color) {
-    if (state) {
+  if (first_scan || state != old_state || dyn->reset_color)
+  {
+    if (state)
+    {
       set_color = true;
       dyn->ignore_color = true;
-    } else {
+    }
+    else
+    {
       reset_color = true;
       dyn->reset_color = true;
     }
     old_state = state;
-  } else if (state)
+  }
+  else if (state)
     dyn->ignore_color = true;
 
-  if (!set_color && !reset_color) {
+  if (!set_color && !reset_color)
+  {
     return 1;
   }
-  if (dyn->total_dyn_type1 & ge_mDynType1_Tone) {
-    if (set_color) {
-      if (color >= (glow_eDrawType)glow_eDrawTone__) {
+  if (dyn->total_dyn_type1 & ge_mDynType1_Tone)
+  {
+    if (set_color)
+    {
+      if (color >= (glow_eDrawType)glow_eDrawTone__)
+      {
         if (!border)
           grow_SetObjectFillColor(object, color);
         else
           grow_SetObjectBorderColor(object, color);
-      } else
+      }
+      else
         grow_SetObjectColorTone(object, (glow_eDrawTone)color);
       dyn->ignore_color = true;
-    } else {
-      if (color >= (glow_eDrawType)glow_eDrawTone__) {
+    }
+    else
+    {
+      if (color >= (glow_eDrawType)glow_eDrawTone__)
+      {
         if (!border)
           grow_ResetObjectFillColor(object);
         else
@@ -7191,14 +7591,19 @@ int GeAnalogColor::scan(grow_tObject object)
       grow_ResetObjectColorTone(object);
       dyn->reset_color = true;
     }
-  } else {
-    if (set_color) {
+  }
+  else
+  {
+    if (set_color)
+    {
       if (!border)
         grow_SetObjectFillColor(object, color);
       else
         grow_SetObjectBorderColor(object, color);
       dyn->ignore_color = true;
-    } else {
+    }
+    else
+    {
       if (!border)
         grow_ResetObjectFillColor(object);
       else
@@ -7210,7 +7615,7 @@ int GeAnalogColor::scan(grow_tObject object)
   return 1;
 }
 
-int GeAnalogColor::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GeAnalogColor::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
   char name[80];
   int e_common_attr;
@@ -7220,15 +7625,20 @@ int GeAnalogColor::export_script(grow_tObject o, std::ofstream& fp, char *indent
     sprintf(name, "%sAnalogColor", prefix);
 
   // Find first instance and print instance mask
-  for (GeDynElem *elem = dyn->elements; elem; elem = elem->next) {
-    if (elem->dyn_type1 == ge_mDynType1_AnalogColor && elem->instance == ge_mInstance_1) {
-      if (instance ==  instance_highest(elem->instance_mask)) {
-	if (elem->instance_mask != 1)
-	  fp << indentation << "SetObjectAttribute(id,\"" << name << ".Instances\"," << elem->instance_mask << ");" << '\n';
-	e_common_attr = ((GeAnalogColor *)elem)->common_attr;
-	if (e_common_attr != 1)
-	  fp << indentation << "SetObjectAttribute(id,\"" << name << ".CommonAttribute\"," << e_common_attr << ");" << '\n';
-	break;
+  for (GeDynElem* elem = dyn->elements; elem; elem = elem->next)
+  {
+    if (elem->dyn_type1 == ge_mDynType1_AnalogColor && elem->instance == ge_mInstance_1)
+    {
+      if (instance == instance_highest(elem->instance_mask))
+      {
+        if (elem->instance_mask != 1)
+          fp << indentation << "SetObjectAttribute(id,\"" << name << ".Instances\"," << elem->instance_mask
+             << ");" << '\n';
+        e_common_attr = ((GeAnalogColor*)elem)->common_attr;
+        if (e_common_attr != 1)
+          fp << indentation << "SetObjectAttribute(id,\"" << name << ".CommonAttribute\"," << e_common_attr
+             << ");" << '\n';
+        break;
       }
     }
   }
@@ -7236,7 +7646,8 @@ int GeAnalogColor::export_script(grow_tObject o, std::ofstream& fp, char *indent
     sprintf(&name[strlen(name)], "%d", instance_number(instance));
   if (limit != 0)
     fp << indentation << "SetObjectAttribute(id,\"" << name << ".Limit\"," << dtostr(limit) << ");" << '\n';
-  if (color != glow_eDrawType_Inherit) {
+  if (color != glow_eDrawType_Inherit)
+  {
     if (dyn->total_dyn_type1 & ge_mDynType1_Tone)
       fp << indentation << "SetObjectAttribute(id,\"" << name << ".Tone\"," << (int)color << ");" << '\n';
     else
@@ -7244,58 +7655,58 @@ int GeAnalogColor::export_script(grow_tObject o, std::ofstream& fp, char *indent
   }
   if (limit_type != ge_eLimitType_Gt)
     fp << indentation << "SetObjectAttribute(id,\"" << name << ".LimitType\"," << limit_type << ");" << '\n';
-  if (!e_common_attr || instance == ge_mInstance_1) {
+  if (!e_common_attr || instance == ge_mInstance_1)
+  {
     if (!streq(attribute, ""))
-      fp << indentation << "SetObjectAttribute(id,\"" << name << ".Attribute\",\"" << attribute << "\");" << '\n';
+      fp << indentation << "SetObjectAttribute(id,\"" << name << ".Attribute\",\"" << attribute << "\");"
+         << '\n';
   }
   if (border != 0)
     fp << indentation << "SetObjectAttribute(id,\"" << name << ".Border\"," << border << ");" << '\n';
   return 1;
 }
 
-int GeAnalogColor::export_java(
-    grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeAnalogColor::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
   if (first)
     fp << "      ";
   else
     fp << "      ,";
-  fp << "new GeDynAnalogColor(" << var_name << ".dd, \"" << attribute << "\","
-     << limit << "," << limit_type << "," << color << ")\n";
+  fp << "new GeDynAnalogColor(" << var_name << ".dd, \"" << attribute << "\"," << limit << "," << limit_type
+     << "," << color << ")\n";
   return 1;
 }
 
-int GeAnalogColor::syntax_check(
-    grow_tObject object, int* error_cnt, int* warning_cnt)
+int GeAnalogColor::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
   glow_eDrawType tcolor = dyn->get_color1(object, color);
-  if (tcolor < 0 || tcolor >= glow_eDrawType__) {
+  if (tcolor < 0 || tcolor >= glow_eDrawType__)
+  {
     dyn->graph->syntax_msg('E', object, "AnalogColor, Color out or range");
     (*error_cnt)++;
   }
 
-  if (instance == ge_mInstance_1) {
-    int types[] = { pwr_eType_Int32, pwr_eType_UInt32, pwr_eType_Float32, 0 };
-    graph_eDatabase databases[] = { graph_eDatabase_Gdh, graph_eDatabase__ };
-    dyn->syntax_check_attribute(object, "AnalogColor.Attribute", attribute, 0,
-        types, databases, error_cnt, warning_cnt);
+  if (instance == ge_mInstance_1)
+  {
+    int types[] = {pwr_eType_Int32, pwr_eType_UInt32, pwr_eType_Float32, 0};
+    graph_eDatabase databases[] = {graph_eDatabase_Gdh, graph_eDatabase__};
+    dyn->syntax_check_attribute(object, "AnalogColor.Attribute", attribute, 0, types, databases, error_cnt,
+                                warning_cnt);
   }
   return 1;
 }
 
 GeRotate::GeRotate(GeDyn* e_dyn)
-    : GeDynElem(e_dyn, ge_mDynType1_Rotate, ge_mDynType2_No, ge_mActionType1_No,
-          ge_mActionType2_No, ge_eDynPrio_Rotate),
+    : GeDynElem(e_dyn, ge_mDynType1_Rotate, ge_mDynType2_No, ge_mActionType1_No, ge_mActionType2_No,
+                ge_eDynPrio_Rotate),
       x0(0), y0(0), factor(1), offset(0), min_angle(0), max_angle(0)
 {
   strcpy(attribute, "");
 }
 
 GeRotate::GeRotate(const GeRotate& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-          x.prio),
-      x0(x.x0), y0(x.y0), factor(x.factor), offset(x.offset), min_angle(x.min_angle),
-      max_angle(x.max_angle)
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio), x0(x.x0), y0(x.y0),
+      factor(x.factor), offset(x.offset), min_angle(x.min_angle), max_angle(x.max_angle)
 {
   strcpy(attribute, x.attribute);
 }
@@ -7342,11 +7753,11 @@ void GeRotate::get_attributes(attr_sItem* attrinfo, int* item_count)
   *item_count = i;
 }
 
-void GeRotate::set_attribute(
-    grow_tObject object, const char* attr_name, int* cnt)
+void GeRotate::set_attribute(grow_tObject object, const char* attr_name, int* cnt)
 {
   (*cnt)--;
-  if (*cnt == 0) {
+  if (*cnt == 0)
+  {
     char msg[200];
 
     strncpy(attribute, attr_name, sizeof(attribute));
@@ -7380,8 +7791,10 @@ void GeRotate::open(std::ifstream& fp)
   int end_found = 0;
   char dummy[40];
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeRotate: \"%d %s\"\n", type, dummy);
@@ -7389,7 +7802,8 @@ void GeRotate::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_Rotate:
       break;
     case ge_eSave_Rotate_attribute:
@@ -7426,8 +7840,7 @@ void GeRotate::open(std::ifstream& fp)
   }
 }
 
-int GeRotate::connect(
-    grow_tObject object, glow_sTraceData* trace_data, bool now)
+int GeRotate::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
 {
   int attr_type, attr_size;
   pwr_tAName parsed_name;
@@ -7436,13 +7849,11 @@ int GeRotate::connect(
 
   size = 4;
   p = 0;
-  db = dyn->parse_attr_name(
-      attribute, parsed_name, &inverted, &attr_type, &attr_size);
+  db = dyn->parse_attr_name(attribute, parsed_name, &inverted, &attr_type, &attr_size);
   if (streq(parsed_name, ""))
     return 1;
 
-  sts = dyn->graph->ref_object_info(
-      dyn->cycle, parsed_name, (void**)&p, &subid, size, object, now);
+  sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&p, &subid, size, object, now);
   if (EVEN(sts))
     return sts;
 
@@ -7461,11 +7872,12 @@ int GeRotate::connect(
 
 int GeRotate::disconnect(grow_tObject object)
 {
-  if (p) {
+  if (p)
+  {
     grow_SetObjectRotation(object, 0, x0, y0, rotation_point);
     grow_RevertTransform(object);
   }
-    
+
   if (p && db == graph_eDatabase_Gdh)
     gdh_UnrefObjectInfo(subid);
   p = 0;
@@ -7478,15 +7890,18 @@ int GeRotate::scan(grow_tObject object)
     return 1;
   pwr_tFloat32 val = *p;
 
-  if (!first_scan) {
+  if (!first_scan)
+  {
     if (fabs(old_value - val) < FLT_EPSILON)
       // No change since last time
       return 1;
-  } else
+  }
+  else
     first_scan = false;
 
   double value = val * factor + offset;
-  if (!feq(min_angle, 0.0) || !feq(max_angle, 0.0)) {
+  if (!feq(min_angle, 0.0) || !feq(max_angle, 0.0))
+  {
     if (value < min_angle)
       value = min_angle;
     else if (value > max_angle)
@@ -7498,50 +7913,55 @@ int GeRotate::scan(grow_tObject object)
   return 1;
 }
 
-int GeRotate::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GeRotate::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
   if (!streq(attribute, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Rotate.Attribute\",\"" << attribute << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Rotate.Attribute\",\"" << attribute
+       << "\");" << '\n';
   if (x0 != 0)
     fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Rotate.x0\"," << dtostr(x0) << ");" << '\n';
   if (y0 != 0)
     fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Rotate.y0\"," << dtostr(y0) << ");" << '\n';
-  if (!feq(factor,1.0))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Rotate.Factor\"," << dtostr(factor) << ");" << '\n';
+  if (!feq(factor, 1.0))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Rotate.Factor\"," << dtostr(factor) << ");"
+       << '\n';
   if (offset != 0)
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Rotate.Offset\"," << dtostr(offset) << ");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Rotate.Offset\"," << dtostr(offset) << ");"
+       << '\n';
   if (min_angle != 0)
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Rotate.MinAngle\"," << dtostr(min_angle) << ");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Rotate.MinAngle\"," << dtostr(min_angle)
+       << ");" << '\n';
   if (max_angle != 0)
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Rotate.MinAngle\"," << dtostr(max_angle) << ");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Rotate.MinAngle\"," << dtostr(max_angle)
+       << ");" << '\n';
   return 1;
 }
 
-int GeRotate::export_java(
-    grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeRotate::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
   double x1, x2, y1, y2;
   double rotation_x, rotation_y;
 
-  if (!feq(x0, 0.0) || !feq(y0, 0.0)) {
+  if (!feq(x0, 0.0) || !feq(y0, 0.0))
+  {
     rotation_x = x0;
     rotation_y = y0;
 
-    grow_ToPixel(dyn->graph->grow->ctx, rotation_x, rotation_y, &rotation_x,
-        &rotation_y);
+    grow_ToPixel(dyn->graph->grow->ctx, rotation_x, rotation_y, &rotation_x, &rotation_y);
     grow_MeasureJavaBean(dyn->graph->grow->ctx, &x2, &x1, &y2, &y1);
 
     rotation_x -= x1 - glow_cJBean_Offset;
     rotation_y -= y1 - glow_cJBean_Offset;
-  } else {
+  }
+  else
+  {
     // Zero point for nodeclass is rotation point
     grow_GetNodeClassOrigo(object, &rotation_x, &rotation_y);
     grow_MeasureNode(object, &x1, &y1, &x2, &y2);
     rotation_x += x1;
     rotation_y += y1;
 
-    grow_ToPixel(dyn->graph->grow->ctx, rotation_x, rotation_y, &rotation_x,
-        &rotation_y);
+    grow_ToPixel(dyn->graph->grow->ctx, rotation_x, rotation_y, &rotation_x, &rotation_y);
 
     grow_MeasureJavaBean(dyn->graph->grow->ctx, &x2, &x1, &y2, &y1);
 
@@ -7553,27 +7973,26 @@ int GeRotate::export_java(
     fp << "      ";
   else
     fp << "      ,";
-  fp << "new GeDynRotate(" << var_name << ".dd, \"" << attribute << "\","
-     << rotation_x << "," << rotation_y << "," << factor << ")\n";
+  fp << "new GeDynRotate(" << var_name << ".dd, \"" << attribute << "\"," << rotation_x << "," << rotation_y
+     << "," << factor << ")\n";
   return 1;
 }
 
-int GeRotate::syntax_check(
-    grow_tObject object, int* error_cnt, int* warning_cnt)
+int GeRotate::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
-  int types[] = { pwr_eType_Float32, 0 };
-  graph_eDatabase databases[] = { graph_eDatabase_Gdh, graph_eDatabase__ };
-  dyn->syntax_check_attribute(object, "Rotate.Attribute", attribute, 0, types,
-      databases, error_cnt, warning_cnt);
+  int types[] = {pwr_eType_Float32, 0};
+  graph_eDatabase databases[] = {graph_eDatabase_Gdh, graph_eDatabase__};
+  dyn->syntax_check_attribute(object, "Rotate.Attribute", attribute, 0, types, databases, error_cnt,
+                              warning_cnt);
 
   return 1;
 }
 
 GeMove::GeMove(GeDyn* e_dyn)
-    : GeDynElem(e_dyn, ge_mDynType1_Move, ge_mDynType2_No, ge_mActionType1_No,
-          ge_mActionType2_No, ge_eDynPrio_Move),
-      x_offset(0), y_offset(0), x_factor(1), y_factor(1), scale_x_factor(1),
-      scale_y_factor(1), scale_type(glow_eScaleType_LowerLeft)
+    : GeDynElem(e_dyn, ge_mDynType1_Move, ge_mDynType2_No, ge_mActionType1_No, ge_mActionType2_No,
+                ge_eDynPrio_Move),
+      x_offset(0), y_offset(0), x_factor(1), y_factor(1), scale_x_factor(1), scale_y_factor(1),
+      scale_type(glow_eScaleType_LowerLeft)
 {
   strcpy(move_x_attribute, "");
   strcpy(move_y_attribute, "");
@@ -7582,11 +8001,9 @@ GeMove::GeMove(GeDyn* e_dyn)
 }
 
 GeMove::GeMove(const GeMove& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-          x.prio),
-      x_offset(x.x_offset), y_offset(x.y_offset), x_factor(x.x_factor),
-      y_factor(x.y_factor), scale_x_factor(x.scale_x_factor),
-      scale_y_factor(x.scale_y_factor), scale_type(x.scale_type)
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio),
+      x_offset(x.x_offset), y_offset(x.y_offset), x_factor(x.x_factor), y_factor(x.y_factor),
+      scale_x_factor(x.scale_x_factor), scale_y_factor(x.scale_y_factor), scale_type(x.scale_type)
 {
   strcpy(move_x_attribute, x.move_x_attribute);
   strcpy(move_y_attribute, x.move_y_attribute);
@@ -7659,14 +8076,17 @@ void GeMove::get_attributes(attr_sItem* attrinfo, int* item_count)
 void GeMove::set_attribute(grow_tObject object, const char* attr_name, int* cnt)
 {
   (*cnt)--;
-  if (*cnt == 0) {
+  if (*cnt == 0)
+  {
     char msg[200];
 
     strncpy(move_x_attribute, attr_name, sizeof(move_x_attribute));
     snprintf(msg, sizeof(msg), "Move.XAttribute = %s", attr_name);
     msg[sizeof(msg) - 1] = 0;
     dyn->graph->message('I', msg);
-  } else if (*cnt == 1) {
+  }
+  else if (*cnt == 1)
+  {
     char msg[200];
 
     strncpy(move_y_attribute, attr_name, sizeof(move_y_attribute));
@@ -7679,27 +8099,19 @@ void GeMove::set_attribute(grow_tObject object, const char* attr_name, int* cnt)
 
 void GeMove::replace_attribute(char* from, char* to, int* cnt, int strict)
 {
-  GeDyn::replace_attribute(
-      move_x_attribute, sizeof(move_x_attribute), from, to, cnt, strict);
-  GeDyn::replace_attribute(
-      move_y_attribute, sizeof(move_y_attribute), from, to, cnt, strict);
-  GeDyn::replace_attribute(
-      scale_x_attribute, sizeof(scale_x_attribute), from, to, cnt, strict);
-  GeDyn::replace_attribute(
-      scale_y_attribute, sizeof(scale_y_attribute), from, to, cnt, strict);
+  GeDyn::replace_attribute(move_x_attribute, sizeof(move_x_attribute), from, to, cnt, strict);
+  GeDyn::replace_attribute(move_y_attribute, sizeof(move_y_attribute), from, to, cnt, strict);
+  GeDyn::replace_attribute(scale_x_attribute, sizeof(scale_x_attribute), from, to, cnt, strict);
+  GeDyn::replace_attribute(scale_y_attribute, sizeof(scale_y_attribute), from, to, cnt, strict);
 }
 
 void GeMove::save(std::ofstream& fp)
 {
   fp << int(ge_eSave_Move) << '\n';
-  fp << int(ge_eSave_Move_move_x_attribute) << FSPACE << move_x_attribute
-     << '\n';
-  fp << int(ge_eSave_Move_move_y_attribute) << FSPACE << move_y_attribute
-     << '\n';
-  fp << int(ge_eSave_Move_scale_x_attribute) << FSPACE << scale_x_attribute
-     << '\n';
-  fp << int(ge_eSave_Move_scale_y_attribute) << FSPACE << scale_y_attribute
-     << '\n';
+  fp << int(ge_eSave_Move_move_x_attribute) << FSPACE << move_x_attribute << '\n';
+  fp << int(ge_eSave_Move_move_y_attribute) << FSPACE << move_y_attribute << '\n';
+  fp << int(ge_eSave_Move_scale_x_attribute) << FSPACE << scale_x_attribute << '\n';
+  fp << int(ge_eSave_Move_scale_y_attribute) << FSPACE << scale_y_attribute << '\n';
   fp << int(ge_eSave_Move_x_offset) << FSPACE << x_offset << '\n';
   fp << int(ge_eSave_Move_y_offset) << FSPACE << y_offset << '\n';
   fp << int(ge_eSave_Move_x_factor) << FSPACE << x_factor << '\n';
@@ -7717,8 +8129,10 @@ void GeMove::open(std::ifstream& fp)
   char dummy[40];
   int tmp;
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeMove: \"%d %s\"\n", type, dummy);
@@ -7726,7 +8140,8 @@ void GeMove::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_Move:
       break;
     case ge_eSave_Move_move_x_attribute:
@@ -7797,54 +8212,57 @@ int GeMove::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
 
   move_x_size = 4;
   move_x_type = pwr_eType_Float32;
-  move_x_db = dyn->parse_attr_name(
-      move_x_attribute, parsed_name, &inverted, &move_x_type, &move_x_size);
-  if (!streq(parsed_name, "")) {
-    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name,
-        (void**)&move_x_p, &move_x_subid, move_x_size, object, now);
+  move_x_db = dyn->parse_attr_name(move_x_attribute, parsed_name, &inverted, &move_x_type, &move_x_size);
+  if (!streq(parsed_name, ""))
+  {
+    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&move_x_p, &move_x_subid, move_x_size,
+                                      object, now);
     if (EVEN(sts))
       return sts;
   }
   move_y_size = 4;
   move_y_type = pwr_eType_Float32;
-  move_y_db = dyn->parse_attr_name(
-      move_y_attribute, parsed_name, &inverted, &move_y_type, &move_y_size);
-  if (!streq(parsed_name, "")) {
-    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name,
-        (void**)&move_y_p, &move_y_subid, move_y_size, object, now);
+  move_y_db = dyn->parse_attr_name(move_y_attribute, parsed_name, &inverted, &move_y_type, &move_y_size);
+  if (!streq(parsed_name, ""))
+  {
+    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&move_y_p, &move_y_subid, move_y_size,
+                                      object, now);
     if (EVEN(sts))
       return sts;
   }
   scale_x_size = 4;
   scale_x_type = pwr_eType_Float32;
-  scale_x_db = dyn->parse_attr_name(
-      scale_x_attribute, parsed_name, &inverted, &scale_x_type, &scale_x_size);
-  if (!streq(parsed_name, "")) {
-    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name,
-        (void**)&scale_x_p, &scale_x_subid, scale_x_size, object, now);
+  scale_x_db = dyn->parse_attr_name(scale_x_attribute, parsed_name, &inverted, &scale_x_type, &scale_x_size);
+  if (!streq(parsed_name, ""))
+  {
+    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&scale_x_p, &scale_x_subid,
+                                      scale_x_size, object, now);
     if (EVEN(sts))
       return sts;
   }
   scale_y_size = 4;
   scale_y_type = pwr_eType_Float32;
-  scale_y_db = dyn->parse_attr_name(
-      scale_y_attribute, parsed_name, &inverted, &scale_y_type, &scale_y_size);
-  if (!streq(parsed_name, "")) {
-    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name,
-        (void**)&scale_y_p, &scale_y_subid, scale_y_size, object, now);
+  scale_y_db = dyn->parse_attr_name(scale_y_attribute, parsed_name, &inverted, &scale_y_type, &scale_y_size);
+  if (!streq(parsed_name, ""))
+  {
+    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&scale_y_p, &scale_y_subid,
+                                      scale_y_size, object, now);
     if (EVEN(sts))
       return sts;
   }
   trace_data->p = &pdummy;
 
   first_scan = true;
-  if (!grow_TransformIsStored(object)) {
+  if (!grow_TransformIsStored(object))
+  {
     grow_StoreTransform(object);
     grow_StoreObjectBorders(object);
     grow_MeasureNode(object, &x_orig, &y_orig, &ur_x, &ur_y);
     width_orig = ur_x - x_orig;
     height_orig = ur_y - y_orig;
-  } else {
+  }
+  else
+  {
     grow_RevertTransform(object);
     grow_GetObjectBorder(object);
     grow_StoreObjectBorders(object);
@@ -7874,27 +8292,30 @@ int GeMove::scan(grow_tObject object)
 {
   bool update = false;
 
-  if (!first_scan) {
+  if (!first_scan)
+  {
     if (move_x_p && memcmp(&move_x_old_value, move_x_p, move_x_size) != 0)
       update = true;
     else if (move_y_p && memcmp(&move_y_old_value, move_y_p, move_y_size) != 0)
       update = true;
-    else if (scale_x_p
-        && memcmp(&scale_x_old_value, scale_x_p, scale_x_size) != 0)
+    else if (scale_x_p && memcmp(&scale_x_old_value, scale_x_p, scale_x_size) != 0)
       update = true;
-    else if (scale_y_p
-        && memcmp(&scale_y_old_value, scale_y_p, scale_y_size) != 0)
+    else if (scale_y_p && memcmp(&scale_y_old_value, scale_y_p, scale_y_size) != 0)
       update = true;
     if (!update)
       return 1;
-  } else
+  }
+  else
     first_scan = false;
 
   double move_x, move_y, scale_x, scale_y;
 
-  if (scale_x_p || scale_y_p) {
-    if (scale_x_p) {
-      switch (scale_x_type) {
+  if (scale_x_p || scale_y_p)
+  {
+    if (scale_x_p)
+    {
+      switch (scale_x_type)
+      {
       case pwr_eType_Float32:
         scale_x = *scale_x_p * scale_x_factor;
         break;
@@ -7910,11 +8331,14 @@ int GeMove::scan(grow_tObject object)
       default:
         scale_x = 1;
       }
-    } else
+    }
+    else
       scale_x = 1;
 
-    if (scale_y_p) {
-      switch (scale_y_type) {
+    if (scale_y_p)
+    {
+      switch (scale_y_type)
+      {
       case pwr_eType_Float32:
         scale_y = *scale_y_p * scale_y_factor;
         break;
@@ -7930,7 +8354,8 @@ int GeMove::scan(grow_tObject object)
       default:
         scale_y = 1;
       }
-    } else
+    }
+    else
       scale_y = 1;
 
     if (!(move_x_p || move_y_p))
@@ -7940,11 +8365,14 @@ int GeMove::scan(grow_tObject object)
     if (scale_y_p)
       memcpy(&scale_y_old_value, scale_y_p, scale_y_size);
 
-    if (move_x_p || move_y_p) {
-      if (move_x_p) {
+    if (move_x_p || move_y_p)
+    {
+      if (move_x_p)
+      {
         double scale_offs = 0;
         // Adjust position for different scaletypes
-        switch (scale_type) {
+        switch (scale_type)
+        {
         case glow_eScaleType_LowerRight:
         case glow_eScaleType_UpperRight:
           scale_offs = width_orig * (1 - scale_x);
@@ -7954,32 +8382,33 @@ int GeMove::scan(grow_tObject object)
           break;
         default:;
         }
-        switch (move_x_type) {
+        switch (move_x_type)
+        {
         case pwr_eType_Float32:
           move_x = x_orig + scale_offs + (*move_x_p - x_offset) * x_factor;
           break;
         case pwr_eType_Float64:
-          move_x = x_orig + scale_offs
-              + (*(pwr_tFloat64*)move_x_p - x_offset) * x_factor;
+          move_x = x_orig + scale_offs + (*(pwr_tFloat64*)move_x_p - x_offset) * x_factor;
           break;
         case pwr_eType_Int32:
-          move_x = x_orig + scale_offs
-              + (*(pwr_tInt32*)move_x_p - x_offset) * x_factor;
+          move_x = x_orig + scale_offs + (*(pwr_tInt32*)move_x_p - x_offset) * x_factor;
           break;
         case pwr_eType_UInt32:
-          move_x = x_orig + scale_offs
-              + (*(pwr_tUInt32*)move_x_p - x_offset) * x_factor;
+          move_x = x_orig + scale_offs + (*(pwr_tUInt32*)move_x_p - x_offset) * x_factor;
           break;
         default:
           move_x = x_orig + scale_offs;
         }
-      } else
+      }
+      else
         move_x = x_orig;
 
-      if (move_y_p) {
+      if (move_y_p)
+      {
         double scale_offs = 0;
         // Adjust position for different scaletypes
-        switch (scale_type) {
+        switch (scale_type)
+        {
         case glow_eScaleType_UpperRight:
         case glow_eScaleType_UpperLeft:
           scale_offs = height_orig * (1 - scale_y);
@@ -7990,26 +8419,25 @@ int GeMove::scan(grow_tObject object)
         default:;
         }
 
-        switch (move_y_type) {
+        switch (move_y_type)
+        {
         case pwr_eType_Float32:
           move_y = y_orig + scale_offs + (*move_y_p - y_offset) * y_factor;
           break;
         case pwr_eType_Float64:
-          move_y = y_orig + scale_offs
-              + (*(pwr_tFloat64*)move_y_p - y_offset) * y_factor;
+          move_y = y_orig + scale_offs + (*(pwr_tFloat64*)move_y_p - y_offset) * y_factor;
           break;
         case pwr_eType_Int32:
-          move_y = y_orig + scale_offs
-              + (*(pwr_tInt32*)move_y_p - y_offset) * y_factor;
+          move_y = y_orig + scale_offs + (*(pwr_tInt32*)move_y_p - y_offset) * y_factor;
           break;
         case pwr_eType_UInt32:
-          move_y = y_orig + scale_offs
-              + (*(pwr_tUInt32*)move_y_p - y_offset) * y_factor;
+          move_y = y_orig + scale_offs + (*(pwr_tUInt32*)move_y_p - y_offset) * y_factor;
           break;
         default:
           move_y = y_orig + scale_offs;
         }
-      } else
+      }
+      else
         move_y = y_orig;
 
       if (fabs(scale_x) < DBL_EPSILON)
@@ -8017,16 +8445,19 @@ int GeMove::scan(grow_tObject object)
       if (fabs(scale_y) < DBL_EPSILON)
         scale_y = 10e-5;
 
-      grow_SetObjectScalePos(
-          object, move_x, move_y, scale_x, scale_y, 0, 0, scale_type);
+      grow_SetObjectScalePos(object, move_x, move_y, scale_x, scale_y, 0, 0, scale_type);
       if (move_x_p)
         memcpy(&move_x_old_value, move_x_p, move_x_size);
       if (move_y_p)
         memcpy(&move_y_old_value, move_y_p, move_y_size);
     }
-  } else {
-    if (move_x_p) {
-      switch (move_x_type) {
+  }
+  else
+  {
+    if (move_x_p)
+    {
+      switch (move_x_type)
+      {
       case pwr_eType_Float32:
         move_x = (*move_x_p - x_offset) * x_factor;
         break;
@@ -8042,11 +8473,14 @@ int GeMove::scan(grow_tObject object)
       default:
         move_x = 0;
       }
-    } else
+    }
+    else
       move_x = 0;
 
-    if (move_y_p) {
-      switch (move_y_type) {
+    if (move_y_p)
+    {
+      switch (move_y_type)
+      {
       case pwr_eType_Float32:
         move_y = (*move_y_p - y_offset) * y_factor;
         break;
@@ -8062,7 +8496,8 @@ int GeMove::scan(grow_tObject object)
       default:
         move_y = 0;
       }
-    } else
+    }
+    else
       move_y = 0;
 
     grow_SetObjectPosition(object, move_x, move_y);
@@ -8075,35 +8510,45 @@ int GeMove::scan(grow_tObject object)
   return 1;
 }
 
-int GeMove::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GeMove::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
   if (!streq(move_x_attribute, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Move.XAttribute\",\"" << move_x_attribute << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Move.XAttribute\",\"" << move_x_attribute
+       << "\");" << '\n';
   if (!streq(move_y_attribute, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Move.YAttribute\",\"" << move_y_attribute << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Move.YAttribute\",\"" << move_y_attribute
+       << "\");" << '\n';
   if (x_offset != 0)
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Move.XOffset\"," << dtostr(x_offset) << ");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Move.XOffset\"," << dtostr(x_offset) << ");"
+       << '\n';
   if (y_offset != 0)
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Move.YOffset\"," << dtostr(y_offset) << ");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Move.YOffset\"," << dtostr(y_offset) << ");"
+       << '\n';
   if (!feq(x_factor, 1.0))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Move.XFactor\"," << dtostr(x_factor) << ");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Move.XFactor\"," << dtostr(x_factor) << ");"
+       << '\n';
   if (!feq(y_factor, 1.0))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Move.YFactor\"," << dtostr(y_factor) << ");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Move.YFactor\"," << dtostr(y_factor) << ");"
+       << '\n';
   if (!streq(scale_x_attribute, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Move.ScaleXAttribute\",\"" << scale_x_attribute << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Move.ScaleXAttribute\",\""
+       << scale_x_attribute << "\");" << '\n';
   if (!streq(scale_y_attribute, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Move.ScaleYAttribute\",\"" << scale_y_attribute << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Move.ScaleYAttribute\",\""
+       << scale_y_attribute << "\");" << '\n';
   if (!feq(scale_x_factor, 1.0))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Move.ScaleXFactor\"," << dtostr(scale_x_factor) << ");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Move.ScaleXFactor\","
+       << dtostr(scale_x_factor) << ");" << '\n';
   if (!feq(scale_y_factor, 1.0))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Move.ScaleYFactor\"," << dtostr(scale_y_factor) << ");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Move.ScaleYFactor\","
+       << dtostr(scale_y_factor) << ");" << '\n';
   if (scale_type != glow_eScaleType_LowerLeft)
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Move.ScaleType\"," << scale_type << ");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Move.ScaleType\"," << scale_type << ");"
+       << '\n';
   return 1;
 }
 
-int GeMove::export_java(
-    grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeMove::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
   double zoom_factor;
 
@@ -8113,31 +8558,29 @@ int GeMove::export_java(
     fp << "      ";
   else
     fp << "      ,";
-  fp << "new GeDynMove(" << var_name << ".dd, \"" << move_x_attribute << "\",\""
-     << move_y_attribute << "\",\"" << scale_x_attribute << "\",\""
-     << scale_y_attribute << "\"," << x_offset << "," << y_offset << ","
-     << x_factor * zoom_factor << "," << y_factor * zoom_factor << ","
-     << scale_x_factor << "," << scale_y_factor << ")\n";
+  fp << "new GeDynMove(" << var_name << ".dd, \"" << move_x_attribute << "\",\"" << move_y_attribute
+     << "\",\"" << scale_x_attribute << "\",\"" << scale_y_attribute << "\"," << x_offset << "," << y_offset
+     << "," << x_factor * zoom_factor << "," << y_factor * zoom_factor << "," << scale_x_factor << ","
+     << scale_y_factor << ")\n";
   return 1;
 }
 
 int GeMove::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
-  int types[] = { pwr_eType_Int32, pwr_eType_UInt32, pwr_eType_Float32,
-    pwr_eType_Float64, 0 };
-  graph_eDatabase databases[] = { graph_eDatabase_Gdh, graph_eDatabase__ };
-  dyn->syntax_check_attribute(object, "Move.XAttribute", move_x_attribute, 1,
-      types, databases, error_cnt, warning_cnt);
-  dyn->syntax_check_attribute(object, "Move.YAttribute", move_y_attribute, 1,
-      types, databases, error_cnt, warning_cnt);
-  dyn->syntax_check_attribute(object, "Move.ScaleXAttribute", scale_x_attribute,
-      1, types, databases, error_cnt, warning_cnt);
-  dyn->syntax_check_attribute(object, "Move.ScaleYAttribute", scale_y_attribute,
-      1, types, databases, error_cnt, warning_cnt);
+  int types[] = {pwr_eType_Int32, pwr_eType_UInt32, pwr_eType_Float32, pwr_eType_Float64, 0};
+  graph_eDatabase databases[] = {graph_eDatabase_Gdh, graph_eDatabase__};
+  dyn->syntax_check_attribute(object, "Move.XAttribute", move_x_attribute, 1, types, databases, error_cnt,
+                              warning_cnt);
+  dyn->syntax_check_attribute(object, "Move.YAttribute", move_y_attribute, 1, types, databases, error_cnt,
+                              warning_cnt);
+  dyn->syntax_check_attribute(object, "Move.ScaleXAttribute", scale_x_attribute, 1, types, databases,
+                              error_cnt, warning_cnt);
+  dyn->syntax_check_attribute(object, "Move.ScaleYAttribute", scale_y_attribute, 1, types, databases,
+                              error_cnt, warning_cnt);
 
-  if (streq(move_x_attribute, "") && streq(move_y_attribute, "")
-      && streq(scale_x_attribute, "")
-      && streq(scale_y_attribute, "")) {
+  if (streq(move_x_attribute, "") && streq(move_y_attribute, "") && streq(scale_x_attribute, "") &&
+      streq(scale_y_attribute, ""))
+  {
     dyn->graph->syntax_msg('E', object, "Move, no attribute");
     (*error_cnt)++;
   }
@@ -8146,17 +8589,15 @@ int GeMove::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 }
 
 GeAnalogShift::GeAnalogShift(GeDyn* e_dyn)
-    : GeDynElem(e_dyn, ge_mDynType1_AnalogShift, ge_mDynType2_No,
-          ge_mActionType1_No, ge_mActionType2_No, ge_eDynPrio_AnalogShift),
+    : GeDynElem(e_dyn, ge_mDynType1_AnalogShift, ge_mDynType2_No, ge_mActionType1_No, ge_mActionType2_No,
+                ge_eDynPrio_AnalogShift),
       old_value(FLT_INI)
 {
   strcpy(attribute, "");
 }
 
 GeAnalogShift::GeAnalogShift(const GeAnalogShift& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-          x.prio),
-      old_value(FLT_INI)
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio), old_value(FLT_INI)
 {
   strcpy(attribute, x.attribute);
 }
@@ -8173,11 +8614,11 @@ void GeAnalogShift::get_attributes(attr_sItem* attrinfo, int* item_count)
   *item_count = i;
 }
 
-void GeAnalogShift::set_attribute(
-    grow_tObject object, const char* attr_name, int* cnt)
+void GeAnalogShift::set_attribute(grow_tObject object, const char* attr_name, int* cnt)
 {
   (*cnt)--;
-  if (*cnt == 0) {
+  if (*cnt == 0)
+  {
     char msg[200];
 
     strncpy(attribute, attr_name, sizeof(attribute));
@@ -8187,8 +8628,7 @@ void GeAnalogShift::set_attribute(
   }
 }
 
-void GeAnalogShift::replace_attribute(
-    char* from, char* to, int* cnt, int strict)
+void GeAnalogShift::replace_attribute(char* from, char* to, int* cnt, int strict)
 {
   GeDyn::replace_attribute(attribute, sizeof(attribute), from, to, cnt, strict);
 }
@@ -8206,8 +8646,10 @@ void GeAnalogShift::open(std::ifstream& fp)
   int end_found = 0;
   char dummy[40];
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeAnalogShift: \"%d %s\"\n", type, dummy);
@@ -8215,7 +8657,8 @@ void GeAnalogShift::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_AnalogShift:
       break;
     case ge_eSave_AnalogShift_attribute:
@@ -8234,8 +8677,7 @@ void GeAnalogShift::open(std::ifstream& fp)
   }
 }
 
-int GeAnalogShift::connect(
-    grow_tObject object, glow_sTraceData* trace_data, bool now)
+int GeAnalogShift::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
 {
   pwr_tAName parsed_name;
   int inverted;
@@ -8247,7 +8689,8 @@ int GeAnalogShift::connect(
   if (streq(parsed_name, ""))
     return 1;
 
-  switch (type) {
+  switch (type)
+  {
   case pwr_eType_Float32:
   case pwr_eType_Int32:
   case pwr_eType_UInt32:
@@ -8257,8 +8700,7 @@ int GeAnalogShift::connect(
     return 1;
   }
 
-  sts = dyn->graph->ref_object_info(
-      dyn->cycle, parsed_name, (void**)&p, &subid, size, object, now);
+  sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&p, &subid, size, object, now);
   if (EVEN(sts))
     return sts;
 
@@ -8280,8 +8722,10 @@ int GeAnalogShift::scan(grow_tObject object)
   if (!p)
     return 1;
 
-  if (!first_scan) {
-    switch (type) {
+  if (!first_scan)
+  {
+    switch (type)
+    {
     case pwr_eType_Float32:
       if (fabs(old_value - *p) < FLT_EPSILON)
         return 1;
@@ -8290,31 +8734,39 @@ int GeAnalogShift::scan(grow_tObject object)
       if (memcmp(&old_value, p, size) == 0)
         return 1;
     }
-  } else
+  }
+  else
     first_scan = false;
 
   int index;
 
-  switch (type) {
-  case pwr_eType_Float32: {
+  switch (type)
+  {
+  case pwr_eType_Float32:
+  {
     pwr_tFloat32 val = *p;
 
-    if (!first_scan) {
+    if (!first_scan)
+    {
       if (fabs(old_value - val) < FLT_EPSILON)
         return 1;
-    } else
+    }
+    else
       first_scan = false;
 
     index = int(val + 0.5);
     old_value = val;
     break;
   }
-  default: {
+  default:
+  {
     pwr_tInt32 val = *(pwr_tInt32*)p;
-    if (!first_scan) {
+    if (!first_scan)
+    {
       if (memcmp(&old_value, &val, size) == 0)
         return 1;
-    } else
+    }
+    else
       first_scan = false;
 
     index = val;
@@ -8326,47 +8778,43 @@ int GeAnalogShift::scan(grow_tObject object)
   return 1;
 }
 
-int GeAnalogShift::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GeAnalogShift::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
   if (!streq(attribute, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "AnalogShift.Attribute\",\"" << attribute << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "AnalogShift.Attribute\",\"" << attribute
+       << "\");" << '\n';
   return 1;
 }
 
-int GeAnalogShift::export_java(
-    grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeAnalogShift::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
   if (first)
     fp << "      ";
   else
     fp << "      ,";
-  fp << "new GeDynAnalogShift(" << var_name << ".dd, \"" << attribute << "\")"
-     << '\n';
+  fp << "new GeDynAnalogShift(" << var_name << ".dd, \"" << attribute << "\")" << '\n';
   return 1;
 }
 
-int GeAnalogShift::syntax_check(
-    grow_tObject object, int* error_cnt, int* warning_cnt)
+int GeAnalogShift::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
-  int types[] = { pwr_eType_Int32, pwr_eType_UInt32, pwr_eType_Float32,
-    pwr_eType_Enum, 0 };
-  graph_eDatabase databases[] = { graph_eDatabase_Gdh, graph_eDatabase__ };
-  dyn->syntax_check_attribute(object, "AnalogShift.Attribute", attribute, 0,
-      types, databases, error_cnt, warning_cnt);
+  int types[] = {pwr_eType_Int32, pwr_eType_UInt32, pwr_eType_Float32, pwr_eType_Enum, 0};
+  graph_eDatabase databases[] = {graph_eDatabase_Gdh, graph_eDatabase__};
+  dyn->syntax_check_attribute(object, "AnalogShift.Attribute", attribute, 0, types, databases, error_cnt,
+                              warning_cnt);
 
   return 1;
 }
 
 GeDigShift::GeDigShift(GeDyn* e_dyn)
-    : GeDynElem(e_dyn, ge_mDynType1_DigShift, ge_mDynType2_No,
-          ge_mActionType1_No, ge_mActionType2_No, ge_eDynPrio_DigShift)
+    : GeDynElem(e_dyn, ge_mDynType1_DigShift, ge_mDynType2_No, ge_mActionType1_No, ge_mActionType2_No,
+                ge_eDynPrio_DigShift)
 {
   strcpy(attribute, "");
 }
 
 GeDigShift::GeDigShift(const GeDigShift& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-          x.prio)
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio)
 {
   strcpy(attribute, x.attribute);
 }
@@ -8383,11 +8831,11 @@ void GeDigShift::get_attributes(attr_sItem* attrinfo, int* item_count)
   *item_count = i;
 }
 
-void GeDigShift::set_attribute(
-    grow_tObject object, const char* attr_name, int* cnt)
+void GeDigShift::set_attribute(grow_tObject object, const char* attr_name, int* cnt)
 {
   (*cnt)--;
-  if (*cnt == 0) {
+  if (*cnt == 0)
+  {
     char msg[200];
 
     strncpy(attribute, attr_name, sizeof(attribute));
@@ -8415,8 +8863,10 @@ void GeDigShift::open(std::ifstream& fp)
   int end_found = 0;
   char dummy[40];
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeDigShift: \"%d %s\"\n", type, dummy);
@@ -8424,7 +8874,8 @@ void GeDigShift::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_DigShift:
       break;
     case ge_eSave_DigShift_attribute:
@@ -8443,8 +8894,7 @@ void GeDigShift::open(std::ifstream& fp)
   }
 }
 
-int GeDigShift::connect(
-    grow_tObject object, glow_sTraceData* trace_data, bool now)
+int GeDigShift::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
 {
   int attr_type, attr_size;
   pwr_tAName parsed_name;
@@ -8452,18 +8902,17 @@ int GeDigShift::connect(
 
   size = 4;
   p = 0;
-  db = dyn->parse_attr_name(
-      attribute, parsed_name, &inverted, &attr_type, &attr_size);
+  db = dyn->parse_attr_name(attribute, parsed_name, &inverted, &attr_type, &attr_size);
   if (streq(parsed_name, ""))
     return 1;
 
   get_bit(parsed_name, attr_type, &bitmask);
   a_typeid = attr_type;
 
-  switch (db) {
+  switch (db)
+  {
   case graph_eDatabase_Gdh:
-    sts = dyn->graph->ref_object_info(
-        dyn->cycle, parsed_name, (void**)&p, &subid, size, object, now);
+    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&p, &subid, size, object, now);
     if (EVEN(sts))
       return sts;
     break;
@@ -8501,17 +8950,23 @@ int GeDigShift::scan(grow_tObject object)
   if (inverted)
     val = !val;
 
-  if (!first_scan) {
-    if (old_value == val) {
+  if (!first_scan)
+  {
+    if (old_value == val)
+    {
       // No change since last time
       return 1;
     }
-  } else
+  }
+  else
     first_scan = false;
 
-  if (val) {
+  if (val)
+  {
     grow_SetObjectLastNodeClass(object);
-  } else {
+  }
+  else
+  {
     grow_SetObjectFirstNodeClass(object);
   }
   old_value = val;
@@ -8519,49 +8974,44 @@ int GeDigShift::scan(grow_tObject object)
   return 1;
 }
 
-int GeDigShift::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GeDigShift::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
   if (!streq(attribute, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigShift.Attribute\",\"" << attribute << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigShift.Attribute\",\"" << attribute
+       << "\");" << '\n';
   return 1;
 }
 
-int GeDigShift::export_java(
-    grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeDigShift::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
   if (first)
     fp << "      ";
   else
     fp << "      ,";
-  fp << "new GeDynDigShift(" << var_name << ".dd, \"" << attribute << "\")"
-     << '\n';
+  fp << "new GeDynDigShift(" << var_name << ".dd, \"" << attribute << "\")" << '\n';
   return 1;
 }
 
-int GeDigShift::syntax_check(
-    grow_tObject object, int* error_cnt, int* warning_cnt)
+int GeDigShift::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
-  int types[] = { pwr_eType_Boolean, pwr_eType_Int32, pwr_eType_UInt32,
-    pwr_eType_Int64, pwr_eType_UInt64, graph_eType_Bit, pwr_eType_Float32,
-    pwr_eType_Float64, pwr_eType_String, 0 };
-  graph_eDatabase databases[]
-      = { graph_eDatabase_Ccm, graph_eDatabase_Gdh, graph_eDatabase__ };
-  dyn->syntax_check_attribute(object, "DigShift.Attribute", attribute, 0, types,
-      databases, error_cnt, warning_cnt);
+  int types[] = {pwr_eType_Boolean, pwr_eType_Int32,   pwr_eType_UInt32,  pwr_eType_Int64,  pwr_eType_UInt64,
+                 graph_eType_Bit,   pwr_eType_Float32, pwr_eType_Float64, pwr_eType_String, 0};
+  graph_eDatabase databases[] = {graph_eDatabase_Ccm, graph_eDatabase_Gdh, graph_eDatabase__};
+  dyn->syntax_check_attribute(object, "DigShift.Attribute", attribute, 0, types, databases, error_cnt,
+                              warning_cnt);
 
   return 1;
 }
 
 GeDigLowShift::GeDigLowShift(GeDyn* e_dyn)
-    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_DigLowShift,
-          ge_mActionType1_No, ge_mActionType2_No, ge_eDynPrio_DigLowShift)
+    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_DigLowShift, ge_mActionType1_No, ge_mActionType2_No,
+                ge_eDynPrio_DigLowShift)
 {
   strcpy(attribute, "");
 }
 
 GeDigLowShift::GeDigLowShift(const GeDigLowShift& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-          x.prio)
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio)
 {
   strcpy(attribute, x.attribute);
 }
@@ -8578,11 +9028,11 @@ void GeDigLowShift::get_attributes(attr_sItem* attrinfo, int* item_count)
   *item_count = i;
 }
 
-void GeDigLowShift::set_attribute(
-    grow_tObject object, const char* attr_name, int* cnt)
+void GeDigLowShift::set_attribute(grow_tObject object, const char* attr_name, int* cnt)
 {
   (*cnt)--;
-  if (*cnt == 0) {
+  if (*cnt == 0)
+  {
     char msg[200];
 
     strncpy(attribute, attr_name, sizeof(attribute));
@@ -8610,8 +9060,10 @@ void GeDigLowShift::open(std::ifstream& fp)
   int end_found = 0;
   char dummy[40];
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeDigLowShift: \"%d %s\"\n", type, dummy);
@@ -8619,7 +9071,8 @@ void GeDigLowShift::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_DigLowShift:
       break;
     case ge_eSave_DigLowShift_attribute:
@@ -8638,8 +9091,7 @@ void GeDigLowShift::open(std::ifstream& fp)
   }
 }
 
-int GeDigLowShift::connect(
-    grow_tObject object, glow_sTraceData* trace_data, bool now)
+int GeDigLowShift::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
 {
   int attr_type, attr_size;
   pwr_tAName parsed_name;
@@ -8647,18 +9099,17 @@ int GeDigLowShift::connect(
 
   size = 4;
   p = 0;
-  db = dyn->parse_attr_name(
-      attribute, parsed_name, &inverted, &attr_type, &attr_size);
+  db = dyn->parse_attr_name(attribute, parsed_name, &inverted, &attr_type, &attr_size);
   if (streq(parsed_name, ""))
     return 1;
 
   get_bit(parsed_name, attr_type, &bitmask);
   a_typeid = attr_type;
 
-  switch (db) {
+  switch (db)
+  {
   case graph_eDatabase_Gdh:
-    sts = dyn->graph->ref_object_info(
-        dyn->cycle, parsed_name, (void**)&p, &subid, size, object, now);
+    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&p, &subid, size, object, now);
     if (EVEN(sts))
       return sts;
     break;
@@ -8696,17 +9147,23 @@ int GeDigLowShift::scan(grow_tObject object)
   if (inverted)
     val = !val;
 
-  if (!first_scan) {
-    if (old_value == val) {
+  if (!first_scan)
+  {
+    if (old_value == val)
+    {
       // No change since last time
       return 1;
     }
-  } else
+  }
+  else
     first_scan = false;
 
-  if (val) {
+  if (val)
+  {
     grow_SetObjectFirstNodeClass(object);
-  } else {
+  }
+  else
+  {
     grow_SetObjectLastNodeClass(object);
   }
   old_value = val;
@@ -8714,30 +9171,28 @@ int GeDigLowShift::scan(grow_tObject object)
   return 1;
 }
 
-int GeDigLowShift::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GeDigLowShift::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
   if (!streq(attribute, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigLowShift.Attribute\",\"" << attribute << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigLowShift.Attribute\",\"" << attribute
+       << "\");" << '\n';
   return 1;
 }
 
-int GeDigLowShift::syntax_check(
-    grow_tObject object, int* error_cnt, int* warning_cnt)
+int GeDigLowShift::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
-  int types[] = { pwr_eType_Boolean, pwr_eType_Int32, pwr_eType_UInt32,
-    pwr_eType_Int64, pwr_eType_UInt64, graph_eType_Bit, pwr_eType_Float32,
-    pwr_eType_Float64, pwr_eType_String, 0 };
-  graph_eDatabase databases[]
-      = { graph_eDatabase_Ccm, graph_eDatabase_Gdh, graph_eDatabase__ };
-  dyn->syntax_check_attribute(object, "DigLowShift.Attribute", attribute, 0, types,
-      databases, error_cnt, warning_cnt);
+  int types[] = {pwr_eType_Boolean, pwr_eType_Int32,   pwr_eType_UInt32,  pwr_eType_Int64,  pwr_eType_UInt64,
+                 graph_eType_Bit,   pwr_eType_Float32, pwr_eType_Float64, pwr_eType_String, 0};
+  graph_eDatabase databases[] = {graph_eDatabase_Ccm, graph_eDatabase_Gdh, graph_eDatabase__};
+  dyn->syntax_check_attribute(object, "DigLowShift.Attribute", attribute, 0, types, databases, error_cnt,
+                              warning_cnt);
 
   return 1;
 }
 
 GeDigFourShift::GeDigFourShift(GeDyn* e_dyn)
-    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_DigFourShift,
-          ge_mActionType1_No, ge_mActionType2_No, ge_eDynPrio_DigFourShift)
+    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_DigFourShift, ge_mActionType1_No, ge_mActionType2_No,
+                ge_eDynPrio_DigFourShift)
 {
   strcpy(attribute1, "");
   strcpy(attribute2, "");
@@ -8745,8 +9200,7 @@ GeDigFourShift::GeDigFourShift(GeDyn* e_dyn)
 }
 
 GeDigFourShift::GeDigFourShift(const GeDigFourShift& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-          x.prio)
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio)
 {
   strcpy(attribute1, x.attribute1);
   strcpy(attribute2, x.attribute2);
@@ -8775,11 +9229,11 @@ void GeDigFourShift::get_attributes(attr_sItem* attrinfo, int* item_count)
   *item_count = i;
 }
 
-void GeDigFourShift::set_attribute(
-    grow_tObject object, const char* attr_name, int* cnt)
+void GeDigFourShift::set_attribute(grow_tObject object, const char* attr_name, int* cnt)
 {
   (*cnt)--;
-  if (*cnt == 0) {
+  if (*cnt == 0)
+  {
     char msg[200];
 
     strncpy(attribute1, attr_name, sizeof(attribute1));
@@ -8789,15 +9243,11 @@ void GeDigFourShift::set_attribute(
   }
 }
 
-void GeDigFourShift::replace_attribute(
-    char* from, char* to, int* cnt, int strict)
+void GeDigFourShift::replace_attribute(char* from, char* to, int* cnt, int strict)
 {
-  GeDyn::replace_attribute(
-      attribute1, sizeof(attribute1), from, to, cnt, strict);
-  GeDyn::replace_attribute(
-      attribute2, sizeof(attribute2), from, to, cnt, strict);
-  GeDyn::replace_attribute(
-      attribute3, sizeof(attribute3), from, to, cnt, strict);
+  GeDyn::replace_attribute(attribute1, sizeof(attribute1), from, to, cnt, strict);
+  GeDyn::replace_attribute(attribute2, sizeof(attribute2), from, to, cnt, strict);
+  GeDyn::replace_attribute(attribute3, sizeof(attribute3), from, to, cnt, strict);
 }
 
 void GeDigFourShift::save(std::ofstream& fp)
@@ -8815,8 +9265,10 @@ void GeDigFourShift::open(std::ifstream& fp)
   int end_found = 0;
   char dummy[40];
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeDigFourShift: \"%d %s\"\n", type, dummy);
@@ -8824,7 +9276,8 @@ void GeDigFourShift::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_DigFourShift:
       break;
     case ge_eSave_DigFourShift_attribute1:
@@ -8851,8 +9304,7 @@ void GeDigFourShift::open(std::ifstream& fp)
   }
 }
 
-int GeDigFourShift::connect(
-    grow_tObject object, glow_sTraceData* trace_data, bool now)
+int GeDigFourShift::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
 {
   int attr_type, attr_size;
   pwr_tAName parsed_name;
@@ -8860,16 +9312,16 @@ int GeDigFourShift::connect(
 
   size1 = 4;
   p1 = 0;
-  db1 = dyn->parse_attr_name(
-      attribute1, parsed_name, &inverted1, &attr_type, &attr_size);
-  if (!streq(parsed_name, "")) {
+  db1 = dyn->parse_attr_name(attribute1, parsed_name, &inverted1, &attr_type, &attr_size);
+  if (!streq(parsed_name, ""))
+  {
     get_bit(parsed_name, attr_type, &bitmask1);
     a_typeid1 = attr_type;
 
-    switch (db1) {
+    switch (db1)
+    {
     case graph_eDatabase_Gdh:
-      sts = dyn->graph->ref_object_info(
-          dyn->cycle, parsed_name, (void**)&p1, &subid1, size1, object, now);
+      sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&p1, &subid1, size1, object, now);
       if (EVEN(sts))
         return sts;
       break;
@@ -8884,16 +9336,16 @@ int GeDigFourShift::connect(
 
   size2 = 4;
   p2 = 0;
-  db2 = dyn->parse_attr_name(
-      attribute2, parsed_name, &inverted2, &attr_type, &attr_size);
-  if (!streq(parsed_name, "")) {
+  db2 = dyn->parse_attr_name(attribute2, parsed_name, &inverted2, &attr_type, &attr_size);
+  if (!streq(parsed_name, ""))
+  {
     get_bit(parsed_name, attr_type, &bitmask2);
     a_typeid2 = attr_type;
 
-    switch (db2) {
+    switch (db2)
+    {
     case graph_eDatabase_Gdh:
-      sts = dyn->graph->ref_object_info(
-          dyn->cycle, parsed_name, (void**)&p2, &subid2, size2, object, now);
+      sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&p2, &subid2, size2, object, now);
       if (EVEN(sts))
         return sts;
       break;
@@ -8908,16 +9360,16 @@ int GeDigFourShift::connect(
 
   size3 = 4;
   p3 = 0;
-  db3 = dyn->parse_attr_name(
-      attribute3, parsed_name, &inverted3, &attr_type, &attr_size);
-  if (!streq(parsed_name, "")) {
+  db3 = dyn->parse_attr_name(attribute3, parsed_name, &inverted3, &attr_type, &attr_size);
+  if (!streq(parsed_name, ""))
+  {
     get_bit(parsed_name, attr_type, &bitmask3);
     a_typeid3 = attr_type;
 
-    switch (db3) {
+    switch (db3)
+    {
     case graph_eDatabase_Gdh:
-      sts = dyn->graph->ref_object_info(
-          dyn->cycle, parsed_name, (void**)&p3, &subid3, size3, object, now);
+      sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&p3, &subid3, size3, object, now);
       if (EVEN(sts))
         return sts;
       break;
@@ -8956,39 +9408,48 @@ int GeDigFourShift::scan(grow_tObject object)
   if (!(p1 || p2 || p3))
     return 1;
 
-  if (p1) {
+  if (p1)
+  {
     if (!get_dig(&val1, p1, a_typeid1, bitmask1))
       return 1;
 
     if (inverted1)
       val1 = !val1;
-  } else
+  }
+  else
     val1 = 0;
 
-  if (p2) {
+  if (p2)
+  {
     if (!get_dig(&val2, p2, a_typeid2, bitmask2))
       return 1;
 
     if (inverted2)
       val2 = !val2;
-  } else
+  }
+  else
     val2 = 0;
 
-  if (p3) {
+  if (p3)
+  {
     if (!get_dig(&val3, p3, a_typeid3, bitmask3))
       return 1;
 
     if (inverted3)
       val3 = !val3;
-  } else
+  }
+  else
     val3 = 0;
 
-  if (!first_scan) {
-    if (old_value1 == val1 && old_value2 == val2 && old_value3 == val3) {
+  if (!first_scan)
+  {
+    if (old_value1 == val1 && old_value2 == val2 && old_value3 == val3)
+    {
       // No change since last time
       return 1;
     }
-  } else
+  }
+  else
     first_scan = false;
 
   if (val3)
@@ -9007,40 +9468,39 @@ int GeDigFourShift::scan(grow_tObject object)
   return 1;
 }
 
-int GeDigFourShift::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GeDigFourShift::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
   if (!streq(attribute1, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigFourShift.Attribute1\",\"" << attribute1 << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigFourShift.Attribute1\",\"" << attribute1
+       << "\");" << '\n';
   if (!streq(attribute2, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigFourShift.Attribute2\",\"" << attribute2 << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigFourShift.Attribute2\",\"" << attribute2
+       << "\");" << '\n';
   if (!streq(attribute3, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigFourShift.Attribute3\",\"" << attribute3 << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigFourShift.Attribute3\",\"" << attribute3
+       << "\");" << '\n';
   return 1;
 }
 
-int GeDigFourShift::export_java(
-    grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeDigFourShift::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
   return 1;
 }
 
-int GeDigFourShift::syntax_check(
-    grow_tObject object, int* error_cnt, int* warning_cnt)
+int GeDigFourShift::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
-  int types[] = { pwr_eType_Boolean, pwr_eType_Int32, pwr_eType_UInt32,
-    pwr_eType_Int64, pwr_eType_UInt64, graph_eType_Bit, pwr_eType_Float32,
-    pwr_eType_Float64, pwr_eType_String, 0 };
-  graph_eDatabase databases[]
-      = { graph_eDatabase_Ccm, graph_eDatabase_Gdh, graph_eDatabase__ };
-  dyn->syntax_check_attribute(object, "DigFourShift.Attribute1", attribute1, 1,
-      types, databases, error_cnt, warning_cnt);
-  dyn->syntax_check_attribute(object, "DigFourShift.Attribute2", attribute2, 1,
-      types, databases, error_cnt, warning_cnt);
-  dyn->syntax_check_attribute(object, "DigFourShift.Attribute3", attribute3, 1,
-      types, databases, error_cnt, warning_cnt);
+  int types[] = {pwr_eType_Boolean, pwr_eType_Int32,   pwr_eType_UInt32,  pwr_eType_Int64,  pwr_eType_UInt64,
+                 graph_eType_Bit,   pwr_eType_Float32, pwr_eType_Float64, pwr_eType_String, 0};
+  graph_eDatabase databases[] = {graph_eDatabase_Ccm, graph_eDatabase_Gdh, graph_eDatabase__};
+  dyn->syntax_check_attribute(object, "DigFourShift.Attribute1", attribute1, 1, types, databases, error_cnt,
+                              warning_cnt);
+  dyn->syntax_check_attribute(object, "DigFourShift.Attribute2", attribute2, 1, types, databases, error_cnt,
+                              warning_cnt);
+  dyn->syntax_check_attribute(object, "DigFourShift.Attribute3", attribute3, 1, types, databases, error_cnt,
+                              warning_cnt);
 
-  if (streq(attribute1, "") && streq(attribute2, "")
-      && streq(attribute3, "")) {
+  if (streq(attribute1, "") && streq(attribute2, "") && streq(attribute3, ""))
+  {
     dyn->graph->syntax_msg('E', object, "DigFourShift, no attribute");
     (*error_cnt)++;
   }
@@ -9049,18 +9509,16 @@ int GeDigFourShift::syntax_check(
 }
 
 GeScrollingText::GeScrollingText(GeDyn* e_dyn)
-    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_ScrollingText,
-          ge_mActionType1_No, ge_mActionType2_No, ge_eDynPrio_ScrollingText),
+    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_ScrollingText, ge_mActionType1_No, ge_mActionType2_No,
+                ge_eDynPrio_ScrollingText),
       direction(glow_eDirection_Right), speed(2), bounce(0), offset(0), tsize(0)
 {
   strcpy(attribute, "");
 }
 
 GeScrollingText::GeScrollingText(const GeScrollingText& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-          x.prio),
-      direction(x.direction), speed(x.speed), bounce(x.bounce), offset(0),
-      tsize(0)
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio),
+      direction(x.direction), speed(x.speed), bounce(x.bounce), offset(0), tsize(0)
 {
   strcpy(attribute, x.attribute);
 }
@@ -9092,11 +9550,11 @@ void GeScrollingText::get_attributes(attr_sItem* attrinfo, int* item_count)
   *item_count = i;
 }
 
-void GeScrollingText::set_attribute(
-    grow_tObject object, const char* attr_name, int* cnt)
+void GeScrollingText::set_attribute(grow_tObject object, const char* attr_name, int* cnt)
 {
   (*cnt)--;
-  if (*cnt == 0) {
+  if (*cnt == 0)
+  {
     char msg[200];
 
     strncpy(attribute, attr_name, sizeof(attribute));
@@ -9106,8 +9564,7 @@ void GeScrollingText::set_attribute(
   }
 }
 
-void GeScrollingText::replace_attribute(
-    char* from, char* to, int* cnt, int strict)
+void GeScrollingText::replace_attribute(char* from, char* to, int* cnt, int strict)
 {
   GeDyn::replace_attribute(attribute, sizeof(attribute), from, to, cnt, strict);
 }
@@ -9116,8 +9573,7 @@ void GeScrollingText::save(std::ofstream& fp)
 {
   fp << int(ge_eSave_ScrollingText) << '\n';
   fp << int(ge_eSave_ScrollingText_attribute) << FSPACE << attribute << '\n';
-  fp << int(ge_eSave_ScrollingText_direction) << FSPACE << int(direction)
-     << '\n';
+  fp << int(ge_eSave_ScrollingText_direction) << FSPACE << int(direction) << '\n';
   fp << int(ge_eSave_ScrollingText_speed) << FSPACE << speed << '\n';
   fp << int(ge_eSave_ScrollingText_bounce) << FSPACE << bounce << '\n';
   fp << int(ge_eSave_End) << '\n';
@@ -9130,8 +9586,10 @@ void GeScrollingText::open(std::ifstream& fp)
   char dummy[40];
   int tmp;
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeScrollingText: \"%d %s\"\n", type, dummy);
@@ -9139,7 +9597,8 @@ void GeScrollingText::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_ScrollingText:
       break;
     case ge_eSave_ScrollingText_attribute:
@@ -9168,8 +9627,7 @@ void GeScrollingText::open(std::ifstream& fp)
   }
 }
 
-int GeScrollingText::connect(
-    grow_tObject object, glow_sTraceData* trace_data, bool now)
+int GeScrollingText::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
 {
   int attr_type, attr_size, inverted;
   pwr_tAName parsed_name;
@@ -9178,13 +9636,13 @@ int GeScrollingText::connect(
 
   size = 4;
   p = 0;
-  db = dyn->parse_attr_name(
-      attribute, parsed_name, &inverted, &attr_type, &attr_size);
-  if (!streq(parsed_name, "")) {
-    switch (db) {
+  db = dyn->parse_attr_name(attribute, parsed_name, &inverted, &attr_type, &attr_size);
+  if (!streq(parsed_name, ""))
+  {
+    switch (db)
+    {
     case graph_eDatabase_Gdh:
-      sts = dyn->graph->ref_object_info(
-          dyn->cycle, parsed_name, (void**)&p, &subid, size, object, now);
+      sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&p, &subid, size, object, now);
       if (EVEN(sts))
         return sts;
       break;
@@ -9198,7 +9656,8 @@ int GeScrollingText::connect(
   }
 
   grow_MeasureNode(object, &ll_x, &ll_y, &ur_x, &ur_y);
-  switch (direction) {
+  switch (direction)
+  {
   case glow_eDirection_Left:
   case glow_eDirection_Right:
     osize = ur_x - ll_x;
@@ -9224,71 +9683,100 @@ int GeScrollingText::scan(grow_tObject object)
   double width, height;
   grow_GetAnnotationTextExtent(object, 1, &width, &height);
 
-  switch (direction) {
-  case glow_eDirection_Left: {
+  switch (direction)
+  {
+  case glow_eDirection_Left:
+  {
     offset -= speed * dyn->graph->animation_scan_time;
-    if (bounce) {
-      if (width < osize) {
-        if (offset < 0) {
+    if (bounce)
+    {
+      if (width < osize)
+      {
+        if (offset < 0)
+        {
           offset = -offset;
           direction = glow_eDirection_Right;
         }
-      } else {
-        if (offset < osize - width) {
+      }
+      else
+      {
+        if (offset < osize - width)
+        {
           offset += (osize - width) - offset;
           direction = glow_eDirection_Right;
         }
       }
-    } else {
+    }
+    else
+    {
       if (offset < -width)
         offset = osize;
     }
     grow_SetAnnotationTextOffset(object, 1, offset, 0);
     break;
   }
-  case glow_eDirection_Right: {
+  case glow_eDirection_Right:
+  {
     offset += speed * dyn->graph->animation_scan_time;
-    if (bounce) {
-      if (width < osize) {
-        if (offset > osize - width) {
+    if (bounce)
+    {
+      if (width < osize)
+      {
+        if (offset > osize - width)
+        {
           offset -= offset - (osize - width);
           direction = glow_eDirection_Left;
         }
-      } else {
-        if (offset > 0) {
+      }
+      else
+      {
+        if (offset > 0)
+        {
           offset = -offset;
           direction = glow_eDirection_Left;
         }
       }
-    } else {
+    }
+    else
+    {
       if (offset > osize)
         offset = -width;
     }
     grow_SetAnnotationTextOffset(object, 1, offset, 0);
     break;
   }
-  case glow_eDirection_Up: {
+  case glow_eDirection_Up:
+  {
     offset += speed * dyn->graph->animation_scan_time;
-    if (bounce) {
-      if (offset > osize - height) {
+    if (bounce)
+    {
+      if (offset > osize - height)
+      {
         offset -= offset - (osize - height);
         direction = glow_eDirection_Down;
       }
-    } else {
+    }
+    else
+    {
       if (offset > osize)
         offset = -height;
     }
     grow_SetAnnotationTextOffset(object, 1, 0, offset);
     break;
   }
-  case glow_eDirection_Down: {
+  case glow_eDirection_Down:
+  {
     offset -= speed * dyn->graph->animation_scan_time;
-    if (bounce) {
-      if (offset < 0) {
+    if (bounce)
+    {
+      if (offset < 0)
+      {
         offset = -offset;
         direction = glow_eDirection_Up;
       }
-    } else {
+    }
+    else
+    {
       if (offset < -height)
         offset = osize;
     }
@@ -9298,11 +9786,13 @@ int GeScrollingText::scan(grow_tObject object)
   default:;
   }
 
-  if (!first_scan) {
+  if (!first_scan)
+  {
     if (strncmp(old_value, (char*)p, size) == 0)
       // No change since last time
       return 1;
-  } else
+  }
+  else
     first_scan = false;
 
   memcpy(&old_value, p, MIN(size, (int)sizeof(old_value)));
@@ -9312,51 +9802,43 @@ int GeScrollingText::scan(grow_tObject object)
   return 1;
 }
 
-int GeScrollingText::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GeScrollingText::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
   if (!streq(attribute, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "ScrollingText.Attribute\",\"" << attribute << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "ScrollingText.Attribute\",\"" << attribute
+       << "\");" << '\n';
   if (direction != glow_eDirection_Right)
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "ScrollingText.Direction\"," << direction << ");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "ScrollingText.Direction\"," << direction
+       << ");" << '\n';
   if (!feq(speed, 2.0))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "ScrollingText.Speed\"," << dtostr(speed) << ");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "ScrollingText.Speed\"," << dtostr(speed)
+       << ");" << '\n';
   if (bounce != 0)
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "ScrollingText.Bounce\"," << bounce << ");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "ScrollingText.Bounce\"," << bounce << ");"
+       << '\n';
   return 1;
 }
 
-int GeScrollingText::export_java(
-    grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeScrollingText::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
   return 1;
 }
 
-int GeScrollingText::syntax_check(
-    grow_tObject object, int* error_cnt, int* warning_cnt)
+int GeScrollingText::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
-  int types[] = { pwr_eType_String, pwr_eType_Text, 0 };
-  graph_eDatabase databases[]
-      = { graph_eDatabase_Ccm, graph_eDatabase_Gdh, graph_eDatabase__ };
-  dyn->syntax_check_attribute(object, "ScrollingText.Attribute", attribute, 0,
-      types, databases, error_cnt, warning_cnt);
+  int types[] = {pwr_eType_String, pwr_eType_Text, 0};
+  graph_eDatabase databases[] = {graph_eDatabase_Ccm, graph_eDatabase_Gdh, graph_eDatabase__};
+  dyn->syntax_check_attribute(object, "ScrollingText.Attribute", attribute, 0, types, databases, error_cnt,
+                              warning_cnt);
 
   return 1;
 }
 
-void GeColorThemeLightness::get_attributes(
-    attr_sItem* attrinfo, int* item_count)
-{
-}
+void GeColorThemeLightness::get_attributes(attr_sItem* attrinfo, int* item_count) {}
 
-void GeColorThemeLightness::set_attribute(
-    grow_tObject object, const char* attr_name, int* cnt)
-{
-}
+void GeColorThemeLightness::set_attribute(grow_tObject object, const char* attr_name, int* cnt) {}
 
-void GeColorThemeLightness::replace_attribute(
-    char* from, char* to, int* cnt, int strict)
-{
-}
+void GeColorThemeLightness::replace_attribute(char* from, char* to, int* cnt, int strict) {}
 
 void GeColorThemeLightness::save(std::ofstream& fp)
 {
@@ -9370,8 +9852,10 @@ void GeColorThemeLightness::open(std::ifstream& fp)
   int end_found = 0;
   char dummy[40];
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeColorThemeLightness: \"%d %s\"\n", type, dummy);
@@ -9379,7 +9863,8 @@ void GeColorThemeLightness::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_ColorThemeLightness:
       break;
     case ge_eSave_End:
@@ -9394,17 +9879,13 @@ void GeColorThemeLightness::open(std::ifstream& fp)
   }
 }
 
-int GeColorThemeLightness::connect(
-    grow_tObject object, glow_sTraceData* trace_data, bool now)
+int GeColorThemeLightness::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
 {
   trace_data->p = &pdummy;
   return 1;
 }
 
-int GeColorThemeLightness::disconnect(grow_tObject object)
-{
-  return 1;
-}
+int GeColorThemeLightness::disconnect(grow_tObject object) { return 1; }
 
 int GeColorThemeLightness::scan(grow_tObject object)
 {
@@ -9412,17 +9893,14 @@ int GeColorThemeLightness::scan(grow_tObject object)
   return 1;
 }
 
-int GeColorThemeLightness::export_java(
-    grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeColorThemeLightness::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
   return 1;
 }
 
-GeDigBackgroundColor::GeDigBackgroundColor(
-    GeDyn* e_dyn, ge_mInstance e_instance)
-    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_DigBackgroundColor,
-          ge_mActionType1_No, ge_mActionType2_No,
-          ge_eDynPrio_DigBackgroundColor),
+GeDigBackgroundColor::GeDigBackgroundColor(GeDyn* e_dyn, ge_mInstance e_instance)
+    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_DigBackgroundColor, ge_mActionType1_No,
+                ge_mActionType2_No, ge_eDynPrio_DigBackgroundColor),
       color(glow_eDrawType_Inherit), bitmask(0)
 {
   strcpy(attribute, "");
@@ -9430,9 +9908,7 @@ GeDigBackgroundColor::GeDigBackgroundColor(
 }
 
 GeDigBackgroundColor::GeDigBackgroundColor(const GeDigBackgroundColor& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-          x.prio),
-      color(x.color)
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio), color(x.color)
 {
   strcpy(attribute, x.attribute);
   instance = x.instance;
@@ -9443,7 +9919,8 @@ void GeDigBackgroundColor::get_attributes(attr_sItem* attrinfo, int* item_count)
 {
   int i = *item_count;
 
-  if (instance == ge_mInstance_1) {
+  if (instance == ge_mInstance_1)
+  {
     strcpy(attrinfo[i].name, "DigBackgroundColor.Attribute");
     attrinfo[i].value = attribute;
     attrinfo[i].type = glow_eType_String;
@@ -9458,11 +9935,14 @@ void GeDigBackgroundColor::get_attributes(attr_sItem* attrinfo, int* item_count)
     attrinfo[i].value = &instance_mask;
     attrinfo[i].type = ge_eAttrType_InstanceMask;
     attrinfo[i++].size = sizeof(instance_mask);
-  } else {
+  }
+  else
+  {
     // Get instance number
     int inst = 1;
     unsigned int m = instance;
-    while (m > 1) {
+    while (m > 1)
+    {
       m = m >> 1;
       inst++;
     }
@@ -9480,28 +9960,29 @@ void GeDigBackgroundColor::get_attributes(attr_sItem* attrinfo, int* item_count)
   *item_count = i;
 }
 
-void GeDigBackgroundColor::set_attribute(
-    grow_tObject object, const char* attr_name, int* cnt)
+void GeDigBackgroundColor::set_attribute(grow_tObject object, const char* attr_name, int* cnt)
 {
   (*cnt)--;
-  if (*cnt == 0) {
+  if (*cnt == 0)
+  {
     char msg[200];
 
     strncpy(attribute, attr_name, sizeof(attribute));
-    if (instance == ge_mInstance_1) {
-      snprintf(
-          msg, sizeof(msg), "DigBackgroundColor.Attribute = %s", attr_name);
-    } else {
-      snprintf(msg, sizeof(msg), "DigBackgroundColor%d.Attribute = %s",
-          GeDyn::instance_to_number(instance), attr_name);
+    if (instance == ge_mInstance_1)
+    {
+      snprintf(msg, sizeof(msg), "DigBackgroundColor.Attribute = %s", attr_name);
+    }
+    else
+    {
+      snprintf(msg, sizeof(msg), "DigBackgroundColor%d.Attribute = %s", GeDyn::instance_to_number(instance),
+               attr_name);
     }
     msg[sizeof(msg) - 1] = 0;
     dyn->graph->message('I', msg);
   }
 }
 
-void GeDigBackgroundColor::replace_attribute(
-    char* from, char* to, int* cnt, int strict)
+void GeDigBackgroundColor::replace_attribute(char* from, char* to, int* cnt, int strict)
 {
   GeDyn::replace_attribute(attribute, sizeof(attribute), from, to, cnt, strict);
 }
@@ -9512,11 +9993,10 @@ int GeDigBackgroundColor::set_color(grow_tObject object, glow_eDrawType color)
 
   this->color = color;
   if (instance == ge_mInstance_1)
-    snprintf(msg, sizeof(msg), "DigBackgroundColor.Color = %s",
-        grow_ColorToName(this->color));
+    snprintf(msg, sizeof(msg), "DigBackgroundColor.Color = %s", grow_ColorToName(this->color));
   else
-    snprintf(msg, sizeof(msg), "DigBackgroundColor%d.Color = %s",
-        GeDyn::instance_to_number(instance), grow_ColorToName(this->color));
+    snprintf(msg, sizeof(msg), "DigBackgroundColor%d.Color = %s", GeDyn::instance_to_number(instance),
+             grow_ColorToName(this->color));
 
   msg[sizeof(msg) - 1] = 0;
   dyn->graph->message('I', msg);
@@ -9526,13 +10006,10 @@ int GeDigBackgroundColor::set_color(grow_tObject object, glow_eDrawType color)
 void GeDigBackgroundColor::save(std::ofstream& fp)
 {
   fp << int(ge_eSave_DigBackgroundColor) << '\n';
-  fp << int(ge_eSave_DigBackgroundColor_attribute) << FSPACE << attribute
-     << '\n';
+  fp << int(ge_eSave_DigBackgroundColor_attribute) << FSPACE << attribute << '\n';
   fp << int(ge_eSave_DigBackgroundColor_color) << FSPACE << int(color) << '\n';
-  fp << int(ge_eSave_DigBackgroundColor_instance) << FSPACE << int(instance)
-     << '\n';
-  fp << int(ge_eSave_DigBackgroundColor_instance_mask) << FSPACE
-     << int(instance_mask) << '\n';
+  fp << int(ge_eSave_DigBackgroundColor_instance) << FSPACE << int(instance) << '\n';
+  fp << int(ge_eSave_DigBackgroundColor_instance_mask) << FSPACE << int(instance_mask) << '\n';
   fp << int(ge_eSave_End) << '\n';
 }
 
@@ -9543,8 +10020,10 @@ void GeDigBackgroundColor::open(std::ifstream& fp)
   int tmp;
   char dummy[40];
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeDigBackgroundColor: \"%d %s\"\n", type, dummy);
@@ -9552,7 +10031,8 @@ void GeDigBackgroundColor::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_DigBackgroundColor:
       break;
     case ge_eSave_DigBackgroundColor_attribute:
@@ -9583,15 +10063,15 @@ void GeDigBackgroundColor::open(std::ifstream& fp)
   }
 }
 
-int GeDigBackgroundColor::connect(
-    grow_tObject object, glow_sTraceData* trace_data, bool now)
+int GeDigBackgroundColor::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
 {
   int attr_type, attr_size;
   pwr_tAName parsed_name;
   int sts;
 
   color = dyn->get_color2(object, color);
-  if (color < 0 || color >= glow_eDrawType__) {
+  if (color < 0 || color >= glow_eDrawType__)
+  {
     printf("** Color out of range, %s\n", attribute);
     p = 0;
     return 0;
@@ -9599,15 +10079,13 @@ int GeDigBackgroundColor::connect(
 
   size = 4;
   p = 0;
-  db = dyn->parse_attr_name(
-      attribute, parsed_name, &inverted, &attr_type, &attr_size);
+  db = dyn->parse_attr_name(attribute, parsed_name, &inverted, &attr_type, &attr_size);
   if (streq(parsed_name, ""))
     return 1;
 
   get_bit(parsed_name, attr_type, &bitmask);
 
-  sts = dyn->graph->ref_object_info(
-      dyn->cycle, parsed_name, (void**)&p, &subid, size, object, now);
+  sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&p, &subid, size, object, now);
   a_typeid = attr_type;
 
   if (EVEN(sts))
@@ -9639,20 +10117,26 @@ int GeDigBackgroundColor::scan(grow_tObject object)
   if (inverted)
     val = !val;
 
-  if (!first_scan) {
-    if (old_value == val && !dyn->reset_bgcolor) {
+  if (!first_scan)
+  {
+    if (old_value == val && !dyn->reset_bgcolor)
+    {
       // No change since last time
       if (val)
         dyn->ignore_bgcolor = true;
       return 1;
     }
-  } else
+  }
+  else
     first_scan = false;
 
-  if (val) {
+  if (val)
+  {
     grow_SetObjectBackgroundColor(object, color);
     dyn->ignore_bgcolor = true;
-  } else {
+  }
+  else
+  {
     grow_ResetObjectBackgroundColor(object);
     dyn->reset_bgcolor = true;
   }
@@ -9661,76 +10145,76 @@ int GeDigBackgroundColor::scan(grow_tObject object)
   return 1;
 }
 
-int GeDigBackgroundColor::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GeDigBackgroundColor::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
   char name[80];
 
   sprintf(name, "%sDigBackgroundColor", prefix);
 
   // Find first instance and print instance mask
-  for (GeDynElem *elem = dyn->elements; elem; elem = elem->next) {
-    if (elem->dyn_type2 == ge_mDynType2_DigBackgroundColor && elem->instance == ge_mInstance_1) {
-      if (instance ==  instance_highest(elem->instance_mask)) {
-	if (elem->instance_mask != 1)
-	  fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigBackgroundColor.Instances\"," << elem->instance_mask << ");" << '\n';
-	break;
+  for (GeDynElem* elem = dyn->elements; elem; elem = elem->next)
+  {
+    if (elem->dyn_type2 == ge_mDynType2_DigBackgroundColor && elem->instance == ge_mInstance_1)
+    {
+      if (instance == instance_highest(elem->instance_mask))
+      {
+        if (elem->instance_mask != 1)
+          fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigBackgroundColor.Instances\","
+             << elem->instance_mask << ");" << '\n';
+        break;
       }
     }
   }
   if (instance != ge_mInstance_1)
     sprintf(&name[strlen(name)], "%d", instance_number(instance));
   if (!streq(attribute, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << name << ".Attribute\",\"" << attribute << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".Attribute\",\"" << attribute << "\");"
+       << '\n';
   if (color != glow_eDrawType_Inherit)
     fp << indentation << "SetObjectAttribute(id,\"" << name << ".Color\"," << color << ");" << '\n';
-  
+
   return 1;
 }
 
-int GeDigBackgroundColor::export_java(
-    grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeDigBackgroundColor::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
   return 1;
 }
 
-int GeDigBackgroundColor::syntax_check(
-    grow_tObject object, int* error_cnt, int* warning_cnt)
+int GeDigBackgroundColor::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
   char name[40];
 
   if (instance == 1)
     strcpy(name, "DigBackgroundColor.Attribute");
   else
-    sprintf(name, "DigBackgroundColor%d.Attribute",
-        GeDyn::instance_to_number(instance));
+    sprintf(name, "DigBackgroundColor%d.Attribute", GeDyn::instance_to_number(instance));
 
   glow_eDrawType tcolor = dyn->get_color1(object, color);
-  if (tcolor < 0 || tcolor >= glow_eDrawType__) {
+  if (tcolor < 0 || tcolor >= glow_eDrawType__)
+  {
     dyn->graph->syntax_msg('E', object, "Color out or range");
     (*error_cnt)++;
   }
 
-  int types[] = { pwr_eType_Boolean, pwr_eType_Int32, pwr_eType_UInt32,
-    pwr_eType_Int64, pwr_eType_UInt64, graph_eType_Bit, pwr_eType_Float32,
-    pwr_eType_Float64, pwr_eType_String, 0 };
-  graph_eDatabase databases[] = { graph_eDatabase_Gdh, graph_eDatabase__ };
-  dyn->syntax_check_attribute(
-      object, name, attribute, 0, types, databases, error_cnt, warning_cnt);
+  int types[] = {pwr_eType_Boolean, pwr_eType_Int32,   pwr_eType_UInt32,  pwr_eType_Int64,  pwr_eType_UInt64,
+                 graph_eType_Bit,   pwr_eType_Float32, pwr_eType_Float64, pwr_eType_String, 0};
+  graph_eDatabase databases[] = {graph_eDatabase_Gdh, graph_eDatabase__};
+  dyn->syntax_check_attribute(object, name, attribute, 0, types, databases, error_cnt, warning_cnt);
 
   return 1;
 }
 
 GeDigSwap::GeDigSwap(GeDyn* e_dyn, ge_mInstance e_instance)
-    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_DigSwap,
-          ge_mActionType1_No, ge_mActionType2_No, ge_eDynPrio_DigSwap),
+    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_DigSwap, ge_mActionType1_No, ge_mActionType2_No,
+                ge_eDynPrio_DigSwap),
       reset_value(0), bitmask(0), since_reset(0)
 {
   strcpy(attribute, "");
 }
 
 GeDigSwap::GeDigSwap(const GeDigSwap& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-          x.prio),
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio),
       reset_value(x.reset_value), since_reset(x.since_reset)
 {
   strcpy(attribute, x.attribute);
@@ -9753,19 +10237,21 @@ void GeDigSwap::get_attributes(attr_sItem* attrinfo, int* item_count)
   *item_count = i;
 }
 
-void GeDigSwap::set_attribute(
-    grow_tObject object, const char* attr_name, int* cnt)
+void GeDigSwap::set_attribute(grow_tObject object, const char* attr_name, int* cnt)
 {
   (*cnt)--;
-  if (*cnt == 0) {
+  if (*cnt == 0)
+  {
     char msg[200];
 
     strncpy(attribute, attr_name, sizeof(attribute));
-    if (instance == ge_mInstance_1) {
+    if (instance == ge_mInstance_1)
+    {
       snprintf(msg, sizeof(msg), "DigSwap.Attribute = %s", attr_name);
-    } else {
-      snprintf(msg, sizeof(msg), "DigSwap%d.Attribute = %s",
-          GeDyn::instance_to_number(instance), attr_name);
+    }
+    else
+    {
+      snprintf(msg, sizeof(msg), "DigSwap%d.Attribute = %s", GeDyn::instance_to_number(instance), attr_name);
     }
     msg[sizeof(msg) - 1] = 0;
     dyn->graph->message('I', msg);
@@ -9791,8 +10277,10 @@ void GeDigSwap::open(std::ifstream& fp)
   int end_found = 0;
   char dummy[40];
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeDigSwap: \"%d %s\"\n", type, dummy);
@@ -9800,7 +10288,8 @@ void GeDigSwap::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_DigSwap:
       break;
     case ge_eSave_DigSwap_attribute:
@@ -9822,8 +10311,7 @@ void GeDigSwap::open(std::ifstream& fp)
   }
 }
 
-int GeDigSwap::connect(
-    grow_tObject object, glow_sTraceData* trace_data, bool now)
+int GeDigSwap::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
 {
   int attr_type, attr_size;
   pwr_tAName parsed_name;
@@ -9831,23 +10319,21 @@ int GeDigSwap::connect(
 
   size = 4;
   p = 0;
-  db = dyn->parse_attr_name(
-      attribute, parsed_name, &inverted, &attr_type, &attr_size);
+  db = dyn->parse_attr_name(attribute, parsed_name, &inverted, &attr_type, &attr_size);
   if (streq(parsed_name, ""))
     return 1;
 
   get_bit(parsed_name, attr_type, &bitmask);
 
-  switch (db) {
+  switch (db)
+  {
   case graph_eDatabase_Gdh:
-    sts = dyn->graph->ref_object_info(
-        dyn->cycle, parsed_name, (void**)&p, &subid, size, object, now);
+    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&p, &subid, size, object, now);
     if (EVEN(sts))
       return sts;
     break;
   case graph_eDatabase_Local:
-    p = (pwr_tBoolean*)dyn->graph->localdb_ref_or_create(
-        parsed_name, attr_type);
+    p = (pwr_tBoolean*)dyn->graph->localdb_ref_or_create(parsed_name, attr_type);
     sts = 1;
     break;
   default:;
@@ -9877,7 +10363,8 @@ int GeDigSwap::scan(grow_tObject object)
   if (!get_dig(&val, p, a_typeid, bitmask))
     return 1;
 
-  if (first_scan) {
+  if (first_scan)
+  {
     old_value = val;
     first_scan = 0;
     return 1;
@@ -9886,33 +10373,40 @@ int GeDigSwap::scan(grow_tObject object)
   if (inverted)
     val = !val;
 
-  if (reset_value) {
+  if (reset_value)
+  {
     if (since_reset < 100)
       since_reset++;
     if (since_reset < 3)
       return 1;
-  } else {
+  }
+  else
+  {
     if (old_value == val)
       // No change since last time
       return 1;
   }
 
-  if (val) {
-    if (reset_value) {
+  if (val)
+  {
+    if (reset_value)
+    {
       int attr_type, attr_size;
       pwr_tAName parsed_name;
       pwr_tStatus sts;
 
       since_reset = 0;
-      dyn->parse_attr_name(
-          attribute, parsed_name, &inverted, &attr_type, &attr_size);
-      switch (attr_type) {
-      case pwr_eType_Boolean: {
+      dyn->parse_attr_name(attribute, parsed_name, &inverted, &attr_type, &attr_size);
+      switch (attr_type)
+      {
+      case pwr_eType_Boolean:
+      {
         pwr_tBoolean ivalue = 0;
-        switch (db) {
-        case graph_eDatabase_Local: {
-          sts = dyn->graph->localdb_set_value(
-              parsed_name, &ivalue, sizeof(ivalue));
+        switch (db)
+        {
+        case graph_eDatabase_Local:
+        {
+          sts = dyn->graph->localdb_set_value(parsed_name, &ivalue, sizeof(ivalue));
           if (EVEN(sts))
             printf("DigSwap error: %s\n", attribute);
           break;
@@ -9939,47 +10433,40 @@ int GeDigSwap::scan(grow_tObject object)
   return 1;
 }
 
-int GeDigSwap::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GeDigSwap::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
   if (!streq(attribute, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigSwap.Attribute\",\"" << attribute << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigSwap.Attribute\",\"" << attribute
+       << "\");" << '\n';
   if (reset_value != 0)
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigSwap.ResetValue\"," << reset_value << ");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigSwap.ResetValue\"," << reset_value
+       << ");" << '\n';
   return 1;
 }
 
-int GeDigSwap::export_java(
-    grow_tObject object, std::ofstream& fp, bool first, char* var_name)
-{
-  return 1;
-}
+int GeDigSwap::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name) { return 1; }
 
-int GeDigSwap::syntax_check(
-    grow_tObject object, int* error_cnt, int* warning_cnt)
+int GeDigSwap::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
-  int types[] = { pwr_eType_Boolean, pwr_eType_Int32, pwr_eType_UInt32,
-    pwr_eType_Int64, pwr_eType_UInt64, graph_eType_Bit, pwr_eType_Float32,
-    pwr_eType_Float64, pwr_eType_String, 0 };
-  graph_eDatabase databases[]
-      = { graph_eDatabase_Gdh, graph_eDatabase_Local, graph_eDatabase__ };
-  dyn->syntax_check_attribute(object, "DigSwap.Attribute", attribute, 0, types,
-      databases, error_cnt, warning_cnt);
+  int types[] = {pwr_eType_Boolean, pwr_eType_Int32,   pwr_eType_UInt32,  pwr_eType_Int64,  pwr_eType_UInt64,
+                 graph_eType_Bit,   pwr_eType_Float32, pwr_eType_Float64, pwr_eType_String, 0};
+  graph_eDatabase databases[] = {graph_eDatabase_Gdh, graph_eDatabase_Local, graph_eDatabase__};
+  dyn->syntax_check_attribute(object, "DigSwap.Attribute", attribute, 0, types, databases, error_cnt,
+                              warning_cnt);
 
   return 1;
 }
 
 GeAnimation::GeAnimation(GeDyn* e_dyn)
-    : GeDynElem(e_dyn, ge_mDynType1_Animation, ge_mDynType2_No,
-          ge_mActionType1_No, ge_mActionType2_No, ge_eDynPrio_Animation),
+    : GeDynElem(e_dyn, ge_mDynType1_Animation, ge_mDynType2_No, ge_mActionType1_No, ge_mActionType2_No,
+                ge_eDynPrio_Animation),
       sequence(ge_eAnimSequence_Inherit)
 {
   strcpy(attribute, "");
 }
 
 GeAnimation::GeAnimation(const GeAnimation& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-          x.prio),
-      sequence(x.sequence)
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio), sequence(x.sequence)
 {
   strcpy(attribute, x.attribute);
 }
@@ -10009,11 +10496,11 @@ void GeAnimation::save(std::ofstream& fp)
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeAnimation::set_attribute(
-    grow_tObject object, const char* attr_name, int* cnt)
+void GeAnimation::set_attribute(grow_tObject object, const char* attr_name, int* cnt)
 {
   (*cnt)--;
-  if (*cnt == 0) {
+  if (*cnt == 0)
+  {
     char msg[200];
 
     strncpy(attribute, attr_name, sizeof(attribute));
@@ -10035,8 +10522,10 @@ void GeAnimation::open(std::ifstream& fp)
   int tmp;
   char dummy[40];
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeAnimation: \"%d %s\"\n", type, dummy);
@@ -10044,7 +10533,8 @@ void GeAnimation::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_Animation:
       break;
     case ge_eSave_Animation_attribute:
@@ -10067,8 +10557,7 @@ void GeAnimation::open(std::ifstream& fp)
   }
 }
 
-int GeAnimation::connect(
-    grow_tObject object, glow_sTraceData* trace_data, bool now)
+int GeAnimation::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
 {
   int attr_type, attr_size;
   pwr_tAName parsed_name;
@@ -10077,16 +10566,14 @@ int GeAnimation::connect(
 
   size = 4;
   p = 0;
-  db = dyn->parse_attr_name(
-      attribute, parsed_name, &inverted, &attr_type, &attr_size);
+  db = dyn->parse_attr_name(attribute, parsed_name, &inverted, &attr_type, &attr_size);
   if (streq(parsed_name, ""))
     return 1;
 
   get_bit(parsed_name, attr_type, &bitmask);
   a_typeid = attr_type;
 
-  sts = dyn->graph->ref_object_info(
-      dyn->cycle, parsed_name, (void**)&p, &subid, size, object, now);
+  sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&p, &subid, size, object, now);
   if (EVEN(sts))
     return sts;
 
@@ -10123,54 +10610,69 @@ int GeAnimation::scan(grow_tObject object)
   if (inverted)
     val = !val;
 
-  if (first_scan) {
+  if (first_scan)
+  {
     animation_count = 0;
     animation_direction = 0;
     first_scan = false;
-    if (sequence == ge_eAnimSequence_Dig) {
+    if (sequence == ge_eAnimSequence_Dig)
+    {
       if (val)
         grow_SetObjectLastNodeClass(object);
       old_value = val;
     }
-    else if (sequence == ge_eAnimSequence_CycleLast) {
+    else if (sequence == ge_eAnimSequence_CycleLast)
+    {
       if (!val)
-	grow_SetObjectLastNodeClass(object);
+        grow_SetObjectLastNodeClass(object);
       old_value = val;
     }
   }
 
-  if (sequence == ge_eAnimSequence_Dig) {
-    if (old_value != val) {
+  if (sequence == ge_eAnimSequence_Dig)
+  {
+    if (old_value != val)
+    {
       // Start animation
-      if (val) {
+      if (val)
+      {
         animation_count = 0;
         animation_direction = 1;
-      } else if (!val) {
+      }
+      else if (!val)
+      {
         animation_direction = 2;
         animation_count = 0;
       }
     }
 
-    if (animation_direction != 0) {
+    if (animation_direction != 0)
+    {
       grow_GetObjectAnimationCount(object, &max_count);
       animation_count++;
-      if (animation_count >= max_count) {
+      if (animation_count >= max_count)
+      {
         // Shift nodeclass
-        if (animation_direction == 1) {
+        if (animation_direction == 1)
+        {
           // Shift forward
 
           sts = grow_SetObjectNextNodeClass(object);
-          if (EVEN(sts)) {
+          if (EVEN(sts))
+          {
             // End of animation
             animation_count = 0;
             animation_direction = 0;
           }
           animation_count = 0;
-        } else {
+        }
+        else
+        {
           // Shift backward
 
           sts = grow_SetObjectPrevNodeClass(object);
-          if (EVEN(sts)) {
+          if (EVEN(sts))
+          {
             // End of animation
             animation_count = 0;
             animation_direction = 0;
@@ -10179,9 +10681,13 @@ int GeAnimation::scan(grow_tObject object)
         }
       }
     }
-  } else {
-    if (val) {
-      if (animation_direction == 0) {
+  }
+  else
+  {
+    if (val)
+    {
+      if (animation_direction == 0)
+      {
         // Animation has been stopped
         animation_count = 0;
         animation_direction = 1;
@@ -10189,39 +10695,52 @@ int GeAnimation::scan(grow_tObject object)
 
       grow_GetObjectAnimationCount(object, &max_count);
       animation_count++;
-      if (animation_count >= max_count) {
+      if (animation_count >= max_count)
+      {
         // Shift nodeclass
-        if (animation_direction == 1) {
+        if (animation_direction == 1)
+        {
           // Shift forward
-	  if (sequence == ge_eAnimSequence_CycleLast) {
-	    grow_tNodeClass next_nc;
+          if (sequence == ge_eAnimSequence_CycleLast)
+          {
+            grow_tNodeClass next_nc;
 
- 	    sts = grow_GetObjectNextNodeClass(object, &next_nc);
-	    if (EVEN(sts) || grow_IsLastNodeClass(next_nc)) {
+            sts = grow_GetObjectNextNodeClass(object, &next_nc);
+            if (EVEN(sts) || grow_IsLastNodeClass(next_nc))
+            {
               // Start from the beginning again
-	      grow_SetObjectFirstNodeClass(object);
-	    }
-	    else
-	      sts = grow_SetObjectNextNodeClass(object);
-	  } else {
-	    sts = grow_SetObjectNextNodeClass(object);
-	    if (EVEN(sts)) {
-	      if (sequence == ge_eAnimSequence_Cycle) {
-		// Start from the beginning again
-		grow_SetObjectNodeClassByIndex(object, 1);
-	      } else {
-		// Change direction
-		animation_direction = 2;
-		sts = grow_SetObjectPrevNodeClass(object);
-	      }
-	    }
-	  }
+              grow_SetObjectFirstNodeClass(object);
+            }
+            else
+              sts = grow_SetObjectNextNodeClass(object);
+          }
+          else
+          {
+            sts = grow_SetObjectNextNodeClass(object);
+            if (EVEN(sts))
+            {
+              if (sequence == ge_eAnimSequence_Cycle)
+              {
+                // Start from the beginning again
+                grow_SetObjectNodeClassByIndex(object, 1);
+              }
+              else
+              {
+                // Change direction
+                animation_direction = 2;
+                sts = grow_SetObjectPrevNodeClass(object);
+              }
+            }
+          }
           animation_count = 0;
-        } else {
+        }
+        else
+        {
           // Shift backward
 
           sts = grow_SetObjectPrevNodeClass(object);
-          if (EVEN(sts)) {
+          if (EVEN(sts))
+          {
             // Change direction
             animation_direction = 1;
             sts = grow_SetObjectNextNodeClass(object);
@@ -10229,14 +10748,17 @@ int GeAnimation::scan(grow_tObject object)
           animation_count = 0;
         }
       }
-    } else {
-      if (animation_direction != 0) {
+    }
+    else
+    {
+      if (animation_direction != 0)
+      {
         // Stop and reset animation
         animation_direction = 0;
-	if (sequence == ge_eAnimSequence_CycleLast)
-	  grow_SetObjectLastNodeClass(object);
-	else
-	  grow_SetObjectFirstNodeClass(object);
+        if (sequence == ge_eAnimSequence_CycleLast)
+          grow_SetObjectLastNodeClass(object);
+        else
+          grow_SetObjectFirstNodeClass(object);
       }
     }
   }
@@ -10244,17 +10766,18 @@ int GeAnimation::scan(grow_tObject object)
   return 1;
 }
 
-int GeAnimation::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GeAnimation::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
   if (!streq(attribute, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Animation.Attribute\",\"" << attribute << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Animation.Attribute\",\"" << attribute
+       << "\");" << '\n';
   if (sequence != ge_eAnimSequence_Inherit)
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Animation.Sequence\"," << sequence << ");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Animation.Sequence\"," << sequence << ");"
+       << '\n';
   return 1;
 }
 
-int GeAnimation::export_java(
-    grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeAnimation::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
   int seq, attr2;
 
@@ -10267,20 +10790,17 @@ int GeAnimation::export_java(
     fp << "      ";
   else
     fp << "      ,";
-  fp << "new GeDynAnimation(" << var_name << ".dd, \"" << attribute << "\","
-     << seq << ")\n";
+  fp << "new GeDynAnimation(" << var_name << ".dd, \"" << attribute << "\"," << seq << ")\n";
   return 1;
 }
 
-int GeAnimation::syntax_check(
-    grow_tObject object, int* error_cnt, int* warning_cnt)
+int GeAnimation::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
-  int types[] = { pwr_eType_Boolean, pwr_eType_Int32, pwr_eType_UInt32,
-    pwr_eType_Int64, pwr_eType_UInt64, graph_eType_Bit, pwr_eType_Float32,
-    pwr_eType_Float64, pwr_eType_String, 0 };
-  graph_eDatabase databases[] = { graph_eDatabase_Gdh, graph_eDatabase__ };
-  dyn->syntax_check_attribute(object, "Animation.Attribute", attribute, 0,
-      types, databases, error_cnt, warning_cnt);
+  int types[] = {pwr_eType_Boolean, pwr_eType_Int32,   pwr_eType_UInt32,  pwr_eType_Int64,  pwr_eType_UInt64,
+                 graph_eType_Bit,   pwr_eType_Float32, pwr_eType_Float64, pwr_eType_String, 0};
+  graph_eDatabase databases[] = {graph_eDatabase_Gdh, graph_eDatabase__};
+  dyn->syntax_check_attribute(object, "Animation.Attribute", attribute, 0, types, databases, error_cnt,
+                              warning_cnt);
 
   return 1;
 }
@@ -10297,8 +10817,10 @@ void GeVideo::open(std::ifstream& fp)
   int end_found = 0;
   char dummy[40];
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeVideo: \"%d %s\"\n", type, dummy);
@@ -10306,7 +10828,8 @@ void GeVideo::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_Video:
       break;
     case ge_eSave_End:
@@ -10327,10 +10850,7 @@ int GeVideo::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
   return 1;
 }
 
-int GeVideo::disconnect(grow_tObject object)
-{
-  return 1;
-}
+int GeVideo::disconnect(grow_tObject object) { return 1; }
 
 int GeVideo::scan(grow_tObject object)
 {
@@ -10339,8 +10859,10 @@ int GeVideo::scan(grow_tObject object)
 
   grow_GetGroupObjectList(object, &objectlist, &object_cnt);
 
-  for (int i = 0; i < object_cnt; i++) {
-    if (grow_GetObjectType(objectlist[i]) == glow_eObjectType_GrowImage) {
+  for (int i = 0; i < object_cnt; i++)
+  {
+    if (grow_GetObjectType(objectlist[i]) == glow_eObjectType_GrowImage)
+    {
       grow_ImageUpdate(objectlist[i]);
       break;
     }
@@ -10353,7 +10875,8 @@ int GeVideo::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
   grow_tObject* objectlist;
   int object_cnt;
 
-  if (grow_GetObjectType(object) != glow_eObjectType_GrowGroup) {
+  if (grow_GetObjectType(object) != glow_eObjectType_GrowGroup)
+  {
     dyn->graph->syntax_msg('E', object, "Video, object isn't a group");
     (*error_cnt)++;
     return 1;
@@ -10363,13 +10886,16 @@ int GeVideo::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
   grow_GetGroupObjectList(object, &objectlist, &object_cnt);
 
   int found = 0;
-  for (int i = 0; i < object_cnt; i++) {
-    if (grow_GetObjectType(objectlist[i]) == glow_eObjectType_GrowImage) {
+  for (int i = 0; i < object_cnt; i++)
+  {
+    if (grow_GetObjectType(objectlist[i]) == glow_eObjectType_GrowImage)
+    {
       found = 1;
       break;
     }
   }
-  if (!found) {
+  if (!found)
+  {
     dyn->graph->syntax_msg('E', object, "Video, no image found in group");
     (*error_cnt)++;
   }
@@ -10377,8 +10903,8 @@ int GeVideo::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 }
 
 GeBar::GeBar(GeDyn* e_dyn)
-    : GeDynElem(e_dyn, ge_mDynType1_Bar, ge_mDynType2_No, ge_mActionType1_No,
-          ge_mActionType2_No, ge_eDynPrio_Bar),
+    : GeDynElem(e_dyn, ge_mDynType1_Bar, ge_mDynType2_No, ge_mActionType1_No, ge_mActionType2_No,
+                ge_eDynPrio_Bar),
       min_value_p(0), max_value_p(0), old_min_value(0), old_max_value(0)
 {
   strcpy(attribute, "");
@@ -10387,9 +10913,8 @@ GeBar::GeBar(GeDyn* e_dyn)
 }
 
 GeBar::GeBar(const GeBar& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-          x.prio),
-      min_value_p(0), max_value_p(0), old_min_value(0), old_max_value(0)
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio), min_value_p(0),
+      max_value_p(0), old_min_value(0), old_max_value(0)
 {
   strcpy(attribute, x.attribute);
   strcpy(minvalue_attr, x.minvalue_attr);
@@ -10421,7 +10946,8 @@ void GeBar::get_attributes(attr_sItem* attrinfo, int* item_count)
 void GeBar::set_attribute(grow_tObject object, const char* attr_name, int* cnt)
 {
   (*cnt)--;
-  if (*cnt == 0) {
+  if (*cnt == 0)
+  {
     char msg[200];
 
     strncpy(attribute, attr_name, sizeof(attribute));
@@ -10451,8 +10977,10 @@ void GeBar::open(std::ifstream& fp)
   int end_found = 0;
   char dummy[40];
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeBar: \"%d %s\"\n", type, dummy);
@@ -10460,7 +10988,8 @@ void GeBar::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_Bar:
       break;
     case ge_eSave_Bar_attribute:
@@ -10496,22 +11025,20 @@ int GeBar::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
 
   size = 4;
   p = 0;
-  db = dyn->parse_attr_name(
-      attribute, parsed_name, &inverted, &attr_type, &attr_size);
+  db = dyn->parse_attr_name(attribute, parsed_name, &inverted, &attr_type, &attr_size);
   if (streq(parsed_name, ""))
     return 1;
 
-  switch (db) {
+  switch (db)
+  {
   case graph_eDatabase_Gdh:
-    sts = dyn->graph->ref_object_info(
-        dyn->cycle, parsed_name, (void**)&p, &subid, attr_size, object, now);
+    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&p, &subid, attr_size, object, now);
     if (EVEN(sts))
       return sts;
     bar_typeid = attr_type;
     break;
   case graph_eDatabase_Local:
-    p = (pwr_tFloat32*)dyn->graph->localdb_ref_or_create(
-        parsed_name, attr_type);
+    p = (pwr_tFloat32*)dyn->graph->localdb_ref_or_create(parsed_name, attr_type);
     bar_typeid = attr_type;
   case graph_eDatabase_User:
     bar_typeid = attr_type;
@@ -10520,34 +11047,34 @@ int GeBar::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
   }
 
   min_value_p = 0;
-  min_value_db = dyn->parse_attr_name(
-      minvalue_attr, parsed_name, &inverted, &attr_type, &attr_size);
-  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32) {
-    switch (min_value_db) {
+  min_value_db = dyn->parse_attr_name(minvalue_attr, parsed_name, &inverted, &attr_type, &attr_size);
+  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32)
+  {
+    switch (min_value_db)
+    {
     case graph_eDatabase_Gdh:
-      sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name,
-          (void**)&min_value_p, &min_value_subid, attr_size, object, now);
+      sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&min_value_p, &min_value_subid,
+                                        attr_size, object, now);
       break;
     case graph_eDatabase_Local:
-      min_value_p = (pwr_tFloat32*)dyn->graph->localdb_ref_or_create(
-          parsed_name, attr_type);
+      min_value_p = (pwr_tFloat32*)dyn->graph->localdb_ref_or_create(parsed_name, attr_type);
       break;
     default:;
     }
   }
 
   max_value_p = 0;
-  max_value_db = dyn->parse_attr_name(
-      maxvalue_attr, parsed_name, &inverted, &attr_type, &attr_size);
-  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32) {
-    switch (min_value_db) {
+  max_value_db = dyn->parse_attr_name(maxvalue_attr, parsed_name, &inverted, &attr_type, &attr_size);
+  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32)
+  {
+    switch (min_value_db)
+    {
     case graph_eDatabase_Gdh:
-      sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name,
-          (void**)&max_value_p, &max_value_subid, attr_size, object, now);
+      sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&max_value_p, &max_value_subid,
+                                        attr_size, object, now);
       break;
     case graph_eDatabase_Local:
-      max_value_p = (pwr_tFloat32*)dyn->graph->localdb_ref_or_create(
-          parsed_name, attr_type);
+      max_value_p = (pwr_tFloat32*)dyn->graph->localdb_ref_or_create(parsed_name, attr_type);
       break;
     default:;
     }
@@ -10564,11 +11091,13 @@ int GeBar::disconnect(grow_tObject object)
     gdh_UnrefObjectInfo(subid);
   p = 0;
 
-  if (min_value_p && min_value_db == graph_eDatabase_Gdh) {
+  if (min_value_p && min_value_db == graph_eDatabase_Gdh)
+  {
     gdh_UnrefObjectInfo(min_value_subid);
     min_value_p = 0;
   }
-  if (max_value_p && max_value_db == graph_eDatabase_Gdh) {
+  if (max_value_p && max_value_db == graph_eDatabase_Gdh)
+  {
     gdh_UnrefObjectInfo(max_value_subid);
     max_value_p = 0;
   }
@@ -10580,31 +11109,36 @@ int GeBar::scan(grow_tObject object)
   if (!p)
     return 1;
 
-  if (max_value_p || min_value_p) {
+  if (max_value_p || min_value_p)
+  {
     bool update = false;
 
     pwr_tFloat32 maxval;
     pwr_tFloat32 minval;
-    if (max_value_p) {
+    if (max_value_p)
+    {
       maxval = *max_value_p;
       if (!feqf(maxval, old_max_value))
-	update = true;
+        update = true;
     }
-    if (min_value_p) {
+    if (min_value_p)
+    {
       minval = *min_value_p;
       if (!feqf(minval, old_min_value))
-	update = true;
+        update = true;
     }
-    if (update) {
+    if (update)
+    {
       double minvald, maxvald;
       grow_GetBarRange(object, &minvald, &maxvald);
 
       if (!min_value_p)
-	minval = minvald;
+        minval = minvald;
       if (!max_value_p)
-	maxval = maxvald;
+        maxval = maxvald;
 
-      if (fabsf(maxval - minval) > FLT_EPSILON) {
+      if (fabsf(maxval - minval) > FLT_EPSILON)
+      {
         grow_SetBarRange(object, minval, maxval);
       }
       old_min_value = minval;
@@ -10612,27 +11146,33 @@ int GeBar::scan(grow_tObject object)
     }
   }
 
-  if (!first_scan) {
+  if (!first_scan)
+  {
     if (memcmp(&old_value, p, size) == 0)
       // No change since last time
       return 1;
-  } else
+  }
+  else
     first_scan = false;
 
-  switch (bar_typeid) {
-  case pwr_eType_Float32: {
+  switch (bar_typeid)
+  {
+  case pwr_eType_Float32:
+  {
     pwr_tFloat32 val = *(pwr_tFloat32*)p;
     grow_SetBarValue(object, double(val));
     memcpy(&old_value, &val, size);
     break;
   }
-  case pwr_eType_UInt32: {
+  case pwr_eType_UInt32:
+  {
     pwr_tUInt32 val = *(pwr_tUInt32*)p;
     grow_SetBarValue(object, double(val));
     memcpy(&old_value, &val, size);
     break;
   }
-  case pwr_eType_Int32: {
+  case pwr_eType_Int32:
+  {
     pwr_tInt32 val = *(pwr_tInt32*)p;
     grow_SetBarValue(object, double(val));
     memcpy(&old_value, &val, size);
@@ -10643,34 +11183,36 @@ int GeBar::scan(grow_tObject object)
   return 1;
 }
 
-int GeBar::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GeBar::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
   if (!streq(attribute, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Bar.Attribute\",\"" << attribute << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Bar.Attribute\",\"" << attribute << "\");"
+       << '\n';
   if (!streq(minvalue_attr, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Bar.MinValueAttr\",\"" << minvalue_attr << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Bar.MinValueAttr\",\"" << minvalue_attr
+       << "\");" << '\n';
   if (!streq(maxvalue_attr, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Bar.MaxValueAttr\",\"" << maxvalue_attr << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Bar.MaxValueAttr\",\"" << maxvalue_attr
+       << "\");" << '\n';
   return 1;
 }
 
 int GeBar::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
-  int types[] = { pwr_eType_Int32, pwr_eType_UInt32, pwr_eType_Float32, 0 };
-  graph_eDatabase databases[] = { graph_eDatabase_Gdh, graph_eDatabase_Local,
-    graph_eDatabase_User, graph_eDatabase__ };
-  dyn->syntax_check_attribute(object, "Bar.Attribute", attribute, 0, types,
-      databases, error_cnt, warning_cnt);
+  int types[] = {pwr_eType_Int32, pwr_eType_UInt32, pwr_eType_Float32, 0};
+  graph_eDatabase databases[] = {graph_eDatabase_Gdh, graph_eDatabase_Local, graph_eDatabase_User,
+                                 graph_eDatabase__};
+  dyn->syntax_check_attribute(object, "Bar.Attribute", attribute, 0, types, databases, error_cnt,
+                              warning_cnt);
 
   return 1;
 }
 
 GeTrend::GeTrend(GeDyn* e_dyn)
-    : GeDynElem(e_dyn, ge_mDynType1_Trend, ge_mDynType2_No, ge_mActionType1_No,
-          ge_mActionType2_No, ge_eDynPrio_Trend),
-      min_value1_p(0), max_value1_p(0), old_min_value1(0), old_max_value1(0),
-      min_value2_p(0), max_value2_p(0), old_min_value2(0), old_max_value2(0),
-      hold_p(0), timerange_p(0), old_timerange(0),
+    : GeDynElem(e_dyn, ge_mDynType1_Trend, ge_mDynType2_No, ge_mActionType1_No, ge_mActionType2_No,
+                ge_eDynPrio_Trend),
+      min_value1_p(0), max_value1_p(0), old_min_value1(0), old_max_value1(0), min_value2_p(0),
+      max_value2_p(0), old_min_value2(0), old_max_value2(0), hold_p(0), timerange_p(0), old_timerange(0),
       mark1_color(glow_eDrawType_Inherit), mark2_color(glow_eDrawType_Inherit)
 {
   strcpy(attribute1, "");
@@ -10686,8 +11228,7 @@ GeTrend::GeTrend(GeDyn* e_dyn)
 }
 
 GeTrend::GeTrend(const GeTrend& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-          x.prio),
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio),
       mark1_color(x.mark1_color), mark2_color(x.mark2_color)
 {
   strcpy(attribute1, x.attribute1);
@@ -10769,18 +11310,20 @@ void GeTrend::get_attributes(attr_sItem* attrinfo, int* item_count)
   *item_count = i;
 }
 
-void GeTrend::set_attribute(
-    grow_tObject object, const char* attr_name, int* cnt)
+void GeTrend::set_attribute(grow_tObject object, const char* attr_name, int* cnt)
 {
   (*cnt)--;
-  if (*cnt == 0) {
+  if (*cnt == 0)
+  {
     char msg[200];
 
     strncpy(attribute1, attr_name, sizeof(attribute1));
     snprintf(msg, sizeof(msg), "Trend.Attribute1 = %s", attr_name);
     msg[sizeof(msg) - 1] = 0;
     dyn->graph->message('I', msg);
-  } else if (*cnt == 1) {
+  }
+  else if (*cnt == 1)
+  {
     char msg[200];
 
     strncpy(attribute2, attr_name, sizeof(attribute2));
@@ -10793,25 +11336,16 @@ void GeTrend::set_attribute(
 
 void GeTrend::replace_attribute(char* from, char* to, int* cnt, int strict)
 {
-  GeDyn::replace_attribute(
-      attribute1, sizeof(attribute1), from, to, cnt, strict);
-  GeDyn::replace_attribute(
-      attribute2, sizeof(attribute2), from, to, cnt, strict);
-  GeDyn::replace_attribute(
-      minvalue_attr1, sizeof(minvalue_attr1), from, to, cnt, strict);
-  GeDyn::replace_attribute(
-      maxvalue_attr1, sizeof(maxvalue_attr1), from, to, cnt, strict);
-  GeDyn::replace_attribute(
-      minvalue_attr2, sizeof(minvalue_attr2), from, to, cnt, strict);
-  GeDyn::replace_attribute(
-      maxvalue_attr2, sizeof(maxvalue_attr2), from, to, cnt, strict);
+  GeDyn::replace_attribute(attribute1, sizeof(attribute1), from, to, cnt, strict);
+  GeDyn::replace_attribute(attribute2, sizeof(attribute2), from, to, cnt, strict);
+  GeDyn::replace_attribute(minvalue_attr1, sizeof(minvalue_attr1), from, to, cnt, strict);
+  GeDyn::replace_attribute(maxvalue_attr1, sizeof(maxvalue_attr1), from, to, cnt, strict);
+  GeDyn::replace_attribute(minvalue_attr2, sizeof(minvalue_attr2), from, to, cnt, strict);
+  GeDyn::replace_attribute(maxvalue_attr2, sizeof(maxvalue_attr2), from, to, cnt, strict);
   GeDyn::replace_attribute(hold_attr, sizeof(hold_attr), from, to, cnt, strict);
-  GeDyn::replace_attribute(
-      timerange_attr, sizeof(timerange_attr), from, to, cnt, strict);
-  GeDyn::replace_attribute(
-      mark1_attr, sizeof(mark1_attr), from, to, cnt, strict);
-  GeDyn::replace_attribute(
-      mark2_attr, sizeof(mark2_attr), from, to, cnt, strict);
+  GeDyn::replace_attribute(timerange_attr, sizeof(timerange_attr), from, to, cnt, strict);
+  GeDyn::replace_attribute(mark1_attr, sizeof(mark1_attr), from, to, cnt, strict);
+  GeDyn::replace_attribute(mark2_attr, sizeof(mark2_attr), from, to, cnt, strict);
 }
 
 void GeTrend::save(std::ofstream& fp)
@@ -10839,8 +11373,10 @@ void GeTrend::open(std::ifstream& fp)
   char dummy[40];
   int tmp;
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeTrend: \"%d %s\"\n", type, dummy);
@@ -10848,7 +11384,8 @@ void GeTrend::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_Trend:
       break;
     case ge_eSave_Trend_attribute1:
@@ -10921,20 +11458,20 @@ int GeTrend::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
 
   size1 = 4;
   p1 = 0;
-  db1 = dyn->parse_attr_name(
-      attribute1, parsed_name, &inverted, &attr_type, &attr_size);
-  if (!streq(parsed_name, "")) {
-    switch (db1) {
+  db1 = dyn->parse_attr_name(attribute1, parsed_name, &inverted, &attr_type, &attr_size);
+  if (!streq(parsed_name, ""))
+  {
+    switch (db1)
+    {
     case graph_eDatabase_Gdh:
-      sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&p1,
-          &subid1, attr_size, object, now);
+      sts =
+          dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&p1, &subid1, attr_size, object, now);
       if (EVEN(sts))
         return sts;
       trend_typeid1 = attr_type;
       break;
     case graph_eDatabase_Local:
-      p1 = (pwr_tFloat32*)dyn->graph->localdb_ref_or_create(
-          parsed_name, attr_type);
+      p1 = (pwr_tFloat32*)dyn->graph->localdb_ref_or_create(parsed_name, attr_type);
       trend_typeid1 = attr_type;
     case graph_eDatabase_User:
       trend_typeid1 = attr_type;
@@ -10945,20 +11482,20 @@ int GeTrend::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
   }
   size2 = 4;
   p2 = 0;
-  db2 = dyn->parse_attr_name(
-      attribute2, parsed_name, &inverted, &attr_type, &attr_size);
-  if (!streq(parsed_name, "")) {
-    switch (db2) {
+  db2 = dyn->parse_attr_name(attribute2, parsed_name, &inverted, &attr_type, &attr_size);
+  if (!streq(parsed_name, ""))
+  {
+    switch (db2)
+    {
     case graph_eDatabase_Gdh:
-      sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&p2,
-          &subid2, attr_size, object, now);
+      sts =
+          dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&p2, &subid2, attr_size, object, now);
       if (EVEN(sts))
         return sts;
       trend_typeid2 = attr_type;
       break;
     case graph_eDatabase_Local:
-      p2 = (pwr_tFloat32*)dyn->graph->localdb_ref_or_create(
-          parsed_name, attr_type);
+      p2 = (pwr_tFloat32*)dyn->graph->localdb_ref_or_create(parsed_name, attr_type);
       trend_typeid2 = attr_type;
     case graph_eDatabase_User:
       trend_typeid2 = attr_type;
@@ -10973,85 +11510,85 @@ int GeTrend::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
   trend_hold = 0;
 
   min_value1_p = 0;
-  min_value1_db = dyn->parse_attr_name(
-      minvalue_attr1, parsed_name, &inverted, &attr_type, &attr_size);
-  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32) {
-    switch (min_value1_db) {
+  min_value1_db = dyn->parse_attr_name(minvalue_attr1, parsed_name, &inverted, &attr_type, &attr_size);
+  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32)
+  {
+    switch (min_value1_db)
+    {
     case graph_eDatabase_Gdh:
-      sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name,
-          (void**)&min_value1_p, &min_value_subid1, attr_size, object, now);
+      sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&min_value1_p, &min_value_subid1,
+                                        attr_size, object, now);
       break;
     case graph_eDatabase_Local:
-      min_value1_p = (pwr_tFloat32*)dyn->graph->localdb_ref_or_create(
-          parsed_name, attr_type);
+      min_value1_p = (pwr_tFloat32*)dyn->graph->localdb_ref_or_create(parsed_name, attr_type);
       break;
     default:;
     }
   }
   max_value1_p = 0;
-  max_value1_db = dyn->parse_attr_name(
-      maxvalue_attr1, parsed_name, &inverted, &attr_type, &attr_size);
-  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32) {
-    switch (max_value1_db) {
+  max_value1_db = dyn->parse_attr_name(maxvalue_attr1, parsed_name, &inverted, &attr_type, &attr_size);
+  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32)
+  {
+    switch (max_value1_db)
+    {
     case graph_eDatabase_Gdh:
-      sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name,
-          (void**)&max_value1_p, &max_value_subid1, attr_size, object, now);
+      sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&max_value1_p, &max_value_subid1,
+                                        attr_size, object, now);
       break;
     case graph_eDatabase_Local:
-      max_value1_p = (pwr_tFloat32*)dyn->graph->localdb_ref_or_create(
-          parsed_name, attr_type);
+      max_value1_p = (pwr_tFloat32*)dyn->graph->localdb_ref_or_create(parsed_name, attr_type);
       break;
     default:;
     }
   }
   min_value2_p = 0;
-  dyn->parse_attr_name(
-      minvalue_attr2, parsed_name, &inverted, &attr_type, &attr_size);
-  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32) {
-    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name,
-        (void**)&min_value2_p, &min_value_subid2, attr_size, object, now);
+  dyn->parse_attr_name(minvalue_attr2, parsed_name, &inverted, &attr_type, &attr_size);
+  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32)
+  {
+    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&min_value2_p, &min_value_subid2,
+                                      attr_size, object, now);
   }
   max_value2_p = 0;
-  dyn->parse_attr_name(
-      maxvalue_attr2, parsed_name, &inverted, &attr_type, &attr_size);
-  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32) {
-    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name,
-        (void**)&max_value2_p, &max_value_subid2, attr_size, object, now);
+  dyn->parse_attr_name(maxvalue_attr2, parsed_name, &inverted, &attr_type, &attr_size);
+  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32)
+  {
+    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&max_value2_p, &max_value_subid2,
+                                      attr_size, object, now);
   }
 
   hold_p = 0;
-  hold_db = dyn->parse_attr_name(
-      hold_attr, parsed_name, &inverted, &attr_type, &attr_size);
-  if (!streq(parsed_name, "") && attr_type == pwr_eType_Boolean) {
-    switch (hold_db) {
+  hold_db = dyn->parse_attr_name(hold_attr, parsed_name, &inverted, &attr_type, &attr_size);
+  if (!streq(parsed_name, "") && attr_type == pwr_eType_Boolean)
+  {
+    switch (hold_db)
+    {
     case graph_eDatabase_Gdh:
-      sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name,
-          (void**)&hold_p, &hold_subid, attr_size, object, now);
+      sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&hold_p, &hold_subid, attr_size,
+                                        object, now);
       if (EVEN(sts))
         return sts;
       break;
     case graph_eDatabase_Local:
-      hold_p = (pwr_tBoolean*)dyn->graph->localdb_ref_or_create(
-          parsed_name, attr_type);
+      hold_p = (pwr_tBoolean*)dyn->graph->localdb_ref_or_create(parsed_name, attr_type);
       break;
     default:;
     }
   }
 
   timerange_p = 0;
-  timerange_db = dyn->parse_attr_name(
-      timerange_attr, parsed_name, &inverted, &attr_type, &attr_size);
-  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32) {
-    switch (timerange_db) {
+  timerange_db = dyn->parse_attr_name(timerange_attr, parsed_name, &inverted, &attr_type, &attr_size);
+  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32)
+  {
+    switch (timerange_db)
+    {
     case graph_eDatabase_Gdh:
-      sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name,
-          (void**)&timerange_p, &timerange_subid, attr_size, object, now);
+      sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&timerange_p, &timerange_subid,
+                                        attr_size, object, now);
       if (EVEN(sts))
         return sts;
       break;
     case graph_eDatabase_Local:
-      timerange_p = (pwr_tFloat32*)dyn->graph->localdb_ref_or_create(
-          parsed_name, attr_type);
+      timerange_p = (pwr_tFloat32*)dyn->graph->localdb_ref_or_create(parsed_name, attr_type);
       if (feqf(*timerange_p, 0.0f))
         *timerange_p = scan_time * no_of_points;
       break;
@@ -11063,24 +11600,23 @@ int GeTrend::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
   }
 
   mark1_p = 0;
-  dyn->parse_attr_name(
-      mark1_attr, parsed_name, &inverted, &attr_type, &attr_size);
-  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32) {
-    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&mark1_p,
-        &mark1_subid, attr_size, object, now);
+  dyn->parse_attr_name(mark1_attr, parsed_name, &inverted, &attr_type, &attr_size);
+  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32)
+  {
+    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&mark1_p, &mark1_subid, attr_size,
+                                      object, now);
   }
 
   mark2_p = 0;
-  dyn->parse_attr_name(
-      mark2_attr, parsed_name, &inverted, &attr_type, &attr_size);
-  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32) {
-    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&mark2_p,
-        &mark2_subid, attr_size, object, now);
+  dyn->parse_attr_name(mark2_attr, parsed_name, &inverted, &attr_type, &attr_size);
+  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32)
+  {
+    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&mark2_p, &mark2_subid, attr_size,
+                                      object, now);
   }
 
   grow_SetTrendNoOfCurves(object, attr_cnt);
-  if (mark1_color != glow_eDrawType_Inherit
-      || mark2_color != glow_eDrawType_Inherit)
+  if (mark1_color != glow_eDrawType_Inherit || mark2_color != glow_eDrawType_Inherit)
     grow_SetTrendMarkColor(object, mark1_color, mark2_color);
   trace_data->p = &pdummy;
   first_scan = true;
@@ -11095,35 +11631,43 @@ int GeTrend::disconnect(grow_tObject object)
   if (p2 && db2 == graph_eDatabase_Gdh)
     gdh_UnrefObjectInfo(subid2);
   p2 = 0;
-  if (min_value1_p && min_value1_db == graph_eDatabase_Gdh) {
+  if (min_value1_p && min_value1_db == graph_eDatabase_Gdh)
+  {
     gdh_UnrefObjectInfo(min_value_subid1);
     min_value1_p = 0;
   }
-  if (max_value1_p && max_value1_db == graph_eDatabase_Gdh) {
+  if (max_value1_p && max_value1_db == graph_eDatabase_Gdh)
+  {
     gdh_UnrefObjectInfo(max_value_subid1);
     max_value1_p = 0;
   }
-  if (min_value2_p) {
+  if (min_value2_p)
+  {
     gdh_UnrefObjectInfo(min_value_subid2);
     min_value2_p = 0;
   }
-  if (max_value2_p) {
+  if (max_value2_p)
+  {
     gdh_UnrefObjectInfo(max_value_subid2);
     max_value2_p = 0;
   }
-  if (hold_p && hold_db == graph_eDatabase_Gdh) {
+  if (hold_p && hold_db == graph_eDatabase_Gdh)
+  {
     gdh_UnrefObjectInfo(hold_subid);
     hold_p = 0;
   }
-  if (timerange_p && timerange_db == graph_eDatabase_Gdh) {
+  if (timerange_p && timerange_db == graph_eDatabase_Gdh)
+  {
     gdh_UnrefObjectInfo(timerange_subid);
     timerange_p = 0;
   }
-  if (mark1_p) {
+  if (mark1_p)
+  {
     gdh_UnrefObjectInfo(mark1_subid);
     mark1_p = 0;
   }
-  if (mark2_p) {
+  if (mark2_p)
+  {
     gdh_UnrefObjectInfo(mark2_subid);
     mark1_p = 0;
   }
@@ -11139,31 +11683,36 @@ int GeTrend::scan(grow_tObject object)
   if (trend_hold)
     return 1;
 
-  if (max_value1_p || min_value1_p) {
+  if (max_value1_p || min_value1_p)
+  {
     bool update = false;
 
     pwr_tFloat32 maxval;
     pwr_tFloat32 minval;
-    if (max_value1_p) {
+    if (max_value1_p)
+    {
       maxval = *max_value1_p;
       if (!feqf(maxval, old_max_value1))
-	update = true;
+        update = true;
     }
-    if (min_value1_p) {
+    if (min_value1_p)
+    {
       minval = *min_value1_p;
       if (!feqf(minval, old_min_value1))
-	update = true;
+        update = true;
     }
-    if (update) {
+    if (update)
+    {
       double minvald, maxvald;
       grow_GetTrendRangeY(object, 0, &minvald, &maxvald);
 
       if (!min_value1_p)
-	minval = minvald;
+        minval = minvald;
       if (!max_value1_p)
-	maxval = maxvald;
+        maxval = maxvald;
 
-      if (fabsf(maxval - minval) > FLT_EPSILON) {
+      if (fabsf(maxval - minval) > FLT_EPSILON)
+      {
         grow_SetTrendRangeY(object, 0, minval, maxval);
       }
       old_min_value1 = minval;
@@ -11171,31 +11720,36 @@ int GeTrend::scan(grow_tObject object)
     }
   }
 
-  if (max_value2_p || min_value2_p) {
+  if (max_value2_p || min_value2_p)
+  {
     bool update = false;
 
     pwr_tFloat32 maxval;
     pwr_tFloat32 minval;
-    if (max_value2_p) {
+    if (max_value2_p)
+    {
       maxval = *max_value2_p;
       if (!feqf(maxval, old_max_value2))
-	update = true;
+        update = true;
     }
-    if (min_value2_p) {
+    if (min_value2_p)
+    {
       minval = *min_value2_p;
       if (!feqf(minval, old_min_value2))
-	update = true;
+        update = true;
     }
-    if (update) {
+    if (update)
+    {
       double minvald, maxvald;
       grow_GetTrendRangeY(object, 1, &minvald, &maxvald);
 
       if (!min_value2_p)
-	minval = minvald;
+        minval = minvald;
       if (!max_value2_p)
-	maxval = maxvald;
+        maxval = maxvald;
 
-      if (fabsf(maxval - minval) > FLT_EPSILON) {
+      if (fabsf(maxval - minval) > FLT_EPSILON)
+      {
         grow_SetTrendRangeY(object, 1, minval, maxval);
       }
       old_min_value2 = minval;
@@ -11203,16 +11757,21 @@ int GeTrend::scan(grow_tObject object)
     }
   }
 
-  if (timerange_p) {
-    if (fabsf(*timerange_p - old_timerange) > FLT_EPSILON) {
+  if (timerange_p)
+  {
+    if (fabsf(*timerange_p - old_timerange) > FLT_EPSILON)
+    {
       double dt = *timerange_p / no_of_points;
-      if (dt >= 0.001) {
+      if (dt >= 0.001)
+      {
         grow_SetTrendScanTime(object, dt);
         scan_time = dt;
-        if (dyn->cycle == glow_eCycle_Slow) {
+        if (dyn->cycle == glow_eCycle_Slow)
+        {
           if (dyn->graph->scan_time > scan_time)
             dyn->graph->scan_time = scan_time;
-          else {
+          else
+          {
             if (scan_time > orig_graph_scan_time)
               dyn->graph->scan_time = orig_graph_scan_time;
             else
@@ -11220,7 +11779,8 @@ int GeTrend::scan(grow_tObject object)
           }
           if (dyn->graph->fast_scan_time > scan_time)
             dyn->graph->fast_scan_time = scan_time;
-          else {
+          else
+          {
             if (scan_time > orig_graph_fast_scan_time)
               dyn->graph->fast_scan_time = orig_graph_fast_scan_time;
             else
@@ -11228,17 +11788,21 @@ int GeTrend::scan(grow_tObject object)
           }
           if (dyn->graph->animation_scan_time > scan_time)
             dyn->graph->animation_scan_time = scan_time;
-          else {
+          else
+          {
             if (scan_time > orig_graph_animation_scan_time)
               dyn->graph->animation_scan_time = orig_graph_animation_scan_time;
             else
               dyn->graph->animation_scan_time = scan_time;
           }
-        } else {
+        }
+        else
+        {
           // Fast cycle
           if (dyn->graph->fast_scan_time > scan_time)
             dyn->graph->fast_scan_time = scan_time;
-          else {
+          else
+          {
             if (scan_time > orig_graph_fast_scan_time)
               dyn->graph->fast_scan_time = orig_graph_fast_scan_time;
             else
@@ -11246,7 +11810,8 @@ int GeTrend::scan(grow_tObject object)
           }
           if (dyn->graph->animation_scan_time > scan_time)
             dyn->graph->animation_scan_time = scan_time;
-          else {
+          else
+          {
             if (scan_time > orig_graph_animation_scan_time)
               dyn->graph->animation_scan_time = orig_graph_animation_scan_time;
             else
@@ -11258,11 +11823,13 @@ int GeTrend::scan(grow_tObject object)
     }
   }
 
-  if (mark1_p && (first_scan || fabsf(*mark1_p - old_mark1) > FLT_EPSILON)) {
+  if (mark1_p && (first_scan || fabsf(*mark1_p - old_mark1) > FLT_EPSILON))
+  {
     grow_SetTrendYMark1(object, *mark1_p);
     old_mark1 = *mark1_p;
   }
-  if (mark2_p && (first_scan || fabsf(*mark2_p - old_mark2) > FLT_EPSILON)) {
+  if (mark2_p && (first_scan || fabsf(*mark2_p - old_mark2) > FLT_EPSILON))
+  {
     grow_SetTrendYMark2(object, *mark2_p);
     old_mark2 = *mark2_p;
   }
@@ -11275,9 +11842,12 @@ int GeTrend::scan(grow_tObject object)
   else
     acc_time += dyn->graph->fast_scan_time;
 
-  if (acc_time + DBL_EPSILON >= scan_time) {
-    if (p1) {
-      switch (trend_typeid1) {
+  if (acc_time + DBL_EPSILON >= scan_time)
+  {
+    if (p1)
+    {
+      switch (trend_typeid1)
+      {
       case pwr_eType_Boolean:
         grow_AddTrendValue(object, double(*(pwr_tBoolean*)p1), 0);
         break;
@@ -11293,8 +11863,10 @@ int GeTrend::scan(grow_tObject object)
       default:;
       }
     }
-    if (p2) {
-      switch (trend_typeid2) {
+    if (p2)
+    {
+      switch (trend_typeid2)
+      {
       case pwr_eType_Boolean:
         grow_AddTrendValue(object, double(*(pwr_tBoolean*)p2), 1);
         break;
@@ -11315,69 +11887,80 @@ int GeTrend::scan(grow_tObject object)
   return 1;
 }
 
-int GeTrend::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GeTrend::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
   if (!streq(attribute1, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Trend.Attribute1\",\"" << attribute1 << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Trend.Attribute1\",\"" << attribute1
+       << "\");" << '\n';
   if (!streq(attribute2, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Trend.Attribute2\",\"" << attribute2 << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Trend.Attribute2\",\"" << attribute2
+       << "\");" << '\n';
   if (!streq(minvalue_attr1, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Trend.MinValueAttr1\",\"" << minvalue_attr1 << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Trend.MinValueAttr1\",\"" << minvalue_attr1
+       << "\");" << '\n';
   if (!streq(maxvalue_attr1, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Trend.MaxValueAttr1\",\"" << maxvalue_attr1 << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Trend.MaxValueAttr1\",\"" << maxvalue_attr1
+       << "\");" << '\n';
   if (!streq(minvalue_attr2, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Trend.MinValueAttr2\",\"" << minvalue_attr2 << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Trend.MinValueAttr2\",\"" << minvalue_attr2
+       << "\");" << '\n';
   if (!streq(maxvalue_attr2, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Trend.MaxValueAttr2\",\"" << maxvalue_attr2 << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Trend.MaxValueAttr2\",\"" << maxvalue_attr2
+       << "\");" << '\n';
   if (!streq(hold_attr, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Trend.HoldAttr\",\"" << hold_attr << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Trend.HoldAttr\",\"" << hold_attr << "\");"
+       << '\n';
   if (!streq(timerange_attr, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Trend.TimeRangeAttr\",\"" << timerange_attr << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Trend.TimeRangeAttr\",\"" << timerange_attr
+       << "\");" << '\n';
   if (!streq(mark1_attr, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Trend.Mark1Attr\",\"" << mark1_attr << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Trend.Mark1Attr\",\"" << mark1_attr
+       << "\");" << '\n';
   if (!streq(mark2_attr, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Trend.Mark2Attr\",\"" << mark2_attr << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Trend.Mark2Attr\",\"" << mark2_attr
+       << "\");" << '\n';
   if (mark1_color != glow_eDrawType_Inherit)
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Trend.Mark1Color\"," << mark1_color << ");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Trend.Mark1Color\"," << mark1_color << ");"
+       << '\n';
   if (mark2_color != glow_eDrawType_Inherit)
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Trend.Mark2Color\"," << mark2_color << ");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Trend.Mark2Color\"," << mark2_color << ");"
+       << '\n';
   return 1;
 }
 
 int GeTrend::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
-  int types[] = { pwr_eType_Boolean, pwr_eType_Int32, pwr_eType_UInt32,
-    pwr_eType_Float32, 0 };
-  int types2[] = { pwr_eType_Float32, 0 };
-  int types3[] = { pwr_eType_Boolean, 0 };
-  graph_eDatabase databases[] = { graph_eDatabase_Gdh, graph_eDatabase_Local,
-    graph_eDatabase_User, graph_eDatabase__ };
-  graph_eDatabase databases2[]
-      = { graph_eDatabase_Gdh, graph_eDatabase_Local, graph_eDatabase__ };
-  graph_eDatabase databases3[] = { graph_eDatabase_Gdh, graph_eDatabase__ };
-  dyn->syntax_check_attribute(object, "Trend.Attribute1", attribute1, 1, types,
-      databases, error_cnt, warning_cnt);
-  dyn->syntax_check_attribute(object, "Trend.Attribute2", attribute2, 1, types,
-      databases, error_cnt, warning_cnt);
+  int types[] = {pwr_eType_Boolean, pwr_eType_Int32, pwr_eType_UInt32, pwr_eType_Float32, 0};
+  int types2[] = {pwr_eType_Float32, 0};
+  int types3[] = {pwr_eType_Boolean, 0};
+  graph_eDatabase databases[] = {graph_eDatabase_Gdh, graph_eDatabase_Local, graph_eDatabase_User,
+                                 graph_eDatabase__};
+  graph_eDatabase databases2[] = {graph_eDatabase_Gdh, graph_eDatabase_Local, graph_eDatabase__};
+  graph_eDatabase databases3[] = {graph_eDatabase_Gdh, graph_eDatabase__};
+  dyn->syntax_check_attribute(object, "Trend.Attribute1", attribute1, 1, types, databases, error_cnt,
+                              warning_cnt);
+  dyn->syntax_check_attribute(object, "Trend.Attribute2", attribute2, 1, types, databases, error_cnt,
+                              warning_cnt);
 
-  dyn->syntax_check_attribute(object, "Trend.MinValueAttr1", minvalue_attr1, 1,
-      types2, databases2, error_cnt, warning_cnt);
-  dyn->syntax_check_attribute(object, "Trend.MaxValueAttr1", maxvalue_attr1, 1,
-      types2, databases2, error_cnt, warning_cnt);
-  dyn->syntax_check_attribute(object, "Trend.MinValueAttr2", minvalue_attr2, 1,
-      types2, databases2, error_cnt, warning_cnt);
-  dyn->syntax_check_attribute(object, "Trend.MaxValueAttr2", maxvalue_attr2, 1,
-      types2, databases2, error_cnt, warning_cnt);
-  dyn->syntax_check_attribute(object, "Trend.HoldAttr", hold_attr, 1, types3,
-      databases2, error_cnt, warning_cnt);
-  dyn->syntax_check_attribute(object, "Trend.TimeRangeAttr", timerange_attr, 1,
-      types2, databases2, error_cnt, warning_cnt);
-  dyn->syntax_check_attribute(object, "Trend.Mark1Attr", mark1_attr, 1, types2,
-      databases3, error_cnt, warning_cnt);
-  dyn->syntax_check_attribute(object, "Trend.Mark2Attr", mark2_attr, 1, types2,
-      databases3, error_cnt, warning_cnt);
+  dyn->syntax_check_attribute(object, "Trend.MinValueAttr1", minvalue_attr1, 1, types2, databases2, error_cnt,
+                              warning_cnt);
+  dyn->syntax_check_attribute(object, "Trend.MaxValueAttr1", maxvalue_attr1, 1, types2, databases2, error_cnt,
+                              warning_cnt);
+  dyn->syntax_check_attribute(object, "Trend.MinValueAttr2", minvalue_attr2, 1, types2, databases2, error_cnt,
+                              warning_cnt);
+  dyn->syntax_check_attribute(object, "Trend.MaxValueAttr2", maxvalue_attr2, 1, types2, databases2, error_cnt,
+                              warning_cnt);
+  dyn->syntax_check_attribute(object, "Trend.HoldAttr", hold_attr, 1, types3, databases2, error_cnt,
+                              warning_cnt);
+  dyn->syntax_check_attribute(object, "Trend.TimeRangeAttr", timerange_attr, 1, types2, databases2, error_cnt,
+                              warning_cnt);
+  dyn->syntax_check_attribute(object, "Trend.Mark1Attr", mark1_attr, 1, types2, databases3, error_cnt,
+                              warning_cnt);
+  dyn->syntax_check_attribute(object, "Trend.Mark2Attr", mark2_attr, 1, types2, databases3, error_cnt,
+                              warning_cnt);
 
-  if (streq(attribute1, "") && streq(attribute2, "")) {
+  if (streq(attribute1, "") && streq(attribute2, ""))
+  {
     dyn->graph->syntax_msg('E', object, "Trend, no attribute");
     (*error_cnt)++;
   }
@@ -11387,16 +11970,14 @@ int GeTrend::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 
 // XY_Curve
 GeXY_Curve::GeXY_Curve(GeDyn* e_dyn, ge_mInstance e_instance)
-    : GeDynElem(e_dyn, ge_mDynType1_XY_Curve, ge_mDynType2_No,
-          ge_mActionType1_No, ge_mActionType2_No, ge_eDynPrio_XY_Curve),
-      y_min_value(0), y_max_value(100), x_min_value(0), x_max_value(100),
-      noofpoints(100), datatype(0), curve_color(glow_eDrawType_Inherit),
-      fill_color(glow_eDrawType_Inherit), horizontal_padding(0), update_p(0),
-      old_update(0), noofpoints_p(0), old_noofpoints(0), y_min_value_p(0),
-      y_max_value_p(0), x_min_value_p(0), x_max_value_p(0), old_y_min_value(0),
-      old_y_max_value(0), old_x_min_value(0), old_x_max_value(0), x_mark1_p(0),
-      x_mark2_p(0), y_mark1_p(0), y_mark2_p(0), old_x_mark1(0), old_x_mark2(0),
-      old_y_mark1(0), old_y_mark2(0), mark1_color(glow_eDrawType_Inherit),
+    : GeDynElem(e_dyn, ge_mDynType1_XY_Curve, ge_mDynType2_No, ge_mActionType1_No, ge_mActionType2_No,
+                ge_eDynPrio_XY_Curve),
+      y_min_value(0), y_max_value(100), x_min_value(0), x_max_value(100), noofpoints(100), datatype(0),
+      curve_color(glow_eDrawType_Inherit), fill_color(glow_eDrawType_Inherit), horizontal_padding(0),
+      update_p(0), old_update(0), noofpoints_p(0), old_noofpoints(0), y_min_value_p(0), y_max_value_p(0),
+      x_min_value_p(0), x_max_value_p(0), old_y_min_value(0), old_y_max_value(0), old_x_min_value(0),
+      old_x_max_value(0), x_mark1_p(0), x_mark2_p(0), y_mark1_p(0), y_mark2_p(0), old_x_mark1(0),
+      old_x_mark2(0), old_y_mark1(0), old_y_mark2(0), mark1_color(glow_eDrawType_Inherit),
       mark2_color(glow_eDrawType_Inherit)
 {
   instance = e_instance;
@@ -11416,13 +11997,10 @@ GeXY_Curve::GeXY_Curve(GeDyn* e_dyn, ge_mInstance e_instance)
 }
 
 GeXY_Curve::GeXY_Curve(const GeXY_Curve& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-          x.prio),
-      y_min_value(x.y_min_value), y_max_value(x.y_max_value),
-      x_min_value(x.x_min_value), x_max_value(x.x_max_value),
-      noofpoints(x.noofpoints), datatype(x.datatype),
-      curve_color(x.curve_color), fill_color(x.fill_color),
-      horizontal_padding(x.horizontal_padding), mark1_color(x.mark1_color),
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio),
+      y_min_value(x.y_min_value), y_max_value(x.y_max_value), x_min_value(x.x_min_value),
+      x_max_value(x.x_max_value), noofpoints(x.noofpoints), datatype(x.datatype), curve_color(x.curve_color),
+      fill_color(x.fill_color), horizontal_padding(x.horizontal_padding), mark1_color(x.mark1_color),
       mark2_color(x.mark2_color)
 {
   instance = x.instance;
@@ -11446,7 +12024,8 @@ void GeXY_Curve::get_attributes(attr_sItem* attrinfo, int* item_count)
 {
   int i = *item_count;
 
-  if (instance == ge_mInstance_1) {
+  if (instance == ge_mInstance_1)
+  {
     strcpy(attrinfo[i].name, "XY_Curve.DataType");
     attrinfo[i].value = &datatype;
     attrinfo[i].type = ge_eAttrType_CurveDataType;
@@ -11567,11 +12146,14 @@ void GeXY_Curve::get_attributes(attr_sItem* attrinfo, int* item_count)
     attrinfo[i].type = ge_eAttrType_InstanceMask;
     attrinfo[i].mask = 1023;
     attrinfo[i++].size = sizeof(instance_mask);
-  } else {
+  }
+  else
+  {
     // Get instance number
     int inst = 1;
     unsigned int m = instance;
-    while (m > 1) {
+    while (m > 1)
+    {
       m = m >> 1;
       inst++;
     }
@@ -11664,18 +12246,20 @@ void GeXY_Curve::get_attributes(attr_sItem* attrinfo, int* item_count)
   *item_count = i;
 }
 
-void GeXY_Curve::set_attribute(
-    grow_tObject object, const char* attr_name, int* cnt)
+void GeXY_Curve::set_attribute(grow_tObject object, const char* attr_name, int* cnt)
 {
   (*cnt)--;
-  if (*cnt == 0) {
+  if (*cnt == 0)
+  {
     char msg[200];
 
     strncpy(x_attr, attr_name, sizeof(x_attr));
     snprintf(msg, sizeof(msg), "XY_Curve.XAttr = %s", attr_name);
     msg[sizeof(msg) - 1] = 0;
     dyn->graph->message('I', msg);
-  } else if (*cnt == 1) {
+  }
+  else if (*cnt == 1)
+  {
     char msg[200];
 
     strncpy(y_attr, attr_name, sizeof(y_attr));
@@ -11690,28 +12274,17 @@ void GeXY_Curve::replace_attribute(char* from, char* to, int* cnt, int strict)
 {
   GeDyn::replace_attribute(x_attr, sizeof(x_attr), from, to, cnt, strict);
   GeDyn::replace_attribute(y_attr, sizeof(y_attr), from, to, cnt, strict);
-  GeDyn::replace_attribute(
-      update_attr, sizeof(update_attr), from, to, cnt, strict);
-  GeDyn::replace_attribute(
-      update_attr, sizeof(hold_attr), from, to, cnt, strict);
-  GeDyn::replace_attribute(
-      noofpoints_attr, sizeof(noofpoints_attr), from, to, cnt, strict);
-  GeDyn::replace_attribute(
-      y_minvalue_attr, sizeof(y_minvalue_attr), from, to, cnt, strict);
-  GeDyn::replace_attribute(
-      y_maxvalue_attr, sizeof(y_maxvalue_attr), from, to, cnt, strict);
-  GeDyn::replace_attribute(
-      x_minvalue_attr, sizeof(x_minvalue_attr), from, to, cnt, strict);
-  GeDyn::replace_attribute(
-      x_maxvalue_attr, sizeof(x_maxvalue_attr), from, to, cnt, strict);
-  GeDyn::replace_attribute(
-      x_mark1_attr, sizeof(x_mark1_attr), from, to, cnt, strict);
-  GeDyn::replace_attribute(
-      x_mark2_attr, sizeof(x_mark2_attr), from, to, cnt, strict);
-  GeDyn::replace_attribute(
-      y_mark1_attr, sizeof(y_mark1_attr), from, to, cnt, strict);
-  GeDyn::replace_attribute(
-      y_mark2_attr, sizeof(y_mark2_attr), from, to, cnt, strict);
+  GeDyn::replace_attribute(update_attr, sizeof(update_attr), from, to, cnt, strict);
+  GeDyn::replace_attribute(update_attr, sizeof(hold_attr), from, to, cnt, strict);
+  GeDyn::replace_attribute(noofpoints_attr, sizeof(noofpoints_attr), from, to, cnt, strict);
+  GeDyn::replace_attribute(y_minvalue_attr, sizeof(y_minvalue_attr), from, to, cnt, strict);
+  GeDyn::replace_attribute(y_maxvalue_attr, sizeof(y_maxvalue_attr), from, to, cnt, strict);
+  GeDyn::replace_attribute(x_minvalue_attr, sizeof(x_minvalue_attr), from, to, cnt, strict);
+  GeDyn::replace_attribute(x_maxvalue_attr, sizeof(x_maxvalue_attr), from, to, cnt, strict);
+  GeDyn::replace_attribute(x_mark1_attr, sizeof(x_mark1_attr), from, to, cnt, strict);
+  GeDyn::replace_attribute(x_mark2_attr, sizeof(x_mark2_attr), from, to, cnt, strict);
+  GeDyn::replace_attribute(y_mark1_attr, sizeof(y_mark1_attr), from, to, cnt, strict);
+  GeDyn::replace_attribute(y_mark2_attr, sizeof(y_mark2_attr), from, to, cnt, strict);
 }
 
 void GeXY_Curve::save(std::ofstream& fp)
@@ -11719,16 +12292,11 @@ void GeXY_Curve::save(std::ofstream& fp)
   fp << int(ge_eSave_XY_Curve) << '\n';
   fp << int(ge_eSave_XY_Curve_x_attr) << FSPACE << x_attr << '\n';
   fp << int(ge_eSave_XY_Curve_y_attr) << FSPACE << y_attr << '\n';
-  fp << int(ge_eSave_XY_Curve_y_minvalue_attr) << FSPACE << y_minvalue_attr
-     << '\n';
-  fp << int(ge_eSave_XY_Curve_y_maxvalue_attr) << FSPACE << y_maxvalue_attr
-     << '\n';
-  fp << int(ge_eSave_XY_Curve_x_minvalue_attr) << FSPACE << x_minvalue_attr
-     << '\n';
-  fp << int(ge_eSave_XY_Curve_x_maxvalue_attr) << FSPACE << x_maxvalue_attr
-     << '\n';
-  fp << int(ge_eSave_XY_Curve_noofpoints_attr) << FSPACE << noofpoints_attr
-     << '\n';
+  fp << int(ge_eSave_XY_Curve_y_minvalue_attr) << FSPACE << y_minvalue_attr << '\n';
+  fp << int(ge_eSave_XY_Curve_y_maxvalue_attr) << FSPACE << y_maxvalue_attr << '\n';
+  fp << int(ge_eSave_XY_Curve_x_minvalue_attr) << FSPACE << x_minvalue_attr << '\n';
+  fp << int(ge_eSave_XY_Curve_x_maxvalue_attr) << FSPACE << x_maxvalue_attr << '\n';
+  fp << int(ge_eSave_XY_Curve_noofpoints_attr) << FSPACE << noofpoints_attr << '\n';
   fp << int(ge_eSave_XY_Curve_update_attr) << FSPACE << update_attr << '\n';
   fp << int(ge_eSave_XY_Curve_hold_attr) << FSPACE << hold_attr << '\n';
   fp << int(ge_eSave_XY_Curve_y_min_value) << FSPACE << y_min_value << '\n';
@@ -11737,21 +12305,16 @@ void GeXY_Curve::save(std::ofstream& fp)
   fp << int(ge_eSave_XY_Curve_x_max_value) << FSPACE << x_max_value << '\n';
   fp << int(ge_eSave_XY_Curve_datatype) << FSPACE << datatype << '\n';
   fp << int(ge_eSave_XY_Curve_instance) << FSPACE << int(instance) << '\n';
-  fp << int(ge_eSave_XY_Curve_instance_mask) << FSPACE << int(instance_mask)
-     << '\n';
-  fp << int(ge_eSave_XY_Curve_curve_color) << FSPACE << int(curve_color)
-     << '\n';
+  fp << int(ge_eSave_XY_Curve_instance_mask) << FSPACE << int(instance_mask) << '\n';
+  fp << int(ge_eSave_XY_Curve_curve_color) << FSPACE << int(curve_color) << '\n';
   fp << int(ge_eSave_XY_Curve_fill_color) << FSPACE << int(fill_color) << '\n';
-  fp << int(ge_eSave_XY_Curve_horizontal_padding) << FSPACE
-     << horizontal_padding << '\n';
+  fp << int(ge_eSave_XY_Curve_horizontal_padding) << FSPACE << horizontal_padding << '\n';
   fp << int(ge_eSave_XY_Curve_x_mark1_attr) << FSPACE << x_mark1_attr << '\n';
   fp << int(ge_eSave_XY_Curve_x_mark2_attr) << FSPACE << x_mark2_attr << '\n';
   fp << int(ge_eSave_XY_Curve_y_mark1_attr) << FSPACE << y_mark1_attr << '\n';
   fp << int(ge_eSave_XY_Curve_y_mark2_attr) << FSPACE << y_mark2_attr << '\n';
-  fp << int(ge_eSave_XY_Curve_mark1_color) << FSPACE << int(mark1_color)
-     << '\n';
-  fp << int(ge_eSave_XY_Curve_mark2_color) << FSPACE << int(mark2_color)
-     << '\n';
+  fp << int(ge_eSave_XY_Curve_mark1_color) << FSPACE << int(mark1_color) << '\n';
+  fp << int(ge_eSave_XY_Curve_mark2_color) << FSPACE << int(mark2_color) << '\n';
   fp << int(ge_eSave_End) << '\n';
 }
 
@@ -11762,8 +12325,10 @@ void GeXY_Curve::open(std::ifstream& fp)
   int tmp;
   char dummy[40];
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeXY_Curve: \"%d %s\"\n", type, dummy);
@@ -11771,7 +12336,8 @@ void GeXY_Curve::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_XY_Curve:
       break;
     case ge_eSave_XY_Curve_x_attr:
@@ -11880,8 +12446,7 @@ void GeXY_Curve::open(std::ifstream& fp)
   }
 }
 
-int GeXY_Curve::connect(
-    grow_tObject object, glow_sTraceData* trace_data, bool now)
+int GeXY_Curve::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
 {
   int attr_type, attr_size;
   pwr_tAName parsed_name;
@@ -11889,103 +12454,102 @@ int GeXY_Curve::connect(
   int inverted;
 
   update_p = 0;
-  dyn->parse_attr_name(
-      update_attr, parsed_name, &inverted, &attr_type, &attr_size);
-  if (!streq(parsed_name, "")) {
-    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name,
-        (void**)&update_p, &update_subid, attr_size, object, now);
+  dyn->parse_attr_name(update_attr, parsed_name, &inverted, &attr_type, &attr_size);
+  if (!streq(parsed_name, ""))
+  {
+    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&update_p, &update_subid, attr_size,
+                                      object, now);
     if (EVEN(sts))
       return sts;
   }
 
   hold_p = 0;
-  hold_db = dyn->parse_attr_name(
-      hold_attr, parsed_name, &inverted, &attr_type, &attr_size);
-  if (!streq(parsed_name, "")) {
-    switch (hold_db) {
+  hold_db = dyn->parse_attr_name(hold_attr, parsed_name, &inverted, &attr_type, &attr_size);
+  if (!streq(parsed_name, ""))
+  {
+    switch (hold_db)
+    {
     case graph_eDatabase_Gdh:
-      sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name,
-          (void**)&hold_p, &hold_subid, attr_size, object, now);
+      sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&hold_p, &hold_subid, attr_size,
+                                        object, now);
       if (EVEN(sts))
         return sts;
       break;
     case graph_eDatabase_Local:
-      hold_p = (pwr_tBoolean*)dyn->graph->localdb_ref_or_create(
-          parsed_name, attr_type);
+      hold_p = (pwr_tBoolean*)dyn->graph->localdb_ref_or_create(parsed_name, attr_type);
       break;
     default:;
     }
   }
 
   noofpoints_p = 0;
-  dyn->parse_attr_name(
-      noofpoints_attr, parsed_name, &inverted, &attr_type, &attr_size);
-  if (!streq(parsed_name, "")
-      && (attr_type == pwr_eType_Int32 || attr_type == pwr_eType_UInt32)) {
-    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name,
-        (void**)&noofpoints_p, &noofpoints_subid, attr_size, object, now);
+  dyn->parse_attr_name(noofpoints_attr, parsed_name, &inverted, &attr_type, &attr_size);
+  if (!streq(parsed_name, "") && (attr_type == pwr_eType_Int32 || attr_type == pwr_eType_UInt32))
+  {
+    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&noofpoints_p, &noofpoints_subid,
+                                      attr_size, object, now);
   }
 
   x_min_value_p = 0;
-  dyn->parse_attr_name(
-      x_minvalue_attr, parsed_name, &inverted, &attr_type, &attr_size);
-  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32) {
-    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name,
-        (void**)&x_min_value_p, &x_min_value_subid, attr_size, object, now);
+  dyn->parse_attr_name(x_minvalue_attr, parsed_name, &inverted, &attr_type, &attr_size);
+  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32)
+  {
+    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&x_min_value_p, &x_min_value_subid,
+                                      attr_size, object, now);
   }
   x_max_value_p = 0;
-  dyn->parse_attr_name(
-      x_maxvalue_attr, parsed_name, &inverted, &attr_type, &attr_size);
-  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32) {
-    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name,
-        (void**)&x_max_value_p, &x_max_value_subid, attr_size, object, now);
+  dyn->parse_attr_name(x_maxvalue_attr, parsed_name, &inverted, &attr_type, &attr_size);
+  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32)
+  {
+    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&x_max_value_p, &x_max_value_subid,
+                                      attr_size, object, now);
   }
 
   y_min_value_p = 0;
-  dyn->parse_attr_name(
-      y_minvalue_attr, parsed_name, &inverted, &attr_type, &attr_size);
-  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32) {
-    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name,
-        (void**)&y_min_value_p, &y_min_value_subid, attr_size, object, now);
+  dyn->parse_attr_name(y_minvalue_attr, parsed_name, &inverted, &attr_type, &attr_size);
+  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32)
+  {
+    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&y_min_value_p, &y_min_value_subid,
+                                      attr_size, object, now);
   }
   y_max_value_p = 0;
-  dyn->parse_attr_name(
-      y_maxvalue_attr, parsed_name, &inverted, &attr_type, &attr_size);
-  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32) {
-    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name,
-        (void**)&y_max_value_p, &y_max_value_subid, attr_size, object, now);
+  dyn->parse_attr_name(y_maxvalue_attr, parsed_name, &inverted, &attr_type, &attr_size);
+  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32)
+  {
+    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&y_max_value_p, &y_max_value_subid,
+                                      attr_size, object, now);
   }
 
   x_mark1_p = 0;
-  dyn->parse_attr_name(
-      x_mark1_attr, parsed_name, &inverted, &attr_type, &attr_size);
-  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32) {
-    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name,
-        (void**)&x_mark1_p, &x_mark1_subid, attr_size, object, now);
+  dyn->parse_attr_name(x_mark1_attr, parsed_name, &inverted, &attr_type, &attr_size);
+  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32)
+  {
+    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&x_mark1_p, &x_mark1_subid, attr_size,
+                                      object, now);
   }
 
   x_mark2_p = 0;
-  dyn->parse_attr_name(
-      x_mark2_attr, parsed_name, &inverted, &attr_type, &attr_size);
-  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32) {
-    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name,
-        (void**)&x_mark2_p, &x_mark2_subid, attr_size, object, now);
+  dyn->parse_attr_name(x_mark2_attr, parsed_name, &inverted, &attr_type, &attr_size);
+  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32)
+  {
+    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&x_mark2_p, &x_mark2_subid, attr_size,
+                                      object, now);
   }
 
   y_mark1_p = 0;
-  dyn->parse_attr_name(
-      y_mark1_attr, parsed_name, &inverted, &attr_type, &attr_size);
-  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32) {
-    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name,
-        (void**)&y_mark1_p, &y_mark1_subid, attr_size, object, now);
+  dyn->parse_attr_name(y_mark1_attr, parsed_name, &inverted, &attr_type, &attr_size);
+  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32)
+  {
+    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&y_mark1_p, &y_mark1_subid, attr_size,
+                                      object, now);
   }
 
   y_mark2_p = 0;
-  dyn->parse_attr_name(
-      y_mark2_attr, parsed_name, &inverted, &attr_type, &attr_size);
-  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32) {
-    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name,
-        (void**)&y_mark2_p, &y_mark2_subid, attr_size, object, now);
+  dyn->parse_attr_name(y_mark2_attr, parsed_name, &inverted, &attr_type, &attr_size);
+  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32)
+  {
+    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&y_mark2_p, &y_mark2_subid, attr_size,
+                                      object, now);
   }
 
   trace_data->p = &pdummy;
@@ -11994,16 +12558,19 @@ int GeXY_Curve::connect(
   // Get curve number
   curve_number = 0;
   unsigned int m = instance;
-  while (m) {
+  while (m)
+  {
     m = m >> 1;
     curve_number++;
   }
 
   // Get number of curves
-  if (instance == ge_mInstance_1) {
+  if (instance == ge_mInstance_1)
+  {
     unsigned int m = instance_mask;
     int noofcurves = 0;
-    while (m) {
+    while (m)
+    {
       m = m >> 1;
       noofcurves++;
     }
@@ -12013,8 +12580,7 @@ int GeXY_Curve::connect(
   // Set default colors
   set_curve_default_color(instance, &curve_color, &fill_color);
   grow_SetXYCurveCurveColor(object, curve_number - 1, curve_color, fill_color);
-  if (mark1_color != glow_eDrawType_Inherit
-      || mark2_color != glow_eDrawType_Inherit)
+  if (mark1_color != glow_eDrawType_Inherit || mark2_color != glow_eDrawType_Inherit)
     grow_SetXYCurveMarkColor(object, mark1_color, mark2_color);
   noofpoints = grow_GetTrendNoOfPoints(object);
 
@@ -12023,47 +12589,58 @@ int GeXY_Curve::connect(
 
 int GeXY_Curve::disconnect(grow_tObject object)
 {
-  if (update_p) {
+  if (update_p)
+  {
     gdh_UnrefObjectInfo(update_subid);
     update_p = 0;
   }
-  if (hold_p) {
+  if (hold_p)
+  {
     gdh_UnrefObjectInfo(hold_subid);
     hold_p = 0;
   }
-  if (noofpoints_p) {
+  if (noofpoints_p)
+  {
     gdh_UnrefObjectInfo(noofpoints_subid);
     noofpoints_p = 0;
   }
-  if (x_min_value_p) {
+  if (x_min_value_p)
+  {
     gdh_UnrefObjectInfo(x_min_value_subid);
     x_min_value_p = 0;
   }
-  if (x_max_value_p) {
+  if (x_max_value_p)
+  {
     gdh_UnrefObjectInfo(x_max_value_subid);
     x_max_value_p = 0;
   }
-  if (y_min_value_p) {
+  if (y_min_value_p)
+  {
     gdh_UnrefObjectInfo(y_min_value_subid);
     y_min_value_p = 0;
   }
-  if (y_max_value_p) {
+  if (y_max_value_p)
+  {
     gdh_UnrefObjectInfo(y_max_value_subid);
     y_max_value_p = 0;
   }
-  if (x_mark1_p) {
+  if (x_mark1_p)
+  {
     gdh_UnrefObjectInfo(x_mark1_subid);
     x_mark1_p = 0;
   }
-  if (x_mark2_p) {
+  if (x_mark2_p)
+  {
     gdh_UnrefObjectInfo(x_mark2_subid);
     x_mark1_p = 0;
   }
-  if (y_mark1_p) {
+  if (y_mark1_p)
+  {
     gdh_UnrefObjectInfo(y_mark1_subid);
     y_mark1_p = 0;
   }
-  if (y_mark2_p) {
+  if (y_mark2_p)
+  {
     gdh_UnrefObjectInfo(y_mark2_subid);
     y_mark1_p = 0;
   }
@@ -12081,19 +12658,17 @@ int GeXY_Curve::scan(grow_tObject object)
     // Update every scan...
     redraw = true;
 
-  if (first_scan && !(x_max_value_p && x_min_value_p)
-      && fabs(x_max_value - x_min_value) > DBL_EPSILON)
+  if (first_scan && !(x_max_value_p && x_min_value_p) && fabs(x_max_value - x_min_value) > DBL_EPSILON)
     grow_SetXYCurveRangeX(object, curve_number - 1, x_min_value, x_max_value);
-  if (first_scan && !(y_max_value_p && y_min_value_p)
-      && fabs(y_max_value - y_min_value) > DBL_EPSILON)
+  if (first_scan && !(y_max_value_p && y_min_value_p) && fabs(y_max_value - y_min_value) > DBL_EPSILON)
     grow_SetXYCurveRangeY(object, curve_number - 1, y_min_value, y_max_value);
 
-  if (x_max_value_p && x_min_value_p
-      && (!feqf(*x_max_value_p, old_x_max_value)
-             || !feqf(*x_min_value_p, old_x_min_value))) {
-    if (fabsf(*x_max_value_p - *x_min_value_p) > FLT_EPSILON) {
-      grow_SetXYCurveRangeX(object, curve_number - 1, double(*x_min_value_p),
-          double(*x_max_value_p));
+  if (x_max_value_p && x_min_value_p &&
+      (!feqf(*x_max_value_p, old_x_max_value) || !feqf(*x_min_value_p, old_x_min_value)))
+  {
+    if (fabsf(*x_max_value_p - *x_min_value_p) > FLT_EPSILON)
+    {
+      grow_SetXYCurveRangeX(object, curve_number - 1, double(*x_min_value_p), double(*x_max_value_p));
       redraw = true;
     }
     old_x_min_value = *x_min_value_p;
@@ -12102,12 +12677,12 @@ int GeXY_Curve::scan(grow_tObject object)
     x_max_value = *x_max_value_p;
   }
 
-  if (y_max_value_p && y_min_value_p
-      && (!feqf(*y_max_value_p, old_y_max_value)
-             || !feqf(*y_min_value_p, old_y_min_value))) {
-    if (fabsf(*y_max_value_p - *y_min_value_p) > FLT_EPSILON) {
-      grow_SetXYCurveRangeY(object, curve_number - 1, double(*y_min_value_p),
-          double(*y_max_value_p));
+  if (y_max_value_p && y_min_value_p &&
+      (!feqf(*y_max_value_p, old_y_max_value) || !feqf(*y_min_value_p, old_y_min_value)))
+  {
+    if (fabsf(*y_max_value_p - *y_min_value_p) > FLT_EPSILON)
+    {
+      grow_SetXYCurveRangeY(object, curve_number - 1, double(*y_min_value_p), double(*y_max_value_p));
       redraw = true;
     }
     old_y_min_value = *y_min_value_p;
@@ -12116,39 +12691,42 @@ int GeXY_Curve::scan(grow_tObject object)
     y_max_value = *y_max_value_p;
   }
 
-  if (x_mark1_p
-      && (first_scan || fabsf(*x_mark1_p - old_x_mark1) > FLT_EPSILON)) {
+  if (x_mark1_p && (first_scan || fabsf(*x_mark1_p - old_x_mark1) > FLT_EPSILON))
+  {
     grow_SetXYCurveXMark1(object, *x_mark1_p);
     old_x_mark1 = *x_mark1_p;
   }
-  if (x_mark2_p
-      && (first_scan || fabsf(*x_mark2_p - old_x_mark2) > FLT_EPSILON)) {
+  if (x_mark2_p && (first_scan || fabsf(*x_mark2_p - old_x_mark2) > FLT_EPSILON))
+  {
     grow_SetXYCurveXMark2(object, *x_mark2_p);
     old_x_mark2 = *x_mark2_p;
   }
-  if (y_mark1_p
-      && (first_scan || fabsf(*y_mark1_p - old_y_mark1) > FLT_EPSILON)) {
+  if (y_mark1_p && (first_scan || fabsf(*y_mark1_p - old_y_mark1) > FLT_EPSILON))
+  {
     grow_SetXYCurveYMark1(object, *y_mark1_p);
     old_y_mark1 = *y_mark1_p;
   }
-  if (y_mark2_p
-      && (first_scan || fabsf(*y_mark2_p - old_y_mark2) > FLT_EPSILON)) {
+  if (y_mark2_p && (first_scan || fabsf(*y_mark2_p - old_y_mark2) > FLT_EPSILON))
+  {
     grow_SetXYCurveYMark2(object, *y_mark2_p);
     old_y_mark2 = *y_mark2_p;
   }
 
-  if (noofpoints_p && *noofpoints_p != old_noofpoints) {
+  if (noofpoints_p && *noofpoints_p != old_noofpoints)
+  {
     redraw = true;
     old_noofpoints = *noofpoints_p;
   }
 
-  if (update_p) {
+  if (update_p)
+  {
     if (*update_p && !old_update)
       redraw = true;
     old_update = *update_p;
   }
 
-  if (first_scan || redraw) {
+  if (first_scan || redraw)
+  {
     int attr_type_x;
     int attr_type_y = 0;
     int attr_size;
@@ -12171,17 +12749,18 @@ int GeXY_Curve::scan(grow_tObject object)
     if (!no_of_points)
       return 1;
 
-    if (x_attr[0] == '&') {
+    if (x_attr[0] == '&')
+    {
       // Attribute starting with '&' indicates reference
       pwr_tAName refname;
-      dyn->parse_attr_name(
-          x_attr, refname, &inverted, &attr_type_x, &attr_size, &attr_elem);
+      dyn->parse_attr_name(x_attr, refname, &inverted, &attr_type_x, &attr_size, &attr_elem);
       sts = dyn->graph->get_reference_name(refname, parsed_name);
       if (EVEN(sts))
         return 1;
-    } else {
-      dyn->parse_attr_name(
-          x_attr, parsed_name, &inverted, &attr_type_x, &attr_size, &attr_elem);
+    }
+    else
+    {
+      dyn->parse_attr_name(x_attr, parsed_name, &inverted, &attr_type_x, &attr_size, &attr_elem);
     }
     if (attr_elem == 0)
       return 1;
@@ -12192,19 +12771,21 @@ int GeXY_Curve::scan(grow_tObject object)
     if (EVEN(sts))
       return 1;
 
-    switch (datatype) {
+    switch (datatype)
+    {
     case ge_eCurveDataType_XYArrays:
-      if (y_attr[0] == '&') {
+      if (y_attr[0] == '&')
+      {
         // Attribute starting with '&' indicates reference
         pwr_tAName refname;
-        dyn->parse_attr_name(
-            y_attr, refname, &inverted, &attr_type_y, &attr_size, &attr_elem);
+        dyn->parse_attr_name(y_attr, refname, &inverted, &attr_type_y, &attr_size, &attr_elem);
         sts = dyn->graph->get_reference_name(refname, parsed_name);
         if (EVEN(sts))
           return 1;
-      } else {
-        dyn->parse_attr_name(y_attr, parsed_name, &inverted, &attr_type_y,
-            &attr_size, &attr_elem);
+      }
+      else
+      {
+        dyn->parse_attr_name(y_attr, parsed_name, &inverted, &attr_type_y, &attr_size, &attr_elem);
       }
       y_value = calloc(MAX(attr_elem, no_of_points), attr_size / attr_elem);
       sts = gdh_GetObjectInfo(parsed_name, y_value, attr_size);
@@ -12223,20 +12804,25 @@ int GeXY_Curve::scan(grow_tObject object)
     x_trendvalue = (double*)malloc(no_of_points * sizeof(double));
     y_trendvalue = (double*)malloc(no_of_points * sizeof(double));
 
-    switch (datatype) {
+    switch (datatype)
+    {
     case ge_eCurveDataType_XYArrays:
-      for (int i = 0; i < no_of_points; i++) {
-        if (horizontal_padding) {
+      for (int i = 0; i < no_of_points; i++)
+      {
+        if (horizontal_padding)
+        {
           if (i == 0)
             j = 0;
           else if (i == no_of_points - 1)
             j = i - 2;
           else
             j = i - 1;
-        } else
+        }
+        else
           j = i;
 
-        switch (attr_type_x) {
+        switch (attr_type_x)
+        {
         case pwr_eType_Float32:
           x_trendvalue[i] = ((pwr_tFloat32*)x_value)[j];
           break;
@@ -12263,7 +12849,8 @@ int GeXY_Curve::scan(grow_tObject object)
           break;
         default:;
         }
-        switch (attr_type_y) {
+        switch (attr_type_y)
+        {
         case pwr_eType_Float32:
           y_trendvalue[i] = ((pwr_tFloat32*)y_value)[j];
           break;
@@ -12291,7 +12878,8 @@ int GeXY_Curve::scan(grow_tObject object)
         default:;
         }
       }
-      if (horizontal_padding) {
+      if (horizontal_padding)
+      {
         x_trendvalue[0] = x_min_value;
         x_trendvalue[no_of_points - 1] = x_max_value;
       }
@@ -12299,18 +12887,22 @@ int GeXY_Curve::scan(grow_tObject object)
       free(x_value);
       break;
     case ge_eCurveDataType_PointArray:
-      for (int i = 0; i < no_of_points; i++) {
-        if (horizontal_padding) {
+      for (int i = 0; i < no_of_points; i++)
+      {
+        if (horizontal_padding)
+        {
           if (i == 0)
             j = 0;
           else if (i == no_of_points - 1)
             j = i - 2;
           else
             j = i - 1;
-        } else
+        }
+        else
           j = i;
 
-        switch (attr_type_x) {
+        switch (attr_type_x)
+        {
         case pwr_eType_Float32:
           x_trendvalue[i] = ((pwr_tFloat32*)x_value)[2 * j];
           y_trendvalue[i] = ((pwr_tFloat32*)x_value)[2 * j + 1];
@@ -12346,25 +12938,30 @@ int GeXY_Curve::scan(grow_tObject object)
         default:;
         }
       }
-      if (horizontal_padding) {
+      if (horizontal_padding)
+      {
         x_trendvalue[0] = x_min_value;
         x_trendvalue[no_of_points - 1] = x_max_value;
       }
       free(x_value);
       break;
     case ge_eCurveDataType_TableObject:
-      for (int i = 0; i < no_of_points; i++) {
-        if (horizontal_padding) {
+      for (int i = 0; i < no_of_points; i++)
+      {
+        if (horizontal_padding)
+        {
           if (i == 0)
             j = 0;
           else if (i == no_of_points - 1)
             j = i - 2;
           else
             j = i - 1;
-        } else
+        }
+        else
           j = i;
 
-        switch (attr_type_x) {
+        switch (attr_type_x)
+        {
         case pwr_eType_Float32:
           x_trendvalue[i] = ((pwr_tFloat32*)x_value)[2 * j + 1];
           y_trendvalue[i] = ((pwr_tFloat32*)x_value)[2 * j + 2];
@@ -12372,7 +12969,8 @@ int GeXY_Curve::scan(grow_tObject object)
         default:;
         }
       }
-      if (horizontal_padding) {
+      if (horizontal_padding)
+      {
         x_trendvalue[0] = x_min_value;
         x_trendvalue[no_of_points - 1] = x_max_value;
       }
@@ -12380,8 +12978,7 @@ int GeXY_Curve::scan(grow_tObject object)
       break;
     }
 
-    grow_SetXYCurveData(
-        object, y_trendvalue, x_trendvalue, curve_number - 1, no_of_points);
+    grow_SetXYCurveData(object, y_trendvalue, x_trendvalue, curve_number - 1, no_of_points);
     free(y_trendvalue);
     free(x_trendvalue);
   }
@@ -12392,19 +12989,23 @@ int GeXY_Curve::scan(grow_tObject object)
   return 1;
 }
 
-int GeXY_Curve::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GeXY_Curve::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
   char name[80];
 
   sprintf(name, "%sXY_Curve", prefix);
 
   // Find first instance and print instance mask
-  for (GeDynElem *elem = dyn->elements; elem; elem = elem->next) {
-    if (elem->dyn_type1 == ge_mDynType1_XY_Curve && elem->instance == ge_mInstance_1) {
-      if (instance ==  instance_highest(elem->instance_mask)) {
-	if (elem->instance_mask != 1)
-	  fp << indentation << "SetObjectAttribute(id,\"" << prefix << "XY_Curve.Instances\"," << elem->instance_mask << ");" << '\n';
-	break;
+  for (GeDynElem* elem = dyn->elements; elem; elem = elem->next)
+  {
+    if (elem->dyn_type1 == ge_mDynType1_XY_Curve && elem->instance == ge_mInstance_1)
+    {
+      if (instance == instance_highest(elem->instance_mask))
+      {
+        if (elem->instance_mask != 1)
+          fp << indentation << "SetObjectAttribute(id,\"" << prefix << "XY_Curve.Instances\","
+             << elem->instance_mask << ");" << '\n';
+        break;
       }
     }
   }
@@ -12417,52 +13018,71 @@ int GeXY_Curve::export_script(grow_tObject o, std::ofstream& fp, char *indentati
   if (!streq(y_attr, ""))
     fp << indentation << "SetObjectAttribute(id,\"" << name << ".YAttr\",\"" << y_attr << "\");" << '\n';
   if (!streq(update_attr, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << name << ".UpdateAttr\",\"" << update_attr << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".UpdateAttr\",\"" << update_attr << "\");"
+       << '\n';
   if (!streq(hold_attr, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << name << ".HoldAttr\",\"" << hold_attr << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".HoldAttr\",\"" << hold_attr << "\");"
+       << '\n';
   if (x_min_value != 0)
-    fp << indentation << "SetObjectAttribute(id,\"" << name << ".XMinValue\"," << dtostr(x_min_value) << ");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".XMinValue\"," << dtostr(x_min_value) << ");"
+       << '\n';
   if (x_max_value != 0)
-    fp << indentation << "SetObjectAttribute(id,\"" << name << ".XMaxValue\"," << dtostr(x_max_value) << ");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".XMaxValue\"," << dtostr(x_max_value) << ");"
+       << '\n';
   if (y_min_value != 0)
-    fp << indentation << "SetObjectAttribute(id,\"" << name << ".YMinValue\"," << dtostr(y_min_value) << ");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".YMinValue\"," << dtostr(y_min_value) << ");"
+       << '\n';
   if (y_max_value != 0)
-    fp << indentation << "SetObjectAttribute(id,\"" << name << ".YMaxValue\"," << dtostr(y_max_value) << ");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".YMaxValue\"," << dtostr(y_max_value) << ");"
+       << '\n';
   if (!streq(x_minvalue_attr, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << name << ".XMinValueAttr\",\"" << x_minvalue_attr << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".XMinValueAttr\",\"" << x_minvalue_attr
+       << "\");" << '\n';
   if (!streq(x_maxvalue_attr, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << name << ".XMaxValueAttr\",\"" << x_maxvalue_attr << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".XMaxValueAttr\",\"" << x_maxvalue_attr
+       << "\");" << '\n';
   if (!streq(y_minvalue_attr, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << name << ".YMinValueAttr\",\"" << y_minvalue_attr << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".YMinValueAttr\",\"" << y_minvalue_attr
+       << "\");" << '\n';
   if (!streq(y_maxvalue_attr, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << name << ".YMaxValueAttr\",\"" << y_maxvalue_attr << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".YMaxValueAttr\",\"" << y_maxvalue_attr
+       << "\");" << '\n';
   if (!streq(noofpoints_attr, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << name << ".NoOfPointsAttr\",\"" << noofpoints_attr << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".NoOfPointsAttr\",\"" << noofpoints_attr
+       << "\");" << '\n';
   if (curve_color != glow_eDrawType_Inherit)
-    fp << indentation << "SetObjectAttribute(id,\"" << name << ".CurveColor\"," << curve_color << ");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".CurveColor\"," << curve_color << ");"
+       << '\n';
   if (fill_color != glow_eDrawType_Inherit)
     fp << indentation << "SetObjectAttribute(id,\"" << name << ".FillColor\"," << fill_color << ");" << '\n';
   if (horizontal_padding != 0)
-    fp << indentation << "SetObjectAttribute(id,\"" << name << ".HorizontalPadding\"," << horizontal_padding << ");" << '\n';
-  if (instance == ge_mInstance_1) {
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".HorizontalPadding\"," << horizontal_padding
+       << ");" << '\n';
+  if (instance == ge_mInstance_1)
+  {
     if (!streq(x_mark1_attr, ""))
-      fp << indentation << "SetObjectAttribute(id,\"" << name << ".XMark1Attr\",\"" << x_mark1_attr << "\");" << '\n';
+      fp << indentation << "SetObjectAttribute(id,\"" << name << ".XMark1Attr\",\"" << x_mark1_attr << "\");"
+         << '\n';
     if (!streq(x_mark2_attr, ""))
-      fp << indentation << "SetObjectAttribute(id,\"" << name << ".XMark2Attr\",\"" << x_mark2_attr << "\");" << '\n';
+      fp << indentation << "SetObjectAttribute(id,\"" << name << ".XMark2Attr\",\"" << x_mark2_attr << "\");"
+         << '\n';
     if (!streq(y_mark1_attr, ""))
-      fp << indentation << "SetObjectAttribute(id,\"" << name << ".YMark1Attr\",\"" << y_mark1_attr << "\");" << '\n';
+      fp << indentation << "SetObjectAttribute(id,\"" << name << ".YMark1Attr\",\"" << y_mark1_attr << "\");"
+         << '\n';
     if (!streq(y_mark2_attr, ""))
-      fp << indentation << "SetObjectAttribute(id,\"" << name << ".YMark2Attr\",\"" << y_mark2_attr << "\");" << '\n';
+      fp << indentation << "SetObjectAttribute(id,\"" << name << ".YMark2Attr\",\"" << y_mark2_attr << "\");"
+         << '\n';
     if (mark1_color != glow_eDrawType_Inherit)
-      fp << indentation << "SetObjectAttribute(id,\"" << name << ".Mark1Color\"," << mark1_color << ");" << '\n';
+      fp << indentation << "SetObjectAttribute(id,\"" << name << ".Mark1Color\"," << mark1_color << ");"
+         << '\n';
     if (mark2_color != glow_eDrawType_Inherit)
-      fp << indentation << "SetObjectAttribute(id,\"" << name << ".Mark2Color\"," << mark2_color << ");" << '\n';
-  }  
+      fp << indentation << "SetObjectAttribute(id,\"" << name << ".Mark2Color\"," << mark2_color << ");"
+         << '\n';
+  }
   return 1;
 }
 
-int GeXY_Curve::export_java(
-    grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeXY_Curve::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
   glow_eDrawType ccolor = curve_color;
   glow_eDrawType fcolor = fill_color;
@@ -12475,18 +13095,15 @@ int GeXY_Curve::export_java(
     fp << "      ";
   else
     fp << "      ,";
-  fp << "new GeDynXYCurve(" << var_name << ".dd, \"" << x_attr << "\",\""
-     << y_attr << "\",\"" << y_minvalue_attr << "\",\"" << y_maxvalue_attr
-     << "\",\"" << x_minvalue_attr << "\",\"" << x_maxvalue_attr << "\",\""
-     << noofpoints_attr << "\",\"" << update_attr << "\"," << y_min_value << ","
-     << y_max_value << "," << x_min_value << "," << x_max_value << ","
-     << noofpoints << "," << (int)datatype << "," << (int)ccolor << ","
-     << (int)fcolor << "," << fill_curve << ")\n";
+  fp << "new GeDynXYCurve(" << var_name << ".dd, \"" << x_attr << "\",\"" << y_attr << "\",\""
+     << y_minvalue_attr << "\",\"" << y_maxvalue_attr << "\",\"" << x_minvalue_attr << "\",\""
+     << x_maxvalue_attr << "\",\"" << noofpoints_attr << "\",\"" << update_attr << "\"," << y_min_value << ","
+     << y_max_value << "," << x_min_value << "," << x_max_value << "," << noofpoints << "," << (int)datatype
+     << "," << (int)ccolor << "," << (int)fcolor << "," << fill_curve << ")\n";
   return 1;
 }
 
-int GeXY_Curve::syntax_check(
-    grow_tObject object, int* error_cnt, int* warning_cnt)
+int GeXY_Curve::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
   char name[40];
   char atext[60];
@@ -12496,61 +13113,51 @@ int GeXY_Curve::syntax_check(
   else
     sprintf(name, "XY_Curve%d", GeDyn::instance_to_number(instance));
 
-  int types[] = { pwr_eType_Int8, pwr_eType_Int16, pwr_eType_Int32,
-    pwr_eType_UInt8, pwr_eType_UInt16, pwr_eType_UInt32, pwr_eType_Float32, 0 };
-  int types1[] = { pwr_eType_Boolean, pwr_eType_Int32, pwr_eType_UInt32, 0 };
-  int types2[] = { pwr_eType_Int32, pwr_eType_UInt32, 0 };
-  int types3[] = { pwr_eType_Float32, 0 };
-  graph_eDatabase databases[] = { graph_eDatabase_Gdh, graph_eDatabase__ };
+  int types[] = {pwr_eType_Int8,   pwr_eType_Int16,  pwr_eType_Int32,   pwr_eType_UInt8,
+                 pwr_eType_UInt16, pwr_eType_UInt32, pwr_eType_Float32, 0};
+  int types1[] = {pwr_eType_Boolean, pwr_eType_Int32, pwr_eType_UInt32, 0};
+  int types2[] = {pwr_eType_Int32, pwr_eType_UInt32, 0};
+  int types3[] = {pwr_eType_Float32, 0};
+  graph_eDatabase databases[] = {graph_eDatabase_Gdh, graph_eDatabase__};
 
   sprintf(atext, "%s.UpdateAttr", name);
-  dyn->syntax_check_attribute(
-      object, atext, update_attr, 1, types1, databases, error_cnt, warning_cnt);
+  dyn->syntax_check_attribute(object, atext, update_attr, 1, types1, databases, error_cnt, warning_cnt);
   sprintf(atext, "%s.NoOfPointsAttr", name);
-  dyn->syntax_check_attribute(object, atext, noofpoints_attr, 1, types2,
-      databases, error_cnt, warning_cnt);
+  dyn->syntax_check_attribute(object, atext, noofpoints_attr, 1, types2, databases, error_cnt, warning_cnt);
   sprintf(atext, "%s.XMinValueAttr", name);
-  dyn->syntax_check_attribute(object, atext, x_minvalue_attr, 1, types3,
-      databases, error_cnt, warning_cnt);
+  dyn->syntax_check_attribute(object, atext, x_minvalue_attr, 1, types3, databases, error_cnt, warning_cnt);
   sprintf(atext, "%s.XMaxValueAttr", name);
-  dyn->syntax_check_attribute(object, atext, x_maxvalue_attr, 1, types3,
-      databases, error_cnt, warning_cnt);
+  dyn->syntax_check_attribute(object, atext, x_maxvalue_attr, 1, types3, databases, error_cnt, warning_cnt);
   sprintf(atext, "%s.YMinValueAttr", name);
-  dyn->syntax_check_attribute(object, atext, y_minvalue_attr, 1, types3,
-      databases, error_cnt, warning_cnt);
+  dyn->syntax_check_attribute(object, atext, y_minvalue_attr, 1, types3, databases, error_cnt, warning_cnt);
   sprintf(atext, "%s.YMaxValueAttr", name);
-  dyn->syntax_check_attribute(object, atext, y_maxvalue_attr, 1, types3,
-      databases, error_cnt, warning_cnt);
+  dyn->syntax_check_attribute(object, atext, y_maxvalue_attr, 1, types3, databases, error_cnt, warning_cnt);
   sprintf(atext, "%s.XMark1Attr", name);
-  dyn->syntax_check_attribute(object, atext, x_mark1_attr, 1, types3, databases,
-      error_cnt, warning_cnt);
+  dyn->syntax_check_attribute(object, atext, x_mark1_attr, 1, types3, databases, error_cnt, warning_cnt);
   sprintf(atext, "%s.XMark2Attr", name);
-  dyn->syntax_check_attribute(object, atext, x_mark2_attr, 1, types3, databases,
-      error_cnt, warning_cnt);
+  dyn->syntax_check_attribute(object, atext, x_mark2_attr, 1, types3, databases, error_cnt, warning_cnt);
   sprintf(atext, "%s.YMark1Attr", name);
-  dyn->syntax_check_attribute(object, atext, y_mark1_attr, 1, types3, databases,
-      error_cnt, warning_cnt);
+  dyn->syntax_check_attribute(object, atext, y_mark1_attr, 1, types3, databases, error_cnt, warning_cnt);
   sprintf(atext, "%s.YMark2Attr", name);
-  dyn->syntax_check_attribute(object, atext, y_mark2_attr, 1, types3, databases,
-      error_cnt, warning_cnt);
+  dyn->syntax_check_attribute(object, atext, y_mark2_attr, 1, types3, databases, error_cnt, warning_cnt);
   sprintf(atext, "%s.XAttr", name);
-  dyn->syntax_check_attribute(
-      object, atext, x_attr, 0, types, databases, error_cnt, warning_cnt);
-  if (datatype == ge_eCurveDataType_XYArrays) {
+  dyn->syntax_check_attribute(object, atext, x_attr, 0, types, databases, error_cnt, warning_cnt);
+  if (datatype == ge_eCurveDataType_XYArrays)
+  {
     sprintf(atext, "%s.YAttr", name);
-    dyn->syntax_check_attribute(
-        object, atext, y_attr, 0, types, databases, error_cnt, warning_cnt);
-  } else if (!streq(y_attr, "")) {
-    dyn->graph->syntax_msg(
-        'W', object, "XY_Curve.YAttr not used for this DataType");
+    dyn->syntax_check_attribute(object, atext, y_attr, 0, types, databases, error_cnt, warning_cnt);
+  }
+  else if (!streq(y_attr, ""))
+  {
+    dyn->graph->syntax_msg('W', object, "XY_Curve.YAttr not used for this DataType");
     (*warning_cnt)++;
   }
   return 1;
 }
 
 GeTable::GeTable(GeDyn* e_dyn)
-    : GeDynElem(e_dyn, ge_mDynType1_Table, ge_mDynType2_No, ge_mActionType1_No,
-          ge_mActionType2_No, ge_eDynPrio_Table)
+    : GeDynElem(e_dyn, ge_mDynType1_Table, ge_mDynType2_No, ge_mActionType1_No, ge_mActionType2_No,
+                ge_eDynPrio_Table)
 {
   memset(attribute, 0, sizeof(attribute));
   memset(format, 0, sizeof(format));
@@ -12563,8 +13170,7 @@ GeTable::GeTable(GeDyn* e_dyn)
 }
 
 GeTable::GeTable(const GeTable& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-          x.prio)
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio)
 {
   memcpy(attribute, x.attribute, sizeof(attribute));
   memcpy(format, x.format, sizeof(format));
@@ -12760,11 +13366,11 @@ void GeTable::get_attributes(attr_sItem* attrinfo, int* item_count)
   *item_count = i;
 }
 
-void GeTable::set_attribute(
-    grow_tObject object, const char* attr_name, int* cnt)
+void GeTable::set_attribute(grow_tObject object, const char* attr_name, int* cnt)
 {
   (*cnt)--;
-  if (*cnt == 0) {
+  if (*cnt == 0)
+  {
     char msg[200];
 
     strncpy(attribute[0], attr_name, sizeof(attribute[0]));
@@ -12777,19 +13383,17 @@ void GeTable::set_attribute(
 void GeTable::replace_attribute(char* from, char* to, int* cnt, int strict)
 {
   for (int i = 0; i < TABLE_MAX_COL; i++)
-    GeDyn::replace_attribute(
-        attribute[i], sizeof(attribute[0]), from, to, cnt, strict);
+    GeDyn::replace_attribute(attribute[i], sizeof(attribute[0]), from, to, cnt, strict);
 }
 
 void GeTable::save(std::ofstream& fp)
 {
   fp << int(ge_eSave_Table) << '\n';
-  for (int i = 0; i < TABLE_MAX_COL; i++) {
-    fp << int(ge_eSave_Table_attribute1) + 3 * i << FSPACE << attribute[i]
-       << '\n';
+  for (int i = 0; i < TABLE_MAX_COL; i++)
+  {
+    fp << int(ge_eSave_Table_attribute1) + 3 * i << FSPACE << attribute[i] << '\n';
     fp << int(ge_eSave_Table_format1) + 3 * i << FSPACE << format[i] << '\n';
-    fp << int(ge_eSave_Table_sel_attribute1) + 3 * i << FSPACE
-       << sel_attribute[i] << '\n';
+    fp << int(ge_eSave_Table_sel_attribute1) + 3 * i << FSPACE << sel_attribute[i] << '\n';
   }
   fp << int(ge_eSave_End) << '\n';
 }
@@ -12800,8 +13404,10 @@ void GeTable::open(std::ifstream& fp)
   int end_found = 0;
   char dummy[40];
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeTable: \"%d %s\"\n", type, dummy);
@@ -12809,7 +13415,8 @@ void GeTable::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_Table:
       break;
     case ge_eSave_Table_attribute1:
@@ -12981,10 +13588,11 @@ int GeTable::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
   columns = info.columns;
   rows = info.rows;
 
-  for (int i = 0; i < columns; i++) {
+  for (int i = 0; i < columns; i++)
+  {
     p[i] = 0;
-    db[i] = dyn->parse_attr_name(attribute[i], (char*)parsed_name, &inverted,
-        &attr_type, &size[i], &elements[i]);
+    db[i] =
+        dyn->parse_attr_name(attribute[i], (char*)parsed_name, &inverted, &attr_type, &size[i], &elements[i]);
     if (streq(parsed_name, ""))
       continue;
 
@@ -12999,18 +13607,22 @@ int GeTable::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
 
     elements[i] = MIN(elements[i], rows);
 
-    if (!str_StartsWith(parsed_name, "$header.")) {
-      switch (db[i]) {
+    if (!str_StartsWith(parsed_name, "$header."))
+    {
+      switch (db[i])
+      {
       case graph_eDatabase_Gdh:
-        sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name,
-            (void**)&p[i], &subid[i], col_size, object, now);
+        sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&p[i], &subid[i], col_size, object,
+                                          now);
         if (EVEN(sts))
           return sts;
         type_id[i] = attr_type;
         break;
       default:;
       }
-    } else {
+    }
+    else
+    {
       int h_attr_type;
       int h_attr_size;
       pwr_tAName h_parsed_name;
@@ -13026,33 +13638,33 @@ int GeTable::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
       headerref_p[i] = (char**)calloc(elements[i], sizeof(char*));
       headerref_subid[i] = (pwr_tSubid*)calloc(elements[i], sizeof(pwr_tSubid));
 
-      dyn->parse_attr_name(attribute[0], (char*)h_parsed_name, &h_inverted,
-          &h_attr_type, &h_attr_size, &h_elements);
+      dyn->parse_attr_name(attribute[0], (char*)h_parsed_name, &h_inverted, &h_attr_type, &h_attr_size,
+                           &h_elements);
       objid_value = (pwr_tObjid*)calloc(h_elements, sizeof(pwr_tObjid));
-      sts = gdh_GetObjectInfo(
-          h_parsed_name, objid_value, h_elements * sizeof(pwr_tObjid));
+      sts = gdh_GetObjectInfo(h_parsed_name, objid_value, h_elements * sizeof(pwr_tObjid));
       if (EVEN(sts))
         continue;
 
-      for (int j = 0; j < elements[i]; j++) {
-        if (cdh_ObjidIsNotNull(objid_value[j])) {
-          sts = gdh_ObjidToName(
-              objid_value[j], name, sizeof(name), cdh_mName_volumeStrict);
+      for (int j = 0; j < elements[i]; j++)
+      {
+        if (cdh_ObjidIsNotNull(objid_value[j]))
+        {
+          sts = gdh_ObjidToName(objid_value[j], name, sizeof(name), cdh_mName_volumeStrict);
           if (EVEN(sts))
             continue;
 
           strcat(name, &parsed_name[7]);
           type_id[i] = attr_type;
-          sts = dyn->graph->ref_object_info(dyn->cycle, name,
-              (void**)&headerref_p[i][j], &headerref_subid[i][j], size[i],
-              object, now);
+          sts = dyn->graph->ref_object_info(dyn->cycle, name, (void**)&headerref_p[i][j],
+                                            &headerref_subid[i][j], size[i], object, now);
           if (EVEN(sts))
             return sts;
         }
       }
     }
 
-    switch (type_id[i]) {
+    switch (type_id[i])
+    {
     case pwr_eType_String:
       info.column_size[i] = size[i];
       break;
@@ -13065,7 +13677,8 @@ int GeTable::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
       info.column_size[i] = 25;
       break;
     case pwr_eType_Objid:
-      switch (format[i][1]) {
+      switch (format[i][1])
+      {
       case '1':
       case '2':
         info.column_size[i] = 200;
@@ -13075,7 +13688,8 @@ int GeTable::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
       }
       break;
     case pwr_eType_AttrRef:
-      switch (format[i][1]) {
+      switch (format[i][1])
+      {
       case '1':
       case '2':
         info.column_size[i] = 400;
@@ -13092,8 +13706,8 @@ int GeTable::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
 
     // Connect select array
     sel_p[i] = 0;
-    sel_db[i] = dyn->parse_attr_name(sel_attribute[i], (char*)parsed_name,
-        &inverted, &attr_type, &attr_size, &sel_elements[i]);
+    sel_db[i] = dyn->parse_attr_name(sel_attribute[i], (char*)parsed_name, &inverted, &attr_type, &attr_size,
+                                     &sel_elements[i]);
     if (streq(parsed_name, ""))
       continue;
 
@@ -13102,11 +13716,11 @@ int GeTable::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
     if (attr_type != pwr_eType_Boolean || !sel_elements[i])
       continue;
 
-    switch (sel_db[i]) {
+    switch (sel_db[i])
+    {
     case graph_eDatabase_Gdh:
-      sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name,
-          (void**)&sel_p[i], &sel_subid[i],
-          sel_elements[i] * sizeof(pwr_tBoolean), object, now);
+      sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&sel_p[i], &sel_subid[i],
+                                        sel_elements[i] * sizeof(pwr_tBoolean), object, now);
       if (EVEN(sts))
         return sts;
       break;
@@ -13123,11 +13737,13 @@ int GeTable::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
 
 int GeTable::disconnect(grow_tObject object)
 {
-  for (int i = 0; i < columns; i++) {
+  for (int i = 0; i < columns; i++)
+  {
     if (p[i] && db[i] == graph_eDatabase_Gdh)
       gdh_UnrefObjectInfo(subid[i]);
     p[i] = 0;
-    if (old_value[i]) {
+    if (old_value[i])
+    {
       free(old_value[i]);
       old_value[i] = 0;
     }
@@ -13136,8 +13752,10 @@ int GeTable::disconnect(grow_tObject object)
       gdh_UnrefObjectInfo(sel_subid[i]);
     sel_p[i] = 0;
 
-    if (is_headerref[i]) {
-      for (int j = 0; j < elements[i]; j++) {
+    if (is_headerref[i])
+    {
+      for (int j = 0; j < elements[i]; j++)
+      {
         if (headerref_p[i][j])
           gdh_UnrefObjectInfo(headerref_subid[i][j]);
       }
@@ -13158,20 +13776,25 @@ int GeTable::scan(grow_tObject object)
   int len;
 
   grow_SetDeferedRedraw(dyn->graph->grow->ctx);
-  for (i = 0; i < columns; i++) {
-    if (is_headerref[i]) {
-      for (j = 0; j < elements[i]; j++) {
+  for (i = 0; i < columns; i++)
+  {
+    if (is_headerref[i])
+    {
+      for (j = 0; j < elements[i]; j++)
+      {
         if (!headerref_p[i][j])
           continue;
 
         offs = j * size[i];
-        if (!first_scan) {
+        if (!first_scan)
+        {
           if (memcmp(old_value[i] + offs, headerref_p[i][j], size[i]) == 0)
             // No change since last time
             continue;
         }
 
-        switch (type_id[i]) {
+        switch (type_id[i])
+        {
         case pwr_eType_Float32:
           len = sprintf(buf, format[i], *(pwr_tFloat32*)headerref_p[i][j]);
           break;
@@ -13185,12 +13808,14 @@ int GeTable::scan(grow_tObject object)
           break;
         case pwr_eType_Status:
         case pwr_eType_NetStatus:
-          if (*(pwr_tStatus*)headerref_p[i][j] == 0) {
+          if (*(pwr_tStatus*)headerref_p[i][j] == 0)
+          {
             strcpy(buf, "");
             len = 0;
             break;
           }
-          switch (format[i][1]) {
+          switch (format[i][1])
+          {
           case '1':
             // Format %1m: Write only the text
             msg_GetText(*(pwr_tStatus*)headerref_p[i][j], buf, sizeof(buf));
@@ -13203,21 +13828,21 @@ int GeTable::scan(grow_tObject object)
         case pwr_eType_String:
           len = sprintf(buf, format[i], (char*)headerref_p[i][j]);
           break;
-        case pwr_eType_Objid: {
+        case pwr_eType_Objid:
+        {
           int sts;
           pwr_tOName name;
           pwr_tObjid objid = *(pwr_tObjid*)headerref_p[i][j];
 
-          switch (format[i][1]) {
+          switch (format[i][1])
+          {
           case '1':
             // Format %1o, write path
-            sts = gdh_ObjidToName(
-                objid, name, sizeof(name), cdh_mName_pathStrict);
+            sts = gdh_ObjidToName(objid, name, sizeof(name), cdh_mName_pathStrict);
             break;
           case '2':
             // Format %2o, write volume and path
-            sts = gdh_ObjidToName(
-                objid, name, sizeof(name), cdh_mName_volumeStrict);
+            sts = gdh_ObjidToName(objid, name, sizeof(name), cdh_mName_volumeStrict);
             break;
           default:
             sts = gdh_ObjidToName(objid, name, sizeof(name), cdh_mName_object);
@@ -13227,52 +13852,53 @@ int GeTable::scan(grow_tObject object)
           len = sprintf(buf, "%s", name);
           break;
         }
-        case pwr_eType_Time: {
+        case pwr_eType_Time:
+        {
           int sts;
           char timstr[40];
 
           if (memcmp(headerref_p[i][j], &pwr_cNTime, sizeof(pwr_tTime)) == 0)
             strcpy(timstr, "");
-          else {
-            switch (format[i][1]) {
+          else
+          {
+            switch (format[i][1])
+            {
             case '1':
               // Format %1t, only time, no hundredth
-              sts = time_AtoAscii((pwr_tTime*)headerref_p[i][j],
-                  time_eFormat_Time, timstr, sizeof(timstr));
+              sts = time_AtoAscii((pwr_tTime*)headerref_p[i][j], time_eFormat_Time, timstr, sizeof(timstr));
               timstr[8] = 0;
               break;
             case '2':
               // Format %2t, only time, with hundredth
-              sts = time_AtoAscii((pwr_tTime*)headerref_p[i][j],
-                  time_eFormat_Time, timstr, sizeof(timstr));
+              sts = time_AtoAscii((pwr_tTime*)headerref_p[i][j], time_eFormat_Time, timstr, sizeof(timstr));
               break;
             case '3':
               // Format %3t, compressed date and time, no hundredth
-              sts = time_AtoAscii((pwr_tTime*)headerref_p[i][j],
-                  time_eFormat_ComprDateAndTime, timstr, sizeof(timstr));
+              sts = time_AtoAscii((pwr_tTime*)headerref_p[i][j], time_eFormat_ComprDateAndTime, timstr,
+                                  sizeof(timstr));
               timstr[17] = 0;
               break;
             case '4':
               // Format %4t, date only
-              sts = time_AtoAscii((pwr_tTime*)headerref_p[i][j],
-                  time_eFormat_DateAndTime, timstr, sizeof(timstr));
+              sts = time_AtoAscii((pwr_tTime*)headerref_p[i][j], time_eFormat_DateAndTime, timstr,
+                                  sizeof(timstr));
               timstr[11] = 0;
               break;
             case '5':
               // Format %5t, compressed date only
-              sts = time_AtoAscii((pwr_tTime*)headerref_p[i][j],
-                  time_eFormat_ComprDateAndTime, timstr, sizeof(timstr));
+              sts = time_AtoAscii((pwr_tTime*)headerref_p[i][j], time_eFormat_ComprDateAndTime, timstr,
+                                  sizeof(timstr));
               timstr[8] = 0;
               break;
             case '6':
               // Format %6t, 01:00:00 30/01/87
-              sts = time_AtoAscii((pwr_tTime*)headerref_p[i][j],
-                  time_eFormat_TimeAndDate, timstr, sizeof(timstr));
+              sts = time_AtoAscii((pwr_tTime*)headerref_p[i][j], time_eFormat_TimeAndDate, timstr,
+                                  sizeof(timstr));
               timstr[17] = 0;
               break;
             default:
-              sts = time_AtoAscii((pwr_tTime*)headerref_p[i][j],
-                  time_eFormat_DateAndTime, timstr, sizeof(timstr));
+              sts = time_AtoAscii((pwr_tTime*)headerref_p[i][j], time_eFormat_DateAndTime, timstr,
+                                  sizeof(timstr));
             }
             if (EVEN(sts))
               strcpy(timstr, "-");
@@ -13280,19 +13906,19 @@ int GeTable::scan(grow_tObject object)
           len = sprintf(buf, "%s", timstr);
           break;
         }
-        case pwr_eType_DeltaTime: {
+        case pwr_eType_DeltaTime:
+        {
           int sts;
           char timstr[40];
 
-          switch (format[i][1]) {
+          switch (format[i][1])
+          {
           case '1':
             // Format %1t, only time, no hundredth
-            sts = time_DtoAscii(
-                (pwr_tDeltaTime*)headerref_p[i][j], 0, timstr, sizeof(timstr));
+            sts = time_DtoAscii((pwr_tDeltaTime*)headerref_p[i][j], 0, timstr, sizeof(timstr));
             break;
           default:
-            sts = time_DtoAscii(
-                (pwr_tDeltaTime*)headerref_p[i][j], 1, timstr, sizeof(timstr));
+            sts = time_DtoAscii((pwr_tDeltaTime*)headerref_p[i][j], 1, timstr, sizeof(timstr));
           }
           if (EVEN(sts))
             strcpy(timstr, "-");
@@ -13306,10 +13932,10 @@ int GeTable::scan(grow_tObject object)
             strcpy(buf, "0");
           len = 1;
           break;
-        default: {
+        default:
+        {
           int sts;
-          sts = cdh_AttrValueToString(
-              (pwr_eType)type_id[i], headerref_p[i][j], buf, sizeof(buf));
+          sts = cdh_AttrValueToString((pwr_eType)type_id[i], headerref_p[i][j], buf, sizeof(buf));
           if (EVEN(sts))
             sprintf(buf, "Invalid type");
           len = strlen(buf);
@@ -13319,18 +13945,23 @@ int GeTable::scan(grow_tObject object)
         grow_SetCellValue(object, i, j, buf);
         memcpy(old_value[i] + offs, headerref_p[i][j], size[i]);
       }
-    } else {
+    }
+    else
+    {
       if (!p[i])
         continue;
-      for (j = 0; j < elements[i]; j++) {
+      for (j = 0; j < elements[i]; j++)
+      {
         offs = j * size[i];
-        if (!first_scan) {
+        if (!first_scan)
+        {
           if (memcmp(old_value[i] + offs, p[i] + offs, size[i]) == 0)
             // No change since last time
             continue;
         }
 
-        switch (type_id[i]) {
+        switch (type_id[i])
+        {
         case pwr_eType_Float32:
           len = sprintf(buf, format[i], *(pwr_tFloat32*)(p[i] + offs));
           break;
@@ -13342,20 +13973,20 @@ int GeTable::scan(grow_tObject object)
         case pwr_eType_String:
           len = sprintf(buf, format[i], (char*)(p[i] + offs));
           break;
-        case pwr_eType_Objid: {
+        case pwr_eType_Objid:
+        {
           int sts;
           pwr_tOName name;
           pwr_tObjid objid = *(pwr_tObjid*)(p[i] + offs);
-          switch (format[i][1]) {
+          switch (format[i][1])
+          {
           case '1':
             // Format %1o, write path
-            sts = gdh_ObjidToName(
-                objid, name, sizeof(name), cdh_mName_pathStrict);
+            sts = gdh_ObjidToName(objid, name, sizeof(name), cdh_mName_pathStrict);
             break;
           case '2':
             // Format %2o, write volume and path
-            sts = gdh_ObjidToName(
-                objid, name, sizeof(name), cdh_mName_volumeStrict);
+            sts = gdh_ObjidToName(objid, name, sizeof(name), cdh_mName_volumeStrict);
             break;
           default:
             sts = gdh_ObjidToName(objid, name, sizeof(name), cdh_mName_object);
@@ -13365,28 +13996,28 @@ int GeTable::scan(grow_tObject object)
           len = sprintf(buf, "%s", name);
           break;
         }
-        case pwr_eType_AttrRef: {
+        case pwr_eType_AttrRef:
+        {
           int sts;
           pwr_tOName name;
           pwr_tAttrRef aref = *(pwr_tAttrRef*)(p[i] + offs);
 
           if (cdh_ObjidIsNull(aref.Objid))
             strcpy(name, "");
-          else {
-            switch (format[i][1]) {
+          else
+          {
+            switch (format[i][1])
+            {
             case '1':
               // Format %1o, write path
-              sts = gdh_AttrrefToName(
-                  &aref, name, sizeof(name), cdh_mName_pathStrict);
+              sts = gdh_AttrrefToName(&aref, name, sizeof(name), cdh_mName_pathStrict);
               break;
             case '2':
               // Format %2o, write volume and path
-              sts = gdh_AttrrefToName(
-                  &aref, name, sizeof(name), cdh_mName_volumeStrict);
+              sts = gdh_AttrrefToName(&aref, name, sizeof(name), cdh_mName_volumeStrict);
               break;
             default:
-              sts = gdh_AttrrefToName(&aref, name, sizeof(name),
-                  cdh_mName_object | cdh_mName_attribute);
+              sts = gdh_AttrrefToName(&aref, name, sizeof(name), cdh_mName_object | cdh_mName_attribute);
             }
             if (EVEN(sts))
               strcpy(name, "");
@@ -13394,52 +14025,51 @@ int GeTable::scan(grow_tObject object)
           len = sprintf(buf, "%s", name);
           break;
         }
-        case pwr_eType_Time: {
+        case pwr_eType_Time:
+        {
           int sts;
           char timstr[40];
 
           if (memcmp(p[i] + offs, &pwr_cNTime, sizeof(pwr_tTime)) == 0)
             strcpy(timstr, "");
-          else {
-            switch (format[i][1]) {
+          else
+          {
+            switch (format[i][1])
+            {
             case '1':
               // Format %1t, only time, no hundredth
-              sts = time_AtoAscii((pwr_tTime*)(p[i] + offs), time_eFormat_Time,
-                  timstr, sizeof(timstr));
+              sts = time_AtoAscii((pwr_tTime*)(p[i] + offs), time_eFormat_Time, timstr, sizeof(timstr));
               timstr[8] = 0;
               break;
             case '2':
               // Format %2t, only time, with hundredth
-              sts = time_AtoAscii((pwr_tTime*)(p[i] + offs), time_eFormat_Time,
-                  timstr, sizeof(timstr));
+              sts = time_AtoAscii((pwr_tTime*)(p[i] + offs), time_eFormat_Time, timstr, sizeof(timstr));
               break;
             case '3':
               // Format %3t, compressed date and time, no hundredth
-              sts = time_AtoAscii((pwr_tTime*)(p[i] + offs),
-                  time_eFormat_ComprDateAndTime, timstr, sizeof(timstr));
+              sts = time_AtoAscii((pwr_tTime*)(p[i] + offs), time_eFormat_ComprDateAndTime, timstr,
+                                  sizeof(timstr));
               timstr[17] = 0;
               break;
             case '4':
               // Format %4t, date only
-              sts = time_AtoAscii((pwr_tTime*)p[i] + offs,
-                  time_eFormat_DateAndTime, timstr, sizeof(timstr));
+              sts = time_AtoAscii((pwr_tTime*)p[i] + offs, time_eFormat_DateAndTime, timstr, sizeof(timstr));
               timstr[11] = 0;
               break;
             case '5':
               // Format %5t, compressed date only
-              sts = time_AtoAscii((pwr_tTime*)p[i] + offs,
-                  time_eFormat_ComprDateAndTime, timstr, sizeof(timstr));
+              sts = time_AtoAscii((pwr_tTime*)p[i] + offs, time_eFormat_ComprDateAndTime, timstr,
+                                  sizeof(timstr));
               timstr[8] = 0;
               break;
             case '6':
               // Format %6t, 01:00:00 30/01/87
-              sts = time_AtoAscii((pwr_tTime*)p[i] + offs,
-                  time_eFormat_TimeAndDate, timstr, sizeof(timstr));
+              sts = time_AtoAscii((pwr_tTime*)p[i] + offs, time_eFormat_TimeAndDate, timstr, sizeof(timstr));
               timstr[17] = 0;
               break;
             default:
-              sts = time_AtoAscii((pwr_tTime*)(p[i] + offs),
-                  time_eFormat_DateAndTime, timstr, sizeof(timstr));
+              sts =
+                  time_AtoAscii((pwr_tTime*)(p[i] + offs), time_eFormat_DateAndTime, timstr, sizeof(timstr));
             }
             if (EVEN(sts))
               strcpy(timstr, "-");
@@ -13447,19 +14077,19 @@ int GeTable::scan(grow_tObject object)
           len = sprintf(buf, "%s", timstr);
           break;
         }
-        case pwr_eType_DeltaTime: {
+        case pwr_eType_DeltaTime:
+        {
           int sts;
           char timstr[40];
 
-          switch (format[i][1]) {
+          switch (format[i][1])
+          {
           case '1':
             // Format %1t, only time, no hundredth
-            sts = time_DtoAscii(
-                (pwr_tDeltaTime*)(p[i] + offs), 0, timstr, sizeof(timstr));
+            sts = time_DtoAscii((pwr_tDeltaTime*)(p[i] + offs), 0, timstr, sizeof(timstr));
             break;
           default:
-            sts = time_DtoAscii(
-                (pwr_tDeltaTime*)(p[i] + offs), 1, timstr, sizeof(timstr));
+            sts = time_DtoAscii((pwr_tDeltaTime*)(p[i] + offs), 1, timstr, sizeof(timstr));
           }
           if (EVEN(sts))
             strcpy(timstr, "-");
@@ -13473,10 +14103,10 @@ int GeTable::scan(grow_tObject object)
             strcpy(buf, "0");
           len = 1;
           break;
-        default: {
+        default:
+        {
           int sts;
-          sts = cdh_AttrValueToString(
-              (pwr_eType)type_id[i], p[i] + offs, buf, sizeof(buf));
+          sts = cdh_AttrValueToString((pwr_eType)type_id[i], p[i] + offs, buf, sizeof(buf));
           if (EVEN(sts))
             sprintf(buf, "Invalid type");
           len = strlen(buf);
@@ -13491,11 +14121,14 @@ int GeTable::scan(grow_tObject object)
 
   // Examine select array
   int sel_found = 0;
-  for (i = 0; i < columns; i++) {
+  for (i = 0; i < columns; i++)
+  {
     if (!sel_p[i])
       continue;
-    for (j = 0; j < sel_elements[i]; j++) {
-      if (sel_p[i][j]) {
+    for (j = 0; j < sel_elements[i]; j++)
+    {
+      if (sel_p[i][j])
+      {
         sel_found = 1;
         grow_SetSelectedCell(object, i, j);
       }
@@ -13514,13 +14147,15 @@ int GeTable::action(grow_tObject object, glow_tEvent event)
   if (!dyn->graph->is_authorized(dyn->access))
     return 1;
 
-  switch (event->event) {
+  switch (event->event)
+  {
   case glow_eEvent_MB1Down:
     grow_SetClickSensitivity(dyn->graph->grow->ctx, glow_mSensitivity_MB1Click);
     break;
   case glow_eEvent_MB1Up:
     break;
-  case glow_eEvent_MB1Click: {
+  case glow_eEvent_MB1Click:
+  {
     int column, row;
     pwr_tBoolean value;
     int sts;
@@ -13533,21 +14168,21 @@ int GeTable::action(grow_tObject object, glow_tEvent event)
       break;
 
     sts = grow_GetSelectedCell(object, &column, &row);
-    if (ODD(sts) && sel_p[column]) {
+    if (ODD(sts) && sel_p[column])
+    {
       // Reset previously selected
-      db = dyn->parse_attr_name(sel_attribute[column], parsed_name, &inverted,
-          &attr_type, &attr_size);
+      db = dyn->parse_attr_name(sel_attribute[column], parsed_name, &inverted, &attr_type, &attr_size);
       value = 0;
       sprintf(&parsed_name[strlen(parsed_name)], "[%d]", row);
       sts = gdh_SetObjectInfo(parsed_name, &value, sizeof(value));
       if (EVEN(sts))
         printf("Table error: %s\n", parsed_name);
     }
-    if (sel_p[event->table.column]
-        && !(event->table.column == column && event->table.row == row)) {
+    if (sel_p[event->table.column] && !(event->table.column == column && event->table.row == row))
+    {
       // Set new selected, if not same as previous selected
-      db = dyn->parse_attr_name(sel_attribute[event->table.column], parsed_name,
-          &inverted, &attr_type, &attr_size);
+      db = dyn->parse_attr_name(sel_attribute[event->table.column], parsed_name, &inverted, &attr_type,
+                                &attr_size);
       value = 1;
       sprintf(&parsed_name[strlen(parsed_name)], "[%d]", event->table.row);
       sts = gdh_SetObjectInfo(parsed_name, &value, sizeof(value));
@@ -13561,7 +14196,8 @@ int GeTable::action(grow_tObject object, glow_tEvent event)
   case glow_eEvent_Key_Up:
   case glow_eEvent_Key_Down:
   case glow_eEvent_Key_Left:
-  case glow_eEvent_Key_Right: {
+  case glow_eEvent_Key_Right:
+  {
     int column, row, new_column = 0, new_row = 0;
     pwr_tBoolean value;
     int sts;
@@ -13572,7 +14208,8 @@ int GeTable::action(grow_tObject object, glow_tEvent event)
 
     sts = grow_GetSelectedCell(object, &column, &row);
 
-    switch (event->event) {
+    switch (event->event)
+    {
     case glow_eEvent_Key_Up:
       if (EVEN(sts))
         return GE__NO_PROPAGATE;
@@ -13582,7 +14219,8 @@ int GeTable::action(grow_tObject object, glow_tEvent event)
         return GE__NO_PROPAGATE;
       break;
     case glow_eEvent_Key_Down:
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         column = 0;
         row = -1;
       }
@@ -13600,7 +14238,8 @@ int GeTable::action(grow_tObject object, glow_tEvent event)
         return GE__NO_PROPAGATE;
       break;
     case glow_eEvent_Key_Right:
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         column = -1;
         row = 0;
       }
@@ -13612,31 +14251,33 @@ int GeTable::action(grow_tObject object, glow_tEvent event)
     default:;
     }
 
-    if (ODD(sts) && sel_p[column]) {
-      db = dyn->parse_attr_name(sel_attribute[column], parsed_name, &inverted,
-          &attr_type, &attr_size);
+    if (ODD(sts) && sel_p[column])
+    {
+      db = dyn->parse_attr_name(sel_attribute[column], parsed_name, &inverted, &attr_type, &attr_size);
       value = 0;
       sprintf(&parsed_name[strlen(parsed_name)], "[%d]", row);
       sts = gdh_SetObjectInfo(parsed_name, &value, sizeof(value));
       if (EVEN(sts))
         printf("Table error: %s\n", parsed_name);
     }
-    if (sel_p[new_column]) {
-      db = dyn->parse_attr_name(sel_attribute[new_column], parsed_name,
-          &inverted, &attr_type, &attr_size);
+    if (sel_p[new_column])
+    {
+      db = dyn->parse_attr_name(sel_attribute[new_column], parsed_name, &inverted, &attr_type, &attr_size);
       value = 1;
       sprintf(&parsed_name[strlen(parsed_name)], "[%d]", new_row);
       sts = gdh_SetObjectInfo(parsed_name, &value, sizeof(value));
       if (EVEN(sts))
         printf("Table error: %s\n", parsed_name);
-      else {
+      else
+      {
         grow_SetSelectedCell(object, new_column, new_row);
         grow_TableMakeCellVisible(object, new_column, new_row);
       }
     }
     return GE__NO_PROPAGATE;
   }
-  case glow_eEvent_MB3Press: {
+  case glow_eEvent_MB3Press:
+  {
     int sts;
     pwr_tAName parsed_name;
     int inverted;
@@ -13648,27 +14289,26 @@ int GeTable::action(grow_tObject object, glow_tEvent event)
     if (event->any.type != glow_eEventType_Table)
       break;
 
-    if (type_id[event->table.column] == pwr_eType_Objid) {
-      dyn->parse_attr_name(attribute[event->table.column], parsed_name,
-          &inverted, &attr_type, &attr_size);
+    if (type_id[event->table.column] == pwr_eType_Objid)
+    {
+      dyn->parse_attr_name(attribute[event->table.column], parsed_name, &inverted, &attr_type, &attr_size);
 
       sprintf(&parsed_name[strlen(parsed_name)], "[%d]", event->table.row);
       memset(&attrref, 0, sizeof(attrref));
-      sts = gdh_GetObjectInfo(
-          parsed_name, &attrref.Objid, sizeof(attrref.Objid));
+      sts = gdh_GetObjectInfo(parsed_name, &attrref.Objid, sizeof(attrref.Objid));
       if (EVEN(sts))
         break;
       if (cdh_ObjidIsNull(attrref.Objid))
         break;
 
-      if (dyn->graph->popup_menu_cb) {
+      if (dyn->graph->popup_menu_cb)
+      {
         // Display popup menu
         grow_GetName(dyn->graph->grow->ctx, name);
 
-        dyn->graph->popup_position(
-            event->any.x_pixel + 8, event->any.y_pixel, &x, &y);
-        (dyn->graph->popup_menu_cb)(dyn->graph->parent_ctx, attrref,
-            xmenu_eItemType_Object, xmenu_mUtility_Ge, name, x, y);
+        dyn->graph->popup_position(event->any.x_pixel + 8, event->any.y_pixel, &x, &y);
+        (dyn->graph->popup_menu_cb)(dyn->graph->parent_ctx, attrref, xmenu_eItemType_Object,
+                                    xmenu_mUtility_Ge, name, x, y);
       }
     }
     break;
@@ -13678,85 +14318,120 @@ int GeTable::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
-int GeTable::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GeTable::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
   if (!streq(attribute[0], ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column1.Attribute\",\"" << attribute[0] << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column1.Attribute\",\"" << attribute[0]
+       << "\");" << '\n';
   if (!streq(format[0], ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column1.Format\",\"" << format[0] << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column1.Format\",\"" << format[0] << "\");"
+       << '\n';
   if (!streq(sel_attribute[0], ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column1.SelectAttribute\",\"" << sel_attribute[0] << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column1.SelectAttribute\",\""
+       << sel_attribute[0] << "\");" << '\n';
   if (!streq(attribute[1], ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column2.Attribute\",\"" << attribute[1] << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column2.Attribute\",\"" << attribute[1]
+       << "\");" << '\n';
   if (!streq(format[1], ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column2.Format\",\"" << format[1] << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column2.Format\",\"" << format[1] << "\");"
+       << '\n';
   if (!streq(sel_attribute[1], ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column2.SelectAttribute\",\"" << sel_attribute[1] << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column2.SelectAttribute\",\""
+       << sel_attribute[1] << "\");" << '\n';
   if (!streq(attribute[2], ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column3.Attribute\",\"" << attribute[2] << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column3.Attribute\",\"" << attribute[2]
+       << "\");" << '\n';
   if (!streq(format[2], ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column3.Format\",\"" << format[2] << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column3.Format\",\"" << format[2] << "\");"
+       << '\n';
   if (!streq(sel_attribute[2], ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column3.SelectAttribute\",\"" << sel_attribute[2] << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column3.SelectAttribute\",\""
+       << sel_attribute[2] << "\");" << '\n';
   if (!streq(attribute[3], ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column4.Attribute\",\"" << attribute[3] << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column4.Attribute\",\"" << attribute[3]
+       << "\");" << '\n';
   if (!streq(format[3], ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column4.Format\",\"" << format[3] << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column4.Format\",\"" << format[3] << "\");"
+       << '\n';
   if (!streq(sel_attribute[3], ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column4.SelectAttribute\",\"" << sel_attribute[3] << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column4.SelectAttribute\",\""
+       << sel_attribute[3] << "\");" << '\n';
   if (!streq(attribute[4], ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column5.Attribute\",\"" << attribute[4] << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column5.Attribute\",\"" << attribute[4]
+       << "\");" << '\n';
   if (!streq(format[4], ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column5.Format\",\"" << format[4] << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column5.Format\",\"" << format[4] << "\");"
+       << '\n';
   if (!streq(sel_attribute[4], ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column5.SelectAttribute\",\"" << sel_attribute[4] << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column5.SelectAttribute\",\""
+       << sel_attribute[4] << "\");" << '\n';
   if (!streq(attribute[5], ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column6.Attribute\",\"" << attribute[5] << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column6.Attribute\",\"" << attribute[5]
+       << "\");" << '\n';
   if (!streq(format[5], ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column6.Format\",\"" << format[5] << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column6.Format\",\"" << format[5] << "\");"
+       << '\n';
   if (!streq(sel_attribute[5], ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column6.SelectAttribute\",\"" << sel_attribute[5] << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column6.SelectAttribute\",\""
+       << sel_attribute[5] << "\");" << '\n';
   if (!streq(attribute[6], ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column7.Attribute\",\"" << attribute[6] << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column7.Attribute\",\"" << attribute[6]
+       << "\");" << '\n';
   if (!streq(format[6], ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column7.Format\",\"" << format[6] << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column7.Format\",\"" << format[6] << "\");"
+       << '\n';
   if (!streq(sel_attribute[6], ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column7.SelectAttribute\",\"" << sel_attribute[6] << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column7.SelectAttribute\",\""
+       << sel_attribute[6] << "\");" << '\n';
   if (!streq(attribute[7], ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column8.Attribute\",\"" << attribute[7] << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column8.Attribute\",\"" << attribute[7]
+       << "\");" << '\n';
   if (!streq(format[7], ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column8.Format\",\"" << format[7] << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column8.Format\",\"" << format[7] << "\");"
+       << '\n';
   if (!streq(sel_attribute[7], ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column8.SelectAttribute\",\"" << sel_attribute[7] << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column8.SelectAttribute\",\""
+       << sel_attribute[7] << "\");" << '\n';
   if (!streq(attribute[8], ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column9.Attribute\",\"" << attribute[8] << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column9.Attribute\",\"" << attribute[8]
+       << "\");" << '\n';
   if (!streq(format[8], ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column9.Format\",\"" << format[8] << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column9.Format\",\"" << format[8] << "\");"
+       << '\n';
   if (!streq(sel_attribute[8], ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column9.SelectAttribute\",\"" << sel_attribute[8] << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column9.SelectAttribute\",\""
+       << sel_attribute[8] << "\");" << '\n';
   if (!streq(attribute[9], ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column10.Attribute\",\"" << attribute[9] << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column10.Attribute\",\"" << attribute[9]
+       << "\");" << '\n';
   if (!streq(format[9], ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column10.Format\",\"" << format[9] << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column10.Format\",\"" << format[9] << "\");"
+       << '\n';
   if (!streq(sel_attribute[9], ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column10.SelectAttribute\",\"" << sel_attribute[9] << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column10.SelectAttribute\",\""
+       << sel_attribute[9] << "\");" << '\n';
   if (!streq(attribute[10], ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column11.Attribute\",\"" << attribute[10] << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column11.Attribute\",\"" << attribute[10]
+       << "\");" << '\n';
   if (!streq(format[10], ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column11.Format\",\"" << format[10] << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column11.Format\",\"" << format[10]
+       << "\");" << '\n';
   if (!streq(sel_attribute[10], ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column11.SelectAttribute\",\"" << sel_attribute[10] << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column11.SelectAttribute\",\""
+       << sel_attribute[10] << "\");" << '\n';
   if (!streq(attribute[11], ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column12.Attribute\",\"" << attribute[11] << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column12.Attribute\",\"" << attribute[11]
+       << "\");" << '\n';
   if (!streq(format[11], ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column12.Format\",\"" << format[11] << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column12.Format\",\"" << format[11]
+       << "\");" << '\n';
   if (!streq(sel_attribute[11], ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column12.SelectAttribute\",\"" << sel_attribute[11] << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column12.SelectAttribute\",\""
+       << sel_attribute[11] << "\");" << '\n';
   return 1;
 }
 
-int GeTable::export_java(
-    grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeTable::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
   glow_sTableInfo info;
 
@@ -13769,19 +14444,22 @@ int GeTable::export_java(
   else
     fp << "      ,";
   fp << "new GeDynTable(" << var_name << ".dd, new String[] {";
-  for (int i = 0; i < columns; i++) {
+  for (int i = 0; i < columns; i++)
+  {
     if (i != 0)
       fp << ",";
     fp << "\"" << attribute[i] << "\"";
   }
   fp << "}, new String[] {";
-  for (int i = 0; i < columns; i++) {
+  for (int i = 0; i < columns; i++)
+  {
     if (i != 0)
       fp << ",";
     fp << "\"" << format[i] << "\"";
   }
   fp << "}, new String[] {";
-  for (int i = 0; i < columns; i++) {
+  for (int i = 0; i < columns; i++)
+  {
     if (i != 0)
       fp << ",";
     fp << "\"" << sel_attribute[i] << "\"";
@@ -13797,30 +14475,32 @@ int GeTable::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
   int inverted;
   char atext[40];
 
-  int types[] = { pwr_eType_Boolean, pwr_eType_Int32, pwr_eType_UInt32,
-    pwr_eType_Int64, pwr_eType_UInt64, graph_eType_Bit, pwr_eType_Float32,
-    pwr_eType_Float64, pwr_eType_String, pwr_eType_NetStatus, pwr_eType_Status,
-    pwr_eType_Text, pwr_eType_Objid, pwr_eType_AttrRef, pwr_eType_DataRef,
-    pwr_eType_Time, pwr_eType_DeltaTime, pwr_eType_Enum, pwr_eType_Mask, 0 };
-  int types1[] = { pwr_eType_Boolean, 0 };
-  graph_eDatabase databases[] = { graph_eDatabase_Gdh, graph_eDatabase__ };
+  int types[] = {pwr_eType_Boolean,   pwr_eType_Int32,     pwr_eType_UInt32,  pwr_eType_Int64,
+                 pwr_eType_UInt64,    graph_eType_Bit,     pwr_eType_Float32, pwr_eType_Float64,
+                 pwr_eType_String,    pwr_eType_NetStatus, pwr_eType_Status,  pwr_eType_Text,
+                 pwr_eType_Objid,     pwr_eType_AttrRef,   pwr_eType_DataRef, pwr_eType_Time,
+                 pwr_eType_DeltaTime, pwr_eType_Enum,      pwr_eType_Mask,    0};
+  int types1[] = {pwr_eType_Boolean, 0};
+  graph_eDatabase databases[] = {graph_eDatabase_Gdh, graph_eDatabase__};
 
-  for (int i = 0; i < TABLE_MAX_COL; i++) {
+  for (int i = 0; i < TABLE_MAX_COL; i++)
+  {
     sprintf(atext, "Column%d.Attribute", i + 1);
-    dyn->syntax_check_attribute(object, atext, attribute[i], i == 0 ? 0 : 1,
-        types, databases, error_cnt, warning_cnt);
+    dyn->syntax_check_attribute(object, atext, attribute[i], i == 0 ? 0 : 1, types, databases, error_cnt,
+                                warning_cnt);
 
     sprintf(atext, "Column%d.SelectAttribute", i + 1);
-    dyn->syntax_check_attribute(object, atext, sel_attribute[i], 1, types1,
-        databases, error_cnt, warning_cnt);
+    dyn->syntax_check_attribute(object, atext, sel_attribute[i], 1, types1, databases, error_cnt,
+                                warning_cnt);
 
     // Check format
 
-    if (!streq(attribute[i], "")) {
-      dyn->parse_attr_name(
-          attribute[i], parsed_name, &inverted, &attr_type, &attr_size);
+    if (!streq(attribute[i], ""))
+    {
+      dyn->parse_attr_name(attribute[i], parsed_name, &inverted, &attr_type, &attr_size);
 
-      if (streq(format[i], "")) {
+      if (streq(format[i], ""))
+      {
         char msg[200];
 
         sprintf(msg, "Column%d.Format, format is missing", i + 1);
@@ -13828,11 +14508,11 @@ int GeTable::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
         (*error_cnt)++;
       }
 
-      else if (!check_format(format[i], attr_type)) {
+      else if (!check_format(format[i], attr_type))
+      {
         char msg[200];
 
-        sprintf(
-            msg, "Column%d.Format, erroneous format \"%s\"", i + 1, format[i]);
+        sprintf(msg, "Column%d.Format, erroneous format \"%s\"", i + 1, format[i]);
         dyn->graph->syntax_msg('E', object, msg);
         (*warning_cnt)++;
       }
@@ -13842,16 +14522,15 @@ int GeTable::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 }
 
 GeStatusColor::GeStatusColor(GeDyn* e_dyn)
-    : GeDynElem(e_dyn, ge_mDynType1_StatusColor, ge_mDynType2_No,
-          ge_mActionType1_No, ge_mActionType2_No, ge_eDynPrio_StatusColor),
+    : GeDynElem(e_dyn, ge_mDynType1_StatusColor, ge_mDynType2_No, ge_mActionType1_No, ge_mActionType2_No,
+                ge_eDynPrio_StatusColor),
       nostatus_color(glow_eDrawType_Inherit), use_colortheme(0), on(true)
 {
   strcpy(attribute, "");
 }
 
 GeStatusColor::GeStatusColor(const GeStatusColor& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-          x.prio),
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio),
       nostatus_color(x.nostatus_color), use_colortheme(x.use_colortheme)
 {
   strcpy(attribute, x.attribute);
@@ -13861,7 +14540,8 @@ void GeStatusColor::get_attributes(attr_sItem* attrinfo, int* item_count)
 {
   int i = *item_count;
 
-  if (dyn->total_dyn_type1 & ge_mDynType1_Tone) {
+  if (dyn->total_dyn_type1 & ge_mDynType1_Tone)
+  {
     strcpy(attrinfo[i].name, "StatusTone.Attribute");
     attrinfo[i].value = attribute;
     attrinfo[i].type = glow_eType_String;
@@ -13871,7 +14551,9 @@ void GeStatusColor::get_attributes(attr_sItem* attrinfo, int* item_count)
     attrinfo[i].value = &nostatus_color;
     attrinfo[i].type = glow_eType_ToneOrColor;
     attrinfo[i++].size = sizeof(nostatus_color);
-  } else {
+  }
+  else
+  {
     strcpy(attrinfo[i].name, "StatusColor.Attribute");
     attrinfo[i].value = attribute;
     attrinfo[i].type = glow_eType_String;
@@ -13890,11 +14572,11 @@ void GeStatusColor::get_attributes(attr_sItem* attrinfo, int* item_count)
   *item_count = i;
 }
 
-void GeStatusColor::set_attribute(
-    grow_tObject object, const char* attr_name, int* cnt)
+void GeStatusColor::set_attribute(grow_tObject object, const char* attr_name, int* cnt)
 {
   (*cnt)--;
-  if (*cnt == 0) {
+  if (*cnt == 0)
+  {
     char msg[200];
 
     strncpy(attribute, attr_name, sizeof(attribute));
@@ -13907,8 +14589,7 @@ void GeStatusColor::set_attribute(
   }
 }
 
-void GeStatusColor::replace_attribute(
-    char* from, char* to, int* cnt, int strict)
+void GeStatusColor::replace_attribute(char* from, char* to, int* cnt, int strict)
 {
   GeDyn::replace_attribute(attribute, sizeof(attribute), from, to, cnt, strict);
 }
@@ -13917,14 +14598,15 @@ int GeStatusColor::set_color(grow_tObject object, glow_eDrawType color)
 {
   char msg[200];
 
-  if (dyn->total_dyn_type1 & ge_mDynType1_Tone) {
+  if (dyn->total_dyn_type1 & ge_mDynType1_Tone)
+  {
     this->nostatus_color = glow_eDrawType(color / 30);
-    snprintf(msg, sizeof(msg), "StatusTone.NoStatusTone = %s",
-        grow_ColorToneToName(this->nostatus_color));
-  } else {
+    snprintf(msg, sizeof(msg), "StatusTone.NoStatusTone = %s", grow_ColorToneToName(this->nostatus_color));
+  }
+  else
+  {
     this->nostatus_color = color;
-    snprintf(msg, sizeof(msg), "StatusColor.NoStatusColor = %s",
-        grow_ColorToName(this->nostatus_color));
+    snprintf(msg, sizeof(msg), "StatusColor.NoStatusColor = %s", grow_ColorToName(this->nostatus_color));
   }
   msg[sizeof(msg) - 1] = 0;
   dyn->graph->message('I', msg);
@@ -13935,10 +14617,8 @@ void GeStatusColor::save(std::ofstream& fp)
 {
   fp << int(ge_eSave_StatusColor) << '\n';
   fp << int(ge_eSave_StatusColor_attribute) << FSPACE << attribute << '\n';
-  fp << int(ge_eSave_StatusColor_nostatus_color) << FSPACE
-     << int(nostatus_color) << '\n';
-  fp << int(ge_eSave_StatusColor_use_colortheme) << FSPACE << use_colortheme
-     << '\n';
+  fp << int(ge_eSave_StatusColor_nostatus_color) << FSPACE << int(nostatus_color) << '\n';
+  fp << int(ge_eSave_StatusColor_use_colortheme) << FSPACE << use_colortheme << '\n';
   fp << int(ge_eSave_End) << '\n';
 }
 
@@ -13949,8 +14629,10 @@ void GeStatusColor::open(std::ifstream& fp)
   int tmp;
   char dummy[40];
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeStatusColor: \"%d %s\"\n", type, dummy);
@@ -13958,7 +14640,8 @@ void GeStatusColor::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_StatusColor:
       break;
     case ge_eSave_StatusColor_attribute:
@@ -13984,8 +14667,7 @@ void GeStatusColor::open(std::ifstream& fp)
   }
 }
 
-int GeStatusColor::connect(
-    grow_tObject object, glow_sTraceData* trace_data, bool now)
+int GeStatusColor::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
 {
   int attr_size;
   pwr_tAName parsed_name;
@@ -13993,7 +14675,8 @@ int GeStatusColor::connect(
   int inverted;
 
   nostatus_color = dyn->get_color1(object, nostatus_color);
-  if (nostatus_color < 0 || nostatus_color >= glow_eDrawType__) {
+  if (nostatus_color < 0 || nostatus_color >= glow_eDrawType__)
+  {
     printf("** Color out of range, %s\n", attribute);
     p = 0;
     return 0;
@@ -14001,13 +14684,11 @@ int GeStatusColor::connect(
 
   size = 4;
   p = 0;
-  db = dyn->parse_attr_name(
-      attribute, parsed_name, &inverted, &attr_type, &attr_size);
+  db = dyn->parse_attr_name(attribute, parsed_name, &inverted, &attr_type, &attr_size);
   if (streq(parsed_name, ""))
     return 1;
 
-  sts = dyn->graph->ref_object_info(
-      dyn->cycle, parsed_name, (void**)&p, &subid, size, object, now);
+  sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&p, &subid, size, object, now);
   if (EVEN(sts))
     return sts;
 
@@ -14029,7 +14710,8 @@ int GeStatusColor::scan(grow_tObject object)
   if (!p)
     return 1;
 
-  if (db == graph_eDatabase_Gdh && attr_type == pwr_eType_NetStatus) {
+  if (db == graph_eDatabase_Gdh && attr_type == pwr_eType_NetStatus)
+  {
     pwr_tTime t;
     pwr_tStatus sts;
     pwr_tBoolean old;
@@ -14042,7 +14724,8 @@ int GeStatusColor::scan(grow_tObject object)
   if (dyn->ignore_color)
     return 1;
 
-  if (!first_scan && old_status != ge_ePwrStatus_Fatal) {
+  if (!first_scan && old_status != ge_ePwrStatus_Fatal)
+  {
     if (old_value == *p && !dyn->reset_color)
       // No change since last time
       return 1;
@@ -14053,8 +14736,10 @@ int GeStatusColor::scan(grow_tObject object)
   ge_ePwrStatus value;
   if (*p == pwr_cNStatus)
     value = ge_ePwrStatus_No;
-  else {
-    switch (*p & 7) {
+  else
+  {
+    switch (*p & 7)
+    {
     case 3:
     case 1:
       value = ge_ePwrStatus_Success;
@@ -14077,8 +14762,10 @@ int GeStatusColor::scan(grow_tObject object)
   else
     first_scan = false;
 
-  if (dyn->total_dyn_type1 & ge_mDynType1_Tone) {
-    switch (value) {
+  if (dyn->total_dyn_type1 & ge_mDynType1_Tone)
+  {
+    switch (value)
+    {
     case ge_ePwrStatus_No:
       if (nostatus_color >= (glow_eDrawType)glow_eDrawTone__)
         grow_SetObjectFillColor(object, nostatus_color);
@@ -14100,7 +14787,8 @@ int GeStatusColor::scan(grow_tObject object)
       on = !on;
       if (on)
         grow_SetObjectColorTone(object, glow_eDrawTone_Red);
-      else {
+      else
+      {
         if (nostatus_color >= (glow_eDrawType)glow_eDrawTone__)
           grow_SetObjectFillColor(object, nostatus_color);
         else
@@ -14108,8 +14796,11 @@ int GeStatusColor::scan(grow_tObject object)
       }
       break;
     }
-  } else {
-    switch (value) {
+  }
+  else
+  {
+    switch (value)
+    {
     case ge_ePwrStatus_No:
       grow_SetObjectFillColor(object, nostatus_color);
       break;
@@ -14117,21 +14808,18 @@ int GeStatusColor::scan(grow_tObject object)
       grow_ResetObjectFillColor(object);
       break;
     case ge_ePwrStatus_Warning:
-      grow_SetObjectFillColor(object, use_colortheme
-              ? glow_eDrawType_CustomColor41
-              : glow_eDrawType_ColorYellow);
+      grow_SetObjectFillColor(object,
+                              use_colortheme ? glow_eDrawType_CustomColor41 : glow_eDrawType_ColorYellow);
       break;
     case ge_ePwrStatus_Error:
-      grow_SetObjectFillColor(object, use_colortheme
-              ? glow_eDrawType_CustomColor11
-              : glow_eDrawType_ColorRed);
+      grow_SetObjectFillColor(object,
+                              use_colortheme ? glow_eDrawType_CustomColor11 : glow_eDrawType_ColorRed);
       break;
     case ge_ePwrStatus_Fatal:
       on = !on;
       if (on)
-        grow_SetObjectFillColor(object, use_colortheme
-                ? glow_eDrawType_CustomColor11
-                : glow_eDrawType_ColorRed);
+        grow_SetObjectFillColor(object,
+                                use_colortheme ? glow_eDrawType_CustomColor11 : glow_eDrawType_ColorRed);
       else
         grow_SetObjectFillColor(object, nostatus_color);
       break;
@@ -14141,7 +14829,7 @@ int GeStatusColor::scan(grow_tObject object)
   return 1;
 }
 
-int GeStatusColor::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GeStatusColor::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
   char name[80];
   if (dyn->total_dyn_type1 & ge_mDynType1_Tone)
@@ -14150,51 +14838,54 @@ int GeStatusColor::export_script(grow_tObject o, std::ofstream& fp, char *indent
     sprintf(name, "%sStatusColor", prefix);
 
   if (!streq(attribute, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << name << ".Attribute\",\"" << attribute << "\");" << '\n';
-  if (nostatus_color != glow_eDrawType_Inherit) {
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".Attribute\",\"" << attribute << "\");"
+       << '\n';
+  if (nostatus_color != glow_eDrawType_Inherit)
+  {
     if (dyn->total_dyn_type1 & ge_mDynType1_Tone)
-      fp << indentation << "SetObjectAttribute(id,\"" << name << ".NoStatusTone\"," << (int)nostatus_color << ");" << '\n';
+      fp << indentation << "SetObjectAttribute(id,\"" << name << ".NoStatusTone\"," << (int)nostatus_color
+         << ");" << '\n';
     else
-      fp << indentation << "SetObjectAttribute(id,\"" << name << ".NoStatusColor\"," << (int)nostatus_color << ");" << '\n';
+      fp << indentation << "SetObjectAttribute(id,\"" << name << ".NoStatusColor\"," << (int)nostatus_color
+         << ");" << '\n';
   }
   if (use_colortheme != 0 && !(dyn->total_dyn_type1 & ge_mDynType1_Tone))
-    fp << indentation << "SetObjectAttribute(id,\"" << name << ".UseColorTheme\"," << use_colortheme << ");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".UseColorTheme\"," << use_colortheme << ");"
+       << '\n';
   return 1;
 }
 
-int GeStatusColor::export_java(
-    grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeStatusColor::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
   glow_eDrawType jcolor = dyn->get_color1(object, nostatus_color);
   if (first)
     fp << "      ";
   else
     fp << "      ,";
-  fp << "new GeDynStatusColor(" << var_name << ".dd, \"" << attribute << "\","
-     << jcolor << ")\n";
+  fp << "new GeDynStatusColor(" << var_name << ".dd, \"" << attribute << "\"," << jcolor << ")\n";
   return 1;
 }
 
-int GeStatusColor::syntax_check(
-    grow_tObject object, int* error_cnt, int* warning_cnt)
+int GeStatusColor::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
   glow_eDrawType tcolor = dyn->get_color1(object, nostatus_color);
-  if (tcolor < 0 || tcolor >= glow_eDrawType__) {
+  if (tcolor < 0 || tcolor >= glow_eDrawType__)
+  {
     dyn->graph->syntax_msg('E', object, "Color out or range");
     (*error_cnt)++;
   }
 
-  int types[] = { pwr_eType_Status, pwr_eType_NetStatus, 0 };
-  graph_eDatabase databases[] = { graph_eDatabase_Gdh, graph_eDatabase__ };
-  dyn->syntax_check_attribute(object, "StatusColor.Attribute", attribute, 0,
-      types, databases, error_cnt, warning_cnt);
+  int types[] = {pwr_eType_Status, pwr_eType_NetStatus, 0};
+  graph_eDatabase databases[] = {graph_eDatabase_Gdh, graph_eDatabase__};
+  dyn->syntax_check_attribute(object, "StatusColor.Attribute", attribute, 0, types, databases, error_cnt,
+                              warning_cnt);
 
   return 1;
 }
 
 GePie::GePie(GeDyn* e_dyn)
-    : GeDynElem(e_dyn, ge_mDynType1_Pie, ge_mDynType2_No, ge_mActionType1_No,
-          ge_mActionType2_No, ge_eDynPrio_Pie),
+    : GeDynElem(e_dyn, ge_mDynType1_Pie, ge_mDynType2_No, ge_mActionType1_No, ge_mActionType2_No,
+                ge_eDynPrio_Pie),
       sectors(0), min_value(0), max_value(0), fix_range(0)
 {
   for (int i = 0; i < PIE_MAX_SECTORS; i++)
@@ -14202,10 +14893,8 @@ GePie::GePie(GeDyn* e_dyn)
 }
 
 GePie::GePie(const GePie& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-          x.prio),
-      sectors(x.sectors), min_value(x.min_value), max_value(x.max_value),
-      fix_range(x.fix_range)
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio), sectors(x.sectors),
+      min_value(x.min_value), max_value(x.max_value), fix_range(x.fix_range)
 {
   for (int i = 0; i < PIE_MAX_SECTORS; i++)
     strcpy(attribute[i], x.attribute[i]);
@@ -14215,8 +14904,9 @@ void GePie::get_attributes(attr_sItem* attrinfo, int* item_count)
 {
   int i = *item_count;
 
-  for (int j = 0; j < PIE_MAX_SECTORS; j++) {
-    sprintf(attrinfo[i].name, "Pie.Attribute%d", j+1);
+  for (int j = 0; j < PIE_MAX_SECTORS; j++)
+  {
+    sprintf(attrinfo[i].name, "Pie.Attribute%d", j + 1);
     attrinfo[i].value = attribute[j];
     attrinfo[i].type = glow_eType_String;
     attrinfo[i++].size = sizeof(attribute[0]);
@@ -14243,8 +14933,7 @@ void GePie::set_attribute(grow_tObject object, const char* attr_name, int* cnt)
 void GePie::replace_attribute(char* from, char* to, int* cnt, int strict)
 {
   for (int i = 0; i < PIE_MAX_SECTORS; i++)
-    GeDyn::replace_attribute(
-        attribute[i], sizeof(attribute[0]), from, to, cnt, strict);
+    GeDyn::replace_attribute(attribute[i], sizeof(attribute[0]), from, to, cnt, strict);
 }
 
 void GePie::save(std::ofstream& fp)
@@ -14262,8 +14951,10 @@ void GePie::open(std::ifstream& fp)
   int end_found = 0;
   char dummy[40];
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GePie: \"%d %s\"\n", type, dummy);
@@ -14271,7 +14962,8 @@ void GePie::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_Pie:
       break;
     case ge_eSave_Pie_fix_range:
@@ -14349,29 +15041,33 @@ int GePie::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
   if (sectors >= PIE_MAX_SECTORS)
     sectors = PIE_MAX_SECTORS;
 
-  for (int i = 0; i < sectors; i++) {
+  for (int i = 0; i < sectors; i++)
+  {
     dyn->parse_attr_name(attribute[i], parsed_name, &inverted, &atype, &asize);
     if (streq(parsed_name, ""))
       continue;
 
-    if (i == 0) {
+    if (i == 0)
+    {
       attr_type = atype;
       size = asize;
 
-      switch (atype) {
+      switch (atype)
+      {
       case pwr_eType_Float32:
       case pwr_eType_Int32:
         break;
       default:
         return 1;
       }
-    } else {
+    }
+    else
+    {
       if (attr_type != atype || size != asize)
         continue;
     }
 
-    sts = dyn->graph->ref_object_info(
-        dyn->cycle, parsed_name, (void**)&p[i], &subid[i], asize, object, now);
+    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&p[i], &subid[i], asize, object, now);
     if (EVEN(sts))
       return sts;
 
@@ -14384,7 +15080,8 @@ int GePie::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
 
 int GePie::disconnect(grow_tObject object)
 {
-  for (int i = 0; i < sectors; i++) {
+  for (int i = 0; i < sectors; i++)
+  {
     gdh_UnrefObjectInfo(subid[i]);
     p[i] = 0;
   }
@@ -14395,39 +15092,50 @@ int GePie::scan(grow_tObject object)
 {
   int i;
 
-  switch (attr_type) {
-  case pwr_eType_Float32: {
+  switch (attr_type)
+  {
+  case pwr_eType_Float32:
+  {
     pwr_tFloat32 val[PIE_MAX_SECTORS];
-    for (i = 0; i < sectors; i++) {
+    for (i = 0; i < sectors; i++)
+    {
       if (p[i] == 0)
-	return 1;
+        return 1;
       val[i] = *p[i];
     }
-    if (!first_scan) {
+    if (!first_scan)
+    {
       int update = 0;
-      for (i = 0; i < sectors; i++) {
-        if (fabs(old_value[i] - val[i]) > FLT_EPSILON) {
+      for (i = 0; i < sectors; i++)
+      {
+        if (fabs(old_value[i] - val[i]) > FLT_EPSILON)
+        {
           update = 1;
           break;
         }
       }
       if (!update)
         return 1;
-    } else
+    }
+    else
       first_scan = false;
 
     if (fabs(max_value - min_value) < FLT_EPSILON)
       return 1;
 
     double dval[PIE_MAX_SECTORS];
-    if (fix_range || sectors == 1) {
+    if (fix_range || sectors == 1)
+    {
       for (i = 0; i < sectors; i++)
         dval[i] = val[i] - min_value;
-    } else {
+    }
+    else
+    {
       double sum = 0;
       for (i = 0; i < sectors; i++)
         sum += val[i] - min_value;
-      for (i = 0; i < sectors; i++) {
+      for (i = 0; i < sectors; i++)
+      {
         if (fabs(sum) < DBL_EPSILON)
           dval[i] = 0;
         else
@@ -14439,7 +15147,8 @@ int GePie::scan(grow_tObject object)
     memcpy(&old_value, &val, size * sectors);
     break;
   }
-  case pwr_eType_Int32: {
+  case pwr_eType_Int32:
+  {
     break;
   }
   default:;
@@ -14447,57 +15156,57 @@ int GePie::scan(grow_tObject object)
   return 1;
 }
 
-int GePie::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GePie::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
-  for (int j = 0; j < PIE_MAX_SECTORS; j++) {
+  for (int j = 0; j < PIE_MAX_SECTORS; j++)
+  {
     if (!streq(attribute[j], ""))
-      fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Pie.Attribute" << j + 1 << "\",\"" << attribute[j] << "\");" << '\n';
+      fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Pie.Attribute" << j + 1 << "\",\""
+         << attribute[j] << "\");" << '\n';
   }
   if (fix_range != 0)
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Pie.FixRange\"," << fix_range << ");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Pie.FixRange\"," << fix_range << ");"
+       << '\n';
   return 1;
 }
 
-int GePie::export_java(
-    grow_tObject object, std::ofstream& fp, bool first, char* var_name)
-{
-  return 1;
-}
+int GePie::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name) { return 1; }
 
 int GePie::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
   char atext[40];
 
-  int types[] = { pwr_eType_Int32, pwr_eType_Float32, 0 };
-  graph_eDatabase databases[] = { graph_eDatabase_Gdh, graph_eDatabase__ };
+  int types[] = {pwr_eType_Int32, pwr_eType_Float32, 0};
+  graph_eDatabase databases[] = {graph_eDatabase_Gdh, graph_eDatabase__};
 
-  for (int i = 0; i < PIE_MAX_SECTORS; i++) {
-    sprintf(atext, "Pie.Attribute%d", i+1);
-    dyn->syntax_check_attribute(object, atext, attribute[i], i == 0 ? 0 : 1,
-        types, databases, error_cnt, warning_cnt);
+  for (int i = 0; i < PIE_MAX_SECTORS; i++)
+  {
+    sprintf(atext, "Pie.Attribute%d", i + 1);
+    dyn->syntax_check_attribute(object, atext, attribute[i], i == 0 ? 0 : 1, types, databases, error_cnt,
+                                warning_cnt);
   }
   return 1;
 }
 
 GeBarChart::GeBarChart(GeDyn* e_dyn)
-    : GeDynElem(e_dyn, ge_mDynType1_BarChart, ge_mDynType2_No,
-          ge_mActionType1_No, ge_mActionType2_No, ge_eDynPrio_BarChart),
-      bars(0), barsegments(0), min_value(0), max_value(0), fix_range(0),
-      value(0), old_value(0)
+    : GeDynElem(e_dyn, ge_mDynType1_BarChart, ge_mDynType2_No, ge_mActionType1_No, ge_mActionType2_No,
+                ge_eDynPrio_BarChart),
+      bars(0), barsegments(0), min_value(0), max_value(0), fix_range(0), value(0), old_value(0)
 {
-  for (int i = 0; i < BARCHART_MAX_BARSEGMENTS; i++) {
+  for (int i = 0; i < BARCHART_MAX_BARSEGMENTS; i++)
+  {
     strcpy(attribute[i], "");
     p[i] = 0;
   }
 }
 
 GeBarChart::GeBarChart(const GeBarChart& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-          x.prio),
-      bars(x.bars), barsegments(x.barsegments), min_value(x.min_value),
-      max_value(x.max_value), fix_range(x.fix_range), value(0), old_value(0)
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio), bars(x.bars),
+      barsegments(x.barsegments), min_value(x.min_value), max_value(x.max_value), fix_range(x.fix_range),
+      value(0), old_value(0)
 {
-  for (int i = 0; i < BARCHART_MAX_BARSEGMENTS; i++) {
+  for (int i = 0; i < BARCHART_MAX_BARSEGMENTS; i++)
+  {
     strcpy(attribute[i], x.attribute[i]);
     p[i] = 0;
   }
@@ -14507,7 +15216,8 @@ void GeBarChart::get_attributes(attr_sItem* attrinfo, int* item_count)
 {
   int i = *item_count;
 
-  for (int j = 0; j < BARCHART_MAX_BARSEGMENTS; j++) {
+  for (int j = 0; j < BARCHART_MAX_BARSEGMENTS; j++)
+  {
     sprintf(attrinfo[i].name, "BarChart.Attribute%d", j);
     attrinfo[i].value = attribute[j];
     attrinfo[i].type = glow_eType_String;
@@ -14522,8 +15232,7 @@ void GeBarChart::get_attributes(attr_sItem* attrinfo, int* item_count)
   *item_count = i;
 }
 
-void GeBarChart::set_attribute(
-    grow_tObject object, const char* attr_name, int* cnt)
+void GeBarChart::set_attribute(grow_tObject object, const char* attr_name, int* cnt)
 {
   char msg[200];
 
@@ -14536,8 +15245,7 @@ void GeBarChart::set_attribute(
 void GeBarChart::replace_attribute(char* from, char* to, int* cnt, int strict)
 {
   for (int i = 0; i < BARCHART_MAX_BARSEGMENTS; i++)
-    GeDyn::replace_attribute(
-        attribute[i], sizeof(attribute[0]), from, to, cnt, strict);
+    GeDyn::replace_attribute(attribute[i], sizeof(attribute[0]), from, to, cnt, strict);
 }
 
 void GeBarChart::save(std::ofstream& fp)
@@ -14545,8 +15253,7 @@ void GeBarChart::save(std::ofstream& fp)
   fp << int(ge_eSave_BarChart) << '\n';
   fp << int(ge_eSave_BarChart_fix_range) << FSPACE << fix_range << '\n';
   for (int i = 0; i < BARCHART_MAX_BARSEGMENTS; i++)
-    fp << int(ge_eSave_BarChart_attribute1) + i << FSPACE << attribute[i]
-       << '\n';
+    fp << int(ge_eSave_BarChart_attribute1) + i << FSPACE << attribute[i] << '\n';
   fp << int(ge_eSave_End) << '\n';
 }
 
@@ -14556,8 +15263,10 @@ void GeBarChart::open(std::ifstream& fp)
   int end_found = 0;
   char dummy[40];
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeBarChart: \"%d %s\"\n", type, dummy);
@@ -14565,7 +15274,8 @@ void GeBarChart::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_BarChart:
       break;
     case ge_eSave_BarChart_fix_range:
@@ -14631,8 +15341,7 @@ void GeBarChart::open(std::ifstream& fp)
   }
 }
 
-int GeBarChart::connect(
-    grow_tObject object, glow_sTraceData* trace_data, bool now)
+int GeBarChart::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
 {
   pwr_tAName parsed_name;
   int inverted;
@@ -14645,9 +15354,9 @@ int GeBarChart::connect(
   if (barsegments >= BARCHART_MAX_BARSEGMENTS)
     barsegments = BARCHART_MAX_BARSEGMENTS;
 
-  for (int i = 0; i < barsegments; i++) {
-    dyn->parse_attr_name(
-        attribute[i], parsed_name, &inverted, &atype, &asize, &elements);
+  for (int i = 0; i < barsegments; i++)
+  {
+    dyn->parse_attr_name(attribute[i], parsed_name, &inverted, &atype, &asize, &elements);
     if (streq(parsed_name, ""))
       continue;
 
@@ -14657,23 +15366,27 @@ int GeBarChart::connect(
     asize = asize / elements;
     bars = MIN(bars, elements);
 
-    if (i == 0) {
+    if (i == 0)
+    {
       attr_type = atype;
 
-      switch (atype) {
+      switch (atype)
+      {
       case pwr_eType_Float32:
       case pwr_eType_Int32:
         break;
       default:
         return 1;
       }
-    } else {
+    }
+    else
+    {
       if (attr_type != atype)
         continue;
     }
 
-    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&p[i],
-        &subid[i], bars * asize, object, now);
+    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&p[i], &subid[i], bars * asize, object,
+                                      now);
     if (EVEN(sts))
       return sts;
 
@@ -14690,7 +15403,8 @@ int GeBarChart::connect(
 
 int GeBarChart::disconnect(grow_tObject object)
 {
-  for (int i = 0; i < barsegments; i++) {
+  for (int i = 0; i < barsegments; i++)
+  {
     gdh_UnrefObjectInfo(subid[i]);
     p[i] = 0;
   }
@@ -14701,31 +15415,37 @@ int GeBarChart::scan(grow_tObject object)
 {
   int i;
 
-  switch (attr_type) {
-  case pwr_eType_Float32: {
-    for (i = 0; i < barsegments; i++) {
+  switch (attr_type)
+  {
+  case pwr_eType_Float32:
+  {
+    for (i = 0; i < barsegments; i++)
+    {
       if (p[i])
         memcpy(&value[i * bars], p[i], bars * sizeof(pwr_tFloat32));
     }
-    if (!first_scan) {
+    if (!first_scan)
+    {
       if (memcmp(value, old_value, size) == 0)
         return 1;
-    } else
+    }
+    else
       first_scan = false;
 
     if (fabs(max_value - min_value) < FLT_EPSILON)
       return 1;
 
-    pwr_tFloat32* valp[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    pwr_tFloat32* valp[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
     for (i = 0; i < barsegments; i++)
       valp[i] = &value[i * bars];
-    grow_SetBarChartValues(object, valp[0], valp[1], valp[2], valp[3], valp[4],
-        valp[5], valp[6], valp[7], valp[8], valp[9], valp[10], valp[11]);
+    grow_SetBarChartValues(object, valp[0], valp[1], valp[2], valp[3], valp[4], valp[5], valp[6], valp[7],
+                           valp[8], valp[9], valp[10], valp[11]);
     memcpy(old_value, value, size);
     break;
   }
-  case pwr_eType_Int32: {
+  case pwr_eType_Int32:
+  {
     break;
   }
   default:;
@@ -14733,56 +15453,52 @@ int GeBarChart::scan(grow_tObject object)
   return 1;
 }
 
-int GeBarChart::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GeBarChart::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
-  for (int j = 0; j < BARCHART_MAX_BARSEGMENTS; j++) {
+  for (int j = 0; j < BARCHART_MAX_BARSEGMENTS; j++)
+  {
     if (!streq(attribute[j], ""))
-      fp << indentation << "SetObjectAttribute(id,\"" << prefix << "BarChart.Attribute" << j << "\",\"" << attribute[j] << "\");" << '\n';
+      fp << indentation << "SetObjectAttribute(id,\"" << prefix << "BarChart.Attribute" << j << "\",\""
+         << attribute[j] << "\");" << '\n';
   }
   if (fix_range != 0)
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "BarChart.FixRange\"," << fix_range << ");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "BarChart.FixRange\"," << fix_range << ");"
+       << '\n';
   return 1;
 }
 
-int GeBarChart::export_java(
-    grow_tObject object, std::ofstream& fp, bool first, char* var_name)
-{
-  return 1;
-}
+int GeBarChart::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name) { return 1; }
 
-int GeBarChart::syntax_check(
-    grow_tObject object, int* error_cnt, int* warning_cnt)
+int GeBarChart::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
   char atext[40];
 
-  int types[] = { pwr_eType_Int32, pwr_eType_Float32, 0 };
-  graph_eDatabase databases[] = { graph_eDatabase_Gdh, graph_eDatabase__ };
+  int types[] = {pwr_eType_Int32, pwr_eType_Float32, 0};
+  graph_eDatabase databases[] = {graph_eDatabase_Gdh, graph_eDatabase__};
 
-  for (int i = 0; i < BARCHART_MAX_BARSEGMENTS; i++) {
+  for (int i = 0; i < BARCHART_MAX_BARSEGMENTS; i++)
+  {
     sprintf(atext, "BarChart.Attribute%d", i);
-    dyn->syntax_check_attribute(object, atext, attribute[i], i == 0 ? 0 : 1,
-        types, databases, error_cnt, warning_cnt);
+    dyn->syntax_check_attribute(object, atext, attribute[i], i == 0 ? 0 : 1, types, databases, error_cnt,
+                                warning_cnt);
   }
   return 1;
 }
 
 GeAxis::GeAxis(GeDyn* e_dyn)
-    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_Axis, ge_mActionType1_No,
-          ge_mActionType2_No, ge_eDynPrio_Axis),
-      min_value(0), max_value(100), keep_settings(0), imin_value(0),
-      imax_value(0), min_value_p(0), max_value_p(0), imin_value_p(0),
-      imax_value_p(0), attr_type(0)
+    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_Axis, ge_mActionType1_No, ge_mActionType2_No,
+                ge_eDynPrio_Axis),
+      min_value(0), max_value(100), keep_settings(0), imin_value(0), imax_value(0), min_value_p(0),
+      max_value_p(0), imin_value_p(0), imax_value_p(0), attr_type(0)
 {
   strcpy(minvalue_attr, "");
   strcpy(maxvalue_attr, "");
 }
 
 GeAxis::GeAxis(const GeAxis& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-          x.prio),
-      min_value(x.min_value), max_value(x.max_value),
-      keep_settings(x.keep_settings), min_value_p(0), max_value_p(0),
-      imin_value_p(0), imax_value_p(0)
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio),
+      min_value(x.min_value), max_value(x.max_value), keep_settings(x.keep_settings), min_value_p(0),
+      max_value_p(0), imin_value_p(0), imax_value_p(0)
 {
   strcpy(minvalue_attr, x.minvalue_attr);
   strcpy(maxvalue_attr, x.maxvalue_attr);
@@ -14810,16 +15526,12 @@ void GeAxis::get_attributes(attr_sItem* attrinfo, int* item_count)
   *item_count = i;
 }
 
-void GeAxis::set_attribute(grow_tObject object, const char* attr_name, int* cnt)
-{
-}
+void GeAxis::set_attribute(grow_tObject object, const char* attr_name, int* cnt) {}
 
 void GeAxis::replace_attribute(char* from, char* to, int* cnt, int strict)
 {
-  GeDyn::replace_attribute(
-      minvalue_attr, sizeof(minvalue_attr), from, to, cnt, strict);
-  GeDyn::replace_attribute(
-      maxvalue_attr, sizeof(maxvalue_attr), from, to, cnt, strict);
+  GeDyn::replace_attribute(minvalue_attr, sizeof(minvalue_attr), from, to, cnt, strict);
+  GeDyn::replace_attribute(maxvalue_attr, sizeof(maxvalue_attr), from, to, cnt, strict);
 }
 
 void GeAxis::save(std::ofstream& fp)
@@ -14837,8 +15549,10 @@ void GeAxis::open(std::ifstream& fp)
   int end_found = 0;
   char dummy[40];
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeAxis: \"%d %s\"\n", type, dummy);
@@ -14846,7 +15560,8 @@ void GeAxis::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_Axis:
       break;
     case ge_eSave_Axis_minvalue_attr:
@@ -14884,7 +15599,7 @@ int GeAxis::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
   int db;
   glow_sAxisInfo info;
 
-  grow_GetAxisInfo( object, &info);
+  grow_GetAxisInfo(object, &info);
   min_value = info.min_value;
   max_value = info.max_value;
 
@@ -14893,32 +15608,33 @@ int GeAxis::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
   min_value_p = 0;
   imin_value_p = 0;
 
-  db = dyn->parse_attr_name(
-      minvalue_attr, parsed_name, &inverted, &attr_type_min, &attr_size);
-  if (!streq(parsed_name, "")) {
-    switch (attr_type_min) {
+  db = dyn->parse_attr_name(minvalue_attr, parsed_name, &inverted, &attr_type_min, &attr_size);
+  if (!streq(parsed_name, ""))
+  {
+    switch (attr_type_min)
+    {
     case pwr_eType_Float32:
-      switch (db) {
+      switch (db)
+      {
       case graph_eDatabase_Gdh:
-        sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name,
-            (void**)&min_value_p, &min_value_subid, attr_size, object, now);
+        sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&min_value_p, &min_value_subid,
+                                          attr_size, object, now);
         break;
       case graph_eDatabase_Local:
-        min_value_p = (pwr_tFloat32*)dyn->graph->localdb_ref_or_create(
-            parsed_name, attr_type_min);
+        min_value_p = (pwr_tFloat32*)dyn->graph->localdb_ref_or_create(parsed_name, attr_type_min);
       default:;
       }
       min_found = 1;
       break;
     case pwr_eType_Int32:
-      sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name,
-          (void**)&imin_value_p, &min_value_subid, attr_size, object, now);
+      sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&imin_value_p, &min_value_subid,
+                                        attr_size, object, now);
       min_found = 1;
       break;
     case pwr_eType_Time:
     case pwr_eType_DeltaTime:
-      sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name,
-          (void**)&tmin_value_p, &min_value_subid, attr_size, object, now);
+      sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&tmin_value_p, &min_value_subid,
+                                        attr_size, object, now);
       min_found = 1;
       break;
     default:;
@@ -14927,42 +15643,45 @@ int GeAxis::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
 
   max_value_p = 0;
   imax_value_p = 0;
-  db = dyn->parse_attr_name(
-      maxvalue_attr, parsed_name, &inverted, &attr_type_max, &attr_size);
-  if (!streq(parsed_name, "")) {
-    switch (attr_type_max) {
+  db = dyn->parse_attr_name(maxvalue_attr, parsed_name, &inverted, &attr_type_max, &attr_size);
+  if (!streq(parsed_name, ""))
+  {
+    switch (attr_type_max)
+    {
     case pwr_eType_Float32:
-      switch (db) {
+      switch (db)
+      {
       case graph_eDatabase_Gdh:
-        sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name,
-            (void**)&max_value_p, &max_value_subid, attr_size, object, now);
+        sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&max_value_p, &max_value_subid,
+                                          attr_size, object, now);
       case graph_eDatabase_Local:
-        max_value_p = (pwr_tFloat32*)dyn->graph->localdb_ref_or_create(
-            parsed_name, attr_type_max);
+        max_value_p = (pwr_tFloat32*)dyn->graph->localdb_ref_or_create(parsed_name, attr_type_max);
       default:;
       }
       max_found = 1;
       break;
     case pwr_eType_Int32:
-      sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name,
-          (void**)&imax_value_p, &max_value_subid, attr_size, object, now);
+      sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&imax_value_p, &max_value_subid,
+                                        attr_size, object, now);
       max_found = 1;
       break;
     case pwr_eType_Time:
     case pwr_eType_DeltaTime:
-      sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name,
-          (void**)&tmax_value_p, &max_value_subid, attr_size, object, now);
+      sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&tmax_value_p, &max_value_subid,
+                                        attr_size, object, now);
       max_found = 1;
       break;
     default:;
     }
   }
-  if (min_found && max_found) {
+  if (min_found && max_found)
+  {
     if (attr_type_min != attr_type_max)
       attr_type = 0;
     else
       attr_type = attr_type_max;
-  } else if (max_found)
+  }
+  else if (max_found)
     attr_type = attr_type_max;
   else if (min_found)
     attr_type = attr_type_min;
@@ -14975,11 +15694,13 @@ int GeAxis::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
 
 int GeAxis::disconnect(grow_tObject object)
 {
-  if (min_value_p || imin_value_p) {
+  if (min_value_p || imin_value_p)
+  {
     gdh_UnrefObjectInfo(min_value_subid);
     min_value_p = 0;
   }
-  if (max_value_p || imax_value_p) {
+  if (max_value_p || imax_value_p)
+  {
     gdh_UnrefObjectInfo(max_value_subid);
     max_value_p = 0;
   }
@@ -14988,13 +15709,16 @@ int GeAxis::disconnect(grow_tObject object)
 
 int GeAxis::scan(grow_tObject object)
 {
-  switch (attr_type) {
-  case pwr_eType_Float32: {
+  switch (attr_type)
+  {
+  case pwr_eType_Float32:
+  {
     if (!(max_value_p || min_value_p))
       return 1;
 
-    if (!(first_scan || (max_value_p && (!feqf(*max_value_p, max_value)))
-            || (min_value_p && (!feqf(*min_value_p, min_value))))) {
+    if (!(first_scan || (max_value_p && (!feqf(*max_value_p, max_value))) ||
+          (min_value_p && (!feqf(*min_value_p, min_value)))))
+    {
       return 1;
     }
     if (first_scan)
@@ -15011,12 +15735,14 @@ int GeAxis::scan(grow_tObject object)
     grow_SetAxisRange(object, min_value, max_value, keep_settings);
     break;
   }
-  case pwr_eType_Int32: {
+  case pwr_eType_Int32:
+  {
     if (!(imax_value_p || imin_value_p))
       return 1;
 
-    if (!(first_scan || (imax_value_p && (*imax_value_p != imax_value))
-            || (imin_value_p && (*imin_value_p != imin_value)))) {
+    if (!(first_scan || (imax_value_p && (*imax_value_p != imax_value)) ||
+          (imin_value_p && (*imin_value_p != imin_value))))
+    {
       return 1;
     }
     if (first_scan)
@@ -15030,17 +15756,18 @@ int GeAxis::scan(grow_tObject object)
     if (imax_value == imin_value)
       return 1;
 
-    grow_SetAxisRange(
-        object, (double)imin_value, (double)imax_value, keep_settings);
+    grow_SetAxisRange(object, (double)imin_value, (double)imax_value, keep_settings);
     break;
   }
   case pwr_eType_Time:
-  case pwr_eType_DeltaTime: {
+  case pwr_eType_DeltaTime:
+  {
     if (!(tmax_value_p || tmin_value_p))
       return 1;
 
-    if (!(first_scan || (tmax_value_p && (tmax_value_p->tv_sec != imax_value))
-            || (tmin_value_p && (tmin_value_p->tv_sec != imin_value)))) {
+    if (!(first_scan || (tmax_value_p && (tmax_value_p->tv_sec != imax_value)) ||
+          (tmin_value_p && (tmin_value_p->tv_sec != imin_value))))
+    {
       return 1;
     }
     if (first_scan)
@@ -15054,8 +15781,7 @@ int GeAxis::scan(grow_tObject object)
     if (imax_value == imin_value)
       return 1;
 
-    grow_SetAxisRange(
-        object, (double)imin_value, (double)imax_value, keep_settings);
+    grow_SetAxisRange(object, (double)imin_value, (double)imax_value, keep_settings);
     break;
   }
   default:;
@@ -15063,33 +15789,31 @@ int GeAxis::scan(grow_tObject object)
   return 1;
 }
 
-int GeAxis::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GeAxis::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
   if (!streq(minvalue_attr, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Axis.MinValueAttr\",\"" << minvalue_attr << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Axis.MinValueAttr\",\"" << minvalue_attr
+       << "\");" << '\n';
   if (!streq(maxvalue_attr, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Axis.MaxValueAttr\",\"" << maxvalue_attr << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Axis.MaxValueAttr\",\"" << maxvalue_attr
+       << "\");" << '\n';
   if (keep_settings != 0)
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Axis.KeepSettings\"," << keep_settings << ");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Axis.KeepSettings\"," << keep_settings
+       << ");" << '\n';
   return 1;
 }
 
-int GeAxis::export_java(
-    grow_tObject object, std::ofstream& fp, bool first, char* var_name)
-{
-  return 1;
-}
+int GeAxis::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name) { return 1; }
 
 int GeAxis::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
-  int types[] = { pwr_eType_Int32, pwr_eType_Float32, 0 };
-  graph_eDatabase databases[]
-      = { graph_eDatabase_Gdh, graph_eDatabase_Local, graph_eDatabase__ };
+  int types[] = {pwr_eType_Int32, pwr_eType_Float32, 0};
+  graph_eDatabase databases[] = {graph_eDatabase_Gdh, graph_eDatabase_Local, graph_eDatabase__};
 
-  dyn->syntax_check_attribute(object, "Axis.MinValueAttr", minvalue_attr, 1,
-      types, databases, error_cnt, warning_cnt);
-  dyn->syntax_check_attribute(object, "Axis.MaxValueAttr", maxvalue_attr, 1,
-      types, databases, error_cnt, warning_cnt);
+  dyn->syntax_check_attribute(object, "Axis.MinValueAttr", minvalue_attr, 1, types, databases, error_cnt,
+                              warning_cnt);
+  dyn->syntax_check_attribute(object, "Axis.MaxValueAttr", maxvalue_attr, 1, types, databases, error_cnt,
+                              warning_cnt);
   return 1;
 }
 
@@ -15125,8 +15849,10 @@ void GeTimeoutColor::open(std::ifstream& fp)
   int tmp;
   char dummy[40];
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeTimeoutColor: \"%d %s\"\n", type, dummy);
@@ -15134,7 +15860,8 @@ void GeTimeoutColor::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_TimeoutColor:
       break;
     case ge_eSave_TimeoutColor_time:
@@ -15156,11 +15883,11 @@ void GeTimeoutColor::open(std::ifstream& fp)
   }
 }
 
-int GeTimeoutColor::connect(
-    grow_tObject object, glow_sTraceData* trace_data, bool now)
+int GeTimeoutColor::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
 {
   color = dyn->get_color1(object, color);
-  if (color < 0 || color >= glow_eDrawType__) {
+  if (color < 0 || color >= glow_eDrawType__)
+  {
     printf("** Color out of range, TimeoutColor\n");
     return 0;
   }
@@ -15172,7 +15899,8 @@ int GeTimeoutColor::connect(
   init_done = false;
 
   double scan_time;
-  switch (dyn->cycle) {
+  switch (dyn->cycle)
+  {
   case glow_eCycle_Slow:
     scan_time = dyn->graph->scan_time;
     break;
@@ -15205,13 +15933,16 @@ int GeTimeoutColor::scan(grow_tObject object)
     return 1;
   interval_cnt = 0;
 
-  if (!init_done) {
+  if (!init_done)
+  {
     // Get subid from other dyn element
-    for (GeDynElem* elem = dyn->elements; elem; elem = elem->next) {
+    for (GeDynElem* elem = dyn->elements; elem; elem = elem->next)
+    {
       if (elem == this)
         continue;
 
-      switch (elem->dyn_type1) {
+      switch (elem->dyn_type1)
+      {
       case ge_mDynType1_DigLowColor:
         subid = ((GeDigLowColor*)elem)->subid;
         break;
@@ -15311,7 +16042,8 @@ int GeTimeoutColor::scan(grow_tObject object)
         break;
       default:;
       }
-      switch (elem->dyn_type2) {
+      switch (elem->dyn_type2)
+      {
       case ge_mDynType2_Axis:
         if (((GeAxis*)elem)->min_value_p)
           subid = ((GeAxis*)elem)->min_value_subid;
@@ -15366,34 +16098,48 @@ int GeTimeoutColor::scan(grow_tObject object)
   else
     val = 0;
 
-  if (!first_scan) {
-    if (old_value == val) {
+  if (!first_scan)
+  {
+    if (old_value == val)
+    {
       // No change since last time
       return 1;
     }
-  } else
+  }
+  else
     first_scan = false;
 
-  if (dyn->total_dyn_type1 & ge_mDynType1_Tone) {
-    if (val) {
-      if (color >= (glow_eDrawType)glow_eDrawTone__) {
+  if (dyn->total_dyn_type1 & ge_mDynType1_Tone)
+  {
+    if (val)
+    {
+      if (color >= (glow_eDrawType)glow_eDrawTone__)
+      {
         if (dyn->reset_color)
           grow_ResetObjectFillColor(object); // Previous color might be a tone
         grow_SetObjectFillColor(object, color);
-      } else
+      }
+      else
         grow_SetObjectColorTone(object, (glow_eDrawTone)color);
       dyn->ignore_color = true;
-    } else {
+    }
+    else
+    {
       if (color >= (glow_eDrawType)glow_eDrawTone__)
         grow_ResetObjectFillColor(object);
       grow_ResetObjectColorTone(object);
       dyn->reset_color = true;
     }
-  } else {
-    if (val) {
+  }
+  else
+  {
+    if (val)
+    {
       grow_SetObjectFillColor(object, color);
       dyn->ignore_color = true;
-    } else {
+    }
+    else
+    {
       grow_ResetObjectFillColor(object);
       dyn->reset_color = true;
     }
@@ -15403,25 +16149,28 @@ int GeTimeoutColor::scan(grow_tObject object)
   return 1;
 }
 
-int GeTimeoutColor::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GeTimeoutColor::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
   if (!feq(time, 5.0))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "TimeoutColor.Time\"," << dtostr(time) << ");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "TimeoutColor.Time\"," << dtostr(time)
+       << ");" << '\n';
   if (color != glow_eDrawType_Inherit)
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "TimeoutColor.Color\"," << color << ");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "TimeoutColor.Color\"," << color << ");"
+       << '\n';
   return 1;
 }
 
-int GeTimeoutColor::syntax_check(
-    grow_tObject object, int* error_cnt, int* warning_cnt)
+int GeTimeoutColor::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
   // Check of there is any other element that can be checked for timeout
   int found = 0;
-  for (GeDynElem* elem = dyn->elements; elem; elem = elem->next) {
+  for (GeDynElem* elem = dyn->elements; elem; elem = elem->next)
+  {
     if (elem == this)
       continue;
 
-    switch (elem->dyn_type1) {
+    switch (elem->dyn_type1)
+    {
     case ge_mDynType1_DigLowColor:
     case ge_mDynType1_DigColor:
     case ge_mDynType1_DigError:
@@ -15452,7 +16201,8 @@ int GeTimeoutColor::syntax_check(
       break;
     default:;
     }
-    switch (elem->dyn_type2) {
+    switch (elem->dyn_type2)
+    {
     case ge_mDynType2_Axis:
     case ge_mDynType2_DigTextColor:
     case ge_mDynType2_DigFourShift:
@@ -15465,19 +16215,21 @@ int GeTimeoutColor::syntax_check(
     if (found)
       break;
   }
-  if (!found) {
-    dyn->graph->syntax_msg(
-        'E', object, "TimeoutColor, no attribute to supervise found");
+  if (!found)
+  {
+    dyn->graph->syntax_msg('E', object, "TimeoutColor, no attribute to supervise found");
     (*error_cnt)++;
   }
 
   glow_eDrawType tcolor = dyn->get_color1(object, color);
-  if (tcolor < 0 || tcolor >= glow_eDrawType__) {
+  if (tcolor < 0 || tcolor >= glow_eDrawType__)
+  {
     dyn->graph->syntax_msg('E', object, "Color out or range");
     (*error_cnt)++;
   }
 
-  if (fabs(time) < FLT_EPSILON) {
+  if (fabs(time) < FLT_EPSILON)
+  {
     dyn->graph->syntax_msg('E', object, "TimeoutColor.Time is zero");
     (*error_cnt)++;
   }
@@ -15486,15 +16238,14 @@ int GeTimeoutColor::syntax_check(
 }
 
 GeHostObject::GeHostObject(GeDyn* e_dyn)
-    : GeDynElem(e_dyn, ge_mDynType1_HostObject, ge_mDynType2_No,
-          ge_mActionType1_No, ge_mActionType2_No, ge_eDynPrio_HostObject)
+    : GeDynElem(e_dyn, ge_mDynType1_HostObject, ge_mDynType2_No, ge_mActionType1_No, ge_mActionType2_No,
+                ge_eDynPrio_HostObject)
 {
   strcpy(hostobject, "");
 }
 
 GeHostObject::GeHostObject(const GeHostObject& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-          x.prio)
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio)
 {
   strcpy(hostobject, x.hostobject);
 }
@@ -15510,11 +16261,11 @@ void GeHostObject::get_attributes(attr_sItem* attrinfo, int* item_count)
   *item_count = i;
 }
 
-void GeHostObject::set_attribute(
-    grow_tObject object, const char* attr_name, int* cnt)
+void GeHostObject::set_attribute(grow_tObject object, const char* attr_name, int* cnt)
 {
   (*cnt)--;
-  if (*cnt == 0) {
+  if (*cnt == 0)
+  {
     char* s;
 
     strncpy(hostobject, attr_name, sizeof(hostobject));
@@ -15530,8 +16281,7 @@ void GeHostObject::set_attribute(
 
 void GeHostObject::replace_attribute(char* from, char* to, int* cnt, int strict)
 {
-  GeDyn::replace_attribute(
-      hostobject, sizeof(hostobject), from, to, cnt, strict);
+  GeDyn::replace_attribute(hostobject, sizeof(hostobject), from, to, cnt, strict);
 }
 
 void GeHostObject::save(std::ofstream& fp)
@@ -15547,8 +16297,10 @@ void GeHostObject::open(std::ifstream& fp)
   int end_found = 0;
   char dummy[40];
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeHostObject: \"%d %s\"\n", type, dummy);
@@ -15556,7 +16308,8 @@ void GeHostObject::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_HostObject:
       break;
     case ge_eSave_HostObject_object:
@@ -15575,10 +16328,10 @@ void GeHostObject::open(std::ifstream& fp)
   }
 }
 
-int GeHostObject::connect(
-    grow_tObject object, glow_sTraceData* trace_data, bool now)
+int GeHostObject::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
 {
-  if (grow_GetObjectRecursiveTrace(object)) {
+  if (grow_GetObjectRecursiveTrace(object))
+  {
     grow_tObject *objectlist, *object_p;
     int object_cnt;
     grow_tNodeClass nodeclass;
@@ -15586,14 +16339,15 @@ int GeHostObject::connect(
     grow_GetObjectClass(object, &nodeclass);
     grow_GetNodeClassObjectList(nodeclass, &objectlist, &object_cnt);
     object_p = objectlist;
-    for (int i = 0; i < object_cnt; i++) {
-      if (grow_GetObjectType(*object_p) == glow_eObjectType_GrowNode
-          || grow_GetObjectType(*object_p) == glow_eObjectType_GrowGroup) {
+    for (int i = 0; i < object_cnt; i++)
+    {
+      if (grow_GetObjectType(*object_p) == glow_eObjectType_GrowNode ||
+          grow_GetObjectType(*object_p) == glow_eObjectType_GrowGroup)
+      {
         GeDyn* gm_dyn;
 
         grow_GetUserData(*object_p, (void**)&gm_dyn);
-        strncpy(gm_dyn->recursive_hostobject, hostobject,
-            sizeof(gm_dyn->recursive_hostobject));
+        strncpy(gm_dyn->recursive_hostobject, hostobject, sizeof(gm_dyn->recursive_hostobject));
       }
       object_p++;
     }
@@ -15601,15 +16355,15 @@ int GeHostObject::connect(
   return 1;
 }
 
-int GeHostObject::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GeHostObject::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
   if (!streq(hostobject, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "HostObject.Object\",\"" << hostobject << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "HostObject.Object\",\"" << hostobject
+       << "\");" << '\n';
   return 1;
 }
 
-int GeHostObject::export_java(
-    grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeHostObject::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
   GeDyn* nodeclass_dyn;
 
@@ -15617,8 +16371,7 @@ int GeHostObject::export_java(
     fp << "      ";
   else
     fp << "      ,";
-  fp << "new GeDynHostObject(" << var_name << ".dd, \"" << hostobject << "\")"
-     << '\n';
+  fp << "new GeDynHostObject(" << var_name << ".dd, \"" << hostobject << "\")" << '\n';
 
   grow_GetObjectClassUserData(object, (void**)&nodeclass_dyn);
   for (GeDynElem* elem = nodeclass_dyn->elements; elem; elem = elem->next)
@@ -15627,8 +16380,7 @@ int GeHostObject::export_java(
   return 1;
 }
 
-int GeHostObject::syntax_check(
-    grow_tObject object, int* error_cnt, int* warning_cnt)
+int GeHostObject::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
   int sts;
   pwr_eType a_type;
@@ -15637,13 +16389,15 @@ int GeHostObject::syntax_check(
   if (current_dyn == dyn)
     return 1;
 
-  if (streq(hostobject, "")) {
+  if (streq(hostobject, ""))
+  {
     dyn->graph->syntax_msg('W', object, "HostObject.Object is missing");
     (*warning_cnt)++;
     return 1;
   }
   sts = dyn->graph->check_ldh_object(hostobject, &a_type);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     char msg[440];
     sprintf(msg, "HostObject.Object \"%s\" not found", hostobject);
     dyn->graph->syntax_msg('W', object, msg);
@@ -15654,14 +16408,15 @@ int GeHostObject::syntax_check(
   GeDyn *nodeclass_dyn, *hostobject_dyn;
 
   grow_GetObjectClassUserData(object, (void**)&nodeclass_dyn);
-  if (nodeclass_dyn) {
+  if (nodeclass_dyn)
+  {
     hostobject_dyn = new GeDyn(*nodeclass_dyn);
     hostobject_dyn->merge(*dyn);
 
     hostobject_dyn->set_hostobject(hostobject);
     if (!(hostobject_dyn->total_dyn_type1 & ge_mDynType1_HostObject))
-      hostobject_dyn->total_dyn_type1 = (ge_mDynType1)(
-          hostobject_dyn->total_dyn_type1 | ge_mDynType1_HostObject);
+      hostobject_dyn->total_dyn_type1 =
+          (ge_mDynType1)(hostobject_dyn->total_dyn_type1 | ge_mDynType1_HostObject);
 
     current_dyn = hostobject_dyn; // Avoid recursion
     hostobject_dyn->syntax_check(object, error_cnt, warning_cnt);
@@ -15673,8 +16428,8 @@ int GeHostObject::syntax_check(
 }
 
 GeDigSound::GeDigSound(GeDyn* e_dyn, ge_mInstance e_instance)
-    : GeDynElem(e_dyn, ge_mDynType1_DigSound, ge_mDynType2_No,
-          ge_mActionType1_No, ge_mActionType2_No, ge_eDynPrio_DigSound),
+    : GeDynElem(e_dyn, ge_mDynType1_DigSound, ge_mDynType2_No, ge_mActionType1_No, ge_mActionType2_No,
+                ge_eDynPrio_DigSound),
       level(0), interval(10), time_since_last(0)
 {
   strcpy(attribute, "");
@@ -15683,9 +16438,8 @@ GeDigSound::GeDigSound(GeDyn* e_dyn, ge_mInstance e_instance)
 }
 
 GeDigSound::GeDigSound(const GeDigSound& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-          x.prio),
-      level(x.level), interval(x.interval), time_since_last(0)
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio), level(x.level),
+      interval(x.interval), time_since_last(0)
 {
   strcpy(attribute, x.attribute);
   strcpy(soundobject, x.soundobject);
@@ -15695,7 +16449,8 @@ void GeDigSound::get_attributes(attr_sItem* attrinfo, int* item_count)
 {
   int i = *item_count;
 
-  if (instance == ge_mInstance_1) {
+  if (instance == ge_mInstance_1)
+  {
     strcpy(attrinfo[i].name, "DigSound.Attribute");
     attrinfo[i].value = attribute;
     attrinfo[i].type = glow_eType_String;
@@ -15720,11 +16475,14 @@ void GeDigSound::get_attributes(attr_sItem* attrinfo, int* item_count)
     attrinfo[i].value = &instance_mask;
     attrinfo[i].type = ge_eAttrType_InstanceMask;
     attrinfo[i++].size = sizeof(instance_mask);
-  } else {
+  }
+  else
+  {
     // Get instance number
     int inst = 1;
     unsigned int m = instance;
-    while (m > 1) {
+    while (m > 1)
+    {
       m = m >> 1;
       inst++;
     }
@@ -15753,19 +16511,21 @@ void GeDigSound::get_attributes(attr_sItem* attrinfo, int* item_count)
   *item_count = i;
 }
 
-void GeDigSound::set_attribute(
-    grow_tObject object, const char* attr_name, int* cnt)
+void GeDigSound::set_attribute(grow_tObject object, const char* attr_name, int* cnt)
 {
   (*cnt)--;
-  if (*cnt == 0) {
+  if (*cnt == 0)
+  {
     char msg[200];
 
     strncpy(attribute, attr_name, sizeof(attribute));
-    if (instance == ge_mInstance_1) {
+    if (instance == ge_mInstance_1)
+    {
       snprintf(msg, sizeof(msg), "DigSound.Attribute = %s", attr_name);
-    } else {
-      snprintf(msg, sizeof(msg), "DigSound%d.Attribute = %s",
-          GeDyn::instance_to_number(instance), attr_name);
+    }
+    else
+    {
+      snprintf(msg, sizeof(msg), "DigSound%d.Attribute = %s", GeDyn::instance_to_number(instance), attr_name);
     }
     msg[sizeof(msg) - 1] = 0;
     dyn->graph->message('I', msg);
@@ -15785,8 +16545,7 @@ void GeDigSound::save(std::ofstream& fp)
   fp << int(ge_eSave_DigSound_level) << FSPACE << level << '\n';
   fp << int(ge_eSave_DigSound_interval) << FSPACE << interval << '\n';
   fp << int(ge_eSave_DigSound_instance) << FSPACE << int(instance) << '\n';
-  fp << int(ge_eSave_DigSound_instance_mask) << FSPACE << int(instance_mask)
-     << '\n';
+  fp << int(ge_eSave_DigSound_instance_mask) << FSPACE << int(instance_mask) << '\n';
   fp << int(ge_eSave_End) << '\n';
 }
 
@@ -15797,8 +16556,10 @@ void GeDigSound::open(std::ifstream& fp)
   int tmp;
   char dummy[40];
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeDigSound: \"%d %s\"\n", type, dummy);
@@ -15806,7 +16567,8 @@ void GeDigSound::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_DigSound:
       break;
     case ge_eSave_DigSound_attribute:
@@ -15843,8 +16605,7 @@ void GeDigSound::open(std::ifstream& fp)
   }
 }
 
-int GeDigSound::connect(
-    grow_tObject object, glow_sTraceData* trace_data, bool now)
+int GeDigSound::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
 {
   int attr_type, attr_size;
   pwr_tAName parsed_name;
@@ -15858,16 +16619,14 @@ int GeDigSound::connect(
     return 1;
 
   size = 4;
-  db = dyn->parse_attr_name(
-      attribute, parsed_name, &inverted, &attr_type, &attr_size);
+  db = dyn->parse_attr_name(attribute, parsed_name, &inverted, &attr_type, &attr_size);
   if (streq(parsed_name, ""))
     return 1;
 
   get_bit(parsed_name, attr_type, &bitmask);
   a_typeid = attr_type;
 
-  sts = dyn->graph->ref_object_info(
-      dyn->cycle, parsed_name, (void**)&p, &subid, size, object, now);
+  sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&p, &subid, size, object, now);
   if (EVEN(sts))
     return sts;
 
@@ -15899,27 +16658,35 @@ int GeDigSound::scan(grow_tObject object)
   if (inverted)
     val = !val;
 
-  if (!first_scan) {
-    if (old_value == *p && !level) {
+  if (!first_scan)
+  {
+    if (old_value == *p && !level)
+    {
       // No change since last time
       return 1;
     }
-  } else
+  }
+  else
     first_scan = false;
 
-  if (!level) {
+  if (!level)
+  {
     // Sound on positive edge
     if (val && !old_value)
       dyn->graph->sound(&soundaref);
-  } else {
-    if (val) {
+  }
+  else
+  {
+    if (val)
+    {
       if (time_since_last >= interval)
         time_since_last = 0;
       if (feq(time_since_last, 0.0))
         dyn->graph->sound(&soundaref);
 
       time_since_last += dyn->graph->scan_time;
-    } else
+    }
+    else
       time_since_last = 0;
   }
   old_value = val;
@@ -15927,34 +16694,38 @@ int GeDigSound::scan(grow_tObject object)
   return 1;
 }
 
-int GeDigSound::syntax_check(
-    grow_tObject object, int* error_cnt, int* warning_cnt)
+int GeDigSound::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
   int sts;
   pwr_eType a_type;
 
-  int types[] = { pwr_eType_Boolean, pwr_eType_Int32, pwr_eType_UInt32,
-    pwr_eType_Int64, pwr_eType_UInt64, graph_eType_Bit, pwr_eType_Float32,
-    pwr_eType_Float64, pwr_eType_String, 0 };
-  graph_eDatabase databases[] = { graph_eDatabase_Gdh, graph_eDatabase__ };
+  int types[] = {pwr_eType_Boolean, pwr_eType_Int32,   pwr_eType_UInt32,  pwr_eType_Int64,  pwr_eType_UInt64,
+                 graph_eType_Bit,   pwr_eType_Float32, pwr_eType_Float64, pwr_eType_String, 0};
+  graph_eDatabase databases[] = {graph_eDatabase_Gdh, graph_eDatabase__};
 
-  dyn->syntax_check_attribute(object, "DigSound.Attribute", attribute, 0, types,
-      databases, error_cnt, warning_cnt);
+  dyn->syntax_check_attribute(object, "DigSound.Attribute", attribute, 0, types, databases, error_cnt,
+                              warning_cnt);
 
-  if (streq(soundobject, "")) {
+  if (streq(soundobject, ""))
+  {
     dyn->graph->syntax_msg('W', object, "DigSound.SoundObject is missing");
     (*warning_cnt)++;
-  } else {
+  }
+  else
+  {
     sts = dyn->graph->check_ldh_object(soundobject, &a_type);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       char msg[440];
       sprintf(msg, "DigSound.SoundObject \"%s\" not found", soundobject);
       dyn->graph->syntax_msg('W', object, msg);
       (*warning_cnt)++;
-    } else {
-      if (!(a_type == pwr_cClass_Sound || a_type == pwr_cClass_SoundSequence)) {
-        dyn->graph->syntax_msg(
-            'E', object, "DigSound.SoundObject is of wrong class");
+    }
+    else
+    {
+      if (!(a_type == pwr_cClass_Sound || a_type == pwr_cClass_SoundSequence))
+      {
+        dyn->graph->syntax_msg('E', object, "DigSound.SoundObject is of wrong class");
         (*error_cnt)++;
       }
     }
@@ -15963,11 +16734,10 @@ int GeDigSound::syntax_check(
 }
 
 GeFillLevel::GeFillLevel(GeDyn* e_dyn)
-    : GeDynElem(e_dyn, ge_mDynType1_FillLevel, ge_mDynType2_No,
-          ge_mActionType1_No, ge_mActionType2_No, ge_eDynPrio_FillLevel),
-      color(glow_eDrawType_Inherit), direction(glow_eDirection_Down),
-      min_value(0), max_value(100), limits_found(false), min_value_p(0),
-      max_value_p(0)
+    : GeDynElem(e_dyn, ge_mDynType1_FillLevel, ge_mDynType2_No, ge_mActionType1_No, ge_mActionType2_No,
+                ge_eDynPrio_FillLevel),
+      color(glow_eDrawType_Inherit), direction(glow_eDirection_Down), min_value(0), max_value(100),
+      limits_found(false), min_value_p(0), max_value_p(0)
 {
   strcpy(attribute, "");
   strcpy(minvalue_attr, "");
@@ -15975,10 +16745,8 @@ GeFillLevel::GeFillLevel(GeDyn* e_dyn)
 }
 
 GeFillLevel::GeFillLevel(const GeFillLevel& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-          x.prio),
-      color(x.color), direction(x.direction), min_value(x.min_value),
-      max_value(x.max_value), min_value_p(0), max_value_p(0)
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio), color(x.color),
+      direction(x.direction), min_value(x.min_value), max_value(x.max_value), min_value_p(0), max_value_p(0)
 {
   strcpy(attribute, x.attribute);
   strcpy(minvalue_attr, x.minvalue_attr);
@@ -15994,12 +16762,15 @@ void GeFillLevel::get_attributes(attr_sItem* attrinfo, int* item_count)
   attrinfo[i].type = glow_eType_String;
   attrinfo[i++].size = sizeof(attribute);
 
-  if (dyn->total_dyn_type1 & ge_mDynType1_Tone) {
+  if (dyn->total_dyn_type1 & ge_mDynType1_Tone)
+  {
     strcpy(attrinfo[i].name, "FillLevel.BackgroundTone");
     attrinfo[i].value = &color;
     attrinfo[i].type = glow_eType_ToneOrColor;
     attrinfo[i++].size = sizeof(color);
-  } else {
+  }
+  else
+  {
     strcpy(attrinfo[i].name, "FillLevel.BackgroundColor");
     attrinfo[i].value = &color;
     attrinfo[i].type = glow_eType_Color;
@@ -16033,11 +16804,11 @@ void GeFillLevel::get_attributes(attr_sItem* attrinfo, int* item_count)
   *item_count = i;
 }
 
-void GeFillLevel::set_attribute(
-    grow_tObject object, const char* attr_name, int* cnt)
+void GeFillLevel::set_attribute(grow_tObject object, const char* attr_name, int* cnt)
 {
   (*cnt)--;
-  if (*cnt == 0) {
+  if (*cnt == 0)
+  {
     char msg[200];
 
     strncpy(attribute, attr_name, sizeof(attribute));
@@ -16060,10 +16831,8 @@ void GeFillLevel::save(std::ofstream& fp)
   fp << int(ge_eSave_FillLevel_direction) << FSPACE << int(direction) << '\n';
   fp << int(ge_eSave_FillLevel_max_value) << FSPACE << max_value << '\n';
   fp << int(ge_eSave_FillLevel_min_value) << FSPACE << min_value << '\n';
-  fp << int(ge_eSave_FillLevel_minvalue_attr) << FSPACE << minvalue_attr
-     << '\n';
-  fp << int(ge_eSave_FillLevel_maxvalue_attr) << FSPACE << maxvalue_attr
-     << '\n';
+  fp << int(ge_eSave_FillLevel_minvalue_attr) << FSPACE << minvalue_attr << '\n';
+  fp << int(ge_eSave_FillLevel_maxvalue_attr) << FSPACE << maxvalue_attr << '\n';
   fp << int(ge_eSave_End) << '\n';
 }
 
@@ -16074,8 +16843,10 @@ void GeFillLevel::open(std::ifstream& fp)
   int tmp;
   char dummy[40];
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeFillLevel: \"%d %s\"\n", type, dummy);
@@ -16083,7 +16854,8 @@ void GeFillLevel::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_FillLevel:
       break;
     case ge_eSave_FillLevel_attribute:
@@ -16124,8 +16896,7 @@ void GeFillLevel::open(std::ifstream& fp)
   }
 }
 
-int GeFillLevel::connect(
-    grow_tObject object, glow_sTraceData* trace_data, bool now)
+int GeFillLevel::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
 {
   int attr_type, attr_size;
   pwr_tAName parsed_name;
@@ -16134,7 +16905,8 @@ int GeFillLevel::connect(
   glow_eDirection dir;
 
   color = dyn->get_color2(object, color);
-  if (color < 0 || color >= glow_eDrawType__) {
+  if (color < 0 || color >= glow_eDrawType__)
+  {
     printf("** Color out of range, %s\n", attribute);
     p = 0;
     return 0;
@@ -16142,48 +16914,49 @@ int GeFillLevel::connect(
 
   size = 4;
   p = 0;
-  db = dyn->parse_attr_name(
-      attribute, parsed_name, &inverted, &attr_type, &attr_size);
+  db = dyn->parse_attr_name(attribute, parsed_name, &inverted, &attr_type, &attr_size);
   if (streq(parsed_name, ""))
     return 1;
 
-  sts = dyn->graph->ref_object_info(
-      dyn->cycle, parsed_name, (void**)&p, &subid, size, object, now);
+  sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&p, &subid, size, object, now);
   if (EVEN(sts))
     return sts;
 
   trace_data->p = &pdummy;
   first_scan = true;
 
-  if (dyn->total_dyn_type1 & ge_mDynType1_Tone) {
+  if (dyn->total_dyn_type1 & ge_mDynType1_Tone)
+  {
     if (color >= (glow_eDrawType)glow_eDrawTone__)
       grow_SetObjectLevelFillColor(object, color);
     else
       grow_SetObjectLevelColorTone(object, (glow_eDrawTone)color);
-  } else
+  }
+  else
     grow_SetObjectLevelFillColor(object, color);
 
   sts = grow_GetObjectLimits(object, &limit_min, &limit_max, &dir);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     limits_found = true;
     direction = dir;
   }
   grow_SetObjectLevelDirection(object, direction);
 
   min_value_p = 0;
-  dyn->parse_attr_name(
-      minvalue_attr, parsed_name, &inverted, &attr_type, &attr_size);
-  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32) {
-    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name,
-        (void**)&min_value_p, &min_value_subid, attr_size, object, now);
+  dyn->parse_attr_name(minvalue_attr, parsed_name, &inverted, &attr_type, &attr_size);
+  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32)
+  {
+    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&min_value_p, &min_value_subid,
+                                      attr_size, object, now);
   }
 
   max_value_p = 0;
-  dyn->parse_attr_name(
-      maxvalue_attr, parsed_name, &inverted, &attr_type, &attr_size);
-  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32) {
-    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name,
-        (void**)&max_value_p, &max_value_subid, attr_size, object, now);
+  dyn->parse_attr_name(maxvalue_attr, parsed_name, &inverted, &attr_type, &attr_size);
+  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32)
+  {
+    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&max_value_p, &max_value_subid,
+                                      attr_size, object, now);
   }
   return 1;
 }
@@ -16194,11 +16967,13 @@ int GeFillLevel::disconnect(grow_tObject object)
     gdh_UnrefObjectInfo(subid);
   p = 0;
 
-  if (min_value_p) {
+  if (min_value_p)
+  {
     gdh_UnrefObjectInfo(min_value_subid);
     min_value_p = 0;
   }
-  if (max_value_p) {
+  if (max_value_p)
+  {
     gdh_UnrefObjectInfo(max_value_subid);
     max_value_p = 0;
   }
@@ -16210,20 +16985,24 @@ int GeFillLevel::scan(grow_tObject object)
   if (!p)
     return 1;
 
-  if (min_value_p && !feqf(*min_value_p, min_value)) {
+  if (min_value_p && !feqf(*min_value_p, min_value))
+  {
     min_value = *min_value_p;
     first_scan = 1;
   }
-  if (max_value_p && !feqf(*max_value_p, max_value)) {
+  if (max_value_p && !feqf(*max_value_p, max_value))
+  {
     max_value = *max_value_p;
     first_scan = 1;
   }
 
-  if (!first_scan) {
+  if (!first_scan)
+  {
     if (fabs(old_value - *p) < FLT_EPSILON)
       // No change since last time
       return 1;
-  } else
+  }
+  else
     first_scan = false;
 
   if (feqf(max_value, min_value))
@@ -16232,35 +17011,29 @@ int GeFillLevel::scan(grow_tObject object)
   double value = 0.0;
   if (!limits_found)
     value = (*p - min_value) / (max_value - min_value);
-  else {
+  else
+  {
     double ll_x, ll_y, ur_x, ur_y;
 
     grow_MeasureNode(object, &ll_x, &ll_y, &ur_x, &ur_y);
 
-    switch (direction) {
+    switch (direction)
+    {
     case glow_eDirection_Right:
-      value = ((*p - min_value) / (max_value - min_value)
-                      * (limit_max - limit_min)
-                  + (limit_min - ll_x))
-          / (ur_x - ll_x);
+      value = ((*p - min_value) / (max_value - min_value) * (limit_max - limit_min) + (limit_min - ll_x)) /
+              (ur_x - ll_x);
       break;
     case glow_eDirection_Left:
-      value = ((*p - min_value) / (max_value - min_value)
-                      * (limit_max - limit_min)
-                  + (ur_x - limit_max))
-          / (ur_x - ll_x);
+      value = ((*p - min_value) / (max_value - min_value) * (limit_max - limit_min) + (ur_x - limit_max)) /
+              (ur_x - ll_x);
       break;
     case glow_eDirection_Up:
-      value = ((*p - min_value) / (max_value - min_value)
-                      * (limit_max - limit_min)
-                  + (limit_min - ll_y))
-          / (ur_y - ll_y);
+      value = ((*p - min_value) / (max_value - min_value) * (limit_max - limit_min) + (limit_min - ll_y)) /
+              (ur_y - ll_y);
       break;
     case glow_eDirection_Down:
-      value = ((*p - min_value) / (max_value - min_value)
-                      * (limit_max - limit_min)
-                  + (ur_y - limit_max))
-          / (ur_y - ll_y);
+      value = ((*p - min_value) / (max_value - min_value) * (limit_max - limit_min) + (ur_y - limit_max)) /
+              (ur_y - ll_y);
       break;
     default:;
     }
@@ -16270,32 +17043,40 @@ int GeFillLevel::scan(grow_tObject object)
   return 1;
 }
 
-int GeFillLevel::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GeFillLevel::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
   if (!streq(attribute, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "FillLevel.Attribute\",\"" << attribute << "\");" << '\n';
-  if (color != glow_eDrawType_Inherit) {
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "FillLevel.Attribute\",\"" << attribute
+       << "\");" << '\n';
+  if (color != glow_eDrawType_Inherit)
+  {
     if (dyn->total_dyn_type1 & ge_mDynType1_Tone)
-      fp << indentation << "SetObjectAttribute(id,\"" << prefix << "FillLevel.BackgroundTone\"," << color << ");" << '\n';
+      fp << indentation << "SetObjectAttribute(id,\"" << prefix << "FillLevel.BackgroundTone\"," << color
+         << ");" << '\n';
     else
-      fp << indentation << "SetObjectAttribute(id,\"" << prefix << "FillLevel.BackgroundColor\"," << color << ");" << '\n';
+      fp << indentation << "SetObjectAttribute(id,\"" << prefix << "FillLevel.BackgroundColor\"," << color
+         << ");" << '\n';
   }
   if (direction != glow_eDirection_Down)
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "FillLevel.Direction\"," << direction << ");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "FillLevel.Direction\"," << direction << ");"
+       << '\n';
   if (!feqf(min_value, 0.0F))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "FillLevel.MinValue\"," << min_value << ");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "FillLevel.MinValue\"," << min_value << ");"
+       << '\n';
   if (!feqf(max_value, 100.0F))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "FillLevel.MaxValue\"," << max_value << ");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "FillLevel.MaxValue\"," << max_value << ");"
+       << '\n';
   if (!streq(minvalue_attr, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "FillLevel.MinValueAttr\",\"" << minvalue_attr << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "FillLevel.MinValueAttr\",\""
+       << minvalue_attr << "\");" << '\n';
   if (!streq(maxvalue_attr, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "FillLevel.MaxValueAttr\",\"" << maxvalue_attr << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "FillLevel.MaxValueAttr\",\""
+       << maxvalue_attr << "\");" << '\n';
 
   return 1;
 }
 
-int GeFillLevel::export_java(
-    grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeFillLevel::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
   glow_eDrawType jcolor = dyn->get_color2(object, color);
   int sts;
@@ -16303,10 +17084,13 @@ int GeFillLevel::export_java(
   glow_eDirection dir;
 
   sts = grow_GetObjectLimitsPixel(object, &min_limit, &max_limit, &dir);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     min_limit = max_limit = 0;
     dir = direction;
-  } else if (!(feq(min_limit, 0.0) && feq(max_limit, 0.0))) {
+  }
+  else if (!(feq(min_limit, 0.0) && feq(max_limit, 0.0)))
+  {
     min_limit += glow_cJBean_Offset;
     max_limit += glow_cJBean_Offset;
   }
@@ -16315,9 +17099,8 @@ int GeFillLevel::export_java(
     fp << "      ";
   else
     fp << "      ,";
-  fp << "new GeDynFillLevel(" << var_name << ".dd, \"" << attribute << "\","
-     << jcolor << "," << dir << "," << min_value << "," << max_value << ","
-     << min_limit << "," << max_limit << ",";
+  fp << "new GeDynFillLevel(" << var_name << ".dd, \"" << attribute << "\"," << jcolor << "," << dir << ","
+     << min_value << "," << max_value << "," << min_limit << "," << max_limit << ",";
   if (streq(minvalue_attr, ""))
     fp << "null,";
   else
@@ -16330,30 +17113,30 @@ int GeFillLevel::export_java(
   return 1;
 }
 
-int GeFillLevel::syntax_check(
-    grow_tObject object, int* error_cnt, int* warning_cnt)
+int GeFillLevel::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
   glow_eDrawType tcolor = dyn->get_color2(object, color);
-  if (tcolor < 0 || tcolor >= glow_eDrawType__) {
+  if (tcolor < 0 || tcolor >= glow_eDrawType__)
+  {
     dyn->graph->syntax_msg('E', object, "Color out or range");
     (*error_cnt)++;
   }
 
-  int types[] = { pwr_eType_Float32, 0 };
-  graph_eDatabase databases[] = { graph_eDatabase_Gdh, graph_eDatabase__ };
+  int types[] = {pwr_eType_Float32, 0};
+  graph_eDatabase databases[] = {graph_eDatabase_Gdh, graph_eDatabase__};
 
-  dyn->syntax_check_attribute(object, "FillLevel.Attribute", attribute, 0,
-      types, databases, error_cnt, warning_cnt);
-  dyn->syntax_check_attribute(object, "FillLevel.MinValueAttr", minvalue_attr,
-      1, types, databases, error_cnt, warning_cnt);
-  dyn->syntax_check_attribute(object, "FillLevel.MaxValueAttr", maxvalue_attr,
-      1, types, databases, error_cnt, warning_cnt);
+  dyn->syntax_check_attribute(object, "FillLevel.Attribute", attribute, 0, types, databases, error_cnt,
+                              warning_cnt);
+  dyn->syntax_check_attribute(object, "FillLevel.MinValueAttr", minvalue_attr, 1, types, databases, error_cnt,
+                              warning_cnt);
+  dyn->syntax_check_attribute(object, "FillLevel.MaxValueAttr", maxvalue_attr, 1, types, databases, error_cnt,
+                              warning_cnt);
   return 1;
 }
 
 GeDigCommand::GeDigCommand(GeDyn* e_dyn, ge_mInstance e_instance)
-    : GeDynElem(e_dyn, ge_mDynType1_DigCommand, ge_mDynType2_No,
-          ge_mActionType1_No, ge_mActionType2_No, ge_eDynPrio_DigCommand),
+    : GeDynElem(e_dyn, ge_mDynType1_DigCommand, ge_mDynType2_No, ge_mActionType1_No, ge_mActionType2_No,
+                ge_eDynPrio_DigCommand),
       level(0)
 {
   strcpy(attribute, "");
@@ -16362,9 +17145,7 @@ GeDigCommand::GeDigCommand(GeDyn* e_dyn, ge_mInstance e_instance)
 }
 
 GeDigCommand::GeDigCommand(const GeDigCommand& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-          x.prio),
-      level(x.level)
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio), level(x.level)
 {
   strcpy(attribute, x.attribute);
   strcpy(command, x.command);
@@ -16376,7 +17157,8 @@ void GeDigCommand::get_attributes(attr_sItem* attrinfo, int* item_count)
 {
   int i = *item_count;
 
-  if (instance == ge_mInstance_1) {
+  if (instance == ge_mInstance_1)
+  {
     strcpy(attrinfo[i].name, "DigCommand.Attribute");
     attrinfo[i].value = attribute;
     attrinfo[i].type = glow_eType_String;
@@ -16396,11 +17178,14 @@ void GeDigCommand::get_attributes(attr_sItem* attrinfo, int* item_count)
     attrinfo[i].value = &instance_mask;
     attrinfo[i].type = ge_eAttrType_InstanceMask;
     attrinfo[i++].size = sizeof(instance_mask);
-  } else {
+  }
+  else
+  {
     // Get instance number
     int inst = 1;
     unsigned int m = instance;
-    while (m > 1) {
+    while (m > 1)
+    {
       m = m >> 1;
       inst++;
     }
@@ -16423,19 +17208,22 @@ void GeDigCommand::get_attributes(attr_sItem* attrinfo, int* item_count)
   *item_count = i;
 }
 
-void GeDigCommand::set_attribute(
-    grow_tObject object, const char* attr_name, int* cnt)
+void GeDigCommand::set_attribute(grow_tObject object, const char* attr_name, int* cnt)
 {
   (*cnt)--;
-  if (*cnt == 0) {
+  if (*cnt == 0)
+  {
     char msg[200];
 
     strncpy(attribute, attr_name, sizeof(attribute));
-    if (instance == ge_mInstance_1) {
+    if (instance == ge_mInstance_1)
+    {
       snprintf(msg, sizeof(msg), "DigCommand.Attribute = %s", attr_name);
-    } else {
-      snprintf(msg, sizeof(msg), "DigCommand%d.Attribute = %s",
-          GeDyn::instance_to_number(instance), attr_name);
+    }
+    else
+    {
+      snprintf(msg, sizeof(msg), "DigCommand%d.Attribute = %s", GeDyn::instance_to_number(instance),
+               attr_name);
     }
     msg[sizeof(msg) - 1] = 0;
     dyn->graph->message('I', msg);
@@ -16454,8 +17242,7 @@ void GeDigCommand::save(std::ofstream& fp)
   fp << int(ge_eSave_DigCommand_command) << FSPACE << command << '\n';
   fp << int(ge_eSave_DigCommand_level) << FSPACE << level << '\n';
   fp << int(ge_eSave_DigCommand_instance) << FSPACE << int(instance) << '\n';
-  fp << int(ge_eSave_DigCommand_instance_mask) << FSPACE << int(instance_mask)
-     << '\n';
+  fp << int(ge_eSave_DigCommand_instance_mask) << FSPACE << int(instance_mask) << '\n';
   fp << int(ge_eSave_End) << '\n';
 }
 
@@ -16466,8 +17253,10 @@ void GeDigCommand::open(std::ifstream& fp)
   int tmp;
   char dummy[40];
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeDigCommand: \"%d %s\"\n", type, dummy);
@@ -16475,7 +17264,8 @@ void GeDigCommand::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_DigCommand:
       break;
     case ge_eSave_DigCommand_attribute:
@@ -16509,8 +17299,7 @@ void GeDigCommand::open(std::ifstream& fp)
   }
 }
 
-int GeDigCommand::connect(
-    grow_tObject object, glow_sTraceData* trace_data, bool now)
+int GeDigCommand::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
 {
   int attr_type, attr_size;
   pwr_tAName parsed_name;
@@ -16518,16 +17307,14 @@ int GeDigCommand::connect(
 
   size = 4;
   p = 0;
-  db = dyn->parse_attr_name(
-      attribute, parsed_name, &inverted, &attr_type, &attr_size);
+  db = dyn->parse_attr_name(attribute, parsed_name, &inverted, &attr_type, &attr_size);
   if (streq(parsed_name, ""))
     return 1;
 
   get_bit(parsed_name, attr_type, &bitmask);
   a_typeid = attr_type;
 
-  sts = dyn->graph->ref_object_info(
-      dyn->cycle, parsed_name, (void**)&p, &subid, size, object, now);
+  sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&p, &subid, size, object, now);
 
   if (EVEN(sts))
     return sts;
@@ -16560,14 +17347,17 @@ int GeDigCommand::scan(grow_tObject object)
   if (inverted)
     val = !val;
 
-  if (first_scan) {
+  if (first_scan)
+  {
     old_value = val;
     first_scan = false;
     return 1;
   }
 
-  if ((!level && val && !old_value) || (level && val)) {
-    if (dyn->graph->command_cb) {
+  if ((!level && val && !old_value) || (level && val))
+  {
+    if (dyn->graph->command_cb)
+    {
       char cmd[400];
 
       dyn->graph->get_command(command, cmd, dyn);
@@ -16579,33 +17369,40 @@ int GeDigCommand::scan(grow_tObject object)
   return sts;
 }
 
-int GeDigCommand::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GeDigCommand::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
   char name[80];
 
   sprintf(name, "%sDigCommand", prefix);
 
   // Find first instance and print instance mask
-  for (GeDynElem *elem = dyn->elements; elem; elem = elem->next) {
-    if (elem->dyn_type1 == ge_mDynType1_DigCommand && elem->instance == ge_mInstance_1) {
-      if (instance ==  instance_highest(elem->instance_mask)) {
-	if (elem->instance_mask != 1)
-	  fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigCommand.Instances\"," << elem->instance_mask << ");" << '\n';
-	break;
+  for (GeDynElem* elem = dyn->elements; elem; elem = elem->next)
+  {
+    if (elem->dyn_type1 == ge_mDynType1_DigCommand && elem->instance == ge_mInstance_1)
+    {
+      if (instance == instance_highest(elem->instance_mask))
+      {
+        if (elem->instance_mask != 1)
+          fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigCommand.Instances\","
+             << elem->instance_mask << ");" << '\n';
+        break;
       }
     }
   }
   if (instance != ge_mInstance_1)
     sprintf(&name[strlen(name)], "%d", instance_number(instance));
   if (!streq(attribute, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << name << ".Attribute\",\"" << attribute << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".Attribute\",\"" << attribute << "\");"
+       << '\n';
   if (level != 0)
     fp << indentation << "SetObjectAttribute(id,\"" << name << ".Level\"," << level << ");" << '\n';
-  if (!streq(command, "")) {
+  if (!streq(command, ""))
+  {
     fp << indentation << "SetObjectAttribute(id,\"" << name << ".Command\",\"";
-    for (char *s = command; *s; s++) {
+    for (char* s = command; *s; s++)
+    {
       if (*s == '\"')
-	fp << '\\';
+        fp << '\\';
       fp << *s;
     }
     fp << "\");" << '\n';
@@ -16613,24 +17410,22 @@ int GeDigCommand::export_script(grow_tObject o, std::ofstream& fp, char *indenta
   return 1;
 }
 
-int GeDigCommand::export_java(
-    grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeDigCommand::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
   return 1;
 }
 
-int GeDigCommand::syntax_check(
-    grow_tObject object, int* error_cnt, int* warning_cnt)
+int GeDigCommand::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
-  int types[] = { pwr_eType_Boolean, pwr_eType_Int32, pwr_eType_UInt32,
-    pwr_eType_Int64, pwr_eType_UInt64, graph_eType_Bit, pwr_eType_Float32,
-    pwr_eType_Float64, pwr_eType_String, 0 };
-  graph_eDatabase databases[] = { graph_eDatabase_Gdh, graph_eDatabase__ };
+  int types[] = {pwr_eType_Boolean, pwr_eType_Int32,   pwr_eType_UInt32,  pwr_eType_Int64,  pwr_eType_UInt64,
+                 graph_eType_Bit,   pwr_eType_Float32, pwr_eType_Float64, pwr_eType_String, 0};
+  graph_eDatabase databases[] = {graph_eDatabase_Gdh, graph_eDatabase__};
 
-  dyn->syntax_check_attribute(object, "DigCommand.Attribute", attribute, 0,
-      types, databases, error_cnt, warning_cnt);
+  dyn->syntax_check_attribute(object, "DigCommand.Attribute", attribute, 0, types, databases, error_cnt,
+                              warning_cnt);
 
-  if (streq(command, "")) {
+  if (streq(command, ""))
+  {
     dyn->graph->syntax_msg('E', object, "DigCommand.Command is missing");
     (*error_cnt)++;
   }
@@ -16638,8 +17433,8 @@ int GeDigCommand::syntax_check(
 }
 
 GeDigScript::GeDigScript(GeDyn* e_dyn, ge_mInstance e_instance)
-    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_DigScript,
-          ge_mActionType1_No, ge_mActionType2_No, ge_eDynPrio_DigScript),
+    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_DigScript, ge_mActionType1_No, ge_mActionType2_No,
+                ge_eDynPrio_DigScript),
       script_len(0), level(0)
 {
   strcpy(attribute, "");
@@ -16649,8 +17444,7 @@ GeDigScript::GeDigScript(GeDyn* e_dyn, ge_mInstance e_instance)
 }
 
 GeDigScript::GeDigScript(const GeDigScript& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-          x.prio),
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio),
       script_len(x.script_len), level(x.level)
 {
   strcpy(attribute, x.attribute);
@@ -16688,11 +17482,11 @@ void GeDigScript::get_attributes(attr_sItem* attrinfo, int* item_count)
   *item_count = i;
 }
 
-void GeDigScript::set_attribute(
-    grow_tObject object, const char* attr_name, int* cnt)
+void GeDigScript::set_attribute(grow_tObject object, const char* attr_name, int* cnt)
 {
   (*cnt)--;
-  if (*cnt == 0) {
+  if (*cnt == 0)
+  {
     char msg[200];
 
     strncpy(attribute, attr_name, sizeof(attribute));
@@ -16716,7 +17510,8 @@ void GeDigScript::save(std::ofstream& fp)
   fp << int(ge_eSave_DigScript_arguments) << FSPACE << arguments << '\n';
   fp << int(ge_eSave_DigScript_script) << '\n';
   fp << "\"";
-  for (char* s = script; *s; s++) {
+  for (char* s = script; *s; s++)
+  {
     if (*s == '"')
       fp << "\\";
     fp << *s;
@@ -16732,8 +17527,10 @@ void GeDigScript::open(std::ifstream& fp)
   char dummy[200];
   char c;
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeDigScript: \"%d %s\"\n", type, dummy);
@@ -16741,7 +17538,8 @@ void GeDigScript::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_DigScript:
       break;
     case ge_eSave_DigScript_attribute:
@@ -16758,17 +17556,21 @@ void GeDigScript::open(std::ifstream& fp)
       fp.get();
       fp.getline(arguments, sizeof(arguments));
       break;
-    case ge_eSave_DigScript_script: {
+    case ge_eSave_DigScript_script:
+    {
       fp.getline(dummy, sizeof(dummy));
       fp.get();
       int j = 0;
-      while (1) {
+      while (1)
+      {
         if (j > (int)sizeof(script))
           break;
-        if ((c = fp.get()) == '"') {
+        if ((c = fp.get()) == '"')
+        {
           if (script[j - 1] == '\\')
             j--;
-          else {
+          else
+          {
             script[j] = 0;
             break;
           }
@@ -16790,8 +17592,7 @@ void GeDigScript::open(std::ifstream& fp)
   }
 }
 
-int GeDigScript::connect(
-    grow_tObject object, glow_sTraceData* trace_data, bool now)
+int GeDigScript::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
 {
   int attr_type, attr_size;
   pwr_tAName parsed_name;
@@ -16799,22 +17600,20 @@ int GeDigScript::connect(
 
   size = 4;
   p = 0;
-  db = dyn->parse_attr_name(
-      attribute, parsed_name, &inverted, &attr_type, &attr_size);
+  db = dyn->parse_attr_name(attribute, parsed_name, &inverted, &attr_type, &attr_size);
   if (streq(parsed_name, ""))
     return 1;
 
   get_bit(parsed_name, attr_type, &bitmask);
   a_typeid = attr_type;
 
-  switch (db) {
+  switch (db)
+  {
   case graph_eDatabase_Local:
-    p = (pwr_tBoolean*)dyn->graph->localdb_ref_or_create(
-        parsed_name, attr_type);
+    p = (pwr_tBoolean*)dyn->graph->localdb_ref_or_create(parsed_name, attr_type);
     break;
   case graph_eDatabase_Gdh:
-    sts = dyn->graph->ref_object_info(
-        dyn->cycle, parsed_name, (void**)&p, &subid, size, object, now);
+    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&p, &subid, size, object, now);
     if (EVEN(sts))
       return sts;
     break;
@@ -16852,14 +17651,17 @@ int GeDigScript::scan(grow_tObject object)
   if (inverted)
     val = !val;
 
-  if (first_scan) {
+  if (first_scan)
+  {
     old_value = val;
     first_scan = false;
     return 1;
   }
 
-  if ((!level && val && !old_value) || (level && val)) {
-    if (dyn->graph->command_cb) {
+  if ((!level && val && !old_value) || (level && val))
+  {
+    if (dyn->graph->command_cb)
+    {
       sts = (dyn->graph->command_cb)(dyn->graph->parent_ctx, 0, script, argstr);
     }
   }
@@ -16868,19 +17670,24 @@ int GeDigScript::scan(grow_tObject object)
   return sts;
 }
 
-int GeDigScript::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GeDigScript::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
   if (!streq(attribute, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigScript.Attribute\",\"" << attribute << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigScript.Attribute\",\"" << attribute
+       << "\");" << '\n';
   if (level != 0)
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigScript.Level\"," << level << ");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigScript.Level\"," << level << ");"
+       << '\n';
   if (!streq(arguments, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigScript.Arguments\",\"" << arguments << "\");" << '\n';
-  if (!streq(script, "")) {
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigScript.Arguments\",\"" << arguments
+       << "\");" << '\n';
+  if (!streq(script, ""))
+  {
     fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigScript.Script\",\"";
-    for (char *s = script; *s; s++) {
+    for (char* s = script; *s; s++)
+    {
       if (*s == '\"')
-	fp << '\\';
+        fp << '\\';
       fp << *s;
     }
     fp << "\");" << '\n';
@@ -16888,24 +17695,19 @@ int GeDigScript::export_script(grow_tObject o, std::ofstream& fp, char *indentat
   return 1;
 }
 
-int GeDigScript::export_java(
-    grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeDigScript::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name) { return 1; }
+
+int GeDigScript::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
-  return 1;
-}
+  int types[] = {pwr_eType_Boolean, pwr_eType_Int32,   pwr_eType_UInt32,  pwr_eType_Int64,  pwr_eType_UInt64,
+                 graph_eType_Bit,   pwr_eType_Float32, pwr_eType_Float64, pwr_eType_String, 0};
+  graph_eDatabase databases[] = {graph_eDatabase_Gdh, graph_eDatabase__};
 
-int GeDigScript::syntax_check(
-    grow_tObject object, int* error_cnt, int* warning_cnt)
-{
-  int types[] = { pwr_eType_Boolean, pwr_eType_Int32, pwr_eType_UInt32,
-    pwr_eType_Int64, pwr_eType_UInt64, graph_eType_Bit, pwr_eType_Float32,
-    pwr_eType_Float64, pwr_eType_String, 0 };
-  graph_eDatabase databases[] = { graph_eDatabase_Gdh, graph_eDatabase__ };
+  dyn->syntax_check_attribute(object, "DigScript.Attribute", attribute, 0, types, databases, error_cnt,
+                              warning_cnt);
 
-  dyn->syntax_check_attribute(object, "DigScript.Attribute", attribute, 0,
-      types, databases, error_cnt, warning_cnt);
-
-  if (streq(script, "")) {
+  if (streq(script, ""))
+  {
     dyn->graph->syntax_msg('E', object, "DigScript.Script is missing");
     (*error_cnt)++;
   }
@@ -16913,8 +17715,8 @@ int GeDigScript::syntax_check(
 }
 
 GeRefUpdate::GeRefUpdate(GeDyn* e_dyn, ge_mInstance e_instance)
-    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_RefUpdate,
-          ge_mActionType1_No, ge_mActionType2_No, ge_eDynPrio_RefUpdate),
+    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_RefUpdate, ge_mActionType1_No, ge_mActionType2_No,
+                ge_eDynPrio_RefUpdate),
       whole_graph(0), ref_cnt(0), idx_ref_cnt(0)
 {
   instance = e_instance;
@@ -16922,8 +17724,7 @@ GeRefUpdate::GeRefUpdate(GeDyn* e_dyn, ge_mInstance e_instance)
 }
 
 GeRefUpdate::GeRefUpdate(const GeRefUpdate& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-          x.prio),
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio),
       whole_graph(x.whole_graph), ref_cnt(x.ref_cnt), idx_ref_cnt(x.idx_ref_cnt)
 {
   instance = x.instance;
@@ -16948,11 +17749,11 @@ void GeRefUpdate::get_attributes(attr_sItem* attrinfo, int* item_count)
   *item_count = i;
 }
 
-void GeRefUpdate::set_attribute(
-    grow_tObject object, const char* attr_name, int* cnt)
+void GeRefUpdate::set_attribute(grow_tObject object, const char* attr_name, int* cnt)
 {
   (*cnt)--;
-  if (*cnt == 0) {
+  if (*cnt == 0)
+  {
     char msg[200];
 
     strncpy(attribute, attr_name, sizeof(attribute));
@@ -16981,8 +17782,10 @@ void GeRefUpdate::open(std::ifstream& fp)
   int end_found = 0;
   char dummy[200];
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeRefUpdate: \"%d %s\"\n", type, dummy);
@@ -16990,7 +17793,8 @@ void GeRefUpdate::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_RefUpdate:
       break;
     case ge_eSave_RefUpdate_attribute:
@@ -17012,8 +17816,7 @@ void GeRefUpdate::open(std::ifstream& fp)
   }
 }
 
-int GeRefUpdate::connect(
-    grow_tObject object, glow_sTraceData* trace_data, bool now)
+int GeRefUpdate::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
 {
   int sts;
   pwr_tAName attr;
@@ -17024,21 +17827,26 @@ int GeRefUpdate::connect(
     idx_p[i] = 0;
   status = GE__SUCCESS;
 
-  if (streq(attribute, "")) {
+  if (streq(attribute, ""))
+  {
     // Find a reference attribute
-    for (GeDynElem* elem = dyn->elements; elem; elem = elem->next) {
+    for (GeDynElem* elem = dyn->elements; elem; elem = elem->next)
+    {
       if (elem == this)
         continue;
-      if (elem->dyn_type1 == ge_mDynType1_DigColor) {
+      if (elem->dyn_type1 == ge_mDynType1_DigColor)
+      {
         strcpy(attr, ((GeDigColor*)elem)->attribute);
-        if (attr[0] == '&' && attr[1] == '(') {
+        if (attr[0] == '&' && attr[1] == '(')
+        {
           strcpy(attribute, attr);
           break;
         }
       }
     }
   }
-  if (!streq(attribute, "")) {
+  if (!streq(attribute, ""))
+  {
     int attr_type, attr_size;
     pwr_tAName parsed_name;
     int inverted;
@@ -17046,25 +17854,27 @@ int GeRefUpdate::connect(
     pwr_tAName ref_name[2];
     pwr_tAName idx_ref_name[2];
 
-    db = dyn->parse_attr_name(attribute, parsed_name, &inverted, &attr_type,
-        &attr_size, 0, graph_mParseOpt_KeepIndex);
+    db = dyn->parse_attr_name(attribute, parsed_name, &inverted, &attr_type, &attr_size, 0,
+                              graph_mParseOpt_KeepIndex);
     if (streq(parsed_name, ""))
       return 1;
 
-    sts = dyn->graph->get_refupdate(parsed_name, ref_name, ref_tid, ref_size,
-        &ref_cnt, idx_ref_name, idx_ref_tid, idx_ref_size, &idx_ref_cnt, dyn);
+    sts = dyn->graph->get_refupdate(parsed_name, ref_name, ref_tid, ref_size, &ref_cnt, idx_ref_name,
+                                    idx_ref_tid, idx_ref_size, &idx_ref_cnt, dyn);
     if (EVEN(sts))
       status = sts;
 
-    for (int i = 0; i < ref_cnt; i++) {
-      sts = dyn->graph->ref_object_info(dyn->cycle, ref_name[i], (void**)&p[i],
-          &subid[i], ref_size[i], object, now);
+    for (int i = 0; i < ref_cnt; i++)
+    {
+      sts = dyn->graph->ref_object_info(dyn->cycle, ref_name[i], (void**)&p[i], &subid[i], ref_size[i],
+                                        object, now);
       if (EVEN(sts))
         status = sts;
     }
-    for (int i = 0; i < idx_ref_cnt; i++) {
-      sts = dyn->graph->ref_object_info(dyn->cycle, idx_ref_name[i],
-          (void**)&idx_p[i], &idx_subid[i], idx_ref_size[i], object, now);
+    for (int i = 0; i < idx_ref_cnt; i++)
+    {
+      sts = dyn->graph->ref_object_info(dyn->cycle, idx_ref_name[i], (void**)&idx_p[i], &idx_subid[i],
+                                        idx_ref_size[i], object, now);
       if (EVEN(sts))
         status = sts;
     }
@@ -17077,7 +17887,8 @@ int GeRefUpdate::connect(
 
 int GeRefUpdate::connect(grow_tObject object, int level)
 {
-  if (!streq(attribute, "")) {
+  if (!streq(attribute, ""))
+  {
     int attr_type, attr_size;
     pwr_tAName parsed_name;
     int inverted;
@@ -17087,25 +17898,27 @@ int GeRefUpdate::connect(grow_tObject object, int level)
     pwr_tStatus sts;
 
     status = GE__SUCCESS;
-    db = dyn->parse_attr_name(attribute, parsed_name, &inverted, &attr_type,
-        &attr_size, 0, graph_mParseOpt_KeepIndex);
+    db = dyn->parse_attr_name(attribute, parsed_name, &inverted, &attr_type, &attr_size, 0,
+                              graph_mParseOpt_KeepIndex);
     if (streq(parsed_name, ""))
       return 1;
 
-    dyn->graph->get_refupdate(parsed_name, ref_name, ref_tid, ref_size,
-        &ref_cnt, idx_ref_name, idx_ref_tid, idx_ref_size, &idx_ref_cnt, dyn);
+    dyn->graph->get_refupdate(parsed_name, ref_name, ref_tid, ref_size, &ref_cnt, idx_ref_name, idx_ref_tid,
+                              idx_ref_size, &idx_ref_cnt, dyn);
 
-    for (int i = level; i < ref_cnt; i++) {
+    for (int i = level; i < ref_cnt; i++)
+    {
       p[i] = 0;
-      sts = dyn->graph->ref_object_info(dyn->cycle, ref_name[i], (void**)&p[i],
-          &subid[i], ref_size[i], object, true);
+      sts = dyn->graph->ref_object_info(dyn->cycle, ref_name[i], (void**)&p[i], &subid[i], ref_size[i],
+                                        object, true);
       if (EVEN(sts))
         status = sts;
     }
-    for (int i = 0; i < idx_ref_cnt; i++) {
+    for (int i = 0; i < idx_ref_cnt; i++)
+    {
       idx_p[i] = 0;
-      sts = dyn->graph->ref_object_info(dyn->cycle, idx_ref_name[i],
-          (void**)&idx_p[i], &idx_subid[i], idx_ref_size[i], object, true);
+      sts = dyn->graph->ref_object_info(dyn->cycle, idx_ref_name[i], (void**)&idx_p[i], &idx_subid[i],
+                                        idx_ref_size[i], object, true);
       if (EVEN(sts))
         status = sts;
     }
@@ -17116,12 +17929,14 @@ int GeRefUpdate::connect(grow_tObject object, int level)
 
 int GeRefUpdate::disconnect(grow_tObject object)
 {
-  for (int i = 0; i < ref_cnt; i++) {
+  for (int i = 0; i < ref_cnt; i++)
+  {
     if (p[i])
       gdh_UnrefObjectInfo(subid[i]);
     p[i] = 0;
   }
-  for (int i = 0; i < idx_ref_cnt; i++) {
+  for (int i = 0; i < idx_ref_cnt; i++)
+  {
     if (idx_p[i])
       gdh_UnrefObjectInfo(idx_subid[i]);
     idx_p[i] = 0;
@@ -17131,12 +17946,14 @@ int GeRefUpdate::disconnect(grow_tObject object)
 
 int GeRefUpdate::disconnect(int level)
 {
-  for (int i = level; i < ref_cnt; i++) {
+  for (int i = level; i < ref_cnt; i++)
+  {
     if (p[i])
       gdh_UnrefObjectInfo(subid[i]);
     p[i] = 0;
   }
-  for (int i = 0; i < idx_ref_cnt; i++) {
+  for (int i = 0; i < idx_ref_cnt; i++)
+  {
     if (idx_p[i])
       gdh_UnrefObjectInfo(idx_subid[i]);
     idx_p[i] = 0;
@@ -17150,47 +17967,56 @@ int GeRefUpdate::scan(grow_tObject object)
   bool update = false;
   int level = 0;
 
-  for (int i = 0; i < idx_ref_cnt; i++) {
-    if (!idx_p[i]) {
+  for (int i = 0; i < idx_ref_cnt; i++)
+  {
+    if (!idx_p[i])
+    {
       if (first_scan && i == idx_ref_cnt - 1 && ref_cnt == 0)
         first_scan = false;
       continue;
     }
 
-    if (first_scan) {
+    if (first_scan)
+    {
       idx_old_value[i] = *idx_p[i];
       if (i == idx_ref_cnt - 1 && ref_cnt == 0)
         first_scan = false;
       continue;
     }
 
-    if (memcmp(idx_p[i], &idx_old_value[i], sizeof(pwr_tAttrRef)) != 0) {
+    if (memcmp(idx_p[i], &idx_old_value[i], sizeof(pwr_tAttrRef)) != 0)
+    {
       update = true;
       break;
     }
   }
-  for (int i = 0; i < ref_cnt; i++) {
-    if (!p[i]) {
+  for (int i = 0; i < ref_cnt; i++)
+  {
+    if (!p[i])
+    {
       if (first_scan && i == ref_cnt - 1)
         first_scan = false;
       continue;
     }
 
-    if (first_scan) {
+    if (first_scan)
+    {
       old_value[i] = *p[i];
       if (i == ref_cnt - 1)
         first_scan = false;
       continue;
     }
 
-    if (memcmp(p[i], &old_value[i], sizeof(pwr_tAttrRef)) != 0) {
+    if (memcmp(p[i], &old_value[i], sizeof(pwr_tAttrRef)) != 0)
+    {
       update = true;
       level = i;
       break;
     }
   }
 
-  if (update) {
+  if (update)
+  {
     glow_sTraceData td;
 
     for (int i = 0; i < ref_cnt; i++)
@@ -17198,7 +18024,8 @@ int GeRefUpdate::scan(grow_tObject object)
     for (int i = 0; i < idx_ref_cnt; i++)
       idx_old_value[i] = *idx_p[i];
 
-    if (whole_graph) {
+    if (whole_graph)
+    {
       dyn->graph->swap(0);
       dyn->graph->swap(1);
       grow_Redraw(dyn->graph->grow->ctx);
@@ -17206,7 +18033,8 @@ int GeRefUpdate::scan(grow_tObject object)
       return GLOW__SWAPTERMINATED;
     }
 
-    for (GeDynElem* elem = dyn->elements; elem; elem = elem->next) {
+    for (GeDynElem* elem = dyn->elements; elem; elem = elem->next)
+    {
       if (elem == this)
         continue;
       elem->disconnect(object);
@@ -17214,7 +18042,8 @@ int GeRefUpdate::scan(grow_tObject object)
       if (EVEN(sts))
         elem->reset(object);
     }
-    if (idx_ref_cnt > 0 || level < ref_cnt - 1) {
+    if (idx_ref_cnt > 0 || level < ref_cnt - 1)
+    {
       disconnect(level + 1);
       connect(object, level + 1);
 
@@ -17227,44 +18056,41 @@ int GeRefUpdate::scan(grow_tObject object)
   return 1;
 }
 
-int GeRefUpdate::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GeRefUpdate::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
   if (!streq(attribute, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "RefUpdate.Attribute\",\"" << attribute << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "RefUpdate.Attribute\",\"" << attribute
+       << "\");" << '\n';
   if (whole_graph != 0)
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "RefUpdate.WholeGraph\"," << whole_graph << ");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "RefUpdate.WholeGraph\"," << whole_graph
+       << ");" << '\n';
   return 1;
 }
 
-int GeRefUpdate::export_java(
-    grow_tObject object, std::ofstream& fp, bool first, char* var_name)
-{
-  return 1;
-}
+int GeRefUpdate::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name) { return 1; }
 
-int GeRefUpdate::syntax_check(
-    grow_tObject object, int* error_cnt, int* warning_cnt)
+int GeRefUpdate::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
-  if (!streq(attribute, "")) {
-    int types[] = { pwr_eType_Objid, pwr_eType_AttrRef, 0 };
-    graph_eDatabase databases[] = { graph_eDatabase_Gdh, graph_eDatabase__ };
+  if (!streq(attribute, ""))
+  {
+    int types[] = {pwr_eType_Objid, pwr_eType_AttrRef, 0};
+    graph_eDatabase databases[] = {graph_eDatabase_Gdh, graph_eDatabase__};
 
-    dyn->syntax_check_attribute(object, "RefUpdate.Attribute", attribute, 0,
-        types, databases, error_cnt, warning_cnt);
+    dyn->syntax_check_attribute(object, "RefUpdate.Attribute", attribute, 0, types, databases, error_cnt,
+                                warning_cnt);
   }
   return 1;
 }
 
 GePopupMenu::GePopupMenu(GeDyn* e_dyn)
-    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_No,
-          ge_mActionType1_PopupMenu, ge_mActionType2_No, ge_eDynPrio_PopupMenu)
+    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_No, ge_mActionType1_PopupMenu, ge_mActionType2_No,
+                ge_eDynPrio_PopupMenu)
 {
   strcpy(ref_object, "");
 }
 
 GePopupMenu::GePopupMenu(const GePopupMenu& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-          x.prio)
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio)
 {
   strcpy(ref_object, x.ref_object);
 }
@@ -17282,11 +18108,11 @@ void GePopupMenu::get_attributes(attr_sItem* attrinfo, int* item_count)
   *item_count = i;
 }
 
-void GePopupMenu::set_attribute(
-    grow_tObject object, const char* attr_name, int* cnt)
+void GePopupMenu::set_attribute(grow_tObject object, const char* attr_name, int* cnt)
 {
   (*cnt)--;
-  if (*cnt == 0) {
+  if (*cnt == 0)
+  {
     char* s;
 
     strncpy(ref_object, attr_name, sizeof(ref_object));
@@ -17302,8 +18128,7 @@ void GePopupMenu::set_attribute(
 
 void GePopupMenu::replace_attribute(char* from, char* to, int* cnt, int strict)
 {
-  GeDyn::replace_attribute(
-      ref_object, sizeof(ref_object), from, to, cnt, strict);
+  GeDyn::replace_attribute(ref_object, sizeof(ref_object), from, to, cnt, strict);
 }
 
 void GePopupMenu::save(std::ofstream& fp)
@@ -17319,8 +18144,10 @@ void GePopupMenu::open(std::ifstream& fp)
   int end_found = 0;
   char dummy[40];
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GePopupMenu: \"%d %s\"\n", type, dummy);
@@ -17328,7 +18155,8 @@ void GePopupMenu::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_PopupMenu:
       break;
     case ge_eSave_PopupMenu_ref_object:
@@ -17352,8 +18180,10 @@ int GePopupMenu::action(grow_tObject object, glow_tEvent event)
   if (!dyn->graph->is_authorized(dyn->access))
     return 1;
 
-  switch (event->event) {
-  case glow_eEvent_MB3Press: {
+  switch (event->event)
+  {
+  case glow_eEvent_MB3Press:
+  {
     int sts;
     pwr_tAName parsed_name;
     int inverted;
@@ -17363,23 +18193,28 @@ int GePopupMenu::action(grow_tObject object, glow_tEvent event)
     int x, y;
     int reference = 0;
 
-    dyn->parse_attr_name(
-        ref_object, parsed_name, &inverted, &attr_type, &attr_size);
-    if (parsed_name[0] == '&') {
+    dyn->parse_attr_name(ref_object, parsed_name, &inverted, &attr_type, &attr_size);
+    if (parsed_name[0] == '&')
+    {
       // Refobject starting with '&' indicates reference
       pwr_tAName refname;
       strncpy(refname, parsed_name, sizeof(refname));
       sts = dyn->graph->get_reference_name(refname, parsed_name);
       if (EVEN(sts))
         break;
-    } else {
+    }
+    else
+    {
       if (inverted) // Old syntax for reference
         reference = 1;
     }
-    if (reference) {
+    if (reference)
+    {
       // The ref_object is an objid-attribute that contains the object
-      switch (attr_type) {
-      case pwr_eType_AttrRef: {
+      switch (attr_type)
+      {
+      case pwr_eType_AttrRef:
+      {
         pwr_tAttrRef aref;
 
         sts = gdh_GetObjectInfo(parsed_name, &aref, sizeof(aref));
@@ -17390,7 +18225,8 @@ int GePopupMenu::action(grow_tObject object, glow_tEvent event)
         attrref = aref;
         break;
       }
-      case pwr_eType_DataRef: {
+      case pwr_eType_DataRef:
+      {
         pwr_tDataRef dataref;
 
         sts = gdh_GetObjectInfo(parsed_name, &dataref, sizeof(dataref));
@@ -17401,7 +18237,8 @@ int GePopupMenu::action(grow_tObject object, glow_tEvent event)
         attrref = dataref.Aref;
         break;
       }
-      default: {
+      default:
+      {
         pwr_tOid oid;
 
         sts = gdh_GetObjectInfo(parsed_name, &oid, sizeof(oid));
@@ -17412,12 +18249,15 @@ int GePopupMenu::action(grow_tObject object, glow_tEvent event)
         attrref = cdh_ObjidToAref(oid);
       }
       }
-    } else {
+    }
+    else
+    {
       sts = gdh_NameToAttrref(pwr_cNObjid, parsed_name, &attrref);
       if (EVEN(sts))
         break;
     }
-    if (dyn->graph->popup_menu_cb) {
+    if (dyn->graph->popup_menu_cb)
+    {
       // Display popup menu
       grow_GetName(dyn->graph->grow->ctx, name);
 
@@ -17427,18 +18267,18 @@ int GePopupMenu::action(grow_tObject object, glow_tEvent event)
       else if (attrref.Flags.b.ObjectAttr)
         item_type = xmenu_eItemType_AttrObject;
 
-      dyn->graph->popup_position(
-          event->any.x_pixel + 8, event->any.y_pixel, &x, &y);
-      (dyn->graph->popup_menu_cb)(dyn->graph->parent_ctx, attrref, item_type,
-          xmenu_mUtility_Ge, name, x, y);
+      dyn->graph->popup_position(event->any.x_pixel + 8, event->any.y_pixel, &x, &y);
+      (dyn->graph->popup_menu_cb)(dyn->graph->parent_ctx, attrref, item_type, xmenu_mUtility_Ge, name, x, y);
     }
     break;
   }
-  case glow_eEvent_Key_CtrlAscii: {
+  case glow_eEvent_Key_CtrlAscii:
+  {
     char method[40];
     char filter[40];
 
-    switch (event->key.ascii) {
+    switch (event->key.ascii)
+    {
     case 1:
       strcpy(method, "$Object-OpenObject");
       strcpy(filter, "$Object-OpenObjectFilter");
@@ -17471,7 +18311,8 @@ int GePopupMenu::action(grow_tObject object, glow_tEvent event)
       return 1;
     }
 
-    if (dyn->graph->call_method_cb) {
+    if (dyn->graph->call_method_cb)
+    {
       int sts;
       pwr_tAName parsed_name;
       int inverted;
@@ -17480,18 +18321,19 @@ int GePopupMenu::action(grow_tObject object, glow_tEvent event)
       pwr_sAttrRef attrref;
       pwr_tOid oid;
 
-      dyn->parse_attr_name(
-          ref_object, parsed_name, &inverted, &attr_type, &attr_size);
-      if (inverted) {
+      dyn->parse_attr_name(ref_object, parsed_name, &inverted, &attr_type, &attr_size);
+      if (inverted)
+      {
         // The ref_object is an objid-attribute that containts the object
         memset(&attrref, 0, sizeof(attrref));
-        sts = gdh_GetObjectInfo(
-            parsed_name, &attrref.Objid, sizeof(attrref.Objid));
+        sts = gdh_GetObjectInfo(parsed_name, &attrref.Objid, sizeof(attrref.Objid));
         if (EVEN(sts))
           break;
         if (cdh_ObjidIsNull(attrref.Objid))
           break;
-      } else {
+      }
+      else
+      {
         if ((s = strrchr(parsed_name, '.')))
           *s = 0;
 
@@ -17501,8 +18343,8 @@ int GePopupMenu::action(grow_tObject object, glow_tEvent event)
 
         attrref = cdh_ObjidToAref(oid);
       }
-      (dyn->graph->call_method_cb)(dyn->graph->parent_ctx, method, filter,
-          attrref, xmenu_eItemType_Object, xmenu_mUtility_Ge, NULL);
+      (dyn->graph->call_method_cb)(dyn->graph->parent_ctx, method, filter, attrref, xmenu_eItemType_Object,
+                                   xmenu_mUtility_Ge, NULL);
     }
     break;
   }
@@ -17511,27 +18353,25 @@ int GePopupMenu::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
-int GePopupMenu::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GePopupMenu::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
   if (!streq(ref_object, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "PopupMenu.ReferenceObject\",\"" << ref_object << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "PopupMenu.ReferenceObject\",\""
+       << ref_object << "\");" << '\n';
   return 1;
 }
 
-int GePopupMenu::export_java(
-    grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GePopupMenu::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
   if (first)
     fp << "      ";
   else
     fp << "      ,";
-  fp << "new GeDynPopupMenu(" << var_name << ".dd, \"" << ref_object << "\")"
-     << '\n';
+  fp << "new GeDynPopupMenu(" << var_name << ".dd, \"" << ref_object << "\")" << '\n';
   return 1;
 }
 
-int GePopupMenu::syntax_check(
-    grow_tObject object, int* error_cnt, int* warning_cnt)
+int GePopupMenu::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
   int sts;
   pwr_tAName parsed_name;
@@ -17539,35 +18379,43 @@ int GePopupMenu::syntax_check(
   int attr_type, attr_size;
   pwr_eType a_type;
 
-  if (streq(ref_object, "")) {
+  if (streq(ref_object, ""))
+  {
     dyn->graph->syntax_msg('W', object, "PopupMenu.ReferenceObject is missing");
     (*warning_cnt)++;
-  } else {
-    if (ref_object[0] == '&') {
+  }
+  else
+  {
+    if (ref_object[0] == '&')
+    {
       // Refobject starting with '&' indicates reference
 
       sts = dyn->graph->check_ldh_object(&ref_object[1], &a_type);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         char msg[440];
         sprintf(msg, "PopupMenu.ReferenceObject \"%s\" not found", ref_object);
         dyn->graph->syntax_msg('W', object, msg);
         (*warning_cnt)++;
-      } else if (!(a_type == pwr_eType_Objid || a_type == pwr_eType_AttrRef
-                     || a_type == pwr_eType_DataRef)) {
+      }
+      else if (!(a_type == pwr_eType_Objid || a_type == pwr_eType_AttrRef || a_type == pwr_eType_DataRef))
+      {
         char msg[440];
         sprintf(msg, "PopupMenu.ReferenceObject \"%s\" type error", ref_object);
         dyn->graph->syntax_msg('W', object, msg);
         (*warning_cnt)++;
       }
       return 1;
-    } else {
-      dyn->parse_attr_name(
-          ref_object, parsed_name, &inverted, &attr_type, &attr_size);
+    }
+    else
+    {
+      dyn->parse_attr_name(ref_object, parsed_name, &inverted, &attr_type, &attr_size);
       if (inverted)
         return 1;
 
       sts = dyn->graph->check_ldh_object(parsed_name, &a_type);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         char msg[440];
         sprintf(msg, "PopupMenu.ReferenceObject \"%s\" not found", ref_object);
         dyn->graph->syntax_msg('W', object, msg);
@@ -17579,20 +18427,21 @@ int GePopupMenu::syntax_check(
 }
 
 GeContextMenu::GeContextMenu(GeDyn* e_dyn)
-    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_No,
-          ge_mActionType1_ContextMenu, ge_mActionType2_No, ge_eDynPrio_ContextMenu)
+    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_No, ge_mActionType1_ContextMenu, ge_mActionType2_No,
+                ge_eDynPrio_ContextMenu)
 {
-  for (int i = 0; i < int(sizeof(mdata.item_text)/sizeof(mdata.item_text[0])); i++) {
+  for (int i = 0; i < int(sizeof(mdata.item_text) / sizeof(mdata.item_text[0])); i++)
+  {
     strcpy(mdata.item_text[i], "");
     strcpy(mdata.item_action[i], "");
   }
 }
 
 GeContextMenu::GeContextMenu(const GeContextMenu& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-          x.prio)
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio)
 {
-  for (int i = 0; i < int(sizeof(mdata.item_text)/sizeof(mdata.item_text[0])); i++) {
+  for (int i = 0; i < int(sizeof(mdata.item_text) / sizeof(mdata.item_text[0])); i++)
+  {
     strcpy(mdata.item_text[i], x.mdata.item_text[i]);
     strcpy(mdata.item_action[i], x.mdata.item_action[i]);
   }
@@ -17696,33 +18545,20 @@ void GeContextMenu::get_attributes(attr_sItem* attrinfo, int* item_count)
   *item_count = i;
 }
 
-void GeContextMenu::set_attribute(
-    grow_tObject object, const char* attr_name, int* cnt)
-{
-}
+void GeContextMenu::set_attribute(grow_tObject object, const char* attr_name, int* cnt) {}
 
 void GeContextMenu::replace_attribute(char* from, char* to, int* cnt, int strict)
 {
-  GeDyn::replace_attribute(
-      mdata.item_text[0], sizeof(mdata.item_text[0]), from, to, cnt, strict);
-  GeDyn::replace_attribute(
-      mdata.item_text[1], sizeof(mdata.item_text[0]), from, to, cnt, strict);
-  GeDyn::replace_attribute(
-      mdata.item_text[2], sizeof(mdata.item_text[0]), from, to, cnt, strict);
-  GeDyn::replace_attribute(
-      mdata.item_text[3], sizeof(mdata.item_text[0]), from, to, cnt, strict);
-  GeDyn::replace_attribute(
-      mdata.item_text[4], sizeof(mdata.item_text[0]), from, to, cnt, strict);
-  GeDyn::replace_attribute(
-      mdata.item_action[0], sizeof(mdata.item_action[0]), from, to, cnt, strict);
-  GeDyn::replace_attribute(
-      mdata.item_action[1], sizeof(mdata.item_action[0]), from, to, cnt, strict);
-  GeDyn::replace_attribute(
-      mdata.item_action[2], sizeof(mdata.item_action[0]), from, to, cnt, strict);
-  GeDyn::replace_attribute(
-      mdata.item_action[3], sizeof(mdata.item_action[0]), from, to, cnt, strict);
-  GeDyn::replace_attribute(
-      mdata.item_action[4], sizeof(mdata.item_action[0]), from, to, cnt, strict);
+  GeDyn::replace_attribute(mdata.item_text[0], sizeof(mdata.item_text[0]), from, to, cnt, strict);
+  GeDyn::replace_attribute(mdata.item_text[1], sizeof(mdata.item_text[0]), from, to, cnt, strict);
+  GeDyn::replace_attribute(mdata.item_text[2], sizeof(mdata.item_text[0]), from, to, cnt, strict);
+  GeDyn::replace_attribute(mdata.item_text[3], sizeof(mdata.item_text[0]), from, to, cnt, strict);
+  GeDyn::replace_attribute(mdata.item_text[4], sizeof(mdata.item_text[0]), from, to, cnt, strict);
+  GeDyn::replace_attribute(mdata.item_action[0], sizeof(mdata.item_action[0]), from, to, cnt, strict);
+  GeDyn::replace_attribute(mdata.item_action[1], sizeof(mdata.item_action[0]), from, to, cnt, strict);
+  GeDyn::replace_attribute(mdata.item_action[2], sizeof(mdata.item_action[0]), from, to, cnt, strict);
+  GeDyn::replace_attribute(mdata.item_action[3], sizeof(mdata.item_action[0]), from, to, cnt, strict);
+  GeDyn::replace_attribute(mdata.item_action[4], sizeof(mdata.item_action[0]), from, to, cnt, strict);
 }
 
 void GeContextMenu::save(std::ofstream& fp)
@@ -17757,8 +18593,10 @@ void GeContextMenu::open(std::ifstream& fp)
   int end_found = 0;
   char dummy[40];
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeContextMenu: \"%d %s\"\n", type, dummy);
@@ -17766,7 +18604,8 @@ void GeContextMenu::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_ContextMenu:
       break;
     case ge_eSave_ContextMenu_item_text1:
@@ -17866,19 +18705,20 @@ int GeContextMenu::action(grow_tObject object, glow_tEvent event)
   if (!dyn->graph->is_authorized(dyn->access))
     return 1;
 
-  switch (event->event) {
-  case glow_eEvent_MB3Press: {
+  switch (event->event)
+  {
+  case glow_eEvent_MB3Press:
+  {
     char name[80];
     int x, y;
 
-    if (dyn->graph->context_menu_cb) {
+    if (dyn->graph->context_menu_cb)
+    {
       // Display context menu
       grow_GetName(dyn->graph->grow->ctx, name);
 
-      dyn->graph->popup_position(
-          event->any.x_pixel + 8, event->any.y_pixel, &x, &y);
-      (dyn->graph->context_menu_cb)(dyn->graph->parent_ctx, (void *)&mdata, 
-	  xmenu_mUtility_Ge, name, x, y);
+      dyn->graph->popup_position(event->any.x_pixel + 8, event->any.y_pixel, &x, &y);
+      (dyn->graph->context_menu_cb)(dyn->graph->parent_ctx, (void*)&mdata, xmenu_mUtility_Ge, name, x, y);
     }
     break;
   }
@@ -17887,30 +18727,32 @@ int GeContextMenu::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
-int GeContextMenu::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GeContextMenu::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
-  for (int i = 0; i < int(sizeof(mdata.item_text)/sizeof(mdata.item_text[0])); i++) {
-    if (!streq(mdata.item_text[i], "")) {
-      fp << indentation << "SetObjectAttribute(id,\"" << prefix << 
-	"ContextMenu.ItemText[" << i << "]\",\"" << mdata.item_text[i] << 
-	"\");" << '\n';
-      fp << indentation << "SetObjectAttribute(id,\"" << prefix << 
-	"ContextMenu.ItemAction[" << i << "]\",\"" << mdata.item_action[i] << 
-	"\");" << '\n';
+  for (int i = 0; i < int(sizeof(mdata.item_text) / sizeof(mdata.item_text[0])); i++)
+  {
+    if (!streq(mdata.item_text[i], ""))
+    {
+      fp << indentation << "SetObjectAttribute(id,\"" << prefix << "ContextMenu.ItemText[" << i << "]\",\""
+         << mdata.item_text[i] << "\");" << '\n';
+      fp << indentation << "SetObjectAttribute(id,\"" << prefix << "ContextMenu.ItemAction[" << i << "]\",\""
+         << mdata.item_action[i] << "\");" << '\n';
     }
   }
   return 1;
 }
 
-int GeContextMenu::syntax_check(
-    grow_tObject object, int* error_cnt, int* warning_cnt)
+int GeContextMenu::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
-  if (streq(mdata.item_text[0], "")) {
+  if (streq(mdata.item_text[0], ""))
+  {
     dyn->graph->syntax_msg('W', object, "ContextMenu.ItemText is missing");
     (*warning_cnt)++;
   }
-  for (int i = 0; i < int(sizeof(mdata.item_text)/sizeof(mdata.item_text[0])); i++) {
-    if (!streq(mdata.item_text[i], "") && streq(mdata.item_action[i], "")) {
+  for (int i = 0; i < int(sizeof(mdata.item_text) / sizeof(mdata.item_text[0])); i++)
+  {
+    if (!streq(mdata.item_text[i], "") && streq(mdata.item_action[i], ""))
+    {
       dyn->graph->syntax_msg('W', object, "ContextMenu.ItemAction is missing");
       (*warning_cnt)++;
     }
@@ -17919,16 +18761,15 @@ int GeContextMenu::syntax_check(
 }
 
 GeSetDig::GeSetDig(GeDyn* e_dyn, ge_mInstance e_instance)
-    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_No, ge_mActionType1_SetDig,
-          ge_mActionType2_No, ge_eDynPrio_SetDig)
+    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_No, ge_mActionType1_SetDig, ge_mActionType2_No,
+                ge_eDynPrio_SetDig)
 {
   strcpy(attribute, "");
   instance = e_instance;
 }
 
 GeSetDig::GeSetDig(const GeSetDig& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-          x.prio)
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio)
 {
   strcpy(attribute, x.attribute);
   instance = x.instance, instance_mask = x.instance_mask;
@@ -17938,7 +18779,8 @@ void GeSetDig::get_attributes(attr_sItem* attrinfo, int* item_count)
 {
   int i = *item_count;
 
-  if (instance == ge_mInstance_1) {
+  if (instance == ge_mInstance_1)
+  {
     strcpy(attrinfo[i].name, "SetDig.Attribute");
     attrinfo[i].value = attribute;
     attrinfo[i].type = glow_eType_String;
@@ -17948,11 +18790,14 @@ void GeSetDig::get_attributes(attr_sItem* attrinfo, int* item_count)
     attrinfo[i].value = &instance_mask;
     attrinfo[i].type = ge_eAttrType_InstanceMask;
     attrinfo[i++].size = sizeof(instance_mask);
-  } else {
+  }
+  else
+  {
     // Get instance number
     int inst = 1;
     unsigned int m = instance;
-    while (m > 1) {
+    while (m > 1)
+    {
       m = m >> 1;
       inst++;
     }
@@ -17969,26 +18814,24 @@ void GeSetDig::get_attributes(attr_sItem* attrinfo, int* item_count)
 
 int GeSetDig::get_transtab(char** tt)
 {
-  static char transtab[][32]
-      = { "SubGraph", "SubGraph", "A1", "Text", "Dynamic", "", "" };
+  static char transtab[][32] = {"SubGraph", "SubGraph", "A1", "Text", "Dynamic", "", ""};
 
   *tt = (char*)transtab;
   return 0;
 }
 
-void GeSetDig::set_attribute(
-    grow_tObject object, const char* attr_name, int* cnt)
+void GeSetDig::set_attribute(grow_tObject object, const char* attr_name, int* cnt)
 {
   (*cnt)--;
-  if (*cnt == 0) {
+  if (*cnt == 0)
+  {
     char msg[200];
 
     strncpy(attribute, attr_name, sizeof(attribute));
     if (instance == ge_mInstance_1)
       snprintf(msg, sizeof(msg), "SetDig.Attribute = %s", attr_name);
     else
-      snprintf(msg, sizeof(msg), "SetDig%d.Attribute = %s",
-          GeDyn::instance_to_number(instance), attr_name);
+      snprintf(msg, sizeof(msg), "SetDig%d.Attribute = %s", GeDyn::instance_to_number(instance), attr_name);
     msg[sizeof(msg) - 1] = 0;
     dyn->graph->message('I', msg);
   }
@@ -18004,8 +18847,7 @@ void GeSetDig::save(std::ofstream& fp)
   fp << int(ge_eSave_SetDig) << '\n';
   fp << int(ge_eSave_SetDig_attribute) << FSPACE << attribute << '\n';
   fp << int(ge_eSave_SetDig_instance) << FSPACE << int(instance) << '\n';
-  fp << int(ge_eSave_SetDig_instance_mask) << FSPACE << int(instance_mask)
-     << '\n';
+  fp << int(ge_eSave_SetDig_instance_mask) << FSPACE << int(instance_mask) << '\n';
   fp << int(ge_eSave_End) << '\n';
 }
 
@@ -18016,8 +18858,10 @@ void GeSetDig::open(std::ifstream& fp)
   char dummy[40];
   int tmp;
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeSetDig: \"%d %s\"\n", type, dummy);
@@ -18025,7 +18869,8 @@ void GeSetDig::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_SetDig:
       break;
     case ge_eSave_SetDig_attribute:
@@ -18057,7 +18902,8 @@ int GeSetDig::action(grow_tObject object, glow_tEvent event)
   if (!dyn->graph->is_authorized(dyn->access))
     return 1;
 
-  switch (event->event) {
+  switch (event->event)
+  {
   case glow_eEvent_MB1Down:
     grow_SetClickSensitivity(dyn->graph->grow->ctx, glow_mSensitivity_MB1Click);
     grow_SetObjectColorInverse(object, 1);
@@ -18066,7 +18912,8 @@ int GeSetDig::action(grow_tObject object, glow_tEvent event)
     grow_SetObjectColorInverse(object, 0);
     break;
   case glow_eEvent_Key_Return:
-  case glow_eEvent_MB1Click: {
+  case glow_eEvent_MB1Click:
+  {
     int sts;
     pwr_tAName parsed_name;
     int inverted;
@@ -18076,13 +18923,14 @@ int GeSetDig::action(grow_tObject object, glow_tEvent event)
     if (dyn->total_action_type1 & ge_mActionType1_Confirm)
       break;
 
-    db = dyn->parse_attr_name(
-        attribute, parsed_name, &inverted, &attr_type, &attr_size);
+    db = dyn->parse_attr_name(attribute, parsed_name, &inverted, &attr_type, &attr_size);
     if (parsed_name[0] == '&')
       dyn->graph->get_reference_name(parsed_name, parsed_name);
 
-    switch (db) {
-    case graph_eDatabase_Local: {
+    switch (db)
+    {
+    case graph_eDatabase_Local:
+    {
       pwr_tBoolean value = 1;
 
       sts = dyn->graph->localdb_set_value(parsed_name, &value, sizeof(value));
@@ -18091,8 +18939,10 @@ int GeSetDig::action(grow_tObject object, glow_tEvent event)
       break;
     }
     case graph_eDatabase_Gdh:
-      switch (attr_type) {
-      case pwr_eType_Boolean: {
+      switch (attr_type)
+      {
+      case pwr_eType_Boolean:
+      {
         pwr_tBoolean value = 1;
 
         sts = gdh_SetObjectInfo(parsed_name, &value, sizeof(value));
@@ -18101,7 +18951,8 @@ int GeSetDig::action(grow_tObject object, glow_tEvent event)
         break;
       }
       case pwr_eType_Int32:
-      case pwr_eType_UInt32: {
+      case pwr_eType_UInt32:
+      {
         pwr_tInt32 value = 1;
 
         sts = gdh_SetObjectInfo(parsed_name, &value, sizeof(value));
@@ -18109,13 +18960,15 @@ int GeSetDig::action(grow_tObject object, glow_tEvent event)
           printf("SetDig error: %s\n", attribute);
         break;
       }
-      case graph_eType_Bit: {
+      case graph_eType_Bit:
+      {
         // Get bit number from parsed name
         pwr_tUInt32 value = 1;
         char* s;
         int bitnum = 0;
 
-        if ((s = strrchr(parsed_name, '['))) {
+        if ((s = strrchr(parsed_name, '[')))
+        {
           sscanf(s + 1, "%d", &bitnum);
           *s = 0;
           if (!(bitnum >= 0 && bitnum < 32))
@@ -18123,7 +18976,8 @@ int GeSetDig::action(grow_tObject object, glow_tEvent event)
         }
 
         sts = gdh_GetObjectInfo(parsed_name, &value, sizeof(value));
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           printf("SetDig error: %s\n", attribute);
           break;
         }
@@ -18138,7 +18992,8 @@ int GeSetDig::action(grow_tObject object, glow_tEvent event)
       default:;
       }
       break;
-    case graph_eDatabase_Ccm: {
+    case graph_eDatabase_Ccm:
+    {
       pwr_tBoolean value = 1;
 
       sts = dyn->graph->ccm_set_variable(parsed_name, attr_type, &value);
@@ -18155,65 +19010,65 @@ int GeSetDig::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
-int GeSetDig::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GeSetDig::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
   char name[80];
 
   sprintf(name, "%sSetDig", prefix);
 
   // Find first instance and print instance mask
-  for (GeDynElem *elem = dyn->elements; elem; elem = elem->next) {
-    if (elem->action_type1 == ge_mActionType1_SetDig && elem->instance == ge_mInstance_1) {
-      if (instance ==  instance_highest(elem->instance_mask)) {
-	if (elem->instance_mask != 1)
-	  fp << indentation << "SetObjectAttribute(id,\"" << prefix << "SetDig.Instances\"," << elem->instance_mask << ");" << '\n';
-	break;
+  for (GeDynElem* elem = dyn->elements; elem; elem = elem->next)
+  {
+    if (elem->action_type1 == ge_mActionType1_SetDig && elem->instance == ge_mInstance_1)
+    {
+      if (instance == instance_highest(elem->instance_mask))
+      {
+        if (elem->instance_mask != 1)
+          fp << indentation << "SetObjectAttribute(id,\"" << prefix << "SetDig.Instances\","
+             << elem->instance_mask << ");" << '\n';
+        break;
       }
     }
   }
   if (instance != ge_mInstance_1)
     sprintf(&name[strlen(name)], "%d", instance_number(instance));
   if (!streq(attribute, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << name << ".Attribute\",\"" << attribute << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".Attribute\",\"" << attribute << "\");"
+       << '\n';
   return 1;
 }
 
-int GeSetDig::export_java(
-    grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeSetDig::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
   if (first)
     fp << "      ";
   else
     fp << "      ,";
-  fp << "new GeDynSetDig(" << var_name << ".dd, \"" << attribute << "\")"
-     << '\n';
+  fp << "new GeDynSetDig(" << var_name << ".dd, \"" << attribute << "\")" << '\n';
   return 1;
 }
 
-int GeSetDig::syntax_check(
-    grow_tObject object, int* error_cnt, int* warning_cnt)
+int GeSetDig::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
-  int types[] = { pwr_eType_Boolean, pwr_eType_Int32, pwr_eType_UInt32,
-    graph_eType_Bit, 0 };
-  graph_eDatabase databases[] = { graph_eDatabase_Local, graph_eDatabase_Gdh,
-    graph_eDatabase_Ccm, graph_eDatabase__ };
-  dyn->syntax_check_attribute(object, "SetDig.Attribute", attribute, 0, types,
-      databases, error_cnt, warning_cnt);
+  int types[] = {pwr_eType_Boolean, pwr_eType_Int32, pwr_eType_UInt32, graph_eType_Bit, 0};
+  graph_eDatabase databases[] = {graph_eDatabase_Local, graph_eDatabase_Gdh, graph_eDatabase_Ccm,
+                                 graph_eDatabase__};
+  dyn->syntax_check_attribute(object, "SetDig.Attribute", attribute, 0, types, databases, error_cnt,
+                              warning_cnt);
 
   return 1;
 }
 
 GeResetDig::GeResetDig(GeDyn* e_dyn, ge_mInstance e_instance)
-    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_No,
-          ge_mActionType1_ResetDig, ge_mActionType2_No, ge_eDynPrio_ResetDig)
+    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_No, ge_mActionType1_ResetDig, ge_mActionType2_No,
+                ge_eDynPrio_ResetDig)
 {
   strcpy(attribute, "");
   instance = e_instance;
 }
 
 GeResetDig::GeResetDig(const GeResetDig& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-          x.prio)
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio)
 {
   strcpy(attribute, x.attribute);
   instance = x.instance;
@@ -18224,7 +19079,8 @@ void GeResetDig::get_attributes(attr_sItem* attrinfo, int* item_count)
 {
   int i = *item_count;
 
-  if (instance == ge_mInstance_1) {
+  if (instance == ge_mInstance_1)
+  {
     strcpy(attrinfo[i].name, "ResetDig.Attribute");
     attrinfo[i].value = attribute;
     attrinfo[i].type = glow_eType_String;
@@ -18234,11 +19090,14 @@ void GeResetDig::get_attributes(attr_sItem* attrinfo, int* item_count)
     attrinfo[i].value = &instance_mask;
     attrinfo[i].type = ge_eAttrType_InstanceMask;
     attrinfo[i++].size = sizeof(instance_mask);
-  } else {
+  }
+  else
+  {
     // Get instance number
     int inst = 1;
     unsigned int m = instance;
-    while (m > 1) {
+    while (m > 1)
+    {
       m = m >> 1;
       inst++;
     }
@@ -18255,26 +19114,24 @@ void GeResetDig::get_attributes(attr_sItem* attrinfo, int* item_count)
 
 int GeResetDig::get_transtab(char** tt)
 {
-  static char transtab[][32]
-      = { "SubGraph", "SubGraph", "A1", "Text", "Dynamic", "", "" };
+  static char transtab[][32] = {"SubGraph", "SubGraph", "A1", "Text", "Dynamic", "", ""};
 
   *tt = (char*)transtab;
   return 0;
 }
 
-void GeResetDig::set_attribute(
-    grow_tObject object, const char* attr_name, int* cnt)
+void GeResetDig::set_attribute(grow_tObject object, const char* attr_name, int* cnt)
 {
   (*cnt)--;
-  if (*cnt == 0) {
+  if (*cnt == 0)
+  {
     char msg[200];
 
     strncpy(attribute, attr_name, sizeof(attribute));
     if (instance == ge_mInstance_1)
       snprintf(msg, sizeof(msg), "ResetDig.Attribute = %s", attr_name);
     else
-      snprintf(msg, sizeof(msg), "ResetDig%d.Attribute = %s",
-          GeDyn::instance_to_number(instance), attr_name);
+      snprintf(msg, sizeof(msg), "ResetDig%d.Attribute = %s", GeDyn::instance_to_number(instance), attr_name);
     msg[sizeof(msg) - 1] = 0;
     dyn->graph->message('I', msg);
   }
@@ -18290,8 +19147,7 @@ void GeResetDig::save(std::ofstream& fp)
   fp << int(ge_eSave_ResetDig) << '\n';
   fp << int(ge_eSave_ResetDig_attribute) << FSPACE << attribute << '\n';
   fp << int(ge_eSave_ResetDig_instance) << FSPACE << int(instance) << '\n';
-  fp << int(ge_eSave_ResetDig_instance_mask) << FSPACE << int(instance_mask)
-     << '\n';
+  fp << int(ge_eSave_ResetDig_instance_mask) << FSPACE << int(instance_mask) << '\n';
   fp << int(ge_eSave_End) << '\n';
 }
 
@@ -18302,8 +19158,10 @@ void GeResetDig::open(std::ifstream& fp)
   char dummy[40];
   int tmp;
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeResetDig: \"%d %s\"\n", type, dummy);
@@ -18311,7 +19169,8 @@ void GeResetDig::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_ResetDig:
       break;
     case ge_eSave_ResetDig_attribute:
@@ -18343,7 +19202,8 @@ int GeResetDig::action(grow_tObject object, glow_tEvent event)
   if (!dyn->graph->is_authorized(dyn->access))
     return 1;
 
-  switch (event->event) {
+  switch (event->event)
+  {
   case glow_eEvent_MB1Down:
     grow_SetClickSensitivity(dyn->graph->grow->ctx, glow_mSensitivity_MB1Click);
     grow_SetObjectColorInverse(object, 1);
@@ -18352,7 +19212,8 @@ int GeResetDig::action(grow_tObject object, glow_tEvent event)
     grow_SetObjectColorInverse(object, 0);
     break;
   case glow_eEvent_Key_Return:
-  case glow_eEvent_MB1Click: {
+  case glow_eEvent_MB1Click:
+  {
     int sts;
     pwr_tAName parsed_name;
     int inverted;
@@ -18361,13 +19222,14 @@ int GeResetDig::action(grow_tObject object, glow_tEvent event)
     if (dyn->total_action_type1 & ge_mActionType1_Confirm)
       break;
 
-    dyn->parse_attr_name(
-        attribute, parsed_name, &inverted, &attr_type, &attr_size);
+    dyn->parse_attr_name(attribute, parsed_name, &inverted, &attr_type, &attr_size);
     if (parsed_name[0] == '&')
       dyn->graph->get_reference_name(parsed_name, parsed_name);
 
-    switch (attr_type) {
-    case pwr_eType_Boolean: {
+    switch (attr_type)
+    {
+    case pwr_eType_Boolean:
+    {
       pwr_tBoolean value = 0;
 
       sts = gdh_SetObjectInfo(parsed_name, &value, sizeof(value));
@@ -18376,7 +19238,8 @@ int GeResetDig::action(grow_tObject object, glow_tEvent event)
       break;
     }
     case pwr_eType_Int32:
-    case pwr_eType_UInt32: {
+    case pwr_eType_UInt32:
+    {
       pwr_tInt32 value = 0;
 
       sts = gdh_SetObjectInfo(parsed_name, &value, sizeof(value));
@@ -18384,13 +19247,15 @@ int GeResetDig::action(grow_tObject object, glow_tEvent event)
         printf("SetDig error: %s\n", attribute);
       break;
     }
-    case graph_eType_Bit: {
+    case graph_eType_Bit:
+    {
       // Get bit number from parsed name
       pwr_tUInt32 value = 0;
       char* s;
       int bitnum = 0;
 
-      if ((s = strrchr(parsed_name, '['))) {
+      if ((s = strrchr(parsed_name, '[')))
+      {
         sscanf(s + 1, "%d", &bitnum);
         *s = 0;
         if (!(bitnum >= 0 && bitnum < 32))
@@ -18398,7 +19263,8 @@ int GeResetDig::action(grow_tObject object, glow_tEvent event)
       }
 
       sts = gdh_GetObjectInfo(parsed_name, &value, sizeof(value));
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         printf("ResetDig error: %s\n", attribute);
         break;
       }
@@ -18420,64 +19286,64 @@ int GeResetDig::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
-int GeResetDig::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GeResetDig::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
   char name[80];
 
   sprintf(name, "%sResetDig", prefix);
 
   // Find first instance and print instance mask
-  for (GeDynElem *elem = dyn->elements; elem; elem = elem->next) {
-    if (elem->action_type1 == ge_mActionType1_ResetDig && elem->instance == ge_mInstance_1) {
-      if (instance ==  instance_highest(elem->instance_mask)) {
-	if (elem->instance_mask != 1)
-	  fp << indentation << "SetObjectAttribute(id,\"" << prefix << "ResetDig.Instances\"," << elem->instance_mask << ");" << '\n';
-	break;
+  for (GeDynElem* elem = dyn->elements; elem; elem = elem->next)
+  {
+    if (elem->action_type1 == ge_mActionType1_ResetDig && elem->instance == ge_mInstance_1)
+    {
+      if (instance == instance_highest(elem->instance_mask))
+      {
+        if (elem->instance_mask != 1)
+          fp << indentation << "SetObjectAttribute(id,\"" << prefix << "ResetDig.Instances\","
+             << elem->instance_mask << ");" << '\n';
+        break;
       }
     }
   }
   if (instance != ge_mInstance_1)
     sprintf(&name[strlen(name)], "%d", instance_number(instance));
   if (!streq(attribute, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << name << ".Attribute\",\"" << attribute << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".Attribute\",\"" << attribute << "\");"
+       << '\n';
   return 1;
 }
 
-int GeResetDig::export_java(
-    grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeResetDig::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
   if (first)
     fp << "      ";
   else
     fp << "      ,";
-  fp << "new GeDynResetDig(" << var_name << ".dd, \"" << attribute << "\")"
-     << '\n';
+  fp << "new GeDynResetDig(" << var_name << ".dd, \"" << attribute << "\")" << '\n';
   return 1;
 }
 
-int GeResetDig::syntax_check(
-    grow_tObject object, int* error_cnt, int* warning_cnt)
+int GeResetDig::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
-  int types[] = { pwr_eType_Boolean, pwr_eType_Int32, pwr_eType_UInt32,
-    graph_eType_Bit, 0 };
-  graph_eDatabase databases[] = { graph_eDatabase_Local, graph_eDatabase_Gdh,
-    graph_eDatabase_Ccm, graph_eDatabase__ };
-  dyn->syntax_check_attribute(object, "ResetDig.Attribute", attribute, 0, types,
-      databases, error_cnt, warning_cnt);
+  int types[] = {pwr_eType_Boolean, pwr_eType_Int32, pwr_eType_UInt32, graph_eType_Bit, 0};
+  graph_eDatabase databases[] = {graph_eDatabase_Local, graph_eDatabase_Gdh, graph_eDatabase_Ccm,
+                                 graph_eDatabase__};
+  dyn->syntax_check_attribute(object, "ResetDig.Attribute", attribute, 0, types, databases, error_cnt,
+                              warning_cnt);
 
   return 1;
 }
 
 GeToggleDig::GeToggleDig(GeDyn* e_dyn)
-    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_No,
-          ge_mActionType1_ToggleDig, ge_mActionType2_No, ge_eDynPrio_ToggleDig)
+    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_No, ge_mActionType1_ToggleDig, ge_mActionType2_No,
+                ge_eDynPrio_ToggleDig)
 {
   strcpy(attribute, "");
 }
 
 GeToggleDig::GeToggleDig(const GeToggleDig& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-          x.prio)
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio)
 {
   strcpy(attribute, x.attribute);
 }
@@ -18497,18 +19363,17 @@ void GeToggleDig::get_attributes(attr_sItem* attrinfo, int* item_count)
 
 int GeToggleDig::get_transtab(char** tt)
 {
-  static char transtab[][32]
-      = { "SubGraph", "SubGraph", "A1", "Text", "Dynamic", "", "" };
+  static char transtab[][32] = {"SubGraph", "SubGraph", "A1", "Text", "Dynamic", "", ""};
 
   *tt = (char*)transtab;
   return 0;
 }
 
-void GeToggleDig::set_attribute(
-    grow_tObject object, const char* attr_name, int* cnt)
+void GeToggleDig::set_attribute(grow_tObject object, const char* attr_name, int* cnt)
 {
   (*cnt)--;
-  if (*cnt == 0) {
+  if (*cnt == 0)
+  {
     char msg[200];
 
     strncpy(attribute, attr_name, sizeof(attribute));
@@ -18536,8 +19401,10 @@ void GeToggleDig::open(std::ifstream& fp)
   int end_found = 0;
   char dummy[40];
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeToggleDig: \"%d %s\"\n", type, dummy);
@@ -18545,7 +19412,8 @@ void GeToggleDig::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_ToggleDig:
       break;
     case ge_eSave_ToggleDig_attribute:
@@ -18569,7 +19437,8 @@ int GeToggleDig::action(grow_tObject object, glow_tEvent event)
   if (!dyn->graph->is_authorized(dyn->access))
     return 1;
 
-  switch (event->event) {
+  switch (event->event)
+  {
   case glow_eEvent_MB1Down:
     grow_SetClickSensitivity(dyn->graph->grow->ctx, glow_mSensitivity_MB1Click);
     grow_SetObjectColorInverse(object, 1);
@@ -18578,7 +19447,8 @@ int GeToggleDig::action(grow_tObject object, glow_tEvent event)
     grow_SetObjectColorInverse(object, 0);
     break;
   case glow_eEvent_Key_Return:
-  case glow_eEvent_MB1Click: {
+  case glow_eEvent_MB1Click:
+  {
     int sts;
     pwr_tAName parsed_name;
     int inverted;
@@ -18588,15 +19458,18 @@ int GeToggleDig::action(grow_tObject object, glow_tEvent event)
     if (dyn->total_action_type1 & ge_mActionType1_Confirm)
       break;
 
-    db = dyn->parse_attr_name(
-        attribute, parsed_name, &inverted, &attr_type, &attr_size);
+    db = dyn->parse_attr_name(attribute, parsed_name, &inverted, &attr_type, &attr_size);
     if (parsed_name[0] == '&')
       dyn->graph->get_reference_name(parsed_name, parsed_name);
 
-    switch (db) {
-    case graph_eDatabase_Gdh: {
-      switch (attr_type) {
-      case pwr_eType_Boolean: {
+    switch (db)
+    {
+    case graph_eDatabase_Gdh:
+    {
+      switch (attr_type)
+      {
+      case pwr_eType_Boolean:
+      {
         pwr_tBoolean value;
 
         sts = gdh_GetObjectInfo(parsed_name, &value, sizeof(value));
@@ -18609,7 +19482,8 @@ int GeToggleDig::action(grow_tObject object, glow_tEvent event)
           printf("ToggleDig error: %s\n", attribute);
         break;
       }
-      case pwr_eType_Int32: {
+      case pwr_eType_Int32:
+      {
       case pwr_eType_UInt32:
         pwr_tInt32 value;
 
@@ -18623,13 +19497,15 @@ int GeToggleDig::action(grow_tObject object, glow_tEvent event)
           printf("ToggleDig error: %s\n", attribute);
         break;
       }
-      case graph_eType_Bit: {
+      case graph_eType_Bit:
+      {
         // Get bit number from parsed name
         pwr_tUInt32 value;
         char* s;
         int bitnum = 0;
 
-        if ((s = strrchr(parsed_name, '['))) {
+        if ((s = strrchr(parsed_name, '[')))
+        {
           sscanf(s + 1, "%d", &bitnum);
           *s = 0;
           if (!(bitnum >= 0 && bitnum < 32))
@@ -18637,7 +19513,8 @@ int GeToggleDig::action(grow_tObject object, glow_tEvent event)
         }
 
         sts = gdh_GetObjectInfo(parsed_name, &value, sizeof(value));
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           printf("ToggleDig error: %s\n", attribute);
           break;
         }
@@ -18658,14 +19535,16 @@ int GeToggleDig::action(grow_tObject object, glow_tEvent event)
 
       break;
     }
-    case graph_eDatabase_Local: {
+    case graph_eDatabase_Local:
+    {
       sts = dyn->graph->localdb_toggle_value(parsed_name);
       if (EVEN(sts))
         printf("ToggleDig error: %s\n", attribute);
 
       break;
     }
-    case graph_eDatabase_Ccm: {
+    case graph_eDatabase_Ccm:
+    {
       pwr_tBoolean value;
 
       sts = dyn->graph->ccm_get_variable(parsed_name, attr_type, &value);
@@ -18688,48 +19567,44 @@ int GeToggleDig::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
-int GeToggleDig::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GeToggleDig::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
   if (!streq(attribute, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "ToggleDig.Attribute\",\"" << attribute << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "ToggleDig.Attribute\",\"" << attribute
+       << "\");" << '\n';
   return 1;
 }
 
-int GeToggleDig::export_java(
-    grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeToggleDig::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
   if (first)
     fp << "      ";
   else
     fp << "      ,";
-  fp << "new GeDynToggleDig(" << var_name << ".dd, \"" << attribute << "\")"
-     << '\n';
+  fp << "new GeDynToggleDig(" << var_name << ".dd, \"" << attribute << "\")" << '\n';
   return 1;
 }
 
-int GeToggleDig::syntax_check(
-    grow_tObject object, int* error_cnt, int* warning_cnt)
+int GeToggleDig::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
-  int types[] = { pwr_eType_Boolean, pwr_eType_Int32, pwr_eType_UInt32,
-    graph_eType_Bit, 0 };
-  graph_eDatabase databases[] = { graph_eDatabase_Local, graph_eDatabase_Gdh,
-    graph_eDatabase_Ccm, graph_eDatabase__ };
-  dyn->syntax_check_attribute(object, "SetToggle.Attribute", attribute, 0,
-      types, databases, error_cnt, warning_cnt);
+  int types[] = {pwr_eType_Boolean, pwr_eType_Int32, pwr_eType_UInt32, graph_eType_Bit, 0};
+  graph_eDatabase databases[] = {graph_eDatabase_Local, graph_eDatabase_Gdh, graph_eDatabase_Ccm,
+                                 graph_eDatabase__};
+  dyn->syntax_check_attribute(object, "SetToggle.Attribute", attribute, 0, types, databases, error_cnt,
+                              warning_cnt);
 
   return 1;
 }
 
 GeStoDig::GeStoDig(GeDyn* e_dyn)
-    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_No, ge_mActionType1_StoDig,
-          ge_mActionType2_No, ge_eDynPrio_StoDig)
+    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_No, ge_mActionType1_StoDig, ge_mActionType2_No,
+                ge_eDynPrio_StoDig)
 {
   strcpy(attribute, "");
 }
 
 GeStoDig::GeStoDig(const GeStoDig& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-          x.prio)
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio)
 {
   strcpy(attribute, x.attribute);
 }
@@ -18749,18 +19624,17 @@ void GeStoDig::get_attributes(attr_sItem* attrinfo, int* item_count)
 
 int GeStoDig::get_transtab(char** tt)
 {
-  static char transtab[][32]
-      = { "SubGraph", "SubGraph", "A1", "Text", "Dynamic", "", "" };
+  static char transtab[][32] = {"SubGraph", "SubGraph", "A1", "Text", "Dynamic", "", ""};
 
   *tt = (char*)transtab;
   return 0;
 }
 
-void GeStoDig::set_attribute(
-    grow_tObject object, const char* attr_name, int* cnt)
+void GeStoDig::set_attribute(grow_tObject object, const char* attr_name, int* cnt)
 {
   (*cnt)--;
-  if (*cnt == 0) {
+  if (*cnt == 0)
+  {
     char msg[200];
 
     strncpy(attribute, attr_name, sizeof(attribute));
@@ -18788,8 +19662,10 @@ void GeStoDig::open(std::ifstream& fp)
   int end_found = 0;
   char dummy[40];
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeStoDig: \"%d %s\"\n", type, dummy);
@@ -18797,7 +19673,8 @@ void GeStoDig::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_StoDig:
       break;
     case ge_eSave_StoDig_attribute:
@@ -18827,17 +19704,18 @@ int GeStoDig::action(grow_tObject object, glow_tEvent event)
   if (!dyn->graph->is_authorized(dyn->access))
     return 1;
 
-  switch (event->event) {
+  switch (event->event)
+  {
   case glow_eEvent_MB1Down:
     grow_SetObjectColorInverse(object, 1);
     value = 1;
-    dyn->parse_attr_name(
-        attribute, parsed_name, &inverted, &attr_type, &attr_size);
+    dyn->parse_attr_name(attribute, parsed_name, &inverted, &attr_type, &attr_size);
     if (parsed_name[0] == '&')
       dyn->graph->get_reference_name(parsed_name, parsed_name);
 
     sts = gdh_SetObjectInfo(parsed_name, &value, sizeof(value));
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       printf("StoDig error: %s\n", attribute);
       break;
     }
@@ -18845,8 +19723,7 @@ int GeStoDig::action(grow_tObject object, glow_tEvent event)
   case glow_eEvent_MB1Up:
     grow_SetObjectColorInverse(object, 0);
     value = 0;
-    dyn->parse_attr_name(
-        attribute, parsed_name, &inverted, &attr_type, &attr_size);
+    dyn->parse_attr_name(attribute, parsed_name, &inverted, &attr_type, &attr_size);
     if (parsed_name[0] == '&')
       dyn->graph->get_reference_name(parsed_name, parsed_name);
     sts = gdh_SetObjectInfo(parsed_name, &value, sizeof(value));
@@ -18859,48 +19736,44 @@ int GeStoDig::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
-int GeStoDig::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GeStoDig::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
   if (!streq(attribute, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "StoDig.Attribute\",\"" << attribute << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "StoDig.Attribute\",\"" << attribute
+       << "\");" << '\n';
   return 1;
 }
 
-int GeStoDig::export_java(
-    grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeStoDig::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
   if (first)
     fp << "      ";
   else
     fp << "      ,";
-  fp << "new GeDynStoDig(" << var_name << ".dd, \"" << attribute << "\")"
-     << '\n';
+  fp << "new GeDynStoDig(" << var_name << ".dd, \"" << attribute << "\")" << '\n';
   return 1;
 }
 
-int GeStoDig::syntax_check(
-    grow_tObject object, int* error_cnt, int* warning_cnt)
+int GeStoDig::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
-  int types[] = { pwr_eType_Boolean, pwr_eType_Int32, pwr_eType_UInt32,
-    graph_eType_Bit, 0 };
-  graph_eDatabase databases[] = { graph_eDatabase_Local, graph_eDatabase_Gdh,
-    graph_eDatabase_Ccm, graph_eDatabase__ };
-  dyn->syntax_check_attribute(object, "StoDig.Attribute", attribute, 0, types,
-      databases, error_cnt, warning_cnt);
+  int types[] = {pwr_eType_Boolean, pwr_eType_Int32, pwr_eType_UInt32, graph_eType_Bit, 0};
+  graph_eDatabase databases[] = {graph_eDatabase_Local, graph_eDatabase_Gdh, graph_eDatabase_Ccm,
+                                 graph_eDatabase__};
+  dyn->syntax_check_attribute(object, "StoDig.Attribute", attribute, 0, types, databases, error_cnt,
+                              warning_cnt);
 
   return 1;
 }
 
 GeCommand::GeCommand(GeDyn* e_dyn)
-    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_No,
-          ge_mActionType1_Command, ge_mActionType2_No, ge_eDynPrio_Command)
+    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_No, ge_mActionType1_Command, ge_mActionType2_No,
+                ge_eDynPrio_Command)
 {
   strcpy(command, "");
 }
 
 GeCommand::GeCommand(const GeCommand& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-          x.prio)
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio)
 {
   strcpy(command, x.command);
 }
@@ -18920,8 +19793,7 @@ void GeCommand::get_attributes(attr_sItem* attrinfo, int* item_count)
 
 int GeCommand::get_transtab(char** tt)
 {
-  static char transtab[][32]
-      = { "SubGraph", "SubGraph", "A1", "Text", "Dynamic", "", "" };
+  static char transtab[][32] = {"SubGraph", "SubGraph", "A1", "Text", "Dynamic", "", ""};
 
   *tt = (char*)transtab;
   return 0;
@@ -18945,8 +19817,10 @@ void GeCommand::open(std::ifstream& fp)
   int end_found = 0;
   char dummy[40];
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeCommand: \"%d %s\"\n", type, dummy);
@@ -18954,7 +19828,8 @@ void GeCommand::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_Command:
       break;
     case ge_eSave_Command_command:
@@ -18978,7 +19853,8 @@ int GeCommand::action(grow_tObject object, glow_tEvent event)
   if (!dyn->graph->is_authorized(dyn->access))
     return 1;
 
-  switch (event->event) {
+  switch (event->event)
+  {
   case glow_eEvent_MB1Down:
     grow_SetClickSensitivity(dyn->graph->grow->ctx, glow_mSensitivity_MB1Click);
     grow_SetObjectColorInverse(object, 1);
@@ -18991,7 +19867,8 @@ int GeCommand::action(grow_tObject object, glow_tEvent event)
     if (dyn->total_action_type1 & ge_mActionType1_Confirm)
       break;
 
-    if (dyn->graph->command_cb) {
+    if (dyn->graph->command_cb)
+    {
       char cmd[400];
       int sts;
 
@@ -19005,13 +19882,15 @@ int GeCommand::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
-int GeCommand::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GeCommand::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
-  if (!streq(command, "")) {
+  if (!streq(command, ""))
+  {
     fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Command.Command\",\"";
-    for (char *s = command; *s; s++) {
+    for (char* s = command; *s; s++)
+    {
       if (*s == '\"')
-	fp << '\\';
+        fp << '\\';
       fp << *s;
     }
     fp << "\");" << '\n';
@@ -19019,22 +19898,20 @@ int GeCommand::export_script(grow_tObject o, std::ofstream& fp, char *indentatio
   return 1;
 }
 
-int GeCommand::export_java(
-    grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeCommand::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
   if (first)
     fp << "      ";
   else
     fp << "      ,";
-  fp << "new GeDynCommand(" << var_name << ".dd, \"" << GeDyn::cmd_cnv(command)
-     << "\")\n";
+  fp << "new GeDynCommand(" << var_name << ".dd, \"" << GeDyn::cmd_cnv(command) << "\")\n";
   return 1;
 }
 
-int GeCommand::syntax_check(
-    grow_tObject object, int* error_cnt, int* warning_cnt)
+int GeCommand::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
-  if (streq(command, "")) {
+  if (streq(command, ""))
+  {
     dyn->graph->syntax_msg('E', object, "Command.Command is missing");
     (*error_cnt)++;
   }
@@ -19042,16 +19919,14 @@ int GeCommand::syntax_check(
 }
 
 GeCommandDoubleClick::GeCommandDoubleClick(GeDyn* e_dyn)
-    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_No,
-          ge_mActionType1_CommandDoubleClick, ge_mActionType2_No,
-          ge_eDynPrio_CommandDoubleClick)
+    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_No, ge_mActionType1_CommandDoubleClick,
+                ge_mActionType2_No, ge_eDynPrio_CommandDoubleClick)
 {
   strcpy(command, "");
 }
 
 GeCommandDoubleClick::GeCommandDoubleClick(const GeCommandDoubleClick& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-          x.prio)
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio)
 {
   strcpy(command, x.command);
 }
@@ -19071,15 +19946,13 @@ void GeCommandDoubleClick::get_attributes(attr_sItem* attrinfo, int* item_count)
 
 int GeCommandDoubleClick::get_transtab(char** tt)
 {
-  static char transtab[][32]
-      = { "SubGraph", "SubGraph", "A1", "Text", "Dynamic", "", "" };
+  static char transtab[][32] = {"SubGraph", "SubGraph", "A1", "Text", "Dynamic", "", ""};
 
   *tt = (char*)transtab;
   return 0;
 }
 
-void GeCommandDoubleClick::replace_attribute(
-    char* from, char* to, int* cnt, int strict)
+void GeCommandDoubleClick::replace_attribute(char* from, char* to, int* cnt, int strict)
 {
   GeDyn::replace_attribute(command, sizeof(command), from, to, cnt, strict);
 }
@@ -19097,8 +19970,10 @@ void GeCommandDoubleClick::open(std::ifstream& fp)
   int end_found = 0;
   char dummy[40];
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeCommandDoubleClick: \"%d %s\"\n", type, dummy);
@@ -19106,7 +19981,8 @@ void GeCommandDoubleClick::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_CommandDC:
       break;
     case ge_eSave_CommandDC_command:
@@ -19130,17 +20006,19 @@ int GeCommandDoubleClick::action(grow_tObject object, glow_tEvent event)
   if (!dyn->graph->is_authorized(dyn->access))
     return 1;
 
-  switch (event->event) {
+  switch (event->event)
+  {
   case glow_eEvent_MB1Down:
     grow_SetClickSensitivity(dyn->graph->grow->ctx,
-        glow_mSensitivity_MB1Click | glow_mSensitivity_MB1DoubleClick);
+                             glow_mSensitivity_MB1Click | glow_mSensitivity_MB1DoubleClick);
     grow_SetObjectColorInverse(object, 1);
     break;
   case glow_eEvent_MB1Up:
     grow_SetObjectColorInverse(object, 0);
     break;
   case glow_eEvent_MB1DoubleClick:
-    if (dyn->graph->command_cb) {
+    if (dyn->graph->command_cb)
+    {
       char cmd[400];
 
       dyn->graph->get_command(command, cmd, dyn);
@@ -19152,37 +20030,36 @@ int GeCommandDoubleClick::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
-int GeCommandDoubleClick::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GeCommandDoubleClick::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
   if (!streq(command, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "CommandDoubleClick.Command\",\"" << command << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "CommandDoubleClick.Command\",\"" << command
+       << "\");" << '\n';
   return 1;
 }
 
-int GeCommandDoubleClick::syntax_check(
-    grow_tObject object, int* error_cnt, int* warning_cnt)
+int GeCommandDoubleClick::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
-  if (streq(command, "")) {
-    dyn->graph->syntax_msg(
-        'E', object, "CommandDoubleClick.Command is missing");
+  if (streq(command, ""))
+  {
+    dyn->graph->syntax_msg('E', object, "CommandDoubleClick.Command is missing");
     (*error_cnt)++;
   }
   return 1;
 }
 
 GeScript::GeScript(GeDyn* e_dyn)
-    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_No, ge_mActionType1_Script,
-      ge_mActionType2_No, ge_eDynPrio_Script), script_len(0),
-      trigger_event(ge_eScriptTriggerEvent_ClickMB1)
-      
+    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_No, ge_mActionType1_Script, ge_mActionType2_No,
+                ge_eDynPrio_Script),
+      script_len(0), trigger_event(ge_eScriptTriggerEvent_ClickMB1)
+
 {
   strcpy(script, "");
   strcpy(arguments, "");
 }
 
 GeScript::GeScript(const GeScript& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-          x.prio),
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio),
       script_len(x.script_len), trigger_event(x.trigger_event)
 {
   strncpy(script, x.script, sizeof(script));
@@ -19215,8 +20092,7 @@ void GeScript::get_attributes(attr_sItem* attrinfo, int* item_count)
 
 int GeScript::get_transtab(char** tt)
 {
-  static char transtab[][32]
-      = { "SubGraph", "SubGraph", "A1", "Text", "Dynamic", "", "" };
+  static char transtab[][32] = {"SubGraph", "SubGraph", "A1", "Text", "Dynamic", "", ""};
 
   *tt = (char*)transtab;
   return 0;
@@ -19235,7 +20111,8 @@ void GeScript::save(std::ofstream& fp)
   fp << int(ge_eSave_Script_script_len) << FSPACE << script_len << '\n';
   fp << int(ge_eSave_Script_script) << '\n';
   fp << "\"";
-  for (char* s = script; *s; s++) {
+  for (char* s = script; *s; s++)
+  {
     if (*s == '"')
       fp << "\\";
     fp << *s;
@@ -19251,9 +20128,11 @@ void GeScript::open(std::ifstream& fp)
   char dummy[200];
   char c;
   int tmp;
-  
-  for (;;) {
-    if (!fp.good()) {
+
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeScript: \"%d %s\"\n", type, dummy);
@@ -19261,7 +20140,8 @@ void GeScript::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_Script:
       break;
     case ge_eSave_Script_trigger_event:
@@ -19275,17 +20155,21 @@ void GeScript::open(std::ifstream& fp)
     case ge_eSave_Script_script_len:
       fp >> script_len;
       break;
-    case ge_eSave_Script_script: {
+    case ge_eSave_Script_script:
+    {
       fp.getline(dummy, sizeof(dummy));
       fp.get();
       int j = 0;
-      while (1) {
+      while (1)
+      {
         if (j > (int)sizeof(script))
           break;
-        if ((c = fp.get()) == '"') {
+        if ((c = fp.get()) == '"')
+        {
           if (script[j - 1] == '\\')
             j--;
-          else {
+          else
+          {
             script[j] = 0;
             break;
           }
@@ -19309,12 +20193,14 @@ void GeScript::open(std::ifstream& fp)
 
 int GeScript::action(grow_tObject object, glow_tEvent event)
 {
-  switch (trigger_event) {
+  switch (trigger_event)
+  {
   case ge_eScriptTriggerEvent_ClickMB1:
     if (!dyn->graph->is_authorized(dyn->access))
       return 1;
 
-    switch (event->event) {
+    switch (event->event)
+    {
     case glow_eEvent_MB1Down:
       grow_SetClickSensitivity(dyn->graph->grow->ctx, glow_mSensitivity_MB1Click);
       grow_SetObjectColorInverse(object, 1);
@@ -19325,45 +20211,50 @@ int GeScript::action(grow_tObject object, glow_tEvent event)
     case glow_eEvent_Key_Return:
     case glow_eEvent_MB1Click:
       if (dyn->total_action_type1 & ge_mActionType1_Confirm)
-	break;
-      
-      if (dyn->graph->command_cb) {
-	int sts;
-	pwr_tCmd argstr;
-	
-	dyn->graph->get_command(arguments, argstr, dyn);
-	sts = (dyn->graph->command_cb)(dyn->graph->parent_ctx, 0, script, argstr);
-	return sts;
+        break;
+
+      if (dyn->graph->command_cb)
+      {
+        int sts;
+        pwr_tCmd argstr;
+
+        dyn->graph->get_command(arguments, argstr, dyn);
+        sts = (dyn->graph->command_cb)(dyn->graph->parent_ctx, 0, script, argstr);
+        return sts;
       }
       break;
     default:;
     }
     break;
   case ge_eScriptTriggerEvent_Open:
-    switch (event->event) {
+    switch (event->event)
+    {
     case glow_eEvent_Open:
-      if (dyn->graph->command_cb) {
-	int sts;
-	pwr_tCmd argstr;
+      if (dyn->graph->command_cb)
+      {
+        int sts;
+        pwr_tCmd argstr;
 
-	dyn->graph->get_command(arguments, argstr, dyn);
-	sts = (dyn->graph->command_cb)(dyn->graph->parent_ctx, 0, script, argstr);
-	return sts;
+        dyn->graph->get_command(arguments, argstr, dyn);
+        sts = (dyn->graph->command_cb)(dyn->graph->parent_ctx, 0, script, argstr);
+        return sts;
       }
       break;
     default:;
     }
     break;
   case ge_eScriptTriggerEvent_Close:
-    switch (event->event) {
+    switch (event->event)
+    {
     case glow_eEvent_Close:
-      if (dyn->graph->command_cb) {
-	int sts;
-	pwr_tCmd argstr;
+      if (dyn->graph->command_cb)
+      {
+        int sts;
+        pwr_tCmd argstr;
 
-	dyn->graph->get_command(arguments, argstr, dyn);
-	sts = (dyn->graph->command_cb)(dyn->graph->parent_ctx, 0, script, argstr);
-	return sts;
+        dyn->graph->get_command(arguments, argstr, dyn);
+        sts = (dyn->graph->command_cb)(dyn->graph->parent_ctx, 0, script, argstr);
+        return sts;
       }
       break;
     default:;
@@ -19373,17 +20264,21 @@ int GeScript::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
-int GeScript::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GeScript::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
   if (trigger_event != ge_eScriptTriggerEvent_ClickMB1)
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Script.TriggerEvent\"," << trigger_event << ");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Script.TriggerEvent\"," << trigger_event
+       << ");" << '\n';
   if (!streq(arguments, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Script.Arguments\",\"" << arguments << "\");" << '\n';
-  if (!streq(script, "")) {
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Script.Arguments\",\"" << arguments
+       << "\");" << '\n';
+  if (!streq(script, ""))
+  {
     fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Script.Script\",\"";
-    for (char *s = script; *s; s++) {
+    for (char* s = script; *s; s++)
+    {
       if (*s == '\"')
-	fp << '\\';
+        fp << '\\';
       fp << *s;
     }
     fp << "\");" << '\n';
@@ -19391,10 +20286,10 @@ int GeScript::export_script(grow_tObject o, std::ofstream& fp, char *indentation
   return 1;
 }
 
-int GeScript::syntax_check(
-    grow_tObject object, int* error_cnt, int* warning_cnt)
+int GeScript::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
-  if (streq(script, "")) {
+  if (streq(script, ""))
+  {
     dyn->graph->syntax_msg('E', object, "Script.Script is missing");
     (*error_cnt)++;
   }
@@ -19402,17 +20297,16 @@ int GeScript::syntax_check(
 }
 
 GeConfirm::GeConfirm(GeDyn* e_dyn)
-    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_No,
-          ge_mActionType1_Confirm, ge_mActionType2_No, ge_eDynPrio_Confirm),
+    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_No, ge_mActionType1_Confirm, ge_mActionType2_No,
+                ge_eDynPrio_Confirm),
       on_set(0), on_reset(0)
 {
   strcpy(text, "");
 }
 
 GeConfirm::GeConfirm(const GeConfirm& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-          x.prio),
-      on_set(x.on_set), on_reset(x.on_reset)
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio), on_set(x.on_set),
+      on_reset(x.on_reset)
 {
   strcpy(text, x.text);
 }
@@ -19455,8 +20349,10 @@ void GeConfirm::open(std::ifstream& fp)
   int end_found = 0;
   char dummy[40];
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeConfirm: \"%d %s\"\n", type, dummy);
@@ -19464,7 +20360,8 @@ void GeConfirm::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_Confirm:
       break;
     case ge_eSave_Confirm_text:
@@ -19497,17 +20394,22 @@ int GeConfirm::action(grow_tObject object, glow_tEvent event)
   if (!(dyn->total_action_type1 & ge_mActionType1_Confirm))
     return 1;
 
-  switch (event->event) {
+  switch (event->event)
+  {
   case glow_eEvent_Key_Return:
-  case glow_eEvent_MB1Click: {
+  case glow_eEvent_MB1Click:
+  {
     if (dyn->total_action_type1 & ge_mActionType1_ValueInput)
       return 1;
 
     int skip = 0;
-    if (((on_set && !on_reset) || (on_reset && !on_set))
-        && dyn->total_action_type1 & ge_mActionType1_ToggleDig) {
-      for (GeDynElem* elem = dyn->elements; elem; elem = elem->next) {
-        if (elem->action_type1 == ge_mActionType1_ToggleDig) {
+    if (((on_set && !on_reset) || (on_reset && !on_set)) &&
+        dyn->total_action_type1 & ge_mActionType1_ToggleDig)
+    {
+      for (GeDynElem* elem = dyn->elements; elem; elem = elem->next)
+      {
+        if (elem->action_type1 == ge_mActionType1_ToggleDig)
+        {
           pwr_tAName parsed_name;
           int inverted;
           int attr_type, attr_size;
@@ -19515,15 +20417,18 @@ int GeConfirm::action(grow_tObject object, glow_tEvent event)
           pwr_tBoolean value;
           pwr_tStatus sts;
 
-          db = dyn->parse_attr_name(((GeToggleDig*)elem)->attribute,
-              parsed_name, &inverted, &attr_type, &attr_size);
+          db = dyn->parse_attr_name(((GeToggleDig*)elem)->attribute, parsed_name, &inverted, &attr_type,
+                                    &attr_size);
           if (parsed_name[0] == '&')
             dyn->graph->get_reference_name(parsed_name, parsed_name);
 
-          switch (db) {
-          case graph_eDatabase_Gdh: {
+          switch (db)
+          {
+          case graph_eDatabase_Gdh:
+          {
             sts = gdh_GetObjectInfo(parsed_name, &value, sizeof(value));
-            if (EVEN(sts)) {
+            if (EVEN(sts))
+            {
               printf("Confirm error: %s\n", parsed_name);
               break;
             }
@@ -19537,12 +20442,14 @@ int GeConfirm::action(grow_tObject object, glow_tEvent event)
         }
       }
     }
-    if (skip) {
+    if (skip)
+    {
       dyn->confirmed_action(object, event);
       return 1;
     }
 
-    if (dyn->graph->confirm_cb) {
+    if (dyn->graph->confirm_cb)
+    {
       if (grow_GetTranslate(dyn->graph->grow->ctx))
         Lng::translate(text, text);
       (dyn->graph->confirm_cb)(dyn->graph->parent_ctx, object, text);
@@ -19554,19 +20461,20 @@ int GeConfirm::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
-int GeConfirm::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GeConfirm::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
   if (!streq(text, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Confirm.Text\",\"" << text << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Confirm.Text\",\"" << text << "\");"
+       << '\n';
   if (on_set != 0)
     fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Confirm.OnSet\"," << on_set << ");" << '\n';
   if (on_reset != 0)
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Confirm.OnReset\"," << on_reset << ");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Confirm.OnReset\"," << on_reset << ");"
+       << '\n';
   return 1;
 }
 
-int GeConfirm::export_java(
-    grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeConfirm::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
   if (first)
     fp << "      ";
@@ -19576,10 +20484,10 @@ int GeConfirm::export_java(
   return 1;
 }
 
-int GeConfirm::syntax_check(
-    grow_tObject object, int* error_cnt, int* warning_cnt)
+int GeConfirm::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
-  if (streq(text, "")) {
+  if (streq(text, ""))
+  {
     dyn->graph->syntax_msg('E', object, "Confirm.Text is missing");
     (*error_cnt)++;
   }
@@ -19587,17 +20495,15 @@ int GeConfirm::syntax_check(
 }
 
 GeIncrAnalog::GeIncrAnalog(GeDyn* e_dyn)
-    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_No,
-          ge_mActionType1_IncrAnalog, ge_mActionType2_No,
-          ge_eDynPrio_IncrAnalog),
+    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_No, ge_mActionType1_IncrAnalog, ge_mActionType2_No,
+                ge_eDynPrio_IncrAnalog),
       increment(1), min_value(0), max_value(0)
 {
   strcpy(attribute, "");
 }
 
 GeIncrAnalog::GeIncrAnalog(const GeIncrAnalog& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-          x.prio),
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio),
       increment(x.increment), min_value(x.min_value), max_value(x.max_value)
 {
   strcpy(attribute, x.attribute);
@@ -19631,11 +20537,11 @@ void GeIncrAnalog::get_attributes(attr_sItem* attrinfo, int* item_count)
   *item_count = i;
 }
 
-void GeIncrAnalog::set_attribute(
-    grow_tObject object, const char* attr_name, int* cnt)
+void GeIncrAnalog::set_attribute(grow_tObject object, const char* attr_name, int* cnt)
 {
   (*cnt)--;
-  if (*cnt == 0) {
+  if (*cnt == 0)
+  {
     char msg[200];
 
     strncpy(attribute, attr_name, sizeof(attribute));
@@ -19666,8 +20572,10 @@ void GeIncrAnalog::open(std::ifstream& fp)
   int end_found = 0;
   char dummy[40];
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeIncrAnalog: \"%d %s\"\n", type, dummy);
@@ -19675,7 +20583,8 @@ void GeIncrAnalog::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_IncrAnalog:
       break;
     case ge_eSave_IncrAnalog_attribute:
@@ -19708,7 +20617,8 @@ int GeIncrAnalog::action(grow_tObject object, glow_tEvent event)
   if (!dyn->graph->is_authorized(dyn->access))
     return 1;
 
-  switch (event->event) {
+  switch (event->event)
+  {
   case glow_eEvent_MB1Down:
     grow_SetClickSensitivity(dyn->graph->grow->ctx, glow_mSensitivity_MB1Click);
     grow_SetObjectColorInverse(object, 1);
@@ -19717,48 +20627,53 @@ int GeIncrAnalog::action(grow_tObject object, glow_tEvent event)
     grow_SetObjectColorInverse(object, 0);
     break;
   case glow_eEvent_Key_Return:
-  case glow_eEvent_MB1Click: {
+  case glow_eEvent_MB1Click:
+  {
     int sts;
     pwr_tAName parsed_name;
     int inverted;
     int attr_type, attr_size;
 
-    dyn->parse_attr_name(
-        attribute, parsed_name, &inverted, &attr_type, &attr_size);
+    dyn->parse_attr_name(attribute, parsed_name, &inverted, &attr_type, &attr_size);
     if (parsed_name[0] == '&')
       dyn->graph->get_reference_name(parsed_name, parsed_name);
 
-    switch (attr_type) {
-    case pwr_eType_Int32: {
+    switch (attr_type)
+    {
+    case pwr_eType_Int32:
+    {
       pwr_tInt32 value;
       sts = gdh_GetObjectInfo(parsed_name, &value, sizeof(value));
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         printf("IncrAnalog error: %s\n", attribute);
         break;
       }
 
       value += int(increment > 0 ? increment + 0.5 : increment - 0.5);
-      if (!(feq(min_value, 0.0) && feq(max_value, 0.0))) {
-        value = MAX(
-            value, int(min_value > 0 ? min_value + 0.5 : min_value - 0.5));
-        value = MIN(
-            value, int(max_value > 0 ? max_value + 0.5 : max_value - 0.5));
+      if (!(feq(min_value, 0.0) && feq(max_value, 0.0)))
+      {
+        value = MAX(value, int(min_value > 0 ? min_value + 0.5 : min_value - 0.5));
+        value = MIN(value, int(max_value > 0 ? max_value + 0.5 : max_value - 0.5));
       }
       sts = gdh_SetObjectInfo(parsed_name, &value, sizeof(value));
       if (EVEN(sts))
         printf("IncrAnalog error: %s\n", attribute);
       break;
     }
-    default: {
+    default:
+    {
       pwr_tFloat32 value;
       sts = gdh_GetObjectInfo(parsed_name, &value, sizeof(value));
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         printf("IncrAnalog error: %s\n", attribute);
         break;
       }
 
       value += increment;
-      if (!(feq(min_value, 0.0) && feq(max_value, 0.0))) {
+      if (!(feq(min_value, 0.0) && feq(max_value, 0.0)))
+      {
         value = MAX(value, min_value);
         value = MIN(value, max_value);
       }
@@ -19774,52 +20689,52 @@ int GeIncrAnalog::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
-int GeIncrAnalog::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GeIncrAnalog::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
   if (!streq(attribute, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "IncrAnalog.Attribute\",\"" << attribute << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "IncrAnalog.Attribute\",\"" << attribute
+       << "\");" << '\n';
   if (increment != 0)
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "IncrAnalog.Increment\"," << dtostr(increment) << ");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "IncrAnalog.Increment\","
+       << dtostr(increment) << ");" << '\n';
   if (min_value != 0)
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "IncrAnalog.MinValue\"," << dtostr(min_value) << ");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "IncrAnalog.MinValue\"," << dtostr(min_value)
+       << ");" << '\n';
   if (max_value != 0)
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "IncrAnalog.MaxValue\"," << dtostr(max_value) << ");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "IncrAnalog.MaxValue\"," << dtostr(max_value)
+       << ");" << '\n';
   return 1;
 }
 
-int GeIncrAnalog::export_java(
-    grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeIncrAnalog::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
   if (first)
     fp << "      ";
   else
     fp << "      ,";
-  fp << "new GeDynIncrAnalog(" << var_name << ".dd, \"" << attribute << "\","
-     << increment << "," << min_value << "," << max_value << ")\n";
+  fp << "new GeDynIncrAnalog(" << var_name << ".dd, \"" << attribute << "\"," << increment << "," << min_value
+     << "," << max_value << ")\n";
   return 1;
 }
 
-int GeIncrAnalog::syntax_check(
-    grow_tObject object, int* error_cnt, int* warning_cnt)
+int GeIncrAnalog::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
-  int types[] = { pwr_eType_Int32, pwr_eType_UInt32, pwr_eType_Float32, 0 };
-  graph_eDatabase databases[] = { graph_eDatabase_Gdh, graph_eDatabase__ };
-  dyn->syntax_check_attribute(object, "IncrAnalog.Attribute", attribute, 0,
-      types, databases, error_cnt, warning_cnt);
+  int types[] = {pwr_eType_Int32, pwr_eType_UInt32, pwr_eType_Float32, 0};
+  graph_eDatabase databases[] = {graph_eDatabase_Gdh, graph_eDatabase__};
+  dyn->syntax_check_attribute(object, "IncrAnalog.Attribute", attribute, 0, types, databases, error_cnt,
+                              warning_cnt);
   return 1;
 }
 
 GeRadioButton::GeRadioButton(GeDyn* e_dyn)
-    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_No,
-          ge_mActionType1_RadioButton, ge_mActionType2_No,
-          ge_eDynPrio_RadioButton)
+    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_No, ge_mActionType1_RadioButton, ge_mActionType2_No,
+                ge_eDynPrio_RadioButton)
 {
   strcpy(attribute, "");
 }
 
 GeRadioButton::GeRadioButton(const GeRadioButton& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-          x.prio)
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio)
 {
   strcpy(attribute, x.attribute);
 }
@@ -19837,11 +20752,11 @@ void GeRadioButton::get_attributes(attr_sItem* attrinfo, int* item_count)
   *item_count = i;
 }
 
-void GeRadioButton::set_attribute(
-    grow_tObject object, const char* attr_name, int* cnt)
+void GeRadioButton::set_attribute(grow_tObject object, const char* attr_name, int* cnt)
 {
   (*cnt)--;
-  if (*cnt == 0) {
+  if (*cnt == 0)
+  {
     char msg[200];
 
     strncpy(attribute, attr_name, sizeof(attribute));
@@ -19851,8 +20766,7 @@ void GeRadioButton::set_attribute(
   }
 }
 
-void GeRadioButton::replace_attribute(
-    char* from, char* to, int* cnt, int strict)
+void GeRadioButton::replace_attribute(char* from, char* to, int* cnt, int strict)
 {
   GeDyn::replace_attribute(attribute, sizeof(attribute), from, to, cnt, strict);
 }
@@ -19870,8 +20784,10 @@ void GeRadioButton::open(std::ifstream& fp)
   int end_found = 0;
   char dummy[40];
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeRadioButton: \"%d %s\"\n", type, dummy);
@@ -19879,7 +20795,8 @@ void GeRadioButton::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_RadioButton:
       break;
     case ge_eSave_RadioButton_attribute:
@@ -19898,8 +20815,7 @@ void GeRadioButton::open(std::ifstream& fp)
   }
 }
 
-int GeRadioButton::connect(
-    grow_tObject object, glow_sTraceData* trace_data, bool now)
+int GeRadioButton::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
 {
   int attr_type, attr_size;
   pwr_tAName parsed_name;
@@ -19907,15 +20823,14 @@ int GeRadioButton::connect(
 
   size = 4;
   p = 0;
-  db = dyn->parse_attr_name(
-      attribute, parsed_name, &inverted, &attr_type, &attr_size);
+  db = dyn->parse_attr_name(attribute, parsed_name, &inverted, &attr_type, &attr_size);
   if (streq(parsed_name, ""))
     return 1;
 
-  switch (db) {
+  switch (db)
+  {
   case graph_eDatabase_Gdh:
-    sts = dyn->graph->ref_object_info(
-        dyn->cycle, parsed_name, (void**)&p, &subid, size, object, now);
+    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&p, &subid, size, object, now);
     if (EVEN(sts))
       return sts;
     break;
@@ -19945,17 +20860,23 @@ int GeRadioButton::scan(grow_tObject object)
   if (!p)
     return 1;
 
-  if (!first_scan) {
-    if (old_value == *p) {
+  if (!first_scan)
+  {
+    if (old_value == *p)
+    {
       // No change since last time
       return 1;
     }
-  } else
+  }
+  else
     first_scan = false;
 
-  if ((!inverted && *p) || (inverted && !*p)) {
+  if ((!inverted && *p) || (inverted && !*p))
+  {
     grow_SetObjectLastNodeClass(object);
-  } else {
+  }
+  else
+  {
     grow_SetObjectFirstNodeClass(object);
   }
   old_value = *p;
@@ -19967,7 +20888,8 @@ int GeRadioButton::action(grow_tObject object, glow_tEvent event)
   if (!dyn->graph->is_authorized(dyn->access))
     return 1;
 
-  switch (event->event) {
+  switch (event->event)
+  {
   case glow_eEvent_MB1Down:
     grow_SetClickSensitivity(dyn->graph->grow->ctx, glow_mSensitivity_MB1Click);
     grow_SetObjectColorInverse(object, 1);
@@ -19975,7 +20897,8 @@ int GeRadioButton::action(grow_tObject object, glow_tEvent event)
   case glow_eEvent_MB1Up:
     grow_SetObjectColorInverse(object, 0);
     break;
-  case glow_eEvent_MB1Click: {
+  case glow_eEvent_MB1Click:
+  {
     grow_tObject group;
     grow_tObject *objectlist, *object_p;
     int object_cnt;
@@ -19994,29 +20917,33 @@ int GeRadioButton::action(grow_tObject object, glow_tEvent event)
 
     grow_GetGroupObjectList(group, &objectlist, &object_cnt);
     object_p = objectlist;
-    for (int i = 0; i < object_cnt; i++) {
-      if (*object_p != event->object.object
-          && grow_GetObjectType(*object_p) == glow_eObjectType_GrowNode) {
+    for (int i = 0; i < object_cnt; i++)
+    {
+      if (*object_p != event->object.object && grow_GetObjectType(*object_p) == glow_eObjectType_GrowNode)
+      {
         value = 0;
 
         GeDyn* gm_dyn;
 
         grow_GetUserData(*object_p, (void**)&gm_dyn);
-        if (gm_dyn->total_action_type1 & ge_mActionType1_RadioButton) {
-          for (GeDynElem* elem = gm_dyn->elements; elem; elem = elem->next) {
-            if (elem->action_type1 == ge_mActionType1_RadioButton) {
-              dyn->parse_attr_name(((GeRadioButton*)elem)->attribute,
-                  parsed_name, &inverted, &attr_type, &attr_size);
+        if (gm_dyn->total_action_type1 & ge_mActionType1_RadioButton)
+        {
+          for (GeDynElem* elem = gm_dyn->elements; elem; elem = elem->next)
+          {
+            if (elem->action_type1 == ge_mActionType1_RadioButton)
+            {
+              dyn->parse_attr_name(((GeRadioButton*)elem)->attribute, parsed_name, &inverted, &attr_type,
+                                   &attr_size);
               if (parsed_name[0] == '&')
                 dyn->graph->get_reference_name(parsed_name, parsed_name);
 
-              switch (db) {
+              switch (db)
+              {
               case graph_eDatabase_Gdh:
                 sts = gdh_SetObjectInfo(parsed_name, &value, sizeof(value));
                 break;
               case graph_eDatabase_Ccm:
-                sts = dyn->graph->ccm_set_variable(
-                    parsed_name, attr_type, &value);
+                sts = dyn->graph->ccm_set_variable(parsed_name, attr_type, &value);
                 break;
               default:;
               }
@@ -20029,9 +20956,9 @@ int GeRadioButton::action(grow_tObject object, glow_tEvent event)
 
     value = 1;
 
-    dyn->parse_attr_name(
-        attribute, parsed_name, &inverted, &attr_type, &attr_size);
-    switch (db) {
+    dyn->parse_attr_name(attribute, parsed_name, &inverted, &attr_type, &attr_size);
+    switch (db)
+    {
     case graph_eDatabase_Gdh:
       sts = gdh_SetObjectInfo(parsed_name, &value, sizeof(value));
       break;
@@ -20049,39 +20976,37 @@ int GeRadioButton::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
-int GeRadioButton::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GeRadioButton::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
   if (!streq(attribute, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "RadioButton.Attribute\",\"" << attribute << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "RadioButton.Attribute\",\"" << attribute
+       << "\");" << '\n';
   return 1;
 }
 
-int GeRadioButton::export_java(
-    grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeRadioButton::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
   if (first)
     fp << "      ";
   else
     fp << "      ,";
-  fp << "new GeDynRadioButton(" << var_name << ".dd, \"" << attribute << "\")"
-     << '\n';
+  fp << "new GeDynRadioButton(" << var_name << ".dd, \"" << attribute << "\")" << '\n';
   return 1;
 }
 
-int GeRadioButton::syntax_check(
-    grow_tObject object, int* error_cnt, int* warning_cnt)
+int GeRadioButton::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
   grow_tObject group;
   int sts;
 
-  int types[] = { pwr_eType_Boolean, 0 };
-  graph_eDatabase databases[]
-      = { graph_eDatabase_Local, graph_eDatabase_Gdh, graph_eDatabase__ };
-  dyn->syntax_check_attribute(object, "RadioButton.Attribute", attribute, 0,
-      types, databases, error_cnt, warning_cnt);
+  int types[] = {pwr_eType_Boolean, 0};
+  graph_eDatabase databases[] = {graph_eDatabase_Local, graph_eDatabase_Gdh, graph_eDatabase__};
+  dyn->syntax_check_attribute(object, "RadioButton.Attribute", attribute, 0, types, databases, error_cnt,
+                              warning_cnt);
 
   sts = grow_GetObjectGroup(dyn->graph->grow->ctx, object, &group);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     dyn->graph->syntax_msg('E', object, "RadioButton is not member of a group");
     (*error_cnt)++;
   }
@@ -20090,15 +21015,14 @@ int GeRadioButton::syntax_check(
 }
 
 GeTipText::GeTipText(GeDyn* e_dyn)
-    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_No,
-          ge_mActionType1_TipText, ge_mActionType2_No, ge_eDynPrio_TipText)
+    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_No, ge_mActionType1_TipText, ge_mActionType2_No,
+                ge_eDynPrio_TipText)
 {
   strcpy(text, "");
 }
 
 GeTipText::GeTipText(const GeTipText& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-          x.prio)
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio)
 {
   strcpy(text, x.text);
 }
@@ -20127,8 +21051,10 @@ void GeTipText::open(std::ifstream& fp)
   int end_found = 0;
   char dummy[40];
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeTipText: \"%d %s\"\n", type, dummy);
@@ -20136,7 +21062,8 @@ void GeTipText::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_TipText:
       break;
     case ge_eSave_TipText_text:
@@ -20159,9 +21086,12 @@ void GeTipText::open(std::ifstream& fp)
 
 int GeTipText::action(grow_tObject object, glow_tEvent event)
 {
-  switch (event->event) {
-  case glow_eEvent_TipText: {
-    if (streq(text, "")) {
+  switch (event->event)
+  {
+  case glow_eEvent_TipText:
+  {
+    if (streq(text, ""))
+    {
       pwr_tAName attr;
       char value[80];
       pwr_tAName parsed_name;
@@ -20171,18 +21101,25 @@ int GeTipText::action(grow_tObject object, glow_tEvent event)
       int found = 0;
 
       // Fetch text from Description for popup menu object
-      if (dyn->total_action_type1 & ge_mActionType1_PopupMenu) {
-        for (GeDynElem* elem = dyn->elements; elem; elem = elem->next) {
-          if (elem->action_type1 == ge_mActionType1_PopupMenu) {
+      if (dyn->total_action_type1 & ge_mActionType1_PopupMenu)
+      {
+        for (GeDynElem* elem = dyn->elements; elem; elem = elem->next)
+        {
+          if (elem->action_type1 == ge_mActionType1_PopupMenu)
+          {
             strncpy(attr, ((GePopupMenu*)elem)->ref_object, sizeof(attr));
             strncat(attr, ".Description", sizeof(attr) - strlen(attr) - 1);
             found = 1;
             break;
           }
         }
-      } else if (dyn->total_dyn_type1 & ge_mDynType1_HostObject) {
-        for (GeDynElem* elem = dyn->elements; elem; elem = elem->next) {
-          if (elem->dyn_type1 == ge_mDynType1_HostObject) {
+      }
+      else if (dyn->total_dyn_type1 & ge_mDynType1_HostObject)
+      {
+        for (GeDynElem* elem = dyn->elements; elem; elem = elem->next)
+        {
+          if (elem->dyn_type1 == ge_mDynType1_HostObject)
+          {
             strncpy(attr, ((GeHostObject*)elem)->hostobject, sizeof(attr));
             strncat(attr, ".Description", sizeof(attr) - strlen(attr) - 1);
             found = 1;
@@ -20190,34 +21127,37 @@ int GeTipText::action(grow_tObject object, glow_tEvent event)
           }
         }
       }
-      if (found) {
-        dyn->parse_attr_name(
-            attr, parsed_name, &inverted, &attr_type, &attr_size);
+      if (found)
+      {
+        dyn->parse_attr_name(attr, parsed_name, &inverted, &attr_type, &attr_size);
         sts = gdh_GetObjectInfo(parsed_name, value, sizeof(value));
         if (EVEN(sts))
           printf("ToolTip error: %s\n", attr);
 
-        grow_SetTipText(dyn->graph->grow->ctx, event->object.object, value,
-            event->any.x_pixel, event->any.y_pixel);
+        grow_SetTipText(dyn->graph->grow->ctx, event->object.object, value, event->any.x_pixel,
+                        event->any.y_pixel);
       }
-    } else if (text[0] == '&') {
+    }
+    else if (text[0] == '&')
+    {
       char value[80];
       pwr_tAName parsed_name;
       int inverted;
       int attr_type, attr_size;
       int sts;
 
-      dyn->parse_attr_name(
-          &text[1], parsed_name, &inverted, &attr_type, &attr_size);
+      dyn->parse_attr_name(&text[1], parsed_name, &inverted, &attr_type, &attr_size);
       sts = gdh_GetObjectInfo(parsed_name, value, sizeof(value));
       if (EVEN(sts))
         printf("ToolTip error: %s\n", text);
 
-      grow_SetTipText(dyn->graph->grow->ctx, event->object.object, value,
-          event->any.x_pixel, event->any.y_pixel);
-    } else {
-      grow_SetTipText(dyn->graph->grow->ctx, event->object.object, text,
-          event->any.x_pixel, event->any.y_pixel);
+      grow_SetTipText(dyn->graph->grow->ctx, event->object.object, value, event->any.x_pixel,
+                      event->any.y_pixel);
+    }
+    else
+    {
+      grow_SetTipText(dyn->graph->grow->ctx, event->object.object, text, event->any.x_pixel,
+                      event->any.y_pixel);
     }
     break;
   }
@@ -20226,32 +21166,31 @@ int GeTipText::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
-int GeTipText::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GeTipText::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
   if (!streq(text, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "ToolTip.Text\",\"" << text << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "ToolTip.Text\",\"" << text << "\");"
+       << '\n';
   return 1;
 }
 
-int GeTipText::export_java(
-    grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeTipText::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
   if (first)
     fp << "      ";
   else
     fp << "      ,";
   if (grow_GetTranslate(dyn->graph->grow->ctx))
-    fp << "new GeDynTipText(" << var_name << ".dd, JopLang.transl(\"" << text
-       << "\"))\n";
+    fp << "new GeDynTipText(" << var_name << ".dd, JopLang.transl(\"" << text << "\"))\n";
   else
     fp << "new GeDynTipText(" << var_name << ".dd, \"" << text << "\")\n";
   return 1;
 }
 
-int GeTipText::syntax_check(
-    grow_tObject object, int* error_cnt, int* warning_cnt)
+int GeTipText::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
-  if (streq(text, "")) {
+  if (streq(text, ""))
+  {
     dyn->graph->syntax_msg('E', object, "ToolTip.Text is missing");
     (*error_cnt)++;
   }
@@ -20259,16 +21198,15 @@ int GeTipText::syntax_check(
 }
 
 GeHelp::GeHelp(GeDyn* e_dyn)
-    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_No, ge_mActionType1_Help,
-          ge_mActionType2_No, ge_eDynPrio_Help)
+    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_No, ge_mActionType1_Help, ge_mActionType2_No,
+                ge_eDynPrio_Help)
 {
   strcpy(topic, "");
   strcpy(bookmark, "");
 }
 
 GeHelp::GeHelp(const GeHelp& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-          x.prio)
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio)
 {
   strcpy(topic, x.topic);
   strcpy(bookmark, x.bookmark);
@@ -20294,8 +21232,7 @@ void GeHelp::get_attributes(attr_sItem* attrinfo, int* item_count)
 
 int GeHelp::get_transtab(char** tt)
 {
-  static char transtab[][32]
-      = { "SubGraph", "SubGraph", "A1", "Text", "Dynamic", "", "" };
+  static char transtab[][32] = {"SubGraph", "SubGraph", "A1", "Text", "Dynamic", "", ""};
 
   *tt = (char*)transtab;
   return 0;
@@ -20315,8 +21252,10 @@ void GeHelp::open(std::ifstream& fp)
   int end_found = 0;
   char dummy[40];
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeHelp: \"%d %s\"\n", type, dummy);
@@ -20324,7 +21263,8 @@ void GeHelp::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_Help:
       break;
     case ge_eSave_Help_topic:
@@ -20352,7 +21292,8 @@ int GeHelp::action(grow_tObject object, glow_tEvent event)
   if (!dyn->graph->is_authorized(dyn->access))
     return 1;
 
-  switch (event->event) {
+  switch (event->event)
+  {
   case glow_eEvent_MB1Down:
     grow_SetClickSensitivity(dyn->graph->grow->ctx, glow_mSensitivity_MB1Click);
     grow_SetObjectColorInverse(object, 1);
@@ -20365,7 +21306,8 @@ int GeHelp::action(grow_tObject object, glow_tEvent event)
     if (dyn->total_action_type1 & ge_mActionType1_Confirm)
       break;
 
-    if (dyn->graph->command_cb) {
+    if (dyn->graph->command_cb)
+    {
       char command[400];
       char cmd[400];
 
@@ -20382,17 +21324,17 @@ int GeHelp::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
-int GeHelp::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GeHelp::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
   if (!streq(topic, ""))
     fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Help.Topic\",\"" << topic << "\");" << '\n';
   if (!streq(bookmark, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Help.BookMark\",\"" << bookmark << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Help.BookMark\",\"" << bookmark << "\");"
+       << '\n';
   return 1;
 }
 
-int GeHelp::export_java(
-    grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeHelp::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
   char command[200];
 
@@ -20405,14 +21347,14 @@ int GeHelp::export_java(
     fp << "      ";
   else
     fp << "      ,";
-  fp << "new GeDynCommand(" << var_name << ".dd, \"" << GeDyn::cmd_cnv(command)
-     << "\")\n";
+  fp << "new GeDynCommand(" << var_name << ".dd, \"" << GeDyn::cmd_cnv(command) << "\")\n";
   return 1;
 }
 
 int GeHelp::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
-  if (streq(topic, "")) {
+  if (streq(topic, ""))
+  {
     dyn->graph->syntax_msg('E', object, "Help.Topic is missing");
     (*error_cnt)++;
   }
@@ -20420,15 +21362,14 @@ int GeHelp::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 }
 
 GeOpenGraph::GeOpenGraph(GeDyn* e_dyn)
-    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_No,
-          ge_mActionType1_OpenGraph, ge_mActionType2_No, ge_eDynPrio_OpenGraph)
+    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_No, ge_mActionType1_OpenGraph, ge_mActionType2_No,
+                ge_eDynPrio_OpenGraph)
 {
   strcpy(graph_object, "");
 }
 
 GeOpenGraph::GeOpenGraph(const GeOpenGraph& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-          x.prio)
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio)
 {
   strcpy(graph_object, x.graph_object);
 }
@@ -20448,18 +21389,17 @@ void GeOpenGraph::get_attributes(attr_sItem* attrinfo, int* item_count)
 
 int GeOpenGraph::get_transtab(char** tt)
 {
-  static char transtab[][32]
-      = { "SubGraph", "SubGraph", "A1", "Text", "Dynamic", "", "" };
+  static char transtab[][32] = {"SubGraph", "SubGraph", "A1", "Text", "Dynamic", "", ""};
 
   *tt = (char*)transtab;
   return 0;
 }
 
-void GeOpenGraph::set_attribute(
-    grow_tObject object, const char* attr_name, int* cnt)
+void GeOpenGraph::set_attribute(grow_tObject object, const char* attr_name, int* cnt)
 {
   (*cnt)--;
-  if (*cnt == 0) {
+  if (*cnt == 0)
+  {
     char msg[200];
     char* s;
 
@@ -20474,8 +21414,7 @@ void GeOpenGraph::set_attribute(
 
 void GeOpenGraph::replace_attribute(char* from, char* to, int* cnt, int strict)
 {
-  GeDyn::replace_attribute(
-      graph_object, sizeof(graph_object), from, to, cnt, strict);
+  GeDyn::replace_attribute(graph_object, sizeof(graph_object), from, to, cnt, strict);
 }
 
 void GeOpenGraph::save(std::ofstream& fp)
@@ -20491,8 +21430,10 @@ void GeOpenGraph::open(std::ifstream& fp)
   int end_found = 0;
   char dummy[40];
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeOpenGraph: \"%d %s\"\n", type, dummy);
@@ -20500,7 +21441,8 @@ void GeOpenGraph::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_OpenGraph:
       break;
     case ge_eSave_OpenGraph_graph_object:
@@ -20524,7 +21466,8 @@ int GeOpenGraph::action(grow_tObject object, glow_tEvent event)
   if (!dyn->graph->is_authorized(dyn->access))
     return 1;
 
-  switch (event->event) {
+  switch (event->event)
+  {
   case glow_eEvent_MB1Down:
     grow_SetClickSensitivity(dyn->graph->grow->ctx, glow_mSensitivity_MB1Click);
     grow_SetObjectColorInverse(object, 1);
@@ -20537,33 +21480,41 @@ int GeOpenGraph::action(grow_tObject object, glow_tEvent event)
     if (dyn->total_action_type1 & ge_mActionType1_Confirm)
       break;
 
-    if (dyn->graph->command_cb) {
+    if (dyn->graph->command_cb)
+    {
       char command[430];
       char cmd[400] = "";
 
       if (!streq(graph_object, ""))
         sprintf(command, "open graph/object=%s", graph_object);
-      else {
+      else
+      {
         // Open classgraph for popup menu object
-        if (dyn->total_action_type1 & ge_mActionType1_PopupMenu) {
-          for (GeDynElem* elem = dyn->elements; elem; elem = elem->next) {
-            if (elem->action_type1 == ge_mActionType1_PopupMenu) {
-              sprintf(command, "open graph/class/instance=%s",
-                  ((GePopupMenu*)elem)->ref_object);
+        if (dyn->total_action_type1 & ge_mActionType1_PopupMenu)
+        {
+          for (GeDynElem* elem = dyn->elements; elem; elem = elem->next)
+          {
+            if (elem->action_type1 == ge_mActionType1_PopupMenu)
+            {
+              sprintf(command, "open graph/class/instance=%s", ((GePopupMenu*)elem)->ref_object);
               break;
             }
           }
-        } else if (dyn->total_dyn_type1 & ge_mDynType1_HostObject) {
-          for (GeDynElem* elem = dyn->elements; elem; elem = elem->next) {
-            if (elem->dyn_type1 == ge_mDynType1_HostObject) {
-              sprintf(command, "open graph/class/instance=%s",
-                  ((GeHostObject*)elem)->hostobject);
+        }
+        else if (dyn->total_dyn_type1 & ge_mDynType1_HostObject)
+        {
+          for (GeDynElem* elem = dyn->elements; elem; elem = elem->next)
+          {
+            if (elem->dyn_type1 == ge_mDynType1_HostObject)
+            {
+              sprintf(command, "open graph/class/instance=%s", ((GeHostObject*)elem)->hostobject);
               break;
             }
           }
         }
       }
-      if (!streq(command, "")) {
+      if (!streq(command, ""))
+      {
         dyn->graph->get_command(command, cmd, dyn);
         (dyn->graph->command_cb)(dyn->graph->parent_ctx, cmd, 0, 0);
       }
@@ -20574,15 +21525,15 @@ int GeOpenGraph::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
-int GeOpenGraph::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GeOpenGraph::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
   if (!streq(graph_object, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "OpenGraph.GraphObject\",\"" << graph_object << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "OpenGraph.GraphObject\",\"" << graph_object
+       << "\");" << '\n';
   return 1;
 }
 
-int GeOpenGraph::export_java(
-    grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeOpenGraph::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
   char command[200];
 
@@ -20592,42 +21543,48 @@ int GeOpenGraph::export_java(
     fp << "      ";
   else
     fp << "      ,";
-  fp << "new GeDynCommand(" << var_name << ".dd, \"" << GeDyn::cmd_cnv(command)
-     << "\")\n";
+  fp << "new GeDynCommand(" << var_name << ".dd, \"" << GeDyn::cmd_cnv(command) << "\")\n";
   return 1;
 }
 
-int GeOpenGraph::syntax_check(
-    grow_tObject object, int* error_cnt, int* warning_cnt)
+int GeOpenGraph::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
   int sts;
   pwr_eType a_type;
 
-  if (!streq(graph_object, "")) {
+  if (!streq(graph_object, ""))
+  {
     sts = dyn->graph->check_ldh_object(graph_object, &a_type);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       char msg[300];
       sprintf(msg, "OpenGraph.GraphObject \"%s\" not found", graph_object);
       dyn->graph->syntax_msg('W', object, msg);
       (*warning_cnt)++;
-    } else {
-      if (a_type != pwr_cClass_XttGraph) {
-        dyn->graph->syntax_msg(
-            'E', object, "OpenGraph.GraphObject is of wrong class");
+    }
+    else
+    {
+      if (a_type != pwr_cClass_XttGraph)
+      {
+        dyn->graph->syntax_msg('E', object, "OpenGraph.GraphObject is of wrong class");
         (*error_cnt)++;
       }
     }
-  } else {
+  }
+  else
+  {
     int found = 0;
     // For HostObject and PopupMenu object is fetched from these dynamics
-    for (GeDynElem* elem = dyn->elements; elem; elem = elem->next) {
-      if (elem->dyn_type1 == ge_mDynType1_HostObject
-          || elem->action_type1 == ge_mActionType1_PopupMenu) {
+    for (GeDynElem* elem = dyn->elements; elem; elem = elem->next)
+    {
+      if (elem->dyn_type1 == ge_mDynType1_HostObject || elem->action_type1 == ge_mActionType1_PopupMenu)
+      {
         found = 1;
         break;
       }
     }
-    if (!found) {
+    if (!found)
+    {
       dyn->graph->syntax_msg('W', object, "OpenGraph.GraphObject is missing");
       (*warning_cnt)++;
     }
@@ -20636,15 +21593,14 @@ int GeOpenGraph::syntax_check(
 }
 
 GeOpenURL::GeOpenURL(GeDyn* e_dyn)
-    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_No,
-          ge_mActionType1_OpenURL, ge_mActionType2_No, ge_eDynPrio_OpenURL)
+    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_No, ge_mActionType1_OpenURL, ge_mActionType2_No,
+                ge_eDynPrio_OpenURL)
 {
   strcpy(url, "");
 }
 
 GeOpenURL::GeOpenURL(const GeOpenURL& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-          x.prio)
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio)
 {
   strcpy(url, x.url);
 }
@@ -20664,8 +21620,7 @@ void GeOpenURL::get_attributes(attr_sItem* attrinfo, int* item_count)
 
 int GeOpenURL::get_transtab(char** tt)
 {
-  static char transtab[][32]
-      = { "SubGraph", "SubGraph", "A1", "Text", "Dynamic", "", "" };
+  static char transtab[][32] = {"SubGraph", "SubGraph", "A1", "Text", "Dynamic", "", ""};
 
   *tt = (char*)transtab;
   return 0;
@@ -20684,8 +21639,10 @@ void GeOpenURL::open(std::ifstream& fp)
   int end_found = 0;
   char dummy[40];
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeOpenURL: \"%d %s\"\n", type, dummy);
@@ -20693,7 +21650,8 @@ void GeOpenURL::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_OpenURL:
       break;
     case ge_eSave_OpenURL_url:
@@ -20717,7 +21675,8 @@ int GeOpenURL::action(grow_tObject object, glow_tEvent event)
   if (!dyn->graph->is_authorized(dyn->access))
     return 1;
 
-  switch (event->event) {
+  switch (event->event)
+  {
   case glow_eEvent_MB1Down:
     grow_SetClickSensitivity(dyn->graph->grow->ctx, glow_mSensitivity_MB1Click);
     grow_SetObjectColorInverse(object, 1);
@@ -20730,7 +21689,8 @@ int GeOpenURL::action(grow_tObject object, glow_tEvent event)
     if (dyn->total_action_type1 & ge_mActionType1_Confirm)
       break;
 
-    if (dyn->graph->command_cb) {
+    if (dyn->graph->command_cb)
+    {
       char command[400];
       char cmd[400];
 
@@ -20744,15 +21704,14 @@ int GeOpenURL::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
-int GeOpenURL::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GeOpenURL::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
   if (!streq(url, ""))
     fp << indentation << "SetObjectAttribute(id,\"" << prefix << "OpenURL.URL\",\"" << url << "\");" << '\n';
   return 1;
 }
 
-int GeOpenURL::export_java(
-    grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeOpenURL::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
   char command[220];
   sprintf(command, "open url \"%s\"", url);
@@ -20761,15 +21720,14 @@ int GeOpenURL::export_java(
     fp << "      ";
   else
     fp << "      ,";
-  fp << "new GeDynCommand(" << var_name << ".dd, \"" << GeDyn::cmd_cnv(command)
-     << "\")\n";
+  fp << "new GeDynCommand(" << var_name << ".dd, \"" << GeDyn::cmd_cnv(command) << "\")\n";
   return 1;
 }
 
-int GeOpenURL::syntax_check(
-    grow_tObject object, int* error_cnt, int* warning_cnt)
+int GeOpenURL::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
-  if (streq(url, "")) {
+  if (streq(url, ""))
+  {
     dyn->graph->syntax_msg('W', object, "OpenURL.URL is missing");
     (*warning_cnt)++;
   }
@@ -20777,9 +21735,8 @@ int GeOpenURL::syntax_check(
 }
 
 GeInputFocus::GeInputFocus(GeDyn* e_dyn)
-    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_No,
-          ge_mActionType1_InputFocus, ge_mActionType2_No,
-          ge_eDynPrio_InputFocus),
+    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_No, ge_mActionType1_InputFocus, ge_mActionType2_No,
+                ge_eDynPrio_InputFocus),
       initial_focus(0), prev_tab(0)
 {
   strcpy(next_horizontal, "");
@@ -20788,8 +21745,7 @@ GeInputFocus::GeInputFocus(GeDyn* e_dyn)
 }
 
 GeInputFocus::GeInputFocus(const GeInputFocus& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-          x.prio),
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio),
       initial_focus(x.initial_focus), prev_tab(0)
 {
   strcpy(next_horizontal, x.next_horizontal);
@@ -20827,12 +21783,9 @@ void GeInputFocus::get_attributes(attr_sItem* attrinfo, int* item_count)
 void GeInputFocus::save(std::ofstream& fp)
 {
   fp << int(ge_eSave_InputFocus) << '\n';
-  fp << int(ge_eSave_InputFocus_initial_focus) << FSPACE << initial_focus
-     << '\n';
-  fp << int(ge_eSave_InputFocus_next_horizontal) << FSPACE << next_horizontal
-     << '\n';
-  fp << int(ge_eSave_InputFocus_next_vertical) << FSPACE << next_vertical
-     << '\n';
+  fp << int(ge_eSave_InputFocus_initial_focus) << FSPACE << initial_focus << '\n';
+  fp << int(ge_eSave_InputFocus_next_horizontal) << FSPACE << next_horizontal << '\n';
+  fp << int(ge_eSave_InputFocus_next_vertical) << FSPACE << next_vertical << '\n';
   fp << int(ge_eSave_InputFocus_next_tab) << FSPACE << next_tab << '\n';
   fp << int(ge_eSave_End) << '\n';
 }
@@ -20843,8 +21796,10 @@ void GeInputFocus::open(std::ifstream& fp)
   int end_found = 0;
   char dummy[40];
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeInputFocus: \"%d %s\"\n", type, dummy);
@@ -20852,7 +21807,8 @@ void GeInputFocus::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_InputFocus:
       break;
     case ge_eSave_InputFocus_initial_focus:
@@ -20890,46 +21846,54 @@ int GeInputFocus::action(grow_tObject object, glow_tEvent event)
   GeDyn* next_dyn;
   GeInputFocus* next_inputfocus;
 
-  switch (event->event) {
+  switch (event->event)
+  {
   case glow_eEvent_MB1Click:
     grow_SetObjectInputFocus(object, 1, event->event);
     dyn->graph->set_inputfocus(1);
     break;
   case glow_eEvent_InputFocusInit:
-    if (initial_focus & ge_mInputFocus_InitialFocus) {
+    if (initial_focus & ge_mInputFocus_InitialFocus)
+    {
       grow_SetObjectInputFocus(object, 1, event->event);
-      if (dyn->graph->keyboard_cb) {
+      if (dyn->graph->keyboard_cb)
+      {
         // Get keyboard type from ValueInput
         graph_eKeyboard keyboard_type = graph_eKeyboard_Standard;
-        for (GeDynElem* elem = dyn->elements; elem; elem = elem->next) {
-          if (elem->action_type1 == ge_mActionType1_ValueInput) {
+        for (GeDynElem* elem = dyn->elements; elem; elem = elem->next)
+        {
+          if (elem->action_type1 == ge_mActionType1_ValueInput)
+          {
             keyboard_type = ((GeValueInput*)elem)->keyboard_type;
             break;
           }
         }
-        (dyn->graph->keyboard_cb)(
-            dyn->graph->parent_ctx, keyboard_mAction_Open, keyboard_type);
+        (dyn->graph->keyboard_cb)(dyn->graph->parent_ctx, keyboard_mAction_Open, keyboard_type);
       }
     }
     break;
   case glow_eEvent_Key_Right:
-    if (event->object.object_type != glow_eObjectType_NoObject) {
+    if (event->object.object_type != glow_eObjectType_NoObject)
+    {
       found = 0;
       next_inputfocus = this;
       int objcnt = 0;
-      while (!found) {
-        if (!streq(next_inputfocus->next_horizontal, "")) {
-          sts = grow_FindObjectByName(
-              dyn->graph->grow->ctx, next_inputfocus->next_horizontal, &next);
+      while (!found)
+      {
+        if (!streq(next_inputfocus->next_horizontal, ""))
+        {
+          sts = grow_FindObjectByName(dyn->graph->grow->ctx, next_inputfocus->next_horizontal, &next);
           if (EVEN(sts))
             break;
 
           // Check that this object can handle input focus
           grow_GetUserData(next, (void**)&next_dyn);
-          if (next_dyn->total_action_type1 & ge_mActionType1_InputFocus) {
-            for (GeDynElem* elem = next_dyn->elements; elem;
-                 elem = elem->next) {
-              if (elem->action_type1 == ge_mActionType1_InputFocus) {
+          if (next_dyn->total_action_type1 & ge_mActionType1_InputFocus)
+          {
+            for (GeDynElem* elem = next_dyn->elements; elem; elem = elem->next)
+            {
+              if (elem->action_type1 == ge_mActionType1_InputFocus)
+              {
                 next_inputfocus = (GeInputFocus*)elem;
                 found = 1;
                 break;
@@ -20938,18 +21902,21 @@ int GeInputFocus::action(grow_tObject object, glow_tEvent event)
             if (found && grow_GetObjectVisibility(next) != glow_eVis_Visible)
               found = 0;
           }
-        } else if (!streq(next_inputfocus->next_tab, "")) {
-          sts = grow_FindObjectByName(
-              dyn->graph->grow->ctx, next_inputfocus->next_tab, &next);
+        }
+        else if (!streq(next_inputfocus->next_tab, ""))
+        {
+          sts = grow_FindObjectByName(dyn->graph->grow->ctx, next_inputfocus->next_tab, &next);
           if (EVEN(sts))
             break;
 
           // Check that this object can handle input focus
           grow_GetUserData(next, (void**)&next_dyn);
-          if (next_dyn->total_action_type1 & ge_mActionType1_InputFocus) {
-            for (GeDynElem* elem = next_dyn->elements; elem;
-                 elem = elem->next) {
-              if (elem->action_type1 == ge_mActionType1_InputFocus) {
+          if (next_dyn->total_action_type1 & ge_mActionType1_InputFocus)
+          {
+            for (GeDynElem* elem = next_dyn->elements; elem; elem = elem->next)
+            {
+              if (elem->action_type1 == ge_mActionType1_InputFocus)
+              {
                 next_inputfocus = (GeInputFocus*)elem;
                 found = 1;
                 break;
@@ -20968,14 +21935,17 @@ int GeInputFocus::action(grow_tObject object, glow_tEvent event)
         grow_SetObjectInputFocus(next, 1, event->event);
       else
         grow_SetObjectInputFocus(object, 0, event->event);
-    } else {
+    }
+    else
+    {
       // No current object with input focus, check initial mask
       if (initial_focus & ge_mInputFocus_FirstHorizontal)
         grow_SetObjectInputFocus(object, 1, event->event);
     }
     break;
   case glow_eEvent_Key_Left:
-    if (event->object.object_type != glow_eObjectType_NoObject) {
+    if (event->object.object_type != glow_eObjectType_NoObject)
+    {
       char name[80];
       grow_tObject *objectlist, *object_p;
       int object_cnt;
@@ -20989,15 +21959,21 @@ int GeInputFocus::action(grow_tObject object, glow_tEvent event)
       grow_GetObjectList(dyn->graph->grow->ctx, &objectlist, &object_cnt);
       object_p = objectlist;
       found = 0;
-      for (i = 0; i < object_cnt; i++) {
-        if (grow_GetObjectType(*object_p) == glow_eObjectType_GrowNode
-            || grow_GetObjectType(*object_p) == glow_eObjectType_GrowSlider
-            || grow_GetObjectType(*object_p) == glow_eObjectType_GrowGroup) {
+      for (i = 0; i < object_cnt; i++)
+      {
+        if (grow_GetObjectType(*object_p) == glow_eObjectType_GrowNode ||
+            grow_GetObjectType(*object_p) == glow_eObjectType_GrowSlider ||
+            grow_GetObjectType(*object_p) == glow_eObjectType_GrowGroup)
+        {
           grow_GetUserData(*object_p, (void**)&gm_dyn);
-          if (gm_dyn->total_action_type1 & ge_mActionType1_InputFocus) {
-            for (GeDynElem* elem = gm_dyn->elements; elem; elem = elem->next) {
-              if (elem->action_type1 == ge_mActionType1_InputFocus) {
-                if (streq(((GeInputFocus*)elem)->next_horizontal, name)) {
+          if (gm_dyn->total_action_type1 & ge_mActionType1_InputFocus)
+          {
+            for (GeDynElem* elem = gm_dyn->elements; elem; elem = elem->next)
+            {
+              if (elem->action_type1 == ge_mActionType1_InputFocus)
+              {
+                if (streq(((GeInputFocus*)elem)->next_horizontal, name))
+                {
                   found = 1;
                   prev = *object_p;
                   break;
@@ -21011,7 +21987,8 @@ int GeInputFocus::action(grow_tObject object, glow_tEvent event)
         object_p++;
       }
 
-      if (found) {
+      if (found)
+      {
         // Check that this object can handle input focus
         GeDyn* prev_dyn;
         grow_GetUserData(prev, (void**)&prev_dyn);
@@ -21020,7 +21997,9 @@ int GeInputFocus::action(grow_tObject object, glow_tEvent event)
         else
           grow_SetObjectInputFocus(object, 0, event->event);
       }
-    } else {
+    }
+    else
+    {
       // No current object with input focus, check initial mask
       if (initial_focus & ge_mInputFocus_LastHorizontal)
         grow_SetObjectInputFocus(object, 1, event->event);
@@ -21028,21 +22007,26 @@ int GeInputFocus::action(grow_tObject object, glow_tEvent event)
     break;
 
   case glow_eEvent_Key_Down:
-    if (event->object.object_type != glow_eObjectType_NoObject) {
+    if (event->object.object_type != glow_eObjectType_NoObject)
+    {
       found = 0;
-      if (!streq(next_vertical, "")) {
-        sts = grow_FindObjectByName(
-            dyn->graph->grow->ctx, next_vertical, &next);
-        if (ODD(sts)) {
+      if (!streq(next_vertical, ""))
+      {
+        sts = grow_FindObjectByName(dyn->graph->grow->ctx, next_vertical, &next);
+        if (ODD(sts))
+        {
           // Check that this object can handle input focus
           GeDyn* next_dyn;
           grow_GetUserData(next, (void**)&next_dyn);
           if (next_dyn->total_action_type1 & ge_mActionType1_InputFocus)
             found = 1;
         }
-      } else if (!streq(next_tab, "")) {
+      }
+      else if (!streq(next_tab, ""))
+      {
         sts = grow_FindObjectByName(dyn->graph->grow->ctx, next_tab, &next);
-        if (ODD(sts)) {
+        if (ODD(sts))
+        {
           // Check that this object can handle input focus
           GeDyn* next_dyn;
           grow_GetUserData(next, (void**)&next_dyn);
@@ -21055,14 +22039,17 @@ int GeInputFocus::action(grow_tObject object, glow_tEvent event)
         grow_SetObjectInputFocus(next, 1, event->event);
       else
         grow_SetObjectInputFocus(object, 0, event->event);
-    } else {
+    }
+    else
+    {
       // No current object with input focus, check initial mask
       if (initial_focus & ge_mInputFocus_FirstVertical)
         grow_SetObjectInputFocus(object, 1, event->event);
     }
     break;
   case glow_eEvent_Key_Up:
-    if (event->object.object_type != glow_eObjectType_NoObject) {
+    if (event->object.object_type != glow_eObjectType_NoObject)
+    {
       char name[80];
       grow_tObject *objectlist, *object_p;
       int object_cnt;
@@ -21077,15 +22064,21 @@ int GeInputFocus::action(grow_tObject object, glow_tEvent event)
       grow_GetObjectList(dyn->graph->grow->ctx, &objectlist, &object_cnt);
       object_p = objectlist;
       found = 0;
-      for (i = 0; i < object_cnt; i++) {
-        if (grow_GetObjectType(*object_p) == glow_eObjectType_GrowNode
-            || grow_GetObjectType(*object_p) == glow_eObjectType_GrowSlider
-            || grow_GetObjectType(*object_p) == glow_eObjectType_GrowGroup) {
+      for (i = 0; i < object_cnt; i++)
+      {
+        if (grow_GetObjectType(*object_p) == glow_eObjectType_GrowNode ||
+            grow_GetObjectType(*object_p) == glow_eObjectType_GrowSlider ||
+            grow_GetObjectType(*object_p) == glow_eObjectType_GrowGroup)
+        {
           grow_GetUserData(*object_p, (void**)&gm_dyn);
-          if (gm_dyn->total_action_type1 & ge_mActionType1_InputFocus) {
-            for (GeDynElem* elem = gm_dyn->elements; elem; elem = elem->next) {
-              if (elem->action_type1 == ge_mActionType1_InputFocus) {
-                if (streq(((GeInputFocus*)elem)->next_vertical, name)) {
+          if (gm_dyn->total_action_type1 & ge_mActionType1_InputFocus)
+          {
+            for (GeDynElem* elem = gm_dyn->elements; elem; elem = elem->next)
+            {
+              if (elem->action_type1 == ge_mActionType1_InputFocus)
+              {
+                if (streq(((GeInputFocus*)elem)->next_vertical, name))
+                {
                   found = 1;
                   prev = *object_p;
                   break;
@@ -21099,7 +22092,8 @@ int GeInputFocus::action(grow_tObject object, glow_tEvent event)
         object_p++;
       }
 
-      if (found) {
+      if (found)
+      {
         // Check that this object can handle input focus
         GeDyn* prev_dyn;
         grow_GetUserData(prev, (void**)&prev_dyn);
@@ -21108,7 +22102,9 @@ int GeInputFocus::action(grow_tObject object, glow_tEvent event)
         else
           grow_SetObjectInputFocus(object, 0, event->event);
       }
-    } else {
+    }
+    else
+    {
       // No current object with input focus, check initial mask
       if (initial_focus & ge_mInputFocus_LastVertical)
         grow_SetObjectInputFocus(object, 1, event->event);
@@ -21116,23 +22112,27 @@ int GeInputFocus::action(grow_tObject object, glow_tEvent event)
     break;
 
   case glow_eEvent_Key_Tab:
-    if (event->object.object_type != glow_eObjectType_NoObject) {
+    if (event->object.object_type != glow_eObjectType_NoObject)
+    {
       found = 0;
       next_inputfocus = this;
       int objcnt = 0;
-      while (!found) {
-        if (!streq(next_inputfocus->next_tab, "")) {
-          sts = grow_FindObjectByName(
-              dyn->graph->grow->ctx, next_inputfocus->next_tab, &next);
+      while (!found)
+      {
+        if (!streq(next_inputfocus->next_tab, ""))
+        {
+          sts = grow_FindObjectByName(dyn->graph->grow->ctx, next_inputfocus->next_tab, &next);
           if (EVEN(sts))
             break;
 
           // Check that this object can handle input focus
           grow_GetUserData(next, (void**)&next_dyn);
-          if (next_dyn->total_action_type1 & ge_mActionType1_InputFocus) {
-            for (GeDynElem* elem = next_dyn->elements; elem;
-                 elem = elem->next) {
-              if (elem->action_type1 == ge_mActionType1_InputFocus) {
+          if (next_dyn->total_action_type1 & ge_mActionType1_InputFocus)
+          {
+            for (GeDynElem* elem = next_dyn->elements; elem; elem = elem->next)
+            {
+              if (elem->action_type1 == ge_mActionType1_InputFocus)
+              {
                 next_inputfocus = (GeInputFocus*)elem;
                 found = 1;
                 break;
@@ -21146,12 +22146,16 @@ int GeInputFocus::action(grow_tObject object, glow_tEvent event)
         if (next_inputfocus == this || objcnt > 50)
           break;
       }
-      if (found) {
+      if (found)
+      {
         grow_SetObjectInputFocus(next, 1, event->event);
         next_inputfocus->prev_tab = object;
-      } else
+      }
+      else
         grow_SetObjectInputFocus(object, 0, event->event);
-    } else {
+    }
+    else
+    {
       // No current object with input focus, check initial mask
       if (initial_focus & ge_mInputFocus_FirstTab)
         grow_SetObjectInputFocus(object, 1, event->event);
@@ -21159,8 +22163,10 @@ int GeInputFocus::action(grow_tObject object, glow_tEvent event)
     break;
 
   case glow_eEvent_Key_ShiftTab:
-    if (event->object.object_type != glow_eObjectType_NoObject) {
-      if (prev_tab) {
+    if (event->object.object_type != glow_eObjectType_NoObject)
+    {
+      if (prev_tab)
+      {
         GeDyn* prev_dyn;
         grow_GetUserData(prev_tab, (void**)&prev_dyn);
         if (prev_dyn->total_action_type1 & ge_mActionType1_InputFocus)
@@ -21172,7 +22178,8 @@ int GeInputFocus::action(grow_tObject object, glow_tEvent event)
     break;
 
   case glow_eEvent_Key_Escape:
-    if (event->object.object_type != glow_eObjectType_NoObject) {
+    if (event->object.object_type != glow_eObjectType_NoObject)
+    {
       grow_SetObjectInputFocus(object, 0, event->event);
     }
     break;
@@ -21182,52 +22189,57 @@ int GeInputFocus::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
-int GeInputFocus::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GeInputFocus::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
   if (initial_focus != 0)
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "InputFocus.InitialFocus\"," << initial_focus << ");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "InputFocus.InitialFocus\"," << initial_focus
+       << ");" << '\n';
   if (!streq(next_horizontal, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "InputFocus.NextHorizontal\",\"" << next_horizontal << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "InputFocus.NextHorizontal\",\""
+       << next_horizontal << "\");" << '\n';
   if (!streq(next_vertical, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "InputFocus.NextVertical\",\"" << next_vertical << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "InputFocus.NextVertical\",\""
+       << next_vertical << "\");" << '\n';
   if (!streq(next_tab, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "InputFocus.NextTab\",\"" << next_tab << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "InputFocus.NextTab\",\"" << next_tab
+       << "\");" << '\n';
   return 1;
 }
 
-
-int GeInputFocus::syntax_check(
-    grow_tObject object, int* error_cnt, int* warning_cnt)
+int GeInputFocus::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
   grow_tObject next;
   int sts;
 
-  if (!streq(next_horizontal, "")) {
+  if (!streq(next_horizontal, ""))
+  {
     sts = grow_FindObjectByName(dyn->graph->grow->ctx, next_horizontal, &next);
-    if (EVEN(sts)) {
-      dyn->graph->syntax_msg(
-          'E', object, "InputFocus.NextHorizontal, object not found");
+    if (EVEN(sts))
+    {
+      dyn->graph->syntax_msg('E', object, "InputFocus.NextHorizontal, object not found");
       (*error_cnt)++;
     }
   }
-  if (!streq(next_vertical, "")) {
+  if (!streq(next_vertical, ""))
+  {
     sts = grow_FindObjectByName(dyn->graph->grow->ctx, next_vertical, &next);
-    if (EVEN(sts)) {
-      dyn->graph->syntax_msg(
-          'E', object, "InputFocus.NextVertical, object not found");
+    if (EVEN(sts))
+    {
+      dyn->graph->syntax_msg('E', object, "InputFocus.NextVertical, object not found");
       (*error_cnt)++;
     }
   }
-  if (!streq(next_tab, "")) {
+  if (!streq(next_tab, ""))
+  {
     sts = grow_FindObjectByName(dyn->graph->grow->ctx, next_tab, &next);
-    if (EVEN(sts)) {
-      dyn->graph->syntax_msg(
-          'E', object, "InputFocus.NextTab, object not found");
+    if (EVEN(sts))
+    {
+      dyn->graph->syntax_msg('E', object, "InputFocus.NextTab, object not found");
       (*error_cnt)++;
     }
   }
-  if (initial_focus == 0 && streq(next_horizontal, "")
-      && streq(next_vertical, "") && streq(next_tab, "")) {
+  if (initial_focus == 0 && streq(next_horizontal, "") && streq(next_vertical, "") && streq(next_tab, ""))
+  {
     dyn->graph->syntax_msg('E', object, "InputFocus, no action found");
     (*error_cnt)++;
   }
@@ -21253,8 +22265,10 @@ void GeCloseGraph::open(std::ifstream& fp)
   int end_found = 0;
   char dummy[40];
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeCloseGraph: \"%d %s\"\n", type, dummy);
@@ -21262,7 +22276,8 @@ void GeCloseGraph::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_CloseGraph:
       break;
     case ge_eSave_End:
@@ -21282,7 +22297,8 @@ int GeCloseGraph::action(grow_tObject object, glow_tEvent event)
   if (!dyn->graph->is_authorized(dyn->access))
     return 1;
 
-  switch (event->event) {
+  switch (event->event)
+  {
   case glow_eEvent_MB1Down:
     grow_SetClickSensitivity(dyn->graph->grow->ctx, glow_mSensitivity_MB1Click);
     grow_SetObjectColorInverse(object, 1);
@@ -21295,7 +22311,8 @@ int GeCloseGraph::action(grow_tObject object, glow_tEvent event)
     if (dyn->total_action_type1 & ge_mActionType1_Confirm)
       break;
 
-    if (dyn->graph->close_cb) {
+    if (dyn->graph->close_cb)
+    {
       (dyn->graph->close_cb)(dyn->graph->parent_ctx);
       return GLOW__TERMINATED;
     }
@@ -21305,8 +22322,7 @@ int GeCloseGraph::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
-int GeCloseGraph::export_java(
-    grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeCloseGraph::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
   if (first)
     fp << "      ";
@@ -21317,10 +22333,9 @@ int GeCloseGraph::export_java(
 }
 
 GeSlider::GeSlider(GeDyn* e_dyn)
-    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_No, ge_mActionType1_Slider,
-          ge_mActionType2_No, ge_eDynPrio_Slider),
-      min_value_p(0), max_value_p(0), old_min_value(0), old_max_value(0),
-      insensitive_p(0)
+    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_No, ge_mActionType1_Slider, ge_mActionType2_No,
+                ge_eDynPrio_Slider),
+      min_value_p(0), max_value_p(0), old_min_value(0), old_max_value(0), insensitive_p(0)
 {
   strcpy(attribute, "");
   strcpy(minvalue_attr, "");
@@ -21330,10 +22345,8 @@ GeSlider::GeSlider(GeDyn* e_dyn)
 }
 
 GeSlider::GeSlider(const GeSlider& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-          x.prio),
-      min_value_p(0), max_value_p(0), old_min_value(0), old_max_value(0),
-      insensitive_p(0)
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio), min_value_p(0),
+      max_value_p(0), old_min_value(0), old_max_value(0), insensitive_p(0)
 {
   strcpy(attribute, x.attribute);
   strcpy(minvalue_attr, x.minvalue_attr);
@@ -21375,11 +22388,11 @@ void GeSlider::get_attributes(attr_sItem* attrinfo, int* item_count)
   *item_count = i;
 }
 
-void GeSlider::set_attribute(
-    grow_tObject object, const char* attr_name, int* cnt)
+void GeSlider::set_attribute(grow_tObject object, const char* attr_name, int* cnt)
 {
   (*cnt)--;
-  if (*cnt == 0) {
+  if (*cnt == 0)
+  {
     char msg[200];
 
     strncpy(attribute, attr_name, sizeof(attribute));
@@ -21392,14 +22405,10 @@ void GeSlider::set_attribute(
 void GeSlider::replace_attribute(char* from, char* to, int* cnt, int strict)
 {
   GeDyn::replace_attribute(attribute, sizeof(attribute), from, to, cnt, strict);
-  GeDyn::replace_attribute(
-      minvalue_attr, sizeof(minvalue_attr), from, to, cnt, strict);
-  GeDyn::replace_attribute(
-      maxvalue_attr, sizeof(maxvalue_attr), from, to, cnt, strict);
-  GeDyn::replace_attribute(
-      insensitive_attr, sizeof(insensitive_attr), from, to, cnt, strict);
-  GeDyn::replace_attribute(
-      release_attr, sizeof(release_attr), from, to, cnt, strict);
+  GeDyn::replace_attribute(minvalue_attr, sizeof(minvalue_attr), from, to, cnt, strict);
+  GeDyn::replace_attribute(maxvalue_attr, sizeof(maxvalue_attr), from, to, cnt, strict);
+  GeDyn::replace_attribute(insensitive_attr, sizeof(insensitive_attr), from, to, cnt, strict);
+  GeDyn::replace_attribute(release_attr, sizeof(release_attr), from, to, cnt, strict);
 }
 
 void GeSlider::save(std::ofstream& fp)
@@ -21408,8 +22417,7 @@ void GeSlider::save(std::ofstream& fp)
   fp << int(ge_eSave_Slider_attribute) << FSPACE << attribute << '\n';
   fp << int(ge_eSave_Slider_minvalue_attr) << FSPACE << minvalue_attr << '\n';
   fp << int(ge_eSave_Slider_maxvalue_attr) << FSPACE << maxvalue_attr << '\n';
-  fp << int(ge_eSave_Slider_insensitive_attr) << FSPACE << insensitive_attr
-     << '\n';
+  fp << int(ge_eSave_Slider_insensitive_attr) << FSPACE << insensitive_attr << '\n';
   fp << int(ge_eSave_Slider_release_attr) << FSPACE << release_attr << '\n';
   fp << int(ge_eSave_End) << '\n';
 }
@@ -21420,8 +22428,10 @@ void GeSlider::open(std::ifstream& fp)
   int end_found = 0;
   char dummy[40];
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeSlider: \"%d %s\"\n", type, dummy);
@@ -21429,7 +22439,8 @@ void GeSlider::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_Slider:
       break;
     case ge_eSave_Slider_attribute:
@@ -21464,8 +22475,7 @@ void GeSlider::open(std::ifstream& fp)
   }
 }
 
-int GeSlider::connect(
-    grow_tObject object, glow_sTraceData* trace_data, bool now)
+int GeSlider::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
 {
   int inverted;
   pwr_tAName parsed_name;
@@ -21474,12 +22484,12 @@ int GeSlider::connect(
 
   size = 4;
   p = 0;
-  db = dyn->parse_attr_name(
-      attribute, parsed_name, &inverted, &attr_type, &size);
+  db = dyn->parse_attr_name(attribute, parsed_name, &inverted, &attr_type, &size);
   if (streq(parsed_name, ""))
     return 1;
 
-  switch (attr_type) {
+  switch (attr_type)
+  {
   case pwr_eType_Float32:
   case pwr_eType_Int32:
   case pwr_eType_Boolean:
@@ -21487,8 +22497,7 @@ int GeSlider::connect(
   default:
     return 1;
   }
-  sts = dyn->graph->ref_object_info(
-      dyn->cycle, parsed_name, (void**)&p, &subid, size, object, now);
+  sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&p, &subid, size, object, now);
   if (EVEN(sts))
     return sts;
 
@@ -21503,37 +22512,37 @@ int GeSlider::connect(
   grow_tObject background;
   double origo;
 
-  if (!grow_TransformIsStored(object)) {
+  if (!grow_TransformIsStored(object))
+  {
     grow_StoreTransform(object);
     grow_MeasureNode(object, &ll_x, &ll_y, &ur_x, &ur_y);
-    grow_GetSliderInfo(
-        object, &direction, &max_value, &min_value, &max_pos, &min_pos);
+    grow_GetSliderInfo(object, &direction, &max_value, &min_value, &max_pos, &min_pos);
     sts = grow_GetBackgroundObjectLimits(dyn->graph->grow->ctx,
-        (glow_eTraceType)ge_mDynType1_SliderBackground, (ll_x + ur_x) / 2,
-        (ll_y + ur_y) / 2, &background, &min_pos, &max_pos, &direction);
-    if (ODD(sts)) {
+                                         (glow_eTraceType)ge_mDynType1_SliderBackground, (ll_x + ur_x) / 2,
+                                         (ll_y + ur_y) / 2, &background, &min_pos, &max_pos, &direction);
+    if (ODD(sts))
+    {
       grow_GetSliderOrigo(object, direction, &origo);
 
-      switch (direction) {
+      switch (direction)
+      {
       case glow_eDirection_Down:
-        grow_SetSliderInfo(object, direction, max_value, min_value,
-            max_pos - origo, min_pos - origo);
+        grow_SetSliderInfo(object, direction, max_value, min_value, max_pos - origo, min_pos - origo);
 
         grow_MoveNode(object, ll_x, min_pos - origo);
         break;
       case glow_eDirection_Up:
-        grow_SetSliderInfo(object, direction, max_value, min_value,
-            max_pos - (ur_y - ll_y - origo), min_pos - (ur_y - ll_y - origo));
+        grow_SetSliderInfo(object, direction, max_value, min_value, max_pos - (ur_y - ll_y - origo),
+                           min_pos - (ur_y - ll_y - origo));
         grow_MoveNode(object, ll_x, min_pos - (ur_y - ll_y - origo));
         break;
       case glow_eDirection_Left:
-        grow_SetSliderInfo(object, direction, max_value, min_value,
-            max_pos - (ur_x - ll_x - origo), min_pos - (ur_x - ll_x - origo));
+        grow_SetSliderInfo(object, direction, max_value, min_value, max_pos - (ur_x - ll_x - origo),
+                           min_pos - (ur_x - ll_x - origo));
         grow_MoveNode(object, min_pos - (ur_x - ll_x - origo), ll_y);
         break;
       case glow_eDirection_Right:
-        grow_SetSliderInfo(object, direction, max_value, min_value,
-            max_pos - origo, min_pos - origo);
+        grow_SetSliderInfo(object, direction, max_value, min_value, max_pos - origo, min_pos - origo);
 
         grow_MoveNode(object, min_pos - origo, ll_y);
         break;
@@ -21544,51 +22553,52 @@ int GeSlider::connect(
   }
 
   min_value_p = 0;
-  min_value_db = dyn->parse_attr_name(
-      minvalue_attr, parsed_name, &inverted, &a_type, &a_size);
-  if (!streq(parsed_name, "") && a_type == pwr_eType_Float32) {
-    switch (min_value_db) {
+  min_value_db = dyn->parse_attr_name(minvalue_attr, parsed_name, &inverted, &a_type, &a_size);
+  if (!streq(parsed_name, "") && a_type == pwr_eType_Float32)
+  {
+    switch (min_value_db)
+    {
     case graph_eDatabase_Gdh:
-      sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name,
-          (void**)&min_value_p, &min_value_subid, a_size, object, now);
+      sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&min_value_p, &min_value_subid,
+                                        a_size, object, now);
       break;
     case graph_eDatabase_Local:
-      min_value_p = (pwr_tFloat32*)dyn->graph->localdb_ref_or_create(
-          parsed_name, a_type);
+      min_value_p = (pwr_tFloat32*)dyn->graph->localdb_ref_or_create(parsed_name, a_type);
       break;
     default:;
     }
   }
 
   max_value_p = 0;
-  max_value_db = dyn->parse_attr_name(
-      maxvalue_attr, parsed_name, &inverted, &a_type, &a_size);
-  if (!streq(parsed_name, "") && a_type == pwr_eType_Float32) {
-    switch (max_value_db) {
+  max_value_db = dyn->parse_attr_name(maxvalue_attr, parsed_name, &inverted, &a_type, &a_size);
+  if (!streq(parsed_name, "") && a_type == pwr_eType_Float32)
+  {
+    switch (max_value_db)
+    {
     case graph_eDatabase_Gdh:
-      sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name,
-          (void**)&max_value_p, &max_value_subid, a_size, object, now);
+      sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&max_value_p, &max_value_subid,
+                                        a_size, object, now);
       break;
     case graph_eDatabase_Local:
-      max_value_p = (pwr_tFloat32*)dyn->graph->localdb_ref_or_create(
-          parsed_name, a_type);
+      max_value_p = (pwr_tFloat32*)dyn->graph->localdb_ref_or_create(parsed_name, a_type);
       break;
     default:;
     }
   }
 
   insensitive_p = 0;
-  insensitive_db = dyn->parse_attr_name(
-      insensitive_attr, parsed_name, &insensitive_inverted, &a_type, &a_size);
-  if (!streq(parsed_name, "") && a_type == pwr_eType_Boolean) {
-    switch (insensitive_db) {
+  insensitive_db =
+      dyn->parse_attr_name(insensitive_attr, parsed_name, &insensitive_inverted, &a_type, &a_size);
+  if (!streq(parsed_name, "") && a_type == pwr_eType_Boolean)
+  {
+    switch (insensitive_db)
+    {
     case graph_eDatabase_Gdh:
-      sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name,
-          (void**)&insensitive_p, &insensitive_subid, a_size, object, now);
+      sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&insensitive_p, &insensitive_subid,
+                                        a_size, object, now);
       break;
     case graph_eDatabase_Local:
-      insensitive_p = (pwr_tBoolean*)dyn->graph->localdb_ref_or_create(
-          parsed_name, a_type);
+      insensitive_p = (pwr_tBoolean*)dyn->graph->localdb_ref_or_create(parsed_name, a_type);
       break;
     default:;
     }
@@ -21602,15 +22612,18 @@ int GeSlider::disconnect(grow_tObject object)
     gdh_UnrefObjectInfo(subid);
   p = 0;
 
-  if (min_value_p && min_value_db == graph_eDatabase_Gdh) {
+  if (min_value_p && min_value_db == graph_eDatabase_Gdh)
+  {
     gdh_UnrefObjectInfo(min_value_subid);
     min_value_p = 0;
   }
-  if (max_value_p && max_value_db == graph_eDatabase_Gdh) {
+  if (max_value_p && max_value_db == graph_eDatabase_Gdh)
+  {
     gdh_UnrefObjectInfo(max_value_subid);
     max_value_p = 0;
   }
-  if (insensitive_p && insensitive_db == graph_eDatabase_Gdh) {
+  if (insensitive_p && insensitive_db == graph_eDatabase_Gdh)
+  {
     gdh_UnrefObjectInfo(insensitive_subid);
     insensitive_p = 0;
   }
@@ -21625,24 +22638,29 @@ int GeSlider::scan(grow_tObject object)
   if (!p)
     return 1;
 
-  if (insensitive_p) {
+  if (insensitive_p)
+  {
     if (insensitive_inverted)
       slider_disabled = !*insensitive_p;
     else
       slider_disabled = *insensitive_p;
   }
 
-  if (max_value_p && min_value_p
-      && (!feqf(*max_value_p, old_max_value) || !feqf(*min_value_p, old_min_value))) {
-    if (fabsf(*max_value_p - *min_value_p) > FLT_EPSILON) {
+  if (max_value_p && min_value_p &&
+      (!feqf(*max_value_p, old_max_value) || !feqf(*min_value_p, old_min_value)))
+  {
+    if (fabsf(*max_value_p - *min_value_p) > FLT_EPSILON)
+    {
       first_scan = 1;
     }
     old_min_value = *min_value_p;
     old_max_value = *max_value_p;
   }
 
-  if (!first_scan) {
-    switch (attr_type) {
+  if (!first_scan)
+  {
+    switch (attr_type)
+    {
     case pwr_eType_Float32:
       if (fabs(old_value - *p) < FLT_EPSILON)
         // No change since last time
@@ -21658,21 +22676,25 @@ int GeSlider::scan(grow_tObject object)
       break;
     default:;
     }
-  } else
+  }
+  else
     first_scan = 0;
 
-  grow_GetSliderInfo(
-      object, &direction, &max_value, &min_value, &max_pos, &min_pos);
-  if (max_value_p && min_value_p && !feqf(*max_value_p, *min_value_p)) {
+  grow_GetSliderInfo(object, &direction, &max_value, &min_value, &max_pos, &min_pos);
+  if (max_value_p && min_value_p && !feqf(*max_value_p, *min_value_p))
+  {
     max_value = *max_value_p;
     min_value = *min_value_p;
   }
-  if (!feq(min_pos, max_pos)) {
-    if (dyn->graph->current_slider != object && !feq(max_value, min_value)) {
+  if (!feq(min_pos, max_pos))
+  {
+    if (dyn->graph->current_slider != object && !feq(max_value, min_value))
+    {
       float value;
       double pos_x, pos_y;
 
-      switch (attr_type) {
+      switch (attr_type)
+      {
       case pwr_eType_Float32:
         value = *p;
         break;
@@ -21684,10 +22706,10 @@ int GeSlider::scan(grow_tObject object)
         break;
       }
 
-      switch (direction) {
+      switch (direction)
+      {
       case glow_eDirection_Down:
-        pos_y = (max_value - value) / (max_value - min_value)
-            * (max_pos - min_pos);
+        pos_y = (max_value - value) / (max_value - min_value) * (max_pos - min_pos);
         if (pos_y < 0)
           pos_y = 0;
         else if (pos_y > max_pos - min_pos)
@@ -21695,9 +22717,7 @@ int GeSlider::scan(grow_tObject object)
         pos_x = 0;
         break;
       case glow_eDirection_Right:
-        pos_x = max_pos - min_pos
-            - (value - min_value) / (max_value - min_value)
-                * (max_pos - min_pos);
+        pos_x = max_pos - min_pos - (value - min_value) / (max_value - min_value) * (max_pos - min_pos);
         if (pos_x < 0)
           pos_x = 0;
         else if (pos_x > max_pos - min_pos)
@@ -21705,9 +22725,7 @@ int GeSlider::scan(grow_tObject object)
         pos_y = 0;
         break;
       case glow_eDirection_Left:
-        pos_x = max_pos - min_pos
-            - (max_value - value) / (max_value - min_value)
-                * (max_pos - min_pos);
+        pos_x = max_pos - min_pos - (max_value - value) / (max_value - min_value) * (max_pos - min_pos);
         if (pos_x < 0)
           pos_x = 0;
         else if (pos_x > max_pos - min_pos)
@@ -21715,8 +22733,7 @@ int GeSlider::scan(grow_tObject object)
         pos_y = 0;
         break;
       default: // Up
-        pos_y = (value - min_value) / (max_value - min_value)
-            * (max_pos - min_pos);
+        pos_y = (value - min_value) / (max_value - min_value) * (max_pos - min_pos);
         if (pos_y < 0)
           pos_y = 0;
         else if (pos_y > max_pos - min_pos)
@@ -21727,7 +22744,8 @@ int GeSlider::scan(grow_tObject object)
     }
   }
 
-  switch (attr_type) {
+  switch (attr_type)
+  {
   case pwr_eType_Float32:
     old_value = *p;
     break;
@@ -21744,28 +22762,32 @@ int GeSlider::scan(grow_tObject object)
 
 int GeSlider::action(grow_tObject object, glow_tEvent event)
 {
-  if (insensitive_p) {
-    if ((insensitive_inverted && !*insensitive_p)
-        || (!insensitive_inverted && *insensitive_p))
+  if (insensitive_p)
+  {
+    if ((insensitive_inverted && !*insensitive_p) || (!insensitive_inverted && *insensitive_p))
       return 1;
   }
 
-  switch (event->event) {
+  switch (event->event)
+  {
   case glow_eEvent_MB1Down:
     grow_SetClickSensitivity(dyn->graph->grow->ctx, glow_mSensitivity_MB1Press);
     break;
-  case glow_eEvent_SliderMoveEnd: {
+  case glow_eEvent_SliderMoveEnd:
+  {
     pwr_tAName parsed_name;
     int inverted;
     int attr_type, attr_size;
     pwr_tBoolean val = 1;
     pwr_tStatus sts;
 
-    if (!streq(release_attr, "")) {
-      dyn->parse_attr_name(
-          release_attr, parsed_name, &inverted, &attr_type, &attr_size);
-      switch (attr_type) {
-      case pwr_eType_Boolean: {
+    if (!streq(release_attr, ""))
+    {
+      dyn->parse_attr_name(release_attr, parsed_name, &inverted, &attr_type, &attr_size);
+      switch (attr_type)
+      {
+      case pwr_eType_Boolean:
+      {
         sts = gdh_SetObjectInfo(parsed_name, &val, sizeof(val));
         break;
       }
@@ -21774,31 +22796,30 @@ int GeSlider::action(grow_tObject object, glow_tEvent event)
     }
     break;
   }
-  case glow_eEvent_SliderMoveStart: {
+  case glow_eEvent_SliderMoveStart:
+  {
     double max_value, min_value, max_pos, min_pos;
     glow_eDirection direction;
 
-    if (!dyn->graph->is_authorized(dyn->access) || slider_disabled) {
-      grow_SetMoveRestrictions(
-          dyn->graph->grow->ctx, glow_eMoveRestriction_Disable, 0, 0, NULL);
+    if (!dyn->graph->is_authorized(dyn->access) || slider_disabled)
+    {
+      grow_SetMoveRestrictions(dyn->graph->grow->ctx, glow_eMoveRestriction_Disable, 0, 0, NULL);
       dyn->graph->current_slider = NULL;
       break;
     }
-    grow_GetSliderInfo(
-        object, &direction, &max_value, &min_value, &max_pos, &min_pos);
+    grow_GetSliderInfo(object, &direction, &max_value, &min_value, &max_pos, &min_pos);
     if (direction == glow_eDirection_Right || direction == glow_eDirection_Left)
-      grow_SetMoveRestrictions(dyn->graph->grow->ctx,
-          glow_eMoveRestriction_HorizontalSlider, max_pos, min_pos,
-          event->object.object);
+      grow_SetMoveRestrictions(dyn->graph->grow->ctx, glow_eMoveRestriction_HorizontalSlider, max_pos,
+                               min_pos, event->object.object);
     else
-      grow_SetMoveRestrictions(dyn->graph->grow->ctx,
-          glow_eMoveRestriction_VerticalSlider, max_pos, min_pos,
-          event->object.object);
+      grow_SetMoveRestrictions(dyn->graph->grow->ctx, glow_eMoveRestriction_VerticalSlider, max_pos, min_pos,
+                               event->object.object);
 
     dyn->graph->current_slider = object;
     break;
   }
-  case glow_eEvent_SliderMoved: {
+  case glow_eEvent_SliderMoved:
+  {
     double max_value, min_value, max_pos, min_pos;
     glow_eDirection direction;
     float value;
@@ -21808,54 +22829,50 @@ int GeSlider::action(grow_tObject object, glow_tEvent event)
     int inverted;
     int attr_type, attr_size;
 
-    grow_GetSliderInfo(
-        object, &direction, &max_value, &min_value, &max_pos, &min_pos);
-    if (!feq(min_pos, max_pos)) {
-      if (max_value_p && min_value_p && !feqf(*max_value_p, *min_value_p)) {
+    grow_GetSliderInfo(object, &direction, &max_value, &min_value, &max_pos, &min_pos);
+    if (!feq(min_pos, max_pos))
+    {
+      if (max_value_p && min_value_p && !feqf(*max_value_p, *min_value_p))
+      {
         max_value = *max_value_p;
         min_value = *min_value_p;
       }
       grow_MeasureNode(object, &ll_x, &ll_y, &ur_x, &ur_y);
 
-      switch (direction) {
+      switch (direction)
+      {
       case glow_eDirection_Down:
-        value = float(
-            (max_pos - ll_y) / (max_pos - min_pos) * (max_value - min_value)
-            + min_value);
+        value = float((max_pos - ll_y) / (max_pos - min_pos) * (max_value - min_value) + min_value);
         break;
       case glow_eDirection_Right:
-        value = float(
-            (max_pos - ll_x) / (max_pos - min_pos) * (max_value - min_value)
-            + min_value);
+        value = float((max_pos - ll_x) / (max_pos - min_pos) * (max_value - min_value) + min_value);
         break;
       case glow_eDirection_Left:
-        value = float(
-            (ll_x - min_pos) / (max_pos - min_pos) * (max_value - min_value)
-            + min_value);
+        value = float((ll_x - min_pos) / (max_pos - min_pos) * (max_value - min_value) + min_value);
         break;
       default:
-        value = float(
-            (ll_y - min_pos) / (max_pos - min_pos) * (max_value - min_value)
-            + min_value);
+        value = float((ll_y - min_pos) / (max_pos - min_pos) * (max_value - min_value) + min_value);
       }
       if (value > max_value)
         value = max_value;
       if (value < min_value)
         value = min_value;
 
-      dyn->parse_attr_name(
-          attribute, parsed_name, &inverted, &attr_type, &attr_size);
-      switch (attr_type) {
+      dyn->parse_attr_name(attribute, parsed_name, &inverted, &attr_type, &attr_size);
+      switch (attr_type)
+      {
       case pwr_eType_Float32:
         sts = gdh_SetObjectInfo(parsed_name, &value, sizeof(value));
         old_value = value;
         break;
-      case pwr_eType_Boolean: {
+      case pwr_eType_Boolean:
+      {
         pwr_tBoolean ivalue = (pwr_tBoolean)(value > 0.5 ? 1 : 0);
         sts = gdh_SetObjectInfo(parsed_name, &ivalue, sizeof(ivalue));
         break;
       }
-      default: {
+      default:
+      {
         pwr_tInt32 ivalue = (pwr_tInt32)(value > 0 ? value + 0.5 : value - 0.5);
         sts = gdh_SetObjectInfo(parsed_name, &ivalue, sizeof(ivalue));
       }
@@ -21870,35 +22887,37 @@ int GeSlider::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
-int GeSlider::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GeSlider::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
   if (!streq(attribute, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Slider.Attribute\",\"" << attribute << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Slider.Attribute\",\"" << attribute
+       << "\");" << '\n';
   if (!streq(minvalue_attr, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Slider.MinValueAttr\",\"" << minvalue_attr << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Slider.MinValueAttr\",\"" << minvalue_attr
+       << "\");" << '\n';
   if (!streq(maxvalue_attr, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Slider.MaxValueAttr\",\"" << maxvalue_attr << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Slider.MaxValueAttr\",\"" << maxvalue_attr
+       << "\");" << '\n';
   if (!streq(insensitive_attr, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Slider.InsensitiveAttr\",\"" << insensitive_attr << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Slider.InsensitiveAttr\",\""
+       << insensitive_attr << "\");" << '\n';
   if (!streq(release_attr, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Slider.ReleaseAttr\",\"" << release_attr << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Slider.ReleaseAttr\",\"" << release_attr
+       << "\");" << '\n';
   return 1;
 }
 
-int GeSlider::export_java(
-    grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeSlider::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
   double dim_x0, dim_x1, dim_y0, dim_y1;
   double min_pos, max_pos, min_value, max_value;
   glow_eDirection direction;
-  grow_MeasureJavaBean(
-      dyn->graph->grow->ctx, &dim_x1, &dim_x0, &dim_y1, &dim_y0);
-  grow_GetSliderInfo(
-      object, &direction, &max_value, &min_value, &max_pos, &min_pos);
-  grow_GetSliderInfoPixel(
-      object, &direction, &max_pos, &min_pos, ge_mDynType1_SliderBackground);
+  grow_MeasureJavaBean(dyn->graph->grow->ctx, &dim_x1, &dim_x0, &dim_y1, &dim_y0);
+  grow_GetSliderInfo(object, &direction, &max_value, &min_value, &max_pos, &min_pos);
+  grow_GetSliderInfoPixel(object, &direction, &max_pos, &min_pos, ge_mDynType1_SliderBackground);
 
-  switch (direction) {
+  switch (direction)
+  {
   case glow_eDirection_Left:
   case glow_eDirection_Right:
     min_pos += -dim_x0 + glow_cJBean_Offset /*+ glow_cJBean_SizeCorr/2*/;
@@ -21913,9 +22932,8 @@ int GeSlider::export_java(
     fp << "      ";
   else
     fp << "      ,";
-  fp << "new GeDynSlider(" << var_name << ".dd, \"" << attribute << "\","
-     << min_value << "," << max_value << "," << direction << "," << min_pos
-     << "," << max_pos << ",";
+  fp << "new GeDynSlider(" << var_name << ".dd, \"" << attribute << "\"," << min_value << "," << max_value
+     << "," << direction << "," << min_pos << "," << max_pos << ",";
   if (streq(minvalue_attr, ""))
     fp << "null,";
   else
@@ -21933,40 +22951,37 @@ int GeSlider::export_java(
   return 1;
 }
 
-int GeSlider::syntax_check(
-    grow_tObject object, int* error_cnt, int* warning_cnt)
+int GeSlider::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
-  int types[] = { pwr_eType_Boolean, pwr_eType_Int32, pwr_eType_Float32, 0 };
-  int types2[] = { pwr_eType_Float32, 0 };
-  int types3[] = { pwr_eType_Boolean, 0 };
-  graph_eDatabase databases[] = { graph_eDatabase_Gdh, graph_eDatabase__ };
-  graph_eDatabase databases2[]
-      = { graph_eDatabase_Local, graph_eDatabase_Gdh, graph_eDatabase__ };
+  int types[] = {pwr_eType_Boolean, pwr_eType_Int32, pwr_eType_Float32, 0};
+  int types2[] = {pwr_eType_Float32, 0};
+  int types3[] = {pwr_eType_Boolean, 0};
+  graph_eDatabase databases[] = {graph_eDatabase_Gdh, graph_eDatabase__};
+  graph_eDatabase databases2[] = {graph_eDatabase_Local, graph_eDatabase_Gdh, graph_eDatabase__};
 
-  dyn->syntax_check_attribute(object, "Slider.Attribute", attribute, 0, types,
-      databases, error_cnt, warning_cnt);
-  dyn->syntax_check_attribute(object, "Slider.MinValueAttr", minvalue_attr, 1,
-      types2, databases2, error_cnt, warning_cnt);
-  dyn->syntax_check_attribute(object, "Slider.MaxValueAttr", maxvalue_attr, 1,
-      types2, databases2, error_cnt, warning_cnt);
-  dyn->syntax_check_attribute(object, "Slider.InsensitiveAttr",
-      insensitive_attr, 1, types3, databases2, error_cnt, warning_cnt);
-  dyn->syntax_check_attribute(object, "Slider.ReleaseAttr", release_attr, 1,
-      types3, databases, error_cnt, warning_cnt);
+  dyn->syntax_check_attribute(object, "Slider.Attribute", attribute, 0, types, databases, error_cnt,
+                              warning_cnt);
+  dyn->syntax_check_attribute(object, "Slider.MinValueAttr", minvalue_attr, 1, types2, databases2, error_cnt,
+                              warning_cnt);
+  dyn->syntax_check_attribute(object, "Slider.MaxValueAttr", maxvalue_attr, 1, types2, databases2, error_cnt,
+                              warning_cnt);
+  dyn->syntax_check_attribute(object, "Slider.InsensitiveAttr", insensitive_attr, 1, types3, databases2,
+                              error_cnt, warning_cnt);
+  dyn->syntax_check_attribute(object, "Slider.ReleaseAttr", release_attr, 1, types3, databases, error_cnt,
+                              warning_cnt);
   return 1;
 }
 
 GeFastCurve::GeFastCurve(GeDyn* e_dyn)
-    : GeDynElem(e_dyn, ge_mDynType1_FastCurve, ge_mDynType2_No,
-          ge_mActionType1_No, ge_mActionType2_No, ge_eDynPrio_FastCurve),
+    : GeDynElem(e_dyn, ge_mDynType1_FastCurve, ge_mDynType2_No, ge_mActionType1_No, ge_mActionType2_No,
+                ge_eDynPrio_FastCurve),
       curve_index1(0), curve_index2(0)
 {
   strcpy(fast_object, "");
 }
 
 GeFastCurve::GeFastCurve(const GeFastCurve& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-          x.prio),
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio),
       curve_index1(x.curve_index1), curve_index2(x.curve_index2)
 {
   strcpy(fast_object, x.fast_object);
@@ -21994,18 +23009,18 @@ void GeFastCurve::get_attributes(attr_sItem* attrinfo, int* item_count)
   *item_count = i;
 }
 
-void GeFastCurve::set_attribute(
-    grow_tObject object, const char* attr_name, int* cnt)
+void GeFastCurve::set_attribute(grow_tObject object, const char* attr_name, int* cnt)
 {
   (*cnt)--;
-  if (*cnt == 0) {
+  if (*cnt == 0)
+  {
     char* s;
 
     strncpy(fast_object, attr_name, sizeof(fast_object));
     if ((s = strchr(fast_object, '.')))
       *s = 0;
 
-    char msg[23 + sizeof(fast_object) +1];
+    char msg[23 + sizeof(fast_object) + 1];
     snprintf(msg, sizeof(msg), "FastCurve.FastObject = %s", fast_object);
     msg[sizeof(msg) - 1] = 0;
     dyn->graph->message('I', msg);
@@ -22014,8 +23029,7 @@ void GeFastCurve::set_attribute(
 
 void GeFastCurve::replace_attribute(char* from, char* to, int* cnt, int strict)
 {
-  GeDyn::replace_attribute(
-      fast_object, sizeof(fast_object), from, to, cnt, strict);
+  GeDyn::replace_attribute(fast_object, sizeof(fast_object), from, to, cnt, strict);
 }
 
 void GeFastCurve::save(std::ofstream& fp)
@@ -22033,8 +23047,10 @@ void GeFastCurve::open(std::ifstream& fp)
   int end_found = 0;
   char dummy[40];
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeFastCurve: \"%d %s\"\n", type, dummy);
@@ -22042,7 +23058,8 @@ void GeFastCurve::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_FastCurve:
       break;
     case ge_eSave_FastCurve_fast_object:
@@ -22067,8 +23084,7 @@ void GeFastCurve::open(std::ifstream& fp)
   }
 }
 
-int GeFastCurve::connect(
-    grow_tObject object, glow_sTraceData* trace_data, bool now)
+int GeFastCurve::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
 {
   int attr_type, attr_size;
   pwr_tAName parsed_name;
@@ -22078,8 +23094,7 @@ int GeFastCurve::connect(
   pwr_sClass_DsFastCurve fp;
   int i;
 
-  dyn->parse_attr_name(
-      fast_object, parsed_name, &inverted, &attr_type, &attr_size);
+  dyn->parse_attr_name(fast_object, parsed_name, &inverted, &attr_type, &attr_size);
   sts = gdh_GetObjectInfo(parsed_name, &fp, sizeof(fp));
   if (EVEN(sts))
     return 1;
@@ -22087,7 +23102,8 @@ int GeFastCurve::connect(
   max_points = fp.NoOfPoints;
   fast_function = fp.Function;
 
-  if (fast_function & fast_mFunction_BeforeTrigg) {
+  if (fast_function & fast_mFunction_BeforeTrigg)
+  {
     strcpy(attr_name, parsed_name);
     strcat(attr_name, ".TriggIndex");
     gdh_NameToAttrref(pwr_cNObjid, attr_name, &trigg_index_attr);
@@ -22104,17 +23120,20 @@ int GeFastCurve::connect(
   // Subscribe to object
   strcpy(attr_name, parsed_name);
   strcat(attr_name, ".New");
-  sts = dyn->graph->ref_object_info(dyn->cycle, attr_name, (void**)&new_p,
-      &subid, sizeof(pwr_tBoolean), object, now);
+  sts = dyn->graph->ref_object_info(dyn->cycle, attr_name, (void**)&new_p, &subid, sizeof(pwr_tBoolean),
+                                    object, now);
   if (EVEN(sts))
     return sts;
 
   memcpy(&time_buff, &fp.TimeBuffer, sizeof(time_buff));
 
   fast_cnt = 0;
-  if (curve_index1 == 0 && curve_index2 == 0) {
-    for (i = 0; i < FAST_CURVES; i++) {
-      if (fp.CurveValid[i]) {
+  if (curve_index1 == 0 && curve_index2 == 0)
+  {
+    for (i = 0; i < FAST_CURVES; i++)
+    {
+      if (fp.CurveValid[i])
+      {
         memcpy(&buff[fast_cnt], &fp.Buffers[i], sizeof(buff[0]));
         type[fast_cnt] = (pwr_eType)fp.AttributeType[i];
         fast_idx[i] = fast_cnt + 1;
@@ -22122,9 +23141,11 @@ int GeFastCurve::connect(
         fast_cnt++;
       }
     }
-  } else {
-    if (curve_index1 >= 0 && curve_index1 < FAST_CURVES
-        && fp.CurveValid[curve_index1]) {
+  }
+  else
+  {
+    if (curve_index1 >= 0 && curve_index1 < FAST_CURVES && fp.CurveValid[curve_index1])
+    {
       i = curve_index1;
       memcpy(&buff[fast_cnt], &fp.Buffers[i], sizeof(buff[0]));
       type[fast_cnt] = (pwr_eType)fp.AttributeType[i];
@@ -22132,8 +23153,8 @@ int GeFastCurve::connect(
       curve_idx[fast_cnt + 1] = i;
       fast_cnt++;
     }
-    if (curve_index2 >= 1 && curve_index2 < FAST_CURVES
-        && fp.CurveValid[curve_index2]) {
+    if (curve_index2 >= 1 && curve_index2 < FAST_CURVES && fp.CurveValid[curve_index2])
+    {
       i = curve_index2;
       memcpy(&buff[fast_cnt], &fp.Buffers[i], sizeof(buff[0]));
       type[fast_cnt] = (pwr_eType)fp.AttributeType[i];
@@ -22143,8 +23164,10 @@ int GeFastCurve::connect(
     }
   }
 
-  for (i = 0; i < fast_cnt; i++) {
-    switch (type[i]) {
+  for (i = 0; i < fast_cnt; i++)
+  {
+    switch (type[i])
+    {
     case pwr_eType_Float32:
     case pwr_eType_Int32:
     case pwr_eType_UInt32:
@@ -22190,20 +23213,19 @@ int GeFastCurve::scan(grow_tObject object)
   double* data[DYN_FAST_MAX];
 
   // Check if any new value
-  if ((*new_p && !old_new) || first_scan) {
+  if ((*new_p && !old_new) || first_scan)
+  {
     // Update curves
-    if (fast_function & fast_mFunction_BeforeTrigg) {
+    if (fast_function & fast_mFunction_BeforeTrigg)
+    {
       // Get first, last and trigg index
-      sts = gdh_GetObjectInfoAttrref(
-          &trigg_index_attr, &trigg_index, sizeof(trigg_index));
+      sts = gdh_GetObjectInfoAttrref(&trigg_index_attr, &trigg_index, sizeof(trigg_index));
       if (EVEN(sts))
         return sts;
-      sts = gdh_GetObjectInfoAttrref(
-          &first_index_attr, &first_index, sizeof(first_index));
+      sts = gdh_GetObjectInfoAttrref(&first_index_attr, &first_index, sizeof(first_index));
       if (EVEN(sts))
         return sts;
-      sts = gdh_GetObjectInfoAttrref(
-          &last_index_attr, &last_index, sizeof(last_index));
+      sts = gdh_GetObjectInfoAttrref(&last_index_attr, &last_index, sizeof(last_index));
       if (EVEN(sts))
         return sts;
 
@@ -22215,7 +23237,8 @@ int GeFastCurve::scan(grow_tObject object)
         return sts;
 
       k = first_index;
-      for (j = 0; j < max_points; j++) {
+      for (j = 0; j < max_points; j++)
+      {
         if (k >= max_points)
           k = 0;
         data[0][j] = tmp[k] - tmp[trigg_index];
@@ -22224,11 +23247,14 @@ int GeFastCurve::scan(grow_tObject object)
         k++;
       }
       // If to few points, fill with dummy data
-      for (; j < max_points; j++) {
+      for (; j < max_points; j++)
+      {
         data[0][j] = tmp[k] - tmp[trigg_index];
       }
       free(tmp);
-    } else {
+    }
+    else
+    {
       pwr_tFloat32* tmp = (pwr_tFloat32*)calloc(max_points, 4);
       data[0] = (double*)calloc(max_points, 8);
       sts = gdh_GetObjectInfoAttrref(&time_buff, tmp, max_points * 4);
@@ -22239,21 +23265,24 @@ int GeFastCurve::scan(grow_tObject object)
         data[0][j] = tmp[j];
       free(tmp);
     }
-    for (i = 0; i < fast_cnt; i++) {
-      if (fast_function & fast_mFunction_BeforeTrigg) {
+    for (i = 0; i < fast_cnt; i++)
+    {
+      if (fast_function & fast_mFunction_BeforeTrigg)
+      {
         // Read into temporary buffer
         void* tmp = calloc(max_points, element_size[i]);
         data[i + 1] = (double*)calloc(max_points, 8);
-        sts = gdh_GetObjectInfoAttrref(
-            &buff[i], tmp, max_points * element_size[i]);
+        sts = gdh_GetObjectInfoAttrref(&buff[i], tmp, max_points * element_size[i]);
         if (EVEN(sts))
           return sts;
 
         k = first_index;
-        for (j = 0; j < max_points; j++) {
+        for (j = 0; j < max_points; j++)
+        {
           if (k >= max_points)
             k = 0;
-          switch (type[i]) {
+          switch (type[i])
+          {
           case pwr_eType_Float32:
             data[i + 1][j] = ((pwr_tFloat32*)tmp)[k];
             break;
@@ -22291,8 +23320,10 @@ int GeFastCurve::scan(grow_tObject object)
           k++;
         }
         // If to few points, fill with 0
-        for (; j < max_points; j++) {
-          switch (type[i]) {
+        for (; j < max_points; j++)
+        {
+          switch (type[i])
+          {
           case pwr_eType_Float32:
             data[i + 1][j] = ((pwr_tFloat32*)tmp)[k];
             break;
@@ -22327,16 +23358,19 @@ int GeFastCurve::scan(grow_tObject object)
           }
         }
         free(tmp);
-      } else {
+      }
+      else
+      {
         void* tmp = calloc(max_points, element_size[i]);
         data[i + 1] = (double*)calloc(max_points, 8);
-        sts = gdh_GetObjectInfoAttrref(
-            &buff[i], tmp, max_points * element_size[i]);
+        sts = gdh_GetObjectInfoAttrref(&buff[i], tmp, max_points * element_size[i]);
         if (EVEN(sts))
           return sts;
 
-        for (j = 0; j < max_points; j++) {
-          switch (type[i]) {
+        for (j = 0; j < max_points; j++)
+        {
+          switch (type[i])
+          {
           case pwr_eType_Float32:
             data[i + 1][j] = ((pwr_tFloat32*)tmp)[j];
             break;
@@ -22383,26 +23417,31 @@ int GeFastCurve::scan(grow_tObject object)
   return 1;
 }
 
-int GeFastCurve::syntax_check(
-    grow_tObject object, int* error_cnt, int* warning_cnt)
+int GeFastCurve::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
   int sts;
   pwr_eType a_type;
 
-  if (streq(fast_object, "")) {
+  if (streq(fast_object, ""))
+  {
     dyn->graph->syntax_msg('W', object, "FastCurve.FastObject is missing");
     (*warning_cnt)++;
-  } else {
+  }
+  else
+  {
     sts = dyn->graph->check_ldh_object(fast_object, &a_type);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       char msg[440];
       sprintf(msg, "FastCurve.FastObject \"%s\" not found", fast_object);
       dyn->graph->syntax_msg('W', object, msg);
       (*warning_cnt)++;
-    } else {
-      if (a_type != pwr_cClass_DsFastCurve) {
-        dyn->graph->syntax_msg(
-            'E', object, "FastCurve.FastObject is of wrong class");
+    }
+    else
+    {
+      if (a_type != pwr_cClass_DsFastCurve)
+      {
+        dyn->graph->syntax_msg('E', object, "FastCurve.FastObject is of wrong class");
         (*error_cnt)++;
       }
     }
@@ -22411,12 +23450,11 @@ int GeFastCurve::syntax_check(
 }
 
 GeDsTrend::GeDsTrend(GeDyn* e_dyn)
-    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_DsTrend,
-		ge_mActionType1_No, ge_mActionType2_No, ge_eDynPrio_DsTrend),
-      min_value1_p(0), max_value1_p(0), old_min_value1(0), old_max_value1(0),
-      min_value2_p(0), max_value2_p(0), old_min_value2(0), old_max_value2(0),
-      hold_p(0),
-      mark1_color(glow_eDrawType_Inherit), mark2_color(glow_eDrawType_Inherit)
+    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_DsTrend, ge_mActionType1_No, ge_mActionType2_No,
+                ge_eDynPrio_DsTrend),
+      min_value1_p(0), max_value1_p(0), old_min_value1(0), old_max_value1(0), min_value2_p(0),
+      max_value2_p(0), old_min_value2(0), old_max_value2(0), hold_p(0), mark1_color(glow_eDrawType_Inherit),
+      mark2_color(glow_eDrawType_Inherit)
 {
   strcpy(dstrend_object1, "");
   strcpy(dstrend_object2, "");
@@ -22430,8 +23468,7 @@ GeDsTrend::GeDsTrend(GeDyn* e_dyn)
 }
 
 GeDsTrend::GeDsTrend(const GeDsTrend& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-		x.prio),
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio),
       mark1_color(x.mark1_color), mark2_color(x.mark2_color)
 
 {
@@ -22508,18 +23545,18 @@ void GeDsTrend::get_attributes(attr_sItem* attrinfo, int* item_count)
   *item_count = i;
 }
 
-void GeDsTrend::set_attribute(
-    grow_tObject object, const char* attr_name, int* cnt)
+void GeDsTrend::set_attribute(grow_tObject object, const char* attr_name, int* cnt)
 {
   (*cnt)--;
-  if (*cnt == 0) {
+  if (*cnt == 0)
+  {
     char* s;
 
     strncpy(dstrend_object1, attr_name, sizeof(dstrend_object1));
     if ((s = strchr(dstrend_object1, '.')))
       *s = 0;
 
-    char msg[23 + sizeof(dstrend_object1) +1];
+    char msg[23 + sizeof(dstrend_object1) + 1];
     snprintf(msg, sizeof(msg), "DsTrend.Object1 = %s", dstrend_object1);
     msg[sizeof(msg) - 1] = 0;
     dyn->graph->message('I', msg);
@@ -22528,23 +23565,15 @@ void GeDsTrend::set_attribute(
 
 void GeDsTrend::replace_attribute(char* from, char* to, int* cnt, int strict)
 {
-  GeDyn::replace_attribute(
-      dstrend_object1, sizeof(dstrend_object1), from, to, cnt, strict);
-  GeDyn::replace_attribute(
-      dstrend_object2, sizeof(dstrend_object2), from, to, cnt, strict);
-  GeDyn::replace_attribute(
-      minvalue_attr1, sizeof(minvalue_attr1), from, to, cnt, strict);
-  GeDyn::replace_attribute(
-      maxvalue_attr1, sizeof(maxvalue_attr1), from, to, cnt, strict);
-  GeDyn::replace_attribute(
-      minvalue_attr2, sizeof(minvalue_attr2), from, to, cnt, strict);
-  GeDyn::replace_attribute(
-      maxvalue_attr2, sizeof(maxvalue_attr2), from, to, cnt, strict);
+  GeDyn::replace_attribute(dstrend_object1, sizeof(dstrend_object1), from, to, cnt, strict);
+  GeDyn::replace_attribute(dstrend_object2, sizeof(dstrend_object2), from, to, cnt, strict);
+  GeDyn::replace_attribute(minvalue_attr1, sizeof(minvalue_attr1), from, to, cnt, strict);
+  GeDyn::replace_attribute(maxvalue_attr1, sizeof(maxvalue_attr1), from, to, cnt, strict);
+  GeDyn::replace_attribute(minvalue_attr2, sizeof(minvalue_attr2), from, to, cnt, strict);
+  GeDyn::replace_attribute(maxvalue_attr2, sizeof(maxvalue_attr2), from, to, cnt, strict);
   GeDyn::replace_attribute(hold_attr, sizeof(hold_attr), from, to, cnt, strict);
-  GeDyn::replace_attribute(
-      mark1_attr, sizeof(mark1_attr), from, to, cnt, strict);
-  GeDyn::replace_attribute(
-      mark2_attr, sizeof(mark2_attr), from, to, cnt, strict);
+  GeDyn::replace_attribute(mark1_attr, sizeof(mark1_attr), from, to, cnt, strict);
+  GeDyn::replace_attribute(mark2_attr, sizeof(mark2_attr), from, to, cnt, strict);
 }
 
 void GeDsTrend::save(std::ofstream& fp)
@@ -22571,8 +23600,10 @@ void GeDsTrend::open(std::ifstream& fp)
   char dummy[40];
   int tmp;
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeDsTrend: \"%d %s\"\n", type, dummy);
@@ -22580,7 +23611,8 @@ void GeDsTrend::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_DsTrend:
       break;
     case ge_eSave_DsTrend_dstrend_object1:
@@ -22639,8 +23671,7 @@ void GeDsTrend::open(std::ifstream& fp)
   }
 }
 
-int GeDsTrend::connect(
-    grow_tObject object, glow_sTraceData* trace_data, bool now)
+int GeDsTrend::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
 {
   pwr_tStatus sts;
   pwr_sClass_DsTrend tp[2];
@@ -22651,7 +23682,8 @@ int GeDsTrend::connect(
 
   // Get current status of the trend objects
   dstrend_cnt = 0;
-  for (int i = 0; i < 2; i++) {
+  for (int i = 0; i < 2; i++)
+  {
     pwr_tOName oname;
 
     if (i == 0)
@@ -22660,11 +23692,11 @@ int GeDsTrend::connect(
       strcpy(oname, dstrend_object2);
     if (strcmp(oname, "") == 0)
       continue;
-  
+
     sts = gdh_NameToAttrref(pwr_cNOid, oname, &dstrend_aref[i]);
     if (EVEN(sts))
       return sts;
-      
+
     sts = gdh_GetObjectInfoAttrref(&dstrend_aref[i], &tp[i], sizeof(tp[0]));
     if (EVEN(sts))
       return sts;
@@ -22675,103 +23707,102 @@ int GeDsTrend::connect(
     return 0;
 
   min_value1_p = 0;
-  min_value1_db = dyn->parse_attr_name(
-      minvalue_attr1, parsed_name, &inverted, &attr_type, &attr_size);
-  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32) {
-    switch (min_value1_db) {
+  min_value1_db = dyn->parse_attr_name(minvalue_attr1, parsed_name, &inverted, &attr_type, &attr_size);
+  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32)
+  {
+    switch (min_value1_db)
+    {
     case graph_eDatabase_Gdh:
-      sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name,
-          (void**)&min_value1_p, &min_value_subid1, attr_size, object, now);
+      sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&min_value1_p, &min_value_subid1,
+                                        attr_size, object, now);
       break;
     case graph_eDatabase_Local:
-      min_value1_p = (pwr_tFloat32*)dyn->graph->localdb_ref_or_create(
-          parsed_name, attr_type);
+      min_value1_p = (pwr_tFloat32*)dyn->graph->localdb_ref_or_create(parsed_name, attr_type);
       break;
     default:;
     }
   }
   max_value1_p = 0;
-  max_value1_db = dyn->parse_attr_name(
-      maxvalue_attr1, parsed_name, &inverted, &attr_type, &attr_size);
-  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32) {
-    switch (max_value1_db) {
+  max_value1_db = dyn->parse_attr_name(maxvalue_attr1, parsed_name, &inverted, &attr_type, &attr_size);
+  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32)
+  {
+    switch (max_value1_db)
+    {
     case graph_eDatabase_Gdh:
-      sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name,
-          (void**)&max_value1_p, &max_value_subid1, attr_size, object, now);
+      sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&max_value1_p, &max_value_subid1,
+                                        attr_size, object, now);
       break;
     case graph_eDatabase_Local:
-      max_value1_p = (pwr_tFloat32*)dyn->graph->localdb_ref_or_create(
-          parsed_name, attr_type);
+      max_value1_p = (pwr_tFloat32*)dyn->graph->localdb_ref_or_create(parsed_name, attr_type);
       break;
     default:;
     }
   }
   min_value2_p = 0;
-  dyn->parse_attr_name(
-      minvalue_attr2, parsed_name, &inverted, &attr_type, &attr_size);
-  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32) {
-    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name,
-        (void**)&min_value2_p, &min_value_subid2, attr_size, object, now);
+  dyn->parse_attr_name(minvalue_attr2, parsed_name, &inverted, &attr_type, &attr_size);
+  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32)
+  {
+    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&min_value2_p, &min_value_subid2,
+                                      attr_size, object, now);
   }
   max_value2_p = 0;
-  dyn->parse_attr_name(
-      maxvalue_attr2, parsed_name, &inverted, &attr_type, &attr_size);
-  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32) {
-    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name,
-        (void**)&max_value2_p, &max_value_subid2, attr_size, object, now);
+  dyn->parse_attr_name(maxvalue_attr2, parsed_name, &inverted, &attr_type, &attr_size);
+  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32)
+  {
+    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&max_value2_p, &max_value_subid2,
+                                      attr_size, object, now);
   }
 
   trend_hold = 0;
   hold_p = 0;
-  hold_db = dyn->parse_attr_name(
-      hold_attr, parsed_name, &inverted, &attr_type, &attr_size);
-  if (!streq(parsed_name, "") && attr_type == pwr_eType_Boolean) {
-    switch (hold_db) {
+  hold_db = dyn->parse_attr_name(hold_attr, parsed_name, &inverted, &attr_type, &attr_size);
+  if (!streq(parsed_name, "") && attr_type == pwr_eType_Boolean)
+  {
+    switch (hold_db)
+    {
     case graph_eDatabase_Gdh:
-      sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name,
-          (void**)&hold_p, &hold_subid, attr_size, object, now);
+      sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&hold_p, &hold_subid, attr_size,
+                                        object, now);
       if (EVEN(sts))
         return sts;
       break;
     case graph_eDatabase_Local:
-      hold_p = (pwr_tBoolean*)dyn->graph->localdb_ref_or_create(
-          parsed_name, attr_type);
+      hold_p = (pwr_tBoolean*)dyn->graph->localdb_ref_or_create(parsed_name, attr_type);
       break;
     default:;
     }
   }
 
   mark1_p = 0;
-  dyn->parse_attr_name(
-      mark1_attr, parsed_name, &inverted, &attr_type, &attr_size);
-  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32) {
-    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&mark1_p,
-        &mark1_subid, attr_size, object, now);
+  dyn->parse_attr_name(mark1_attr, parsed_name, &inverted, &attr_type, &attr_size);
+  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32)
+  {
+    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&mark1_p, &mark1_subid, attr_size,
+                                      object, now);
   }
 
   mark2_p = 0;
-  dyn->parse_attr_name(
-      mark2_attr, parsed_name, &inverted, &attr_type, &attr_size);
-  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32) {
-    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&mark2_p,
-        &mark2_subid, attr_size, object, now);
+  dyn->parse_attr_name(mark2_attr, parsed_name, &inverted, &attr_type, &attr_size);
+  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32)
+  {
+    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&mark2_p, &mark2_subid, attr_size,
+                                      object, now);
   }
 
-  if (mark1_color != glow_eDrawType_Inherit
-      || mark2_color != glow_eDrawType_Inherit)
+  if (mark1_color != glow_eDrawType_Inherit || mark2_color != glow_eDrawType_Inherit)
     grow_SetTrendMarkColor(object, mark1_color, mark2_color);
-
 
   // Calculate number of points
   max_time = 0;
   min_interval = 100000;
-  for (int i = 0; i < dstrend_cnt; i++) {
-    time = tp[i].Multiple * tp[i].ScanTime * tp[i].NoOfBuffers
-      * tp[i].NoOfSample;
+  for (int i = 0; i < dstrend_cnt; i++)
+  {
+    time = tp[i].Multiple * tp[i].ScanTime * tp[i].NoOfBuffers * tp[i].NoOfSample;
     if (time > max_time)
       max_time = time;
-    
-    if ((int)(tp[i].Multiple * tp[i].ScanTime) < min_interval) {
+
+    if ((int)(tp[i].Multiple * tp[i].ScanTime) < min_interval)
+    {
       min_interval = tp[i].Multiple * tp[i].ScanTime;
       min_interval_idx = i;
     }
@@ -22782,7 +23813,8 @@ int GeDsTrend::connect(
 
   max_points = max_time / min_interval;
 
-  for (int i = 0; i < dstrend_cnt; i++) {
+  for (int i = 0; i < dstrend_cnt; i++)
+  {
     interval[i] = tp[i].Multiple * tp[i].ScanTime / min_interval;
   }
 
@@ -22795,31 +23827,38 @@ int GeDsTrend::connect(
 
 int GeDsTrend::disconnect(grow_tObject object)
 {
-  if (min_value1_p && min_value1_db == graph_eDatabase_Gdh) {
+  if (min_value1_p && min_value1_db == graph_eDatabase_Gdh)
+  {
     gdh_UnrefObjectInfo(min_value_subid1);
     min_value1_p = 0;
   }
-  if (max_value1_p && max_value1_db == graph_eDatabase_Gdh) {
+  if (max_value1_p && max_value1_db == graph_eDatabase_Gdh)
+  {
     gdh_UnrefObjectInfo(max_value_subid1);
     max_value1_p = 0;
   }
-  if (min_value2_p) {
+  if (min_value2_p)
+  {
     gdh_UnrefObjectInfo(min_value_subid2);
     min_value2_p = 0;
   }
-  if (max_value2_p) {
+  if (max_value2_p)
+  {
     gdh_UnrefObjectInfo(max_value_subid2);
     max_value2_p = 0;
   }
-  if (hold_p && hold_db == graph_eDatabase_Gdh) {
+  if (hold_p && hold_db == graph_eDatabase_Gdh)
+  {
     gdh_UnrefObjectInfo(hold_subid);
     hold_p = 0;
   }
-  if (mark1_p) {
+  if (mark1_p)
+  {
     gdh_UnrefObjectInfo(mark1_subid);
     mark1_p = 0;
   }
-  if (mark2_p) {
+  if (mark2_p)
+  {
     gdh_UnrefObjectInfo(mark2_subid);
     mark1_p = 0;
   }
@@ -22838,89 +23877,102 @@ int GeDsTrend::scan(grow_tObject object)
   int values;
   int trend_buff_size = 478;
   pwr_sClass_DsTrend tp[2];
-  double *data[3];
+  double* data[3];
   int start_idx;
   int new_curve = 0;
 
   if (hold_p)
     trend_hold = *hold_p;
 
-  if (max_value1_p || min_value1_p) {
+  if (max_value1_p || min_value1_p)
+  {
     bool update = false;
 
     pwr_tFloat32 maxval;
     pwr_tFloat32 minval;
-    if (max_value1_p) {
+    if (max_value1_p)
+    {
       maxval = *max_value1_p;
       if (!feqf(maxval, old_max_value1))
-	update = true;
+        update = true;
     }
-    if (min_value1_p) {
+    if (min_value1_p)
+    {
       minval = *min_value1_p;
       if (!feqf(minval, old_min_value1))
-	update = true;
+        update = true;
     }
-    if (update) {
+    if (update)
+    {
       double minvald, maxvald;
       grow_GetTrendRangeY(object, 0, &minvald, &maxvald);
 
       if (!min_value1_p)
-	minval = minvald;
+        minval = minvald;
       if (!max_value1_p)
-	maxval = maxvald;
+        maxval = maxvald;
 
-      if (fabsf(maxval - minval) > FLT_EPSILON) {
+      if (fabsf(maxval - minval) > FLT_EPSILON)
+      {
         grow_SetTrendRangeY(object, 0, minval, maxval);
-	new_curve = 1;
+        new_curve = 1;
       }
       old_min_value1 = minval;
       old_max_value1 = maxval;
     }
   }
 
-  if (max_value2_p || min_value2_p) {
+  if (max_value2_p || min_value2_p)
+  {
     bool update = false;
 
     pwr_tFloat32 maxval;
     pwr_tFloat32 minval;
-    if (max_value2_p) {
+    if (max_value2_p)
+    {
       maxval = *max_value2_p;
       if (!feqf(maxval, old_max_value2))
-	update = true;
+        update = true;
     }
-    if (min_value2_p) {
+    if (min_value2_p)
+    {
       minval = *min_value2_p;
       if (!feqf(minval, old_min_value2))
-	update = true;
+        update = true;
     }
-    if (update) {
+    if (update)
+    {
       double minvald, maxvald;
       grow_GetTrendRangeY(object, 1, &minvald, &maxvald);
 
       if (!min_value2_p)
-	minval = minvald;
+        minval = minvald;
       if (!max_value2_p)
-	maxval = maxvald;
+        maxval = maxvald;
 
-      if (fabsf(maxval - minval) > FLT_EPSILON) {
+      if (fabsf(maxval - minval) > FLT_EPSILON)
+      {
         grow_SetTrendRangeY(object, 1, minval, maxval);
-	new_curve = 1;
+        new_curve = 1;
       }
       old_min_value2 = minval;
       old_max_value2 = maxval;
     }
   }
 
-  if (mark1_p && (first_scan || fabsf(*mark1_p - old_mark1) > FLT_EPSILON)) {
+  if (mark1_p && (first_scan || fabsf(*mark1_p - old_mark1) > FLT_EPSILON))
+  {
     grow_SetTrendYMark1(object, *mark1_p);
     old_mark1 = *mark1_p;
   }
-  if (mark2_p && (first_scan || fabsf(*mark2_p - old_mark2) > FLT_EPSILON)) {
+  if (mark2_p && (first_scan || fabsf(*mark2_p - old_mark2) > FLT_EPSILON))
+  {
     grow_SetTrendYMark2(object, *mark2_p);
     old_mark2 = *mark2_p;
   }
 
-  if (first_scan) {
+  if (first_scan)
+  {
     first_scan = false;
     new_curve = 1;
   }
@@ -22928,56 +23980,67 @@ int GeDsTrend::scan(grow_tObject object)
   if (trend_hold)
     return 1;
 
-  for (i = 0; i < dstrend_cnt; i++) {
+  for (i = 0; i < dstrend_cnt; i++)
+  {
     sts = gdh_GetObjectInfoAttrref(&dstrend_aref[i], &tp[i], sizeof(tp[0]));
     if (EVEN(sts))
       return sts;
   }
 
-  if (new_curve) {
+  if (new_curve)
+  {
     // Draw whole curve
     data[0] = (double*)calloc(1, 8 * max_points);
     for (j = 0; j < max_points; j++)
-      data[0][max_points-j-1] = (double)j / max_points * 100;
+      data[0][max_points - j - 1] = (double)j / max_points * 100;
 
-    for (i = 0; i < dstrend_cnt; i++) {
-      data[i+1] = (double*)calloc(1, 8 * max_points);
+    for (i = 0; i < dstrend_cnt; i++)
+    {
+      data[i + 1] = (double*)calloc(1, 8 * max_points);
 
       int write_buffer = (int)tp[i].WriteBuffer;
-      start_idx = write_buffer * trend_buff_size / 2
-	+ int(tp[i].NextWriteIndex[write_buffer]);
-      if (start_idx == 0) {
-	start_idx = tp[i].NoOfSample - 1 + trend_buff_size / 2;
-	write_buffer = 1;
-      } else if (start_idx == trend_buff_size / 2) {
-	start_idx = tp[i].NoOfSample - 1;
-	write_buffer = 0;
-      } else
-	start_idx--;
-      
+      start_idx = write_buffer * trend_buff_size / 2 + int(tp[i].NextWriteIndex[write_buffer]);
+      if (start_idx == 0)
+      {
+        start_idx = tp[i].NoOfSample - 1 + trend_buff_size / 2;
+        write_buffer = 1;
+      }
+      else if (start_idx == trend_buff_size / 2)
+      {
+        start_idx = tp[i].NoOfSample - 1;
+        write_buffer = 0;
+      }
+      else
+        start_idx--;
+
       int idx = 0;
-      for (j = start_idx; j >= write_buffer * trend_buff_size / 2; j--) {
-	for (k = 0; k < interval[i]; k++) {
-	  data[i+1][idx] = tp[i].DataBuffer[j];
-	  idx++;
-	}
+      for (j = start_idx; j >= write_buffer * trend_buff_size / 2; j--)
+      {
+        for (k = 0; k < interval[i]; k++)
+        {
+          data[i + 1][idx] = tp[i].DataBuffer[j];
+          idx++;
+        }
       }
       for (j = tp[i].NoOfSample - 1 + (!write_buffer) * trend_buff_size / 2;
-	   j >= (!write_buffer) * trend_buff_size / 2; j--) {
-	for (k = 0; k < interval[i]; k++) {
-	  data[i+1][idx] = tp[i].DataBuffer[j];
-	  idx++;
-	}
+           j >= (!write_buffer) * trend_buff_size / 2; j--)
+      {
+        for (k = 0; k < interval[i]; k++)
+        {
+          data[i + 1][idx] = tp[i].DataBuffer[j];
+          idx++;
+        }
       }
-      if (start_idx
-	  != (int)tp[i].NoOfSample - 1 + write_buffer * trend_buff_size / 2) {
-	for (j = tp[i].NoOfSample - 1 + write_buffer * trend_buff_size / 2;
-	     j > start_idx; j--) {
-	  for (k = 0; k < interval[i]; k++) {
-	    data[i+1][idx] = tp[i].DataBuffer[j];
-	    idx++;
-	  }
-	}
+      if (start_idx != (int)tp[i].NoOfSample - 1 + write_buffer * trend_buff_size / 2)
+      {
+        for (j = tp[i].NoOfSample - 1 + write_buffer * trend_buff_size / 2; j > start_idx; j--)
+        {
+          for (k = 0; k < interval[i]; k++)
+          {
+            data[i + 1][idx] = tp[i].DataBuffer[j];
+            idx++;
+          }
+        }
       }
       last_buffer[i] = tp[i].WriteBuffer;
       last_next_index[i] = tp[i].NextWriteIndex[last_buffer[i]];
@@ -22987,83 +24050,91 @@ int GeDsTrend::scan(grow_tObject object)
 
     free(data[0]);
     for (i = 0; i < dstrend_cnt; i++)
-      free(data[i+1]);
+      free(data[i + 1]);
   }
-  else {
+  else
+  {
     // Check if any new value
     i = min_interval_idx;
-    if (tp[i].NextWriteIndex[tp[i].WriteBuffer]
-	!= last_next_index[i]) {
-      values = tp[i].NextWriteIndex[tp[i].WriteBuffer]
-	- last_next_index[i];
+    if (tp[i].NextWriteIndex[tp[i].WriteBuffer] != last_next_index[i])
+    {
+      values = tp[i].NextWriteIndex[tp[i].WriteBuffer] - last_next_index[i];
       if (values < 0)
-	values = values + tp[i].NoOfSample;
-      
-      last_next_index[i]
-	= tp[i].NextWriteIndex[tp[i].WriteBuffer];
-      
+        values = values + tp[i].NoOfSample;
+
+      last_next_index[i] = tp[i].NextWriteIndex[tp[i].WriteBuffer];
+
       if (values > 2)
-	grow_SetNodraw(dyn->graph->grow->ctx);
-      for (k = 0; k < values; k++) {
-	// Add new points
-	for (i = 0; i < dstrend_cnt; i++) {
-	  // Insert new value
-	  write_buffer = tp[i].WriteBuffer;
-	  idx = write_buffer * trend_buff_size / 2
-	    + int(tp[i].NextWriteIndex[write_buffer])
-	    - (values - 1 - k);
-	  if (idx == 0 || idx == trend_buff_size / 2)
-	    idx = tp[i].NoOfSample - 1
-	      + (!write_buffer) * trend_buff_size / 2;
-	  else
-	    idx--;
-	  
-	  grow_AddTrendValue(object, double(tp[i].DataBuffer[idx]), i);
-	}
+        grow_SetNodraw(dyn->graph->grow->ctx);
+      for (k = 0; k < values; k++)
+      {
+        // Add new points
+        for (i = 0; i < dstrend_cnt; i++)
+        {
+          // Insert new value
+          write_buffer = tp[i].WriteBuffer;
+          idx =
+              write_buffer * trend_buff_size / 2 + int(tp[i].NextWriteIndex[write_buffer]) - (values - 1 - k);
+          if (idx == 0 || idx == trend_buff_size / 2)
+            idx = tp[i].NoOfSample - 1 + (!write_buffer) * trend_buff_size / 2;
+          else
+            idx--;
+
+          grow_AddTrendValue(object, double(tp[i].DataBuffer[idx]), i);
+        }
       }
       if (values > 2)
-	grow_ResetNodraw(dyn->graph->grow->ctx);
+        grow_ResetNodraw(dyn->graph->grow->ctx);
     }
   }
-  
+
   return 1;
 }
 
-int GeDsTrend::syntax_check(
-    grow_tObject object, int* error_cnt, int* warning_cnt)
+int GeDsTrend::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
   int sts;
   pwr_eType a_type;
 
-  if (streq(dstrend_object1, "")) {
+  if (streq(dstrend_object1, ""))
+  {
     dyn->graph->syntax_msg('W', object, "DsTrend.Object1 is missing");
     (*warning_cnt)++;
-  } else {
+  }
+  else
+  {
     sts = dyn->graph->check_ldh_object(dstrend_object1, &a_type);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       char msg[440];
       sprintf(msg, "DsTrend.Object1 \"%s\" not found", dstrend_object1);
       dyn->graph->syntax_msg('W', object, msg);
       (*warning_cnt)++;
-    } else {
-      if (a_type != pwr_cClass_DsTrend) {
-        dyn->graph->syntax_msg(
-            'E', object, "DsTrend.Object1 is of wrong class");
+    }
+    else
+    {
+      if (a_type != pwr_cClass_DsTrend)
+      {
+        dyn->graph->syntax_msg('E', object, "DsTrend.Object1 is of wrong class");
         (*error_cnt)++;
       }
     }
   }
-  if (!streq(dstrend_object2, "")) {
+  if (!streq(dstrend_object2, ""))
+  {
     sts = dyn->graph->check_ldh_object(dstrend_object2, &a_type);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       char msg[440];
       sprintf(msg, "DsTrend.Object2 \"%s\" not found", dstrend_object2);
       dyn->graph->syntax_msg('W', object, msg);
       (*warning_cnt)++;
-    } else {
-      if (a_type != pwr_cClass_DsTrend) {
-        dyn->graph->syntax_msg(
-            'E', object, "DsTrend.Object2 is of wrong class");
+    }
+    else
+    {
+      if (a_type != pwr_cClass_DsTrend)
+      {
+        dyn->graph->syntax_msg('E', object, "DsTrend.Object2 is of wrong class");
         (*error_cnt)++;
       }
     }
@@ -23072,12 +24143,11 @@ int GeDsTrend::syntax_check(
 }
 
 GeDsTrendCurve::GeDsTrendCurve(GeDyn* e_dyn)
-    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_DsTrendCurve,
-		ge_mActionType1_No, ge_mActionType2_No, ge_eDynPrio_DsTrendCurve),
-      min_value1_p(0), max_value1_p(0), old_min_value1(0), old_max_value1(0),
-      min_value2_p(0), max_value2_p(0), old_min_value2(0), old_max_value2(0),
-      hold_p(0),
-      mark1_color(glow_eDrawType_Inherit), mark2_color(glow_eDrawType_Inherit)
+    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_DsTrendCurve, ge_mActionType1_No, ge_mActionType2_No,
+                ge_eDynPrio_DsTrendCurve),
+      min_value1_p(0), max_value1_p(0), old_min_value1(0), old_max_value1(0), min_value2_p(0),
+      max_value2_p(0), old_min_value2(0), old_max_value2(0), hold_p(0), mark1_color(glow_eDrawType_Inherit),
+      mark2_color(glow_eDrawType_Inherit)
 {
   strcpy(dstrend_object, "");
   strcpy(minvalue_attr1, "");
@@ -23090,8 +24160,7 @@ GeDsTrendCurve::GeDsTrendCurve(GeDyn* e_dyn)
 }
 
 GeDsTrendCurve::GeDsTrendCurve(const GeDsTrendCurve& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-		x.prio),
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio),
       mark1_color(x.mark1_color), mark2_color(x.mark2_color)
 
 {
@@ -23162,18 +24231,18 @@ void GeDsTrendCurve::get_attributes(attr_sItem* attrinfo, int* item_count)
   *item_count = i;
 }
 
-void GeDsTrendCurve::set_attribute(
-    grow_tObject object, const char* attr_name, int* cnt)
+void GeDsTrendCurve::set_attribute(grow_tObject object, const char* attr_name, int* cnt)
 {
   (*cnt)--;
-  if (*cnt == 0) {
+  if (*cnt == 0)
+  {
     char* s;
 
     strncpy(dstrend_object, attr_name, sizeof(dstrend_object));
     if ((s = strchr(dstrend_object, '.')))
       *s = 0;
 
-    char msg[23 + sizeof(dstrend_object) +1];
+    char msg[23 + sizeof(dstrend_object) + 1];
     snprintf(msg, sizeof(msg), "DsTrendCurve.Object = %s", dstrend_object);
     msg[sizeof(msg) - 1] = 0;
     dyn->graph->message('I', msg);
@@ -23182,21 +24251,14 @@ void GeDsTrendCurve::set_attribute(
 
 void GeDsTrendCurve::replace_attribute(char* from, char* to, int* cnt, int strict)
 {
-  GeDyn::replace_attribute(
-      dstrend_object, sizeof(dstrend_object), from, to, cnt, strict);
-  GeDyn::replace_attribute(
-      minvalue_attr1, sizeof(minvalue_attr1), from, to, cnt, strict);
-  GeDyn::replace_attribute(
-      maxvalue_attr1, sizeof(maxvalue_attr1), from, to, cnt, strict);
-  GeDyn::replace_attribute(
-      minvalue_attr2, sizeof(minvalue_attr2), from, to, cnt, strict);
-  GeDyn::replace_attribute(
-      maxvalue_attr2, sizeof(maxvalue_attr2), from, to, cnt, strict);
+  GeDyn::replace_attribute(dstrend_object, sizeof(dstrend_object), from, to, cnt, strict);
+  GeDyn::replace_attribute(minvalue_attr1, sizeof(minvalue_attr1), from, to, cnt, strict);
+  GeDyn::replace_attribute(maxvalue_attr1, sizeof(maxvalue_attr1), from, to, cnt, strict);
+  GeDyn::replace_attribute(minvalue_attr2, sizeof(minvalue_attr2), from, to, cnt, strict);
+  GeDyn::replace_attribute(maxvalue_attr2, sizeof(maxvalue_attr2), from, to, cnt, strict);
   GeDyn::replace_attribute(hold_attr, sizeof(hold_attr), from, to, cnt, strict);
-  GeDyn::replace_attribute(
-      mark1_attr, sizeof(mark1_attr), from, to, cnt, strict);
-  GeDyn::replace_attribute(
-      mark2_attr, sizeof(mark2_attr), from, to, cnt, strict);
+  GeDyn::replace_attribute(mark1_attr, sizeof(mark1_attr), from, to, cnt, strict);
+  GeDyn::replace_attribute(mark2_attr, sizeof(mark2_attr), from, to, cnt, strict);
 }
 
 void GeDsTrendCurve::save(std::ofstream& fp)
@@ -23222,8 +24284,10 @@ void GeDsTrendCurve::open(std::ifstream& fp)
   char dummy[40];
   int tmp;
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeDsTrendCurve: \"%d %s\"\n", type, dummy);
@@ -23231,7 +24295,8 @@ void GeDsTrendCurve::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_DsTrendCurve:
       break;
     case ge_eSave_DsTrendCurve_dstrend_object:
@@ -23286,8 +24351,7 @@ void GeDsTrendCurve::open(std::ifstream& fp)
   }
 }
 
-int GeDsTrendCurve::connect(
-    grow_tObject object, glow_sTraceData* trace_data, bool now)
+int GeDsTrendCurve::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
 {
   pwr_tStatus sts;
   pwr_sClass_DsTrendCurve tcp;
@@ -23302,37 +24366,34 @@ int GeDsTrendCurve::connect(
   sts = gdh_NameToAttrref(pwr_cNOid, dstrend_object, &dstrend_aref);
   if (EVEN(sts))
     return sts;
-     
+
   sts = gdh_GetObjectInfoAttrref(&dstrend_aref, &tcp, sizeof(tcp));
   if (EVEN(sts))
     return sts;
 
   i = 0;
-  for (int j = 0; j < 10; j++) {
-    if (cdh_ObjidIsNotNull(tcp.Attribute[j].Objid)
-	&& cdh_ObjidIsNotNull(tcp.Buffers[j].Objid)) {
-      sts = gdh_AttrrefToName(&tcp.Buffers[j], object_name[i],
-			       sizeof(object_name[0]), cdh_mNName);
+  for (int j = 0; j < 10; j++)
+  {
+    if (cdh_ObjidIsNotNull(tcp.Attribute[j].Objid) && cdh_ObjidIsNotNull(tcp.Buffers[j].Objid))
+    {
+      sts = gdh_AttrrefToName(&tcp.Buffers[j], object_name[i], sizeof(object_name[0]), cdh_mNName);
       if (EVEN(sts))
-	return sts;
+        return sts;
 
-      sts = gdh_AttrrefToName(&tcp.Attribute[j], object_name[i],
-			       sizeof(object_name[0]), cdh_mNName);
+      sts = gdh_AttrrefToName(&tcp.Attribute[j], object_name[i], sizeof(object_name[0]), cdh_mNName);
       if (EVEN(sts))
-	return sts;
+        return sts;
 
-      element_size[i]
-	= cdh_TypeToSize((pwr_eType)tcp.AttributeType[j]);
+      element_size[i] = cdh_TypeToSize((pwr_eType)tcp.AttributeType[j]);
       element_type[i] = (pwr_eType)tcp.AttributeType[j];
       cb_info[i].resolution = tcp.DisplayResolution;
       if (cb_info[i].resolution <= 0)
-	cb_info[i].resolution = 1;
-      cb_info[i].samples = tcp.DisplayTime / tcp.ScanTime
-	/ cb_info[i].resolution;
+        cb_info[i].resolution = 1;
+      cb_info[i].samples = tcp.DisplayTime / tcp.ScanTime / cb_info[i].resolution;
       cb_info[i].bufsize = cb_info[i].samples * element_size[i];
       cb_info[i].bufp = (char*)calloc(1, cb_info[i].bufsize);
       cb_info[i].circ_aref = tcp.Buffers[j];
-      
+
       i++;
       dstrend_cnt++;
     }
@@ -23344,90 +24405,89 @@ int GeDsTrendCurve::connect(
     return 0;
 
   min_value1_p = 0;
-  min_value1_db = dyn->parse_attr_name(
-      minvalue_attr1, parsed_name, &inverted, &attr_type, &attr_size);
-  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32) {
-    switch (min_value1_db) {
+  min_value1_db = dyn->parse_attr_name(minvalue_attr1, parsed_name, &inverted, &attr_type, &attr_size);
+  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32)
+  {
+    switch (min_value1_db)
+    {
     case graph_eDatabase_Gdh:
-      sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name,
-          (void**)&min_value1_p, &min_value_subid1, attr_size, object, now);
+      sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&min_value1_p, &min_value_subid1,
+                                        attr_size, object, now);
       break;
     case graph_eDatabase_Local:
-      min_value1_p = (pwr_tFloat32*)dyn->graph->localdb_ref_or_create(
-          parsed_name, attr_type);
+      min_value1_p = (pwr_tFloat32*)dyn->graph->localdb_ref_or_create(parsed_name, attr_type);
       break;
     default:;
     }
   }
   max_value1_p = 0;
-  max_value1_db = dyn->parse_attr_name(
-      maxvalue_attr1, parsed_name, &inverted, &attr_type, &attr_size);
-  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32) {
-    switch (max_value1_db) {
+  max_value1_db = dyn->parse_attr_name(maxvalue_attr1, parsed_name, &inverted, &attr_type, &attr_size);
+  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32)
+  {
+    switch (max_value1_db)
+    {
     case graph_eDatabase_Gdh:
-      sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name,
-          (void**)&max_value1_p, &max_value_subid1, attr_size, object, now);
+      sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&max_value1_p, &max_value_subid1,
+                                        attr_size, object, now);
       break;
     case graph_eDatabase_Local:
-      max_value1_p = (pwr_tFloat32*)dyn->graph->localdb_ref_or_create(
-          parsed_name, attr_type);
+      max_value1_p = (pwr_tFloat32*)dyn->graph->localdb_ref_or_create(parsed_name, attr_type);
       break;
     default:;
     }
   }
   min_value2_p = 0;
-  dyn->parse_attr_name(
-      minvalue_attr2, parsed_name, &inverted, &attr_type, &attr_size);
-  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32) {
-    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name,
-        (void**)&min_value2_p, &min_value_subid2, attr_size, object, now);
+  dyn->parse_attr_name(minvalue_attr2, parsed_name, &inverted, &attr_type, &attr_size);
+  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32)
+  {
+    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&min_value2_p, &min_value_subid2,
+                                      attr_size, object, now);
   }
   max_value2_p = 0;
-  dyn->parse_attr_name(
-      maxvalue_attr2, parsed_name, &inverted, &attr_type, &attr_size);
-  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32) {
-    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name,
-        (void**)&max_value2_p, &max_value_subid2, attr_size, object, now);
+  dyn->parse_attr_name(maxvalue_attr2, parsed_name, &inverted, &attr_type, &attr_size);
+  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32)
+  {
+    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&max_value2_p, &max_value_subid2,
+                                      attr_size, object, now);
   }
 
   trend_hold = 0;
   hold_p = 0;
-  hold_db = dyn->parse_attr_name(
-      hold_attr, parsed_name, &inverted, &attr_type, &attr_size);
-  if (!streq(parsed_name, "") && attr_type == pwr_eType_Boolean) {
-    switch (hold_db) {
+  hold_db = dyn->parse_attr_name(hold_attr, parsed_name, &inverted, &attr_type, &attr_size);
+  if (!streq(parsed_name, "") && attr_type == pwr_eType_Boolean)
+  {
+    switch (hold_db)
+    {
     case graph_eDatabase_Gdh:
-      sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name,
-          (void**)&hold_p, &hold_subid, attr_size, object, now);
+      sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&hold_p, &hold_subid, attr_size,
+                                        object, now);
       if (EVEN(sts))
         return sts;
       break;
     case graph_eDatabase_Local:
-      hold_p = (pwr_tBoolean*)dyn->graph->localdb_ref_or_create(
-          parsed_name, attr_type);
+      hold_p = (pwr_tBoolean*)dyn->graph->localdb_ref_or_create(parsed_name, attr_type);
       break;
     default:;
     }
   }
 
   mark1_p = 0;
-  dyn->parse_attr_name(
-      mark1_attr, parsed_name, &inverted, &attr_type, &attr_size);
-  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32) {
-    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&mark1_p,
-        &mark1_subid, attr_size, object, now);
+  dyn->parse_attr_name(mark1_attr, parsed_name, &inverted, &attr_type, &attr_size);
+  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32)
+  {
+    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&mark1_p, &mark1_subid, attr_size,
+                                      object, now);
   }
 
   mark2_p = 0;
-  dyn->parse_attr_name(
-      mark2_attr, parsed_name, &inverted, &attr_type, &attr_size);
-  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32) {
-    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&mark2_p,
-        &mark2_subid, attr_size, object, now);
+  dyn->parse_attr_name(mark2_attr, parsed_name, &inverted, &attr_type, &attr_size);
+  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32)
+  {
+    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&mark2_p, &mark2_subid, attr_size,
+                                      object, now);
   }
 
-  if (mark1_color != glow_eDrawType_Inherit
-      || mark2_color != glow_eDrawType_Inherit)
+  if (mark1_color != glow_eDrawType_Inherit || mark2_color != glow_eDrawType_Inherit)
     grow_SetTrendMarkColor(object, mark1_color, mark2_color);
 
   grow_SetTrendNoOfCurves(object, dstrend_cnt);
@@ -23439,31 +24499,38 @@ int GeDsTrendCurve::connect(
 
 int GeDsTrendCurve::disconnect(grow_tObject object)
 {
-  if (min_value1_p && min_value1_db == graph_eDatabase_Gdh) {
+  if (min_value1_p && min_value1_db == graph_eDatabase_Gdh)
+  {
     gdh_UnrefObjectInfo(min_value_subid1);
     min_value1_p = 0;
   }
-  if (max_value1_p && max_value1_db == graph_eDatabase_Gdh) {
+  if (max_value1_p && max_value1_db == graph_eDatabase_Gdh)
+  {
     gdh_UnrefObjectInfo(max_value_subid1);
     max_value1_p = 0;
   }
-  if (min_value2_p) {
+  if (min_value2_p)
+  {
     gdh_UnrefObjectInfo(min_value_subid2);
     min_value2_p = 0;
   }
-  if (max_value2_p) {
+  if (max_value2_p)
+  {
     gdh_UnrefObjectInfo(max_value_subid2);
     max_value2_p = 0;
   }
-  if (hold_p && hold_db == graph_eDatabase_Gdh) {
+  if (hold_p && hold_db == graph_eDatabase_Gdh)
+  {
     gdh_UnrefObjectInfo(hold_subid);
     hold_p = 0;
   }
-  if (mark1_p) {
+  if (mark1_p)
+  {
     gdh_UnrefObjectInfo(mark1_subid);
     mark1_p = 0;
   }
-  if (mark2_p) {
+  if (mark2_p)
+  {
     gdh_UnrefObjectInfo(mark2_subid);
     mark1_p = 0;
   }
@@ -23477,7 +24544,7 @@ int GeDsTrendCurve::scan(grow_tObject object)
 
   pwr_tStatus sts;
   int i, j;
-  double *data[3];
+  double* data[3];
   int new_curve = 0;
   unsigned int size;
   unsigned int actual_data_size[2];
@@ -23485,82 +24552,95 @@ int GeDsTrendCurve::scan(grow_tObject object)
   if (hold_p)
     trend_hold = *hold_p;
 
-  if (max_value1_p || min_value1_p) {
+  if (max_value1_p || min_value1_p)
+  {
     bool update = false;
 
     pwr_tFloat32 maxval;
     pwr_tFloat32 minval;
-    if (max_value1_p) {
+    if (max_value1_p)
+    {
       maxval = *max_value1_p;
       if (!feqf(maxval, old_max_value1))
-	update = true;
+        update = true;
     }
-    if (min_value1_p) {
+    if (min_value1_p)
+    {
       minval = *min_value1_p;
       if (!feqf(minval, old_min_value1))
-	update = true;
+        update = true;
     }
-    if (update) {
+    if (update)
+    {
       double minvald, maxvald;
       grow_GetTrendRangeY(object, 0, &minvald, &maxvald);
 
       if (!min_value1_p)
-	minval = minvald;
+        minval = minvald;
       if (!max_value1_p)
-	maxval = maxvald;
+        maxval = maxvald;
 
-      if (fabsf(maxval - minval) > FLT_EPSILON) {
+      if (fabsf(maxval - minval) > FLT_EPSILON)
+      {
         grow_SetTrendRangeY(object, 0, minval, maxval);
-	new_curve = 1;
+        new_curve = 1;
       }
       old_min_value1 = minval;
       old_max_value1 = maxval;
     }
   }
 
-  if (max_value2_p || min_value2_p) {
+  if (max_value2_p || min_value2_p)
+  {
     bool update = false;
 
     pwr_tFloat32 maxval;
     pwr_tFloat32 minval;
-    if (max_value2_p) {
+    if (max_value2_p)
+    {
       maxval = *max_value2_p;
       if (!feqf(maxval, old_max_value2))
-	update = true;
+        update = true;
     }
-    if (min_value2_p) {
+    if (min_value2_p)
+    {
       minval = *min_value2_p;
       if (!feqf(minval, old_min_value2))
-	update = true;
+        update = true;
     }
-    if (update) {
+    if (update)
+    {
       double minvald, maxvald;
       grow_GetTrendRangeY(object, 1, &minvald, &maxvald);
 
       if (!min_value2_p)
-	minval = minvald;
+        minval = minvald;
       if (!max_value2_p)
-	maxval = maxvald;
+        maxval = maxvald;
 
-      if (fabsf(maxval - minval) > FLT_EPSILON) {
+      if (fabsf(maxval - minval) > FLT_EPSILON)
+      {
         grow_SetTrendRangeY(object, 1, minval, maxval);
-	new_curve = 1;
+        new_curve = 1;
       }
       old_min_value2 = minval;
       old_max_value2 = maxval;
     }
   }
 
-  if (mark1_p && (first_scan || fabsf(*mark1_p - old_mark1) > FLT_EPSILON)) {
+  if (mark1_p && (first_scan || fabsf(*mark1_p - old_mark1) > FLT_EPSILON))
+  {
     grow_SetTrendYMark1(object, *mark1_p);
     old_mark1 = *mark1_p;
   }
-  if (mark2_p && (first_scan || fabsf(*mark2_p - old_mark2) > FLT_EPSILON)) {
+  if (mark2_p && (first_scan || fabsf(*mark2_p - old_mark2) > FLT_EPSILON))
+  {
     grow_SetTrendYMark2(object, *mark2_p);
     old_mark2 = *mark2_p;
   }
 
-  if (first_scan) {
+  if (first_scan)
+  {
     first_scan = false;
     new_curve = 1;
   }
@@ -23568,88 +24648,99 @@ int GeDsTrendCurve::scan(grow_tObject object)
   if (trend_hold)
     return 1;
 
-  if (new_curve) {
+  if (new_curve)
+  {
     // Draw whole curve
-    
+
     max_points = 0;
-    for (i = 0; i < dstrend_cnt; i++) 
+    for (i = 0; i < dstrend_cnt; i++)
       max_points = MAX(max_points, cb_info[i].samples);
 
-    for (i = 0; i < dstrend_cnt; i++) {
+    for (i = 0; i < dstrend_cnt; i++)
+    {
       sts = cbuf_GetCircBuffInfo(&cb_info[i], 1);
       if (EVEN(sts))
-	continue;
+        continue;
 
       actual_data_size[i] = cb_info[i].size;
       if (actual_data_size[i] > cb_info[i].bufsize)
-	printf("** Sample size error !!!\n");
+        printf("** Sample size error !!!\n");
 
       data[0] = (double*)calloc(1, 8 * max_points);
       for (j = 0; j < max_points; j++)
-	data[0][max_points-j-1] = (double)j / max_points * 100;
+        data[0][max_points - j - 1] = (double)j / max_points * 100;
 
-      data[i+1] = (double*)calloc(1, 8 * max_points);
+      data[i + 1] = (double*)calloc(1, 8 * max_points);
       for (unsigned int j = 0; j < actual_data_size[i]; j++)
-	data[i+1][j] = *(pwr_tFloat32*)((char*)cb_info[i].bufp
-	     + (actual_data_size[i] - j - 1) * sizeof(pwr_tFloat32));
+        data[i + 1][j] =
+            *(pwr_tFloat32*)((char*)cb_info[i].bufp + (actual_data_size[i] - j - 1) * sizeof(pwr_tFloat32));
     }
 
     grow_SetTrendData(object, data, dstrend_cnt + 1, max_points);
 
     free(data[0]);
     for (i = 0; i < dstrend_cnt; i++)
-      free(data[i+1]);
+      free(data[i + 1]);
   }
-  else {
+  else
+  {
     // Check if any new value
     sts = cbuf_UpdateCircBuffInfo(cb_info, dstrend_cnt);
     if (EVEN(sts))
       return sts;
 
-    for (i = 0; i < dstrend_cnt; i++) {
+    for (i = 0; i < dstrend_cnt; i++)
+    {
       size = cb_info[i].size;
-      if (size > 0) {
+      if (size > 0)
+      {
         // Shift data
-	if (size > 2)
-	  grow_SetNodraw(dyn->graph->grow->ctx);
+        if (size > 2)
+          grow_SetNodraw(dyn->graph->grow->ctx);
 
-        for (j = 0; j < (int)size; j++) {
-	  float value = *(pwr_tFloat32*)((char*)cb_info[i].bufp
-					 + j * sizeof(pwr_tFloat32));
-	  grow_AddTrendValue(object, double(value), i);
+        for (j = 0; j < (int)size; j++)
+        {
+          float value = *(pwr_tFloat32*)((char*)cb_info[i].bufp + j * sizeof(pwr_tFloat32));
+          grow_AddTrendValue(object, double(value), i);
         }
 
-	if (size > 2) {
-	  grow_ResetNodraw(dyn->graph->grow->ctx);
-	  grow_Redraw(dyn->graph->grow->ctx);
-	}
+        if (size > 2)
+        {
+          grow_ResetNodraw(dyn->graph->grow->ctx);
+          grow_Redraw(dyn->graph->grow->ctx);
+        }
       }
     }
   }
-  
+
   return 1;
 }
 
-int GeDsTrendCurve::syntax_check(
-    grow_tObject object, int* error_cnt, int* warning_cnt)
+int GeDsTrendCurve::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
   int sts;
   pwr_eType a_type;
 
-  if (streq(dstrend_object, "")) {
+  if (streq(dstrend_object, ""))
+  {
     dyn->graph->syntax_msg('W', object, "DsTrendCurve.Object is missing");
     (*warning_cnt)++;
-  } else {
+  }
+  else
+  {
     sts = dyn->graph->check_ldh_object(dstrend_object, &a_type);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       char msg[440];
       sprintf(msg, "DsTrendCurve.Object \"%s\" not found", dstrend_object);
       dyn->graph->syntax_msg('W', object, msg);
       (*warning_cnt)++;
-    } else {
-      if (a_type != pwr_cClass_DsTrendCurve) {
-        dyn->graph->syntax_msg(
-            'E', object, "DsTrendCurve.Object is of wrong class");
+    }
+    else
+    {
+      if (a_type != pwr_cClass_DsTrendCurve)
+      {
+        dyn->graph->syntax_msg('E', object, "DsTrendCurve.Object is of wrong class");
         (*error_cnt)++;
       }
     }
@@ -23658,14 +24749,12 @@ int GeDsTrendCurve::syntax_check(
 }
 
 GeSevHist::GeSevHist(GeDyn* e_dyn)
-    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_SevHist,
-		ge_mActionType1_No, ge_mActionType2_No, ge_eDynPrio_SevHist),
-      timerange(0), updatetime(0), sevhist_cnt(0),
-      min_value1_p(0), max_value1_p(0), old_min_value1(0), old_max_value1(0),
-      min_value2_p(0), max_value2_p(0), old_min_value2(0), old_max_value2(0),
-      timerange_p(0), hold_p(0), update_p(0), old_update(0),
-      mark1_color(glow_eDrawType_Inherit), mark2_color(glow_eDrawType_Inherit),
-      acc_time(0)
+    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_SevHist, ge_mActionType1_No, ge_mActionType2_No,
+                ge_eDynPrio_SevHist),
+      timerange(0), updatetime(0), sevhist_cnt(0), min_value1_p(0), max_value1_p(0), old_min_value1(0),
+      old_max_value1(0), min_value2_p(0), max_value2_p(0), old_min_value2(0), old_max_value2(0),
+      timerange_p(0), hold_p(0), update_p(0), old_update(0), mark1_color(glow_eDrawType_Inherit),
+      mark2_color(glow_eDrawType_Inherit), acc_time(0)
 {
   strcpy(sevhist_object1, "");
   strcpy(sevhist_object2, "");
@@ -23684,9 +24773,8 @@ GeSevHist::GeSevHist(GeDyn* e_dyn)
 }
 
 GeSevHist::GeSevHist(const GeSevHist& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-		x.prio), timerange(x.timerange), updatetime(x.updatetime),
-      mark1_color(x.mark1_color), mark2_color(x.mark2_color)
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio),
+      timerange(x.timerange), updatetime(x.updatetime), mark1_color(x.mark1_color), mark2_color(x.mark2_color)
 
 {
   strcpy(sevhist_object1, x.sevhist_object1);
@@ -23803,14 +24891,14 @@ void GeSevHist::get_attributes(attr_sItem* attrinfo, int* item_count)
   *item_count = i;
 }
 
-void GeSevHist::set_attribute(
-    grow_tObject object, const char* attr_name, int* cnt)
+void GeSevHist::set_attribute(grow_tObject object, const char* attr_name, int* cnt)
 {
   (*cnt)--;
-  if (*cnt == 0) {
+  if (*cnt == 0)
+  {
     strncpy(attribute1, attr_name, sizeof(attribute1));
 
-    char msg[23 + sizeof(attribute1) +1];
+    char msg[23 + sizeof(attribute1) + 1];
     snprintf(msg, sizeof(msg), "SevHist.Attribute1 = %s", attribute1);
     msg[sizeof(msg) - 1] = 0;
     dyn->graph->message('I', msg);
@@ -23819,32 +24907,20 @@ void GeSevHist::set_attribute(
 
 void GeSevHist::replace_attribute(char* from, char* to, int* cnt, int strict)
 {
-  GeDyn::replace_attribute(
-      sevhist_object1, sizeof(sevhist_object1), from, to, cnt, strict);
-  GeDyn::replace_attribute(
-      sevhist_object2, sizeof(sevhist_object2), from, to, cnt, strict);
-  GeDyn::replace_attribute(
-      attribute1, sizeof(attribute1), from, to, cnt, strict);
-  GeDyn::replace_attribute(
-      attribute2, sizeof(attribute2), from, to, cnt, strict);
-  GeDyn::replace_attribute(
-      server, sizeof(server), from, to, cnt, strict);
-  GeDyn::replace_attribute(
-      timerange_attr, sizeof(timerange_attr), from, to, cnt, strict);
-  GeDyn::replace_attribute(
-      minvalue_attr1, sizeof(minvalue_attr1), from, to, cnt, strict);
-  GeDyn::replace_attribute(
-      maxvalue_attr1, sizeof(maxvalue_attr1), from, to, cnt, strict);
-  GeDyn::replace_attribute(
-      minvalue_attr2, sizeof(minvalue_attr2), from, to, cnt, strict);
-  GeDyn::replace_attribute(
-      maxvalue_attr2, sizeof(maxvalue_attr2), from, to, cnt, strict);
+  GeDyn::replace_attribute(sevhist_object1, sizeof(sevhist_object1), from, to, cnt, strict);
+  GeDyn::replace_attribute(sevhist_object2, sizeof(sevhist_object2), from, to, cnt, strict);
+  GeDyn::replace_attribute(attribute1, sizeof(attribute1), from, to, cnt, strict);
+  GeDyn::replace_attribute(attribute2, sizeof(attribute2), from, to, cnt, strict);
+  GeDyn::replace_attribute(server, sizeof(server), from, to, cnt, strict);
+  GeDyn::replace_attribute(timerange_attr, sizeof(timerange_attr), from, to, cnt, strict);
+  GeDyn::replace_attribute(minvalue_attr1, sizeof(minvalue_attr1), from, to, cnt, strict);
+  GeDyn::replace_attribute(maxvalue_attr1, sizeof(maxvalue_attr1), from, to, cnt, strict);
+  GeDyn::replace_attribute(minvalue_attr2, sizeof(minvalue_attr2), from, to, cnt, strict);
+  GeDyn::replace_attribute(maxvalue_attr2, sizeof(maxvalue_attr2), from, to, cnt, strict);
   GeDyn::replace_attribute(hold_attr, sizeof(hold_attr), from, to, cnt, strict);
   GeDyn::replace_attribute(update_attr, sizeof(update_attr), from, to, cnt, strict);
-  GeDyn::replace_attribute(
-      mark1_attr, sizeof(mark1_attr), from, to, cnt, strict);
-  GeDyn::replace_attribute(
-      mark2_attr, sizeof(mark2_attr), from, to, cnt, strict);
+  GeDyn::replace_attribute(mark1_attr, sizeof(mark1_attr), from, to, cnt, strict);
+  GeDyn::replace_attribute(mark2_attr, sizeof(mark2_attr), from, to, cnt, strict);
 }
 
 void GeSevHist::save(std::ofstream& fp)
@@ -23878,8 +24954,10 @@ void GeSevHist::open(std::ifstream& fp)
   char dummy[40];
   int tmp;
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeSevHist: \"%d %s\"\n", type, dummy);
@@ -23887,7 +24965,8 @@ void GeSevHist::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_SevHist:
       break;
     case ge_eSave_SevHist_sevhist_object1:
@@ -23972,24 +25051,25 @@ void GeSevHist::open(std::ifstream& fp)
   }
 }
 
-int GeSevHist::connect(
-    grow_tObject object, glow_sTraceData* trace_data, bool now)
+int GeSevHist::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
 {
   pwr_tStatus sts;
   int attr_type, attr_size;
   pwr_tAName parsed_name;
   int inverted;
-  char *s;
+  char* s;
 
   scctx = sevcli_get_stored_ctx();
-  if (!scctx) {
+  if (!scctx)
+  {
     sevcli_init(&sts, &scctx);
     if (EVEN(sts))
       return sts;
     sevcli_store_ctx(scctx);
   }
 
-  if (strcmp(sevhist_object1, "") != 0) {
+  if (strcmp(sevhist_object1, "") != 0)
+  {
     pwr_tAttrRef sevhist_aref;
     pwr_tAttrRef thread_aref;
     pwr_tAttrRef aref;
@@ -23997,31 +25077,33 @@ int GeSevHist::connect(
     pwr_tAName aname;
     pwr_tCid cid;
     pwr_tOid thread_oid;
-    char *np;
-    char *s;
+    char* np;
+    char* s;
     int server_found = 0;
 
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < 2; i++)
+    {
       if (i == 0)
-	np = sevhist_object1;
+        np = sevhist_object1;
       else
-	np = sevhist_object2;
+        np = sevhist_object2;
 
       if (strcmp(np, "") == 0)
-	continue;
+        continue;
 
       sts = gdh_NameToAttrref(pwr_cNObjid, np, &sevhist_aref);
       if (EVEN(sts))
-	return sts;
+        return sts;
 
       sts = gdh_GetAttrRefTid(&sevhist_aref, &cid);
       if (EVEN(sts))
         return sts;
 
       if (cid != pwr_cClass_SevHist)
-	continue;
+        continue;
 
-      if (!server_found) {
+      if (!server_found)
+      {
 
         sts = gdh_ArefANameToAref(&sevhist_aref, "ThreadObject", &aref);
         if (EVEN(sts))
@@ -24031,53 +25113,56 @@ int GeSevHist::connect(
         if (EVEN(sts))
           return sts;
 
-	thread_aref = cdh_ObjidToAref(thread_oid);
-	sts = gdh_ArefANameToAref(&thread_aref, "ServerNode", &aref);
-	if (EVEN(sts)) 
-	  return sts;
+        thread_aref = cdh_ObjidToAref(thread_oid);
+        sts = gdh_ArefANameToAref(&thread_aref, "ServerNode", &aref);
+        if (EVEN(sts))
+          return sts;
 
-	sts = gdh_GetObjectInfoAttrref(&aref, server, sizeof(server));
-	if (EVEN(sts))
-	  return sts;    
+        sts = gdh_GetObjectInfoAttrref(&aref, server, sizeof(server));
+        if (EVEN(sts))
+          return sts;
 
-	server_found = 1;
+        server_found = 1;
       }
 
       sts = gdh_ArefANameToAref(&sevhist_aref, "Attribute", &aref);
       if (EVEN(sts))
-	return sts;
-    
+        return sts;
+
       sts = gdh_GetObjectInfoAttrref(&aref, &attr_aref, sizeof(attr_aref));
       if (EVEN(sts))
-	return sts;    
+        return sts;
 
       sts = gdh_AttrrefToName(&attr_aref, aname, sizeof(aname), cdh_mNName);
       if (EVEN(sts))
-	return sts;
+        return sts;
 
       s = strchr(aname, '.');
       if (!s)
-	return 0;
+        return 0;
 
       oidv[sevhist_cnt] = attr_aref.Objid;
-      strcpy(anamev[sevhist_cnt], s+1);
+      strcpy(anamev[sevhist_cnt], s + 1);
       sevhist_cnt++;
     }
   }
-  else {
+  else
+  {
     memset(oidv, 0, sizeof(oidv));
     if (strcmp(server, "") == 0)
       return 0;
-    if (strcmp(attribute1, "") != 0) {
+    if (strcmp(attribute1, "") != 0)
+    {
       strncpy(anamev[sevhist_cnt], attribute1, sizeof(anamev[0]));
       if ((s = strchr(anamev[sevhist_cnt], '#')))
-	*s = 0;
+        *s = 0;
       sevhist_cnt++;
     }
-    if (strcmp(attribute2, "") != 0) {
+    if (strcmp(attribute2, "") != 0)
+    {
       strncpy(anamev[sevhist_cnt], attribute2, sizeof(anamev[0]));
       if ((s = strchr(anamev[sevhist_cnt], '#')))
-	*s = 0;
+        *s = 0;
       sevhist_cnt++;
     }
   }
@@ -24086,64 +25171,64 @@ int GeSevHist::connect(
     return 0;
 
   min_value1_p = 0;
-  min_value1_db = dyn->parse_attr_name(
-      minvalue_attr1, parsed_name, &inverted, &attr_type, &attr_size);
-  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32) {
-    switch (min_value1_db) {
+  min_value1_db = dyn->parse_attr_name(minvalue_attr1, parsed_name, &inverted, &attr_type, &attr_size);
+  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32)
+  {
+    switch (min_value1_db)
+    {
     case graph_eDatabase_Gdh:
-      sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name,
-          (void**)&min_value1_p, &min_value_subid1, attr_size, object, now);
+      sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&min_value1_p, &min_value_subid1,
+                                        attr_size, object, now);
       break;
     case graph_eDatabase_Local:
-      min_value1_p = (pwr_tFloat32*)dyn->graph->localdb_ref_or_create(
-          parsed_name, attr_type);
+      min_value1_p = (pwr_tFloat32*)dyn->graph->localdb_ref_or_create(parsed_name, attr_type);
       break;
     default:;
     }
   }
   max_value1_p = 0;
-  max_value1_db = dyn->parse_attr_name(
-      maxvalue_attr1, parsed_name, &inverted, &attr_type, &attr_size);
-  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32) {
-    switch (max_value1_db) {
+  max_value1_db = dyn->parse_attr_name(maxvalue_attr1, parsed_name, &inverted, &attr_type, &attr_size);
+  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32)
+  {
+    switch (max_value1_db)
+    {
     case graph_eDatabase_Gdh:
-      sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name,
-          (void**)&max_value1_p, &max_value_subid1, attr_size, object, now);
+      sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&max_value1_p, &max_value_subid1,
+                                        attr_size, object, now);
       break;
     case graph_eDatabase_Local:
-      max_value1_p = (pwr_tFloat32*)dyn->graph->localdb_ref_or_create(
-          parsed_name, attr_type);
+      max_value1_p = (pwr_tFloat32*)dyn->graph->localdb_ref_or_create(parsed_name, attr_type);
       break;
     default:;
     }
   }
   min_value2_p = 0;
-  dyn->parse_attr_name(
-      minvalue_attr2, parsed_name, &inverted, &attr_type, &attr_size);
-  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32) {
-    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name,
-        (void**)&min_value2_p, &min_value_subid2, attr_size, object, now);
+  dyn->parse_attr_name(minvalue_attr2, parsed_name, &inverted, &attr_type, &attr_size);
+  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32)
+  {
+    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&min_value2_p, &min_value_subid2,
+                                      attr_size, object, now);
   }
   max_value2_p = 0;
-  dyn->parse_attr_name(
-      maxvalue_attr2, parsed_name, &inverted, &attr_type, &attr_size);
-  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32) {
-    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name,
-        (void**)&max_value2_p, &max_value_subid2, attr_size, object, now);
+  dyn->parse_attr_name(maxvalue_attr2, parsed_name, &inverted, &attr_type, &attr_size);
+  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32)
+  {
+    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&max_value2_p, &max_value_subid2,
+                                      attr_size, object, now);
   }
 
   timerange_p = 0;
-  timerange_db = dyn->parse_attr_name(
-      timerange_attr, parsed_name, &inverted, &attr_type, &attr_size);
-  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32) {
-    switch (timerange_db) {
+  timerange_db = dyn->parse_attr_name(timerange_attr, parsed_name, &inverted, &attr_type, &attr_size);
+  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32)
+  {
+    switch (timerange_db)
+    {
     case graph_eDatabase_Gdh:
-      sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name,
-          (void**)&timerange_p, &timerange_subid, attr_size, object, now);
+      sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&timerange_p, &timerange_subid,
+                                        attr_size, object, now);
       break;
     case graph_eDatabase_Local:
-      timerange_p = (pwr_tFloat32*)dyn->graph->localdb_ref_or_create(
-          parsed_name, attr_type);
+      timerange_p = (pwr_tFloat32*)dyn->graph->localdb_ref_or_create(parsed_name, attr_type);
       break;
     default:;
     }
@@ -24151,19 +25236,19 @@ int GeSevHist::connect(
 
   trend_hold = 0;
   hold_p = 0;
-  hold_db = dyn->parse_attr_name(
-      hold_attr, parsed_name, &inverted, &attr_type, &attr_size);
-  if (!streq(parsed_name, "") && attr_type == pwr_eType_Boolean) {
-    switch (hold_db) {
+  hold_db = dyn->parse_attr_name(hold_attr, parsed_name, &inverted, &attr_type, &attr_size);
+  if (!streq(parsed_name, "") && attr_type == pwr_eType_Boolean)
+  {
+    switch (hold_db)
+    {
     case graph_eDatabase_Gdh:
-      sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name,
-          (void**)&hold_p, &hold_subid, attr_size, object, now);
+      sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&hold_p, &hold_subid, attr_size,
+                                        object, now);
       if (EVEN(sts))
         return sts;
       break;
     case graph_eDatabase_Local:
-      hold_p = (pwr_tBoolean*)dyn->graph->localdb_ref_or_create(
-          parsed_name, attr_type);
+      hold_p = (pwr_tBoolean*)dyn->graph->localdb_ref_or_create(parsed_name, attr_type);
       break;
     default:;
     }
@@ -24171,42 +25256,41 @@ int GeSevHist::connect(
 
   old_update = 0;
   update_p = 0;
-  update_db = dyn->parse_attr_name(
-      update_attr, parsed_name, &inverted, &attr_type, &attr_size);
-  if (!streq(parsed_name, "") && attr_type == pwr_eType_Boolean) {
-    switch (update_db) {
+  update_db = dyn->parse_attr_name(update_attr, parsed_name, &inverted, &attr_type, &attr_size);
+  if (!streq(parsed_name, "") && attr_type == pwr_eType_Boolean)
+  {
+    switch (update_db)
+    {
     case graph_eDatabase_Gdh:
-      sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name,
-          (void**)&update_p, &update_subid, attr_size, object, now);
+      sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&update_p, &update_subid, attr_size,
+                                        object, now);
       if (EVEN(sts))
         return sts;
       break;
     case graph_eDatabase_Local:
-      update_p = (pwr_tBoolean*)dyn->graph->localdb_ref_or_create(
-          parsed_name, attr_type);
+      update_p = (pwr_tBoolean*)dyn->graph->localdb_ref_or_create(parsed_name, attr_type);
       break;
     default:;
     }
   }
 
   mark1_p = 0;
-  dyn->parse_attr_name(
-      mark1_attr, parsed_name, &inverted, &attr_type, &attr_size);
-  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32) {
-    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&mark1_p,
-        &mark1_subid, attr_size, object, now);
+  dyn->parse_attr_name(mark1_attr, parsed_name, &inverted, &attr_type, &attr_size);
+  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32)
+  {
+    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&mark1_p, &mark1_subid, attr_size,
+                                      object, now);
   }
 
   mark2_p = 0;
-  dyn->parse_attr_name(
-      mark2_attr, parsed_name, &inverted, &attr_type, &attr_size);
-  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32) {
-    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&mark2_p,
-        &mark2_subid, attr_size, object, now);
+  dyn->parse_attr_name(mark2_attr, parsed_name, &inverted, &attr_type, &attr_size);
+  if (!streq(parsed_name, "") && attr_type == pwr_eType_Float32)
+  {
+    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&mark2_p, &mark2_subid, attr_size,
+                                      object, now);
   }
 
-  if (mark1_color != glow_eDrawType_Inherit
-      || mark2_color != glow_eDrawType_Inherit)
+  if (mark1_color != glow_eDrawType_Inherit || mark2_color != glow_eDrawType_Inherit)
     grow_SetXYCurveMarkColor(object, mark1_color, mark2_color);
 
   max_points = grow_GetXYCurveNoOfPoints(object);
@@ -24224,31 +25308,38 @@ int GeSevHist::connect(
 
 int GeSevHist::disconnect(grow_tObject object)
 {
-  if (min_value1_p && min_value1_db == graph_eDatabase_Gdh) {
+  if (min_value1_p && min_value1_db == graph_eDatabase_Gdh)
+  {
     gdh_UnrefObjectInfo(min_value_subid1);
     min_value1_p = 0;
   }
-  if (max_value1_p && max_value1_db == graph_eDatabase_Gdh) {
+  if (max_value1_p && max_value1_db == graph_eDatabase_Gdh)
+  {
     gdh_UnrefObjectInfo(max_value_subid1);
     max_value1_p = 0;
   }
-  if (min_value2_p) {
+  if (min_value2_p)
+  {
     gdh_UnrefObjectInfo(min_value_subid2);
     min_value2_p = 0;
   }
-  if (max_value2_p) {
+  if (max_value2_p)
+  {
     gdh_UnrefObjectInfo(max_value_subid2);
     max_value2_p = 0;
   }
-  if (hold_p && hold_db == graph_eDatabase_Gdh) {
+  if (hold_p && hold_db == graph_eDatabase_Gdh)
+  {
     gdh_UnrefObjectInfo(hold_subid);
     hold_p = 0;
   }
-  if (mark1_p) {
+  if (mark1_p)
+  {
     gdh_UnrefObjectInfo(mark1_subid);
     mark1_p = 0;
   }
-  if (mark2_p) {
+  if (mark2_p)
+  {
     gdh_UnrefObjectInfo(mark2_subid);
     mark1_p = 0;
   }
@@ -24267,82 +25358,95 @@ int GeSevHist::scan(grow_tObject object)
   if (hold_p)
     trend_hold = *hold_p;
 
-  if (max_value1_p || min_value1_p) {
+  if (max_value1_p || min_value1_p)
+  {
     bool update = false;
 
     pwr_tFloat32 maxval;
     pwr_tFloat32 minval;
-    if (max_value1_p) {
+    if (max_value1_p)
+    {
       maxval = *max_value1_p;
       if (!feqf(maxval, old_max_value1))
-	update = true;
+        update = true;
     }
-    if (min_value1_p) {
+    if (min_value1_p)
+    {
       minval = *min_value1_p;
       if (!feqf(minval, old_min_value1))
-	update = true;
+        update = true;
     }
-    if (update) {
+    if (update)
+    {
       double minvald, maxvald;
       grow_GetXYCurveRangeY(object, 0, &minvald, &maxvald);
 
       if (!min_value1_p)
-	minval = minvald;
+        minval = minvald;
       if (!max_value1_p)
-	maxval = maxvald;
+        maxval = maxvald;
 
-      if (fabsf(maxval - minval) > FLT_EPSILON) {
+      if (fabsf(maxval - minval) > FLT_EPSILON)
+      {
         grow_SetXYCurveRangeY(object, 0, minval, maxval);
-	new_curve = 1;
+        new_curve = 1;
       }
       old_min_value1 = minval;
       old_max_value1 = maxval;
     }
   }
 
-  if (max_value2_p || min_value2_p) {
+  if (max_value2_p || min_value2_p)
+  {
     bool update = false;
 
     pwr_tFloat32 maxval;
     pwr_tFloat32 minval;
-    if (max_value2_p) {
+    if (max_value2_p)
+    {
       maxval = *max_value2_p;
       if (!feqf(maxval, old_max_value2))
-	update = true;
+        update = true;
     }
-    if (min_value2_p) {
+    if (min_value2_p)
+    {
       minval = *min_value2_p;
       if (!feqf(minval, old_min_value2))
-	update = true;
+        update = true;
     }
-    if (update) {
+    if (update)
+    {
       double minvald, maxvald;
       grow_GetXYCurveRangeY(object, 1, &minvald, &maxvald);
 
       if (!min_value2_p)
-	minval = minvald;
+        minval = minvald;
       if (!max_value2_p)
-	maxval = maxvald;
+        maxval = maxvald;
 
-      if (fabsf(maxval - minval) > FLT_EPSILON) {
+      if (fabsf(maxval - minval) > FLT_EPSILON)
+      {
         grow_SetXYCurveRangeY(object, 1, minval, maxval);
-	new_curve = 1;
+        new_curve = 1;
       }
       old_min_value2 = minval;
       old_max_value2 = maxval;
     }
   }
 
-  if (mark1_p && (first_scan || fabsf(*mark1_p - old_mark1) > FLT_EPSILON)) {
+  if (mark1_p && (first_scan || fabsf(*mark1_p - old_mark1) > FLT_EPSILON))
+  {
     grow_SetXYCurveYMark1(object, *mark1_p);
     old_mark1 = *mark1_p;
   }
-  if (mark2_p && (first_scan || fabsf(*mark2_p - old_mark2) > FLT_EPSILON)) {
+  if (mark2_p && (first_scan || fabsf(*mark2_p - old_mark2) > FLT_EPSILON))
+  {
     grow_SetXYCurveYMark2(object, *mark2_p);
     old_mark2 = *mark2_p;
   }
 
-  if (timerange_p && (fabsf(*timerange_p - timerange) > FLT_EPSILON)) {
+  if (timerange_p && (fabsf(*timerange_p - timerange) > FLT_EPSILON))
+  {
     timerange = *timerange_p;
     time_Float64ToD(&dt_timerange, timerange);
     for (int i = 0; i < sevhist_cnt; i++)
@@ -24350,7 +25454,8 @@ int GeSevHist::scan(grow_tObject object)
     new_curve = 1;
   }
 
-  if (first_scan) {
+  if (first_scan)
+  {
     first_scan = false;
     new_curve = 1;
   }
@@ -24358,25 +25463,29 @@ int GeSevHist::scan(grow_tObject object)
   if (trend_hold)
     return 1;
 
-  if (update_p) {
+  if (update_p)
+  {
     if (*update_p && !old_update)
       new_curve = 1;
     old_update = *update_p;
   }
 
-  if (updatetime != 0) {
+  if (updatetime != 0)
+  {
     if (dyn->cycle == glow_eCycle_Slow)
       acc_time += dyn->graph->scan_time;
     else
       acc_time += dyn->graph->fast_scan_time;
 
-    if (acc_time + DBL_EPSILON >= updatetime) {
+    if (acc_time + DBL_EPSILON >= updatetime)
+    {
       new_curve = 1;
       acc_time = 0;
     }
   }
 
-  if (new_curve) {
+  if (new_curve)
+  {
     pwr_tTime* tbuf;
     void* vbuf;
     int rows;
@@ -24396,65 +25505,73 @@ int GeSevHist::scan(grow_tObject object)
       return sts;
 
     // Draw whole curve
-    for (i = 0; i < sevhist_cnt; i++) {
-      sevcli_get_itemdata(&sts, scctx, oidv[i], anamev[i], from, to, max_points, &tbuf,
-			  &vbuf, &rows, &vtype, &vsize);
+    for (i = 0; i < sevhist_cnt; i++)
+    {
+      sevcli_get_itemdata(&sts, scctx, oidv[i], anamev[i], from, to, max_points, &tbuf, &vbuf, &rows, &vtype,
+                          &vsize);
       if (EVEN(sts))
-	  continue;
+        continue;
 
-      switch (vtype) {
+      switch (vtype)
+      {
       case pwr_eType_Int32:
       case pwr_eType_Float32:
-	tdata = (double*)calloc(1, 8 * rows);
-	vdata = (double*)calloc(1, 8 * rows);
-	break;
+        tdata = (double*)calloc(1, 8 * rows);
+        vdata = (double*)calloc(1, 8 * rows);
+        break;
       case pwr_eType_Boolean:
-	tdata = (double*)calloc(1, 8 * rows * 2);
-	vdata = (double*)calloc(1, 8 * rows * 2);
-	break;
+        tdata = (double*)calloc(1, 8 * rows * 2);
+        vdata = (double*)calloc(1, 8 * rows * 2);
+        break;
       default:
-	return 0;
+        return 0;
       }
 
       points = 0;
-      for (k = 0; k < rows; k++) {
-	time_Adiff(&diff, &to, &tbuf[k]);
-	time_DToFloat64(&time, &diff);
+      for (k = 0; k < rows; k++)
+      {
+        time_Adiff(&diff, &to, &tbuf[k]);
+        time_DToFloat64(&time, &diff);
 
-  	switch (vtype) {
-	case pwr_eType_Int32:
-	  vdata[k] = ((pwr_tInt32*)vbuf)[k];
-	  tdata[k] = time;
-	  points++;
-	  break;
-	case pwr_eType_Float32:
-	  vdata[k] = ((pwr_tFloat32*)vbuf)[k];	  
-	  tdata[k] = time;
-	  points++;
-	  break;
-	case pwr_eType_Boolean:
-	  if (k == 0) {
-	    vdata[points] = ((pwr_tBoolean*)vbuf)[k];
-	    tdata[points++] = time;
-	  }
-	  else if (((pwr_tBoolean*)vbuf)[k] != ((pwr_tBoolean*)vbuf)[k-1]) {
-	    vdata[points] = ((pwr_tBoolean*)vbuf)[k-1];	  
-	    tdata[points++] = time;
-	    vdata[points] = ((pwr_tBoolean*)vbuf)[k];
-	    tdata[points++] = time;
-	  }
-	  else if (k == rows - 1) {
-	    vdata[points] = ((pwr_tBoolean*)vbuf)[k];
-	    tdata[points++] = time;
-	  }
-	  break;
-	default:
-	  return 0;
-	}
+        switch (vtype)
+        {
+        case pwr_eType_Int32:
+          vdata[k] = ((pwr_tInt32*)vbuf)[k];
+          tdata[k] = time;
+          points++;
+          break;
+        case pwr_eType_Float32:
+          vdata[k] = ((pwr_tFloat32*)vbuf)[k];
+          tdata[k] = time;
+          points++;
+          break;
+        case pwr_eType_Boolean:
+          if (k == 0)
+          {
+            vdata[points] = ((pwr_tBoolean*)vbuf)[k];
+            tdata[points++] = time;
+          }
+          else if (((pwr_tBoolean*)vbuf)[k] != ((pwr_tBoolean*)vbuf)[k - 1])
+          {
+            vdata[points] = ((pwr_tBoolean*)vbuf)[k - 1];
+            tdata[points++] = time;
+            vdata[points] = ((pwr_tBoolean*)vbuf)[k];
+            tdata[points++] = time;
+          }
+          else if (k == rows - 1)
+          {
+            vdata[points] = ((pwr_tBoolean*)vbuf)[k];
+            tdata[points++] = time;
+          }
+          break;
+        default:
+          return 0;
+        }
       }
-      if (direction == glow_eHorizDirection_Right) {
-	for (k = 0; k < points; k++)
-	  tdata[k] = timerange - tdata[k];
+      if (direction == glow_eHorizDirection_Right)
+      {
+        for (k = 0; k < points; k++)
+          tdata[k] = timerange - tdata[k];
       }
       grow_SetXYCurveData(object, vdata, tdata, i, points);
       free(tdata);
@@ -24463,61 +25580,72 @@ int GeSevHist::scan(grow_tObject object)
       free(vbuf);
     }
   }
-  
+
   return 1;
 }
 
-int GeSevHist::syntax_check(
-    grow_tObject object, int* error_cnt, int* warning_cnt)
+int GeSevHist::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
   int sts;
   pwr_eType a_type;
 
-  if (streq(sevhist_object1, "") && streq(attribute1, "")) {
+  if (streq(sevhist_object1, "") && streq(attribute1, ""))
+  {
     dyn->graph->syntax_msg('W', object, "SevHist.Object1 or SevHist.Attribute1 is missing");
     (*warning_cnt)++;
   }
 
-  if (streq(server, "") && !streq(attribute1, "")) {
+  if (streq(server, "") && !streq(attribute1, ""))
+  {
     dyn->graph->syntax_msg('W', object, "SevHist.Attribute1 set but SevHist.Server is missing");
     (*warning_cnt)++;
   }
 
-  if (!streq(sevhist_object1, "")) {
+  if (!streq(sevhist_object1, ""))
+  {
     sts = dyn->graph->check_ldh_object(sevhist_object1, &a_type);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       char msg[440];
       sprintf(msg, "SevHist.Object1 \"%s\" not found", sevhist_object1);
       dyn->graph->syntax_msg('W', object, msg);
       (*warning_cnt)++;
-    } else {
-      if (a_type != pwr_cClass_SevHist) {
-        dyn->graph->syntax_msg(
-            'E', object, "SevHist.Object1 is of wrong class");
+    }
+    else
+    {
+      if (a_type != pwr_cClass_SevHist)
+      {
+        dyn->graph->syntax_msg('E', object, "SevHist.Object1 is of wrong class");
         (*error_cnt)++;
       }
     }
   }
 
-  if (!streq(sevhist_object2, "")) {
+  if (!streq(sevhist_object2, ""))
+  {
     sts = dyn->graph->check_ldh_object(sevhist_object2, &a_type);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       char msg[440];
       sprintf(msg, "SevHist.Object2 \"%s\" not found", sevhist_object2);
       dyn->graph->syntax_msg('W', object, msg);
       (*warning_cnt)++;
-    } else {
-      if (a_type != pwr_cClass_SevHist) {
-        dyn->graph->syntax_msg(
-            'E', object, "SevHist.Object2 is of wrong class");
+    }
+    else
+    {
+      if (a_type != pwr_cClass_SevHist)
+      {
+        dyn->graph->syntax_msg('E', object, "SevHist.Object2 is of wrong class");
         (*error_cnt)++;
       }
     }
   }
 
-  if (!streq(attribute1, "")) {
+  if (!streq(attribute1, ""))
+  {
     sts = dyn->graph->check_ldh_object(attribute1, &a_type);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       char msg[440];
       sprintf(msg, "SevHist.Attribute1 \"%s\" not found", attribute1);
       dyn->graph->syntax_msg('W', object, msg);
@@ -24525,9 +25653,11 @@ int GeSevHist::syntax_check(
     }
   }
 
-  if (!streq(attribute2, "")) {
+  if (!streq(attribute2, ""))
+  {
     sts = dyn->graph->check_ldh_object(attribute2, &a_type);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       char msg[440];
       sprintf(msg, "SevHist.Attribute2 \"%s\" not found", attribute2);
       dyn->graph->syntax_msg('W', object, msg);
@@ -24538,16 +25668,15 @@ int GeSevHist::syntax_check(
 }
 
 GeDigTransparency::GeDigTransparency(GeDyn* e_dyn)
-      : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_DigTransparency,
-      ge_mActionType1_No, ge_mActionType2_No, ge_eDynPrio_DigTransparency),
-	low_value(0), high_value(0.5), smooth_transition(0), transition_cnt(0)
+    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_DigTransparency, ge_mActionType1_No, ge_mActionType2_No,
+                ge_eDynPrio_DigTransparency),
+      low_value(0), high_value(0.5), smooth_transition(0), transition_cnt(0)
 {
   strcpy(attribute, "");
 }
 
 GeDigTransparency::GeDigTransparency(const GeDigTransparency& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-          x.prio),
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio),
       low_value(x.low_value), high_value(x.high_value), smooth_transition(x.smooth_transition),
       transition_cnt(0)
 {
@@ -24585,11 +25714,11 @@ void GeDigTransparency::get_attributes(attr_sItem* attrinfo, int* item_count)
   *item_count = i;
 }
 
-void GeDigTransparency::set_attribute(
-    grow_tObject object, const char* attr_name, int* cnt)
+void GeDigTransparency::set_attribute(grow_tObject object, const char* attr_name, int* cnt)
 {
   (*cnt)--;
-  if (*cnt == 0) {
+  if (*cnt == 0)
+  {
     char msg[200];
 
     strncpy(attribute, attr_name, sizeof(attribute));
@@ -24620,8 +25749,10 @@ void GeDigTransparency::open(std::ifstream& fp)
   int end_found = 0;
   char dummy[40];
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeDigTransparency: \"%d %s\"\n", type, dummy);
@@ -24629,7 +25760,8 @@ void GeDigTransparency::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_DigTransparency:
       break;
     case ge_eSave_DigTransparency_attribute:
@@ -24657,8 +25789,7 @@ void GeDigTransparency::open(std::ifstream& fp)
   }
 }
 
-int GeDigTransparency::connect(
-    grow_tObject object, glow_sTraceData* trace_data, bool now)
+int GeDigTransparency::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
 {
   int attr_type, attr_size;
   pwr_tAName parsed_name;
@@ -24666,22 +25797,20 @@ int GeDigTransparency::connect(
 
   size = 4;
   p = 0;
-  db = dyn->parse_attr_name(
-      attribute, parsed_name, &inverted, &attr_type, &attr_size);
+  db = dyn->parse_attr_name(attribute, parsed_name, &inverted, &attr_type, &attr_size);
   if (streq(parsed_name, ""))
     return 1;
 
   a_typeid = attr_type;
   get_bit(parsed_name, attr_type, &bitmask);
 
-  switch (db) {
+  switch (db)
+  {
   case graph_eDatabase_Local:
-    p = (pwr_tBoolean*)dyn->graph->localdb_ref_or_create(
-        parsed_name, attr_type);
+    p = (pwr_tBoolean*)dyn->graph->localdb_ref_or_create(parsed_name, attr_type);
     break;
   case graph_eDatabase_Gdh:
-    sts = dyn->graph->ref_object_info(
-        dyn->cycle, parsed_name, (void**)&p, &subid, size, object, now);
+    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&p, &subid, size, object, now);
     if (EVEN(sts))
       return sts;
     break;
@@ -24715,33 +25844,39 @@ int GeDigTransparency::scan(grow_tObject object)
   if (inverted)
     val = !val;
 
-  if (!first_scan) {
+  if (!first_scan)
+  {
     if (old_value == val && !dyn->reset_color && !transition_cnt)
       // No change since last time
       return 1;
   }
 
-  if (val) {
-    if (smooth_transition && !first_scan) {
+  if (val)
+  {
+    if (smooth_transition && !first_scan)
+    {
       transition_cnt++;
       double sval = low_value + (high_value - low_value) * transition_cnt / 5;
-      grow_SetObjectTransparency(object, sval);	
+      grow_SetObjectTransparency(object, sval);
       if (transition_cnt == 5)
-	transition_cnt = 0;
+        transition_cnt = 0;
     }
-    else {
+    else
+    {
       grow_SetObjectTransparency(object, high_value);
     }
   }
-  else {
-    if (smooth_transition && !first_scan) {
+  else
+  {
+    if (smooth_transition && !first_scan)
+    {
       transition_cnt++;
       double sval = low_value + (high_value - low_value) * (5 - transition_cnt) / 5;
-      grow_SetObjectTransparency(object, sval);	
+      grow_SetObjectTransparency(object, sval);
       if (transition_cnt == 5)
-	transition_cnt = 0;
+        transition_cnt = 0;
     }
-    else 
+    else
       grow_SetObjectTransparency(object, low_value);
   }
   old_value = *p;
@@ -24752,39 +25887,40 @@ int GeDigTransparency::scan(grow_tObject object)
   return 1;
 }
 
-int GeDigTransparency::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GeDigTransparency::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
   if (!streq(attribute, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigTransparency.Attribute\",\"" << attribute << "\");" << '\n';
-  if (!feq(low_value,50.0))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigTransparency.LowValue\"," << dtostr(low_value) << ");" << '\n';
-  if (!feq(high_value,100.0))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigTransparency.HighValue\"," << dtostr(high_value) << ");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigTransparency.Attribute\",\"" << attribute
+       << "\");" << '\n';
+  if (!feq(low_value, 50.0))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigTransparency.LowValue\","
+       << dtostr(low_value) << ");" << '\n';
+  if (!feq(high_value, 100.0))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigTransparency.HighValue\","
+       << dtostr(high_value) << ");" << '\n';
   return 1;
 }
 
-int GeDigTransparency::syntax_check(
-    grow_tObject object, int* error_cnt, int* warning_cnt)
+int GeDigTransparency::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
-  int types[] = { pwr_eType_Float32, 0 };
-  graph_eDatabase databases[] = { graph_eDatabase_Gdh, graph_eDatabase__ };
+  int types[] = {pwr_eType_Float32, 0};
+  graph_eDatabase databases[] = {graph_eDatabase_Gdh, graph_eDatabase__};
 
-  dyn->syntax_check_attribute(object, "DigTransparency.Attribute", attribute, 0,
-      types, databases, error_cnt, warning_cnt);
+  dyn->syntax_check_attribute(object, "DigTransparency.Attribute", attribute, 0, types, databases, error_cnt,
+                              warning_cnt);
   return 1;
 }
 
 GeAnalogTransparency::GeAnalogTransparency(GeDyn* e_dyn)
-      : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_AnalogTransparency,
-      ge_mActionType1_No, ge_mActionType2_No, ge_eDynPrio_AnalogTransparency),
+    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_AnalogTransparency, ge_mActionType1_No,
+                ge_mActionType2_No, ge_eDynPrio_AnalogTransparency),
       min_value(0), max_value(100)
 {
   strcpy(attribute, "");
 }
 
 GeAnalogTransparency::GeAnalogTransparency(const GeAnalogTransparency& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-          x.prio),
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio),
       min_value(x.min_value), max_value(x.max_value)
 {
   strcpy(attribute, x.attribute);
@@ -24812,11 +25948,11 @@ void GeAnalogTransparency::get_attributes(attr_sItem* attrinfo, int* item_count)
   *item_count = i;
 }
 
-void GeAnalogTransparency::set_attribute(
-    grow_tObject object, const char* attr_name, int* cnt)
+void GeAnalogTransparency::set_attribute(grow_tObject object, const char* attr_name, int* cnt)
 {
   (*cnt)--;
-  if (*cnt == 0) {
+  if (*cnt == 0)
+  {
     char msg[200];
 
     strncpy(attribute, attr_name, sizeof(attribute));
@@ -24846,8 +25982,10 @@ void GeAnalogTransparency::open(std::ifstream& fp)
   int end_found = 0;
   char dummy[40];
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeAnalogTransparency: \"%d %s\"\n", type, dummy);
@@ -24855,7 +25993,8 @@ void GeAnalogTransparency::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_AnalogTransparency:
       break;
     case ge_eSave_AnalogTransparency_attribute:
@@ -24880,8 +26019,7 @@ void GeAnalogTransparency::open(std::ifstream& fp)
   }
 }
 
-int GeAnalogTransparency::connect(
-    grow_tObject object, glow_sTraceData* trace_data, bool now)
+int GeAnalogTransparency::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
 {
   int attr_type, attr_size;
   pwr_tAName parsed_name;
@@ -24890,13 +26028,11 @@ int GeAnalogTransparency::connect(
 
   size = 4;
   p = 0;
-  db = dyn->parse_attr_name(
-      attribute, parsed_name, &inverted, &attr_type, &attr_size);
+  db = dyn->parse_attr_name(attribute, parsed_name, &inverted, &attr_type, &attr_size);
   if (streq(parsed_name, ""))
     return 1;
 
-  sts = dyn->graph->ref_object_info(
-      dyn->cycle, parsed_name, (void**)&p, &subid, size, object, now);
+  sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&p, &subid, size, object, now);
   if (EVEN(sts))
     return sts;
 
@@ -24920,11 +26056,13 @@ int GeAnalogTransparency::scan(grow_tObject object)
   if (!p)
     return 1;
 
-  if (!first_scan) {
+  if (!first_scan)
+  {
     if (fabs(old_value - *p) < FLT_EPSILON)
       // No change since last time
       return 1;
-  } else
+  }
+  else
     first_scan = false;
 
   if (feq(max_value, min_value))
@@ -24936,37 +26074,40 @@ int GeAnalogTransparency::scan(grow_tObject object)
   return 1;
 }
 
-int GeAnalogTransparency::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GeAnalogTransparency::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
   if (!streq(attribute, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "AnalogTransparency.Attribute\",\"" << attribute << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "AnalogTransparency.Attribute\",\""
+       << attribute << "\");" << '\n';
   if (min_value != 0)
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "AnalogTransparency.MinValue\"," << dtostr(min_value) << ");" << '\n';
-  if (!feq(max_value,100.0))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "AnalogTransparency.MaxValue\"," << dtostr(max_value) << ");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "AnalogTransparency.MinValue\","
+       << dtostr(min_value) << ");" << '\n';
+  if (!feq(max_value, 100.0))
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "AnalogTransparency.MaxValue\","
+       << dtostr(max_value) << ");" << '\n';
   return 1;
 }
 
-int GeAnalogTransparency::syntax_check(
-    grow_tObject object, int* error_cnt, int* warning_cnt)
+int GeAnalogTransparency::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
-  int types[] = { pwr_eType_Float32, 0 };
-  graph_eDatabase databases[] = { graph_eDatabase_Gdh, graph_eDatabase__ };
+  int types[] = {pwr_eType_Float32, 0};
+  graph_eDatabase databases[] = {graph_eDatabase_Gdh, graph_eDatabase__};
 
-  dyn->syntax_check_attribute(object, "AnalogTransparency.Attribute", attribute, 0,
-      types, databases, error_cnt, warning_cnt);
+  dyn->syntax_check_attribute(object, "AnalogTransparency.Attribute", attribute, 0, types, databases,
+                              error_cnt, warning_cnt);
   return 1;
 }
 
 GeUnitConvert::GeUnitConvert(GeDyn* e_dyn)
-    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_UnitConvert, ge_mActionType1_No,
-		ge_mActionType2_No, ge_eDynPrio_UnitConvert), entity(graph_eUcEntity_General), db_unit(0), display_unit(0)
+    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_UnitConvert, ge_mActionType1_No, ge_mActionType2_No,
+                ge_eDynPrio_UnitConvert),
+      entity(graph_eUcEntity_General), db_unit(0), display_unit(0)
 {
 }
 
 GeUnitConvert::GeUnitConvert(const GeUnitConvert& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-		x.prio), entity(x.entity), db_unit(x.db_unit), display_unit(x.display_unit)
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio), entity(x.entity),
+      db_unit(x.db_unit), display_unit(x.display_unit)
 {
 }
 
@@ -24995,8 +26136,7 @@ void GeUnitConvert::get_attributes(attr_sItem* attrinfo, int* item_count)
 
 int GeUnitConvert::get_transtab(char** tt)
 {
-  static char transtab[][32]
-      = { "SubGraph", "SubGraph", "A1", "Text", "Dynamic", "", "" };
+  static char transtab[][32] = {"SubGraph", "SubGraph", "A1", "Text", "Dynamic", "", ""};
 
   *tt = (char*)transtab;
   return 0;
@@ -25017,8 +26157,10 @@ void GeUnitConvert::open(std::ifstream& fp)
   int end_found = 0;
   char dummy[40];
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeUnitConvert: \"%d %s\"\n", type, dummy);
@@ -25026,7 +26168,8 @@ void GeUnitConvert::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_UnitConvert:
       break;
     case ge_eSave_UnitConvert_entity:
@@ -25050,26 +26193,25 @@ void GeUnitConvert::open(std::ifstream& fp)
   }
 }
 
-int GeUnitConvert::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GeUnitConvert::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
   if (entity != 0)
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "UnitConvert.Entity\"," << entity << ");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "UnitConvert.Entity\"," << entity << ");"
+       << '\n';
   if (db_unit != 0)
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "UnitConvert.DbUnit\"," << db_unit << ");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "UnitConvert.DbUnit\"," << db_unit << ");"
+       << '\n';
   if (display_unit != 0)
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "UnitConvert.DisplayUnit\"," << display_unit << ");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "UnitConvert.DisplayUnit\"," << display_unit
+       << ");" << '\n';
   return 1;
 }
 
-int GeUnitConvert::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
-{
-  return 1;
-}
+int GeUnitConvert::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt) { return 1; }
 
 GePulldownMenu::GePulldownMenu(GeDyn* e_dyn)
-    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_No,
-          ge_mActionType1_PulldownMenu, ge_mActionType2_No,
-          ge_eDynPrio_PulldownMenu),
+    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_No, ge_mActionType1_PulldownMenu, ge_mActionType2_No,
+                ge_eDynPrio_PulldownMenu),
       button_mask(1), menu_object(0)
 {
   memset(items_dyn, 0, sizeof(items_dyn));
@@ -25079,14 +26221,14 @@ GePulldownMenu::GePulldownMenu(GeDyn* e_dyn)
 }
 
 GePulldownMenu::GePulldownMenu(const GePulldownMenu& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-          x.prio),
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio),
       button_mask(x.button_mask), menu_object(0)
 {
   memset(items_dyn, 0, sizeof(items_dyn));
   memset(&focus_gained_time, 0, sizeof(focus_gained_time));
   memcpy(items_text, x.items_text, sizeof(items_text));
-  for (int i = 0; i < 32; i++) {
+  for (int i = 0; i < 32; i++)
+  {
     if (x.items_dyn[i])
       items_dyn[i] = new GeDyn(*x.items_dyn[i]);
   }
@@ -25094,7 +26236,8 @@ GePulldownMenu::GePulldownMenu(const GePulldownMenu& x)
 
 GePulldownMenu::~GePulldownMenu()
 {
-  for (int i = 0; i < 32; i++) {
+  for (int i = 0; i < 32; i++)
+  {
     if (items_dyn[i])
       delete items_dyn[i];
   }
@@ -25105,8 +26248,10 @@ void GePulldownMenu::get_attributes(attr_sItem* attrinfo, int* item_count)
   int i = *item_count;
 
   int b_mask = ge_mInstance_1;
-  for (int j = 0; j < 32; j++) {
-    if (b_mask & button_mask && !items_dyn[j]) {
+  for (int j = 0; j < 32; j++)
+  {
+    if (b_mask & button_mask && !items_dyn[j])
+    {
       items_dyn[j] = new GeDyn(dyn->graph, ge_eDynAttr_Menu);
     }
     b_mask = b_mask << 1;
@@ -25118,8 +26263,10 @@ void GePulldownMenu::get_attributes(attr_sItem* attrinfo, int* item_count)
   attrinfo[i++].size = sizeof(button_mask);
 
   b_mask = ge_mInstance_1;
-  for (int j = 0; j < 32; j++) {
-    if (b_mask & button_mask) {
+  for (int j = 0; j < 32; j++)
+  {
+    if (b_mask & button_mask)
+    {
       sprintf(attrinfo[i].name, "PulldownMenu.ItemText%d", j + 1);
       attrinfo[i].value = items_text[j];
       attrinfo[i].type = glow_eType_String;
@@ -25138,8 +26285,7 @@ void GePulldownMenu::get_attributes(attr_sItem* attrinfo, int* item_count)
 
 int GePulldownMenu::get_transtab(char** tt)
 {
-  static char transtab[][32]
-      = { "SubGraph", "SubGraph", "A1", "Text", "Dynamic", "", "" };
+  static char transtab[][32] = {"SubGraph", "SubGraph", "A1", "Text", "Dynamic", "", ""};
 
   *tt = (char*)transtab;
   return 0;
@@ -25150,13 +26296,13 @@ void GePulldownMenu::save(std::ofstream& fp)
   int b_mask = ge_mInstance_1;
 
   fp << int(ge_eSave_PulldownMenu) << '\n';
-  fp << int(ge_eSave_PulldownMenu_button_mask) << FSPACE << int(button_mask)
-     << '\n';
+  fp << int(ge_eSave_PulldownMenu_button_mask) << FSPACE << int(button_mask) << '\n';
   b_mask = ge_mInstance_1;
-  for (int j = 0; j < 32; j++) {
-    if (b_mask & button_mask) {
-      fp << int(ge_eSave_PulldownMenu_items_text0 + j) << FSPACE
-         << items_text[j] << '\n';
+  for (int j = 0; j < 32; j++)
+  {
+    if (b_mask & button_mask)
+    {
+      fp << int(ge_eSave_PulldownMenu_items_text0 + j) << FSPACE << items_text[j] << '\n';
       fp << int(ge_eSave_PulldownMenu_items_dyn0 + j) << '\n';
       if (items_dyn[j])
         items_dyn[j]->save(fp);
@@ -25173,8 +26319,10 @@ void GePulldownMenu::open(std::ifstream& fp)
   char dummy[40];
   int tmp;
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GePulldownMenu: \"%d %s\"\n", type, dummy);
@@ -25182,7 +26330,8 @@ void GePulldownMenu::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_PulldownMenu:
       break;
     case ge_eSave_PulldownMenu_button_mask:
@@ -25556,7 +26705,8 @@ int GePulldownMenu::action(grow_tObject object, glow_tEvent event)
   if (!dyn->graph->is_authorized(dyn->access))
     return 1;
 
-  switch (event->event) {
+  switch (event->event)
+  {
   case glow_eEvent_MB1Down:
     grow_SetClickSensitivity(dyn->graph->grow->ctx, glow_mSensitivity_MB1Click);
     break;
@@ -25565,14 +26715,18 @@ int GePulldownMenu::action(grow_tObject object, glow_tEvent event)
   case glow_eEvent_Key_Up:
     if (!menu_object)
       break;
-    if (grow_GetMenuInputFocus(menu_object)) {
+    if (grow_GetMenuInputFocus(menu_object))
+    {
       grow_MenuShiftCurrentItem(menu_object, -1);
       return GE__NO_PROPAGATE;
-    } else {
+    }
+    else
+    {
       int sts;
-      for (int j = 0; j < 32; j++) {
-        if (items_dyn[j]
-            && items_dyn[j]->action_type1 & ge_mActionType1_PulldownMenu) {
+      for (int j = 0; j < 32; j++)
+      {
+        if (items_dyn[j] && items_dyn[j]->action_type1 & ge_mActionType1_PulldownMenu)
+        {
           sts = items_dyn[j]->action(0, event);
           if (sts == GE__NO_PROPAGATE)
             return sts;
@@ -25583,14 +26737,18 @@ int GePulldownMenu::action(grow_tObject object, glow_tEvent event)
   case glow_eEvent_Key_Down:
     if (!menu_object)
       break;
-    if (grow_GetMenuInputFocus(menu_object)) {
+    if (grow_GetMenuInputFocus(menu_object))
+    {
       grow_MenuShiftCurrentItem(menu_object, 1);
       return GE__NO_PROPAGATE;
-    } else {
+    }
+    else
+    {
       int sts;
-      for (int j = 0; j < 32; j++) {
-        if (items_dyn[j]
-            && items_dyn[j]->action_type1 & ge_mActionType1_PulldownMenu) {
+      for (int j = 0; j < 32; j++)
+      {
+        if (items_dyn[j] && items_dyn[j]->action_type1 & ge_mActionType1_PulldownMenu)
+        {
           sts = items_dyn[j]->action(0, event);
           if (sts == GE__NO_PROPAGATE)
             return sts;
@@ -25602,14 +26760,15 @@ int GePulldownMenu::action(grow_tObject object, glow_tEvent event)
     if (!menu_object)
       break;
 
-    if (grow_GetMenuInputFocus(menu_object)) {
+    if (grow_GetMenuInputFocus(menu_object))
+    {
       int item, sts;
       sts = grow_MenuGetCurrentItem(menu_object, &item);
       if (EVEN(sts))
         break;
 
-      if (items_dyn[item]
-          && items_dyn[item]->action_type1 & ge_mActionType1_PulldownMenu) {
+      if (items_dyn[item] && items_dyn[item]->action_type1 & ge_mActionType1_PulldownMenu)
+      {
         // Send create menu event
         glow_sEvent e;
         e.event = glow_eEvent_MenuCreate;
@@ -25619,11 +26778,14 @@ int GePulldownMenu::action(grow_tObject object, glow_tEvent event)
         action(object, &e);
         return GE__NO_PROPAGATE;
       }
-    } else {
+    }
+    else
+    {
       int sts;
-      for (int j = 0; j < 32; j++) {
-        if (items_dyn[j]
-            && items_dyn[j]->action_type1 & ge_mActionType1_PulldownMenu) {
+      for (int j = 0; j < 32; j++)
+      {
+        if (items_dyn[j] && items_dyn[j]->action_type1 & ge_mActionType1_PulldownMenu)
+        {
           sts = items_dyn[j]->action(0, event);
           if (sts == GE__NO_PROPAGATE)
             return sts;
@@ -25635,25 +26797,29 @@ int GePulldownMenu::action(grow_tObject object, glow_tEvent event)
     if (!menu_object)
       break;
 
-    if (!object && grow_GetMenuInputFocus(menu_object)) {
+    if (!object && grow_GetMenuInputFocus(menu_object))
+    {
       // Delete this and all child menues
       glow_sEvent e;
       e.event = glow_eEvent_MenuDelete;
       e.menu.object = 0;
-      for (int j = 0; j < 32; j++) {
-        if (items_dyn[j]
-            && items_dyn[j]->action_type1 & ge_mActionType1_PulldownMenu)
+      for (int j = 0; j < 32; j++)
+      {
+        if (items_dyn[j] && items_dyn[j]->action_type1 & ge_mActionType1_PulldownMenu)
           items_dyn[j]->action(0, &e);
       }
 
       grow_DeleteObject(dyn->graph->grow->ctx, menu_object);
       menu_object = 0;
       return GE__NO_PROPAGATE;
-    } else {
+    }
+    else
+    {
       int sts;
-      for (int j = 0; j < 32; j++) {
-        if (items_dyn[j]
-            && items_dyn[j]->action_type1 & ge_mActionType1_PulldownMenu) {
+      for (int j = 0; j < 32; j++)
+      {
+        if (items_dyn[j] && items_dyn[j]->action_type1 & ge_mActionType1_PulldownMenu)
+        {
           sts = items_dyn[j]->action(0, event);
           if (sts == GE__NO_PROPAGATE)
             return sts;
@@ -25665,7 +26831,8 @@ int GePulldownMenu::action(grow_tObject object, glow_tEvent event)
     if (!menu_object)
       break;
 
-    if (grow_GetMenuInputFocus(menu_object)) {
+    if (grow_GetMenuInputFocus(menu_object))
+    {
       // Send menu activated event
       int sts;
       glow_sEvent e;
@@ -25676,13 +26843,13 @@ int GePulldownMenu::action(grow_tObject object, glow_tEvent event)
         break;
 
       int close_graph = 0;
-      if (items_dyn[e.menu.item]
-          && items_dyn[e.menu.item]->action_type1 & ge_mActionType1_CloseGraph)
+      if (items_dyn[e.menu.item] && items_dyn[e.menu.item]->action_type1 & ge_mActionType1_CloseGraph)
         close_graph = 1;
 
       action(object, &e);
 
-      if (!close_graph) {
+      if (!close_graph)
+      {
         // Close any open menu
         Graph* graph = dyn->graph;
         glow_sEvent e;
@@ -25695,10 +26862,11 @@ int GePulldownMenu::action(grow_tObject object, glow_tEvent event)
         e.menu.object = 0;
 
         grow_GetObjectList(graph->grow->ctx, &objectlist, &object_cnt);
-        for (i = 0; i < object_cnt; i++) {
-          if (grow_GetObjectType(objectlist[i]) == glow_eObjectType_GrowNode
-              || grow_GetObjectType(objectlist[i])
-                  == glow_eObjectType_GrowGroup) {
+        for (i = 0; i < object_cnt; i++)
+        {
+          if (grow_GetObjectType(objectlist[i]) == glow_eObjectType_GrowNode ||
+              grow_GetObjectType(objectlist[i]) == glow_eObjectType_GrowGroup)
+          {
             grow_GetUserData(objectlist[i], (void**)&dyn);
             dyn->action(objectlist[i], &e);
             grow_GetObjectList(graph->grow->ctx, &objectlist, &cnt);
@@ -25709,10 +26877,12 @@ int GePulldownMenu::action(grow_tObject object, glow_tEvent event)
         }
         return GE__NO_PROPAGATE;
       }
-    } else {
-      for (int j = 0; j < 32; j++) {
-        if (items_dyn[j]
-            && items_dyn[j]->action_type1 & ge_mActionType1_PulldownMenu)
+    }
+    else
+    {
+      for (int j = 0; j < 32; j++)
+      {
+        if (items_dyn[j] && items_dyn[j]->action_type1 & ge_mActionType1_PulldownMenu)
           items_dyn[j]->action(object, event);
       }
     }
@@ -25723,40 +26893,49 @@ int GePulldownMenu::action(grow_tObject object, glow_tEvent event)
       break;
     time_GetTime(&focus_gained_time);
   case glow_eEvent_MB1Click:
-    if (event->event == glow_eEvent_MB1Click) {
+    if (event->event == glow_eEvent_MB1Click)
+    {
       pwr_tTime now;
       time_GetTime(&now);
       if (ABS((int)(now.tv_sec - focus_gained_time.tv_sec)) < 2)
         break;
     }
-    if (menu_object) {
+    if (menu_object)
+    {
       // Close, delete this menu and all childmenues
-      for (int j = 0; j < 32; j++) {
-        if (items_dyn[j]
-            && items_dyn[j]->action_type1 & ge_mActionType1_PulldownMenu)
+      for (int j = 0; j < 32; j++)
+      {
+        if (items_dyn[j] && items_dyn[j]->action_type1 & ge_mActionType1_PulldownMenu)
           items_dyn[j]->action(0, event);
       }
 
       grow_DeleteObject(dyn->graph->grow->ctx, menu_object);
       menu_object = 0;
-    } else if (object) {
+    }
+    else if (object)
+    {
       double ll_x, ll_y, ur_x, ur_y;
       glow_sMenuInfo info;
 
       int b_mask = 1;
-      for (int i = 0; i < 32; i++) {
-        if (b_mask & button_mask) {
+      for (int i = 0; i < 32; i++)
+      {
+        if (b_mask & button_mask)
+        {
           info.item[i].occupied = true;
           strcpy(info.item[i].text, items_text[i]);
 
           // Check access
           if (items_dyn[i]->action_type1 & ge_mActionType1_PulldownMenu)
             info.item[i].type = glow_eMenuItem_PulldownMenu;
-          else {
+          else
+          {
             // Check access
-            if (dyn->graph->is_authorized(items_dyn[i]->access)) {
+            if (dyn->graph->is_authorized(items_dyn[i]->access))
+            {
               info.item[i].type = glow_eMenuItem_Button;
-              if (items_dyn[i]->dyn_type1 & ge_mDynType1_Invisible) {
+              if (items_dyn[i]->dyn_type1 & ge_mDynType1_Invisible)
+              {
                 int attr_type, attr_size;
                 int inverted;
                 pwr_tAName parsed_name;
@@ -25766,18 +26945,21 @@ int GePulldownMenu::action(grow_tObject object, glow_tEvent event)
                 char* s;
                 pwr_tBoolean value;
 
-                for (GeDynElem* elem = items_dyn[i]->elements; elem;
-                     elem = elem->next) {
-                  if (elem->dyn_type1 == ge_mDynType1_Invisible) {
+                for (GeDynElem* elem = items_dyn[i]->elements; elem; elem = elem->next)
+                {
+                  if (elem->dyn_type1 == ge_mDynType1_Invisible)
+                  {
                     invis_element = (GeInvisible*)elem;
                     break;
                   }
                 }
-                if (invis_element) {
-                  dyn->parse_attr_name(invis_element->attribute, parsed_name,
-                      &inverted, &attr_type, &attr_size);
+                if (invis_element)
+                {
+                  dyn->parse_attr_name(invis_element->attribute, parsed_name, &inverted, &attr_type,
+                                       &attr_size);
 
-                  if (str_NoCaseStrncmp(parsed_name, "$cmd(", 5) == 0) {
+                  if (str_NoCaseStrncmp(parsed_name, "$cmd(", 5) == 0)
+                  {
                     strcpy(command, &parsed_name[5]);
 
                     if ((s = strrchr(command, ')')))
@@ -25785,14 +26967,17 @@ int GePulldownMenu::action(grow_tObject object, glow_tEvent event)
 
                     dyn->graph->get_command(command, cmd, dyn);
 
-                    sts = (dyn->graph->command_cb)(
-			dyn->graph->parent_ctx, cmd, 0, 0);
+                    sts = (dyn->graph->command_cb)(dyn->graph->parent_ctx, cmd, 0, 0);
                     if (EVEN(sts))
                       info.item[i].type = glow_eMenuItem_ButtonDisabled;
-                  } else {
+                  }
+                  else
+                  {
                     sts = gdh_GetObjectInfo(parsed_name, &value, sizeof(value));
-                    if (ODD(sts)) {
-                      if ((!inverted && value) || (inverted && !value)) {
+                    if (ODD(sts))
+                    {
+                      if ((!inverted && value) || (inverted && !value))
+                      {
                         if (invis_element->dimmed)
                           info.item[i].type = glow_eMenuItem_ButtonDisabled;
                         else
@@ -25802,10 +26987,12 @@ int GePulldownMenu::action(grow_tObject object, glow_tEvent event)
                   }
                 }
               }
-            } else
+            }
+            else
               info.item[i].type = glow_eMenuItem_ButtonDisabled;
           }
-        } else
+        }
+        else
           info.item[i].occupied = false;
         b_mask = b_mask << 1;
       }
@@ -25818,82 +27005,96 @@ int GePulldownMenu::action(grow_tObject object, glow_tEvent event)
       glow_eFont text_font;
       glow_eAnnotType annot_type;
 
-      sts = grow_GetObjectAnnotInfo(object, 1, &text_size, &text_drawtype,
-          &text_color, &bg_color, &scale, &text_font, &annot_type);
-      if (EVEN(sts)) {
+      sts = grow_GetObjectAnnotInfo(object, 1, &text_size, &text_drawtype, &text_color, &bg_color, &scale,
+                                    &text_font, &annot_type);
+      if (EVEN(sts))
+      {
         text_size = 2;
         text_drawtype = glow_eDrawType_TextHelveticaBold;
         text_font = glow_eFont_Helvetica;
         text_color = glow_eDrawType_Line;
         bg_color = glow_eDrawType_LightGray;
-      } else if (bg_color == glow_eDrawType_No
-          || bg_color == glow_eDrawType_Inherit)
+      }
+      else if (bg_color == glow_eDrawType_No || bg_color == glow_eDrawType_Inherit)
         bg_color = glow_eDrawType_LightGray;
 
       grow_MeasureNode(object, &ll_x, &ll_y, &ur_x, &ur_y);
-      grow_CreateGrowMenu(dyn->graph->grow->ctx, "__Menu", &info, ll_x, ur_y,
-          ur_x - ll_x, glow_eDrawType_Line, 0, 1, 1, bg_color, text_size,
-          text_drawtype, text_color, glow_eDrawType_MediumGray, text_font, 0,
-          &menu_object);
-      grow_SetObjectScale(
-          menu_object, scale, scale, 0, 0, glow_eScaleType_LowerLeft);
+      grow_CreateGrowMenu(dyn->graph->grow->ctx, "__Menu", &info, ll_x, ur_y, ur_x - ll_x,
+                          glow_eDrawType_Line, 0, 1, 1, bg_color, text_size, text_drawtype, text_color,
+                          glow_eDrawType_MediumGray, text_font, 0, &menu_object);
+      grow_SetObjectScale(menu_object, scale, scale, 0, 0, glow_eScaleType_LowerLeft);
       grow_SetMenuInputFocus(menu_object, 1);
     }
     break;
   case glow_eEvent_MenuActivated:
     if (!menu_object)
       break;
-    if (event->menu.object == menu_object) {
-      if (items_dyn[event->menu.item]) {
+    if (event->menu.object == menu_object)
+    {
+      if (items_dyn[event->menu.item])
+      {
         glow_sEvent e;
         e.event = glow_eEvent_MB1Click;
         return items_dyn[event->menu.item]->action(event->menu.object, &e);
       }
-    } else {
-      for (int j = 0; j < 32; j++) {
-        if (items_dyn[j]
-            && items_dyn[j]->action_type1 & ge_mActionType1_PulldownMenu)
+    }
+    else
+    {
+      for (int j = 0; j < 32; j++)
+      {
+        if (items_dyn[j] && items_dyn[j]->action_type1 & ge_mActionType1_PulldownMenu)
           items_dyn[j]->action(0, event);
       }
     }
     break;
   case glow_eEvent_MenuCreate:
-    if (object && !(grow_GetObjectType(object) == glow_eObjectType_GrowMenu)) {
+    if (object && !(grow_GetObjectType(object) == glow_eObjectType_GrowMenu))
+    {
       // Parent menu, call submenues
-      if (event->menu.object == menu_object) {
+      if (event->menu.object == menu_object)
+      {
         // Call specified item to create the menu
         // send menu_object as object arg to pass parent menu
         if (items_dyn[event->menu.item])
           items_dyn[event->menu.item]->action(menu_object, event);
-      } else {
+      }
+      else
+      {
         // Send event to all child menu items
-        for (int j = 0; j < 32; j++) {
-          if (items_dyn[j]
-              && items_dyn[j]->action_type1 & ge_mActionType1_PulldownMenu)
+        for (int j = 0; j < 32; j++)
+        {
+          if (items_dyn[j] && items_dyn[j]->action_type1 & ge_mActionType1_PulldownMenu)
             items_dyn[j]->action(0, event);
         }
       }
-    } else {
+    }
+    else
+    {
       // A submenu
-      if (object) {
+      if (object)
+      {
         // Create this menu
         glow_sMenuInfo info;
 
         int b_mask = 1;
-        for (int i = 0; i < 32; i++) {
-          if (b_mask & button_mask) {
+        for (int i = 0; i < 32; i++)
+        {
+          if (b_mask & button_mask)
+          {
             info.item[i].occupied = true;
             strcpy(info.item[i].text, items_text[i]);
             if (items_dyn[i]->action_type1 & ge_mActionType1_PulldownMenu)
               info.item[i].type = glow_eMenuItem_PulldownMenu;
-            else {
+            else
+            {
               // Check access
               if (dyn->graph->is_authorized(items_dyn[i]->access))
                 info.item[i].type = glow_eMenuItem_Button;
               else
                 info.item[i].type = glow_eMenuItem_ButtonDisabled;
             }
-          } else
+          }
+          else
             info.item[i].occupied = false;
           b_mask = b_mask << 1;
         }
@@ -25902,41 +27103,46 @@ int GePulldownMenu::action(grow_tObject object, glow_tEvent event)
         int tsize;
         glow_eFont text_font;
 
-        grow_GetMenuChar(object, &tsize, &bg_color, &text_drawtype, &text_color,
-            &text_color_disabled, &text_font);
+        grow_GetMenuChar(object, &tsize, &bg_color, &text_drawtype, &text_color, &text_color_disabled,
+                         &text_font);
 
-        grow_CreateGrowMenu(dyn->graph->grow->ctx, "__Menu", &info,
-            event->menu.x, event->menu.y, 0, glow_eDrawType_Line, 0, 1, 1,
-            bg_color, tsize, text_drawtype, text_color, text_color_disabled,
-            text_font, object, &menu_object);
+        grow_CreateGrowMenu(dyn->graph->grow->ctx, "__Menu", &info, event->menu.x, event->menu.y, 0,
+                            glow_eDrawType_Line, 0, 1, 1, bg_color, tsize, text_drawtype, text_color,
+                            text_color_disabled, text_font, object, &menu_object);
         grow_SetMenuInputFocus(object, 0);
         grow_SetMenuInputFocus(menu_object, 1);
-      } else {
-        if (menu_object == event->menu.object) {
+      }
+      else
+      {
+        if (menu_object == event->menu.object)
+        {
           // Call specified item to create the menu
           // send menu_object as object arg to pass parent menu
           if (items_dyn[event->menu.item])
             items_dyn[event->menu.item]->action(menu_object, event);
-        } else {
+        }
+        else
+        {
           // Send event to child menu items
-          for (int j = 0; j < 32; j++) {
-            if (items_dyn[j]
-                && items_dyn[j]->action_type1 & ge_mActionType1_PulldownMenu)
+          for (int j = 0; j < 32; j++)
+          {
+            if (items_dyn[j] && items_dyn[j]->action_type1 & ge_mActionType1_PulldownMenu)
               items_dyn[j]->action(0, event);
           }
         }
       }
     }
     break;
-  case glow_eEvent_InputFocusLost: {
+  case glow_eEvent_InputFocusLost:
+  {
     // Delete this and all child menues
     glow_sEvent e;
     e.event = glow_eEvent_MenuDelete;
     e.menu.object = 0;
 
-    for (int j = 0; j < 32; j++) {
-      if (items_dyn[j]
-          && items_dyn[j]->action_type1 & ge_mActionType1_PulldownMenu)
+    for (int j = 0; j < 32; j++)
+    {
+      if (items_dyn[j] && items_dyn[j]->action_type1 & ge_mActionType1_PulldownMenu)
         items_dyn[j]->action(0, &e);
     }
     grow_DeleteObject(dyn->graph->grow->ctx, menu_object);
@@ -25946,32 +27152,38 @@ int GePulldownMenu::action(grow_tObject object, glow_tEvent event)
   case glow_eEvent_MenuDelete:
     if (menu_object == 0)
       break;
-    if (event->menu.object == 0) {
+    if (event->menu.object == 0)
+    {
       // Delete this and all child menues
-      for (int j = 0; j < 32; j++) {
-        if (items_dyn[j]
-            && items_dyn[j]->action_type1 & ge_mActionType1_PulldownMenu)
+      for (int j = 0; j < 32; j++)
+      {
+        if (items_dyn[j] && items_dyn[j]->action_type1 & ge_mActionType1_PulldownMenu)
           items_dyn[j]->action(0, event);
       }
       grow_DeleteObject(dyn->graph->grow->ctx, menu_object);
       menu_object = 0;
-    } else {
-      if (event->menu.object == menu_object) {
+    }
+    else
+    {
+      if (event->menu.object == menu_object)
+      {
         // Delete this and all child menues
         event->menu.object = 0;
-        for (int j = 0; j < 32; j++) {
-          if (items_dyn[j]
-              && items_dyn[j]->action_type1 & ge_mActionType1_PulldownMenu)
+        for (int j = 0; j < 32; j++)
+        {
+          if (items_dyn[j] && items_dyn[j]->action_type1 & ge_mActionType1_PulldownMenu)
             items_dyn[j]->action(0, event);
         }
         event->menu.object = menu_object;
 
         grow_DeleteObject(dyn->graph->grow->ctx, menu_object);
         menu_object = 0;
-      } else {
-        for (int j = 0; j < 32; j++) {
-          if (items_dyn[j]
-              && items_dyn[j]->action_type1 & ge_mActionType1_PulldownMenu)
+      }
+      else
+      {
+        for (int j = 0; j < 32; j++)
+        {
+          if (items_dyn[j] && items_dyn[j]->action_type1 & ge_mActionType1_PulldownMenu)
             items_dyn[j]->action(0, event);
         }
       }
@@ -25982,18 +27194,22 @@ int GePulldownMenu::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
-int GePulldownMenu::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GePulldownMenu::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
   char pref[200];
 
   if (button_mask != 0)
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "PulldownMenu.ItemMask\"," << button_mask << ");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "PulldownMenu.ItemMask\"," << button_mask
+       << ");" << '\n';
 
   int b_mask = ge_mInstance_1;
-  for (int j = 0; j < 32; j++) {
-    if (b_mask & button_mask) {
+  for (int j = 0; j < 32; j++)
+  {
+    if (b_mask & button_mask)
+    {
       if (!streq(items_text[j], ""))
-	fp << indentation << "SetObjectAttribute(id,\"" << prefix << "PulldownMenu.ItemText" << j+1 << "\",\"" << items_text[j] << "\");" << '\n';
+        fp << indentation << "SetObjectAttribute(id,\"" << prefix << "PulldownMenu.ItemText" << j + 1
+           << "\",\"" << items_text[j] << "\");" << '\n';
       sprintf(pref, "%sPulldownMenu.ItemDyn%d.", prefix, j + 1);
       items_dyn[j]->export_script(o, fp, indentation, pref);
     }
@@ -26002,8 +27218,7 @@ int GePulldownMenu::export_script(grow_tObject o, std::ofstream& fp, char *inden
   return 1;
 }
 
-int GePulldownMenu::export_java(
-    grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GePulldownMenu::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
   if (first)
     fp << "      ";
@@ -26012,13 +27227,16 @@ int GePulldownMenu::export_java(
   fp << "new GeDynPulldownMenu(" << var_name << ".dd, new String[] {\n"
      << "        ";
   int b_mask = 1;
-  for (int i = 0; i < 32; i++) {
-    if (b_mask & button_mask) {
+  for (int i = 0; i < 32; i++)
+  {
+    if (b_mask & button_mask)
+    {
       if (grow_GetTranslate(dyn->graph->grow->ctx))
         fp << "JopLang.transl(\"" << items_text[i] << "\")";
       else
         fp << "\"" << items_text[i] << "\"";
-    } else
+    }
+    else
       fp << "null";
     if (i != 31)
       fp << ",";
@@ -26028,10 +27246,12 @@ int GePulldownMenu::export_java(
      << "        new GeDyn[] {\n"
      << "        ";
   b_mask = 1;
-  for (int i = 0; i < 32; i++) {
+  for (int i = 0; i < 32; i++)
+  {
     if (b_mask & button_mask)
       items_dyn[i]->export_java_object(object, fp, var_name);
-    else {
+    else
+    {
       fp << "null";
       if (i != 31)
         fp << ",";
@@ -26043,9 +27263,8 @@ int GePulldownMenu::export_java(
 }
 
 GeOptionMenu::GeOptionMenu(GeDyn* e_dyn)
-    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_No,
-          ge_mActionType1_OptionMenu, ge_mActionType2_No,
-          ge_eDynPrio_OptionMenu),
+    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_No, ge_mActionType1_OptionMenu, ge_mActionType2_No,
+                ge_eDynPrio_OptionMenu),
       button_mask(1), menu_object(0), optionmenu_type(ge_eOptionMenuType_Static)
 {
   strcpy(attribute, "");
@@ -26059,10 +27278,8 @@ GeOptionMenu::GeOptionMenu(GeDyn* e_dyn)
 }
 
 GeOptionMenu::GeOptionMenu(const GeOptionMenu& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-          x.prio),
-      button_mask(x.button_mask), menu_object(0),
-      optionmenu_type(x.optionmenu_type)
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio),
+      button_mask(x.button_mask), menu_object(0), optionmenu_type(x.optionmenu_type)
 {
   memset(&focus_gained_time, 0, sizeof(focus_gained_time));
   strcpy(attribute, x.attribute);
@@ -26070,7 +27287,8 @@ GeOptionMenu::GeOptionMenu(const GeOptionMenu& x)
   strcpy(size_attribute, x.size_attribute);
   strcpy(update_attribute, x.update_attribute);
   memcpy(items_text, x.items_text, sizeof(items_text));
-  for (int i = 0; i < 32; i++) {
+  for (int i = 0; i < 32; i++)
+  {
     items_enum[i] = x.items_enum[i];
   }
 }
@@ -26089,7 +27307,8 @@ void GeOptionMenu::get_attributes(attr_sItem* attrinfo, int* item_count)
   attrinfo[i].type = glow_eType_String;
   attrinfo[i++].size = sizeof(attribute);
 
-  if (optionmenu_type == ge_eOptionMenuType_Dynamic) {
+  if (optionmenu_type == ge_eOptionMenuType_Dynamic)
+  {
     strcpy(attrinfo[i].name, "OptionMenu.TextAttribute");
     attrinfo[i].value = text_attribute;
     attrinfo[i].type = glow_eType_String;
@@ -26104,15 +27323,19 @@ void GeOptionMenu::get_attributes(attr_sItem* attrinfo, int* item_count)
     attrinfo[i].value = update_attribute;
     attrinfo[i].type = glow_eType_String;
     attrinfo[i++].size = sizeof(update_attribute);
-  } else {
+  }
+  else
+  {
     strcpy(attrinfo[i].name, "OptionMenu.ItemMask");
     attrinfo[i].value = &button_mask;
     attrinfo[i].type = ge_eAttrType_InstanceMask;
     attrinfo[i++].size = sizeof(button_mask);
 
     int b_mask = ge_mInstance_1;
-    for (int j = 0; j < 32; j++) {
-      if (b_mask & button_mask) {
+    for (int j = 0; j < 32; j++)
+    {
+      if (b_mask & button_mask)
+      {
         sprintf(attrinfo[i].name, "OptionMenu.ItemText%d", j + 1);
         attrinfo[i].value = items_text[j];
         attrinfo[i].type = glow_eType_String;
@@ -26132,18 +27355,17 @@ void GeOptionMenu::get_attributes(attr_sItem* attrinfo, int* item_count)
 
 int GeOptionMenu::get_transtab(char** tt)
 {
-  static char transtab[][32]
-      = { "SubGraph", "SubGraph", "A1", "", "Dynamic", "", "" };
+  static char transtab[][32] = {"SubGraph", "SubGraph", "A1", "", "Dynamic", "", ""};
 
   *tt = (char*)transtab;
   return 0;
 }
 
-void GeOptionMenu::set_attribute(
-    grow_tObject object, const char* attr_name, int* cnt)
+void GeOptionMenu::set_attribute(grow_tObject object, const char* attr_name, int* cnt)
 {
   (*cnt)--;
-  if (*cnt == 0) {
+  if (*cnt == 0)
+  {
     char msg[200];
 
     strncpy(attribute, attr_name, sizeof(attribute));
@@ -26162,23 +27384,18 @@ void GeOptionMenu::save(std::ofstream& fp)
 {
   fp << int(ge_eSave_OptionMenu) << '\n';
   fp << int(ge_eSave_OptionMenu_attribute) << FSPACE << attribute << '\n';
-  fp << int(ge_eSave_OptionMenu_text_attribute) << FSPACE << text_attribute
-     << '\n';
-  fp << int(ge_eSave_OptionMenu_size_attribute) << FSPACE << size_attribute
-     << '\n';
-  fp << int(ge_eSave_OptionMenu_update_attribute) << FSPACE << update_attribute
-     << '\n';
-  fp << int(ge_eSave_OptionMenu_optionmenu_type) << FSPACE << optionmenu_type
-     << '\n';
-  fp << int(ge_eSave_OptionMenu_button_mask) << FSPACE << int(button_mask)
-     << '\n';
+  fp << int(ge_eSave_OptionMenu_text_attribute) << FSPACE << text_attribute << '\n';
+  fp << int(ge_eSave_OptionMenu_size_attribute) << FSPACE << size_attribute << '\n';
+  fp << int(ge_eSave_OptionMenu_update_attribute) << FSPACE << update_attribute << '\n';
+  fp << int(ge_eSave_OptionMenu_optionmenu_type) << FSPACE << optionmenu_type << '\n';
+  fp << int(ge_eSave_OptionMenu_button_mask) << FSPACE << int(button_mask) << '\n';
   int b_mask = ge_mInstance_1;
-  for (int j = 0; j < 32; j++) {
-    if (b_mask & button_mask) {
-      fp << int(ge_eSave_OptionMenu_items_text0 + j) << FSPACE << items_text[j]
-         << '\n';
-      fp << int(ge_eSave_OptionMenu_items_enum0 + j) << FSPACE << items_enum[j]
-         << '\n';
+  for (int j = 0; j < 32; j++)
+  {
+    if (b_mask & button_mask)
+    {
+      fp << int(ge_eSave_OptionMenu_items_text0 + j) << FSPACE << items_text[j] << '\n';
+      fp << int(ge_eSave_OptionMenu_items_enum0 + j) << FSPACE << items_enum[j] << '\n';
     }
     b_mask = b_mask << 1;
   }
@@ -26192,8 +27409,10 @@ void GeOptionMenu::open(std::ifstream& fp)
   char dummy[40];
   int tmp;
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeOptionMenu: \"%d %s\"\n", type, dummy);
@@ -26201,7 +27420,8 @@ void GeOptionMenu::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_OptionMenu:
       break;
     case ge_eSave_OptionMenu_attribute:
@@ -26464,8 +27684,7 @@ void GeOptionMenu::open(std::ifstream& fp)
   }
 }
 
-int GeOptionMenu::connect(
-    grow_tObject object, glow_sTraceData* trace_data, bool now)
+int GeOptionMenu::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
 {
   int attr_type, attr_size;
   pwr_tAName parsed_name;
@@ -26473,16 +27692,15 @@ int GeOptionMenu::connect(
   int inverted;
 
   p = 0;
-  db = dyn->parse_attr_name(
-      attribute, parsed_name, &inverted, &attr_type, &attr_size);
+  db = dyn->parse_attr_name(attribute, parsed_name, &inverted, &attr_type, &attr_size);
   if (streq(parsed_name, ""))
     return 1;
 
   size = attr_size;
-  switch (db) {
+  switch (db)
+  {
   case graph_eDatabase_Gdh:
-    sts = dyn->graph->ref_object_info(
-        dyn->cycle, parsed_name, &p, &subid, attr_size, object, now);
+    sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, &p, &subid, attr_size, object, now);
     if (EVEN(sts))
       return sts;
     if (attr_type != 0)
@@ -26502,7 +27720,8 @@ int GeOptionMenu::connect(
   default:;
   }
 
-  switch (type_id) {
+  switch (type_id)
+  {
   case pwr_eType_Float32:
     size = sizeof(pwr_tFloat32);
     break;
@@ -26538,13 +27757,15 @@ int GeOptionMenu::connect(
   }
 
   update_p = 0;
-  if (optionmenu_type == ge_eOptionMenuType_Dynamic) {
-    if (!streq(text_attribute, "") && !streq(update_attribute, "")) {
-      db = dyn->parse_attr_name(
-          update_attribute, parsed_name, &inverted, &attr_type, &attr_size);
-      if (!streq(parsed_name, "")) {
-        sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name,
-            (void**)&update_p, &update_subid, attr_size, object, now);
+  if (optionmenu_type == ge_eOptionMenuType_Dynamic)
+  {
+    if (!streq(text_attribute, "") && !streq(update_attribute, ""))
+    {
+      db = dyn->parse_attr_name(update_attribute, parsed_name, &inverted, &attr_type, &attr_size);
+      if (!streq(parsed_name, ""))
+      {
+        sts = dyn->graph->ref_object_info(dyn->cycle, parsed_name, (void**)&update_p, &update_subid,
+                                          attr_size, object, now);
         if (EVEN(sts))
           return sts;
       }
@@ -26577,33 +27798,39 @@ int GeOptionMenu::scan(grow_tObject object)
     return 1;
 
   int update_texts = 0;
-  if (!first_scan) {
-    if (update_p) {
+  if (!first_scan)
+  {
+    if (update_p)
+    {
       if (*update_p == old_update_value && memcmp(&old_value, p, size) == 0)
         // No change since last time
         return 1;
-    } else {
+    }
+    else
+    {
       if (memcmp(&old_value, p, size) == 0)
         // No change since last time
         return 1;
     }
     if (update_p && !old_update_value)
       update_texts = 1;
-  } else {
+  }
+  else
+  {
     if (update_p)
       update_texts = 1;
   }
 
   unsigned int enum_value;
 
-  if (update_texts) {
+  if (update_texts)
+  {
     pwr_tAName pname;
     int attr_type, attr_size;
     int sts;
     int inverted;
 
-    dyn->parse_attr_name(
-        size_attribute, pname, &inverted, &attr_type, &attr_size);
+    dyn->parse_attr_name(size_attribute, pname, &inverted, &attr_type, &attr_size);
 
     sts = gdh_GetObjectInfo(pname, &text_size, sizeof(text_size));
     if (EVEN(sts))
@@ -26612,18 +27839,17 @@ int GeOptionMenu::scan(grow_tObject object)
     if (text_size > 32)
       return 0;
 
-    dyn->parse_attr_name(
-        text_attribute, pname, &inverted, &attr_type, &attr_size);
+    dyn->parse_attr_name(text_attribute, pname, &inverted, &attr_type, &attr_size);
 
-    sts = gdh_GetObjectInfo(
-        pname, items_text, text_size * sizeof(pwr_tString80));
+    sts = gdh_GetObjectInfo(pname, items_text, text_size * sizeof(pwr_tString80));
     if (EVEN(sts))
       return sts;
   }
 
-  if ((first_scan || update_texts)
-      && grow_GetTranslate(dyn->graph->grow->ctx)) {
-    for (int i = 0; i < 32; i++) {
+  if ((first_scan || update_texts) && grow_GetTranslate(dyn->graph->grow->ctx))
+  {
+    for (int i = 0; i < 32; i++)
+    {
       if (!streq(items_text[i], ""))
         Lng::translate(items_text[i], items_text[i]);
     }
@@ -26632,11 +27858,10 @@ int GeOptionMenu::scan(grow_tObject object)
   if (first_scan)
     first_scan = false;
 
-  switch (type_id) {
+  switch (type_id)
+  {
   case pwr_eType_Float32:
-    enum_value
-        = (unsigned int)(*(pwr_tFloat32*)p > 0 ? *(pwr_tFloat32*)p + 0.5
-                                               : *(pwr_tFloat32*)p - 0.5);
+    enum_value = (unsigned int)(*(pwr_tFloat32*)p > 0 ? *(pwr_tFloat32*)p + 0.5 : *(pwr_tFloat32*)p - 0.5);
     break;
   case pwr_eType_Int64:
     enum_value = (unsigned int)*(pwr_tInt64*)p;
@@ -26669,10 +27894,13 @@ int GeOptionMenu::scan(grow_tObject object)
     return 1;
   }
 
-  if (!update_p) {
+  if (!update_p)
+  {
     int found = 0;
-    for (int i = 0; i < 32; i++) {
-      if (items_enum[i] == enum_value) {
+    for (int i = 0; i < 32; i++)
+    {
+      if (items_enum[i] == enum_value)
+      {
         grow_SetAnnotation(object, 1, items_text[i], strlen(items_text[i]));
         found = 1;
         break;
@@ -26680,11 +27908,15 @@ int GeOptionMenu::scan(grow_tObject object)
     }
     if (!found)
       grow_SetAnnotation(object, 1, "", 0);
-  } else {
-    if ((unsigned int)enum_value < text_size) {
+  }
+  else
+  {
+    if ((unsigned int)enum_value < text_size)
+    {
       int len = MIN(strlen(items_text[enum_value]), sizeof(pwr_tString80));
       grow_SetAnnotation(object, 1, items_text[enum_value], len);
-    } else
+    }
+    else
       grow_SetAnnotation(object, 1, "", 0);
     old_update_value = *update_p;
   }
@@ -26698,7 +27930,8 @@ int GeOptionMenu::action(grow_tObject object, glow_tEvent event)
   if (!dyn->graph->is_authorized(dyn->access))
     return 1;
 
-  switch (event->event) {
+  switch (event->event)
+  {
   case glow_eEvent_MB1Down:
     grow_SetClickSensitivity(dyn->graph->grow->ctx, glow_mSensitivity_MB1Click);
     break;
@@ -26710,7 +27943,8 @@ int GeOptionMenu::action(grow_tObject object, glow_tEvent event)
     grow_MenuShiftCurrentItem(menu_object, -1);
     return GE__NO_PROPAGATE;
   case glow_eEvent_Key_Down:
-    if (!menu_object) {
+    if (!menu_object)
+    {
       // Create a menu by triggering a click event
       glow_sEvent e;
 
@@ -26721,13 +27955,16 @@ int GeOptionMenu::action(grow_tObject object, glow_tEvent event)
     grow_MenuShiftCurrentItem(menu_object, 1);
     return GE__NO_PROPAGATE;
   case glow_eEvent_Key_Return:
-    if (!menu_object) {
+    if (!menu_object)
+    {
       // Open menu, simulate a MB1 click event
       glow_sEvent e;
       e.event = glow_eEvent_MB1Click;
       e.object.object = object;
       action(object, &e);
-    } else {
+    }
+    else
+    {
       // Activate current item, simulate an activated event
       int sts;
       glow_sEvent e;
@@ -26762,35 +27999,46 @@ int GeOptionMenu::action(grow_tObject object, glow_tEvent event)
     //  if ( ABS(now.tv_sec - focus_gained_time.tv_sec) < 2)
     //	break;
     //}
-    if (menu_object) {
+    if (menu_object)
+    {
       // Close, delete this menu
       grow_DeleteObject(dyn->graph->grow->ctx, menu_object);
       menu_object = 0;
-    } else {
+    }
+    else
+    {
       double ll_x, ll_y, ur_x, ur_y;
       glow_sMenuInfo info;
 
-      if (!update_p) {
+      if (!update_p)
+      {
         int b_mask = 1;
-        for (int i = 0; i < 32; i++) {
-          if (b_mask & button_mask) {
+        for (int i = 0; i < 32; i++)
+        {
+          if (b_mask & button_mask)
+          {
             info.item[i].occupied = true;
             strcpy(info.item[i].text, items_text[i]);
 
             // Check access
             info.item[i].type = glow_eMenuItem_Button;
-          } else
+          }
+          else
             info.item[i].occupied = false;
           b_mask = b_mask << 1;
         }
-      } else {
-        for (unsigned int i = 0; i < 32; i++) {
-          if (i < text_size) {
-            strncpy(
-                info.item[i].text, items_text[i], sizeof(info.item[0].text));
+      }
+      else
+      {
+        for (unsigned int i = 0; i < 32; i++)
+        {
+          if (i < text_size)
+          {
+            strncpy(info.item[i].text, items_text[i], sizeof(info.item[0].text));
             info.item[i].type = glow_eMenuItem_Button;
             info.item[i].occupied = true;
-          } else
+          }
+          else
             info.item[i].occupied = false;
         }
       }
@@ -26803,76 +28051,84 @@ int GeOptionMenu::action(grow_tObject object, glow_tEvent event)
       glow_eFont text_font;
       glow_eAnnotType annot_type;
 
-      sts = grow_GetObjectAnnotInfo(object, 1, &tsize, &text_drawtype,
-          &text_color, &bg_color, &scale, &text_font, &annot_type);
-      if (EVEN(sts)) {
+      sts = grow_GetObjectAnnotInfo(object, 1, &tsize, &text_drawtype, &text_color, &bg_color, &scale,
+                                    &text_font, &annot_type);
+      if (EVEN(sts))
+      {
         tsize = 2;
         text_drawtype = glow_eDrawType_TextHelveticaBold;
         text_color = glow_eDrawType_Line;
         bg_color = glow_eDrawType_LightGray;
-      } else if (bg_color == glow_eDrawType_No
-          || bg_color == glow_eDrawType_Inherit)
+      }
+      else if (bg_color == glow_eDrawType_No || bg_color == glow_eDrawType_Inherit)
         bg_color = glow_eDrawType_LightGray;
 
       grow_MeasureNode(object, &ll_x, &ll_y, &ur_x, &ur_y);
-      grow_CreateGrowMenu(dyn->graph->grow->ctx, "__Menu", &info, ll_x, ur_y,
-          ur_x - ll_x, glow_eDrawType_Line, 0, 1, 1, bg_color, tsize,
-          text_drawtype, text_color, glow_eDrawType_MediumGray, text_font, 0,
-          &menu_object);
-      grow_SetObjectScale(
-          menu_object, scale, scale, 0, 0, glow_eScaleType_LowerLeft);
+      grow_CreateGrowMenu(dyn->graph->grow->ctx, "__Menu", &info, ll_x, ur_y, ur_x - ll_x,
+                          glow_eDrawType_Line, 0, 1, 1, bg_color, tsize, text_drawtype, text_color,
+                          glow_eDrawType_MediumGray, text_font, 0, &menu_object);
+      grow_SetObjectScale(menu_object, scale, scale, 0, 0, glow_eScaleType_LowerLeft);
     }
     break;
   case glow_eEvent_MenuActivated:
     if (menu_object == 0)
       break;
-    if (event->menu.object == menu_object) {
+    if (event->menu.object == menu_object)
+    {
       // Set enum value to attribute
       int sts = 0;
       pwr_tAName parsed_name;
       int inverted;
       int attr_type, attr_size;
 
-      dyn->parse_attr_name(
-          attribute, parsed_name, &inverted, &attr_type, &attr_size);
+      dyn->parse_attr_name(attribute, parsed_name, &inverted, &attr_type, &attr_size);
       if (parsed_name[0] == '&')
-	// Attribute starting with '&' indicates reference
-	dyn->graph->get_reference_name(parsed_name, parsed_name);
+        // Attribute starting with '&' indicates reference
+        dyn->graph->get_reference_name(parsed_name, parsed_name);
 
-      switch (db) {
+      switch (db)
+      {
       case graph_eDatabase_Gdh:
-        switch (type_id) {
-        case pwr_eType_Float32: {
+        switch (type_id)
+        {
+        case pwr_eType_Float32:
+        {
           pwr_tFloat32 value = items_enum[event->menu.item];
           sts = gdh_SetObjectInfo(parsed_name, &value, sizeof(value));
           break;
         }
-        case pwr_eType_Int32: {
+        case pwr_eType_Int32:
+        {
           pwr_tInt32 value = items_enum[event->menu.item];
           sts = gdh_SetObjectInfo(parsed_name, &value, sizeof(value));
           break;
         }
-        case pwr_eType_UInt32: {
+        case pwr_eType_UInt32:
+        {
           pwr_tUInt32 value = items_enum[event->menu.item];
           sts = gdh_SetObjectInfo(parsed_name, &value, sizeof(value));
           break;
         }
-        case pwr_eType_Int16: {
+        case pwr_eType_Int16:
+        {
           pwr_tInt16 value = items_enum[event->menu.item];
           sts = gdh_SetObjectInfo(parsed_name, &value, sizeof(value));
           break;
         }
-        case pwr_eType_UInt16: {
+        case pwr_eType_UInt16:
+        {
           pwr_tUInt16 value = items_enum[event->menu.item];
           sts = gdh_SetObjectInfo(parsed_name, &value, sizeof(value));
           break;
         }
-        case pwr_eType_Int8: {
+        case pwr_eType_Int8:
+        {
           pwr_tInt8 value = items_enum[event->menu.item];
           sts = gdh_SetObjectInfo(parsed_name, &value, sizeof(value));
           break;
         }
-        case pwr_eType_UInt8: {
+        case pwr_eType_UInt8:
+        {
           pwr_tUInt8 value = items_enum[event->menu.item];
           sts = gdh_SetObjectInfo(parsed_name, &value, sizeof(value));
           break;
@@ -26881,7 +28137,8 @@ int GeOptionMenu::action(grow_tObject object, glow_tEvent event)
           sts = 0;
         }
         break;
-      case graph_eDatabase_Ccm: {
+      case graph_eDatabase_Ccm:
+      {
         pwr_tInt32 value = items_enum[event->menu.item];
         sts = dyn->graph->ccm_set_variable(parsed_name, type_id, &value);
         break;
@@ -26895,7 +28152,10 @@ int GeOptionMenu::action(grow_tObject object, glow_tEvent event)
     break;
   case glow_eEvent_MenuCreate:
     break;
-  case glow_eEvent_InputFocusLost: {
+  case glow_eEvent_InputFocusLost:
+  {
+    if (!menu_object)
+      break;
     // Delete this menu
     grow_DeleteObject(dyn->graph->grow->ctx, menu_object);
     menu_object = 0;
@@ -26904,7 +28164,8 @@ int GeOptionMenu::action(grow_tObject object, glow_tEvent event)
   case glow_eEvent_MenuDelete:
     if (menu_object == 0)
       break;
-    if (event->menu.object == 0 || event->menu.object == menu_object) {
+    if (event->menu.object == 0 || event->menu.object == menu_object)
+    {
       // Delete this menu
       grow_DeleteObject(dyn->graph->grow->ctx, menu_object);
       menu_object = 0;
@@ -26915,35 +28176,47 @@ int GeOptionMenu::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
-int GeOptionMenu::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GeOptionMenu::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
   if (optionmenu_type != ge_eOptionMenuType_Static)
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "OptionMenu.Type\"," << optionmenu_type << ");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "OptionMenu.Type\"," << optionmenu_type
+       << ");" << '\n';
 
   if (!streq(attribute, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "OptionMenu.Attribute\",\"" << attribute << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "OptionMenu.Attribute\",\"" << attribute
+       << "\");" << '\n';
 
-  if (optionmenu_type == ge_eOptionMenuType_Dynamic) {
+  if (optionmenu_type == ge_eOptionMenuType_Dynamic)
+  {
     if (!streq(text_attribute, ""))
-      fp << indentation << "SetObjectAttribute(id,\"" << prefix << "OptionMenu.TextAttribute\",\"" << text_attribute << "\");" << '\n';
+      fp << indentation << "SetObjectAttribute(id,\"" << prefix << "OptionMenu.TextAttribute\",\""
+         << text_attribute << "\");" << '\n';
 
     if (!streq(size_attribute, ""))
-      fp << indentation << "SetObjectAttribute(id,\"" << prefix << "OptionMenu.SizeAttribute\",\"" << size_attribute << "\");" << '\n';
+      fp << indentation << "SetObjectAttribute(id,\"" << prefix << "OptionMenu.SizeAttribute\",\""
+         << size_attribute << "\");" << '\n';
 
     if (!streq(update_attribute, ""))
-      fp << indentation << "SetObjectAttribute(id,\"" << prefix << "OptionMenu.UpdateAttribute\",\"" << update_attribute << "\");" << '\n';
-
-  } else {
+      fp << indentation << "SetObjectAttribute(id,\"" << prefix << "OptionMenu.UpdateAttribute\",\""
+         << update_attribute << "\");" << '\n';
+  }
+  else
+  {
     if (button_mask != 0)
-      fp << indentation << "SetObjectAttribute(id,\"" << prefix << "OptionMenu.ItemMask\"," << button_mask << ");" << '\n';
+      fp << indentation << "SetObjectAttribute(id,\"" << prefix << "OptionMenu.ItemMask\"," << button_mask
+         << ");" << '\n';
 
     int b_mask = ge_mInstance_1;
-    for (int j = 0; j < 32; j++) {
-      if (b_mask & button_mask) {
-	if (!streq(items_text[j], ""))
-	  fp << indentation << "SetObjectAttribute(id,\"" << prefix << "OptionMenu.ItemText" << j+1 << "\",\"" << items_text[j] << "\");" << '\n';
-	if (items_enum[j] != j)
-	  fp << indentation << "SetObjectAttribute(id,\"" << prefix << "OptionMenu.ItemEnum" << j+1 << "\"," << items_enum[j] << ");" << '\n';
+    for (int j = 0; j < 32; j++)
+    {
+      if (b_mask & button_mask)
+      {
+        if (!streq(items_text[j], ""))
+          fp << indentation << "SetObjectAttribute(id,\"" << prefix << "OptionMenu.ItemText" << j + 1
+             << "\",\"" << items_text[j] << "\");" << '\n';
+        if (items_enum[j] != j)
+          fp << indentation << "SetObjectAttribute(id,\"" << prefix << "OptionMenu.ItemEnum" << j + 1 << "\","
+             << items_enum[j] << ");" << '\n';
       }
       b_mask = b_mask << 1;
     }
@@ -26951,24 +28224,25 @@ int GeOptionMenu::export_script(grow_tObject o, std::ofstream& fp, char *indenta
   return 1;
 }
 
-int GeOptionMenu::export_java(
-    grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeOptionMenu::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
   if (first)
     fp << "      ";
   else
     fp << "      ,";
-  fp << "new GeDynOptionMenu(" << var_name << ".dd, \"" << attribute
-     << "\", new String[] {\n"
+  fp << "new GeDynOptionMenu(" << var_name << ".dd, \"" << attribute << "\", new String[] {\n"
      << "        ";
   int b_mask = 1;
-  for (int i = 0; i < 32; i++) {
-    if (b_mask & button_mask) {
+  for (int i = 0; i < 32; i++)
+  {
+    if (b_mask & button_mask)
+    {
       if (grow_GetTranslate(dyn->graph->grow->ctx))
         fp << "JopLang.transl(\"" << items_text[i] << "\")";
       else
         fp << "\"" << items_text[i] << "\"";
-    } else
+    }
+    else
       fp << "null";
     if (i != 31)
       fp << ",";
@@ -26978,7 +28252,8 @@ int GeOptionMenu::export_java(
      << "        new int[] {\n"
      << "        ";
   b_mask = 1;
-  for (int i = 0; i < 32; i++) {
+  for (int i = 0; i < 32; i++)
+  {
     if (b_mask & button_mask)
       fp << items_enum[i];
     else
@@ -26991,30 +28266,38 @@ int GeOptionMenu::export_java(
   return 1;
 }
 
-int GeOptionMenu::syntax_check(
-    grow_tObject object, int* error_cnt, int* warning_cnt)
+int GeOptionMenu::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
-  int types[] = { pwr_eType_Int8, pwr_eType_UInt8, pwr_eType_Int16,
-    pwr_eType_UInt16, pwr_eType_Int32, pwr_eType_UInt32, pwr_eType_Int64,
-    pwr_eType_UInt64, pwr_eType_Float32, pwr_eType_Float64, 0 };
-  graph_eDatabase databases[] = { graph_eDatabase_Gdh, graph_eDatabase_Local,
-    graph_eDatabase_User, graph_eDatabase_Ccm, graph_eDatabase__ };
+  int types[] = {pwr_eType_Int8,
+                 pwr_eType_UInt8,
+                 pwr_eType_Int16,
+                 pwr_eType_UInt16,
+                 pwr_eType_Int32,
+                 pwr_eType_UInt32,
+                 pwr_eType_Int64,
+                 pwr_eType_UInt64,
+                 pwr_eType_Float32,
+                 pwr_eType_Float64,
+                 0};
+  graph_eDatabase databases[] = {graph_eDatabase_Gdh, graph_eDatabase_Local, graph_eDatabase_User,
+                                 graph_eDatabase_Ccm, graph_eDatabase__};
 
-  dyn->syntax_check_attribute(object, "OptionMenu.Attribute", attribute, 0,
-      types, databases, error_cnt, warning_cnt);
+  dyn->syntax_check_attribute(object, "OptionMenu.Attribute", attribute, 0, types, databases, error_cnt,
+                              warning_cnt);
 
-  if (optionmenu_type == ge_eOptionMenuType_Dynamic) {
-    int types2[] = { pwr_eType_String, 0 };
-    int types3[] = { pwr_eType_Int32, pwr_eType_UInt32, 0 };
-    int types4[] = { pwr_eType_Boolean, 0 };
-    graph_eDatabase databases2[] = { graph_eDatabase_Gdh, graph_eDatabase__ };
+  if (optionmenu_type == ge_eOptionMenuType_Dynamic)
+  {
+    int types2[] = {pwr_eType_String, 0};
+    int types3[] = {pwr_eType_Int32, pwr_eType_UInt32, 0};
+    int types4[] = {pwr_eType_Boolean, 0};
+    graph_eDatabase databases2[] = {graph_eDatabase_Gdh, graph_eDatabase__};
 
-    dyn->syntax_check_attribute(object, "OptionMenu.TextAttribute",
-        text_attribute, 0, types2, databases2, error_cnt, warning_cnt);
-    dyn->syntax_check_attribute(object, "OptionMenu.SizeAttribute",
-        size_attribute, 0, types3, databases2, error_cnt, warning_cnt);
-    dyn->syntax_check_attribute(object, "OptionMenu.UpdateAttribute",
-        update_attribute, 0, types4, databases2, error_cnt, warning_cnt);
+    dyn->syntax_check_attribute(object, "OptionMenu.TextAttribute", text_attribute, 0, types2, databases2,
+                                error_cnt, warning_cnt);
+    dyn->syntax_check_attribute(object, "OptionMenu.SizeAttribute", size_attribute, 0, types3, databases2,
+                                error_cnt, warning_cnt);
+    dyn->syntax_check_attribute(object, "OptionMenu.UpdateAttribute", update_attribute, 0, types4, databases2,
+                                error_cnt, warning_cnt);
   }
   return 1;
 }
@@ -27034,8 +28317,10 @@ void GeAnalogText::get_attributes(attr_sItem* attrinfo, int* item_count)
   attrinfo[i++].size = sizeof(button_mask);
 
   int b_mask = ge_mInstance_1;
-  for (int j = 0; j < 32; j++) {
-    if (b_mask & button_mask) {
+  for (int j = 0; j < 32; j++)
+  {
+    if (b_mask & button_mask)
+    {
       sprintf(attrinfo[i].name, "AnalogText.Text%d", j + 1);
       attrinfo[i].value = items_text[j];
       attrinfo[i].type = glow_eType_String;
@@ -27052,11 +28337,11 @@ void GeAnalogText::get_attributes(attr_sItem* attrinfo, int* item_count)
   *item_count = i;
 }
 
-void GeAnalogText::set_attribute(
-    grow_tObject object, const char* attr_name, int* cnt)
+void GeAnalogText::set_attribute(grow_tObject object, const char* attr_name, int* cnt)
 {
   (*cnt)--;
-  if (*cnt == 0) {
+  if (*cnt == 0)
+  {
     char msg[200];
 
     strncpy(attribute, attr_name, sizeof(attribute));
@@ -27085,8 +28370,10 @@ void GeAnalogText::open(std::ifstream& fp)
   int end_found = 0;
   char dummy[40];
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeAnalogText: \"%d %s\"\n", type, dummy);
@@ -27094,7 +28381,8 @@ void GeAnalogText::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_AnalogText:
       break;
     case ge_eSave_AnalogText_super:
@@ -27112,39 +28400,44 @@ void GeAnalogText::open(std::ifstream& fp)
   }
 }
 
-int GeAnalogText::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GeAnalogText::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
   if (!streq(attribute, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "AnalogText.Attribute\",\"" << attribute << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "AnalogText.Attribute\",\"" << attribute
+       << "\");" << '\n';
 
   if (button_mask != 0)
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "AnalogText.TextMask\"," << button_mask << ");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "AnalogText.TextMask\"," << button_mask
+       << ");" << '\n';
 
   int b_mask = ge_mInstance_1;
-  for (int j = 0; j < 32; j++) {
-    if (b_mask & button_mask) {
+  for (int j = 0; j < 32; j++)
+  {
+    if (b_mask & button_mask)
+    {
       if (!streq(items_text[j], ""))
-	fp << indentation << "SetObjectAttribute(id,\"" << prefix << "AnalogText.Text" << j+1 << "\",\"" << items_text[j] << "\");" << '\n';
+        fp << indentation << "SetObjectAttribute(id,\"" << prefix << "AnalogText.Text" << j + 1 << "\",\""
+           << items_text[j] << "\");" << '\n';
       if (items_enum[j] != j)
-	fp << indentation << "SetObjectAttribute(id,\"" << prefix << "AnalogText.Enum" << j+1 << "\"," << items_enum[j] << ");" << '\n';
+        fp << indentation << "SetObjectAttribute(id,\"" << prefix << "AnalogText.Enum" << j + 1 << "\","
+           << items_enum[j] << ");" << '\n';
     }
     b_mask = b_mask << 1;
   }
   return 1;
 }
 
-int GeAnalogText::export_java(
-    grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeAnalogText::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
   if (first)
     fp << "      ";
   else
     fp << "      ,";
-  fp << "new GeDynAnalogText(" << var_name << ".dd, \"" << attribute
-     << "\", new String[] {\n"
+  fp << "new GeDynAnalogText(" << var_name << ".dd, \"" << attribute << "\", new String[] {\n"
      << "        ";
   int b_mask = 1;
-  for (int i = 0; i < 32; i++) {
+  for (int i = 0; i < 32; i++)
+  {
     if (b_mask & button_mask)
       fp << "\"" << items_text[i] << "\"";
     else
@@ -27157,7 +28450,8 @@ int GeAnalogText::export_java(
      << "        new int[] {\n"
      << "        ";
   b_mask = 1;
-  for (int i = 0; i < 32; i++) {
+  for (int i = 0; i < 32; i++)
+  {
     if (b_mask & button_mask)
       fp << (int)items_enum[i];
     else
@@ -27171,8 +28465,8 @@ int GeAnalogText::export_java(
 }
 
 GeSetValue::GeSetValue(GeDyn* e_dyn, ge_mInstance e_instance)
-    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_No,
-          ge_mActionType1_SetValue, ge_mActionType2_No, ge_eDynPrio_SetValue)
+    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_No, ge_mActionType1_SetValue, ge_mActionType2_No,
+                ge_eDynPrio_SetValue)
 {
   strcpy(attribute, "");
   strcpy(value, "");
@@ -27180,8 +28474,7 @@ GeSetValue::GeSetValue(GeDyn* e_dyn, ge_mInstance e_instance)
 }
 
 GeSetValue::GeSetValue(const GeSetValue& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-          x.prio)
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio)
 {
   strcpy(attribute, x.attribute);
   strcpy(value, x.value);
@@ -27192,7 +28485,8 @@ void GeSetValue::get_attributes(attr_sItem* attrinfo, int* item_count)
 {
   int i = *item_count;
 
-  if (instance == ge_mInstance_1) {
+  if (instance == ge_mInstance_1)
+  {
     strcpy(attrinfo[i].name, "SetValue.Attribute");
     attrinfo[i].value = attribute;
     attrinfo[i].type = glow_eType_String;
@@ -27207,11 +28501,14 @@ void GeSetValue::get_attributes(attr_sItem* attrinfo, int* item_count)
     attrinfo[i].value = &instance_mask;
     attrinfo[i].type = ge_eAttrType_InstanceMask;
     attrinfo[i++].size = sizeof(instance_mask);
-  } else {
+  }
+  else
+  {
     // Get instance number
     int inst = 1;
     unsigned int m = instance;
-    while (m > 1) {
+    while (m > 1)
+    {
       m = m >> 1;
       inst++;
     }
@@ -27231,19 +28528,18 @@ void GeSetValue::get_attributes(attr_sItem* attrinfo, int* item_count)
   *item_count = i;
 }
 
-void GeSetValue::set_attribute(
-    grow_tObject object, const char* attr_name, int* cnt)
+void GeSetValue::set_attribute(grow_tObject object, const char* attr_name, int* cnt)
 {
   (*cnt)--;
-  if (*cnt == 0) {
+  if (*cnt == 0)
+  {
     char msg[200];
 
     strncpy(attribute, attr_name, sizeof(attribute));
     if (instance == ge_mInstance_1)
       snprintf(msg, sizeof(msg), "SetValue.Attribute = %s", attr_name);
     else
-      snprintf(msg, sizeof(msg), "SetValue%d.Attribute = %s",
-          GeDyn::instance_to_number(instance), attr_name);
+      snprintf(msg, sizeof(msg), "SetValue%d.Attribute = %s", GeDyn::instance_to_number(instance), attr_name);
     msg[sizeof(msg) - 1] = 0;
     dyn->graph->message('I', msg);
   }
@@ -27260,8 +28556,7 @@ void GeSetValue::save(std::ofstream& fp)
   fp << int(ge_eSave_SetValue_attribute) << FSPACE << attribute << '\n';
   fp << int(ge_eSave_SetValue_value) << FSPACE << value << '\n';
   fp << int(ge_eSave_SetValue_instance) << FSPACE << int(instance) << '\n';
-  fp << int(ge_eSave_SetValue_instance_mask) << FSPACE << int(instance_mask)
-     << '\n';
+  fp << int(ge_eSave_SetValue_instance_mask) << FSPACE << int(instance_mask) << '\n';
   fp << int(ge_eSave_End) << '\n';
 }
 
@@ -27272,8 +28567,10 @@ void GeSetValue::open(std::ifstream& fp)
   char dummy[40];
   int tmp;
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeSetValue: \"%d %s\"\n", type, dummy);
@@ -27281,7 +28578,8 @@ void GeSetValue::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_SetValue:
       break;
     case ge_eSave_SetValue_attribute:
@@ -27317,7 +28615,8 @@ int GeSetValue::action(grow_tObject object, glow_tEvent event)
   if (!dyn->graph->is_authorized(dyn->access))
     return 1;
 
-  switch (event->event) {
+  switch (event->event)
+  {
   case glow_eEvent_MB1Down:
     grow_SetClickSensitivity(dyn->graph->grow->ctx, glow_mSensitivity_MB1Click);
     grow_SetObjectColorInverse(object, 1);
@@ -27326,7 +28625,8 @@ int GeSetValue::action(grow_tObject object, glow_tEvent event)
     grow_SetObjectColorInverse(object, 0);
     break;
   case glow_eEvent_Key_Return:
-  case glow_eEvent_MB1Click: {
+  case glow_eEvent_MB1Click:
+  {
     int sts;
     pwr_tAName parsed_name;
     int inverted;
@@ -27337,21 +28637,22 @@ int GeSetValue::action(grow_tObject object, glow_tEvent event)
     if (dyn->total_action_type1 & ge_mActionType1_Confirm)
       break;
 
-    db = dyn->parse_attr_name(
-        attribute, parsed_name, &inverted, &attr_type, &attr_size);
+    db = dyn->parse_attr_name(attribute, parsed_name, &inverted, &attr_type, &attr_size);
     if (parsed_name[0] == '&')
       // Attribute starting with '&' indicates reference
       dyn->graph->get_reference_name(parsed_name, parsed_name);
 
-    sts = graph_attr_string_to_value(
-        attr_type, value, (void*)&buf, sizeof(buf), sizeof(buf));
-    if (EVEN(sts)) {
+    sts = graph_attr_string_to_value(attr_type, value, (void*)&buf, sizeof(buf), sizeof(buf));
+    if (EVEN(sts))
+    {
       printf("SetValue error: %s\n", attribute);
       return 1;
     }
 
-    switch (db) {
-    case graph_eDatabase_Local: {
+    switch (db)
+    {
+    case graph_eDatabase_Local:
+    {
       sts = dyn->graph->localdb_set_value(parsed_name, buf, attr_size);
       if (EVEN(sts))
         printf("SetValue error: %s\n", attribute);
@@ -27362,7 +28663,8 @@ int GeSetValue::action(grow_tObject object, glow_tEvent event)
       if (EVEN(sts))
         printf("SetValue error: %s\n", attribute);
       break;
-    case graph_eDatabase_Ccm: {
+    case graph_eDatabase_Ccm:
+    {
       sts = dyn->graph->ccm_set_variable(parsed_name, attr_type, buf);
       if (EVEN(sts))
         printf("SetValue error: %s\n", attribute);
@@ -27377,65 +28679,72 @@ int GeSetValue::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
-int GeSetValue::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GeSetValue::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
   char name[80];
 
   sprintf(name, "%sSetValue", prefix);
 
   // Find first instance and print instance mask
-  for (GeDynElem *elem = dyn->elements; elem; elem = elem->next) {
-    if (elem->action_type1 == ge_mActionType1_SetValue && elem->instance == ge_mInstance_1) {
-      if (instance ==  instance_highest(elem->instance_mask)) {
-	if (elem->instance_mask != 1)
-	  fp << indentation << "SetObjectAttribute(id,\"" << prefix << "SetValue.Instances\"," << elem->instance_mask << ");" << '\n';
-	break;
+  for (GeDynElem* elem = dyn->elements; elem; elem = elem->next)
+  {
+    if (elem->action_type1 == ge_mActionType1_SetValue && elem->instance == ge_mInstance_1)
+    {
+      if (instance == instance_highest(elem->instance_mask))
+      {
+        if (elem->instance_mask != 1)
+          fp << indentation << "SetObjectAttribute(id,\"" << prefix << "SetValue.Instances\","
+             << elem->instance_mask << ");" << '\n';
+        break;
       }
     }
   }
   if (instance != ge_mInstance_1)
     sprintf(&name[strlen(name)], "%d", instance_number(instance));
   if (!streq(attribute, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << name << ".Attribute\",\"" << attribute << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << name << ".Attribute\",\"" << attribute << "\");"
+       << '\n';
   if (!streq(value, ""))
     fp << indentation << "SetObjectAttribute(id,\"" << name << ".Value\",\"" << value << "\");" << '\n';
   return 1;
 }
 
-int GeSetValue::export_java(
-    grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeSetValue::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
   if (first)
     fp << "      ";
   else
     fp << "      ,";
-  fp << "new GeDynSetValue(" << var_name << ".dd, \"" << attribute << "\",\""
-     << value << "\")\n";
+  fp << "new GeDynSetValue(" << var_name << ".dd, \"" << attribute << "\",\"" << value << "\")\n";
   return 1;
 }
 
-int GeSetValue::syntax_check(
-    grow_tObject object, int* error_cnt, int* warning_cnt)
+int GeSetValue::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
-  int types[] = { pwr_eType_Boolean, pwr_eType_Float32, pwr_eType_Float64,
-    pwr_eType_Char, pwr_eType_Int8, pwr_eType_Int16, pwr_eType_Int32,
-    pwr_eType_Int64, pwr_eType_UInt8, pwr_eType_UInt16, pwr_eType_UInt32,
-    pwr_eType_UInt64, pwr_eType_String, pwr_eType_Objid, pwr_eType_ClassId,
-    pwr_eType_TypeId, pwr_eType_ObjectIx, pwr_eType_VolumeId,
-    graph_eType_NodeId, pwr_eType_RefId, pwr_eType_AttrRef, pwr_eType_Time,
-    pwr_eType_DeltaTime, pwr_eType_Enum, pwr_eType_Mask, 0 };
-  graph_eDatabase databases[] = { graph_eDatabase_Local, graph_eDatabase_Gdh,
-    graph_eDatabase_Ccm, graph_eDatabase__ };
-  dyn->syntax_check_attribute(object, "SetValue.Attribute", attribute, 0, types,
-      databases, error_cnt, warning_cnt);
+  int types[] = {pwr_eType_Boolean,   pwr_eType_Float32,
+                 pwr_eType_Float64,   pwr_eType_Char,
+                 pwr_eType_Int8,      pwr_eType_Int16,
+                 pwr_eType_Int32,     pwr_eType_Int64,
+                 pwr_eType_UInt8,     pwr_eType_UInt16,
+                 pwr_eType_UInt32,    pwr_eType_UInt64,
+                 pwr_eType_String,    pwr_eType_Objid,
+                 pwr_eType_ClassId,   pwr_eType_TypeId,
+                 pwr_eType_ObjectIx,  pwr_eType_VolumeId,
+                 graph_eType_NodeId,  pwr_eType_RefId,
+                 pwr_eType_AttrRef,   pwr_eType_Time,
+                 pwr_eType_DeltaTime, pwr_eType_Enum,
+                 pwr_eType_Mask,      0};
+  graph_eDatabase databases[] = {graph_eDatabase_Local, graph_eDatabase_Gdh, graph_eDatabase_Ccm,
+                                 graph_eDatabase__};
+  dyn->syntax_check_attribute(object, "SetValue.Attribute", attribute, 0, types, databases, error_cnt,
+                              warning_cnt);
 
   return 1;
 }
 
 GeMethodToolbar::GeMethodToolbar(GeDyn* e_dyn, ge_mInstance e_instance)
-    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_No,
-          ge_mActionType1_MethodToolbar, ge_mActionType2_No,
-          ge_eDynPrio_MethodToolbar),
+    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_No, ge_mActionType1_MethodToolbar, ge_mActionType2_No,
+                ge_eDynPrio_MethodToolbar),
       toolbar_type(ge_eMethodToolbarType_Object)
 {
   strcpy(method_object, "");
@@ -27443,8 +28752,7 @@ GeMethodToolbar::GeMethodToolbar(GeDyn* e_dyn, ge_mInstance e_instance)
 }
 
 GeMethodToolbar::GeMethodToolbar(const GeMethodToolbar& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-          x.prio),
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio),
       toolbar_type(x.toolbar_type)
 {
   strcpy(method_object, x.method_object);
@@ -27469,11 +28777,11 @@ void GeMethodToolbar::get_attributes(attr_sItem* attrinfo, int* item_count)
   *item_count = i;
 }
 
-void GeMethodToolbar::set_attribute(
-    grow_tObject object, const char* attr_name, int* cnt)
+void GeMethodToolbar::set_attribute(grow_tObject object, const char* attr_name, int* cnt)
 {
   (*cnt)--;
-  if (*cnt == 0) {
+  if (*cnt == 0)
+  {
     char msg[200];
 
     strncpy(method_object, attr_name, sizeof(method_object));
@@ -27483,20 +28791,16 @@ void GeMethodToolbar::set_attribute(
   }
 }
 
-void GeMethodToolbar::replace_attribute(
-    char* from, char* to, int* cnt, int strict)
+void GeMethodToolbar::replace_attribute(char* from, char* to, int* cnt, int strict)
 {
-  GeDyn::replace_attribute(
-      method_object, sizeof(method_object), from, to, cnt, strict);
+  GeDyn::replace_attribute(method_object, sizeof(method_object), from, to, cnt, strict);
 }
 
 void GeMethodToolbar::save(std::ofstream& fp)
 {
   fp << int(ge_eSave_MethodToolbar) << '\n';
-  fp << int(ge_eSave_MethodToolbar_method_object) << FSPACE << method_object
-     << '\n';
-  fp << int(ge_eSave_MethodToolbar_toolbar_type) << FSPACE << (int)toolbar_type
-     << '\n';
+  fp << int(ge_eSave_MethodToolbar_method_object) << FSPACE << method_object << '\n';
+  fp << int(ge_eSave_MethodToolbar_toolbar_type) << FSPACE << (int)toolbar_type << '\n';
   fp << int(ge_eSave_End) << '\n';
 }
 
@@ -27507,8 +28811,10 @@ void GeMethodToolbar::open(std::ifstream& fp)
   char dummy[40];
   int tmp;
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeMethodToolbar: \"%d %s\"\n", type, dummy);
@@ -27516,7 +28822,8 @@ void GeMethodToolbar::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_MethodToolbar:
       break;
     case ge_eSave_MethodToolbar_method_object:
@@ -27548,8 +28855,7 @@ static int methods_command_cb(char* command, void* udata)
   return (dyn->graph->command_cb)(dyn->graph->parent_ctx, cmd, 0, 0);
 }
 
-int GeMethodToolbar::connect(
-    grow_tObject object, glow_sTraceData* trace_data, bool now)
+int GeMethodToolbar::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
 {
   int sts;
   pwr_tAName parsed_name;
@@ -27559,11 +28865,9 @@ int GeMethodToolbar::connect(
   pwr_sClass_XttMethodsMask xm_mask;
   int mask_store = 0;
 
-  db = dyn->parse_attr_name(
-      method_object, parsed_name, &inverted, &attr_type, &attr_size);
+  db = dyn->parse_attr_name(method_object, parsed_name, &inverted, &attr_type, &attr_size);
 
-  sts = GeMethods::get_xm_mask(
-      0, parsed_name, &xm_mask, &mask_store, methods_command_cb, dyn);
+  sts = GeMethods::get_xm_mask(0, parsed_name, &xm_mask, &mask_store, methods_command_cb, dyn);
 
   unsigned int opmask = xm_mask.OpMethods;
   unsigned int mntmask = xm_mask.MntMethods;
@@ -27571,12 +28875,10 @@ int GeMethodToolbar::connect(
   unsigned int insensitive_mntmask = 0;
 
   opmask &= ~pwr_mXttOpMethodsMask_OpenObjectGraph;
-  if (!dyn->graph->is_authorized(
-          pwr_mAccess_RtEventsBlock | pwr_mAccess_System))
+  if (!dyn->graph->is_authorized(pwr_mAccess_RtEventsBlock | pwr_mAccess_System))
     insensitive_opmask |= pwr_mXttOpMethodsMask_BlockEvents;
-  if (!dyn->graph->is_authorized(pwr_mAccess_AllOperators | pwr_mAccess_System
-          | pwr_mAccess_RtWrite | pwr_mAccess_Maintenance | pwr_mAccess_Process
-          | pwr_mAccess_Instrument))
+  if (!dyn->graph->is_authorized(pwr_mAccess_AllOperators | pwr_mAccess_System | pwr_mAccess_RtWrite |
+                                 pwr_mAccess_Maintenance | pwr_mAccess_Process | pwr_mAccess_Instrument))
     insensitive_opmask |= pwr_mXttOpMethodsMask_Note;
   if (!dyn->graph->is_authorized(pwr_mAccess_RtNavigator | pwr_mAccess_System))
     insensitive_mntmask |= pwr_mXttMntMethodsMask_RtNavigator;
@@ -27586,12 +28888,12 @@ int GeMethodToolbar::connect(
   if (toolbar_type == ge_eMethodToolbarType_Simulate)
     opmask = 0;
 
-  grow_ToolbarConfigure(object, (char*)GeMethods::op_subgraph,
-      (char*)GeMethods::mnt_subgraph, GeMethods::opmeth_size,
-      GeMethods::mntmeth_size, opmask, mntmask, insensitive_opmask,
-      insensitive_mntmask);
+  grow_ToolbarConfigure(object, (char*)GeMethods::op_subgraph, (char*)GeMethods::mnt_subgraph,
+                        GeMethods::opmeth_size, GeMethods::mntmeth_size, opmask, mntmask, insensitive_opmask,
+                        insensitive_mntmask);
 
-  if (mask_store) {
+  if (mask_store)
+  {
     strcat(parsed_name, ".XttMethodsMask");
     sts = gdh_SetObjectInfo(parsed_name, &xm_mask, sizeof(xm_mask));
     if (EVEN(sts))
@@ -27606,45 +28908,54 @@ int GeMethodToolbar::action(grow_tObject object, glow_tEvent event)
   if (!dyn->graph->is_authorized(dyn->access))
     return 1;
 
-  switch (event->event) {
+  switch (event->event)
+  {
   case glow_eEvent_MB1Down:
     break;
   case glow_eEvent_MB1Up:
     break;
-  case glow_eEvent_TipText: {
+  case glow_eEvent_TipText:
+  {
     pwr_tString80 text;
     int sts;
 
-    if (event->toolbar.category == 1) {
+    if (event->toolbar.category == 1)
+    {
       sts = 0;
       if (grow_GetTranslate(dyn->graph->grow->ctx))
         sts = Lng::translate(GeMethods::op_tooltip[event->toolbar.idx], text);
       if (EVEN(sts))
         strcpy(text, GeMethods::op_tooltip[event->toolbar.idx]);
-    } else {
+    }
+    else
+    {
       sts = 0;
       if (grow_GetTranslate(dyn->graph->grow->ctx))
         sts = Lng::translate(GeMethods::mnt_tooltip[event->toolbar.idx], text);
       if (EVEN(sts))
         strcpy(text, GeMethods::mnt_tooltip[event->toolbar.idx]);
     }
-    grow_SetTipText(dyn->graph->grow->ctx, event->toolbar.object, text,
-        event->any.x_pixel, event->any.y_pixel);
+    grow_SetTipText(dyn->graph->grow->ctx, event->toolbar.object, text, event->any.x_pixel,
+                    event->any.y_pixel);
 
     break;
   }
   case glow_eEvent_Key_Return:
-  case glow_eEvent_MB1Click: {
+  case glow_eEvent_MB1Click:
+  {
     int sts;
     pwr_tCmd cmd;
     char command[512];
 
-    if (event->toolbar.category == 1) {
-      sprintf(command, "call method/function=\"%s\"/object=%s",
-          GeMethods::op_method[event->toolbar.idx], method_object);
-    } else {
-      sprintf(command, "call method/function=\"%s\"/object=%s",
-          GeMethods::mnt_method[event->toolbar.idx], method_object);
+    if (event->toolbar.category == 1)
+    {
+      sprintf(command, "call method/function=\"%s\"/object=%s", GeMethods::op_method[event->toolbar.idx],
+              method_object);
+    }
+    else
+    {
+      sprintf(command, "call method/function=\"%s\"/object=%s", GeMethods::mnt_method[event->toolbar.idx],
+              method_object);
     }
 
     dyn->graph->get_command(command, cmd, dyn);
@@ -27657,33 +28968,37 @@ int GeMethodToolbar::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
-int GeMethodToolbar::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GeMethodToolbar::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
   if (!streq(method_object, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "MethodToolbar.Object\",\"" << method_object << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "MethodToolbar.Object\",\"" << method_object
+       << "\");" << '\n';
   if (toolbar_type != ge_eMethodToolbarType_Object)
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "MethodToolbar.ToolbarType\"," << toolbar_type << ");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "MethodToolbar.ToolbarType\","
+       << toolbar_type << ");" << '\n';
   return 1;
 }
 
-int GeMethodToolbar::export_java(
-    grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeMethodToolbar::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
   return 1;
 }
 
-int GeMethodToolbar::syntax_check(
-    grow_tObject object, int* error_cnt, int* warning_cnt)
+int GeMethodToolbar::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
   int sts;
   pwr_eType a_type;
 
-  if (streq(method_object, "")) {
+  if (streq(method_object, ""))
+  {
     dyn->graph->syntax_msg('E', object, "MethodToolbar.Object is missing");
     (*warning_cnt)++;
-  } else {
+  }
+  else
+  {
     sts = dyn->graph->check_ldh_object(method_object, &a_type);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       char msg[440];
       sprintf(msg, "MethodToolbar.Object \"%s\" not found", method_object);
       dyn->graph->syntax_msg('W', object, msg);
@@ -27694,17 +29009,15 @@ int GeMethodToolbar::syntax_check(
 }
 
 GeMethodPulldownMenu::GeMethodPulldownMenu(GeDyn* e_dyn)
-    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_No,
-          ge_mActionType1_MethodPulldownMenu, ge_mActionType2_No,
-          ge_eDynPrio_MethodPulldownMenu),
+    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_No, ge_mActionType1_MethodPulldownMenu,
+                ge_mActionType2_No, ge_eDynPrio_MethodPulldownMenu),
       menu_type(ge_eMethodsMenuType_Object), menu_object(0)
 {
   strcpy(method_object, "");
 }
 
 GeMethodPulldownMenu::GeMethodPulldownMenu(const GeMethodPulldownMenu& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-          x.prio),
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio),
       menu_type(x.menu_type), menu_object(0)
 {
   strcpy(method_object, x.method_object);
@@ -27732,10 +29045,8 @@ void GeMethodPulldownMenu::get_attributes(attr_sItem* attrinfo, int* item_count)
 void GeMethodPulldownMenu::save(std::ofstream& fp)
 {
   fp << int(ge_eSave_MethodPulldownMenu) << '\n';
-  fp << int(ge_eSave_MethodPulldownMenu_method_object) << FSPACE
-     << method_object << '\n';
-  fp << int(ge_eSave_MethodPulldownMenu_menu_type) << FSPACE << menu_type
-     << '\n';
+  fp << int(ge_eSave_MethodPulldownMenu_method_object) << FSPACE << method_object << '\n';
+  fp << int(ge_eSave_MethodPulldownMenu_menu_type) << FSPACE << menu_type << '\n';
   fp << int(ge_eSave_End) << '\n';
 }
 
@@ -27746,8 +29057,10 @@ void GeMethodPulldownMenu::open(std::ifstream& fp)
   char dummy[40];
   int tmp;
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeMethodPulldownMenu: \"%d %s\"\n", type, dummy);
@@ -27755,7 +29068,8 @@ void GeMethodPulldownMenu::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_MethodPulldownMenu:
       break;
     case ge_eSave_MethodPulldownMenu_method_object:
@@ -27783,7 +29097,8 @@ int GeMethodPulldownMenu::action(grow_tObject object, glow_tEvent event)
   if (!dyn->graph->is_authorized(dyn->access))
     return 1;
 
-  switch (event->event) {
+  switch (event->event)
+  {
   case glow_eEvent_MB1Down:
     grow_SetClickSensitivity(dyn->graph->grow->ctx, glow_mSensitivity_MB1Click);
     break;
@@ -27792,7 +29107,8 @@ int GeMethodPulldownMenu::action(grow_tObject object, glow_tEvent event)
   case glow_eEvent_Key_Up:
     if (!menu_object)
       break;
-    if (grow_GetMenuInputFocus(menu_object)) {
+    if (grow_GetMenuInputFocus(menu_object))
+    {
       grow_MenuShiftCurrentItem(menu_object, -1);
       return GE__NO_PROPAGATE;
     }
@@ -27800,7 +29116,8 @@ int GeMethodPulldownMenu::action(grow_tObject object, glow_tEvent event)
   case glow_eEvent_Key_Down:
     if (!menu_object)
       break;
-    if (grow_GetMenuInputFocus(menu_object)) {
+    if (grow_GetMenuInputFocus(menu_object))
+    {
       grow_MenuShiftCurrentItem(menu_object, 1);
       return GE__NO_PROPAGATE;
     }
@@ -27809,8 +29126,11 @@ int GeMethodPulldownMenu::action(grow_tObject object, glow_tEvent event)
     if (!menu_object)
       break;
 
-    if (grow_GetMenuInputFocus(menu_object)) {
-    } else {
+    if (grow_GetMenuInputFocus(menu_object))
+    {
+    }
+    else
+    {
     }
     break;
   case glow_eEvent_Key_Left:
@@ -27819,7 +29139,8 @@ int GeMethodPulldownMenu::action(grow_tObject object, glow_tEvent event)
     if (!menu_object)
       break;
 
-    if (grow_GetMenuInputFocus(menu_object)) {
+    if (grow_GetMenuInputFocus(menu_object))
+    {
       // Send menu activated event
       int sts;
       glow_sEvent e;
@@ -27842,10 +29163,11 @@ int GeMethodPulldownMenu::action(grow_tObject object, glow_tEvent event)
       e.menu.object = 0;
 
       grow_GetObjectList(graph->grow->ctx, &objectlist, &object_cnt);
-      for (i = 0; i < object_cnt; i++) {
-        if (grow_GetObjectType(objectlist[i]) == glow_eObjectType_GrowNode
-            || grow_GetObjectType(objectlist[i])
-                == glow_eObjectType_GrowGroup) {
+      for (i = 0; i < object_cnt; i++)
+      {
+        if (grow_GetObjectType(objectlist[i]) == glow_eObjectType_GrowNode ||
+            grow_GetObjectType(objectlist[i]) == glow_eObjectType_GrowGroup)
+        {
           grow_GetUserData(objectlist[i], (void**)&dyn);
           dyn->action(objectlist[i], &e);
           grow_GetObjectList(graph->grow->ctx, &objectlist, &cnt);
@@ -27863,17 +29185,21 @@ int GeMethodPulldownMenu::action(grow_tObject object, glow_tEvent event)
       break;
     time_GetTime(&focus_gained_time);
   case glow_eEvent_MB1Click:
-    if (event->event == glow_eEvent_MB1Click) {
+    if (event->event == glow_eEvent_MB1Click)
+    {
       pwr_tTime now;
       time_GetTime(&now);
       if (ABS((int)(now.tv_sec - focus_gained_time.tv_sec)) < 2)
         break;
     }
-    if (menu_object) {
+    if (menu_object)
+    {
       // Close, delete this menu
       grow_DeleteObject(dyn->graph->grow->ctx, menu_object);
       menu_object = 0;
-    } else if (object) {
+    }
+    else if (object)
+    {
       double ll_x, ll_y, ur_x, ur_y;
       glow_sMenuInfo info;
 
@@ -27885,11 +29211,9 @@ int GeMethodPulldownMenu::action(grow_tObject object, glow_tEvent event)
       pwr_sClass_XttMethodsMask xm_mask;
       int mask_store = 0;
 
-      db = dyn->parse_attr_name(
-          method_object, parsed_name, &inverted, &attr_type, &attr_size);
+      db = dyn->parse_attr_name(method_object, parsed_name, &inverted, &attr_type, &attr_size);
 
-      sts = GeMethods::get_xm_mask(
-          0, parsed_name, &xm_mask, &mask_store, methods_command_cb, dyn);
+      sts = GeMethods::get_xm_mask(0, parsed_name, &xm_mask, &mask_store, methods_command_cb, dyn);
 
       strcpy(xm_name, parsed_name);
       strcat(xm_name, ".XttMethodsMask");
@@ -27900,16 +29224,12 @@ int GeMethodPulldownMenu::action(grow_tObject object, glow_tEvent event)
       unsigned int insensitive_mntmask = 0;
 
       opmask &= ~pwr_mXttOpMethodsMask_OpenObjectGraph;
-      if (!dyn->graph->is_authorized(
-              pwr_mAccess_RtEventsBlock | pwr_mAccess_System))
+      if (!dyn->graph->is_authorized(pwr_mAccess_RtEventsBlock | pwr_mAccess_System))
         insensitive_opmask |= pwr_mXttOpMethodsMask_BlockEvents;
-      if (!dyn->graph->is_authorized(pwr_mAccess_AllOperators
-              | pwr_mAccess_System | pwr_mAccess_RtWrite
-              | pwr_mAccess_Maintenance | pwr_mAccess_Process
-              | pwr_mAccess_Instrument))
+      if (!dyn->graph->is_authorized(pwr_mAccess_AllOperators | pwr_mAccess_System | pwr_mAccess_RtWrite |
+                                     pwr_mAccess_Maintenance | pwr_mAccess_Process | pwr_mAccess_Instrument))
         insensitive_opmask |= pwr_mXttOpMethodsMask_Note;
-      if (!dyn->graph->is_authorized(
-              pwr_mAccess_RtNavigator | pwr_mAccess_System))
+      if (!dyn->graph->is_authorized(pwr_mAccess_RtNavigator | pwr_mAccess_System))
         insensitive_mntmask |= pwr_mXttMntMethodsMask_RtNavigator;
       if (!dyn->graph->is_authorized(pwr_mAccess_RtPlc | pwr_mAccess_System))
         insensitive_mntmask |= pwr_mXttMntMethodsMask_OpenTrace;
@@ -27918,25 +29238,25 @@ int GeMethodPulldownMenu::action(grow_tObject object, glow_tEvent event)
       for (int i = 0; i < (int)(sizeof(info.item) / sizeof(info.item[0])); i++)
         info.item[i].occupied = false;
 
-      for (int i = 0; i < GeMethods::opmeth_size; i++) {
+      for (int i = 0; i < GeMethods::opmeth_size; i++)
+      {
         if (menu_idx >= (int)(sizeof(info.item) / sizeof(info.item[0])))
           break;
 
         if (streq(GeMethods::op_name[i], ""))
           continue;
 
-        if (menu_type == ge_eMethodsMenuType_Help
-            && !(GeMethods::op_helpmask & (1 << i)))
+        if (menu_type == ge_eMethodsMenuType_Help && !(GeMethods::op_helpmask & (1 << i)))
           continue;
         if (menu_type == ge_eMethodsMenuType_Simulate)
           continue;
 
-        if (opmask & (1 << i)) {
+        if (opmask & (1 << i))
+        {
           info.item[menu_idx].type = glow_eMenuItem_Button;
           sts = 0;
           if (grow_GetTranslate(dyn->graph->grow->ctx))
-            sts = Lng::translate(
-                GeMethods::op_name[i], info.item[menu_idx].text);
+            sts = Lng::translate(GeMethods::op_name[i], info.item[menu_idx].text);
           if (EVEN(sts))
             strcpy(info.item[menu_idx].text, GeMethods::op_name[i]);
           info.item[menu_idx].occupied = true;
@@ -27945,23 +29265,23 @@ int GeMethodPulldownMenu::action(grow_tObject object, glow_tEvent event)
           menu_idx++;
         }
       }
-      for (int i = 0; i < GeMethods::mntmeth_size; i++) {
+      for (int i = 0; i < GeMethods::mntmeth_size; i++)
+      {
         if (menu_idx >= (int)(sizeof(info.item) / sizeof(info.item[0])))
           break;
 
         if (streq(GeMethods::mnt_name[i], ""))
           continue;
 
-        if (menu_type == ge_eMethodsMenuType_Help
-            && !(GeMethods::mnt_helpmask & (1 << i)))
+        if (menu_type == ge_eMethodsMenuType_Help && !(GeMethods::mnt_helpmask & (1 << i)))
           continue;
 
-        if (mntmask & (1 << i)) {
+        if (mntmask & (1 << i))
+        {
           info.item[menu_idx].type = glow_eMenuItem_Button;
           sts = 0;
           if (grow_GetTranslate(dyn->graph->grow->ctx))
-            sts = Lng::translate(
-                GeMethods::mnt_name[i], info.item[menu_idx].text);
+            sts = Lng::translate(GeMethods::mnt_name[i], info.item[menu_idx].text);
           if (EVEN(sts))
             strcpy(info.item[menu_idx].text, GeMethods::mnt_name[i]);
           info.item[menu_idx].occupied = true;
@@ -27978,35 +29298,36 @@ int GeMethodPulldownMenu::action(grow_tObject object, glow_tEvent event)
       glow_eFont text_font;
       glow_eAnnotType annot_type;
 
-      sts = grow_GetObjectAnnotInfo(object, 1, &text_size, &text_drawtype,
-          &text_color, &bg_color, &scale, &text_font, &annot_type);
-      if (EVEN(sts)) {
+      sts = grow_GetObjectAnnotInfo(object, 1, &text_size, &text_drawtype, &text_color, &bg_color, &scale,
+                                    &text_font, &annot_type);
+      if (EVEN(sts))
+      {
         text_size = 2;
         text_drawtype = glow_eDrawType_TextHelveticaBold;
         text_font = glow_eFont_Helvetica;
         text_color = glow_eDrawType_Line;
         bg_color = glow_eDrawType_LightGray;
-      } else if (bg_color == glow_eDrawType_No
-          || bg_color == glow_eDrawType_Inherit)
+      }
+      else if (bg_color == glow_eDrawType_No || bg_color == glow_eDrawType_Inherit)
         bg_color = glow_eDrawType_LightGray;
 
       grow_MeasureNode(object, &ll_x, &ll_y, &ur_x, &ur_y);
-      grow_CreateGrowMenu(dyn->graph->grow->ctx, "__Menu", &info, ll_x, ur_y,
-          ur_x - ll_x, glow_eDrawType_Line, 0, 1, 1, bg_color, text_size,
-          text_drawtype, text_color, glow_eDrawType_MediumGray, text_font, 0,
-          &menu_object);
-      grow_SetObjectScale(
-          menu_object, scale, scale, 0, 0, glow_eScaleType_LowerLeft);
+      grow_CreateGrowMenu(dyn->graph->grow->ctx, "__Menu", &info, ll_x, ur_y, ur_x - ll_x,
+                          glow_eDrawType_Line, 0, 1, 1, bg_color, text_size, text_drawtype, text_color,
+                          glow_eDrawType_MediumGray, text_font, 0, &menu_object);
+      grow_SetObjectScale(menu_object, scale, scale, 0, 0, glow_eScaleType_LowerLeft);
       grow_SetMenuInputFocus(menu_object, 1);
 
-      if (mask_store) {
+      if (mask_store)
+      {
         sts = gdh_SetObjectInfo(xm_name, &xm_mask, sizeof(xm_mask));
         if (EVEN(sts))
           printf("Set mask error %s\n", parsed_name);
       }
     }
     break;
-  case glow_eEvent_MenuActivated: {
+  case glow_eEvent_MenuActivated:
+  {
     if (!menu_object)
       break;
 
@@ -28016,18 +29337,18 @@ int GeMethodPulldownMenu::action(grow_tObject object, glow_tEvent event)
     int idx = 0;
     int found = 0;
 
-    for (int i = 0; i < GeMethods::opmeth_size; i++) {
-      if (menu_type == ge_eMethodsMenuType_Help
-          && !(GeMethods::op_helpmask & (1 << i)))
+    for (int i = 0; i < GeMethods::opmeth_size; i++)
+    {
+      if (menu_type == ge_eMethodsMenuType_Help && !(GeMethods::op_helpmask & (1 << i)))
         continue;
       if (menu_type == ge_eMethodsMenuType_Simulate)
         continue;
 
       if (opmask & (1 << i))
         idx++;
-      if (event->menu.item + 1 == idx) {
-        sprintf(command, "call method/function=\"%s\"/object=%s",
-            GeMethods::op_method[i], method_object);
+      if (event->menu.item + 1 == idx)
+      {
+        sprintf(command, "call method/function=\"%s\"/object=%s", GeMethods::op_method[i], method_object);
         dyn->graph->get_command(command, cmd, dyn);
         sts = (dyn->graph->command_cb)(dyn->graph->parent_ctx, cmd, 0, 0);
         found = 1;
@@ -28035,17 +29356,18 @@ int GeMethodPulldownMenu::action(grow_tObject object, glow_tEvent event)
       }
     }
 
-    if (!found) {
-      for (int i = 0; i < GeMethods::mntmeth_size; i++) {
-        if (menu_type == ge_eMethodsMenuType_Help
-            && !(GeMethods::mnt_helpmask & (1 << i)))
+    if (!found)
+    {
+      for (int i = 0; i < GeMethods::mntmeth_size; i++)
+      {
+        if (menu_type == ge_eMethodsMenuType_Help && !(GeMethods::mnt_helpmask & (1 << i)))
           continue;
 
         if (mntmask & (1 << i))
           idx++;
-        if (event->menu.item + 1 == idx) {
-          sprintf(command, "call method/function=\"%s\"/object=%s",
-              GeMethods::mnt_method[i], method_object);
+        if (event->menu.item + 1 == idx)
+        {
+          sprintf(command, "call method/function=\"%s\"/object=%s", GeMethods::mnt_method[i], method_object);
           dyn->graph->get_command(command, cmd, dyn);
           sts = (dyn->graph->command_cb)(dyn->graph->parent_ctx, cmd, 0, 0);
           found = 1;
@@ -28058,7 +29380,11 @@ int GeMethodPulldownMenu::action(grow_tObject object, glow_tEvent event)
   }
   case glow_eEvent_MenuCreate:
     break;
-  case glow_eEvent_InputFocusLost: {
+  case glow_eEvent_InputFocusLost:
+  {
+    if (!menu_object)
+      break;
+
     // Delete this and all child menues
     glow_sEvent e;
     e.event = glow_eEvent_MenuDelete;
@@ -28071,12 +29397,16 @@ int GeMethodPulldownMenu::action(grow_tObject object, glow_tEvent event)
   case glow_eEvent_MenuDelete:
     if (menu_object == 0)
       break;
-    if (event->menu.object == 0) {
+    if (event->menu.object == 0)
+    {
       // Delete this menu
       grow_DeleteObject(dyn->graph->grow->ctx, menu_object);
       menu_object = 0;
-    } else {
-      if (event->menu.object == menu_object) {
+    }
+    else
+    {
+      if (event->menu.object == menu_object)
+      {
         // Delete this and all child menues
         event->menu.object = menu_object;
 
@@ -28090,33 +29420,37 @@ int GeMethodPulldownMenu::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
-int GeMethodPulldownMenu::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GeMethodPulldownMenu::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
   if (!streq(method_object, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "MethodPulldownMenu.Object\",\"" << method_object << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "MethodPulldownMenu.Object\",\""
+       << method_object << "\");" << '\n';
   if (menu_type != ge_eMethodsMenuType_Object)
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "MethodPulldownMenu.MenuType\"," << menu_type << ");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "MethodPulldownMenu.MenuType\"," << menu_type
+       << ");" << '\n';
   return 1;
 }
 
-int GeMethodPulldownMenu::export_java(
-    grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeMethodPulldownMenu::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
   return 1;
 }
 
-int GeMethodPulldownMenu::syntax_check(
-    grow_tObject object, int* error_cnt, int* warning_cnt)
+int GeMethodPulldownMenu::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
   int sts;
   pwr_eType a_type;
 
-  if (streq(method_object, "")) {
+  if (streq(method_object, ""))
+  {
     dyn->graph->syntax_msg('E', object, "MethodPulldownMenu.Object is missing");
     (*warning_cnt)++;
-  } else {
+  }
+  else
+  {
     sts = dyn->graph->check_ldh_object(method_object, &a_type);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       char msg[440];
       sprintf(msg, "MethodPulldownMenu.Object \"%s\" not found", method_object);
       dyn->graph->syntax_msg('W', object, msg);
@@ -28127,16 +29461,14 @@ int GeMethodPulldownMenu::syntax_check(
 }
 
 GeCatchSignal::GeCatchSignal(GeDyn* e_dyn)
-    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_No,
-          ge_mActionType1_CatchSignal, ge_mActionType2_No,
-          ge_eDynPrio_CatchSignal)
+    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_No, ge_mActionType1_CatchSignal, ge_mActionType2_No,
+                ge_eDynPrio_CatchSignal)
 {
   strcpy(signal_name, "");
 }
 
 GeCatchSignal::GeCatchSignal(const GeCatchSignal& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-          x.prio)
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio)
 {
   strcpy(signal_name, x.signal_name);
 }
@@ -28167,8 +29499,10 @@ void GeCatchSignal::open(std::ifstream& fp)
   int end_found = 0;
   char dummy[40];
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeCatchSignal: \"%d %s\"\n", type, dummy);
@@ -28176,7 +29510,8 @@ void GeCatchSignal::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_CatchSignal:
       break;
     case ge_eSave_CatchSignal_signal_name:
@@ -28202,8 +29537,10 @@ int GeCatchSignal::action(grow_tObject object, glow_tEvent event)
   if (!dyn->graph->is_authorized(dyn->access))
     return 1;
 
-  switch (event->event) {
-  case glow_eEvent_Signal: {
+  switch (event->event)
+  {
+  case glow_eEvent_Signal:
+  {
     if (!streq(event->signal.signal_name, signal_name))
       break;
 
@@ -28212,8 +29549,8 @@ int GeCatchSignal::action(grow_tObject object, glow_tEvent event)
     e.event = glow_eEvent_MB1Click;
     e.object.object = object;
     sts = dyn->action(object, &e);
-    if (sts == GE__NO_PROPAGATE || sts == GLOW__TERMINATED
-        || sts == GLOW__SUBTERMINATED || sts == GLOW__SWAPTERMINATED)
+    if (sts == GE__NO_PROPAGATE || sts == GLOW__TERMINATED || sts == GLOW__SUBTERMINATED ||
+        sts == GLOW__SWAPTERMINATED)
       return sts;
     break;
   }
@@ -28222,23 +29559,23 @@ int GeCatchSignal::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
-int GeCatchSignal::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GeCatchSignal::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
   if (!streq(signal_name, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "CatchSignal.SignalName\",\"" << signal_name << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "CatchSignal.SignalName\",\"" << signal_name
+       << "\");" << '\n';
   return 1;
 }
 
-int GeCatchSignal::export_java(
-    grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeCatchSignal::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
   return 1;
 }
 
-int GeCatchSignal::syntax_check(
-    grow_tObject object, int* error_cnt, int* warning_cnt)
+int GeCatchSignal::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
-  if (streq(signal_name, "")) {
+  if (streq(signal_name, ""))
+  {
     dyn->graph->syntax_msg('E', object, "CatchSignal.SignalName is missing");
     (*warning_cnt)++;
   }
@@ -28246,18 +29583,15 @@ int GeCatchSignal::syntax_check(
 }
 
 GeEmitSignal::GeEmitSignal(GeDyn* e_dyn)
-    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_No,
-          ge_mActionType1_EmitSignal, ge_mActionType2_No,
-          ge_eDynPrio_EmitSignal),
+    : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_No, ge_mActionType1_EmitSignal, ge_mActionType2_No,
+                ge_eDynPrio_EmitSignal),
       global(0)
 {
   strcpy(signal_name, "");
 }
 
 GeEmitSignal::GeEmitSignal(const GeEmitSignal& x)
-    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2,
-          x.prio),
-      global(x.global)
+    : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio), global(x.global)
 {
   strcpy(signal_name, x.signal_name);
 }
@@ -28293,8 +29627,10 @@ void GeEmitSignal::open(std::ifstream& fp)
   int end_found = 0;
   char dummy[40];
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GeEmitSignal: \"%d %s\"\n", type, dummy);
@@ -28302,7 +29638,8 @@ void GeEmitSignal::open(std::ifstream& fp)
 
     fp >> type;
 
-    switch (type) {
+    switch (type)
+    {
     case ge_eSave_EmitSignal:
       break;
     case ge_eSave_EmitSignal_signal_name:
@@ -28329,7 +29666,8 @@ int GeEmitSignal::action(grow_tObject object, glow_tEvent event)
   if (!dyn->graph->is_authorized(dyn->access))
     return 1;
 
-  switch (event->event) {
+  switch (event->event)
+  {
   case glow_eEvent_MB1Down:
     grow_SetClickSensitivity(dyn->graph->grow->ctx, glow_mSensitivity_MB1Click);
     grow_SetObjectColorInverse(object, 1);
@@ -28338,15 +29676,19 @@ int GeEmitSignal::action(grow_tObject object, glow_tEvent event)
     grow_SetObjectColorInverse(object, 0);
     break;
   case glow_eEvent_Key_Return:
-  case glow_eEvent_MB1Click: {
-    if (global) {
+  case glow_eEvent_MB1Click:
+  {
+    if (global)
+    {
       pwr_tCmd command, cmd;
       int sts;
 
       sprintf(command, "emit signal/signalname=%s", signal_name);
       dyn->graph->get_command(command, cmd, dyn);
       sts = (dyn->graph->command_cb)(dyn->graph->parent_ctx, cmd, 0, 0);
-    } else {
+    }
+    else
+    {
       dyn->graph->signal_send(signal_name);
     }
     break;
@@ -28356,25 +29698,26 @@ int GeEmitSignal::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
-int GeEmitSignal::export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
+int GeEmitSignal::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
 {
   if (!streq(signal_name, ""))
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "EmitSignal.SignalName\",\"" << signal_name << "\");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "EmitSignal.SignalName\",\"" << signal_name
+       << "\");" << '\n';
   if (global != 0)
-    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "EmitSignal.Global\"," << global << ");" << '\n';
+    fp << indentation << "SetObjectAttribute(id,\"" << prefix << "EmitSignal.Global\"," << global << ");"
+       << '\n';
   return 1;
 }
 
-int GeEmitSignal::export_java(
-    grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeEmitSignal::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
 {
   return 1;
 }
 
-int GeEmitSignal::syntax_check(
-    grow_tObject object, int* error_cnt, int* warning_cnt)
+int GeEmitSignal::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
-  if (streq(signal_name, "")) {
+  if (streq(signal_name, ""))
+  {
     dyn->graph->syntax_msg('E', object, "EmitSignal.SignalName is missing");
     (*warning_cnt)++;
   }
