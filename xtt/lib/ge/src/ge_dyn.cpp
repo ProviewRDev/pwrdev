@@ -28154,6 +28154,8 @@ int GeOptionMenu::action(grow_tObject object, glow_tEvent event)
     break;
   case glow_eEvent_InputFocusLost:
   {
+    if (!menu_object)
+      break;
     // Delete this menu
     grow_DeleteObject(dyn->graph->grow->ctx, menu_object);
     menu_object = 0;
