@@ -218,7 +218,7 @@ SObject pwrb:Class
         EndBody
       EndObject
       !/**
-      !  This is a shorthand for when Active is high and the alarm is not Acked.
+      !  This is a shorthand for when Action is high and the alarm is not Acked.
       !  
       !  Timing diagram:
       !  @image orm_dsup_fo_ana.png
