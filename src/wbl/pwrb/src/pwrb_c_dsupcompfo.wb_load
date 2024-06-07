@@ -141,7 +141,10 @@ SObject pwrb:Class
         EndBody
       EndObject
       !/**
-      !  Bla bla bla
+      !  This is a shorthand when Active is high and the alarm is not Acked.
+      !  
+      !  Timing diagram:
+      !  @image orm_dsup_fo_ana.png
       !*/
       Object ActiveNotAcked $Output 8 
         Body SysBody

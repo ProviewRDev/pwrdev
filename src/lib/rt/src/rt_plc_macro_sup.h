@@ -198,7 +198,8 @@
   {                                                                                                          \
     o->TimerCount = 0;                                                                                       \
     o->DetectCheck = TRUE;                                                                                   \
-  }
+  }                                                                                                          \
+  o->ActiveNotAcked = (o->Action && !o->Acked);
 
 /*_*
   Name:

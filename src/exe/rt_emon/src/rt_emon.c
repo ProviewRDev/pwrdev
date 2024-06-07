@@ -233,6 +233,7 @@ struct s_Sup
   pwr_tBoolean Action pwr_dAlignW;
   pwr_tBoolean Acked pwr_dAlignW;
   pwr_tBoolean Blocked pwr_dAlignW;
+  pwr_tBoolean ActiveNotAcked pwr_dAlignW;
   pwr_tString80 Description pwr_dAlignW;
   pwr_tBoolean DetectOn pwr_dAlignW;
   pwr_tString80 DetectText pwr_dAlignW;
