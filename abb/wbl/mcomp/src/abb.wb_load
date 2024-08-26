@@ -20287,10 +20287,10 @@ SW bit:
     !  @Summary Plc simulation object to ABB_ACC800.
     !  Plc simulation object to ABB_ACC800.
     ! 
-    !  @image orm_abb_acc800sim_fo.gif
+    !  @image orm_abb_acs800sim_fo.gif
     ! 
     !  @b Object Graph
-    !  @image orm_abb_acc800sim_og.gif
+    !  @image orm_abb_acs800sim_og.gif
     ! 
     !  Connect the function object to an object of class or subclass of
     !  ABB_ACC800.
@@ -37315,7 +37315,7 @@ ABB ACS800 Aggregate
     !  - colored red when the HighHigh or LowLow limit is activated.
     ! 
     ! @b Object Graph
-    ! @image orm_baseflowsensor_og.gif
+    ! @image orm_baseflowsensor_og.png
     ! 
     ! @h1 Configuration
     ! @b Plc coding
