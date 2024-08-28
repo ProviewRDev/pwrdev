@@ -562,7 +562,7 @@ page_4:
     attr = name + ".NodeName";
     SetAttribute( attr, node_name[i]);
     attr = name + ".OperatingSystem";
-
+ 
     if ( os == "Linux")
       if ( hw == "x86_64")
         SetAttribute( attr, 128);
@@ -570,7 +570,11 @@ page_4:
         if ( hw == "ARM")
           SetAttribute( attr, 512);
         else
-          SetAttribute( attr, 64);
+          if ( hw == "ARM64")
+            SetAttribute( attr, 8192);
+          else
+            SetAttribute( attr, 64);
+          endif
         endif
       endif
     endif
@@ -589,6 +593,7 @@ page_4:
     if ( os == "Cygwin")
       SetAttribute( attr, 4096);
     endif
+
   
     attr = name + ".Address";
     SetAttribute( attr, node_ip[i]);

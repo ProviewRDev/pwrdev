@@ -168,8 +168,12 @@ page_4:
       if ( hw == "ARM")
         set attr/name='str1'/attr=OperatingSystem/value=512/nolog/noconf
       else 
-        set attr/name='str1'/attr=OperatingSystem/value=64/nolog/noconf
-       endif
+        if ( hw == "ARM64")
+          set attr/name='str1'/attr=OperatingSystem/value=8192/nolog/noconf
+        else
+          set attr/name='str1'/attr=OperatingSystem/value=64/nolog/noconf
+        endif
+      endif
     endif
   endif
   if ( os == "ARM")
