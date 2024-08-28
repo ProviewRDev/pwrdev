@@ -1,7 +1,7 @@
 
 Wireshark dissectors for Proview
 
-Built for Wireshark 1.6.4.
+Built for Wireshark 4.2.4.
 
 This directory contains the subdirectories qcom and redcom that contains files to build 
 the wireshark dissectors for QCom and RedCom.
@@ -9,74 +9,45 @@ the wireshark dissectors for QCom and RedCom.
 Build QCom and Redcom dissectors
 --------------------------------
 
-1. Download the wireshark source code.
+1. Download the wireshark source code and go to the root directory.
 
 2. Read README.plugins and README.developer on the wireshark directory.
 
-3. Create the directory plugin/qcom and copy the files on 
+3. Create the directory plugin/epan/qcom and copy the files on 
    $pwre_croot/src/tools/wireshark/qcom to this directory.
+   respectively.
 
-4. Create the directory plugin/redcom and copy the files on 
+4. Create the directory plugin/epan/redcom and copy the files on 
    $pwre_croot/src/tools/wireshark/redcom to this directory.
 
-5. Edit these files and add qcom and redcom analog to the gryphon dissector
-
-	configure.in
-	CMakeLists.txt
-	epan/Makefile.am
-	Makefile.am
-	packaging/nsis/Makefile.nmake
-	packaging/nsis/wireshark.nsi
-	plugins/Makefile.am
-	plugins/Makefile.nmake
+5. Edit ./CMakeLists.txt files and add qcom and redcom analog to the gryphon dissector
 
 6. Build wireshark
 
-   Install autoconf, libtool, bison, libpcap-dev
+   Install dependencies
+   > sudo ./tools/debian-setup.sh --install-all
 
-   > ./autogen.sh
-   > ./configure
-   > make all
+   Build
+   > mkdir build
+   > cd build
+   > cmake ..
+   > make
 
-7. Setup a working root to build and intstall wireshark there.
+   Install
+   > sudo make install
 
-   > mkdir -p /data0/wireshark/bld
-   > ./configure --prefix=/data0/wireshark/bld;make install
-
-8. To install changes in the qcom plugin, go to the plugin/qcom directory
-   and execute 'make install'
-
-   > make all
-   > make install
-
-9. To run wireshark, define PWR_BUS_ID, go to the bin directory in the build
-   tree, and define WIRESHARK_RUN_FROM_BUILD_DIRECTORY
-
-   > cd /data0/wireshark/bld/bin
+9. To run wireshark, define PWR_BUS_ID and run wireshark as root
    > export PWR_BUS_ID=999
-   > export WIRESHARK_RUN_FROM_BUILD_DIRECTORY=1
-   > ./wireshark
-
-   or to run with debug
-
-   > libtool --mode=execute gdb wireshark
+   > wireshark
 
    Specify filter 'qcom' and start capturing.
 
 10. Build debian package.
 
-   Install dependencies, for example
+   From wireshark root directory
 
-   > apt-get install docbook-xsl libpcre3-dev libcap-dev libgnutls-dev portaudio19-dev libkrb5-dev liblua5.1-0-dev libsmi2-dev libgeoip-dev dpatch automake1.9 libc-ares-dev xsltproc
-
-  On ubuntu change libwireshark.so.1.1.0 -> libwireshark.so.1.1.1 in
-  debian/wireshark-common.files
-
-  > make debian-package
-
-  Install the wireshark-common and wireshark packages on the target node
-
-  > dpkg -i wireshark-common_1.6.4_i386.deb
-  > dpgk -i wireshark_1.6.4_i386.deb
+   > ln -snf packaging/debian
+   > export DEB_BUILD_OPTIONS="nocheck"
+   > dpkg-buildpackage -b -us -uc -jauto
 
   

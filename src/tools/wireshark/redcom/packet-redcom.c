@@ -1,7 +1,7 @@
 /* packet-redcom.c
  * Routines for Interlink protocol packet disassembly
- * By Claes Sjöfors <claes.sjofors@proview.se>
- * Copyright 2010 Claes Sjöfors
+ * By Claes Sjofors <claes.sjofors@proview.se>
+ * Copyright 2010 Claes Sjofors
  *
  * $Id$
  *
@@ -31,8 +31,8 @@
 #include <stdio.h>
 #include <glib.h>
 #include <epan/packet.h>
-
-#include "co_string.h"
+#include <epan/prefs.h>
+#include <string.h>
 
 #include "packet-redcom.h"
 #include "redcom_def.h"
@@ -47,9 +47,6 @@ static int proto_redcom = -1;
 
 static dissector_handle_t data_handle = 0;
 static dissector_handle_t redcom_handle;
-
-static const value_string packettypenames[]
-    = { { 0, "TEXT" }, { 1, "SOMETHING_ELSE" }, { 0, 0 } };
 
 static gint hf_redcom = -1;
 static gint hf_redcom_header = -1;
@@ -288,14 +285,15 @@ void proto_register_redcom(void)
 
   };
 
+  proto_redcom = proto_register_protocol("Redcom ProviewR", "Redcom", "redcom");
+
   proto_register_field_array(proto_redcom, hf, array_length(hf));
   proto_register_subtree_array(ett, array_length(ett));
   register_dissector("redcom", dissect_redcom, proto_redcom);
 
-  proto_redcom = proto_register_protocol("Redcom Proview", "Redcom", "redcom");
 }
 
-void dissect_redcom(tvbuff_t* tvb, packet_info* pinfo, proto_tree* tree)
+int dissect_redcom(tvbuff_t* tvb, packet_info* pinfo, proto_tree* tree, void*)
 {
   proto_item* redcom_item = NULL;
   proto_item* redcom_sub_item = NULL;
@@ -415,17 +413,13 @@ void dissect_redcom(tvbuff_t* tvb, packet_info* pinfo, proto_tree* tree)
       strcat(info, " First segment");
   }
 
-  if (check_col(pinfo->cinfo, COL_PROTOCOL)) {
-    col_set_str(pinfo->cinfo, COL_PROTOCOL, protostrp);
-  }
+  col_set_str(pinfo->cinfo, COL_PROTOCOL, protostrp);
 
   /* Clear out stuff in the info column */
-  if (check_col(pinfo->cinfo, COL_INFO)) {
-    if (!streq(info, ""))
-      col_add_fstr(pinfo->cinfo, COL_INFO, "%s", info);
-    else
-      col_clear(pinfo->cinfo, COL_INFO);
-  }
+  if (strcmp(info, "") != 0)
+    col_add_fstr(pinfo->cinfo, COL_INFO, "%s", info);
+  else
+    col_clear(pinfo->cinfo, COL_INFO);
 
   // Here we check to see if the INFO column is present. If it is we output
   // which ports the packet came from and went to. Also, we indicate the type
@@ -598,6 +592,7 @@ void dissect_redcom(tvbuff_t* tvb, packet_info* pinfo, proto_tree* tree)
       }
     }
   }
+  return tvb_reported_length(tvb);
 }
 
 void proto_register_handoff_redcom(void)
