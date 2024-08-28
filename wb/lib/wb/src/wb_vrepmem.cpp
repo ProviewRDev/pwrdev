@@ -2373,6 +2373,7 @@ void wb_vrepmem::classeditorDeleteObject(mem_object* memo)
 
 void wb_vrepmem::classeditorCheckCommit()
 {
+  std::vector<mem_object*> classdef_vect;
   std::vector<std::string> rtbody_vect;
   std::vector<std::string> devbody_vect;
 
@@ -2385,8 +2386,28 @@ void wb_vrepmem::classeditorCheckCommit()
   if (!class_hier || class_hier->m_cid != pwr_eClass_ClassHier)
     return;
 
-  // Check that RtBody.StructName is unique
+  // Get all $ClassDef objecs
   for (mem_object* o1 = class_hier->fch; o1; o1 = o1->fws) {
+    switch (o1->m_cid) {
+    case pwr_eClass_ClassDef:
+      classdef_vect.push_back(o1);
+      break;
+    case pwr_eClass_ClassHier:
+      for (mem_object* o2 = o1->fch; o2; o2 = o2->fws) {
+	switch (o2->m_cid) {
+	case pwr_eClass_ClassDef:
+	  classdef_vect.push_back(o2);
+	  break;
+	}
+	break;
+      }
+      break;
+    }
+  }
+
+  // Check that RtBody.StructName is unique
+  for (unsigned int j = 0; j < classdef_vect.size(); j++) {
+    mem_object* o1 = classdef_vect[j];
     for (mem_object* o2 = o1->fch; o2; o2 = o2->fws) {
       switch (o2->m_cid) {
       case pwr_eClass_ObjBodyDef:
@@ -2439,7 +2460,8 @@ void wb_vrepmem::classeditorCheckCommit()
   }
 
   // Check that Attribute.PgmName is unique within one class
-  for (mem_object* o1 = class_hier->fch; o1; o1 = o1->fws) {
+  for (unsigned int j = 0; j < classdef_vect.size(); j++) {
+    mem_object* o1 = classdef_vect[j];
     std::vector<std::string> pgmname_vect;
     for (mem_object* o2 = o1->fch; o2; o2 = o2->fws) {
       switch (o2->m_cid) {
@@ -2483,6 +2505,52 @@ void wb_vrepmem::classeditorCheckCommit()
       default:;
       }
     }
+  }
+
+  // Check that Attribute.TypeRef doesn't point to class not yet defined
+  std::vector<pwr_tCid> cid_vect;
+  for (unsigned int j = 0; j < classdef_vect.size(); j++) {
+    mem_object* o1 = classdef_vect[j];
+    for (mem_object* o2 = o1->fch; o2; o2 = o2->fws) {
+      switch (o2->m_cid) {
+      case pwr_eClass_ObjBodyDef:
+	for (mem_object* o3 = o2->fch; o3; o3 = o3->fws) {
+	  switch (o3->m_cid) {
+	  case pwr_eClass_Param:
+	  case pwr_eClass_Input:
+	  case pwr_eClass_Output:
+	  case pwr_eClass_Intern:
+	  case pwr_eClass_TargetAttribute:
+	  case pwr_eClass_Buffer:
+	  case pwr_eClass_ObjXRef:
+	  case pwr_eClass_AttrXRef: {
+	    int found = 0;
+	    if (cdh_tidIsCid(((pwr_sParam*)o3->rbody)->TypeRef) &&
+		cdh_CidToVid(((pwr_sParam*)o3->rbody)->TypeRef) == m_vid) {
+	      for (unsigned int i = 0; i < cid_vect.size(); i++) {
+		if (cid_vect[i] == ((pwr_sParam*)o3->rbody)->TypeRef) {
+		  found = 1;
+		  break;
+		}
+	      }
+	      if (!found) {
+		char str[400];
+		sprintf(str,
+			"Invalid TypeRef, %s-%s-%s",
+			o1->name(), o2->name(), o3->name());
+		MsgWindow::message('E', str, msgw_ePop_Yes);
+		break;
+	      }
+	    }
+	    break;
+	  }
+	  default:;
+	  }
+	}
+      default:;
+      }
+    }
+    cid_vect.push_back(cdh_cixToCid(m_vid, cdh_oixToCix(o1->m_oid.oix)));
   }
 }
 
