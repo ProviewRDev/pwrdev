@@ -484,6 +484,8 @@ int gsx_check_connection(WFoe* foe, vldh_t_node sourceobject, unsigned long sour
     else if (source_array_flag != dest_array_flag)
     {
       if (!(dest_class == pwr_cClass_step || source_class == pwr_cClass_step ||
+            dest_class == pwr_cClass_ssbegin || source_class == pwr_cClass_ssbegin ||
+            dest_class == pwr_cClass_ssend || source_class == pwr_cClass_ssend ||
             dest_class == pwr_cClass_initstep || source_class == pwr_cClass_initstep ||
             dest_class == pwr_cClass_substep || source_class == pwr_cClass_substep ||
             dest_class == pwr_cClass_order || source_class == pwr_cClass_order ||
