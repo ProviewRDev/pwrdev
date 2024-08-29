@@ -3091,6 +3091,8 @@ int gcg_get_outputstring(gcg_ctx gcgctx, vldh_t_node output_node, ldh_sParDef* o
       switch (output_node->ln.cid)
       {
       case pwr_cClass_step:
+      case pwr_cClass_ssbegin:
+      case pwr_cClass_ssend:
       case pwr_cClass_initstep:
       case pwr_cClass_substep:
       case pwr_cClass_order:
