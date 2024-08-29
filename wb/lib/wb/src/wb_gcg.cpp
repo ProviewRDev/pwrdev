@@ -58,7 +58,8 @@
 
 #include "wb_dir.h"
 #include "wb_exo.h"
-extern "C" {
+extern "C"
+{
 #include "wb_foe_dataarithm.h"
 }
 #include "wb_foe_msg.h"
@@ -110,18 +111,16 @@ extern "C" {
 
 #define IS_CYGWIN(os) (os & pwr_mOpSys_X86_CYGWIN)
 
-#define IS_LINUX(os)                                                           \
-  ((os & pwr_mOpSys_PPC_LINUX) || (os & pwr_mOpSys_X86_LINUX)                  \
-      || (os & pwr_mOpSys_X86_64_LINUX) || (os & pwr_mOpSys_ARM_LINUX)         \
-      || (os & pwr_mOpSys_ARM64_LINUX) || (os & pwr_mOpSys_CustomBuild))
+#define IS_LINUX(os)                                                                                         \
+  ((os & pwr_mOpSys_PPC_LINUX) || (os & pwr_mOpSys_X86_LINUX) || (os & pwr_mOpSys_X86_64_LINUX) ||           \
+   (os & pwr_mOpSys_ARM_LINUX) || (os & pwr_mOpSys_ARM64_LINUX) || (os & pwr_mOpSys_CustomBuild))
 
-#define IS_UNIX(os)                                                            \
-  (IS_LINUX(os) || IS_MACOS(os) || IS_FREEBSD(os) || IS_OPENBSD(os)            \
-      || IS_CYGWIN(os))
+#define IS_UNIX(os) (IS_LINUX(os) || IS_MACOS(os) || IS_FREEBSD(os) || IS_OPENBSD(os) || IS_CYGWIN(os))
 
 #define IS_NOT_VALID_OS(os) (!IS_UNIX(os))
 
-typedef struct {
+typedef struct
+{
   pwr_tObjid thread_objid;
   pwr_tObjid plcproc_objid;
   float scantime;
@@ -130,7 +129,8 @@ typedef struct {
   int plc_count;
 } gcg_t_timebase;
 
-typedef struct {
+typedef struct
+{
   short buflen;
   short itemcode;
   void* buf;
@@ -138,23 +138,21 @@ typedef struct {
 } itemdsc;
 
 static int gcg_debug;
-static char gcgmv_filenames[2][30] = { "plc_v" };
+static char gcgmv_filenames[2][30] = {"plc_v"};
 
-static char gcgmn_filenames[2][30] = { "plc_" };
+static char gcgmn_filenames[2][30] = {"plc_"};
 
-static char gcgm0_filenames[GCGM0_MAXFILES][30] = { "plc_m" };
+static char gcgm0_filenames[GCGM0_MAXFILES][30] = {"plc_m"};
 
-static char gcgm1_filenames[GCGM1_MAXFILES][30]
-    = { "plc_dec", "plc_r1r", "plc_r2r", "plc_ref", "plc_cod", "plc_m" };
+static char gcgm1_filenames[GCGM1_MAXFILES][30] = {"plc_dec", "plc_r1r", "plc_r2r",
+                                                   "plc_ref", "plc_cod", "plc_m"};
 
 typedef int (*gcg_tMethod)(gcg_ctx, vldh_t_node);
 
-int gcg_comp_m0(vldh_t_plc plc, unsigned long codetype,
-    unsigned long* errorcount, unsigned long* warningcount,
-    unsigned long spawn);
-int gcg_comp_m1(vldh_t_wind wind, unsigned long codetype,
-    unsigned long* errorcount, unsigned long* warningcount,
-    unsigned long spawn);
+int gcg_comp_m0(vldh_t_plc plc, unsigned long codetype, unsigned long* errorcount,
+                unsigned long* warningcount, unsigned long spawn);
+int gcg_comp_m1(vldh_t_wind wind, unsigned long codetype, unsigned long* errorcount,
+                unsigned long* warningcount, unsigned long spawn);
 int gcg_comp_m2(gcg_ctx gcgctx, vldh_t_node node);
 int gcg_comp_m4(gcg_ctx gcgctx, vldh_t_node node);
 int gcg_comp_m5(gcg_ctx gcgctx, vldh_t_node node);
@@ -230,62 +228,116 @@ int gcg_comp_m76(gcg_ctx gcgctx, vldh_t_node node);
 int gcg_comp_m77(gcg_ctx gcgctx, vldh_t_node node);
 int gcg_comp_m78(gcg_ctx gcgctx, vldh_t_node node);
 
-gcg_tMethod gcg_comp_m[80]
-    = { (gcg_tMethod)gcg_comp_m0, (gcg_tMethod)gcg_comp_m1, gcg_comp_m2,
-        gcg_comp_m2, gcg_comp_m4, gcg_comp_m5, gcg_comp_m6, gcg_comp_m7,
-        gcg_comp_m8, gcg_comp_m9, gcg_comp_m10, gcg_comp_m11, gcg_comp_m12,
-        gcg_comp_m13, gcg_comp_m13, gcg_comp_m15, gcg_comp_m16, gcg_comp_m17,
-        gcg_comp_m18, gcg_comp_m19, gcg_comp_m20, gcg_comp_m21, gcg_comp_m22,
-        gcg_comp_m23, gcg_comp_m24, gcg_comp_m25, gcg_comp_m26, gcg_comp_m26,
-        gcg_comp_m28, gcg_comp_m29, gcg_comp_m30, gcg_comp_m31, gcg_comp_m32,
-        gcg_comp_m33, gcg_comp_m34, gcg_comp_m35, gcg_comp_m36, gcg_comp_m37,
-        gcg_comp_m38, gcg_comp_m39, gcg_comp_m40, gcg_comp_m41, gcg_comp_m42,
-        gcg_comp_m43, gcg_comp_m44, gcg_comp_m45, gcg_comp_m46, gcg_comp_m47,
-        gcg_comp_m48, gcg_comp_m49, gcg_comp_m50, gcg_comp_m51, gcg_comp_m52,
-        gcg_comp_m53, gcg_comp_m54, gcg_comp_m55, gcg_comp_m56, gcg_comp_m57,
-        gcg_comp_m58, gcg_comp_m59, gcg_comp_m60, gcg_comp_m61, gcg_comp_m62,
-        gcg_comp_m63, gcg_comp_m64, gcg_comp_m65, gcg_comp_m66, gcg_comp_m67,
-        gcg_comp_m68, gcg_comp_m69, gcg_comp_m70, gcg_comp_m71, gcg_comp_m72,
-        gcg_comp_m73, gcg_comp_m74, gcg_comp_m75, gcg_comp_m76, gcg_comp_m77,
-	gcg_comp_m78};
+gcg_tMethod gcg_comp_m[80] = {(gcg_tMethod)gcg_comp_m0,
+                              (gcg_tMethod)gcg_comp_m1,
+                              gcg_comp_m2,
+                              gcg_comp_m2,
+                              gcg_comp_m4,
+                              gcg_comp_m5,
+                              gcg_comp_m6,
+                              gcg_comp_m7,
+                              gcg_comp_m8,
+                              gcg_comp_m9,
+                              gcg_comp_m10,
+                              gcg_comp_m11,
+                              gcg_comp_m12,
+                              gcg_comp_m13,
+                              gcg_comp_m13,
+                              gcg_comp_m15,
+                              gcg_comp_m16,
+                              gcg_comp_m17,
+                              gcg_comp_m18,
+                              gcg_comp_m19,
+                              gcg_comp_m20,
+                              gcg_comp_m21,
+                              gcg_comp_m22,
+                              gcg_comp_m23,
+                              gcg_comp_m24,
+                              gcg_comp_m25,
+                              gcg_comp_m26,
+                              gcg_comp_m26,
+                              gcg_comp_m28,
+                              gcg_comp_m29,
+                              gcg_comp_m30,
+                              gcg_comp_m31,
+                              gcg_comp_m32,
+                              gcg_comp_m33,
+                              gcg_comp_m34,
+                              gcg_comp_m35,
+                              gcg_comp_m36,
+                              gcg_comp_m37,
+                              gcg_comp_m38,
+                              gcg_comp_m39,
+                              gcg_comp_m40,
+                              gcg_comp_m41,
+                              gcg_comp_m42,
+                              gcg_comp_m43,
+                              gcg_comp_m44,
+                              gcg_comp_m45,
+                              gcg_comp_m46,
+                              gcg_comp_m47,
+                              gcg_comp_m48,
+                              gcg_comp_m49,
+                              gcg_comp_m50,
+                              gcg_comp_m51,
+                              gcg_comp_m52,
+                              gcg_comp_m53,
+                              gcg_comp_m54,
+                              gcg_comp_m55,
+                              gcg_comp_m56,
+                              gcg_comp_m57,
+                              gcg_comp_m58,
+                              gcg_comp_m59,
+                              gcg_comp_m60,
+                              gcg_comp_m61,
+                              gcg_comp_m62,
+                              gcg_comp_m63,
+                              gcg_comp_m64,
+                              gcg_comp_m65,
+                              gcg_comp_m66,
+                              gcg_comp_m67,
+                              gcg_comp_m68,
+                              gcg_comp_m69,
+                              gcg_comp_m70,
+                              gcg_comp_m71,
+                              gcg_comp_m72,
+                              gcg_comp_m73,
+                              gcg_comp_m74,
+                              gcg_comp_m75,
+                              gcg_comp_m76,
+                              gcg_comp_m77,
+                              gcg_comp_m78};
 
 // static pwr_tStatus gcg_get_build_host(pwr_mOpSys os, char* buf, int bufsize);
 
-static int gcg_cc(unsigned long filetype, const char* p1, const char* p2,
-    const char* p3, pwr_mOpSys os, unsigned long spawn);
+static int gcg_cc(unsigned long filetype, const char* p1, const char* p2, const char* p3, pwr_mOpSys os,
+                  unsigned long spawn);
 
-static int gcg_get_structname(
-    gcg_ctx gcgctx, pwr_tObjid objdid, char** structname);
+static int gcg_get_structname(gcg_ctx gcgctx, pwr_tObjid objdid, char** structname);
 
-static int gcg_get_connected_par_close(vldh_t_node node, unsigned long point,
-    vldh_t_node* conn_node, char* conn_obj, char* conn_par);
+static int gcg_get_connected_par_close(vldh_t_node node, unsigned long point, vldh_t_node* conn_node,
+                                       char* conn_obj, char* conn_par);
 
-static int gcg_pgmname_to_parname(
-    ldh_tSesContext ldhses, pwr_tClassId cid, char* pgmname, char* parname);
+static int gcg_pgmname_to_parname(ldh_tSesContext ldhses, pwr_tClassId cid, char* pgmname, char* parname);
 
-static int gcg_get_par_close(vldh_t_node node, unsigned long point,
-    unsigned long* output_count, vldh_t_node* output_node,
-    unsigned long* output_point, ldh_sParDef* output_bodydef,
-    unsigned long conmask, unsigned long* par_type);
+static int gcg_get_par_close(vldh_t_node node, unsigned long point, unsigned long* output_count,
+                             vldh_t_node* output_node, unsigned long* output_point,
+                             ldh_sParDef* output_bodydef, unsigned long conmask, unsigned long* par_type);
 
-static int gcg_get_input(vldh_t_node node, unsigned long point,
-    unsigned long* output_count, vldh_t_node* output_node,
-    unsigned long* output_point, ldh_sParDef* output_bodydef,
-    unsigned long conmask);
+static int gcg_get_input(vldh_t_node node, unsigned long point, unsigned long* output_count,
+                         vldh_t_node* output_node, unsigned long* output_point, ldh_sParDef* output_bodydef,
+                         unsigned long conmask);
 static void gcg_ctx_new(gcg_ctx* gcgctx, vldh_t_wind wind);
 
 static void gcg_ctx_delete(gcg_ctx gcgctx);
 
 static int gcg_ioread_insert(gcg_ctx gcgctx, pwr_sAttrRef attrref, char prefix);
 
-static int gcg_iowrite_insert(
-    gcg_ctx gcgctx, pwr_sAttrRef attrref, char prefix);
+static int gcg_iowrite_insert(gcg_ctx gcgctx, pwr_sAttrRef attrref, char prefix);
 
-static int gcg_ref_insert(
-    gcg_ctx gcgctx, pwr_tObjid objdid, char prefix, vldh_t_node node);
+static int gcg_ref_insert(gcg_ctx gcgctx, pwr_tObjid objdid, char prefix, vldh_t_node node);
 
-static int gcg_aref_insert(
-    gcg_ctx gcgctx, pwr_sAttrRef attrref, char prefix, vldh_t_node node);
+static int gcg_aref_insert(gcg_ctx gcgctx, pwr_sAttrRef attrref, char prefix, vldh_t_node node);
 
 static int gcg_ref_print(gcg_ctx gcgctx);
 
@@ -295,25 +347,24 @@ static int gcg_ioread_print(gcg_ctx gcgctx);
 
 static int gcg_iowrite_print(gcg_ctx gcgctx);
 
-static int gcg_get_outputstring_spec(gcg_ctx gcgctx, vldh_t_node output_node,
-    ldh_sParDef* output_bodydef, pwr_sAttrRef* parattrref, int* partype,
-    char* parprefix, char* parstring);
+static int gcg_get_outputstring_spec(gcg_ctx gcgctx, vldh_t_node output_node, ldh_sParDef* output_bodydef,
+                                     pwr_sAttrRef* parattrref, int* partype, char* parprefix,
+                                     char* parstring);
 
-static int gcg_get_inputstring(gcg_ctx gcgctx, vldh_t_node output_node,
-    ldh_sParDef* output_bodydef, pwr_sAttrRef* parattrref, int* partype,
-    char* parprefix, char* parstring);
+static int gcg_get_inputstring(gcg_ctx gcgctx, vldh_t_node output_node, ldh_sParDef* output_bodydef,
+                               pwr_sAttrRef* parattrref, int* partype, char* parprefix, char* parstring);
 
-static void gcg_print_decl(gcg_ctx gcgctx, char* objname, pwr_tObjid objdid,
-    char prefix, unsigned long reftype);
+static void gcg_print_decl(gcg_ctx gcgctx, char* objname, pwr_tObjid objdid, char prefix,
+                           unsigned long reftype);
 
-static void gcg_print_adecl(gcg_ctx gcgctx, char* objname, pwr_sAttrRef attrref,
-    char prefix, unsigned long reftype);
+static void gcg_print_adecl(gcg_ctx gcgctx, char* objname, pwr_sAttrRef attrref, char prefix,
+                            unsigned long reftype);
 
-static void gcg_print_rtdbref(gcg_ctx gcgctx, pwr_tObjid objdid, char prefix,
-    pwr_tClassId cid, unsigned long reftype);
+static void gcg_print_rtdbref(gcg_ctx gcgctx, pwr_tObjid objdid, char prefix, pwr_tClassId cid,
+                              unsigned long reftype);
 
-static void gcg_print_artdbref(gcg_ctx gcgctx, pwr_sAttrRef attrref,
-    char prefix, pwr_tClassId cid, unsigned long reftype, unsigned int offset);
+static void gcg_print_artdbref(gcg_ctx gcgctx, pwr_sAttrRef attrref, char prefix, pwr_tClassId cid,
+                               unsigned long reftype, unsigned int offset);
 
 static int gcg_error_msg(gcg_ctx gcgctx, unsigned long sts, vldh_t_node node);
 
@@ -321,37 +372,30 @@ static int gcg_plc_msg(gcg_ctx gcgctx, unsigned long sts, pwr_tObjid plcobjdid);
 
 static int gcg_node_comp(gcg_ctx gcgctx, vldh_t_node node);
 
-static int gcg_get_child_windows(ldh_tSesContext ldhses,
-    pwr_tObjid parent_objdid, unsigned long* wind_count, pwr_tObjid** windlist);
+static int gcg_get_child_windows(ldh_tSesContext ldhses, pwr_tObjid parent_objdid, unsigned long* wind_count,
+                                 pwr_tObjid** windlist);
 
-static int gcg_get_plc_windows(ldh_tSesContext ldhses, pwr_tObjid plcobjdid,
-    unsigned long* wind_count, pwr_tObjid** windlist);
+static int gcg_get_plc_windows(ldh_tSesContext ldhses, pwr_tObjid plcobjdid, unsigned long* wind_count,
+                               pwr_tObjid** windlist);
 
-static int gcg_get_child_plc(gcg_ctx gcgctx, pwr_tObjid objdid,
-    pwr_tObjid rtnode, pwr_mOpSys os, unsigned long* plc_count,
-    gcg_t_plclist** plclist);
+static int gcg_get_child_plc(gcg_ctx gcgctx, pwr_tObjid objdid, pwr_tObjid rtnode, pwr_mOpSys os,
+                             unsigned long* plc_count, gcg_t_plclist** plclist);
 
-static int gcg_get_rtnode_plc(gcg_ctx gcgctx, pwr_tObjid rtnode, pwr_mOpSys os,
-    unsigned long* plc_count, gcg_t_plclist** plclist);
+static int gcg_get_rtnode_plc(gcg_ctx gcgctx, pwr_tObjid rtnode, pwr_mOpSys os, unsigned long* plc_count,
+                              gcg_t_plclist** plclist);
 
-static int gcg_sort_plclist(
-    gcg_ctx gcgctx, gcg_t_plclist* plclist, unsigned long size);
+static int gcg_sort_plclist(gcg_ctx gcgctx, gcg_t_plclist* plclist, unsigned long size);
 
-static int gcg_sort_threadlist(
-    gcg_ctx gcgctx, gcg_t_threadlist* threadlist, unsigned long size);
+static int gcg_sort_threadlist(gcg_ctx gcgctx, gcg_t_threadlist* threadlist, unsigned long size);
 
 static int gcg_check_ra_plc_user(char* filename);
-static int gcg_parname_to_pgmname(
-    ldh_tSesContext ldhses, pwr_tClassId cid, char* parname, char* pgmname);
-static pwr_tStatus gcg_replace_ref(
-    gcg_ctx gcgctx, pwr_sAttrRef* attrref, vldh_t_node output_node);
+static int gcg_parname_to_pgmname(ldh_tSesContext ldhses, pwr_tClassId cid, char* parname, char* pgmname);
+static pwr_tStatus gcg_replace_ref(gcg_ctx gcgctx, pwr_sAttrRef* attrref, vldh_t_node output_node);
 static int gcg_set_cmanager(vldh_t_wind wind);
-static int gcg_cmanager_find_nodes(
-    vldh_t_wind wind, vldh_t_node mgr, vldh_t_node* nodelist, int node_count);
+static int gcg_cmanager_find_nodes(vldh_t_wind wind, vldh_t_node mgr, vldh_t_node* nodelist, int node_count);
 static int gcg_cmanager_comp(gcg_ctx gcgctx, vldh_t_node node);
 static int gcg_reset_cmanager(gcg_ctx gcgctx);
-static int gcg_check_attrref(
-    gcg_ctx gcgctx, vldh_t_node node, const char* attr, pwr_tAttrRef* arp);
+static int gcg_check_attrref(gcg_ctx gcgctx, vldh_t_node node, const char* attr, pwr_tAttrRef* arp);
 static int gcg_is_in_focode(gcg_ctx gcgctx, vldh_t_node node);
 static void gcg_pending_compile_add(gcg_ctx gcgctx, pwr_tOid wind);
 static int gcg_pending_compile_exec(gcg_ctx gcgctx);
@@ -361,21 +405,21 @@ static int gcg_in_libhier(gcg_ctx gcgctx, pwr_tOid oid);
 /*_Methods defined for this module_______________________________________*/
 
 /*************************************************************************
-*
-* Name:		gcg_executorder_nodes()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* vldh_t_node	*nodelist	I	list of vldh nodes
-* unsigned long	node_count	I	number of nodes in nodelist
-*					on the nodes.
-*
-* Description:	Order the nodes in the nodelist in order of increasing
-*	executeorder. The executer order has to be calculated by the
-*	exo module first.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_executorder_nodes()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * vldh_t_node	*nodelist	I	list of vldh nodes
+ * unsigned long	node_count	I	number of nodes in nodelist
+ *					on the nodes.
+ *
+ * Description:	Order the nodes in the nodelist in order of increasing
+ *	executeorder. The executer order has to be calculated by the
+ *	exo module first.
+ *
+ **************************************************************************/
 
 int gcg_executeorder_nodes(unsigned long node_count, vldh_t_node* nodelist)
 {
@@ -384,11 +428,14 @@ int gcg_executeorder_nodes(unsigned long node_count, vldh_t_node* nodelist)
   vldh_t_node dum;
   int i, j;
 
-  for (i = node_count - 1; i > 0; i--) {
+  for (i = node_count - 1; i > 0; i--)
+  {
     node_ptr1 = nodelist;
     node_ptr2 = node_ptr1 + 1;
-    for (j = 0; j < i; j++) {
-      if ((*node_ptr1)->hn.executeorder > (*node_ptr2)->hn.executeorder) {
+    for (j = 0; j < i; j++)
+    {
+      if ((*node_ptr1)->hn.executeorder > (*node_ptr2)->hn.executeorder)
+      {
         /* Change order */
         dum = *node_ptr2;
         *node_ptr2 = *node_ptr1;
@@ -402,31 +449,30 @@ int gcg_executeorder_nodes(unsigned long node_count, vldh_t_node* nodelist)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_get_conpoint_nodes()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* vldh_t_node	node		I	vldh node
-* unsigned long	point		I	connection point on node
-* unsigned long	*point_count	O	number of conpoints in pointlist
-* vldh_t_conpoint **pointlist	O	connected nodes and connectionpoints
-*					on the nodes.
-*
-* Description:
-*	This routine calls vldh_get_conpoint_nodes which
-*	returns all nodeobjects connected to a connectionpoint and the
-*	connectionpoints on the found nodes. The input node and
-*	connectionpoint is placed first in the list.
-*	All nodes of class Point is taken away from the list in this
-*	routine.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_get_conpoint_nodes()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * vldh_t_node	node		I	vldh node
+ * unsigned long	point		I	connection point on node
+ * unsigned long	*point_count	O	number of conpoints in pointlist
+ * vldh_t_conpoint **pointlist	O	connected nodes and connectionpoints
+ *					on the nodes.
+ *
+ * Description:
+ *	This routine calls vldh_get_conpoint_nodes which
+ *	returns all nodeobjects connected to a connectionpoint and the
+ *	connectionpoints on the found nodes. The input node and
+ *	connectionpoint is placed first in the list.
+ *	All nodes of class Point is taken away from the list in this
+ *	routine.
+ *
+ **************************************************************************/
 
-int gcg_get_conpoint_nodes(vldh_t_node node, unsigned long point,
-    unsigned long* point_count, vldh_t_conpoint** pointlist,
-    unsigned long conmask)
+int gcg_get_conpoint_nodes(vldh_t_node node, unsigned long point, unsigned long* point_count,
+                           vldh_t_conpoint** pointlist, unsigned long conmask)
 {
   unsigned long p_count;
   vldh_t_node next_node;
@@ -438,9 +484,11 @@ int gcg_get_conpoint_nodes(vldh_t_node node, unsigned long point,
     return sts;
 
   nopoint = 0;
-  for (i = 0; i < (int)p_count; i++) {
+  for (i = 0; i < (int)p_count; i++)
+  {
     next_node = (*pointlist + i)->node;
-    if (next_node->ln.cid != pwr_cClass_Point) {
+    if (next_node->ln.cid != pwr_cClass_Point)
+    {
       (*pointlist + nopoint)->node = (*pointlist + i)->node;
       (*pointlist + nopoint)->conpoint = (*pointlist + i)->conpoint;
       nopoint++;
@@ -451,24 +499,24 @@ int gcg_get_conpoint_nodes(vldh_t_node node, unsigned long point,
 }
 
 /*************************************************************************
-*
-* Name:		gcg_scantime_print()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* pwr_tObjid	objdid		I	objdid of the object.
-*
-* Description:
-*	This routine is called when generating code for objects that
-*	might use the scantime of the plcprogram.
-*	Checks first if there is a parameter called Scantime in rtbody
-*	and if this is found prints the line
-*	'objectpointer'->Scantime = Time;
-*	in initiation file (GCGM1_REF_FILE).
-*
-**************************************************************************/
+ *
+ * Name:		gcg_scantime_print()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * pwr_tObjid	objdid		I	objdid of the object.
+ *
+ * Description:
+ *	This routine is called when generating code for objects that
+ *	might use the scantime of the plcprogram.
+ *	Checks first if there is a parameter called Scantime in rtbody
+ *	and if this is found prints the line
+ *	'objectpointer'->Scantime = Time;
+ *	in initiation file (GCGM1_REF_FILE).
+ *
+ **************************************************************************/
 
 int gcg_scantime_print(gcg_ctx gcgctx, pwr_tObjid objdid)
 {
@@ -477,36 +525,35 @@ int gcg_scantime_print(gcg_ctx gcgctx, pwr_tObjid objdid)
 
   /* If there is a parameter named scantime insert it
     in the reffile */
-  sts = ldh_GetObjectPar(
-      gcgctx->ldhses, objdid, "RtBody", "ScanTime", (char**)&scantime, &size);
-  if (ODD(sts)) {
+  sts = ldh_GetObjectPar(gcgctx->ldhses, objdid, "RtBody", "ScanTime", (char**)&scantime, &size);
+  if (ODD(sts))
+  {
     free((char*)scantime);
-    IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE],
-        "%c%s->ScanTime = &tp->ActualScanTime;\n", GCG_PREFIX_REF,
-        vldh_IdToStr(0, objdid));
+    IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->ScanTime = &tp->ActualScanTime;\n", GCG_PREFIX_REF,
+                  vldh_IdToStr(0, objdid));
   }
   return GSX__SUCCESS;
 }
 
 /*************************************************************************
-*
-* Name:		gcg_timer_print()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* pwr_tObjid	objdid		I	objdid of the object.
-*
-* Description:
-*	This routine is called when generating code for objects that
-*	might include a timer.
-*	Checks first if there is a parameter called TimerDo in rtbody
-*	and if this is found prints the line
-*	'objectpointer'->TimerDO = &'objectpointer'->TimerDODum;
-*	in initiation file (GCGM1_REF_FILE).
-*
-**************************************************************************/
+ *
+ * Name:		gcg_timer_print()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * pwr_tObjid	objdid		I	objdid of the object.
+ *
+ * Description:
+ *	This routine is called when generating code for objects that
+ *	might include a timer.
+ *	Checks first if there is a parameter called TimerDo in rtbody
+ *	and if this is found prints the line
+ *	'objectpointer'->TimerDO = &'objectpointer'->TimerDODum;
+ *	in initiation file (GCGM1_REF_FILE).
+ *
+ **************************************************************************/
 
 static int gcg_timer_print(gcg_ctx gcgctx, pwr_tObjid objdid)
 {
@@ -515,24 +562,23 @@ static int gcg_timer_print(gcg_ctx gcgctx, pwr_tObjid objdid)
 
   /* If there is a parameter named TimerDo insert it
     in the reffile */
-  sts = ldh_GetObjectPar(
-      gcgctx->ldhses, objdid, "RtBody", "TimerDO", &dummy, &size);
-  if (ODD(sts)) {
+  sts = ldh_GetObjectPar(gcgctx->ldhses, objdid, "RtBody", "TimerDO", &dummy, &size);
+  if (ODD(sts))
+  {
     free(dummy);
-    IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE],
-        "%c%s->TimerDO = &%c%s->TimerDODum;\n", GCG_PREFIX_REF,
-        vldh_IdToStr(0, objdid), GCG_PREFIX_REF, vldh_IdToStr(1, objdid));
+    IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->TimerDO = &%c%s->TimerDODum;\n", GCG_PREFIX_REF,
+                  vldh_IdToStr(0, objdid), GCG_PREFIX_REF, vldh_IdToStr(1, objdid));
   }
   return GSX__SUCCESS;
 }
 
 /*************************************************************************
-*
-* Name:		gcg_get_build_host
-*
-* Description: Gets the name of UNIX build host
-*
-**************************************************************************/
+ *
+ * Name:		gcg_get_build_host
+ *
+ * Description: Gets the name of UNIX build host
+ *
+ **************************************************************************/
 /*
 static pwr_tStatus gcg_get_build_host(pwr_mOpSys os, char* buf, int bufsize)
 {
@@ -576,39 +622,39 @@ static pwr_tStatus gcg_get_build_host(pwr_mOpSys os, char* buf, int bufsize)
 */
 
 /*************************************************************************
-*
-* Name:		gcg_cc()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* unsigned long	filetype	I	parameter to ds_foe_gcg.com
-*					type of operation
-*					0: create plc process objectmodule
-*					1: create plcpgm objectmodule
-*					2: create window objectmodule
-*					3: link
-* char		*p1		I	parameter to ds_foe_gcg.com
-* char		*p2		I	parameter to ds_foe_gcg.com
-* char		*p3		I	parameter to ds_foe_gcg.com
-* pwr_mOpSys os       I       Operating system
-* unsigned long	spawn		I	if eq GCG_SPAWN the operation
-*					is spawned, else a system call is done.
-*
-* Description:
-*	Create an objectfile from the generated c-code.
-*	The command file ds_foe_gcg.com is started and one of the
-*	following operations is made:
-*	- create plc process objectmodule
-*	- create plcpgm objectmodule
-*	- create window objectmodule
-*	- linking of the plc job.
-*
-*
-**************************************************************************/
+ *
+ * Name:		gcg_cc()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * unsigned long	filetype	I	parameter to ds_foe_gcg.com
+ *					type of operation
+ *					0: create plc process objectmodule
+ *					1: create plcpgm objectmodule
+ *					2: create window objectmodule
+ *					3: link
+ * char		*p1		I	parameter to ds_foe_gcg.com
+ * char		*p2		I	parameter to ds_foe_gcg.com
+ * char		*p3		I	parameter to ds_foe_gcg.com
+ * pwr_mOpSys os       I       Operating system
+ * unsigned long	spawn		I	if eq GCG_SPAWN the operation
+ *					is spawned, else a system call is done.
+ *
+ * Description:
+ *	Create an objectfile from the generated c-code.
+ *	The command file ds_foe_gcg.com is started and one of the
+ *	following operations is made:
+ *	- create plc process objectmodule
+ *	- create plcpgm objectmodule
+ *	- create window objectmodule
+ *	- linking of the plc job.
+ *
+ *
+ **************************************************************************/
 
-static int gcg_cc(unsigned long filetype, const char* p1, const char* p2,
-    const char* p3, pwr_mOpSys os, unsigned long spawn)
+static int gcg_cc(unsigned long filetype, const char* p1, const char* p2, const char* p3, pwr_mOpSys os,
+                  unsigned long spawn)
 {
   // char build_host[32];
   char systemname[80];
@@ -626,14 +672,16 @@ static int gcg_cc(unsigned long filetype, const char* p1, const char* p2,
   utl_get_projectname(systemname);
 
   dcli_translate_filename(fname, CC_COMMAND_UNIX);
-  if (!msgw_has_default()) {
+  if (!msgw_has_default())
+  {
     // pwrc: don't redirect output
-    sprintf(cmd, "%s %d %ld %s %d %s %s %s", fname, gcg_debug, filetype, p1, os,
-        p2, p3, systemname);
+    sprintf(cmd, "%s %d %ld %s %d %s %s %s", fname, gcg_debug, filetype, p1, os, p2, p3, systemname);
     sts = system(cmd);
-  } else {
-    sprintf(cmd, "%s %d %ld %s %d %s %s %s 2> %s", fname, gcg_debug, filetype,
-        p1, os, p2, p3, systemname, CC_OUTPUT_FILE);
+  }
+  else
+  {
+    sprintf(cmd, "%s %d %ld %s %d %s %s %s 2> %s", fname, gcg_debug, filetype, p1, os, p2, p3, systemname,
+            CC_OUTPUT_FILE);
     sts = system(cmd);
     pwr_tFileName efile;
     char line[50][200];
@@ -641,18 +689,20 @@ static int gcg_cc(unsigned long filetype, const char* p1, const char* p2,
 
     dcli_translate_filename(efile, CC_OUTPUT_FILE);
     FILE* fp = fopen(efile, "r");
-    if (!fp) {
+    if (!fp)
+    {
       if (sts != 0)
         return GSX__CCERROR;
       else
         return GSX__SUCCESS;
     }
     int i = 0;
-    while (dcli_read_line(line[i], sizeof(line[0]), fp)) {
+    while (dcli_read_line(line[i], sizeof(line[0]), fp))
+    {
       i++;
-      if (i >= 50) {
-        sprintf(
-            line[i - 1], "** Truncated, see all errors in terminal window **");
+      if (i >= 50)
+      {
+        sprintf(line[i - 1], "** Truncated, see all errors in terminal window **");
         break;
       }
     }
@@ -661,16 +711,19 @@ static int gcg_cc(unsigned long filetype, const char* p1, const char* p2,
     system(cmd);
     sprintf(cmd, "rm -f %s", CC_OUTPUT_FILE);
     system(cmd);
-    for (int j = i - 1; j >= 0; j--) {
+    for (int j = i - 1; j >= 0; j--)
+    {
       msgw_ePop pop;
       if (j == 0)
         pop = msgw_ePop_Yes;
       else
         pop = msgw_ePop_No;
-      if (line[j][0] == '/' && (s = strstr(line[j], "/common/tmp/"))) {
+      if (line[j][0] == '/' && (s = strstr(line[j], "/common/tmp/")))
+      {
         strncpy(s + 2, "$pwrp_tmp", 10);
         msgw_message(0, s + 2, pop);
-      } else
+      }
+      else
         msgw_message(0, line[j], pop);
     }
     if (sts != 0)
@@ -686,26 +739,25 @@ static int gcg_cc(unsigned long filetype, const char* p1, const char* p2,
 }
 
 /*************************************************************************
-*
-* Name:		gcg_get_structname()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context
-* pwr_tObjid	objdid		I	objdid of object
-* char		**structname	O	name of c-struct describing the
-*					object in rtdb.
-*
-* Description:
-*	Get the name of the c-struct describing the object in rtdb.
-*	The name is fetched from StructName in rtbody.
-*
-*
-**************************************************************************/
+ *
+ * Name:		gcg_get_structname()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context
+ * pwr_tObjid	objdid		I	objdid of object
+ * char		**structname	O	name of c-struct describing the
+ *					object in rtdb.
+ *
+ * Description:
+ *	Get the name of the c-struct describing the object in rtdb.
+ *	The name is fetched from StructName in rtbody.
+ *
+ *
+ **************************************************************************/
 
-static int gcg_get_structname_from_cid(
-    gcg_ctx gcgctx, pwr_tCid cid, char** structname)
+static int gcg_get_structname_from_cid(gcg_ctx gcgctx, pwr_tCid cid, char** structname)
 {
   ldh_tSesContext ldhses;
   pwr_tClassId bodyclass;
@@ -714,12 +766,11 @@ static int gcg_get_structname_from_cid(
 
   ldhses = gcgctx->wind->hw.ldhses;
 
-  sts = ldh_GetClassBody(
-      ldhses, cid, "RtBody", &bodyclass, (char**)&bodydef, &size);
-  if (EVEN(sts)) {
+  sts = ldh_GetClassBody(ldhses, cid, "RtBody", &bodyclass, (char**)&bodydef, &size);
+  if (EVEN(sts))
+  {
     /* Try sysbody */
-    sts = ldh_GetClassBody(
-        ldhses, cid, "SysBody", &bodyclass, (char**)&bodydef, &size);
+    sts = ldh_GetClassBody(ldhses, cid, "SysBody", &bodyclass, (char**)&bodydef, &size);
     if (EVEN(sts))
       return sts;
   }
@@ -729,8 +780,7 @@ static int gcg_get_structname_from_cid(
   return GSX__SUCCESS;
 }
 
-static int gcg_get_structname(
-    gcg_ctx gcgctx, pwr_tObjid objdid, char** structname)
+static int gcg_get_structname(gcg_ctx gcgctx, pwr_tObjid objdid, char** structname)
 {
   pwr_tClassId cid;
   ldh_tSesContext ldhses;
@@ -746,28 +796,27 @@ static int gcg_get_structname(
 }
 
 /*************************************************************************
-*
-* Name:		gcg_plc_compile()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* vldh_t_plc	plc		I	vldh plc.
-* unsigned long	codetype	I	1: code is generated
-*					0: only syntax control
-* unsigned long	*errorcount	O	number of errors
-* unsigned long	*warningcount	O	number of warnings
-* unsigned long	spawn		I	if the c compilation should be spawned
-*					(0) or not (1).
-*
-* Description:
-*	Calls the gcg method for a plcpgm.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_plc_compile()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * vldh_t_plc	plc		I	vldh plc.
+ * unsigned long	codetype	I	1: code is generated
+ *					0: only syntax control
+ * unsigned long	*errorcount	O	number of errors
+ * unsigned long	*warningcount	O	number of warnings
+ * unsigned long	spawn		I	if the c compilation should be spawned
+ *					(0) or not (1).
+ *
+ * Description:
+ *	Calls the gcg method for a plcpgm.
+ *
+ **************************************************************************/
 
-int gcg_plc_compile(vldh_t_plc plc, unsigned long codetype,
-    unsigned long* errorcount, unsigned long* warningcount, unsigned long spawn,
-    int debug)
+int gcg_plc_compile(vldh_t_plc plc, unsigned long codetype, unsigned long* errorcount,
+                    unsigned long* warningcount, unsigned long spawn, int debug)
 {
   int sts;
 
@@ -788,27 +837,26 @@ int gcg_plc_compile(vldh_t_plc plc, unsigned long codetype,
 }
 
 /*************************************************************************
-*
-* Name:		gcg_plcwindow_compile()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* vldh_t_wind	wind		I	vldh window.
-* unsigned long	codetype	I	1: code is generated
-*					0: only syntax control
-* unsigned long	*errorcount	O	number of errors
-* unsigned long	*warningcount	O	number of warnings
-* unsigned long	spawn		I	if the c compilation should be spawned
-*					(0) or not (1).
-*
-* Description:
-*	Calls the gcg method for a window.
-*
-**************************************************************************/
-int gcg_plcwindow_compile(vldh_t_wind wind, unsigned long codetype,
-    unsigned long* errorcount, unsigned long* warningcount, unsigned long spawn,
-    int debug)
+ *
+ * Name:		gcg_plcwindow_compile()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * vldh_t_wind	wind		I	vldh window.
+ * unsigned long	codetype	I	1: code is generated
+ *					0: only syntax control
+ * unsigned long	*errorcount	O	number of errors
+ * unsigned long	*warningcount	O	number of warnings
+ * unsigned long	spawn		I	if the c compilation should be spawned
+ *					(0) or not (1).
+ *
+ * Description:
+ *	Calls the gcg method for a window.
+ *
+ **************************************************************************/
+int gcg_plcwindow_compile(vldh_t_wind wind, unsigned long codetype, unsigned long* errorcount,
+                          unsigned long* warningcount, unsigned long spawn, int debug)
 {
   int sts;
 
@@ -828,52 +876,51 @@ int gcg_plcwindow_compile(vldh_t_wind wind, unsigned long codetype,
     return sts;
 
   if (*errorcount == 0)
-    wb_log::log(
-        (wb_session*)wind->hw.ldhses, wlog_eCategory_PlcBuild, wind->lw.oid);
+    wb_log::log((wb_session*)wind->hw.ldhses, wlog_eCategory_PlcBuild, wind->lw.oid);
 
   return GSX__SUCCESS;
 }
 
 /*************************************************************************
-*
-* Name:		gcg_print_inputs()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-* char		*delimstr	I	delimiter string.
-* unsigned long	printtype	I	if all input should be printed
-*					(GCG_PRINT_ALLPAR) or only the
-*					connected (GCG_PRINT_CONPAR).
-* unsigned long	*nocondef	I	pointer to a value that should be
-*					printed as defaultvalue if the input
-*					is not connected.
-* unsigned long	*nocontype	I	type of the inputvalue.
-*
-* Description:
-*	Gets and prints all inputs.
-*	This routine is used by some gcgmethods to get and print
-*	all the connected objects and parameters in the printed function call.
-*	Connected outputs for all the inputs are looked for and if
-*	they are found they are printed separated by the delimstr
-*	If one input is not found printtype tells wether to jump to
-*	the next on without printing anything, or to print
-*	- 0 if nocondef is NULL or
-*	- the value specified by nocondef.
-*	nocondef makes it possible to define an array that contains a default
-*	value for each input parameter. nocondef is a pointer to this array and
-*	nocontype is a pointer to an array with the types of the values in
-*	nocondef.
-*	Ex declaration of nocondef and nocontype:
-* 	unsigned long		nocondef[2] = { 0, TRUE};
-*	unsigned long		nocontype[2] = { GCG_BOOLEAN, GCG_BOOLEAN };
-*
-**************************************************************************/
+ *
+ * Name:		gcg_print_inputs()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ * char		*delimstr	I	delimiter string.
+ * unsigned long	printtype	I	if all input should be printed
+ *					(GCG_PRINT_ALLPAR) or only the
+ *					connected (GCG_PRINT_CONPAR).
+ * unsigned long	*nocondef	I	pointer to a value that should be
+ *					printed as defaultvalue if the input
+ *					is not connected.
+ * unsigned long	*nocontype	I	type of the inputvalue.
+ *
+ * Description:
+ *	Gets and prints all inputs.
+ *	This routine is used by some gcgmethods to get and print
+ *	all the connected objects and parameters in the printed function call.
+ *	Connected outputs for all the inputs are looked for and if
+ *	they are found they are printed separated by the delimstr
+ *	If one input is not found printtype tells wether to jump to
+ *	the next on without printing anything, or to print
+ *	- 0 if nocondef is NULL or
+ *	- the value specified by nocondef.
+ *	nocondef makes it possible to define an array that contains a default
+ *	value for each input parameter. nocondef is a pointer to this array and
+ *	nocontype is a pointer to an array with the types of the values in
+ *	nocondef.
+ *	Ex declaration of nocondef and nocontype:
+ * 	unsigned long		nocondef[2] = { 0, TRUE};
+ *	unsigned long		nocontype[2] = { GCG_BOOLEAN, GCG_BOOLEAN };
+ *
+ **************************************************************************/
 
-int gcg_print_inputs(gcg_ctx gcgctx, vldh_t_node node, const char* delimstr,
-    unsigned long printtype, gcg_t_nocondef* nocondef, unsigned long* nocontype)
+int gcg_print_inputs(gcg_ctx gcgctx, vldh_t_node node, const char* delimstr, unsigned long printtype,
+                     gcg_t_nocondef* nocondef, unsigned long* nocontype)
 {
   ldh_sParDef* bodydef;
   int rows, sts;
@@ -894,8 +941,7 @@ int gcg_print_inputs(gcg_ctx gcgctx, vldh_t_node node, const char* delimstr,
   ldhses = (node->hn.wind)->hw.ldhses;
 
   /* Get the runtime parameters for this class */
-  sts = ldh_GetObjectBodyDef(
-      (node->hn.wind)->hw.ldhses, node->ln.cid, "RtBody", 1, &bodydef, &rows);
+  sts = ldh_GetObjectBodyDef((node->hn.wind)->hw.ldhses, node->ln.cid, "RtBody", 1, &bodydef, &rows);
   if (EVEN(sts))
     return sts;
 
@@ -903,85 +949,90 @@ int gcg_print_inputs(gcg_ctx gcgctx, vldh_t_node node, const char* delimstr,
   input_count = 0;
   inputscon_count = 0;
   first_par = 1;
-  while ((i < rows) && (bodydef[i].ParClass == pwr_eClass_Input)) {
+  while ((i < rows) && (bodydef[i].ParClass == pwr_eClass_Input))
+  {
     /* Get the point for this parameter if there is one */
     output_found = 0;
     sts = gcg_get_inputpoint(node, i, &point, &par_inverted);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       /* Look for an output connected to this point */
       input_count++;
-      sts = gcg_get_output(node, point, &output_count, &output_node,
-          &output_point, &output_bodydef,
-          GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
+      sts = gcg_get_output(node, point, &output_count, &output_node, &output_point, &output_bodydef,
+                           GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
       if (EVEN(sts))
         return sts;
 
-      if (output_count > 0) {
+      if (output_count > 0)
+      {
         output_found = 1;
         inputscon_count++;
         if (output_count > 1)
           gcg_error_msg(gcgctx, GSX__CONOUTPUT, output_node);
 
-        sts = gcg_get_outputstring(gcgctx, output_node, &output_bodydef,
-            &output_attrref, &output_type, &output_prefix, output_par);
-        if (sts == GSX__NEXTPAR) {
+        sts = gcg_get_outputstring(gcgctx, output_node, &output_bodydef, &output_attrref, &output_type,
+                                   &output_prefix, output_par);
+        if (sts == GSX__NEXTPAR)
+        {
           i++;
           continue;
         }
         if (EVEN(sts))
           return sts;
 
-        if ((inputscon_count - 4 * (inputscon_count / 4)) == 0
-            && inputscon_count)
+        if ((inputscon_count - 4 * (inputscon_count / 4)) == 0 && inputscon_count)
           IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "\n");
         if (!first_par)
           IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s", delimstr);
         if (par_inverted)
           IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "!");
         IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%c%s->%s", output_prefix,
-            output_type == GCG_OTYPE_OID ? vldh_IdToStr(0, output_attrref.Objid)
-                                         : vldh_AttrRefToStr(0, output_attrref),
-            output_par);
-      } else {
+                      output_type == GCG_OTYPE_OID ? vldh_IdToStr(0, output_attrref.Objid)
+                                                   : vldh_AttrRefToStr(0, output_attrref),
+                      output_par);
+      }
+      else
+      {
         /* Point visible but not connected, errormessage */
         gcg_error_msg(gcgctx, GSX__NOTCON, node);
       }
     }
-    if (!output_found) {
-      if (printtype == GCG_PRINT_ALLPAR) {
+    if (!output_found)
+    {
+      if (printtype == GCG_PRINT_ALLPAR)
+      {
         /* The point is not connected and not visible */
-        if (!first_par) {
+        if (!first_par)
+        {
           IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s", delimstr);
         }
-        if (nocondef == NULL) {
+        if (nocondef == NULL)
+        {
           IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "0");
-        } else {
-          switch (*(nocontype + i)) {
+        }
+        else
+        {
+          switch (*(nocontype + i))
+          {
           case GCG_BOOLEAN:
-            IF_PR fprintf(
-                gcgctx->files[GCGM1_CODE_FILE], "%d", (nocondef + i)->bo);
+            IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%d", (nocondef + i)->bo);
             break;
           case GCG_INT32:
-            IF_PR fprintf(
-                gcgctx->files[GCGM1_CODE_FILE], "%d", (nocondef + i)->bo);
+            IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%d", (nocondef + i)->bo);
             break;
           case GCG_FLOAT:
-            IF_PR fprintf(
-                gcgctx->files[GCGM1_CODE_FILE], "%f", (nocondef + i)->fl);
+            IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%f", (nocondef + i)->fl);
             break;
           case GCG_STRING:
-            IF_PR fprintf(
-                gcgctx->files[GCGM1_CODE_FILE], "\"%s\"", (nocondef + i)->str);
+            IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "\"%s\"", (nocondef + i)->str);
             break;
           case GCG_ATIME:
-            IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "{%ld,%ld}",
-                (long int)(nocondef + i)->atime.tv_sec,
-                (long int)(nocondef + i)->atime.tv_nsec);
+            IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "{%ld,%ld}", (long int)(nocondef + i)->atime.tv_sec,
+                          (long int)(nocondef + i)->atime.tv_nsec);
             break;
           case GCG_DTIME:
-            IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "{%ld,%ld}",
-                (long int)(nocondef + i)->dtime.tv_sec,
-                (long int)(nocondef + i)->dtime.tv_nsec);
+            IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "{%ld,%ld}", (long int)(nocondef + i)->dtime.tv_sec,
+                          (long int)(nocondef + i)->dtime.tv_nsec);
             break;
           }
         }
@@ -993,22 +1044,28 @@ int gcg_print_inputs(gcg_ctx gcgctx, vldh_t_node node, const char* delimstr,
 
     i++;
   }
-  if ((input_count == 0) || (inputscon_count == 0)) {
+  if ((input_count == 0) || (inputscon_count == 0))
+  {
     /* No inputs in the graphics or no inputs connected
     if ( inputscon_count > inputscon_count)
       gcg_error_msg( gcgctx, GSX__NOINPUTS, node);
     */
 
-    if (printtype == GCG_PRINT_CONPAR) {
-      if (nocondef == NULL) {
+    if (printtype == GCG_PRINT_CONPAR)
+    {
+      if (nocondef == NULL)
+      {
         IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "0");
-      } else {
-        if (*(nocontype + i) == GCG_BOOLEAN) {
-          IF_PR fprintf(
-              gcgctx->files[GCGM1_CODE_FILE], "%d", (nocondef + i)->bo);
-        } else {
-          IF_PR fprintf(
-              gcgctx->files[GCGM1_CODE_FILE], "%f", (nocondef + i)->fl);
+      }
+      else
+      {
+        if (*(nocontype + i) == GCG_BOOLEAN)
+        {
+          IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%d", (nocondef + i)->bo);
+        }
+        else
+        {
+          IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%f", (nocondef + i)->fl);
         }
       }
     }
@@ -1019,25 +1076,24 @@ int gcg_print_inputs(gcg_ctx gcgctx, vldh_t_node node, const char* delimstr,
 }
 
 /*************************************************************************
-*
-* Name:		gcg_print_exec_macro()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-* pwr_tObjid	objdid		I  	objdid.
-* char		prefix		I	rtdb pointer prefix.
-*
-* Description:
-*	Prints the beginning of an exec command for a macro.
-*		'structname'_exec( 'pointername',
-*
-**************************************************************************/
+ *
+ * Name:		gcg_print_exec_macro()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ * pwr_tObjid	objdid		I  	objdid.
+ * char		prefix		I	rtdb pointer prefix.
+ *
+ * Description:
+ *	Prints the beginning of an exec command for a macro.
+ *		'structname'_exec( 'pointername',
+ *
+ **************************************************************************/
 
-static int gcg_print_exec_macro(
-    gcg_ctx gcgctx, vldh_t_node node, pwr_tObjid objdid, char prefix)
+static int gcg_print_exec_macro(gcg_ctx gcgctx, vldh_t_node node, pwr_tObjid objdid, char prefix)
 {
   int sts;
   char* name;
@@ -1048,34 +1104,33 @@ static int gcg_print_exec_macro(
     return sts;
 
   /* Print the execute command */
-  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( %c%s, ", name, prefix,
-      vldh_IdToStr(0, objdid));
+  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( %c%s, ", name, prefix, vldh_IdToStr(0, objdid));
   return GSX__SUCCESS;
 }
 
 /*************************************************************************
-*
-* Name:		gcg_get_connected_parameter()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* vldh_t_node	node		I	vldh node.
-* unsigned long	point		I	connection point.
-* vldh_t_node	*conn_node	O	found connected node.
-* char		*conn_obj	O	object string of connected node.
-* char		*conn_par	O	parameter name of connected node.
-*
-* Description:
-*	Looks for an output or input connected to a connectionpoint.
-*	Looks first for an output, if no output is found it looks for an input.
-*	Returns a string with objectname and parameter and index 0
-*	if output is an array.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_get_connected_parameter()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * vldh_t_node	node		I	vldh node.
+ * unsigned long	point		I	connection point.
+ * vldh_t_node	*conn_node	O	found connected node.
+ * char		*conn_obj	O	object string of connected node.
+ * char		*conn_par	O	parameter name of connected node.
+ *
+ * Description:
+ *	Looks for an output or input connected to a connectionpoint.
+ *	Looks first for an output, if no output is found it looks for an input.
+ *	Returns a string with objectname and parameter and index 0
+ *	if output is an array.
+ *
+ **************************************************************************/
 
-int gcg_get_connected_parameter(vldh_t_node node, unsigned long point,
-    vldh_t_node* conn_node, char* conn_obj, char* conn_par)
+int gcg_get_connected_parameter(vldh_t_node node, unsigned long point, vldh_t_node* conn_node, char* conn_obj,
+                                char* conn_par)
 {
   gcg_t_ctx gcgctx;
   char* name;
@@ -1100,46 +1155,47 @@ int gcg_get_connected_parameter(vldh_t_node node, unsigned long point,
   gcgctx.warningcount = 0;
 
   /* Check if the point is an output */
-  sts = goen_get_parameter(node->ln.cid, node->hn.wind->hw.ldhses,
-      node->ln.mask, point, &par_type, &par_inverted, &par_index);
+  sts = goen_get_parameter(node->ln.cid, node->hn.wind->hw.ldhses, node->ln.mask, point, &par_type,
+                           &par_inverted, &par_index);
   if (EVEN(sts))
     return sts;
 
-  if (par_type == PAR_OUTPUT) {
+  if (par_type == PAR_OUTPUT)
+  {
     output_count = 1;
     output_node = node;
     output_point = point;
-    sts = ldh_GetObjectBodyDef(
-        node->hn.wind->hw.ldhses, node->ln.cid, "RtBody", 1, &bodydef, &rows);
-    if (EVEN(sts)) {
+    sts = ldh_GetObjectBodyDef(node->hn.wind->hw.ldhses, node->ln.cid, "RtBody", 1, &bodydef, &rows);
+    if (EVEN(sts))
+    {
       /* This is a development node, get the development body instead */
-      sts = ldh_GetObjectBodyDef(node->hn.wind->hw.ldhses, node->ln.cid,
-          "DevBody", 1, &bodydef, &rows);
+      sts = ldh_GetObjectBodyDef(node->hn.wind->hw.ldhses, node->ln.cid, "DevBody", 1, &bodydef, &rows);
       if (EVEN(sts))
         return sts;
     }
     memcpy(&output_bodydef, &(bodydef[par_index]), sizeof(output_bodydef));
     free((char*)bodydef);
-  } else {
+  }
+  else
+  {
     /* Look for an output connected to this point */
-    sts = gcg_get_output(node, point, &output_count, &output_node,
-        &output_point, &output_bodydef,
-        GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
+    sts = gcg_get_output(node, point, &output_count, &output_node, &output_point, &output_bodydef,
+                         GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
     if (EVEN(sts))
       return sts;
   }
 
-  if (output_count > 0) {
-    sts = gcg_get_outputstring(&gcgctx, output_node, &output_bodydef,
-        &output_attrref, &output_type, &output_prefix, output_par);
+  if (output_count > 0)
+  {
+    sts = gcg_get_outputstring(&gcgctx, output_node, &output_bodydef, &output_attrref, &output_type,
+                               &output_prefix, output_par);
     if (sts == GSX__NEXTPAR)
       return GSX__SWINDERR;
     if (EVEN(sts))
       return sts;
 
     /* Get the name of the node */
-    sts = ldh_AttrRefToName(
-        gcgctx.ldhses, &output_attrref, cdh_mNName, &name, &size);
+    sts = ldh_AttrRefToName(gcgctx.ldhses, &output_attrref, cdh_mNName, &name, &size);
     if (EVEN(sts))
       return sts;
 
@@ -1156,26 +1212,28 @@ int gcg_get_connected_parameter(vldh_t_node node, unsigned long point,
       return sts;
 
     *conn_node = output_node;
-  } else {
+  }
+  else
+  {
     /* Look for an input connected to this point */
-    sts = gcg_get_input(node, point, &output_count, &output_node, &output_point,
-        &output_bodydef, GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
+    sts = gcg_get_input(node, point, &output_count, &output_node, &output_point, &output_bodydef,
+                        GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
     if (EVEN(sts))
       return sts;
 
-    if (output_count > 0) {
+    if (output_count > 0)
+    {
       output_found = 1;
 
-      sts = gcg_get_inputstring(&gcgctx, output_node, &output_bodydef,
-          &output_attrref, &output_type, &output_prefix, output_par);
+      sts = gcg_get_inputstring(&gcgctx, output_node, &output_bodydef, &output_attrref, &output_type,
+                                &output_prefix, output_par);
       if (sts == GSX__NEXTPAR)
         return GSX__SWINDERR;
       if (EVEN(sts))
         return sts;
 
       /* Get the name of the node */
-      sts = ldh_AttrRefToName(
-          gcgctx.ldhses, &output_attrref, ldh_eName_Hierarchy, &name, &size);
+      sts = ldh_AttrRefToName(gcgctx.ldhses, &output_attrref, ldh_eName_Hierarchy, &name, &size);
       if (EVEN(sts))
         return sts;
 
@@ -1192,7 +1250,9 @@ int gcg_get_connected_parameter(vldh_t_node node, unsigned long point,
         return sts;
 
       *conn_node = output_node;
-    } else {
+    }
+    else
+    {
       /* No output and no input found */
       return GSX__NOTCON;
     }
@@ -1201,28 +1261,28 @@ int gcg_get_connected_parameter(vldh_t_node node, unsigned long point,
 }
 
 /*************************************************************************
-*
-* Name:		gcg_get_connected_parameter()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* vldh_t_node	node		I	vldh node.
-* unsigned long	point		I	connection point.
-* vldh_t_node	*conn_node	O	found connected node.
-* char		*conn_obj	O	object string of connected node.
-* char		*conn_par	O	parameter name of connected node.
-*
-* Description:
-*	Looks for an output or input connected to a connectionpoint.
-*	Looks first for an output, if no output is found it looks for an input.
-*	Returns a string with objectname and parameter and index 0
-*	if output is an array.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_get_connected_parameter()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * vldh_t_node	node		I	vldh node.
+ * unsigned long	point		I	connection point.
+ * vldh_t_node	*conn_node	O	found connected node.
+ * char		*conn_obj	O	object string of connected node.
+ * char		*conn_par	O	parameter name of connected node.
+ *
+ * Description:
+ *	Looks for an output or input connected to a connectionpoint.
+ *	Looks first for an output, if no output is found it looks for an input.
+ *	Returns a string with objectname and parameter and index 0
+ *	if output is an array.
+ *
+ **************************************************************************/
 
-static int gcg_get_connected_par_close(vldh_t_node node, unsigned long point,
-    vldh_t_node* conn_node, char* conn_obj, char* conn_par)
+static int gcg_get_connected_par_close(vldh_t_node node, unsigned long point, vldh_t_node* conn_node,
+                                       char* conn_obj, char* conn_par)
 {
   gcg_t_ctx gcgctx;
   char* name;
@@ -1243,32 +1303,36 @@ static int gcg_get_connected_par_close(vldh_t_node node, unsigned long point,
   gcgctx.warningcount = 0;
 
   /* Look for a parameter connected to this point */
-  sts = gcg_get_par_close(node, point, &output_count, &output_node,
-      &output_point, &output_bodydef, GOEN_CON_SIGNAL, &par_type);
+  sts = gcg_get_par_close(node, point, &output_count, &output_node, &output_point, &output_bodydef,
+                          GOEN_CON_SIGNAL, &par_type);
   if (EVEN(sts))
     return sts;
 
-  if (output_count > 0) {
-    if (par_type == PAR_OUTPUT) {
-      sts = gcg_get_outputstring(&gcgctx, output_node, &output_bodydef,
-          &output_attrref, &output_type, &output_prefix, output_par);
+  if (output_count > 0)
+  {
+    if (par_type == PAR_OUTPUT)
+    {
+      sts = gcg_get_outputstring(&gcgctx, output_node, &output_bodydef, &output_attrref, &output_type,
+                                 &output_prefix, output_par);
       if (sts == GSX__NEXTPAR)
         return GSX__SWINDERR;
       if (EVEN(sts))
         return sts;
-    } else if (par_type == PAR_INPUT) {
-      sts = gcg_get_inputstring(&gcgctx, output_node, &output_bodydef,
-          &output_attrref, &output_type, &output_prefix, output_par);
+    }
+    else if (par_type == PAR_INPUT)
+    {
+      sts = gcg_get_inputstring(&gcgctx, output_node, &output_bodydef, &output_attrref, &output_type,
+                                &output_prefix, output_par);
       if (sts == GSX__NEXTPAR)
         return GSX__SWINDERR;
       if (EVEN(sts))
         return sts;
-    } else
+    }
+    else
       return GSX__SWINDERR;
 
     /* Get the name of the node */
-    sts = ldh_AttrRefToName(
-        gcgctx.ldhses, &output_attrref, ldh_eName_Hierarchy, &name, &size);
+    sts = ldh_AttrRefToName(gcgctx.ldhses, &output_attrref, ldh_eName_Hierarchy, &name, &size);
     if (EVEN(sts))
       return sts;
 
@@ -1285,7 +1349,9 @@ static int gcg_get_connected_par_close(vldh_t_node node, unsigned long point,
       return sts;
 
     *conn_node = output_node;
-  } else {
+  }
+  else
+  {
     /* No output and no input found */
     return GSX__NOTCON;
   }
@@ -1293,30 +1359,29 @@ static int gcg_get_connected_par_close(vldh_t_node node, unsigned long point,
 }
 
 /*************************************************************************
-*
-* Name:		gcg_get_debug()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* vldh_t_node	node		I	vldh node.
-* char		*debug_parname	I	pgmname of debug parameter.
-* char		*conn_obj	I	name of object associated with debugpar.
-* char		*conn_par	I	name of the parameter.
-*
-* Description:
-*	Return the object and parameter for the debugparameter in
-*	graphbody.
-*	First parameter refered to by the debugpar is identified.
-*	Then the object and parameter is fetched with the routine
-*	gcg_get_outputstring and the pgmname return by this routine
-*	is converted to parametername.
-*
-*
-**************************************************************************/
+ *
+ * Name:		gcg_get_debug()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * vldh_t_node	node		I	vldh node.
+ * char		*debug_parname	I	pgmname of debug parameter.
+ * char		*conn_obj	I	name of object associated with debugpar.
+ * char		*conn_par	I	name of the parameter.
+ *
+ * Description:
+ *	Return the object and parameter for the debugparameter in
+ *	graphbody.
+ *	First parameter refered to by the debugpar is identified.
+ *	Then the object and parameter is fetched with the routine
+ *	gcg_get_outputstring and the pgmname return by this routine
+ *	is converted to parametername.
+ *
+ *
+ **************************************************************************/
 
-int gcg_get_debug(vldh_t_node node, char* debug_parname, char* conn_obj,
-    char* conn_par, pwr_eType* par_type)
+int gcg_get_debug(vldh_t_node node, char* debug_parname, char* conn_obj, char* conn_par, pwr_eType* par_type)
 {
   gcg_t_ctx gcgctx;
   char* name;
@@ -1343,18 +1408,19 @@ int gcg_get_debug(vldh_t_node node, char* debug_parname, char* conn_obj,
   debug_par[pos] = '\0';
 
   /* Get the parameter index */
-  sts = ldh_GetObjectBodyDef(
-      gcgctx.ldhses, node->ln.cid, "RtBody", 1, &bodydef, &rows);
-  if (EVEN(sts)) {
+  sts = ldh_GetObjectBodyDef(gcgctx.ldhses, node->ln.cid, "RtBody", 1, &bodydef, &rows);
+  if (EVEN(sts))
+  {
     /* This is a development node, get the development body instead */
-    sts = ldh_GetObjectBodyDef(
-        gcgctx.ldhses, node->ln.cid, "DevBody", 1, &bodydef, &rows);
+    sts = ldh_GetObjectBodyDef(gcgctx.ldhses, node->ln.cid, "DevBody", 1, &bodydef, &rows);
     if (EVEN(sts))
       return sts;
   }
   found = 0;
-  for (i = 0; i < rows; i++) {
-    if (streq(debug_par, bodydef[i].ParName)) {
+  for (i = 0; i < rows; i++)
+  {
+    if (streq(debug_par, bodydef[i].ParName))
+    {
       found = 1;
       par_index = i;
       break;
@@ -1367,8 +1433,8 @@ int gcg_get_debug(vldh_t_node node, char* debug_parname, char* conn_obj,
   memcpy(&debug_bodydef, &(bodydef[par_index]), sizeof(debug_bodydef));
   free((char*)bodydef);
 
-  sts = gcg_get_outputstring(&gcgctx, node, &debug_bodydef, &output_attrref,
-      &output_type, &output_prefix, output_par);
+  sts = gcg_get_outputstring(&gcgctx, node, &debug_bodydef, &output_attrref, &output_type, &output_prefix,
+                             output_par);
   if (sts == GSX__NEXTPAR)
     return GSX__SWINDERR;
   if (EVEN(sts))
@@ -1378,8 +1444,7 @@ int gcg_get_debug(vldh_t_node node, char* debug_parname, char* conn_obj,
   // output_par[pos] = '\0';
 
   /* Get the name of the node */
-  sts = ldh_AttrRefToName(
-      gcgctx.ldhses, &output_attrref, cdh_mNName, &name, &size);
+  sts = ldh_AttrRefToName(gcgctx.ldhses, &output_attrref, cdh_mNName, &name, &size);
   if (EVEN(sts))
     return sts;
 
@@ -1399,31 +1464,31 @@ int gcg_get_debug(vldh_t_node node, char* debug_parname, char* conn_obj,
 }
 
 /*************************************************************************
-*
-* Name:		gcg_get_debug_virtual()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* vldh_t_node	node		I	vldh node.
-* char		*debug_parname	I	pgmname of debug parameter.
-* char		*conn_obj	I	name of object associated with debugpar.
-* char		*conn_par	I	name of the parameter.
-*
-* Description:
-*	Return the object and parameter for the debugparameter in
-*	graphbody for a debugparameter which is a mask RTVIRTUAL
-*	$Input.
-*	For this type of object the object and parameter to
-*	debug is the one the debugparameter is connected to by a
-*	vldh connection.
-*	First the parameter and the connection point of this parameter is
-*	identified. Then a output connected to this point is returned.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_get_debug_virtual()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * vldh_t_node	node		I	vldh node.
+ * char		*debug_parname	I	pgmname of debug parameter.
+ * char		*conn_obj	I	name of object associated with debugpar.
+ * char		*conn_par	I	name of the parameter.
+ *
+ * Description:
+ *	Return the object and parameter for the debugparameter in
+ *	graphbody for a debugparameter which is a mask RTVIRTUAL
+ *	$Input.
+ *	For this type of object the object and parameter to
+ *	debug is the one the debugparameter is connected to by a
+ *	vldh connection.
+ *	First the parameter and the connection point of this parameter is
+ *	identified. Then a output connected to this point is returned.
+ *
+ **************************************************************************/
 
-int gcg_get_debug_virtual(vldh_t_node node, char* debug_parname, char* conn_obj,
-    char* conn_par, pwr_eType* par_type, int* par_inverted)
+int gcg_get_debug_virtual(vldh_t_node node, char* debug_parname, char* conn_obj, char* conn_par,
+                          pwr_eType* par_type, int* par_inverted)
 {
   gcg_t_ctx gcgctx;
   int i, sts;
@@ -1446,14 +1511,15 @@ int gcg_get_debug_virtual(vldh_t_node node, char* debug_parname, char* conn_obj,
   debug_par[pos] = '\0';
 
   /* Get the parameter index */
-  sts = ldh_GetObjectBodyDef(
-      gcgctx.ldhses, node->ln.cid, "RtBody", 1, &bodydef, &rows);
+  sts = ldh_GetObjectBodyDef(gcgctx.ldhses, node->ln.cid, "RtBody", 1, &bodydef, &rows);
   if (EVEN(sts))
     return sts;
 
   found = 0;
-  for (i = 0; i < rows; i++) {
-    if (streq(debug_par, bodydef[i].ParName)) {
+  for (i = 0; i < rows; i++)
+  {
+    if (streq(debug_par, bodydef[i].ParName))
+    {
       found = 1;
       par_index = i;
       break;
@@ -1472,8 +1538,7 @@ int gcg_get_debug_virtual(vldh_t_node node, char* debug_parname, char* conn_obj,
   *par_inverted = inverted;
 
   /* Get the connected output */
-  sts = gcg_get_connected_parameter(
-      node, point, &conn_node, conn_obj, conn_par);
+  sts = gcg_get_connected_parameter(node, point, &conn_node, conn_obj, conn_par);
   if (EVEN(sts))
     return sts;
 
@@ -1481,24 +1546,23 @@ int gcg_get_debug_virtual(vldh_t_node node, char* debug_parname, char* conn_obj,
 }
 
 /*************************************************************************
-*
-* Name:		gcg_parname_to_pgmname()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext ldhses		I	ldh session.
-* pwr_tObjid	cid		I	class.
-* char		*parname	I	parameter name.
-* char		*pgmname	O	pgm name.
-*
-* Description:
-*	Converts a parametername to a pgmname.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_parname_to_pgmname()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext ldhses		I	ldh session.
+ * pwr_tObjid	cid		I	class.
+ * char		*parname	I	parameter name.
+ * char		*pgmname	O	pgm name.
+ *
+ * Description:
+ *	Converts a parametername to a pgmname.
+ *
+ **************************************************************************/
 
-static int gcg_parname_to_pgmname(
-    ldh_tSesContext ldhses, pwr_tClassId cid, char* parname, char* pgmname)
+static int gcg_parname_to_pgmname(ldh_tSesContext ldhses, pwr_tClassId cid, char* parname, char* pgmname)
 {
   ldh_sParDef* bodydef;
   int rows;
@@ -1509,10 +1573,12 @@ static int gcg_parname_to_pgmname(
 
   /* Get the parameter index */
   sts = ldh_GetObjectBodyDef(ldhses, cid, "RtBody", 1, &bodydef, &rows);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     /* This is a development node, get the development body instead */
     sts = ldh_GetObjectBodyDef(ldhses, cid, "DevBody", 1, &bodydef, &rows);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       /* This is a system node, get the system body instead */
       sts = ldh_GetObjectBodyDef(ldhses, cid, "SysBody", 1, &bodydef, &rows);
       if (EVEN(sts))
@@ -1521,22 +1587,27 @@ static int gcg_parname_to_pgmname(
   }
   /* If the pgmname contains an index, store the index */
   s = strchr(parname, '[');
-  if (s != 0) {
+  if (s != 0)
+  {
     strcpy(indexstr, s);
     *s = 0;
-  } else
+  }
+  else
     strcpy(indexstr, "");
 
   found = 0;
-  for (i = 0; i < rows; i++) {
+  for (i = 0; i < rows; i++)
+  {
     s = bodydef[i].ParName;
     strcpy(superstr, "");
-    while (str_StartsWith(s, "Super.")) {
+    while (str_StartsWith(s, "Super."))
+    {
       strcat(superstr, "Super.");
       s += 6;
     }
 
-    if (streq(parname, s)) {
+    if (streq(parname, s))
+    {
       found = 1;
       par_index = i;
       break;
@@ -1557,24 +1628,23 @@ static int gcg_parname_to_pgmname(
 }
 
 /*************************************************************************
-*
-* Name:		gcg_pgmname_to_parname()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext ldhses		I	ldh session.
-* pwr_tClassId	cid		I	class.
-* char		*pgmname	I	pgmname.
-* char		*parname	O	parameter name.
-*
-* Description:
-*	Converts a pgmname to a parametername.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_pgmname_to_parname()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext ldhses		I	ldh session.
+ * pwr_tClassId	cid		I	class.
+ * char		*pgmname	I	pgmname.
+ * char		*parname	O	parameter name.
+ *
+ * Description:
+ *	Converts a pgmname to a parametername.
+ *
+ **************************************************************************/
 
-static int gcg_pgmname_to_parname(
-    ldh_tSesContext ldhses, pwr_tClassId cid, char* pgmname, char* parname)
+static int gcg_pgmname_to_parname(ldh_tSesContext ldhses, pwr_tClassId cid, char* pgmname, char* parname)
 {
   ldh_sParDef* bodydef;
   int rows;
@@ -1588,7 +1658,8 @@ static int gcg_pgmname_to_parname(
 
   /* Get the parameter index */
   sts = ldh_GetObjectBodyDef(ldhses, cid, "RtBody", 1, &bodydef, &rows);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     /* This is a development node, get the development body instead */
     sts = ldh_GetObjectBodyDef(ldhses, cid, "DevBody", 1, &bodydef, &rows);
     if (EVEN(sts))
@@ -1596,15 +1667,19 @@ static int gcg_pgmname_to_parname(
   }
   /* If the pgmname contains an index, store the index */
   s = strchr(pname, '[');
-  if (s != 0) {
+  if (s != 0)
+  {
     strcpy(indexstr, s);
     *s = 0;
-  } else
+  }
+  else
     strcpy(indexstr, "");
 
   found = 0;
-  for (i = 0; i < rows; i++) {
-    if (streq(pname, bodydef[i].Par->Param.Info.PgmName)) {
+  for (i = 0; i < rows; i++)
+  {
+    if (streq(pname, bodydef[i].Par->Param.Info.PgmName))
+    {
       found = 1;
       par_index = i;
       break;
@@ -1626,33 +1701,35 @@ static int gcg_pgmname_to_parname(
 }
 
 /*************************************************************************
-*
-* Name:		gcg_wind_comp_all()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* unsigned long	ldhwb		I	ldh workbench.
-* ldh_tSesContext ldhses		I	ldh session.
-* unsigned long	window		I	vldh window.
-* unsigned long	codetype	I	generate code or syntax control only.
-* unsigned long	modified	I	only modified windows will be compiled.
-*
-* Description:
-*	Compile the window and all subwindows.
-*	This routine fetches all subwindows to the window.
-*	Every window is loaded to vldh and compiled.
-*	The plc is also loaded and compiled.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_wind_comp_all()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * unsigned long	ldhwb		I	ldh workbench.
+ * ldh_tSesContext ldhses		I	ldh session.
+ * unsigned long	window		I	vldh window.
+ * unsigned long	codetype	I	generate code or syntax control only.
+ * unsigned long	modified	I	only modified windows will be compiled.
+ *
+ * Description:
+ *	Compile the window and all subwindows.
+ *	This routine fetches all subwindows to the window.
+ *	Every window is loaded to vldh and compiled.
+ *	The plc is also loaded and compiled.
+ *
+ **************************************************************************/
 
-static pwr_tBoolean IsWindowLoaded(vldh_t_wind loaded_windlist[],
-    int loaded_windcount, pwr_tObjid object, vldh_t_wind* wind)
+static pwr_tBoolean IsWindowLoaded(vldh_t_wind loaded_windlist[], int loaded_windcount, pwr_tObjid object,
+                                   vldh_t_wind* wind)
 {
   int i;
 
-  for (i = 0; i < loaded_windcount; i++) {
-    if (cdh_ObjidIsEqual(loaded_windlist[i]->lw.oid, object)) {
+  for (i = 0; i < loaded_windcount; i++)
+  {
+    if (cdh_ObjidIsEqual(loaded_windlist[i]->lw.oid, object))
+    {
       *wind = loaded_windlist[i];
       return 1;
     }
@@ -1660,9 +1737,8 @@ static pwr_tBoolean IsWindowLoaded(vldh_t_wind loaded_windlist[],
   return 0;
 }
 
-int gcg_wind_comp_all(ldh_tWBContext ldhwb, ldh_tSesContext ldhses,
-    pwr_tObjid window, unsigned long codetype, int modified, int debug,
-    int skip_plc)
+int gcg_wind_comp_all(ldh_tWBContext ldhwb, ldh_tSesContext ldhses, pwr_tObjid window, unsigned long codetype,
+                      int modified, int debug, int skip_plc)
 {
   pwr_tObjid* windlist;
   unsigned long wind_count;
@@ -1696,21 +1772,26 @@ int gcg_wind_comp_all(ldh_tWBContext ldhwb, ldh_tSesContext ldhses,
 
   wind_compiled = 0;
   windlist_ptr = windlist;
-  for (j = 0; j < (int)wind_count; j++) {
+  for (j = 0; j < (int)wind_count; j++)
+  {
     /* Check that the window still exist, if Func subwindow it has
        been replaced and has already been compiled during parent window
        compilation */
     sts = ldh_GetParent(ldhses, *windlist_ptr, &parent);
-    if (sts == LDH__NOSUCHOBJ) {
+    if (sts == LDH__NOSUCHOBJ)
+    {
       windlist_ptr++;
       continue;
-    } else if (EVEN(sts))
+    }
+    else if (EVEN(sts))
       goto error;
 
     /* Check if this window is modified */
-    if (modified && !force) {
+    if (modified && !force)
+    {
       sts = gcg_wind_check_modification(ldhses, *windlist_ptr);
-      if (sts == GSX__COMPILEPARENT) {
+      if (sts == GSX__COMPILEPARENT)
+      {
         // Rewind to parent, and force parent to compile
         pwr_tOid parent_window;
 
@@ -1718,8 +1799,10 @@ int gcg_wind_comp_all(ldh_tWBContext ldhwb, ldh_tSesContext ldhses,
         if (EVEN(sts))
           goto error;
 
-        for (int k = 0; k < j; k++) {
-          if (cdh_ObjidIsEqual(windlist[k], parent_window)) {
+        for (int k = 0; k < j; k++)
+        {
+          if (cdh_ObjidIsEqual(windlist[k], parent_window))
+          {
             j = k - 1;
             windlist_ptr = &windlist[k];
             force = true;
@@ -1728,7 +1811,9 @@ int gcg_wind_comp_all(ldh_tWBContext ldhwb, ldh_tSesContext ldhses,
         }
         if (force)
           continue;
-      } else if (ODD(sts)) {
+      }
+      else if (ODD(sts))
+      {
         /* This object is ok, take the next one */
         windlist_ptr++;
         continue;
@@ -1741,36 +1826,39 @@ int gcg_wind_comp_all(ldh_tWBContext ldhwb, ldh_tSesContext ldhses,
 
     /* Check if the plcpgm is loaded in vldh */
     sts = vldh_get_plc_objdid(*(parentlist + parent_count - 1), &plc);
-    if (sts == VLDH__OBJNOTFOUND) {
+    if (sts == VLDH__OBJNOTFOUND)
+    {
       /* Load the plcpgm */
-      sts = vldh_plc_load(
-          *(parentlist + parent_count - 1), ldhwb, ldhses, &plc);
-    } else if (EVEN(sts))
+      sts = vldh_plc_load(*(parentlist + parent_count - 1), ldhwb, ldhses, &plc);
+    }
+    else if (EVEN(sts))
       goto error;
 
-    for (i = parent_count - 2; i >= 0; i -= 2) {
+    for (i = parent_count - 2; i >= 0; i -= 2)
+    {
       /* Check if this window is loaded */
-      if (!IsWindowLoaded(
-              loaded_windlist, loaded_windcount, *(parentlist + i), &wind)) {
+      if (!IsWindowLoaded(loaded_windlist, loaded_windcount, *(parentlist + i), &wind))
+      {
         sts = vldh_get_wind_objdid(*(parentlist + i), &wind);
-        if (sts == VLDH__OBJNOTFOUND) {
+        if (sts == VLDH__OBJNOTFOUND)
+        {
           /* Load the window */
-          if (i == (int)(parent_count - 2)) {
+          if (i == (int)(parent_count - 2))
+          {
             /* This is the child to the plc */
-            sts = vldh_wind_load(plc, 0, *(parentlist + i), 0, &wind,
-                ldh_eAccess_SharedReadWrite);
+            sts = vldh_wind_load(plc, 0, *(parentlist + i), 0, &wind, ldh_eAccess_SharedReadWrite);
             if (EVEN(sts))
               goto error;
             plc->hp.wind = wind;
-          } else {
+          }
+          else
+          {
             /* Get the parent vldhnode */
-            sts = vldh_get_node_objdid(
-                *(parentlist + i + 1), parentwind, &node);
+            sts = vldh_get_node_objdid(*(parentlist + i + 1), parentwind, &node);
             if (EVEN(sts))
               goto error;
 
-            sts = vldh_wind_load(plc, node, *(parentlist + i), 0, &wind,
-                ldh_eAccess_SharedReadWrite);
+            sts = vldh_wind_load(plc, node, *(parentlist + i), 0, &wind, ldh_eAccess_SharedReadWrite);
             if (EVEN(sts))
               goto error;
           }
@@ -1782,28 +1870,32 @@ int gcg_wind_comp_all(ldh_tWBContext ldhwb, ldh_tSesContext ldhses,
           *(loaded_list + loaded_windcount) = 1;
           loaded_windcount++;
         }
-      } else if (EVEN(sts))
+      }
+      else if (EVEN(sts))
         goto error;
 
       parentwind = wind;
     }
     /* Load the last window */
     /* Check if this window is loaded */
-    if (!IsWindowLoaded(
-            loaded_windlist, loaded_windcount, *windlist_ptr, &wind)) {
-      if (parent_count == 1) {
+    if (!IsWindowLoaded(loaded_windlist, loaded_windcount, *windlist_ptr, &wind))
+    {
+      if (parent_count == 1)
+      {
         /* This is the child to the plc */
         sts = vldh_get_wind_objdid(*windlist_ptr, &wind);
-        if (sts == VLDH__OBJNOTFOUND) {
-          sts = vldh_wind_load(
-              plc, 0, *windlist_ptr, 0, &wind, ldh_eAccess_SharedReadWrite);
+        if (sts == VLDH__OBJNOTFOUND)
+        {
+          sts = vldh_wind_load(plc, 0, *windlist_ptr, 0, &wind, ldh_eAccess_SharedReadWrite);
           if (EVEN(sts))
             goto error;
           plc->hp.wind = wind;
 
           sts = vldh_wind_load_all(wind);
           *(loaded_list + loaded_windcount) = 1;
-        } else {
+        }
+        else
+        {
           ldh_sSessInfo info;
 
           sts = ldh_GetSessionInfo(wind->hw.ldhses, &info);
@@ -1817,22 +1909,26 @@ int gcg_wind_comp_all(ldh_tWBContext ldhwb, ldh_tSesContext ldhses,
           if (EVEN(sts))
             goto error;
         }
-      } else {
+      }
+      else
+      {
         /* Get the parent vldhnode */
         sts = vldh_get_node_objdid(*parentlist, parentwind, &node);
         if (EVEN(sts))
           goto error;
 
         sts = vldh_get_wind_objdid(*windlist_ptr, &wind);
-        if (sts == VLDH__OBJNOTFOUND) {
-          sts = vldh_wind_load(
-              plc, node, *windlist_ptr, 0, &wind, ldh_eAccess_SharedReadWrite);
+        if (sts == VLDH__OBJNOTFOUND)
+        {
+          sts = vldh_wind_load(plc, node, *windlist_ptr, 0, &wind, ldh_eAccess_SharedReadWrite);
           if (EVEN(sts))
             goto error;
           *(loaded_list + loaded_windcount) = 1;
 
           sts = vldh_wind_load_all(wind);
-        } else {
+        }
+        else
+        {
           ldh_sSessInfo info;
 
           sts = ldh_GetSessionInfo(wind->hw.ldhses, &info);
@@ -1855,12 +1951,13 @@ int gcg_wind_comp_all(ldh_tWBContext ldhwb, ldh_tSesContext ldhses,
     }
 
     /* Compile the window */
-    sts = gcg_plcwindow_compile(
-        wind, codetype, &errorcount, &warningcount, 1, debug);
-    if (sts == GSX__PLCWIND_ERRORS || sts == GSX__AMBIGOUS_EXECUTEORDER) {
+    sts = gcg_plcwindow_compile(wind, codetype, &errorcount, &warningcount, 1, debug);
+    if (sts == GSX__PLCWIND_ERRORS || sts == GSX__AMBIGOUS_EXECUTEORDER)
+    {
       /* continue */
       sumsts = sts;
-    } else if (EVEN(sts))
+    }
+    else if (EVEN(sts))
       goto error;
     else
       wind_compiled = 1;
@@ -1872,33 +1969,42 @@ int gcg_wind_comp_all(ldh_tWBContext ldhwb, ldh_tSesContext ldhses,
   /* Compile the plc */
 
   /* FIX, the plc is unloaded by the Func objects, load it again... */
-  if (parent_count) {
+  if (parent_count)
+  {
     sts = vldh_get_plc_objdid(*(parentlist + parent_count - 1), &plc);
-    if (sts == VLDH__OBJNOTFOUND) {
+    if (sts == VLDH__OBJNOTFOUND)
+    {
       /* Load the plcpgm */
-      sts = vldh_plc_load(
-          *(parentlist + parent_count - 1), ldhwb, ldhses, &plc);
-    } else if (EVEN(sts))
+      sts = vldh_plc_load(*(parentlist + parent_count - 1), ldhwb, ldhses, &plc);
+    }
+    else if (EVEN(sts))
       goto error;
   }
   /* End of FIX */
 
-  if (wind_compiled && !skip_plc) {
+  if (wind_compiled && !skip_plc)
+  {
     sts = gcg_plc_compile(plc, codetype, &errorcount, &warningcount, 1, debug);
-    if (sts == GSX__PLCPGM_ERRORS) {
+    if (sts == GSX__PLCPGM_ERRORS)
+    {
       /* continue */
       sumsts = sts;
-    } else if (EVEN(sts))
+    }
+    else if (EVEN(sts))
       goto error;
   }
 
   /* Unload the loaded windows */
-  for (i = 0; i < loaded_windcount; i++) {
-    if (*(loaded_list + loaded_windcount - i - 1)) {
+  for (i = 0; i < loaded_windcount; i++)
+  {
+    if (*(loaded_list + loaded_windcount - i - 1))
+    {
       sts = vldh_wind_quit_all(*(loaded_windlist + loaded_windcount - i - 1));
       if (EVEN(sts))
         goto error;
-    } else {
+    }
+    else
+    {
       ldh_sSessInfo info;
 
       wind = loaded_windlist[loaded_windcount - i - 1];
@@ -1907,7 +2013,8 @@ int gcg_wind_comp_all(ldh_tWBContext ldhwb, ldh_tSesContext ldhses,
       if (EVEN(sts))
         goto error;
 
-      if (!info.Empty) {
+      if (!info.Empty)
+      {
         sts = ldh_RevertSession(wind->hw.ldhses);
         if (EVEN(sts))
           goto error;
@@ -1933,36 +2040,35 @@ error:
 }
 
 /*************************************************************************
-*
-* Name:		gcg_get_output()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* vldh_t_node	node		I	vldh node.
-* unsigned long	point		I	connectionpoint on node.
-* unsigned long	*output_count	O	number of found connected outputs
-* vldh_t_node	*output_node	O	found node connected with an output
-*					(last node).
-* unsigned long	*output_point	O	output connectionpoint on output_node
-* ldh_sParDef 	*output_bodydef	O	bodydef of the corresponding parameter
-*					of output_point.
-*
-* Description:
-*	The routine searches though all connected nodes connected
-*	to a connectionpoint on a node, looking for an output.
-*	The output is returned (node, connectionpoint and corresponding
-*	parameter) and the number of found outputs.
-*	Normally if this routine is called only one output is expected
-*	and more than one is an error.
-*	If more than one outputs is found the last one is returned.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_get_output()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * vldh_t_node	node		I	vldh node.
+ * unsigned long	point		I	connectionpoint on node.
+ * unsigned long	*output_count	O	number of found connected outputs
+ * vldh_t_node	*output_node	O	found node connected with an output
+ *					(last node).
+ * unsigned long	*output_point	O	output connectionpoint on output_node
+ * ldh_sParDef 	*output_bodydef	O	bodydef of the corresponding parameter
+ *					of output_point.
+ *
+ * Description:
+ *	The routine searches though all connected nodes connected
+ *	to a connectionpoint on a node, looking for an output.
+ *	The output is returned (node, connectionpoint and corresponding
+ *	parameter) and the number of found outputs.
+ *	Normally if this routine is called only one output is expected
+ *	and more than one is an error.
+ *	If more than one outputs is found the last one is returned.
+ *
+ **************************************************************************/
 
-int gcg_get_output(vldh_t_node node, unsigned long point,
-    unsigned long* output_count, vldh_t_node* output_node,
-    unsigned long* output_point, ldh_sParDef* output_bodydef,
-    unsigned long conmask)
+int gcg_get_output(vldh_t_node node, unsigned long point, unsigned long* output_count,
+                   vldh_t_node* output_node, unsigned long* output_point, ldh_sParDef* output_bodydef,
+                   unsigned long conmask)
 {
   unsigned long point_count;
   vldh_t_conpoint* pointlist;
@@ -1978,30 +2084,31 @@ int gcg_get_output(vldh_t_node node, unsigned long point,
   gcg_get_conpoint_nodes(node, point, &point_count, &pointlist, conmask);
 
   *output_count = 0;
-  for (k = 1; k < (int)point_count; k++) {
+  for (k = 1; k < (int)point_count; k++)
+  {
     next_node = (pointlist + k)->node;
     next_point = (pointlist + k)->conpoint;
-    sts = goen_get_parameter(next_node->ln.cid, (next_node->hn.wind)->hw.ldhses,
-        next_node->ln.mask, next_point, &next_par_type, &next_par_inverted,
-        &next_par_index);
+    sts = goen_get_parameter(next_node->ln.cid, (next_node->hn.wind)->hw.ldhses, next_node->ln.mask,
+                             next_point, &next_par_type, &next_par_inverted, &next_par_index);
     if (EVEN(sts))
       return sts;
 
-    if (next_par_type == PAR_OUTPUT) {
+    if (next_par_type == PAR_OUTPUT)
+    {
       (*output_count)++;
       *output_node = (pointlist + k)->node;
       *output_point = (pointlist + k)->conpoint;
-      sts = ldh_GetObjectBodyDef((next_node->hn.wind)->hw.ldhses,
-          next_node->ln.cid, "RtBody", 1, &bodydef, &rows);
-      if (EVEN(sts)) {
+      sts = ldh_GetObjectBodyDef((next_node->hn.wind)->hw.ldhses, next_node->ln.cid, "RtBody", 1, &bodydef,
+                                 &rows);
+      if (EVEN(sts))
+      {
         /* This is a development node, get the development body instead */
-        sts = ldh_GetObjectBodyDef((next_node->hn.wind)->hw.ldhses,
-            next_node->ln.cid, "DevBody", 1, &bodydef, &rows);
+        sts = ldh_GetObjectBodyDef((next_node->hn.wind)->hw.ldhses, next_node->ln.cid, "DevBody", 1, &bodydef,
+                                   &rows);
         if (EVEN(sts))
           return sts;
       }
-      memcpy(
-          output_bodydef, &(bodydef[next_par_index]), sizeof(*output_bodydef));
+      memcpy(output_bodydef, &(bodydef[next_par_index]), sizeof(*output_bodydef));
       free((char*)bodydef);
     }
   }
@@ -2011,36 +2118,35 @@ int gcg_get_output(vldh_t_node node, unsigned long point,
 }
 
 /*************************************************************************
-*
-* Name:		gcg_get_par_close()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* vldh_t_node	node		I	vldh node.
-* unsigned long	point		I	connectionpoint on node.
-* unsigned long	*output_count	O	number of found connected outputs
-* vldh_t_node	*output_node	O	found node connected with an output
-*					(last node).
-* unsigned long	*output_point	O	output connectionpoint on output_node
-* ldh_sParDef 	*output_bodydef	O	bodydef of the corresponding parameter
-*					of output_point.
-*
-* Description:
-*	The routine searches though all connected nodes connected
-*	to a connectionpoint on a node, looking for an output.
-*	The output is returned (node, connectionpoint and corresponding
-*	parameter) and the number of found outputs.
-*	Normally if this routine is called only one output is expected
-*	and more than one is an error.
-*	If more than one outputs is found the last one is returned.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_get_par_close()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * vldh_t_node	node		I	vldh node.
+ * unsigned long	point		I	connectionpoint on node.
+ * unsigned long	*output_count	O	number of found connected outputs
+ * vldh_t_node	*output_node	O	found node connected with an output
+ *					(last node).
+ * unsigned long	*output_point	O	output connectionpoint on output_node
+ * ldh_sParDef 	*output_bodydef	O	bodydef of the corresponding parameter
+ *					of output_point.
+ *
+ * Description:
+ *	The routine searches though all connected nodes connected
+ *	to a connectionpoint on a node, looking for an output.
+ *	The output is returned (node, connectionpoint and corresponding
+ *	parameter) and the number of found outputs.
+ *	Normally if this routine is called only one output is expected
+ *	and more than one is an error.
+ *	If more than one outputs is found the last one is returned.
+ *
+ **************************************************************************/
 
-static int gcg_get_par_close(vldh_t_node node, unsigned long point,
-    unsigned long* output_count, vldh_t_node* output_node,
-    unsigned long* output_point, ldh_sParDef* output_bodydef,
-    unsigned long conmask, unsigned long* par_type)
+static int gcg_get_par_close(vldh_t_node node, unsigned long point, unsigned long* output_count,
+                             vldh_t_node* output_node, unsigned long* output_point,
+                             ldh_sParDef* output_bodydef, unsigned long conmask, unsigned long* par_type)
 {
   unsigned long point_count;
   vldh_t_conpoint* pointlist;
@@ -2053,13 +2159,13 @@ static int gcg_get_par_close(vldh_t_node node, unsigned long point,
   ldh_sParDef* bodydef;
   int rows;
 
-  sts = vldh_get_conpoint_nodes_close(
-      node, point, &point_count, &pointlist, conmask);
+  sts = vldh_get_conpoint_nodes_close(node, point, &point_count, &pointlist, conmask);
   if (EVEN(sts))
     return sts;
 
   *output_count = point_count - 1;
-  if (*output_count == 0) {
+  if (*output_count == 0)
+  {
     /* Nothing connected */
     if (point_count > 0)
       free((char*)pointlist);
@@ -2070,21 +2176,21 @@ static int gcg_get_par_close(vldh_t_node node, unsigned long point,
 
   next_node = (pointlist + k)->node;
   next_point = (pointlist + k)->conpoint;
-  sts = goen_get_parameter(next_node->ln.cid, (next_node->hn.wind)->hw.ldhses,
-      next_node->ln.mask, next_point, &next_par_type, &next_par_inverted,
-      &next_par_index);
+  sts = goen_get_parameter(next_node->ln.cid, (next_node->hn.wind)->hw.ldhses, next_node->ln.mask, next_point,
+                           &next_par_type, &next_par_inverted, &next_par_index);
   if (EVEN(sts))
     return sts;
 
   *par_type = next_par_type;
   *output_node = (pointlist + k)->node;
   *output_point = (pointlist + k)->conpoint;
-  sts = ldh_GetObjectBodyDef((next_node->hn.wind)->hw.ldhses, next_node->ln.cid,
-      "RtBody", 1, &bodydef, &rows);
-  if (EVEN(sts)) {
+  sts =
+      ldh_GetObjectBodyDef((next_node->hn.wind)->hw.ldhses, next_node->ln.cid, "RtBody", 1, &bodydef, &rows);
+  if (EVEN(sts))
+  {
     /* This is a development node, get the development body instead */
-    sts = ldh_GetObjectBodyDef((next_node->hn.wind)->hw.ldhses,
-        next_node->ln.cid, "DevBody", 1, &bodydef, &rows);
+    sts = ldh_GetObjectBodyDef((next_node->hn.wind)->hw.ldhses, next_node->ln.cid, "DevBody", 1, &bodydef,
+                               &rows);
     if (EVEN(sts))
       return sts;
   }
@@ -2096,36 +2202,35 @@ static int gcg_get_par_close(vldh_t_node node, unsigned long point,
 }
 
 /*************************************************************************
-*
-* Name:		gcg_get_output()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* vldh_t_node	node		I	vldh node.
-* unsigned long	point		I	connectionpoint on node.
-* unsigned long	*output_count	O	number of found connected inputs
-* vldh_t_node	*output_node	O	found node connected with an input
-*					(last node).
-* unsigned long	*output_point	O	input connectionpoint on output_node
-* ldh_sParDef 	*output_bodydef	O	bodydef of the corresponding parameter
-*					of output_point.
-*
-* Description:
-*	The routine searches though all connected nodes connected
-*	to a connectionpoint on a node, looking for an input.
-*	The input is returned (node, connectionpoint and corresponding
-*	parameter) and the number of found inputs.
-*	Normally if this routine is called only one input is expected
-*	and more than one is an error.
-*	If more than one inputs is found the last one is returned.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_get_output()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * vldh_t_node	node		I	vldh node.
+ * unsigned long	point		I	connectionpoint on node.
+ * unsigned long	*output_count	O	number of found connected inputs
+ * vldh_t_node	*output_node	O	found node connected with an input
+ *					(last node).
+ * unsigned long	*output_point	O	input connectionpoint on output_node
+ * ldh_sParDef 	*output_bodydef	O	bodydef of the corresponding parameter
+ *					of output_point.
+ *
+ * Description:
+ *	The routine searches though all connected nodes connected
+ *	to a connectionpoint on a node, looking for an input.
+ *	The input is returned (node, connectionpoint and corresponding
+ *	parameter) and the number of found inputs.
+ *	Normally if this routine is called only one input is expected
+ *	and more than one is an error.
+ *	If more than one inputs is found the last one is returned.
+ *
+ **************************************************************************/
 
-static int gcg_get_input(vldh_t_node node, unsigned long point,
-    unsigned long* output_count, vldh_t_node* output_node,
-    unsigned long* output_point, ldh_sParDef* output_bodydef,
-    unsigned long conmask)
+static int gcg_get_input(vldh_t_node node, unsigned long point, unsigned long* output_count,
+                         vldh_t_node* output_node, unsigned long* output_point, ldh_sParDef* output_bodydef,
+                         unsigned long conmask)
 {
   unsigned long point_count;
   vldh_t_conpoint* pointlist;
@@ -2141,30 +2246,31 @@ static int gcg_get_input(vldh_t_node node, unsigned long point,
   gcg_get_conpoint_nodes(node, point, &point_count, &pointlist, conmask);
 
   *output_count = 0;
-  for (k = 1; k < (int)point_count; k++) {
+  for (k = 1; k < (int)point_count; k++)
+  {
     next_node = (pointlist + k)->node;
     next_point = (pointlist + k)->conpoint;
-    sts = goen_get_parameter(next_node->ln.cid, (next_node->hn.wind)->hw.ldhses,
-        next_node->ln.mask, next_point, &next_par_type, &next_par_inverted,
-        &next_par_index);
+    sts = goen_get_parameter(next_node->ln.cid, (next_node->hn.wind)->hw.ldhses, next_node->ln.mask,
+                             next_point, &next_par_type, &next_par_inverted, &next_par_index);
     if (EVEN(sts))
       return sts;
 
-    if (next_par_type == PAR_INPUT) {
+    if (next_par_type == PAR_INPUT)
+    {
       (*output_count)++;
       *output_node = (pointlist + k)->node;
       *output_point = (pointlist + k)->conpoint;
-      sts = ldh_GetObjectBodyDef((next_node->hn.wind)->hw.ldhses,
-          next_node->ln.cid, "RtBody", 1, &bodydef, &rows);
-      if (EVEN(sts)) {
+      sts = ldh_GetObjectBodyDef((next_node->hn.wind)->hw.ldhses, next_node->ln.cid, "RtBody", 1, &bodydef,
+                                 &rows);
+      if (EVEN(sts))
+      {
         /* This is a development node, get the development body instead */
-        sts = ldh_GetObjectBodyDef((next_node->hn.wind)->hw.ldhses,
-            next_node->ln.cid, "DevBody", 1, &bodydef, &rows);
+        sts = ldh_GetObjectBodyDef((next_node->hn.wind)->hw.ldhses, next_node->ln.cid, "DevBody", 1, &bodydef,
+                                   &rows);
         if (EVEN(sts))
           return sts;
       }
-      memcpy(
-          output_bodydef, &(bodydef[next_par_index]), sizeof(*output_bodydef));
+      memcpy(output_bodydef, &(bodydef[next_par_index]), sizeof(*output_bodydef));
       free((char*)bodydef);
     }
   }
@@ -2174,19 +2280,19 @@ static int gcg_get_input(vldh_t_node node, unsigned long point,
 }
 
 /*************************************************************************
-*
-* Name:		gcg_ctx_new()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	*gcgctx		O	created gcg context
-* vldh_t_wind	wind		I	vldh window.
-*
-* Description:
-*	Create a gcg context for a window.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_ctx_new()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	*gcgctx		O	created gcg context
+ * vldh_t_wind	wind		I	vldh window.
+ *
+ * Description:
+ *	Create a gcg context for a window.
+ *
+ **************************************************************************/
 
 static void gcg_ctx_new(gcg_ctx* gcgctx, vldh_t_wind wind)
 {
@@ -2196,19 +2302,19 @@ static void gcg_ctx_new(gcg_ctx* gcgctx, vldh_t_wind wind)
   (*gcgctx)->wind = wind;
 }
 /*************************************************************************
-*
-* Name:		gcg_ctx_delete()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-*
-* Description:
-*	Delete a context for a window.
-*	Free's all allocated memory in the gcg context.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_ctx_delete()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ *
+ * Description:
+ *	Delete a context for a window.
+ *	Free's all allocated memory in the gcg context.
+ *
+ **************************************************************************/
 
 static void gcg_ctx_delete(gcg_ctx gcgctx)
 {
@@ -2226,21 +2332,21 @@ static void gcg_ctx_delete(gcg_ctx gcgctx)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_ioread_insert()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* pwr_sAttrRef	attrref		I 	attrref of object.
-* char		prefix		I	prefix in pointer name.
-*
-* Description:
-*	Insert objdid for a io-node in the ioread list in gcg context.
-*	Check first that the objdid is not already inserted.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_ioread_insert()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * pwr_sAttrRef	attrref		I 	attrref of object.
+ * char		prefix		I	prefix in pointer name.
+ *
+ * Description:
+ *	Insert objdid for a io-node in the ioread list in gcg context.
+ *	Check first that the objdid is not already inserted.
+ *
+ **************************************************************************/
 
 static int gcg_ioread_insert(gcg_ctx gcgctx, pwr_sAttrRef attrref, char prefix)
 {
@@ -2248,21 +2354,22 @@ static int gcg_ioread_insert(gcg_ctx gcgctx, pwr_sAttrRef attrref, char prefix)
 
   /* Check if the objdid already is inserted */
   found = 0;
-  for (i = 0; i < (int)gcgctx->ioreadcount; i++) {
-    if (cdh_ObjidIsEqual((gcgctx->ioread + i)->attrref.Objid, attrref.Objid)
-        && (gcgctx->ioread + i)->attrref.Offset == attrref.Offset
-        && (gcgctx->ioread + i)->attrref.Size == attrref.Size
-        && (gcgctx->ioread + i)->prefix == prefix) {
+  for (i = 0; i < (int)gcgctx->ioreadcount; i++)
+  {
+    if (cdh_ObjidIsEqual((gcgctx->ioread + i)->attrref.Objid, attrref.Objid) &&
+        (gcgctx->ioread + i)->attrref.Offset == attrref.Offset &&
+        (gcgctx->ioread + i)->attrref.Size == attrref.Size && (gcgctx->ioread + i)->prefix == prefix)
+    {
       found = 1;
       break;
     }
   }
-  if (!found) {
+  if (!found)
+  {
     /* The attrref was not found, insert it */
     /* Increase size of the iolist */
-    sts = utl_realloc((char**)&gcgctx->ioread,
-        gcgctx->ioreadcount * sizeof(gcg_t_areflist),
-        (gcgctx->ioreadcount + 1) * sizeof(gcg_t_areflist));
+    sts = utl_realloc((char**)&gcgctx->ioread, gcgctx->ioreadcount * sizeof(gcg_t_areflist),
+                      (gcgctx->ioreadcount + 1) * sizeof(gcg_t_areflist));
     if (EVEN(sts))
       return sts;
 
@@ -2273,22 +2380,22 @@ static int gcg_ioread_insert(gcg_ctx gcgctx, pwr_sAttrRef attrref, char prefix)
   return GSX__SUCCESS;
 }
 /*************************************************************************
-*
-* Name:		gcg_iowrite_insert()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* pwr_tObjid	objdid		I 	objdid of object.
-* char		prefix		I	prefix in pointer name.
-*
-* Description:
-*	Insert attrref for a io-node in the iowrite list in gcg context.
-*	Check first that the attrref is not already inserted.
-*
-*
-**************************************************************************/
+ *
+ * Name:		gcg_iowrite_insert()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * pwr_tObjid	objdid		I 	objdid of object.
+ * char		prefix		I	prefix in pointer name.
+ *
+ * Description:
+ *	Insert attrref for a io-node in the iowrite list in gcg context.
+ *	Check first that the attrref is not already inserted.
+ *
+ *
+ **************************************************************************/
 
 static int gcg_iowrite_insert(gcg_ctx gcgctx, pwr_sAttrRef attrref, char prefix)
 {
@@ -2296,21 +2403,22 @@ static int gcg_iowrite_insert(gcg_ctx gcgctx, pwr_sAttrRef attrref, char prefix)
 
   /* Check if the objdid already is inserted */
   found = 0;
-  for (i = 0; i < (int)gcgctx->iowritecount; i++) {
-    if (cdh_ObjidIsEqual((gcgctx->iowrite + i)->attrref.Objid, attrref.Objid)
-        && (gcgctx->iowrite + i)->attrref.Offset == attrref.Offset
-        && (gcgctx->iowrite + i)->attrref.Size == attrref.Size
-        && (gcgctx->iowrite + i)->prefix == prefix) {
+  for (i = 0; i < (int)gcgctx->iowritecount; i++)
+  {
+    if (cdh_ObjidIsEqual((gcgctx->iowrite + i)->attrref.Objid, attrref.Objid) &&
+        (gcgctx->iowrite + i)->attrref.Offset == attrref.Offset &&
+        (gcgctx->iowrite + i)->attrref.Size == attrref.Size && (gcgctx->iowrite + i)->prefix == prefix)
+    {
       found = 1;
       break;
     }
   }
-  if (!found) {
+  if (!found)
+  {
     /* The objdid was not found, insert it */
     /* Increase size of the iolist */
-    sts = utl_realloc((char**)&gcgctx->iowrite,
-        gcgctx->iowritecount * sizeof(gcg_t_areflist),
-        (gcgctx->iowritecount + 1) * sizeof(gcg_t_areflist));
+    sts = utl_realloc((char**)&gcgctx->iowrite, gcgctx->iowritecount * sizeof(gcg_t_areflist),
+                      (gcgctx->iowritecount + 1) * sizeof(gcg_t_areflist));
     if (EVEN(sts))
       return sts;
     (gcgctx->iowrite + gcgctx->iowritecount)->attrref = attrref;
@@ -2320,42 +2428,42 @@ static int gcg_iowrite_insert(gcg_ctx gcgctx, pwr_sAttrRef attrref, char prefix)
   return GSX__SUCCESS;
 }
 /*************************************************************************
-*
-* Name:		gcg_ref_insert()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* pwr_tObjid	objdid		I 	objdid of object.
-* char		prefix		I	prefix in pointer name.
-*
-* Description:
-*	Insert objdid for a node in the ref list in gcg context.
-*	Check first that the objdid is not already inserted.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_ref_insert()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * pwr_tObjid	objdid		I 	objdid of object.
+ * char		prefix		I	prefix in pointer name.
+ *
+ * Description:
+ *	Insert objdid for a node in the ref list in gcg context.
+ *	Check first that the objdid is not already inserted.
+ *
+ **************************************************************************/
 
-static int gcg_ref_insert(
-    gcg_ctx gcgctx, pwr_tObjid objdid, char prefix, vldh_t_node node)
+static int gcg_ref_insert(gcg_ctx gcgctx, pwr_tObjid objdid, char prefix, vldh_t_node node)
 {
   int i, found, sts;
 
   /* Check if the objdid already is inserted */
   found = 0;
-  for (i = 0; i < (int)gcgctx->refcount; i++) {
-    if (cdh_ObjidIsEqual((gcgctx->ref + i)->objdid, objdid) &&
-	(gcgctx->ref + i)->prefix == prefix) {
+  for (i = 0; i < (int)gcgctx->refcount; i++)
+  {
+    if (cdh_ObjidIsEqual((gcgctx->ref + i)->objdid, objdid) && (gcgctx->ref + i)->prefix == prefix)
+    {
       found = 1;
       break;
     }
   }
-  if (!found) {
+  if (!found)
+  {
     /* The objdid was not found,
       increase size of the reflist and insert it */
-    sts = utl_realloc((char**)&gcgctx->ref,
-        gcgctx->refcount * sizeof(gcg_t_reflist),
-        (gcgctx->refcount + 1) * sizeof(gcg_t_reflist));
+    sts = utl_realloc((char**)&gcgctx->ref, gcgctx->refcount * sizeof(gcg_t_reflist),
+                      (gcgctx->refcount + 1) * sizeof(gcg_t_reflist));
     if (EVEN(sts))
       return sts;
     (gcgctx->ref + gcgctx->refcount)->objdid = objdid;
@@ -2367,44 +2475,44 @@ static int gcg_ref_insert(
 }
 
 /*************************************************************************
-*
-* Name:		gcg_aref_insert()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* pwr_sAttrRef	attrref		I 	attrref of object.
-* char		prefix		I	prefix in pointer name.
-*
-* Description:
-*	Insert objdid for a node in the ref list in gcg context.
-*	Check first that the objdid is not already inserted.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_aref_insert()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * pwr_sAttrRef	attrref		I 	attrref of object.
+ * char		prefix		I	prefix in pointer name.
+ *
+ * Description:
+ *	Insert objdid for a node in the ref list in gcg context.
+ *	Check first that the objdid is not already inserted.
+ *
+ **************************************************************************/
 
-static int gcg_aref_insert(
-    gcg_ctx gcgctx, pwr_sAttrRef attrref, char prefix, vldh_t_node node)
+static int gcg_aref_insert(gcg_ctx gcgctx, pwr_sAttrRef attrref, char prefix, vldh_t_node node)
 {
   int i, found, sts;
 
   /* Check if the objdid already is inserted */
   found = 0;
-  for (i = 0; i < (int)gcgctx->arefcount; i++) {
-    if (cdh_ObjidIsEqual((gcgctx->aref + i)->attrref.Objid, attrref.Objid)
-        && (gcgctx->aref + i)->attrref.Offset == attrref.Offset
-        && (gcgctx->aref + i)->attrref.Size == attrref.Size
-	&& (gcgctx->aref + i)->prefix == prefix) {
+  for (i = 0; i < (int)gcgctx->arefcount; i++)
+  {
+    if (cdh_ObjidIsEqual((gcgctx->aref + i)->attrref.Objid, attrref.Objid) &&
+        (gcgctx->aref + i)->attrref.Offset == attrref.Offset &&
+        (gcgctx->aref + i)->attrref.Size == attrref.Size && (gcgctx->aref + i)->prefix == prefix)
+    {
       found = 1;
       break;
     }
   }
-  if (!found) {
+  if (!found)
+  {
     /* The attrref was not found,
       increase size of the reflist and insert it */
-    sts = utl_realloc((char**)&gcgctx->aref,
-        gcgctx->arefcount * sizeof(gcg_t_areflist),
-        (gcgctx->arefcount + 1) * sizeof(gcg_t_areflist));
+    sts = utl_realloc((char**)&gcgctx->aref, gcgctx->arefcount * sizeof(gcg_t_areflist),
+                      (gcgctx->arefcount + 1) * sizeof(gcg_t_areflist));
     if (EVEN(sts))
       return sts;
     (gcgctx->aref + gcgctx->arefcount)->attrref = attrref;
@@ -2416,20 +2524,20 @@ static int gcg_aref_insert(
 }
 
 /*************************************************************************
-*
-* Name:		gcg_ref_print()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-*
-* Description:
-*	Print the ref list.
-*	Prints pointer declarations and rtdb directlink code
-*	for the objects in ref list of gcg context.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_ref_print()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ *
+ * Description:
+ *	Print the ref list.
+ *	Prints pointer declarations and rtdb directlink code
+ *	for the objects in ref list of gcg context.
+ *
+ **************************************************************************/
 
 static int gcg_ref_print(gcg_ctx gcgctx)
 {
@@ -2440,19 +2548,22 @@ static int gcg_ref_print(gcg_ctx gcgctx)
   char* name;
 
   /* Check if the objdid already is inserted */
-  for (i = 0; i < (int)gcgctx->refcount; i++) {
+  for (i = 0; i < (int)gcgctx->refcount; i++)
+  {
     objdid = (gcgctx->ref + i)->objdid;
     prefix = (gcgctx->ref + i)->prefix;
 
     sts = ldh_GetObjectClass(gcgctx->wind->hw.ldhses, objdid, &cid);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       gcg_error_msg(gcgctx, GSX__REFOBJ, (gcgctx->ref + i)->node);
       continue;
     }
 
     /* Get name for this class */
     sts = gcg_get_structname(gcgctx, objdid, &name);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       gcg_error_msg(gcgctx, GSX__REFOBJ, (gcgctx->ref + i)->node);
       continue;
     }
@@ -2465,20 +2576,20 @@ static int gcg_ref_print(gcg_ctx gcgctx)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_aref_print()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-*
-* Description:
-*	Print the aref list.
-*	Prints pointer declarations and rtdb directlink code
-*	for the objects in ref list of gcg context.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_aref_print()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ *
+ * Description:
+ *	Print the aref list.
+ *	Prints pointer declarations and rtdb directlink code
+ *	for the objects in ref list of gcg context.
+ *
+ **************************************************************************/
 
 static int gcg_aref_print(gcg_ctx gcgctx)
 {
@@ -2489,19 +2600,22 @@ static int gcg_aref_print(gcg_ctx gcgctx)
   char* name;
 
   /* Check if the objdid already is inserted */
-  for (i = 0; i < (int)gcgctx->arefcount; i++) {
+  for (i = 0; i < (int)gcgctx->arefcount; i++)
+  {
     attrref = (gcgctx->aref + i)->attrref;
     prefix = (gcgctx->aref + i)->prefix;
 
     sts = ldh_GetAttrRefOrigTid(gcgctx->wind->hw.ldhses, &attrref, &cid);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       gcg_error_msg(gcgctx, GSX__REFOBJ, (gcgctx->aref + i)->node);
       continue;
     }
 
     /* Get name for this class */
     sts = gcg_get_structname_from_cid(gcgctx, cid, &name);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       gcg_error_msg(gcgctx, GSX__REFOBJ, (gcgctx->aref + i)->node);
       continue;
     }
@@ -2514,20 +2628,20 @@ static int gcg_aref_print(gcg_ctx gcgctx)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_ioread_print()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-*
-* Description:
-*	Print the ioread list.
-*	Prints pointer declarations and rtdb directlink code
-*	for the objects in ioread list of gcg context.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_ioread_print()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ *
+ * Description:
+ *	Print the ioread list.
+ *	Prints pointer declarations and rtdb directlink code
+ *	for the objects in ioread list of gcg context.
+ *
+ **************************************************************************/
 
 static int gcg_ioread_print(gcg_ctx gcgctx)
 {
@@ -2539,7 +2653,8 @@ static int gcg_ioread_print(gcg_ctx gcgctx)
   pwr_tObjName name;
   unsigned int offset;
 
-  for (i = 0; i < (int)gcgctx->ioreadcount; i++) {
+  for (i = 0; i < (int)gcgctx->ioreadcount; i++)
+  {
     offset = 0;
     attrref = (gcgctx->ioread + i)->attrref;
     prefix = (gcgctx->ioread + i)->prefix;
@@ -2548,7 +2663,8 @@ static int gcg_ioread_print(gcg_ctx gcgctx)
     if (EVEN(sts))
       return sts;
 
-    if (!cdh_tidIsCid(cid)) {
+    if (!cdh_tidIsCid(cid))
+    {
       // This is a Bi
       char* name_p;
       pwr_tAName oname;
@@ -2560,12 +2676,12 @@ static int gcg_ioread_print(gcg_ctx gcgctx)
       pwr_tCid ocid;
 
       // Get offset from name
-      sts = ldh_AttrRefToName(
-          gcgctx->ldhses, &attrref, ldh_eName_ArefVol, &name_p, &size);
+      sts = ldh_AttrRefToName(gcgctx->ldhses, &attrref, ldh_eName_ArefVol, &name_p, &size);
       if (EVEN(sts))
         return sts;
 
-      if (name_p[strlen(name_p) - 1] == ']') {
+      if (name_p[strlen(name_p) - 1] == ']')
+      {
         s = strrchr(name_p, '[');
         if (!s)
           continue;
@@ -2591,7 +2707,8 @@ static int gcg_ioread_print(gcg_ctx gcgctx)
       if (EVEN(sts))
         return sts;
 
-      switch (cid) {
+      switch (cid)
+      {
       case pwr_eType_Boolean:
         offset *= sizeof(pwr_tBoolean);
         strcpy(name, "BBoolean");
@@ -2620,24 +2737,29 @@ static int gcg_ioread_print(gcg_ctx gcgctx)
         offset *= sizeof(pwr_tFloat64);
         strcpy(name, "BFloat64");
         break;
-      default: {
+      default:
+      {
         pwr_eType type;
 
         sts = ldh_GetAttrRefType(gcgctx->wind->hw.ldhses, &attrref, &type);
         if (EVEN(sts))
           return sts;
 
-        if (type == pwr_eType_String) {
+        if (type == pwr_eType_String)
+        {
           offset *= attrref.Size;
           strcpy(name, "BString");
-        } else
+        }
+        else
           continue;
       }
       }
 
       // Print object cid
       cid = ocid;
-    } else {
+    }
+    else
+    {
       /* Get name for this class */
       sts = gcg_get_structname_from_cid(gcgctx, cid, &namep);
       if (EVEN(sts))
@@ -2656,20 +2778,20 @@ static int gcg_ioread_print(gcg_ctx gcgctx)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_iowrite_print()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-*
-* Description:
-*	Print the iowrite list.
-*	Prints pointer declarations and rtdb directlink code
-*	for the objects in iowrite list of gcg context.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_iowrite_print()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ *
+ * Description:
+ *	Print the iowrite list.
+ *	Prints pointer declarations and rtdb directlink code
+ *	for the objects in iowrite list of gcg context.
+ *
+ **************************************************************************/
 
 static int gcg_iowrite_print(gcg_ctx gcgctx)
 {
@@ -2681,7 +2803,8 @@ static int gcg_iowrite_print(gcg_ctx gcgctx)
   pwr_tObjName name;
   unsigned int offset;
 
-  for (i = 0; i < (int)gcgctx->iowritecount; i++) {
+  for (i = 0; i < (int)gcgctx->iowritecount; i++)
+  {
     offset = 0;
     attrref = (gcgctx->iowrite + i)->attrref;
     prefix = (gcgctx->iowrite + i)->prefix;
@@ -2690,7 +2813,8 @@ static int gcg_iowrite_print(gcg_ctx gcgctx)
     if (EVEN(sts))
       return sts;
 
-    if (!cdh_tidIsCid(cid)) {
+    if (!cdh_tidIsCid(cid))
+    {
       // This is a Bi or Bo
       char* name_p;
       pwr_tAName oname;
@@ -2702,12 +2826,12 @@ static int gcg_iowrite_print(gcg_ctx gcgctx)
       pwr_tCid ocid;
 
       // Get offset from name
-      sts = ldh_AttrRefToName(
-          gcgctx->ldhses, &attrref, ldh_eName_ArefVol, &name_p, &size);
+      sts = ldh_AttrRefToName(gcgctx->ldhses, &attrref, ldh_eName_ArefVol, &name_p, &size);
       if (EVEN(sts))
         return sts;
 
-      if (name_p[strlen(name_p) - 1] == ']') {
+      if (name_p[strlen(name_p) - 1] == ']')
+      {
         s = strrchr(name_p, '[');
         if (!s)
           continue;
@@ -2733,7 +2857,8 @@ static int gcg_iowrite_print(gcg_ctx gcgctx)
       if (EVEN(sts))
         return sts;
 
-      switch (cid) {
+      switch (cid)
+      {
       case pwr_eType_Boolean:
         offset *= sizeof(pwr_tBoolean);
         strcpy(name, "BBoolean");
@@ -2762,24 +2887,29 @@ static int gcg_iowrite_print(gcg_ctx gcgctx)
         offset *= sizeof(pwr_tFloat64);
         strcpy(name, "BFloat64");
         break;
-      default: {
+      default:
+      {
         pwr_eType type;
 
         sts = ldh_GetAttrRefType(gcgctx->wind->hw.ldhses, &attrref, &type);
         if (EVEN(sts))
           return sts;
 
-        if (type == pwr_eType_String) {
+        if (type == pwr_eType_String)
+        {
           offset *= attrref.Size;
           strcpy(name, "BString");
-        } else
+        }
+        else
           continue;
       }
       }
 
       // Print object cid
       cid = ocid;
-    } else {
+    }
+    else
+    {
       /* Get name for this class */
       sts = gcg_get_structname_from_cid(gcgctx, cid, &namep);
       if (EVEN(sts))
@@ -2790,8 +2920,7 @@ static int gcg_iowrite_print(gcg_ctx gcgctx)
 
     gcg_print_adecl(gcgctx, name, attrref, prefix, GCG_REFTYPE_IOW);
     if (prefix == GCG_PREFIX_IOCW)
-      gcg_print_artdbref(
-          gcgctx, attrref, prefix, cid, GCG_REFTYPE_IOCW, offset);
+      gcg_print_artdbref(gcgctx, attrref, prefix, cid, GCG_REFTYPE_IOCW, offset);
     else
       gcg_print_artdbref(gcgctx, attrref, prefix, cid, GCG_REFTYPE_IOW, offset);
   }
@@ -2800,43 +2929,42 @@ static int gcg_iowrite_print(gcg_ctx gcgctx)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_get_outputstring()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	output_node	I	vldh node
-* ldh_sParDef 	*output_bodydef	I	bodydef of output node
-* pwr_tObjid	objdid	O	objdid for referenced object.
-* char		*parprefix	O	prefix for rtdb pointer.
-* char		*parstring	O	pgamname of referenced parameter
-*
-* Description:
-*	This routine is called when an output connectionpoint is found
-*	connected to some node and you want to get information to
-*	a reference to this parameter in a function call (code producing)
-*	or make a direct link to the referenced object (trace).
-*	The returned parameter and objdid is calculated:
-*	- if the object is treated in gcg_get_outputstring_spec this
-*	  routin returns the objdid and parstring.
-*	- if the parameter has flag PWR_MASK_DEVBODYREF the content first found
-*	found parameter of type objdid in devbody is returned as objdid, the
-*	pgmname of the connected parameter is returned as parstring.
-*	Ex for a getdi you want to get the objdid of the Di object and
-*	the pgmname ActualValue. The ouputparameter in rtbody that is connected
-*	has flag PWR_MASK_DEVBODYREF and pgmname ActualValue. In the devbody
-*	parameter DiObject the objdid of the Di object is stored and the
-*	type of this parameter is pwr_eType_ObjDId.
-*	- default the objdid of the connected object and the pgmname of
-*	the connected point is return as parstring.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_get_outputstring()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	output_node	I	vldh node
+ * ldh_sParDef 	*output_bodydef	I	bodydef of output node
+ * pwr_tObjid	objdid	O	objdid for referenced object.
+ * char		*parprefix	O	prefix for rtdb pointer.
+ * char		*parstring	O	pgamname of referenced parameter
+ *
+ * Description:
+ *	This routine is called when an output connectionpoint is found
+ *	connected to some node and you want to get information to
+ *	a reference to this parameter in a function call (code producing)
+ *	or make a direct link to the referenced object (trace).
+ *	The returned parameter and objdid is calculated:
+ *	- if the object is treated in gcg_get_outputstring_spec this
+ *	  routin returns the objdid and parstring.
+ *	- if the parameter has flag PWR_MASK_DEVBODYREF the content first found
+ *	found parameter of type objdid in devbody is returned as objdid, the
+ *	pgmname of the connected parameter is returned as parstring.
+ *	Ex for a getdi you want to get the objdid of the Di object and
+ *	the pgmname ActualValue. The ouputparameter in rtbody that is connected
+ *	has flag PWR_MASK_DEVBODYREF and pgmname ActualValue. In the devbody
+ *	parameter DiObject the objdid of the Di object is stored and the
+ *	type of this parameter is pwr_eType_ObjDId.
+ *	- default the objdid of the connected object and the pgmname of
+ *	the connected point is return as parstring.
+ *
+ **************************************************************************/
 
-int gcg_get_outputstring(gcg_ctx gcgctx, vldh_t_node output_node,
-    ldh_sParDef* output_bodydef, pwr_sAttrRef* parattrref, int* partype,
-    char* parprefix, char* parstring)
+int gcg_get_outputstring(gcg_ctx gcgctx, vldh_t_node output_node, ldh_sParDef* output_bodydef,
+                         pwr_sAttrRef* parattrref, int* partype, char* parprefix, char* parstring)
 {
   int sts, size;
   ldh_sParDef* bodydef;
@@ -2847,8 +2975,8 @@ int gcg_get_outputstring(gcg_ctx gcgctx, vldh_t_node output_node,
   pwr_tClassId cid;
 
   /* Look if this is a specific class with special treatment */
-  sts = gcg_get_outputstring_spec(gcgctx, output_node, output_bodydef,
-      parattrref, partype, parprefix, parstring);
+  sts = gcg_get_outputstring_spec(gcgctx, output_node, output_bodydef, parattrref, partype, parprefix,
+                                  parstring);
   if (EVEN(sts))
     return sts;
   if (sts == GSX__SPECFOUND)
@@ -2859,37 +2987,41 @@ int gcg_get_outputstring(gcg_ctx gcgctx, vldh_t_node output_node,
   /* Special output not found, continue to get the outputstring
     the default way */
 
-  if (output_bodydef->Par->Output.Info.Flags & PWR_MASK_DEVBODYREF) {
+  if (output_bodydef->Par->Output.Info.Flags & PWR_MASK_DEVBODYREF)
+  {
     /* This is a reference to an objdid in the devbody,
       and the parameter in the referenced object has the
       same name as the name of the parameter in rtbody
       in the referenceobject */
-    sts = ldh_GetObjectBodyDef((output_node->hn.wind)->hw.ldhses,
-        output_node->ln.cid, "DevBody", 1, &bodydef, &rows);
+    sts = ldh_GetObjectBodyDef((output_node->hn.wind)->hw.ldhses, output_node->ln.cid, "DevBody", 1, &bodydef,
+                               &rows);
     if (EVEN(sts))
       return sts;
     found = 0;
-    for (i = 0; i < rows; i++) {
-      if (bodydef[i].Par->Output.Info.Type == pwr_eType_Objid) {
+    for (i = 0; i < rows; i++)
+    {
+      if (bodydef[i].Par->Output.Info.Type == pwr_eType_Objid)
+      {
         found = 1;
         /* Get the objdid stored in the parameter */
-        sts = ldh_GetObjectPar((output_node->hn.wind)->hw.ldhses,
-            output_node->ln.oid, "DevBody", bodydef[i].ParName, (char**)&objdid,
-            &size);
+        sts = ldh_GetObjectPar((output_node->hn.wind)->hw.ldhses, output_node->ln.oid, "DevBody",
+                               bodydef[i].ParName, (char**)&objdid, &size);
         if (EVEN(sts))
           return sts;
 
         /* Check that this is objdid of an existing object */
-        sts = ldh_GetObjectClass(
-            (output_node->hn.wind)->hw.ldhses, *objdid, &cid);
-        if (EVEN(sts)) {
+        sts = ldh_GetObjectClass((output_node->hn.wind)->hw.ldhses, *objdid, &cid);
+        if (EVEN(sts))
+        {
           gcg_error_msg(gcgctx, GSX__REFOBJ, output_node);
           free((char*)objdid);
           return GSX__NEXTPAR;
         }
         /* Check that the object is not in a library hierarchy */
-        if (gcg_in_libhier(gcgctx, *objdid)) {
-          if (!gcg_in_libhier(gcgctx, output_node->ln.oid)) {
+        if (gcg_in_libhier(gcgctx, *objdid))
+        {
+          if (!gcg_in_libhier(gcgctx, output_node->ln.oid))
+          {
             gcg_error_msg(gcgctx, GSX__LIBREF, output_node);
             free((char*)objdid);
             return GSX__NEXTPAR;
@@ -2903,12 +3035,13 @@ int gcg_get_outputstring(gcg_ctx gcgctx, vldh_t_node output_node,
         *partype = GCG_OTYPE_OID;
         free((char*)objdid);
         break;
-      } else if (bodydef[i].Par->Output.Info.Type == pwr_eType_AttrRef) {
+      }
+      else if (bodydef[i].Par->Output.Info.Type == pwr_eType_AttrRef)
+      {
         found = 1;
         /* Get the objdid stored in the parameter */
-        sts = ldh_GetObjectPar((output_node->hn.wind)->hw.ldhses,
-            output_node->ln.oid, "DevBody", bodydef[i].ParName,
-            (char**)&attrref, &size);
+        sts = ldh_GetObjectPar((output_node->hn.wind)->hw.ldhses, output_node->ln.oid, "DevBody",
+                               bodydef[i].ParName, (char**)&attrref, &size);
         if (EVEN(sts))
           return sts;
 
@@ -2917,16 +3050,18 @@ int gcg_get_outputstring(gcg_ctx gcgctx, vldh_t_node output_node,
           return sts;
 
         /* Check that this is objdid of an existing object */
-        sts = ldh_GetAttrRefOrigTid(
-            (output_node->hn.wind)->hw.ldhses, attrref, &cid);
-        if (EVEN(sts)) {
+        sts = ldh_GetAttrRefOrigTid((output_node->hn.wind)->hw.ldhses, attrref, &cid);
+        if (EVEN(sts))
+        {
           gcg_error_msg(gcgctx, GSX__REFOBJ, output_node);
           free((char*)attrref);
           return GSX__NEXTPAR;
         }
         /* Check that object is not in a library hierarchy */
-        if (gcg_in_libhier(gcgctx, attrref->Objid)) {
-          if (!gcg_in_libhier(gcgctx, output_node->ln.oid)) {
+        if (gcg_in_libhier(gcgctx, attrref->Objid))
+        {
+          if (!gcg_in_libhier(gcgctx, output_node->ln.oid))
+          {
             gcg_error_msg(gcgctx, GSX__LIBREF, output_node);
             free((char*)attrref);
             return GSX__NEXTPAR;
@@ -2945,19 +3080,23 @@ int gcg_get_outputstring(gcg_ctx gcgctx, vldh_t_node output_node,
     free((char*)bodydef);
     if (!found)
       return GSX__CLASSREF;
-  } else {
+  }
+  else
+  {
     /* Return the objdid as a string and the name of
       the parameter */
     strcpy(parstring, (output_bodydef->Par)->Param.Info.PgmName);
-    if (output_bodydef->Par->Output.Info.Flags & PWR_MASK_ARRAY) {
-      switch (output_node->ln.cid) {
+    if (output_bodydef->Par->Output.Info.Flags & PWR_MASK_ARRAY)
+    {
+      switch (output_node->ln.cid)
+      {
       case pwr_cClass_step:
       case pwr_cClass_initstep:
       case pwr_cClass_substep:
       case pwr_cClass_order:
-	strncat(parstring, "[0]", 80);
-	break;
-      default: ;
+        strncat(parstring, "[0]", 80);
+        break;
+      default:;
       }
     }
 
@@ -2970,40 +3109,39 @@ int gcg_get_outputstring(gcg_ctx gcgctx, vldh_t_node output_node,
 }
 
 /*************************************************************************
-*
-* Name:		gcg_get_outputstring_spec()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	output_node	I	vldh node
-* ldh_sParDef 	*output_bodydef	I	bodydef of output node
-* pwr_tObjid	*parobjdid	O	objdid for referenced object.
-* char		*parprefix	O	prefix for rtdb pointer.
-* char		*parstring	O	pgamname of referenced parameter
-*
-* Description:
-*	This routine is called when an output connectionpoint is found
-*	connected to some node and you want to get information to
-*	a reference to this parameter in a function call (code producing)
-*	or make a direct link to the referenced object (trace).
-*	If the object is treated in this routine the status GSX__SPECFOUND
-*	is returned.
-*	The following objects is treated:
-*	- getdp, objdid from parameter DpObject and pgmname in parameter
-*	  Parameter.
-*	- getap, objdid from parameter ApObject and pgmname in parameter
-*	  Parameter.
-*	- getpi, objdid from parameter CoObject and pgmname from the
-*	  connected parameter. If the connected parameter is "PulsIn"
-*	  GCG_PREFIX_IOC is returned as parprefix else GCG_PREFIX_REF.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_get_outputstring_spec()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	output_node	I	vldh node
+ * ldh_sParDef 	*output_bodydef	I	bodydef of output node
+ * pwr_tObjid	*parobjdid	O	objdid for referenced object.
+ * char		*parprefix	O	prefix for rtdb pointer.
+ * char		*parstring	O	pgamname of referenced parameter
+ *
+ * Description:
+ *	This routine is called when an output connectionpoint is found
+ *	connected to some node and you want to get information to
+ *	a reference to this parameter in a function call (code producing)
+ *	or make a direct link to the referenced object (trace).
+ *	If the object is treated in this routine the status GSX__SPECFOUND
+ *	is returned.
+ *	The following objects is treated:
+ *	- getdp, objdid from parameter DpObject and pgmname in parameter
+ *	  Parameter.
+ *	- getap, objdid from parameter ApObject and pgmname in parameter
+ *	  Parameter.
+ *	- getpi, objdid from parameter CoObject and pgmname from the
+ *	  connected parameter. If the connected parameter is "PulsIn"
+ *	  GCG_PREFIX_IOC is returned as parprefix else GCG_PREFIX_REF.
+ *
+ **************************************************************************/
 
-static int gcg_get_outputstring_spec(gcg_ctx gcgctx, vldh_t_node output_node,
-    ldh_sParDef* output_bodydef, pwr_sAttrRef* parattrref, int* partype,
-    char* parprefix, char* parstring)
+static int gcg_get_outputstring_spec(gcg_ctx gcgctx, vldh_t_node output_node, ldh_sParDef* output_bodydef,
+                                     pwr_sAttrRef* parattrref, int* partype, char* parprefix, char* parstring)
 {
   int sts, size;
   pwr_sAttrRef* attrref;
@@ -3016,16 +3154,19 @@ static int gcg_get_outputstring_spec(gcg_ctx gcgctx, vldh_t_node output_node,
 
   ldhses = (output_node->hn.wind)->hw.ldhses;
 
-  switch (output_node->ln.cid) {
+  switch (output_node->ln.cid)
+  {
   case pwr_cClass_GetDp:
-  case pwr_cClass_GetAp: {
+  case pwr_cClass_GetAp:
+  {
     /**********************************************************
      *  GetDp, GetAp
      ***********************************************************/
 
     pwr_tObjName pname;
 
-    switch (output_node->ln.cid) {
+    switch (output_node->ln.cid)
+    {
     case pwr_cClass_GetDp:
       strcpy(pname, "DpObject");
       break;
@@ -3036,8 +3177,7 @@ static int gcg_get_outputstring_spec(gcg_ctx gcgctx, vldh_t_node output_node,
     }
 
     /* Get the objdid stored in the parameter */
-    sts = ldh_GetObjectPar(
-        ldhses, output_node->ln.oid, "DevBody", pname, (char**)&attrref, &size);
+    sts = ldh_GetObjectPar(ldhses, output_node->ln.oid, "DevBody", pname, (char**)&attrref, &size);
     if (EVEN(sts))
       return sts;
 
@@ -3047,14 +3187,17 @@ static int gcg_get_outputstring_spec(gcg_ctx gcgctx, vldh_t_node output_node,
 
     /* Check that this is objdid of an existing object */
     sts = ldh_GetAttrRefOrigTid(ldhses, attrref, &cid);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       gcg_error_msg(gcgctx, GSX__REFOBJ, output_node);
       free((char*)attrref);
       return GSX__NEXTPAR;
     }
     /* Check that the object is not in a library hierarchy */
-    if (gcg_in_libhier(gcgctx, attrref->Objid)) {
-      if (!gcg_in_libhier(gcgctx, output_node->ln.oid)) {
+    if (gcg_in_libhier(gcgctx, attrref->Objid))
+    {
+      if (!gcg_in_libhier(gcgctx, output_node->ln.oid))
+      {
         gcg_error_msg(gcgctx, GSX__LIBREF, output_node);
         free((char*)attrref);
         return GSX__NEXTPAR;
@@ -3063,7 +3206,8 @@ static int gcg_get_outputstring_spec(gcg_ctx gcgctx, vldh_t_node output_node,
 
     /* Get the attribute name of last segment */
     sts = ldh_AttrRefToName(ldhses, attrref, ldh_eName_ArefVol, &name_p, &size);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       gcg_error_msg(gcgctx, GSX__REFOBJ, output_node);
       free((char*)attrref);
       return GSX__NEXTPAR;
@@ -3071,19 +3215,22 @@ static int gcg_get_outputstring_spec(gcg_ctx gcgctx, vldh_t_node output_node,
     free((char*)attrref);
 
     strcpy(aname, name_p);
-    if ((s = strrchr(aname, '.')) == 0) {
+    if ((s = strrchr(aname, '.')) == 0)
+    {
       gcg_error_msg(gcgctx, GSX__REFOBJ, output_node);
       return GSX__NEXTPAR;
     }
 
     *s = 0;
     sts = ldh_NameToAttrRef(ldhses, aname, parattrref);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       gcg_error_msg(gcgctx, GSX__REFOBJ, output_node);
       return GSX__NEXTPAR;
     }
     sts = ldh_GetAttrRefOrigTid(ldhses, parattrref, &cid);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       gcg_error_msg(gcgctx, GSX__REFOBJ, output_node);
       return GSX__NEXTPAR;
     }
@@ -3096,13 +3243,13 @@ static int gcg_get_outputstring_spec(gcg_ctx gcgctx, vldh_t_node output_node,
     return GSX__SPECFOUND;
   }
 
-  case pwr_cClass_GetPi: {
+  case pwr_cClass_GetPi:
+  {
     /**********************************************************
      *  GETPI
      ***********************************************************/
     /* Get the objdid stored in the parameter */
-    sts = ldh_GetObjectPar(ldhses, output_node->ln.oid, "DevBody", "CoObject",
-        (char**)&attrref, &size);
+    sts = ldh_GetObjectPar(ldhses, output_node->ln.oid, "DevBody", "CoObject", (char**)&attrref, &size);
     if (EVEN(sts))
       return sts;
 
@@ -3112,14 +3259,17 @@ static int gcg_get_outputstring_spec(gcg_ctx gcgctx, vldh_t_node output_node,
 
     /* Check that this is objdid of an existing object */
     sts = ldh_GetAttrRefOrigTid(ldhses, attrref, &cid);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       gcg_error_msg(gcgctx, GSX__REFOBJ, output_node);
       free((char*)attrref);
       return GSX__NEXTPAR;
     }
     /* Check that the object is not in a library hierarchy */
-    if (gcg_in_libhier(gcgctx, attrref->Objid)) {
-      if (!gcg_in_libhier(gcgctx, output_node->ln.oid)) {
+    if (gcg_in_libhier(gcgctx, attrref->Objid))
+    {
+      if (!gcg_in_libhier(gcgctx, output_node->ln.oid))
+      {
         gcg_error_msg(gcgctx, GSX__LIBREF, output_node);
         free((char*)attrref);
         return GSX__NEXTPAR;
@@ -3137,14 +3287,16 @@ static int gcg_get_outputstring_spec(gcg_ctx gcgctx, vldh_t_node output_node,
     free((char*)attrref);
     return GSX__SPECFOUND;
   }
-  case pwr_cClass_GetDataRefp: {
+  case pwr_cClass_GetDataRefp:
+  {
     /**********************************************************
      *  GetDataRefp
      ***********************************************************/
 
     pwr_tAName aname;
 
-    switch (output_node->ln.cid) {
+    switch (output_node->ln.cid)
+    {
     case pwr_cClass_GetDataRefp:
       strcpy(aname, "DataRefpObject");
       break;
@@ -3152,8 +3304,7 @@ static int gcg_get_outputstring_spec(gcg_ctx gcgctx, vldh_t_node output_node,
     }
 
     /* Get the objdid stored in the parameter */
-    sts = ldh_GetObjectPar(
-        ldhses, output_node->ln.oid, "DevBody", aname, (char**)&attrref, &size);
+    sts = ldh_GetObjectPar(ldhses, output_node->ln.oid, "DevBody", aname, (char**)&attrref, &size);
     if (EVEN(sts))
       return sts;
 
@@ -3163,14 +3314,17 @@ static int gcg_get_outputstring_spec(gcg_ctx gcgctx, vldh_t_node output_node,
 
     /* Check that this is objdid of an existing object */
     sts = ldh_GetAttrRefOrigTid(ldhses, attrref, &tid);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       gcg_error_msg(gcgctx, GSX__REFOBJ, output_node);
       free((char*)attrref);
       return GSX__NEXTPAR;
     }
     /* Check that the object is not in a library hierarchy */
-    if (gcg_in_libhier(gcgctx, attrref->Objid)) {
-      if (!gcg_in_libhier(gcgctx, output_node->ln.oid)) {
+    if (gcg_in_libhier(gcgctx, attrref->Objid))
+    {
+      if (!gcg_in_libhier(gcgctx, output_node->ln.oid))
+      {
         gcg_error_msg(gcgctx, GSX__LIBREF, output_node);
         free((char*)attrref);
         return GSX__NEXTPAR;
@@ -3179,7 +3333,8 @@ static int gcg_get_outputstring_spec(gcg_ctx gcgctx, vldh_t_node output_node,
 
     /* Get the attribute name of last segment */
     sts = ldh_AttrRefToName(ldhses, attrref, ldh_eName_ArefVol, &name_p, &size);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       gcg_error_msg(gcgctx, GSX__REFOBJ, output_node);
       free((char*)attrref);
       return GSX__NEXTPAR;
@@ -3187,19 +3342,22 @@ static int gcg_get_outputstring_spec(gcg_ctx gcgctx, vldh_t_node output_node,
     free((char*)attrref);
 
     strcpy(aname, name_p);
-    if ((s = strrchr(aname, '.')) == 0) {
+    if ((s = strrchr(aname, '.')) == 0)
+    {
       gcg_error_msg(gcgctx, GSX__REFOBJ, output_node);
       return GSX__NEXTPAR;
     }
 
     *s = 0;
     sts = ldh_NameToAttrRef(ldhses, aname, parattrref);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       gcg_error_msg(gcgctx, GSX__REFOBJ, output_node);
       return GSX__NEXTPAR;
     }
     sts = ldh_GetAttrRefOrigTid(ldhses, parattrref, &cid);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       gcg_error_msg(gcgctx, GSX__REFOBJ, output_node);
       return GSX__NEXTPAR;
     }
@@ -3218,7 +3376,8 @@ static int gcg_get_outputstring_spec(gcg_ctx gcgctx, vldh_t_node output_node,
   case pwr_cClass_GetDattr:
   case pwr_cClass_GetAattr:
   case pwr_cClass_GetIattr:
-  case pwr_cClass_GetSattr: {
+  case pwr_cClass_GetSattr:
+  {
     /**********************************************************
      *  GetDattr
      ***********************************************************/
@@ -3230,15 +3389,15 @@ static int gcg_get_outputstring_spec(gcg_ctx gcgctx, vldh_t_node output_node,
 
     sts = ldh_GetObjectClass(ldhses, host_objid, &cid);
 
-    if (cdh_ObjidIsNull(host_objid)) {
+    if (cdh_ObjidIsNull(host_objid))
+    {
       /* Parent is a plcprogram */
       gcg_error_msg(gcgctx, GSX__BADWIND, output_node);
       return GSX__NEXTPAR;
     }
 
     /* Get the referenced attribute stored in Attribute */
-    sts = ldh_GetObjectPar(ldhses, output_node->ln.oid, "DevBody", "Attribute",
-        (char**)&parameter, &size);
+    sts = ldh_GetObjectPar(ldhses, output_node->ln.oid, "DevBody", "Attribute", (char**)&parameter, &size);
     if (EVEN(sts))
       return sts;
 
@@ -3253,7 +3412,8 @@ static int gcg_get_outputstring_spec(gcg_ctx gcgctx, vldh_t_node output_node,
     return GSX__SPECFOUND;
   }
 
-  case pwr_cClass_Disabled: {
+  case pwr_cClass_Disabled:
+  {
     /**********************************************************
      *  Disabled
      ***********************************************************/
@@ -3262,8 +3422,7 @@ static int gcg_get_outputstring_spec(gcg_ctx gcgctx, vldh_t_node output_node,
     pwr_sAttrRef disaref;
 
     /* Get the objdid stored in the parameter */
-    sts = ldh_GetObjectPar(ldhses, output_node->ln.oid, "DevBody", "Object",
-        (char**)&attrref, &size);
+    sts = ldh_GetObjectPar(ldhses, output_node->ln.oid, "DevBody", "Object", (char**)&attrref, &size);
     if (EVEN(sts))
       return sts;
 
@@ -3273,14 +3432,17 @@ static int gcg_get_outputstring_spec(gcg_ctx gcgctx, vldh_t_node output_node,
 
     /* Check that this is objdid of an existing object */
     sts = ldh_GetAttrRefOrigTid(ldhses, attrref, &cid);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       gcg_error_msg(gcgctx, GSX__REFOBJ, output_node);
       free((char*)attrref);
       return GSX__NEXTPAR;
     }
     /* Check that the object is not in a library hierarchy */
-    if (gcg_in_libhier(gcgctx, attrref->Objid)) {
-      if (!gcg_in_libhier(gcgctx, output_node->ln.oid)) {
+    if (gcg_in_libhier(gcgctx, attrref->Objid))
+    {
+      if (!gcg_in_libhier(gcgctx, output_node->ln.oid))
+      {
         gcg_error_msg(gcgctx, GSX__LIBREF, output_node);
         free((char*)attrref);
         return GSX__NEXTPAR;
@@ -3292,7 +3454,8 @@ static int gcg_get_outputstring_spec(gcg_ctx gcgctx, vldh_t_node output_node,
     if (EVEN(sts))
       return sts;
 
-    if (!(info.flags & PWR_MASK_DISABLEATTR)) {
+    if (!(info.flags & PWR_MASK_DISABLEATTR))
+    {
       gcg_error_msg(gcgctx, GSX__REFOBJ, output_node);
       free((char*)attrref);
       return GSX__NEXTPAR;
@@ -3302,9 +3465,9 @@ static int gcg_get_outputstring_spec(gcg_ctx gcgctx, vldh_t_node output_node,
     disaref = cdh_ArefToDisableAref(attrref);
 
     /* Get the attribute name of last segment */
-    sts = ldh_AttrRefToName(
-        ldhses, &disaref, ldh_eName_ArefVol, &name_p, &size);
-    if (EVEN(sts)) {
+    sts = ldh_AttrRefToName(ldhses, &disaref, ldh_eName_ArefVol, &name_p, &size);
+    if (EVEN(sts))
+    {
       gcg_error_msg(gcgctx, GSX__REFOBJ, output_node);
       free((char*)attrref);
       return GSX__NEXTPAR;
@@ -3312,19 +3475,22 @@ static int gcg_get_outputstring_spec(gcg_ctx gcgctx, vldh_t_node output_node,
     free((char*)attrref);
 
     strcpy(aname, name_p);
-    if ((s = strrchr(aname, '.')) == 0) {
+    if ((s = strrchr(aname, '.')) == 0)
+    {
       gcg_error_msg(gcgctx, GSX__REFOBJ, output_node);
       return GSX__NEXTPAR;
     }
 
     *s = 0;
     sts = ldh_NameToAttrRef(ldhses, aname, parattrref);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       gcg_error_msg(gcgctx, GSX__REFOBJ, output_node);
       return GSX__NEXTPAR;
     }
     sts = ldh_GetAttrRefOrigTid(ldhses, parattrref, &cid);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       gcg_error_msg(gcgctx, GSX__REFOBJ, output_node);
       return GSX__NEXTPAR;
     }
@@ -3342,43 +3508,42 @@ static int gcg_get_outputstring_spec(gcg_ctx gcgctx, vldh_t_node output_node,
 }
 
 /*************************************************************************
-*
-* Name:		gcg_get_inputstring()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	output_node	I	vldh node
-* ldh_sParDef 	*output_bodydef	I	bodydef of output node
-* pwr_tObjid	*parobjdid	O	objdid for referenced object.
-* char		*parprefix	O	prefix for rtdb pointer.
-* char		*parstring	O	pgamname of referenced parameter
-*
-* Description:
-*	The funktions is mainly the same as gcg_get_outputstring, but this
-*	routine is working with inputs instead of outputs.
-*	This routine is called when an input connectionpoint is found
-*	connected to some node and you want to get information
-*	make a direct link to the referenced object (trace).
-*	The returned parameter and objdid is calculated:
-*	- if the parameter has flag PWR_MASK_DEVBODYREF the content first found
-*	found parameter of type objdid in devbody is returned as objdid, the
-*	pgmname of the connected parameter is returned as parstring.
-*	Ex for a stodo you want to get the objdid of the Do object and
-*	the pgmname ActualValue. The inputparameter in rtbody that is connected
-*	has flag PWR_MASK_DEVBODYREF and pgmname ActualValue. In the devbody
-*	parameter DoObject the objdid of the Do object is stored and the
-*	type of this parameter is pwr_eType_ObjDId.
-*	- default the objdid of the connected object and the pgmname of
-*	the connected point is return as parstring.
-*
-*
-**************************************************************************/
+ *
+ * Name:		gcg_get_inputstring()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	output_node	I	vldh node
+ * ldh_sParDef 	*output_bodydef	I	bodydef of output node
+ * pwr_tObjid	*parobjdid	O	objdid for referenced object.
+ * char		*parprefix	O	prefix for rtdb pointer.
+ * char		*parstring	O	pgamname of referenced parameter
+ *
+ * Description:
+ *	The funktions is mainly the same as gcg_get_outputstring, but this
+ *	routine is working with inputs instead of outputs.
+ *	This routine is called when an input connectionpoint is found
+ *	connected to some node and you want to get information
+ *	make a direct link to the referenced object (trace).
+ *	The returned parameter and objdid is calculated:
+ *	- if the parameter has flag PWR_MASK_DEVBODYREF the content first found
+ *	found parameter of type objdid in devbody is returned as objdid, the
+ *	pgmname of the connected parameter is returned as parstring.
+ *	Ex for a stodo you want to get the objdid of the Do object and
+ *	the pgmname ActualValue. The inputparameter in rtbody that is connected
+ *	has flag PWR_MASK_DEVBODYREF and pgmname ActualValue. In the devbody
+ *	parameter DoObject the objdid of the Do object is stored and the
+ *	type of this parameter is pwr_eType_ObjDId.
+ *	- default the objdid of the connected object and the pgmname of
+ *	the connected point is return as parstring.
+ *
+ *
+ **************************************************************************/
 
-static int gcg_get_inputstring(gcg_ctx gcgctx, vldh_t_node output_node,
-    ldh_sParDef* output_bodydef, pwr_sAttrRef* parattrref, int* partype,
-    char* parprefix, char* parstring)
+static int gcg_get_inputstring(gcg_ctx gcgctx, vldh_t_node output_node, ldh_sParDef* output_bodydef,
+                               pwr_sAttrRef* parattrref, int* partype, char* parprefix, char* parstring)
 {
   int sts, size;
   ldh_sParDef* bodydef;
@@ -3388,30 +3553,32 @@ static int gcg_get_inputstring(gcg_ctx gcgctx, vldh_t_node output_node,
   pwr_sAttrRef* attrref;
   pwr_tClassId cid;
 
-  if (output_bodydef->Par->Output.Info.Flags & PWR_MASK_DEVBODYREF) {
+  if (output_bodydef->Par->Output.Info.Flags & PWR_MASK_DEVBODYREF)
+  {
     /* This is a reference to an objdid in the devbody,
       and the parameter in the referenced object has the
       same name as the name of the parameter in rtbody
       in the referenceobject */
-    sts = ldh_GetObjectBodyDef((output_node->hn.wind)->hw.ldhses,
-        output_node->ln.cid, "DevBody", 1, &bodydef, &rows);
+    sts = ldh_GetObjectBodyDef((output_node->hn.wind)->hw.ldhses, output_node->ln.cid, "DevBody", 1, &bodydef,
+                               &rows);
     if (EVEN(sts))
       return sts;
     found = 0;
-    for (i = 0; i < rows; i++) {
-      if (bodydef[i].Par->Output.Info.Type == pwr_eType_Objid) {
+    for (i = 0; i < rows; i++)
+    {
+      if (bodydef[i].Par->Output.Info.Type == pwr_eType_Objid)
+      {
         found = 1;
         /* Get the objdid stored in the parameter */
-        sts = ldh_GetObjectPar((output_node->hn.wind)->hw.ldhses,
-            output_node->ln.oid, "DevBody", bodydef[i].ParName, (char**)&objdid,
-            &size);
+        sts = ldh_GetObjectPar((output_node->hn.wind)->hw.ldhses, output_node->ln.oid, "DevBody",
+                               bodydef[i].ParName, (char**)&objdid, &size);
         if (EVEN(sts))
           return sts;
 
         /* Check that this is objdid of an existing object */
-        sts = ldh_GetObjectClass(
-            (output_node->hn.wind)->hw.ldhses, *objdid, &cid);
-        if (EVEN(sts)) {
+        sts = ldh_GetObjectClass((output_node->hn.wind)->hw.ldhses, *objdid, &cid);
+        if (EVEN(sts))
+        {
           gcg_error_msg(gcgctx, GSX__REFOBJ, output_node);
           free((char*)objdid);
           return GSX__NEXTPAR;
@@ -3423,12 +3590,13 @@ static int gcg_get_inputstring(gcg_ctx gcgctx, vldh_t_node output_node,
         *partype = GCG_OTYPE_OID;
         free((char*)objdid);
         break;
-      } else if (bodydef[i].Par->Output.Info.Type == pwr_eType_AttrRef) {
+      }
+      else if (bodydef[i].Par->Output.Info.Type == pwr_eType_AttrRef)
+      {
         found = 1;
         /* Get the objdid stored in the parameter */
-        sts = ldh_GetObjectPar((output_node->hn.wind)->hw.ldhses,
-            output_node->ln.oid, "DevBody", bodydef[i].ParName,
-            (char**)&attrref, &size);
+        sts = ldh_GetObjectPar((output_node->hn.wind)->hw.ldhses, output_node->ln.oid, "DevBody",
+                               bodydef[i].ParName, (char**)&attrref, &size);
         if (EVEN(sts))
           return sts;
 
@@ -3437,9 +3605,9 @@ static int gcg_get_inputstring(gcg_ctx gcgctx, vldh_t_node output_node,
           return sts;
 
         /* Check that this is objdid of an existing object */
-        sts = ldh_GetAttrRefOrigTid(
-            (output_node->hn.wind)->hw.ldhses, attrref, &cid);
-        if (EVEN(sts)) {
+        sts = ldh_GetAttrRefOrigTid((output_node->hn.wind)->hw.ldhses, attrref, &cid);
+        if (EVEN(sts))
+        {
           gcg_error_msg(gcgctx, GSX__REFOBJ, output_node);
           free((char*)attrref);
           return GSX__NEXTPAR;
@@ -3456,10 +3624,14 @@ static int gcg_get_inputstring(gcg_ctx gcgctx, vldh_t_node output_node,
     free((char*)bodydef);
     if (!found)
       return GSX__CLASSREF;
-  } else if (output_bodydef->Par->Output.Info.Flags & PWR_MASK_RTVIRTUAL) {
+  }
+  else if (output_bodydef->Par->Output.Info.Flags & PWR_MASK_RTVIRTUAL)
+  {
     /* The input doesn't exist in runtime */
     return GSX__NEXTPAR;
-  } else {
+  }
+  else
+  {
     /* Return the objdid as a string and the name of
       the parameter */
     strcpy(parstring, (output_bodydef->Par)->Param.Info.PgmName);
@@ -3475,152 +3647,157 @@ static int gcg_get_inputstring(gcg_ctx gcgctx, vldh_t_node output_node,
 }
 
 /*************************************************************************
-*
-* Name:		gcg_print_decl()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gre context
-* char		*objname	I	name of c-struct
-* pwr_tObjid	objdid		I	objdid of object
-* char		prefix		I	prefix of rtdbpointer name.
-* unsigned long	reftype		I	iocopied object or not.
-*
-* Description:
-*	Print c declaration of a rtdb pointer in the declaration file
-*	(GCGM1_DECL_FILE).
-*	For an object that is not iocopied (reftype == GCG_REFTYPE_REF)
-*
-*	static pwr_sClass_'objname' 'pointername';
-*
-*	For iocopied objects the c struct is typedefed in
-*	rplc_src:rt_plc_io.h
-*
-*	static plc_sClass_'objname' 'pointername';
-*
-**************************************************************************/
+ *
+ * Name:		gcg_print_decl()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gre context
+ * char		*objname	I	name of c-struct
+ * pwr_tObjid	objdid		I	objdid of object
+ * char		prefix		I	prefix of rtdbpointer name.
+ * unsigned long	reftype		I	iocopied object or not.
+ *
+ * Description:
+ *	Print c declaration of a rtdb pointer in the declaration file
+ *	(GCGM1_DECL_FILE).
+ *	For an object that is not iocopied (reftype == GCG_REFTYPE_REF)
+ *
+ *	static pwr_sClass_'objname' 'pointername';
+ *
+ *	For iocopied objects the c struct is typedefed in
+ *	rplc_src:rt_plc_io.h
+ *
+ *	static plc_sClass_'objname' 'pointername';
+ *
+ **************************************************************************/
 
-static void gcg_print_decl(gcg_ctx gcgctx, char* objname, pwr_tObjid objdid,
-    char prefix, unsigned long reftype)
+static void gcg_print_decl(gcg_ctx gcgctx, char* objname, pwr_tObjid objdid, char prefix,
+                           unsigned long reftype)
 {
-  if (reftype == GCG_REFTYPE_REF) {
+  if (reftype == GCG_REFTYPE_REF)
+  {
     /* Print declaration of the rtdb reference pointer */
-    IF_PR fprintf(gcgctx->files[GCGM1_DECL_FILE],
-        "static pwr_sClass_%s *%c%s;\n", objname, prefix,
-        vldh_IdToStr(0, objdid));
-  } else {
+    IF_PR fprintf(gcgctx->files[GCGM1_DECL_FILE], "static pwr_sClass_%s *%c%s;\n", objname, prefix,
+                  vldh_IdToStr(0, objdid));
+  }
+  else
+  {
     /* Print declaration of the valuebase reference pointer */
-    IF_PR fprintf(gcgctx->files[GCGM1_DECL_FILE],
-        "static plc_sClass_%s *%c%s;\n", objname, prefix,
-        vldh_IdToStr(0, objdid));
+    IF_PR fprintf(gcgctx->files[GCGM1_DECL_FILE], "static plc_sClass_%s *%c%s;\n", objname, prefix,
+                  vldh_IdToStr(0, objdid));
   }
 }
 
-static void gcg_print_adecl(gcg_ctx gcgctx, char* objname, pwr_sAttrRef attrref,
-    char prefix, unsigned long reftype)
+static void gcg_print_adecl(gcg_ctx gcgctx, char* objname, pwr_sAttrRef attrref, char prefix,
+                            unsigned long reftype)
 {
-  if (reftype == GCG_REFTYPE_REF) {
+  if (reftype == GCG_REFTYPE_REF)
+  {
     /* Print declaration of the rtdb reference pointer */
-    IF_PR fprintf(gcgctx->files[GCGM1_DECL_FILE],
-        "static pwr_sClass_%s *%c%s;\n", objname, prefix,
-        vldh_AttrRefToStr(0, attrref));
-  } else {
+    IF_PR fprintf(gcgctx->files[GCGM1_DECL_FILE], "static pwr_sClass_%s *%c%s;\n", objname, prefix,
+                  vldh_AttrRefToStr(0, attrref));
+  }
+  else
+  {
     /* Print declaration of the valuebase reference pointer */
-    IF_PR fprintf(gcgctx->files[GCGM1_DECL_FILE],
-        "static plc_sClass_%s *%c%s;\n", objname, prefix,
-        vldh_AttrRefToStr(0, attrref));
+    IF_PR fprintf(gcgctx->files[GCGM1_DECL_FILE], "static plc_sClass_%s *%c%s;\n", objname, prefix,
+                  vldh_AttrRefToStr(0, attrref));
   }
 }
 /*************************************************************************
-*
-* Name:		gcg_print_rtdbref()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* pwr_tObjid	objdid		I	objdid of object.
-* char		prefix		I 	prefix of rtdb pointer name.
-* pwr_tClassId	cid		I	object class.
-* unsigned long	reftype		I	iocopied object or not.
-*
-* Description:
-*	Prints code for direct och rtdb pointer in the rtdbreference file
-*	(GCGM1_RTDBREF_FILE). The code is initialization of an array
-*	that in input to the routine plc_rtdbref.
-*	This line is written:
-*		{ &'pointername', 'objdid', 'class', 'reftype' },
-*
-*	Reftype tells which kind of reference that should be made:
-*	GCG_REFTYPE_REF 0	direct link to object
-*	GCG_REFTYPE_IOR 1	read pointer of iocopied object (to valuebase
-*				object for current frequency of plcprocess).
-*	GCG_REFTYPE_IOW 2	write pointer of iocopied object (to valuebase
-*				object for base frequency of the plc job.
-*	GCG_REFTYPE_IOC 3	special for co object.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_print_rtdbref()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * pwr_tObjid	objdid		I	objdid of object.
+ * char		prefix		I 	prefix of rtdb pointer name.
+ * pwr_tClassId	cid		I	object class.
+ * unsigned long	reftype		I	iocopied object or not.
+ *
+ * Description:
+ *	Prints code for direct och rtdb pointer in the rtdbreference file
+ *	(GCGM1_RTDBREF_FILE). The code is initialization of an array
+ *	that in input to the routine plc_rtdbref.
+ *	This line is written:
+ *		{ &'pointername', 'objdid', 'class', 'reftype' },
+ *
+ *	Reftype tells which kind of reference that should be made:
+ *	GCG_REFTYPE_REF 0	direct link to object
+ *	GCG_REFTYPE_IOR 1	read pointer of iocopied object (to valuebase
+ *				object for current frequency of plcprocess).
+ *	GCG_REFTYPE_IOW 2	write pointer of iocopied object (to valuebase
+ *				object for base frequency of the plc job.
+ *	GCG_REFTYPE_IOC 3	special for co object.
+ *
+ **************************************************************************/
 
-static void gcg_print_rtdbref(gcg_ctx gcgctx, pwr_tObjid objdid, char prefix,
-    pwr_tClassId cid, unsigned long reftype)
+static void gcg_print_rtdbref(gcg_ctx gcgctx, pwr_tObjid objdid, char prefix, pwr_tClassId cid,
+                              unsigned long reftype)
 {
   /* Print direct link command */
-  if (reftype == 0) {
+  if (reftype == 0)
+  {
     IF_PR fprintf(gcgctx->files[GCGM1_RTDBREF_FILE],
-        "{ (void **)&%c%s, {{%u,%u},0,0,0, {%u}}, %uUL,  sizeof(*%c%s), %ld, "
-        "0},\n",
-        prefix, vldh_IdToStr(0, objdid), objdid.oix, objdid.vid, pwr_mAttrRef_Object,
-	cid, prefix,
-        vldh_IdToStr(1, objdid), reftype);
-  } else {
+                  "{ (void **)&%c%s, {{%u,%u},0,0,0, {%u}}, %uUL,  sizeof(*%c%s), %ld, "
+                  "0},\n",
+                  prefix, vldh_IdToStr(0, objdid), objdid.oix, objdid.vid, pwr_mAttrRef_Object, cid, prefix,
+                  vldh_IdToStr(1, objdid), reftype);
+  }
+  else
+  {
     IF_PR fprintf(gcgctx->files[GCGM1_RTDBREF2_FILE],
-        "{ (void **)&%c%s, {{%u,%u},0,0,0,{%u}}, %uUL, sizeof(*%c%s), %ld, "
-        "0},\n",
-	prefix, vldh_IdToStr(0, objdid), objdid.oix, objdid.vid, pwr_mAttrRef_Object, cid, prefix,
-        vldh_IdToStr(1, objdid), reftype);
+                  "{ (void **)&%c%s, {{%u,%u},0,0,0,{%u}}, %uUL, sizeof(*%c%s), %ld, "
+                  "0},\n",
+                  prefix, vldh_IdToStr(0, objdid), objdid.oix, objdid.vid, pwr_mAttrRef_Object, cid, prefix,
+                  vldh_IdToStr(1, objdid), reftype);
   }
 }
 
-static void gcg_print_artdbref(gcg_ctx gcgctx, pwr_sAttrRef attrref,
-    char prefix, pwr_tClassId cid, unsigned long reftype, unsigned int offset)
+static void gcg_print_artdbref(gcg_ctx gcgctx, pwr_sAttrRef attrref, char prefix, pwr_tClassId cid,
+                               unsigned long reftype, unsigned int offset)
 {
   /* Print direct link command */
-  if (reftype == 0) {
+  if (reftype == 0)
+  {
     IF_PR fprintf(gcgctx->files[GCGM1_RTDBREF_FILE],
-        "{ (void **)&%c%s, {{%u,%u},%uUL,%u,%u,{%u}}, %uUL,  sizeof(*%c%s), "
-        "%ld, %u},\n",
-        prefix, vldh_AttrRefToStr(0, attrref), attrref.Objid.oix,
-        attrref.Objid.vid, attrref.Body, attrref.Offset, attrref.Size,
-        attrref.Flags.m, cid, prefix, vldh_AttrRefToStr(1, attrref), reftype,
-        offset);
-  } else {
+                  "{ (void **)&%c%s, {{%u,%u},%uUL,%u,%u,{%u}}, %uUL,  sizeof(*%c%s), "
+                  "%ld, %u},\n",
+                  prefix, vldh_AttrRefToStr(0, attrref), attrref.Objid.oix, attrref.Objid.vid, attrref.Body,
+                  attrref.Offset, attrref.Size, attrref.Flags.m, cid, prefix, vldh_AttrRefToStr(1, attrref),
+                  reftype, offset);
+  }
+  else
+  {
     IF_PR fprintf(gcgctx->files[GCGM1_RTDBREF2_FILE],
-        "{ (void **)&%c%s, {{%u,%u},%uUL,%u,%u,{%u}}, %uUL, sizeof(*%c%s), "
-        "%ld, %u},\n",
-        prefix, vldh_AttrRefToStr(0, attrref), attrref.Objid.oix,
-        attrref.Objid.vid, attrref.Body, attrref.Offset, attrref.Size,
-        attrref.Flags.m, cid, prefix, vldh_AttrRefToStr(1, attrref), reftype,
-        offset);
+                  "{ (void **)&%c%s, {{%u,%u},%uUL,%u,%u,{%u}}, %uUL, sizeof(*%c%s), "
+                  "%ld, %u},\n",
+                  prefix, vldh_AttrRefToStr(0, attrref), attrref.Objid.oix, attrref.Objid.vid, attrref.Body,
+                  attrref.Offset, attrref.Size, attrref.Flags.m, cid, prefix, vldh_AttrRefToStr(1, attrref),
+                  reftype, offset);
   }
 }
 
 /*************************************************************************
-*
-* Name:		gcg_error_msg()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* unsigned long sts		I	message identifier
-* vldh_t_node	node		I	vldh node
-*
-* Description:
-*	Prints a error or warning message for a node and increments the
-*	errorcount or warningcount in the gcg context.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_error_msg()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * unsigned long sts		I	message identifier
+ * vldh_t_node	node		I	vldh node
+ *
+ * Description:
+ *	Prints a error or warning message for a node and increments the
+ *	errorcount or warningcount in the gcg context.
+ *
+ **************************************************************************/
 
 static int gcg_error_msg(gcg_ctx gcgctx, unsigned long sts, vldh_t_node node)
 {
@@ -3631,7 +3808,8 @@ static int gcg_error_msg(gcg_ctx gcgctx, unsigned long sts, vldh_t_node node)
 
   logfile = NULL;
 
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     msg_GetMsg(sts, msg, sizeof(msg));
 
     if (logfile != NULL)
@@ -3640,10 +3818,11 @@ static int gcg_error_msg(gcg_ctx gcgctx, unsigned long sts, vldh_t_node node)
       printf("%s\n", msg);
     if (node == 0)
       msgw_message_sts(sts, 0, 0);
-    else {
+    else
+    {
       /* Get the full hierarchy name for the node */
-      status = ldh_ObjidToName((node->hn.wind)->hw.ldhses, node->ln.oid,
-          ldh_eName_Hierarchy, hier_name, sizeof(hier_name), &size);
+      status = ldh_ObjidToName((node->hn.wind)->hw.ldhses, node->ln.oid, ldh_eName_Hierarchy, hier_name,
+                               sizeof(hier_name), &size);
       if (EVEN(status))
         return status;
       if (logfile != NULL)
@@ -3652,7 +3831,8 @@ static int gcg_error_msg(gcg_ctx gcgctx, unsigned long sts, vldh_t_node node)
         printf("        in object  %s\n", hier_name);
       msgw_message_plcobject(sts, "   in object", hier_name, node->ln.oid);
     }
-    if (gcgctx) {
+    if (gcgctx)
+    {
       if ((sts & 2) && !(sts & 1))
         gcgctx->errorcount++;
       else if (!(sts & 2) && !(sts & 1))
@@ -3663,25 +3843,24 @@ static int gcg_error_msg(gcg_ctx gcgctx, unsigned long sts, vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_wind_msg()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* unsigned long sts		I	message identifier
-* vldh_t_node	wind		I	vldh wind
-*
-* Description:
-*	Prints a message for a window. The number of errors and warning
-*	found in errorcount and warningcount in gcg context is printed if
-*	they are greater than zero.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_wind_msg()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * unsigned long sts		I	message identifier
+ * vldh_t_node	wind		I	vldh wind
+ *
+ * Description:
+ *	Prints a message for a window. The number of errors and warning
+ *	found in errorcount and warningcount in gcg context is printed if
+ *	they are greater than zero.
+ *
+ **************************************************************************/
 
-int gcg_wind_msg(
-    gcg_ctx gcgctx, unsigned long sts, vldh_t_wind wind, int in_wind)
+int gcg_wind_msg(gcg_ctx gcgctx, unsigned long sts, vldh_t_wind wind, int in_wind)
 {
   static char msg[256];
   int status, size;
@@ -3695,7 +3874,8 @@ int gcg_wind_msg(
 
   if (logfile != NULL)
     fprintf(logfile, "%s\n", msg);
-  else {
+  else
+  {
     if (wind && !in_wind)
       printf("%s ", msg);
     else
@@ -3703,26 +3883,29 @@ int gcg_wind_msg(
   }
   if (wind == 0)
     msgw_message_sts(sts, 0, 0);
-  else {
+  else
+  {
     char str[80] = "";
 
     /* Get the full hierarchy name for the wind */
-    status = ldh_ObjidToName(wind->hw.ldhses, wind->lw.oid, ldh_eName_Hierarchy,
-        hier_name, sizeof(hier_name), &size);
+    status = ldh_ObjidToName(wind->hw.ldhses, wind->lw.oid, ldh_eName_Hierarchy, hier_name, sizeof(hier_name),
+                             &size);
     if (EVEN(status))
       return status;
     if (logfile != NULL)
       fprintf(logfile, "        ");
     else
       printf("        ");
-    if (gcgctx->errorcount > 0) {
+    if (gcgctx->errorcount > 0)
+    {
       if (logfile != NULL)
         fprintf(logfile, "%ld errors ", gcgctx->errorcount);
       else
         printf("%ld errors ", gcgctx->errorcount);
       sprintf(&str[strlen(str)], "%ld errors ", gcgctx->errorcount);
     }
-    if (gcgctx->warningcount > 0) {
+    if (gcgctx->warningcount > 0)
+    {
       if (logfile != NULL)
         fprintf(logfile, "%ld warnings ", gcgctx->warningcount);
       else
@@ -3745,22 +3928,22 @@ int gcg_wind_msg(
 }
 
 /*************************************************************************
-*
-* Name:		gcg_plc_msg()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* unsigned long sts		I	message identifier
-* pwr_tObjid	plcobjdid	I	objdid of the plcpgm object.
-*
-* Description:
-*	Prints a message for a plcpgm. If it is a error or warning
-*	message the errorcount and warningcount in gcg context is
-*	incremented.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_plc_msg()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * unsigned long sts		I	message identifier
+ * pwr_tObjid	plcobjdid	I	objdid of the plcpgm object.
+ *
+ * Description:
+ *	Prints a message for a plcpgm. If it is a error or warning
+ *	message the errorcount and warningcount in gcg context is
+ *	incremented.
+ *
+ **************************************************************************/
 
 static int gcg_plc_msg(gcg_ctx gcgctx, unsigned long sts, pwr_tObjid plcobjdid)
 {
@@ -3779,10 +3962,11 @@ static int gcg_plc_msg(gcg_ctx gcgctx, unsigned long sts, pwr_tObjid plcobjdid)
     printf("%s\n", msg);
   if (cdh_ObjidIsNull(plcobjdid))
     msgw_message_sts(sts, 0, 0);
-  else {
+  else
+  {
     /* Get the full hierarchy name for the plc */
-    status = ldh_ObjidToName(gcgctx->ldhses, plcobjdid, ldh_eName_Hierarchy,
-        hier_name, sizeof(hier_name), &size);
+    status =
+        ldh_ObjidToName(gcgctx->ldhses, plcobjdid, ldh_eName_Hierarchy, hier_name, sizeof(hier_name), &size);
     if (EVEN(status))
       return status;
     if (logfile != NULL)
@@ -3800,22 +3984,22 @@ static int gcg_plc_msg(gcg_ctx gcgctx, unsigned long sts, pwr_tObjid plcobjdid)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_text_msg()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* unsigned long sts		I	message identifier
-* char		*text		I	some text.
-*
-* Description:
-*	Prints a message. If it is a error or warning
-*	message the errorcount and warningcount in gcg context is
-*	incremented.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_text_msg()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * unsigned long sts		I	message identifier
+ * char		*text		I	some text.
+ *
+ * Description:
+ *	Prints a message. If it is a error or warning
+ *	message the errorcount and warningcount in gcg context is
+ *	incremented.
+ *
+ **************************************************************************/
 
 static int gcg_text_msg(gcg_ctx gcgctx, unsigned long sts, char* text)
 {
@@ -3828,7 +4012,8 @@ static int gcg_text_msg(gcg_ctx gcgctx, unsigned long sts, char* text)
 
   if (logfile != NULL)
     fprintf(logfile, "%s\n", msg);
-  else {
+  else
+  {
     printf("%s\n", msg);
     if (logfile != NULL)
       fprintf(logfile, "        %s\n", text);
@@ -3844,22 +4029,22 @@ static int gcg_text_msg(gcg_ctx gcgctx, unsigned long sts, char* text)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_node_comp()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Generates code for an object.
-*	Calls the compile method for the object.
-*	Compilemethod is stored in the parameter compmethod in graphbody
-*	of the class object.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_node_comp()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Generates code for an object.
+ *	Calls the compile method for the object.
+ *	Compilemethod is stored in the parameter compmethod in graphbody
+ *	of the class object.
+ *
+ **************************************************************************/
 
 static int gcg_node_comp(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -3871,52 +4056,55 @@ static int gcg_node_comp(gcg_ctx gcgctx, vldh_t_node node)
 
   wind = node->hn.wind;
 
-  if (!node->hn.comp_manager) {
+  if (!node->hn.comp_manager)
+  {
     if (gcgctx->current_cmanager)
       gcg_reset_cmanager(gcgctx);
 
     /* Get comp method for this node */
-    sts = ldh_GetClassBody(wind->hw.ldhses, node->ln.cid, "GraphPlcNode",
-        &bodyclass, (char**)&graphbody, &size);
+    sts = ldh_GetClassBody(wind->hw.ldhses, node->ln.cid, "GraphPlcNode", &bodyclass, (char**)&graphbody,
+                           &size);
     if (EVEN(sts))
       return sts;
 
     compmethod = graphbody->compmethod;
-    if (compmethod < 2
-        || compmethod >= (int)(sizeof(gcg_comp_m) / sizeof(gcg_comp_m[0]))) {
+    if (compmethod < 2 || compmethod >= (int)(sizeof(gcg_comp_m) / sizeof(gcg_comp_m[0])))
+    {
       gcg_error_msg(gcgctx, GSX__COMPMETHOD, node);
       return GSX__COMPMETHOD;
     }
 
     sts = (gcg_comp_m[compmethod])(gcgctx, node);
-  } else {
+  }
+  else
+  {
     sts = gcg_cmanager_comp(gcgctx, node);
   }
   return sts;
 }
 
 /*************************************************************************
-*
-* Name:		gcg_get_inputpoint()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-* unsigned long	index		I	index for parameter in objbodydef.
-* unsigned long	*pointptr	I	connection point.
-* unsigned long	*inverted	I	connection point inverted or not.
-*
-* Description:
-*	This routine returns the connection point for a parameter in an
-*	object if it is an output.
-*	The id of the parameter is index in the object bodydef.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_get_inputpoint()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ * unsigned long	index		I	index for parameter in objbodydef.
+ * unsigned long	*pointptr	I	connection point.
+ * unsigned long	*inverted	I	connection point inverted or not.
+ *
+ * Description:
+ *	This routine returns the connection point for a parameter in an
+ *	object if it is an output.
+ *	The id of the parameter is index in the object bodydef.
+ *
+ **************************************************************************/
 
-int gcg_get_inputpoint(vldh_t_node node, unsigned long index,
-    unsigned long* pointptr, unsigned long* inverted)
+int gcg_get_inputpoint(vldh_t_node node, unsigned long index, unsigned long* pointptr,
+                       unsigned long* inverted)
 {
   unsigned long par_inverted;
   unsigned long par_index;
@@ -3927,18 +4115,23 @@ int gcg_get_inputpoint(vldh_t_node node, unsigned long index,
   /* Get the point for this parameter if there is one */
   point = 0;
   par_found = 0;
-  while (ODD(goen_get_parameter(node->ln.cid, (node->hn.wind)->hw.ldhses,
-             node->ln.mask, point, &par_type, &par_inverted, &par_index))
-      && (par_type == PAR_INPUT)) {
-    if (index == par_index) {
+  while (ODD(goen_get_parameter(node->ln.cid, (node->hn.wind)->hw.ldhses, node->ln.mask, point, &par_type,
+                                &par_inverted, &par_index)) &&
+         (par_type == PAR_INPUT))
+  {
+    if (index == par_index)
+    {
       par_found = 1;
       break;
     }
     point++;
   }
-  if (!par_found) {
+  if (!par_found)
+  {
     return GSX__NOPOINT;
-  } else {
+  }
+  else
+  {
     *pointptr = point;
     *inverted = par_inverted;
     return GSX__SUCCESS;
@@ -3946,27 +4139,26 @@ int gcg_get_inputpoint(vldh_t_node node, unsigned long index,
 }
 
 /*************************************************************************
-*
-* Name:		gcg_get_inputpoint()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-* unsigned long	index		I	index for parameter in objbodydef.
-* unsigned long	*pointptr	I	connection point.
-* unsigned long	*inverted	I	connection point inverted or not.
-*
-* Description:
-*	This routine returns the connection point for a parameter in an
-*	object (input or output).
-*	The id of the parameter is index in the object bodydef.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_get_inputpoint()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ * unsigned long	index		I	index for parameter in objbodydef.
+ * unsigned long	*pointptr	I	connection point.
+ * unsigned long	*inverted	I	connection point inverted or not.
+ *
+ * Description:
+ *	This routine returns the connection point for a parameter in an
+ *	object (input or output).
+ *	The id of the parameter is index in the object bodydef.
+ *
+ **************************************************************************/
 
-int gcg_get_point(vldh_t_node node, unsigned long index,
-    unsigned long* pointptr, unsigned long* inverted)
+int gcg_get_point(vldh_t_node node, unsigned long index, unsigned long* pointptr, unsigned long* inverted)
 {
   unsigned long par_inverted;
   unsigned long par_index;
@@ -3977,18 +4169,23 @@ int gcg_get_point(vldh_t_node node, unsigned long index,
   /* Get the point for this parameter if there is one */
   point = 0;
   par_found = 0;
-  while (ODD(goen_get_parameter(node->ln.cid, (node->hn.wind)->hw.ldhses,
-             node->ln.mask, point, &par_type, &par_inverted, &par_index))
-      && ((par_type == PAR_INPUT) || (par_type == PAR_OUTPUT))) {
-    if (index == par_index) {
+  while (ODD(goen_get_parameter(node->ln.cid, (node->hn.wind)->hw.ldhses, node->ln.mask, point, &par_type,
+                                &par_inverted, &par_index)) &&
+         ((par_type == PAR_INPUT) || (par_type == PAR_OUTPUT)))
+  {
+    if (index == par_index)
+    {
       par_found = 1;
       break;
     }
     point++;
   }
-  if (!par_found) {
+  if (!par_found)
+  {
     return GSX__NOPOINT;
-  } else {
+  }
+  else
+  {
     *pointptr = point;
     *inverted = par_inverted;
     return GSX__SUCCESS;
@@ -3996,26 +4193,26 @@ int gcg_get_point(vldh_t_node node, unsigned long index,
 }
 
 /*************************************************************************
-*
-* Name:		gcg_get_child_windows()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext ldhses		I	ldh session.
-* pwr_tObjid	parent_objdid	I	objdid of object.
-* unsigned long	*wind_count	IO	number of windows in windlist.
-* void		**windlist	IO	found windows.
-*
-* Description:
-*	Routine used by gcg_get_plc_windows to find all the windows in
-*	a plcpgm. If a window is found it is added to the windlist.
-*	Rekursive funktion which calls itself for all children to the object.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_get_child_windows()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext ldhses		I	ldh session.
+ * pwr_tObjid	parent_objdid	I	objdid of object.
+ * unsigned long	*wind_count	IO	number of windows in windlist.
+ * void		**windlist	IO	found windows.
+ *
+ * Description:
+ *	Routine used by gcg_get_plc_windows to find all the windows in
+ *	a plcpgm. If a window is found it is added to the windlist.
+ *	Rekursive funktion which calls itself for all children to the object.
+ *
+ **************************************************************************/
 
-static int gcg_get_child_windows(ldh_tSesContext ldhses,
-    pwr_tObjid parent_objdid, unsigned long* wind_count, pwr_tObjid** windlist)
+static int gcg_get_child_windows(ldh_tSesContext ldhses, pwr_tObjid parent_objdid, unsigned long* wind_count,
+                                 pwr_tObjid** windlist)
 {
   pwr_tClassId cid;
   pwr_tObjid objdid;
@@ -4024,15 +4221,15 @@ static int gcg_get_child_windows(ldh_tSesContext ldhses,
 
   /* Get all the children of this  node */
   sts = ldh_GetChild(ldhses, parent_objdid, &objdid);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     /* Check if plc */
     sts = ldh_GetObjectClass(ldhses, objdid, &cid);
-    if (cid == pwr_cClass_windowplc || cid == pwr_cClass_windowcond
-        || cid == pwr_cClass_windowsubstep
-        || cid == pwr_cClass_windoworderact) {
-      sts = utl_realloc((char**)windlist,
-          *wind_count * sizeof(*windlist_pointer),
-          (*wind_count + 1) * sizeof(*windlist_pointer));
+    if (cid == pwr_cClass_windowplc || cid == pwr_cClass_windowcond || cid == pwr_cClass_windowsubstep ||
+        cid == pwr_cClass_windoworderact)
+    {
+      sts = utl_realloc((char**)windlist, *wind_count * sizeof(*windlist_pointer),
+                        (*wind_count + 1) * sizeof(*windlist_pointer));
       windlist_pointer = *windlist;
       *(windlist_pointer + *wind_count) = objdid;
       (*wind_count)++;
@@ -4048,25 +4245,25 @@ static int gcg_get_child_windows(ldh_tSesContext ldhses,
 }
 
 /*************************************************************************
-*
-* Name:		gcg_get_plc_windows()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext ldhses		I	ldh session.
-* pwr_tObjid	plcobjdid	I	objdid of an plc object.
-* unsigned long	*wind_count	O	number of windows in windlist.
-* void		**windlist	O	found windows.
-*
-* Description:
-* 	Returns a list of all windows in a plcpgm.
-*	The list should be freed by a free call after use.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_get_plc_windows()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext ldhses		I	ldh session.
+ * pwr_tObjid	plcobjdid	I	objdid of an plc object.
+ * unsigned long	*wind_count	O	number of windows in windlist.
+ * void		**windlist	O	found windows.
+ *
+ * Description:
+ * 	Returns a list of all windows in a plcpgm.
+ *	The list should be freed by a free call after use.
+ *
+ **************************************************************************/
 
-static int gcg_get_plc_windows(ldh_tSesContext ldhses, pwr_tObjid plcobjdid,
-    unsigned long* wind_count, pwr_tObjid** windlist)
+static int gcg_get_plc_windows(ldh_tSesContext ldhses, pwr_tObjid plcobjdid, unsigned long* wind_count,
+                               pwr_tObjid** windlist)
 {
   int sts;
 
@@ -4082,24 +4279,24 @@ static int gcg_get_plc_windows(ldh_tSesContext ldhses, pwr_tObjid plcobjdid,
 }
 
 /*************************************************************************
-*
-* Name:		gcg_get_rtnode_plcproc()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* unsigned long	gcgctx		I	gcg context.
-* unsigned long	*plcproc_count	O	number of plcproc objects in list.
-* gcg_t_plcproclist **plcproclist O	found thread's.
-*
-* Description:
-*	This routine returns a list of all plcprocess objects in the volume.
-*       The list should be freed by the caller.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_get_rtnode_plcproc()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * unsigned long	gcgctx		I	gcg context.
+ * unsigned long	*plcproc_count	O	number of plcproc objects in list.
+ * gcg_t_plcproclist **plcproclist O	found thread's.
+ *
+ * Description:
+ *	This routine returns a list of all plcprocess objects in the volume.
+ *       The list should be freed by the caller.
+ *
+ **************************************************************************/
 
 static int gcg_get_rtnode_plcproc(gcg_ctx gcgctx, unsigned long* plcproc_count,
-    gcg_t_plcproclist** plcproclist)
+                                  gcg_t_plcproclist** plcproclist)
 {
   int sts;
   pwr_tObjid oid;
@@ -4109,22 +4306,21 @@ static int gcg_get_rtnode_plcproc(gcg_ctx gcgctx, unsigned long* plcproc_count,
   /* Get all the plcprocess objects in this volume */
   *plcproc_count = 0;
 
-  for (sts = ldh_GetClassList(gcgctx->ldhses, pwr_cClass_PlcProcess, &oid);
-       ODD(sts); sts = ldh_GetNextObject(gcgctx->ldhses, oid, &oid)) {
+  for (sts = ldh_GetClassList(gcgctx->ldhses, pwr_cClass_PlcProcess, &oid); ODD(sts);
+       sts = ldh_GetNextObject(gcgctx->ldhses, oid, &oid))
+  {
     if (gcg_in_libhier(gcgctx, oid))
       continue;
 
-    sts = utl_realloc((char**)plcproclist,
-        *plcproc_count * sizeof(gcg_t_plcproclist),
-        (*plcproc_count + 1) * sizeof(gcg_t_plcproclist));
+    sts = utl_realloc((char**)plcproclist, *plcproc_count * sizeof(gcg_t_plcproclist),
+                      (*plcproc_count + 1) * sizeof(gcg_t_plcproclist));
     if (EVEN(sts))
       return sts;
 
     plcproclist_pointer = *plcproclist;
     (plcproclist_pointer + *plcproc_count)->oid = oid;
-    sts = ldh_ObjidToName(gcgctx->ldhses, oid, ldh_eName_Object,
-        (plcproclist_pointer + *plcproc_count)->name,
-        sizeof((plcproclist_pointer + *plcproc_count)->name), &size);
+    sts = ldh_ObjidToName(gcgctx->ldhses, oid, ldh_eName_Object, (plcproclist_pointer + *plcproc_count)->name,
+                          sizeof((plcproclist_pointer + *plcproc_count)->name), &size);
     if (EVEN(sts))
       return sts;
 
@@ -4134,31 +4330,30 @@ static int gcg_get_rtnode_plcproc(gcg_ctx gcgctx, unsigned long* plcproc_count,
 }
 
 /*************************************************************************
-*
-* Name:		gcg_get_child_plcthread()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* unsigned long	gcgctx		I	gcg context.
-* pwr_tObjid	plcobjdid	I	objdid of an plc object.
-* pwr_tObjid	rtnode		I	object of class $Node.
-* unsigned long	*plc_count	IO	number of plcpgm's in plclist.
-* void		**plclist	IO	found plcpgm's.
-*
-* Description:
-*	Routine used by gcg_get_rtnode_plc to get all the plcthreads's that
-*	belongs to a rtnode. If a plcthread is found it is added to the
-*threadlist
-*	and the parameter scantime is checked and stored in the list.
-*	Recursive funktion which calls itself for all children to the object.
-*	LibHier hierarchies are not searched.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_get_child_plcthread()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * unsigned long	gcgctx		I	gcg context.
+ * pwr_tObjid	plcobjdid	I	objdid of an plc object.
+ * pwr_tObjid	rtnode		I	object of class $Node.
+ * unsigned long	*plc_count	IO	number of plcpgm's in plclist.
+ * void		**plclist	IO	found plcpgm's.
+ *
+ * Description:
+ *	Routine used by gcg_get_rtnode_plc to get all the plcthreads's that
+ *	belongs to a rtnode. If a plcthread is found it is added to the
+ *threadlist
+ *	and the parameter scantime is checked and stored in the list.
+ *	Recursive funktion which calls itself for all children to the object.
+ *	LibHier hierarchies are not searched.
+ *
+ **************************************************************************/
 
-static int gcg_get_child_plcthread(gcg_ctx gcgctx, pwr_tObjid objdid,
-    pwr_tObjid rtnode, pwr_mOpSys os, unsigned long* thread_count,
-    gcg_t_threadlist** threadlist)
+static int gcg_get_child_plcthread(gcg_ctx gcgctx, pwr_tObjid objdid, pwr_tObjid rtnode, pwr_mOpSys os,
+                                   unsigned long* thread_count, gcg_t_threadlist** threadlist)
 {
   pwr_tClassId cid, pcid;
   int sts, size;
@@ -4170,26 +4365,30 @@ static int gcg_get_child_plcthread(gcg_ctx gcgctx, pwr_tObjid objdid,
 
   /* Get all the children of this  node */
   sts = ldh_GetChild(gcgctx->ldhses, objdid, &objdid);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     /* Check if plc */
     sts = ldh_GetObjectClass(gcgctx->ldhses, objdid, &cid);
-    if (cid == pwr_cClass_PlcThread) {
+    if (cid == pwr_cClass_PlcThread)
+    {
       /* Get the scantime */
-      sts = ldh_GetObjectPar(gcgctx->ldhses, objdid, "RtBody", "ScanTime",
-          (char**)&scantime_ptr, &size);
+      sts = ldh_GetObjectPar(gcgctx->ldhses, objdid, "RtBody", "ScanTime", (char**)&scantime_ptr, &size);
       if (EVEN(sts))
         return sts;
 
       /* Check the scantime */
       timebase = (int)((*scantime_ptr) * 1000 + 0.5);
-      if ((IS_LINUX(os) || IS_MACOS(os) || IS_FREEBSD(os) || IS_OPENBSD(os)
-              || IS_CYGWIN(os))
-          && (*scantime_ptr < 0.0000001)) {
+      if ((IS_LINUX(os) || IS_MACOS(os) || IS_FREEBSD(os) || IS_OPENBSD(os) || IS_CYGWIN(os)) &&
+          (*scantime_ptr < 0.0000001))
+      {
         gcg_plc_msg(gcgctx, GSX__BADSCANTIME, objdid);
-      } else {
+      }
+      else
+      {
         /* Get plcprocess, should be parent */
         sts = ldh_GetParent(gcgctx->ldhses, objdid, &parent);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           gcg_plc_msg(gcgctx, GSX__MISPLACEDTHREAD, objdid);
           return sts;
         }
@@ -4198,20 +4397,19 @@ static int gcg_get_child_plcthread(gcg_ctx gcgctx, pwr_tObjid objdid,
         if (EVEN(sts))
           return sts;
 
-        if (pcid != pwr_cClass_PlcProcess) {
+        if (pcid != pwr_cClass_PlcProcess)
+        {
           gcg_plc_msg(gcgctx, GSX__MISPLACEDTHREAD, objdid);
           return GSX__MISPLACEDTHREAD;
         }
 
         /* Get the priority */
-        sts = ldh_GetObjectPar(
-            gcgctx->ldhses, objdid, "RtBody", "Prio", (char**)&prio_ptr, &size);
+        sts = ldh_GetObjectPar(gcgctx->ldhses, objdid, "RtBody", "Prio", (char**)&prio_ptr, &size);
         if (EVEN(sts))
           return sts;
 
-        sts = utl_realloc((char**)threadlist,
-            *thread_count * sizeof(gcg_t_threadlist),
-            (*thread_count + 1) * sizeof(gcg_t_threadlist));
+        sts = utl_realloc((char**)threadlist, *thread_count * sizeof(gcg_t_threadlist),
+                          (*thread_count + 1) * sizeof(gcg_t_threadlist));
         if (EVEN(sts))
           return sts;
         threadlist_pointer = *threadlist;
@@ -4220,20 +4418,23 @@ static int gcg_get_child_plcthread(gcg_ctx gcgctx, pwr_tObjid objdid,
         (threadlist_pointer + *thread_count)->scantime = *scantime_ptr;
         (threadlist_pointer + *thread_count)->prio = *prio_ptr;
         sts = ldh_ObjidToName(gcgctx->ldhses, objdid, ldh_eName_VolPath,
-            (threadlist_pointer + *thread_count)->name,
-            sizeof((threadlist_pointer + *thread_count)->name), &size);
+                              (threadlist_pointer + *thread_count)->name,
+                              sizeof((threadlist_pointer + *thread_count)->name), &size);
         if (EVEN(sts))
           return sts;
         (*thread_count)++;
         free((char*)prio_ptr);
       }
       free((char*)scantime_ptr);
-    } else if (cid == pwr_eClass_LibHier || cid == pwr_eClass_MountObject) {
+    }
+    else if (cid == pwr_eClass_LibHier || cid == pwr_eClass_MountObject)
+    {
       ; /* Do nothing if it is a LibHier */
-    } else {
+    }
+    else
+    {
       /* Check if the children is a thread */
-      sts = gcg_get_child_plcthread(
-          gcgctx, objdid, rtnode, os, thread_count, threadlist);
+      sts = gcg_get_child_plcthread(gcgctx, objdid, rtnode, os, thread_count, threadlist);
       if (EVEN(sts))
         return sts;
     }
@@ -4243,27 +4444,27 @@ static int gcg_get_child_plcthread(gcg_ctx gcgctx, pwr_tObjid objdid,
 }
 
 /*************************************************************************
-*
-* Name:		gcg_get_rtnode_plcthread()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* unsigned long	gcgctx		I	gcg context.
-* pwr_tObjid	rtnode		I	object of class $Node.
-* unsigned long	*thread_count	O	number of thread's in threadlist.
-* gcg_t_threadlist **threadlist	O	found thread's.
-*
-* Description:
-*	This routine returns a list of all thread's that is assigned to
-*	a rtnode. In the returned list the objdid and the scantime of
-*	the thred is stored. The list should be freed by the caller with
-*	an free call.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_get_rtnode_plcthread()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * unsigned long	gcgctx		I	gcg context.
+ * pwr_tObjid	rtnode		I	object of class $Node.
+ * unsigned long	*thread_count	O	number of thread's in threadlist.
+ * gcg_t_threadlist **threadlist	O	found thread's.
+ *
+ * Description:
+ *	This routine returns a list of all thread's that is assigned to
+ *	a rtnode. In the returned list the objdid and the scantime of
+ *	the thred is stored. The list should be freed by the caller with
+ *	an free call.
+ *
+ **************************************************************************/
 
-static int gcg_get_rtnode_plcthread(gcg_ctx gcgctx, pwr_tObjid rtnode,
-    pwr_mOpSys os, unsigned long* thread_count, gcg_t_threadlist** threadlist)
+static int gcg_get_rtnode_plcthread(gcg_ctx gcgctx, pwr_tObjid rtnode, pwr_mOpSys os,
+                                    unsigned long* thread_count, gcg_t_threadlist** threadlist)
 {
   int sts;
   pwr_tObjid objdid;
@@ -4274,16 +4475,17 @@ static int gcg_get_rtnode_plcthread(gcg_ctx gcgctx, pwr_tObjid rtnode,
   *thread_count = 0;
 
   sts = ldh_GetRootList(gcgctx->ldhses, &objdid);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     sts = ldh_GetObjectClass(gcgctx->ldhses, objdid, &cid);
     if (EVEN(sts))
       return sts;
 
     /* Check that the class of the node object is correct */
-    if (cid == pwr_cClass_NodeHier || cid == pwr_cClass_Node) {
+    if (cid == pwr_cClass_NodeHier || cid == pwr_cClass_Node)
+    {
       /* Check if the children is a thread */
-      sts = gcg_get_child_plcthread(
-          gcgctx, objdid, rtnode, os, thread_count, threadlist);
+      sts = gcg_get_child_plcthread(gcgctx, objdid, rtnode, os, thread_count, threadlist);
       if (EVEN(sts))
         return sts;
     }
@@ -4293,30 +4495,29 @@ static int gcg_get_rtnode_plcthread(gcg_ctx gcgctx, pwr_tObjid rtnode,
 }
 
 /*************************************************************************
-*
-* Name:		gcg_get_child_plc()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* unsigned long	gcgctx		I	gcg context.
-* pwr_tObjid	plcobjdid	I	objdid of an plc object.
-* pwr_tObjid	rtnode		I	object of class $Node.
-* unsigned long	*plc_count	IO	number of plcpgm's in plclist.
-* void		**plclist	IO	found plcpgm's.
-*
-* Description:
-*	Routine used by gcg_get_rtnode_plc to get all the plcpgm's that
-*	belongs to a rtnode. If a plcpgm is found it is added to the plclist
-*	and the parameter scantime is checked and stored in the list.
-*	Recursive funktion which calls itself for all children to the object.
-*	LibHier hierarchies are not searched.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_get_child_plc()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * unsigned long	gcgctx		I	gcg context.
+ * pwr_tObjid	plcobjdid	I	objdid of an plc object.
+ * pwr_tObjid	rtnode		I	object of class $Node.
+ * unsigned long	*plc_count	IO	number of plcpgm's in plclist.
+ * void		**plclist	IO	found plcpgm's.
+ *
+ * Description:
+ *	Routine used by gcg_get_rtnode_plc to get all the plcpgm's that
+ *	belongs to a rtnode. If a plcpgm is found it is added to the plclist
+ *	and the parameter scantime is checked and stored in the list.
+ *	Recursive funktion which calls itself for all children to the object.
+ *	LibHier hierarchies are not searched.
+ *
+ **************************************************************************/
 
-static int gcg_get_child_plc(gcg_ctx gcgctx, pwr_tObjid objdid,
-    pwr_tObjid rtnode, pwr_mOpSys os, unsigned long* plc_count,
-    gcg_t_plclist** plclist)
+static int gcg_get_child_plc(gcg_ctx gcgctx, pwr_tObjid objdid, pwr_tObjid rtnode, pwr_mOpSys os,
+                             unsigned long* plc_count, gcg_t_plclist** plclist)
 {
   pwr_tClassId cid;
   int sts, size;
@@ -4327,53 +4528,62 @@ static int gcg_get_child_plc(gcg_ctx gcgctx, pwr_tObjid objdid,
 
   /* Get all the children of this  node */
   sts = ldh_GetChild(gcgctx->ldhses, objdid, &objdid);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     /* Check if plc */
     sts = ldh_GetObjectClass(gcgctx->ldhses, objdid, &cid);
-    if (cid == pwr_cClass_plc) {
+    if (cid == pwr_cClass_plc)
+    {
       /* If no child, ignore */
       sts = ldh_GetChild(gcgctx->ldhses, objdid, &wind);
-      if (EVEN(sts)) {
-	gcg_plc_msg(gcgctx, GSX__PLCEMPTY, objdid);
-	sts = ldh_GetNextSibling(gcgctx->ldhses, objdid, &objdid);
-	continue;
+      if (EVEN(sts))
+      {
+        gcg_plc_msg(gcgctx, GSX__PLCEMPTY, objdid);
+        sts = ldh_GetNextSibling(gcgctx->ldhses, objdid, &objdid);
+        continue;
       }
 
       /* Get the thread */
-      sts = ldh_GetObjectPar(gcgctx->ldhses, objdid, "RtBody", "ThreadObject",
-          (char**)&threadobject_ptr, &size);
+      sts = ldh_GetObjectPar(gcgctx->ldhses, objdid, "RtBody", "ThreadObject", (char**)&threadobject_ptr,
+                             &size);
       if (EVEN(sts))
         return sts;
 
-      if (cdh_ObjidIsNull(*threadobject_ptr)) {
+      if (cdh_ObjidIsNull(*threadobject_ptr))
+      {
         gcg_plc_msg(gcgctx, GSX__NOTHREAD, objdid);
-      } else {
+      }
+      else
+      {
         /* Get the execute order */
-        sts = ldh_GetObjectPar(gcgctx->ldhses, objdid, "DevBody",
-            "ExecuteOrder", (char**)&executeorder_ptr, &size);
+        sts = ldh_GetObjectPar(gcgctx->ldhses, objdid, "DevBody", "ExecuteOrder", (char**)&executeorder_ptr,
+                               &size);
         if (EVEN(sts))
           return sts;
 
         sts = utl_realloc((char**)plclist, *plc_count * sizeof(gcg_t_plclist),
-            (*plc_count + 1) * sizeof(gcg_t_plclist));
+                          (*plc_count + 1) * sizeof(gcg_t_plclist));
         if (EVEN(sts))
           return sts;
         plclist_pointer = *plclist;
         (plclist_pointer + *plc_count)->objdid = objdid;
         (plclist_pointer + *plc_count)->thread = *threadobject_ptr;
         (plclist_pointer + *plc_count)->executeorder = *executeorder_ptr;
-        sts = ldh_ObjidToName(gcgctx->ldhses, objdid, ldh_eName_VolPath,
-            (plclist_pointer + *plc_count)->name,
-            sizeof((plclist_pointer + *plc_count)->name), &size);
+        sts = ldh_ObjidToName(gcgctx->ldhses, objdid, ldh_eName_VolPath, (plclist_pointer + *plc_count)->name,
+                              sizeof((plclist_pointer + *plc_count)->name), &size);
         if (EVEN(sts))
           return sts;
         (*plc_count)++;
         free((char*)executeorder_ptr);
       }
       free((char*)threadobject_ptr);
-    } else if (cid == pwr_eClass_LibHier || cid == pwr_eClass_MountObject) {
+    }
+    else if (cid == pwr_eClass_LibHier || cid == pwr_eClass_MountObject)
+    {
       ; /* Do nothing if it is a LibHier */
-    } else {
+    }
+    else
+    {
       /* Check if the children is a plc */
       sts = gcg_get_child_plc(gcgctx, objdid, rtnode, os, plc_count, plclist);
       if (EVEN(sts))
@@ -4385,27 +4595,27 @@ static int gcg_get_child_plc(gcg_ctx gcgctx, pwr_tObjid objdid,
 }
 
 /*************************************************************************
-*
-* Name:		gcg_get_child_plc()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* unsigned long	gcgctx		I	gcg context.
-* pwr_tObjid	rtnode		I	object of class $Node.
-* unsigned long	*plc_count	O	number of plcpgm's in plclist.
-* gcg_t_plclist	**plclist	O	found plcpgm's.
-*
-* Description:
-*	This routine returns a list of all plcpgm's that is assigned to
-*	a rtnode. In the returned list the objdid and the scantime of
-*	the plcpgm is stored. The list should be freed by the caller with
-*	an free call.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_get_child_plc()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * unsigned long	gcgctx		I	gcg context.
+ * pwr_tObjid	rtnode		I	object of class $Node.
+ * unsigned long	*plc_count	O	number of plcpgm's in plclist.
+ * gcg_t_plclist	**plclist	O	found plcpgm's.
+ *
+ * Description:
+ *	This routine returns a list of all plcpgm's that is assigned to
+ *	a rtnode. In the returned list the objdid and the scantime of
+ *	the plcpgm is stored. The list should be freed by the caller with
+ *	an free call.
+ *
+ **************************************************************************/
 
-static int gcg_get_rtnode_plc(gcg_ctx gcgctx, pwr_tObjid rtnode, pwr_mOpSys os,
-    unsigned long* plc_count, gcg_t_plclist** plclist)
+static int gcg_get_rtnode_plc(gcg_ctx gcgctx, pwr_tObjid rtnode, pwr_mOpSys os, unsigned long* plc_count,
+                              gcg_t_plclist** plclist)
 {
   int sts;
   pwr_tObjid objdid;
@@ -4417,13 +4627,15 @@ static int gcg_get_rtnode_plc(gcg_ctx gcgctx, pwr_tObjid rtnode, pwr_mOpSys os,
   *plc_count = 0;
 
   sts = ldh_GetRootList(gcgctx->ldhses, &objdid);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     sts = ldh_GetObjectClass(gcgctx->ldhses, objdid, &cid);
     if (EVEN(sts))
       return sts;
 
     /* Check that the class of the node object is correct */
-    if (cid == pwr_cClass_PlantHier) {
+    if (cid == pwr_cClass_PlantHier)
+    {
       /* Check if the children is a plc */
       sts = gcg_get_child_plc(gcgctx, objdid, rtnode, os, plc_count, plclist);
       if (EVEN(sts))
@@ -4435,20 +4647,19 @@ static int gcg_get_rtnode_plc(gcg_ctx gcgctx, pwr_tObjid rtnode, pwr_mOpSys os,
 }
 
 /*************************************************************************
-*
-* Name:		gcg_sort_threadlist()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	This function sorts a threadlist in priority order.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_sort_threadlist()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	This function sorts a threadlist in priority order.
+ *
+ **************************************************************************/
 
-static int gcg_sort_threadlist(
-    gcg_ctx gcgctx, gcg_t_threadlist* threadlist, unsigned long size)
+static int gcg_sort_threadlist(gcg_ctx gcgctx, gcg_t_threadlist* threadlist, unsigned long size)
 {
   int i, j;
   gcg_t_threadlist dum;
@@ -4457,10 +4668,13 @@ static int gcg_sort_threadlist(
   if (threadlist == 0)
     return GSX__SUCCESS;
 
-  for (i = size - 1; i > 0; i--) {
+  for (i = size - 1; i > 0; i--)
+  {
     list_ptr = threadlist;
-    for (j = 0; j < i; j++) {
-      if (list_ptr->prio < (list_ptr + 1)->prio) {
+    for (j = 0; j < i; j++)
+    {
+      if (list_ptr->prio < (list_ptr + 1)->prio)
+      {
         /* Change order */
         memcpy(&dum, list_ptr + 1, sizeof(gcg_t_threadlist));
         memcpy(list_ptr + 1, list_ptr, sizeof(gcg_t_threadlist));
@@ -4473,20 +4687,19 @@ static int gcg_sort_threadlist(
 }
 
 /*************************************************************************
-*
-* Name:		gcg_sort_plclist()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	This function sorts a plclist in execute order order.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_sort_plclist()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	This function sorts a plclist in execute order order.
+ *
+ **************************************************************************/
 
-static int gcg_sort_plclist(
-    gcg_ctx gcgctx, gcg_t_plclist* plclist, unsigned long size)
+static int gcg_sort_plclist(gcg_ctx gcgctx, gcg_t_plclist* plclist, unsigned long size)
 {
   int i, j;
   gcg_t_plclist dum;
@@ -4495,10 +4708,13 @@ static int gcg_sort_plclist(
   if (plclist == 0)
     return GSX__SUCCESS;
 
-  for (i = size - 1; i > 0; i--) {
+  for (i = size - 1; i > 0; i--)
+  {
     list_ptr = plclist;
-    for (j = 0; j < i; j++) {
-      if (list_ptr->executeorder > (list_ptr + 1)->executeorder) {
+    for (j = 0; j < i; j++)
+    {
+      if (list_ptr->executeorder > (list_ptr + 1)->executeorder)
+      {
         /* Change order */
         memcpy(&dum, list_ptr + 1, sizeof(gcg_t_plclist));
         memcpy(list_ptr + 1, list_ptr, sizeof(gcg_t_plclist));
@@ -4510,10 +4726,9 @@ static int gcg_sort_plclist(
   return GSX__SUCCESS;
 }
 
-pwr_tStatus gcg_read_volume_plclist(pwr_tVolumeId volid,
-    unsigned long* plc_count, gcg_t_plclist** plclist,
-    unsigned long* thread_count, gcg_t_threadlist** threadlist,
-    unsigned long* plcproc_count, gcg_t_plcproclist** plcproclist)
+pwr_tStatus gcg_read_volume_plclist(pwr_tVolumeId volid, unsigned long* plc_count, gcg_t_plclist** plclist,
+                                    unsigned long* thread_count, gcg_t_threadlist** threadlist,
+                                    unsigned long* plcproc_count, gcg_t_plcproclist** plcproclist)
 {
   FILE* file;
   pwr_tFileName filenames;
@@ -4540,63 +4755,65 @@ pwr_tStatus gcg_read_volume_plclist(pwr_tVolumeId volid,
   if (!file)
     return GSX__NOLOADFILE;
 
-  while (ODD(sts = utl_read_line(line, sizeof(line), file, &line_count))) {
-    if (str_StartsWith(line, "PlcProcess")) {
-      if (plcproclist) {
+  while (ODD(sts = utl_read_line(line, sizeof(line), file, &line_count)))
+  {
+    if (str_StartsWith(line, "PlcProcess"))
+    {
+      if (plcproclist)
+      {
         sscanf(line, "%s %s %s", type, objid_str, name);
-        sts = utl_realloc((char**)plcproclist,
-            *plcproc_count * sizeof(gcg_t_plcproclist),
-            (*plcproc_count + 1) * sizeof(gcg_t_plcproclist));
+        sts = utl_realloc((char**)plcproclist, *plcproc_count * sizeof(gcg_t_plcproclist),
+                          (*plcproc_count + 1) * sizeof(gcg_t_plcproclist));
         if (EVEN(sts))
           return sts;
         plcproclist_pointer = *plcproclist;
-        sts = cdh_StringToObjid(
-            objid_str, &(plcproclist_pointer + *plcproc_count)->oid);
+        sts = cdh_StringToObjid(objid_str, &(plcproclist_pointer + *plcproc_count)->oid);
         strcpy((plcproclist_pointer + *plcproc_count)->name, name);
         (*plcproc_count)++;
       }
-    } else if (str_StartsWith(line, "PlcThread")) {
-      if (threadlist) {
-        sscanf(line, "%s %s %s %f %d %s", type, objid_str, plcproc_objid_str,
-            &scantime, &prio, name);
-        sts = utl_realloc((char**)threadlist,
-            *thread_count * sizeof(gcg_t_threadlist),
-            (*thread_count + 1) * sizeof(gcg_t_threadlist));
+    }
+    else if (str_StartsWith(line, "PlcThread"))
+    {
+      if (threadlist)
+      {
+        sscanf(line, "%s %s %s %f %d %s", type, objid_str, plcproc_objid_str, &scantime, &prio, name);
+        sts = utl_realloc((char**)threadlist, *thread_count * sizeof(gcg_t_threadlist),
+                          (*thread_count + 1) * sizeof(gcg_t_threadlist));
         if (EVEN(sts))
           return sts;
         threadlist_pointer = *threadlist;
-        sts = cdh_StringToObjid(
-            objid_str, &(threadlist_pointer + *thread_count)->objdid);
+        sts = cdh_StringToObjid(objid_str, &(threadlist_pointer + *thread_count)->objdid);
         if (EVEN(sts))
           return sts;
-        sts = cdh_StringToObjid(plcproc_objid_str,
-            &(threadlist_pointer + *thread_count)->plcproc_oid);
+        sts = cdh_StringToObjid(plcproc_objid_str, &(threadlist_pointer + *thread_count)->plcproc_oid);
         if (EVEN(sts))
           return sts;
         (threadlist_pointer + *thread_count)->scantime = scantime;
         (threadlist_pointer + *thread_count)->prio = prio;
         (*thread_count)++;
       }
-    } else if (str_StartsWith(line, "PlcPgm")) {
-      if (plclist) {
-        sscanf(line, "%s %s %s %d %s", type, objid_str, thread_str,
-            &executeorder, name);
+    }
+    else if (str_StartsWith(line, "PlcPgm"))
+    {
+      if (plclist)
+      {
+        sscanf(line, "%s %s %s %d %s", type, objid_str, thread_str, &executeorder, name);
         sts = utl_realloc((char**)plclist, *plc_count * sizeof(gcg_t_plclist),
-            (*plc_count + 1) * sizeof(gcg_t_plclist));
+                          (*plc_count + 1) * sizeof(gcg_t_plclist));
         if (EVEN(sts))
           return sts;
         plclist_pointer = *plclist;
-        sts = cdh_StringToObjid(
-            objid_str, &(plclist_pointer + *plc_count)->objdid);
+        sts = cdh_StringToObjid(objid_str, &(plclist_pointer + *plc_count)->objdid);
         if (EVEN(sts))
           return sts;
-        sts = cdh_StringToObjid(
-            thread_str, &(plclist_pointer + *plc_count)->thread);
+        sts = cdh_StringToObjid(thread_str, &(plclist_pointer + *plc_count)->thread);
         (plclist_pointer + *plc_count)->executeorder = executeorder;
         strcpy((plclist_pointer + *plc_count)->name, name);
         (*plc_count)++;
       }
-    } else {
+    }
+    else
+    {
       printf("** Syntax error in plcpgm list\n");
     }
   }
@@ -4604,34 +4821,34 @@ pwr_tStatus gcg_read_volume_plclist(pwr_tVolumeId volid,
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_rtnode()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext ldhses		I	ldh session.
-* pwr_tObjid	rtnode		I	objdid of rtnode.
-* vldh_t_plc	plc		I	vldh plc.
-* unsigned long	codetype	I	generating code or syntaxcontrol only.
-* unsigned long	*errorcount	O	error counter
-* unsigned long	*warningcount	O	warning counter
-*
-* Description:
-*	Compile method for a node.
-*	This routine generates code for the plcjob of a node.
-*	All plcpgm objects in this node with the same scantime
-*	is put together in processes. Code is generated for
-*	every process and the process module is compiled to objectmodules.
-*	An .opt_eln file is also produced for the linking of the plcjob
-*	and the linking is done.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_rtnode()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext ldhses		I	ldh session.
+ * pwr_tObjid	rtnode		I	objdid of rtnode.
+ * vldh_t_plc	plc		I	vldh plc.
+ * unsigned long	codetype	I	generating code or syntaxcontrol only.
+ * unsigned long	*errorcount	O	error counter
+ * unsigned long	*warningcount	O	warning counter
+ *
+ * Description:
+ *	Compile method for a node.
+ *	This routine generates code for the plcjob of a node.
+ *	All plcpgm objects in this node with the same scantime
+ *	is put together in processes. Code is generated for
+ *	every process and the process module is compiled to objectmodules.
+ *	An .opt_eln file is also produced for the linking of the plcjob
+ *	and the linking is done.
+ *
+ **************************************************************************/
 
-int gcg_comp_rtnode(char* nodename, pwr_mOpSys os, pwr_tUInt32 bus,
-    unsigned long codetype, unsigned long* errorcount,
-    unsigned long* warningcount, int debug, pwr_tVolumeId* volumelist,
-    int volume_count, unsigned long plc_version, pwr_tFloat32 single_scantime)
+int gcg_comp_rtnode(char* nodename, pwr_mOpSys os, pwr_tUInt32 bus, unsigned long codetype,
+                    unsigned long* errorcount, unsigned long* warningcount, int debug,
+                    pwr_tVolumeId* volumelist, int volume_count, unsigned long plc_version,
+                    pwr_tFloat32 single_scantime)
 {
   int i, j, k, l, sts;
   pwr_tFileName fullfilename;
@@ -4665,7 +4882,8 @@ int gcg_comp_rtnode(char* nodename, pwr_mOpSys os, pwr_tUInt32 bus,
   strcpy(gcdir, GCDIR);
   strncpy(nodename_low, cdh_Low(nodename), sizeof(nodename_low));
 
-  switch (os) {
+  switch (os)
+  {
   case pwr_mOpSys_PPC_LINUX:
     strcpy(objdir, "xxx"); /* Not used */
     strcpy(os_str, "PPC_LINUX");
@@ -4725,10 +4943,12 @@ int gcg_comp_rtnode(char* nodename, pwr_mOpSys os, pwr_tUInt32 bus,
   thread_count = 0;
   plcproc_count = 0;
   volumelist_ptr = volumelist;
-  for (i = 0; i < volume_count; i++) {
-    sts = gcg_read_volume_plclist(*volumelist_ptr, &plc_count, &plclist,
-        &thread_count, &threadlist, &plcproc_count, &plcproclist);
-    if (EVEN(sts)) {
+  for (i = 0; i < volume_count; i++)
+  {
+    sts = gcg_read_volume_plclist(*volumelist_ptr, &plc_count, &plclist, &thread_count, &threadlist,
+                                  &plcproc_count, &plcproclist);
+    if (EVEN(sts))
+    {
       /* No plcpgm's in this volume */
       *volumelist_ptr = 0;
     }
@@ -4745,28 +4965,34 @@ int gcg_comp_rtnode(char* nodename, pwr_mOpSys os, pwr_tUInt32 bus,
   if (EVEN(sts))
     return sts;
 
-  if (plc_count == 0) {
+  if (plc_count == 0)
+  {
     /* No plcpgms on this node */
     printf("-- No plcpgms found on node %s\n", nodename);
     return GSX__NOPLC;
   }
 
   /* Check that every plcpgm has a valid thread */
-  for (i = 0; i < (int)plc_count; i++) {
+  for (i = 0; i < (int)plc_count; i++)
+  {
     found = 0;
-    for (j = 0; j < (int)thread_count; j++) {
-      if (cdh_ObjidIsEqual((plclist + i)->thread, (threadlist + j)->objdid)) {
+    for (j = 0; j < (int)thread_count; j++)
+    {
+      if (cdh_ObjidIsEqual((plclist + i)->thread, (threadlist + j)->objdid))
+      {
         found = 1;
         break;
       }
     }
-    if (!found) {
+    if (!found)
+    {
       sprintf(text, "in plcpgm %s", (plclist + i)->name);
       gcg_text_msg(gcgctx, GSX__NOTHREAD, text);
     }
   }
 
-  if (thread_count == 0) {
+  if (thread_count == 0)
+  {
     /* No threads on this node */
     printf("-- No PlcThreads found on node %s\n", nodename);
     return GSX__NOPLC;
@@ -4774,30 +5000,34 @@ int gcg_comp_rtnode(char* nodename, pwr_mOpSys os, pwr_tUInt32 bus,
 
   /* Insert the plc objects in the timebaselists */
   timebase = (gcg_t_timebase*)calloc(thread_count, sizeof(gcg_t_timebase));
-  for (i = 0; i < (int)thread_count; i++) {
+  for (i = 0; i < (int)thread_count; i++)
+  {
     (timebase + i)->thread_objid = (threadlist + i)->objdid;
     (timebase + i)->plcproc_objid = (threadlist + i)->plcproc_oid;
     (timebase + i)->scantime = (threadlist + i)->scantime;
     (timebase + i)->prio = (threadlist + i)->prio;
     (timebase + i)->plc_count = 0;
-    (timebase + i)->plclist
-        = (pwr_tObjid*)calloc(plc_count, sizeof(pwr_tObjid));
-    for (k = 0; k < (int)plc_count; k++) {
-      if (cdh_ObjidIsEqual((plclist + k)->thread, (threadlist + i)->objdid)) {
-        (timebase + i)->plclist[(timebase + i)->plc_count]
-            = (plclist + k)->objdid;
+    (timebase + i)->plclist = (pwr_tObjid*)calloc(plc_count, sizeof(pwr_tObjid));
+    for (k = 0; k < (int)plc_count; k++)
+    {
+      if (cdh_ObjidIsEqual((plclist + k)->thread, (threadlist + i)->objdid))
+      {
+        (timebase + i)->plclist[(timebase + i)->plc_count] = (plclist + k)->objdid;
         (timebase + i)->plc_count++;
       }
     }
   }
   timebase_count = thread_count;
 
-  if (!feqf(single_scantime, 0.0f)) {
+  if (!feqf(single_scantime, 0.0f))
+  {
     /* Insert all plcpgm's into one timebase */
     timebase->prio = 1;
     timebase_count = 1;
-    for (i = 1; i < (int)thread_count; i++) {
-      for (k = 0; k < (timebase + i)->plc_count; k++) {
+    for (i = 1; i < (int)thread_count; i++)
+    {
+      for (k = 0; k < (timebase + i)->plc_count; k++)
+      {
         timebase->plclist[timebase->plc_count] = (timebase + i)->plclist[k];
         timebase->plc_count++;
       }
@@ -4806,75 +5036,81 @@ int gcg_comp_rtnode(char* nodename, pwr_mOpSys os, pwr_tUInt32 bus,
     printf("-- SimulateSingleProcess is configured for this node\n");
   }
 
-  if (timebase_count > max_no_timebase) {
-    printf("** Error, %d frequencies is supported on %s, %d is found\n",
-        max_no_timebase, os_str, timebase_count);
+  if (timebase_count > max_no_timebase)
+  {
+    printf("** Error, %d frequencies is supported on %s, %d is found\n", max_no_timebase, os_str,
+           timebase_count);
     free(timebase);
     return GSX__NONODE;
   }
 
   /* Generate one c module for every timebase, and one optfile */
-  if (codetype) {
-    for (j = 0; j < (int)plcproc_count; j++) {
-      sprintf(fullfilename, "%s%s%s_%4.4d_%s%s", gcdir, gcgmn_filenames[0],
-          nodename_low, bus, cdh_Low(plcproclist[j].name), GCEXT);
+  if (codetype)
+  {
+    for (j = 0; j < (int)plcproc_count; j++)
+    {
+      sprintf(fullfilename, "%s%s%s_%4.4d_%s%s", gcdir, gcgmn_filenames[0], nodename_low, bus,
+              cdh_Low(plcproclist[j].name), GCEXT);
       dcli_translate_filename(fullfilename, fullfilename);
-      if ((files[0] = fopen(fullfilename, "w")) == NULL) {
+      if ((files[0] = fopen(fullfilename, "w")) == NULL)
+      {
         printf("Cannot open file: %s\n", fullfilename);
         return GSX__OPENFILE;
       }
       fprintf(files[0], "#include \"%s\"\n\n", PLCINC);
       fprintf(files[0], "#include \"%s\"\n\n", PROCINC);
 
-      for (i = 0; i < timebase_count; i++) {
-        if (cdh_ObjidIsEqual(timebase[i].plcproc_objid, plcproclist[j].oid)) {
+      for (i = 0; i < timebase_count; i++)
+      {
+        if (cdh_ObjidIsEqual(timebase[i].plcproc_objid, plcproclist[j].oid))
+        {
           timebase_ms = (int)((timebase + i)->scantime * 1000 + 0.5);
           timebase_ptr = (timebase + i)->plclist;
           printf("-- Plc thread generated priority %d, scantime %9.5f s, %d "
                  "plcpgm's \n",
-              (timebase + i)->prio, (timebase + i)->scantime,
-              (timebase + i)->plc_count);
+                 (timebase + i)->prio, (timebase + i)->scantime, (timebase + i)->plc_count);
 
           /* Prototypes */
-          for (k = 0; k < (timebase + i)->plc_count; k++) {
-            fprintf(files[0],
-                "void %c%s_init( int DirectLink, plc_sThread *tp);\n",
-                GCG_PREFIX_MOD, vldh_IdToStr(0, (timebase + i)->plclist[k]));
+          for (k = 0; k < (timebase + i)->plc_count; k++)
+          {
+            fprintf(files[0], "void %c%s_init( int DirectLink, plc_sThread *tp);\n", GCG_PREFIX_MOD,
+                    vldh_IdToStr(0, (timebase + i)->plclist[k]));
           }
-          for (k = 0; k < (timebase + i)->plc_count; k++) {
-            fprintf(files[0], "void %c%s_exec( plc_sThread *tp);\n",
-                GCG_PREFIX_MOD, vldh_IdToStr(0, (timebase + i)->plclist[k]));
+          for (k = 0; k < (timebase + i)->plc_count; k++)
+          {
+            fprintf(files[0], "void %c%s_exec( plc_sThread *tp);\n", GCG_PREFIX_MOD,
+                    vldh_IdToStr(0, (timebase + i)->plclist[k]));
           }
 
           /* Init */
-          fprintf(files[0],
-              "void plc_p%d_init( int DirectLink, plc_sThread *tp){\n", i + 1);
-          for (k = 0; k < (timebase + i)->plc_count; k++) {
+          fprintf(files[0], "void plc_p%d_init( int DirectLink, plc_sThread *tp){\n", i + 1);
+          for (k = 0; k < (timebase + i)->plc_count; k++)
+          {
             fprintf(files[0], "  %c%s_init( DirectLink, tp);\n", GCG_PREFIX_MOD,
-                vldh_IdToStr(0, (timebase + i)->plclist[k]));
+                    vldh_IdToStr(0, (timebase + i)->plclist[k]));
           }
           fprintf(files[0], "}\n");
 
           /* Exec */
-          fprintf(files[0],
-              "void plc_p%d_exec( int DirectLink, plc_sThread *tp){\n", i + 1);
-          for (k = 0; k < (timebase + i)->plc_count; k++) {
+          fprintf(files[0], "void plc_p%d_exec( int DirectLink, plc_sThread *tp){\n", i + 1);
+          for (k = 0; k < (timebase + i)->plc_count; k++)
+          {
             fprintf(files[0], "  %c%s_exec( tp);\n", GCG_PREFIX_MOD,
-                vldh_IdToStr(0, (timebase + i)->plclist[k]));
+                    vldh_IdToStr(0, (timebase + i)->plclist[k]));
           }
           fprintf(files[0], "}\n");
 
           /* proctbl */
           fprintf(files[0], "struct plc_proctbl plc_proc%d = \n", i + 1);
-          fprintf(files[0], "{ {%d, %d}, plc_p%d_init, plc_p%d_exec };\n",
-              (timebase + i)->thread_objid.oix,
-              (timebase + i)->thread_objid.vid, i + 1, i + 1);
+          fprintf(files[0], "{ {%d, %d}, plc_p%d_init, plc_p%d_exec };\n", (timebase + i)->thread_objid.oix,
+                  (timebase + i)->thread_objid.vid, i + 1, i + 1);
           fprintf(files[0], "\n\n");
         }
       }
 
       fprintf(files[0], "struct plc_proctbl *plc_proctbllist[] = {\n");
-      for (i = 0; i < timebase_count; i++) {
+      for (i = 0; i < timebase_count; i++)
+      {
         if (cdh_ObjidIsEqual(timebase[i].plcproc_objid, plcproclist[j].oid))
           fprintf(files[0], "  &plc_proc%d,\n", i + 1);
       }
@@ -4883,12 +5119,13 @@ int gcg_comp_rtnode(char* nodename, pwr_mOpSys os, pwr_tUInt32 bus,
       files[0] = NULL;
 
       /* Create an object file */
-      sprintf(module_name, "%s%s_%4.4d_%s", gcgmn_filenames[0], nodename_low,
-          bus, cdh_Low(plcproclist[j].name));
+      sprintf(module_name, "%s%s_%4.4d_%s", gcgmn_filenames[0], nodename_low, bus,
+              cdh_Low(plcproclist[j].name));
       sts = gcg_cc(GCG_PROC, module_name, NULL, NULL, os, GCG_NOSPAWN);
       if (sts == GSX__CCWARNING)
         (*warningcount)++;
-      else if (EVEN(sts)) {
+      else if (EVEN(sts))
+      {
         gcg_error_msg(0, sts, 0);
         (*errorcount)++;
         return sts;
@@ -4897,9 +5134,12 @@ int gcg_comp_rtnode(char* nodename, pwr_mOpSys os, pwr_tUInt32 bus,
       /* Print plc libraries in option file */
       volumelist_ptr = volumelist;
       *plclib_frozen = '\0';
-      for (i = l = 0; i < volume_count; i++, volumelist_ptr++) {
-        if (*volumelist_ptr) {
-          switch (os) {
+      for (i = l = 0; i < volume_count; i++, volumelist_ptr++)
+      {
+        if (*volumelist_ptr)
+        {
+          switch (os)
+          {
           case pwr_mOpSys_PPC_LINUX:
           case pwr_mOpSys_X86_LINUX:
           case pwr_mOpSys_X86_64_LINUX:
@@ -4911,7 +5151,7 @@ int gcg_comp_rtnode(char* nodename, pwr_mOpSys os, pwr_tUInt32 bus,
           case pwr_mOpSys_X86_CYGWIN:
           case pwr_mOpSys_CustomBuild:
             l += sprintf(&plclib_frozen[l], "%s%s ", PLCLIB_FROZEN_LINK_UNIX,
-                vldh_VolumeIdToStr(*volumelist_ptr));
+                         vldh_VolumeIdToStr(*volumelist_ptr));
             break;
           default:
             return GSX__UNKNOPSYS;
@@ -4920,15 +5160,14 @@ int gcg_comp_rtnode(char* nodename, pwr_mOpSys os, pwr_tUInt32 bus,
       }
 
       /* Link */
-      sprintf(plcfilename, "plc_%s_%4.4d_%s", nodename_low, bus,
-          cdh_Low(plcproclist[j].name));
-      sprintf(fullfilename, "%s%s_%4.4d_%s", gcgmn_filenames[0], nodename_low,
-          bus, cdh_Low(plcproclist[j].name));
-      sts = gcg_cc(GCG_RTNODE, fullfilename, plcfilename, plclib_frozen, os,
-          GCG_NOSPAWN);
+      sprintf(plcfilename, "plc_%s_%4.4d_%s", nodename_low, bus, cdh_Low(plcproclist[j].name));
+      sprintf(fullfilename, "%s%s_%4.4d_%s", gcgmn_filenames[0], nodename_low, bus,
+              cdh_Low(plcproclist[j].name));
+      sts = gcg_cc(GCG_RTNODE, fullfilename, plcfilename, plclib_frozen, os, GCG_NOSPAWN);
       if (sts == GSX__CCWARNING)
         (*warningcount)++;
-      else if (EVEN(sts)) {
+      else if (EVEN(sts))
+      {
         gcg_error_msg(0, sts, 0);
         (*errorcount)++;
         return sts;
@@ -4936,7 +5175,8 @@ int gcg_comp_rtnode(char* nodename, pwr_mOpSys os, pwr_tUInt32 bus,
     }
   }
 
-  for (i = 0; i < timebase_count; i++) {
+  for (i = 0; i < timebase_count; i++)
+  {
     if ((timebase + i)->plc_count > 0)
       free((char*)(timebase + i)->plclist);
   }
@@ -4954,21 +5194,21 @@ int gcg_comp_rtnode(char* nodename, pwr_mOpSys os, pwr_tUInt32 bus,
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_volume()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* ldh_tSesContext ldhses		I	ldh session.
-*
-* Description:
-*	Compile method for a volume.
-*	All plcpgm are written in a file that will be read later when
-*	linking of the plcprogram is done.
-*	The plc library for the volume is frozen.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_volume()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * ldh_tSesContext ldhses		I	ldh session.
+ *
+ * Description:
+ *	Compile method for a volume.
+ *	All plcpgm are written in a file that will be read later when
+ *	linking of the plcprogram is done.
+ *	The plc library for the volume is frozen.
+ *
+ **************************************************************************/
 
 int gcg_comp_volume(ldh_tSesContext ldhses)
 {
@@ -5008,8 +5248,7 @@ int gcg_comp_volume(ldh_tSesContext ldhses)
   gcgctx->ldhses = ldhses;
 
   /* Get the operating system for this volume */
-  sts = ldh_GetObjectPar(
-      ldhses, volobjid, "SysBody", "OperatingSystem", (char**)&os, &size);
+  sts = ldh_GetObjectPar(ldhses, volobjid, "SysBody", "OperatingSystem", (char**)&os, &size);
   if (EVEN(sts))
     return sts;
 
@@ -5022,26 +5261,26 @@ int gcg_comp_volume(ldh_tSesContext ldhses)
     return sts;
 
   /* Get all plcthread objects in this volume */
-  sts = gcg_get_rtnode_plcthread(
-      gcgctx, volobjid, operating_system, &thread_count, &threadlist);
+  sts = gcg_get_rtnode_plcthread(gcgctx, volobjid, operating_system, &thread_count, &threadlist);
   if (EVEN(sts))
     return sts;
 
   /* Get the plclist for all plcpgm's in this volume */
-  sts = gcg_get_rtnode_plc(
-      gcgctx, volobjid, operating_system, &plc_count, &plclist);
+  sts = gcg_get_rtnode_plc(gcgctx, volobjid, operating_system, &plc_count, &plclist);
   if (EVEN(sts))
     return sts;
 
-  if (plc_count == 0) {
-    sts = ldh_VolumeIdToName(
-        ldh_SessionToWB(ldhses), volid, volumename, sizeof(volumename), &size);
+  if (plc_count == 0)
+  {
+    sts = ldh_VolumeIdToName(ldh_SessionToWB(ldhses), volid, volumename, sizeof(volumename), &size);
     if (EVEN(sts))
       return sts;
 
     /* No plcpgms on this node */
     printf("-- No plcpgms found in volume %s\n", volumename);
-  } else {
+  }
+  else
+  {
     /* Check operating system */
     if (IS_NOT_VALID_OS(operating_system))
       return GSX__NOOPSYS;
@@ -5050,48 +5289,50 @@ int gcg_comp_volume(ldh_tSesContext ldhses)
   sprintf(filenames, "%s%s", gcgmv_filenames[0], vldh_VolumeIdToStr(volid));
   sprintf(fullfilename, "%s%s%s", DATDIR, filenames, DATEXT);
   dcli_translate_filename(fullfilename, fullfilename);
-  if ((file = fopen(fullfilename, "w")) == NULL) {
+  if ((file = fopen(fullfilename, "w")) == NULL)
+  {
     printf("Cannot open file: %s\n", fullfilename);
     return GSX__OPENFILE;
   }
 
-  for (i = 0; i < (int)plcproc_count; i++) {
-    fprintf(file, "%s %s %s\n", "PlcProcess",
-        cdh_ObjidToString((plcproclist + i)->oid, 0), (plcproclist + i)->name);
+  for (i = 0; i < (int)plcproc_count; i++)
+  {
+    fprintf(file, "%s %s %s\n", "PlcProcess", cdh_ObjidToString((plcproclist + i)->oid, 0),
+            (plcproclist + i)->name);
   }
 
-  for (i = 0; i < (int)thread_count; i++) {
-    cdh_OidToString(plcproc_oidstr, sizeof(plcproc_oidstr),
-        (threadlist + i)->plcproc_oid, 0);
-    fprintf(file, "%s %s %s %f %ld %s\n", "PlcThread",
-        cdh_ObjidToString((threadlist + i)->objdid, 0), plcproc_oidstr,
-        (threadlist + i)->scantime, (threadlist + i)->prio,
-        (threadlist + i)->name);
+  for (i = 0; i < (int)thread_count; i++)
+  {
+    cdh_OidToString(plcproc_oidstr, sizeof(plcproc_oidstr), (threadlist + i)->plcproc_oid, 0);
+    fprintf(file, "%s %s %s %f %ld %s\n", "PlcThread", cdh_ObjidToString((threadlist + i)->objdid, 0),
+            plcproc_oidstr, (threadlist + i)->scantime, (threadlist + i)->prio, (threadlist + i)->name);
   }
 
-  for (i = 0; i < (int)plc_count; i++) {
-    cdh_OidToString(
-        thread_objid_str, sizeof(thread_objid_str), (plclist + i)->thread, 0);
-    fprintf(file, "%s %s %s %ld %s\n", "PlcPgm",
-        cdh_ObjidToString((plclist + i)->objdid, 0), thread_objid_str,
-        (plclist + i)->executeorder, (plclist + i)->name);
+  for (i = 0; i < (int)plc_count; i++)
+  {
+    cdh_OidToString(thread_objid_str, sizeof(thread_objid_str), (plclist + i)->thread, 0);
+    fprintf(file, "%s %s %s %ld %s\n", "PlcPgm", cdh_ObjidToString((plclist + i)->objdid, 0),
+            thread_objid_str, (plclist + i)->executeorder, (plclist + i)->name);
   }
   fclose(file);
 
-  if (plc_count > 0) {
+  if (plc_count > 0)
+  {
     /* Freeze the plc library */
 
-    for (opsys = 1; opsys != pwr_mOpSys_; opsys <<= 1) {
-      if (operating_system & opsys) {
-        if (IS_UNIX(opsys)) {
+    for (opsys = 1; opsys != pwr_mOpSys_; opsys <<= 1)
+    {
+      if (operating_system & opsys)
+      {
+        if (IS_UNIX(opsys))
+        {
           sprintf(plclibrary, "NotUsed");
-          sprintf(plclib_frozen, "%s%s.a", PLCLIB_FROZEN_UNIX,
-              vldh_VolumeIdToStr(volid));
+          sprintf(plclib_frozen, "%s%s.a", PLCLIB_FROZEN_UNIX, vldh_VolumeIdToStr(volid));
         }
         {
           /* Insert all objects into the archive */
-          sts = gcg_cc(GCG_LIBRARY, vldh_VolumeIdToStr(volid), plclib_frozen,
-              plclibrary, (pwr_mOpSys)opsys, GCG_NOSPAWN);
+          sts = gcg_cc(GCG_LIBRARY, vldh_VolumeIdToStr(volid), plclib_frozen, plclibrary, (pwr_mOpSys)opsys,
+                       GCG_NOSPAWN);
           if (sts == GSX__CCWARNING)
             gcgctx->warningcount++;
           else if (EVEN(sts))
@@ -5110,32 +5351,32 @@ int gcg_comp_volume(ldh_tSesContext ldhses)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m0()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* vldh_t_plc	plc		I	vldh plc.
-* unsigned long	codetype	I	generate code or syntax only.
-* unsigned long	*errorcount	O	error counter.
-* unsigned long	*warningcount	O	error counter.
-* unsigned long	spawn		I	c-compilation spawned or not.
-*
-* Description:
-*	Compile method for a plcprogram.
-*	The routine generates a c-module whith one init function and
-*	one exec function. The init function calls the initfunctions of
-*	all the windows in the plc, the exec function calls the exec function
-*	of the main window of the plc.
-*	A c compilation of the c module is done and the object module
-*	is placed in the library pwrp_root:['platform'.lib]ra_plc.olb
-*	( this is done by the command file ds_foe_gcg.com)
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m0()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * vldh_t_plc	plc		I	vldh plc.
+ * unsigned long	codetype	I	generate code or syntax only.
+ * unsigned long	*errorcount	O	error counter.
+ * unsigned long	*warningcount	O	error counter.
+ * unsigned long	spawn		I	c-compilation spawned or not.
+ *
+ * Description:
+ *	Compile method for a plcprogram.
+ *	The routine generates a c-module whith one init function and
+ *	one exec function. The init function calls the initfunctions of
+ *	all the windows in the plc, the exec function calls the exec function
+ *	of the main window of the plc.
+ *	A c compilation of the c module is done and the object module
+ *	is placed in the library pwrp_root:['platform'.lib]ra_plc.olb
+ *	( this is done by the command file ds_foe_gcg.com)
+ *
+ **************************************************************************/
 
-int gcg_comp_m0(vldh_t_plc plc, unsigned long codetype,
-    unsigned long* errorcount, unsigned long* warningcount, unsigned long spawn)
+int gcg_comp_m0(vldh_t_plc plc, unsigned long codetype, unsigned long* errorcount,
+                unsigned long* warningcount, unsigned long spawn)
 {
   unsigned long wind_count;
   vldh_t_wind* windlist;
@@ -5157,8 +5398,7 @@ int gcg_comp_m0(vldh_t_plc plc, unsigned long codetype,
   *warningcount = 0;
 
   /* Get operating system */
-  sts = gcg_plcpgm_to_operating_system(
-      plc->hp.ldhsesctx, plc->lp.oid, &operating_system);
+  sts = gcg_plcpgm_to_operating_system(plc->hp.ldhsesctx, plc->lp.oid, &operating_system);
   if (EVEN(sts))
     return sts;
 
@@ -5174,20 +5414,21 @@ int gcg_comp_m0(vldh_t_plc plc, unsigned long codetype,
     return sts;
 
   /* Get all the windows in this plc program in ldh */
-  sts = gcg_get_plc_windows(
-      plc->hp.ldhsesctx, plc->lp.oid, &ldhwind_count, &ldhwindlist);
+  sts = gcg_get_plc_windows(plc->hp.ldhsesctx, plc->lp.oid, &ldhwind_count, &ldhwindlist);
   if (EVEN(sts))
     return sts;
 
-  if (codetype) {
+  if (codetype)
+  {
     /* The plc is a c module, open the files needed for the
        module */
-    for (i = 0; i < GCGM0_MAXFILES; i++) {
-      sprintf(filenames[i], "%s%s", gcgm0_filenames[i],
-          vldh_IdToStr(0, plc->lp.oid));
+    for (i = 0; i < GCGM0_MAXFILES; i++)
+    {
+      sprintf(filenames[i], "%s%s", gcgm0_filenames[i], vldh_IdToStr(0, plc->lp.oid));
       sprintf(fullfilename, "%s%s%s", gcdir, filenames[i], GCEXT);
       dcli_translate_filename(fullfilename, fullfilename);
-      if ((files[i] = fopen(fullfilename, "w")) == NULL) {
+      if ((files[i] = fopen(fullfilename, "w")) == NULL)
+      {
         int j;
         printf("Cannot open file: %s\n", fullfilename);
         for (j = 0; j < i; j++)
@@ -5206,29 +5447,28 @@ int gcg_comp_m0(vldh_t_plc plc, unsigned long codetype,
     fprintf(files[GCGM0_MODULE_FILE], "#include \"%s\"\n", PLCINC);
 
     /* Print pototype declarations for the exec and init function */
-    for (i = 0; i < (int)ldhwind_count; i++) {
-      fprintf(files[GCGM0_MODULE_FILE],
-          "void %c%s_init( int DirectLink, plc_sThread *tp);\n", GCG_PREFIX_MOD,
-          vldh_IdToStr(0, *(ldhwindlist + i)));
+    for (i = 0; i < (int)ldhwind_count; i++)
+    {
+      fprintf(files[GCGM0_MODULE_FILE], "void %c%s_init( int DirectLink, plc_sThread *tp);\n", GCG_PREFIX_MOD,
+              vldh_IdToStr(0, *(ldhwindlist + i)));
     }
-    fprintf(files[GCGM0_MODULE_FILE], "void %c%s_exec( plc_sThread *tp);\n",
-        GCG_PREFIX_MOD, vldh_IdToStr(0, *ldhwindlist));
+    fprintf(files[GCGM0_MODULE_FILE], "void %c%s_exec( plc_sThread *tp);\n", GCG_PREFIX_MOD,
+            vldh_IdToStr(0, *ldhwindlist));
 
-    fprintf(files[GCGM0_MODULE_FILE],
-        "void %c%s_init( int DirectLink, plc_sThread *tp){\n", GCG_PREFIX_MOD,
-        vldh_IdToStr(0, plc->lp.oid));
+    fprintf(files[GCGM0_MODULE_FILE], "void %c%s_init( int DirectLink, plc_sThread *tp){\n", GCG_PREFIX_MOD,
+            vldh_IdToStr(0, plc->lp.oid));
 
     /* Print init calls for the windows */
-    for (i = 0; i < (int)ldhwind_count; i++) {
-      fprintf(files[GCGM0_MODULE_FILE], "%c%s_init( DirectLink, tp);\n",
-          GCG_PREFIX_MOD, vldh_IdToStr(0, *(ldhwindlist + i)));
+    for (i = 0; i < (int)ldhwind_count; i++)
+    {
+      fprintf(files[GCGM0_MODULE_FILE], "%c%s_init( DirectLink, tp);\n", GCG_PREFIX_MOD,
+              vldh_IdToStr(0, *(ldhwindlist + i)));
     }
-    fprintf(files[GCGM0_MODULE_FILE], "}\nvoid %c%s_exec( plc_sThread *tp){\n",
-        GCG_PREFIX_MOD, vldh_IdToStr(0, plc->lp.oid));
+    fprintf(files[GCGM0_MODULE_FILE], "}\nvoid %c%s_exec( plc_sThread *tp){\n", GCG_PREFIX_MOD,
+            vldh_IdToStr(0, plc->lp.oid));
 
     /* Print exec calls for the plc window */
-    fprintf(files[GCGM0_MODULE_FILE], "%c%s_exec( tp);\n", GCG_PREFIX_MOD,
-        vldh_IdToStr(0, *ldhwindlist));
+    fprintf(files[GCGM0_MODULE_FILE], "%c%s_exec( tp);\n", GCG_PREFIX_MOD, vldh_IdToStr(0, *ldhwindlist));
 
     fprintf(files[GCGM0_MODULE_FILE], "}\n");
 
@@ -5237,24 +5477,26 @@ int gcg_comp_m0(vldh_t_plc plc, unsigned long codetype,
       fclose(files[i]);
 
     /* Compile the c code */
-    if (*errorcount == 0) {
-      for (opsys = 1; opsys != pwr_mOpSys_; opsys <<= 1) {
-        if (operating_system & opsys) {
+    if (*errorcount == 0)
+    {
+      for (opsys = 1; opsys != pwr_mOpSys_; opsys <<= 1)
+      {
+        if (operating_system & opsys)
+        {
           if (IS_UNIX(opsys))
-            sprintf(plclibrary, "%s%s.a", PLCLIB_UNIX,
-                vldh_VolumeIdToStr(plc->lp.oid.vid));
+            sprintf(plclibrary, "%s%s.a", PLCLIB_UNIX, vldh_VolumeIdToStr(plc->lp.oid.vid));
 
           sprintf(module_name, "%s", vldh_IdToStr(0, plc->lp.oid));
-          sts = ldh_ObjidToName(plc->hp.ldhsesctx, plc->lp.oid,
-              ldh_eName_Hierarchy, plc_name, sizeof(plc_name), &size);
+          sts = ldh_ObjidToName(plc->hp.ldhsesctx, plc->lp.oid, ldh_eName_Hierarchy, plc_name,
+                                sizeof(plc_name), &size);
           if (EVEN(sts))
             return sts;
 
-          sts = gcg_cc(GCG_PLC, module_name, plclibrary, plc_name,
-              (pwr_mOpSys)opsys, spawn);
+          sts = gcg_cc(GCG_PLC, module_name, plclibrary, plc_name, (pwr_mOpSys)opsys, spawn);
           if (sts == GSX__CCWARNING)
             (*warningcount)++;
-          else if (EVEN(sts)) {
+          else if (EVEN(sts))
+          {
             gcg_error_msg(0, sts, 0);
             (*errorcount)++;
           }
@@ -5275,54 +5517,54 @@ int gcg_comp_m0(vldh_t_plc plc, unsigned long codetype,
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m1()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* vldh_t_wind	wind		I	vldh window.
-* unsigned long	codetype	I	generate code or syntax control only.
-* unsigned long	*errorcount	O	error counter.
-* unsigned long	*warningcount	O	warning counter.
-* unsigned long	spawn		I	if the c-compliation should be spawned
-*					or not.
-*
-* Description:
-*	Compile method for a plcwindow.
-*	Generates a c module for the window and creates a number of
-*	includefiles which is inlcude in the module.
-*	A gcg context is created where data of the compilation of this window
-*	is stored.
-*	The routine calls the compile method for each object in the window
-*	in this order (the order will be the execution order):
-*	1. plc objects from left to right (x-koordinate of lower left corner).
-*	2. grafcet objects up -> down ( y-koordinate of lower left corner)
-*	After the compilation a message of the result of the syntax control
-*	is written with the number of errors and warnings.
-*
-*	Include files:
-* 	GCGM1_DECL_FILE 	plc_dec'objdid'.gc
-*				Declarations of rtdb pointer.
-* 	GCGM1_RTDBREF_FILE 	plc_r1robjdid'.gc
-*				Code to get the rtdb pointer.
-* 	GCGM1_RTDBREF2_FILE 	_plc_r2r'objdid'.gc
-*				Code to get the rtdb pointer for io objects.
-* 	GCGM1_REF_FILE 		_plc_ref'objdid'.gc
-*				Initializations of rtdb objects.
-* 	GCGM1_CODE_FILE 	plc_cod'objdid'.gc
-*				Code to be executed every scan.
-*	Module file:
-* 	GCGM1_MODULE_FILE 	plc_m'objdid'.gc
-*				c module with declarations of rtdbpointers,
-*				an init functions to get the rtdbpointers
-*				and do the initializations of the objects,
-*				an exec function to execute code every scan.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m1()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * vldh_t_wind	wind		I	vldh window.
+ * unsigned long	codetype	I	generate code or syntax control only.
+ * unsigned long	*errorcount	O	error counter.
+ * unsigned long	*warningcount	O	warning counter.
+ * unsigned long	spawn		I	if the c-compliation should be spawned
+ *					or not.
+ *
+ * Description:
+ *	Compile method for a plcwindow.
+ *	Generates a c module for the window and creates a number of
+ *	includefiles which is inlcude in the module.
+ *	A gcg context is created where data of the compilation of this window
+ *	is stored.
+ *	The routine calls the compile method for each object in the window
+ *	in this order (the order will be the execution order):
+ *	1. plc objects from left to right (x-koordinate of lower left corner).
+ *	2. grafcet objects up -> down ( y-koordinate of lower left corner)
+ *	After the compilation a message of the result of the syntax control
+ *	is written with the number of errors and warnings.
+ *
+ *	Include files:
+ * 	GCGM1_DECL_FILE 	plc_dec'objdid'.gc
+ *				Declarations of rtdb pointer.
+ * 	GCGM1_RTDBREF_FILE 	plc_r1robjdid'.gc
+ *				Code to get the rtdb pointer.
+ * 	GCGM1_RTDBREF2_FILE 	_plc_r2r'objdid'.gc
+ *				Code to get the rtdb pointer for io objects.
+ * 	GCGM1_REF_FILE 		_plc_ref'objdid'.gc
+ *				Initializations of rtdb objects.
+ * 	GCGM1_CODE_FILE 	plc_cod'objdid'.gc
+ *				Code to be executed every scan.
+ *	Module file:
+ * 	GCGM1_MODULE_FILE 	plc_m'objdid'.gc
+ *				c module with declarations of rtdbpointers,
+ *				an init functions to get the rtdbpointers
+ *				and do the initializations of the objects,
+ *				an exec function to execute code every scan.
+ *
+ **************************************************************************/
 
-int gcg_comp_m1(vldh_t_wind wind, unsigned long codetype,
-    unsigned long* errorcount, unsigned long* warningcount, unsigned long spawn)
+int gcg_comp_m1(vldh_t_wind wind, unsigned long codetype, unsigned long* errorcount,
+                unsigned long* warningcount, unsigned long spawn)
 {
   ldh_tSesContext ldhses;
   int sts, size;
@@ -5344,12 +5586,13 @@ int gcg_comp_m1(vldh_t_wind wind, unsigned long codetype,
 
   ldhses = wind->hw.ldhses;
 
-  sts = ldh_ObjidToName(wind->hw.ldhses, wind->lw.oid, ldh_eName_Hierarchy,
-      wind_name, sizeof(wind_name), &size);
+  sts = ldh_ObjidToName(wind->hw.ldhses, wind->lw.oid, ldh_eName_Hierarchy, wind_name, sizeof(wind_name),
+                        &size);
   if (EVEN(sts))
     return sts;
 
-  if (codetype) {
+  if (codetype)
+  {
     /* Check that the session is empty */
     sts = ldh_GetSessionInfo(wind->hw.ldhses, &info);
     if (EVEN(sts))
@@ -5359,7 +5602,8 @@ int gcg_comp_m1(vldh_t_wind wind, unsigned long codetype,
 
     /* Check that session is readwrite */
     session_access = info.Access;
-    if (info.Access != ldh_eAccess_ReadWrite) {
+    if (info.Access != ldh_eAccess_ReadWrite)
+    {
       /* Set access read write to be able to compile */
       sts = ldh_SetSession(ldhses, ldh_eAccess_SharedReadWrite);
       if (EVEN(sts))
@@ -5375,20 +5619,21 @@ int gcg_comp_m1(vldh_t_wind wind, unsigned long codetype,
   gcgctx->print = codetype;
 
   /* Get operating system */
-  sts = gcg_wind_to_operating_system(
-      wind->hw.ldhses, wind->lw.oid, &operating_system);
+  sts = gcg_wind_to_operating_system(wind->hw.ldhses, wind->lw.oid, &operating_system);
   if (EVEN(sts))
     gcg_error_msg(gcgctx, sts, 0);
 
   strcpy(gcdir, GCDIR);
 
   /* Check operating system */
-  if (IS_NOT_VALID_OS(operating_system)) {
+  if (IS_NOT_VALID_OS(operating_system))
+  {
     gcg_error_msg(gcgctx, GSX__NOOPSYS, 0);
     return GSX__PLCWIND_ERRORS;
   }
 
-  if (codetype) {
+  if (codetype)
+  {
     /* Check that project specific includefiles and
        libraries exist */
 
@@ -5403,15 +5648,16 @@ int gcg_comp_m1(vldh_t_wind wind, unsigned long codetype,
 
   /* The window is a c module, open the files needed for the
      module */
-  for (i = 0; i < GCGM1_MAXFILES; i++) {
-    sprintf(gcgctx->filenames[i], "%s%s", gcgm1_filenames[i],
-        vldh_IdToStr(0, wind->lw.oid));
+  for (i = 0; i < GCGM1_MAXFILES; i++)
+  {
+    sprintf(gcgctx->filenames[i], "%s%s", gcgm1_filenames[i], vldh_IdToStr(0, wind->lw.oid));
     sprintf(fullfilename, "%s%s%s", gcdir, gcgctx->filenames[i], GCEXT);
     IF_PR
     {
       dcli_translate_filename(fullfilename, fullfilename);
       gcgctx->files[i] = fopen(fullfilename, "w");
-      if (gcgctx->files[i] == NULL) {
+      if (gcgctx->files[i] == NULL)
+      {
         printf("Cannot open file: %s\n", fullfilename);
         for (j = 0; j < i; j++)
           fclose(gcgctx->files[j]);
@@ -5426,35 +5672,29 @@ int gcg_comp_m1(vldh_t_wind wind, unsigned long codetype,
           if ( EVEN(sts)) return sts;
   */
 
-  IF_PR fprintf(
-      gcgctx->files[GCGM1_MODULE_FILE], "#include \"%s\"\n", MACROINC);
+  IF_PR fprintf(gcgctx->files[GCGM1_MODULE_FILE], "#include \"%s\"\n", MACROINC);
+  IF_PR fprintf(gcgctx->files[GCGM1_MODULE_FILE], "#include \"%s%s\"\n", gcgctx->filenames[GCGM1_DECL_FILE],
+                GCEXT);
+  IF_PR fprintf(gcgctx->files[GCGM1_MODULE_FILE], "static plc_t_rtdbref rtdbref[] = {\n");
   IF_PR fprintf(gcgctx->files[GCGM1_MODULE_FILE], "#include \"%s%s\"\n",
-      gcgctx->filenames[GCGM1_DECL_FILE], GCEXT);
-  IF_PR fprintf(
-      gcgctx->files[GCGM1_MODULE_FILE], "static plc_t_rtdbref rtdbref[] = {\n");
-  IF_PR fprintf(gcgctx->files[GCGM1_MODULE_FILE], "#include \"%s%s\"\n",
-      gcgctx->filenames[GCGM1_RTDBREF_FILE], GCEXT);
+                gcgctx->filenames[GCGM1_RTDBREF_FILE], GCEXT);
   IF_PR fprintf(gcgctx->files[GCGM1_MODULE_FILE], "{ 0}};\n");
-  IF_PR fprintf(gcgctx->files[GCGM1_MODULE_FILE],
-      "static plc_t_rtdbref rtdbref2[] = {\n");
+  IF_PR fprintf(gcgctx->files[GCGM1_MODULE_FILE], "static plc_t_rtdbref rtdbref2[] = {\n");
   IF_PR fprintf(gcgctx->files[GCGM1_MODULE_FILE], "#include \"%s%s\"\n",
-      gcgctx->filenames[GCGM1_RTDBREF2_FILE], GCEXT);
+                gcgctx->filenames[GCGM1_RTDBREF2_FILE], GCEXT);
   IF_PR fprintf(gcgctx->files[GCGM1_MODULE_FILE], "{ 0}};\n");
+  IF_PR fprintf(gcgctx->files[GCGM1_MODULE_FILE], "void %c%s_init( int DirectLink, plc_sThread *tp){\n",
+                GCG_PREFIX_MOD, vldh_IdToStr(0, wind->lw.oid));
   IF_PR fprintf(gcgctx->files[GCGM1_MODULE_FILE],
-      "void %c%s_init( int DirectLink, plc_sThread *tp){\n", GCG_PREFIX_MOD,
-      vldh_IdToStr(0, wind->lw.oid));
+                "if (DirectLink == 1)\n  plc_rtdbref( (struct plc_rtdbref (*)[]) "
+                "&rtdbref, tp);\n");
   IF_PR fprintf(gcgctx->files[GCGM1_MODULE_FILE],
-      "if (DirectLink == 1)\n  plc_rtdbref( (struct plc_rtdbref (*)[]) "
-      "&rtdbref, tp);\n");
-  IF_PR fprintf(gcgctx->files[GCGM1_MODULE_FILE],
-      "else if (DirectLink == 2)\n  plc_rtdbref( (struct plc_rtdbref (*)[]) "
-      "&rtdbref2, tp);\n");
-  IF_PR fprintf(gcgctx->files[GCGM1_MODULE_FILE],
-      "else\n  {\n#include \"%s%s\"\n  }\n}\n\n",
-      gcgctx->filenames[GCGM1_REF_FILE], GCEXT);
-  IF_PR fprintf(gcgctx->files[GCGM1_MODULE_FILE],
-      "void %c%s_exec( plc_sThread *tp)\n{\n", GCG_PREFIX_MOD,
-      vldh_IdToStr(0, wind->lw.oid));
+                "else if (DirectLink == 2)\n  plc_rtdbref( (struct plc_rtdbref (*)[]) "
+                "&rtdbref2, tp);\n");
+  IF_PR fprintf(gcgctx->files[GCGM1_MODULE_FILE], "else\n  {\n#include \"%s%s\"\n  }\n}\n\n",
+                gcgctx->filenames[GCGM1_REF_FILE], GCEXT);
+  IF_PR fprintf(gcgctx->files[GCGM1_MODULE_FILE], "void %c%s_exec( plc_sThread *tp)\n{\n", GCG_PREFIX_MOD,
+                vldh_IdToStr(0, wind->lw.oid));
 
   /* Print exec call for the window */
   sts = gcg_ref_insert(gcgctx, wind->lw.oid, GCG_PREFIX_REF, 0);
@@ -5465,11 +5705,11 @@ int gcg_comp_m1(vldh_t_wind wind, unsigned long codetype,
     return sts;
 
   /* Print the execute command */
-  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( %c%s);\n", name,
-      GCG_PREFIX_REF, vldh_IdToStr(0, wind->lw.oid));
+  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( %c%s);\n", name, GCG_PREFIX_REF,
+                vldh_IdToStr(0, wind->lw.oid));
 
   IF_PR fprintf(gcgctx->files[GCGM1_MODULE_FILE], "#include \"%s%s\"\n}\n",
-      gcgctx->filenames[GCGM1_CODE_FILE], GCEXT);
+                gcgctx->filenames[GCGM1_CODE_FILE], GCEXT);
 
   /* Get all nodes this window */
   sts = vldh_get_nodes(wind, &node_count, &nodelist);
@@ -5477,7 +5717,8 @@ int gcg_comp_m1(vldh_t_wind wind, unsigned long codetype,
     return sts;
   gcg_executeorder_nodes(node_count, nodelist);
 
-  for (j = 0; j < (int)node_count; j++) {
+  for (j = 0; j < (int)node_count; j++)
+  {
     node = *(nodelist + j);
     sts = gcg_node_comp(gcgctx, node);
     if (EVEN(sts))
@@ -5486,8 +5727,8 @@ int gcg_comp_m1(vldh_t_wind wind, unsigned long codetype,
   if (node_count > 0)
     free((char*)nodelist);
 
-  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec2( %c%s);\n", name,
-      GCG_PREFIX_REF, vldh_IdToStr(0, wind->lw.oid));
+  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec2( %c%s);\n", name, GCG_PREFIX_REF,
+                vldh_IdToStr(0, wind->lw.oid));
 
   if (gcgctx->current_cmanager)
     gcg_reset_cmanager(gcgctx);
@@ -5509,14 +5750,17 @@ int gcg_comp_m1(vldh_t_wind wind, unsigned long codetype,
   *warningcount = gcgctx->warningcount;
 
   /* Message of result */
-  if (gcgctx->print) {
+  if (gcgctx->print)
+  {
     if (gcgctx->errorcount > 0)
       gcg_wind_msg(gcgctx, GSX__CWINDERR, wind, 1);
     else if (gcgctx->warningcount > 0)
       gcg_wind_msg(gcgctx, GSX__CWINDWARN, wind, 1);
     else
       printf("-- Plc window generated            %s\n", wind_name);
-  } else {
+  }
+  else
+  {
     if (gcgctx->errorcount > 0)
       gcg_wind_msg(gcgctx, GSX__SWINDERR, wind, 1);
     else if (gcgctx->warningcount > 0)
@@ -5532,27 +5776,33 @@ int gcg_comp_m1(vldh_t_wind wind, unsigned long codetype,
     IF_PR fclose(gcgctx->files[i]);
 
   /* Create an object file */
-  if (gcgctx->errorcount == 0) {
-    for (opsys = 1; opsys != pwr_mOpSys_; opsys <<= 1) {
-      if (operating_system & opsys) {
+  if (gcgctx->errorcount == 0)
+  {
+    for (opsys = 1; opsys != pwr_mOpSys_; opsys <<= 1)
+    {
+      if (operating_system & opsys)
+      {
         if (IS_UNIX(opsys))
-          sprintf(plclibrary, "%s%s.a", PLCLIB_UNIX,
-              vldh_VolumeIdToStr(wind->lw.oid.vid));
+          sprintf(plclibrary, "%s%s.a", PLCLIB_UNIX, vldh_VolumeIdToStr(wind->lw.oid.vid));
 
         IF_PR sprintf(module_name, "%s", vldh_IdToStr(0, wind->lw.oid));
         IF_PR
         {
-          sts = gcg_cc(GCG_WIND, module_name, plclibrary, wind_name,
-              (pwr_mOpSys)opsys, spawn);
-          if (sts == GSX__CCWARNING) {
+          sts = gcg_cc(GCG_WIND, module_name, plclibrary, wind_name, (pwr_mOpSys)opsys, spawn);
+          if (sts == GSX__CCWARNING)
+          {
             gcg_wind_msg(gcgctx, sts, wind, 1);
             (*warningcount)++;
-          } else if (EVEN(sts)) {
+          }
+          else if (EVEN(sts))
+          {
             gcg_wind_msg(gcgctx, sts, wind, 1);
             (*errorcount)++;
-          } else {
+          }
+          else
+          {
             // gcg_wind_msg(gcgctx, GSX__CCSUCC, wind, 0);
-	  }
+          }
         }
       }
     }
@@ -5560,15 +5810,18 @@ int gcg_comp_m1(vldh_t_wind wind, unsigned long codetype,
 
   /* Generate code for the plc module */
 
-  if (*errorcount > 0) {
-    if (codetype) {
+  if (*errorcount > 0)
+  {
+    if (codetype)
+    {
       /* Revert the session */
       sts = ldh_RevertSession(wind->hw.ldhses);
       if (EVEN(sts))
         return sts;
 
       /* Return to previous session access */
-      if (session_access != ldh_eAccess_ReadWrite) {
+      if (session_access != ldh_eAccess_ReadWrite)
+      {
         /* Set access read write to be able to compile */
         sts = ldh_SetSession(ldhses, session_access);
         if (EVEN(sts))
@@ -5581,14 +5834,17 @@ int gcg_comp_m1(vldh_t_wind wind, unsigned long codetype,
     gcg_ctx_delete(gcgctx);
 
     return GSX__PLCWIND_ERRORS;
-  } else {
-    if (codetype) {
+  }
+  else
+  {
+    if (codetype)
+    {
       pwr_tTime time;
 
       /* Store compile time for the window */
       time_GetTime(&time);
-      sts = ldh_SetObjectPar(wind->hw.ldhses, wind->lw.oid, "DevBody",
-          "Compiled", (char*)&time, sizeof(time));
+      sts =
+          ldh_SetObjectPar(wind->hw.ldhses, wind->lw.oid, "DevBody", "Compiled", (char*)&time, sizeof(time));
 
       /* Save the session */
       sts = ldh_SaveSession(wind->hw.ldhses);
@@ -5596,7 +5852,8 @@ int gcg_comp_m1(vldh_t_wind wind, unsigned long codetype,
         return sts;
 
       /* Return to previous session access */
-      if (session_access != ldh_eAccess_ReadWrite) {
+      if (session_access != ldh_eAccess_ReadWrite)
+      {
         sts = ldh_SetSession(ldhses, session_access);
         if (EVEN(sts))
           return sts;
@@ -5632,47 +5889,44 @@ classerror:
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m2()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for an object that doesn't need any code in
-*	the plc job.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m2()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for an object that doesn't need any code in
+ *	the plc job.
+ *
+ **************************************************************************/
 
-int gcg_comp_m2(gcg_ctx gcgctx, vldh_t_node node)
-{
-  return GSX__SUCCESS;
-}
+int gcg_comp_m2(gcg_ctx gcgctx, vldh_t_node node) { return GSX__SUCCESS; }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m6()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for AND object.
-*	Prints code for declaration and direkt link of a rtdbpointer
-*	for the and-object.
-*	Prints an exec call. Ex :
-*	and_exec( Z8000086f, Z8000086d->Status && Z800005d5->Status[0]);
-*
-*	If the inputs are not connected or not visible they are not
-*	printed in the exec call.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m6()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for AND object.
+ *	Prints code for declaration and direkt link of a rtdbpointer
+ *	for the and-object.
+ *	Prints an exec call. Ex :
+ *	and_exec( Z8000086f, Z8000086d->Status && Z800005d5->Status[0]);
+ *
+ *	If the inputs are not connected or not visible they are not
+ *	printed in the exec call.
+ *
+ **************************************************************************/
 
 int gcg_comp_m6(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -5697,26 +5951,26 @@ int gcg_comp_m6(gcg_ctx gcgctx, vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m7()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for OR object.
-*	Prints code for declaration and direkt link of rtdbpointer
-*	for the or-object.
-*	Prints an exec call :
-*	or_exec( Z8000086f, Z8000086d->Status || Z800005d5->Status[0]);
-*
-*	If the inputs are not connected or not visible they are not
-*	printed in the exec call.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m7()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for OR object.
+ *	Prints code for declaration and direkt link of rtdbpointer
+ *	for the or-object.
+ *	Prints an exec call :
+ *	or_exec( Z8000086f, Z8000086d->Status || Z800005d5->Status[0]);
+ *
+ *	If the inputs are not connected or not visible they are not
+ *	printed in the exec call.
+ *
+ **************************************************************************/
 
 int gcg_comp_m7(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -5741,28 +5995,28 @@ int gcg_comp_m7(gcg_ctx gcgctx, vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m5()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for standard macro node.
-*	Prints code for declaration and direkt link of rtdbpointer for
-*	the actual object.
-*	Prints an exec call :
-*
-*	'structname'_exec( 'objectpointer', 'in1', 'in2', 'in3'...);
-*	ex: wait_exec( Z800008f1, Z800005d4->Status[0]);
-*
-*	If the any inputs are not connected or not visible zero is printed
-*	in its place in the exec call.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m5()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for standard macro node.
+ *	Prints code for declaration and direkt link of rtdbpointer for
+ *	the actual object.
+ *	Prints an exec call :
+ *
+ *	'structname'_exec( 'objectpointer', 'in1', 'in2', 'in3'...);
+ *	ex: wait_exec( Z800008f1, Z800005d4->Status[0]);
+ *
+ *	If the any inputs are not connected or not visible zero is printed
+ *	in its place in the exec call.
+ *
+ **************************************************************************/
 
 int gcg_comp_m5(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -5787,36 +6041,36 @@ int gcg_comp_m5(gcg_ctx gcgctx, vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m4()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for standard function call node.
-*	Prints code for declaration and direkt link of a rtdbpointer.
-*	Prints code for initialization of pointers in the object:
-*	'objpointer'->'pgmname'P = &'in';
-*	Z80000811->InP = &Z800005f5->ActualValue;
-*
-*	If a parameter is not connected or not visible the pointer
-*	will point to the own object:
-*
-*	'objpointer'->'pgmname'P = &'objpointer'->'pgmname';
-*	Z80000811->LimP = &Z80000811->Lim;
-*
-*	Prints an exec call :
-*	'structname'_exec( tp, 'objpointer');
-*	ex: compl_exec( tp, Z80000811);
-*
-*	Prints initialization for timer and scantime if the object
-*	contain these functions.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m4()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for standard function call node.
+ *	Prints code for declaration and direkt link of a rtdbpointer.
+ *	Prints code for initialization of pointers in the object:
+ *	'objpointer'->'pgmname'P = &'in';
+ *	Z80000811->InP = &Z800005f5->ActualValue;
+ *
+ *	If a parameter is not connected or not visible the pointer
+ *	will point to the own object:
+ *
+ *	'objpointer'->'pgmname'P = &'objpointer'->'pgmname';
+ *	Z80000811->LimP = &Z80000811->Lim;
+ *
+ *	Prints an exec call :
+ *	'structname'_exec( tp, 'objpointer');
+ *	ex: compl_exec( tp, Z80000811);
+ *
+ *	Prints initialization for timer and scantime if the object
+ *	contain these functions.
+ *
+ **************************************************************************/
 
 int gcg_comp_m4(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -5836,7 +6090,8 @@ int gcg_comp_m4(gcg_ctx gcgctx, vldh_t_node node)
   char* name;
   char cast[80];
 
-  switch (node->ln.cid) {
+  switch (node->ln.cid)
+  {
   case pwr_cClass_ApDistribute:
   case pwr_cClass_DpDistribute:
   case pwr_cClass_IpDistribute:
@@ -5855,37 +6110,39 @@ int gcg_comp_m4(gcg_ctx gcgctx, vldh_t_node node)
     return sts;
 
   /* Print the execute command */
-  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( tp, %c%s);\n", name,
-      GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid));
+  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( tp, %c%s);\n", name, GCG_PREFIX_REF,
+                vldh_IdToStr(0, node->ln.oid));
 
   /* Get the runtime parameters for this class */
-  sts = ldh_GetObjectBodyDef(
-      (node->hn.wind)->hw.ldhses, node->ln.cid, "RtBody", 1, &bodydef, &rows);
+  sts = ldh_GetObjectBodyDef((node->hn.wind)->hw.ldhses, node->ln.cid, "RtBody", 1, &bodydef, &rows);
   if (EVEN(sts))
     return sts;
 
   i = 0;
   first_par = 1;
-  while ((i < rows) && (bodydef[i].ParClass == pwr_eClass_Input)) {
+  while ((i < rows) && (bodydef[i].ParClass == pwr_eClass_Input))
+  {
     /* Get the point for this parameter if there is one */
     output_found = 0;
     sts = gcg_get_inputpoint(node, i, &point, &par_inverted);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       /* Look for an output connected to this point */
-      sts = gcg_get_output(node, point, &output_count, &output_node,
-          &output_point, &output_bodydef,
-          GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
+      sts = gcg_get_output(node, point, &output_count, &output_node, &output_point, &output_bodydef,
+                           GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
       if (EVEN(sts))
         return sts;
 
-      if (output_count > 0) {
+      if (output_count > 0)
+      {
         output_found = 1;
         if (output_count > 1)
           gcg_error_msg(gcgctx, GSX__CONOUTPUT, output_node);
 
-        sts = gcg_get_outputstring(gcgctx, output_node, &output_bodydef,
-            &output_attrref, &output_type, &output_prefix, output_par);
-        if (sts == GSX__NEXTPAR) {
+        sts = gcg_get_outputstring(gcgctx, output_node, &output_bodydef, &output_attrref, &output_type,
+                                   &output_prefix, output_par);
+        if (sts == GSX__NEXTPAR)
+        {
           i++;
           continue;
         }
@@ -5897,34 +6154,34 @@ int gcg_comp_m4(gcg_ctx gcgctx, vldh_t_node node)
 
         if (output_bodydef.Par->Output.Info.Type == pwr_eType_DataRef)
           strcpy(cast, "(pwr_tVoid *)");
-	else if (bodydef[i].Par->Param.Info.Type == pwr_eType_DataRef &&
-		 output_bodydef.Par->Output.Info.Type == pwr_eType_Void)
+        else if (bodydef[i].Par->Param.Info.Type == pwr_eType_DataRef &&
+                 output_bodydef.Par->Output.Info.Type == pwr_eType_Void)
           strcpy(cast, "(pwr_tDataRef *)");
-	else if (node->ln.cid == pwr_cClass_curve && strcmp(bodydef[i].Par->Param.Info.PgmName, "Tab") == 0)
-	  strcpy(cast, "(pwr_tFloat32*)");
-	else
-	  strcpy(cast, "");
-        IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE],
-            "%c%s->%sP = %s&%c%s->%s;\n", GCG_PREFIX_REF,
-            vldh_IdToStr(0, node->ln.oid), bodydef[i].Par->Param.Info.PgmName,
-            cast, output_prefix,
-            output_type == GCG_OTYPE_OID ? vldh_IdToStr(1, output_attrref.Objid)
-                                         : vldh_AttrRefToStr(0, output_attrref),
-            output_par);
-      } else {
+        else if (node->ln.cid == pwr_cClass_curve && strcmp(bodydef[i].Par->Param.Info.PgmName, "Tab") == 0)
+          strcpy(cast, "(pwr_tFloat32*)");
+        else
+          strcpy(cast, "");
+        IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = %s&%c%s->%s;\n", GCG_PREFIX_REF,
+                      vldh_IdToStr(0, node->ln.oid), bodydef[i].Par->Param.Info.PgmName, cast, output_prefix,
+                      output_type == GCG_OTYPE_OID ? vldh_IdToStr(1, output_attrref.Objid)
+                                                   : vldh_AttrRefToStr(0, output_attrref),
+                      output_par);
+      }
+      else
+      {
         /* Point visible but not connected, errormessage */
         gcg_error_msg(gcgctx, GSX__NOTCON, node);
       }
       first_par = 0;
     }
-    if (!output_found) {
+    if (!output_found)
+    {
       /* The point is not connected and will point to its
          own object */
 
-      IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = %s&%c%s->%s;\n",
-          GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid),
-          bodydef[i].Par->Param.Info.PgmName, cast, GCG_PREFIX_REF,
-          vldh_IdToStr(1, node->ln.oid), bodydef[i].Par->Param.Info.PgmName);
+      IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = %s&%c%s->%s;\n", GCG_PREFIX_REF,
+                    vldh_IdToStr(0, node->ln.oid), bodydef[i].Par->Param.Info.PgmName, cast, GCG_PREFIX_REF,
+                    vldh_IdToStr(1, node->ln.oid), bodydef[i].Par->Param.Info.PgmName);
     }
     i++;
   }
@@ -5937,24 +6194,24 @@ int gcg_comp_m4(gcg_ctx gcgctx, vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m8()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for GETDI, GETDO, GETDV, GETAI, GETAO, GETAV,
-*       GETII, GETIO, GETIV, GetSv, GetATv and GetDTv node.
-*	Checks that the class of the referenced object is correct.
-*	Prints declaration and directlink for a read rtdb pointer
-*	for the refereced io-object. The pointer will point at
-*	the valuebase object for the frequency of the plcpgm.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m8()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for GETDI, GETDO, GETDV, GETAI, GETAO, GETAV,
+ *       GETII, GETIO, GETIV, GetSv, GetATv and GetDTv node.
+ *	Checks that the class of the referenced object is correct.
+ *	Prints declaration and directlink for a read rtdb pointer
+ *	for the refereced io-object. The pointer will point at
+ *	the valuebase object for the frequency of the plcpgm.
+ *
+ **************************************************************************/
 
 int gcg_comp_m8(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -5975,13 +6232,11 @@ int gcg_comp_m8(gcg_ctx gcgctx, vldh_t_node node)
     first parameter in defbody */
 
   /* Get the devbody parameters for this class */
-  sts = ldh_GetObjectBodyDef(
-      ldhses, node->ln.cid, "DevBody", 1, &bodydef, &rows);
+  sts = ldh_GetObjectBodyDef(ldhses, node->ln.cid, "DevBody", 1, &bodydef, &rows);
   if (EVEN(sts))
     return sts;
 
-  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", bodydef[0].ParName,
-      (char**)&attrref_ptr, &size);
+  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", bodydef[0].ParName, (char**)&attrref_ptr, &size);
   if (EVEN(sts))
     return sts;
   free((char*)bodydef);
@@ -5994,70 +6249,82 @@ int gcg_comp_m8(gcg_ctx gcgctx, vldh_t_node node)
 
   /* Check that this is objdid of an existing object */
   sts = ldh_GetAttrRefOrigTid(ldhses, &attrref, &cid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     gcg_error_msg(gcgctx, GSX__REFOBJ, node);
     return GSX__NEXTNODE;
   }
 
   /* Check if disabled */
-  if (attrref.Flags.b.ObjectAttr && attrref.Flags.b.DisableAttr) {
+  if (attrref.Flags.b.ObjectAttr && attrref.Flags.b.DisableAttr)
+  {
     sts = ldh_AttributeDisabled(ldhses, &attrref, &disabled);
     if (ODD(sts) && disabled && !gcg_is_in_focode(gcgctx, node))
       gcg_error_msg(gcgctx, GSX__DISABLED, node);
   }
 
   /* Check that the class of the referenced object is correct */
-  switch (node->ln.cid) {
+  switch (node->ln.cid)
+  {
   case pwr_cClass_GetDi:
-    if (cid != pwr_cClass_Di) {
+    if (cid != pwr_cClass_Di)
+    {
       gcg_error_msg(gcgctx, GSX__REFCLASS, node);
       return GSX__NEXTNODE;
     }
     break;
   case pwr_cClass_GetDo:
-    if (!(cid == pwr_cClass_Do || cid == pwr_cClass_Po)) {
+    if (!(cid == pwr_cClass_Do || cid == pwr_cClass_Po))
+    {
       gcg_error_msg(gcgctx, GSX__REFCLASS, node);
       return GSX__NEXTNODE;
     }
     break;
   case pwr_cClass_GetDv:
-    if (cid != pwr_cClass_Dv) {
+    if (cid != pwr_cClass_Dv)
+    {
       gcg_error_msg(gcgctx, GSX__REFCLASS, node);
       return GSX__NEXTNODE;
     }
     break;
   case pwr_cClass_GetAi:
-    if (cid != pwr_cClass_Ai) {
+    if (cid != pwr_cClass_Ai)
+    {
       gcg_error_msg(gcgctx, GSX__REFCLASS, node);
       return GSX__NEXTNODE;
     }
     break;
   case pwr_cClass_GetAo:
-    if (cid != pwr_cClass_Ao) {
+    if (cid != pwr_cClass_Ao)
+    {
       gcg_error_msg(gcgctx, GSX__REFCLASS, node);
       return GSX__NEXTNODE;
     }
     break;
   case pwr_cClass_GetAv:
-    if (cid != pwr_cClass_Av) {
+    if (cid != pwr_cClass_Av)
+    {
       gcg_error_msg(gcgctx, GSX__REFCLASS, node);
       return GSX__NEXTNODE;
     }
     break;
   case pwr_cClass_GetIi:
-    if (cid != pwr_cClass_Ii) {
+    if (cid != pwr_cClass_Ii)
+    {
       gcg_error_msg(gcgctx, GSX__REFCLASS, node);
       return GSX__NEXTNODE;
     }
     break;
   case pwr_cClass_GetIo:
-    if (cid != pwr_cClass_Io) {
+    if (cid != pwr_cClass_Io)
+    {
       gcg_error_msg(gcgctx, GSX__REFCLASS, node);
       return GSX__NEXTNODE;
     }
     break;
   case pwr_cClass_GetIv:
-    if (cid != pwr_cClass_Iv) {
+    if (cid != pwr_cClass_Iv)
+    {
       gcg_error_msg(gcgctx, GSX__REFCLASS, node);
       return GSX__NEXTNODE;
     }
@@ -6066,7 +6333,8 @@ int gcg_comp_m8(gcg_ctx gcgctx, vldh_t_node node)
   case pwr_cClass_GetBoInt32:
   case pwr_cClass_GetBiString80:
   case pwr_cClass_GetBiFloat32:
-  case pwr_cClass_GetBoFloat32: {
+  case pwr_cClass_GetBoFloat32:
+  {
   case pwr_cClass_GetBoString80:
     // The attrref is on an ActualValue attribute, and the one level up
     // attribute should
@@ -6077,14 +6345,14 @@ int gcg_comp_m8(gcg_ctx gcgctx, vldh_t_node node)
     pwr_tCid lcid;
     char* s;
 
-    sts = ldh_AttrRefToName(
-        ldhses, &attrref, ldh_eName_ArefVol, &aname_p, &size);
+    sts = ldh_AttrRefToName(ldhses, &attrref, ldh_eName_ArefVol, &aname_p, &size);
     if (EVEN(sts))
       return sts;
 
     strncpy(aname, aname_p, sizeof(aname));
     s = strrchr(aname, '.');
-    if (s == 0) {
+    if (s == 0)
+    {
       gcg_error_msg(gcgctx, GSX__REFCLASS, node);
       return GSX__NEXTNODE;
     }
@@ -6097,16 +6365,19 @@ int gcg_comp_m8(gcg_ctx gcgctx, vldh_t_node node)
     sts = ldh_GetAttrRefOrigTid(ldhses, &laref, &lcid);
 
     sts = ldh_GetSuperClass(gcgctx->ldhses, lcid, &scid);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       gcg_error_msg(gcgctx, GSX__REFCLASS, node);
       return GSX__NEXTNODE;
     }
 
-    switch (node->ln.cid) {
+    switch (node->ln.cid)
+    {
     case pwr_cClass_GetBiInt32:
     case pwr_cClass_GetBiFloat32:
     case pwr_cClass_GetBiString80:
-      if (scid != pwr_cClass_Bi) {
+      if (scid != pwr_cClass_Bi)
+      {
         gcg_error_msg(gcgctx, GSX__REFCLASS, node);
         return GSX__NEXTNODE;
       }
@@ -6114,7 +6385,8 @@ int gcg_comp_m8(gcg_ctx gcgctx, vldh_t_node node)
     case pwr_cClass_GetBoInt32:
     case pwr_cClass_GetBoFloat32:
     case pwr_cClass_GetBoString80:
-      if (scid != pwr_cClass_Bo) {
+      if (scid != pwr_cClass_Bo)
+      {
         gcg_error_msg(gcgctx, GSX__REFCLASS, node);
         return GSX__NEXTNODE;
       }
@@ -6123,25 +6395,29 @@ int gcg_comp_m8(gcg_ctx gcgctx, vldh_t_node node)
     break;
   }
   case pwr_cClass_GetSv:
-    if (cid != pwr_cClass_Sv) {
+    if (cid != pwr_cClass_Sv)
+    {
       gcg_error_msg(gcgctx, GSX__REFCLASS, node);
       return GSX__NEXTNODE;
     }
     break;
   case pwr_cClass_GetATv:
-    if (cid != pwr_cClass_ATv) {
+    if (cid != pwr_cClass_ATv)
+    {
       gcg_error_msg(gcgctx, GSX__REFCLASS, node);
       return GSX__NEXTNODE;
     }
     break;
   case pwr_cClass_GetDTv:
-    if (cid != pwr_cClass_DTv) {
+    if (cid != pwr_cClass_DTv)
+    {
       gcg_error_msg(gcgctx, GSX__REFCLASS, node);
       return GSX__NEXTNODE;
     }
     break;
   case pwr_cClass_GetConstAv:
-    if (cid != pwr_cClass_ConstAv) {
+    if (cid != pwr_cClass_ConstAv)
+    {
       gcg_error_msg(gcgctx, GSX__REFCLASS, node);
       return GSX__NEXTNODE;
     }
@@ -6150,7 +6426,8 @@ int gcg_comp_m8(gcg_ctx gcgctx, vldh_t_node node)
     gcg_aref_insert(gcgctx, attrref, GCG_PREFIX_REF, node);
     return GSX__SUCCESS;
   case pwr_cClass_GetConstIv:
-    if (cid != pwr_cClass_ConstIv) {
+    if (cid != pwr_cClass_ConstIv)
+    {
       gcg_error_msg(gcgctx, GSX__REFCLASS, node);
       return GSX__NEXTNODE;
     }
@@ -6159,7 +6436,8 @@ int gcg_comp_m8(gcg_ctx gcgctx, vldh_t_node node)
     gcg_aref_insert(gcgctx, attrref, GCG_PREFIX_REF, node);
     return GSX__SUCCESS;
   case pwr_cClass_GetDataRefv:
-    if (cid != pwr_cClass_DataRefv) {
+    if (cid != pwr_cClass_DataRefv)
+    {
       gcg_error_msg(gcgctx, GSX__REFCLASS, node);
       return GSX__NEXTNODE;
     }
@@ -6176,7 +6454,8 @@ int gcg_comp_m8(gcg_ctx gcgctx, vldh_t_node node)
   gcg_ioread_insert(gcgctx, attrref, GCG_PREFIX_REF);
 
   /* Print init call */
-  switch (node->ln.cid) {
+  switch (node->ln.cid)
+  {
   case pwr_cClass_GetATv:
   case pwr_cClass_GetDTv:
   case pwr_cClass_GetSv:
@@ -6189,23 +6468,23 @@ int gcg_comp_m8(gcg_ctx gcgctx, vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m9()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for GETPI.
-*	Checks the class of the referenced object (should be a Co object).
-*	Prints declaration and directlink for two read pointers to the
-*	referenced Co objects. The pointers will point to the two
-*	valuebase objects that is created for Co for each plc frequency.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m9()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for GETPI.
+ *	Checks the class of the referenced object (should be a Co object).
+ *	Prints declaration and directlink for two read pointers to the
+ *	referenced Co objects. The pointers will point to the two
+ *	valuebase objects that is created for Co for each plc frequency.
+ *
+ **************************************************************************/
 
 int gcg_comp_m9(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -6223,13 +6502,11 @@ int gcg_comp_m9(gcg_ctx gcgctx, vldh_t_node node)
     first parameter in defbody */
 
   /* Get the devbody parameters for this class */
-  sts = ldh_GetObjectBodyDef(
-      ldhses, node->ln.cid, "DevBody", 1, &bodydef, &rows);
+  sts = ldh_GetObjectBodyDef(ldhses, node->ln.cid, "DevBody", 1, &bodydef, &rows);
   if (EVEN(sts))
     return sts;
 
-  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", bodydef[0].ParName,
-      (char**)&attrref_ptr, &size);
+  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", bodydef[0].ParName, (char**)&attrref_ptr, &size);
   if (EVEN(sts))
     return sts;
   free((char*)bodydef);
@@ -6242,12 +6519,14 @@ int gcg_comp_m9(gcg_ctx gcgctx, vldh_t_node node)
 
   /* Check that this is objdid of an existing object */
   sts = ldh_GetAttrRefOrigTid(ldhses, &attrref, &cid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     gcg_error_msg(gcgctx, GSX__REFOBJ, node);
     return GSX__NEXTNODE;
   }
 
-  if (cid != pwr_cClass_Co) {
+  if (cid != pwr_cClass_Co)
+  {
     gcg_error_msg(gcgctx, GSX__REFCLASS, node);
     return GSX__NEXTNODE;
   }
@@ -6260,23 +6539,23 @@ int gcg_comp_m9(gcg_ctx gcgctx, vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m10()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for GetDp, GetAp, GetSp, GetDataRefp.
-*	Checks that the referenced object exists and that the referenced
-*	parameter exists in that object, and that the type of the parameter
-*	is correct.
-*	Prints declaration and direct link of pointer to referenced object.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m10()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for GetDp, GetAp, GetSp, GetDataRefp.
+ *	Checks that the referenced object exists and that the referenced
+ *	parameter exists in that object, and that the type of the parameter
+ *	is correct.
+ *	Prints declaration and direct link of pointer to referenced object.
+ *
+ **************************************************************************/
 
 int gcg_comp_m10(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -6297,13 +6576,11 @@ int gcg_comp_m10(gcg_ctx gcgctx, vldh_t_node node)
     first parameter in defbody */
 
   /* Get the devbody parameters for this class */
-  sts = ldh_GetObjectBodyDef(
-      ldhses, node->ln.cid, "DevBody", 1, &bodydef, &rows);
+  sts = ldh_GetObjectBodyDef(ldhses, node->ln.cid, "DevBody", 1, &bodydef, &rows);
   if (EVEN(sts))
     return sts;
 
-  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", bodydef[0].ParName,
-      (char**)&refattrref_ptr, &size);
+  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", bodydef[0].ParName, (char**)&refattrref_ptr, &size);
   if (EVEN(sts))
     return sts;
 
@@ -6316,38 +6593,43 @@ int gcg_comp_m10(gcg_ctx gcgctx, vldh_t_node node)
     return sts;
 
   sts = ldh_GetAttrRefInfo(ldhses, &refattrref, &info);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     gcg_error_msg(gcgctx, GSX__REFOBJ, node);
     return GSX__NEXTNODE;
   }
 
   /* Get rid of last attribute segment of the referenced object */
-  sts = ldh_AttrRefToName(
-      ldhses, &refattrref, ldh_eName_ArefVol, &name_p, &size);
+  sts = ldh_AttrRefToName(ldhses, &refattrref, ldh_eName_ArefVol, &name_p, &size);
   if (EVEN(sts))
     return sts;
 
   strcpy(aname, name_p);
-  if ((s = strrchr(aname, '.')) == 0) {
+  if ((s = strrchr(aname, '.')) == 0)
+  {
     gcg_error_msg(gcgctx, GSX__REFOBJ, node);
     return GSX__NEXTPAR;
   }
 
   *s = 0;
   sts = ldh_NameToAttrRef(ldhses, aname, &refattrref);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     gcg_error_msg(gcgctx, GSX__REFOBJ, node);
     return GSX__NEXTPAR;
   }
 
-  if (info.flags & PWR_MASK_RTVIRTUAL) {
+  if (info.flags & PWR_MASK_RTVIRTUAL)
+  {
     /* Attribute is not defined in runtime */
     gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
     return GSX__NEXTNODE;
   }
 
-  if (info.flags & PWR_MASK_ARRAY) {
-    if (info.nElement == -1) {
+  if (info.flags & PWR_MASK_ARRAY)
+  {
+    if (info.nElement == -1)
+    {
       /* No index in attribute */
       gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
       return GSX__NEXTNODE;
@@ -6359,15 +6641,18 @@ int gcg_comp_m10(gcg_ctx gcgctx, vldh_t_node node)
     //}
   }
 
-  switch (info.type) {
+  switch (info.type)
+  {
   case pwr_eType_Float32:
-    if (node->ln.cid != pwr_cClass_GetAp) {
+    if (node->ln.cid != pwr_cClass_GetAp)
+    {
       gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
       return GSX__NEXTNODE;
     }
     break;
   case pwr_eType_Boolean:
-    if (node->ln.cid != pwr_cClass_GetDp) {
+    if (node->ln.cid != pwr_cClass_GetDp)
+    {
       gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
       return GSX__NEXTNODE;
     }
@@ -6382,31 +6667,36 @@ int gcg_comp_m10(gcg_ctx gcgctx, vldh_t_node node)
   case pwr_eType_Mask:
   case pwr_eType_Status:
   case pwr_eType_NetStatus:
-    if (node->ln.cid != pwr_cClass_GetIp) {
+    if (node->ln.cid != pwr_cClass_GetIp)
+    {
       gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
       return GSX__NEXTNODE;
     }
     break;
   case pwr_eType_String:
-    if (node->ln.cid != pwr_cClass_GetSp) {
+    if (node->ln.cid != pwr_cClass_GetSp)
+    {
       gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
       return GSX__NEXTNODE;
     }
     break;
   case pwr_eType_Time:
-    if (node->ln.cid != pwr_cClass_GetATp) {
+    if (node->ln.cid != pwr_cClass_GetATp)
+    {
       gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
       return GSX__NEXTNODE;
     }
     break;
   case pwr_eType_DeltaTime:
-    if (node->ln.cid != pwr_cClass_GetDTp) {
+    if (node->ln.cid != pwr_cClass_GetDTp)
+    {
       gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
       return GSX__NEXTNODE;
     }
     break;
   case pwr_eType_DataRef:
-    if (node->ln.cid != pwr_cClass_GetDataRefp) {
+    if (node->ln.cid != pwr_cClass_GetDataRefp)
+    {
       gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
       return GSX__NEXTNODE;
     }
@@ -6424,33 +6714,33 @@ int gcg_comp_m10(gcg_ctx gcgctx, vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m13()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for step or initstep object.
-*	Gets all order connected to the order pin and calls the
-*	compilemethod for these.
-*	Prints declaration and direct link code for the step object.
-*	Prints exec call with resetobject and the orders exec call
-*	included in the call.
-*
-*	step_exec( 'objectpointer', 'resetobject', 'orderlist' );
-*	Ex:
-*	step_exec( Z800005da, Z800005f0->ActualValue,
-*	sorder_exec( Z8000084a, Z800005da, Z800005f0->ActualValue);
-*	order_exec( Z800005d5, Z8000084a,
-*	M8000084e_exec();
-*	);
-*	);
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m13()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for step or initstep object.
+ *	Gets all order connected to the order pin and calls the
+ *	compilemethod for these.
+ *	Prints declaration and direct link code for the step object.
+ *	Prints exec call with resetobject and the orders exec call
+ *	included in the call.
+ *
+ *	step_exec( 'objectpointer', 'resetobject', 'orderlist' );
+ *	Ex:
+ *	step_exec( Z800005da, Z800005f0->ActualValue,
+ *	sorder_exec( Z8000084a, Z800005da, Z800005f0->ActualValue);
+ *	order_exec( Z800005d5, Z8000084a,
+ *	M8000084e_exec();
+ *	);
+ *	);
+ *
+ **************************************************************************/
 
 int gcg_comp_m13(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -6480,17 +6770,18 @@ int gcg_comp_m13(gcg_ctx gcgctx, vldh_t_node node)
     return sts;
 
   /* Print the reset object */
-  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%c%s->ActualValue,\n",
-      GCG_PREFIX_REF, vldh_AttrRefToStr(0, gcgctx->reset_object));
+  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%c%s->ActualValue,\n", GCG_PREFIX_REF,
+                vldh_AttrRefToStr(0, gcgctx->reset_object));
 
   /* Check if there is any order connected to the outputpin */
   sts = gcg_get_point(node, 2, &point, &par_inverted);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     gcgctx->step_comp = TRUE;
-    gcg_get_conpoint_nodes(node, point, &point_count, &pointlist,
-        GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
+    gcg_get_conpoint_nodes(node, point, &point_count, &pointlist, GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
 
-    for (k = 1; k < (int)point_count; k++) {
+    for (k = 1; k < (int)point_count; k++)
+    {
       next_node = (pointlist + k)->node;
       next_point = (pointlist + k)->conpoint;
       /* Check class of connected nodes */
@@ -6498,12 +6789,15 @@ int gcg_comp_m13(gcg_ctx gcgctx, vldh_t_node node)
       if (EVEN(sts))
         return sts;
 
-      if ((cid == pwr_cClass_order) && (next_point == 0)) {
+      if ((cid == pwr_cClass_order) && (next_point == 0))
+      {
         /* compile this nodes here */
         sts = gcg_node_comp(gcgctx, next_node);
         if (EVEN(sts))
           return sts;
-      } else {
+      }
+      else
+      {
         /* Bad class */
         /*
                       gcg_error_msg( gcgctx, GSX__NOORDER, node);
@@ -6521,46 +6815,46 @@ int gcg_comp_m13(gcg_ctx gcgctx, vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m15()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for trans.
-*
-*	Syntax control:
-*
-*	Checks that there is only step objects connected to the
-*	step input and step output pin.
-*	Checks that there is not both a condition subwindow and something
-*	connected to the condition pin.
-*
-*	Code generation:
-*
-*	Prints declaration an directlink of rtdbpointer for the trans object.
-*	Prints exec call with one list of input steps, one list
-*	of output steps, and a funktion call for a subwindow or
-*	a setcond_exec call.
-*	If no condition window exists and the condition pin is not
-*	connected no condition code is printed and the condition
-*	can be set from the attribute editor.
-*
-*	trans_exec( 'objpointer',
-*	'insteplist', 'outsteplist',
-*	'condition code'
-*	);
-*	Ex:
-*	trans_exec( Z800005c5, {&Z800005db->Status[0] _z_ 0},
-*		{&Z800005da->Status[0] _z_ 0},
-*	setcond_exec( Z800005c5, Z800005f8->ActualValue);
-*	);
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m15()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for trans.
+ *
+ *	Syntax control:
+ *
+ *	Checks that there is only step objects connected to the
+ *	step input and step output pin.
+ *	Checks that there is not both a condition subwindow and something
+ *	connected to the condition pin.
+ *
+ *	Code generation:
+ *
+ *	Prints declaration an directlink of rtdbpointer for the trans object.
+ *	Prints exec call with one list of input steps, one list
+ *	of output steps, and a funktion call for a subwindow or
+ *	a setcond_exec call.
+ *	If no condition window exists and the condition pin is not
+ *	connected no condition code is printed and the condition
+ *	can be set from the attribute editor.
+ *
+ *	trans_exec( 'objpointer',
+ *	'insteplist', 'outsteplist',
+ *	'condition code'
+ *	);
+ *	Ex:
+ *	trans_exec( Z800005c5, {&Z800005db->Status[0] _z_ 0},
+ *		{&Z800005da->Status[0] _z_ 0},
+ *	setcond_exec( Z800005c5, Z800005f8->ActualValue);
+ *	);
+ *
+ **************************************************************************/
 
 int gcg_comp_m15(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -6617,11 +6911,12 @@ int gcg_comp_m15(gcg_ctx gcgctx, vldh_t_node node)
   if (EVEN(sts))
     return sts;
 
-  gcg_get_conpoint_nodes(node, point, &point_count, &pointlist,
-      GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
-  if (point_count > 1) {
+  gcg_get_conpoint_nodes(node, point, &point_count, &pointlist, GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
+  if (point_count > 1)
+  {
     stepcount = 0;
-    for (k = 1; k < (int)point_count; k++) {
+    for (k = 1; k < (int)point_count; k++)
+    {
       next_node = (pointlist + k)->node;
       next_point = (pointlist + k)->conpoint;
       /* Check class of connected nodes */
@@ -6629,28 +6924,34 @@ int gcg_comp_m15(gcg_ctx gcgctx, vldh_t_node node)
       if (EVEN(sts))
         return sts;
 
-      if ((cid == pwr_cClass_step && next_point == 2)
-          || (cid == pwr_cClass_initstep && next_point == 2)
-          || (cid == pwr_cClass_substep && next_point == 2)
-          || (cid == pwr_cClass_ssbegin && next_point == 1)) {
+      if ((cid == pwr_cClass_step && next_point == 2) || (cid == pwr_cClass_initstep && next_point == 2) ||
+          (cid == pwr_cClass_substep && next_point == 2) || (cid == pwr_cClass_ssbegin && next_point == 1))
+      {
         /* Print in the input list */
         stepcount++;
-        if (stepcount > 4) {
+        if (stepcount > 4)
+        {
           stepcount = 0;
           IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "\n");
         }
-        IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "&%c%s->Status[0]%s",
-            GCG_PREFIX_REF, vldh_IdToStr(0, next_node->ln.oid), delimstr);
-      } else if (cid == pwr_cClass_trans) {
+        IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "&%c%s->Status[0]%s", GCG_PREFIX_REF,
+                      vldh_IdToStr(0, next_node->ln.oid), delimstr);
+      }
+      else if (cid == pwr_cClass_trans)
+      {
         /* If not parallell (same point nr) */
         if (next_point != point)
           gcg_error_msg(gcgctx, GSX__NOSTEP, node);
-      } else {
+      }
+      else
+      {
         /* Bad class */
         gcg_error_msg(gcgctx, GSX__NOSTEP, node);
       }
     }
-  } else {
+  }
+  else
+  {
     /* Not connected */
     gcg_error_msg(gcgctx, GSX__GNOTCON, node);
   }
@@ -6665,10 +6966,11 @@ int gcg_comp_m15(gcg_ctx gcgctx, vldh_t_node node)
   if (EVEN(sts))
     return sts;
 
-  gcg_get_conpoint_nodes(node, point, &point_count, &pointlist,
-      GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
-  if (point_count > 1) {
-    for (k = 1; k < (int)point_count; k++) {
+  gcg_get_conpoint_nodes(node, point, &point_count, &pointlist, GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
+  if (point_count > 1)
+  {
+    for (k = 1; k < (int)point_count; k++)
+    {
       next_node = (pointlist + k)->node;
       next_point = (pointlist + k)->conpoint;
       /* Check class of connected nodes */
@@ -6676,28 +6978,34 @@ int gcg_comp_m15(gcg_ctx gcgctx, vldh_t_node node)
       if (EVEN(sts))
         return sts;
 
-      if ((cid == pwr_cClass_step && next_point == 0)
-          || (cid == pwr_cClass_initstep && next_point == 0)
-          || (cid == pwr_cClass_substep && next_point == 0)
-          || (cid == pwr_cClass_ssend && next_point == 0)) {
+      if ((cid == pwr_cClass_step && next_point == 0) || (cid == pwr_cClass_initstep && next_point == 0) ||
+          (cid == pwr_cClass_substep && next_point == 0) || (cid == pwr_cClass_ssend && next_point == 0))
+      {
         /* Print in the input list */
         stepcount++;
-        if (stepcount > 4) {
+        if (stepcount > 4)
+        {
           stepcount = 0;
           IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "\n");
         }
-        IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "&%c%s->Status[0]%s",
-            GCG_PREFIX_REF, vldh_IdToStr(0, next_node->ln.oid), delimstr);
-      } else if (cid == pwr_cClass_trans) {
+        IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "&%c%s->Status[0]%s", GCG_PREFIX_REF,
+                      vldh_IdToStr(0, next_node->ln.oid), delimstr);
+      }
+      else if (cid == pwr_cClass_trans)
+      {
         /* If not parallell (same point nr) */
         if (next_point != point)
           gcg_error_msg(gcgctx, GSX__NOSTEP, node);
-      } else {
+      }
+      else
+      {
         /* Bad class */
         gcg_error_msg(gcgctx, GSX__NOSTEP, node);
       }
     }
-  } else {
+  }
+  else
+  {
     /* Not connected */
     gcg_error_msg(gcgctx, GSX__GNOTCON, node);
   }
@@ -6707,39 +7015,39 @@ int gcg_comp_m15(gcg_ctx gcgctx, vldh_t_node node)
 
   /* Check if the condition pin is visible */
   sts = gcg_get_inputpoint(node, 2, &point, &par_inverted);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     /* Look for an output connected to this point */
-    sts = gcg_get_output(node, point, &output_count, &output_node,
-        &output_point, &output_bodydef,
-        GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
+    sts = gcg_get_output(node, point, &output_count, &output_node, &output_point, &output_bodydef,
+                         GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
     if (EVEN(sts))
       return sts;
 
     pincond_found = 0;
-    if (output_count > 0) {
+    if (output_count > 0)
+    {
       pincond_found = 1;
       if (output_count > 1)
         gcg_error_msg(gcgctx, GSX__CONOUTPUT, node);
 
-      sts = gcg_get_outputstring(gcgctx, output_node, &output_bodydef,
-          &output_attrref, &output_type, &output_prefix, output_par);
+      sts = gcg_get_outputstring(gcgctx, output_node, &output_bodydef, &output_attrref, &output_type,
+                                 &output_prefix, output_par);
       if (sts == GSX__NEXTPAR)
         return sts;
       if (EVEN(sts))
         return sts;
 
       /* Print the execute for a setcond command */
-      IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "setcond_exec( %c%s, ",
-          GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid));
+      IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "setcond_exec( %c%s, ", GCG_PREFIX_REF,
+                    vldh_IdToStr(0, node->ln.oid));
       /*	    if ( par_inverted)
                     IF_PR fprintf( gcgctx->files[GCGM1_CODE_FILE],
                       "!");
       */
-      IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%c%s->%s);\n",
-          output_prefix,
-          output_type == GCG_OTYPE_OID ? vldh_IdToStr(0, output_attrref.Objid)
-                                       : vldh_AttrRefToStr(0, output_attrref),
-          output_par);
+      IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%c%s->%s);\n", output_prefix,
+                    output_type == GCG_OTYPE_OID ? vldh_IdToStr(0, output_attrref.Objid)
+                                                 : vldh_AttrRefToStr(0, output_attrref),
+                    output_par);
     }
   }
 
@@ -6747,11 +7055,13 @@ int gcg_comp_m15(gcg_ctx gcgctx, vldh_t_node node)
   /* Check first that there is a subwindow */
   sts = ldh_GetChild(ldhses, node->ln.oid, &windowobjdid);
   wind_found = 0;
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     /* Check if window */
-    sts = ldh_GetObjectBuffer(ldhses, windowobjdid, "DevBody", "PlcWindow",
-        (pwr_eClass*)&windclass, &windbuffer, &size);
-    if (ODD(sts)) {
+    sts = ldh_GetObjectBuffer(ldhses, windowobjdid, "DevBody", "PlcWindow", (pwr_eClass*)&windclass,
+                              &windbuffer, &size);
+    if (ODD(sts))
+    {
       free((char*)windbuffer);
       wind_found = 1;
       break;
@@ -6759,27 +7069,29 @@ int gcg_comp_m15(gcg_ctx gcgctx, vldh_t_node node)
     sts = ldh_GetNextSibling(ldhses, windowobjdid, &windowobjdid);
   }
 
-  if (wind_found) {
+  if (wind_found)
+  {
     /* Print the window execute command */
-    IF_PR fprintf(gcgctx->files[GCGM1_DECL_FILE],
-        "void %c%s_exec(plc_sThread *tp);", GCG_PREFIX_MOD,
-        vldh_IdToStr(0, windowobjdid));
-    IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%c%s_exec( tp);\n",
-        GCG_PREFIX_MOD, vldh_IdToStr(0, windowobjdid));
+    IF_PR fprintf(gcgctx->files[GCGM1_DECL_FILE], "void %c%s_exec(plc_sThread *tp);", GCG_PREFIX_MOD,
+                  vldh_IdToStr(0, windowobjdid));
+    IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%c%s_exec( tp);\n", GCG_PREFIX_MOD,
+                  vldh_IdToStr(0, windowobjdid));
   }
-  if (wind_found && pincond_found) {
+  if (wind_found && pincond_found)
+  {
     /* The pin is connected and there is a sub window */
     gcg_error_msg(gcgctx, GSX__PINWIND, node);
   }
-  if (!(wind_found || pincond_found)) {
+  if (!(wind_found || pincond_found))
+  {
     /* No window and no pinconnections, set condition true */
     /*
-    *	  gcg_error_msg( gcgctx, GSX__NOPINORWIND, node);
-    *	  IF_PR fprintf( gcgctx->files[GCGM1_CODE_FILE],
-    *		"setcond_exec( %c%lx, 1);\n",
-    *		GCG_PREFIX_REF,
-    *		node->ln.oid);
-    */
+     *	  gcg_error_msg( gcgctx, GSX__NOPINORWIND, node);
+     *	  IF_PR fprintf( gcgctx->files[GCGM1_CODE_FILE],
+     *		"setcond_exec( %c%lx, 1);\n",
+     *		GCG_PREFIX_REF,
+     *		node->ln.oid);
+     */
   }
 
   IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], ");\n");
@@ -6788,62 +7100,62 @@ int gcg_comp_m15(gcg_ctx gcgctx, vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m16()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for ORDER object.
-*	The order code in included in the code of a step.
-*	If the method is not called from the step method it returns
-*	immediately.
-*
-*	Syntax control:
-*	Checks that the input pin is connected to a step.
-*	Checks that if the condition pin is connected order has
-*	a C attribute.
-*	Check that there is no mismatch between suborder objects and
-*	the attributes.
-*	Checks that there is not both a condition subwindow and some object
-*	connected to the condition pin.
-*
-*	Code generation:
-*	An object is created for every attribute of the order and
-*	one object for the order itself. The orders are serially connected
-*	with the first attribute first and the order object last.
-*	Ex DSC order
-*	stepobject - Dorder - Sorder - Corder - order
-*
-*	Ex Sorder med activity window
-*	step_exec( Z800005da, Z800005f0->ActualValue,
-*	sorder_exec( Z8000084a, Z800005da, Z800005f0->ActualValue);
-*	order_exec( Z800005d5, Z8000084a,
-*	M8000084e_exec( tp);
-*	);
-*	);
-*
-*	Declares and links pointers to the order object and all suborder
-*	objects.
-*	Prints an exec call for every suborder.
-*	For a C suborder prints a setcond_exec call or a call for
-*	a subwidow condition.
-*	Prints an exec call for the order including
-*	a activity subwindow exec call if such a window exists or
-*	a call for the following objects if these ar connected to the
-*	output pin
-*	STODO, SETDO, RESDO, STODV, SETDV, RESDV, RESDP, SETDP, RESET_SO,
-*	STODP
-*	This objects will only be executed when the step is activ
-*	when connected to an order. Other objects connected to an order
-*	will follow the general rules. Also the code in the activity window
-*	will be executed only when the step is active.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m16()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for ORDER object.
+ *	The order code in included in the code of a step.
+ *	If the method is not called from the step method it returns
+ *	immediately.
+ *
+ *	Syntax control:
+ *	Checks that the input pin is connected to a step.
+ *	Checks that if the condition pin is connected order has
+ *	a C attribute.
+ *	Check that there is no mismatch between suborder objects and
+ *	the attributes.
+ *	Checks that there is not both a condition subwindow and some object
+ *	connected to the condition pin.
+ *
+ *	Code generation:
+ *	An object is created for every attribute of the order and
+ *	one object for the order itself. The orders are serially connected
+ *	with the first attribute first and the order object last.
+ *	Ex DSC order
+ *	stepobject - Dorder - Sorder - Corder - order
+ *
+ *	Ex Sorder med activity window
+ *	step_exec( Z800005da, Z800005f0->ActualValue,
+ *	sorder_exec( Z8000084a, Z800005da, Z800005f0->ActualValue);
+ *	order_exec( Z800005d5, Z8000084a,
+ *	M8000084e_exec( tp);
+ *	);
+ *	);
+ *
+ *	Declares and links pointers to the order object and all suborder
+ *	objects.
+ *	Prints an exec call for every suborder.
+ *	For a C suborder prints a setcond_exec call or a call for
+ *	a subwidow condition.
+ *	Prints an exec call for the order including
+ *	a activity subwindow exec call if such a window exists or
+ *	a call for the following objects if these ar connected to the
+ *	output pin
+ *	STODO, SETDO, RESDO, STODV, SETDV, RESDV, RESDP, SETDP, RESET_SO,
+ *	STODP
+ *	This objects will only be executed when the step is activ
+ *	when connected to an order. Other objects connected to an order
+ *	will follow the general rules. Also the code in the activity window
+ *	will be executed only when the step is active.
+ *
+ **************************************************************************/
 
 int gcg_comp_m16(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -6881,19 +7193,21 @@ int gcg_comp_m16(gcg_ctx gcgctx, vldh_t_node node)
 
   ldhses = (node->hn.wind)->hw.ldhses;
 
-  if (!gcgctx->step_comp) {
+  if (!gcgctx->step_comp)
+  {
     /* The order will be compile by the step when gcgctx->step_comp
       is true */
     return GSX__SUCCESS;
   }
 
   /* Get the step connected to conpoint 0 */
-  sts = gcg_get_output(node, 0, &output_count, &output_node, &output_point,
-      &output_bodydef, GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
+  sts = gcg_get_output(node, 0, &output_count, &output_node, &output_point, &output_bodydef,
+                       GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
   if (EVEN(sts))
     return sts;
 
-  if (output_count > 0) {
+  if (output_count > 0)
+  {
     output_found = 1;
     if (output_count > 1)
       gcg_error_msg(gcgctx, GSX__CONOUTPUT, node);
@@ -6903,13 +7217,15 @@ int gcg_comp_m16(gcg_ctx gcgctx, vldh_t_node node)
     if (EVEN(sts))
       return sts;
 
-    if (!(cid == pwr_cClass_step || cid == pwr_cClass_substep
-            || cid == pwr_cClass_ssbegin || cid == pwr_cClass_ssend
-            || cid == pwr_cClass_initstep)) {
+    if (!(cid == pwr_cClass_step || cid == pwr_cClass_substep || cid == pwr_cClass_ssbegin ||
+          cid == pwr_cClass_ssend || cid == pwr_cClass_initstep))
+    {
       gcg_error_msg(gcgctx, GSX__NOSTEP, node);
       return GSX__NEXTNODE;
     }
-  } else {
+  }
+  else
+  {
     /* Not connected */
     gcg_error_msg(gcgctx, GSX__GNOTCON, node);
     return GSX__NEXTNODE;
@@ -6920,21 +7236,22 @@ int gcg_comp_m16(gcg_ctx gcgctx, vldh_t_node node)
   /* Check if the condition pin is visible */
   sts = gcg_get_inputpoint(node, 1, &point, &par_inverted);
   pincond_found = 0;
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     /* Look for an output connected to this point */
-    sts = gcg_get_output(node, point, &output_count, &output_node,
-        &output_point, &output_bodydef,
-        GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
+    sts = gcg_get_output(node, point, &output_count, &output_node, &output_point, &output_bodydef,
+                         GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
     if (EVEN(sts))
       return sts;
 
-    if (output_count > 0) {
+    if (output_count > 0)
+    {
       pincond_found = 1;
       if (output_count > 1)
         gcg_error_msg(gcgctx, GSX__CONOUTPUT, node);
 
-      sts = gcg_get_outputstring(gcgctx, output_node, &output_bodydef,
-          &output_attrref, &output_type, &output_prefix, output_par);
+      sts = gcg_get_outputstring(gcgctx, output_node, &output_bodydef, &output_attrref, &output_type,
+                                 &output_prefix, output_par);
       if (sts == GSX__NEXTPAR)
         return sts;
       if (EVEN(sts))
@@ -6943,41 +7260,44 @@ int gcg_comp_m16(gcg_ctx gcgctx, vldh_t_node node)
       /* Get the objdid for the Corder */
       found = 0;
       sts = ldh_GetChild(ldhses, node->ln.oid, &next_objdid);
-      while (ODD(sts)) {
+      while (ODD(sts))
+      {
         /* Find out if this is a COrder */
         sts = ldh_GetObjectClass(ldhses, next_objdid, &cid);
         if (EVEN(sts))
           return sts;
 
-        if (cid == pwr_cClass_corder) {
+        if (cid == pwr_cClass_corder)
+        {
           found = 1;
           break;
         }
         sts = ldh_GetNextSibling(ldhses, next_objdid, &next_objdid);
       }
-      if (!found) {
+      if (!found)
+      {
         gcg_error_msg(gcgctx, GSX__NOCORDER, node);
         return GSX__NEXTNODE;
       }
       /* Print the execute for a setcond command */
-      IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "setcond_exec( %c%s, ",
-          GCG_PREFIX_REF, vldh_IdToStr(0, next_objdid));
+      IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "setcond_exec( %c%s, ", GCG_PREFIX_REF,
+                    vldh_IdToStr(0, next_objdid));
       if (par_inverted)
         IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "!");
-      IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%c%s->%s);\n",
-          output_prefix,
-          output_type == GCG_OTYPE_OID ? vldh_IdToStr(0, output_attrref.Objid)
-                                       : vldh_AttrRefToStr(0, output_attrref),
-          output_par);
-    } else {
+      IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%c%s->%s);\n", output_prefix,
+                    output_type == GCG_OTYPE_OID ? vldh_IdToStr(0, output_attrref.Objid)
+                                                 : vldh_AttrRefToStr(0, output_attrref),
+                    output_par);
+    }
+    else
+    {
       /* Point visible but not connected, errormessage */
       gcg_error_msg(gcgctx, GSX__NOTCON, node);
     }
   }
 
   /* Check the attributes in the parent order node */
-  sts = ldh_GetObjectBodyDef(
-      (node->hn.wind)->hw.ldhses, node->ln.cid, "DevBody", 1, &bodydef, &rows);
+  sts = ldh_GetObjectBodyDef((node->hn.wind)->hw.ldhses, node->ln.cid, "DevBody", 1, &bodydef, &rows);
 
   if (EVEN(sts))
     return sts;
@@ -6992,29 +7312,41 @@ int gcg_comp_m16(gcg_ctx gcgctx, vldh_t_node node)
    */
 
   subordercount = 0;
-  for (i = 0; i < rows - 2; i += 2) {
+  for (i = 0; i < rows - 2; i += 2)
+  {
     /* Get the parameter value */
-    sts = ldh_GetObjectPar((node->hn.wind)->hw.ldhses, node->ln.oid, "DevBody",
-        bodydef[i].ParName, (char**)&parvalue, &size);
+    sts = ldh_GetObjectPar((node->hn.wind)->hw.ldhses, node->ln.oid, "DevBody", bodydef[i].ParName,
+                           (char**)&parvalue, &size);
     if (EVEN(sts))
       return sts;
 
-    if (*parvalue == 'S' || *parvalue == 's') {
+    if (*parvalue == 'S' || *parvalue == 's')
+    {
       suborderclass[subordercount] = pwr_cClass_sorder;
       subordercount++;
-    } else if (*parvalue == 'L' || *parvalue == 'l') {
+    }
+    else if (*parvalue == 'L' || *parvalue == 'l')
+    {
       suborderclass[subordercount] = pwr_cClass_lorder;
       subordercount++;
-    } else if (*parvalue == 'C' || *parvalue == 'c') {
+    }
+    else if (*parvalue == 'C' || *parvalue == 'c')
+    {
       suborderclass[subordercount] = pwr_cClass_corder;
       subordercount++;
-    } else if (*parvalue == 'D' || *parvalue == 'd') {
+    }
+    else if (*parvalue == 'D' || *parvalue == 'd')
+    {
       suborderclass[subordercount] = pwr_cClass_dorder;
       subordercount++;
-    } else if (*parvalue == 'P' || *parvalue == 'p') {
+    }
+    else if (*parvalue == 'P' || *parvalue == 'p')
+    {
       suborderclass[subordercount] = pwr_cClass_porder;
       subordercount++;
-    } else if (*parvalue != 0) {
+    }
+    else if (*parvalue != 0)
+    {
       /* This orderattribute is not allowed */
       gcg_error_msg(gcgctx, GSX__ORDERATTR, node);
     }
@@ -7026,19 +7358,22 @@ int gcg_comp_m16(gcg_ctx gcgctx, vldh_t_node node)
   found = 0;
   ldhsubordercount = 0;
   sts = ldh_GetChild(ldhses, node->ln.oid, &next_objdid);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     /* Find out if this is a suborder */
     sts = ldh_GetObjectClass(ldhses, next_objdid, &cid);
     if (EVEN(sts))
       return sts;
 
-    if (cid == pwr_cClass_sorder || cid == pwr_cClass_dorder
-        || cid == pwr_cClass_lorder || cid == pwr_cClass_corder
-        || cid == pwr_cClass_porder) {
-      if (cid != suborderclass[ldhsubordercount]) {
+    if (cid == pwr_cClass_sorder || cid == pwr_cClass_dorder || cid == pwr_cClass_lorder ||
+        cid == pwr_cClass_corder || cid == pwr_cClass_porder)
+    {
+      if (cid != suborderclass[ldhsubordercount])
+      {
         return GSX__ORDERMISM;
       }
-      if (cid == pwr_cClass_sorder) {
+      if (cid == pwr_cClass_sorder)
+      {
         sts = gcg_ref_insert(gcgctx, next_objdid, GCG_PREFIX_REF, node);
 
         /* Get name for execute call */
@@ -7047,13 +7382,14 @@ int gcg_comp_m16(gcg_ctx gcgctx, vldh_t_node node)
           return sts;
 
         /* Print the execute command */
-        IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE],
-            "%s_exec( %c%s, %c%s, %c%s->ActualValue);\n", name, GCG_PREFIX_REF,
-            vldh_IdToStr(0, next_objdid), GCG_PREFIX_REF,
-            vldh_IdToStr(1, step_objdid), GCG_PREFIX_REF,
-            vldh_AttrRefToStr(2, gcgctx->reset_object));
+        IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( %c%s, %c%s, %c%s->ActualValue);\n", name,
+                      GCG_PREFIX_REF, vldh_IdToStr(0, next_objdid), GCG_PREFIX_REF,
+                      vldh_IdToStr(1, step_objdid), GCG_PREFIX_REF,
+                      vldh_AttrRefToStr(2, gcgctx->reset_object));
         step_objdid = next_objdid;
-      } else if (cid == pwr_cClass_lorder) {
+      }
+      else if (cid == pwr_cClass_lorder)
+      {
         /* Get the time */
 
         sts = gcg_ref_insert(gcgctx, next_objdid, GCG_PREFIX_REF, node);
@@ -7067,11 +7403,12 @@ int gcg_comp_m16(gcg_ctx gcgctx, vldh_t_node node)
           return sts;
 
         /* Print the execute command */
-        IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( %c%s, %c%s);\n",
-            name, GCG_PREFIX_REF, vldh_IdToStr(0, next_objdid), GCG_PREFIX_REF,
-            vldh_IdToStr(1, step_objdid));
+        IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( %c%s, %c%s);\n", name, GCG_PREFIX_REF,
+                      vldh_IdToStr(0, next_objdid), GCG_PREFIX_REF, vldh_IdToStr(1, step_objdid));
         step_objdid = next_objdid;
-      } else if (cid == pwr_cClass_dorder) {
+      }
+      else if (cid == pwr_cClass_dorder)
+      {
         /* Get the time */
 
         sts = gcg_ref_insert(gcgctx, next_objdid, GCG_PREFIX_REF, node);
@@ -7085,11 +7422,12 @@ int gcg_comp_m16(gcg_ctx gcgctx, vldh_t_node node)
           return sts;
 
         /* Print the execute command */
-        IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( %c%s, %c%s);\n",
-            name, GCG_PREFIX_REF, vldh_IdToStr(0, next_objdid), GCG_PREFIX_REF,
-            vldh_IdToStr(1, step_objdid));
+        IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( %c%s, %c%s);\n", name, GCG_PREFIX_REF,
+                      vldh_IdToStr(0, next_objdid), GCG_PREFIX_REF, vldh_IdToStr(1, step_objdid));
         step_objdid = next_objdid;
-      } else if (cid == pwr_cClass_porder) {
+      }
+      else if (cid == pwr_cClass_porder)
+      {
         sts = gcg_ref_insert(gcgctx, next_objdid, GCG_PREFIX_REF, node);
 
         /* Get name for execute call */
@@ -7098,11 +7436,12 @@ int gcg_comp_m16(gcg_ctx gcgctx, vldh_t_node node)
           return sts;
 
         /* Print the execute command */
-        IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( %c%s, %c%s);\n",
-            name, GCG_PREFIX_REF, vldh_IdToStr(0, next_objdid), GCG_PREFIX_REF,
-            vldh_IdToStr(1, step_objdid));
+        IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( %c%s, %c%s);\n", name, GCG_PREFIX_REF,
+                      vldh_IdToStr(0, next_objdid), GCG_PREFIX_REF, vldh_IdToStr(1, step_objdid));
         step_objdid = next_objdid;
-      } else if (cid == pwr_cClass_corder) {
+      }
+      else if (cid == pwr_cClass_corder)
+      {
         sts = gcg_ref_insert(gcgctx, next_objdid, GCG_PREFIX_REF, node);
 
         /* Get name for execute call */
@@ -7111,30 +7450,34 @@ int gcg_comp_m16(gcg_ctx gcgctx, vldh_t_node node)
           return sts;
 
         /* Print the execute command */
-        IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( %c%s, %c%s, ",
-            name, GCG_PREFIX_REF, vldh_IdToStr(0, next_objdid), GCG_PREFIX_REF,
-            vldh_IdToStr(1, step_objdid));
+        IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( %c%s, %c%s, ", name, GCG_PREFIX_REF,
+                      vldh_IdToStr(0, next_objdid), GCG_PREFIX_REF, vldh_IdToStr(1, step_objdid));
 
         /* Look for a condition subwindow */
         wind_found = 0;
         windowindex = 1;
-        if (node->ln.subwindow & (windowindex + 1)) {
+        if (node->ln.subwindow & (windowindex + 1))
+        {
           wind_found = 1;
           windobjdid = node->ln.subwind_oid[windowindex];
         }
-        if (wind_found && pincond_found) {
+        if (wind_found && pincond_found)
+        {
           /* The pin is connected and there is a sub window */
           gcg_error_msg(gcgctx, GSX__PINWIND, node);
-        } else if (!(wind_found || pincond_found)) {
+        }
+        else if (!(wind_found || pincond_found))
+        {
           /* No window and no pinconnection */
           gcg_error_msg(gcgctx, GSX__NOPINORWIND, node);
-        } else if (wind_found) {
+        }
+        else if (wind_found)
+        {
           /* Print execute command for the subwindow */
-          IF_PR fprintf(gcgctx->files[GCGM1_DECL_FILE],
-              "void %c%s_exec(plc_sThread *tp);", GCG_PREFIX_MOD,
-              vldh_IdToStr(0, windobjdid));
-          IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%c%s_exec( tp);",
-              GCG_PREFIX_MOD, vldh_IdToStr(0, windobjdid));
+          IF_PR fprintf(gcgctx->files[GCGM1_DECL_FILE], "void %c%s_exec(plc_sThread *tp);", GCG_PREFIX_MOD,
+                        vldh_IdToStr(0, windobjdid));
+          IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%c%s_exec( tp);", GCG_PREFIX_MOD,
+                        vldh_IdToStr(0, windobjdid));
         }
         IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], ");\n");
         step_objdid = next_objdid;
@@ -7155,20 +7498,20 @@ int gcg_comp_m16(gcg_ctx gcgctx, vldh_t_node node)
     return sts;
 
   /* Print the execute command */
-  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( %c%s, %c%s,\n", name,
-      GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid), GCG_PREFIX_REF,
-      vldh_IdToStr(1, step_objdid));
+  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( %c%s, %c%s,\n", name, GCG_PREFIX_REF,
+                vldh_IdToStr(0, node->ln.oid), GCG_PREFIX_REF, vldh_IdToStr(1, step_objdid));
 
   /* Check if the activity output pin is visible */
   sts = gcg_get_point(node, 2, &point, &par_inverted);
   pinact_found = 0;
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     gcgctx->order_comp = TRUE;
     /* Look for nodes connected to this point */
-    gcg_get_conpoint_nodes(node, point, &point_count, &pointlist,
-        GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
+    gcg_get_conpoint_nodes(node, point, &point_count, &pointlist, GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
 
-    for (k = 1; k < (int)point_count; k++) {
+    for (k = 1; k < (int)point_count; k++)
+    {
       pinact_found = 1;
       next_node = (pointlist + k)->node;
       next_point = (pointlist + k)->conpoint;
@@ -7177,13 +7520,12 @@ int gcg_comp_m16(gcg_ctx gcgctx, vldh_t_node node)
       if (EVEN(sts))
         return sts;
 
-      if (cid == pwr_cClass_stodo || cid == pwr_cClass_setdo
-          || cid == pwr_cClass_resdo || cid == pwr_cClass_stodv
-          || cid == pwr_cClass_setdv || cid == pwr_cClass_resdv
-          || cid == pwr_cClass_setdp || cid == pwr_cClass_resdp
-          || cid == pwr_cClass_reset_so || cid == pwr_cClass_stodp
-          || cid == pwr_cClass_stodi || cid == pwr_cClass_setdi
-          || cid == pwr_cClass_toggledi || cid == pwr_cClass_resdi) {
+      if (cid == pwr_cClass_stodo || cid == pwr_cClass_setdo || cid == pwr_cClass_resdo ||
+          cid == pwr_cClass_stodv || cid == pwr_cClass_setdv || cid == pwr_cClass_resdv ||
+          cid == pwr_cClass_setdp || cid == pwr_cClass_resdp || cid == pwr_cClass_reset_so ||
+          cid == pwr_cClass_stodp || cid == pwr_cClass_stodi || cid == pwr_cClass_setdi ||
+          cid == pwr_cClass_toggledi || cid == pwr_cClass_resdi)
+      {
         /* compile this nodes here */
         sts = gcg_node_comp(gcgctx, next_node);
         if (EVEN(sts))
@@ -7198,23 +7540,28 @@ int gcg_comp_m16(gcg_ctx gcgctx, vldh_t_node node)
   /* Look for a activity subwindow */
   wind_found = 0;
   windowindex = 0;
-  if (node->ln.subwindow & (windowindex + 1)) {
+  if (node->ln.subwindow & (windowindex + 1))
+  {
     wind_found = 1;
     windobjdid = node->ln.subwind_oid[windowindex];
   }
-  if (wind_found && pinact_found) {
+  if (wind_found && pinact_found)
+  {
     /* The pin is connected and there is a sub window */
     gcg_error_msg(gcgctx, GSX__APINWIND, node);
-  } else if (!(wind_found || pinact_found)) {
+  }
+  else if (!(wind_found || pinact_found))
+  {
     /* No window and no pinconnections */
     gcg_error_msg(gcgctx, GSX__ANOPINORWIND, node);
-  } else if (wind_found) {
+  }
+  else if (wind_found)
+  {
     /* There should be an activity window */
-    IF_PR fprintf(gcgctx->files[GCGM1_DECL_FILE],
-        "void %c%s_exec(plc_sThread *tp);", GCG_PREFIX_MOD,
-        vldh_IdToStr(0, windobjdid));
-    IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%c%s_exec( tp);\n",
-        GCG_PREFIX_MOD, vldh_IdToStr(0, windobjdid));
+    IF_PR fprintf(gcgctx->files[GCGM1_DECL_FILE], "void %c%s_exec(plc_sThread *tp);", GCG_PREFIX_MOD,
+                  vldh_IdToStr(0, windobjdid));
+    IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%c%s_exec( tp);\n", GCG_PREFIX_MOD,
+                  vldh_IdToStr(0, windobjdid));
   }
 
   IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], ");\n");
@@ -7223,36 +7570,36 @@ int gcg_comp_m16(gcg_ctx gcgctx, vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m11()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for STODO, STODV, STOAO, STOAV, SETDO, SETDV,
-*	RESDO, RESDV
-*	If the object is connected to an order it will be called
-*	from the order method.
-*
-*	Syntax control:
-*	Checks that the class of the referenced object is correct.
-*
-*	Code generation:
-*	Declares and links a write pointer to the referenced object.
-*	This will point to the valuebase object of the base frequency.
-*	Prints an exec call.
-*	stoav_exec( W800005f6, Z800005f5->ActualValue);
-*
-*	If the input is not connected the value of the inputparameter
-*	will be printed instead of a input object for  sto obect. For set
-*	and reset object TRUE will printed.
-*	stoav_exec( W800005f6, 3.2500);
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m11()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for STODO, STODV, STOAO, STOAV, SETDO, SETDV,
+ *	RESDO, RESDV
+ *	If the object is connected to an order it will be called
+ *	from the order method.
+ *
+ *	Syntax control:
+ *	Checks that the class of the referenced object is correct.
+ *
+ *	Code generation:
+ *	Declares and links a write pointer to the referenced object.
+ *	This will point to the valuebase object of the base frequency.
+ *	Prints an exec call.
+ *	stoav_exec( W800005f6, Z800005f5->ActualValue);
+ *
+ *	If the input is not connected the value of the inputparameter
+ *	will be printed instead of a input object for  sto obect. For set
+ *	and reset object TRUE will printed.
+ *	stoav_exec( W800005f6, 3.2500);
+ *
+ **************************************************************************/
 
 int gcg_comp_m11(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -7283,15 +7630,16 @@ int gcg_comp_m11(gcg_ctx gcgctx, vldh_t_node node)
   if (EVEN(sts))
     return sts;
 
-  if (!gcgctx->order_comp) {
-    if (cid == pwr_cClass_stodo || cid == pwr_cClass_setdo
-        || cid == pwr_cClass_resdo || cid == pwr_cClass_stodv
-        || cid == pwr_cClass_setdv || cid == pwr_cClass_resdv) {
+  if (!gcgctx->order_comp)
+  {
+    if (cid == pwr_cClass_stodo || cid == pwr_cClass_setdo || cid == pwr_cClass_resdo ||
+        cid == pwr_cClass_stodv || cid == pwr_cClass_setdv || cid == pwr_cClass_resdv)
+    {
       /* Check first if the object is connected to an order object,
         if it is, it will be compiled when by the ordermethod, when
         gcgctx->order_comp is true */
-      sts = gcg_get_output(node, 0, &output_count, &output_node, &output_point,
-          &output_bodydef, GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
+      sts = gcg_get_output(node, 0, &output_count, &output_node, &output_point, &output_bodydef,
+                           GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
       if (EVEN(sts))
         return sts;
       if (output_count == 1)
@@ -7304,13 +7652,11 @@ int gcg_comp_m11(gcg_ctx gcgctx, vldh_t_node node)
     first parameter in defbody */
 
   /* Get the devbody parameters for this class */
-  sts = ldh_GetObjectBodyDef(
-      ldhses, node->ln.cid, "DevBody", 1, &bodydef, &rows);
+  sts = ldh_GetObjectBodyDef(ldhses, node->ln.cid, "DevBody", 1, &bodydef, &rows);
   if (EVEN(sts))
     return sts;
 
-  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", bodydef[0].ParName,
-      (char**)&refattrref_ptr, &size);
+  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", bodydef[0].ParName, (char**)&refattrref_ptr, &size);
   if (EVEN(sts))
     return sts;
   refattrref = *refattrref_ptr;
@@ -7323,108 +7669,133 @@ int gcg_comp_m11(gcg_ctx gcgctx, vldh_t_node node)
 
   /* If the object is not connected the value in the
      parameter should be written in the macro call */
-  sts = ldh_GetObjectPar(
-      ldhses, node->ln.oid, "RtBody", "In", &nocondef_ptr, &size);
+  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "RtBody", "In", &nocondef_ptr, &size);
   if (EVEN(sts))
     return sts;
 
   /* Check that this is objdid of an existing object */
   sts = ldh_GetAttrRefOrigTid(ldhses, &refattrref, &cid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     gcg_error_msg(gcgctx, GSX__REFOBJ, node);
     return GSX__NEXTNODE;
   }
 
   /* Check that the class of the referenced object is correct */
-  if ((node->ln.cid == pwr_cClass_setdo)
-      || (node->ln.cid == pwr_cClass_resdo)) {
-    if (!(cid == pwr_cClass_Do || cid == pwr_cClass_Po)) {
+  if ((node->ln.cid == pwr_cClass_setdo) || (node->ln.cid == pwr_cClass_resdo))
+  {
+    if (!(cid == pwr_cClass_Do || cid == pwr_cClass_Po))
+    {
       gcg_error_msg(gcgctx, GSX__REFCLASS, node);
       return GSX__NEXTNODE;
     }
     nocondef[0].bo = TRUE;
     nocontype[0] = GCG_BOOLEAN;
-  } else if (node->ln.cid == pwr_cClass_stodo) {
-    if (!(cid == pwr_cClass_Do || cid == pwr_cClass_Po)) {
+  }
+  else if (node->ln.cid == pwr_cClass_stodo)
+  {
+    if (!(cid == pwr_cClass_Do || cid == pwr_cClass_Po))
+    {
       gcg_error_msg(gcgctx, GSX__REFCLASS, node);
       return GSX__NEXTNODE;
     }
     nocondef[0].bo = (int)*nocondef_ptr;
     nocontype[0] = GCG_BOOLEAN;
-  } else if ((node->ln.cid == pwr_cClass_setdv)
-      || (node->ln.cid == pwr_cClass_resdv)) {
-    if (cid != pwr_cClass_Dv) {
+  }
+  else if ((node->ln.cid == pwr_cClass_setdv) || (node->ln.cid == pwr_cClass_resdv))
+  {
+    if (cid != pwr_cClass_Dv)
+    {
       gcg_error_msg(gcgctx, GSX__REFCLASS, node);
       return GSX__NEXTNODE;
     }
     nocondef[0].bo = TRUE;
     nocontype[0] = GCG_BOOLEAN;
-  } else if (node->ln.cid == pwr_cClass_stodv) {
-    if (cid != pwr_cClass_Dv) {
+  }
+  else if (node->ln.cid == pwr_cClass_stodv)
+  {
+    if (cid != pwr_cClass_Dv)
+    {
       gcg_error_msg(gcgctx, GSX__REFCLASS, node);
       return GSX__NEXTNODE;
     }
     nocondef[0].bo = (int)*nocondef_ptr;
     nocontype[0] = GCG_BOOLEAN;
-  } else if ((node->ln.cid == pwr_cClass_stoao)
-      || (node->ln.cid == pwr_cClass_cstoao)) {
-    if (cid != pwr_cClass_Ao) {
+  }
+  else if ((node->ln.cid == pwr_cClass_stoao) || (node->ln.cid == pwr_cClass_cstoao))
+  {
+    if (cid != pwr_cClass_Ao)
+    {
       gcg_error_msg(gcgctx, GSX__REFCLASS, node);
       return GSX__NEXTNODE;
     }
     nocondef[0].fl = *(float*)nocondef_ptr;
     nocontype[0] = GCG_FLOAT;
-  } else if ((node->ln.cid == pwr_cClass_stoav)
-      || (node->ln.cid == pwr_cClass_cstoav)) {
-    if (cid != pwr_cClass_Av) {
+  }
+  else if ((node->ln.cid == pwr_cClass_stoav) || (node->ln.cid == pwr_cClass_cstoav))
+  {
+    if (cid != pwr_cClass_Av)
+    {
       gcg_error_msg(gcgctx, GSX__REFCLASS, node);
       return GSX__NEXTNODE;
     }
     nocondef[0].fl = *(float*)nocondef_ptr;
     nocontype[0] = GCG_FLOAT;
-  } else if ((node->ln.cid == pwr_cClass_stoio)
-      || (node->ln.cid == pwr_cClass_cstoio)) {
-    if (cid != pwr_cClass_Io) {
+  }
+  else if ((node->ln.cid == pwr_cClass_stoio) || (node->ln.cid == pwr_cClass_cstoio))
+  {
+    if (cid != pwr_cClass_Io)
+    {
       gcg_error_msg(gcgctx, GSX__REFCLASS, node);
       return GSX__NEXTNODE;
     }
     nocondef[0].bo = *(int*)nocondef_ptr;
     nocontype[0] = GCG_INT32;
-  } else if ((node->ln.cid == pwr_cClass_stoiv)
-      || (node->ln.cid == pwr_cClass_cstoiv)) {
-    if (cid != pwr_cClass_Iv) {
+  }
+  else if ((node->ln.cid == pwr_cClass_stoiv) || (node->ln.cid == pwr_cClass_cstoiv))
+  {
+    if (cid != pwr_cClass_Iv)
+    {
       gcg_error_msg(gcgctx, GSX__REFCLASS, node);
       return GSX__NEXTNODE;
     }
     nocondef[0].bo = *(int*)nocondef_ptr;
     nocontype[0] = GCG_INT32;
-  } else if (node->ln.cid == pwr_cClass_stosv
-      || node->ln.cid == pwr_cClass_cstosv) {
-    if (cid != pwr_cClass_Sv) {
+  }
+  else if (node->ln.cid == pwr_cClass_stosv || node->ln.cid == pwr_cClass_cstosv)
+  {
+    if (cid != pwr_cClass_Sv)
+    {
       gcg_error_msg(gcgctx, GSX__REFCLASS, node);
       return GSX__NEXTNODE;
     }
     strcpy(nocondef[0].str, (char*)nocondef_ptr);
     nocontype[0] = GCG_STRING;
-  } else if (node->ln.cid == pwr_cClass_StoATv
-      || node->ln.cid == pwr_cClass_CStoATv) {
-    if (cid != pwr_cClass_ATv) {
+  }
+  else if (node->ln.cid == pwr_cClass_StoATv || node->ln.cid == pwr_cClass_CStoATv)
+  {
+    if (cid != pwr_cClass_ATv)
+    {
       gcg_error_msg(gcgctx, GSX__REFCLASS, node);
       return GSX__NEXTNODE;
     }
     nocondef[0].atime = *(pwr_tTime*)nocondef_ptr;
     nocontype[0] = GCG_ATIME;
-  } else if (node->ln.cid == pwr_cClass_StoDTv
-      || node->ln.cid == pwr_cClass_CStoDTv) {
-    if (cid != pwr_cClass_DTv) {
+  }
+  else if (node->ln.cid == pwr_cClass_StoDTv || node->ln.cid == pwr_cClass_CStoDTv)
+  {
+    if (cid != pwr_cClass_DTv)
+    {
       gcg_error_msg(gcgctx, GSX__REFCLASS, node);
       return GSX__NEXTNODE;
     }
     nocondef[0].dtime = *(pwr_tDeltaTime*)nocondef_ptr;
     nocontype[0] = GCG_DTIME;
-  } else if (node->ln.cid == pwr_cClass_StoDataRefv
-      || node->ln.cid == pwr_cClass_CStoDataRefv) {
-    if (cid != pwr_cClass_DataRefv) {
+  }
+  else if (node->ln.cid == pwr_cClass_StoDataRefv || node->ln.cid == pwr_cClass_CStoDataRefv)
+  {
+    if (cid != pwr_cClass_DataRefv)
+    {
       gcg_error_msg(gcgctx, GSX__REFCLASS, node);
       return GSX__NEXTNODE;
     }
@@ -7432,13 +7803,15 @@ int gcg_comp_m11(gcg_ctx gcgctx, vldh_t_node node)
   free(nocondef_ptr);
 
   /* Check if disabled */
-  if (refattrref.Flags.b.ObjectAttr && refattrref.Flags.b.DisableAttr) {
+  if (refattrref.Flags.b.ObjectAttr && refattrref.Flags.b.DisableAttr)
+  {
     sts = ldh_AttributeDisabled(ldhses, &refattrref, &disabled);
     if (ODD(sts) && disabled && !gcg_is_in_focode(gcgctx, node))
       gcg_error_msg(gcgctx, GSX__DISABLED, node);
   }
 
-  if (cid == pwr_cClass_DataRefv) {
+  if (cid == pwr_cClass_DataRefv)
+  {
     /* Insert io object in ref list */
     gcg_aref_insert(gcgctx, refattrref, GCG_PREFIX_REF, node);
 
@@ -7447,9 +7820,11 @@ int gcg_comp_m11(gcg_ctx gcgctx, vldh_t_node node)
     if (EVEN(sts))
       return sts;
 
-    IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( %c%s, ", name,
-        GCG_PREFIX_REF, vldh_AttrRefToStr(0, refattrref));
-  } else {
+    IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( %c%s, ", name, GCG_PREFIX_REF,
+                  vldh_AttrRefToStr(0, refattrref));
+  }
+  else
+  {
     /* Insert io object in iowrite list */
     gcg_iowrite_insert(gcgctx, refattrref, GCG_PREFIX_IOW);
 
@@ -7458,13 +7833,12 @@ int gcg_comp_m11(gcg_ctx gcgctx, vldh_t_node node)
     if (EVEN(sts))
       return sts;
 
-    IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( %c%s, ", name,
-        GCG_PREFIX_IOW, vldh_AttrRefToStr(0, refattrref));
+    IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( %c%s, ", name, GCG_PREFIX_IOW,
+                  vldh_AttrRefToStr(0, refattrref));
     if (EVEN(sts))
       return sts;
   }
-  sts = gcg_print_inputs(
-      gcgctx, node, ", ", GCG_PRINT_ALLPAR, nocondef, nocontype);
+  sts = gcg_print_inputs(gcgctx, node, ", ", GCG_PRINT_ALLPAR, nocondef, nocontype);
   if (EVEN(sts))
     return sts;
 
@@ -7474,33 +7848,33 @@ int gcg_comp_m11(gcg_ctx gcgctx, vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m12()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for STODP, SETDP, RESDP och STOAP.
-*	If the object is connected to an order the routine is called
-*	from the ordermethod.
-*
-*	Syntax control:
-*	Check that the referenced object exists and that the referenced
-*	parameter exists in this object, and that the object is of
-*	the correct type.
-*
-*	Generating code:
-*	Declares and links a rtdb pointer to the referenced object.
-*	Prints an exec call.
-*	If the input is not connected the value of the input parameter
-*	is printed instead of the input for a sto. For a set or res
-*	TRUE is printed.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m12()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for STODP, SETDP, RESDP och STOAP.
+ *	If the object is connected to an order the routine is called
+ *	from the ordermethod.
+ *
+ *	Syntax control:
+ *	Check that the referenced object exists and that the referenced
+ *	parameter exists in this object, and that the object is of
+ *	the correct type.
+ *
+ *	Generating code:
+ *	Declares and links a rtdb pointer to the referenced object.
+ *	Prints an exec call.
+ *	If the input is not connected the value of the input parameter
+ *	is printed instead of the input for a sto. For a set or res
+ *	TRUE is printed.
+ *
+ **************************************************************************/
 
 int gcg_comp_m12(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -7530,15 +7904,16 @@ int gcg_comp_m12(gcg_ctx gcgctx, vldh_t_node node)
 
   ldhses = (node->hn.wind)->hw.ldhses;
 
-  if (!gcgctx->order_comp) {
-    if ((node->ln.cid == pwr_cClass_resdp
-	 || node->ln.cid == pwr_cClass_stodp
-	 || node->ln.cid == pwr_cClass_setdp)) {
+  if (!gcgctx->order_comp)
+  {
+    if ((node->ln.cid == pwr_cClass_resdp || node->ln.cid == pwr_cClass_stodp ||
+         node->ln.cid == pwr_cClass_setdp))
+    {
       /* Check first if the object is connected to an order object,
         if it is, it will be compiled when by the ordermethod, when
         gcgctx->order_comp is true */
-      sts = gcg_get_output(node, 0, &output_count, &output_node, &output_point,
-          &output_bodydef, GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
+      sts = gcg_get_output(node, 0, &output_count, &output_node, &output_point, &output_bodydef,
+                           GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
       if (EVEN(sts))
         return sts;
       if (output_count == 1)
@@ -7550,13 +7925,11 @@ int gcg_comp_m12(gcg_ctx gcgctx, vldh_t_node node)
     first parameter in defbody */
 
   /* Get the devbody parameters for this class */
-  sts = ldh_GetObjectBodyDef(
-      ldhses, node->ln.cid, "DevBody", 1, &bodydef, &rows);
+  sts = ldh_GetObjectBodyDef(ldhses, node->ln.cid, "DevBody", 1, &bodydef, &rows);
   if (EVEN(sts))
     return sts;
 
-  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", bodydef[0].ParName,
-      (char**)&refattrref_ptr, &size);
+  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", bodydef[0].ParName, (char**)&refattrref_ptr, &size);
   if (EVEN(sts))
     return sts;
   refattrref = *refattrref_ptr;
@@ -7569,7 +7942,8 @@ int gcg_comp_m12(gcg_ctx gcgctx, vldh_t_node node)
 
   /* Check that this is objdid of an existing object */
   sts = ldh_GetAttrRefOrigTid(ldhses, &refattrref, &cid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     gcg_error_msg(gcgctx, GSX__REFOBJ, node);
     return GSX__NEXTNODE;
   }
@@ -7579,20 +7953,21 @@ int gcg_comp_m12(gcg_ctx gcgctx, vldh_t_node node)
     return sts;
 
   /* Get rid of last attribute segment of the referenced object */
-  sts = ldh_AttrRefToName(
-      ldhses, &refattrref, ldh_eName_ArefVol, &name_p, &size);
+  sts = ldh_AttrRefToName(ldhses, &refattrref, ldh_eName_ArefVol, &name_p, &size);
   if (EVEN(sts))
     return sts;
 
   strcpy(aname, name_p);
-  if ((s = strrchr(aname, '.')) == 0) {
+  if ((s = strrchr(aname, '.')) == 0)
+  {
     gcg_error_msg(gcgctx, GSX__REFOBJ, node);
     return GSX__NEXTPAR;
   }
 
   *s = 0;
   sts = ldh_NameToAttrRef(ldhses, aname, &refattrref);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     gcg_error_msg(gcgctx, GSX__REFOBJ, node);
     return GSX__NEXTPAR;
   }
@@ -7605,14 +7980,17 @@ int gcg_comp_m12(gcg_ctx gcgctx, vldh_t_node node)
   if (EVEN(sts))
     return sts;
 
-  if (info.flags & PWR_MASK_RTVIRTUAL) {
+  if (info.flags & PWR_MASK_RTVIRTUAL)
+  {
     /* Attribute is not defined in runtime */
     gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
     return GSX__NEXTNODE;
   }
 
-  if (info.flags & PWR_MASK_ARRAY) {
-    if (info.nElement == -1) {
+  if (info.flags & PWR_MASK_ARRAY)
+  {
+    if (info.nElement == -1)
+    {
       /* No index in attribute */
       gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
       return GSX__NEXTNODE;
@@ -7624,10 +8002,11 @@ int gcg_comp_m12(gcg_ctx gcgctx, vldh_t_node node)
     //}
   }
 
-  switch (info.type) {
+  switch (info.type)
+  {
   case pwr_eType_Float32:
-    if (!(node->ln.cid == pwr_cClass_stoap
-            || node->ln.cid == pwr_cClass_cstoap)) {
+    if (!(node->ln.cid == pwr_cClass_stoap || node->ln.cid == pwr_cClass_cstoap))
+    {
       gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
       return GSX__NEXTNODE;
     }
@@ -7642,47 +8021,47 @@ int gcg_comp_m12(gcg_ctx gcgctx, vldh_t_node node)
   case pwr_eType_Mask:
   case pwr_eType_Status:
   case pwr_eType_NetStatus:
-    if (!(node->ln.cid == pwr_cClass_StoAtoIp
-            || node->ln.cid == pwr_cClass_CStoAtoIp
-            || node->ln.cid == pwr_cClass_StoIp
-            || node->ln.cid == pwr_cClass_CStoIp)) {
+    if (!(node->ln.cid == pwr_cClass_StoAtoIp || node->ln.cid == pwr_cClass_CStoAtoIp ||
+          node->ln.cid == pwr_cClass_StoIp || node->ln.cid == pwr_cClass_CStoIp))
+    {
       gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
       return GSX__NEXTNODE;
     }
     break;
   case pwr_eType_Boolean:
-    if (!(node->ln.cid == pwr_cClass_stodp || node->ln.cid == pwr_cClass_setdp
-            || node->ln.cid == pwr_cClass_resdp)) {
+    if (!(node->ln.cid == pwr_cClass_stodp || node->ln.cid == pwr_cClass_setdp ||
+          node->ln.cid == pwr_cClass_resdp))
+    {
       gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
       return GSX__NEXTNODE;
     }
     break;
   case pwr_eType_String:
-    if (!(node->ln.cid == pwr_cClass_stosp || node->ln.cid == pwr_cClass_cstosp
-            || node->ln.cid == pwr_cClass_stonumsp
-            || node->ln.cid == pwr_cClass_cstonumsp)) {
+    if (!(node->ln.cid == pwr_cClass_stosp || node->ln.cid == pwr_cClass_cstosp ||
+          node->ln.cid == pwr_cClass_stonumsp || node->ln.cid == pwr_cClass_cstonumsp))
+    {
       gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
       return GSX__NEXTNODE;
     }
     break;
   case pwr_eType_Text:
-    if (!(node->ln.cid == pwr_cClass_stosp || node->ln.cid == pwr_cClass_cstosp
-            || node->ln.cid == pwr_cClass_stonumsp
-            || node->ln.cid == pwr_cClass_cstonumsp)) {
+    if (!(node->ln.cid == pwr_cClass_stosp || node->ln.cid == pwr_cClass_cstosp ||
+          node->ln.cid == pwr_cClass_stonumsp || node->ln.cid == pwr_cClass_cstonumsp))
+    {
       gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
       return GSX__NEXTNODE;
     }
     break;
   case pwr_eType_Time:
-    if (!(node->ln.cid == pwr_cClass_StoATp
-            || node->ln.cid == pwr_cClass_CStoATp)) {
+    if (!(node->ln.cid == pwr_cClass_StoATp || node->ln.cid == pwr_cClass_CStoATp))
+    {
       gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
       return GSX__NEXTNODE;
     }
     break;
   case pwr_eType_DeltaTime:
-    if (!(node->ln.cid == pwr_cClass_StoDTp
-            || node->ln.cid == pwr_cClass_CStoDTp)) {
+    if (!(node->ln.cid == pwr_cClass_StoDTp || node->ln.cid == pwr_cClass_CStoDTp))
+    {
       gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
       return GSX__NEXTNODE;
     }
@@ -7695,40 +8074,45 @@ int gcg_comp_m12(gcg_ctx gcgctx, vldh_t_node node)
 
   /* If the object is not connected the value in the
      parameter should be written in the macro call */
-  sts = ldh_GetObjectPar(
-      ldhses, node->ln.oid, "RtBody", "In", &nocondef_ptr, &size);
+  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "RtBody", "In", &nocondef_ptr, &size);
   if (EVEN(sts))
     return sts;
 
   /* Check that the class of the referenced object is correct */
-  if (node->ln.cid == pwr_cClass_setdp || node->ln.cid == pwr_cClass_resdp) {
+  if (node->ln.cid == pwr_cClass_setdp || node->ln.cid == pwr_cClass_resdp)
+  {
     nocondef[0].bo = TRUE;
     nocontype[0] = GCG_BOOLEAN;
-  } else if (node->ln.cid == pwr_cClass_stodp) {
+  }
+  else if (node->ln.cid == pwr_cClass_stodp)
+  {
     nocondef[0].bo = (int)*nocondef_ptr;
     nocontype[0] = GCG_BOOLEAN;
-  } else if (node->ln.cid == pwr_cClass_stoap
-      || node->ln.cid == pwr_cClass_cstoap) {
+  }
+  else if (node->ln.cid == pwr_cClass_stoap || node->ln.cid == pwr_cClass_cstoap)
+  {
     nocondef[0].fl = *(float*)nocondef_ptr;
     nocontype[0] = GCG_FLOAT;
-  } else if (node->ln.cid == pwr_cClass_StoAtoIp
-      || node->ln.cid == pwr_cClass_CStoAtoIp
-      || node->ln.cid == pwr_cClass_StoIp
-      || node->ln.cid == pwr_cClass_CStoIp) {
+  }
+  else if (node->ln.cid == pwr_cClass_StoAtoIp || node->ln.cid == pwr_cClass_CStoAtoIp ||
+           node->ln.cid == pwr_cClass_StoIp || node->ln.cid == pwr_cClass_CStoIp)
+  {
     nocondef[0].bo = *(int*)nocondef_ptr;
     nocontype[0] = GCG_INT32;
-  } else if (node->ln.cid == pwr_cClass_stosp
-      || node->ln.cid == pwr_cClass_cstosp
-      || node->ln.cid == pwr_cClass_stonumsp
-      || node->ln.cid == pwr_cClass_cstonumsp) {
+  }
+  else if (node->ln.cid == pwr_cClass_stosp || node->ln.cid == pwr_cClass_cstosp ||
+           node->ln.cid == pwr_cClass_stonumsp || node->ln.cid == pwr_cClass_cstonumsp)
+  {
     strcpy(nocondef[0].str, (char*)nocondef_ptr);
     nocontype[0] = GCG_STRING;
-  } else if (node->ln.cid == pwr_cClass_StoATp
-      || node->ln.cid == pwr_cClass_CStoATp) {
+  }
+  else if (node->ln.cid == pwr_cClass_StoATp || node->ln.cid == pwr_cClass_CStoATp)
+  {
     nocondef[0].atime = *(pwr_tTime*)nocondef_ptr;
     nocontype[0] = GCG_ATIME;
-  } else if (node->ln.cid == pwr_cClass_StoDTp
-      || node->ln.cid == pwr_cClass_CStoDTp) {
+  }
+  else if (node->ln.cid == pwr_cClass_StoDTp || node->ln.cid == pwr_cClass_CStoDTp)
+  {
     nocondef[0].dtime = *(pwr_tDeltaTime*)nocondef_ptr;
     nocontype[0] = GCG_DTIME;
   }
@@ -7743,29 +8127,28 @@ int gcg_comp_m12(gcg_ctx gcgctx, vldh_t_node node)
     return sts;
 
   /* Print the execute command */
-  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( %c%s->%s, ", name,
-      GCG_PREFIX_REF, vldh_AttrRefToStr(0, refattrref), parameter);
+  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( %c%s->%s, ", name, GCG_PREFIX_REF,
+                vldh_AttrRefToStr(0, refattrref), parameter);
 
-  sts = gcg_print_inputs(
-      gcgctx, node, ", ", GCG_PRINT_ALLPAR, nocondef, nocontype);
+  sts = gcg_print_inputs(gcgctx, node, ", ", GCG_PRINT_ALLPAR, nocondef, nocontype);
   if (EVEN(sts))
     return sts;
 
-  if (node->ln.cid == pwr_cClass_stosp || node->ln.cid == pwr_cClass_cstosp) {
+  if (node->ln.cid == pwr_cClass_stosp || node->ln.cid == pwr_cClass_cstosp)
+  {
     // Add size of connected attribute
     IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], ",%d", info.size);
-  } else if (node->ln.cid == pwr_cClass_stonumsp
-      || node->ln.cid == pwr_cClass_cstonumsp) {
+  }
+  else if (node->ln.cid == pwr_cClass_stonumsp || node->ln.cid == pwr_cClass_cstonumsp)
+  {
     // Add size of connected attribute and number of characters
     pwr_tInt32* numberofchar_ptr;
 
-    sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", "NumberOfChar",
-        (char**)&numberofchar_ptr, &size);
+    sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", "NumberOfChar", (char**)&numberofchar_ptr, &size);
     if (EVEN(sts))
       return sts;
 
-    IF_PR fprintf(
-        gcgctx->files[GCGM1_CODE_FILE], ",%d,%d", info.size, *numberofchar_ptr);
+    IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], ",%d,%d", info.size, *numberofchar_ptr);
     free((char*)numberofchar_ptr);
   }
 
@@ -7775,26 +8158,26 @@ int gcg_comp_m12(gcg_ctx gcgctx, vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m17()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for csub.
-*	Syntax control:
-*	Check that a subwindow exists.
-*
-*	Generating code:
-*	Declares and links a rtdb pointer to the csup object.
-*	Prints an exec call including a exec call for the subwindow.
-*	If the input is not connected the input is set to TRUE.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m17()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for csub.
+ *	Syntax control:
+ *	Check that a subwindow exists.
+ *
+ *	Generating code:
+ *	Declares and links a rtdb pointer to the csup object.
+ *	Prints an exec call including a exec call for the subwindow.
+ *	If the input is not connected the input is set to TRUE.
+ *
+ **************************************************************************/
 
 int gcg_comp_m17(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -7820,8 +8203,7 @@ int gcg_comp_m17(gcg_ctx gcgctx, vldh_t_node node)
   /* Print the execute command */
   IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( ", name);
 
-  sts = gcg_print_inputs(
-      gcgctx, node, ", ", GCG_PRINT_ALLPAR, &nocondef, &nocontype);
+  sts = gcg_print_inputs(gcgctx, node, ", ", GCG_PRINT_ALLPAR, &nocondef, &nocontype);
   if (EVEN(sts))
     return sts;
 
@@ -7830,29 +8212,33 @@ int gcg_comp_m17(gcg_ctx gcgctx, vldh_t_node node)
   /* Get the first child to the plc */
   sts = ldh_GetChild(ldhses, node->ln.oid, &windowobjdid);
   found = 0;
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     /* Check if window */
-    sts = ldh_GetObjectBuffer(ldhses, windowobjdid, "DevBody", "PlcWindow",
-        (pwr_eClass*)&windclass, &windbuffer, &size);
+    sts = ldh_GetObjectBuffer(ldhses, windowobjdid, "DevBody", "PlcWindow", (pwr_eClass*)&windclass,
+                              &windbuffer, &size);
     free((char*)windbuffer);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       found = 1;
       break;
     }
     sts = ldh_GetNextSibling(ldhses, windowobjdid, &windowobjdid);
   }
 
-  if (!found) {
+  if (!found)
+  {
     /* The window is not created */
     gcg_error_msg(gcgctx, GSX__NOSUBWINDOW, node);
     IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], ",\n");
-  } else {
+  }
+  else
+  {
     /* Print the window execute command */
-    IF_PR fprintf(gcgctx->files[GCGM1_DECL_FILE],
-        "void %c%s_exec(plc_sThread *tp);", GCG_PREFIX_MOD,
-        vldh_IdToStr(0, windowobjdid));
-    IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], " ,%c%s_exec( tp);",
-        GCG_PREFIX_MOD, vldh_IdToStr(0, windowobjdid));
+    IF_PR fprintf(gcgctx->files[GCGM1_DECL_FILE], "void %c%s_exec(plc_sThread *tp);", GCG_PREFIX_MOD,
+                  vldh_IdToStr(0, windowobjdid));
+    IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], " ,%c%s_exec( tp);", GCG_PREFIX_MOD,
+                  vldh_IdToStr(0, windowobjdid));
   }
 
   IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], ");\n");
@@ -7861,30 +8247,30 @@ int gcg_comp_m17(gcg_ctx gcgctx, vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m18()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for RESET_SO
-*	If the object is connected to an order it is called from
-*	the order method.
-*
-*	Syntax control:
-*	Checks that the referenced order exists, and that it is an
-*	s-order.
-*
-*	Generating code.
-*	Declares and links a rtdb pointer to the Sorder object.
-*	Prints an exec call.
-*	reset_so_exec( Z8000084a, Z800005d3->Status[0]);
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m18()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for RESET_SO
+ *	If the object is connected to an order it is called from
+ *	the order method.
+ *
+ *	Syntax control:
+ *	Checks that the referenced order exists, and that it is an
+ *	s-order.
+ *
+ *	Generating code.
+ *	Declares and links a rtdb pointer to the Sorder object.
+ *	Prints an exec call.
+ *	reset_so_exec( Z8000084a, Z800005d3->Status[0]);
+ *
+ **************************************************************************/
 
 int gcg_comp_m18(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -7903,12 +8289,13 @@ int gcg_comp_m18(gcg_ctx gcgctx, vldh_t_node node)
 
   ldhses = (node->hn.wind)->hw.ldhses;
 
-  if (!gcgctx->order_comp) {
+  if (!gcgctx->order_comp)
+  {
     /* Check first if the object is connected to an order object,
       if it is, it will be compiled when by the ordermethod, when
       gcgctx->order_comp is true */
-    sts = gcg_get_output(node, 0, &output_count, &output_node, &output_point,
-        &output_bodydef, GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
+    sts = gcg_get_output(node, 0, &output_count, &output_node, &output_point, &output_bodydef,
+                         GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
     if (EVEN(sts))
       return sts;
     if (output_count == 1)
@@ -7919,8 +8306,7 @@ int gcg_comp_m18(gcg_ctx gcgctx, vldh_t_node node)
   /* Get the objdid of the referenced io object stored in the
     first parameter devbody */
 
-  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", "OrderObject",
-      (char**)&refobjdid_ptr, &size);
+  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", "OrderObject", (char**)&refobjdid_ptr, &size);
   if (EVEN(sts))
     return sts;
 
@@ -7929,7 +8315,8 @@ int gcg_comp_m18(gcg_ctx gcgctx, vldh_t_node node)
 
   /* Check that this is objdid of an existing object */
   sts = ldh_GetObjectClass((node->hn.wind)->hw.ldhses, refobjdid, &cid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     gcg_error_msg(gcgctx, GSX__REFOBJ, node);
     return GSX__NEXTNODE;
   }
@@ -7938,19 +8325,22 @@ int gcg_comp_m18(gcg_ctx gcgctx, vldh_t_node node)
   /* Check if this order has a COrder as a child */
   found = 0;
   sts = ldh_GetChild(ldhses, refobjdid, &next_objdid);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     /* Find out if this is a Sorder */
     sts = ldh_GetObjectClass(ldhses, next_objdid, &cid);
     if (EVEN(sts))
       return sts;
 
-    if (cid == pwr_cClass_sorder) {
+    if (cid == pwr_cClass_sorder)
+    {
       found = 1;
       break;
     }
     sts = ldh_GetNextSibling(ldhses, next_objdid, &next_objdid);
   }
-  if (!found) {
+  if (!found)
+  {
     gcg_error_msg(gcgctx, GSX__NOSORDER, node);
     return GSX__NEXTNODE;
   }
@@ -7973,25 +8363,25 @@ int gcg_comp_m18(gcg_ctx gcgctx, vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m19()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for ORDERACT
-*	Syntax control:
-*	Checks that the parent is an order object and that it is
-*	equivalent to the referenced orderobject.
-*
-*	Generating code:
-*	Declares and links a pointer to the referenced order object.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m19()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for ORDERACT
+ *	Syntax control:
+ *	Checks that the parent is an order object and that it is
+ *	equivalent to the referenced orderobject.
+ *
+ *	Generating code:
+ *	Declares and links a pointer to the referenced order object.
+ *
+ **************************************************************************/
 
 int gcg_comp_m19(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -8007,15 +8397,15 @@ int gcg_comp_m19(gcg_ctx gcgctx, vldh_t_node node)
   /* Get the objdid of the referenced order object stored in the
     first parameter devbody */
 
-  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", "OrderObject",
-      (char**)&refobjdid_ptr, &size);
+  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", "OrderObject", (char**)&refobjdid_ptr, &size);
   if (EVEN(sts))
     return sts;
 
   refobjdid = *refobjdid_ptr;
   free((char*)refobjdid_ptr);
 
-  if (cdh_ObjidIsNull(refobjdid)) {
+  if (cdh_ObjidIsNull(refobjdid))
+  {
     /* Parent is a plcprogram */
     gcg_error_msg(gcgctx, GSX__BADWIND, node);
     return GSX__NEXTNODE;
@@ -8023,18 +8413,21 @@ int gcg_comp_m19(gcg_ctx gcgctx, vldh_t_node node)
 
   /* Check that parent is an order object */
   sts = ldh_GetObjectClass((node->hn.wind)->hw.ldhses, refobjdid, &cid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     gcg_error_msg(gcgctx, GSX__REFOBJ, node);
     return GSX__NEXTNODE;
   }
 
-  if (cid != pwr_cClass_order) {
+  if (cid != pwr_cClass_order)
+  {
     gcg_error_msg(gcgctx, GSX__BADWIND, node);
     return GSX__NEXTNODE;
   }
 
   /* Check that this is objdid is the same as the parent node */
-  if (cdh_ObjidIsNotEqual((node->hn.wind)->lw.poid, refobjdid)) {
+  if (cdh_ObjidIsNotEqual((node->hn.wind)->lw.poid, refobjdid))
+  {
     gcg_error_msg(gcgctx, GSX__REFOBJ, node);
     return GSX__NEXTNODE;
   }
@@ -8046,27 +8439,27 @@ int gcg_comp_m19(gcg_ctx gcgctx, vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m20()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for SETCOND
-*	Checks that the parent object of the window is a trans or
-*	an order with a C attribute.
-*	Checks that the referenced order is equivalent to the parent object.
-*
-*	Generating code:
-*	Declares and links a rtdb pointer to the parent object.
-*	Prints an exec call.
-* 	setcond_exec( Z800005c6, Z800005cc->Status);
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m20()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for SETCOND
+ *	Checks that the parent object of the window is a trans or
+ *	an order with a C attribute.
+ *	Checks that the referenced order is equivalent to the parent object.
+ *
+ *	Generating code:
+ *	Declares and links a rtdb pointer to the parent object.
+ *	Prints an exec call.
+ * 	setcond_exec( Z800005c6, Z800005cc->Status);
+ *
+ **************************************************************************/
 
 int gcg_comp_m20(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -8084,7 +8477,8 @@ int gcg_comp_m20(gcg_ctx gcgctx, vldh_t_node node)
     a trans or a order object */
   refobjdid = (node->hn.wind)->lw.poid;
 
-  if (cdh_ObjidIsNull(refobjdid)) {
+  if (cdh_ObjidIsNull(refobjdid))
+  {
     /* Parent is a plcprogram */
     gcg_error_msg(gcgctx, GSX__BADWIND, node);
     return GSX__NEXTNODE;
@@ -8092,34 +8486,40 @@ int gcg_comp_m20(gcg_ctx gcgctx, vldh_t_node node)
 
   /* Check class of this objdid */
   sts = ldh_GetObjectClass((node->hn.wind)->hw.ldhses, refobjdid, &cid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     gcg_error_msg(gcgctx, GSX__REFOBJ, node);
     return GSX__NEXTNODE;
   }
 
-  if (!(cid == pwr_cClass_trans || cid == pwr_cClass_order)) {
+  if (!(cid == pwr_cClass_trans || cid == pwr_cClass_order))
+  {
     gcg_error_msg(gcgctx, GSX__BADWIND, node);
     return GSX__NEXTNODE;
   }
 
-  if (cid == pwr_cClass_order) {
+  if (cid == pwr_cClass_order)
+  {
     /* Get the objdid for the Corder witch is a child of the order */
     /* Check if this order has a COrder as a child */
     found = 0;
     sts = ldh_GetChild(ldhses, refobjdid, &next_objdid);
-    while (ODD(sts)) {
+    while (ODD(sts))
+    {
       /* Find out if this is a COrder */
       sts = ldh_GetObjectClass(ldhses, next_objdid, &cid);
       if (EVEN(sts))
         return sts;
 
-      if (cid == pwr_cClass_corder) {
+      if (cid == pwr_cClass_corder)
+      {
         found = 1;
         break;
       }
       sts = ldh_GetNextSibling(ldhses, next_objdid, &next_objdid);
     }
-    if (!found) {
+    if (!found)
+    {
       gcg_error_msg(gcgctx, GSX__NOCORDER, node);
       return GSX__NEXTNODE;
     }
@@ -8135,8 +8535,8 @@ int gcg_comp_m20(gcg_ctx gcgctx, vldh_t_node node)
     return sts;
 
   /* Print the execute command */
-  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( %c%s, ", name,
-      GCG_PREFIX_REF, vldh_IdToStr(0, refobjdid));
+  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( %c%s, ", name, GCG_PREFIX_REF,
+                vldh_IdToStr(0, refobjdid));
 
   sts = gcg_print_inputs(gcgctx, node, ", ", GCG_PRINT_ALLPAR, NULL, NULL);
   if (EVEN(sts))
@@ -8148,22 +8548,22 @@ int gcg_comp_m20(gcg_ctx gcgctx, vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m21()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for an object where a rtdb reference should be made
-*	but no exec command.
-*	Generated code:
-*	Declares and links a rtdb pointer to the object.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m21()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for an object where a rtdb reference should be made
+ *	but no exec command.
+ *	Generated code:
+ *	Declares and links a rtdb pointer to the object.
+ *
+ **************************************************************************/
 
 int gcg_comp_m21(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -8175,25 +8575,25 @@ int gcg_comp_m21(gcg_ctx gcgctx, vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m25()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for ASUP, DSUP.
-*	Generated code:
-*	Declares and links a rtdb pointer to the sup object.
-*	Prints an exec call.
-*	If the enable input is not connected it is set to true.
-*	Inits the object by putting the supervised object and parameter
-*	into the object and setting AckFlg to true.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m25()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for ASUP, DSUP.
+ *	Generated code:
+ *	Declares and links a rtdb pointer to the sup object.
+ *	Prints an exec call.
+ *	If the enable input is not connected it is set to true.
+ *	Inits the object by putting the supervised object and parameter
+ *	into the object and setting AckFlg to true.
+ *
+ **************************************************************************/
 
 int gcg_comp_m25(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -8214,7 +8614,7 @@ int gcg_comp_m25(gcg_ctx gcgctx, vldh_t_node node)
   int keep = 0;
   int size;
   gcg_t_nocondef nocondef[2];
-  unsigned long nocontype[2] = { GCG_BOOLEAN, GCG_BOOLEAN };
+  unsigned long nocontype[2] = {GCG_BOOLEAN, GCG_BOOLEAN};
 
   nocondef[0].bo = FALSE;
   nocondef[1].bo = TRUE;
@@ -8225,8 +8625,7 @@ int gcg_comp_m25(gcg_ctx gcgctx, vldh_t_node node)
   if (EVEN(sts))
     return sts;
 
-  sts = gcg_print_inputs(
-      gcgctx, node, ", ", GCG_PRINT_ALLPAR, nocondef, nocontype);
+  sts = gcg_print_inputs(gcgctx, node, ", ", GCG_PRINT_ALLPAR, nocondef, nocontype);
   if (EVEN(sts))
     return sts;
 
@@ -8235,23 +8634,24 @@ int gcg_comp_m25(gcg_ctx gcgctx, vldh_t_node node)
   /* Print some init commands */
 
   /* ++ LW 12-MAY-1992 20:44:29.45 */
-  IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "Sup_init(%c%s);\n",
-      GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid));
+  IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "Sup_init(%c%s);\n", GCG_PREFIX_REF,
+                vldh_IdToStr(0, node->ln.oid));
   /* -- LW 12-MAY-1992 20:44:29.45 */
 
   /* Print the supervised object and parameter in the object */
   sts = gcg_get_inputpoint(node, 0, &point, &par_inverted);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     /* Look for an output connected to this point */
-    sts = gcg_get_output(node, point, &output_count, &output_node,
-        &output_point, &output_bodydef,
-        GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
+    sts = gcg_get_output(node, point, &output_count, &output_node, &output_point, &output_bodydef,
+                         GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
     if (EVEN(sts))
       return sts;
 
-    if (output_count > 0) {
-      sts = gcg_get_outputstring(gcgctx, output_node, &output_bodydef,
-          &output_attrref, &output_type, &output_prefix, output_par);
+    if (output_count > 0)
+    {
+      sts = gcg_get_outputstring(gcgctx, output_node, &output_bodydef, &output_attrref, &output_type,
+                                 &output_prefix, output_par);
       if (sts == GSX__NEXTPAR)
         return sts;
       if (EVEN(sts))
@@ -8261,41 +8661,48 @@ int gcg_comp_m25(gcg_ctx gcgctx, vldh_t_node node)
       IF_PR
       {
         /* If a not plc object is assigned, keep this object */
-        sts = ldh_GetObjectPar(gcgctx->ldhses, node->ln.oid, "RtBody",
-            "Attribute", (char**)&a_ptr, &size);
+        sts = ldh_GetObjectPar(gcgctx->ldhses, node->ln.oid, "RtBody", "Attribute", (char**)&a_ptr, &size);
         if (EVEN(sts))
           return sts;
 
         aref = *a_ptr;
         free((char*)a_ptr);
-        if (!cdh_ObjidIsNull(aref.Objid)) {
+        if (!cdh_ObjidIsNull(aref.Objid))
+        {
           sts = gcg_replace_ref(gcgctx, &aref, node);
-          if (sts == GSX__REPLACED) {
+          if (sts == GSX__REPLACED)
+          {
             keep = 1;
             /* Store replaced aref */
-            sts = ldh_SetObjectPar(gcgctx->ldhses, node->ln.oid, "RtBody",
-                "Attribute", (char*)&aref, sizeof(aref));
+            sts = ldh_SetObjectPar(gcgctx->ldhses, node->ln.oid, "RtBody", "Attribute", (char*)&aref,
+                                   sizeof(aref));
             if (EVEN(sts))
               return sts;
-          } else {
+          }
+          else
+          {
             // Check if attribute is locked
-            sts = ldh_GetObjectPar(gcgctx->ldhses, node->ln.oid, "DevBody",
-                "LockAttribute", (char**)&lock_ptr, &size);
-            if (ODD(sts)) {
+            sts = ldh_GetObjectPar(gcgctx->ldhses, node->ln.oid, "DevBody", "LockAttribute",
+                                   (char**)&lock_ptr, &size);
+            if (ODD(sts))
+            {
               if (*lock_ptr)
                 keep = 1;
               free((char*)lock_ptr);
             }
           }
         }
-        if (!keep) {
-          sts = ldh_SetObjectPar(gcgctx->ldhses, node->ln.oid, "RtBody",
-              "Attribute", (char*)&output_attrref, sizeof(output_attrref));
+        if (!keep)
+        {
+          sts = ldh_SetObjectPar(gcgctx->ldhses, node->ln.oid, "RtBody", "Attribute", (char*)&output_attrref,
+                                 sizeof(output_attrref));
           if (EVEN(sts))
             return sts;
         }
       }
-    } else {
+    }
+    else
+    {
       /* Point not connected, errormessage */
       gcg_error_msg(gcgctx, GSX__NOTCON, node);
     }
@@ -8307,31 +8714,31 @@ int gcg_comp_m25(gcg_ctx gcgctx, vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m22()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for AARITHM or LARITHM.
-*	This object contains a macro call but the connections
-*	is put into the rtdb object as pointers.
-*
-*	Syntax control:
-*	Checks that there is an expession stored in the
-*	expression parameter.
-*	Generated code:
-*	Declares an links a rtdb pointer to the arithm object.
-*	Prints a #define command for the expression.
-*	Prints an exec call.
-*	If an input is not connected it will point to its
-*	own object.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m22()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for AARITHM or LARITHM.
+ *	This object contains a macro call but the connections
+ *	is put into the rtdb object as pointers.
+ *
+ *	Syntax control:
+ *	Checks that there is an expession stored in the
+ *	expression parameter.
+ *	Generated code:
+ *	Declares an links a rtdb pointer to the arithm object.
+ *	Prints a #define command for the expression.
+ *	Prints an exec call.
+ *	If an input is not connected it will point to its
+ *	own object.
+ *
+ **************************************************************************/
 
 int gcg_comp_m22(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -8356,8 +8763,7 @@ int gcg_comp_m22(gcg_ctx gcgctx, vldh_t_node node)
   ldhses = (node->hn.wind)->hw.ldhses;
 
   /* Get c-expression stored in devbody */
-  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", "Expression",
-      (char**)&expression, &size);
+  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", "Expression", (char**)&expression, &size);
   if (EVEN(sts))
     return sts;
 
@@ -8367,8 +8773,8 @@ int gcg_comp_m22(gcg_ctx gcgctx, vldh_t_node node)
 
   /* Print the expression */
   IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE],
-      "#define EXPR%s(A1,A2,A3,A4,A5,A6,A7,A8,d1,d2,d3,d4,d5,d6,d7,d8) ",
-      vldh_IdToStr(0, node->ln.oid));
+                "#define EXPR%s(A1,A2,A3,A4,A5,A6,A7,A8,d1,d2,d3,d4,d5,d6,d7,d8) ",
+                vldh_IdToStr(0, node->ln.oid));
   IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s\n\n", expression);
   free((char*)expression);
 
@@ -8381,61 +8787,51 @@ int gcg_comp_m22(gcg_ctx gcgctx, vldh_t_node node)
 
   /* Print the execute command */
   IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE],
-      "%s_exec( "
-      "%c%s,EXPR%s(*%c%s->AIn1P,*%c%s->AIn2P,\n*%c%s->AIn3P,*%c%s->AIn4P,\n",
-      name, GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid),
-      vldh_IdToStr(1, node->ln.oid), GCG_PREFIX_REF,
-      vldh_IdToStr(2, node->ln.oid), GCG_PREFIX_REF,
-      vldh_IdToStr(3, node->ln.oid), GCG_PREFIX_REF,
-      vldh_IdToStr(4, node->ln.oid), GCG_PREFIX_REF,
-      vldh_IdToStr(5, node->ln.oid));
-  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE],
-      "*%c%s->AIn5P,*%c%s->AIn6P,\n*%c%s->AIn7P,*%c%s->AIn8P,\n",
-      GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid), GCG_PREFIX_REF,
-      vldh_IdToStr(1, node->ln.oid), GCG_PREFIX_REF,
-      vldh_IdToStr(2, node->ln.oid), GCG_PREFIX_REF,
-      vldh_IdToStr(3, node->ln.oid));
-  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE],
-      "*%c%s->DIn1P,*%c%s->DIn2P,\n*%c%s->DIn3P,*%c%s->DIn4P,\n",
-      GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid), GCG_PREFIX_REF,
-      vldh_IdToStr(1, node->ln.oid), GCG_PREFIX_REF,
-      vldh_IdToStr(2, node->ln.oid), GCG_PREFIX_REF,
-      vldh_IdToStr(3, node->ln.oid));
-  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE],
-      "*%c%s->DIn5P,*%c%s->DIn6P,\n*%c%s->DIn7P,*%c%s->DIn8P));\n",
-      GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid), GCG_PREFIX_REF,
-      vldh_IdToStr(1, node->ln.oid), GCG_PREFIX_REF,
-      vldh_IdToStr(2, node->ln.oid), GCG_PREFIX_REF,
-      vldh_IdToStr(3, node->ln.oid));
+                "%s_exec( "
+                "%c%s,EXPR%s(*%c%s->AIn1P,*%c%s->AIn2P,\n*%c%s->AIn3P,*%c%s->AIn4P,\n",
+                name, GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid), vldh_IdToStr(1, node->ln.oid),
+                GCG_PREFIX_REF, vldh_IdToStr(2, node->ln.oid), GCG_PREFIX_REF, vldh_IdToStr(3, node->ln.oid),
+                GCG_PREFIX_REF, vldh_IdToStr(4, node->ln.oid), GCG_PREFIX_REF, vldh_IdToStr(5, node->ln.oid));
+  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "*%c%s->AIn5P,*%c%s->AIn6P,\n*%c%s->AIn7P,*%c%s->AIn8P,\n",
+                GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid), GCG_PREFIX_REF, vldh_IdToStr(1, node->ln.oid),
+                GCG_PREFIX_REF, vldh_IdToStr(2, node->ln.oid), GCG_PREFIX_REF, vldh_IdToStr(3, node->ln.oid));
+  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "*%c%s->DIn1P,*%c%s->DIn2P,\n*%c%s->DIn3P,*%c%s->DIn4P,\n",
+                GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid), GCG_PREFIX_REF, vldh_IdToStr(1, node->ln.oid),
+                GCG_PREFIX_REF, vldh_IdToStr(2, node->ln.oid), GCG_PREFIX_REF, vldh_IdToStr(3, node->ln.oid));
+  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "*%c%s->DIn5P,*%c%s->DIn6P,\n*%c%s->DIn7P,*%c%s->DIn8P));\n",
+                GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid), GCG_PREFIX_REF, vldh_IdToStr(1, node->ln.oid),
+                GCG_PREFIX_REF, vldh_IdToStr(2, node->ln.oid), GCG_PREFIX_REF, vldh_IdToStr(3, node->ln.oid));
 
   /* Get the runtime parameters for this class */
-  sts = ldh_GetObjectBodyDef(
-      (node->hn.wind)->hw.ldhses, node->ln.cid, "RtBody", 1, &bodydef, &rows);
+  sts = ldh_GetObjectBodyDef((node->hn.wind)->hw.ldhses, node->ln.cid, "RtBody", 1, &bodydef, &rows);
   if (EVEN(sts))
     return sts;
 
   i = 0;
   first_par = 1;
-  while ((i < rows) && (bodydef[i].ParClass == pwr_eClass_Input)) {
+  while ((i < rows) && (bodydef[i].ParClass == pwr_eClass_Input))
+  {
     /* Get the point for this parameter if there is one */
     output_found = 0;
     sts = gcg_get_inputpoint(node, i, &point, &par_inverted);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       /* Look for an output connected to this point */
-      sts = gcg_get_output(node, point, &output_count, &output_node,
-          &output_point, &output_bodydef,
-          GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
+      sts = gcg_get_output(node, point, &output_count, &output_node, &output_point, &output_bodydef,
+                           GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
       if (EVEN(sts))
         return sts;
 
-      if (output_count > 0) {
+      if (output_count > 0)
+      {
         output_found = 1;
         if (output_count > 1)
           gcg_error_msg(gcgctx, GSX__CONOUTPUT, output_node);
 
-        sts = gcg_get_outputstring(gcgctx, output_node, &output_bodydef,
-            &output_attrref, &output_type, &output_prefix, output_par);
-        if (sts == GSX__NEXTPAR) {
+        sts = gcg_get_outputstring(gcgctx, output_node, &output_bodydef, &output_attrref, &output_type,
+                                   &output_prefix, output_par);
+        if (sts == GSX__NEXTPAR)
+        {
           i++;
           continue;
         }
@@ -8445,26 +8841,27 @@ int gcg_comp_m22(gcg_ctx gcgctx, vldh_t_node node)
         if (par_inverted)
           gcg_error_msg(gcgctx, GSX__INV, node);
 
-        IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = &%c%s->%s;\n",
-            GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid),
-            bodydef[i].Par->Param.Info.PgmName, output_prefix,
-            output_type == GCG_OTYPE_OID ? vldh_IdToStr(1, output_attrref.Objid)
-                                         : vldh_AttrRefToStr(0, output_attrref),
-            output_par);
-      } else {
+        IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = &%c%s->%s;\n", GCG_PREFIX_REF,
+                      vldh_IdToStr(0, node->ln.oid), bodydef[i].Par->Param.Info.PgmName, output_prefix,
+                      output_type == GCG_OTYPE_OID ? vldh_IdToStr(1, output_attrref.Objid)
+                                                   : vldh_AttrRefToStr(0, output_attrref),
+                      output_par);
+      }
+      else
+      {
         /* Point visible but not connected, errormessage */
         gcg_error_msg(gcgctx, GSX__NOTCON, node);
       }
       first_par = 0;
     }
-    if (!output_found) {
+    if (!output_found)
+    {
       /* The point is not connected and will point to its
          own object */
 
-      IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = &%c%s->%s;\n",
-          GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid),
-          bodydef[i].Par->Param.Info.PgmName, GCG_PREFIX_REF,
-          vldh_IdToStr(1, node->ln.oid), bodydef[i].Par->Param.Info.PgmName);
+      IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = &%c%s->%s;\n", GCG_PREFIX_REF,
+                    vldh_IdToStr(0, node->ln.oid), bodydef[i].Par->Param.Info.PgmName, GCG_PREFIX_REF,
+                    vldh_IdToStr(1, node->ln.oid), bodydef[i].Par->Param.Info.PgmName);
     }
     i++;
   }
@@ -8474,31 +8871,31 @@ int gcg_comp_m22(gcg_ctx gcgctx, vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m23()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for POS3P, INC3P.
-*	Syntax control:
-*	Checks that the referenced DoOpen and DoClose objects exists
-*	and is of class Do.
-*
-*	Generated code:
-*	Mainly as in method 4.
-*	Declare and link rtdb pointer to the xxx3p object and
-*	to the doclose and doopen object (read pointers).
-*	Puts the doopen and doclose objects into the rtdb object.
-*
-*
-*
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m23()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for POS3P, INC3P.
+ *	Syntax control:
+ *	Checks that the referenced DoOpen and DoClose objects exists
+ *	and is of class Do.
+ *
+ *	Generated code:
+ *	Mainly as in method 4.
+ *	Declare and link rtdb pointer to the xxx3p object and
+ *	to the doclose and doopen object (read pointers).
+ *	Puts the doopen and doclose objects into the rtdb object.
+ *
+ *
+ *
+ *
+ **************************************************************************/
 
 int gcg_comp_m23(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -8517,8 +8914,7 @@ int gcg_comp_m23(gcg_ctx gcgctx, vldh_t_node node)
     return sts;
 
   /* Get objdid of the open do */
-  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", "DoOpen",
-      (char**)&refattrref_ptr, &size);
+  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", "DoOpen", (char**)&refattrref_ptr, &size);
   if (EVEN(sts))
     return sts;
 
@@ -8530,8 +8926,7 @@ int gcg_comp_m23(gcg_ctx gcgctx, vldh_t_node node)
     return sts;
 
   /* Get objdid of the close do */
-  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", "DoClose",
-      (char**)&refattrref_ptr, &size);
+  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", "DoClose", (char**)&refattrref_ptr, &size);
   if (EVEN(sts))
     return sts;
 
@@ -8544,38 +8939,40 @@ int gcg_comp_m23(gcg_ctx gcgctx, vldh_t_node node)
 
   /* Check that class of the objdids is ok */
   sts = ldh_GetAttrRefOrigTid(ldhses, &doopen_attrref, &cid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     /* No doopen object */
-    IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE],
-        "%c%s->OpenP = &%c%s->TimerDODum;\n", GCG_PREFIX_REF,
-        vldh_IdToStr(0, node->ln.oid), GCG_PREFIX_REF,
-        vldh_IdToStr(1, node->ln.oid));
-  } else {
+    IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->OpenP = &%c%s->TimerDODum;\n", GCG_PREFIX_REF,
+                  vldh_IdToStr(0, node->ln.oid), GCG_PREFIX_REF, vldh_IdToStr(1, node->ln.oid));
+  }
+  else
+  {
     /* Check that the class of the referenced object is correct */
-    if (!(cid == pwr_cClass_Do || cid == pwr_cClass_Po)) {
+    if (!(cid == pwr_cClass_Do || cid == pwr_cClass_Po))
+    {
       gcg_error_msg(gcgctx, GSX__REFCLASS, node);
       return GSX__NEXTNODE;
     }
     /* Insert open do in io write list */
     gcg_iowrite_insert(gcgctx, doopen_attrref, GCG_PREFIX_IOW);
     /* Put the rtdbreferences to the do's in the rtdbobject */
-    IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE],
-        "%c%s->OpenP = &%c%s->ActualValue;\n", GCG_PREFIX_REF,
-        vldh_IdToStr(0, node->ln.oid), GCG_PREFIX_IOW,
-        vldh_AttrRefToStr(1, doopen_attrref));
+    IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->OpenP = &%c%s->ActualValue;\n", GCG_PREFIX_REF,
+                  vldh_IdToStr(0, node->ln.oid), GCG_PREFIX_IOW, vldh_AttrRefToStr(1, doopen_attrref));
   }
 
   /* Check the close do */
   sts = ldh_GetAttrRefOrigTid(ldhses, &doclose_attrref, &cid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     /* No doclose object */
-    IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE],
-        "%c%s->CloseP = &%c%s->TimerDODum;\n", GCG_PREFIX_REF,
-        vldh_IdToStr(0, node->ln.oid), GCG_PREFIX_REF,
-        vldh_IdToStr(1, node->ln.oid));
-  } else {
+    IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->CloseP = &%c%s->TimerDODum;\n", GCG_PREFIX_REF,
+                  vldh_IdToStr(0, node->ln.oid), GCG_PREFIX_REF, vldh_IdToStr(1, node->ln.oid));
+  }
+  else
+  {
     /* Check that the class of the referenced object is correct */
-    if (!(cid == pwr_cClass_Do || cid == pwr_cClass_Po)) {
+    if (!(cid == pwr_cClass_Do || cid == pwr_cClass_Po))
+    {
       gcg_error_msg(gcgctx, GSX__REFCLASS, node);
       return GSX__NEXTNODE;
     }
@@ -8583,35 +8980,33 @@ int gcg_comp_m23(gcg_ctx gcgctx, vldh_t_node node)
     gcg_iowrite_insert(gcgctx, doclose_attrref, GCG_PREFIX_IOW);
 
     /* Put the rtdbreferences to the do's in the rtdbobject */
-    IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE],
-        "%c%s->CloseP = &%c%s->ActualValue;\n", GCG_PREFIX_REF,
-        vldh_IdToStr(0, node->ln.oid), GCG_PREFIX_IOW,
-        vldh_AttrRefToStr(1, doclose_attrref));
+    IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->CloseP = &%c%s->ActualValue;\n", GCG_PREFIX_REF,
+                  vldh_IdToStr(0, node->ln.oid), GCG_PREFIX_IOW, vldh_AttrRefToStr(1, doclose_attrref));
   }
 
   return GSX__SUCCESS;
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m24()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for substep. The same as for an ordinary step
-*	with some exeptions.
-*	Syntax control:
-*	Checks that there is a subwindow to the object.
-*
-*	Generated code:
-*	Prints an exec call to the subwindow in the substep_exec call.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m24()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for substep. The same as for an ordinary step
+ *	with some exeptions.
+ *	Syntax control:
+ *	Checks that there is a subwindow to the object.
+ *
+ *	Generated code:
+ *	Prints an exec call to the subwindow in the substep_exec call.
+ *
+ **************************************************************************/
 
 int gcg_comp_m24(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -8646,47 +9041,52 @@ int gcg_comp_m24(gcg_ctx gcgctx, vldh_t_node node)
     return sts;
 
   /* Print the reset object */
-  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%c%s->ActualValue,",
-      GCG_PREFIX_REF, vldh_AttrRefToStr(0, gcgctx->reset_object));
+  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%c%s->ActualValue,", GCG_PREFIX_REF,
+                vldh_AttrRefToStr(0, gcgctx->reset_object));
 
   /* Print the function call to execute the subwindow */
   /* Check first that there is a subwindow */
   /* Get the first child to the plc */
   sts = ldh_GetChild(ldhses, node->ln.oid, &windowobjdid);
   found = 0;
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     /* Check if window */
-    sts = ldh_GetObjectBuffer(ldhses, windowobjdid, "DevBody", "PlcWindow",
-        (pwr_eClass*)&windclass, &windbuffer, &size);
+    sts = ldh_GetObjectBuffer(ldhses, windowobjdid, "DevBody", "PlcWindow", (pwr_eClass*)&windclass,
+                              &windbuffer, &size);
     free((char*)windbuffer);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       found = 1;
       break;
     }
     sts = ldh_GetNextSibling(ldhses, windowobjdid, &windowobjdid);
   }
 
-  if (!found) {
+  if (!found)
+  {
     /* The window is not created */
     gcg_error_msg(gcgctx, GSX__NOSUBWINDOW, node);
     IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], ",\n");
-  } else {
+  }
+  else
+  {
     /* Print the window execute command */
-    IF_PR fprintf(gcgctx->files[GCGM1_DECL_FILE],
-        "void %c%s_exec(plc_sThread *tp);", GCG_PREFIX_MOD,
-        vldh_IdToStr(0, windowobjdid));
-    IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%c%s_exec( tp);,\n",
-        GCG_PREFIX_MOD, vldh_IdToStr(0, windowobjdid));
+    IF_PR fprintf(gcgctx->files[GCGM1_DECL_FILE], "void %c%s_exec(plc_sThread *tp);", GCG_PREFIX_MOD,
+                  vldh_IdToStr(0, windowobjdid));
+    IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%c%s_exec( tp);,\n", GCG_PREFIX_MOD,
+                  vldh_IdToStr(0, windowobjdid));
   }
 
   /* Check if there is any order connected to the outputpin */
   sts = gcg_get_point(node, 2, &point, &par_inverted);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     gcgctx->step_comp = TRUE;
-    gcg_get_conpoint_nodes(node, point, &point_count, &pointlist,
-        GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
+    gcg_get_conpoint_nodes(node, point, &point_count, &pointlist, GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
 
-    for (k = 1; k < (int)point_count; k++) {
+    for (k = 1; k < (int)point_count; k++)
+    {
       next_node = (pointlist + k)->node;
       next_point = (pointlist + k)->conpoint;
       /* Check class of connected nodes */
@@ -8694,12 +9094,15 @@ int gcg_comp_m24(gcg_ctx gcgctx, vldh_t_node node)
       if (EVEN(sts))
         return sts;
 
-      if (cid == pwr_cClass_order && next_point == 0) {
+      if (cid == pwr_cClass_order && next_point == 0)
+      {
         /* compile this nodes here */
         sts = gcg_node_comp(gcgctx, next_node);
         if (EVEN(sts))
           return sts;
-      } else {
+      }
+      else
+      {
         /* Bad class */
         /*
                       gcg_error_msg( gcgctx, GSX__NOORDER, next_node);
@@ -8717,24 +9120,24 @@ int gcg_comp_m24(gcg_ctx gcgctx, vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m26()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for ssbegin and ssend.
-*	Mainly the same as for an ordinary step.
-*	Syntax control:
-*	Checks that the parent object of the window is a substep.
-*	Generated code:
-*	Declares and links a rtdb pointer to the parent object.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m26()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for ssbegin and ssend.
+ *	Mainly the same as for an ordinary step.
+ *	Syntax control:
+ *	Checks that the parent object of the window is a substep.
+ *	Generated code:
+ *	Declares and links a rtdb pointer to the parent object.
+ *
+ **************************************************************************/
 
 int gcg_comp_m26(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -8757,7 +9160,8 @@ int gcg_comp_m26(gcg_ctx gcgctx, vldh_t_node node)
     a trans or a order object */
   refobjdid = (node->hn.wind)->lw.poid;
 
-  if (cdh_ObjidIsNull(refobjdid)) {
+  if (cdh_ObjidIsNull(refobjdid))
+  {
     /* Parent is a plcprogram */
     gcg_error_msg(gcgctx, GSX__BADWIND, node);
     return GSX__NEXTNODE;
@@ -8765,12 +9169,14 @@ int gcg_comp_m26(gcg_ctx gcgctx, vldh_t_node node)
 
   /* Check class of this objdid */
   sts = ldh_GetObjectClass(ldhses, refobjdid, &cid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     gcg_error_msg(gcgctx, GSX__REFOBJ, node);
     return GSX__NEXTNODE;
   }
 
-  if (!(cid == pwr_cClass_substep)) {
+  if (!(cid == pwr_cClass_substep))
+  {
     gcg_error_msg(gcgctx, GSX__BADWIND, node);
     return GSX__NEXTNODE;
   }
@@ -8791,21 +9197,21 @@ int gcg_comp_m26(gcg_ctx gcgctx, vldh_t_node node)
     return sts;
 
   /* Print the parent object */
-  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%c%s, ", GCG_PREFIX_REF,
-      vldh_IdToStr(0, refobjdid));
+  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%c%s, ", GCG_PREFIX_REF, vldh_IdToStr(0, refobjdid));
 
   /* Print the reset object */
-  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%c%s->ActualValue,\n",
-      GCG_PREFIX_REF, vldh_AttrRefToStr(0, gcgctx->reset_object));
+  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%c%s->ActualValue,\n", GCG_PREFIX_REF,
+                vldh_AttrRefToStr(0, gcgctx->reset_object));
 
   /* Check if there is any order connected to the outputpin */
   sts = gcg_get_point(node, orderpar_index, &point, &par_inverted);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     gcgctx->step_comp = TRUE;
-    gcg_get_conpoint_nodes(node, point, &point_count, &pointlist,
-        GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
+    gcg_get_conpoint_nodes(node, point, &point_count, &pointlist, GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
 
-    for (k = 1; k < (int)point_count; k++) {
+    for (k = 1; k < (int)point_count; k++)
+    {
       next_node = (pointlist + k)->node;
       next_point = (pointlist + k)->conpoint;
       /* Check class of connected nodes */
@@ -8813,12 +9219,15 @@ int gcg_comp_m26(gcg_ctx gcgctx, vldh_t_node node)
       if (EVEN(sts))
         return sts;
 
-      if (cid == pwr_cClass_order && next_point == 0) {
+      if (cid == pwr_cClass_order && next_point == 0)
+      {
         /* compile this nodes here */
         sts = gcg_node_comp(gcgctx, next_node);
         if (EVEN(sts))
           return sts;
-      } else {
+      }
+      else
+      {
         /* Bad class */
         /*
                       gcg_error_msg( gcgctx, GSX__NOORDER, node);
@@ -8836,21 +9245,21 @@ int gcg_comp_m26(gcg_ctx gcgctx, vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m28()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for sum.
-*	Method for with the exeption that an input parameter is
-*	not visible the pointerparameter for input is set to NULL.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m28()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for sum.
+ *	Method for with the exeption that an input parameter is
+ *	not visible the pointerparameter for input is set to NULL.
+ *
+ **************************************************************************/
 
 int gcg_comp_m28(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -8877,37 +9286,39 @@ int gcg_comp_m28(gcg_ctx gcgctx, vldh_t_node node)
     return sts;
 
   /* Print the execute command */
-  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( tp, %c%s);\n", name,
-      GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid));
+  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( tp, %c%s);\n", name, GCG_PREFIX_REF,
+                vldh_IdToStr(0, node->ln.oid));
 
   /* Get the runtime parameters for this class */
-  sts = ldh_GetObjectBodyDef(
-      (node->hn.wind)->hw.ldhses, node->ln.cid, "RtBody", 1, &bodydef, &rows);
+  sts = ldh_GetObjectBodyDef((node->hn.wind)->hw.ldhses, node->ln.cid, "RtBody", 1, &bodydef, &rows);
   if (EVEN(sts))
     return sts;
 
   i = 0;
   first_par = 1;
-  while ((i < rows) && (bodydef[i].ParClass == pwr_eClass_Input)) {
+  while ((i < rows) && (bodydef[i].ParClass == pwr_eClass_Input))
+  {
     /* Get the point for this parameter if there is one */
     output_found = 0;
     sts = gcg_get_inputpoint(node, i, &point, &par_inverted);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       /* Look for an output connected to this point */
-      sts = gcg_get_output(node, point, &output_count, &output_node,
-          &output_point, &output_bodydef,
-          GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
+      sts = gcg_get_output(node, point, &output_count, &output_node, &output_point, &output_bodydef,
+                           GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
       if (EVEN(sts))
         return sts;
 
-      if (output_count > 0) {
+      if (output_count > 0)
+      {
         output_found = 1;
         if (output_count > 1)
           gcg_error_msg(gcgctx, GSX__CONOUTPUT, output_node);
 
-        sts = gcg_get_outputstring(gcgctx, output_node, &output_bodydef,
-            &output_attrref, &output_type, &output_prefix, output_par);
-        if (sts == GSX__NEXTPAR) {
+        sts = gcg_get_outputstring(gcgctx, output_node, &output_bodydef, &output_attrref, &output_type,
+                                   &output_prefix, output_par);
+        if (sts == GSX__NEXTPAR)
+        {
           i++;
           continue;
         }
@@ -8917,23 +9328,24 @@ int gcg_comp_m28(gcg_ctx gcgctx, vldh_t_node node)
         if (par_inverted)
           gcg_error_msg(gcgctx, GSX__INV, node);
 
-        IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = &%c%s->%s;\n",
-            GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid),
-            bodydef[i].Par->Param.Info.PgmName, output_prefix,
-            output_type == GCG_OTYPE_OID ? vldh_IdToStr(1, output_attrref.Objid)
-                                         : vldh_AttrRefToStr(0, output_attrref),
-            output_par);
-      } else {
+        IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = &%c%s->%s;\n", GCG_PREFIX_REF,
+                      vldh_IdToStr(0, node->ln.oid), bodydef[i].Par->Param.Info.PgmName, output_prefix,
+                      output_type == GCG_OTYPE_OID ? vldh_IdToStr(1, output_attrref.Objid)
+                                                   : vldh_AttrRefToStr(0, output_attrref),
+                      output_par);
+      }
+      else
+      {
         /* Point visible but not connected, errormessage */
         gcg_error_msg(gcgctx, GSX__NOTCON, node);
       }
       first_par = 0;
     }
-    if (!output_found) {
+    if (!output_found)
+    {
       /* The point is not connected and will = NULL */
-      IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = NULL;\n",
-          GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid),
-          bodydef[i].Par->Param.Info.PgmName);
+      IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = NULL;\n", GCG_PREFIX_REF,
+                    vldh_IdToStr(0, node->ln.oid), bodydef[i].Par->Param.Info.PgmName);
     }
     i++;
   }
@@ -8943,22 +9355,22 @@ int gcg_comp_m28(gcg_ctx gcgctx, vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m29()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method maxmin.
-*	The same as  method 4 with the exeption that only the first
-*	or the second input will point to its own object if not connected,
-*	the other will be set to NULL.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m29()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method maxmin.
+ *	The same as  method 4 with the exeption that only the first
+ *	or the second input will point to its own object if not connected,
+ *	the other will be set to NULL.
+ *
+ **************************************************************************/
 
 int gcg_comp_m29(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -8985,37 +9397,39 @@ int gcg_comp_m29(gcg_ctx gcgctx, vldh_t_node node)
     return sts;
 
   /* Print the execute command */
-  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( tp, %c%s);\n", name,
-      GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid));
+  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( tp, %c%s);\n", name, GCG_PREFIX_REF,
+                vldh_IdToStr(0, node->ln.oid));
 
   /* Get the runtime parameters for this class */
-  sts = ldh_GetObjectBodyDef(
-      (node->hn.wind)->hw.ldhses, node->ln.cid, "RtBody", 1, &bodydef, &rows);
+  sts = ldh_GetObjectBodyDef((node->hn.wind)->hw.ldhses, node->ln.cid, "RtBody", 1, &bodydef, &rows);
   if (EVEN(sts))
     return sts;
 
   i = 0;
   first_par = 1;
-  while ((i < rows) && (bodydef[i].ParClass == pwr_eClass_Input)) {
+  while ((i < rows) && (bodydef[i].ParClass == pwr_eClass_Input))
+  {
     /* Get the point for this parameter if there is one */
     output_found = 0;
     sts = gcg_get_inputpoint(node, i, &point, &par_inverted);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       /* Look for an output connected to this point */
-      sts = gcg_get_output(node, point, &output_count, &output_node,
-          &output_point, &output_bodydef,
-          GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
+      sts = gcg_get_output(node, point, &output_count, &output_node, &output_point, &output_bodydef,
+                           GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
       if (EVEN(sts))
         return sts;
 
-      if (output_count > 0) {
+      if (output_count > 0)
+      {
         output_found = 1;
         if (output_count > 1)
           gcg_error_msg(gcgctx, GSX__CONOUTPUT, output_node);
 
-        sts = gcg_get_outputstring(gcgctx, output_node, &output_bodydef,
-            &output_attrref, &output_type, &output_prefix, output_par);
-        if (sts == GSX__NEXTPAR) {
+        sts = gcg_get_outputstring(gcgctx, output_node, &output_bodydef, &output_attrref, &output_type,
+                                   &output_prefix, output_par);
+        if (sts == GSX__NEXTPAR)
+        {
           i++;
           continue;
         }
@@ -9025,31 +9439,33 @@ int gcg_comp_m29(gcg_ctx gcgctx, vldh_t_node node)
         if (par_inverted)
           gcg_error_msg(gcgctx, GSX__INV, node);
 
-        IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = &%c%s->%s;\n",
-            GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid),
-            bodydef[i].Par->Param.Info.PgmName, output_prefix,
-            output_type == GCG_OTYPE_OID ? vldh_IdToStr(1, output_attrref.Objid)
-                                         : vldh_AttrRefToStr(0, output_attrref),
-            output_par);
-      } else {
+        IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = &%c%s->%s;\n", GCG_PREFIX_REF,
+                      vldh_IdToStr(0, node->ln.oid), bodydef[i].Par->Param.Info.PgmName, output_prefix,
+                      output_type == GCG_OTYPE_OID ? vldh_IdToStr(1, output_attrref.Objid)
+                                                   : vldh_AttrRefToStr(0, output_attrref),
+                      output_par);
+      }
+      else
+      {
         /* Point visible but not connected, errormessage */
         gcg_error_msg(gcgctx, GSX__NOTCON, node);
       }
       first_par = 0;
     }
-    if (!output_found && (i < 2)) {
+    if (!output_found && (i < 2))
+    {
       /* The point is not connected and will point to its
          own object */
-      IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = &%c%s->%s;\n",
-          GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid),
-          bodydef[i].Par->Param.Info.PgmName, GCG_PREFIX_REF,
-          vldh_IdToStr(1, node->ln.oid), bodydef[i].Par->Param.Info.PgmName);
-    } else if (!output_found) {
+      IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = &%c%s->%s;\n", GCG_PREFIX_REF,
+                    vldh_IdToStr(0, node->ln.oid), bodydef[i].Par->Param.Info.PgmName, GCG_PREFIX_REF,
+                    vldh_IdToStr(1, node->ln.oid), bodydef[i].Par->Param.Info.PgmName);
+    }
+    else if (!output_found)
+    {
       /* The point is not connected and will point to its
          own object */
-      IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = NULL;\n",
-          GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid),
-          bodydef[i].Par->Param.Info.PgmName);
+      IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = NULL;\n", GCG_PREFIX_REF,
+                    vldh_IdToStr(0, node->ln.oid), bodydef[i].Par->Param.Info.PgmName);
     }
     i++;
   }
@@ -9059,22 +9475,22 @@ int gcg_comp_m29(gcg_ctx gcgctx, vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m30()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method drive.
-*	The same as method 4 with the exeption that the pointers of
-*	the parameters Speed and ConOn will point to the parameter Order,
-*	and AutoNoStop will point to AutoStart, if they are not connected.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m30()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method drive.
+ *	The same as method 4 with the exeption that the pointers of
+ *	the parameters Speed and ConOn will point to the parameter Order,
+ *	and AutoNoStop will point to AutoStart, if they are not connected.
+ *
+ **************************************************************************/
 
 int gcg_comp_m30(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -9101,37 +9517,39 @@ int gcg_comp_m30(gcg_ctx gcgctx, vldh_t_node node)
     return sts;
 
   /* Print the execute command */
-  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( tp, %c%s);\n", name,
-      GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid));
+  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( tp, %c%s);\n", name, GCG_PREFIX_REF,
+                vldh_IdToStr(0, node->ln.oid));
 
   /* Get the runtime parameters for this class */
-  sts = ldh_GetObjectBodyDef(
-      (node->hn.wind)->hw.ldhses, node->ln.cid, "RtBody", 1, &bodydef, &rows);
+  sts = ldh_GetObjectBodyDef((node->hn.wind)->hw.ldhses, node->ln.cid, "RtBody", 1, &bodydef, &rows);
   if (EVEN(sts))
     return sts;
 
   i = 0;
   first_par = 1;
-  while ((i < rows) && (bodydef[i].ParClass == pwr_eClass_Input)) {
+  while ((i < rows) && (bodydef[i].ParClass == pwr_eClass_Input))
+  {
     /* Get the point for this parameter if there is one */
     output_found = 0;
     sts = gcg_get_inputpoint(node, i, &point, &par_inverted);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       /* Look for an output connected to this point */
-      sts = gcg_get_output(node, point, &output_count, &output_node,
-          &output_point, &output_bodydef,
-          GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
+      sts = gcg_get_output(node, point, &output_count, &output_node, &output_point, &output_bodydef,
+                           GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
       if (EVEN(sts))
         return sts;
 
-      if (output_count > 0) {
+      if (output_count > 0)
+      {
         output_found = 1;
         if (output_count > 1)
           gcg_error_msg(gcgctx, GSX__CONOUTPUT, output_node);
 
-        sts = gcg_get_outputstring(gcgctx, output_node, &output_bodydef,
-            &output_attrref, &output_type, &output_prefix, output_par);
-        if (sts == GSX__NEXTPAR) {
+        sts = gcg_get_outputstring(gcgctx, output_node, &output_bodydef, &output_attrref, &output_type,
+                                   &output_prefix, output_par);
+        if (sts == GSX__NEXTPAR)
+        {
           i++;
           continue;
         }
@@ -9141,42 +9559,43 @@ int gcg_comp_m30(gcg_ctx gcgctx, vldh_t_node node)
         if (par_inverted)
           gcg_error_msg(gcgctx, GSX__INV, node);
 
-        IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = &%c%s->%s;\n",
-            GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid),
-            bodydef[i].Par->Param.Info.PgmName, output_prefix,
-            output_type == GCG_OTYPE_OID ? vldh_IdToStr(1, output_attrref.Objid)
-                                         : vldh_AttrRefToStr(0, output_attrref),
-            output_par);
-      } else {
+        IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = &%c%s->%s;\n", GCG_PREFIX_REF,
+                      vldh_IdToStr(0, node->ln.oid), bodydef[i].Par->Param.Info.PgmName, output_prefix,
+                      output_type == GCG_OTYPE_OID ? vldh_IdToStr(1, output_attrref.Objid)
+                                                   : vldh_AttrRefToStr(0, output_attrref),
+                      output_par);
+      }
+      else
+      {
         /* Point visible but not connected, errormessage */
         gcg_error_msg(gcgctx, GSX__NOTCON, node);
       }
       first_par = 0;
     }
-    if (!output_found
-        && (streq(bodydef[i].Par->Param.Info.PgmName, "Speed")
-               || streq(bodydef[i].Par->Param.Info.PgmName, "ConOn"))) {
+    if (!output_found && (streq(bodydef[i].Par->Param.Info.PgmName, "Speed") ||
+                          streq(bodydef[i].Par->Param.Info.PgmName, "ConOn")))
+    {
       /* The point is not connected and will point to its
          own object */
-      IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE],
-          "%c%s->%sP = &%c%s->Order;\n", GCG_PREFIX_REF,
-          vldh_IdToStr(0, node->ln.oid), bodydef[i].Par->Param.Info.PgmName,
-          GCG_PREFIX_REF, vldh_IdToStr(1, node->ln.oid));
-    } else if (!output_found
-        && streq(bodydef[i].Par->Param.Info.PgmName, "AutoNoStop")) {
+      IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = &%c%s->Order;\n", GCG_PREFIX_REF,
+                    vldh_IdToStr(0, node->ln.oid), bodydef[i].Par->Param.Info.PgmName, GCG_PREFIX_REF,
+                    vldh_IdToStr(1, node->ln.oid));
+    }
+    else if (!output_found && streq(bodydef[i].Par->Param.Info.PgmName, "AutoNoStop"))
+    {
       /* The point AutoNoStart is not connected and will point to
          AutoStart in its own object */
-      IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE],
-          "%c%s->%sP = &%c%s->AutoStart;\n", GCG_PREFIX_REF,
-          vldh_IdToStr(0, node->ln.oid), bodydef[i].Par->Param.Info.PgmName,
-          GCG_PREFIX_REF, vldh_IdToStr(1, node->ln.oid));
-    } else if (!output_found) {
+      IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = &%c%s->AutoStart;\n", GCG_PREFIX_REF,
+                    vldh_IdToStr(0, node->ln.oid), bodydef[i].Par->Param.Info.PgmName, GCG_PREFIX_REF,
+                    vldh_IdToStr(1, node->ln.oid));
+    }
+    else if (!output_found)
+    {
       /* The point is not connected and will point to its
          own object */
-      IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = &%c%s->%s;\n",
-          GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid),
-          bodydef[i].Par->Param.Info.PgmName, GCG_PREFIX_REF,
-          vldh_IdToStr(1, node->ln.oid), bodydef[i].Par->Param.Info.PgmName);
+      IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = &%c%s->%s;\n", GCG_PREFIX_REF,
+                    vldh_IdToStr(0, node->ln.oid), bodydef[i].Par->Param.Info.PgmName, GCG_PREFIX_REF,
+                    vldh_IdToStr(1, node->ln.oid), bodydef[i].Par->Param.Info.PgmName);
     }
     i++;
   }
@@ -9187,22 +9606,22 @@ int gcg_comp_m30(gcg_ctx gcgctx, vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m31()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method MValve.
-*	The same as method 4 with the exeption that the pointer of
-*	the parameter ConOpen will point to the parameter OrderOpen
-*	if ConOpen is not connected and ConClose will point to OrderClose.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m31()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method MValve.
+ *	The same as method 4 with the exeption that the pointer of
+ *	the parameter ConOpen will point to the parameter OrderOpen
+ *	if ConOpen is not connected and ConClose will point to OrderClose.
+ *
+ **************************************************************************/
 
 int gcg_comp_m31(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -9229,37 +9648,39 @@ int gcg_comp_m31(gcg_ctx gcgctx, vldh_t_node node)
     return sts;
 
   /* Print the execute command */
-  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( tp, %c%s);\n", name,
-      GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid));
+  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( tp, %c%s);\n", name, GCG_PREFIX_REF,
+                vldh_IdToStr(0, node->ln.oid));
 
   /* Get the runtime parameters for this class */
-  sts = ldh_GetObjectBodyDef(
-      (node->hn.wind)->hw.ldhses, node->ln.cid, "RtBody", 1, &bodydef, &rows);
+  sts = ldh_GetObjectBodyDef((node->hn.wind)->hw.ldhses, node->ln.cid, "RtBody", 1, &bodydef, &rows);
   if (EVEN(sts))
     return sts;
 
   i = 0;
   first_par = 1;
-  while ((i < rows) && (bodydef[i].ParClass == pwr_eClass_Input)) {
+  while ((i < rows) && (bodydef[i].ParClass == pwr_eClass_Input))
+  {
     /* Get the point for this parameter if there is one */
     output_found = 0;
     sts = gcg_get_inputpoint(node, i, &point, &par_inverted);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       /* Look for an output connected to this point */
-      sts = gcg_get_output(node, point, &output_count, &output_node,
-          &output_point, &output_bodydef,
-          GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
+      sts = gcg_get_output(node, point, &output_count, &output_node, &output_point, &output_bodydef,
+                           GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
       if (EVEN(sts))
         return sts;
 
-      if (output_count > 0) {
+      if (output_count > 0)
+      {
         output_found = 1;
         if (output_count > 1)
           gcg_error_msg(gcgctx, GSX__CONOUTPUT, output_node);
 
-        sts = gcg_get_outputstring(gcgctx, output_node, &output_bodydef,
-            &output_attrref, &output_type, &output_prefix, output_par);
-        if (sts == GSX__NEXTPAR) {
+        sts = gcg_get_outputstring(gcgctx, output_node, &output_bodydef, &output_attrref, &output_type,
+                                   &output_prefix, output_par);
+        if (sts == GSX__NEXTPAR)
+        {
           i++;
           continue;
         }
@@ -9269,41 +9690,43 @@ int gcg_comp_m31(gcg_ctx gcgctx, vldh_t_node node)
         if (par_inverted)
           gcg_error_msg(gcgctx, GSX__INV, node);
 
-        IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = &%c%s->%s;\n",
-            GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid),
-            bodydef[i].Par->Param.Info.PgmName, output_prefix,
-            output_type == GCG_OTYPE_OID ? vldh_IdToStr(1, output_attrref.Objid)
-                                         : vldh_AttrRefToStr(0, output_attrref),
-            output_par);
-      } else {
+        IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = &%c%s->%s;\n", GCG_PREFIX_REF,
+                      vldh_IdToStr(0, node->ln.oid), bodydef[i].Par->Param.Info.PgmName, output_prefix,
+                      output_type == GCG_OTYPE_OID ? vldh_IdToStr(1, output_attrref.Objid)
+                                                   : vldh_AttrRefToStr(0, output_attrref),
+                      output_par);
+      }
+      else
+      {
         /* Point visible but not connected, errormessage */
         gcg_error_msg(gcgctx, GSX__NOTCON, node);
       }
       first_par = 0;
     }
-    if (!output_found && streq(bodydef[i].Par->Param.Info.PgmName, "ConOpen")) {
+    if (!output_found && streq(bodydef[i].Par->Param.Info.PgmName, "ConOpen"))
+    {
       /* The point is not connected and will point to its
          own object */
-      IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE],
-          "%c%s->%sP = &%c%s->OrderOpen;\n", GCG_PREFIX_REF,
-          vldh_IdToStr(0, node->ln.oid), bodydef[i].Par->Param.Info.PgmName,
-          GCG_PREFIX_REF, vldh_IdToStr(1, node->ln.oid));
-    } else if (!output_found
-        && streq(bodydef[i].Par->Param.Info.PgmName, "ConClose")) {
+      IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = &%c%s->OrderOpen;\n", GCG_PREFIX_REF,
+                    vldh_IdToStr(0, node->ln.oid), bodydef[i].Par->Param.Info.PgmName, GCG_PREFIX_REF,
+                    vldh_IdToStr(1, node->ln.oid));
+    }
+    else if (!output_found && streq(bodydef[i].Par->Param.Info.PgmName, "ConClose"))
+    {
       /* The point is not connected and will point to its
          own object */
-      IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE],
-          "%c%s->%sP = &%c%s->OrderClose;\n", GCG_PREFIX_REF,
-          vldh_IdToStr(0, node->ln.oid), bodydef[i].Par->Param.Info.PgmName,
-          GCG_PREFIX_REF, vldh_IdToStr(1, node->ln.oid));
-    } else if (!output_found) {
+      IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = &%c%s->OrderClose;\n", GCG_PREFIX_REF,
+                    vldh_IdToStr(0, node->ln.oid), bodydef[i].Par->Param.Info.PgmName, GCG_PREFIX_REF,
+                    vldh_IdToStr(1, node->ln.oid));
+    }
+    else if (!output_found)
+    {
       /* The point is not connected and will point to its
          own object */
 
-      IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = &%c%s->%s;\n",
-          GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid),
-          bodydef[i].Par->Param.Info.PgmName, GCG_PREFIX_REF,
-          vldh_IdToStr(1, node->ln.oid), bodydef[i].Par->Param.Info.PgmName);
+      IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = &%c%s->%s;\n", GCG_PREFIX_REF,
+                    vldh_IdToStr(0, node->ln.oid), bodydef[i].Par->Param.Info.PgmName, GCG_PREFIX_REF,
+                    vldh_IdToStr(1, node->ln.oid), bodydef[i].Par->Param.Info.PgmName);
     }
     i++;
   }
@@ -9316,23 +9739,23 @@ int gcg_comp_m31(gcg_ctx gcgctx, vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m32()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method filter and ramp.
-*	The same as method 4 with the exeption that the pointer of
-*	the parameter FeedB will point to the parameter ActVal
-*	if FeedB is not connected.
-*
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m32()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method filter and ramp.
+ *	The same as method 4 with the exeption that the pointer of
+ *	the parameter FeedB will point to the parameter ActVal
+ *	if FeedB is not connected.
+ *
+ *
+ **************************************************************************/
 
 int gcg_comp_m32(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -9359,37 +9782,39 @@ int gcg_comp_m32(gcg_ctx gcgctx, vldh_t_node node)
     return sts;
 
   /* Print the execute command */
-  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( tp, %c%s);\n", name,
-      GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid));
+  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( tp, %c%s);\n", name, GCG_PREFIX_REF,
+                vldh_IdToStr(0, node->ln.oid));
 
   /* Get the runtime parameters for this class */
-  sts = ldh_GetObjectBodyDef(
-      (node->hn.wind)->hw.ldhses, node->ln.cid, "RtBody", 1, &bodydef, &rows);
+  sts = ldh_GetObjectBodyDef((node->hn.wind)->hw.ldhses, node->ln.cid, "RtBody", 1, &bodydef, &rows);
   if (EVEN(sts))
     return sts;
 
   i = 0;
   first_par = 1;
-  while ((i < rows) && (bodydef[i].ParClass == pwr_eClass_Input)) {
+  while ((i < rows) && (bodydef[i].ParClass == pwr_eClass_Input))
+  {
     /* Get the point for this parameter if there is one */
     output_found = 0;
     sts = gcg_get_inputpoint(node, i, &point, &par_inverted);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       /* Look for an output connected to this point */
-      sts = gcg_get_output(node, point, &output_count, &output_node,
-          &output_point, &output_bodydef,
-          GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
+      sts = gcg_get_output(node, point, &output_count, &output_node, &output_point, &output_bodydef,
+                           GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
       if (EVEN(sts))
         return sts;
 
-      if (output_count > 0) {
+      if (output_count > 0)
+      {
         output_found = 1;
         if (output_count > 1)
           gcg_error_msg(gcgctx, GSX__CONOUTPUT, output_node);
 
-        sts = gcg_get_outputstring(gcgctx, output_node, &output_bodydef,
-            &output_attrref, &output_type, &output_prefix, output_par);
-        if (sts == GSX__NEXTPAR) {
+        sts = gcg_get_outputstring(gcgctx, output_node, &output_bodydef, &output_attrref, &output_type,
+                                   &output_prefix, output_par);
+        if (sts == GSX__NEXTPAR)
+        {
           i++;
           continue;
         }
@@ -9399,32 +9824,34 @@ int gcg_comp_m32(gcg_ctx gcgctx, vldh_t_node node)
         if (par_inverted)
           gcg_error_msg(gcgctx, GSX__INV, node);
 
-        IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = &%c%s->%s;\n",
-            GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid),
-            bodydef[i].Par->Param.Info.PgmName, output_prefix,
-            output_type == GCG_OTYPE_OID ? vldh_IdToStr(1, output_attrref.Objid)
-                                         : vldh_AttrRefToStr(0, output_attrref),
-            output_par);
-      } else {
+        IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = &%c%s->%s;\n", GCG_PREFIX_REF,
+                      vldh_IdToStr(0, node->ln.oid), bodydef[i].Par->Param.Info.PgmName, output_prefix,
+                      output_type == GCG_OTYPE_OID ? vldh_IdToStr(1, output_attrref.Objid)
+                                                   : vldh_AttrRefToStr(0, output_attrref),
+                      output_par);
+      }
+      else
+      {
         /* Point visible but not connected, errormessage */
         gcg_error_msg(gcgctx, GSX__NOTCON, node);
       }
       first_par = 0;
     }
-    if (!output_found && streq(bodydef[i].Par->Param.Info.PgmName, "FeedB")) {
+    if (!output_found && streq(bodydef[i].Par->Param.Info.PgmName, "FeedB"))
+    {
       /* The point is not connected and will point to its
          own object */
-      IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE],
-          "%c%s->%sP = &%c%s->ActVal;\n", GCG_PREFIX_REF,
-          vldh_IdToStr(0, node->ln.oid), bodydef[i].Par->Param.Info.PgmName,
-          GCG_PREFIX_REF, vldh_IdToStr(1, node->ln.oid));
-    } else if (!output_found) {
+      IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = &%c%s->ActVal;\n", GCG_PREFIX_REF,
+                    vldh_IdToStr(0, node->ln.oid), bodydef[i].Par->Param.Info.PgmName, GCG_PREFIX_REF,
+                    vldh_IdToStr(1, node->ln.oid));
+    }
+    else if (!output_found)
+    {
       /* The point is not connected and will point to its
          own object */
-      IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = &%c%s->%s;\n",
-          GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid),
-          bodydef[i].Par->Param.Info.PgmName, GCG_PREFIX_REF,
-          vldh_IdToStr(1, node->ln.oid), bodydef[i].Par->Param.Info.PgmName);
+      IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = &%c%s->%s;\n", GCG_PREFIX_REF,
+                    vldh_IdToStr(0, node->ln.oid), bodydef[i].Par->Param.Info.PgmName, GCG_PREFIX_REF,
+                    vldh_IdToStr(1, node->ln.oid), bodydef[i].Par->Param.Info.PgmName);
     }
     i++;
   }
@@ -9436,59 +9863,56 @@ int gcg_comp_m32(gcg_ctx gcgctx, vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m33()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for a mpstrp object.
-*
-*	Syntax control:
-*
-*	Checks that there is only one object connected to the
-*	cell input and cell output pin.
-*	Checks that there is not both a trigg subwindow and some object
-*	connected to the trigg pin.
-*
-*	Code generation:
-*
-*	Prints declaration an directlink of rtdbpointer for the trp object.
-*	Prints exec call with a funktion call for a subwindow or
-*	a triggtrp_exec call.
-*	The name of connected cell objects are put into the trans object.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m33()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for a mpstrp object.
+ *
+ *	Syntax control:
+ *
+ *	Checks that there is only one object connected to the
+ *	cell input and cell output pin.
+ *	Checks that there is not both a trigg subwindow and some object
+ *	connected to the trigg pin.
+ *
+ *	Code generation:
+ *
+ *	Prints declaration an directlink of rtdbpointer for the trp object.
+ *	Prints exec call with a funktion call for a subwindow or
+ *	a triggtrp_exec call.
+ *	The name of connected cell objects are put into the trans object.
+ *
+ **************************************************************************/
 
-int gcg_comp_m33(gcg_ctx gcgctx, vldh_t_node node)
-{
-  return GSX__SUCCESS;
-}
+int gcg_comp_m33(gcg_ctx gcgctx, vldh_t_node node) { return GSX__SUCCESS; }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m34()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for MPSTRIGGTRP
-*	Syntax control:
-*	It should be tested that the parent object of the window is a
-*	trp object, but this is not implemented.
-*	Generated code:
-*	Declares and links a pointer to the parentobject to the window.
-*	Prints an exec call.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m34()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for MPSTRIGGTRP
+ *	Syntax control:
+ *	It should be tested that the parent object of the window is a
+ *	trp object, but this is not implemented.
+ *	Generated code:
+ *	Declares and links a pointer to the parentobject to the window.
+ *	Prints an exec call.
+ *
+ **************************************************************************/
 
 int gcg_comp_m34(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -9504,7 +9928,8 @@ int gcg_comp_m34(gcg_ctx gcgctx, vldh_t_node node)
     a trans or a order object */
   refobjdid = (node->hn.wind)->lw.poid;
 
-  if (cdh_ObjidIsNull(refobjdid)) {
+  if (cdh_ObjidIsNull(refobjdid))
+  {
     /* Parent is a plcprogram */
     gcg_error_msg(gcgctx, GSX__BADWIND, node);
     return GSX__NEXTNODE;
@@ -9512,7 +9937,8 @@ int gcg_comp_m34(gcg_ctx gcgctx, vldh_t_node node)
 
   /* Check class of this objdid */
   sts = ldh_GetObjectClass((node->hn.wind)->hw.ldhses, refobjdid, &cid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     gcg_error_msg(gcgctx, GSX__REFOBJ, node);
     return GSX__NEXTNODE;
   }
@@ -9532,8 +9958,8 @@ int gcg_comp_m34(gcg_ctx gcgctx, vldh_t_node node)
     return sts;
 
   /* Print the execute command */
-  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( %c%s, ", name,
-      GCG_PREFIX_REF, vldh_IdToStr(0, refobjdid));
+  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( %c%s, ", name, GCG_PREFIX_REF,
+                vldh_IdToStr(0, refobjdid));
 
   sts = gcg_print_inputs(gcgctx, node, ", ", GCG_PRINT_ALLPAR, NULL, NULL);
   if (EVEN(sts))
@@ -9545,41 +9971,41 @@ int gcg_comp_m34(gcg_ctx gcgctx, vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m35()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for standard function call node with
-*	initialization function.
-*	Prints code for declaration and direkt link of a rtdbpointer.
-*	Prints code for initialization of pointers in the object:
-*	'objpointer'->'pgmname'P = &'in';
-*	Z80000811->InP = &Z800005f5->ActualValue;
-*
-*	If a parameter is not connected or not visible the pointer
-*	will point to the own object:
-*
-*	'objpointer'->'pgmname'P = &'objpointer'->'pgmname';
-*	Z80000811->LimP = &Z80000811->Lim;
-*
-*	Prints an init call :
-*	'structname'_init( 'objpointer');
-*	ex: pispeed_init( Z80000811);
-*
-*	Prints an exec call :
-*	'structname'_exec( 'objpointer');
-*	ex: pispeed_exec( tp, Z80000811);
-*
-*	Prints iniatilization for timer and scantime if the object
-*	contain these functions.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m35()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for standard function call node with
+ *	initialization function.
+ *	Prints code for declaration and direkt link of a rtdbpointer.
+ *	Prints code for initialization of pointers in the object:
+ *	'objpointer'->'pgmname'P = &'in';
+ *	Z80000811->InP = &Z800005f5->ActualValue;
+ *
+ *	If a parameter is not connected or not visible the pointer
+ *	will point to the own object:
+ *
+ *	'objpointer'->'pgmname'P = &'objpointer'->'pgmname';
+ *	Z80000811->LimP = &Z80000811->Lim;
+ *
+ *	Prints an init call :
+ *	'structname'_init( 'objpointer');
+ *	ex: pispeed_init( Z80000811);
+ *
+ *	Prints an exec call :
+ *	'structname'_exec( 'objpointer');
+ *	ex: pispeed_exec( tp, Z80000811);
+ *
+ *	Prints iniatilization for timer and scantime if the object
+ *	contain these functions.
+ *
+ **************************************************************************/
 
 int gcg_comp_m35(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -9603,17 +10029,20 @@ int gcg_comp_m35(gcg_ctx gcgctx, vldh_t_node node)
 
   /* Check if there is a PlcConnected */
   sts = gcg_check_attrref(gcgctx, node, "PlcConnect", 0);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     gcg_error_msg(gcgctx, GSX__NOCONNECT, node);
     return GSX__NEXTNODE;
   }
 
   /* Check special attrref's for som classes */
-  switch (node->ln.cid) {
+  switch (node->ln.cid)
+  {
   case pwr_cClass_GetApPtr:
   case pwr_cClass_StoApPtr:
     sts = gcg_check_attrref(gcgctx, node, "ApPtrObject", &refattrref);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       gcg_error_msg(gcgctx, sts, node);
       return GSX__NEXTNODE;
     }
@@ -9621,7 +10050,8 @@ int gcg_comp_m35(gcg_ctx gcgctx, vldh_t_node node)
     if (EVEN(sts))
       return sts;
 
-    if (info.type != pwr_eType_Float32) {
+    if (info.type != pwr_eType_Float32)
+    {
       gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
       return GSX__NEXTPAR;
     }
@@ -9629,7 +10059,8 @@ int gcg_comp_m35(gcg_ctx gcgctx, vldh_t_node node)
   case pwr_cClass_GetDpPtr:
   case pwr_cClass_StoDpPtr:
     sts = gcg_check_attrref(gcgctx, node, "DpPtrObject", &refattrref);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       gcg_error_msg(gcgctx, sts, node);
       return GSX__NEXTNODE;
     }
@@ -9637,7 +10068,8 @@ int gcg_comp_m35(gcg_ctx gcgctx, vldh_t_node node)
     if (EVEN(sts))
       return sts;
 
-    if (info.type != pwr_eType_Boolean) {
+    if (info.type != pwr_eType_Boolean)
+    {
       gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
       return GSX__NEXTPAR;
     }
@@ -9645,7 +10077,8 @@ int gcg_comp_m35(gcg_ctx gcgctx, vldh_t_node node)
   case pwr_cClass_GetIpPtr:
   case pwr_cClass_StoIpPtr:
     sts = gcg_check_attrref(gcgctx, node, "IpPtrObject", &refattrref);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       gcg_error_msg(gcgctx, sts, node);
       return GSX__NEXTNODE;
     }
@@ -9653,13 +10086,14 @@ int gcg_comp_m35(gcg_ctx gcgctx, vldh_t_node node)
     if (EVEN(sts))
       return sts;
 
-    if (!(info.type == pwr_eType_Int32 || info.type == pwr_eType_UInt32
-            || info.type == pwr_eType_Status || info.type == pwr_eType_NetStatus
-            || info.type == pwr_eType_Enum || info.type == pwr_eType_Mask)) {
+    if (!(info.type == pwr_eType_Int32 || info.type == pwr_eType_UInt32 || info.type == pwr_eType_Status ||
+          info.type == pwr_eType_NetStatus || info.type == pwr_eType_Enum || info.type == pwr_eType_Mask))
+    {
       gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
       return GSX__NEXTPAR;
     }
-    if (!(info.flags & PWR_MASK_POINTER && !(info.flags & PWR_MASK_PRIVATE))) {
+    if (!(info.flags & PWR_MASK_POINTER && !(info.flags & PWR_MASK_PRIVATE)))
+    {
       gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
       return GSX__NEXTPAR;
     }
@@ -9675,37 +10109,39 @@ int gcg_comp_m35(gcg_ctx gcgctx, vldh_t_node node)
     return sts;
 
   /* Print the execute command */
-  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( tp, %c%s);\n", name,
-      GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid));
+  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( tp, %c%s);\n", name, GCG_PREFIX_REF,
+                vldh_IdToStr(0, node->ln.oid));
 
   /* Get the runtime parameters for this class */
-  sts = ldh_GetObjectBodyDef(
-      (node->hn.wind)->hw.ldhses, node->ln.cid, "RtBody", 1, &bodydef, &rows);
+  sts = ldh_GetObjectBodyDef((node->hn.wind)->hw.ldhses, node->ln.cid, "RtBody", 1, &bodydef, &rows);
   if (EVEN(sts))
     return sts;
 
   i = 0;
   first_par = 1;
-  while ((i < rows) && (bodydef[i].ParClass == pwr_eClass_Input)) {
+  while ((i < rows) && (bodydef[i].ParClass == pwr_eClass_Input))
+  {
     /* Get the point for this parameter if there is one */
     output_found = 0;
     sts = gcg_get_inputpoint(node, i, &point, &par_inverted);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       /* Look for an output connected to this point */
-      sts = gcg_get_output(node, point, &output_count, &output_node,
-          &output_point, &output_bodydef,
-          GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
+      sts = gcg_get_output(node, point, &output_count, &output_node, &output_point, &output_bodydef,
+                           GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
       if (EVEN(sts))
         return sts;
 
-      if (output_count > 0) {
+      if (output_count > 0)
+      {
         output_found = 1;
         if (output_count > 1)
           gcg_error_msg(gcgctx, GSX__CONOUTPUT, output_node);
 
-        sts = gcg_get_outputstring(gcgctx, output_node, &output_bodydef,
-            &output_attrref, &output_type, &output_prefix, output_par);
-        if (sts == GSX__NEXTPAR) {
+        sts = gcg_get_outputstring(gcgctx, output_node, &output_bodydef, &output_attrref, &output_type,
+                                   &output_prefix, output_par);
+        if (sts == GSX__NEXTPAR)
+        {
           i++;
           continue;
         }
@@ -9717,28 +10153,29 @@ int gcg_comp_m35(gcg_ctx gcgctx, vldh_t_node node)
 
         if (output_bodydef.Par->Output.Info.Type == pwr_eType_DataRef)
           strcpy(cast, "(pwr_tVoid *)");
-	else
-	  strcpy(cast, "");
-        IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = %s&%c%s->%s;\n",
-            GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid),
-	    bodydef[i].Par->Param.Info.PgmName, cast, output_prefix,
-            output_type == GCG_OTYPE_OID ? vldh_IdToStr(1, output_attrref.Objid)
-                                         : vldh_AttrRefToStr(0, output_attrref),
-            output_par);
-      } else {
+        else
+          strcpy(cast, "");
+        IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = %s&%c%s->%s;\n", GCG_PREFIX_REF,
+                      vldh_IdToStr(0, node->ln.oid), bodydef[i].Par->Param.Info.PgmName, cast, output_prefix,
+                      output_type == GCG_OTYPE_OID ? vldh_IdToStr(1, output_attrref.Objid)
+                                                   : vldh_AttrRefToStr(0, output_attrref),
+                      output_par);
+      }
+      else
+      {
         /* Point visible but not connected, errormessage */
         gcg_error_msg(gcgctx, GSX__NOTCON, node);
       }
       first_par = 0;
     }
-    if (!output_found) {
+    if (!output_found)
+    {
       /* The point is not connected and will point to its
          own object */
 
-      IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = &%c%s->%s;\n",
-          GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid),
-          bodydef[i].Par->Param.Info.PgmName, GCG_PREFIX_REF,
-          vldh_IdToStr(1, node->ln.oid), bodydef[i].Par->Param.Info.PgmName);
+      IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = &%c%s->%s;\n", GCG_PREFIX_REF,
+                    vldh_IdToStr(0, node->ln.oid), bodydef[i].Par->Param.Info.PgmName, GCG_PREFIX_REF,
+                    vldh_IdToStr(1, node->ln.oid), bodydef[i].Par->Param.Info.PgmName);
     }
     i++;
   }
@@ -9748,35 +10185,35 @@ int gcg_comp_m35(gcg_ctx gcgctx, vldh_t_node node)
   gcg_scantime_print(gcgctx, node->ln.oid);
 
   /* Print the init command */
-  IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%s_init( %c%s);\n", name,
-      GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid));
+  IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%s_init( %c%s);\n", name, GCG_PREFIX_REF,
+                vldh_IdToStr(0, node->ln.oid));
 
   return GSX__SUCCESS;
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m36()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for GetIpToA, GetIp and GetDatap.
-*	Prints code for declaration and direkt link of a rtdbpointer.
-*	Prints an exec call :
-*	'structname'_exec( 'objpointer');
-*	ex: GetIpToA_exec( Z80000811);
-*
-*	Checks that the referenced object exists and that the referenced
-*	parameter exists in that object, and that the type of the parameter
-*	is correct.
-*	Prints declaration and direct link of pointer to referenced object.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m36()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for GetIpToA, GetIp and GetDatap.
+ *	Prints code for declaration and direkt link of a rtdbpointer.
+ *	Prints an exec call :
+ *	'structname'_exec( 'objpointer');
+ *	ex: GetIpToA_exec( Z80000811);
+ *
+ *	Checks that the referenced object exists and that the referenced
+ *	parameter exists in that object, and that the type of the parameter
+ *	is correct.
+ *	Prints declaration and direct link of pointer to referenced object.
+ *
+ **************************************************************************/
 
 int gcg_comp_m36(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -9801,13 +10238,11 @@ int gcg_comp_m36(gcg_ctx gcgctx, vldh_t_node node)
     first parameter in defbody */
 
   /* Get the devbody parameters for this class */
-  sts = ldh_GetObjectBodyDef(
-      ldhses, node->ln.cid, "DevBody", 1, &bodydef, &rows);
+  sts = ldh_GetObjectBodyDef(ldhses, node->ln.cid, "DevBody", 1, &bodydef, &rows);
   if (EVEN(sts))
     return sts;
 
-  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", bodydef[0].ParName,
-      (char**)&refattrref_ptr, &size);
+  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", bodydef[0].ParName, (char**)&refattrref_ptr, &size);
   if (EVEN(sts))
     return sts;
 
@@ -9821,7 +10256,8 @@ int gcg_comp_m36(gcg_ctx gcgctx, vldh_t_node node)
 
   /* Check that this is objdid of an existing object */
   sts = ldh_GetAttrRefOrigTid(ldhses, &refattrref, &cid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     gcg_error_msg(gcgctx, GSX__REFOBJ, node);
     return GSX__NEXTNODE;
   }
@@ -9831,20 +10267,21 @@ int gcg_comp_m36(gcg_ctx gcgctx, vldh_t_node node)
     return sts;
 
   /* Get rid of last attribute segment of the referenced object */
-  sts = ldh_AttrRefToName(
-      ldhses, &refattrref, ldh_eName_ArefVol, &name_p, &size);
+  sts = ldh_AttrRefToName(ldhses, &refattrref, ldh_eName_ArefVol, &name_p, &size);
   if (EVEN(sts))
     return sts;
 
   strcpy(aname, name_p);
-  if ((s = strrchr(aname, '.')) == 0) {
+  if ((s = strrchr(aname, '.')) == 0)
+  {
     gcg_error_msg(gcgctx, GSX__REFOBJ, node);
     return GSX__NEXTPAR;
   }
 
   *s = 0;
   sts = ldh_NameToAttrRef(ldhses, aname, &refattrref);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     gcg_error_msg(gcgctx, GSX__REFOBJ, node);
     return GSX__NEXTPAR;
   }
@@ -9857,14 +10294,17 @@ int gcg_comp_m36(gcg_ctx gcgctx, vldh_t_node node)
   if (EVEN(sts))
     return sts;
 
-  if (info.flags & PWR_MASK_RTVIRTUAL) {
+  if (info.flags & PWR_MASK_RTVIRTUAL)
+  {
     /* Attribute is not defined in runtime */
     gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
     return GSX__NEXTNODE;
   }
 
-  if (info.flags & PWR_MASK_ARRAY) {
-    if (info.nElement == -1) {
+  if (info.flags & PWR_MASK_ARRAY)
+  {
+    if (info.nElement == -1)
+    {
       /* No index in attribute */
       gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
       return GSX__NEXTNODE;
@@ -9876,14 +10316,18 @@ int gcg_comp_m36(gcg_ctx gcgctx, vldh_t_node node)
     //}
   }
 
-  if (info.type == pwr_eType_DataRef || info.flags & PWR_MASK_POINTER) {
-    if (!(node->ln.cid == pwr_cClass_GetDatap
-            || node->ln.cid == pwr_cClass_GetDataRefp)) {
+  if (info.type == pwr_eType_DataRef || info.flags & PWR_MASK_POINTER)
+  {
+    if (!(node->ln.cid == pwr_cClass_GetDatap || node->ln.cid == pwr_cClass_GetDataRefp))
+    {
       gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
       return GSX__NEXTNODE;
     }
-  } else {
-    switch (info.type) {
+  }
+  else
+  {
+    switch (info.type)
+    {
     case pwr_eType_Int32:
     case pwr_eType_UInt32:
     case pwr_eType_Int16:
@@ -9894,26 +10338,29 @@ int gcg_comp_m36(gcg_ctx gcgctx, vldh_t_node node)
     case pwr_eType_Mask:
     case pwr_eType_Status:
     case pwr_eType_NetStatus:
-      if (!(node->ln.cid != pwr_cClass_GetIpToA
-              || node->ln.cid != pwr_cClass_GetIp)) {
+      if (!(node->ln.cid != pwr_cClass_GetIpToA || node->ln.cid != pwr_cClass_GetIp))
+      {
         gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
         return GSX__NEXTNODE;
       }
       break;
     case pwr_eType_Time:
-      if (node->ln.cid != pwr_cClass_GetATp) {
+      if (node->ln.cid != pwr_cClass_GetATp)
+      {
         gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
         return GSX__NEXTNODE;
       }
       break;
     case pwr_eType_DeltaTime:
-      if (node->ln.cid != pwr_cClass_GetDTp) {
+      if (node->ln.cid != pwr_cClass_GetDTp)
+      {
         gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
         return GSX__NEXTNODE;
       }
       break;
     case pwr_eType_String:
-      if (node->ln.cid != pwr_cClass_GetSp) {
+      if (node->ln.cid != pwr_cClass_GetSp)
+      {
         gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
         return GSX__NEXTNODE;
       }
@@ -9931,7 +10378,7 @@ int gcg_comp_m36(gcg_ctx gcgctx, vldh_t_node node)
 
   /* Print the parent object */
   IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%c%s->%s);\n", GCG_PREFIX_REF,
-      vldh_AttrRefToStr(0, refattrref), parameter);
+                vldh_AttrRefToStr(0, refattrref), parameter);
 
   /* Insert object in ref list */
   gcg_aref_insert(gcgctx, refattrref, GCG_PREFIX_REF, node);
@@ -9940,27 +10387,27 @@ int gcg_comp_m36(gcg_ctx gcgctx, vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m37()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for BACKUP
-*	Puts the connected parameter in the parameter 'DataName'
-*	in the backup object.
-*
-*	Prints code for declaration and direkt link of a rtdbpointer.
-*
-*	Prints an init call :
-*	'structname'_init( 'objpointer', "'backup parameter'");
-*	ex: Backup_init( Z80000811, "Temperature.ActualValue");
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m37()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for BACKUP
+ *	Puts the connected parameter in the parameter 'DataName'
+ *	in the backup object.
+ *
+ *	Prints code for declaration and direkt link of a rtdbpointer.
+ *
+ *	Prints an init call :
+ *	'structname'_init( 'objpointer', "'backup parameter'");
+ *	ex: Backup_init( Z80000811, "Temperature.ActualValue");
+ *
+ **************************************************************************/
 
 int gcg_comp_m37(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -9979,30 +10426,35 @@ int gcg_comp_m37(gcg_ctx gcgctx, vldh_t_node node)
   ldhses = (node->hn.wind)->hw.ldhses;
 
   /* Look if the whole object should be backed up */
-  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "RtBody", "ObjectBackup",
-      (char**)&wholeobject, &size);
+  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "RtBody", "ObjectBackup", (char**)&wholeobject, &size);
   if (EVEN(sts))
     return sts;
 
   /* Get the connected object and parameter */
-  sts = gcg_get_connected_par_close(
-      node, point, &conn_node, conn_obj, conn_par);
-  if (sts == GSX__NOTCON) {
+  sts = gcg_get_connected_par_close(node, point, &conn_node, conn_obj, conn_par);
+  if (sts == GSX__NOTCON)
+  {
     /* Point visible but not connected, errormessage */
     gcg_error_msg(gcgctx, GSX__NOTCON, node);
     strcpy(parname, "");
-  } else if (sts == GSX__NEXTPAR || sts == GSX__SWINDERR
-      || sts == GSX__REFPAR) {
+  }
+  else if (sts == GSX__NEXTPAR || sts == GSX__SWINDERR || sts == GSX__REFPAR)
+  {
     /* No backup on this parameter */
     gcg_error_msg(gcgctx, GSX__NOBACKUP, node);
     strcpy(parname, "");
-  } else if (EVEN(sts)) {
+  }
+  else if (EVEN(sts))
+  {
     /* Parameter can't be found */
     gcg_error_msg(gcgctx, GSX__CONBACKUP, node);
     strcpy(parname, "");
-  } else {
+  }
+  else
+  {
     strcpy(parname, conn_obj);
-    if (!(*wholeobject)) {
+    if (!(*wholeobject))
+    {
       strcat(parname, ".");
       strcat(parname, conn_par);
     }
@@ -10011,20 +10463,22 @@ int gcg_comp_m37(gcg_ctx gcgctx, vldh_t_node node)
     return GSX__NEXTPAR;
 
   sts = ldh_GetObjectClass(ldhses, conn_node->ln.oid, &conn_cid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     gcg_error_msg(gcgctx, GSX__REFOBJ, node);
     return GSX__NEXTPAR;
   }
 
-  switch (conn_cid) {
-  case pwr_cClass_GetIp: {
+  switch (conn_cid)
+  {
+  case pwr_cClass_GetIp:
+  {
     // Get the referenced object
     pwr_tAttrRef* attrref;
     pwr_tAttrRef aref;
     char *name_p, *s;
 
-    sts = ldh_GetObjectPar(ldhses, conn_node->ln.oid, "DevBody", "IpObject",
-        (char**)&attrref, &size);
+    sts = ldh_GetObjectPar(ldhses, conn_node->ln.oid, "DevBody", "IpObject", (char**)&attrref, &size);
     if (EVEN(sts))
       return sts;
 
@@ -10036,14 +10490,17 @@ int gcg_comp_m37(gcg_ctx gcgctx, vldh_t_node node)
       return sts;
 
     sts = ldh_AttrRefToName(ldhses, &aref, ldh_eName_ArefVol, &name_p, &size);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       gcg_error_msg(gcgctx, GSX__REFOBJ, conn_node);
       return GSX__NEXTPAR;
     }
 
     strcpy(parname, name_p);
-    if (*wholeobject) {
-      if ((s = strrchr(parname, '.')) == 0) {
+    if (*wholeobject)
+    {
+      if ((s = strrchr(parname, '.')) == 0)
+      {
         gcg_error_msg(gcgctx, GSX__REFOBJ, conn_node);
         return GSX__NEXTPAR;
       }
@@ -10057,7 +10514,8 @@ int gcg_comp_m37(gcg_ctx gcgctx, vldh_t_node node)
   free((char*)wholeobject);
 
   sts = ldh_NameToAttrRef(ldhses, parname, &pararef);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     gcg_error_msg(gcgctx, GSX__REFOBJ, node);
     return GSX__NEXTPAR;
   }
@@ -10065,8 +10523,7 @@ int gcg_comp_m37(gcg_ctx gcgctx, vldh_t_node node)
   /* Put the object and parameter in the backup object */
   IF_PR
   {
-    sts = ldh_SetObjectPar(ldhses, node->ln.oid, "RtBody", "DataName",
-        (char*)&pararef, sizeof(pararef));
+    sts = ldh_SetObjectPar(ldhses, node->ln.oid, "RtBody", "DataName", (char*)&pararef, sizeof(pararef));
     if (EVEN(sts))
       return sts;
   }
@@ -10074,35 +10531,35 @@ int gcg_comp_m37(gcg_ctx gcgctx, vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m38()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for STODI, SETDI, RESDI, TOGGLEDI, STOAI, CSTOAI
-*	If the object is connected to an order it will be called
-*	from the order method.
-*
-*	Syntax control:
-*	Checks that the class of the referenced object is correct.
-*
-*	Code generation:
-*	Declares and links a write pointer to the referenced object.
-*	This will point to the valuebase object of the base frequency.
-*	Prints an exec call.
-*	stoai_exec( W800005f6, Z800005f5->ActualValue);
-*
-*	If the input is not connected the value of the inputparameter
-*	will be printed instead of a input object for  sto obect. For set
-*	and reset object TRUE will printed.
-*	stoai_exec( W800005f6, 3.2500);
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m38()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for STODI, SETDI, RESDI, TOGGLEDI, STOAI, CSTOAI
+ *	If the object is connected to an order it will be called
+ *	from the order method.
+ *
+ *	Syntax control:
+ *	Checks that the class of the referenced object is correct.
+ *
+ *	Code generation:
+ *	Declares and links a write pointer to the referenced object.
+ *	This will point to the valuebase object of the base frequency.
+ *	Prints an exec call.
+ *	stoai_exec( W800005f6, Z800005f5->ActualValue);
+ *
+ *	If the input is not connected the value of the inputparameter
+ *	will be printed instead of a input object for  sto obect. For set
+ *	and reset object TRUE will printed.
+ *	stoai_exec( W800005f6, 3.2500);
+ *
+ **************************************************************************/
 
 int gcg_comp_m38(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -10133,14 +10590,16 @@ int gcg_comp_m38(gcg_ctx gcgctx, vldh_t_node node)
   if (EVEN(sts))
     return sts;
 
-  if (!gcgctx->order_comp) {
-    if (cid == pwr_cClass_stodi || cid == pwr_cClass_setdi
-        || cid == pwr_cClass_toggledi || cid == pwr_cClass_resdi) {
+  if (!gcgctx->order_comp)
+  {
+    if (cid == pwr_cClass_stodi || cid == pwr_cClass_setdi || cid == pwr_cClass_toggledi ||
+        cid == pwr_cClass_resdi)
+    {
       /* Check first if the object is connected to an order object,
         if it is, it will be compiled when by the ordermethod, when
         gcgctx->order_comp is true */
-      sts = gcg_get_output(node, 0, &output_count, &output_node, &output_point,
-          &output_bodydef, GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
+      sts = gcg_get_output(node, 0, &output_count, &output_node, &output_point, &output_bodydef,
+                           GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
       if (EVEN(sts))
         return sts;
       if (output_count == 1)
@@ -10153,13 +10612,11 @@ int gcg_comp_m38(gcg_ctx gcgctx, vldh_t_node node)
     first parameter in defbody */
 
   /* Get the devbody parameters for this class */
-  sts = ldh_GetObjectBodyDef(
-      ldhses, node->ln.cid, "DevBody", 1, &bodydef, &rows);
+  sts = ldh_GetObjectBodyDef(ldhses, node->ln.cid, "DevBody", 1, &bodydef, &rows);
   if (EVEN(sts))
     return sts;
 
-  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", bodydef[0].ParName,
-      (char**)&refattrref_ptr, &size);
+  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", bodydef[0].ParName, (char**)&refattrref_ptr, &size);
   if (EVEN(sts))
     return sts;
   refattrref = *refattrref_ptr;
@@ -10172,24 +10629,26 @@ int gcg_comp_m38(gcg_ctx gcgctx, vldh_t_node node)
 
   /* If the object is not connected the value in the
      parameter should be written in the macro call */
-  sts = ldh_GetObjectPar(
-      ldhses, node->ln.oid, "RtBody", "In", &nocondef_ptr, &size);
+  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "RtBody", "In", &nocondef_ptr, &size);
   if (EVEN(sts))
     return sts;
 
   /* Check that this is objdid of an existing object */
   sts = ldh_GetAttrRefOrigTid(ldhses, &refattrref, &cid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     gcg_error_msg(gcgctx, GSX__REFOBJ, node);
     return GSX__NEXTNODE;
   }
 
   /* Check that the class of the referenced object is correct */
-  switch (node->ln.cid) {
+  switch (node->ln.cid)
+  {
   case pwr_cClass_setdi:
   case pwr_cClass_toggledi:
   case pwr_cClass_resdi:
-    if (cid != pwr_cClass_Di) {
+    if (cid != pwr_cClass_Di)
+    {
       gcg_error_msg(gcgctx, GSX__REFCLASS, node);
       return GSX__NEXTNODE;
     }
@@ -10197,7 +10656,8 @@ int gcg_comp_m38(gcg_ctx gcgctx, vldh_t_node node)
     nocontype[0] = GCG_BOOLEAN;
     break;
   case pwr_cClass_stodi:
-    if (cid != pwr_cClass_Di) {
+    if (cid != pwr_cClass_Di)
+    {
       gcg_error_msg(gcgctx, GSX__REFCLASS, node);
       return GSX__NEXTNODE;
     }
@@ -10206,7 +10666,8 @@ int gcg_comp_m38(gcg_ctx gcgctx, vldh_t_node node)
     break;
   case pwr_cClass_stoai:
   case pwr_cClass_cstoai:
-    if (cid != pwr_cClass_Ai) {
+    if (cid != pwr_cClass_Ai)
+    {
       gcg_error_msg(gcgctx, GSX__REFCLASS, node);
       return GSX__NEXTNODE;
     }
@@ -10215,7 +10676,8 @@ int gcg_comp_m38(gcg_ctx gcgctx, vldh_t_node node)
     break;
   case pwr_cClass_stoii:
   case pwr_cClass_cstoii:
-    if (cid != pwr_cClass_Ii) {
+    if (cid != pwr_cClass_Ii)
+    {
       gcg_error_msg(gcgctx, GSX__REFCLASS, node);
       return GSX__NEXTNODE;
     }
@@ -10233,7 +10695,8 @@ int gcg_comp_m38(gcg_ctx gcgctx, vldh_t_node node)
   case pwr_cClass_CStoBiString80:
   case pwr_cClass_CStoBoInt32:
   case pwr_cClass_CStoBoFloat32:
-  case pwr_cClass_CStoBoString80: {
+  case pwr_cClass_CStoBoString80:
+  {
     // The attrref is on an ActualValue attribute, and the one level up
     // attribute should
     // have Bi/Bo as superclass
@@ -10243,14 +10706,14 @@ int gcg_comp_m38(gcg_ctx gcgctx, vldh_t_node node)
     pwr_tCid lcid;
     char* s;
 
-    sts = ldh_AttrRefToName(
-        ldhses, &refattrref, ldh_eName_ArefVol, &aname_p, &size);
+    sts = ldh_AttrRefToName(ldhses, &refattrref, ldh_eName_ArefVol, &aname_p, &size);
     if (EVEN(sts))
       return sts;
 
     strncpy(aname, aname_p, sizeof(aname));
     s = strrchr(aname, '.');
-    if (s == 0) {
+    if (s == 0)
+    {
       gcg_error_msg(gcgctx, GSX__REFCLASS, node);
       return GSX__NEXTNODE;
     }
@@ -10263,19 +10726,22 @@ int gcg_comp_m38(gcg_ctx gcgctx, vldh_t_node node)
     sts = ldh_GetAttrRefOrigTid(ldhses, &laref, &lcid);
 
     sts = ldh_GetSuperClass(gcgctx->ldhses, lcid, &scid);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       gcg_error_msg(gcgctx, GSX__REFCLASS, node);
       return GSX__NEXTNODE;
     }
 
-    switch (node->ln.cid) {
+    switch (node->ln.cid)
+    {
     case pwr_cClass_StoBiInt32:
     case pwr_cClass_StoBiFloat32:
     case pwr_cClass_StoBiString80:
     case pwr_cClass_CStoBiInt32:
     case pwr_cClass_CStoBiFloat32:
     case pwr_cClass_CStoBiString80:
-      if (scid != pwr_cClass_Bi) {
+      if (scid != pwr_cClass_Bi)
+      {
         gcg_error_msg(gcgctx, GSX__REFCLASS, node);
         return GSX__NEXTNODE;
       }
@@ -10283,13 +10749,15 @@ int gcg_comp_m38(gcg_ctx gcgctx, vldh_t_node node)
     case pwr_cClass_StoBoInt32:
     case pwr_cClass_StoBoFloat32:
     case pwr_cClass_StoBoString80:
-      if (scid != pwr_cClass_Bo) {
+      if (scid != pwr_cClass_Bo)
+      {
         gcg_error_msg(gcgctx, GSX__REFCLASS, node);
         return GSX__NEXTNODE;
       }
       break;
     }
-    switch (node->ln.cid) {
+    switch (node->ln.cid)
+    {
     case pwr_cClass_StoBiInt32:
     case pwr_cClass_StoBoInt32:
     case pwr_cClass_CStoBiInt32:
@@ -10326,11 +10794,10 @@ int gcg_comp_m38(gcg_ctx gcgctx, vldh_t_node node)
     return sts;
 
   /* Print the execute command */
-  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( %c%s, ", name,
-      GCG_PREFIX_IOW, vldh_AttrRefToStr(0, refattrref));
+  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( %c%s, ", name, GCG_PREFIX_IOW,
+                vldh_AttrRefToStr(0, refattrref));
 
-  sts = gcg_print_inputs(
-      gcgctx, node, ", ", GCG_PRINT_ALLPAR, nocondef, nocontype);
+  sts = gcg_print_inputs(gcgctx, node, ", ", GCG_PRINT_ALLPAR, nocondef, nocontype);
   if (EVEN(sts))
     return sts;
 
@@ -10340,32 +10807,32 @@ int gcg_comp_m38(gcg_ctx gcgctx, vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m39()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for STOPI
-*
-*	Syntax control:
-*	Checks that the class of the referenced object is correct.
-*
-*	Code generation:
-*	Declares and links a write pointer to the referenced object.
-*	This will point to the valuebase object of the base frequency.
-*	Prints an exec call.
-*	stopi_exec( W800005f6, X800005f6, Z800005f5->ActualValue);
-*
-*	If the input is not connected the value of the inputparameter
-*	will be printed instead of a input object for  sto obect
-*	stopi_exec( W800005f6, X800005f6, 32500);
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m39()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for STOPI
+ *
+ *	Syntax control:
+ *	Checks that the class of the referenced object is correct.
+ *
+ *	Code generation:
+ *	Declares and links a write pointer to the referenced object.
+ *	This will point to the valuebase object of the base frequency.
+ *	Prints an exec call.
+ *	stopi_exec( W800005f6, X800005f6, Z800005f5->ActualValue);
+ *
+ *	If the input is not connected the value of the inputparameter
+ *	will be printed instead of a input object for  sto obect
+ *	stopi_exec( W800005f6, X800005f6, 32500);
+ *
+ **************************************************************************/
 
 int gcg_comp_m39(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -10395,13 +10862,11 @@ int gcg_comp_m39(gcg_ctx gcgctx, vldh_t_node node)
     first parameter in defbody */
 
   /* Get the devbody parameters for this class */
-  sts = ldh_GetObjectBodyDef(
-      ldhses, node->ln.cid, "DevBody", 1, &bodydef, &rows);
+  sts = ldh_GetObjectBodyDef(ldhses, node->ln.cid, "DevBody", 1, &bodydef, &rows);
   if (EVEN(sts))
     return sts;
 
-  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", bodydef[0].ParName,
-      (char**)&refattrref_ptr, &size);
+  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", bodydef[0].ParName, (char**)&refattrref_ptr, &size);
   if (EVEN(sts))
     return sts;
   refattrref = *refattrref_ptr;
@@ -10410,19 +10875,20 @@ int gcg_comp_m39(gcg_ctx gcgctx, vldh_t_node node)
 
   /* If the object is not connected the value in the
      parameter should be written in the macro call */
-  sts = ldh_GetObjectPar(
-      ldhses, node->ln.oid, "RtBody", "In", &nocondef_ptr, &size);
+  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "RtBody", "In", &nocondef_ptr, &size);
   if (EVEN(sts))
     return sts;
 
   /* Check that this is objdid of an existing object */
   sts = ldh_GetAttrRefOrigTid(ldhses, &refattrref, &cid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     gcg_error_msg(gcgctx, GSX__REFOBJ, node);
     return GSX__NEXTNODE;
   }
 
-  if (cid != pwr_cClass_Co) {
+  if (cid != pwr_cClass_Co)
+  {
     gcg_error_msg(gcgctx, GSX__REFCLASS, node);
     return GSX__NEXTNODE;
   }
@@ -10440,14 +10906,12 @@ int gcg_comp_m39(gcg_ctx gcgctx, vldh_t_node node)
   if (EVEN(sts))
     return sts;
 
-  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( %c%s, ", name,
-      GCG_PREFIX_IOW, vldh_AttrRefToStr(0, refattrref));
+  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( %c%s, ", name, GCG_PREFIX_IOW,
+                vldh_AttrRefToStr(0, refattrref));
 
-  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%c%s, ", GCG_PREFIX_IOCW,
-      vldh_AttrRefToStr(0, refattrref));
+  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%c%s, ", GCG_PREFIX_IOCW, vldh_AttrRefToStr(0, refattrref));
 
-  sts = gcg_print_inputs(
-      gcgctx, node, ", ", GCG_PRINT_ALLPAR, nocondef, nocontype);
+  sts = gcg_print_inputs(gcgctx, node, ", ", GCG_PRINT_ALLPAR, nocondef, nocontype);
   if (EVEN(sts))
     return sts;
 
@@ -10457,31 +10921,31 @@ int gcg_comp_m39(gcg_ctx gcgctx, vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_40()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for CARITHM.
-*	This object contains a macro call but the connections
-*	is put into the rtdb object as pointers.
-*
-*	Syntax control:
-*	Checks that there is an expession stored in the
-*	expression parameter.
-*	Generated code:
-*	Declares an links a rtdb pointer to the arithm object.
-*	Prints a #define command for the expression.
-*	Prints an exec call.
-*	If an input is not connected it will point to its
-*	own object.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_40()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for CARITHM.
+ *	This object contains a macro call but the connections
+ *	is put into the rtdb object as pointers.
+ *
+ *	Syntax control:
+ *	Checks that there is an expession stored in the
+ *	expression parameter.
+ *	Generated code:
+ *	Declares an links a rtdb pointer to the arithm object.
+ *	Prints a #define command for the expression.
+ *	Prints an exec call.
+ *	If an input is not connected it will point to its
+ *	own object.
+ *
+ **************************************************************************/
 
 int gcg_comp_m40(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -10667,40 +11131,40 @@ EXPR%s((*%c%s->AIn1P),(*%c%s->AIn2P),(*%c%s->AIn3P),(*%c%s->AIn4P),\n",
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m41()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for a NMpsTrp object.
-*	Prints code for declaration and direkt link of a rtdbpointer.
-*	Prints code for initialization of pointers in the object:
-*	'objpointer'->'pgmname'P = &'in';
-*	Z80000811->InP = &Z800005f5->ActualValue;
-*
-*	The two first input parameters (In and Out) are initialized
-*	'objpointer'->'pgmname'P = 'inobject_pointer';
-*	Z80000811->InP = Z80000812;
-*
-*	If a parameter is not connected or not visible the pointer
-*	will point to the own object:
-*
-*	'objpointer'->'pgmname'P = &'objpointer'->'pgmname';
-*	Z80000811->LimP = &Z80000811->Lim;
-*
-*	Prints an exec call :
-*	'structname'_exec( tp, 'objpointer');
-*	ex: compl_exec( tp, Z80000811);
-*
-*	Prints iniatilization for timer and scantime if the object
-*	contain these functions.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m41()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for a NMpsTrp object.
+ *	Prints code for declaration and direkt link of a rtdbpointer.
+ *	Prints code for initialization of pointers in the object:
+ *	'objpointer'->'pgmname'P = &'in';
+ *	Z80000811->InP = &Z800005f5->ActualValue;
+ *
+ *	The two first input parameters (In and Out) are initialized
+ *	'objpointer'->'pgmname'P = 'inobject_pointer';
+ *	Z80000811->InP = Z80000812;
+ *
+ *	If a parameter is not connected or not visible the pointer
+ *	will point to the own object:
+ *
+ *	'objpointer'->'pgmname'P = &'objpointer'->'pgmname';
+ *	Z80000811->LimP = &Z80000811->Lim;
+ *
+ *	Prints an exec call :
+ *	'structname'_exec( tp, 'objpointer');
+ *	ex: compl_exec( tp, Z80000811);
+ *
+ *	Prints iniatilization for timer and scantime if the object
+ *	contain these functions.
+ *
+ **************************************************************************/
 
 int gcg_comp_m41(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -10731,37 +11195,39 @@ int gcg_comp_m41(gcg_ctx gcgctx, vldh_t_node node)
     return sts;
 
   /* Print the execute command */
-  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( tp, %c%s);\n", name,
-      GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid));
+  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( tp, %c%s);\n", name, GCG_PREFIX_REF,
+                vldh_IdToStr(0, node->ln.oid));
 
   /* Get the runtime parameters for this class */
-  sts = ldh_GetObjectBodyDef(
-      (node->hn.wind)->hw.ldhses, node->ln.cid, "RtBody", 1, &bodydef, &rows);
+  sts = ldh_GetObjectBodyDef((node->hn.wind)->hw.ldhses, node->ln.cid, "RtBody", 1, &bodydef, &rows);
   if (EVEN(sts))
     return sts;
 
   i = 0;
   first_par = 1;
-  while ((i < rows) && (bodydef[i].ParClass == pwr_eClass_Input)) {
+  while ((i < rows) && (bodydef[i].ParClass == pwr_eClass_Input))
+  {
     /* Get the point for this parameter if there is one */
     output_found = 0;
     sts = gcg_get_inputpoint(node, i, &point, &par_inverted);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       /* Look for an output connected to this point */
-      sts = gcg_get_output(node, point, &output_count, &output_node,
-          &output_point, &output_bodydef,
-          GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
+      sts = gcg_get_output(node, point, &output_count, &output_node, &output_point, &output_bodydef,
+                           GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
       if (EVEN(sts))
         return sts;
 
-      if (output_count > 0) {
+      if (output_count > 0)
+      {
         output_found = 1;
         if (output_count > 1)
           gcg_error_msg(gcgctx, GSX__CONOUTPUT, output_node);
 
-        sts = gcg_get_outputstring(gcgctx, output_node, &output_bodydef,
-            &output_attrref, &output_type, &output_prefix, output_par);
-        if (sts == GSX__NEXTPAR) {
+        sts = gcg_get_outputstring(gcgctx, output_node, &output_bodydef, &output_attrref, &output_type,
+                                   &output_prefix, output_par);
+        if (sts == GSX__NEXTPAR)
+        {
           i++;
           continue;
         }
@@ -10771,36 +11237,37 @@ int gcg_comp_m41(gcg_ctx gcgctx, vldh_t_node node)
         if (par_inverted)
           gcg_error_msg(gcgctx, GSX__INV, node);
 
-        if (i >= cell_inputs) {
-          IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE],
-              "%c%s->%sP = &%c%s->%s;\n", GCG_PREFIX_REF,
-              vldh_IdToStr(0, node->ln.oid), bodydef[i].Par->Param.Info.PgmName,
-              output_prefix, output_type == GCG_OTYPE_OID
-                  ? vldh_IdToStr(1, output_attrref.Objid)
-                  : vldh_AttrRefToStr(0, output_attrref),
-              output_par);
-        } else {
-          IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE],
-              "%c%s->%sP = (pwr_tInt32 *)%c%s;\n", GCG_PREFIX_REF,
-              vldh_IdToStr(0, node->ln.oid), bodydef[i].Par->Param.Info.PgmName,
-              output_prefix, output_type == GCG_OTYPE_OID
-                  ? vldh_IdToStr(1, output_attrref.Objid)
-                  : vldh_AttrRefToStr(0, output_attrref));
+        if (i >= cell_inputs)
+        {
+          IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = &%c%s->%s;\n", GCG_PREFIX_REF,
+                        vldh_IdToStr(0, node->ln.oid), bodydef[i].Par->Param.Info.PgmName, output_prefix,
+                        output_type == GCG_OTYPE_OID ? vldh_IdToStr(1, output_attrref.Objid)
+                                                     : vldh_AttrRefToStr(0, output_attrref),
+                        output_par);
         }
-      } else {
+        else
+        {
+          IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = (pwr_tInt32 *)%c%s;\n", GCG_PREFIX_REF,
+                        vldh_IdToStr(0, node->ln.oid), bodydef[i].Par->Param.Info.PgmName, output_prefix,
+                        output_type == GCG_OTYPE_OID ? vldh_IdToStr(1, output_attrref.Objid)
+                                                     : vldh_AttrRefToStr(0, output_attrref));
+        }
+      }
+      else
+      {
         /* Point visible but not connected, errormessage */
         gcg_error_msg(gcgctx, GSX__NOTCON, node);
       }
       first_par = 0;
     }
-    if (!output_found) {
+    if (!output_found)
+    {
       /* The point is not connected and will point to its
          own object */
 
-      IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = &%c%s->%s;\n",
-          GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid),
-          bodydef[i].Par->Param.Info.PgmName, GCG_PREFIX_REF,
-          vldh_IdToStr(1, node->ln.oid), bodydef[i].Par->Param.Info.PgmName);
+      IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = &%c%s->%s;\n", GCG_PREFIX_REF,
+                    vldh_IdToStr(0, node->ln.oid), bodydef[i].Par->Param.Info.PgmName, GCG_PREFIX_REF,
+                    vldh_IdToStr(1, node->ln.oid), bodydef[i].Par->Param.Info.PgmName);
     }
     i++;
   }
@@ -10813,34 +11280,34 @@ int gcg_comp_m41(gcg_ctx gcgctx, vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m42()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for DATAARITHM.
-*	This converts and puts the code in the dataarithm object
-*	into the code file. The connections
-*	are put into the rtdb object as pointers.
-*
-*	Syntax control:
-*	Checks that there is an expession stored in the
-*	expression parameter.
-*	Generated code:
-*	Declares an links a rtdb pointer to the arithm object.
-*	Converts the code with the lex and yacc generated compiler
-*	pwr_exe:ds_foe_dataarithm.exe, by placing the code in an
-*	input file the the compiler and then copying the output
-*	file of the compiler into the codefile.
-*	If an input is not connected it will point to its
-*	own object.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m42()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for DATAARITHM.
+ *	This converts and puts the code in the dataarithm object
+ *	into the code file. The connections
+ *	are put into the rtdb object as pointers.
+ *
+ *	Syntax control:
+ *	Checks that there is an expession stored in the
+ *	expression parameter.
+ *	Generated code:
+ *	Declares an links a rtdb pointer to the arithm object.
+ *	Converts the code with the lex and yacc generated compiler
+ *	pwr_exe:ds_foe_dataarithm.exe, by placing the code in an
+ *	input file the the compiler and then copying the output
+ *	file of the compiler into the codefile.
+ *	If an input is not connected it will point to its
+ *	own object.
+ *
+ **************************************************************************/
 
 int gcg_comp_m42(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -10873,7 +11340,8 @@ int gcg_comp_m42(gcg_ctx gcgctx, vldh_t_node node)
 
   ldhses = (node->hn.wind)->hw.ldhses;
 
-  switch (node->ln.cid) {
+  switch (node->ln.cid)
+  {
   case pwr_cClass_dataarithml:
   case pwr_cClass_dataarithmtl:
     buff_size = DATAA_BUFF_SIZEL;
@@ -10883,8 +11351,7 @@ int gcg_comp_m42(gcg_ctx gcgctx, vldh_t_node node)
   }
 
   /* Get c-expression stored in devbody */
-  sts = ldh_GetObjectPar(
-      ldhses, node->ln.oid, "DevBody", "Code", (char**)&expression, &size);
+  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", "Code", (char**)&expression, &size);
   if (EVEN(sts))
     return sts;
 
@@ -10898,9 +11365,10 @@ int gcg_comp_m42(gcg_ctx gcgctx, vldh_t_node node)
   if (!newstr)
     return FOE__NOMEMORY;
 
-  sts = dataarithm_convert(expression, newstr, pointer_name, buff_size,
-      error_line, &error_line_size, &error_num, &codesize);
-  if (EVEN(sts)) {
+  sts = dataarithm_convert(expression, newstr, pointer_name, buff_size, error_line, &error_line_size,
+                           &error_num, &codesize);
+  if (EVEN(sts))
+  {
     gcg_error_msg(gcgctx, sts, node);
     printf("Error in line %d,\n  %s\n", error_num, error_line);
     free(newstr);
@@ -10915,33 +11383,35 @@ int gcg_comp_m42(gcg_ctx gcgctx, vldh_t_node node)
   sts = gcg_ref_insert(gcgctx, node->ln.oid, GCG_PREFIX_REF, node);
 
   /* Get the runtime parameters for this class */
-  sts = ldh_GetObjectBodyDef(
-      (node->hn.wind)->hw.ldhses, node->ln.cid, "RtBody", 1, &bodydef, &rows);
+  sts = ldh_GetObjectBodyDef((node->hn.wind)->hw.ldhses, node->ln.cid, "RtBody", 1, &bodydef, &rows);
   if (EVEN(sts))
     return sts;
 
   i = 0;
   first_par = 1;
-  while ((i < rows) && (bodydef[i].ParClass == pwr_eClass_Input)) {
+  while ((i < rows) && (bodydef[i].ParClass == pwr_eClass_Input))
+  {
     /* Get the point for this parameter if there is one */
     output_found = 0;
     sts = gcg_get_inputpoint(node, i, &point, &par_inverted);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       /* Look for an output connected to this point */
-      sts = gcg_get_output(node, point, &output_count, &output_node,
-          &output_point, &output_bodydef,
-          GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
+      sts = gcg_get_output(node, point, &output_count, &output_node, &output_point, &output_bodydef,
+                           GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
       if (EVEN(sts))
         return sts;
 
-      if (output_count > 0) {
+      if (output_count > 0)
+      {
         output_found = 1;
         if (output_count > 1)
           gcg_error_msg(gcgctx, GSX__CONOUTPUT, output_node);
 
-        sts = gcg_get_outputstring(gcgctx, output_node, &output_bodydef,
-            &output_attrref, &output_type, &output_prefix, output_par);
-        if (sts == GSX__NEXTPAR) {
+        sts = gcg_get_outputstring(gcgctx, output_node, &output_bodydef, &output_attrref, &output_type,
+                                   &output_prefix, output_par);
+        if (sts == GSX__NEXTPAR)
+        {
           i++;
           continue;
         }
@@ -10951,27 +11421,27 @@ int gcg_comp_m42(gcg_ctx gcgctx, vldh_t_node node)
         if (par_inverted)
           gcg_error_msg(gcgctx, GSX__INV, node);
 
-        IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE],
-            "%c%s->%sP = (pwr_tVoid *)&%c%s->%s;\n", GCG_PREFIX_REF,
-            vldh_IdToStr(0, node->ln.oid), bodydef[i].Par->Param.Info.PgmName,
-            output_prefix,
-            output_type == GCG_OTYPE_OID ? vldh_IdToStr(1, output_attrref.Objid)
-                                         : vldh_AttrRefToStr(0, output_attrref),
-            output_par);
-      } else {
+        IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = (pwr_tVoid *)&%c%s->%s;\n", GCG_PREFIX_REF,
+                      vldh_IdToStr(0, node->ln.oid), bodydef[i].Par->Param.Info.PgmName, output_prefix,
+                      output_type == GCG_OTYPE_OID ? vldh_IdToStr(1, output_attrref.Objid)
+                                                   : vldh_AttrRefToStr(0, output_attrref),
+                      output_par);
+      }
+      else
+      {
         /* Point visible but not connected, errormessage */
         gcg_error_msg(gcgctx, GSX__NOTCON, node);
       }
       first_par = 0;
     }
-    if (!output_found) {
+    if (!output_found)
+    {
       /* The point is not connected and will point to its
          own object */
 
-      IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = &%c%s->%s;\n",
-          GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid),
-          bodydef[i].Par->Param.Info.PgmName, GCG_PREFIX_REF,
-          vldh_IdToStr(1, node->ln.oid), bodydef[i].Par->Param.Info.PgmName);
+      IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = &%c%s->%s;\n", GCG_PREFIX_REF,
+                    vldh_IdToStr(0, node->ln.oid), bodydef[i].Par->Param.Info.PgmName, GCG_PREFIX_REF,
+                    vldh_IdToStr(1, node->ln.oid), bodydef[i].Par->Param.Info.PgmName);
     }
     i++;
   }
@@ -10981,28 +11451,28 @@ int gcg_comp_m42(gcg_ctx gcgctx, vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m43()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for GetData
-*	Prints code for declaration and direkt link of a rtdbpointer.
-*
-*	Checks that the referenced object exists.
-*	Prints declaration and direct link of pointer to referenced object.
-*
-* 	Initializes the Output to point att the referenced object
-*	ex: Z80000811->Out = Z80000812;
-*	Puts the objid of the refereced object in rtbody. Originaly
-*	is it put in devbody of graphical reasons.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m43()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for GetData
+ *	Prints code for declaration and direkt link of a rtdbpointer.
+ *
+ *	Checks that the referenced object exists.
+ *	Prints declaration and direct link of pointer to referenced object.
+ *
+ * 	Initializes the Output to point att the referenced object
+ *	ex: Z80000811->Out = Z80000812;
+ *	Puts the objid of the refereced object in rtbody. Originaly
+ *	is it put in devbody of graphical reasons.
+ *
+ **************************************************************************/
 
 int gcg_comp_m43(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -11022,13 +11492,11 @@ int gcg_comp_m43(gcg_ctx gcgctx, vldh_t_node node)
     first parameter in defbody */
 
   /* Get the devbody parameters for this class */
-  sts = ldh_GetObjectBodyDef(
-      ldhses, node->ln.cid, "DevBody", 1, &bodydef, &rows);
+  sts = ldh_GetObjectBodyDef(ldhses, node->ln.cid, "DevBody", 1, &bodydef, &rows);
   if (EVEN(sts))
     return sts;
 
-  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", bodydef[0].ParName,
-      (char**)&refattrref_ptr, &size);
+  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", bodydef[0].ParName, (char**)&refattrref_ptr, &size);
   if (EVEN(sts))
     return sts;
 
@@ -11042,12 +11510,14 @@ int gcg_comp_m43(gcg_ctx gcgctx, vldh_t_node node)
 
   /* Check that this is objdid of an existing object */
   sts = ldh_GetAttrRefOrigTid(ldhses, &refattrref, &cid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     gcg_error_msg(gcgctx, GSX__REFOBJ, node);
     return GSX__NEXTNODE;
   }
   /* Check that this is a class, not a type */
-  if (!cdh_tidIsCid(cid)) {
+  if (!cdh_tidIsCid(cid))
+  {
     gcg_error_msg(gcgctx, GSX__REFCLASS, node);
     return GSX__NEXTNODE;
   }
@@ -11057,16 +11527,14 @@ int gcg_comp_m43(gcg_ctx gcgctx, vldh_t_node node)
 
   /* The Out parameter will contain the pointer to the
      referenced object */
-  IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE],
-      "%c%s->Out = (pwr_tVoid *)%c%s;\n", GCG_PREFIX_REF,
-      vldh_IdToStr(0, node->ln.oid), GCG_PREFIX_DATA,
-      vldh_AttrRefToStr(0, refattrref));
+  IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->Out = (pwr_tVoid *)%c%s;\n", GCG_PREFIX_REF,
+                vldh_IdToStr(0, node->ln.oid), GCG_PREFIX_DATA, vldh_AttrRefToStr(0, refattrref));
 
   /* Put referenced object in rt body */
   IF_PR
   {
-    sts = ldh_SetObjectPar(ldhses, node->ln.oid, "RtBody", "DataObjid",
-        (char*)&refattrref, sizeof(refattrref));
+    sts =
+        ldh_SetObjectPar(ldhses, node->ln.oid, "RtBody", "DataObjid", (char*)&refattrref, sizeof(refattrref));
     if (EVEN(sts))
       return sts;
   }
@@ -11075,24 +11543,24 @@ int gcg_comp_m43(gcg_ctx gcgctx, vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m44()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for CurrentData and CurrentIndex
-*	Syntax control:
-*	Checks that the parent is an cell object.
-*
-*	Generating code:
-*	Declares and links a pointer to the referenced cell object.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m44()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for CurrentData and CurrentIndex
+ *	Syntax control:
+ *	Checks that the parent is an cell object.
+ *
+ *	Generating code:
+ *	Declares and links a pointer to the referenced cell object.
+ *
+ **************************************************************************/
 
 int gcg_comp_m44(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -11106,20 +11574,18 @@ int gcg_comp_m44(gcg_ctx gcgctx, vldh_t_node node)
   /* Check that parent is a cell object */
   refobjdid = node->hn.wind->lw.poid;
   sts = ldh_GetObjectClass((node->hn.wind)->hw.ldhses, refobjdid, &cid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     gcg_error_msg(gcgctx, GSX__BADWIND, node);
     return GSX__NEXTNODE;
   }
 
-  if (!((cid == vldh_eclass(ldhses, "NMpsCell"))
-          || (cid == vldh_eclass(ldhses, "NMpsCell60"))
-          || (cid == vldh_eclass(ldhses, "NMpsCell120"))
-          || (cid == vldh_eclass(ldhses, "NMpsStoreCell"))
-          || (cid == vldh_eclass(ldhses, "NMpsStoreCell60"))
-          || (cid == vldh_eclass(ldhses, "NMpsStoreCell120"))
-          || (cid == vldh_eclass(ldhses, "CLoop"))
-          || (cid == vldh_eclass(ldhses, "NMpsMirrorCell"))
-          || (cid == vldh_eclass(ldhses, "NMpsStoreCell")))) {
+  if (!((cid == vldh_eclass(ldhses, "NMpsCell")) || (cid == vldh_eclass(ldhses, "NMpsCell60")) ||
+        (cid == vldh_eclass(ldhses, "NMpsCell120")) || (cid == vldh_eclass(ldhses, "NMpsStoreCell")) ||
+        (cid == vldh_eclass(ldhses, "NMpsStoreCell60")) || (cid == vldh_eclass(ldhses, "NMpsStoreCell120")) ||
+        (cid == vldh_eclass(ldhses, "CLoop")) || (cid == vldh_eclass(ldhses, "NMpsMirrorCell")) ||
+        (cid == vldh_eclass(ldhses, "NMpsStoreCell"))))
+  {
     gcg_error_msg(gcgctx, GSX__BADWIND, node);
     return GSX__NEXTNODE;
   }
@@ -11131,33 +11597,33 @@ int gcg_comp_m44(gcg_ctx gcgctx, vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m45()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method a datacopy.
-*	Prints code for declaration and direkt link of a rtdbpointer.
-*	Prints code for initialization of pointers in the object:
-*	'objpointer'->'pgmname'P = &'in';
-*	Z80000811->InP = &Z800005f5->ActualValue;
-*
-*	If a parameter is not connected or not visible the pointer
-*	will point to the own object:
-*
-*	'objpointer'->'pgmname'P = &'objpointer'->'pgmname';
-*	Z80000811->LimP = &Z80000811->Lim;
-*
-*	Prints an exec call :
-*	'structname'_exec( 'objpointer');
-*	ex: compl_exec( Z80000811);
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m45()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method a datacopy.
+ *	Prints code for declaration and direkt link of a rtdbpointer.
+ *	Prints code for initialization of pointers in the object:
+ *	'objpointer'->'pgmname'P = &'in';
+ *	Z80000811->InP = &Z800005f5->ActualValue;
+ *
+ *	If a parameter is not connected or not visible the pointer
+ *	will point to the own object:
+ *
+ *	'objpointer'->'pgmname'P = &'objpointer'->'pgmname';
+ *	Z80000811->LimP = &Z80000811->Lim;
+ *
+ *	Prints an exec call :
+ *	'structname'_exec( 'objpointer');
+ *	ex: compl_exec( Z80000811);
+ *
+ **************************************************************************/
 
 int gcg_comp_m45(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -11192,46 +11658,46 @@ int gcg_comp_m45(gcg_ctx gcgctx, vldh_t_node node)
     return sts;
 
   /* Get the runtime parameters for this class */
-  sts = ldh_GetObjectBodyDef(
-      (node->hn.wind)->hw.ldhses, node->ln.cid, "RtBody", 1, &bodydef, &rows);
+  sts = ldh_GetObjectBodyDef((node->hn.wind)->hw.ldhses, node->ln.cid, "RtBody", 1, &bodydef, &rows);
   if (EVEN(sts))
     return sts;
 
   i = 0;
   dataclass_found = 0;
   first_par = 1;
-  while ((i < rows) && (bodydef[i].ParClass == pwr_eClass_Input)) {
+  while ((i < rows) && (bodydef[i].ParClass == pwr_eClass_Input))
+  {
     /* Get the point for this parameter if there is one */
     output_found = 0;
     sts = gcg_get_inputpoint(node, i, &point, &par_inverted);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       /* Look for an output connected to this point */
-      sts = gcg_get_output(node, point, &output_count, &output_node,
-          &output_point, &output_bodydef,
-          GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
+      sts = gcg_get_output(node, point, &output_count, &output_node, &output_point, &output_bodydef,
+                           GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
       if (EVEN(sts))
         return sts;
 
-      if (output_count > 0) {
-        if ((i <= 1) && !dataclass_found) {
+      if (output_count > 0)
+      {
+        if ((i <= 1) && !dataclass_found)
+        {
           /* Check if this is a GetData object */
-          sts = ldh_GetObjectClass(
-              (node->hn.wind)->hw.ldhses, output_node->ln.oid, &cid);
+          sts = ldh_GetObjectClass((node->hn.wind)->hw.ldhses, output_node->ln.oid, &cid);
           if (EVEN(sts))
             return sts;
-          if (cid == pwr_cClass_GetData) {
+          if (cid == pwr_cClass_GetData)
+          {
             /* Get the class of the data in the connected GetData */
-            sts = ldh_GetObjectPar((node->hn.wind)->hw.ldhses,
-                output_node->ln.oid, "DevBody", "DataObject",
-                (char**)&refaref_ptr, &size);
+            sts = ldh_GetObjectPar((node->hn.wind)->hw.ldhses, output_node->ln.oid, "DevBody", "DataObject",
+                                   (char**)&refaref_ptr, &size);
             if (EVEN(sts))
               return sts;
 
             refaref = *refaref_ptr;
             free((char*)refaref_ptr);
 
-            sts = ldh_GetAttrRefOrigTid(
-                gcgctx->wind->hw.ldhses, &refaref, &refcid);
+            sts = ldh_GetAttrRefOrigTid(gcgctx->wind->hw.ldhses, &refaref, &refcid);
             if (EVEN(sts))
               return sts;
 
@@ -11247,9 +11713,10 @@ int gcg_comp_m45(gcg_ctx gcgctx, vldh_t_node node)
         if (output_count > 1)
           gcg_error_msg(gcgctx, GSX__CONOUTPUT, output_node);
 
-        sts = gcg_get_outputstring(gcgctx, output_node, &output_bodydef,
-            &output_attrref, &output_type, &output_prefix, output_par);
-        if (sts == GSX__NEXTPAR) {
+        sts = gcg_get_outputstring(gcgctx, output_node, &output_bodydef, &output_attrref, &output_type,
+                                   &output_prefix, output_par);
+        if (sts == GSX__NEXTPAR)
+        {
           i++;
           continue;
         }
@@ -11259,27 +11726,27 @@ int gcg_comp_m45(gcg_ctx gcgctx, vldh_t_node node)
         if (par_inverted)
           gcg_error_msg(gcgctx, GSX__INV, node);
 
-        IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE],
-            "%c%s->%sP = (pwr_tVoid *)&%c%s->%s;\n", GCG_PREFIX_REF,
-            vldh_IdToStr(0, node->ln.oid), bodydef[i].Par->Param.Info.PgmName,
-            output_prefix,
-            output_type == GCG_OTYPE_OID ? vldh_IdToStr(1, output_attrref.Objid)
-                                         : vldh_AttrRefToStr(0, output_attrref),
-            output_par);
-      } else {
+        IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = (pwr_tVoid *)&%c%s->%s;\n", GCG_PREFIX_REF,
+                      vldh_IdToStr(0, node->ln.oid), bodydef[i].Par->Param.Info.PgmName, output_prefix,
+                      output_type == GCG_OTYPE_OID ? vldh_IdToStr(1, output_attrref.Objid)
+                                                   : vldh_AttrRefToStr(0, output_attrref),
+                      output_par);
+      }
+      else
+      {
         /* Point visible but not connected, errormessage */
         gcg_error_msg(gcgctx, GSX__NOTCON, node);
       }
       first_par = 0;
     }
-    if (!output_found) {
+    if (!output_found)
+    {
       /* The point is not connected and will point to its
          own object */
 
-      IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = &%c%s->%s;\n",
-          GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid),
-          bodydef[i].Par->Param.Info.PgmName, GCG_PREFIX_REF,
-          vldh_IdToStr(1, node->ln.oid), bodydef[i].Par->Param.Info.PgmName);
+      IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = &%c%s->%s;\n", GCG_PREFIX_REF,
+                    vldh_IdToStr(0, node->ln.oid), bodydef[i].Par->Param.Info.PgmName, GCG_PREFIX_REF,
+                    vldh_IdToStr(1, node->ln.oid), bodydef[i].Par->Param.Info.PgmName);
     }
     i++;
   }
@@ -11295,33 +11762,32 @@ int gcg_comp_m45(gcg_ctx gcgctx, vldh_t_node node)
     return sts;
 
   /* Print the execute command */
-  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE],
-      "%s_exec( %c%s, sizeof(pwr_sClass_%s));\n", name, GCG_PREFIX_REF,
-      vldh_IdToStr(0, node->ln.oid), refstructname);
+  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( %c%s, sizeof(pwr_sClass_%s));\n", name,
+                GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid), refstructname);
 
   return GSX__SUCCESS;
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m46()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for NMpsCell.
-*	Syntax control:
-*	Check if a subwindow exists.
-*
-*	Generating code:
-*	Identical to method 4 with the following addition:
-*	Prints an special exec call including a exec call for the subwindow.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m46()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for NMpsCell.
+ *	Syntax control:
+ *	Check if a subwindow exists.
+ *
+ *	Generating code:
+ *	Identical to method 4 with the following addition:
+ *	Prints an special exec call including a exec call for the subwindow.
+ *
+ **************************************************************************/
 
 int gcg_comp_m46(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -11339,15 +11805,16 @@ int gcg_comp_m46(gcg_ctx gcgctx, vldh_t_node node)
   ldhses = (node->hn.wind)->hw.ldhses;
 
   /* Check size */
-  sts = ldh_GetObjectPar(
-      ldhses, node->ln.oid, "RtBody", "MaxSize", (char**)&maxsize_ptr, &size);
+  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "RtBody", "MaxSize", (char**)&maxsize_ptr, &size);
   if (EVEN(sts))
     return sts;
 
-  switch (node->ln.cid) {
+  switch (node->ln.cid)
+  {
   case pwr_cClass_NMpsCell60:
   case pwr_cClass_NMpsStoreCell60:
-    if (*maxsize_ptr > 60) {
+    if (*maxsize_ptr > 60)
+    {
       free((char*)maxsize_ptr);
       gcg_error_msg(gcgctx, GSX__MAXSIZE, node);
       return GSX__NEXTNODE;
@@ -11355,14 +11822,16 @@ int gcg_comp_m46(gcg_ctx gcgctx, vldh_t_node node)
     break;
   case pwr_cClass_NMpsCell120:
   case pwr_cClass_NMpsStoreCell120:
-    if (*maxsize_ptr > 120) {
+    if (*maxsize_ptr > 120)
+    {
       free((char*)maxsize_ptr);
       gcg_error_msg(gcgctx, GSX__MAXSIZE, node);
       return GSX__NEXTNODE;
     }
     break;
   default:
-    if (*maxsize_ptr > 30) {
+    if (*maxsize_ptr > 30)
+    {
       free((char*)maxsize_ptr);
       gcg_error_msg(gcgctx, GSX__MAXSIZE, node);
       return GSX__NEXTNODE;
@@ -11380,33 +11849,34 @@ int gcg_comp_m46(gcg_ctx gcgctx, vldh_t_node node)
     return sts;
 
   /* Print the init command */
-  IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%s_init( %c%s);\n", name,
-      GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid));
+  IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%s_init( %c%s);\n", name, GCG_PREFIX_REF,
+                vldh_IdToStr(0, node->ln.oid));
 
   /* Get the resetobject if there is one */
-  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "RtBody", "ResetObject",
-      (char**)&resobjid_ptr, &size);
+  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "RtBody", "ResetObject", (char**)&resobjid_ptr, &size);
   if (EVEN(sts))
     return sts;
 
   resattrref = cdh_ObjidToAref(*resobjid_ptr);
   free((char*)resobjid_ptr);
 
-  if (cdh_ObjidIsNotNull(resattrref.Objid)) {
+  if (cdh_ObjidIsNotNull(resattrref.Objid))
+  {
     sts = gcg_replace_ref(gcgctx, &resattrref, node);
     if (EVEN(sts))
       return sts;
 
     /* The reset object has to be a di, do or dv */
     sts = ldh_GetAttrRefOrigTid(ldhses, &resattrref, &cid);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       gcg_error_msg(gcgctx, GSX__NORESET, node);
       return GSX__NEXTNODE;
     }
 
     /* Check that the class of the reset object is correct */
-    if (!(cid == pwr_cClass_Di || cid == pwr_cClass_Dv || cid == pwr_cClass_Po
-            || cid == pwr_cClass_Do)) {
+    if (!(cid == pwr_cClass_Di || cid == pwr_cClass_Dv || cid == pwr_cClass_Po || cid == pwr_cClass_Do))
+    {
       gcg_error_msg(gcgctx, GSX__CLASSRESET, node);
       return GSX__NEXTNODE;
     }
@@ -11415,14 +11885,14 @@ int gcg_comp_m46(gcg_ctx gcgctx, vldh_t_node node)
     gcg_ioread_insert(gcgctx, resattrref, GCG_PREFIX_REF);
 
     /* Place the pointer to the resetobject in the cell */
-    IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE],
-        "%c%s->ResetObjectP = &%c%s->ActualValue;\n", GCG_PREFIX_REF,
-        vldh_IdToStr(0, node->ln.oid), GCG_PREFIX_REF,
-        vldh_AttrRefToStr(1, resattrref));
-  } else {
+    IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->ResetObjectP = &%c%s->ActualValue;\n", GCG_PREFIX_REF,
+                  vldh_IdToStr(0, node->ln.oid), GCG_PREFIX_REF, vldh_AttrRefToStr(1, resattrref));
+  }
+  else
+  {
     /* No reset object */
-    IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->ResetObjectP = 0;\n",
-        GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid));
+    IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->ResetObjectP = 0;\n", GCG_PREFIX_REF,
+                  vldh_IdToStr(0, node->ln.oid));
   }
 
   /* Print the function call to execute the subwindow */
@@ -11430,34 +11900,36 @@ int gcg_comp_m46(gcg_ctx gcgctx, vldh_t_node node)
   /* Get the first child to the plc */
   sts = ldh_GetChild(ldhses, node->ln.oid, &windowobjdid);
   found = 0;
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     /* Check if window */
-    sts = ldh_GetObjectBuffer(ldhses, windowobjdid, "DevBody", "PlcWindow",
-        (pwr_eClass*)&windclass, &windbuffer, &size);
+    sts = ldh_GetObjectBuffer(ldhses, windowobjdid, "DevBody", "PlcWindow", (pwr_eClass*)&windclass,
+                              &windbuffer, &size);
     free((char*)windbuffer);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       found = 1;
       break;
     }
     sts = ldh_GetNextSibling(ldhses, windowobjdid, &windowobjdid);
   }
 
-  if (found) {
+  if (found)
+  {
     /* Get name for this class */
     sts = gcg_get_structname(gcgctx, node->ln.oid, &name);
     if (EVEN(sts))
       return sts;
 
     /* Print the execute command */
-    IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%sSubWind_exec( %c%s, ",
-        name, GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid));
+    IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%sSubWind_exec( %c%s, ", name, GCG_PREFIX_REF,
+                  vldh_IdToStr(0, node->ln.oid));
 
     /* Print the window execute command */
-    IF_PR fprintf(gcgctx->files[GCGM1_DECL_FILE],
-        "void %c%s_exec(plc_sThread *tp);", GCG_PREFIX_MOD,
-        vldh_IdToStr(0, windowobjdid));
-    IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%c%s_exec( tp)",
-        GCG_PREFIX_MOD, vldh_IdToStr(0, windowobjdid));
+    IF_PR fprintf(gcgctx->files[GCGM1_DECL_FILE], "void %c%s_exec(plc_sThread *tp);", GCG_PREFIX_MOD,
+                  vldh_IdToStr(0, windowobjdid));
+    IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%c%s_exec( tp)", GCG_PREFIX_MOD,
+                  vldh_IdToStr(0, windowobjdid));
     IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], ");\n");
   }
 
@@ -11465,24 +11937,24 @@ int gcg_comp_m46(gcg_ctx gcgctx, vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m47()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for AtLog, DtLog.
-*	Generated code:
-*	Declares and links a rtdb pointer to the sup object.
-*	Prints an exec call.
-*	Inits the object by putting the supervised object and parameter
-*	into the object.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m47()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for AtLog, DtLog.
+ *	Generated code:
+ *	Declares and links a rtdb pointer to the sup object.
+ *	Prints an exec call.
+ *	Inits the object by putting the supervised object and parameter
+ *	into the object.
+ *
+ **************************************************************************/
 
 int gcg_comp_m47(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -11508,8 +11980,7 @@ int gcg_comp_m47(gcg_ctx gcgctx, vldh_t_node node)
   if (EVEN(sts))
     return sts;
 
-  sts = gcg_print_inputs(
-      gcgctx, node, ", ", GCG_PRINT_ALLPAR, &nocondef, &nocontype);
+  sts = gcg_print_inputs(gcgctx, node, ", ", GCG_PRINT_ALLPAR, &nocondef, &nocontype);
   if (EVEN(sts))
     return sts;
 
@@ -11517,17 +11988,18 @@ int gcg_comp_m47(gcg_ctx gcgctx, vldh_t_node node)
 
   /* Print the supervised object and parameter in the object */
   sts = gcg_get_inputpoint(node, 0, &point, &par_inverted);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     /* Look for an output connected to this point */
-    sts = gcg_get_output(node, point, &output_count, &output_node,
-        &output_point, &output_bodydef,
-        GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
+    sts = gcg_get_output(node, point, &output_count, &output_node, &output_point, &output_bodydef,
+                         GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
     if (EVEN(sts))
       return sts;
 
-    if (output_count > 0) {
-      sts = gcg_get_outputstring(gcgctx, output_node, &output_bodydef,
-          &output_attrref, &output_type, &output_prefix, output_par);
+    if (output_count > 0)
+    {
+      sts = gcg_get_outputstring(gcgctx, output_node, &output_bodydef, &output_attrref, &output_type,
+                                 &output_prefix, output_par);
       if (sts == GSX__NEXTPAR)
         return sts;
       if (EVEN(sts))
@@ -11536,12 +12008,14 @@ int gcg_comp_m47(gcg_ctx gcgctx, vldh_t_node node)
       /* Put the attribut reference in the sup object */
       IF_PR
       {
-        sts = ldh_SetObjectPar(gcgctx->ldhses, node->ln.oid, "RtBody",
-            "Attribute", (char*)&output_attrref, sizeof(output_attrref));
+        sts = ldh_SetObjectPar(gcgctx->ldhses, node->ln.oid, "RtBody", "Attribute", (char*)&output_attrref,
+                               sizeof(output_attrref));
         if (EVEN(sts))
           return sts;
       }
-    } else {
+    }
+    else
+    {
       /* Point not connected, errormessage */
       gcg_error_msg(gcgctx, GSX__NOTCON, node);
     }
@@ -11553,28 +12027,28 @@ int gcg_comp_m47(gcg_ctx gcgctx, vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m48()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for ExecPlcOn and ExecPlcOff.
-*	Syntax control:
-*	Check that the objid of a plcpgm is inserted.
-*
-*	Generating code:
-*	Declares and links a rtdb pointer to the ExecPlc object.
-*	Declares and links a rtdb pointer to the window of the
-*	refereced plcpgm.
-*	Prints an exec call including a pointer to the attribute
-*	ScanOff in the window of the plc.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m48()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for ExecPlcOn and ExecPlcOff.
+ *	Syntax control:
+ *	Check that the objid of a plcpgm is inserted.
+ *
+ *	Generating code:
+ *	Declares and links a rtdb pointer to the ExecPlc object.
+ *	Declares and links a rtdb pointer to the window of the
+ *	refereced plcpgm.
+ *	Prints an exec call including a pointer to the attribute
+ *	ScanOff in the window of the plc.
+ *
+ **************************************************************************/
 
 int gcg_comp_m48(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -11595,8 +12069,7 @@ int gcg_comp_m48(gcg_ctx gcgctx, vldh_t_node node)
   ldhses = (node->hn.wind)->hw.ldhses;
 
   /* Get the plcpgm in attribute plcpgmobject */
-  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", "PlcPgmObject",
-      (char**)&parvalue, &size);
+  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", "PlcPgmObject", (char**)&parvalue, &size);
   if (EVEN(sts))
     return sts;
   plcpgm = *parvalue;
@@ -11604,24 +12077,28 @@ int gcg_comp_m48(gcg_ctx gcgctx, vldh_t_node node)
 
   /* Check that it is a plcpgm and that is has a plcwindow as a child */
   sts = ldh_GetObjectClass(ldhses, plcpgm, &cid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     gcg_error_msg(gcgctx, GSX__REFOBJ, node);
     return GSX__NEXTNODE;
   }
   sts = ldh_GetChild(ldhses, plcpgm, &window);
   found = 0;
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     /* Check if window */
-    sts = ldh_GetObjectBuffer(ldhses, window, "DevBody", "PlcWindow",
-        (pwr_eClass*)&eclass, &windbuffer, &size);
+    sts =
+        ldh_GetObjectBuffer(ldhses, window, "DevBody", "PlcWindow", (pwr_eClass*)&eclass, &windbuffer, &size);
     free((char*)windbuffer);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       found = 1;
       break;
     }
     sts = ldh_GetNextSibling(ldhses, window, &window);
   }
-  if (!found) {
+  if (!found)
+  {
     gcg_error_msg(gcgctx, GSX__REFOBJ, node);
     return GSX__NEXTNODE;
   }
@@ -11635,39 +12112,38 @@ int gcg_comp_m48(gcg_ctx gcgctx, vldh_t_node node)
     return sts;
 
   /* Print the execute command */
-  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( %c%s,", name,
-      GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid));
+  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( %c%s,", name, GCG_PREFIX_REF,
+                vldh_IdToStr(0, node->ln.oid));
 
-  sts = gcg_print_inputs(
-      gcgctx, node, ", ", GCG_PRINT_ALLPAR, &nocondef, &nocontype);
+  sts = gcg_print_inputs(gcgctx, node, ", ", GCG_PRINT_ALLPAR, &nocondef, &nocontype);
   if (EVEN(sts))
     return sts;
 
   /* Print the attribute ScanOff of the window */
-  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], ", %c%s->ScanOff);\n",
-      GCG_PREFIX_REF, vldh_IdToStr(0, window));
+  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], ", %c%s->ScanOff);\n", GCG_PREFIX_REF,
+                vldh_IdToStr(0, window));
 
   return GSX__SUCCESS;
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m49()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for an object where the
-*	the contens of the first parameter of type objid in devbody
-*	will be copied to the forst parameter of type objid in rtbody.
-* 	This is because only devbody parameters kan be shown in the plc-editor.
-*	No exec call will be printed, but direct link will be made.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m49()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for an object where the
+ *	the contens of the first parameter of type objid in devbody
+ *	will be copied to the forst parameter of type objid in rtbody.
+ * 	This is because only devbody parameters kan be shown in the plc-editor.
+ *	No exec call will be printed, but direct link will be made.
+ *
+ **************************************************************************/
 
 int gcg_comp_m49(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -11684,18 +12160,19 @@ int gcg_comp_m49(gcg_ctx gcgctx, vldh_t_node node)
   sts = gcg_ref_insert(gcgctx, node->ln.oid, GCG_PREFIX_REF, node);
 
   /* Check the attributes in the parent order node */
-  sts = ldh_GetObjectBodyDef(
-      ldhses, node->ln.cid, "DevBody", 1, &bodydef, &rows);
+  sts = ldh_GetObjectBodyDef(ldhses, node->ln.cid, "DevBody", 1, &bodydef, &rows);
 
   if (EVEN(sts))
     return sts;
 
   found = 0;
-  for (i = 0; i < rows; i++) {
-    if (bodydef[i].Par->Param.Info.Type == pwr_eType_Objid) {
+  for (i = 0; i < rows; i++)
+  {
+    if (bodydef[i].Par->Param.Info.Type == pwr_eType_Objid)
+    {
       /* Get the parameter value */
-      sts = ldh_GetObjectPar((node->hn.wind)->hw.ldhses, node->ln.oid,
-          "DevBody", bodydef[i].ParName, (char**)&parvalue, &size);
+      sts = ldh_GetObjectPar((node->hn.wind)->hw.ldhses, node->ln.oid, "DevBody", bodydef[i].ParName,
+                             (char**)&parvalue, &size);
       if (EVEN(sts))
         return sts;
       found = 1;
@@ -11703,30 +12180,32 @@ int gcg_comp_m49(gcg_ctx gcgctx, vldh_t_node node)
     }
   }
   free((char*)bodydef);
-  if (!found) {
+  if (!found)
+  {
     free((char*)parvalue);
     return GSX__SUCCESS;
   }
 
   /* Check that objid exists */
   sts = ldh_GetObjectClass(ldhses, *parvalue, &cid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     gcg_error_msg(gcgctx, GSX__REFPAR, node);
     return GSX__NEXTNODE;
   }
 
   /* Store value in RtBody */
-  sts = ldh_GetObjectBodyDef(
-      ldhses, node->ln.cid, "RtBody", 1, &bodydef, &rows);
+  sts = ldh_GetObjectBodyDef(ldhses, node->ln.cid, "RtBody", 1, &bodydef, &rows);
   if (EVEN(sts))
     return sts;
 
   found = 0;
-  for (i = 0; i < rows; i++) {
-    if (bodydef[i].Par->Param.Info.Type == pwr_eType_Objid) {
+  for (i = 0; i < rows; i++)
+  {
+    if (bodydef[i].Par->Param.Info.Type == pwr_eType_Objid)
+    {
       /* Set the parameter value */
-      sts = ldh_SetObjectPar(ldhses, node->ln.oid, "RtBody", bodydef[i].ParName,
-          (char*)parvalue, size);
+      sts = ldh_SetObjectPar(ldhses, node->ln.oid, "RtBody", bodydef[i].ParName, (char*)parvalue, size);
       if (EVEN(sts))
         return sts;
       found = 1;
@@ -11740,36 +12219,36 @@ int gcg_comp_m49(gcg_ctx gcgctx, vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m50()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for an object with an subwindow.
-*	Prints code for declaration and direkt link of a rtdbpointer.
-*	Prints code for initialization of pointers in the object:
-*	'objpointer'->'pgmname'P = &'in';
-*	Z80000811->InP = &Z800005f5->ActualValue;
-*
-*	If a parameter is not connected or not visible the pointer
-*	will point to the own object:
-*
-*	'objpointer'->'pgmname'P = &'objpointer'->'pgmname';
-*	Z80000811->LimP = &Z80000811->Lim;
-*
-*	Prints an exec call :
-*	'structname'_exec( 'objpointer', 'subwindow_exec');
-*	ex: compl_exec( Z80000811, Z80000812_exec);
-*
-*	Prints iniatilization for timer and scantime if the object
-*	contain these functions.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m50()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for an object with an subwindow.
+ *	Prints code for declaration and direkt link of a rtdbpointer.
+ *	Prints code for initialization of pointers in the object:
+ *	'objpointer'->'pgmname'P = &'in';
+ *	Z80000811->InP = &Z800005f5->ActualValue;
+ *
+ *	If a parameter is not connected or not visible the pointer
+ *	will point to the own object:
+ *
+ *	'objpointer'->'pgmname'P = &'objpointer'->'pgmname';
+ *	Z80000811->LimP = &Z80000811->Lim;
+ *
+ *	Prints an exec call :
+ *	'structname'_exec( 'objpointer', 'subwindow_exec');
+ *	ex: compl_exec( Z80000811, Z80000812_exec);
+ *
+ *	Prints iniatilization for timer and scantime if the object
+ *	contain these functions.
+ *
+ **************************************************************************/
 
 int gcg_comp_m50(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -11803,19 +12282,22 @@ int gcg_comp_m50(gcg_ctx gcgctx, vldh_t_node node)
   /* Get the first child to the plc */
   sts = ldh_GetChild(ldhses, node->ln.oid, &windowobjdid);
   wind_found = 0;
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     /* Check if window */
-    sts = ldh_GetObjectBuffer(ldhses, windowobjdid, "DevBody", "PlcWindow",
-        (pwr_eClass*)&windclass, &windbuffer, &size);
+    sts = ldh_GetObjectBuffer(ldhses, windowobjdid, "DevBody", "PlcWindow", (pwr_eClass*)&windclass,
+                              &windbuffer, &size);
     free((char*)windbuffer);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       wind_found = 1;
       break;
     }
     sts = ldh_GetNextSibling(ldhses, windowobjdid, &windowobjdid);
   }
 
-  if (!wind_found) {
+  if (!wind_found)
+  {
     /* The window is not created */
     gcg_error_msg(gcgctx, GSX__NOSUBWINDOW, node);
   }
@@ -11826,47 +12308,49 @@ int gcg_comp_m50(gcg_ctx gcgctx, vldh_t_node node)
     return sts;
 
   /* Print the execute command */
-  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( %c%s,\n", name,
-      GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid));
+  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( %c%s,\n", name, GCG_PREFIX_REF,
+                vldh_IdToStr(0, node->ln.oid));
 
   /* Print the window execute command */
-  if (wind_found) {
-    IF_PR fprintf(gcgctx->files[GCGM1_DECL_FILE],
-        "void %c%s_exec(plc_sThread *tp);", GCG_PREFIX_MOD,
-        vldh_IdToStr(0, windowobjdid));
-    IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%c%s_exec( tp)",
-        GCG_PREFIX_MOD, vldh_IdToStr(0, windowobjdid));
+  if (wind_found)
+  {
+    IF_PR fprintf(gcgctx->files[GCGM1_DECL_FILE], "void %c%s_exec(plc_sThread *tp);", GCG_PREFIX_MOD,
+                  vldh_IdToStr(0, windowobjdid));
+    IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%c%s_exec( tp)", GCG_PREFIX_MOD,
+                  vldh_IdToStr(0, windowobjdid));
   }
   IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], ");\n");
 
   /* Get the runtime parameters for this class */
-  sts = ldh_GetObjectBodyDef(
-      (node->hn.wind)->hw.ldhses, node->ln.cid, "RtBody", 1, &bodydef, &rows);
+  sts = ldh_GetObjectBodyDef((node->hn.wind)->hw.ldhses, node->ln.cid, "RtBody", 1, &bodydef, &rows);
   if (EVEN(sts))
     return sts;
 
   i = 0;
   first_par = 1;
-  while ((i < rows) && (bodydef[i].ParClass == pwr_eClass_Input)) {
+  while ((i < rows) && (bodydef[i].ParClass == pwr_eClass_Input))
+  {
     /* Get the point for this parameter if there is one */
     output_found = 0;
     sts = gcg_get_inputpoint(node, i, &point, &par_inverted);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       /* Look for an output connected to this point */
-      sts = gcg_get_output(node, point, &output_count, &output_node,
-          &output_point, &output_bodydef,
-          GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
+      sts = gcg_get_output(node, point, &output_count, &output_node, &output_point, &output_bodydef,
+                           GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
       if (EVEN(sts))
         return sts;
 
-      if (output_count > 0) {
+      if (output_count > 0)
+      {
         output_found = 1;
         if (output_count > 1)
           gcg_error_msg(gcgctx, GSX__CONOUTPUT, output_node);
 
-        sts = gcg_get_outputstring(gcgctx, output_node, &output_bodydef,
-            &output_attrref, &output_type, &output_prefix, output_par);
-        if (sts == GSX__NEXTPAR) {
+        sts = gcg_get_outputstring(gcgctx, output_node, &output_bodydef, &output_attrref, &output_type,
+                                   &output_prefix, output_par);
+        if (sts == GSX__NEXTPAR)
+        {
           i++;
           continue;
         }
@@ -11876,26 +12360,27 @@ int gcg_comp_m50(gcg_ctx gcgctx, vldh_t_node node)
         if (par_inverted)
           gcg_error_msg(gcgctx, GSX__INV, node);
 
-        IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = &%c%s->%s;\n",
-            GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid),
-            bodydef[i].Par->Param.Info.PgmName, output_prefix,
-            output_type == GCG_OTYPE_OID ? vldh_IdToStr(1, output_attrref.Objid)
-                                         : vldh_AttrRefToStr(0, output_attrref),
-            output_par);
-      } else {
+        IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = &%c%s->%s;\n", GCG_PREFIX_REF,
+                      vldh_IdToStr(0, node->ln.oid), bodydef[i].Par->Param.Info.PgmName, output_prefix,
+                      output_type == GCG_OTYPE_OID ? vldh_IdToStr(1, output_attrref.Objid)
+                                                   : vldh_AttrRefToStr(0, output_attrref),
+                      output_par);
+      }
+      else
+      {
         /* Point visible but not connected, errormessage */
         gcg_error_msg(gcgctx, GSX__NOTCON, node);
       }
       first_par = 0;
     }
-    if (!output_found) {
+    if (!output_found)
+    {
       /* The point is not connected and will point to its
          own object */
 
-      IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = &%c%s->%s;\n",
-          GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid),
-          bodydef[i].Par->Param.Info.PgmName, GCG_PREFIX_REF,
-          vldh_IdToStr(1, node->ln.oid), bodydef[i].Par->Param.Info.PgmName);
+      IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = &%c%s->%s;\n", GCG_PREFIX_REF,
+                    vldh_IdToStr(0, node->ln.oid), bodydef[i].Par->Param.Info.PgmName, GCG_PREFIX_REF,
+                    vldh_IdToStr(1, node->ln.oid), bodydef[i].Par->Param.Info.PgmName);
     }
     i++;
   }
@@ -11907,25 +12392,25 @@ int gcg_comp_m50(gcg_ctx gcgctx, vldh_t_node node)
   return GSX__SUCCESS;
 }
 /*************************************************************************
-*
-* Name:		gcg_comp_m51()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for NMps Collect objects.
-*	Syntax control:
-*
-*	Generating code:
-*	Identical to method 4 with the following addition:
-*	Puts pointer an objid of its own object in the output
-*	to admitt connection to a dataarithm object.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m51()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for NMps Collect objects.
+ *	Syntax control:
+ *
+ *	Generating code:
+ *	Identical to method 4 with the following addition:
+ *	Puts pointer an objid of its own object in the output
+ *	to admitt connection to a dataarithm object.
+ *
+ **************************************************************************/
 
 int gcg_comp_m51(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -11942,44 +12427,41 @@ int gcg_comp_m51(gcg_ctx gcgctx, vldh_t_node node)
   strcpy(cast_str, "(pwr_tVoid *)");
 
   /* Place the pointer to the object in the output */
-  IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->OutDataP.Ptr = %s%c%s;\n",
-      GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid), cast_str, GCG_PREFIX_REF,
-      vldh_IdToStr(1, node->ln.oid));
+  IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->OutDataP.Ptr = %s%c%s;\n", GCG_PREFIX_REF,
+                vldh_IdToStr(0, node->ln.oid), cast_str, GCG_PREFIX_REF, vldh_IdToStr(1, node->ln.oid));
 
   /* Place the objid of the object in the output */
-  IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE],
-      "%c%s->OutDataP.Aref.Objid.oix = %u;\n", GCG_PREFIX_REF,
-      vldh_IdToStr(0, node->ln.oid), node->ln.oid.oix);
-  IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE],
-      "%c%s->OutDataP.Aref.Objid.vid = %u;\n", GCG_PREFIX_REF,
-      vldh_IdToStr(0, node->ln.oid), node->ln.oid.vid);
+  IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->OutDataP.Aref.Objid.oix = %u;\n", GCG_PREFIX_REF,
+                vldh_IdToStr(0, node->ln.oid), node->ln.oid.oix);
+  IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->OutDataP.Aref.Objid.vid = %u;\n", GCG_PREFIX_REF,
+                vldh_IdToStr(0, node->ln.oid), node->ln.oid.vid);
 
   return GSX__SUCCESS;
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m52()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for GETDAP
-*	Prints code for declaration and direkt link of a rtdbpointer.
-*	Prints an exec call :
-*	'structname'_exec( 'objpointer');
-*	ex: getpi_exec( Z80000811);
-*
-*	Checks that the referenced object exists and that the referenced
-*	parameter exists in that objekt, and that the type of the parameter
-*	is correct.
-*	Prints declaration and direct link of pointer to referenced object.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m52()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for GETDAP
+ *	Prints code for declaration and direkt link of a rtdbpointer.
+ *	Prints an exec call :
+ *	'structname'_exec( 'objpointer');
+ *	ex: getpi_exec( Z80000811);
+ *
+ *	Checks that the referenced object exists and that the referenced
+ *	parameter exists in that objekt, and that the type of the parameter
+ *	is correct.
+ *	Prints declaration and direct link of pointer to referenced object.
+ *
+ **************************************************************************/
 
 int gcg_comp_m52(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -11989,19 +12471,19 @@ int gcg_comp_m52(gcg_ctx gcgctx, vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m53()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for Func and FuncExtend
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m53()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for Func and FuncExtend
+ *
+ **************************************************************************/
 
 int gcg_comp_m53(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -12032,34 +12514,40 @@ int gcg_comp_m53(gcg_ctx gcgctx, vldh_t_node node)
 
   ldhses = (node->hn.wind)->hw.ldhses;
 
-  if (node->ln.cid == pwr_cClass_FuncExtend) {
+  if (node->ln.cid == pwr_cClass_FuncExtend)
+  {
     /* Check that the Func object exist */
-    sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", "FuncObject",
-        (char**)&function_objid, &size);
+    sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", "FuncObject", (char**)&function_objid, &size);
     if (EVEN(sts))
       return sts;
 
     sts = ldh_GetObjectClass(ldhses, *function_objid, &cid);
     free((char*)function_objid);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       /* Function not found */
       gcg_error_msg(gcgctx, GSX__REFOBJ, node);
       return GSX__NEXTNODE;
     }
-    if (cid != pwr_cClass_Func) {
+    if (cid != pwr_cClass_Func)
+    {
       /* Class of referenced object is not correct */
       gcg_error_msg(gcgctx, GSX__REFCLASS, node);
       return GSX__NEXTNODE;
     }
-  } else if (node->ln.cid == pwr_cClass_Func) {
+  }
+  else if (node->ln.cid == pwr_cClass_Func)
+  {
     /* Check first if there is a subwindow */
     sts = ldh_GetChild(ldhses, node->ln.oid, &window_objid);
     found = 0;
-    while (ODD(sts)) {
+    while (ODD(sts))
+    {
       /* Check if window */
-      sts = ldh_GetObjectBuffer(ldhses, window_objid, "DevBody", "PlcWindow",
-          (pwr_eClass*)&windclass, (char**)&windbuffer, &size);
-      if (ODD(sts)) {
+      sts = ldh_GetObjectBuffer(ldhses, window_objid, "DevBody", "PlcWindow", (pwr_eClass*)&windclass,
+                                (char**)&windbuffer, &size);
+      if (ODD(sts))
+      {
         free((char*)windbuffer);
         found = 1;
         break;
@@ -12067,7 +12555,8 @@ int gcg_comp_m53(gcg_ctx gcgctx, vldh_t_node node)
       sts = ldh_GetNextSibling(ldhses, window_objid, &window_objid);
     }
 
-    if (found) {
+    if (found)
+    {
       /* Delete the window */
       sts = ldh_DeleteObjectTree(ldhses, window_objid, 0);
       if (EVEN(sts))
@@ -12075,21 +12564,22 @@ int gcg_comp_m53(gcg_ctx gcgctx, vldh_t_node node)
     }
 
     /* Copy a new subwindow from the content of "Function" */
-    sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", "Function",
-        (char**)&function_objid, &size);
+    sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", "Function", (char**)&function_objid, &size);
     if (EVEN(sts))
       return sts;
 
     /* Check existence and class of Function object */
     sts = ldh_GetObjectClass(ldhses, *function_objid, &cid);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       /* Function not found */
       free((char*)function_objid);
       gcg_error_msg(gcgctx, GSX__REFOBJ, node);
       return GSX__NEXTNODE;
     }
 
-    if (cid != pwr_cClass_plc) {
+    if (cid != pwr_cClass_plc)
+    {
       /* Class of referenced object is not correct */
       free((char*)function_objid);
       gcg_error_msg(gcgctx, GSX__REFCLASS, node);
@@ -12097,7 +12587,8 @@ int gcg_comp_m53(gcg_ctx gcgctx, vldh_t_node node)
     }
     /* Check that a window is created to this plcpgm */
     sts = ldh_GetChild(ldhses, *function_objid, &window_objid);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       /* Window not found */
       free((char*)function_objid);
       gcg_error_msg(gcgctx, GSX__REFOBJ, node);
@@ -12108,9 +12599,9 @@ int gcg_comp_m53(gcg_ctx gcgctx, vldh_t_node node)
     attrref[1].Objid = pwr_cNObjid;
     free((char*)function_objid);
 
-    sts = ldh_CopyObjectTrees(
-        ldhses, attrref, node->ln.oid, ldh_eDest_IntoFirst, 0, 0, 0, 0);
-    if (EVEN(sts)) {
+    sts = ldh_CopyObjectTrees(ldhses, attrref, node->ln.oid, ldh_eDest_IntoFirst, 0, 0, 0, 0);
+    if (EVEN(sts))
+    {
       /* Function not found */
       gcg_error_msg(gcgctx, GSX__REFOBJ, node);
       return GSX__NEXTNODE;
@@ -12124,8 +12615,7 @@ int gcg_comp_m53(gcg_ctx gcgctx, vldh_t_node node)
     if (EVEN(sts))
       return sts;
 
-    sts = ldh_MoveObject(
-        ldhses, window_objid, node->ln.oid, ldh_eDest_IntoFirst);
+    sts = ldh_MoveObject(ldhses, window_objid, node->ln.oid, ldh_eDest_IntoFirst);
     if (EVEN(sts))
       return sts;
 
@@ -12135,27 +12625,24 @@ int gcg_comp_m53(gcg_ctx gcgctx, vldh_t_node node)
 
     node->ln.subwindow = 1;
     node->ln.subwind_oid[0] = window_objid;
-    sts = ldh_SetObjectBuffer(
-        ldhses, node->ln.oid, "DevBody", "PlcNode", (char*)&node->ln);
+    sts = ldh_SetObjectBuffer(ldhses, node->ln.oid, "DevBody", "PlcNode", (char*)&node->ln);
     if (EVEN(sts))
       return sts;
 
-    sts = ldh_GetObjectBuffer(ldhses, window_objid, "DevBody", "PlcWindow",
-        (pwr_eClass*)&windclass, (char**)&windbuffer, &size);
+    sts = ldh_GetObjectBuffer(ldhses, window_objid, "DevBody", "PlcWindow", (pwr_eClass*)&windclass,
+                              (char**)&windbuffer, &size);
     if (EVEN(sts))
       return sts;
 
     windbuffer->poid = node->ln.oid;
-    sts = ldh_SetObjectBuffer(
-        ldhses, window_objid, "DevBody", "PlcWindow", (char*)windbuffer);
+    sts = ldh_SetObjectBuffer(ldhses, window_objid, "DevBody", "PlcWindow", (char*)windbuffer);
     if (EVEN(sts))
       return sts;
     free((char*)windbuffer);
 
     /* Compile the subwindow... */
     ldhwb = ldh_SessionToWB(ldhses);
-    sts = gcg_wind_comp_all(
-        ldhwb, ldhses, window_objid, gcgctx->print, 0, gcg_debug, 0);
+    sts = gcg_wind_comp_all(ldhwb, ldhses, window_objid, gcgctx->print, 0, gcg_debug, 0);
     node->hn.subwindowobject[0] = 0;
   }
 
@@ -12168,47 +12655,49 @@ int gcg_comp_m53(gcg_ctx gcgctx, vldh_t_node node)
     return sts;
 
   /* Print the execute command */
-  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( %c%s", name,
-      GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid));
+  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( %c%s", name, GCG_PREFIX_REF,
+                vldh_IdToStr(0, node->ln.oid));
 
-  if (node->ln.cid == pwr_cClass_Func) {
+  if (node->ln.cid == pwr_cClass_Func)
+  {
     /* Print the window execute command */
-    IF_PR fprintf(gcgctx->files[GCGM1_DECL_FILE],
-        "void %c%s_exec(plc_sThread *tp);", GCG_PREFIX_MOD,
-        vldh_IdToStr(0, window_objid));
-    IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], ", %c%s_exec( tp)",
-        GCG_PREFIX_MOD, vldh_IdToStr(0, window_objid));
+    IF_PR fprintf(gcgctx->files[GCGM1_DECL_FILE], "void %c%s_exec(plc_sThread *tp);", GCG_PREFIX_MOD,
+                  vldh_IdToStr(0, window_objid));
+    IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], ", %c%s_exec( tp)", GCG_PREFIX_MOD,
+                  vldh_IdToStr(0, window_objid));
   }
   IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], ");\n");
 
   /* Get the runtime parameters for this class */
-  sts = ldh_GetObjectBodyDef(
-      (node->hn.wind)->hw.ldhses, node->ln.cid, "RtBody", 1, &bodydef, &rows);
+  sts = ldh_GetObjectBodyDef((node->hn.wind)->hw.ldhses, node->ln.cid, "RtBody", 1, &bodydef, &rows);
   if (EVEN(sts))
     return sts;
 
   i = 0;
   first_par = 1;
-  while ((i < rows) && (bodydef[i].ParClass == pwr_eClass_Input)) {
+  while ((i < rows) && (bodydef[i].ParClass == pwr_eClass_Input))
+  {
     /* Get the point for this parameter if there is one */
     output_found = 0;
     sts = gcg_get_inputpoint(node, i, &point, &par_inverted);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       /* Look for an output connected to this point */
-      sts = gcg_get_output(node, point, &output_count, &output_node,
-          &output_point, &output_bodydef,
-          GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
+      sts = gcg_get_output(node, point, &output_count, &output_node, &output_point, &output_bodydef,
+                           GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
       if (EVEN(sts))
         return sts;
 
-      if (output_count > 0) {
+      if (output_count > 0)
+      {
         output_found = 1;
         if (output_count > 1)
           gcg_error_msg(gcgctx, GSX__CONOUTPUT, output_node);
 
-        sts = gcg_get_outputstring(gcgctx, output_node, &output_bodydef,
-            &output_attrref, &output_type, &output_prefix, output_par);
-        if (sts == GSX__NEXTPAR) {
+        sts = gcg_get_outputstring(gcgctx, output_node, &output_bodydef, &output_attrref, &output_type,
+                                   &output_prefix, output_par);
+        if (sts == GSX__NEXTPAR)
+        {
           i++;
           continue;
         }
@@ -12218,24 +12707,25 @@ int gcg_comp_m53(gcg_ctx gcgctx, vldh_t_node node)
         if (par_inverted)
           gcg_error_msg(gcgctx, GSX__INV, node);
 
-        IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = &%c%s->%s;\n",
-            GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid),
-            bodydef[i].Par->Param.Info.PgmName, output_prefix,
-            output_type == GCG_OTYPE_OID ? vldh_IdToStr(1, output_attrref.Objid)
-                                         : vldh_AttrRefToStr(0, output_attrref),
-            output_par);
-      } else {
+        IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = &%c%s->%s;\n", GCG_PREFIX_REF,
+                      vldh_IdToStr(0, node->ln.oid), bodydef[i].Par->Param.Info.PgmName, output_prefix,
+                      output_type == GCG_OTYPE_OID ? vldh_IdToStr(1, output_attrref.Objid)
+                                                   : vldh_AttrRefToStr(0, output_attrref),
+                      output_par);
+      }
+      else
+      {
         /* Point visible but not connected, errormessage */
         gcg_error_msg(gcgctx, GSX__NOTCON, node);
       }
       first_par = 0;
     }
-    if (!output_found) {
+    if (!output_found)
+    {
       /* The point is not connected and the pointer will be zero */
 
-      IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = 0;\n",
-          GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid),
-          bodydef[i].Par->Param.Info.PgmName);
+      IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = 0;\n", GCG_PREFIX_REF,
+                    vldh_IdToStr(0, node->ln.oid), bodydef[i].Par->Param.Info.PgmName);
     }
     i++;
   }
@@ -12245,22 +12735,22 @@ int gcg_comp_m53(gcg_ctx gcgctx, vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m54()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for FuncInput and FuncOutput.
-*	Checks that the parent object of the window is a Func object.
-*	Generated code:
-*	Declares and links a rtdb pointer to the parent object.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m54()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for FuncInput and FuncOutput.
+ *	Checks that the parent object of the window is a Func object.
+ *	Generated code:
+ *	Declares and links a rtdb pointer to the parent object.
+ *
+ **************************************************************************/
 
 int gcg_comp_m54(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -12294,7 +12784,8 @@ int gcg_comp_m54(gcg_ctx gcgctx, vldh_t_node node)
     a trans or a order object */
   refobjdid = (node->hn.wind)->lw.poid;
 
-  if (cdh_ObjidIsNull(refobjdid)) {
+  if (cdh_ObjidIsNull(refobjdid))
+  {
     /* Parent is a plcprogram */
     gcg_error_msg(gcgctx, GSX__BADWIND, node);
     return GSX__NEXTNODE;
@@ -12302,23 +12793,25 @@ int gcg_comp_m54(gcg_ctx gcgctx, vldh_t_node node)
 
   /* Check class of this objdid */
   sts = ldh_GetObjectClass(ldhses, refobjdid, &cid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     gcg_error_msg(gcgctx, GSX__REFOBJ, node);
     return GSX__NEXTNODE;
   }
 
-  if (!(cid == pwr_cClass_Func)) {
+  if (!(cid == pwr_cClass_Func))
+  {
     gcg_error_msg(gcgctx, GSX__BADWIND, node);
     return GSX__NEXTNODE;
   }
 
   /* Get the Index */
-  sts = ldh_GetObjectPar(
-      ldhses, node->ln.oid, "DevBody", "Index", (char**)&index_ptr, &size);
+  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", "Index", (char**)&index_ptr, &size);
   if (EVEN(sts))
     return sts;
 
-  if (*index_ptr != 0) {
+  if (*index_ptr != 0)
+  {
     /* The FuncInput/FuncOutput will work with a FuncExtend object,
        find this object */
     sts = ldh_GetParent(ldhses, refobjdid, &parent);
@@ -12327,26 +12820,29 @@ int gcg_comp_m54(gcg_ctx gcgctx, vldh_t_node node)
 
     sts = ldh_GetChild(ldhses, parent, &funcextend_objid);
     found = 0;
-    while (ODD(sts)) {
+    while (ODD(sts))
+    {
       /* Check if FuncExtend object with correct FuncObject and Index */
       sts = ldh_GetObjectClass(ldhses, funcextend_objid, &cid);
       if (EVEN(sts))
         return sts;
 
-      if (cid == pwr_cClass_FuncExtend) {
-        sts = ldh_GetObjectPar(ldhses, funcextend_objid, "DevBody",
-            "FuncObject", (char**)&func_objid, &size);
+      if (cid == pwr_cClass_FuncExtend)
+      {
+        sts = ldh_GetObjectPar(ldhses, funcextend_objid, "DevBody", "FuncObject", (char**)&func_objid, &size);
         if (EVEN(sts))
           return sts;
 
-        if (cdh_ObjidIsEqual(*func_objid, refobjdid)) {
+        if (cdh_ObjidIsEqual(*func_objid, refobjdid))
+        {
           /* Get the Index */
-          sts = ldh_GetObjectPar(ldhses, funcextend_objid, "DevBody", "Index",
-              (char**)&funcextend_index_ptr, &size);
+          sts = ldh_GetObjectPar(ldhses, funcextend_objid, "DevBody", "Index", (char**)&funcextend_index_ptr,
+                                 &size);
           if (EVEN(sts))
             return sts;
 
-          if (*index_ptr == *funcextend_index_ptr) {
+          if (*index_ptr == *funcextend_index_ptr)
+          {
             /* This is the one */
             found = 1;
             free((char*)funcextend_index_ptr);
@@ -12359,7 +12855,8 @@ int gcg_comp_m54(gcg_ctx gcgctx, vldh_t_node node)
       }
       sts = ldh_GetNextSibling(ldhses, funcextend_objid, &funcextend_objid);
     }
-    if (!found) {
+    if (!found)
+    {
       gcg_error_msg(gcgctx, GSX__REFOBJ, node);
       free((char*)index_ptr);
       return GSX__NEXTNODE;
@@ -12381,37 +12878,38 @@ int gcg_comp_m54(gcg_ctx gcgctx, vldh_t_node node)
     return sts;
 
   /* Print the parent object */
-  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%c%s);\n", GCG_PREFIX_REF,
-      vldh_IdToStr(0, refobjdid));
+  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%c%s);\n", GCG_PREFIX_REF, vldh_IdToStr(0, refobjdid));
 
   /* Get the runtime parameters for this class */
-  sts = ldh_GetObjectBodyDef(
-      (node->hn.wind)->hw.ldhses, node->ln.cid, "RtBody", 1, &bodydef, &rows);
+  sts = ldh_GetObjectBodyDef((node->hn.wind)->hw.ldhses, node->ln.cid, "RtBody", 1, &bodydef, &rows);
   if (EVEN(sts))
     return sts;
 
   i = 0;
   first_par = 1;
-  while ((i < rows) && (bodydef[i].ParClass == pwr_eClass_Input)) {
+  while ((i < rows) && (bodydef[i].ParClass == pwr_eClass_Input))
+  {
     /* Get the point for this parameter if there is one */
     output_found = 0;
     sts = gcg_get_inputpoint(node, i, &point, &par_inverted);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       /* Look for an output connected to this point */
-      sts = gcg_get_output(node, point, &output_count, &output_node,
-          &output_point, &output_bodydef,
-          GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
+      sts = gcg_get_output(node, point, &output_count, &output_node, &output_point, &output_bodydef,
+                           GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
       if (EVEN(sts))
         return sts;
 
-      if (output_count > 0) {
+      if (output_count > 0)
+      {
         output_found = 1;
         if (output_count > 1)
           gcg_error_msg(gcgctx, GSX__CONOUTPUT, output_node);
 
-        sts = gcg_get_outputstring(gcgctx, output_node, &output_bodydef,
-            &output_attrref, &output_type, &output_prefix, output_par);
-        if (sts == GSX__NEXTPAR) {
+        sts = gcg_get_outputstring(gcgctx, output_node, &output_bodydef, &output_attrref, &output_type,
+                                   &output_prefix, output_par);
+        if (sts == GSX__NEXTPAR)
+        {
           i++;
           continue;
         }
@@ -12421,26 +12919,27 @@ int gcg_comp_m54(gcg_ctx gcgctx, vldh_t_node node)
         if (par_inverted)
           gcg_error_msg(gcgctx, GSX__INV, node);
 
-        IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = &%c%s->%s;\n",
-            GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid),
-            bodydef[i].Par->Param.Info.PgmName, output_prefix,
-            output_type == GCG_OTYPE_OID ? vldh_IdToStr(1, output_attrref.Objid)
-                                         : vldh_AttrRefToStr(0, output_attrref),
-            output_par);
-      } else {
+        IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = &%c%s->%s;\n", GCG_PREFIX_REF,
+                      vldh_IdToStr(0, node->ln.oid), bodydef[i].Par->Param.Info.PgmName, output_prefix,
+                      output_type == GCG_OTYPE_OID ? vldh_IdToStr(1, output_attrref.Objid)
+                                                   : vldh_AttrRefToStr(0, output_attrref),
+                      output_par);
+      }
+      else
+      {
         /* Point visible but not connected, errormessage */
         gcg_error_msg(gcgctx, GSX__NOTCON, node);
       }
       first_par = 0;
     }
-    if (!output_found) {
+    if (!output_found)
+    {
       /* The point is not connected and will point to its
          own object */
 
-      IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = &%c%s->%s;\n",
-          GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid),
-          bodydef[i].Par->Param.Info.PgmName, GCG_PREFIX_REF,
-          vldh_IdToStr(1, node->ln.oid), bodydef[i].Par->Param.Info.PgmName);
+      IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = &%c%s->%s;\n", GCG_PREFIX_REF,
+                    vldh_IdToStr(0, node->ln.oid), bodydef[i].Par->Param.Info.PgmName, GCG_PREFIX_REF,
+                    vldh_IdToStr(1, node->ln.oid), bodydef[i].Par->Param.Info.PgmName);
     }
     i++;
   }
@@ -12450,25 +12949,25 @@ int gcg_comp_m54(gcg_ctx gcgctx, vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m55()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for macro node with no inputs.
-*	Prints code for declaration and direkt link of rtdbpointer for
-*	the actual object.
-*	Prints an exec call :
-*
-*	'structname'_exec( 'objectpointer');
-*	ex: ScanTime_exec( Z800008f1);
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m55()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for macro node with no inputs.
+ *	Prints code for declaration and direkt link of rtdbpointer for
+ *	the actual object.
+ *	Prints an exec call :
+ *
+ *	'structname'_exec( 'objectpointer');
+ *	ex: ScanTime_exec( Z800008f1);
+ *
+ **************************************************************************/
 
 int gcg_comp_m55(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -12483,14 +12982,15 @@ int gcg_comp_m55(gcg_ctx gcgctx, vldh_t_node node)
     return sts;
 
   /* Print the execute command */
-  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( %c%s);\n", name,
-      GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid));
+  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( %c%s);\n", name, GCG_PREFIX_REF,
+                vldh_IdToStr(0, node->ln.oid));
 
   gcg_scantime_print(gcgctx, node->ln.oid);
   gcg_timer_print(gcgctx, node->ln.oid);
 
   /* Print init call */
-  switch (node->ln.cid) {
+  switch (node->ln.cid)
+  {
   case pwr_cClass_CurrentTime:
     IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%s_init( tp);\n", name);
   default:;
@@ -12499,19 +12999,19 @@ int gcg_comp_m55(gcg_ctx gcgctx, vldh_t_node node)
   return GSX__SUCCESS;
 }
 /*************************************************************************
-*
-* Name:		gcg_comp_m56()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for an generic object that is not exchanged.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m56()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for an generic object that is not exchanged.
+ *
+ **************************************************************************/
 
 int gcg_comp_m56(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -12520,35 +13020,35 @@ int gcg_comp_m56(gcg_ctx gcgctx, vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m57()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for StoDattr, SetDattr, ResDattr, StoAattr,
-*	StoIattr.
-*	If the object is connected to an order it will be called
-*	from the order method.
-*
-*	Syntax control:
-*	Checks that the referenced attribute is correct.
-*
-*	Code generation:
-*	Declares and links a pointer to the host object.
-*	Prints an exec call.
-*	StoDattr_exec( W800005f6->SomeAttribute, Z800005f5->ActualValue);
-*
-*	If the input is not connected the value of the inputparameter
-*	will be printed instead of a input object for sto object. For set
-*	and reset object TRUE will printed.
-*	StoAattr_exec( W800005f6->SomeAttribute, 3.2500);
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m57()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for StoDattr, SetDattr, ResDattr, StoAattr,
+ *	StoIattr.
+ *	If the object is connected to an order it will be called
+ *	from the order method.
+ *
+ *	Syntax control:
+ *	Checks that the referenced attribute is correct.
+ *
+ *	Code generation:
+ *	Declares and links a pointer to the host object.
+ *	Prints an exec call.
+ *	StoDattr_exec( W800005f6->SomeAttribute, Z800005f5->ActualValue);
+ *
+ *	If the input is not connected the value of the inputparameter
+ *	will be printed instead of a input object for sto object. For set
+ *	and reset object TRUE will printed.
+ *	StoAattr_exec( W800005f6->SomeAttribute, 3.2500);
+ *
+ **************************************************************************/
 
 int gcg_comp_m57(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -12577,13 +13077,15 @@ int gcg_comp_m57(gcg_ctx gcgctx, vldh_t_node node)
 
   ldhses = (node->hn.wind)->hw.ldhses;
 
-  if (!gcgctx->order_comp) {
-    if (node->ln.cid == pwr_cClass_StoDattr) {
+  if (!gcgctx->order_comp)
+  {
+    if (node->ln.cid == pwr_cClass_StoDattr)
+    {
       /* Check first if the object is connected to an order object,
         if it is, it will be compiled when by the ordermethod, when
         gcgctx->order_comp is true */
-      sts = gcg_get_output(node, 0, &output_count, &output_node, &output_point,
-          &output_bodydef, GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
+      sts = gcg_get_output(node, 0, &output_count, &output_node, &output_point, &output_bodydef,
+                           GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
       if (EVEN(sts))
         return sts;
       if (output_count == 1)
@@ -12596,13 +13098,11 @@ int gcg_comp_m57(gcg_ctx gcgctx, vldh_t_node node)
     first parameter in devbody */
 
   /* Get the devbody parameters for this class */
-  sts = ldh_GetObjectBodyDef(
-      ldhses, node->ln.cid, "DevBody", 1, &bodydef, &rows);
+  sts = ldh_GetObjectBodyDef(ldhses, node->ln.cid, "DevBody", 1, &bodydef, &rows);
   if (EVEN(sts))
     return sts;
 
-  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", bodydef[0].ParName,
-      (char**)&refattr_ptr, &size);
+  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", bodydef[0].ParName, (char**)&refattr_ptr, &size);
   if (EVEN(sts))
     return sts;
   strncpy(refattr, refattr_ptr, sizeof(refattr));
@@ -12611,15 +13111,15 @@ int gcg_comp_m57(gcg_ctx gcgctx, vldh_t_node node)
 
   /* If the object is not connected the value in the
      parameter should be written in the macro call */
-  sts = ldh_GetObjectPar(
-      ldhses, node->ln.oid, "RtBody", "In", &nocondef_ptr, &size);
+  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "RtBody", "In", &nocondef_ptr, &size);
   if (EVEN(sts))
     return sts;
 
   /* Get the parent node to this window */
   host_objid = (node->hn.wind)->lw.poid;
 
-  if (cdh_ObjidIsNull(host_objid)) {
+  if (cdh_ObjidIsNull(host_objid))
+  {
     /* Parent is a plcprogram */
     gcg_error_msg(gcgctx, GSX__BADWIND, node);
     return GSX__NEXTNODE;
@@ -12627,54 +13127,61 @@ int gcg_comp_m57(gcg_ctx gcgctx, vldh_t_node node)
 
   /* Check class of this objdid */
   sts = ldh_GetObjectClass(ldhses, host_objid, &cid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     gcg_error_msg(gcgctx, GSX__REFOBJ, node);
     return GSX__NEXTNODE;
   }
 
-  if (cid == pwr_cClass_order || cid == pwr_cClass_csub
-      || cid == pwr_cClass_substep) {
+  if (cid == pwr_cClass_order || cid == pwr_cClass_csub || cid == pwr_cClass_substep)
+  {
     gcg_error_msg(gcgctx, GSX__BADWIND, node);
     return GSX__NEXTNODE;
   }
 
   /* Check that the attribute exist in this class */
   sts = ldh_GetObjectClass(ldhses, host_objid, &cid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     gcg_error_msg(gcgctx, GSX__REFOBJ, node);
     return GSX__NEXTNODE;
   }
 
   /* Check that the parameter exists in the referenced object */
   sts = ldh_GetObjectBodyDef(ldhses, cid, "RtBody", 1, &bodydef, &rows);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     gcg_error_msg(gcgctx, GSX__REFCLASS, node);
     return GSX__NEXTNODE;
   }
 
-  for (i = 0, found = 0; i < rows; i++) {
+  for (i = 0, found = 0; i < rows; i++)
+  {
     /* ML 961009. Use ParName instead of PgmName */
-    if (streq(bodydef[i].ParName, refattr)) {
+    if (streq(bodydef[i].ParName, refattr))
+    {
       found = 1;
       break;
     }
   }
-  if (!found) {
+  if (!found)
+  {
     gcg_error_msg(gcgctx, GSX__REFPAR, node);
     free((char*)bodydef);
     return GSX__NEXTNODE;
   }
 
   /* Check type of parameter */
-  switch (bodydef[i].ParClass) {
+  switch (bodydef[i].ParClass)
+  {
   case pwr_eClass_Input:
     info_type = bodydef[i].Par->Input.Info.Type;
     if (bodydef[i].Par->Input.Info.Flags & PWR_MASK_ARRAY)
-      info_size = bodydef[i].Par->Input.Info.Size
-          / bodydef[i].Par->Input.Info.Elements;
+      info_size = bodydef[i].Par->Input.Info.Size / bodydef[i].Par->Input.Info.Elements;
     else
       info_size = bodydef[i].Par->Input.Info.Size;
-    if (bodydef[i].Par->Input.Info.Flags & PWR_MASK_RTVIRTUAL) {
+    if (bodydef[i].Par->Input.Info.Flags & PWR_MASK_RTVIRTUAL)
+    {
       /* Parameter is not defined in runtime */
       gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
       free((char*)bodydef);
@@ -12684,24 +13191,21 @@ int gcg_comp_m57(gcg_ctx gcgctx, vldh_t_node node)
   case pwr_eClass_Output:
     info_type = bodydef[i].Par->Output.Info.Type;
     if (bodydef[i].Par->Output.Info.Flags & PWR_MASK_ARRAY)
-      info_size = bodydef[i].Par->Output.Info.Size
-          / bodydef[i].Par->Output.Info.Elements;
+      info_size = bodydef[i].Par->Output.Info.Size / bodydef[i].Par->Output.Info.Elements;
     else
       info_size = bodydef[i].Par->Output.Info.Size;
     break;
   case pwr_eClass_Intern:
     info_type = bodydef[i].Par->Intern.Info.Type;
     if (bodydef[i].Par->Intern.Info.Flags & PWR_MASK_ARRAY)
-      info_size = bodydef[i].Par->Intern.Info.Size
-          / bodydef[i].Par->Intern.Info.Elements;
+      info_size = bodydef[i].Par->Intern.Info.Size / bodydef[i].Par->Intern.Info.Elements;
     else
       info_size = bodydef[i].Par->Intern.Info.Size;
     break;
   case pwr_eClass_Param:
     info_type = bodydef[i].Par->Param.Info.Type;
     if (bodydef[i].Par->Param.Info.Flags & PWR_MASK_ARRAY)
-      info_size = bodydef[i].Par->Param.Info.Size
-          / bodydef[i].Par->Param.Info.Elements;
+      info_size = bodydef[i].Par->Param.Info.Size / bodydef[i].Par->Param.Info.Elements;
     else
       info_size = bodydef[i].Par->Param.Info.Size;
     break;
@@ -12714,45 +13218,53 @@ int gcg_comp_m57(gcg_ctx gcgctx, vldh_t_node node)
   free((char*)bodydef);
 
   /* Check that the type of the referenced attribute is correct */
-  if (node->ln.cid == pwr_cClass_SetDattr
-      || node->ln.cid == pwr_cClass_ResDattr) {
-    if (info_type != pwr_eType_Boolean) {
+  if (node->ln.cid == pwr_cClass_SetDattr || node->ln.cid == pwr_cClass_ResDattr)
+  {
+    if (info_type != pwr_eType_Boolean)
+    {
       gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
       return GSX__NEXTNODE;
     }
     nocondef[0].bo = TRUE;
     nocontype[0] = GCG_BOOLEAN;
-  } else if (node->ln.cid == pwr_cClass_StoDattr) {
-    if (info_type != pwr_eType_Boolean) {
+  }
+  else if (node->ln.cid == pwr_cClass_StoDattr)
+  {
+    if (info_type != pwr_eType_Boolean)
+    {
       gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
       return GSX__NEXTNODE;
     }
     nocondef[0].bo = (int)*nocondef_ptr;
     nocontype[0] = GCG_BOOLEAN;
-  } else if (node->ln.cid == pwr_cClass_StoAattr
-      || node->ln.cid == pwr_cClass_CStoAattr) {
-    if (info_type != pwr_eType_Float32) {
+  }
+  else if (node->ln.cid == pwr_cClass_StoAattr || node->ln.cid == pwr_cClass_CStoAattr)
+  {
+    if (info_type != pwr_eType_Float32)
+    {
       gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
       return GSX__NEXTNODE;
     }
     nocondef[0].fl = *(float*)nocondef_ptr;
     nocontype[0] = GCG_FLOAT;
-  } else if (node->ln.cid == pwr_cClass_StoIattr
-      || node->ln.cid == pwr_cClass_CStoIattr) {
-    if (!(info_type == pwr_eType_Int32 || info_type == pwr_eType_UInt32
-            || info_type == pwr_eType_Int16 || info_type == pwr_eType_UInt16
-            || info_type == pwr_eType_Int8 || info_type == pwr_eType_UInt8
-            || info_type == pwr_eType_Enum || info_type == pwr_eType_Mask
-            || info_type == pwr_eType_Status
-            || info_type == pwr_eType_NetStatus)) {
+  }
+  else if (node->ln.cid == pwr_cClass_StoIattr || node->ln.cid == pwr_cClass_CStoIattr)
+  {
+    if (!(info_type == pwr_eType_Int32 || info_type == pwr_eType_UInt32 || info_type == pwr_eType_Int16 ||
+          info_type == pwr_eType_UInt16 || info_type == pwr_eType_Int8 || info_type == pwr_eType_UInt8 ||
+          info_type == pwr_eType_Enum || info_type == pwr_eType_Mask || info_type == pwr_eType_Status ||
+          info_type == pwr_eType_NetStatus))
+    {
       gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
       return GSX__NEXTNODE;
     }
     nocondef[0].bo = *(int*)nocondef_ptr;
     nocontype[0] = GCG_FLOAT;
-  } else if (node->ln.cid == pwr_cClass_StoSattr
-      || node->ln.cid == pwr_cClass_CStoSattr) {
-    if (info_type != pwr_eType_String) {
+  }
+  else if (node->ln.cid == pwr_cClass_StoSattr || node->ln.cid == pwr_cClass_CStoSattr)
+  {
+    if (info_type != pwr_eType_String)
+    {
       gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
       return GSX__NEXTNODE;
     }
@@ -12776,16 +13288,15 @@ int gcg_comp_m57(gcg_ctx gcgctx, vldh_t_node node)
     return sts;
 
   /* Print the execute command */
-  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( %c%s->%s, ", name,
-      GCG_PREFIX_REF, vldh_IdToStr(0, host_objid), pgmname);
+  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( %c%s->%s, ", name, GCG_PREFIX_REF,
+                vldh_IdToStr(0, host_objid), pgmname);
 
-  sts = gcg_print_inputs(
-      gcgctx, node, ", ", GCG_PRINT_ALLPAR, nocondef, nocontype);
+  sts = gcg_print_inputs(gcgctx, node, ", ", GCG_PRINT_ALLPAR, nocondef, nocontype);
   if (EVEN(sts))
     return sts;
 
-  if (node->ln.cid == pwr_cClass_StoSattr
-      || node->ln.cid == pwr_cClass_CStoSattr) {
+  if (node->ln.cid == pwr_cClass_StoSattr || node->ln.cid == pwr_cClass_CStoSattr)
+  {
     // Add size of connected attribute
     IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], ",%ld", info_size);
   }
@@ -12796,19 +13307,19 @@ int gcg_comp_m57(gcg_ctx gcgctx, vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m58()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for an object with template plc code in class.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m58()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for an object with template plc code in class.
+ *
+ **************************************************************************/
 
 int gcg_comp_m58(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -12838,7 +13349,7 @@ int gcg_comp_m58(gcg_ctx gcgctx, vldh_t_node node)
   pwr_tClassId cid;
   pwr_tTime* instance_time = NULL;
   pwr_tTime* template_time;
-  pwr_tUInt32 *template_version;
+  pwr_tUInt32* template_version;
   pwr_tObjid template_plc;
   pwr_tObjid template_window;
   pwr_sAttrRef* connect_aref;
@@ -12851,26 +13362,29 @@ int gcg_comp_m58(gcg_ctx gcgctx, vldh_t_node node)
   ldhses = (node->hn.wind)->hw.ldhses;
 
   /* Check if there is a PlcConnected */
-  sts = ldh_GetObjectPar(gcgctx->ldhses, node->ln.oid, "RtBody", "PlcConnect",
-      (char**)&connect_aref, &size);
-  if (ODD(sts)) {
+  sts = ldh_GetObjectPar(gcgctx->ldhses, node->ln.oid, "RtBody", "PlcConnect", (char**)&connect_aref, &size);
+  if (ODD(sts))
+  {
     pwr_sAttrRef aref = *connect_aref;
     free((char*)connect_aref);
     sts = gcg_replace_ref(gcgctx, &aref, node);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       /* Store the converted aref */
-      sts = ldh_SetObjectPar(gcgctx->ldhses, node->ln.oid, "RtBody",
-          "PlcConnect", (char*)&aref, sizeof(aref));
+      sts =
+          ldh_SetObjectPar(gcgctx->ldhses, node->ln.oid, "RtBody", "PlcConnect", (char*)&aref, sizeof(aref));
     }
 
-    if (cdh_ObjidIsNull(aref.Objid)) {
+    if (cdh_ObjidIsNull(aref.Objid))
+    {
       gcg_error_msg(gcgctx, GSX__NOCONNECT, node);
       return GSX__NEXTNODE;
     }
 
     // Check that object exist
     sts = ldh_GetAttrRefOrigTid(gcgctx->ldhses, &aref, &cid);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       gcg_error_msg(gcgctx, GSX__NOCONNECT, node);
       return GSX__NEXTNODE;
     }
@@ -12878,21 +13392,22 @@ int gcg_comp_m58(gcg_ctx gcgctx, vldh_t_node node)
     gcg_aref_insert(gcgctx, aref, GCG_PREFIX_REF, node);
 
     // Make connection mutual
-    sts = ldh_ObjidToName(ldhses, cdh_ClassIdToObjid(node->ln.cid),
-        ldh_eName_Object, cname, sizeof(cname), &size);
+    sts = ldh_ObjidToName(ldhses, cdh_ClassIdToObjid(node->ln.cid), ldh_eName_Object, cname, sizeof(cname),
+                          &size);
     if (EVEN(sts))
       return sts;
 
     // If connectmethod is 26 connect to SimConnect else PlcConnect
-    sts = ldh_GetClassBody(ldhses, node->ln.cid, "GraphPlcNode",
-        &bodyclass, (char**)&graphbody, &size);
+    sts = ldh_GetClassBody(ldhses, node->ln.cid, "GraphPlcNode", &bodyclass, (char**)&graphbody, &size);
     if (ODD(sts) && graphbody->connectmethod == 26)
       sts = ldh_ArefANameToAref(ldhses, &aref, "SimConnect", &caref);
     else
       sts = ldh_ArefANameToAref(ldhses, &aref, "PlcConnect", &caref);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       sts = ldh_ReadAttribute(ldhses, &caref, &ccaref, sizeof(ccaref));
-      if (ODD(sts) && cdh_ObjidIsNotEqual(ccaref.Objid, node->ln.oid)) {
+      if (ODD(sts) && cdh_ObjidIsNotEqual(ccaref.Objid, node->ln.oid))
+      {
         ccaref = cdh_ObjidToAref(node->ln.oid);
         sts = ldh_WriteAttribute(ldhses, &caref, &ccaref, sizeof(caref));
       }
@@ -12902,40 +13417,44 @@ int gcg_comp_m58(gcg_ctx gcgctx, vldh_t_node node)
   /* Check first if there is a subwindow */
   sts = ldh_GetChild(ldhses, node->ln.oid, &window_objid);
   found = 0;
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     /* Check if window */
     sts = ldh_GetObjectClass(ldhses, window_objid, &cid);
     if (EVEN(sts))
       return sts;
-    if (cid == pwr_cClass_windowplc) {
+    if (cid == pwr_cClass_windowplc)
+    {
       found = 1;
       break;
     }
     sts = ldh_GetNextSibling(ldhses, window_objid, &window_objid);
   }
 
-  if (found) {
+  if (found)
+  {
     // Get modification time
-    sts = ldh_GetObjectPar(ldhses, window_objid, "DevBody", "Modified",
-        (char**)&instance_time, &size);
+    sts = ldh_GetObjectPar(ldhses, window_objid, "DevBody", "Modified", (char**)&instance_time, &size);
     if (EVEN(sts))
       return sts;
   }
 
   // Find the template plc
-  sts = ldh_ObjidToName(ldhses, cdh_ClassIdToObjid(node->ln.cid),
-      ldh_eName_VolPath, oname, sizeof(oname), &size);
+  sts = ldh_ObjidToName(ldhses, cdh_ClassIdToObjid(node->ln.cid), ldh_eName_VolPath, oname, sizeof(oname),
+                        &size);
   if (EVEN(sts))
     return sts;
 
   strcat(oname, "-Code");
   sts = ldh_NameToObjid(ldhses, &template_plc, oname);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     gcg_error_msg(gcgctx, GSX__TEMPLATEPLC, node);
     return GSX__NEXTNODE;
   }
   sts = ldh_GetChild(ldhses, template_plc, &template_window);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     gcg_error_msg(gcgctx, GSX__TEMPLATEPLC, node);
     return GSX__NEXTNODE;
   }
@@ -12943,25 +13462,26 @@ int gcg_comp_m58(gcg_ctx gcgctx, vldh_t_node node)
   sts = ldh_GetObjectClass(ldhses, template_window, &cid);
   if (EVEN(sts))
     return sts;
-  if (cid != pwr_cClass_windowplc) {
+  if (cid != pwr_cClass_windowplc)
+  {
     gcg_error_msg(gcgctx, GSX__TEMPLATEPLC, node);
     return GSX__NEXTNODE;
   }
 
   // Get modification time
-  sts = ldh_GetObjectPar(ldhses, template_window, "DevBody", "Modified",
-      (char**)&template_time, &size);
+  sts = ldh_GetObjectPar(ldhses, template_window, "DevBody", "Modified", (char**)&template_time, &size);
   if (EVEN(sts))
     return sts;
 
-  sts = ldh_GetObjectPar(ldhses, template_window, "RtBody", "Version",
-      (char**)&template_version, &size);
+  sts = ldh_GetObjectPar(ldhses, template_window, "RtBody", "Version", (char**)&template_version, &size);
   if (EVEN(sts))
     return sts;
 
-  if (!found || template_time->tv_sec != instance_time->tv_sec) {
+  if (!found || template_time->tv_sec != instance_time->tv_sec)
+  {
     // Replace the code
-    if (found) {
+    if (found)
+    {
       /* Delete the window */
       sts = ldh_DeleteObjectTree(ldhses, window_objid, 1);
       if (EVEN(sts))
@@ -12974,9 +13494,9 @@ int gcg_comp_m58(gcg_ctx gcgctx, vldh_t_node node)
     attrref[0].Objid = template_plc;
     attrref[1].Objid = pwr_cNObjid;
 
-    sts = ldh_CopyObjectTrees(
-        ldhses, attrref, node->ln.oid, ldh_eDest_IntoFirst, 0, 0, 1, found);
-    if (EVEN(sts)) {
+    sts = ldh_CopyObjectTrees(ldhses, attrref, node->ln.oid, ldh_eDest_IntoFirst, 0, 0, 1, found);
+    if (EVEN(sts))
+    {
       /* Function not found */
       gcg_error_msg(gcgctx, GSX__REFOBJ, node);
       return GSX__NEXTNODE;
@@ -12991,8 +13511,7 @@ int gcg_comp_m58(gcg_ctx gcgctx, vldh_t_node node)
     if (EVEN(sts))
       return sts;
 
-    sts = ldh_MoveObject(
-        ldhses, window_objid, node->ln.oid, ldh_eDest_IntoFirst);
+    sts = ldh_MoveObject(ldhses, window_objid, node->ln.oid, ldh_eDest_IntoFirst);
     if (EVEN(sts))
       return sts;
 
@@ -13003,43 +13522,42 @@ int gcg_comp_m58(gcg_ctx gcgctx, vldh_t_node node)
     node->ln.subwindow = 1;
     node->ln.subwind_oid[0] = window_objid;
 
-    sts = ldh_GetObjectBuffer(ldhses, node->ln.oid, "DevBody", "PlcNode",
-        (pwr_eClass*)&windclass, (char**)&nodebuffer, &size);
+    sts = ldh_GetObjectBuffer(ldhses, node->ln.oid, "DevBody", "PlcNode", (pwr_eClass*)&windclass,
+                              (char**)&nodebuffer, &size);
     if (EVEN(sts))
       return sts;
     nodebuffer->subwindow = 1;
     nodebuffer->subwind_oid[0] = window_objid;
-    sts = ldh_SetObjectBuffer(
-        ldhses, node->ln.oid, "DevBody", "PlcNode", (char*)nodebuffer);
+    sts = ldh_SetObjectBuffer(ldhses, node->ln.oid, "DevBody", "PlcNode", (char*)nodebuffer);
     if (EVEN(sts))
       return sts;
 
-    sts = ldh_GetObjectBuffer(ldhses, window_objid, "DevBody", "PlcWindow",
-        (pwr_eClass*)&windclass, (char**)&windbuffer, &size);
+    sts = ldh_GetObjectBuffer(ldhses, window_objid, "DevBody", "PlcWindow", (pwr_eClass*)&windclass,
+                              (char**)&windbuffer, &size);
     if (EVEN(sts))
       return sts;
 
     windbuffer->poid = node->ln.oid;
-    sts = ldh_SetObjectBuffer(
-        ldhses, window_objid, "DevBody", "PlcWindow", (char*)windbuffer);
+    sts = ldh_SetObjectBuffer(ldhses, window_objid, "DevBody", "PlcWindow", (char*)windbuffer);
     if (EVEN(sts))
       return sts;
     free((char*)windbuffer);
 
     // Set window modification time, this is reset by the post copy method
-    sts = ldh_SetObjectPar(ldhses, window_objid, "DevBody", "Modified",
-			   (char*)template_time, sizeof(template_time));
+    sts = ldh_SetObjectPar(ldhses, window_objid, "DevBody", "Modified", (char*)template_time,
+                           sizeof(template_time));
     if (EVEN(sts))
       return sts;
 
-    sts = ldh_SetObjectPar(ldhses, window_objid, "RtBody", "Version",
-			   (char*)template_version, sizeof(template_version));
+    sts = ldh_SetObjectPar(ldhses, window_objid, "RtBody", "Version", (char*)template_version,
+                           sizeof(template_version));
     if (EVEN(sts))
       return sts;
 
     /* Save the session */
-    sts = ldh_SaveSession( ldhses);
-    if ( EVEN(sts)) return sts;
+    sts = ldh_SaveSession(ldhses);
+    if (EVEN(sts))
+      return sts;
 
     gcg_pending_compile_add(gcgctx, window_objid);
 
@@ -13048,7 +13566,9 @@ int gcg_comp_m58(gcg_ctx gcgctx, vldh_t_node node)
     // sts = gcg_wind_comp_all( ldhwb, ldhses, window_objid,
     //	gcgctx->print, 0, gcg_debug);
     node->hn.subwindowobject[0] = 0;
-  } else {
+  }
+  else
+  {
     // Check if new structfile
     char* s;
     char fname[230];
@@ -13056,8 +13576,7 @@ int gcg_comp_m58(gcg_ctx gcgctx, vldh_t_node node)
     pwr_tTime* compile_time;
 
     /* Get compilation time in parameter Compiled */
-    sts = ldh_GetObjectPar(ldhses, window_objid, "DevBody", "Compiled",
-        (char**)&compile_time, &size);
+    sts = ldh_GetObjectPar(ldhses, window_objid, "DevBody", "Compiled", (char**)&compile_time, &size);
     if (EVEN(sts))
       return sts;
 
@@ -13068,7 +13587,8 @@ int gcg_comp_m58(gcg_ctx gcgctx, vldh_t_node node)
     dcli_translate_filename(fname, fname);
 
     sts = stat(fname, &info);
-    if (sts != -1 && info.st_ctime > compile_time->tv_sec) {
+    if (sts != -1 && info.st_ctime > compile_time->tv_sec)
+    {
       /* Compile the subwindow... */
       gcg_pending_compile_add(gcgctx, window_objid);
 
@@ -13092,33 +13612,35 @@ int gcg_comp_m58(gcg_ctx gcgctx, vldh_t_node node)
     return sts;
 
   /* Get the runtime parameters for this class */
-  sts = ldh_GetObjectBodyDef(
-      (node->hn.wind)->hw.ldhses, node->ln.cid, "RtBody", 1, &bodydef, &rows);
+  sts = ldh_GetObjectBodyDef((node->hn.wind)->hw.ldhses, node->ln.cid, "RtBody", 1, &bodydef, &rows);
   if (EVEN(sts))
     return sts;
 
   i = 0;
   first_par = 1;
-  while ((i < rows) && (bodydef[i].ParClass == pwr_eClass_Input)) {
+  while ((i < rows) && (bodydef[i].ParClass == pwr_eClass_Input))
+  {
     /* Get the point for this parameter if there is one */
     output_found = 0;
     sts = gcg_get_inputpoint(node, i, &point, &par_inverted);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       /* Look for an output connected to this point */
-      sts = gcg_get_output(node, point, &output_count, &output_node,
-          &output_point, &output_bodydef,
-          GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
+      sts = gcg_get_output(node, point, &output_count, &output_node, &output_point, &output_bodydef,
+                           GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
       if (EVEN(sts))
         return sts;
 
-      if (output_count > 0) {
+      if (output_count > 0)
+      {
         output_found = 1;
         if (output_count > 1)
           gcg_error_msg(gcgctx, GSX__CONOUTPUT, output_node);
 
-        sts = gcg_get_outputstring(gcgctx, output_node, &output_bodydef,
-            &output_attrref, &output_type, &output_prefix, output_par);
-        if (sts == GSX__NEXTPAR) {
+        sts = gcg_get_outputstring(gcgctx, output_node, &output_bodydef, &output_attrref, &output_type,
+                                   &output_prefix, output_par);
+        if (sts == GSX__NEXTPAR)
+        {
           i++;
           continue;
         }
@@ -13128,83 +13650,78 @@ int gcg_comp_m58(gcg_ctx gcgctx, vldh_t_node node)
         if (par_inverted)
           gcg_error_msg(gcgctx, GSX__INV, node);
 
-	
-        if (bodydef[i].Par->Input.Info.Type == pwr_eType_Void && 
-	  output_bodydef.Par->Output.Info.Type == pwr_eType_DataRef)
+        if (bodydef[i].Par->Input.Info.Type == pwr_eType_Void &&
+            output_bodydef.Par->Output.Info.Type == pwr_eType_DataRef)
           strcpy(cast, "(pwr_tVoid *)");
-        else if (bodydef[i].Par->Input.Info.Type == pwr_eType_DataRef && 
-	  output_bodydef.Par->Output.Info.Type == pwr_eType_Void)
+        else if (bodydef[i].Par->Input.Info.Type == pwr_eType_DataRef &&
+                 output_bodydef.Par->Output.Info.Type == pwr_eType_Void)
           strcpy(cast, "(pwr_tDataRef *)");
-	else
-	  strcpy(cast, "");
-        IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE],
-            "%c%s->%sP = %s&%c%s->%s;\n", GCG_PREFIX_REF,
-            vldh_IdToStr(0, node->ln.oid), bodydef[i].Par->Param.Info.PgmName,
-            cast, output_prefix,
-            output_type == GCG_OTYPE_OID ? vldh_IdToStr(1, output_attrref.Objid)
-                                         : vldh_AttrRefToStr(0, output_attrref),
-            output_par);
+        else
+          strcpy(cast, "");
+        IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = %s&%c%s->%s;\n", GCG_PREFIX_REF,
+                      vldh_IdToStr(0, node->ln.oid), bodydef[i].Par->Param.Info.PgmName, cast, output_prefix,
+                      output_type == GCG_OTYPE_OID ? vldh_IdToStr(1, output_attrref.Objid)
+                                                   : vldh_AttrRefToStr(0, output_attrref),
+                      output_par);
 
-        switch (bodydef[i].Par->Param.Info.Type) {
+        switch (bodydef[i].Par->Param.Info.Type)
+        {
         case pwr_eType_String:
-          IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE],
-              "strncpy( %c%s->%s, (char *)%c%s->%sP, %d);\n", GCG_PREFIX_REF,
-              vldh_IdToStr(0, node->ln.oid), bodydef[i].Par->Param.Info.PgmName,
-              GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid),
-              bodydef[i].Par->Param.Info.PgmName,
-              bodydef[i].Par->Param.Info.Size);
+          IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "strncpy( %c%s->%s, (char *)%c%s->%sP, %d);\n",
+                        GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid), bodydef[i].Par->Param.Info.PgmName,
+                        GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid), bodydef[i].Par->Param.Info.PgmName,
+                        bodydef[i].Par->Param.Info.Size);
           break;
         default:
-          IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE],
-              "%c%s->%s = *%c%s->%sP;\n", GCG_PREFIX_REF,
-              vldh_IdToStr(0, node->ln.oid), bodydef[i].Par->Param.Info.PgmName,
-              GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid),
-              bodydef[i].Par->Param.Info.PgmName);
+          IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%c%s->%s = *%c%s->%sP;\n", GCG_PREFIX_REF,
+                        vldh_IdToStr(0, node->ln.oid), bodydef[i].Par->Param.Info.PgmName, GCG_PREFIX_REF,
+                        vldh_IdToStr(0, node->ln.oid), bodydef[i].Par->Param.Info.PgmName);
         }
-      } else {
+      }
+      else
+      {
         /* Point visible but not connected, errormessage */
         gcg_error_msg(gcgctx, GSX__NOTCON, node);
       }
       first_par = 0;
     }
-    if (!output_found) {
+    if (!output_found)
+    {
       /* The point is not connected and the pointer will be zero */
 
-      IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = 0;\n",
-          GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid),
-          bodydef[i].Par->Param.Info.PgmName);
+      IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = 0;\n", GCG_PREFIX_REF,
+                    vldh_IdToStr(0, node->ln.oid), bodydef[i].Par->Param.Info.PgmName);
     }
     i++;
   }
   free((char*)bodydef);
 
   /* Print the window execute command */
-  IF_PR fprintf(gcgctx->files[GCGM1_DECL_FILE],
-      "void %c%s_exec(plc_sThread *tp);", GCG_PREFIX_MOD,
-      vldh_IdToStr(0, window_objid));
-  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%c%s_exec( tp);\n",
-      GCG_PREFIX_MOD, vldh_IdToStr(0, window_objid));
+  IF_PR fprintf(gcgctx->files[GCGM1_DECL_FILE], "void %c%s_exec(plc_sThread *tp);", GCG_PREFIX_MOD,
+                vldh_IdToStr(0, window_objid));
+  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%c%s_exec( tp);\n", GCG_PREFIX_MOD,
+                vldh_IdToStr(0, window_objid));
 
   return GSX__SUCCESS;
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m59()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for GetDattr, GetAattr, GetIattr and GetSattr.
-*	Checks that the referenced attribute exists, and that the type
-*       of the attribute is correct.
-*	Prints declaration and direct link of pointer to referenced object.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m59()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for GetDattr, GetAattr, GetIattr and GetSattr.
+ *	Checks that the referenced attribute exists, and that the type
+ *       of the attribute is correct.
+ *	Prints declaration and direct link of pointer to referenced object.
+ *
+ **************************************************************************/
 
 int gcg_comp_m59(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -13229,8 +13746,7 @@ int gcg_comp_m59(gcg_ctx gcgctx, vldh_t_node node)
 
   /* Get the referenced attribute stored in 'Attribute' */
 
-  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", "Attribute",
-      (char**)&refattr_ptr, &size);
+  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", "Attribute", (char**)&refattr_ptr, &size);
   if (EVEN(sts))
     return sts;
   strncpy(refattr, refattr_ptr, sizeof(refattr));
@@ -13239,7 +13755,8 @@ int gcg_comp_m59(gcg_ctx gcgctx, vldh_t_node node)
   /* Get the parent node to this window */
   host_objid = (node->hn.wind)->lw.poid;
 
-  if (cdh_ObjidIsNull(host_objid)) {
+  if (cdh_ObjidIsNull(host_objid))
+  {
     /* Parent is a plcprogram */
     gcg_error_msg(gcgctx, GSX__BADWIND, node);
     return GSX__NEXTNODE;
@@ -13247,54 +13764,61 @@ int gcg_comp_m59(gcg_ctx gcgctx, vldh_t_node node)
 
   /* Check class of this objdid */
   sts = ldh_GetObjectClass(ldhses, host_objid, &cid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     gcg_error_msg(gcgctx, GSX__REFOBJ, node);
     return GSX__NEXTNODE;
   }
 
-  if (cid == pwr_cClass_order || cid == pwr_cClass_csub
-      || cid == pwr_cClass_substep) {
+  if (cid == pwr_cClass_order || cid == pwr_cClass_csub || cid == pwr_cClass_substep)
+  {
     gcg_error_msg(gcgctx, GSX__BADWIND, node);
     return GSX__NEXTNODE;
   }
 
   /* Check that the attribute exist in this class */
   sts = ldh_GetObjectClass(ldhses, host_objid, &cid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     gcg_error_msg(gcgctx, GSX__REFOBJ, node);
     return GSX__NEXTNODE;
   }
 
   /* Check that the parameter exists in the referenced object */
   sts = ldh_GetObjectBodyDef(ldhses, cid, "RtBody", 1, &bodydef, &rows);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     gcg_error_msg(gcgctx, GSX__REFCLASS, node);
     return GSX__NEXTNODE;
   }
 
-  for (i = 0, found = 0; i < rows; i++) {
+  for (i = 0, found = 0; i < rows; i++)
+  {
     /* ML 961009. Use ParName instead of PgmName */
-    if (streq(bodydef[i].ParName, refattr)) {
+    if (streq(bodydef[i].ParName, refattr))
+    {
       found = 1;
       break;
     }
   }
-  if (!found) {
+  if (!found)
+  {
     gcg_error_msg(gcgctx, GSX__REFPAR, node);
     free((char*)bodydef);
     return GSX__NEXTNODE;
   }
 
   /* Check type of parameter */
-  switch (bodydef[i].ParClass) {
+  switch (bodydef[i].ParClass)
+  {
   case pwr_eClass_Input:
     info_type = bodydef[i].Par->Input.Info.Type;
     if (bodydef[i].Par->Input.Info.Flags & PWR_MASK_ARRAY)
-      info_size = bodydef[i].Par->Input.Info.Size
-          / bodydef[i].Par->Input.Info.Elements;
+      info_size = bodydef[i].Par->Input.Info.Size / bodydef[i].Par->Input.Info.Elements;
     else
       info_size = bodydef[i].Par->Input.Info.Size;
-    if (bodydef[i].Par->Input.Info.Flags & PWR_MASK_RTVIRTUAL) {
+    if (bodydef[i].Par->Input.Info.Flags & PWR_MASK_RTVIRTUAL)
+    {
       /* Parameter is not defined in runtime */
       gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
       free((char*)bodydef);
@@ -13304,24 +13828,21 @@ int gcg_comp_m59(gcg_ctx gcgctx, vldh_t_node node)
   case pwr_eClass_Output:
     info_type = bodydef[i].Par->Output.Info.Type;
     if (bodydef[i].Par->Output.Info.Flags & PWR_MASK_ARRAY)
-      info_size = bodydef[i].Par->Output.Info.Size
-          / bodydef[i].Par->Output.Info.Elements;
+      info_size = bodydef[i].Par->Output.Info.Size / bodydef[i].Par->Output.Info.Elements;
     else
       info_size = bodydef[i].Par->Output.Info.Size;
     break;
   case pwr_eClass_Intern:
     info_type = bodydef[i].Par->Intern.Info.Type;
     if (bodydef[i].Par->Intern.Info.Flags & PWR_MASK_ARRAY)
-      info_size = bodydef[i].Par->Intern.Info.Size
-          / bodydef[i].Par->Intern.Info.Elements;
+      info_size = bodydef[i].Par->Intern.Info.Size / bodydef[i].Par->Intern.Info.Elements;
     else
       info_size = bodydef[i].Par->Intern.Info.Size;
     break;
   case pwr_eClass_Param:
     info_type = bodydef[i].Par->Param.Info.Type;
     if (bodydef[i].Par->Param.Info.Flags & PWR_MASK_ARRAY)
-      info_size = bodydef[i].Par->Param.Info.Size
-          / bodydef[i].Par->Param.Info.Elements;
+      info_size = bodydef[i].Par->Param.Info.Size / bodydef[i].Par->Param.Info.Elements;
     else
       info_size = bodydef[i].Par->Param.Info.Size;
     break;
@@ -13333,28 +13854,37 @@ int gcg_comp_m59(gcg_ctx gcgctx, vldh_t_node node)
   }
 
   /* Check that the type of the referenced attribute is correct */
-  if (node->ln.cid == pwr_cClass_GetDattr) {
-    if (info_type != pwr_eType_Boolean) {
+  if (node->ln.cid == pwr_cClass_GetDattr)
+  {
+    if (info_type != pwr_eType_Boolean)
+    {
       gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
       return GSX__NEXTNODE;
     }
-  } else if (node->ln.cid == pwr_cClass_GetAattr) {
-    if (info_type != pwr_eType_Float32) {
+  }
+  else if (node->ln.cid == pwr_cClass_GetAattr)
+  {
+    if (info_type != pwr_eType_Float32)
+    {
       gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
       return GSX__NEXTNODE;
     }
-  } else if (node->ln.cid == pwr_cClass_GetIattr) {
-    if (!(info_type == pwr_eType_Int32 || info_type == pwr_eType_UInt32
-            || info_type == pwr_eType_Int16 || info_type == pwr_eType_UInt16
-            || info_type == pwr_eType_Int8 || info_type == pwr_eType_UInt8
-            || info_type == pwr_eType_Enum || info_type == pwr_eType_Mask
-            || info_type == pwr_eType_Status
-            || info_type == pwr_eType_NetStatus)) {
+  }
+  else if (node->ln.cid == pwr_cClass_GetIattr)
+  {
+    if (!(info_type == pwr_eType_Int32 || info_type == pwr_eType_UInt32 || info_type == pwr_eType_Int16 ||
+          info_type == pwr_eType_UInt16 || info_type == pwr_eType_Int8 || info_type == pwr_eType_UInt8 ||
+          info_type == pwr_eType_Enum || info_type == pwr_eType_Mask || info_type == pwr_eType_Status ||
+          info_type == pwr_eType_NetStatus))
+    {
       gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
       return GSX__NEXTNODE;
     }
-  } else if (node->ln.cid == pwr_cClass_GetSattr) {
-    if (info_type != pwr_eType_String) {
+  }
+  else if (node->ln.cid == pwr_cClass_GetSattr)
+  {
+    if (info_type != pwr_eType_String)
+    {
       gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
       return GSX__NEXTNODE;
     }
@@ -13364,21 +13894,27 @@ int gcg_comp_m59(gcg_ctx gcgctx, vldh_t_node node)
   s = strchr(refattr, '[');
   if (s == 0)
     element = -1;
-  else {
+  else
+  {
     t = strchr(refattr, ']');
-    if (t == 0) {
+    if (t == 0)
+    {
       gcg_error_msg(gcgctx, GSX__REFPAR, node);
       return GSX__NEXTNODE;
-    } else {
+    }
+    else
+    {
       len = t - s - 1;
-      if (len > (int)sizeof(elementstr) - 1) {
+      if (len > (int)sizeof(elementstr) - 1)
+      {
         gcg_error_msg(gcgctx, GSX__REFPAR, node);
         return GSX__NEXTNODE;
       }
       strncpy(elementstr, s + 1, len);
       elementstr[len] = 0;
       nr = sscanf(elementstr, "%d", &element);
-      if (nr != 1) {
+      if (nr != 1)
+      {
         gcg_error_msg(gcgctx, GSX__REFPAR, node);
         return GSX__NEXTNODE;
       }
@@ -13387,21 +13923,27 @@ int gcg_comp_m59(gcg_ctx gcgctx, vldh_t_node node)
   }
 
   /* Check elements */
-  if (bodydef[i].Par->Param.Info.Flags & PWR_MASK_ARRAY) {
-    if (element == -1) {
+  if (bodydef[i].Par->Param.Info.Flags & PWR_MASK_ARRAY)
+  {
+    if (element == -1)
+    {
       /* No elementstring found in parameter */
       gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
       free((char*)bodydef);
       return GSX__NEXTNODE;
     }
-    if (element > (int)(bodydef[i].Par->Param.Info.Elements - 1)) {
+    if (element > (int)(bodydef[i].Par->Param.Info.Elements - 1))
+    {
       /* Element index to large */
       gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
       free((char*)bodydef);
       return GSX__NEXTNODE;
     }
-  } else {
-    if (element != -1) {
+  }
+  else
+  {
+    if (element != -1)
+    {
       /* Elementstring found in parameter */
       gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
       free((char*)bodydef);
@@ -13418,20 +13960,20 @@ int gcg_comp_m59(gcg_ctx gcgctx, vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m60()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for NameToStr.
-*	Prints declaration and direct link of pointer to referenced object.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m60()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for NameToStr.
+ *	Prints declaration and direct link of pointer to referenced object.
+ *
+ **************************************************************************/
 
 int gcg_comp_m60(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -13446,15 +13988,13 @@ int gcg_comp_m60(gcg_ctx gcgctx, vldh_t_node node)
 
   /* Get the referenced attribute stored in 'Object' */
 
-  sts = ldh_GetObjectPar(
-      ldhses, node->ln.oid, "DevBody", "Object", (char**)&arefp, &size);
+  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", "Object", (char**)&arefp, &size);
   if (EVEN(sts))
     return sts;
   aref = *arefp;
   free((char*)arefp);
 
-  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", "ObjectSegments",
-      (char**)&segmentsp, &size);
+  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", "ObjectSegments", (char**)&segmentsp, &size);
   if (EVEN(sts))
     return sts;
   segments = *segmentsp;
@@ -13463,13 +14003,15 @@ int gcg_comp_m60(gcg_ctx gcgctx, vldh_t_node node)
   if (segments == 0)
     segments = 1;
 
-  if (cdh_ObjidIsNotNull(aref.Objid)) {
+  if (cdh_ObjidIsNotNull(aref.Objid))
+  {
     sts = gcg_replace_ref(gcgctx, &aref, node);
     if (EVEN(sts))
       return sts;
 
     sts = ldh_AttrRefToName(ldhses, &aref, ldh_eName_Aref, &name_p, &size);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       gcg_error_msg(gcgctx, GSX__REFPAR, node);
       return GSX__NEXTNODE;
     }
@@ -13480,8 +14022,7 @@ int gcg_comp_m60(gcg_ctx gcgctx, vldh_t_node node)
 
   /* Set the parameter value */
   name[79] = 0;
-  sts = ldh_SetObjectPar(
-      ldhses, node->ln.oid, "RtBody", "Out", name, sizeof(pwr_tString80));
+  sts = ldh_SetObjectPar(ldhses, node->ln.oid, "RtBody", "Out", name, sizeof(pwr_tString80));
   if (EVEN(sts))
     return sts;
 
@@ -13492,19 +14033,19 @@ int gcg_comp_m60(gcg_ctx gcgctx, vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m60()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for CArea.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m60()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for CArea.
+ *
+ **************************************************************************/
 
 int gcg_comp_m61(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -13518,7 +14059,8 @@ int gcg_comp_m61(gcg_ctx gcgctx, vldh_t_node node)
 
   if (gcgctx->current_cmanager == node)
     return GSX__SUCCESS;
-  if (gcgctx->current_cmanager) {
+  if (gcgctx->current_cmanager)
+  {
     /* Other cmanager */
     gcg_reset_cmanager(gcgctx);
   }
@@ -13530,8 +14072,7 @@ int gcg_comp_m61(gcg_ctx gcgctx, vldh_t_node node)
   /* Print the execute command */
   IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "if ( ");
 
-  sts = gcg_print_inputs(
-      gcgctx, node, ", ", GCG_PRINT_ALLPAR, &nocondef, &nocontype);
+  sts = gcg_print_inputs(gcgctx, node, ", ", GCG_PRINT_ALLPAR, &nocondef, &nocontype);
   if (EVEN(sts))
     return sts;
 
@@ -13540,23 +14081,23 @@ int gcg_comp_m61(gcg_ctx gcgctx, vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m62()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for Disabled.
-*	Checks that the referenced attribute exists and that is has
-*       a DisableAttr attribute.
-*	Prints declaration and direct link of pointer to DisableAttr of the
-*	referenced object.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m62()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for Disabled.
+ *	Checks that the referenced attribute exists and that is has
+ *       a DisableAttr attribute.
+ *	Prints declaration and direct link of pointer to DisableAttr of the
+ *	referenced object.
+ *
+ **************************************************************************/
 
 int gcg_comp_m62(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -13574,8 +14115,7 @@ int gcg_comp_m62(gcg_ctx gcgctx, vldh_t_node node)
   ldhses = (node->hn.wind)->hw.ldhses;
 
   /* Get the attrref of the referenced attribute */
-  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", "Object",
-      (char**)&refattrref_ptr, &size);
+  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", "Object", (char**)&refattrref_ptr, &size);
   if (EVEN(sts))
     return sts;
 
@@ -13587,12 +14127,14 @@ int gcg_comp_m62(gcg_ctx gcgctx, vldh_t_node node)
     return sts;
 
   sts = ldh_GetAttrRefInfo(ldhses, &refattrref, &info);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     gcg_error_msg(gcgctx, GSX__REFOBJ, node);
     return GSX__NEXTNODE;
   }
 
-  if (!(info.flags & PWR_MASK_DISABLEATTR)) {
+  if (!(info.flags & PWR_MASK_DISABLEATTR))
+  {
     gcg_error_msg(gcgctx, GSX__REFOBJ, node);
     return GSX__NEXTNODE;
   }
@@ -13601,7 +14143,8 @@ int gcg_comp_m62(gcg_ctx gcgctx, vldh_t_node node)
   disaref = cdh_ArefToDisableAref(&refattrref);
 
   sts = ldh_GetAttrRefInfo(ldhses, &disaref, &info);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     gcg_error_msg(gcgctx, GSX__REFOBJ, node);
     return GSX__NEXTNODE;
   }
@@ -13612,19 +14155,22 @@ int gcg_comp_m62(gcg_ctx gcgctx, vldh_t_node node)
     return sts;
 
   strcpy(aname, name_p);
-  if ((s = strrchr(aname, '.')) == 0) {
+  if ((s = strrchr(aname, '.')) == 0)
+  {
     gcg_error_msg(gcgctx, GSX__REFOBJ, node);
     return GSX__NEXTPAR;
   }
 
   *s = 0;
   sts = ldh_NameToAttrRef(ldhses, aname, &refattrref);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     gcg_error_msg(gcgctx, GSX__REFOBJ, node);
     return GSX__NEXTPAR;
   }
 
-  if (info.type != pwr_eType_DisableAttr) {
+  if (info.type != pwr_eType_DisableAttr)
+  {
     gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
     return GSX__NEXTNODE;
   }
@@ -13636,28 +14182,28 @@ int gcg_comp_m62(gcg_ctx gcgctx, vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m63()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for CStoAttrRefP.
-*
-*	Syntax control:
-*	Check that the referenced object exists and that the referenced
-*	parameter exists in this object, and that the object is of
-*	the correct type.
-*
-*	Generating code:
-*	Declares and links a rtdb pointer to the referenced object.
-*	Prints an exec call.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m63()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for CStoAttrRefP.
+ *
+ *	Syntax control:
+ *	Check that the referenced object exists and that the referenced
+ *	parameter exists in this object, and that the object is of
+ *	the correct type.
+ *
+ *	Generating code:
+ *	Declares and links a rtdb pointer to the referenced object.
+ *	Prints an exec call.
+ *
+ **************************************************************************/
 
 int gcg_comp_m63(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -13692,13 +14238,11 @@ int gcg_comp_m63(gcg_ctx gcgctx, vldh_t_node node)
     first parameter in devbody */
 
   /* Get the devbody parameters for this class */
-  sts = ldh_GetObjectBodyDef(
-      ldhses, node->ln.cid, "DevBody", 1, &bodydef, &rows);
+  sts = ldh_GetObjectBodyDef(ldhses, node->ln.cid, "DevBody", 1, &bodydef, &rows);
   if (EVEN(sts))
     return sts;
 
-  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", bodydef[0].ParName,
-      (char**)&refattrref_ptr, &size);
+  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", bodydef[0].ParName, (char**)&refattrref_ptr, &size);
   if (EVEN(sts))
     return sts;
   refattrref = *refattrref_ptr;
@@ -13711,7 +14255,8 @@ int gcg_comp_m63(gcg_ctx gcgctx, vldh_t_node node)
 
   /* Check that this is objdid of an existing object */
   sts = ldh_GetAttrRefOrigTid(ldhses, &refattrref, &cid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     gcg_error_msg(gcgctx, GSX__REFOBJ, node);
     return GSX__NEXTNODE;
   }
@@ -13721,20 +14266,21 @@ int gcg_comp_m63(gcg_ctx gcgctx, vldh_t_node node)
     return sts;
 
   /* Get rid of last attribute segment of the referenced object */
-  sts = ldh_AttrRefToName(
-      ldhses, &refattrref, ldh_eName_ArefVol, &name_p, &size);
+  sts = ldh_AttrRefToName(ldhses, &refattrref, ldh_eName_ArefVol, &name_p, &size);
   if (EVEN(sts))
     return sts;
 
   strcpy(aname, name_p);
-  if ((s = strrchr(aname, '.')) == 0) {
+  if ((s = strrchr(aname, '.')) == 0)
+  {
     gcg_error_msg(gcgctx, GSX__REFOBJ, node);
     return GSX__NEXTPAR;
   }
 
   *s = 0;
   sts = ldh_NameToAttrRef(ldhses, aname, &refattrref);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     gcg_error_msg(gcgctx, GSX__REFOBJ, node);
     return GSX__NEXTPAR;
   }
@@ -13747,14 +14293,17 @@ int gcg_comp_m63(gcg_ctx gcgctx, vldh_t_node node)
   if (EVEN(sts))
     return sts;
 
-  if (info.flags & PWR_MASK_RTVIRTUAL) {
+  if (info.flags & PWR_MASK_RTVIRTUAL)
+  {
     /* Attribute is not defined in runtime */
     gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
     return GSX__NEXTNODE;
   }
 
-  if (info.flags & PWR_MASK_ARRAY) {
-    if (info.nElement == -1) {
+  if (info.flags & PWR_MASK_ARRAY)
+  {
+    if (info.nElement == -1)
+    {
       /* No index in attribute */
       gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
       return GSX__NEXTNODE;
@@ -13766,9 +14315,11 @@ int gcg_comp_m63(gcg_ctx gcgctx, vldh_t_node node)
     //}
   }
 
-  switch (info.type) {
+  switch (info.type)
+  {
   case pwr_eType_AttrRef:
-    if (!(node->ln.cid == pwr_cClass_CStoAttrRefP)) {
+    if (!(node->ln.cid == pwr_cClass_CStoAttrRefP))
+    {
       gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
       return GSX__NEXTNODE;
     }
@@ -13789,39 +14340,39 @@ int gcg_comp_m63(gcg_ctx gcgctx, vldh_t_node node)
     return sts;
 
   /* Print the execute command */
-  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE],
-      "%s_exec( tp, %c%s, &%c%s->%s);\n", name, GCG_PREFIX_REF,
-      vldh_IdToStr(0, node->ln.oid), GCG_PREFIX_REF,
-      vldh_AttrRefToStr(0, refattrref), parameter);
+  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( tp, %c%s, &%c%s->%s);\n", name, GCG_PREFIX_REF,
+                vldh_IdToStr(0, node->ln.oid), GCG_PREFIX_REF, vldh_AttrRefToStr(0, refattrref), parameter);
 
   /* Get the runtime parameters for this class */
-  sts = ldh_GetObjectBodyDef(
-      (node->hn.wind)->hw.ldhses, node->ln.cid, "RtBody", 1, &bodydef, &rows);
+  sts = ldh_GetObjectBodyDef((node->hn.wind)->hw.ldhses, node->ln.cid, "RtBody", 1, &bodydef, &rows);
   if (EVEN(sts))
     return sts;
 
   i = 0;
   first_par = 1;
-  while ((i < rows) && (bodydef[i].ParClass == pwr_eClass_Input)) {
+  while ((i < rows) && (bodydef[i].ParClass == pwr_eClass_Input))
+  {
     /* Get the point for this parameter if there is one */
     output_found = 0;
     sts = gcg_get_inputpoint(node, i, &point, &par_inverted);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       /* Look for an output connected to this point */
-      sts = gcg_get_output(node, point, &output_count, &output_node,
-          &output_point, &output_bodydef,
-          GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
+      sts = gcg_get_output(node, point, &output_count, &output_node, &output_point, &output_bodydef,
+                           GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
       if (EVEN(sts))
         return sts;
 
-      if (output_count > 0) {
+      if (output_count > 0)
+      {
         output_found = 1;
         if (output_count > 1)
           gcg_error_msg(gcgctx, GSX__CONOUTPUT, output_node);
 
-        sts = gcg_get_outputstring(gcgctx, output_node, &output_bodydef,
-            &output_attrref, &output_type, &output_prefix, output_par);
-        if (sts == GSX__NEXTPAR) {
+        sts = gcg_get_outputstring(gcgctx, output_node, &output_bodydef, &output_attrref, &output_type,
+                                   &output_prefix, output_par);
+        if (sts == GSX__NEXTPAR)
+        {
           i++;
           continue;
         }
@@ -13831,26 +14382,27 @@ int gcg_comp_m63(gcg_ctx gcgctx, vldh_t_node node)
         if (par_inverted)
           gcg_error_msg(gcgctx, GSX__INV, node);
 
-        IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = &%c%s->%s;\n",
-            GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid),
-            bodydef[i].Par->Param.Info.PgmName, output_prefix,
-            output_type == GCG_OTYPE_OID ? vldh_IdToStr(1, output_attrref.Objid)
-                                         : vldh_AttrRefToStr(0, output_attrref),
-            output_par);
-      } else {
+        IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = &%c%s->%s;\n", GCG_PREFIX_REF,
+                      vldh_IdToStr(0, node->ln.oid), bodydef[i].Par->Param.Info.PgmName, output_prefix,
+                      output_type == GCG_OTYPE_OID ? vldh_IdToStr(1, output_attrref.Objid)
+                                                   : vldh_AttrRefToStr(0, output_attrref),
+                      output_par);
+      }
+      else
+      {
         /* Point visible but not connected, errormessage */
         gcg_error_msg(gcgctx, GSX__NOTCON, node);
       }
       first_par = 0;
     }
-    if (!output_found) {
+    if (!output_found)
+    {
       /* The point is not connected and will point to its
          own object */
 
-      IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = &%c%s->%s;\n",
-          GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid),
-          bodydef[i].Par->Param.Info.PgmName, GCG_PREFIX_REF,
-          vldh_IdToStr(1, node->ln.oid), bodydef[i].Par->Param.Info.PgmName);
+      IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = &%c%s->%s;\n", GCG_PREFIX_REF,
+                    vldh_IdToStr(0, node->ln.oid), bodydef[i].Par->Param.Info.PgmName, GCG_PREFIX_REF,
+                    vldh_IdToStr(1, node->ln.oid), bodydef[i].Par->Param.Info.PgmName);
     }
     i++;
   }
@@ -13860,27 +14412,27 @@ int gcg_comp_m63(gcg_ctx gcgctx, vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m64()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for a GetExt...
-*	Prints code for declaration and direkt link of rtdbpointer for
-*	the actual object.
-*	Prints an exec call :
-*
-*	'structname'_exec( 'objectpointer', 'in1', 'in2', 'in3'...);
-*
-*       and init call
-*       'structname'_init( 'objectpointer', "'extattribute'");
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m64()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for a GetExt...
+ *	Prints code for declaration and direkt link of rtdbpointer for
+ *	the actual object.
+ *	Prints an exec call :
+ *
+ *	'structname'_exec( 'objectpointer', 'in1', 'in2', 'in3'...);
+ *
+ *       and init call
+ *       'structname'_init( 'objectpointer', "'extattribute'");
+ *
+ **************************************************************************/
 
 int gcg_comp_m64(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -13890,12 +14442,13 @@ int gcg_comp_m64(gcg_ctx gcgctx, vldh_t_node node)
   char* name;
 
   // Get extern attribute
-  sts = ldh_GetObjectPar((node->hn.wind)->hw.ldhses, node->ln.oid, "DevBody",
-      "ExtAttribute", (char**)&extattr_ptr, &size);
+  sts = ldh_GetObjectPar((node->hn.wind)->hw.ldhses, node->ln.oid, "DevBody", "ExtAttribute",
+                         (char**)&extattr_ptr, &size);
   if (EVEN(sts))
     return sts;
 
-  if (*extattr_ptr == 0) {
+  if (*extattr_ptr == 0)
+  {
     gcg_error_msg(gcgctx, GSX__REFOBJ, node);
     return GSX__NEXTNODE;
   }
@@ -13908,12 +14461,12 @@ int gcg_comp_m64(gcg_ctx gcgctx, vldh_t_node node)
     return sts;
 
   /* Print the execute command */
-  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( %c%s, \"%s\");\n", name,
-      GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid), extattr_ptr);
+  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( %c%s, \"%s\");\n", name, GCG_PREFIX_REF,
+                vldh_IdToStr(0, node->ln.oid), extattr_ptr);
 
   /* Print the init command */
-  IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%s_init( %c%s, \"%s\");\n",
-      name, GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid), extattr_ptr);
+  IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%s_init( %c%s, \"%s\");\n", name, GCG_PREFIX_REF,
+                vldh_IdToStr(0, node->ln.oid), extattr_ptr);
 
   gcg_scantime_print(gcgctx, node->ln.oid);
   gcg_timer_print(gcgctx, node->ln.oid);
@@ -13924,27 +14477,27 @@ int gcg_comp_m64(gcg_ctx gcgctx, vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m65()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for a CStoExt...
-*	Prints code for declaration and direkt link of rtdbpointer for
-*	the actual object.
-*	Prints an exec call :
-*
-*	'structname'_exec( 'objectpointer', 'name', 'in1', 'in2');
-*
-*	If the any inputs are not connected or not visible zero is printed
-*	in its place in the exec call.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m65()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for a CStoExt...
+ *	Prints code for declaration and direkt link of rtdbpointer for
+ *	the actual object.
+ *	Prints an exec call :
+ *
+ *	'structname'_exec( 'objectpointer', 'name', 'in1', 'in2');
+ *
+ *	If the any inputs are not connected or not visible zero is printed
+ *	in its place in the exec call.
+ *
+ **************************************************************************/
 
 int gcg_comp_m65(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -13953,12 +14506,13 @@ int gcg_comp_m65(gcg_ctx gcgctx, vldh_t_node node)
   char* extattr_ptr;
 
   // Get extern attribute
-  sts = ldh_GetObjectPar((node->hn.wind)->hw.ldhses, node->ln.oid, "DevBody",
-      "ExtAttribute", (char**)&extattr_ptr, &size);
+  sts = ldh_GetObjectPar((node->hn.wind)->hw.ldhses, node->ln.oid, "DevBody", "ExtAttribute",
+                         (char**)&extattr_ptr, &size);
   if (EVEN(sts))
     return sts;
 
-  if (*extattr_ptr == 0) {
+  if (*extattr_ptr == 0)
+  {
     gcg_error_msg(gcgctx, GSX__REFOBJ, node);
     return GSX__NEXTNODE;
   }
@@ -13986,28 +14540,28 @@ int gcg_comp_m65(gcg_ctx gcgctx, vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m66()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for GetDataP
-*	Prints code for declaration and direkt link of a rtdbpointer.
-*	Prints an exec call :
-*	'structname'_exec( 'objpointer');
-*	ex: getpi_exec( Z80000811);
-*
-*	Checks that the referenced object exists and that the referenced
-*	parameter exists in that objekt, and that the type of the parameter
-*	is correct.
-*	Prints declaration and direct link of pointer to referenced object.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m66()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for GetDataP
+ *	Prints code for declaration and direkt link of a rtdbpointer.
+ *	Prints an exec call :
+ *	'structname'_exec( 'objpointer');
+ *	ex: getpi_exec( Z80000811);
+ *
+ *	Checks that the referenced object exists and that the referenced
+ *	parameter exists in that objekt, and that the type of the parameter
+ *	is correct.
+ *	Prints declaration and direct link of pointer to referenced object.
+ *
+ **************************************************************************/
 
 int gcg_comp_m66(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -14030,13 +14584,11 @@ int gcg_comp_m66(gcg_ctx gcgctx, vldh_t_node node)
     first parameter in defbody */
 
   /* Get the devbody parameters for this class */
-  sts = ldh_GetObjectBodyDef(
-      ldhses, node->ln.cid, "DevBody", 1, &bodydef, &rows);
+  sts = ldh_GetObjectBodyDef(ldhses, node->ln.cid, "DevBody", 1, &bodydef, &rows);
   if (EVEN(sts))
     return sts;
 
-  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", bodydef[0].ParName,
-      (char**)&refattrref_ptr, &size);
+  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", bodydef[0].ParName, (char**)&refattrref_ptr, &size);
   if (EVEN(sts))
     return sts;
 
@@ -14051,23 +14603,25 @@ int gcg_comp_m66(gcg_ctx gcgctx, vldh_t_node node)
 
   /* Get properties of referenced attribute */
   sts = ldh_GetAttrRefInfo((node->hn.wind)->hw.ldhses, &refattrref, &info);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     gcg_error_msg(gcgctx, GSX__REFOBJ, node);
     return GSX__NEXTNODE;
   }
 
-  if (!(info.flags & PWR_MASK_POINTER && info.adefCid == pwr_eClass_Input)) {
+  if (!(info.flags & PWR_MASK_POINTER && info.adefCid == pwr_eClass_Input))
+  {
     gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
     return GSX__NEXTNODE;
   }
 
   /* Get parameter name of attrref */
-  sts = ldh_AttrRefToName(
-      ldhses, &refattrref, ldh_eName_ArefVol, &name_p, &size);
+  sts = ldh_AttrRefToName(ldhses, &refattrref, ldh_eName_ArefVol, &name_p, &size);
   if (EVEN(sts))
     return sts;
 
-  if ((s = strchr(name_p, '.')) == 0) {
+  if ((s = strchr(name_p, '.')) == 0)
+  {
     gcg_error_msg(gcgctx, GSX__REFOBJ, node);
     return GSX__NEXTPAR;
   }
@@ -14080,7 +14634,7 @@ int gcg_comp_m66(gcg_ctx gcgctx, vldh_t_node node)
 
   /* Print the referenced attribute */
   IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%c%s->%sP);\n", GCG_PREFIX_REF,
-      vldh_IdToStr(0, refattrref.Objid), aname);
+                vldh_IdToStr(0, refattrref.Objid), aname);
 
   /* Insert object in ref list */
   gcg_ref_insert(gcgctx, refattrref.Objid, GCG_PREFIX_REF, node);
@@ -14089,25 +14643,25 @@ int gcg_comp_m66(gcg_ctx gcgctx, vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m67()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for DSupComp and ASupComp.
-*	Generated code:
-*	Declares and links a rtdb pointer to the sup object.
-*	Prints an exec call.
-*	If the enable input is not connected it is set to true.
-*	Inits the object by putting the supervised object and parameter
-*	into the object and setting AckFlg to true.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m67()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for DSupComp and ASupComp.
+ *	Generated code:
+ *	Declares and links a rtdb pointer to the sup object.
+ *	Prints an exec call.
+ *	If the enable input is not connected it is set to true.
+ *	Inits the object by putting the supervised object and parameter
+ *	into the object and setting AckFlg to true.
+ *
+ **************************************************************************/
 
 int gcg_comp_m67(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -14126,7 +14680,7 @@ int gcg_comp_m67(gcg_ctx gcgctx, vldh_t_node node)
   pwr_tBoolean locked;
   int size;
   gcg_t_nocondef nocondef[2];
-  unsigned long nocontype[2] = { GCG_BOOLEAN, GCG_BOOLEAN };
+  unsigned long nocontype[2] = {GCG_BOOLEAN, GCG_BOOLEAN};
   pwr_tAttrRef *connect_arp, connect_aref;
   pwr_tAttrRef attribute_aref;
   pwr_tAttrRef aaref;
@@ -14143,8 +14697,7 @@ int gcg_comp_m67(gcg_ctx gcgctx, vldh_t_node node)
   if (EVEN(sts))
     return sts;
 
-  sts = gcg_print_inputs(
-      gcgctx, node, ", ", GCG_PRINT_ALLPAR, nocondef, nocontype);
+  sts = gcg_print_inputs(gcgctx, node, ", ", GCG_PRINT_ALLPAR, nocondef, nocontype);
   if (EVEN(sts))
     return sts;
 
@@ -14155,13 +14708,13 @@ int gcg_comp_m67(gcg_ctx gcgctx, vldh_t_node node)
   if (EVEN(sts))
     return sts;
 
-  IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%s_init( %c%s);\n", name,
-      GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid));
+  IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%s_init( %c%s);\n", name, GCG_PREFIX_REF,
+                vldh_IdToStr(0, node->ln.oid));
 
   /* Get PlcConnect object */
-  sts = ldh_GetObjectPar(gcgctx->ldhses, node->ln.oid, "RtBody", "PlcConnect",
-      (char**)&connect_arp, &size);
-  if (EVEN(sts)) {
+  sts = ldh_GetObjectPar(gcgctx->ldhses, node->ln.oid, "RtBody", "PlcConnect", (char**)&connect_arp, &size);
+  if (EVEN(sts))
+  {
     gcg_error_msg(gcgctx, GSX__REFCONNECT, node);
     return GSX__NEXTNODE;
   }
@@ -14170,35 +14723,41 @@ int gcg_comp_m67(gcg_ctx gcgctx, vldh_t_node node)
   free(connect_arp);
 
   sts = gcg_replace_ref(gcgctx, &connect_aref, node);
-  if (sts == GSX__REPLACED) {
+  if (sts == GSX__REPLACED)
+  {
     /* Store the converted aref */
-    sts = ldh_SetObjectPar(gcgctx->ldhses, node->ln.oid, "RtBody", "PlcConnect",
-        (char*)&connect_aref, sizeof(connect_aref));
+    sts = ldh_SetObjectPar(gcgctx->ldhses, node->ln.oid, "RtBody", "PlcConnect", (char*)&connect_aref,
+                           sizeof(connect_aref));
     if (EVEN(sts))
       return sts;
   }
 
-  if (cdh_ObjidIsNull(connect_aref.Objid)) {
+  if (cdh_ObjidIsNull(connect_aref.Objid))
+  {
     gcg_error_msg(gcgctx, GSX__REFCONNECT, node);
     return GSX__NEXTNODE;
   }
 
   // Check class of connected object
   sts = ldh_GetAttrRefOrigTid(gcgctx->ldhses, &connect_aref, &connect_cid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     gcg_error_msg(gcgctx, GSX__REFCONNECT, node);
     return GSX__NEXTNODE;
   }
 
-  switch (node->ln.cid) {
+  switch (node->ln.cid)
+  {
   case pwr_cClass_DSupCompFo:
-    if (connect_cid != pwr_cClass_DSupComp) {
+    if (connect_cid != pwr_cClass_DSupComp)
+    {
       gcg_error_msg(gcgctx, GSX__REFCONNECT, node);
       return GSX__NEXTNODE;
     }
     break;
   case pwr_cClass_ASupCompFo:
-    if (connect_cid != pwr_cClass_ASupComp) {
+    if (connect_cid != pwr_cClass_ASupComp)
+    {
       gcg_error_msg(gcgctx, GSX__REFCONNECT, node);
       return GSX__NEXTNODE;
     }
@@ -14214,9 +14773,9 @@ int gcg_comp_m67(gcg_ctx gcgctx, vldh_t_node node)
   if (EVEN(sts))
     return sts;
 
-  if (locked) {
-    sts = ldh_ArefANameToAref(
-        ldhses, &connect_aref, "Attribute", &attribute_aref);
+  if (locked)
+  {
+    sts = ldh_ArefANameToAref(ldhses, &connect_aref, "Attribute", &attribute_aref);
     if (EVEN(sts))
       return sts;
 
@@ -14224,32 +14783,37 @@ int gcg_comp_m67(gcg_ctx gcgctx, vldh_t_node node)
     if (EVEN(sts))
       return sts;
 
-    if (!cdh_ObjidIsNull(aref.Objid)) {
+    if (!cdh_ObjidIsNull(aref.Objid))
+    {
       sts = gcg_replace_ref(gcgctx, &aref, node);
-      if (sts == GSX__REPLACED) {
+      if (sts == GSX__REPLACED)
+      {
         sts = ldh_WriteAttribute(ldhses, &attribute_aref, &aref, sizeof(aref));
         if (EVEN(sts))
           return sts;
       }
     }
-  } else {
+  }
+  else
+  {
     sts = ldh_ArefANameToAref(ldhses, &connect_aref, "Attribute", &aaref);
     if (EVEN(sts))
       return sts;
 
     /* Print the supervised object and parameter in the object */
     sts = gcg_get_inputpoint(node, 0, &point, &par_inverted);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       /* Look for an output connected to this point */
-      sts = gcg_get_output(node, point, &output_count, &output_node,
-          &output_point, &output_bodydef,
-          GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
+      sts = gcg_get_output(node, point, &output_count, &output_node, &output_point, &output_bodydef,
+                           GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
       if (EVEN(sts))
         return sts;
 
-      if (output_count > 0) {
-        sts = gcg_get_outputstring(gcgctx, output_node, &output_bodydef,
-            &output_aref, &output_type, &output_prefix, output_par);
+      if (output_count > 0)
+      {
+        sts = gcg_get_outputstring(gcgctx, output_node, &output_bodydef, &output_aref, &output_type,
+                                   &output_prefix, output_par);
         if (sts == GSX__NEXTPAR)
           return sts;
         if (EVEN(sts))
@@ -14258,17 +14822,17 @@ int gcg_comp_m67(gcg_ctx gcgctx, vldh_t_node node)
         /* Put the attribut reference in the sup object */
         IF_PR
         {
-          sts = ldh_ArefANameToAref(
-              ldhses, &connect_aref, "Attribute", &attribute_aref);
+          sts = ldh_ArefANameToAref(ldhses, &connect_aref, "Attribute", &attribute_aref);
           if (EVEN(sts))
             return sts;
 
-          sts = ldh_WriteAttribute(
-              ldhses, &attribute_aref, &output_aref, sizeof(output_aref));
+          sts = ldh_WriteAttribute(ldhses, &attribute_aref, &output_aref, sizeof(output_aref));
           if (EVEN(sts))
             return sts;
         }
-      } else {
+      }
+      else
+      {
         /* Point not connected, errormessage */
         gcg_error_msg(gcgctx, GSX__NOTCON, node);
       }
@@ -14281,27 +14845,27 @@ int gcg_comp_m67(gcg_ctx gcgctx, vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m68()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for GetRefD, GetRefI, GetRefA.
-*	Prints code for declaration and direkt link of a rtdbpointer.
-*	Prints an exec call :
-*	'structname'_exec( 'objpointer');
-*	ex: GetRefD_exec( Z80000811);
-*
-*	Checks that the referenced attribute exists, and that the type of
-*       the referenced attributs is correct.
-*	Prints declaration and direct link of pointer to referenced object.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m68()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for GetRefD, GetRefI, GetRefA.
+ *	Prints code for declaration and direkt link of a rtdbpointer.
+ *	Prints an exec call :
+ *	'structname'_exec( 'objpointer');
+ *	ex: GetRefD_exec( Z80000811);
+ *
+ *	Checks that the referenced attribute exists, and that the type of
+ *       the referenced attributs is correct.
+ *	Prints declaration and direct link of pointer to referenced object.
+ *
+ **************************************************************************/
 
 int gcg_comp_m68(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -14328,13 +14892,11 @@ int gcg_comp_m68(gcg_ctx gcgctx, vldh_t_node node)
     first parameter in defbody */
 
   /* Get the devbody parameters for this class */
-  sts = ldh_GetObjectBodyDef(
-      ldhses, node->ln.cid, "DevBody", 1, &bodydef, &rows);
+  sts = ldh_GetObjectBodyDef(ldhses, node->ln.cid, "DevBody", 1, &bodydef, &rows);
   if (EVEN(sts))
     return sts;
 
-  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", bodydef[0].ParName,
-      (char**)&refattrref_ptr, &size);
+  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", bodydef[0].ParName, (char**)&refattrref_ptr, &size);
   if (EVEN(sts))
     return sts;
 
@@ -14348,7 +14910,8 @@ int gcg_comp_m68(gcg_ctx gcgctx, vldh_t_node node)
 
   /* Check that this is objdid of an existing object */
   sts = ldh_GetAttrRefOrigTid(ldhses, &refattrref, &cid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     gcg_error_msg(gcgctx, GSX__REFOBJ, node);
     return GSX__NEXTNODE;
   }
@@ -14358,13 +14921,13 @@ int gcg_comp_m68(gcg_ctx gcgctx, vldh_t_node node)
     return sts;
 
   /* This as to be of type AttrRef */
-  if (info.type != pwr_eType_AttrRef) {
+  if (info.type != pwr_eType_AttrRef)
+  {
     gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
     return GSX__NEXTNODE;
   }
 
-  sts = ldh_GetAttrObjectPar(
-      ldhses, &refattrref, "RtBody", "", (char**)&aref_ptr, &size);
+  sts = ldh_GetAttrObjectPar(ldhses, &refattrref, "RtBody", "", (char**)&aref_ptr, &size);
   if (EVEN(sts))
     return sts;
 
@@ -14372,16 +14935,19 @@ int gcg_comp_m68(gcg_ctx gcgctx, vldh_t_node node)
   free(aref_ptr);
 
   sts = ldh_GetAttrRefInfo(ldhses, &aref, &info);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     gcg_error_msg(gcgctx, GSX__REFOBJ, node);
     return GSX__NEXTPAR;
   }
 
-  switch (info.tid) {
+  switch (info.tid)
+  {
   case pwr_cClass_Di:
   case pwr_cClass_Do:
   case pwr_cClass_Dv:
-    if (node->ln.cid != pwr_cClass_GetRefD) {
+    if (node->ln.cid != pwr_cClass_GetRefD)
+    {
       gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
       return GSX__NEXTPAR;
     }
@@ -14393,7 +14959,8 @@ int gcg_comp_m68(gcg_ctx gcgctx, vldh_t_node node)
   case pwr_cClass_Ai:
   case pwr_cClass_Ao:
   case pwr_cClass_Av:
-    if (node->ln.cid != pwr_cClass_GetRefA) {
+    if (node->ln.cid != pwr_cClass_GetRefA)
+    {
       gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
       return GSX__NEXTPAR;
     }
@@ -14405,7 +14972,8 @@ int gcg_comp_m68(gcg_ctx gcgctx, vldh_t_node node)
   case pwr_cClass_Ii:
   case pwr_cClass_Io:
   case pwr_cClass_Iv:
-    if (node->ln.cid != pwr_cClass_GetRefI) {
+    if (node->ln.cid != pwr_cClass_GetRefI)
+    {
       gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
       return GSX__NEXTPAR;
     }
@@ -14415,7 +14983,8 @@ int gcg_comp_m68(gcg_ctx gcgctx, vldh_t_node node)
     gcg_ioread_insert(gcgctx, aref, GCG_PREFIX_REF);
     break;
   case pwr_cClass_Sv:
-    if (node->ln.cid != pwr_cClass_GetRefS) {
+    if (node->ln.cid != pwr_cClass_GetRefS)
+    {
       gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
       return GSX__NEXTPAR;
     }
@@ -14424,10 +14993,13 @@ int gcg_comp_m68(gcg_ctx gcgctx, vldh_t_node node)
     /* Insert io object in ioread list */
     gcg_aref_insert(gcgctx, aref, GCG_PREFIX_REF, node);
     break;
-  default: {
-    switch (info.type) {
+  default:
+  {
+    switch (info.type)
+    {
     case pwr_eType_Boolean:
-      if (node->ln.cid != pwr_cClass_GetRefD) {
+      if (node->ln.cid != pwr_cClass_GetRefD)
+      {
         gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
         return GSX__NEXTPAR;
       }
@@ -14440,31 +15012,38 @@ int gcg_comp_m68(gcg_ctx gcgctx, vldh_t_node node)
     case pwr_eType_UInt16:
     case pwr_eType_UInt32:
     case pwr_eType_UInt64:
-      if (node->ln.cid != pwr_cClass_GetRefI) {
+      if (node->ln.cid != pwr_cClass_GetRefI)
+      {
         gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
         return GSX__NEXTPAR;
       }
       break;
     case pwr_eType_Float32:
     case pwr_eType_Float64:
-      if (node->ln.cid != pwr_cClass_GetRefA) {
+      if (node->ln.cid != pwr_cClass_GetRefA)
+      {
         gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
         return GSX__NEXTPAR;
       }
       break;
     case pwr_eType_String:
-      if (node->ln.cid != pwr_cClass_GetRefS) {
+      if (node->ln.cid != pwr_cClass_GetRefS)
+      {
         gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
         return GSX__NEXTPAR;
       }
       break;
     default:
-      if (cdh_tidIsCid(info.tid)) {
-        if (node->ln.cid != pwr_cClass_GetRefData) {
+      if (cdh_tidIsCid(info.tid))
+      {
+        if (node->ln.cid != pwr_cClass_GetRefData)
+        {
           gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
           return GSX__NEXTPAR;
         }
-      } else {
+      }
+      else
+      {
         gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
         return GSX__NEXTPAR;
       }
@@ -14472,21 +15051,24 @@ int gcg_comp_m68(gcg_ctx gcgctx, vldh_t_node node)
 
     if (node->ln.cid == pwr_cClass_GetRefData)
       gcg_aref_insert(gcgctx, aref, GCG_PREFIX_REF, node);
-    else {
+    else
+    {
       /* Get rid of last attribute segment of the referenced object */
       sts = ldh_AttrRefToName(ldhses, &aref, ldh_eName_ArefVol, &name_p, &size);
       if (EVEN(sts))
         return sts;
 
       strcpy(aname, name_p);
-      if ((s = strrchr(aname, '.')) == 0) {
+      if ((s = strrchr(aname, '.')) == 0)
+      {
         gcg_error_msg(gcgctx, GSX__REFOBJ, node);
         return GSX__NEXTPAR;
       }
 
       *s = 0;
       sts = ldh_NameToAttrRef(ldhses, aname, &aref);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         gcg_error_msg(gcgctx, GSX__REFOBJ, node);
         return GSX__NEXTPAR;
       }
@@ -14499,14 +15081,17 @@ int gcg_comp_m68(gcg_ctx gcgctx, vldh_t_node node)
       if (EVEN(sts))
         return sts;
 
-      if (info.flags & PWR_MASK_RTVIRTUAL) {
+      if (info.flags & PWR_MASK_RTVIRTUAL)
+      {
         /* Attribute is not defined in runtime */
         gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
         return GSX__NEXTNODE;
       }
 
-      if (info.flags & PWR_MASK_ARRAY) {
-        if (info.nElement == -1) {
+      if (info.flags & PWR_MASK_ARRAY)
+      {
+        if (info.nElement == -1)
+        {
           /* No index in attribute */
           gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
           return GSX__NEXTNODE;
@@ -14519,47 +15104,48 @@ int gcg_comp_m68(gcg_ctx gcgctx, vldh_t_node node)
   }
   }
 
-  if (node->ln.cid == pwr_cClass_GetRefData) {
-    IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE],
-        "%c%s->Out = (pwr_tVoid *)%c%s;\n", GCG_PREFIX_REF,
-        vldh_IdToStr(0, node->ln.oid), GCG_PREFIX_REF,
-        vldh_AttrRefToStr(0, aref));
-  } else {
+  if (node->ln.cid == pwr_cClass_GetRefData)
+  {
+    IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->Out = (pwr_tVoid *)%c%s;\n", GCG_PREFIX_REF,
+                  vldh_IdToStr(0, node->ln.oid), GCG_PREFIX_REF, vldh_AttrRefToStr(0, aref));
+  }
+  else
+  {
     sts = gcg_print_exec_macro(gcgctx, node, node->ln.oid, GCG_PREFIX_REF);
     if (EVEN(sts))
       return sts;
 
     /* Print the parent object */
-    IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%c%s->%s);\n",
-        GCG_PREFIX_REF, vldh_AttrRefToStr(0, aref), parameter);
+    IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%c%s->%s);\n", GCG_PREFIX_REF, vldh_AttrRefToStr(0, aref),
+                  parameter);
   }
   return GSX__SUCCESS;
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m69()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for StoRefD, SetRefD, ResRefD, StoRefI, CStoRefI,
-*StoRefA,
-*	CStoRefA.
-*	Prints code for declaration and direkt link of a rtdbpointer.
-*	Prints an exec call :
-*	'structname'_exec( 'objpointer');
-*	ex: StoRefD_exec( Z80000811);
-*
-*	Checks that the referenced attribute exists, and that the type of
-*       the referenced attributs is correct.
-*	Prints declaration and direct link of pointer to referenced object.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m69()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for StoRefD, SetRefD, ResRefD, StoRefI, CStoRefI,
+ *StoRefA,
+ *	CStoRefA.
+ *	Prints code for declaration and direkt link of a rtdbpointer.
+ *	Prints an exec call :
+ *	'structname'_exec( 'objpointer');
+ *	ex: StoRefD_exec( Z80000811);
+ *
+ *	Checks that the referenced attribute exists, and that the type of
+ *       the referenced attributs is correct.
+ *	Prints declaration and direct link of pointer to referenced object.
+ *
+ **************************************************************************/
 
 int gcg_comp_m69(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -14592,13 +15178,11 @@ int gcg_comp_m69(gcg_ctx gcgctx, vldh_t_node node)
     first parameter in defbody */
 
   /* Get the devbody parameters for this class */
-  sts = ldh_GetObjectBodyDef(
-      ldhses, node->ln.cid, "DevBody", 1, &bodydef, &rows);
+  sts = ldh_GetObjectBodyDef(ldhses, node->ln.cid, "DevBody", 1, &bodydef, &rows);
   if (EVEN(sts))
     return sts;
 
-  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", bodydef[0].ParName,
-      (char**)&refattrref_ptr, &size);
+  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", bodydef[0].ParName, (char**)&refattrref_ptr, &size);
   if (EVEN(sts))
     return sts;
 
@@ -14612,7 +15196,8 @@ int gcg_comp_m69(gcg_ctx gcgctx, vldh_t_node node)
 
   /* Check that this is objdid of an existing object */
   sts = ldh_GetAttrRefOrigTid(ldhses, &refattrref, &cid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     gcg_error_msg(gcgctx, GSX__REFOBJ, node);
     return GSX__NEXTNODE;
   }
@@ -14622,13 +15207,13 @@ int gcg_comp_m69(gcg_ctx gcgctx, vldh_t_node node)
     return sts;
 
   /* This as to be of type AttrRef */
-  if (info.type != pwr_eType_AttrRef) {
+  if (info.type != pwr_eType_AttrRef)
+  {
     gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
     return GSX__NEXTNODE;
   }
 
-  sts = ldh_GetAttrObjectPar(
-      ldhses, &refattrref, "RtBody", "", (char**)&aref_ptr, &size);
+  sts = ldh_GetAttrObjectPar(ldhses, &refattrref, "RtBody", "", (char**)&aref_ptr, &size);
   if (EVEN(sts))
     return sts;
 
@@ -14636,18 +15221,20 @@ int gcg_comp_m69(gcg_ctx gcgctx, vldh_t_node node)
   free(aref_ptr);
 
   sts = ldh_GetAttrRefInfo(ldhses, &aref, &info);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     gcg_error_msg(gcgctx, GSX__REFOBJ, node);
     return GSX__NEXTPAR;
   }
 
-  switch (info.tid) {
+  switch (info.tid)
+  {
   case pwr_cClass_Di:
   case pwr_cClass_Do:
   case pwr_cClass_Dv:
-    if (!(node->ln.cid == pwr_cClass_StoRefD
-            || node->ln.cid == pwr_cClass_SetRefD
-            || node->ln.cid == pwr_cClass_ResRefD)) {
+    if (!(node->ln.cid == pwr_cClass_StoRefD || node->ln.cid == pwr_cClass_SetRefD ||
+          node->ln.cid == pwr_cClass_ResRefD))
+    {
       gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
       return GSX__NEXTPAR;
     }
@@ -14659,8 +15246,8 @@ int gcg_comp_m69(gcg_ctx gcgctx, vldh_t_node node)
   case pwr_cClass_Ai:
   case pwr_cClass_Ao:
   case pwr_cClass_Av:
-    if (!(node->ln.cid == pwr_cClass_StoRefA
-            || node->ln.cid == pwr_cClass_CStoRefA)) {
+    if (!(node->ln.cid == pwr_cClass_StoRefA || node->ln.cid == pwr_cClass_CStoRefA))
+    {
       gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
       return GSX__NEXTPAR;
     }
@@ -14672,8 +15259,8 @@ int gcg_comp_m69(gcg_ctx gcgctx, vldh_t_node node)
   case pwr_cClass_Ii:
   case pwr_cClass_Io:
   case pwr_cClass_Iv:
-    if (!(node->ln.cid == pwr_cClass_StoRefI
-            || node->ln.cid == pwr_cClass_CStoRefI)) {
+    if (!(node->ln.cid == pwr_cClass_StoRefI || node->ln.cid == pwr_cClass_CStoRefI))
+    {
       gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
       return GSX__NEXTPAR;
     }
@@ -14683,8 +15270,8 @@ int gcg_comp_m69(gcg_ctx gcgctx, vldh_t_node node)
     gcg_iowrite_insert(gcgctx, aref, GCG_PREFIX_REF);
     break;
   case pwr_cClass_Sv:
-    if (!(node->ln.cid == pwr_cClass_StoRefS
-            || node->ln.cid == pwr_cClass_CStoRefS)) {
+    if (!(node->ln.cid == pwr_cClass_StoRefS || node->ln.cid == pwr_cClass_CStoRefS))
+    {
       gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
       return GSX__NEXTPAR;
     }
@@ -14693,13 +15280,15 @@ int gcg_comp_m69(gcg_ctx gcgctx, vldh_t_node node)
     /* Insert io object in ref list */
     gcg_aref_insert(gcgctx, aref, GCG_PREFIX_REF, node);
     break;
-  default: {
+  default:
+  {
     info_size = info.size;
-    switch (info.type) {
+    switch (info.type)
+    {
     case pwr_eType_Boolean:
-      if (!(node->ln.cid == pwr_cClass_StoRefD
-              || node->ln.cid == pwr_cClass_SetRefD
-              || node->ln.cid == pwr_cClass_ResRefD)) {
+      if (!(node->ln.cid == pwr_cClass_StoRefD || node->ln.cid == pwr_cClass_SetRefD ||
+            node->ln.cid == pwr_cClass_ResRefD))
+      {
         gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
         return GSX__NEXTPAR;
       }
@@ -14712,23 +15301,23 @@ int gcg_comp_m69(gcg_ctx gcgctx, vldh_t_node node)
     case pwr_eType_UInt16:
     case pwr_eType_UInt32:
     case pwr_eType_UInt64:
-      if (!(node->ln.cid == pwr_cClass_StoRefI
-              || node->ln.cid == pwr_cClass_CStoRefI)) {
+      if (!(node->ln.cid == pwr_cClass_StoRefI || node->ln.cid == pwr_cClass_CStoRefI))
+      {
         gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
         return GSX__NEXTPAR;
       }
       break;
     case pwr_eType_Float32:
     case pwr_eType_Float64:
-      if (!(node->ln.cid == pwr_cClass_StoRefA
-              || node->ln.cid == pwr_cClass_CStoRefA)) {
+      if (!(node->ln.cid == pwr_cClass_StoRefA || node->ln.cid == pwr_cClass_CStoRefA))
+      {
         gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
         return GSX__NEXTPAR;
       }
       break;
     case pwr_eType_String:
-      if (!(node->ln.cid == pwr_cClass_StoRefS
-              || node->ln.cid == pwr_cClass_CStoRefS)) {
+      if (!(node->ln.cid == pwr_cClass_StoRefS || node->ln.cid == pwr_cClass_CStoRefS))
+      {
         gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
         return GSX__NEXTPAR;
       }
@@ -14744,14 +15333,16 @@ int gcg_comp_m69(gcg_ctx gcgctx, vldh_t_node node)
       return sts;
 
     strcpy(aname, name_p);
-    if ((s = strrchr(aname, '.')) == 0) {
+    if ((s = strrchr(aname, '.')) == 0)
+    {
       gcg_error_msg(gcgctx, GSX__REFOBJ, node);
       return GSX__NEXTPAR;
     }
 
     *s = 0;
     sts = ldh_NameToAttrRef(ldhses, aname, &aref);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       gcg_error_msg(gcgctx, GSX__REFOBJ, node);
       return GSX__NEXTPAR;
     }
@@ -14764,14 +15355,17 @@ int gcg_comp_m69(gcg_ctx gcgctx, vldh_t_node node)
     if (EVEN(sts))
       return sts;
 
-    if (info.flags & PWR_MASK_RTVIRTUAL) {
+    if (info.flags & PWR_MASK_RTVIRTUAL)
+    {
       /* Attribute is not defined in runtime */
       gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
       return GSX__NEXTNODE;
     }
 
-    if (info.flags & PWR_MASK_ARRAY) {
-      if (info.nElement == -1) {
+    if (info.flags & PWR_MASK_ARRAY)
+    {
+      if (info.nElement == -1)
+      {
         /* No index in attribute */
         gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
         return GSX__NEXTNODE;
@@ -14785,13 +15379,13 @@ int gcg_comp_m69(gcg_ctx gcgctx, vldh_t_node node)
 
   /* If the object is not connected the value in the
      parameter should be written in the macro call */
-  sts = ldh_GetObjectPar(
-      ldhses, node->ln.oid, "RtBody", "In", &nocondef_ptr, &size);
+  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "RtBody", "In", &nocondef_ptr, &size);
   if (EVEN(sts))
     return sts;
 
   /* Check that the class of the referenced object is correct */
-  switch (node->ln.cid) {
+  switch (node->ln.cid)
+  {
   case pwr_cClass_StoRefD:
   case pwr_cClass_SetRefD:
   case pwr_cClass_ResRefD:
@@ -14823,16 +15417,15 @@ int gcg_comp_m69(gcg_ctx gcgctx, vldh_t_node node)
     return sts;
 
   /* Print the execute command */
-  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( %c%s->%s, ", name,
-      GCG_PREFIX_REF, vldh_AttrRefToStr(0, aref), parameter);
+  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( %c%s->%s, ", name, GCG_PREFIX_REF,
+                vldh_AttrRefToStr(0, aref), parameter);
 
-  sts = gcg_print_inputs(
-      gcgctx, node, ", ", GCG_PRINT_ALLPAR, nocondef, nocontype);
+  sts = gcg_print_inputs(gcgctx, node, ", ", GCG_PRINT_ALLPAR, nocondef, nocontype);
   if (EVEN(sts))
     return sts;
 
-  if (node->ln.cid == pwr_cClass_StoRefS
-      || node->ln.cid == pwr_cClass_CStoRefS) {
+  if (node->ln.cid == pwr_cClass_StoRefS || node->ln.cid == pwr_cClass_CStoRefS)
+  {
     // Add size of connected attribute
     IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], ",%d", info_size);
   }
@@ -14843,27 +15436,27 @@ int gcg_comp_m69(gcg_ctx gcgctx, vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m38()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for SupressSup.
-*
-*	Syntax control:
-*	Checks that the class of the referenced object is correct.
-*
-*	Code generation:
-*	Declares and links a write pointer to the referenced object.
-*	Prints an exec call.
-*	SupressSup_exec( W800005f6, Z800005e2, Z800005f5->Out);
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m38()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for SupressSup.
+ *
+ *	Syntax control:
+ *	Checks that the class of the referenced object is correct.
+ *
+ *	Code generation:
+ *	Declares and links a write pointer to the referenced object.
+ *	Prints an exec call.
+ *	SupressSup_exec( W800005f6, Z800005e2, Z800005f5->Out);
+ *
+ **************************************************************************/
 
 int gcg_comp_m70(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -14896,13 +15489,11 @@ int gcg_comp_m70(gcg_ctx gcgctx, vldh_t_node node)
     first parameter in defbody */
 
   /* Get the devbody parameters for this class */
-  sts = ldh_GetObjectBodyDef(
-      ldhses, node->ln.cid, "DevBody", 1, &bodydef, &rows);
+  sts = ldh_GetObjectBodyDef(ldhses, node->ln.cid, "DevBody", 1, &bodydef, &rows);
   if (EVEN(sts))
     return sts;
 
-  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", bodydef[0].ParName,
-      (char**)&refattrref_ptr, &size);
+  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", bodydef[0].ParName, (char**)&refattrref_ptr, &size);
   if (EVEN(sts))
     return sts;
   refattrref = *refattrref_ptr;
@@ -14915,21 +15506,22 @@ int gcg_comp_m70(gcg_ctx gcgctx, vldh_t_node node)
 
   /* If the object is not connected the value in the
      parameter should be written in the macro call */
-  sts = ldh_GetObjectPar(
-      ldhses, node->ln.oid, "RtBody", "In", &nocondef_ptr, &size);
+  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "RtBody", "In", &nocondef_ptr, &size);
   if (EVEN(sts))
     return sts;
 
   /* Check that this is objdid of an existing object */
   sts = ldh_GetAttrRefOrigTid(ldhses, &refattrref, &cid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     gcg_error_msg(gcgctx, GSX__REFOBJ, node);
     return GSX__NEXTNODE;
   }
 
   /* Check that the class of the referenced object is correct */
 
-  switch (cid) {
+  switch (cid)
+  {
   case pwr_cClass_DSup:
   case pwr_cClass_DSupComp:
   case pwr_cClass_ASup:
@@ -14953,7 +15545,8 @@ int gcg_comp_m70(gcg_ctx gcgctx, vldh_t_node node)
   if (EVEN(sts))
     return sts;
 
-  switch (cid) {
+  switch (cid)
+  {
   case pwr_cClass_DSup:
     strcpy(cid_str, "pwr_cClass_DSup");
     break;
@@ -14970,12 +15563,10 @@ int gcg_comp_m70(gcg_ctx gcgctx, vldh_t_node node)
   }
 
   /* Print the execute command */
-  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( %c%s, %c%s, %s, ",
-      name, GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid), GCG_PREFIX_REF,
-      vldh_AttrRefToStr(0, refattrref), cid_str);
+  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( %c%s, %c%s, %s, ", name, GCG_PREFIX_REF,
+                vldh_IdToStr(0, node->ln.oid), GCG_PREFIX_REF, vldh_AttrRefToStr(0, refattrref), cid_str);
 
-  sts = gcg_print_inputs(
-      gcgctx, node, ", ", GCG_PRINT_ALLPAR, nocondef, nocontype);
+  sts = gcg_print_inputs(gcgctx, node, ", ", GCG_PRINT_ALLPAR, nocondef, nocontype);
   if (EVEN(sts))
     return sts;
 
@@ -14985,20 +15576,20 @@ int gcg_comp_m70(gcg_ctx gcgctx, vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_71()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for Simulink.
-*	Generates code to call simulink functions with in and out signals.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_71()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for Simulink.
+ *	Generates code to call simulink functions with in and out signals.
+ *
+ **************************************************************************/
 
 int gcg_comp_m71(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -15026,12 +15617,12 @@ int gcg_comp_m71(gcg_ctx gcgctx, vldh_t_node node)
   ldhses = (node->hn.wind)->hw.ldhses;
 
   /* Get Model name stored in devbody */
-  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", "ModelName",
-      (char**)&modelname_p, &size);
+  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", "ModelName", (char**)&modelname_p, &size);
   if (EVEN(sts))
     return sts;
 
-  if (streq(*modelname_p, "")) {
+  if (streq(*modelname_p, ""))
+  {
     /* There is no expression */
     gcg_error_msg(gcgctx, GSX__NOEXPR, node);
     free(modelname_p);
@@ -15039,23 +15630,19 @@ int gcg_comp_m71(gcg_ctx gcgctx, vldh_t_node node)
   }
 
   /* Get Input signals name stored in devbody */
-  sts = ldh_GetObjectPar(
-      ldhses, node->ln.oid, "DevBody", "AInName", (char**)&ainname_p, &size);
+  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", "AInName", (char**)&ainname_p, &size);
   if (EVEN(sts))
     return sts;
 
-  sts = ldh_GetObjectPar(
-      ldhses, node->ln.oid, "DevBody", "DInName", (char**)&dinname_p, &size);
+  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", "DInName", (char**)&dinname_p, &size);
   if (EVEN(sts))
     return sts;
 
-  sts = ldh_GetObjectPar(
-      ldhses, node->ln.oid, "DevBody", "OutAName", (char**)&outaname_p, &size);
+  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", "OutAName", (char**)&outaname_p, &size);
   if (EVEN(sts))
     return sts;
 
-  sts = ldh_GetObjectPar(
-      ldhses, node->ln.oid, "DevBody", "OutDName", (char**)&outdname_p, &size);
+  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", "OutDName", (char**)&outdname_p, &size);
   if (EVEN(sts))
     return sts;
 
@@ -15063,40 +15650,40 @@ int gcg_comp_m71(gcg_ctx gcgctx, vldh_t_node node)
   IF_PR fprintf(gcgctx->files[GCGM1_DECL_FILE], "\
 #include \"rtwtypes.h\"\n\
 #include \"%s.h\"\n",
-      *modelname_p);
+                *modelname_p);
 
   /* Print init */
   IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "\
 %s_initialize();\n",
-      *modelname_p);
+                *modelname_p);
 
   /* Print step code */
-  for (i = 0; i < 8; i++) {
+  for (i = 0; i < 8; i++)
+  {
     if (!streq(ainname_p[i], ""))
-      IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE],
-          "  rtU.%s = *%c%s->AIn%dP;\n", ainname_p[i], GCG_PREFIX_REF,
-          vldh_IdToStr(0, node->ln.oid), i + 1);
+      IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "  rtU.%s = *%c%s->AIn%dP;\n", ainname_p[i],
+                    GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid), i + 1);
   }
-  for (i = 0; i < 8; i++) {
+  for (i = 0; i < 8; i++)
+  {
     if (!streq(dinname_p[i], ""))
-      IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE],
-          "  rtU.%s = *%c%s->DIn%dP;\n", dinname_p[i], GCG_PREFIX_REF,
-          vldh_IdToStr(0, node->ln.oid), i + 1);
+      IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "  rtU.%s = *%c%s->DIn%dP;\n", dinname_p[i],
+                    GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid), i + 1);
   }
 
   IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "  %s_step();\n", *modelname_p);
 
-  for (i = 0; i < 8; i++) {
+  for (i = 0; i < 8; i++)
+  {
     if (!streq(outaname_p[i], ""))
-      IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE],
-          "  %c%s->OutA%d = rtY.%s;\n", GCG_PREFIX_REF,
-          vldh_IdToStr(0, node->ln.oid), i + 1, outaname_p[i]);
+      IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "  %c%s->OutA%d = rtY.%s;\n", GCG_PREFIX_REF,
+                    vldh_IdToStr(0, node->ln.oid), i + 1, outaname_p[i]);
   }
-  for (i = 0; i < 8; i++) {
+  for (i = 0; i < 8; i++)
+  {
     if (!streq(outdname_p[i], ""))
-      IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE],
-          "  %c%s->OutD%d = rtY.%s;\n", GCG_PREFIX_REF,
-          vldh_IdToStr(0, node->ln.oid), i + 1, outdname_p[i]);
+      IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "  %c%s->OutD%d = rtY.%s;\n", GCG_PREFIX_REF,
+                    vldh_IdToStr(0, node->ln.oid), i + 1, outdname_p[i]);
   }
 
   free((char*)modelname_p);
@@ -15108,33 +15695,35 @@ int gcg_comp_m71(gcg_ctx gcgctx, vldh_t_node node)
   sts = gcg_ref_insert(gcgctx, node->ln.oid, GCG_PREFIX_REF, node);
 
   /* Get the runtime parameters for this class */
-  sts = ldh_GetObjectBodyDef(
-      (node->hn.wind)->hw.ldhses, node->ln.cid, "RtBody", 1, &bodydef, &rows);
+  sts = ldh_GetObjectBodyDef((node->hn.wind)->hw.ldhses, node->ln.cid, "RtBody", 1, &bodydef, &rows);
   if (EVEN(sts))
     return sts;
 
   i = 0;
   first_par = 1;
-  while ((i < rows) && (bodydef[i].ParClass == pwr_eClass_Input)) {
+  while ((i < rows) && (bodydef[i].ParClass == pwr_eClass_Input))
+  {
     /* Get the point for this parameter if there is one */
     output_found = 0;
     sts = gcg_get_inputpoint(node, i, &point, &par_inverted);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       /* Look for an output connected to this point */
-      sts = gcg_get_output(node, point, &output_count, &output_node,
-          &output_point, &output_bodydef,
-          GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
+      sts = gcg_get_output(node, point, &output_count, &output_node, &output_point, &output_bodydef,
+                           GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
       if (EVEN(sts))
         return sts;
 
-      if (output_count > 0) {
+      if (output_count > 0)
+      {
         output_found = 1;
         if (output_count > 1)
           gcg_error_msg(gcgctx, GSX__CONOUTPUT, output_node);
 
-        sts = gcg_get_outputstring(gcgctx, output_node, &output_bodydef,
-            &output_attrref, &output_type, &output_prefix, output_par);
-        if (sts == GSX__NEXTPAR) {
+        sts = gcg_get_outputstring(gcgctx, output_node, &output_bodydef, &output_attrref, &output_type,
+                                   &output_prefix, output_par);
+        if (sts == GSX__NEXTPAR)
+        {
           i++;
           continue;
         }
@@ -15144,26 +15733,27 @@ int gcg_comp_m71(gcg_ctx gcgctx, vldh_t_node node)
         if (par_inverted)
           gcg_error_msg(gcgctx, GSX__INV, node);
 
-        IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = &%c%s->%s;\n",
-            GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid),
-            bodydef[i].Par->Param.Info.PgmName, output_prefix,
-            output_type == GCG_OTYPE_OID ? vldh_IdToStr(1, output_attrref.Objid)
-                                         : vldh_AttrRefToStr(0, output_attrref),
-            output_par);
-      } else {
+        IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = &%c%s->%s;\n", GCG_PREFIX_REF,
+                      vldh_IdToStr(0, node->ln.oid), bodydef[i].Par->Param.Info.PgmName, output_prefix,
+                      output_type == GCG_OTYPE_OID ? vldh_IdToStr(1, output_attrref.Objid)
+                                                   : vldh_AttrRefToStr(0, output_attrref),
+                      output_par);
+      }
+      else
+      {
         /* Point visible but not connected, errormessage */
         gcg_error_msg(gcgctx, GSX__NOTCON, node);
       }
       first_par = 0;
     }
-    if (!output_found) {
+    if (!output_found)
+    {
       /* The point is not connected and will point to its
          own object */
 
-      IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = &%c%s->%s;\n",
-          GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid),
-          bodydef[i].Par->Param.Info.PgmName, GCG_PREFIX_REF,
-          vldh_IdToStr(1, node->ln.oid), bodydef[i].Par->Param.Info.PgmName);
+      IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = &%c%s->%s;\n", GCG_PREFIX_REF,
+                    vldh_IdToStr(0, node->ln.oid), bodydef[i].Par->Param.Info.PgmName, GCG_PREFIX_REF,
+                    vldh_IdToStr(1, node->ln.oid), bodydef[i].Par->Param.Info.PgmName);
     }
     i++;
   }
@@ -15173,26 +15763,26 @@ int gcg_comp_m71(gcg_ctx gcgctx, vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m72()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for BusGet.
-*
-*	Syntax control:
-*	Check that the referenced attribute exists.
-*
-*	Generating code:
-*	Declares and links a rtdb pointer to the referenced object.
-*	Prints an exec call.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m72()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for BusGet.
+ *
+ *	Syntax control:
+ *	Check that the referenced attribute exists.
+ *
+ *	Generating code:
+ *	Declares and links a rtdb pointer to the referenced object.
+ *	Prints an exec call.
+ *
+ **************************************************************************/
 
 int gcg_comp_m72(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -15211,13 +15801,11 @@ int gcg_comp_m72(gcg_ctx gcgctx, vldh_t_node node)
     first parameter in devbody */
 
   /* Get the devbody parameters for this class */
-  sts = ldh_GetObjectBodyDef(
-      ldhses, node->ln.cid, "DevBody", 1, &bodydef, &rows);
+  sts = ldh_GetObjectBodyDef(ldhses, node->ln.cid, "DevBody", 1, &bodydef, &rows);
   if (EVEN(sts))
     return sts;
 
-  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", bodydef[0].ParName,
-      (char**)&refattrref_ptr, &size);
+  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", bodydef[0].ParName, (char**)&refattrref_ptr, &size);
   if (EVEN(sts))
     return sts;
   refattrref = *refattrref_ptr;
@@ -15226,23 +15814,23 @@ int gcg_comp_m72(gcg_ctx gcgctx, vldh_t_node node)
 
   /* Check that this is objid of an existing object */
   sts = ldh_GetAttrRefOrigTid(ldhses, &refattrref, &cid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     gcg_error_msg(gcgctx, GSX__REFOBJ, node);
     return GSX__NEXTNODE;
   }
-  sts = ldh_GetObjectBodyDef(
-      ldhses, node->ln.cid, "RtBody", 1, &bodydef, &rows);
+  sts = ldh_GetObjectBodyDef(ldhses, node->ln.cid, "RtBody", 1, &bodydef, &rows);
   if (EVEN(sts))
     return sts;
 
-  if (bodydef[0].Par->Output.TypeRef != cid) {
+  if (bodydef[0].Par->Output.TypeRef != cid)
+  {
     // No object
     gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
     return GSX__NEXTNODE;
   }
 
   free((char*)bodydef);
-
 
   sts = gcg_replace_ref(gcgctx, &refattrref, node);
   if (EVEN(sts))
@@ -15258,43 +15846,41 @@ int gcg_comp_m72(gcg_ctx gcgctx, vldh_t_node node)
     return sts;
 
   /* Print the execute command */
-  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE],
-      "GetBus_generic_exec( tp, %c%s, %c%s);\n", GCG_PREFIX_REF,
-      vldh_IdToStr(0, node->ln.oid), GCG_PREFIX_REF,
-      vldh_AttrRefToStr(0, refattrref));
+  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "GetBus_generic_exec( tp, %c%s, %c%s);\n", GCG_PREFIX_REF,
+                vldh_IdToStr(0, node->ln.oid), GCG_PREFIX_REF, vldh_AttrRefToStr(0, refattrref));
 
   return GSX__SUCCESS;
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m73()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for a CStoBus.
-*	Prints code for declaration and direkt link of a rtdbpointer.
-*	Prints code for initialization of pointers in the object:
-*	'objpointer'->'pgmname'P = &'in';
-*	Z80000811->InP = &Z800005f5->ActualValue;
-*
-*	If a parameter is not connected or not visible the pointer
-*	will point to the own object:
-*
-*	'objpointer'->'pgmname'P = &'objpointer'->'pgmname';
-*	Z80000811->InP = &Z80000811->In;
-*
-*	Prints an exec call :
-*	'structname'_exec( tp, 'objpointer', 'buspointer');
-*	ex: bus_exec( tp, Z80000811, Z80000812);
-*
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m73()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for a CStoBus.
+ *	Prints code for declaration and direkt link of a rtdbpointer.
+ *	Prints code for initialization of pointers in the object:
+ *	'objpointer'->'pgmname'P = &'in';
+ *	Z80000811->InP = &Z800005f5->ActualValue;
+ *
+ *	If a parameter is not connected or not visible the pointer
+ *	will point to the own object:
+ *
+ *	'objpointer'->'pgmname'P = &'objpointer'->'pgmname';
+ *	Z80000811->InP = &Z80000811->In;
+ *
+ *	Prints an exec call :
+ *	'structname'_exec( tp, 'objpointer', 'buspointer');
+ *	ex: bus_exec( tp, Z80000811, Z80000812);
+ *
+ *
+ **************************************************************************/
 
 int gcg_comp_m73(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -15328,13 +15914,11 @@ int gcg_comp_m73(gcg_ctx gcgctx, vldh_t_node node)
     return sts;
 
   /* Get the devbody parameters for this class */
-  sts = ldh_GetObjectBodyDef(
-      ldhses, node->ln.cid, "DevBody", 1, &bodydef, &rows);
+  sts = ldh_GetObjectBodyDef(ldhses, node->ln.cid, "DevBody", 1, &bodydef, &rows);
   if (EVEN(sts))
     return sts;
 
-  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", bodydef[0].ParName,
-      (char**)&refattrref_ptr, &size);
+  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", bodydef[0].ParName, (char**)&refattrref_ptr, &size);
   if (EVEN(sts))
     return sts;
   refattrref = *refattrref_ptr;
@@ -15343,23 +15927,23 @@ int gcg_comp_m73(gcg_ctx gcgctx, vldh_t_node node)
 
   /* Check that this is objid of an existing object */
   sts = ldh_GetAttrRefOrigTid(ldhses, &refattrref, &cid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     gcg_error_msg(gcgctx, GSX__REFOBJ, node);
     return GSX__NEXTNODE;
   }
-  sts = ldh_GetObjectBodyDef(
-      ldhses, node->ln.cid, "RtBody", 1, &bodydef, &rows);
+  sts = ldh_GetObjectBodyDef(ldhses, node->ln.cid, "RtBody", 1, &bodydef, &rows);
   if (EVEN(sts))
     return sts;
 
-  if (bodydef[0].Par->Input.TypeRef != cid) {
+  if (bodydef[0].Par->Input.TypeRef != cid)
+  {
     // No object
     gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
     return GSX__NEXTNODE;
   }
 
   free((char*)bodydef);
-
 
   sts = gcg_replace_ref(gcgctx, &refattrref, node);
   if (EVEN(sts))
@@ -15369,9 +15953,8 @@ int gcg_comp_m73(gcg_ctx gcgctx, vldh_t_node node)
   gcg_aref_insert(gcgctx, refattrref, GCG_PREFIX_REF, node);
 
   /* Print the execute command */
-  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "CStoBus_generic_exec( tp, %c%s, %c%s);\n",
-      GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid), GCG_PREFIX_REF,
-      vldh_AttrRefToStr(0, refattrref));
+  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "CStoBus_generic_exec( tp, %c%s, %c%s);\n", GCG_PREFIX_REF,
+                vldh_IdToStr(0, node->ln.oid), GCG_PREFIX_REF, vldh_AttrRefToStr(0, refattrref));
 
   /* Get the runtime parameters for this class */
   sts = ldh_GetObjectBodyDef(ldhses, node->ln.cid, "RtBody", 1, &bodydef, &rows);
@@ -15380,26 +15963,29 @@ int gcg_comp_m73(gcg_ctx gcgctx, vldh_t_node node)
 
   i = 0;
   first_par = 1;
-  while ((i < rows) && (bodydef[i].ParClass == pwr_eClass_Input)) {
+  while ((i < rows) && (bodydef[i].ParClass == pwr_eClass_Input))
+  {
     /* Get the point for this parameter if there is one */
     output_found = 0;
     sts = gcg_get_inputpoint(node, i, &point, &par_inverted);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       /* Look for an output connected to this point */
-      sts = gcg_get_output(node, point, &output_count, &output_node,
-          &output_point, &output_bodydef,
-          GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
+      sts = gcg_get_output(node, point, &output_count, &output_node, &output_point, &output_bodydef,
+                           GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
       if (EVEN(sts))
         return sts;
 
-      if (output_count > 0) {
+      if (output_count > 0)
+      {
         output_found = 1;
         if (output_count > 1)
           gcg_error_msg(gcgctx, GSX__CONOUTPUT, output_node);
 
-        sts = gcg_get_outputstring(gcgctx, output_node, &output_bodydef,
-            &output_attrref, &output_type, &output_prefix, output_par);
-        if (sts == GSX__NEXTPAR) {
+        sts = gcg_get_outputstring(gcgctx, output_node, &output_bodydef, &output_attrref, &output_type,
+                                   &output_prefix, output_par);
+        if (sts == GSX__NEXTPAR)
+        {
           i++;
           continue;
         }
@@ -15409,27 +15995,27 @@ int gcg_comp_m73(gcg_ctx gcgctx, vldh_t_node node)
         if (par_inverted)
           gcg_error_msg(gcgctx, GSX__INV, node);
 
-        IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE],
-            "%c%s->%sP = &%c%s->%s;\n", GCG_PREFIX_REF,
-            vldh_IdToStr(0, node->ln.oid), bodydef[i].Par->Param.Info.PgmName,
-            output_prefix,
-            output_type == GCG_OTYPE_OID ? vldh_IdToStr(1, output_attrref.Objid)
-                                         : vldh_AttrRefToStr(0, output_attrref),
-            output_par);
-      } else {
+        IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = &%c%s->%s;\n", GCG_PREFIX_REF,
+                      vldh_IdToStr(0, node->ln.oid), bodydef[i].Par->Param.Info.PgmName, output_prefix,
+                      output_type == GCG_OTYPE_OID ? vldh_IdToStr(1, output_attrref.Objid)
+                                                   : vldh_AttrRefToStr(0, output_attrref),
+                      output_par);
+      }
+      else
+      {
         /* Point visible but not connected, errormessage */
         gcg_error_msg(gcgctx, GSX__NOTCON, node);
       }
       first_par = 0;
     }
-    if (!output_found) {
+    if (!output_found)
+    {
       /* The point is not connected and will point to its
          own object */
 
-      IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = &%c%s->%s;\n",
-          GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid),
-          bodydef[i].Par->Param.Info.PgmName, GCG_PREFIX_REF,
-          vldh_IdToStr(1, node->ln.oid), bodydef[i].Par->Param.Info.PgmName);
+      IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = &%c%s->%s;\n", GCG_PREFIX_REF,
+                    vldh_IdToStr(0, node->ln.oid), bodydef[i].Par->Param.Info.PgmName, GCG_PREFIX_REF,
+                    vldh_IdToStr(1, node->ln.oid), bodydef[i].Par->Param.Info.PgmName);
     }
     i++;
   }
@@ -15442,43 +16028,43 @@ int gcg_comp_m73(gcg_ctx gcgctx, vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m74()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for QOrder object.
-*
-*	Syntax control:
-*	Checks that the input pin is connected to a qcell.
-*	Checks that if the condition pin is connected order has
-*	a C attribute.
-*
-*	Code generation:
-*	An object is created for every attribute of the order and
-*	one object for the order itself. The orders are serially connected
-*	with the first attribute first and the order object last.
-*	Ex DSC order
-*       QCell - QDOrder - QSOrder - QCOrder - QOrder
-*
-*	Ex SOrder
-*	qcell_exec(Z800005da);
-*	QSOrder_exec(Z8000084a, Z800005da, Z800005f0->ActualValue);
-*	QOrder_exec(Z800005d5, Z8000084a);
-*
-*	Declares and links pointers to the order object and all suborder
-*	objects.
-*	Prints an exec call for every suborder.
-*	For a C suborder prints a setcond_exec call or a call for
-*	a subwidow condition.
-*	Prints an init and exec call for the order.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m74()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for QOrder object.
+ *
+ *	Syntax control:
+ *	Checks that the input pin is connected to a qcell.
+ *	Checks that if the condition pin is connected order has
+ *	a C attribute.
+ *
+ *	Code generation:
+ *	An object is created for every attribute of the order and
+ *	one object for the order itself. The orders are serially connected
+ *	with the first attribute first and the order object last.
+ *	Ex DSC order
+ *       QCell - QDOrder - QSOrder - QCOrder - QOrder
+ *
+ *	Ex SOrder
+ *	qcell_exec(Z800005da);
+ *	QSOrder_exec(Z8000084a, Z800005da, Z800005f0->ActualValue);
+ *	QOrder_exec(Z800005d5, Z8000084a);
+ *
+ *	Declares and links pointers to the order object and all suborder
+ *	objects.
+ *	Prints an exec call for every suborder.
+ *	For a C suborder prints a setcond_exec call or a call for
+ *	a subwidow condition.
+ *	Prints an init and exec call for the order.
+ *
+ **************************************************************************/
 
 int gcg_comp_m74(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -15508,7 +16094,7 @@ int gcg_comp_m74(gcg_ctx gcgctx, vldh_t_node node)
   unsigned long subordercount;
   unsigned long ldhsubordercount;
   char* name;
-  char *sname;
+  char* sname;
 
   char newsuborderchar[6];
   pwr_tClassId newsuborderclass[6];
@@ -15534,15 +16120,15 @@ int gcg_comp_m74(gcg_ctx gcgctx, vldh_t_node node)
 
   oldsubordercount = 0;
   sts = ldh_GetChild(ldhses, node->ln.oid, &nextoid);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     /* Find out if this is a suborder and wich class */
     sts = ldh_GetObjectClass(ldhses, nextoid, &subordercid);
 
-    if ((subordercid == pwr_cClass_QSOrder)
-	|| (subordercid == pwr_cClass_QLOrder)
-	|| (subordercid == pwr_cClass_QDOrder)
-	|| (subordercid == pwr_cClass_QPOrder)
-	|| (subordercid == pwr_cClass_QCOrder)) {
+    if ((subordercid == pwr_cClass_QSOrder) || (subordercid == pwr_cClass_QLOrder) ||
+        (subordercid == pwr_cClass_QDOrder) || (subordercid == pwr_cClass_QPOrder) ||
+        (subordercid == pwr_cClass_QCOrder))
+    {
       oldsuborderclass[oldsubordercount] = subordercid;
       oldsuborderobjdid[oldsubordercount] = nextoid;
       oldsubordercount++;
@@ -15557,34 +16143,43 @@ int gcg_comp_m74(gcg_ctx gcgctx, vldh_t_node node)
     return sts;
 
   newsubordercount = 0;
-  for (i = 0; i < rows - 2; i += 2) {
+  for (i = 0; i < rows - 2; i += 2)
+  {
     /* Get the parameter value */
-    sts = ldh_GetObjectPar(
-	ldhses, node->ln.oid, "DevBody", bodydef[i].ParName, &parvalue, &size);
+    sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", bodydef[i].ParName, &parvalue, &size);
     if (EVEN(sts))
       return sts;
 
-    if (*parvalue == 'S' || *parvalue == 's') {
+    if (*parvalue == 'S' || *parvalue == 's')
+    {
       newsuborderclass[newsubordercount] = pwr_cClass_QSOrder;
       newsuborderchar[newsubordercount] = *parvalue;
       newsuborderindex[newsubordercount] = i;
       newsubordercount++;
-    } else if (*parvalue == 'L' || *parvalue == 'l') {
+    }
+    else if (*parvalue == 'L' || *parvalue == 'l')
+    {
       newsuborderclass[newsubordercount] = pwr_cClass_QLOrder;
       newsuborderchar[newsubordercount] = *parvalue;
       newsuborderindex[newsubordercount] = i;
       newsubordercount++;
-    } else if (*parvalue == 'C' || *parvalue == 'c') {
+    }
+    else if (*parvalue == 'C' || *parvalue == 'c')
+    {
       newsuborderclass[newsubordercount] = pwr_cClass_QCOrder;
       newsuborderchar[newsubordercount] = *parvalue;
       newsuborderindex[newsubordercount] = i;
       newsubordercount++;
-    } else if (*parvalue == 'D' || *parvalue == 'd') {
+    }
+    else if (*parvalue == 'D' || *parvalue == 'd')
+    {
       newsuborderclass[newsubordercount] = pwr_cClass_QDOrder;
       newsuborderchar[newsubordercount] = *parvalue;
       newsuborderindex[newsubordercount] = i;
       newsubordercount++;
-    } else if (*parvalue == 'P' || *parvalue == 'p') {
+    }
+    else if (*parvalue == 'P' || *parvalue == 'p')
+    {
       newsuborderclass[newsubordercount] = pwr_cClass_QPOrder;
       newsuborderchar[newsubordercount] = *parvalue;
       newsuborderindex[newsubordercount] = i;
@@ -15598,58 +16193,63 @@ int gcg_comp_m74(gcg_ctx gcgctx, vldh_t_node node)
     count_ok = 1;
   else
     count_ok = 0;
-  
+
   classdiff_ok = 1;
   diffcount = 0;
-  for (i = 0; i < (int)oldsubordercount; i++) {
-    if (newsuborderclass[i] != oldsuborderclass[i]) {
+  for (i = 0; i < (int)oldsubordercount; i++)
+  {
+    if (newsuborderclass[i] != oldsuborderclass[i])
+    {
       classdiff_ok = 0;
       diffcount = i;
       break;
-    } else
+    }
+    else
       newsuborderobjdid[i] = oldsuborderobjdid[i];
   }
 
-  if (!(classdiff_ok && count_ok)) {
+  if (!(classdiff_ok && count_ok))
+  {
     /* Delete suborderobjects after the first difference */
-    for (i = diffcount; i < (int)oldsubordercount; i++) {
+    for (i = diffcount; i < (int)oldsubordercount; i++)
+    {
       sts = ldh_DeleteObject(ldhses, oldsuborderobjdid[i]);
       if (EVEN(sts))
-	return sts;
+        return sts;
     }
     /* Create new suborderobjects starting with the first found
        difference */
-    for (i = diffcount; i < (int)newsubordercount; i++) {
+    for (i = diffcount; i < (int)newsubordercount; i++)
+    {
       /* Get default segment name */
       graphname[0] = newsuborderchar[i];
       graphname[1] = '\0';
-      sts = vldh_get_object_defname(
-	  ldhses, node->ln.oid, OT_SUBORDER, graphname, segment_name);
+      sts = vldh_get_object_defname(ldhses, node->ln.oid, OT_SUBORDER, graphname, segment_name);
       if (EVEN(sts))
-	return sts;
+        return sts;
 
       /* Create the object i ldh */
-      sts = ldh_CreateObject(ldhses, &suborderobjdid, segment_name,
-	  newsuborderclass[i], node->ln.oid, ldh_eDest_IntoLast);
+      sts = ldh_CreateObject(ldhses, &suborderobjdid, segment_name, newsuborderclass[i], node->ln.oid,
+                             ldh_eDest_IntoLast);
       if (EVEN(sts))
-	return sts;
+        return sts;
       newsuborderobjdid[i] = suborderobjdid;
     }
   }
 
   /* Move the time from parent to the children */
-  for (i = 0; i < (int)newsubordercount; i++) {
-    if (newsuborderclass[i] == pwr_cClass_QDOrder
-	|| newsuborderclass[i] == pwr_cClass_QLOrder) {
+  for (i = 0; i < (int)newsubordercount; i++)
+  {
+    if (newsuborderclass[i] == pwr_cClass_QDOrder || newsuborderclass[i] == pwr_cClass_QLOrder)
+    {
       /* Move the time from the parent to the child */
-      sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody",
-	 bodydef[newsuborderindex[i] + 1].ParName, (char**)&time_ptr, &size);
+      sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", bodydef[newsuborderindex[i] + 1].ParName,
+                             (char**)&time_ptr, &size);
       if (EVEN(sts))
-	return sts;
-      sts = ldh_SetObjectPar(ldhses, newsuborderobjdid[i], "RtBody",
-          "TimerTime", (char*)time_ptr, size);
+        return sts;
+      sts = ldh_SetObjectPar(ldhses, newsuborderobjdid[i], "RtBody", "TimerTime", (char*)time_ptr, size);
       if (EVEN(sts))
-	return sts;
+        return sts;
       free((char*)time_ptr);
     }
   }
@@ -15659,21 +16259,20 @@ int gcg_comp_m74(gcg_ctx gcgctx, vldh_t_node node)
   if (EVEN(sts))
     return sts;
 
-  sts = gcg_get_output(node, 0, &output_count, &output_node, &output_point,
-      &output_bodydef, GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
+  sts = gcg_get_output(node, 0, &output_count, &output_node, &output_point, &output_bodydef,
+                       GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
   if (EVEN(sts))
     return sts;
 
-  if (output_count > 0) {
+  if (output_count > 0)
+  {
     output_found = 1;
     if (output_count > 1)
       gcg_error_msg(gcgctx, GSX__CONOUTPUT, node);
 
-    IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = &%c%s->%s;\n",
-        GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid),
-	rbodydef[0].Par->Param.Info.PgmName, GCG_PREFIX_REF,
-	vldh_IdToStr(1, output_node->ln.oid),
-	output_bodydef.Par->Param.Info.PgmName);
+    IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->%sP = &%c%s->%s;\n", GCG_PREFIX_REF,
+                  vldh_IdToStr(0, node->ln.oid), rbodydef[0].Par->Param.Info.PgmName, GCG_PREFIX_REF,
+                  vldh_IdToStr(1, output_node->ln.oid), output_bodydef.Par->Param.Info.PgmName);
 #if 0
     /* Check that is it a qcell */
     sts = ldh_GetObjectClass(ldhses, output_node->ln.oid, &cid);
@@ -15687,7 +16286,9 @@ int gcg_comp_m74(gcg_ctx gcgctx, vldh_t_node node)
       return GSX__NEXTNODE;
     }
 #endif
-  } else {
+  }
+  else
+  {
     /* Not connected */
     gcg_error_msg(gcgctx, GSX__GNOTCON, node);
     return GSX__NEXTNODE;
@@ -15705,31 +16306,32 @@ int gcg_comp_m74(gcg_ctx gcgctx, vldh_t_node node)
     return sts;
 
   /* Print the execute command */
-  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec(tp, %c%s);\n", name,
-      GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid));
+  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec(tp, %c%s);\n", name, GCG_PREFIX_REF,
+                vldh_IdToStr(0, node->ln.oid));
 
   /* Print the init command */
-  IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%s_init( %c%s);\n", name,
-      GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid));
+  IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%s_init( %c%s);\n", name, GCG_PREFIX_REF,
+                vldh_IdToStr(0, node->ln.oid));
 
   /* Check if the condition pin is visible */
   sts = gcg_get_inputpoint(node, 1, &point, &par_inverted);
   pincond_found = 0;
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     /* Look for an output connected to this point */
-    sts = gcg_get_output(node, point, &output_count, &output_node,
-        &output_point, &output_bodydef,
-        GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
+    sts = gcg_get_output(node, point, &output_count, &output_node, &output_point, &output_bodydef,
+                         GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
     if (EVEN(sts))
       return sts;
 
-    if (output_count > 0) {
+    if (output_count > 0)
+    {
       pincond_found = 1;
       if (output_count > 1)
         gcg_error_msg(gcgctx, GSX__CONOUTPUT, node);
 
-      sts = gcg_get_outputstring(gcgctx, output_node, &output_bodydef,
-          &output_attrref, &output_type, &output_prefix, output_par);
+      sts = gcg_get_outputstring(gcgctx, output_node, &output_bodydef, &output_attrref, &output_type,
+                                 &output_prefix, output_par);
       if (sts == GSX__NEXTPAR)
         return sts;
       if (EVEN(sts))
@@ -15738,58 +16340,74 @@ int gcg_comp_m74(gcg_ctx gcgctx, vldh_t_node node)
       /* Get the objdid for the QCOrder */
       found = 0;
       sts = ldh_GetChild(ldhses, node->ln.oid, &nextoid);
-      while (ODD(sts)) {
+      while (ODD(sts))
+      {
         /* Find out if this is a QCOrder */
         sts = ldh_GetObjectClass(ldhses, nextoid, &cid);
         if (EVEN(sts))
           return sts;
 
-        if (cid == pwr_cClass_QCOrder) {
+        if (cid == pwr_cClass_QCOrder)
+        {
           found = 1;
           break;
         }
         sts = ldh_GetNextSibling(ldhses, nextoid, &nextoid);
       }
-      if (!found) {
+      if (!found)
+      {
         gcg_error_msg(gcgctx, GSX__NOCORDER, node);
         return GSX__NEXTNODE;
       }
       /* Print the execute for a setcond command */
-      sprintf(condstr, "%s%c%s->%s",
-	  par_inverted ? "!" : "", output_prefix,
-          output_type == GCG_OTYPE_OID ? vldh_IdToStr(0, output_attrref.Objid)
-                                       : vldh_AttrRefToStr(0, output_attrref),
-          output_par);
-    } else {
+      sprintf(condstr, "%s%c%s->%s", par_inverted ? "!" : "", output_prefix,
+              output_type == GCG_OTYPE_OID ? vldh_IdToStr(0, output_attrref.Objid)
+                                           : vldh_AttrRefToStr(0, output_attrref),
+              output_par);
+    }
+    else
+    {
       /* Point visible but not connected, errormessage */
       gcg_error_msg(gcgctx, GSX__NOTCON, node);
     }
   }
 
   subordercount = 0;
-  for (i = 0; i < 12; i += 2) {
+  for (i = 0; i < 12; i += 2)
+  {
     /* Get the parameter value */
-    sts = ldh_GetObjectPar((node->hn.wind)->hw.ldhses, node->ln.oid, "DevBody",
-	bodydef[i].ParName, (char**)&parvalue, &size);
+    sts = ldh_GetObjectPar((node->hn.wind)->hw.ldhses, node->ln.oid, "DevBody", bodydef[i].ParName,
+                           (char**)&parvalue, &size);
     if (EVEN(sts))
       return sts;
 
-    if (*parvalue == 'S' || *parvalue == 's') {
+    if (*parvalue == 'S' || *parvalue == 's')
+    {
       suborderclass[subordercount] = pwr_cClass_QSOrder;
       subordercount++;
-    } else if (*parvalue == 'L' || *parvalue == 'l') {
+    }
+    else if (*parvalue == 'L' || *parvalue == 'l')
+    {
       suborderclass[subordercount] = pwr_cClass_QLOrder;
       subordercount++;
-    } else if (*parvalue == 'C' || *parvalue == 'c') {
+    }
+    else if (*parvalue == 'C' || *parvalue == 'c')
+    {
       suborderclass[subordercount] = pwr_cClass_QCOrder;
       subordercount++;
-    } else if (*parvalue == 'D' || *parvalue == 'd') {
+    }
+    else if (*parvalue == 'D' || *parvalue == 'd')
+    {
       suborderclass[subordercount] = pwr_cClass_QDOrder;
       subordercount++;
-    } else if (*parvalue == 'P' || *parvalue == 'p') {
+    }
+    else if (*parvalue == 'P' || *parvalue == 'p')
+    {
       suborderclass[subordercount] = pwr_cClass_QPOrder;
       subordercount++;
-    } else if (*parvalue != 0) {
+    }
+    else if (*parvalue != 0)
+    {
       /* This orderattribute is not allowed */
       gcg_error_msg(gcgctx, GSX__ORDERATTR, node);
     }
@@ -15800,22 +16418,25 @@ int gcg_comp_m74(gcg_ctx gcgctx, vldh_t_node node)
   found = 0;
   ldhsubordercount = 0;
   sts = ldh_GetChild(ldhses, node->ln.oid, &nextoid);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     /* Find out if this is a suborder */
     sts = ldh_GetObjectClass(ldhses, nextoid, &cid);
     if (EVEN(sts))
       return sts;
 
-    if (cid == pwr_cClass_QSOrder || cid == pwr_cClass_QDOrder
-        || cid == pwr_cClass_QLOrder || cid == pwr_cClass_QCOrder
-        || cid == pwr_cClass_QPOrder) {
-      if (cid != suborderclass[ldhsubordercount]) {
+    if (cid == pwr_cClass_QSOrder || cid == pwr_cClass_QDOrder || cid == pwr_cClass_QLOrder ||
+        cid == pwr_cClass_QCOrder || cid == pwr_cClass_QPOrder)
+    {
+      if (cid != suborderclass[ldhsubordercount])
+      {
         return GSX__ORDERMISM;
       }
-      if (cid == pwr_cClass_QSOrder) {
-	sts = gcg_check_grafcet_reset(gcgctx, node);
-	if (EVEN(sts) || sts == GSX__NEXTNODE)
-	  return sts;
+      if (cid == pwr_cClass_QSOrder)
+      {
+        sts = gcg_check_grafcet_reset(gcgctx, node);
+        if (EVEN(sts) || sts == GSX__NEXTNODE)
+          return sts;
 
         sts = gcg_ref_insert(gcgctx, nextoid, GCG_PREFIX_REF, node);
 
@@ -15825,13 +16446,13 @@ int gcg_comp_m74(gcg_ctx gcgctx, vldh_t_node node)
           return sts;
 
         /* Print the execute command */
-        IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE],
-            "%s_exec( %c%s, %c%s, %c%s->ActualValue);\n", sname, GCG_PREFIX_REF,
-            vldh_IdToStr(0, nextoid), GCG_PREFIX_REF,
-            vldh_IdToStr(1, statusoid), GCG_PREFIX_REF,
-            vldh_AttrRefToStr(2, gcgctx->reset_object));
+        IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( %c%s, %c%s, %c%s->ActualValue);\n", sname,
+                      GCG_PREFIX_REF, vldh_IdToStr(0, nextoid), GCG_PREFIX_REF, vldh_IdToStr(1, statusoid),
+                      GCG_PREFIX_REF, vldh_AttrRefToStr(2, gcgctx->reset_object));
         statusoid = nextoid;
-      } else if (cid == pwr_cClass_QLOrder) {
+      }
+      else if (cid == pwr_cClass_QLOrder)
+      {
         /* Get the time */
 
         sts = gcg_ref_insert(gcgctx, nextoid, GCG_PREFIX_REF, node);
@@ -15845,11 +16466,12 @@ int gcg_comp_m74(gcg_ctx gcgctx, vldh_t_node node)
           return sts;
 
         /* Print the execute command */
-        IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( %c%s, %c%s);\n",
-            sname, GCG_PREFIX_REF, vldh_IdToStr(0, nextoid), GCG_PREFIX_REF,
-            vldh_IdToStr(1, statusoid));
+        IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( %c%s, %c%s);\n", sname, GCG_PREFIX_REF,
+                      vldh_IdToStr(0, nextoid), GCG_PREFIX_REF, vldh_IdToStr(1, statusoid));
         statusoid = nextoid;
-      } else if (cid == pwr_cClass_QDOrder) {
+      }
+      else if (cid == pwr_cClass_QDOrder)
+      {
         /* Get the time */
 
         sts = gcg_ref_insert(gcgctx, nextoid, GCG_PREFIX_REF, node);
@@ -15863,11 +16485,12 @@ int gcg_comp_m74(gcg_ctx gcgctx, vldh_t_node node)
           return sts;
 
         /* Print the execute command */
-        IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( %c%s, %c%s);\n",
-            sname, GCG_PREFIX_REF, vldh_IdToStr(0, nextoid), GCG_PREFIX_REF,
-            vldh_IdToStr(1, statusoid));
+        IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( %c%s, %c%s);\n", sname, GCG_PREFIX_REF,
+                      vldh_IdToStr(0, nextoid), GCG_PREFIX_REF, vldh_IdToStr(1, statusoid));
         statusoid = nextoid;
-      } else if (cid == pwr_cClass_QPOrder) {
+      }
+      else if (cid == pwr_cClass_QPOrder)
+      {
         sts = gcg_ref_insert(gcgctx, nextoid, GCG_PREFIX_REF, node);
 
         /* Get name for execute call */
@@ -15876,11 +16499,12 @@ int gcg_comp_m74(gcg_ctx gcgctx, vldh_t_node node)
           return sts;
 
         /* Print the execute command */
-        IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( %c%s, %c%s);\n",
-            sname, GCG_PREFIX_REF, vldh_IdToStr(0, nextoid), GCG_PREFIX_REF,
-            vldh_IdToStr(1, statusoid));
+        IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( %c%s, %c%s);\n", sname, GCG_PREFIX_REF,
+                      vldh_IdToStr(0, nextoid), GCG_PREFIX_REF, vldh_IdToStr(1, statusoid));
         statusoid = nextoid;
-      } else if (cid == pwr_cClass_QCOrder) {
+      }
+      else if (cid == pwr_cClass_QCOrder)
+      {
         sts = gcg_ref_insert(gcgctx, nextoid, GCG_PREFIX_REF, node);
 
         /* Get name for execute call */
@@ -15889,9 +16513,8 @@ int gcg_comp_m74(gcg_ctx gcgctx, vldh_t_node node)
           return sts;
 
         /* Print the execute command */
-        IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( %c%s, %c%s, %s);\n",
-            sname, GCG_PREFIX_REF, vldh_IdToStr(0, nextoid), GCG_PREFIX_REF,
-	    vldh_IdToStr(1, statusoid), condstr);
+        IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec( %c%s, %c%s, %s);\n", sname, GCG_PREFIX_REF,
+                      vldh_IdToStr(0, nextoid), GCG_PREFIX_REF, vldh_IdToStr(1, statusoid), condstr);
         statusoid = nextoid;
       }
       ldhsubordercount++;
@@ -15902,10 +16525,8 @@ int gcg_comp_m74(gcg_ctx gcgctx, vldh_t_node node)
   if (ldhsubordercount != subordercount)
     return GSX__ORDERMISM;
 
-  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec2(tp, %c%s, %c%s->Status);\n", name,
-      GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid),
-      GCG_PREFIX_REF, vldh_IdToStr(1, statusoid));
-
+  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec2(tp, %c%s, %c%s->Status);\n", name, GCG_PREFIX_REF,
+                vldh_IdToStr(0, node->ln.oid), GCG_PREFIX_REF, vldh_IdToStr(1, statusoid));
 
   free((char*)bodydef);
 
@@ -15913,25 +16534,25 @@ int gcg_comp_m74(gcg_ctx gcgctx, vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m75()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for DataQ.
-*	Syntax control:
-*	Check if a subwindow exists.
-*
-*	Generating code:
-*	Identical to method 4 with the following addition:
-*	Prints an special init call and checks reset object.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m75()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for DataQ.
+ *	Syntax control:
+ *	Check if a subwindow exists.
+ *
+ *	Generating code:
+ *	Identical to method 4 with the following addition:
+ *	Prints an special init call and checks reset object.
+ *
+ **************************************************************************/
 
 int gcg_comp_m75(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -15947,41 +16568,41 @@ int gcg_comp_m75(gcg_ctx gcgctx, vldh_t_node node)
   pwr_tUInt32* maxsize_ptr;
   pwr_tEnum* function_ptr;
   pwr_tUInt32* elements_ptr;
-  pwr_tAttrRef *connect_arp;
+  pwr_tAttrRef* connect_arp;
 
   ldhses = (node->hn.wind)->hw.ldhses;
 
-  sts = ldh_GetObjectPar(gcgctx->ldhses, node->ln.oid, "RtBody", "PlcConnect",
-      (char**)&connect_arp, &size);
-  if (EVEN(sts)) {
+  sts = ldh_GetObjectPar(gcgctx->ldhses, node->ln.oid, "RtBody", "PlcConnect", (char**)&connect_arp, &size);
+  if (EVEN(sts))
+  {
     gcg_error_msg(gcgctx, GSX__BADWIND, node);
     return GSX__NEXTNODE;
   }
 
-  if (cdh_ObjidIsNull(connect_arp->Objid)) {
+  if (cdh_ObjidIsNull(connect_arp->Objid))
+  {
     free((char*)connect_arp);
     gcg_error_msg(gcgctx, GSX__REFOBJ, node);
     return GSX__NEXTNODE;
   }
 
   /* Check size */
-  sts = ldh_GetObjectPar(ldhses, connect_arp->Objid, "RtBody", "Config.MaxSize", 
-      (char**)&maxsize_ptr, &size);
+  sts = ldh_GetObjectPar(ldhses, connect_arp->Objid, "RtBody", "Config.MaxSize", (char**)&maxsize_ptr, &size);
   if (EVEN(sts))
     return sts;
 
-  sts = ldh_GetObjectPar(ldhses, connect_arp->Objid, "RtBody", "Config.Function", 
-      (char**)&function_ptr, &size);
+  sts =
+      ldh_GetObjectPar(ldhses, connect_arp->Objid, "RtBody", "Config.Function", (char**)&function_ptr, &size);
   if (EVEN(sts))
     return sts;
 
-  sts = ldh_GetObjectPar(ldhses, connect_arp->Objid, "RtBody", "Intern.DataElements", 
-      (char**)&elements_ptr, &size);
+  sts = ldh_GetObjectPar(ldhses, connect_arp->Objid, "RtBody", "Intern.DataElements", (char**)&elements_ptr,
+                         &size);
   if (EVEN(sts))
     return sts;
 
-  if (*function_ptr != pwr_eDataQFunctionEnum_EndQueue &&
-      *maxsize_ptr > *elements_ptr) {
+  if (*function_ptr != pwr_eDataQFunctionEnum_EndQueue && *maxsize_ptr > *elements_ptr)
+  {
     free((char*)maxsize_ptr);
     free((char*)function_ptr);
     free((char*)elements_ptr);
@@ -16002,33 +16623,35 @@ int gcg_comp_m75(gcg_ctx gcgctx, vldh_t_node node)
     return sts;
 
   /* Print the init command */
-  IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%s_init( %c%s);\n", name,
-      GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid));
+  IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%s_init( %c%s);\n", name, GCG_PREFIX_REF,
+                vldh_IdToStr(0, node->ln.oid));
 
   /* Get the resetobject if there is one */
-  sts = ldh_GetObjectPar(ldhses, connect_arp->Objid, "RtBody", 
-      "Config.ResetObject", (char**)&resobjid_ptr, &size);
+  sts = ldh_GetObjectPar(ldhses, connect_arp->Objid, "RtBody", "Config.ResetObject", (char**)&resobjid_ptr,
+                         &size);
   if (EVEN(sts))
     return sts;
 
   resattrref = cdh_ObjidToAref(*resobjid_ptr);
   free((char*)resobjid_ptr);
 
-  if (cdh_ObjidIsNotNull(resattrref.Objid)) {
+  if (cdh_ObjidIsNotNull(resattrref.Objid))
+  {
     sts = gcg_replace_ref(gcgctx, &resattrref, node);
     if (EVEN(sts))
       return sts;
 
     /* The reset object has to be a di, do or dv */
     sts = ldh_GetAttrRefOrigTid(ldhses, &resattrref, &cid);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       gcg_error_msg(gcgctx, GSX__NORESET, node);
       return GSX__NEXTNODE;
     }
 
     /* Check that the class of the reset object is correct */
-    if (!(cid == pwr_cClass_Di || cid == pwr_cClass_Dv || cid == pwr_cClass_Po
-            || cid == pwr_cClass_Do)) {
+    if (!(cid == pwr_cClass_Di || cid == pwr_cClass_Dv || cid == pwr_cClass_Po || cid == pwr_cClass_Do))
+    {
       gcg_error_msg(gcgctx, GSX__CLASSRESET, node);
       return GSX__NEXTNODE;
     }
@@ -16037,14 +16660,14 @@ int gcg_comp_m75(gcg_ctx gcgctx, vldh_t_node node)
     gcg_ioread_insert(gcgctx, resattrref, GCG_PREFIX_REF);
 
     /* Place the pointer to the resetobject in the cell */
-    IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE],
-        "%c%s->ResetObjectP = &%c%s->ActualValue;\n", GCG_PREFIX_REF,
-        vldh_IdToStr(0, node->ln.oid), GCG_PREFIX_REF,
-        vldh_AttrRefToStr(1, resattrref));
-  } else {
+    IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->ResetObjectP = &%c%s->ActualValue;\n", GCG_PREFIX_REF,
+                  vldh_IdToStr(0, node->ln.oid), GCG_PREFIX_REF, vldh_AttrRefToStr(1, resattrref));
+  }
+  else
+  {
     /* No reset object */
-    IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->ResetObjectP = 0;\n",
-        GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid));
+    IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%c%s->ResetObjectP = 0;\n", GCG_PREFIX_REF,
+                  vldh_IdToStr(0, node->ln.oid));
   }
 
   /* Print the function call to execute the subwindow */
@@ -16052,34 +16675,36 @@ int gcg_comp_m75(gcg_ctx gcgctx, vldh_t_node node)
   /* Get the first child to the plc */
   sts = ldh_GetChild(ldhses, node->ln.oid, &windowobjdid);
   found = 0;
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     /* Check if window */
-    sts = ldh_GetObjectBuffer(ldhses, windowobjdid, "DevBody", "PlcWindow",
-        (pwr_eClass*)&windclass, &windbuffer, &size);
+    sts = ldh_GetObjectBuffer(ldhses, windowobjdid, "DevBody", "PlcWindow", (pwr_eClass*)&windclass,
+                              &windbuffer, &size);
     free((char*)windbuffer);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       found = 1;
       break;
     }
     sts = ldh_GetNextSibling(ldhses, windowobjdid, &windowobjdid);
   }
 
-  if (found) {
+  if (found)
+  {
     /* Get name for this class */
     sts = gcg_get_structname(gcgctx, node->ln.oid, &name);
     if (EVEN(sts))
       return sts;
 
     /* Print the execute command */
-    IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%sSubWind_exec( %c%s, ",
-        name, GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid));
+    IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%sSubWind_exec( %c%s, ", name, GCG_PREFIX_REF,
+                  vldh_IdToStr(0, node->ln.oid));
 
     /* Print the window execute command */
-    IF_PR fprintf(gcgctx->files[GCGM1_DECL_FILE],
-        "void %c%s_exec(plc_sThread *tp);", GCG_PREFIX_MOD,
-        vldh_IdToStr(0, windowobjdid));
-    IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%c%s_exec( tp)",
-        GCG_PREFIX_MOD, vldh_IdToStr(0, windowobjdid));
+    IF_PR fprintf(gcgctx->files[GCGM1_DECL_FILE], "void %c%s_exec(plc_sThread *tp);", GCG_PREFIX_MOD,
+                  vldh_IdToStr(0, windowobjdid));
+    IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%c%s_exec( tp)", GCG_PREFIX_MOD,
+                  vldh_IdToStr(0, windowobjdid));
     IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], ");\n");
   }
   free((char*)connect_arp);
@@ -16088,25 +16713,25 @@ int gcg_comp_m75(gcg_ctx gcgctx, vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m76()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for DataQCurrentData, DataQCurrentIdx and
-*	DataQCurrentBus.
-*	Syntax control:
-*	Checks that the parent is an DataQ object.
-*
-*	Generating code:
-*	Declares and links a pointer to the referenced cell object.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m76()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for DataQCurrentData, DataQCurrentIdx and
+ *	DataQCurrentBus.
+ *	Syntax control:
+ *	Checks that the parent is an DataQ object.
+ *
+ *	Generating code:
+ *	Declares and links a pointer to the referenced cell object.
+ *
+ **************************************************************************/
 
 int gcg_comp_m76(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -16120,12 +16745,14 @@ int gcg_comp_m76(gcg_ctx gcgctx, vldh_t_node node)
   /* Check that parent is a DataQFo object */
   refobjdid = node->hn.wind->lw.poid;
   sts = ldh_GetObjectClass((node->hn.wind)->hw.ldhses, refobjdid, &cid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     gcg_error_msg(gcgctx, GSX__BADWIND, node);
     return GSX__NEXTNODE;
   }
 
-  if (cid != pwr_cClass_DataQFo) {
+  if (cid != pwr_cClass_DataQFo)
+  {
     gcg_error_msg(gcgctx, GSX__BADWIND, node);
     return GSX__NEXTNODE;
   }
@@ -16137,30 +16764,30 @@ int gcg_comp_m76(gcg_ctx gcgctx, vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m77()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for RESET_SO
-*	If the object is connected to an order it is called from
-*	the order method.
-*
-*	Syntax control:
-*	Checks that the referenced order exists, and that it is an
-*	s-order.
-*
-*	Generating code.
-*	Declares and links a rtdb pointer to the Sorder object.
-*	Prints an exec call.
-*	reset_so_exec( Z8000084a, Z800005d3->Status[0]);
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m77()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for RESET_SO
+ *	If the object is connected to an order it is called from
+ *	the order method.
+ *
+ *	Syntax control:
+ *	Checks that the referenced order exists, and that it is an
+ *	s-order.
+ *
+ *	Generating code.
+ *	Declares and links a rtdb pointer to the Sorder object.
+ *	Prints an exec call.
+ *	reset_so_exec( Z8000084a, Z800005d3->Status[0]);
+ *
+ **************************************************************************/
 
 int gcg_comp_m77(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -16177,8 +16804,7 @@ int gcg_comp_m77(gcg_ctx gcgctx, vldh_t_node node)
 
   /* Get the objid of the referenced io object stored in the
     first parameter devbody */
-  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", "QOrderObject",
-      (char**)&refobjid_ptr, &size);
+  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", "QOrderObject", (char**)&refobjid_ptr, &size);
   if (EVEN(sts))
     return sts;
 
@@ -16187,7 +16813,8 @@ int gcg_comp_m77(gcg_ctx gcgctx, vldh_t_node node)
 
   /* Check that this is objid of an existing object */
   sts = ldh_GetObjectClass((node->hn.wind)->hw.ldhses, refobjid, &cid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     gcg_error_msg(gcgctx, GSX__REFOBJ, node);
     return GSX__NEXTNODE;
   }
@@ -16195,19 +16822,22 @@ int gcg_comp_m77(gcg_ctx gcgctx, vldh_t_node node)
   /* Get the objid for the QSorder witch is a child of the order */
   found = 0;
   sts = ldh_GetChild(ldhses, refobjid, &next_objid);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     /* Find out if this is a QSorder */
     sts = ldh_GetObjectClass(ldhses, next_objid, &cid);
     if (EVEN(sts))
       return sts;
 
-    if (cid == pwr_cClass_QSOrder) {
+    if (cid == pwr_cClass_QSOrder)
+    {
       found = 1;
       break;
     }
     sts = ldh_GetNextSibling(ldhses, next_objid, &next_objid);
   }
-  if (!found) {
+  if (!found)
+  {
     gcg_error_msg(gcgctx, GSX__NOSORDER, node);
     return GSX__NEXTNODE;
   }
@@ -16230,25 +16860,25 @@ int gcg_comp_m77(gcg_ctx gcgctx, vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		gcg_comp_m78()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* gcg_ctx	gcgctx		I	gcg context.
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Compile method for RemoteDataQ.
-*
-*	Syntax control:
-*	Find and store connected DataQ object.
-*
-*	Generating code.
-*	Prints init and exec call.
-*
-**************************************************************************/
+ *
+ * Name:		gcg_comp_m78()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * gcg_ctx	gcgctx		I	gcg context.
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Compile method for RemoteDataQ.
+ *
+ *	Syntax control:
+ *	Find and store connected DataQ object.
+ *
+ *	Generating code.
+ *	Prints init and exec call.
+ *
+ **************************************************************************/
 
 int gcg_comp_m78(gcg_ctx gcgctx, vldh_t_node node)
 {
@@ -16260,11 +16890,11 @@ int gcg_comp_m78(gcg_ctx gcgctx, vldh_t_node node)
   unsigned long output_count;
   unsigned long output_point;
   ldh_sParDef output_bodydef;
-  char *name;
+  char* name;
   pwr_tAName aname;
   int size;
-  pwr_tAttrRef *output_connect_arp;
-  pwr_tAttrRef *connect_arp;
+  pwr_tAttrRef* output_connect_arp;
+  pwr_tAttrRef* connect_arp;
   pwr_tAttrRef aref;
 
   ldhses = (node->hn.wind)->hw.ldhses;
@@ -16273,57 +16903,59 @@ int gcg_comp_m78(gcg_ctx gcgctx, vldh_t_node node)
 
   // Find connected DataQ
   sts = gcg_get_inputpoint(node, 0, &point, &par_inverted);
-  if (EVEN(sts)) 
-    return sts;
-
-  /* Look for an output connected to this point */
-  sts = gcg_get_output(node, point, &output_count, &output_node,
-      &output_point, &output_bodydef,
-      GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
   if (EVEN(sts))
     return sts;
 
-  if (output_count != 1) {
+  /* Look for an output connected to this point */
+  sts = gcg_get_output(node, point, &output_count, &output_node, &output_point, &output_bodydef,
+                       GOEN_CON_SIGNAL | GOEN_CON_OUTPUTTOINPUT);
+  if (EVEN(sts))
+    return sts;
+
+  if (output_count != 1)
+  {
     gcg_error_msg(gcgctx, GSX__CONOUTPUT, node);
     return GSX__NEXTNODE;
   }
 
-  sts = ldh_GetObjectPar(ldhses, output_node->ln.oid, "RtBody", "PlcConnect",
-      (char**)&output_connect_arp, &size);
-  if (EVEN(sts)) {
+  sts = ldh_GetObjectPar(ldhses, output_node->ln.oid, "RtBody", "PlcConnect", (char**)&output_connect_arp,
+                         &size);
+  if (EVEN(sts))
+  {
     gcg_error_msg(gcgctx, GSX__CONOUTPUT, node);
     return GSX__NEXTNODE;
   }
 
-  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "RtBody", "PlcConnect",
-      (char**)&connect_arp, &size);
-  if (EVEN(sts)) {
+  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "RtBody", "PlcConnect", (char**)&connect_arp, &size);
+  if (EVEN(sts))
+  {
     gcg_error_msg(gcgctx, GSX__CONOUTPUT, node);
     return GSX__NEXTNODE;
   }
 
-  if (cdh_ObjidIsNull(output_connect_arp->Objid)) {
+  if (cdh_ObjidIsNull(output_connect_arp->Objid))
+  {
     free((char*)connect_arp);
     free((char*)output_connect_arp);
     gcg_error_msg(gcgctx, GSX__REFOBJ, node);
     return GSX__NEXTNODE;
   }
 
-  if (cdh_ObjidIsNull(connect_arp->Objid)) {
+  if (cdh_ObjidIsNull(connect_arp->Objid))
+  {
     free((char*)connect_arp);
     free((char*)output_connect_arp);
     gcg_error_msg(gcgctx, GSX__REFOBJ, node);
     return GSX__NEXTNODE;
   }
 
-  sts = ldh_AttrRefToName(ldhses, connect_arp,
-      cdh_mName_volumeStrict, &name, &size);
+  sts = ldh_AttrRefToName(ldhses, connect_arp, cdh_mName_volumeStrict, &name, &size);
   if (EVEN(sts))
     return sts;
 
   strcpy(aname, name);
   strcat(aname, ".SourceDataQ");
-    
+
   sts = ldh_NameToAttrRef(ldhses, aname, &aref);
   if (EVEN(sts))
     return sts;
@@ -16334,33 +16966,33 @@ int gcg_comp_m78(gcg_ctx gcgctx, vldh_t_node node)
 
   free((char*)connect_arp);
   free((char*)output_connect_arp);
-  
+
   sts = gcg_get_structname(gcgctx, node->ln.oid, &name);
   if (EVEN(sts))
     return sts;
 
   /* Print the execute command */
-  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec(tp, %c%s);\n", name,
-      GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid));
+  IF_PR fprintf(gcgctx->files[GCGM1_CODE_FILE], "%s_exec(tp, %c%s);\n", name, GCG_PREFIX_REF,
+                vldh_IdToStr(0, node->ln.oid));
 
   /* Print the init command */
-  IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%s_init( %c%s);\n", name,
-      GCG_PREFIX_REF, vldh_IdToStr(0, node->ln.oid));
+  IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%s_init( %c%s);\n", name, GCG_PREFIX_REF,
+                vldh_IdToStr(0, node->ln.oid));
 
   return GSX__SUCCESS;
 }
 
 /*************************************************************************
-*
-* Name:		gcg_wind_check_modification()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*
-**************************************************************************/
+ *
+ * Name:		gcg_wind_check_modification()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *
+ **************************************************************************/
 
 int gcg_wind_check_modification(ldh_tSesContext ldhses, pwr_tOid oid)
 {
@@ -16387,15 +17019,14 @@ int gcg_wind_check_modification(ldh_tSesContext ldhses, pwr_tOid oid)
   if (EVEN(sts))
     return sts;
 
-  sts = ldh_GetClassBody(ldhses, parent_cid, "GraphPlcNode", &bodyclass,
-      (char**)&graphbody, &size);
+  sts = ldh_GetClassBody(ldhses, parent_cid, "GraphPlcNode", &bodyclass, (char**)&graphbody, &size);
   if (ODD(sts) && graphbody->compmethod == 58)
     has_templateplc = true;
 
-  if (!has_templateplc) {
+  if (!has_templateplc)
+  {
     /* Get compilation time in parameter Compiled */
-    sts = ldh_GetObjectPar(
-        ldhses, oid, "DevBody", "Compiled", (char**)&comp_time_ptr, &size);
+    sts = ldh_GetObjectPar(ldhses, oid, "DevBody", "Compiled", (char**)&comp_time_ptr, &size);
     if (EVEN(sts))
       return sts;
 
@@ -16403,8 +17034,7 @@ int gcg_wind_check_modification(ldh_tSesContext ldhses, pwr_tOid oid)
     free((char*)comp_time_ptr);
 
     /* Get modification time in parameter Modified */
-    sts = ldh_GetObjectPar(
-        ldhses, oid, "DevBody", "Modified", (char**)&mod_time_ptr, &size);
+    sts = ldh_GetObjectPar(ldhses, oid, "DevBody", "Modified", (char**)&mod_time_ptr, &size);
     if (EVEN(sts))
       return sts;
 
@@ -16416,7 +17046,9 @@ int gcg_wind_check_modification(ldh_tSesContext ldhses, pwr_tOid oid)
       modification = 1;
     else
       modification = 0;
-  } else {
+  }
+  else
+  {
     // Check template plc
     pwr_tOName oname;
     pwr_tTime* template_time;
@@ -16425,8 +17057,7 @@ int gcg_wind_check_modification(ldh_tSesContext ldhses, pwr_tOid oid)
     pwr_tCid cid;
 
     /* Get modification time in parameter Modified */
-    sts = ldh_GetObjectPar(
-        ldhses, oid, "DevBody", "Modified", (char**)&mod_time_ptr, &size);
+    sts = ldh_GetObjectPar(ldhses, oid, "DevBody", "Modified", (char**)&mod_time_ptr, &size);
     if (EVEN(sts))
       return sts;
 
@@ -16434,8 +17065,8 @@ int gcg_wind_check_modification(ldh_tSesContext ldhses, pwr_tOid oid)
     free((char*)mod_time_ptr);
 
     // Find the template plc
-    sts = ldh_ObjidToName(ldhses, cdh_ClassIdToObjid(parent_cid),
-        ldh_eName_VolPath, oname, sizeof(oname), &size);
+    sts = ldh_ObjidToName(ldhses, cdh_ClassIdToObjid(parent_cid), ldh_eName_VolPath, oname, sizeof(oname),
+                          &size);
     if (EVEN(sts))
       return sts;
 
@@ -16456,8 +17087,7 @@ int gcg_wind_check_modification(ldh_tSesContext ldhses, pwr_tOid oid)
       return GSX__TEMPLATEPLC;
 
     // Get modification time
-    sts = ldh_GetObjectPar(ldhses, template_window, "DevBody", "Modified",
-        (char**)&template_time, &size);
+    sts = ldh_GetObjectPar(ldhses, template_window, "DevBody", "Modified", (char**)&template_time, &size);
     if (EVEN(sts))
       return sts;
 
@@ -16477,19 +17107,18 @@ int gcg_wind_check_modification(ldh_tSesContext ldhses, pwr_tOid oid)
   return GSX__SUCCESS;
 }
 /*************************************************************************
-*
-* Name:		gcg_wind_to_operating_system()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*
-**************************************************************************/
+ *
+ * Name:		gcg_wind_to_operating_system()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *
+ **************************************************************************/
 
-int gcg_wind_to_operating_system(
-    ldh_tSesContext ldhses, pwr_tObjid wind, pwr_mOpSys* os)
+int gcg_wind_to_operating_system(ldh_tSesContext ldhses, pwr_tObjid wind, pwr_mOpSys* os)
 {
   int sts;
   pwr_tClassId cid;
@@ -16501,12 +17130,14 @@ int gcg_wind_to_operating_system(
   if (EVEN(sts))
     return sts;
 
-  while (1) {
+  while (1)
+  {
     sts = ldh_GetObjectClass(ldhses, od, &cid);
     if (EVEN(sts))
       return sts;
 
-    if (plc_pgm == 0) {
+    if (plc_pgm == 0)
+    {
       sts = ldh_ClassNameToId(ldhses, &plc_pgm, "PlcPgm");
       if (EVEN(sts))
         return sts;
@@ -16525,19 +17156,18 @@ int gcg_wind_to_operating_system(
   return sts;
 }
 /*************************************************************************
-*
-* Name:		gcg_plcpgm_to_operating_system()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*
-**************************************************************************/
+ *
+ * Name:		gcg_plcpgm_to_operating_system()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *
+ **************************************************************************/
 
-int gcg_plcpgm_to_operating_system(
-    ldh_tSesContext ldhses, pwr_tObjid plcpgm, pwr_mOpSys* os)
+int gcg_plcpgm_to_operating_system(ldh_tSesContext ldhses, pwr_tObjid plcpgm, pwr_mOpSys* os)
 {
   int sts, size;
   pwr_mOpSys* operating_system;
@@ -16547,8 +17177,7 @@ int gcg_plcpgm_to_operating_system(
   objid.oix = 0;
 
   /* Get the operating system for this volume */
-  sts = ldh_GetObjectPar(ldhses, objid, "SysBody", "OperatingSystem",
-      (char**)&operating_system, &size);
+  sts = ldh_GetObjectPar(ldhses, objid, "SysBody", "OperatingSystem", (char**)&operating_system, &size);
   if (EVEN(sts))
     return sts;
 
@@ -16559,16 +17188,16 @@ int gcg_plcpgm_to_operating_system(
 }
 
 /*************************************************************************
-*
-* Name:		gcg_check_ra_plc_user()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*
-**************************************************************************/
+ *
+ * Name:		gcg_check_ra_plc_user()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *
+ **************************************************************************/
 
 static int gcg_check_ra_plc_user(char* filename)
 {
@@ -16583,15 +17212,15 @@ static int gcg_check_ra_plc_user(char* filename)
   search_ctx = 0;
   sts = dcli_search_file(filename, found_file, DCLI_DIR_SEARCH_INIT);
   dcli_search_file(filename, found_file, DCLI_DIR_SEARCH_END);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     /* Create the file */
     checkfile = fopen(filename, "w");
     if (checkfile == 0)
       return GSX__OPENFILE;
 
     time_GetTime(&current_time);
-    sts = time_AtoAscii(
-        &current_time, time_eFormat_NumDateAndTime, date, sizeof(date));
+    sts = time_AtoAscii(&current_time, time_eFormat_NumDateAndTime, date, sizeof(date));
     date[10] = 0;
 
     sts = syi_UserName(user, sizeof(user));
@@ -16601,8 +17230,7 @@ static int gcg_check_ra_plc_user(char* filename)
     fprintf(checkfile, " *  Description\n");
     fprintf(checkfile, " *  This file is included by the plc code generated "
                        "from the plc windows.\n");
-    fprintf(checkfile,
-        " *  Includefiles for classvolumes with classes referenced by the\n");
+    fprintf(checkfile, " *  Includefiles for classvolumes with classes referenced by the\n");
     fprintf(checkfile, " *  plc program should be inserted here. Also "
                        "declarations of types and\n");
     fprintf(checkfile, " *  functions used in arithm code can be inserted.\n");
@@ -16620,8 +17248,7 @@ static int gcg_check_ra_plc_user(char* filename)
   return GSX__SUCCESS;
 }
 
-static pwr_tStatus gcg_replace_ref(
-    gcg_ctx gcgctx, pwr_sAttrRef* attrref, vldh_t_node node)
+static pwr_tStatus gcg_replace_ref(gcg_ctx gcgctx, pwr_sAttrRef* attrref, vldh_t_node node)
 {
   pwr_tStatus sts;
   pwr_tOid host_oid;
@@ -16631,7 +17258,8 @@ static pwr_tStatus gcg_replace_ref(
   if (node->hn.wind->hw.plc->lp.cid == pwr_cClass_PlcTemplate)
     return GSX__NEXTNODE;
 
-  if (attrref->Objid.vid == ldh_cPlcMainVolume) {
+  if (attrref->Objid.vid == ldh_cPlcMainVolume)
+  {
     pwr_sAttrRef* connect_arp;
     pwr_tCid connect_cid;
 
@@ -16640,7 +17268,8 @@ static pwr_tStatus gcg_replace_ref(
     /* Get the parent node to this window */
     host_oid = (node->hn.wind)->lw.poid;
 
-    if (cdh_ObjidIsNull(host_oid)) {
+    if (cdh_ObjidIsNull(host_oid))
+    {
       /* Parent is a plcprogram */
       gcg_error_msg(gcgctx, GSX__BADWIND, node);
       return GSX__NEXTNODE;
@@ -16648,25 +17277,27 @@ static pwr_tStatus gcg_replace_ref(
 
     /* Check class of this objid */
     sts = ldh_GetObjectClass(gcgctx->ldhses, host_oid, &host_cid);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       gcg_error_msg(gcgctx, GSX__REFOBJ, node);
       return GSX__NEXTNODE;
     }
 
-    if (host_cid == pwr_cClass_order || host_cid == pwr_cClass_csub
-        || host_cid == pwr_cClass_substep) {
+    if (host_cid == pwr_cClass_order || host_cid == pwr_cClass_csub || host_cid == pwr_cClass_substep)
+    {
       gcg_error_msg(gcgctx, GSX__BADWIND, node);
       return GSX__NEXTNODE;
     }
 
-    sts = ldh_GetObjectPar(gcgctx->ldhses, host_oid, "RtBody", "PlcConnect",
-        (char**)&connect_arp, &size);
-    if (EVEN(sts)) {
+    sts = ldh_GetObjectPar(gcgctx->ldhses, host_oid, "RtBody", "PlcConnect", (char**)&connect_arp, &size);
+    if (EVEN(sts))
+    {
       gcg_error_msg(gcgctx, GSX__BADWIND, node);
       return GSX__NEXTNODE;
     }
 
-    if (cdh_ObjidIsNull(connect_arp->Objid)) {
+    if (cdh_ObjidIsNull(connect_arp->Objid))
+    {
       free((char*)connect_arp);
       gcg_error_msg(gcgctx, GSX__REFOBJ, node);
       return GSX__NEXTNODE;
@@ -16675,13 +17306,15 @@ static pwr_tStatus gcg_replace_ref(
     // Check that the class or the connectedobject, or any superclass,
     // matches the symbolic reference
     sts = ldh_GetAttrRefOrigTid(gcgctx->ldhses, connect_arp, &connect_cid);
-    while (ODD(sts)) {
+    while (ODD(sts))
+    {
       if (connect_cid == attrref->Objid.oix)
         break;
 
       sts = ldh_GetSuperClass(gcgctx->ldhses, connect_cid, &connect_cid);
     }
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       free((char*)connect_arp);
       gcg_error_msg(gcgctx, GSX__REFCONNECT, node);
       return GSX__NEXTNODE;
@@ -16689,31 +17322,34 @@ static pwr_tStatus gcg_replace_ref(
 
     attrref->Objid = connect_arp->Objid;
     attrref->Offset += connect_arp->Offset;
-    if (attrref->Flags.b.Object
-        && (attrref->Offset
-               || (attrref->Size && attrref->Size < connect_arp->Size))) {
+    if (attrref->Flags.b.Object && (attrref->Offset || (attrref->Size && attrref->Size < connect_arp->Size)))
+    {
       attrref->Flags.b.Object = 0;
       attrref->Flags.b.ObjectAttr = 1;
     }
     free((char*)connect_arp);
     return GSX__REPLACED;
-  } else if (attrref->Objid.vid == ldh_cPlcFoVolume) {
+  }
+  else if (attrref->Objid.vid == ldh_cPlcFoVolume)
+  {
     // Replace objid with host object
 
     /* Get the parent node to this window */
     host_oid = (node->hn.wind)->lw.poid;
 
-    if (cdh_ObjidIsNull(host_oid)) {
+    if (cdh_ObjidIsNull(host_oid))
+    {
       pwr_sAttrRef* connect_arp;
       pwr_tCid connect_cid;
 
       /* Parent is a plcprogram, check if HostObject is active */
-      sts = ldh_GetObjectPar(gcgctx->ldhses, node->hn.wind->hw.plc->lp.oid,
-          "RtBody", "HostObject", (char**)&connect_arp, &size);
+      sts = ldh_GetObjectPar(gcgctx->ldhses, node->hn.wind->hw.plc->lp.oid, "RtBody", "HostObject",
+                             (char**)&connect_arp, &size);
       if (EVEN(sts))
         return sts;
 
-      if (cdh_ObjidIsNull(connect_arp->Objid)) {
+      if (cdh_ObjidIsNull(connect_arp->Objid))
+      {
         free((char*)connect_arp);
         gcg_error_msg(gcgctx, GSX__BADWIND, node);
         return GSX__NEXTNODE;
@@ -16722,13 +17358,15 @@ static pwr_tStatus gcg_replace_ref(
       // Check that the class or the connectedobject, or any superclass,
       // matches the symbolic reference
       sts = ldh_GetAttrRefOrigTid(gcgctx->ldhses, connect_arp, &connect_cid);
-      while (ODD(sts)) {
+      while (ODD(sts))
+      {
         if (connect_cid == attrref->Objid.oix)
           break;
 
         sts = ldh_GetSuperClass(gcgctx->ldhses, connect_cid, &connect_cid);
       }
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         free((char*)connect_arp);
         gcg_error_msg(gcgctx, GSX__REFCONNECT, node);
         return GSX__NEXTNODE;
@@ -16736,24 +17374,27 @@ static pwr_tStatus gcg_replace_ref(
 
       attrref->Objid = connect_arp->Objid;
       attrref->Offset += connect_arp->Offset;
-      if (attrref->Flags.b.Object
-          && (attrref->Offset
-                 || (attrref->Size && attrref->Size < connect_arp->Size))) {
+      if (attrref->Flags.b.Object &&
+          (attrref->Offset || (attrref->Size && attrref->Size < connect_arp->Size)))
+      {
         attrref->Flags.b.Object = 0;
         attrref->Flags.b.ObjectAttr = 1;
       }
       free((char*)connect_arp);
       return GSX__REPLACED;
-    } else {
+    }
+    else
+    {
       /* Check class of this objid */
       sts = ldh_GetObjectClass(gcgctx->ldhses, host_oid, &host_cid);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         gcg_error_msg(gcgctx, GSX__REFOBJ, node);
         return GSX__NEXTNODE;
       }
 
-      if (host_cid == pwr_cClass_order || host_cid == pwr_cClass_csub
-          || host_cid == pwr_cClass_substep) {
+      if (host_cid == pwr_cClass_order || host_cid == pwr_cClass_csub || host_cid == pwr_cClass_substep)
+      {
         gcg_error_msg(gcgctx, GSX__BADWIND, node);
         return GSX__NEXTNODE;
       }
@@ -16766,10 +17407,10 @@ static pwr_tStatus gcg_replace_ref(
 }
 
 /*************************************************************************
-*
-*  Set compilation manager for all nodes in a window.
-*
-**************************************************************************/
+ *
+ *  Set compilation manager for all nodes in a window.
+ *
+ **************************************************************************/
 static int gcg_set_cmanager(vldh_t_wind wind)
 {
   int sts;
@@ -16782,17 +17423,22 @@ static int gcg_set_cmanager(vldh_t_wind wind)
   vldh_get_nodes(wind, &node_count, &nodelist);
 
   /* Reset compilation manager */
-  for (j = 0; j < (int)node_count; j++) {
+  for (j = 0; j < (int)node_count; j++)
+  {
     nodelist[j]->hn.comp_manager = 0;
   }
 
   /* Find managers in this window */
-  for (j = 0; j < (int)node_count; j++) {
+  for (j = 0; j < (int)node_count; j++)
+  {
     mgr = nodelist[j];
-    switch (mgr->ln.cid) {
-    case pwr_cClass_CArea: {
+    switch (mgr->ln.cid)
+    {
+    case pwr_cClass_CArea:
+    {
       sts = gcg_cmanager_find_nodes(wind, mgr, nodelist, node_count);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         if (node_count > 0)
           free((char*)nodelist);
         return sts;
@@ -16808,26 +17454,27 @@ static int gcg_set_cmanager(vldh_t_wind wind)
   return GSX__SUCCESS;
 }
 
-static int gcg_cmanager_find_nodes(
-    vldh_t_wind wind, vldh_t_node mgr, vldh_t_node* nodelist, int node_count)
+static int gcg_cmanager_find_nodes(vldh_t_wind wind, vldh_t_node mgr, vldh_t_node* nodelist, int node_count)
 {
   int sts;
   vldh_t_node n;
   int i;
 
   /* Find managers in this manager */
-  for (i = 0; i < node_count; i++) {
+  for (i = 0; i < node_count; i++)
+  {
     n = nodelist[i];
     if (n == mgr)
       continue;
-    switch (n->ln.cid) {
-    case pwr_cClass_CArea: {
-      if ((mgr->ln.x <= n->ln.x && n->ln.x <= mgr->ln.x + mgr->ln.width)
-          && (mgr->ln.x <= n->ln.x + n->ln.width
-                 && n->ln.x + n->ln.width <= mgr->ln.x + mgr->ln.width)
-          && (mgr->ln.y <= n->ln.y && n->ln.y <= mgr->ln.y + mgr->ln.height)
-          && (mgr->ln.y <= n->ln.y + n->ln.height
-                 && n->ln.y + n->ln.height <= mgr->ln.y + mgr->ln.height)) {
+    switch (n->ln.cid)
+    {
+    case pwr_cClass_CArea:
+    {
+      if ((mgr->ln.x <= n->ln.x && n->ln.x <= mgr->ln.x + mgr->ln.width) &&
+          (mgr->ln.x <= n->ln.x + n->ln.width && n->ln.x + n->ln.width <= mgr->ln.x + mgr->ln.width) &&
+          (mgr->ln.y <= n->ln.y && n->ln.y <= mgr->ln.y + mgr->ln.height) &&
+          (mgr->ln.y <= n->ln.y + n->ln.height && n->ln.y + n->ln.height <= mgr->ln.y + mgr->ln.height))
+      {
         // Whole n inside mgr
         sts = gcg_cmanager_find_nodes(wind, n, nodelist, node_count);
         if (EVEN(sts))
@@ -16842,15 +17489,16 @@ static int gcg_cmanager_find_nodes(
   }
 
   /* Find nodes for this manager */
-  for (i = 0; i < node_count; i++) {
+  for (i = 0; i < node_count; i++)
+  {
     n = nodelist[i];
     if (n == mgr)
       continue;
-    if (n->hn.comp_manager == 0) {
-      if (mgr->ln.x <= n->ln.x + n->ln.width / 2
-          && mgr->ln.x + mgr->ln.width >= n->ln.x + n->ln.width / 2
-          && mgr->ln.y <= n->ln.y + n->ln.height / 2
-          && mgr->ln.y + mgr->ln.height >= n->ln.y + n->ln.height / 2) {
+    if (n->hn.comp_manager == 0)
+    {
+      if (mgr->ln.x <= n->ln.x + n->ln.width / 2 && mgr->ln.x + mgr->ln.width >= n->ln.x + n->ln.width / 2 &&
+          mgr->ln.y <= n->ln.y + n->ln.height / 2 && mgr->ln.y + mgr->ln.height >= n->ln.y + n->ln.height / 2)
+      {
         n->hn.comp_manager = mgr;
       }
     }
@@ -16869,22 +17517,23 @@ static int gcg_cmanager_comp(gcg_ctx gcgctx, vldh_t_node node)
 
   wind = node->hn.wind;
 
-  sts = ldh_GetClassBody(wind->hw.ldhses, node->hn.comp_manager->ln.cid,
-      "GraphPlcNode", &bodyclass, (char**)&graphbody, &size);
+  sts = ldh_GetClassBody(wind->hw.ldhses, node->hn.comp_manager->ln.cid, "GraphPlcNode", &bodyclass,
+                         (char**)&graphbody, &size);
   if (EVEN(sts))
     return sts;
 
   mcompmethod = graphbody->compmethod;
 
   /* Get comp method for this node */
-  sts = ldh_GetClassBody(wind->hw.ldhses, node->ln.cid, "GraphPlcNode",
-      &bodyclass, (char**)&graphbody, &size);
+  sts =
+      ldh_GetClassBody(wind->hw.ldhses, node->ln.cid, "GraphPlcNode", &bodyclass, (char**)&graphbody, &size);
   if (EVEN(sts))
     return sts;
 
   compmethod = graphbody->compmethod;
 
-  if (compmethod != 2 && compmethod != 8 && compmethod != 10) {
+  if (compmethod != 2 && compmethod != 8 && compmethod != 10)
+  {
     gcgctx->cmanager_active = 1;
     sts = (gcg_comp_m[mcompmethod])(gcgctx, node->hn.comp_manager);
     if (EVEN(sts))
@@ -16903,8 +17552,7 @@ static int gcg_reset_cmanager(gcg_ctx gcgctx)
   return GSX__SUCCESS;
 }
 
-static int gcg_check_attrref(
-    gcg_ctx gcgctx, vldh_t_node node, const char* attr, pwr_tAttrRef* arp)
+static int gcg_check_attrref(gcg_ctx gcgctx, vldh_t_node node, const char* attr, pwr_tAttrRef* arp)
 {
   pwr_tStatus sts;
   int size;
@@ -16912,16 +17560,16 @@ static int gcg_check_attrref(
   pwr_tAttrRef aref;
   pwr_tCid cid;
 
-  sts = ldh_GetObjectPar(
-      gcgctx->ldhses, node->ln.oid, "RtBody", attr, (char**)&arefp, &size);
-  if (ODD(sts)) {
+  sts = ldh_GetObjectPar(gcgctx->ldhses, node->ln.oid, "RtBody", attr, (char**)&arefp, &size);
+  if (ODD(sts))
+  {
     aref = *arefp;
     free((char*)arefp);
     sts = gcg_replace_ref(gcgctx, &aref, node);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       /* Store the converted aref */
-      sts = ldh_SetObjectPar(gcgctx->ldhses, node->ln.oid, "RtBody", attr,
-          (char*)&aref, sizeof(aref));
+      sts = ldh_SetObjectPar(gcgctx->ldhses, node->ln.oid, "RtBody", attr, (char*)&aref, sizeof(aref));
     }
 
     if (cdh_ObjidIsNull(aref.Objid))
@@ -16948,7 +17596,8 @@ static int gcg_is_in_focode(gcg_ctx gcgctx, vldh_t_node node)
   int size;
 
   sts = ldh_GetParent(gcgctx->ldhses, node->ln.oid, &parent);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     sts = ldh_GetObjectClass(gcgctx->ldhses, parent, &cid);
     if (EVEN(sts))
       return 0;
@@ -16956,8 +17605,7 @@ static int gcg_is_in_focode(gcg_ctx gcgctx, vldh_t_node node)
     if (cid == pwr_cClass_plc)
       break;
 
-    sts = ldh_GetClassBody(gcgctx->ldhses, cid, "GraphPlcNode", &bodyclass,
-        (char**)&graphbody, &size);
+    sts = ldh_GetClassBody(gcgctx->ldhses, cid, "GraphPlcNode", &bodyclass, (char**)&graphbody, &size);
     if (ODD(sts) && graphbody->compmethod == 58)
       return 1;
 
@@ -16968,7 +17616,8 @@ static int gcg_is_in_focode(gcg_ctx gcgctx, vldh_t_node node)
 
 static void gcg_pending_compile_add(gcg_ctx gcgctx, pwr_tOid wind)
 {
-  for (unsigned int i = 0; i < gcgctx->pending_compile.size(); i++) {
+  for (unsigned int i = 0; i < gcgctx->pending_compile.size(); i++)
+  {
     if (cdh_ObjidIsEqual(wind, gcgctx->pending_compile[i]))
       return;
   }
@@ -16981,9 +17630,9 @@ static int gcg_pending_compile_exec(gcg_ctx gcgctx)
   ldh_tSesContext ldhses = gcgctx->ldhses;
   ldh_tWBContext ldhwb = ldh_SessionToWB(ldhses);
 
-  for (unsigned int i = 0; i < gcgctx->pending_compile.size(); i++) {
-    sts = gcg_wind_comp_all(ldhwb, ldhses, gcgctx->pending_compile[i],
-        gcgctx->print, 0, gcg_debug, 1);
+  for (unsigned int i = 0; i < gcgctx->pending_compile.size(); i++)
+  {
+    sts = gcg_wind_comp_all(ldhwb, ldhses, gcgctx->pending_compile[i], gcgctx->print, 0, gcg_debug, 1);
     if (EVEN(sts))
       return sts;
   }
@@ -16999,8 +17648,10 @@ static int gcg_check_grafcet_reset(gcg_ctx gcgctx, vldh_t_node node)
   vldh_t_plc plc;
   pwr_tCid cid;
 
-  if (gcgctx->reset_checked == FALSE) {
-    if (gcg_is_in_focode(gcgctx, node)) {
+  if (gcgctx->reset_checked == FALSE)
+  {
+    if (gcg_is_in_focode(gcgctx, node))
+    {
       pwr_tOid parent;
       pwr_tAttrRef* connect_arp;
       pwr_tAttrRef connect_ar;
@@ -17016,9 +17667,9 @@ static int gcg_check_grafcet_reset(gcg_ctx gcgctx, vldh_t_node node)
         return sts;
 
       // Get Connected main object
-      sts = ldh_GetObjectPar(gcgctx->ldhses, parent, "RtBody", "PlcConnect",
-          (char**)&connect_arp, &size);
-      if (EVEN(sts)) {
+      sts = ldh_GetObjectPar(gcgctx->ldhses, parent, "RtBody", "PlcConnect", (char**)&connect_arp, &size);
+      if (EVEN(sts))
+      {
         gcg_error_msg(gcgctx, GSX__BADWIND, node);
         return GSX__NEXTNODE;
       }
@@ -17030,17 +17681,19 @@ static int gcg_check_grafcet_reset(gcg_ctx gcgctx, vldh_t_node node)
       if (EVEN(sts))
         return sts;
 
-      sts = ldh_ArefANameToAref(
-          gcgctx->ldhses, &connect_ar, "SequenceReset", &resattrref);
-      if (EVEN(sts)) {
+      sts = ldh_ArefANameToAref(gcgctx->ldhses, &connect_ar, "SequenceReset", &resattrref);
+      if (EVEN(sts))
+      {
         gcg_error_msg(gcgctx, GSX__NOSEQRESET, node);
         return GSX__NEXTNODE;
       }
-    } else {
+    }
+    else
+    {
       /* Check the resetobject in the plcobject */
       plc = (node->hn.wind)->hw.plc;
-      sts = ldh_GetObjectPar(gcgctx->ldhses, plc->lp.oid, "DevBody",
-          "ResetObject", (char**)&resattrref_ptr, &size);
+      sts = ldh_GetObjectPar(gcgctx->ldhses, plc->lp.oid, "DevBody", "ResetObject", (char**)&resattrref_ptr,
+                             &size);
       if (EVEN(sts))
         return sts;
 
@@ -17057,14 +17710,15 @@ static int gcg_check_grafcet_reset(gcg_ctx gcgctx, vldh_t_node node)
 
     /* The reset object has to be a di, do or dv */
     sts = ldh_GetAttrRefOrigTid(gcgctx->ldhses, &resattrref, &cid);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       gcg_error_msg(gcgctx, GSX__NORESET, node);
       return GSX__NEXTNODE;
     }
 
     /* Check that the class of the reset object is correct */
-    if (!(cid == pwr_cClass_Di || cid == pwr_cClass_Dv || cid == pwr_cClass_Po
-            || cid == pwr_cClass_Do)) {
+    if (!(cid == pwr_cClass_Di || cid == pwr_cClass_Dv || cid == pwr_cClass_Po || cid == pwr_cClass_Do))
+    {
       gcg_error_msg(gcgctx, GSX__CLASSRESET, node);
       return GSX__NEXTNODE;
     }
@@ -17083,7 +17737,8 @@ static int gcg_in_libhier(gcg_ctx gcgctx, pwr_tOid oid)
   pwr_tCid cid;
 
   for (sts = ldh_GetParent(gcgctx->ldhses, oid, &parent); ODD(sts);
-       sts = ldh_GetParent(gcgctx->ldhses, parent, &parent)) {
+       sts = ldh_GetParent(gcgctx->ldhses, parent, &parent))
+  {
     sts = ldh_GetObjectClass(gcgctx->ldhses, parent, &cid);
     if (EVEN(sts))
       return 0;
@@ -17107,16 +17762,17 @@ int gcg_comp_plcembed_all(ldh_tSession ldhses, int force)
   if (EVEN(sts))
     return sts;
 
-  if (info.Access == ldh_eAccess_ReadOnly) {
+  if (info.Access == ldh_eAccess_ReadOnly)
+  {
     sts = ldh_SetSession(ldhses, ldh_eAccess_SharedReadWrite);
     if (EVEN(sts))
       return sts;
     write_set = true;
   }
 
-  for (sts = ldh_GetClassListAttrRef(ldhses, pwr_cClass_PlcEmbed, &plcint_aref);
-       ODD(sts); sts = ldh_GetNextAttrRef(
-                     ldhses, pwr_cClass_PlcEmbed, &plcint_aref, &plcint_aref)) {
+  for (sts = ldh_GetClassListAttrRef(ldhses, pwr_cClass_PlcEmbed, &plcint_aref); ODD(sts);
+       sts = ldh_GetNextAttrRef(ldhses, pwr_cClass_PlcEmbed, &plcint_aref, &plcint_aref))
+  {
     if (cdh_ObjidIsEqual(last_oid, plcint_aref.Objid))
       continue;
 
@@ -17127,17 +17783,19 @@ int gcg_comp_plcembed_all(ldh_tSession ldhses, int force)
     last_oid = plcint_aref.Objid;
   }
 
-  if (write_set) {
+  if (write_set)
+  {
     ldh_sSessInfo info;
 
     sts = ldh_GetSessionInfo(ldhses, &info);
     if (EVEN(sts))
       return sts;
 
-    if (!info.Empty) {
+    if (!info.Empty)
+    {
       sts = ldh_SaveSession(ldhses);
       if (EVEN(sts))
-	return sts;
+        return sts;
     }
     sts = ldh_SetSession(ldhses, ldh_eAccess_ReadOnly);
     if (EVEN(sts))
@@ -17187,12 +17845,13 @@ int gcg_comp_plcembed(ldh_tSession ldhses, pwr_tOid oid, int force)
   if (EVEN(sts))
     return sts;
 
-  for (int i = 0; i < rows; i++) {
-    if (bodydef[i].Par->Param.TypeRef == pwr_cClass_PlcEmbed) {
+  for (int i = 0; i < rows; i++)
+  {
+    if (bodydef[i].Par->Param.TypeRef == pwr_cClass_PlcEmbed)
+    {
       pwr_sClass_PlcEmbed* plcembed_p;
 
-      sts = ldh_GetObjectPar(ldhses, oid, "RtBody", bodydef[i].ParName,
-          (char**)&plcembed_p, &size);
+      sts = ldh_GetObjectPar(ldhses, oid, "RtBody", bodydef[i].ParName, (char**)&plcembed_p, &size);
       if (EVEN(sts))
         return sts;
       thread_oid = plcembed_p->ThreadObject;
@@ -17202,28 +17861,27 @@ int gcg_comp_plcembed(ldh_tSession ldhses, pwr_tOid oid, int force)
   }
 
   found = 0;
-  for (sts = ldh_GetObjectClassList(
-           ldhses, pwr_cClass_PlcEmbed, oid, &plcembed_aref);
-       ODD(sts); sts = ldh_GetNextObjectAttrRef(ldhses, pwr_cClass_PlcEmbed,
-                     &plcembed_aref, &plcembed_aref)) {
+  for (sts = ldh_GetObjectClassList(ldhses, pwr_cClass_PlcEmbed, oid, &plcembed_aref); ODD(sts);
+       sts = ldh_GetNextObjectAttrRef(ldhses, pwr_cClass_PlcEmbed, &plcembed_aref, &plcembed_aref))
+  {
     found = 1;
     copy_window = 0;
 
-    sts = ldh_ReadAttribute(
-        ldhses, &plcembed_aref, (void*)plcembed_p, sizeof(*plcembed_p));
+    sts = ldh_ReadAttribute(ldhses, &plcembed_aref, (void*)plcembed_p, sizeof(*plcembed_p));
     if (EVEN(sts))
       return sts;
 
     // Find the window for this PlcEmbed
     plc_found = 0;
     for (sts = ldh_GetChild(ldhses, plcembed_aref.Objid, &plcoid); ODD(sts);
-         sts = ldh_GetNextSibling(ldhses, plcoid, &plcoid)) {
-      sts = ldh_ObjidToName(
-          ldhses, plcoid, cdh_mName_object, plcname, sizeof(plcname), &size);
+         sts = ldh_GetNextSibling(ldhses, plcoid, &plcoid))
+    {
+      sts = ldh_ObjidToName(ldhses, plcoid, cdh_mName_object, plcname, sizeof(plcname), &size);
       if (EVEN(sts))
         return sts;
 
-      if (streq(plcname, plcembed_p->Name)) {
+      if (streq(plcname, plcembed_p->Name))
+      {
         plc_found = 1;
         break;
       }
@@ -17238,8 +17896,8 @@ int gcg_comp_plcembed(ldh_tSession ldhses, pwr_tOid oid, int force)
     if (EVEN(sts))
       return sts;
 
-    sts = ldh_ObjidToName(ldhses, cdh_ClassIdToObjid(parent_cid),
-        ldh_eName_VolPath, oname, sizeof(oname), &size);
+    sts = ldh_ObjidToName(ldhses, cdh_ClassIdToObjid(parent_cid), ldh_eName_VolPath, oname, sizeof(oname),
+                          &size);
     if (EVEN(sts))
       return sts;
 
@@ -17260,15 +17918,16 @@ int gcg_comp_plcembed(ldh_tSession ldhses, pwr_tOid oid, int force)
       return GSX__TEMPLATEPLC;
 
     // Get modification time
-    sts = ldh_GetObjectPar(ldhses, template_window, "DevBody", "Modified",
-        (char**)&template_time, &size);
+    sts = ldh_GetObjectPar(ldhses, template_window, "DevBody", "Modified", (char**)&template_time, &size);
     if (EVEN(sts))
       return sts;
 
-    if (plc_found) {
+    if (plc_found)
+    {
       wind_found = 0;
       sts = ldh_GetChild(ldhses, plcoid, &windoid);
-      if (ODD(sts)) {
+      if (ODD(sts))
+      {
         sts = ldh_GetObjectClass(ldhses, windoid, &cid);
         if (EVEN(sts))
           return sts;
@@ -17279,26 +17938,28 @@ int gcg_comp_plcembed(ldh_tSession ldhses, pwr_tOid oid, int force)
       if (!wind_found)
         copy_window = 1;
 
-      if (wind_found) {
+      if (wind_found)
+      {
         /* Get modification time in parameter Modified */
-        sts = ldh_GetObjectPar(ldhses, windoid, "DevBody", "Modified",
-            (char**)&mod_time_ptr, &size);
+        sts = ldh_GetObjectPar(ldhses, windoid, "DevBody", "Modified", (char**)&mod_time_ptr, &size);
         if (EVEN(sts))
           return sts;
 
         memcpy(&mod_time, mod_time_ptr, sizeof(mod_time));
         free((char*)mod_time_ptr);
 
-	if (force)
-	  modified = 1;
-	else {
-	  if (template_time->tv_sec != mod_time.tv_sec)
-	    modified = 1;
-	  else
-	    modified = 0;
-	}
+        if (force)
+          modified = 1;
+        else
+        {
+          if (template_time->tv_sec != mod_time.tv_sec)
+            modified = 1;
+          else
+            modified = 0;
+        }
 
-        if (modified) {
+        if (modified)
+        {
           // Delete old window
           sts = ldh_DeleteObjectTree(ldhses, windoid, 1);
           if (EVEN(sts))
@@ -17310,24 +17971,25 @@ int gcg_comp_plcembed(ldh_tSession ldhses, pwr_tOid oid, int force)
           copy_window = 1;
         }
       }
-    } else {
+    }
+    else
+    {
       pwr_sPlcProgram plcbuffer;
       pwr_tClassId bodyclass;
       pwr_sGraphPlcProgram* graphbody;
 
       // Create the plc
       if (cdh_ObjidIsNull(last_plcoid))
-        sts = ldh_CreateObject(ldhses, &plcoid, plcembed_p->Name,
-            pwr_cClass_plc, plcembed_aref.Objid, ldh_eDest_IntoLast);
+        sts = ldh_CreateObject(ldhses, &plcoid, plcembed_p->Name, pwr_cClass_plc, plcembed_aref.Objid,
+                               ldh_eDest_IntoLast);
       else
-        sts = ldh_CreateObject(ldhses, &plcoid, plcembed_p->Name,
-            pwr_cClass_plc, last_plcoid, ldh_eDest_Before);
+        sts = ldh_CreateObject(ldhses, &plcoid, plcembed_p->Name, pwr_cClass_plc, last_plcoid,
+                               ldh_eDest_Before);
       if (EVEN(sts))
         return sts;
 
       // Fill in the plc buffer
-      sts = ldh_GetClassBody(ldhses, pwr_cClass_plc, "GraphPlcPgm", &bodyclass,
-          (char**)&graphbody, &size);
+      sts = ldh_GetClassBody(ldhses, pwr_cClass_plc, "GraphPlcPgm", &bodyclass, (char**)&graphbody, &size);
       if (EVEN(sts))
         return sts;
 
@@ -17336,8 +17998,7 @@ int gcg_comp_plcembed(ldh_tSession ldhses, pwr_tOid oid, int force)
       plcbuffer.object_type = graphbody->plc_type;
       plcbuffer.cid = pwr_cClass_plc;
 
-      sts = ldh_SetObjectBuffer(
-          ldhses, plcoid, "DevBody", "PlcProgram", (char*)&plcbuffer);
+      sts = ldh_SetObjectBuffer(ldhses, plcoid, "DevBody", "PlcProgram", (char*)&plcbuffer);
       if (EVEN(sts))
         return sts;
 
@@ -17345,17 +18006,17 @@ int gcg_comp_plcembed(ldh_tSession ldhses, pwr_tOid oid, int force)
     }
 
     // Set ThreadObject of the top PlcEmbed to this PlcEmbed
-    if (cdh_ObjidIsNotNull(thread_oid)) {
+    if (cdh_ObjidIsNotNull(thread_oid))
+    {
       pwr_tAttrRef threadobject_aref;
 
-      sts = ldh_ArefANameToAref(
-          ldhses, &plcembed_aref, "ThreadObject", &threadobject_aref);
+      sts = ldh_ArefANameToAref(ldhses, &plcembed_aref, "ThreadObject", &threadobject_aref);
       if (EVEN(sts))
         return sts;
 
-      if (cdh_ObjidIsNotEqual(thread_oid, plcembed_p->ThreadObject)) {
-        sts = ldh_WriteAttribute(
-            ldhses, &threadobject_aref, (void*)&thread_oid, sizeof(thread_oid));
+      if (cdh_ObjidIsNotEqual(thread_oid, plcembed_p->ThreadObject))
+      {
+        sts = ldh_WriteAttribute(ldhses, &threadobject_aref, (void*)&thread_oid, sizeof(thread_oid));
         if (EVEN(sts))
           return sts;
 
@@ -17365,43 +18026,42 @@ int gcg_comp_plcembed(ldh_tSession ldhses, pwr_tOid oid, int force)
 
     // Transfer attributes from the dPlcEmbed to the PlcPgm object
     pwr_tOid* threadobject_p;
-    sts = ldh_GetObjectPar(ldhses, plcoid, "RtBody", "ThreadObject",
-        (char**)&threadobject_p, &size);
+    sts = ldh_GetObjectPar(ldhses, plcoid, "RtBody", "ThreadObject", (char**)&threadobject_p, &size);
     if (EVEN(sts))
       return sts;
 
-    if (cdh_ObjidIsNotEqual(plcembed_p->ThreadObject, *threadobject_p)) {
-      sts = ldh_SetObjectPar(ldhses, plcoid, "RtBody", "ThreadObject",
-          (char*)&plcembed_p->ThreadObject, sizeof(pwr_tOid));
+    if (cdh_ObjidIsNotEqual(plcembed_p->ThreadObject, *threadobject_p))
+    {
+      sts = ldh_SetObjectPar(ldhses, plcoid, "RtBody", "ThreadObject", (char*)&plcembed_p->ThreadObject,
+                             sizeof(pwr_tOid));
       if (EVEN(sts))
         return sts;
     }
     free((char*)threadobject_p);
 
     pwr_tAttrRef* resetobject_p;
-    sts = ldh_GetObjectPar(ldhses, plcoid, "DevBody", "ResetObject",
-        (char**)&resetobject_p, &size);
+    sts = ldh_GetObjectPar(ldhses, plcoid, "DevBody", "ResetObject", (char**)&resetobject_p, &size);
     if (EVEN(sts))
       return sts;
 
-    if (memcmp(&plcembed_p->ResetObject, resetobject_p, sizeof(pwr_tAttrRef))
-        != 0) {
-      sts = ldh_SetObjectPar(ldhses, plcoid, "DevBody", "ResetObject",
-          (char*)&plcembed_p->ResetObject, sizeof(pwr_tAttrRef));
+    if (memcmp(&plcembed_p->ResetObject, resetobject_p, sizeof(pwr_tAttrRef)) != 0)
+    {
+      sts = ldh_SetObjectPar(ldhses, plcoid, "DevBody", "ResetObject", (char*)&plcembed_p->ResetObject,
+                             sizeof(pwr_tAttrRef));
       if (EVEN(sts))
         return sts;
     }
     free((char*)resetobject_p);
 
     pwr_tInt32* executeorder_p;
-    sts = ldh_GetObjectPar(ldhses, plcoid, "DevBody", "ExecuteOrder",
-        (char**)&executeorder_p, &size);
+    sts = ldh_GetObjectPar(ldhses, plcoid, "DevBody", "ExecuteOrder", (char**)&executeorder_p, &size);
     if (EVEN(sts))
       return sts;
 
-    if (*executeorder_p != plcembed_p->ExecuteOrder) {
-      sts = ldh_SetObjectPar(ldhses, plcoid, "DevBody", "ExecuteOrder",
-          (char*)&plcembed_p->ExecuteOrder, sizeof(pwr_tInt32));
+    if (*executeorder_p != plcembed_p->ExecuteOrder)
+    {
+      sts = ldh_SetObjectPar(ldhses, plcoid, "DevBody", "ExecuteOrder", (char*)&plcembed_p->ExecuteOrder,
+                             sizeof(pwr_tInt32));
       if (EVEN(sts))
         return sts;
     }
@@ -17409,13 +18069,13 @@ int gcg_comp_plcembed(ldh_tSession ldhses, pwr_tOid oid, int force)
 
     // Set current object in PlcPgm to find $PlcFo references
     pwr_tAttrRef* hostobject_p;
-    sts = ldh_GetObjectPar(
-        ldhses, plcoid, "RtBody", "HostObject", (char**)&hostobject_p, &size);
+    sts = ldh_GetObjectPar(ldhses, plcoid, "RtBody", "HostObject", (char**)&hostobject_p, &size);
     if (EVEN(sts))
       return sts;
-    if (memcmp(hostobject_p, &parent_aref, sizeof(parent_aref)) != 0) {
-      sts = ldh_SetObjectPar(ldhses, plcoid, "RtBody", "HostObject",
-          (char*)&parent_aref, sizeof(pwr_tAttrRef));
+    if (memcmp(hostobject_p, &parent_aref, sizeof(parent_aref)) != 0)
+    {
+      sts =
+          ldh_SetObjectPar(ldhses, plcoid, "RtBody", "HostObject", (char*)&parent_aref, sizeof(pwr_tAttrRef));
       if (EVEN(sts))
         return sts;
     }
@@ -17425,24 +18085,23 @@ int gcg_comp_plcembed(ldh_tSession ldhses, pwr_tOid oid, int force)
     pwr_tOid plcobject;
     pwr_tAttrRef plcobject_aref;
 
-    sts = ldh_ArefANameToAref(
-        ldhses, &plcembed_aref, "PlcObject", &plcobject_aref);
+    sts = ldh_ArefANameToAref(ldhses, &plcembed_aref, "PlcObject", &plcobject_aref);
     if (EVEN(sts))
       return sts;
 
-    sts = ldh_ReadAttribute(
-        ldhses, &plcobject_aref, (void*)&plcobject, sizeof(plcobject));
+    sts = ldh_ReadAttribute(ldhses, &plcobject_aref, (void*)&plcobject, sizeof(plcobject));
     if (EVEN(sts))
       return sts;
 
-    if (cdh_ObjidIsNotEqual(plcoid, plcobject)) {
-      sts = ldh_WriteAttribute(
-          ldhses, &plcobject_aref, (void*)&plcoid, sizeof(plcoid));
+    if (cdh_ObjidIsNotEqual(plcoid, plcobject))
+    {
+      sts = ldh_WriteAttribute(ldhses, &plcobject_aref, (void*)&plcoid, sizeof(plcoid));
       if (EVEN(sts))
         return sts;
     }
 
-    if (copy_window) {
+    if (copy_window)
+    {
       pwr_tAttrRef attrref[2];
       pwr_sPlcProgram* plcbufp;
       pwr_eClass eclass;
@@ -17450,8 +18109,7 @@ int gcg_comp_plcembed(ldh_tSession ldhses, pwr_tOid oid, int force)
       attrref[0].Objid = template_window;
       attrref[1].Objid = pwr_cNObjid;
 
-      sts = ldh_CopyObjectTrees(
-          ldhses, attrref, plcoid, ldh_eDest_IntoFirst, 0, 0, 1, plc_found);
+      sts = ldh_CopyObjectTrees(ldhses, attrref, plcoid, ldh_eDest_IntoFirst, 0, 0, 1, plc_found);
       if (EVEN(sts))
         return sts;
 
@@ -17459,15 +18117,13 @@ int gcg_comp_plcembed(ldh_tSession ldhses, pwr_tOid oid, int force)
       if (EVEN(sts))
         return sts;
 
-      sts = ldh_GetObjectBuffer(ldhses, plcoid, "DevBody", "PlcProgram",
-          &eclass, (char**)&plcbufp, &size);
+      sts = ldh_GetObjectBuffer(ldhses, plcoid, "DevBody", "PlcProgram", &eclass, (char**)&plcbufp, &size);
       if (EVEN(sts))
         return sts;
 
       plcbufp->woid = windoid;
 
-      sts = ldh_SetObjectBuffer(
-          ldhses, plcoid, "DevBody", "PlcProgram", (char*)plcbufp);
+      sts = ldh_SetObjectBuffer(ldhses, plcoid, "DevBody", "PlcProgram", (char*)plcbufp);
       if (EVEN(sts))
         return sts;
 
