@@ -59,10 +59,10 @@
 #include "co_cdh.h"
 #include "co_dcli.h"
 #include "co_string.h"
+#include "co_cJSON.h"
 #include "pwr_ssaboxclasses.h"
 
 #include "export_rtdb_pre_v61.h"
-#include "export_rtdb_cjson.h"
 #include "export_rtdb_avro.h"
 #include "export_rtdb_gdh.h"
 #include "export_rtdb_kafka.h"
