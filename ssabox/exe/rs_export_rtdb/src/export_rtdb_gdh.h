@@ -37,7 +37,7 @@
 #ifndef export_rtdb_gdh_h
 #define export_rtdb_gdh_h
 
-int encode_val(AvroEncoder &enc, pwr_eType type_id, bool is_ptr, pwr_sAttrRef* aref, void* val);
+int encode_val(AvroEncoder& enc, pwr_eType type_id, bool is_ptr, pwr_sAttrRef* aref, void* val);
 std::string pwr_eType_to_str(pwr_eType tid);
 
 #endif

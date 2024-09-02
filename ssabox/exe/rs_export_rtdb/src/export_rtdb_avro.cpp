@@ -38,86 +38,80 @@
 
 #include "export_rtdb_avro.h"
 
-void AvroEncoder::encodeInt64(int64_t input) {
+void AvroEncoder::encodeInt64(int64_t input)
+{
   unsigned long long val = ((input << 1) ^ (input >> 63));
   const int mask = 0x7F;
   unsigned long long v = val & mask;
-  while (val >>= 7) {
+  while (val >>= 7)
+  {
     out.push_back(v | 0x80);
     v = val & mask;
   }
   out.push_back(v);
 }
 
-void AvroEncoder::encodeInt32(int32_t input) {
+void AvroEncoder::encodeInt32(int32_t input)
+{
   unsigned int val = ((input << 1) ^ (input >> 31));
   const int mask = 0x7F;
   unsigned int v = val & mask;
-  while (val >>= 7) {
+  while (val >>= 7)
+  {
     out.push_back(v | 0x80);
     v = val & mask;
   }
   out.push_back(v);
 }
 
-void AvroEncoder::writeBytes(const uint8_t* p, int size) {
-  for (int i = 0; i < size; i++) {
+void AvroEncoder::writeBytes(const uint8_t* p, int size)
+{
+  for (int i = 0; i < size; i++)
+  {
     out.push_back(p[i]);
   }
 }
 
-void AvroEncoder::clear() {
-  out.clear();
-}
+void AvroEncoder::clear() { out.clear(); }
 
 void AvroEncoder::arrayStart() {}
 void AvroEncoder::startItem() {}
-void AvroEncoder::arrayEnd() {
-  this->encodeLong(0);
-}
+void AvroEncoder::arrayEnd() { this->encodeLong(0); }
 
-void AvroEncoder::setItemCount(size_t count) {
-  this->encodeLong(count);
-}
+void AvroEncoder::setItemCount(size_t count) { this->encodeLong(count); }
 
-void AvroEncoder::encodeBool(bool b) {
-  out.push_back(b ? 1 : 0);
-}
+void AvroEncoder::encodeBool(bool b) { out.push_back(b ? 1 : 0); }
 
-void AvroEncoder::encodeInt(int32_t i) {
-  encodeInt32(i);
-}
+void AvroEncoder::encodeInt(int32_t i) { encodeInt32(i); }
 
-void AvroEncoder::encodeLong(int64_t i) {
-  encodeInt64(i);
-}
+void AvroEncoder::encodeLong(int64_t i) { encodeInt64(i); }
 
-void AvroEncoder::encodeFloat(float f) {
-  const auto *p = reinterpret_cast<const uint8_t*>(&f);
+void AvroEncoder::encodeFloat(float f)
+{
+  const auto* p = reinterpret_cast<const uint8_t*>(&f);
   writeBytes(p, sizeof(float));
 }
 
-void AvroEncoder::encodeDouble(double d) {
-  const auto *p = reinterpret_cast<const uint8_t*>(&d);
+void AvroEncoder::encodeDouble(double d)
+{
+  const auto* p = reinterpret_cast<const uint8_t*>(&d);
   writeBytes(p, sizeof(double));
 }
 
-void AvroEncoder::encodeString(const std::string &s) {
+void AvroEncoder::encodeString(const std::string& s)
+{
   encodeInt64(s.size());
   writeBytes(reinterpret_cast<const uint8_t*>(s.c_str()), s.size());
 }
 
-void AvroEncoder::encodeBytes(const uint8_t *bytes, size_t len) {
+void AvroEncoder::encodeBytes(const uint8_t* bytes, size_t len)
+{
   encodeInt64(len);
   writeBytes(bytes, len);
 }
 
-void AvroEncoder::encodeFixed(const uint8_t *bytes, size_t len) {
-  writeBytes(bytes, len);
-}
+void AvroEncoder::encodeFixed(const uint8_t* bytes, size_t len) { writeBytes(bytes, len); }
 
-void AvroEncoder::encodeUnionIndex(size_t e) {
-  encodeInt64(e);
-}
+void AvroEncoder::encodeUnionIndex(size_t e) { encodeInt64(e); }
 
 #endif
