@@ -51,15 +51,9 @@ static void sigHandler();
 
 static qdb_sBuffer* inPool(pwr_tStatus*, void*);
 
-static void exitHandler()
-{
-  qcom_Exit(NULL);
-}
+static void exitHandler() { qcom_Exit(NULL); }
 
-static void sigHandler()
-{
-  exit(0);
-}
+static void sigHandler() { exit(0); }
 
 static qdb_sBuffer* inPool(pwr_tStatus* sts, void* p)
 {
@@ -137,7 +131,7 @@ pwr_tBoolean qcom_AttachQ(pwr_tStatus* status, const qcom_sQid* qid)
   return ODD(*sts);
 }
 
-pwr_tBoolean qcom_StealQ(pwr_tStatus *status, const qcom_sQid *qid)
+pwr_tBoolean qcom_StealQ(pwr_tStatus* status, const qcom_sQid* qid)
 {
   qdb_sQue* qp;
   pwr_dStatus(sts, status, QCOM__SUCCESS);
@@ -168,8 +162,7 @@ pwr_tBoolean qcom_StealQ(pwr_tStatus *status, const qcom_sQid *qid)
  * A private queue can be bound to one or many forward
  * queues.
  */
-pwr_tBoolean qcom_Bind(
-    pwr_tStatus* status, const qcom_sQid* tqid, const qcom_sQid* sqid)
+pwr_tBoolean qcom_Bind(pwr_tStatus* status, const qcom_sQid* tqid, const qcom_sQid* sqid)
 {
   qdb_sQbond* bp = NULL;
   qdb_sQue* sq;
@@ -210,8 +203,7 @@ pwr_tBoolean qcom_Bind(
 /**
  * @brief Create a queue and make an implicit connect to it.
  */
-pwr_tBoolean qcom_CreateQ(
-    pwr_tStatus* status, qcom_sQid* qid, qcom_sQattr* attr, const char* qname)
+pwr_tBoolean qcom_CreateQ(pwr_tStatus* status, qcom_sQid* qid, qcom_sQattr* attr, const char* qname)
 {
   qdb_sQue* qp;
   qdb_eQue type;
@@ -227,8 +219,10 @@ pwr_tBoolean qcom_CreateQ(
 
   flags.m = 0;
 
-  if (attr != NULL) {
-    switch (attr->type) {
+  if (attr != NULL)
+  {
+    switch (attr->type)
+    {
     case qcom_eQtype_private:
       type = qdb_eQue_private;
       break;
@@ -246,7 +240,9 @@ pwr_tBoolean qcom_CreateQ(
     default:
       pwr_Return(NO, sts, QCOM__QTYPE);
     }
-  } else {
+  }
+  else
+  {
     type = qdb_eQue_private;
   }
 
@@ -267,14 +263,17 @@ pwr_tBoolean qcom_CreateQ(
     qp = qdb_AttachQue(sts, qp, qdb->ap);
     if (qp == NULL)
       break;
-    if (flags.b.broadcast) {
+    if (flags.b.broadcast)
+    {
       qdb_AddBond(sts, qp, qdb->exportque);
     }
 
-    if (qname != NULL) {
+    if (qname != NULL)
+    {
       strncpy(qp->name, qname, sizeof(qp->name) - 1);
       qp->name[sizeof(qp->name) - 1] = '\0';
-    } else
+    }
+    else
       strcpy(qp->name, "\"unknown name\"");
   }
   qdb_ScopeUnlock;
@@ -303,14 +302,15 @@ pwr_tBoolean qcom_DeleteQ(pwr_tStatus* status, const qcom_sQid* qid)
     if (qp == NULL)
       pwr_StatusBreak(*sts, QCOM__NOQ);
 
-
-    if (qp->flags.b.broadcast) {
+    if (qp->flags.b.broadcast)
+    {
       qdb_sQbond* bp;
 
-      if ((bp = qdb_GetBond(sts, qp, qdb->exportque)) != NULL) {
-	pool_Qremove(sts, &qdb->pool, &bp->tgt_ll);
-	pool_Qremove(sts, &qdb->pool, &bp->src_ll);
-	pool_Free(sts, &qdb->pool, bp);
+      if ((bp = qdb_GetBond(sts, qp, qdb->exportque)) != NULL)
+      {
+        pool_Qremove(sts, &qdb->pool, &bp->tgt_ll);
+        pool_Qremove(sts, &qdb->pool, &bp->src_ll);
+        pool_Free(sts, &qdb->pool, bp);
       }
     }
 
@@ -323,8 +323,8 @@ pwr_tBoolean qcom_DeleteQ(pwr_tStatus* status, const qcom_sQid* qid)
 
 /**
  * @brief Disconnect from QCom.
- * Disconnects an application from the Qcom message bus, 
- * all resources such as, queue, messages andbindings, held 
+ * Disconnects an application from the Qcom message bus,
+ * all resources such as, queue, messages andbindings, held
  * by the application will be released.
  */
 
@@ -395,8 +395,7 @@ pwr_tBoolean qcom_Free(pwr_tStatus* status, void* p)
  * @return void*
  */
 
-void* qcom_Get(
-    pwr_tStatus* status, const qcom_sQid* qid, qcom_sGet* gp, int tmo)
+void* qcom_Get(pwr_tStatus* status, const qcom_sQid* qid, qcom_sGet* gp, int tmo)
 {
   pwr_tStatus lsts;
   qdb_sQue* qp = NULL;
@@ -417,7 +416,8 @@ void* qcom_Get(
     /* Check that a given gp or gp->data is not in pool,
        this could cause serious problems.  */
 
-    if (gp != NULL && gp->data != NULL) {
+    if (gp != NULL && gp->data != NULL)
+    {
       br = pool_InPool(&lsts, &qdb->pool, gp->data, gp->size);
       if (br != pool_cNRef)
         break;
@@ -434,7 +434,8 @@ void* qcom_Get(
 
     bp = qdb_Get(sts, qp, tmo, gp, 0);
 
-    if (bp != NULL) {
+    if (bp != NULL)
+    {
       qdb->ap->get_count++;
       qp->get_count++;
     }
@@ -446,11 +447,16 @@ void* qcom_Get(
 
   dp = bp + 1;
 
-  if (gp == NULL) {
+  if (gp == NULL)
+  {
     ; /* do nothing! */
-  } else if (gp->data == NULL) {
+  }
+  else if (gp->data == NULL)
+  {
     gp->data = dp;
-  } else {
+  }
+  else
+  {
     if (bp->c.type == qdb_eBuffer_reference)
       bbp = pool_Address(sts, &qdb->pool, bp->r.src);
     else
@@ -471,7 +477,6 @@ void* qcom_Get(
   return dp;
 }
 
-
 /**
  * @brief Get the current qcom bus number.
  */
@@ -481,10 +486,7 @@ qcom_tBus qcom_MyBus(pwr_tStatus* status)
 
   pwr_dStatus(sts, status, QCOM__SUCCESS);
 
-  qdb_ScopeLock
-  {
-    bus = qdb->g->bus;
-  }
+  qdb_ScopeLock { bus = qdb->g->bus; }
   qdb_ScopeUnlock;
 
   return bus;
@@ -500,10 +502,7 @@ pwr_tBoolean qcom_MyNode(pwr_tStatus* status, qcom_sNode* node)
   if (node == NULL)
     pwr_Return(NO, sts, QCOM__BADARG);
 
-  qdb_ScopeLock
-  {
-    qdb_NodeInfo(NULL, node, qdb->my_node);
-  }
+  qdb_ScopeLock { qdb_NodeInfo(NULL, node, qdb->my_node); }
   qdb_ScopeUnlock;
 
   return YES;
@@ -553,8 +552,8 @@ pwr_tBoolean qcom_Node(pwr_tStatus* status, qcom_sNode* node, pwr_tNodeId nid)
 
 /**
  * @brief Get the next qcom node.
- * If nid is pwr_cNNodeId the first node is returned. 
- * 
+ * If nid is pwr_cNNodeId the first node is returned.
+ *
  * Example
  * \code{.c}
  * for (nid = qcom_cNNid; qcom_NextNode(&sts, &node, nid); nid = node.nid) {
@@ -562,8 +561,7 @@ pwr_tBoolean qcom_Node(pwr_tStatus* status, qcom_sNode* node, pwr_tNodeId nid)
  * }
  * \endcode
  */
-pwr_tBoolean qcom_NextNode(
-    pwr_tStatus* status, qcom_sNode* node, pwr_tNodeId nid)
+pwr_tBoolean qcom_NextNode(pwr_tStatus* status, qcom_sNode* node, pwr_tNodeId nid)
 {
   pool_sQlink* nl = NULL;
   qdb_sNode* np = NULL;
@@ -574,24 +572,33 @@ pwr_tBoolean qcom_NextNode(
 
   qdb_ScopeLock
   {
-    if (nid == pwr_cNNodeId) {
+    if (nid == pwr_cNNodeId)
+    {
       nl = pool_Qsucc(NULL, &qdb->pool, &qdb->g->node_lh);
-      if (nl == &qdb->g->node_lh) {
+      if (nl == &qdb->g->node_lh)
+      {
         *sts = QCOM__NO_NODE;
         break;
-      } else {
-        np = pool_Qitem(nl, qdb_sNode, node_ll);
-	if (np == NULL)
-	  break;
-
-	qdb_NodeInfo(NULL, node, np);
-	break;
       }
-    } else {
+      else
+      {
+        np = pool_Qitem(nl, qdb_sNode, node_ll);
+        if (np == NULL)
+          break;
+
+        qdb_NodeInfo(NULL, node, np);
+        break;
+      }
+    }
+    else
+    {
       np = hash_Search(sts, &qdb->nid_ht, &nid);
-      if (np == NULL) {
+      if (np == NULL)
+      {
         *sts = QCOM__NOSUCHNODE;
-      } else {
+      }
+      else
+      {
         nl = &np->node_ll;
       }
     }
@@ -599,18 +606,25 @@ pwr_tBoolean qcom_NextNode(
     if (nl == NULL)
       break;
 
-    while (TRUE) {
+    while (TRUE)
+    {
       /* loop over no node */
       np = NULL;
       nl = pool_Qsucc(NULL, &qdb->pool, nl);
-      if (nl == &qdb->g->node_lh) {
+      if (nl == &qdb->g->node_lh)
+      {
         *sts = QCOM__NO_NODE;
         break;
-      } else {
+      }
+      else
+      {
         np = pool_Qitem(nl, qdb_sNode, node_ll);
-        if (np->nid == pwr_cNNodeId) {
+        if (np->nid == pwr_cNNodeId)
+        {
           continue;
-        } else {
+        }
+        else
+        {
           break;
         }
       }
@@ -629,16 +643,16 @@ pwr_tBoolean qcom_NextNode(
 /**
  * @brief Connect to QCom.
  *
- * Before using Qcom an application must connect to Qcom. 
- * The application has an identity and name. The identity is generated by 
- * Qcom and is returned in 'aid'. If 'name' is a null pointer the 
- * application will be given the name 'unknown name'. Every message sent 
- * from an application contains the application identity and the identity 
- * can be read by the receiving application. 
+ * Before using Qcom an application must connect to Qcom.
+ * The application has an identity and name. The identity is generated by
+ * Qcom and is returned in 'aid'. If 'name' is a null pointer the
+ * application will be given the name 'unknown name'. Every message sent
+ * from an application contains the application identity and the identity
+ * can be read by the receiving application.
  *
- * Applications using GDH, MH_APPL 
- * or MH_OUTUNIT do not have to call qcom_Init(), it is done inside the 
- * gdh_Init() and mh_OutunitConnect() calls. 
+ * Applications using GDH, MH_APPL
+ * or MH_OUTUNIT do not have to call qcom_Init(), it is done inside the
+ * gdh_Init() and mh_OutunitConnect() calls.
  */
 pwr_tBoolean qcom_Init(pwr_tStatus* status, qcom_sAid* aid, const char* aname)
 {
@@ -650,7 +664,8 @@ pwr_tBoolean qcom_Init(pwr_tStatus* status, qcom_sAid* aid, const char* aname)
   sigset_t ss;
   pwr_dStatus(sts, status, QCOM__SUCCESS);
 
-  if (aid == NULL) {
+  if (aid == NULL)
+  {
     memset(&laid, 0, sizeof(laid));
     aid = &laid;
   }
@@ -663,9 +678,11 @@ pwr_tBoolean qcom_Init(pwr_tStatus* status, qcom_sAid* aid, const char* aname)
   {
     qdb->g->call_count++;
 
-    if (qdb->ap == NULL) {
+    if (qdb->ap == NULL)
+    {
       ap = hash_Search(sts, &qdb->pid_ht, &qdb->my_pid);
-      if (ap != NULL) {
+      if (ap != NULL)
+      {
         qdb->ap = ap;
         qdb_RemoveAppl(&lsts, ap);
         qdb->ap = NULL;
@@ -678,13 +695,18 @@ pwr_tBoolean qcom_Init(pwr_tStatus* status, qcom_sAid* aid, const char* aname)
       added = 1;
 
       ap->call_count = 1;
-      if (aname != NULL) {
+      if (aname != NULL)
+      {
         strncpy(ap->name, aname, sizeof(ap->name) - 1);
         ap->name[sizeof(ap->name) - 1] = '\0';
-      } else {
+      }
+      else
+      {
         strcpy(ap->name, "\"unknown name\"");
       }
-    } else {
+    }
+    else
+    {
       ap = qdb->ap;
     }
   }
@@ -711,10 +733,7 @@ pwr_tBoolean qcom_Init(pwr_tStatus* status, qcom_sAid* aid, const char* aname)
   sigaddset(&ss, qdb_cSigMsg);
   sigprocmask(SIG_BLOCK, &ss, NULL);
 
-  qdb_ScopeLock
-  {
-    qdb_ApplEvent(NULL, ap, qcom_eStype_applConnect);
-  }
+  qdb_ScopeLock { qdb_ApplEvent(NULL, ap, qcom_eStype_applConnect); }
   qdb_ScopeUnlock;
 
   return YES;
@@ -723,9 +742,9 @@ pwr_tBoolean qcom_Init(pwr_tStatus* status, qcom_sAid* aid, const char* aname)
 /**
  * @brief Put a new message.
  *
- * When sending a message an application can use private data, allocated 
- * on the stack, head, or static memory, or allocate data from the Qcom 
- * pool. 
+ * When sending a message an application can use private data, allocated
+ * on the stack, head, or static memory, or allocate data from the Qcom
+ * pool.
  * \code{.c}
  * char data[100];
  * qcom_sPut put;
@@ -734,7 +753,7 @@ pwr_tBoolean qcom_Init(pwr_tStatus* status, qcom_sAid* aid, const char* aname)
  * put.data = data;
  * qcom_Put(&sts, &q, &put);
  * \endcode
- * Internally Qcom will allocate a buffer from the pool and copy user data 
+ * Internally Qcom will allocate a buffer from the pool and copy user data
  * to that buffer. Another way is to use a buffer allocated from the pool.
  * \code{.c}
  * put.data = qcom_Alloc(&sts, sizeof(data));
@@ -742,7 +761,7 @@ pwr_tBoolean qcom_Init(pwr_tStatus* status, qcom_sAid* aid, const char* aname)
  * // prepare data
  * qcom_Put(&sts, &q, &put);
  * \endcode
- * Qcom checks if the buffer is allocated in the pool or not. 
+ * Qcom checks if the buffer is allocated in the pool or not.
  */
 pwr_tBoolean qcom_Put(pwr_tStatus* status, const qcom_sQid* qidp, qcom_sPut* pp)
 {
@@ -768,25 +787,32 @@ pwr_tBoolean qcom_Put(pwr_tStatus* status, const qcom_sQid* qidp, qcom_sPut* pp)
 
     if (!pp->allocate)
       bp = inPool(sts, pp->data);
-    if (pp->allocate || bp == NULL) {
+    if (pp->allocate || bp == NULL)
+    {
       bp = qdb_Alloc(sts, qdb_eBuffer_base, pp->size);
-      if (bp == NULL) {
+      if (bp == NULL)
+      {
         *sts = QDB__QUOTAEXCEEDED;
         break;
       }
       memcpy((char*)(bp + 1), pp->data, pp->size);
-    } else {
+    }
+    else
+    {
       /* check that this buffer is really owned by this process */
     }
 
     qdb_PutInfo(bp, pp, qidp, 0);
 
-    if (qp->qix == qdb_cIexport) {
+    if (qp->qix == qdb_cIexport)
+    {
       bp->c.flags.b.remote = 1;
       bp->b.noderef = pool_Reference(sts, &qdb->pool, np);
       bp->b.msg_id = pp->msg_id;
       bp->b.prio = pp->prio;
-    } else {
+    }
+    else
+    {
       bp->b.msg_id = pp->msg_id;
       bp->b.prio = pp->prio;
     }
@@ -808,8 +834,7 @@ pwr_tBoolean qcom_Put(pwr_tStatus* status, const qcom_sQid* qidp, qcom_sPut* pp)
  * Buffers allready queued in the bound queue from the
  * forwarding queue will not be unqueued.
  */
-pwr_tBoolean qcom_Unbind(
-    pwr_tStatus* status, const qcom_sQid* sqid, const qcom_sQid* tqid)
+pwr_tBoolean qcom_Unbind(pwr_tStatus* status, const qcom_sQid* sqid, const qcom_sQid* tqid)
 {
   qdb_sQue* sq;
   qdb_sQue* tq;
@@ -857,14 +882,16 @@ pwr_tBoolean qcom_Unbind(
 
 int qcom_QidCompare(const qcom_sQid* q1, const qcom_sQid* q2)
 {
-  if (q1->nid == q2->nid) {
+  if (q1->nid == q2->nid)
+  {
     if (q1->qix == q2->qix)
       return 0;
     else if (q1->qix < q2->qix)
       return -1;
     else
       return 1;
-  } else if (q1->nid < q2->nid)
+  }
+  else if (q1->nid < q2->nid)
     return -1;
   else
     return 1;
@@ -931,14 +958,16 @@ pwr_tBoolean qcom_QidIsNotNull(const qcom_sQid* q)
 
 int qcom_AidCompare(const qcom_sAid* a1, const qcom_sAid* a2)
 {
-  if (a1->nid == a2->nid) {
+  if (a1->nid == a2->nid)
+  {
     if (a1->aix == a2->aix)
       return 0;
     else if (a1->aix < a2->aix)
       return -1;
     else
       return 1;
-  } else if (a1->nid < a2->nid)
+  }
+  else if (a1->nid < a2->nid)
     return -1;
   else
     return 1;
@@ -1012,15 +1041,15 @@ pwr_tBoolean qcom_AidIsNotNull(const qcom_sAid* a)
 /**
  * @brief Put a request and return the reply.
  *
- * The qcom_Request() call combines qcom_Put() and qcom_Get() in one call, 
- * and the application is guaranteed that at the return from qcom_Request() 
- * it either has the correct reply on the request or a time out. Internal 
+ * The qcom_Request() call combines qcom_Put() and qcom_Get() in one call,
+ * and the application is guaranteed that at the return from qcom_Request()
+ * it either has the correct reply on the request or a time out. Internal
  * to the qcom_Request() call, Qcom filters away any stray responses.
  *
  * The request should be answered with a qcom_Reply().
  */
-void* qcom_Request(pwr_tStatus* status, const qcom_sQid* pqid, qcom_sPut* pp,
-    const qcom_sQid* gqid, qcom_sGet* gp, int tmo, pwr_tBitMask flags)
+void* qcom_Request(pwr_tStatus* status, const qcom_sQid* pqid, qcom_sPut* pp, const qcom_sQid* gqid,
+                   qcom_sGet* gp, int tmo, pwr_tBitMask flags)
 {
   qdb_sBuffer* pbp;
   qdb_sNode* np = NULL;
@@ -1035,7 +1064,8 @@ void* qcom_Request(pwr_tStatus* status, const qcom_sQid* pqid, qcom_sPut* pp,
 
   pwr_Assert(pp != NULL);
 
-  if (tmo < 0) {
+  if (tmo < 0)
+  {
     pwr_Return(NULL, sts, QCOM__HIGHTMO);
   }
 
@@ -1054,7 +1084,8 @@ void* qcom_Request(pwr_tStatus* status, const qcom_sQid* pqid, qcom_sPut* pp,
     /* Check that a given gp or gp->data is not in pool,
        this could cause serious problems.  */
 
-    if (gp != NULL && gp->data != NULL) {
+    if (gp != NULL && gp->data != NULL)
+    {
       gbr = pool_InPool(&lsts, &qdb->pool, gp->data, gp->size);
       if (gbr != pool_cNRef)
         return NULL;
@@ -1070,17 +1101,21 @@ void* qcom_Request(pwr_tStatus* status, const qcom_sQid* pqid, qcom_sPut* pp,
       pwr_StatusBreak(*sts, QCOM__NOTOWNED);
 
     pbp = inPool(sts, pp->data);
-    if (pbp == NULL) {
+    if (pbp == NULL)
+    {
       pbp = qdb_Alloc(sts, qdb_eBuffer_base, pp->size);
       memcpy((char*)(pbp + 1), pp->data, pp->size);
-    } else {
+    }
+    else
+    {
       /* check that this buffer is really owned by this process */
     }
 
     pbp->c.flags.b.request = 1;
     qdb_PutInfo(pbp, pp, pqid, 0);
 
-    if (pqp->qix == qdb_cIexport) {
+    if (pqp->qix == qdb_cIexport)
+    {
       pbp->c.flags.b.remote = 1;
       pbp->b.noderef = pool_Reference(sts, &qdb->pool, np);
     }
@@ -1096,11 +1131,16 @@ void* qcom_Request(pwr_tStatus* status, const qcom_sQid* pqid, qcom_sPut* pp,
 
   dp = gbp + 1;
 
-  if (gp == NULL) {
+  if (gp == NULL)
+  {
     ; /* do nothing! */
-  } else if (gp->data == NULL) {
+  }
+  else if (gp->data == NULL)
+  {
     gp->data = dp;
-  } else {
+  }
+  else
+  {
     if (gbp->c.type == qdb_eBuffer_reference)
       gbbp = pool_Address(sts, &qdb->pool, gbp->r.src);
     else
@@ -1123,9 +1163,9 @@ void* qcom_Request(pwr_tStatus* status, const qcom_sQid* pqid, qcom_sPut* pp,
 
 /**
  * @brief Reply to a qcom_Request.
- * The qcom_Reply() call looks almost like a qcom_Put(), but the queue id is 
- * replaced with a qcom_sGet. Applications must agree on using 
- * qcom_Request/qcom_Reply, using a qcom_Put to reply on a qcom_Request will not work. 
+ * The qcom_Reply() call looks almost like a qcom_Put(), but the queue id is
+ * replaced with a qcom_sGet. Applications must agree on using
+ * qcom_Request/qcom_Reply, using a qcom_Put to reply on a qcom_Request will not work.
  */
 
 pwr_tBoolean qcom_Reply(pwr_tStatus* status, qcom_sGet* gp, qcom_sPut* pp)
@@ -1151,10 +1191,13 @@ pwr_tBoolean qcom_Reply(pwr_tStatus* status, qcom_sGet* gp, qcom_sPut* pp)
       break;
 
     bp = inPool(sts, pp->data);
-    if (bp == NULL) {
+    if (bp == NULL)
+    {
       bp = qdb_Alloc(sts, qdb_eBuffer_base, pp->size);
       memcpy((char*)(bp + 1), pp->data, pp->size);
-    } else {
+    }
+    else
+    {
       /* check that this buffer is really owned by this process */
     }
 
@@ -1167,7 +1210,8 @@ pwr_tBoolean qcom_Reply(pwr_tStatus* status, qcom_sGet* gp, qcom_sPut* pp)
     bp->b.info.flags.b.request = 0;
     bp->b.info.status = QCOM__SUCCESS;
 
-    if (qp->qix == qdb_cIexport) {
+    if (qp->qix == qdb_cIexport)
+    {
       bp->c.flags.b.remote = 1;
       bp->b.noderef = pool_Reference(sts, &qdb->pool, np);
     }
@@ -1204,8 +1248,8 @@ char* qcom_QidToString(char* s, qcom_sQid* qid, int prefix)
   loid.pwr.vid = (pwr_tVolumeId)qid->nid;
   loid.pwr.oix = (pwr_tObjectIx)qid->qix;
 
-  sprintf(ls, "%s%u.%u.%u.%u:%u", (prefix ? "_Q" : ""), loid.o.vid_3,
-      loid.o.vid_2, loid.o.vid_1, loid.o.vid_0, loid.o.oix);
+  sprintf(ls, "%s%u.%u.%u.%u:%u", (prefix ? "_Q" : ""), loid.o.vid_3, loid.o.vid_2, loid.o.vid_1,
+          loid.o.vid_0, loid.o.oix);
 
   if (s != NULL)
     return strcat(s, ls);
@@ -1216,7 +1260,7 @@ char* qcom_QidToString(char* s, qcom_sQid* qid, int prefix)
 /**
  * @brief  Wait for an event or a message.
  *
- * Wait for an event on the message queue (eid) matching the supplied 
+ * Wait for an event on the message queue (eid) matching the supplied
  * mask, or an message on the message queue (qid).
  *
  * For qcom_WaitOr at least one of the bits in the mask has to match
@@ -1225,8 +1269,8 @@ char* qcom_QidToString(char* s, qcom_sQid* qid, int prefix)
  * @return pwr_tBoolean
  */
 
-pwr_tBoolean qcom_WaitOr(pwr_tStatus* status, const qcom_sQid* qid,
-    const qcom_sQid* eid, int mask, int tmo, int* event)
+pwr_tBoolean qcom_WaitOr(pwr_tStatus* status, const qcom_sQid* qid, const qcom_sQid* eid, int mask, int tmo,
+                         int* event)
 {
   int result = 0;
   qdb_sQue* qp;
@@ -1264,7 +1308,7 @@ pwr_tBoolean qcom_WaitOr(pwr_tStatus* status, const qcom_sQid* qid,
 /**
  * @brief  Wait for an event or a message.
  *
- * Wait for an event on the message queue (eid) matching the supplied 
+ * Wait for an event on the message queue (eid) matching the supplied
  * mask, or an message on the message queue (qid).
  *
  * For qcom_WaitAnd all the bits in the mask have to match
@@ -1273,8 +1317,7 @@ pwr_tBoolean qcom_WaitOr(pwr_tStatus* status, const qcom_sQid* qid,
  * @return pwr_tBoolean
  */
 
-pwr_tBoolean qcom_WaitAnd(pwr_tStatus* status, const qcom_sQid* qid,
-    const qcom_sQid* eid, int mask, int tmo)
+pwr_tBoolean qcom_WaitAnd(pwr_tStatus* status, const qcom_sQid* qid, const qcom_sQid* eid, int mask, int tmo)
 {
   int result = 0;
   qdb_sQue* qp;
@@ -1371,10 +1414,7 @@ pwr_tBitMask qcom_EventMask(pwr_tStatus* status, const qcom_sQid* eid)
   return result;
 }
 
-void qcom_SetRedundancyState(pwr_eRedundancyState state)
-{
-  qdb->my_node->redundancy_state = state;
-}
+void qcom_SetRedundancyState(pwr_eRedundancyState state) { qdb->my_node->redundancy_state = state; }
 
 /**
  * Send a connect action message to rt_qmon
@@ -1383,7 +1423,7 @@ void qcom_LinkConnect(pwr_tNodeId nid)
 {
   pwr_tStatus sts;
   qcom_sPut put;
-  qcom_sQid qmon_qid = { qcom_cImonAction, 0 };
+  qcom_sQid qmon_qid = {qcom_cImonAction, 0};
 
   memset(&put, 0, sizeof(put));
   put.type.b = (qcom_eBtype)qmon_cMsgClassAction;
@@ -1403,7 +1443,7 @@ void qcom_LinkDisconnect(pwr_tNodeId nid)
 {
   pwr_tStatus sts;
   qcom_sPut put;
-  qcom_sQid qmon_qid = { qcom_cImonAction, 0 };
+  qcom_sQid qmon_qid = {qcom_cImonAction, 0};
 
   memset(&put, 0, sizeof(put));
   put.type.b = (qcom_eBtype)qmon_cMsgClassAction;
@@ -1417,8 +1457,8 @@ void qcom_LinkDisconnect(pwr_tNodeId nid)
 }
 
 /*
-* XDR Routines
-*/
+ * XDR Routines
+ */
 
 bool_t xdr_qcom_sAid(XDR* xdrs, qcom_sAid* objp)
 {
