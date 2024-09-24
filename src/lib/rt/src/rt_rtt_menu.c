@@ -44,6 +44,7 @@
 
 #include <stdarg.h>
 #include <stdlib.h>
+#include <signal.h>
 
 #include "pwr_baseclasses.h"
 #include "pwr_privilege.h"
@@ -67,13 +68,15 @@
 #include "rt_qcom_msg.h"
 
 #define RTT_HIDE_ELEMENTS 2
-
+                                                                        
 #define IF_NOGDH_RETURN                                                                                      \
   if (!rtt_gdh_started)                                                                                      \
   {                                                                                                          \
     rtt_message('E', "Rtt is not connected to nethandler");                                                  \
     return RTT__NOPICTURE;                                                                                   \
   }
+
+static volatile sig_atomic_t exit_process = 0;
 
 typedef struct
 {
@@ -138,6 +141,7 @@ static int rtt_get_stored_menuctx(void** ctx, void* key);
 static int rtt_get_system_name(char* system_name, int size);
 static int rtt_parse_mainmenu(char* mainmenu_title);
 static int rtt_help_show_all(menu_ctx parent_ctx, rtt_t_helptext* helptext);
+// static void handle_signal(int sig);
 
 /*************************************************************************
  *
@@ -231,6 +235,12 @@ void rtt_usage()
          "	qcomonly   Attach qcom, not gdh.\n\n");
 }
 
+void handle_signal(int sig)
+{
+  // All signals should exit rtt
+  exit_process = 1;
+}
+
 /*************************************************************************
  *
  * Name:		rtt_initialize()
@@ -249,6 +259,18 @@ int rtt_initialize(char* username, char* password, char* commandfile, char* main
   int sts;
   int noneth = 0;
   int qcom_only = 0;
+
+  // Set up signal handler
+  struct sigaction sa;
+  sa.sa_handler = handle_signal;
+  sigemptyset(&sa.sa_mask);
+  sa.sa_flags = 0;
+  sigaction(SIGTERM, &sa, NULL);
+  sigaction(SIGINT, &sa, NULL);
+  sigaction(SIGHUP, &sa, NULL);
+  sigaction(SIGABRT, &sa, NULL);
+  sigaction(SIGQUIT, &sa, NULL);
+  sigaction(SIGSEGV, &sa, NULL);
 
   rtt_init_state_table();
 
@@ -269,6 +291,14 @@ int rtt_initialize(char* username, char* password, char* commandfile, char* main
   if (!noneth)
   {
     sts = rtt_gdh_init();
+
+    if (EVEN(sts))
+    {
+      printf("rt_rtt was unable to initialize a connection to ProviewR\n");
+      rtt_logging_close_files();
+      qio_reset((int*)rtt_chn);
+      exit(EXIT_FAILURE);
+    }
 
     rtt_logon(rtt_chn, &rtt_priv, username, password);
 
@@ -1398,7 +1428,7 @@ int rtt_get_input_string(char* chn, char* out_string, unsigned long* out_termina
   terminator = 0;
   index = 0;
   out_str[0] = 0;
-  while (1)
+  while (!exit_process)
   {
     r_print_buffer();
     rtt_get_input(chn, input_str, &terminator, maxlen, option, timeout);
@@ -2725,7 +2755,7 @@ int rtt_menu_new(menu_ctx parent_ctx, pwr_tObjid argoi, rtt_t_menu** menu_p, cha
 
   option = RTT_OPT_NORECALL | RTT_OPT_NOEDIT | RTT_OPT_NOECHO | RTT_OPT_TIMEOUT;
 
-  while (1)
+  while (!exit_process)
   {
     rtt_command_get_input_string((char*)&rtt_chn, input_str, &terminator, maxlen, rtt_recallbuff, option,
                                  rtt_scantime, &rtt_scan, (void*)ctx, NULL, RTT_COMMAND_PICTURE);
@@ -3068,8 +3098,13 @@ int rtt_menu_new(menu_ctx parent_ctx, pwr_tObjid argoi, rtt_t_menu** menu_p, cha
       }
     }
   }
+  
+  qcom_Exit(&sts);  
+  rtt_logging_close_files();
+  qio_reset((int*)rtt_chn);
 
-  return RTT__SUCCESS;
+  return sts;
+  //  return RTT__SUCCESS;
 }
 /*************************************************************************
  *
@@ -3116,7 +3151,7 @@ int rtt_menu_upd_new(menu_ctx parent_ctx, pwr_tObjid argoi, rtt_t_menu_upd** men
 
   option = RTT_OPT_NORECALL | RTT_OPT_NOEDIT | RTT_OPT_NOECHO | RTT_OPT_TIMEOUT;
 
-  while (1)
+  while (!exit_process)
   {
     rtt_command_get_input_string((char*)&rtt_chn, input_str, &terminator, maxlen, rtt_recallbuff, option,
                                  rtt_scantime, &rtt_menu_upd_update, (void*)ctx, NULL, RTT_COMMAND_PICTURE);
@@ -3552,7 +3587,7 @@ int rtt_menu_edit_new(menu_ctx parent_ctx, pwr_tObjid argoi, rtt_t_menu_upd** me
 
   option = RTT_OPT_NORECALL | RTT_OPT_NOEDIT | RTT_OPT_NOECHO | RTT_OPT_TIMEOUT;
 
-  while (1)
+  while (!exit_process)
   {
     rtt_command_get_input_string((char*)&rtt_chn, input_str, &terminator, maxlen, rtt_recallbuff, option,
                                  rtt_scantime, &rtt_menu_edit_update, (void*)ctx, NULL, RTT_COMMAND_PICTURE);
@@ -4051,7 +4086,7 @@ int rtt_menu_sysedit_new(menu_ctx parent_ctx, pwr_tObjid argoi, rtt_t_menu_upd**
 
   option = RTT_OPT_NORECALL | RTT_OPT_NOEDIT | RTT_OPT_NOECHO | RTT_OPT_TIMEOUT;
 
-  while (1)
+  while (!exit_process)
   {
     rtt_command_get_input_string((char*)&rtt_chn, input_str, &terminator, maxlen, rtt_recallbuff, option,
                                  rtt_scantime, &rtt_menu_edit_update, (void*)ctx, NULL, RTT_COMMAND_PICTURE);
@@ -7413,7 +7448,7 @@ static int rtt_get_value(menu_ctx ctx, int timeout, int (*timeout_func)(), void*
     return RTT__NOPRIV;
   }
 
-  while (1)
+  while (!exit_process)
   {
     rtt_cursor_abs(x, y);
     rtt_eofline_erase();
@@ -7855,7 +7890,7 @@ static int rtt_logon(unsigned long* chn, unsigned long* priv, char* username, ch
     }
     sts = rtt_logon_pict(chn, priv);
     if (EVEN(sts))
-      exit(0);
+      rtt_exit_now(0, sts);
     return sts;
   }
 
@@ -7895,7 +7930,7 @@ static int rtt_logon(unsigned long* chn, unsigned long* priv, char* username, ch
   }
   sts = rtt_logon_pict(chn, priv);
   if (EVEN(sts))
-    exit(0);
+    rtt_exit_now(0, sts);
   return sts;
 }
 
@@ -7943,7 +7978,7 @@ int rtt_logon_pict(unsigned long* chn, unsigned long* priv)
   r_print(rtt_version);
   r_print_buffer();
 
-  while (attempts < 3)
+  while (attempts < 3 && !exit_process)
   {
     rtt_cursor_abs(32, 20);
     rtt_eofline_erase();
@@ -9220,7 +9255,7 @@ int rtt_wait_for_return()
   r_print_buffer();
   rtt_printf("	Use the return or the PF4 key to continue");
   rtt_message('S', "");
-  while (1)
+  while (!exit_process)
   {
     rtt_get_input((char*)rtt_chn, input_str, &terminator, 1, option, rtt_scantime);
 
