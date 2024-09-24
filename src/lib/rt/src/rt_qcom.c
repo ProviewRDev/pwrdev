@@ -45,15 +45,7 @@
 #include "rt_qdb.h"
 #include "rt_qmon.h"
 
-static void exitHandler();
-
-static void sigHandler();
-
 static qdb_sBuffer* inPool(pwr_tStatus*, void*);
-
-static void exitHandler() { qcom_Exit(NULL); }
-
-static void sigHandler() { exit(0); }
 
 static qdb_sBuffer* inPool(pwr_tStatus* sts, void* p)
 {
@@ -659,9 +651,7 @@ pwr_tBoolean qcom_Init(pwr_tStatus* status, qcom_sAid* aid, const char* aname)
   qdb_sAppl* ap = NULL;
   pwr_tStatus lsts;
   qcom_sAid laid;
-  pwr_tBoolean added = 0;
-  struct sigaction sa;
-  sigset_t ss;
+  pwr_tBoolean added = 0;    
   pwr_dStatus(sts, status, QCOM__SUCCESS);
 
   if (aid == NULL)
@@ -723,16 +713,7 @@ pwr_tBoolean qcom_Init(pwr_tStatus* status, qcom_sAid* aid, const char* aname)
   *aid = ap->aid;
 
   errh_Info("Adding application. aix: %d", ap->aid.aix);
-  atexit(exitHandler);
-  sa.sa_handler = sigHandler;
-  sa.sa_flags = 0;
-  sigemptyset(&sa.sa_mask);
-  sigaction(SIGHUP, &sa, NULL);
-  sigaction(SIGINT, &sa, NULL);
-  sigemptyset(&ss);
-  sigaddset(&ss, qdb_cSigMsg);
-  sigprocmask(SIG_BLOCK, &ss, NULL);
-
+  
   qdb_ScopeLock { qdb_ApplEvent(NULL, ap, qcom_eStype_applConnect); }
   qdb_ScopeUnlock;
 
