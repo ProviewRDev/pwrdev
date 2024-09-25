@@ -645,6 +645,30 @@ pwr_tBoolean qcom_NextNode(pwr_tStatus* status, qcom_sNode* node, pwr_tNodeId ni
  * Applications using GDH, MH_APPL
  * or MH_OUTUNIT do not have to call qcom_Init(), it is done inside the
  * gdh_Init() and mh_OutunitConnect() calls.
+ * 
+ * Note!
+ *  
+ * All processes that call this function, either through any of the above
+ * functions or directly, must also make sure that qcom_Exit
+ * is called before quitting so that the process may clean up any resources.
+ * 
+ * Signal handling in the process should also be done appropriately making
+ * sure that signals are processed in a such a way that qcom calls can finish
+ * and unlock any locks held by the qcom library calls. Failure to do so may
+ * cause other qcom applications to not be able to acquire locks for their
+ * calls. Resulting in lost communication for all processes utilizing qcom
+ * on the system.
+ * 
+ * At a minimum one could implement something like this:
+ * 
+ * void exit_handler()
+ * {
+ *  qcom_Exit(NULL);
+ * }
+ * 
+ * in main:
+ * 
+ * atexit(exit_handler);
  */
 pwr_tBoolean qcom_Init(pwr_tStatus* status, qcom_sAid* aid, const char* aname)
 {
