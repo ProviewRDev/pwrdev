@@ -333,8 +333,11 @@ int rtt_initialize(char* username, char* password, char* commandfile, char* main
   else if (qcom_only)
   {
     sts = rtt_qcom_init();
-    printf("rt_rtt was unable to initialize a qcom connection to ProviewR. Is it running?\n");      
-    exit(EXIT_FAILURE);
+    if (EVEN(sts))
+    {
+      printf("rt_rtt was unable to initialize a qcom connection to ProviewR. Is it running?\n");      
+      exit(EXIT_FAILURE);
+    }
   }
 
   sts = rtt_recall_create(&rtt_recallbuff);
