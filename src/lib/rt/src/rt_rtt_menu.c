@@ -1009,7 +1009,7 @@ int rtt_get_input(char* chn, char* input_str, unsigned long* terminator, int max
 
   input_ptr = input_str;
 
-  for (i = 0; i < maxlen; i++)
+  for (i = 0; i < maxlen && !exit_process; i++)
   {
     if ((option & RTT_OPT_TIMEOUT) == 0)
       qio_readw((int*)chn, (char*)&c, 1);
