@@ -1463,3 +1463,20 @@ void StrParse_exec(plc_sThread* tp, pwr_sClass_StrParse* o)
   for (i = tokens; i < STRPARSE_SIZE; i++)
     *(char*)((char*)o->Token1 + i * sizeof(o->Token1)) = 0;
 }
+
+/*_*
+  StatusSeverity
+  funktion:	Get status severity
+
+  @aref statusseverity StatusSeverity
+*/
+void StatusSeverity_exec(plc_sThread* tp, pwr_sClass_StatusSeverity* object)
+{
+  object->Status = *object->StatusP;
+  object->Fatal = (object->Status & 7) == 4 ? TRUE : FALSE;
+  object->Error = (object->Status & 7) == 2 ? TRUE : FALSE;
+  object->Warning = ((object->Status & 7) == 0  && (object->Status != pwr_cNStatus)) ? TRUE : FALSE;
+  object->Success = ((object->Status & 7) == 1 || (object->Status & 7) == 3) ? TRUE : FALSE;
+  object->Zero = (object->Status == pwr_cNStatus) ? TRUE : FALSE;
+}
+

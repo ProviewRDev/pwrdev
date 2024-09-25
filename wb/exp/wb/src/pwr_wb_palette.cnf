@@ -1097,6 +1097,7 @@ palette PlcEditorPalette
       class GetRefI
       class IpCollect
       class IpDistribute
+      class StatusSeverity
       class StoIo
       class StoIp
       class StoIpPtr

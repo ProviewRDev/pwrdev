@@ -114,5 +114,6 @@ void StrNotEqual_exec(plc_sThread* tp, pwr_sClass_StrNotEqual* object);
 void StrAdd_exec(plc_sThread* tp, pwr_sClass_StrAdd* object);
 void StrTrim_exec(plc_sThread* tp, pwr_sClass_StrTrim* object);
 void StrParse_exec(plc_sThread* tp, pwr_sClass_StrParse* object);
+void StatusSeverity_exec(plc_sThread* tp, pwr_sClass_StatusSeverity* object);
 
 #endif
