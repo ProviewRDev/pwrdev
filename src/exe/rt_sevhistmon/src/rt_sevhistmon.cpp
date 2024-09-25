@@ -1811,7 +1811,7 @@ int rt_sevhistmon::init_events()
        sts = gdh_GetNextObject(he_oid, &he_oid)) {
     he_cnt++;
 
-    sts = gdh_ObjidToName(he_oid, oname, sizeof(oname), cdh_mName_volumeStrict);
+    m_sts = gdh_ObjidToName(he_oid, oname, sizeof(oname), cdh_mName_volumeStrict);
     if (EVEN(m_sts))
       throw co_error(m_sts);
 
