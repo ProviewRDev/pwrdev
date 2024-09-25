@@ -45,6 +45,17 @@
 #include "rt_qdb.h"
 #include "rt_qmon.h"
 
+/**
+ * @brief Make sure to run qcom_Exit if we exit this process
+ * 
+ * If qcom exits for some reason we should release resources. 
+ * 
+ */
+static void exit_handler()
+{
+  qcom_Exit(NULL);
+}
+
 static qdb_sBuffer* inPool(pwr_tStatus*, void*);
 
 static qdb_sBuffer* inPool(pwr_tStatus* sts, void* p)
@@ -648,27 +659,18 @@ pwr_tBoolean qcom_NextNode(pwr_tStatus* status, qcom_sNode* node, pwr_tNodeId ni
  * 
  * Note!
  *  
- * All processes that call this function, either through any of the above
- * functions or directly, must also make sure that qcom_Exit
- * is called before quitting so that the process may clean up any resources.
+ * This call adds qcom exit handler to the stack which will close down all
+ * qcom communication and release resources. It's imperative that the user
+ * of qcom try to catch signals that could otherwise end the process during
+ * a qcom call where locks are held.
  * 
- * Signal handling in the process should also be done appropriately making
+ * Signal handling in the process should be done appropriately making
  * sure that signals are processed in a such a way that qcom calls can finish
  * and unlock any locks held by the qcom library calls. Failure to do so may
  * cause other qcom applications to not be able to acquire locks for their
  * calls. Resulting in lost communication for all processes utilizing qcom
  * on the system.
- * 
- * At a minimum one could implement something like this:
- * 
- * void exit_handler()
- * {
- *  qcom_Exit(NULL);
- * }
- * 
- * in main:
- * 
- * atexit(exit_handler);
+ *  
  */
 pwr_tBoolean qcom_Init(pwr_tStatus* status, qcom_sAid* aid, const char* aname)
 {
@@ -735,6 +737,8 @@ pwr_tBoolean qcom_Init(pwr_tStatus* status, qcom_sAid* aid, const char* aname)
     return YES;
 
   *aid = ap->aid;
+
+  atexit(exit_handler);
 
   errh_Info("Adding application. aix: %d", ap->aid.aix);
   
