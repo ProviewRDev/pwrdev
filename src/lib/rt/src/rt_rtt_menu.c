@@ -141,7 +141,6 @@ static int rtt_get_stored_menuctx(void** ctx, void* key);
 static int rtt_get_system_name(char* system_name, int size);
 static int rtt_parse_mainmenu(char* mainmenu_title);
 static int rtt_help_show_all(menu_ctx parent_ctx, rtt_t_helptext* helptext);
-// static void handle_signal(int sig);
 
 /*************************************************************************
  *
@@ -235,7 +234,23 @@ void rtt_usage()
          "	qcomonly   Attach qcom, not gdh.\n\n");
 }
 
-void handle_signal(int sig)
+/**
+ * @brief Make sure that rtt reset the terminal
+ * 
+ */
+static void exit_handler()
+{  
+  // Call rtt_exit_now with status code 0 "OK". We have no notion of knowing
+  // unless we use GNU extensions and on_exit instead of atexit.
+  rtt_exit_now(1, 0);  
+}
+
+/**
+ * @brief Signal handler to tell rtt to "exit"
+ * 
+ * @param sig Signal caught, in this case we ignore it and try to exit in a clean manner
+ */
+static void handle_signal(int sig)
 {
   // All signals should exit rtt
   exit_process = 1;
@@ -259,6 +274,9 @@ int rtt_initialize(char* username, char* password, char* commandfile, char* main
   int sts;
   int noneth = 0;
   int qcom_only = 0;
+
+  // Add an exit handler to reset rtt and exit 
+  atexit(exit_handler);
 
   // Set up signal handler
   struct sigaction sa;
@@ -294,9 +312,7 @@ int rtt_initialize(char* username, char* password, char* commandfile, char* main
 
     if (EVEN(sts))
     {
-      printf("rt_rtt was unable to initialize a connection to ProviewR\n");
-      rtt_logging_close_files();
-      qio_reset((int*)rtt_chn);
+      printf("rt_rtt was unable to initialize a connection to ProviewR\n");      
       exit(EXIT_FAILURE);
     }
 
@@ -3099,10 +3115,6 @@ int rtt_menu_new(menu_ctx parent_ctx, pwr_tObjid argoi, rtt_t_menu** menu_p, cha
     }
   }
   
-  qcom_Exit(&sts);  
-  rtt_logging_close_files();
-  qio_reset((int*)rtt_chn);
-
   return sts;
   //  return RTT__SUCCESS;
 }
