@@ -248,7 +248,7 @@ static void exit_handler()
 /**
  * @brief Signal handler to tell rtt to "exit"
  * 
- * @param sig Signal caught, in this case we ignore it and try to exit in a clean manner
+ * @param sig Signal caught, ignored
  */
 static void handle_signal(int sig)
 {
