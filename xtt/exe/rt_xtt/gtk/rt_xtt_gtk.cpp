@@ -91,7 +91,34 @@ static GdkFilterReturn xtt_hotkey_filter(GdkXEvent* xevent, GdkEvent* event, gpo
   return (GdkFilterReturn)XttHotkey::event_handler(xevent, data);
 }
 
-void XttGtk::xtt_mainloop() { gtk_main(); }
+void XttGtk::xtt_mainloop()
+{ 
+
+  // Declare a sigaction structure
+  struct sigaction sa;
+  
+  // Clear the sigaction structure
+  memset(&sa, 0, sizeof(sa));
+  
+  // Specify the signal handler function
+  sa.sa_handler = signal_handler;
+  
+  // Block all signals while the signal handler is running
+  sigfillset(&sa.sa_mask);
+  
+  // Register the signals
+  sigaction(SIGTERM, &sa, NULL);
+  sigaction(SIGINT, &sa, NULL);
+  sigaction(SIGHUP, &sa, NULL);
+  sigaction(SIGABRT, &sa, NULL);
+  sigaction(SIGQUIT, &sa, NULL);
+  sigaction(SIGSEGV, &sa, NULL);
+
+  while (!g_xtt_exit_process)
+  {
+    g_main_context_iteration(NULL, FALSE);
+  }
+}
 
 void XttGtk::open_input_dialog(const char* text, const char* title, const char* init_text,
                                void (*ok_cb)(Xtt*, char*))
