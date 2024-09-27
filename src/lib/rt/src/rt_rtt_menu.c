@@ -281,7 +281,7 @@ int rtt_initialize(char* username, char* password, char* commandfile, char* main
   // Set up signal handler
   struct sigaction sa;
   sa.sa_handler = handle_signal;
-  sigemptyset(&sa.sa_mask);
+  sigfillset(&sa.sa_mask); // Block all signals while our handler is running
   sa.sa_flags = 0;
   sigaction(SIGTERM, &sa, NULL);
   sigaction(SIGINT, &sa, NULL);
