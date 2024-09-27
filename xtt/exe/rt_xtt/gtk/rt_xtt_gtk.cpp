@@ -705,7 +705,15 @@ int main(int argc, char* argv[])
   int sts;
 
   new XttGtk(argc, argv, &sts);
-  exit(sts);
+
+  if (EVEN(sts))
+  {
+    exit(EXIT_FAILURE);
+  }
+  else
+  {
+    exit(EXIT_SUCCESS);
+  }
 }
 
 XttGtk::~XttGtk()
