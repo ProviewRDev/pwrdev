@@ -51,23 +51,23 @@ EXIT			Terminate.")
 RTT_HELP_SUBJ("RTT ALARM LIST")
 RTT_HELP_INFO("  Ctrl/A Open object             Ctrl/E Acknowledge    Ctrl/R Back   ")
 RTT_HELP_TEXT("\
-	Alarmlist visar larmlistan.\n\r\n\r\
-	** 	markerar att larmet �r aktivt.\n\r\
-	!! 	markerar att larmet �r okvitterat.\n\r\
-	A,B,C,D eller I anger larmets prioritet.\n\r\n\r\
-	Larm-namn f�r utvalt larm visas med PF1, om larm-namnet �r ett objekt\n\r\
-	�ppnas objektet.\n\r\
-	Samtliga okvitterade larm kvitteras med PF3.\n\r\
-	G� ur larmlistan med PF4")
+	Alarmlist shows the alarm list.\n\r\n\r\
+	** 	Indicates an active alarm.\n\r\
+	!! 	Indicates an unacknowledged alarm.\n\r\
+	A,B,C,D or I indicates the priority of the alarm.\n\r\n\r\
+	Alarm name for the chosen alarm is shown with PF1, if the alarm is an object\n\r\
+	the object is opened.\n\r\
+	All unacknowledged alarm are acknowledged with PF3.\n\r\
+	Exit the alarm list with PF4")
 
 RTT_HELP_SUBJ("RTT EVENT LIST")
 RTT_HELP_INFO("                                                   Ctrl/R Back   ")
 RTT_HELP_TEXT("\
-	Eventlist visar h�ndelselistan.\n\r\n\r\
-	*A,*B,C,D eller I anger larmets prioritet.\n\r\
-	r	markerar tid f�r retur av larmstatus.\n\r\
-	a	markerar tid f�r kvittens.\n\r\n\r\
-	G� ur h�ndelselistan med PF4")
+	Eventlist shows the event list.\n\r\n\r\
+	*A,*B,C,D o I indicates the priority of the alarm.\n\r\
+	r	indicates the time for receiving the returned alarm status.\n\r\
+	a	indicates the time for alarm acknowledgement.\n\r\n\r\
+	Exit the event list with PF4")
 
 RTT_HELP_END
 
