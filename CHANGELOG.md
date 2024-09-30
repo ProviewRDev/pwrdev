@@ -32,6 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The rs_export_rtdb executable now uses the common library for cJSON
 - Simplify the dir_symbols.mk file
 - $pwrp_doc is now created on rt systems
+- pwr_stop.sh has been updated to remove the POSIX log message queue
 
 ### Removed
 
