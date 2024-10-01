@@ -51,7 +51,7 @@
 #include "rt_rtt_global.h"
 #include "rt_rtt_msg.h"
 
-extern volatile sig_atomic_t rtt_exit_process;
+extern volatile sig_atomic_t g_rtt_exit_process;
 
 /************************************************************************
 *
@@ -171,7 +171,7 @@ int qio_readw(int* chn, char* buf, int len)
 {
   int n = 0;
 
-  while (n == 0 && !rtt_exit_process)
+  while (n == 0 && !g_rtt_exit_process)
     n = read(*chn, buf, len);
   return 1;
 }

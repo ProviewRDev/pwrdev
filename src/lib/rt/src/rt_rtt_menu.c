@@ -76,7 +76,7 @@
     return RTT__NOPICTURE;                                                                                   \
   }
 
-volatile sig_atomic_t rtt_exit_process = 0;
+volatile sig_atomic_t g_rtt_exit_process = 0;
 
 typedef struct
 {
@@ -253,7 +253,7 @@ static void exit_handler()
 static void handle_signal(int sig)
 {
   // All signals should exit rtt
-  rtt_exit_process = 1;
+  g_rtt_exit_process = 1;
 }
 
 /*************************************************************************
@@ -1015,7 +1015,7 @@ int rtt_get_input(char* chn, char* input_str, unsigned long* terminator, int max
 
   input_ptr = input_str;
 
-  for (i = 0; i < maxlen && !rtt_exit_process; i++)
+  for (i = 0; i < maxlen && !g_rtt_exit_process; i++)
   {
     if ((option & RTT_OPT_TIMEOUT) == 0)
       qio_readw((int*)chn, (char*)&c, 1);
@@ -1450,7 +1450,7 @@ int rtt_get_input_string(char* chn, char* out_string, unsigned long* out_termina
   terminator = 0;
   index = 0;
   out_str[0] = 0;
-  while (!rtt_exit_process)
+  while (!g_rtt_exit_process)
   {
     r_print_buffer();
     rtt_get_input(chn, input_str, &terminator, maxlen, option, timeout);
@@ -2777,7 +2777,7 @@ int rtt_menu_new(menu_ctx parent_ctx, pwr_tObjid argoi, rtt_t_menu** menu_p, cha
 
   option = RTT_OPT_NORECALL | RTT_OPT_NOEDIT | RTT_OPT_NOECHO | RTT_OPT_TIMEOUT;
 
-  while (!rtt_exit_process)
+  while (!g_rtt_exit_process)
   {
     rtt_command_get_input_string((char*)&rtt_chn, input_str, &terminator, maxlen, rtt_recallbuff, option,
                                  rtt_scantime, &rtt_scan, (void*)ctx, NULL, RTT_COMMAND_PICTURE);
@@ -3169,7 +3169,7 @@ int rtt_menu_upd_new(menu_ctx parent_ctx, pwr_tObjid argoi, rtt_t_menu_upd** men
 
   option = RTT_OPT_NORECALL | RTT_OPT_NOEDIT | RTT_OPT_NOECHO | RTT_OPT_TIMEOUT;
 
-  while (!rtt_exit_process)
+  while (!g_rtt_exit_process)
   {
     rtt_command_get_input_string((char*)&rtt_chn, input_str, &terminator, maxlen, rtt_recallbuff, option,
                                  rtt_scantime, &rtt_menu_upd_update, (void*)ctx, NULL, RTT_COMMAND_PICTURE);
@@ -3605,7 +3605,7 @@ int rtt_menu_edit_new(menu_ctx parent_ctx, pwr_tObjid argoi, rtt_t_menu_upd** me
 
   option = RTT_OPT_NORECALL | RTT_OPT_NOEDIT | RTT_OPT_NOECHO | RTT_OPT_TIMEOUT;
 
-  while (!rtt_exit_process)
+  while (!g_rtt_exit_process)
   {
     rtt_command_get_input_string((char*)&rtt_chn, input_str, &terminator, maxlen, rtt_recallbuff, option,
                                  rtt_scantime, &rtt_menu_edit_update, (void*)ctx, NULL, RTT_COMMAND_PICTURE);
@@ -4104,7 +4104,7 @@ int rtt_menu_sysedit_new(menu_ctx parent_ctx, pwr_tObjid argoi, rtt_t_menu_upd**
 
   option = RTT_OPT_NORECALL | RTT_OPT_NOEDIT | RTT_OPT_NOECHO | RTT_OPT_TIMEOUT;
 
-  while (!rtt_exit_process)
+  while (!g_rtt_exit_process)
   {
     rtt_command_get_input_string((char*)&rtt_chn, input_str, &terminator, maxlen, rtt_recallbuff, option,
                                  rtt_scantime, &rtt_menu_edit_update, (void*)ctx, NULL, RTT_COMMAND_PICTURE);
@@ -7466,7 +7466,7 @@ static int rtt_get_value(menu_ctx ctx, int timeout, int (*timeout_func)(), void*
     return RTT__NOPRIV;
   }
 
-  while (!rtt_exit_process)
+  while (!g_rtt_exit_process)
   {
     rtt_cursor_abs(x, y);
     rtt_eofline_erase();
@@ -7996,7 +7996,7 @@ int rtt_logon_pict(unsigned long* chn, unsigned long* priv)
   r_print(rtt_version);
   r_print_buffer();
 
-  while (attempts < 3 && !rtt_exit_process)
+  while (attempts < 3 && !g_rtt_exit_process)
   {
     rtt_cursor_abs(32, 20);
     rtt_eofline_erase();
@@ -9273,7 +9273,7 @@ int rtt_wait_for_return()
   r_print_buffer();
   rtt_printf("	Use the return or the PF4 key to continue");
   rtt_message('S', "");
-  while (!rtt_exit_process)
+  while (!g_rtt_exit_process)
   {
     rtt_get_input((char*)rtt_chn, input_str, &terminator, 1, option, rtt_scantime);
 
