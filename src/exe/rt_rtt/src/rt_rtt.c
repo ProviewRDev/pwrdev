@@ -49,27 +49,25 @@ EVENT LIST		Show the event list.\n\r\
 EXIT			Terminate.")
 
 RTT_HELP_SUBJ("RTT ALARM LIST")
-RTT_HELP_INFO(
-    "  Ctrl/A Open object             Ctrl/E Acknowledge    Ctrl/R Back   ")
+RTT_HELP_INFO("  Ctrl/A Open object             Ctrl/E Acknowledge    Ctrl/R Back   ")
 RTT_HELP_TEXT("\
-	Alarmlist visar larmlistan.\n\r\n\r\
-	** 	markerar att larmet är aktivt.\n\r\
-	!! 	markerar att larmet är okvitterat.\n\r\
-	A,B,C,D eller I anger larmets prioritet.\n\r\n\r\
-	Larm-namn för utvalt larm visas med PF1, om larm-namnet är ett objekt\n\r\
-	öppnas objektet.\n\r\
-	Samtliga okvitterade larm kvitteras med PF3.\n\r\
-	Gå ur larmlistan med PF4")
+	Alarmlist shows the alarm list.\n\r\n\r\
+	** 	Indicates an active alarm.\n\r\
+	!! 	Indicates an unacknowledged alarm.\n\r\
+	A,B,C,D or I indicates the priority of the alarm.\n\r\n\r\
+	Alarm name for the chosen alarm is shown with PF1, if the alarm is an object\n\r\
+	the object is opened.\n\r\
+	All unacknowledged alarm are acknowledged with PF3.\n\r\
+	Exit the alarm list with PF4")
 
 RTT_HELP_SUBJ("RTT EVENT LIST")
-RTT_HELP_INFO(
-    "                                                   Ctrl/R Back   ")
+RTT_HELP_INFO("                                                   Ctrl/R Back   ")
 RTT_HELP_TEXT("\
-	Eventlist visar händelselistan.\n\r\n\r\
-	*A,*B,C,D eller I anger larmets prioritet.\n\r\
-	r	markerar tid för retur av larmstatus.\n\r\
-	a	markerar tid för kvittens.\n\r\n\r\
-	Gå ur händelselistan med PF4")
+	Eventlist shows the event list.\n\r\n\r\
+	*A,*B,C,D o I indicates the priority of the alarm.\n\r\
+	r	indicates the time for receiving the returned alarm status.\n\r\
+	a	indicates the time for alarm acknowledgement.\n\r\n\r\
+	Exit the event list with PF4")
 
 RTT_HELP_END
 
@@ -117,3 +115,63 @@ RTT_MENU_NEW("SYSTEM", dtt_menu_m6)
 RTT_MENUITEM_COMMAND("STORE", "SHOW FILE")
 RTT_MENUITEM_EXIT("EXIT")
 RTT_MAINMENU_END
+
+rtt_t_menu* mainmenu_ptr = (rtt_t_menu*)&rtt_mainmenu;
+
+unsigned int rtt_exception(void* signalP, void* mechanismP);
+
+int main(int argc, char* argv[])
+{
+  int sts, i;
+  char username[40];
+  char password[40];
+  char commandfile[80];
+
+  rtt_args = argc - 1;
+  for (i = 0; i < rtt_args; i++)
+  {
+    if (i >= (int)(sizeof(rtt_arg) / sizeof(rtt_arg[0])))
+      break;
+    strncpy(rtt_arg[i], argv[i + 1], sizeof(rtt_arg[i]));
+    rtt_toupper(rtt_arg[i], rtt_arg[i]);
+  }
+  if (argc >= 2 && streq(argv[1], "qcomonly"))
+    strcpy(username, argv[1]);
+  else if (argc >= 2 && streq(argv[1], "noneth"))
+    strcpy(username, argv[1]);
+  else if (argc >= 2 && streq(argv[1], "-h"))
+  {
+    rtt_usage();
+    exit(0);
+  }
+  else if (argc >= 3)
+  {
+    strcpy(username, argv[1]);
+    rtt_toupper(username, username);
+    strcpy(password, argv[2]);
+    if (argc >= 4)
+    {
+      strcpy(commandfile, argv[3]);
+      if (argc >= 5)
+      {
+        strcpy(rtt_ConfigureObject, argv[4]);
+        if (argc >= 6)
+        {
+          strcpy(mainmenu_title, argv[5]);
+        }
+      }
+    }
+    else
+      strcpy(commandfile, "");
+  }
+  else
+  {
+    strcpy(username, "");
+    strcpy(password, "");
+    strcpy(commandfile, "");
+  }
+  sts = rtt_initialize(username, password, commandfile, mainmenu_title);
+  sts = rtt_menu_new(0, pwr_cNObjid, &mainmenu_ptr, rtt_mainmenu_title, 0, RTT_MENUTYPE_STAT);
+  rtt_error_msg(sts);
+  return 1;
+}

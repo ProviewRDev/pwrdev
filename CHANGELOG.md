@@ -26,6 +26,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Some aggregates for ABB and Eurotherm did not have their dynamic graphs generated correctly. They do now.
 - Fix some renamed/misspelled images for the documentation.
 - Fix the SsEnd/SsBegin objects for grafcet. They could not be used with boolean inputs and if connected prior to an upgrade they generated errorenous code.
+- QCom had a high chance of deadlocking the entire QCom library on a node due to incorrect signal handling, causing communication outage.
+  - Signal handling is removed in QCom leaving it up to the user to handle application specifics in regards to signals, as it should be.
+  - Signal handling was added to the most common utilities used such as rt_xtt and rt_rtt where signals will be handled in an application specific manner and exit accordingly without deadlocks.
 
 ### Changed
 
