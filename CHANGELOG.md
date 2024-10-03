@@ -9,20 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Added triage bot to the project
-- Added issue templates
-- Added some ABB classes to the workbench palette for quick access
-- Added the cJSON library to the project
-- Added this changelog
+- Added triage bot to the project.
+- Added issue templates.
+- Added some ABB classes to the workbench palette for quick access.
+- Added the cJSON library to the project.
+- Added this changelog.
 
 ### Fixed
 
-- Deb archive installation script would cause the script to fail since the service file had been renewed
-- Templates for objects inheriting PnDevice are now fixed
-- Animation bug in javascript ge graphs caused execution to stop in the browser
-- Fix build scripts where some directories where not created as they should when using parallel build
-- The "Alarm and event analyzer" would not start due to missing environmental variables
-- Fix a bug that caused the operator graph to crash when an input lost focus
+- Deb archive installation script would cause the script to fail since the service file had been renewed.
+- Templates for objects inheriting PnDevice are now fixed.
+- Animation bug in javascript ge graphs caused execution to stop in the browser.
+- Fix build scripts where some directories where not created as they should when using parallel build.
+- The "Alarm and event analyzer" would not start due to missing environmental variables.
+- Fix a bug that caused the operator graph to crash when an input lost focus.
 - Some aggregates for ABB and Eurotherm did not have their dynamic graphs generated correctly. They do now.
 - Fix some renamed/misspelled images for the documentation.
 - Fix the SsEnd/SsBegin objects for grafcet. They could not be used with boolean inputs and if connected prior to an upgrade they generated errorenous code.
@@ -32,10 +32,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- The rs_export_rtdb executable now uses the common library for cJSON
-- Simplify the dir_symbols.mk file
-- $pwrp_doc is now created on rt systems
-- pwr_stop.sh has been updated to remove the POSIX log message queue
+- The rs_export_rtdb executable now uses the common library for cJSON.
+- Simplify the dir_symbols.mk file.
+- $pwrp_doc is now created on rt systems.
+- pwr_stop.sh has been updated to remove the POSIX log message queue.
+- profibus: The PROFINET configurator was not prepared for multiple fixed Virtual Submodule Items, it is now.
 
 ### Removed
 
