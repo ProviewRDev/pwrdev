@@ -1737,23 +1737,43 @@ int ItemPnSlot::open_children_impl()
     new ItemPnModuleInfo(m_attrnav, "ModuleInfo", &module->_ModuleInfo, m_node, flow_eDest_IntoLast,
                          "Module information.");
 
-    // First we create the virtual submodules if any (usually at least one...)
-    // The virtual submodules start at subslot 1. And ISO 15745-4 says that
-    // there must not be more than 1 virtual submodule item. But standards
-    // change so we might as well loop through it since the name does imply a
-    // list :) Who knows...
-    size_t subslot_number = 1;
-    for (auto const& virtual_submodule_item : module->_VirtualSubmoduleList)
+    // Extract the items into a vector of pairs (key, value)
+    std::vector<std::pair<std::string, std::shared_ptr<GSDML::SubmoduleItem>>> virtual_submodule_items(
+        module->_VirtualSubmoduleList.begin(), module->_VirtualSubmoduleList.end());
+
+    // Sort the vector based on the the minimum starting subslot in which this virtual submodule item is fixed
+    std::sort(virtual_submodule_items.begin(), virtual_submodule_items.end(),
+              [](const auto& a, const auto& b)
+              { return a.second->_FixedInSubslots.min() < b.second->_FixedInSubslots.min(); });
+
+    // Iterate over the sorted vector and add the virtual submodule items to all "fixed" subslots
+    for (auto const& virtual_submodule_item : virtual_submodule_items)
     {
       std::ostringstream subslot_name("Subslot ", std::ios_base::ate);
-      subslot_name << subslot_number << " (" << *virtual_submodule_item.second->_ModuleInfo._Name << ")";
-
-      new ItemPnSubslot(m_attrnav, subslot_name.str().c_str(), m_slot_data,
-                        &m_slot_data->m_subslot_map[subslot_number], module, subslot_number,
-                        virtual_submodule_item.second, m_node, flow_eDest_IntoLast,
-                        "Virtual submodule of this module/DAP.");
-
-      subslot_number++;
+      // FixedInSubslots are mandatory if more than one virtual submodule item is present.
+      // Specs does not however state that it aint allowed to be present even if there's only one virtual
+      // submodule item. If we have an empty list the default according to spec is 1
+      if (!virtual_submodule_item.second->_FixedInSubslots.empty())
+      {
+        for (auto const& fixed_subslot_index : virtual_submodule_item.second->_FixedInSubslots.getList())
+        {
+          subslot_name << fixed_subslot_index.second << " ("
+                       << *virtual_submodule_item.second->_ModuleInfo._Name << ")";
+          new ItemPnSubslot(m_attrnav, subslot_name.str().c_str(), m_slot_data,
+                            &m_slot_data->m_subslot_map[fixed_subslot_index.second], module,
+                            fixed_subslot_index.second, virtual_submodule_item.second, m_node,
+                            flow_eDest_IntoLast, "Virtual submodule of this module/DAP.");
+        }
+      }
+      else
+      {
+        // If FixedInSubslots is empty it's implied byt eh spec that there's only one Virtual Submodule Item
+        // present and it should then be in the default subslot 1
+        subslot_name << "1 (" << *virtual_submodule_item.second->_ModuleInfo._Name << ")";
+        new ItemPnSubslot(m_attrnav, subslot_name.str().c_str(), m_slot_data, &m_slot_data->m_subslot_map[1],
+                          module, 1, virtual_submodule_item.second, m_node, flow_eDest_IntoLast,
+                          "Virtual submodule of this module/DAP.");
+      }
     }
 
     // If we have physical subslots add those extra subslots. This is schema

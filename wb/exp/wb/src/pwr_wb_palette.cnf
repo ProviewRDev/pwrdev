@@ -149,7 +149,7 @@ palette NavigatorPalette
         class CompMPC_MLP
         class CompOnOffBurner
         class CompOnOffZone
-	class CompPosit
+	      class CompPosit
         class CompPID
         class RunTimeCounter
       }
@@ -170,6 +170,13 @@ palette NavigatorPalette
           class ABB_ACS880MotorAggr
           class ABB_ACS880PumpAggr
           class ABB_ACS880_1
+          class ABB_ACS880_PnDevice
+          class ABB_ACS880_Pn_1
+          class ABB_ACS880_PnModule          
+          class ABB_ACS880_PnMotorAggr
+          class ABB_ACS880_PnFanAggr
+          class ABB_ACS880_PnPumpAggr
+          class ABB_ACS880_PPO7_Pn_V1_IOModule
           class ABB_CircuitBreaker_MS116
           class ABB_Contactor_A
           class ABB_Converter_ACS800_PPO3
@@ -1343,7 +1350,7 @@ palette PlcEditorPalette
       class ABB_TempSensor_TF12Fo
       class ABB_PressureSensor_265GSFo
       class ABB_DiffPressureSensor_265DSFo
-      class ABB_FlowSensor_FXE4000Fo
+      class ABB_FlowSensor_FXE4000Fo      
     }
     menu Siemens
     {

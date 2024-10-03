@@ -51,57 +51,58 @@
 #include "export_rtdb_kafka.h"
 
 extern int exp_debug;
-static rd_kafka_t *producer;
+static rd_kafka_t* producer;
 static char topic[100];
 static pwr_tFileName config_file;
 static pwr_sClass_Ssab_ExportRtdbServer* confobj;
 static rd_kafka_resp_err_t last_msg_err = (rd_kafka_resp_err_t)0;
 
-int send_kafka_key_val(void* val, int val_len) {
-  if (exp_debug) {
-    FILE*f = fopen("avro_payload.bin", "wb");
+int send_kafka_key_val(void* val, int val_len)
+{
+  if (exp_debug)
+  {
+    FILE* f = fopen("avro_payload.bin", "wb");
     fwrite(val, val_len, 1, f);
     fclose(f);
   }
 
-  int e = rd_kafka_producev(producer,
-      RD_KAFKA_V_TOPIC(topic),
-      RD_KAFKA_V_MSGFLAGS(RD_KAFKA_MSG_F_COPY),
-      RD_KAFKA_V_VALUE((void*)val, val_len),
-      RD_KAFKA_V_END
-  );
+  int e = rd_kafka_producev(producer, RD_KAFKA_V_TOPIC(topic), RD_KAFKA_V_MSGFLAGS(RD_KAFKA_MSG_F_COPY),
+                            RD_KAFKA_V_VALUE((void*)val, val_len), RD_KAFKA_V_END);
 
   if (e == 0)
     rd_kafka_poll(producer, 0);
-  
+
   return e;
 }
 
-const char* kafka_err_to_str(int e) {
-  return rd_kafka_err2str((rd_kafka_resp_err_t)e);
-}
+const char* kafka_err_to_str(int e) { return rd_kafka_err2str((rd_kafka_resp_err_t)e); }
 
-static void load_config_group(rd_kafka_conf_t *conf, GKeyFile *key_file, const char* group) {
+static void load_config_group(rd_kafka_conf_t* conf, GKeyFile* key_file, const char* group)
+{
   char errstr[512];
   g_autoptr(GError) error = NULL;
 
-  gchar **ptr = g_key_file_get_keys(key_file, group, NULL, &error);
-  if (error) {
+  gchar** ptr = g_key_file_get_keys(key_file, group, NULL, &error);
+  if (error)
+  {
     fprintf(stderr, "%s\n", error->message);
     errh_SetStatus(PWR__SRVTERM);
     exit(1);
   }
 
-  while (*ptr) {
+  while (*ptr)
+  {
     const char* key = *ptr;
-    g_autofree gchar *value = g_key_file_get_string(key_file, group, key, &error);
-    if (error) {
+    g_autofree gchar* value = g_key_file_get_string(key_file, group, key, &error);
+    if (error)
+    {
       fprintf(stderr, "Reading key: %s\n", error->message);
       errh_SetStatus(PWR__SRVTERM);
       exit(1);
     }
 
-    if (rd_kafka_conf_set(conf, key, value, errstr, sizeof(errstr)) != RD_KAFKA_CONF_OK) {
+    if (rd_kafka_conf_set(conf, key, value, errstr, sizeof(errstr)) != RD_KAFKA_CONF_OK)
+    {
       fprintf(stderr, "%s\n", errstr);
       errh_SetStatus(PWR__SRVTERM);
       exit(1);
@@ -111,14 +112,17 @@ static void load_config_group(rd_kafka_conf_t *conf, GKeyFile *key_file, const c
   }
 }
 
-static void dr_msg_cb(rd_kafka_t *kafka_handle, const rd_kafka_message_t *rkmessage, void *opaque) {
-  if (rkmessage->err) {
+static void dr_msg_cb(rd_kafka_t* kafka_handle, const rd_kafka_message_t* rkmessage, void* opaque)
+{
+  if (rkmessage->err)
+  {
     fprintf(stderr, "Message delivery failed: %s\n", rd_kafka_err2str(rkmessage->err));
     confobj->ServerConnection = pwr_eSsabDbServerConnection_MsgError;
     if (rkmessage->err != last_msg_err)
       errh_Error("Message delivery failed, %s", rd_kafka_err2str(rkmessage->err));
   }
-  else {
+  else
+  {
     confobj->SendCnt++;
     confobj->ServerConnection = pwr_eSsabDbServerConnection_Up;
     if (last_msg_err)
@@ -127,7 +131,8 @@ static void dr_msg_cb(rd_kafka_t *kafka_handle, const rd_kafka_message_t *rkmess
   last_msg_err = rkmessage->err;
 }
 
-static void set_default_topic() {
+static void set_default_topic()
+{
   char hostname[HOST_NAME_MAX];
   char ver[20];
 
@@ -139,11 +144,10 @@ static void set_default_topic() {
   strcat(topic, ver);
 }
 
-char* kafka_get_topic() {
-  return topic;
-}
+char* kafka_get_topic() { return topic; }
 
-void kafka_init(pwr_sClass_Ssab_ExportRtdbServer *a_confobj, char *a_topic, char* a_config_file) {
+void kafka_init(pwr_sClass_Ssab_ExportRtdbServer* a_confobj, char* a_topic, char* a_config_file)
+{
   confobj = a_confobj;
 
   if (streq(a_topic, ""))
@@ -155,24 +159,27 @@ void kafka_init(pwr_sClass_Ssab_ExportRtdbServer *a_confobj, char *a_topic, char
   dcli_translate_filename(config_file, config_file);
 }
 
-void kafka_open() {
+void kafka_open()
+{
   g_autoptr(GError) error = NULL;
   g_autoptr(GKeyFile) key_file = g_key_file_new();
-  if (!g_key_file_load_from_file(key_file, config_file, G_KEY_FILE_NONE, &error)) {
+  if (!g_key_file_load_from_file(key_file, config_file, G_KEY_FILE_NONE, &error))
+  {
     confobj->ServerConnection = pwr_eSsabDbServerConnection_NoConfigFile;
     errh_Fatal("Error loading config file: %s, %s", error->message, config_file);
     errh_SetStatus(PWR__SRVTERM);
     exit(1);
   }
 
-  rd_kafka_conf_t *conf = rd_kafka_conf_new();
+  rd_kafka_conf_t* conf = rd_kafka_conf_new();
   load_config_group(conf, key_file, "default");
 
   rd_kafka_conf_set_dr_msg_cb(conf, dr_msg_cb);
 
   char errstr[512];
   producer = rd_kafka_new(RD_KAFKA_PRODUCER, conf, errstr, sizeof(errstr));
-  if (!producer) {
+  if (!producer)
+  {
     confobj->ServerConnection = pwr_eSsabDbServerConnection_InitFailed;
     errh_Fatal("Failed to create new producer: %s", errstr);
     errh_SetStatus(PWR__SRVTERM);
@@ -182,17 +189,16 @@ void kafka_open() {
   conf = NULL;
 }
 
-void kafka_exit() {
-  rd_kafka_flush(producer, 10*1000);
-  if (rd_kafka_outq_len(producer) > 0) {
+void kafka_exit()
+{
+  rd_kafka_flush(producer, 10 * 1000);
+  if (rd_kafka_outq_len(producer) > 0)
+  {
     errh_Error("%d message(s) were not delivered", rd_kafka_outq_len(producer));
   }
   rd_kafka_destroy(producer);
 }
 
-void kafka_flush(int tmo)
-{
-  rd_kafka_flush(producer, tmo);
-}
+void kafka_flush(int tmo) { rd_kafka_flush(producer, tmo); }
 
 #endif

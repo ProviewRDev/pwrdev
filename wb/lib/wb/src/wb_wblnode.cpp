@@ -51,335 +51,359 @@
 #include "wb_orepwbl.h"
 
 /* Datatypes */
-static wbl_sSym datatypes[] = { { "pwr_eType_Boolean", pwr_eType_Boolean },
-  { "pwr_eTix_Boolean", pwr_eTix_Boolean },
-  { "pwr_eType_Float32", pwr_eType_Float32 },
-  { "pwr_eTix_Float32", pwr_eTix_Float32 },
-  { "pwr_eType_Float64", pwr_eType_Float64 },
-  { "pwr_eTix_Float64", pwr_eTix_Float64 },
-  { "pwr_eType_Char", pwr_eType_Char }, { "pwr_eTix_Char", pwr_eTix_Char },
-  { "pwr_eType_Int8", pwr_eType_Int8 }, { "pwr_eTix_Int8", pwr_eTix_Int8 },
-  { "pwr_eType_Int16", pwr_eType_Int16 }, { "pwr_eTix_Int16", pwr_eTix_Int16 },
-  { "pwr_eType_Int32", pwr_eType_Int32 }, { "pwr_eTix_Int32", pwr_eTix_Int32 },
-  { "pwr_eType_Int64", pwr_eType_Int64 }, { "pwr_eTix_Int64", pwr_eTix_Int64 },
-  { "pwr_eType_UInt8", pwr_eType_UInt8 }, { "pwr_eTix_UInt8", pwr_eTix_UInt8 },
-  { "pwr_eType_UInt16", pwr_eType_UInt16 },
-  { "pwr_eTix_UInt16", pwr_eTix_UInt16 },
-  { "pwr_eType_UInt32", pwr_eType_UInt32 },
-  { "pwr_eTix_UInt32", pwr_eTix_UInt32 },
-  { "pwr_eType_UInt64", pwr_eType_UInt64 },
-  { "pwr_eTix_UInt64", pwr_eTix_UInt64 }
-  /*  ,{ "pwr_eType_ObjDId", pwr_eType_ObjDId } */
-  /*  ,{ "pwr_eTix_ObjDId", pwr_eTix_ObjDId } */
-  ,
-  { "pwr_eType_Buffer", pwr_eType_Buffer },
-  { "pwr_eTix_Buffer", pwr_eTix_Buffer },
-  { "pwr_eType_String", pwr_eType_String },
-  { "pwr_eTix_String", pwr_eTix_String }, { "pwr_eType_Enum", pwr_eType_Enum },
-  { "pwr_eTix_Enum", pwr_eTix_Enum }, { "pwr_eType_Struct", pwr_eType_Struct },
-  { "pwr_eTix_Struct", pwr_eTix_Struct }, { "pwr_eType_Mask", pwr_eType_Mask },
-  { "pwr_eTix_Mask", pwr_eTix_Mask }, { "pwr_eType_Array", pwr_eType_Array },
-  { "pwr_eTix_Array", pwr_eTix_Array }, { "pwr_eType_Time", pwr_eType_Time },
-  { "pwr_eTix_Time", pwr_eTix_Time }, { "pwr_eType_Text", pwr_eType_Text },
-  { "pwr_eTix_Text", pwr_eTix_Text }, { "pwr_eType_Objid", pwr_eType_Objid },
-  { "pwr_eTix_Objid", pwr_eTix_Objid },
-  { "pwr_eType_AttrRef", pwr_eType_AttrRef },
-  { "pwr_eTix_AttrRef", pwr_eTix_AttrRef },
-  { "pwr_eType_ClassId", pwr_eType_ClassId },
-  { "pwr_eTix_ClassId", pwr_eTix_ClassId },
-  { "pwr_eType_TypeId", pwr_eType_TypeId },
-  { "pwr_eTix_TypeId", pwr_eTix_TypeId },
-  { "pwr_eType_VolumeId", pwr_eType_VolumeId },
-  { "pwr_eTix_VolumeId", pwr_eTix_VolumeId },
-  { "pwr_eType_ObjectIx", pwr_eType_ObjectIx },
-  { "pwr_eTix_ObjectIx", pwr_eTix_ObjectIx },
-  { "pwr_eType_RefId", pwr_eType_RefId }, { "pwr_eTix_RefId", pwr_eTix_RefId },
-  { "pwr_eType_DeltaTime", pwr_eType_DeltaTime },
-  { "pwr_eTix_DeltaTime", pwr_eTix_DeltaTime },
-  { "pwr_eType_Status", pwr_eType_Status },
-  { "pwr_eTix_Status", pwr_eTix_Status },
-  { "pwr_eType_NetStatus", pwr_eType_NetStatus },
-  { "pwr_eTix_NetStatus", pwr_eTix_NetStatus },
-  { "pwr_eType_CastId", pwr_eType_CastId },
-  { "pwr_eTix_CastId", pwr_eTix_CastId },
-  { "pwr_eType_ProString", pwr_eType_ProString },
-  { "pwr_eTix_ProString", pwr_eTix_ProString },
-  { "pwr_eType_DisableAttr", pwr_eType_DisableAttr },
-  { "pwr_eTix_DisableAttr", pwr_eTix_DisableAttr },
-  { "pwr_eTypeDef_AdefFlags", pwr_eTypeDef_AdefFlags },
-  { "pwr_eTdix_AdefFlags", pwr_eTdix_AdefFlags },
-  { "pwr_eTypeDef_ClassDefFlags", pwr_eTypeDef_ClassDefFlags },
-  { "pwr_eTdix_ClassDefFlags", pwr_eTdix_ClassDefFlags },
-  { "pwr_eTypeDef_ObjBodyDefFlags", pwr_eTypeDef_ObjBodyDefFlags },
-  { "pwr_eTdix_ObjBodyDefFlags", pwr_eTdix_ObjBodyDefFlags },
-  { "pwr_eType_DataRef", pwr_eType_DataRef },
-  { "pwr_eTix_DataRef", pwr_eTix_DataRef },
-  { "pwr_eType_Void", pwr_eType_Void }, { "pwr_eTix_Void", pwr_eTix_Void },
-  { "pwr_eTypeDef_PopEditorEnum", pwr_eTypeDef_PopEditorEnum },
-  { "pwr_eTdix_PopEditorEnum", pwr_eTdix_PopEditorEnum },
-  { 0, 0 } };
+static wbl_sSym datatypes[] = {{"pwr_eType_Boolean", pwr_eType_Boolean},
+                               {"pwr_eTix_Boolean", pwr_eTix_Boolean},
+                               {"pwr_eType_Float32", pwr_eType_Float32},
+                               {"pwr_eTix_Float32", pwr_eTix_Float32},
+                               {"pwr_eType_Float64", pwr_eType_Float64},
+                               {"pwr_eTix_Float64", pwr_eTix_Float64},
+                               {"pwr_eType_Char", pwr_eType_Char},
+                               {"pwr_eTix_Char", pwr_eTix_Char},
+                               {"pwr_eType_Int8", pwr_eType_Int8},
+                               {"pwr_eTix_Int8", pwr_eTix_Int8},
+                               {"pwr_eType_Int16", pwr_eType_Int16},
+                               {"pwr_eTix_Int16", pwr_eTix_Int16},
+                               {"pwr_eType_Int32", pwr_eType_Int32},
+                               {"pwr_eTix_Int32", pwr_eTix_Int32},
+                               {"pwr_eType_Int64", pwr_eType_Int64},
+                               {"pwr_eTix_Int64", pwr_eTix_Int64},
+                               {"pwr_eType_UInt8", pwr_eType_UInt8},
+                               {"pwr_eTix_UInt8", pwr_eTix_UInt8},
+                               {"pwr_eType_UInt16", pwr_eType_UInt16},
+                               {"pwr_eTix_UInt16", pwr_eTix_UInt16},
+                               {"pwr_eType_UInt32", pwr_eType_UInt32},
+                               {"pwr_eTix_UInt32", pwr_eTix_UInt32},
+                               {"pwr_eType_UInt64", pwr_eType_UInt64},
+                               {"pwr_eTix_UInt64", pwr_eTix_UInt64}
+                               /*  ,{ "pwr_eType_ObjDId", pwr_eType_ObjDId } */
+                               /*  ,{ "pwr_eTix_ObjDId", pwr_eTix_ObjDId } */
+                               ,
+                               {"pwr_eType_Buffer", pwr_eType_Buffer},
+                               {"pwr_eTix_Buffer", pwr_eTix_Buffer},
+                               {"pwr_eType_String", pwr_eType_String},
+                               {"pwr_eTix_String", pwr_eTix_String},
+                               {"pwr_eType_Enum", pwr_eType_Enum},
+                               {"pwr_eTix_Enum", pwr_eTix_Enum},
+                               {"pwr_eType_Struct", pwr_eType_Struct},
+                               {"pwr_eTix_Struct", pwr_eTix_Struct},
+                               {"pwr_eType_Mask", pwr_eType_Mask},
+                               {"pwr_eTix_Mask", pwr_eTix_Mask},
+                               {"pwr_eType_Array", pwr_eType_Array},
+                               {"pwr_eTix_Array", pwr_eTix_Array},
+                               {"pwr_eType_Time", pwr_eType_Time},
+                               {"pwr_eTix_Time", pwr_eTix_Time},
+                               {"pwr_eType_Text", pwr_eType_Text},
+                               {"pwr_eTix_Text", pwr_eTix_Text},
+                               {"pwr_eType_Objid", pwr_eType_Objid},
+                               {"pwr_eTix_Objid", pwr_eTix_Objid},
+                               {"pwr_eType_AttrRef", pwr_eType_AttrRef},
+                               {"pwr_eTix_AttrRef", pwr_eTix_AttrRef},
+                               {"pwr_eType_ClassId", pwr_eType_ClassId},
+                               {"pwr_eTix_ClassId", pwr_eTix_ClassId},
+                               {"pwr_eType_TypeId", pwr_eType_TypeId},
+                               {"pwr_eTix_TypeId", pwr_eTix_TypeId},
+                               {"pwr_eType_VolumeId", pwr_eType_VolumeId},
+                               {"pwr_eTix_VolumeId", pwr_eTix_VolumeId},
+                               {"pwr_eType_ObjectIx", pwr_eType_ObjectIx},
+                               {"pwr_eTix_ObjectIx", pwr_eTix_ObjectIx},
+                               {"pwr_eType_RefId", pwr_eType_RefId},
+                               {"pwr_eTix_RefId", pwr_eTix_RefId},
+                               {"pwr_eType_DeltaTime", pwr_eType_DeltaTime},
+                               {"pwr_eTix_DeltaTime", pwr_eTix_DeltaTime},
+                               {"pwr_eType_Status", pwr_eType_Status},
+                               {"pwr_eTix_Status", pwr_eTix_Status},
+                               {"pwr_eType_NetStatus", pwr_eType_NetStatus},
+                               {"pwr_eTix_NetStatus", pwr_eTix_NetStatus},
+                               {"pwr_eType_CastId", pwr_eType_CastId},
+                               {"pwr_eTix_CastId", pwr_eTix_CastId},
+                               {"pwr_eType_ProString", pwr_eType_ProString},
+                               {"pwr_eTix_ProString", pwr_eTix_ProString},
+                               {"pwr_eType_DisableAttr", pwr_eType_DisableAttr},
+                               {"pwr_eTix_DisableAttr", pwr_eTix_DisableAttr},
+                               {"pwr_eTypeDef_AdefFlags", pwr_eTypeDef_AdefFlags},
+                               {"pwr_eTdix_AdefFlags", pwr_eTdix_AdefFlags},
+                               {"pwr_eTypeDef_ClassDefFlags", pwr_eTypeDef_ClassDefFlags},
+                               {"pwr_eTdix_ClassDefFlags", pwr_eTdix_ClassDefFlags},
+                               {"pwr_eTypeDef_ObjBodyDefFlags", pwr_eTypeDef_ObjBodyDefFlags},
+                               {"pwr_eTdix_ObjBodyDefFlags", pwr_eTdix_ObjBodyDefFlags},
+                               {"pwr_eType_DataRef", pwr_eType_DataRef},
+                               {"pwr_eTix_DataRef", pwr_eTix_DataRef},
+                               {"pwr_eType_Void", pwr_eType_Void},
+                               {"pwr_eTix_Void", pwr_eTix_Void},
+                               {"pwr_eTypeDef_PopEditorEnum", pwr_eTypeDef_PopEditorEnum},
+                               {"pwr_eTdix_PopEditorEnum", pwr_eTdix_PopEditorEnum},
+                               {0, 0}};
 
 /* System Classes */
-static wbl_sSym classes[] = { { "pwr_eClass_ClassDef", pwr_eClass_ClassDef },
-  { "pwr_eCix_ClassDef", pwr_eCix_ClassDef },
-  { "pwr_eClass_Type", pwr_eClass_Type }, { "pwr_eCix_Type", pwr_eCix_Type },
-  { "pwr_eClass_TypeDef", pwr_eClass_TypeDef },
-  { "pwr_eCix_TypeDef", pwr_eCix_TypeDef },
-  { "pwr_eClass_ObjBodyDef", pwr_eClass_ObjBodyDef },
-  { "pwr_eCix_ObjBodyDef", pwr_eCix_ObjBodyDef },
-  { "pwr_eClass_Param", pwr_eClass_Param },
-  { "pwr_eCix_Param", pwr_eCix_Param },
-  { "pwr_eClass_Attribute", pwr_eClass_Param },
-  { "pwr_eCix_Attribute", pwr_eCix_Param },
-  { "pwr_eClass_Input", pwr_eClass_Input },
-  { "pwr_eCix_Input", pwr_eCix_Input },
-  { "pwr_eClass_Output", pwr_eClass_Output },
-  { "pwr_eCix_Output", pwr_eCix_Output },
-  { "pwr_eClass_Intern", pwr_eClass_Intern },
-  { "pwr_eCix_Intern", pwr_eCix_Intern },
-  { "pwr_eClass_TargetAttribute", pwr_eClass_TargetAttribute },
-  { "pwr_eCix_TargetAttribute", pwr_eCix_TargetAttribute },
-  { "pwr_eClass_Buffer", pwr_eClass_Buffer },
-  { "pwr_eCix_Buffer", pwr_eCix_Buffer },
-  { "pwr_eClass_ObjXRef", pwr_eClass_ObjXRef },
-  { "pwr_eCix_ObjXRef", pwr_eCix_ObjXRef },
-  { "pwr_eClass_Layout", pwr_eClass_Layout },
-  { "pwr_eCix_Layout", pwr_eCix_Layout },
-  { "pwr_eClass_Group", pwr_eClass_Group },
-  { "pwr_eCix_Group", pwr_eCix_Group },
-  { "pwr_eClass_GroupRef", pwr_eClass_GroupRef },
-  { "pwr_eCix_GroupRef", pwr_eCix_GroupRef },
-  { "pwr_eClass_TypeHier", pwr_eClass_TypeHier },
-  { "pwr_eCix_TypeHier", pwr_eCix_TypeHier },
-  { "pwr_eClass_ClassHier", pwr_eClass_ClassHier },
-  { "pwr_eCix_ClassHier", pwr_eCix_ClassHier },
-  { "pwr_eClass_ModHier", pwr_eClass_ModHier },
-  { "pwr_eCix_ModHier", pwr_eCix_ModHier },
-  { "pwr_eClass_PlantHier", pwr_eClass_PlantHier },
-  { "pwr_eCix_PlantHier", pwr_eCix_PlantHier },
-  { "pwr_eClass_PlcProgram", pwr_eClass_PlcProgram },
-  { "pwr_eCix_PlcProgram", pwr_eCix_PlcProgram },
-  { "pwr_eClass_PlcWindow", pwr_eClass_PlcWindow },
-  { "pwr_eCix_PlcWindow", pwr_eCix_PlcWindow },
-  { "pwr_eClass_PlcNode", pwr_eClass_PlcNode },
-  { "pwr_eCix_PlcNode", pwr_eCix_PlcNode },
-  { "pwr_eClass_PlcConnection", pwr_eClass_PlcConnection },
-  { "pwr_eCix_PlcConnection", pwr_eCix_PlcConnection },
-  { "pwr_eClass_Point", pwr_eClass_Point },
-  { "pwr_eCix_Point", pwr_eCix_Point },
-  { "pwr_eClass_GraphPlcProgram", pwr_eClass_GraphPlcProgram },
-  { "pwr_eCix_GraphPlcProgram", pwr_eCix_GraphPlcProgram },
-  { "pwr_eClass_GraphPlcWindow", pwr_eClass_GraphPlcWindow },
-  { "pwr_eCix_GraphPlcWindow", pwr_eCix_GraphPlcWindow },
-  { "pwr_eClass_GraphPlcNode", pwr_eClass_GraphPlcNode },
-  { "pwr_eCix_GraphPlcNode", pwr_eCix_GraphPlcNode },
-  { "pwr_eClass_GraphPlcConnection", pwr_eClass_GraphPlcConnection },
-  { "pwr_eCix_GraphPlcConnection", pwr_eCix_GraphPlcConnection },
-  { "pwr_eClass_PlcPgm", pwr_eClass_PlcPgm },
-  { "pwr_eCix_PlcPgm", pwr_eCix_PlcPgm }
-  /*  ,{ "pwr_eClass_Hierarchy", pwr_eClass_Hierarchy }*/
-  /*  ,{ "pwr_eCix_Hierarchy", pwr_eCix_Hierarchy }*/
-  ,
-  { "pwr_eClass_NodeHier", pwr_eClass_NodeHier },
-  { "pwr_eCix_NodeHier", pwr_eCix_NodeHier },
-  { "pwr_eClass_PgmDef", pwr_eClass_PgmDef },
-  { "pwr_eCix_PgmDef", pwr_eCix_PgmDef },
-  { "pwr_eClass_Node", pwr_eClass_Node }, { "pwr_eCix_Node", pwr_eCix_Node },
-  { "pwr_eClass_Appl", pwr_eClass_Appl }, { "pwr_eCix_Appl", pwr_eCix_Appl },
-  { "pwr_eClass_System", pwr_eClass_System },
-  { "pwr_eCix_System", pwr_eCix_System },
-  { "pwr_eClass_LibHier", pwr_eClass_LibHier },
-  { "pwr_eCix_LibHier", pwr_eCix_LibHier },
-  { "pwr_eClass_DocHier", pwr_eClass_DocHier },
-  { "pwr_eCix_DocHier", pwr_eCix_DocHier },
-  { "pwr_eClass_AttrXRef", pwr_eClass_AttrXRef },
-  { "pwr_eCix_AttrXRef", pwr_eCix_AttrXRef },
-  { "pwr_eClass_Menu", pwr_eClass_Menu }, { "pwr_eCix_Menu", pwr_eCix_Menu },
-  { "pwr_eClass_RtMenu", pwr_eClass_RtMenu },
-  { "pwr_eCix_RtMenu", pwr_eCix_RtMenu },
-  { "pwr_eClass_MenuSeparator", pwr_eClass_MenuSeparator },
-  { "pwr_eCix_MenuSeparator", pwr_eCix_MenuSeparator },
-  { "pwr_eClass_MenuCascade", pwr_eClass_MenuCascade },
-  { "pwr_eCix_MenuCascade", pwr_eCix_MenuCascade },
-  { "pwr_eClass_MenuButton", pwr_eClass_MenuButton },
-  { "pwr_eCix_MenuButton", pwr_eCix_MenuButton },
-  { "pwr_eClass_MenuRef", pwr_eClass_MenuRef },
-  { "pwr_eCix_MenuRef", pwr_eCix_MenuRef },
-  { "pwr_eClass_Object", pwr_eClass_Object },
-  { "pwr_eCix_Object", pwr_eCix_Object },
-  { "pwr_eClass_DbCallBack", pwr_eClass_DbCallBack },
-  { "pwr_eCix_DbCallBack", pwr_eCix_DbCallBack },
-  { "pwr_eClass_Alias", pwr_eClass_Alias },
-  { "pwr_eCix_Alias", pwr_eCix_Alias },
-  { "pwr_eClass_RootVolume", pwr_eClass_RootVolume },
-  { "pwr_eCix_RootVolume", pwr_eCix_RootVolume },
-  { "pwr_eClass_SubVolume", pwr_eClass_SubVolume },
-  { "pwr_eCix_SubVolume", pwr_eCix_SubVolume },
-  { "pwr_eClass_SharedVolume", pwr_eClass_SharedVolume },
-  { "pwr_eCix_SharedVolume", pwr_eCix_SharedVolume },
-  { "pwr_eClass_DynamicVolume", pwr_eClass_DynamicVolume },
-  { "pwr_eCix_DynamicVolume", pwr_eCix_DynamicVolume },
-  { "pwr_eClass_SystemVolume", pwr_eClass_SystemVolume },
-  { "pwr_eCix_SystemVolume", pwr_eCix_SystemVolume },
-  { "pwr_eClass_ClassVolume", pwr_eClass_ClassVolume },
-  { "pwr_eCix_ClassVolume", pwr_eCix_ClassVolume },
-  { "pwr_eClass_DetachedClassVolume", pwr_eClass_DetachedClassVolume },
-  { "pwr_eCix_DetachedClassVolume", pwr_eCix_DetachedClassVolume },
-  { "pwr_eClass_WorkBenchVolume", pwr_eClass_WorkBenchVolume },
-  { "pwr_eCix_WorkBenchVolume", pwr_eCix_WorkBenchVolume },
-  { "pwr_eClass_DirectoryVolume", pwr_eClass_DirectoryVolume },
-  { "pwr_eCix_DirectoryVolume", pwr_eCix_DirectoryVolume },
-  { "pwr_eClass_VolatileVolume", pwr_eClass_VolatileVolume },
-  { "pwr_eCix_VolatileVolume", pwr_eCix_VolatileVolume },
-  { "pwr_eClass_ExternVolume", pwr_eClass_ExternVolume },
-  { "pwr_eCix_ExternVolume", pwr_eCix_ExternVolume },
-  { "pwr_eClass_CreateVolume", pwr_eClass_CreateVolume },
-  { "pwr_eCix_CreateVolume", pwr_eCix_CreateVolume },
-  { "pwr_eClass_MountVolume", pwr_eClass_MountVolume },
-  { "pwr_eCix_MountVolume", pwr_eCix_MountVolume },
-  { "pwr_eClass_MountObject", pwr_eClass_MountObject },
-  { "pwr_eCix_MountObject", pwr_eCix_MountObject },
-  { "pwr_eClass_Bit", pwr_eClass_Bit }, { "pwr_eCix_Bit", pwr_eCix_Bit },
-  { "pwr_eClass_Value", pwr_eClass_Value },
-  { "pwr_eCix_Value", pwr_eCix_Value },
-  { "pwr_eClass_Method", pwr_eClass_Method },
-  { "pwr_eCix_Method", pwr_eCix_Method },
-  { "pwr_eClass_RtMethod", pwr_eClass_RtMethod },
-  { "pwr_eCix_RtMethod", pwr_eCix_RtMethod },
-  { "pwr_eClass_Hier", pwr_eClass_Hier }, { "pwr_eCix_Hier", pwr_eCix_Hier },
-  { "pwr_eClass_ClassLost", pwr_eClass_ClassLost },
-  { "pwr_eCix_ClassLost", pwr_eCix_ClassLost },
-  { "pwr_eClass_Security", pwr_eClass_Security },
-  { "pwr_eCix_Security", pwr_eCix_Security },
-  { "pwr_eClass_ReferenceList", pwr_eClass_ReferenceList },
-  { "pwr_eCix_ReferenceList", pwr_eCix_ReferenceList },
-  { "pwr_eClass_Block", pwr_eClass_Block },
-  { "pwr_eCix_Block", pwr_eCix_Block },
-  { "pwr_eClass_SubBlock", pwr_eClass_SubBlock },
-  { "pwr_eCix_SubBlock", pwr_eCix_SubBlock },
-  { "pwr_eClass_BlockAttribute", pwr_eClass_BlockAttribute },
-  { "pwr_eCix_BlockAttribute", pwr_eCix_BlockAttribute },
-  { "pwr_eClass_MountDynObject", pwr_eClass_MountDynObject },
-  { "pwr_eCix_MountDynObject", pwr_eCix_MountDynObject }
+static wbl_sSym classes[] = {{"pwr_eClass_ClassDef", pwr_eClass_ClassDef},
+                             {"pwr_eCix_ClassDef", pwr_eCix_ClassDef},
+                             {"pwr_eClass_Type", pwr_eClass_Type},
+                             {"pwr_eCix_Type", pwr_eCix_Type},
+                             {"pwr_eClass_TypeDef", pwr_eClass_TypeDef},
+                             {"pwr_eCix_TypeDef", pwr_eCix_TypeDef},
+                             {"pwr_eClass_ObjBodyDef", pwr_eClass_ObjBodyDef},
+                             {"pwr_eCix_ObjBodyDef", pwr_eCix_ObjBodyDef},
+                             {"pwr_eClass_Param", pwr_eClass_Param},
+                             {"pwr_eCix_Param", pwr_eCix_Param},
+                             {"pwr_eClass_Attribute", pwr_eClass_Param},
+                             {"pwr_eCix_Attribute", pwr_eCix_Param},
+                             {"pwr_eClass_Input", pwr_eClass_Input},
+                             {"pwr_eCix_Input", pwr_eCix_Input},
+                             {"pwr_eClass_Output", pwr_eClass_Output},
+                             {"pwr_eCix_Output", pwr_eCix_Output},
+                             {"pwr_eClass_Intern", pwr_eClass_Intern},
+                             {"pwr_eCix_Intern", pwr_eCix_Intern},
+                             {"pwr_eClass_TargetAttribute", pwr_eClass_TargetAttribute},
+                             {"pwr_eCix_TargetAttribute", pwr_eCix_TargetAttribute},
+                             {"pwr_eClass_Buffer", pwr_eClass_Buffer},
+                             {"pwr_eCix_Buffer", pwr_eCix_Buffer},
+                             {"pwr_eClass_ObjXRef", pwr_eClass_ObjXRef},
+                             {"pwr_eCix_ObjXRef", pwr_eCix_ObjXRef},
+                             {"pwr_eClass_Layout", pwr_eClass_Layout},
+                             {"pwr_eCix_Layout", pwr_eCix_Layout},
+                             {"pwr_eClass_Group", pwr_eClass_Group},
+                             {"pwr_eCix_Group", pwr_eCix_Group},
+                             {"pwr_eClass_GroupRef", pwr_eClass_GroupRef},
+                             {"pwr_eCix_GroupRef", pwr_eCix_GroupRef},
+                             {"pwr_eClass_TypeHier", pwr_eClass_TypeHier},
+                             {"pwr_eCix_TypeHier", pwr_eCix_TypeHier},
+                             {"pwr_eClass_ClassHier", pwr_eClass_ClassHier},
+                             {"pwr_eCix_ClassHier", pwr_eCix_ClassHier},
+                             {"pwr_eClass_ModHier", pwr_eClass_ModHier},
+                             {"pwr_eCix_ModHier", pwr_eCix_ModHier},
+                             {"pwr_eClass_PlantHier", pwr_eClass_PlantHier},
+                             {"pwr_eCix_PlantHier", pwr_eCix_PlantHier},
+                             {"pwr_eClass_PlcProgram", pwr_eClass_PlcProgram},
+                             {"pwr_eCix_PlcProgram", pwr_eCix_PlcProgram},
+                             {"pwr_eClass_PlcWindow", pwr_eClass_PlcWindow},
+                             {"pwr_eCix_PlcWindow", pwr_eCix_PlcWindow},
+                             {"pwr_eClass_PlcNode", pwr_eClass_PlcNode},
+                             {"pwr_eCix_PlcNode", pwr_eCix_PlcNode},
+                             {"pwr_eClass_PlcConnection", pwr_eClass_PlcConnection},
+                             {"pwr_eCix_PlcConnection", pwr_eCix_PlcConnection},
+                             {"pwr_eClass_Point", pwr_eClass_Point},
+                             {"pwr_eCix_Point", pwr_eCix_Point},
+                             {"pwr_eClass_GraphPlcProgram", pwr_eClass_GraphPlcProgram},
+                             {"pwr_eCix_GraphPlcProgram", pwr_eCix_GraphPlcProgram},
+                             {"pwr_eClass_GraphPlcWindow", pwr_eClass_GraphPlcWindow},
+                             {"pwr_eCix_GraphPlcWindow", pwr_eCix_GraphPlcWindow},
+                             {"pwr_eClass_GraphPlcNode", pwr_eClass_GraphPlcNode},
+                             {"pwr_eCix_GraphPlcNode", pwr_eCix_GraphPlcNode},
+                             {"pwr_eClass_GraphPlcConnection", pwr_eClass_GraphPlcConnection},
+                             {"pwr_eCix_GraphPlcConnection", pwr_eCix_GraphPlcConnection},
+                             {"pwr_eClass_PlcPgm", pwr_eClass_PlcPgm},
+                             {"pwr_eCix_PlcPgm", pwr_eCix_PlcPgm}
+                             /*  ,{ "pwr_eClass_Hierarchy", pwr_eClass_Hierarchy }*/
+                             /*  ,{ "pwr_eCix_Hierarchy", pwr_eCix_Hierarchy }*/
+                             ,
+                             {"pwr_eClass_NodeHier", pwr_eClass_NodeHier},
+                             {"pwr_eCix_NodeHier", pwr_eCix_NodeHier},
+                             {"pwr_eClass_PgmDef", pwr_eClass_PgmDef},
+                             {"pwr_eCix_PgmDef", pwr_eCix_PgmDef},
+                             {"pwr_eClass_Node", pwr_eClass_Node},
+                             {"pwr_eCix_Node", pwr_eCix_Node},
+                             {"pwr_eClass_Appl", pwr_eClass_Appl},
+                             {"pwr_eCix_Appl", pwr_eCix_Appl},
+                             {"pwr_eClass_System", pwr_eClass_System},
+                             {"pwr_eCix_System", pwr_eCix_System},
+                             {"pwr_eClass_LibHier", pwr_eClass_LibHier},
+                             {"pwr_eCix_LibHier", pwr_eCix_LibHier},
+                             {"pwr_eClass_DocHier", pwr_eClass_DocHier},
+                             {"pwr_eCix_DocHier", pwr_eCix_DocHier},
+                             {"pwr_eClass_AttrXRef", pwr_eClass_AttrXRef},
+                             {"pwr_eCix_AttrXRef", pwr_eCix_AttrXRef},
+                             {"pwr_eClass_Menu", pwr_eClass_Menu},
+                             {"pwr_eCix_Menu", pwr_eCix_Menu},
+                             {"pwr_eClass_RtMenu", pwr_eClass_RtMenu},
+                             {"pwr_eCix_RtMenu", pwr_eCix_RtMenu},
+                             {"pwr_eClass_MenuSeparator", pwr_eClass_MenuSeparator},
+                             {"pwr_eCix_MenuSeparator", pwr_eCix_MenuSeparator},
+                             {"pwr_eClass_MenuCascade", pwr_eClass_MenuCascade},
+                             {"pwr_eCix_MenuCascade", pwr_eCix_MenuCascade},
+                             {"pwr_eClass_MenuButton", pwr_eClass_MenuButton},
+                             {"pwr_eCix_MenuButton", pwr_eCix_MenuButton},
+                             {"pwr_eClass_MenuRef", pwr_eClass_MenuRef},
+                             {"pwr_eCix_MenuRef", pwr_eCix_MenuRef},
+                             {"pwr_eClass_Object", pwr_eClass_Object},
+                             {"pwr_eCix_Object", pwr_eCix_Object},
+                             {"pwr_eClass_DbCallBack", pwr_eClass_DbCallBack},
+                             {"pwr_eCix_DbCallBack", pwr_eCix_DbCallBack},
+                             {"pwr_eClass_Alias", pwr_eClass_Alias},
+                             {"pwr_eCix_Alias", pwr_eCix_Alias},
+                             {"pwr_eClass_RootVolume", pwr_eClass_RootVolume},
+                             {"pwr_eCix_RootVolume", pwr_eCix_RootVolume},
+                             {"pwr_eClass_SubVolume", pwr_eClass_SubVolume},
+                             {"pwr_eCix_SubVolume", pwr_eCix_SubVolume},
+                             {"pwr_eClass_SharedVolume", pwr_eClass_SharedVolume},
+                             {"pwr_eCix_SharedVolume", pwr_eCix_SharedVolume},
+                             {"pwr_eClass_DynamicVolume", pwr_eClass_DynamicVolume},
+                             {"pwr_eCix_DynamicVolume", pwr_eCix_DynamicVolume},
+                             {"pwr_eClass_SystemVolume", pwr_eClass_SystemVolume},
+                             {"pwr_eCix_SystemVolume", pwr_eCix_SystemVolume},
+                             {"pwr_eClass_ClassVolume", pwr_eClass_ClassVolume},
+                             {"pwr_eCix_ClassVolume", pwr_eCix_ClassVolume},
+                             {"pwr_eClass_DetachedClassVolume", pwr_eClass_DetachedClassVolume},
+                             {"pwr_eCix_DetachedClassVolume", pwr_eCix_DetachedClassVolume},
+                             {"pwr_eClass_WorkBenchVolume", pwr_eClass_WorkBenchVolume},
+                             {"pwr_eCix_WorkBenchVolume", pwr_eCix_WorkBenchVolume},
+                             {"pwr_eClass_DirectoryVolume", pwr_eClass_DirectoryVolume},
+                             {"pwr_eCix_DirectoryVolume", pwr_eCix_DirectoryVolume},
+                             {"pwr_eClass_VolatileVolume", pwr_eClass_VolatileVolume},
+                             {"pwr_eCix_VolatileVolume", pwr_eCix_VolatileVolume},
+                             {"pwr_eClass_ExternVolume", pwr_eClass_ExternVolume},
+                             {"pwr_eCix_ExternVolume", pwr_eCix_ExternVolume},
+                             {"pwr_eClass_CreateVolume", pwr_eClass_CreateVolume},
+                             {"pwr_eCix_CreateVolume", pwr_eCix_CreateVolume},
+                             {"pwr_eClass_MountVolume", pwr_eClass_MountVolume},
+                             {"pwr_eCix_MountVolume", pwr_eCix_MountVolume},
+                             {"pwr_eClass_MountObject", pwr_eClass_MountObject},
+                             {"pwr_eCix_MountObject", pwr_eCix_MountObject},
+                             {"pwr_eClass_Bit", pwr_eClass_Bit},
+                             {"pwr_eCix_Bit", pwr_eCix_Bit},
+                             {"pwr_eClass_Value", pwr_eClass_Value},
+                             {"pwr_eCix_Value", pwr_eCix_Value},
+                             {"pwr_eClass_Method", pwr_eClass_Method},
+                             {"pwr_eCix_Method", pwr_eCix_Method},
+                             {"pwr_eClass_RtMethod", pwr_eClass_RtMethod},
+                             {"pwr_eCix_RtMethod", pwr_eCix_RtMethod},
+                             {"pwr_eClass_Hier", pwr_eClass_Hier},
+                             {"pwr_eCix_Hier", pwr_eCix_Hier},
+                             {"pwr_eClass_ClassLost", pwr_eClass_ClassLost},
+                             {"pwr_eCix_ClassLost", pwr_eCix_ClassLost},
+                             {"pwr_eClass_Security", pwr_eClass_Security},
+                             {"pwr_eCix_Security", pwr_eCix_Security},
+                             {"pwr_eClass_ReferenceList", pwr_eClass_ReferenceList},
+                             {"pwr_eCix_ReferenceList", pwr_eCix_ReferenceList},
+                             {"pwr_eClass_Block", pwr_eClass_Block},
+                             {"pwr_eCix_Block", pwr_eCix_Block},
+                             {"pwr_eClass_SubBlock", pwr_eClass_SubBlock},
+                             {"pwr_eCix_SubBlock", pwr_eCix_SubBlock},
+                             {"pwr_eClass_BlockAttribute", pwr_eClass_BlockAttribute},
+                             {"pwr_eCix_BlockAttribute", pwr_eCix_BlockAttribute},
+                             {"pwr_eClass_MountDynObject", pwr_eClass_MountDynObject},
+                             {"pwr_eCix_MountDynObject", pwr_eCix_MountDynObject}
 
-  ,
-  { "pwr_cClass_ChanDi", pwr_cClass_ChanDi },
-  { "pwr_cClass_ChanDo", pwr_cClass_ChanDo },
-  { "pwr_cClass_ChanAi", pwr_cClass_ChanAi },
-  { "pwr_cClass_ChanAi", pwr_cClass_ChanAo },
-  { "pwr_cClass_ChanIi", pwr_cClass_ChanIi },
-  { "pwr_cClass_ChanIo", pwr_cClass_ChanIo },
-  { "pwr_cClass_RootVolumeConfig", pwr_cClass_RootVolumeConfig },
-  { "pwr_cClass_ClassVolumeConfig", pwr_cClass_ClassVolumeConfig },
-  { "pwr_cClass_SharedVolumeConfig", pwr_cClass_SharedVolumeConfig },
-  { "pwr_cClass_SubVolumeConfig", pwr_cClass_SubVolumeConfig },
-  { "pwr_cClass_pid", pwr_cClass_pid }, { "pwr_cClass_mode", pwr_cClass_mode },
-  { "pwr_cClass_XttGraph", pwr_cClass_XttGraph },
-  { "pwr_cClass_XttCamera", pwr_cClass_XttCamera },
-  { "pwr_cClass_XttMultiView", pwr_cClass_XttMultiView },
-  { "pwr_cClass_AlarmView", pwr_cClass_AlarmView },
-  { "pwr_cClass_DsTrend", pwr_cClass_DsTrend },
-  { "pwr_cClass_DsTrendCurve", pwr_cClass_DsTrendCurve },
-  { "pwr_cClass_CircBuff1k", pwr_cClass_CircBuff1k },
-  { "pwr_cClass_CircBuff2k", pwr_cClass_CircBuff2k },
-  { "pwr_cClass_CircBuff10k", pwr_cClass_CircBuff10k },
-  { "pwr_cClass_CircBuff20k", pwr_cClass_CircBuff20k },
-  { "pwr_cClass_CircBuff100k", pwr_cClass_CircBuff100k },
-  { "pwr_cClass_CircBuff200k", pwr_cClass_CircBuff200k },
-  { "pwr_cClass_Buff256", pwr_cClass_Buff256 },
-  { "pwr_cClass_Buff1440", pwr_cClass_Buff1440 },
-  { "pwr_cClass_Buff4096", pwr_cClass_Buff4096 },
-  { "pwr_cClass_Buff32k", pwr_cClass_Buff32k },
-  { "pwr_cClass_BuffStr80", pwr_cClass_BuffStr80 },
-  { "BaseComponent:Class-CompModePID", pwr_cClass_CompModePID },
-  { "BaseComponent:Class-CompPID", pwr_cClass_CompPID },
-  { "BaseComponent:Class-CompModeIMC", pwr_cClass_CompModeIMC },
-  { "BaseComponent:Class-CompMPC", pwr_cClass_CompMPC },
-  { "BaseComponent:Class-CompMPC_MLP", pwr_cClass_CompMPC_MLP },
-  { "BaseComponent:Class-CompMPC_Monitor", pwr_cClass_CompMPC_Monitor },
-  { "BaseComponent:Class-CompIMC", pwr_cClass_CompIMC }, { 0, 0 } };
+                             ,
+                             {"pwr_cClass_ChanDi", pwr_cClass_ChanDi},
+                             {"pwr_cClass_ChanDo", pwr_cClass_ChanDo},
+                             {"pwr_cClass_ChanAi", pwr_cClass_ChanAi},
+                             {"pwr_cClass_ChanAi", pwr_cClass_ChanAo},
+                             {"pwr_cClass_ChanIi", pwr_cClass_ChanIi},
+                             {"pwr_cClass_ChanIo", pwr_cClass_ChanIo},
+                             {"pwr_cClass_RootVolumeConfig", pwr_cClass_RootVolumeConfig},
+                             {"pwr_cClass_ClassVolumeConfig", pwr_cClass_ClassVolumeConfig},
+                             {"pwr_cClass_SharedVolumeConfig", pwr_cClass_SharedVolumeConfig},
+                             {"pwr_cClass_SubVolumeConfig", pwr_cClass_SubVolumeConfig},
+                             {"pwr_cClass_pid", pwr_cClass_pid},
+                             {"pwr_cClass_mode", pwr_cClass_mode},
+                             {"pwr_cClass_XttGraph", pwr_cClass_XttGraph},
+                             {"pwr_cClass_XttCamera", pwr_cClass_XttCamera},
+                             {"pwr_cClass_XttMultiView", pwr_cClass_XttMultiView},
+                             {"pwr_cClass_AlarmView", pwr_cClass_AlarmView},
+                             {"pwr_cClass_DsTrend", pwr_cClass_DsTrend},
+                             {"pwr_cClass_DsTrendCurve", pwr_cClass_DsTrendCurve},
+                             {"pwr_cClass_CircBuff1k", pwr_cClass_CircBuff1k},
+                             {"pwr_cClass_CircBuff2k", pwr_cClass_CircBuff2k},
+                             {"pwr_cClass_CircBuff10k", pwr_cClass_CircBuff10k},
+                             {"pwr_cClass_CircBuff20k", pwr_cClass_CircBuff20k},
+                             {"pwr_cClass_CircBuff100k", pwr_cClass_CircBuff100k},
+                             {"pwr_cClass_CircBuff200k", pwr_cClass_CircBuff200k},
+                             {"pwr_cClass_Buff256", pwr_cClass_Buff256},
+                             {"pwr_cClass_Buff1440", pwr_cClass_Buff1440},
+                             {"pwr_cClass_Buff4096", pwr_cClass_Buff4096},
+                             {"pwr_cClass_Buff32k", pwr_cClass_Buff32k},
+                             {"pwr_cClass_BuffStr80", pwr_cClass_BuffStr80},
+                             {"BaseComponent:Class-CompModePID", pwr_cClass_CompModePID},
+                             {"BaseComponent:Class-CompPID", pwr_cClass_CompPID},
+                             {"BaseComponent:Class-CompModeIMC", pwr_cClass_CompModeIMC},
+                             {"BaseComponent:Class-CompMPC", pwr_cClass_CompMPC},
+                             {"BaseComponent:Class-CompMPC_MLP", pwr_cClass_CompMPC_MLP},
+                             {"BaseComponent:Class-CompMPC_Monitor", pwr_cClass_CompMPC_Monitor},
+                             {"BaseComponent:Class-CompIMC", pwr_cClass_CompIMC},
+                             {0, 0}};
 
 /* Datatypes */
-static wbl_sSym editor[] = { { "pwr_eEditor_HiEd", pwr_eEditor_HiEd },
-  { "pwr_eEditor_PlcEd", pwr_eEditor_PlcEd },
-  { "pwr_eEditor_AttrEd", pwr_eEditor_AttrEd },
-  { "pwr_eEditor_ClassEd", pwr_eEditor_ClassEd }
+static wbl_sSym editor[] = {{"pwr_eEditor_HiEd", pwr_eEditor_HiEd},
+                            {"pwr_eEditor_PlcEd", pwr_eEditor_PlcEd},
+                            {"pwr_eEditor_AttrEd", pwr_eEditor_AttrEd},
+                            {"pwr_eEditor_ClassEd", pwr_eEditor_ClassEd}
 
-  ,
-  { "pwr_eMethod__", pwr_eMethod__ },
-  { "pwr_eMethod_Standard", pwr_eMethod_Standard },
-  { "pwr_eMethod_Connections", pwr_eMethod_Connections },
-  { "pwr_eMethod_DrawingInfo", pwr_eMethod_DrawingInfo },
-  { "pwr_eMethod_DevBodyOnly", pwr_eMethod_DevBodyOnly },
-  { "pwr_eMethod_RtAndDevBodies", pwr_eMethod_RtAndDevBodies },
-  { "pwr_eMethod_RtConnectionsAndDevBodies",
-      pwr_eMethod_RtConnectionsAndDevBodies },
-  { "pwr_eMethod_DevBodyWithChkb", pwr_eMethod_DevBodyWithChkb },
-  { "pwr_eMethod_SysBody", pwr_eMethod_SysBody },
-  { "pwr_eMethod_DevBodyConnections", pwr_eMethod_DevBodyConnections },
-  { "pwr_ePopEditorEnum_None", pwr_ePopEditorEnum_None },
-  { "pwr_ePopEditorEnum_GeGraph", pwr_ePopEditorEnum_GeGraph },
-  { "pwr_ePopEditorEnum_AttrEd", pwr_ePopEditorEnum_AttrEd },
-  { "pwr_ePopEditorEnum_GeScript", pwr_ePopEditorEnum_GeScript },
-  { "pwr_ePopEditorEnum_GeCurve", pwr_ePopEditorEnum_GeCurve },
-  { "pwr_ePopEditorEnum_GeGraphConf", pwr_ePopEditorEnum_GeGraphConf }, 
-  { 0, 0 } };
+                            ,
+                            {"pwr_eMethod__", pwr_eMethod__},
+                            {"pwr_eMethod_Standard", pwr_eMethod_Standard},
+                            {"pwr_eMethod_Connections", pwr_eMethod_Connections},
+                            {"pwr_eMethod_DrawingInfo", pwr_eMethod_DrawingInfo},
+                            {"pwr_eMethod_DevBodyOnly", pwr_eMethod_DevBodyOnly},
+                            {"pwr_eMethod_RtAndDevBodies", pwr_eMethod_RtAndDevBodies},
+                            {"pwr_eMethod_RtConnectionsAndDevBodies", pwr_eMethod_RtConnectionsAndDevBodies},
+                            {"pwr_eMethod_DevBodyWithChkb", pwr_eMethod_DevBodyWithChkb},
+                            {"pwr_eMethod_SysBody", pwr_eMethod_SysBody},
+                            {"pwr_eMethod_DevBodyConnections", pwr_eMethod_DevBodyConnections},
+                            {"pwr_ePopEditorEnum_None", pwr_ePopEditorEnum_None},
+                            {"pwr_ePopEditorEnum_GeGraph", pwr_ePopEditorEnum_GeGraph},
+                            {"pwr_ePopEditorEnum_AttrEd", pwr_ePopEditorEnum_AttrEd},
+                            {"pwr_ePopEditorEnum_GeScript", pwr_ePopEditorEnum_GeScript},
+                            {"pwr_ePopEditorEnum_GeCurve", pwr_ePopEditorEnum_GeCurve},
+                            {"pwr_ePopEditorEnum_GeGraphConf", pwr_ePopEditorEnum_GeGraphConf},
+                            {0, 0}};
 
 static wbl_sSym attr_flags[] = {
-  /* Bitmask for flags */
+    /* Bitmask for flags */
 
-  { "PWR_MASK_POINTER", PWR_MASK_POINTER },
-  { "PWR_MASK_ARRAY", PWR_MASK_ARRAY },
-  { "PWR_MASK_REDUTRANSFER", PWR_MASK_REDUTRANSFER },
-  { "PWR_MASK_CASTATTR", PWR_MASK_CASTATTR },
-  { "PWR_MASK_STATE", PWR_MASK_STATE }, { "PWR_MASK_CONST", PWR_MASK_CONST },
-  { "PWR_MASK_RTVIRTUAL", PWR_MASK_RTVIRTUAL },
-  { "PWR_MASK_DEVBODYREF", PWR_MASK_DEVBODYREF },
-  { "PWR_MASK_DYNAMIC", PWR_MASK_DYNAMIC },
-  { "PWR_MASK_PUBLICWRITE", PWR_MASK_PUBLICWRITE },
-  { "PWR_MASK_NOEDIT", PWR_MASK_NOEDIT },
-  { "PWR_MASK_INVISIBLE", PWR_MASK_INVISIBLE },
-  { "PWR_MASK_REFDIRECT", PWR_MASK_REFDIRECT },
-  { "PWR_MASK_NOINVERT", PWR_MASK_NOINVERT },
-  { "PWR_MASK_NOREMOVE", PWR_MASK_NOREMOVE },
-  { "PWR_MASK_RTDBREF", PWR_MASK_RTDBREF },
-  { "PWR_MASK_PRIVATE", PWR_MASK_PRIVATE },
-  { "PWR_MASK_CLASS", PWR_MASK_CLASS },
-  { "PWR_MASK_SUPERCLASS", PWR_MASK_SUPERCLASS },
-  { "PWR_MASK_BUFFER", PWR_MASK_BUFFER }, { "PWR_MASK_NOWBL", PWR_MASK_NOWBL },
-  { "PWR_MASK_ALWAYSWBL", PWR_MASK_ALWAYSWBL },
-  { "PWR_MASK_DISABLEATTR", PWR_MASK_DISABLEATTR },
-  { "PWR_MASK_RTHIDE", PWR_MASK_RTHIDE },
-  { "PWR_MASK_DEVHIDEVALUE", PWR_MASK_DEVHIDEVALUE }
+    {"PWR_MASK_POINTER", PWR_MASK_POINTER},
+    {"PWR_MASK_ARRAY", PWR_MASK_ARRAY},
+    {"PWR_MASK_REDUTRANSFER", PWR_MASK_REDUTRANSFER},
+    {"PWR_MASK_CASTATTR", PWR_MASK_CASTATTR},
+    {"PWR_MASK_STATE", PWR_MASK_STATE},
+    {"PWR_MASK_CONST", PWR_MASK_CONST},
+    {"PWR_MASK_RTVIRTUAL", PWR_MASK_RTVIRTUAL},
+    {"PWR_MASK_DEVBODYREF", PWR_MASK_DEVBODYREF},
+    {"PWR_MASK_DYNAMIC", PWR_MASK_DYNAMIC},
+    {"PWR_MASK_PUBLICWRITE", PWR_MASK_PUBLICWRITE},
+    {"PWR_MASK_NOEDIT", PWR_MASK_NOEDIT},
+    {"PWR_MASK_INVISIBLE", PWR_MASK_INVISIBLE},
+    {"PWR_MASK_REFDIRECT", PWR_MASK_REFDIRECT},
+    {"PWR_MASK_NOINVERT", PWR_MASK_NOINVERT},
+    {"PWR_MASK_NOREMOVE", PWR_MASK_NOREMOVE},
+    {"PWR_MASK_RTDBREF", PWR_MASK_RTDBREF},
+    {"PWR_MASK_PRIVATE", PWR_MASK_PRIVATE},
+    {"PWR_MASK_CLASS", PWR_MASK_CLASS},
+    {"PWR_MASK_SUPERCLASS", PWR_MASK_SUPERCLASS},
+    {"PWR_MASK_BUFFER", PWR_MASK_BUFFER},
+    {"PWR_MASK_NOWBL", PWR_MASK_NOWBL},
+    {"PWR_MASK_ALWAYSWBL", PWR_MASK_ALWAYSWBL},
+    {"PWR_MASK_DISABLEATTR", PWR_MASK_DISABLEATTR},
+    {"PWR_MASK_RTHIDE", PWR_MASK_RTHIDE},
+    {"PWR_MASK_DEVHIDEVALUE", PWR_MASK_DEVHIDEVALUE}
 
-  ,
-  { "pwr_mClassDef_DevOnly", pwr_mClassDef_DevOnly },
-  { "pwr_mClassDef_System", pwr_mClassDef_System },
-  { "pwr_mClassDef_Multinode", pwr_mClassDef_Multinode },
-  { "pwr_mClassDef_ObjXRef", pwr_mClassDef_ObjXRef },
-  { "pwr_mClassDef_RtBody", pwr_mClassDef_RtBody },
-  { "pwr_mClassDef_AttrXRef", pwr_mClassDef_AttrXRef },
-  { "pwr_mClassDef_ObjRef", pwr_mClassDef_ObjRef },
-  { "pwr_mClassDef_AttrRef", pwr_mClassDef_AttrRef },
-  { "pwr_mClassDef_TopObject", pwr_mClassDef_TopObject },
-  { "pwr_mClassDef_NoAdopt", pwr_mClassDef_NoAdopt },
-  { "pwr_mClassDef_Template", pwr_mClassDef_Template },
-  { "pwr_mClassDef_IO", pwr_mClassDef_IO },
-  { "pwr_mClassDef_IOAgent", pwr_mClassDef_IOAgent },
-  { "pwr_mClassDef_IORack", pwr_mClassDef_IORack },
-  { "pwr_mClassDef_IOCard", pwr_mClassDef_IOCard },
-  { "pwr_mClassDef_HasCallBack", pwr_mClassDef_HasCallBack },
-  { "pwr_mClassDef_RtReadOnly", pwr_mClassDef_RtReadOnly },
-  { "pwr_mClassDef_Internal", pwr_mClassDef_Internal },
-  { "pwr_mClassDef_Plc", pwr_mClassDef_Plc },
-  { "pwr_mClassDef_Obsolete", pwr_mClassDef_Obsolete }, { 0, 0 }
-};
+    ,
+    {"pwr_mClassDef_DevOnly", pwr_mClassDef_DevOnly},
+    {"pwr_mClassDef_System", pwr_mClassDef_System},
+    {"pwr_mClassDef_Multinode", pwr_mClassDef_Multinode},
+    {"pwr_mClassDef_ObjXRef", pwr_mClassDef_ObjXRef},
+    {"pwr_mClassDef_RtBody", pwr_mClassDef_RtBody},
+    {"pwr_mClassDef_AttrXRef", pwr_mClassDef_AttrXRef},
+    {"pwr_mClassDef_ObjRef", pwr_mClassDef_ObjRef},
+    {"pwr_mClassDef_AttrRef", pwr_mClassDef_AttrRef},
+    {"pwr_mClassDef_TopObject", pwr_mClassDef_TopObject},
+    {"pwr_mClassDef_NoAdopt", pwr_mClassDef_NoAdopt},
+    {"pwr_mClassDef_Template", pwr_mClassDef_Template},
+    {"pwr_mClassDef_IO", pwr_mClassDef_IO},
+    {"pwr_mClassDef_IOAgent", pwr_mClassDef_IOAgent},
+    {"pwr_mClassDef_IORack", pwr_mClassDef_IORack},
+    {"pwr_mClassDef_IOCard", pwr_mClassDef_IOCard},
+    {"pwr_mClassDef_HasCallBack", pwr_mClassDef_HasCallBack},
+    {"pwr_mClassDef_RtReadOnly", pwr_mClassDef_RtReadOnly},
+    {"pwr_mClassDef_Internal", pwr_mClassDef_Internal},
+    {"pwr_mClassDef_Plc", pwr_mClassDef_Plc},
+    {"pwr_mClassDef_Obsolete", pwr_mClassDef_Obsolete},
+    {0, 0}};
 
 static int check_conversion_error(const char* attr);
 
 wbl_object::wbl_object()
-    : rbody_size(0), dbody_size(0), rbody(0), dbody(0), m_cid(0), m_tid(0),
-      fth(0), bws(0), fws(0), fch(0), docblock(0), is_built(0)
+    : rbody_size(0), dbody_size(0), rbody(0), dbody(0), m_cid(0), m_tid(0), fth(0), bws(0), fws(0), fch(0),
+      docblock(0), is_built(0)
 {
   strcpy(cname, "");
   m_flags.m = 0;
@@ -412,22 +436,32 @@ int wb_wblnode::classNameToCid(char* class_name, pwr_tCid* cid)
   pwr_tStatus sts;
 
   wb_cdrep* cd = m_vrep->merep()->cdrep(&sts, class_name);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     *cid = cd->cid();
     delete cd;
-  } else {
+  }
+  else
+  {
     char buf[80];
 
-    if (!m_vrep->classNameToCid(class_name, cid)) {
-      if (sscanf(class_name, "%d", cid) != 1) {
-        if (class_name[0] == '$') {
+    if (!m_vrep->classNameToCid(class_name, cid))
+    {
+      if (sscanf(class_name, "%d", cid) != 1)
+      {
+        if (class_name[0] == '$')
+        {
           sprintf(buf, "pwr_eClass_%s", &class_name[1]);
-          if (!lookup((int*)cid, buf, classes)) {
+          if (!lookup((int*)cid, buf, classes))
+          {
             if (!lookup((int*)cid, buf, datatypes))
               return 0;
           }
-        } else {
-          if (!lookup((int*)cid, class_name, classes)) {
+        }
+        else
+        {
+          if (!lookup((int*)cid, class_name, classes))
+          {
             if (!lookup((int*)cid, class_name, datatypes))
               return 0;
           }
@@ -441,8 +475,10 @@ int wb_wblnode::classNameToCid(char* class_name, pwr_tCid* cid)
 int wb_wblnode::stringToOix(const char* buf, pwr_tOix* oix) const
 {
   *oix = 0;
-  if (sscanf(buf, "%d", oix) != 1) {
-    if (!lookup((int*)oix, buf, classes)) {
+  if (sscanf(buf, "%d", oix) != 1)
+  {
+    if (!lookup((int*)oix, buf, classes))
+    {
       if (!lookup((int*)oix, buf, datatypes))
         return 0;
     }
@@ -481,7 +517,8 @@ int wb_wblnode::convconst(int* val, char* str)
     return (TRUE);
   if (wb_wblnode::lookup(val, str, attr_flags))
     return (TRUE);
-  if (str_StartsWith(str, "\"_X")) {
+  if (str_StartsWith(str, "\"_X"))
+  {
     if (sscanf(&str[3], "%d", val) == 1)
       return (TRUE);
   }
@@ -490,21 +527,25 @@ int wb_wblnode::convconst(int* val, char* str)
 
 ref_wblnode wb_wblnode::find(wb_name* oname, int level)
 {
-  if (getType() == wbl_eToken_Object) {
-    if (oname->segmentIsEqual(name(), level)) {
+  if (getType() == wbl_eToken_Object)
+  {
+    if (oname->segmentIsEqual(name(), level))
+    {
       if (!oname->hasSegment(level + 1))
         return this;
       else if (o->fch)
         return o->fch->find(oname, level + 1);
       else
         return 0;
-    } else if (o->fws)
+    }
+    else if (o->fws)
       return o->fws->find(oname, level);
     else
       return 0;
   }
 
-  if ((getType() == wbl_eToken_Volume) || (getType() == wbl_eToken_Object)) {
+  if ((getType() == wbl_eToken_Volume) || (getType() == wbl_eToken_Object))
+  {
     if (oname->volumeIsEqual(name()) && !oname->hasSegment(0))
       return this;
     else if (o->fch)
@@ -519,8 +560,7 @@ void wb_wblnode::info_link(int level)
 {
   for (int i = 0; i < level; i++)
     std::cout << "  ";
-  std::cout << name() << "  " << o->cname << "  " << o->m_oid.oix << " "
-            << o->m_oid.vid << '\n';
+  std::cout << name() << "  " << o->cname << "  " << o->m_oid.oix << " " << o->m_oid.vid << '\n';
   if (o->fch)
     o->fch->info_link(level + 1);
   if (o->fws)
@@ -542,29 +582,36 @@ ref_wblnode wb_wblnode::get_o_lch()
 
 void wb_wblnode::build(bool recursive)
 {
-  if (!o->is_built) {
+  if (!o->is_built)
+  {
     // Check name
     wb_name n = wb_name(name());
     if (!n)
       m_vrep->error("Object name syntax error", getFileName(), line_number);
 
-    if (o->m_cid == 0) {
+    if (o->m_cid == 0)
+    {
       if (!classNameToCid(o->cname, &o->m_cid))
         m_vrep->error("Unknown class", getFileName(), line_number);
     }
 
     o->m_oid.vid = m_vrep->vid();
 
-    if (isClassDef()) {
-      m_vrep->getTemplateBody(
-          o->m_cid, pwr_eBix_sys, &o->rbody_size, &o->rbody);
-    } else if (isType() || isTypeDef()) {
-      m_vrep->getTemplateBody(
-          o->m_cid, pwr_eBix_sys, &o->rbody_size, &o->rbody);
-    } else if (isTemplate()) {
+    if (isClassDef())
+    {
+      m_vrep->getTemplateBody(o->m_cid, pwr_eBix_sys, &o->rbody_size, &o->rbody);
+    }
+    else if (isType() || isTypeDef())
+    {
+      m_vrep->getTemplateBody(o->m_cid, pwr_eBix_sys, &o->rbody_size, &o->rbody);
+    }
+    else if (isTemplate())
+    {
       // Build later by classdef
       return;
-    } else {
+    }
+    else
+    {
       static int tot_size = 0;
       tot_size += o->rbody_size + o->dbody_size;
 
@@ -572,28 +619,29 @@ void wb_wblnode::build(bool recursive)
       // <<
       // o->dbody_size << '\n';
       m_vrep->getTemplateBody(o->m_cid, pwr_eBix_rt, &o->rbody_size, &o->rbody);
-      m_vrep->getTemplateBody(
-          o->m_cid, pwr_eBix_dev, &o->dbody_size, &o->dbody);
+      m_vrep->getTemplateBody(o->m_cid, pwr_eBix_dev, &o->dbody_size, &o->dbody);
     }
 
     ref_wblnode first_child;
     first_child = getFirstChild();
 
-    if (first_child) {
-      if (node_type == wbl_eNodeType_No
-          || node_type == wbl_eNodeType_Code) // Avoid infinite loop
+    if (first_child)
+    {
+      if (node_type == wbl_eNodeType_No || node_type == wbl_eNodeType_Code) // Avoid infinite loop
         o->is_built = 1;
       first_child->buildBody(this);
       if (node_type == wbl_eNodeType_No || node_type == wbl_eNodeType_Code)
         o->is_built = 0;
     }
 
-    if (o->fch && (recursive || isClassDef())) {
+    if (o->fch && (recursive || isClassDef()))
+    {
       if (node_type == wbl_eNodeType_No)
         o->is_built = 1;
       // o->fch->build( 1);
       wb_wblnode* ch = o->fch;
-      while (ch) {
+      while (ch)
+      {
         if (!(isClassDef() && ch->isCode()))
           ch->build(1);
         ch = ch->o->fws;
@@ -601,7 +649,8 @@ void wb_wblnode::build(bool recursive)
       if (node_type == wbl_eNodeType_No)
         o->is_built = 0;
     }
-    if (isClassDef()) {
+    if (isClassDef())
+    {
       o->m_oid.oix = cdh_cixToOix(o->m_oid.oix, 0, 0);
       if (!m_vrep->registerObject(o->m_oid.oix, this))
         m_vrep->error("Duplicate class index", getFileName(), line_number);
@@ -611,8 +660,10 @@ void wb_wblnode::build(bool recursive)
 
       // Calculate offset for attributes
       wb_wblnode* child = o->fch;
-      while (child) {
-        if (child->isObjBodyDef()) {
+      while (child)
+      {
+        if (child->isObjBodyDef())
+        {
           child->buildObjBodyDef(this);
 
           ((pwr_sClassDef*)o->rbody)->NumOfObjBodies++;
@@ -620,9 +671,12 @@ void wb_wblnode::build(bool recursive)
             ((pwr_sClassDef*)o->rbody)->Flags.b.RtBody = 1;
 
           wb_wblnode* attr = child->o->fch;
-          while (attr) {
-            if (attr->isAttribute()) {
-              switch (attr->o->m_cid) {
+          while (attr)
+          {
+            if (attr->isAttribute())
+            {
+              switch (attr->o->m_cid)
+              {
               case pwr_eClass_ObjXRef:
                 ((pwr_sClassDef*)o->rbody)->Flags.b.ObjXRef = 1;
                 break;
@@ -645,8 +699,9 @@ void wb_wblnode::build(bool recursive)
 
             attr = attr->o->fws;
           }
-        } else if (str_NoCaseStrcmp(child->o->cname, "$DbCallBack") == 0
-            && !child->isTemplate()) {
+        }
+        else if (str_NoCaseStrcmp(child->o->cname, "$DbCallBack") == 0 && !child->isTemplate())
+        {
           ((pwr_sClassDef*)o->rbody)->Flags.b.HasCallBack = 1;
         }
 
@@ -659,7 +714,9 @@ void wb_wblnode::build(bool recursive)
       o->c.templ->buildTemplate(this);
       if (o->c.code)
         o->c.code->build(1);
-    } else if (isType()) {
+    }
+    else if (isType())
+    {
       o->m_oid.oix = cdh_tixToOix(0, o->m_oid.oix);
       if (!m_vrep->registerObject(o->m_oid.oix, this))
         m_vrep->error("Duplicate type index", getFileName(), line_number);
@@ -667,8 +724,9 @@ void wb_wblnode::build(bool recursive)
       o->ty.tid = o->ty.type = ((pwr_sType*)o->rbody)->Type;
       o->ty.size = ((pwr_sType*)o->rbody)->Size;
       o->ty.elements = 1;
-
-    } else if (isTypeDef()) {
+    }
+    else if (isTypeDef())
+    {
       o->m_oid.oix = cdh_tixToOix(1, o->m_oid.oix);
       if (!m_vrep->registerObject(o->m_oid.oix, this))
         m_vrep->error("Duplicate type index", getFileName(), line_number);
@@ -679,22 +737,32 @@ void wb_wblnode::build(bool recursive)
       if (((pwr_sTypeDef*)o->rbody)->Elements == 0)
         ((pwr_sTypeDef*)o->rbody)->Elements = 1;
       o->ty.elements = ((pwr_sTypeDef*)o->rbody)->Elements;
-      if (o->ty.type == 0) {
+      if (o->ty.type == 0)
+      {
         pwr_eType type;
         size_t size;
         int elements;
 
-        if (!m_vrep->getTypeInfo(o->ty.tid, &type, &size, &elements)) {
+        if (!m_vrep->getTypeInfo(o->ty.tid, &type, &size, &elements))
+        {
           m_vrep->error("Can't find TypeDef type", getFileName(), line_number);
           return;
         }
         o->ty.type = ((pwr_sTypeDef*)o->rbody)->Type = type;
         o->ty.size = ((pwr_sTypeDef*)o->rbody)->Size = o->ty.elements * size;
       }
-    } else if (isObjBodyDef()) {
-    } else if (isAttribute()) {
-    } else if (isBuffer()) {
-    } else if (isVolume()) {
+    }
+    else if (isObjBodyDef())
+    {
+    }
+    else if (isAttribute())
+    {
+    }
+    else if (isBuffer())
+    {
+    }
+    else if (isVolume())
+    {
       size_t size, offset;
       int elements;
       pwr_tTypeId tid;
@@ -704,14 +772,18 @@ void wb_wblnode::build(bool recursive)
 
       // Transfer next_oix from volumes rtbody
 
-      if (m_vrep->getAttrInfo("NextOix", pwr_eBix_sys, o->m_cid, &size, &offset,
-              &tid, &elements, &type, &flags)) {
+      if (m_vrep->getAttrInfo("NextOix", pwr_eBix_sys, o->m_cid, &size, &offset, &tid, &elements, &type,
+                              &flags))
+      {
         no = *(pwr_tObjectIx*)((char*)o->rbody + offset);
         if (no > (pwr_tObjectIx)m_vrep->next_oix)
           m_vrep->next_oix = *(pwr_tObjectIx*)((char*)o->rbody + offset);
       }
-    } else {
-      if (!m_vrep->registerObject(o->m_oid.oix, this)) {
+    }
+    else
+    {
+      if (!m_vrep->registerObject(o->m_oid.oix, this))
+      {
         // Print error message
         pwr_tStatus sts;
         char name[120];
@@ -726,9 +798,11 @@ void wb_wblnode::build(bool recursive)
     o->is_built = 1;
   }
 
-  if (recursive) {
+  if (recursive)
+  {
     wb_wblnode* ch = o->fch;
-    while (ch) {
+    while (ch)
+    {
       ch->build(recursive);
       ch = ch->o->fws;
     }
@@ -750,12 +824,14 @@ void wb_wblnode::postBuild()
     m_vrep->error("Can't find class flags", getFileName(), line_number);
 
   wb_wblnode* ch = o->fch;
-  while (ch) {
+  while (ch)
+  {
     ch->postBuild();
     ch = ch->o->fws;
   }
 
-  if (isVolume()) {
+  if (isVolume())
+  {
     size_t size, offset;
     int elements;
     pwr_tTypeId tid;
@@ -765,14 +841,16 @@ void wb_wblnode::postBuild()
 
     // Transfer next_oix to volumes rtbody
 
-    if (m_vrep->getAttrInfo("NextOix", pwr_eBix_sys, o->m_cid, &size, &offset,
-            &tid, &elements, &type, &flags)) {
+    if (m_vrep->getAttrInfo("NextOix", pwr_eBix_sys, o->m_cid, &size, &offset, &tid, &elements, &type,
+                            &flags))
+    {
       no = *(pwr_tObjectIx*)((char*)o->rbody + offset);
       if (no < (pwr_tObjectIx)m_vrep->next_oix)
         *(pwr_tObjectIx*)((char*)o->rbody + offset) = m_vrep->next_oix;
     }
-  } else if (o->m_cid == pwr_eClass_GraphPlcNode
-      && m_vrep->vid() > cdh_cSystemClassVolMax) {
+  }
+  else if (o->m_cid == pwr_eClass_GraphPlcNode && m_vrep->vid() > cdh_cSystemClassVolMax)
+  {
     // Count number of $Input, $Output and $Intern and put in parameters
     pwr_tStatus sts;
     int interns = 0;
@@ -787,11 +865,13 @@ void wb_wblnode::postBuild()
     wb_orep* obody = 0;
     wb_name nrb = wb_name("RtBody");
     obody = oclassdef->child(&sts, nrb);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       wb_orep* oattr = obody->first(&sts);
       wb_orep* new_oattr;
 
-      while (ODD(sts)) {
+      while (ODD(sts))
+      {
         if (oattr->cid() == pwr_eClass_Intern)
           interns++;
         if (oattr->cid() == pwr_eClass_Input && !outputs)
@@ -813,11 +893,13 @@ void wb_wblnode::postBuild()
     ((pwr_sGraphPlcNode*)o->rbody)->parameters[1] = interns;
     ((pwr_sGraphPlcNode*)o->rbody)->parameters[2] = outputs;
 
-    if (((pwr_sGraphPlcNode*)o->rbody)->default_mask[0] == 0
-        && ((pwr_sGraphPlcNode*)o->rbody)->default_mask[1] == 0) {
+    if (((pwr_sGraphPlcNode*)o->rbody)->default_mask[0] == 0 &&
+        ((pwr_sGraphPlcNode*)o->rbody)->default_mask[1] == 0)
+    {
       unsigned int mask = 0;
       unsigned int m = 0;
-      for (int i = 0; i < inputs; i++) {
+      for (int i = 0; i < inputs; i++)
+      {
         m = i ? 2 * m : 1;
         mask += m;
       }
@@ -825,38 +907,44 @@ void wb_wblnode::postBuild()
 
       mask = 0;
       m = 0;
-      for (int i = 0; i < outputs; i++) {
+      for (int i = 0; i < outputs; i++)
+      {
         m = i ? 2 * m : 1;
         mask += m;
       }
       ((pwr_sGraphPlcNode*)o->rbody)->default_mask[1] = mask;
     }
-  } else if (isTemplate()) {
-    if (o->templ.created) {
+  }
+  else if (isTemplate())
+  {
+    if (o->templ.created)
+    {
       // New template object, insert template values of attribute objects into
       // body
       size_t size;
       void* body;
 
       ch = o->fth->o->fch;
-      while (ch) {
-        if (ch->isObjBodyDef() && ch->o->b.bix == pwr_eBix_rt) {
+      while (ch)
+      {
+        if (ch->isObjBodyDef() && ch->o->b.bix == pwr_eBix_rt)
+        {
           wb_wblnode* attr = ch->o->fch;
-          while (attr) {
-            if (attr->isAttribute()) {
-              if (cdh_tidIsCid(attr->o->a.tid)) {
+          while (attr)
+          {
+            if (attr->isAttribute())
+            {
+              if (cdh_tidIsCid(attr->o->a.tid))
+              {
                 // Copy template for this object to offset of the attribute
-                if (m_vrep->getTemplateBody(
-                        attr->o->a.tid, pwr_eBix_sys, &size, &body)) {
-                  if (size * attr->o->a.elements != attr->o->a.size
-                      || attr->o->a.offset + size * attr->o->a.elements
-                          > o->rbody_size)
-                    m_vrep->error(
-                        "AttrObject size mismatch", getFileName(), line_number);
+                if (m_vrep->getTemplateBody(attr->o->a.tid, pwr_eBix_sys, &size, &body))
+                {
+                  if (size * attr->o->a.elements != attr->o->a.size ||
+                      attr->o->a.offset + size * attr->o->a.elements > o->rbody_size)
+                    m_vrep->error("AttrObject size mismatch", getFileName(), line_number);
                   else
                     for (int i = 0; i < attr->o->a.elements; i++)
-                      memcpy((char*)o->rbody + attr->o->a.offset + i * size,
-                          body, size);
+                      memcpy((char*)o->rbody + attr->o->a.offset + i * size, body, size);
                   free(body);
                 }
               }
@@ -868,36 +956,38 @@ void wb_wblnode::postBuild()
         }
         ch = ch->o->fws;
       }
-    } else {
+    }
+    else
+    {
       // Check if any new attribute is created
       size_t size;
       void* body;
 
       ch = o->fth->o->fch;
-      while (ch) {
-        if (ch->isObjBodyDef() && ch->o->b.bix == pwr_eBix_rt) {
+      while (ch)
+      {
+        if (ch->isObjBodyDef() && ch->o->b.bix == pwr_eBix_rt)
+        {
           wb_wblnode* attr = ch->o->fch;
-          while (attr) {
-            if (attr->isAttribute()) {
-              if (cdh_tidIsCid(attr->o->a.tid)
-                  && ((pwr_sParam*)attr->o->rbody)->Info.Flags
-                      & PWR_MASK_NEWATTRIBUTE) {
+          while (attr)
+          {
+            if (attr->isAttribute())
+            {
+              if (cdh_tidIsCid(attr->o->a.tid) &&
+                  ((pwr_sParam*)attr->o->rbody)->Info.Flags & PWR_MASK_NEWATTRIBUTE)
+              {
                 // Copy template for this object to offset of the attribute
-                if (m_vrep->getTemplateBody(
-                        attr->o->a.tid, pwr_eBix_sys, &size, &body)) {
-                  if (size * attr->o->a.elements != attr->o->a.size
-                      || attr->o->a.offset + size * attr->o->a.elements
-                          > o->rbody_size)
-                    m_vrep->error(
-                        "AttrObject size mismatch", getFileName(), line_number);
+                if (m_vrep->getTemplateBody(attr->o->a.tid, pwr_eBix_sys, &size, &body))
+                {
+                  if (size * attr->o->a.elements != attr->o->a.size ||
+                      attr->o->a.offset + size * attr->o->a.elements > o->rbody_size)
+                    m_vrep->error("AttrObject size mismatch", getFileName(), line_number);
                   else
                     for (int i = 0; i < attr->o->a.elements; i++)
-                      memcpy((char*)o->rbody + attr->o->a.offset + i * size,
-                          body, size);
+                      memcpy((char*)o->rbody + attr->o->a.offset + i * size, body, size);
                   free(body);
                 }
-                ((pwr_sParam*)attr->o->rbody)->Info.Flags
-                    &= ~PWR_MASK_NEWATTRIBUTE;
+                ((pwr_sParam*)attr->o->rbody)->Info.Flags &= ~PWR_MASK_NEWATTRIBUTE;
               }
             }
             attr = attr->o->fws;
@@ -920,7 +1010,8 @@ void wb_wblnode::buildObjBodyDef(ref_wblnode classdef)
   int index = 0;
   o->b.size = 0;
   wb_wblnode* child = o->fch;
-  while (child) {
+  while (child)
+  {
     if (child->isAttribute())
       child->buildAttribute(classdef, this, &index, &o->b.size);
     if (child->isBuffer())
@@ -934,15 +1025,13 @@ void wb_wblnode::buildObjBodyDef(ref_wblnode classdef)
   ((pwr_sObjBodyDef*)o->rbody)->NumOfParams = index;
 }
 
-void wb_wblnode::buildAttribute(
-    ref_wblnode classdef, ref_wblnode objbodydef, int* bindex, size_t* boffset)
+void wb_wblnode::buildAttribute(ref_wblnode classdef, ref_wblnode objbodydef, int* bindex, size_t* boffset)
 {
   pwr_eType type;
   size_t size;
   int elements;
 
-  o->m_oid.oix
-      = cdh_cixToOix(classdef->o->c.cix, objbodydef->o->b.bix, o->m_oid.oix);
+  o->m_oid.oix = cdh_cixToOix(classdef->o->c.cix, objbodydef->o->b.bix, o->m_oid.oix);
   if (!m_vrep->registerObject(o->m_oid.oix, this))
     m_vrep->error("Duplicate attribute index", getFileName(), line_number);
 
@@ -968,16 +1057,19 @@ void wb_wblnode::buildAttribute(
   if (o->a.elements == 0)
     o->a.elements = 1;
 
-  if (!o->a.tid) {
+  if (!o->a.tid)
+  {
     m_vrep->error("Unknown attribute type", getFileName(), line_number);
     ((pwr_sParam*)o->rbody)->Info.ParamIndex = *bindex;
     (*bindex)++;
     return;
   }
-  if (cdh_tidIsCid(o->a.tid)) {
+  if (cdh_tidIsCid(o->a.tid))
+  {
     size_t dsize;
 
-    if (!m_vrep->getClassInfo(o->a.tid, &size, &dsize)) {
+    if (!m_vrep->getClassInfo(o->a.tid, &size, &dsize))
+    {
       m_vrep->error("Can't find attribute type", getFileName(), line_number);
       ((pwr_sParam*)o->rbody)->Info.ParamIndex = *bindex;
       (*bindex)++;
@@ -987,8 +1079,11 @@ void wb_wblnode::buildAttribute(
     type = (pwr_eType)o->a.tid;
     // Align attribute objects on longword
     *boffset = pwr_AlignLW(*boffset);
-  } else {
-    if (!m_vrep->getTypeInfo(o->a.tid, &type, &size, &elements)) {
+  }
+  else
+  {
+    if (!m_vrep->getTypeInfo(o->a.tid, &type, &size, &elements))
+    {
       m_vrep->error("Can't find attribute type", getFileName(), line_number);
       ((pwr_sParam*)o->rbody)->Info.ParamIndex = *bindex;
       (*bindex)++;
@@ -996,56 +1091,65 @@ void wb_wblnode::buildAttribute(
     }
   }
 
-  if (o->a.tid == pwr_eType_Time || o->a.tid == pwr_eType_DeltaTime
-      || o->a.tid == pwr_eType_Int64 || o->a.tid == pwr_eType_UInt64
-      || o->a.tid == pwr_eType_Float64 || o->a.tid == pwr_eType_CastId
-      || o->a.tid == pwr_eType_DisableAttr || o->a.tid == pwr_eType_DataRef
-      || streq(name(), "TimerFlag")) {
+  if (o->a.tid == pwr_eType_Time || o->a.tid == pwr_eType_DeltaTime || o->a.tid == pwr_eType_Int64 ||
+      o->a.tid == pwr_eType_UInt64 || o->a.tid == pwr_eType_Float64 || o->a.tid == pwr_eType_CastId ||
+      o->a.tid == pwr_eType_DisableAttr || o->a.tid == pwr_eType_DataRef || streq(name(), "TimerFlag"))
+  {
     // Align on longword
     *boffset = pwr_AlignLW(*boffset);
   }
   if (o->a.type == 0)
     o->a.type = ((pwr_sParam*)o->rbody)->Info.Type = type;
 
-  if (o->a.flags & pwr_mAdef_pointer) {
+  if (o->a.flags & pwr_mAdef_pointer)
+  {
     size = pwr_AlignLW(sizeof(void*));
     // Align pointers on longword
     *boffset = pwr_AlignLW(*boffset);
   }
-  if (o->a.flags & pwr_mAdef_array) {
+  if (o->a.flags & pwr_mAdef_array)
+  {
     size *= o->a.elements;
   }
-  if (((pwr_sParam*)o->rbody)->Info.PgmName[0] == 0) {
+  if (((pwr_sParam*)o->rbody)->Info.PgmName[0] == 0)
+  {
     strncpy(((pwr_sParam*)o->rbody)->Info.PgmName, wb_name::unatName(name()),
-        sizeof(((pwr_sParam*)o->rbody)->Info.PgmName));
+            sizeof(((pwr_sParam*)o->rbody)->Info.PgmName));
   }
-  if (str_NoCaseStrcmp(o->cname, "$Buffer") == 0) {
+  if (str_NoCaseStrcmp(o->cname, "$Buffer") == 0)
+  {
     *boffset = pwr_AlignLW(*boffset);
   }
-  if (str_NoCaseStrcmp(o->cname, "$Input") == 0) {
+  if (str_NoCaseStrcmp(o->cname, "$Input") == 0)
+  {
     o->a.size = ((pwr_sParam*)o->rbody)->Info.Size = size;
     *boffset = pwr_AlignLW(*boffset) + pwr_cAlignLW;
     o->a.offset = ((pwr_sParam*)o->rbody)->Info.Offset = *boffset;
     *boffset += pwr_AlignW(o->a.size);
-  } else {
+  }
+  else
+  {
     o->a.offset = ((pwr_sParam*)o->rbody)->Info.Offset = *boffset;
-    if (o->a.flags & pwr_mAdef_pointer && !(o->a.flags & pwr_mAdef_private)) {
+    if (o->a.flags & pwr_mAdef_pointer && !(o->a.flags & pwr_mAdef_private))
+    {
       // Size contains the size if the pointed entity
       if (o->a.size == 0)
-        m_vrep->error("Size of relative pointer should contain target size",
-            getFileName(), line_number);
+        m_vrep->error("Size of relative pointer should contain target size", getFileName(), line_number);
 
       if (o->a.flags & pwr_mAdef_array)
         *boffset += pwr_cAlignLW * o->a.elements;
       else
         *boffset += pwr_cAlignLW;
-    } else {
+    }
+    else
+    {
       o->a.size = ((pwr_sParam*)o->rbody)->Info.Size = size;
       *boffset += pwr_AlignW(o->a.size);
     }
   }
-  if (cdh_tidIsCid(o->a.tid) || o->a.flags & pwr_mAdef_pointer
-      || o->a.tid == pwr_eType_CastId || o->a.tid == pwr_eType_DisableAttr) {
+  if (cdh_tidIsCid(o->a.tid) || o->a.flags & pwr_mAdef_pointer || o->a.tid == pwr_eType_CastId ||
+      o->a.tid == pwr_eType_DisableAttr)
+  {
     // Align next attribute on longword
     *boffset = pwr_AlignLW(*boffset);
   }
@@ -1053,14 +1157,12 @@ void wb_wblnode::buildAttribute(
   (*bindex)++;
 
   // Do some syntax check of flags and typeref
-  if (((pwr_sParam*)o->rbody)->Info.Flags & PWR_MASK_SUPERCLASS
-      && !streq(name(), "Super"))
-    m_vrep->error(
-        "Super class attribute not named Super", getFileName(), line_number);
-  if (streq(name(), "Super")) {
+  if (((pwr_sParam*)o->rbody)->Info.Flags & PWR_MASK_SUPERCLASS && !streq(name(), "Super"))
+    m_vrep->error("Super class attribute not named Super", getFileName(), line_number);
+  if (streq(name(), "Super"))
+  {
     if (*bindex != 1)
-      m_vrep->error(
-          "Super has to be first attribute", getFileName(), line_number);
+      m_vrep->error("Super has to be first attribute", getFileName(), line_number);
     if (!(((pwr_sParam*)o->rbody)->Info.Flags & PWR_MASK_SUPERCLASS))
       ((pwr_sParam*)o->rbody)->Info.Flags |= PWR_MASK_SUPERCLASS;
     if (!(((pwr_sParam*)o->rbody)->Info.Flags & PWR_MASK_CLASS))
@@ -1068,49 +1170,47 @@ void wb_wblnode::buildAttribute(
     if (!cdh_tidIsCid(o->a.tid))
       m_vrep->error("TypeRef is not a class", getFileName(), line_number);
   }
-  if (((pwr_sParam*)o->rbody)->Info.Flags & PWR_MASK_CLASS
-      && !cdh_tidIsCid(o->a.tid))
+  if (((pwr_sParam*)o->rbody)->Info.Flags & PWR_MASK_CLASS && !cdh_tidIsCid(o->a.tid))
     m_vrep->error("TypeRef is not a class", getFileName(), line_number);
-  if (cdh_tidIsCid(o->a.tid)) {
+  if (cdh_tidIsCid(o->a.tid))
+  {
     if (!(((pwr_sParam*)o->rbody)->Info.Flags & PWR_MASK_CLASS))
       ((pwr_sParam*)o->rbody)->Info.Flags |= PWR_MASK_CLASS;
   }
-  if (((pwr_sParam*)o->rbody)->Info.Flags & PWR_MASK_CASTATTR) {
-    if (((pwr_sParam*)o->rbody)->Info.Flags & PWR_MASK_DISABLEATTR) {
-      if (!o->bws || !o->bws->o->bws
-          || o->bws->o->bws->o->a.type != pwr_eType_CastId)
+  if (((pwr_sParam*)o->rbody)->Info.Flags & PWR_MASK_CASTATTR)
+  {
+    if (((pwr_sParam*)o->rbody)->Info.Flags & PWR_MASK_DISABLEATTR)
+    {
+      if (!o->bws || !o->bws->o->bws || o->bws->o->bws->o->a.type != pwr_eType_CastId)
         m_vrep->error("Cast attribute not found", getFileName(), line_number);
-    } else {
+    }
+    else
+    {
       if (!o->bws || o->bws->o->a.type != pwr_eType_CastId)
         m_vrep->error("Cast attribute not found", getFileName(), line_number);
     }
   }
-  if (((pwr_sParam*)o->rbody)->Info.Flags & PWR_MASK_DISABLEATTR) {
+  if (((pwr_sParam*)o->rbody)->Info.Flags & PWR_MASK_DISABLEATTR)
+  {
     if (!o->bws || o->bws->o->a.type != pwr_eType_DisableAttr)
-      m_vrep->error(
-          "DisableAttr attribute not found", getFileName(), line_number);
+      m_vrep->error("DisableAttr attribute not found", getFileName(), line_number);
   }
-  if (((pwr_sParam*)o->rbody)->Info.Elements > 1
-      && !(((pwr_sParam*)o->rbody)->Info.Flags & PWR_MASK_ARRAY))
-    m_vrep->error("Array flag not set though Elements larger than 1",
-        getFileName(), line_number);
+  if (((pwr_sParam*)o->rbody)->Info.Elements > 1 && !(((pwr_sParam*)o->rbody)->Info.Flags & PWR_MASK_ARRAY))
+    m_vrep->error("Array flag not set though Elements larger than 1", getFileName(), line_number);
 }
 
-void wb_wblnode::buildBuffer(
-    ref_wblnode classdef, ref_wblnode objbodydef, int* bindex, size_t* boffset)
+void wb_wblnode::buildBuffer(ref_wblnode classdef, ref_wblnode objbodydef, int* bindex, size_t* boffset)
 {
   size_t rsize, dsize;
 
-  o->m_oid.oix
-      = cdh_cixToOix(classdef->o->c.cix, objbodydef->o->b.bix, o->m_oid.oix);
+  o->m_oid.oix = cdh_cixToOix(classdef->o->c.cix, objbodydef->o->b.bix, o->m_oid.oix);
   if (!m_vrep->registerObject(o->m_oid.oix, this))
     m_vrep->error("Duplicate buffer index", getFileName(), line_number);
 
   if (((pwr_sBuffer*)o->rbody)->Info.Elements == 0)
     ((pwr_sBuffer*)o->rbody)->Info.Elements = 1;
   if (((pwr_sBuffer*)o->rbody)->Info.Type == 0)
-    ((pwr_sParam*)o->rbody)->Info.Type
-        = (pwr_eType)((pwr_sBuffer*)o->rbody)->Class;
+    ((pwr_sParam*)o->rbody)->Info.Type = (pwr_eType)((pwr_sBuffer*)o->rbody)->Class;
 
   o->a.tid = ((pwr_sBuffer*)o->rbody)->Class;
   o->a.type = ((pwr_sParam*)o->rbody)->Info.Type;
@@ -1119,11 +1219,13 @@ void wb_wblnode::buildBuffer(
   o->a.elements = ((pwr_sBuffer*)o->rbody)->Info.Elements;
   o->a.flags = ((pwr_sBuffer*)o->rbody)->Info.Flags;
 
-  if (!o->a.tid) {
+  if (!o->a.tid)
+  {
     m_vrep->error("Unknown buffer type", getFileName(), line_number);
     return;
   }
-  if (!m_vrep->getClassInfo(o->a.tid, &rsize, &dsize)) {
+  if (!m_vrep->getClassInfo(o->a.tid, &rsize, &dsize))
+  {
     m_vrep->error("Can't find buffer class", getFileName(), line_number);
     return;
   }
@@ -1140,21 +1242,26 @@ void wb_wblnode::buildTemplate(ref_wblnode classdef)
 {
   wb_wblnode* objbodydef = classdef->o->fch;
   o->m_oid.oix = cdh_cixToOix(classdef->o->c.cix, pwr_eBix_template, 0);
-  if (!m_vrep->registerObject(o->m_oid.oix, this)) {
+  if (!m_vrep->registerObject(o->m_oid.oix, this))
+  {
     ref_wblnode n = m_vrep->findObject(o->m_oid.oix);
     printf("Duplicate: %s\n", n->name());
     m_vrep->error("Duplicate template oix", getFileName(), line_number);
   }
-  while (objbodydef) {
-    if (objbodydef->isObjBodyDef()) {
-      if (objbodydef->o->b.bix == pwr_eBix_sys
-          || objbodydef->o->b.bix == pwr_eBix_rt) {
+  while (objbodydef)
+  {
+    if (objbodydef->isObjBodyDef())
+    {
+      if (objbodydef->o->b.bix == pwr_eBix_sys || objbodydef->o->b.bix == pwr_eBix_rt)
+      {
         o->rbody_size = objbodydef->o->b.size;
-        if (o->rbody_size) {
+        if (o->rbody_size)
+        {
           o->rbody = calloc(1, o->rbody_size);
         }
       }
-      if (objbodydef->o->b.bix == pwr_eBix_dev) {
+      if (objbodydef->o->b.bix == pwr_eBix_dev)
+      {
         o->dbody_size = objbodydef->o->b.size;
         if (o->dbody_size)
           o->dbody = calloc(1, o->dbody_size);
@@ -1175,14 +1282,16 @@ void wb_wblnode::buildBody(ref_wblnode object)
   ref_wblnode first_child;
   ref_wblnode next_sibling;
 
-  if (getType() == wbl_eToken_Body) {
+  if (getType() == wbl_eToken_Body)
+  {
     if (str_NoCaseStrcmp(name(), "SysBody") == 0)
       bix = pwr_eBix_sys;
     else if (str_NoCaseStrcmp(name(), "RtBody") == 0)
       bix = pwr_eBix_rt;
     else if (str_NoCaseStrcmp(name(), "DevBody") == 0)
       bix = pwr_eBix_dev;
-    else {
+    else
+    {
       // Body exception
       m_vrep->error("Bad body name", getFileName(), line_number);
     }
@@ -1190,14 +1299,17 @@ void wb_wblnode::buildBody(ref_wblnode object)
     first_child = getFirstChild();
 
     // First child might be body time
-    if (first_child && first_child->getType() == wbl_eToken_Date) {
+    if (first_child && first_child->getType() == wbl_eToken_Date)
+    {
       pwr_tTime bodytime;
-      if (stringToTime(first_child->getText(), &bodytime)) {
+      if (stringToTime(first_child->getText(), &bodytime))
+      {
         if (bix == pwr_eBix_rt)
           object->o->m_rbtime = bodytime;
         else
           object->o->m_dbtime = bodytime;
-      } else
+      }
+      else
         m_vrep->error("Time syntax", getFileName(), line_number);
       first_child = first_child->getNextSibling();
     }
@@ -1208,7 +1320,9 @@ void wb_wblnode::buildBody(ref_wblnode object)
     next_sibling = getNextSibling();
     if (next_sibling)
       next_sibling->buildBody(object);
-  } else {
+  }
+  else
+  {
     next_sibling = getNextSibling();
     if (next_sibling)
       next_sibling->buildBody(object);
@@ -1230,37 +1344,43 @@ void wb_wblnode::buildAttr(ref_wblnode object, pwr_eBix bix)
   int int_val, current_int_val;
   bool string_continue = false;
 
-  if (getType() == wbl_eToken_Attr) {
+  if (getType() == wbl_eToken_Attr)
+  {
     first_child = getFirstChild();
-    if (!first_child) {
+    if (!first_child)
+    {
       // Attr exception
       m_vrep->error("Attribute syntax", getFileName(), line_number);
       goto error_continue;
     }
 
     oper = first_child->getType();
-    if (!(oper == wbl_eToken_Operator_eq || oper == wbl_eToken_Operator_oreq)) {
+    if (!(oper == wbl_eToken_Operator_eq || oper == wbl_eToken_Operator_oreq))
+    {
       // Attr exception
       m_vrep->error("Attribute value required", getFileName(), line_number);
       goto error_continue;
     }
 
-    if (!m_vrep->getAttrInfo(name(), (pwr_eBix)bix, object->o->m_cid, &size,
-            &offset, &tid, &elements, &type, &flags)) {
+    if (!m_vrep->getAttrInfo(name(), (pwr_eBix)bix, object->o->m_cid, &size, &offset, &tid, &elements, &type,
+                             &flags))
+    {
       // This might be string special syntax
       wb_attrname n = wb_attrname(name());
-      if (n.hasAttrIndex()
-          && m_vrep->getAttrInfo(n.attribute(), (pwr_eBix)bix, object->o->m_cid,
-                 &size, &offset, &tid, &elements, &type, &flags)
-          && elements == 1
-          && (type == pwr_eType_String || type == pwr_eType_Text)) {
+      if (n.hasAttrIndex() &&
+          m_vrep->getAttrInfo(n.attribute(), (pwr_eBix)bix, object->o->m_cid, &size, &offset, &tid, &elements,
+                              &type, &flags) &&
+          elements == 1 && (type == pwr_eType_String || type == pwr_eType_Text))
+      {
         // Index in string attribute marks a new row
         int index = n.attrIndex();
         if (index > 0)
           string_continue = true;
         offset += index;
         size = size - index;
-      } else {
+      }
+      else
+      {
         // Attr exception
         m_vrep->error("Unknown attribute", getFileName(), line_number);
         goto error_continue;
@@ -1268,22 +1388,23 @@ void wb_wblnode::buildAttr(ref_wblnode object, pwr_eBix bix)
     }
 
     second_child = first_child->getNextSibling();
-    if (!second_child) {
+    if (!second_child)
+    {
       // Attr exception
       m_vrep->error("Attribute value required", getFileName(), line_number);
       goto error_continue;
     }
 
-    if (((bix == pwr_eBix_rt || bix == pwr_eBix_sys)
-            && object->o->rbody_size == 0)
-        || (bix == pwr_eBix_dev && object->o->dbody_size == 0)) {
+    if (((bix == pwr_eBix_rt || bix == pwr_eBix_sys) && object->o->rbody_size == 0) ||
+        (bix == pwr_eBix_dev && object->o->dbody_size == 0))
+    {
       m_vrep->error("Attribute body", getFileName(), line_number);
       return;
     }
 
-    if (((bix == pwr_eBix_rt || bix == pwr_eBix_sys)
-            && offset + size > object->o->rbody_size)
-        || (bix == pwr_eBix_rt && offset + size > object->o->rbody_size)) {
+    if (((bix == pwr_eBix_rt || bix == pwr_eBix_sys) && offset + size > object->o->rbody_size) ||
+        (bix == pwr_eBix_rt && offset + size > object->o->rbody_size))
+    {
       m_vrep->error("Mismatch in attribute offset", getFileName(), line_number);
       return;
     }
@@ -1292,57 +1413,65 @@ void wb_wblnode::buildAttr(ref_wblnode object, pwr_eBix bix)
 
     // printf( "Attr %s %s %d %d %s\n", object->name, name, size, offset,
     // value);
-    if (size == sizeof(int_val) && convconst(&int_val, value)) {
-      if (oper == wbl_eToken_Operator_eq) {
+    if (size == sizeof(int_val) && convconst(&int_val, value))
+    {
+      if (oper == wbl_eToken_Operator_eq)
+      {
         if (bix == pwr_eBix_rt || bix == pwr_eBix_sys)
-          memcpy((char*)((unsigned long)object->o->rbody + offset), &int_val,
-              size);
+          memcpy((char*)((unsigned long)object->o->rbody + offset), &int_val, size);
         else if (bix == pwr_eBix_dev)
-          memcpy((char*)((unsigned long)object->o->dbody + offset), &int_val,
-              size);
-      } else if (oper == wbl_eToken_Operator_oreq) {
-        if (bix == pwr_eBix_rt || bix == pwr_eBix_sys) {
+          memcpy((char*)((unsigned long)object->o->dbody + offset), &int_val, size);
+      }
+      else if (oper == wbl_eToken_Operator_oreq)
+      {
+        if (bix == pwr_eBix_rt || bix == pwr_eBix_sys)
+        {
           current_int_val = *(int*)((unsigned long)object->o->rbody + offset);
           int_val |= current_int_val;
-          memcpy((char*)((unsigned long)object->o->rbody + offset), &int_val,
-              size);
-        } else if (bix == pwr_eBix_dev) {
+          memcpy((char*)((unsigned long)object->o->rbody + offset), &int_val, size);
+        }
+        else if (bix == pwr_eBix_dev)
+        {
           current_int_val = *(int*)((unsigned long)object->o->dbody + offset);
           int_val |= current_int_val;
-          memcpy((char*)((unsigned long)object->o->dbody + offset), &int_val,
-              size);
+          memcpy((char*)((unsigned long)object->o->dbody + offset), &int_val, size);
         }
       }
-    } else if (attrStringToValue(type, value, buf, sizeof(buf), size)) {
-      if (bix == pwr_eBix_rt || bix == pwr_eBix_sys) {
-        if (string_continue
-            && !*(char*)((unsigned long)object->o->rbody + offset - 1))
+    }
+    else if (attrStringToValue(type, value, buf, sizeof(buf), size))
+    {
+      if (bix == pwr_eBix_rt || bix == pwr_eBix_sys)
+      {
+        if (string_continue && !*(char*)((unsigned long)object->o->rbody + offset - 1))
           // If previous char is null, this was originally linefeed
           *(char*)((unsigned long)object->o->rbody + offset - 1) = '\n';
         memcpy((char*)((unsigned long)object->o->rbody + offset), buf, size);
-      } else if (bix == pwr_eBix_dev) {
-        if (string_continue
-            && !*(char*)((unsigned long)object->o->dbody + offset - 1))
+      }
+      else if (bix == pwr_eBix_dev)
+      {
+        if (string_continue && !*(char*)((unsigned long)object->o->dbody + offset - 1))
           // If previous char is null, this was originally linefeed
           *(char*)((unsigned long)object->o->dbody + offset - 1) = '\n';
         memcpy((char*)((unsigned long)object->o->dbody + offset), buf, size);
       }
-    } else {
+    }
+    else
+    {
       // Attr conversion exception
       if (!check_conversion_error(name()))
-        m_vrep->error(
-            "Unable to convert string to value", getFileName(), line_number);
+        m_vrep->error("Unable to convert string to value", getFileName(), line_number);
     }
 
   error_continue:;
-
-  } else if (getType() == wbl_eToken_Buffer) {
+  }
+  else if (getType() == wbl_eToken_Buffer)
+  {
     buildBuff(object, bix, 0, 0, 0);
   }
 }
 
-void wb_wblnode::buildBuff(ref_wblnode object, pwr_eBix bix,
-    pwr_tCid buffer_cid, int buffer_offset, int buffer_size)
+void wb_wblnode::buildBuff(ref_wblnode object, pwr_eBix bix, pwr_tCid buffer_cid, int buffer_offset,
+                           int buffer_size)
 {
   ref_wblnode first_child;
   int size, offset, elements;
@@ -1351,28 +1480,34 @@ void wb_wblnode::buildBuff(ref_wblnode object, pwr_eBix bix,
   pwr_tCid cid;
   wb_attrname aname = wb_attrname(name());
 
-  if (buffer_cid != 0) {
+  if (buffer_cid != 0)
+  {
     // Buffer in buffer... Fix
     host_cid = buffer_cid;
-  } else
+  }
+  else
     host_cid = object->o->m_cid;
 
-  if (cdh_CidToVid(host_cid) == m_vrep->vid()) {
+  if (cdh_CidToVid(host_cid) == m_vrep->vid())
+  {
     pwr_tTypeId tid;
     pwr_eType type;
     int flags;
-    sts = m_vrep->getAttrInfo(name(), (pwr_eBix)bix, host_cid, (size_t*)&size,
-        (size_t*)&offset, &tid, &elements, &type, &flags);
+    sts = m_vrep->getAttrInfo(name(), (pwr_eBix)bix, host_cid, (size_t*)&size, (size_t*)&offset, &tid,
+                              &elements, &type, &flags);
     cid = (pwr_tCid)tid;
-  } else {
+  }
+  else
+  {
     wb_cdrep* cdrep = m_vrep->merep()->cdrep(&sts, host_cid);
-    if (EVEN(sts)) {
-      m_vrep->error(
-          "Unknown class of buffer owner", getFileName(), line_number);
+    if (EVEN(sts))
+    {
+      m_vrep->error("Unknown class of buffer owner", getFileName(), line_number);
       return;
     }
     wb_adrep* adrep = cdrep->adrep(&sts, aname.attribute());
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       m_vrep->error("Unknown Buffer", getFileName(), line_number);
       delete cdrep;
       return;
@@ -1385,7 +1520,8 @@ void wb_wblnode::buildBuff(ref_wblnode object, pwr_eBix bix,
     delete cdrep;
     delete adrep;
   }
-  if (aname.hasAttrIndex(0)) {
+  if (aname.hasAttrIndex(0))
+  {
     size = size / elements;
     offset += aname.attrIndex(0) * size;
   }
@@ -1398,8 +1534,8 @@ void wb_wblnode::buildBuff(ref_wblnode object, pwr_eBix bix,
     first_child->buildBuffAttr(object, bix, cid, offset, size);
 }
 
-void wb_wblnode::buildBuffAttr(ref_wblnode object, pwr_eBix bix,
-    pwr_tCid buffer_cid, size_t buffer_offset, size_t buffer_size)
+void wb_wblnode::buildBuffAttr(ref_wblnode object, pwr_eBix bix, pwr_tCid buffer_cid, size_t buffer_offset,
+                               size_t buffer_size)
 {
   ref_wblnode first_child;
   ref_wblnode second_child;
@@ -1416,16 +1552,19 @@ void wb_wblnode::buildBuffAttr(ref_wblnode object, pwr_eBix bix,
   wb_adrep* adrep;
   wb_attrname aname;
 
-  if (getType() == wbl_eToken_Attr) {
+  if (getType() == wbl_eToken_Attr)
+  {
     first_child = getFirstChild();
-    if (!first_child) {
+    if (!first_child)
+    {
       // Attr exception
       m_vrep->error("Attribute syntax", getFileName(), line_number);
       goto error_continue;
     }
 
     oper = first_child->getType();
-    if (!(oper == wbl_eToken_Operator_eq || oper == wbl_eToken_Operator_oreq)) {
+    if (!(oper == wbl_eToken_Operator_eq || oper == wbl_eToken_Operator_oreq))
+    {
       // Attr exception
       m_vrep->error("Attribute value required", getFileName(), line_number);
       goto error_continue;
@@ -1433,7 +1572,8 @@ void wb_wblnode::buildBuffAttr(ref_wblnode object, pwr_eBix bix,
 
     pwr_tStatus sts;
     cdrep = m_vrep->merep()->cdrep(&sts, buffer_cid);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       m_vrep->error("Error in buffer class", getFileName(), line_number);
       goto error_continue;
     }
@@ -1442,7 +1582,8 @@ void wb_wblnode::buildBuffAttr(ref_wblnode object, pwr_eBix bix,
 
     // Backward compability with V4.0 : classid was named class
     // This section can be removed in later versions
-    switch (cdrep->cid()) {
+    switch (cdrep->cid())
+    {
     case pwr_eClass_PlcProgram:
       if (streq(name(), "objdid"))
         adrep = cdrep->adrep(&sts, "oid");
@@ -1495,7 +1636,8 @@ void wb_wblnode::buildBuffAttr(ref_wblnode object, pwr_eBix bix,
       // end of compability section
       adrep = cdrep->adrep(&sts, aname.attribute());
     }
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       m_vrep->error("Unknown buffer attribute", getFileName(), line_number);
       delete cdrep;
       goto error_continue;
@@ -1507,11 +1649,12 @@ void wb_wblnode::buildBuffAttr(ref_wblnode object, pwr_eBix bix,
     elements = adrep->nElement();
     type = adrep->type();
 
-    if (aname.hasAttrIndex()) {
+    if (aname.hasAttrIndex())
+    {
       int index = aname.attrIndex();
-      if (index >= elements) {
-        m_vrep->error(
-            "Max attribute index exceeded", getFileName(), line_number);
+      if (index >= elements)
+      {
+        m_vrep->error("Max attribute index exceeded", getFileName(), line_number);
         goto error_continue;
       }
       offset += index * size / elements;
@@ -1520,23 +1663,23 @@ void wb_wblnode::buildBuffAttr(ref_wblnode object, pwr_eBix bix,
     delete adrep;
 
     second_child = first_child->getNextSibling();
-    if (!second_child) {
+    if (!second_child)
+    {
       // Attr exception
       m_vrep->error("Attribute value required", getFileName(), line_number);
       goto error_continue;
     }
 
-    if (((bix == pwr_eBix_rt || bix == pwr_eBix_sys)
-            && object->o->rbody_size == 0)
-        || (bix == pwr_eBix_dev && object->o->dbody_size == 0)) {
+    if (((bix == pwr_eBix_rt || bix == pwr_eBix_sys) && object->o->rbody_size == 0) ||
+        (bix == pwr_eBix_dev && object->o->dbody_size == 0))
+    {
       m_vrep->error("Attribute body", getFileName(), line_number);
       return;
     }
 
-    if (((bix == pwr_eBix_rt || bix == pwr_eBix_sys)
-            && offset + size / elements > object->o->rbody_size)
-        || (bix == pwr_eBix_rt
-               && offset + size / elements > object->o->rbody_size)) {
+    if (((bix == pwr_eBix_rt || bix == pwr_eBix_sys) && offset + size / elements > object->o->rbody_size) ||
+        (bix == pwr_eBix_rt && offset + size / elements > object->o->rbody_size))
+    {
       m_vrep->error("Mismatch in attribute offset", getFileName(), line_number);
       return;
     }
@@ -1545,64 +1688,71 @@ void wb_wblnode::buildBuffAttr(ref_wblnode object, pwr_eBix bix,
 
     // printf( "Attr %s %s %d %d %s\n", object->name, name, size, offset,
     // value);
-    if (size / elements == sizeof(int_val) && convconst(&int_val, value)) {
-      if (oper == wbl_eToken_Operator_eq) {
+    if (size / elements == sizeof(int_val) && convconst(&int_val, value))
+    {
+      if (oper == wbl_eToken_Operator_eq)
+      {
         if (bix == pwr_eBix_rt || bix == pwr_eBix_sys)
-          memcpy((char*)((unsigned long)object->o->rbody + offset), &int_val,
-              size / elements);
+          memcpy((char*)((unsigned long)object->o->rbody + offset), &int_val, size / elements);
         else if (bix == pwr_eBix_dev)
-          memcpy((char*)((unsigned long)object->o->dbody + offset), &int_val,
-              size / elements);
-      } else if (oper == wbl_eToken_Operator_oreq) {
-        if (bix == pwr_eBix_rt || bix == pwr_eBix_sys) {
+          memcpy((char*)((unsigned long)object->o->dbody + offset), &int_val, size / elements);
+      }
+      else if (oper == wbl_eToken_Operator_oreq)
+      {
+        if (bix == pwr_eBix_rt || bix == pwr_eBix_sys)
+        {
           current_int_val = *(int*)((unsigned long)object->o->rbody + offset);
           int_val |= current_int_val;
-          memcpy((char*)((unsigned long)object->o->rbody + offset), &int_val,
-              size / elements);
-        } else if (bix == pwr_eBix_dev) {
+          memcpy((char*)((unsigned long)object->o->rbody + offset), &int_val, size / elements);
+        }
+        else if (bix == pwr_eBix_dev)
+        {
           current_int_val = *(int*)((unsigned long)object->o->dbody + offset);
           int_val |= current_int_val;
-          memcpy((char*)((unsigned long)object->o->dbody + offset), &int_val,
-              size / elements);
+          memcpy((char*)((unsigned long)object->o->dbody + offset), &int_val, size / elements);
         }
       }
-    } else if (attrStringToValue(type, value, buf, sizeof(buf), size)) {
+    }
+    else if (attrStringToValue(type, value, buf, sizeof(buf), size))
+    {
       if (bix == pwr_eBix_rt || bix == pwr_eBix_sys)
-        memcpy((char*)((unsigned long)object->o->rbody + offset), buf,
-            size / elements);
+        memcpy((char*)((unsigned long)object->o->rbody + offset), buf, size / elements);
       else if (bix == pwr_eBix_dev)
-        memcpy((char*)((unsigned long)object->o->dbody + offset), buf,
-            size / elements);
-    } else {
+        memcpy((char*)((unsigned long)object->o->dbody + offset), buf, size / elements);
+    }
+    else
+    {
       // Attr conversion exception
       if (!check_conversion_error(name()))
-        m_vrep->error(
-            "Unable to convert string to value", getFileName(), line_number);
+        m_vrep->error("Unable to convert string to value", getFileName(), line_number);
     }
   error_continue:;
-  } else if (getType() == wbl_eToken_Buffer) {
+  }
+  else if (getType() == wbl_eToken_Buffer)
+  {
     buildBuff(object, bix, buffer_cid, buffer_offset, buffer_size);
   }
 
   next_sibling = getNextSibling();
   if (next_sibling)
-    next_sibling->buildBuffAttr(
-        object, bix, buffer_cid, buffer_offset, buffer_size);
+    next_sibling->buildBuffAttr(object, bix, buffer_cid, buffer_offset, buffer_size);
 }
 
-void wb_wblnode::link(
-    wb_vrepwbl* vol, ref_wblnode father, ref_wblnode parent_ast)
+void wb_wblnode::link(wb_vrepwbl* vol, ref_wblnode father, ref_wblnode parent_ast)
 {
   ref_wblnode first_child;
   ref_wblnode next_sibling;
 
-  if ((getType() == wbl_eToken_Object) || (getType() == wbl_eToken_Volume)) {
-    if (!father) {
+  if ((getType() == wbl_eToken_Object) || (getType() == wbl_eToken_Volume))
+  {
+    if (!father)
+    {
       // Volume root
       vol->root_object = this;
     }
     o->fth = father;
-    if (o->fth) {
+    if (o->fth)
+    {
       o->bws = o->fth->get_o_lch();
       if (o->bws)
         o->bws->o->fws = this;
@@ -1620,10 +1770,12 @@ void wb_wblnode::link(
     // Link docblock, previous child to parent ast
     if (!parent_ast)
       parent_ast = father;
-    if (parent_ast) {
+    if (parent_ast)
+    {
       ref_wblnode prev = 0;
       ref_wblnode child = parent_ast->getFirstChild();
-      while (child && child != this) {
+      while (child && child != this)
+      {
         prev = child;
         child = child->getNextSibling();
       }
@@ -1631,9 +1783,12 @@ void wb_wblnode::link(
         o->docblock = prev;
     }
     // std::cout << "Linking " << name << '\n';
-  } else if (getType() == wbl_eToken_SObject) {
+  }
+  else if (getType() == wbl_eToken_SObject)
+  {
     ref_wblnode snode = m_vrep->find(name());
-    if (!snode) {
+    if (!snode)
+    {
       // SObject exception
       m_vrep->error("SObject syntax", getFileName(), line_number);
     }
@@ -1645,7 +1800,9 @@ void wb_wblnode::link(
     next_sibling = getNextSibling();
     if (next_sibling)
       next_sibling->link(vol, father);
-  } else {
+  }
+  else
+  {
     first_child = getFirstChild();
     if (first_child)
       first_child->link(vol, father);
@@ -1661,13 +1818,17 @@ void wb_wblnode::registerNode(wb_vrepwbl* vol)
   ref_wblnode first_child = getFirstChild();
   m_vrep = vol;
 
-  if (getType() == wbl_eToken_DocBlock) {
+  if (getType() == wbl_eToken_DocBlock)
+  {
     std::string txt = getText();
-  } else if (getType() == wbl_eToken_Object) {
+  }
+  else if (getType() == wbl_eToken_Object)
+  {
     if (!o)
       o = new wbl_object();
 
-    if (!wb_name::checkObjectName(name())) {
+    if (!wb_name::checkObjectName(name()))
+    {
       m_vrep->error("Bad object name", getFileName(), line_number);
     }
 
@@ -1675,91 +1836,117 @@ void wb_wblnode::registerNode(wb_vrepwbl* vol)
     o->m_ohtime = getFileTime();
 
     // Get class
-    if (first_child) {
+    if (first_child)
+    {
       strcpy(o->cname, first_child->getText());
 
-      if (!classNameToCid(o->cname, &o->m_cid)) {
+      if (!classNameToCid(o->cname, &o->m_cid))
+      {
         o->m_cid = 0;
         // m_vrep->error( "Unknown class", getFileName(), line_number);
       }
 
       // If $ClassDef, register class in classlist
-      if (!isTemplate()) {
-        if (first_child->getType() == wbl_eToken_Name
-            && (streq(o->cname, "$ClassDef")
-                   || streq(o->cname, "pwr_eClass_ClassDef"))) {
+      if (!isTemplate())
+      {
+        if (first_child->getType() == wbl_eToken_Name &&
+            (streq(o->cname, "$ClassDef") || streq(o->cname, "pwr_eClass_ClassDef")))
+        {
           node_type = wbl_eNodeType_ClassDef;
-        } else if (first_child->getType() == wbl_eToken_Name
-            && (streq(o->cname, "$Type")
-                   || streq(o->cname, "pwr_eClass_Type"))) {
+        }
+        else if (first_child->getType() == wbl_eToken_Name &&
+                 (streq(o->cname, "$Type") || streq(o->cname, "pwr_eClass_Type")))
+        {
           node_type = wbl_eNodeType_Type;
-        } else if (first_child->getType() == wbl_eToken_Name
-            && (streq(o->cname, "$TypeDef")
-                   || streq(o->cname, "pwr_eClass_TypeDef"))) {
+        }
+        else if (first_child->getType() == wbl_eToken_Name &&
+                 (streq(o->cname, "$TypeDef") || streq(o->cname, "pwr_eClass_TypeDef")))
+        {
           node_type = wbl_eNodeType_TypeDef;
-        } else if (first_child->getType() == wbl_eToken_Name
-            && (streq(o->cname, "$ObjBodyDef")
-                   || streq(o->cname, "pwr_eClass_ObjBodyDef"))) {
+        }
+        else if (first_child->getType() == wbl_eToken_Name &&
+                 (streq(o->cname, "$ObjBodyDef") || streq(o->cname, "pwr_eClass_ObjBodyDef")))
+        {
           node_type = wbl_eNodeType_ObjBodyDef;
-        } else if (first_child->getType() == wbl_eToken_Name
-            && (streq(o->cname, "$Attribute") || streq(o->cname, "$Input")
-                   || streq(o->cname, "$Output") || streq(o->cname, "$Intern")
-                   || streq(o->cname, "$TargetAttribute")
-                   || streq(o->cname, "$ObjXRef")
-                   || streq(o->cname, "$AttrXRef")
-                   || streq(o->cname, "pwr_eClass_Param"))) {
+        }
+        else if (first_child->getType() == wbl_eToken_Name &&
+                 (streq(o->cname, "$Attribute") || streq(o->cname, "$Input") || streq(o->cname, "$Output") ||
+                  streq(o->cname, "$Intern") || streq(o->cname, "$TargetAttribute") ||
+                  streq(o->cname, "$ObjXRef") || streq(o->cname, "$AttrXRef") ||
+                  streq(o->cname, "pwr_eClass_Param")))
+        {
           node_type = wbl_eNodeType_Attribute;
-        } else if (first_child->getType() == wbl_eToken_Name
-            && (streq(o->cname, "$Buffer"))) {
+        }
+        else if (first_child->getType() == wbl_eToken_Name && (streq(o->cname, "$Buffer")))
+        {
           node_type = wbl_eNodeType_Buffer;
-        } else if (first_child->getType() == wbl_eToken_Name
-            && (streq(o->cname, "$Param"))) {
-          m_vrep->error("Obsolete attribute class, use $Attribute instead",
-              getFileName(), line_number);
+        }
+        else if (first_child->getType() == wbl_eToken_Name && (streq(o->cname, "$Param")))
+        {
+          m_vrep->error("Obsolete attribute class, use $Attribute instead", getFileName(), line_number);
         }
       }
 
       // Get oix
       ref_wblnode second_child = first_child->getNextSibling();
-      if (second_child) {
+      if (second_child)
+      {
         ref_wblnode third_child = second_child->getNextSibling();
 
-        if (second_child->getType() == wbl_eToken_Index) {
-          if (!stringToOix(second_child->getText(), &o->m_oid.oix)
-              || m_vrep->m_ignore_oix) {
+        if (second_child->getType() == wbl_eToken_Index)
+        {
+          if (!stringToOix(second_child->getText(), &o->m_oid.oix) || m_vrep->m_ignore_oix)
+          {
             o->m_oid.oix = m_vrep->nextOix();
           }
-          if (third_child && third_child->getType() == wbl_eToken_Date) {
+          if (third_child && third_child->getType() == wbl_eToken_Date)
+          {
             if (!stringToTime(third_child->getText(), &o->m_ohtime))
               m_vrep->error("Time syntax", getFileName(), line_number);
           }
-        } else if (second_child->getType() == wbl_eToken_Date) {
+        }
+        else if (second_child->getType() == wbl_eToken_Date)
+        {
           if (!stringToTime(second_child->getText(), &o->m_ohtime))
             m_vrep->error("Time syntax", getFileName(), line_number);
-        } else if ((second_child->getType() == wbl_eToken_Object)
-            || (second_child->getType() == wbl_eToken_Body)) {
+        }
+        else if ((second_child->getType() == wbl_eToken_Object) ||
+                 (second_child->getType() == wbl_eToken_Body))
+        {
           o->m_oid.oix = m_vrep->nextOix();
-        } else {
+        }
+        else
+        {
           ; // Syntax exception -- oix
           m_vrep->error("Syntax", getFileName(), line_number);
         }
-      } else {
-        if (isClassDef() || isType() || isTypeDef() || isObjBodyDef()) {
+      }
+      else
+      {
+        if (isClassDef() || isType() || isTypeDef() || isObjBodyDef())
+        {
           // Syntax exception -- no cix or tix
           m_vrep->error("Missing index", getFileName(), line_number);
-        } else {
+        }
+        else
+        {
           if (!isTemplate())
             o->m_oid.oix = m_vrep->nextOix();
         }
       }
-    } else if (isTemplate() && !streq(o->cname, "")) {
+    }
+    else if (isTemplate() && !streq(o->cname, ""))
+    {
       // Created template object
-    } else {
+    }
+    else
+    {
       // Syntax exception -- No class
       m_vrep->error("Missing class", getFileName(), line_number);
     }
 
-    if (isClassDef()) {
+    if (isClassDef())
+    {
       o->c.cid = cdh_cixToCid(m_vrep->vid(), o->m_oid.oix);
       o->c.cix = o->m_oid.oix;
       m_vrep->registerClass(name(), o->c.cid, this);
@@ -1767,14 +1954,20 @@ void wb_wblnode::registerNode(wb_vrepwbl* vol)
       // Find Template object
       ref_wblnode child = first_child;
       ref_wblnode last_child = child;
-      while (child) {
-        if (child->getType() == wbl_eToken_Object) {
-          if (streq(child->getText(), "Template")) {
+      while (child)
+      {
+        if (child->getType() == wbl_eToken_Object)
+        {
+          if (streq(child->getText(), "Template"))
+          {
             ref_wblnode fc = child->getFirstChild();
-            if (fc->getText() == name()) {
+            if (fc->getText() == name())
+            {
               o->c.templ = child;
               o->c.templ->node_type = wbl_eNodeType_Template;
-            } else {
+            }
+            else
+            {
               // Erroneous class from paste
               o->c.templ = child;
               o->c.templ->o = new wbl_object();
@@ -1783,7 +1976,9 @@ void wb_wblnode::registerNode(wb_vrepwbl* vol)
               o->c.templ->node_type = wbl_eNodeType_Template;
               fc->setText((char*)name());
             }
-          } else if (streq(child->getText(), "Code")) {
+          }
+          else if (streq(child->getText(), "Code"))
+          {
             o->c.code = child;
             o->c.code->node_type = wbl_eNodeType_Code;
           }
@@ -1791,7 +1986,8 @@ void wb_wblnode::registerNode(wb_vrepwbl* vol)
         last_child = child;
         child = child->getNextSibling();
       }
-      if (!o->c.templ) {
+      if (!o->c.templ)
+      {
         // Create a template node
 
         wb_wblnode* templ = new wb_wblnode();
@@ -1810,73 +2006,94 @@ void wb_wblnode::registerNode(wb_vrepwbl* vol)
         o->c.templ->o->templ.created = true;
         o->c.templ->node_type = wbl_eNodeType_Template;
       }
-    } else if (isType()) {
+    }
+    else if (isType())
+    {
       o->m_tid = cdh_tixToTid(m_vrep->vid(), 0, o->m_oid.oix);
       m_vrep->registerType(name(), o->m_tid, this);
-    } else if (isTypeDef()) {
+    }
+    else if (isTypeDef())
+    {
       o->m_tid = cdh_tixToTid(m_vrep->vid(), 1, o->m_oid.oix);
       m_vrep->registerType(name(), o->m_tid, this);
-    } else if (isObjBodyDef()) {
+    }
+    else if (isObjBodyDef())
+    {
       o->b.bix = (pwr_eBix)o->m_oid.oix;
-      if (!(o->b.bix == pwr_eBix_rt || o->b.bix == pwr_eBix_sys
-              || o->b.bix == pwr_eBix_dev))
+      if (!(o->b.bix == pwr_eBix_rt || o->b.bix == pwr_eBix_sys || o->b.bix == pwr_eBix_dev))
         m_vrep->error("Bad body index", getFileName(), line_number);
     }
-  } else if (getType() == wbl_eToken_Volume) {
+  }
+  else if (getType() == wbl_eToken_Volume)
+  {
     pwr_tVid vid = 0;
     int sts;
 
     o = new wbl_object();
 
     // Get class
-    if (first_child) {
+    if (first_child)
+    {
       strcpy(o->cname, first_child->getText());
 
-      if (!classNameToCid(o->cname, &o->m_cid)) {
+      if (!classNameToCid(o->cname, &o->m_cid))
+      {
         // Syntax exception -- vid
         m_vrep->error("Unkowon class", getFileName(), line_number);
       }
 
       // Get oid
       ref_wblnode second_child = first_child->getNextSibling();
-      if (second_child) {
-        if (second_child->getType() == wbl_eToken_Index) {
+      if (second_child)
+      {
+        if (second_child->getType() == wbl_eToken_Index)
+        {
           sts = cdh_StringToVolumeId(second_child->getText(), &vid);
-          if (EVEN(sts)) {
+          if (EVEN(sts))
+          {
             // Syntax exception -- vid
             m_vrep->error("Volume id syntax", getFileName(), line_number);
           }
-        } else {
+        }
+        else
+        {
           // Syntax exception -- vid
           m_vrep->error("Volume syntax", getFileName(), line_number);
         }
-      } else {
+      }
+      else
+      {
         // Syntax exception -- no cix
         m_vrep->error("Volume id is missing", getFileName(), line_number);
       }
       node_type = wbl_eNodeType_Volume;
-    } else {
+    }
+    else
+    {
       // Syntax exception -- No class
       m_vrep->error("Volume class is missing", getFileName(), line_number);
     }
     // Register volume
     m_vrep->registerVolume(name(), o->m_cid, vid, this);
 
-    if (o->m_cid == pwr_eClass_ClassVolume
-        || o->m_cid == pwr_eClass_DetachedClassVolume) {
+    if (o->m_cid == pwr_eClass_ClassVolume || o->m_cid == pwr_eClass_DetachedClassVolume)
+    {
       // Build to get next oix
       build(false);
     }
-  } else if (getType() == wbl_eToken_Char) {
+  }
+  else if (getType() == wbl_eToken_Char)
+  {
     // Remove quotes
     char str[10];
     const char* text_p = getText();
     strncpy(str, &text_p[1], sizeof(str));
     str[strlen(str) - 1] = 0;
     setText(str);
-  } else if (getType() == wbl_eToken_String
-      || (getType() == wbl_eToken_Value && text[0] == '\"'
-             && text[size - 1] == '\"')) {
+  }
+  else if (getType() == wbl_eToken_String ||
+           (getType() == wbl_eToken_Value && text[0] == '\"' && text[size - 1] == '\"'))
+  {
     // Remove quotes and replace \" with " and also backslash
     char str[8192];
     const char* s;
@@ -1885,17 +2102,21 @@ void wb_wblnode::registerNode(wb_vrepwbl* vol)
     bool backslash_done = false;
 
     t = str;
-    for (s = getText(); *s; s++) {
-      if (first) {
+    for (s = getText(); *s; s++)
+    {
+      if (first)
+      {
         first = false;
         continue;
       }
       if (*s == '"' && *(s - 1) == '\\')
         t--;
-      if (*s == '\\' && *(s - 1) == '\\' && !backslash_done) {
+      if (*s == '\\' && *(s - 1) == '\\' && !backslash_done)
+      {
         backslash_done = true;
         t--;
-      } else
+      }
+      else
         backslash_done = false;
       *t = *s;
       t++;
@@ -1906,7 +2127,8 @@ void wb_wblnode::registerNode(wb_vrepwbl* vol)
   }
 
   ref_wblnode child = first_child;
-  while (child) {
+  while (child)
+  {
     child->registerNode(vol);
     child = child->getNextSibling();
   }
@@ -1922,9 +2144,9 @@ bool wb_wblnode::exportHead(wb_import& i)
   pwr_tOid lchoid = o_lch ? o_lch->o->m_oid : pwr_cNOid;
   wb_name n = wb_name(name());
 
-  i.importHead(o->m_oid, o->m_cid, fthoid, bwsoid, fwsoid, fchoid, lchoid,
-      name(), n.normName(cdh_mName_object), o->m_flags, o->m_ohtime,
-      o->m_rbtime, o->m_dbtime, o->rbody_size, o->dbody_size);
+  i.importHead(o->m_oid, o->m_cid, fthoid, bwsoid, fwsoid, fchoid, lchoid, name(),
+               n.normName(cdh_mName_object), o->m_flags, o->m_ohtime, o->m_rbtime, o->m_dbtime, o->rbody_size,
+               o->dbody_size);
 
   if (o->fch)
     o->fch->exportHead(i);
@@ -1966,7 +2188,8 @@ bool wb_wblnode::exportDocBlock(wb_import& i)
   char* block;
   int size;
 
-  if (o->docblock && docBlock(&block, &size)) {
+  if (o->docblock && docBlock(&block, &size))
+  {
     i.importDocBlock(o->m_oid, size, block);
     free(block);
   }
@@ -1985,8 +2208,8 @@ bool wb_wblnode::exportTree(wb_treeimport& i, bool isRoot)
   pwr_tOid fthoid = (o->fth && !isRoot) ? o->fth->o->m_oid : pwr_cNOid;
   pwr_tOid bwsoid = (o->bws && !isRoot) ? o->bws->o->m_oid : pwr_cNOid;
 
-  i.importTreeObject(m_vrep->merep(), o->m_oid, o->m_cid, fthoid, bwsoid,
-      name(), o->m_flags, o->rbody_size, o->dbody_size, o->rbody, o->dbody);
+  i.importTreeObject(m_vrep->merep(), o->m_oid, o->m_cid, fthoid, bwsoid, name(), o->m_flags, o->rbody_size,
+                     o->dbody_size, o->rbody, o->dbody);
 
   if (o->fch)
     o->fch->exportTree(i, false);
@@ -2010,20 +2233,23 @@ void wb_wblnode::setFile(wb_wblfile* f)
     next_sibling->setFile(f);
 }
 
-int wb_wblnode::attrStringToValue(int type_id, char* value_str,
-    void* buffer_ptr, size_t buff_size, size_t attr_size)
+int wb_wblnode::attrStringToValue(int type_id, char* value_str, void* buffer_ptr, size_t buff_size,
+                                  size_t attr_size)
 {
   int sts;
 
-  switch (type_id) {
-  case pwr_eType_Boolean: {
+  switch (type_id)
+  {
+  case pwr_eType_Boolean:
+  {
     if (sscanf(value_str, "%d", (pwr_tBoolean*)buffer_ptr) != 1)
       return 0;
     if (*(pwr_tBoolean*)buffer_ptr > 1)
       return 0;
     break;
   }
-  case pwr_eType_Float32: {
+  case pwr_eType_Float32:
+  {
     if (streq(value_str, "FLT_MIN"))
       *(float*)buffer_ptr = FLT_MIN;
     else if (streq(value_str, "FLT_NMIN"))
@@ -2036,7 +2262,8 @@ int wb_wblnode::attrStringToValue(int type_id, char* value_str,
       return 0;
     break;
   }
-  case pwr_eType_Float64: {
+  case pwr_eType_Float64:
+  {
     pwr_tFloat64 d;
     if (sscanf(value_str, "%lf", &d) != 1)
       return 0;
@@ -2044,12 +2271,14 @@ int wb_wblnode::attrStringToValue(int type_id, char* value_str,
 
     break;
   }
-  case pwr_eType_Char: {
+  case pwr_eType_Char:
+  {
     if (sscanf(value_str, "%c", (char*)buffer_ptr) != 1)
       return 0;
     break;
   }
-  case pwr_eType_Int8: {
+  case pwr_eType_Int8:
+  {
     pwr_tInt8 i8;
     pwr_tInt16 i16;
     if (sscanf(value_str, "%hd", &i16) != 1)
@@ -2058,28 +2287,36 @@ int wb_wblnode::attrStringToValue(int type_id, char* value_str,
     memcpy(buffer_ptr, (char*)&i8, sizeof(i8));
     break;
   }
-  case pwr_eType_Int16: {
+  case pwr_eType_Int16:
+  {
     if (sscanf(value_str, "%hd", (short*)buffer_ptr) != 1)
       return 0;
     break;
   }
   case pwr_eType_Int32:
   case pwr_eType_Status:
-  case pwr_eType_NetStatus: {
-    if (streq(value_str, "INT_MIN")) {
+  case pwr_eType_NetStatus:
+  {
+    if (streq(value_str, "INT_MIN"))
+    {
       *(int*)buffer_ptr = INT_MIN;
-    } else if (streq(value_str, "INT_MAX")) {
+    }
+    else if (streq(value_str, "INT_MAX"))
+    {
       *(int*)buffer_ptr = INT_MAX;
-    } else if (sscanf(value_str, "%d", (int*)buffer_ptr) != 1)
+    }
+    else if (sscanf(value_str, "%d", (int*)buffer_ptr) != 1)
       return 0;
     break;
   }
-  case pwr_eType_Int64: {
+  case pwr_eType_Int64:
+  {
     if (sscanf(value_str, pwr_dFormatInt64, (pwr_tInt64*)buffer_ptr) != 1)
       return 0;
     break;
   }
-  case pwr_eType_UInt8: {
+  case pwr_eType_UInt8:
+  {
     pwr_tUInt8 i8;
     pwr_tUInt16 i16;
     if (sscanf(value_str, "%hu", &i16) != 1)
@@ -2088,7 +2325,8 @@ int wb_wblnode::attrStringToValue(int type_id, char* value_str,
     memcpy(buffer_ptr, (char*)&i8, sizeof(i8));
     break;
   }
-  case pwr_eType_UInt16: {
+  case pwr_eType_UInt16:
+  {
     if (sscanf(value_str, "%hu", (unsigned short*)buffer_ptr) != 1)
       return 0;
     break;
@@ -2096,25 +2334,29 @@ int wb_wblnode::attrStringToValue(int type_id, char* value_str,
   case pwr_eType_UInt32:
   case pwr_eType_Mask:
   case pwr_eType_Enum:
-  case pwr_eType_DisableAttr: {
+  case pwr_eType_DisableAttr:
+  {
     if (sscanf(value_str, "%lu", (unsigned long*)buffer_ptr) != 1)
       return 0;
     break;
   }
-  case pwr_eType_UInt64: {
+  case pwr_eType_UInt64:
+  {
     if (sscanf(value_str, pwr_dFormatUInt64, (pwr_tUInt64*)buffer_ptr) != 1)
       return 0;
     break;
   }
   case pwr_eType_Text:
   case pwr_eType_String:
-  case pwr_eType_ProString: {
+  case pwr_eType_ProString:
+  {
     if (strlen(value_str) >= attr_size)
       return 0;
     strncpy((char*)buffer_ptr, value_str, MIN(attr_size, buff_size));
     break;
   }
-  case pwr_eType_Objid: {
+  case pwr_eType_Objid:
+  {
     pwr_tObjid objid;
 
     sts = m_vrep->nameToOid(value_str, &objid);
@@ -2124,7 +2366,8 @@ int wb_wblnode::attrStringToValue(int type_id, char* value_str,
     memcpy(buffer_ptr, &objid, sizeof(objid));
     break;
   }
-  case pwr_eType_ClassId: {
+  case pwr_eType_ClassId:
+  {
     pwr_tClassId classid;
     pwr_tObjid objid;
 
@@ -2136,7 +2379,8 @@ int wb_wblnode::attrStringToValue(int type_id, char* value_str,
     break;
   }
   case pwr_eType_TypeId:
-  case pwr_eType_CastId: {
+  case pwr_eType_CastId:
+  {
     pwr_tTypeId val_typeid;
     pwr_eType type;
     size_t size;
@@ -2145,7 +2389,8 @@ int wb_wblnode::attrStringToValue(int type_id, char* value_str,
     // sts = m_vrep->nameToOid( value_str, &objid);
     if (m_vrep->getTypeInfo(value_str, &val_typeid, &type, &size, &elements))
       memcpy(buffer_ptr, (char*)&val_typeid, sizeof(val_typeid));
-    else {
+    else
+    {
       pwr_tClassId classid;
       pwr_tObjid objid;
 
@@ -2158,7 +2403,8 @@ int wb_wblnode::attrStringToValue(int type_id, char* value_str,
     }
     break;
   }
-  case pwr_eType_ObjectIx: {
+  case pwr_eType_ObjectIx:
+  {
     pwr_tObjectIx objectix;
 
     sts = cdh_StringToObjectIx(value_str, &objectix);
@@ -2167,7 +2413,8 @@ int wb_wblnode::attrStringToValue(int type_id, char* value_str,
     memcpy(buffer_ptr, (char*)&objectix, sizeof(objectix));
     break;
   }
-  case pwr_eType_VolumeId: {
+  case pwr_eType_VolumeId:
+  {
     pwr_tVolumeId volumeid;
 
     sts = cdh_StringToVolumeId(value_str, &volumeid);
@@ -2176,7 +2423,8 @@ int wb_wblnode::attrStringToValue(int type_id, char* value_str,
     memcpy(buffer_ptr, (char*)&volumeid, sizeof(volumeid));
     break;
   }
-  case pwr_eType_RefId: {
+  case pwr_eType_RefId:
+  {
     pwr_tRefId subid;
 
     sts = cdh_StringToSubid(value_str, &subid);
@@ -2185,7 +2433,8 @@ int wb_wblnode::attrStringToValue(int type_id, char* value_str,
     memcpy(buffer_ptr, (char*)&subid, sizeof(subid));
     break;
   }
-  case pwr_eType_AttrRef: {
+  case pwr_eType_AttrRef:
+  {
     pwr_sAttrRef attrref;
 
     sts = m_vrep->nameToAttrRef(value_str, &attrref);
@@ -2193,14 +2442,14 @@ int wb_wblnode::attrStringToValue(int type_id, char* value_str,
       return 0;
 
     if (sts == LDH__NUMAREF)
-      m_vrep->error("Local numeric attribute reference conversion",
-          getFileName(), line_number);
+      m_vrep->error("Local numeric attribute reference conversion", getFileName(), line_number);
 
     memcpy(buffer_ptr, &attrref, sizeof(attrref));
 
     break;
   }
-  case pwr_eType_DataRef: {
+  case pwr_eType_DataRef:
+  {
     pwr_tDataRef dataref;
 
     sts = m_vrep->nameToAttrRef(value_str, &dataref.Aref);
@@ -2212,7 +2461,8 @@ int wb_wblnode::attrStringToValue(int type_id, char* value_str,
 
     break;
   }
-  case pwr_eType_Time: {
+  case pwr_eType_Time:
+  {
     pwr_tTime time;
 
     if (streq(value_str, "ATTIME_MIN"))
@@ -2221,7 +2471,8 @@ int wb_wblnode::attrStringToValue(int type_id, char* value_str,
       memcpy(buffer_ptr, &pwr_cAtMax, sizeof(pwr_tTime));
     else if (streq(value_str, "NotATime"))
       memcpy(buffer_ptr, &pwr_cNotATime, sizeof(pwr_tTime));
-    else {
+    else
+    {
       sts = time_AsciiToA(value_str, &time);
       if (EVEN(sts))
         return 0;
@@ -2229,7 +2480,8 @@ int wb_wblnode::attrStringToValue(int type_id, char* value_str,
     }
     break;
   }
-  case pwr_eType_DeltaTime: {
+  case pwr_eType_DeltaTime:
+  {
     pwr_tDeltaTime deltatime;
 
     if (streq(value_str, "DTTIME_MIN"))
@@ -2238,7 +2490,8 @@ int wb_wblnode::attrStringToValue(int type_id, char* value_str,
       memcpy(buffer_ptr, &pwr_cDtMax, sizeof(pwr_tDeltaTime));
     else if (streq(value_str, "NotADeltaTime"))
       memcpy(buffer_ptr, &pwr_cNotADeltaTime, sizeof(pwr_tDeltaTime));
-    else {
+    else
+    {
       sts = time_AsciiToD(value_str, &deltatime);
       if (EVEN(sts))
         return 0;
@@ -2254,7 +2507,8 @@ int wb_wblnode::attrStringToValue(int type_id, char* value_str,
 
 bool wb_wblnode::docBlock(char** block, int* size) const
 {
-  switch (o->m_cid) {
+  switch (o->m_cid)
+  {
   case pwr_eClass_ClassDef:
   case pwr_eClass_Param:
   case pwr_eClass_Intern:
@@ -2267,7 +2521,8 @@ bool wb_wblnode::docBlock(char** block, int* size) const
   default:
     return false;
   }
-  if (!o->docblock) {
+  if (!o->docblock)
+  {
     // Return nullstring
     *block = (char*)calloc(1, 1);
     *size = 1;
@@ -2289,10 +2544,12 @@ bool wb_wblnode::docBlock(char** block, int* size) const
   s++;
   // Skip leading '!'
   bool skip = true;
-  while (*s) {
+  while (*s)
+  {
     if (t - start_t >= *size - 1)
       break;
-    if (*s == '!') {
+    if (*s == '!')
+    {
       skip = false;
       s++;
       // Skip first space also
@@ -2306,7 +2563,8 @@ bool wb_wblnode::docBlock(char** block, int* size) const
     s++;
   }
   // Skip last line
-  while (*t != '\n') {
+  while (*t != '\n')
+  {
     if (t <= start_t)
       break;
     t--;
@@ -2327,13 +2585,14 @@ static int check_conversion_error(const char* attr)
     return 1;
 
   // PlcConnect and SimConnect are ok in attribute objects
-  nr = dcli_parse((char*)attr, ".", "", (char*)seg,
-      sizeof(seg) / sizeof(seg[0]), sizeof(seg[0]), 0);
+  nr = dcli_parse((char*)attr, ".", "", (char*)seg, sizeof(seg) / sizeof(seg[0]), sizeof(seg[0]), 0);
   if (nr <= 1)
     return 0;
 
-  if (streq(seg[nr - 1], "PlcConnect") || streq(seg[nr - 1], "SimConnect")) {
-    for (int i = nr - 2; i >= 0; i--) {
+  if (streq(seg[nr - 1], "PlcConnect") || streq(seg[nr - 1], "SimConnect"))
+  {
+    for (int i = nr - 2; i >= 0; i--)
+    {
       if (!streq(seg[i], "Super"))
         return 1;
     }

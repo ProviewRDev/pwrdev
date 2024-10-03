@@ -51,6 +51,8 @@
 #include "rt_rtt_global.h"
 #include "rt_rtt_msg.h"
 
+extern volatile sig_atomic_t g_rtt_exit_process;
+
 /************************************************************************
 *
 * Name:	qio_assign(char *s, int *chn)
@@ -61,7 +63,7 @@
 * char		*s		     I	    String
 * int		*chn		 O	    Kanal
 *
-* Description:	Gör en assign av s till kanalnummer chn
+* Description:	Gï¿½r en assign av s till kanalnummer chn
 *************************************************************************/
 int qio_assign(char* s, int* chn)
 {
@@ -160,16 +162,16 @@ int qio_reset(int* chn)
 *
 * TYPE		PARAMETER	IOGF	DESCRIPTION
 * int		chn         I       Kanal
-* char		*buf         O      Läst buffer
-* int		len         I       Antal tecken som får läsas
+* char		*buf         O      Lï¿½st buffer
+* int		len         I       Antal tecken som fï¿½r lï¿½sas
 *
-* Description:	Läser med qiow från chn till buf
+* Description:	Lï¿½ser med qiow frï¿½n chn till buf
 *************************************************************************/
 int qio_readw(int* chn, char* buf, int len)
 {
   int n = 0;
 
-  while (n == 0)
+  while (n == 0 && !g_rtt_exit_process)
     n = read(*chn, buf, len);
   return 1;
 }
@@ -183,10 +185,10 @@ int qio_readw(int* chn, char* buf, int len)
 * TYPE		PARAMETER	IOGF	DESCRIPTION
 * int		chn         I       Kanal
 * int		tmo         I       Timout-tid
-* char		*buf         O      Läst buffer
-* int		len         I       Antal tecken som får läsas
+* char		*buf         O      Lï¿½st buffer
+* int		len         I       Antal tecken som fï¿½r lï¿½sas
 *
-* Description:	Läser med qio från chn till buf med timout-tid tmo (ms)
+* Description:	Lï¿½ser med qio frï¿½n chn till buf med timout-tid tmo (ms)
 *************************************************************************/
 int qio_read(int* chn, int tmo, char* buf, int len)
 {
@@ -210,7 +212,7 @@ int qio_read(int* chn, int tmo, char* buf, int len)
 * char		*buf        I       Buffer
 * int		len         I       Antal tecken som ska skrivas
 *
-* Description:	Skriver med qiow från buf till chn
+* Description:	Skriver med qiow frï¿½n buf till chn
 *************************************************************************/
 int qio_writew(int* chn, char* buf, int len)
 {
@@ -230,10 +232,10 @@ int qio_writew(int* chn, char* buf, int len)
 * TYPE		PARAMETER	IOGF	DESCRIPTION
 * int		chn         I       Kanal
 * int		tmo         I       Timout-tid
-* char		*buf         O      Läst buffer
-* int		len         I       Antal tecken som får läsas
+* char		*buf         O      Lï¿½st buffer
+* int		len         I       Antal tecken som fï¿½r lï¿½sas
 *
-* Description:	Skriver med qio från buf till chn med timout-tid tmo (ms)
+* Description:	Skriver med qio frï¿½n buf till chn med timout-tid tmo (ms)
 *************************************************************************/
 int qio_write(int* chn, int tmo, char* buf, int len)
 {

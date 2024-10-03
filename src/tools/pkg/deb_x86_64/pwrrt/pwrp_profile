@@ -26,11 +26,13 @@ export pwrp_exe=$pwrp_root/$platform/exe
 export pwrp_lib=$pwrp_root/$platform/lib
 export pwrp_obj=$pwrp_root/$platform/obj
 export pwrp_lis=$pwrp_root/$platform/lis
+export pwrp_doc=$pwrp_root/common/doc
 export pwrp_inc=$pwrp_root/common/inc
 export pwrp_cnf=$pwrp_root/common/cnf
 export pwrp_load=$pwrp_root/common/load
 export pwrp_log=$pwrp_root/common/log
 export pwrp_db=$pwrp_root/common/db
+export pwrp_tmp=/tmp
 if [ "$web_dir" != "" ]; then
   export pwrp_web=$web_dir
 else

@@ -41,11 +41,13 @@
 #include <cstdint>
 #include <string>
 
-class AvroEncoder {
+class AvroEncoder
+{
 private:
   void encodeInt64(int64_t input);
   void encodeInt32(int32_t input);
   void writeBytes(const uint8_t* p, int size);
+
 public:
   std::vector<uint8_t> out;
   void clear();
@@ -54,7 +56,7 @@ public:
   void encodeLong(int64_t l);
   void encodeFloat(float f);
   void encodeDouble(double d);
-  void encodeString(const std::string &s);
+  void encodeString(const std::string& s);
   void encodeBytes(const uint8_t* b, size_t len);
   void encodeFixed(const uint8_t* b, size_t len);
   void encodeUnionIndex(size_t e);

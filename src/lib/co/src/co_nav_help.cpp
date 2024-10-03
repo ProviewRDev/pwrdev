@@ -41,7 +41,8 @@
 
 #include <stdlib.h>
 
-extern "C" {
+extern "C"
+{
 #include "co_cdh.h"
 #include "co_dcli.h"
 }
@@ -53,21 +54,18 @@ extern "C" {
 #include "co_string.h"
 
 /*** Local funktions ***************************************************/
-static FILE* navhelp_open_file(
-    NavHelp* navhelp, navh_eHelpFile file_type, const char* file_name);
+static FILE* navhelp_open_file(NavHelp* navhelp, navh_eHelpFile file_type, const char* file_name);
 static pwr_tStatus get_lang_file(char* file, char* found_file);
 
-NavHelp::NavHelp(
-    void* h_parent_ctx, const char* h_base_file, const char* h_project_file)
+NavHelp::NavHelp(void* h_parent_ctx, const char* h_base_file, const char* h_project_file)
     : parent_ctx(h_parent_ctx), noprop(0)
 {
   strncpy(project_file, h_project_file, sizeof(project_file));
   strncpy(base_file, h_base_file, sizeof(base_file));
 }
 
-int NavHelp::help(const char* help_key, const char* help_bookmark,
-    navh_eHelpFile file_type, const char* file_name, void** book_mark,
-    bool strict)
+int NavHelp::help(const char* help_key, const char* help_bookmark, navh_eHelpFile file_type,
+                  const char* file_name, void** book_mark, bool strict)
 {
   FILE* file;
   char line[200];
@@ -112,7 +110,8 @@ int NavHelp::help(const char* help_key, const char* help_bookmark,
   lng_eCoding coding = lng_eCoding_ISO8859_1;
 
   print_all = (help_key == NULL);
-  if (help_key) {
+  if (help_key)
+  {
     str_ToLower(key, help_key);
     str_ToLower(search_bookmark, help_bookmark);
   }
@@ -123,57 +122,80 @@ int NavHelp::help(const char* help_key, const char* help_bookmark,
     return NAV__NOFILE;
 
   if (!print_all)
-    key_nr = dcli_parse(key, " 	", "", (char*)key_part,
-        sizeof(key_part) / sizeof(key_part[0]), sizeof(key_part[0]), 0);
+    key_nr = dcli_parse(key, " 	", "", (char*)key_part, sizeof(key_part) / sizeof(key_part[0]),
+                        sizeof(key_part[0]), 0);
 
   sts = dcli_read_line(line, sizeof(line), file);
-  while (ODD(sts)) {
-    if (str_NoCaseStrncmp(line, "<coding>", 8) == 0) {
+  while (ODD(sts))
+  {
+    if (str_NoCaseStrncmp(line, "<coding>", 8) == 0)
+    {
       char codingstr[40];
 
       str_trim(codingstr, &line[8]);
-      if (str_NoCaseStrcmp(codingstr, "ISO8859-1") == 0) {
+      if (str_NoCaseStrcmp(codingstr, "ISO8859-1") == 0)
+      {
         coding = lng_eCoding_ISO8859_1;
-      } else if (str_NoCaseStrcmp(codingstr, "UTF-8") == 0) {
+      }
+      else if (str_NoCaseStrcmp(codingstr, "UTF-8") == 0)
+      {
         coding = lng_eCoding_UTF_8;
       }
-    } else if (str_NoCaseStrncmp(line, "<include>", 9) == 0) {
+    }
+    else if (str_NoCaseStrncmp(line, "<include>", 9) == 0)
+    {
       str_trim(include_file, &line[9]);
 
-      if (!noprop || strstr(include_file, "$pwr_lang") == 0) {
-        sts = help(help_key, help_bookmark, navh_eHelpFile_Other, include_file,
-            book_mark, strict);
-        if (ODD(sts) && !print_all) {
+      if (!noprop || strstr(include_file, "$pwr_lang") == 0)
+      {
+        sts = help(help_key, help_bookmark, navh_eHelpFile_Other, include_file, book_mark, strict);
+        if (ODD(sts) && !print_all)
+        {
           fclose(file);
           return sts;
         }
       }
 
       hit = 0;
-    } else if (str_NoCaseStrncmp(line, "<chapter>", 9) == 0) {
-      (insert_cb)(parent_ctx, navh_eItemType_Chapter, "", NULL, NULL, NULL,
-          NULL, NULL, navh_eHelpFile_, 0, NULL, coding);
-    } else if (str_NoCaseStrncmp(line, "</chapter>", 10) == 0) {
-      (insert_cb)(parent_ctx, navh_eItemType_EndChapter, "", NULL, NULL, NULL,
-          NULL, NULL, navh_eHelpFile_, 0, NULL, coding);
-    } else if (str_NoCaseStrncmp(line, "<headerlevel>", 13) == 0) {
-      (insert_cb)(parent_ctx, navh_eItemType_HeaderLevel, "", NULL, NULL, NULL,
-          NULL, NULL, navh_eHelpFile_, 0, NULL, coding);
-    } else if (str_NoCaseStrncmp(line, "</headerlevel>", 14) == 0) {
-      (insert_cb)(parent_ctx, navh_eItemType_EndHeaderLevel, "", NULL, NULL,
-          NULL, NULL, NULL, navh_eHelpFile_, 0, NULL, coding);
-    } else if (str_NoCaseStrncmp(line, "<pagebreak>", 11) == 0) {
-      (insert_cb)(parent_ctx, navh_eItemType_PageBreak, "", NULL, NULL, NULL,
-          NULL, NULL, navh_eHelpFile_, 0, NULL, coding);
-    } else if (str_NoCaseStrncmp(line, "<option>", 8) == 0) {
+    }
+    else if (str_NoCaseStrncmp(line, "<chapter>", 9) == 0)
+    {
+      (insert_cb)(parent_ctx, navh_eItemType_Chapter, "", NULL, NULL, NULL, NULL, NULL, navh_eHelpFile_, 0,
+                  NULL, coding);
+    }
+    else if (str_NoCaseStrncmp(line, "</chapter>", 10) == 0)
+    {
+      (insert_cb)(parent_ctx, navh_eItemType_EndChapter, "", NULL, NULL, NULL, NULL, NULL, navh_eHelpFile_, 0,
+                  NULL, coding);
+    }
+    else if (str_NoCaseStrncmp(line, "<headerlevel>", 13) == 0)
+    {
+      (insert_cb)(parent_ctx, navh_eItemType_HeaderLevel, "", NULL, NULL, NULL, NULL, NULL, navh_eHelpFile_,
+                  0, NULL, coding);
+    }
+    else if (str_NoCaseStrncmp(line, "</headerlevel>", 14) == 0)
+    {
+      (insert_cb)(parent_ctx, navh_eItemType_EndHeaderLevel, "", NULL, NULL, NULL, NULL, NULL,
+                  navh_eHelpFile_, 0, NULL, coding);
+    }
+    else if (str_NoCaseStrncmp(line, "<pagebreak>", 11) == 0)
+    {
+      (insert_cb)(parent_ctx, navh_eItemType_PageBreak, "", NULL, NULL, NULL, NULL, NULL, navh_eHelpFile_, 0,
+                  NULL, coding);
+    }
+    else if (str_NoCaseStrncmp(line, "<option>", 8) == 0)
+    {
       char option[80];
 
       str_trim(option, &line[8]);
       str_ToLower(option, option);
-      (insert_cb)(parent_ctx, navh_eItemType_Option, option, NULL, NULL, NULL,
-          NULL, NULL, navh_eHelpFile_, 0, NULL, coding);
-    } else if (str_NoCaseStrncmp(line, "<topic>", 7) == 0) {
-      if ((s = strstr(line, "<style>")) || (s = strstr(line, "<STYLE>"))) {
+      (insert_cb)(parent_ctx, navh_eItemType_Option, option, NULL, NULL, NULL, NULL, NULL, navh_eHelpFile_, 0,
+                  NULL, coding);
+    }
+    else if (str_NoCaseStrncmp(line, "<topic>", 7) == 0)
+    {
+      if ((s = strstr(line, "<style>")) || (s = strstr(line, "<STYLE>")))
+      {
         style = 1;
         str_trim(style_str, s + 7);
         *s = 0;
@@ -182,161 +204,190 @@ int NavHelp::help(const char* help_key, const char* help_bookmark,
       str_trim(subject, &line[7]);
       str_ToLower(subject, subject);
       subject_nr = dcli_parse(subject, " 	", "", (char*)subject_part,
-          sizeof(subject_part) / sizeof(subject_part[0]),
-          sizeof(subject_part[0]), 0);
+                              sizeof(subject_part) / sizeof(subject_part[0]), sizeof(subject_part[0]), 0);
       hit = 0;
-      if (!print_all) {
-        if (key_nr == subject_nr) {
-          for (i = 0; i < key_nr; i++) {
-            if ((!strict && str_StartsWith(subject_part[i], key_part[i]))
-                || (strict && streq(subject_part[i], key_part[i]))) {
+      if (!print_all)
+      {
+        if (key_nr == subject_nr)
+        {
+          for (i = 0; i < key_nr; i++)
+          {
+            if ((!strict && str_StartsWith(subject_part[i], key_part[i])) ||
+                (strict && streq(subject_part[i], key_part[i])))
+            {
               if (i == key_nr - 1)
                 hit = 1;
-            } else
+            }
+            else
               break;
           }
         }
-      } else {
+      }
+      else
+      {
         if (str_NoCaseStrcmp(subject_part[0], "__documenttitlepage") == 0)
-          (insert_cb)(parent_ctx, navh_eItemType_DocTitlePage, subject, NULL,
-              NULL, NULL, NULL, NULL, navh_eHelpFile_, 0, NULL, coding);
+          (insert_cb)(parent_ctx, navh_eItemType_DocTitlePage, subject, NULL, NULL, NULL, NULL, NULL,
+                      navh_eHelpFile_, 0, NULL, coding);
         else if (str_NoCaseStrcmp(subject_part[0], "__documentinfopage") == 0)
-          (insert_cb)(parent_ctx, navh_eItemType_DocInfoPage, subject, NULL,
-              NULL, NULL, NULL, NULL, navh_eHelpFile_, 0, NULL, coding);
+          (insert_cb)(parent_ctx, navh_eItemType_DocInfoPage, subject, NULL, NULL, NULL, NULL, NULL,
+                      navh_eHelpFile_, 0, NULL, coding);
         else
-          (insert_cb)(parent_ctx, navh_eItemType_Topic, subject, NULL, NULL,
-              NULL, NULL, NULL, navh_eHelpFile_, 0, NULL, coding);
+          (insert_cb)(parent_ctx, navh_eItemType_Topic, subject, NULL, NULL, NULL, NULL, NULL,
+                      navh_eHelpFile_, 0, NULL, coding);
         if (style)
-          node = (insert_cb)(parent_ctx, navh_eItemType_Style, style_str, NULL,
-              NULL, NULL, NULL, NULL, navh_eHelpFile_, 0, NULL, coding);
+          node = (insert_cb)(parent_ctx, navh_eItemType_Style, style_str, NULL, NULL, NULL, NULL, NULL,
+                             navh_eHelpFile_, 0, NULL, coding);
         hit = 1;
       }
     }
-    if (hit) {
+    if (hit)
+    {
       sts = dcli_read_line(line, sizeof(line), file);
-      (insert_cb)(parent_ctx, navh_eItemType_HelpHeader, line, NULL, NULL, NULL,
-          NULL, NULL, navh_eHelpFile_, 0, NULL, coding);
+      (insert_cb)(parent_ctx, navh_eItemType_HelpHeader, line, NULL, NULL, NULL, NULL, NULL, navh_eHelpFile_,
+                  0, NULL, coding);
       sts = dcli_read_line(line, sizeof(line), file);
-      while (ODD(sts)) {
+      while (ODD(sts))
+      {
         bookmark_p = 0;
 
-        if (str_StartsWith(line, "</topic>") || str_StartsWith(line, "</TOPIC>")) {
+        if (str_StartsWith(line, "</topic>") || str_StartsWith(line, "</TOPIC>"))
+        {
           if (print_all)
-            (insert_cb)(parent_ctx, navh_eItemType_EndTopic, subject, NULL,
-                NULL, NULL, NULL, NULL, navh_eHelpFile_, 0, NULL, coding);
+            (insert_cb)(parent_ctx, navh_eItemType_EndTopic, subject, NULL, NULL, NULL, NULL, NULL,
+                        navh_eHelpFile_, 0, NULL, coding);
           break;
         }
 
         // Ignore all other tags
-        if ((s = strstr(line, "<ib>")) || (s = strstr(line, "<IB>"))) {
+        if ((s = strstr(line, "<ib>")) || (s = strstr(line, "<IB>")))
+        {
           strcpy(text1, s + 4);
-          (insert_cb)(parent_ctx, navh_eItemType_HelpBold, text1, "", "", "",
-              "", NULL, file_type, 0, NULL, coding);
+          (insert_cb)(parent_ctx, navh_eItemType_HelpBold, text1, "", "", "", "", NULL, file_type, 0, NULL,
+                      coding);
           sts = dcli_read_line(line, sizeof(line), file);
           continue;
         }
-        if ((s = strstr(line, "<i>")) || (s = strstr(line, "<I>"))) {
+        if ((s = strstr(line, "<i>")) || (s = strstr(line, "<I>")))
+        {
           strcpy(text1, s + 3);
-          (insert_cb)(parent_ctx, navh_eItemType_Help, text1, "", "", "", "",
-              NULL, file_type, 0, bookmark_p, coding);
+          (insert_cb)(parent_ctx, navh_eItemType_Help, text1, "", "", "", "", NULL, file_type, 0, bookmark_p,
+                      coding);
           sts = dcli_read_line(line, sizeof(line), file);
           continue;
         }
-        if (str_NoCaseStrncmp(line, "<option>", 8) == 0) {
+        if (str_NoCaseStrncmp(line, "<option>", 8) == 0)
+        {
           char option[80];
 
           str_trim(option, &line[8]);
           str_ToLower(option, option);
-          (insert_cb)(parent_ctx, navh_eItemType_Option, option, NULL, NULL,
-              NULL, NULL, NULL, navh_eHelpFile_, 0, NULL, coding);
+          (insert_cb)(parent_ctx, navh_eItemType_Option, option, NULL, NULL, NULL, NULL, NULL,
+                      navh_eHelpFile_, 0, NULL, coding);
           sts = dcli_read_line(line, sizeof(line), file);
           continue;
         }
 
-        if ((s = strstr(line, "<link>")) || (s = strstr(line, "<LINK>"))) {
+        if ((s = strstr(line, "<link>")) || (s = strstr(line, "<LINK>")))
+        {
           str_trim(link, s + 6);
           *s = 0;
 
-          link_nr = dcli_parse(link, ",", "", (char*)link_part,
-              sizeof(link_part) / sizeof(link_part[0]), sizeof(link_part[0]),
-              0);
-          if (link_nr == 1) {
+          link_nr = dcli_parse(link, ",", "", (char*)link_part, sizeof(link_part) / sizeof(link_part[0]),
+                               sizeof(link_part[0]), 0);
+          if (link_nr == 1)
+          {
             str_trim(link, link_part[0]);
             strcpy(link_bookmark, "");
             link_filename_p = (char*)file_name;
-          } else if (link_nr == 2) {
+          }
+          else if (link_nr == 2)
+          {
             str_trim(link, link_part[0]);
             str_trim(link_bookmark, link_part[1]);
             link_filename_p = (char*)file_name;
-          } else if (link_nr > 2) {
+          }
+          else if (link_nr > 2)
+          {
             str_trim(link, link_part[0]);
             str_trim(link_bookmark, link_part[1]);
             str_trim(link_filename, link_part[2]);
             link_filename_p = link_filename;
           }
-        } else if ((s = strstr(line, "<weblink>"))
-            || (s = strstr(line, "<WEBLINK>"))) {
+        }
+        else if ((s = strstr(line, "<weblink>")) || (s = strstr(line, "<WEBLINK>")))
+        {
           str_trim(link, s + 9);
           *s = 0;
 
-          link_nr = dcli_parse(link, ",", "", (char*)link_part,
-              sizeof(link_part) / sizeof(link_part[0]), sizeof(link_part[0]),
-              0);
-          if (link_nr == 1) {
+          link_nr = dcli_parse(link, ",", "", (char*)link_part, sizeof(link_part) / sizeof(link_part[0]),
+                               sizeof(link_part[0]), 0);
+          if (link_nr == 1)
+          {
             strcpy(link, "$web:");
             str_trim(&link[5], link_part[0]);
             strcpy(link_bookmark, "");
             link_filename_p = (char*)file_name;
-          } else if (link_nr == 2) {
+          }
+          else if (link_nr == 2)
+          {
             strcpy(link, "$web:");
             str_trim(&link[5], link_part[0]);
             str_trim(link_bookmark, link_part[1]);
             link_filename_p = (char*)file_name;
-          } else if (link_nr > 2) {
+          }
+          else if (link_nr > 2)
+          {
             strcpy(link, "$web:");
             str_trim(&link[5], link_part[0]);
             str_trim(link_bookmark, link_part[1]);
             str_trim(link_filename, link_part[2]);
             link_filename_p = link_filename;
           }
-        } else if ((s = strstr(line, "<classlink>"))
-            || (s = strstr(line, "<CLASSLINK>"))) {
+        }
+        else if ((s = strstr(line, "<classlink>")) || (s = strstr(line, "<CLASSLINK>")))
+        {
           str_trim(link, s + 11);
           *s = 0;
 
-          link_nr = dcli_parse(link, ",", "", (char*)link_part,
-              sizeof(link_part) / sizeof(link_part[0]), sizeof(link_part[0]),
-              0);
-          if (link_nr == 1) {
+          link_nr = dcli_parse(link, ",", "", (char*)link_part, sizeof(link_part) / sizeof(link_part[0]),
+                               sizeof(link_part[0]), 0);
+          if (link_nr == 1)
+          {
             strcpy(link, "$class:");
             str_trim(&link[7], link_part[0]);
             strcpy(link_bookmark, "");
             link_filename_p = (char*)file_name;
-          } else if (link_nr == 2) {
+          }
+          else if (link_nr == 2)
+          {
             strcpy(link, "$class:");
             str_trim(&link[7], link_part[0]);
             str_trim(link_bookmark, link_part[1]);
             link_filename_p = (char*)file_name;
-          } else if (link_nr > 2) {
+          }
+          else if (link_nr > 2)
+          {
             strcpy(link, "$class:");
             str_trim(&link[7], link_part[0]);
             str_trim(link_bookmark, link_part[1]);
             str_trim(link_filename, link_part[2]);
             link_filename_p = link_filename;
           }
-        } else {
+        }
+        else
+        {
           strcpy(link, "");
           strcpy(link_bookmark, "");
           link_filename_p = link_filename;
         }
 
-        if ((s = strstr(line, "<bookmark>"))
-            || (s = strstr(line, "<BOOKMARK>"))) {
+        if ((s = strstr(line, "<bookmark>")) || (s = strstr(line, "<BOOKMARK>")))
+        {
           str_trim(bookmark, s + 10);
           *s = 0;
           str_ToLower(bookmark, bookmark);
-          if (!bookmark_found && !print_all
-              && streq(search_bookmark, bookmark)) {
+          if (!bookmark_found && !print_all && streq(search_bookmark, bookmark))
+          {
             bookmark_found = 1;
             register_bookmark = 1;
           }
@@ -344,10 +395,12 @@ int NavHelp::help(const char* help_key, const char* help_bookmark,
             bookmark_p = bookmark;
         }
 
-        if ((s = strstr(line, "<index>")) || (s = strstr(line, "<INDEX>"))) {
+        if ((s = strstr(line, "<index>")) || (s = strstr(line, "<INDEX>")))
+        {
           index_link = 1;
           *s = 0;
-        } else
+        }
+        else
           index_link = 0;
 
         image = 0;
@@ -357,89 +410,119 @@ int NavHelp::help(const char* help_key, const char* help_bookmark,
         code = 0;
         horizontal_line = 0;
         style = 0;
-        if ((s = strstr(line, "<h1>")) || (s = strstr(line, "<H1>"))) {
+        if ((s = strstr(line, "<h1>")) || (s = strstr(line, "<H1>")))
+        {
           header1 = 1;
           strcpy(text1, s + 4);
-        } else if ((s = strstr(line, "<h2>")) || (s = strstr(line, "<H2>"))) {
+        }
+        else if ((s = strstr(line, "<h2>")) || (s = strstr(line, "<H2>")))
+        {
           header2 = 1;
           strcpy(text1, s + 4);
-        } else if ((s = strstr(line, "<b>")) || (s = strstr(line, "<B>"))) {
+        }
+        else if ((s = strstr(line, "<b>")) || (s = strstr(line, "<B>")))
+        {
           bold = 1;
           strcpy(text1, s + 3);
-        } else if ((s = strstr(line, "<c>")) || (s = strstr(line, "<C>"))) {
+        }
+        else if ((s = strstr(line, "<c>")) || (s = strstr(line, "<C>")))
+        {
           code = 1;
           strcpy(text1, s + 3);
-        } else if ((s = strstr(line, "<hr>")) || (s = strstr(line, "<HR>"))) {
+        }
+        else if ((s = strstr(line, "<hr>")) || (s = strstr(line, "<HR>")))
+        {
           horizontal_line = 1;
-        } else if ((s = strstr(line, "<image>"))
-            || (s = strstr(line, "<IMAGE>"))) {
+        }
+        else if ((s = strstr(line, "<image>")) || (s = strstr(line, "<IMAGE>")))
+        {
           str_trim(imagefile, s + 7);
           image = 1;
         }
 
-        else {
+        else
+        {
           strcpy(text1, line);
         }
 
-        if ((s = strstr(text1, "<t>")) || (s = strstr(text1, "<T>"))) {
+        if ((s = strstr(text1, "<t>")) || (s = strstr(text1, "<T>")))
+        {
           strcpy(text2, s + 3);
           *s = 0;
-          if ((s = strstr(text2, "<t>")) || (s = strstr(text2, "<T>"))) {
+          if ((s = strstr(text2, "<t>")) || (s = strstr(text2, "<T>")))
+          {
             strcpy(text3, s + 3);
             *s = 0;
-          } else
+          }
+          else
             strcpy(text3, "");
-        } else {
+        }
+        else
+        {
           strcpy(text2, "");
           strcpy(text3, "");
         }
-        if (header1) {
-          node = (insert_cb)(parent_ctx, navh_eItemType_HeaderLarge, text1,
-              NULL, NULL, NULL, NULL, NULL, navh_eHelpFile_, 0, bookmark_p,
-              coding);
-          if (register_bookmark) {
+        if (header1)
+        {
+          node = (insert_cb)(parent_ctx, navh_eItemType_HeaderLarge, text1, NULL, NULL, NULL, NULL, NULL,
+                             navh_eHelpFile_, 0, bookmark_p, coding);
+          if (register_bookmark)
+          {
             bookmark_node = node;
             register_bookmark = 0;
           }
-        } else if (header2) {
-          node = (insert_cb)(parent_ctx, navh_eItemType_Header, text1, NULL,
-              NULL, NULL, NULL, NULL, navh_eHelpFile_, 0, bookmark_p, coding);
-          if (register_bookmark) {
+        }
+        else if (header2)
+        {
+          node = (insert_cb)(parent_ctx, navh_eItemType_Header, text1, NULL, NULL, NULL, NULL, NULL,
+                             navh_eHelpFile_, 0, bookmark_p, coding);
+          if (register_bookmark)
+          {
             bookmark_node = node;
             register_bookmark = 0;
           }
-        } else if (bold) {
-          node = (insert_cb)(parent_ctx, navh_eItemType_HelpBold, text1, text2,
-              text3, link, link_bookmark, link_filename_p, file_type,
-              index_link, bookmark_p, coding);
-          if (register_bookmark) {
+        }
+        else if (bold)
+        {
+          node = (insert_cb)(parent_ctx, navh_eItemType_HelpBold, text1, text2, text3, link, link_bookmark,
+                             link_filename_p, file_type, index_link, bookmark_p, coding);
+          if (register_bookmark)
+          {
             bookmark_node = node;
             register_bookmark = 0;
           }
-        } else if (code) {
-          node = (insert_cb)(parent_ctx, navh_eItemType_HelpCode, text1, text2,
-              text3, link, link_bookmark, link_filename_p, file_type,
-              index_link, bookmark_p, coding);
-          if (register_bookmark) {
+        }
+        else if (code)
+        {
+          node = (insert_cb)(parent_ctx, navh_eItemType_HelpCode, text1, text2, text3, link, link_bookmark,
+                             link_filename_p, file_type, index_link, bookmark_p, coding);
+          if (register_bookmark)
+          {
             bookmark_node = node;
             register_bookmark = 0;
           }
-        } else if (horizontal_line) {
-          node = (insert_cb)(parent_ctx, navh_eItemType_HorizontalLine, NULL,
-              NULL, NULL, NULL, NULL, NULL, navh_eHelpFile_, 0, NULL, coding);
-        } else if (image) {
-          node = (insert_cb)(parent_ctx, navh_eItemType_Image, imagefile, NULL,
-              NULL, link, link_bookmark, link_filename_p, file_type, index_link,
-              bookmark_p, coding);
-          if (register_bookmark) {
+        }
+        else if (horizontal_line)
+        {
+          node = (insert_cb)(parent_ctx, navh_eItemType_HorizontalLine, NULL, NULL, NULL, NULL, NULL, NULL,
+                             navh_eHelpFile_, 0, NULL, coding);
+        }
+        else if (image)
+        {
+          node = (insert_cb)(parent_ctx, navh_eItemType_Image, imagefile, NULL, NULL, link, link_bookmark,
+                             link_filename_p, file_type, index_link, bookmark_p, coding);
+          if (register_bookmark)
+          {
             bookmark_node = node;
             register_bookmark = 0;
           }
-        } else {
-          node = (insert_cb)(parent_ctx, navh_eItemType_Help, text1, text2,
-              text3, link, link_bookmark, link_filename_p, file_type,
-              index_link, bookmark_p, coding);
-          if (register_bookmark) {
+        }
+        else
+        {
+          node = (insert_cb)(parent_ctx, navh_eItemType_Help, text1, text2, text3, link, link_bookmark,
+                             link_filename_p, file_type, index_link, bookmark_p, coding);
+          if (register_bookmark)
+          {
             bookmark_node = node;
             register_bookmark = 0;
           }
@@ -465,8 +548,8 @@ int NavHelp::help(const char* help_key, const char* help_bookmark,
   return NAV__SUCCESS;
 }
 
-int NavHelp::get_next_key(const char* help_key, navh_eHelpFile file_type,
-    const char* file_name, bool strict, char* next_key)
+int NavHelp::get_next_key(const char* help_key, navh_eHelpFile file_type, const char* file_name, bool strict,
+                          char* next_key)
 {
   FILE* file;
   char line[200];
@@ -483,7 +566,8 @@ int NavHelp::get_next_key(const char* help_key, navh_eHelpFile file_type,
   int i;
   char* s;
 
-  if (help_key) {
+  if (help_key)
+  {
     str_ToLower(key, help_key);
   }
 
@@ -492,52 +576,62 @@ int NavHelp::get_next_key(const char* help_key, navh_eHelpFile file_type,
   if (!file)
     return NAV__NOFILE;
 
-  key_nr = dcli_parse(key, " 	", "", (char*)key_part,
-      sizeof(key_part) / sizeof(key_part[0]), sizeof(key_part[0]), 0);
+  key_nr = dcli_parse(key, " 	", "", (char*)key_part, sizeof(key_part) / sizeof(key_part[0]),
+                      sizeof(key_part[0]), 0);
 
   sts = dcli_read_line(line, sizeof(line), file);
-  while (ODD(sts)) {
-    if (str_NoCaseStrncmp(line, "<include>", 9) == 0) {
+  while (ODD(sts))
+  {
+    if (str_NoCaseStrncmp(line, "<include>", 9) == 0)
+    {
       str_trim(include_file, &line[9]);
       // Replace symbol for language
-      if (str_StartsWith(include_file, "$pwr_lang/")) {
+      if (str_StartsWith(include_file, "$pwr_lang/"))
+      {
         sts = get_lang_file(include_file, include_file);
         if (EVEN(sts))
           continue;
       }
 
-      if (!noprop) {
-        sts = get_next_key(
-            help_key, navh_eHelpFile_Other, include_file, strict, next_key);
-        if (ODD(sts)) {
+      if (!noprop)
+      {
+        sts = get_next_key(help_key, navh_eHelpFile_Other, include_file, strict, next_key);
+        if (ODD(sts))
+        {
           fclose(file);
           return sts;
         }
       }
       hit = 0;
     }
-    if (str_NoCaseStrncmp(line, "<topic>", 7) == 0) {
-      if ((s = strstr(line, "<style>")) || (s = strstr(line, "<STYLE>"))) {
+    if (str_NoCaseStrncmp(line, "<topic>", 7) == 0)
+    {
+      if ((s = strstr(line, "<style>")) || (s = strstr(line, "<STYLE>")))
+      {
         *s = 0;
       }
 
       str_trim(subject, &line[7]);
-      if (hit) {
+      if (hit)
+      {
         strcpy(next_key, subject);
         next_hit = 1;
         break;
       }
       str_ToLower(subject, subject);
       subject_nr = dcli_parse(subject, " 	", "", (char*)subject_part,
-          sizeof(subject_part) / sizeof(subject_part[0]),
-          sizeof(subject_part[0]), 0);
-      if (key_nr == subject_nr) {
-        for (i = 0; i < key_nr; i++) {
-          if ((!strict && str_StartsWith(subject_part[i], key_part[i]))
-              || (strict && streq(subject_part[i], key_part[i]))) {
+                              sizeof(subject_part) / sizeof(subject_part[0]), sizeof(subject_part[0]), 0);
+      if (key_nr == subject_nr)
+      {
+        for (i = 0; i < key_nr; i++)
+        {
+          if ((!strict && str_StartsWith(subject_part[i], key_part[i])) ||
+              (strict && streq(subject_part[i], key_part[i])))
+          {
             if (i == key_nr - 1)
               hit = 1;
-          } else
+          }
+          else
             break;
         }
       }
@@ -551,8 +645,8 @@ int NavHelp::get_next_key(const char* help_key, navh_eHelpFile file_type,
   return NAV__SUCCESS;
 }
 
-int NavHelp::get_previous_key(const char* help_key, navh_eHelpFile file_type,
-    const char* file_name, bool strict, char* prev_key)
+int NavHelp::get_previous_key(const char* help_key, navh_eHelpFile file_type, const char* file_name,
+                              bool strict, char* prev_key)
 {
   FILE* file;
   char line[200];
@@ -569,7 +663,8 @@ int NavHelp::get_previous_key(const char* help_key, navh_eHelpFile file_type,
   char* s;
   char prev[80] = "";
 
-  if (help_key) {
+  if (help_key)
+  {
     str_ToLower(key, help_key);
   }
 
@@ -578,49 +673,59 @@ int NavHelp::get_previous_key(const char* help_key, navh_eHelpFile file_type,
   if (!file)
     return NAV__NOFILE;
 
-  key_nr = dcli_parse(key, " 	", "", (char*)key_part,
-      sizeof(key_part) / sizeof(key_part[0]), sizeof(key_part[0]), 0);
+  key_nr = dcli_parse(key, " 	", "", (char*)key_part, sizeof(key_part) / sizeof(key_part[0]),
+                      sizeof(key_part[0]), 0);
 
   sts = dcli_read_line(line, sizeof(line), file);
-  while (ODD(sts)) {
-    if (str_NoCaseStrncmp(line, "<include>", 9) == 0) {
+  while (ODD(sts))
+  {
+    if (str_NoCaseStrncmp(line, "<include>", 9) == 0)
+    {
       str_trim(include_file, &line[9]);
       // Replace symbol for language
-      if (str_StartsWith(include_file, "$pwr_lang/")) {
+      if (str_StartsWith(include_file, "$pwr_lang/"))
+      {
         sts = get_lang_file(include_file, include_file);
         if (EVEN(sts))
           continue;
       }
 
-      if (!noprop) {
-        sts = get_previous_key(
-            help_key, navh_eHelpFile_Other, include_file, strict, prev_key);
-        if (ODD(sts)) {
+      if (!noprop)
+      {
+        sts = get_previous_key(help_key, navh_eHelpFile_Other, include_file, strict, prev_key);
+        if (ODD(sts))
+        {
           fclose(file);
           return sts;
         }
       }
       hit = 0;
     }
-    if (str_NoCaseStrncmp(line, "<topic>", 7) == 0) {
-      if ((s = strstr(line, "<style>")) || (s = strstr(line, "<STYLE>"))) {
+    if (str_NoCaseStrncmp(line, "<topic>", 7) == 0)
+    {
+      if ((s = strstr(line, "<style>")) || (s = strstr(line, "<STYLE>")))
+      {
         *s = 0;
       }
 
       str_trim(subject, &line[7]);
       str_ToLower(subject, subject);
       subject_nr = dcli_parse(subject, " 	", "", (char*)subject_part,
-          sizeof(subject_part) / sizeof(subject_part[0]),
-          sizeof(subject_part[0]), 0);
-      if (key_nr == subject_nr) {
-        for (i = 0; i < key_nr; i++) {
-          if ((!strict && str_StartsWith(subject_part[i], key_part[i]))
-              || (strict && streq(subject_part[i], key_part[i]))) {
-            if (i == key_nr - 1) {
+                              sizeof(subject_part) / sizeof(subject_part[0]), sizeof(subject_part[0]), 0);
+      if (key_nr == subject_nr)
+      {
+        for (i = 0; i < key_nr; i++)
+        {
+          if ((!strict && str_StartsWith(subject_part[i], key_part[i])) ||
+              (strict && streq(subject_part[i], key_part[i])))
+          {
+            if (i == key_nr - 1)
+            {
               hit = 1;
               strcpy(prev_key, prev);
             }
-          } else
+          }
+          else
             break;
         }
       }
@@ -654,26 +759,35 @@ int NavHelp::help_index(navh_eHelpFile file_type, const char* file_name)
     return NAV__NOFILE;
 
   sts = dcli_read_line(line, sizeof(line), file);
-  while (ODD(sts)) {
-    if (str_NoCaseStrncmp(line, "<coding>", 8) == 0) {
+  while (ODD(sts))
+  {
+    if (str_NoCaseStrncmp(line, "<coding>", 8) == 0)
+    {
       char codingstr[40];
 
       str_trim(codingstr, &line[8]);
-      if (str_NoCaseStrcmp(codingstr, "ISO8859-1") == 0) {
+      if (str_NoCaseStrcmp(codingstr, "ISO8859-1") == 0)
+      {
         coding = lng_eCoding_ISO8859_1;
-      } else if (str_NoCaseStrcmp(codingstr, "UTF-8") == 0) {
+      }
+      else if (str_NoCaseStrcmp(codingstr, "UTF-8") == 0)
+      {
         coding = lng_eCoding_UTF_8;
       }
-    } else if (str_NoCaseStrncmp(line, "<include>", 9) == 0) {
+    }
+    else if (str_NoCaseStrncmp(line, "<include>", 9) == 0)
+    {
       str_trim(include_file, &line[9]);
       sts = help_index(navh_eHelpFile_Other, include_file);
-    } else if (str_NoCaseStrncmp(line, "<topic>", 7) == 0) {
+    }
+    else if (str_NoCaseStrncmp(line, "<topic>", 7) == 0)
+    {
       if ((s = strstr(line, "<style>")) || (s = strstr(line, "<STYLE>")))
         *s = 0;
       str_trim(subject, &line[7]);
 
-      (insert_cb)(parent_ctx, navh_eItemType_HelpBold, subject, "", "", subject,
-          "", file_name, file_type, 0, NULL, coding);
+      (insert_cb)(parent_ctx, navh_eItemType_HelpBold, subject, "", "", subject, "", file_name, file_type, 0,
+                  NULL, coding);
     }
     sts = dcli_read_line(line, sizeof(line), file);
   }
@@ -681,8 +795,7 @@ int NavHelp::help_index(navh_eHelpFile file_type, const char* file_name)
   return NAV__SUCCESS;
 }
 
-static FILE* navhelp_open_file(
-    NavHelp* navhelp, navh_eHelpFile file_type, const char* file_name)
+static FILE* navhelp_open_file(NavHelp* navhelp, navh_eHelpFile file_type, const char* file_name)
 {
   pwr_tFileName filestr;
   FILE* file;
@@ -698,23 +811,25 @@ static FILE* navhelp_open_file(
     dcli_get_defaultfilename(navhelp->base_file, filestr, NULL);
 
   // Replace symbol for language
-  if (str_StartsWith(filestr, "$pwr_lang/")) {
+  if (str_StartsWith(filestr, "$pwr_lang/"))
+  {
     char lng_filestr[512];
 
-    sprintf(
-        lng_filestr, "$pwr_exe/%s/%s", Lng::get_language_str(), &filestr[10]);
+    sprintf(lng_filestr, "$pwr_exe/%s/%s", Lng::get_language_str(), &filestr[10]);
 
     dcli_translate_filename(lng_filestr, lng_filestr);
 
     file = fopen(lng_filestr, "r");
-    if (file == 0) {
+    if (file == 0)
+    {
       // Default to English version
       sprintf(lng_filestr, "$pwr_exe/en_us/%s", &filestr[10]);
 
       dcli_translate_filename(lng_filestr, lng_filestr);
 
       file = fopen(lng_filestr, "r");
-      if (file == 0) {
+      if (file == 0)
+      {
         sts = get_lang_file(filestr, lng_filestr);
         if (EVEN(sts))
           return 0;
@@ -724,7 +839,9 @@ static FILE* navhelp_open_file(
           return 0;
       }
     }
-  } else {
+  }
+  else
+  {
     dcli_translate_filename(filestr, filestr);
 
     file = fopen(filestr, "r");
@@ -744,17 +861,17 @@ static pwr_tStatus get_lang_file(char* file, char* found_file)
     return NAV__NOFILE;
 
   // Try pwr_exe/xx_xx/
-  sprintf(
-      lng_include_file, "$pwr_exe/%s/%s", Lng::get_language_str(), &file[10]);
+  sprintf(lng_include_file, "$pwr_exe/%s/%s", Lng::get_language_str(), &file[10]);
   dcli_translate_filename(tmp_file, lng_include_file);
   sts = dcli_file_time(tmp_file, &t);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     // Try pwrp_exe/xx_xx/ instead
-    sprintf(lng_include_file, "$pwrp_exe/%s/%s", Lng::get_language_str(),
-        &file[10]);
+    sprintf(lng_include_file, "$pwrp_exe/%s/%s", Lng::get_language_str(), &file[10]);
     dcli_translate_filename(tmp_file, lng_include_file);
     sts = dcli_file_time(tmp_file, &t);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       // Try pwrp_exe/ instead
       sprintf(lng_include_file, "$pwrp_exe/%s", &file[10]);
       dcli_translate_filename(tmp_file, lng_include_file);

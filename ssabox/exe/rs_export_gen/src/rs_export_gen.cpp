@@ -59,7 +59,8 @@
 #include "co_error.h"
 #include "co_string.h"
 
-typedef enum {
+typedef enum
+{
   gen_eFilter_All,
   gen_eFilter_Signals,
   gen_eFilter_Redu,
@@ -71,26 +72,35 @@ static gen_eFilter filter = gen_eFilter_Signals;
 
 std::vector<std::string> tmp_array;
 
-std::string aref_to_str(pwr_tAttrRef &aref) {
-  return "{\"Objid\":{\"oix\":" + std::to_string(aref.Objid.oix) + ",\"vid\":" + std::to_string(aref.Objid.vid) + "},\"Body\":" + std::to_string(aref.Body) + ",\"Offset\":" + std::to_string(aref.Offset) + ",\"Size\":" + std::to_string(aref.Size) + ",\"Flags\":" + std::to_string(aref.Flags.m) + "}";
+std::string aref_to_str(pwr_tAttrRef& aref)
+{
+  return "{\"Objid\":{\"oix\":" + std::to_string(aref.Objid.oix) +
+         ",\"vid\":" + std::to_string(aref.Objid.vid) + "},\"Body\":" + std::to_string(aref.Body) +
+         ",\"Offset\":" + std::to_string(aref.Offset) + ",\"Size\":" + std::to_string(aref.Size) +
+         ",\"Flags\":" + std::to_string(aref.Flags.m) + "}";
 }
 
-void printObjectR(char* ap, char* aname, pwr_tAttrRef* arp, pwr_tCid cid) {
+void printObjectR(char* ap, char* aname, pwr_tAttrRef* arp, pwr_tCid cid)
+{
   gdh_sAttrDef* bd;
   int rows;
   pwr_tStatus sts = gdh_GetObjectBodyDef(cid, &bd, &rows, arp->Objid);
-  if (EVEN(sts)) throw co_error(sts);
+  if (EVEN(sts))
+    throw co_error(sts);
 
-  for (int i = 0; i < rows; i++) {
+  for (int i = 0; i < rows; i++)
+  {
     pwr_sParInfo pari = bd[i].attr->Param.Info;
 
-    if (filter == gen_eFilter_Signals && !(pari.Flags & PWR_MASK_CLASS) && strcmp(bd[i].attrName, "ActualValue") != 0)
+    if (filter == gen_eFilter_Signals && !(pari.Flags & PWR_MASK_CLASS) &&
+        strcmp(bd[i].attrName, "ActualValue") != 0)
       continue;
 
     if (filter == gen_eFilter_Redu && !(pari.Flags & PWR_MASK_REDUTRANSFER))
       continue;
 
-    if (pari.Flags & PWR_MASK_RTVIRTUAL || (pari.Flags & PWR_MASK_PRIVATE && pari.Flags & PWR_MASK_POINTER) || pari.Type == pwr_eType_Void)
+    if (pari.Flags & PWR_MASK_RTVIRTUAL || (pari.Flags & PWR_MASK_PRIVATE && pari.Flags & PWR_MASK_POINTER) ||
+        pari.Type == pwr_eType_Void)
       continue;
 
     pwr_tOName name, attrName;
@@ -103,8 +113,10 @@ void printObjectR(char* ap, char* aname, pwr_tAttrRef* arp, pwr_tCid cid) {
     if (pari.Flags & PWR_MASK_ARRAY)
       elements = pari.Elements;
 
-    for (int j = 0; j < elements; j++) {
-      if (pari.Flags & PWR_MASK_ARRAY) {
+    for (int j = 0; j < elements; j++)
+    {
+      if (pari.Flags & PWR_MASK_ARRAY)
+      {
         char idx[20];
         sprintf(idx, "[%d]", j);
         strcpy(name, aname);
@@ -116,27 +128,39 @@ void printObjectR(char* ap, char* aname, pwr_tAttrRef* arp, pwr_tCid cid) {
       }
       pwr_tAttrRef aref;
       sts = gdh_ArefANameToAref(arp, attrName, &aref);
-      if (EVEN(sts)) throw co_error(sts);
+      if (EVEN(sts))
+        throw co_error(sts);
 
-      if (bd[i].attr->Param.Info.Flags & PWR_MASK_CLASS) {
+      if (bd[i].attr->Param.Info.Flags & PWR_MASK_CLASS)
+      {
         printObjectR(ap + pari.Offset + j * pari.Size / elements, name, &aref, pari.Type);
-      } else {
-        std::string tmp = "{\"name\":\"" + std::string(name) + "\",\"aref\":" + aref_to_str(aref) + ",\"type\":" + std::to_string(pari.Type) + ",\"flags\":" + std::to_string(pari.Flags) + ",\"enable\":1}";
+      }
+      else
+      {
+        std::string tmp = "{\"name\":\"" + std::string(name) + "\",\"aref\":" + aref_to_str(aref) +
+                          ",\"type\":" + std::to_string(pari.Type) +
+                          ",\"flags\":" + std::to_string(pari.Flags) + ",\"enable\":1}";
         tmp_array.push_back(tmp);
       }
     }
   }
 }
 
-void printObject(pwr_tAttrRef* arp, char* aname) {
+void printObject(pwr_tAttrRef* arp, char* aname)
+{
   pwr_tTid tid;
   pwr_tStatus sts = gdh_GetAttrRefTid(arp, &tid);
-  if (EVEN(sts)) throw co_error(sts);
+  if (EVEN(sts))
+    throw co_error(sts);
 
-  if (arp->Flags.b.Object && arp->Size == 0) {
+  if (arp->Flags.b.Object && arp->Size == 0)
+  {
     sts = gdh_GetObjectSize(arp->Objid, &arp->Size);
-    if (EVEN(sts)) throw co_error(sts);
-  } else if (arp->Size == 0) {
+    if (EVEN(sts))
+      throw co_error(sts);
+  }
+  else if (arp->Size == 0)
+  {
     throw co_error(GDH__BADARG);
   }
 
@@ -144,7 +168,8 @@ void printObject(pwr_tAttrRef* arp, char* aname) {
   memset(ap, 0, arp->Size);
 
   sts = gdh_GetObjectInfoAttrref(arp, ap, arp->Size);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     fprintf(stderr, "Couldn't get object info attr ref for object %s\n", aname);
     throw co_error(sts);
   }
@@ -154,7 +179,8 @@ void printObject(pwr_tAttrRef* arp, char* aname) {
   free(ap);
 }
 
-void dfs_helper(pwr_tOid oid) {
+void dfs_helper(pwr_tOid oid)
+{
   pwr_tOName name;
   pwr_tCid cid;
   pwr_tStatus sts;
@@ -162,19 +188,22 @@ void dfs_helper(pwr_tOid oid) {
 
   // Dismiss the security object, dynamic volumes and mounted remote objects
   sts = gdh_GetObjectLocation(oid, &local);
-  if (EVEN(sts)) throw co_error(sts);
+  if (EVEN(sts))
+    throw co_error(sts);
 
   if (!local)
     return;
 
   sts = gdh_GetObjectClass(oid, &cid);
-  if (EVEN(sts)) throw co_error(sts);
+  if (EVEN(sts))
+    throw co_error(sts);
 
   if (cid == pwr_cClass_Security || cid == pwr_cClass_DynamicVolume)
     return;
 
   sts = gdh_ObjidToName(oid, name, sizeof(name), cdh_mName_volumeStrict);
-  if (EVEN(sts)) throw co_error(sts);
+  if (EVEN(sts))
+    throw co_error(sts);
 
   pwr_tAttrRef aref = cdh_ObjidToAref(oid);
 
@@ -182,26 +211,30 @@ void dfs_helper(pwr_tOid oid) {
 
   pwr_tOid coid;
   pwr_tStatus sts2 = gdh_GetChild(oid, &coid);
-  while (ODD(sts2)) {
+  while (ODD(sts2))
+  {
     dfs_helper(coid);
     sts2 = gdh_GetNextSibling(coid, &coid);
   }
 }
 
-void usage() {
+void usage()
+{
   printf("rs_export_gen [-f 'filter']\n\n"
-	 "-f Filter, 'all', 'signals' or 'redu'. Default 'signals'\n\n");
+         "-f Filter, 'all', 'signals' or 'redu'. Default 'signals'\n\n");
 }
 
-int main(int argc, char**argv) {
+int main(int argc, char** argv)
+{
 
-  if (argc > 1 && streq(argv[1], "-h")) {
+  if (argc > 1 && streq(argv[1], "-h"))
+  {
     usage();
-    exit(0);      
+    exit(0);
   }
 
-
-  if (argc > 2 && streq(argv[1], "-f")) {
+  if (argc > 2 && streq(argv[1], "-f"))
+  {
     if (streq(argv[2], "all"))
       filter = gen_eFilter_All;
     else if (streq(argv[2], "signals"))
@@ -210,18 +243,20 @@ int main(int argc, char**argv) {
       filter = gen_eFilter_Redu;
     else if (streq(argv[2], "sevhist"))
       filter = gen_eFilter_SevHist;
-    else {
+    else
+    {
       usage();
       exit(0);
     }
   }
-    
+
   pwr_tFileName fname;
   dcli_translate_filename(fname, json_filename);
   errh_Interactive();
 
   pwr_tStatus sts = gdh_Init("java_native");
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     fprintf(stderr, "gdh_Init failed\n");
     return sts;
   }
@@ -234,15 +269,18 @@ int main(int argc, char**argv) {
   json_string << "  \"signals\": [\n";
 
   sts = gdh_GetRootList(&oid);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     if (oid.oix != 0x80000001)
       dfs_helper(oid);
     sts = gdh_GetNextSibling(oid, &oid);
   }
   std::sort(std::begin(tmp_array), std::end(tmp_array));
-  for (int i = 0; i < tmp_array.size(); i++) {
+  for (int i = 0; i < tmp_array.size(); i++)
+  {
     json_string << "    " << tmp_array[i];
-    if (i < tmp_array.size() - 1) {
+    if (i < tmp_array.size() - 1)
+    {
       json_string << ",";
     }
     json_string << "\n";
@@ -251,7 +289,8 @@ int main(int argc, char**argv) {
   json_string << "}";
 
   FILE* fp = fopen(fname, "w");
-  if (!fp) return 1;
+  if (!fp)
+    return 1;
   fputs(json_string.str().c_str(), fp);
   fclose(fp);
 

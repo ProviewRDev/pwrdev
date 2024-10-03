@@ -79,40 +79,40 @@
 #include "xtt_xcrr.h"
 #include "xtt_xnav_crr.h"
 
-class xnav_file {
+class xnav_file
+{
 public:
-  xnav_file(char* text, char* file, item_eFileType file_type)
-      : m_file_type(file_type)
+  xnav_file(char* text, char* file, item_eFileType file_type) : m_file_type(file_type)
   {
     strcpy(m_text, text);
     strcpy(m_file, file);
   }
-  bool operator<(const xnav_file& x)
-  {
-    return (strcmp(m_text, x.m_text) < 0);
-  }
+  bool operator<(const xnav_file& x) { return (strcmp(m_text, x.m_text) < 0); }
 
   char m_text[80];
   pwr_tFileName m_file;
   item_eFileType m_file_type;
 };
 
-typedef struct {
+typedef struct
+{
   pwr_tOid oid;
   XNav* xnav;
   char title[256];
 } xnav_sHistList;
 
-typedef struct {
+typedef struct
+{
   pwr_tCid cid;
   XNav* xnav;
   char title[256];
 } xnav_sObjectList;
 
-#define IF_NOGDH_RETURN                                                        \
-  if (!xnav->gbl.gdh_started) {                                                \
-    xnav->message('E', "Xtt is not connected to nethandler");                  \
-    return XNAV__SUCCESS;                                                      \
+#define IF_NOGDH_RETURN                                                                                      \
+  if (!xnav->gbl.gdh_started)                                                                                \
+  {                                                                                                          \
+    xnav->message('E', "Xtt is not connected to nethandler");                                                \
+    return XNAV__SUCCESS;                                                                                    \
   }
 
 #define XNAV_MENU_CREATE 0
@@ -131,22 +131,19 @@ static int xnav_ev_sound_cb(void* xnav, pwr_sAttrRef* arp);
 static void xnav_ev_pop_cb(void* xnav);
 static void xnav_ev_update_info_cb(void* xnav);
 static void xnav_ge_help_cb(void* ctx, const char* key);
-static int xnav_ge_get_current_objects_cb(
-    void* vxnav, pwr_sAttrRef** alist, int** is_areflist);
+static int xnav_ge_get_current_objects_cb(void* vxnav, pwr_sAttrRef** alist, int** is_areflist);
 static int xnav_ge_sound_cb(void* xnav, pwr_sAttrRef* arp);
-static void xnav_ge_eventlog_cb(
-    void* xnav, void* gectx, int type, void* data, unsigned int size);
+static void xnav_ge_eventlog_cb(void* xnav, void* gectx, int type, void* data, unsigned int size);
 static void xnav_ge_keyboard_cb(void* ctx, void* gectx, int action, int type);
 static void xnav_ge_display_in_xnav_cb(void* xnav, pwr_sAttrRef* arp);
 static int xnav_ge_is_authorized_cb(void* xnav, unsigned int access);
 static void xnav_ge_namechanged_cb(void* ctx, void* gectx, char* name);
 static int xnav_ge_get_select_cb(void* ctx, char* oname, pwr_tTypeId* type);
-static int xnav_attribute_func(char* name, int* return_decl,
-    ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string);
-static int xnav_multiview_command_cb(
-    void* gectx, char* command, char* script, char *scriptargs, void* caller);
-static int xnav_ge_command_cb(
-    void* gectx, char* command, char* script, char *scriptargs, void* caller);
+static int xnav_attribute_func(char* name, int* return_decl, ccm_tFloat* return_float, ccm_tInt* return_int,
+                               char* return_string);
+static int xnav_multiview_command_cb(void* gectx, char* command, char* script, char* scriptargs,
+                                     void* caller);
+static int xnav_ge_command_cb(void* gectx, char* command, char* script, char* scriptargs, void* caller);
 static void xnav_ge_close_cb(void* xnav, void* gectx);
 static void xnav_multiview_close_cb(void* xnav, void* mvctx);
 static void xnav_stream_close_cb(void* xnav, XttStream* strmctx);
@@ -159,7 +156,7 @@ static void xnav_op_help_cb(void* ctx, const char* key);
 static void xnav_op_map_cb(void* ctx);
 static int xnav_op_get_alarm_info_cb(void* xnav, evlist_sAlarmInfo* info, int backward, int alarmsize);
 static void xnav_op_ack_last_cb(void* xnav, unsigned long type, unsigned long prio, int backward,
-				int timecheck);
+                                int timecheck);
 static void xnav_trend_close_cb(void* ctx, XttTrend* trend);
 static void xnav_trend_command_cb(void* ctx, const char* key);
 static void xnav_trend_help_cb(void* ctx, const char* key);
@@ -167,8 +164,7 @@ static void xnav_tcurve_close_cb(void* ctx, XttTCurve* trend);
 static void xnav_tcurve_help_cb(void* ctx, const char* key);
 static void xnav_sevhist_help_cb(void* ctx, const char* key);
 static void xnav_sevhist_close_cb(void* ctx, XttSevHist* hist);
-static int xnav_sevhist_get_select_cb(
-    void* ctx, pwr_tOid* oid, char* aname, char* oname);
+static int xnav_sevhist_get_select_cb(void* ctx, pwr_tOid* oid, char* aname, char* oname);
 static int xnav_get_select_cb(void* ctx, pwr_tAttrRef* aref, int* is_attr);
 static void xnav_fast_close_cb(void* ctx, XttFast* fast);
 static void xnav_fast_help_cb(void* ctx, const char* key);
@@ -178,8 +174,7 @@ static void xnav_open_shist_cb(void* ctx, char* text, int ok_pressed);
 static void xnav_open_shist_cancel_cb(void* ctx);
 static void xnav_show_objectlist_cb(void* ctx, char* text, int ok_pressed);
 static void xnav_show_objectlist_cancel_cb(void* ctx);
-static void xnav_colortheme_selector_ok_cb(
-    void* ctx, char* text, int ok_pressed);
+static void xnav_colortheme_selector_ok_cb(void* ctx, char* text, int ok_pressed);
 static void xnav_keyboard_key_pressed_cb(void*, int);
 static void xnav_keyboard_close_cb(void*);
 static int xnav_replace_node_str(char* out, char* object_str);
@@ -220,126 +215,175 @@ static int xnav_plcscan_func(void* client_data, void* client_flag);
 static int xnav_graph_func(void* client_data, void* client_flag);
 
 dcli_tCmdTable xnav_command_table[] = {
-  { "SHOW", &xnav_show_func,
-      { "dcli_arg1", "dcli_arg2", "/NAME", "/CLASS", "/HIERARCHY", "/PARAMETER",
-          "/OBJID", "/FILE", "/LOCAL", "/INITSTEP", "/MAXOBJECTS", "/VOLUME",
-          "/ALL", "/TYPE", "/OPTION", "/ENTRY", "/NEW", "/TITLE", "/WINDOW",
-          "/ALARMVIEW", "/WIDTH", "/HEIGHT", "/XPOSITION", "/YPOSITION",
-	  "/FULLSCREEN", "/MAXIMIZE", "/FULLMAXIMIZE", "/SORT", 
-	  "/TEXT","/LAYOUT", "/GLOBAL", "/ALPHAORDER", "/HEXADECIMAL", "" } },
-  { "OPEN", &xnav_open_func,
-      { "dcli_arg1", "dcli_arg2", "/NAME", "/FILE", "/SCROLLBAR", "/WIDTH",
-          "/HEIGHT", "/MENU", "/NAVIGATOR", "/CENTER", "/OBJECT", "/NEW",
-          "/INSTANCE", "/COLLECT", "/FOCUS", "/INPUTEMPTY", "/MAIN", "/ENTRY",
-          "/TITLE", "/ACCESS", "/DASHBOARD", "/CLASSGRAPH", "/PARENT", "/PWINDOW",
-          "/PINSTANCE", "/BYPASS", "/CLOSEBUTTON", "/TARGET", "/TRIGGER",
-          "/TYPE", "/FTYPE", "/FULLSCREEN", "/MAXIMIZE", "/FULLMAXIMIZE",
-          "/ICONIFY", "/HIDE", "/XPOSITION", "/YPOSITION", "/X0", "/Y0", "/X1",
-          "/Y1", "/URL", "/CONTINOUS", "/CAMERAPOSITION", "/CAMERACONTROLPANEL",
-          "/VIDEOCONTROLPANEL", "/VIDEOPROGRESSBAR", "/SCANTIME", "/KEYMAP",
-	  "/RESIZEFREE", "" } },
-  { "CLOSE", &xnav_close_func,
-      { "dcli_arg1", "dcli_arg2", "/NAME", "/OBJECT", "/INSTANCE",
-          "/CLASSGRAPH", "/ALL", "/EXCEPT", "/MVEXCEPT", "/ICONIFY", "" } },
-  { "CREATE", &xnav_create_func,
-      { "dcli_arg1", "/TEXT", "/MENU", "/DESTINATION", "/COMMAND", "/AFTER",
-          "/BEFORE", "/FIRSTCHILD", "/LASTCHILD", "/CLASS", "/NAME", "/PIXMAP",
-          "" } },
-  { "DELETE", &xnav_delete_func, { "dcli_arg1", "/NAME", "" } },
-  { "ADD", &xnav_add_func,
-      { "dcli_arg1", "dcli_arg2", "/NAME", "/CLASS", "/HIERARCHY", "/PARAMETER",
-          "/LOCAL", "/TEXT", "/OBJECT", "/COMMAND", "" } },
-  { "STORE", &xnav_store_func,
-      { "dcli_arg1", "/COLLECT", "/FILE", "/SYMBOLS", "" } },
-  { "EXIT", &xnav_exit_func,
-      {
-          "",
-      } },
-  { "QUIT", &xnav_exit_func,
-      {
-          "",
-      } },
-  { "DEFINE", &xnav_define_func,
-      { "dcli_arg1", "dcli_arg2", "dcli_arg3", "dcli_arg4", "" } },
-  { "HELP", &xnav_help_func,
-      { "dcli_arg1", "dcli_arg2", "dcli_arg3", "dcli_arg4", "/HELPFILE",
-          "/POPNAVIGATOR", "/BOOKMARK", "/INDEX", "/BASE", "/RETURNCOMMAND",
-          "/WIDTH", "/HEIGHT", "/VERSION", "/STRICT", "" } },
-  { "LOGOUT", &xnav_logout_func, { "/MESSAGEWINDOW", "" } },
-  { "LOGIN", &xnav_login_func, { "dcli_arg1", "dcli_arg2", "" } },
-  { "COLLECT", &xnav_collect_func,
-      { "dcli_arg1", "/NAME", "/NEWWINDOW", "/ADDWINDOW", "/LAST", "/TITLE",
-          "/WIDTH", "/HEIGHT", "/SCANTIME", "/ZOOMFACTOR", "/FILE", "" } },
-  { "DASHBOARD", &xnav_dashboard_func,
-      { "dcli_arg1", "dcli_arg2", "/NAME", "" } },
-  { "CROSSREFERENCE", &xnav_crossref_func,
-      { "dcli_arg1", "/NAME", "/FILE", "/STRING", "/BRIEF", "/FUNCTION",
-          "/CASE_SENSITIVE", "/WINDOW", "" } },
-  { "SET", &xnav_set_func,
-      { "dcli_arg1", "dcli_arg2", "/NAME", "/VALUE", "/BYPASS", "/PUBLICWRITE",
-	"/INDEX", "/NEXT", "/SOURCE", "/OBJECT", "/CONTINUE", "/X0", "/Y0", "/X1",
-          "/Y1", "/INSTANCE", "/ESCAPESTORE", "/FOCUS", "/INPUTEMPTY",
-          "/ICONIFY", "/BELOW", "/ON", "/OFF", "" } },
-  { "SETUP", &xnav_setup_func,
-      {
-          "",
-      } },
-  { "SEARCH", &xnav_search_func,
-      { "dcli_arg1", "/REGULAREXPRESSION", "/NEXT", "" } },
-  { "EVENTLIST", &xnav_eventlist_func,
-      {
-	"dcli_arg1", "/PRIORITY", "/NAME", "/ALL", "/AUTOACKNOWLEDGE", "/OLDEST",
-	"/TIMECHECK", "",
-      } },
-  { "TEST", &xnav_test_func, { "dcli_arg1", "dcli_arg2", "" } },
-  { "LOGGING", &xnav_logging_func,
-      { "dcli_arg1", "dcli_arg2", "/FILE", "/TIME", "/ENTRY", "/TYPE", "/FORMAT",
-          "/PARAMETER", "/CONDITION", "/INSERT", "/BUFFER_SIZE", "/PRIORITY",
-          "/STOP", "/NOSTOP", "/CREATE", "/ALL", "/LINE_SIZE", "/SHORTNAME",
-          "/NOSHORTNAME", "" } },
-  { "CALL", &xnav_call_func,
-      { "dcli_arg1", "/METHOD", "/OBJECT", "/FUNCTION", "" } },
-  { "CHECK", &xnav_check_func,
-      { "dcli_arg1", "/METHOD", "/OBJECT", "/FILTER", "" } },
-  { "PRINT", &xnav_print_func,
-      { "dcli_arg1", "dcli_arg2", "/NAME", "/FILE", "/OBJECT", "/CLASSGRAPH",
-          "/INSTANCE", "" } },
-  { "EXPORT", &xnav_export_func,
-      { "dcli_arg1", "/GRAPH", "/NAME", "/FILE", "/OBJECT", "/CLASSGRAPH",
-          "/INSTANCE", "" } },
-  { "SOUND", &xnav_sound_func, { "dcli_arg1", "/OBJECT", "" } },
-  { "WRITE", &xnav_write_func, { "dcli_arg1", "/OBJECT", "/FILE", "" } },
-  { "READ", &xnav_read_func, { "dcli_arg1", "/OBJECT", "/FILE", "" } },
-  { "WAIT", &xnav_wait_func, { "dcli_arg1", "/TIME", "" } },
-  { "OPLOG", &xnav_oplog_func,
-      { "dcli_arg1", "/FILE", "/SPEED", "/PID", "/EVENT", "" } },
-  { "EMIT", &xnav_emit_func,
-      { "dcli_arg1", "/SIGNALNAME", "/GRAPH", "/INSTANCE", "" } },
-  { "PLCSCAN", &xnav_plcscan_func,
-      { "/ON", "/OFF", "/ALL", "/NAME", "" } },
-  { "GRAPH", &xnav_graph_func,
-      { "dcli_arg1", "/NAME", "/FILE", "/SCROLLBAR", "/WIDTH",
-          "/HEIGHT", "/OBJECT",
-          "/INSTANCE", "/FOCUS", "/INPUTEMPTY", "/MAIN", "/ENTRY",
-          "/TITLE", "/ACCESS", "/DASHBOARD", "/CLASSGRAPH", "/PARENT", "/PWINDOW",
-          "/PINSTANCE", "/BYPASS", "/CLOSEBUTTON", "/TARGET", "/TRIGGER",
-          "/TYPE", "/FTYPE", "/FULLSCREEN", "/MAXIMIZE", "/FULLMAXIMIZE",
-          "/ICONIFY", "/HIDE", "/XPOSITION", "/YPOSITION", "/X0", "/Y0", "/X1",
-          "/Y1", "/RESIZEFREE", "" } },
-  {
-      "", NULL, { "" }
-  }
-};
+    {"SHOW",
+     &xnav_show_func,
+     {"dcli_arg1",   "dcli_arg2",   "/NAME",         "/CLASS",    "/HIERARCHY",  "/PARAMETER",
+      "/OBJID",      "/FILE",       "/LOCAL",        "/INITSTEP", "/MAXOBJECTS", "/VOLUME",
+      "/ALL",        "/TYPE",       "/OPTION",       "/ENTRY",    "/NEW",        "/TITLE",
+      "/WINDOW",     "/ALARMVIEW",  "/WIDTH",        "/HEIGHT",   "/XPOSITION",  "/YPOSITION",
+      "/FULLSCREEN", "/MAXIMIZE",   "/FULLMAXIMIZE", "/SORT",     "/TEXT",       "/LAYOUT",
+      "/GLOBAL",     "/ALPHAORDER", "/HEXADECIMAL",  ""}},
+    {"OPEN",
+     &xnav_open_func,
+     {"dcli_arg1",
+      "dcli_arg2",
+      "/NAME",
+      "/FILE",
+      "/SCROLLBAR",
+      "/WIDTH",
+      "/HEIGHT",
+      "/MENU",
+      "/NAVIGATOR",
+      "/CENTER",
+      "/OBJECT",
+      "/NEW",
+      "/INSTANCE",
+      "/COLLECT",
+      "/FOCUS",
+      "/INPUTEMPTY",
+      "/MAIN",
+      "/ENTRY",
+      "/TITLE",
+      "/ACCESS",
+      "/DASHBOARD",
+      "/CLASSGRAPH",
+      "/PARENT",
+      "/PWINDOW",
+      "/PINSTANCE",
+      "/BYPASS",
+      "/CLOSEBUTTON",
+      "/TARGET",
+      "/TRIGGER",
+      "/TYPE",
+      "/FTYPE",
+      "/FULLSCREEN",
+      "/MAXIMIZE",
+      "/FULLMAXIMIZE",
+      "/ICONIFY",
+      "/HIDE",
+      "/XPOSITION",
+      "/YPOSITION",
+      "/X0",
+      "/Y0",
+      "/X1",
+      "/Y1",
+      "/URL",
+      "/CONTINOUS",
+      "/CAMERAPOSITION",
+      "/CAMERACONTROLPANEL",
+      "/VIDEOCONTROLPANEL",
+      "/VIDEOPROGRESSBAR",
+      "/SCANTIME",
+      "/KEYMAP",
+      "/RESIZEFREE",
+      ""}},
+    {"CLOSE",
+     &xnav_close_func,
+     {"dcli_arg1", "dcli_arg2", "/NAME", "/OBJECT", "/INSTANCE", "/CLASSGRAPH", "/ALL", "/EXCEPT",
+      "/MVEXCEPT", "/ICONIFY", ""}},
+    {"CREATE",
+     &xnav_create_func,
+     {"dcli_arg1", "/TEXT", "/MENU", "/DESTINATION", "/COMMAND", "/AFTER", "/BEFORE", "/FIRSTCHILD",
+      "/LASTCHILD", "/CLASS", "/NAME", "/PIXMAP", ""}},
+    {"DELETE", &xnav_delete_func, {"dcli_arg1", "/NAME", ""}},
+    {"ADD",
+     &xnav_add_func,
+     {"dcli_arg1", "dcli_arg2", "/NAME", "/CLASS", "/HIERARCHY", "/PARAMETER", "/LOCAL", "/TEXT", "/OBJECT",
+      "/COMMAND", ""}},
+    {"STORE", &xnav_store_func, {"dcli_arg1", "/COLLECT", "/FILE", "/SYMBOLS", ""}},
+    {"EXIT",
+     &xnav_exit_func,
+     {
+         "",
+     }},
+    {"QUIT",
+     &xnav_exit_func,
+     {
+         "",
+     }},
+    {"DEFINE", &xnav_define_func, {"dcli_arg1", "dcli_arg2", "dcli_arg3", "dcli_arg4", ""}},
+    {"HELP",
+     &xnav_help_func,
+     {"dcli_arg1", "dcli_arg2", "dcli_arg3", "dcli_arg4", "/HELPFILE", "/POPNAVIGATOR", "/BOOKMARK", "/INDEX",
+      "/BASE", "/RETURNCOMMAND", "/WIDTH", "/HEIGHT", "/VERSION", "/STRICT", ""}},
+    {"LOGOUT", &xnav_logout_func, {"/MESSAGEWINDOW", ""}},
+    {"LOGIN", &xnav_login_func, {"dcli_arg1", "dcli_arg2", ""}},
+    {"COLLECT",
+     &xnav_collect_func,
+     {"dcli_arg1", "/NAME", "/NEWWINDOW", "/ADDWINDOW", "/LAST", "/TITLE", "/WIDTH", "/HEIGHT", "/SCANTIME",
+      "/ZOOMFACTOR", "/FILE", ""}},
+    {"DASHBOARD", &xnav_dashboard_func, {"dcli_arg1", "dcli_arg2", "/NAME", ""}},
+    {"CROSSREFERENCE",
+     &xnav_crossref_func,
+     {"dcli_arg1", "/NAME", "/FILE", "/STRING", "/BRIEF", "/FUNCTION", "/CASE_SENSITIVE", "/WINDOW", ""}},
+    {"SET",
+     &xnav_set_func,
+     {"dcli_arg1",   "dcli_arg2", "/NAME",   "/VALUE",    "/BYPASS",      "/PUBLICWRITE",
+      "/INDEX",      "/NEXT",     "/SOURCE", "/OBJECT",   "/CONTINUE",    "/X0",
+      "/Y0",         "/X1",       "/Y1",     "/INSTANCE", "/ESCAPESTORE", "/FOCUS",
+      "/INPUTEMPTY", "/ICONIFY",  "/BELOW",  "/ON",       "/OFF",         ""}},
+    {"SETUP",
+     &xnav_setup_func,
+     {
+         "",
+     }},
+    {"SEARCH", &xnav_search_func, {"dcli_arg1", "/REGULAREXPRESSION", "/NEXT", ""}},
+    {"EVENTLIST",
+     &xnav_eventlist_func,
+     {
+         "dcli_arg1",
+         "/PRIORITY",
+         "/NAME",
+         "/ALL",
+         "/AUTOACKNOWLEDGE",
+         "/OLDEST",
+         "/TIMECHECK",
+         "",
+     }},
+    {"TEST", &xnav_test_func, {"dcli_arg1", "dcli_arg2", ""}},
+    {"LOGGING", &xnav_logging_func, {"dcli_arg1",    "dcli_arg2",  "/FILE",      "/TIME",        "/ENTRY",
+                                     "/TYPE",        "/FORMAT",    "/PARAMETER", "/CONDITION",   "/INSERT",
+                                     "/BUFFER_SIZE", "/PRIORITY",  "/STOP",      "/NOSTOP",      "/CREATE",
+                                     "/ALL",         "/LINE_SIZE", "/SHORTNAME", "/NOSHORTNAME", ""}},
+    {"CALL", &xnav_call_func, {"dcli_arg1", "/METHOD", "/OBJECT", "/FUNCTION", ""}},
+    {"CHECK", &xnav_check_func, {"dcli_arg1", "/METHOD", "/OBJECT", "/FILTER", ""}},
+    {"PRINT",
+     &xnav_print_func,
+     {"dcli_arg1", "dcli_arg2", "/NAME", "/FILE", "/OBJECT", "/CLASSGRAPH", "/INSTANCE", ""}},
+    {"EXPORT",
+     &xnav_export_func,
+     {"dcli_arg1", "/GRAPH", "/NAME", "/FILE", "/OBJECT", "/CLASSGRAPH", "/INSTANCE", ""}},
+    {"SOUND", &xnav_sound_func, {"dcli_arg1", "/OBJECT", ""}},
+    {"WRITE", &xnav_write_func, {"dcli_arg1", "/OBJECT", "/FILE", ""}},
+    {"READ", &xnav_read_func, {"dcli_arg1", "/OBJECT", "/FILE", ""}},
+    {"WAIT", &xnav_wait_func, {"dcli_arg1", "/TIME", ""}},
+    {"OPLOG", &xnav_oplog_func, {"dcli_arg1", "/FILE", "/SPEED", "/PID", "/EVENT", ""}},
+    {"EMIT", &xnav_emit_func, {"dcli_arg1", "/SIGNALNAME", "/GRAPH", "/INSTANCE", ""}},
+    {"PLCSCAN", &xnav_plcscan_func, {"/ON", "/OFF", "/ALL", "/NAME", ""}},
+    {"GRAPH", &xnav_graph_func, {"dcli_arg1",    "/NAME",
+                                 "/FILE",        "/SCROLLBAR",
+                                 "/WIDTH",       "/HEIGHT",
+                                 "/OBJECT",      "/INSTANCE",
+                                 "/FOCUS",       "/INPUTEMPTY",
+                                 "/MAIN",        "/ENTRY",
+                                 "/TITLE",       "/ACCESS",
+                                 "/DASHBOARD",   "/CLASSGRAPH",
+                                 "/PARENT",      "/PWINDOW",
+                                 "/PINSTANCE",   "/BYPASS",
+                                 "/CLOSEBUTTON", "/TARGET",
+                                 "/TRIGGER",     "/TYPE",
+                                 "/FTYPE",       "/FULLSCREEN",
+                                 "/MAXIMIZE",    "/FULLMAXIMIZE",
+                                 "/ICONIFY",     "/HIDE",
+                                 "/XPOSITION",   "/YPOSITION",
+                                 "/X0",          "/Y0",
+                                 "/X1",          "/Y1",
+                                 "/RESIZEFREE",  ""}},
+    {"", NULL, {""}}};
 
-static void xnav_store_xnav(XNav* xnav)
-{
-  current_xnav = xnav;
-}
+static void xnav_store_xnav(XNav* xnav) { current_xnav = xnav; }
 
-static void xnav_get_stored_xnav(XNav** xnav)
-{
-  *xnav = current_xnav;
-}
+static void xnav_get_stored_xnav(XNav** xnav) { *xnav = current_xnav; }
 
 static int xnav_help_func(void* client_data, void* client_flag)
 {
@@ -354,12 +398,16 @@ static int xnav_help_func(void* client_data, void* client_flag)
   int width, height;
   int nr;
 
-  if (ODD(dcli_get_qualifier("/INDEX", file_str, sizeof(file_str)))) {
-    if (ODD(dcli_get_qualifier("/HELPFILE", file_str, sizeof(file_str)))) {
+  if (ODD(dcli_get_qualifier("/INDEX", file_str, sizeof(file_str))))
+  {
+    if (ODD(dcli_get_qualifier("/HELPFILE", file_str, sizeof(file_str))))
+    {
       sts = CoXHelp::dhelp_index(navh_eHelpFile_Other, file_str);
       if (EVEN(sts))
         xnav->message('E', "Unable to find file");
-    } else {
+    }
+    else
+    {
       if (ODD(dcli_get_qualifier("/BASE", 0, 0)))
         sts = CoXHelp::dhelp_index(navh_eHelpFile_Base, NULL);
       else
@@ -368,9 +416,9 @@ static int xnav_help_func(void* client_data, void* client_flag)
     return 1;
   }
 
-  if (ODD(dcli_get_qualifier("/VERSION", 0, 0))) {
-    sts = CoXHelp::dhelp("version", "", navh_eHelpFile_Other,
-        "$pwr_load/xtt_version_help.dat", 0);
+  if (ODD(dcli_get_qualifier("/VERSION", 0, 0)))
+  {
+    sts = CoXHelp::dhelp("version", "", navh_eHelpFile_Other, "$pwr_load/xtt_version_help.dat", 0);
     if (EVEN(sts))
       xnav->message('E', "No help on this subject");
     return sts;
@@ -378,7 +426,8 @@ static int xnav_help_func(void* client_data, void* client_flag)
 
   int strict = ODD(dcli_get_qualifier("/STRICT", 0, 0));
 
-  if (EVEN(dcli_get_qualifier("dcli_arg1", arg_str, sizeof(arg_str)))) {
+  if (EVEN(dcli_get_qualifier("dcli_arg1", arg_str, sizeof(arg_str))))
+  {
     sts = CoXHelp::dhelp("help command", "", navh_eHelpFile_Base, NULL, strict);
     return 1;
   }
@@ -386,64 +435,78 @@ static int xnav_help_func(void* client_data, void* client_flag)
     strcpy(bookmark_str, "");
 
   strcpy(key, arg_str);
-  if (ODD(dcli_get_qualifier("dcli_arg2", arg_str, sizeof(arg_str)))) {
+  if (ODD(dcli_get_qualifier("dcli_arg2", arg_str, sizeof(arg_str))))
+  {
     strcat(key, " ");
     strcat(key, arg_str);
-    if (ODD(dcli_get_qualifier("dcli_arg3", arg_str, sizeof(arg_str)))) {
+    if (ODD(dcli_get_qualifier("dcli_arg3", arg_str, sizeof(arg_str))))
+    {
       strcat(key, " ");
       strcat(key, arg_str);
-      if (ODD(dcli_get_qualifier("dcli_arg3", arg_str, sizeof(arg_str)))) {
+      if (ODD(dcli_get_qualifier("dcli_arg3", arg_str, sizeof(arg_str))))
+      {
         strcat(key, " ");
         strcat(key, arg_str);
-        if (ODD(dcli_get_qualifier("dcli_arg4", arg_str, sizeof(arg_str)))) {
+        if (ODD(dcli_get_qualifier("dcli_arg4", arg_str, sizeof(arg_str))))
+        {
           strcat(key, " ");
           strcat(key, arg_str);
         }
       }
     }
   }
-  if (!ODD(
-          dcli_get_qualifier("/RETURNCOMMAND", return_str, sizeof(return_str))))
+  if (!ODD(dcli_get_qualifier("/RETURNCOMMAND", return_str, sizeof(return_str))))
     strcpy(return_str, "");
 
-  if (ODD(dcli_get_qualifier("/WIDTH", arg_str, sizeof(arg_str)))) {
+  if (ODD(dcli_get_qualifier("/WIDTH", arg_str, sizeof(arg_str))))
+  {
     // convert to integer
     nr = sscanf(arg_str, "%d", &width);
-    if (nr != 1) {
+    if (nr != 1)
+    {
       xnav->message('E', "Width syntax error");
       return XNAV__HOLDCOMMAND;
     }
-  } else
+  }
+  else
     width = 0;
 
-  if (ODD(dcli_get_qualifier("/HEIGHT", arg_str, sizeof(arg_str)))) {
+  if (ODD(dcli_get_qualifier("/HEIGHT", arg_str, sizeof(arg_str))))
+  {
     // convert to integer
     nr = sscanf(arg_str, "%d", &height);
-    if (nr != 1) {
+    if (nr != 1)
+    {
       xnav->message('E', "Height syntax error");
       return XNAV__HOLDCOMMAND;
     }
-  } else
+  }
+  else
     height = 0;
 
   pop = ODD(dcli_get_qualifier("/POPNAVIGATOR", 0, 0));
 
-  if (ODD(dcli_get_qualifier("/HELPFILE", file_str, sizeof(file_str)))) {
-    sts = CoXHelp::dhelp(
-        key, bookmark_str, navh_eHelpFile_Other, file_str, strict);
+  if (ODD(dcli_get_qualifier("/HELPFILE", file_str, sizeof(file_str))))
+  {
+    sts = CoXHelp::dhelp(key, bookmark_str, navh_eHelpFile_Other, file_str, strict);
     if (EVEN(sts))
       xnav->message('E', "No help on this subject");
     else if (!streq(return_str, ""))
       xnav->set_push_command(return_str);
-  } else if (ODD(dcli_get_qualifier("/BASE", 0, 0))) {
+  }
+  else if (ODD(dcli_get_qualifier("/BASE", 0, 0)))
+  {
     sts = CoXHelp::dhelp(key, bookmark_str, navh_eHelpFile_Base, 0, strict);
     if (EVEN(sts))
       xnav->message('E', "No help on this subject");
     else if (!streq(return_str, ""))
       xnav->set_push_command(return_str);
-  } else {
+  }
+  else
+  {
     sts = CoXHelp::dhelp(key, bookmark_str, navh_eHelpFile_Project, 0, strict);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       sts = CoXHelp::dhelp(key, bookmark_str, navh_eHelpFile_Base, 0, strict);
       if (EVEN(sts))
         xnav->message('E', "No help on this subject");
@@ -466,11 +529,13 @@ static int xnav_define_func(void* client_data, void* client_flag)
   char* arg3_ptr;
   char* arg4_ptr;
 
-  if (EVEN(dcli_get_qualifier("dcli_arg1", arg1_str, sizeof(arg1_str)))) {
+  if (EVEN(dcli_get_qualifier("dcli_arg1", arg1_str, sizeof(arg1_str))))
+  {
     xnav->message('E', "Syntax error");
     return 1;
   }
-  if (EVEN(dcli_get_qualifier("dcli_arg2", arg2_str, sizeof(arg2_str)))) {
+  if (EVEN(dcli_get_qualifier("dcli_arg2", arg2_str, sizeof(arg2_str))))
+  {
     xnav->message('E', "Syntax error");
     return 1;
   }
@@ -502,10 +567,7 @@ static void xnav_login_success_bc(void* ctx)
     xnav->op->set_title(xnav->user);
 }
 
-static void xnav_login_cancel_bc(void* xnav)
-{
-  ((XNav*)xnav)->cologin = 0;
-}
+static void xnav_login_cancel_bc(void* xnav) { ((XNav*)xnav)->cologin = 0; }
 
 static int xnav_login_func(void* client_data, void* client_flag)
 {
@@ -518,39 +580,42 @@ static int xnav_login_func(void* client_data, void* client_flag)
   char msg[120];
   void* basewidget = 0;
 
-  sts = gdh_GetObjectInfo(
-      "pwrNode-System.SystemGroup", &systemgroup, sizeof(systemgroup));
+  sts = gdh_GetObjectInfo("pwrNode-System.SystemGroup", &systemgroup, sizeof(systemgroup));
   if (EVEN(sts))
     return sts;
 
-  if (EVEN(dcli_get_qualifier("dcli_arg1", arg1_str, sizeof(arg1_str)))) {
+  if (EVEN(dcli_get_qualifier("dcli_arg1", arg1_str, sizeof(arg1_str))))
+  {
     if (xnav->cologin)
       xnav->cologin->pop();
-    else {
-      if (xnav->opplace_p->Options & pwr_mOpPlaceOptionsMask_AllMainTransient) {
+    else
+    {
+      if (xnav->opplace_p->Options & pwr_mOpPlaceOptionsMask_AllMainTransient)
+      {
         if (xnav->ge_main)
           basewidget = xnav->ge_main->get_widget();
         else if (xnav->multiview_main)
           basewidget = xnav->multiview_main->get_widget();
       }
 
-      xnav->cologin = xnav->login_new("PwR Login", systemgroup,
-          xnav_login_success_bc, xnav_login_cancel_bc, basewidget, &sts);
+      xnav->cologin = xnav->login_new("PwR Login", systemgroup, xnav_login_success_bc, xnav_login_cancel_bc,
+                                      basewidget, &sts);
     }
     return 1;
   }
-  if (EVEN(dcli_get_qualifier("dcli_arg2", arg2_str, sizeof(arg2_str)))) {
+  if (EVEN(dcli_get_qualifier("dcli_arg2", arg2_str, sizeof(arg2_str))))
+  {
     xnav->message('E', "Syntax error");
     return 1;
   }
 
   str_ToLower(arg1_str, arg1_str);
   str_ToLower(arg2_str, arg2_str);
-  sts = user_CheckUser(
-      systemgroup, arg1_str, UserList::pwcrypt(arg2_str), &priv);
+  sts = user_CheckUser(systemgroup, arg1_str, UserList::pwcrypt(arg2_str), &priv);
   if (EVEN(sts))
     xnav->message('E', "Login failure");
-  else {
+  else
+  {
     strcpy(xnav->user, arg1_str);
     xnav->priv = priv;
     sprintf(msg, "User %s logged in", arg1_str);
@@ -569,15 +634,17 @@ static int xnav_logout_func(void* client_data, void* client_flag)
 
   int window = ODD(dcli_get_qualifier("/MESSAGEWINDOW", 0, 0));
 
-  if (streq(xnav->base_user, "")) {
+  if (streq(xnav->base_user, ""))
+  {
     sprintf(msg, "User %s logged out", xnav->user);
     XttLog::dlog(xttlog_eCategory_User, msg, 0, 0);
     xnav->message('I', msg);
     if (window)
       xnav->wow->DisplayText("Logout", msg);
-  } else {
-    sprintf(msg, "User %s logged out, returned to user %s", xnav->user,
-        xnav->base_user);
+  }
+  else
+  {
+    sprintf(msg, "User %s logged out, returned to user %s", xnav->user, xnav->base_user);
     XttLog::dlog(xttlog_eCategory_User, msg, 0, 0);
     sprintf(msg, "Returned to user %s", xnav->base_user);
     xnav->message('I', msg);
@@ -599,43 +666,55 @@ static int xnav_set_func(void* client_data, void* client_flag)
 
   arg1_sts = dcli_get_qualifier("dcli_arg1", arg1_str, sizeof(arg1_str));
 
-  if (str_NoCaseStrncmp(arg1_str, "JOP_QUEID", strlen(arg1_str)) == 0) {
+  if (str_NoCaseStrncmp(arg1_str, "JOP_QUEID", strlen(arg1_str)) == 0)
+  {
     // Command is "SET JOP_QUEID"
     char arg2_str[80];
     int nr;
     int qid;
 
-    if (EVEN(dcli_get_qualifier("dcli_arg2", arg2_str, sizeof(arg2_str)))) {
+    if (EVEN(dcli_get_qualifier("dcli_arg2", arg2_str, sizeof(arg2_str))))
+    {
       xnav->message('E', "Syntax error");
       return 1;
     }
 
     // Convert to qid
     nr = sscanf(arg2_str, "%d", &qid);
-    if (nr != 1) {
+    if (nr != 1)
+    {
       xnav->message('E', "Syntax error");
       return XNAV__HOLDCOMMAND;
     }
     xnav->op->set_jop_qid(qid);
-  } else if (str_NoCaseStrncmp(arg1_str, "ADVANCEDUSER", strlen(arg1_str))
-      == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "ADVANCEDUSER", strlen(arg1_str)) == 0)
+  {
     xnav->gbl.advanced_user = 1;
     xnav->message('I', "Advanced user");
-  } else if (str_NoCaseStrncmp(arg1_str, "NOADVANCEDUSER", strlen(arg1_str))
-      == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "NOADVANCEDUSER", strlen(arg1_str)) == 0)
+  {
     xnav->gbl.advanced_user = 0;
-  } else if (str_NoCaseStrncmp(arg1_str, "SHOWTRUEDB", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "SHOWTRUEDB", strlen(arg1_str)) == 0)
+  {
     xnav->gbl.show_truedb = 1;
-  } else if (str_NoCaseStrncmp(arg1_str, "NOSHOWTRUEDB", strlen(arg1_str))
-      == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "NOSHOWTRUEDB", strlen(arg1_str)) == 0)
+  {
     xnav->gbl.show_truedb = 0;
-  } else if (str_NoCaseStrncmp(arg1_str, "SHOWALLATTR", strlen(arg1_str))
-      == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "SHOWALLATTR", strlen(arg1_str)) == 0)
+  {
     xnav->gbl.show_allattr = 1;
-  } else if (str_NoCaseStrncmp(arg1_str, "NOSHOWALLATTR", strlen(arg1_str))
-      == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "NOSHOWALLATTR", strlen(arg1_str)) == 0)
+  {
     xnav->gbl.show_allattr = 0;
-  } else if (str_NoCaseStrncmp(arg1_str, "PARAMETER", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "PARAMETER", strlen(arg1_str)) == 0)
+  {
     // Command is "SET PARAMETER"
     pwr_tAName name_str;
     char value_str[400];
@@ -644,30 +723,37 @@ static int xnav_set_func(void* client_data, void* client_flag)
     int publicwrite;
 
     bypass = ODD(dcli_get_qualifier("/BYPASS", 0, 0));
-    if (bypass) {
+    if (bypass)
+    {
       xnav->message('E', "Bypass is obsolete");
       return XNAV__HOLDCOMMAND;
     }
 
     publicwrite = ODD(dcli_get_qualifier("/PUBLICWRITE", 0, 0));
 
-    if (EVEN(dcli_get_qualifier("/NAME", name_str, sizeof(name_str)))) {
+    if (EVEN(dcli_get_qualifier("/NAME", name_str, sizeof(name_str))))
+    {
       xnav->message('E', "Enter name of parameter");
       return XNAV__HOLDCOMMAND;
     }
-    if (EVEN(dcli_get_qualifier("/VALUE", value_str, sizeof(value_str)))) {
+    if (EVEN(dcli_get_qualifier("/VALUE", value_str, sizeof(value_str))))
+    {
       xnav->message('E', "Enter value");
       return XNAV__HOLDCOMMAND;
     }
     sts = xnav->set_parameter(name_str, value_str, publicwrite);
     if (sts == XNAV__NOTAUTHORIZED)
       xnav->message('E', "Not authorized for this operation");
-    else if (EVEN(sts)) {
+    else if (EVEN(sts))
+    {
       xnav->message('E', "Unable to set parameter");
       return XNAV__HOLDCOMMAND;
-    } else
+    }
+    else
       return sts;
-  } else if (str_NoCaseStrncmp(arg1_str, "FOLDER", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "FOLDER", strlen(arg1_str)) == 0)
+  {
     // Command is "SET FOLDER"
     XttGe* gectx;
     char graph_str[80];
@@ -676,31 +762,38 @@ static int xnav_set_func(void* client_data, void* client_flag)
     int nr;
     int idx;
 
-    if (EVEN(dcli_get_qualifier("dcli_arg2", graph_str, sizeof(graph_str)))) {
+    if (EVEN(dcli_get_qualifier("dcli_arg2", graph_str, sizeof(graph_str))))
+    {
       xnav->message('E', "Graph name is missing");
       return XNAV__HOLDCOMMAND;
     }
 
-    if (EVEN(dcli_get_qualifier("/NAME", object_str, sizeof(object_str)))) {
+    if (EVEN(dcli_get_qualifier("/NAME", object_str, sizeof(object_str))))
+    {
       xnav->message('E', "Object name is missing");
       return XNAV__HOLDCOMMAND;
     }
-    if (EVEN(dcli_get_qualifier("/INDEX", idx_str, sizeof(idx_str)))) {
+    if (EVEN(dcli_get_qualifier("/INDEX", idx_str, sizeof(idx_str))))
+    {
       xnav->message('E', "Syntax error");
       return XNAV__HOLDCOMMAND;
     }
     nr = sscanf(idx_str, "%d", &idx);
-    if (nr != 1) {
+    if (nr != 1)
+    {
       xnav->message('E', "Syntax error");
       return XNAV__HOLDCOMMAND;
     }
 
-    if (!xnav->appl.find(applist_eType_Graph, graph_str, 0, (void**)&gectx)) {
+    if (!xnav->appl.find(applist_eType_Graph, graph_str, 0, (void**)&gectx))
+    {
       xnav->message('E', "Graph is not open");
       return XNAV__HOLDCOMMAND;
     }
     gectx->set_folder_index(object_str, idx);
-  } else if (str_NoCaseStrncmp(arg1_str, "SUBWINDOW", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "SUBWINDOW", strlen(arg1_str)) == 0)
+  {
     // Command is "SET SUBWINDOW"
     XttGe* gectx;
     XttMultiView* mvctx;
@@ -716,12 +809,14 @@ static int xnav_set_func(void* client_data, void* client_flag)
     int sts;
     char focus[200];
 
-    if (EVEN(dcli_get_qualifier("dcli_arg2", graph_str, sizeof(graph_str)))) {
+    if (EVEN(dcli_get_qualifier("dcli_arg2", graph_str, sizeof(graph_str))))
+    {
       xnav->message('E', "Graph name is missing");
       return XNAV__HOLDCOMMAND;
     }
 
-    if (EVEN(dcli_get_qualifier("/NAME", name_str, sizeof(name_str)))) {
+    if (EVEN(dcli_get_qualifier("/NAME", name_str, sizeof(name_str))))
+    {
       xnav->message('E', "Object name is missing");
       return XNAV__HOLDCOMMAND;
     }
@@ -746,222 +841,276 @@ static int xnav_set_func(void* client_data, void* client_flag)
 
     cont = ODD(dcli_get_qualifier("/CONTINUE", 0, 0));
 
-    if (str_NoCaseStrcmp(graph_str, "$current") == 0 && xnav->current_cmd_ctx) {
+    if (str_NoCaseStrcmp(graph_str, "$current") == 0 && xnav->current_cmd_ctx)
+    {
       gectx = (XttGe*)xnav->current_cmd_ctx;
       sts = gectx->set_subwindow_source(name_str, source_str, object_p);
 
-      if (focus_p) {
+      if (focus_p)
+      {
         sprintf(focus, "%s.%s", name_str, focus_p);
         gectx->set_object_focus(focus, inputempty);
       }
       if (cont && sts == GLOW__SUBTERMINATED)
         return XNAV__SUCCESS;
       return sts;
-    } else if (xnav->appl.find_graph(graph_str, 0, (void**)&gectx)) {
-      if (streq(source_str, "")) {
+    }
+    else if (xnav->appl.find_graph(graph_str, 0, (void**)&gectx))
+    {
+      if (streq(source_str, ""))
+      {
         xnav->message('E', "Syntax error");
         return XNAV__HOLDCOMMAND;
       }
       sts = gectx->set_subwindow_source(name_str, source_str, object_p);
 
-      if (focus_p) {
+      if (focus_p)
+      {
         sprintf(focus, "%s.%s", name_str, focus_p);
         gectx->set_object_focus(focus, inputempty);
       }
       return sts;
-    } else {
+    }
+    else
+    {
       pwr_tStatus sts;
       pwr_tAttrRef aref;
       char tmp_str[80];
       int nr;
-      double borders[4] = { 0, 0, 0, 0 };
+      double borders[4] = {0, 0, 0, 0};
       double* bordersp = borders;
 
       xnav_replace_node_str(graph_str, graph_str);
 
-      if (ODD(dcli_get_qualifier("/X0", tmp_str, sizeof(tmp_str)))) {
+      if (ODD(dcli_get_qualifier("/X0", tmp_str, sizeof(tmp_str))))
+      {
         nr = sscanf(tmp_str, "%lf", &borders[0]);
-        if (nr != 1) {
+        if (nr != 1)
+        {
           xnav->message('E', "Syntax error in x0");
           return XNAV__HOLDCOMMAND;
         }
-      } else
+      }
+      else
         borders[0] = 0;
 
-      if (ODD(dcli_get_qualifier("/Y0", tmp_str, sizeof(tmp_str)))) {
+      if (ODD(dcli_get_qualifier("/Y0", tmp_str, sizeof(tmp_str))))
+      {
         nr = sscanf(tmp_str, "%lf", &borders[1]);
-        if (nr != 1) {
+        if (nr != 1)
+        {
           xnav->message('E', "Syntax error in y0");
           return XNAV__HOLDCOMMAND;
         }
-      } else
+      }
+      else
         borders[1] = 0;
 
-      if (ODD(dcli_get_qualifier("/X1", tmp_str, sizeof(tmp_str)))) {
+      if (ODD(dcli_get_qualifier("/X1", tmp_str, sizeof(tmp_str))))
+      {
         nr = sscanf(tmp_str, "%lf", &borders[2]);
-        if (nr != 1) {
+        if (nr != 1)
+        {
           xnav->message('E', "Syntax error in x1");
           return XNAV__HOLDCOMMAND;
         }
-      } else
+      }
+      else
         borders[2] = 0;
 
-      if (ODD(dcli_get_qualifier("/Y1", tmp_str, sizeof(tmp_str)))) {
+      if (ODD(dcli_get_qualifier("/Y1", tmp_str, sizeof(tmp_str))))
+      {
         nr = sscanf(tmp_str, "%lf", &borders[3]);
-        if (nr != 1) {
+        if (nr != 1)
+        {
           xnav->message('E', "Syntax error in y1");
           return XNAV__HOLDCOMMAND;
         }
-      } else
+      }
+      else
         borders[3] = 0;
 
-      if (feq(borders[0], 0.0) && feq(borders[1], 0.0) && feq(borders[2], 0.0)
-          && feq(borders[3], 0.0))
+      if (feq(borders[0], 0.0) && feq(borders[1], 0.0) && feq(borders[2], 0.0) && feq(borders[3], 0.0))
         bordersp = 0;
 
       sts = gdh_NameToAttrref(pwr_cNObjid, graph_str, &aref);
-      if (ODD(sts)
-          && xnav->appl.find(applist_eType_MultiView, &aref, (void**)&mvctx)) {
-        return mvctx->set_subwindow_source(
-            name_str, source_str, object_p, bordersp, cont);
-      } else {
+      if (ODD(sts) && xnav->appl.find(applist_eType_MultiView, &aref, (void**)&mvctx))
+      {
+        return mvctx->set_subwindow_source(name_str, source_str, object_p, bordersp, cont);
+      }
+      else
+      {
         xnav->message('E', "Graph is not open");
         return XNAV__HOLDCOMMAND;
       }
     }
-  } else if (str_NoCaseStrncmp(arg1_str, "NEXTSUBWINDOW", strlen(arg1_str))
-      == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "NEXTSUBWINDOW", strlen(arg1_str)) == 0)
+  {
     // Command is "SET NEXTSUBWINDOW"
     XttGe* gectx;
     XttMultiView* mvctx;
     pwr_tOName graph_str;
     char name_str[80];
 
-    if (EVEN(dcli_get_qualifier("dcli_arg2", graph_str, sizeof(graph_str)))) {
+    if (EVEN(dcli_get_qualifier("dcli_arg2", graph_str, sizeof(graph_str))))
+    {
       xnav->message('E', "Graph name is missing");
       return XNAV__HOLDCOMMAND;
     }
 
-    if (EVEN(dcli_get_qualifier("/NAME", name_str, sizeof(name_str)))) {
+    if (EVEN(dcli_get_qualifier("/NAME", name_str, sizeof(name_str))))
+    {
       xnav->message('E', "Object name is missing");
       return XNAV__HOLDCOMMAND;
     }
 
-    if (xnav->appl.find_graph(graph_str, 0, (void**)&gectx)) {
+    if (xnav->appl.find_graph(graph_str, 0, (void**)&gectx))
+    {
       // todo
-    } else {
+    }
+    else
+    {
       pwr_tStatus sts;
       pwr_tAttrRef aref;
 
       xnav_replace_node_str(graph_str, graph_str);
 
       sts = gdh_NameToAttrref(pwr_cNObjid, graph_str, &aref);
-      if (ODD(sts)
-          && xnav->appl.find(applist_eType_MultiView, &aref, (void**)&mvctx)) {
+      if (ODD(sts) && xnav->appl.find(applist_eType_MultiView, &aref, (void**)&mvctx))
+      {
         return mvctx->set_subwindow_next(name_str);
-      } else {
+      }
+      else
+      {
         xnav->message('E', "Graph is not open");
         return XNAV__HOLDCOMMAND;
       }
     }
-  } else if (str_NoCaseStrncmp(arg1_str, "PREVSUBWINDOW", strlen(arg1_str))
-      == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "PREVSUBWINDOW", strlen(arg1_str)) == 0)
+  {
     // Command is "SET PREVSUBWINDOW"
     XttGe* gectx;
     XttMultiView* mvctx;
     pwr_tOName graph_str;
     char name_str[80];
 
-    if (EVEN(dcli_get_qualifier("dcli_arg2", graph_str, sizeof(graph_str)))) {
+    if (EVEN(dcli_get_qualifier("dcli_arg2", graph_str, sizeof(graph_str))))
+    {
       xnav->message('E', "Graph name is missing");
       return XNAV__HOLDCOMMAND;
     }
 
-    if (EVEN(dcli_get_qualifier("/NAME", name_str, sizeof(name_str)))) {
+    if (EVEN(dcli_get_qualifier("/NAME", name_str, sizeof(name_str))))
+    {
       xnav->message('E', "Object name is missing");
       return XNAV__HOLDCOMMAND;
     }
 
-    if (xnav->appl.find_graph(graph_str, 0, (void**)&gectx)) {
+    if (xnav->appl.find_graph(graph_str, 0, (void**)&gectx))
+    {
       // todo
-    } else {
+    }
+    else
+    {
       pwr_tStatus sts;
       pwr_tAttrRef aref;
 
       xnav_replace_node_str(graph_str, graph_str);
 
       sts = gdh_NameToAttrref(pwr_cNObjid, graph_str, &aref);
-      if (ODD(sts)
-          && xnav->appl.find(applist_eType_MultiView, &aref, (void**)&mvctx)) {
+      if (ODD(sts) && xnav->appl.find(applist_eType_MultiView, &aref, (void**)&mvctx))
+      {
         return mvctx->set_subwindow_prev(name_str);
-      } else {
+      }
+      else
+      {
         xnav->message('E', "Graph is not open");
         return XNAV__HOLDCOMMAND;
       }
     }
-  } else if (str_NoCaseStrncmp(arg1_str, "SUBEVENTS", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "SUBEVENTS", strlen(arg1_str)) == 0)
+  {
     // Command is "SET SUBEVENTS"
     XttGe* gectx;
     pwr_tOName graph_str;
     int disable;
 
-    if ( ODD(dcli_get_qualifier("/OFF", 0, 0)))
+    if (ODD(dcli_get_qualifier("/OFF", 0, 0)))
       disable = 1;
     else if (ODD(dcli_get_qualifier("/ON", 0, 0)))
       disable = 0;
-    else {
+    else
+    {
       xnav->message('E', "On or off is missing");
       return XNAV__HOLDCOMMAND;
     }
 
-    if (EVEN(dcli_get_qualifier("dcli_arg2", graph_str, sizeof(graph_str)))) {
+    if (EVEN(dcli_get_qualifier("dcli_arg2", graph_str, sizeof(graph_str))))
+    {
       xnav->message('E', "Graph name is missing");
       return XNAV__HOLDCOMMAND;
     }
 
-    if (str_NoCaseStrcmp(graph_str, "$current") == 0 && xnav->current_cmd_ctx) {
+    if (str_NoCaseStrcmp(graph_str, "$current") == 0 && xnav->current_cmd_ctx)
+    {
       gectx = (XttGe*)xnav->current_cmd_ctx;
       gectx->disable_subwindow_events(disable);
-    } else if (xnav->appl.find_graph(graph_str, 0, (void**)&gectx)) {
+    }
+    else if (xnav->appl.find_graph(graph_str, 0, (void**)&gectx))
+    {
       gectx->disable_subwindow_events(disable);
-    } 
-  } else if (str_NoCaseStrncmp(arg1_str, "LANGUAGE", strlen(arg1_str)) == 0) {
+    }
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "LANGUAGE", strlen(arg1_str)) == 0)
+  {
     char language_str[80];
     ApplListElem* elem;
     pwr_tStatus sts;
 
     // Command is "SET LANGUAGE"
-    if (EVEN(dcli_get_qualifier(
-            "dcli_arg2", language_str, sizeof(language_str)))) {
+    if (EVEN(dcli_get_qualifier("dcli_arg2", language_str, sizeof(language_str))))
+    {
       xnav->message('E', "Enter language");
       return XNAV__HOLDCOMMAND;
     }
     str_ToLower(language_str, language_str);
     sts = Lng::set(language_str);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       xnav->message(' ', XNav::get_message(sts));
       return XNAV__SUCCESS;
     }
 
     // Set new coding to all graphs
-    for (elem = xnav->appl.root; elem; elem = elem->next) {
+    for (elem = xnav->appl.root; elem; elem = elem->next)
+    {
       if (elem->type == applist_eType_Graph)
         ((XttGe*)elem->ctx)->set_text_coding(Lng::translatefile_coding());
     }
-  } else if (str_NoCaseStrncmp(arg1_str, "NORATIO", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "NORATIO", strlen(arg1_str)) == 0)
+  {
     // Command is "SET NORATIO"
     xnav->gbl.no_graph_ratio = 1;
-  } else if (str_NoCaseStrcmp(arg1_str, "crashtest") == 0) {
+  }
+  else if (str_NoCaseStrcmp(arg1_str, "crashtest") == 0)
+  {
     // Command is "SET CRASHTEST"
     char* p = 0;
     char c;
     c = *p;
-  } else if (str_NoCaseStrncmp(arg1_str, "DISPLAY", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "DISPLAY", strlen(arg1_str)) == 0)
+  {
     // Command is "SET DISPLAY"
     xnav_eConv conv;
     char arg2_str[80];
 
-    if (EVEN(dcli_get_qualifier("dcli_arg2", arg2_str, sizeof(arg2_str)))) {
+    if (EVEN(dcli_get_qualifier("dcli_arg2", arg2_str, sizeof(arg2_str))))
+    {
       xnav->message('E', "Syntax error");
       return 1;
     }
@@ -984,37 +1133,45 @@ static int xnav_set_func(void* client_data, void* client_flag)
       conv = xnav_eConv_Identity;
     else if (str_NoCaseStrncmp(arg2_str, "DEFAULT", strlen(arg2_str)) == 0)
       conv = xnav_eConv_No;
-    else {
+    else
+    {
       xnav->message('E', "Syntax error");
       return 1;
     }
 
     xnav->set_select_conversion(conv);
-  } else if (str_NoCaseStrncmp(arg1_str, "ALARMVIEW", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "ALARMVIEW", strlen(arg1_str)) == 0)
+  {
     // Command is "SET ALARMVIEW"
     pwr_tOName name_str;
     pwr_tObjid objid;
     pwr_tStatus sts;
 
-    if (!xnav->ev) {
+    if (!xnav->ev)
+    {
       xnav->message('E', "Alarmlist is not loaded");
       return XNAV__SUCCESS;
     }
 
-    if (EVEN(dcli_get_qualifier("dcli_arg2", name_str, sizeof(name_str)))) {
-      if (EVEN(dcli_get_qualifier("/NAME", name_str, sizeof(name_str)))) {
+    if (EVEN(dcli_get_qualifier("dcli_arg2", name_str, sizeof(name_str))))
+    {
+      if (EVEN(dcli_get_qualifier("/NAME", name_str, sizeof(name_str))))
+      {
         xnav->message('E', "Object name is missing");
         return XNAV__HOLDCOMMAND;
       }
     }
 
-    if (str_NoCaseStrcmp(name_str, "none") == 0) {
+    if (str_NoCaseStrcmp(name_str, "none") == 0)
+    {
       sts = xnav->ev->set_view(pwr_cNOid);
       return XNAV__SUCCESS;
     }
 
     sts = gdh_NameToObjid(name_str, &objid);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       xnav->message('E', "Object not found");
       return XNAV__SUCCESS;
     }
@@ -1023,39 +1180,47 @@ static int xnav_set_func(void* client_data, void* client_flag)
     if (EVEN(sts))
       return sts;
     return XNAV__SUCCESS;
-  } else if (str_NoCaseStrncmp(arg1_str, "COLORTHEME", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "COLORTHEME", strlen(arg1_str)) == 0)
+  {
     // Command is "SET COLORTHEME"
     char idx_str[20];
     int idx;
     int num;
     ApplListElem* elem;
 
-    if (ODD(dcli_get_qualifier("/NEXT", 0, 0))) {
+    if (ODD(dcli_get_qualifier("/NEXT", 0, 0)))
+    {
       idx = xnav->gbl.color_theme + 1;
       if (idx > 16)
-	idx = 1;
+        idx = 1;
     }
-    else {
-      if (EVEN(dcli_get_qualifier("/INDEX", idx_str, sizeof(idx_str)))) {
-	xnav->message('E', "Type syntax error");
-	return XNAV__HOLDCOMMAND;
+    else
+    {
+      if (EVEN(dcli_get_qualifier("/INDEX", idx_str, sizeof(idx_str))))
+      {
+        xnav->message('E', "Type syntax error");
+        return XNAV__HOLDCOMMAND;
       }
 
       num = sscanf(idx_str, "%d", &idx);
-      if (num != 1) {
-	xnav->message('E', "Type syntax error");
-	return XNAV__HOLDCOMMAND;
+      if (num != 1)
+      {
+        xnav->message('E', "Type syntax error");
+        return XNAV__HOLDCOMMAND;
       }
     }
 
     idx = CoWow::SetColorTheme(idx);
-    if (xnav->gbl.color_theme != idx) {
+    if (xnav->gbl.color_theme != idx)
+    {
       xnav->gbl.color_theme = idx;
 
       xnav->update_color_theme(idx);
       if (xnav->ev)
-	xnav->ev->update_color_theme(idx);
-      for (elem = xnav->appl.root; elem; elem = elem->next) {
+        xnav->ev->update_color_theme(idx);
+      for (elem = xnav->appl.root; elem; elem = elem->next)
+      {
         if (elem->type == applist_eType_Graph)
           ((XttGe*)elem->ctx)->update_color_theme(idx);
         else if (elem->type == applist_eType_Dashboard)
@@ -1072,7 +1237,9 @@ static int xnav_set_func(void* client_data, void* client_flag)
     }
     if (xnav->op)
       xnav->op->set_color_theme(idx);
-  } else if (str_NoCaseStrncmp(arg1_str, "GRAPH", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "GRAPH", strlen(arg1_str)) == 0)
+  {
     // Command is "SET GRAPH"
     pwr_tAName instance_str;
     char* instance_p = 0;
@@ -1081,63 +1248,75 @@ static int xnav_set_func(void* client_data, void* client_flag)
     char below_str[20];
     XttGe* gectx;
 
-    if (ODD(dcli_get_qualifier(
-            "/INSTANCE", instance_str, sizeof(instance_str))))
+    if (ODD(dcli_get_qualifier("/INSTANCE", instance_str, sizeof(instance_str))))
       instance_p = instance_str;
 
-    if (EVEN(dcli_get_qualifier("dcli_arg2", name_str, sizeof(name_str)))) {
+    if (EVEN(dcli_get_qualifier("dcli_arg2", name_str, sizeof(name_str))))
+    {
       xnav->message('E', "Syntax error");
       return XNAV__SUCCESS;
     }
-    if (!xnav->appl.find(
-            applist_eType_Graph, name_str, instance_p, (void**)&gectx)) {
+    if (!xnav->appl.find(applist_eType_Graph, name_str, instance_p, (void**)&gectx))
+    {
       xnav->message('E', "Graph not found");
       return XNAV__SUCCESS;
     }
 
-    if (ODD(dcli_get_qualifier("/ESCAPESTORE", 0, 0))) {
+    if (ODD(dcli_get_qualifier("/ESCAPESTORE", 0, 0)))
+    {
       gectx->set_object_focus(0, 0);
-    } else if (ODD(dcli_get_qualifier(
-                   "/ICONIFY", iconify_str, sizeof(iconify_str)))) {
+    }
+    else if (ODD(dcli_get_qualifier("/ICONIFY", iconify_str, sizeof(iconify_str))))
+    {
       int iconify;
       if (streq(iconify_str, "1"))
         iconify = 1;
       else if (streq(iconify_str, "0"))
         iconify = 0;
-      else {
+      else
+      {
         xnav->message('E', "Syntax error");
         return XNAV__SUCCESS;
       }
 
       gectx->iconify(iconify);
-    } else if (ODD(dcli_get_qualifier(
-                   "/BELOW", below_str, sizeof(below_str)))) {
+    }
+    else if (ODD(dcli_get_qualifier("/BELOW", below_str, sizeof(below_str))))
+    {
       int below;
       if (streq(below_str, "1"))
         below = 1;
       else if (streq(below_str, "0"))
         below = 0;
-      else {
+      else
+      {
         xnav->message('E', "Syntax error");
         return XNAV__SUCCESS;
       }
 
       gectx->set_below(below);
-    } else {
+    }
+    else
+    {
       xnav->message('E', "Syntax error");
       return XNAV__SUCCESS;
     }
-  } else if (str_NoCaseStrncmp(arg1_str, "SIGNAL", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "SIGNAL", strlen(arg1_str)) == 0)
+  {
     char arg2_str[80];
 
-    if (EVEN(dcli_get_qualifier("dcli_arg2", arg2_str, sizeof(arg2_str)))) {
+    if (EVEN(dcli_get_qualifier("dcli_arg2", arg2_str, sizeof(arg2_str))))
+    {
       xnav->message('E', "Syntax error");
       return XNAV__SUCCESS;
     }
 
-    if (str_NoCaseStrncmp(arg2_str, "INVERT", strlen(arg2_str)) == 0) {
+    if (str_NoCaseStrncmp(arg2_str, "INVERT", strlen(arg2_str)) == 0)
+    {
       // Check authorization
-      if (!(xnav->priv & pwr_mPrv_System)) {
+      if (!(xnav->priv & pwr_mPrv_System))
+      {
         xnav->message('E', "Not authorized for this operation");
         return XNAV__SUCCESS;
       }
@@ -1150,21 +1329,27 @@ static int xnav_set_func(void* client_data, void* client_flag)
       int on = ODD(dcli_get_qualifier("/ON", 0, 0));
       int off = ODD(dcli_get_qualifier("/OFF", 0, 0));
 
-      if ((on && off) || (!on && !off)) {
+      if ((on && off) || (!on && !off))
+      {
         xnav->message('E', "Syntax error");
         return XNAV__HOLDCOMMAND;
       }
 
-      if (ODD(dcli_get_qualifier("/NAME", name_str, sizeof(name_str)))) {
+      if (ODD(dcli_get_qualifier("/NAME", name_str, sizeof(name_str))))
+      {
         sts = gdh_NameToAttrref(pwr_cNObjid, name_str, &aref);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           xnav->message('E', "No such object");
           return XNAV__SUCCESS;
         }
-      } else {
+      }
+      else
+      {
         /* Get the selected object */
         sts = xnav->get_select(&aref, &is_attr);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           xnav->message('E', "Enter name or select an object");
           return XNAV__SUCCESS;
         }
@@ -1172,17 +1357,20 @@ static int xnav_set_func(void* client_data, void* client_flag)
       }
 
       sts = xnav->set_signal(&aref, xnav_eSetSignal_Invert, on);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         xnav->message(' ', XNav::get_message(sts));
         return XNAV__SUCCESS;
       }
 
       if (selected)
         xnav->refresh();
-    } else if (str_NoCaseStrncmp(arg2_str, "CONVERSION", strlen(arg2_str))
-        == 0) {
+    }
+    else if (str_NoCaseStrncmp(arg2_str, "CONVERSION", strlen(arg2_str)) == 0)
+    {
       // Check authorization
-      if (!(xnav->priv & pwr_mPrv_System)) {
+      if (!(xnav->priv & pwr_mPrv_System))
+      {
         xnav->message('E', "Not authorized for this operation");
         return XNAV__SUCCESS;
       }
@@ -1195,21 +1383,27 @@ static int xnav_set_func(void* client_data, void* client_flag)
       int on = ODD(dcli_get_qualifier("/ON", 0, 0));
       int off = ODD(dcli_get_qualifier("/OFF", 0, 0));
 
-      if ((on && off) || (!on && !off)) {
+      if ((on && off) || (!on && !off))
+      {
         xnav->message('E', "Syntax error");
         return XNAV__HOLDCOMMAND;
       }
 
-      if (ODD(dcli_get_qualifier("/NAME", name_str, sizeof(name_str)))) {
+      if (ODD(dcli_get_qualifier("/NAME", name_str, sizeof(name_str))))
+      {
         sts = gdh_NameToAttrref(pwr_cNObjid, name_str, &aref);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           xnav->message('E', "No such object");
           return XNAV__SUCCESS;
         }
-      } else {
+      }
+      else
+      {
         /* Get the selected object */
         sts = xnav->get_select(&aref, &is_attr);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           xnav->message('E', "Enter name or select an object");
           return XNAV__SUCCESS;
         }
@@ -1217,15 +1411,19 @@ static int xnav_set_func(void* client_data, void* client_flag)
       }
 
       sts = xnav->set_signal(&aref, xnav_eSetSignal_Conversion, on);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         xnav->message(' ', XNav::get_message(sts));
         return XNAV__SUCCESS;
       }
       if (selected)
         xnav->refresh();
-    } else if (str_NoCaseStrncmp(arg2_str, "TEST", strlen(arg2_str)) == 0) {
+    }
+    else if (str_NoCaseStrncmp(arg2_str, "TEST", strlen(arg2_str)) == 0)
+    {
       // Check authorization
-      if (!(xnav->priv & pwr_mPrv_System)) {
+      if (!(xnav->priv & pwr_mPrv_System))
+      {
         xnav->message('E', "Not authorized for this operation");
         return XNAV__SUCCESS;
       }
@@ -1238,21 +1436,27 @@ static int xnav_set_func(void* client_data, void* client_flag)
       int on = ODD(dcli_get_qualifier("/ON", 0, 0));
       int off = ODD(dcli_get_qualifier("/OFF", 0, 0));
 
-      if ((on && off) || (!on && !off)) {
+      if ((on && off) || (!on && !off))
+      {
         xnav->message('E', "Syntax error");
         return XNAV__HOLDCOMMAND;
       }
 
-      if (ODD(dcli_get_qualifier("/NAME", name_str, sizeof(name_str)))) {
+      if (ODD(dcli_get_qualifier("/NAME", name_str, sizeof(name_str))))
+      {
         sts = gdh_NameToAttrref(pwr_cNObjid, name_str, &aref);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           xnav->message('E', "No such object");
           return XNAV__SUCCESS;
         }
-      } else {
+      }
+      else
+      {
         /* Get the selected object */
         sts = xnav->get_select(&aref, &is_attr);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           xnav->message('E', "Enter name or select an object");
           return XNAV__SUCCESS;
         }
@@ -1260,16 +1464,19 @@ static int xnav_set_func(void* client_data, void* client_flag)
       }
 
       sts = xnav->set_signal(&aref, xnav_eSetSignal_Test, on);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         xnav->message(' ', XNav::get_message(sts));
         return XNAV__SUCCESS;
       }
       if (selected)
         xnav->refresh();
-    } else if (str_NoCaseStrncmp(arg2_str, "TESTVALUE", strlen(arg2_str))
-        == 0) {
+    }
+    else if (str_NoCaseStrncmp(arg2_str, "TESTVALUE", strlen(arg2_str)) == 0)
+    {
       // Check authorization
-      if (!(xnav->priv & pwr_mPrv_System)) {
+      if (!(xnav->priv & pwr_mPrv_System))
+      {
         xnav->message('E', "Not authorized for this operation");
         return XNAV__SUCCESS;
       }
@@ -1282,21 +1489,27 @@ static int xnav_set_func(void* client_data, void* client_flag)
       int on = ODD(dcli_get_qualifier("/ON", 0, 0));
       int off = ODD(dcli_get_qualifier("/OFF", 0, 0));
 
-      if ((on && off) || (!on && !off)) {
+      if ((on && off) || (!on && !off))
+      {
         xnav->message('E', "Syntax error");
         return XNAV__HOLDCOMMAND;
       }
 
-      if (ODD(dcli_get_qualifier("/NAME", name_str, sizeof(name_str)))) {
+      if (ODD(dcli_get_qualifier("/NAME", name_str, sizeof(name_str))))
+      {
         sts = gdh_NameToAttrref(pwr_cNObjid, name_str, &aref);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           xnav->message('E', "No such object");
           return XNAV__SUCCESS;
         }
-      } else {
+      }
+      else
+      {
         /* Get the selected object */
         sts = xnav->get_select(&aref, &is_attr);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           xnav->message('E', "Enter name or select an object");
           return XNAV__SUCCESS;
         }
@@ -1304,15 +1517,18 @@ static int xnav_set_func(void* client_data, void* client_flag)
       }
 
       sts = xnav->set_signal(&aref, xnav_eSetSignal_TestValue, on);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         xnav->message(' ', XNav::get_message(sts));
         return XNAV__SUCCESS;
       }
       if (selected)
         xnav->refresh();
-    } else
+    }
+    else
       xnav->message('E', "Syntax error");
-  } else
+  }
+  else
     xnav->message('E', "Syntax error");
   return 1;
 }
@@ -1327,7 +1543,8 @@ static int xnav_show_func(void* client_data, void* client_flag)
 
   arg1_sts = dcli_get_qualifier("dcli_arg1", arg1_str, sizeof(arg1_str));
 
-  if (str_NoCaseStrncmp(arg1_str, "VERSION", strlen(arg1_str)) == 0) {
+  if (str_NoCaseStrncmp(arg1_str, "VERSION", strlen(arg1_str)) == 0)
+  {
     // Command is "SHOW VERSION"
     char message_str[100];
 
@@ -1335,26 +1552,35 @@ static int xnav_show_func(void* client_data, void* client_flag)
     strcat(message_str, xtt_version);
     xnav->message('I', message_str);
     return 1;
-  } else if (str_NoCaseStrncmp(arg1_str, "LICENSE", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "LICENSE", strlen(arg1_str)) == 0)
+  {
     // Command is "SHOW LICENSE"
     xnav->wow->DisplayLicense();
     return 1;
-  } else if (str_NoCaseStrncmp(arg1_str, "SYMBOL", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "SYMBOL", strlen(arg1_str)) == 0)
+  {
     /* Command is "SHOW SYMBOL" */
     char arg2_str[80];
     char message_str[400];
     char value[DCLI_SYM_VALUE_SIZE];
 
-    if (ODD(dcli_get_qualifier("/ALL", 0, 0))) {
+    if (ODD(dcli_get_qualifier("/ALL", 0, 0)))
+    {
       sts = xnav->show_symbols();
       return sts;
-    } else {
-      if (EVEN(dcli_get_qualifier("dcli_arg2", arg2_str, sizeof(arg2_str)))) {
+    }
+    else
+    {
+      if (EVEN(dcli_get_qualifier("dcli_arg2", arg2_str, sizeof(arg2_str))))
+      {
         sts = xnav->show_symbols();
         return sts;
       }
       sts = dcli_get_symbol(arg2_str, value);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         xnav->message('E', "Symbol not found");
         return 1;
       }
@@ -1362,70 +1588,99 @@ static int xnav_show_func(void* client_data, void* client_flag)
       xnav->message('I', message_str);
       return 1;
     }
-  } else if (str_NoCaseStrncmp(arg1_str, "PLCPGM", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "PLCPGM", strlen(arg1_str)) == 0)
+  {
     /* Command is "SHOW PLCPGM" */
     xnav->show_plcpgm();
     return 1;
-  } else if (str_NoCaseStrncmp(arg1_str, "PLCTHREADS", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "PLCTHREADS", strlen(arg1_str)) == 0)
+  {
     /* Command is "SHOW PLCTHREAD" */
     xnav->show_plcthreads();
     return 1;
-  } else if (str_NoCaseStrncmp(arg1_str, "NODES", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "NODES", strlen(arg1_str)) == 0)
+  {
     /* Command is "SHOW NODES" */
     xnav->show_nethandler();
     return 1;
-  } else if (str_NoCaseStrncmp(arg1_str, "LINKS", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "LINKS", strlen(arg1_str)) == 0)
+  {
     /* Command is "SHOW LINKS" */
     xnav->show_nethandler();
     return 1;
-  } else if (str_NoCaseStrncmp(arg1_str, "SUBSRV", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "SUBSRV", strlen(arg1_str)) == 0)
+  {
     /* Command is "SHOW SUBSRV" */
     xnav->show_subsrv();
     return 1;
-  } else if (str_NoCaseStrncmp(arg1_str, "SUBCLI", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "SUBCLI", strlen(arg1_str)) == 0)
+  {
     /* Command is "SHOW SUBCLI" */
     xnav->show_subcli();
     return 1;
-  } else if (str_NoCaseStrncmp(arg1_str, "DEVICE", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "DEVICE", strlen(arg1_str)) == 0)
+  {
     /* Command is "SHOW DEVICE" */
     xnav->show_device();
     return 1;
-  } else if (str_NoCaseStrncmp(arg1_str, "REMNODE", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "REMNODE", strlen(arg1_str)) == 0)
+  {
     /* Command is "SHOW REMNODE" */
     xnav->show_remnode();
     return 1;
-  } else if (str_NoCaseStrncmp(arg1_str, "REMTRANS", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "REMTRANS", strlen(arg1_str)) == 0)
+  {
     /* Command is "SHOW REMTRANS" */
     xnav->show_remtrans(pwr_cNObjid);
     return 1;
-  } else if (str_NoCaseStrncmp(arg1_str, "DATABASE", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "DATABASE", strlen(arg1_str)) == 0)
+  {
     /* Command is "SHOW DATABASE" */
     xnav->show_database();
     return 1;
-  } else if (str_NoCaseStrncmp(arg1_str, "LOGGING", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "LOGGING", strlen(arg1_str)) == 0)
+  {
     /* Command is "SHOW LOGGING" */
     char entry_str[80];
     int entry;
     int nr;
 
-    if (ODD(dcli_get_qualifier("/ENTRY", entry_str, sizeof(entry_str)))) {
+    if (ODD(dcli_get_qualifier("/ENTRY", entry_str, sizeof(entry_str))))
+    {
       /* convert to integer */
       nr = sscanf(entry_str, "%d", &entry);
-      if (nr != 1) {
+      if (nr != 1)
+      {
         xnav->message('E', "Entry syntax error");
         return XNAV__HOLDCOMMAND;
       }
-    } else {
+    }
+    else
+    {
       // entry 1 is default
       entry = 1;
     }
-    if (entry > XNAV_LOGG_MAX || entry < 1) {
+    if (entry > XNAV_LOGG_MAX || entry < 1)
+    {
       xnav->message('E', "Entry out of range");
       return XNAV__HOLDCOMMAND;
     }
 
     xnav->show_logging(entry - 1);
-  } else if (str_NoCaseStrncmp(arg1_str, "FILE", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "FILE", strlen(arg1_str)) == 0)
+  {
     /* Command is "SHOW FILE" */
     char arg2_str[80];
     char title[80];
@@ -1433,25 +1688,32 @@ static int xnav_show_func(void* client_data, void* client_flag)
     char option_str[80];
     int hide_dir = 0;
 
-    if (EVEN(dcli_get_qualifier("dcli_arg2", arg2_str, sizeof(arg2_str)))) {
+    if (EVEN(dcli_get_qualifier("dcli_arg2", arg2_str, sizeof(arg2_str))))
+    {
       hide_dir = 1;
       dcli_get_defaultfilename("*", filename, ".rtt_com");
       strcpy(title, "Stored pictures and scripts");
-    } else {
+    }
+    else
+    {
       dcli_get_defaultfilename(arg2_str, filename, ".rtt_com");
       strcpy(title, "File list");
     }
-    if (ODD(dcli_get_qualifier("/OPTION", option_str, sizeof(option_str)))) {
+    if (ODD(dcli_get_qualifier("/OPTION", option_str, sizeof(option_str))))
+    {
       if (str_NoCaseStrcmp(option_str, "HIDE_DIR") == 0)
         hide_dir = 1;
     }
     sts = xnav->show_file(filename, title, hide_dir);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       xnav->message('E', "No files found");
       return XNAV__SUCCESS;
     }
     return sts;
-  } else if (str_NoCaseStrncmp(arg1_str, "GRAPH", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "GRAPH", strlen(arg1_str)) == 0)
+  {
     /* Command is "SHOW GRAPH" */
     char arg2_str[80];
     char title[80];
@@ -1459,25 +1721,32 @@ static int xnav_show_func(void* client_data, void* client_flag)
     char option_str[80];
     int hide_dir = 0;
 
-    if (EVEN(dcli_get_qualifier("dcli_arg2", arg2_str, sizeof(arg2_str)))) {
+    if (EVEN(dcli_get_qualifier("dcli_arg2", arg2_str, sizeof(arg2_str))))
+    {
       hide_dir = 1;
       dcli_get_defaultfilename("pwrp_exe:*", filename, ".pwg");
       strcpy(title, "Graphs");
-    } else {
+    }
+    else
+    {
       dcli_get_defaultfilename(arg2_str, filename, ".pwg");
       strcpy(title, "Graph list");
     }
-    if (ODD(dcli_get_qualifier("/OPTION", option_str, sizeof(option_str)))) {
+    if (ODD(dcli_get_qualifier("/OPTION", option_str, sizeof(option_str))))
+    {
       if (str_NoCaseStrcmp(option_str, "HIDE_DIR") == 0)
         hide_dir = 1;
     }
     sts = xnav->show_file(filename, title, hide_dir);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       xnav->message('E', "No files found");
       return XNAV__SUCCESS;
     }
     return sts;
-  } else if (str_NoCaseStrncmp(arg1_str, "LOGFILES", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "LOGFILES", strlen(arg1_str)) == 0)
+  {
     /* Command is "SHOW LOGFILES" */
     char arg2_str[80];
     char title[80];
@@ -1485,25 +1754,32 @@ static int xnav_show_func(void* client_data, void* client_flag)
     char option_str[80];
     int hide_dir = 0;
 
-    if (EVEN(dcli_get_qualifier("dcli_arg2", arg2_str, sizeof(arg2_str)))) {
+    if (EVEN(dcli_get_qualifier("dcli_arg2", arg2_str, sizeof(arg2_str))))
+    {
       hide_dir = 1;
       dcli_get_defaultfilename("*", filename, ".rtt_log");
       strcpy(title, "RttLogFiles");
-    } else {
+    }
+    else
+    {
       dcli_get_defaultfilename(arg2_str, filename, ".rtt_log");
       strcpy(title, "RttLogFiles");
     }
-    if (ODD(dcli_get_qualifier("/OPTION", option_str, sizeof(option_str)))) {
+    if (ODD(dcli_get_qualifier("/OPTION", option_str, sizeof(option_str))))
+    {
       if (str_NoCaseStrcmp(option_str, "HIDE_DIR") == 0)
         hide_dir = 1;
     }
     sts = xnav->show_file(filename, title, hide_dir);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       xnav->message('E', "No files found");
       return XNAV__SUCCESS;
     }
     return sts;
-  } else if (str_NoCaseStrncmp(arg1_str, "TIME", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "TIME", strlen(arg1_str)) == 0)
+  {
     /* Command is "SHOW TIME" */
     char message_str[100];
 
@@ -1511,24 +1787,33 @@ static int xnav_show_func(void* client_data, void* client_flag)
     sprintf(message_str, "Time is %s", xnav->gbl.time);
     xnav->message('I', message_str);
     return XNAV__SUCCESS;
-  } else if (str_NoCaseStrncmp(arg1_str, "DEFAULT", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "DEFAULT", strlen(arg1_str)) == 0)
+  {
     /* Command is "SHOW DEFAULT" */
     char message_str[100];
 
     sprintf(message_str, "Default directory: %s", xnav->gbl.default_directory);
     xnav->message('I', message_str);
     return XNAV__SUCCESS;
-  } else if (str_NoCaseStrncmp(arg1_str, "MENU", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "MENU", strlen(arg1_str)) == 0)
+  {
     /* Command is "SHOW MENU" */
     char name_str[80];
 
-    if (ODD(dcli_get_qualifier("dcli_arg2", name_str, sizeof(name_str)))) {
-      if (name_str[0] == '/') {
+    if (ODD(dcli_get_qualifier("dcli_arg2", name_str, sizeof(name_str))))
+    {
+      if (name_str[0] == '/')
+      {
         xnav->message('E', "Syntax error");
         return XNAV__HOLDCOMMAND;
       }
-    } else {
-      if (EVEN(dcli_get_qualifier("/NAME", name_str, sizeof(name_str)))) {
+    }
+    else
+    {
+      if (EVEN(dcli_get_qualifier("/NAME", name_str, sizeof(name_str))))
+      {
         xnav->message('E', "Syntax error, name not found");
         return XNAV__HOLDCOMMAND;
       }
@@ -1536,61 +1821,71 @@ static int xnav_show_func(void* client_data, void* client_flag)
     //    sts = rtt_show_menu( ctx, name_str);
     sts = 0;
     return sts;
-  } else if (str_NoCaseStrncmp(arg1_str, "HIERARCHY", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "HIERARCHY", strlen(arg1_str)) == 0)
+  {
     /* Command is "SHOW HIERARCHY" */
     IF_NOGDH_RETURN;
-    sts = dcli_cli(
-        (dcli_tCmdTable*)&xnav_command_table, "SHOW DATABASE", (void*)xnav, 0);
+    sts = dcli_cli((dcli_tCmdTable*)&xnav_command_table, "SHOW DATABASE", (void*)xnav, 0);
     return sts;
-  } else if (str_NoCaseStrncmp(arg1_str, "CHILDREN", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "CHILDREN", strlen(arg1_str)) == 0)
+  {
     // Command is "SHOW CHILDREN"
     pwr_tOName name_str;
     pwr_tObjid objid;
     int newlist;
 
     IF_NOGDH_RETURN;
-    if (ODD(dcli_get_qualifier("/NAME", name_str, sizeof(name_str)))) {
+    if (ODD(dcli_get_qualifier("/NAME", name_str, sizeof(name_str))))
+    {
       sts = gdh_NameToObjid(name_str, &objid);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         xnav->message('E', "Object not found");
         return XNAV__SUCCESS;
       }
-      sts = gdh_ObjidToName(
-          objid, name_str, sizeof(name_str), cdh_mName_volumeStrict);
+      sts = gdh_ObjidToName(objid, name_str, sizeof(name_str), cdh_mName_volumeStrict);
       if (EVEN(sts))
         return sts;
-    } else {
+    }
+    else
+    {
       /* Get the selected object */
-      sts = xnav->get_current_object(
-          &objid, name_str, sizeof(name_str), cdh_mName_volumeStrict);
-      if (EVEN(sts)) {
+      sts = xnav->get_current_object(&objid, name_str, sizeof(name_str), cdh_mName_volumeStrict);
+      if (EVEN(sts))
+      {
         xnav->message('E', "Select an object or enter name");
         return XNAV__SUCCESS;
       }
     }
     newlist = ODD(dcli_get_qualifier("/NEW", 0, 0));
 
-    try {
+    try
+    {
       if (!newlist)
         xnav->display_object(objid, 1);
-      else {
+      else
+      {
         sts = gdh_ObjidToName(objid, name_str, sizeof(name_str), cdh_mNName);
         xnav->brow_pop();
-        ItemObject* item
-            = new ItemObject(xnav->brow, objid, NULL, flow_eDest_IntoLast, 1);
-        new ItemHeader(
-            xnav->brow, "Title", name_str, NULL, flow_eDest_IntoLast);
+        ItemObject* item = new ItemObject(xnav->brow, objid, NULL, flow_eDest_IntoLast, 1);
+        new ItemHeader(xnav->brow, "Title", name_str, NULL, flow_eDest_IntoLast);
         item->open_children(xnav->brow, 0, 0);
         delete item;
       }
-    } catch (co_error& e) {
+    }
+    catch (co_error& e)
+    {
       xnav->brow_push_all();
       brow_Redraw(xnav->brow->ctx, 0);
       xnav->message('E', (char*)e.what().c_str());
     }
 
     return XNAV__SUCCESS;
-  } else if (str_NoCaseStrncmp(arg1_str, "OBJECT", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "OBJECT", strlen(arg1_str)) == 0)
+  {
     /* Command is "SHOW OBJECT" */
     pwr_tObjName class_str;
     pwr_tOName name_str;
@@ -1608,24 +1903,26 @@ static int xnav_show_func(void* client_data, void* client_flag)
     int nr;
 
     IF_NOGDH_RETURN;
-    if (ODD(dcli_get_qualifier("/OBJID", objdid_str, sizeof(objdid_str)))) {
+    if (ODD(dcli_get_qualifier("/OBJID", objdid_str, sizeof(objdid_str))))
+    {
       pwr_tObjid objid;
       pwr_tClassId classid;
 
       /* Convert to objid */
       sts = cdh_StringToObjid(objdid_str, &objid);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         xnav->message('E', "Syntax error in objid");
         return XNAV__HOLDCOMMAND;
       }
       sts = gdh_GetObjectClass(objid, &classid);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         xnav->message('E', "Objid not found");
         return XNAV__HOLDCOMMAND;
       }
       /* Get the object name */
-      sts = gdh_ObjidToName(
-          objid, name_str, sizeof(name_str), cdh_mName_volumeStrict);
+      sts = gdh_ObjidToName(objid, name_str, sizeof(name_str), cdh_mName_volumeStrict);
 
       if (EVEN(sts))
         return sts;
@@ -1635,29 +1932,35 @@ static int xnav_show_func(void* client_data, void* client_flag)
       //  		name_ptr, 0, 0);
       sts = 0;
       return sts;
-    } else if (ODD(dcli_get_qualifier("/TYPE", type_str, sizeof(type_str)))) {
+    }
+    else if (ODD(dcli_get_qualifier("/TYPE", type_str, sizeof(type_str))))
+    {
       pwr_tObjid objid;
       char* msg;
 
-      if (EVEN(dcli_get_qualifier("/FILE", file_str, sizeof(file_str)))) {
+      if (EVEN(dcli_get_qualifier("/FILE", file_str, sizeof(file_str))))
+      {
         xnav->message('E', "Enter filename");
         return XNAV__HOLDCOMMAND;
       }
-      if (ODD(dcli_get_qualifier("/NAME", name_str, sizeof(name_str)))) {
+      if (ODD(dcli_get_qualifier("/NAME", name_str, sizeof(name_str))))
+      {
         sts = gdh_NameToObjid(name_str, &objid);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           xnav->message('E', "Object not found");
           return XNAV__SUCCESS;
         }
-        sts = gdh_ObjidToName(
-            objid, name_str, sizeof(name_str), cdh_mName_volumeStrict);
+        sts = gdh_ObjidToName(objid, name_str, sizeof(name_str), cdh_mName_volumeStrict);
         if (EVEN(sts))
           return sts;
-      } else {
+      }
+      else
+      {
         /* Get the selected object */
-        sts = xnav->get_current_object(
-            &objid, name_str, sizeof(name_str), cdh_mName_volumeStrict);
-        if (EVEN(sts)) {
+        sts = xnav->get_current_object(&objid, name_str, sizeof(name_str), cdh_mName_volumeStrict);
+        if (EVEN(sts))
+        {
           xnav->message('E', "Select an object or enter name");
           return XNAV__SUCCESS;
         }
@@ -1670,28 +1973,34 @@ static int xnav_show_func(void* client_data, void* client_flag)
     }
 
     /* Get maxobjects qualifier */
-    if (ODD(dcli_get_qualifier(
-            "/MAXOBJECTS", maxobjects_str, sizeof(maxobjects_str)))) {
+    if (ODD(dcli_get_qualifier("/MAXOBJECTS", maxobjects_str, sizeof(maxobjects_str))))
+    {
       /* Convert to objid */
       nr = sscanf(maxobjects_str, "%d", &maxobjects);
-      if (nr != 1) {
+      if (nr != 1)
+      {
         xnav->message('E', "Syntax error in maxobjects");
         return XNAV__HOLDCOMMAND;
       }
-    } else
+    }
+    else
       /* Default value */
       maxobjects = 0;
 
     /* Get the name qualifier */
-    if (ODD(dcli_get_qualifier("dcli_arg2", name_str, sizeof(name_str)))) {
+    if (ODD(dcli_get_qualifier("dcli_arg2", name_str, sizeof(name_str))))
+    {
       if (name_str[0] != '/')
         /* Assume that this is the namestring */
         name_ptr = name_str;
-      else {
+      else
+      {
         xnav->message('E', "Syntax error");
         return XNAV__HOLDCOMMAND;
       }
-    } else {
+    }
+    else
+    {
       if (ODD(dcli_get_qualifier("/NAME", name_str, sizeof(name_str))))
         name_ptr = name_str;
       else
@@ -1702,8 +2011,7 @@ static int xnav_show_func(void* client_data, void* client_flag)
       class_ptr = class_str;
     else
       class_ptr = NULL;
-    if (ODD(dcli_get_qualifier(
-            "/HIERARCHY", hierarchy_str, sizeof(hierarchy_str))))
+    if (ODD(dcli_get_qualifier("/HIERARCHY", hierarchy_str, sizeof(hierarchy_str))))
       hierarchy_ptr = hierarchy_str;
     else
       hierarchy_ptr = NULL;
@@ -1718,7 +2026,8 @@ static int xnav_show_func(void* client_data, void* client_flag)
     return sts;
   }
 
-  else if (str_NoCaseStrncmp(arg1_str, "OBJID", strlen(arg1_str)) == 0) {
+  else if (str_NoCaseStrncmp(arg1_str, "OBJID", strlen(arg1_str)) == 0)
+  {
     /* Command is "SHOW OBJID" */
     pwr_tOName name_str;
     pwr_tObjid objid;
@@ -1729,36 +2038,39 @@ static int xnav_show_func(void* client_data, void* client_flag)
 
     hex = ODD(dcli_get_qualifier("/HEXADECIMAL", 0, 0));
 
-    if (ODD(dcli_get_qualifier("/NAME", name_str, sizeof(name_str)))) {
+    if (ODD(dcli_get_qualifier("/NAME", name_str, sizeof(name_str))))
+    {
       sts = gdh_NameToObjid(name_str, &objid);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         xnav->message('E', "Object not found");
         return XNAV__SUCCESS;
       }
-      sts = gdh_ObjidToName(
-          objid, name_str, sizeof(name_str), cdh_mName_volumeStrict);
+      sts = gdh_ObjidToName(objid, name_str, sizeof(name_str), cdh_mName_volumeStrict);
       if (EVEN(sts))
         return sts;
-    } else {
+    }
+    else
+    {
       /* Get the selected object */
-      sts = xnav->get_current_object(
-          &objid, name_str, sizeof(name_str), cdh_mName_volumeStrict);
-      if (EVEN(sts)) {
+      sts = xnav->get_current_object(&objid, name_str, sizeof(name_str), cdh_mName_volumeStrict);
+      if (EVEN(sts))
+      {
         xnav->message('E', "Select an object or enter name");
         return XNAV__SUCCESS;
       }
     }
 
     if (hex)
-      sprintf(msg, "Objid %s%08x, Name %s", cdh_VolumeIdToString(0, 0, objid.vid, 0, 1), 
-	  objid.oix, name_str);
+      sprintf(msg, "Objid %s%08x, Name %s", cdh_VolumeIdToString(0, 0, objid.vid, 0, 1), objid.oix, name_str);
     else
       sprintf(msg, "Objid %s, Name %s", cdh_ObjidToString(objid, 0), name_str);
     xnav->message('I', msg);
     return XNAV__SUCCESS;
   }
 
-  else if (str_NoCaseStrncmp(arg1_str, "SIGNALS", strlen(arg1_str)) == 0) {
+  else if (str_NoCaseStrncmp(arg1_str, "SIGNALS", strlen(arg1_str)) == 0)
+  {
     /* Command is "SHOW SIGNALS" */
     pwr_tFileName file_str;
     pwr_tOName name_str;
@@ -1776,21 +2088,25 @@ static int xnav_show_func(void* client_data, void* client_flag)
       file_ptr = NULL;
 
     /* Get the name qualifier */
-    if (ODD(dcli_get_qualifier("dcli_arg2", name_str, sizeof(name_str)))) {
+    if (ODD(dcli_get_qualifier("dcli_arg2", name_str, sizeof(name_str))))
+    {
       if (name_str[0] != '/')
         /* Assume that this is the namestring */
         name_ptr = name_str;
-      else {
+      else
+      {
         xnav->message('E', "Syntax error");
         return XNAV__HOLDCOMMAND;
       }
-    } else if (ODD(dcli_get_qualifier("/NAME", name_str, sizeof(name_str))))
+    }
+    else if (ODD(dcli_get_qualifier("/NAME", name_str, sizeof(name_str))))
       name_ptr = name_str;
-    else {
+    else
+    {
       /* Get the selected object */
-      sts = xnav->get_current_object(&objid, name_str, sizeof(name_str),
-          cdh_mName_path | cdh_mName_object);
-      if (EVEN(sts)) {
+      sts = xnav->get_current_object(&objid, name_str, sizeof(name_str), cdh_mName_path | cdh_mName_object);
+      if (EVEN(sts))
+      {
         xnav->message('E', "Enter name or select an object");
         return XNAV__HOLDCOMMAND;
       }
@@ -1799,18 +2115,21 @@ static int xnav_show_func(void* client_data, void* client_flag)
       sts = gdh_GetObjectClass(objid, &classid);
       if (EVEN(sts))
         return sts;
-      sts = gdh_ObjidToName(cdh_ClassIdToObjid(classid), classname,
-          sizeof(classname), cdh_mName_volumeStrict);
+      sts =
+          gdh_ObjidToName(cdh_ClassIdToObjid(classid), classname, sizeof(classname), cdh_mName_volumeStrict);
       if (EVEN(sts))
         return sts;
       /* Check that this is a or a plc */
-      if (streq(classname, "pwrb:Class-PlcPgm")) {
+      if (streq(classname, "pwrb:Class-PlcPgm"))
+      {
         /* Get all the windows in the plc */
         strcat(name_str, "-W*");
-      } else if (!((streq(classname, "pwrb:Class-WindowPlc"))
-                     || (streq(classname, "pwrb:Class-WindowOrderact"))
-                     || (streq(classname, "pwrb:Class-WindowCond"))
-                     || (streq(classname, "pwrb:Class-WindowSubstep")))) {
+      }
+      else if (!((streq(classname, "pwrb:Class-WindowPlc")) ||
+                 (streq(classname, "pwrb:Class-WindowOrderact")) ||
+                 (streq(classname, "pwrb:Class-WindowCond")) ||
+                 (streq(classname, "pwrb:Class-WindowSubstep"))))
+      {
         /* Try with the parent */
         sts = gdh_GetParent(objid, &parentobjid);
         if (EVEN(sts))
@@ -1818,21 +2137,20 @@ static int xnav_show_func(void* client_data, void* client_flag)
         sts = gdh_GetObjectClass(parentobjid, &classid);
         if (EVEN(sts))
           return sts;
-        sts = gdh_ObjidToName(cdh_ClassIdToObjid(classid), classname,
-            sizeof(classname), cdh_mName_volumeStrict);
+        sts = gdh_ObjidToName(cdh_ClassIdToObjid(classid), classname, sizeof(classname),
+                              cdh_mName_volumeStrict);
         if (EVEN(sts))
           return sts;
 
-        if (!((streq(classname, "pwrb:Class-WindowPlc"))
-                || (streq(classname, "pwrb:Class-WindowOrderact"))
-                || (streq(classname, "pwrb:Class-WindowCond"))
-                || (streq(classname, "pwrb:Class-WindowSubstep")))) {
-          xnav->message(
-              'E', "Selected object has to be in a plcpgm or a plcpgm");
+        if (!((streq(classname, "pwrb:Class-WindowPlc")) || (streq(classname, "pwrb:Class-WindowOrderact")) ||
+              (streq(classname, "pwrb:Class-WindowCond")) || (streq(classname, "pwrb:Class-WindowSubstep"))))
+        {
+          xnav->message('E', "Selected object has to be in a plcpgm or a plcpgm");
           return XNAV__HOLDCOMMAND;
-        } else {
-          sts = gdh_ObjidToName(
-              parentobjid, name_str, sizeof(name_str), cdh_mName_volumeStrict);
+        }
+        else
+        {
+          sts = gdh_ObjidToName(parentobjid, name_str, sizeof(name_str), cdh_mName_volumeStrict);
           if (EVEN(sts))
             return sts;
         }
@@ -1843,7 +2161,8 @@ static int xnav_show_func(void* client_data, void* client_flag)
     return sts;
   }
 
-  else if (str_NoCaseStrncmp(arg1_str, "PARAMETER", strlen(arg1_str)) == 0) {
+  else if (str_NoCaseStrncmp(arg1_str, "PARAMETER", strlen(arg1_str)) == 0)
+  {
     /* Command is "SHOW PARAMETER" */
     pwr_tOName parameter_str;
     pwr_tObjName class_str;
@@ -1861,34 +2180,39 @@ static int xnav_show_func(void* client_data, void* client_flag)
 
     IF_NOGDH_RETURN;
     /* Get maxobjects qualifier */
-    if (ODD(dcli_get_qualifier(
-            "/MAXOBJECTS", maxobjects_str, sizeof(maxobjects_str)))) {
+    if (ODD(dcli_get_qualifier("/MAXOBJECTS", maxobjects_str, sizeof(maxobjects_str))))
+    {
       /* Convert to objid */
       nr = sscanf(maxobjects_str, "%d", &maxobjects);
-      if (nr != 1) {
+      if (nr != 1)
+      {
         xnav->message('E', "Syntax error in maxobjects");
         return XNAV__HOLDCOMMAND;
       }
-    } else
+    }
+    else
       /* Default value */
       maxobjects = 0;
 
-    if (ODD(dcli_get_qualifier(
-            "/PARAMETER", parameter_str, sizeof(parameter_str))))
+    if (ODD(dcli_get_qualifier("/PARAMETER", parameter_str, sizeof(parameter_str))))
       parameter_ptr = parameter_str;
     else
       parameter_ptr = NULL;
 
     /* Get the name qualifier */
-    if (ODD(dcli_get_qualifier("dcli_arg2", name_str, sizeof(name_str)))) {
+    if (ODD(dcli_get_qualifier("dcli_arg2", name_str, sizeof(name_str))))
+    {
       if (name_str[0] != '/')
         /* Assume that this is the namestring */
         name_ptr = name_str;
-      else {
+      else
+      {
         xnav->message('E', "Syntax error");
         return XNAV__HOLDCOMMAND;
       }
-    } else {
+    }
+    else
+    {
       if (ODD(dcli_get_qualifier("/NAME", name_str, sizeof(name_str))))
         name_ptr = name_str;
       else
@@ -1898,8 +2222,7 @@ static int xnav_show_func(void* client_data, void* client_flag)
       class_ptr = class_str;
     else
       class_ptr = NULL;
-    if (ODD(dcli_get_qualifier(
-            "/HIERARCHY", hierarchy_str, sizeof(hierarchy_str))))
+    if (ODD(dcli_get_qualifier("/HIERARCHY", hierarchy_str, sizeof(hierarchy_str))))
       hierarchy_ptr = hierarchy_str;
     else
       hierarchy_ptr = NULL;
@@ -1908,15 +2231,25 @@ static int xnav_show_func(void* client_data, void* client_flag)
     else
       global = 1;
 
-    sts = xnav->show_par_hier_class_name(parameter_ptr, hierarchy_ptr,
-        class_ptr, name_ptr, XNAV_MENU_CREATE, global, maxobjects);
+    sts = xnav->show_par_hier_class_name(parameter_ptr, hierarchy_ptr, class_ptr, name_ptr, XNAV_MENU_CREATE,
+                                         global, maxobjects);
     sts = 0;
     return sts;
-  } else if (str_NoCaseStrncmp(arg1_str, "CONVERSION", strlen(arg1_str)) == 0) {
-  } else if (str_NoCaseStrncmp(arg1_str, "INVERT", strlen(arg1_str)) == 0) {
-  } else if (str_NoCaseStrncmp(arg1_str, "DOTEST", strlen(arg1_str)) == 0) {
-  } else if (str_NoCaseStrncmp(arg1_str, "TESTVALUE", strlen(arg1_str)) == 0) {
-  } else if (str_NoCaseStrncmp(arg1_str, "EVENTLIST", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "CONVERSION", strlen(arg1_str)) == 0)
+  {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "INVERT", strlen(arg1_str)) == 0)
+  {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "DOTEST", strlen(arg1_str)) == 0)
+  {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "TESTVALUE", strlen(arg1_str)) == 0)
+  {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "EVENTLIST", strlen(arg1_str)) == 0)
+  {
     char arg2_str[80];
     int arg2_sts;
     unsigned int options = 0;
@@ -1931,17 +2264,18 @@ static int xnav_show_func(void* client_data, void* client_flag)
     if (ODD(dcli_get_qualifier("/ICONIFY", 0, 0)))
       options |= ev_mAlaOptions_Iconify;
 
-    if (!xnav->ev) {
+    if (!xnav->ev)
+    {
       char alarm_title[40], event_title[40], block_title[40];
 
       strcpy(alarm_title, Lng::translate("Alarm List"));
       strcpy(event_title, Lng::translate("Event List"));
       strcpy(block_title, Lng::translate("Blocked Alarms"));
-      xnav->ev = xnav->ev_new(event_title, alarm_title, block_title,
-          xnav->gbl.OpObject, 0, 1, 0, xnav->gbl.AlarmReturn,
-          xnav->gbl.AlarmAck, xnav->gbl.AlarmBeep, xnav->gbl.op_wind_pop,
-          xnav->gbl.op_wind_eventname_seg, &sts);
-      if (EVEN(sts)) {
+      xnav->ev = xnav->ev_new(event_title, alarm_title, block_title, xnav->gbl.OpObject, 0, 1, 0,
+                              xnav->gbl.AlarmReturn, xnav->gbl.AlarmAck, xnav->gbl.AlarmBeep,
+                              xnav->gbl.op_wind_pop, xnav->gbl.op_wind_eventname_seg, &sts);
+      if (EVEN(sts))
+      {
         delete xnav->ev;
         xnav->ev = NULL;
         xnav->message('E', "Unable to load eventlist");
@@ -1958,74 +2292,94 @@ static int xnav_show_func(void* client_data, void* client_flag)
     }
 
     arg2_sts = dcli_get_qualifier("dcli_arg2", arg2_str, sizeof(arg2_str));
-    if (ODD(arg2_sts)) {
-      if (str_NoCaseStrncmp(arg2_str, "SATELLITE", strlen(arg2_str)) == 0) {
+    if (ODD(arg2_sts))
+    {
+      if (str_NoCaseStrncmp(arg2_str, "SATELLITE", strlen(arg2_str)) == 0)
+      {
         pwr_tOName alarmview_str;
         char tmp_str[40];
         pwr_tOid alarmview_oid = pwr_cNOid;
         int width, height, x, y;
         int nr;
 
-        if (ODD(dcli_get_qualifier(
-                "/ALARMVIEW", alarmview_str, sizeof(alarmview_str)))) {
+        if (ODD(dcli_get_qualifier("/ALARMVIEW", alarmview_str, sizeof(alarmview_str))))
+        {
           sts = gdh_NameToObjid(alarmview_str, &alarmview_oid);
-          if (EVEN(sts)) {
+          if (EVEN(sts))
+          {
             xnav->message('E', "Alarmview not found");
             return XNAV__SUCCESS;
           }
         }
 
-        if (ODD(dcli_get_qualifier("/WIDTH", tmp_str, sizeof(tmp_str)))) {
+        if (ODD(dcli_get_qualifier("/WIDTH", tmp_str, sizeof(tmp_str))))
+        {
           nr = sscanf(tmp_str, "%d", &width);
-          if (nr != 1) {
+          if (nr != 1)
+          {
             xnav->message('E', "Syntax error in width");
             return XNAV__HOLDCOMMAND;
           }
-        } else
+        }
+        else
           width = 0;
 
-        if (ODD(dcli_get_qualifier("/HEIGHT", tmp_str, sizeof(tmp_str)))) {
+        if (ODD(dcli_get_qualifier("/HEIGHT", tmp_str, sizeof(tmp_str))))
+        {
           nr = sscanf(tmp_str, "%d", &height);
-          if (nr != 1) {
+          if (nr != 1)
+          {
             xnav->message('E', "Syntax error in height");
             return XNAV__HOLDCOMMAND;
           }
-        } else
+        }
+        else
           height = 0;
 
-        if (ODD(dcli_get_qualifier("/XPOSITION", tmp_str, sizeof(tmp_str)))) {
+        if (ODD(dcli_get_qualifier("/XPOSITION", tmp_str, sizeof(tmp_str))))
+        {
           nr = sscanf(tmp_str, "%d", &x);
-          if (nr != 1) {
+          if (nr != 1)
+          {
             xnav->message('E', "Syntax error in x coordinate");
             return XNAV__HOLDCOMMAND;
           }
-        } else
+        }
+        else
           x = 0;
 
-        if (ODD(dcli_get_qualifier("/YPOSITION", tmp_str, sizeof(tmp_str)))) {
+        if (ODD(dcli_get_qualifier("/YPOSITION", tmp_str, sizeof(tmp_str))))
+        {
           nr = sscanf(tmp_str, "%d", &y);
-          if (nr != 1) {
+          if (nr != 1)
+          {
             xnav->message('E', "Syntax error in y coordinate");
             return XNAV__HOLDCOMMAND;
           }
-        } else
+        }
+        else
           y = 0;
 
         if (xnav->ev)
-          xnav->ev->open_eventlist_satellite(
-              "Eventlist Satellite", &sts, width, height, x, y, alarmview_oid);
-        else {
+          xnav->ev->open_eventlist_satellite("Eventlist Satellite", &sts, width, height, x, y, alarmview_oid);
+        else
+        {
           xnav->message('E', "Eventlist not loaded");
           return XNAV__HOLDCOMMAND;
         }
-      } else {
+      }
+      else
+      {
         xnav->message('E', "Syntax error");
         return XNAV__HOLDCOMMAND;
       }
-    } else {
+    }
+    else
+    {
       xnav->ev->map_eve(options);
 
-      if (xnav->opplace_p->Options & pwr_mOpPlaceOptionsMask_AllMainTransient) {
+      if (xnav->opplace_p->Options & pwr_mOpPlaceOptionsMask_AllMainTransient)
+      {
         if (xnav->ge_main)
           basewidget = xnav->ge_main->get_widget();
         else if (xnav->multiview_main)
@@ -2036,15 +2390,18 @@ static int xnav_show_func(void* client_data, void* client_flag)
     }
   }
   /*new code by Jonas Nylund 030122*/
-  else if (str_NoCaseStrncmp(arg1_str, "HISTLIST", strlen(arg1_str)) == 0) {
+  else if (str_NoCaseStrncmp(arg1_str, "HISTLIST", strlen(arg1_str)) == 0)
+  {
     char hist_title[40];
     pwr_tAName name_str;
     pwr_tAttrRef* arp = 0;
     pwr_tAttrRef aref;
 
-    if (ODD(dcli_get_qualifier("dcli_arg2", name_str, sizeof(name_str)))) {
+    if (ODD(dcli_get_qualifier("dcli_arg2", name_str, sizeof(name_str))))
+    {
       sts = gdh_NameToAttrref(pwr_cNOid, name_str, &aref);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         xnav->message('E', "Object not found");
         return XNAV__HOLDCOMMAND;
       }
@@ -2054,7 +2411,8 @@ static int xnav_show_func(void* client_data, void* client_flag)
     strcpy(hist_title, Lng::translate("Event Log"));
     Hist* hist;
     hist = xnav->hist_new(hist_title, arp, &sts);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       delete hist;
       hist = NULL;
       xnav->message('E', "Unable to load histlist");
@@ -2069,7 +2427,8 @@ static int xnav_show_func(void* client_data, void* client_flag)
     hist->popup_menu_cb = xnav_popup_menu_cb;
   }
   /*end new code by Jonas Nylund 030122*/
-  else if (str_NoCaseStrncmp(arg1_str, "ALARMLIST", strlen(arg1_str)) == 0) {
+  else if (str_NoCaseStrncmp(arg1_str, "ALARMLIST", strlen(arg1_str)) == 0)
+  {
     char arg2_str[80];
     int arg2_sts;
     unsigned int options = 0;
@@ -2084,17 +2443,18 @@ static int xnav_show_func(void* client_data, void* client_flag)
     if (ODD(dcli_get_qualifier("/ICONIFY", 0, 0)))
       options |= ev_mAlaOptions_Iconify;
 
-    if (!xnav->ev) {
+    if (!xnav->ev)
+    {
       char alarm_title[40], event_title[40], block_title[40];
 
       strcpy(alarm_title, Lng::translate("Alarm List"));
       strcpy(event_title, Lng::translate("Event List"));
       strcpy(block_title, Lng::translate("Blocked Alarms"));
-      xnav->ev = xnav->ev_new(event_title, alarm_title, block_title,
-          xnav->gbl.OpObject, 1, 0, 0, xnav->gbl.AlarmReturn,
-          xnav->gbl.AlarmAck, xnav->gbl.AlarmBeep, xnav->gbl.op_wind_pop,
-          xnav->gbl.op_wind_eventname_seg, &sts);
-      if (EVEN(sts)) {
+      xnav->ev = xnav->ev_new(event_title, alarm_title, block_title, xnav->gbl.OpObject, 1, 0, 0,
+                              xnav->gbl.AlarmReturn, xnav->gbl.AlarmAck, xnav->gbl.AlarmBeep,
+                              xnav->gbl.op_wind_pop, xnav->gbl.op_wind_eventname_seg, &sts);
+      if (EVEN(sts))
+      {
         delete xnav->ev;
         xnav->ev = NULL;
         xnav->message('E', "Unable to load eventlist");
@@ -2111,74 +2471,94 @@ static int xnav_show_func(void* client_data, void* client_flag)
     }
 
     arg2_sts = dcli_get_qualifier("dcli_arg2", arg2_str, sizeof(arg2_str));
-    if (ODD(arg2_sts)) {
-      if (str_NoCaseStrncmp(arg2_str, "SATELLITE", strlen(arg2_str)) == 0) {
+    if (ODD(arg2_sts))
+    {
+      if (str_NoCaseStrncmp(arg2_str, "SATELLITE", strlen(arg2_str)) == 0)
+      {
         pwr_tOName alarmview_str;
         char tmp_str[40];
         pwr_tOid alarmview_oid = pwr_cNOid;
         int width, height, x, y;
         int nr;
 
-        if (ODD(dcli_get_qualifier(
-                "/ALARMVIEW", alarmview_str, sizeof(alarmview_str)))) {
+        if (ODD(dcli_get_qualifier("/ALARMVIEW", alarmview_str, sizeof(alarmview_str))))
+        {
           sts = gdh_NameToObjid(alarmview_str, &alarmview_oid);
-          if (EVEN(sts)) {
+          if (EVEN(sts))
+          {
             xnav->message('E', "Alarmview not found");
             return XNAV__SUCCESS;
           }
         }
 
-        if (ODD(dcli_get_qualifier("/WIDTH", tmp_str, sizeof(tmp_str)))) {
+        if (ODD(dcli_get_qualifier("/WIDTH", tmp_str, sizeof(tmp_str))))
+        {
           nr = sscanf(tmp_str, "%d", &width);
-          if (nr != 1) {
+          if (nr != 1)
+          {
             xnav->message('E', "Syntax error in width");
             return XNAV__HOLDCOMMAND;
           }
-        } else
+        }
+        else
           width = 0;
 
-        if (ODD(dcli_get_qualifier("/HEIGHT", tmp_str, sizeof(tmp_str)))) {
+        if (ODD(dcli_get_qualifier("/HEIGHT", tmp_str, sizeof(tmp_str))))
+        {
           nr = sscanf(tmp_str, "%d", &height);
-          if (nr != 1) {
+          if (nr != 1)
+          {
             xnav->message('E', "Syntax error in height");
             return XNAV__HOLDCOMMAND;
           }
-        } else
+        }
+        else
           height = 0;
 
-        if (ODD(dcli_get_qualifier("/XPOSITION", tmp_str, sizeof(tmp_str)))) {
+        if (ODD(dcli_get_qualifier("/XPOSITION", tmp_str, sizeof(tmp_str))))
+        {
           nr = sscanf(tmp_str, "%d", &x);
-          if (nr != 1) {
+          if (nr != 1)
+          {
             xnav->message('E', "Syntax error in x coordinate");
             return XNAV__HOLDCOMMAND;
           }
-        } else
+        }
+        else
           x = 0;
 
-        if (ODD(dcli_get_qualifier("/YPOSITION", tmp_str, sizeof(tmp_str)))) {
+        if (ODD(dcli_get_qualifier("/YPOSITION", tmp_str, sizeof(tmp_str))))
+        {
           nr = sscanf(tmp_str, "%d", &y);
-          if (nr != 1) {
+          if (nr != 1)
+          {
             xnav->message('E', "Syntax error in y coordinate");
             return XNAV__HOLDCOMMAND;
           }
-        } else
+        }
+        else
           y = 0;
 
         if (xnav->ev)
-          xnav->ev->open_alarmlist_satellite(
-              "Alarmlist Satellite", &sts, width, height, x, y, alarmview_oid);
-        else {
+          xnav->ev->open_alarmlist_satellite("Alarmlist Satellite", &sts, width, height, x, y, alarmview_oid);
+        else
+        {
           xnav->message('E', "Eventlist not loaded");
           return XNAV__HOLDCOMMAND;
         }
-      } else {
+      }
+      else
+      {
         xnav->message('E', "Syntax error");
         return XNAV__HOLDCOMMAND;
       }
-    } else {
+    }
+    else
+    {
       xnav->ev->map_ala(options);
 
-      if (xnav->opplace_p->Options & pwr_mOpPlaceOptionsMask_AllMainTransient) {
+      if (xnav->opplace_p->Options & pwr_mOpPlaceOptionsMask_AllMainTransient)
+      {
         if (xnav->ge_main)
           basewidget = xnav->ge_main->get_widget();
         else if (xnav->multiview_main)
@@ -2187,7 +2567,9 @@ static int xnav_show_func(void* client_data, void* client_flag)
           xnav->ev->set_transient_ala(basewidget);
       }
     }
-  } else if (str_NoCaseStrncmp(arg1_str, "BLOCKLIST", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "BLOCKLIST", strlen(arg1_str)) == 0)
+  {
     unsigned int options = 0;
     void* basewidget = 0;
 
@@ -2200,17 +2582,18 @@ static int xnav_show_func(void* client_data, void* client_flag)
     if (ODD(dcli_get_qualifier("/ICONIFY", 0, 0)))
       options |= ev_mAlaOptions_Iconify;
 
-    if (!xnav->ev) {
+    if (!xnav->ev)
+    {
       char alarm_title[40], event_title[40], block_title[40];
 
       strcpy(alarm_title, Lng::translate("Alarm List"));
       strcpy(event_title, Lng::translate("Event List"));
       strcpy(block_title, Lng::translate("Blocked Alarms"));
-      xnav->ev = xnav->ev_new(event_title, alarm_title, block_title,
-          xnav->gbl.OpObject, 0, 0, 1, xnav->gbl.AlarmReturn,
-          xnav->gbl.AlarmAck, xnav->gbl.AlarmBeep, xnav->gbl.op_wind_pop,
-          xnav->gbl.op_wind_eventname_seg, &sts);
-      if (EVEN(sts)) {
+      xnav->ev = xnav->ev_new(event_title, alarm_title, block_title, xnav->gbl.OpObject, 0, 0, 1,
+                              xnav->gbl.AlarmReturn, xnav->gbl.AlarmAck, xnav->gbl.AlarmBeep,
+                              xnav->gbl.op_wind_pop, xnav->gbl.op_wind_eventname_seg, &sts);
+      if (EVEN(sts))
+      {
         delete xnav->ev;
         xnav->ev = NULL;
         xnav->message('E', "Unable to load eventlist");
@@ -2224,10 +2607,12 @@ static int xnav_show_func(void* client_data, void* client_flag)
       xnav->ev->sound_cb = xnav_ev_sound_cb;
       xnav->ev->pop_cb = xnav_ev_pop_cb;
       xnav->ev->is_authorized_cb = xnav->is_authorized_cb;
-    } else
+    }
+    else
       xnav->ev->map_blk(options);
 
-    if (xnav->opplace_p->Options & pwr_mOpPlaceOptionsMask_AllMainTransient) {
+    if (xnav->opplace_p->Options & pwr_mOpPlaceOptionsMask_AllMainTransient)
+    {
       if (xnav->ge_main)
         basewidget = xnav->ge_main->get_widget();
       else if (xnav->multiview_main)
@@ -2235,43 +2620,55 @@ static int xnav_show_func(void* client_data, void* client_flag)
       if (basewidget)
         xnav->ev->set_transient_blk(basewidget);
     }
-  } else if (str_NoCaseStrncmp(arg1_str, "USER", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "USER", strlen(arg1_str)) == 0)
+  {
     char msg[256];
     char priv_str[80];
 
     int window = ODD(dcli_get_qualifier("/WINDOW", 0, 0));
 
-    if (streq(xnav->user, "")) {
+    if (streq(xnav->user, ""))
+    {
       user_RtPrivToString(xnav->priv, priv_str, sizeof(priv_str));
-      if (window) {
-        sprintf(msg, "Current User:   Not logged in\n\nPrivileges:   %s)",
-            priv_str);
+      if (window)
+      {
+        sprintf(msg, "Current User:   Not logged in\n\nPrivileges:   %s)", priv_str);
         xnav->wow->DisplayText("User", msg);
-      } else {
+      }
+      else
+      {
         sprintf(msg, "Not logged in (%s)", priv_str);
         xnav->message('I', msg);
       }
-    } else {
+    }
+    else
+    {
       user_RtPrivToString(xnav->priv, priv_str, sizeof(priv_str));
-      if (window) {
-        sprintf(msg, "Current User:   %s\n\nPrivileges:   %s", xnav->user,
-            priv_str);
-        if (!streq(xnav->base_user, "")
-            && !streq(xnav->base_user, xnav->user)) {
+      if (window)
+      {
+        sprintf(msg, "Current User:   %s\n\nPrivileges:   %s", xnav->user, priv_str);
+        if (!streq(xnav->base_user, "") && !streq(xnav->base_user, xnav->user))
+        {
           strcat(msg, "\n\nOriginal User:   ");
           strcat(msg, xnav->base_user);
         }
         xnav->wow->DisplayText("User", msg);
-      } else {
+      }
+      else
+      {
         sprintf(msg, "User %s (%s)", xnav->user, priv_str);
         xnav->message('I', msg);
       }
     }
-  } else if (str_NoCaseStrncmp(arg1_str, "MESSAGE", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "MESSAGE", strlen(arg1_str)) == 0)
+  {
     char text_str[256];
     char title_str[256];
 
-    if (EVEN(dcli_get_qualifier("/TEXT", text_str, sizeof(text_str)))) {
+    if (EVEN(dcli_get_qualifier("/TEXT", text_str, sizeof(text_str))))
+    {
       xnav->message('E', "Syntax error");
       return XNAV__SUCCESS;
     }
@@ -2280,7 +2677,9 @@ static int xnav_show_func(void* client_data, void* client_flag)
       strncpy(title_str, Lng::translate("Message"), sizeof(title_str));
 
     xnav->wow->DisplayText(title_str, text_str);
-  } else if (str_NoCaseStrncmp(arg1_str, "VOLUMES", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "VOLUMES", strlen(arg1_str)) == 0)
+  {
     /* Command is "SHOW VOLUMES" */
     pwr_tVid vid;
     pwr_tOid oid;
@@ -2289,24 +2688,26 @@ static int xnav_show_func(void* client_data, void* client_flag)
     Item* item;
 
     sts = gdh_GetVolumeList(&vid);
-    while (ODD(sts)) {
+    while (ODD(sts))
+    {
       oid.oix = 0;
       oid.vid = vid;
 
-      if (!volume_cnt) {
+      if (!volume_cnt)
+      {
         xnav->brow_pop();
         brow_SetNodraw(xnav->brow->ctx);
       }
-      nsts = xnav->create_object_item(
-          oid, NULL, flow_eDest_IntoLast, (void**)&item, 0);
+      nsts = xnav->create_object_item(oid, NULL, flow_eDest_IntoLast, (void**)&item, 0);
       volume_cnt++;
 
       sts = gdh_GetNextVolume(vid, &vid);
     }
     brow_ResetNodraw(xnav->brow->ctx);
     brow_Redraw(xnav->brow->ctx, 0);
-  } else if (str_NoCaseStrncmp(arg1_str, "NODEOBJECTS", strlen(arg1_str))
-      == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "NODEOBJECTS", strlen(arg1_str)) == 0)
+  {
     /* Command is "SHOW NODEOBJECTS" */
     pwr_tVid vid;
     pwr_tOid oid;
@@ -2315,8 +2716,8 @@ static int xnav_show_func(void* client_data, void* client_flag)
     Item* item;
     gdh_sVolumeInfo info;
 
-    for (sts = gdh_GetVolumeList(&vid); ODD(sts);
-         sts = gdh_GetNextVolume(vid, &vid)) {
+    for (sts = gdh_GetVolumeList(&vid); ODD(sts); sts = gdh_GetNextVolume(vid, &vid))
+    {
       sts = gdh_GetVolumeInfo(vid, &info);
       if (EVEN(sts))
         continue;
@@ -2328,17 +2729,19 @@ static int xnav_show_func(void* client_data, void* client_flag)
       if (EVEN(sts))
         continue;
 
-      if (!node_cnt) {
+      if (!node_cnt)
+      {
         xnav->brow_pop();
         brow_SetNodraw(xnav->brow->ctx);
       }
-      nsts = xnav->create_object_item(
-          oid, NULL, flow_eDest_IntoLast, (void**)&item, 0);
+      nsts = xnav->create_object_item(oid, NULL, flow_eDest_IntoLast, (void**)&item, 0);
       node_cnt++;
     }
     brow_ResetNodraw(xnav->brow->ctx);
     brow_Redraw(xnav->brow->ctx, 0);
-  } else if (str_NoCaseStrncmp(arg1_str, "NODEINFO", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "NODEINFO", strlen(arg1_str)) == 0)
+  {
     /* Command is "SHOW NODEINFO" */
     pwr_tVid vid;
     pwr_tOid oid;
@@ -2351,8 +2754,8 @@ static int xnav_show_func(void* client_data, void* client_flag)
     char descr[120];
     char* descr_p;
 
-    for (sts = gdh_GetVolumeList(&vid); ODD(sts);
-         sts = gdh_GetNextVolume(vid, &vid)) {
+    for (sts = gdh_GetVolumeList(&vid); ODD(sts); sts = gdh_GetNextVolume(vid, &vid))
+    {
       sts = gdh_GetVolumeInfo(vid, &info);
       if (EVEN(sts))
         continue;
@@ -2364,7 +2767,8 @@ static int xnav_show_func(void* client_data, void* client_flag)
       if (EVEN(sts))
         continue;
 
-      if (!node_cnt) {
+      if (!node_cnt)
+      {
         xnav->brow_pop();
         brow_SetNodraw(xnav->brow->ctx);
       }
@@ -2384,16 +2788,20 @@ static int xnav_show_func(void* client_data, void* client_flag)
       else
         descr_p = 0;
 
-      item = (Item*)new ItemCommand(xnav->brow, name, descr, NULL,
-          flow_eDest_IntoLast, cmd, 0, xnav->brow->pixmap_list);
+      item = (Item*)new ItemCommand(xnav->brow, name, descr, NULL, flow_eDest_IntoLast, cmd, 0,
+                                    xnav->brow->pixmap_list);
       node_cnt++;
     }
     brow_ResetNodraw(xnav->brow->ctx);
     brow_Redraw(xnav->brow->ctx, 0);
-  } else if (str_NoCaseStrncmp(arg1_str, "METHODS", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "METHODS", strlen(arg1_str)) == 0)
+  {
     /* Command is "SHOW METHODS" */
     xnav->print_methods();
-  } else if (str_NoCaseStrncmp(arg1_str, "OBJECTLIST", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "OBJECTLIST", strlen(arg1_str)) == 0)
+  {
     // Command is "SHOW OBJECTLIST"
     pwr_tAttrRef aref;
     int cnt = 0;
@@ -2407,27 +2815,30 @@ static int xnav_show_func(void* client_data, void* client_flag)
     int class_num;
     int i;
 
-    if (EVEN(dcli_get_qualifier("/CLASS", class_str, sizeof(class_str)))) {
+    if (EVEN(dcli_get_qualifier("/CLASS", class_str, sizeof(class_str))))
+    {
       xnav->message('E', "Class is missing");
       return XNAV__HOLDCOMMAND;
     }
 
     // The class string can contain several classes separated by ','
     class_num = dcli_parse(class_str, ",", "", (char*)class_array,
-        sizeof(class_array) / sizeof(class_array[0]), sizeof(class_array[0]),
-        0);
+                           sizeof(class_array) / sizeof(class_array[0]), sizeof(class_array[0]), 0);
 
     gdh_GetRootVolume(&root_vid);
 
-    for (i = 0; i < class_num; i++) {
+    for (i = 0; i < class_num; i++)
+    {
       sts = gdh_ClassNameToId(class_array[i], &cid[i]);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         xnav->message('E', "Unknown class");
         return XNAV__HOLDCOMMAND;
       }
 
       for (sts = gdh_GetClassListAttrRef(cid[i], &aref); ODD(sts);
-           sts = gdh_GetNextAttrRef(cid[i], &aref, &aref)) {
+           sts = gdh_GetNextAttrRef(cid[i], &aref, &aref))
+      {
         cnt++;
       }
     }
@@ -2435,15 +2846,15 @@ static int xnav_show_func(void* client_data, void* client_flag)
     names = (pwr_tOName*)calloc(cnt + 1, sizeof(pwr_tOName));
 
     int idx = 0;
-    for (i = 0; i < class_num; i++) {
+    for (i = 0; i < class_num; i++)
+    {
       for (sts = gdh_GetClassListAttrRef(cid[i], &aref); ODD(sts);
-           sts = gdh_GetNextAttrRef(cid[i], &aref, &aref)) {
+           sts = gdh_GetNextAttrRef(cid[i], &aref, &aref))
+      {
         if (aref.Objid.vid == root_vid)
-          sts = gdh_AttrrefToName(
-              &aref, names[idx], sizeof(names[0]), cdh_mNName);
+          sts = gdh_AttrrefToName(&aref, names[idx], sizeof(names[0]), cdh_mNName);
         else
-          sts = gdh_AttrrefToName(
-              &aref, names[idx], sizeof(names[0]), cdh_mName_volumeStrict);
+          sts = gdh_AttrrefToName(&aref, names[idx], sizeof(names[0]), cdh_mName_volumeStrict);
         if (EVEN(sts))
           continue;
 
@@ -2453,9 +2864,9 @@ static int xnav_show_func(void* client_data, void* client_flag)
       }
     }
 
-    if (EVEN(dcli_get_qualifier("/TITLE", title_str, sizeof(title_str)))) {
-      sts = gdh_ObjidToName(cdh_ClassIdToObjid(cid[i]), title_str,
-          sizeof(title_str), cdh_mName_object);
+    if (EVEN(dcli_get_qualifier("/TITLE", title_str, sizeof(title_str))))
+    {
+      sts = gdh_ObjidToName(cdh_ClassIdToObjid(cid[i]), title_str, sizeof(title_str), cdh_mName_object);
       if (EVEN(sts))
         return sts;
 
@@ -2463,12 +2874,16 @@ static int xnav_show_func(void* client_data, void* client_flag)
     }
 
     int sort = ODD(dcli_get_qualifier("/SORT", 0, 0));
-    if (sort) {
+    if (sort)
+    {
       // Sort
       pwr_tOName tmp;
-      for (int i = cnt - 1; i > 0; i--) {
-        for (int j = 0; j < i; j++) {
-          if (strcmp(names[j], names[j + 1]) > 0) {
+      for (int i = cnt - 1; i > 0; i--)
+      {
+        for (int j = 0; j < i; j++)
+        {
+          if (strcmp(names[j], names[j + 1]) > 0)
+          {
             strcpy(tmp, names[j + 1]);
             strcpy(names[j + 1], names[j]);
             strcpy(names[j], tmp);
@@ -2481,14 +2896,17 @@ static int xnav_show_func(void* client_data, void* client_flag)
     ctx->cid = cid[0];
     ctx->xnav = xnav;
 
-    xnav->wow->CreateList(title_str, (char*)names, sizeof(names[0]),
-        xnav_show_objectlist_cb, xnav_show_objectlist_cancel_cb, ctx);
+    xnav->wow->CreateList(title_str, (char*)names, sizeof(names[0]), xnav_show_objectlist_cb,
+                          xnav_show_objectlist_cancel_cb, ctx);
     free(names);
-  } else if (str_NoCaseStrncmp(arg1_str, "OBJECTTREE", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "OBJECTTREE", strlen(arg1_str)) == 0)
+  {
     char class_str[80];
 
     // Command is "SHOW OBJECTTREE"
-    if (ODD(dcli_get_qualifier("/CLASS", class_str, sizeof(class_str)))) {
+    if (ODD(dcli_get_qualifier("/CLASS", class_str, sizeof(class_str))))
+    {
       pwr_tCid cid[20];
       pwr_tObjName class_array[20];
       int class_num;
@@ -2509,12 +2927,13 @@ static int xnav_show_func(void* client_data, void* client_flag)
 
       // The class string can contain several classes separated by ','
       class_num = dcli_parse(class_str, ",", "", (char*)class_array,
-          sizeof(class_array) / sizeof(class_array[0]), sizeof(class_array[0]),
-          0);
+                             sizeof(class_array) / sizeof(class_array[0]), sizeof(class_array[0]), 0);
 
-      for (i = 0; i < class_num; i++) {
+      for (i = 0; i < class_num; i++)
+      {
         sts = gdh_ClassNameToId(class_array[i], &cid[i]);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           xnav->message('E', "Unknown class");
           return XNAV__HOLDCOMMAND;
         }
@@ -2524,30 +2943,38 @@ static int xnav_show_func(void* client_data, void* client_flag)
         sts = gdh_GetGlobalClassList(class_num, cid, 1, &list, &listcnt);
       else
         sts = gdh_GetLocalClassList(class_num, cid, 1, &list, &listcnt);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         xnav->message('E', "Class list error");
         return XNAV__HOLDCOMMAND;
       }
-      if (listcnt == 0) {
+      if (listcnt == 0)
+      {
         xnav->message('E', "No objects found");
         return XNAV__EMPTYLIST;
       }
 
-      if (ODD(dcli_get_qualifier("/LAYOUT", layout_str, sizeof(layout_str)))) {
+      if (ODD(dcli_get_qualifier("/LAYOUT", layout_str, sizeof(layout_str))))
+      {
         if (str_NoCaseStrcmp(layout_str, "list") == 0)
           options |= tree_mOptions_LayoutList;
         else if (str_NoCaseStrcmp(layout_str, "tree") == 0)
           options |= tree_mOptions_LayoutTree;
-        else if (str_NoCaseStrcmp(layout_str, "default") == 0) {
+        else if (str_NoCaseStrcmp(layout_str, "default") == 0)
+        {
           if (listcnt > 20)
             options |= tree_mOptions_LayoutTree;
           else
             options |= tree_mOptions_LayoutList;
-        } else {
+        }
+        else
+        {
           xnav->message('E', "No such layout");
           return XNAV__HOLDCOMMAND;
         }
-      } else {
+      }
+      else
+      {
         if (listcnt > 20)
           options |= tree_mOptions_LayoutTree;
         else
@@ -2560,74 +2987,89 @@ static int xnav_show_func(void* client_data, void* client_flag)
 
       free((char*)list);
       return XNAV__SUCCESS;
-    } else {
+    }
+    else
+    {
       xnav->message('E', "Syntax error");
       return XNAV__HOLDCOMMAND;
     }
-  } else if (str_NoCaseStrncmp(arg1_str, "HISTORY", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "HISTORY", strlen(arg1_str)) == 0)
+  {
     char arg2_str[80];
     int arg2_sts;
 
     arg2_sts = dcli_get_qualifier("dcli_arg2", arg2_str, sizeof(arg2_str));
-    if (ODD(arg2_sts)) {
-      if (str_NoCaseStrncmp(arg2_str, "ITEMS", strlen(arg2_str)) == 0) {
-	int sts;
-	pwr_tOid root;
-	pwr_tOid child;
-	Item* item;
-	int cnt;
+    if (ODD(arg2_sts))
+    {
+      if (str_NoCaseStrncmp(arg2_str, "ITEMS", strlen(arg2_str)) == 0)
+      {
+        int sts;
+        pwr_tOid root;
+        pwr_tOid child;
+        Item* item;
+        int cnt;
 
-	// Get the toplevel objects
-	sts = gdh_NameToObjid("pwrNode-sev", &root);
-	if (EVEN(sts)) {
-	  xnav->message('E', "No storage server on this node");
-	  return XNAV__SUCCESS;
-	}
+        // Get the toplevel objects
+        sts = gdh_NameToObjid("pwrNode-sev", &root);
+        if (EVEN(sts))
+        {
+          xnav->message('E', "No storage server on this node");
+          return XNAV__SUCCESS;
+        }
 
-	//  Loop through all root objects and see if they are valid at toplevel
-	cnt = 0;
-	for (sts = gdh_GetChild(root, &child); ODD(sts);
-	     sts = gdh_GetNextSibling(child, &child)) {
-	  if (cnt == 0) {
-	    xnav->brow_pop();
-	    brow_SetNodraw(xnav->brow->ctx);
-	  }
-	  sts = xnav->create_object_item(
-	      child, NULL, flow_eDest_IntoLast, (void**)&item, 0);
+        //  Loop through all root objects and see if they are valid at toplevel
+        cnt = 0;
+        for (sts = gdh_GetChild(root, &child); ODD(sts); sts = gdh_GetNextSibling(child, &child))
+        {
+          if (cnt == 0)
+          {
+            xnav->brow_pop();
+            brow_SetNodraw(xnav->brow->ctx);
+          }
+          sts = xnav->create_object_item(child, NULL, flow_eDest_IntoLast, (void**)&item, 0);
 
-	  cnt++;
-	}
+          cnt++;
+        }
 
-	if (!cnt) {
-	  xnav->message('E', "No history objects found");
-	  return XNAV__SUCCESS;
-	}
-	brow_ResetNodraw(xnav->brow->ctx);
-	brow_Redraw(xnav->brow->ctx, 0);
+        if (!cnt)
+        {
+          xnav->message('E', "No history objects found");
+          return XNAV__SUCCESS;
+        }
+        brow_ResetNodraw(xnav->brow->ctx);
+        brow_Redraw(xnav->brow->ctx, 0);
       }
-      else if (str_NoCaseStrncmp(arg2_str, "ANALYSER", strlen(arg2_str)) == 0) {
-	pwr_tCmd cmd;
-	sprintf(cmd, "sev_analyse.py -c %d &", xnav->gbl.color_theme);
-	system(cmd);
+      else if (str_NoCaseStrncmp(arg2_str, "ANALYSER", strlen(arg2_str)) == 0)
+      {
+        pwr_tCmd cmd;
+        sprintf(cmd, "sev_analyse.py -c %d &", xnav->gbl.color_theme);
+        system(cmd);
       }
-      else if (str_NoCaseStrncmp(arg2_str, "EVENTS", strlen(arg2_str)) == 0) {
-	pwr_tCmd cmd;
-	sprintf(cmd, "sev_eva.py -c %d &", xnav->gbl.color_theme);
-	system(cmd);
+      else if (str_NoCaseStrncmp(arg2_str, "EVENTS", strlen(arg2_str)) == 0)
+      {
+        pwr_tCmd cmd;
+        sprintf(cmd, "sev_eva.py -c %d &", xnav->gbl.color_theme);
+        system(cmd);
       }
-      else {
-	xnav->message('E', "Syntax error");
-	return XNAV__HOLDCOMMAND;
+      else
+      {
+        xnav->message('E', "Syntax error");
+        return XNAV__HOLDCOMMAND;
       }
     }
-    else {
+    else
+    {
       xnav->message('E', "Syntax error");
       return XNAV__HOLDCOMMAND;
     }
-  } else {
+  }
+  else
+  {
     /* This might be a system picture */
     sts = 0; // rttsys_start_system_picture( ctx, arg1_str);
-    if (sts == 0) {
+    if (sts == 0)
+    {
       xnav->message('E', "Unknown qualifier");
       return XNAV__HOLDCOMMAND;
     }
@@ -2646,19 +3088,21 @@ static int xnav_eventlist_func(void* client_data, void* client_flag)
 
   arg1_sts = dcli_get_qualifier("dcli_arg1", arg1_str, sizeof(arg1_str));
 
-  if (str_NoCaseStrncmp(arg1_str, "LOAD", strlen(arg1_str)) == 0) {
+  if (str_NoCaseStrncmp(arg1_str, "LOAD", strlen(arg1_str)) == 0)
+  {
     // Command is "EVENTLIST LOAD"
-    if (!xnav->ev) {
+    if (!xnav->ev)
+    {
       char alarm_title[40], event_title[40], block_title[40];
 
       strcpy(alarm_title, Lng::translate("Alarm List"));
       strcpy(event_title, Lng::translate("Event List"));
       strcpy(block_title, Lng::translate("Blocked Alarms"));
-      xnav->ev = xnav->ev_new(event_title, alarm_title, block_title,
-          xnav->gbl.OpObject, 0, 0, 0, xnav->gbl.AlarmReturn,
-          xnav->gbl.AlarmAck, xnav->gbl.AlarmBeep, xnav->gbl.op_wind_pop,
-          xnav->gbl.op_wind_eventname_seg, &sts);
-      if (EVEN(sts)) {
+      xnav->ev = xnav->ev_new(event_title, alarm_title, block_title, xnav->gbl.OpObject, 0, 0, 0,
+                              xnav->gbl.AlarmReturn, xnav->gbl.AlarmAck, xnav->gbl.AlarmBeep,
+                              xnav->gbl.op_wind_pop, xnav->gbl.op_wind_eventname_seg, &sts);
+      if (EVEN(sts))
+      {
         delete xnav->ev;
         xnav->ev = NULL;
         xnav->message('E', "Unable to load eventlist");
@@ -2673,20 +3117,27 @@ static int xnav_eventlist_func(void* client_data, void* client_flag)
       xnav->ev->pop_cb = xnav_ev_pop_cb;
       xnav->ev->is_authorized_cb = xnav->is_authorized_cb;
       if (xnav->gbl.color_theme)
-	xnav->ev->update_color_theme(xnav->gbl.color_theme);
-    } else {
+        xnav->ev->update_color_theme(xnav->gbl.color_theme);
+    }
+    else
+    {
       xnav->message('I', "Eventlist is already loaded");
     }
     return XNAV__SUCCESS;
-  } else if (str_NoCaseStrncmp(arg1_str, "UNLOAD", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "UNLOAD", strlen(arg1_str)) == 0)
+  {
     // Command is "EVENTLIST UNLOAD"
-    if (xnav->ev) {
+    if (xnav->ev)
+    {
       delete ((XNav*)xnav)->ev;
       ((XNav*)xnav)->ev = NULL;
-    } else
+    }
+    else
       xnav->message('I', "Eventlist is not loaded");
-  } else if (str_NoCaseStrncmp(arg1_str, "ACKNOWLEDGE", strlen(arg1_str))
-      == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "ACKNOWLEDGE", strlen(arg1_str)) == 0)
+  {
     // Command is "EVENTLIST ACKNOWLEDGE"
     char prio_str[80];
     char autoack_str[80];
@@ -2699,24 +3150,27 @@ static int xnav_eventlist_func(void* client_data, void* client_flag)
     timecheck = ODD(dcli_get_qualifier("/TIMECHECK", 0, 0));
 
     all = ODD(dcli_get_qualifier("/ALL", 0, 0));
-    if (all) {
+    if (all)
+    {
       if (xnav->ev)
         xnav->ev->ack_all();
       return XNAV__SUCCESS;
     }
 
-    if (ODD(dcli_get_qualifier(
-            "/AUTOACKNOWLEDGE", autoack_str, sizeof(autoack_str)))) {
+    if (ODD(dcli_get_qualifier("/AUTOACKNOWLEDGE", autoack_str, sizeof(autoack_str))))
+    {
       float ftime;
 
       // Check authorization
-      if (!(xnav->priv & pwr_mPrv_System)) {
+      if (!(xnav->priv & pwr_mPrv_System))
+      {
         xnav->message('E', "Not authorized for this operation");
         return XNAV__SUCCESS;
       }
 
       int nr = sscanf(autoack_str, "%f", &ftime);
-      if (nr != 1) {
+      if (nr != 1)
+      {
         xnav->message('E', "Syntax error in time");
         return XNAV__HOLDCOMMAND;
       }
@@ -2729,8 +3183,10 @@ static int xnav_eventlist_func(void* client_data, void* client_flag)
       return XNAV__SUCCESS;
     }
 
-    if (xnav->ev) {
-      if (ODD(dcli_get_qualifier("/PRIORITY", prio_str, sizeof(prio_str)))) {
+    if (xnav->ev)
+    {
+      if (ODD(dcli_get_qualifier("/PRIORITY", prio_str, sizeof(prio_str))))
+      {
         str_ToUpper(prio_str, prio_str);
         if (streq(prio_str, "A"))
           xnav->ev->ack_last_prio(evlist_eEventType_Alarm, mh_eEventPrio_A, oldest, timecheck);
@@ -2742,56 +3198,65 @@ static int xnav_eventlist_func(void* client_data, void* client_flag)
           xnav->ev->ack_last_prio(evlist_eEventType_Alarm, mh_eEventPrio_D, oldest, timecheck);
         else if (str_StartsWith(prio_str, "I"))
           xnav->ev->ack_last_prio(evlist_eEventType_Info, 0, oldest, timecheck);
-        else if (streq(prio_str, "NOA")) {
-          if (ODD(xnav->ev->get_last_not_acked_prio(
-                  &id, evlist_eEventType_Alarm, mh_eEventPrio_B)))
+        else if (streq(prio_str, "NOA"))
+        {
+          if (ODD(xnav->ev->get_last_not_acked_prio(&id, evlist_eEventType_Alarm, mh_eEventPrio_B)))
             xnav->ev->ack_last_prio(evlist_eEventType_Alarm, mh_eEventPrio_B, oldest, timecheck);
-          else if (ODD(xnav->ev->get_last_not_acked_prio(
-                       &id, evlist_eEventType_Alarm, mh_eEventPrio_C)))
+          else if (ODD(xnav->ev->get_last_not_acked_prio(&id, evlist_eEventType_Alarm, mh_eEventPrio_C)))
             xnav->ev->ack_last_prio(evlist_eEventType_Alarm, mh_eEventPrio_C, oldest, timecheck);
-          else if (ODD(xnav->ev->get_last_not_acked_prio(
-                       &id, evlist_eEventType_Alarm, mh_eEventPrio_D)))
+          else if (ODD(xnav->ev->get_last_not_acked_prio(&id, evlist_eEventType_Alarm, mh_eEventPrio_D)))
             xnav->ev->ack_last_prio(evlist_eEventType_Alarm, mh_eEventPrio_D, oldest, timecheck);
-          else if (ODD(xnav->ev->get_last_not_acked_prio(
-                       &id, evlist_eEventType_Info, 0)))
+          else if (ODD(xnav->ev->get_last_not_acked_prio(&id, evlist_eEventType_Info, 0)))
             xnav->ev->ack_last_prio(evlist_eEventType_Info, 0, oldest, timecheck);
-        } else
+        }
+        else
           xnav->message('E', "Unknown priority");
-      } else
+      }
+      else
         xnav->message('E', "Enter priority");
-    } else
+    }
+    else
       xnav->message('I', "Eventlist is not loaded");
-  } else if (str_NoCaseStrncmp(arg1_str, "BLOCK", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "BLOCK", strlen(arg1_str)) == 0)
+  {
     // Command is "EVENTLIST BLOCK"
     char prio_str[80];
     pwr_tOName name_str;
     pwr_tObjid objid;
     mh_eEventPrio prio;
 
-    if (!xnav->ev) {
+    if (!xnav->ev)
+    {
       xnav->message('E', "Eventlist is not loaded");
       return XNAV__SUCCESS;
     }
 
-    if (ODD(dcli_get_qualifier("/NAME", name_str, sizeof(name_str)))) {
+    if (ODD(dcli_get_qualifier("/NAME", name_str, sizeof(name_str))))
+    {
       sts = gdh_NameToObjid(name_str, &objid);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         xnav->message('E', "Object not found");
         return XNAV__SUCCESS;
       }
-    } else {
+    }
+    else
+    {
       // Get the selected object
-      sts = xnav->get_current_object(
-          &objid, name_str, sizeof(name_str), cdh_mName_volumeStrict);
-      if (EVEN(sts)) {
+      sts = xnav->get_current_object(&objid, name_str, sizeof(name_str), cdh_mName_volumeStrict);
+      if (EVEN(sts))
+      {
         xnav->message('E', "Enter name or select an object");
         return XNAV__HOLDCOMMAND;
       }
     }
 
-    if (ODD(dcli_get_qualifier("/PRIORITY", prio_str, sizeof(prio_str)))) {
+    if (ODD(dcli_get_qualifier("/PRIORITY", prio_str, sizeof(prio_str))))
+    {
       str_ToUpper(prio_str, prio_str);
-      switch (prio_str[0]) {
+      switch (prio_str[0])
+      {
       case 'A':
         prio = mh_eEventPrio_A;
         break;
@@ -2812,30 +3277,37 @@ static int xnav_eventlist_func(void* client_data, void* client_flag)
       sts = mh_OutunitBlock(objid, prio);
       if (EVEN(sts))
         xnav->message(' ', XNav::get_message(sts));
-    } else {
+    }
+    else
+    {
       pwr_sAttrRef oar = cdh_ObjidToAref(objid);
 
       xnav->block_new(&oar, Lng::translate("Alarm Blocking"), xnav->priv, &sts);
       xnav->message('E', "Enter priority");
       return XNAV__HOLDCOMMAND;
     }
-
-  } else if (str_NoCaseStrncmp(arg1_str, "UNBLOCK", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "UNBLOCK", strlen(arg1_str)) == 0)
+  {
     // Command is "EVENTLIST UNBLOCK"
     pwr_tOName name_str;
     pwr_tObjid objid;
 
-    if (ODD(dcli_get_qualifier("/NAME", name_str, sizeof(name_str)))) {
+    if (ODD(dcli_get_qualifier("/NAME", name_str, sizeof(name_str))))
+    {
       sts = gdh_NameToObjid(name_str, &objid);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         xnav->message('E', "Object not found");
         return XNAV__SUCCESS;
       }
-    } else {
+    }
+    else
+    {
       // Get the selected object
-      sts = xnav->get_current_object(
-          &objid, name_str, sizeof(name_str), cdh_mName_volumeStrict);
-      if (EVEN(sts)) {
+      sts = xnav->get_current_object(&objid, name_str, sizeof(name_str), cdh_mName_volumeStrict);
+      if (EVEN(sts))
+      {
         xnav->message('E', "Enter name or select an object");
         return XNAV__HOLDCOMMAND;
       }
@@ -2844,7 +3316,9 @@ static int xnav_eventlist_func(void* client_data, void* client_flag)
     sts = mh_OutunitBlock(objid, (mh_eEventPrio)0);
     if (EVEN(sts))
       xnav->message(' ', XNav::get_message(sts));
-  } else {
+  }
+  else
+  {
     xnav->message('E', "Unknown qualifier");
     return XNAV__HOLDCOMMAND;
   }
@@ -2860,7 +3334,8 @@ static int xnav_add_func(void* client_data, void* client_flag)
 
   arg1_sts = dcli_get_qualifier("dcli_arg1", arg1_str, sizeof(arg1_str));
 
-  if (str_NoCaseStrncmp(arg1_str, "PARAMETER", strlen(arg1_str)) == 0) {
+  if (str_NoCaseStrncmp(arg1_str, "PARAMETER", strlen(arg1_str)) == 0)
+  {
     /* Command is "ADD PARAMETER" */
     pwr_tOName parameter_str;
     pwr_tObjName class_str;
@@ -2875,22 +3350,25 @@ static int xnav_add_func(void* client_data, void* client_flag)
 
     IF_NOGDH_RETURN;
 
-    if (ODD(dcli_get_qualifier(
-            "/PARAMETER", parameter_str, sizeof(parameter_str))))
+    if (ODD(dcli_get_qualifier("/PARAMETER", parameter_str, sizeof(parameter_str))))
       parameter_ptr = parameter_str;
     else
       parameter_ptr = NULL;
 
     /* Get the name qualifier */
-    if (ODD(dcli_get_qualifier("dcli_arg2", name_str, sizeof(name_str)))) {
+    if (ODD(dcli_get_qualifier("dcli_arg2", name_str, sizeof(name_str))))
+    {
       if (name_str[0] != '/')
         /* Assume that this is the namestring */
         name_ptr = name_str;
-      else {
+      else
+      {
         xnav->message('E', "Syntax error");
         return XNAV__HOLDCOMMAND;
       }
-    } else {
+    }
+    else
+    {
       if (ODD(dcli_get_qualifier("/NAME", name_str, sizeof(name_str))))
         name_ptr = name_str;
       else
@@ -2900,8 +3378,7 @@ static int xnav_add_func(void* client_data, void* client_flag)
       class_ptr = class_str;
     else
       class_ptr = NULL;
-    if (ODD(dcli_get_qualifier(
-            "/HIERARCHY", hierarchy_str, sizeof(hierarchy_str))))
+    if (ODD(dcli_get_qualifier("/HIERARCHY", hierarchy_str, sizeof(hierarchy_str))))
       hierarchy_ptr = hierarchy_str;
     else
       hierarchy_ptr = NULL;
@@ -2910,12 +3387,13 @@ static int xnav_add_func(void* client_data, void* client_flag)
     else
       global = 1;
 
-    sts = xnav->show_par_hier_class_name(parameter_ptr, hierarchy_ptr,
-        class_ptr, name_ptr, XNAV_MENU_ADD, global, 0);
+    sts = xnav->show_par_hier_class_name(parameter_ptr, hierarchy_ptr, class_ptr, name_ptr, XNAV_MENU_ADD,
+                                         global, 0);
     return sts;
   }
 
-  if (str_NoCaseStrncmp(arg1_str, "DEBUG", strlen(arg1_str)) == 0) {
+  if (str_NoCaseStrncmp(arg1_str, "DEBUG", strlen(arg1_str)) == 0)
+  {
     /* Command is "ADD DEBUG" */
     pwr_tObjName class_str;
     pwr_tOName name_str;
@@ -2929,15 +3407,19 @@ static int xnav_add_func(void* client_data, void* client_flag)
     IF_NOGDH_RETURN;
 
     /* Get the name qualifier */
-    if (ODD(dcli_get_qualifier("dcli_arg2", name_str, sizeof(name_str)))) {
+    if (ODD(dcli_get_qualifier("dcli_arg2", name_str, sizeof(name_str))))
+    {
       if (name_str[0] != '/')
         /* Assume that this is the namestring */
         name_ptr = name_str;
-      else {
+      else
+      {
         xnav->message('E', "Syntax error");
         return XNAV__HOLDCOMMAND;
       }
-    } else {
+    }
+    else
+    {
       if (ODD(dcli_get_qualifier("/NAME", name_str, sizeof(name_str))))
         name_ptr = name_str;
       else
@@ -2947,8 +3429,7 @@ static int xnav_add_func(void* client_data, void* client_flag)
       class_ptr = class_str;
     else
       class_ptr = NULL;
-    if (ODD(dcli_get_qualifier(
-            "/HIERARCHY", hierarchy_str, sizeof(hierarchy_str))))
+    if (ODD(dcli_get_qualifier("/HIERARCHY", hierarchy_str, sizeof(hierarchy_str))))
       hierarchy_ptr = hierarchy_str;
     else
       hierarchy_ptr = NULL;
@@ -2962,7 +3443,9 @@ static int xnav_add_func(void* client_data, void* client_flag)
     //			global);
     sts = 0;
     return sts;
-  } else if (str_NoCaseStrncmp(arg1_str, "MENU", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "MENU", strlen(arg1_str)) == 0)
+  {
     /* Command is "ADD MENU" */
     int sts;
     char object_str[80];
@@ -2972,7 +3455,8 @@ static int xnav_add_func(void* client_data, void* client_flag)
     int object;
     pwr_tObjid objid;
 
-    if (EVEN(dcli_get_qualifier("/TEXT", text_str, sizeof(text_str)))) {
+    if (EVEN(dcli_get_qualifier("/TEXT", text_str, sizeof(text_str))))
+    {
       xnav->message('E', "Enter text");
       return XNAV__HOLDCOMMAND;
     }
@@ -2980,28 +3464,34 @@ static int xnav_add_func(void* client_data, void* client_flag)
       command = 1;
     else
       command = 0;
-    if (ODD(dcli_get_qualifier("/OBJECT", object_str, sizeof(object_str)))) {
+    if (ODD(dcli_get_qualifier("/OBJECT", object_str, sizeof(object_str))))
+    {
       IF_NOGDH_RETURN;
       object = 1;
       sts = gdh_NameToObjid(object_str, &objid);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         xnav->message('E', "Object not found");
         return XNAV__HOLDCOMMAND;
       }
-    } else
+    }
+    else
       object = 0;
 
-    try {
+    try
+    {
       if (object)
         new ItemObject(xnav->brow, objid, NULL, flow_eDest_IntoLast, 0);
       else if (command)
-        new ItemCommand(xnav->brow, text_str, 0, NULL, flow_eDest_IntoLast,
-            command_str, 0, xnav->brow->pixmap_map);
+        new ItemCommand(xnav->brow, text_str, 0, NULL, flow_eDest_IntoLast, command_str, 0,
+                        xnav->brow->pixmap_map);
       //    else
       //      new ItemMenu( xnav->brow, text_str, NULL,
       //		flow_eDest_IntoLast, (xnav_sMenu *) menu->action,
       //		0);
-    } catch (co_error& e) {
+    }
+    catch (co_error& e)
+    {
       xnav->brow_push_all();
       brow_Redraw(xnav->brow->ctx, 0);
       xnav->message('E', (char*)e.what().c_str());
@@ -3011,7 +3501,6 @@ static int xnav_add_func(void* client_data, void* client_flag)
 
   return XNAV__SUCCESS;
 }
-
 
 static void xnav_dashboard_open_cb(void* ctx, char* text, int ok_pressed)
 {
@@ -3047,7 +3536,8 @@ static int xnav_open_func(void* client_data, void* client_flag)
 
   arg1_sts = dcli_get_qualifier("dcli_arg1", arg1_str, sizeof(arg1_str));
 
-  if (str_NoCaseStrncmp(arg1_str, "GRAPH", strlen(arg1_str)) == 0) {
+  if (str_NoCaseStrncmp(arg1_str, "GRAPH", strlen(arg1_str)) == 0)
+  {
     pwr_tAName object_str;
     pwr_tAName instance_str;
     char* instance_p;
@@ -3075,94 +3565,103 @@ static int xnav_open_func(void* client_data, void* client_flag)
       options |= ge_mOptions_Invisible;
     if (ODD(dcli_get_qualifier("/RESIZEFREE", 0, 0)))
       options |= ge_mOptions_ResizeFree;
-    if (ODD(dcli_get_qualifier("/MAIN", 0, 0)) && !xnav->op && !xnav->ge_main
-        && !xnav->multiview_main) {
+    if (ODD(dcli_get_qualifier("/MAIN", 0, 0)) && !xnav->op && !xnav->ge_main && !xnav->multiview_main)
+    {
       options |= ge_mOptions_IsMain;
       if (xnav->opplace_p->OpWindLayout & pwr_mOpWindLayoutMask_HideCloseButton)
         options |= ge_mOptions_HideCloseButton;
     }
 
-    if (ODD(dcli_get_qualifier("/PWINDOW", pwindow_str, sizeof(pwindow_str)))) {
+    if (ODD(dcli_get_qualifier("/PWINDOW", pwindow_str, sizeof(pwindow_str))))
+    {
       char* pinstance_p = 0;
       XttGe* gectx;
 
-      if (str_NoCaseStrcmp(pwindow_str, "$current") == 0) {
-        if (xnav->current_cmd_ctx) {
+      if (str_NoCaseStrcmp(pwindow_str, "$current") == 0)
+      {
+        if (xnav->current_cmd_ctx)
+        {
           pwr_tFileName name;
           pwr_tAName inst;
 
-          if (xnav->appl.find(
-                  applist_eType_Graph, xnav->current_cmd_ctx, name, inst))
+          if (xnav->appl.find(applist_eType_Graph, xnav->current_cmd_ctx, name, inst))
             basewidget = ((XttGe*)xnav->current_cmd_ctx)->get_widget();
-          else if (xnav->appl.find(applist_eType_MultiView,
-                       xnav->current_cmd_ctx, name, inst))
+          else if (xnav->appl.find(applist_eType_MultiView, xnav->current_cmd_ctx, name, inst))
             basewidget = ((XttMultiView*)xnav->current_cmd_ctx)->get_widget();
         }
-      } else {
-        if (ODD(dcli_get_qualifier(
-                "/PINSTANCE", pinstance_str, sizeof(pinstance_str)))) {
+      }
+      else
+      {
+        if (ODD(dcli_get_qualifier("/PINSTANCE", pinstance_str, sizeof(pinstance_str))))
+        {
           pinstance_p = pinstance_str;
         }
 
-        if (xnav->appl.find(
-                applist_eType_Graph, pwindow_str, pinstance_p, (void**)&gectx))
+        if (xnav->appl.find(applist_eType_Graph, pwindow_str, pinstance_p, (void**)&gectx))
           basewidget = gectx->get_widget();
       }
-    } else if (xnav->opplace_p->Options
-        & pwr_mOpPlaceOptionsMask_AllMainTransient) {
+    }
+    else if (xnav->opplace_p->Options & pwr_mOpPlaceOptionsMask_AllMainTransient)
+    {
       if (xnav->ge_main)
         basewidget = xnav->ge_main->get_widget();
       else if (xnav->multiview_main)
         basewidget = xnav->multiview_main->get_widget();
     }
 
-    if (ODD(dcli_get_qualifier(
-            "/INSTANCE", instance_str, sizeof(instance_str)))) {
+    if (ODD(dcli_get_qualifier("/INSTANCE", instance_str, sizeof(instance_str))))
+    {
       instance_p = instance_str;
 
-      if (instance_str[0] == '&') {
+      if (instance_str[0] == '&')
+      {
         pwr_tStatus sts;
         pwr_tTid tid;
         pwr_tUInt32 size, offs, elem;
         char* instp;
 
-        if (instance_str[1] == '('
-            && instance_str[strlen(instance_str) - 1] == ')') {
+        if (instance_str[1] == '(' && instance_str[strlen(instance_str) - 1] == ')')
+        {
           instp = &instance_str[2];
           instance_str[strlen(instance_str) - 1] = 0;
-        } else
+        }
+        else
           instp = &instance_str[1];
 
         sts = gdh_GetAttributeCharacteristics(instp, &tid, &size, &offs, &elem);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           xnav->message('E', "Instance object not found");
           return XNAV__HOLDCOMMAND;
         }
 
-        switch (tid) {
-        case pwr_eType_Objid: {
+        switch (tid)
+        {
+        case pwr_eType_Objid:
+        {
           pwr_tOid oid;
 
           // Objid attribute the contains the instance
           sts = gdh_GetObjectInfo(instp, &oid, sizeof(oid));
           if (ODD(sts))
-            sts = gdh_ObjidToName(oid, instance_str, sizeof(instance_str),
-                cdh_mName_volumeStrict);
-          if (EVEN(sts)) {
+            sts = gdh_ObjidToName(oid, instance_str, sizeof(instance_str), cdh_mName_volumeStrict);
+          if (EVEN(sts))
+          {
             xnav->message('E', "Instance object not found");
             return XNAV__HOLDCOMMAND;
           }
           break;
         }
-        case pwr_eType_AttrRef: {
+        case pwr_eType_AttrRef:
+        {
           pwr_tAttrRef aref;
 
           // Objid attribute the contains the instance
           sts = gdh_GetObjectInfo(instp, &aref, sizeof(aref));
           if (ODD(sts))
-            sts = gdh_AttrrefToName(&aref, instance_str, sizeof(instance_str),
-                cdh_mName_volumeStrict);
-          if (EVEN(sts)) {
+            sts = gdh_AttrrefToName(&aref, instance_str, sizeof(instance_str), cdh_mName_volumeStrict);
+          if (EVEN(sts))
+          {
             xnav->message('E', "Instance object not found");
             return XNAV__HOLDCOMMAND;
           }
@@ -3173,7 +3672,8 @@ static int xnav_open_func(void* client_data, void* client_flag)
           return XNAV__HOLDCOMMAND;
         }
       }
-      if (parent) {
+      if (parent)
+      {
         // Replace instance object with parent object attribute
         char* s;
         if ((s = strrchr(instance_str, '.')))
@@ -3181,19 +3681,24 @@ static int xnav_open_func(void* client_data, void* client_flag)
         else if ((s = strrchr(instance_str, '-')))
           *s = 0;
       }
-    } else
+    }
+    else
       instance_p = 0;
 
-    if (ODD(dcli_get_qualifier("/CLASSGRAPH", 0, 0))) {
+    if (ODD(dcli_get_qualifier("/CLASSGRAPH", 0, 0)))
+    {
       classgraph = 1;
-      if (!instance_p) {
+      if (!instance_p)
+      {
         xnav->message('E', "Instance is missing");
         return XNAV__HOLDCOMMAND;
       }
-    } else
+    }
+    else
       classgraph = 0;
 
-    if (ODD(dcli_get_qualifier("/OBJECT", object_str, sizeof(object_str)))) {
+    if (ODD(dcli_get_qualifier("/OBJECT", object_str, sizeof(object_str))))
+    {
       pwr_tObjid objid;
       pwr_tAName xttgraph_name;
       int sts;
@@ -3210,7 +3715,8 @@ static int xnav_open_func(void* client_data, void* client_flag)
       xnav_replace_node_str(xttgraph_name, object_str);
 
       sts = gdh_NameToObjid(xttgraph_name, &objid);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         xnav->message('E', "Object not found");
         return XNAV__HOLDCOMMAND;
       }
@@ -3222,26 +3728,31 @@ static int xnav_open_func(void* client_data, void* client_flag)
       else
         focus_p = 0;
 
-      if (ODD(dcli_get_qualifier("/ACCESS", tmp_str, sizeof(tmp_str)))) {
+      if (ODD(dcli_get_qualifier("/ACCESS", tmp_str, sizeof(tmp_str))))
+      {
         nr = sscanf(tmp_str, "%u", &access);
-        if (nr != 1) {
+        if (nr != 1)
+        {
           xnav->message('E', "Syntax error in access");
           return XNAV__HOLDCOMMAND;
         }
         use_default_access = 1;
-      } else
+      }
+      else
         use_default_access = 0;
 
-      xnav->exec_xttgraph(objid, instance_p, focus_p, inputempty,
-          use_default_access, access, options, basewidget);
-    } else {
+      xnav->exec_xttgraph(objid, instance_p, focus_p, inputempty, use_default_access, access, options,
+                          basewidget);
+    }
+    else
+    {
       pwr_tFileName file_str;
       pwr_tAName name_str;
       char focus_str[80];
       char tmp_str[80];
       char* focus_p;
       int width, height, nr, scrollbar, menu, navigator;
-      double borders[4] = { 0, 0, 0, 0 };
+      double borders[4] = {0, 0, 0, 0};
       double* bordersp = borders;
       int inputempty;
       pwr_tFileName fname;
@@ -3253,46 +3764,57 @@ static int xnav_open_func(void* client_data, void* client_flag)
       scrollbar = ODD(dcli_get_qualifier("/SCROLLBAR", 0, 0));
       dashboard = ODD(dcli_get_qualifier("/DASHBOARD", 0, 0));
 
-      if (ODD(dcli_get_qualifier("/COLLECT", 0, 0))) {
+      if (ODD(dcli_get_qualifier("/COLLECT", 0, 0)))
+      {
         scrollbar = ODD(dcli_get_qualifier("/SCROLLBAR", 0, 0));
         menu = ODD(dcli_get_qualifier("/MENU", 0, 0));
         navigator = ODD(dcli_get_qualifier("/NAVIGATOR", 0, 0));
 
-        xnav->open_graph("Collect", "_none_", scrollbar, menu, navigator, 0, 0,
-	     0, 0, "collect", NULL, 0, 0, 0, options, basewidget, 0, 0);
+        xnav->open_graph("Collect", "_none_", scrollbar, menu, navigator, 0, 0, 0, 0, "collect", NULL, 0, 0,
+                         0, options, basewidget, 0, 0);
         return XNAV__SUCCESS;
       }
-      if (ODD(dcli_get_qualifier("dcli_arg2", file_str, sizeof(file_str)))) {
+      if (ODD(dcli_get_qualifier("dcli_arg2", file_str, sizeof(file_str))))
+      {
         // Get base class graphs on $pwr_exe
         str_ToLower(fname, file_str);
-        if (instance_p && (str_NoCaseStrncmp(fname, "pwr_c_", 6) == 0
-                              || str_NoCaseStrncmp(fname, "pwr_c_", 6) == 0)) {
+        if (instance_p &&
+            (str_NoCaseStrncmp(fname, "pwr_c_", 6) == 0 || str_NoCaseStrncmp(fname, "pwr_c_", 6) == 0))
+        {
           strcpy(fname, "$pwr_exe/");
           strcat(fname, file_str);
           strcpy(file_str, fname);
         }
-      } else if (ODD(dcli_get_qualifier("/FILE", file_str, sizeof(file_str)))) {
+      }
+      else if (ODD(dcli_get_qualifier("/FILE", file_str, sizeof(file_str))))
+      {
         // Get base class graphs on $pwr_exe
         str_ToLower(fname, file_str);
-        if (instance_p && (str_NoCaseStrncmp(fname, "pwr_c_", 6) == 0
-                              || str_NoCaseStrncmp(fname, "pwr_t_", 6) == 0)) {
+        if (instance_p &&
+            (str_NoCaseStrncmp(fname, "pwr_c_", 6) == 0 || str_NoCaseStrncmp(fname, "pwr_t_", 6) == 0))
+        {
           strcpy(fname, "$pwr_exe/");
           strcat(fname, file_str);
           strcpy(file_str, fname);
         }
-      } else {
-        if (classgraph) {
+      }
+      else
+      {
+        if (classgraph)
+        {
           // Get file from class of instance object
           pwr_tAttrRef aref;
           pwr_tCid cid;
 
-          if (!instance_p) {
+          if (!instance_p)
+          {
             xnav->message('E', "Enter instance object");
             return XNAV__HOLDCOMMAND;
           }
 
           sts = XNav::get_instance_classgraph(instance_p, file_str);
-          if (EVEN(sts)) {
+          if (EVEN(sts))
+          {
             xnav->message('E', XNav::get_message(sts));
             return XNAV__HOLDCOMMAND;
           }
@@ -3305,20 +3827,25 @@ static int xnav_open_func(void* client_data, void* client_flag)
           if (EVEN(sts))
             return sts;
 
-          switch (cid) {
+          switch (cid)
+          {
           case pwr_cClass_NMpsCell:
           case pwr_cClass_NMpsStoreCell:
             scrollbar = 0;
             break;
           default:;
           }
-        } else {
+        }
+        else
+        {
           xnav->message('E', "Enter file");
           return XNAV__HOLDCOMMAND;
         }
       }
-      if (EVEN(dcli_get_qualifier("/NAME", name_str, sizeof(name_str)))) {
-        if (instance_p) {
+      if (EVEN(dcli_get_qualifier("/NAME", name_str, sizeof(name_str))))
+      {
+        if (instance_p)
+        {
           pwr_sAttrRef aref;
           char* s;
 
@@ -3326,21 +3853,25 @@ static int xnav_open_func(void* client_data, void* client_flag)
           if ((s = strchr(instance_p, ',')))
             *s = 0;
           sts = gdh_NameToAttrref(pwr_cNObjid, instance_p, &aref);
-          if (EVEN(sts)) {
+          if (EVEN(sts))
+          {
             xnav->message('E', "Instance object not found");
             return XNAV__HOLDCOMMAND;
           }
           if (s)
             *s = ',';
-          sts = gdh_AttrrefToName(
-              &aref, name_str, sizeof(name_str), cdh_mName_pathStrict);
+          sts = gdh_AttrrefToName(&aref, name_str, sizeof(name_str), cdh_mName_pathStrict);
           if (EVEN(sts))
             return sts;
-        } else {
-          if (file_str[0] == '/') {
+        }
+        else
+        {
+          if (file_str[0] == '/')
+          {
             char* t = strrchr(file_str, '/');
             strncpy(name_str, t + 1, sizeof(name_str));
-          } else
+          }
+          else
             strncpy(name_str, file_str, sizeof(name_str));
         }
       }
@@ -3353,80 +3884,102 @@ static int xnav_open_func(void* client_data, void* client_flag)
       navigator = ODD(dcli_get_qualifier("/NAVIGATOR", 0, 0));
       inputempty = ODD(dcli_get_qualifier("/INPUTEMPTY", 0, 0));
 
-      if (ODD(dcli_get_qualifier("/WIDTH", tmp_str, sizeof(tmp_str)))) {
+      if (ODD(dcli_get_qualifier("/WIDTH", tmp_str, sizeof(tmp_str))))
+      {
         nr = sscanf(tmp_str, "%d", &width);
-        if (nr != 1) {
+        if (nr != 1)
+        {
           xnav->message('E', "Syntax error in width");
           return XNAV__HOLDCOMMAND;
         }
-      } else
+      }
+      else
         width = 0;
 
-      if (ODD(dcli_get_qualifier("/HEIGHT", tmp_str, sizeof(tmp_str)))) {
+      if (ODD(dcli_get_qualifier("/HEIGHT", tmp_str, sizeof(tmp_str))))
+      {
         nr = sscanf(tmp_str, "%d", &height);
-        if (nr != 1) {
+        if (nr != 1)
+        {
           xnav->message('E', "Syntax error in height");
           return XNAV__HOLDCOMMAND;
         }
-      } else
+      }
+      else
         height = 0;
 
-      if (ODD(dcli_get_qualifier("/X0", tmp_str, sizeof(tmp_str)))) {
+      if (ODD(dcli_get_qualifier("/X0", tmp_str, sizeof(tmp_str))))
+      {
         nr = sscanf(tmp_str, "%lf", &borders[0]);
-        if (nr != 1) {
+        if (nr != 1)
+        {
           xnav->message('E', "Syntax error in x0");
           return XNAV__HOLDCOMMAND;
         }
-      } else
+      }
+      else
         borders[0] = 0;
 
-      if (ODD(dcli_get_qualifier("/Y0", tmp_str, sizeof(tmp_str)))) {
+      if (ODD(dcli_get_qualifier("/Y0", tmp_str, sizeof(tmp_str))))
+      {
         nr = sscanf(tmp_str, "%lf", &borders[1]);
-        if (nr != 1) {
+        if (nr != 1)
+        {
           xnav->message('E', "Syntax error in y0");
           return XNAV__HOLDCOMMAND;
         }
-      } else
+      }
+      else
         borders[1] = 0;
 
-      if (ODD(dcli_get_qualifier("/X1", tmp_str, sizeof(tmp_str)))) {
+      if (ODD(dcli_get_qualifier("/X1", tmp_str, sizeof(tmp_str))))
+      {
         nr = sscanf(tmp_str, "%lf", &borders[2]);
-        if (nr != 1) {
+        if (nr != 1)
+        {
           xnav->message('E', "Syntax error in x1");
           return XNAV__HOLDCOMMAND;
         }
-      } else
+      }
+      else
         borders[2] = 0;
 
-      if (ODD(dcli_get_qualifier("/Y1", tmp_str, sizeof(tmp_str)))) {
+      if (ODD(dcli_get_qualifier("/Y1", tmp_str, sizeof(tmp_str))))
+      {
         nr = sscanf(tmp_str, "%lf", &borders[3]);
-        if (nr != 1) {
+        if (nr != 1)
+        {
           xnav->message('E', "Syntax error in y1");
           return XNAV__HOLDCOMMAND;
         }
-      } else
+      }
+      else
         borders[3] = 0;
 
-      if (feq(borders[0], 0.0) && feq(borders[1], 0.0) && feq(borders[2], 0.0)
-          && feq(borders[3], 0.0))
+      if (feq(borders[0], 0.0) && feq(borders[1], 0.0) && feq(borders[2], 0.0) && feq(borders[3], 0.0))
         bordersp = 0;
 
-      if (ODD(dcli_get_qualifier("/ACCESS", tmp_str, sizeof(tmp_str)))) {
+      if (ODD(dcli_get_qualifier("/ACCESS", tmp_str, sizeof(tmp_str))))
+      {
         nr = sscanf(tmp_str, "%u", &access);
-        if (nr != 1) {
+        if (nr != 1)
+        {
           xnav->message('E', "Syntax error in access");
           return XNAV__HOLDCOMMAND;
         }
         use_default_access = 1;
-      } else
+      }
+      else
         use_default_access = 0;
 
-      xnav->open_graph(name_str, file_str, scrollbar, menu, navigator, width,
-          height, 0, 0, instance_p, focus_p, inputempty, use_default_access,
-	  access, options, basewidget, bordersp, dashboard);
+      xnav->open_graph(name_str, file_str, scrollbar, menu, navigator, width, height, 0, 0, instance_p,
+                       focus_p, inputempty, use_default_access, access, options, basewidget, bordersp,
+                       dashboard);
       return XNAV__SUCCESS;
     }
-  } else if (str_NoCaseStrncmp(arg1_str, "MULTIVIEW", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "MULTIVIEW", strlen(arg1_str)) == 0)
+  {
     char tmp_str[80];
     int width, height;
     int x, y;
@@ -3442,22 +3995,28 @@ static int xnav_open_func(void* client_data, void* client_flag)
     // Command is "OPEN MULTIVIEW"
 
     /* Get the name qualifier */
-    if (ODD(dcli_get_qualifier("dcli_arg2", name_str, sizeof(name_str)))) {
+    if (ODD(dcli_get_qualifier("dcli_arg2", name_str, sizeof(name_str))))
+    {
       if (name_str[0] != '/')
         /* Assume that this is the namestring */
         name_ptr = name_str;
-      else {
+      else
+      {
         xnav->message('E', "Syntax error");
         return XNAV__HOLDCOMMAND;
       }
-    } else {
+    }
+    else
+    {
       if (ODD(dcli_get_qualifier("/NAME", name_str, sizeof(name_str))))
         name_ptr = name_str;
-      else {
+      else
+      {
         /* Get the selected object */
         sts = xnav->get_current_aref(&aref_vect[0], name_str, sizeof(name_str),
-            cdh_mName_path | cdh_mName_object | cdh_mName_attribute);
-        if (EVEN(sts)) {
+                                     cdh_mName_path | cdh_mName_object | cdh_mName_attribute);
+        if (EVEN(sts))
+        {
           xnav->message('E', "Enter name or select an object");
           return XNAV__SUCCESS;
         }
@@ -3468,7 +4027,8 @@ static int xnav_open_func(void* client_data, void* client_flag)
     xnav_replace_node_str(name_ptr, name_ptr);
 
     sts = gdh_NameToAttrref(pwr_cNObjid, name_ptr, &aref);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       xnav->message('E', "MultiView object not found");
       return XNAV__HOLDCOMMAND;
     }
@@ -3483,66 +4043,83 @@ static int xnav_open_func(void* client_data, void* client_flag)
       options |= ge_mOptions_Iconify;
     if (ODD(dcli_get_qualifier("/HIDE", 0, 0)))
       options |= ge_mOptions_Invisible;
-    if (ODD(dcli_get_qualifier("/MAIN", 0, 0)) && !xnav->op && !xnav->ge_main
-        && !xnav->multiview_main) {
+    if (ODD(dcli_get_qualifier("/MAIN", 0, 0)) && !xnav->op && !xnav->ge_main && !xnav->multiview_main)
+    {
       options |= ge_mOptions_IsMain;
       if (xnav->opplace_p->OpWindLayout & pwr_mOpWindLayoutMask_HideCloseButton)
         options |= ge_mOptions_HideCloseButton;
     }
 
-    if (ODD(dcli_get_qualifier("/WIDTH", tmp_str, sizeof(tmp_str)))) {
+    if (ODD(dcli_get_qualifier("/WIDTH", tmp_str, sizeof(tmp_str))))
+    {
       nr = sscanf(tmp_str, "%d", &width);
-      if (nr != 1) {
+      if (nr != 1)
+      {
         xnav->message('E', "Syntax error in width");
         return XNAV__HOLDCOMMAND;
       }
-    } else
+    }
+    else
       width = 0;
 
-    if (ODD(dcli_get_qualifier("/HEIGHT", tmp_str, sizeof(tmp_str)))) {
+    if (ODD(dcli_get_qualifier("/HEIGHT", tmp_str, sizeof(tmp_str))))
+    {
       nr = sscanf(tmp_str, "%d", &height);
-      if (nr != 1) {
+      if (nr != 1)
+      {
         xnav->message('E', "Syntax error in height");
         return XNAV__HOLDCOMMAND;
       }
-    } else
+    }
+    else
       height = 0;
 
-    if (ODD(dcli_get_qualifier("/XPOSITION", tmp_str, sizeof(tmp_str)))) {
+    if (ODD(dcli_get_qualifier("/XPOSITION", tmp_str, sizeof(tmp_str))))
+    {
       nr = sscanf(tmp_str, "%d", &x);
-      if (nr != 1) {
+      if (nr != 1)
+      {
         xnav->message('E', "Syntax error in x coordinate");
         return XNAV__HOLDCOMMAND;
       }
-    } else
+    }
+    else
       x = 0;
 
-    if (ODD(dcli_get_qualifier("/YPOSITION", tmp_str, sizeof(tmp_str)))) {
+    if (ODD(dcli_get_qualifier("/YPOSITION", tmp_str, sizeof(tmp_str))))
+    {
       nr = sscanf(tmp_str, "%d", &y);
-      if (nr != 1) {
+      if (nr != 1)
+      {
         xnav->message('E', "Syntax error in y coordinate");
         return XNAV__HOLDCOMMAND;
       }
-    } else
+    }
+    else
       y = 0;
 
     XttMultiView* mvctx;
 
-    if (xnav->appl.find(applist_eType_MultiView, &aref, (void**)&mvctx)) {
+    if (xnav->appl.find(applist_eType_MultiView, &aref, (void**)&mvctx))
+    {
       mvctx->pop();
-    } else {
-      if (xnav->opplace_p->Options & pwr_mOpPlaceOptionsMask_AllMainTransient) {
+    }
+    else
+    {
+      if (xnav->opplace_p->Options & pwr_mOpPlaceOptionsMask_AllMainTransient)
+      {
         if (xnav->ge_main)
           basewidget = xnav->ge_main->get_widget();
         else if (xnav->multiview_main)
           basewidget = xnav->multiview_main->get_widget();
       }
 
-      mvctx = xnav->multiview_new(name_str, &aref, width, height, x, y, options,
-          basewidget, xnav->gbl.color_theme, &sts, &xnav_multiview_command_cb,
-          &xnav_ge_get_current_objects_cb, &xnav_ge_is_authorized_cb,
-          &xnav_ge_keyboard_cb);
-      if (EVEN(sts)) {
+      mvctx = xnav->multiview_new(name_str, &aref, width, height, x, y, options, basewidget,
+                                  xnav->gbl.color_theme, &sts, &xnav_multiview_command_cb,
+                                  &xnav_ge_get_current_objects_cb, &xnav_ge_is_authorized_cb,
+                                  &xnav_ge_keyboard_cb);
+      if (EVEN(sts))
+      {
         xnav->message(' ', XNav::get_message(sts));
         return sts;
       }
@@ -3557,16 +4134,18 @@ static int xnav_open_func(void* client_data, void* client_flag)
 
       xnav->appl.insert(applist_eType_MultiView, (void*)mvctx, &aref, "", NULL);
 
-      if (options & ge_mOptions_IsMain) {
-        if (xnav->opplace_p->OpWindLayout
-            & pwr_mOpWindLayoutMask_HideCloseButton)
+      if (options & ge_mOptions_IsMain)
+      {
+        if (xnav->opplace_p->OpWindLayout & pwr_mOpWindLayoutMask_HideCloseButton)
           options |= ge_mOptions_HideCloseButton;
         if (!xnav->op && !xnav->ge_main)
           xnav->multiview_main = mvctx;
       }
     }
     return XNAV__SUCCESS;
-  } else if (str_NoCaseStrncmp(arg1_str, "DASHBOARD", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "DASHBOARD", strlen(arg1_str)) == 0)
+  {
     char name_str[80];
     int name_found = 0;
 
@@ -3576,20 +4155,25 @@ static int xnav_open_func(void* client_data, void* client_flag)
       name_found = 1;
     else if (ODD(dcli_get_qualifier("/NAME", name_str, sizeof(name_str))))
       name_found = 1;
-    if (!name_found) {
-      xnav->wow->CreateFileList("Open Dashboard", "$pwrp_exe", "*", "pwd",
-	    xnav_dashboard_open_cb, 0, xnav, 1);
+    if (!name_found)
+    {
+      xnav->wow->CreateFileList("Open Dashboard", "$pwrp_exe", "*", "pwd", xnav_dashboard_open_cb, 0, xnav,
+                                1);
 
       return XNAV__SUCCESS;
-    } else {
+    }
+    else
+    {
       // Name found
       pwr_tCmd cmd;
       sprintf(cmd, "open graph %s/dash/menu", name_str);
-      
+
       xnav->command(cmd);
     }
-  } else if (str_NoCaseStrncmp(arg1_str, "CAMERA", strlen(arg1_str)) == 0
-      || str_NoCaseStrncmp(arg1_str, "VIDEO", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "CAMERA", strlen(arg1_str)) == 0 ||
+           str_NoCaseStrncmp(arg1_str, "VIDEO", strlen(arg1_str)) == 0)
+  {
     char tmp_str[80];
     int width, height;
     int x, y;
@@ -3603,31 +4187,31 @@ static int xnav_open_func(void* client_data, void* client_flag)
     pwr_tAName camerapos_str;
     int camerapos_found = 0;
     pwr_sClass_CameraPosition pos;
-    int is_video
-        = (str_NoCaseStrncmp(arg1_str, "VIDEO", strlen(arg1_str)) == 0);
+    int is_video = (str_NoCaseStrncmp(arg1_str, "VIDEO", strlen(arg1_str)) == 0);
 
     // Command is "OPEN CAMERA" or "OPEN VIDEO"
 
-    if (ODD(dcli_get_qualifier(
-            "/CAMERAPOSITION", camerapos_str, sizeof(camerapos_str)))) {
+    if (ODD(dcli_get_qualifier("/CAMERAPOSITION", camerapos_str, sizeof(camerapos_str))))
+    {
       // CameraPosition object supplied
 
       sts = gdh_GetObjectInfo(camerapos_str, &pos, sizeof(pos));
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         xnav->message('E', "Object not found");
         return XNAV__HOLDCOMMAND;
       }
 
-      sts = gdh_AttrrefToName(
-          &pos.VideoObject, object_str, sizeof(object_str), cdh_mNName);
-      if (EVEN(sts)) {
+      sts = gdh_AttrrefToName(&pos.VideoObject, object_str, sizeof(object_str), cdh_mNName);
+      if (EVEN(sts))
+      {
         xnav->message('E', "Configuration error, video object not found");
         return XNAV__HOLDCOMMAND;
       }
       camerapos_found = 1;
     }
-    if (camerapos_found
-        || ODD(dcli_get_qualifier("/OBJECT", object_str, sizeof(object_str)))) {
+    if (camerapos_found || ODD(dcli_get_qualifier("/OBJECT", object_str, sizeof(object_str))))
+    {
       // XttCamera object supplied, fetch data from object
       pwr_tOName xttcamera_name;
       pwr_sClass_XttCamera xttcamera;
@@ -3637,7 +4221,8 @@ static int xnav_open_func(void* client_data, void* client_flag)
       xnav_replace_node_str(xttcamera_name, object_str);
 
       sts = gdh_NameToObjid(xttcamera_name, &objid);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         xnav->message('E', "Object not found");
         return XNAV__HOLDCOMMAND;
       }
@@ -3646,14 +4231,14 @@ static int xnav_open_func(void* client_data, void* client_flag)
       if (EVEN(sts))
         return sts;
 
-      if (cid != pwr_cClass_XttCamera) {
+      if (cid != pwr_cClass_XttCamera)
+      {
         xnav->message('E', "Error in object class");
         return XNAV__HOLDCOMMAND;
       }
       pwr_tAttrRef aref = cdh_ObjidToAref(objid);
 
-      sts = gdh_GetObjectInfoAttrref(
-          &aref, (pwr_tAddress)&xttcamera, sizeof(xttcamera));
+      sts = gdh_GetObjectInfoAttrref(&aref, (pwr_tAddress)&xttcamera, sizeof(xttcamera));
       if (EVEN(sts))
         return sts;
 
@@ -3672,12 +4257,15 @@ static int xnav_open_func(void* client_data, void* client_flag)
         options |= strm_mOptions_FullMaximize;
       if (xttcamera.Options & pwr_mCameraOptionsMask_Iconify)
         options |= strm_mOptions_Iconify;
-      if (is_video) {
+      if (is_video)
+      {
         if (ODD(dcli_get_qualifier("/VIDEOCONTROLPANEL", 0, 0)))
           options |= strm_mOptions_VideoControlPanel;
         if (ODD(dcli_get_qualifier("/VIDEOPROGRESSBAR", 0, 0)))
           options |= strm_mOptions_VideoProgressBar;
-      } else {
+      }
+      else
+      {
         if (xttcamera.Options & pwr_mCameraOptionsMask_CameraControlPanel)
           options |= strm_mOptions_CameraControlPanel;
       }
@@ -3688,28 +4276,33 @@ static int xnav_open_func(void* client_data, void* client_flag)
 
       XttStream* strmctx;
 
-      if (xnav->appl.find(applist_eType_Stream, objid, (void**)&strmctx)) {
+      if (xnav->appl.find(applist_eType_Stream, objid, (void**)&strmctx))
+      {
         strmctx->pop();
-      } else {
-        strmctx = xnav->stream_new(
-            name_str, url_str, width, height, x, y, 0, options, 0, &aref, &sts);
-        if (EVEN(sts)) {
+      }
+      else
+      {
+        strmctx = xnav->stream_new(name_str, url_str, width, height, x, y, 0, options, 0, &aref, &sts);
+        if (EVEN(sts))
+        {
           xnav->message(' ', XNav::get_message(sts));
           return sts;
         }
         strmctx->close_cb = xnav_stream_close_cb;
 
-        xnav->appl.insert(
-            applist_eType_Stream, (void*)strmctx, objid, name_str, url_str);
+        xnav->appl.insert(applist_eType_Stream, (void*)strmctx, objid, name_str, url_str);
       }
       if (camerapos_found)
         strmctx->position(pos.Pan, pos.Tilt, pos.Zoom);
-    } else {
+    }
+    else
+    {
       /* Get the name qualifier */
       if (EVEN(dcli_get_qualifier("/NAME", name_str, sizeof(name_str))))
         strcpy(name_str, "");
 
-      if (EVEN(dcli_get_qualifier("/URL", url_str, sizeof(url_str)))) {
+      if (EVEN(dcli_get_qualifier("/URL", url_str, sizeof(url_str))))
+      {
         xnav->message('E', "Url is missing");
         return XNAV__SUCCESS;
       }
@@ -3722,81 +4315,102 @@ static int xnav_open_func(void* client_data, void* client_flag)
         options |= strm_mOptions_FullMaximize;
       if (ODD(dcli_get_qualifier("/ICONIFY", 0, 0)))
         options |= strm_mOptions_Iconify;
-      if (is_video) {
+      if (is_video)
+      {
         if (ODD(dcli_get_qualifier("/VIDEOCONTROLPANEL", 0, 0)))
           options |= strm_mOptions_VideoControlPanel;
         if (ODD(dcli_get_qualifier("/VIDEOPROGRESSBAR", 0, 0)))
           options |= strm_mOptions_VideoProgressBar;
-      } else {
+      }
+      else
+      {
         if (ODD(dcli_get_qualifier("/CAMERACONTROLPANEL", 0, 0)))
           options |= strm_mOptions_CameraControlPanel;
       }
 
-      if (ODD(dcli_get_qualifier("/WIDTH", tmp_str, sizeof(tmp_str)))) {
+      if (ODD(dcli_get_qualifier("/WIDTH", tmp_str, sizeof(tmp_str))))
+      {
         nr = sscanf(tmp_str, "%d", &width);
-        if (nr != 1) {
+        if (nr != 1)
+        {
           xnav->message('E', "Syntax error in width");
           return XNAV__HOLDCOMMAND;
         }
-      } else
+      }
+      else
         width = 0;
 
-      if (ODD(dcli_get_qualifier("/HEIGHT", tmp_str, sizeof(tmp_str)))) {
+      if (ODD(dcli_get_qualifier("/HEIGHT", tmp_str, sizeof(tmp_str))))
+      {
         nr = sscanf(tmp_str, "%d", &height);
-        if (nr != 1) {
+        if (nr != 1)
+        {
           xnav->message('E', "Syntax error in height");
           return XNAV__HOLDCOMMAND;
         }
-      } else
+      }
+      else
         height = 0;
 
-      if (ODD(dcli_get_qualifier("/XPOSITION", tmp_str, sizeof(tmp_str)))) {
+      if (ODD(dcli_get_qualifier("/XPOSITION", tmp_str, sizeof(tmp_str))))
+      {
         nr = sscanf(tmp_str, "%d", &x);
-        if (nr != 1) {
+        if (nr != 1)
+        {
           xnav->message('E', "Syntax error in x coordinate");
           return XNAV__HOLDCOMMAND;
         }
-      } else
+      }
+      else
         x = 0;
 
-      if (ODD(dcli_get_qualifier("/YPOSITION", tmp_str, sizeof(tmp_str)))) {
+      if (ODD(dcli_get_qualifier("/YPOSITION", tmp_str, sizeof(tmp_str))))
+      {
         nr = sscanf(tmp_str, "%d", &y);
-        if (nr != 1) {
+        if (nr != 1)
+        {
           xnav->message('E', "Syntax error in y coordinate");
           return XNAV__HOLDCOMMAND;
         }
-      } else
+      }
+      else
         y = 0;
 
-      if (ODD(dcli_get_qualifier("/SCANTIME", tmp_str, sizeof(tmp_str)))) {
+      if (ODD(dcli_get_qualifier("/SCANTIME", tmp_str, sizeof(tmp_str))))
+      {
         nr = sscanf(tmp_str, "%f", &scantime);
-        if (nr != 1) {
+        if (nr != 1)
+        {
           xnav->message('E', "Syntax error in scantime");
           return XNAV__HOLDCOMMAND;
         }
-      } else
+      }
+      else
         scantime = 0;
 
       XttStream* strmctx;
 
-      if (xnav->appl.find(
-              applist_eType_Stream, name_str, url_str, (void**)&strmctx)) {
+      if (xnav->appl.find(applist_eType_Stream, name_str, url_str, (void**)&strmctx))
+      {
         strmctx->pop();
-      } else {
-        strmctx = xnav->stream_new(name_str, url_str, width, height, x, y,
-            scantime, options, 0, 0, &sts);
-        if (EVEN(sts)) {
+      }
+      else
+      {
+        strmctx = xnav->stream_new(name_str, url_str, width, height, x, y, scantime, options, 0, 0, &sts);
+        if (EVEN(sts))
+        {
           xnav->message(' ', XNav::get_message(sts));
           return sts;
         }
         strmctx->close_cb = xnav_stream_close_cb;
 
-        xnav->appl.insert(
-            applist_eType_Stream, (void*)strmctx, pwr_cNOid, name_str, url_str);
+        xnav->appl.insert(applist_eType_Stream, (void*)strmctx, pwr_cNOid, name_str, url_str);
       }
     }
     return XNAV__SUCCESS;
-  } else if (str_NoCaseStrncmp(arg1_str, "TRACE", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "TRACE", strlen(arg1_str)) == 0)
+  {
     pwr_tOName name_str;
     char center_str[80];
     char* center_p;
@@ -3806,22 +4420,31 @@ static int xnav_open_func(void* client_data, void* client_flag)
     int sts;
 
     // Command is "OPEN TRACE"
-    if (ODD(dcli_get_qualifier("dcli_arg2", name_str, sizeof(name_str)))) {
+    if (ODD(dcli_get_qualifier("dcli_arg2", name_str, sizeof(name_str))))
+    {
       sts = gdh_NameToObjid(name_str, &objid);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         xnav->message('E', "Object not found");
         return XNAV__HOLDCOMMAND;
       }
-    } else {
-      if (ODD(dcli_get_qualifier("/NAME", name_str, sizeof(name_str)))) {
+    }
+    else
+    {
+      if (ODD(dcli_get_qualifier("/NAME", name_str, sizeof(name_str))))
+      {
         sts = gdh_NameToObjid(name_str, &objid);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           xnav->message('E', "Object not found");
           return XNAV__HOLDCOMMAND;
         }
-      } else {
+      }
+      else
+      {
         sts = xnav->get_select(&attrref, &is_attr);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           xnav->message('E', "Enter name or select object");
           return XNAV__SUCCESS;
         }
@@ -3836,18 +4459,21 @@ static int xnav_open_func(void* client_data, void* client_flag)
 
     xnav->start_trace(objid, center_p);
     return XNAV__SUCCESS;
-  } else if (str_NoCaseStrncmp(arg1_str, "OPERATORWINDOW", strlen(arg1_str))
-      == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "OPERATORWINDOW", strlen(arg1_str)) == 0)
+  {
     int sts;
     char opplace_str[80];
 
-    if (!xnav->op) {
-      if (xnav->ge_main || xnav->multiview_main) {
+    if (!xnav->op)
+    {
+      if (xnav->ge_main || xnav->multiview_main)
+      {
         xnav->message('E', "Main window alreay opened");
         return XNAV__HOLDCOMMAND;
       }
-      if (EVEN(dcli_get_qualifier(
-              "dcli_arg2", opplace_str, sizeof(opplace_str)))) {
+      if (EVEN(dcli_get_qualifier("dcli_arg2", opplace_str, sizeof(opplace_str))))
+      {
         xnav->message('E', "Enter opplace");
         return XNAV__HOLDCOMMAND;
       }
@@ -3857,9 +4483,11 @@ static int xnav_open_func(void* client_data, void* client_flag)
       strcpy(xnav->opplace_name, opplace_str);
       xnav->gbl.load_config(xnav);
 
-      if (!xnav->gbl.hide_opwind) {
+      if (!xnav->gbl.hide_opwind)
+      {
         xnav->op = xnav->op_new(opplace_str, &sts);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           delete xnav->op;
           xnav->op = NULL;
           xnav->message('E', "Unable to open operator window");
@@ -3880,66 +4508,88 @@ static int xnav_open_func(void* client_data, void* client_flag)
       }
 
       // Load eventlist
-      if (xnav->ev) {
+      if (xnav->ev)
+      {
         delete ((XNav*)xnav)->ev;
         ((XNav*)xnav)->ev = NULL;
       }
 
       xnav->load_ev_from_opplace();
       xnav->appl_startup();
-    } else {
+    }
+    else
+    {
       xnav->op->map();
     }
-  } else if (str_NoCaseStrncmp(arg1_str, "JGRAPH", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "JGRAPH", strlen(arg1_str)) == 0)
+  {
     char arg2_str[80];
     pwr_tCmd command;
 
-    if (EVEN(dcli_get_qualifier("dcli_arg2", arg2_str, sizeof(arg2_str)))) {
+    if (EVEN(dcli_get_qualifier("dcli_arg2", arg2_str, sizeof(arg2_str))))
+    {
       xnav->message('E', "Syntax error");
       return 1;
     }
 
-    if (xnav->op) {
+    if (xnav->op)
+    {
       strcpy(command, "open jgraph ");
       strcat(command, arg2_str);
       xnav->op->jop_command(command);
-    } else
+    }
+    else
       xnav->message('E', "Java process not started");
-  } else if (str_NoCaseStrncmp(arg1_str, "LOGGFILE", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "LOGGFILE", strlen(arg1_str)) == 0)
+  {
     char file_str[80];
     char entry_str[80];
     int entry;
     int nr;
 
-    if (ODD(dcli_get_qualifier("/ENTRY", entry_str, sizeof(entry_str)))) {
-      if (!str_NoCaseStrcmp(entry_str, "CURRENT")) {
-        if (xnav->current_logging_index == -1) {
+    if (ODD(dcli_get_qualifier("/ENTRY", entry_str, sizeof(entry_str))))
+    {
+      if (!str_NoCaseStrcmp(entry_str, "CURRENT"))
+      {
+        if (xnav->current_logging_index == -1)
+        {
           xnav->message('E', "No current logging entry");
           return XNAV__HOLDCOMMAND;
         }
         entry = xnav->current_logging_index + 1;
-      } else {
+      }
+      else
+      {
         /* convert to integer */
         nr = sscanf(entry_str, "%d", &entry);
-        if (nr != 1) {
+        if (nr != 1)
+        {
           xnav->message('E', "Entry syntax error");
           return XNAV__HOLDCOMMAND;
         }
       }
       strcpy(file_str, xnav->logg[entry - 1].logg_filename);
 
-      if (xnav->logg[entry - 1].active) {
+      if (xnav->logg[entry - 1].active)
+      {
         xnav->message('E', "Logging entry is active");
         return XNAV__HOLDCOMMAND;
       }
-    } else if (EVEN(dcli_get_qualifier("/FILE", file_str, sizeof(file_str)))) {
-      if (EVEN(dcli_get_qualifier("dcli_arg2", file_str, sizeof(file_str)))) {
+    }
+    else if (EVEN(dcli_get_qualifier("/FILE", file_str, sizeof(file_str))))
+    {
+      if (EVEN(dcli_get_qualifier("dcli_arg2", file_str, sizeof(file_str))))
+      {
         xnav->message('E', "Enter filename");
         return XNAV__HOLDCOMMAND;
       }
     }
     xnav->open_rttlog(file_str, file_str);
-  } else if (str_NoCaseStrncmp(arg1_str, "TREND", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "TREND", strlen(arg1_str)) == 0)
+  {
     pwr_tAName name_str;
     char* name_ptr;
     pwr_tAName title_str;
@@ -3970,41 +4620,53 @@ static int xnav_open_func(void* client_data, void* client_flag)
     if (ODD(dcli_get_qualifier("/HIDE", 0, 0)))
       options |= curve_mOptions_Invisible;
 
-    if (ODD(dcli_get_qualifier("/WIDTH", tmp_str, sizeof(tmp_str)))) {
+    if (ODD(dcli_get_qualifier("/WIDTH", tmp_str, sizeof(tmp_str))))
+    {
       nr = sscanf(tmp_str, "%d", &width);
-      if (nr != 1) {
+      if (nr != 1)
+      {
         xnav->message('E', "Syntax error in width");
         return XNAV__HOLDCOMMAND;
       }
-    } else
+    }
+    else
       width = 0;
 
-    if (ODD(dcli_get_qualifier("/HEIGHT", tmp_str, sizeof(tmp_str)))) {
+    if (ODD(dcli_get_qualifier("/HEIGHT", tmp_str, sizeof(tmp_str))))
+    {
       nr = sscanf(tmp_str, "%d", &height);
-      if (nr != 1) {
+      if (nr != 1)
+      {
         xnav->message('E', "Syntax error in height");
         return XNAV__HOLDCOMMAND;
       }
-    } else
+    }
+    else
       height = 0;
 
     /* Get the name qualifier */
-    if (ODD(dcli_get_qualifier("dcli_arg2", name_str, sizeof(name_str)))) {
+    if (ODD(dcli_get_qualifier("dcli_arg2", name_str, sizeof(name_str))))
+    {
       if (name_str[0] != '/')
         /* Assume that this is the namestring */
         name_ptr = name_str;
-      else {
+      else
+      {
         xnav->message('E', "Syntax error");
         return XNAV__HOLDCOMMAND;
       }
-    } else {
+    }
+    else
+    {
       if (ODD(dcli_get_qualifier("/NAME", name_str, sizeof(name_str))))
         name_ptr = name_str;
-      else {
+      else
+      {
         /* Get the selected object */
         sts = xnav->get_current_aref(&aref_vect[0], name_str, sizeof(name_str),
-            cdh_mName_path | cdh_mName_object | cdh_mName_attribute);
-        if (EVEN(sts)) {
+                                     cdh_mName_path | cdh_mName_object | cdh_mName_attribute);
+        if (EVEN(sts))
+        {
           xnav->message('E', "Enter name or select an object");
           return XNAV__SUCCESS;
         }
@@ -4013,25 +4675,28 @@ static int xnav_open_func(void* client_data, void* client_flag)
     }
 
     // The name string can contain several trends separated by ','
-    names = dcli_parse(name_str, ",", "", (char*)name_array,
-        sizeof(name_array) / sizeof(name_array[0]), sizeof(name_array[0]), 0);
+    names = dcli_parse(name_str, ",", "", (char*)name_array, sizeof(name_array) / sizeof(name_array[0]),
+                       sizeof(name_array[0]), 0);
 
-    for (i = 0; i < names; i++) {
-      if (str_StartsWith(name_array[i], "*-")) {
+    for (i = 0; i < names; i++)
+    {
+      if (str_StartsWith(name_array[i], "*-"))
+      {
         // Replace * by the node object
         sts = gdh_GetNodeObject(0, &node_objid);
         if (EVEN(sts))
           return sts;
-        sts = gdh_ObjidToName(
-            node_objid, trend_name, sizeof(trend_name), cdh_mNName);
+        sts = gdh_ObjidToName(node_objid, trend_name, sizeof(trend_name), cdh_mNName);
         if (EVEN(sts))
           return sts;
         strcat(trend_name, &name_array[i][1]);
-      } else
+      }
+      else
         strcpy(trend_name, name_array[i]);
 
       sts = gdh_NameToAttrref(pwr_cNObjid, trend_name, &aref_vect[i]);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         xnav->message('E', "Object not found");
         return XNAV__HOLDCOMMAND;
       }
@@ -4039,7 +4704,8 @@ static int xnav_open_func(void* client_data, void* client_flag)
       if (EVEN(sts))
         return sts;
 
-      switch (classid) {
+      switch (classid)
+      {
       case pwr_cClass_DsTrend:
         break;
       case pwr_cClass_DsTrendCurve:
@@ -4047,7 +4713,8 @@ static int xnav_open_func(void* client_data, void* client_flag)
       case pwr_cClass_PlotGroup:
         plotgroup = aref_vect[i];
         plotgroup_found = 1;
-        if (i != 0) {
+        if (i != 0)
+        {
           xnav->message('E', "Error in object class");
           return XNAV__HOLDCOMMAND;
         }
@@ -4061,8 +4728,10 @@ static int xnav_open_func(void* client_data, void* client_flag)
     }
     aref_vect[i] = pwr_cNAttrRef;
 
-    if (EVEN(dcli_get_qualifier("/TITLE", title_str, sizeof(title_str)))) {
-      if (plotgroup_found) {
+    if (EVEN(dcli_get_qualifier("/TITLE", title_str, sizeof(title_str))))
+    {
+      if (plotgroup_found)
+      {
         pwr_tAName attr;
 
         // Get title from plotgroup object
@@ -4071,59 +4740,73 @@ static int xnav_open_func(void* client_data, void* client_flag)
         sts = gdh_GetObjectInfo(attr, &title_str, sizeof(title_str));
         if (EVEN(sts))
           return sts;
-      } else
+      }
+      else
         strcpy(title_str, "Trend");
     }
 
     void* basewidget = 0;
-    if (xnav->opplace_p->Options & pwr_mOpPlaceOptionsMask_AllMainTransient) {
+    if (xnav->opplace_p->Options & pwr_mOpPlaceOptionsMask_AllMainTransient)
+    {
       if (xnav->ge_main)
         basewidget = xnav->ge_main->get_widget();
       else if (xnav->multiview_main)
         basewidget = xnav->multiview_main->get_widget();
     }
 
-    if (plotgroup_found) {
-      if (xnav->appl.find(applist_eType_Trend, &plotgroup, (void**)&trend)) {
+    if (plotgroup_found)
+    {
+      if (xnav->appl.find(applist_eType_Trend, &plotgroup, (void**)&trend))
+      {
         trend->pop();
-      } else {
-        trend = xnav->xtttrend_new(title_str, NULL, &plotgroup, width, height,
-            options, xnav->gbl.color_theme, basewidget, &sts);
+      }
+      else
+      {
+        trend = xnav->xtttrend_new(title_str, NULL, &plotgroup, width, height, options, xnav->gbl.color_theme,
+                                   basewidget, &sts);
         if (EVEN(sts))
           xnav->message('E', "Error in trend configuration");
-        else {
+        else
+        {
           trend->close_cb = xnav_trend_close_cb;
           trend->help_cb = xnav_trend_command_cb;
           trend->help_cb = xnav_trend_help_cb;
           trend->command_cb = xnav_trend_command_cb;
           trend->get_select_cb = xnav_get_select_cb;
-          xnav->appl.insert(
-              applist_eType_Trend, (void*)trend, &plotgroup, "", NULL);
+          xnav->appl.insert(applist_eType_Trend, (void*)trend, &plotgroup, "", NULL);
         }
       }
-    } else {
-      if (names == 1) {
-        if (xnav->appl.find(
-                applist_eType_Trend, &aref_vect[0], (void**)&trend)) {
+    }
+    else
+    {
+      if (names == 1)
+      {
+        if (xnav->appl.find(applist_eType_Trend, &aref_vect[0], (void**)&trend))
+        {
           trend->pop();
-        } else {
-          trend = xnav->xtttrend_new(title_str, aref_vect, 0, width, height,
-              options, xnav->gbl.color_theme, basewidget, &sts);
+        }
+        else
+        {
+          trend = xnav->xtttrend_new(title_str, aref_vect, 0, width, height, options, xnav->gbl.color_theme,
+                                     basewidget, &sts);
           if (EVEN(sts))
             xnav->message('E', "Error in trend configuration");
-          else {
+          else
+          {
             trend->close_cb = xnav_trend_close_cb;
             trend->command_cb = xnav_trend_command_cb;
             trend->help_cb = xnav_trend_help_cb;
             trend->get_select_cb = xnav_get_select_cb;
-            xnav->appl.insert(
-                applist_eType_Trend, (void*)trend, &aref_vect[0], "", NULL);
+            xnav->appl.insert(applist_eType_Trend, (void*)trend, &aref_vect[0], "", NULL);
           }
         }
-      } else {
-        trend = xnav->xtttrend_new(title_str, aref_vect, 0, width, height,
-            options, xnav->gbl.color_theme, basewidget, &sts);
-        if (ODD(sts)) {
+      }
+      else
+      {
+        trend = xnav->xtttrend_new(title_str, aref_vect, 0, width, height, options, xnav->gbl.color_theme,
+                                   basewidget, &sts);
+        if (ODD(sts))
+        {
           trend->close_cb = xnav_trend_close_cb;
           trend->command_cb = xnav_trend_command_cb;
           trend->help_cb = xnav_trend_help_cb;
@@ -4131,7 +4814,9 @@ static int xnav_open_func(void* client_data, void* client_flag)
         }
       }
     }
-  } else if (str_NoCaseStrncmp(arg1_str, "SHISTORY", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "SHISTORY", strlen(arg1_str)) == 0)
+  {
     pwr_tAName name_str;
     char* name_ptr;
     pwr_tOid oid, coid;
@@ -4143,22 +4828,28 @@ static int xnav_open_func(void* client_data, void* client_flag)
     int idx;
 
     /* Get the name qualifier */
-    if (ODD(dcli_get_qualifier("dcli_arg2", name_str, sizeof(name_str)))) {
+    if (ODD(dcli_get_qualifier("dcli_arg2", name_str, sizeof(name_str))))
+    {
       if (name_str[0] != '/')
         /* Assume that this is the namestring */
         name_ptr = name_str;
-      else {
+      else
+      {
         xnav->message('E', "Syntax error");
         return XNAV__HOLDCOMMAND;
       }
-    } else {
+    }
+    else
+    {
       if (ODD(dcli_get_qualifier("/NAME", name_str, sizeof(name_str))))
         name_ptr = name_str;
-      else {
+      else
+      {
         /* Get the selected object */
         sts = xnav->get_current_aref(&aref, name_str, sizeof(name_str),
-            cdh_mName_path | cdh_mName_object | cdh_mName_attribute);
-        if (EVEN(sts)) {
+                                     cdh_mName_path | cdh_mName_object | cdh_mName_attribute);
+        if (EVEN(sts))
+        {
           xnav->message('E', "Enter name or select an object");
           return XNAV__SUCCESS;
         }
@@ -4167,13 +4858,14 @@ static int xnav_open_func(void* client_data, void* client_flag)
     }
 
     sts = gdh_NameToObjid(name_ptr, &oid);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       xnav->message('E', "Object not found");
       return XNAV__HOLDCOMMAND;
     }
     idx = 0;
-    for (sts = gdh_GetChild(oid, &coid); ODD(sts);
-         sts = gdh_GetNextSibling(coid, &coid)) {
+    for (sts = gdh_GetChild(oid, &coid); ODD(sts); sts = gdh_GetNextSibling(coid, &coid))
+    {
       sts = gdh_GetObjectClass(coid, &cid);
       if (EVEN(sts))
         return sts;
@@ -4181,8 +4873,7 @@ static int xnav_open_func(void* client_data, void* client_flag)
       if (!(cid == pwr_cClass_SevHist || cid == pwr_cClass_SevHistObject))
         continue;
 
-      sts = gdh_ObjidToName(
-          coid, cname[idx], sizeof(cname[0]), cdh_mName_object);
+      sts = gdh_ObjidToName(coid, cname[idx], sizeof(cname[0]), cdh_mName_object);
       if (EVEN(sts))
         return sts;
 
@@ -4196,9 +4887,11 @@ static int xnav_open_func(void* client_data, void* client_flag)
     ctx = (xnav_sHistList*)calloc(1, sizeof(xnav_sHistList));
     ctx->oid = oid;
     ctx->xnav = xnav;
-    xnav->wow->CreateList("History List", (char*)cname, sizeof(cname[0]),
-        xnav_open_shist_cb, xnav_open_shist_cancel_cb, ctx);
-  } else if (str_NoCaseStrncmp(arg1_str, "TCURVE", strlen(arg1_str)) == 0) {
+    xnav->wow->CreateList("History List", (char*)cname, sizeof(cname[0]), xnav_open_shist_cb,
+                          xnav_open_shist_cancel_cb, ctx);
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "TCURVE", strlen(arg1_str)) == 0)
+  {
     pwr_tAName name_str;
     char* name_ptr;
     pwr_tAttrRef aref_vect[2];
@@ -4219,40 +4912,50 @@ static int xnav_open_func(void* client_data, void* client_flag)
     if (ODD(dcli_get_qualifier("/HIDE", 0, 0)))
       options |= curve_mOptions_Invisible;
 
-    if (ODD(dcli_get_qualifier("/WIDTH", tmp_str, sizeof(tmp_str)))) {
+    if (ODD(dcli_get_qualifier("/WIDTH", tmp_str, sizeof(tmp_str))))
+    {
       nr = sscanf(tmp_str, "%d", &width);
-      if (nr != 1) {
+      if (nr != 1)
+      {
         xnav->message('E', "Syntax error in width");
         return XNAV__HOLDCOMMAND;
       }
-    } else
+    }
+    else
       width = 0;
 
-    if (ODD(dcli_get_qualifier("/HEIGHT", tmp_str, sizeof(tmp_str)))) {
+    if (ODD(dcli_get_qualifier("/HEIGHT", tmp_str, sizeof(tmp_str))))
+    {
       nr = sscanf(tmp_str, "%d", &height);
-      if (nr != 1) {
+      if (nr != 1)
+      {
         xnav->message('E', "Syntax error in height");
         return XNAV__HOLDCOMMAND;
       }
-    } else
+    }
+    else
       height = 0;
 
-    if (EVEN(dcli_get_qualifier("/TITLE", title_str, sizeof(title_str)))) {
+    if (EVEN(dcli_get_qualifier("/TITLE", title_str, sizeof(title_str))))
+    {
       strcpy(title_str, "Trend");
     }
 
     void* basewidget = 0;
-    if (xnav->opplace_p->Options & pwr_mOpPlaceOptionsMask_AllMainTransient) {
+    if (xnav->opplace_p->Options & pwr_mOpPlaceOptionsMask_AllMainTransient)
+    {
       if (xnav->ge_main)
         basewidget = xnav->ge_main->get_widget();
       else if (xnav->multiview_main)
         basewidget = xnav->multiview_main->get_widget();
     }
 
-    if (ODD(dcli_get_qualifier("/NEW", 0, 0))) {
-      XttTCurve* tcurve = xnav->xtttcurve_new(title_str, 0, width, height,
-          options, xnav->gbl.color_theme, basewidget, &sts);
-      if (ODD(sts)) {
+    if (ODD(dcli_get_qualifier("/NEW", 0, 0)))
+    {
+      XttTCurve* tcurve =
+          xnav->xtttcurve_new(title_str, 0, width, height, options, xnav->gbl.color_theme, basewidget, &sts);
+      if (ODD(sts))
+      {
         tcurve->close_cb = xnav_tcurve_close_cb;
         tcurve->command_cb = xnav_trend_command_cb;
         tcurve->help_cb = xnav_tcurve_help_cb;
@@ -4261,22 +4964,28 @@ static int xnav_open_func(void* client_data, void* client_flag)
     }
 
     /* Get the name qualifier */
-    if (ODD(dcli_get_qualifier("dcli_arg2", name_str, sizeof(name_str)))) {
+    if (ODD(dcli_get_qualifier("dcli_arg2", name_str, sizeof(name_str))))
+    {
       if (name_str[0] != '/')
         /* Assume that this is the namestring */
         name_ptr = name_str;
-      else {
+      else
+      {
         xnav->message('E', "Syntax error");
         return XNAV__HOLDCOMMAND;
       }
-    } else {
+    }
+    else
+    {
       if (ODD(dcli_get_qualifier("/NAME", name_str, sizeof(name_str))))
         name_ptr = name_str;
-      else {
+      else
+      {
         /* Get the selected object */
         sts = xnav->get_current_aref(&aref_vect[0], name_str, sizeof(name_str),
-            cdh_mName_path | cdh_mName_object | cdh_mName_attribute);
-        if (EVEN(sts)) {
+                                     cdh_mName_path | cdh_mName_object | cdh_mName_attribute);
+        if (EVEN(sts))
+        {
           xnav->message('E', "Enter name or select an object");
           return XNAV__SUCCESS;
         }
@@ -4286,19 +4995,23 @@ static int xnav_open_func(void* client_data, void* client_flag)
 
     memset(aref_vect, 0, sizeof(aref_vect));
     sts = gdh_NameToAttrref(pwr_cNObjid, name_str, &aref_vect[0]);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       xnav->message('E', "Object not found");
       return XNAV__HOLDCOMMAND;
     }
-    XttTCurve* tcurve = xnav->xtttcurve_new(title_str, aref_vect, width, height,
-        options, xnav->gbl.color_theme, basewidget, &sts);
-    if (ODD(sts)) {
+    XttTCurve* tcurve = xnav->xtttcurve_new(title_str, aref_vect, width, height, options,
+                                            xnav->gbl.color_theme, basewidget, &sts);
+    if (ODD(sts))
+    {
       tcurve->close_cb = xnav_tcurve_close_cb;
       tcurve->command_cb = xnav_trend_command_cb;
       tcurve->help_cb = xnav_tcurve_help_cb;
     }
     return XNAV__SUCCESS;
-  } else if (str_NoCaseStrncmp(arg1_str, "HISTORY", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "HISTORY", strlen(arg1_str)) == 0)
+  {
     pwr_tAName name_str;
     char* name_ptr;
     pwr_tAName title_str;
@@ -4332,7 +5045,8 @@ static int xnav_open_func(void* client_data, void* client_flag)
     time_ePeriod period = time_ePeriod_;
 
     // Command is "OPEN HISTORY"
-    for (i = 0; i < 11; i++) {
+    for (i = 0; i < 11; i++)
+    {
       strcpy(onamev[i], "");
       strcpy(anamev[i], "");
     }
@@ -4348,65 +5062,78 @@ static int xnav_open_func(void* client_data, void* client_flag)
     if (ODD(dcli_get_qualifier("/HIDE", 0, 0)))
       options |= curve_mOptions_Invisible;
 
-    if (ODD(dcli_get_qualifier("/WIDTH", tmp_str, sizeof(tmp_str)))) {
+    if (ODD(dcli_get_qualifier("/WIDTH", tmp_str, sizeof(tmp_str))))
+    {
       nr = sscanf(tmp_str, "%d", &width);
-      if (nr != 1) {
+      if (nr != 1)
+      {
         xnav->message('E', "Syntax error in width");
         return XNAV__HOLDCOMMAND;
       }
-    } else
+    }
+    else
       width = 0;
 
-    if (ODD(dcli_get_qualifier("/HEIGHT", tmp_str, sizeof(tmp_str)))) {
+    if (ODD(dcli_get_qualifier("/HEIGHT", tmp_str, sizeof(tmp_str))))
+    {
       nr = sscanf(tmp_str, "%d", &height);
-      if (nr != 1) {
+      if (nr != 1)
+      {
         xnav->message('E', "Syntax error in height");
         return XNAV__HOLDCOMMAND;
       }
-    } else
+    }
+    else
       height = 0;
 
     void* basewidget = 0;
-    if (xnav->opplace_p->Options & pwr_mOpPlaceOptionsMask_AllMainTransient) {
+    if (xnav->opplace_p->Options & pwr_mOpPlaceOptionsMask_AllMainTransient)
+    {
       if (xnav->ge_main)
         basewidget = xnav->ge_main->get_widget();
       else if (xnav->multiview_main)
         basewidget = xnav->multiview_main->get_widget();
     }
 
-    if (ODD(dcli_get_qualifier("/FILE", file_str, sizeof(file_str)))) {
+    if (ODD(dcli_get_qualifier("/FILE", file_str, sizeof(file_str))))
+    {
       // Open exported history file
 
-      hist = xnav->xttsevhist_new(file_str, 0, 0, 0, 0, 0, file_str, width,
-          height, options, xnav->gbl.color_theme, time_ePeriod_, basewidget,
-          &sts);
-      if (ODD(sts)) {
+      hist = xnav->xttsevhist_new(file_str, 0, 0, 0, 0, 0, file_str, width, height, options,
+                                  xnav->gbl.color_theme, time_ePeriod_, basewidget, &sts);
+      if (ODD(sts))
+      {
         hist->help_cb = xnav_sevhist_help_cb;
         hist->close_cb = xnav_sevhist_close_cb;
         // hist->get_select_cb = xnav_sevhist_get_select_cb;
-        xnav->appl.insert(
-            applist_eType_SevHist, (void*)hist, pwr_cNOid, "", NULL);
+        xnav->appl.insert(applist_eType_SevHist, (void*)hist, pwr_cNOid, "", NULL);
       }
       return XNAV__SUCCESS;
     }
 
     /* Get the name qualifier */
-    if (ODD(dcli_get_qualifier("dcli_arg2", name_str, sizeof(name_str)))) {
+    if (ODD(dcli_get_qualifier("dcli_arg2", name_str, sizeof(name_str))))
+    {
       if (name_str[0] != '/')
         /* Assume that this is the namestring */
         name_ptr = name_str;
-      else {
+      else
+      {
         xnav->message('E', "Syntax error");
         return XNAV__HOLDCOMMAND;
       }
-    } else {
+    }
+    else
+    {
       if (ODD(dcli_get_qualifier("/NAME", name_str, sizeof(name_str))))
         name_ptr = name_str;
-      else {
+      else
+      {
         /* Get the selected object */
         sts = xnav->get_current_aref(&sevhist_aref, name_str, sizeof(name_str),
-            cdh_mName_path | cdh_mName_object | cdh_mName_attribute);
-        if (EVEN(sts)) {
+                                     cdh_mName_path | cdh_mName_object | cdh_mName_attribute);
+        if (EVEN(sts))
+        {
           xnav->message('E', "Enter name or select an object");
           return XNAV__SUCCESS;
         }
@@ -4415,25 +5142,28 @@ static int xnav_open_func(void* client_data, void* client_flag)
     }
 
     // The name string can contain several hists separated by ','
-    names = dcli_parse(name_str, ",", "", (char*)name_array,
-        sizeof(name_array) / sizeof(name_array[0]), sizeof(name_array[0]), 0);
+    names = dcli_parse(name_str, ",", "", (char*)name_array, sizeof(name_array) / sizeof(name_array[0]),
+                       sizeof(name_array[0]), 0);
 
-    for (i = 0; i < names; i++) {
-      if (str_StartsWith(name_array[i], "*-")) {
+    for (i = 0; i < names; i++)
+    {
+      if (str_StartsWith(name_array[i], "*-"))
+      {
         // Replace * by the node object
         sts = gdh_GetNodeObject(0, &node_objid);
         if (EVEN(sts))
           return sts;
-        sts = gdh_ObjidToName(
-            node_objid, hist_name, sizeof(hist_name), cdh_mNName);
+        sts = gdh_ObjidToName(node_objid, hist_name, sizeof(hist_name), cdh_mNName);
         if (EVEN(sts))
           return sts;
         strcat(hist_name, &name_array[i][1]);
-      } else
+      }
+      else
         strcpy(hist_name, name_array[i]);
 
       sts = gdh_NameToAttrref(pwr_cNObjid, hist_name, &sevhist_aref);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         xnav->message('E', "Object not found");
         return XNAV__HOLDCOMMAND;
       }
@@ -4441,7 +5171,8 @@ static int xnav_open_func(void* client_data, void* client_flag)
       if (EVEN(sts))
         return sts;
 
-      switch (classid) {
+      switch (classid)
+      {
       case pwr_cClass_SevHist:
         break;
       case pwr_cClass_SevHistObject:
@@ -4465,7 +5196,8 @@ static int xnav_open_func(void* client_data, void* client_flag)
         return XNAV__HOLDCOMMAND;
       }
 
-      if (sevitem_found) {
+      if (sevitem_found)
+      {
         pwr_sClass_SevItem item;
         sts = gdh_GetObjectInfoAttrref(&sevhist_aref, &item, sizeof(item));
         if (EVEN(sts))
@@ -4475,29 +5207,38 @@ static int xnav_open_func(void* client_data, void* client_flag)
         oid_cnt = 1;
         sevhistobjectv[0] = item.NoOfAttr > 1;
         sevhistobjectv[1] = false;
-        if (!sevhistobjectv[0]) {
+        if (!sevhistobjectv[0])
+        {
           strcpy(anamev[0], item.Attr);
           strcpy(onamev[0], item.ObjectName);
-        } else {
+        }
+        else
+        {
           char* s;
           pwr_tAName aname;
           s = strchr(item.ObjectName, '.');
-          if (!s) {
+          if (!s)
+          {
             // It is a complete object
             aname[0] = '\0';
-          } else {
+          }
+          else
+          {
             strcpy(aname, s + 1);
           }
           strcpy(anamev[0], aname);
         }
-      } else if (plotgroup_found || sevplotgroup_found) {
+      }
+      else if (plotgroup_found || sevplotgroup_found)
+      {
         pwr_tAttrRef plot_objects[20];
         unsigned int plot_layout;
         int plot_timerange;
         pwr_tCid cid;
         int j;
 
-        if (plotgroup_found) {
+        if (plotgroup_found)
+        {
           pwr_sClass_PlotGroup plot;
 
           sts = gdh_GetObjectInfo(hist_name, &plot, sizeof(plot));
@@ -4507,7 +5248,9 @@ static int xnav_open_func(void* client_data, void* client_flag)
           memcpy(plot_objects, plot.YObjectName, sizeof(plot_objects));
           plot_layout = plot.Layout;
           plot_timerange = plot.TimeRange;
-        } else {
+        }
+        else
+        {
           pwr_sClass_SevPlotGroup plot;
 
           sts = gdh_GetObjectInfo(hist_name, &plot, sizeof(plot));
@@ -4515,10 +5258,11 @@ static int xnav_open_func(void* client_data, void* client_flag)
             return sts;
 
           memset(plot_objects, 0, sizeof(plot_objects));
-          for (j = 0; j < 20; j++) {
-            if (!streq(plot.ObjectName[j], "")) {
-              sts = gdh_NameToAttrref(
-                  pwr_cNObjid, plot.ObjectName[j], &plot_objects[j]);
+          for (j = 0; j < 20; j++)
+          {
+            if (!streq(plot.ObjectName[j], ""))
+            {
+              sts = gdh_NameToAttrref(pwr_cNObjid, plot.ObjectName[j], &plot_objects[j]);
               if (EVEN(sts))
                 continue;
             }
@@ -4543,7 +5287,8 @@ static int xnav_open_func(void* client_data, void* client_flag)
           options |= curve_mOptions_SplitDigital;
         if (plot_layout & pwr_mCurveLayoutMask_LightBackground)
           options |= curve_mOptions_LightBackground;
-        switch (plot_timerange) {
+        switch (plot_timerange)
+        {
         case pwr_eTimeRangeEnum_Second:
           period = time_ePeriod_OneSecond;
           break;
@@ -4574,7 +5319,8 @@ static int xnav_open_func(void* client_data, void* client_flag)
         default:;
         }
 
-        for (j = 0; j < 20; j++) {
+        for (j = 0; j < 20; j++)
+        {
           if (cdh_ObjidIsNull(plot_objects[j].Objid))
             break;
 
@@ -4583,8 +5329,10 @@ static int xnav_open_func(void* client_data, void* client_flag)
           if (EVEN(sts))
             return sts;
 
-          switch (cid) {
-          case pwr_cClass_SevHist: {
+          switch (cid)
+          {
+          case pwr_cClass_SevHist:
+          {
             sts = gdh_ArefANameToAref(&sevhist_aref, "Attribute", &attr_aref);
             if (EVEN(sts))
               return sts;
@@ -4594,12 +5342,14 @@ static int xnav_open_func(void* client_data, void* client_flag)
               return sts;
 
             sts = gdh_AttrrefToName(&aref, aname, sizeof(aname), cdh_mNName);
-            if (EVEN(sts)) {
+            if (EVEN(sts))
+            {
               xnav->message('E', "Error in SevHist configuration");
               return XNAV__HOLDCOMMAND;
             }
             s = strchr(aname, '.');
-            if (!s) {
+            if (!s)
+            {
               xnav->message('E', "Error in SevHist configuration");
               return XNAV__HOLDCOMMAND;
             }
@@ -4613,7 +5363,8 @@ static int xnav_open_func(void* client_data, void* client_flag)
 
             break;
           }
-          case pwr_cClass_SevHistObject: {
+          case pwr_cClass_SevHistObject:
+          {
             sts = gdh_ArefANameToAref(&sevhist_aref, "Object", &attr_aref);
             if (EVEN(sts))
               return sts;
@@ -4623,15 +5374,19 @@ static int xnav_open_func(void* client_data, void* client_flag)
               return sts;
 
             sts = gdh_AttrrefToName(&aref, aname, sizeof(aname), cdh_mNName);
-            if (EVEN(sts)) {
+            if (EVEN(sts))
+            {
               xnav->message('E', "Error in SevHist configuration");
               return XNAV__HOLDCOMMAND;
             }
             s = strchr(aname, '.');
-            if (!s) {
+            if (!s)
+            {
               // It is a complete object
               anamev[oid_cnt][0] = '\0';
-            } else {
+            }
+            else
+            {
               strcpy(anamev[oid_cnt], s + 1);
               *s = 0;
             }
@@ -4643,7 +5398,8 @@ static int xnav_open_func(void* client_data, void* client_flag)
           }
           case pwr_cClass_SevItemBoolean:
           case pwr_cClass_SevItemFloat32:
-          case pwr_cClass_SevItemInt32: {
+          case pwr_cClass_SevItemInt32:
+          {
             pwr_tOName oname;
             pwr_tOid oid;
 
@@ -4682,11 +5438,14 @@ static int xnav_open_func(void* client_data, void* client_flag)
           default:;
           }
         }
-        if (oid_cnt == 0) {
+        if (oid_cnt == 0)
+        {
           xnav->message('E', "History objects in PlotGroup not found");
           return XNAV__SUCCESS;
         }
-      } else if (sevHistObjectFound) {
+      }
+      else if (sevHistObjectFound)
+      {
         sts = gdh_ArefANameToAref(&sevhist_aref, "Object", &attr_aref);
         if (EVEN(sts))
           return sts;
@@ -4696,22 +5455,28 @@ static int xnav_open_func(void* client_data, void* client_flag)
           return sts;
 
         sts = gdh_AttrrefToName(&aref, aname, sizeof(aname), cdh_mNName);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           xnav->message('E', "Error in SevHist configuration");
           return XNAV__HOLDCOMMAND;
         }
         s = strchr(aname, '.');
-        if (!s) {
+        if (!s)
+        {
           // It is a complete object
           anamev[oid_cnt][0] = '\0';
-        } else {
+        }
+        else
+        {
           strcpy(anamev[oid_cnt], s + 1);
         }
         oidv[oid_cnt] = aref.Objid;
         sevhistobjectv[oid_cnt] = true;
         strcpy(onamev[oid_cnt], "");
         oid_cnt++;
-      } else {
+      }
+      else
+      {
         sts = gdh_ArefANameToAref(&sevhist_aref, "Attribute", &attr_aref);
         if (EVEN(sts))
           return sts;
@@ -4721,12 +5486,14 @@ static int xnav_open_func(void* client_data, void* client_flag)
           return sts;
 
         sts = gdh_AttrrefToName(&aref, aname, sizeof(aname), cdh_mNName);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           xnav->message('E', "Error in SevHist configuration");
           return XNAV__HOLDCOMMAND;
         }
         s = strchr(aname, '.');
-        if (!s) {
+        if (!s)
+        {
           xnav->message('E', "Error in SevHist configuration");
           return XNAV__HOLDCOMMAND;
         }
@@ -4735,44 +5502,46 @@ static int xnav_open_func(void* client_data, void* client_flag)
         oidv[oid_cnt] = aref.Objid;
         sevhistobjectv[oid_cnt] = false;
         strcpy(onamev[oid_cnt], "");
-        sts = gdh_ObjidToName(
-            aref.Objid, onamev[oid_cnt], sizeof(onamev[0]), cdh_mNName);
+        sts = gdh_ObjidToName(aref.Objid, onamev[oid_cnt], sizeof(onamev[0]), cdh_mNName);
         oid_cnt++;
       }
 
       // Get server and connect to server
-      if (sevitem_found || sevplotgroup_found) {
+      if (sevitem_found || sevplotgroup_found)
+      {
         // Connect to local node
         syi_NodeName(&sts, server_node, sizeof(server_node));
-      } else {
+      }
+      else
+      {
         sts = gdh_ArefANameToAref(&sevhist_aref, "ThreadObject", &attr_aref);
         if (EVEN(sts))
           return sts;
 
-        sts = gdh_GetObjectInfoAttrref(
-            &attr_aref, &histthread_oid, sizeof(histthread_oid));
+        sts = gdh_GetObjectInfoAttrref(&attr_aref, &histthread_oid, sizeof(histthread_oid));
         if (EVEN(sts))
           return sts;
 
         histthread_aref = cdh_ObjidToAref(histthread_oid);
         sts = gdh_ArefANameToAref(&histthread_aref, "ServerNode", &attr_aref);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           xnav->message('E', "Error in SevHist configuration");
           return XNAV__HOLDCOMMAND;
         }
 
-        sts = gdh_GetObjectInfoAttrref(
-            &attr_aref, server_node, sizeof(server_node));
+        sts = gdh_GetObjectInfoAttrref(&attr_aref, server_node, sizeof(server_node));
         if (EVEN(sts))
           return sts;
       }
 
       xnav->scctx = sevcli_get_stored_ctx();
-      if (!xnav->scctx) {
+      if (!xnav->scctx)
+      {
         sevcli_init(&sts, &xnav->scctx);
         if (EVEN(sts))
           return sts;
-	sevcli_store_ctx(xnav->scctx);
+        sevcli_store_ctx(xnav->scctx);
       }
       sevcli_set_servernode(&sts, xnav->scctx, server_node);
       if (EVEN(sts))
@@ -4780,8 +5549,10 @@ static int xnav_open_func(void* client_data, void* client_flag)
     }
     oidv[oid_cnt] = pwr_cNOid;
 
-    if (EVEN(dcli_get_qualifier("/TITLE", title_str, sizeof(title_str)))) {
-      if (plotgroup_found || sevplotgroup_found) {
+    if (EVEN(dcli_get_qualifier("/TITLE", title_str, sizeof(title_str))))
+    {
+      if (plotgroup_found || sevplotgroup_found)
+      {
         pwr_tAName attr;
 
         // Get title from plotgroup object
@@ -4790,37 +5561,41 @@ static int xnav_open_func(void* client_data, void* client_flag)
         sts = gdh_GetObjectInfo(attr, &title_str, sizeof(title_str));
         if (EVEN(sts))
           return sts;
-      } else
+      }
+      else
         strcpy(title_str, "History");
     }
 
     xnav->set_clock_cursor();
-    if (plotgroup_found || sevplotgroup_found || sevitem_found) {
-      hist = xnav->xttsevhist_new(title_str, oidv, anamev, onamev,
-          sevhistobjectv, xnav->scctx, 0, width, height, options,
-          xnav->gbl.color_theme, period, basewidget, &sts);
-      if (ODD(sts)) {
+    if (plotgroup_found || sevplotgroup_found || sevitem_found)
+    {
+      hist = xnav->xttsevhist_new(title_str, oidv, anamev, onamev, sevhistobjectv, xnav->scctx, 0, width,
+                                  height, options, xnav->gbl.color_theme, period, basewidget, &sts);
+      if (ODD(sts))
+      {
         hist->help_cb = xnav_sevhist_help_cb;
         hist->close_cb = xnav_sevhist_close_cb;
         if (sevitem_found)
           hist->get_select_cb = xnav_sevhist_get_select_cb;
-        xnav->appl.insert(
-            applist_eType_SevHist, (void*)hist, oidv[0], "", NULL);
+        xnav->appl.insert(applist_eType_SevHist, (void*)hist, oidv[0], "", NULL);
       }
-    } else {
-      hist = xnav->xttsevhist_new(title_str, oidv, anamev, onamev,
-          sevhistobjectv, xnav->scctx, 0, width, height, options,
-          xnav->gbl.color_theme, time_ePeriod_, basewidget, &sts);
-      if (ODD(sts)) {
+    }
+    else
+    {
+      hist = xnav->xttsevhist_new(title_str, oidv, anamev, onamev, sevhistobjectv, xnav->scctx, 0, width,
+                                  height, options, xnav->gbl.color_theme, time_ePeriod_, basewidget, &sts);
+      if (ODD(sts))
+      {
         hist->help_cb = xnav_sevhist_help_cb;
         hist->close_cb = xnav_sevhist_close_cb;
         // hist->get_select_cb = xnav_sevhist_get_select_cb;
-        xnav->appl.insert(
-            applist_eType_SevHist, (void*)hist, oidv[0], "", NULL);
+        xnav->appl.insert(applist_eType_SevHist, (void*)hist, oidv[0], "", NULL);
       }
     }
     xnav->reset_cursor();
-  } else if (str_NoCaseStrncmp(arg1_str, "FAST", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "FAST", strlen(arg1_str)) == 0)
+  {
     pwr_tAName name_str;
     char* name_ptr;
     pwr_tAName title_str;
@@ -4845,39 +5620,48 @@ static int xnav_open_func(void* client_data, void* client_flag)
     if (ODD(dcli_get_qualifier("/HIDE", 0, 0)))
       options |= curve_mOptions_Invisible;
 
-    if (ODD(dcli_get_qualifier("/WIDTH", tmp_str, sizeof(tmp_str)))) {
+    if (ODD(dcli_get_qualifier("/WIDTH", tmp_str, sizeof(tmp_str))))
+    {
       nr = sscanf(tmp_str, "%d", &width);
-      if (nr != 1) {
+      if (nr != 1)
+      {
         xnav->message('E', "Syntax error in width");
         return XNAV__HOLDCOMMAND;
       }
-    } else
+    }
+    else
       width = 0;
 
-    if (ODD(dcli_get_qualifier("/HEIGHT", tmp_str, sizeof(tmp_str)))) {
+    if (ODD(dcli_get_qualifier("/HEIGHT", tmp_str, sizeof(tmp_str))))
+    {
       nr = sscanf(tmp_str, "%d", &height);
-      if (nr != 1) {
+      if (nr != 1)
+      {
         xnav->message('E', "Syntax error in height");
         return XNAV__HOLDCOMMAND;
       }
-    } else
+    }
+    else
       height = 0;
 
     void* basewidget = 0;
-    if (xnav->opplace_p->Options & pwr_mOpPlaceOptionsMask_AllMainTransient) {
+    if (xnav->opplace_p->Options & pwr_mOpPlaceOptionsMask_AllMainTransient)
+    {
       if (xnav->ge_main)
         basewidget = xnav->ge_main->get_widget();
       else if (xnav->multiview_main)
         basewidget = xnav->multiview_main->get_widget();
     }
 
-    if (ODD(dcli_get_qualifier("/FILE", file_str, sizeof(file_str)))) {
+    if (ODD(dcli_get_qualifier("/FILE", file_str, sizeof(file_str))))
+    {
       // Open exported fast file
-      XttFast* fast = xnav->xttfast_new(title_str, 0, width, height, 0,
-          file_str, xnav->gbl.color_theme, basewidget, &sts);
+      XttFast* fast = xnav->xttfast_new(title_str, 0, width, height, 0, file_str, xnav->gbl.color_theme,
+                                        basewidget, &sts);
       if (EVEN(sts))
         xnav->message('E', "Error in fast configuration");
-      else {
+      else
+      {
         fast->close_cb = xnav_fast_close_cb;
         fast->help_cb = xnav_fast_help_cb;
       }
@@ -4885,22 +5669,28 @@ static int xnav_open_func(void* client_data, void* client_flag)
     }
 
     /* Get the name qualifier */
-    if (ODD(dcli_get_qualifier("dcli_arg2", name_str, sizeof(name_str)))) {
+    if (ODD(dcli_get_qualifier("dcli_arg2", name_str, sizeof(name_str))))
+    {
       if (name_str[0] != '/')
         /* Assume that this is the namestring */
         name_ptr = name_str;
-      else {
+      else
+      {
         xnav->message('E', "Syntax error");
         return XNAV__HOLDCOMMAND;
       }
-    } else {
+    }
+    else
+    {
       if (ODD(dcli_get_qualifier("/NAME", name_str, sizeof(name_str))))
         name_ptr = name_str;
-      else {
+      else
+      {
         /* Get the selected object */
         sts = xnav->get_current_aref(&aref, name_str, sizeof(name_str),
-            cdh_mName_path | cdh_mName_object | cdh_mName_attribute);
-        if (EVEN(sts)) {
+                                     cdh_mName_path | cdh_mName_object | cdh_mName_attribute);
+        if (EVEN(sts))
+        {
           xnav->message('E', "Enter name or select an object");
           return XNAV__SUCCESS;
         }
@@ -4909,7 +5699,8 @@ static int xnav_open_func(void* client_data, void* client_flag)
     }
 
     sts = gdh_NameToAttrref(pwr_cNObjid, name_str, &aref);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       xnav->message('E', "Object not found");
       return XNAV__HOLDCOMMAND;
     }
@@ -4917,7 +5708,8 @@ static int xnav_open_func(void* client_data, void* client_flag)
     if (EVEN(sts))
       return sts;
 
-    switch (classid) {
+    switch (classid)
+    {
     case pwr_cClass_DsFastCurve:
       break;
     default:
@@ -4925,25 +5717,32 @@ static int xnav_open_func(void* client_data, void* client_flag)
       return XNAV__HOLDCOMMAND;
     }
 
-    if (EVEN(dcli_get_qualifier("/TITLE", title_str, sizeof(title_str)))) {
+    if (EVEN(dcli_get_qualifier("/TITLE", title_str, sizeof(title_str))))
+    {
       strcpy(title_str, "");
     }
 
     XttFast* fast;
-    if (xnav->appl.find(applist_eType_Fast, &aref, (void**)&fast)) {
+    if (xnav->appl.find(applist_eType_Fast, &aref, (void**)&fast))
+    {
       fast->pop();
-    } else {
-      fast = xnav->xttfast_new(title_str, &aref, width, height, options, 0,
-          xnav->gbl.color_theme, basewidget, &sts);
+    }
+    else
+    {
+      fast = xnav->xttfast_new(title_str, &aref, width, height, options, 0, xnav->gbl.color_theme, basewidget,
+                               &sts);
       if (EVEN(sts))
         xnav->message('E', "Error in fast configuration");
-      else {
+      else
+      {
         fast->close_cb = xnav_fast_close_cb;
         fast->help_cb = xnav_fast_help_cb;
         xnav->appl.insert(applist_eType_Fast, (void*)fast, &aref, "", NULL);
       }
     }
-  } else if (str_NoCaseStrncmp(arg1_str, "PLOTGROUP", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "PLOTGROUP", strlen(arg1_str)) == 0)
+  {
     char cmd[430];
     pwr_tAName name_str;
     char* name_ptr;
@@ -4973,43 +5772,55 @@ static int xnav_open_func(void* client_data, void* client_flag)
     iconify = ODD(dcli_get_qualifier("/ICONIFY", 0, 0));
     hide = ODD(dcli_get_qualifier("/HIDE", 0, 0));
 
-    if (ODD(dcli_get_qualifier("/WIDTH", tmp_str, sizeof(tmp_str)))) {
+    if (ODD(dcli_get_qualifier("/WIDTH", tmp_str, sizeof(tmp_str))))
+    {
       nr = sscanf(tmp_str, "%d", &width);
-      if (nr != 1) {
+      if (nr != 1)
+      {
         xnav->message('E', "Syntax error in width");
         return XNAV__HOLDCOMMAND;
       }
       width_found = 1;
-    } else
+    }
+    else
       width_found = 0;
 
-    if (ODD(dcli_get_qualifier("/HEIGHT", tmp_str, sizeof(tmp_str)))) {
+    if (ODD(dcli_get_qualifier("/HEIGHT", tmp_str, sizeof(tmp_str))))
+    {
       nr = sscanf(tmp_str, "%d", &height);
-      if (nr != 1) {
+      if (nr != 1)
+      {
         xnav->message('E', "Syntax error in height");
         return XNAV__HOLDCOMMAND;
       }
       height_found = 1;
-    } else
+    }
+    else
       height_found = 0;
 
     /* Get the name qualifier */
-    if (ODD(dcli_get_qualifier("dcli_arg2", name_str, sizeof(name_str)))) {
+    if (ODD(dcli_get_qualifier("dcli_arg2", name_str, sizeof(name_str))))
+    {
       if (name_str[0] != '/')
         /* Assume that this is the namestring */
         name_ptr = name_str;
-      else {
+      else
+      {
         xnav->message('E', "Syntax error");
         return XNAV__HOLDCOMMAND;
       }
-    } else {
+    }
+    else
+    {
       if (ODD(dcli_get_qualifier("/NAME", name_str, sizeof(name_str))))
         name_ptr = name_str;
-      else {
+      else
+      {
         /* Get the selected object */
         sts = xnav->get_current_aref(&aref, name_str, sizeof(name_str),
-            cdh_mName_path | cdh_mName_object | cdh_mName_attribute);
-        if (EVEN(sts)) {
+                                     cdh_mName_path | cdh_mName_object | cdh_mName_attribute);
+        if (EVEN(sts))
+        {
           xnav->message('E', "Enter name or select an object");
           return XNAV__SUCCESS;
         }
@@ -5029,7 +5840,8 @@ static int xnav_open_func(void* client_data, void* client_flag)
     if (EVEN(sts))
       return sts;
 
-    if (cdh_ObjidIsNull(yo.Objid)) {
+    if (cdh_ObjidIsNull(yo.Objid))
+    {
       xnav->message('E', "Error in plotgroup configuration");
       return XNAV__SUCCESS;
     }
@@ -5038,7 +5850,8 @@ static int xnav_open_func(void* client_data, void* client_flag)
     if (EVEN(sts))
       return sts;
 
-    switch (classid) {
+    switch (classid)
+    {
     case pwr_cClass_DsTrend:
     case pwr_cClass_DsTrendCurve:
       strcpy(type, "trend");
@@ -5076,7 +5889,9 @@ static int xnav_open_func(void* client_data, void* client_flag)
       strcat(cmd, "/hide");
 
     xnav->command(cmd);
-  } else if (str_NoCaseStrncmp(arg1_str, "ATTRIBUTE", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "ATTRIBUTE", strlen(arg1_str)) == 0)
+  {
     pwr_tAName name_str;
     char* name_ptr;
     char title_str[80];
@@ -5090,22 +5905,28 @@ static int xnav_open_func(void* client_data, void* client_flag)
     bypass = ODD(dcli_get_qualifier("/BYPASS", 0, 0));
 
     /* Get the name qualifier */
-    if (ODD(dcli_get_qualifier("dcli_arg2", name_str, sizeof(name_str)))) {
+    if (ODD(dcli_get_qualifier("dcli_arg2", name_str, sizeof(name_str))))
+    {
       if (name_str[0] != '/')
         /* Assume that this is the namestring */
         name_ptr = name_str;
-      else {
+      else
+      {
         xnav->message('E', "Syntax error");
         return XNAV__HOLDCOMMAND;
       }
-    } else {
+    }
+    else
+    {
       if (ODD(dcli_get_qualifier("/NAME", name_str, sizeof(name_str))))
         name_ptr = name_str;
-      else {
+      else
+      {
         /* Get the selected object */
         sts = xnav->get_current_aref(&aref, name_str, sizeof(name_str),
-            cdh_mName_path | cdh_mName_object | cdh_mName_attribute);
-        if (EVEN(sts)) {
+                                     cdh_mName_path | cdh_mName_object | cdh_mName_attribute);
+        if (EVEN(sts))
+        {
           xnav->message('E', "Enter name or select an object");
           return XNAV__SUCCESS;
         }
@@ -5114,7 +5935,8 @@ static int xnav_open_func(void* client_data, void* client_flag)
     }
 
     sts = gdh_NameToAttrref(pwr_cNObjid, name_str, &aref);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       xnav->message('E', "Attribute not found");
       return XNAV__HOLDCOMMAND;
     }
@@ -5122,28 +5944,35 @@ static int xnav_open_func(void* client_data, void* client_flag)
     if (EVEN(sts))
       return sts;
 
-    if (EVEN(dcli_get_qualifier("/TITLE", title_str, sizeof(title_str)))) {
+    if (EVEN(dcli_get_qualifier("/TITLE", title_str, sizeof(title_str))))
+    {
       strcpy(title_str, "Attribute");
     }
 
     XAttOne* xao;
-    if (xnav->appl.find(applist_eType_AttrOne, &aref, (void**)&xao)) {
+    if (xnav->appl.find(applist_eType_AttrOne, &aref, (void**)&xao))
+    {
       xao->pop();
-    } else {
-      xao = xnav->xattone_new(
-          &aref, title_str, bypass ? pwr_mPrv_RtWrite : ((pwr_mPrv) xnav->priv), &sts);
+    }
+    else
+    {
+      xao = xnav->xattone_new(&aref, title_str, bypass ? pwr_mPrv_RtWrite : ((pwr_mPrv)xnav->priv), &sts);
       if (EVEN(sts))
         xnav->message('E', "Unable to open attribute");
-      else {
+      else
+      {
         xao->close_cb = xnav_xao_close_cb;
         xnav->appl.insert(applist_eType_AttrOne, (void*)xao, &aref, "", NULL);
       }
     }
-  } else if (str_NoCaseStrncmp(arg1_str, "URL", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "URL", strlen(arg1_str)) == 0)
+  {
     char arg2_str[80];
     int sts;
 
-    if (EVEN(dcli_get_qualifier("dcli_arg2", arg2_str, sizeof(arg2_str)))) {
+    if (EVEN(dcli_get_qualifier("dcli_arg2", arg2_str, sizeof(arg2_str))))
+    {
       xnav->message('E', "Syntax error");
       return 1;
     }
@@ -5151,14 +5980,18 @@ static int xnav_open_func(void* client_data, void* client_flag)
     sts = xnav_open_URL(arg2_str);
     if (EVEN(sts))
       xnav->message(' ', XNav::get_message(sts));
-  } else if (str_NoCaseStrncmp(arg1_str, "CONSOLELOG", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "CONSOLELOG", strlen(arg1_str)) == 0)
+  {
     int sts;
 
     if (xnav->clog)
       xnav->clog->pop();
-    else {
+    else
+    {
       xnav->clog = xnav->clog_new("System Messages", &sts);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         delete xnav->clog;
         xnav->clog = 0;
         xnav->message('E', "Unable to open console log");
@@ -5167,24 +6000,30 @@ static int xnav_open_func(void* client_data, void* client_flag)
       xnav->clog->help_cb = xnav_ev_help_cb;
       xnav->clog->close_cb = xnav_clog_close_cb;
     }
-  } else if (str_NoCaseStrncmp(arg1_str, "FILE", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "FILE", strlen(arg1_str)) == 0)
+  {
     char arg2_str[200];
     pwr_tCmd cmd;
     int sts;
     char msg[80];
 
-    if (EVEN(dcli_get_qualifier("dcli_arg2", arg2_str, sizeof(arg2_str)))) {
+    if (EVEN(dcli_get_qualifier("dcli_arg2", arg2_str, sizeof(arg2_str))))
+    {
       xnav->message('E', "Syntax error");
       return 1;
     }
     strcpy(cmd, "xdg-open ");
     strcat(cmd, arg2_str);
     sts = system(cmd);
-    if (sts != 0) {
+    if (sts != 0)
+    {
       sprintf(msg, "Error from xdg-open %d", sts >> 8);
       xnav->message('E', msg);
     }
-  } else if (str_NoCaseStrncmp(arg1_str, "FILEVIEW", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "FILEVIEW", strlen(arg1_str)) == 0)
+  {
     XttFileview* fileview;
     pwr_tFileName file_str;
     pwr_tFileName dir_str;
@@ -5199,63 +6038,75 @@ static int xnav_open_func(void* client_data, void* client_flag)
     pwr_tAttrRef aref;
     pwr_tStatus sts;
 
-    if (EVEN(dcli_get_qualifier("/FILE", dir_str, sizeof(dir_str)))) {
+    if (EVEN(dcli_get_qualifier("/FILE", dir_str, sizeof(dir_str))))
+    {
       xnav->message('E', "Enter file specification");
       return XNAV__HOLDCOMMAND;
     }
-    if (EVEN(dcli_get_qualifier("/TARGET", target_str, sizeof(target_str)))) {
+    if (EVEN(dcli_get_qualifier("/TARGET", target_str, sizeof(target_str))))
+    {
       xnav->message('E', "Enter target attribute");
       return XNAV__HOLDCOMMAND;
     }
-    if (EVEN(
-            dcli_get_qualifier("/TRIGGER", trigger_str, sizeof(trigger_str)))) {
+    if (EVEN(dcli_get_qualifier("/TRIGGER", trigger_str, sizeof(trigger_str))))
+    {
       xnav->message('E', "Enter trigger attribute");
       return XNAV__HOLDCOMMAND;
     }
-    if (ODD(dcli_get_qualifier("/TYPE", type_str, sizeof(type_str)))) {
+    if (ODD(dcli_get_qualifier("/TYPE", type_str, sizeof(type_str))))
+    {
       if (str_NoCaseStrcmp(type_str, "SAVE") == 0)
         type = fileview_eType_Save;
       else if (str_NoCaseStrcmp(type_str, "OPEN") == 0)
         type = fileview_eType_Open;
-      else {
+      else
+      {
         xnav->message('E', "Type syntax error");
         return XNAV__HOLDCOMMAND;
       }
-    } else
+    }
+    else
       type = fileview_eType_Open;
 
     if (ODD(dcli_get_qualifier("/FTYPE", filetype_str, sizeof(filetype_str))))
       filetype_p = filetype_str;
 
-    if (EVEN(dcli_get_qualifier("/TITLE", title_str, sizeof(title_str)))) {
+    if (EVEN(dcli_get_qualifier("/TITLE", title_str, sizeof(title_str))))
+    {
       if (type == fileview_eType_Open)
         strcpy(title_str, "Open File");
       else if (type == fileview_eType_Save)
         strcpy(title_str, "Save File");
     }
 
-    if ((s = strrchr(dir_str, '/'))) {
+    if ((s = strrchr(dir_str, '/')))
+    {
       *s = 0;
       strcpy(file_str, s + 1);
     }
 
     sts = gdh_NameToAttrref(pwr_cNObjid, target_str, &aref);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       xnav->message('E', "Uable to find target object");
       return XNAV__HOLDCOMMAND;
     }
 
-    fileview = xnav->fileview_new(aref.Objid, title_str, dir_str, file_str,
-        type, target_str, trigger_str, filetype_p);
-  } else if (str_NoCaseStrncmp(arg1_str, "NAVIGATOR", strlen(arg1_str)) == 0) {
+    fileview = xnav->fileview_new(aref.Objid, title_str, dir_str, file_str, type, target_str, trigger_str,
+                                  filetype_p);
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "NAVIGATOR", strlen(arg1_str)) == 0)
+  {
     pwr_tAName object_str;
     pwr_tAttrRef aref;
     pwr_tStatus sts;
     void* basewidget = 0;
 
-    if (ODD(dcli_get_qualifier("/OBJECT", object_str, sizeof(object_str)))) {
+    if (ODD(dcli_get_qualifier("/OBJECT", object_str, sizeof(object_str))))
+    {
       sts = gdh_NameToAttrref(pwr_cNObjid, object_str, &aref);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         xnav->message('E', "Uable to find object");
         return XNAV__HOLDCOMMAND;
       }
@@ -5265,7 +6116,8 @@ static int xnav_open_func(void* client_data, void* client_flag)
 
     xnav->pop();
 
-    if (xnav->opplace_p->Options & pwr_mOpPlaceOptionsMask_AllMainTransient) {
+    if (xnav->opplace_p->Options & pwr_mOpPlaceOptionsMask_AllMainTransient)
+    {
       if (xnav->ge_main)
         basewidget = xnav->ge_main->get_widget();
       else if (xnav->multiview_main)
@@ -5273,9 +6125,9 @@ static int xnav_open_func(void* client_data, void* client_flag)
       if (basewidget)
         xnav->set_transient(basewidget);
     }
-
-  } else if (str_NoCaseStrncmp(arg1_str, "COLORTHEMESELECTOR", strlen(arg1_str))
-      == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "COLORTHEMESELECTOR", strlen(arg1_str)) == 0)
+  {
     gdh_sValueDef* vd;
     pwr_tString80 cname[30];
     pwr_tTid tid;
@@ -5301,41 +6153,50 @@ static int xnav_open_func(void* client_data, void* client_flag)
     free(vd);
 
     xnav->wow->CreateList("ColorTheme Selector", (char*)cname, sizeof(cname[0]),
-        xnav_colortheme_selector_ok_cb, 0, xnav);
-  } else if (str_NoCaseStrncmp(arg1_str, "KEYBOARD", strlen(arg1_str)) == 0) {
+                          xnav_colortheme_selector_ok_cb, 0, xnav);
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "KEYBOARD", strlen(arg1_str)) == 0)
+  {
     char keymap_str[80];
     char type_str[80];
     keyboard_eKeymap keymap;
     graph_eKeyboard type;
 
-    if (ODD(dcli_get_qualifier("/KEYMAP", keymap_str, sizeof(keymap_str)))) {
+    if (ODD(dcli_get_qualifier("/KEYMAP", keymap_str, sizeof(keymap_str))))
+    {
       if (str_NoCaseStrcmp(keymap_str, "en_us") == 0)
         keymap = keyboard_eKeymap_Low_en_us;
       else if (str_NoCaseStrcmp(keymap_str, "sv_se") == 0)
         keymap = keyboard_eKeymap_Low_sv_se;
-      else {
+      else
+      {
         xnav->message('E', "Unknown keymap");
         return XNAV__HOLDCOMMAND;
       }
-    } else
+    }
+    else
       keymap = keyboard_eKeymap_;
 
-    if (ODD(dcli_get_qualifier("/TYPE", type_str, sizeof(type_str)))) {
+    if (ODD(dcli_get_qualifier("/TYPE", type_str, sizeof(type_str))))
+    {
       if (str_NoCaseStrcmp(type_str, "standard") == 0)
         type = graph_eKeyboard_Standard;
       else if (str_NoCaseStrcmp(type_str, "numeric") == 0)
         type = graph_eKeyboard_Numeric;
       else if (str_NoCaseStrcmp(type_str, "alphabetic") == 0)
         type = graph_eKeyboard_Alphabetic;
-      else {
+      else
+      {
         xnav->message('E', "Unknown type");
         return XNAV__HOLDCOMMAND;
       }
-    } else
+    }
+    else
       type = graph_eKeyboard_Standard;
 
     xnav->open_keyboard(0, keymap, type);
-  } else
+  }
+  else
     xnav->message('E', "Syntax error");
 
   return XNAV__SUCCESS;
@@ -5350,7 +6211,8 @@ static int xnav_close_func(void* client_data, void* client_flag)
 
   arg1_sts = dcli_get_qualifier("dcli_arg1", arg1_str, sizeof(arg1_str));
 
-  if (str_NoCaseStrncmp(arg1_str, "GRAPH", strlen(arg1_str)) == 0) {
+  if (str_NoCaseStrncmp(arg1_str, "GRAPH", strlen(arg1_str)) == 0)
+  {
     pwr_tAName object_str;
     pwr_tAName instance_str;
     char* instance_p;
@@ -5359,22 +6221,25 @@ static int xnav_close_func(void* client_data, void* client_flag)
 
     iconify = ODD(dcli_get_qualifier("/ICONIFY", 0, 0));
 
-    if (ODD(dcli_get_qualifier(
-            "/INSTANCE", instance_str, sizeof(instance_str))))
+    if (ODD(dcli_get_qualifier("/INSTANCE", instance_str, sizeof(instance_str))))
       instance_p = instance_str;
     else
       instance_p = 0;
 
-    if (ODD(dcli_get_qualifier("/CLASSGRAPH", 0, 0))) {
+    if (ODD(dcli_get_qualifier("/CLASSGRAPH", 0, 0)))
+    {
       classgraph = 1;
-      if (!instance_p) {
+      if (!instance_p)
+      {
         xnav->message('E', "Instance is missing");
         return XNAV__HOLDCOMMAND;
       }
-    } else
+    }
+    else
       classgraph = 0;
 
-    if (ODD(dcli_get_qualifier("/OBJECT", object_str, sizeof(object_str)))) {
+    if (ODD(dcli_get_qualifier("/OBJECT", object_str, sizeof(object_str))))
+    {
       pwr_tObjid objid;
       pwr_tAName xttgraph_name;
       int sts;
@@ -5387,7 +6252,8 @@ static int xnav_close_func(void* client_data, void* client_flag)
       xnav_replace_node_str(xttgraph_name, object_str);
 
       sts = gdh_NameToObjid(xttgraph_name, &objid);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         xnav->message('E', "Object not found");
         return XNAV__HOLDCOMMAND;
       }
@@ -5397,53 +6263,71 @@ static int xnav_close_func(void* client_data, void* client_flag)
         return sts;
 
       str_ToLower(action, xttgraph_p->Action);
-      if ((s = strstr(action, ".pwg"))) {
+      if ((s = strstr(action, ".pwg")))
+      {
         *s = 0;
         xnav->close_graph(action, 0, iconify);
       }
-    } else {
+    }
+    else
+    {
       char file_str[80];
       char fname[80];
 
       // Command is "CLOSE GRAPH"
-      if (ODD(dcli_get_qualifier("dcli_arg2", file_str, sizeof(file_str)))) {
-      } else if (classgraph) {
+      if (ODD(dcli_get_qualifier("dcli_arg2", file_str, sizeof(file_str))))
+      {
+      }
+      else if (classgraph)
+      {
         // Get file from class of instance object
         pwr_tStatus sts;
 
-        if (!instance_p) {
+        if (!instance_p)
+        {
           xnav->message('E', "Enter instance object");
           return XNAV__HOLDCOMMAND;
         }
 
         sts = XNav::get_instance_classgraph(instance_p, file_str);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           xnav->message('E', XNav::get_message(sts));
           return XNAV__HOLDCOMMAND;
         }
-      } else if (ODD(dcli_get_qualifier("/FILE", file_str, sizeof(file_str)))) {
+      }
+      else if (ODD(dcli_get_qualifier("/FILE", file_str, sizeof(file_str))))
+      {
         // Get base class graphs on $pwr_exe
-        if (instance_p && (str_NoCaseStrncmp(fname, "pwr_c_", 6) == 0
-                              || str_NoCaseStrncmp(fname, "pwr_t_", 6) == 0)) {
+        if (instance_p &&
+            (str_NoCaseStrncmp(fname, "pwr_c_", 6) == 0 || str_NoCaseStrncmp(fname, "pwr_t_", 6) == 0))
+        {
           strcpy(fname, "$pwr_exe/");
           strcat(fname, file_str);
           strcpy(file_str, fname);
         }
-      } else {
+      }
+      else
+      {
         xnav->message('E', "Enter file");
         return XNAV__HOLDCOMMAND;
       }
 
-      if (str_NoCaseStrcmp(file_str, "$current") == 0) {
-        if (xnav->current_cmd_ctx) {
+      if (str_NoCaseStrcmp(file_str, "$current") == 0)
+      {
+        if (xnav->current_cmd_ctx)
+        {
           if (iconify)
             ((XttGe*)xnav->current_cmd_ctx)->iconify();
-          else {
+          else
+          {
             xnav->appl.remove((void*)xnav->current_cmd_ctx);
             delete (XttGe*)xnav->current_cmd_ctx;
             return GLOW__TERMINATED;
           }
-        } else {
+        }
+        else
+        {
           xnav->message('E', "No current graph");
           return XNAV__SUCCESS;
         }
@@ -5452,7 +6336,9 @@ static int xnav_close_func(void* client_data, void* client_flag)
       xnav->close_graph(file_str, instance_p, iconify);
       return XNAV__SUCCESS;
     }
-  } else if (str_NoCaseStrncmp(arg1_str, "MULTIVIEW", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "MULTIVIEW", strlen(arg1_str)) == 0)
+  {
     pwr_tAName name_str;
     char* name_ptr;
     pwr_tAttrRef aref;
@@ -5463,29 +6349,38 @@ static int xnav_close_func(void* client_data, void* client_flag)
     // Command is "CLOSE MULTIVIEW"
 
     /* Get the name qualifier */
-    if (ODD(dcli_get_qualifier("dcli_arg2", name_str, sizeof(name_str)))) {
+    if (ODD(dcli_get_qualifier("dcli_arg2", name_str, sizeof(name_str))))
+    {
       if (name_str[0] != '/')
         /* Assume that this is the namestring */
         name_ptr = name_str;
-      else {
+      else
+      {
         xnav->message('E', "Syntax error");
         return XNAV__HOLDCOMMAND;
       }
-    } else {
+    }
+    else
+    {
       if (ODD(dcli_get_qualifier("/NAME", name_str, sizeof(name_str))))
         name_ptr = name_str;
-      else {
+      else
+      {
         xnav->message('E', "Enter name");
         return XNAV__SUCCESS;
       }
     }
 
-    if (str_NoCaseStrcmp(name_str, "$current") == 0) {
-      if (xnav->current_cmd_ctx) {
+    if (str_NoCaseStrcmp(name_str, "$current") == 0)
+    {
+      if (xnav->current_cmd_ctx)
+      {
         xnav->appl.remove((void*)xnav->current_cmd_ctx);
         delete (XttMultiView*)xnav->current_cmd_ctx;
         return GLOW__TERMINATED;
-      } else {
+      }
+      else
+      {
         xnav->message('E', "No current multiview");
         return XNAV__SUCCESS;
       }
@@ -5494,7 +6389,8 @@ static int xnav_close_func(void* client_data, void* client_flag)
     xnav_replace_node_str(name_ptr, name_ptr);
 
     sts = gdh_NameToAttrref(pwr_cNObjid, name_ptr, &aref);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       xnav->message('E', "Object not found");
       return XNAV__HOLDCOMMAND;
     }
@@ -5502,7 +6398,8 @@ static int xnav_close_func(void* client_data, void* client_flag)
     if (EVEN(sts))
       return sts;
 
-    switch (classid) {
+    switch (classid)
+    {
     case pwr_cClass_XttMultiView:
       break;
     default:
@@ -5510,11 +6407,14 @@ static int xnav_close_func(void* client_data, void* client_flag)
       return XNAV__HOLDCOMMAND;
     }
 
-    if (xnav->appl.find(applist_eType_MultiView, &aref, (void**)&mvctx)) {
+    if (xnav->appl.find(applist_eType_MultiView, &aref, (void**)&mvctx))
+    {
       xnav->appl.remove((void*)mvctx);
       delete mvctx;
     }
-  } else if (str_NoCaseStrncmp(arg1_str, "TREND", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "TREND", strlen(arg1_str)) == 0)
+  {
     pwr_tAName name_str;
     char* name_ptr;
     pwr_tAttrRef aref;
@@ -5528,38 +6428,45 @@ static int xnav_close_func(void* client_data, void* client_flag)
     // Command is "CLOSE TREND"
 
     /* Get the name qualifier */
-    if (ODD(dcli_get_qualifier("dcli_arg2", name_str, sizeof(name_str)))) {
+    if (ODD(dcli_get_qualifier("dcli_arg2", name_str, sizeof(name_str))))
+    {
       if (name_str[0] != '/')
         /* Assume that this is the namestring */
         name_ptr = name_str;
-      else {
+      else
+      {
         xnav->message('E', "Syntax error");
         return XNAV__HOLDCOMMAND;
       }
-    } else {
+    }
+    else
+    {
       if (ODD(dcli_get_qualifier("/NAME", name_str, sizeof(name_str))))
         name_ptr = name_str;
-      else {
+      else
+      {
         xnav->message('E', "Enter name");
         return XNAV__SUCCESS;
       }
     }
 
-    if (str_StartsWith(name_str, "*-")) {
+    if (str_StartsWith(name_str, "*-"))
+    {
       // Replace * by the node object
       sts = gdh_GetNodeObject(0, &node_objid);
       if (EVEN(sts))
         return sts;
-      sts = gdh_ObjidToName(
-          node_objid, trend_name, sizeof(trend_name), cdh_mNName);
+      sts = gdh_ObjidToName(node_objid, trend_name, sizeof(trend_name), cdh_mNName);
       if (EVEN(sts))
         return sts;
       strcat(trend_name, &name_str[1]);
-    } else
+    }
+    else
       strcpy(trend_name, name_str);
 
     sts = gdh_NameToAttrref(pwr_cNObjid, trend_name, &aref);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       xnav->message('E', "Object not found");
       return XNAV__HOLDCOMMAND;
     }
@@ -5567,7 +6474,8 @@ static int xnav_close_func(void* client_data, void* client_flag)
     if (EVEN(sts))
       return sts;
 
-    switch (classid) {
+    switch (classid)
+    {
     case pwr_cClass_PlotGroup:
     case pwr_cClass_DsTrend:
     case pwr_cClass_DsTrendCurve:
@@ -5578,23 +6486,32 @@ static int xnav_close_func(void* client_data, void* client_flag)
       return XNAV__HOLDCOMMAND;
     }
 
-    if (plotgroup_found) {
-      if (xnav->appl.find(applist_eType_Trend, &aref, (void**)&trend)) {
+    if (plotgroup_found)
+    {
+      if (xnav->appl.find(applist_eType_Trend, &aref, (void**)&trend))
+      {
         xnav->appl.remove((void*)trend);
         delete trend;
       }
     }
-  } else if (str_NoCaseStrncmp(arg1_str, "ALARMLIST", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "ALARMLIST", strlen(arg1_str)) == 0)
+  {
     if (xnav->ev && xnav->ev->is_mapped_ala())
       xnav->ev->unmap_ala();
-  } else if (str_NoCaseStrncmp(arg1_str, "EVENTLIST", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "EVENTLIST", strlen(arg1_str)) == 0)
+  {
     if (xnav->ev && xnav->ev->is_mapped_eve())
       xnav->ev->unmap_eve();
-  } else if (str_NoCaseStrncmp(arg1_str, "NAVIGATOR", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "NAVIGATOR", strlen(arg1_str)) == 0)
+  {
     if (xnav->close_cb)
-      (xnav->close_cb)(xnav->parent_ctx,
-          xnav->op || xnav->ge_main || xnav->multiview_main ? 0 : 1);
-  } else if (str_NoCaseStrncmp(arg1_str, "ALL", strlen(arg1_str)) == 0) {
+      (xnav->close_cb)(xnav->parent_ctx, xnav->op || xnav->ge_main || xnav->multiview_main ? 0 : 1);
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "ALL", strlen(arg1_str)) == 0)
+  {
     char except_str[400];
     char name_array[20][80];
     char mvname_array[10][200];
@@ -5611,55 +6528,72 @@ static int xnav_close_func(void* client_data, void* client_flag)
 
     // Close everything
 
-    if (ODD(dcli_get_qualifier("/EXCEPT", except_str, sizeof(except_str)))) {
+    if (ODD(dcli_get_qualifier("/EXCEPT", except_str, sizeof(except_str))))
+    {
       // The except string can contain several items separated by ','
-      names = dcli_parse(except_str, ",", "", (char*)name_array,
-          sizeof(name_array) / sizeof(name_array[0]), sizeof(name_array[0]), 0);
-      for (int i = 0; i < names; i++) {
-        if (streq(name_array[i], "$current")) {
+      names = dcli_parse(except_str, ",", "", (char*)name_array, sizeof(name_array) / sizeof(name_array[0]),
+                         sizeof(name_array[0]), 0);
+      for (int i = 0; i < names; i++)
+      {
+        if (streq(name_array[i], "$current"))
+        {
           except_current = 1;
           break;
         }
       }
-    } else
+    }
+    else
       names = 0;
 
-    if (ODD(dcli_get_qualifier("/MVEXCEPT", except_str, sizeof(except_str)))) {
+    if (ODD(dcli_get_qualifier("/MVEXCEPT", except_str, sizeof(except_str))))
+    {
       // The except string can contain several items separated by ','
       mvnames = dcli_parse(except_str, ",", "", (char*)mvname_array,
-          sizeof(mvname_array) / sizeof(mvname_array[0]),
-          sizeof(mvname_array[0]), 0);
-      for (int i = 0; i < mvnames; i++) {
-        if (streq(mvname_array[i], "$current")) {
+                           sizeof(mvname_array) / sizeof(mvname_array[0]), sizeof(mvname_array[0]), 0);
+      for (int i = 0; i < mvnames; i++)
+      {
+        if (streq(mvname_array[i], "$current"))
+        {
           except_current = 1;
-        } else {
-          sts = gdh_NameToAttrref(
-              pwr_cNObjid, mvname_array[i], &mv_aref_array[i]);
-          if (EVEN(sts)) {
+        }
+        else
+        {
+          sts = gdh_NameToAttrref(pwr_cNObjid, mvname_array[i], &mv_aref_array[i]);
+          if (EVEN(sts))
+          {
             xnav->message('E', "No such multiview");
             return XNAV__HOLDCOMMAND;
           }
         }
       }
-    } else
+    }
+    else
       mvnames = 0;
 
     // Close graphs
     type = applist_eType_Graph;
-    for (elem = xnav->appl.root; elem;) {
-      if (elem->type == type) {
+    for (elem = xnav->appl.root; elem;)
+    {
+      if (elem->type == type)
+      {
         keep = 0;
-        if (except_current && elem->ctx == xnav->current_cmd_ctx) {
+        if (except_current && elem->ctx == xnav->current_cmd_ctx)
+        {
           keep = 1;
-        } else {
-          for (i = 0; i < names; i++) {
-            if (str_NoCaseStrcmp(name_array[i], elem->name) == 0) {
+        }
+        else
+        {
+          for (i = 0; i < names; i++)
+          {
+            if (str_NoCaseStrcmp(name_array[i], elem->name) == 0)
+            {
               keep = 1;
               break;
             }
           }
         }
-        if (keep) {
+        if (keep)
+        {
           elem = elem->next;
           continue;
         }
@@ -5673,21 +6607,29 @@ static int xnav_close_func(void* client_data, void* client_flag)
 
     // Close multiviews
     type = applist_eType_MultiView;
-    for (elem = xnav->appl.root; elem;) {
-      if (elem->type == type) {
+    for (elem = xnav->appl.root; elem;)
+    {
+      if (elem->type == type)
+      {
         keep = 0;
-        if (except_current && elem->ctx == xnav->current_cmd_ctx) {
+        if (except_current && elem->ctx == xnav->current_cmd_ctx)
+        {
           keep = 1;
-        } else {
-          for (i = 0; i < mvnames; i++) {
-            if (cdh_ObjidIsEqual(mv_aref_array[i].Objid, elem->aref.Objid)
-                && mv_aref_array[i].Offset == elem->aref.Offset) {
+        }
+        else
+        {
+          for (i = 0; i < mvnames; i++)
+          {
+            if (cdh_ObjidIsEqual(mv_aref_array[i].Objid, elem->aref.Objid) &&
+                mv_aref_array[i].Offset == elem->aref.Offset)
+            {
               keep = 1;
               break;
             }
           }
         }
-        if (keep) {
+        if (keep)
+        {
           elem = elem->next;
           continue;
         }
@@ -5703,8 +6645,10 @@ static int xnav_close_func(void* client_data, void* client_flag)
 
     // Close all trends
     type = applist_eType_Trend;
-    for (elem = xnav->appl.root; elem;) {
-      if (elem->type == type) {
+    for (elem = xnav->appl.root; elem;)
+    {
+      if (elem->type == type)
+      {
         next_elem = elem->next;
         delete (XttTrend*)elem->ctx;
         xnav->appl.remove(elem->ctx);
@@ -5716,8 +6660,10 @@ static int xnav_close_func(void* client_data, void* client_flag)
 
     // Close all trends
     type = applist_eType_Fast;
-    for (elem = xnav->appl.root; elem;) {
-      if (elem->type == type) {
+    for (elem = xnav->appl.root; elem;)
+    {
+      if (elem->type == type)
+      {
         next_elem = elem->next;
         delete (XttFast*)elem->ctx;
         xnav->appl.remove(elem->ctx);
@@ -5729,8 +6675,10 @@ static int xnav_close_func(void* client_data, void* client_flag)
 
     // Close all hists
     type = applist_eType_Hist;
-    for (elem = xnav->appl.root; elem;) {
-      if (elem->type == type) {
+    for (elem = xnav->appl.root; elem;)
+    {
+      if (elem->type == type)
+      {
         next_elem = elem->next;
         delete (Hist*)elem->ctx;
         xnav->appl.remove(elem->ctx);
@@ -5742,53 +6690,67 @@ static int xnav_close_func(void* client_data, void* client_flag)
 
     // Close navigator
     keep = 0;
-    for (i = 0; i < names; i++) {
-      if (str_NoCaseStrcmp(name_array[i], "NAVIGATOR") == 0) {
+    for (i = 0; i < names; i++)
+    {
+      if (str_NoCaseStrcmp(name_array[i], "NAVIGATOR") == 0)
+      {
         keep = 1;
         break;
       }
     }
-    if (!keep) {
+    if (!keep)
+    {
       if (xnav->close_cb)
         (xnav->close_cb)(xnav->parent_ctx, 0);
     }
 
     // Close alarmlist
     keep = 0;
-    for (i = 0; i < names; i++) {
-      if (str_NoCaseStrcmp(name_array[i], "ALARMLIST") == 0) {
+    for (i = 0; i < names; i++)
+    {
+      if (str_NoCaseStrcmp(name_array[i], "ALARMLIST") == 0)
+      {
         keep = 1;
         break;
       }
     }
-    if (!keep) {
+    if (!keep)
+    {
       if (xnav->ev && xnav->ev->is_mapped_ala())
         xnav->ev->unmap_ala();
     }
 
     // Close eventlist
     keep = 0;
-    for (i = 0; i < names; i++) {
-      if (str_NoCaseStrcmp(name_array[i], "EVENTLIST") == 0) {
+    for (i = 0; i < names; i++)
+    {
+      if (str_NoCaseStrcmp(name_array[i], "EVENTLIST") == 0)
+      {
         keep = 1;
         break;
       }
     }
-    if (!keep) {
+    if (!keep)
+    {
       if (xnav->ev && xnav->ev->is_mapped_eve())
         xnav->ev->unmap_eve();
     }
-  } else if (str_NoCaseStrncmp(arg1_str, "TRACE", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "TRACE", strlen(arg1_str)) == 0)
+  {
     RtTrace* tractx;
     pwr_tOName name_str;
     pwr_tStatus sts;
     pwr_tCid cid;
     pwr_tOid window_oid, oid;
 
-    if (EVEN(dcli_get_qualifier("dcli_arg2", name_str, sizeof(name_str)))) {
-      if (EVEN(dcli_get_qualifier("/NAME", name_str, sizeof(name_str)))) {
+    if (EVEN(dcli_get_qualifier("dcli_arg2", name_str, sizeof(name_str))))
+    {
+      if (EVEN(dcli_get_qualifier("/NAME", name_str, sizeof(name_str))))
+      {
         if (EVEN(xnav->get_current_object(&oid, name_str, sizeof(name_str),
-                cdh_mName_path | cdh_mName_object | cdh_mName_attribute))) {
+                                          cdh_mName_path | cdh_mName_object | cdh_mName_attribute)))
+        {
           xnav->message('E', "Enter name or select an object");
           return XNAV__SUCCESS;
         }
@@ -5796,7 +6758,8 @@ static int xnav_close_func(void* client_data, void* client_flag)
     }
 
     sts = gdh_NameToObjid(name_str, &oid);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       xnav->message('E', "No such object");
       return XNAV__SUCCESS;
     }
@@ -5805,19 +6768,23 @@ static int xnav_close_func(void* client_data, void* client_flag)
     if (EVEN(sts))
       return sts;
 
-    if (cid == pwr_cClass_plc) {
+    if (cid == pwr_cClass_plc)
+    {
       // Take the first child
       sts = gdh_GetChild(oid, &window_oid);
       if (EVEN(sts))
         return sts;
-    } else
+    }
+    else
       window_oid = oid;
 
-    if (xnav->appl.find(applist_eType_Trace, window_oid, (void**)&tractx)) {
+    if (xnav->appl.find(applist_eType_Trace, window_oid, (void**)&tractx))
+    {
       xnav->appl.remove((void*)tractx);
       delete tractx;
     }
-  } else
+  }
+  else
     xnav->message('E', "Syntax error");
 
   return XNAV__SUCCESS;
@@ -5837,8 +6804,7 @@ static void xnav_ge_help_cb(void* ctx, const char* key)
     xnav->message(' ', null_str);
 }
 
-static int xnav_multiview_command_cb(
-    void* ctx, char* command, char* script, char *scriptargs, void* caller)
+static int xnav_multiview_command_cb(void* ctx, char* command, char* script, char* scriptargs, void* caller)
 {
   ((XNav*)ctx)->current_cmd_ctx = caller;
   if (command)
@@ -5849,13 +6815,13 @@ static int xnav_multiview_command_cb(
   return ((XNav*)ctx)->get_command_sts();
 }
 
-static int xnav_ge_command_cb(
-    void* ctx, char* command, char* script, char *scriptargs, void* caller)
+static int xnav_ge_command_cb(void* ctx, char* command, char* script, char* scriptargs, void* caller)
 {
   ((XNav*)ctx)->current_cmd_ctx = caller;
   if (command)
     ((XNav*)ctx)->command(command);
-  else if (script) {
+  else if (script)
+  {
     ((XNav*)ctx)->script(script, scriptargs);
   }
   ((XNav*)ctx)->current_cmd_ctx = 0;
@@ -5866,12 +6832,15 @@ static void xnav_ge_close_cb(void* nav, void* ctx)
 {
   XNav* xnav = (XNav*)nav;
 
-  if (ctx == xnav->ge_main) {
+  if (ctx == xnav->ge_main)
+  {
     if (xnav->close_cb)
       (xnav->close_cb)(xnav->parent_ctx, 1);
     else
       exit(0);
-  } else {
+  }
+  else
+  {
     if (xnav->keyboard_owner == ctx)
       xnav->close_keyboard(keyboard_mAction_Close);
 
@@ -5883,12 +6852,14 @@ static void xnav_multiview_close_cb(void* nav, void* ctx)
 {
   XNav* xnav = (XNav*)nav;
 
-  if (ctx == xnav->multiview_main) {
+  if (ctx == xnav->multiview_main)
+  {
     if (xnav->close_cb)
       (xnav->close_cb)(xnav->parent_ctx, 1);
     else
       exit(0);
-  } else
+  }
+  else
     xnav->appl.remove((void*)ctx);
 }
 
@@ -5977,8 +6948,7 @@ static void xnav_sevhist_close_cb(void* ctx, XttSevHist* hist)
   delete hist;
 }
 
-static int xnav_sevhist_get_select_cb(
-    void* ctx, pwr_tOid* oid, char* aname, char* oname)
+static int xnav_sevhist_get_select_cb(void* ctx, pwr_tOid* oid, char* aname, char* oname)
 {
   XNav* xnav = (XNav*)ctx;
   pwr_tAttrRef sel_aref, attr_aref, aref;
@@ -6000,7 +6970,8 @@ static int xnav_sevhist_get_select_cb(
     return sts;
 
   sts = gdh_GetObjectClass(sel_aref.Objid, &cid);
-  switch (cid) {
+  switch (cid)
+  {
   case pwr_cClass_SevHist:
   case pwr_cClass_SevItemFloat32:
   case pwr_cClass_SevItemInt32:
@@ -6010,13 +6981,14 @@ static int xnav_sevhist_get_select_cb(
     return 0; // NYI
   default:
     // Look for a SevHist child
-    for (sts = gdh_GetChild(sel_aref.Objid, &ch); ODD(sts);
-         sts = gdh_GetNextSibling(ch, &ch)) {
+    for (sts = gdh_GetChild(sel_aref.Objid, &ch); ODD(sts); sts = gdh_GetNextSibling(ch, &ch))
+    {
       sts = gdh_GetObjectClass(ch, &cid);
       if (EVEN(sts))
         return sts;
 
-      switch (cid) {
+      switch (cid)
+      {
       case pwr_cClass_SevHist:
       case pwr_cClass_SevItemFloat32:
       case pwr_cClass_SevItemInt32:
@@ -6029,7 +7001,8 @@ static int xnav_sevhist_get_select_cb(
     }
   }
 
-  switch (cid) {
+  switch (cid)
+  {
   case pwr_cClass_SevHist:
     sts = gdh_ArefANameToAref(&sel_aref, "Attribute", &attr_aref);
     if (EVEN(sts))
@@ -6134,7 +7107,8 @@ static int xnav_create_func(void* client_data, void* client_flag)
 
   arg1_sts = dcli_get_qualifier("dcli_arg1", arg1_str, sizeof(arg1_str));
 
-  if (str_NoCaseStrncmp(arg1_str, "ITEM", strlen(arg1_str)) == 0) {
+  if (str_NoCaseStrncmp(arg1_str, "ITEM", strlen(arg1_str)) == 0)
+  {
     char text_str[80];
     char destination_str[80];
     char* destination_p = destination_str;
@@ -6146,17 +7120,21 @@ static int xnav_create_func(void* client_data, void* client_flag)
     xnav_sMenu* menu_item;
 
     // Command is "CREATE ITEM"
-    if (ODD(dcli_get_qualifier("dcli_arg2", text_str, sizeof(text_str)))) {
-      if (text_str[0] == '/') {
+    if (ODD(dcli_get_qualifier("dcli_arg2", text_str, sizeof(text_str))))
+    {
+      if (text_str[0] == '/')
+      {
         xnav->message('E', "Syntax error");
         return XNAV__HOLDCOMMAND;
       }
-    } else if (EVEN(dcli_get_qualifier("/TEXT", text_str, sizeof(text_str)))) {
+    }
+    else if (EVEN(dcli_get_qualifier("/TEXT", text_str, sizeof(text_str))))
+    {
       xnav->message('E', "Enter text");
       return XNAV__HOLDCOMMAND;
     }
-    if (EVEN(dcli_get_qualifier(
-            "/DESTINATION", destination_str, sizeof(destination_str)))) {
+    if (EVEN(dcli_get_qualifier("/DESTINATION", destination_str, sizeof(destination_str))))
+    {
       xnav->message('E', "Enter destination");
       return XNAV__HOLDCOMMAND;
     }
@@ -6177,7 +7155,8 @@ static int xnav_create_func(void* client_data, void* client_flag)
     else
       dest_code = xnav_eDestCode_After;
 
-    if (ODD(dcli_get_qualifier("/PIXMAP", pixmap_str, sizeof(pixmap_str)))) {
+    if (ODD(dcli_get_qualifier("/PIXMAP", pixmap_str, sizeof(pixmap_str))))
+    {
       if (str_NoCaseStrcmp(pixmap_str, "MAP") == 0)
         pixmap = menu_ePixmap_Map;
       else if (str_NoCaseStrcmp(pixmap_str, "GRAPH") == 0)
@@ -6190,16 +7169,19 @@ static int xnav_create_func(void* client_data, void* client_flag)
         pixmap = menu_ePixmap_Leaf;
       else
         pixmap = menu_ePixmap_Map;
-    } else
+    }
+    else
       pixmap = menu_ePixmap_Map;
 
-    sts = xnav->menu_tree_insert(text_str, item_type, command_str, pixmap,
-        destination_p, dest_code, &menu_item);
+    sts = xnav->menu_tree_insert(text_str, item_type, command_str, pixmap, destination_p, dest_code,
+                                 &menu_item);
     if (EVEN(sts))
       xnav->message('E', "Destination not found");
 
     return XNAV__SUCCESS;
-  } else if (str_NoCaseStrncmp(arg1_str, "OPMENUITEM", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "OPMENUITEM", strlen(arg1_str)) == 0)
+  {
     char name_str[80];
     pwr_tCmd command_str;
     char pixmap_str[80];
@@ -6207,39 +7189,48 @@ static int xnav_create_func(void* client_data, void* client_flag)
     int append = 1;
 
     // Command is "CREATE OPMENUITEM"
-    if (ODD(dcli_get_qualifier("dcli_arg2", name_str, sizeof(name_str)))) {
-      if (name_str[0] == '/') {
+    if (ODD(dcli_get_qualifier("dcli_arg2", name_str, sizeof(name_str))))
+    {
+      if (name_str[0] == '/')
+      {
         xnav->message('E', "Syntax error");
         return XNAV__HOLDCOMMAND;
       }
-    } else if (EVEN(dcli_get_qualifier("/NAME", name_str, sizeof(name_str)))) {
+    }
+    else if (EVEN(dcli_get_qualifier("/NAME", name_str, sizeof(name_str))))
+    {
       xnav->message('E', "Enter name");
       return XNAV__HOLDCOMMAND;
     }
-    if (EVEN(
-            dcli_get_qualifier("/COMMAND", command_str, sizeof(command_str)))) {
+    if (EVEN(dcli_get_qualifier("/COMMAND", command_str, sizeof(command_str))))
+    {
       xnav->message('E', "Enter name");
       return XNAV__HOLDCOMMAND;
     }
 
-    if (ODD(dcli_get_qualifier("/PIXMAP", pixmap_str, sizeof(pixmap_str)))) {
+    if (ODD(dcli_get_qualifier("/PIXMAP", pixmap_str, sizeof(pixmap_str))))
+    {
       if (str_NoCaseStrcmp(pixmap_str, "GRAPH") == 0)
         pixmap = wow_ePixmap_Graph;
       else
         pixmap = wow_ePixmap_No;
-    } else
+    }
+    else
       pixmap = wow_ePixmap_No;
 
     if (ODD(dcli_get_qualifier("/BEFORE", 0, 0)))
       append = 0;
 
-    if (xnav->op) {
+    if (xnav->op)
+    {
       sts = xnav->op->create_menu_item(name_str, pixmap, append, command_str);
       if (EVEN(sts))
         xnav->message('E', "Unable to create op menu item");
     }
     return XNAV__SUCCESS;
-  } else if (str_NoCaseStrncmp(arg1_str, "OBJECT", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "OBJECT", strlen(arg1_str)) == 0)
+  {
     // Command is "CREATE OBJECT"
 
     pwr_tOName name_str;
@@ -6248,24 +7239,28 @@ static int xnav_create_func(void* client_data, void* client_flag)
     IF_NOGDH_RETURN;
 
     // Check authorization
-    if (!((xnav->priv & pwr_mPrv_RtWrite) || (xnav->priv & pwr_mPrv_System))) {
+    if (!((xnav->priv & pwr_mPrv_RtWrite) || (xnav->priv & pwr_mPrv_System)))
+    {
       xnav->message('E', "Not authorized for this operation");
       return 0;
     }
 
-    if (EVEN(dcli_get_qualifier("/CLASS", class_str, sizeof(class_str)))) {
+    if (EVEN(dcli_get_qualifier("/CLASS", class_str, sizeof(class_str))))
+    {
       xnav->message('E', "Enter class");
       return XNAV__HOLDCOMMAND;
     }
 
-    if (EVEN(dcli_get_qualifier("/NAME", name_str, sizeof(name_str)))) {
+    if (EVEN(dcli_get_qualifier("/NAME", name_str, sizeof(name_str))))
+    {
       xnav->message('E', "Enter name");
       return XNAV__HOLDCOMMAND;
     }
 
     sts = xnav->create_object(class_str, name_str);
     return sts;
-  } else
+  }
+  else
     xnav->message('E', "Syntax error");
 
   return XNAV__SUCCESS;
@@ -6281,16 +7276,21 @@ static int xnav_delete_func(void* client_data, void* client_flag)
 
   arg1_sts = dcli_get_qualifier("dcli_arg1", arg1_str, sizeof(arg1_str));
 
-  if (str_NoCaseStrncmp(arg1_str, "ITEM", strlen(arg1_str)) == 0) {
+  if (str_NoCaseStrncmp(arg1_str, "ITEM", strlen(arg1_str)) == 0)
+  {
     char name_str[80];
 
     // Command is "DELETE ITEM"
-    if (ODD(dcli_get_qualifier("dcli_arg2", name_str, sizeof(name_str)))) {
-      if (name_str[0] == '/') {
+    if (ODD(dcli_get_qualifier("dcli_arg2", name_str, sizeof(name_str))))
+    {
+      if (name_str[0] == '/')
+      {
         xnav->message('E', "Syntax error");
         return XNAV__HOLDCOMMAND;
       }
-    } else if (EVEN(dcli_get_qualifier("/NAME", name_str, sizeof(name_str)))) {
+    }
+    else if (EVEN(dcli_get_qualifier("/NAME", name_str, sizeof(name_str))))
+    {
       xnav->message('E', "Enter name");
       return XNAV__HOLDCOMMAND;
     }
@@ -6300,27 +7300,36 @@ static int xnav_delete_func(void* client_data, void* client_flag)
       xnav->message('E', "Item not found");
 
     return XNAV__SUCCESS;
-  } else if (str_NoCaseStrncmp(arg1_str, "OPMENUITEM", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "OPMENUITEM", strlen(arg1_str)) == 0)
+  {
     char name_str[80];
 
     // Command is "DELETE OPMENUITEM"
-    if (ODD(dcli_get_qualifier("dcli_arg2", name_str, sizeof(name_str)))) {
-      if (name_str[0] == '/') {
+    if (ODD(dcli_get_qualifier("dcli_arg2", name_str, sizeof(name_str))))
+    {
+      if (name_str[0] == '/')
+      {
         xnav->message('E', "Syntax error");
         return XNAV__HOLDCOMMAND;
       }
-    } else if (EVEN(dcli_get_qualifier("/NAME", name_str, sizeof(name_str)))) {
+    }
+    else if (EVEN(dcli_get_qualifier("/NAME", name_str, sizeof(name_str))))
+    {
       xnav->message('E', "Enter name");
       return XNAV__HOLDCOMMAND;
     }
 
-    if (xnav->op) {
+    if (xnav->op)
+    {
       sts = xnav->op->delete_menu_item(name_str);
       if (EVEN(sts))
         xnav->message('E', "Unable to delete op menu item");
     }
     return XNAV__SUCCESS;
-  } else if (str_NoCaseStrncmp(arg1_str, "OBJECT", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "OBJECT", strlen(arg1_str)) == 0)
+  {
     // Command is "DELETE OBJECT"
 
     char name_str[80];
@@ -6328,19 +7337,23 @@ static int xnav_delete_func(void* client_data, void* client_flag)
     IF_NOGDH_RETURN;
 
     // Check authorization
-    if (!((xnav->priv & pwr_mPrv_RtWrite) || (xnav->priv & pwr_mPrv_System))) {
+    if (!((xnav->priv & pwr_mPrv_RtWrite) || (xnav->priv & pwr_mPrv_System)))
+    {
       xnav->message('E', "Not authorized for this operation");
       return 0;
     }
 
-    if (EVEN(dcli_get_qualifier("/NAME", name_str, sizeof(name_str)))) {
+    if (EVEN(dcli_get_qualifier("/NAME", name_str, sizeof(name_str))))
+    {
       xnav->message('E', "Enter name");
       return XNAV__HOLDCOMMAND;
     }
 
     sts = xnav->delete_object(name_str);
     return sts;
-  } else if (str_NoCaseStrncmp(arg1_str, "TREE", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "TREE", strlen(arg1_str)) == 0)
+  {
     // Command is "DELETE TREE"
 
     char name_str[80];
@@ -6349,33 +7362,37 @@ static int xnav_delete_func(void* client_data, void* client_flag)
     IF_NOGDH_RETURN;
 
     // Check authorization
-    if (!((xnav->priv & pwr_mPrv_RtWrite) || (xnav->priv & pwr_mPrv_System))) {
+    if (!((xnav->priv & pwr_mPrv_RtWrite) || (xnav->priv & pwr_mPrv_System)))
+    {
       xnav->message('E', "Not authorized for this operation");
       return 0;
     }
 
-    if (EVEN(dcli_get_qualifier("/NAME", name_str, sizeof(name_str)))) {
+    if (EVEN(dcli_get_qualifier("/NAME", name_str, sizeof(name_str))))
+    {
       xnav->message('E', "Enter name");
       return XNAV__HOLDCOMMAND;
     }
 
-
     /* Get objid for the object */
     sts = gdh_NameToObjid(name_str, &objid);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       xnav->message('E', "Object does not exist");
       return XNAV__HOLDCOMMAND;
     }
 
     sts = gdh_DeleteObjectTree(objid);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       xnav->message('E', "Unable to delete object tree");
       return XNAV__HOLDCOMMAND;
     }
 
     xnav->message('I', "Object deleted");
     return XNAV__SUCCESS;
-  } else
+  }
+  else
     xnav->message('E', "Syntax error");
 
   return XNAV__SUCCESS;
@@ -6403,7 +7420,8 @@ static int xnav_collect_func(void* client_data, void* client_flag)
 
   IF_NOGDH_RETURN;
 
-  if (EVEN(dcli_get_qualifier("dcli_arg1", arg1_str, sizeof(arg1_str)))) {
+  if (EVEN(dcli_get_qualifier("dcli_arg1", arg1_str, sizeof(arg1_str))))
+  {
     int newwindow;
     int addwindow;
     int last;
@@ -6412,15 +7430,20 @@ static int xnav_collect_func(void* client_data, void* client_flag)
     char str[80];
     int num;
 
-    if (ODD(dcli_get_qualifier("/NAME", name_str, sizeof(name_str)))) {
+    if (ODD(dcli_get_qualifier("/NAME", name_str, sizeof(name_str))))
+    {
       sts = gdh_NameToAttrref(pwr_cNObjid, name_str, &attrref);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         xnav->message('E', "No such object");
         return XNAV__HOLDCOMMAND;
       }
-    } else {
+    }
+    else
+    {
       sts = xnav->get_select(&attrref, &is_attr);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         xnav->message('E', "Enter name or select object");
         return XNAV__SUCCESS;
       }
@@ -6430,52 +7453,66 @@ static int xnav_collect_func(void* client_data, void* client_flag)
     addwindow = ODD(dcli_get_qualifier("/ADDWINDOW", 0, 0));
     last = ODD(dcli_get_qualifier("/LAST", 0, 0));
 
-    if (ODD(dcli_get_qualifier("/WIDTH", str, sizeof(str)))) {
+    if (ODD(dcli_get_qualifier("/WIDTH", str, sizeof(str))))
+    {
       num = sscanf(str, "%d", &width);
-      if (num != 1) {
+      if (num != 1)
+      {
         xnav->message('E', "Width syntax error");
         return XNAV__SUCCESS;
       }
-    } else
+    }
+    else
       width = 0;
 
-    if (ODD(dcli_get_qualifier("/HEIGHT", str, sizeof(str)))) {
+    if (ODD(dcli_get_qualifier("/HEIGHT", str, sizeof(str))))
+    {
       num = sscanf(str, "%d", &height);
-      if (num != 1) {
+      if (num != 1)
+      {
         xnav->message('E', "Height syntax error");
         return XNAV__SUCCESS;
       }
-    } else
+    }
+    else
       height = 0;
 
-    if (ODD(dcli_get_qualifier("/ZOOMFACTOR", str, sizeof(str)))) {
+    if (ODD(dcli_get_qualifier("/ZOOMFACTOR", str, sizeof(str))))
+    {
       num = sscanf(str, "%lf", &zoomfactor);
-      if (num != 1) {
+      if (num != 1)
+      {
         xnav->message('E', "Zoomfactor syntax error");
         return XNAV__SUCCESS;
       }
-    } else
+    }
+    else
       zoomfactor = 0;
 
-    if (ODD(dcli_get_qualifier("/SCANTIME", str, sizeof(str)))) {
+    if (ODD(dcli_get_qualifier("/SCANTIME", str, sizeof(str))))
+    {
       num = sscanf(str, "%lf", &scantime);
-      if (num != 1) {
+      if (num != 1)
+      {
         xnav->message('E', "Scantime syntax error");
         return XNAV__SUCCESS;
       }
-    } else
+    }
+    else
       scantime = 0;
 
-    if (newwindow) {
+    if (newwindow)
+    {
       // Create a new window and insert into window
       pwr_tAttrRef* arlist = (pwr_tAttrRef*)calloc(2, sizeof(pwr_tAttrRef));
       arlist[0] = attrref;
 
       dcli_get_qualifier("/TITLE", title_str, sizeof(title_str));
 
-      xnav->last_xcolwind = xnav->xcolwind_new(arlist, title_str,
-          xnav->gbl.advanced_user, xcolwind_eType_Collect, &sts);
-      if (EVEN(sts)) {
+      xnav->last_xcolwind =
+          xnav->xcolwind_new(arlist, title_str, xnav->gbl.advanced_user, xcolwind_eType_Collect, &sts);
+      if (EVEN(sts))
+      {
         xnav->last_xcolwind = 0;
         return XNAV__SUCCESS;
       }
@@ -6497,9 +7534,12 @@ static int xnav_collect_func(void* client_data, void* client_flag)
 
       if (last)
         xnav->last_xcolwind = 0;
-    } else if (addwindow) {
+    }
+    else if (addwindow)
+    {
       // Add to last created window
-      if (!xnav->last_xcolwind) {
+      if (!xnav->last_xcolwind)
+      {
         xnav->message('E', "No last collection window");
         return XNAV__SUCCESS;
       }
@@ -6507,14 +7547,19 @@ static int xnav_collect_func(void* client_data, void* client_flag)
 
       if (last)
         xnav->last_xcolwind = 0;
-    } else {
+    }
+    else
+    {
       sts = xnav->collect_insert(&attrref);
     }
     return sts;
-  } else if (str_NoCaseStrncmp(arg1_str, "OPEN", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "OPEN", strlen(arg1_str)) == 0)
+  {
     pwr_tFileName file_str;
 
-    if (ODD(dcli_get_qualifier("/FILE", file_str, sizeof(file_str)))) {
+    if (ODD(dcli_get_qualifier("/FILE", file_str, sizeof(file_str))))
+    {
       pwr_tCmd cmd;
 
       strcpy(cmd, "@\"");
@@ -6526,24 +7571,33 @@ static int xnav_collect_func(void* client_data, void* client_flag)
       strcat(cmd, "\"");
 
       xnav->command(cmd);
-    } else
-      xnav->wow->CreateFileList("Open Collection", "$pwrp_load", "*", "rtt_col",
-          xnav_collect_open_cb, 0, xnav, 1);
+    }
+    else
+      xnav->wow->CreateFileList("Open Collection", "$pwrp_load", "*", "rtt_col", xnav_collect_open_cb, 0,
+                                xnav, 1);
 
     return XNAV__SUCCESS;
-  } else if (str_NoCaseStrncmp(arg1_str, "SHOW", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "SHOW", strlen(arg1_str)) == 0)
+  {
     sts = xnav->collect_show();
     return sts;
-  } else if (str_NoCaseStrncmp(arg1_str, "REMOVE", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "REMOVE", strlen(arg1_str)) == 0)
+  {
     sts = xnav->collect_remove();
     if (EVEN(sts))
       xnav->message(' ', XNav::get_message(sts));
 
     return XNAV__SUCCESS;
-  } else if (str_NoCaseStrncmp(arg1_str, "CLEAR", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "CLEAR", strlen(arg1_str)) == 0)
+  {
     xnav->collect_clear();
     return XNAV__SUCCESS;
-  } else {
+  }
+  else
+  {
     xnav->message('E', "Unknown qualifier");
     return XNAV__HOLDCOMMAND;
   }
@@ -6556,32 +7610,41 @@ static int xnav_dashboard_func(void* client_data, void* client_flag)
 
   IF_NOGDH_RETURN;
 
-  if (ODD(dcli_get_qualifier("dcli_arg1", arg1_str, sizeof(arg1_str)))) {
-    if (str_NoCaseStrncmp(arg1_str, "OPEN", strlen(arg1_str)) == 0) {
+  if (ODD(dcli_get_qualifier("dcli_arg1", arg1_str, sizeof(arg1_str))))
+  {
+    if (str_NoCaseStrncmp(arg1_str, "OPEN", strlen(arg1_str)) == 0)
+    {
       char name_str[80];
       int name_found = 0;
 
       if (ODD(dcli_get_qualifier("dcli_arg2", name_str, sizeof(name_str))))
-	name_found = 1;
+        name_found = 1;
       else if (ODD(dcli_get_qualifier("/NAME", name_str, sizeof(name_str))))
-	name_found = 1;
-      if (!name_found) {
-	xnav->wow->CreateFileList("Open Dashboard", "$pwrp_exe", "*", "pwd",
-	     xnav_dashboard_open_cb, 0, xnav, 1);
+        name_found = 1;
+      if (!name_found)
+      {
+        xnav->wow->CreateFileList("Open Dashboard", "$pwrp_exe", "*", "pwd", xnav_dashboard_open_cb, 0, xnav,
+                                  1);
 
-	return XNAV__SUCCESS;
-      } else {
-	// Name found
-	pwr_tCmd cmd;
-	sprintf(cmd, "open graph %s/dash/menu", name_str);
-
-	xnav->command(cmd);
+        return XNAV__SUCCESS;
       }
-    } else {
+      else
+      {
+        // Name found
+        pwr_tCmd cmd;
+        sprintf(cmd, "open graph %s/dash/menu", name_str);
+
+        xnav->command(cmd);
+      }
+    }
+    else
+    {
       xnav->message('E', "Unknown qualifier");
       return XNAV__HOLDCOMMAND;
     }
-  } else {
+  }
+  else
+  {
     xnav->message('E', "Missing qualifier");
     return XNAV__HOLDCOMMAND;
   }
@@ -6600,33 +7663,42 @@ static int xnav_store_func(void* client_data, void* client_flag)
 
   IF_NOGDH_RETURN;
 
-  if (ODD(dcli_get_qualifier("/SYMBOLS", str, sizeof(str)))) {
+  if (ODD(dcli_get_qualifier("/SYMBOLS", str, sizeof(str))))
+  {
     if (ODD(dcli_get_qualifier("/FILE", file_str, sizeof(file_str))))
       file_ptr = file_str;
-    else if (ODD(dcli_get_qualifier("dcli_arg1", file_str, sizeof(file_str)))) {
+    else if (ODD(dcli_get_qualifier("dcli_arg1", file_str, sizeof(file_str))))
+    {
       if (file_str[0] != '/')
         /* Assume that this is the filestring */
         file_ptr = file_str;
       else
         file_ptr = xnav->gbl.setupscript;
-    } else
+    }
+    else
       file_ptr = xnav->gbl.setupscript;
 
     dcli_get_defaultfilename(file_ptr, filename, ".rtt_com");
     sts = dcli_store_symbols(filename);
     return sts;
-  } else {
+  }
+  else
+  {
     if (ODD(dcli_get_qualifier("/FILE", file_str, sizeof(file_str))))
       file_ptr = file_str;
-    else if (ODD(dcli_get_qualifier("dcli_arg1", file_str, sizeof(file_str)))) {
+    else if (ODD(dcli_get_qualifier("dcli_arg1", file_str, sizeof(file_str))))
+    {
       if (file_str[0] != '/')
         /* Assume that this is the filestring */
         file_ptr = file_str;
-      else {
+      else
+      {
         xnav->message('E', "Enter file");
         return XNAV__HOLDCOMMAND;
       }
-    } else {
+    }
+    else
+    {
       xnav->message('E', "Enter file");
       return XNAV__HOLDCOMMAND;
     }
@@ -6666,24 +7738,28 @@ static int xnav_crossref_func(void* client_data, void* client_flag)
   else
     file_ptr = NULL;
 
-  if (ODD(dcli_get_qualifier("/STRING", string_str, sizeof(string_str)))) {
-    if (ODD(dcli_get_qualifier("/FUNCTION", func_str, sizeof(func_str)))) {
+  if (ODD(dcli_get_qualifier("/STRING", string_str, sizeof(string_str))))
+  {
+    if (ODD(dcli_get_qualifier("/FUNCTION", func_str, sizeof(func_str))))
+    {
       xnav->message('E', "Syntax error");
       return XNAV__SUCCESS;
     }
     brief = ODD(dcli_get_qualifier("/BRIEF", name_str, sizeof(name_str)));
-    case_sens = ODD(
-        dcli_get_qualifier("/CASE_SENSITIVE", name_str, sizeof(name_str)));
+    case_sens = ODD(dcli_get_qualifier("/CASE_SENSITIVE", name_str, sizeof(name_str)));
     xnav->brow_pop();
     brow_SetNodraw(xnav->brow->ctx);
     sts = xnav_crr_code(xnav->brow, file_ptr, string_str, brief, 0, case_sens);
     brow_ResetNodraw(xnav->brow->ctx);
     brow_Redraw(xnav->brow->ctx, 0);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       xnav->brow_push();
       xnav->message(' ', XNav::get_message(sts));
     }
-  } else if (ODD(dcli_get_qualifier("/FUNCTION", func_str, sizeof(func_str)))) {
+  }
+  else if (ODD(dcli_get_qualifier("/FUNCTION", func_str, sizeof(func_str))))
+  {
     brief = ODD(dcli_get_qualifier("/BRIEF", 0, 0));
     case_sens = ODD(dcli_get_qualifier("/CASE_SENSITIVE", 0, 0));
     xnav->brow_pop();
@@ -6691,32 +7767,42 @@ static int xnav_crossref_func(void* client_data, void* client_flag)
     sts = xnav_crr_code(xnav->brow, file_ptr, func_str, brief, 1, case_sens);
     brow_ResetNodraw(xnav->brow->ctx);
     brow_Redraw(xnav->brow->ctx, 0);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       xnav->brow_push();
       xnav->message(' ', XNav::get_message(sts));
     }
-  } else {
+  }
+  else
+  {
     /* Get the name qualifier */
-    if (ODD(dcli_get_qualifier("dcli_arg1", name_str, sizeof(name_str)))) {
+    if (ODD(dcli_get_qualifier("dcli_arg1", name_str, sizeof(name_str))))
+    {
       if (name_str[0] != '/')
         /* Assume that this is the namestring */
         name_ptr = name_str;
-      else {
+      else
+      {
         xnav->message('E', "Syntax error");
         return XNAV__SUCCESS;
       }
-    } else if (ODD(dcli_get_qualifier("/NAME", name_str, sizeof(name_str)))) {
+    }
+    else if (ODD(dcli_get_qualifier("/NAME", name_str, sizeof(name_str))))
+    {
       name_ptr = name_str;
       sts = gdh_NameToAttrref(pwr_cNObjid, name_str, &objar);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         xnav->message('E', "Object not found");
         return XNAV__HOLDCOMMAND;
       }
-    } else {
+    }
+    else
+    {
       /* Get the selected object */
-      sts = xnav->get_current_aref(&objar, name_str, sizeof(name_str),
-          cdh_mName_path | cdh_mName_object);
-      if (EVEN(sts)) {
+      sts = xnav->get_current_aref(&objar, name_str, sizeof(name_str), cdh_mName_path | cdh_mName_object);
+      if (EVEN(sts))
+      {
         xnav->message('E', "Enter name or select an object");
         return XNAV__SUCCESS;
       }
@@ -6728,11 +7814,13 @@ static int xnav_crossref_func(void* client_data, void* client_flag)
       return sts;
 
     window = ODD(dcli_get_qualifier("/WINDOW", 0, 0));
-    if (window) {
+    if (window)
+    {
       XCrr* xcrr = xnav->xcrr_new(&objar, xnav->gbl.advanced_user, &sts);
       if (EVEN(sts))
         xnav->message(' ', XNav::get_message(sts));
-      else {
+      else
+      {
         xcrr->popup_menu_cb = xnav_popup_menu_cb;
         xcrr->start_trace_cb = xnav_start_trace_cb;
       }
@@ -6746,7 +7834,8 @@ static int xnav_crossref_func(void* client_data, void* client_flag)
     sprintf(title, "Crossreference list %s\n", name_str);
     new ItemHeader(xnav->brow, "Title", title, NULL, flow_eDest_IntoLast);
 
-    switch (classid) {
+    switch (classid)
+    {
     case pwr_cClass_Di:
     case pwr_cClass_Dv:
     case pwr_cClass_Do:
@@ -6761,7 +7850,8 @@ static int xnav_crossref_func(void* client_data, void* client_flag)
     case pwr_cClass_Sv:
     case pwr_cClass_ATv:
     case pwr_cClass_DTv:
-      if (!file_ptr) {
+      if (!file_ptr)
+      {
         strcpy(file_str, "*");
         file_ptr = file_str;
       }
@@ -6769,7 +7859,8 @@ static int xnav_crossref_func(void* client_data, void* client_flag)
       break;
     default:
       /* Not a signal */
-      if (!file_ptr) {
+      if (!file_ptr)
+      {
         strcpy(file_str, "*");
         file_ptr = file_str;
       }
@@ -6809,19 +7900,24 @@ static int xnav_search_func(void* client_data, void* client_flag)
   char arg1_str[80];
   int regexp;
 
-  if (ODD(dcli_get_qualifier("/NEXT", 0, 0))) {
+  if (ODD(dcli_get_qualifier("/NEXT", 0, 0)))
+  {
     sts = xnav->search_next();
     if (EVEN(sts))
       xnav->message(' ', XNav::get_message(sts));
     return sts;
-  } else if (ODD(dcli_get_qualifier("dcli_arg1", arg1_str, sizeof(arg1_str)))) {
+  }
+  else if (ODD(dcli_get_qualifier("dcli_arg1", arg1_str, sizeof(arg1_str))))
+  {
     regexp = ODD(dcli_get_qualifier("/REGULAREXPRESSION", 0, 0));
 
     sts = xnav->search(arg1_str, regexp);
     if (EVEN(sts))
       xnav->message(' ', XNav::get_message(sts));
     return sts;
-  } else {
+  }
+  else
+  {
     xnav->message('E', "Syntax error");
     return XNAV__SYNTAX;
   }
@@ -6835,10 +7931,13 @@ static int xnav_test_func(void* client_data, void* client_flag)
 
   arg1_sts = dcli_get_qualifier("dcli_arg1", arg1_str, sizeof(arg1_str));
 
-  if (str_NoCaseStrncmp(arg1_str, "BELL", strlen(arg1_str)) == 0) {
+  if (str_NoCaseStrncmp(arg1_str, "BELL", strlen(arg1_str)) == 0)
+  {
     // Command is "TEST BELL"
     xnav->bell(100);
-  } else if (str_NoCaseStrncmp(arg1_str, "BEEP", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "BEEP", strlen(arg1_str)) == 0)
+  {
     // Command is "TEST BEEP"
     putchar('\7');
   }
@@ -6854,8 +7953,9 @@ static int xnav_logging_func(void* client_data, void* client_flag)
 
   arg1_sts = dcli_get_qualifier("dcli_arg1", arg1_str, sizeof(arg1_str));
 
-  if (str_NoCaseStrncmp(arg1_str, "SET", strlen(arg1_str)) == 0
-      || str_NoCaseStrncmp(arg1_str, "CREATE", strlen(arg1_str)) == 0) {
+  if (str_NoCaseStrncmp(arg1_str, "SET", strlen(arg1_str)) == 0 ||
+      str_NoCaseStrncmp(arg1_str, "CREATE", strlen(arg1_str)) == 0)
+  {
     /* Command is "LOGGING SET" */
 
     char entry_str[80];
@@ -6883,56 +7983,71 @@ static int xnav_logging_func(void* client_data, void* client_flag)
     int create;
     int shortname;
 
-    if (ODD(dcli_get_qualifier("/ENTRY", entry_str, sizeof(entry_str)))) {
-      if (!str_NoCaseStrcmp(entry_str, "CURRENT")) {
-        if (xnav->current_logging_index == -1) {
+    if (ODD(dcli_get_qualifier("/ENTRY", entry_str, sizeof(entry_str))))
+    {
+      if (!str_NoCaseStrcmp(entry_str, "CURRENT"))
+      {
+        if (xnav->current_logging_index == -1)
+        {
           xnav->message('E', "No current logging entry");
           return XNAV__HOLDCOMMAND;
         }
         entry = xnav->current_logging_index + 1;
-      } else {
+      }
+      else
+      {
         /* convert to integer */
         nr = sscanf(entry_str, "%d", &entry);
-        if (nr != 1) {
+        if (nr != 1)
+        {
           xnav->message('E', "Entry syntax error");
           return XNAV__HOLDCOMMAND;
         }
       }
-    } else {
+    }
+    else
+    {
       xnav->message('E', "Enter entry");
       return XNAV__HOLDCOMMAND;
     }
 
-    if (ODD(dcli_get_qualifier("/TIME", time_str, sizeof(time_str)))) {
+    if (ODD(dcli_get_qualifier("/TIME", time_str, sizeof(time_str))))
+    {
       /* convert to integer */
       nr = sscanf(time_str, "%f", &logg_time);
-      if (nr != 1) {
+      if (nr != 1)
+      {
         xnav->message('E', "Time syntax error");
         return XNAV__HOLDCOMMAND;
       }
-    } else
+    }
+    else
       logg_time = 0;
 
-    if (ODD(dcli_get_qualifier(
-            "/BUFFER_SIZE", buffer_size_str, sizeof(buffer_size_str)))) {
+    if (ODD(dcli_get_qualifier("/BUFFER_SIZE", buffer_size_str, sizeof(buffer_size_str))))
+    {
       /* convert to integer */
       nr = sscanf(buffer_size_str, "%d", &buffer_size);
-      if (nr != 1) {
+      if (nr != 1)
+      {
         xnav->message('E', "Buffer size syntax error");
         return XNAV__HOLDCOMMAND;
       }
-    } else
+    }
+    else
       buffer_size = 0;
 
-    if (ODD(dcli_get_qualifier(
-            "/LINE_SIZE", line_size_str, sizeof(line_size_str)))) {
+    if (ODD(dcli_get_qualifier("/LINE_SIZE", line_size_str, sizeof(line_size_str))))
+    {
       /* convert to integer */
       nr = sscanf(line_size_str, "%d", &line_size);
-      if (nr != 1) {
+      if (nr != 1)
+      {
         xnav->message('E', "Line size syntax error");
         return XNAV__HOLDCOMMAND;
       }
-    } else
+    }
+    else
       line_size = 0;
 
     if (ODD(dcli_get_qualifier("/FILE", file_str, sizeof(file_str))))
@@ -6940,43 +8055,47 @@ static int xnav_logging_func(void* client_data, void* client_flag)
     else
       file_ptr = NULL;
 
-    if (ODD(dcli_get_qualifier(
-            "/PARAMETER", parameter_str, sizeof(parameter_str))))
+    if (ODD(dcli_get_qualifier("/PARAMETER", parameter_str, sizeof(parameter_str))))
       parameter_ptr = parameter_str;
     else
       parameter_ptr = NULL;
 
-    if (ODD(dcli_get_qualifier(
-            "/CONDITION", condition_str, sizeof(condition_str))))
+    if (ODD(dcli_get_qualifier("/CONDITION", condition_str, sizeof(condition_str))))
       condition_ptr = condition_str;
     else
       condition_ptr = NULL;
 
-    if (ODD(dcli_get_qualifier("/TYPE", str, sizeof(str)))) {
+    if (ODD(dcli_get_qualifier("/TYPE", str, sizeof(str))))
+    {
       if (str_NoCaseStrncmp(str, "EVENT", strlen(str)) == 0)
         logg_type = xtt_eLoggType_Mod;
       else if (str_NoCaseStrncmp(str, "CONTINOUS", strlen(str)) == 0)
         logg_type = xtt_eLoggType_Cont;
-    } else
+    }
+    else
       logg_type = 0;
 
-    if (ODD(dcli_get_qualifier("/FORMAT", str, sizeof(str)))) {
+    if (ODD(dcli_get_qualifier("/FORMAT", str, sizeof(str))))
+    {
       if (str_NoCaseStrncmp(str, "STD", strlen(str)) == 0)
         logg_format = xtt_eLoggFormat_Std;
       else if (str_NoCaseStrncmp(str, "PY", strlen(str)) == 0)
         logg_format = xtt_eLoggFormat_Py;
-    } else
+    }
+    else
       logg_format = -1;
 
-    if (ODD(dcli_get_qualifier(
-            "/PRIORITY", priority_str, sizeof(priority_str)))) {
+    if (ODD(dcli_get_qualifier("/PRIORITY", priority_str, sizeof(priority_str))))
+    {
       /* convert to integer */
       nr = sscanf(priority_str, "%d", &priority);
-      if (nr != 1) {
+      if (nr != 1)
+      {
         xnav->message('E', "Priority syntax error");
         return XNAV__HOLDCOMMAND;
       }
-    } else
+    }
+    else
       priority = -1;
 
     if (ODD(dcli_get_qualifier("/STOP", 0, 0)))
@@ -7003,18 +8122,20 @@ static int xnav_logging_func(void* client_data, void* client_flag)
     else
       create = 0;
 
-    if (entry > XNAV_LOGG_MAX || entry < 1) {
+    if (entry > XNAV_LOGG_MAX || entry < 1)
+    {
       xnav->message('E', "Entry out of range");
       return XNAV__HOLDCOMMAND;
     }
 
-    sts = xnav->logg[entry - 1].logging_set(logg_time, file_ptr, parameter_ptr,
-	condition_ptr, logg_type, logg_format, insert, buffer_size, stop, priority, create,
-        line_size, shortname);
+    sts = xnav->logg[entry - 1].logging_set(logg_time, file_ptr, parameter_ptr, condition_ptr, logg_type,
+                                            logg_format, insert, buffer_size, stop, priority, create,
+                                            line_size, shortname);
     return sts;
   }
 
-  else if (str_NoCaseStrncmp(arg1_str, "DELETE", strlen(arg1_str)) == 0) {
+  else if (str_NoCaseStrncmp(arg1_str, "DELETE", strlen(arg1_str)) == 0)
+  {
     /* Command is "LOGGING DELETE" */
 
     char entry_str[80];
@@ -7023,35 +8144,43 @@ static int xnav_logging_func(void* client_data, void* client_flag)
     int entry;
     int nr;
 
-    if (ODD(dcli_get_qualifier("/ENTRY", entry_str, sizeof(entry_str)))) {
-      if (!str_NoCaseStrcmp(entry_str, "CURRENT")) {
-        if (xnav->current_logging_index == -1) {
+    if (ODD(dcli_get_qualifier("/ENTRY", entry_str, sizeof(entry_str))))
+    {
+      if (!str_NoCaseStrcmp(entry_str, "CURRENT"))
+      {
+        if (xnav->current_logging_index == -1)
+        {
           xnav->message('E', "No current logging entry");
           return XNAV__HOLDCOMMAND;
         }
         entry = xnav->current_logging_index + 1;
-      } else {
+      }
+      else
+      {
         /* convert to integer */
         nr = sscanf(entry_str, "%d", &entry);
-        if (nr != 1) {
+        if (nr != 1)
+        {
           xnav->message('E', "Entry syntax error");
           return XNAV__HOLDCOMMAND;
         }
       }
-    } else {
+    }
+    else
+    {
       xnav->message('E', "Enter entry");
       return XNAV__HOLDCOMMAND;
     }
 
-    if (entry > XNAV_LOGG_MAX || entry < 1) {
+    if (entry > XNAV_LOGG_MAX || entry < 1)
+    {
       xnav->message('E', "Entry out of range");
       return XNAV__HOLDCOMMAND;
     }
 
     if (ODD(dcli_get_qualifier("/ALL", 0, 0)))
       parameter_ptr = 0;
-    else if (ODD(dcli_get_qualifier(
-                 "/PARAMETER", parameter_str, sizeof(parameter_str))))
+    else if (ODD(dcli_get_qualifier("/PARAMETER", parameter_str, sizeof(parameter_str))))
       parameter_ptr = parameter_str;
     else
       return XNAV__SUCCESS;
@@ -7061,26 +8190,32 @@ static int xnav_logging_func(void* client_data, void* client_flag)
     return sts;
   }
 
-  else if (str_NoCaseStrncmp(arg1_str, "START", strlen(arg1_str)) == 0) {
+  else if (str_NoCaseStrncmp(arg1_str, "START", strlen(arg1_str)) == 0)
+  {
     /* Command is "LOGGING START" */
 
     char entry_str[80];
     int entry;
     int nr;
 
-    if (ODD(dcli_get_qualifier("/ENTRY", entry_str, sizeof(entry_str)))) {
+    if (ODD(dcli_get_qualifier("/ENTRY", entry_str, sizeof(entry_str))))
+    {
       /* convert to integer */
       nr = sscanf(entry_str, "%d", &entry);
-      if (nr != 1) {
+      if (nr != 1)
+      {
         xnav->message('E', "Entry syntax error");
         return XNAV__HOLDCOMMAND;
       }
-    } else {
+    }
+    else
+    {
       xnav->message('E', "Enter entry");
       return XNAV__HOLDCOMMAND;
     }
 
-    if (entry > XNAV_LOGG_MAX || entry < 1) {
+    if (entry > XNAV_LOGG_MAX || entry < 1)
+    {
       xnav->message('E', "Entry out of range");
       return XNAV__HOLDCOMMAND;
     }
@@ -7089,92 +8224,118 @@ static int xnav_logging_func(void* client_data, void* client_flag)
     return sts;
   }
 
-  else if (str_NoCaseStrncmp(arg1_str, "STOP", strlen(arg1_str)) == 0) {
+  else if (str_NoCaseStrncmp(arg1_str, "STOP", strlen(arg1_str)) == 0)
+  {
     /* Command is "LOGGING STOP" */
 
     char entry_str[80];
     int entry;
     int nr;
 
-    if (ODD(dcli_get_qualifier("/ENTRY", entry_str, sizeof(entry_str)))) {
+    if (ODD(dcli_get_qualifier("/ENTRY", entry_str, sizeof(entry_str))))
+    {
       /* convert to integer */
       nr = sscanf(entry_str, "%d", &entry);
-      if (nr != 1) {
+      if (nr != 1)
+      {
         xnav->message('E', "Entry syntax error");
         return XNAV__HOLDCOMMAND;
       }
-    } else {
+    }
+    else
+    {
       xnav->message('E', "Enter entry");
       return XNAV__HOLDCOMMAND;
     }
 
-    if (entry > XNAV_LOGG_MAX || entry < 1) {
+    if (entry > XNAV_LOGG_MAX || entry < 1)
+    {
       xnav->message('E', "Entry out of range");
       return XNAV__HOLDCOMMAND;
     }
 
     sts = xnav->logg[entry - 1].stop();
     return sts;
-  } else if (str_NoCaseStrncmp(arg1_str, "SHOW", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "SHOW", strlen(arg1_str)) == 0)
+  {
     /* Command is "LOGGING SHOW" */
 
     char entry_str[80];
     int entry;
     int nr;
 
-    if (ODD(dcli_get_qualifier("/ENTRY", entry_str, sizeof(entry_str)))) {
+    if (ODD(dcli_get_qualifier("/ENTRY", entry_str, sizeof(entry_str))))
+    {
       /* convert to integer */
       nr = sscanf(entry_str, "%d", &entry);
-      if (nr != 1) {
+      if (nr != 1)
+      {
         xnav->message('E', "Entry syntax error");
         return XNAV__HOLDCOMMAND;
       }
-    } else {
+    }
+    else
+    {
       entry = 0;
     }
 
-    if (entry > XNAV_LOGG_MAX || entry < 1) {
+    if (entry > XNAV_LOGG_MAX || entry < 1)
+    {
       xnav->message('E', "Entry out of range");
       return XNAV__HOLDCOMMAND;
     }
 
     sts = xnav->logg[entry - 1].show();
     return sts;
-  } else if (str_NoCaseStrncmp(arg1_str, "ANALYSE", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "ANALYSE", strlen(arg1_str)) == 0)
+  {
     /* Command is "LOGGING ANALYSE" */
 
     char entry_str[80];
     int entry;
     int nr;
 
-    if (ODD(dcli_get_qualifier("/ENTRY", entry_str, sizeof(entry_str)))) {
-      if (!str_NoCaseStrcmp(entry_str, "CURRENT")) {
-        if (xnav->current_logging_index == -1) {
+    if (ODD(dcli_get_qualifier("/ENTRY", entry_str, sizeof(entry_str))))
+    {
+      if (!str_NoCaseStrcmp(entry_str, "CURRENT"))
+      {
+        if (xnav->current_logging_index == -1)
+        {
           xnav->message('E', "No current logging entry");
           return XNAV__HOLDCOMMAND;
         }
         entry = xnav->current_logging_index + 1;
-      } else {
+      }
+      else
+      {
         /* convert to integer */
         nr = sscanf(entry_str, "%d", &entry);
-        if (nr != 1) {
+        if (nr != 1)
+        {
           xnav->message('E', "Entry syntax error");
           return XNAV__HOLDCOMMAND;
         }
       }
-    } else {
+    }
+    else
+    {
       xnav->message('E', "Enter entry");
       return XNAV__HOLDCOMMAND;
     }
 
-    if (entry > XNAV_LOGG_MAX || entry < 1) {
+    if (entry > XNAV_LOGG_MAX || entry < 1)
+    {
       xnav->message('E', "Entry out of range");
       return XNAV__HOLDCOMMAND;
     }
 
     sts = xnav->logg[entry - 1].analyse();
     return sts;
-  } else if (str_NoCaseStrncmp(arg1_str, "STORE", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "STORE", strlen(arg1_str)) == 0)
+  {
     /* Command is "LOGGING STORE" */
 
     char entry_str[80];
@@ -7185,41 +8346,53 @@ static int xnav_logging_func(void* client_data, void* client_flag)
 
     if (ODD(dcli_get_qualifier("/FILE", file_str, sizeof(file_str))))
       file_ptr = file_str;
-    else if (ODD(dcli_get_qualifier("dcli_arg2", file_str, sizeof(file_str)))) {
+    else if (ODD(dcli_get_qualifier("dcli_arg2", file_str, sizeof(file_str))))
+    {
       if (file_str[0] != '/')
         /* Assume that this is the filestring */
         file_ptr = file_str;
-      else {
+      else
+      {
         xnav->message('E', "Enter file");
         return XNAV__HOLDCOMMAND;
       }
-    } else {
+    }
+    else
+    {
       xnav->message('E', "Enter file");
       return XNAV__HOLDCOMMAND;
     }
 
-    if (ODD(dcli_get_qualifier("/ENTRY", entry_str, sizeof(entry_str)))) {
+    if (ODD(dcli_get_qualifier("/ENTRY", entry_str, sizeof(entry_str))))
+    {
       /* convert to integer */
       nr = sscanf(entry_str, "%d", &entry);
-      if (nr != 1) {
+      if (nr != 1)
+      {
         xnav->message('E', "Entry syntax error");
         return XNAV__HOLDCOMMAND;
       }
-    } else {
-      if (xnav->current_logging_index == -1) {
+    }
+    else
+    {
+      if (xnav->current_logging_index == -1)
+      {
         xnav->message('E', "Entry syntax error");
         return XNAV__HOLDCOMMAND;
       }
       entry = xnav->current_logging_index + 1;
     }
-    if (entry > XNAV_LOGG_MAX || entry < 1) {
+    if (entry > XNAV_LOGG_MAX || entry < 1)
+    {
       xnav->message('E', "Entry out of range");
       return XNAV__HOLDCOMMAND;
     }
 
     sts = xnav->logg[entry - 1].store(file_str);
     return sts;
-  } else {
+  }
+  else
+  {
     xnav->message('E', "Unknown qualifier");
     return XNAV__HOLDCOMMAND;
   }
@@ -7234,7 +8407,8 @@ static int xnav_call_func(void* client_data, void* client_flag)
 
   arg1_sts = dcli_get_qualifier("dcli_arg1", arg1_str, sizeof(arg1_str));
 
-  if (str_NoCaseStrncmp(arg1_str, "METHOD", strlen(arg1_str)) == 0) {
+  if (str_NoCaseStrncmp(arg1_str, "METHOD", strlen(arg1_str)) == 0)
+  {
     // Command is "CALL METHOD"
     char method_str[80];
     pwr_tAName object_str;
@@ -7242,23 +8416,27 @@ static int xnav_call_func(void* client_data, void* client_flag)
     xmenu_eItemType menu_type;
     pwr_sAttrRef aref;
 
-    if (ODD(dcli_get_qualifier("/FUNCTION", method_str, sizeof(method_str)))) {
+    if (ODD(dcli_get_qualifier("/FUNCTION", method_str, sizeof(method_str))))
+    {
       xmenu_sMenuCall mcp;
       pwr_tStatus (*method)(xmenu_sMenuCall*);
 
       sts = XNav::GetMethod(method_str, &method);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         xnav->message('E', "Method not found");
         return XNAV__HOLDCOMMAND;
       }
 
-      if (EVEN(dcli_get_qualifier("/OBJECT", object_str, sizeof(object_str)))) {
+      if (EVEN(dcli_get_qualifier("/OBJECT", object_str, sizeof(object_str))))
+      {
         xnav->message('E', "Enter object");
         return XNAV__HOLDCOMMAND;
       }
 
       sts = gdh_NameToAttrref(pwr_cNObjid, object_str, &aref);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         xnav->message('E', "No such object");
         return XNAV__HOLDCOMMAND;
       }
@@ -7271,18 +8449,23 @@ static int xnav_call_func(void* client_data, void* client_flag)
 
       sts = (method)(&mcp);
       return sts;
-    } else {
-      if (EVEN(dcli_get_qualifier("/METHOD", method_str, sizeof(method_str)))) {
+    }
+    else
+    {
+      if (EVEN(dcli_get_qualifier("/METHOD", method_str, sizeof(method_str))))
+      {
         xnav->message('E', "Enter method");
         return XNAV__HOLDCOMMAND;
       }
-      if (EVEN(dcli_get_qualifier("/OBJECT", object_str, sizeof(object_str)))) {
+      if (EVEN(dcli_get_qualifier("/OBJECT", object_str, sizeof(object_str))))
+      {
         xnav->message('E', "Enter object");
         return XNAV__HOLDCOMMAND;
       }
 
       sts = gdh_NameToAttrref(pwr_cNObjid, object_str, &aref);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         xnav->message('E', "No such object");
         return XNAV__HOLDCOMMAND;
       }
@@ -7294,15 +8477,17 @@ static int xnav_call_func(void* client_data, void* client_flag)
       else
         menu_type = xmenu_eItemType_Attribute;
 
-      sts = xnav->call_object_method(
-          aref, menu_type, xmenu_mUtility_XNav, xnav->priv, method_str);
-      if (EVEN(sts)) {
+      sts = xnav->call_object_method(aref, menu_type, xmenu_mUtility_XNav, xnav->priv, method_str);
+      if (EVEN(sts))
+      {
         xnav->message('E', "Unable to call method");
         return XNAV__HOLDCOMMAND;
-      } else
+      }
+      else
         return sts;
     }
-  } else
+  }
+  else
     xnav->message('E', "Syntax error");
   return 1;
 }
@@ -7315,7 +8500,8 @@ static int xnav_check_func(void* client_data, void* client_flag)
 
   arg1_sts = dcli_get_qualifier("dcli_arg1", arg1_str, sizeof(arg1_str));
 
-  if (str_NoCaseStrncmp(arg1_str, "METHOD", strlen(arg1_str)) == 0) {
+  if (str_NoCaseStrncmp(arg1_str, "METHOD", strlen(arg1_str)) == 0)
+  {
     // Command is "CHECK METHOD"
     char method_str[80];
     pwr_tAName object_str;
@@ -7323,23 +8509,27 @@ static int xnav_check_func(void* client_data, void* client_flag)
     xmenu_eItemType menu_type;
     pwr_sAttrRef aref;
 
-    if (ODD(dcli_get_qualifier("/FILTER", method_str, sizeof(method_str)))) {
+    if (ODD(dcli_get_qualifier("/FILTER", method_str, sizeof(method_str))))
+    {
       xmenu_sMenuCall mcp;
       pwr_tStatus (*method)(xmenu_sMenuCall*);
 
       sts = XNav::GetMethod(method_str, &method);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         xnav->message('E', "Method not found");
         return XNAV__HOLDCOMMAND;
       }
 
-      if (EVEN(dcli_get_qualifier("/OBJECT", object_str, sizeof(object_str)))) {
+      if (EVEN(dcli_get_qualifier("/OBJECT", object_str, sizeof(object_str))))
+      {
         xnav->message('E', "Enter object");
         return XNAV__HOLDCOMMAND;
       }
 
       sts = gdh_NameToAttrref(pwr_cNObjid, object_str, &aref);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         xnav->message('E', "No such object");
         return XNAV__HOLDCOMMAND;
       }
@@ -7352,18 +8542,23 @@ static int xnav_check_func(void* client_data, void* client_flag)
 
       sts = (method)(&mcp);
       return sts;
-    } else {
-      if (EVEN(dcli_get_qualifier("/METHOD", method_str, sizeof(method_str)))) {
+    }
+    else
+    {
+      if (EVEN(dcli_get_qualifier("/METHOD", method_str, sizeof(method_str))))
+      {
         xnav->message('E', "Enter method");
         return XNAV__HOLDCOMMAND;
       }
-      if (EVEN(dcli_get_qualifier("/OBJECT", object_str, sizeof(object_str)))) {
+      if (EVEN(dcli_get_qualifier("/OBJECT", object_str, sizeof(object_str))))
+      {
         xnav->message('E', "Enter object");
         return XNAV__HOLDCOMMAND;
       }
 
       sts = gdh_NameToAttrref(pwr_cNObjid, object_str, &aref);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         xnav->message('E', "No such object");
         return XNAV__HOLDCOMMAND;
       }
@@ -7375,16 +8570,17 @@ static int xnav_check_func(void* client_data, void* client_flag)
       else
         menu_type = xmenu_eItemType_Attribute;
 
-      sts = xnav->check_object_methodfilter(
-          aref, menu_type, xmenu_mUtility_XNav, xnav->priv, method_str);
+      sts = xnav->check_object_methodfilter(aref, menu_type, xmenu_mUtility_XNav, xnav->priv, method_str);
       return sts;
     }
   }
-  if (str_NoCaseStrncmp(arg1_str, "ISATTRIBUTE", strlen(arg1_str)) == 0) {
+  if (str_NoCaseStrncmp(arg1_str, "ISATTRIBUTE", strlen(arg1_str)) == 0)
+  {
     // Command is "CHECK ISATTRIBUTE"
     pwr_tAName object_str;
 
-    if (EVEN(dcli_get_qualifier("/OBJECT", object_str, sizeof(object_str)))) {
+    if (EVEN(dcli_get_qualifier("/OBJECT", object_str, sizeof(object_str))))
+    {
       xnav->message('E', "Enter object");
       return XNAV__HOLDCOMMAND;
     }
@@ -7393,7 +8589,8 @@ static int xnav_check_func(void* client_data, void* client_flag)
       return 1;
     else
       return 0;
-  } else
+  }
+  else
     xnav->message('E', "Syntax error");
   return 1;
 }
@@ -7407,7 +8604,8 @@ static int xnav_print_func(void* client_data, void* client_flag)
 
   arg1_sts = dcli_get_qualifier("dcli_arg1", arg1_str, sizeof(arg1_str));
 
-  if (str_NoCaseStrncmp(arg1_str, "GRAPH", strlen(arg1_str)) == 0) {
+  if (str_NoCaseStrncmp(arg1_str, "GRAPH", strlen(arg1_str)) == 0)
+  {
     pwr_tFileName file_str;
     pwr_tAName instance_str;
     pwr_tAName object_str;
@@ -7417,77 +8615,92 @@ static int xnav_print_func(void* client_data, void* client_flag)
     char* instance_p;
     int sts;
 
-    if (ODD(dcli_get_qualifier(
-            "/INSTANCE", instance_str, sizeof(instance_str)))) {
+    if (ODD(dcli_get_qualifier("/INSTANCE", instance_str, sizeof(instance_str))))
+    {
       instance_p = instance_str;
-    } else
+    }
+    else
       instance_p = 0;
 
-    if (ODD(dcli_get_qualifier("/CLASSGRAPH", 0, 0))) {
+    if (ODD(dcli_get_qualifier("/CLASSGRAPH", 0, 0)))
+    {
       classgraph = 1;
-      if (!instance_p) {
+      if (!instance_p)
+      {
         xnav->message('E', "Instance is missing");
         return XNAV__HOLDCOMMAND;
       }
-    } else
+    }
+    else
       classgraph = 0;
 
-    if (ODD(dcli_get_qualifier("dcli_arg2", file_str, sizeof(file_str)))) {
-      if (file_str[0] == '/') {
+    if (ODD(dcli_get_qualifier("dcli_arg2", file_str, sizeof(file_str))))
+    {
+      if (file_str[0] == '/')
+      {
         xnav->message('E', "Syntax error");
         return XNAV__HOLDCOMMAND;
       }
-    } else if (ODD(dcli_get_qualifier("/FILE", file_str, sizeof(file_str)))) {
+    }
+    else if (ODD(dcli_get_qualifier("/FILE", file_str, sizeof(file_str))))
+    {
       // Get base class graphs on $pwr_exe
       str_ToLower(fname, file_str);
-    } else if (classgraph) {
+    }
+    else if (classgraph)
+    {
       // Get file from class of instance object
       pwr_sAttrRef aref;
       pwr_tObjName cname;
       pwr_tCid cid;
       pwr_tFileName found_file;
 
-      if (!instance_p) {
+      if (!instance_p)
+      {
         xnav->message('E', "Enter instance object");
         return XNAV__HOLDCOMMAND;
       }
 
       sts = gdh_NameToAttrref(pwr_cNObjid, instance_p, &aref);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         xnav->message('E', "Instance object not found");
         return XNAV__HOLDCOMMAND;
       }
-      sts = gdh_AttrrefToName(
-          &aref, instance_str, sizeof(instance_str), cdh_mName_volumeStrict);
+      sts = gdh_AttrrefToName(&aref, instance_str, sizeof(instance_str), cdh_mName_volumeStrict);
       if (EVEN(sts))
         return sts;
 
       sts = gdh_GetAttrRefTid(&aref, &cid);
-      while (ODD(sts)) {
+      while (ODD(sts))
+      {
         // Try all superclasses
-        sts = gdh_ObjidToName(
-            cdh_ClassIdToObjid(cid), cname, sizeof(cname), cdh_mName_object);
+        sts = gdh_ObjidToName(cdh_ClassIdToObjid(cid), cname, sizeof(cname), cdh_mName_object);
         if (EVEN(sts))
           return sts;
 
         str_ToLower(cname, cname);
-        if (cdh_CidToVid(cid) < cdh_cUserClassVolMin
-            || (cdh_CidToVid(cid) >= cdh_cManufactClassVolMin
-                   && cdh_CidToVid(cid) <= cdh_cManufactClassVolMax)) {
+        if (cdh_CidToVid(cid) < cdh_cUserClassVolMin ||
+            (cdh_CidToVid(cid) >= cdh_cManufactClassVolMin && cdh_CidToVid(cid) <= cdh_cManufactClassVolMax))
+        {
           if (cname[0] == '$')
             sprintf(file_str, "pwr_c_%s", &cname[1]);
           else
             sprintf(file_str, "pwr_c_%s", cname);
-        } else
+        }
+        else
           strcpy(file_str, cname);
 
         // Get base class graphs on $pwr_exe
         str_ToLower(fname, file_str);
-        if (instance_p && (str_NoCaseStrncmp(fname, "pwr_c_", 6) == 0
-                              || str_NoCaseStrncmp(fname, "pwr_c_", 6) == 0)) {
+        if (instance_p &&
+            (str_NoCaseStrncmp(fname, "pwr_c_", 6) == 0 || str_NoCaseStrncmp(fname, "pwr_c_", 6) == 0))
+        {
           strcpy(fname, "$pwr_exe/");
           strcat(fname, file_str);
-        } else {
+        }
+        else
+        {
           strcpy(fname, "$pwrp_exe/");
           strcat(fname, file_str);
         }
@@ -7500,13 +8713,15 @@ static int xnav_print_func(void* client_data, void* client_flag)
 
         sts = gdh_GetSuperClass(cid, &cid, aref.Objid);
       }
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         xnav->message('E', "No classgraph found");
         return XNAV__HOLDCOMMAND;
       }
     }
 
-    if (ODD(dcli_get_qualifier("/OBJECT", object_str, sizeof(object_str)))) {
+    if (ODD(dcli_get_qualifier("/OBJECT", object_str, sizeof(object_str))))
+    {
       // Find graph from XttGraph object
       pwr_tObjid objid;
       pwr_tAName xttgraph_name;
@@ -7516,13 +8731,13 @@ static int xnav_print_func(void* client_data, void* client_flag)
       xnav_replace_node_str(xttgraph_name, object_str);
 
       sts = gdh_NameToObjid(xttgraph_name, &objid);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         xnav->message('E', "Object not found");
         return XNAV__HOLDCOMMAND;
       }
 
-      sts = gdh_GetObjectInfo(
-          xttgraph_name, (void*)&xttgraph_o, sizeof(xttgraph_o));
+      sts = gdh_GetObjectInfo(xttgraph_name, (void*)&xttgraph_o, sizeof(xttgraph_o));
       if (EVEN(sts))
         return sts;
 
@@ -7530,25 +8745,28 @@ static int xnav_print_func(void* client_data, void* client_flag)
       if ((s = strrchr(file_str, '.')))
         *s = 0;
 
-      if (cdh_ObjidIsNotNull(xttgraph_o.Object[0])) {
-        sts = gdh_ObjidToName(xttgraph_o.Object[0], instance_str,
-            sizeof(instance_str), cdh_mName_volumeStrict);
+      if (cdh_ObjidIsNotNull(xttgraph_o.Object[0]))
+      {
+        sts =
+            gdh_ObjidToName(xttgraph_o.Object[0], instance_str, sizeof(instance_str), cdh_mName_volumeStrict);
         if (EVEN(sts))
           return sts;
 
         instance_p = instance_str;
-      } else
+      }
+      else
         instance_p = 0;
     }
 
-    if (xnav->appl.find(
-            applist_eType_Graph, file_str, instance_p, (void**)&gectx))
+    if (xnav->appl.find(applist_eType_Graph, file_str, instance_p, (void**)&gectx))
       gectx->print();
-    else {
+    else
+    {
       xnav->message('E', "Graph not found");
       return XNAV__HOLDCOMMAND;
     }
-  } else
+  }
+  else
     xnav->message('E', "Syntax error");
 
   return XNAV__SUCCESS;
@@ -7563,7 +8781,8 @@ static int xnav_export_func(void* client_data, void* client_flag)
 
   arg1_sts = dcli_get_qualifier("dcli_arg1", arg1_str, sizeof(arg1_str));
 
-  if (str_NoCaseStrncmp(arg1_str, "GRAPH", strlen(arg1_str)) == 0) {
+  if (str_NoCaseStrncmp(arg1_str, "GRAPH", strlen(arg1_str)) == 0)
+  {
     pwr_tFileName file_str;
     pwr_tFileName graph_str;
     pwr_tAName instance_str;
@@ -7574,73 +8793,87 @@ static int xnav_export_func(void* client_data, void* client_flag)
     char* instance_p;
     int sts;
 
-    if (ODD(dcli_get_qualifier(
-            "/INSTANCE", instance_str, sizeof(instance_str)))) {
+    if (ODD(dcli_get_qualifier("/INSTANCE", instance_str, sizeof(instance_str))))
+    {
       instance_p = instance_str;
-    } else
+    }
+    else
       instance_p = 0;
 
-    if (ODD(dcli_get_qualifier("/CLASSGRAPH", 0, 0))) {
+    if (ODD(dcli_get_qualifier("/CLASSGRAPH", 0, 0)))
+    {
       classgraph = 1;
-      if (!instance_p) {
+      if (!instance_p)
+      {
         xnav->message('E', "Instance is missing");
         return XNAV__HOLDCOMMAND;
       }
-    } else
+    }
+    else
       classgraph = 0;
 
-    if (EVEN(dcli_get_qualifier("/file", file_str, sizeof(file_str)))) {
+    if (EVEN(dcli_get_qualifier("/file", file_str, sizeof(file_str))))
+    {
       xnav->message('E', "File is missing");
       return XNAV__HOLDCOMMAND;
     }
 
-    if (ODD(dcli_get_qualifier("/GRAPH", graph_str, sizeof(graph_str)))) {
+    if (ODD(dcli_get_qualifier("/GRAPH", graph_str, sizeof(graph_str))))
+    {
       // Get base class graphs on $pwr_exe
       str_ToLower(graph_str, graph_str);
-    } else if (classgraph) {
+    }
+    else if (classgraph)
+    {
       // Get file from class of instance object
       pwr_sAttrRef aref;
       pwr_tObjName cname;
       pwr_tCid cid;
       pwr_tFileName found_file;
 
-      if (!instance_p) {
+      if (!instance_p)
+      {
         xnav->message('E', "Enter instance object");
         return XNAV__HOLDCOMMAND;
       }
 
       sts = gdh_NameToAttrref(pwr_cNObjid, instance_p, &aref);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         xnav->message('E', "Instance object not found");
         return XNAV__HOLDCOMMAND;
       }
       sts = gdh_GetAttrRefTid(&aref, &cid);
-      while (ODD(sts)) {
+      while (ODD(sts))
+      {
         // Try all superclasses
-        sts = gdh_ObjidToName(
-            cdh_ClassIdToObjid(cid), cname, sizeof(cname), cdh_mName_object);
+        sts = gdh_ObjidToName(cdh_ClassIdToObjid(cid), cname, sizeof(cname), cdh_mName_object);
         if (EVEN(sts))
           return sts;
 
         str_ToLower(cname, cname);
-        if (cdh_CidToVid(cid) < cdh_cUserClassVolMin
-            || (cdh_CidToVid(cid) >= cdh_cManufactClassVolMin
-                   && cdh_CidToVid(cid) <= cdh_cManufactClassVolMax)) {
+        if (cdh_CidToVid(cid) < cdh_cUserClassVolMin ||
+            (cdh_CidToVid(cid) >= cdh_cManufactClassVolMin && cdh_CidToVid(cid) <= cdh_cManufactClassVolMax))
+        {
           if (cname[0] == '$')
             sprintf(graph_str, "pwr_c_%s", &cname[1]);
           else
             sprintf(graph_str, "pwr_c_%s", cname);
-        } else
+        }
+        else
           strcpy(graph_str, cname);
 
         // Get base class graphs on $pwr_exe
         str_ToLower(fname, graph_str);
-        if (instance_p && (str_NoCaseStrncmp(fname, "pwr_c_", 6) == 0
-                              || str_NoCaseStrncmp(fname, "pwr_c_", 6) == 0)) {
+        if (instance_p &&
+            (str_NoCaseStrncmp(fname, "pwr_c_", 6) == 0 || str_NoCaseStrncmp(fname, "pwr_c_", 6) == 0))
+        {
           strcpy(fname, "$pwr_exe/");
           strcat(fname, graph_str);
           strcpy(graph_str, fname);
-        } else {
+        }
+        else
+        {
           strcpy(fname, "$pwrp_exe/");
           strcat(fname, graph_str);
           strcpy(graph_str, fname);
@@ -7653,13 +8886,15 @@ static int xnav_export_func(void* client_data, void* client_flag)
 
         sts = gdh_GetSuperClass(cid, &cid, aref.Objid);
       }
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         xnav->message('E', "No classgraph found");
         return XNAV__HOLDCOMMAND;
       }
     }
 
-    if (ODD(dcli_get_qualifier("/OBJECT", object_str, sizeof(object_str)))) {
+    if (ODD(dcli_get_qualifier("/OBJECT", object_str, sizeof(object_str))))
+    {
       // Find graph from XttGraph object
       pwr_tObjid objid;
       pwr_tAName xttgraph_name;
@@ -7669,13 +8904,13 @@ static int xnav_export_func(void* client_data, void* client_flag)
       xnav_replace_node_str(xttgraph_name, object_str);
 
       sts = gdh_NameToObjid(xttgraph_name, &objid);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         xnav->message('E', "Object not found");
         return XNAV__HOLDCOMMAND;
       }
 
-      sts = gdh_GetObjectInfo(
-          xttgraph_name, (void*)&xttgraph_o, sizeof(xttgraph_o));
+      sts = gdh_GetObjectInfo(xttgraph_name, (void*)&xttgraph_o, sizeof(xttgraph_o));
       if (EVEN(sts))
         return sts;
 
@@ -7683,25 +8918,28 @@ static int xnav_export_func(void* client_data, void* client_flag)
       if ((s = strrchr(graph_str, '.')))
         *s = 0;
 
-      if (cdh_ObjidIsNotNull(xttgraph_o.Object[0])) {
-        sts = gdh_ObjidToName(xttgraph_o.Object[0], instance_str,
-            sizeof(instance_str), cdh_mName_volumeStrict);
+      if (cdh_ObjidIsNotNull(xttgraph_o.Object[0]))
+      {
+        sts =
+            gdh_ObjidToName(xttgraph_o.Object[0], instance_str, sizeof(instance_str), cdh_mName_volumeStrict);
         if (EVEN(sts))
           return sts;
 
         instance_p = instance_str;
-      } else
+      }
+      else
         instance_p = 0;
     }
 
-    if (xnav->appl.find(
-            applist_eType_Graph, graph_str, instance_p, (void**)&gectx))
+    if (xnav->appl.find(applist_eType_Graph, graph_str, instance_p, (void**)&gectx))
       gectx->export_image(file_str);
-    else {
+    else
+    {
       xnav->message('E', "Graph not found");
       return XNAV__HOLDCOMMAND;
     }
-  } else
+  }
+  else
     xnav->message('E', "Syntax error");
 
   return XNAV__SUCCESS;
@@ -7715,15 +8953,18 @@ static int xnav_sound_func(void* client_data, void* client_flag)
   int sts;
   pwr_tAttrRef aref;
 
-  if (EVEN(dcli_get_qualifier("/OBJECT", object_str, sizeof(object_str)))) {
-    if (EVEN(dcli_get_qualifier("dcli_arg1", object_str, sizeof(object_str)))) {
+  if (EVEN(dcli_get_qualifier("/OBJECT", object_str, sizeof(object_str))))
+  {
+    if (EVEN(dcli_get_qualifier("dcli_arg1", object_str, sizeof(object_str))))
+    {
       xnav->message('E', "Object is missing");
       return XNAV__HOLDCOMMAND;
     }
   }
 
   sts = gdh_NameToAttrref(pwr_cNObjid, object_str, &aref);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     xnav->message('E', "Sound object not found");
     return XNAV__HOLDCOMMAND;
   }
@@ -7742,27 +8983,31 @@ static int xnav_write_func(void* client_data, void* client_flag)
 
   arg1_sts = dcli_get_qualifier("dcli_arg1", arg1_str, sizeof(arg1_str));
 
-  if (str_NoCaseStrncmp(arg1_str, "OBJECT", strlen(arg1_str)) == 0) {
+  if (str_NoCaseStrncmp(arg1_str, "OBJECT", strlen(arg1_str)) == 0)
+  {
     pwr_tOName object_str;
     pwr_tFileName file_str;
     int sts;
     pwr_tAttrRef aref;
 
-    if (EVEN(dcli_get_qualifier("/OBJECT", object_str, sizeof(object_str)))) {
-      if (EVEN(dcli_get_qualifier(
-              "dcli_arg2", object_str, sizeof(object_str)))) {
+    if (EVEN(dcli_get_qualifier("/OBJECT", object_str, sizeof(object_str))))
+    {
+      if (EVEN(dcli_get_qualifier("dcli_arg2", object_str, sizeof(object_str))))
+      {
         xnav->message('E', "Object is missing");
         return XNAV__HOLDCOMMAND;
       }
     }
 
-    if (EVEN(dcli_get_qualifier("/FILE", file_str, sizeof(file_str)))) {
+    if (EVEN(dcli_get_qualifier("/FILE", file_str, sizeof(file_str))))
+    {
       xnav->message('E', "Enter file");
       return XNAV__HOLDCOMMAND;
     }
 
     sts = gdh_NameToAttrref(pwr_cNObjid, object_str, &aref);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       xnav->message('E', "Object not found");
       return XNAV__HOLDCOMMAND;
     }
@@ -7770,7 +9015,9 @@ static int xnav_write_func(void* client_data, void* client_flag)
     sts = gdh_FWriteObject(file_str, &aref);
     if (EVEN(sts))
       xnav->message(' ', XNav::get_message(sts));
-  } else {
+  }
+  else
+  {
     xnav->message('E', "Syntax error");
     return XNAV__HOLDCOMMAND;
   }
@@ -7787,27 +9034,31 @@ static int xnav_read_func(void* client_data, void* client_flag)
 
   arg1_sts = dcli_get_qualifier("dcli_arg1", arg1_str, sizeof(arg1_str));
 
-  if (str_NoCaseStrncmp(arg1_str, "OBJECT", strlen(arg1_str)) == 0) {
+  if (str_NoCaseStrncmp(arg1_str, "OBJECT", strlen(arg1_str)) == 0)
+  {
     pwr_tOName object_str;
     pwr_tFileName file_str;
     int sts;
     pwr_tAttrRef aref;
 
-    if (EVEN(dcli_get_qualifier("/OBJECT", object_str, sizeof(object_str)))) {
-      if (EVEN(dcli_get_qualifier(
-              "dcli_arg2", object_str, sizeof(object_str)))) {
+    if (EVEN(dcli_get_qualifier("/OBJECT", object_str, sizeof(object_str))))
+    {
+      if (EVEN(dcli_get_qualifier("dcli_arg2", object_str, sizeof(object_str))))
+      {
         xnav->message('E', "Object is missing");
         return XNAV__HOLDCOMMAND;
       }
     }
 
-    if (EVEN(dcli_get_qualifier("/FILE", file_str, sizeof(file_str)))) {
+    if (EVEN(dcli_get_qualifier("/FILE", file_str, sizeof(file_str))))
+    {
       xnav->message('E', "Enter file");
       return XNAV__HOLDCOMMAND;
     }
 
     sts = gdh_NameToAttrref(pwr_cNObjid, object_str, &aref);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       xnav->message('E', "Object not found");
       return XNAV__HOLDCOMMAND;
     }
@@ -7815,7 +9066,9 @@ static int xnav_read_func(void* client_data, void* client_flag)
     sts = gdh_FReadObject(file_str, &aref);
     if (EVEN(sts))
       xnav->message(' ', XNav::get_message(sts));
-  } else {
+  }
+  else
+  {
     xnav->message('E', "Syntax error");
     return XNAV__HOLDCOMMAND;
   }
@@ -7831,15 +9084,18 @@ static int xnav_wait_func(void* client_data, void* client_flag)
   float ftime;
   int sts;
 
-  if (EVEN(dcli_get_qualifier("/TIME", time_str, sizeof(time_str)))) {
-    if (EVEN(dcli_get_qualifier("dcli_arg1", time_str, sizeof(time_str)))) {
+  if (EVEN(dcli_get_qualifier("/TIME", time_str, sizeof(time_str))))
+  {
+    if (EVEN(dcli_get_qualifier("dcli_arg1", time_str, sizeof(time_str))))
+    {
       xnav->message('E', "Time is missing");
       return XNAV__HOLDCOMMAND;
     }
   }
 
   sts = sscanf(time_str, "%f", &ftime);
-  if (sts != 1) {
+  if (sts != 1)
+  {
     xnav->message('E', "Time syntax error");
     return XNAV__HOLDCOMMAND;
   }
@@ -7859,12 +9115,14 @@ static int xnav_oplog_func(void* client_data, void* client_flag)
 
   arg1_sts = dcli_get_qualifier("dcli_arg1", arg1_str, sizeof(arg1_str));
 
-  if (str_NoCaseStrncmp(arg1_str, "START", strlen(arg1_str)) == 0) {
+  if (str_NoCaseStrncmp(arg1_str, "START", strlen(arg1_str)) == 0)
+  {
     pwr_tFileName file_str;
 
     int event = ODD(dcli_get_qualifier("/EVENT", 0, 0));
 
-    if (EVEN(dcli_get_qualifier("/FILE", file_str, sizeof(file_str)))) {
+    if (EVEN(dcli_get_qualifier("/FILE", file_str, sizeof(file_str))))
+    {
       char* s;
 
       if ((s = strrchr(xnav->opplace_name, '-')))
@@ -7887,11 +9145,15 @@ static int xnav_oplog_func(void* client_data, void* client_flag)
     log->set_default();
 
     xnav->message('I', "Operator logging started");
-  } else if (str_NoCaseStrncmp(arg1_str, "STOP", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "STOP", strlen(arg1_str)) == 0)
+  {
     XttLog::delete_default();
 
     xnav->message('I', "Operator logging stopped");
-  } else if (str_NoCaseStrncmp(arg1_str, "PLAY", strlen(arg1_str)) == 0) {
+  }
+  else if (str_NoCaseStrncmp(arg1_str, "PLAY", strlen(arg1_str)) == 0)
+  {
     pwr_tStatus sts;
     pwr_tFileName file_str;
     int num;
@@ -7900,7 +9162,8 @@ static int xnav_oplog_func(void* client_data, void* client_flag)
     char pid_str[40];
     int pid;
 
-    if (EVEN(dcli_get_qualifier("/FILE", file_str, sizeof(file_str)))) {
+    if (EVEN(dcli_get_qualifier("/FILE", file_str, sizeof(file_str))))
+    {
       char* s;
 
       if ((s = strrchr(xnav->opplace_name, '-')))
@@ -7911,28 +9174,36 @@ static int xnav_oplog_func(void* client_data, void* client_flag)
       sprintf(file_str, xttlog_cLogFile, cdh_Low(s));
     }
 
-    if (ODD(dcli_get_qualifier("/SPEED", speed_str, sizeof(speed_str)))) {
+    if (ODD(dcli_get_qualifier("/SPEED", speed_str, sizeof(speed_str))))
+    {
       num = sscanf(speed_str, "%lf", &speed);
-      if (num != 1) {
+      if (num != 1)
+      {
         xnav->message('E', "Speed syntax error");
         return XNAV__HOLDCOMMAND;
       }
-    } else
+    }
+    else
       speed = 1;
 
-    if (ODD(dcli_get_qualifier("/PID", pid_str, sizeof(pid_str)))) {
+    if (ODD(dcli_get_qualifier("/PID", pid_str, sizeof(pid_str))))
+    {
       num = sscanf(pid_str, "%d", &pid);
-      if (num != 1) {
+      if (num != 1)
+      {
         xnav->message('E', "Pid syntax error");
         return XNAV__HOLDCOMMAND;
       }
-    } else
+    }
+    else
       pid = 0;
 
     sts = XttLog::play(xnav, file_str, speed, pid);
     if (EVEN(sts))
       xnav->message(' ', XNav::get_message(sts));
-  } else {
+  }
+  else
+  {
     xnav->message('E', "Syntax error");
     return XNAV__HOLDCOMMAND;
   }
@@ -7948,7 +9219,8 @@ static int xnav_emit_func(void* client_data, void* client_flag)
 
   arg1_sts = dcli_get_qualifier("dcli_arg1", arg1_str, sizeof(arg1_str));
 
-  if (str_NoCaseStrncmp(arg1_str, "SIGNAL", strlen(arg1_str)) == 0) {
+  if (str_NoCaseStrncmp(arg1_str, "SIGNAL", strlen(arg1_str)) == 0)
+  {
     pwr_tString80 signalname_str;
     ApplListElem* elem;
     char* instance_p;
@@ -7957,8 +9229,8 @@ static int xnav_emit_func(void* client_data, void* client_flag)
     pwr_tString80 graph_str;
     void* appl_ctx;
 
-    if (EVEN(dcli_get_qualifier(
-            "/SIGNALNAME", signalname_str, sizeof(signalname_str)))) {
+    if (EVEN(dcli_get_qualifier("/SIGNALNAME", signalname_str, sizeof(signalname_str))))
+    {
       xnav->message('E', "Syntax error");
       return XNAV__HOLDCOMMAND;
     }
@@ -7968,29 +9240,33 @@ static int xnav_emit_func(void* client_data, void* client_flag)
     else
       graph_p = 0;
 
-    if (ODD(dcli_get_qualifier(
-            "/INSTANCE", instance_str, sizeof(instance_str))))
+    if (ODD(dcli_get_qualifier("/INSTANCE", instance_str, sizeof(instance_str))))
       instance_p = instance_str;
     else
       instance_p = 0;
 
-    if (graph_p) {
+    if (graph_p)
+    {
       // Send to specified graph
       if (xnav->appl.find(applist_eType_Graph, graph_p, instance_p, &appl_ctx))
         ((XttGe*)appl_ctx)->signal_send(signalname_str);
-      else if (xnav->appl.find(
-                   applist_eType_MultiView, graph_p, instance_p, &appl_ctx))
+      else if (xnav->appl.find(applist_eType_MultiView, graph_p, instance_p, &appl_ctx))
         ((XttMultiView*)appl_ctx)->signal_send(signalname_str);
-    } else {
+    }
+    else
+    {
       // Graph not specified, send to all
-      for (elem = xnav->appl.root; elem; elem = elem->next) {
+      for (elem = xnav->appl.root; elem; elem = elem->next)
+      {
         if (elem->type == applist_eType_Graph)
           ((XttGe*)elem->ctx)->signal_send(signalname_str);
         else if (elem->type == applist_eType_MultiView)
           ((XttMultiView*)elem->ctx)->signal_send(signalname_str);
       }
     }
-  } else {
+  }
+  else
+  {
     xnav->message('E', "Syntax error");
     return XNAV__HOLDCOMMAND;
   }
@@ -8011,7 +9287,8 @@ static int xnav_plcscan_func(void* client_data, void* client_flag)
   pwr_tBoolean value;
   pwr_tOName name_str;
 
-  if (!(xnav->priv & pwr_mPrv_System)) {
+  if (!(xnav->priv & pwr_mPrv_System))
+  {
     xnav->message('E', "Not authorized for this operation");
     return XNAV__SUCCESS;
   }
@@ -8020,62 +9297,65 @@ static int xnav_plcscan_func(void* client_data, void* client_flag)
   off = ODD(dcli_get_qualifier("/OFF", 0, 0));
   all = ODD(dcli_get_qualifier("/ALL", 0, 0));
 
-  if ((on && off) || (!on && !off)) {
+  if ((on && off) || (!on && !off))
+  {
     xnav->message('E', "Syntax error");
     return XNAV__HOLDCOMMAND;
   }
 
-  if (all) {
+  if (all)
+  {
 
-    for (sts = gdh_GetClassList(pwr_cClass_plc, &poid); 
-	 ODD(sts);
-	 sts = gdh_GetNextObject(poid, &poid)) {
+    for (sts = gdh_GetClassList(pwr_cClass_plc, &poid); ODD(sts); sts = gdh_GetNextObject(poid, &poid))
+    {
       sts = gdh_GetChild(poid, &woid);
       if (EVEN(sts))
-	continue;
+        continue;
 
       sts = gdh_GetObjectClass(woid, &cid);
       if (EVEN(sts))
-	return sts;
-      if (!(cid == pwr_cClass_windowplc || 
-	    cid == pwr_cClass_windowcond ||
-	    cid == pwr_cClass_windowsubstep ||
-	    cid == pwr_cClass_windoworderact))
-	continue;
+        return sts;
+      if (!(cid == pwr_cClass_windowplc || cid == pwr_cClass_windowcond || cid == pwr_cClass_windowsubstep ||
+            cid == pwr_cClass_windoworderact))
+        continue;
 
       aref = cdh_ObjidToAref(woid);
       sts = gdh_ArefANameToAref(&aref, "ScanOff", &scanoff_aref);
       if (EVEN(sts))
-	return sts;
+        return sts;
 
       if (on)
-	value = 0;
+        value = 0;
       else if (off)
-	value = 1;
+        value = 1;
 
       sts = gdh_SetObjectInfoAttrref(&scanoff_aref, &value, sizeof(value));
       if (EVEN(sts))
-	return sts;
+        return sts;
     }
     if (on)
       xnav->message('I', "Plc scan set on for all programs");
     else
       xnav->message('I', "Plc scan set off for all programs");
-
   }
-  else {
-    if (ODD(dcli_get_qualifier("/NAME", name_str, sizeof(name_str)))) {
+  else
+  {
+    if (ODD(dcli_get_qualifier("/NAME", name_str, sizeof(name_str))))
+    {
       sts = gdh_NameToObjid(name_str, &poid);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         xnav->message('E', "No such object");
         return XNAV__HOLDCOMMAND;
       }
-
-    } else {
+    }
+    else
+    {
       sts = xnav->get_select(&aref, &is_attr);
-      if (EVEN(sts)) {
-	xnav->message('E', "Enter name or select object");
-	return XNAV__SUCCESS;
+      if (EVEN(sts))
+      {
+        xnav->message('E', "Enter name or select object");
+        return XNAV__SUCCESS;
       }
       poid = aref.Objid;
     }
@@ -8084,10 +9364,11 @@ static int xnav_plcscan_func(void* client_data, void* client_flag)
     if (EVEN(sts))
       return sts;
 
-    if (cid == pwr_cClass_plc) {
+    if (cid == pwr_cClass_plc)
+    {
       sts = gdh_GetChild(poid, &woid);
       if (EVEN(sts))
-	return sts;
+        return sts;
     }
     else
       woid = poid;
@@ -8095,10 +9376,9 @@ static int xnav_plcscan_func(void* client_data, void* client_flag)
     sts = gdh_GetObjectClass(woid, &cid);
     if (EVEN(sts))
       return sts;
-    if (!(cid == pwr_cClass_windowplc || 
-	  cid == pwr_cClass_windowcond ||
-	  cid == pwr_cClass_windowsubstep ||
-	  cid == pwr_cClass_windoworderact)) {
+    if (!(cid == pwr_cClass_windowplc || cid == pwr_cClass_windowcond || cid == pwr_cClass_windowsubstep ||
+          cid == pwr_cClass_windoworderact))
+    {
       xnav->message('E', "Object is not plcpgm or plc window");
       return XNAV__HOLDCOMMAND;
     }
@@ -8121,7 +9401,6 @@ static int xnav_plcscan_func(void* client_data, void* client_flag)
       xnav->message('I', "Plc scan set on");
     else
       xnav->message('I', "Plc scan set off");
-
   }
   return XNAV__SUCCESS;
 }
@@ -8143,16 +9422,18 @@ int XNav::show_database(int nopop)
 
   //  Loop through all root objects and see if they are valid at toplevel
   toplevel_cnt = 0;
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     sts = gdh_GetObjectClass(root, &classid);
-    if (ODD(sts)) {
-      if (!toplevel_cnt) {
+    if (ODD(sts))
+    {
+      if (!toplevel_cnt)
+      {
         if (!nopop)
           brow_pop();
         brow_SetNodraw(brow->ctx);
       }
-      sts = create_object_item(
-          root, NULL, flow_eDest_IntoLast, (void**)&item, 0);
+      sts = create_object_item(root, NULL, flow_eDest_IntoLast, (void**)&item, 0);
       if (EVEN(sts))
         return sts;
       toplevel_cnt++;
@@ -8160,7 +9441,8 @@ int XNav::show_database(int nopop)
     sts = gdh_GetNextSibling(root, &root);
   }
 
-  if (!toplevel_cnt) {
+  if (!toplevel_cnt)
+  {
     message('I', "No objects found in database");
     return 1;
   }
@@ -8169,12 +9451,9 @@ int XNav::show_database(int nopop)
   return 1;
 }
 
-pwr_tStatus XNav::get_command_sts()
-{
-  return command_sts;
-}
+pwr_tStatus XNav::get_command_sts() { return command_sts; }
 
-int XNav::script(char* buffer, char *bufargs)
+int XNav::script(char* buffer, char* bufargs)
 {
   int sts;
 
@@ -8192,19 +9471,22 @@ int XNav::command(char* input_str)
   int sts, sym_sts;
   char symbol_value[DCLI_SYM_VALUE_SIZE];
 
-  if (input_str[0] == '@') {
+  if (input_str[0] == '@')
+  {
     sts = dcli_replace_symbol(input_str, command, sizeof(command));
     if (EVEN(sts))
       return sts;
 
     /* Read command file */
     sts = readcmdfile(&command[1], 0, 0);
-    if (sts == DCLI__NOFILE) {
+    if (sts == DCLI__NOFILE)
+    {
       char tmp[1030];
       snprintf(tmp, sizeof(tmp), "Unable to open file \"%s\"", &command[1]);
       message('E', tmp);
       return DCLI__SUCCESS;
-    } else if (EVEN(sts))
+    }
+    else if (EVEN(sts))
       return sts;
 
     command_sts = sts;
@@ -8218,25 +9500,30 @@ int XNav::command(char* input_str)
   XttLog::dlog(xttlog_eCategory_Command, command, 0, 0);
 
   sts = dcli_cli((dcli_tCmdTable*)&xnav_command_table, command, (void*)this, 0);
-  if (sts == DCLI__COM_NODEF) {
+  if (sts == DCLI__COM_NODEF)
+  {
     /* Try to find a matching symbol */
     sym_sts = dcli_get_symbol_cmd(command, symbol_value);
-    if (ODD(sym_sts)) {
-      if (symbol_value[0] == '@') {
+    if (ODD(sym_sts))
+    {
+      if (symbol_value[0] == '@')
+      {
         /* Read command file */
         sts = readcmdfile(&symbol_value[1], 0, 0);
-        if (sts == DCLI__NOFILE) {
+        if (sts == DCLI__NOFILE)
+        {
           char tmp[230];
           snprintf(tmp, sizeof(tmp), "Unable to open file \"%s\"", &symbol_value[1]);
           message('E', tmp);
           return DCLI__SUCCESS;
-        } else if (EVEN(sts))
+        }
+        else if (EVEN(sts))
           return sts;
         return DCLI__SUCCESS;
       }
-      sts = dcli_cli(
-          (dcli_tCmdTable*)&xnav_command_table, symbol_value, (void*)this, 0);
-    } else if (sym_sts == DCLI__SYMBOL_AMBIG)
+      sts = dcli_cli((dcli_tCmdTable*)&xnav_command_table, symbol_value, (void*)this, 0);
+    }
+    else if (sym_sts == DCLI__SYMBOL_AMBIG)
       sts = sym_sts;
   }
   if (sts == DCLI__COM_AMBIG)
@@ -8254,9 +9541,8 @@ int XNav::command(char* input_str)
   return DCLI__SUCCESS;
 }
 
-static int xnav_getcurrenttext_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int xnav_getcurrenttext_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                    ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   XNav* xnav;
   char text[80];
@@ -8270,7 +9556,8 @@ static int xnav_getcurrenttext_func(void* filectx, ccm_sArg* arg_list,
   brow_GetSelectedNodes(xnav->brow->ctx, &node_list, &node_count);
   if (!node_count)
     strcpy(return_string, "");
-  else {
+  else
+  {
     // Get annotation number 0
     brow_GetAnnotation(node_list[0], 0, text, sizeof(text));
     free(node_list);
@@ -8281,9 +9568,8 @@ static int xnav_getcurrenttext_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int xnav_getcurrentobject_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int xnav_getcurrentobject_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                      ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   XNav* xnav;
   pwr_tOName name;
@@ -8307,9 +9593,8 @@ static int xnav_getcurrentobject_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int xnav_getchild_func(void* filectx, ccm_sArg* arg_list, int arg_count,
-    int* return_decl, ccm_tFloat* return_float, ccm_tInt* return_int,
-    char* return_string)
+static int xnav_getchild_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                              ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   int sts;
   pwr_tOName name;
@@ -8323,7 +9608,8 @@ static int xnav_getchild_func(void* filectx, ccm_sArg* arg_list, int arg_count,
     return CCM__ARGMISM;
 
   sts = gdh_NameToObjid(arg_list->value_string, &parent_objid);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     sts = gdh_GetChild(parent_objid, &child_objid);
     if (ODD(sts))
       sts = gdh_ObjidToName(child_objid, name, sizeof(name), cdh_mNName);
@@ -8337,9 +9623,8 @@ static int xnav_getchild_func(void* filectx, ccm_sArg* arg_list, int arg_count,
   return 1;
 }
 
-static int xnav_getparent_func(void* filectx, ccm_sArg* arg_list, int arg_count,
-    int* return_decl, ccm_tFloat* return_float, ccm_tInt* return_int,
-    char* return_string)
+static int xnav_getparent_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                               ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   int sts;
   pwr_tOName name;
@@ -8353,7 +9638,8 @@ static int xnav_getparent_func(void* filectx, ccm_sArg* arg_list, int arg_count,
     return CCM__ARGMISM;
 
   sts = gdh_NameToObjid(arg_list->value_string, &child_objid);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     sts = gdh_GetParent(child_objid, &parent_objid);
     if (ODD(sts))
       sts = gdh_ObjidToName(parent_objid, name, sizeof(name), cdh_mNName);
@@ -8367,9 +9653,8 @@ static int xnav_getparent_func(void* filectx, ccm_sArg* arg_list, int arg_count,
   return 1;
 }
 
-static int xnav_getnextsibling_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int xnav_getnextsibling_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                    ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   int sts;
   pwr_tOName name;
@@ -8383,7 +9668,8 @@ static int xnav_getnextsibling_func(void* filectx, ccm_sArg* arg_list,
     return CCM__ARGMISM;
 
   sts = gdh_NameToObjid(arg_list->value_string, &objid);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     sts = gdh_GetNextSibling(objid, &next_objid);
     if (ODD(sts))
       sts = gdh_ObjidToName(next_objid, name, sizeof(name), cdh_mNName);
@@ -8397,9 +9683,8 @@ static int xnav_getnextsibling_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int xnav_getclasslist_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int xnav_getclasslist_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                  ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   int sts;
   pwr_tOName name;
@@ -8413,7 +9698,8 @@ static int xnav_getclasslist_func(void* filectx, ccm_sArg* arg_list,
     return CCM__ARGMISM;
 
   sts = gdh_ClassNameToId(arg_list->value_string, &classid);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     sts = gdh_GetClassList(classid, &objid);
     if (ODD(sts))
       sts = gdh_ObjidToName(objid, name, sizeof(name), cdh_mNName);
@@ -8427,9 +9713,8 @@ static int xnav_getclasslist_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int xnav_getclasslistattrref_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int xnav_getclasslistattrref_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                         ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   int sts;
   pwr_tAName name;
@@ -8443,7 +9728,8 @@ static int xnav_getclasslistattrref_func(void* filectx, ccm_sArg* arg_list,
     return CCM__ARGMISM;
 
   sts = gdh_ClassNameToId(arg_list->value_string, &classid);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     sts = gdh_GetClassListAttrRef(classid, &aref);
     if (ODD(sts))
       sts = gdh_AttrrefToName(&aref, name, sizeof(name), cdh_mNName);
@@ -8457,9 +9743,8 @@ static int xnav_getclasslistattrref_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int xnav_getrootlist_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int xnav_getrootlist_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                 ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   int sts;
   pwr_tOName name;
@@ -8481,9 +9766,8 @@ static int xnav_getrootlist_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int xnav_getnodeobject_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int xnav_getnodeobject_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                   ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   int sts;
   pwr_tOName name;
@@ -8505,9 +9789,8 @@ static int xnav_getnodeobject_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int xnav_getnextobject_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int xnav_getnextobject_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                   ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   int sts;
   pwr_tOName name;
@@ -8521,7 +9804,8 @@ static int xnav_getnextobject_func(void* filectx, ccm_sArg* arg_list,
     return CCM__ARGMISM;
 
   sts = gdh_NameToObjid(arg_list->value_string, &objid);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     sts = gdh_GetNextObject(objid, &next_objid);
     if (ODD(sts))
       sts = gdh_ObjidToName(next_objid, name, sizeof(name), cdh_mNName);
@@ -8535,9 +9819,8 @@ static int xnav_getnextobject_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int xnav_getnextattrref_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int xnav_getnextattrref_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                    ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   int sts;
   pwr_tAName name;
@@ -8558,12 +9841,14 @@ static int xnav_getnextattrref_func(void* filectx, ccm_sArg* arg_list,
     return CCM__ARGMISM;
 
   sts = gdh_ClassNameToId(arg_list->value_string, &cid);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     sts = gdh_NameToAttrref(pwr_cNOid, arg_p2->value_string, &aref);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       sts = gdh_GetNextAttrRef(cid, &aref, &next_aref);
       if (ODD(sts))
-	sts = gdh_AttrrefToName(&next_aref, name, sizeof(name), cdh_mNName);
+        sts = gdh_AttrrefToName(&next_aref, name, sizeof(name), cdh_mNName);
     }
   }
   if (ODD(sts))
@@ -8575,9 +9860,8 @@ static int xnav_getnextattrref_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int xnav_getobjectclass_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int xnav_getobjectclass_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                    ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   int sts;
   pwr_tOName name;
@@ -8594,8 +9878,7 @@ static int xnav_getobjectclass_func(void* filectx, ccm_sArg* arg_list,
   if (ODD(sts))
     sts = gdh_GetObjectClass(objid, &classid);
   if (ODD(sts))
-    sts = gdh_ObjidToName(
-        cdh_ClassIdToObjid(classid), name, sizeof(name), cdh_mName_object);
+    sts = gdh_ObjidToName(cdh_ClassIdToObjid(classid), name, sizeof(name), cdh_mName_object);
   if (ODD(sts))
     strcpy(return_string, name);
   else
@@ -8605,9 +9888,8 @@ static int xnav_getobjectclass_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int xnav_messageerror_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int xnav_messageerror_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                  ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   XNav* xnav;
 
@@ -8626,9 +9908,8 @@ static int xnav_messageerror_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int xnav_messageinfo_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int xnav_messageinfo_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                 ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   XNav* xnav;
 
@@ -8647,9 +9928,8 @@ static int xnav_messageinfo_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int xnav_confirmdialog_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int xnav_confirmdialog_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                   ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   XNav* xnav;
   ccm_sArg* arg_p2;
@@ -8674,9 +9954,8 @@ static int xnav_confirmdialog_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int xnav_textdialog_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int xnav_textdialog_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   XNav* xnav;
   ccm_sArg* arg_p2;
@@ -8692,7 +9971,8 @@ static int xnav_textdialog_func(void* filectx, ccm_sArg* arg_list,
     return CCM__ARGMISM;
   if (arg_p2->value_decl != CCM_DECL_STRING)
     return CCM__ARGMISM;
-  if (arg_count == 3) {
+  if (arg_count == 3)
+  {
     arg_p3 = arg_p2->next;
     if (arg_p3->value_decl != CCM_DECL_INT)
       return CCM__ARGMISM;
@@ -8702,14 +9982,12 @@ static int xnav_textdialog_func(void* filectx, ccm_sArg* arg_list,
     image = wow_eImage_No;
 
   xnav_get_stored_xnav(&xnav);
-  xnav->wow->DisplayText(arg_list->value_string, arg_p2->value_string,
-      0, 0, image);
+  xnav->wow->DisplayText(arg_list->value_string, arg_p2->value_string, 0, 0, image);
   return 1;
 }
 
-static int xnav_cutobjectname_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int xnav_cutobjectname_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                   ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   ccm_sArg* arg_p2;
 
@@ -8729,9 +10007,8 @@ static int xnav_cutobjectname_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int xnav_getattribute_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int xnav_getattribute_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                  ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   ccm_sArg* arg_p2;
   int sts;
@@ -8749,27 +10026,36 @@ static int xnav_getattribute_func(void* filectx, ccm_sArg* arg_list,
   if (arg_count == 2 && arg_p2->value_decl != CCM_DECL_INT)
     return CCM__ARGMISM;
 
-  sts = xnav_attribute_func(arg_list->value_string, &value_decl, &value_float,
-      &value_int, value_string);
-  if (EVEN(sts)) {
-    if (arg_count == 2) {
+  sts = xnav_attribute_func(arg_list->value_string, &value_decl, &value_float, &value_int, value_string);
+  if (EVEN(sts))
+  {
+    if (arg_count == 2)
+    {
       arg_p2->value_int = 0;
       arg_p2->value_returned = 1;
       arg_p2->var_decl = arg_p2->value_decl;
     }
     *return_decl = CCM_DECL_UNKNOWN;
-  } else {
-    if (value_decl == CCM_DECL_INT) {
+  }
+  else
+  {
+    if (value_decl == CCM_DECL_INT)
+    {
       *return_int = value_int;
       *return_decl = CCM_DECL_INT;
-    } else if (value_decl == CCM_DECL_FLOAT) {
+    }
+    else if (value_decl == CCM_DECL_FLOAT)
+    {
       *return_float = value_float;
       *return_decl = CCM_DECL_FLOAT;
-    } else if (value_decl == CCM_DECL_STRING) {
+    }
+    else if (value_decl == CCM_DECL_STRING)
+    {
       strcpy(return_string, value_string);
       *return_decl = CCM_DECL_STRING;
     }
-    if (arg_count == 2) {
+    if (arg_count == 2)
+    {
       arg_p2->value_int = 1;
       arg_p2->value_returned = 1;
       arg_p2->var_decl = arg_p2->value_decl;
@@ -8779,9 +10065,8 @@ static int xnav_getattribute_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int xnav_setattribute_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int xnav_setattribute_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                  ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   ccm_sArg *arg_p2, *arg_p3;
   int sts;
@@ -8799,7 +10084,8 @@ static int xnav_setattribute_func(void* filectx, ccm_sArg* arg_list,
   arg_p3 = arg_p2->next;
   if (arg_list->value_decl != CCM_DECL_STRING)
     return CCM__ARGMISM;
-  if (arg_count == 3) {
+  if (arg_count == 3)
+  {
     if (arg_p3->value_decl != CCM_DECL_INT)
       return CCM__ARGMISM;
 
@@ -8810,115 +10096,126 @@ static int xnav_setattribute_func(void* filectx, ccm_sArg* arg_list,
   xnav_get_stored_xnav(&xnav);
 
   sts = gdh_NameToAttrref(pwr_cNObjid, arg_list->value_string, &attrref);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     *return_int = sts;
     *return_decl = CCM_DECL_INT;
     return 1;
   }
 
   // Check authorization
-  if (publicwrite) {
+  if (publicwrite)
+  {
     sts = gdh_GetAttributeFlags(&attrref, &a_flags);
     if (EVEN(sts))
       return sts;
 
     if (!(a_flags & pwr_mAdef_publicwrite))
       sts = XNAV__NOTAUTHORIZED;
-    if (!((xnav->priv & pwr_mPrv_RtRead) || (xnav->priv & pwr_mPrv_RtWrite)
-            || (xnav->priv & pwr_mPrv_System)
-            || (xnav->priv & pwr_mPrv_Maintenance)
-            || (xnav->priv & pwr_mPrv_Process)
-            || (xnav->priv & pwr_mPrv_Instrument)
-            || (xnav->priv & pwr_mPrv_Operator1)
-            || (xnav->priv & pwr_mPrv_Operator2)
-            || (xnav->priv & pwr_mPrv_Operator3)
-            || (xnav->priv & pwr_mPrv_Operator4)
-            || (xnav->priv & pwr_mPrv_Operator5)
-            || (xnav->priv & pwr_mPrv_Operator6)
-            || (xnav->priv & pwr_mPrv_Operator7)
-            || (xnav->priv & pwr_mPrv_Operator8)
-            || (xnav->priv & pwr_mPrv_Operator9)
-            || (xnav->priv & pwr_mPrv_Operator10)))
+    if (!((xnav->priv & pwr_mPrv_RtRead) || (xnav->priv & pwr_mPrv_RtWrite) ||
+          (xnav->priv & pwr_mPrv_System) || (xnav->priv & pwr_mPrv_Maintenance) ||
+          (xnav->priv & pwr_mPrv_Process) || (xnav->priv & pwr_mPrv_Instrument) ||
+          (xnav->priv & pwr_mPrv_Operator1) || (xnav->priv & pwr_mPrv_Operator2) ||
+          (xnav->priv & pwr_mPrv_Operator3) || (xnav->priv & pwr_mPrv_Operator4) ||
+          (xnav->priv & pwr_mPrv_Operator5) || (xnav->priv & pwr_mPrv_Operator6) ||
+          (xnav->priv & pwr_mPrv_Operator7) || (xnav->priv & pwr_mPrv_Operator8) ||
+          (xnav->priv & pwr_mPrv_Operator9) || (xnav->priv & pwr_mPrv_Operator10)))
       sts = XNAV__NOTAUTHORIZED;
-  } else {
+  }
+  else
+  {
     if (!((xnav->priv & pwr_mPrv_RtWrite) || (xnav->priv & pwr_mPrv_System)))
       sts = XNAV__NOTAUTHORIZED;
   }
 
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     *return_int = sts;
     *return_decl = CCM_DECL_INT;
     return 1;
   }
 
-  sts = gdh_GetAttributeCharAttrref(
-      &attrref, &attr_type, &attr_size, &attr_offset, &attr_dim);
+  sts = gdh_GetAttributeCharAttrref(&attrref, &attr_type, &attr_size, &attr_offset, &attr_dim);
   if (EVEN(sts))
     return sts;
 
-  switch (arg_p2->value_decl) {
-  case CCM_DECL_STRING: {
+  switch (arg_p2->value_decl)
+  {
+  case CCM_DECL_STRING:
+  {
     char buffer[512];
 
-    sts = xnav->attr_string_to_value(
-        attr_type, arg_p2->value_string, buffer, sizeof(buffer), attr_size);
+    sts = xnav->attr_string_to_value(attr_type, arg_p2->value_string, buffer, sizeof(buffer), attr_size);
     if (ODD(sts))
       sts = gdh_SetObjectInfo(arg_list->value_string, buffer, attr_size);
     break;
   }
-  case CCM_DECL_INT: {
-    switch (attr_type) {
-    case pwr_eType_Int8: {
+  case CCM_DECL_INT:
+  {
+    switch (attr_type)
+    {
+    case pwr_eType_Int8:
+    {
       pwr_tInt8 val = arg_p2->value_int;
       sts = gdh_SetObjectInfo(arg_list->value_string, &val, attr_size);
       break;
     }
-    case pwr_eType_Int16: {
+    case pwr_eType_Int16:
+    {
       pwr_tInt16 val = arg_p2->value_int;
       sts = gdh_SetObjectInfo(arg_list->value_string, &val, attr_size);
       break;
     }
-    case pwr_eType_Int32: {
+    case pwr_eType_Int32:
+    {
       pwr_tInt32 val = arg_p2->value_int;
       sts = gdh_SetObjectInfo(arg_list->value_string, &val, attr_size);
       break;
     }
-    case pwr_eType_Int64: {
+    case pwr_eType_Int64:
+    {
       pwr_tInt64 val = arg_p2->value_int;
       sts = gdh_SetObjectInfo(arg_list->value_string, &val, attr_size);
       break;
     }
-    case pwr_eType_UInt8: {
+    case pwr_eType_UInt8:
+    {
       pwr_tUInt8 val = arg_p2->value_int;
       sts = gdh_SetObjectInfo(arg_list->value_string, &val, attr_size);
       break;
     }
-    case pwr_eType_UInt16: {
+    case pwr_eType_UInt16:
+    {
       pwr_tUInt16 val = arg_p2->value_int;
       sts = gdh_SetObjectInfo(arg_list->value_string, &val, attr_size);
       break;
     }
-    case pwr_eType_UInt32: {
+    case pwr_eType_UInt32:
+    {
       pwr_tUInt32 val = arg_p2->value_int;
       sts = gdh_SetObjectInfo(arg_list->value_string, &val, attr_size);
       break;
     }
-    case pwr_eType_UInt64: {
+    case pwr_eType_UInt64:
+    {
       pwr_tUInt64 val = arg_p2->value_int;
       sts = gdh_SetObjectInfo(arg_list->value_string, &val, attr_size);
       break;
     }
-    case pwr_eType_Float32: {
+    case pwr_eType_Float32:
+    {
       pwr_tFloat32 val = arg_p2->value_int;
       sts = gdh_SetObjectInfo(arg_list->value_string, &val, attr_size);
       break;
     }
-    case pwr_eType_Float64: {
+    case pwr_eType_Float64:
+    {
       pwr_tFloat64 val = arg_p2->value_int;
       sts = gdh_SetObjectInfo(arg_list->value_string, &val, attr_size);
       break;
     }
-    case pwr_eType_Boolean: {
+    case pwr_eType_Boolean:
+    {
       pwr_tBoolean val = arg_p2->value_int ? 1 : 0;
       sts = gdh_SetObjectInfo(arg_list->value_string, &val, attr_size);
       break;
@@ -8926,59 +10223,72 @@ static int xnav_setattribute_func(void* filectx, ccm_sArg* arg_list,
     }
     break;
   }
-  case CCM_DECL_FLOAT: {
-    switch (attr_type) {
-    case pwr_eType_Int8: {
+  case CCM_DECL_FLOAT:
+  {
+    switch (attr_type)
+    {
+    case pwr_eType_Int8:
+    {
       pwr_tInt8 val = arg_p2->value_float;
       sts = gdh_SetObjectInfo(arg_list->value_string, &val, attr_size);
       break;
     }
-    case pwr_eType_Int16: {
+    case pwr_eType_Int16:
+    {
       pwr_tInt16 val = arg_p2->value_float;
       sts = gdh_SetObjectInfo(arg_list->value_string, &val, attr_size);
       break;
     }
-    case pwr_eType_Int32: {
+    case pwr_eType_Int32:
+    {
       pwr_tInt32 val = arg_p2->value_float;
       sts = gdh_SetObjectInfo(arg_list->value_string, &val, attr_size);
       break;
     }
-    case pwr_eType_Int64: {
+    case pwr_eType_Int64:
+    {
       pwr_tInt64 val = arg_p2->value_float;
       sts = gdh_SetObjectInfo(arg_list->value_string, &val, attr_size);
       break;
     }
-    case pwr_eType_UInt8: {
+    case pwr_eType_UInt8:
+    {
       pwr_tUInt8 val = arg_p2->value_float;
       sts = gdh_SetObjectInfo(arg_list->value_string, &val, attr_size);
       break;
     }
-    case pwr_eType_UInt16: {
+    case pwr_eType_UInt16:
+    {
       pwr_tUInt16 val = arg_p2->value_float;
       sts = gdh_SetObjectInfo(arg_list->value_string, &val, attr_size);
       break;
     }
-    case pwr_eType_UInt32: {
+    case pwr_eType_UInt32:
+    {
       pwr_tUInt32 val = arg_p2->value_float;
       sts = gdh_SetObjectInfo(arg_list->value_string, &val, attr_size);
       break;
     }
-    case pwr_eType_UInt64: {
+    case pwr_eType_UInt64:
+    {
       pwr_tUInt64 val = arg_p2->value_float;
       sts = gdh_SetObjectInfo(arg_list->value_string, &val, attr_size);
       break;
     }
-    case pwr_eType_Float32: {
+    case pwr_eType_Float32:
+    {
       pwr_tFloat32 val = arg_p2->value_float;
       sts = gdh_SetObjectInfo(arg_list->value_string, &val, attr_size);
       break;
     }
-    case pwr_eType_Float64: {
+    case pwr_eType_Float64:
+    {
       pwr_tFloat64 val = arg_p2->value_float;
       sts = gdh_SetObjectInfo(arg_list->value_string, &val, attr_size);
       break;
     }
-    case pwr_eType_Boolean: {
+    case pwr_eType_Boolean:
+    {
       pwr_tBoolean val = arg_p2->value_float ? 1 : 0;
       sts = gdh_SetObjectInfo(arg_list->value_string, &val, attr_size);
       break;
@@ -8994,9 +10304,8 @@ static int xnav_setattribute_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int xnav_getuser_func(void* filectx, ccm_sArg* arg_list, int arg_count,
-    int* return_decl, ccm_tFloat* return_float, ccm_tInt* return_int,
-    char* return_string)
+static int xnav_getuser_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                             ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   XNav* xnav;
 
@@ -9011,9 +10320,8 @@ static int xnav_getuser_func(void* filectx, ccm_sArg* arg_list, int arg_count,
   return 1;
 }
 
-static int xnav_getprivileges_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int xnav_getprivileges_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                   ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   XNav* xnav;
 
@@ -9028,9 +10336,8 @@ static int xnav_getprivileges_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int xnav_getgraphinstance_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int xnav_getgraphinstance_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                      ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   XNav* xnav;
   XttGe* gectx;
@@ -9044,11 +10351,13 @@ static int xnav_getgraphinstance_func(void* filectx, ccm_sArg* arg_list,
 
   xnav_get_stored_xnav(&xnav);
 
-  if (xnav->appl.find_graph_first(arg_list->value_string, (void**)&gectx)) {
+  if (xnav->appl.find_graph_first(arg_list->value_string, (void**)&gectx))
+  {
     sts = gectx->get_object_name(0, sizeof(ccm_tString), return_string);
     if (EVEN(sts))
       strcpy(return_string, "");
-  } else
+  }
+  else
     strcpy(return_string, "");
 
   *return_decl = CCM_DECL_STRING;
@@ -9056,9 +10365,8 @@ static int xnav_getgraphinstance_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int xnav_getgraphinstancenext_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int xnav_getgraphinstancenext_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                          ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   XNav* xnav;
   XttGe* gectx;
@@ -9078,12 +10386,13 @@ static int xnav_getgraphinstancenext_func(void* filectx, ccm_sArg* arg_list,
 
   xnav_get_stored_xnav(&xnav);
 
-  if (xnav->appl.find_graph_next(
-          arg_list->value_string, arg_p2->value_string, (void**)&gectx)) {
+  if (xnav->appl.find_graph_next(arg_list->value_string, arg_p2->value_string, (void**)&gectx))
+  {
     sts = gectx->get_object_name(0, sizeof(ccm_tString), return_string);
     if (EVEN(sts))
       strcpy(return_string, "");
-  } else
+  }
+  else
     strcpy(return_string, "");
 
   *return_decl = CCM_DECL_STRING;
@@ -9091,9 +10400,8 @@ static int xnav_getgraphinstancenext_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int xnav_setsubwindow_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+static int xnav_setsubwindow_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                                  ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   XNav* xnav;
   XttGe* gectx;
@@ -9103,7 +10411,7 @@ static int xnav_setsubwindow_func(void* filectx, ccm_sArg* arg_list,
   pwr_tOName graph_str;
   char name_str[80];
   char object_str[800];
-  char *object_p = 0;
+  char* object_p = 0;
   pwr_tOName source_str;
   int self = 0;
 
@@ -9122,26 +10430,29 @@ static int xnav_setsubwindow_func(void* filectx, ccm_sArg* arg_list,
   if (arg_p3->value_decl != CCM_DECL_STRING)
     return CCM__ARGMISM;
 
-  if (arg_count > 3) {
+  if (arg_count > 3)
+  {
     arg_p4 = arg_p3->next;
     if (arg_p4->value_decl != CCM_DECL_STRING)
       return CCM__ARGMISM;
-    if (strcmp(arg_p4->value_string, "") != 0) {
-      strncpy(object_str, arg_p4->value_string, sizeof(object_str)-1);
+    if (strcmp(arg_p4->value_string, "") != 0)
+    {
+      strncpy(object_str, arg_p4->value_string, sizeof(object_str) - 1);
       object_p = object_str;
     }
   }
-  
-  if (arg_count > 4) {
+
+  if (arg_count > 4)
+  {
     arg_p5 = arg_p4->next;
     if (arg_p5->value_decl != CCM_DECL_INT)
       return CCM__ARGMISM;
-    self = arg_p5->value_int; 
+    self = arg_p5->value_int;
   }
-  
-  strncpy(graph_str, arg_list->value_string, sizeof(graph_str)-1);
-  strncpy(name_str, arg_p2->value_string, sizeof(name_str)-1);
-  strncpy(source_str, arg_p3->value_string, sizeof(source_str)-1);
+
+  strncpy(graph_str, arg_list->value_string, sizeof(graph_str) - 1);
+  strncpy(name_str, arg_p2->value_string, sizeof(name_str) - 1);
+  strncpy(source_str, arg_p3->value_string, sizeof(source_str) - 1);
   if (strcmp(object_str, "") == 0)
     object_p = 0;
   else
@@ -9149,11 +10460,13 @@ static int xnav_setsubwindow_func(void* filectx, ccm_sArg* arg_list,
 
   xnav_get_stored_xnav(&xnav);
 
-  if (str_NoCaseStrcmp(graph_str, "$current") == 0 && xnav->current_cmd_ctx) {
+  if (str_NoCaseStrcmp(graph_str, "$current") == 0 && xnav->current_cmd_ctx)
+  {
     gectx = (XttGe*)xnav->current_cmd_ctx;
     sts = gectx->set_subwindow_source(name_str, source_str, object_p);
-    if (self) {
-      *return_int = GLOW__SUBTERMINATED;      
+    if (self)
+    {
+      *return_int = GLOW__SUBTERMINATED;
       *return_decl = CCM_DECL_INT;
       return CCM__EXITFUNC;
     }
@@ -9164,14 +10477,18 @@ static int xnav_setsubwindow_func(void* filectx, ccm_sArg* arg_list,
       gectx->set_object_focus(focus, inputempty);
     }
 #endif
-  } else if (xnav->appl.find_graph(graph_str, 0, (void**)&gectx)) {
-    if (streq(source_str, "")) {
+  }
+  else if (xnav->appl.find_graph(graph_str, 0, (void**)&gectx))
+  {
+    if (streq(source_str, ""))
+    {
       xnav->message('E', "Syntax error");
       return XNAV__HOLDCOMMAND;
     }
     sts = gectx->set_subwindow_source(name_str, source_str, object_p);
-    if (self) {
-      *return_int = GLOW__SUBTERMINATED;      
+    if (self)
+    {
+      *return_int = GLOW__SUBTERMINATED;
       *return_decl = CCM_DECL_INT;
       return CCM__EXITFUNC;
     }
@@ -9182,10 +10499,12 @@ static int xnav_setsubwindow_func(void* filectx, ccm_sArg* arg_list,
       gectx->set_object_focus(focus, inputempty);
     }
 #endif
-  } else {
+  }
+  else
+  {
     pwr_tStatus sts;
     pwr_tAttrRef aref;
-    double borders[4] = { 0, 0, 0, 0 };
+    double borders[4] = {0, 0, 0, 0};
     double* bordersp = borders;
     int cont = 0;
 
@@ -9194,10 +10513,9 @@ static int xnav_setsubwindow_func(void* filectx, ccm_sArg* arg_list,
     bordersp = 0;
 
     sts = gdh_NameToAttrref(pwr_cNObjid, graph_str, &aref);
-    if (ODD(sts)
-	&& xnav->appl.find(applist_eType_MultiView, &aref, (void**)&mvctx)) {
-      return mvctx->set_subwindow_source(
-	  name_str, source_str, object_p, bordersp, cont);
+    if (ODD(sts) && xnav->appl.find(applist_eType_MultiView, &aref, (void**)&mvctx))
+    {
+      return mvctx->set_subwindow_source(name_str, source_str, object_p, bordersp, cont);
     }
   }
   *return_int = sts;
@@ -9205,16 +10523,14 @@ static int xnav_setsubwindow_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int xnav_quit_func(void* filectx, ccm_sArg* arg_list, int arg_count,
-    int* return_decl, ccm_tFloat* return_float, ccm_tInt* return_int,
-    char* return_string)
+static int xnav_quit_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                          ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   exit(0);
 }
 
-static int xnav_sleep_func(void* filectx, ccm_sArg* arg_list, int arg_count,
-    int* return_decl, ccm_tFloat* return_float, ccm_tInt* return_int,
-    char* return_string)
+static int xnav_sleep_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                           ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   XNav* xnav;
 
@@ -9229,8 +10545,7 @@ static int xnav_sleep_func(void* filectx, ccm_sArg* arg_list, int arg_count,
   return 1;
 }
 
-static int xnav_ccm_deffilename_func(
-    char* outfile, char* infile, void* client_data)
+static int xnav_ccm_deffilename_func(char* outfile, char* infile, void* client_data)
 {
   pwr_tFileName fname;
 
@@ -9239,12 +10554,12 @@ static int xnav_ccm_deffilename_func(
   return 1;
 }
 
-static int xnav_ccm_errormessage_func(
-    char* msg, int severity, void* client_data)
+static int xnav_ccm_errormessage_func(char* msg, int severity, void* client_data)
 {
   XNav* xnav = (XNav*)client_data;
 
-  switch(severity) {
+  switch (severity)
+  {
   case msg_eSeverity_Info:
   case msg_eSeverity_Success:
     xnav->message('I', msg);
@@ -9268,30 +10583,29 @@ int xnav_externcmd_func(char* cmd, void* client_data)
 }
 
 /*************************************************************************
-*
-* Name:		readcmdfile()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*
-**************************************************************************/
+ *
+ * Name:		readcmdfile()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *
+ **************************************************************************/
 
-int XNav::readcmdfile(char* incommand, char* buffer, char *bufargs)
+int XNav::readcmdfile(char* incommand, char* buffer, char* bufargs)
 {
   char input_str[160];
   int sts = 0;
   int appl_sts = 0;
 
-  if (!ccm_func_registred) {
-    sts = ccm_register_function(
-        "Xtt", "GetCurrentText", xnav_getcurrenttext_func);
+  if (!ccm_func_registred)
+  {
+    sts = ccm_register_function("Xtt", "GetCurrentText", xnav_getcurrenttext_func);
     if (EVEN(sts))
       return sts;
-    sts = ccm_register_function(
-        "Xtt", "GetCurrentObject", xnav_getcurrentobject_func);
+    sts = ccm_register_function("Xtt", "GetCurrentObject", xnav_getcurrentobject_func);
     if (EVEN(sts))
       return sts;
     sts = ccm_register_function("Xtt", "GetChild", xnav_getchild_func);
@@ -9300,8 +10614,7 @@ int XNav::readcmdfile(char* incommand, char* buffer, char *bufargs)
     sts = ccm_register_function("Xtt", "GetParent", xnav_getparent_func);
     if (EVEN(sts))
       return sts;
-    sts = ccm_register_function(
-        "Xtt", "GetNextSibling", xnav_getnextsibling_func);
+    sts = ccm_register_function("Xtt", "GetNextSibling", xnav_getnextsibling_func);
     if (EVEN(sts))
       return sts;
     sts = ccm_register_function("Xtt", "GetClassList", xnav_getclasslist_func);
@@ -9313,20 +10626,16 @@ int XNav::readcmdfile(char* incommand, char* buffer, char *bufargs)
     sts = ccm_register_function("Xtt", "GetRootList", xnav_getrootlist_func);
     if (EVEN(sts))
       return sts;
-    sts = ccm_register_function(
-        "Xtt", "GetNodeObject", xnav_getnodeobject_func);
+    sts = ccm_register_function("Xtt", "GetNodeObject", xnav_getnodeobject_func);
     if (EVEN(sts))
       return sts;
-    sts = ccm_register_function(
-        "Xtt", "GetNextObject", xnav_getnextobject_func);
+    sts = ccm_register_function("Xtt", "GetNextObject", xnav_getnextobject_func);
     if (EVEN(sts))
       return sts;
-    sts = ccm_register_function(
-        "Xtt", "GetNextAttrRef", xnav_getnextattrref_func);
+    sts = ccm_register_function("Xtt", "GetNextAttrRef", xnav_getnextattrref_func);
     if (EVEN(sts))
       return sts;
-    sts = ccm_register_function(
-        "Xtt", "GetObjectClass", xnav_getobjectclass_func);
+    sts = ccm_register_function("Xtt", "GetObjectClass", xnav_getobjectclass_func);
     if (EVEN(sts))
       return sts;
     sts = ccm_register_function("Xtt", "MessageError", xnav_messageerror_func);
@@ -9335,8 +10644,7 @@ int XNav::readcmdfile(char* incommand, char* buffer, char *bufargs)
     sts = ccm_register_function("Xtt", "MessageInfo", xnav_messageinfo_func);
     if (EVEN(sts))
       return sts;
-    sts = ccm_register_function(
-        "Xtt", "CutObjectName", xnav_cutobjectname_func);
+    sts = ccm_register_function("Xtt", "CutObjectName", xnav_cutobjectname_func);
     if (EVEN(sts))
       return sts;
     sts = ccm_register_function("Xtt", "GetAttribute", xnav_getattribute_func);
@@ -9345,31 +10653,25 @@ int XNav::readcmdfile(char* incommand, char* buffer, char *bufargs)
     sts = ccm_register_function("Xtt", "SetAttribute", xnav_setattribute_func);
     if (EVEN(sts))
       return sts;
-    sts = ccm_register_function(
-        "Xtt", "ConfirmDialog", xnav_confirmdialog_func);
+    sts = ccm_register_function("Xtt", "ConfirmDialog", xnav_confirmdialog_func);
     if (EVEN(sts))
       return sts;
-    sts = ccm_register_function(
-        "Xtt", "TextDialog", xnav_textdialog_func);
+    sts = ccm_register_function("Xtt", "TextDialog", xnav_textdialog_func);
     if (EVEN(sts))
       return sts;
     sts = ccm_register_function("Xtt", "GetUser", xnav_getuser_func);
     if (EVEN(sts))
       return sts;
-    sts = ccm_register_function(
-        "Xtt", "GetPrivileges", xnav_getprivileges_func);
+    sts = ccm_register_function("Xtt", "GetPrivileges", xnav_getprivileges_func);
     if (EVEN(sts))
       return sts;
-    sts = ccm_register_function(
-        "Xtt", "GetGraphInstance", xnav_getgraphinstance_func);
+    sts = ccm_register_function("Xtt", "GetGraphInstance", xnav_getgraphinstance_func);
     if (EVEN(sts))
       return sts;
-    sts = ccm_register_function(
-        "Xtt", "GetGraphInstanceNext", xnav_getgraphinstancenext_func);
+    sts = ccm_register_function("Xtt", "GetGraphInstanceNext", xnav_getgraphinstancenext_func);
     if (EVEN(sts))
       return sts;
-    sts = ccm_register_function(
-        "Xtt", "SetSubwindow", xnav_setsubwindow_func);
+    sts = ccm_register_function("Xtt", "SetSubwindow", xnav_setsubwindow_func);
     if (EVEN(sts))
       return sts;
     sts = ccm_register_function("Xtt", "Quit", xnav_quit_func);
@@ -9379,29 +10681,29 @@ int XNav::readcmdfile(char* incommand, char* buffer, char *bufargs)
     if (EVEN(sts))
       return sts;
 
-    sts = ccm_create_external_var(
-        "GLOW__SUBTERMINATED", CCM_DECL_INT, 0, GLOW__SUBTERMINATED, 0);
+    sts = ccm_create_external_var("GLOW__SUBTERMINATED", CCM_DECL_INT, 0, GLOW__SUBTERMINATED, 0);
 
     ccm_func_registred = 1;
   }
 
-  if (incommand) {
+  if (incommand)
+  {
     strcpy(input_str, incommand);
     str_trim(input_str, input_str);
     xnav_store_xnav(this);
 
     /* Read and execute the command file */
-    sts = ccm_file_exec(input_str, xnav_externcmd_func,
-        xnav_ccm_deffilename_func, xnav_ccm_errormessage_func, &appl_sts,
-        verify, 0, NULL, 0, 0, NULL, (void*)this);
+    sts = ccm_file_exec(input_str, xnav_externcmd_func, xnav_ccm_deffilename_func, xnav_ccm_errormessage_func,
+                        &appl_sts, verify, 0, NULL, 0, 0, NULL, (void*)this);
     if (EVEN(sts))
       return sts;
-  } else if (buffer) {
+  }
+  else if (buffer)
+  {
     /* Execute the buffer */
     xnav_store_xnav(this);
-    sts = ccm_buffer_exec(buffer, bufargs, xnav_externcmd_func,
-        xnav_ccm_deffilename_func, xnav_ccm_errormessage_func, &appl_sts, 
-	verify, 0, NULL, 0, NULL, (void*)this);
+    sts = ccm_buffer_exec(buffer, bufargs, xnav_externcmd_func, xnav_ccm_deffilename_func,
+                          xnav_ccm_errormessage_func, &appl_sts, verify, 0, NULL, 0, NULL, (void*)this);
     if (EVEN(sts))
       return sts;
   }
@@ -9416,21 +10718,25 @@ int xnav_cut_segments(char* outname, char* name, int segments)
   char* s[20];
   int i, j, last_i = 0;
 
-  if (segments == 0) {
+  if (segments == 0)
+  {
     strcpy(outname, "");
     return 1;
   }
-      
-  for (i = 0; i < segments; i++) {
+
+  for (i = 0; i < segments; i++)
+  {
     s[i] = strrchr(name, '-');
-    if (s[i] == 0) {
+    if (s[i] == 0)
+    {
       last_i = i;
       break;
     }
     *s[i] = '+';
     last_i = i;
   }
-  for (j = 0; j <= last_i; j++) {
+  for (j = 0; j <= last_i; j++)
+  {
     if (s[j] != 0)
       *s[j] = '-';
   }
@@ -9443,19 +10749,19 @@ int xnav_cut_segments(char* outname, char* name, int segments)
 }
 
 /*************************************************************************
-*
-* Name:		xnav_attribute_func()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*		Backcall function for ccm.
-*
-**************************************************************************/
-static int xnav_attribute_func(char* name, int* return_decl,
-    ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
+ *
+ * Name:		xnav_attribute_func()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *		Backcall function for ccm.
+ *
+ **************************************************************************/
+static int xnav_attribute_func(char* name, int* return_decl, ccm_tFloat* return_float, ccm_tInt* return_int,
+                               char* return_string)
 {
   int sts;
   char object_par[80];
@@ -9473,8 +10779,7 @@ static int xnav_attribute_func(char* name, int* return_decl,
     return sts;
 
   /* Get type of attribute */
-  sts = gdh_GetAttributeCharacteristics(
-      name, &attrtype, &attrsize, &attroffs, &attrelem);
+  sts = gdh_GetAttributeCharacteristics(name, &attrtype, &attrsize, &attroffs, &attrelem);
   if (EVEN(sts))
     return sts;
 
@@ -9485,54 +10790,65 @@ static int xnav_attribute_func(char* name, int* return_decl,
 
   object_element = object_par;
 
-  switch (attrtype) {
-  case pwr_eType_Boolean: {
+  switch (attrtype)
+  {
+  case pwr_eType_Boolean:
+  {
     int_val = *(pwr_tBoolean*)object_element;
     decl = CCM_DECL_INT;
     break;
   }
-  case pwr_eType_Float32: {
+  case pwr_eType_Float32:
+  {
     float_val = *(pwr_tFloat32*)object_element;
     decl = CCM_DECL_FLOAT;
     break;
   }
-  case pwr_eType_Float64: {
+  case pwr_eType_Float64:
+  {
     float_val = *(pwr_tFloat64*)object_element;
     decl = CCM_DECL_FLOAT;
     break;
   }
-  case pwr_eType_Char: {
+  case pwr_eType_Char:
+  {
     int_val = *(pwr_tChar*)object_element;
     decl = CCM_DECL_INT;
     break;
   }
-  case pwr_eType_Int8: {
+  case pwr_eType_Int8:
+  {
     int_val = *(pwr_tInt8*)object_element;
     decl = CCM_DECL_INT;
     break;
   }
-  case pwr_eType_Int16: {
+  case pwr_eType_Int16:
+  {
     int_val = *(pwr_tInt16*)object_element;
     decl = CCM_DECL_INT;
     break;
   }
   case pwr_eType_Int32:
-  case pwr_eType_Enum: {
+  case pwr_eType_Enum:
+  {
     int_val = *(pwr_tInt32*)object_element;
     decl = CCM_DECL_INT;
     break;
   }
-  case pwr_eType_Int64: {
+  case pwr_eType_Int64:
+  {
     int_val = *(pwr_tInt64*)object_element;
     decl = CCM_DECL_INT;
     break;
   }
-  case pwr_eType_UInt8: {
+  case pwr_eType_UInt8:
+  {
     int_val = *(pwr_tUInt8*)object_element;
     decl = CCM_DECL_INT;
     break;
   }
-  case pwr_eType_UInt16: {
+  case pwr_eType_UInt16:
+  {
     int_val = *(pwr_tUInt16*)object_element;
     decl = CCM_DECL_INT;
     break;
@@ -9545,34 +10861,38 @@ static int xnav_attribute_func(char* name, int* return_decl,
   case pwr_eType_ObjectIx:
   case pwr_eType_Status:
   case pwr_eType_NetStatus:
-  case pwr_eType_Mask: {
+  case pwr_eType_Mask:
+  {
     int_val = *(pwr_tUInt32*)object_element;
     decl = CCM_DECL_INT;
     break;
   }
-  case pwr_eType_UInt64: {
+  case pwr_eType_UInt64:
+  {
     int_val = *(pwr_tUInt64*)object_element;
     decl = CCM_DECL_INT;
     break;
   }
-  case pwr_eType_String: {
+  case pwr_eType_String:
+  {
     strncpy(string_val, object_element, sizeof(string_val));
     string_val[sizeof(string_val) - 1] = 0;
     decl = CCM_DECL_STRING;
     break;
   }
-  case pwr_eType_Text: {
+  case pwr_eType_Text:
+  {
     strncpy(string_val, object_element, sizeof(string_val));
     string_val[sizeof(string_val) - 1] = 0;
     decl = CCM_DECL_STRING;
     break;
   }
-  case pwr_eType_Objid: {
+  case pwr_eType_Objid:
+  {
     pwr_tOName hier_name;
 
     /* Get the object name from ldh */
-    sts = gdh_ObjidToName(*(pwr_tObjid*)object_element, hier_name,
-        sizeof(hier_name), cdh_mName_volumeStrict);
+    sts = gdh_ObjidToName(*(pwr_tObjid*)object_element, hier_name, sizeof(hier_name), cdh_mName_volumeStrict);
     if (EVEN(sts))
       strcpy(string_val, "Undefined Object");
     else
@@ -9581,12 +10901,13 @@ static int xnav_attribute_func(char* name, int* return_decl,
     decl = CCM_DECL_STRING;
     break;
   }
-  case pwr_eType_AttrRef: {
+  case pwr_eType_AttrRef:
+  {
     pwr_tAName hier_name;
 
     /* Get the object name from ldh */
-    sts = gdh_AttrrefToName((pwr_sAttrRef*)object_element, hier_name,
-        sizeof(hier_name), cdh_mName_volumeStrict);
+    sts = gdh_AttrrefToName((pwr_sAttrRef*)object_element, hier_name, sizeof(hier_name),
+                            cdh_mName_volumeStrict);
     if (EVEN(sts))
       strcpy(string_val, "Undefined attribute");
     else
@@ -9595,18 +10916,18 @@ static int xnav_attribute_func(char* name, int* return_decl,
     decl = CCM_DECL_STRING;
     break;
   }
-  case pwr_eType_Time: {
+  case pwr_eType_Time:
+  {
     /* Convert time to ascii */
-    sts = time_AtoAscii((pwr_tTime*)object_element, time_eFormat_DateAndTime,
-        string_val, sizeof(string_val));
+    sts = time_AtoAscii((pwr_tTime*)object_element, time_eFormat_DateAndTime, string_val, sizeof(string_val));
     string_val[20] = 0;
     decl = CCM_DECL_STRING;
     break;
   }
-  case pwr_eType_DeltaTime: {
+  case pwr_eType_DeltaTime:
+  {
     /* Convert time to ascii */
-    sts = time_DtoAscii((pwr_tDeltaTime*)object_element, 1,
-        string_val, sizeof(string_val));
+    sts = time_DtoAscii((pwr_tDeltaTime*)object_element, 1, string_val, sizeof(string_val));
     decl = CCM_DECL_STRING;
     break;
   }
@@ -9623,23 +10944,22 @@ static int xnav_attribute_func(char* name, int* return_decl,
   return DCLI__SUCCESS;
 }
 
-int XNav::get_current_object(
-    pwr_tObjid* objid, char* objectname, int size, pwr_tBitMask nametype)
+int XNav::get_current_object(pwr_tObjid* objid, char* objectname, int size, pwr_tBitMask nametype)
 {
   int sts;
   pwr_sAttrRef attrref;
   int is_attr;
 
   sts = get_select(&attrref, &is_attr);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     *objid = attrref.Objid;
     sts = gdh_ObjidToName(attrref.Objid, objectname, size, nametype);
   }
   return sts;
 }
 
-int XNav::get_current_aref(
-    pwr_sAttrRef* arp, char* arname, int size, pwr_tBitMask nametype)
+int XNav::get_current_aref(pwr_sAttrRef* arp, char* arname, int size, pwr_tBitMask nametype)
 {
   int sts;
   int is_attr;
@@ -9651,17 +10971,17 @@ int XNav::get_current_aref(
   return sts;
 }
 /*************************************************************************
-*
-* Name:		show_file()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Displays all files with matching a wilcard specification.
-*
-**************************************************************************/
+ *
+ * Name:		show_file()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Displays all files with matching a wilcard specification.
+ *
+ **************************************************************************/
 
 int XNav::show_file(char* filename, char* intitle, int hide_dir)
 {
@@ -9686,11 +11006,13 @@ int XNav::show_file(char* filename, char* intitle, int hide_dir)
     return sts;
 
   dcli_parse_filename(found_file, dev, dir, file, type, &version);
-  if (hide_dir) {
+  if (hide_dir)
+  {
     strcpy(text, file);
     // str_ToLower( text, text);
     // text[0] = toupper( text[0]);
-  } else
+  }
+  else
     strcpy(text, found_file);
   // str_ToUpper( type, type);
   if (streq(type, ".rtt_com"))
@@ -9710,15 +11032,19 @@ int XNav::show_file(char* filename, char* intitle, int hide_dir)
   xnav_file fi(text, found_file, file_type);
   filelist.push_back(fi);
 
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     sts = dcli_search_file(file_spec, found_file, DCLI_DIR_SEARCH_NEXT);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       dcli_parse_filename(found_file, dev, dir, file, type, &version);
-      if (hide_dir) {
+      if (hide_dir)
+      {
         strcpy(text, file);
         // str_ToLower( text, text);
         // text[0] = toupper( text[0]);
-      } else
+      }
+      else
         strcpy(text, found_file);
       // str_ToUpper( type, type);
       if (streq(type, ".rtt_com"))
@@ -9739,9 +11065,12 @@ int XNav::show_file(char* filename, char* intitle, int hide_dir)
   dcli_search_file(filename, found_file, DCLI_DIR_SEARCH_END);
 
   // Sort
-  for (unsigned int i = filelist.size() - 1; i > 0; i--) {
-    for (unsigned int j = 0; j < i; j++) {
-      if (!(filelist[j] < filelist[j + 1])) {
+  for (unsigned int i = filelist.size() - 1; i > 0; i--)
+  {
+    for (unsigned int j = 0; j < i; j++)
+    {
+      if (!(filelist[j] < filelist[j + 1]))
+      {
         xnav_file fi = filelist[j + 1];
         filelist[j + 1] = filelist[j];
         filelist[j] = fi;
@@ -9750,8 +11079,8 @@ int XNav::show_file(char* filename, char* intitle, int hide_dir)
   }
 
   for (unsigned int i = 0; i < filelist.size(); i++)
-    new ItemFile(brow, "", filelist[i].m_text, filelist[i].m_file,
-        filelist[i].m_file_type, NULL, flow_eDest_IntoLast);
+    new ItemFile(brow, "", filelist[i].m_text, filelist[i].m_file, filelist[i].m_file_type, NULL,
+                 flow_eDest_IntoLast);
 
   brow_ResetNodraw(brow->ctx);
   brow_Redraw(brow->ctx, 0);
@@ -9769,29 +11098,29 @@ void XNav::update_time()
 }
 
 /*************************************************************************
-*
-* Name:		rtt_show_par_hier_class_name()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* char		*parametername	I	name of parameter.
-* char		*hiername	I	name of hierarchy object.
-* char		*classname	I	name of class.
-* char		*name		I	name description.
-* int		add		I	if added to existing menulist or
-*					createing a new menu.
-*
-* Description:
-*	This function is called when a 'show parameter' command is recieved.
-*	All object under the hierarchy object, with the specified class
-*	that fits in the name description is inserted in a menulist
-*	and displayed on the screen.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_show_par_hier_class_name()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * char		*parametername	I	name of parameter.
+ * char		*hiername	I	name of hierarchy object.
+ * char		*classname	I	name of class.
+ * char		*name		I	name description.
+ * int		add		I	if added to existing menulist or
+ *					createing a new menu.
+ *
+ * Description:
+ *	This function is called when a 'show parameter' command is recieved.
+ *	All object under the hierarchy object, with the specified class
+ *	that fits in the name description is inserted in a menulist
+ *	and displayed on the screen.
+ *
+ **************************************************************************/
 
-int XNav::show_par_hier_class_name(char* parametername, char* hiername,
-    char* classname, char* namep, int add, int global, int max_objects)
+int XNav::show_par_hier_class_name(char* parametername, char* hiername, char* classname, char* namep, int add,
+                                   int global, int max_objects)
 {
   ItemCollect* item;
   int sts;
@@ -9807,7 +11136,8 @@ int XNav::show_par_hier_class_name(char* parametername, char* hiername,
   unsigned int a_flags = 0;
   pwr_tAName name;
 
-  if (!namep) {
+  if (!namep)
+  {
     message('E', "Syntax error");
     return XNAV__HOLDCOMMAND;
   }
@@ -9815,7 +11145,8 @@ int XNav::show_par_hier_class_name(char* parametername, char* hiername,
   if (add != XNAV_MENU_ADD)
     brow_pop();
 
-  try {
+  try
+  {
     pwr_tAttrRef aref;
     sts = gdh_NameToAttrref(pwr_cNObjid, namep, &aref);
     if (EVEN(sts))
@@ -9825,13 +11156,13 @@ int XNav::show_par_hier_class_name(char* parametername, char* hiername,
     if (EVEN(sts))
       return sts;
 
-    if (!aref.Flags.b.Object && !aref.Flags.b.ObjectAttr) {
+    if (!aref.Flags.b.Object && !aref.Flags.b.ObjectAttr)
+    {
       if ((s = strchr(name, '.')) == 0)
         return 0;
       strcpy(attr, s + 1);
 
-      sts = gdh_GetAttributeCharAttrref(
-          &aref, &a_type_id, &a_size, &a_offset, &a_dim);
+      sts = gdh_GetAttributeCharAttrref(&aref, &a_type_id, &a_size, &a_offset, &a_dim);
       if (EVEN(sts))
         return sts;
 
@@ -9842,7 +11173,9 @@ int XNav::show_par_hier_class_name(char* parametername, char* hiername,
       sts = gdh_GetAttrRefTid(&aref, &a_tid);
       if (EVEN(sts))
         return sts;
-    } else {
+    }
+    else
+    {
       sts = get_trace_attr(&aref, attr);
       if (EVEN(sts))
         return sts;
@@ -9855,8 +11188,7 @@ int XNav::show_par_hier_class_name(char* parametername, char* hiername,
 
       strcpy(attr, strchr(obj_name, '.') + 1);
 
-      sts = gdh_GetAttributeCharAttrref(
-          &ar, &a_type_id, &a_size, &a_offset, &a_dim);
+      sts = gdh_GetAttributeCharAttrref(&ar, &a_type_id, &a_size, &a_offset, &a_dim);
       if (EVEN(sts))
         return sts;
 
@@ -9869,9 +11201,11 @@ int XNav::show_par_hier_class_name(char* parametername, char* hiername,
         return sts;
     }
 
-    item = new ItemCollect(brow, aref.Objid, attr, NULL, flow_eDest_IntoLast,
-        a_type_id, a_tid, a_size, a_flags, 0);
-  } catch (co_error& e) {
+    item = new ItemCollect(brow, aref.Objid, attr, NULL, flow_eDest_IntoLast, a_type_id, a_tid, a_size,
+                           a_flags, 0);
+  }
+  catch (co_error& e)
+  {
     brow_push_all();
     brow_Redraw(brow->ctx, 0);
     message('E', (char*)e.what().c_str());
@@ -9903,7 +11237,8 @@ int XNav::store(char* filename, int collect)
 
   /* Open the file */
   outfile = fopen(filename_str, "w");
-  if (outfile == 0) {
+  if (outfile == 0)
+  {
     char tmp[280];
     snprintf(tmp, sizeof(tmp), "Unable to open file \"%s\"", filename_str);
     message('E', tmp);
@@ -9917,16 +11252,22 @@ int XNav::store(char* filename, int collect)
     brow_GetObjectList(brow->ctx, &node_list, &node_count);
 
   first = 1;
-  for (i = 0; i < node_count; i++) {
+  for (i = 0; i < node_count; i++)
+  {
     brow_GetUserData(node_list[i], (void**)&item);
-    if (first) {
-      if (collect) {
+    if (first)
+    {
+      if (collect)
+      {
         fprintf(outfile, "collect clear\n");
         fprintf(outfile, "collect/name=%s\n", item->name);
-      } else
+      }
+      else
         fprintf(outfile, "show parameter/name=%s\n", item->name);
       first = 0;
-    } else {
+    }
+    else
+    {
       if (collect)
         fprintf(outfile, "collect/name=%s\n", item->name);
       else
@@ -9955,45 +11296,46 @@ int XNav::show_symbols()
   char text[410];
 
   i = 0;
-  while (1) {
+  while (1)
+  {
     sts = dcli_get_symbol_by_index(i, key, value);
     if (EVEN(sts))
       break;
 
     sprintf(text, "%s = \"%s\"", key, value);
-    if (i == 0) {
+    if (i == 0)
+    {
       brow_pop();
       brow_SetNodraw(brow->ctx);
       new ItemHeader(brow, "Title", "Symbols", NULL, flow_eDest_IntoLast);
     }
-    new ItemCommand(
-        brow, text, 0, NULL, flow_eDest_IntoLast, key, 0, brow->pixmap_symbol);
+    new ItemCommand(brow, text, 0, NULL, flow_eDest_IntoLast, key, 0, brow->pixmap_symbol);
     i++;
   }
   if (i == 0)
     message('I', "Symboltable is empty");
-  else {
+  else
+  {
     brow_ResetNodraw(brow->ctx);
     brow_Redraw(brow->ctx, 0);
   }
   return XNAV__SUCCESS;
 }
 
-void xnav_popup_menu_cb(void* xnav, pwr_sAttrRef attrref,
-    unsigned long item_type, unsigned long utility, char* arg, int x, int y)
+void xnav_popup_menu_cb(void* xnav, pwr_sAttrRef attrref, unsigned long item_type, unsigned long utility,
+                        char* arg, int x, int y)
 {
   ((XNav*)xnav)
-      ->get_popup_menu(attrref, (xmenu_eItemType)item_type,
-          (xmenu_mUtility)utility, ((XNav*)xnav)->priv, arg, x, y);
+      ->get_popup_menu(attrref, (xmenu_eItemType)item_type, (xmenu_mUtility)utility, ((XNav*)xnav)->priv, arg,
+                       x, y);
 }
 
-int xnav_call_method_cb(void* xnav, const char* method, const char* filter,
-    pwr_sAttrRef attrref, unsigned long item_type, unsigned long utility,
-    char* arg)
+int xnav_call_method_cb(void* xnav, const char* method, const char* filter, pwr_sAttrRef attrref,
+                        unsigned long item_type, unsigned long utility, char* arg)
 {
   return ((XNav*)xnav)
-      ->call_method(method, filter, attrref, (xmenu_eItemType)item_type,
-          (xmenu_mUtility)utility, ((XNav*)xnav)->priv, arg);
+      ->call_method(method, filter, attrref, (xmenu_eItemType)item_type, (xmenu_mUtility)utility,
+                    ((XNav*)xnav)->priv, arg);
 }
 
 void xnav_start_trace_cb(void* xnav, pwr_tObjid objid, char* name)
@@ -10016,10 +11358,12 @@ static void xnav_ev_help_cb(void* ctx, const char* key)
   char objid_str[40];
 
   sts = CoXHelp::dhelp(key, "", navh_eHelpFile_Project, NULL, 0);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     // Try to convert to objid and search for objid as topic
     sts = gdh_NameToObjid(key, &objid);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       cdh_OidToString(objid_str, sizeof(objid_str), objid, 1);
       sts = CoXHelp::dhelp(objid_str, "", navh_eHelpFile_Project, NULL, 0);
     }
@@ -10039,41 +11383,36 @@ static void xnav_ev_display_in_xnav_cb(void* xnav, pwr_sAttrRef* arp)
   ((XNav*)xnav)->pop();
 }
 
-static int xnav_ev_sound_cb(void* xnav, pwr_sAttrRef* arp)
-{
-  return ((XNav*)xnav)->sound(arp);
-}
+static int xnav_ev_sound_cb(void* xnav, pwr_sAttrRef* arp) { return ((XNav*)xnav)->sound(arp); }
 
-static int xnav_ge_sound_cb(void* xnav, pwr_sAttrRef* arp)
-{
-  return ((XNav*)xnav)->sound(arp);
-}
+static int xnav_ge_sound_cb(void* xnav, pwr_sAttrRef* arp) { return ((XNav*)xnav)->sound(arp); }
 
-static void xnav_ge_namechanged_cb(void* xnav, void *gectx, char *name)
+static void xnav_ge_namechanged_cb(void* xnav, void* gectx, char* name)
 {
-  for (ApplListElem* elem = ((XNav *)xnav)->appl.root; elem; elem = elem->next) {
-    if (elem->ctx == gectx) {
+  for (ApplListElem* elem = ((XNav*)xnav)->appl.root; elem; elem = elem->next)
+  {
+    if (elem->ctx == gectx)
+    {
       strcpy(elem->name, name);
       break;
     }
   }
 }
 
-static int xnav_ge_get_select_cb(void* xnav, char* oname, pwr_tTypeId *type)
+static int xnav_ge_get_select_cb(void* xnav, char* oname, pwr_tTypeId* type)
 {
   int sts;
   pwr_tAttrRef aref;
   int is_attrref;
 
-  sts = ((XNav *)xnav)->get_select(&aref, &is_attrref);
+  sts = ((XNav*)xnav)->get_select(&aref, &is_attrref);
   if (EVEN(sts))
     return sts;
 
-  return ((XNav *)xnav)->get_dashboard_name(&aref, oname, type);
+  return ((XNav*)xnav)->get_dashboard_name(&aref, oname, type);
 }
 
-static void xnav_ge_eventlog_cb(
-    void* xnav, void* gectx, int type, void* data, unsigned int size)
+static void xnav_ge_eventlog_cb(void* xnav, void* gectx, int type, void* data, unsigned int size)
 {
   int sts;
   char name[80];
@@ -10081,12 +11420,12 @@ static void xnav_ge_eventlog_cb(
   char text[600];
 
   sts = ((XNav*)xnav)->appl.find(applist_eType_Graph, gectx, name, instance);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     strcpy(text, name);
     strcat(text, ":");
     strcat(text, instance);
-    XttLog::dlog((xttlog_eCategory)type, text, (const char*)data,
-        xttlog_mOption_Binary, size);
+    XttLog::dlog((xttlog_eCategory)type, text, (const char*)data, xttlog_mOption_Binary, size);
   }
 }
 
@@ -10103,18 +11442,22 @@ static void xnav_ge_keyboard_cb(void* ctx, void* gectx, int action, int type)
   if (!(xnav->opplace_p->Options & pwr_mOpPlaceOptionsMask_VirtualKeyboard))
     return;
 
-  if (action & keyboard_mAction_Open) {
+  if (action & keyboard_mAction_Open)
+  {
     // Open keyboard
     sts = xnav->appl.find(applist_eType_Graph, gectx, name, instance);
     if (ODD(sts))
       xnav->open_keyboard(gectx, keyboard_eKeymap_, type);
-    else {
+    else
+    {
       sts = xnav->appl.find(applist_eType_MultiView, gectx, name, instance);
       if (ODD(sts))
         xnav->open_keyboard(gectx, keyboard_eKeymap_, type);
     }
-    if (EVEN(sts)) {
-      switch (((XttUtility*)gectx)->get_type()) {
+    if (EVEN(sts))
+    {
+      switch (((XttUtility*)gectx)->get_type())
+      {
       case xtt_eUtility_Graph:
       case xtt_eUtility_MultiView:
         xnav->open_keyboard(gectx, keyboard_eKeymap_, type);
@@ -10124,8 +11467,9 @@ static void xnav_ge_keyboard_cb(void* ctx, void* gectx, int action, int type)
     }
     // Disable close keyboard request from lost input focus
     time_GetTime(&open_time);
-
-  } else {
+  }
+  else
+  {
     // Close keyboard
     time_GetTime(&current_time);
     if (time_DToFloat(0, time_Adiff(&dt, &current_time, &open_time)) < 0.1)
@@ -10158,8 +11502,7 @@ static int xnav_ge_is_authorized_cb(void* xnav, unsigned int access)
   return (((XNav*)xnav)->priv & access) != 0;
 }
 
-static int xnav_ge_get_current_objects_cb(
-    void* vxnav, pwr_sAttrRef** alist, int** is_areflist)
+static int xnav_ge_get_current_objects_cb(void* vxnav, pwr_sAttrRef** alist, int** is_areflist)
 {
   int sts;
   XNav* xnav = (XNav*)vxnav;
@@ -10176,9 +11519,11 @@ static void xnav_keyboard_key_pressed_cb(void* ctx, int ascii)
   XNav* xnav = (XNav*)ctx;
   ApplListElem* elem;
 
-  if (ascii == 27) {
+  if (ascii == 27)
+  {
     // Escape, close all input
-    for (elem = xnav->appl.root; elem; elem = elem->next) {
+    for (elem = xnav->appl.root; elem; elem = elem->next)
+    {
       if (elem->type == applist_eType_Graph)
         ((XttGe*)elem->ctx)->close_input_all();
       else if (elem->type == applist_eType_MultiView)
@@ -10186,10 +11531,14 @@ static void xnav_keyboard_key_pressed_cb(void* ctx, int ascii)
     }
     xnav->keyboard_owner = 0;
     xnav->close_keyboard(keyboard_mAction_Close | keyboard_mAction_ResetInput);
-  } else {
+  }
+  else
+  {
     // Forward key to current owner
-    for (elem = xnav->appl.root; elem; elem = elem->next) {
-      if (elem->ctx == xnav->keyboard_owner) {
+    for (elem = xnav->appl.root; elem; elem = elem->next)
+    {
+      if (elem->ctx == xnav->keyboard_owner)
+      {
         if (elem->type == applist_eType_Graph)
           ((XttGe*)elem->ctx)->key_pressed(ascii);
         else if (elem->type == applist_eType_MultiView)
@@ -10223,7 +11572,8 @@ static pwr_tStatus xnav_otree_action_cb(void* ctx, pwr_tAttrRef* aref)
   if (EVEN(sts))
     return sts;
 
-  switch (cid) {
+  switch (cid)
+  {
   case pwr_cClass_DsTrend:
   case pwr_cClass_DsTrendCurve:
     sprintf(cmd, "open trend/name=%s/title=\"%s\"", aname, aname);
@@ -10251,25 +11601,26 @@ static pwr_tStatus xnav_otree_action_cb(void* ctx, pwr_tAttrRef* aref)
   return 1;
 }
 
-void XNav::open_graph(const char* name, const char* filename, int scrollbar,
-    int menu, int navigator, int width, int height, int x, int y,
-    const char* object_name, const char* focus_name, int input_focus_empty,
-    int use_default_access, unsigned int access, unsigned int options,
-    void* basewidget, double* borders, int dashboard)
+void XNav::open_graph(const char* name, const char* filename, int scrollbar, int menu, int navigator,
+                      int width, int height, int x, int y, const char* object_name, const char* focus_name,
+                      int input_focus_empty, int use_default_access, unsigned int access,
+                      unsigned int options, void* basewidget, double* borders, int dashboard)
 {
   XttGe* gectx;
 
-  if (appl.find(dashboard ? applist_eType_Dashboard : applist_eType_Graph, 
-      filename, object_name, (void**)&gectx)) {
+  if (appl.find(dashboard ? applist_eType_Dashboard : applist_eType_Graph, filename, object_name,
+                (void**)&gectx))
+  {
     gectx->pop();
     if (focus_name)
       gectx->set_object_focus(focus_name, input_focus_empty);
-  } else {
-    gectx = xnav_ge_new(name, filename, scrollbar, menu, navigator, width,
-        height, x, y, gbl.scantime, object_name, use_default_access, access,
-	options, basewidget, borders, gbl.color_theme, dashboard, 
-        &xnav_ge_command_cb, &xnav_ge_get_current_objects_cb, 
-        &xnav_ge_is_authorized_cb, &xnav_ge_keyboard_cb);
+  }
+  else
+  {
+    gectx = xnav_ge_new(name, filename, scrollbar, menu, navigator, width, height, x, y, gbl.scantime,
+                        object_name, use_default_access, access, options, basewidget, borders,
+                        gbl.color_theme, dashboard, &xnav_ge_command_cb, &xnav_ge_get_current_objects_cb,
+                        &xnav_ge_is_authorized_cb, &xnav_ge_keyboard_cb);
     gectx->close_cb = xnav_ge_close_cb;
     gectx->help_cb = xnav_ge_help_cb;
     gectx->display_in_xnav_cb = xnav_ge_display_in_xnav_cb;
@@ -10280,12 +11631,12 @@ void XNav::open_graph(const char* name, const char* filename, int scrollbar,
     gectx->namechanged_cb = xnav_ge_namechanged_cb;
     gectx->get_select_cb = xnav_ge_get_select_cb;
 
-    appl.insert(
-	dashboard ? applist_eType_Dashboard : applist_eType_Graph, 
-	(void*)gectx, pwr_cNObjid, filename, object_name);
+    appl.insert(dashboard ? applist_eType_Dashboard : applist_eType_Graph, (void*)gectx, pwr_cNObjid,
+                filename, object_name);
     if (focus_name)
       gectx->set_object_focus(focus_name, input_focus_empty);
-    if (options & ge_mOptions_IsMain) {
+    if (options & ge_mOptions_IsMain)
+    {
       if (!op && !multiview_main)
         ge_main = gectx;
     }
@@ -10296,7 +11647,8 @@ void XNav::close_graph(char* filename, char* object_name, int iconify)
 {
   XttGe* gectx;
 
-  if (appl.find(applist_eType_Graph, filename, object_name, (void**)&gectx)) {
+  if (appl.find(applist_eType_Graph, filename, object_name, (void**)&gectx))
+  {
     if (iconify)
       gectx->iconify();
     else
@@ -10304,9 +11656,8 @@ void XNav::close_graph(char* filename, char* object_name, int iconify)
   }
 }
 
-int XNav::exec_xttgraph(pwr_tObjid xttgraph, char* instance, char* focus,
-    int inputempty, int use_default_access, unsigned int access,
-    unsigned int options, void* basewidget)
+int XNav::exec_xttgraph(pwr_tObjid xttgraph, char* instance, char* focus, int inputempty,
+                        int use_default_access, unsigned int access, unsigned int options, void* basewidget)
 {
   pwr_sClass_XttGraph xttgraph_o;
   char action[80];
@@ -10327,21 +11678,23 @@ int XNav::exec_xttgraph(pwr_tObjid xttgraph, char* instance, char* focus,
     return sts;
 
   str_ToLower(action, xttgraph_o.Action);
-  if (!instance) {
-    for (int i = 0; i < 4; i++) {
+  if (!instance)
+  {
+    for (int i = 0; i < 4; i++)
+    {
       pwr_tOName oname;
 
       if (cdh_ObjidIsNull(xttgraph_o.Object[i]))
         break;
 
-      sts = gdh_ObjidToName(
-          xttgraph_o.Object[i], oname, sizeof(oname), cdh_mName_volumeStrict);
+      sts = gdh_ObjidToName(xttgraph_o.Object[i], oname, sizeof(oname), cdh_mName_volumeStrict);
       if (EVEN(sts))
         break;
 
       if (i == 0)
         strncpy(instance_str, oname, sizeof(instance_str));
-      else {
+      else
+      {
         strncat(instance_str, ",", sizeof(instance_str) - strlen(instance_str) - 1);
         strncat(instance_str, oname, sizeof(instance_str) - strlen(instance_str) - 1);
       }
@@ -10349,19 +11702,20 @@ int XNav::exec_xttgraph(pwr_tObjid xttgraph, char* instance, char* focus,
     }
   }
 
-  if (!feqf(xttgraph_o.Borders[0], 0.0f) || !feqf(xttgraph_o.Borders[1], 0.0f)
-      || !feqf(xttgraph_o.Borders[2], 0.0f) || !feqf(xttgraph_o.Borders[3], 0.0f)) {
+  if (!feqf(xttgraph_o.Borders[0], 0.0f) || !feqf(xttgraph_o.Borders[1], 0.0f) ||
+      !feqf(xttgraph_o.Borders[2], 0.0f) || !feqf(xttgraph_o.Borders[3], 0.0f))
+  {
     for (int i = 0; i < 4; i++)
       borders[i] = xttgraph_o.Borders[i];
     bordersp = borders;
   }
 
-  if ((s = strstr(action, ".pwg")) || action[0] == '@') {
+  if ((s = strstr(action, ".pwg")) || action[0] == '@')
+  {
     // Open graph
     if (s)
       *s = 0;
-    scrollbars
-        = xttgraph_o.Options & pwr_mXttGraphOptionsMask_Scrollbars ? 1 : 0;
+    scrollbars = xttgraph_o.Options & pwr_mXttGraphOptionsMask_Scrollbars ? 1 : 0;
     menu = xttgraph_o.Options & pwr_mXttGraphOptionsMask_Menu ? 1 : 0;
     navigator = xttgraph_o.Options & pwr_mXttGraphOptionsMask_Navigator ? 1 : 0;
     if (xttgraph_o.Options & pwr_mXttGraphOptionsMask_FullScreen)
@@ -10377,11 +11731,12 @@ int XNav::exec_xttgraph(pwr_tObjid xttgraph, char* instance, char* focus,
     if (xttgraph_o.Options & pwr_mXttGraphOptionsMask_Dialog)
       options |= ge_mOptions_Dialog;
 
-    open_graph(xttgraph_o.Title, action, scrollbars, menu, navigator,
-        xttgraph_o.Width, xttgraph_o.Height, xttgraph_o.X, xttgraph_o.Y,
-        instance, focus, inputempty, use_default_access, access, options,
-	basewidget, bordersp, 0);
-  } else if ((strstr(action, ".class"))) {
+    open_graph(xttgraph_o.Title, action, scrollbars, menu, navigator, xttgraph_o.Width, xttgraph_o.Height,
+               xttgraph_o.X, xttgraph_o.Y, instance, focus, inputempty, use_default_access, access, options,
+               basewidget, bordersp, 0);
+  }
+  else if ((strstr(action, ".class")))
+  {
     // Open jgraph
     char cmd[80];
 
@@ -10389,27 +11744,31 @@ int XNav::exec_xttgraph(pwr_tObjid xttgraph, char* instance, char* focus,
     s = strrchr(action, '.');
     *s = 0;
 
-    if (op) {
+    if (op)
+    {
       strcpy(cmd, "open jgraph ");
       strcat(cmd, s);
       op->jop_command(cmd);
-    } else
+    }
+    else
       message('E', "Java process not started");
-  } else {
+  }
+  else
+  {
     // Execute command
     return command(xttgraph_o.Action);
   }
   return XNAV__SUCCESS;
 }
 
-void XNav::ge_event_exec(
-    int type, char* name, char* instance, void* event, unsigned int size)
+void XNav::ge_event_exec(int type, char* name, char* instance, void* event, unsigned int size)
 {
   int sts;
   XttGe* gectx;
 
   sts = appl.find(applist_eType_Graph, name, instance, (void**)&gectx);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     gectx->event_exec(type, event, size);
   }
 }
@@ -10423,7 +11782,7 @@ static int xnav_op_get_alarm_info_cb(void* xnav, evlist_sAlarmInfo* info, int ba
 }
 
 static void xnav_op_ack_last_cb(void* xnav, unsigned long type, unsigned long prio, int backward,
-				int timecheck)
+                                int timecheck)
 {
   if (((XNav*)xnav)->ev)
     ((XNav*)xnav)->ev->ack_last_prio(type, prio, backward, timecheck);
@@ -10479,34 +11838,33 @@ int XNav::set_parameter(char* name_str, char* value_str, int publicwrite)
     return sts;
 
   // Check authorization
-  if (publicwrite) {
+  if (publicwrite)
+  {
     sts = gdh_GetAttributeFlags(&attrref, &a_flags);
     if (EVEN(sts))
       return sts;
 
     if (!(a_flags & pwr_mAdef_publicwrite))
       return XNAV__NOTAUTHORIZED;
-    if (!((priv & pwr_mPrv_RtRead) || (priv & pwr_mPrv_RtWrite)
-            || (priv & pwr_mPrv_System) || (priv & pwr_mPrv_Maintenance)
-            || (priv & pwr_mPrv_Process) || (priv & pwr_mPrv_Instrument)
-            || (priv & pwr_mPrv_Operator1) || (priv & pwr_mPrv_Operator2)
-            || (priv & pwr_mPrv_Operator3) || (priv & pwr_mPrv_Operator4)
-            || (priv & pwr_mPrv_Operator5) || (priv & pwr_mPrv_Operator6)
-            || (priv & pwr_mPrv_Operator7) || (priv & pwr_mPrv_Operator8)
-            || (priv & pwr_mPrv_Operator9) || (priv & pwr_mPrv_Operator10)))
+    if (!((priv & pwr_mPrv_RtRead) || (priv & pwr_mPrv_RtWrite) || (priv & pwr_mPrv_System) ||
+          (priv & pwr_mPrv_Maintenance) || (priv & pwr_mPrv_Process) || (priv & pwr_mPrv_Instrument) ||
+          (priv & pwr_mPrv_Operator1) || (priv & pwr_mPrv_Operator2) || (priv & pwr_mPrv_Operator3) ||
+          (priv & pwr_mPrv_Operator4) || (priv & pwr_mPrv_Operator5) || (priv & pwr_mPrv_Operator6) ||
+          (priv & pwr_mPrv_Operator7) || (priv & pwr_mPrv_Operator8) || (priv & pwr_mPrv_Operator9) ||
+          (priv & pwr_mPrv_Operator10)))
       return XNAV__NOTAUTHORIZED;
-  } else {
+  }
+  else
+  {
     if (!((priv & pwr_mPrv_RtWrite) || (priv & pwr_mPrv_System)))
       return XNAV__NOTAUTHORIZED;
   }
 
-  sts = gdh_GetAttributeCharAttrref(
-      &attrref, &attr_type, &attr_size, &attr_offset, &attr_dim);
+  sts = gdh_GetAttributeCharAttrref(&attrref, &attr_type, &attr_size, &attr_offset, &attr_dim);
   if (EVEN(sts))
     return sts;
 
-  sts = attr_string_to_value(
-      attr_type, value_str, buffer, sizeof(buffer), attr_size);
+  sts = attr_string_to_value(attr_type, value_str, buffer, sizeof(buffer), attr_size);
   if (EVEN(sts))
     return sts;
 
@@ -10520,20 +11878,22 @@ int XNav::set_parameter(char* name_str, char* value_str, int publicwrite)
 void XNav::open_rttlog(char* name, char* filename)
 {
   void* basewidget = 0;
-  if (opplace_p->Options & pwr_mOpPlaceOptionsMask_AllMainTransient) {
+  if (opplace_p->Options & pwr_mOpPlaceOptionsMask_AllMainTransient)
+  {
     if (ge_main)
       basewidget = ge_main->get_widget();
     else if (multiview_main)
       basewidget = multiview_main->get_widget();
   }
 
-  try {
-   GeCurve* c
-      = gecurve_new(name, filename, NULL, 0, 0, gbl.color_theme, basewidget);
+  try
+  {
+    GeCurve* c = gecurve_new(name, filename, NULL, 0, 0, gbl.color_theme, basewidget);
 
-   c->setup(curve_mEnable_CurveType | curve_mEnable_CurveTypeSquare
-      | curve_mEnable_FillCurve);
-  } catch (co_error& e) {
+    c->setup(curve_mEnable_CurveType | curve_mEnable_CurveTypeSquare | curve_mEnable_FillCurve);
+  }
+  catch (co_error& e)
+  {
     message('E', (char*)e.what().c_str());
   }
 }
@@ -10544,19 +11904,22 @@ int XNav::search(char* search_str, int regexp)
   pwr_tObjid found_objid;
   char str[200];
 
-  if (regexp) {
+  if (regexp)
+  {
     if (search_compiled)
       regfree(&search_creg);
 
     sts = regcomp(&search_creg, search_str, REG_NOSUB | REG_ICASE);
-    if (sts != 0) {
+    if (sts != 0)
+    {
       search_compiled = 0;
       search_type = xnav_eSearchType_No;
       return XNAV__SEARCHCOMPILE;
     }
     search_compiled = 1;
     search_type = xnav_eSearchType_RegularExpr;
-  } else
+  }
+  else
     search_type = xnav_eSearchType_Name;
 
   str_ToUpper(str, search_str);
@@ -10600,7 +11963,8 @@ int XNav::search_root(char* search_str, pwr_tObjid* found_objid, int next)
   search_sts = 0;
 
   sts = gdh_GetRootList(&root);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     search_sts = search_object(root, search_str, found_objid, next);
     if (ODD(search_sts))
       break;
@@ -10609,31 +11973,38 @@ int XNav::search_root(char* search_str, pwr_tObjid* found_objid, int next)
   return search_sts;
 }
 
-int XNav::search_object(
-    pwr_tObjid objid, char* search_str, pwr_tObjid* found_objid, int next)
+int XNav::search_object(pwr_tObjid objid, char* search_str, pwr_tObjid* found_objid, int next)
 {
   pwr_tObjName name;
   int sts, search_sts;
   pwr_tObjid child;
   pwr_tClassId classid;
 
-  if (next && !search_last_found) {
+  if (next && !search_last_found)
+  {
     if (cdh_ObjidIsEqual(objid, search_last))
       search_last_found = 1;
-  } else {
+  }
+  else
+  {
     sts = gdh_ObjidToName(objid, name, sizeof(name), cdh_mName_object);
     if (EVEN(sts))
       return sts;
 
-    if (search_type == xnav_eSearchType_Name) {
+    if (search_type == xnav_eSearchType_Name)
+    {
       // str_ToUpper( name, name);
-      if (str_NoCaseStrcmp(name, search_str) == 0) {
+      if (str_NoCaseStrcmp(name, search_str) == 0)
+      {
         *found_objid = objid;
         return XNAV__SUCCESS;
       }
-    } else {
+    }
+    else
+    {
       sts = regexec(&search_creg, name, 0, NULL, 0);
-      if (sts == REG_OK) {
+      if (sts == REG_OK)
+      {
         *found_objid = objid;
         return XNAV__SUCCESS;
       }
@@ -10650,7 +12021,8 @@ int XNav::search_object(
 
   search_sts = XNAV__NOMATCH;
   sts = gdh_GetChild(objid, &child);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     search_sts = search_object(child, search_str, found_objid, next);
     if (ODD(search_sts))
       break;
@@ -10666,10 +12038,12 @@ int XNav::create_object(char* classname, char* name)
   pwr_tClassId classid = 0;
 
   /* Check if class */
-  if (classname != NULL) {
+  if (classname != NULL)
+  {
     /* Get classid for the class */
     sts = gdh_ClassNameToId(classname, &classid);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       /* Class not found */
       message('E', "Unknown class");
       return XNAV__HOLDCOMMAND;
@@ -10677,7 +12051,8 @@ int XNav::create_object(char* classname, char* name)
   }
 
   sts = gdh_CreateObject(name, classid, 0, &objid, pwr_cNObjid, 0, pwr_cNObjid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     message('E', "Error in object name");
     return XNAV__HOLDCOMMAND;
   }
@@ -10693,13 +12068,15 @@ int XNav::delete_object(char* name)
 
   /* Get objid for the object */
   sts = gdh_NameToObjid(name, &objid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     message('E', "Object does not exist");
     return XNAV__HOLDCOMMAND;
   }
 
   sts = gdh_DeleteObject(objid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     message('E', "Unable to delete object");
     return XNAV__HOLDCOMMAND;
   }
@@ -10713,16 +12090,17 @@ void XNav::print_methods()
   int i, j;
 
   printf("Base Methods\n");
-  for (i = 0;; i++) {
+  for (i = 0;; i++)
+  {
     if (pwr_gBase_XttClassMethods[i].ClassName[0] == '\0')
       break;
 
     printf("%3d %-20s\n", i, pwr_gBase_XttClassMethods[i].ClassName);
-    for (j = 0;; j++) {
+    for (j = 0;; j++)
+    {
       if ((*pwr_gBase_XttClassMethods[i].Methods)[j].MethodName[0] == '\0')
         break;
-      printf(
-          "       %s\n", (*pwr_gBase_XttClassMethods[i].Methods)[j].MethodName);
+      printf("       %s\n", (*pwr_gBase_XttClassMethods[i].Methods)[j].MethodName);
     }
   }
 }
@@ -10752,13 +12130,9 @@ static void xnav_open_shist_cb(void* ctx, char* text, int ok_pressed)
   xnav->command(cmd);
 }
 
-static void xnav_open_shist_cancel_cb(void* ctx)
-{
-  free(ctx);
-}
+static void xnav_open_shist_cancel_cb(void* ctx) { free(ctx); }
 
-static void xnav_colortheme_selector_ok_cb(
-    void* ctx, char* text, int ok_pressed)
+static void xnav_colortheme_selector_ok_cb(void* ctx, char* text, int ok_pressed)
 {
   XNav* xnav = (XNav*)ctx;
   gdh_sValueDef* vd;
@@ -10780,22 +12154,27 @@ static void xnav_colortheme_selector_ok_cb(
     return;
 
   found = 0;
-  for (i = 0; i < rows; i++) {
-    if (streq(text, vd[i].Name)) {
+  for (i = 0; i < rows; i++)
+  {
+    if (streq(text, vd[i].Name))
+    {
       idx = vd[i].Value->Value;
       found = 1;
       break;
     }
   }
-  if (found) {
+  if (found)
+  {
     idx = CoWow::SetColorTheme(idx);
-    if (xnav->gbl.color_theme != idx) {
+    if (xnav->gbl.color_theme != idx)
+    {
       xnav->gbl.color_theme = idx;
 
       xnav->update_color_theme(idx);
       if (xnav->ev)
-	xnav->ev->update_color_theme(idx);
-      for (elem = xnav->appl.root; elem; elem = elem->next) {
+        xnav->ev->update_color_theme(idx);
+      for (elem = xnav->appl.root; elem; elem = elem->next)
+      {
         if (elem->type == applist_eType_Graph)
           ((XttGe*)elem->ctx)->update_color_theme(idx);
         else if (elem->type == applist_eType_SevHist)
@@ -10822,7 +12201,8 @@ static void xnav_show_objectlist_cb(void* ctx, char* text, int ok_pressed)
 
   free(ctx);
 
-  switch (cid) {
+  switch (cid)
+  {
   case pwr_cClass_DsTrend:
   case pwr_cClass_DsTrendCurve:
     sprintf(cmd, "open trend/name=%s/title=\"%s\"", text, text);
@@ -10844,13 +12224,9 @@ static void xnav_show_objectlist_cb(void* ctx, char* text, int ok_pressed)
   xnav->command(cmd);
 }
 
-static void xnav_show_objectlist_cancel_cb(void* ctx)
-{
-  free(ctx);
-}
+static void xnav_show_objectlist_cancel_cb(void* ctx) { free(ctx); }
 
-pwr_tStatus XNav::get_instance_classgraph(
-    char* instance_str, pwr_tFileName filename)
+pwr_tStatus XNav::get_instance_classgraph(char* instance_str, pwr_tFileName filename)
 {
   // Get file from class of instance object
   pwr_tStatus sts;
@@ -10871,64 +12247,74 @@ pwr_tStatus XNav::get_instance_classgraph(
     return sts;
 
   sts = gdh_GetAttrRefTid(&aref, &cid);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     is_script = 0;
 
     sts = gdh_GetClassInfo(cid, &info);
-    if (EVEN(sts)) 
+    if (EVEN(sts))
       return sts;
 
     // Try all superclasses
-    sts = gdh_ObjidToName(
-        cdh_ClassIdToObjid(cid), cname, sizeof(cname), cdh_mName_object);
+    sts = gdh_ObjidToName(cdh_ClassIdToObjid(cid), cname, sizeof(cname), cdh_mName_object);
     if (EVEN(sts))
       return sts;
 
     str_ToLower(cname, cname);
-    if (cdh_CidToVid(cid) < cdh_cUserClassVolMin
-        || (cdh_CidToVid(cid) >= cdh_cManufactClassVolMin
-               && cdh_CidToVid(cid) <= cdh_cManufactClassVolMax)) {
+    if (cdh_CidToVid(cid) < cdh_cUserClassVolMin ||
+        (cdh_CidToVid(cid) >= cdh_cManufactClassVolMin && cdh_CidToVid(cid) <= cdh_cManufactClassVolMax))
+    {
       is_baseclass = 1;
       if (cname[0] == '$')
         sprintf(file_str, "pwr_c_%s", &cname[1]);
       else
         sprintf(file_str, "pwr_c_%s", cname);
-    } else
+    }
+    else
       strcpy(file_str, cname);
 
     // Get base class graphs on $pwrp_exe or $pwr_exe
-    for (i = 0; i < 2; i++) {
+    for (i = 0; i < 2; i++)
+    {
       str_ToLower(fname, file_str);
-      if (is_baseclass && i == 1) {
+      if (is_baseclass && i == 1)
+      {
         strcpy(fname, "$pwr_exe/");
         strcat(fname, file_str);
-      } else {
+      }
+      else
+      {
         strcpy(fname, "$pwrp_exe/");
         strcat(fname, file_str);
       }
 
-      if (info.PopEditor == pwr_ePopEditorEnum_GeGraphConf) {
-	// Add any GraphConfiguration to filename
-	strcpy(aname, instance_str);
-	strcat(aname, ".GraphConfiguration");
-	sts = gdh_GetObjectInfo(aname, &graph_conf, sizeof(graph_conf));
-	if (ODD(sts)) {
-	  if (graph_conf != 0) {
-	    char gc[12];
-	    sprintf(gc, "%d", graph_conf);
-	    strcat(fname, gc);
-	  }
-	}
+      if (info.PopEditor == pwr_ePopEditorEnum_GeGraphConf)
+      {
+        // Add any GraphConfiguration to filename
+        strcpy(aname, instance_str);
+        strcat(aname, ".GraphConfiguration");
+        sts = gdh_GetObjectInfo(aname, &graph_conf, sizeof(graph_conf));
+        if (ODD(sts))
+        {
+          if (graph_conf != 0)
+          {
+            char gc[12];
+            sprintf(gc, "%d", graph_conf);
+            strcat(fname, gc);
+          }
+        }
       }
-      if (info.PopEditor == pwr_ePopEditorEnum_GeScript) {
-	is_script = 1;
-	strcat(fname, ".ge_com");
+      if (info.PopEditor == pwr_ePopEditorEnum_GeScript)
+      {
+        is_script = 1;
+        strcat(fname, ".ge_com");
       }
       else
-	strcat(fname, ".pwg");
+        strcat(fname, ".pwg");
       sts = dcli_search_file(fname, found_file, DCLI_DIR_SEARCH_INIT);
       dcli_search_file(fname, found_file, DCLI_DIR_SEARCH_END);
-      if (ODD(sts)) {
+      if (ODD(sts))
+      {
         found = 1;
         break;
       }
@@ -10943,7 +12329,8 @@ pwr_tStatus XNav::get_instance_classgraph(
   if (EVEN(sts))
     return XNAV__NOCLASSGRAPH;
 
-  if (is_script) {
+  if (is_script)
+  {
     strcpy(filename, "@");
     strcat(filename, fname);
   }
@@ -10962,18 +12349,22 @@ int XNav::collect_window(int copy, int type)
   int i;
   XColWind* xcolwind;
 
-  if (type == xcolwind_eType_Collect) {
-    if (copy) {
+  if (type == xcolwind_eType_Collect)
+  {
+    if (copy)
+    {
       brow_GetObjectList(collect_brow->ctx, &node_list, &node_count);
       if (!node_count)
         return 0;
 
       ap = (pwr_sAttrRef*)calloc(node_count + 1, sizeof(pwr_sAttrRef));
 
-      for (i = 0; i < node_count; i++) {
+      for (i = 0; i < node_count; i++)
+      {
         brow_GetUserData(node_list[i], (void**)&item);
 
-        switch (item->type) {
+        switch (item->type)
+        {
         case xnav_eItemType_Collect:
           sts = gdh_NameToAttrref(pwr_cNObjid, item->name, &ap[i]);
           if (EVEN(sts))
@@ -10984,13 +12375,13 @@ int XNav::collect_window(int copy, int type)
         }
       }
 
-      xcolwind = xcolwind_new(
-          ap, 0, gbl.advanced_user, xcolwind_eType_Collect, &sts);
-    } else
-      xcolwind
-          = xcolwind_new(0, 0, gbl.advanced_user, xcolwind_eType_Collect, &sts);
+      xcolwind = xcolwind_new(ap, 0, gbl.advanced_user, xcolwind_eType_Collect, &sts);
+    }
+    else
+      xcolwind = xcolwind_new(0, 0, gbl.advanced_user, xcolwind_eType_Collect, &sts);
 
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       xcolwind->close_cb = xatt_close_cb;
       xcolwind->popup_menu_cb = xnav_popup_menu_cb;
       xcolwind->call_method_cb = xnav_call_method_cb;
@@ -11001,8 +12392,9 @@ int XNav::collect_window(int copy, int type)
       if (copy)
         collect_clear();
     }
-  } else if (type == xcolwind_eType_CollectSignals
-      || type == xcolwind_eType_CollectIOSignals) {
+  }
+  else if (type == xcolwind_eType_CollectSignals || type == xcolwind_eType_CollectIOSignals)
+  {
     pwr_tAttrRef attrref;
     int is_attr;
 
@@ -11011,7 +12403,8 @@ int XNav::collect_window(int copy, int type)
       return sts;
 
     xcolwind = xcolwind_new(&attrref, 0, gbl.advanced_user, type, &sts);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       xcolwind->close_cb = xatt_close_cb;
       xcolwind->popup_menu_cb = xnav_popup_menu_cb;
       xcolwind->call_method_cb = xnav_call_method_cb;
@@ -11039,7 +12432,8 @@ void XNav::open_keyboard(void* owner, keyboard_eKeymap keymap, int type)
   if (keyboard)
     delete keyboard;
 
-  switch (type) {
+  switch (type)
+  {
   case graph_eKeyboard_StandardShifted:
     shifted = 1;
   case graph_eKeyboard_Standard:
@@ -11055,8 +12449,7 @@ void XNav::open_keyboard(void* owner, keyboard_eKeymap keymap, int type)
     break;
   }
 
-  keyboard
-      = keyboard_new("Keyboard", keymap, keyboard_type, gbl.color_theme, &sts);
+  keyboard = keyboard_new("Keyboard", keymap, keyboard_type, gbl.color_theme, &sts);
   keyboard->key_pressed_cb = xnav_keyboard_key_pressed_cb;
   keyboard->close_cb = xnav_keyboard_close_cb;
   keyboard_owner = owner;
@@ -11064,7 +12457,8 @@ void XNav::open_keyboard(void* owner, keyboard_eKeymap keymap, int type)
   if (shifted)
     keyboard->set_shift(1);
 
-  if (opplace_p->Options & pwr_mOpPlaceOptionsMask_AllMainTransient) {
+  if (opplace_p->Options & pwr_mOpPlaceOptionsMask_AllMainTransient)
+  {
     if (ge_main)
       basewidget = ge_main->get_widget();
     else if (multiview_main)
@@ -11081,13 +12475,16 @@ void XNav::close_keyboard(int action)
   if (!(opplace_p->Options & pwr_mOpPlaceOptionsMask_VirtualKeyboard))
     return;
 
-  if (keyboard) {
+  if (keyboard)
+  {
     delete keyboard;
     keyboard = 0;
     keyboard_owner = 0;
 
-    if (action & keyboard_mAction_ResetInput) {
-      for (elem = appl.root; elem; elem = elem->next) {
+    if (action & keyboard_mAction_ResetInput)
+    {
+      for (elem = appl.root; elem; elem = elem->next)
+      {
         if (elem->type == applist_eType_Graph)
           ((XttGe*)elem->ctx)->close_input_all();
         else if (elem->type == applist_eType_MultiView)
@@ -11099,8 +12496,8 @@ void XNav::close_keyboard(int action)
 
 static int xnav_replace_node_str(char* out, char* object_str)
 {
-  if (str_StartsWith(object_str, "*-")
-      || str_NoCaseStrncmp(object_str, "$node-", 6) == 0) {
+  if (str_StartsWith(object_str, "*-") || str_NoCaseStrncmp(object_str, "$node-", 6) == 0)
+  {
     // Replace * by the node object
     pwr_tObjid node_objid;
     pwr_tAName str;
@@ -11135,18 +12532,16 @@ int XNav::set_signal(pwr_tAttrRef* arp, xnav_eSetSignal type, int on)
   pwr_tMask valuemask;
   pwr_tBoolean value_on;
 
-  static char card_mask1[][32]
-      = { "ConvMask1", "InvMask1", "TestMask1", "TestValue1" };
-  static char card_mask2[][32]
-      = { "ConvMask2", "InvMask2", "TestMask2", "TestValue2" };
-  static char chan_attr[][32]
-      = { "ConversionOn", "InvertOn", "TestOn", "TestValue" };
+  static char card_mask1[][32] = {"ConvMask1", "InvMask1", "TestMask1", "TestValue1"};
+  static char card_mask2[][32] = {"ConvMask2", "InvMask2", "TestMask2", "TestValue2"};
+  static char chan_attr[][32] = {"ConversionOn", "InvertOn", "TestOn", "TestValue"};
 
   sts = gdh_GetAttrRefTid(arp, &sig_cid);
   if (EVEN(sts))
     return sts;
 
-  switch (sig_cid) {
+  switch (sig_cid)
+  {
   case pwr_cClass_Di:
   case pwr_cClass_Do:
   case pwr_cClass_Po:
@@ -11178,21 +12573,20 @@ int XNav::set_signal(pwr_tAttrRef* arp, xnav_eSetSignal type, int on)
     return XNAV__INVALIDOBJECT;
   }
 
-  switch (chan_cid) {
+  switch (chan_cid)
+  {
   case pwr_cClass_ChanDi:
     if (!(type == xnav_eSetSignal_Conversion || type == xnav_eSetSignal_Invert))
       return XNAV__INVALIDOBJECT;
     break;
   case pwr_cClass_ChanDo:
-    if (!(type == xnav_eSetSignal_Invert || 
-	  type == xnav_eSetSignal_Test || 
-	  type == xnav_eSetSignal_TestValue || 
-	  type == xnav_eSetSignal_Conversion))
+    if (!(type == xnav_eSetSignal_Invert || type == xnav_eSetSignal_Test ||
+          type == xnav_eSetSignal_TestValue || type == xnav_eSetSignal_Conversion))
       return XNAV__INVALIDOBJECT;
     break;
   case pwr_cClass_ChanD:
-    if (!(type == xnav_eSetSignal_Invert || type == xnav_eSetSignal_Test
-            || type == xnav_eSetSignal_TestValue))
+    if (!(type == xnav_eSetSignal_Invert || type == xnav_eSetSignal_Test ||
+          type == xnav_eSetSignal_TestValue))
       return XNAV__INVALIDOBJECT;
     break;
   case pwr_cClass_ChanAi:
@@ -11210,11 +12604,13 @@ int XNav::set_signal(pwr_tAttrRef* arp, xnav_eSetSignal type, int on)
   }
 
   // Get the card object
-  if (chan_aref.Flags.b.Object) {
+  if (chan_aref.Flags.b.Object)
+  {
     sts = gdh_GetParent(chan_aref.Objid, &card_oid);
     if (EVEN(sts))
       return sts;
-  } else
+  }
+  else
     card_oid = chan_aref.Objid;
 
   sts = gdh_GetObjectClass(card_oid, &card_cid);
@@ -11222,14 +12618,17 @@ int XNav::set_signal(pwr_tAttrRef* arp, xnav_eSetSignal type, int on)
     return sts;
 
   sts = gdh_GetSuperClass(card_cid, &cid, card_oid);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     card_cid = cid;
     sts = gdh_GetSuperClass(card_cid, &cid, card_oid);
   }
 
-  switch (card_cid) {
+  switch (card_cid)
+  {
   case pwr_cClass_Ssab_BaseDiCard:
-  case pwr_cClass_Ssab_BaseDoCard: {
+  case pwr_cClass_Ssab_BaseDoCard:
+  {
     pwr_tUInt32 number;
 
     card_aref = cdh_ObjidToAref(card_oid);
@@ -11242,17 +12641,21 @@ int XNav::set_signal(pwr_tAttrRef* arp, xnav_eSetSignal type, int on)
     if (EVEN(sts))
       return sts;
 
-    if (number < 16) {
+    if (number < 16)
+    {
       sts = gdh_ArefANameToAref(&card_aref, card_mask1[type], &value_aref);
       if (EVEN(sts))
         return sts;
-    } else if (number >= 16 && number < 32) {
+    }
+    else if (number >= 16 && number < 32)
+    {
       sts = gdh_ArefANameToAref(&card_aref, card_mask2[type], &value_aref);
       if (EVEN(sts))
         return sts;
 
       number -= 16;
-    } else
+    }
+    else
       return XNAV__INVALIDOBJECT;
 
     sts = gdh_GetObjectInfoAttrref(&value_aref, &valuemask, sizeof(valuemask));
