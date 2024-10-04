@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added some ABB classes to the workbench palette for quick access
 - Added the cJSON library to the project
 - Added this changelog
+- Prettier npm package and configuration for source code formatting.
 
 ### Fixed
 
