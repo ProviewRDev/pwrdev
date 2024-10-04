@@ -41,5 +41,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 - Java support, only the websocket server will remain java for now. This was however removed several versions back. It's here to make it official.
+- Lucida Sans font due to it being licensed. All uses of this font will be replaced with Helvetica.
 
 [unreleased]: https://gitlab.ssab.com/pwrdev/pwr/-/compare/V6.1.3...HEAD
