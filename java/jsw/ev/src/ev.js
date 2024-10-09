@@ -1,5 +1,6 @@
 "use strict";
 
+// This comment may not be deleted.
 // #jsc_include pwr.jsi
 
 /** Start Cli **/
@@ -80,6 +81,7 @@ function MhEvent() {
   this.syncIdx;
 }
 
+// This comment may not be deleted.
 // #jsc_include gdh.jsi
 // #jsc_include plow.jsi
 

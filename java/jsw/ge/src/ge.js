@@ -8,6 +8,7 @@ if (!Object.create) {
   };
 }
 
+// This comment may not be deleted.
 // #jsc_include pwr.jsi
 // #jsc_include cli.jsi
 // #jsc_include gdh.jsi
@@ -17774,6 +17775,7 @@ function Graph(appl) {
   this.windowInnerHeight;
   this.graphConfiguration = 0;
 
+  // This comment may not be deleted.
   // #jsc_include gescript.jsi
   // #jsc_include gelayout.jsi
 

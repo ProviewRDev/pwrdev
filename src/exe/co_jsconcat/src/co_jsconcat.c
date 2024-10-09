@@ -36,9 +36,11 @@ int read_file(FILE* ofp, char* incfile)
 
   while (dcli_read_line(line, sizeof(line), ifp))
   {
-    if (strncmp(line, "#jsc_include", 12) == 0)
+    char trimmedLine[400];
+    str_trim(trimmedLine, line);
+    if (strncmp(trimmedLine, "// #jsc_include", 15) == 0)
     {
-      str_trim(incfile, &line[13]);
+      str_trim(incfile, &trimmedLine[16]);
       read_file(ofp, (char*)incfile);
     }
     else
@@ -133,9 +135,11 @@ int main(int argc, char* argv[])
 
   while (dcli_read_line(line, sizeof(line), ifp))
   {
-    if (strncmp(line, "#jsc_include", 12) == 0)
+    char trimmedLine[400];
+    str_trim(trimmedLine, line);
+    if (strncmp(trimmedLine, "// #jsc_include", 15) == 0)
     {
-      str_trim(incfile, &line[13]);
+      str_trim(incfile, &trimmedLine[16]);
       read_file(ofp, incfile);
     }
     else

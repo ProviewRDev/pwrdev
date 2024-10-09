@@ -1,5 +1,6 @@
 "use strict";
 
+// This comment may not be deleted.
 // #jsc_include pwr.jsi
 // #jsc_include gdh.jsi
 
