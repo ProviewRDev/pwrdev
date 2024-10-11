@@ -1392,37 +1392,6 @@ int unpack_get_alarm_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local
   return -1;
 }
 
-/* Returns the PnModule given from a device_reference and a slot_number */
-pwr_sClass_PnModule* get_pwr_pn_module(io_sAgent* ap, uint device_reference, uint slot_number)
-{
-  int i;
-
-  if (ap)
-  {
-    /* Find corresponding device */
-    io_sRack* slave_list;
-    for (slave_list = ap->racklist, i = 0; (slave_list != NULL) && i < device_reference - 1;
-         slave_list = slave_list->next, i++)
-    {
-    }
-
-    if (slave_list)
-    {
-      pwr_sClass_PnModule* module = NULL;
-
-      // Loop through the modules and return the corresponding module
-      io_sCard* module_list;
-      for (module_list = slave_list->cardlist; module_list != NULL; module_list = module_list->next)
-      {
-        module = (pwr_sClass_PnModule*)module_list->op;
-        if (module->Slot == slot_number)
-          return module;
-      }
-    }
-  }
-  return (pwr_sClass_PnModule*)0;
-}
-
 int unpack_get_device_state_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local, io_sAgent* ap)
 {
   if (pSdb->Result == PNAK_RESULT_POS)
