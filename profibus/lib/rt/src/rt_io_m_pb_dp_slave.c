@@ -73,8 +73,7 @@ static pwr_tStatus IoRackInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
   pwr_sClass_Pb_Ii* iip;
   pwr_sClass_Pb_Io* iop;
   pwr_sClass_Pb_Module* mp;
-  char name[196];
-  pwr_tStatus sts;
+  char name[196];  
   pwr_tCid cid;
 
   io_sChannel* chanp;
@@ -95,7 +94,7 @@ static pwr_tStatus IoRackInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
 
   local->dp = 1;
 
-  sts = gdh_ObjidToName(rp->Objid, (char*)&name, sizeof(name), cdh_mNName);
+  gdh_ObjidToName(rp->Objid, (char*)&name, sizeof(name), cdh_mNName);
   errh_Info("PROFIBUS: Init of DP slave and modules %s", name);
 
   op = (pwr_sClass_Pb_DP_Slave*)rp->op;

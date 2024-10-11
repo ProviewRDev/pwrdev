@@ -218,7 +218,7 @@ void create_parameter_value_class(GsdmlAttrNav* attrnav, const char* name, std::
   {
     // For this type we create as many uint8 input fields as required.
     uint8_t* byte_data = (uint8_t*)data;
-    for (int byte = 0; byte < ref->_Length; byte++)
+    for (std::size_t byte = 0; byte < ref->_Length; byte++)
     {
       std::ostringstream byte_name(name, std::ios_base::ate);
 
@@ -1171,8 +1171,7 @@ void GsdmlAttrNavBrow::brow_setup()
 int GsdmlAttrNav::init_brow_cb(FlowCtx* fctx, void* client_data)
 {
   GsdmlAttrNav* attrnav = (GsdmlAttrNav*)client_data;
-  BrowCtx* ctx = (BrowCtx*)fctx;
-  int sts;
+  BrowCtx* ctx = (BrowCtx*)fctx;  
 
   attrnav->brow = new GsdmlAttrNavBrow(ctx, (void*)attrnav);
 
@@ -1182,7 +1181,7 @@ int GsdmlAttrNav::init_brow_cb(FlowCtx* fctx, void* client_data)
   // Create the root item
   attrnav->object_attr();
 
-  sts = brow_TraceInit(ctx, trace_connect_bc, trace_disconnect_bc, trace_scan_bc);
+  brow_TraceInit(ctx, trace_connect_bc, trace_disconnect_bc, trace_scan_bc); // TODO Check return value?
   attrnav->trace_started = 1;
 
   trace_scan(attrnav);

@@ -193,9 +193,9 @@ void pack_set_identification_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes)
 
   pSSIR = (T_PN_SERVICE_SET_IDENTIFICATION_REQ*)(service_desc + 1);
 
-  sprintf((char*)pSSIR->TypeOfStation, "PN-IO-CON-OC-Implementation");
-  sprintf((char*)pSSIR->OrderId, "PN-IO-CON-OC       ");
-  sprintf((char*)pSSIR->SerialNumber, "0700123456789099");
+  sprintf((char*)pSSIR->TypeOfStation, "PN-IO-CON-OC-Implementation"); // Null termination required
+  memcpy((char*)pSSIR->OrderId, "PN-IO-CON-OC", 12); // Padded trailing zeros needed, already present due to memset
+  memcpy((char*)pSSIR->SerialNumber, "0700123456789099", 16); // Container exatly 16 in size, no \0
   pSSIR->HwRevisionHighByte = 0;
   pSSIR->HwRevisionLowByte = 1;
   pSSIR->SwRevisionHighWordHighByte = 0;
@@ -1175,7 +1175,7 @@ int unpack_get_alarm_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local
         dev = (pwr_sClass_PnDevice*)device_list->op;
         pwr_tObjid dev_objid = device_list->Objid;
 
-        int index = dev->AlarmBuffer.CurrentIndex;
+        pwr_tUInt32 index = dev->AlarmBuffer.CurrentIndex;
         if (++index >= dev->AlarmBuffer.BufferSize)
           index = 0;
         dev->AlarmBuffer.CurrentIndex = index;
@@ -1864,10 +1864,14 @@ int wait_service_con(io_sAgentLocal* local, io_sAgent* ap)
   return sts;
 }
 
-void handle_exception(io_sAgentLocal* local) { return; }
+void handle_exception(io_sAgentLocal* local) { 
+  (void)local;
+  return;
+}
 
 void handle_state_changed(io_sAgentLocal* local)
 {
+  (void)local;
   printf("State changed!\n");
   return;
 }

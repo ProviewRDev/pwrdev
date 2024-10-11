@@ -74,8 +74,8 @@ void GsdAttr::activate_exit()
   {
     if (gsd->is_modified())
     {
-      wow->DisplayQuestion((void*)this, "Apply", "Do you want to apply changes",
-                           cmd_close_apply_cb, cmd_close_no_cb, 0);
+      wow->DisplayQuestion((void*)this, "Apply", "Do you want to apply changes", cmd_close_apply_cb,
+                           cmd_close_no_cb, 0);
     }
     else
       (close_cb)(parent_ctx);
@@ -86,12 +86,8 @@ void GsdAttr::activate_exit()
 
 void GsdAttr::activate_help()
 {
-  int sts;
-
   if (help_cb)
-    sts = (help_cb)(
-        parent_ctx,
-        "pb_slave_editor /helpfile=\"$pwr_exe/profibus_xtthelp.dat\"");
+    (help_cb)(parent_ctx, "pb_slave_editor /helpfile=\"$pwr_exe/profibus_xtthelp.dat\"");
 }
 
 void GsdAttr::activate_copy()
@@ -185,14 +181,13 @@ void GsdAttr::activate_zoom_reset() { attrnav->unzoom(); }
 void GsdAttr::activate_print()
 {
   char filename[80] = "pwrp_tmp:wnav.ps";
-  char cmd[200];
-  int sts;
+  char cmd[200];  
 
   dcli_translate_filename(filename, filename);
   attrnav->print(filename);
 
   sprintf(cmd, "wb_gre_print.sh %s", filename);
-  sts = system(cmd);
+  system(cmd); // TODO Do something with return value
 }
 
 void GsdAttr::activate_cmd_ok()
@@ -213,12 +208,10 @@ void GsdAttr::activate_cmd_ok()
         sprintf(msg, "Syntax error in module %d, No module name", idx + 1);
         break;
       case PB__DUPLMODULENAME:
-        sprintf(msg, "Syntax error in module %s, Duplicate module name",
-                gsd->module_conf[idx].name);
+        sprintf(msg, "Syntax error in module %s, Duplicate module name", gsd->module_conf[idx].name);
         break;
       case PB__NOMODULECLASS:
-        sprintf(msg, "Syntax error in module %s, Module class is missing",
-                gsd->module_conf[idx].name);
+        sprintf(msg, "Syntax error in module %s, Module class is missing", gsd->module_conf[idx].name);
         break;
       default:
         sprintf(msg, "Syntax error in module %d", idx + 1);
@@ -255,12 +248,10 @@ void GsdAttr::activate_cmd_apply()
         sprintf(msg, "Syntax error in module %d, No module name", idx + 1);
         break;
       case PB__DUPLMODULENAME:
-        sprintf(msg, "Syntax error in module %s, Duplicate module name",
-                gsd->module_conf[idx].name);
+        sprintf(msg, "Syntax error in module %s, Duplicate module name", gsd->module_conf[idx].name);
         break;
       case PB__NOMODULECLASS:
-        sprintf(msg, "Syntax error in module %s, Module class is missing",
-                gsd->module_conf[idx].name);
+        sprintf(msg, "Syntax error in module %s, Module class is missing", gsd->module_conf[idx].name);
         break;
       default:
         sprintf(msg, "Syntax error in module %d", idx + 1);
@@ -305,8 +296,8 @@ void GsdAttr::activate_cmd_ca()
   {
     if (gsd->is_modified())
     {
-      wow->DisplayQuestion((void*)this, "Apply", "Do you want to apply changes",
-                           cmd_close_apply_cb, cmd_close_no_cb, 0);
+      wow->DisplayQuestion((void*)this, "Apply", "Do you want to apply changes", cmd_close_apply_cb,
+                           cmd_close_no_cb, 0);
     }
     else
       (close_cb)(parent_ctx);
@@ -315,10 +306,8 @@ void GsdAttr::activate_cmd_ca()
 
 GsdAttr::~GsdAttr() {}
 
-GsdAttr::GsdAttr(void* a_parent_ctx, void* a_object, pb_gsd* a_gsd,
-                 int a_edit_mode)
-    : parent_ctx(a_parent_ctx), gsd(a_gsd), edit_mode(a_edit_mode),
-      input_open(0), object(a_object), close_cb(0), save_cb(0), help_cb(0),
-      client_data(0), recall_idx(-1), value_current_recall(0)
+GsdAttr::GsdAttr(void* a_parent_ctx, void* a_object, pb_gsd* a_gsd, int a_edit_mode)
+    : parent_ctx(a_parent_ctx), gsd(a_gsd), edit_mode(a_edit_mode), input_open(0), object(a_object),
+      close_cb(0), save_cb(0), help_cb(0), client_data(0), recall_idx(-1), value_current_recall(0)
 {
 }

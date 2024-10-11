@@ -75,6 +75,7 @@ static pwr_tStatus IoAgentSwap(io_tCtx ctx, io_sAgent* ap, io_eEvent event);
 \*----------------------------------------------------------------------------*/
 static pwr_tStatus IoAgentInit(io_tCtx ctx, io_sAgent* ap)
 {
+  (void)ctx; // Ignored
   io_sAgentLocal* local;
   pwr_sClass_PnControllerSoftingPNAK* op;
 
@@ -130,6 +131,7 @@ static pwr_tStatus IoAgentInit(io_tCtx ctx, io_sAgent* ap)
 \*----------------------------------------------------------------------------*/
 static pwr_tStatus IoAgentRead(io_tCtx ctx, io_sAgent* ap)
 {
+  (void)ctx; // Ignored
   io_sAgentLocal* local;
   // PnIOCRData* pn_iocr_data;
   pwr_tUInt16 sts;
@@ -203,6 +205,7 @@ static pwr_tStatus IoAgentRead(io_tCtx ctx, io_sAgent* ap)
 \*----------------------------------------------------------------------------*/
 static pwr_tStatus IoAgentWrite(io_tCtx ctx, io_sAgent* ap)
 {
+  (void)ctx; // Ignored
   io_sAgentLocal* local;
   pwr_tUInt16 sts;
   unsigned char* io_datap;
@@ -329,6 +332,7 @@ static pwr_tStatus IoAgentWrite(io_tCtx ctx, io_sAgent* ap)
 \*----------------------------------------------------------------------------*/
 static pwr_tStatus IoAgentClose(io_tCtx ctx, io_sAgent* ap)
 {
+  (void)ctx; // Ignored
   io_sAgentLocal* local;
   int* exitcodep;
   int error;
