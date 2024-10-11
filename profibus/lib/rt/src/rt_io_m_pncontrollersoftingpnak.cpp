@@ -127,7 +127,7 @@ static pwr_tStatus IoAgentInit(io_tCtx ctx, io_sAgent* ap)
 }
 
 /*----------------------------------------------------------------------------*\
-   Read method for the Pb_Profiboard agent
+   Read method for the PN Controller Softing PNAK agent
 \*----------------------------------------------------------------------------*/
 static pwr_tStatus IoAgentRead(io_tCtx ctx, io_sAgent* ap)
 {
@@ -168,9 +168,13 @@ static pwr_tStatus IoAgentRead(io_tCtx ctx, io_sAgent* ap)
       sts = pnak_get_iocr_data(0, iocr.m_rt_identifier, iocr.m_rt_io_data, &data_length, &ioxs, &status_data);
       if (sts == PNAK_OK)
       {
-        // Set the iocs status. If we have bad data, teh stack will give os zeroed inputs and
-        // the error counter will start increasing
-        if ((pwr_device->IOCS = ioxs) == 0x40)
+        // Set the iocs status. If we have bad data, the stack will give us zeroed inputs and
+        // the error counter will start increasing        
+        // Some converters have shown troubles during startup of the stack and if we disable these when they show
+        // bad ioxs data they will never come back up. So we utilize the startuptime timer for this to give them some time.
+        // TODO Investigate further...
+        io_sPnRackLocal* local_device = (io_sPnRackLocal*)device_list->Local;        
+        if ((pwr_device->IOCS = ioxs) == 0x40 && local_device->start_cnt >= local_device->start_time)
         {
           pwr_device->Status = PB__DISABLED;
         } // 0x40 == Bad, 0x80 == Good...
