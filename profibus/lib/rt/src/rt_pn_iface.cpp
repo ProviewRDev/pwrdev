@@ -2208,28 +2208,28 @@ void* handle_events(void* ptr)
     }
   }
 
-  /* Activate the devices */
+  // /* Activate the devices */
 
-  T_PNAK_EVENT_SET_DEVICE_STATE set_dev_state;
-  unsigned short index, bit_no;
+  // T_PNAK_EVENT_SET_DEVICE_STATE set_dev_state;
+  // unsigned short index, bit_no;
 
-  memset(&set_dev_state, 0, sizeof(set_dev_state));
+  // memset(&set_dev_state, 0, sizeof(set_dev_state));
 
-  for (int device = 0; device < local->device_list.size(); device++)
-  {
-    index = device / 8;
-    bit_no = device % 8;
-    set_dev_state.ActivateDeviceReference[index] |= (1 << bit_no);
-  }
+  // for (int device = 0; device < local->device_list.size(); device++)
+  // {
+  //   index = device / 8;
+  //   bit_no = device % 8;
+  //   set_dev_state.ActivateDeviceReference[index] |= (1 << bit_no);
+  // }
 
-  sts = pnak_set_device_state(0, &set_dev_state);
+  // sts = pnak_set_device_state(0, &set_dev_state);
 
-  if (sts != PNAK_OK)
-  {
-    op->Status = PB__INITFAIL;
-    errh_Error("PROFINET: Unable to activate devices, error code: %d", sts);
-    //    return IO__ERRINIDEVICE;
-  }
+  // if (sts != PNAK_OK)
+  // {
+  //   op->Status = PB__INITFAIL;
+  //   errh_Error("PROFINET: Unable to activate devices, error code: %d", sts);
+  //   //    return IO__ERRINIDEVICE;
+  // }
 
   /* Check state for all devices */
 
