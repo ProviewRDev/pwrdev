@@ -194,7 +194,8 @@ void pack_set_identification_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes)
   pSSIR = (T_PN_SERVICE_SET_IDENTIFICATION_REQ*)(service_desc + 1);
 
   sprintf((char*)pSSIR->TypeOfStation, "PN-IO-CON-OC-Implementation"); // Null termination required
-  memcpy((char*)pSSIR->OrderId, "PN-IO-CON-OC", 12); // Padded trailing zeros needed, already present due to memset
+  memcpy((char*)pSSIR->OrderId, "PN-IO-CON-OC",
+         12); // Padded trailing zeros needed, already present due to memset
   memcpy((char*)pSSIR->SerialNumber, "0700123456789099", 16); // Container exatly 16 in size, no \0
   pSSIR->HwRevisionHighByte = 0;
   pSSIR->HwRevisionLowByte = 1;
@@ -1833,7 +1834,8 @@ int wait_service_con(io_sAgentLocal* local, io_sAgent* ap)
   return sts;
 }
 
-void handle_exception(io_sAgentLocal* local) { 
+void handle_exception(io_sAgentLocal* local)
+{
   (void)local;
   return;
 }
