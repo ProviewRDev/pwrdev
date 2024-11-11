@@ -263,7 +263,7 @@ int wb_wbl_parser::read_docblock(
   tp[line_len] = '\n';
 
   is.seekg(fstart);
-  m_line_cnt++;
+
   c1 = c2 = 0;
   int i = line_len + 1;
   while (is.get(c)) {
