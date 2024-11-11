@@ -65,7 +65,7 @@ SObject pwrb:Class
       EndObject
       Object Identity $Attribute 3 
         Body SysBody
-          Attr TypeRef = "pwrs:Type-$String40"
+          Attr TypeRef = "pwrs:Type-$String80"
         EndBody
       EndObject
       Object Number $Attribute 4 
