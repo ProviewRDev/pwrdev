@@ -318,6 +318,12 @@ static int ccm_func_sort(void* filectx, ccm_sArg* arg_list, int arg_count,
 static int ccm_func_ccm_env_js(void* filectx, ccm_sArg* arg_list, int arg_count,
     int* return_decl, ccm_tFloat* return_float, ccm_tInt* return_int,
     char* return_string);
+static int ccm_func_file_search(void* filectx, ccm_sArg* arg_list, int arg_count,
+    int* return_decl, ccm_tFloat* return_float, ccm_tInt* return_int,
+    char* return_string);
+static int ccm_func_terminate(void* filectx, ccm_sArg* arg_list, int arg_count,
+    int* return_decl, ccm_tFloat* return_float, ccm_tInt* return_int,
+    char* return_string);
 
 #define CCM_SYSFUNC_MAX 200
 
@@ -361,6 +367,8 @@ static ccm_sSysFunc ccm_sysfunc[CCM_SYSFUNC_MAX] = { { "std", "printf",
   { "std", "arrayclear", &ccm_func_arrayclear },
   { "std", "sort", &ccm_func_sort },
   { "std", "ccm_env_js", &ccm_func_ccm_env_js },
+  { "std", "file_search", &ccm_func_file_search },
+  { "std", "terminate", &ccm_func_terminate },
   { "", "", 0 } };
 
 /************* TEST *********************/
@@ -6036,6 +6044,57 @@ static int ccm_func_ccm_env_js(void* filectx, ccm_sArg* arg_list, int arg_count,
   *return_int = 0;
   *return_decl = K_DECL_INT;
   return 1;
+}
+
+static int ccm_func_file_search(void* filectx, ccm_sArg* arg_list, int arg_count,
+    int* return_decl, ccm_tFloat* return_float, ccm_tInt* return_int,
+    char* return_string)
+{
+  ccm_sArg *arg_p1, *arg_p2, *arg_p3;
+  pwr_tFileName fname;
+  pwr_tStatus sts;
+
+  if (arg_count != 3)
+    return CCM__ARGMISM;
+
+  arg_p1 = arg_list;
+  arg_p2 = arg_list->next;
+  arg_p3 = arg_p2->next;
+
+  if (arg_p1->value_decl != K_DECL_STRING)
+    return CCM__VARTYPE;
+  if (arg_p2->value_decl != K_DECL_STRING)
+    return CCM__VARTYPE;
+  if (arg_p3->value_decl != K_DECL_INT)
+    return CCM__VARTYPE;
+
+  if (!(arg_p3->value_int == DCLI_DIR_SEARCH_INIT ||
+	arg_p3->value_int == DCLI_DIR_SEARCH_NEXT ||
+	arg_p3->value_int == DCLI_DIR_SEARCH_END))
+    return CCM__INVARG;
+
+  sts = dcli_search_file(arg_p1->value_string, arg_p2->value_string, arg_p3->value_int);
+  if (ODD(sts) &&
+      (arg_p3->value_int == DCLI_DIR_SEARCH_INIT ||
+       arg_p3->value_int == DCLI_DIR_SEARCH_NEXT)) {
+      strncpy(arg_p1->value_string, fname, K_STRING_SIZE);
+      arg_p2->value_string[K_STRING_SIZE - 1] = 0;
+      arg_p2->value_returned = 1;
+  }
+
+  *return_int = sts;
+  *return_decl = K_DECL_INT;
+  return 1;
+}
+
+static int ccm_func_terminate(void* filectx, ccm_sArg* arg_list, int arg_count,
+    int* return_decl, ccm_tFloat* return_float, ccm_tInt* return_int,
+    char* return_string)
+{
+  if (arg_count != 0)
+    return CCM__ARGMISM;
+
+  exit(0);
 }
 
 static int ccm_extract_parenthes_expr(char* expr, char* line)
