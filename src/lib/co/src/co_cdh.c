@@ -2441,6 +2441,7 @@ pwr_sAttrRef cdh_ArefToCastAref(pwr_sAttrRef* arp)
   cast_aref.Flags.b.ObjectAttr = 0;
   cast_aref.Flags.b.CastAttr = 0;
   cast_aref.Flags.b.DisableAttr = 0;
+  cast_aref.Flags.b.Indirect = 0;
   return cast_aref;
 }
 
