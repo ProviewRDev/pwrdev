@@ -792,6 +792,8 @@ pwr_tStatus Ev::mh_alarmstatus_bc(mh_sAlarmStatus* MsgP)
 
   found = (int*)calloc(1, MsgP->Count * sizeof(int));
 
+  // Check alarmlist
+
   brow_GetObjectList(ev->ala->browbase->ctx, &object_list, &object_cnt);
   ev->ala->size = object_cnt;
 
@@ -884,6 +886,57 @@ pwr_tStatus Ev::mh_alarmstatus_bc(mh_sAlarmStatus* MsgP)
     if (ev->update_info_cb)
       ev->update_info_cb(ev->parent_ctx);
     ev->ala->fill_alarm_tables();
+  }
+
+  // Check blocklist
+
+  brow_GetObjectList(ev->blk->browbase->ctx, &object_list, &object_cnt);
+  ev->blk->size = object_cnt;
+
+  // Reset check to find obsolete items
+  for (i = 0; i < object_cnt; i++) {
+    brow_GetUserData(object_list[i], (void**)&item);
+    switch (item->type) {
+    case evlist_eItemType_Alarm:
+      if (MsgP->Nix == item->eventid.Nix)
+        item->check = 0;
+      break;
+    default:;
+    }
+  }
+  for (i = 0; i < object_cnt; i++) {
+    brow_GetUserData(object_list[i], (void**)&item);
+    switch (item->type) {
+    case evlist_eItemType_Alarm:
+      for (j = 0; j < MsgP->Count; j++) {
+        if (MsgP->Nix == item->eventid.Nix
+            && MsgP->Sts[j].Idx == item->eventid.Idx) {
+          found[j] = 1;
+          item->check = 1;
+        }
+      }
+      break;
+    default:;
+    }
+  }
+
+  // Find and remove the obsolete items
+  brow_GetObjectList(ev->blk->browbase->ctx, &object_list, &object_cnt);
+  for (i = 0; i < object_cnt; i++) {
+    brow_GetUserData(object_list[i], (void**)&item);
+    switch (item->type) {
+    case evlist_eItemType_Alarm:
+      if (MsgP->Nix == item->eventid.Nix && !item->check) {
+        mh_sEventId eventid = item->eventid;
+        ev->blk->event_delete(&item->eventid);
+        // Note, item is now deleted
+        i--;
+        object_cnt--;
+        modified = 1;
+      }
+      break;
+    default:;
+    }
   }
 
   // Request info about any missing ids

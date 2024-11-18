@@ -940,6 +940,17 @@ int EvList::event_delete(mh_sEventId* id)
 
     size--;
   }
+  else if (type == ev_eType_BlockList) {
+    // Blocklist
+    ItemAlarm* item;
+
+    if (!id_to_item(id, (void**)&item))
+      return 0;
+
+    brow_DeleteNode(browbase->ctx, item->node);
+
+    size--;
+  }
   return 1;
 }
 

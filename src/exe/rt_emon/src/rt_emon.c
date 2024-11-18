@@ -405,6 +405,7 @@ struct sLocal {
   pwr_tUInt32 handlerListCount;
   pwr_tBoolean applAlarmQuotaSent;
   redu_tCtx redu;
+  pwr_eRedundancyState reduState;
 };
 
 /* Global variables */
@@ -1202,41 +1203,46 @@ static pwr_tStatus sendAlarmStatus(sOutunit* op)
   LstForEach(al, &l.active_l) {
     ap = LstEntry(al, sActive, active_l);
 
-    if (!ap->detect_etp)
-      continue;
+    if (l.redu && (ap->eventType == (pwr_eEventTypeEnum)mh_eEvent_Block ||
+		   ap->eventType == (pwr_eEventTypeEnum)mh_eEvent_Reblock))
+      count++;
+    else {
+      if (!ap->detect_etp)
+	continue;
 
-    switch (ap->detect_etp->event) {
-    case mh_eEvent_Info:
-    case mh_eEvent_InfoSuccess:
-    case mh_eEvent_Alarm:
-    case mh_eEvent_MaintenanceAlarm:
-    case mh_eEvent_SystemAlarm:
-    case mh_eEvent_UserAlarm1:
-    case mh_eEvent_UserAlarm2:
-    case mh_eEvent_UserAlarm3:
-    case mh_eEvent_UserAlarm4:
+      switch (ap->detect_etp->event) {
+      case mh_eEvent_Info:
+      case mh_eEvent_InfoSuccess:
+      case mh_eEvent_Alarm:
+      case mh_eEvent_MaintenanceAlarm:
+      case mh_eEvent_SystemAlarm:
+      case mh_eEvent_UserAlarm1:
+      case mh_eEvent_UserAlarm2:
+      case mh_eEvent_UserAlarm3:
+      case mh_eEvent_UserAlarm4:
 
-      ep = ap->detect_etp->ep;
+	ep = ap->detect_etp->ep;
 
-      if (ap->detect_etp->event == mh_eEvent_Info
-          || ap->detect_etp->event == mh_eEvent_InfoSuccess) {
-        if (ep && !(ep->msg.info.EventFlags & mh_mEventFlags_InfoWindow))
-          break;
-        if (ep && ep->msg.info.EventFlags & mh_mEventFlags_InfoWindow
-            && !(ep->msg.info.EventFlags & mh_mEventFlags_Ack))
-          break;
+	if (ap->detect_etp->event == mh_eEvent_Info
+	    || ap->detect_etp->event == mh_eEvent_InfoSuccess) {
+	  if (ep && !(ep->msg.info.EventFlags & mh_mEventFlags_InfoWindow))
+	    break;
+	  if (ep && ep->msg.info.EventFlags & mh_mEventFlags_InfoWindow
+	      && !(ep->msg.info.EventFlags & mh_mEventFlags_Ack))
+	    break;
+	}
+	
+	if (ep)
+	  is_for_outunit = isForOutunit(op, ep->outunit, ep->object.Objid,
+					ep->objName, ep->msg.info.EventFlags, ep->eventType, ep->local);
+	else
+	  is_for_outunit = isForOutunit(op, ap->outunit, ap->object.Objid,
+					ap->objName, ap->eventFlags, ap->eventType, ap->local);
+	if (is_for_outunit)
+	  count++;
+	break;
+      default:;
       }
-
-      if (ep)
-        is_for_outunit = isForOutunit(op, ep->outunit, ep->object.Objid,
-            ep->objName, ep->msg.info.EventFlags, ep->eventType, ep->local);
-      else
-        is_for_outunit = isForOutunit(op, ap->outunit, ap->object.Objid,
-            ap->objName, ap->eventFlags, ap->eventType, ap->local);
-      if (is_for_outunit)
-        count++;
-      break;
-    default:;
     }
   }
 
@@ -1249,44 +1255,57 @@ static pwr_tStatus sendAlarmStatus(sOutunit* op)
   LstForEach(al, &l.active_l) {
     ap = LstEntry(al, sActive, active_l);
 
-    if (!ap->detect_etp)
-      continue;
+    if (l.redu && (ap->eventType == (pwr_eEventTypeEnum)mh_eEvent_Block ||
+		   ap->eventType == (pwr_eEventTypeEnum)mh_eEvent_Reblock)) {
+      // Block events are not included for none redundancy nodes for backward compabilites reasons
+      if (!ap->detect_etp)
+	continue;
 
-    switch (ap->detect_etp->event) {
-    case mh_eEvent_Info:
-    case mh_eEvent_InfoSuccess:
-    case mh_eEvent_Alarm:
-    case mh_eEvent_MaintenanceAlarm:
-    case mh_eEvent_SystemAlarm:
-    case mh_eEvent_UserAlarm1:
-    case mh_eEvent_UserAlarm2:
-    case mh_eEvent_UserAlarm3:
-    case mh_eEvent_UserAlarm4:
+      msg->Sts[count].Idx = ap->idx;
+      msg->Sts[count].Status = ap->status.Event.Status;
+      count++;
+    }
+    else {
 
-      ep = ap->detect_etp->ep;
+      if (!ap->detect_etp)
+	continue;
 
-      if (ap->detect_etp->event == mh_eEvent_Info
-          || ap->detect_etp->event == mh_eEvent_InfoSuccess) {
-        if (ep && !(ep->msg.info.EventFlags & mh_mEventFlags_InfoWindow))
-          break;
-        if (ep && ep->msg.info.EventFlags & mh_mEventFlags_InfoWindow
-            && !(ep->msg.info.EventFlags & mh_mEventFlags_Ack))
-          break;
+      switch (ap->detect_etp->event) {
+      case mh_eEvent_Info:
+      case mh_eEvent_InfoSuccess:
+      case mh_eEvent_Alarm:
+      case mh_eEvent_MaintenanceAlarm:
+      case mh_eEvent_SystemAlarm:
+      case mh_eEvent_UserAlarm1:
+      case mh_eEvent_UserAlarm2:
+      case mh_eEvent_UserAlarm3:
+      case mh_eEvent_UserAlarm4:
+	
+	ep = ap->detect_etp->ep;
+
+	if (ap->detect_etp->event == mh_eEvent_Info
+	    || ap->detect_etp->event == mh_eEvent_InfoSuccess) {
+	  if (ep && !(ep->msg.info.EventFlags & mh_mEventFlags_InfoWindow))
+	    break;
+	  if (ep && ep->msg.info.EventFlags & mh_mEventFlags_InfoWindow
+	      && !(ep->msg.info.EventFlags & mh_mEventFlags_Ack))
+	    break;
+	}
+
+	if (ep)
+	  is_for_outunit = isForOutunit(op, ep->outunit, ep->object.Objid,
+	      ep->objName, ep->msg.info.EventFlags, ep->eventType, ep->local);
+	else
+	  is_for_outunit = isForOutunit(op, ap->outunit, ap->object.Objid,
+              ap->objName, ap->eventFlags, ap->eventType, ap->local);
+	if (is_for_outunit) {
+	  msg->Sts[count].Idx = ap->idx;
+	  msg->Sts[count].Status = ap->status.Event.Status;
+	  count++;
+	}
+	break;
+      default:;
       }
-
-      if (ep)
-        is_for_outunit = isForOutunit(op, ep->outunit, ep->object.Objid,
-            ep->objName, ep->msg.info.EventFlags, ep->eventType, ep->local);
-      else
-        is_for_outunit = isForOutunit(op, ap->outunit, ap->object.Objid,
-            ap->objName, ap->eventFlags, ap->eventType, ap->local);
-      if (is_for_outunit) {
-        msg->Sts[count].Idx = ap->idx;
-        msg->Sts[count].Status = ap->status.Event.Status;
-        count++;
-      }
-      break;
-    default:;
     }
   }
   sts = sendToOutunit(
@@ -3535,9 +3554,17 @@ static void outunitAlarmReq(mh_sHead* hp, sOutunit* op)
       ap = LstEntry(al, sActive, active_l);
 
       if (ap->idx == msg->Idx[i]) {
-        if (!ap->detect_etp->ap)
-          /* Not active any more, don't resend */
-          break;
+
+
+	if (ap->eventType == (pwr_eEventTypeEnum)mh_eEvent_Block ||
+	    ap->eventType == (pwr_eEventTypeEnum)mh_eEvent_Reblock) {
+	  if (!ap->detect_etp)
+	    break;
+	} else {
+	  if (!ap->detect_etp->ap)
+	    /* Not active any more, don't resend */
+	    break;
+	}
 
         ok = reSendEventToOutunit(op, ap->detect_etp);
         if (ok) {
@@ -3597,6 +3624,7 @@ static void receive(qcom_sQid myQ)
 
   while (1) {
     if (l.redu && l.nodep->RedundancyState == pwr_eRedundancyState_Passive) {
+      l.reduState = l.nodep->RedundancyState;
       if (l.supListState == eSupListState_Init) {
         initSupList();
         if (!LstEmpty(&l.sup_l))
@@ -3620,6 +3648,28 @@ static void receive(qcom_sQid myQ)
       }
       pwrs_Node_Exec(handlerEvent_cb);
     } else {
+      if (l.redu && l.nodep->RedundancyState == pwr_eRedundancyState_Active &&
+	  l.reduState == pwr_eRedundancyState_Passive) {
+	// Switched to active, refresh outunits
+	l.reduState = l.nodep->RedundancyState;
+       
+	struct LstHead * ol;
+	sOutunit* op;
+
+	LstForEach(ol, &l.outunit_l) {
+	  op = LstEntry(ol, sOutunit, outunit_l);
+	  if (op->outunit.vid == l.nodeDb[0].nid)
+	    sendToOutunit(op, mh_eMsg_OutunitClear, 0, 0, NULL, 0);
+	}
+	LstForEach(ol, &l.outunit_l) {
+	  op = LstEntry(ol, sOutunit, outunit_l);
+	  if (op->outunit.vid == l.nodeDb[0].nid)
+	    sendEventListToOutunit(op);
+	}
+      }
+      else
+	l.reduState = l.nodep->RedundancyState;
+
       get.maxSize = sizeof(mp);
       get.data = mp;
       qcom_Get(&sts, &myQ, &get, tmo);
@@ -3772,7 +3822,8 @@ static pwr_tBoolean reSendEventToOutunit(sOutunit* op, sEventTab* etp)
   case mh_eSource_Scanner:
     sp = (sSupActive*)ap;
     formatSupEvent(etp->event, NULL, (sSupActive*)ap, &event, &size);
-    Status = sp->sup->AlarmStatus.All;
+    //Status = sp->sup->AlarmStatus.All;
+    Status = sp->link.status.All;
     break;
   case mh_eSource_Application:
   case mh_eSource_Handler:
@@ -4538,6 +4589,8 @@ typedef struct {
   pwr_tUInt32 detect_event;
   pwr_tUInt32 return_event;
   pwr_tUInt32 ack_event;
+  mh_sEventId target_id;
+  pwr_tObjid outunit_block;
 } redu_sEvActive;
 
 typedef struct {
@@ -4668,7 +4721,10 @@ static pwr_tStatus emon_redu_send()
       activep->returnTime = sp->sup->ReturnTime;
       activep->ackTime = sp->sup->AckTime;
     }
-
+    if (ap->source == mh_eSource_Outunit) {
+      activep->target_id = ((sBlock*)ap)->targetId;
+      activep->outunit_block = ((sBlock*)ap)->outunitBlock.outunit;
+    }
     activep++;
   }
 
@@ -4817,7 +4873,7 @@ static pwr_tStatus emon_redu_receive()
       ep->object = eventp->object;
       ep->local = eventp->local;
       ep->event = eventp->event;
-      ep->eventType = ep->eventType;
+      ep->eventType = eventp->eventType;
       strncpy(ep->objName, eventp->objName, sizeof(ep->objName));
       ep->msg = eventp->msg;
       if (eventp->etp == NOIDX)
@@ -4884,24 +4940,146 @@ static pwr_tStatus emon_redu_receive()
           activeListRemove(ap);
         }
       }
+      else if (ap->source == mh_eSource_Outunit) {
+	activeListRemove(ap);
+	sts = gdh_SetAlarmBlockLevel(ap->object.Objid, 0);
+	switch (ap->event) {
+	case mh_eEvent_Block:
+	case mh_eEvent_Reblock:
+	  blockListFree((sBlock*)ap);
+	  break;
+	default:
+	  ;
+	}
+      }
     }
 
     /* Add new elements in active list and update existing */
     activep = (redu_sEvActive*)((char*)msg + sizeof(redu_sEvMsgHeader));
+    
     for (i = 0; i < actives; i++) {
       found = 0;
       if (activep->source == mh_eSource_Scanner
           || activep->source == mh_eSource_Handler) {
         LstForEach(al, &l.active_l) {
           ap = LstEntry(al, sActive, active_l);
-          if ((activep->source == mh_eSource_Scanner
-                  || activep->source == mh_eSource_Handler)
-              && cdh_ArefIsEqual(&activep->supObject, &ap->supObject)) {
+          if (activep->source == ap->source &&
+              cdh_ArefIsEqual(&activep->supObject, &ap->supObject)) {
             sp = (sSupActive*)ap;
             found = 1;
             break;
           }
         }
+      }
+      else if (activep->source == mh_eSource_Outunit) {
+        LstForEach(al, &l.active_l) {
+          ap = LstEntry(al, sActive, active_l);
+          if (activep->source == ap->source &&
+	      cdh_ArefIsEqual(&activep->object, &ap->object)) {
+            sp = (sSupActive*)ap;
+            found = 1;
+            break;
+          }
+        }
+      }
+
+      if (activep->source == mh_eSource_Outunit) {
+	if (!found) {
+	  switch((int)activep->eventType) {
+	  case mh_eEvent_Block:
+	  case mh_eEvent_Reblock:
+	  case mh_eEvent_Unblock:
+	    break;
+	  default:
+	    activep++;
+	    continue;
+	  }
+	  sBlock* bp = NULL;
+	  struct LstHead * bl;
+	  pwr_tNodeIndex nix;
+	  
+	  LstForEach(bl, &l.block_l) {
+	    if (cdh_ObjidIsEqual(activep->object.Objid, LstEntry(bl, sBlock, block_l)->link.object.Objid))
+	      bp = LstEntry(bl, sBlock, block_l);
+	  }
+	  if (bp == NULL) {
+	    sts = gdh_GetObjectNodeIndex(activep->object.Objid, &nix);
+	    if (EVEN(sts) || nix != l.head.nix) {
+	      activep++;
+	      continue;
+	    }
+
+	    bp = blockListAlloc();
+	    bp->link.event = mh_eEvent_Block;
+	    bp->link.eventType = activep->eventType;
+	    bp->link.eventFlags = mh_mEventFlags_Force;
+	    bp->link.source = activep->source;
+	    bp->link.object = activep->object;
+	    bp->link.status = activep->status;
+	    bp->link.idx = activep->idx;
+	    bp->link.outunit = activep->outunit;
+	    bp->outunitBlock.outunit = activep->outunit_block;
+	    bp->targetId = activep->target_id;
+	    sts = gdh_ObjidToName(activep->object.Objid, bp->link.objName, 
+		sizeof(bp->link.objName), cdh_mNName);
+	    strcpy(bp->link.eventName, bp->link.objName);
+
+	    if (activep->detect_etp == NOIDX)
+	      ap->detect_etp = 0;
+	    else {
+	      bp->link.detect_etp = tree_Find(&sts, l.eventTab, &activep->detect_etp);
+	      if (bp->link.detect_etp == 0) {
+		bp->link.detect_etp = tree_Insert(&sts, l.eventTab, &activep->detect_etp);
+		bp->link.detect_etp->ep = 0;
+	      }
+	      bp->link.detect_etp->event = activep->detect_event;
+	      // bp->link.detect_etp->event = bp.link->event;
+	      bp->link.detect_etp->ap = (sActive*)bp;
+	      if (bp->link.detect_etp->ep) {
+		bp->outunitBlock.prio = bp->link.detect_etp->ep->msg.message.Info.EventPrio;
+		bp->outunitBlock.time = bp->link.detect_etp->ep->msg.message.Info.EventTime;
+		bp->outunitUnblock.prio = bp->link.detect_etp->ep->msg.message.Info.EventPrio;
+		bp->outunitUnblock.time = bp->link.detect_etp->ep->msg.message.Info.EventTime;
+	      }
+	    }
+	  } 
+	  l.newBlock = TRUE;
+
+	  ep = bp->link.detect_etp->ep;
+	  switch (bp->link.event) {
+	  case mh_eEvent_Unblock:
+	    activeListRemove((sActive*)bp);
+	    blockListFree(bp);
+	    sts = gdh_SetAlarmBlockLevel(bp->link.object.Objid, 0);
+	    break;
+	  case mh_eEvent_Block:
+	    //bp->targetId.Idx = bp->link.idx;
+	    activeListInsert((sActive*)bp, ep, mh_eSource_Outunit);
+	    sts = gdh_SetAlarmBlockLevel(bp->link.object.Objid, bp->link.status.All);
+	    break;
+	  case mh_eEvent_Reblock:
+	    //bp->targetId.Idx = bp->link.idx;
+	    activeListRemove((sActive*)bp);
+	    activeListInsert((sActive*)bp, ep, mh_eSource_Outunit);
+	    sts = gdh_SetAlarmBlockLevel(bp->link.object.Objid, bp->link.status.All);
+	    break;
+	  default:
+	    errh_Error("outunitBlock, program error (2), event: %d", bp->link.event);
+	    break;
+	  }
+
+	  saveBlockList();
+	} else {
+	  if (activep->detect_etp == NOIDX)
+	    ((sBlock*)ap)->link.detect_etp = 0;
+	  else {
+	    ((sBlock*)ap)->link.detect_etp = tree_Find(&sts, l.eventTab, &activep->detect_etp);
+	    ((sBlock*)ap)->link.detect_etp->ap = ap;
+	    ((sBlock*)ap)->link.detect_etp->event = ((sBlock*)ap)->link.event;
+	  }
+	}
+	activep++;
+	continue;
       }
 
       if (!found) {
@@ -4971,24 +5149,9 @@ static pwr_tStatus emon_redu_receive()
         continue;
       }
       if (!found) {
-        struct LstHead * al;
-        struct LstHead * bl;
 
-        // printf( "Active add, idx %d %s\n", ap->detect_etp->idx,
-        // ap->detect_etp->ep ? ap->detect_etp->ep->objName : "");
-        // if ( sp->sup) {
-        // sp->sup->DetectTime = activep->detectTime;
-        // sp->sup->AckTime = activep->ackTime;
-        // sp->sup->ReturnTime = activep->returnTime;
-        // sp->sup->AlarmCheck = FALSE;
-        // sp->sup->DetectCheck = FALSE;
-        // sp->sup->ReturnCheck = TRUE;
-        // sp->sup->AlarmStatus.All = activep->status.All;
-        //}
         /* Insert in active list */
-
-        al = &l.active_l;
-        LstInsert(al, &ap->active_l);
+        struct LstHead *al = &l.active_l;
 
         switch (ap->event) {
         case mh_eEvent_Alarm:
@@ -4998,16 +5161,12 @@ static pwr_tStatus emon_redu_receive()
         case mh_eEvent_UserAlarm2:
         case mh_eEvent_UserAlarm3:
         case mh_eEvent_UserAlarm4:
+	  LstInsert(al, &ap->active_l);
           ++l.emon->AlarmCount;
-          break;
-        case mh_eEvent_Block:
-        case mh_eEvent_Reblock:
-          bl = &l.block_l;
-          LstInsert(bl, &((sBlock*)ap)->block_l);
-          ++l.emon->BlockCount;
           break;
         case mh_eEvent_Info:
         case mh_eEvent_InfoSuccess:
+	  LstInsert(al, &ap->active_l);
           break;
         default:
           errh_Error("activeListInsert, program error, event: %d", ap->event);
@@ -5020,6 +5179,11 @@ static pwr_tStatus emon_redu_receive()
       ap->idx = activep->idx;
       ap->outunit = activep->outunit;
       ap->status = activep->status;
+      if (activep->source == mh_eSource_Scanner) {
+	((sSupActive*)sp)->sup->DetectTime = activep->detectTime;
+	((sSupActive*)sp)->sup->ReturnTime = activep->returnTime;
+	((sSupActive*)sp)->sup->AckTime = activep->ackTime;
+      }
       activep++;
     }
 
