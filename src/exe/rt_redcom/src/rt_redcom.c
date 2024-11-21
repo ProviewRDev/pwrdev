@@ -1273,7 +1273,9 @@ static void iseg_import(sLink* lp, sIseg* sp)
         /* To do !!!  Send notification reply if requested. */
         qdb_Free(NULL, lp->bp[prio]);
       } else {
-        qdb_Put(NULL, lp->bp[prio], qp);
+        qdb_Put(&sts, lp->bp[prio], qp);
+	if (sts == QDB__QUOTAEXCEEDED)
+	  qdb_Free(NULL, lp->bp[prio]);
       }
     }
     qdb_ScopeUnlock;
