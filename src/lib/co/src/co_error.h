@@ -39,14 +39,16 @@
 
 #include "co_status.h"
 
-class co_error : public co_status {
+class co_error : public co_status
+{
 public:
   co_error();
   co_error(pwr_tStatus sts);
   virtual std::string what() const;
 };
 
-class co_error_str : public co_error {
+class co_error_str : public co_error
+{
   std::string m_error_str;
 
 public:

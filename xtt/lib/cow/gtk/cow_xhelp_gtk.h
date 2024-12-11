@@ -40,10 +40,10 @@
 #include "cow_xhelp.h"
 #include "cow_wow_gtk.h"
 
-class CoXHelpGtk : public CoXHelp {
+class CoXHelpGtk : public CoXHelp
+{
 public:
-  CoXHelpGtk(GtkWidget* xa_parent_wid, void* xa_parent_ctx,
-      xhelp_eUtility utility, int* xa_sts);
+  CoXHelpGtk(GtkWidget* xa_parent_wid, void* xa_parent_ctx, xhelp_eUtility utility, int* xa_sts);
   GtkWidget* parent_wid;
   GtkWidget* brow_widget;
   GtkWidget* form_widget;
@@ -57,8 +57,8 @@ public:
   void set_dimension(int width, int height);
   void pop();
   void print();
-  void open_input_dialog(const char* text, const char* title,
-      const char* init_text, void (*ok_cb)(CoXHelp*, char*));
+  void open_input_dialog(const char* text, const char* title, const char* init_text,
+                         void (*ok_cb)(CoXHelp*, char*));
   static void activate_close(GtkWidget* w, gpointer data);
   static void activate_print(GtkWidget* w, gpointer data);
   static void activate_home(GtkWidget* w, gpointer data);
@@ -76,8 +76,7 @@ public:
   static void activate_help(GtkWidget* w, gpointer data);
   static void enable_set_focus(CoXHelpGtk* xhelp);
   static void disable_set_focus(CoXHelpGtk* xhelp, int time);
-  static gboolean action_inputfocus(
-      GtkWidget* w, GdkEvent* event, gpointer data);
+  static gboolean action_inputfocus(GtkWidget* w, GdkEvent* event, gpointer data);
 
   static GtkWidget* get_widget()
   {

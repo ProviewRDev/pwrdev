@@ -40,7 +40,8 @@
 /* xtt_xnav.h -- Simple navigator */
 
 #if defined __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 #include "pwr_baseclasses.h"
@@ -90,14 +91,16 @@ class XttFileview;
 class CoLogin;
 class XttStream;
 
-typedef enum {
+typedef enum
+{
   xnav_mOpen_All = ~0,
   xnav_mOpen_Children = 1 << 0,
   xnav_mOpen_Attributes = 1 << 1,
   xnav_mOpen_Crossref = 1 << 2
 } xnav_mOpen;
 
-typedef enum {
+typedef enum
+{
   xnav_eType_GdbNodeFlags = 10000,
   xnav_eType_Empty = 10001,
   xnav_eType_FixStr = 10002,
@@ -111,20 +114,23 @@ typedef enum {
   xnav_eType_LoggType = 10010
 } xnav_eType;
 
-typedef enum {
+typedef enum
+{
   xnav_eDestCode_After,
   xnav_eDestCode_Before,
   xnav_eDestCode_FirstChild,
   xnav_eDestCode_LastChild
 } xnav_eDestCode;
 
-typedef enum {
+typedef enum
+{
   xnav_eSearchType_No,
   xnav_eSearchType_Name,
   xnav_eSearchType_RegularExpr
 } xnav_eSearchType;
 
-typedef enum {
+typedef enum
+{
   menu_ePixmap_Map,
   menu_ePixmap_Graph,
   menu_ePixmap_Script,
@@ -132,7 +138,8 @@ typedef enum {
   menu_ePixmap_Leaf
 } menu_ePixmap;
 
-typedef enum {
+typedef enum
+{
   xnav_eConv_No,
   xnav_eConv_Hex,
   xnav_eConv_Decimal,
@@ -144,14 +151,16 @@ typedef enum {
   xnav_eConv_FloatF
 } xnav_eConv;
 
-typedef struct {
+typedef struct
+{
   char title[80];
   int item_type;
   int pixmap;
   void* action;
 } xnav_sStartMenu;
 
-typedef struct xnav_s_Menu {
+typedef struct xnav_s_Menu
+{
   char title[80];
   int item_type;
   char command[256];
@@ -163,25 +172,29 @@ typedef struct xnav_s_Menu {
 
 typedef struct s_trace_node t_trace_node;
 
-struct s_trace_node {
+struct s_trace_node
+{
   t_trace_node* Next;
   RtTrace* tractx;
   pwr_tObjid Objid;
 };
 
-typedef enum {
+typedef enum
+{
   xnav_eSetSignal_Conversion,
   xnav_eSetSignal_Invert,
   xnav_eSetSignal_Test,
   xnav_eSetSignal_TestValue
 } xnav_eSetSignal;
 
-typedef struct {
+typedef struct
+{
   unsigned int num;
   char name[40];
 } xnav_sEnumElement;
 
-typedef struct {
+typedef struct
+{
   unsigned int num;
   xnav_sEnumElement* elements;
 } xnav_sEnum;
@@ -190,14 +203,14 @@ extern xnav_sEnum xnav_enum_types[];
 
 class XNav;
 
-class XNavGbl {
+class XNavGbl
+{
 public:
   XNavGbl()
-      : priv(0), OpObject(pwr_cNObjid), AlarmBeep(0), AlarmReturn(0),
-        AlarmAck(0), hide_opwind(0), hide_statusbar(0), op_wind_pop(0),
-        op_wind_eventname_seg(0), gdh_started(1), verify(0), scantime(0.5),
-        signal_test_mode(0), advanced_user(1), show_truedb(0), show_allattr(0),
-        no_graph_ratio(0), color_theme(0)
+      : priv(0), OpObject(pwr_cNObjid), AlarmBeep(0), AlarmReturn(0), AlarmAck(0), hide_opwind(0),
+        hide_statusbar(0), op_wind_pop(0), op_wind_eventname_seg(0), gdh_started(1), verify(0), scantime(0.5),
+        signal_test_mode(0), advanced_user(1), show_truedb(0), show_allattr(0), no_graph_ratio(0),
+        color_theme(0)
   {
     strcpy(version, xnav_cVersion);
     strcpy(time, "");
@@ -233,10 +246,11 @@ public:
   int setupscript_exec(XNav* xnav);
 };
 
-class XNav {
+class XNav
+{
 public:
-  XNav(void* xn_parent_ctx, const char* xn_name, xnav_sStartMenu* root_menu,
-      char* xn_opplace_name, int xn_op_close_button, pwr_tStatus* status);
+  XNav(void* xn_parent_ctx, const char* xn_name, xnav_sStartMenu* root_menu, char* xn_opplace_name,
+       int xn_op_close_button, pwr_tStatus* status);
   virtual ~XNav();
 
   XNavGbl gbl;
@@ -302,161 +316,113 @@ public:
   XttKeyboard* keyboard;
   void* keyboard_owner;
 
-  virtual void set_inputfocus()
+  virtual void set_inputfocus() {}
+  virtual void pop() {}
+  virtual void set_transient(void* basewidget) {}
+  virtual void create_popup_menu(pwr_sAttrRef attrref, xmenu_eItemType item_type, xmenu_mUtility caller,
+                                 unsigned int priv, char* arg, int x, int y)
   {
   }
-  virtual void pop()
-  {
-  }
-  virtual void set_transient(void* basewidget)
-  {
-  }
-  virtual void create_popup_menu(pwr_sAttrRef attrref,
-      xmenu_eItemType item_type, xmenu_mUtility caller, unsigned int priv,
-      char* arg, int x, int y)
-  {
-  }
-  virtual RtTrace* plctrace_new(pwr_tOid oid, pwr_tStatus* sts)
+  virtual RtTrace* plctrace_new(pwr_tOid oid, pwr_tStatus* sts) { return 0; }
+  virtual XAtt* xatt_new(pwr_tAttrRef* arp, int advanced_user, pwr_tStatus* sts) { return 0; }
+  virtual XCrr* xcrr_new(pwr_tAttrRef* arp, int advanced_user, pwr_tStatus* sts) { return 0; }
+  virtual XColWind* xcolwind_new(pwr_tAttrRef* ar_list, char* title, int advanced_user, int type,
+                                 pwr_tStatus* sts)
   {
     return 0;
   }
-  virtual XAtt* xatt_new(pwr_tAttrRef* arp, int advanced_user, pwr_tStatus* sts)
+  virtual Ev* ev_new(char* eve_name, char* ala_name, char* blk_name, pwr_tObjid ev_user, int display_ala,
+                     int display_eve, int display_blk, int display_return, int display_ack, int ev_beep,
+                     pwr_tMask ev_pop_mask, int ev_eventname_seg, pwr_tStatus* status)
   {
     return 0;
   }
-  virtual XCrr* xcrr_new(pwr_tAttrRef* arp, int advanced_user, pwr_tStatus* sts)
+  virtual Hist* hist_new(char* title, pwr_tAttrRef* arp, pwr_tStatus* sts) { return 0; }
+  virtual Block* block_new(pwr_tAttrRef* arp, char* name, unsigned int priv, pwr_tStatus* sts) { return 0; }
+  virtual Op* op_new(char* opplace, pwr_tStatus* sts) { return 0; }
+  virtual XttTrend* xtttrend_new(char* name, pwr_tAttrRef* objar, pwr_tAttrRef* plotgroup, int width,
+                                 int height, unsigned int options, int color_theme, void* basewidget,
+                                 pwr_tStatus* sts)
   {
     return 0;
   }
-  virtual XColWind* xcolwind_new(pwr_tAttrRef* ar_list, char* title,
-      int advanced_user, int type, pwr_tStatus* sts)
+  virtual XttSevHist* xttsevhist_new(char* name, pwr_tOid* oidv, pwr_tOName* aname, pwr_tOName* oname,
+                                     bool* sevhistobjectv, sevcli_tCtx scctx, char* filename, int width,
+                                     int height, unsigned int options, int color_theme,
+                                     time_ePeriod time_range, void* basewidget, pwr_tStatus* sts)
   {
     return 0;
   }
-  virtual Ev* ev_new(char* eve_name, char* ala_name, char* blk_name,
-      pwr_tObjid ev_user, int display_ala, int display_eve, int display_blk,
-      int display_return, int display_ack, int ev_beep, pwr_tMask ev_pop_mask,
-      int ev_eventname_seg, pwr_tStatus* status)
+  virtual XttTCurve* xtttcurve_new(char* name, pwr_tAttrRef* arefv, int width, int height,
+                                   unsigned int options, int color_theme, void* basewidget, pwr_tStatus* sts)
   {
     return 0;
   }
-  virtual Hist* hist_new(char* title, pwr_tAttrRef* arp, pwr_tStatus* sts)
+  virtual XttFast* xttfast_new(char* name, pwr_tAttrRef* objar, int width, int height, unsigned int options,
+                               char* filename, int color_theme, void* basewidget, pwr_tStatus* sts)
   {
     return 0;
   }
-  virtual Block* block_new(
-      pwr_tAttrRef* arp, char* name, unsigned int priv, pwr_tStatus* sts)
+  virtual XAttOne* xattone_new(pwr_tAttrRef* objar, char* title, unsigned int priv, pwr_tStatus* sts)
   {
     return 0;
   }
-  virtual Op* op_new(char* opplace, pwr_tStatus* sts)
+  virtual CLog* clog_new(const char* name, pwr_tStatus* sts) { return 0; }
+  virtual XttGe* xnav_ge_new(const char* name, const char* filename, int scrollbar, int menu, int navigator,
+                             int width, int height, int x, int y, double scan_time, const char* object_name,
+                             int use_default_access, unsigned int access, unsigned int options,
+                             void* basewidget, double* borders, int color_theme, int dashboard,
+                             int (*xg_command_cb)(void*, char*, char*, char*, void*),
+                             int (*xg_get_current_objects_cb)(void*, pwr_sAttrRef**, int**),
+                             int (*xg_is_authorized_cb)(void*, unsigned int),
+                             void (*xg_keyboard_cb)(void*, void*, int, int))
   {
     return 0;
   }
-  virtual XttTrend* xtttrend_new(char* name, pwr_tAttrRef* objar,
-      pwr_tAttrRef* plotgroup, int width, int height, unsigned int options,
-      int color_theme, void* basewidget, pwr_tStatus* sts)
+  virtual XttMultiView* multiview_new(const char* name, pwr_tAttrRef* aref, int width, int height, int x,
+                                      int y, unsigned int options, void* basewidget, int color_theme,
+                                      pwr_tStatus* sts, int (*command_cb)(void*, char*, char*, char*, void*),
+                                      int (*get_current_objects_cb)(void*, pwr_sAttrRef**, int**),
+                                      int (*is_authorized_cb)(void*, unsigned int),
+                                      void (*keyboard_cb)(void*, void*, int, int))
   {
     return 0;
   }
-  virtual XttSevHist* xttsevhist_new(char* name, pwr_tOid* oidv,
-      pwr_tOName* aname, pwr_tOName* oname, bool* sevhistobjectv,
-      sevcli_tCtx scctx, char* filename, int width, int height,
-      unsigned int options, int color_theme, time_ePeriod time_range,
-      void* basewidget, pwr_tStatus* sts)
+  virtual XttStream* stream_new(const char* name, const char* uri, int width, int height, int x, int y,
+                                double scan_time, unsigned int options, int embedded, pwr_tAttrRef* arp,
+                                pwr_tStatus* sts)
   {
     return 0;
   }
-  virtual XttTCurve* xtttcurve_new(char* name, pwr_tAttrRef* arefv, int width,
-      int height, unsigned int options, int color_theme, void* basewidget,
-      pwr_tStatus* sts)
+  virtual GeCurve* gecurve_new(char* name, char* filename, GeCurveData* data, int pos_right,
+                               unsigned int options, int color_theme, void* basewidget)
   {
     return 0;
   }
-  virtual XttFast* xttfast_new(char* name, pwr_tAttrRef* objar, int width,
-      int height, unsigned int options, char* filename, int color_theme,
-      void* basewidget, pwr_tStatus* sts)
+  virtual XttFileview* fileview_new(pwr_tOid oid, char* title, char* dir, char* pattern, int type,
+                                    char* target_attr, char* trigger_attr, char* filetype)
   {
     return 0;
   }
-  virtual XAttOne* xattone_new(
-      pwr_tAttrRef* objar, char* title, unsigned int priv, pwr_tStatus* sts)
+  virtual CoLogin* login_new(const char* wl_name, const char* wl_groupname, void (*wl_bc_success)(void*),
+                             void (*wl_bc_cancel)(void*), void* basewidget, pwr_tStatus* status)
   {
     return 0;
   }
-  virtual CLog* clog_new(const char* name, pwr_tStatus* sts)
+  virtual XttKeyboard* keyboard_new(const char* name, keyboard_eKeymap keymap, keyboard_eType type,
+                                    int color_theme, pwr_tStatus* status)
   {
     return 0;
   }
-  virtual XttGe* xnav_ge_new(const char* name, const char* filename,
-      int scrollbar, int menu, int navigator, int width, int height, int x,
-      int y, double scan_time, const char* object_name, int use_default_access,
-      unsigned int access, unsigned int options, void* basewidget,
-      double* borders, int color_theme, int dashboard,
-      int (*xg_command_cb)(void*, char*, char*, char *, void*),
-      int (*xg_get_current_objects_cb)(void*, pwr_sAttrRef**, int**),
-      int (*xg_is_authorized_cb)(void*, unsigned int),
-      void (*xg_keyboard_cb)(void*, void*, int, int))
+  virtual XttOTree* tree_new(const char* title, pwr_tAttrRef* itemlist, int itemcnt, unsigned int options,
+                             pwr_tStatus (*action_cb)(void*, pwr_tAttrRef*))
   {
     return 0;
   }
-  virtual XttMultiView* multiview_new(const char* name, pwr_tAttrRef* aref,
-      int width, int height, int x, int y, unsigned int options,
-      void* basewidget, int color_theme, pwr_tStatus* sts,
-      int (*command_cb)(void*, char*, char*, char *, void*),
-      int (*get_current_objects_cb)(void*, pwr_sAttrRef**, int**),
-      int (*is_authorized_cb)(void*, unsigned int),
-      void (*keyboard_cb)(void*, void*, int, int))
-  {
-    return 0;
-  }
-  virtual XttStream* stream_new(const char* name, const char* uri, int width,
-      int height, int x, int y, double scan_time, unsigned int options,
-      int embedded, pwr_tAttrRef* arp, pwr_tStatus* sts)
-  {
-    return 0;
-  }
-  virtual GeCurve* gecurve_new(char* name, char* filename, GeCurveData* data,
-      int pos_right, unsigned int options, int color_theme, void* basewidget)
-  {
-    return 0;
-  }
-  virtual XttFileview* fileview_new(pwr_tOid oid, char* title, char* dir,
-      char* pattern, int type, char* target_attr, char* trigger_attr,
-      char* filetype)
-  {
-    return 0;
-  }
-  virtual CoLogin* login_new(const char* wl_name, const char* wl_groupname,
-      void (*wl_bc_success)(void*), void (*wl_bc_cancel)(void*),
-      void* basewidget, pwr_tStatus* status)
-  {
-    return 0;
-  }
-  virtual XttKeyboard* keyboard_new(const char* name, keyboard_eKeymap keymap,
-      keyboard_eType type, int color_theme, pwr_tStatus* status)
-  {
-    return 0;
-  }
-  virtual XttOTree* tree_new(const char* title, pwr_tAttrRef* itemlist,
-      int itemcnt, unsigned int options,
-      pwr_tStatus (*action_cb)(void*, pwr_tAttrRef*))
-  {
-    return 0;
-  }
-  virtual void bell(int time)
-  {
-  }
-  virtual int confirm_dialog(char* title, char* text)
-  {
-    return 0;
-  }
-  virtual void set_clock_cursor()
-  {
-  }
-  virtual void reset_cursor()
-  {
-  }
+  virtual void bell(int time) {}
+  virtual int confirm_dialog(char* title, char* text) { return 0; }
+  virtual void set_clock_cursor() {}
+  virtual void reset_cursor() {}
 
   static int string_to_local_enum(int type_id, char* str, pwr_tEnum* enumval);
   static int local_enum_to_string(int type_id, pwr_tEnum enumval, char* str, int strsize);
@@ -464,11 +430,9 @@ public:
   void start_trace(pwr_tObjid Objid, char* object_str);
   void start_trace_selected();
   void show_crossref();
-  int create_object_item(pwr_tObjid objid, brow_tNode dest,
-      flow_eDest dest_code, void** item, int is_root);
+  int create_object_item(pwr_tObjid objid, brow_tNode dest, flow_eDest dest_code, void** item, int is_root);
   void print(char* filename);
-  void print_draw_page(void* context, const char* title, int page,
-      flow_eOrientation orientation);
+  void print_draw_page(void* context, const char* title, int page, flow_eOrientation orientation);
   void print_get_pages(flow_eOrientation orientation, int* pages);
   void zoom(double zoom_factor);
   void get_zoom(double* zoom_factor);
@@ -485,8 +449,7 @@ public:
   int collect_show();
   int collect_window(int copy, int type);
   void collect_clear();
-  int get_dashboard_name(pwr_sAttrRef* arp, char* dash_name, 
-      pwr_tTypeId* dash_type);
+  int get_dashboard_name(pwr_sAttrRef* arp, char* dash_name, pwr_tTypeId* dash_type);
   int dashboard_insert(pwr_sAttrRef* attrref);
   void clear();
   void message(char sev, const char* text);
@@ -502,16 +465,13 @@ public:
   int show_logging(int entry);
   void force_trace_scan();
   void menu_tree_build(xnav_sStartMenu* root);
-  xnav_sMenu* menu_tree_build_children(
-      xnav_sStartMenu* first_child, xnav_sMenu* parent);
+  xnav_sMenu* menu_tree_build_children(xnav_sStartMenu* first_child, xnav_sMenu* parent);
   void menu_tree_free();
   void menu_tree_free_children(xnav_sMenu* first_child);
   int menu_tree_search(char* name, xnav_sMenu** menu_item);
-  int menu_tree_search_children(
-      char* name, xnav_sMenu* child_list, xnav_sMenu** menu_item);
-  int menu_tree_insert(char* title, int item_type, char* command,
-      menu_ePixmap pixmap, char* destination, int dest_code,
-      xnav_sMenu** menu_item);
+  int menu_tree_search_children(char* name, xnav_sMenu* child_list, xnav_sMenu** menu_item);
+  int menu_tree_insert(char* title, int item_type, char* command, menu_ePixmap pixmap, char* destination,
+                       int dest_code, xnav_sMenu** menu_item);
   int menu_tree_delete(char* name);
   int load_ev_from_opplace();
   int login_from_opplace();
@@ -535,10 +495,10 @@ public:
 
   static int init_brow_base_cb(FlowCtx* fctx, void* client_data);
   static int get_trace_attr(pwr_sAttrRef* arp, char* attr);
-  static int attr_string_to_value(int type_id, char* value_str,
-      void* buffer_ptr, int buff_size, int attr_size);
-  static void attrvalue_to_string(int type_id, pwr_tTid tid, void* value_ptr,
-      char* str, int size, int* len, char* format, int conv);
+  static int attr_string_to_value(int type_id, char* value_str, void* buffer_ptr, int buff_size,
+                                  int attr_size);
+  static void attrvalue_to_string(int type_id, pwr_tTid tid, void* value_ptr, char* str, int size, int* len,
+                                  char* format, int conv);
   static void trace_subwindow_cb(void* ctx, pwr_tObjid objid);
   static void trace_display_object_cb(void* ctx, pwr_tObjid objid);
   static int is_authorized_cb(void* xnav, unsigned int access);
@@ -550,8 +510,7 @@ public:
   static int brow_cb(FlowCtx* ctx, flow_tEvent event);
   static void trace_scan(void* data);
   static int trace_scan_bc(brow_tObject object, void* p);
-  static int trace_connect_bc(brow_tObject object, char* name, char* attr,
-      flow_eTraceType type, void** p);
+  static int trace_connect_bc(brow_tObject object, char* name, char* attr, flow_eTraceType type, void** p);
   static int trace_disconnect_bc(brow_tObject object);
   static int init_brow_collect_cb(BrowCtx* ctx, void* client_data);
   static int init_brow_cb(BrowCtx* ctx, void* client_data);
@@ -559,38 +518,32 @@ public:
 
   // Command module member functions
   int command(char* cmd);
-  int script(char* buffer, char *scriptargs);
+  int script(char* buffer, char* scriptargs);
   pwr_tStatus get_command_sts();
-  int readcmdfile(char* incommand, char* buffer, char *bufargs);
+  int readcmdfile(char* incommand, char* buffer, char* bufargs);
   int show_database(int nopop = 0);
-  int get_current_object(
-      pwr_tObjid* objid, char* objectname, int size, pwr_tBitMask nametype);
-  int get_current_aref(
-      pwr_sAttrRef* arp, char* arname, int size, pwr_tBitMask nametype);
+  int get_current_object(pwr_tObjid* objid, char* objectname, int size, pwr_tBitMask nametype);
+  int get_current_aref(pwr_sAttrRef* arp, char* arname, int size, pwr_tBitMask nametype);
   int show_file(char* filename, char* intitle, int hide_dir);
   void update_time();
   int find_name(char* name, pwr_tObjid* objid);
-  int show_par_hier_class_name(char* parametername, char* hiername,
-      char* classname, char* name, int add, int global, int max_objects);
+  int show_par_hier_class_name(char* parametername, char* hiername, char* classname, char* name, int add,
+                               int global, int max_objects);
   int store(char* filename, int collect);
   int show_symbols();
-  void open_graph(const char* name, const char* filename, int scrollbar,
-      int menu, int navigator, int width, int height, int x, int y,
-      const char* object_name, const char* focus, int inputempty,
-      int use_default_access, unsigned int access, unsigned int options,
-      void* basewidget, double* borders, int dashboard);
+  void open_graph(const char* name, const char* filename, int scrollbar, int menu, int navigator, int width,
+                  int height, int x, int y, const char* object_name, const char* focus, int inputempty,
+                  int use_default_access, unsigned int access, unsigned int options, void* basewidget,
+                  double* borders, int dashboard);
   void close_graph(char* filename, char* object_name, int iconify);
-  int exec_xttgraph(pwr_tObjid xttgraph, char* instance, char* focus,
-      int inputempty, int use_default_access, unsigned int access,
-      unsigned int options, void* basewidget);
-  void ge_event_exec(
-      int type, char* name, char* instance, void* event, unsigned int size);
+  int exec_xttgraph(pwr_tObjid xttgraph, char* instance, char* focus, int inputempty, int use_default_access,
+                    unsigned int access, unsigned int options, void* basewidget);
+  void ge_event_exec(int type, char* name, char* instance, void* event, unsigned int size);
   int set_parameter(char* name_str, char* value_str, int bypass);
   void open_rttlog(char* name, char* filename);
   int search(char* search_str, int regexp);
   int search_root(char* search_str, pwr_tObjid* found_objid, int next);
-  int search_object(
-      pwr_tObjid objid, char* search_str, pwr_tObjid* found_objid, int next);
+  int search_object(pwr_tObjid objid, char* search_str, pwr_tObjid* found_objid, int next);
   int search_next();
   int create_object(char* classname, char* name);
   int delete_object(char* name);
@@ -598,8 +551,7 @@ public:
   void close_keyboard(int action);
   int set_signal(pwr_tAttrRef* arp, xnav_eSetSignal type, int on);
   static void print_methods();
-  static pwr_tStatus get_instance_classgraph(
-      char* instance_str, pwr_tFileName filename);
+  static pwr_tStatus get_instance_classgraph(char* instance_str, pwr_tFileName filename);
 
   // Table module member functions
   int show_plcthreads();
@@ -608,70 +560,58 @@ public:
   int show_subcli();
   int show_device();
   int show_channels(pwr_tObjid card_objid);
-  int show_attr_channels(pwr_tAttrRef* mod_aref, void* cardp,
-      pwr_tSubid* card_subid, pwr_tCid card_cid);
+  int show_attr_channels(pwr_tAttrRef* mod_aref, void* cardp, pwr_tSubid* card_subid, pwr_tCid card_cid);
   int show_object(pwr_tAttrRef* oarp, brow_tNode node);
   int show_remnode();
   int show_remtrans(pwr_tObjid remnode_objid);
   int show_plcpgm();
 
   // Help module member functions
-  int help(char* key, char* help_bookmark, navh_eHelpFile file_type,
-      char* file_name, int pop);
+  int help(char* key, char* help_bookmark, navh_eHelpFile file_type, char* file_name, int pop);
   int help_index(navh_eHelpFile file_type, char* file_name, int pop);
 
   // Methods and Popup menu functions
-  virtual void get_popup_menu(pwr_sAttrRef attrref, xmenu_eItemType item_type,
-      xmenu_mUtility caller, unsigned int priv, char* arg, int x, int y)
+  virtual void get_popup_menu(pwr_sAttrRef attrref, xmenu_eItemType item_type, xmenu_mUtility caller,
+                              unsigned int priv, char* arg, int x, int y)
   {
   }
-  void get_popup_menu_items(pwr_sAttrRef attrref, xmenu_eItemType item_type,
-      xmenu_mUtility caller, unsigned int priv, char* arg);
+  void get_popup_menu_items(pwr_sAttrRef attrref, xmenu_eItemType item_type, xmenu_mUtility caller,
+                            unsigned int priv, char* arg);
   static int CallMenuMethod(xmenu_sMenuCall* ip, int idx);
   static int CheckMenuMethodFilter(xmenu_sMenuCall* ip, int idx);
-  int call_method(const char* method, const char* filter, pwr_sAttrRef attrref,
-      xmenu_eItemType item_type, xmenu_mUtility caller, unsigned int priv,
-      char* arg);
-  int call_object_method(pwr_sAttrRef attrref, xmenu_eItemType item_type,
-      xmenu_mUtility caller, unsigned int priv, char* method_name);
-  int check_object_methodfilter(pwr_sAttrRef attrref, xmenu_eItemType item_type,
-      xmenu_mUtility caller, unsigned int priv, char* method_name);
-  static int GetObjectMenu(xmenu_sMenuCall* ip, pwr_tCid classid,
-      xmenu_sMenuItem** Item, pwr_tUInt32 Level, int* nItems, int AddSeparator,
-      pwr_sAttrRef* CurrentObject);
-  static int GetMethod(
-      const char* name, pwr_tStatus (**method)(xmenu_sMenuCall*));
-  static int getAllMenuItems(xmenu_sMenuCall* ip, xmenu_sMenuItem** Item,
-      pwr_tObjid objid, pwr_tUInt32 Level, int* nItems, int AddSeparator,
-      pwr_sAttrRef* CurrentObject);
+  int call_method(const char* method, const char* filter, pwr_sAttrRef attrref, xmenu_eItemType item_type,
+                  xmenu_mUtility caller, unsigned int priv, char* arg);
+  int call_object_method(pwr_sAttrRef attrref, xmenu_eItemType item_type, xmenu_mUtility caller,
+                         unsigned int priv, char* method_name);
+  int check_object_methodfilter(pwr_sAttrRef attrref, xmenu_eItemType item_type, xmenu_mUtility caller,
+                                unsigned int priv, char* method_name);
+  static int GetObjectMenu(xmenu_sMenuCall* ip, pwr_tCid classid, xmenu_sMenuItem** Item, pwr_tUInt32 Level,
+                           int* nItems, int AddSeparator, pwr_sAttrRef* CurrentObject);
+  static int GetMethod(const char* name, pwr_tStatus (**method)(xmenu_sMenuCall*));
+  static int getAllMenuItems(xmenu_sMenuCall* ip, xmenu_sMenuItem** Item, pwr_tObjid objid, pwr_tUInt32 Level,
+                             int* nItems, int AddSeparator, pwr_sAttrRef* CurrentObject);
   static int GetMenu(xmenu_sMenuCall* ip);
 };
 
 int xnav_cut_segments(char* outname, char* name, int segments);
 
-int xnav_attr_string_to_value(int type_id, char* value_str, void* buffer_ptr,
-    int buff_size, int attr_size);
-void xnav_attrvalue_to_string(int type_id, pwr_tTid tid, void* value_ptr,
-    char* str, int size, int* len, char* format);
+int xnav_attr_string_to_value(int type_id, char* value_str, void* buffer_ptr, int buff_size, int attr_size);
+void xnav_attrvalue_to_string(int type_id, pwr_tTid tid, void* value_ptr, char* str, int size, int* len,
+                              char* format);
 
-void xnav_create_popup_menu(XNav* xnav, pwr_sAttrRef attrref,
-    xmenu_eItemType item_type, xmenu_mUtility caller, unsigned int priv,
-    char* arg, int x, int y);
-int xnav_call_method(XNav* xnav, char* method, char* filter,
-    pwr_sAttrRef attrref, xmenu_eItemType item_type, xmenu_mUtility caller,
-    unsigned int priv, char* arg);
-int xnav_call_object_method(XNav* xnav, pwr_sAttrRef attrref,
-    xmenu_eItemType item_type, xmenu_mUtility caller, unsigned int priv,
-    char* method_name);
-int xnav_check_object_methodfilter(XNav* xnav, pwr_sAttrRef attrref,
-    xmenu_eItemType item_type, xmenu_mUtility caller, unsigned int priv,
-    char* method_name);
+void xnav_create_popup_menu(XNav* xnav, pwr_sAttrRef attrref, xmenu_eItemType item_type,
+                            xmenu_mUtility caller, unsigned int priv, char* arg, int x, int y);
+int xnav_call_method(XNav* xnav, char* method, char* filter, pwr_sAttrRef attrref, xmenu_eItemType item_type,
+                     xmenu_mUtility caller, unsigned int priv, char* arg);
+int xnav_call_object_method(XNav* xnav, pwr_sAttrRef attrref, xmenu_eItemType item_type,
+                            xmenu_mUtility caller, unsigned int priv, char* method_name);
+int xnav_check_object_methodfilter(XNav* xnav, pwr_sAttrRef attrref, xmenu_eItemType item_type,
+                                   xmenu_mUtility caller, unsigned int priv, char* method_name);
 
-void xnav_popup_menu_cb(void* xnav, pwr_sAttrRef attrref,
-    unsigned long item_type, unsigned long utility, char* arg, int x, int y);
-int xnav_call_method_cb(void* xnav, const char* method, const char* filter,
-    pwr_sAttrRef attrref, unsigned long item_type, unsigned long utility,
-    char* arg);
+void xnav_popup_menu_cb(void* xnav, pwr_sAttrRef attrref, unsigned long item_type, unsigned long utility,
+                        char* arg, int x, int y);
+int xnav_call_method_cb(void* xnav, const char* method, const char* filter, pwr_sAttrRef attrref,
+                        unsigned long item_type, unsigned long utility, char* arg);
 void xnav_start_trace_cb(void* xnav, pwr_tObjid objid, char* name);
 int xnav_get_trace_attr(pwr_sAttrRef* arp, char* attr);
 
