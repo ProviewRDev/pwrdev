@@ -6918,6 +6918,8 @@ MergeAllLayers <t><t>Slå ihop alla lager. <link>MergeAllLayers()
 MoveAbsObject <t><t>Flytta ett objekt till en position. <link>MoveAbsObject()
 MoveObject <t><t>Flytta ett objekt ett visst avstånd. <link>MoveObject()
 MoveSelectToLayer <t><t>Flytta utvalda objekt till aktivt lager. <link>MoveSelectToLayer()
+PopSelected <t><t>Lägg utvalda objekt över andra objekt. <link>PopSelected()
+PushSelected <t><t>Lägg utvalda object under andra objekt. <link>PopSelected()
 OpenGraph <t><t>Öppna en graph. <link>OpenGraph()
 PolyLineAdd <t><t>Addera ett segment till en PolyLine.<link>PolyLineAdd()
 Reload <t><t>Läs in innevarande graph från fil. <link>Reload()
@@ -6966,6 +6968,7 @@ scanf  <t>Formaterad inläsning
 fclose <t>Stäng en fil
 felement <t>Hämta ett element ur den med fgets senaste lästa raden.
 fgets <t>Läsning av en rad från fil
+file_search <t>Sök efter en fil eller flera filer.
 fopen <t>Öppna en fil
 fprintf <t>Formaterad skrivning på fil
 fscanf <t>Formaterad läsning frän fil
@@ -7000,8 +7003,9 @@ GetVolumeClass <t>Hämta klassen för en volym
 <h2>System funktioner
 <b>Funktion <t>Beskrivning
 exit <t>Avsluta exekveringen av ett skript
-time <t>Hämta systemtiden
 system <t>Exekvera ett shell kommando
+terminate <t>Avsluta processen
+time <t>Hämta systemtiden
 verify <t>Sätt verify på eller av
 
 <option> printdisable
@@ -8403,6 +8407,33 @@ float <t>dy <t>Avstånd att flytta i y-led.
 <b>Exempel
 
 <c> MoveObject( oid, 0.5, 0.5);
+</topic>
+
+<topic>MoveSelectToLayer() <style>function
+MoveSelectToLayer()
+void MoveSelectToLayer()
+
+<h2>Description
+
+Flytta utvalda objekt till det aktiva lagret.
+</topic>
+
+<topic>PopSelected() <style>function
+PopSelected()
+void PopSelected()
+
+<h2>Description
+
+Lägg utvalda objekt över andra objekt.
+</topic>
+
+<topic>PushSelected() <style>function
+PushSelected()
+void PushSelected()
+
+<h2>Description
+
+Lägg utvalda objekt under andra objekt.
 </topic>
 
 <topic>OpenGraph() <style>function

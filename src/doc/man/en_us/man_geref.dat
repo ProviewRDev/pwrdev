@@ -7023,6 +7023,8 @@ MergeAllLayers <t><t>Merge all layers. <link>MergeAllLayers()
 MoveAbsObject <t><t>Move an object to a position. <link>MoveAbsObject()
 MoveObject <t><t>Move an object a distance. <link>MoveObject()
 MoveSelectToLayer <t><t>Move selected objects to active layer. <link>MoveSelectToLayer()
+PopSeleted <t><t>Pop the selected objects. <link>PopSelected()
+PushSeleted <t><t>Push the selected objects. <link>PopSelected()
 OpenGraph <t><t>Open a graph. <link>OpenGraph()
 PolyLineAdd <t><t>Add a segment to a PolyLine.<link>PolyLineAdd()
 Reload <t><t>Read current graph from file. <link>Reload()
@@ -7071,6 +7073,7 @@ scanf  <t>Formatted read.
 fclose <t>Close a file
 felement <t>Extract one element from the last read line.
 fgets <t>Read a line from a file.
+file_search <t>Search for file or files.
 fopen <t>Open a file.
 fprintf <t>Formatted write to file.
 fscanf <t>Formatted read from file.
@@ -7105,8 +7108,9 @@ GetVolumeClass <t>Get the class of a volume.
 <h2>System functions
 <b>Function <t>Description
 exit <t>Terminate the execution of a script.
-time <t>Fetch the system time.
 system <t>Execute a shell command.
+terminate <t>Terminate the process.
+time <t>Fetch the system time.
 verify <t>Set verify on or off.
 
 <option> printdisable
@@ -8843,6 +8847,24 @@ void MoveSelectToLayer()
 <h2>Description
 
 Move the selected objects to the active layer.
+</topic>
+
+<topic>PopSelected() <style>function
+PopSelected()
+void PopSelected()
+
+<h2>Description
+
+Pop the selected objects.
+</topic>
+
+<topic>PushSelected() <style>function
+PushSelected()
+void PushSelected()
+
+<h2>Description
+
+Push the selected objects.
 </topic>
 
 <topic>OpenGraph() <style>function
