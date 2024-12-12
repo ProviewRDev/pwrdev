@@ -592,7 +592,7 @@ static pwr_tStatus redu_node_init()
 
 static int export_alloc_check(sLink* lp)
 {
-  if (lp->np->link.export_alloc_cnt > EXPORT_BUF_WARN_LEVEL
+  if ((lp->exp_buf_quota - lp->np->link.export_alloc_cnt) <= EXPORT_BUF_WARN_LEVEL
       && redu_sts != REDU__BUFFHIGH)
     set_status(REDU__BUFFHIGH);
   if (lp->np->link.export_alloc_cnt > lp->exp_buf_quota) {
@@ -611,7 +611,7 @@ static void export_alloc_sub(sEseg* sp)
   if (sp->lp->np->link.export_alloc_cnt < 0)
     sp->lp->np->link.export_alloc_cnt = 0;
   if (redu_sts == REDU__BUFFHIGH
-      && sp->lp->np->link.export_alloc_cnt < EXPORT_BUF_WARN_LEVEL)
+      && (sp->lp->exp_buf_quota - sp->lp->np->link.export_alloc_cnt) > EXPORT_BUF_WARN_LEVEL)
     set_status(PWR__SRUN);
   l.config->Link[sp->lp->idx].ExportAlloc = sp->lp->np->link.export_alloc_cnt;
 }
