@@ -120,7 +120,7 @@ SObject pwrb:Type
         Attr Text = "HideDecorations"
         Attr Value = 128
       EndBody
-     EndObject
+    EndObject
     !/**
     !  Dialog window.
     !*/

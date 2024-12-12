@@ -130,7 +130,7 @@ SObject pwrb:Type
         Attr Text = "HideDecorations"
         Attr Value = 128
       EndBody
-     EndObject
+    EndObject
     !/**
     !  Dialog window. Window can't be resized, minimized or maximized.
     !*/

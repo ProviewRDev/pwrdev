@@ -48,7 +48,7 @@ SObject pwrs:Type
 ! @b See also
 !  @classlink Text pwrs_text.html
 !*/
-   Object $Text8192 $TypeDef 24
+  Object $Text8192 $TypeDef 24
     Body SysBody
       Attr Type = pwr_eType_Text
       Attr Size = 8192

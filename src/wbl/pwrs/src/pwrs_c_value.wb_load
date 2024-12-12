@@ -54,7 +54,7 @@ SObject pwrs:Class
       Body SysBody
         Attr StructName = "Value"
       EndBody
-       Object Text $Attribute 1
+      Object Text $Attribute 1
         Body SysBody
           Attr TypeRef = "pwrs:Type-$String80"
         EndBody
@@ -64,7 +64,7 @@ SObject pwrs:Class
           Attr TypeRef = "pwrs:Type-$String32"
         EndBody
       EndObject
-     Object Value $Attribute 3
+      Object Value $Attribute 3
         Body SysBody
           Attr TypeRef = "pwrs:Type-$Int32"
         EndBody

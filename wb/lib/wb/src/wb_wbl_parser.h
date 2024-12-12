@@ -39,6 +39,8 @@
 
 #include "wb_error.h"
 
+#define MAX_OBJECT_LEVEL 200
+
 typedef enum {
   wbl_mState_InDocBlock = 1 << 0,
   wbl_mState_InVolume = 1 << 1,
@@ -145,6 +147,9 @@ private:
   wbl_ast_node* m_current;
   int m_object_level;
   int m_buffer_level;
+  int m_line_indent;
+  int m_object_line[MAX_OBJECT_LEVEL];
+  int m_object_indent[MAX_OBJECT_LEVEL];
 };
 
 #endif

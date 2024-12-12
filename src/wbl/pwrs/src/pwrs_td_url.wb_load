@@ -51,7 +51,7 @@ SObject pwrs:Type
 ! @b See also
 !  @classlink String pwrs_string.html
 !*/
-   Object $URL $TypeDef 13
+  Object $URL $TypeDef 13
     Body SysBody
       Attr Type = pwr_eType_String
       Attr Size = 160

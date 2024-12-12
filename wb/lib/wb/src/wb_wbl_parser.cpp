@@ -349,6 +349,21 @@ int wb_wbl_parser::check_operator(wbl_ast_node* n)
   return 0;
 }
 
+int str_indent(char *line)
+{
+  int indent = 0;
+
+  for (char *s = line; *s; s++) {
+    if (*s == ' ')
+      indent++;
+    else if (*s == '	')
+      indent += 8;
+    else
+      break;
+  }
+  return indent;
+}
+
 void wb_wbl_parser::parse(const char* filename)
 {
   char line[400];
@@ -372,6 +387,7 @@ void wb_wbl_parser::parse(const char* filename)
       last = m_line_cnt;
     }
 
+    m_line_indent = str_indent(line);
     str_trim(line, line);
 
     if (streq(line, ""))
@@ -423,8 +439,11 @@ void wb_wbl_parser::parse(const char* filename)
         throw wb_error_str("Volume - EndVolume mismatch");
       if (m_state & wbl_mState_InBody)
         throw wb_error_str("Body not terminated");
-      if (m_state & wbl_mState_InObject)
-        throw wb_error_str("Body not terminated");
+      if (m_state & wbl_mState_InObject) {
+	char msg[40];
+	sprintf(msg, "Object at line %d not terminated", m_object_line[m_object_level-1]);
+        throw wb_error_str(msg);
+      }
       m_state &= ~wbl_mState_InVolume;
     } else if (str_StartsWith(line, "SObject")) {
       if (m_state & wbl_mState_InSObject)
@@ -459,6 +478,8 @@ void wb_wbl_parser::parse(const char* filename)
     } else if (str_StartsWith(line, "Object")) {
       if (!(m_state & wbl_mState_InVolume || m_state & wbl_mState_InSObject))
         throw wb_error_str("Object defined outside volume");
+      m_object_line[m_object_level] = m_line_cnt;
+      m_object_indent[m_object_level] = m_line_indent;
       m_object_level++;
       m_state |= wbl_mState_InObject;
 
@@ -503,7 +524,10 @@ void wb_wbl_parser::parse(const char* filename)
         throw wb_error_str("Buffer not terminated");
       if (m_object_level <= 0)
         throw wb_error_str("Object - EndObject mismatch");
+      if (m_object_indent[m_object_level - 1] != m_line_indent)
+	printf("Warning, indentation mismatch, EndObject at line %d and Object at line %d, %s\n", m_line_cnt, m_object_line[m_object_level - 1], m_fname);
       m_object_level--;
+
       if (m_object_level == 0)
         m_state &= ~wbl_mState_InObject;
       m_current = m_current->fth;
