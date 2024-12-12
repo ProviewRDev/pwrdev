@@ -68,6 +68,68 @@
   }
 
 /*_*
+  GETSI
+  get string value
+  @aref getsi GetSi
+*/
+#define GetSi_init(tp) tp->str_copy_lock = 1;
+
+/*_*
+  STOSI
+  store string value
+  @aref stosi StoSi
+*/
+#define stosi_exec(obj, in)                                                    \
+  lck_LockStr;                                                                 \
+  strncpy(obj->ActualValue, in, sizeof(obj->ActualValue));                     \
+  obj->ActualValue[sizeof(obj->ActualValue) - 1] = 0;                          \
+  lck_UnlockStr;
+
+/*_*
+  CSTOSI
+  store conditionally into string value
+  @aref cstosi CStoSi
+*/
+#define cstosi_exec(obj, in, cond)                                             \
+  if (cond) {                                                                  \
+    lck_LockStr;                                                               \
+    strncpy(obj->ActualValue, in, sizeof(obj->ActualValue));                   \
+    obj->ActualValue[sizeof(obj->ActualValue) - 1] = 0;                        \
+    lck_UnlockStr;                                                             \
+  }
+
+/*_*
+  GETSO
+  get string value
+  @aref getso GetSo
+*/
+#define GetSo_init(tp) tp->str_copy_lock = 1;
+
+/*_*
+  STOSO
+  store string value
+  @aref stoso StoSo
+*/
+#define stoso_exec(obj, in)                                                    \
+  lck_LockStr;                                                                 \
+  strncpy(obj->ActualValue, in, sizeof(obj->ActualValue));                     \
+  obj->ActualValue[sizeof(obj->ActualValue) - 1] = 0;                          \
+  lck_UnlockStr;
+
+/*_*
+  CSTOSO
+  store conditionally into string value
+  @aref cstoso CStoSo
+*/
+#define cstoso_exec(obj, in, cond)                                             \
+  if (cond) {                                                                  \
+    lck_LockStr;                                                               \
+    strncpy(obj->ActualValue, in, sizeof(obj->ActualValue));                   \
+    obj->ActualValue[sizeof(obj->ActualValue) - 1] = 0;                        \
+    lck_UnlockStr;                                                             \
+  }
+
+/*_*
   STRCAT
   @aref strcat Strcat
 */

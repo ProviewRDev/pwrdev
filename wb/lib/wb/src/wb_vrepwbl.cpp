@@ -753,15 +753,19 @@ int wb_vrepwbl::getAttrInfo(const char* attr, pwr_eBix bix, pwr_tCid cid,
   if (aname.evenSts())
     return 0;
 
-  if (getAttrInfoRec(&aname, bix, cid, &a_size, &a_offset, &a_tid, &a_elements,
+  try {
+    if (getAttrInfoRec(&aname, bix, cid, &a_size, &a_offset, &a_tid, &a_elements,
           &a_type, &a_flags, 0)) {
-    *size = a_size;
-    *offset = a_offset;
-    *tid = a_tid;
-    *elements = a_elements;
-    *type = a_type;
-    *flags = a_flags;
-    return 1;
+      *size = a_size;
+      *offset = a_offset;
+      *tid = a_tid;
+      *elements = a_elements;
+      *type = a_type;
+      *flags = a_flags;
+      return 1;
+    }
+  } catch (wb_error& e) {
+    std::cout << "Exception: " << e.what() << ", " << aname.name() << '\n';
   }
   return 0;
 }

@@ -315,6 +315,54 @@
     obj->ActualValue = in;
 
 /*_*
+  StoEo
+  Store enumeration output
+  @aref stoeo StoEo
+*/
+#define stoeo_exec(obj, in) obj->ActualValue = in;
+
+/*_*
+  CStoEo
+  store conditionally into enumeration output
+  @aref cstoio CStoEo
+*/
+#define cstoeo_exec(obj, in, cond)                                             \
+  if (cond)                                                                    \
+    obj->ActualValue = in;
+
+/*_*
+  StoEv
+  Store enumeration value
+  @aref stoev StoEv
+*/
+#define stoev_exec(obj, in) obj->ActualValue = in;
+
+/*_*
+  CStoEv
+  store conditionally into enumeration value
+  @aref cstoev CStoEv
+*/
+#define cstoev_exec(obj, in, cond)                                             \
+  if (cond)                                                                    \
+    obj->ActualValue = in;
+
+/*_*
+  StoEi
+  store enumeration input (Simulate)
+  @aref stoei StoEi
+*/
+#define stoei_exec(obj, in) obj->ActualValue = in;
+
+/*_*
+  CStoEi
+  store conditionally into enumeration input (Simulate)
+  @aref cstoei CStoEi
+*/
+#define cstoei_exec(obj, in, cond)                                             \
+  if (cond)                                                                    \
+    obj->ActualValue = in;
+
+/*_*
   StoBiInt32
   store buffer input (Simulate)
   @aref stobiint32 StoBiInt32

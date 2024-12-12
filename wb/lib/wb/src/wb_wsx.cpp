@@ -537,6 +537,22 @@ pwr_tStatus wsx_CheckSigChanCon(ldh_tSesContext sesctx, pwr_tAttrRef aref,
     if (con_class != pwr_cClass_ChanIi)
       class_error = 1;
     break;
+  case pwr_cClass_Eo:
+    if (con_class != pwr_cClass_ChanEo)
+      class_error = 1;
+    break;
+  case pwr_cClass_Ei:
+    if (con_class != pwr_cClass_ChanEi)
+      class_error = 1;
+    break;
+  case pwr_cClass_So:
+    if (con_class != pwr_cClass_ChanSo)
+      class_error = 1;
+    break;
+  case pwr_cClass_Si:
+    if (con_class != pwr_cClass_ChanSi)
+      class_error = 1;
+    break;
   case pwr_cClass_Bi:
     if (con_class != pwr_cClass_ChanBi)
       class_error = 1;

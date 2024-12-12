@@ -625,6 +625,7 @@ typedef enum {
   ge_eSave_Axis_minvalue_attr = 3800,
   ge_eSave_Axis_maxvalue_attr = 3801,
   ge_eSave_Axis_keep_settings = 3802,
+  ge_eSave_Axis_enum_attr = 3803,
   ge_eSave_DigTextColor_attribute = 3900,
   ge_eSave_DigTextColor_color = 3901,
   ge_eSave_TimeoutColor_time = 4000,
@@ -1646,6 +1647,7 @@ public:
   int annot_typeid;
   int annot_size;
   GeValue* value_element;
+  grow_tObject menu_object;
 
   GeValueInput(GeDyn* e_dyn);
   GeValueInput(const GeValueInput& x);
@@ -3540,6 +3542,7 @@ public:
   int imax_value;
   pwr_tAName minvalue_attr;
   pwr_tAName maxvalue_attr;
+  pwr_tAName enum_attr;
 
   pwr_tFloat32* min_value_p;
   pwr_tFloat32* max_value_p;

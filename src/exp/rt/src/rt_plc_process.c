@@ -481,10 +481,20 @@ static void link_io_base_areas(plc_sProcess* pp)
       pp->IOHandler->IoCount * sizeof(pwr_tInt32));
   dlink_area((plc_sDlink*)&pp->base.iv_a, "pwrNode-active-io-iv",
       pp->IOHandler->IvCount * sizeof(pwr_tInt32));
+  dlink_area((plc_sDlink*)&pp->base.ei_a, "pwrNode-active-io-ei",
+      pp->IOHandler->EiCount * sizeof(pwr_tInt32));
+  dlink_area((plc_sDlink*)&pp->base.eo_a, "pwrNode-active-io-eo",
+      pp->IOHandler->EoCount * sizeof(pwr_tInt32));
+  dlink_area((plc_sDlink*)&pp->base.ev_a, "pwrNode-active-io-ev",
+      pp->IOHandler->EvCount * sizeof(pwr_tInt32));
   dlink_area((plc_sDlink*)&pp->base.atv_a, "pwrNode-active-io-atv",
       pp->IOHandler->ATvCount * sizeof(pwr_tTime));
   dlink_area((plc_sDlink*)&pp->base.dtv_a, "pwrNode-active-io-dtv",
       pp->IOHandler->DTvCount * sizeof(pwr_tDeltaTime));
+  dlink_area((plc_sDlink*)&pp->base.si_a, "pwrNode-active-io-si",
+      pp->IOHandler->SiCount * sizeof(pwr_tString80));
+  dlink_area((plc_sDlink*)&pp->base.so_a, "pwrNode-active-io-so",
+      pp->IOHandler->SoCount * sizeof(pwr_tString80));
   dlink_area((plc_sDlink*)&pp->base.sv_a, "pwrNode-active-io-sv",
       pp->IOHandler->SvCount * sizeof(pwr_tString80));
   dlink_area((plc_sDlink*)&pp->base.bi_a, "pwrNode-active-io-bi",
@@ -509,12 +519,20 @@ static void link_io_base_areas(plc_sProcess* pp)
       pp->IOHandler->IiCount * sizeof(pwr_tUInt64));
   dlink_area((plc_sDlink*)&pp->base.io_i, "pwrNode-active-io-io_init",
       pp->IOHandler->IoCount * sizeof(pwr_tUInt64));
+  dlink_area((plc_sDlink*)&pp->base.ei_i, "pwrNode-active-io-ei_init",
+      pp->IOHandler->EiCount * sizeof(pwr_tUInt64));
+  dlink_area((plc_sDlink*)&pp->base.eo_i, "pwrNode-active-io-eo_init",
+      pp->IOHandler->EoCount * sizeof(pwr_tUInt64));
   dlink_area((plc_sDlink*)&pp->base.atv_i, "pwrNode-active-io-atv_init",
       pp->IOHandler->ATvCount * sizeof(pwr_tTime));
   dlink_area((plc_sDlink*)&pp->base.dtv_i, "pwrNode-active-io-dtv_init",
       pp->IOHandler->DTvCount * sizeof(pwr_tDeltaTime));
   dlink_area((plc_sDlink*)&pp->base.sv_i, "pwrNode-active-io-sv_init",
       pp->IOHandler->SvCount * sizeof(pwr_tString80));
+  dlink_area((plc_sDlink*)&pp->base.si_i, "pwrNode-active-io-si_init",
+      pp->IOHandler->SiCount * sizeof(pwr_tString80));
+  dlink_area((plc_sDlink*)&pp->base.so_i, "pwrNode-active-io-so_init",
+      pp->IOHandler->SoCount * sizeof(pwr_tString80));
   dlink_area((plc_sDlink*)&pp->base.bi_i, "pwrNode-active-io-bi_init",
       pp->IOHandler->BiCount * sizeof(pwr_tUInt64));
   dlink_area((plc_sDlink*)&pp->base.bi_isize, "pwrNode-active-io-bi_initsize",
@@ -566,11 +584,26 @@ static void link_io_copy_areas(plc_sThread* tp)
   tp->copy.iv_a = pp->base.iv_a;
   tp->copy.iv_a.p = calloc(1, tp->copy.iv_a.size);
 
+  tp->copy.ei_a = pp->base.ei_a;
+  tp->copy.ei_a.p = calloc(1, tp->copy.ei_a.size);
+
+  tp->copy.eo_a = pp->base.eo_a;
+  tp->copy.eo_a.p = calloc(1, tp->copy.eo_a.size);
+
+  tp->copy.ev_a = pp->base.ev_a;
+  tp->copy.ev_a.p = calloc(1, tp->copy.ev_a.size);
+
   tp->copy.atv_a = pp->base.atv_a;
   tp->copy.atv_a.p = calloc(1, tp->copy.atv_a.size);
 
   tp->copy.dtv_a = pp->base.dtv_a;
   tp->copy.dtv_a.p = calloc(1, tp->copy.dtv_a.size);
+
+  tp->copy.si_a = pp->base.si_a;
+  tp->copy.si_a.p = calloc(1, tp->copy.si_a.size);
+
+  tp->copy.so_a = pp->base.so_a;
+  tp->copy.so_a.p = calloc(1, tp->copy.so_a.size);
 
   tp->copy.sv_a = pp->base.sv_a;
   tp->copy.sv_a.p = calloc(1, tp->copy.sv_a.size);
@@ -746,6 +779,26 @@ static void save_values(plc_sProcess* pp)
     if (p != NULL)
       *p = pp->base.io_a.p->Value[i];
   }
+  for (i = 0; i < pp->IOHandler->EiCount; i++) {
+    pwr_tInt32* p = gdh_TranslateRtdbPointer(pp->base.ei_i.p->Value[i]);
+    if (p != NULL)
+      *p = pp->base.ei_a.p->Value[i];
+  }
+  for (i = 0; i < pp->IOHandler->EoCount; i++) {
+    pwr_tInt32* p = gdh_TranslateRtdbPointer(pp->base.eo_i.p->Value[i]);
+    if (p != NULL)
+      *p = pp->base.eo_a.p->Value[i];
+  }
+  for (i = 0; i < pp->IOHandler->SiCount; i++) {
+    char* p = gdh_TranslateRtdbPointer(pp->base.si_i.p->Value[i]);
+    if (p != NULL)
+      memcpy(p, &pp->base.si_a.p->Value[i], sizeof(pwr_tString80));
+  }
+  for (i = 0; i < pp->IOHandler->SoCount; i++) {
+    char* p = gdh_TranslateRtdbPointer(pp->base.so_i.p->Value[i]);
+    if (p != NULL)
+      memcpy(p, &pp->base.so_a.p->Value[i], sizeof(pwr_tString80));
+  }
   for (i = 0; i < pp->IOHandler->BiCount; i++) {
     char* p = gdh_TranslateRtdbPointer(pp->base.bi_i.p->Value[i]);
     unsigned int idx = pp->base.bi_isize.p->Value[i] >> 32;
@@ -810,6 +863,26 @@ static void set_values(plc_sProcess* pp)
     pwr_tInt32* p = gdh_TranslateRtdbPointer(pp->base.io_i.p->Value[i]);
     if (p != NULL)
       pp->base.io_a.p->Value[i] = *p;
+  }
+  for (i = 0; i < pp->IOHandler->EiCount; i++) {
+    pwr_tInt32* p = gdh_TranslateRtdbPointer(pp->base.ei_i.p->Value[i]);
+    if (p != NULL)
+      pp->base.ei_a.p->Value[i] = *p;
+  }
+  for (i = 0; i < pp->IOHandler->EoCount; i++) {
+    pwr_tInt32* p = gdh_TranslateRtdbPointer(pp->base.eo_i.p->Value[i]);
+    if (p != NULL)
+      pp->base.eo_a.p->Value[i] = *p;
+  }
+  for (i = 0; i < pp->IOHandler->SiCount; i++) {
+    char* p = gdh_TranslateRtdbPointer(pp->base.si_i.p->Value[i]);
+    if (p != NULL)
+      memcpy(&pp->base.si_a.p->Value[i], p, sizeof(pwr_tString80));
+  }
+  for (i = 0; i < pp->IOHandler->SoCount; i++) {
+    char* p = gdh_TranslateRtdbPointer(pp->base.so_i.p->Value[i]);
+    if (p != NULL)
+      memcpy(&pp->base.so_a.p->Value[i], p, sizeof(pwr_tString80));
   }
   for (i = 0; i < pp->IOHandler->BiCount; i++) {
     char* p = gdh_TranslateRtdbPointer(pp->base.bi_i.p->Value[i]);

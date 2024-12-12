@@ -5376,6 +5376,37 @@ static int graph_getmodified_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
+static int graph_pushselected_func(void* filectx, ccm_sArg* arg_list, int arg_count,
+    int* return_decl, ccm_tFloat* return_float, ccm_tInt* return_int,
+    char* return_string)
+{
+  Graph* graph;
+
+  if (arg_count)
+    return CCM__ARGMISM;
+
+  graph_get_stored_graph(&graph);
+
+  grow_PushSelectedObjects(graph->grow->ctx);
+
+  return 1;
+}
+
+static int graph_popselected_func(void* filectx, ccm_sArg* arg_list, int arg_count,
+    int* return_decl, ccm_tFloat* return_float, ccm_tInt* return_int,
+    char* return_string)
+{
+  Graph* graph;
+
+  if (arg_count)
+    return CCM__ARGMISM;
+
+  graph_get_stored_graph(&graph);
+
+  grow_PopSelectedObjects(graph->grow->ctx);
+
+  return 1;
+}
 
 int Graph::script_func_register(void)
 {
@@ -5786,16 +5817,19 @@ int Graph::script_func_register(void)
   sts = ccm_register_function("Ge", "MoveSelectToLayer", graph_moveselecttolayer_func);
   if (EVEN(sts))
     return sts;
-  sts = ccm_register_function(
-      "Ge", "LayerGetFirstObject", graph_layergetfirstobject_func);
+  sts = ccm_register_function("Ge", "LayerGetFirstObject", graph_layergetfirstobject_func);
   if (EVEN(sts))
     return sts;
-  sts = ccm_register_function(
-      "Ge", "LayerGetNextObject", graph_layergetnextobject_func);
+  sts = ccm_register_function("Ge", "LayerGetNextObject", graph_layergetnextobject_func);
   if (EVEN(sts))
     return sts;
-  sts = ccm_register_function(
-      "Ge", "GetModified", graph_getmodified_func);
+  sts = ccm_register_function("Ge", "GetModified", graph_getmodified_func);
+  if (EVEN(sts))
+    return sts;
+  sts = ccm_register_function("Ge", "PushSelected", graph_pushselected_func);
+  if (EVEN(sts))
+    return sts;
+  sts = ccm_register_function("Ge", "PopSelected", graph_popselected_func);
   if (EVEN(sts))
     return sts;
   

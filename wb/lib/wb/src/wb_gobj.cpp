@@ -52,7 +52,7 @@
 
 #define BEEP putchar('\7');
 
-#define GOBJ_MAX_METHOD 37
+#define GOBJ_MAX_METHOD 40
 
 typedef int (*gobj_tMethod)(WFoe*, vldh_t_node, unsigned long);
 
@@ -94,8 +94,11 @@ int gobj_get_object_m34(WFoe* foe, vldh_t_node node, unsigned long index);
 int gobj_get_object_m35(WFoe* foe, vldh_t_node node, unsigned long index);
 int gobj_get_object_m36(WFoe* foe, vldh_t_node node, unsigned long index);
 int gobj_get_object_m37(WFoe* foe, vldh_t_node node, unsigned long index);
+int gobj_get_object_m38(WFoe* foe, vldh_t_node node, unsigned long index);
+int gobj_get_object_m39(WFoe* foe, vldh_t_node node, unsigned long index);
+int gobj_get_object_m40(WFoe* foe, vldh_t_node node, unsigned long index);
 
-gobj_tMethod gobj_get_object_m[40] = {
+gobj_tMethod gobj_get_object_m[50] = {
   gobj_get_object_m0, gobj_get_object_m1, gobj_get_object_m2,
   gobj_get_object_m3, gobj_get_object_m4, gobj_get_object_m5,
   gobj_get_object_m6, gobj_get_object_m7, gobj_get_object_m8,
@@ -108,7 +111,8 @@ gobj_tMethod gobj_get_object_m[40] = {
   gobj_get_object_m27, gobj_get_object_m28, gobj_get_object_m29,
   gobj_get_object_m30, gobj_get_object_m31, gobj_get_object_m32,
   gobj_get_object_m33, gobj_get_object_m34, gobj_get_object_m35,
-  gobj_get_object_m36, gobj_get_object_m37,
+  gobj_get_object_m36, gobj_get_object_m37, gobj_get_object_m38, 
+  gobj_get_object_m39, gobj_get_object_m40,
 };
 
 static pwr_tAttrRef gobj_selected_aref;
@@ -1595,6 +1599,7 @@ int gobj_get_object_m18(WFoe* foe, vldh_t_node node, unsigned long index)
   vldh_t_plc plc;
   pwr_sAttrRef attrref;
   int is_attr;
+  char parname[32];
 
   /* Get the selected object in the navigator */
   plc = (node->hn.wind)->hw.plc;
@@ -1612,9 +1617,39 @@ int gobj_get_object_m18(WFoe* foe, vldh_t_node node, unsigned long index)
   if (EVEN(sts))
     return sts;
 
-  if (cid != pwr_cClass_Sv) {
-    foe->message("Selected object is not a Sv object");
-    BEEP;
+  switch (node->ln.cid) {
+  case pwr_cClass_GetSv:
+  case pwr_cClass_stosv:
+  case pwr_cClass_cstosv:
+    if (cid != pwr_cClass_Sv) {
+      foe->message("Selected object is not a Sv object");
+      BEEP;
+      return 0;
+    }
+    strcpy(parname, "SvObject");
+    break;
+  case pwr_cClass_GetSi:
+  case pwr_cClass_stosi:
+  case pwr_cClass_cstosi:
+    if (cid != pwr_cClass_Si) {
+      foe->message("Selected object is not a Sv object");
+      BEEP;
+      return 0;
+    }
+    strcpy(parname, "SiObject");
+    break;
+  case pwr_cClass_GetSo:
+  case pwr_cClass_stoso:
+  case pwr_cClass_cstoso:
+    if (cid != pwr_cClass_So) {
+      foe->message("Selected object is not a So object");
+      BEEP;
+      return 0;
+    }
+    strcpy(parname, "SoObject");
+    break;
+  default:
+    foe->message("Class error");
     return 0;
   }
 
@@ -1625,7 +1660,7 @@ int gobj_get_object_m18(WFoe* foe, vldh_t_node node, unsigned long index)
   }
 
   /* Set the parameter value */
-  sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "SvObject",
+  sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", parname,
       (char*)&attrref, sizeof(attrref));
   if (EVEN(sts))
     return sts;
@@ -1690,6 +1725,14 @@ int gobj_get_object_m19(WFoe* foe, vldh_t_node node, unsigned long index)
   case pwr_cClass_Sv:
     strcpy(parname, "SvObject");
     create_classid = pwr_cClass_GetSv;
+    break;
+  case pwr_cClass_Si:
+    strcpy(parname, "SiObject");
+    create_classid = pwr_cClass_GetSi;
+    break;
+  case pwr_cClass_So:
+    strcpy(parname, "SoObject");
+    create_classid = pwr_cClass_GetSo;
     break;
   default:
     foe->message("Select string value or attribute in the navigator");
@@ -1802,6 +1845,14 @@ int gobj_get_object_m20(WFoe* foe, vldh_t_node node, unsigned long index)
   case pwr_cClass_Sv:
     strcpy(parname, "SvObject");
     create_classid = pwr_cClass_stosv;
+    break;
+  case pwr_cClass_Si:
+    strcpy(parname, "SiObject");
+    create_classid = pwr_cClass_stosi;
+    break;
+  case pwr_cClass_So:
+    strcpy(parname, "SoObject");
+    create_classid = pwr_cClass_stoso;
     break;
   default:
     foe->message("Select a string value or attribute in the navigator");
@@ -2087,6 +2138,18 @@ int gobj_get_object_m24(WFoe* foe, vldh_t_node node, unsigned long index)
     strcpy(parname, "IvObject");
     create_classid = pwr_cClass_GetIv;
     break;
+  case pwr_cClass_Ei:
+    strcpy(parname, "EiObject");
+    create_classid = pwr_cClass_GetEi;
+    break;
+  case pwr_cClass_Eo:
+    strcpy(parname, "EoObject");
+    create_classid = pwr_cClass_GetEo;
+    break;
+  case pwr_cClass_Ev:
+    strcpy(parname, "EvObject");
+    create_classid = pwr_cClass_GetEv;
+    break;
   case pwr_cClass_ConstIv:
     strcpy(parname, "IvObject");
     create_classid = pwr_cClass_GetConstIv;
@@ -2218,6 +2281,18 @@ int gobj_get_object_m25(WFoe* foe, vldh_t_node node, unsigned long index)
   case pwr_cClass_Iv:
     strcpy(parname, "IvObject");
     create_classid = pwr_cClass_stoiv;
+    break;
+  case pwr_cClass_Ei:
+    strcpy(parname, "EiObject");
+    create_classid = pwr_cClass_stoei;
+    break;
+  case pwr_cClass_Eo:
+    strcpy(parname, "EoObject");
+    create_classid = pwr_cClass_stoeo;
+    break;
+  case pwr_cClass_Ev:
+    strcpy(parname, "EvObject");
+    create_classid = pwr_cClass_stoev;
     break;
   default:
     foe->message("Select an integer signal in the navigator");
@@ -3289,6 +3364,162 @@ int gobj_get_object_m37(WFoe* foe, vldh_t_node node, unsigned long index)
 
   sprintf(msg, "Connected to: %s", aname);
   foe->message(msg);
+
+  return FOE__SUCCESS;
+}
+
+//
+//	Method for getev, stoev, cstoev. Inserts the selected ev-object in the
+//	navigator in the parameter EvObject in a GetEv object.
+//
+int gobj_get_object_m38(WFoe* foe, vldh_t_node node, unsigned long index)
+{
+  pwr_tClassId cid;
+  ldh_tSesContext ldhses;
+  int sts;
+  vldh_t_plc plc;
+  pwr_sAttrRef attrref;
+  int is_attr;
+
+  /* Get the selected object in the navigator */
+  plc = (node->hn.wind)->hw.plc;
+  ldhses = (node->hn.wind)->hw.ldhses;
+
+  sts = gobj_get_select(foe, &attrref, &is_attr);
+  if (EVEN(sts)) {
+    foe->message("Select an Ev object in the navigator");
+    BEEP;
+    return sts;
+  }
+
+  /* Check that the objdid is an ev object */
+  sts = ldh_GetAttrRefTid(ldhses, &attrref, &cid);
+  if (EVEN(sts))
+    return sts;
+
+  if (!(cid == pwr_cClass_Ev)) {
+    foe->message("Selected object is not a Ev object");
+    BEEP;
+    return 0;
+  }
+
+  if (cdh_IsClassVolume(node->ln.oid.vid)) {
+    sts = gobj_ref_replace(ldhses, node, &attrref);
+    if (EVEN(sts))
+      return sts;
+  }
+
+  /* Set the parameter value */
+  sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "EvObject",
+      (char*)&attrref, sizeof(attrref));
+  if (EVEN(sts))
+    return sts;
+
+  foe->gre->node_update(node);
+
+  return FOE__SUCCESS;
+}
+
+//
+//	Method for getei, stoei, cstoei. Inserts the selected ei-object in the
+//	navigator in the parameter EiObject in a GetEi object.
+//
+int gobj_get_object_m39(WFoe* foe, vldh_t_node node, unsigned long index)
+{
+  pwr_tClassId cid;
+  ldh_tSesContext ldhses;
+  int sts;
+  vldh_t_plc plc;
+  pwr_sAttrRef attrref;
+  int is_attr;
+
+  /* Get the selected object in the navigator */
+  plc = (node->hn.wind)->hw.plc;
+  ldhses = (node->hn.wind)->hw.ldhses;
+
+  sts = gobj_get_select(foe, &attrref, &is_attr);
+  if (EVEN(sts)) {
+    foe->message("Select an Ei object in the navigator");
+    BEEP;
+    return sts;
+  }
+
+  /* Check that the objdid is an ei object */
+  sts = ldh_GetAttrRefTid(ldhses, &attrref, &cid);
+  if (EVEN(sts))
+    return sts;
+
+  if (cid != pwr_cClass_Ei) {
+    foe->message("Selected object is not a Ei object");
+    BEEP;
+    return 0;
+  }
+
+  if (cdh_IsClassVolume(node->ln.oid.vid)) {
+    sts = gobj_ref_replace(ldhses, node, &attrref);
+    if (EVEN(sts))
+      return sts;
+  }
+
+  /* Set the parameter value */
+  sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "EiObject",
+      (char*)&attrref, sizeof(attrref));
+  if (EVEN(sts))
+    return sts;
+
+  foe->gre->node_update(node);
+
+  return FOE__SUCCESS;
+}
+
+//
+//	Method for geteo, stoeo, cstoeo. Inserts the selected io-object in the
+//	navigator in the parameter EoObject in a GetEo object.
+//
+int gobj_get_object_m40(WFoe* foe, vldh_t_node node, unsigned long index)
+{
+  pwr_tClassId cid;
+  ldh_tSesContext ldhses;
+  int sts;
+  vldh_t_plc plc;
+  pwr_sAttrRef attrref;
+  int is_attr;
+
+  /* Get the selected object in the navigator */
+  plc = (node->hn.wind)->hw.plc;
+  ldhses = (node->hn.wind)->hw.ldhses;
+
+  sts = gobj_get_select(foe, &attrref, &is_attr);
+  if (EVEN(sts)) {
+    foe->message("Select an Eo object in the navigator");
+    BEEP;
+    return sts;
+  }
+
+  /* Check that the objdid is an eo object */
+  sts = ldh_GetAttrRefTid(ldhses, &attrref, &cid);
+  if (EVEN(sts))
+    return sts;
+
+  if (cid != pwr_cClass_Eo) {
+    foe->message("Selected object is not a Eo object");
+    BEEP;
+    return 0;
+  }
+
+  if (cdh_IsClassVolume(node->ln.oid.vid)) {
+    sts = gobj_ref_replace(ldhses, node, &attrref);
+    if (EVEN(sts))
+      return sts;
+  }
+
+  /* Set the parameter value */
+  sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "EoObject",
+      (char*)&attrref, sizeof(attrref));
+  if (EVEN(sts))
+    return sts;
+
+  foe->gre->node_update(node);
 
   return FOE__SUCCESS;
 }

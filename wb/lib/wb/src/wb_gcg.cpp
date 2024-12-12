@@ -5948,7 +5948,8 @@ int gcg_comp_m4(gcg_ctx gcgctx, vldh_t_node node)
 *
 * Description:
 *	Compile method for GETDI, GETDO, GETDV, GETAI, GETAO, GETAV,
-*       GETII, GETIO, GETIV, GetSv, GetATv and GetDTv node.
+*       GETII, GETIO, GETIV, GetEi, GetEo, GetEv, GetSv, GetSo, GetSi,
+*       GetATv and GetDTv node.
 *	Checks that the class of the referenced object is correct.
 *	Prints declaration and directlink for a read rtdb pointer
 *	for the refereced io-object. The pointer will point at
@@ -6062,6 +6063,24 @@ int gcg_comp_m8(gcg_ctx gcgctx, vldh_t_node node)
       return GSX__NEXTNODE;
     }
     break;
+  case pwr_cClass_GetEi:
+    if (cid != pwr_cClass_Ei) {
+      gcg_error_msg(gcgctx, GSX__REFCLASS, node);
+      return GSX__NEXTNODE;
+    }
+    break;
+  case pwr_cClass_GetEo:
+    if (cid != pwr_cClass_Eo) {
+      gcg_error_msg(gcgctx, GSX__REFCLASS, node);
+      return GSX__NEXTNODE;
+    }
+    break;
+  case pwr_cClass_GetEv:
+    if (cid != pwr_cClass_Ev) {
+      gcg_error_msg(gcgctx, GSX__REFCLASS, node);
+      return GSX__NEXTNODE;
+    }
+    break;
   case pwr_cClass_GetBiInt32:
   case pwr_cClass_GetBoInt32:
   case pwr_cClass_GetBiString80:
@@ -6128,6 +6147,18 @@ int gcg_comp_m8(gcg_ctx gcgctx, vldh_t_node node)
       return GSX__NEXTNODE;
     }
     break;
+  case pwr_cClass_GetSi:
+    if (cid != pwr_cClass_Si) {
+      gcg_error_msg(gcgctx, GSX__REFCLASS, node);
+      return GSX__NEXTNODE;
+    }
+    break;
+  case pwr_cClass_GetSo:
+    if (cid != pwr_cClass_So) {
+      gcg_error_msg(gcgctx, GSX__REFCLASS, node);
+      return GSX__NEXTNODE;
+    }
+    break;
   case pwr_cClass_GetATv:
     if (cid != pwr_cClass_ATv) {
       gcg_error_msg(gcgctx, GSX__REFCLASS, node);
@@ -6180,6 +6211,8 @@ int gcg_comp_m8(gcg_ctx gcgctx, vldh_t_node node)
   case pwr_cClass_GetATv:
   case pwr_cClass_GetDTv:
   case pwr_cClass_GetSv:
+  case pwr_cClass_GetSi:
+  case pwr_cClass_GetSo:
     sts = gcg_get_structname(gcgctx, node->ln.oid, &name);
     IF_PR fprintf(gcgctx->files[GCGM1_REF_FILE], "%s_init( tp);\n", name);
   default:;
@@ -7401,6 +7434,22 @@ int gcg_comp_m11(gcg_ctx gcgctx, vldh_t_node node)
   } else if (node->ln.cid == pwr_cClass_stosv
       || node->ln.cid == pwr_cClass_cstosv) {
     if (cid != pwr_cClass_Sv) {
+      gcg_error_msg(gcgctx, GSX__REFCLASS, node);
+      return GSX__NEXTNODE;
+    }
+    strcpy(nocondef[0].str, (char*)nocondef_ptr);
+    nocontype[0] = GCG_STRING;
+  } else if (node->ln.cid == pwr_cClass_stosi
+      || node->ln.cid == pwr_cClass_cstosi) {
+    if (cid != pwr_cClass_Si) {
+      gcg_error_msg(gcgctx, GSX__REFCLASS, node);
+      return GSX__NEXTNODE;
+    }
+    strcpy(nocondef[0].str, (char*)nocondef_ptr);
+    nocontype[0] = GCG_STRING;
+  } else if (node->ln.cid == pwr_cClass_stoso
+      || node->ln.cid == pwr_cClass_cstoso) {
+    if (cid != pwr_cClass_So) {
       gcg_error_msg(gcgctx, GSX__REFCLASS, node);
       return GSX__NEXTNODE;
     }
@@ -10216,6 +10265,15 @@ int gcg_comp_m38(gcg_ctx gcgctx, vldh_t_node node)
   case pwr_cClass_stoii:
   case pwr_cClass_cstoii:
     if (cid != pwr_cClass_Ii) {
+      gcg_error_msg(gcgctx, GSX__REFCLASS, node);
+      return GSX__NEXTNODE;
+    }
+    nocondef[0].bo = *(int*)nocondef_ptr;
+    nocontype[0] = GCG_INT32;
+    break;
+  case pwr_cClass_stoei:
+  case pwr_cClass_cstoei:
+    if (cid != pwr_cClass_Ei) {
       gcg_error_msg(gcgctx, GSX__REFCLASS, node);
       return GSX__NEXTNODE;
     }
@@ -14414,6 +14472,20 @@ int gcg_comp_m68(gcg_ctx gcgctx, vldh_t_node node)
     /* Insert io object in ioread list */
     gcg_ioread_insert(gcgctx, aref, GCG_PREFIX_REF);
     break;
+  case pwr_cClass_Ei:
+  case pwr_cClass_Eo:
+  case pwr_cClass_Ev:
+    if (node->ln.cid != pwr_cClass_GetRefI) {
+      gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
+      return GSX__NEXTPAR;
+    }
+    strcpy(parameter, "ActualValue");
+
+    /* Insert io object in ioread list */
+    gcg_ioread_insert(gcgctx, aref, GCG_PREFIX_REF);
+    break;
+  case pwr_cClass_Si:
+  case pwr_cClass_So:
   case pwr_cClass_Sv:
     if (node->ln.cid != pwr_cClass_GetRefS) {
       gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
@@ -14682,6 +14754,21 @@ int gcg_comp_m69(gcg_ctx gcgctx, vldh_t_node node)
     /* Insert io object in iowrite list */
     gcg_iowrite_insert(gcgctx, aref, GCG_PREFIX_REF);
     break;
+  case pwr_cClass_Ei:
+  case pwr_cClass_Eo:
+  case pwr_cClass_Ev:
+    if (!(node->ln.cid == pwr_cClass_StoRefI
+            || node->ln.cid == pwr_cClass_CStoRefI)) {
+      gcg_error_msg(gcgctx, GSX__REFPARTYPE, node);
+      return GSX__NEXTPAR;
+    }
+    strcpy(parameter, "ActualValue");
+
+    /* Insert io object in iowrite list */
+    gcg_iowrite_insert(gcgctx, aref, GCG_PREFIX_REF);
+    break;
+  case pwr_cClass_Si:
+  case pwr_cClass_So:
   case pwr_cClass_Sv:
     if (!(node->ln.cid == pwr_cClass_StoRefS
             || node->ln.cid == pwr_cClass_CStoRefS)) {

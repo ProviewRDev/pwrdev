@@ -83,8 +83,8 @@ public:
       glow_eDrawType t_drawtype = glow_eDrawType_TextHelvetica,
       glow_eDrawType t_color = glow_eDrawType_Line,
       glow_eDrawType t_color_disabled = glow_eDrawType_Line,
-      glow_eFont t_font = glow_eFont_Helvetica, GlowArrayElem* parent = 0,
-      int nodraw = 0);
+      glow_eFont t_font = glow_eFont_Helvetica, double scale = 1,
+      GlowArrayElem* parent = 0, int nodraw = 0);
 
   //! Destructor
   /*! Remove the object from context, and erase it from the screen.
@@ -146,6 +146,7 @@ public:
   double min_width; //!< Minimum width of menu.
   int input_focus; //!< This menu has input focus.
   glow_eFont font; //!< Text font.
+  double text_scale; //!< Text scale
 
   //! Draw the object.
   /*!

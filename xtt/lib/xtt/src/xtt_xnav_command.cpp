@@ -1631,6 +1631,7 @@ static int xnav_show_func(void* client_data, void* client_flag)
         return sts;
 
       name_ptr = name_str;
+      xnav->message('I', name_ptr);
       //      sts = rtt_show_obj_hier_class_name( ctx, 0, 0,
       //  		name_ptr, 0, 0);
       sts = 0;
@@ -2816,7 +2817,6 @@ static int xnav_eventlist_func(void* client_data, void* client_flag)
       pwr_sAttrRef oar = cdh_ObjidToAref(objid);
 
       xnav->block_new(&oar, Lng::translate("Alarm Blocking"), xnav->priv, &sts);
-      xnav->message('E', "Enter priority");
       return XNAV__HOLDCOMMAND;
     }
 
@@ -6757,8 +6757,13 @@ static int xnav_crossref_func(void* client_data, void* client_flag)
     case pwr_cClass_Iv:
     case pwr_cClass_Ii:
     case pwr_cClass_Io:
+    case pwr_cClass_Ev:
+    case pwr_cClass_Ei:
+    case pwr_cClass_Eo:
     case pwr_cClass_Co:
     case pwr_cClass_Sv:
+    case pwr_cClass_Si:
+    case pwr_cClass_So:
     case pwr_cClass_ATv:
     case pwr_cClass_DTv:
       if (!file_ptr) {
@@ -11171,6 +11176,10 @@ int XNav::set_signal(pwr_tAttrRef* arp, xnav_eSetSignal type, int on)
   case pwr_cClass_ChanAo:
   case pwr_cClass_ChanIi:
   case pwr_cClass_ChanIo:
+  case pwr_cClass_ChanEi:
+  case pwr_cClass_ChanEo:
+  case pwr_cClass_ChanSi:
+  case pwr_cClass_ChanSo:
     chan_aref = *arp;
     chan_cid = sig_cid;
     break;
@@ -11197,11 +11206,15 @@ int XNav::set_signal(pwr_tAttrRef* arp, xnav_eSetSignal type, int on)
     break;
   case pwr_cClass_ChanAi:
   case pwr_cClass_ChanIi:
+  case pwr_cClass_ChanEi:
+  case pwr_cClass_ChanSi:
     if (!(type == xnav_eSetSignal_Conversion))
       return XNAV__INVALIDOBJECT;
     break;
   case pwr_cClass_ChanAo:
   case pwr_cClass_ChanIo:
+  case pwr_cClass_ChanEo:
+  case pwr_cClass_ChanSo:
     if (!(type == xnav_eSetSignal_Test))
       return XNAV__INVALIDOBJECT;
     break;

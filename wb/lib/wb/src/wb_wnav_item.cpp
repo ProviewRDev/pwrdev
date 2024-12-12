@@ -656,6 +656,15 @@ int WItemBaseObject::open_attributes(WNav* wnav, double x, double y)
             continue;
         }
 
+	pwr_tTid typeref = bodydef[j].Par->Output.TypeRef;
+	if (bodydef[j].Par->Param.Info.Flags & PWR_MASK_CASTATTR) {
+          pwr_sAttrRef aar;
+          pwr_sAttrRef ar = cdh_ObjidToAref(objid);
+
+          sts = ldh_ArefANameToAref(ldhses, &ar, parname, &aar);
+          if (ODD(sts))
+	    sts = ldh_GetAttrRefTid(ldhses, &aar, &typeref);
+	}
         if (bodydef[j].Par->Output.Info.Flags & PWR_MASK_ARRAY) {
           elements = bodydef[j].Par->Output.Info.Elements;
 
@@ -664,7 +673,7 @@ int WItemBaseObject::open_attributes(WNav* wnav, double x, double y)
                 flow_eDest_IntoLast, parname,
                 bodydef[j].Par->Output.Info.Elements,
                 bodydef[j].Par->Output.Info.Type,
-                bodydef[j].Par->Output.TypeRef,
+                typeref,
                 bodydef[j].Par->Output.Info.Size,
                 bodydef[j].Par->Output.Info.Flags, body, output_cnt);
             output_cnt++;
@@ -673,7 +682,7 @@ int WItemBaseObject::open_attributes(WNav* wnav, double x, double y)
                 flow_eDest_IntoLast, parname,
                 bodydef[j].Par->Output.Info.Elements,
                 bodydef[j].Par->Output.Info.Type,
-                bodydef[j].Par->Output.TypeRef,
+                typeref,
                 bodydef[j].Par->Output.Info.Size,
                 bodydef[j].Par->Output.Info.Flags, body, 0);
           attr_exist = 1;
@@ -744,7 +753,7 @@ int WItemBaseObject::open_attributes(WNav* wnav, double x, double y)
           else
             new WItemAttr(wnav->brow, wnav->ldhses, objid, node,
                 flow_eDest_IntoLast, parname, bodydef[j].Par->Output.Info.Type,
-                bodydef[j].Par->Output.TypeRef,
+                typeref,
                 bodydef[j].Par->Output.Info.Size,
                 bodydef[j].Par->Output.Info.Flags, body, 0);
           attr_exist = 1;
@@ -826,7 +835,12 @@ int WItemBaseObject::open_crossref(WNav* wnav, double x, double y)
     case pwr_cClass_Iv:
     case pwr_cClass_Ii:
     case pwr_cClass_Io:
+    case pwr_cClass_Ev:
+    case pwr_cClass_Ei:
+    case pwr_cClass_Eo:
     case pwr_cClass_Sv:
+    case pwr_cClass_Si:
+    case pwr_cClass_So:
     case pwr_cClass_ATv:
     case pwr_cClass_DTv:
       sts = wnav->crr_signal(wnav->brow, wnav->ldhses, NULL, name, node);
@@ -3079,6 +3093,16 @@ int WItemAttrObject::open_attributes(double x, double y)
             continue;
         }
 
+	pwr_tTid typeref = bodydef[j].Par->Output.TypeRef;
+	if (bodydef[j].Par->Param.Info.Flags & PWR_MASK_CASTATTR) {
+          pwr_sAttrRef aar;
+          pwr_sAttrRef ar = cdh_ObjidToAref(objid);
+
+          sts = ldh_ArefANameToAref(ldhses, &ar, parname, &aar);
+          if (ODD(sts))
+	    sts = ldh_GetAttrRefTid(ldhses, &aar, &typeref);
+	}
+
         if (bodydef[j].Par->Output.Info.Flags & PWR_MASK_ARRAY) {
           elements = bodydef[j].Par->Output.Info.Elements;
 
@@ -3095,7 +3119,7 @@ int WItemAttrObject::open_attributes(double x, double y)
             new WItemAttrArray(brow, ldhses, objid, node, flow_eDest_IntoLast,
                 parname, bodydef[j].Par->Output.Info.Elements,
                 bodydef[j].Par->Output.Info.Type,
-                bodydef[j].Par->Output.TypeRef,
+                typeref,
                 bodydef[j].Par->Output.Info.Size,
                 bodydef[j].Par->Output.Info.Flags, body, 0);
           attr_exist = 1;
@@ -3166,7 +3190,7 @@ int WItemAttrObject::open_attributes(double x, double y)
           else
             new WItemAttr(brow, ldhses, objid, node, flow_eDest_IntoLast,
                 parname, bodydef[j].Par->Output.Info.Type,
-                bodydef[j].Par->Output.TypeRef,
+                typeref,
                 bodydef[j].Par->Output.Info.Size,
                 bodydef[j].Par->Output.Info.Flags, body, 0);
           attr_exist = 1;

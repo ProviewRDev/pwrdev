@@ -66,7 +66,8 @@ GrowAxis::GrowAxis(GrowCtx* glow_ctx, const char* name, double x1, double y1,
           0, glow_mDisplayLevel_1, 0, 1, 0, glow_eDrawType_Line, 1),
       text_size(t_size), text_drawtype(t_drawtype),
       text_color_drawtype(glow_eDrawType_Line), max_value(100), min_value(0),
-      lines(11), longquotient(1), valuequotient(1), increment(0)
+      lines(11), longquotient(1), valuequotient(1), increment(0), label_table(0),
+      label_table_size(0), axis_type(glow_eAxisType_Numeric)
 {
   strcpy(format, "%3.0f");
 
@@ -77,6 +78,8 @@ GrowAxis::GrowAxis(GrowCtx* glow_ctx, const char* name, double x1, double y1,
 
 GrowAxis::~GrowAxis()
 {
+  if (label_table)
+    free(label_table);      
 }
 
 void GrowAxis::configure()
@@ -346,6 +349,10 @@ void GrowAxis::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
       line_length = ur_x - ll_x - max_z_width;
       if (line_length < 3)
         line_length = 3;
+      if (axis_type == glow_eAxisType_String) {
+	if (line_length > 10)
+	  line_length = 10;
+      }
     } else {
       x_text = ll_x;
       line_length = ur_x - ll_x;
@@ -363,13 +370,23 @@ void GrowAxis::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
 
         if (text_idx >= 0 && max_z_width < ur_x - ll_x
             && i % valuequotient == 0) {
-          if (i == lines - 1)
-            y_text = y;
-          else if (i == 0)
-            y_text = y + z_height - z_descent;
-          else
-            y_text = y + (z_height - z_descent) / 2;
-          ctx->gdraw->text(w, ll_x, y_text, text, strlen(text), text_drawtype,
+	  if (axis_type == glow_eAxisType_String) {
+	    ctx->gdraw->get_text_extent(text, strlen(text), text_drawtype,
+                MAX(0, text_idx), glow_eFont_Helvetica, &z_width, &z_height,
+                &z_descent, tsize, 0);
+	    x_text = ur_x - line_length - z_width - 3;
+	  }
+	  else
+	    x_text = ll_x;
+
+	  if (i == lines - 1)
+	    y_text = y;
+	  else if (i == 0)
+	    y_text = y + z_height - z_descent;
+	  else
+	    y_text = y + (z_height - z_descent) / 2;
+
+          ctx->gdraw->text(w, x_text, y_text, text, strlen(text), text_drawtype,
               text_color_drawtype, text_idx, highlight, 0, glow_eFont_Helvetica,
               tsize, 0, transp);
         }
@@ -730,26 +747,28 @@ void GrowAxis::set_range(double minval, double maxval, int keep_settings)
 
     double m = MAX(fabs(maxval), fabs(minval));
 
-    if (m < 0.01)
-      strcpy(format, "%g");
-    else if (m < 0.1)
-      strcpy(format, "%5.3f");
-    else if (m < 1)
-      strcpy(format, "%4.2f");
-    else if (!lix && m < 3)
-      strcpy(format, "%3.1f");
-    else if (lix && m <= 4)
-      strcpy(format, "%3.1f");
-    else if (m <= 20)
-      strcpy(format, "%2.0f");
-    else if (m <= 200)
-      strcpy(format, "%3.0f");
-    else if (m < 2000)
-      strcpy(format, "%4.0f");
-    else if (m < 20000)
-      strcpy(format, "%5.0f");
-    else
-      strcpy(format, "%g");
+    if (axis_type != glow_eAxisType_String) {
+      if (m < 0.01)
+	strcpy(format, "%g");
+      else if (m < 0.1)
+	strcpy(format, "%5.3f");
+      else if (m < 1)
+	strcpy(format, "%4.2f");
+      else if (!lix && m < 3)
+	strcpy(format, "%3.1f");
+      else if (lix && m <= 4)
+	strcpy(format, "%3.1f");
+      else if (m <= 20)
+	strcpy(format, "%2.0f");
+      else if (m <= 200)
+	strcpy(format, "%3.0f");
+      else if (m < 2000)
+	strcpy(format, "%4.0f");
+      else if (m < 20000)
+	strcpy(format, "%5.0f");
+      else
+	strcpy(format, "%g");
+    }
   }
   configure();
   draw();
@@ -973,6 +992,12 @@ void GrowAxis::format_text(char* text, char* fmt, double value)
     time_AtoAscii(&t, time_eFormat_NumDateAndTime, timstr, sizeof(timstr));
     timstr[16] = 0;
     strcpy(text, timstr);
+  } else if (streq(fmt, "%s") && label_table) {
+    int idx = floor(value + FLT_EPSILON);
+    if (idx >= 0 && idx < label_table_size)
+      strcpy(text, label_table[idx]);
+    else
+      strcpy(text, "");
   } else {
     if (fabs(value) < FLT_EPSILON)
       value = 0;
@@ -1022,4 +1047,11 @@ void GrowAxis::set_visibility(glow_eVis visibility)
 int GrowAxis::export_script(GlowExportScript* es, void* o, void* m)
 {
   return es->axis(this, o, m);
+}
+
+void GrowAxis::set_labels(char (*labels)[40], int size)
+{
+  label_table = labels;
+  label_table_size = size;
+  axis_type = glow_eAxisType_String;  
 }

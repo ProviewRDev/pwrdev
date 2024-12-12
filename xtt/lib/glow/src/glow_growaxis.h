@@ -46,6 +46,12 @@ class GlowExportScript;
 /*! \addtogroup Glow */
 /*@{*/
 
+typedef enum {
+  glow_eAxisType_Numeric,
+  glow_eAxisType_String
+} glow_eAxisType;
+
+
 //! Class for drawing an axis object.
 /*! A GrowAxis object is an object that displays an axis or scale.
 
@@ -142,6 +148,9 @@ public:
   int valuequotient; //!< Quotient of lines that displays a value.
   double increment; //!< Value difference between two lines.
   char format[20]; //!< Format of displayed values.
+  char (*label_table)[40]; //!< Labels for enum variables.
+  int label_table_size; //!< Number of labels in label_table.
+  glow_eAxisType axis_type; //!< Type of axis
   GlowTraceData trace; //!< Obsolete
 
   //! Draw the object.
@@ -282,6 +291,7 @@ public:
   glow_eVis get_visibility();
   void set_visibility(glow_eVis visibility);
   int export_script(GlowExportScript* es, void* o, void* m);
+  void set_labels(char (*labels)[40], int size);
 };
 
 /*@}*/

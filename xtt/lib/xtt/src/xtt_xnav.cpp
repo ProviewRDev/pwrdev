@@ -207,6 +207,11 @@ int XNav::get_trace_attr(pwr_sAttrRef* arp, char* attr)
   case pwr_cClass_Ii:
   case pwr_cClass_Io:
   case pwr_cClass_Iv:
+  case pwr_cClass_Ei:
+  case pwr_cClass_Eo:
+  case pwr_cClass_Ev:
+  case pwr_cClass_Si:
+  case pwr_cClass_So:
   case pwr_cClass_Sv:
   case pwr_cClass_ATv:
   case pwr_cClass_DTv:
@@ -224,6 +229,10 @@ int XNav::get_trace_attr(pwr_sAttrRef* arp, char* attr)
   case pwr_cClass_ChanAo:
   case pwr_cClass_ChanIi:
   case pwr_cClass_ChanIo:
+  case pwr_cClass_ChanEi:
+  case pwr_cClass_ChanEo:
+  case pwr_cClass_ChanSi:
+  case pwr_cClass_ChanSo:
     sts = gdh_AttrrefToName(
         arp, objname, sizeof(objname), cdh_mName_volumeStrict);
     if (EVEN(sts))
@@ -441,8 +450,15 @@ int XNav::attr_string_to_value(int type_id, char* value_str, void* buffer_ptr,
       *(int*)buffer_ptr = INT_MIN;
     else if (streq(value_str, "IntMax"))
       *(int*)buffer_ptr = INT_MAX;
-    else if (sscanf(value_str, "%d%s", (int*)buffer_ptr, s) != 1)
-      return XNAV__INPUT_SYNTAX;
+    else {
+      if (value_str[0] == '0' && value_str[1] == 'x') {
+	if (sscanf(&value_str[2], "%lx%s", (unsigned long*)buffer_ptr, s) != 1)
+	  return XNAV__INPUT_SYNTAX;
+      } else {
+	if (sscanf(value_str, "%d%s", (int*)buffer_ptr, s) != 1)
+	  return XNAV__INPUT_SYNTAX;
+      }
+    }
     break;
   }
   case pwr_eType_Int64: {
@@ -469,8 +485,13 @@ int XNav::attr_string_to_value(int type_id, char* value_str, void* buffer_ptr,
   case pwr_eType_Mask:
   case pwr_eType_Enum:
   case pwr_eType_DisableAttr: {
-    if (sscanf(value_str, "%lu%s", (unsigned long*)buffer_ptr, s) != 1)
-      return XNAV__INPUT_SYNTAX;
+    if (value_str[0] == '0' && value_str[1] == 'x') {
+      if (sscanf(&value_str[2], "%lx%s", (unsigned long*)buffer_ptr, s) != 1)
+	return XNAV__INPUT_SYNTAX;
+    } else {
+      if (sscanf(value_str, "%lu%s", (unsigned long*)buffer_ptr, s) != 1)
+	return XNAV__INPUT_SYNTAX;
+    }
     break;
   }
   case pwr_eType_UInt64: {
@@ -1234,6 +1255,10 @@ int XNav::collect_insert(pwr_sAttrRef* arp)
     sts = gdh_GetAttrRefTid(arp, &a_tid);
     if (EVEN(sts))
       return sts;
+
+    if (a_flags & PWR_MASK_CASTATTR) {
+      sts = gdh_GetAttrRefTid(&ar, &a_tid);
+    }
   }
 
   item = new ItemCollect(collect_brow, arp->Objid, attr, NULL,

@@ -407,6 +407,15 @@ int ItemBaseObject::open_attributes(XNavBrow* brow, double x, double y)
           continue;
       }
 
+      pwr_tTid typeref = bd[i].attr->Param.TypeRef;
+      if (bd[i].attr->Param.Info.Flags & PWR_MASK_CASTATTR) {
+	pwr_tAttrRef aaref;
+	pwr_tAttrRef aref = cdh_ObjidToAref(objid);
+	sts = gdh_ArefANameToAref(&aref, bd[i].attrName, &aaref);
+	if (ODD(sts))
+	  sts = gdh_GetAttrRefTid(&aaref, &typeref);	  
+      }
+
       if (classid == pwr_eClass_System)
         bd[i].attr->Param.Info.Flags |= PWR_MASK_CONST;
 
@@ -434,7 +443,7 @@ int ItemBaseObject::open_attributes(XNavBrow* brow, double x, double y)
 
         item = (Item*)new ItemAttrArray(brow, objid, node, flow_eDest_IntoLast,
             bd[i].attrName, aelem, bd[i].attr->Param.Info.Type,
-            bd[i].attr->Param.TypeRef, asize, bd[i].attr->Param.Info.Flags, 0);
+            typeref, asize, bd[i].attr->Param.Info.Flags, 0);
       } else if (bd[i].attr->Param.Info.Flags & PWR_MASK_CLASS) {
         attr_exist = 1;
         item = (Item*)new ItemAttrObject(brow, objid, node, flow_eDest_IntoLast,
@@ -444,7 +453,7 @@ int ItemBaseObject::open_attributes(XNavBrow* brow, double x, double y)
         attr_exist = 1;
         item = (Item*)new ItemAttr(brow, objid, node, flow_eDest_IntoLast,
             bd[i].attrName, bd[i].attr->Param.Info.Type,
-            bd[i].attr->Param.TypeRef, bd[i].attr->Param.Info.Size,
+            typeref, bd[i].attr->Param.Info.Size,
             bd[i].attr->Param.Info.Flags, 0, item_eDisplayType_Attr);
       }
     }
@@ -513,9 +522,16 @@ int ItemBaseObject::open_attribute(
             bd[i].attr->Param.Info.Flags, 0, item_eDisplayType_Path);
       } else {
         attr_exist = 1;
+	pwr_tTid typeref = bd[i].attr->Param.TypeRef;
+	if (bd[i].attr->Param.Info.Flags & PWR_MASK_CASTATTR) {
+	  pwr_tAttrRef aaref;
+	  pwr_tAttrRef aref = cdh_ObjidToAref(objid);
+	  sts = gdh_ArefANameToAref(&aref, bd[i].attrName, &aaref);
+	  sts = gdh_GetAttrRefTid(&aaref, &typeref);	  
+	}
         item = (Item*)new ItemAttr(brow, objid, node, flow_eDest_IntoLast,
             bd[i].attrName, bd[i].attr->Param.Info.Type,
-            bd[i].attr->Param.TypeRef, bd[i].attr->Param.Info.Size,
+            typeref, bd[i].attr->Param.Info.Size,
             bd[i].attr->Param.Info.Flags, 0, item_eDisplayType_Path);
       }
       break;
@@ -581,8 +597,13 @@ int ItemBaseObject::open_crossref(XNavBrow* brow, double x, double y)
     case pwr_cClass_Iv:
     case pwr_cClass_Ii:
     case pwr_cClass_Io:
+    case pwr_cClass_Ev:
+    case pwr_cClass_Ei:
+    case pwr_cClass_Eo:
     case pwr_cClass_Co:
     case pwr_cClass_Sv:
+    case pwr_cClass_Si:
+    case pwr_cClass_So:
     case pwr_cClass_ATv:
     case pwr_cClass_DTv:
       sts = xnav_crr_signal(brow, file, name, node);
@@ -1176,8 +1197,15 @@ int ItemAttrObject::open_attributes(XNavBrow* brow, double x, double y)
             bd[i].attr->Param.Info.Flags, 0, 0);
       } else {
         attr_exist = 1;
+	pwr_tTid typeref = bd[i].attr->Param.TypeRef;
+	if (bd[i].attr->Param.Info.Flags & PWR_MASK_CASTATTR) {
+	  pwr_tAttrRef aaref;
+	  pwr_tAttrRef aref = cdh_ObjidToAref(objid);
+	  sts = gdh_ArefANameToAref(&aref, attr_name, &aaref);
+	  sts = gdh_GetAttrRefTid(&aaref, &typeref);	  
+	}
         item = (Item*)new ItemAttr(brow, objid, node, flow_eDest_IntoLast,
-            attr_name, bd[i].attr->Param.Info.Type, bd[i].attr->Param.TypeRef,
+            attr_name, bd[i].attr->Param.Info.Type, typeref,
             bd[i].attr->Param.Info.Size, bd[i].attr->Param.Info.Flags, 0,
             item_eDisplayType_Attr);
       }
@@ -1252,8 +1280,13 @@ int ItemAttrObject::open_crossref(XNavBrow* brow, double x, double y)
     case pwr_cClass_Iv:
     case pwr_cClass_Ii:
     case pwr_cClass_Io:
+    case pwr_cClass_Ev:
+    case pwr_cClass_Ei:
+    case pwr_cClass_Eo:
     case pwr_cClass_Co:
     case pwr_cClass_Sv:
+    case pwr_cClass_Si:
+    case pwr_cClass_So:
     case pwr_cClass_ATv:
     case pwr_cClass_DTv:
       sts = xnav_crr_signal(brow, file, aname, node);
@@ -1616,6 +1649,10 @@ void ItemCollect::set_signal_flags(XNavBrow* brow)
     case pwr_cClass_Do:
     case pwr_cClass_Ii:
     case pwr_cClass_Io:
+    case pwr_cClass_Ei:
+    case pwr_cClass_Eo:
+    case pwr_cClass_Si:
+    case pwr_cClass_So:
     case pwr_cClass_Ai:
     case pwr_cClass_Ao:
     case pwr_cClass_Co:
@@ -3182,6 +3219,10 @@ static void xnav_set_sigchan_flags(
   case pwr_cClass_Ao:
   case pwr_cClass_Ii:
   case pwr_cClass_Io:
+  case pwr_cClass_Ei:
+  case pwr_cClass_Eo:
+  case pwr_cClass_Si:
+  case pwr_cClass_So:
   case pwr_cClass_Co:
   case pwr_cClass_Po: {
     is_signal = 1;
@@ -3195,6 +3236,10 @@ static void xnav_set_sigchan_flags(
   case pwr_cClass_ChanAo:
   case pwr_cClass_ChanIi:
   case pwr_cClass_ChanIo:
+  case pwr_cClass_ChanEi:
+  case pwr_cClass_ChanEo:
+  case pwr_cClass_ChanSi:
+  case pwr_cClass_ChanSo:
   case pwr_cClass_ChanCo: {
     break;
   }
@@ -3500,6 +3545,8 @@ static void xnav_set_sigchan_flags(
       break;
     case pwr_cClass_ChanAi:
     case pwr_cClass_ChanIi:
+    case pwr_cClass_ChanEi:
+    case pwr_cClass_ChanSi:
     case pwr_cClass_ChanCo:
       sts = gdh_ArefANameToAref(&chanaref, "ConversionOn", &aref);
       if (EVEN(sts)) {
@@ -3516,6 +3563,8 @@ static void xnav_set_sigchan_flags(
       break;
     case pwr_cClass_ChanAo:
     case pwr_cClass_ChanIo:
+    case pwr_cClass_ChanEo:
+    case pwr_cClass_ChanSo:
       sts = gdh_ArefANameToAref(&chanaref, "TestOn", &aref);
       if (EVEN(sts)) {
         brow_SetAnnotPixmap(node, annot, brow->pixmap_offline);

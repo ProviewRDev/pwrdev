@@ -167,6 +167,14 @@ static pwr_tStatus SyntaxCheck(
   case pwr_cClass_Di:
   case pwr_cClass_Ai:
   case pwr_cClass_Ii:
+  case pwr_cClass_Ei:
+  case pwr_cClass_Eo:
+  case pwr_cClass_Ev:
+  case pwr_cClass_Si:
+  case pwr_cClass_So:
+  case pwr_cClass_Sv:
+  case pwr_cClass_ATv:
+  case pwr_cClass_DTv:
     wsx_error_msg(Session, WSX__BCKINVALID, Object, ErrorCount, WarningCount);
     return PWRB__SUCCESS;
   default:;
@@ -190,6 +198,12 @@ static pwr_tStatus SyntaxCheck(
     case pwr_cClass_Av:
     case pwr_cClass_Io:
     case pwr_cClass_Iv:
+    case pwr_cClass_Eo:
+    case pwr_cClass_Ev:
+    case pwr_cClass_So:
+    case pwr_cClass_Sv:
+    case pwr_cClass_ATv:
+    case pwr_cClass_DTv:
     case pwr_cClass_Po:
     case pwr_cClass_Co: {
       if (!streq(s + 1, "ActualValue"))
@@ -199,7 +213,9 @@ static pwr_tStatus SyntaxCheck(
     }
     case pwr_cClass_Di:
     case pwr_cClass_Ai:
-    case pwr_cClass_Ii: {
+    case pwr_cClass_Ii:
+    case pwr_cClass_Ei:
+    case pwr_cClass_Si: {
       wsx_error_msg(Session, WSX__BCKINVALID, Object, ErrorCount, WarningCount);
       break;
     }

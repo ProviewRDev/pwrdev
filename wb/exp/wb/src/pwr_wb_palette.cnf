@@ -46,10 +46,15 @@ palette NavigatorPalette
       class Do
       class Dv
       class DTv
+      class Ei
+      class Eo
+      class Ev
       class Ii
       class Io
       class Iv
       class Po
+      class Si
+      class So
       class Sv
       menu Bi
       {	
@@ -306,8 +311,12 @@ palette NavigatorPalette
         class ChanD
         class ChanDi
         class ChanDo
+        class ChanEi
+        class ChanEo
         class ChanIi
         class ChanIo
+        class ChanSi
+        class ChanSo
       }
       menu GPIO
       {
@@ -351,6 +360,8 @@ palette NavigatorPalette
       {
         class MQTT_Client
 	class MQTT_Device
+        class Zigbee2MQTT_Client
+	class Zigbee2MQTT_Device
       }
       menu OneWire
       {
@@ -1106,6 +1117,15 @@ palette PlcEditorPalette
       class GetPi
       class PiPos
     }
+    menu Enumeration
+      class CStoEo
+      class CStoEv
+      class GetEi
+      class GetEo
+      class GetEv
+      class StoEo
+      class StoEv
+    }
     menu Buffer 
     {
       class CStoBoInt32
@@ -1166,13 +1186,17 @@ palette PlcEditorPalette
     {
       class CStoNumSp
       class CStoRefS
+      class CStoSo
       class CStoSp
       class CStoSv
       class GetRefS
+      class GetSi
+      class GetSo
       class GetSp
       class GetSv
       class StoNumSp
       class StoRefS
+      class StoSo
       class StoSp
       class StoSv
       class StrAdd
@@ -1233,7 +1257,9 @@ palette PlcEditorPalette
       class CStoBiInt32
       class CStoBiFloat32
       class CStoBiString80
+      class CStoEi
       class CStoIi
+      class CStoSi
       class IOSimulFlag
       class ResDi
       class SetDi
@@ -1242,8 +1268,10 @@ palette PlcEditorPalette
       class StoBiFloat32
       class StoBiString80
       class StoDi
+      class StoEi
       class StoIi
       class StoPi
+      class StoSi
       class ToggleDi
     }
   }

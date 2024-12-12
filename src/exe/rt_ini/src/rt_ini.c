@@ -1016,12 +1016,14 @@ static void load_backup()
   pwr_sClass_AvArea* avp;
   pwr_sClass_DvArea* dvp;
   pwr_sClass_IvArea* ivp;
+  pwr_sClass_EvArea* evp;
   pwr_sClass_ATvArea* atvp;
   pwr_sClass_DTvArea* dtvp;
   pwr_sClass_SvArea* svp;
   pwr_sClass_InitArea* iavp;
   pwr_sClass_InitArea* idvp;
   pwr_sClass_InitArea* iivp;
+  pwr_sClass_InitArea* ievp;
   pwr_sClass_InitArea* iatvp;
   pwr_sClass_InitArea* idtvp;
   pwr_sClass_InitArea* isvp;
@@ -1096,6 +1098,18 @@ static void load_backup()
     return;
   }
 
+  sts = gdh_NameToObjid("pwrNode-active-io-ev", &oid);
+  if (EVEN(sts)) {
+    errh_Error("gdh_NameToObjid(pwrNode-active-io-ev, &oid), %m", sts);
+    return;
+  }
+
+  sts = gdh_ObjidToPointer(oid, (void*)&evp);
+  if (EVEN(sts)) {
+    errh_Error("gdh_ObjidToPointer(oid, (void *) &evp), %m", sts);
+    return;
+  }
+
   sts = gdh_NameToObjid("pwrNode-active-io-atv", &oid);
   if (EVEN(sts)) {
     errh_Error("gdh_NameToObjid(pwrNode-active-io-atv, &oid), %m", sts);
@@ -1141,6 +1155,18 @@ static void load_backup()
   sts = gdh_ObjidToPointer(oid, (void*)&iivp);
   if (EVEN(sts)) {
     errh_Error("gdh_ObjidToPointer(oid, (void *) &iivp), %m", sts);
+    return;
+  }
+
+  sts = gdh_NameToObjid("pwrNode-active-io-ev_init", &oid);
+  if (EVEN(sts)) {
+    errh_Error("gdh_NameToObjid(pwrNode-active-io-ev_init, &oid), %m", sts);
+    return;
+  }
+
+  sts = gdh_ObjidToPointer(oid, (void*)&ievp);
+  if (EVEN(sts)) {
+    errh_Error("gdh_ObjidToPointer(oid, (void *) &ievp), %m", sts);
     return;
   }
 
@@ -1195,6 +1221,11 @@ static void load_backup()
     ivp->Value[i] = *iip;
   }
 
+  for (i = 0; i < iop->EvCount; i++) {
+    pwr_tInt32* eip = gdh_TranslateRtdbPointer(ievp->Value[i]);
+    evp->Value[i] = *eip;
+  }
+
   for (i = 1; i < iop->ATvCount; i++) {
     pwr_tTime* iatp = gdh_TranslateRtdbPointer(iatvp->Value[i]);
     atvp->Value[i] = *iatp;
@@ -1224,10 +1255,15 @@ static void load_backup()
       pwr_sClass_Av* av;
       pwr_sClass_Iv* iv;
       pwr_sClass_Dv* dv;
+      pwr_sClass_Ev* ev;
       pwr_sClass_Ai* ai;
       pwr_sClass_Ao* ao;
       pwr_sClass_Ii* ii;
       pwr_sClass_Io* io;
+      pwr_sClass_Ei* ei;
+      pwr_sClass_Eo* eo;
+      pwr_sClass_Si* si;
+      pwr_sClass_So* so;
       pwr_sClass_Di* di;
       pwr_sClass_Do* dox;
       pwr_sClass_Co* co;
@@ -1240,6 +1276,7 @@ static void load_backup()
   ini_sRestoreSig* rsav = NULL;
   ini_sRestoreSig* rsdv = NULL;
   ini_sRestoreSig* rsiv = NULL;
+  ini_sRestoreSig* rsev = NULL;
   ini_sRestoreSig* rsatv = NULL;
   ini_sRestoreSig* rsdtv = NULL;
   ini_sRestoreSig* rssv = NULL;
@@ -1247,6 +1284,10 @@ static void load_backup()
   ini_sRestoreSig* rsao = NULL;
   ini_sRestoreSig* rsii = NULL;
   ini_sRestoreSig* rsio = NULL;
+  ini_sRestoreSig* rsei = NULL;
+  ini_sRestoreSig* rseo = NULL;
+  ini_sRestoreSig* rssi = NULL;
+  ini_sRestoreSig* rsso = NULL;
   ini_sRestoreSig* rsdi = NULL;
   ini_sRestoreSig* rsdo = NULL;
   ini_sRestoreSig* rsco = NULL;
@@ -1304,6 +1345,24 @@ static void load_backup()
 
     rsiv[i].actval_p.i = rsiv[i].op.iv->ActualValue;
     rsiv[i].validx = rsiv[i].op.iv->ValueIndex;
+    i++;
+  }
+
+  rsev = calloc(sizeof(ini_sRestoreSig), iop->EvCount);
+  i = 0;
+  for (sts = gdh_GetClassListAttrRef(pwr_cClass_Ev, &aref); ODD(sts);
+       sts = gdh_GetNextAttrRef(pwr_cClass_Ev, &aref, &aref)) {
+    if (i >= iop->EvCount)
+      break;
+
+    sts = gdh_AttrRefToPointer(&aref, (pwr_tAddress*)&rsev[i].op.ev);
+    if (EVEN(sts)) {
+      errh_Error("gdh_AttrRefToPointer Ev, %m", sts);
+      goto error;
+    }
+
+    rsev[i].actval_p.i = rsev[i].op.ev->ActualValue;
+    rsev[i].validx = rsev[i].op.ev->ValueIndex;
     i++;
   }
 
@@ -1370,7 +1429,7 @@ static void load_backup()
 
     sts = gdh_AttrRefToPointer(&aref, (pwr_tAddress*)&rsai[i].op.ai);
     if (EVEN(sts)) {
-      errh_Error("gdh_AttrRefToPointer Iv, %m", sts);
+      errh_Error("gdh_AttrRefToPointer Ai, %m", sts);
       goto error;
     }
 
@@ -1430,6 +1489,78 @@ static void load_backup()
 
     rsio[i].actval_p.i = rsio[i].op.io->ActualValue;
     rsio[i].validx = rsio[i].op.io->ValueIndex;
+    i++;
+  }
+
+  rsei = calloc(sizeof(ini_sRestoreSig), iop->EiCount);
+  i = 0;
+  for (sts = gdh_GetClassListAttrRef(pwr_cClass_Ei, &aref); ODD(sts);
+       sts = gdh_GetNextAttrRef(pwr_cClass_Ei, &aref, &aref)) {
+    if (i >= iop->EiCount)
+      break;
+
+    sts = gdh_AttrRefToPointer(&aref, (pwr_tAddress*)&rsei[i].op.ei);
+    if (EVEN(sts)) {
+      errh_Error("gdh_AttrRefToPointer Iv, %m", sts);
+      goto error;
+    }
+
+    rsei[i].actval_p.i = rsei[i].op.ei->ActualValue;
+    rsei[i].validx = rsei[i].op.ei->ValueIndex;
+    i++;
+  }
+
+  rseo = calloc(sizeof(ini_sRestoreSig), iop->EoCount);
+  i = 0;
+  for (sts = gdh_GetClassListAttrRef(pwr_cClass_Eo, &aref); ODD(sts);
+       sts = gdh_GetNextAttrRef(pwr_cClass_Eo, &aref, &aref)) {
+    if (i >= iop->EoCount)
+      break;
+
+    sts = gdh_AttrRefToPointer(&aref, (pwr_tAddress*)&rseo[i].op.eo);
+    if (EVEN(sts)) {
+      errh_Error("gdh_AttrRefToPointer Iv, %m", sts);
+      goto error;
+    }
+
+    rseo[i].actval_p.i = rseo[i].op.eo->ActualValue;
+    rseo[i].validx = rseo[i].op.eo->ValueIndex;
+    i++;
+  }
+
+  rssi = calloc(sizeof(ini_sRestoreSig), iop->SiCount);
+  i = 0;
+  for (sts = gdh_GetClassListAttrRef(pwr_cClass_Si, &aref); ODD(sts);
+       sts = gdh_GetNextAttrRef(pwr_cClass_Si, &aref, &aref)) {
+    if (i >= iop->SiCount)
+      break;
+
+    sts = gdh_AttrRefToPointer(&aref, (pwr_tAddress*)&rssi[i].op.si);
+    if (EVEN(sts)) {
+      errh_Error("gdh_AttrRefToPointer Iv, %m", sts);
+      goto error;
+    }
+
+    rssi[i].actval_p.str = rssi[i].op.si->ActualValue;
+    rssi[i].validx = rssi[i].op.si->ValueIndex;
+    i++;
+  }
+
+  rsso = calloc(sizeof(ini_sRestoreSig), iop->SoCount);
+  i = 0;
+  for (sts = gdh_GetClassListAttrRef(pwr_cClass_So, &aref); ODD(sts);
+       sts = gdh_GetNextAttrRef(pwr_cClass_So, &aref, &aref)) {
+    if (i >= iop->SoCount)
+      break;
+
+    sts = gdh_AttrRefToPointer(&aref, (pwr_tAddress*)&rsso[i].op.so);
+    if (EVEN(sts)) {
+      errh_Error("gdh_AttrRefToPointer Iv, %m", sts);
+      goto error;
+    }
+
+    rsso[i].actval_p.str = rsso[i].op.so->ActualValue;
+    rsso[i].validx = rsso[i].op.so->ValueIndex;
     i++;
   }
 
@@ -1514,6 +1645,12 @@ static void load_backup()
   }
   free(rsiv);
 
+  for (i = 0; i < iop->EvCount; i++) {
+    rsev[i].op.ev->ActualValue = rsev[i].actval_p.i;
+    rsev[i].op.ev->ValueIndex = rsev[i].validx;
+  }
+  free(rsev);
+
   for (i = 1; i < iop->ATvCount; i++) {
     rsatv[i].op.atv->ActualValue = rsatv[i].actval_p.at;
     rsatv[i].op.atv->ValueIndex = rsatv[i].validx;
@@ -1555,6 +1692,30 @@ static void load_backup()
     rsio[i].op.io->ValueIndex = rsio[i].validx;
   }
   free(rsio);
+
+  for (i = 0; i < iop->EiCount; i++) {
+    rsei[i].op.ei->ActualValue = rsei[i].actval_p.i;
+    rsei[i].op.ei->ValueIndex = rsei[i].validx;
+  }
+  free(rsei);
+
+  for (i = 0; i < iop->EoCount; i++) {
+    rseo[i].op.eo->ActualValue = rseo[i].actval_p.i;
+    rseo[i].op.eo->ValueIndex = rseo[i].validx;
+  }
+  free(rseo);
+
+  for (i = 0; i < iop->SiCount; i++) {
+    rssi[i].op.si->ActualValue = rssi[i].actval_p.str;
+    rssi[i].op.si->ValueIndex = rssi[i].validx;
+  }
+  free(rssi);
+
+  for (i = 0; i < iop->SoCount; i++) {
+    rsso[i].op.so->ActualValue = rsso[i].actval_p.str;
+    rsso[i].op.so->ValueIndex = rsso[i].validx;
+  }
+  free(rsso);
 
   for (i = 0; i < iop->DiCount; i++) {
     rsdi[i].op.di->ActualValue = rsdi[i].actval_p.b;

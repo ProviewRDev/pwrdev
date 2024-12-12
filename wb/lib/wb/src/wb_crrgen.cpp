@@ -162,9 +162,39 @@ static crrgen_tRefList reflist[]
             crrgen_eTable_Signal, 0 },
         { pwr_cClass_GetIv, "DevBody", "IvObject", crrgen_eType_Read,
             crrgen_eTable_Signal, 0 },
+        { pwr_cClass_stoei, "DevBody", "EiObject", crrgen_eType_Write,
+            crrgen_eTable_Signal, 0 },
+        { pwr_cClass_stoeo, "DevBody", "EoObject", crrgen_eType_Write,
+            crrgen_eTable_Signal, 0 },
+        { pwr_cClass_stoev, "DevBody", "EvObject", crrgen_eType_Write,
+            crrgen_eTable_Signal, 0 },
+        { pwr_cClass_cstoei, "DevBody", "EiObject", crrgen_eType_Write,
+            crrgen_eTable_Signal, 0 },
+        { pwr_cClass_cstoeo, "DevBody", "EoObject", crrgen_eType_Write,
+            crrgen_eTable_Signal, 0 },
+        { pwr_cClass_cstoev, "DevBody", "EvObject", crrgen_eType_Write,
+            crrgen_eTable_Signal, 0 },
+        { pwr_cClass_GetEi, "DevBody", "EiObject", crrgen_eType_Read,
+            crrgen_eTable_Signal, 0 },
+        { pwr_cClass_GetEo, "DevBody", "EoObject", crrgen_eType_Read,
+            crrgen_eTable_Signal, 0 },
+        { pwr_cClass_GetEv, "DevBody", "EvObject", crrgen_eType_Read,
+            crrgen_eTable_Signal, 0 },
+        { pwr_cClass_GetSi, "DevBody", "SiObject", crrgen_eType_Read,
+            crrgen_eTable_Signal, 0 },
+        { pwr_cClass_GetSo, "DevBody", "SoObject", crrgen_eType_Read,
+            crrgen_eTable_Signal, 0 },
         { pwr_cClass_GetSv, "DevBody", "SvObject", crrgen_eType_Read,
             crrgen_eTable_Signal, 0 },
+        { pwr_cClass_stosi, "DevBody", "SiObject", crrgen_eType_Write,
+            crrgen_eTable_Signal, 0 },
+        { pwr_cClass_stoso, "DevBody", "SoObject", crrgen_eType_Write,
+            crrgen_eTable_Signal, 0 },
         { pwr_cClass_stosv, "DevBody", "SvObject", crrgen_eType_Write,
+            crrgen_eTable_Signal, 0 },
+        { pwr_cClass_cstosi, "DevBody", "SiObject", crrgen_eType_Write,
+            crrgen_eTable_Signal, 0 },
+        { pwr_cClass_cstoso, "DevBody", "SoObject", crrgen_eType_Write,
             crrgen_eTable_Signal, 0 },
         { pwr_cClass_cstosv, "DevBody", "SvObject", crrgen_eType_Write,
             crrgen_eTable_Signal, 0 },
@@ -588,6 +618,11 @@ void wb_crrgen::load(pwr_tStatus* rsts, int sim, int graph)
             case pwr_cClass_Ii:
             case pwr_cClass_Io:
             case pwr_cClass_Iv:
+            case pwr_cClass_Ei:
+            case pwr_cClass_Eo:
+            case pwr_cClass_Ev:
+            case pwr_cClass_Si:
+            case pwr_cClass_So:
             case pwr_cClass_Sv:
             case pwr_cClass_ATv:
             case pwr_cClass_DTv: {

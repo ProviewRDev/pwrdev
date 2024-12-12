@@ -868,7 +868,7 @@ int CnvWblToH::check_typename(char* type_volume, char* type_name)
       "pwr_tText256", "pwr_tText1024", "pwr_tText8192", "pwr_tURL",
       "pwr_tOpSysEnum", "pwr_tPrivMask", "pwr_tProString40", "pwr_tDataRef",
       "pwr_tVoid", "pwr_tConfigStatusEnum", "pwr_tSafetyLevelEnum", "pwr_tPgmName",
-      "pwr_tAdefFlags", "pwr_tObjName", "pwr_sClass_BlockAttribute", 
+      "pwr_tAdefFlags", "pwr_tObjName", "pwr_tCastId", "pwr_sClass_BlockAttribute", 
       "pwr_Class_BlockAttribute", "" };
 
     for (name = valid_names[0]; !streq(name, "");

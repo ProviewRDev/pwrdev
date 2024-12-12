@@ -41,8 +41,8 @@ SObject pwrb:Class
 !/**
 !  @Version 1.0
 !  @Group IO,Channels,NodeConfiguration
-!  @Summary Configures a integer output channel
-!  Configures a integer output channel.
+!  @Summary Configures an integer output channel
+!  Configures an integer output channel.
 !
 !  If EmergBreakTrue = TRUE and EmergBreakSelect = 2 then
 !  the output is based on FixedOutValue. Otherwise TestOn

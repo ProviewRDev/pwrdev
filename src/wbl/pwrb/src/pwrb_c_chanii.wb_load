@@ -42,7 +42,7 @@ SObject pwrb:Class
 !  @Version 1.0
 !  @Group IO,Channels,NodeConfiguration
 !  @Summary Configures a integer input channel
-!   Configures a integer input channel. 
+!   Configures an integer input channel. 
 !   Integer values are normally recieved from bus io-systems.
 !   The integer value is stored as a 32-bit signed integer.
 !  

@@ -1336,7 +1336,7 @@ void grow_CreateGrowMenu(grow_tCtx ctx, const char* name, glow_sMenuInfo* info,
     double x, double y, double min_width, glow_eDrawType draw_type,
     int line_width, int fill_rect, int border, glow_eDrawType fill_draw_type,
     int text_size, glow_eDrawType text_drawtype, glow_eDrawType text_color,
-    glow_eDrawType disabled_text_color, glow_eFont text_font,
+    glow_eDrawType disabled_text_color, glow_eFont text_font, double scale,
     grow_tObject parent, grow_tObject* menu);
 
 void grow_CreateGrowLayer(grow_tCtx ctx, const char* name, void* user_data,
@@ -2568,6 +2568,7 @@ void grow_SetAxisRange(
 
 void grow_SetAxisFormat(grow_tObject object, const char* format);
 void grow_GetAxisFormat(grow_tObject object, char* format);
+void grow_SetAxisLabels(grow_tObject object, char (*labels)[40], int size);
 
 //! Set that graph is modified or not since last save.
 /*!

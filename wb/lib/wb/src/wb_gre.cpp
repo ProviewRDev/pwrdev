@@ -3009,6 +3009,15 @@ int WGre::set_trace_attributes(char* host)
       case pwr_cClass_cstoii:
       case pwr_cClass_cstoio:
       case pwr_cClass_cstoiv:
+      case pwr_cClass_GetEi:
+      case pwr_cClass_GetEo:
+      case pwr_cClass_GetEv:
+      case pwr_cClass_stoei:
+      case pwr_cClass_stoeo:
+      case pwr_cClass_stoev:
+      case pwr_cClass_cstoei:
+      case pwr_cClass_cstoeo:
+      case pwr_cClass_cstoev:
       case pwr_cClass_GetAp:
       case pwr_cClass_GetIp:
       case pwr_cClass_stoap:

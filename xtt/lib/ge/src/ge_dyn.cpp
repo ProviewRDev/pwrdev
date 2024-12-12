@@ -75,6 +75,104 @@ static char *dtostr(double f)
   return str;
 }
 
+static float rgb_to_hue(int rgb)
+{
+  float max, min, delta;
+  float r, g, b;
+  float v, s, h;
+
+  r = ((float)((rgb >> 16) & 0xff)) / 255;
+  g = ((float)((rgb >> 8) & 0xff)) / 255;
+  b = ((float)(rgb & 0xff)) / 255;
+
+  min = r < g ? r : g;
+  min = min < b ? min : b;
+  max = r > g ? r : g;
+  max = max > b ? max : b;
+
+  v = max;
+  delta = max - min;
+  if (delta < 0.00001)
+    return 0;
+
+  if (max > 0)
+    s = delta / max;
+  else
+    return 0;
+
+  if (r >= max)
+    h = (g - b) / delta;
+  else if (g >= max)
+    h = 2.0 + (b - r) / delta;
+  else
+    h = 4.0 + (r - g) / delta;
+
+  h *= 16.667;
+  if (h < 0)
+    h += 100;
+      
+  return h;
+}
+
+// Convert hue (0-100) to rgb
+static int hue_to_rgb(float hue)
+{
+  double ff, hh, p, q, t, r, g, b;
+  double v = 1.0;
+  double s = 1.0;
+  int i;
+
+  if (hue > 100)
+    hue = 100;
+  else if (hue < 0)
+    hue = 0;
+
+  hh = hue / 100.0 * 6.0;
+  i = (int)hh;
+  ff = hh - i;
+  p = v * (1.0 - s);
+  q = v * (1.0 - (s * ff));
+  t = v * (1.0 - (s * (1.0 - ff)));
+
+  switch(i) {
+  case 0:
+    r = v;
+    g = t;
+    b = p;
+    break;
+  case 1:
+    r = q;
+    g = v;
+    b = p;
+    break;
+  case 2:
+    r = p;
+    g = v;
+    b = t;
+    break;
+  case 3:
+    r = p;
+    g = q;
+    b = v;
+    break;
+  case 4:
+    r = t;
+    g = p;
+    b = v;
+    break;
+  case 5:
+    r = v;
+    g = p;
+    b = q;
+    break;
+  default:
+    r = v;
+    g = p;
+    b = q;
+  }
+  return ((int)(r * 255) << 16) + ((int)(g * 255) << 8) + (int)(b * 255);
+}
+
 static int get_dig(
     pwr_tBoolean* val, pwr_tBoolean* p, int a_typeid, unsigned int bitmask)
 {
@@ -6069,7 +6167,7 @@ GeValueInput::GeValueInput(GeDyn* e_dyn)
           ge_eDynPrio_ValueInput),
       min_value(0), max_value(0), clear(0), popup(0), unselect(0),
       escape_store(0), keyboard_type(graph_eKeyboard_Standard), update_open(0),
-      value_element(0)
+      value_element(0), menu_object(0)
 {
   strcpy(minvalue_attr, "");
   strcpy(maxvalue_attr, "");
@@ -6080,7 +6178,8 @@ GeValueInput::GeValueInput(const GeValueInput& x)
           x.prio),
       min_value(x.min_value), max_value(x.max_value), clear(x.clear),
       popup(x.popup), unselect(x.unselect), escape_store(x.escape_store),
-      keyboard_type(x.keyboard_type), update_open(x.update_open)
+      keyboard_type(x.keyboard_type), update_open(x.update_open), 
+      menu_object(x.menu_object)
 {
   strcpy(minvalue_attr, x.minvalue_attr);
   strcpy(maxvalue_attr, x.maxvalue_attr);
@@ -6271,9 +6370,79 @@ int GeValueInput::action(grow_tObject object, glow_tEvent event)
     grow_SetClickSensitivity(dyn->graph->grow->ctx, glow_mSensitivity_MB1Click);
     break;
   case glow_eEvent_MB1Click:
-    if (!(dyn->total_action_type1 & ge_mActionType1_InputFocus)) {
-      grow_SetObjectInputFocus(object, 1, event->event);
-      dyn->graph->set_inputfocus(1);
+    if (annot_typeid == pwr_eType_Enum && strcmp(value_element->format, "%s") == 0) {
+      if (menu_object) {
+	// Close, delete this menu
+	grow_DeleteObject(dyn->graph->grow->ctx, menu_object);
+	menu_object = 0;
+      } else {
+	double ll_x, ll_y, ur_x, ur_y;
+	glow_sMenuInfo info;
+	gdh_sValueDef* valuedef;
+	int rows;
+	pwr_tAName parsed_name;
+	int inverted;
+	int attr_type, attr_size;
+	graph_eDatabase db;
+	pwr_tAttrRef aref;
+	pwr_tTid tid;
+	int sts;
+
+	db = dyn->parse_attr_name(
+            value_element->attribute, parsed_name, &inverted, &attr_type, &attr_size);
+	if (parsed_name[0] == '&')
+	  dyn->graph->get_reference_name(parsed_name, parsed_name);
+	sts = gdh_NameToAttrref(pwr_cNObjid, parsed_name, &aref);
+	if (EVEN(sts))
+	  break;
+	sts = gdh_GetAttrRefTid(&aref, &tid);
+	if (EVEN(sts))
+	  break;
+	sts = gdh_GetEnumValueDef(tid, &valuedef, &rows);
+	if (EVEN(sts))
+	  break;
+
+	memset(&info, 0, sizeof(info));
+	for (int i = 0; i < rows; i++) {
+          strcpy(info.item[i].text, valuedef[i].Value->Text);
+	  info.item[i].type = glow_eMenuItem_Button;
+	  info.item[i].occupied = true;
+        }
+	free((char*)valuedef);
+
+	// Get fillcolor, and textattributes from object
+	glow_eDrawType text_drawtype, text_color, bg_color;
+	int tsize;
+	double scale;
+	glow_eFont text_font;
+	glow_eAnnotType annot_type;
+
+	sts = grow_GetObjectAnnotInfo(object, 1, &tsize, &text_drawtype,
+	     &text_color, &bg_color, &scale, &text_font, &annot_type);
+	if (EVEN(sts)) {
+	  tsize = 2;
+	  text_drawtype = glow_eDrawType_TextHelveticaBold;
+	  text_color = glow_eDrawType_Line;
+	  bg_color = glow_eDrawType_LightGray;
+	} else if (bg_color == glow_eDrawType_No
+		   || bg_color == glow_eDrawType_Inherit)
+	  bg_color = glow_eDrawType_LightGray;
+
+	grow_MeasureNode(object, &ll_x, &ll_y, &ur_x, &ur_y);
+	grow_CreateGrowMenu(dyn->graph->grow->ctx, "__Menu", &info, ll_x, ur_y,
+            ur_x - ll_x, glow_eDrawType_Line, 0, 1, 1, bg_color, tsize,
+            text_drawtype, text_color, glow_eDrawType_MediumGray, text_font, 
+	    scale, 0, &menu_object);
+	// grow_SetObjectScale(
+        //    menu_object, scale, scale, 0, 0, glow_eScaleType_LowerLeft);
+      }
+    }
+    else {
+      if (!(dyn->total_action_type1 & ge_mActionType1_InputFocus)) {
+	grow_SetObjectInputFocus(object, 1, event->event);
+	dyn->graph->set_inputfocus(1);
+
+      }
     }
     break;
   case glow_eEvent_AnnotationInput: {
@@ -6315,6 +6484,13 @@ int GeValueInput::action(grow_tObject object, glow_tEvent event)
     break;
   }
   case glow_eEvent_InputFocusLost: {
+    // Delete this menu
+    if (menu_object) {
+      grow_DeleteObject(dyn->graph->grow->ctx, menu_object);
+      menu_object = 0;
+      break;
+    }
+
     if (escape_store) {
       pwr_tStatus sts;
       char str[200];
@@ -6339,6 +6515,37 @@ int GeValueInput::action(grow_tObject object, glow_tEvent event)
       if (dyn->graph->keyboard_cb)
         (dyn->graph->keyboard_cb)(dyn->graph->parent_ctx,
             keyboard_mAction_Close | keyboard_mAction_ResetInput, 0);
+    }
+    break;
+  case glow_eEvent_MenuDelete:
+    if (menu_object == 0)
+      break;
+    if (event->menu.object == 0 || event->menu.object == menu_object) {
+      // Delete this menu
+      grow_DeleteObject(dyn->graph->grow->ctx, menu_object);
+      menu_object = 0;
+    }
+    break;
+  case glow_eEvent_MenuActivated:
+    if (menu_object == 0)
+      break;
+    if (event->menu.object == menu_object) {
+      // Set enum value to attribute
+      int sts = 0;
+      pwr_tAName parsed_name;
+      int inverted;
+      int attr_type, attr_size;
+
+      dyn->parse_attr_name(
+          value_element->attribute, parsed_name, &inverted, &attr_type, &attr_size);
+      if (parsed_name[0] == '&')
+	// Attribute starting with '&' indicates reference
+	dyn->graph->get_reference_name(parsed_name, parsed_name);
+
+      pwr_tUInt32 value = event->menu.item;
+      sts = gdh_SetObjectInfo(parsed_name, &value, sizeof(value));
+      if (EVEN(sts))
+        printf("ValueInput error: %s\n", value_element->attribute);
     }
     break;
   default:;
@@ -14775,6 +14982,7 @@ GeAxis::GeAxis(GeDyn* e_dyn)
 {
   strcpy(minvalue_attr, "");
   strcpy(maxvalue_attr, "");
+  strcpy(enum_attr, "");
 }
 
 GeAxis::GeAxis(const GeAxis& x)
@@ -14786,6 +14994,7 @@ GeAxis::GeAxis(const GeAxis& x)
 {
   strcpy(minvalue_attr, x.minvalue_attr);
   strcpy(maxvalue_attr, x.maxvalue_attr);
+  strcpy(enum_attr, x.enum_attr);
 }
 
 void GeAxis::get_attributes(attr_sItem* attrinfo, int* item_count)
@@ -14807,6 +15016,11 @@ void GeAxis::get_attributes(attr_sItem* attrinfo, int* item_count)
   attrinfo[i].type = glow_eType_Int;
   attrinfo[i++].size = sizeof(keep_settings);
 
+  strcpy(attrinfo[i].name, "Axis.EnumAttr");
+  attrinfo[i].value = enum_attr;
+  attrinfo[i].type = glow_eType_String;
+  attrinfo[i++].size = sizeof(enum_attr);
+
   *item_count = i;
 }
 
@@ -14820,6 +15034,8 @@ void GeAxis::replace_attribute(char* from, char* to, int* cnt, int strict)
       minvalue_attr, sizeof(minvalue_attr), from, to, cnt, strict);
   GeDyn::replace_attribute(
       maxvalue_attr, sizeof(maxvalue_attr), from, to, cnt, strict);
+  GeDyn::replace_attribute(
+      enum_attr, sizeof(enum_attr), from, to, cnt, strict);
 }
 
 void GeAxis::save(std::ofstream& fp)
@@ -14828,6 +15044,7 @@ void GeAxis::save(std::ofstream& fp)
   fp << int(ge_eSave_Axis_minvalue_attr) << FSPACE << minvalue_attr << '\n';
   fp << int(ge_eSave_Axis_maxvalue_attr) << FSPACE << maxvalue_attr << '\n';
   fp << int(ge_eSave_Axis_keep_settings) << FSPACE << keep_settings << '\n';
+  fp << int(ge_eSave_Axis_enum_attr) << FSPACE << enum_attr << '\n';
   fp << int(ge_eSave_End) << '\n';
 }
 
@@ -14859,6 +15076,10 @@ void GeAxis::open(std::ifstream& fp)
       break;
     case ge_eSave_Axis_keep_settings:
       fp >> keep_settings;
+      break;
+    case ge_eSave_Axis_enum_attr:
+      fp.get();
+      fp.getline(enum_attr, sizeof(enum_attr));
       break;
     case ge_eSave_End:
       end_found = 1;
@@ -14957,6 +15178,50 @@ int GeAxis::connect(grow_tObject object, glow_sTraceData* trace_data, bool now)
     default:;
     }
   }
+
+  dyn->parse_attr_name(
+      enum_attr, parsed_name, &inverted, &attr_type, &attr_size);
+  if (!streq(parsed_name, "")) {
+    gdh_sValueDef* valuedef;
+    int rows;
+    pwr_tTid tid;
+    pwr_tAttrRef aref;
+
+    sts = gdh_NameToAttrref(pwr_cNObjid, parsed_name, &aref);
+    if (ODD(sts))
+      sts = gdh_GetAttrRefTid(&aref, &tid);
+
+    if (ODD(sts))
+      sts = gdh_GetEnumValueDef(tid, &valuedef, &rows);
+
+    if (ODD(sts)) {
+      int ok = 1;
+      for (int i = 0; i < rows; i++) {
+	if (valuedef[i].Value->Value != i) {
+	  ok = 0;
+	  break;
+	}
+      }
+      if (ok) {
+	glow_sAxisInfo info;
+	pwr_tString40 *labels = (pwr_tString40*)calloc(rows, 40);
+	for (int i = 0; i < rows; i++)
+	  strncpy(labels[i], valuedef[i].Value->Text, sizeof(pwr_tString40));
+	grow_SetAxisLabels(object, labels, rows);
+	
+	info.max_value = rows - 1;
+	info.min_value = 0;
+	info.lines = rows;
+	info.longquotient = 1;
+	info.valuequotient = 1;
+	strcpy(info.format, "%s");
+	grow_SetAxisInfo(object, &info);
+      }
+      free((char*)valuedef);
+    }
+
+  }
+
   if (min_found && max_found) {
     if (attr_type_min != attr_type_max)
       attr_type = 0;
@@ -21483,6 +21748,7 @@ int GeSlider::connect(
   case pwr_eType_Float32:
   case pwr_eType_Int32:
   case pwr_eType_Boolean:
+  case graph_eType_Color:
     break;
   default:
     return 1;
@@ -21649,6 +21915,7 @@ int GeSlider::scan(grow_tObject object)
         return 1;
       break;
     case pwr_eType_Int32:
+    case graph_eType_Color:
       if (*(pwr_tInt32*)p == old_ivalue)
         return 1;
       break;
@@ -21679,6 +21946,11 @@ int GeSlider::scan(grow_tObject object)
       case pwr_eType_Boolean:
         value = (*(pwr_tBoolean*)p) ? 1 : 0;
         break;
+      case graph_eType_Color: {
+        int rgb = (*(pwr_tInt32*)p);
+	value = rgb_to_hue(rgb);
+        break;
+      }
       default:
         value = (float)(*(pwr_tInt32*)p);
         break;
@@ -21732,6 +22004,7 @@ int GeSlider::scan(grow_tObject object)
     old_value = *p;
     break;
   case pwr_eType_Int32:
+  case graph_eType_Color:
     old_ivalue = *(pwr_tInt32*)p;
     break;
   case pwr_eType_Boolean:
@@ -21853,6 +22126,12 @@ int GeSlider::action(grow_tObject object, glow_tEvent event)
       case pwr_eType_Boolean: {
         pwr_tBoolean ivalue = (pwr_tBoolean)(value > 0.5 ? 1 : 0);
         sts = gdh_SetObjectInfo(parsed_name, &ivalue, sizeof(ivalue));
+        break;
+      }
+      case graph_eType_Color: {
+	pwr_tInt32 rgb = hue_to_rgb(value);
+        sts = gdh_SetObjectInfo(parsed_name, &rgb, sizeof(rgb));
+        old_value = value;
         break;
       }
       default: {
@@ -25833,10 +26112,10 @@ int GePulldownMenu::action(grow_tObject object, glow_tEvent event)
       grow_MeasureNode(object, &ll_x, &ll_y, &ur_x, &ur_y);
       grow_CreateGrowMenu(dyn->graph->grow->ctx, "__Menu", &info, ll_x, ur_y,
           ur_x - ll_x, glow_eDrawType_Line, 0, 1, 1, bg_color, text_size,
-          text_drawtype, text_color, glow_eDrawType_MediumGray, text_font, 0,
-          &menu_object);
-      grow_SetObjectScale(
-          menu_object, scale, scale, 0, 0, glow_eScaleType_LowerLeft);
+          text_drawtype, text_color, glow_eDrawType_MediumGray, text_font, 
+	  scale, 0, &menu_object);
+      //grow_SetObjectScale(
+      //    menu_object, scale, scale, 0, 0, glow_eScaleType_LowerLeft);
       grow_SetMenuInputFocus(menu_object, 1);
     }
     break;
@@ -25908,7 +26187,7 @@ int GePulldownMenu::action(grow_tObject object, glow_tEvent event)
         grow_CreateGrowMenu(dyn->graph->grow->ctx, "__Menu", &info,
             event->menu.x, event->menu.y, 0, glow_eDrawType_Line, 0, 1, 1,
             bg_color, tsize, text_drawtype, text_color, text_color_disabled,
-            text_font, object, &menu_object);
+	    text_font, 0, object, &menu_object);
         grow_SetMenuInputFocus(object, 0);
         grow_SetMenuInputFocus(menu_object, 1);
       } else {
@@ -26817,10 +27096,10 @@ int GeOptionMenu::action(grow_tObject object, glow_tEvent event)
       grow_MeasureNode(object, &ll_x, &ll_y, &ur_x, &ur_y);
       grow_CreateGrowMenu(dyn->graph->grow->ctx, "__Menu", &info, ll_x, ur_y,
           ur_x - ll_x, glow_eDrawType_Line, 0, 1, 1, bg_color, tsize,
-          text_drawtype, text_color, glow_eDrawType_MediumGray, text_font, 0,
-          &menu_object);
-      grow_SetObjectScale(
-          menu_object, scale, scale, 0, 0, glow_eScaleType_LowerLeft);
+          text_drawtype, text_color, glow_eDrawType_MediumGray, text_font, 
+	  scale, 0, &menu_object);
+      //grow_SetObjectScale(
+      //    menu_object, scale, scale, 0, 0, glow_eScaleType_LowerLeft);
     }
     break;
   case glow_eEvent_MenuActivated:
@@ -27993,10 +28272,10 @@ int GeMethodPulldownMenu::action(grow_tObject object, glow_tEvent event)
       grow_MeasureNode(object, &ll_x, &ll_y, &ur_x, &ur_y);
       grow_CreateGrowMenu(dyn->graph->grow->ctx, "__Menu", &info, ll_x, ur_y,
           ur_x - ll_x, glow_eDrawType_Line, 0, 1, 1, bg_color, text_size,
-          text_drawtype, text_color, glow_eDrawType_MediumGray, text_font, 0,
-          &menu_object);
-      grow_SetObjectScale(
-          menu_object, scale, scale, 0, 0, glow_eScaleType_LowerLeft);
+	  text_drawtype, text_color, glow_eDrawType_MediumGray, text_font, 
+	  scale,0, &menu_object);
+      //grow_SetObjectScale(
+      //    menu_object, scale, scale, 0, 0, glow_eScaleType_LowerLeft);
       grow_SetMenuInputFocus(menu_object, 1);
 
       if (mask_store) {

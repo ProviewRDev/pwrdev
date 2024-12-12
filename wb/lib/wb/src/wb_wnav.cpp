@@ -481,6 +481,8 @@ void wnav_attrvalue_to_string(
     break;
   }
   case pwr_eType_UInt32:
+  case pwr_eType_Status:
+  case pwr_eType_NetStatus:
   case pwr_eType_DisableAttr: {
     *len = sprintf(str, "%u", *(pwr_tUInt32*)value_ptr);
     *buff = str;

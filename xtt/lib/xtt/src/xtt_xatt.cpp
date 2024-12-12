@@ -236,12 +236,19 @@ int XAtt::object_attr()
       strcat(name, attr_name);
     }
 
+    pwr_tTid typeref = bd[i].attr->Param.TypeRef;
+    if (bd[i].attr->Param.Info.Flags & PWR_MASK_CASTATTR) {
+      pwr_tAttrRef aaref;
+      sts = gdh_ArefANameToAref(&objar, attr_name, &aaref);
+      sts = gdh_GetAttrRefTid(&aaref, &typeref);
+    }
+
     elements = 1;
     if (bd[i].attr->Param.Info.Flags & PWR_MASK_ARRAY) {
       attr_exist = 1;
       item = (Item*)new ItemAttrArray(xattnav->brow, objar.Objid, 0,
           flow_eDest_IntoLast, name, bd[i].attr->Param.Info.Elements,
-          bd[i].attr->Param.Info.Type, bd[i].attr->Param.TypeRef,
+          bd[i].attr->Param.Info.Type, typeref,
           bd[i].attr->Param.Info.Size, bd[i].attr->Param.Info.Flags, 0);
     } else if (bd[i].attr->Param.Info.Flags & PWR_MASK_CLASS) {
       attr_exist = 1;
@@ -252,7 +259,7 @@ int XAtt::object_attr()
       attr_exist = 1;
       item = (Item*)new ItemAttr(xattnav->brow, objar.Objid, 0,
           flow_eDest_IntoLast, name, bd[i].attr->Param.Info.Type,
-          bd[i].attr->Param.TypeRef, bd[i].attr->Param.Info.Size,
+          typeref, bd[i].attr->Param.Info.Size,
           bd[i].attr->Param.Info.Flags, 0, item_eDisplayType_Attr);
     }
   }

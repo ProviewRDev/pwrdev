@@ -180,12 +180,17 @@ pwr_tStatus plc_rtdbref(plc_t_rtdbref (*LinkArray)[], plc_sThread* tp)
         case pwr_cClass_Di:
         case pwr_cClass_Ai:
         case pwr_cClass_Ii:
+        case pwr_cClass_Ei:
+        case pwr_cClass_Si:
         case pwr_cClass_Do:
         case pwr_cClass_Ao:
         case pwr_cClass_Io:
+        case pwr_cClass_Eo:
+        case pwr_cClass_So:
         case pwr_cClass_Dv:
         case pwr_cClass_Av:
         case pwr_cClass_Iv:
+        case pwr_cClass_Ev:
         case pwr_cClass_Co:
         case pwr_cClass_ATv:
         case pwr_cClass_DTv:
@@ -226,6 +231,16 @@ pwr_tStatus plc_rtdbref(plc_t_rtdbref (*LinkArray)[], plc_sThread* tp)
           *la->Pointer = &tp->copy.ii_a.p->Value[Index];
         break;
 
+      case pwr_cClass_Ei:
+        if (la->UseCode == UC_READ && local_object)
+          *la->Pointer = &tp->copy.ei_a.p->Value[Index];
+        break;
+
+      case pwr_cClass_Si:
+        if (la->UseCode == UC_READ && local_object)
+          *la->Pointer = &tp->copy.si_a.p->Value[Index];
+        break;
+
       case pwr_cClass_Do:
         if (la->UseCode == UC_READ && local_object)
           *la->Pointer = &tp->copy.do_a.p->Value[Index];
@@ -241,6 +256,16 @@ pwr_tStatus plc_rtdbref(plc_t_rtdbref (*LinkArray)[], plc_sThread* tp)
           *la->Pointer = &tp->copy.io_a.p->Value[Index];
         break;
 
+      case pwr_cClass_Eo:
+        if (la->UseCode == UC_READ && local_object)
+          *la->Pointer = &tp->copy.eo_a.p->Value[Index];
+        break;
+
+      case pwr_cClass_So:
+        if (la->UseCode == UC_READ && local_object)
+          *la->Pointer = &tp->copy.so_a.p->Value[Index];
+        break;
+
       case pwr_cClass_Dv:
         if (la->UseCode == UC_READ && local_object)
           *la->Pointer = &tp->copy.dv_a.p->Value[Index];
@@ -254,6 +279,11 @@ pwr_tStatus plc_rtdbref(plc_t_rtdbref (*LinkArray)[], plc_sThread* tp)
       case pwr_cClass_Iv:
         if (la->UseCode == UC_READ && local_object)
           *la->Pointer = &tp->copy.iv_a.p->Value[Index];
+        break;
+
+      case pwr_cClass_Ev:
+        if (la->UseCode == UC_READ && local_object)
+          *la->Pointer = &tp->copy.ev_a.p->Value[Index];
         break;
 
       case pwr_cClass_ATv:

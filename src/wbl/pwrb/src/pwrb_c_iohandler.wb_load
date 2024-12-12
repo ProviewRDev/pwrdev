@@ -263,6 +263,36 @@ SObject pwrb:Class
         EndBody
       EndObject
       !/**
+      !  Number of configured Ei objects in the node.
+      !*/
+      Object EiCount $Attribute 26
+        Body SysBody
+          Attr TypeRef = "pwrs:Type-$UInt32"
+	  Attr Flags |= PWR_MASK_STATE
+	  Attr Flags |= PWR_MASK_INVISIBLE
+        EndBody
+      EndObject
+      !/**
+      !  Number of configured Eo (Enumeration Output) objects in the node.
+      !*/
+      Object EoCount $Attribute 27
+        Body SysBody
+          Attr TypeRef = "pwrs:Type-$UInt32"
+	  Attr Flags |= PWR_MASK_STATE
+	  Attr Flags |= PWR_MASK_INVISIBLE
+        EndBody
+      EndObject
+      !/**
+      !  Number of configured Ev objects in the node.
+      !*/
+      Object EvCount $Attribute 28
+        Body SysBody
+          Attr TypeRef = "pwrs:Type-$UInt32"
+	  Attr Flags |= PWR_MASK_STATE
+	  Attr Flags |= PWR_MASK_INVISIBLE
+        EndBody
+      EndObject
+      !/**
       !  Number of configured ATv objects in the node.
       !*/
       Object ATvCount $Attribute 23
@@ -286,6 +316,26 @@ SObject pwrb:Class
       !  Number of configured Sv objects in the node.
       !*/
       Object SvCount $Attribute 25
+        Body SysBody
+          Attr TypeRef = "pwrs:Type-$UInt32"
+	  Attr Flags |= PWR_MASK_STATE
+	  Attr Flags |= PWR_MASK_INVISIBLE
+        EndBody
+      EndObject
+      !/**
+      !  Number of configured Si objects in the node.
+      !*/
+      Object SiCount $Attribute 29
+        Body SysBody
+          Attr TypeRef = "pwrs:Type-$UInt32"
+	  Attr Flags |= PWR_MASK_STATE
+	  Attr Flags |= PWR_MASK_INVISIBLE
+        EndBody
+      EndObject
+      !/**
+      !  Number of configured So objects in the node.
+      !*/
+      Object SoCount $Attribute 30
         Body SysBody
           Attr TypeRef = "pwrs:Type-$UInt32"
 	  Attr Flags |= PWR_MASK_STATE

@@ -44,6 +44,7 @@
 #include "rt_gdh_msg.h"
 #include "rt_io_bus.h"
 #include "rt_io_msg.h"
+#include "rt_lck.h"
 
 #define PB_UDATA_DIAG 1
 
@@ -320,6 +321,40 @@ pwr_tStatus io_bus_card_init(io_tCtx ctx, io_sCard* cp, unsigned int* input_area
       break;
     }
 
+    case pwr_cClass_ChanEi:
+    {
+      pwr_sClass_ChanEi* chan_ei = (pwr_sClass_ChanEi*)chanp->cop;
+      *input_area_offset += *input_area_chansize;
+      *input_area_chansize = GetChanSize(chan_ei->Representation);
+      if (!chanp->sop)
+        continue;
+
+      if (alignment == io_eAlignment_Powerlink)
+        *input_area_offset = pwr_Align(*input_area_offset, *input_area_chansize);
+
+      chanp->offset = *input_area_offset;
+      chanp->size = *input_area_chansize;
+      chanp->mask = 0;
+      break;
+    }
+
+    case pwr_cClass_ChanSi:
+    {
+      pwr_sClass_ChanSi* chan_si = (pwr_sClass_ChanSi*)chanp->cop;
+      *input_area_offset += *input_area_chansize;
+      *input_area_chansize = chan_si->Size;
+      if (!chanp->sop)
+        continue;
+
+      if (alignment == io_eAlignment_Powerlink)
+        *input_area_offset = pwr_Align(*input_area_offset, *input_area_chansize);
+
+      chanp->offset = *input_area_offset;
+      chanp->size = *input_area_chansize;
+      chanp->mask = 0;
+      break;
+    }
+
     case pwr_cClass_ChanBi:
     {
       pwr_sClass_ChanBi* chan_bi = (pwr_sClass_ChanBi*)chanp->cop;
@@ -460,6 +495,40 @@ pwr_tStatus io_bus_card_init(io_tCtx ctx, io_sCard* cp, unsigned int* input_area
       break;
     }
 
+    case pwr_cClass_ChanEo:
+    {
+      pwr_sClass_ChanEo* chan_eo = (pwr_sClass_ChanEo*)chanp->cop;
+      *output_area_offset += *output_area_chansize;
+      *output_area_chansize = GetChanSize(chan_eo->Representation);
+      if (!chanp->sop)
+        continue;
+
+      if (alignment == io_eAlignment_Powerlink)
+        *output_area_offset = pwr_Align(*output_area_offset, *output_area_chansize);
+
+      chanp->offset = *output_area_offset;
+      chanp->size = *output_area_chansize;
+      chanp->mask = 0;
+      break;
+    }
+
+    case pwr_cClass_ChanSo:
+    {
+      pwr_sClass_ChanSo* chan_so = (pwr_sClass_ChanSo*)chanp->cop;
+      *output_area_offset += *output_area_chansize;
+      *output_area_chansize = chan_so->Size;
+      if (!chanp->sop)
+        continue;
+
+      if (alignment == io_eAlignment_Powerlink)
+        *output_area_offset = pwr_Align(*output_area_offset, *output_area_chansize);
+
+      chanp->offset = *output_area_offset;
+      chanp->size = *output_area_chansize;
+      chanp->mask = 0;
+      break;
+    }
+
     case pwr_cClass_ChanD:
     {
       pwr_sClass_ChanD* chan_d = (pwr_sClass_ChanD*)chanp->cop;
@@ -550,6 +619,12 @@ void io_bus_card_area_size(io_tCtx ctx, io_sCard* cp, unsigned int* input_area_s
     case pwr_cClass_ChanIi:
       *input_area_size += GetChanSize(((pwr_sClass_ChanIi*)chanp->cop)->Representation);
       break;
+    case pwr_cClass_ChanEi:
+      *input_area_size += GetChanSize(((pwr_sClass_ChanEi*)chanp->cop)->Representation);
+      break;
+    case pwr_cClass_ChanSi:
+      *input_area_size += ((pwr_sClass_ChanSi*)chanp->cop)->Size;
+      break;
     case pwr_cClass_ChanBi:
       *input_area_size += ((pwr_sClass_ChanBi*)chanp->cop)->Size;
       break;
@@ -571,6 +646,12 @@ void io_bus_card_area_size(io_tCtx ctx, io_sCard* cp, unsigned int* input_area_s
       break;
     case pwr_cClass_ChanIo:
       *output_area_size += GetChanSize(((pwr_sClass_ChanIo*)chanp->cop)->Representation);
+      break;
+    case pwr_cClass_ChanEo:
+      *output_area_size += GetChanSize(((pwr_sClass_ChanEo*)chanp->cop)->Representation);
+      break;
+    case pwr_cClass_ChanSo:
+      *output_area_size += ((pwr_sClass_ChanSo*)chanp->cop)->Size;
       break;
     case pwr_cClass_ChanD:
     {
@@ -599,16 +680,7 @@ void io_bus_card_read(io_tCtx ctx, io_sRack* rp, io_sCard* cp, void* input_area,
                       pwr_tByteOrderingEnum byte_order, pwr_tFloatRepEnum float_rep)
 {
   io_sChannel* chanp;
-  pwr_sClass_ChanDi* chan_di;
-  pwr_sClass_ChanD* chan_d;
-  pwr_sClass_Di* sig_di;
-  pwr_sClass_ChanAi* chan_ai;
-  pwr_sClass_Ai* sig_ai;
   //  pwr_sClass_ChanAit *chan_ait;
-  pwr_sClass_ChanIi* chan_ii;
-  pwr_sClass_Ii* sig_ii;
-  pwr_sClass_ChanBi* chan_bi;
-  pwr_sClass_Bi* sig_bi;
   pwr_tUInt8 udata8 = 0;
   pwr_tUInt16 udata16 = 0;
   pwr_tUInt32 udata32 = 0;
@@ -628,9 +700,9 @@ void io_bus_card_read(io_tCtx ctx, io_sRack* rp, io_sCard* cp, void* input_area,
     {
       // Channel type is Di (digital input)
 
-    case pwr_cClass_ChanDi:
-      chan_di = (pwr_sClass_ChanDi*)chanp->cop;
-      sig_di = (pwr_sClass_Di*)chanp->sop;
+    case pwr_cClass_ChanDi: {
+      pwr_sClass_ChanDi* chan_di = (pwr_sClass_ChanDi*)chanp->cop;
+      pwr_sClass_Di* sig_di = (pwr_sClass_Di*)chanp->sop;
       if (chan_di && sig_di && chan_di->ConversionOn)
       {
         switch (chan_di->Representation)
@@ -655,12 +727,12 @@ void io_bus_card_read(io_tCtx ctx, io_sRack* rp, io_sCard* cp, void* input_area,
         }
       }
       break;
-
-    case pwr_cClass_ChanD:
-      chan_d = (pwr_sClass_ChanD*)chanp->cop;
+    }
+    case pwr_cClass_ChanD: {
+      pwr_sClass_ChanD* chan_d = (pwr_sClass_ChanD*)chanp->cop;
       if (chan_d->Type == pwr_eDChanTypeEnum_Di)
       {
-        sig_di = (pwr_sClass_Di*)chanp->sop;
+	pwr_sClass_Di* sig_di = (pwr_sClass_Di*)chanp->sop;
         if (chan_d && sig_di && chan_d->ConversionOn)
         {
           switch (chan_d->Representation)
@@ -686,12 +758,13 @@ void io_bus_card_read(io_tCtx ctx, io_sRack* rp, io_sCard* cp, void* input_area,
         }
       }
       break;
+    }
 
       // Channel type is Ai (analog input)
 
-    case pwr_cClass_ChanAi:
-      chan_ai = (pwr_sClass_ChanAi*)chanp->cop;
-      sig_ai = (pwr_sClass_Ai*)chanp->sop;
+    case pwr_cClass_ChanAi: {
+      pwr_sClass_ChanAi* chan_ai = (pwr_sClass_ChanAi*)chanp->cop;
+      pwr_sClass_Ai* sig_ai = (pwr_sClass_Ai*)chanp->sop;
       if (chan_ai && sig_ai && chan_ai->ConversionOn)
       {
         if (chan_ai->CalculateNewCoef)
@@ -783,6 +856,7 @@ void io_bus_card_read(io_tCtx ctx, io_sRack* rp, io_sCard* cp, void* input_area,
         ConvertAi(ctx, f_raw, chan_ai, sig_ai, chanp);
       }
       break;
+    }
 
       // Channel type is Ait (analog input with table conversion)
 
@@ -791,9 +865,9 @@ void io_bus_card_read(io_tCtx ctx, io_sRack* rp, io_sCard* cp, void* input_area,
 
       // Channel type is Ii (integer input)
 
-    case pwr_cClass_ChanIi:
-      chan_ii = (pwr_sClass_ChanIi*)chanp->cop;
-      sig_ii = (pwr_sClass_Ii*)chanp->sop;
+    case pwr_cClass_ChanIi: {
+      pwr_sClass_ChanIi* chan_ii = (pwr_sClass_ChanIi*)chanp->cop;
+      pwr_sClass_Ii* sig_ii = (pwr_sClass_Ii*)chanp->sop;
       if (chan_ii && sig_ii && chan_ii->ConversionOn)
       {
         if ((chanp->udata & PB_UDATA_DIAG) == 0)
@@ -934,14 +1008,187 @@ void io_bus_card_read(io_tCtx ctx, io_sRack* rp, io_sCard* cp, void* input_area,
         }
       }
       break;
-    case pwr_cClass_ChanBi:
-    {
+    }
+
+      // Channel type is Ei (enumeration input)
+
+    case pwr_cClass_ChanEi: {
+      pwr_sClass_ChanEi* chan_ei = (pwr_sClass_ChanEi*)chanp->cop;
+      pwr_sClass_Ei* sig_ei = (pwr_sClass_Ei*)chanp->sop;
+      if (chan_ei && sig_ei && chan_ei->ConversionOn)
+      {
+        if ((chanp->udata & PB_UDATA_DIAG) == 0)
+        {
+          /* Fetch data from input area */
+          switch (chan_ei->Representation)
+          {
+          case pwr_eDataRepEnum_Int8:
+            memcpy(&data8, input_area + cp->offset + chanp->offset, 1);
+            *(pwr_tInt32*)chanp->vbp = (pwr_tInt32)data8;
+            break;
+
+          case pwr_eDataRepEnum_UInt8:
+            memcpy(&udata8, input_area + cp->offset + chanp->offset, 1);
+            *(pwr_tInt32*)chanp->vbp = (pwr_tInt32)udata8;
+            break;
+
+          case pwr_eDataRepEnum_Int16:
+            memcpy(&data16, input_area + cp->offset + chanp->offset, 2);
+            if (byte_order == pwr_eByteOrderingEnum_BigEndian)
+              data16 = swap16(data16);
+            *(pwr_tInt32*)chanp->vbp = (pwr_tInt32)data16;
+            break;
+
+          case pwr_eDataRepEnum_UInt16:
+            memcpy(&udata16, input_area + cp->offset + chanp->offset, 2);
+            if (byte_order == pwr_eByteOrderingEnum_BigEndian)
+              udata16 = swap16(udata16);
+            *(pwr_tInt32*)chanp->vbp = (pwr_tInt32)udata16;
+            break;
+
+          case pwr_eDataRepEnum_Int24:
+            data32 = 0;
+            memcpy(&data32, input_area + cp->offset + chanp->offset, 3);
+            if (byte_order == pwr_eByteOrderingEnum_BigEndian)
+            {
+              data32 = swap32(data32);
+              data32 = data32 >> 8;
+            }
+            *(pwr_tInt32*)chanp->vbp = (pwr_tInt32)data32;
+            break;
+
+          case pwr_eDataRepEnum_UInt24:
+            udata32 = 0;
+            memcpy(&udata32, input_area + cp->offset + chanp->offset, 3);
+            if (byte_order == pwr_eByteOrderingEnum_BigEndian)
+            {
+              udata32 = swap32(udata32);
+              udata32 = udata32 >> 8;
+            }
+            *(pwr_tInt32*)chanp->vbp = (pwr_tInt32)udata32;
+            break;
+
+          case pwr_eDataRepEnum_Int32:
+            memcpy(&data32, input_area + cp->offset + chanp->offset, 4);
+            if (byte_order == pwr_eByteOrderingEnum_BigEndian)
+              data32 = swap32(data32);
+            *(pwr_tInt32*)chanp->vbp = data32;
+            break;
+
+          case pwr_eDataRepEnum_UInt32:
+            memcpy(&udata32, input_area + cp->offset + chanp->offset, 4);
+            if (byte_order == pwr_eByteOrderingEnum_BigEndian)
+              udata32 = swap32(udata32);
+            *(pwr_tInt32*)chanp->vbp = (pwr_tInt32)udata32;
+            break;
+          }
+        }
+        else
+        {
+          /* Fetch value from diagnostic area */
+
+          if (diag_area)
+          {
+            switch (chan_ei->Representation)
+            {
+            case pwr_eDataRepEnum_Int8:
+              memcpy(&data8, diag_area + chanp->offset, 1);
+              *(pwr_tInt32*)chanp->vbp = (pwr_tInt32)data8;
+              break;
+
+            case pwr_eDataRepEnum_UInt8:
+              memcpy(&udata8, diag_area + chanp->offset, 1);
+              *(pwr_tInt32*)chanp->vbp = (pwr_tInt32)udata8;
+              break;
+
+            case pwr_eDataRepEnum_Int16:
+              memcpy(&data16, diag_area + chanp->offset, 2);
+              if (byte_order == pwr_eByteOrderingEnum_BigEndian)
+                data16 = swap16(data16);
+              *(pwr_tInt32*)chanp->vbp = (pwr_tInt32)data16;
+              break;
+
+            case pwr_eDataRepEnum_UInt16:
+              memcpy(&udata16, diag_area + chanp->offset, 2);
+              if (byte_order == pwr_eByteOrderingEnum_BigEndian)
+                udata16 = swap16(udata16);
+              *(pwr_tInt32*)chanp->vbp = (pwr_tInt32)udata16;
+              break;
+
+            case pwr_eDataRepEnum_Int24:
+              data32 = 0;
+              memcpy(&data32, diag_area + chanp->offset, 3);
+              if (byte_order == pwr_eByteOrderingEnum_BigEndian)
+              {
+                data32 = swap32(data32);
+                data32 = data32 >> 8;
+              }
+              *(pwr_tInt32*)chanp->vbp = (pwr_tInt32)data32;
+              break;
+
+            case pwr_eDataRepEnum_UInt24:
+              udata32 = 0;
+              memcpy(&udata32, diag_area + chanp->offset, 3);
+              if (byte_order == pwr_eByteOrderingEnum_BigEndian)
+              {
+                udata32 = swap32(udata32);
+                udata32 = udata32 >> 8;
+              }
+              *(pwr_tInt32*)chanp->vbp = (pwr_tInt32)udata32;
+              break;
+
+            case pwr_eDataRepEnum_Int32:
+              memcpy(&data32, diag_area + chanp->offset, 4);
+              if (byte_order == pwr_eByteOrderingEnum_BigEndian)
+                data32 = swap32(data32);
+              *(pwr_tInt32*)chanp->vbp = data32;
+              break;
+
+            case pwr_eDataRepEnum_UInt32:
+              memcpy(&udata32, diag_area + chanp->offset, 4);
+              if (byte_order == pwr_eByteOrderingEnum_BigEndian)
+                udata32 = swap32(udata32);
+              *(pwr_tInt32*)chanp->vbp = (pwr_tInt32)udata32;
+              break;
+            }
+          }
+        }
+      }
+      break;
+    }
+
+    case pwr_cClass_ChanSi: {
+      pwr_sClass_ChanSi* chan_si = (pwr_sClass_ChanSi*)chanp->cop;
+      pwr_sClass_Si* sig_si = (pwr_sClass_Si*)chanp->sop;
+
+      if (chan_si && sig_si && chan_si->ConversionOn) {
+	/* Fetch data from input area */
+	lck_LockStr;
+	switch (chan_si->Representation) {
+	case pwr_eStringRepEnum_ISO_8851_1_nullterminated:
+	  strncpy(chanp->vbp, input_area + cp->offset + chanp->offset, MIN(80, chan_si->Size));
+	  ((char*)chanp->vbp)[MIN(80, chan_si->Size)-1] = 0;
+	  break;
+	case pwr_eStringRepEnum_ISO_8851_1:
+	  memcpy(chanp->vbp, input_area + cp->offset + chanp->offset, MIN(80, chan_si->Size));
+	  break;
+	case pwr_eStringRepEnum_UTF_8_nullterminated:
+	  break;
+	case pwr_eStringRepEnum_UTF_8:
+	  break;
+	}
+	lck_UnlockStr;
+      }
+      break;
+    }
+
+    case pwr_cClass_ChanBi: {
       int chan_elem;
       int elem;
       char *fromp, *top;
 
-      chan_bi = (pwr_sClass_ChanBi*)chanp->cop;
-      sig_bi = (pwr_sClass_Bi*)chanp->sop;
+      pwr_sClass_ChanBi* chan_bi = (pwr_sClass_ChanBi*)chanp->cop;
+      pwr_sClass_Bi* sig_bi = (pwr_sClass_Bi*)chanp->sop;
       if (chan_bi && sig_bi)
       {
         chan_elem = chan_bi->Size / GetChanSize(chan_bi->Representation);
@@ -1127,16 +1374,6 @@ void io_bus_card_write(io_tCtx ctx, io_sCard* cp, void* output_area, pwr_tByteOr
 {
   io_sChannel* chanp;
 
-  pwr_sClass_ChanDo* chan_do;
-  pwr_sClass_ChanD* chan_d;
-  pwr_sClass_Do* sig_do;
-  pwr_sClass_ChanAo* chan_ao;
-  pwr_sClass_Ao* sig_ao;
-  pwr_sClass_ChanIo* chan_io;
-  pwr_sClass_Io* sig_io;
-  pwr_sClass_ChanBo* chan_bo;
-  pwr_sClass_Bo* sig_bo;
-
   pwr_tUInt8* udata8p;
   pwr_tUInt16* udata16p;
   pwr_tUInt32* udata32p;
@@ -1159,9 +1396,10 @@ void io_bus_card_write(io_tCtx ctx, io_sCard* cp, void* output_area, pwr_tByteOr
     chanp = &cp->chanlist[i];
     switch (chanp->ChanClass)
     {
-    case pwr_cClass_ChanDo:
-      chan_do = (pwr_sClass_ChanDo*)chanp->cop;
-      sig_do = (pwr_sClass_Do*)chanp->sop;
+    case pwr_cClass_ChanDo: {
+      pwr_sClass_ChanDo* chan_do = (pwr_sClass_ChanDo*)chanp->cop;
+      pwr_sClass_Do* sig_do = (pwr_sClass_Do*)chanp->sop;
+
       if (chan_do && sig_do)
       {
         if (fixout)
@@ -1200,12 +1438,12 @@ void io_bus_card_write(io_tCtx ctx, io_sCard* cp, void* output_area, pwr_tByteOr
       }
 
       break;
-
-    case pwr_cClass_ChanD:
-      chan_d = (pwr_sClass_ChanD*)chanp->cop;
+    }
+    case pwr_cClass_ChanD: {
+      pwr_sClass_ChanD* chan_d = (pwr_sClass_ChanD*)chanp->cop;
       if (chan_d->Type == pwr_eDChanTypeEnum_Do)
       {
-        sig_do = (pwr_sClass_Do*)chanp->sop;
+	pwr_sClass_Do* sig_do = (pwr_sClass_Do*)chanp->sop;
         if (chan_d && sig_do)
         {
           if (fixout)
@@ -1245,12 +1483,13 @@ void io_bus_card_write(io_tCtx ctx, io_sCard* cp, void* output_area, pwr_tByteOr
       }
 
       break;
-
+    }
       // Channel type is Ao (analog output)
 
-    case pwr_cClass_ChanAo:
-      chan_ao = (pwr_sClass_ChanAo*)chanp->cop;
-      sig_ao = (pwr_sClass_Ao*)chanp->sop;
+    case pwr_cClass_ChanAo: {
+      pwr_sClass_ChanAo* chan_ao = (pwr_sClass_ChanAo*)chanp->cop;
+      pwr_sClass_Ao* sig_ao = (pwr_sClass_Ao*)chanp->sop;
+
       if (chan_ao && sig_ao)
       {
         if (fixout)
@@ -1357,12 +1596,13 @@ void io_bus_card_write(io_tCtx ctx, io_sCard* cp, void* output_area, pwr_tByteOr
         }
       }
       break;
-
+    }
       // Channel type is Io (integer output)
 
-    case pwr_cClass_ChanIo:
-      chan_io = (pwr_sClass_ChanIo*)chanp->cop;
-      sig_io = (pwr_sClass_Io*)chanp->sop;
+    case pwr_cClass_ChanIo: {
+      pwr_sClass_ChanIo* chan_io = (pwr_sClass_ChanIo*)chanp->cop;
+      pwr_sClass_Io* sig_io = (pwr_sClass_Io*)chanp->sop;
+
       if (chan_io && sig_io)
       {
         if (fixout)
@@ -1426,7 +1666,118 @@ void io_bus_card_write(io_tCtx ctx, io_sCard* cp, void* output_area, pwr_tByteOr
         }
       }
       break;
+    }
 
+      // Channel type is Eo (enumeration output)
+
+    case pwr_cClass_ChanEo: {
+      pwr_sClass_ChanEo* chan_eo = (pwr_sClass_ChanEo*)chanp->cop;
+      pwr_sClass_Eo* sig_eo = (pwr_sClass_Eo*)chanp->sop;
+
+      if (chan_eo && sig_eo)
+      {
+        if (fixout)
+          data32 = (pwr_tInt32)chan_eo->FixedOutValue;
+        else if (chan_eo->TestOn)
+          data32 = (pwr_tInt32)chan_eo->TestValue;
+        else
+          data32 = *(pwr_tInt32*)chanp->vbp;
+
+        switch (chan_eo->Representation)
+        {
+        case pwr_eDataRepEnum_Int8:
+          data8 = (pwr_tInt8)data32;
+          memcpy(output_area + cp->offset + chanp->offset, &data8, 1);
+          break;
+
+        case pwr_eDataRepEnum_UInt8:
+          udata8 = (pwr_tUInt8)data32;
+          memcpy(output_area + cp->offset + chanp->offset, &udata8, 1);
+          break;
+
+        case pwr_eDataRepEnum_Int16:
+          data16 = (pwr_tInt16)data32;
+          if (byte_order == pwr_eByteOrderingEnum_BigEndian)
+            data16 = swap16(data16);
+          memcpy(output_area + cp->offset + chanp->offset, &data16, 2);
+          break;
+
+        case pwr_eDataRepEnum_UInt16:
+          udata16 = (pwr_tUInt16)data32;
+          if (byte_order == pwr_eByteOrderingEnum_BigEndian)
+            udata16 = swap16(udata16);
+          memcpy(output_area + cp->offset + chanp->offset, &udata16, 2);
+          break;
+
+        case pwr_eDataRepEnum_Int24:
+          if (byte_order == pwr_eByteOrderingEnum_BigEndian)
+            data32 = swap32(data32) << 8;
+          memcpy(output_area + cp->offset + chanp->offset, &data32, 3);
+          break;
+
+        case pwr_eDataRepEnum_UInt24:
+          udata32 = (pwr_tUInt32)data32;
+          if (byte_order == pwr_eByteOrderingEnum_BigEndian)
+            udata32 = swap32(udata32) << 8;
+          memcpy(output_area + cp->offset + chanp->offset, &udata32, 3);
+          break;
+
+        case pwr_eDataRepEnum_Int32:
+          if (byte_order == pwr_eByteOrderingEnum_BigEndian)
+            data32 = swap32(data32);
+          memcpy(output_area + cp->offset + chanp->offset, &data32, 4);
+          break;
+
+        case pwr_eDataRepEnum_UInt32:
+          udata32 = (pwr_tUInt32)data32;
+          if (byte_order == pwr_eByteOrderingEnum_BigEndian)
+            udata32 = swap32(udata32);
+          memcpy(output_area + cp->offset + chanp->offset, &udata32, 4);
+          break;
+        }
+      }
+      break;
+    }
+
+      // Channel type is So (string output)
+
+    case pwr_cClass_ChanSo: {
+      pwr_sClass_ChanSo* chan_so = (pwr_sClass_ChanSo*)chanp->cop;
+      pwr_sClass_So* sig_so = (pwr_sClass_So*)chanp->sop;
+
+      if (chan_so && sig_so) {
+
+	lck_LockStr;
+        switch (chan_so->Representation) {
+	case pwr_eStringRepEnum_ISO_8851_1_nullterminated: {
+	  if (fixout)
+	    strncpy(output_area + cp->offset + chanp->offset, chan_so->FixedOutValue, MIN(80, chan_so->Size));
+	  else if (chan_so->TestOn)
+	    strncpy(output_area + cp->offset + chanp->offset, chan_so->TestValue, MIN(80, chan_so->Size));
+	  else
+	    strncpy(output_area + cp->offset + chanp->offset, chanp->vbp, MIN(80, chan_so->Size));
+	  break;
+	}
+	case pwr_eStringRepEnum_ISO_8851_1: {
+	  if (fixout)
+	    memcpy(output_area + cp->offset + chanp->offset, chan_so->FixedOutValue, MIN(80, chan_so->Size));
+	  else if (chan_so->TestOn)
+	    memcpy(output_area + cp->offset + chanp->offset, chan_so->TestValue, MIN(80, chan_so->Size));
+	  else
+	    memcpy(output_area + cp->offset + chanp->offset, chanp->vbp, MIN(80, chan_so->Size));
+	  break;
+	}
+	case pwr_eStringRepEnum_UTF_8_nullterminated: {
+	  break;
+	}
+	case pwr_eStringRepEnum_UTF_8: {
+	  break;
+	}
+	}
+	lck_UnlockStr;
+      }
+      break;
+    }
       // Channel type is Bo (buffer output)
 
     case pwr_cClass_ChanBo:
@@ -1434,9 +1785,9 @@ void io_bus_card_write(io_tCtx ctx, io_sCard* cp, void* output_area, pwr_tByteOr
       int chan_elem;
       int elem;
       char *fromp, *top;
+      pwr_sClass_ChanBo* chan_bo = (pwr_sClass_ChanBo*)chanp->cop;
+      pwr_sClass_Bo* sig_bo = (pwr_sClass_Bo*)chanp->sop;
 
-      chan_bo = (pwr_sClass_ChanBo*)chanp->cop;
-      sig_bo = (pwr_sClass_Bo*)chanp->sop;
       if (chan_bo && sig_bo)
       {
         chan_elem = chan_bo->Size / GetChanSize(chan_bo->Representation);

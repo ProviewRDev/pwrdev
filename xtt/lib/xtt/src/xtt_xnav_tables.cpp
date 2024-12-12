@@ -1073,6 +1073,38 @@ static void xnav_channel_get_flags(void* cardp, void* chanp, pwr_tCid card_cid,
       *teston = cp->TestOn;
       break;
     }
+    case pwr_cClass_ChanEi: {
+      pwr_sClass_ChanEi* cp = (pwr_sClass_ChanEi*)chanp;
+
+      *inv = 0;
+      *conv = cp->ConversionOn;
+      *teston = 0;
+      break;
+    }
+    case pwr_cClass_ChanEo: {
+      pwr_sClass_ChanEo* cp = (pwr_sClass_ChanEo*)chanp;
+
+      *inv = 0;
+      *conv = 1;
+      *teston = cp->TestOn;
+      break;
+    }
+    case pwr_cClass_ChanSi: {
+      pwr_sClass_ChanSi* cp = (pwr_sClass_ChanSi*)chanp;
+
+      *inv = 0;
+      *conv = cp->ConversionOn;
+      *teston = 0;
+      break;
+    }
+    case pwr_cClass_ChanSo: {
+      pwr_sClass_ChanSo* cp = (pwr_sClass_ChanSo*)chanp;
+
+      *inv = 0;
+      *conv = 1;
+      *teston = cp->TestOn;
+      break;
+    }
     case pwr_cClass_ChanAi: {
       pwr_sClass_ChanAi* cp = (pwr_sClass_ChanAi*)chanp;
 
@@ -1307,6 +1339,10 @@ int XNav::show_channels(pwr_tObjid card_objid)
       case pwr_cClass_ChanAo:
       case pwr_cClass_ChanIi:
       case pwr_cClass_ChanIo:
+      case pwr_cClass_ChanEi:
+      case pwr_cClass_ChanEo:
+      case pwr_cClass_ChanSi:
+      case pwr_cClass_ChanSo:
         strcat(attr_name, ".ActualValue");
         break;
       case pwr_cClass_ChanCo:
@@ -1342,6 +1378,10 @@ int XNav::show_channels(pwr_tObjid card_objid)
       case pwr_cClass_ChanD:
       case pwr_cClass_ChanIi:
       case pwr_cClass_ChanIo:
+      case pwr_cClass_ChanEi:
+      case pwr_cClass_ChanEo:
+      case pwr_cClass_ChanSi:
+      case pwr_cClass_ChanSo:
       case pwr_cClass_ChanCo:
         strcpy(t.elem[t.elem_cnt++].format, "%8d");
         break;
@@ -1462,6 +1502,10 @@ int XNav::show_attr_channels(pwr_tAttrRef* mod_aref, void* cardp,
     case pwr_cClass_ChanD:
     case pwr_cClass_ChanIi:
     case pwr_cClass_ChanIo:
+    case pwr_cClass_ChanEi:
+    case pwr_cClass_ChanEo:
+    case pwr_cClass_ChanSi:
+    case pwr_cClass_ChanSo:
     case pwr_cClass_ChanCo:
     case pwr_cClass_ChanBo:
     case pwr_cClass_ChanBi:
@@ -1556,6 +1600,10 @@ int XNav::show_attr_channels(pwr_tAttrRef* mod_aref, void* cardp,
         case pwr_cClass_ChanAo:
         case pwr_cClass_ChanIi:
         case pwr_cClass_ChanIo:
+        case pwr_cClass_ChanEi:
+        case pwr_cClass_ChanEo:
+        case pwr_cClass_ChanSi:
+        case pwr_cClass_ChanSo:
           strcat(attr_name, ".ActualValue");
           break;
         case pwr_cClass_ChanCo:
@@ -1591,6 +1639,10 @@ int XNav::show_attr_channels(pwr_tAttrRef* mod_aref, void* cardp,
         case pwr_cClass_ChanD:
         case pwr_cClass_ChanIi:
         case pwr_cClass_ChanIo:
+        case pwr_cClass_ChanEi:
+        case pwr_cClass_ChanEo:
+        case pwr_cClass_ChanSi:
+        case pwr_cClass_ChanSo:
         case pwr_cClass_ChanCo:
           strcpy(t.elem[t.elem_cnt++].format, "%8d");
           break;

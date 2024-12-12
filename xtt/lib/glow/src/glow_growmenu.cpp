@@ -49,24 +49,26 @@ GrowMenu::GrowMenu(GrowCtx* glow_ctx, const char* name,
     glow_eDrawType border_d_type, int line_w, int fill_rect, int display_border,
     glow_eDrawType fill_d_type, int t_size, glow_eDrawType t_drawtype,
     glow_eDrawType t_color, glow_eDrawType t_color_disabled, glow_eFont t_font,
-    GlowArrayElem* parent, int nodraw)
+    double scale, GlowArrayElem* parent, int nodraw)
     : GrowRect(glow_ctx, name, x, y, 10, 10, border_d_type, line_w, 0,
           glow_mDisplayLevel_1, fill_rect, display_border, 0, fill_d_type, 1),
       info(*menu_info), text_size(t_size), text_drawtype(t_drawtype),
       text_color(t_color), text_color_disabled(t_color_disabled), item_cnt(0),
       item_height(0), current_item(-1), current_idx(-1), new_item(0),
       old_item(-1), parent_menu(parent), min_width(min_w), input_focus(0),
-      font(t_font)
+      font(t_font), text_scale(scale)
 {
   if (!nodraw)
     draw();
 
-
   // Calculate size
-  int text_idx = int(trf.vertical_scale(0) * ctx->mw.zoom_factor_y
+  //if (text_scale != 0)
+  //  set_scale(scale, scale, 0, 0, glow_eScaleType_LowerLeft);
+
+  int text_idx = int(text_scale * ctx->mw.zoom_factor_y
           / ctx->mw.base_zoom_factor * (text_size + 4)
       - 4);
-  double tsize = trf.vertical_scale(0) * ctx->mw.zoom_factor_y / ctx->mw.base_zoom_factor
+  double tsize = text_scale * ctx->mw.zoom_factor_y / ctx->mw.base_zoom_factor
       * (8 + 2 * text_size);
   text_idx = MIN(text_idx, DRAW_TYPE_SIZE - 1);
   text_idx = MAX(0, text_idx);
@@ -99,6 +101,21 @@ GrowMenu::GrowMenu(GrowCtx* glow_ctx, const char* name,
       ur_x = ll_x + int(min_width * ctx->mw.zoom_factor_x);
     ur_y = ll_y + int(tot_z_height);
     ur.posit_z(ur_x + ctx->mw.offset_x, ur_y + ctx->mw.offset_y);
+
+
+    if (ur_y > ctx->mw.window_height + ctx->mw.subwindow_y) {
+      // Outside window border
+      ur_y = ctx->mw.window_height + ctx->mw.subwindow_y;
+      ll_y = ur_y - int(tot_z_height);
+      ll.posit_z(ll.z_x, ll_y + ctx->mw.offset_y);
+      ur.posit_z(ur.z_x, ur_y + ctx->mw.offset_y); // Might not always be correct?
+      ll_x = int(ll.x * ctx->mw.zoom_factor_x) - ctx->mw.offset_x;
+      ll_y = int(ll.y * ctx->mw.zoom_factor_y) - ctx->mw.offset_y;
+      ur_x = ll_x + max_z_width + 15 + int(pulldown_found * arrow_size);
+      ur_y = ll_y + int(tot_z_height);
+    } else
+      ur.posit_z(ur_x + ctx->mw.offset_x, ur_y + ctx->mw.offset_y);
+    ll_y = int(ll.y * ctx->mw.zoom_factor_y) - ctx->mw.offset_y;
     get_node_borders();
   }
 
@@ -148,7 +165,6 @@ void GrowMenu::draw(GlowWind* w, int ll_x, int ll_y, int ur_x, int ur_y)
     ll_y = ur_y;
     ur_y = tmp;
   }
-
   if (x_right * w->zoom_factor_x - w->offset_x + 1 >= ll_x
       && x_left * w->zoom_factor_x - w->offset_x <= ur_x
       && y_high * w->zoom_factor_y - w->offset_y + 1 >= ll_y
@@ -205,10 +221,10 @@ void GrowMenu::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
     hot = 0;
   }
   int idx;
-  int text_idx = int(trf.vertical_scale(t) * w->zoom_factor_y
+  int text_idx = int(text_scale * w->zoom_factor_y
           / w->base_zoom_factor * (text_size + 4)
       - 4);
-  double tsize = trf.vertical_scale(t) * w->zoom_factor_y / w->base_zoom_factor
+  double tsize = text_scale * w->zoom_factor_y / w->base_zoom_factor
       * (8 + 2 * text_size);
   text_idx = MIN(text_idx, DRAW_TYPE_SIZE - 1);
   text_idx = MAX(0, text_idx);

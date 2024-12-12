@@ -104,6 +104,8 @@ int main(int argc, char* argv[])
     setlocale(LC_TIME, "en_US");
 
     new WbGtk(argc, argv);
+  } catch(wb_error_str& e) {
+    std::cout << "** wb_error exception, " <<  e.what() << '\n';
   } catch(wb_error& e) {
     std::cout << "** wb_error exception, " <<  e.what() << '\n';
   }

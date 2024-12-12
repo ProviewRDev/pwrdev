@@ -1765,7 +1765,8 @@ static void create_active_io()
   pwr_tObjid oid;
   pwr_tAttrRef aref;
   int ai_cnt, ao_cnt, av_cnt, di_cnt, do_cnt, dv_cnt, ii_cnt, io_cnt, iv_cnt;
-  int atv_cnt, dtv_cnt, sv_cnt, co_cnt, bi_cnt, bo_cnt;
+  int atv_cnt, dtv_cnt, si_cnt, so_cnt, sv_cnt, co_cnt, bi_cnt, bo_cnt;
+  int ei_cnt, eo_cnt, ev_cnt;
   int bi_size, bo_size;
   pwr_tCid subcid;
   pwr_tAttrRef actval_aref;
@@ -1819,6 +1820,21 @@ static void create_active_io()
        sts = gdh_GetNextAttrRef(pwr_cClass_Iv, &aref, &aref))
     iv_cnt++;
 
+  ei_cnt = 0;
+  for (sts = gdh_GetClassListAttrRef(pwr_cClass_Ei, &aref); ODD(sts);
+       sts = gdh_GetNextAttrRef(pwr_cClass_Ei, &aref, &aref))
+    ei_cnt++;
+
+  eo_cnt = 0;
+  for (sts = gdh_GetClassListAttrRef(pwr_cClass_Eo, &aref); ODD(sts);
+       sts = gdh_GetNextAttrRef(pwr_cClass_Eo, &aref, &aref))
+    eo_cnt++;
+
+  ev_cnt = 0;
+  for (sts = gdh_GetClassListAttrRef(pwr_cClass_Ev, &aref); ODD(sts);
+       sts = gdh_GetNextAttrRef(pwr_cClass_Ev, &aref, &aref))
+    ev_cnt++;
+
   atv_cnt = 1;
   for (sts = gdh_GetClassListAttrRef(pwr_cClass_ATv, &aref); ODD(sts);
        sts = gdh_GetNextAttrRef(pwr_cClass_ATv, &aref, &aref))
@@ -1828,6 +1844,16 @@ static void create_active_io()
   for (sts = gdh_GetClassListAttrRef(pwr_cClass_DTv, &aref); ODD(sts);
        sts = gdh_GetNextAttrRef(pwr_cClass_DTv, &aref, &aref))
     dtv_cnt++;
+
+  si_cnt = 0;
+  for (sts = gdh_GetClassListAttrRef(pwr_cClass_Si, &aref); ODD(sts);
+       sts = gdh_GetNextAttrRef(pwr_cClass_Si, &aref, &aref))
+    si_cnt++;
+
+  so_cnt = 0;
+  for (sts = gdh_GetClassListAttrRef(pwr_cClass_So, &aref); ODD(sts);
+       sts = gdh_GetNextAttrRef(pwr_cClass_So, &aref, &aref))
+    so_cnt++;
 
   sv_cnt = 0;
   for (sts = gdh_GetClassListAttrRef(pwr_cClass_Sv, &aref); ODD(sts);
@@ -1923,12 +1949,27 @@ static void create_active_io()
   sts = gdh_CreateObject("pwrNode-active-io-iv", pwr_cClass_IvArea,
       iv_cnt * sizeof(((pwr_sClass_IvArea*)0)->Value[0]), &oid, pwr_cNObjid, 0,
       pwr_cNObjid);
+  sts = gdh_CreateObject("pwrNode-active-io-ei", pwr_cClass_EiArea,
+      ei_cnt * sizeof(((pwr_sClass_EiArea*)0)->Value[0]), &oid, pwr_cNObjid, 0,
+      pwr_cNObjid);
+  sts = gdh_CreateObject("pwrNode-active-io-eo", pwr_cClass_EoArea,
+      eo_cnt * sizeof(((pwr_sClass_EoArea*)0)->Value[0]), &oid, pwr_cNObjid, 0,
+      pwr_cNObjid);
+  sts = gdh_CreateObject("pwrNode-active-io-ev", pwr_cClass_EvArea,
+      ev_cnt * sizeof(((pwr_sClass_EvArea*)0)->Value[0]), &oid, pwr_cNObjid, 0,
+      pwr_cNObjid);
   sts = gdh_CreateObject("pwrNode-active-io-atv", pwr_cClass_ATvArea,
       atv_cnt * sizeof(((pwr_sClass_ATvArea*)0)->Value[0]), &oid, pwr_cNObjid,
       0, pwr_cNObjid);
   sts = gdh_CreateObject("pwrNode-active-io-dtv", pwr_cClass_DTvArea,
       dtv_cnt * sizeof(((pwr_sClass_DTvArea*)0)->Value[0]), &oid, pwr_cNObjid,
       0, pwr_cNObjid);
+  sts = gdh_CreateObject("pwrNode-active-io-si", pwr_cClass_SiArea,
+      si_cnt * sizeof(((pwr_sClass_SiArea*)0)->Value[0]), &oid, pwr_cNObjid, 0,
+      pwr_cNObjid);
+  sts = gdh_CreateObject("pwrNode-active-io-so", pwr_cClass_SoArea,
+      so_cnt * sizeof(((pwr_sClass_SoArea*)0)->Value[0]), &oid, pwr_cNObjid, 0,
+      pwr_cNObjid);
   sts = gdh_CreateObject("pwrNode-active-io-sv", pwr_cClass_SvArea,
       sv_cnt * sizeof(((pwr_sClass_SvArea*)0)->Value[0]), &oid, pwr_cNObjid, 0,
       pwr_cNObjid);
@@ -1944,6 +1985,9 @@ static void create_active_io()
       0, pwr_cNObjid);
   sts = gdh_CreateObject("pwrNode-active-io-iv_init", pwr_cClass_InitArea,
       iv_cnt * sizeof(((pwr_sClass_InitArea*)0)->Value[0]), &oid, pwr_cNObjid,
+      0, pwr_cNObjid);
+  sts = gdh_CreateObject("pwrNode-active-io-ev_init", pwr_cClass_InitArea,
+      ev_cnt * sizeof(((pwr_sClass_InitArea*)0)->Value[0]), &oid, pwr_cNObjid,
       0, pwr_cNObjid);
   sts = gdh_CreateObject("pwrNode-active-io-ai_init", pwr_cClass_InitArea,
       ai_cnt * sizeof(((pwr_sClass_InitArea*)0)->Value[0]), &oid, pwr_cNObjid,
@@ -1963,11 +2007,23 @@ static void create_active_io()
   sts = gdh_CreateObject("pwrNode-active-io-io_init", pwr_cClass_InitArea,
       io_cnt * sizeof(((pwr_sClass_InitArea*)0)->Value[0]), &oid, pwr_cNObjid,
       0, pwr_cNObjid);
+  sts = gdh_CreateObject("pwrNode-active-io-ei_init", pwr_cClass_InitArea,
+      ei_cnt * sizeof(((pwr_sClass_InitArea*)0)->Value[0]), &oid, pwr_cNObjid,
+      0, pwr_cNObjid);
+  sts = gdh_CreateObject("pwrNode-active-io-eo_init", pwr_cClass_InitArea,
+      eo_cnt * sizeof(((pwr_sClass_InitArea*)0)->Value[0]), &oid, pwr_cNObjid,
+      0, pwr_cNObjid);
   sts = gdh_CreateObject("pwrNode-active-io-atv_init", pwr_cClass_InitArea,
       atv_cnt * sizeof(((pwr_sClass_InitArea*)0)->Value[0]), &oid, pwr_cNObjid,
       0, pwr_cNObjid);
   sts = gdh_CreateObject("pwrNode-active-io-dtv_init", pwr_cClass_InitArea,
       dtv_cnt * sizeof(((pwr_sClass_InitArea*)0)->Value[0]), &oid, pwr_cNObjid,
+      0, pwr_cNObjid);
+  sts = gdh_CreateObject("pwrNode-active-io-si_init", pwr_cClass_InitArea,
+      si_cnt * sizeof(((pwr_sClass_InitArea*)0)->Value[0]), &oid, pwr_cNObjid,
+      0, pwr_cNObjid);
+  sts = gdh_CreateObject("pwrNode-active-io-so_init", pwr_cClass_InitArea,
+      so_cnt * sizeof(((pwr_sClass_InitArea*)0)->Value[0]), &oid, pwr_cNObjid,
       0, pwr_cNObjid);
   sts = gdh_CreateObject("pwrNode-active-io-sv_init", pwr_cClass_InitArea,
       sv_cnt * sizeof(((pwr_sClass_InitArea*)0)->Value[0]), &oid, pwr_cNObjid,
@@ -2045,6 +2101,15 @@ static void delete_old_io()
   sts = gdh_NameToObjid("pwrNode-old-io-iv", &oid);
   if (ODD(sts))
     gdh_DeleteObject(oid);
+  sts = gdh_NameToObjid("pwrNode-old-io-ei", &oid);
+  if (ODD(sts))
+    gdh_DeleteObject(oid);
+  sts = gdh_NameToObjid("pwrNode-old-io-eo", &oid);
+  if (ODD(sts))
+    gdh_DeleteObject(oid);
+  sts = gdh_NameToObjid("pwrNode-old-io-ev", &oid);
+  if (ODD(sts))
+    gdh_DeleteObject(oid);
   sts = gdh_NameToObjid("pwrNode-old-io-atv", &oid);
   if (ODD(sts))
     gdh_DeleteObject(oid);
@@ -2069,6 +2134,9 @@ static void delete_old_io()
   sts = gdh_NameToObjid("pwrNode-old-io-iv_init", &oid);
   if (ODD(sts))
     gdh_DeleteObject(oid);
+  sts = gdh_NameToObjid("pwrNode-old-io-ev_init", &oid);
+  if (ODD(sts))
+    gdh_DeleteObject(oid);
   sts = gdh_NameToObjid("pwrNode-old-io-ai_init", &oid);
   if (ODD(sts))
     gdh_DeleteObject(oid);
@@ -2085,6 +2153,12 @@ static void delete_old_io()
   if (ODD(sts))
     gdh_DeleteObject(oid);
   sts = gdh_NameToObjid("pwrNode-old-io-io_init", &oid);
+  if (ODD(sts))
+    gdh_DeleteObject(oid);
+  sts = gdh_NameToObjid("pwrNode-old-io-ei_init", &oid);
+  if (ODD(sts))
+    gdh_DeleteObject(oid);
+  sts = gdh_NameToObjid("pwrNode-old-io-eo_init", &oid);
   if (ODD(sts))
     gdh_DeleteObject(oid);
   sts = gdh_NameToObjid("pwrNode-old-io-atv_init", &oid);

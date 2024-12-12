@@ -101,6 +101,18 @@ typedef struct {
 } plc_sClass_Iv;
 
 typedef struct {
+  pwr_tInt32 ActualValue;
+} plc_sClass_Ei;
+
+typedef struct {
+  pwr_tInt32 ActualValue;
+} plc_sClass_Eo;
+
+typedef struct {
+  pwr_tInt32 ActualValue;
+} plc_sClass_Ev;
+
+typedef struct {
   pwr_tBoolean ActualValue;
 } plc_sClass_BBoolean;
 
@@ -143,3 +155,11 @@ typedef struct {
 typedef struct {
   pwr_tString80 ActualValue;
 } plc_sClass_Sv;
+
+typedef struct {
+  pwr_tString80 ActualValue;
+} plc_sClass_Si;
+
+typedef struct {
+  pwr_tString80 ActualValue;
+} plc_sClass_So;

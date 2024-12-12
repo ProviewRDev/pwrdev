@@ -505,6 +505,7 @@ menu Other
   subgraph 	OptionMenu	pwr_exe:pwr_optionmenu.pwsg 		31
   subgraph 	Window		pwr_window.component 			29
   subgraph 	Smiley	 	pwr_exe:pwr_smiley.pwsg 		79
+  subgraph 	Spectrum	pwr_exe:pwr_spectrum.pwsg 		49
   subgraph 	Table		pwr_table.component 			30
   subgraph 	TabbedWindow	pwr_folder.component 			35
 }
@@ -739,6 +740,7 @@ menu ColorTheme
   }
   menu Electric
   {
+    subgraph 	Bulb		pwr_exe:pwrct_bulb.pwsg 		260
     subgraph 	Contactor	pwr_exe:pwrct_contactor.pwsg 		60
     subgraph 	Contactor2	pwr_exe:pwr_contactor2.pwsg 		61
     subgraph 	ControlSwitch	pwr_exe:pwr_controlswitch.pwsg 		62
@@ -1050,6 +1052,7 @@ menu ColorTheme
     subgraph 	OptionMenu		pwr_exe:pwrct_optionmenu.pwsg 		31
     subgraph 	Window			pwrct_window.component 			29
     subgraph 	Smiley	 		pwr_exe:pwrct_smiley.pwsg 		79
+    subgraph 	Spectrum		pwr_exe:pwrct_spectrum.pwsg 		49
     subgraph 	Table			pwrct_table.component 			30
     subgraph 	TabbedWindow		pwrct_folder.component 			35
   }

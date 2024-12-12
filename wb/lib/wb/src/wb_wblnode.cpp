@@ -269,6 +269,10 @@ static wbl_sSym classes[] = { { "pwr_eClass_ClassDef", pwr_eClass_ClassDef },
   { "pwr_cClass_ChanAi", pwr_cClass_ChanAo },
   { "pwr_cClass_ChanIi", pwr_cClass_ChanIi },
   { "pwr_cClass_ChanIo", pwr_cClass_ChanIo },
+  { "pwr_cClass_ChanEi", pwr_cClass_ChanEi },
+  { "pwr_cClass_ChanEo", pwr_cClass_ChanEo },
+  { "pwr_cClass_ChanSi", pwr_cClass_ChanSi },
+  { "pwr_cClass_ChanSo", pwr_cClass_ChanSo },
   { "pwr_cClass_RootVolumeConfig", pwr_cClass_RootVolumeConfig },
   { "pwr_cClass_ClassVolumeConfig", pwr_cClass_ClassVolumeConfig },
   { "pwr_cClass_SharedVolumeConfig", pwr_cClass_SharedVolumeConfig },
@@ -1744,7 +1748,8 @@ void wb_wblnode::registerNode(wb_vrepwbl* vol)
           m_vrep->error("Syntax", getFileName(), line_number);
         }
       } else {
-        if (isClassDef() || isType() || isTypeDef() || isObjBodyDef()) {
+        if (isClassDef() || isType() || isTypeDef() || isObjBodyDef() ||
+	    isAttribute()) {
           // Syntax exception -- no cix or tix
           m_vrep->error("Missing index", getFileName(), line_number);
         } else {

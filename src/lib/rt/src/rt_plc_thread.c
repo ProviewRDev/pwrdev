@@ -395,6 +395,9 @@ void plc_thread(plc_sThread* tp)
   memcpy(tp->copy.ii_a.p, tp->pp->base.ii_a.p, tp->copy.ii_a.size);
   memcpy(tp->copy.io_a.p, tp->pp->base.io_a.p, tp->copy.io_a.size);
   memcpy(tp->copy.iv_a.p, tp->pp->base.iv_a.p, tp->copy.iv_a.size);
+  memcpy(tp->copy.ei_a.p, tp->pp->base.ei_a.p, tp->copy.ei_a.size);
+  memcpy(tp->copy.eo_a.p, tp->pp->base.eo_a.p, tp->copy.eo_a.size);
+  memcpy(tp->copy.ev_a.p, tp->pp->base.ev_a.p, tp->copy.ev_a.size);
   memcpy(tp->copy.bi_a.p, tp->pp->base.bi_a.p, tp->copy.bi_a.size);
   memcpy(tp->copy.bo_a.p, tp->pp->base.bo_a.p, tp->copy.bo_a.size);
   thread_MutexUnlock(&tp->pp->io_copy_mutex);
@@ -408,6 +411,8 @@ void plc_thread(plc_sThread* tp)
   if (tp->str_copy_lock) {
     lck_LockStr;
     memcpy(tp->copy.sv_a.p, tp->pp->base.sv_a.p, tp->copy.sv_a.size);
+    memcpy(tp->copy.si_a.p, tp->pp->base.si_a.p, tp->copy.si_a.size);
+    memcpy(tp->copy.so_a.p, tp->pp->base.so_a.p, tp->copy.so_a.size);
     lck_UnlockStr;
   }
 
@@ -677,6 +682,9 @@ static void scan(plc_sThread* tp)
     memcpy(tp->copy.ii_a.p, pp->base.ii_a.p, tp->copy.ii_a.size);
     memcpy(tp->copy.io_a.p, pp->base.io_a.p, tp->copy.io_a.size);
     memcpy(tp->copy.iv_a.p, pp->base.iv_a.p, tp->copy.iv_a.size);
+    memcpy(tp->copy.ei_a.p, pp->base.ei_a.p, tp->copy.ei_a.size);
+    memcpy(tp->copy.eo_a.p, pp->base.eo_a.p, tp->copy.eo_a.size);
+    memcpy(tp->copy.ev_a.p, pp->base.ev_a.p, tp->copy.ev_a.size);
     memcpy(tp->copy.bi_a.p, pp->base.bi_a.p, tp->copy.bi_a.size);
     memcpy(tp->copy.bo_a.p, pp->base.bo_a.p, tp->copy.bo_a.size);
     thread_MutexUnlock(&pp->io_copy_mutex);
@@ -691,6 +699,8 @@ static void scan(plc_sThread* tp)
     if (tp->str_copy_lock) {
       lck_LockStr;
       memcpy(tp->copy.sv_a.p, pp->base.sv_a.p, tp->copy.sv_a.size);
+      memcpy(tp->copy.si_a.p, pp->base.si_a.p, tp->copy.si_a.size);
+      memcpy(tp->copy.so_a.p, pp->base.so_a.p, tp->copy.so_a.size);
       lck_UnlockStr;
     }
 

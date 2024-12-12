@@ -1202,13 +1202,13 @@ void grow_CreateGrowMenu(grow_tCtx ctx, const char* name, glow_sMenuInfo* info,
     double x, double y, double min_width, glow_eDrawType draw_type,
     int line_width, int fill_rect, int border, glow_eDrawType fill_draw_type,
     int text_size, glow_eDrawType text_drawtype, glow_eDrawType text_color,
-    glow_eDrawType disabled_text_color, glow_eFont text_font,
+    glow_eDrawType disabled_text_color, glow_eFont text_font, double scale,
     grow_tObject parent, grow_tObject* menu)
 {
   GrowMenu* r1;
   r1 = new GrowMenu(ctx, name, info, x, y, min_width, draw_type, line_width,
       fill_rect, border, fill_draw_type, text_size, text_drawtype, text_color,
-      disabled_text_color, text_font, (GlowArrayElem*)parent);
+      disabled_text_color, text_font, scale, (GlowArrayElem*)parent);
   ctx->insert(r1);
   ctx->pop(r1);
   r1->draw();
@@ -5387,6 +5387,12 @@ void grow_GetAxisFormat(grow_tObject object, char* format)
     ((GrowAxis*)object)->get_format(format);
   else if (((GlowArrayElem*)object)->type() == glow_eObjectType_GrowAxisArc)
     ((GrowAxisArc*)object)->get_format(format);
+}
+
+void grow_SetAxisLabels(grow_tObject object, char (*labels)[40], int size)
+{
+  if (((GlowArrayElem*)object)->type() == glow_eObjectType_GrowAxis)
+    ((GrowAxis*)object)->set_labels(labels, size);
 }
 
 void grow_SetModified(grow_tCtx ctx, int modified)

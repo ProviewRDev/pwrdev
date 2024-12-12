@@ -1090,9 +1090,13 @@ int RtTrace::flow_cb(FlowCtx* ctx, flow_tEvent event)
         case pwr_cClass_Di:
         case pwr_cClass_Ai:
         case pwr_cClass_Ii:
+        case pwr_cClass_Ei:
+        case pwr_cClass_Si:
         case pwr_cClass_Do:
         case pwr_cClass_Ao:
         case pwr_cClass_Io:
+        case pwr_cClass_Eo:
+        case pwr_cClass_So:
         case pwr_cClass_Co: {
           strcpy(aname, name);
           strcat(aname, ".SigChanCon");
