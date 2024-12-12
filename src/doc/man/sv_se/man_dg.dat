@@ -9977,6 +9977,7 @@ scanf()			<LINK> scanf()
 fclose()		<LINK> fclose()
 felement()		<LINK> felement()
 fgets()			<LINK> fgets()
+file_search()		<LINK> file_search()
 fopen()			<LINK> fopen()
 fprintf()		<LINK> fprintf()
 fscanf()		<LINK> fscanf()
@@ -10028,6 +10029,7 @@ exit()			<LINK> exit()
 get_namespace()		<LINK> get_namespace()
 set_namespace()		<LINK> set_namespace()
 system()		<LINK> system()
+terminate()		<LINK> terminate()
 time()			<LINK> time()
 tzset()			<LINK> tzset()
 verify()		<LINK> verify()
@@ -10462,6 +10464,7 @@ Filhanterings funktioner
 fclose <t>Stäng en fil. 		<link> fclose()
 felement <t>Extrahera ett element från senaste lästa rad. <link> felement()
 fgets <t>Läs en rad från en fil. 	<link> fgets()
+file_search <t>Sök efter filer. 	<link> file_search()
 fopen <t>Öppna en fil.			<link> fopen()
 fprintf <t>Formaterad utskrift till fil. <link> fprintf()
 fscanf <t>Formaterad läsning från fil.	<link> fscanf()
@@ -10542,6 +10545,41 @@ int		<t>file		<t>Fil id returnerad av fopen.
 <c>    say( str);
 <c>  endwhile
 <c>  fclose( file);
+</TOPIC>
+
+<TOPIC> file_search() <style> function
+file_search()
+
+int file_search( string pattern, string found_file, int pass)
+
+<b>Beskrivning
+
+Söker efter filer.
+Ett sökmönster med wildcard kan anges för att söka på flera filer.
+Söksekvensen är indelad i passen init, next och end. Vid första
+anropet anges pass init (1). Vid sökning av flera filer med samma
+mönster anges pass next (0). Sökningen avslutas med pass end (2).
+Returnerar udda status om en fil har hittats, annars jämn status.
+
+<b>Argument
+
+string 		<t>pattern	<t>Namn på fil som ska sökas efter, kan innehålla wildcard ('*').
+string		<t>found_file	<t>Hittad fil.
+int		<t>pass		<t>Pass. Init (1), next (0) eller end (2).
+
+<b>Exempel
+
+<c>  string pattern = "*.txt";
+<c>  string found_file;
+<c>  int sts;
+
+<c>  sts = file_search(pattern, found_file, 1);
+<c>  while (sts & 1)
+<c>    printf("Processing %s\n", found_file);
+<c>    ...
+<c>    sts = file_search(pattern, found_file, 0);
+<c>  endwhile
+<c>  file_search(pattern, found_file, 2);
 </TOPIC>
 
 <TOPIC> fopen() <style> function
@@ -10924,6 +10962,7 @@ exit <t>Avsluta scriptet. <link> exit()
 get_namespace <t>Hämta aktuell namespace. <link> get_namespace()
 set_namespace <t>Sätt namespace för externa variabler. <link> set_namespace()
 system <t>Exekvera ett shell kommando. <link> system()
+terminate <t>Avsluta processen. <link> terminate()
 time <t>Hämta systemtiden. <link> time()
 tzset <t>Sätt tidszon. <link> tzset()
 verify <t>Skriv ut exekverade rader. <link> verify()
@@ -11002,6 +11041,17 @@ int				<t><t>Returvärdet är -1 vid fel eller annars returstatus
 
 <c>  cmd = "firefox http://www.proview.se";
 <c>  system( cmd);
+</TOPIC>
+
+<TOPIC> terminate() <style> function
+terminate()
+
+int terminate()
+
+<b>Beskrivning
+
+Avsluta processen.
+
 </TOPIC>
 
 <TOPIC> time() <style> function

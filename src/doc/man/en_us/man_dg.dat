@@ -10101,6 +10101,7 @@ scanf()			<LINK> scanf()
 fclose()		<LINK> fclose()
 felement()		<LINK> felement()
 fgets()			<LINK> fgets()
+file_search()		<LINK> file_search()
 fopen()			<LINK> fopen()
 fprintf()		<LINK> fprintf()
 fscanf()		<LINK> fscanf()
@@ -10152,6 +10153,7 @@ exit()			<LINK> exit()
 get_namespace()		<LINK> get_namespace()
 set_namespace()		<LINK> set_namespace()
 system()		<LINK> system()
+terminate()		<LINK> terminate()
 time()			<LINK> time()
 tzset()			<LINK> tzset()
 verify()		<LINK> verify()
@@ -10586,6 +10588,7 @@ Input/Output functions
 fclose <t>Close a file 			<link> fclose()
 felement <t>Extract one element from the last read line. <link> felement()
 fgets <t>Read a line from a file. 	<link> fgets()
+file_search <t>Search for files. 	<link> file_search()
 fopen <t>Open a file.			<link> fopen()
 fprintf <t>Formatted write to file.	<link> fprintf()
 fscanf <t>Formatted read from file.	<link> fscanf()
@@ -10669,6 +10672,42 @@ int		<t>file		<t>file returned by fopen.
 <c>    say( str);
 <c>  endwhile
 <c>  fclose( file);
+</TOPIC>
+
+<TOPIC> file_search() <style> function
+file_search()
+
+int file_search( string pattern, string found_file, int pass)
+
+<b>Description
+
+Search for files.
+A pattern with wildcard can be specifed to search for several files.
+The search sequence is divided in the passes init, next and end.
+At the first call pass init (1) is specified. At search of more 
+files with the same patter the pass next (1) is specified. The
+search is closed with the pass end (2).
+Returns odd status if a file is found, else even status.
+
+<b>Arguments
+
+string 		<t>pattern	<t>Name of file to search for. Can contain wild card ('*').
+string		<t>found_file	<t>Found file.
+int		<t>pass		<t>Pass. Init (1), next (0) or end (2).
+
+<b>Example
+
+<c>  string pattern = "*.txt";
+<c>  string found_file;
+<c>  int sts;
+
+<c>  sts = file_search(pattern, found_file, 1);
+<c>  while (sts & 1)
+<c>    printf("Processing %s\n", found_file);
+<c>    ...
+<c>    sts = file_search(pattern, found_file, 0);
+<c>  endwhile
+<c>  file_search(pattern, found_file, 2);
 </TOPIC>
 
 <TOPIC> fopen() <style> function
@@ -11053,6 +11092,7 @@ exit <t>Exit script. <link> exit()
 get_namespace <t>Get current namespace. <link> get_namespace()
 set_namespace <t>Set namespace for extern variables. <link> set_namespace()
 system <t>Execute shell command. <link> system()
+terminate <t>Terminate the process. <link> terminate()
 time <t>Get system time. <link> time()
 tzset <t>Set time zone. <link> tzset()
 verify <t>Print executed lines. <link> verify()
@@ -11134,6 +11174,17 @@ int				<t><t>The return value is -1 on error and the
 
 <c>  cmd = "firefox http://www.proview.se";
 <c>  system( cmd);
+</TOPIC>
+
+<TOPIC> terminate() <style> function
+terminate()
+
+int terminate()
+
+<b>Descriptions
+
+Terminate processen.
+
 </TOPIC>
 
 <TOPIC> time() <style> function
