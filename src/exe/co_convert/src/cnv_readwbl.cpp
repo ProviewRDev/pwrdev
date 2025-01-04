@@ -122,8 +122,9 @@ int CnvReadWbl::read_wbl(char* filename)
         linetype = cread_eLine_SObject;
       else if (streq(low(line_part[0]), "endsobject"))
         linetype = cread_eLine_EndSObject;
-      else if (streq(low(line_part[0]), "object") && nr > 1
-          && streq(low(line_part[1]), "template"))
+      else if (streq(low(line_part[0]), "object") && nr > 2
+	   && streq(low(line_part[1]), "template")
+	   && !streq(line_part[2], "$Bit"))
         linetype = cread_eLine_Template;
       else if (streq(low(line_part[0]), "object") && nr > 2
           && streq(low(line_part[2]), "$classdef"))
