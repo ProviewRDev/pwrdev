@@ -231,6 +231,14 @@ void errh_SetName(char* name) { set_name(name); }
 
 char* errh_GetMsg(const int sts, char* buf, int bufSize) { return get_message(sts, 0xf, buf, bufSize); }
 
+/* Check if a given messagenumber exists,
+   return string representation if valid.  */
+
+char* errh_GetError(const int sts, char* buf, int bufSize)
+{
+  return get_message(sts, 0x2, buf, bufSize);
+}
+
 /* Checks if a given messagenumber exists,
   return string representation if valid.  */
 

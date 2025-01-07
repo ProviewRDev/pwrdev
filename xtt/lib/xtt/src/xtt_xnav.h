@@ -47,12 +47,12 @@ extern "C"
 #include "pwr_baseclasses.h"
 #include "co_regex.h"
 #include "co_time.h"
-#include "co_nav_help.h"
 
 #if defined __cplusplus
 }
 #endif
 
+#include "co_nav_help.h"
 #include "flow_api.h"
 #include "xtt_xnav_brow.h"
 #include "xtt_localdb.h"

@@ -35,6 +35,7 @@
  */
 
 /* co_xhelpnav.cpp -- helptext navigator */
+#include <map>
 
 #include "co_cdh.h"
 #include "co_dcli.h"
@@ -43,13 +44,25 @@
 #include "co_time.h"
 
 #include "cow_xhelpnav.h"
+#include "rt_errh.h"
+#include "cow_msgwindow.h"
+#include <cow_xhelp_gtk.h>
 
 static int help_cmp_items(const void* node1, const void* node2);
+void doubleclick_action_helper_func(CoXHelpNav* xhelpnav, int sts, char* link, char* bookmark,
+                                    char* file_name);
+static void trim(char* str);
 
 static void xhelpnav_open_URL(CoXHelpNav* xhelpnav, char* url)
 {
   if (xhelpnav->open_URL_cb)
     (xhelpnav->open_URL_cb)(xhelpnav->parent_ctx, url);
+}
+
+static void xhelpnav_help_message_cb(void* ctx, char sev, char* text)
+{
+  CoXHelpNav* xhelpnav = (CoXHelpNav*)ctx;
+  xhelpnav->message(sev, text);
 }
 
 //
@@ -662,14 +675,7 @@ int HItemHelpImage::doubleclick_action(CoXHelpNavBrow* brow, CoXHelpNav* xhelpna
     }
     else
     {
-      if (file_name[0] == 0)
-      {
-        sts = xhelpnav->help(link, bookmark, navh_eHelpFile_Base, NULL, 1, true);
-        if (EVEN(sts))
-          sts = xhelpnav->help(link, bookmark, navh_eHelpFile_Project, NULL, 1, true);
-      }
-      else
-        sts = xhelpnav->help(link, bookmark, navh_eHelpFile_Other, file_name, 1, true);
+      doubleclick_action_helper_func(xhelpnav, sts, link, bookmark, file_name);
     }
   }
   return 1;
@@ -792,14 +798,7 @@ int HItemHelp::doubleclick_action(CoXHelpNavBrow* brow, CoXHelpNav* xhelpnav, do
     }
     else
     {
-      if (file_name[0] == 0)
-      {
-        sts = xhelpnav->help(link, bookmark, navh_eHelpFile_Base, NULL, 1, true);
-        if (EVEN(sts))
-          sts = xhelpnav->help(link, bookmark, navh_eHelpFile_Project, NULL, 1, true);
-      }
-      else
-        sts = xhelpnav->help(link, bookmark, navh_eHelpFile_Other, file_name, 1, true);
+      doubleclick_action_helper_func(xhelpnav, sts, link, bookmark, file_name);
     }
   }
   return 1;
@@ -869,17 +868,77 @@ int HItemHelpBold::doubleclick_action(CoXHelpNavBrow* brow, CoXHelpNav* xhelpnav
     }
     else
     {
-      if (file_name[0] == 0)
-      {
-        sts = xhelpnav->help(link, bookmark, navh_eHelpFile_Base, NULL, 1, true);
-        if (EVEN(sts))
-          sts = xhelpnav->help(link, bookmark, navh_eHelpFile_Project, NULL, 1, true);
-      }
-      else
-        sts = xhelpnav->help(link, bookmark, navh_eHelpFile_Other, file_name, 1, true);
+      doubleclick_action_helper_func(xhelpnav, sts, link, bookmark, file_name);
     }
   }
   return 1;
+}
+
+void handleError(CoXHelpNav* xhelpnav, int sts, char temp_file_name[80],
+                 std::optional<ErrorLog> error_optional_log)
+{
+  if (EVEN(sts))
+  {
+    char msg[256];
+    char error_msg[336];
+    errh_GetError(sts, msg, sizeof(msg));
+    sprintf(error_msg, "Error: %s. File:%s", msg, temp_file_name);
+
+    if (xhelpnav->utility == xhelp_eUtility_Xtt)
+    {
+      xhelpnav->message('E', error_msg);
+      ((CoXHelp*)xhelpnav->parent_ctx)->status_message('E', error_msg);
+    }
+    else if (xhelpnav->utility == xhelp_eUtility_Wtt)
+    {
+      MsgWindow::message('E', error_msg, msgw_ePop_Yes);
+      ((CoXHelp*)xhelpnav->parent_ctx)->status_message('E', error_msg);
+    }
+
+    if (error_optional_log && !error_optional_log->log_map.empty())
+    {
+      for (const auto& outerEntry : error_optional_log->log_map)
+      {
+        printf("Error(s) in following file: %s \n", outerEntry.first.c_str());
+        for (const auto& innerEntry : outerEntry.second.place_map)
+        {
+          for (const auto& innerInnerEntry : innerEntry.second.reason_map)
+          {
+            char temp_error_msg[256];
+            errh_GetError(innerInnerEntry.second, temp_error_msg, sizeof(temp_error_msg));
+            printf("Error: %s in line number: %d. Line: %s \n", temp_error_msg, innerEntry.first,
+                   innerInnerEntry.first.c_str());
+          }
+        }
+      }
+    }
+    else
+    {
+      printf("Error log is empty! \n");
+    }
+  }
+}
+
+void doubleclick_action_helper_func(CoXHelpNav* xhelpnav, int sts, char* link, char* bookmark,
+                                    char* file_name)
+{
+  char temp_file_name[80];
+  std::optional<ErrorLog> error_optional_log;
+
+  if (file_name[0] == 0)
+  {
+    sprintf(temp_file_name, "");
+    sts = xhelpnav->help(link, bookmark, navh_eHelpFile_Base, NULL, 1, true, &error_optional_log);
+    if (EVEN(sts))
+      sts = xhelpnav->help(link, bookmark, navh_eHelpFile_Project, NULL, 1, true, &error_optional_log);
+  }
+  else
+  {
+    sts = xhelpnav->help(link, bookmark, navh_eHelpFile_Other, file_name, 1, true, &error_optional_log);
+    sprintf(temp_file_name, " %s", file_name);
+  }
+
+  handleError(xhelpnav, sts, temp_file_name, error_optional_log);
 }
 
 static void trim(char* str)
@@ -1048,7 +1107,7 @@ static void* xhelpnav_help_insert_cb(void* ctx, navh_eItemType item_type, const 
 }
 
 int CoXHelpNav::help(const char* help_key, const char* help_bookmark, navh_eHelpFile file_type,
-                     const char* file_name, int pop, bool strict)
+                     const char* file_name, int pop, bool strict, std::optional<ErrorLog>* error_log)
 {
   int sts;
   brow_tNode bookmark_node;
@@ -1075,7 +1134,43 @@ int CoXHelpNav::help(const char* help_key, const char* help_bookmark, navh_eHelp
     init_help = 2;
     brow_SetNodraw(brow->ctx);
   }
-  sts = navhelp->help(help_key, help_bookmark, file_type, file_name, &bookmark_node, strict);
+
+  // the if statement needs to be used so that we dont go below brow_cnt 0.
+  // if 1, then it should return base project name.
+  char* previous_filename;
+  navh_eHelpFile previous_filetype;
+  if (brow_cnt >= 1)
+  {
+    if (strcmp(brow_stack[brow_cnt - 1]->current_filename, ""))
+    {
+      previous_filename = brow_stack[brow_cnt - 1]->current_filename;
+      previous_filetype = brow_stack[brow_cnt - 1]->current_filetype;
+    }
+    else
+    {
+      previous_filename = navhelp->project_file;
+      previous_filetype = navh_eHelpFile_Project;
+    }
+  }
+  else
+  {
+    previous_filename = navhelp->project_file;
+    previous_filetype = navh_eHelpFile_Project;
+  }
+
+  if (error_log)
+  {
+    std::tie(sts, *error_log) =
+        navhelp->help_with_status(help_key, help_bookmark, file_type, file_name, &bookmark_node, strict,
+                                  previous_filename, previous_filetype);
+  }
+  else
+  {
+    auto result = navhelp->help_with_status(help_key, help_bookmark, file_type, file_name, &bookmark_node,
+                                            strict, previous_filename, previous_filetype);
+    sts = result.first;
+  }
+
   if (EVEN(sts))
   {
     if (!pop || (pop && init_help != 1))
@@ -1118,6 +1213,13 @@ int CoXHelpNav::help(const char* help_key, const char* help_bookmark, navh_eHelp
   return 1;
 }
 
+void CoXHelpNav::message(char sev, char* text)
+{
+  errh_eAnix test_Anix = errh_eNAnix;
+  errh_Init("help", test_Anix);
+  errh_Error(text);
+}
+
 int CoXHelpNav::home()
 {
   navh_eHelpFile current_filetype;
@@ -1129,10 +1231,7 @@ int CoXHelpNav::home()
   if (current_filetype == navh_eHelpFile_Other)
     strncpy(current_filename, brow_stack[0]->current_filename, sizeof(current_filename));
 
-  // if ( current_filetype == navh_eHelpFile_Other)
-  //  current_filetype = navh_eHelpFile_Project;
-
-  if (current_filetype == navh_eHelpFile_Base /*&& utility == xhelp_eUtility_Xtt*/)
+  if (current_filetype == navh_eHelpFile_Base)
     strcpy(topic, "overview");
 
   brow_push_all();
@@ -1175,11 +1274,14 @@ int CoXHelpNav::next_topic()
   sts = navhelp->get_next_key(current_key, current_filetype, current_filename[0] == 0 ? 0 : current_filename,
                               1, next_key);
   delete navhelp;
+
   if (ODD(sts))
   {
     brow_push();
     sts = help(next_key, 0, current_filetype, current_filename[0] == 0 ? 0 : current_filename, 1, 1);
   }
+
+  handleError(this, sts, current_filename, std::nullopt);
   return sts;
 }
 

@@ -52,9 +52,14 @@ public:
   GtkWidget* india_widget;
   GtkWidget* india_label;
   GtkWidget* india_text;
+  GtkWidget* vbox;
+  GtkWidget* vbox_status;
+  GtkWidget* scrolled_window;
   CoWowFocusTimerGtk focustimer;
+  int label_number = 1;
 
   void set_dimension(int width, int height);
+  void status_message(char severity, const char* message);
   void pop();
   void print();
   void open_input_dialog(const char* text, const char* title, const char* init_text,

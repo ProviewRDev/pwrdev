@@ -238,6 +238,7 @@ extern "C"
   void errh_SetStatus(pwr_tStatus sts);
   void errh_Interactive(void);
   char* errh_GetMsg(const pwr_tStatus sts, char* buf, int bufSize);
+  char* errh_GetError(const pwr_tStatus sts, char* buf, int bufSize);
   char* errh_GetText(const pwr_tStatus sts, char* buf, int bufSize);
   char* errh_Log(char* buff, char severity, const char* msg, ...);
   void errh_Fatal(const char* msg, ...);

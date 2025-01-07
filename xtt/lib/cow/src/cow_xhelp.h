@@ -59,6 +59,8 @@ public:
   virtual void pop();
   virtual void print() {}
 
+  virtual void status_message(char severity, const char* message) {};
+
   void map();
   void clear();
   int help(const char* key, const char* help_bookmark, navh_eHelpFile file_type, const char* file_name,

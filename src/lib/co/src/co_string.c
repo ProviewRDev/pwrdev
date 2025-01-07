@@ -37,7 +37,7 @@
 #include <ctype.h>
 
 #include "co_string.h"
-
+#include <stdlib.h>
 char* str_ToLower(char* dst, const char* src)
 {
   char* rs = dst;
@@ -172,4 +172,41 @@ void str_trim(char* out, const char* in)
   int length = end - in;
   str_Strncpy(out, in, length);
   out[length] = 0;
+}
+
+/*************************************************************************
+ *
+ * Name:	str_trim_rtn(const char* in)
+ *
+ * Type		const char*
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Trims given string and returns it.
+ *
+ **************************************************************************/
+const char* str_trim_rtn(const char* in)
+{
+  // Skip leading whitespace
+  while (isspace((unsigned char)*in))
+  {
+    in++;
+  }
+
+  // Skip trailing whitespace
+  const char* end = in + strlen(in) - 1;
+  while (end > in && isspace((unsigned char)*end))
+  {
+    end--;
+  }
+  end++;
+
+  size_t inLength = strlen(in);
+  char* out = malloc(inLength + 1);
+  int length = end - in;
+  out = str_Strncpy(out, in, length);
+  out[length] = 0;
+
+  return out;
 }

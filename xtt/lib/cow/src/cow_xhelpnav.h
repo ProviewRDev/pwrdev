@@ -42,8 +42,14 @@
 #include "pwr_names.h"
 
 #include "co_nav_help.h"
+#include "co_error.h"
 
 #include "flow_browapi.h"
+
+#include "cow_gtk.h"
+
+#include <gtk/gtk.h>
+#include <optional>
 
 #define xhelp_cFile_BaseXtt pwr_cNameBaseXttHelp
 #define xhelp_cFile_BaseWtt pwr_cNameBaseWttHelp
@@ -127,8 +133,9 @@ public:
   int brow_push();
   int brow_push_all();
   void enable_events(CoXHelpNavBrow* brow);
-  int help(const char* key, const char* help_bookmark, navh_eHelpFile file_type, const char* file_name,
-           int pop, bool strict);
+  int help(const char* help_key, const char* help_bookmark, navh_eHelpFile file_type, const char* file_name,
+           int pop, bool strict, std::optional<ErrorLog>* error_log = nullptr);
+
   int home();
   int back();
   int next_topic();

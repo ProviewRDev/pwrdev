@@ -76,6 +76,8 @@ extern "C"
   char* dcli_pwr_dir(const char* dir);
   int dcli_wildcard(char* wildname, char* name);
   int dcli_read_line(char* line, int maxsize, FILE* file);
+  int dcli_search_line_in_file(FILE* file, const char* target_line, const char* location, char* error_line,
+                               int* error_line_number);
   unsigned int dcli_random();
 
   /* Functions in module co_dcli_file */

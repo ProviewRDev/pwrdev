@@ -218,6 +218,36 @@ void CoXHelpGtk::print()
                                      (void*)toplevel, &sts);
 }
 
+void CoXHelpGtk::status_message(char severity, const char* message)
+{
+  GList* children = gtk_container_get_children(GTK_CONTAINER(vbox_status));
+  int child_count = g_list_length(children);
+
+  // Remove the oldest label if there are already 10 labels
+  if (child_count >= 10)
+  {
+    GtkWidget* oldest_label = GTK_WIDGET(children->data);
+    gtk_widget_destroy(oldest_label); // Remove the oldest label
+  }
+  g_list_free(children); // Free the GList after use
+
+  // Create and add the new label
+  char numbered_message[512];
+  snprintf(numbered_message, sizeof(numbered_message), "%d%s%s", label_number, ": ", message);
+  label_number++;
+
+  char* messageutf8 = g_convert(numbered_message, -1, "UTF-8", "ISO8859-1", NULL, NULL, NULL);
+  GtkWidget* new_label = gtk_label_new(messageutf8);
+  g_free(messageutf8);
+  gtk_box_pack_start(GTK_BOX(vbox_status), new_label, TRUE, TRUE, 0);
+  gtk_widget_show_all(vbox_status); // Update the scrolled window
+
+  // Scroll to the bottom of the scrolled window
+  GtkAdjustment* adjustment = gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(scrolled_window));
+  gtk_adjustment_set_value(adjustment,
+                           gtk_adjustment_get_upper(adjustment) - gtk_adjustment_get_page_size(adjustment));
+}
+
 static gint delete_event(GtkWidget* w, GdkEvent* event, gpointer data)
 {
   CoXHelpGtk* xhelp = (CoXHelpGtk*)data;
@@ -404,9 +434,23 @@ CoXHelpGtk::CoXHelpGtk(GtkWidget* xa_parent_wid, void* xa_parent_ctx, xhelp_eUti
   xhelpnav = new CoXHelpNavGtk((void*)this, vbox, title, utility, &brow_widget, &sts);
   xhelpnav->open_URL_cb = CoXHelp::open_URL;
 
+  // Statusbar
+  // Create a scrolled window
+  scrolled_window = gtk_scrolled_window_new(NULL, NULL);
+  gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolled_window), GTK_POLICY_AUTOMATIC,
+                                 GTK_POLICY_AUTOMATIC);
+
+  // container with all status messages
+  vbox_status = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+
+  // adding container to scrolled window
+  gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(scrolled_window), vbox_status);
+  gtk_widget_set_size_request(scrolled_window, -1, 50);
+
   gtk_box_pack_start(GTK_BOX(vbox), GTK_WIDGET(menu_bar), FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(vbox), GTK_WIDGET(tools), FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(vbox), GTK_WIDGET(brow_widget), TRUE, TRUE, 0);
+  gtk_box_pack_start(GTK_BOX(vbox), GTK_WIDGET(scrolled_window), FALSE, FALSE, 3);
 
   gtk_container_add(GTK_CONTAINER(toplevel), vbox);
 

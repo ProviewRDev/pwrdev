@@ -1111,6 +1111,79 @@ int dcli_read_line(char* line, int maxsize, FILE* file)
   return 1;
 }
 
+
+int checkTargetLocation(const char* line, const char* target_word)
+{
+  size_t length = strlen(line);
+  char lowerLine[length + 1];
+
+  // lowercase to find link
+  str_ToLower(lowerLine, line);
+
+  char* lowerLink = strstr(lowerLine, "<link>");
+
+  if (lowerLink != NULL)
+  {
+    // Find the corresponding position in the original line
+    // Calculate the position of the found link in the original line
+    size_t pos = lowerLink - lowerLine;
+
+    // search if target word exists in the link
+    if (strstr(&line[pos], target_word))
+    {
+      return 1; // exists
+    }
+  }
+  return 0;
+}
+
+int dcli_search_line_in_file(FILE* file, const char* target_line, const char* location, char* error_line,
+                             int* error_line_number)
+{
+  char line[256];
+  int line_number = 0;
+
+  while (fgets(line, sizeof(line), file) != NULL)
+  {
+    line_number++;
+
+    // Remove the newline character, if present
+    line[strcspn(line, "\n")] = 0;
+
+    // Check if the current line matches the target line
+    if (strcmp(line, target_line) == 0)
+    {
+      strcpy(error_line, line);
+      error_line[strlen(line)] = '\0';
+
+      *error_line_number = line_number;
+
+      return 1;
+    }
+    // Check if the line and location is a substring of current_line
+    else if (strstr(line, target_line) != NULL)
+    {
+      // if (strstr(line, location) != NULL || countOccurrences(line, target_line) > 1)
+      if (checkTargetLocation(line, location) || checkTargetLocation(line, target_line))
+      {
+        strcpy(error_line, line);
+        error_line[strlen(line)] = '\0';
+
+        *error_line_number = line_number;
+
+
+        return 1;
+      }
+    }
+  }
+
+  *error_line_number = 0;
+  char str[] = "Can't find target!";
+  strcpy(error_line, str);
+  error_line[strlen(str)] = '\0';
+  return 0; // Line not found
+}
+
 unsigned int dcli_random()
 {
   pwr_tTime t;
