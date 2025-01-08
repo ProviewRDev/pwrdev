@@ -800,6 +800,8 @@ menu ColorTheme
     subgraph 	IndError	 	pwr_exe:pwrct_inderror.pwsg 		257
     subgraph 	IndState	 	pwr_exe:pwrct_indstate.pwsg 		256
     subgraph 	IndSelect	 	pwr_exe:pwrct_indselect.pwsg 		259
+    subgraph 	Smoke			pwr_exe:pwrct_smoke.pwsg 		47
+    subgraph 	WaterLeak		pwr_exe:pwrct_waterleak.pwsg 		47
   }
   menu Pushbuttons
   {
