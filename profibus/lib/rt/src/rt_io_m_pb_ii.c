@@ -59,6 +59,7 @@ static pwr_tStatus IoCardInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp,
 
   op = (pwr_sClass_Pb_Ii*)cp->op;
   local = (io_sCardLocal*)cp->Local;
+  (void)local; // Do nothing
 
   if (rp->Class != pwr_cClass_Pb_DP_Slave)
   {
@@ -82,8 +83,7 @@ static pwr_tStatus IoCardRead(io_tCtx ctx, io_sAgent* ap, io_sRack* rp,
   pwr_sClass_Pb_Ii* op;
   pwr_sClass_Pb_DP_Slave* slave;
   io_sChannel* chanp;
-  pwr_sClass_ChanIi* cop;
-  pwr_sClass_Ii* sop;
+  pwr_sClass_ChanIi* cop;  
   pwr_tUInt8 udata8 = 0;
   pwr_tUInt16 udata16 = 0;
   pwr_tUInt32 udata32 = 0;
@@ -104,8 +104,7 @@ static pwr_tStatus IoCardRead(io_tCtx ctx, io_sAgent* ap, io_sRack* rp,
       if (!chanp->cop || !chanp->sop)
         continue;
 
-      cop = (pwr_sClass_ChanIi*)chanp->cop;
-      sop = (pwr_sClass_Ii*)chanp->sop;
+      cop = (pwr_sClass_ChanIi*)chanp->cop;      
 
       if (cop->ConversionOn)
       {

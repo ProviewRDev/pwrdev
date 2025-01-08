@@ -28,9 +28,6 @@ elif [ "$1" == "wb_load" ]; then
 elif [ "$1" == "msg" ]; then
   file="*.msg"
   ftype="wbl"
-elif [ "$1" == "uil" ]; then
-  file="*.uil"
-  ftype="wbl"
 elif [ "$1" == "xxx" ]; then
   file="*.xxx"
   ftype="c"

@@ -745,13 +745,11 @@ possible return values:
 
         if (sp->SAP_Nr == ind_ptr->ssap)
         {
-          io_sCard* card_list = slave_list->cardlist;
-          pwr_sClass_Pb_FDL_DataTransfer* cp;
+          io_sCard* card_list = slave_list->cardlist;          
           io_sFDLCardLocal* local_card;
 
           if (card_list != NULL)
-          {
-            cp = (pwr_sClass_Pb_FDL_DataTransfer*)card_list->op;
+          {            
             local_card = (io_sFDLCardLocal*)card_list->Local;
 
             if (local_card->input_area_size > 0)
@@ -1838,17 +1836,14 @@ static pwr_tStatus IoAgentInit(io_tCtx ctx, io_sAgent* ap)
 \*----------------------------------------------------------------------------*/
 static pwr_tStatus IoAgentRead(io_tCtx ctx, io_sAgent* ap)
 {
-  io_sAgentLocal* local;
-  pwr_sClass_Pb_Profiboard* op;
-  pwr_tUInt16 sts;
+  io_sAgentLocal* local;  
 
   pwr_sClass_Pb_Profiboard* mp;
   pwr_sClass_Pb_DP_Slave* sp;
   pwr_tUInt16 data_len;
   io_sRack* slave_list;
 
-  local = (io_sAgentLocal*)ap->Local;
-  op = (pwr_sClass_Pb_Profiboard*)ap->op;
+  local = (io_sAgentLocal*)ap->Local;  
 
   /* Activate supervision thread, first cycle */
 
@@ -1885,7 +1880,7 @@ static pwr_tStatus IoAgentRead(io_tCtx ctx, io_sAgent* ap)
           sp->DisableSlave != 1 && mp->DisableBus != 1)
       {
         data_len = sp->BytesOfInput;
-        sts = profi_get_data(ID_DP_SLAVE_IO_IMAGE, sp->OffsetInputs, &data_len,
+        profi_get_data(ID_DP_SLAVE_IO_IMAGE, sp->OffsetInputs, &data_len,
                              &sp->Inputs);
       }
     }

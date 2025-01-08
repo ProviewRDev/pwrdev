@@ -394,8 +394,7 @@ short DevInitBoard(unsigned short usDevNumber)
 short DevReset(unsigned char usDevNumber, unsigned short usMode,
                unsigned long ulTimeout)
 {
-  DEVIO_RESETCMD tBuffer;
-  unsigned int lBytesReturned;
+  DEVIO_RESETCMD tBuffer;  
   short sRet = DRV_NO_ERROR;
 
   // valid handle available, driver is open
@@ -413,9 +412,7 @@ short DevReset(unsigned char usDevNumber, unsigned short usMode,
     sRet = DRV_USR_MODE_INVALID;
   }
   else
-  {
-    // fill in parameter data
-    lBytesReturned = 0;
+  {    
     // set output buffer
     tBuffer.usBoard = usDevNumber;
     tBuffer.usMode = usMode;
@@ -456,8 +453,7 @@ short DevReset(unsigned char usDevNumber, unsigned short usMode,
 short DevGetInfo(unsigned short usDevNumber, unsigned short usInfoArea,
                  unsigned short usSize, void* pvData)
 {
-  DEVIO_GETDEVINFOCMD tBuffer;
-  unsigned int lBytesReturned;
+  DEVIO_GETDEVINFOCMD tBuffer;  
   short sRet = DRV_NO_ERROR;
 
   // valid handle available, driver is open
@@ -533,8 +529,7 @@ short DevGetInfo(unsigned short usDevNumber, unsigned short usInfoArea,
     {
       // complete buffer length with return data
       // usDataBufferLen = usSize;
-      // fill in parameter data
-      lBytesReturned = 0;
+      
       // set output buffer
       tBuffer.usBoard = usDevNumber;
       tBuffer.usInfoArea = usInfoArea;
@@ -579,8 +574,7 @@ short DevGetInfo(unsigned short usDevNumber, unsigned short usInfoArea,
 short DevPutTaskParameter(unsigned short usDevNumber, unsigned short usNumber,
                           unsigned short usSize, void* pvData)
 {
-  DEVIO_PUTPARAMETERCMD tBuffer;
-  unsigned int lBytesReturned;
+  DEVIO_PUTPARAMETERCMD tBuffer;  
   short sRet = DRV_NO_ERROR;
   // valid handle available, driver is open
   if (hDevDrv == INVALID_HANDLE_VALUE)
@@ -604,9 +598,7 @@ short DevPutTaskParameter(unsigned short usDevNumber, unsigned short usNumber,
     sRet = DRV_USR_SIZE_TOO_LONG;
   }
   else
-  {
-    // fill in parameter data
-    lBytesReturned = 0;
+  {    
     // set command buffer
     tBuffer.usBoard = usDevNumber;
     tBuffer.usTaskParamNum = usNumber;
@@ -645,8 +637,7 @@ short DevPutTaskParameter(unsigned short usDevNumber, unsigned short usNumber,
 short DevGetTaskState(unsigned short usDevNumber, unsigned short usNumber,
                       unsigned short usSize, void* pvData)
 {
-  DEVIO_GETTASKSTATECMD tBuffer;
-  unsigned int lBytesReturned;
+  DEVIO_GETTASKSTATECMD tBuffer;  
   short sRet = DRV_NO_ERROR;
 
   // valid handle available, driver is open
@@ -671,9 +662,7 @@ short DevGetTaskState(unsigned short usDevNumber, unsigned short usNumber,
     sRet = DRV_USR_SIZE_TOO_LONG;
   }
   else
-  {
-    // fill in parameter data
-    lBytesReturned = 0;
+  {    
 
     // set command buffer
     tBuffer.ucBoard = usDevNumber;
@@ -713,8 +702,7 @@ short DevGetTaskState(unsigned short usDevNumber, unsigned short usNumber,
 short DevGetMBXState(unsigned short usDevNumber, unsigned short* pusDevMbxState,
                      unsigned short* pusHostMbxState)
 {
-  DEVIO_MBXINFOCMD tBuffer;
-  unsigned int lBytesReturned;
+  DEVIO_MBXINFOCMD tBuffer;  
   short sRet = DRV_NO_ERROR;
 
   // valid handle available, driver is open
@@ -727,9 +715,7 @@ short DevGetMBXState(unsigned short usDevNumber, unsigned short* pusDevMbxState,
     sRet = DRV_USR_DEV_NUMBER_INVALID;
   }
   else
-  {
-    // fill in parameter data
-    lBytesReturned = 0;
+  {    
     // set output buffer
     tBuffer.ucBoard = usDevNumber;
     tBuffer.usDevMbxState = 0x00;  //*pusDevMbxState;
@@ -770,7 +756,6 @@ short DevGetMBXData(unsigned short usDevNumber, unsigned short usHostSize,
                     void* pvHostData, unsigned short usDevSize, void* pvDevData)
 {
   DEVIO_GETMBXCMD tBuffer;
-  unsigned int lBytesReturned;
   short sRet = DRV_NO_ERROR;
 
   // valid handle available, driver is open
@@ -792,9 +777,7 @@ short DevGetMBXData(unsigned short usDevNumber, unsigned short usHostSize,
   }
   else
   {
-    // fill in parameter data
-    lBytesReturned = 0;
-
+    // fill in parameter data    
     tBuffer.usBoard = usDevNumber;
     tBuffer.usHostLen = usHostSize;
     tBuffer.usDevLen = usDevSize;
@@ -846,8 +829,7 @@ short DevGetMBXData(unsigned short usDevNumber, unsigned short usHostSize,
 
 short DevExitBoard(unsigned short usDevNumber)
 {
-  DEVIO_EXITCMD tBuffer;
-  unsigned int lBytesReturned;
+  DEVIO_EXITCMD tBuffer;  
   unsigned short usDrvOpenCount = 0;
   short sRet = DRV_NO_ERROR;
 
@@ -864,7 +846,7 @@ short DevExitBoard(unsigned short usDevNumber)
   {
     // valid handle available, driver is open
     // clear all data buffers
-    lBytesReturned = 0;
+    
     tBuffer.usBoard = usDevNumber; // [in]
     // tBuffer.usDrvOpenCount = usDrvOpenCount; // [out]
     // tBuffer.sError         = sRet;           // [out]
@@ -902,8 +884,7 @@ short DevExitBoard(unsigned short usDevNumber)
 short DevReadSendData(unsigned short usDevNumber, unsigned short usOffset,
                       unsigned short usSize, void* pvData)
 {
-  DEVIO_READSENDCMD tBuffer;
-  unsigned int lBytesReturned;
+  DEVIO_READSENDCMD tBuffer;  
   short sRet = DRV_NO_ERROR;
 
   // valid handle available, driver is open
@@ -923,8 +904,7 @@ short DevReadSendData(unsigned short usDevNumber, unsigned short usOffset,
   }
   else
   {
-    // fill in parameter data
-    lBytesReturned = 0;
+    // fill in parameter data    
     // set output buffer
     tBuffer.usBoard = usDevNumber;
     tBuffer.usReadOffset = usOffset;
@@ -963,8 +943,7 @@ short DevReadSendData(unsigned short usDevNumber, unsigned short usOffset,
 short DevTriggerWatchDog(unsigned short usDevNumber, unsigned short usMode,
                          unsigned short* pusDevWatchDog)
 {
-  DEVIO_TRIGGERCMD tBuffer;
-  unsigned int lBytesReturned;
+  DEVIO_TRIGGERCMD tBuffer;  
   short sRet = DRV_NO_ERROR;
   // valid handle available, driver is open
   if (hDevDrv == INVALID_HANDLE_VALUE)
@@ -981,8 +960,7 @@ short DevTriggerWatchDog(unsigned short usDevNumber, unsigned short usMode,
   }
   else
   {
-    // fill in parameter data
-    lBytesReturned = 0;
+    // fill in parameter data    
     // set output buffer
     tBuffer.usBoard = usDevNumber;
     tBuffer.usMode = usMode;
@@ -1022,8 +1000,7 @@ short DevTriggerWatchDog(unsigned short usDevNumber, unsigned short usMode,
 short DevSpecialControl(unsigned short usDevNumber, unsigned short usMode,
                         unsigned short* pusCtrlAck)
 {
-  DEVIO_TRIGGERCMD tBuffer;
-  unsigned int lBytesReturned;
+  DEVIO_TRIGGERCMD tBuffer;  
   short sRet = DRV_NO_ERROR;
   // valid handle available, driver is open
   if (hDevDrv == INVALID_HANDLE_VALUE)
@@ -1040,8 +1017,7 @@ short DevSpecialControl(unsigned short usDevNumber, unsigned short usMode,
   }
   else
   {
-    // fill in parameter data
-    lBytesReturned = 0;
+    // fill in parameter data    
     // set output buffer
     tBuffer.usBoard = usDevNumber;
     tBuffer.usMode = usMode;
@@ -1081,8 +1057,7 @@ short DevSpecialControl(unsigned short usDevNumber, unsigned short usMode,
 short DevExtendedData(unsigned short usDevNumber, unsigned short usMode,
                       unsigned short usSize, void* pvData)
 {
-  DEVIO_EXTDATACMD tBuffer;
-  unsigned int lBytesReturned;
+  DEVIO_EXTDATACMD tBuffer;  
   short sRet = DRV_NO_ERROR;
   // valid handle available, driver is open
   if (hDevDrv == INVALID_HANDLE_VALUE)
@@ -1107,8 +1082,7 @@ short DevExtendedData(unsigned short usDevNumber, unsigned short usMode,
   }
   else
   {
-    // fill in parameter data
-    lBytesReturned = 0;
+    // fill in parameter data    
 
     tBuffer.usBoard = usDevNumber;
     tBuffer.usMode = usMode;
@@ -1151,8 +1125,7 @@ short DevExtendedData(unsigned short usDevNumber, unsigned short usMode,
 short DevGetTaskParameter(unsigned short usDevNumber, unsigned short usNumber,
                           unsigned short usSize, void* pvData)
 {
-  DEVIO_GETPARAMETERCMD tBuffer;
-  unsigned int lBytesReturned;
+  DEVIO_GETPARAMETERCMD tBuffer;  
   short sRet = DRV_NO_ERROR;
 
   // valid handle available, driver is open
@@ -1178,8 +1151,7 @@ short DevGetTaskParameter(unsigned short usDevNumber, unsigned short usNumber,
   }
   else
   {
-    // fill in parameter data
-    lBytesReturned = 0;
+    // fill in parameter data    
     // set command buffer
     tBuffer.usBoard = usDevNumber;
     tBuffer.usTaskParamNum = usNumber;
@@ -1219,8 +1191,7 @@ short DevReadWriteDPMData(unsigned short usDevNumber, unsigned short usMode,
                           unsigned short usOffset, unsigned short usSize,
                           void* pvData)
 {
-  DEVIO_RWDPMDATACMD tBuffer;
-  unsigned int lBytesReturned;
+  DEVIO_RWDPMDATACMD tBuffer;  
   short sRet = DRV_NO_ERROR;
 
   // valid handle available, driver is open
@@ -1245,8 +1216,7 @@ short DevReadWriteDPMData(unsigned short usDevNumber, unsigned short usMode,
   }
   else
   {
-    // fill in parameter data
-    lBytesReturned = 0;
+    // fill in parameter data    
     tBuffer.usBoard = usDevNumber;
     tBuffer.usMode = usMode;
     tBuffer.usOffset = usOffset;
@@ -1286,8 +1256,7 @@ short DevReadWriteDPMRaw(unsigned short usDevNumber, unsigned short usMode,
                          unsigned short usOffset, unsigned short usSize,
                          void* pvData)
 {
-  DEVIO_RWRAWDATACMD tBuffer;
-  unsigned int lBytesReturned;
+  DEVIO_RWRAWDATACMD tBuffer;  
   short sRet = DRV_NO_ERROR;
 
   // valid handle available, driver is open
@@ -1309,8 +1278,7 @@ short DevReadWriteDPMRaw(unsigned short usDevNumber, unsigned short usMode,
   }
   else
   {
-    // fill in parameter data
-    lBytesReturned = 0;
+    // fill in parameter data    
     tBuffer.usBoard = usDevNumber;
     tBuffer.usMode = usMode;
     tBuffer.usOffset = usOffset;
@@ -1352,7 +1320,6 @@ short DevExchangeIO(unsigned short usDevNumber, unsigned short usSendOffset,
                     unsigned long ulTimeout)
 {
   DEVIO_EXIOCMD tBuffer;
-  unsigned int lBytesReturned;
   short sRet = DRV_NO_ERROR;
   int lRet = 0;
   // valid handle available, driver is open
@@ -1378,8 +1345,7 @@ short DevExchangeIO(unsigned short usDevNumber, unsigned short usSendOffset,
   }
   else
   {
-    // fill in parameter data
-    lBytesReturned = 0;
+    // fill in parameter data    
     // set output buffer
     tBuffer.usBoard = usDevNumber;
     tBuffer.usReceiveOffset = usReceiveOffset;
@@ -1426,8 +1392,7 @@ short DevExchangeIOEx(unsigned short usDevNumber, unsigned short usMode,
                       unsigned short usReceiveSize, void* pvReceiveData,
                       unsigned long ulTimeout)
 {
-  DEVIO_EXIOCMDEX tBuffer;
-  unsigned int lBytesReturned;
+  DEVIO_EXIOCMDEX tBuffer;  
   short sRet = DRV_NO_ERROR;
   int lRet = 0;
 
@@ -1459,8 +1424,7 @@ short DevExchangeIOEx(unsigned short usDevNumber, unsigned short usMode,
   else
   {
     // fill in parameter data
-    lBytesReturned = 0;
-
+    
     // set output buffer
     tBuffer.usBoard = usDevNumber;
     tBuffer.usReceiveOffset = usReceiveOffset;
@@ -1508,8 +1472,7 @@ short DevExchangeIOErr(unsigned short usDevNumber, unsigned short usSendOffset,
                        unsigned short usReceiveSize, void* pvReceiveData,
                        COMSTATE* ptState, unsigned long ulTimeout)
 {
-  DEVIO_EXIOCMDERR tBuffer;
-  unsigned int lBytesReturned;
+  DEVIO_EXIOCMDERR tBuffer;  
   short sRet = DRV_NO_ERROR;
   int lRet = 0;
 
@@ -1537,7 +1500,7 @@ short DevExchangeIOErr(unsigned short usDevNumber, unsigned short usSendOffset,
   else
   {
     // fill in parameter data
-    lBytesReturned = 0;
+    
     // set output buffer
     tBuffer.usBoard = usDevNumber;
     tBuffer.usReceiveOffset = usReceiveOffset;
@@ -1580,8 +1543,7 @@ short DevExchangeIOErr(unsigned short usDevNumber, unsigned short usSendOffset,
 short DevSetHostState(unsigned short usDevNumber, unsigned short usMode,
                       unsigned long ulTimeout)
 {
-  DEVIO_TRIGGERCMD tBuffer;
-  unsigned int lBytesReturned;
+  DEVIO_TRIGGERCMD tBuffer;  
   short sRet = DRV_NO_ERROR;
 
   // valid handle available, driver is open
@@ -1600,7 +1562,6 @@ short DevSetHostState(unsigned short usDevNumber, unsigned short usMode,
   else
   {
     // fill in parameter data
-    lBytesReturned = 0;
 
     // set output buffer
     tBuffer.usBoard = usDevNumber;
@@ -1637,8 +1598,7 @@ short DevSetHostState(unsigned short usDevNumber, unsigned short usMode,
 short DevPutMessage(unsigned short usDevNumber, MSG_STRUC* ptMessage,
                     unsigned long ulTimeout)
 {
-  DEVIO_PUTMESSAGECMD tBuffer;
-  unsigned int lBytesReturned;
+  DEVIO_PUTMESSAGECMD tBuffer;  
   short sRet = DRV_NO_ERROR;
 
   // valid handle available, driver is open
@@ -1653,7 +1613,6 @@ short DevPutMessage(unsigned short usDevNumber, MSG_STRUC* ptMessage,
   else
   {
     // fill in parameter data
-    lBytesReturned = 0;
     // set output buffer
     tBuffer.usBoard = usDevNumber;
     tBuffer.ulTimeout = ulTimeout;
@@ -1692,8 +1651,7 @@ short DevPutMessage(unsigned short usDevNumber, MSG_STRUC* ptMessage,
 short DevGetMessage(unsigned short usDevNumber, unsigned short usSize,
                     MSG_STRUC* ptMessage, unsigned long ulTimeout)
 {
-  DEVIO_GETMESSAGECMD tBuffer;
-  unsigned int lBytesReturned;
+  DEVIO_GETMESSAGECMD tBuffer;  
   short sRet = DRV_NO_ERROR;
 
   // valid handle available, driver is open
@@ -1711,8 +1669,7 @@ short DevGetMessage(unsigned short usDevNumber, unsigned short usSize,
   }
   else
   {
-    // fill in parameter data
-    lBytesReturned = 0;
+    // fill in parameter data    
     // set output buffer
     tBuffer.usBoard = usDevNumber;
     tBuffer.ulTimeout = ulTimeout;

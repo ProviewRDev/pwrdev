@@ -402,7 +402,7 @@ public:
                                     // instance when datatype is "VisibleString"
   ValueList<double> _AllowedValues; // Using double here works for all available data types...use more memory
                                     // though but it's fine...
-  ushort _Length;
+  std::size_t _Length;
   bool _Changeable;
   bool _Visible;
   std::shared_ptr<std::string> _Text;

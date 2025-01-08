@@ -269,8 +269,7 @@ void GsdmlAttrGtk::activate_cmd_ca(GtkWidget* w, gpointer data)
 void GsdmlAttrGtk::activate_cmd_input(GtkWidget* w, gpointer data)
 {
   char* text;
-  GsdmlAttrGtk* attr = (GsdmlAttrGtk*)data;
-  int sts;
+  GsdmlAttrGtk* attr = (GsdmlAttrGtk*)data;  
 
   g_object_set(attr->cmd_prompt, "visible", FALSE, NULL);
   g_object_set(attr->cmd_input, "visible", FALSE, NULL);
@@ -280,7 +279,7 @@ void GsdmlAttrGtk::activate_cmd_input(GtkWidget* w, gpointer data)
   text = gtk_editable_get_chars(GTK_EDITABLE(w), 0, -1);
   if (attr->input_open)
   {
-    sts = attr->attrnav->set_attr_value(text);
+    attr->attrnav->set_attr_value(text);
     g_object_set(w, "visible", FALSE, NULL);
     attr->set_prompt("");
     attr->input_open = 0;

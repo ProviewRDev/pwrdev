@@ -284,8 +284,7 @@ void PnViewerGtk::open_change_value()
 
 void PnViewerGtk::valchanged_cmd_input(GtkWidget* w, gpointer data)
 {
-  PnViewer* viewer = (PnViewer*)data;
-  int sts;
+  PnViewer* viewer = (PnViewer*)data;  
   char *text, *textutf8;
 
   textutf8 = gtk_editable_get_chars(GTK_EDITABLE(w), 0, -1);
@@ -294,7 +293,7 @@ void PnViewerGtk::valchanged_cmd_input(GtkWidget* w, gpointer data)
 
   if (viewer->input_open)
   {
-    sts = viewer->viewernav->set_attr_value(text);
+    viewer->viewernav->set_attr_value(text); // TODO Check return value?
     g_object_set(w, "visible", FALSE, NULL);
     viewer->set_prompt("");
     viewer->input_open = 0;
