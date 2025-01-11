@@ -85,7 +85,6 @@ log_ps		= echo "I $(time)  build-$(pwre_bmodule), Generate postscript files $(no
 log_pdf		= echo "I $(time)  build-$(pwre_bmodule), Generate pdf files $(notdir $@)" | tee -a $(logfile)
 log_xtthelp	= echo "I $(time)  build-$(pwre_bmodule), Generate xtthelp files $(notdir $@)" | tee -a $(logfile)
 
-
 .SUFFIXES:
 
 $(bld_dir)$(dir_ext) :
@@ -129,11 +128,11 @@ $(doc_dir)/sv_se/orm/%_allclasses.html : %.wb_load
 
 $(doc_dir)/en_us/%.ps : %.wb_load
 	@ $(log_ps)
-	@ $(co_convert) -q -l en_us -d $(doc_dir)/en_us "$(source)"
+	@ #$(co_convert) -q -l en_us -d $(doc_dir)/en_us "$(source)"
 
 $(doc_dir)/sv_se/%.ps : %.wb_load
 	@ $(log_ps)
-	@ $(co_convert) -q -l sv_se -d $(doc_dir)/sv_se "$(source)"
+	@ #$(co_convert) -q -l sv_se -d $(doc_dir)/sv_se "$(source)"
 
 $(doc_dir)/en_us/%.pdf : %.wb_load
 	@ $(log_pdf)
