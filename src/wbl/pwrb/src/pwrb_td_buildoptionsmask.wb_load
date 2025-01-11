@@ -191,5 +191,15 @@ SObject pwrb:Type
        Attr Value = 4194304
      EndBody
     EndObject
+    !/**
+    !  Zigbee2mqtt I/O.
+    !*/
+    Object Zigbee2mqttIo $Bit
+     Body SysBody
+       Attr PgmName = "Zigbee2mqttIo"
+       Attr Text = "Zigbee2mqttIo"
+       Attr Value = 8388608
+     EndBody
+    EndObject
   EndObject
 EndSObject

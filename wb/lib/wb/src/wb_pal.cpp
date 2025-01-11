@@ -1144,6 +1144,8 @@ int Pal::session_opened(ldh_tSesContext pal_ldhses, char* pal_root_name)
       return 0;
     }
     PalFile::config_tree_build(
+        ldhses, "$pwr_exe/pwr_z2m_palette.cnf", pal_eNameType_Palette, root_name, menu);
+    PalFile::config_tree_build(
         ldhses, pal_cLocalPaletteFile, pal_eNameType_Palette, root_name, menu);
   }
 

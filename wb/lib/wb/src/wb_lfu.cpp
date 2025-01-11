@@ -2675,10 +2675,15 @@ pwr_tStatus lfu_SaveDirectoryVolume(
               else
                 sprintf(&str[strlen(str)], "-lpwr_nodave_dummy ");
 
-              if (bop->SystemModules & pwr_mBuildOptionsMask_MqttIo)
+              if (bop->SystemModules & pwr_mBuildOptionsMask_Zigbee2mqttIo)
+		sprintf(&str[strlen(str)], "-lpwr_z2m ");
+
+              if (bop->SystemModules & pwr_mBuildOptionsMask_MqttIo ||
+		  bop->SystemModules & pwr_mBuildOptionsMask_Zigbee2mqttIo)
                 sprintf(&str[strlen(str)], "-lmosquitto ");
               else
                 sprintf(&str[strlen(str)], "-lpwr_mqtt_dummy ");
+
 
               // Powerlink can't be called from plc yet, always use the dummy
               sprintf(&str[strlen(str)], "-lpwr_epl_dummy ");

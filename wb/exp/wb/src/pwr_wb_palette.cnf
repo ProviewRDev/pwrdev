@@ -360,8 +360,6 @@ palette NavigatorPalette
       {
         class MQTT_Client
 	class MQTT_Device
-        class Zigbee2MQTT_Client
-	class Zigbee2MQTT_Device
       }
       menu OneWire
       {
@@ -1118,6 +1116,7 @@ palette PlcEditorPalette
       class PiPos
     }
     menu Enumeration
+    {
       class CStoEo
       class CStoEv
       class GetEi

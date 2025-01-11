@@ -58,7 +58,27 @@
 #include "rt_io_mqtt_client.h"
 #include "rs_remote_msg.h"
 
+typedef enum {
+  json_mOpt_remove_quotes = 1
+} json_mOpt;
+
 /* Callback from mosquitto when message is received */
+
+static void rgb_to_xy(unsigned int rgb, float* x, float* y)
+{
+  float blue = rgb & 0xff / 0xff;
+  float green = (rgb >> 8) & 0xff / 0xff;
+  float red = (rgb << 16) & 0xff / 0xff;
+
+  red = (red > 0.04045) ? pow((red + 0.055) / (1.0 + 0.055), 2.4) : (red / 12.92);
+  green = (green > 0.04045) ? pow((green + 0.055) / (1.0 + 0.055), 2.4) : (green / 12.92);
+  blue = (blue > 0.04045) ? pow((blue + 0.055) / (1.0 + 0.055), 2.4) : (blue / 12.92);
+  float X = red * 0.664511 + green * 0.154324 + blue * 0.162028;
+  float Y = red * 0.283881 + green * 0.668433 + blue * 0.047685;
+  float Z = red * 0.000088 + green * 0.072310 + blue * 0.986039;
+  *x = X / (X + Y + Z);
+  *y = Y / (X + Y + Z);
+}
 
 static pwr_tStatus mqtt_error_to_sts(int err)
 {
@@ -135,7 +155,7 @@ static pwr_tStatus mqtt_error_to_sts(int err)
   return sts;
 }
 
-static int json_match(pwr_tCid chan_cid, const char *id, const pwr_eDataRepEnum rep, const char *msg, void *ovalue)
+static int json_match(pwr_tCid chan_cid, const char *id, const pwr_eDataRepEnum rep, const char *msg, void *ovalue, int osize, unsigned int opt)
 {
   char iname[80];
   char ivalue[80];
@@ -277,6 +297,56 @@ static int json_match(pwr_tCid chan_cid, const char *id, const pwr_eDataRepEnum 
       return 1;
     return 0;
   }
+  case pwr_cClass_ChanEi: {
+    int len;
+    char *s2 = strstr(msg, iname);
+    if (!s2)
+      return 0;
+
+    s2 += strlen(iname);
+    while (*s2) {
+      if (*s2 == ':')
+	break;
+      s2++;
+    }
+    s2++;
+    while (*s2) {
+      if (*s2 != ' ' && *s2 != '	')
+	break;
+      s2++;
+    }
+    if (*s2 == 0)
+      return 0;
+
+    char *s3 = strchr(s2+1, '\"');
+    if (s3)
+      len = s3 - s2 + 1;
+    else
+      len = strlen(s2);
+
+    if (len > osize - 1) 
+      return 0;
+
+    if ((opt & json_mOpt_remove_quotes) && *s2 == '\"') {
+      strcpy((char *)ovalue, s2+1);
+      ((char *)ovalue)[len - 1] = 0;
+    } else {
+      strcpy((char *)ovalue, s2);
+      ((char *)ovalue)[len] = 0;
+    }
+
+    s3 = ovalue + strlen(ovalue) - 1;
+    while (s3 != ovalue) {
+      if (*s3 != ' ' && *s3 != '	')
+	break;
+      s3--;
+    }
+    *(s3+1) = 0;
+    if ((opt & json_mOpt_remove_quotes) && *s3 == '\"')
+      *s3 = 0;
+
+    return 1;
+  }
   default:
     return 0;
   }
@@ -327,6 +397,17 @@ static int json_amsg(char *id, pwr_tInt32 sigval, char *msg)
   return 1;
 }
 
+static int json_smsg(char *id, char *sigval, char *msg)
+{
+  char iname[80];
+
+  strcpy(iname, id);
+  str_trim(iname, iname);
+
+  sprintf(msg, "{%s\"%s\"}", iname, sigval);
+  return 1;
+}
+
 static void message_cb(struct mosquitto *mosq, void *obj, 
     const struct mosquitto_message *msg)
 {
@@ -355,8 +436,8 @@ static void message_cb(struct mosquitto *mosq, void *obj,
 	    char *s1, *s2, *id;
 
 	    id = ((pwr_sClass_ChanDi *)chanp->cop)->Identity;
-	    if ((s1 = strstr(id, ",\"")) != 0 &&
-		(s2 = strstr(id, ":\"")) != 0) {    
+	    if ((s1 = strstr(id, ",")) != 0 &&
+		(s2 = strstr(id, ":")) != 0) {    
 	      char ident1[40];
 	      char ident2[40];
 	      int idx1 = s1 - id;
@@ -367,16 +448,16 @@ static void message_cb(struct mosquitto *mosq, void *obj,
 	      ident1[idx1] = 0;
 	      strncpy(ident2, id, idx2 + 1);
 	      strcpy(&ident2[idx2+1], &id[idx1+1]);
-	      sts = json_match(chanp->ChanClass, ident1, 0, (char*)msg->payload, &value);
+	      sts = json_match(chanp->ChanClass, ident1, 0, (char*)msg->payload, &value, 0, 0);
 	      if (ODD(sts)) 
 		*(pwr_tBoolean *)chanp->vbp = 1;
 	      else {
-		sts = json_match(chanp->ChanClass, ident2, 0, (char*)msg->payload, &value);
+		sts = json_match(chanp->ChanClass, ident2, 0, (char*)msg->payload, &value, 0, 0);
 		if (ODD(sts)) 
 		  *(pwr_tBoolean *)chanp->vbp = 0;
 	      }
 	    } else {
-	      sts = json_match(chanp->ChanClass, ((pwr_sClass_ChanDi *)chanp->cop)->Identity, 0, (char*)msg->payload, &value);
+	      sts = json_match(chanp->ChanClass, ((pwr_sClass_ChanDi *)chanp->cop)->Identity, 0, (char*)msg->payload, &value, 0, 0);
 	      if (ODD(sts) && value) {
 		*(pwr_tBoolean *)chanp->vbp = 1;
 	      }
@@ -386,7 +467,7 @@ static void message_cb(struct mosquitto *mosq, void *obj,
 	  case pwr_cClass_ChanDo: {
 	    pwr_tBoolean value;
 
-	    sts = json_match(chanp->ChanClass, ((pwr_sClass_ChanDo *)chanp->cop)->Identity, 0, (char*)msg->payload, &value);
+	    sts = json_match(chanp->ChanClass, ((pwr_sClass_ChanDo *)chanp->cop)->Identity, 0, (char*)msg->payload, &value, 0, 0);
 	    if (ODD(sts)) {
 	      if (*(pwr_tBoolean *)chanp->vbp != value) {
 		*(pwr_tBoolean *)chanp->vbp = value;
@@ -396,10 +477,32 @@ static void message_cb(struct mosquitto *mosq, void *obj,
 	  }
 	  case pwr_cClass_ChanIi: {
 	    pwr_tInt32 value;
-	    sts = json_match(chanp->ChanClass, ((pwr_sClass_ChanIi *)chanp->cop)->Identity, 0, (char*)msg->payload, &value);
+	    sts = json_match(chanp->ChanClass, ((pwr_sClass_ChanIi *)chanp->cop)->Identity, 0, (char*)msg->payload, &value, 0, 0);
 	    if (ODD(sts)) {
 	      *(pwr_tInt32 *)chanp->vbp = value;
 	    }
+	    break;
+	  }
+	  case pwr_cClass_ChanEi: {
+	    pwr_tTid tid = ((pwr_sClass_Ei *)chanp->sop)->CastActualValue;
+	    gdh_sValueDef* valuedef;
+	    int rows;
+	    char enumstr[80];
+
+	    sts = json_match(chanp->ChanClass, ((pwr_sClass_ChanEi *)chanp->cop)->Identity, 0, 
+			     (char*)msg->payload, enumstr, sizeof(enumstr), json_mOpt_remove_quotes);
+
+	    sts = gdh_GetEnumValueDef(tid, &valuedef, &rows);
+	    if (EVEN(sts))
+	      break;
+
+	    for (int i = 0; i < rows; i++) {
+	      if (strcmp(valuedef[i].Value->Text, enumstr) == 0) {
+		*(pwr_tInt32 *)chanp->vbp = valuedef[i].Value->Value;
+		break;
+	      }
+	    }
+	    free((char*)valuedef);
 	    break;
 	  }
 	  case pwr_cClass_ChanAi: {
@@ -408,14 +511,14 @@ static void message_cb(struct mosquitto *mosq, void *obj,
 
 	    if (((pwr_sClass_ChanAi *)chanp->cop)->Representation == pwr_eDataRepEnum_Float32) {
 	      sts = json_match(chanp->ChanClass, ((pwr_sClass_ChanAi *)chanp->cop)->Identity, 
-		  ((pwr_sClass_ChanAi *)chanp->cop)->Representation, (char*)msg->payload, &fvalue);
+		  ((pwr_sClass_ChanAi *)chanp->cop)->Representation, (char*)msg->payload, &fvalue, 0, 0);
 	      if (ODD(sts)) {
 		fvalue = ((pwr_sClass_ChanAi *)chanp->cop)->SensorPolyCoef0 + 
                     ((pwr_sClass_ChanAi *)chanp->cop)->SensorPolyCoef1 * fvalue;
 		*(pwr_tFloat32 *)chanp->vbp = fvalue;
 	      }
 	    } else {
-	      sts = json_match(chanp->ChanClass, ((pwr_sClass_ChanAi *)chanp->cop)->Identity, ((pwr_sClass_ChanAi *)chanp->cop)->Representation, (char*)msg->payload, &ivalue);
+	      sts = json_match(chanp->ChanClass, ((pwr_sClass_ChanAi *)chanp->cop)->Identity, ((pwr_sClass_ChanAi *)chanp->cop)->Representation, (char*)msg->payload, &ivalue, 0, 0);
 
 	      if (ODD(sts)) {
 		((pwr_sClass_Ai *)chanp->sop)->RawValue = ivalue;
@@ -666,6 +769,20 @@ static pwr_tStatus IoRackWrite(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
 	  pwr_tInt32 value;
 	  char msg[200];
 
+	  if (strcmp(((pwr_sClass_ChanIo *)chanp->cop)->Identity, "\"color_xy\":") == 0) {
+	    float x, y;
+
+	    value = *(pwr_tInt32 *)chanp->vbp;
+	    rgb_to_xy(value, &x, &y);
+	    //sprintf(msg, "{\"color\":{\"x\":%5.3f,\"y\":%5.3f}}", x, y);
+	    sprintf(msg, "{\"color\":{\"hex\":\"#%06X\"}}", value);
+	    chanp->udata = *(pwr_tInt32 *)chanp->vbp;
+	    rc = mosquitto_publish(local->mosq, NULL, cop->PublishTopic, strlen(msg), 
+		msg, 1, 0);
+	    cop->PublishCount++;
+	    break;
+	  }
+
 	  switch(((pwr_sClass_ChanIo *)chanp->cop)->RawValueType) {
 	  case pwr_eRawValueTypeEnum_DeltaValue:
 	    value = *(pwr_tInt32 *)chanp->vbp - chanp->udata;
@@ -680,6 +797,45 @@ static pwr_tStatus IoRackWrite(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
 	  rc = mosquitto_publish(local->mosq, NULL, cop->PublishTopic, strlen(msg), 
 				 msg, 1, 0);
 	  cop->PublishCount++;
+	}
+	break;
+      case pwr_cClass_ChanEo:
+	if (*(pwr_tInt32 *)chanp->vbp != chanp->udata) {
+	  /* Publish set */
+	  pwr_tTid tid = ((pwr_sClass_Eo *)chanp->sop)->CastActualValue;
+	  pwr_tInt32 value;
+	  char msg[200];
+	  gdh_sValueDef* valuedef;
+	  int rows;
+	  bool converted;
+	  char enumstr[80];
+
+	  value = *(pwr_tInt32 *)chanp->vbp;
+	  chanp->udata = *(pwr_tInt32 *)chanp->vbp;
+
+	  sts = gdh_GetEnumValueDef(tid, &valuedef, &rows);
+	  if (EVEN(sts))
+	    break;
+
+	  for (int i = 0; i < rows; i++) {
+	    if (valuedef[i].Value->Value == value) {
+	      strcpy(enumstr, valuedef[i].Value->Text);
+	      converted = true;
+	      break;
+	    }
+	  }
+	  free((char*)valuedef);
+
+	  if (!converted)
+	    break;
+
+	  sts = json_smsg(((pwr_sClass_ChanEo *)chanp->cop)->Identity, 
+			  enumstr, msg);
+
+	  rc = mosquitto_publish(local->mosq, NULL, cop->PublishTopic, strlen(msg), 
+				 msg, 1, 0);
+	  cop->PublishCount++;
+	  *(pwr_tInt32 *)chanp->vbp = 0;
 	}
 	break;
       case pwr_cClass_ChanAo: {

@@ -36,4 +36,6 @@ PiFace_Digital
 Gertboard
 MQTT_Client
 MQTT_Device
+Zigbee2MQTT_Client
+Zigbee2MQTT_Device
 #endif

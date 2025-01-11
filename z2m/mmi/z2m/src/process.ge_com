@@ -1,0 +1,25 @@
+#
+#  Script to process all graphs
+#
+#
+#
+
+main()
+  string files = "$pwre_sroot/mmi/z2m/src/pwr_c_*.ge_com";
+  string file;
+  int sts;
+  int cnt;
+
+  sts = file_search(files, file, 1);
+  while (sts & 1)
+    cnt++;
+#    printf("Processing %d %s\n", cnt, file);
+    @'file'
+    save
+    new
+    sts = file_search(files, file, 0);
+  endwhile
+  file_search(files, file, 2);
+  printf("\n");
+  terminate();
+endmain

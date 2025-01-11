@@ -957,6 +957,8 @@ sub create_all_modules()
   create_module();
   _module("telemecanique");
   create_module();
+  _module("z2m");
+  create_module();
 }
 
 #

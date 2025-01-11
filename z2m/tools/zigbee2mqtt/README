@@ -1,0 +1,38 @@
+The z2m  module is generated from the device data in zigbee2mqtt.
+
+To update with new devices or modifications
+
+- copy the sources for zigbee2mqtt.io and build.
+
+- copy pwr_index.ts, pwr_generate_devices.ts, pwr_device_page_exposes.ts
+  and pwr_device_page_options.ts to zigbee2mqtt.io/docgen.
+
+- cd zigbee2mqtt.io/docgen and compile and generate the device data file with
+
+  > tsc pwr_index.ts
+  > tsc && node pwr_index.js > z2m_devices.dat
+
+- copy z2m_devices.dat to $pwre_croot/z2m/exp/z2m/src
+
+- build tools_z2m_gen that generates the ProviewR objects from the device data file, and
+  tools_z2m_palgen that generates the navigator and plc editor palettes.
+
+  > pwre module z2m
+  > pwre build tools/exe tools_z2m_gen src
+  > pwre build tools/exe tools_z2m_palgen src
+
+- Generate objects 
+
+  If the module has been generated previously, first execute
+  > pwre build exp z2m src clean.
+
+  > pwre build exp z2m src gen
+
+  this will generate
+  - wb_load files on wbl/z2m*/src
+  - c and h files on lib/z2m/src
+  - ge graphs on mmi/z2m/src
+
+- Build the module
+
+  > pwre build_all
