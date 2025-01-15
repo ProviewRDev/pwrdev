@@ -937,6 +937,103 @@ function Dyn( graph) {
   this.ignoreBgColor = false;
   this.resetBgColor = false;
 
+  this.rgb_to_hue = function(rgb) {
+    var max, min, delta;
+    var r, g, b;
+    var v, s, h;
+
+    r = (((rgb >> 16) & 0xff)) / 255;
+    g = (((rgb >> 8) & 0xff)) / 255;
+    b = ((rgb & 0xff)) / 255;
+
+    min = r < g ? r : g;
+    min = min < b ? min : b;
+    max = r > g ? r : g;
+    max = max > b ? max : b;
+
+    v = max;
+    delta = max - min;
+    if (delta < 0.00001)
+      return 0;
+
+    if (max > 0)
+      s = delta / max;
+    else
+      return 0;
+
+    if (r >= max)
+      h = (g - b) / delta;
+    else if (g >= max)
+      h = 2.0 + (b - r) / delta;
+    else
+      h = 4.0 + (r - g) / delta;
+
+    h *= 16.667;
+    if (h < 0)
+      h += 100;
+      
+    return h;
+  }
+
+  // Convert hue (0-100) to rgb
+  this.hue_to_rgb = function(hue) {
+    var ff, hh, p, q, t, r, g, b;
+    var v = 1.0;
+    var s = 1.0;
+    var i;
+
+    if (hue > 100)
+      hue = 100;
+    else if (hue < 0)
+      hue = 0;
+
+    hh = hue / 100.0 * 6.0;
+    i = Math.floor(hh);
+    ff = hh - i;
+    p = v * (1.0 - s);
+    q = v * (1.0 - (s * ff));
+    t = v * (1.0 - (s * (1.0 - ff)));
+
+    switch(i) {
+    case 0:
+      r = v;
+      g = t;
+      b = p;
+      break;
+    case 1:
+      r = q;
+      g = v;
+      b = p;
+      break;
+    case 2:
+      r = p;
+      g = v;
+      b = t;
+      break;
+    case 3:
+      r = p;
+      g = q;
+      b = v;
+      break;
+    case 4:
+      r = t;
+      g = p;
+      b = v;
+      break;
+    case 5:
+      r = v;
+      g = p;
+      b = q;
+      break;
+    default:
+      r = v;
+      g = p;
+      b = q;
+    }
+    return (Math.floor(r * 255) << 16) + (Math.floor(g * 255) << 8) + Math.floor(b * 255);
+  }
+
+
   this.getColor1 = function( object, color) {
     if ( color == Glow.eDrawType_Inherit) {
       return object.getClassTraceColor1();
@@ -3415,7 +3512,7 @@ function DynInvisible( dyn, instance) {
 	this.command = this.attribute.substring(5, idx);
       else
 	this.command = this.attribute.substring(5);
-      this.command = this.dyn.graph.getCommand(command);
+      this.command = this.dyn.graph.getCommand(this.command);
     }
     else {
       this.a = new DynReference( this.dyn, this.attribute);
@@ -4345,6 +4442,32 @@ function DynValue( dyn) {
       this.oldValueI = value0;
       break;
     }
+    case Pwr.eType_Enum: {
+      var value0 = this.a.get_ref_value(this.dyn);
+      if ( typeof value0 == 'undefined')
+	return;
+
+      if ( value0 != this.oldValueI || this.firstScan) {
+	if ( this.a.database == GraphIfc.eDatabase_Gdh) {
+	  if (this.format === "%s") {
+	    var pname = this.dyn.parseAttrName( this.attribute);
+	    if ( pname === null)
+	      return 1;
+	    var data = new Array(2);
+	    data[0] = this;
+	    data[1] = object;
+	    this.dyn.graph.getGdh().getObjectEnumText( pname.name, value0, this.scan2, data);
+	  }
+	  else if ( this.cFormat !== null) {
+	    var sb = this.cFormat.format( value0);
+	    object.setAnnotation( annot_num, sb);
+	    this.dyn.repaintNow = true;
+	  }
+	}
+      }
+      this.oldValueI = value0;
+      break;
+    }
     }
     if ( this.firstScan)
       this.firstScan = false;
@@ -4360,7 +4483,10 @@ function DynValue( dyn) {
       self.dyn.repaintNow = true;
     }
     else {
-      object.setAnnotation( annot_num, "Unknown message");
+      if ( self.a.typeid === Pwr.eType_Enum)
+	object.setAnnotation( annot_num, "");
+      else
+	object.setAnnotation( annot_num, "Unknown message");
       this.dyn.repaintNow = true;
     }
   }
@@ -15308,6 +15434,7 @@ function DynSlider( dyn) {
 	value = 0;
       break;
     case Pwr.eType_Int32:
+    case GraphIfc.eType_Color:
       ivalue = this.a.get_ref_value(this.dyn);
       if ( typeof ivalue == 'undefined')
 	ivalue = 0;
@@ -15350,6 +15477,7 @@ function DynSlider( dyn) {
 	  return;
 	break;
 	case Pwr.eType_Int32:
+	case GraphIfc.eType_Color:
 	case Pwr.eType_Boolean:
 	if ( ivalue == this.old_ivalue)
 	  return;
@@ -15365,6 +15493,7 @@ function DynSlider( dyn) {
       this.old_value = value;
       break;
     case Pwr.eType_Int32:
+    case GraphIfc.eType_Color:
     case Pwr.eType_Boolean:
       this.old_ivalue = ivalue;
       break;
@@ -15384,6 +15513,9 @@ function DynSlider( dyn) {
 
 	switch ( this.a.typeid) {
 	case Pwr.eType_Float32:
+	  break;
+	case GraphIfc.eType_Color:
+	  value = this.dyn.rgb_to_hue(ivalue);
 	  break;
 	default:
 	  value = ivalue;
@@ -15539,6 +15671,18 @@ function DynSlider( dyn) {
 	    break;
 	  case GraphIfc.eDatabase_Local:
 	    sts = this.dyn.graph.getLdb().setObjectInfo( this.dyn.graph, pname.name, bvalue);
+	    break;
+	  }
+	  break;
+	}
+	case GraphIfc.eType_Color: {
+	  var ivalue = this.dyn.hue_to_rgb(value);
+	  switch (pname.database) {
+	  case GraphIfc.eDatabase_Gdh:
+	    sts = this.dyn.graph.getGdh().setObjectInfoInt( pname.name, ivalue);
+	    break;
+	  case GraphIfc.eDatabase_Local:
+	    sts = this.dyn.graph.getLdb().setObjectInfo( this.dyn.graph, pname.name, ivalue);
 	    break;
 	  }
 	  break;
@@ -16254,9 +16398,9 @@ function DynOptionMenu( dyn) {
   this.dyn = dyn;
   this.dyn_type1 = 0;
   this.dyn_type2 = 0;
-  this.action_type1 = DynC.mActionType1_OptionsMenu;
+  this.action_type1 = DynC.mActionType1_OptionMenu;
   this.action_type2 = 0;
-  this.prio = DynC.eDynPrio_OptionsMenu;
+  this.prio = DynC.eDynPrio_OptionMenu;
   this.instance_mask = 0;
   this.instance = DynC.mInstance_1;
 
@@ -18619,7 +18763,9 @@ var GraphIfc = {
   eDatabase_Local 	: 2,
   eDatabase_Ccm 	: 3,
 
-  eType_Bit 		: (1 << 15) + 1
+  eType_Bit 		: (1 << 15) + 1,
+  eType_NodeId 		: (1 << 15) + 2,
+  eType_Color		: (1 << 15) + 3
 };
 
 var current_graph = null;
@@ -19108,6 +19254,8 @@ function Graph( appl) {
       return Pwr.eType_Mask;
     if ( str.toLowerCase() ==  "bit")
       return GraphIfc.eType_Bit;
+    if ( str.toLowerCase() ==  "color")
+      return GraphIfc.eType_Color;
     if ( str.length >= 6 && str.substring(0,6).toLowerCase() == "string")
       return Pwr.eType_String;
     return 0;

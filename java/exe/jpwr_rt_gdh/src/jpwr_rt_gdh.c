@@ -59,7 +59,9 @@
 
 // Defined in ge_graph.h...
 typedef enum {
-  graph_eType_Bit = (1 << 15) + 1 //!< Type for a bit in a bitmask
+  graph_eType_Bit = (1 << 15) + 1, //!< Type for a bit in a bitmask
+  graph_eType_NodeId = (1 << 15) + 2, //!< Type for node id
+  graph_eType_Color = (1 << 15) + 3 //!< Type for rgb color.
 } graph_eType;
 
 typedef struct {
@@ -1763,7 +1765,12 @@ static void  gdh_TranslateSuffixToClassData (
     {"ATTRREF" ,pwr_eType_AttrRef, sizeof(pwr_sAttrRef)},
     {"STATUS" ,pwr_eType_Status, sizeof(pwr_tStatus)},
     {"NETSTATUS" ,pwr_eType_NetStatus, sizeof(pwr_tNetStatus)},
-    {"BIT" ,(pwr_eType)graph_eType_Bit, sizeof(pwr_tBit)}
+    {"ENUM"   ,pwr_eType_Enum, sizeof(pwr_tEnum)},
+    {"MASK"   ,pwr_eType_Mask, sizeof(pwr_tMask)},
+    {"VOLUMEID" ,pwr_eType_VolumeId, sizeof(pwr_tVolumeId)},
+    {"NODEID" ,(pwr_eType)graph_eType_NodeId, sizeof(pwr_tNodeId)},
+    {"BIT" ,(pwr_eType)graph_eType_Bit, sizeof(pwr_tBit)},
+    {"COLOR" ,(pwr_eType)graph_eType_Color, sizeof(pwr_tInt32)}
   };
 
   static const int    XlationTblLen = sizeof(XlationTbl)/sizeof(XlationTbl[0]);
@@ -3477,6 +3484,72 @@ JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getSevItemInfo
 				      (jint)sts);
   
   return gdhrSevItemInfo;
+}
+
+JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getObjectEnumText
+  (JNIEnv *env, jclass obj, jstring name, jint value)
+{
+  int sts;
+  const char *str;
+  char *cstr;
+  pwr_tInt32 val;
+  jstring	jbuf = NULL;
+  char          buf[200];
+  jclass cdhrString_id;
+  static jmethodID cdhrString_cid = NULL;
+  jobject 	return_obj;
+  jint		jsts;
+  char 		*s, *s1;
+  gdh_sValueDef* valuedef;
+  int rows;
+  int converted = 0;
+  pwr_tAttrRef aref;
+  pwr_tTid tid;
+
+  cdhrString_id = (*env)->FindClass( env, "jpwr/rt/CdhrString");
+  if(cdhrString_cid == NULL)
+  {
+    cdhrString_cid = (*env)->GetMethodID( env, cdhrString_id,
+    	  "<init>", "(Ljava/lang/String;I)V");
+    //printf("cdhrString_cid initierad\n");
+  }
+
+  val = value;
+  str = (*env)->GetStringUTFChars( env, name, 0);
+  cstr = (char *)str;
+  gdh_ConvertUTFstring( cstr, cstr);
+  if ( (s = (char *)strchr( cstr, '#'))) {
+    *s = 0;
+    if ( (s1 = strchr( s+1, '[')))
+      strcat( cstr, s1);
+  }
+
+  sts = gdh_NameToAttrref(pwr_cNObjid, cstr, &aref);
+  if (ODD(sts))
+    sts = gdh_GetAttrRefTid(&aref, &tid);
+  if (ODD(sts))
+    sts = gdh_GetEnumValueDef(tid, &valuedef, &rows);
+  if (ODD(sts)) {
+    for (int i = 0; i < rows; i++) {
+      if (valuedef[i].Value->Value == val) {
+	strncpy(buf, valuedef[i].Value->Text, sizeof(buf));
+	converted = 1;
+	break;
+      }
+    }
+    free((char*)valuedef);
+    if (!converted)
+      sts = 0;
+  }
+
+
+  (*env)->ReleaseStringUTFChars( env, name, cstr);
+
+  jbuf = (*env)->NewStringUTF( env, buf);
+  jsts = (jint) sts;
+  return_obj = (*env)->NewObject( env, cdhrString_id,
+  	cdhrString_cid, jbuf, jsts);
+  return return_obj;
 }
 
 static int gdh_JidToPointer( int id, void **p)

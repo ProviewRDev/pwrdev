@@ -431,6 +431,14 @@ JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getSevItemInfo
 JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getSevItemData
 (JNIEnv *, jobject, jstring, jobject, jstring, jfloat, jint);
 
+/*
+ * Class:     jpwr_rt_Gdh
+ * Method:    getObjectEnumText
+ * Signature: (Ljava/lang/String;I)Ljpwr/rt/CdhrString;
+ */
+JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getObjectEnumText
+  (JNIEnv *, jobject, jstring, jint);
+
 #ifdef __cplusplus
 }
 #endif

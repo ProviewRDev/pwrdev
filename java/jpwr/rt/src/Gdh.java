@@ -715,6 +715,10 @@ public class Gdh {
     public native GdhrSevItemData getSevItemData(String jserver, PwrtObjid oid, 
 						 String jattribute, float timerange, 
 						 int max_size);
+    /**
+       Get enum text.
+    */
+    public native CdhrString getObjectEnumText( String attributeName, int value);
 }
 
 

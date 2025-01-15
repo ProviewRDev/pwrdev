@@ -61,6 +61,8 @@ public class GdhWebSocketServer
 {
   public final static int SOCKETSERVER_VERSION = 101;
   public final static int graph_eType_Bit = (1 << 15) + 1;
+  public final static int graph_eType_NodeId = (1 << 15) + 2;
+  public final static int graph_eType_Color = (1 << 15) + 3;
   public final static int SET_OBJECT_INFO_BOOLEAN = 1;
   public final static int SET_OBJECT_INFO_FLOAT = 2;
   public final static int SET_OBJECT_INFO_INT = 3;
@@ -135,6 +137,7 @@ public class GdhWebSocketServer
   public final static int GET_SEVHIST_INFO = 72;
   public final static int GET_SEVHIST_DATA = 73;
   public final static int GET_SOCKETSERVER_VERSION = 74;
+  public final static int GET_OBJECT_ENUM_TEXT = 75;
 
   public final static int GET_OP_SELF = 1;
   public final static int GET_OP_METHOD_PLC = 2;
@@ -1050,6 +1053,66 @@ public class GdhWebSocketServer
 		  }
 
 		  break;
+	      case GET_OBJECT_ENUM_TEXT:
+		  try {
+		      int i = 6;
+		      int ivalue = ((value[i] & 0xFF) << 0) + ((value[i+1] & 0xFF) << 8) + ((value[i+2] & 0xFF) << 16) + ((value[i+3] & 0xFF) << 24);
+		      i += 4;
+		      int nameSize = ((value[i] & 0xFF) << 0) + ((value[i+1] & 0xFF) << 8);
+		      i += 2;
+		      String attrName = new String( value, i, nameSize); 
+ 		      int j;
+		      int refsize;
+
+		      CdhrString ret = gdh.getObjectEnumText( attrName, ivalue);
+		      int sts = ret.getSts();
+		      if ( ret.oddSts())
+			  refsize = 2 + ret.str.length();
+		      else
+			  refsize = 0;
+
+		      byte[] msg;
+		      if ( refsize + 13 < 125) {
+			  msg = new byte[15 + refsize + 1]; // One extra byte needed for ByteBuffer ??
+			  msg[0] = (byte)130;
+			  msg[1] = (byte)(13 + refsize + 1);
+			  j = 2;
+		      }
+		      else {
+			  msg = new byte[17 + refsize + 1];
+			  msg[0] = (byte)130;
+			  msg[1] = (byte)126;
+			  msg[2] = (byte)(((13 + refsize + 1) >> 8) & 0xFF);
+			  msg[3] = (byte)((13 + refsize + 1) & 0xFF);
+			  j = 4;
+		      }	
+		      msg[j++] = GET_OBJECT_ENUM_TEXT;
+		      msg[j++] = (byte)(id >> 24);
+		      msg[j++] = (byte)((id >> 16) & 0xFF);
+		      msg[j++] = (byte)((id >> 8) & 0xFF);
+		      msg[j++] = (byte)(id & 0xFF);
+		      msg[j++] = (byte)(sts >> 24);
+		      msg[j++] = (byte)((sts >> 16) & 0xFF);
+		      msg[j++] = (byte)((sts >> 8) & 0xFF);
+		      msg[j++] = (byte)(sts & 0xFF);
+		  
+		      if ( ret.oddSts()) {
+			  ByteBuffer bb = ByteBuffer.wrap( msg);
+		  
+			  bb.putShort( j, (short)ret.str.length());
+			  j += 2;
+			  for ( int k = 0; k < ret.str.length(); k++) {
+			      bb.put( j++, (byte)ret.str.charAt(k));
+			  }
+		      }
+		      out.write( msg);
+		      out.flush();
+		  }
+		  catch(IOException e) {
+		      System.out.println("getObjectEnumText: IO exception");
+		  }
+		  break;
+	      	  
 	      case REF_OBJECT_INFO:
 		  try {
 		      int sts;
@@ -1244,6 +1307,7 @@ public class GdhWebSocketServer
 		      case Pwr.eType_Mask:
 		      case Pwr.eType_Enum:
 		      case graph_eType_Bit:
+		      case graph_eType_Color:
 			  if ( asub.elements <= 1)
 			      refsize += 8 + 4;
 			  else
@@ -1385,6 +1449,7 @@ public class GdhWebSocketServer
 		      case Pwr.eType_Mask:
 		      case Pwr.eType_Enum:
 		      case graph_eType_Bit:
+		      case graph_eType_Color:
 			  bb.putInt( j, asub.subscriptionsIndex);
 			  j += 4;
 			  if ( asub.elements <= 1) {
