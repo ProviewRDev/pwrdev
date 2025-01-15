@@ -10682,7 +10682,7 @@ int file_search( string pattern, string found_file, int pass)
 <b>Description
 
 Search for files.
-A pattern with wildcard can be specifed to search for several files.
+A pattern with wildcard can be specified to search for several files.
 The search sequence is divided in the passes init, next and end.
 At the first call pass init (1) is specified. At search of more 
 files with the same patter the pass next (1) is specified. The
@@ -11183,7 +11183,7 @@ int terminate()
 
 <b>Descriptions
 
-Terminate processen.
+Terminate the process.
 
 </TOPIC>
 
