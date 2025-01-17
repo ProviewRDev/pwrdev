@@ -604,6 +604,12 @@ sub ebuild # args: pass flavour
       _build("mmi", "*", "src", "copy");
       merge();
     }
+    if ($to_build{"z2m"}) {
+      _module("z2m");
+      _build("tools/exe", "*", "src", "all");
+      _build("exp", "z2m", "src", "all");
+      merge();
+    }
     method_build("rt_io_comm", $flavour);
     method_build("rt_xtt", $flavour);
   }
@@ -1157,6 +1163,34 @@ sub build_module()
       }
       _build("exe", "*", "src", "all");
       _build("exe", "*", $flavour, "all");
+    }
+  } elsif ($module eq "z2m") {
+    if ($copy == 1) {
+      _build("tools/exe", "*", "src", "all");
+      _build("wbl", "*", "src", "init");
+      _build("wbl", "*", "src", "copy");
+      _build("lib", "*", "src", "init");
+      _build("lib", "*", "src", "copy");
+      _build("lib", "*", $flavour, "copy");
+      _build("exp", "*", "src", "init");
+      _build("exp", "*", "src", "copy");
+      _build("mmi", "*", "src", "copy");
+      _build("mmi", "*", $flavour, "copy");
+      _build("exe", "*", "src", "copy");
+    }
+    if ($lib == 1) {
+      _build("lib", "*", "src", "lib");
+      _build("lib", "*", $flavour, "lib");
+      _build("exp", "*", "src", "lib");
+    }
+    if ($exe == 1) {
+      _build("doc", "orm", "src", "copy");
+      _build("wbl", "*", "src", "lib");
+      _build("wbl", "*", "src", "exe");
+      _build("exe", "*", "src", "all");
+      _build("exe", "*", $flavour, "all");
+      _build("exp", "*", "src", "exe");
+      _build("doc", "dsh", "src", "copy");
     }
   } else {
     if ($copy == 1) {
