@@ -503,6 +503,12 @@ sub ebuild # args: pass flavour
       _module("misc");
       merge();
     }
+    if ($to_build{"z2m"}) {
+      _module("z2m");
+      _build("tools/exe", "*", "src", "all");
+      _build("exp", "z2m", "src", "all");
+      merge();
+    }
   } elsif ($pass eq "op" ) {
     _module("xtt");
     _build("lib", "*", "src", "init copy");
@@ -707,6 +713,9 @@ sub build_all_modules()
   build_module($flavour);
   merge();
   _module("telemecanique");
+  build_module($flavour);
+  merge();
+  _module("z2m");
   build_module($flavour);
   merge();
 
