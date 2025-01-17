@@ -57,6 +57,7 @@ static pwr_tStatus IoCardInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp,
 
   op = (pwr_sClass_Pb_Io*)cp->op;
   local = (io_sCardLocal*)cp->Local;
+  (void)local; // Do nothing
 
   if (rp->Class != pwr_cClass_Pb_DP_Slave)
   {
@@ -85,8 +86,7 @@ static pwr_tStatus IoCardWrite(io_tCtx ctx, io_sAgent* ap, io_sRack* rp,
   pwr_tInt8 data8 = 0;
   pwr_tInt16 data16 = 0;
   pwr_tInt32 data32 = 0;
-  pwr_sClass_ChanIo* cop;
-  pwr_sClass_Io* sop;
+  pwr_sClass_ChanIo* cop;  
   io_sChannel* chanp;
 
   local = (io_sCardLocal*)cp->Local;
@@ -101,8 +101,7 @@ static pwr_tStatus IoCardWrite(io_tCtx ctx, io_sAgent* ap, io_sRack* rp,
       if (!chanp->cop || !chanp->sop)
         continue;
 
-      cop = (pwr_sClass_ChanIo*)chanp->cop;
-      sop = (pwr_sClass_Io*)chanp->sop;
+      cop = (pwr_sClass_ChanIo*)chanp->cop;      
 
       if (cop->TestOn != 0)
         continue;

@@ -410,8 +410,7 @@ pb_gsd::~pb_gsd()
 
 int pb_gsd::read(char* filename)
 {
-  pwr_tFileName fname;
-  int state;
+  pwr_tFileName fname;  
   char line[2000];
   gsd_sKeyword* keyp;
   gsd_sData* datap;
@@ -433,8 +432,6 @@ int pb_gsd::read(char* filename)
   fp = fopen(fname, "r");
   if (!fp)
     return PB__GSDFILE;
-
-  state = 0;
 
   line_cnt = 0;
   while (1)

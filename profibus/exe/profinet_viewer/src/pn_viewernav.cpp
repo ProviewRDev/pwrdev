@@ -316,8 +316,7 @@ int PnViewerNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
   {
     brow_tNode* node_list;
     int node_count;
-    int sts;
-
+    
     brow_GetSelectedNodes(viewernav->brow->ctx, &node_list, &node_count);
     if (!node_count)
       break;
@@ -326,7 +325,7 @@ int PnViewerNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
     switch (item->type)
     {
     case viewitem_eItemType_Device:
-      sts = item->open_children(viewernav);
+      item->open_children(viewernav);
       break;
     case viewitem_eItemType_DeviceAttr:
       (viewernav->change_value_cb)(viewernav->parent_ctx);

@@ -48,6 +48,7 @@ static pwr_tStatus IoCardInit(
 
   op = (pwr_sClass_PnModule*)cp->op;
   local = (io_sPnCardLocal*)cp->Local;
+  (void)local; // Do nothing
 
   op->Status = PB__NORMAL;
 

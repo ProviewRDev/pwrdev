@@ -180,6 +180,7 @@ static pwr_tStatus IoCardInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp,
 
   op = (pwr_sClass_Pb_Di*)cp->op;
   local = (io_sCardLocal*)cp->Local;
+  (void)local; // Do nothing with this
 
   // Check configuration
 

@@ -37,6 +37,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - $pwrp_doc is now created on rt systems.
 - pwr_stop.sh has been updated to remove the POSIX log message queue.
 - profibus: The PROFINET configurator was not prepared for multiple fixed Virtual Submodule Items, it is now.
+- profibus: PROFINET startup sequence now waits StartupTime seconds before checking IOCS status from devices
+- Updated the documentation for the PID controller.
 
 ### Removed
 

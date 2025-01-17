@@ -523,6 +523,9 @@ SObject         pwrb:Class
       !  31  -- PID  Proportional Integral Derivative
       !              Controller. Both the P- and D-term are
       !              based on the control error.
+      !
+      !  If WindupMask is selected to I or BI, then PidAlg I+P 
+      !  and I+PD will be treated as PI and PI+D, respectively.
       !*/
       Object PidAlg $Intern 12 
         Body SysBody

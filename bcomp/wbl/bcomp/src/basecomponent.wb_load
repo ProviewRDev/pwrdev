@@ -52401,6 +52401,9 @@ and no Auto/Man button."
         !  31  -- PID  Proportional Integral Derivative
         !              Controller. Both the P- and D-term are
         !              based on the control error.
+        !
+        !  If WindupMask is selected to I or BI, then PidAlg I+P 
+        !  and I+PD will be treated as PI and PI+D, respectively.
         !*/
         Object PidAlg $Attribute 12 18-MAY-2006 15:12:04.04
           Body SysBody 27-MAR-2014 07:30:20.83

@@ -88,10 +88,8 @@ void GsdmlAttr::activate_ordermoduletype(attr_eOrderModuleType type) { attrnav->
 
 void GsdmlAttr::activate_help()
 {
-  int sts;
-
   if (help_cb)
-    sts = (help_cb)(parent_ctx, "pn_device_editor /helpfile=\"$pwr_exe/profibus_xtthelp.dat\"");
+    (help_cb)(parent_ctx, "pn_device_editor /helpfile=\"$pwr_exe/profibus_xtthelp.dat\"");
 }
 
 void GsdmlAttr::activate_copy()
@@ -183,14 +181,13 @@ void GsdmlAttr::activate_expand_all() { attrnav->expand_all(); }
 void GsdmlAttr::activate_print()
 {
   char filename[80] = "pwrp_tmp:wnav.ps";
-  char cmd[200];
-  int sts;
+  char cmd[200];  
 
   dcli_translate_filename(filename, filename);
   attrnav->print(filename);
 
   sprintf(cmd, "wb_gre_print.sh %s", filename);
-  sts = system(cmd);
+  system(cmd);
 }
 
 void GsdmlAttr::activate_cmd_ok()

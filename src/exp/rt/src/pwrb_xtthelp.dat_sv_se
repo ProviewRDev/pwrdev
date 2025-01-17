@@ -10107,6 +10107,9 @@ Både P- och D-termen baseras på reglerfelet.
 integrerande och deriverande reglerverkan. Både P- och
 D-termen baseras på reglerfelet.
 
+Om WindupMask är vald till I eller BI, så kommer PidAlg I+P 
+respektive I+PD att behandlas som PI respektive PI+D.
+
 <b>Gain 
 Type: pwr_tFloat32
 Flags: Param, Access

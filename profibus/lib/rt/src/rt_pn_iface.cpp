@@ -193,9 +193,10 @@ void pack_set_identification_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes)
 
   pSSIR = (T_PN_SERVICE_SET_IDENTIFICATION_REQ*)(service_desc + 1);
 
-  sprintf((char*)pSSIR->TypeOfStation, "PN-IO-CON-OC-Implementation");
-  sprintf((char*)pSSIR->OrderId, "PN-IO-CON-OC       ");
-  sprintf((char*)pSSIR->SerialNumber, "0700123456789099");
+  sprintf((char*)pSSIR->TypeOfStation, "PN-IO-CON-OC-Implementation"); // Null termination required
+  memcpy((char*)pSSIR->OrderId, "PN-IO-CON-OC",
+         12); // Padded trailing zeros needed, already present due to memset
+  memcpy((char*)pSSIR->SerialNumber, "0700123456789099", 16); // Container exatly 16 in size, no \0
   pSSIR->HwRevisionHighByte = 0;
   pSSIR->HwRevisionLowByte = 1;
   pSSIR->SwRevisionHighWordHighByte = 0;
@@ -1175,7 +1176,7 @@ int unpack_get_alarm_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local
         dev = (pwr_sClass_PnDevice*)device_list->op;
         pwr_tObjid dev_objid = device_list->Objid;
 
-        int index = dev->AlarmBuffer.CurrentIndex;
+        pwr_tUInt32 index = dev->AlarmBuffer.CurrentIndex;
         if (++index >= dev->AlarmBuffer.BufferSize)
           index = 0;
         dev->AlarmBuffer.CurrentIndex = index;
@@ -1390,37 +1391,6 @@ int unpack_get_alarm_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local
   }
 
   return -1;
-}
-
-/* Returns the PnModule given from a device_reference and a slot_number */
-pwr_sClass_PnModule* get_pwr_pn_module(io_sAgent* ap, uint device_reference, uint slot_number)
-{
-  int i;
-
-  if (ap)
-  {
-    /* Find corresponding device */
-    io_sRack* slave_list;
-    for (slave_list = ap->racklist, i = 0; (slave_list != NULL) && i < device_reference - 1;
-         slave_list = slave_list->next, i++)
-    {
-    }
-
-    if (slave_list)
-    {
-      pwr_sClass_PnModule* module = NULL;
-
-      // Loop through the modules and return the corresponding module
-      io_sCard* module_list;
-      for (module_list = slave_list->cardlist; module_list != NULL; module_list = module_list->next)
-      {
-        module = (pwr_sClass_PnModule*)module_list->op;
-        if (module->Slot == slot_number)
-          return module;
-      }
-    }
-  }
-  return (pwr_sClass_PnModule*)0;
 }
 
 int unpack_get_device_state_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local, io_sAgent* ap)
@@ -1864,10 +1834,15 @@ int wait_service_con(io_sAgentLocal* local, io_sAgent* ap)
   return sts;
 }
 
-void handle_exception(io_sAgentLocal* local) { return; }
+void handle_exception(io_sAgentLocal* local)
+{
+  (void)local;
+  return;
+}
 
 void handle_state_changed(io_sAgentLocal* local)
 {
+  (void)local;
   printf("State changed!\n");
   return;
 }
@@ -2235,28 +2210,28 @@ void* handle_events(void* ptr)
     }
   }
 
-  /* Activate the devices */
+  // /* Activate the devices */
 
-  T_PNAK_EVENT_SET_DEVICE_STATE set_dev_state;
-  unsigned short index, bit_no;
+  // T_PNAK_EVENT_SET_DEVICE_STATE set_dev_state;
+  // unsigned short index, bit_no;
 
-  memset(&set_dev_state, 0, sizeof(set_dev_state));
+  // memset(&set_dev_state, 0, sizeof(set_dev_state));
 
-  for (int device = 0; device < local->device_list.size(); device++)
-  {
-    index = device / 8;
-    bit_no = device % 8;
-    set_dev_state.ActivateDeviceReference[index] |= (1 << bit_no);
-  }
+  // for (int device = 0; device < local->device_list.size(); device++)
+  // {
+  //   index = device / 8;
+  //   bit_no = device % 8;
+  //   set_dev_state.ActivateDeviceReference[index] |= (1 << bit_no);
+  // }
 
-  sts = pnak_set_device_state(0, &set_dev_state);
+  // sts = pnak_set_device_state(0, &set_dev_state);
 
-  if (sts != PNAK_OK)
-  {
-    op->Status = PB__INITFAIL;
-    errh_Error("PROFINET: Unable to activate devices, error code: %d", sts);
-    //    return IO__ERRINIDEVICE;
-  }
+  // if (sts != PNAK_OK)
+  // {
+  //   op->Status = PB__INITFAIL;
+  //   errh_Error("PROFINET: Unable to activate devices, error code: %d", sts);
+  //   //    return IO__ERRINIDEVICE;
+  // }
 
   /* Check state for all devices */
 
