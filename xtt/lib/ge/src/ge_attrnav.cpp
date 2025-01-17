@@ -957,6 +957,7 @@ static attrnav_sEnumElement elem_font[] = {
     {(unsigned int)glow_eFont_Times, "Times"},
     {(unsigned int)glow_eFont_NewCenturySchoolbook, "New Century Schoolbook"},
     {(unsigned int)glow_eFont_Courier, "Courier"},
+    {(unsigned int)glow_eFont_Roboto, "Roboto"},
     {0, ""}};
 
 static attrnav_sEnumElement elem_hot_indication[] = {

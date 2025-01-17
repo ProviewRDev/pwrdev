@@ -92,7 +92,8 @@ static sComboTableText gridsize_combo_table[] = {
 static sComboTableText font_combo_table[] = {{"Helvetica", glow_eFont_Helvetica},
                                              {"Times", glow_eFont_Times},
                                              {"New Century SB", glow_eFont_NewCenturySchoolbook},
-                                             {"Courier", glow_eFont_Courier}};
+                                             {"Courier", glow_eFont_Courier},
+                                             {"Roboto", glow_eFont_Roboto}};
 
 static sComboTableImage textsize_combo_table[] = {
     {"Textsize 8", "$pwr_exe/ge_textsize_8.png", 0},   {"Textsize 10", "$pwr_exe/ge_textsize_10.png", 1},

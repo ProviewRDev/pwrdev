@@ -436,6 +436,7 @@ extern "C"
     glow_eFont_Times,                //!< Font Times
     glow_eFont_NewCenturySchoolbook, //!< Font New Century Schoolbook
     glow_eFont_Courier,              //!< Font Courier
+    glow_eFont_Roboto,               //!< Font Roboto
     glow_eFont__,                    //!< Number of defined fonts
     glow_eFont_No = 9999             //!< No font defined
   } glow_eFont;
@@ -820,10 +821,10 @@ extern "C"
     glow_eDrawType_LineErase = 300,
     glow_eDrawType_LineDashed = 301,
     glow_eDrawType_LineDashedRed = 302,
-    glow_eDrawType_TextHelvetica = 303,
-    glow_eDrawType_TextHelveticaBold = 304,
-    glow_eDrawType_TextHelveticaErase = 305,
-    glow_eDrawType_TextHelveticaEraseBold = 306,
+    glow_eDrawType_TextRoboto = 303,
+    glow_eDrawType_TextRobotoBold = 304,
+    glow_eDrawType_TextRobotoErase = 305,
+    glow_eDrawType_TextRobotoEraseBold = 306,
     glow_eDrawType_Color__ = 307,
     glow_eDrawType_CustomColor1 = 310,
     glow_eDrawType_CustomColor2 = 314,
@@ -916,6 +917,10 @@ extern "C"
     glow_eDrawType_CustomColor89 = 662,
     glow_eDrawType_CustomColor90 = 666,
     glow_eDrawType_CustomColor__ = 670,
+    glow_eDrawType_TextHelvetica = 700,
+    glow_eDrawType_TextHelveticaBold = 701,
+    glow_eDrawType_TextHelveticaErase = 702,
+    glow_eDrawType_TextHelveticaEraseBold = 703,
     glow_eDrawType_Inherit = 9999,
     glow_eDrawType_No = 10000
   } glow_eDrawType;

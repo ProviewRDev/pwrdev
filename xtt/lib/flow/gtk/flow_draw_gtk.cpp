@@ -81,7 +81,7 @@ typedef struct
   unsigned char* data[DRAW_PIXMAP_SIZE];
 } draw_sPixmap;
 
-char FlowDrawGtk::font_name[40] = "Helvetica";
+//char FlowDrawGtk::font_name[40] = "Roboto";
 
 static GdkEvent last_event;
 
@@ -2243,19 +2243,63 @@ int FlowDrawGtk::get_text_extent(FlowCtx* ctx, const char* text, int len, flow_e
 
 cairo_font_face_t* FlowDrawGtk::get_font_face(flow_eDrawType gc_type)
 {
-  if (gc_type == flow_eDrawType_TextHelveticaBold || gc_type == flow_eDrawType_TextHelveticaEraseBold)
+  switch (gc_type)
   {
-    if (!font_face_bold)
-      font_face_bold = cairo_toy_font_face_create(font_name, CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
-    return font_face_bold;
+    case flow_eDrawType_TextHelveticaBold:
+    case flow_eDrawType_TextHelveticaEraseBold:
+    {
+      if (!font_face_bold)
+      {
+        font_face_bold = cairo_toy_font_face_create(FONT_NAME_HELVETICA, CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+      }
+      return font_face_bold;  
+    }
+
+    case flow_eDrawType_TextHelvetica:
+    case flow_eDrawType_TextHelveticaErase:
+    {
+      if (!font_face_normal)
+      {
+        font_face_normal = cairo_toy_font_face_create(FONT_NAME_HELVETICA, CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
+      }
+      return font_face_normal;
+    }
+
+    case flow_eDrawType_TextRobotoBold:
+    case flow_eDrawType_TextRobotoEraseBold:
+    {
+      if (!font_face_bold)
+      {
+        font_face_bold = cairo_toy_font_face_create(FONT_NAME_ROBOTO, CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+      }
+      return font_face_bold;  
+    }
+
+    case flow_eDrawType_TextRoboto:
+    case flow_eDrawType_TextRobotoErase:
+    default:
+    {
+      if (!font_face_normal)
+      {
+        font_face_normal = cairo_toy_font_face_create(FONT_NAME_ROBOTO, CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
+      }
+      return font_face_normal;
+    }    
   }
-  else
-  {
-    if (!font_face_normal)
-      font_face_normal =
-          cairo_toy_font_face_create(font_name, CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
-    return font_face_normal;
-  }
+  
+  // if (gc_type == flow_eDrawType_TextHelveticaBold || gc_type == flow_eDrawType_TextHelveticaEraseBold)
+  // {
+  //   if (!font_face_bold)
+  //     font_face_bold = cairo_toy_font_face_create(font_name, CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+  //   return font_face_bold;
+  // }
+  // else
+  // {
+  //   if (!font_face_normal)
+  //     font_face_normal =
+  //         cairo_toy_font_face_create(font_name, CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
+  //   return font_face_normal;
+  // }
 }
 
 void FlowDrawGtk::copy_area(FlowCtx* ctx, int x, int y)
@@ -2302,8 +2346,16 @@ int FlowDrawGtk::get_font_idx(int gc_type)
   case flow_eDrawType_TextHelveticaEraseBold:
     font_idx = draw_eFont_HelveticaBold;
     break;
+  case flow_eDrawType_TextRoboto:
+  case flow_eDrawType_TextRobotoErase:
+    font_idx = draw_eFont_Roboto;
+    break;
+  case flow_eDrawType_TextRobotoBold:
+  case flow_eDrawType_TextRobotoEraseBold:
+    font_idx = draw_eFont_RobotoBold;
+    break;
   default:
-    font_idx = draw_eFont_Helvetica;
+    font_idx = draw_eFont_Roboto;
   }
 
   return font_idx;

@@ -101,7 +101,7 @@ void GlowTipText::draw()
   ctx->gdraw->fill_rect(&ctx->mw, text_x, text_y, text_width, text_height, glow_eDrawType_Color4);
   ctx->gdraw->rect(&ctx->mw, text_x, text_y, text_width, text_height, glow_eDrawType_Line, 0, 0);
   ctx->gdraw->text(&ctx->mw, text_x + 2, text_y + text_height - text_descent - 2, tiptext, strlen(tiptext),
-                   glow_eDrawType_TextHelvetica, glow_eDrawType_Line, text_size, 0, 0, glow_eFont_Helvetica,
+                   glow_eDrawType_TextRoboto, glow_eDrawType_Line, text_size, 0, 0, glow_eFont_Roboto,
                    ctx->mw.zoom_factor_y / ctx->mw.base_zoom_factor * (8 + 2 * text_size), 0);
 }
 
