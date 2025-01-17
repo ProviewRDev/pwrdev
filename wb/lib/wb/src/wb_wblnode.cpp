@@ -1741,7 +1741,8 @@ void wb_wblnode::registerNode(wb_vrepwbl* vol)
           if (!stringToTime(second_child->getText(), &o->m_ohtime))
             m_vrep->error("Time syntax", getFileName(), line_number);
         } else if ((second_child->getType() == wbl_eToken_Object)
-            || (second_child->getType() == wbl_eToken_Body)) {
+            || (second_child->getType() == wbl_eToken_Body)
+            || (second_child->getType() == wbl_eToken_DocBlock)) {
           o->m_oid.oix = m_vrep->nextOix();
         } else {
           ; // Syntax exception -- oix
