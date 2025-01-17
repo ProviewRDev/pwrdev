@@ -506,6 +506,7 @@ sub ebuild # args: pass flavour
     if ($to_build{"z2m"}) {
       _module("z2m");
       _build("tools/exe", "*", "src", "all");
+      merge();
       _build("exp", "z2m", "src", "all");
       merge();
     }
@@ -607,6 +608,7 @@ sub ebuild # args: pass flavour
     if ($to_build{"z2m"}) {
       _module("z2m");
       _build("tools/exe", "*", "src", "all");
+      merge();
       _build("exp", "z2m", "src", "all");
       merge();
     }
@@ -1167,6 +1169,7 @@ sub build_module()
   } elsif ($module eq "z2m") {
     if ($copy == 1) {
       _build("tools/exe", "*", "src", "all");
+      merge();
       _build("wbl", "*", "src", "init");
       _build("wbl", "*", "src", "copy");
       _build("lib", "*", "src", "init");
