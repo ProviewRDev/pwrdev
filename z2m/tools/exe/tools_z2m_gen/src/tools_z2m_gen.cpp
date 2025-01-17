@@ -214,7 +214,7 @@ public:
 class z2m_device {
 public:
   z2m_device() : next_aix(1), has_scantime(0), has_state(0), has_brightness(0),
-      has_transition(0), group(z2m_eGroup_other), max_enum_size(0) {
+      has_transition(0), group(z2m_eGroup_other), max_enum_size(0), has_fo(0) {
     strcpy(vendor, "");
     strcpy(model, "");
     strcpy(classname, "");
@@ -226,8 +226,8 @@ public:
   z2m_device(const z2m_device& x) : next_aix(x.next_aix), has_scantime(x.has_scantime), 
       has_state(x.has_state), has_brightness(x.has_brightness), 
       has_transition(x.has_transition), group(x.group), 
-      max_enum_size(x.max_enum_size), signals(x.signals),
-      doc(x.doc) {
+      max_enum_size(x.max_enum_size), has_fo(x.has_fo), signals(x.signals),
+      doc(x.doc), docio(x.docio), docfo(x.docfo) {
     strcpy(vendor, x.vendor);
     strcpy(model, x.model);
     strcpy(classname, x.classname);
@@ -250,9 +250,12 @@ public:
   char description[200];
   char exposes[200];
   int max_enum_size;
+  int has_fo;
   FILE *fpog;
   std::vector<z2m_signal> signals;
   std::string doc;
+  std::string docio;
+  std::string docfo;
 };
 
 class z2m {
@@ -306,6 +309,7 @@ public:
   void print_enumtypes();
   void print_submodules();
   void print_doc(std::string& doc, int is_signal);
+  void trim_doc();
   void error_msg(int sts, int line_cnt, z2m_device *dp, z2m_signal *sp);
   int get_enumtypes();
   int check_enum(z2m_device *dp, z2m_signal *sp); 
@@ -828,11 +832,20 @@ void z2m::print_device(z2m_device *dp)
 
 void z2m::print_features(z2m_device *dp, z2m_signal *sp, int *next_aix)
 {
+  char iosubmodulelow[80];
   get_featuresname(sp);
   get_ioclassname(sp);
+  strcpy(iosubmodulelow, cdh_Low(sp->iosubmodule));
 
   fprintf(fpocix, "SubModule %s %s %d\n", pwr_name(dp->vendor), sp->submodule, next_cix);
 
+  fprintf(fpo, "    !/**\n");
+  fprintf(fpo, "    ! @Summary Class for composite option.\n");
+  fprintf(fpo, "    ! Class for composite option.\n");
+  fprintf(fpo, "    ! \n");
+  fprintf(fpo, "    ! @b See also\n");
+  fprintf(fpo, "    !   @classlink %s %s_%s.html\n", sp->iosubmodule, cdh_Low(volume), iosubmodulelow);
+  fprintf(fpo, "    !*/\n");
   fprintf(fpo, "    Object %s $ClassDef %d\n", sp->submodule, next_cix++);
   fprintf(fpo, "      Body SysBody\n");
   fprintf(fpo, "        Attr PopEditor = 1\n");
@@ -1478,6 +1491,68 @@ void z2m::get_device_group(z2m_device *dp)
     dp->group = z2m_eGroup_cover;
   else if (strstr(dp->exposes, "action") != 0)
     dp->group = z2m_eGroup_action;
+
+  // Check if any fo class should be written
+  dp->has_fo = 0;
+  for (unsigned int i = 0; i < dp->signals.size(); i++) {
+    if (dp->signals[i].features.size() > 0) {
+      for (unsigned int j = 0; j < dp->signals[i].features.size(); j++) {
+	if (strncmp(dp->signals[i].features[j].name, "state", 6) == 0 &&
+	    dp->signals[i].features[j].chantype == z2m_eChanType_Do) {
+	  dp->has_fo = 1;
+	  break;
+	}
+	else if (strcmp(dp->signals[i].features[j].name, "brightness") == 0 &&
+		 dp->signals[i].features[j].chantype == z2m_eChanType_Io) {
+	  dp->has_fo = 1;
+	  break;
+	}
+	else if (strcmp(dp->signals[i].features[j].name, "effect") == 0 &&
+		 dp->signals[i].features[j].chantype == z2m_eChanType_Eo) {
+	  dp->has_fo = 1;
+	  break;
+	}
+	if (strncmp(dp->signals[i].features[j].name, "state", 6) == 0 &&
+	    dp->signals[i].features[j].chantype == z2m_eChanType_Di) {
+	  dp->has_fo = 1;
+	  break;
+	}
+	else if (strcmp(dp->signals[i].features[j].name, "action") == 0 &&
+		 dp->signals[i].features[j].chantype == z2m_eChanType_Ei) {
+	  dp->has_fo = 1;
+	  break;
+	}
+      }
+      if (dp->has_fo)
+	break;
+    }
+    else if (strncmp(dp->signals[i].name, "state", 6) == 0 &&
+	dp->signals[i].chantype == z2m_eChanType_Do) {
+      dp->has_fo = 1;
+      break;
+    }
+    else if (strcmp(dp->signals[i].name, "brightness") == 0 &&
+	dp->signals[i].chantype == z2m_eChanType_Io) {
+      dp->has_fo = 1;
+      break;
+    }
+    else if (strcmp(dp->signals[i].name, "effect") == 0 &&
+	dp->signals[i].chantype == z2m_eChanType_Eo) {
+      dp->has_fo = 1;
+      break;
+    }
+    if (strncmp(dp->signals[i].name, "state", 6) == 0 &&
+	dp->signals[i].chantype == z2m_eChanType_Di) {
+      dp->has_fo = 1;
+      break;
+    }
+    else if (strcmp(dp->signals[i].name, "action") == 0 &&
+	dp->signals[i].chantype == z2m_eChanType_Ei) {
+      dp->has_fo = 1;
+      break;
+    }
+  }
+
 }
 
 void z2m::graph_signal(z2m_device *dp, z2m_signal *sp, z2m_eSigFilter filter)
@@ -2524,6 +2599,8 @@ void z2m::print_device_end(z2m_device *dp)
   dp->next_aix = 1;
   fprintf(fpocix, "DeviceIo %s %s %d\n", pwr_name(dp->vendor), dp->ioclassname, next_cix);
 
+  if (doc && !dp->docio.empty())
+    print_doc(dp->docio, 0);
   fprintf(fpo, "    Object %s $ClassDef %d\n", dp->ioclassname, next_cix++);
   fprintf(fpo, "      Body SysBody\n");
   fprintf(fpo, "        Attr PopEditor = 1\n");
@@ -2730,67 +2807,7 @@ void z2m::print_device_end(z2m_device *dp)
 
   // Fo class
 
-  // Check if any fo class should be written
-  int fo = 0;
-  for (unsigned int i = 0; i < dp->signals.size(); i++) {
-    if (dp->signals[i].features.size() > 0) {
-      for (unsigned int j = 0; j < dp->signals[i].features.size(); j++) {
-	if (strncmp(dp->signals[i].features[j].name, "state", 6) == 0 &&
-	    dp->signals[i].features[j].chantype == z2m_eChanType_Do) {
-	  fo = 1;
-	  break;
-	}
-	else if (strcmp(dp->signals[i].features[j].name, "brightness") == 0 &&
-		 dp->signals[i].features[j].chantype == z2m_eChanType_Io) {
-	  fo = 1;
-	  break;
-	}
-	else if (strcmp(dp->signals[i].features[j].name, "effect") == 0 &&
-		 dp->signals[i].features[j].chantype == z2m_eChanType_Eo) {
-	  fo = 1;
-	  break;
-	}
-	if (strncmp(dp->signals[i].features[j].name, "state", 6) == 0 &&
-	    dp->signals[i].features[j].chantype == z2m_eChanType_Di) {
-	  fo = 1;
-	  break;
-	}
-	else if (strcmp(dp->signals[i].features[j].name, "action") == 0 &&
-		 dp->signals[i].features[j].chantype == z2m_eChanType_Ei) {
-	  fo = 1;
-	  break;
-	}
-      }
-      if (fo)
-	break;
-    }
-    else if (strncmp(dp->signals[i].name, "state", 6) == 0 &&
-	dp->signals[i].chantype == z2m_eChanType_Do) {
-      fo = 1;
-      break;
-    }
-    else if (strcmp(dp->signals[i].name, "brightness") == 0 &&
-	dp->signals[i].chantype == z2m_eChanType_Io) {
-      fo = 1;
-      break;
-    }
-    else if (strcmp(dp->signals[i].name, "effect") == 0 &&
-	dp->signals[i].chantype == z2m_eChanType_Eo) {
-      fo = 1;
-      break;
-    }
-    if (strncmp(dp->signals[i].name, "state", 6) == 0 &&
-	dp->signals[i].chantype == z2m_eChanType_Di) {
-      fo = 1;
-      break;
-    }
-    else if (strcmp(dp->signals[i].name, "action") == 0 &&
-	dp->signals[i].chantype == z2m_eChanType_Ei) {
-      fo = 1;
-      break;
-    }
-  }
-  if (fo) {
+  if (dp->has_fo) {
 
     // Code
     fprintf(fpoc, "void %s_init(pwr_sClass_%s* o)\n", dp->foclassname, dp->foclassname);
@@ -2817,6 +2834,8 @@ void z2m::print_device_end(z2m_device *dp)
     dp->next_aix = 1;
     fprintf(fpocix, "DeviceFo %s %s %d\n", pwr_name(dp->vendor), dp->foclassname, next_cix);
 
+    if (doc && !dp->docfo.empty())
+      print_doc(dp->docfo, 0);
     fprintf(fpo, "    Object %s $ClassDef %d\n", dp->foclassname, next_cix++);
     fprintf(fpo, "      Body SysBody\n");
     fprintf(fpo, "        Attr PopEditor = 1\n");
@@ -3328,9 +3347,19 @@ void z2m::print_features_end(z2m_device *dp, z2m_signal *sp, int *next_aix)
   fprintf(fpo, "    EndObject\n");
 
   // Io class
+  char submodulelow[80];
+  strcpy(submodulelow, cdh_Low(sp->submodule));
+
   sp->next_aix = 1;
   fprintf(fpocix, "SubModuleIo %s %s %d\n", pwr_name(dp->vendor), sp->iosubmodule, next_cix);
 
+  fprintf(fpo, "    !/**\n");
+  fprintf(fpo, "    ! @Summary IO Class for submodule %s.\n", sp->submodule);
+  fprintf(fpo, "    ! IO Class for submodule %s.\n", sp->submodule);
+  fprintf(fpo, "    ! \n");
+  fprintf(fpo, "    ! @b See also\n");
+  fprintf(fpo, "    !   @classlink %s %s_%s.html\n", sp->submodule, cdh_Low(volume), submodulelow);
+  fprintf(fpo, "    !*/\n");
   fprintf(fpo, "    Object %s $ClassDef %d\n", sp->iosubmodule, next_cix++);
   fprintf(fpo, "      Body SysBody\n");
   fprintf(fpo, "        Attr PopEditor = 1\n");
@@ -3759,6 +3788,124 @@ int z2m::get_submodules()
   return 1;
 }
 
+void z2m::trim_doc()
+{
+  char classnamelow[80];
+  char ioclassnamelow[80];
+  char foclassnamelow[80];
+
+  for (unsigned int i = 0; i < devices.size(); i++) {
+    z2m_device *dp = &devices[i];
+
+    int pos = dp->doc.find("####");
+    while(pos != std::string::npos) {
+      dp->doc.replace(pos, 4, "@b");
+      pos = dp->doc.find("####", pos);
+    }
+
+    pos = dp->doc.find("###");
+    while(pos != std::string::npos) {
+      dp->doc.replace(pos, 3, "@h2");
+      pos = dp->doc.find("###", pos);
+    }
+
+    pos = dp->doc.find("##");
+    while(pos != std::string::npos) {
+      dp->doc.replace(pos, 2, "@h1");
+      pos = dp->doc.find("##", pos);
+    }
+
+
+    strcpy(classnamelow, cdh_Low(dp->classname));
+    strcpy(ioclassnamelow, cdh_Low(dp->ioclassname));
+    strcpy(foclassnamelow, cdh_Low(dp->foclassname));
+    dp->doc.resize(dp->doc.length() - 3);
+    dp->doc += '\n';
+    dp->doc += "@b See also\n";
+    dp->doc += " @classlink " + std::string(dp->ioclassname) + " " + cdh_Low(volume) + "_" + ioclassnamelow + ".html\n";
+    if (dp->has_fo)
+      dp->doc += " @classlink " + std::string(dp->foclassname) + " " + cdh_Low(volume) + "_" + foclassnamelow + ".html\n";
+    dp->doc += "*/\n";
+
+    for (unsigned int j = 0; j < dp->signals.size(); j++) {
+      z2m_signal *sp = &dp->signals[j];
+
+      if (!sp->doc.empty()) {
+	pos = sp->doc.find("####");
+	while(pos != std::string::npos) {
+	  sp->doc.replace(pos, 4, "@b");
+	  pos = sp->doc.find("####", pos);
+	}
+
+	pos = sp->doc.find("###");
+	while(pos != std::string::npos) {
+	  sp->doc.replace(pos, 3, "@h2");
+	  pos = sp->doc.find("###", pos);
+	}
+
+	pos = sp->doc.find("##");
+	while(pos != std::string::npos) {
+	  sp->doc.replace(pos, 2, "@h1");
+	  pos = sp->doc.find("##", pos);
+	}
+	
+      }
+
+      if (sp->features.size() > 0) {
+	for (unsigned int k = 0; k < sp->features.size(); k++) {
+	  z2m_signal *ssp = &sp->features[k];
+
+	  if (!ssp->doc.empty()) {
+	    pos = ssp->doc.find("####");
+	    while(pos != std::string::npos) {
+	      ssp->doc.replace(pos, 4, "@b");
+	      pos = ssp->doc.find("####", pos);
+	    }
+
+	    pos = ssp->doc.find("###");
+	    while(pos != std::string::npos) {
+	      ssp->doc.replace(pos, 3, "@h2");
+	      pos = ssp->doc.find("###", pos);
+	    }
+
+	    pos = ssp->doc.find("##");
+	    while(pos != std::string::npos) {
+	      ssp->doc.replace(pos, 2, "@h1");
+	      pos = ssp->doc.find("##", pos);
+	    }
+	  }
+	}
+      }
+    }
+
+    dp->docio += "/**\n";
+    dp->docio += "@Summary IO object to " + std::string(dp->classname) + ".\n";
+    dp->docio += "IO object to " + std::string(dp->classname) + ".\n";
+    dp->docio += "\n";
+    dp->docio += "Place the object under a Zigbee2MQTT_Client object in the\n";
+    dp->docio += "Node hierarchy and Connect the object to an object of class\n";
+    dp->docio += std::string(dp->classname) + " with the IoConnect method.\n";
+    dp->docio += "\n";
+    dp->docio += "@b See also\n";
+    dp->docio += " @classlink " + std::string(dp->classname) + " " + cdh_Low(volume) + "_" + classnamelow + ".html\n";
+    if (dp->has_fo)
+      dp->docio += " @classlink " + std::string(dp->foclassname) + " " + cdh_Low(volume) + "_" + foclassnamelow + ".html\n";
+    dp->docio += "*/\n";
+
+    if (dp->has_fo) {
+      dp->docfo += "/**\n";
+      dp->docfo += "@Summary Plc function object to " + std::string(dp->classname) + ".\n";
+      dp->docfo += "Plc function object to " + std::string(dp->classname) + ".\n";
+      dp->docfo += "\n";
+      dp->docfo += "Connect the function object to an object of class " + std::string(dp->classname) + ".\n";
+      dp->docfo += "\n";
+      dp->docfo += "@b See also\n";
+      dp->docfo += " @classlink " + std::string(dp->classname) + " " + cdh_Low(volume) + "_" + classnamelow + ".html\n";
+      dp->docfo += " @classlink " + std::string(dp->ioclassname) + " " + cdh_Low(volume) + "_" + ioclassnamelow + ".html\n";
+      dp->docfo += "*/\n";
+    }
+  }
+}
 
 bool sort_cmp(z2m_device &a, z2m_device &b) 
 {
@@ -4040,12 +4187,13 @@ int z2m::read_file()
   get_enumtypes();
   get_submodules();
 
-
   // Print file
   for (unsigned int i = 0; i < devices.size(); i++) {
     get_device_group(&devices[i]);
     graph_signals_filter(&devices[i]);
   }
+  trim_doc();
+
   print_volume();
   print_enumtypes();
   print_submodules();
