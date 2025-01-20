@@ -841,8 +841,10 @@ void HistGtk::insert_eventname(const char* name)
 {
   int pos = 0;
 
+  char* name_utf8 = g_convert(name, -1, "UTF-8", "ISO8859-1", NULL, NULL, NULL);
   gtk_editable_insert_text(
-      GTK_EDITABLE(event_name_entry_w), name, strlen(name), &pos);
+      GTK_EDITABLE(event_name_entry_w), name_utf8, strlen(name_utf8), &pos);
+  g_free(name_utf8);
 }
 
 /************************************************************************
