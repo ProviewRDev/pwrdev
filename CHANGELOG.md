@@ -29,6 +29,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - QCom had a high chance of deadlocking the entire QCom library on a node due to incorrect signal handling, causing communication outage.
   - Signal handling is removed in QCom leaving it up to the user to handle application specifics in regards to signals, as it should be.
   - Signal handling was added to the most common utilities used such as rt_xtt and rt_rtt where signals will be handled in an application specific manner and exit accordingly without deadlocks.
+- DsFastCurve could crash because of an uninitialized variable used for the TriggIndex. It is now fixed.
+- The Event Log would not convert Event Name to the correct coding resulting in garbled text in the Event Name and no results in the search.
 
 ### Changed
 
