@@ -352,7 +352,7 @@ if [ $OpSys -eq $OpSys_PPC_LINUX ]; then
   pwrp_gc="$pwrp_tmp"
 
 # Suppress all warnings, -x
-  cc_cmd="$cc -c -x c -Wall $cc_debug -D_REENTRANT -DOS_LINUX -I$pwr_inc -I$pwrp_inc -I$pwrp_tmp-I/usr/include/tirpc $PWR_EXT_INC"
+  cc_cmd="$cc -c -x c -Wall $cc_debug -D_REENTRANT -DOS_LINUX -I$pwr_inc -I$pwrp_inc -I$pwrp_tmp -I/usr/include/tirpc $PWR_EXT_INC"
 
   FileTypeStr="`echo $vFileType| cut -f $FileTypeIdx -d ,`"
 
