@@ -935,7 +935,7 @@ bool opc_convert_opctype_to_pwrtype(
       snprintf((char*)bufp, size, "%f", ((xsd__double*)value)->__item);
       break;
     case opc_eDataType_long:
-#if defined(HW_X86_64)
+#if defined(HW_X86_64) || defined(HW_ARM64)
       snprintf((char*)bufp, size, "%ld", ((xsd__long*)value)->__item);
 #else
       snprintf((char*)bufp, size, "%lld", ((xsd__long*)value)->__item);
@@ -951,7 +951,7 @@ bool opc_convert_opctype_to_pwrtype(
       snprintf((char*)bufp, size, "%hhd", ((xsd__byte*)value)->__item);
       break;
     case opc_eDataType_unsignedLong:
-#if defined(HW_X86_64)
+#if defined(HW_X86_64) || defined(HW_ARM64)
       snprintf((char*)bufp, size, "%lu", ((xsd__unsignedLong*)value)->__item);
 #else
       snprintf((char*)bufp, size, "%llu", ((xsd__unsignedLong*)value)->__item);

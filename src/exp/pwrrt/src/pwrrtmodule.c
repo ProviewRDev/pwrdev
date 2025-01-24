@@ -2038,7 +2038,7 @@ Aref_value(ArefObject *self, PyObject *args)
   }
   case pwr_eType_Int64: {
     char format[2];
-#if defined HW_X86_64
+#if defined(HW_X86_64) || defined(HW_ARM64)
     strcpy( format, "l");
 #else
     strcpy( format, "L");
@@ -2061,7 +2061,7 @@ Aref_value(ArefObject *self, PyObject *args)
   }
   case pwr_eType_UInt64: {
     char format[2];
-#if defined HW_X86_64
+#if defined(HW_X86_64) || defined(HW_ARM64)
     strcpy( format, "k");
 #else
     strcpy( format, "K");
@@ -2557,7 +2557,7 @@ Aref_setValue(ArefObject *self, PyObject *args)
   }
   case pwr_eType_Int64: {
     if (!self->aref.Flags.b.Array) {
-#if defined HW_X86_64
+#if defined(HW_X86_64) || defined(HW_ARM64)
       char format[] = "l|I";
 #else
       char format[] = "L|I";
@@ -2602,7 +2602,7 @@ Aref_setValue(ArefObject *self, PyObject *args)
   }
   case pwr_eType_UInt64: {
     if (!self->aref.Flags.b.Array) {
-#if defined HW_X86_64
+#if defined(HW_X86_64) || defined(HW_ARM64)
       char format[] = "k|I";
 #else
       char format[] = "K|I";
@@ -3759,7 +3759,7 @@ Sub_value(SubObject *self, PyObject *args)
   }
   case pwr_eType_Int64: {
     char format[2];
-#if defined HW_X86_64
+#if defined(HW_X86_64) || defined(HW_ARM64)
     strcpy( format, "l");
 #else
     strcpy( format, "L");
@@ -3780,7 +3780,7 @@ Sub_value(SubObject *self, PyObject *args)
   }
   case pwr_eType_UInt64: {
     char format[2];
-#if defined HW_X86_64
+#if defined(HW_X86_64) || defined(HW_ARM64)
     strcpy( format, "k");
 #else
     strcpy( format, "K");
@@ -3995,7 +3995,7 @@ Sub_setValue(SubObject *self, PyObject *args)
     break;
   }
   case pwr_eType_Int64: {
-#if defined HW_X86_64
+#if defined(HW_X86_64) || defined(HW_ARM64)
     char format[] = "l";
 #else
     char format[] = "L";
@@ -4005,7 +4005,7 @@ Sub_setValue(SubObject *self, PyObject *args)
     break;
   }
   case pwr_eType_UInt64: {
-#if defined HW_X86_64
+#if defined(HW_X86_64) || defined(HW_ARM64)
     char format[] = "k";
 #else
     char format[] = "K";

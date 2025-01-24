@@ -5046,7 +5046,7 @@ static int rtt_edit_print_value(rtt_t_menu_upd* menu_ptr, unsigned long init)
     }
     case pwr_eType_Int64: {
       if (menu_ptr->characters > 0)
-#if defined HW_X86_64
+#if defined(HW_X86_64) || defined(HW_ARM64)
         r_print(
             "%*ld", menu_ptr->characters, *(pwr_tInt64*)menu_ptr->value_ptr);
 #else
@@ -5085,7 +5085,7 @@ static int rtt_edit_print_value(rtt_t_menu_upd* menu_ptr, unsigned long init)
     }
     case pwr_eType_UInt64: {
       if (menu_ptr->characters > 0)
-#if defined HW_X86_64
+#if defined(HW_X86_64) || defined(HW_ARM64)
         r_print(
             "%*lu", menu_ptr->characters, *(pwr_tUInt64*)menu_ptr->value_ptr);
 #else

@@ -90,7 +90,7 @@ extern "C" {
 #define pwr_Bit(b) (1 << b)
 #define pwr_SetByte(byte, val) (val << (byte << 3))
 
-#if defined(HW_X86_64)
+#if defined(HW_X86_64) || defined(HW_ARM64)
 #define pwr_cAlignW 4
 #define pwr_cAlignLW 8
 #else
@@ -166,7 +166,7 @@ typedef struct {
   unsigned int low;
   int high;
 } __pwr_tInt64;
-#if defined HW_X86_64
+#if defined(HW_X86_64) || defined(HW_ARM64)
 typedef long int pwr_tInt64;
 #define PWR_INT64MAX LONG_MAX
 #define PWR_INT64MIN LONG_MIN
@@ -185,7 +185,7 @@ typedef struct {
   unsigned int high;
 } __pwr_tUInt64;
 
-#if defined HW_X86_64
+#if defined(HW_X86_64) || defined(HW_ARM64)
 typedef unsigned long int pwr_tUInt64;
 #define PWR_UINT64MAX ULONG_MAX
 #else
@@ -757,7 +757,7 @@ static const pwr_tDeltaTime pwr_cDtMin = PWR_DTTIME_MIN;
                        exit(EXIT_FAILURE)))
 #endif
 
-#if defined HW_X86_64
+#if defined(HW_X86_64) || defined(HW_ARM64)
 #define pwr_dFormatUInt64 "%lu"
 #define pwr_dFormatInt64 "%ld"
 #define pwr_dFormatHexInt64 "%lx"

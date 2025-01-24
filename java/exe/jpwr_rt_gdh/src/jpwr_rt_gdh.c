@@ -83,7 +83,7 @@ typedef struct {
   int truncated;
 } gdh_sCrrCtx;
 
-#if defined HW_X86_64
+#if defined(HW_X86_64) || defined(HW_ARM64)
 static tree_sTable *jid_table = 0;
 static int jid_next = 1;
 static thread_sMutex jid_mutex;
@@ -3554,7 +3554,7 @@ JNIEXPORT jobject JNICALL Java_jpwr_rt_Gdh_getObjectEnumText
 
 static int gdh_JidToPointer( int id, void **p)
 {
-#if defined HW_X86_64
+#if defined(HW_X86_64) || defined(HW_ARM64)
   pwr_tStatus sts;
   sJid *jp;
 
@@ -3576,7 +3576,7 @@ static int gdh_JidToPointer( int id, void **p)
 
 static int gdh_JidStore( void *p, pwr_tRefId r, int *id)
 {
-#if defined HW_X86_64
+#if defined(HW_X86_64) || defined(HW_ARM64)
   sJid *jp;
   pwr_tStatus sts;
 
@@ -3606,7 +3606,7 @@ static int gdh_JidStore( void *p, pwr_tRefId r, int *id)
 
 static int gdh_JidRemove( pwr_tRefId r)
 {
-#if defined HW_X86_64
+#if defined(HW_X86_64) || defined(HW_ARM64)
   sJid *jp;
   pwr_tStatus sts;
 

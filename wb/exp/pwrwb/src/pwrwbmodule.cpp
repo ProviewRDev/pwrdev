@@ -1991,7 +1991,7 @@ Aref_value(PyObject *s, PyObject *args)
     char format[2];
     pwr_tInt64 value = *(pwr_tInt64 *)buf;
     free(buf);
-#if defined HW_X86_64
+#if defined(HW_X86_64) || defined(HW_ARM64)
     strcpy( format, "l");
 #else
     strcpy( format, "L");
@@ -2002,7 +2002,7 @@ Aref_value(PyObject *s, PyObject *args)
     char format[2];
     pwr_tUInt64 value = *(pwr_tUInt64 *)buf;
     free(buf);
-#if defined HW_X86_64
+#if defined(HW_X86_64) || defined(HW_ARM64)
     strcpy( format, "k");
 #else
     strcpy( format, "K");
@@ -2136,7 +2136,7 @@ Aref_setValue(PyObject *s, PyObject *args)
     break;
   }
   case pwr_eType_Int64: {
-#if defined HW_X86_64
+#if defined(HW_X86_64) || defined(HW_ARM64)
     char format[] = "l";
 #else
     char format[] = "L";
@@ -2146,7 +2146,7 @@ Aref_setValue(PyObject *s, PyObject *args)
     break;
   }
   case pwr_eType_UInt64: {
-#if defined HW_X86_64
+#if defined(HW_X86_64) || defined(HW_ARM64)
     char format[] = "k";
 #else
     char format[] = "K";
