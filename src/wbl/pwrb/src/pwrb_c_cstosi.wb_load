@@ -42,7 +42,7 @@ SObject pwrb:Class
 !  @Group Plc,PlcString
 !  @Summary Conditional storage of string value.
 !  Conditional storage of string value.
-!  @image orm_cstosi_fo.gif
+!  @image orm_cstosi_fo.png
 !
 !  Conditional storage of a string value on a specified
 !  local Si object.
