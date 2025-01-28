@@ -1,8 +1,8 @@
 #!/bin/bash
 
-release="ubuntu:22.04"
+release="ubuntu:24.04"
 release_name="ubu"
-buildversion="01-MAR-2024 12:00:00"
+buildversion="17-JAN-2025 12:00:00"
 tz="Europe/Stockholm"
 build_rpi=1
 gitrepo="-b develop http://git:git@192.168.0.105/pwr/.git"
@@ -19,21 +19,21 @@ install_rpi="apt-get install -y gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf 
 install_sev="apt-get install -y default-mysql-server"
 install_web="apt-get install -y nginx"
 install_remote="apt-get install -y socat"
-install_pwr="apt-get install -y libgtk-3-0 libasound2 \
-	libdb5.3 libdb5.3++ libsqlite3-0 librsvg2-2 g++  xterm libmariadb3 \
-	librabbitmq4 libusb-1.0-0 libhdf5-openmpi-103 librabbitmq4 libmosquitto1 \
-	libgstreamer1.0-0 libgstreamer-plugins-base1.0-0 openjdk-11-jdk \
+install_pwr="apt-get install -y libgtk-3-0t64 libasound2t64 \
+	libdb5.3t64 libdb5.3++t64 libsqlite3-0 librsvg2-2 g++  xterm libmariadb3 \
+	librabbitmq4 libusb-1.0-0 libhdf5-openmpi-103-1t64 librabbitmq4 libmosquitto1 \
+	libtirpc3t64 libgstreamer1.0-0 libgstreamer-plugins-base1.0-0 openjdk-11-jdk \
 	xterm xfonts-100dpi sudo procps libpython3-dev python3"
-install_pwrrt="apt-get install -y libgtk-3-0 libasound2 \
-	libdb5.3 libdb5.3++ libsqlite3-0 librsvg2-2 g++ xterm libmariadb3 \
-	librabbitmq4 libmosquitto1 libusb-1.0-0 libhdf5-openmpi-103 \
-	libgstreamer1.0-0 libgstreamer-plugins-base1.0-0 \
+install_pwrrt="apt-get install -y libgtk-3-0t64 libasound2t64 \
+	libdb5.3t64 libdb5.3++t64 libsqlite3-0 librsvg2-2 g++ xterm libmariadb3 \
+	librabbitmq4 libmosquitto1 libusb-1.0-0 libhdf5-openmpi-103-1t64 \
+	libtirpc3t64 libgstreamer1.0-0 libgstreamer-plugins-base1.0-0 \
 	xterm xfonts-100dpi sudo procps python3 python3-pandas python3-seaborn \
 	python3-statsmodels python3-sklearn python3-paho-mqtt mosquitto mosquitto-clients \
 	openjdk-11-jre"
 install_pkg="dpkg -i"
 jdk_dir=/usr/lib/jvm/java-11-openjdk-amd64
-ver="6.1.3-1"
+ver="6.1.4-1"
 sver="61"
 arch="amd64"
 pkg_pwr="pwr"$sver"_"$ver"_"$arch".deb"
