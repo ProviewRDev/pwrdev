@@ -117,6 +117,8 @@ void XttGeGtk::set_below(int val)
 void XttGeGtk::set_aspect_ratio(int width, int height) {
   static float rd = 0.0;
   static int rd_read = 0;
+  static float hd = 0.0;
+  static int hd_read = 0;
 
   if (!rd_read) {
     char str[80];
@@ -129,11 +131,21 @@ void XttGeGtk::set_aspect_ratio(int width, int height) {
     rd_read = 1;
   }
 
+  if (!hd_read) {
+    char str[80];
+    if (cnf_get_value("geAspectHeightDelta", str, sizeof(str))) {
+      sscanf(str, "%f", &hd);
+    }
+
+    rd_read = 1;
+  }
+
   GdkGeometry geometry;
-  geometry.min_aspect = gdouble(width) / height * (1.0 - rd);
-  geometry.max_aspect = gdouble(width) / height * (1.0 + rd);
+  geometry.min_aspect = gdouble(width) / (height + hd) * (1.0 - rd);
+  geometry.max_aspect = gdouble(width) / (height + hd) * (1.0 + rd);
   gtk_window_set_geometry_hints(
-      GTK_WINDOW(toplevel), GTK_WIDGET(toplevel), &geometry, GDK_HINT_ASPECT);
+      GTK_WINDOW(toplevel), GTK_WIDGET(toplevel), &geometry, 
+      GdkWindowHints(GDK_HINT_ASPECT | GDK_HINT_POS | GDK_HINT_USER_POS | GDK_HINT_USER_SIZE));
 }
 
 void XttGeGtk::set_size(int width, int height)
