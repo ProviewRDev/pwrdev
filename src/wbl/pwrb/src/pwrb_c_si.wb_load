@@ -45,6 +45,8 @@ SObject pwrb:Class
 !  Configures a text string value in the Plant
 !  Configuration.
 !  
+! @b Object graph
+!  @image orm_si_og.png
 !*/
   Object Si $ClassDef 745 
     Body SysBody
