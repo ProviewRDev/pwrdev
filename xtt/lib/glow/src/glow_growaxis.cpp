@@ -267,7 +267,7 @@ void GrowAxis::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
   int draw_text = (fabs(increment) > DBL_EPSILON);
   int idx;
   int x, y;
-  char text[20];
+  char text[40];
   int line_length;
   int x_text, y_text;
   int z_height = 0, z_width, z_descent = 0;
