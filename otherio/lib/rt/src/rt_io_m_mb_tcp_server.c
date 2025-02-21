@@ -860,7 +860,7 @@ static pwr_tStatus IoRackInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
     return 0;
   }
 
-  errh_Info("Modbus TCP Sever bind to port %d, %s", port, name);
+  errh_Info("Modbus TCP Server bind to port %d, %s", port, name);
 
   sts = listen(local->s, 16);
 
