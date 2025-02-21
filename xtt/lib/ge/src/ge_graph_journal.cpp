@@ -3704,53 +3704,59 @@ int GraphJournal::restore(char* fname)
 
     sscanf(line, "%d %d %d %d", &tag, &action, (int*)&status, &idx);
 
-    switch (action) {
-    case journal_eAction_DeleteSelect:
-      redo_delete_select();
-      break;
-    case journal_eAction_DeleteObject:
-      redo_delete_object();
-      break;
-    case journal_eAction_CreateObject:
-      redo_create_object();
-      break;
-    case journal_eAction_AntePropertiesSelect:
-    case journal_eAction_PostPropertiesSelect:
-      undo_properties_select();
-      break;
-    case journal_eAction_AntePropertiesObject:
-    case journal_eAction_PostPropertiesObject:
-      undo_properties_object();
-      break;
-    case journal_eAction_AnteGroupSelect:
-    case journal_eAction_PostGroupSelect:
-      redo_group_select();
-      break;
-    case journal_eAction_UngroupSelect:
-      redo_ungroup_select();
-      break;
-    case journal_eAction_AntePaste:
-    case journal_eAction_PostPaste:
-      redo_paste();
-      break;
-    case journal_eAction_PopSelect:
-      redo_pop_select();
-      break;
-    case journal_eAction_PushSelect:
-      redo_push_select();
-      break;
-    case journal_eAction_AnteRename:
-    case journal_eAction_PostRename:
-      redo_rename();
-      break;
-    case journal_eAction_AnteOrderObject:
-    case journal_eAction_PostOrderObject:
-      redo_order_object();
-      break;
-    case journal_eAction_No:
-      break;
-    default:;
+    try {
+      switch (action) {
+      case journal_eAction_DeleteSelect:
+	redo_delete_select();
+	break;
+      case journal_eAction_DeleteObject:
+	redo_delete_object();
+	break;
+      case journal_eAction_CreateObject:
+	redo_create_object();
+	break;
+      case journal_eAction_AntePropertiesSelect:
+      case journal_eAction_PostPropertiesSelect:
+	undo_properties_select();
+	break;
+      case journal_eAction_AntePropertiesObject:
+      case journal_eAction_PostPropertiesObject:
+	undo_properties_object();
+	break;
+      case journal_eAction_AnteGroupSelect:
+      case journal_eAction_PostGroupSelect:
+	redo_group_select();
+	break;
+      case journal_eAction_UngroupSelect:
+	redo_ungroup_select();
+	break;
+      case journal_eAction_AntePaste:
+      case journal_eAction_PostPaste:
+	redo_paste();
+	break;
+      case journal_eAction_PopSelect:
+	redo_pop_select();
+	break;
+      case journal_eAction_PushSelect:
+	redo_push_select();
+	break;
+      case journal_eAction_AnteRename:
+      case journal_eAction_PostRename:
+	redo_rename();
+	break;
+      case journal_eAction_AnteOrderObject:
+      case journal_eAction_PostOrderObject:
+	redo_order_object();
+	break;
+      case journal_eAction_No:
+	break;
+      default:;
+      }
+    } catch (co_error& e) {
+      std::cerr << "** Restore journal file: " << e.what();
+      graph->message('E', e.what().c_str());
     }
+
     nr = 0;
   }
   fp.clear();
