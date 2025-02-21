@@ -7109,7 +7109,7 @@ function DynAnimation( dyn) {
 	  // Shift nodeclass
 	  if ( this.animation_direction == 1) {
 	    // Shift forward
-	    if (sequence == ge_eAnimSequence_CycleLast) {
+	    if (this.sequence == DynC.eAnimSequence_CycleLast) {
 
  	      next_nc = object.get_next_nodeclass();
 	      if (next_nc != null && next_nc.is_last() == 1)
