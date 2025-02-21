@@ -9,8 +9,8 @@
 
 
 <hr>
-2022-09-06
-Version 6.0.0
+2025-02-21
+Version 6.1.4
 <hr>
 </topic>
 
@@ -48,12 +48,12 @@ Debian
 
 <h1>System requirements
 
-Debian version: 11 (Bullseye)
+Debian version: 12 (Bookworm)
 Architecture: amd64
 
-<h1> Development environment pwr60
+<h1> Development environment pwr61
 
-1. Download pwr60_6.0.0-1_amd64.deb from the ProviewR download page.
+1. Download pwr61_6.1.4-1_amd64.deb from the ProviewR download page.
 
 2. Open a terminal window and install dependency packages
 
@@ -61,7 +61,7 @@ Architecture: amd64
 <c>> sudo apt-get install -y libgtk-3-0 libasound2 \
 <c>	libdb5.3 libdb5.3++ libsqlite3-0 librsvg2-2 g++  xterm libmariadb3 \
 <c>	librabbitmq4 libusb-1.0-0 libhdf5-openmpi-103 librabbitmq4 libmosquitto1 \
-<c>	libgstreamer1.0-0 libgstreamer-plugins-base1.0-0 openjdk-11-jdk \
+<c>	libgstreamer1.0-0 libgstreamer-plugins-base1.0-0 openjdk-17-jdk \
 <c>	xterm xfonts-100dpi sudo procps libpython3-dev python3
 
 3. Go to the download directory
@@ -70,7 +70,7 @@ Architecture: amd64
 
 4. Install the ProviewR package
 
-<c>> sudo dpkg -i pwr60_6.0.0-1_amd64.deb
+<c>> sudo dpkg -i pwr61_6.1.4-1_amd64.deb
 
 5. Logout and login as user 'pwrp' with the same password. Start ProviewR from the
 desktop icon, or from a terminal window with 
@@ -83,9 +83,9 @@ desktop icon, or from a terminal window with
 
 <h1> Demo project pwrdemo
 
-1. Install the pwr60 package.
+1. Install the pwr61 package.
 
-2. Download pwrdemo60_6.0.0-1_amd64.deb from the ProviewR download page.
+2. Download pwrdemo61_6.1.4-1_amd64.deb from the ProviewR download page.
 
 3. Go to the download directory.
 
@@ -93,11 +93,11 @@ desktop icon, or from a terminal window with
 
 4. Install the ProviewR demo package
 
-<c>> sudo dpkg -i pwrdemo60_6.0.0-1_amd64.deb
+<c>> sudo dpkg -i pwrdemo61_6.1.4-1_amd64.deb
 
 5. Attach the project from the desktop icon, or from a terminal window with
 
-<c>> sdf pwrdemo60
+<c>> sdf pwrdemo61
 <c>> rt_ini &
 <c>> rt_xtt op
 <c>...
@@ -107,7 +107,7 @@ desktop icon, or from a terminal window with
 
 <h1> Runtime environment pwrrt
 
-1. Download pwrrt_6.0.0-1_amd64.deb from the ProviewR download page.
+1. Download pwrrt_6.1.4-1_amd64.deb from the ProviewR download page.
 
 2. Open a terminal window and install dependency packages
 
@@ -117,7 +117,8 @@ desktop icon, or from a terminal window with
 <c>	librabbitmq4 libmosquitto1 libusb-1.0-0 libhdf5-openmpi-103 \
 <c>	libgstreamer1.0-0 libgstreamer-plugins-base1.0-0 \
 <c>	xterm xfonts-100dpi sudo procps python3 python3-pandas python3-seaborn \
-<c>	python3-statsmodels python3-sklearn
+<c>	python3-statsmodels python3-sklearn python3-paho-mqtt mosquitto mosquitto-clients \
+<c>     openjdk-17-jre
 
 3. Go to the download directory
 
@@ -125,7 +126,7 @@ desktop icon, or from a terminal window with
 
 4. Install the ProviewR package
 
-<c>> sudo dpkg -i pwrrt_6.0.0-1_amd64.deb
+<c>> sudo dpkg -i pwrrt_6.1.4-1_amd64.deb
 
 5. Configure, build and distribute a node from the development environment.
 
@@ -139,11 +140,11 @@ desktop icon, or from a terminal window with
 
 <c>> systemctl enable pwr
 
-<h1> Rpi crosscompilation package pwrrpi
+<h1> Rpi crosscompilation package pwrrpi64
 
-1. Install the pwr60 package.
+1. Install the pwr61 package.
 
-2. Download pwrrpi60_6.0.0-1_amd64.deb from the ProviewR download page.
+2. Download pwrrpi6461_6.1.4-1_amd64.deb from the ProviewR download page.
 
 3. Go to the download directory.
 
@@ -151,7 +152,7 @@ desktop icon, or from a terminal window with
 
 4. Install the ProviewR pwrrpi package
 
-<c>> sudo dpkg -i pwrrpi60_6.0.0-1_amd64.deb
+<c>> sudo dpkg -i pwrrpi6461_6.1.4-1_amd64.deb
 
 </topic>
 </chapter>
@@ -162,20 +163,20 @@ Ubuntu
 
 <h1>System requirements
 
-Ubuntu version: 22.04 LTS
+Ubuntu version: 24.04 LTS
 Architecture: amd64
 
-<h1> Development environment pwr60
+<h1> Development environment pwr61
 
-1. Download pwr60_6.0.0-1_amd64.deb from the ProviewR download page.
+1. Download pwr61_6.1.4-1_amd64.deb from the ProviewR download page.
 
 2. Open a terminal window and install dependency packages
 
 <c>> sudo apt-get update
-<c>> sudo apt-get install -y libgtk-3-0 libasound2 \
-<c>	libdb5.3 libdb5.3++ libsqlite3-0 librsvg2-2 g++  xterm libmariadb3 \
-<c>	librabbitmq4 libusb-1.0-0 libhdf5-openmpi-103 librabbitmq4 libmosquitto1\
-<c>	libgstreamer1.0-0 libgstreamer-plugins-base1.0-0 openjdk-11-jdk \
+<c>> sudo apt-get install -y libgtk-3-0t64 libasound2t64 \
+<c>	libdb5.3t64 libdb5.3++t64 libsqlite3-0 librsvg2-2 g++  xterm libmariadb3 \
+<c>	librabbitmq4 libusb-1.0-0 libhdf5-openmpi-103-1t64 librabbitmq4 libmosquitto1 \
+<c>	libtirpc3t64 libgstreamer1.0-0 libgstreamer-plugins-base1.0-0 openjdk-11-jdk \
 <c>	xterm xfonts-100dpi sudo procps libpython3-dev python3
 
 3. Go to the download directory
@@ -184,7 +185,7 @@ Architecture: amd64
 
 4. Install the ProviewR package
 
-<c>> sudo dpkg -i pwr60_6.0.0-1_amd64.deb
+<c>> sudo dpkg -i pwr61_6.1.4-1_amd64.deb
 
 5. Logout and login as user 'pwrp' with the same password. Start ProviewR from the
 desktop icon, or from a terminal window with 
@@ -197,9 +198,9 @@ desktop icon, or from a terminal window with
 
 <h1> Demo project pwrdemo
 
-1. Install the pwr60 package.
+1. Install the pwr61 package.
 
-2. Download pwrdemo60_6.0.0-1_amd64.deb from the ProviewR download page.
+2. Download pwrdemo61_6.1.4-1_amd64.deb from the ProviewR download page.
 
 3. Go to the download directory.
 
@@ -207,11 +208,11 @@ desktop icon, or from a terminal window with
 
 4. Install the ProviewR demo package
 
-<c>> sudo dpkg -i pwrdemo60_6.0.0-1_amd64.deb
+<c>> sudo dpkg -i pwrdemo61_6.1.4-1_amd64.deb
 
 5. Attach the project from the desktop icon, or from a terminal window with
 
-<c>> sdf pwrdemo60
+<c>> sdf pwrdemo61
 <c>> rt_ini &
 <c>> rt_xtt op
 <c>...
@@ -221,7 +222,114 @@ desktop icon, or from a terminal window with
 
 <h1> Runtime environment pwrrt
 
-1. Download pwrrt_6.0.0-1_amd64.deb from the ProviewR download page.
+1. Download pwrrt_6.1.4-1_amd64.deb from the ProviewR download page.
+
+2. Open a terminal window and install 
+
+<c>> sudo apt-get update
+<c>> sudo apt-get install -y libgtk-3-0t64 libasound2t64 \
+<c>	libdb5.3t64 libdb5.3++t64 libsqlite3-0 librsvg2-2 g++ xterm libmariadb3 \
+<c>	librabbitmq4 libmosquitto1 libusb-1.0-0 libhdf5-openmpi-103-1t64 \
+<c>	libtirpc3t64 libgstreamer1.0-0 libgstreamer-plugins-base1.0-0 \
+<c>	xterm xfonts-100dpi sudo procps python3 python3-pandas python3-seaborn \
+<c>	python3-statsmodels python3-sklearn python3-paho-mqtt mosquitto mosquitto-clients \
+<c>	openjdk-11-jre
+
+3. Go to the download directory
+
+<c>> cd Downloads
+
+4. Install the ProviewR package
+
+<c>> sudo dpkg -i pwrrt_6.1.4-1_amd64.deb
+
+5. Configure, build and distribute a node from the development environment.
+
+6. Start ProviewR runtime
+
+<c>> pwr start
+
+<h1> Rpi crosscompilation package pwrrpi64
+
+1. Install the pwr61 package.
+
+2. Download pwrrpi6461_6.1.4-1_amd64.deb from the ProviewR download page.
+
+3. Go to the download directory.
+
+<c>> cd Downloads
+
+4. Install the ProviewR pwrrpi64 package
+
+<c>> sudo dpkg -i pwrrpi6461_6.1.4-1_amd64.deb
+</topic>
+</chapter>
+
+<chapter>
+<topic> rpios
+Raspberry Pi OS
+<h1>System requirements
+
+Raspberry Pi OS version: Debian 12 (Bookworm)
+Architecture: arm64
+
+<h1> Development environment pwr61
+
+1. Download pwr61_6.1.4-1_arm64.deb from the ProviewR download page.
+
+2. Open a terminal window and install dependency packages
+
+<c>> sudo apt-get update
+<c>> sudo apt-get install -y libgtk-3-0 libasound2 \
+<c>	libdb5.3 libdb5.3++ libsqlite3-0 librsvg2-2 g++  xterm libmariadb3 \
+<c>	librabbitmq4 libusb-1.0-0 libhdf5-openmpi-103 librabbitmq4 libmosquitto1 \
+<c>	libgstreamer1.0-0 libgstreamer-plugins-base1.0-0 openjdk-17-jdk \
+<c>	xterm xfonts-100dpi sudo procps libpython3-dev python3
+
+3. Go to the download directory
+
+<c>> cd Downloads
+
+4. Install the ProviewR package
+
+<c>> sudo dpkg -i pwr61_6.1.4-1_arm64.deb
+
+5. Logout and login as user 'pwrp' with the same password. Start ProviewR from the
+desktop icon, or from a terminal window with 
+
+<c>>pwra
+
+6. Follow the Getting Started Guide to create and configure a project.
+
+7. If you enable MqttIo in BuildOptions, install libmosquitto-dev.
+
+<h1> Demo project pwrdemo
+
+1. Install the pwr61 package.
+
+2. Download pwrdemo61_6.1.4-1_arm64.deb from the ProviewR download page.
+
+3. Go to the download directory.
+
+<c>> cd Downloads
+
+4. Install the ProviewR demo package
+
+<c>> sudo dpkg -i pwrdemo61_6.1.4-1_arm64.deb
+
+5. Attach the project from the desktop icon, or from a terminal window with
+
+<c>> sdf pwrdemo61
+<c>> rt_ini &
+<c>> rt_xtt op
+<c>...
+<c>> source pwr_stop.sh
+
+6. Open in web browser with http://'hostname'/pwrdemo/index.html
+
+<h1> Runtime environment pwrrt
+
+1. Download pwrrt_6.1.4-1_arm64.deb from the ProviewR download page.
 
 2. Open a terminal window and install 
 
@@ -231,7 +339,8 @@ desktop icon, or from a terminal window with
 <c>	librabbitmq4 libmosquitto1 libusb-1.0-0 libhdf5-openmpi-103 \
 <c>	libgstreamer1.0-0 libgstreamer-plugins-base1.0-0 \
 <c>	xterm xfonts-100dpi sudo procps python3 python3-pandas python3-seaborn \
-<c>	python3-statsmodels python3-sklearn
+<c>	python3-statsmodels python3-sklearn python3-paho-mqtt mosquitto mosquitto-clients \
+<c>	openjdk-17-jre
 
 3. Go to the download directory
 
@@ -239,113 +348,7 @@ desktop icon, or from a terminal window with
 
 4. Install the ProviewR package
 
-<c>> sudo dpkg -i pwrrt_6.0.0-1_amd64.deb
-
-5. Configure, build and distribute a node from the development environment.
-
-6. Start ProviewR runtime
-
-<c>> pwr start
-
-<h1> Rpi crosscompilation package pwrrpi
-
-1. Install the pwr60 package.
-
-2. Download pwrrpi60_6.0.0-1_amd64.deb from the ProviewR download page.
-
-3. Go to the download directory.
-
-<c>> cd Downloads
-
-4. Install the ProviewR pwrrpi package
-
-<c>> sudo dpkg -i pwrrpi60_6.0.0-1_amd64.deb
-</topic>
-</chapter>
-
-<chapter>
-<topic> rpios
-Raspberry Pi OS
-<h1>System requirements
-
-Raspberry Pi OS version: Debian 11 (Bullseye)
-Architecture: armhf
-
-<h1> Development environment pwr60
-
-1. Download pwr60_6.0.0-1_armhf.deb from the ProviewR download page.
-
-2. Open a terminal window and install dependency packages
-
-<c>> sudo apt-get update
-<c>> sudo apt-get install -y libgtk-3-0 libasound2 \
-<c>	libdb5.3 libdb5.3++ libsqlite3-0 librsvg2-2 g++  xterm libmariadb3 \
-<c>	libusb-1.0-0 libhdf5-openmpi-103 librabbitmq4 libmosquitto1 \
-<c>	libgstreamer1.0-0 libgstreamer-plugins-base1.0-0 openjdk-11-jdk \
-<c>	xterm xfonts-100dpi sudo procps libpython3-dev python3
-
-3. Go to the download directory
-
-<c>> cd Downloads
-
-4. Install the ProviewR package
-
-<c>> sudo dpkg -i pwr60_6.0.0-1_armhf.deb
-
-5. Logout and login as user 'pwrp' with the same password. Start ProviewR from the
-desktop icon, or from a terminal window with 
-
-<c>>pwra
-
-6. Follow the Getting Started Guide to create and configure a project.
-
-7. If you enable MqttIo in BuildOptions, install libmosquitto-dev.
-
-<h1> Demo project pwrdemo
-
-1. Install the pwr60 package.
-
-2. Download pwrdemo60_6.0.0-1_armhf.deb from the ProviewR download page.
-
-3. Go to the download directory.
-
-<c>> cd Downloads
-
-4. Install the ProviewR demo package
-
-<c>> sudo dpkg -i pwrdemo60_6.0.0-1_armhf.deb
-
-5. Attach the project from the desktop icon, or from a terminal window with
-
-<c>> sdf pwrdemo60
-<c>> rt_ini &
-<c>> rt_xtt op
-<c>...
-<c>> source pwr_stop.sh
-
-6. Open in web browser with http://'hostname'/pwrdemo/index.html
-
-<h1> Runtime environment pwrrt
-
-1. Download pwrrt_6.0.0-1_armhf.deb from the ProviewR download page.
-
-2. Open a terminal window and install 
-
-<c>> sudo apt-get update
-<c>> sudo apt-get install -y libgtk-3-0 libasound2 \
-<c>	libdb5.3 libdb5.3++ libsqlite3-0 librsvg2-2 g++ xterm libmariadb3 \
-<c>	libusb-1.0-0 libhdf5-openmpi-103 librabbitmq4 libmosquitto1 \
-<c>	libgstreamer1.0-0 libgstreamer-plugins-base1.0-0 \
-<c>	xterm xfonts-100dpi sudo procps python3 python3-pandas python3-seaborn \
-<c>	python3-statsmodels python3-sklearn
-
-3. Go to the download directory
-
-<c>> cd Downloads
-
-4. Install the ProviewR package
-
-<c>> sudo dpkg -i pwrrt_6.0.0-1_armhf.deb
+<c>> sudo dpkg -i pwrrt_6.1.4-1_arm64.deb
 
 5. Configure, build and distribute a node from the development environment.
 
@@ -382,30 +385,30 @@ In this example the development environment and demo project is installed.
 
 1. Run docker
 
-<c>> docker run -it --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" debian:11 /bin/bash
+<c>> docker run -it --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" debian:12 /bin/bash
 
 2. Install dependency packages
 
 <c>> apt-get update
 <c>> apt-get install -y wget
-<c>> apt-get install -y libgtk-3-0 libasound2 \
+<c>> sudo apt-get install -y libgtk-3-0 libasound2 \
 <c>	libdb5.3 libdb5.3++ libsqlite3-0 librsvg2-2 g++  xterm libmariadb3 \
-<c>	librabbitmq4 libusb-1.0-0 libhdf5-openmpi-103 librabbitmq4 \
-<c>	libgstreamer1.0-0 libgstreamer-plugins-base1.0-0 openjdk-11-jdk \
+<c>	librabbitmq4 libusb-1.0-0 libhdf5-openmpi-103 librabbitmq4 libmosquitto1 \
+<c>	libgstreamer1.0-0 libgstreamer-plugins-base1.0-0 openjdk-17-jdk \
 <c>	xterm xfonts-100dpi sudo procps libpython3-dev python3
 
 
 3. Dowload the development environment and demo project
 
-<c>> wget http://downloads.sourceforge.net/project/proview/proview/proviewr_6.0.0-1/\
-debian11/pwr60_6.0.0-1_amd64.deb
-<c>> wget http://downloads.sourceforge.net/project/proview/proview/proviewr_6.0.0-1/\
-debian11/pwrdemo60_6.0.0-1_amd64.deb
+<c>> wget http://downloads.sourceforge.net/project/proview/proview/proviewr_6.1.4-1/\
+debian12/pwr61_6.1.4-1_amd64.deb
+<c>> wget http://downloads.sourceforge.net/project/proview/proview/proviewr_6.1.4-1/\
+debian12/pwrdemo61_6.1.4-1_amd64.deb
 
-4. Install pwr60 and pwrdemo60
+4. Install pwr61 and pwrdemo61
 
-<c>> dpkg -i pwr60_6.0.0-1_amd64.deb
-<c>> dpkg -i pwrdemo60_6.0.0-1_amd64.deb
+<c>> dpkg -i pwr61_6.1.4-1_amd64.deb
+<c>> dpkg -i pwrdemo61_6.1.4-1_amd64.deb
 
 5. Login as user 'pwrp'
 
@@ -414,7 +417,7 @@ debian11/pwrdemo60_6.0.0-1_amd64.deb
 
 6. Attach and start the demo project
 
-<c>> sdf pwrdemo60
+<c>> sdf pwrdemo61
 <c>> pwr_rtmon
 
 7. Create a new project
@@ -440,7 +443,7 @@ In the XQuartz terminal, allow access from local host
 
 2. Run docker in a docker terminal
 
-<c>> docker run -it debian:11 /bin/bash
+<c>> docker run -it debian:12 /bin/bash
 
 3. Install dependency packages
 
@@ -448,29 +451,29 @@ In the XQuartz terminal, allow access from local host
 <c>> apt-get install -y wget
 <c>> apt-get install -y libgtk-3-0 libasound2 \
 <c>	libdb5.3 libdb5.3++ libsqlite3-0 librsvg2-2 g++  xterm libmariadb3 \
-<c>	librabbitmq4 libusb-1.0-0 libhdf5-openmpi-103 librabbitmq4 \
-<c>	libgstreamer1.0-0 libgstreamer-plugins-base1.0-0 openjdk-11-jdk \
+<c>	librabbitmq4 libusb-1.0-0 libhdf5-openmpi-103 librabbitmq4 libmosquitto1 \
+<c>	libgstreamer1.0-0 libgstreamer-plugins-base1.0-0 openjdk-17-jdk \
 <c>	xterm xfonts-100dpi sudo procps libpython3-dev python3
 
-4. Download pwr60 and pwrdemo60 packages
+4. Download pwr61 and pwrdemo61 packages
 
-<c>> wget http://downloads.sourceforge.net/project/proview/proview/proviewr_6.0.0-1/\
-<c>debian11/pwr60_6.0.0-1_amd64.deb
+<c>> wget http://downloads.sourceforge.net/project/proview/proview/proviewr_6.1.4-1/\
+<c>debian12/pwr61_6.1.4-1_amd64.deb
 
-<c>> wget http://downloads.sourceforge.net/project/proview/proview/proviewr_6.0.0-1/\
-<c>debian11/pwrdemo60_6.0.0-1_amd64.deb
+<c>> wget http://downloads.sourceforge.net/project/proview/proview/proviewr_6.1.4-1/\
+<c>debian12/pwrdemo61_6.1.4-1_amd64.deb
 
-5. Install pwr60 and pwrdemo60
+5. Install pwr61 and pwrdemo61
 
-<c>> dpkg -i pwr60_6.0.0-1_amd64.deb
-<c>> dpkg -i pwrdemo60_6.0.0-1_amd64.deb
+<c>> dpkg -i pwr61_6.1.4-1_amd64.deb
+<c>> dpkg -i pwrdemo61_6.1.4-1_amd64.deb
 
 6. Login as user 'pwrp'
 <c>> su - pwrp
 <c>> export DISPLAY=host.docker.internal:0
 
 7. Attach and start the demo project
-<c>> sdf pwrdemo60
+<c>> sdf pwrdemo61
 <c>> pwr_rtmon
 
 8. Create a new project
