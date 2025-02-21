@@ -1,0 +1,22 @@
+Description to generate gedemo on www.proviewr.se
+
+1. Build the pwrdemo project
+
+> pwre module project
+> pwre build pwrdemo build src
+
+2. Copy all file from $pwrp_web to a another directory
+
+3. Modfy the pwg files in the new directory
+> find ./ -name "*.pwg" -exec sed -i 's/Demo-/\$local.Demo-/g' {} \; 
+> find ./ -name "*.pwg" -exec sed -i 's/DEMO-/\$local.Demo-/g' {} \; 
+
+4. Insert 'Not working in the live demo' plate in
+  demo_ge_sub_barchart.pwg
+  demo_ge_sub_fastcurve.pwg
+  demo_ge_sub_xycurve.pwg
+  demo_ge_sub_digcolor.pwg
+  demo_ge_sub_table.pwg ## and remove the table
+
+5. Copy files to gedemo on web host
+
