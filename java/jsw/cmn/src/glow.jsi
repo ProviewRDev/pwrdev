@@ -6767,6 +6767,7 @@ function GrowRectRounded( ctx) {
   this.gradient = 0 
   this.gradient_contrast = 4;
   this.disable_gradient = Glow.eGradient_No;
+  this.transparency = 0;
   this.dynamicsize = 0;    
   this.trf = new GlowTransform();
   this.round_amount = 15;
@@ -17050,11 +17051,11 @@ function GlowDraw( ctx) {
       case Glow.eGradient_DiagonalLowerRight: {
 	var linear = this.gctx.createLinearGradient( gx0, gy0, gx1, gy1);
         if (Number(transparency) === 0) {
-	  linear.addColorStop( 0, this.getColor(f2));
-	  linear.addColorStop( 1, this.getColor(f1));
+	  linear.addColorStop( 0.0, this.getColor(f2));
+	  linear.addColorStop( 1.0, this.getColor(f1));
         } else {
-	  linear.addColorStop( 0, this.getColorTransparent(f2, transparency));
-	  linear.addColorStop( 1, this.getColorTransparent(f1, transparency));
+	  linear.addColorStop( 0.0, this.getColorTransparent(f2, transparency));
+	  linear.addColorStop( 1.0, this.getColorTransparent(f1, transparency));
         }
 	this.gctx.fillStyle = linear;
 	break;
@@ -17065,13 +17066,13 @@ function GlowDraw( ctx) {
       case Glow.eGradient_DiagonalDownTube: {
 	var linear = this.gctx.createLinearGradient( gx0, gy0, gx1, gy1);
         if (Number(transparency) === 0) {
-	  linear.addColorStop( 0, this.getColor(f1));
+	  linear.addColorStop( 0.0, this.getColor(f1));
 	  linear.addColorStop( 0.5, this.getColor(f2));
-	  linear.addColorStop( 1, this.getColor(f1));
+	  linear.addColorStop( 1.0, this.getColor(f1));
         } else {
-	  linear.addColorStop( 0, this.getColorTransparent(f1, transparency));
+	  linear.addColorStop( 0.0, this.getColorTransparent(f1, transparency));
 	  linear.addColorStop( 0.5, this.getColorTransparent(f2, transparency));
-	  linear.addColorStop( 1, this.getColorTransparent(f1, transparency));
+	  linear.addColorStop( 1.0, this.getColorTransparent(f1, transparency));
         }
 	this.gctx.fillStyle = linear;
 	break;
@@ -17080,11 +17081,11 @@ function GlowDraw( ctx) {
       case Glow.eGradient_VerticalTube2: {
 	var linear = this.gctx.createLinearGradient( gx0, gy0, gx1, gy1);
         if (Number(transparency) === 0) {
-	  linear.addColorStop( 0, this.getColor(f1));
+	  linear.addColorStop( 0.0, this.getColor(f1));
 	  linear.addColorStop( 0.3, this.getColor(f2));
 	  linear.addColorStop( 0.95, this.getColor(f1));
         } else {
-	  linear.addColorStop( 0, this.getColorTransparent(f1, transparency));
+	  linear.addColorStop( 0.0, this.getColorTransparent(f1, transparency));
 	  linear.addColorStop( 0.3, this.getColorTransparent(f2, transparency));
 	  linear.addColorStop( 0.95, this.getColorTransparent(f1, transparency));
         }
@@ -17099,11 +17100,11 @@ function GlowDraw( ctx) {
       case Glow.eGradient_RadialLowerRight:{
 	var radial = this.gctx.createRadialGradient( gx0, gy0, 1, gx0, gy0, gr);
         if (Number(transparency) === 0) {
-	  radial.addColorStop( 0, this.getColor(f2));
-	  radial.addColorStop( 1, this.getColor(f1));
+	  radial.addColorStop( 0.0, this.getColor(f2));
+	  radial.addColorStop( 1.0, this.getColor(f1));
         } else {
-	  radial.addColorStop( 0, this.getColorTransparent(f2, transparency));
-	  radial.addColorStop( 1, this.getColorTransparent(f1, transparency));
+	  radial.addColorStop( 0.0, this.getColorTransparent(f2, transparency));
+	  radial.addColorStop( 1.0, this.getColorTransparent(f1, transparency));
         }
 	this.gctx.fillStyle = radial;
 	break;
