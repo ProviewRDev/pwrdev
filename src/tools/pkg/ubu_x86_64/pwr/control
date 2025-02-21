@@ -3,7 +3,7 @@ Section: devel
 Package: pwr61
 Priority: optional
 Maintainer: ProviewR <postmaster@proview.se>
-Version: 6.1.4-1
+Version: 6.1.4-2
 Architecture: amd64
 Depends: libc6 (>= 2.39-0ubuntu8.1),
  libgtk-3-0t64 (>= 3.24.41-4ubuntu1.2),
@@ -28,3 +28,8 @@ Homepage: http://www.proview.se
 Installed-Size: 1114020
 Description: ProviewR development and runtime environment package
  6.1.4-1 Base release
+ 6.1.4-2
+   - Bugfix in Ge axis for enumerations.
+   - Zigbee module common structfile fix.
+   - Javascript bugfix for Ge rounded rectangle.
+   - Javascript bugfix for animation dynamics.

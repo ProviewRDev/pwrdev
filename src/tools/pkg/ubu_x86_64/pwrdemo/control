@@ -1,9 +1,9 @@
 Package: pwrdemo61
-Version: 6.1.4-1
+Version: 6.1.4-2
 Section: base
 Priority: optional
 Architecture: amd64
-Depends: pwr61 (>= 6.1.4-1)
+Depends: pwr61 (>= 6.1.4-2)
 Replaces:
 Maintainer: ProviewR <postmaster@proview.se>
 Description: ProviewR Demo Project package

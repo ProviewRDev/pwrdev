@@ -1,9 +1,9 @@
 Package: pwrrpi6461
-Version: 6.1.4-1
+Version: 6.1.4-2
 Section: base
 Priority: optional
 Architecture: amd64
-Depends: pwr61 (>= 6.1.4-1)
+Depends: pwr61 (>= 6.1.4-2)
 Replaces: pwr61
 Maintainer: ProviewR <postmaster@proview.se>
 Description: ProviewR RPI development package

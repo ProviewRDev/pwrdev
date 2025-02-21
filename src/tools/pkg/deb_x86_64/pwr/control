@@ -1,5 +1,5 @@
 Package: pwr61
-Version: 6.1.4-1
+Version: 6.1.4-2
 Section: base
 Priority: optional
 Architecture: amd64
@@ -21,3 +21,8 @@ Replaces: pwr50,pwr51,pwr52,pwr53,pwr54,pwr55,pwr56,pwr57,pwr58,pwr59,pwr60
 Maintainer: ProviewR <postmaster@proview.se>
 Description: ProviewR development and runtime environment package
  6.1.4-1 Base release
+ 6.1.4-2
+   - Bugfix in Ge axis for enumerations.
+   - Zigbee module common structfile fix.
+   - Javascript bugfix for Ge rounded rectangle.
+   - Javascript bugfix for animation dynamics.
