@@ -467,7 +467,7 @@ void GrowPie::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
 
     // printf( "draw: %d %d\n", ll_x, ll_y);
     ctx->gdraw->arc(w, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, angle1 - rot,
-        angle2, drawtype, idx, 0);
+	angle2, drawtype, idx, highlight, transparency);
   }
 }
 
