@@ -65,6 +65,8 @@ Ge Dynamics and Actions
 <b>DigFourShift <link>Ge_DigFourShift
 <b>AnalogShift <link>Ge_AnalogShift
 <b>Animation <link>Ge_Animation
+<b>DigTransparency <link>Ge_DigTransparency
+<b>AnalogTransparency <link>Ge_AnalogTransparency
 <b>HostObject <link>Ge_HostObject
 <b>DigSound <link>Ge_DigSound
 <b>Slider <link>Ge_Slider
@@ -385,6 +387,30 @@ the value is true. When the value shifts, the pages of the animation are run thr
 <h1>ForwBack sequence
 ForwBack sequece is similar to the Cyclic sequence, but now the animation runs first forward 
 and then backwards then the attribute value is true.
+</topic>
+
+<topic>Ge_DigTransparency
+Demo DigTransparency
+
+The motor valve to the left has the dynamic DigTransparency, and is connected 
+a digital attribute. You can toggle the value of the attribute with the Toggle button.
+
+When the value is toggled, the motor valve shifts beween two predifined levels of 
+tranparency. In this case the transparency is 0 (no transparency) when the value is low,
+and 0.3 (30% transparent) when the value is high.
+
+Also smooth transition is configured.
+</topic>
+
+<topic>Ge_AnalogTransparency
+Demo AnalogTransparency
+
+The motor valve to the left has the dynamic AnalogTransparency, and is connected 
+an analog attribute. The value of the attribute can be changed between 0 and 1 with the
+slider.
+
+The analog value will affect the level of transparency of the motor valve, where 0 is no
+transparency and 1 is full transparency.
 </topic>
 
 <topic>Ge_DigSound

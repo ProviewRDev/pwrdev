@@ -15,7 +15,9 @@ Description to generate gedemo on www.proviewr.se
   demo_ge_sub_barchart.pwg
   demo_ge_sub_fastcurve.pwg
   demo_ge_sub_xycurve.pwg
-  demo_ge_sub_digcolor.pwg
+  demo_ge_digcolor.pwg
+  demo_ge_digsound.pwg
+  demo_ge_popupmenu.pwg
   demo_ge_sub_table.pwg ## and remove the table
 
 5. Copy files to gedemo on web host

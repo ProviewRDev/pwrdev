@@ -7,7 +7,7 @@
 function int process( string graph)
   open 'graph'
   printf( "Processing %s...\n", graph);
-  @t
+  @exchange
   save
 endfunction
 
@@ -225,5 +225,14 @@ main()
   process( "demo_proc_temperaturecontrol");
   process( "demopushb");
   process( "demosliders");
+  process( "demo_ge_colorthemes.pwg");
+  process( "demo_proc_levelcontrolmpc.pwg");
+  process( "demo_misc_pingpong.pwg");
+  process( "demo_menu_misc.pwg");
+  process( "pwrdemo.pwg");
+  process( "help_button.pwg");
+  process( "demo_proc_levelcontrolpid.pwg");
+  process( "demo_proc_dataqueues.pwg");
+  process( "demo_proc_dataqueues_l.pwg");
 
 endmain
