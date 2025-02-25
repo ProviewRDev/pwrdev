@@ -25080,12 +25080,12 @@ void GeAnalogTransparency::get_attributes(attr_sItem* attrinfo, int* item_count)
 
   strcpy(attrinfo[i].name, "AnalogTransparency.MinValue");
   attrinfo[i].value = &min_value;
-  attrinfo[i].type = glow_eType_Float;
+  attrinfo[i].type = glow_eType_Double;
   attrinfo[i++].size = sizeof(min_value);
 
   strcpy(attrinfo[i].name, "AnalogTransparency.MaxValue");
   attrinfo[i].value = &max_value;
-  attrinfo[i].type = glow_eType_Float;
+  attrinfo[i].type = glow_eType_Double;
   attrinfo[i++].size = sizeof(max_value);
 
   *item_count = i;
