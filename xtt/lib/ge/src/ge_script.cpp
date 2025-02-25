@@ -603,6 +603,29 @@ static int graph_getobjectfill_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
+static int graph_resetobjectcolors_func(void* filectx, ccm_sArg* arg_list,
+    int arg_count, int* return_decl, ccm_tFloat* return_float,
+    ccm_tInt* return_int, char* return_string)
+{
+  Graph* graph;
+
+  if (arg_count != 1)
+    return CCM__ARGMISM;
+
+  if (arg_list->value_decl != CCM_DECL_INT)
+    return CCM__ARGMISM;
+
+  if (arg_list->value_int == 0)
+    return CCM__INVARG;
+
+  graph_get_stored_graph(&graph);
+
+  grow_SetObjectOriginalFillColor((grow_tObject)arg_list->value_int, glow_eDrawType_No);
+  grow_SetObjectOriginalBorderColor((grow_tObject)arg_list->value_int, glow_eDrawType_No);
+  grow_SetObjectOriginalTextColor((grow_tObject)arg_list->value_int, glow_eDrawType_No);
+  return 1;
+}
+
 static int graph_setobjectfill_func(void* filectx, ccm_sArg* arg_list,
     int arg_count, int* return_decl, ccm_tFloat* return_float,
     ccm_tInt* return_int, char* return_string)
@@ -2808,6 +2831,7 @@ static int graph_scaleobject_func(void* filectx, ccm_sArg* arg_list,
   Graph* graph;
   ccm_sArg* arg_p2; // scale x
   ccm_sArg* arg_p3; // scale y
+  ccm_sArg* arg_p4; // scale type
   double scalex, scaley;
   glow_eScaleType scale_type;
   grow_tObject oid = (grow_tObject)arg_list->value_int;
@@ -2815,7 +2839,7 @@ static int graph_scaleobject_func(void* filectx, ccm_sArg* arg_list,
   if (oid == 0)
     return 1;
 
-  if (arg_count != 3)
+  if (!(arg_count == 3 || arg_count == 4))
     return CCM__ARGMISM;
 
   arg_p2 = arg_list->next;
@@ -2827,13 +2851,20 @@ static int graph_scaleobject_func(void* filectx, ccm_sArg* arg_list,
     return CCM__ARGMISM;
   if (arg_p3->value_decl != CCM_DECL_FLOAT)
     return CCM__ARGMISM;
+  if (arg_count >= 4) {
+    arg_p4 = arg_p3->next;
+    if (arg_p4->value_decl != CCM_DECL_INT)
+      return CCM__ARGMISM;
+  }    
 
   graph_get_stored_graph(&graph);
 
   scalex = (double)arg_p2->value_float;
   scaley = (double)arg_p3->value_float;
-
-  scale_type = glow_eScaleType_LowerLeft;
+  if (arg_count >= 4)
+    scale_type = (glow_eScaleType)arg_p4->value_int;
+  else
+    scale_type = glow_eScaleType_LowerLeft;
 
   grow_StoreTransform(oid);
   grow_SetObjectScale(oid, scalex, scaley, 0, 0, scale_type);
@@ -5499,6 +5530,10 @@ int Graph::script_func_register(void)
     return sts;
   sts = ccm_register_function(
       "Ge", "GetObjectFill", graph_getobjectfill_func);
+  if (EVEN(sts))
+    return sts;
+  sts = ccm_register_function(
+      "Ge", "ResetObjectColors", graph_resetobjectcolors_func);
   if (EVEN(sts))
     return sts;
   sts = ccm_register_function(
