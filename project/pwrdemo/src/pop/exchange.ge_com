@@ -6,7 +6,7 @@ main()
 
   verify(1);
 #  SetColorTheme(16);
-  SetGraphAttribute("AntiAliasing", 1);
+#  SetGraphAttribute("AntiAliasing", 1);
 
   oid = GetFirstObject();
   while (oid != 0)
@@ -14,32 +14,11 @@ main()
     printf("Type: %d\n", type);
     if (type == eObjectType_SubGraph)
       class = GetObjectClass(oid);
-      if (class == "pwrct_buttonsmalltoggle")
-        SetObjectClass(oid, "pwrct_buttonrounded");
-        ScaleObject(oid, 0.75, 0.75, 0);
-        MoveObject(oid, 3.8, 1.5);
+      if (class == "mb2helpclass")
+        MoveObject(oid, -0.1, 0.0);
       endif
-      if (class == "pwr_mb2helpclass")
-	ResetObjectColors(oid);
-        SetObjectClass(oid, "mb2helpclass");
-      endif
-      if (class == "pwr_mb2help")
-	ResetObjectColors(oid);
-        SetObjectClass(oid, "mb2help");
-      endif
-      if (class == "pwrct_buttoncommand")
-        SetObjectClass(oid, "pwrct_buttonrounded");
-      endif
-      if (class == "pwrct_buttontoggle")
-        SetObjectClass(oid, "pwrct_buttonrounded");
-      endif
-      if (class == "pwr_indround")
-        ScaleObject(oid, 1.2, 1.2, 0);
-        MoveObject(oid, -3.8, -1.4);
-      endif
-      if (class == "pwrct_indroundgreenbg")
-        ScaleObject(oid, 1.2, 1.2, 0);
-        MoveObject(oid, -3.8, -1.4);
+      if (class == "mb2help")
+        MoveObject(oid, -0.1, 0.0);
       endif
     endif
 

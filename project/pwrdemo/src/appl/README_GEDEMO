@@ -20,5 +20,12 @@ Description to generate gedemo on www.proviewr.se
   demo_ge_popupmenu.pwg
   demo_ge_sub_table.pwg ## and remove the table
 
-5. Copy files to gedemo on web host
+5. Remove the demo_menu and extend the demo_menu_ge in pwrdemo.pwg.
+   Remove ColorThemes in demo_menu_ge.pwg
+
+6. To change colortheme:
+   Execute process.ge_com and call SetColorTheme(16) in exchange.ge_com
+   Replace "pwr_colortheme1.pwgc" with "pwr_colortheme16.pwgc" in ge.js
+
+7. Copy files to gedemo on web host
 
