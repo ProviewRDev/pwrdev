@@ -18,7 +18,8 @@ class pn_gsdml;
 namespace GSDML
 {
 
-void parse_octet_string(std::string const& string_data, unsigned char* output_data, std::vector<unsigned char> &output_vector);
+void parse_octet_string(std::string const& string_data, unsigned char* output_data,
+                        std::vector<unsigned char>& output_vector);
 
 typedef enum
 {
@@ -199,6 +200,15 @@ public:
       if (value >= range.first && value <= range.second)
         return true;
     return false;
+  }
+
+  size_t size() const
+  {
+    size_t size = 0;
+    for (auto& range : listItems)
+      for (auto i = range.first; i <= range.second; i++)
+        size++;
+    return size;
   }
 
   void print()
@@ -419,7 +429,7 @@ public:
   // Attributes
   ushort _UserStructureIdentifier;
 
-  // Elements  
+  // Elements
   std::shared_ptr<std::string> _Name;
   std::shared_ptr<std::string> _Help;
   std::vector<std::shared_ptr<Ref>> _Ref;
