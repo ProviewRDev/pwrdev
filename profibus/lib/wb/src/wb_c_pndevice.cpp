@@ -418,6 +418,14 @@ int pndevice_save_cb(void* sctx)
 
       ProfinetSlot* slot = &ctx->attr->attrnav->pn_runtime_data->m_PnDevice->m_slot_list[slot_number];
 
+      // Check if the slot number we have in the module object is the same as the slot number in
+      // the corresponding slot object
+      if (slot->m_slot_number != slot_number)
+      {
+        // MsgWindow::message('E', "Slot number mismatch", msgw_ePop_Yes, module_oid);
+        continue;
+      }
+
       // Now check if the module is indeed present in our configuration, if it isn't we don't update the oid
       // (i.e. we mark it for removal)
       if (slot->m_module_ID == "")
@@ -441,8 +449,7 @@ int pndevice_save_cb(void* sctx)
     pwr_tCid cid = pwr_cNCid;
     ldh_GetObjectClass(ctx->ldhses, module_oid, &cid); // Ignore return...
     auto result = std::find_if(
-        std::begin(slot_list), std::end(slot_list),
-        [&module_oid, &cid](auto& slot)
+        std::begin(slot_list), std::end(slot_list), [&module_oid, &cid](auto& slot)
         { return (cdh_ObjidIsEqual(slot.m_module_oid, module_oid) && (slot.m_module_class == cid)); });
 
     // If we reached the end we didn't find a module matching our conf so this module has to go. It's either
@@ -452,9 +459,8 @@ int pndevice_save_cb(void* sctx)
       pwr_tOid purged_oid = module_oid;
 
       // Find and clear the saved oid for the module we are about to remove
-      auto search_oid =
-          std::find_if(std::begin(slot_list), std::end(slot_list),
-                       [&module_oid](auto& slot) { return cdh_ObjidIsEqual(slot.m_module_oid, module_oid); });
+      auto search_oid = std::find_if(std::begin(slot_list), std::end(slot_list), [&module_oid](auto& slot)
+                                     { return cdh_ObjidIsEqual(slot.m_module_oid, module_oid); });
       if (search_oid != std::end(slot_list))
         search_oid->m_module_oid = pwr_cNOid;
 
@@ -580,7 +586,19 @@ int pndevice_save_cb(void* sctx)
     slot_number = *slot_number_p;
     free(slot_number_p);
 
-    auto& slot = ctx->attr->attrnav->pn_runtime_data->m_PnDevice->m_slot_list[slot_number];
+    // Find the item where m_slot_number matches
+    auto it =
+        std::find_if(ctx->attr->attrnav->pn_runtime_data->m_PnDevice->m_slot_list.begin(),
+                     ctx->attr->attrnav->pn_runtime_data->m_PnDevice->m_slot_list.end(),
+                     [slot_number](ProfinetSlot const& slot) { return slot.m_slot_number == slot_number; });
+
+    if (it == ctx->attr->attrnav->pn_runtime_data->m_PnDevice->m_slot_list.end())
+    {
+      // No matching slot number found, skip this module
+      continue;
+    }
+    auto& slot = *it;
+
     if (slot.m_is_dap) // DAP
     {
       module_item = ctx->attr->attrnav->gsdml->getDeviceAccessPointMap().at(slot.m_module_ID);
