@@ -810,10 +810,10 @@ void GsdmlAttrNav::device_update_change(void* ctx)
 
   // The number of physical slots are not always the same in each DAP so we need
   // to adjust the slot count. If the new size is smaller the slots will be
-  // removed from the end. If it's bigger they will be default constructed. The
-  // PhysicalSlots starts at zero, hence the max() + 1.
+  // removed from the end. If it's bigger they will be default constructed.
+  slot_index = attrnav->m_selected_device_item->_PhysicalSlots.min();
   attrnav->pn_runtime_data->m_PnDevice->m_slot_list.resize(
-      attrnav->m_selected_device_item->_PhysicalSlots.max() + 1);
+      attrnav->m_selected_device_item->_PhysicalSlots.size());
 
   for (auto& slot : attrnav->pn_runtime_data->m_PnDevice->m_slot_list)
   {
@@ -847,12 +847,17 @@ pwr_tBoolean GsdmlAttrNav::device_check_change_ok(void* ctx)
   // Get a reference to the new selected device
   auto const new_dap = attrnav->gsdml->getDeviceAccessPointMap()[new_dap_id];
 
+  // If the starting index of our slots are not the same we have incompatibilities
+  if (new_dap->_PhysicalSlots.min() != attrnav->m_selected_device_item->_PhysicalSlots.min())
+    return false;
+
   // So we are to check if the modules already selected are valid on this new
   // DAP We will check if the module ID is allowed to be in the respective slot.
   // Start looping through all slots of the previously selected DAP (since these
   // slots aren't updated yet)
   for (auto const& slot : attrnav->pn_runtime_data->m_PnDevice->m_slot_list)
   {
+
     // Skip the DAP itself and any "unconfigured" slots i.e. module ident number
     // is 0
     if (slot.m_is_dap || slot.m_module_ident_number == 0)
@@ -1060,7 +1065,7 @@ int GsdmlAttrNav::object_attr()
         "just to be sure.");
 
     m_wow->DisplayText("New GSDML file detected", msg.c_str());
-    pn_runtime_data->m_gsdml_mismatch = false; // Reset this since we've made the use aware :)
+    pn_runtime_data->m_gsdml_mismatch = false; // Reset this since we've made the user aware :)
   }
 
   brow_SetNodraw(brow->ctx);
@@ -1171,7 +1176,7 @@ void GsdmlAttrNavBrow::brow_setup()
 int GsdmlAttrNav::init_brow_cb(FlowCtx* fctx, void* client_data)
 {
   GsdmlAttrNav* attrnav = (GsdmlAttrNav*)client_data;
-  BrowCtx* ctx = (BrowCtx*)fctx;  
+  BrowCtx* ctx = (BrowCtx*)fctx;
 
   attrnav->brow = new GsdmlAttrNavBrow(ctx, (void*)attrnav);
 
@@ -1741,8 +1746,7 @@ int ItemPnSlot::open_children_impl()
         module->_VirtualSubmoduleList.begin(), module->_VirtualSubmoduleList.end());
 
     // Sort the vector based on the the minimum starting subslot in which this virtual submodule item is fixed
-    std::sort(virtual_submodule_items.begin(), virtual_submodule_items.end(),
-              [](const auto& a, const auto& b)
+    std::sort(virtual_submodule_items.begin(), virtual_submodule_items.end(), [](const auto& a, const auto& b)
               { return a.second->_FixedInSubslots.min() < b.second->_FixedInSubslots.min(); });
 
     // Iterate over the sorted vector and add the virtual submodule items to all "fixed" subslots
