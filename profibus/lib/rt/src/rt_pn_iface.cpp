@@ -775,6 +775,10 @@ void pack_download_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes, std::shared_ptr<Pr
 
     for (auto& subslot : slot.m_subslot_map)
     {
+      // Skip empty subslots here aswell
+      if (subslot.second.m_submodule_ID == "")
+        continue;
+
       total_data_length += sizeof(T_PN_SUBMODULE);
       /* Fill data for the submodule */
 
@@ -825,6 +829,10 @@ void pack_download_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes, std::shared_ptr<Pr
 
     for (auto& subslot : slot.m_subslot_map)
     {
+      // Skip unconfigured subslots...
+      if (subslot.second.m_submodule_ID == "")
+        continue;
+
       for (auto& data_record : subslot.second.m_data_record_map)
       {
         total_data_length += sizeof(T_PN_DATA_RECORD) + data_record.second.m_data_length;
