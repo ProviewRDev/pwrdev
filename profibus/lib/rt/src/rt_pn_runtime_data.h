@@ -44,6 +44,7 @@
 #include <memory>
 #include <map>
 #include <iostream>
+#include <functional>
 
 #include "pwr.h"
 #include "co_pugixml.hpp"
@@ -308,6 +309,8 @@ public:
       m_unit_diag_type_map; // <UserStructureIdentifier, xxxxxxxxxxxxxxxxxx>
 
   // Runtime specifics
+  std::map<uint, std::reference_wrapper<ProfinetSlot>>
+      m_rt_plugged_slots_map; // This is a map of references (slots with modules plugged into them)
   unsigned short m_rt_device_state;
   unsigned short m_rt_device_ref;
   unsigned short m_rt_alarm_ref;

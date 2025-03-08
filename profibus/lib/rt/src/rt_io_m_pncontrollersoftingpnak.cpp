@@ -169,11 +169,12 @@ static pwr_tStatus IoAgentRead(io_tCtx ctx, io_sAgent* ap)
       if (sts == PNAK_OK)
       {
         // Set the iocs status. If we have bad data, the stack will give us zeroed inputs and
-        // the error counter will start increasing        
-        // Some converters have shown troubles during startup of the stack and if we disable these when they show
-        // bad ioxs data they will never come back up. So we utilize the startuptime timer for this to give them some time.
+        // the error counter will start increasing
+        // Some converters have shown troubles during startup of the stack and if we disable these when they
+        // show bad ioxs data they will never come back up. So we utilize the startuptime timer for this to
+        // give them some time.
         // TODO Investigate further...
-        io_sPnRackLocal* local_device = (io_sPnRackLocal*)device_list->Local;        
+        io_sPnRackLocal* local_device = (io_sPnRackLocal*)device_list->Local;
         if ((pwr_device->IOCS = ioxs) == 0x40 && local_device->start_cnt >= local_device->start_time)
         {
           pwr_device->Status = PB__DISABLED;
