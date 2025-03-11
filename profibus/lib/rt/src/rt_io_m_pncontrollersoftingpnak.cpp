@@ -180,9 +180,9 @@ static pwr_tStatus IoAgentRead(io_tCtx ctx, io_sAgent* ap)
           pwr_device->Status = PB__DISABLED;
         } // 0x40 == Bad, 0x80 == Good...
 
-        for (auto& slot : pn_device->m_slot_list)
+        for (auto& slot : pn_device->m_slot_map)
         {
-          for (auto& subslot : slot.m_subslot_map)
+          for (auto& subslot : slot.second.m_subslot_map)
           {
             if (subslot.second.m_rt_io_submodule_type & PROFINET_IO_SUBMODULE_TYPE_INPUT)
             {
@@ -244,9 +244,9 @@ static pwr_tStatus IoAgentWrite(io_tCtx ctx, io_sAgent* ap)
 
       memset(iocr.m_rt_io_data, PNAK_IOXS_STATUS_DATA_GOOD, data_length);
 
-      for (auto& slot : pn_device->m_slot_list)
+      for (auto& slot : pn_device->m_slot_map)
       {
-        for (auto& subslot : slot.m_subslot_map)
+        for (auto& subslot : slot.second.m_subslot_map)
         {
           if (subslot.second.m_rt_io_submodule_type == PROFINET_IO_SUBMODULE_TYPE_OUTPUT ||
               subslot.second.m_rt_io_submodule_type == PROFINET_IO_SUBMODULE_TYPE_INPUT_AND_OUTPUT)

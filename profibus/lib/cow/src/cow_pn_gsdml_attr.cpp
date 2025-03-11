@@ -136,7 +136,7 @@ void GsdmlAttr::activate_paste()
   {
     // Copy assignment constructor of ProfinetSlot will invoke ProfinetSubslot copy constructor to deep copy
     // the data
-    attrnav->pn_runtime_data->m_PnDevice->m_slot_list[item->m_slot_data->m_slot_number] =
+    attrnav->pn_runtime_data->m_PnDevice->m_slot_map[item->m_slot_data->m_slot_number] =
         *ProfinetRuntimeData::m_paste_slotdata;
   }
   else
@@ -181,7 +181,7 @@ void GsdmlAttr::activate_expand_all() { attrnav->expand_all(); }
 void GsdmlAttr::activate_print()
 {
   char filename[80] = "pwrp_tmp:wnav.ps";
-  char cmd[200];  
+  char cmd[200];
 
   dcli_translate_filename(filename, filename);
   attrnav->print(filename);

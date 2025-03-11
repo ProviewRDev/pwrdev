@@ -443,13 +443,13 @@ void pack_download_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes, std::shared_ptr<Pr
   num_apis = pn_device->m_API_map.size();
 
   /* Calculate the rest */
-  for (auto& slot : pn_device->m_slot_list)
+  for (auto& slot : pn_device->m_slot_map)
   {
     // Skip empty slots
-    if (slot.m_module_ID == "")
+    if (slot.second.m_module_ID == "")
       continue;
 
-    for (auto const& subslot : slot.m_subslot_map)
+    for (auto const& subslot : slot.second.m_subslot_map)
     {
       // Skip unconfigured subslots...
       if (subslot.second.m_submodule_ID == "")
@@ -467,7 +467,8 @@ void pack_download_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes, std::shared_ptr<Pr
     num_modules++;
 
     // "Plug" the module into our runtime modules
-    pn_device->m_rt_plugged_slots_map.insert(std::make_pair(slot.m_slot_number, std::ref(slot)));
+    pn_device->m_rt_plugged_slots_map.insert(
+        std::make_pair(slot.second.m_slot_number, std::ref(slot.second)));
   }
 
   pData = (char*)(service_desc + 1);
@@ -821,13 +822,13 @@ void pack_download_req(T_PNAK_SERVICE_REQ_RES* ServiceReqRes, std::shared_ptr<Pr
   /* Fill the DATA_RECORD's */
   pDataRecord = (T_PN_DATA_RECORD*)pModule;
 
-  for (auto& slot : pn_device->m_slot_list)
+  for (auto& slot : pn_device->m_slot_map)
   {
     // Skip empty slot
-    if (slot.m_module_ID == "")
+    if (slot.second.m_module_ID == "")
       continue;
 
-    for (auto& subslot : slot.m_subslot_map)
+    for (auto& subslot : slot.second.m_subslot_map)
     {
       // Skip unconfigured subslots...
       if (subslot.second.m_submodule_ID == "")
@@ -1665,12 +1666,12 @@ int unpack_download_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local)
 
         for (IODataIndex = 0u; IODataIndex < NumberIODatas; IODataIndex++)
         {
-          for (auto& slot : pn_device->m_slot_list)
+          for (auto& slot : pn_device->m_slot_map)
           {
-            if (slot.m_slot_number ==
+            if (slot.second.m_slot_number ==
                 _HIGH_LOW_BYTES_TO_PN_U16(pDataInfo->SlotNumberHighByte, pDataInfo->SlotNumberLowByte))
             {
-              for (auto& subslot : slot.m_subslot_map)
+              for (auto& subslot : slot.second.m_subslot_map)
               {
                 if (subslot.second.m_subslot_number ==
                     _HIGH_LOW_BYTES_TO_PN_U16(pDataInfo->SubSlotNumberHighByte,
@@ -1698,12 +1699,12 @@ int unpack_download_con(T_PNAK_SERVICE_DESCRIPTION* pSdb, io_sAgentLocal* local)
 
         for (IODataIndex = 0u; IODataIndex < NumberIODatas; IODataIndex++)
         {
-          for (auto& slot : pn_device->m_slot_list)
+          for (auto& slot : pn_device->m_slot_map)
           {
-            if (slot.m_slot_number ==
+            if (slot.second.m_slot_number ==
                 _HIGH_LOW_BYTES_TO_PN_U16(pDataInfo->SlotNumberHighByte, pDataInfo->SlotNumberLowByte))
             {
-              for (auto& subslot : slot.m_subslot_map)
+              for (auto& subslot : slot.second.m_subslot_map)
               {
                 if (subslot.second.m_subslot_number ==
                     _HIGH_LOW_BYTES_TO_PN_U16(pDataInfo->SubSlotNumberHighByte,
@@ -2126,9 +2127,9 @@ void* handle_events(void* ptr)
           offset_inputs = 0;
           offset_outputs = 0;
 
-          for (auto& module_data : pn_device->m_slot_list)
+          for (auto& module_data : pn_device->m_slot_map)
           {
-            for (auto& submodule_data : module_data.m_subslot_map)
+            for (auto& submodule_data : module_data.second.m_subslot_map)
             {
               if (iocr.first == PROFINET_IO_CR_TYPE_INPUT &&
                   (submodule_data.second.m_rt_io_submodule_type == PROFINET_IO_SUBMODULE_TYPE_INPUT ||

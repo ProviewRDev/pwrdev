@@ -301,7 +301,7 @@ public:
 
   // Elements
   ProfinetNetworkSettings m_NetworkSettings;
-  std::vector<ProfinetSlot> m_slot_list;
+  std::map<uint, ProfinetSlot> m_slot_map;
   std::map<uint, ProfinetAPI> m_API_map;                            // <api, ProfinetAPI>
   std::map<uint, ProfinetIOCR> m_IOCR_map;                          // <iocr type, ProfinetIOCR>
   std::unordered_map<uint, ProfinetChannelDiag> m_channel_diag_map; // <ErrorType, xxxxxxxxxxxxxxxxxxx>
