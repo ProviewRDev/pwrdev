@@ -938,58 +938,36 @@ pwr_tStatus pndevice_init(device_sCtx* ctx)
 {
   pwr_tOid module_oid;
   int corrupt = 0;
-  unsigned int idx;
   pwr_tStatus sts;
-
-  // Identify module objects
-
+  unsigned int *slot_number_p, slot_number;
   int size;
-  pwr_tObjName module_name;
 
   for (sts = ldh_GetChild(ctx->ldhses, ctx->aref.Objid, &module_oid); ODD(sts);
        sts = ldh_GetNextSibling(ctx->ldhses, module_oid, &module_oid))
   {
-    sts = ldh_ObjidToName(ctx->ldhses, module_oid, cdh_mName_object, module_name, sizeof(module_name), &size);
+    sts = ldh_GetObjectPar(ctx->ldhses, module_oid, "RtBody", "Slot", (char**)&slot_number_p, &size);
+    slot_number = *slot_number_p;
+    free(slot_number_p);
+
     if (EVEN(sts))
       return sts;
 
-    if (!(sscanf(module_name, "M%d", &idx) == 1))
+    try
+    {
+      auto& slot = ctx->attr->attrnav->pn_runtime_data->m_PnDevice->m_slot_map.at(slot_number);
+      slot.m_module_oid = module_oid;
+    }
+    catch (std::exception const& e)
     {
       corrupt = 1;
       continue;
     }
-    // if (idx >= ctx->attr->attrnav->dev_data.slot_data.size())
-    if (idx >= ctx->attr->attrnav->pn_runtime_data->m_PnDevice->m_slot_map.size())
-    {
-      corrupt = 1;
-      continue;
-    }
-    // ctx->attr->attrnav->dev_data.slot_data[idx]->module_oid = module_oid;
-    ctx->attr->attrnav->pn_runtime_data->m_PnDevice->m_slot_map[idx].m_module_oid = module_oid;
   }
 
   if (corrupt)
-  {
-    corrupt = 0;
+    ctx->attr->wow->DisplayError("Configuration corrupt",
+                                 "Configuration of module objects doesn't match device configuration");
 
-    // Not standard module names, get slot number from object order instead
-    idx = 1;
-    for (sts = ldh_GetChild(ctx->ldhses, ctx->aref.Objid, &module_oid); ODD(sts);
-         sts = ldh_GetNextSibling(ctx->ldhses, module_oid, &module_oid))
-    {
-      if (idx >= ctx->attr->attrnav->pn_runtime_data->m_PnDevice->m_slot_map.size())
-      {
-        corrupt = 1;
-        break;
-      }
-
-      ctx->attr->attrnav->pn_runtime_data->m_PnDevice->m_slot_map[idx].m_module_oid = module_oid;
-      idx++;
-    }
-    if (corrupt)
-      ctx->attr->wow->DisplayError("Configuration corrupt",
-                                   "Configuration of module objects doesn't match device configuration");
-  }
   return 1;
 }
 
