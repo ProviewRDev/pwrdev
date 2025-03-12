@@ -206,7 +206,7 @@ static pwr_tStatus IoAgentRead(io_tCtx ctx, io_sAgent* ap)
 }
 
 /*----------------------------------------------------------------------------*\
-   Write method for the Pb_Profiboard agent
+   Write method for the PnControllersoftingPNAK agent
 \*----------------------------------------------------------------------------*/
 static pwr_tStatus IoAgentWrite(io_tCtx ctx, io_sAgent* ap)
 {

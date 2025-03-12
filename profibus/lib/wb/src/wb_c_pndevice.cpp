@@ -475,7 +475,7 @@ int pndevice_save_cb(void* sctx)
     sts = ldh_GetNextSibling(ctx->ldhses, module_oid, &module_oid);
   }
 
-  // Create new module objects
+  // Create new module objects or update existing ones with new names and descriptions if they have changed
   pwr_tOid last_object = pwr_cNOid;
   for (auto& slot : ctx->attr->attrnav->pn_runtime_data->m_PnDevice->m_slot_map)
   {
@@ -484,11 +484,34 @@ int pndevice_save_cb(void* sctx)
     // Skip if if we have an oid (There's already an object in place, and we never remove existing configured
     // items) OR we do not have a module class, we need one to know what to create (The configurator forces
     // one to select a module class). The DAP has no selection but is forced to be pwr_cClass_PnModule.
-
-    // TODO If we have slot.m_is_modified force an update of the module name and description since it could
-    // have changed
     if (cdh_ObjidIsNotNull(slot.second.m_module_oid) || slot.second.m_module_class == pwr_cNCid)
+    {
+      if (slot.second.m_is_modified && cdh_ObjidIsNotNull(slot.second.m_module_oid))
+      {
+        // The module object exists already and we did modify this. We update the name and description
+        pwr_tAttrRef module_aref = cdh_ObjidToAref(slot.second.m_module_oid);
+        if (slot.second.m_is_dap)
+        {
+          std::string name = *ctx->attr->attrnav->gsdml->getDeviceAccessPointMap()
+                                  .at(slot.second.m_module_ID)
+                                  ->_ModuleInfo._Name;
+          std::string info = *ctx->attr->attrnav->gsdml->getDeviceAccessPointMap()
+                                  .at(slot.second.m_module_ID)
+                                  ->_ModuleInfo._InfoText;
+          set_attribute(ctx->ldhses, (void*)name.c_str(), name.length(), "ModuleName", &module_aref);
+          set_attribute(ctx->ldhses, (void*)info.c_str(), info.length(), "Description", &module_aref);
+        }
+        else
+        {
+          std::string name =
+              *ctx->attr->attrnav->gsdml->getModuleMap().at(slot.second.m_module_ID)->_ModuleInfo._Name;
+          set_attribute(ctx->ldhses, (void*)name.c_str(), name.length(), "ModuleName", &module_aref);
+          set_attribute(ctx->ldhses, (void*)name.c_str(), name.length(), "Description", &module_aref);
+        }
+      }
+
       continue;
+    }
 
     // Create a fancy name like "M0, M1" and so on and so forth...
     std::ostringstream module_name(std::ios_base::out);
@@ -555,7 +578,7 @@ int pndevice_save_cb(void* sctx)
     pwr_tAttrRef module_aref = cdh_ObjidToAref(slot.second.m_module_oid);
     set_attribute(ctx->ldhses, &slot.second.m_slot_number, sizeof(slot.second.m_slot_number), "Slot",
                   &module_aref);
-    // Set both ModuleName and Description as a default. Again, slot 0 is treated a little different
+    // Set both ModuleName and Description as a default. Again, DAP is treated a little different
     if (slot.second.m_is_dap)
     {
       std::string name = *ctx->attr->attrnav->gsdml->getDeviceAccessPointMap()
