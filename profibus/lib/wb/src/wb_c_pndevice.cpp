@@ -931,8 +931,7 @@ pwr_tStatus pndevice_create_ctx(ldh_tSession ldhses, pwr_tAttrRef aref, void* ed
 }
 
 /*
-  TODO Rewrite this so that we use the SlotNumber attribute instead. AND also introduce moduleID as an
-  attribute.
+  Called when the user selects to configure a PnDevice.
 */
 pwr_tStatus pndevice_init(device_sCtx* ctx)
 {
