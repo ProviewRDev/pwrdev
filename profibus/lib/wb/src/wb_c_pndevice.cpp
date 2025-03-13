@@ -90,10 +90,6 @@ static int pndevice_populate_channel_vectors(device_sCtx* ctx, GSDML::IOData* io
                                              std::vector<ChanItem>& input_vect,
                                              std::vector<ChanItem>& output_vect);
 
-// static int pndevice_check_io(device_sCtx* ctx,
-//                              std::map<std::string, std::shared_ptr<GSDML::SubmoduleItem>> const& vsl,
-//                              std::vector<ChanItem>& input_vect, std::vector<ChanItem>& output_vect);
-
 static int set_attribute(ldh_tSession p_ldhses, void* p_value, size_t p_length, const char* p_attribute_name,
                          pwr_tAttrRef* p_aref)
 {

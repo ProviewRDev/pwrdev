@@ -1135,6 +1135,7 @@ int GsdmlAttrNav::object_attr()
       if (slot.second.m_is_dap && !dap_inserted)
       {
         dap_inserted = true;
+        slot.second.m_is_modified = true;
         slot_string << " (DAP)";
         new ItemPnDAP(this, slot_string.str().c_str(), &slot.second, NULL, flow_eDest_IntoLast,
                       "Configure the DAP here. Some DAPs may let you select "
