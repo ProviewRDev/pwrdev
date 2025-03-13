@@ -31,6 +31,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Signal handling was added to the most common utilities used such as rt_xtt and rt_rtt where signals will be handled in an application specific manner and exit accordingly without deadlocks.
 - DsFastCurve could crash because of an uninitialized variable used for the TriggIndex. It is now fixed.
 - The Event Log would not convert Event Name to the correct coding resulting in garbled text in the Event Name and no results in the search.
+- PROFINET: The configurator was unprepared for unpopulated slot 0. It is now well prepared for this.
+- PROFINET: The configurator could show some inconsistencies in slots when changing DAP when the starting index of the physical slots did not start at 0.
 
 ### Changed
 
@@ -41,6 +43,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - profibus: The PROFINET configurator was not prepared for multiple fixed Virtual Submodule Items, it is now.
 - profibus: PROFINET startup sequence now waits StartupTime seconds before checking IOCS status from devices
 - Updated the documentation for the PID controller.
+- PROFINET: The configurator will now rename modules and change the description if you change them. For instance, when changing DAP.
+- PROFINET: The configurator will now do a sanity check on the modules configured for the DAP and remove submodules not in the submodules list for the DAP
+  - This could happen during an upgrade when inconsistency in the GSDML files used as source would imply that a submodule should exists. This is due to the way things were implemented in the old configurator using simple indexes to map DAPs.
 
 ### Removed
 

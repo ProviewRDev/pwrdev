@@ -90,10 +90,6 @@ static int pndevice_populate_channel_vectors(device_sCtx* ctx, GSDML::IOData* io
                                              std::vector<ChanItem>& input_vect,
                                              std::vector<ChanItem>& output_vect);
 
-// static int pndevice_check_io(device_sCtx* ctx,
-//                              std::map<std::string, std::shared_ptr<GSDML::SubmoduleItem>> const& vsl,
-//                              std::vector<ChanItem>& input_vect, std::vector<ChanItem>& output_vect);
-
 static int set_attribute(ldh_tSession p_ldhses, void* p_value, size_t p_length, const char* p_attribute_name,
                          pwr_tAttrRef* p_aref)
 {
@@ -381,8 +377,8 @@ int pndevice_save_cb(void* sctx)
   ((WNav*)ctx->editor_ctx)->set_nodraw();
 
   // Reset all module object identities
-  for (auto& slot : ctx->attr->attrnav->pn_runtime_data->m_PnDevice->m_slot_list)
-    slot.m_module_oid = pwr_cNOid;
+  for (auto& slot : ctx->attr->attrnav->pn_runtime_data->m_PnDevice->m_slot_map)
+    slot.second.m_module_oid = pwr_cNOid;
 
   // Check if we are indeed iterating over a pnmodule and that this module is "in use"
   // If both things above are true we save the oid of the PnModule. And we only save each slot number once.
@@ -410,20 +406,29 @@ int pndevice_save_cb(void* sctx)
       }
 
       // This module is exceeding the allowed number of modules for the DAP.
-      if (slot_number >= ctx->attr->attrnav->pn_runtime_data->m_PnDevice->m_slot_list.size())
+      if (slot_number >= ctx->attr->attrnav->pn_runtime_data->m_PnDevice->m_slot_map.size())
       {
         MsgWindow::message('E', "Slot number exceeds maximum slot list size", msgw_ePop_Yes, module_oid);
         continue;
       }
 
-      ProfinetSlot* slot = &ctx->attr->attrnav->pn_runtime_data->m_PnDevice->m_slot_list[slot_number];
+      auto& slot_map = ctx->attr->attrnav->pn_runtime_data->m_PnDevice->m_slot_map;
+      auto const& slot = slot_map[slot_number];
+
+      // Check if the slot number we have in the module object is the same as the slot number in
+      // the corresponding slot object
+      if (slot.m_slot_number != slot_number)
+      {
+        // MsgWindow::message('E', "Slot number mismatch", msgw_ePop_Yes, module_oid);
+        continue;
+      }
 
       // Now check if the module is indeed present in our configuration, if it isn't we don't update the oid
       // (i.e. we mark it for removal)
-      if (slot->m_module_ID == "")
+      if (slot.m_module_ID == "")
         continue; // Leaving the oid untouched
 
-      ctx->attr->attrnav->pn_runtime_data->m_PnDevice->m_slot_list[slot_number].m_module_oid = module_oid;
+      ctx->attr->attrnav->pn_runtime_data->m_PnDevice->m_slot_map[slot_number].m_module_oid = module_oid;
       traversed_slot_numbers.push_back(slot_number);
     }
   }
@@ -435,28 +440,29 @@ int pndevice_save_cb(void* sctx)
   // changes configuration for modules in the middle without changing the module class...
   for (sts = ldh_GetChild(ctx->ldhses, ctx->aref.Objid, &module_oid); ODD(sts);)
   {
-    auto& slot_list = ctx->attr->attrnav->pn_runtime_data->m_PnDevice->m_slot_list;
+    auto& slot_map = ctx->attr->attrnav->pn_runtime_data->m_PnDevice->m_slot_map;
     // We want to find an object, if we do not find one we remove it. The predicate says we want
     // the same oid to be present in the saved conf and that the module class hasn't changed...
     pwr_tCid cid = pwr_cNCid;
     ldh_GetObjectClass(ctx->ldhses, module_oid, &cid); // Ignore return...
-    auto result = std::find_if(
-        std::begin(slot_list), std::end(slot_list),
-        [&module_oid, &cid](auto& slot)
-        { return (cdh_ObjidIsEqual(slot.m_module_oid, module_oid) && (slot.m_module_class == cid)); });
+    auto result = std::find_if(std::begin(slot_map), std::end(slot_map),
+                               [&module_oid, &cid](auto& slot)
+                               {
+                                 return (cdh_ObjidIsEqual(slot.second.m_module_oid, module_oid) &&
+                                         (slot.second.m_module_class == cid));
+                               });
 
     // If we reached the end we didn't find a module matching our conf so this module has to go. It's either
     // removed or one changed the module class
-    if (result == std::end(slot_list))
+    if (result == std::end(slot_map))
     {
       pwr_tOid purged_oid = module_oid;
 
       // Find and clear the saved oid for the module we are about to remove
-      auto search_oid =
-          std::find_if(std::begin(slot_list), std::end(slot_list),
-                       [&module_oid](auto& slot) { return cdh_ObjidIsEqual(slot.m_module_oid, module_oid); });
-      if (search_oid != std::end(slot_list))
-        search_oid->m_module_oid = pwr_cNOid;
+      auto search_oid = std::find_if(std::begin(slot_map), std::end(slot_map), [&module_oid](auto& slot)
+                                     { return cdh_ObjidIsEqual(slot.second.m_module_oid, module_oid); });
+      if (search_oid != std::end(slot_map))
+        search_oid->second.m_module_oid = pwr_cNOid;
 
       sts = ldh_GetNextSibling(ctx->ldhses, purged_oid, &module_oid);
       sts = ldh_DeleteObjectTree(ctx->ldhses, purged_oid, 0);
@@ -465,24 +471,47 @@ int pndevice_save_cb(void* sctx)
     sts = ldh_GetNextSibling(ctx->ldhses, module_oid, &module_oid);
   }
 
-  // Create new module objects
+  // Create new module objects or update existing ones with new names and descriptions if they have changed
   pwr_tOid last_object = pwr_cNOid;
-  for (auto& slot : ctx->attr->attrnav->pn_runtime_data->m_PnDevice->m_slot_list)
+  for (auto& slot : ctx->attr->attrnav->pn_runtime_data->m_PnDevice->m_slot_map)
   {
     bool created = false;
 
     // Skip if if we have an oid (There's already an object in place, and we never remove existing configured
     // items) OR we do not have a module class, we need one to know what to create (The configurator forces
     // one to select a module class). The DAP has no selection but is forced to be pwr_cClass_PnModule.
+    if (cdh_ObjidIsNotNull(slot.second.m_module_oid) || slot.second.m_module_class == pwr_cNCid)
+    {
+      if (slot.second.m_is_modified && cdh_ObjidIsNotNull(slot.second.m_module_oid))
+      {
+        // The module object exists already and we did modify this. We update the name and description
+        pwr_tAttrRef module_aref = cdh_ObjidToAref(slot.second.m_module_oid);
+        if (slot.second.m_is_dap)
+        {
+          std::string name = *ctx->attr->attrnav->gsdml->getDeviceAccessPointMap()
+                                  .at(slot.second.m_module_ID)
+                                  ->_ModuleInfo._Name;
+          std::string info = *ctx->attr->attrnav->gsdml->getDeviceAccessPointMap()
+                                  .at(slot.second.m_module_ID)
+                                  ->_ModuleInfo._InfoText;
+          set_attribute(ctx->ldhses, (void*)name.c_str(), name.length(), "ModuleName", &module_aref);
+          set_attribute(ctx->ldhses, (void*)info.c_str(), info.length(), "Description", &module_aref);
+        }
+        else
+        {
+          std::string name =
+              *ctx->attr->attrnav->gsdml->getModuleMap().at(slot.second.m_module_ID)->_ModuleInfo._Name;
+          set_attribute(ctx->ldhses, (void*)name.c_str(), name.length(), "ModuleName", &module_aref);
+          set_attribute(ctx->ldhses, (void*)name.c_str(), name.length(), "Description", &module_aref);
+        }
+      }
 
-    // TODO If we have slot.m_is_modified force an update of the module name and description since it could
-    // have changed
-    if (cdh_ObjidIsNotNull(slot.m_module_oid) || slot.m_module_class == pwr_cNCid)
       continue;
+    }
 
     // Create a fancy name like "M0, M1" and so on and so forth...
     std::ostringstream module_name(std::ios_base::out);
-    module_name << "M" << slot.m_slot_number;
+    module_name << "M" << slot.second.m_slot_number;
 
     // We need to insert the module in the correct place! Find out where to insert module
     for (sts = ldh_GetChild(ctx->ldhses, ctx->aref.Objid, &module_oid); ODD(sts);
@@ -495,10 +524,10 @@ int pndevice_save_cb(void* sctx)
       slot_number = *slot_number_p;
       free(slot_number_p);
 
-      if (slot.m_slot_number < slot_number)
+      if (slot.second.m_slot_number < slot_number)
       {
-        sts = ldh_CreateObject(ctx->ldhses, &slot.m_module_oid, module_name.str().c_str(),
-                               slot.m_module_class, module_oid, ldh_eDest_Before);
+        sts = ldh_CreateObject(ctx->ldhses, &slot.second.m_module_oid, module_name.str().c_str(),
+                               slot.second.m_module_class, module_oid, ldh_eDest_Before);
         if (EVEN(sts))
         {
           MsgWindow::message('E', "Error creating module object", module_name.str().c_str());
@@ -519,13 +548,13 @@ int pndevice_save_cb(void* sctx)
       // We are either at the beginning or at the end
       if (cdh_ObjidIsNull(last_object))
       {
-        sts = ldh_CreateObject(ctx->ldhses, &slot.m_module_oid, module_name.str().c_str(),
-                               slot.m_module_class, ctx->aref.Objid, ldh_eDest_IntoFirst);
+        sts = ldh_CreateObject(ctx->ldhses, &slot.second.m_module_oid, module_name.str().c_str(),
+                               slot.second.m_module_class, ctx->aref.Objid, ldh_eDest_IntoFirst);
       }
       else // All subsequent pnmodules created
       {
-        sts = ldh_CreateObject(ctx->ldhses, &slot.m_module_oid, module_name.str().c_str(),
-                               slot.m_module_class, last_object, ldh_eDest_After);
+        sts = ldh_CreateObject(ctx->ldhses, &slot.second.m_module_oid, module_name.str().c_str(),
+                               slot.second.m_module_class, last_object, ldh_eDest_After);
       }
     }
 
@@ -539,24 +568,28 @@ int pndevice_save_cb(void* sctx)
     }
 
     // Save last object id so that we can continue creating objects from there...
-    last_object = slot.m_module_oid;
+    last_object = slot.second.m_module_oid;
 
     // Update slot number in our module object and set a name for the attribute ModuleName
-    pwr_tAttrRef module_aref = cdh_ObjidToAref(slot.m_module_oid);
-    set_attribute(ctx->ldhses, &slot.m_slot_number, sizeof(slot.m_slot_number), "Slot", &module_aref);
-    // Set both ModuleName and Description as a default. Again, slot 0 is treated a little different
-    if (slot.m_is_dap)
+    pwr_tAttrRef module_aref = cdh_ObjidToAref(slot.second.m_module_oid);
+    set_attribute(ctx->ldhses, &slot.second.m_slot_number, sizeof(slot.second.m_slot_number), "Slot",
+                  &module_aref);
+    // Set both ModuleName and Description as a default. Again, DAP is treated a little different
+    if (slot.second.m_is_dap)
     {
-      std::string name =
-          *ctx->attr->attrnav->gsdml->getDeviceAccessPointMap().at(slot.m_module_ID)->_ModuleInfo._Name;
-      std::string info =
-          *ctx->attr->attrnav->gsdml->getDeviceAccessPointMap().at(slot.m_module_ID)->_ModuleInfo._InfoText;
+      std::string name = *ctx->attr->attrnav->gsdml->getDeviceAccessPointMap()
+                              .at(slot.second.m_module_ID)
+                              ->_ModuleInfo._Name;
+      std::string info = *ctx->attr->attrnav->gsdml->getDeviceAccessPointMap()
+                              .at(slot.second.m_module_ID)
+                              ->_ModuleInfo._InfoText;
       set_attribute(ctx->ldhses, (void*)name.c_str(), name.length(), "ModuleName", &module_aref);
       set_attribute(ctx->ldhses, (void*)info.c_str(), info.length(), "Description", &module_aref);
     }
     else
     {
-      std::string name = *ctx->attr->attrnav->gsdml->getModuleMap().at(slot.m_module_ID)->_ModuleInfo._Name;
+      std::string name =
+          *ctx->attr->attrnav->gsdml->getModuleMap().at(slot.second.m_module_ID)->_ModuleInfo._Name;
       set_attribute(ctx->ldhses, (void*)name.c_str(), name.length(), "ModuleName", &module_aref);
       set_attribute(ctx->ldhses, (void*)name.c_str(), name.length(), "Description", &module_aref);
     }
@@ -580,7 +613,16 @@ int pndevice_save_cb(void* sctx)
     slot_number = *slot_number_p;
     free(slot_number_p);
 
-    auto& slot = ctx->attr->attrnav->pn_runtime_data->m_PnDevice->m_slot_list[slot_number];
+    // Find the item where m_slot_number matches
+    auto it = ctx->attr->attrnav->pn_runtime_data->m_PnDevice->m_slot_map.find(slot_number);
+
+    if (it == ctx->attr->attrnav->pn_runtime_data->m_PnDevice->m_slot_map.end())
+    {
+      continue;
+    }
+
+    auto& slot = ctx->attr->attrnav->pn_runtime_data->m_PnDevice->m_slot_map.at(slot_number);
+
     if (slot.m_is_dap) // DAP
     {
       module_item = ctx->attr->attrnav->gsdml->getDeviceAccessPointMap().at(slot.m_module_ID);
@@ -660,8 +702,8 @@ int pndevice_save_cb(void* sctx)
           return sts;
         }
       }
-      slot.m_is_modified = false; // Reset this flag since we now have our channels and we ain't really in a
-                                  // modified state anymore...
+      slot.m_is_modified = false; // Reset this flag since we now have our channels and we ain't really
+                                  // in a modified state anymore...
     }
     else // This is NOT a PnModule, we then remove everything apparently
     {
@@ -908,66 +950,42 @@ pwr_tStatus pndevice_create_ctx(ldh_tSession ldhses, pwr_tAttrRef aref, void* ed
 }
 
 /*
-  TODO Rewrite this so that we use the SlotNumber attribute instead. AND also introduce moduleID as an
-  attribute.
+  Called when the user selects to configure a PnDevice.
 */
 pwr_tStatus pndevice_init(device_sCtx* ctx)
 {
   pwr_tOid module_oid;
   int corrupt = 0;
-  unsigned int idx;
   pwr_tStatus sts;
-
-  // Identify module objects
-
+  unsigned int *slot_number_p, slot_number;
   int size;
-  pwr_tObjName module_name;
 
   for (sts = ldh_GetChild(ctx->ldhses, ctx->aref.Objid, &module_oid); ODD(sts);
        sts = ldh_GetNextSibling(ctx->ldhses, module_oid, &module_oid))
   {
-    sts = ldh_ObjidToName(ctx->ldhses, module_oid, cdh_mName_object, module_name, sizeof(module_name), &size);
+    sts = ldh_GetObjectPar(ctx->ldhses, module_oid, "RtBody", "Slot", (char**)&slot_number_p, &size);
+    slot_number = *slot_number_p;
+    free(slot_number_p);
+
     if (EVEN(sts))
       return sts;
 
-    if (!(sscanf(module_name, "M%d", &idx) == 1))
+    try
+    {
+      auto& slot = ctx->attr->attrnav->pn_runtime_data->m_PnDevice->m_slot_map.at(slot_number);
+      slot.m_module_oid = module_oid;
+    }
+    catch (std::exception const& e)
     {
       corrupt = 1;
       continue;
     }
-    // if (idx >= ctx->attr->attrnav->dev_data.slot_data.size())
-    if (idx >= ctx->attr->attrnav->pn_runtime_data->m_PnDevice->m_slot_list.size())
-    {
-      corrupt = 1;
-      continue;
-    }
-    // ctx->attr->attrnav->dev_data.slot_data[idx]->module_oid = module_oid;
-    ctx->attr->attrnav->pn_runtime_data->m_PnDevice->m_slot_list[idx].m_module_oid = module_oid;
   }
 
   if (corrupt)
-  {
-    corrupt = 0;
+    ctx->attr->wow->DisplayError("Configuration corrupt",
+                                 "Configuration of module objects doesn't match device configuration");
 
-    // Not standard module names, get slot number from object order instead
-    idx = 1;
-    for (sts = ldh_GetChild(ctx->ldhses, ctx->aref.Objid, &module_oid); ODD(sts);
-         sts = ldh_GetNextSibling(ctx->ldhses, module_oid, &module_oid))
-    {
-      // if (idx >= ctx->attr->attrnav->dev_data.slot_data.size())
-      if (idx >= ctx->attr->attrnav->pn_runtime_data->m_PnDevice->m_slot_list.size())
-      {
-        corrupt = 1;
-        break;
-      }
-      // ctx->attr->attrnav->dev_data.slot_data[idx]->module_oid = module_oid;
-      ctx->attr->attrnav->pn_runtime_data->m_PnDevice->m_slot_list[idx].m_module_oid = module_oid;
-      idx++;
-    }
-    if (corrupt)
-      ctx->attr->wow->DisplayError("Configuration corrupt",
-                                   "Configuration of module objects doesn't match device configuration");
-  }
   return 1;
 }
 
