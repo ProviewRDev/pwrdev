@@ -90,6 +90,31 @@ static int pndevice_populate_channel_vectors(device_sCtx* ctx, GSDML::IOData* io
                                              std::vector<ChanItem>& input_vect,
                                              std::vector<ChanItem>& output_vect);
 
+static int set_string_attribute(ldh_tSession p_ldhses, std::string const& value, const char* p_attribute_name,
+                                pwr_tAttrRef* p_aref)
+{
+  pwr_tStatus sts;
+  pwr_tAttrRef attribute_aref;
+  sts = ldh_ArefANameToAref(p_ldhses, p_aref, p_attribute_name, &attribute_aref);
+  if (EVEN(sts))
+    return sts;
+
+  // We need to truncate the string to 79 characters since the attribute value is limited to 80 characters
+  // including null termination
+  std::string truncated_value = value;
+  if (truncated_value.length() > 79)
+  {
+    truncated_value.resize(79);
+  }
+
+  void* p_value = (void*)truncated_value.c_str();
+  int p_length = truncated_value.length();
+
+  sts = ldh_WriteAttribute(p_ldhses, &attribute_aref, p_value, p_length);
+
+  return sts;
+}
+
 static int set_attribute(ldh_tSession p_ldhses, void* p_value, size_t p_length, const char* p_attribute_name,
                          pwr_tAttrRef* p_aref)
 {
@@ -126,8 +151,7 @@ static int create_channel(ldh_tSession ldhses, ChanItem const& chan, pwr_tOid ta
   if (EVEN(sts))
     return sts;
 
-  sts = set_attribute(ldhses, (void*)chan.description.c_str(), sizeof(chan.description), "Description",
-                      &chan_aref);
+  sts = set_string_attribute(ldhses, chan.description, "Description", &chan_aref);
 
   return sts;
 }
@@ -471,7 +495,7 @@ int pndevice_save_cb(void* sctx)
     sts = ldh_GetNextSibling(ctx->ldhses, module_oid, &module_oid);
   }
 
-  // Create new module objects or update existing ones with new names and descriptions if they have changed
+  // Create or update module objects
   pwr_tOid last_object = pwr_cNOid;
   for (auto& slot : ctx->attr->attrnav->pn_runtime_data->m_PnDevice->m_slot_map)
   {
@@ -480,91 +504,77 @@ int pndevice_save_cb(void* sctx)
     // Skip if if we have an oid (There's already an object in place, and we never remove existing configured
     // items) OR we do not have a module class, we need one to know what to create (The configurator forces
     // one to select a module class). The DAP has no selection but is forced to be pwr_cClass_PnModule.
+    // But if we are on a modified slot we keep on since we might need to update some descriptions or names
+    // in already existing module objects. (Yes this will overwrite if one has changed to a custom
+    // name/description).
     if (cdh_ObjidIsNotNull(slot.second.m_module_oid) || slot.second.m_module_class == pwr_cNCid)
     {
-      if (slot.second.m_is_modified && cdh_ObjidIsNotNull(slot.second.m_module_oid))
+      if (!slot.second.m_is_modified)
       {
-        // The module object exists already and we did modify this. We update the name and description
-        pwr_tAttrRef module_aref = cdh_ObjidToAref(slot.second.m_module_oid);
-        if (slot.second.m_is_dap)
-        {
-          std::string name = *ctx->attr->attrnav->gsdml->getDeviceAccessPointMap()
-                                  .at(slot.second.m_module_ID)
-                                  ->_ModuleInfo._Name;
-          std::string info = *ctx->attr->attrnav->gsdml->getDeviceAccessPointMap()
-                                  .at(slot.second.m_module_ID)
-                                  ->_ModuleInfo._InfoText;
-          set_attribute(ctx->ldhses, (void*)name.c_str(), name.length(), "ModuleName", &module_aref);
-          set_attribute(ctx->ldhses, (void*)info.c_str(), info.length(), "Description", &module_aref);
-        }
-        else
-        {
-          std::string name =
-              *ctx->attr->attrnav->gsdml->getModuleMap().at(slot.second.m_module_ID)->_ModuleInfo._Name;
-          set_attribute(ctx->ldhses, (void*)name.c_str(), name.length(), "ModuleName", &module_aref);
-          set_attribute(ctx->ldhses, (void*)name.c_str(), name.length(), "Description", &module_aref);
-        }
+        continue;
       }
-
-      continue;
     }
 
     // Create a fancy name like "M0, M1" and so on and so forth...
     std::ostringstream module_name(std::ios_base::out);
     module_name << "M" << slot.second.m_slot_number;
 
-    // We need to insert the module in the correct place! Find out where to insert module
-    for (sts = ldh_GetChild(ctx->ldhses, ctx->aref.Objid, &module_oid); ODD(sts);
-         sts = ldh_GetNextSibling(ctx->ldhses, module_oid, &module_oid))
+    // We have no module object, create one
+    if (cdh_ObjidIsNull(slot.second.m_module_oid))
     {
-      // Boiler plate for extracting the slot number ....... TODO refactor, second use here...
-      unsigned int *slot_number_p, slot_number;
-      int size;
-      sts = ldh_GetObjectPar(ctx->ldhses, module_oid, "RtBody", "Slot", (char**)&slot_number_p, &size);
-      slot_number = *slot_number_p;
-      free(slot_number_p);
-
-      if (slot.second.m_slot_number < slot_number)
+      // We need to insert the module in the correct place! Find out where to insert module
+      for (sts = ldh_GetChild(ctx->ldhses, ctx->aref.Objid, &module_oid); ODD(sts);
+           sts = ldh_GetNextSibling(ctx->ldhses, module_oid, &module_oid))
       {
-        sts = ldh_CreateObject(ctx->ldhses, &slot.second.m_module_oid, module_name.str().c_str(),
-                               slot.second.m_module_class, module_oid, ldh_eDest_Before);
-        if (EVEN(sts))
+        // Boiler plate for extracting the slot number ....... TODO refactor, second use here...
+        unsigned int *slot_number_p, slot_number;
+        int size;
+        sts = ldh_GetObjectPar(ctx->ldhses, module_oid, "RtBody", "Slot", (char**)&slot_number_p, &size);
+        slot_number = *slot_number_p;
+        free(slot_number_p);
+
+        if (slot.second.m_slot_number < slot_number)
         {
-          MsgWindow::message('E', "Error creating module object", module_name.str().c_str());
-          sts = 0;
-          ((WNav*)ctx->editor_ctx)->reset_nodraw();
-          return sts;
+          sts = ldh_CreateObject(ctx->ldhses, &slot.second.m_module_oid, module_name.str().c_str(),
+                                 slot.second.m_module_class, module_oid, ldh_eDest_Before);
+          if (EVEN(sts))
+          {
+            MsgWindow::message('E', "Error creating module object", module_name.str().c_str());
+            sts = 0;
+            ((WNav*)ctx->editor_ctx)->reset_nodraw();
+            return sts;
+          }
+          created = true; // Set created, we won't create another item :D
+          break;
         }
-        created = true; // Set created, we won't create another item :D
-        break;
+        last_object = module_oid; // Update last object in case we reach the end
       }
-      last_object = module_oid; // Update last object in case we reach the end
-    }
 
-    sts = PB__SUCCESS; // Reset the status once out of the loop...
+      sts = PB__SUCCESS; // Reset the status once out of the loop...
 
-    if (!created)
-    {
-      // We are either at the beginning or at the end
-      if (cdh_ObjidIsNull(last_object))
+      if (!created)
       {
-        sts = ldh_CreateObject(ctx->ldhses, &slot.second.m_module_oid, module_name.str().c_str(),
-                               slot.second.m_module_class, ctx->aref.Objid, ldh_eDest_IntoFirst);
+        // We are either at the beginning or at the end
+        if (cdh_ObjidIsNull(last_object))
+        {
+          sts = ldh_CreateObject(ctx->ldhses, &slot.second.m_module_oid, module_name.str().c_str(),
+                                 slot.second.m_module_class, ctx->aref.Objid, ldh_eDest_IntoFirst);
+        }
+        else // All subsequent pnmodules created
+        {
+          sts = ldh_CreateObject(ctx->ldhses, &slot.second.m_module_oid, module_name.str().c_str(),
+                                 slot.second.m_module_class, last_object, ldh_eDest_After);
+        }
       }
-      else // All subsequent pnmodules created
-      {
-        sts = ldh_CreateObject(ctx->ldhses, &slot.second.m_module_oid, module_name.str().c_str(),
-                               slot.second.m_module_class, last_object, ldh_eDest_After);
-      }
-    }
 
-    // Did everything go as planned?
-    if (EVEN(sts))
-    {
-      MsgWindow::message('E', "Error creating module object", module_name.str().c_str());
-      sts = 0;
-      ((WNav*)ctx->editor_ctx)->reset_nodraw();
-      return sts;
+      // Did everything go as planned?
+      if (EVEN(sts))
+      {
+        MsgWindow::message('E', "Error creating module object", module_name.str().c_str());
+        sts = 0;
+        ((WNav*)ctx->editor_ctx)->reset_nodraw();
+        return sts;
+      }
     }
 
     // Save last object id so that we can continue creating objects from there...
@@ -583,15 +593,15 @@ int pndevice_save_cb(void* sctx)
       std::string info = *ctx->attr->attrnav->gsdml->getDeviceAccessPointMap()
                               .at(slot.second.m_module_ID)
                               ->_ModuleInfo._InfoText;
-      set_attribute(ctx->ldhses, (void*)name.c_str(), name.length(), "ModuleName", &module_aref);
-      set_attribute(ctx->ldhses, (void*)info.c_str(), info.length(), "Description", &module_aref);
+      set_string_attribute(ctx->ldhses, name, "ModuleName", &module_aref);
+      set_string_attribute(ctx->ldhses, info, "Description", &module_aref);
     }
     else
     {
       std::string name =
           *ctx->attr->attrnav->gsdml->getModuleMap().at(slot.second.m_module_ID)->_ModuleInfo._Name;
-      set_attribute(ctx->ldhses, (void*)name.c_str(), name.length(), "ModuleName", &module_aref);
-      set_attribute(ctx->ldhses, (void*)name.c_str(), name.length(), "Description", &module_aref);
+      set_string_attribute(ctx->ldhses, name, "ModuleName", &module_aref);
+      set_string_attribute(ctx->ldhses, name, "Description", &module_aref);
     }
 
   } // Done creating modules
