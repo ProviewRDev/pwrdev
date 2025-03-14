@@ -33,6 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The Event Log would not convert Event Name to the correct coding resulting in garbled text in the Event Name and no results in the search.
 - PROFINET: The configurator was unprepared for unpopulated slot 0. It is now well prepared for this.
 - PROFINET: The configurator could show some inconsistencies in slots when changing DAP when the starting index of the physical slots did not start at 0.
+- PROFINET: The configurator will now truncate strings to 79 characters before writing attributes using cdh-functions that doesn't add null termination.
 
 ### Changed
 
