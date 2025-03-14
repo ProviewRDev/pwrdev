@@ -848,6 +848,7 @@ void GsdmlAttrNav::device_update_change(void* ctx)
     // The DAP
     if (slot.second.m_is_dap)
     {
+      slot.second.m_is_modified = true;
       slot.second.m_subslot_map.clear();
       slot.second.m_module_ident_number = attrnav->m_selected_device_item->_ModuleIdentNumber;
       slot.second.m_module_ID = new_dap_id;
@@ -1135,7 +1136,6 @@ int GsdmlAttrNav::object_attr()
       if (slot.second.m_is_dap && !dap_inserted)
       {
         dap_inserted = true;
-        slot.second.m_is_modified = true;
         slot_string << " (DAP)";
         new ItemPnDAP(this, slot_string.str().c_str(), &slot.second, NULL, flow_eDest_IntoLast,
                       "Configure the DAP here. Some DAPs may let you select "
