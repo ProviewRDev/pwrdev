@@ -509,7 +509,7 @@ int pndevice_save_cb(void* sctx)
     // name/description).
     if (cdh_ObjidIsNotNull(slot.second.m_module_oid) || slot.second.m_module_class == pwr_cNCid)
     {
-      if (!slot.second.m_is_modified)
+      if (!slot.second.m_is_modified || slot.second.m_module_class == pwr_cNCid)
       {
         continue;
       }
