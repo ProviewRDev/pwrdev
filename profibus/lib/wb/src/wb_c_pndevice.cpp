@@ -212,22 +212,22 @@ static int pndevice_fill_io_vector_from_data_item(std::vector<ChanItem>& io_vect
     case GSDML::ValueDataType_Integer8:
     case GSDML::ValueDataType_Unsigned8:
     case GSDML::ValueDataType_OctetString:
-      ci.representation = pwr_eDataRepEnum_Bit8;
+      ci.representation = pwr_eDataRepEnum_BitField8;
       bits = 8;
       break;
     case GSDML::ValueDataType_Integer16:
     case GSDML::ValueDataType_Unsigned16:
-      ci.representation = pwr_eDataRepEnum_Bit16;
+      ci.representation = pwr_eDataRepEnum_BitField16;
       bits = 16;
       break;
     case GSDML::ValueDataType_Integer32:
     case GSDML::ValueDataType_Unsigned32:
-      ci.representation = pwr_eDataRepEnum_Bit32;
+      ci.representation = pwr_eDataRepEnum_BitField32;
       bits = 32;
       break;
     case GSDML::ValueDataType_Integer64:
     case GSDML::ValueDataType_Unsigned64:
-      ci.representation = pwr_eDataRepEnum_Bit64;
+      ci.representation = pwr_eDataRepEnum_BitField64;
       bits = 64;
       break;
     default:

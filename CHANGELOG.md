@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added some ABB classes to the workbench palette for quick access.
 - Added the cJSON library to the project.
 - Added this changelog.
+- Added BitField8/16/32/64 data representation. These represent bitfields that are not byte-swapped, in accordance with their definition.
 
 ### Fixed
 
