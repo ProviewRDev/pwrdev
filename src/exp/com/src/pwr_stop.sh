@@ -123,6 +123,7 @@
   fi
 
   rm -f /tmp/pwr*$PWR_BUS_ID
+  unlink /dev/mqueue/pwrlogqueue_${PWR_BUS_ID}
 
   #rm -f /tmp/pwr*
   #id=`ipcs -s | grep $user | awk '{print $2}'`

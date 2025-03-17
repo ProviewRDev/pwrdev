@@ -35,23 +35,23 @@
  */
 
 /*************************************************************************
-*		===============
-*                P r o v i e w
-*               ===============
-**************************************************************************
-*
-* Filename:             rs_remote_tcpip.c
-*
-*                       Date    Pgm.    Read.   Remark
-* Modified              040108  CJu
-*
-* Description:		Remote transport process TCP/IP
-*			Implements transport protocol TCP/IP, connection
-*oriented
-*			protocol on the IP-stack.
-*
-**************************************************************************
-**************************************************************************/
+ *		===============
+ *                P r o v i e w
+ *               ===============
+ **************************************************************************
+ *
+ * Filename:             rs_remote_tcpip.c
+ *
+ *                       Date    Pgm.    Read.   Remark
+ * Modified              040108  CJu
+ *
+ * Description:		Remote transport process TCP/IP
+ *			Implements transport protocol TCP/IP, connection
+ *oriented
+ *			protocol on the IP-stack.
+ *
+ **************************************************************************
+ **************************************************************************/
 
 /*_Include files_________________________________________________________*/
 
@@ -76,7 +76,7 @@
 #include "remote.h"
 #include "remote_remtrans_utils.h"
 
-//#define debug 0
+// #define debug 0
 
 #define STX 2
 #define ETB 15
@@ -89,7 +89,8 @@ int debug = 0;
 fd_set fdr; /* For select call */
 fd_set fde; /* For select call */
 
-typedef struct {
+typedef struct
+{
   unsigned char protocol_id[2];
   short int msg_size;
   short int msg_id[2];
@@ -103,14 +104,18 @@ float time_since_rcv;
 float time_since_keepalive;
 
 char receive_buffer[65536];
-unsigned char remote_tcp_id[2] = { STX, ETB };
+unsigned char remote_tcp_id[2] = {STX, ETB};
 
-int l_socket; /* Local socket */
-int c_socket; /* The connected socket */
+int l_socket;              /* Local socket */
+int c_socket;              /* The connected socket */
 struct sockaddr_in l_addr; /* Local named socket description */
 struct sockaddr_in r_addr; /* Remote socket description */
 
-enum cs_modes { TCP_CLIENT, TCP_SERVER } cs_mode;
+enum cs_modes
+{
+  TCP_CLIENT,
+  TCP_SERVER
+} cs_mode;
 
 /*************************************************************************
 **************************************************************************
@@ -133,10 +138,13 @@ void RemoteSleep(float time)
 
   rqtp.tv_sec = 0;
   rqtp.tv_nsec = time * 1000000000;
-  if (time >= 1.0) {
+  if (time >= 1.0)
+  {
     rqtp.tv_sec = time / 1;
     rqtp.tv_nsec = 0;
-  } else {
+  }
+  else
+  {
     rqtp.tv_nsec = time * 1000000000;
   }
   nanosleep(&rqtp, &rmtp);
@@ -163,7 +171,8 @@ int CreateSocket()
 {
   int sts;
 
-  if (cs_mode == TCP_CLIENT) {
+  if (cs_mode == TCP_CLIENT)
+  {
     /* Create a socket for TCP */
     c_socket = socket(AF_INET, SOCK_STREAM, 0);
     if (debug)
@@ -175,7 +184,8 @@ int CreateSocket()
 
     /* Bind the created socket */
 
-    if (rn_tcp->LocalPort != 0) {
+    if (rn_tcp->LocalPort != 0)
+    {
       l_addr.sin_family = AF_INET;
       l_addr.sin_port = htons(rn_tcp->LocalPort);
       sts = bind(c_socket, (struct sockaddr*)&l_addr, sizeof(l_addr));
@@ -188,7 +198,8 @@ int CreateSocket()
     }
   }
 
-  else {
+  else
+  {
     /* Create a socket for TCP */
     l_socket = socket(AF_INET, SOCK_STREAM, 0);
     if (debug)
@@ -200,7 +211,8 @@ int CreateSocket()
 
     /* Bind the created socket */
 
-    if (rn_tcp->LocalPort != 0) {
+    if (rn_tcp->LocalPort != 0)
+    {
       l_addr.sin_family = AF_INET;
       l_addr.sin_port = htons(rn_tcp->LocalPort);
       sts = bind(l_socket, (struct sockaddr*)&l_addr, sizeof(l_addr));
@@ -249,7 +261,8 @@ int Connect()
   int l_addr_len;
 
   sts = -1;
-  if (cs_mode == TCP_CLIENT) {
+  if (cs_mode == TCP_CLIENT)
+  {
     /* Initialize remote address structure */
 
     r_addr.sin_family = AF_INET;
@@ -265,10 +278,10 @@ int Connect()
       perror("connect");
 
     /* Get local socket description */
-    if (sts == 0) {
+    if (sts == 0)
+    {
       l_addr_len = sizeof(struct sockaddr);
-      sts2 = getsockname(
-          c_socket, (struct sockaddr*)&l_addr, (unsigned int*)&l_addr_len);
+      sts2 = getsockname(c_socket, (struct sockaddr*)&l_addr, (unsigned int*)&l_addr_len);
       if (sts2 == 0)
         rn_tcp->LocalPort = ntohs(l_addr.sin_port);
     }
@@ -298,10 +311,10 @@ int Accept()
 {
   int l_addr_len;
 
-  if (cs_mode == TCP_SERVER) {
+  if (cs_mode == TCP_SERVER)
+  {
     /* Wait for client */
-    c_socket = accept(
-        l_socket, (struct sockaddr*)&r_addr, (unsigned int*)&l_addr_len);
+    c_socket = accept(l_socket, (struct sockaddr*)&r_addr, (unsigned int*)&l_addr_len);
 
     if (debug)
       printf("accept: %d\n", c_socket);
@@ -332,9 +345,12 @@ void Shutdown()
 {
   int sts;
 
-  if (cs_mode == TCP_SERVER) {
+  if (cs_mode == TCP_SERVER)
+  {
     sts = close(c_socket);
-  } else {
+  }
+  else
+  {
     sts = shutdown(c_socket, 2);
     if (debug)
       printf("shutdown: %d\n", sts);
@@ -382,14 +398,15 @@ void TreatRemtrans1(char* buf)
 
   remtrans = rn.remtrans;
   search_remtrans = true;
-  while (remtrans && search_remtrans) {
+  while (remtrans && search_remtrans)
+  {
     /* Match? */
-    if (remtrans->objp->Address[0] == header.msg_id[0]
-        && remtrans->objp->Address[1] == header.msg_id[1]
-        && remtrans->objp->Direction == REMTRANS_IN) {
+    if (remtrans->objp->Address[0] == header.msg_id[0] && remtrans->objp->Address[1] == header.msg_id[1] &&
+        remtrans->objp->Direction == REMTRANS_IN)
+    {
       search_remtrans = false;
       sts = RemTrans_Receive(remtrans, buf + sizeof(remote_tcp_header),
-          header.msg_size - sizeof(remote_tcp_header));
+                             header.msg_size - sizeof(remote_tcp_header));
     }
     remtrans = (remtrans_item*)remtrans->next;
   }
@@ -421,9 +438,11 @@ void TreatRemtrans2(char* buf, int size)
 
   remtrans = rn.remtrans;
   search_remtrans = true;
-  while (remtrans && search_remtrans) {
+  while (remtrans && search_remtrans)
+  {
     /* Match? */
-    if (remtrans->objp->Direction == REMTRANS_IN) {
+    if (remtrans->objp->Direction == REMTRANS_IN)
+    {
       search_remtrans = false;
       sts = RemTrans_Receive(remtrans, buf, size);
     }
@@ -464,17 +483,20 @@ unsigned int Receive()
 
   data_size = recv(c_socket, receive_buffer, sizeof(receive_buffer), 0);
 
-  if (data_size < 0) {
+  if (data_size < 0)
+  {
     /* Error */
     return (-1);
   }
 
-  if (data_size == 0) {
+  if (data_size == 0)
+  {
     /* Disconnected */
     return (0);
   }
 
-  if (rn_tcp->Disable) {
+  if (rn_tcp->Disable)
+  {
     saved_fl = false;
     return (1);
   }
@@ -484,8 +506,10 @@ unsigned int Receive()
 
   time_since_rcv = 0;
 
-  if (saved_fl) {
-    if (data_size >= expected_rest) {
+  if (saved_fl)
+  {
+    if (data_size >= expected_rest)
+    {
       memcpy(&saved_buffer[saved_size], &receive_buffer, expected_rest);
 
       TreatRemtrans1(saved_buffer);
@@ -500,13 +524,16 @@ unsigned int Receive()
     saved_fl = 0;
   }
 
-  while (more_messages) {
-    if (data_size > 0 && rn_tcp->DisableHeader) {
+  while (more_messages)
+  {
+    if (data_size > 0 && rn_tcp->DisableHeader)
+    {
       /* Header disabled, take the first receive remtrans object */
 
       TreatRemtrans2(receive_buffer, data_size);
-
-    } else if (data_size >= sizeof(remote_tcp_header)) {
+    }
+    else if (data_size >= sizeof(remote_tcp_header))
+    {
       memcpy(&header, &receive_buffer[buf_ix], sizeof(remote_tcp_header));
 
       /* Convert to host byte order */
@@ -515,34 +542,42 @@ unsigned int Receive()
       header.msg_id[0] = ntohs(header.msg_id[0]);
       header.msg_id[1] = ntohs(header.msg_id[1]);
 
-      if (header.protocol_id[0] == remote_tcp_id[0]
-          && header.protocol_id[1] == remote_tcp_id[1]) {
-        if (data_size >= header.msg_size) {
+      if (header.protocol_id[0] == remote_tcp_id[0] && header.protocol_id[1] == remote_tcp_id[1])
+      {
+        if (data_size >= header.msg_size)
+        {
           if (header.msg_size > sizeof(header)) /* Not keepalive buffer */
           {
             TreatRemtrans1(&receive_buffer[buf_ix]);
-          } else if (header.msg_size == sizeof(header)) /* Keepalive buffer */
+          }
+          else if (header.msg_size == sizeof(header)) /* Keepalive buffer */
             rn_tcp->KeepaliveDiff--;
           else /* Too short */
             rn_tcp->ErrCount++;
-        } else {
+        }
+        else
+        {
           /* Remote ip-message but not complete, save buffer */
           memcpy(&saved_buffer, &receive_buffer[buf_ix], data_size);
           saved_fl = 1;
           saved_size = data_size;
           expected_rest = header.msg_size - data_size;
         }
-      } else
+      }
+      else
         rn_tcp->ErrCount++;
-    } else /* Too short */
+    }
+    else /* Too short */
       rn_tcp->ErrCount++;
 
-    if (!rn_tcp->DisableHeader && header.msg_size > 0 && !saved_fl) {
+    if (!rn_tcp->DisableHeader && header.msg_size > 0 && !saved_fl)
+    {
       data_size -= header.msg_size;
       buf_ix += header.msg_size;
       if (data_size < sizeof(header))
         more_messages = false;
-    } else
+    }
+    else
       more_messages = false;
   }
 
@@ -600,22 +635,25 @@ unsigned int SendKeepalive(void)
 **************************************************************************
 **************************************************************************/
 
-unsigned int RemnodeSend(remnode_item* remnode, pwr_sClass_RemTrans* remtrans,
-    char* buf, int buf_size)
+unsigned int RemnodeSend(remnode_item* remnode, pwr_sClass_RemTrans* remtrans, char* buf, int buf_size)
 
 {
   int sts;
 
-  static struct message_s {
+  static struct message_s
+  {
     remote_tcp_header header;
     char data[TCP_MAX_SIZE];
   } message;
 
   memcpy(&message.data, buf, buf_size);
 
-  if (rn_tcp->DisableHeader) {
+  if (rn_tcp->DisableHeader)
+  {
     sts = send(c_socket, &message.data, buf_size, 0);
-  } else {
+  }
+  else
+  {
     message.header.protocol_id[0] = STX;
     message.header.protocol_id[1] = ETB;
 
@@ -682,7 +720,8 @@ int main(int argc, char* argv[])
   sts = gdh_Init(pname);
   if (debug)
     printf("Gdh init: %d\n", sts);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Error("gdh_Init, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
@@ -696,7 +735,8 @@ int main(int argc, char* argv[])
     sts = cdh_StringToObjid(argv[2], &rn.objid);
   if (debug)
     printf("StringToObjid: %d\n", sts);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Error("cdh_StringToObjid, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
@@ -707,7 +747,8 @@ int main(int argc, char* argv[])
   sts = gdh_ObjidToPointer(rn.objid, (pwr_tAddress*)&rn_tcp);
   if (debug)
     printf("ObjidToPointer: %d\n", sts);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Error("cdh_ObjidToPointer, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
@@ -722,7 +763,8 @@ int main(int argc, char* argv[])
 
   sts = RemTrans_Init(&rn);
 
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Error("RemTrans_Init, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
@@ -743,14 +785,16 @@ int main(int argc, char* argv[])
   /* Create TCP socket and init adress structures */
   rn_tcp->LinkUp = 0;
 
-  for (i = 0; i < 10; i++) {
+  for (i = 0; i < 10; i++)
+  {
     sts = CreateSocket();
     if (sts >= 0)
       break;
     else
       RemoteSleep(3);
   }
-  if (sts != 0) {
+  if (sts != 0)
+  {
     errh_Error("CreateSocket, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
@@ -763,24 +807,28 @@ int main(int argc, char* argv[])
   /* Store remtrans objects objid in remnode_tcp object */
   remtrans = rn.remtrans;
   i = 0;
-  while (remtrans) {
+  while (remtrans)
+  {
     rn_tcp->RemTransObjects[i++] = remtrans->objid;
-    if (i >= (int)(sizeof(rn_tcp->RemTransObjects)
-                 / sizeof(rn_tcp->RemTransObjects[0])))
+    if (i >= (int)(sizeof(rn_tcp->RemTransObjects) / sizeof(rn_tcp->RemTransObjects[0])))
       break;
     remtrans = (remtrans_item*)remtrans->next;
   }
 
-  if (cs_mode == TCP_CLIENT) {
+  if (cs_mode == TCP_CLIENT)
+  {
     /* Connect, make 10 attempts with 3 seconds interval */
-    for (i = 0; i < 10; i++) {
+    for (i = 0; i < 10; i++)
+    {
       sts = Connect();
       if (sts >= 0)
         break;
       else
         RemoteSleep(3);
     }
-  } else {
+  }
+  else
+  {
     Accept();
   }
 
@@ -790,8 +838,10 @@ int main(int argc, char* argv[])
 
   errh_SetStatus(PWR__SRUN);
 
-  while (!doomsday) {
-    if (rn_tcp->Disable == 1) {
+  while (!doomsday)
+  {
+    if (rn_tcp->Disable == 1)
+    {
       errh_Fatal("Disabled, exiting");
       errh_SetStatus(PWR__SRVTERM);
       exit(0);
@@ -809,8 +859,7 @@ int main(int argc, char* argv[])
     time_since_keepalive += TIME_INCR;
     time_since_rcv += TIME_INCR;
     time_since_scan = MIN(time_since_scan, rn_tcp->ScanTime + 1.0);
-    time_since_keepalive
-        = MIN(time_since_keepalive, rn_tcp->KeepaliveTime + 1.0);
+    time_since_keepalive = MIN(time_since_keepalive, rn_tcp->KeepaliveTime + 1.0);
     time_since_rcv = MIN(time_since_rcv, rn_tcp->LinkTimeout + 1.0);
 
     /* Update retransmit time, could have been changed */
@@ -818,15 +867,16 @@ int main(int argc, char* argv[])
     rn.retransmit_time = rn_tcp->RetransmitTime;
 
     remtrans = rn.remtrans;
-    while (remtrans) {
+    while (remtrans)
+    {
       remtrans->time_since_send += TIME_INCR;
       /* Prevent big counter */
-      remtrans->time_since_send
-          = MIN(remtrans->time_since_send, rn.retransmit_time + 1.0);
+      remtrans->time_since_send = MIN(remtrans->time_since_send, rn.retransmit_time + 1.0);
       remtrans = (remtrans_item*)remtrans->next;
     }
 
-    if (rn_tcp->LinkUp == 0) {
+    if (rn_tcp->LinkUp == 0)
+    {
       Shutdown();
       if (cs_mode == TCP_CLIENT)
         exit(0);
@@ -850,7 +900,8 @@ int main(int argc, char* argv[])
     if (sts < 0)
       exit(sts);
 
-    if (sts > 0) {
+    if (sts > 0)
+    {
       sts = Receive();
       if (sts <= 0 && debug)
         perror("receive:");
@@ -860,21 +911,26 @@ int main(int argc, char* argv[])
         rn_tcp->LinkUp = 0;
     }
 
-    if (rn_tcp->LinkUp == 1) {
-      if (time_since_scan >= rn_tcp->ScanTime) {
+    if (rn_tcp->LinkUp == 1)
+    {
+      if (time_since_scan >= rn_tcp->ScanTime)
+      {
         if (!rn_tcp->Disable)
           RemTrans_Cyclic(&rn, &RemnodeSend);
         time_since_scan = 0;
       }
 
-      if (time_since_keepalive >= rn_tcp->KeepaliveTime) {
+      if (time_since_keepalive >= rn_tcp->KeepaliveTime)
+      {
         if (!rn_tcp->Disable && rn_tcp->UseKeepalive)
           SendKeepalive();
         time_since_keepalive = 0;
       }
 
-      if (time_since_rcv >= rn_tcp->LinkTimeout && !feqf(rn_tcp->LinkTimeout, 0.0f)) {
-        if (rn_tcp->LinkUp) {
+      if (time_since_rcv >= rn_tcp->LinkTimeout && !feqf(rn_tcp->LinkTimeout, 0.0f))
+      {
+        if (rn_tcp->LinkUp)
+        {
           errh_Info("TCP link down %s", rn_tcp->RemoteHostname);
           rn_tcp->LinkUp = 0;
         }

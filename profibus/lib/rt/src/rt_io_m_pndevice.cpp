@@ -48,8 +48,7 @@ static pwr_tStatus IoRackInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
   short output_counter;
   pwr_sClass_PnDevice* op;
   pwr_sClass_PnModule* mp;
-  char name[196];
-  pwr_tStatus sts;
+  char name[196];  
   pwr_tCid cid;
 
   io_sChannel* chanp;
@@ -63,7 +62,7 @@ static pwr_tStatus IoRackInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
   pwr_sClass_ChanAo* chan_ao;
   pwr_sClass_ChanIo* chan_io;
 
-  sts = gdh_ObjidToName(rp->Objid, (char*)&name, sizeof(name), cdh_mNName);
+  gdh_ObjidToName(rp->Objid, (char*)&name, sizeof(name), cdh_mNName); // TODO Check return status?
   errh_Info("PROFINET: Init of device and modules %s", name);
 
   op = (pwr_sClass_PnDevice*)rp->op;

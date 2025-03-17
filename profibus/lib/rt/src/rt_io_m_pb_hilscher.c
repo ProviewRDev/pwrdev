@@ -1316,8 +1316,6 @@ static pwr_tStatus IoAgentInit(io_tCtx ctx, io_sAgent* ap)
 
   struct timespec rqtp = {0, 20000000}; /* 20 ms */
 
-  int retry;
-
   /* Allocates area for local data structure */
   ap->Local = calloc(1, sizeof(io_sAgentLocalHilscher));
   if (!ap->Local)
@@ -1382,8 +1380,7 @@ static pwr_tStatus IoAgentInit(io_tCtx ctx, io_sAgent* ap)
   {
     ok = FALSE;
     if (ctx->Node->Restarts == 0)
-    {
-      retry = 0;
+    {      
       while (!ok)
       {
         op->Status = PB__NOTINIT;
@@ -1457,8 +1454,7 @@ static pwr_tStatus IoAgentRead(io_tCtx ctx, io_sAgent* ap)
   io_sRack* slave_list;
 
   pwr_sClass_Pb_Hilscher* op;
-  unsigned short rv;
-
+  
   int i;
   DPM_DIAGNOSTICS diag;
 
@@ -1483,7 +1479,7 @@ static pwr_tStatus IoAgentRead(io_tCtx ctx, io_sAgent* ap)
       /* Triggers the board's watchdog.  */
       DevTriggerWatchDog(local->dev_number, WATCHDOG_START, &local->watchdog);
       /* Reads process image from the slave.  */
-      rv = DevExchangeIO(local->dev_number, 0, 0, NULL, sp->OffsetInputs,
+      DevExchangeIO(local->dev_number, 0, 0, NULL, sp->OffsetInputs,
                          sp->BytesOfInput, sp->Inputs, 100);
     }
   }

@@ -41,7 +41,7 @@
 
 int send_kafka_key_val(void* val, int val_len);
 char* kafka_get_topic();
-void kafka_init(pwr_sClass_Ssab_ExportRtdbServer *a_confobj, char *a_topic, char* a_config_file);
+void kafka_init(pwr_sClass_Ssab_ExportRtdbServer* a_confobj, char* a_topic, char* a_config_file);
 void kafka_open();
 void kafka_exit();
 void kafka_flush(int tmo);

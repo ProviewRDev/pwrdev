@@ -59,7 +59,8 @@ using namespace std;
 #define DRAW_PRESS_PIX 9
 #define DRAW_TSCALE 0.93
 
-typedef struct {
+typedef struct
+{
   GtkWidget w;
   int x;
   int y;
@@ -70,69 +71,72 @@ typedef struct {
   GlowCtx* ctx;
 } draw_sAnnotData;
 
-typedef struct {
+typedef struct
+{
   GlowCtx* ctx;
   void (*callback_func)(GlowCtx* ctx);
   guint timer_id;
 } draw_sTimerCb;
 
-typedef struct {
+typedef struct
+{
   Pixmap pixmap[DRAW_PIXMAP_SIZE];
 } draw_sPixmap;
 
-typedef struct {
+typedef struct
+{
   int red;
   int green;
   int blue;
 } draw_sColor;
 
-char GlowDrawGtk::font_names[glow_eFont__][40] = {"Helvetica",
-				       "Times",
-				       "New century schoolbook",
-				       "Courier",
-				       "Lucida Sans"};
+char GlowDrawGtk::font_names[glow_eFont__][40] = {"Helvetica", "Times", "New century schoolbook", "Courier",
+                                                  "Lucida Sans"};
 
 static GdkEvent last_event;
 
 static void event_timer(GlowDrawGtk* ctx, int time_ms);
 static void cancel_event_timer(GlowDrawGtk* ctx);
 static gboolean event_timer_cb(void* ctx);
-static int glow_read_color_file(
-    const char* filename, draw_sColor** color_array, int* size);
+static int glow_read_color_file(const char* filename, draw_sColor** color_array, int* size);
 
 static cairo_pattern_t* get_gc(GlowDrawGtk* draw_ctx, int i, int j)
 {
   int crea = 0;
 
-  if (GlowColor::is_custom((glow_eDrawType)i)) {
+  if (GlowColor::is_custom((glow_eDrawType)i))
+  {
     if (!draw_ctx->get_customcolors())
       return draw_ctx->gcs[0];
     if (!draw_ctx->get_customcolors()->gcs[i - glow_eDrawType_CustomColor1])
       crea = 1;
-  } else if (!draw_ctx->gcs[i])
+  }
+  else if (!draw_ctx->gcs[i])
     crea = 1;
 
-  if (crea) {
+  if (crea)
+  {
     double r, g, b;
 
     GlowColor::rgb_color(i, &r, &g, &b, draw_ctx->get_customcolors());
-    if (GlowColor::is_custom((glow_eDrawType)i)) {
-      draw_ctx->get_customcolors()->gcs[i - glow_eDrawType_CustomColor1]
-          = cairo_pattern_create_rgb(r, g, b);
-      //printf("C Custom:  %4d %llu\n", i - glow_eDrawType_CustomColor1, (unsigned long long)draw_ctx->get_customcolors()->gcs[i - glow_eDrawType_CustomColor1]);
+    if (GlowColor::is_custom((glow_eDrawType)i))
+    {
+      draw_ctx->get_customcolors()->gcs[i - glow_eDrawType_CustomColor1] = cairo_pattern_create_rgb(r, g, b);
+      // printf("C Custom:  %4d %llu\n", i - glow_eDrawType_CustomColor1, (unsigned long
+      // long)draw_ctx->get_customcolors()->gcs[i - glow_eDrawType_CustomColor1]);
       cairo_pattern_reference(draw_ctx->get_customcolors()->gcs[i - glow_eDrawType_CustomColor1]);
     }
-    else {
+    else
+    {
       draw_ctx->gcs[i] = cairo_pattern_create_rgb(r, g, b);
       cairo_pattern_reference(draw_ctx->gcs[i]);
-      //printf("C Regular: %4d %llu\n", i, (unsigned long long)draw_ctx->gcs[i]);
+      // printf("C Regular: %4d %llu\n", i, (unsigned long long)draw_ctx->gcs[i]);
     }
   }
   if (GlowColor::is_custom((glow_eDrawType)i))
     return draw_ctx->get_customcolors()->gcs[i - glow_eDrawType_CustomColor1];
   else
     return draw_ctx->gcs[i];
-
 }
 
 static int glow_create_cursor(GlowDrawGtk* draw_ctx)
@@ -140,38 +144,35 @@ static int glow_create_cursor(GlowDrawGtk* draw_ctx)
   /* Create some cursors */
 
   /* Cross cursor */
-  draw_ctx->cursors[glow_eDrawCursor_CrossHair]
-      = gdk_cursor_new_for_display(draw_ctx->display, GDK_CROSSHAIR);
+  draw_ctx->cursors[glow_eDrawCursor_CrossHair] =
+      gdk_cursor_new_for_display(draw_ctx->display, GDK_CROSSHAIR);
 
-  draw_ctx->cursors[glow_eDrawCursor_DiamondCross]
-      = gdk_cursor_new_for_display(draw_ctx->display, GDK_DIAMOND_CROSS);
+  draw_ctx->cursors[glow_eDrawCursor_DiamondCross] =
+      gdk_cursor_new_for_display(draw_ctx->display, GDK_DIAMOND_CROSS);
 
-  draw_ctx->cursors[glow_eDrawCursor_Hand]
-      = gdk_cursor_new_for_display(draw_ctx->display, GDK_HAND2);
+  draw_ctx->cursors[glow_eDrawCursor_Hand] = gdk_cursor_new_for_display(draw_ctx->display, GDK_HAND2);
 
-  draw_ctx->cursors[glow_eDrawCursor_BottomLeftCorner]
-      = gdk_cursor_new_for_display(draw_ctx->display, GDK_BOTTOM_LEFT_CORNER);
+  draw_ctx->cursors[glow_eDrawCursor_BottomLeftCorner] =
+      gdk_cursor_new_for_display(draw_ctx->display, GDK_BOTTOM_LEFT_CORNER);
 
-  draw_ctx->cursors[glow_eDrawCursor_BottomRightCorner]
-      = gdk_cursor_new_for_display(draw_ctx->display, GDK_BOTTOM_RIGHT_CORNER);
+  draw_ctx->cursors[glow_eDrawCursor_BottomRightCorner] =
+      gdk_cursor_new_for_display(draw_ctx->display, GDK_BOTTOM_RIGHT_CORNER);
 
-  draw_ctx->cursors[glow_eDrawCursor_BottomSide]
-      = gdk_cursor_new_for_display(draw_ctx->display, GDK_BOTTOM_SIDE);
+  draw_ctx->cursors[glow_eDrawCursor_BottomSide] =
+      gdk_cursor_new_for_display(draw_ctx->display, GDK_BOTTOM_SIDE);
 
-  draw_ctx->cursors[glow_eDrawCursor_TopLeftCorner]
-      = gdk_cursor_new_for_display(draw_ctx->display, GDK_TOP_LEFT_CORNER);
+  draw_ctx->cursors[glow_eDrawCursor_TopLeftCorner] =
+      gdk_cursor_new_for_display(draw_ctx->display, GDK_TOP_LEFT_CORNER);
 
-  draw_ctx->cursors[glow_eDrawCursor_TopRightCorner]
-      = gdk_cursor_new_for_display(draw_ctx->display, GDK_TOP_RIGHT_CORNER);
+  draw_ctx->cursors[glow_eDrawCursor_TopRightCorner] =
+      gdk_cursor_new_for_display(draw_ctx->display, GDK_TOP_RIGHT_CORNER);
 
-  draw_ctx->cursors[glow_eDrawCursor_TopSide]
-      = gdk_cursor_new_for_display(draw_ctx->display, GDK_TOP_SIDE);
+  draw_ctx->cursors[glow_eDrawCursor_TopSide] = gdk_cursor_new_for_display(draw_ctx->display, GDK_TOP_SIDE);
 
-  draw_ctx->cursors[glow_eDrawCursor_RightSide]
-      = gdk_cursor_new_for_display(draw_ctx->display, GDK_RIGHT_SIDE);
+  draw_ctx->cursors[glow_eDrawCursor_RightSide] =
+      gdk_cursor_new_for_display(draw_ctx->display, GDK_RIGHT_SIDE);
 
-  draw_ctx->cursors[glow_eDrawCursor_LeftSide]
-      = gdk_cursor_new_for_display(draw_ctx->display, GDK_LEFT_SIDE);
+  draw_ctx->cursors[glow_eDrawCursor_LeftSide] = gdk_cursor_new_for_display(draw_ctx->display, GDK_LEFT_SIDE);
 
   return 1;
 }
@@ -185,10 +186,12 @@ static int draw_free_gc(GlowDrawGtk* draw_ctx)
   for (int i = 1; i < glow_eDrawCursor__; i++)
     g_object_unref(draw_ctx->cursors[i]);
 
-  for (int i = 0; i < glow_eDrawType_CustomColor__; i++) {
-    if (draw_ctx->gcs[i]) {
+  for (int i = 0; i < glow_eDrawType_CustomColor__; i++)
+  {
+    if (draw_ctx->gcs[i])
+    {
       cairo_pattern_destroy(draw_ctx->gcs[i]);
-      //printf("X Regular: %4d %llu\n", i, (unsigned long long)draw_ctx->gcs[i]);
+      // printf("X Regular: %4d %llu\n", i, (unsigned long long)draw_ctx->gcs[i]);
     }
   }
   return 1;
@@ -201,11 +204,11 @@ static int glow_create_gc(GlowDrawGtk* draw_ctx, GdkWindow* window)
   draw_ctx->gc_inverse = cairo_pattern_create_rgb(0.0, 0.0, 0.0);
   draw_ctx->gc_erase = get_gc(draw_ctx, glow_eDrawType_Color32, 0);
 
-  if (0) {
-    draw_sColor *color_array;
+  if (0)
+  {
+    draw_sColor* color_array;
     int size, sts;
-    sts = glow_read_color_file(
-        "/home/claes/test/ge_colors.dat", &color_array, &size);
+    sts = glow_read_color_file("/home/claes/test/ge_colors.dat", &color_array, &size);
   }
   return 1;
 }
@@ -231,7 +234,6 @@ GlowDrawGtk::~GlowDrawGtk()
 
   if (timer_id)
     g_source_remove(timer_id);
-
 }
 
 int GlowDrawGtk::init_nav(GtkWidget* nav_widget)
@@ -239,8 +241,8 @@ int GlowDrawGtk::init_nav(GtkWidget* nav_widget)
   nav_wind.toplevel = nav_widget;
   nav_wind.window = gtk_widget_get_window(nav_wind.toplevel);
 
-  //gtk_widget_modify_bg(nav_widget, GTK_STATE_NORMAL, &background);
-  //  glow_create_gc( this, nav_wind.window);
+  // gtk_widget_modify_bg(nav_widget, GTK_STATE_NORMAL, &background);
+  //   glow_create_gc( this, nav_wind.window);
 
   ctx->no_nav = 0;
 
@@ -248,13 +250,12 @@ int GlowDrawGtk::init_nav(GtkWidget* nav_widget)
 }
 
 GlowDrawGtk::GlowDrawGtk(GtkWidget* toplevel, void** glow_ctx,
-    int (*init_proc)(GtkWidget* w, GlowCtx* ctx, void* client_data),
-    void* client_data, glow_eCtxType type)
-    : ef(0), timer_id(0), click_sensitivity(0), color_vect_cnt(0),
-      closing_down(0), customcolors_cnt(0), cairo_cr(0), cairo_cr_refcnt(0), cairo_region(0),
-      cairo_context(0), cairo_nav_cr(0), cairo_nav_cr_refcnt(0), cairo_nav_region(0),
-      cairo_nav_context(0), erase_stack_cnt(0), antialias(CAIRO_ANTIALIAS_NONE),
-      css_background(0)
+                         int (*init_proc)(GtkWidget* w, GlowCtx* ctx, void* client_data), void* client_data,
+                         glow_eCtxType type)
+    : ef(0), timer_id(0), click_sensitivity(0), color_vect_cnt(0), closing_down(0), customcolors_cnt(0),
+      cairo_cr(0), cairo_cr_refcnt(0), cairo_region(0), cairo_context(0), cairo_nav_cr(0),
+      cairo_nav_cr_refcnt(0), cairo_nav_region(0), cairo_nav_context(0), erase_stack_cnt(0),
+      antialias(CAIRO_ANTIALIAS_NONE), css_background(0)
 {
   memset(gcs, 0, sizeof(gcs));
   memset(font_face, 0, sizeof(font_face));
@@ -287,8 +288,8 @@ GlowDrawGtk::GlowDrawGtk(GtkWidget* toplevel, void** glow_ctx,
   ctx->mw.window = &m_wind;
   ctx->navw.window = &nav_wind;
 
-  if (type == glow_eCtxType_Grow || type == glow_eCtxType_Curve
-      || type == glow_eCtxType_Keyboard) {
+  if (type == glow_eCtxType_Grow || type == glow_eCtxType_Curve || type == glow_eCtxType_Keyboard)
+  {
     ctx->customcolors = create_customcolors();
     push_customcolors(ctx->customcolors);
   }
@@ -307,39 +308,44 @@ int GlowDrawGtk::expose(cairo_t* cr, int is_navigator)
   int x, y, width, height;
   GdkRectangle rect;
 
-  if (!is_navigator) {
+  if (!is_navigator)
+  {
     pwr_Assert(cairo_cr_refcnt == 0);
 
     cairo_cr = cr;
     cairo_cr_refcnt++;
-    //cairo_save(cairo_cr);
+    // cairo_save(cairo_cr);
     get_window_size(&ctx->mw, &ctx->mw.window_width, &ctx->mw.window_height);
-    if (gdk_cairo_get_clip_rectangle(cr, &rect)) {
+    if (gdk_cairo_get_clip_rectangle(cr, &rect))
+    {
       x = rect.x;
       y = rect.y;
       width = rect.width;
       height = rect.height;
-    } else {
+    }
+    else
+    {
       x = 0;
       y = 0;
       width = ctx->mw.window_width;
       height = ctx->mw.window_height;
     }
     if (css_background)
-      gtk_render_background(((DrawWindGtk *)ctx->mw.window)->style_context, 
-	  cr, 0, 0, x + width, y + height);
+      gtk_render_background(((DrawWindGtk*)ctx->mw.window)->style_context, cr, 0, 0, x + width, y + height);
     else
       draw_background(&ctx->mw, x, y, width, height);
     sts = ctx->event_handler(glow_eEvent_Exposure, x, y, width, height);
     cairo_cr = 0;
     cairo_cr_refcnt--;
     pwr_Assert(cairo_cr_refcnt == 0);
-  } else {
+  }
+  else
+  {
     pwr_Assert(cairo_nav_cr_refcnt == 0);
 
     cairo_nav_cr = cr;
     cairo_nav_cr_refcnt++;
-    //cairo_save(cairo_nav_cr);
+    // cairo_save(cairo_nav_cr);
     draw_background(&ctx->navw, 0, 0, ctx->navw.window_width, ctx->navw.window_height);
     sts = ctx->event_handler_nav(glow_eEvent_Exposure, 0, 0);
     cairo_nav_cr = 0;
@@ -367,18 +373,21 @@ int GlowDrawGtk::event_handler(GdkEvent event)
   //  cout << "Event : button_pressed " << button_pressed << " clicked " <<
   //	button_clicked << " c&p " << button_clicked_and_pressed << endl;
 
-  if (event.any.window == m_wind.window || event.type == GDK_KEY_PRESS) {
+  if (event.any.window == m_wind.window || event.type == GDK_KEY_PRESS)
+  {
     if (GlowCtx::eventlog_enabled)
       log_event(&event);
 
-    switch (event.type) {
-    case GDK_KEY_PRESS: {
+    switch (event.type)
+    {
+    case GDK_KEY_PRESS:
+    {
       guint keysym;
 
       keysym = event.key.keyval;
-      if ((keysym >= 0x020 && keysym <= 0x20ac)
-          || (keysym >= 0xFF80 && keysym <= 0xFFB9 && keysym != GDK_KEY_KP_Enter
-                 && keysym != 0xFF44)) {
+      if ((keysym >= 0x020 && keysym <= 0x20ac) ||
+          (keysym >= 0xFF80 && keysym <= 0xFFB9 && keysym != GDK_KEY_KP_Enter && keysym != 0xFF44))
+      {
         unsigned char buff;
         // gint unival = gdk_keyval_to_unicode( keysym);
         // gchar utfval[6];
@@ -390,12 +399,15 @@ int GlowDrawGtk::event_handler(GdkEvent event)
 
         if (buff >= 0x020)
           sts = ctx->event_handler(glow_eEvent_Key_Ascii, 0, 0, (int)buff, 0);
-        else if (buff > 0) {
-          sts = ctx->event_handler(
-              glow_eEvent_Key_CtrlAscii, 0, 0, (int)buff, 0);
+        else if (buff > 0)
+        {
+          sts = ctx->event_handler(glow_eEvent_Key_CtrlAscii, 0, 0, (int)buff, 0);
         }
-      } else {
-        switch (keysym) {
+      }
+      else
+      {
+        switch (keysym)
+        {
         case GDK_KEY_Return:
         case GDK_KEY_KP_Enter:
         case 0xFF44: // XK_KP_Enter sometimes...
@@ -460,22 +472,25 @@ int GlowDrawGtk::event_handler(GdkEvent event)
       //        XSetInputFocus( display, m_wind.window,
       //		RevertToNone, CurrentTime);
 
-      switch (event.button.button) {
+      switch (event.button.button)
+      {
       case 1:
-        sts = ctx->event_handler(glow_eEvent_MB1Down, (int)event.button.x,
-            (int)event.button.y, 0, 0);
-        if (click_sensitivity & glow_mSensitivity_MB1Click
-            && !(click_sensitivity & glow_mSensitivity_MB1DoubleClick)
-            && !(click_sensitivity & glow_mSensitivity_MB1Press)) {
+        sts = ctx->event_handler(glow_eEvent_MB1Down, (int)event.button.x, (int)event.button.y, 0, 0);
+        if (click_sensitivity & glow_mSensitivity_MB1Click &&
+            !(click_sensitivity & glow_mSensitivity_MB1DoubleClick) &&
+            !(click_sensitivity & glow_mSensitivity_MB1Press))
+        {
           memcpy(&last_event, &event, sizeof(event));
           button_pressed = 0;
           button_clicked = 1;
           last_press_x = (int)event.button.x;
           last_press_y = (int)event.button.y;
           return 1;
-        } else if (!(click_sensitivity & glow_mSensitivity_MB1Click)
-            && !(click_sensitivity & glow_mSensitivity_MB1DoubleClick)
-            && click_sensitivity & glow_mSensitivity_MB1Press) {
+        }
+        else if (!(click_sensitivity & glow_mSensitivity_MB1Click) &&
+                 !(click_sensitivity & glow_mSensitivity_MB1DoubleClick) &&
+                 click_sensitivity & glow_mSensitivity_MB1Press)
+        {
           memcpy(&last_event, &event, sizeof(event));
           button_pressed = 1;
           button_clicked = 0;
@@ -484,18 +499,19 @@ int GlowDrawGtk::event_handler(GdkEvent event)
         }
         break;
       case 3:
-        sts = ctx->event_handler(glow_eEvent_MB3Down, (int)event.button.x,
-            (int)event.button.y, 0, 0);
-        if (click_sensitivity & glow_mSensitivity_MB3Press
-            && !(click_sensitivity & glow_mSensitivity_MB3DoubleClick)
-            && !(click_sensitivity & glow_mSensitivity_MB3Click)) {
-          sts = ctx->event_handler(glow_eEvent_MB3Press, (int)event.button.x,
-              (int)event.button.y, 0, 0);
+        sts = ctx->event_handler(glow_eEvent_MB3Down, (int)event.button.x, (int)event.button.y, 0, 0);
+        if (click_sensitivity & glow_mSensitivity_MB3Press &&
+            !(click_sensitivity & glow_mSensitivity_MB3DoubleClick) &&
+            !(click_sensitivity & glow_mSensitivity_MB3Click))
+        {
+          sts = ctx->event_handler(glow_eEvent_MB3Press, (int)event.button.x, (int)event.button.y, 0, 0);
           click_sensitivity = 0;
           return 1;
-        } else if (click_sensitivity & glow_mSensitivity_MB3Click
-            && !(click_sensitivity & glow_mSensitivity_MB3DoubleClick)
-            && !(click_sensitivity & glow_mSensitivity_MB3Press)) {
+        }
+        else if (click_sensitivity & glow_mSensitivity_MB3Click &&
+                 !(click_sensitivity & glow_mSensitivity_MB3DoubleClick) &&
+                 !(click_sensitivity & glow_mSensitivity_MB3Press))
+        {
           memcpy(&last_event, &event, sizeof(event));
           button_pressed = 0;
           button_clicked = 1;
@@ -507,7 +523,8 @@ int GlowDrawGtk::event_handler(GdkEvent event)
       }
 
       /* Detect press or click event */
-      if (button_clicked) {
+      if (button_clicked)
+      {
         /* Wait for release */
         button_clicked_and_pressed = 1;
         cancel_event_timer(this);
@@ -519,70 +536,79 @@ int GlowDrawGtk::event_handler(GdkEvent event)
         event_timer(this, 200);
         return 1;
       }
-      if (!button_pressed) {
+      if (!button_pressed)
+      {
         memcpy(&last_event, &event, sizeof(event));
         button_pressed = event.button.button;
         last_press_x = (int)event.button.x;
         last_press_y = (int)event.button.y;
         event_timer(this, 200);
         return 1;
-      } else {
+      }
+      else
+      {
         // cout << "Button press detected" << endl;
         /* Press event, callback from timer */
         button_pressed = 0;
         button_clicked_and_pressed = 0;
-        switch (event.button.button) {
+        switch (event.button.button)
+        {
         case 1: // Button 1
 
           button1_pressed = 1;
-          if ((event.button.state & GDK_SHIFT_MASK)
-              && !(event.button.state & GDK_CONTROL_MASK)) {
-            sts = ctx->event_handler(glow_eEvent_MB1PressShift,
-                (int)event.button.x, (int)event.button.y, 0, 0);
+          if ((event.button.state & GDK_SHIFT_MASK) && !(event.button.state & GDK_CONTROL_MASK))
+          {
+            sts =
+                ctx->event_handler(glow_eEvent_MB1PressShift, (int)event.button.x, (int)event.button.y, 0, 0);
             click_sensitivity = 0;
-          } else if (!(event.button.state & GDK_SHIFT_MASK)
-              && (event.button.state & GDK_CONTROL_MASK)) {
-            sts = ctx->event_handler(glow_eEvent_MB1PressCtrl,
-                (int)event.button.x, (int)event.button.y, 0, 0);
+          }
+          else if (!(event.button.state & GDK_SHIFT_MASK) && (event.button.state & GDK_CONTROL_MASK))
+          {
+            sts =
+                ctx->event_handler(glow_eEvent_MB1PressCtrl, (int)event.button.x, (int)event.button.y, 0, 0);
             click_sensitivity = 0;
-          } else if ((event.button.state & GDK_SHIFT_MASK)
-              && (event.button.state & GDK_CONTROL_MASK)) {
-            sts = ctx->event_handler(glow_eEvent_MB1PressShiftCtrl,
-                (int)event.button.x, (int)event.button.y, 0, 0);
+          }
+          else if ((event.button.state & GDK_SHIFT_MASK) && (event.button.state & GDK_CONTROL_MASK))
+          {
+            sts = ctx->event_handler(glow_eEvent_MB1PressShiftCtrl, (int)event.button.x, (int)event.button.y,
+                                     0, 0);
             click_sensitivity = 0;
-          } else {
-            sts = ctx->event_handler(glow_eEvent_MB1Press, (int)event.button.x,
-                (int)event.button.y, 0, 0);
+          }
+          else
+          {
+            sts = ctx->event_handler(glow_eEvent_MB1Press, (int)event.button.x, (int)event.button.y, 0, 0);
             click_sensitivity = 0;
           }
           break;
         case 2: // Button2
           button2_pressed = 1;
-          if ((event.button.state & GDK_SHIFT_MASK)
-              && !(event.button.state & GDK_CONTROL_MASK)) {
-            sts = ctx->event_handler(glow_eEvent_MB2PressShift,
-                (int)event.button.x, (int)event.button.y, 0, 0);
+          if ((event.button.state & GDK_SHIFT_MASK) && !(event.button.state & GDK_CONTROL_MASK))
+          {
+            sts =
+                ctx->event_handler(glow_eEvent_MB2PressShift, (int)event.button.x, (int)event.button.y, 0, 0);
             click_sensitivity = 0;
-          } else if (!(event.button.state & GDK_SHIFT_MASK)
-              && (event.button.state & GDK_CONTROL_MASK)) {
-            sts = ctx->event_handler(glow_eEvent_MB2PressShift,
-                (int)event.button.x, (int)event.button.y, 0, 0);
+          }
+          else if (!(event.button.state & GDK_SHIFT_MASK) && (event.button.state & GDK_CONTROL_MASK))
+          {
+            sts =
+                ctx->event_handler(glow_eEvent_MB2PressShift, (int)event.button.x, (int)event.button.y, 0, 0);
             click_sensitivity = 0;
-          } else if ((event.button.state & GDK_SHIFT_MASK)
-              && (event.button.state & GDK_CONTROL_MASK)) {
-            sts = ctx->event_handler(glow_eEvent_MB2PressShiftCtrl,
-                (int)event.button.x, (int)event.button.y, 0, 0);
+          }
+          else if ((event.button.state & GDK_SHIFT_MASK) && (event.button.state & GDK_CONTROL_MASK))
+          {
+            sts = ctx->event_handler(glow_eEvent_MB2PressShiftCtrl, (int)event.button.x, (int)event.button.y,
+                                     0, 0);
             click_sensitivity = 0;
-          } else {
-            sts = ctx->event_handler(glow_eEvent_MB2Press, (int)event.button.x,
-                (int)event.button.y, 0, 0);
+          }
+          else
+          {
+            sts = ctx->event_handler(glow_eEvent_MB2Press, (int)event.button.x, (int)event.button.y, 0, 0);
             click_sensitivity = 0;
           }
           break;
         case 3: // Button3
           button3_pressed = 1;
-          sts = ctx->event_handler(glow_eEvent_MB3Press, (int)event.button.x,
-              (int)event.button.y, 0, 0);
+          sts = ctx->event_handler(glow_eEvent_MB3Press, (int)event.button.x, (int)event.button.y, 0, 0);
           click_sensitivity = 0;
           break;
         }
@@ -596,100 +622,112 @@ int GlowDrawGtk::event_handler(GdkEvent event)
 
       // cout << "Button release event" << endl;
 
-      switch (event.button.button) {
+      switch (event.button.button)
+      {
       case Button1:
-        sts = ctx->event_handler(
-            glow_eEvent_MB1Up, (int)event.button.x, (int)event.button.y, 0, 0);
+        sts = ctx->event_handler(glow_eEvent_MB1Up, (int)event.button.x, (int)event.button.y, 0, 0);
         break;
       }
 
-      if (!button_pressed) {
-        if (button_clicked) {
+      if (!button_pressed)
+      {
+        if (button_clicked)
+        {
           /* Button click, callback from timer */
           // cout << "Button click detected state " << event.button.state <<
           // endl;
           button_clicked = 0;
-          switch (event.button.button) {
+          switch (event.button.button)
+          {
           case 1: // Button1
-            if ((event.button.state & GDK_SHIFT_MASK)
-                && !(event.button.state & GDK_CONTROL_MASK)) {
-              sts = ctx->event_handler(glow_eEvent_MB1ClickShift,
-                  (int)event.button.x, (int)event.button.y, 0, 0);
+            if ((event.button.state & GDK_SHIFT_MASK) && !(event.button.state & GDK_CONTROL_MASK))
+            {
+              sts = ctx->event_handler(glow_eEvent_MB1ClickShift, (int)event.button.x, (int)event.button.y, 0,
+                                       0);
               if (sts == GLOW__TERMINATED || sts == GLOW__DESTROYED)
                 return 1;
               click_sensitivity = 0;
-            } else if (!(event.button.state & GDK_SHIFT_MASK)
-                && (event.button.state & GDK_CONTROL_MASK)) {
-              sts = ctx->event_handler(glow_eEvent_MB1ClickCtrl,
-                  (int)event.button.x, (int)event.button.y, 0, 0);
+            }
+            else if (!(event.button.state & GDK_SHIFT_MASK) && (event.button.state & GDK_CONTROL_MASK))
+            {
+              sts = ctx->event_handler(glow_eEvent_MB1ClickCtrl, (int)event.button.x, (int)event.button.y, 0,
+                                       0);
               if (sts == GLOW__TERMINATED || sts == GLOW__DESTROYED)
                 return 1;
               click_sensitivity = 0;
-            } else if ((event.button.state & GDK_SHIFT_MASK)
-                && (event.button.state & GDK_CONTROL_MASK)) {
-              sts = ctx->event_handler(glow_eEvent_MB1ClickShiftCtrl,
-                  (int)event.button.x, (int)event.button.y, 0, 0);
+            }
+            else if ((event.button.state & GDK_SHIFT_MASK) && (event.button.state & GDK_CONTROL_MASK))
+            {
+              sts = ctx->event_handler(glow_eEvent_MB1ClickShiftCtrl, (int)event.button.x,
+                                       (int)event.button.y, 0, 0);
               if (sts == GLOW__TERMINATED || sts == GLOW__DESTROYED)
                 return 1;
               click_sensitivity = 0;
-            } else {
-              sts = ctx->event_handler(glow_eEvent_MB1Click,
-                  (int)event.button.x, (int)event.button.y, 0, 0);
+            }
+            else
+            {
+              sts = ctx->event_handler(glow_eEvent_MB1Click, (int)event.button.x, (int)event.button.y, 0, 0);
               if (sts == GLOW__TERMINATED || sts == GLOW__DESTROYED)
                 return 1;
               click_sensitivity = 0;
             }
             break;
           case 2: // Button2
-            if ((event.button.state & GDK_SHIFT_MASK)
-                && !(event.button.state & GDK_CONTROL_MASK)) {
-              sts = ctx->event_handler(glow_eEvent_MB2ClickShift,
-                  (int)event.button.x, (int)event.button.y, 0, 0);
+            if ((event.button.state & GDK_SHIFT_MASK) && !(event.button.state & GDK_CONTROL_MASK))
+            {
+              sts = ctx->event_handler(glow_eEvent_MB2ClickShift, (int)event.button.x, (int)event.button.y, 0,
+                                       0);
               if (sts == GLOW__TERMINATED || sts == GLOW__DESTROYED)
                 return 1;
               click_sensitivity = 0;
-            } else if (!(event.button.state & GDK_SHIFT_MASK)
-                && (event.button.state & GDK_CONTROL_MASK)) {
-              sts = ctx->event_handler(glow_eEvent_MB2ClickCtrl,
-                  (int)event.button.x, (int)event.button.y, 0, 0);
+            }
+            else if (!(event.button.state & GDK_SHIFT_MASK) && (event.button.state & GDK_CONTROL_MASK))
+            {
+              sts = ctx->event_handler(glow_eEvent_MB2ClickCtrl, (int)event.button.x, (int)event.button.y, 0,
+                                       0);
               if (sts == GLOW__TERMINATED || sts == GLOW__DESTROYED)
                 return 1;
               click_sensitivity = 0;
-            } else if ((event.button.state & GDK_SHIFT_MASK)
-                && (event.button.state & GDK_CONTROL_MASK)) {
-              sts = ctx->event_handler(glow_eEvent_MB2ClickShiftCtrl,
-                  (int)event.button.x, (int)event.button.y, 0, 0);
+            }
+            else if ((event.button.state & GDK_SHIFT_MASK) && (event.button.state & GDK_CONTROL_MASK))
+            {
+              sts = ctx->event_handler(glow_eEvent_MB2ClickShiftCtrl, (int)event.button.x,
+                                       (int)event.button.y, 0, 0);
               if (sts == GLOW__TERMINATED || sts == GLOW__DESTROYED)
                 return 1;
               click_sensitivity = 0;
-            } else {
-              sts = ctx->event_handler(glow_eEvent_MB2Click,
-                  (int)event.button.x, (int)event.button.y, 0, 0);
+            }
+            else
+            {
+              sts = ctx->event_handler(glow_eEvent_MB2Click, (int)event.button.x, (int)event.button.y, 0, 0);
               if (sts == GLOW__TERMINATED || sts == GLOW__DESTROYED)
                 return 1;
               click_sensitivity = 0;
             }
             break;
           case 3: // Button3
-            sts = ctx->event_handler(glow_eEvent_MB3Click, (int)event.button.x,
-                (int)event.button.y, 0, 0);
+            sts = ctx->event_handler(glow_eEvent_MB3Click, (int)event.button.x, (int)event.button.y, 0, 0);
             if (sts == GLOW__TERMINATED || sts == GLOW__DESTROYED)
               return 1;
             click_sensitivity = 0;
             break;
           }
-        } else {
+        }
+        else
+        {
           /* Button release */
           // cout << "Button release detected" << endl;
-          sts = ctx->event_handler(glow_eEvent_ButtonRelease,
-              (int)event.button.x, (int)event.button.y, 0, 0);
+          sts = ctx->event_handler(glow_eEvent_ButtonRelease, (int)event.button.x, (int)event.button.y, 0, 0);
           if (sts == GLOW__TERMINATED || sts == GLOW__DESTROYED)
             return 1;
         }
-      } else {
+      }
+      else
+      {
         /* Button click */
         cancel_event_timer(this);
-        if (!button_clicked_and_pressed) {
+        if (!button_clicked_and_pressed)
+        {
           //  cout << "Button first click detected" << endl;
           /* wait for button double click */
           memcpy(&last_event, &event, sizeof(event));
@@ -697,69 +735,80 @@ int GlowDrawGtk::event_handler(GdkEvent event)
           event_timer(this, 200);
           button_pressed = 0;
           return 1;
-        } else {
+        }
+        else
+        {
           /* Button double click */
           // cout << "Button double click detected" << endl;
           cancel_event_timer(this);
           button_clicked = 0;
           button_pressed = 0;
           button_clicked_and_pressed = 0;
-          switch (event.button.button) {
+          switch (event.button.button)
+          {
           case 1: // Button1
-            if ((event.button.state & GDK_SHIFT_MASK)
-                && !(event.button.state & GDK_CONTROL_MASK)) {
-              sts = ctx->event_handler(glow_eEvent_MB1DoubleClickShift,
-                  (int)event.button.x, (int)event.button.y, 0, 0);
+            if ((event.button.state & GDK_SHIFT_MASK) && !(event.button.state & GDK_CONTROL_MASK))
+            {
+              sts = ctx->event_handler(glow_eEvent_MB1DoubleClickShift, (int)event.button.x,
+                                       (int)event.button.y, 0, 0);
               if (sts == GLOW__TERMINATED || sts == GLOW__DESTROYED)
                 return 1;
               click_sensitivity = 0;
-            } else if (!(event.button.state & GDK_SHIFT_MASK)
-                && (event.button.state & GDK_CONTROL_MASK)) {
-              sts = ctx->event_handler(glow_eEvent_MB1DoubleClickCtrl,
-                  (int)event.button.x, (int)event.button.y, 0, 0);
+            }
+            else if (!(event.button.state & GDK_SHIFT_MASK) && (event.button.state & GDK_CONTROL_MASK))
+            {
+              sts = ctx->event_handler(glow_eEvent_MB1DoubleClickCtrl, (int)event.button.x,
+                                       (int)event.button.y, 0, 0);
               if (sts == GLOW__TERMINATED || sts == GLOW__DESTROYED)
                 return 1;
               click_sensitivity = 0;
-            } else if ((event.button.state & GDK_SHIFT_MASK)
-                && (event.button.state & GDK_CONTROL_MASK)) {
-              sts = ctx->event_handler(glow_eEvent_MB1DoubleClickShiftCtrl,
-                  (int)event.button.x, (int)event.button.y, 0, 0);
+            }
+            else if ((event.button.state & GDK_SHIFT_MASK) && (event.button.state & GDK_CONTROL_MASK))
+            {
+              sts = ctx->event_handler(glow_eEvent_MB1DoubleClickShiftCtrl, (int)event.button.x,
+                                       (int)event.button.y, 0, 0);
               if (sts == GLOW__TERMINATED || sts == GLOW__DESTROYED)
                 return 1;
               click_sensitivity = 0;
-            } else {
-              sts = ctx->event_handler(glow_eEvent_MB1DoubleClick,
-                  (int)event.button.x, (int)event.button.y, 0, 0);
+            }
+            else
+            {
+              sts = ctx->event_handler(glow_eEvent_MB1DoubleClick, (int)event.button.x, (int)event.button.y,
+                                       0, 0);
               if (sts == GLOW__TERMINATED || sts == GLOW__DESTROYED)
                 return 1;
               click_sensitivity = 0;
             }
             break;
           case 2: // Button2
-            if ((event.button.state & GDK_SHIFT_MASK)
-                && !(event.button.state & GDK_CONTROL_MASK)) {
-              sts = ctx->event_handler(glow_eEvent_MB2DoubleClickShift,
-                  (int)event.button.x, (int)event.button.y, 0, 0);
+            if ((event.button.state & GDK_SHIFT_MASK) && !(event.button.state & GDK_CONTROL_MASK))
+            {
+              sts = ctx->event_handler(glow_eEvent_MB2DoubleClickShift, (int)event.button.x,
+                                       (int)event.button.y, 0, 0);
               if (sts == GLOW__TERMINATED || sts == GLOW__DESTROYED)
                 return 1;
               click_sensitivity = 0;
-            } else if (!(event.button.state & GDK_SHIFT_MASK)
-                && (event.button.state & GDK_CONTROL_MASK)) {
-              sts = ctx->event_handler(glow_eEvent_MB2DoubleClickCtrl,
-                  (int)event.button.x, (int)event.button.y, 0, 0);
+            }
+            else if (!(event.button.state & GDK_SHIFT_MASK) && (event.button.state & GDK_CONTROL_MASK))
+            {
+              sts = ctx->event_handler(glow_eEvent_MB2DoubleClickCtrl, (int)event.button.x,
+                                       (int)event.button.y, 0, 0);
               if (sts == GLOW__TERMINATED || sts == GLOW__DESTROYED)
                 return 1;
               click_sensitivity = 0;
-            } else if ((event.button.state & GDK_SHIFT_MASK)
-                && (event.button.state & GDK_CONTROL_MASK)) {
-              sts = ctx->event_handler(glow_eEvent_MB2DoubleClickShiftCtrl,
-                  (int)event.button.x, (int)event.button.y, 0, 0);
+            }
+            else if ((event.button.state & GDK_SHIFT_MASK) && (event.button.state & GDK_CONTROL_MASK))
+            {
+              sts = ctx->event_handler(glow_eEvent_MB2DoubleClickShiftCtrl, (int)event.button.x,
+                                       (int)event.button.y, 0, 0);
               if (sts == GLOW__TERMINATED || sts == GLOW__DESTROYED)
                 return 1;
               click_sensitivity = 0;
-            } else {
-              sts = ctx->event_handler(glow_eEvent_MB2DoubleClick,
-                  (int)event.button.x, (int)event.button.y, 0, 0);
+            }
+            else
+            {
+              sts = ctx->event_handler(glow_eEvent_MB2DoubleClick, (int)event.button.x, (int)event.button.y,
+                                       0, 0);
               if (sts == GLOW__TERMINATED || sts == GLOW__DESTROYED)
                 return 1;
               click_sensitivity = 0;
@@ -776,12 +825,12 @@ int GlowDrawGtk::event_handler(GdkEvent event)
       //		event.expose.x,
       //		event.expose.y, event.expose.width,
       // event.expose.height);
-      sts = ctx->event_handler(glow_eEvent_Exposure, event.expose.area.x,
-          event.expose.area.y, event.expose.area.width,
-          event.expose.area.height);
+      sts = ctx->event_handler(glow_eEvent_Exposure, event.expose.area.x, event.expose.area.y,
+                               event.expose.area.width, event.expose.area.height);
       break;
     case GDK_VISIBILITY_NOTIFY:
-      switch (event.visibility.state) {
+      switch (event.visibility.state)
+      {
       case GDK_VISIBILITY_UNOBSCURED:
         sts = ctx->event_handler(glow_eEvent_VisibilityUnobscured, 0, 0, 0, 0);
         break;
@@ -794,24 +843,25 @@ int GlowDrawGtk::event_handler(GdkEvent event)
       //            printf( "-- Button1 motion event: (%d,%d)\n",
       //            event.button.x,
       //		event.button.y);
-      if (event.motion.is_hint) {
+      if (event.motion.is_hint)
+      {
         int x, y;
 
-        gdk_window_get_device_position(event.any.window, 
-	    gdk_seat_get_pointer(gdk_display_get_default_seat(display)), 
-	    &x, &y, NULL);
+        gdk_window_get_device_position(
+            event.any.window, gdk_seat_get_pointer(gdk_display_get_default_seat(display)), &x, &y, NULL);
         event.button.x = x;
         event.button.y = y;
       }
 
-      if (button3_pressed) {
+      if (button3_pressed)
+      {
         button3_pressed = 0;
         button_pressed = 0;
         button_clicked_and_pressed = 0;
       }
-      if (button_pressed
-          && (ABS(event.button.x - last_press_x) > DRAW_PRESS_PIX
-                 || ABS(event.button.y - last_press_y) > DRAW_PRESS_PIX)) {
+      if (button_pressed && (ABS(event.button.x - last_press_x) > DRAW_PRESS_PIX ||
+                             ABS(event.button.y - last_press_y) > DRAW_PRESS_PIX))
+      {
         //          printf( "Press: x %d last_x %d\n", event.button.x,
         //          last_press_x);
         //          printf( "       y %d last_y %d\n", event.button.y,
@@ -822,67 +872,55 @@ int GlowDrawGtk::event_handler(GdkEvent event)
 
         /* Button press */
         cancel_event_timer(this);
-        switch (button_pressed) {
+        switch (button_pressed)
+        {
         case 1: // Button1
           button1_pressed = 1;
-          if ((event.button.state & GDK_SHIFT_MASK)
-              && !(event.button.state & GDK_CONTROL_MASK))
-            sts = ctx->event_handler(glow_eEvent_MB1PressShift,
-                (int)event.button.x, (int)event.button.y, 0, 0);
-          else if (!(event.button.state & GDK_SHIFT_MASK)
-              && (event.button.state & GDK_CONTROL_MASK))
-            sts = ctx->event_handler(glow_eEvent_MB1PressCtrl,
-                (int)event.button.x, (int)event.button.y, 0, 0);
-          else if ((event.button.state & GDK_SHIFT_MASK)
-              && (event.button.state & GDK_CONTROL_MASK))
-            sts = ctx->event_handler(glow_eEvent_MB1PressShiftCtrl,
-                (int)event.button.x, (int)event.button.y, 0, 0);
+          if ((event.button.state & GDK_SHIFT_MASK) && !(event.button.state & GDK_CONTROL_MASK))
+            sts =
+                ctx->event_handler(glow_eEvent_MB1PressShift, (int)event.button.x, (int)event.button.y, 0, 0);
+          else if (!(event.button.state & GDK_SHIFT_MASK) && (event.button.state & GDK_CONTROL_MASK))
+            sts =
+                ctx->event_handler(glow_eEvent_MB1PressCtrl, (int)event.button.x, (int)event.button.y, 0, 0);
+          else if ((event.button.state & GDK_SHIFT_MASK) && (event.button.state & GDK_CONTROL_MASK))
+            sts = ctx->event_handler(glow_eEvent_MB1PressShiftCtrl, (int)event.button.x, (int)event.button.y,
+                                     0, 0);
           else
-            sts = ctx->event_handler(glow_eEvent_MB1Press, (int)event.button.x,
-                (int)event.button.y, 0, 0);
+            sts = ctx->event_handler(glow_eEvent_MB1Press, (int)event.button.x, (int)event.button.y, 0, 0);
           break;
         case 2: // Button2
           button2_pressed = 1;
-          if ((event.button.state & GDK_SHIFT_MASK)
-              && !(event.button.state & GDK_CONTROL_MASK))
-            sts = ctx->event_handler(glow_eEvent_MB2PressShift,
-                (int)event.button.x, (int)event.button.y, 0, 0);
-          else if (!(event.button.state & GDK_SHIFT_MASK)
-              && (event.button.state & GDK_CONTROL_MASK))
-            sts = ctx->event_handler(glow_eEvent_MB2PressShift,
-                (int)event.button.x, (int)event.button.y, 0, 0);
-          else if ((event.button.state & GDK_SHIFT_MASK)
-              && (event.button.state & GDK_CONTROL_MASK))
-            sts = ctx->event_handler(glow_eEvent_MB2PressShiftCtrl,
-                (int)event.button.x, (int)event.button.y, 0, 0);
+          if ((event.button.state & GDK_SHIFT_MASK) && !(event.button.state & GDK_CONTROL_MASK))
+            sts =
+                ctx->event_handler(glow_eEvent_MB2PressShift, (int)event.button.x, (int)event.button.y, 0, 0);
+          else if (!(event.button.state & GDK_SHIFT_MASK) && (event.button.state & GDK_CONTROL_MASK))
+            sts =
+                ctx->event_handler(glow_eEvent_MB2PressShift, (int)event.button.x, (int)event.button.y, 0, 0);
+          else if ((event.button.state & GDK_SHIFT_MASK) && (event.button.state & GDK_CONTROL_MASK))
+            sts = ctx->event_handler(glow_eEvent_MB2PressShiftCtrl, (int)event.button.x, (int)event.button.y,
+                                     0, 0);
           else
-            sts = ctx->event_handler(glow_eEvent_MB2Press, (int)event.button.x,
-                (int)event.button.y, 0, 0);
+            sts = ctx->event_handler(glow_eEvent_MB2Press, (int)event.button.x, (int)event.button.y, 0, 0);
           break;
         case 3: // Button3
           button3_pressed = 1;
-          sts = ctx->event_handler(glow_eEvent_MB3Press, (int)event.button.x,
-              (int)event.button.y, 0, 0);
+          sts = ctx->event_handler(glow_eEvent_MB3Press, (int)event.button.x, (int)event.button.y, 0, 0);
           break;
         }
         button_pressed = 0;
         button_clicked_and_pressed = 0;
       }
       if (button1_pressed || button2_pressed || button3_pressed)
-        sts = ctx->event_handler(glow_eEvent_ButtonMotion, (int)event.button.x,
-            (int)event.button.y, 0, 0);
+        sts = ctx->event_handler(glow_eEvent_ButtonMotion, (int)event.button.x, (int)event.button.y, 0, 0);
       else
-        sts = ctx->event_handler(glow_eEvent_CursorMotion, (int)event.button.x,
-            (int)event.button.y, 0, 0);
+        sts = ctx->event_handler(glow_eEvent_CursorMotion, (int)event.button.x, (int)event.button.y, 0, 0);
       break;
     case GDK_ENTER_NOTIFY:
-      sts = ctx->event_handler(glow_eEvent_Enter, (int)event.crossing.x,
-          (int)event.crossing.y, 0, 0);
+      sts = ctx->event_handler(glow_eEvent_Enter, (int)event.crossing.x, (int)event.crossing.y, 0, 0);
       break;
     case GDK_LEAVE_NOTIFY:
 
-      sts = ctx->event_handler(glow_eEvent_Leave, (int)event.crossing.x,
-          (int)event.crossing.y, 0, 0);
+      sts = ctx->event_handler(glow_eEvent_Leave, (int)event.crossing.x, (int)event.crossing.y, 0, 0);
       break;
     case GDK_MAP:
       sts = ctx->event_handler(glow_eEvent_Map, 0, 0, 0, 0);
@@ -894,31 +932,31 @@ int GlowDrawGtk::event_handler(GdkEvent event)
       break;
     case GDK_SCROLL:
       if (event.scroll.direction == GDK_SCROLL_UP)
-        sts = ctx->event_handler(glow_eEvent_ScrollUp, (int)event.scroll.x,
-            (int)event.scroll.y, 0, 0);
+        sts = ctx->event_handler(glow_eEvent_ScrollUp, (int)event.scroll.x, (int)event.scroll.y, 0, 0);
       else if (event.scroll.direction == GDK_SCROLL_DOWN)
-        sts = ctx->event_handler(glow_eEvent_ScrollDown, (int)event.scroll.x,
-            (int)event.scroll.y, 0, 0);
+        sts = ctx->event_handler(glow_eEvent_ScrollDown, (int)event.scroll.x, (int)event.scroll.y, 0, 0);
       break;
     default:
       break;
     }
-  } else if (event.any.window == nav_wind.window) {
-    switch (event.type) {
+  }
+  else if (event.any.window == nav_wind.window)
+  {
+    switch (event.type)
+    {
     case GDK_BUTTON_PRESS:
       //            printf( "-- Button event nav: (%d,%d) button: %d\n",
       //            event.button.x,
       //		event.button.y, event.button.button);
-      switch (event.button.button) {
+      switch (event.button.button)
+      {
       case 1: // Button1
         button1_pressed = 1;
-        ctx->event_handler_nav(
-            glow_eEvent_MB1Press, (int)event.button.x, (int)event.button.y);
+        ctx->event_handler_nav(glow_eEvent_MB1Press, (int)event.button.x, (int)event.button.y);
         break;
       case 2: // Button2
         button2_pressed = 1;
-        ctx->event_handler_nav(
-            glow_eEvent_MB2Press, (int)event.button.x, (int)event.button.y);
+        ctx->event_handler_nav(glow_eEvent_MB2Press, (int)event.button.x, (int)event.button.y);
         break;
       case 3: // Button3
         button3_pressed = 1;
@@ -929,7 +967,8 @@ int GlowDrawGtk::event_handler(GdkEvent event)
       //        printf( "-- Button release event nav: (%d,%d)\n",
       //        event.button.x,
       //		event.button.y);
-      switch (event.button.button) {
+      switch (event.button.button)
+      {
       case 1: // Button1
         button1_pressed = 0;
         break;
@@ -940,8 +979,7 @@ int GlowDrawGtk::event_handler(GdkEvent event)
         button3_pressed = 0;
         break;
       }
-      sts = ctx->event_handler_nav(
-          glow_eEvent_ButtonRelease, (int)event.button.x, (int)event.button.y);
+      sts = ctx->event_handler_nav(glow_eEvent_ButtonRelease, (int)event.button.x, (int)event.button.y);
       break;
     case GDK_EXPOSE:
       //        printf( "-- Navigator expose event..\n" );
@@ -952,21 +990,19 @@ int GlowDrawGtk::event_handler(GdkEvent event)
       //            event.button.x,
       //		event.button.y);
 
-      if (event.motion.is_hint) {
+      if (event.motion.is_hint)
+      {
         int x, y;
 
-        gdk_window_get_device_position(event.any.window, 
-	    gdk_seat_get_pointer(gdk_display_get_default_seat(display)), 
-	    &x, &y, NULL);
+        gdk_window_get_device_position(
+            event.any.window, gdk_seat_get_pointer(gdk_display_get_default_seat(display)), &x, &y, NULL);
         event.button.x = x;
         event.button.y = y;
       }
       if (button1_pressed || button2_pressed || button3_pressed)
-        sts = ctx->event_handler_nav(
-            glow_eEvent_ButtonMotion, (int)event.button.x, (int)event.button.y);
+        sts = ctx->event_handler_nav(glow_eEvent_ButtonMotion, (int)event.button.x, (int)event.button.y);
       else
-        sts = ctx->event_handler_nav(
-            glow_eEvent_CursorMotion, (int)event.button.x, (int)event.button.y);
+        sts = ctx->event_handler_nav(glow_eEvent_CursorMotion, (int)event.button.x, (int)event.button.y);
       break;
     default:;
     }
@@ -979,12 +1015,12 @@ int GlowDrawGtk::event_handler(GdkEvent event)
 }
 
 void GlowDrawGtk::enable_event(glow_eEvent event, glow_eEventType event_type,
-    int (*event_cb)(GlowCtx* ctx, glow_tEvent event))
+                               int (*event_cb)(GlowCtx* ctx, glow_tEvent event))
 {
   ctx->enable_event(event, event_type, event_cb);
 }
 
-void GlowDrawGtk::invalidate(GlowWind *wind, int x, int y, int width, int height)
+void GlowDrawGtk::invalidate(GlowWind* wind, int x, int y, int width, int height)
 {
   DrawWindGtk* w = (DrawWindGtk*)wind->window;
   GdkRectangle rect;
@@ -1008,24 +1044,29 @@ void GlowDrawGtk::invalidate(GlowWind *wind, int x, int y, int width, int height
 
 cairo_t* GlowDrawGtk::get_cairo(GlowWind* wind, int create)
 {
-  if (wind->window == ctx->mw.window) {
-    if (!cairo_cr_refcnt) {
+  if (wind->window == ctx->mw.window)
+  {
+    if (!cairo_cr_refcnt)
+    {
       if (!create)
-	printf("** Cairo context create error (glow)\n");
+        printf("** Cairo context create error (glow)\n");
 
       cairo_region = cairo_region_create();
       cairo_context = gdk_window_begin_draw_frame(m_wind.window, cairo_region);
       cairo_cr = gdk_drawing_context_get_cairo_context(cairo_context);
-      //cairo_save(cairo_cr);
+      // cairo_save(cairo_cr);
     }
     cairo_cr_refcnt++;
     return cairo_cr;
-  } else {
-    if (!cairo_nav_cr_refcnt) {
+  }
+  else
+  {
+    if (!cairo_nav_cr_refcnt)
+    {
       cairo_nav_region = cairo_region_create();
       cairo_nav_context = gdk_window_begin_draw_frame(nav_wind.window, cairo_nav_region);
       cairo_nav_cr = gdk_drawing_context_get_cairo_context(cairo_nav_context);
-      //cairo_save(cairo_nav_cr);
+      // cairo_save(cairo_nav_cr);
     }
     cairo_nav_cr_refcnt++;
     return cairo_nav_cr;
@@ -1034,8 +1075,10 @@ cairo_t* GlowDrawGtk::get_cairo(GlowWind* wind, int create)
 
 cairo_t* GlowDrawGtk::get_cairo(GlowWind* wind, int x, int y, int width, int height)
 {
-  if (wind->window == ctx->mw.window) {
-    if (!cairo_cr_refcnt) {
+  if (wind->window == ctx->mw.window)
+  {
+    if (!cairo_cr_refcnt)
+    {
       cairo_rectangle_int_t rect;
       rect.x = x;
       rect.y = y;
@@ -1045,16 +1088,19 @@ cairo_t* GlowDrawGtk::get_cairo(GlowWind* wind, int x, int y, int width, int hei
       cairo_region_reference(cairo_region);
       cairo_context = gdk_window_begin_draw_frame(m_wind.window, cairo_region);
       cairo_cr = gdk_drawing_context_get_cairo_context(cairo_context);
-      //cairo_save(cairo_cr);
+      // cairo_save(cairo_cr);
     }
     cairo_cr_refcnt++;
     return cairo_cr;
-  } else {
-    if (!cairo_nav_cr_refcnt) {
+  }
+  else
+  {
+    if (!cairo_nav_cr_refcnt)
+    {
       cairo_nav_region = cairo_region_create();
       cairo_nav_context = gdk_window_begin_draw_frame(nav_wind.window, cairo_nav_region);
       cairo_nav_cr = gdk_drawing_context_get_cairo_context(cairo_nav_context);
-      //cairo_save(cairo_nav_cr);
+      // cairo_save(cairo_nav_cr);
     }
     cairo_nav_cr_refcnt++;
     return cairo_nav_cr;
@@ -1063,65 +1109,76 @@ cairo_t* GlowDrawGtk::get_cairo(GlowWind* wind, int x, int y, int width, int hei
 
 void GlowDrawGtk::end_cairo(GlowWind* wind, cairo_t* cr)
 {
-  if (wind->window == ctx->mw.window) {
+  if (wind->window == ctx->mw.window)
+  {
     pwr_Assert(cairo_cr_refcnt != 0);
     cairo_cr_refcnt--;
 
-    if (cairo_cr_refcnt == 0) {
+    if (cairo_cr_refcnt == 0)
+    {
       gdk_window_end_draw_frame(m_wind.window, cairo_context);
       cairo_region_destroy(cairo_region);
     }
-    else {
-      //cairo_restore(cairo_cr);
-      //cairo_save(cairo_cr);
+    else
+    {
+      // cairo_restore(cairo_cr);
+      // cairo_save(cairo_cr);
     }
-  } else {
+  }
+  else
+  {
     pwr_Assert(cairo_nav_cr_refcnt != 0);
     cairo_nav_cr_refcnt--;
 
-    if (cairo_nav_cr_refcnt == 0) {
+    if (cairo_nav_cr_refcnt == 0)
+    {
       gdk_window_end_draw_frame(nav_wind.window, cairo_nav_context);
       cairo_region_destroy(cairo_nav_region);
     }
-    else {
-      //cairo_restore(cairo_nav_cr);
-      //cairo_save(cairo_nav_cr);
+    else
+    {
+      // cairo_restore(cairo_nav_cr);
+      // cairo_save(cairo_nav_cr);
     }
   }
 }
 
-int GlowDrawGtk::rect(GlowWind* wind, int x, int y, int width, int height,
-    glow_eDrawType gc_type, int idx, int highlight, double transparency)
+int GlowDrawGtk::rect(GlowWind* wind, int x, int y, int width, int height, glow_eDrawType gc_type, int idx,
+                      int highlight, double transparency)
 {
   DrawWindGtk* ww = (DrawWindGtk*)wind->window;
 
   if (ctx->nodraw)
     return 1;
 
-  cairo_t *cr = get_cairo(wind);
-  cairo_pattern_t *pat = 0;
+  cairo_t* cr = get_cairo(wind);
+  cairo_pattern_t* pat = 0;
 
   if (ww->clip_on)
     set_cairo_clip(ww, cr);
 
   cairo_set_antialias(cr, antialias);
-  if (highlight) {
+  if (highlight)
+  {
     if (gc_type == glow_eDrawType_LineGray)
       cairo_set_source(cr, gc_black);
     else
       cairo_set_source(cr, gc_red);
-  } else {
+  }
+  else
+  {
     if (feq(transparency, 0.0))
       cairo_set_source(cr, get_gc(this, gc_type + highlight, idx));
-    else {
+    else
+    {
       double r1, g1, b1;
 
       GlowColor::rgb_color(gc_type, &r1, &g1, &b1, get_customcolors());
       pat = cairo_pattern_create_rgba(r1, g1, b1, 1.0 - transparency);
-      cairo_set_source(cr,  pat);
+      cairo_set_source(cr, pat);
     }
   }
-  cairo_set_line_width(cr, idx+1);
+  cairo_set_line_width(cr, idx + 1);
 
   cairo_rectangle(cr, x, y, width, height);
   cairo_stroke(cr);
@@ -1135,22 +1192,21 @@ int GlowDrawGtk::rect(GlowWind* wind, int x, int y, int width, int height,
   return 1;
 }
 
-int GlowDrawGtk::rect_erase(
-    GlowWind* wind, int x, int y, int width, int height, int idx)
+int GlowDrawGtk::rect_erase(GlowWind* wind, int x, int y, int width, int height, int idx)
 {
   DrawWindGtk* ww = (DrawWindGtk*)wind->window;
 
   if (ctx->nodraw)
     return 1;
 
-  cairo_t *cr = get_cairo(wind);
+  cairo_t* cr = get_cairo(wind);
 
   if (ww->clip_on)
     set_cairo_clip(ww, cr);
 
   cairo_set_antialias(cr, antialias);
   cairo_set_source(cr, gc_erase);
-  cairo_set_line_width(cr, idx+1);
+  cairo_set_line_width(cr, idx + 1);
 
   cairo_rectangle(cr, x, y, width, height);
   cairo_stroke(cr);
@@ -1161,15 +1217,15 @@ int GlowDrawGtk::rect_erase(
   return 1;
 }
 
-int GlowDrawGtk::arrow(GlowWind* wind, int x1, int y1, int x2, int y2, int x3,
-    int y3, glow_eDrawType gc_type, int idx, int highlight)
+int GlowDrawGtk::arrow(GlowWind* wind, int x1, int y1, int x2, int y2, int x3, int y3, glow_eDrawType gc_type,
+                       int idx, int highlight)
 {
   DrawWindGtk* w = (DrawWindGtk*)wind->window;
 
   if (ctx->nodraw)
     return 1;
 
-  cairo_t *cr = get_cairo(wind);
+  cairo_t* cr = get_cairo(wind);
 
   if (w->clip_on)
     set_cairo_clip(w, cr);
@@ -1181,7 +1237,7 @@ int GlowDrawGtk::arrow(GlowWind* wind, int x1, int y1, int x2, int y2, int x3,
     cairo_set_source(cr, gc_red);
   else
     cairo_set_source(cr, get_gc(this, gc_type, 0));
-  
+
   cairo_move_to(cr, x1, y1);
   cairo_line_to(cr, x2, y2);
   cairo_line_to(cr, x3, y3);
@@ -1195,21 +1251,20 @@ int GlowDrawGtk::arrow(GlowWind* wind, int x1, int y1, int x2, int y2, int x3,
   return 1;
 }
 
-int GlowDrawGtk::arrow_erase(
-    GlowWind* wind, int x1, int y1, int x2, int y2, int x3, int y3, int idx)
+int GlowDrawGtk::arrow_erase(GlowWind* wind, int x1, int y1, int x2, int y2, int x3, int y3, int idx)
 {
   DrawWindGtk* w = (DrawWindGtk*)wind->window;
 
   if (ctx->nodraw)
     return 1;
 
-  cairo_t *cr = get_cairo(wind);
+  cairo_t* cr = get_cairo(wind);
 
   if (w->clip_on)
     set_cairo_clip(w, cr);
 
   cairo_set_source(cr, gc_erase);
-  
+
   cairo_move_to(cr, x1, y1);
   cairo_line_to(cr, x2, y2);
   cairo_line_to(cr, x3, y3);
@@ -1222,9 +1277,8 @@ int GlowDrawGtk::arrow_erase(
   return 1;
 }
 
-int GlowDrawGtk::arc(GlowWind* wind, int x, int y, int width, int height,
-    int angle1, int angle2, glow_eDrawType gc_type, int idx, int highlight,
-    double transparency)
+int GlowDrawGtk::arc(GlowWind* wind, int x, int y, int width, int height, int angle1, int angle2,
+                     glow_eDrawType gc_type, int idx, int highlight, double transparency)
 {
   DrawWindGtk* w = (DrawWindGtk*)wind->window;
 
@@ -1234,20 +1288,15 @@ int GlowDrawGtk::arc(GlowWind* wind, int x, int y, int width, int height,
   if (width == 0 || height == 0)
     return 1;
 
-  if (w->clip_on
-      && !(w->clip_rectangle[w->clip_cnt - 1].x <= x + width
-             && w->clip_rectangle[w->clip_cnt - 1].x
-                     + w->clip_rectangle[w->clip_cnt - 1].width
-                 >= x
-             && w->clip_rectangle[w->clip_cnt - 1].y <= y + height
-             && w->clip_rectangle[w->clip_cnt - 1].y
-                     + w->clip_rectangle[w->clip_cnt - 1].height
-                 >= y))
+  if (w->clip_on && !(w->clip_rectangle[w->clip_cnt - 1].x <= x + width &&
+                      w->clip_rectangle[w->clip_cnt - 1].x + w->clip_rectangle[w->clip_cnt - 1].width >= x &&
+                      w->clip_rectangle[w->clip_cnt - 1].y <= y + height &&
+                      w->clip_rectangle[w->clip_cnt - 1].y + w->clip_rectangle[w->clip_cnt - 1].height >= y))
     return 1;
 
   cairo_matrix_t matrix;
-  cairo_t *cr = get_cairo(wind);
-  cairo_pattern_t *pat = 0;
+  cairo_t* cr = get_cairo(wind);
+  cairo_pattern_t* pat = 0;
 
   if (gc_type == glow_eDrawType_LineGray && highlight)
     gc_type = glow_eDrawType_Line;
@@ -1270,7 +1319,8 @@ int GlowDrawGtk::arc(GlowWind* wind, int x, int y, int width, int height,
   cairo_set_antialias(cr, antialias);
   if (feq(transparency, 0.0))
     cairo_set_source(cr, get_gc(this, gc_type, 0));
-  else {
+  else
+  {
     double r1, g1, b1;
 
     GlowColor::rgb_color(gc_type, &r1, &g1, &b1, get_customcolors());
@@ -1278,15 +1328,17 @@ int GlowDrawGtk::arc(GlowWind* wind, int x, int y, int width, int height,
     cairo_set_source(cr, pat);
   }
 
-  cairo_set_line_width(cr, idx+1);
+  cairo_set_line_width(cr, idx + 1);
 
-  if (width != height) {
+  if (width != height)
+  {
     cairo_get_matrix(cr, &matrix);
-    cairo_translate(cr, x + width/2, y + height/2);
-    cairo_scale(cr, 1, (double)height/width);
-    cairo_translate(cr, -(x + width/2), -(y + height/2));
+    cairo_translate(cr, x + width / 2, y + height / 2);
+    cairo_scale(cr, 1, (double)height / width);
+    cairo_translate(cr, -(x + width / 2), -(y + height / 2));
   }
-  cairo_arc(cr, x+width/2, y+height/2, 0.5 * width, -M_PI/180*(angle1 + angle2),- M_PI/180*angle1);
+  cairo_arc(cr, x + width / 2, y + height / 2, 0.5 * width, -M_PI / 180 * (angle1 + angle2),
+            -M_PI / 180 * angle1);
 
   if (width != height)
     cairo_set_matrix(cr, &matrix);
@@ -1302,9 +1354,8 @@ int GlowDrawGtk::arc(GlowWind* wind, int x, int y, int width, int height,
   return 1;
 }
 
-int GlowDrawGtk::fill_arc(GlowWind* wind, int x, int y, int width, int height,
-    int angle1, int angle2, glow_eDrawType gc_type, int highlight,
-    double transparency)
+int GlowDrawGtk::fill_arc(GlowWind* wind, int x, int y, int width, int height, int angle1, int angle2,
+                          glow_eDrawType gc_type, int highlight, double transparency)
 {
   DrawWindGtk* w = (DrawWindGtk*)wind->window;
 
@@ -1315,8 +1366,8 @@ int GlowDrawGtk::fill_arc(GlowWind* wind, int x, int y, int width, int height,
     return 1;
 
   cairo_matrix_t matrix;
-  cairo_t *cr = get_cairo(wind);
-  cairo_pattern_t *pat = 0;
+  cairo_t* cr = get_cairo(wind);
+  cairo_pattern_t* pat = 0;
 
   if (angle2 > 360)
     angle2 = 360;
@@ -1332,7 +1383,8 @@ int GlowDrawGtk::fill_arc(GlowWind* wind, int x, int y, int width, int height,
   cairo_set_antialias(cr, antialias);
   if (feq(transparency, 0.0))
     cairo_set_source(cr, get_gc(this, gc_type, 0));
-  else {
+  else
+  {
     double r1, g1, b1;
 
     GlowColor::rgb_color(gc_type, &r1, &g1, &b1, get_customcolors());
@@ -1340,17 +1392,19 @@ int GlowDrawGtk::fill_arc(GlowWind* wind, int x, int y, int width, int height,
     cairo_set_source(cr, pat);
   }
 
-  if (width != height) {
+  if (width != height)
+  {
     cairo_get_matrix(cr, &matrix);
-    cairo_translate(cr, x + width/2, y + height/2);
-    cairo_scale(cr, 1, (double)height/width);
-    cairo_translate(cr, -(x + width/2), -(y + height/2));
+    cairo_translate(cr, x + width / 2, y + height / 2);
+    cairo_scale(cr, 1, (double)height / width);
+    cairo_translate(cr, -(x + width / 2), -(y + height / 2));
   }
   if (angle2 != 360)
-    cairo_move_to(cr, x + width/2, y+height/2);
-  cairo_arc(cr, x+width/2, y+height/2, 0.5 * width, -M_PI/180*(angle1 + angle2),- M_PI/180*angle1);
+    cairo_move_to(cr, x + width / 2, y + height / 2);
+  cairo_arc(cr, x + width / 2, y + height / 2, 0.5 * width, -M_PI / 180 * (angle1 + angle2),
+            -M_PI / 180 * angle1);
   if (angle2 != 360)
-    cairo_line_to(cr, x + width/2, y + height/2);
+    cairo_line_to(cr, x + width / 2, y + height / 2);
 
   if (width != height)
     cairo_set_matrix(cr, &matrix);
@@ -1366,8 +1420,8 @@ int GlowDrawGtk::fill_arc(GlowWind* wind, int x, int y, int width, int height,
   return 1;
 }
 
-int GlowDrawGtk::arc_erase(GlowWind* wind, int x, int y, int width, int height,
-    int angle1, int angle2, int idx)
+int GlowDrawGtk::arc_erase(GlowWind* wind, int x, int y, int width, int height, int angle1, int angle2,
+                           int idx)
 {
   DrawWindGtk* w = (DrawWindGtk*)wind->window;
 
@@ -1377,19 +1431,14 @@ int GlowDrawGtk::arc_erase(GlowWind* wind, int x, int y, int width, int height,
   if (width == 0 || height == 0)
     return 1;
 
-  if (w->clip_on
-      && !(w->clip_rectangle[w->clip_cnt - 1].x <= x + width
-             && w->clip_rectangle[w->clip_cnt - 1].x
-                     + w->clip_rectangle[w->clip_cnt - 1].width
-                 >= x
-             && w->clip_rectangle[w->clip_cnt - 1].y <= y + height
-             && w->clip_rectangle[w->clip_cnt - 1].y
-                     + w->clip_rectangle[w->clip_cnt - 1].height
-                 >= y))
+  if (w->clip_on && !(w->clip_rectangle[w->clip_cnt - 1].x <= x + width &&
+                      w->clip_rectangle[w->clip_cnt - 1].x + w->clip_rectangle[w->clip_cnt - 1].width >= x &&
+                      w->clip_rectangle[w->clip_cnt - 1].y <= y + height &&
+                      w->clip_rectangle[w->clip_cnt - 1].y + w->clip_rectangle[w->clip_cnt - 1].height >= y))
     return 1;
 
   cairo_matrix_t matrix;
-  cairo_t *cr = get_cairo(wind);
+  cairo_t* cr = get_cairo(wind);
 
   if (angle1 >= 360)
     angle1 = angle1 - angle1 / 360 * 360;
@@ -1401,15 +1450,17 @@ int GlowDrawGtk::arc_erase(GlowWind* wind, int x, int y, int width, int height,
 
   cairo_set_antialias(cr, antialias);
   cairo_set_source(cr, gc_erase);
-  cairo_set_line_width(cr, idx+1);
+  cairo_set_line_width(cr, idx + 1);
 
-  if (width != height) {
+  if (width != height)
+  {
     cairo_get_matrix(cr, &matrix);
-    cairo_translate(cr, x + width/2, y + height/2);
-    cairo_scale(cr, 1, (double)height/width);
-    cairo_translate(cr, -(x + width/2), -(y + height/2));
+    cairo_translate(cr, x + width / 2, y + height / 2);
+    cairo_scale(cr, 1, (double)height / width);
+    cairo_translate(cr, -(x + width / 2), -(y + height / 2));
   }
-  cairo_arc(cr, x+width/2, y+height/2, 0.5 * width, -M_PI/180*(angle1 + angle2),- M_PI/180*angle1);
+  cairo_arc(cr, x + width / 2, y + height / 2, 0.5 * width, -M_PI / 180 * (angle1 + angle2),
+            -M_PI / 180 * angle1);
 
   if (width != height)
     cairo_set_matrix(cr, &matrix);
@@ -1423,23 +1474,19 @@ int GlowDrawGtk::arc_erase(GlowWind* wind, int x, int y, int width, int height,
   return 1;
 }
 
-int GlowDrawGtk::line(GlowWind* wind, int x1, int y1, int x2, int y2,
-    glow_eDrawType gc_type, int idx, int highlight, double transparency)
+int GlowDrawGtk::line(GlowWind* wind, int x1, int y1, int x2, int y2, glow_eDrawType gc_type, int idx,
+                      int highlight, double transparency)
 {
   if (ctx->nodraw)
     return 1;
 
   DrawWindGtk* w = (DrawWindGtk*)wind->window;
 
-  if (w->clip_on
-      && !(w->clip_rectangle[w->clip_cnt - 1].x <= MAX(x1, x2)
-             && w->clip_rectangle[w->clip_cnt - 1].x
-                     + w->clip_rectangle[w->clip_cnt - 1].width
-                 >= MIN(x1, x2)
-             && w->clip_rectangle[w->clip_cnt - 1].y <= MAX(y1, y2)
-             && w->clip_rectangle[w->clip_cnt - 1].y
-                     + w->clip_rectangle[w->clip_cnt - 1].height
-                 >= MIN(y1, y2)))
+  if (w->clip_on &&
+      !(w->clip_rectangle[w->clip_cnt - 1].x <= MAX(x1, x2) &&
+        w->clip_rectangle[w->clip_cnt - 1].x + w->clip_rectangle[w->clip_cnt - 1].width >= MIN(x1, x2) &&
+        w->clip_rectangle[w->clip_cnt - 1].y <= MAX(y1, y2) &&
+        w->clip_rectangle[w->clip_cnt - 1].y + w->clip_rectangle[w->clip_cnt - 1].height >= MIN(y1, y2)))
     return 1;
 
   // Fix for highlight for connections in grow
@@ -1449,8 +1496,8 @@ int GlowDrawGtk::line(GlowWind* wind, int x1, int y1, int x2, int y2,
   if (gc_type == glow_eDrawType_LineGray && highlight)
     gc_type = glow_eDrawType_Line;
 
-  cairo_t *cr = get_cairo(wind);
-  cairo_pattern_t *pat = 0;
+  cairo_t* cr = get_cairo(wind);
+  cairo_pattern_t* pat = 0;
 
   if (w->clip_on)
     set_cairo_clip(w, cr);
@@ -1458,19 +1505,20 @@ int GlowDrawGtk::line(GlowWind* wind, int x1, int y1, int x2, int y2,
   cairo_set_antialias(cr, antialias);
   if (feq(transparency, 0.0))
     cairo_set_source(cr, get_gc(this, gc_type, 0));
-  else {
+  else
+  {
     double r1, g1, b1;
-    
+
     GlowColor::rgb_color(gc_type, &r1, &g1, &b1, get_customcolors());
     pat = cairo_pattern_create_rgba(r1, g1, b1, 1.0 - transparency);
     cairo_set_source(cr, pat);
   }
-  cairo_set_line_width(cr, idx+1);
+  cairo_set_line_width(cr, idx + 1);
 
   cairo_move_to(cr, x1, y1);
   cairo_line_to(cr, x2, y2);
   cairo_stroke(cr);
-  
+
   if (w->clip_on)
     reset_cairo_clip(w, cr);
   if (pat)
@@ -1481,24 +1529,19 @@ int GlowDrawGtk::line(GlowWind* wind, int x1, int y1, int x2, int y2,
   return 1;
 }
 
-int GlowDrawGtk::line_dashed(GlowWind* wind, int x1, int y1, int x2, int y2,
-    glow_eDrawType gc_type, int idx, int highlight, glow_eLineType line_type,
-    double transparency)
+int GlowDrawGtk::line_dashed(GlowWind* wind, int x1, int y1, int x2, int y2, glow_eDrawType gc_type, int idx,
+                             int highlight, glow_eLineType line_type, double transparency)
 {
   if (ctx->nodraw)
     return 1;
 
   DrawWindGtk* w = (DrawWindGtk*)wind->window;
 
-  if (w->clip_on
-      && !(w->clip_rectangle[w->clip_cnt - 1].x <= MAX(x1, x2)
-             && w->clip_rectangle[w->clip_cnt - 1].x
-                     + w->clip_rectangle[w->clip_cnt - 1].width
-                 >= MIN(x1, x2)
-             && w->clip_rectangle[w->clip_cnt - 1].y <= MAX(y1, y2)
-             && w->clip_rectangle[w->clip_cnt - 1].y
-                     + w->clip_rectangle[w->clip_cnt - 1].height
-                 >= MIN(y1, y2)))
+  if (w->clip_on &&
+      !(w->clip_rectangle[w->clip_cnt - 1].x <= MAX(x1, x2) &&
+        w->clip_rectangle[w->clip_cnt - 1].x + w->clip_rectangle[w->clip_cnt - 1].width >= MIN(x1, x2) &&
+        w->clip_rectangle[w->clip_cnt - 1].y <= MAX(y1, y2) &&
+        w->clip_rectangle[w->clip_cnt - 1].y + w->clip_rectangle[w->clip_cnt - 1].height >= MIN(y1, y2)))
     return 1;
 
   // Fix for highlight for connections in grow
@@ -1508,8 +1551,8 @@ int GlowDrawGtk::line_dashed(GlowWind* wind, int x1, int y1, int x2, int y2,
   if (gc_type == glow_eDrawType_LineGray && highlight)
     gc_type = glow_eDrawType_Line;
 
-  cairo_t *cr = get_cairo(wind);
-  cairo_pattern_t *pat = 0;
+  cairo_t* cr = get_cairo(wind);
+  cairo_pattern_t* pat = 0;
 
   if (w->clip_on)
     set_cairo_clip(w, cr);
@@ -1517,17 +1560,19 @@ int GlowDrawGtk::line_dashed(GlowWind* wind, int x1, int y1, int x2, int y2,
   cairo_set_antialias(cr, antialias);
   if (feq(transparency, 0.0))
     cairo_set_source(cr, get_gc(this, gc_type, 0));
-  else {
+  else
+  {
     double r1, g1, b1;
-    
+
     GlowColor::rgb_color(gc_type, &r1, &g1, &b1, get_customcolors());
     pat = cairo_pattern_create_rgba(r1, g1, b1, 1.0 - transparency);
     cairo_set_source(cr, pat);
   }
-  cairo_set_line_width(cr, idx+1);
+  cairo_set_line_width(cr, idx + 1);
   int dash_offset = 0;
   double dashes[4];
-  switch (line_type) {
+  switch (line_type)
+  {
   case glow_eLineType_Dashed1:
     dashes[0] = 1 + idx;
     cairo_set_dash(cr, dashes, 1, dash_offset);
@@ -1540,13 +1585,15 @@ int GlowDrawGtk::line_dashed(GlowWind* wind, int x1, int y1, int x2, int y2,
     dashes[0] = 1 + 3 * idx;
     cairo_set_dash(cr, dashes, 1, dash_offset);
     break;
-  case glow_eLineType_Dotted: {
+  case glow_eLineType_Dotted:
+  {
     dashes[0] = 1 + idx;
     dashes[1] = 1 + 4 * idx;
     cairo_set_dash(cr, dashes, 2, dash_offset);
     break;
   }
-  case glow_eLineType_DotDashed1: {
+  case glow_eLineType_DotDashed1:
+  {
     dashes[0] = 1 + 3 * idx;
     dashes[1] = 1 + 2 * idx;
     dashes[2] = 1 + idx;
@@ -1554,7 +1601,8 @@ int GlowDrawGtk::line_dashed(GlowWind* wind, int x1, int y1, int x2, int y2,
     cairo_set_dash(cr, dashes, 4, dash_offset);
     break;
   }
-  case glow_eLineType_DotDashed2: {
+  case glow_eLineType_DotDashed2:
+  {
     dashes[0] = 1 + 6 * idx;
     dashes[1] = 1 + 3 * idx;
     dashes[2] = 1 + idx;
@@ -1569,7 +1617,7 @@ int GlowDrawGtk::line_dashed(GlowWind* wind, int x1, int y1, int x2, int y2,
   cairo_line_to(cr, x2, y2);
   cairo_stroke(cr);
   cairo_set_dash(cr, 0, 0, 0);
-  
+
   if (w->clip_on)
     reset_cairo_clip(w, cr);
   if (pat)
@@ -1579,38 +1627,33 @@ int GlowDrawGtk::line_dashed(GlowWind* wind, int x1, int y1, int x2, int y2,
   return 1;
 }
 
-int GlowDrawGtk::line_erase(
-    GlowWind* wind, int x1, int y1, int x2, int y2, int idx)
+int GlowDrawGtk::line_erase(GlowWind* wind, int x1, int y1, int x2, int y2, int idx)
 {
   if (ctx->nodraw)
     return 1;
 
   DrawWindGtk* w = (DrawWindGtk*)wind->window;
 
-  if (w->clip_on
-      && !(w->clip_rectangle[w->clip_cnt - 1].x <= MAX(x1, x2)
-             && w->clip_rectangle[w->clip_cnt - 1].x
-                     + w->clip_rectangle[w->clip_cnt - 1].width
-                 >= MIN(x1, x2)
-             && w->clip_rectangle[w->clip_cnt - 1].y <= MAX(y1, y2)
-             && w->clip_rectangle[w->clip_cnt - 1].y
-                     + w->clip_rectangle[w->clip_cnt - 1].height
-                 >= MIN(y1, y2)))
+  if (w->clip_on &&
+      !(w->clip_rectangle[w->clip_cnt - 1].x <= MAX(x1, x2) &&
+        w->clip_rectangle[w->clip_cnt - 1].x + w->clip_rectangle[w->clip_cnt - 1].width >= MIN(x1, x2) &&
+        w->clip_rectangle[w->clip_cnt - 1].y <= MAX(y1, y2) &&
+        w->clip_rectangle[w->clip_cnt - 1].y + w->clip_rectangle[w->clip_cnt - 1].height >= MIN(y1, y2)))
     return 1;
 
-  cairo_t *cr = get_cairo(wind);
+  cairo_t* cr = get_cairo(wind);
 
   if (w->clip_on)
     set_cairo_clip(w, cr);
 
   cairo_set_antialias(cr, antialias);
   cairo_set_source(cr, gc_erase);
-  cairo_set_line_width(cr, idx+1);
+  cairo_set_line_width(cr, idx + 1);
 
   cairo_move_to(cr, x1, y1);
   cairo_line_to(cr, x2, y2);
   cairo_stroke(cr);
-  
+
   if (w->clip_on)
     reset_cairo_clip(w, cr);
 
@@ -1619,8 +1662,8 @@ int GlowDrawGtk::line_erase(
   return 1;
 }
 
-int GlowDrawGtk::polyline(GlowWind* wind, glow_sPointX* points, int point_cnt,
-    glow_eDrawType gc_type, int idx, int highlight, double transparency)
+int GlowDrawGtk::polyline(GlowWind* wind, glow_sPointX* points, int point_cnt, glow_eDrawType gc_type,
+                          int idx, int highlight, double transparency)
 {
   if (ctx->nodraw)
     return 1;
@@ -1632,8 +1675,8 @@ int GlowDrawGtk::polyline(GlowWind* wind, glow_sPointX* points, int point_cnt,
 
   int cnt;
   GdkPoint* gpoints = points_to_gdk_points_curve(wind, points, point_cnt, &cnt);
-  cairo_t *cr = get_cairo(wind);
-  cairo_pattern_t *pat = 0;
+  cairo_t* cr = get_cairo(wind);
+  cairo_pattern_t* pat = 0;
 
   if (w->clip_on)
     set_cairo_clip(w, cr);
@@ -1641,14 +1684,15 @@ int GlowDrawGtk::polyline(GlowWind* wind, glow_sPointX* points, int point_cnt,
   cairo_set_antialias(cr, antialias);
   if (feq(transparency, 0.0))
     cairo_set_source(cr, get_gc(this, gc_type, 0));
-  else {
+  else
+  {
     double r1, g1, b1;
-    
+
     GlowColor::rgb_color(gc_type, &r1, &g1, &b1, get_customcolors());
     pat = cairo_pattern_create_rgba(r1, g1, b1, 1.0 - transparency);
     cairo_set_source(cr, pat);
   }
-  cairo_set_line_width(cr, idx+1);
+  cairo_set_line_width(cr, idx + 1);
   cairo_set_line_join(cr, CAIRO_LINE_JOIN_BEVEL);
 
   cairo_move_to(cr, gpoints[0].x, gpoints[0].y);
@@ -1667,8 +1711,8 @@ int GlowDrawGtk::polyline(GlowWind* wind, glow_sPointX* points, int point_cnt,
   return 1;
 }
 
-int GlowDrawGtk::fill_polyline(GlowWind* wind, glow_sPointX* points,
-    int point_cnt, glow_eDrawType gc_type, int highlight, double transparency)
+int GlowDrawGtk::fill_polyline(GlowWind* wind, glow_sPointX* points, int point_cnt, glow_eDrawType gc_type,
+                               int highlight, double transparency)
 {
   if (ctx->nodraw)
     return 1;
@@ -1679,8 +1723,8 @@ int GlowDrawGtk::fill_polyline(GlowWind* wind, glow_sPointX* points,
     gc_type = glow_eDrawType_Line;
 
   GdkPoint* gpoints = points_to_gdk_points(points, point_cnt);
-  cairo_t *cr = get_cairo(wind);
-  cairo_pattern_t *pat = 0;
+  cairo_t* cr = get_cairo(wind);
+  cairo_pattern_t* pat = 0;
 
   if (w->clip_on)
     set_cairo_clip(w, cr);
@@ -1688,7 +1732,8 @@ int GlowDrawGtk::fill_polyline(GlowWind* wind, glow_sPointX* points,
   cairo_set_antialias(cr, antialias);
   if (feq(transparency, 0.0))
     cairo_set_source(cr, get_gc(this, gc_type, 0));
-  else {
+  else
+  {
     double r1, g1, b1;
 
     GlowColor::rgb_color(gc_type, &r1, &g1, &b1, get_customcolors());
@@ -1701,7 +1746,7 @@ int GlowDrawGtk::fill_polyline(GlowWind* wind, glow_sPointX* points,
     cairo_line_to(cr, gpoints[i].x, gpoints[i].y);
 
   cairo_fill(cr);
-  
+
   if (w->clip_on)
     reset_cairo_clip(w, cr);
   if (pat)
@@ -1713,8 +1758,7 @@ int GlowDrawGtk::fill_polyline(GlowWind* wind, glow_sPointX* points,
   return 1;
 }
 
-int GlowDrawGtk::polyline_erase(
-    GlowWind* wind, glow_sPointX* points, int point_cnt, int idx)
+int GlowDrawGtk::polyline_erase(GlowWind* wind, glow_sPointX* points, int point_cnt, int idx)
 {
   if (ctx->nodraw)
     return 1;
@@ -1723,20 +1767,20 @@ int GlowDrawGtk::polyline_erase(
 
   int cnt;
   GdkPoint* gpoints = points_to_gdk_points_curve(wind, points, point_cnt, &cnt);
-  cairo_t *cr = get_cairo(wind);
+  cairo_t* cr = get_cairo(wind);
 
   if (w->clip_on)
     set_cairo_clip(w, cr);
 
   cairo_set_antialias(cr, antialias);
   cairo_set_source(cr, gc_erase);
-  cairo_set_line_width(cr, idx+1);
+  cairo_set_line_width(cr, idx + 1);
 
   cairo_move_to(cr, gpoints[0].x, gpoints[0].y);
   for (int i = 1; i < cnt; i++)
     cairo_line_to(cr, gpoints[i].x, gpoints[i].y);
   cairo_stroke(cr);
-  
+
   if (w->clip_on)
     reset_cairo_clip(w, cr);
 
@@ -1746,15 +1790,16 @@ int GlowDrawGtk::polyline_erase(
   return 1;
 }
 
-int GlowDrawGtk::text(GlowWind* wind, int x, int y, char* text, int len,
-    glow_eDrawType gc_type, glow_eDrawType color, int idx, int highlight,
-    int line, glow_eFont font_idx, double size, int rot, double transparency)
+int GlowDrawGtk::text(GlowWind* wind, int x, int y, char* text, int len, glow_eDrawType gc_type,
+                      glow_eDrawType color, int idx, int highlight, int line, glow_eFont font_idx,
+                      double size, int rot, double transparency)
 {
   if (ctx->nodraw)
     return 1;
 
   char* textutf8 = 0;
-  if (((GrowCtx*)ctx)->text_coding != glow_eTextCoding_UTF_8) {
+  if (((GrowCtx*)ctx)->text_coding != glow_eTextCoding_UTF_8)
+  {
     textutf8 = g_convert(text, -1, "UTF-8", "ISO8859-1", NULL, NULL, NULL);
     text = textutf8;
   }
@@ -1765,27 +1810,29 @@ int GlowDrawGtk::text(GlowWind* wind, int x, int y, char* text, int len,
   if (font_idx >= glow_eFont__)
     font_idx = glow_eFont_Helvetica;
 
-  cairo_t *cr = get_cairo(wind);
-  cairo_pattern_t *pat = 0;
+  cairo_t* cr = get_cairo(wind);
+  cairo_pattern_t* pat = 0;
 
   if (w->clip_on)
     set_cairo_clip(w, cr);
 
   if (feq(transparency, 0.0))
     cairo_set_source(cr, get_gc(this, color, 0));
-  else {
+  else
+  {
     double r1, g1, b1;
-    
+
     GlowColor::rgb_color(color, &r1, &g1, &b1, get_customcolors());
     pat = cairo_pattern_create_rgba(r1, g1, b1, 1.0 - transparency);
     cairo_set_source(cr, pat);
   }
-  
-  cairo_font_face_t *font_face = get_font_face(font_idx, drawtype_to_fonttype(gc_type));
+
+  cairo_font_face_t* font_face = get_font_face(font_idx, drawtype_to_fonttype(gc_type));
   cairo_set_font_face(cr, font_face);
   cairo_set_font_size(cr, size);
 
-  if (rot != 0) {
+  if (rot != 0)
+  {
     cairo_matrix_t matrix;
     cairo_text_extents_t extents;
 
@@ -1793,19 +1840,20 @@ int GlowDrawGtk::text(GlowWind* wind, int x, int y, char* text, int len,
 
     rot = 360 - rot;
     cairo_get_matrix(cr, &matrix);
-    cairo_translate(cr, x + extents.width/2, y - extents.height/2);
-    cairo_rotate(cr, rot * M_PI/180);
+    cairo_translate(cr, x + extents.width / 2, y - extents.height / 2);
+    cairo_rotate(cr, rot * M_PI / 180);
     if (rot == 90)
-      cairo_translate(cr, 0, extents.width/2);
+      cairo_translate(cr, 0, extents.width / 2);
     else if (rot == 270)
-      cairo_translate(cr, -extents.height/2, -extents.width/2 + extents.height);
+      cairo_translate(cr, -extents.height / 2, -extents.width / 2 + extents.height);
     else
-      cairo_translate(cr, -extents.width/2, extents.height/2);
+      cairo_translate(cr, -extents.width / 2, extents.height / 2);
     cairo_move_to(cr, 0, 0);
     cairo_show_text(cr, text);
     cairo_set_matrix(cr, &matrix);
   }
-  else {
+  else
+  {
     cairo_move_to(cr, x, y);
     cairo_show_text(cr, text);
   }
@@ -1822,23 +1870,22 @@ int GlowDrawGtk::text(GlowWind* wind, int x, int y, char* text, int len,
   return 1;
 }
 
-int GlowDrawGtk::text_cursor(GlowWind* wind, int x, int y, char* text, int len,
-    glow_eDrawType gc_type, glow_eDrawType color, int idx, int highlight,
-    int pos, glow_eFont font, double size)
+int GlowDrawGtk::text_cursor(GlowWind* wind, int x, int y, char* text, int len, glow_eDrawType gc_type,
+                             glow_eDrawType color, int idx, int highlight, int pos, glow_eFont font,
+                             double size)
 {
   if (ctx->nodraw)
     return 1;
   DrawWindGtk* w = (DrawWindGtk*)wind->window;
 
   int theight, tdescent, width, height, descent;
-  get_text_extent(
-      "A", 1, gc_type, idx, font, &width, &height, &descent, size, 0);
-  if (pos != 0) {
-    char *textp = (char*)malloc(pos + 1);
+  get_text_extent("A", 1, gc_type, idx, font, &width, &height, &descent, size, 0);
+  if (pos != 0)
+  {
+    char* textp = (char*)malloc(pos + 1);
     strncpy(textp, text, pos);
     textp[pos] = 0;
-    get_text_extent(
-        textp, pos, gc_type, idx, font, &width, &theight, &tdescent, size, 0);
+    get_text_extent(textp, pos, gc_type, idx, font, &width, &theight, &tdescent, size, 0);
     free(textp);
   }
   else
@@ -1846,7 +1893,7 @@ int GlowDrawGtk::text_cursor(GlowWind* wind, int x, int y, char* text, int len,
 
   gc_type = glow_eDrawType_Line;
 
-  cairo_t *cr = get_cairo(wind);
+  cairo_t* cr = get_cairo(wind);
 
   if (w->clip_on)
     set_cairo_clip(w, cr);
@@ -1858,7 +1905,7 @@ int GlowDrawGtk::text_cursor(GlowWind* wind, int x, int y, char* text, int len,
   cairo_move_to(cr, x + width, y + descent);
   cairo_line_to(cr, x + width, y - height + descent);
   cairo_stroke(cr);
-  
+
   if (w->clip_on)
     reset_cairo_clip(w, cr);
 
@@ -1866,9 +1913,8 @@ int GlowDrawGtk::text_cursor(GlowWind* wind, int x, int y, char* text, int len,
   return 1;
 }
 
-int GlowDrawGtk::text_erase(GlowWind* wind, int x, int y, char* text, int len,
-    glow_eDrawType gc_type, int idx, int line, glow_eFont font_idx, double size,
-    int rot)
+int GlowDrawGtk::text_erase(GlowWind* wind, int x, int y, char* text, int len, glow_eDrawType gc_type,
+                            int idx, int line, glow_eFont font_idx, double size, int rot)
 {
   if (ctx->nodraw)
     return 1;
@@ -1877,35 +1923,41 @@ int GlowDrawGtk::text_erase(GlowWind* wind, int x, int y, char* text, int len,
   size *= DRAW_TSCALE;
 
   char* textutf8 = 0;
-  if (((GrowCtx*)ctx)->text_coding != glow_eTextCoding_UTF_8) {
+  if (((GrowCtx*)ctx)->text_coding != glow_eTextCoding_UTF_8)
+  {
     textutf8 = g_convert(text, -1, "UTF-8", "ISO8859-1", NULL, NULL, NULL);
     text = textutf8;
   }
 
   cairo_text_extents_t extents;
-  cairo_t *cr = get_cairo(wind);
+  cairo_t* cr = get_cairo(wind);
   if (w->clip_on)
     set_cairo_clip(w, cr);
 
   cairo_set_source(cr, gc_erase);
 
-  cairo_font_face_t *font_face = get_font_face(font_idx, drawtype_to_fonttype(gc_type));
+  cairo_font_face_t* font_face = get_font_face(font_idx, drawtype_to_fonttype(gc_type));
   cairo_set_font_face(cr, font_face);
   cairo_set_font_size(cr, size);
   cairo_text_extents(cr, text, &extents);
   cairo_set_source(cr, gc_erase);
   double px, py, ph, pw;
-  if (rot == 90) {
+  if (rot == 90)
+  {
     px = x;
     py = y - extents.width;
     ph = extents.width;
     pw = extents.height;
-  } else if (rot == 270) {
+  }
+  else if (rot == 270)
+  {
     px = x;
     py = y - extents.height;
     ph = extents.width;
     pw = extents.height;
-  } else {
+  }
+  else
+  {
     px = (double)x + extents.x_bearing;
     py = (double)y + extents.y_bearing;
     pw = extents.width;
@@ -1924,39 +1976,30 @@ int GlowDrawGtk::text_erase(GlowWind* wind, int x, int y, char* text, int len,
   return 1;
 }
 
-int GlowDrawGtk::pixmaps_create(
-    GlowWind* wind, glow_sPixmapData* pixmap_data, void** pixmaps)
+int GlowDrawGtk::pixmaps_create(GlowWind* wind, glow_sPixmapData* pixmap_data, void** pixmaps) { return 1; }
+
+void GlowDrawGtk::pixmaps_delete(GlowWind* wind, void* pixmaps) {}
+
+int GlowDrawGtk::pixmap(GlowWind* wind, int x, int y, glow_sPixmapData* pixmap_data, void* pixmaps,
+                        glow_eDrawType gc_type, int idx, int highlight, int line)
 {
   return 1;
 }
 
-void GlowDrawGtk::pixmaps_delete(GlowWind* wind, void* pixmaps)
-{
-}
-
-int GlowDrawGtk::pixmap(GlowWind* wind, int x, int y,
-    glow_sPixmapData* pixmap_data, void* pixmaps, glow_eDrawType gc_type,
-    int idx, int highlight, int line)
+int GlowDrawGtk::pixmap_inverse(GlowWind* wind, int x, int y, glow_sPixmapData* pixmap_data, void* pixmaps,
+                                glow_eDrawType gc_type, int idx, int line)
 {
   return 1;
 }
 
-int GlowDrawGtk::pixmap_inverse(GlowWind* wind, int x, int y,
-    glow_sPixmapData* pixmap_data, void* pixmaps, glow_eDrawType gc_type,
-    int idx, int line)
+int GlowDrawGtk::pixmap_erase(GlowWind* wind, int x, int y, glow_sPixmapData* pixmap_data, void* pixmaps,
+                              glow_eDrawType gc_type, int idx, int line)
 {
   return 1;
 }
 
-int GlowDrawGtk::pixmap_erase(GlowWind* wind, int x, int y,
-    glow_sPixmapData* pixmap_data, void* pixmaps, glow_eDrawType gc_type,
-    int idx, int line)
-{
-  return 1;
-}
-
-int GlowDrawGtk::image(GlowWind* wind, int x, int y, int width, int height,
-    glow_tImImage image, glow_tPixmap pixmap, glow_tPixmap clip_mask)
+int GlowDrawGtk::image(GlowWind* wind, int x, int y, int width, int height, glow_tImImage image,
+                       glow_tPixmap pixmap, glow_tPixmap clip_mask)
 {
   if (ctx->nodraw)
     return 1;
@@ -1966,11 +2009,11 @@ int GlowDrawGtk::image(GlowWind* wind, int x, int y, int width, int height,
 
   DrawWindGtk* w = (DrawWindGtk*)wind->window;
 
-  cairo_t *cr = get_cairo(wind);
+  cairo_t* cr = get_cairo(wind);
   if (w->clip_on)
     set_cairo_clip(w, cr);
 
-  gdk_cairo_set_source_pixbuf(cr, (GdkPixbuf *)image, x, y);
+  gdk_cairo_set_source_pixbuf(cr, (GdkPixbuf*)image, x, y);
   cairo_paint(cr);
 
   if (w->clip_on)
@@ -1979,9 +2022,8 @@ int GlowDrawGtk::image(GlowWind* wind, int x, int y, int width, int height,
   return 1;
 }
 
-int GlowDrawGtk::image_d(GlowWind* wind, double x, double y, int width,
-    int height, glow_tImImage image, glow_tPixmap pixmap,
-    glow_tPixmap clip_mask)
+int GlowDrawGtk::image_d(GlowWind* wind, double x, double y, int width, int height, glow_tImImage image,
+                         glow_tPixmap pixmap, glow_tPixmap clip_mask)
 {
   DrawWindGtk* w = (DrawWindGtk*)wind->window;
 
@@ -1991,7 +2033,7 @@ int GlowDrawGtk::image_d(GlowWind* wind, double x, double y, int width,
   if (width == 0 || height == 0)
     return 1;
 
-  cairo_t *cr = get_cairo(wind);
+  cairo_t* cr = get_cairo(wind);
   if (w->clip_on)
     set_cairo_clip(w, cr);
 
@@ -2004,17 +2046,16 @@ int GlowDrawGtk::image_d(GlowWind* wind, double x, double y, int width,
   return 1;
 }
 
-int GlowDrawGtk::fill_rect(
-    GlowWind* wind, int x, int y, int width, int height, glow_eDrawType gc_type,
-    double transparency)
+int GlowDrawGtk::fill_rect(GlowWind* wind, int x, int y, int width, int height, glow_eDrawType gc_type,
+                           double transparency)
 {
   if (ctx->nodraw)
     return 1;
 
   DrawWindGtk* w = (DrawWindGtk*)wind->window;
 
-  cairo_t *cr = get_cairo(wind);
-  cairo_pattern_t *pat = 0;
+  cairo_t* cr = get_cairo(wind);
+  cairo_pattern_t* pat = 0;
 
   cairo_set_antialias(cr, antialias);
 
@@ -2023,10 +2064,12 @@ int GlowDrawGtk::fill_rect(
 
   if (gc_type == glow_eDrawType_LineErase)
     cairo_set_source(cr, gc_erase);
-  else {
+  else
+  {
     if (feq(transparency, 0.0))
       cairo_set_source(cr, get_gc(this, gc_type, 0));
-    else {
+    else
+    {
       double r1, g1, b1;
 
       GlowColor::rgb_color(gc_type, &r1, &g1, &b1, get_customcolors());
@@ -2034,7 +2077,7 @@ int GlowDrawGtk::fill_rect(
       cairo_set_source(cr, pat);
     }
   }
-  cairo_rectangle(cr, x-1, y-1, width+1, height+1);
+  cairo_rectangle(cr, x - 1, y - 1, width + 1, height + 1);
   cairo_fill(cr);
 
   if (w->clip_on)
@@ -2053,7 +2096,7 @@ void GlowDrawGtk::draw_background(GlowWind* wind, int x, int y, int width, int h
 
   DrawWindGtk* w = (DrawWindGtk*)wind->window;
 
-  cairo_t *cr = get_cairo(wind);
+  cairo_t* cr = get_cairo(wind);
 
   if (w->clip_on)
     set_cairo_clip(w, cr);
@@ -2068,20 +2111,15 @@ void GlowDrawGtk::draw_background(GlowWind* wind, int x, int y, int width, int h
   end_cairo(wind, cr);
 }
 
-void GlowDrawGtk::clear(GlowWind* wind)
-{
-}
+void GlowDrawGtk::clear(GlowWind* wind) {}
 
-void GlowDrawGtk::copy_buffer(
-    GlowWind* wind, int ll_x, int ll_y, int ur_x, int ur_y)
-{
-}
+void GlowDrawGtk::copy_buffer(GlowWind* wind, int ll_x, int ll_y, int ur_x, int ur_y) {}
 
 void GlowDrawGtk::get_window_size(GlowWind* wind, int* width, int* height)
 {
   DrawWindGtk* w = (DrawWindGtk*)wind->window;
   *width = gdk_window_get_width(w->window);
-  *height = gdk_window_get_height(w->window); 
+  *height = gdk_window_get_height(w->window);
 }
 
 void GlowDrawGtk::set_window_size(GlowWind* wind, int width, int height)
@@ -2126,7 +2164,8 @@ static gboolean event_timer_cb(void* ctx)
 
 static void cancel_event_timer(GlowDrawGtk* draw_ctx)
 {
-  if (draw_ctx->timer_id) {
+  if (draw_ctx->timer_id)
+  {
     g_source_remove(draw_ctx->timer_id);
     draw_ctx->timer_id = 0;
   }
@@ -2139,8 +2178,7 @@ static void event_timer(GlowDrawGtk* draw_ctx, int time_ms)
   draw_ctx->timer_id = g_timeout_add(time_ms, event_timer_cb, draw_ctx);
 }
 
-void GlowDrawGtk::set_timer(
-    GlowCtx* gctx, int time_ms, void (*callback_func)(GlowCtx* ctx), void** id)
+void GlowDrawGtk::set_timer(GlowCtx* gctx, int time_ms, void (*callback_func)(GlowCtx* ctx), void** id)
 {
   draw_sTimerCb* timer_cb;
 
@@ -2173,39 +2211,44 @@ void GlowDrawGtk::set_cursor(GlowWind* wind, glow_eDrawCursor cursor)
   gdk_display_flush(display);
 }
 
-int GlowDrawGtk::get_text_extent(const char* text, int len,
-    glow_eDrawType gc_type, int idx, glow_eFont font_idx, int* width,
-    int* height, int* descent, double size, int rot)
+int GlowDrawGtk::get_text_extent(const char* text, int len, glow_eDrawType gc_type, int idx,
+                                 glow_eFont font_idx, int* width, int* height, int* descent, double size,
+                                 int rot)
 {
   cairo_text_extents_t extents;
-  cairo_font_face_t *font_face;
+  cairo_font_face_t* font_face;
 
   size *= DRAW_TSCALE;
 
   char* textutf8 = 0;
-  if (((GrowCtx*)ctx)->text_coding != glow_eTextCoding_UTF_8) {
+  if (((GrowCtx*)ctx)->text_coding != glow_eTextCoding_UTF_8)
+  {
     textutf8 = g_convert(text, -1, "UTF-8", "ISO8859-1", NULL, NULL, NULL);
     text = textutf8;
   }
 
-  cairo_t *cr = get_cairo(&ctx->mw, 1);
+  cairo_t* cr = get_cairo(&ctx->mw, 1);
 
   font_face = get_font_face(font_idx, drawtype_to_fonttype(gc_type));
   cairo_set_font_face(cr, font_face);
   cairo_set_font_size(cr, size);
 
   cairo_text_extents(cr, text, &extents);
-  if (text[0] == ' ') {
+  if (text[0] == ' ')
+  {
     cairo_text_extents_t spaceextents;
-    
+
     cairo_text_extents(cr, "1", &spaceextents);
-    for (const char *s = text; *s == ' '; s++)
+    for (const char* s = text; *s == ' '; s++)
       extents.width += spaceextents.width;
   }
-  if (rot == 90 || rot == 270) {
+  if (rot == 90 || rot == 270)
+  {
     *height = extents.width;
     *width = extents.height;
-  } else {
+  }
+  else
+  {
     *height = extents.height;
     *width = extents.width;
   }
@@ -2226,8 +2269,7 @@ void GlowDrawGtk::copy_area(GlowWind* wind, int x, int y)
   ctx->draw(wind, 0, 0, ctx->mw.window_width, ctx->mw.window_height);
 }
 
-void GlowDrawGtk::clear_area(
-    GlowWind* wind, int ll_x, int ur_x, int ll_y, int ur_y)
+void GlowDrawGtk::clear_area(GlowWind* wind, int ll_x, int ur_x, int ll_y, int ur_y)
 {
   fill_rect(wind, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, glow_eDrawType_LineErase);
 }
@@ -2239,8 +2281,7 @@ void GlowDrawGtk::set_inputfocus(GlowWind* wind)
   // gtk_widget_grab_focus( m_wind.toplevel);
 }
 
-static int glow_read_color_file(
-    const char* filename, draw_sColor** color_array, int* size)
+static int glow_read_color_file(const char* filename, draw_sColor** color_array, int* size)
 {
   char line[80];
   draw_sColor* color_p;
@@ -2249,9 +2290,12 @@ static int glow_read_color_file(
   int line_cnt;
   float f_red, f_green, f_blue;
 
-  if (!check_file(filename)) {
+  if (!check_file(filename))
+  {
     return 0;
-  } else {
+  }
+  else
+  {
     printf("** Opening color file %s\n", filename);
 
     fp.open(filename);
@@ -2262,7 +2306,8 @@ static int glow_read_color_file(
     *size = 0;
     line_cnt = 0;
     color_p = *color_array;
-    while (*size < 300) {
+    while (*size < 300)
+    {
       fp.getline(line, sizeof(line));
       if (line[0] == 0)
         break;
@@ -2272,7 +2317,8 @@ static int glow_read_color_file(
       nr = sscanf(line, "%f %f %f", &f_red, &f_green, &f_blue);
       if (nr != 3)
         printf("** Syntax error in file %s, line %d", filename, line_cnt);
-      else {
+      else
+      {
         color_p->red = int(f_red * 65535);
         color_p->green = int(f_green * 65535);
         color_p->blue = int(f_blue * 65535);
@@ -2288,7 +2334,8 @@ static int glow_read_color_file(
 
 void GlowDrawGtk::push_background(glow_eDrawType drawtype)
 {
-  if (erase_stack_cnt > DRAW_ERASE_STACK_SIZE) {
+  if (erase_stack_cnt > DRAW_ERASE_STACK_SIZE)
+  {
     printf("** Erase stack exceeded\n");
     return;
   }
@@ -2305,8 +2352,7 @@ void GlowDrawGtk::pop_background()
   gc_erase = erase_stack[erase_stack_cnt - 1];
 }
 
-void GlowDrawGtk::set_background(GlowWind* wind, glow_eDrawType drawtype,
-    char *image)
+void GlowDrawGtk::set_background(GlowWind* wind, glow_eDrawType drawtype, char* image)
 {
   if (drawtype == glow_eDrawType_LineErase)
     drawtype = glow_eDrawType_Color32;
@@ -2369,52 +2415,43 @@ void GlowDrawGtk::set_background(GlowWind* wind, glow_eDrawType drawtype,
 #endif
 }
 
-void GlowDrawGtk::reset_background(GlowWind* wind)
-{
-}
+void GlowDrawGtk::reset_background(GlowWind* wind) {}
 
-void GlowDrawGtk::set_clip(DrawWind* wind, GdkGC* gc)
-{
-}
+void GlowDrawGtk::set_clip(DrawWind* wind, GdkGC* gc) {}
 
-void GlowDrawGtk::reset_clip(DrawWind* w, GdkGC* gc)
-{
-}
+void GlowDrawGtk::reset_clip(DrawWind* w, GdkGC* gc) {}
 
-void GlowDrawGtk::set_image_clip_mask(glow_tPixmap pixmap, int x, int y)
-{
-}
+void GlowDrawGtk::set_image_clip_mask(glow_tPixmap pixmap, int x, int y) {}
 
-void GlowDrawGtk::reset_image_clip_mask()
-{
-}
+void GlowDrawGtk::reset_image_clip_mask() {}
 
-int GlowDrawGtk::set_clip_rectangle(
-    GlowWind* wind, int ll_x, int ll_y, int ur_x, int ur_y)
+int GlowDrawGtk::set_clip_rectangle(GlowWind* wind, int ll_x, int ll_y, int ur_x, int ur_y)
 {
   DrawWindGtk* w = (DrawWindGtk*)wind->window;
-  if (w->clip_cnt >= DRAW_CLIP_SIZE) {
+  if (w->clip_cnt >= DRAW_CLIP_SIZE)
+  {
     printf("** Draw clip refused\n");
     return 0;
   }
   int x0, x1, y0, y1;
-  if (w->clip_cnt == 0) {
+  if (w->clip_cnt == 0)
+  {
     x0 = MIN(ll_x, ur_x);
     x1 = MAX(ll_x, ur_x);
     y0 = MIN(ll_y, ur_y);
     y1 = MAX(ll_y, ur_y);
-  } else {
+  }
+  else
+  {
     x0 = MIN(ll_x, ur_x);
     x1 = MAX(ll_x, ur_x);
     y0 = MIN(ll_y, ur_y);
     y1 = MAX(ll_y, ur_y);
 
     x0 = MAX(x0, w->clip_rectangle[w->clip_cnt - 1].x);
-    x1 = MIN(x1, w->clip_rectangle[w->clip_cnt - 1].x
-            + w->clip_rectangle[w->clip_cnt - 1].width);
+    x1 = MIN(x1, w->clip_rectangle[w->clip_cnt - 1].x + w->clip_rectangle[w->clip_cnt - 1].width);
     y0 = MAX(y0, w->clip_rectangle[w->clip_cnt - 1].y);
-    y1 = MIN(y1, w->clip_rectangle[w->clip_cnt - 1].y
-            + w->clip_rectangle[w->clip_cnt - 1].height);
+    y1 = MIN(y1, w->clip_rectangle[w->clip_cnt - 1].y + w->clip_rectangle[w->clip_cnt - 1].height);
     if (x0 > x1)
       x0 = x1;
     if (y0 > y1)
@@ -2432,7 +2469,8 @@ int GlowDrawGtk::set_clip_rectangle(
 void GlowDrawGtk::reset_clip_rectangle(GlowWind* wind)
 {
   DrawWindGtk* w = (DrawWindGtk*)wind->window;
-  if (w->clip_cnt == 0) {
+  if (w->clip_cnt == 0)
+  {
     printf("** Draw clip mismatch\n");
     return;
   }
@@ -2447,15 +2485,14 @@ int GlowDrawGtk::clip_level(GlowWind* wind)
   return w->clip_cnt;
 }
 
-int GlowDrawGtk::draw_point(
-    GlowWind* wind, int x1, int y1, glow_eDrawType gc_type)
+int GlowDrawGtk::draw_point(GlowWind* wind, int x1, int y1, glow_eDrawType gc_type)
 {
   DrawWindGtk* w = (DrawWindGtk*)wind->window;
 
   if (ctx->nodraw)
     return 1;
 
-  cairo_t *cr = get_cairo(wind);
+  cairo_t* cr = get_cairo(wind);
 
   if (w->clip_on)
     set_cairo_clip(w, cr);
@@ -2474,15 +2511,15 @@ int GlowDrawGtk::draw_point(
   return 1;
 }
 
-int GlowDrawGtk::draw_points(GlowWind* wind, glow_sPointX* points,
-    int point_num, glow_eDrawType gc_type, int idx)
+int GlowDrawGtk::draw_points(GlowWind* wind, glow_sPointX* points, int point_num, glow_eDrawType gc_type,
+                             int idx)
 {
   DrawWindGtk* w = (DrawWindGtk*)wind->window;
 
   if (ctx->nodraw)
     return 1;
 
-  cairo_t *cr = get_cairo(wind);
+  cairo_t* cr = get_cairo(wind);
 
   if (w->clip_on)
     set_cairo_clip(w, cr);
@@ -2490,9 +2527,10 @@ int GlowDrawGtk::draw_points(GlowWind* wind, glow_sPointX* points,
   cairo_set_antialias(cr, antialias);
   cairo_set_source(cr, get_gc(this, gc_type, 0));
   cairo_set_line_width(cr, idx + 2);
-  //cairo_set_line_cap(cr, CAIRO_LINE_CAP_ROUND);
+  // cairo_set_line_cap(cr, CAIRO_LINE_CAP_ROUND);
 
-  for (int i = 0; i < point_num; i++) {
+  for (int i = 0; i < point_num; i++)
+  {
     cairo_move_to(cr, points[i].x, points[i].y - (idx + 1));
     cairo_line_to(cr, points[i].x, points[i].y);
   }
@@ -2504,11 +2542,7 @@ int GlowDrawGtk::draw_points(GlowWind* wind, glow_sPointX* points,
   return 1;
 }
 
-void GlowDrawGtk::set_click_sensitivity(GlowWind* wind, int value)
-{
-  click_sensitivity = value;
-}
-
+void GlowDrawGtk::set_click_sensitivity(GlowWind* wind, int value) { click_sensitivity = value; }
 
 int GlowDrawGtk::export_image(char* filename)
 {
@@ -2564,22 +2598,27 @@ int GlowDrawGtk::print(char* filename, double x0, double x1, int end)
   if (!image)
     return 0;
 
-  if (!ps) {
+  if (!ps)
+  {
     ps = new DrawPs(filename);
     new_file = true;
     ps->y = y;
-  } else
+  }
+  else
     y = ps->y;
 
   width = gdk_pixbuf_get_width(image);
   height = gdk_pixbuf_get_height(image);
 
-  if (!feq(x0, 0.0) || !feq(x1, 0.0)) {
+  if (!feq(x0, 0.0) || !feq(x1, 0.0))
+  {
     double total_width = width / (x1 - x0);
 
-    if (total_width * scalex > ps_cPageWidth - ps_cLeftMargin) {
+    if (total_width * scalex > ps_cPageWidth - ps_cLeftMargin)
+    {
       x = ps_cPageWidth - total_width * scalex;
-      if (x < 50) {
+      if (x < 50)
+      {
         double scale_factor = (ps_cPageWidth - 50) / (total_width * scalex);
         x = 50;
         scalex = scalex * scale_factor;
@@ -2587,9 +2626,12 @@ int GlowDrawGtk::print(char* filename, double x0, double x1, int end)
       }
     }
     x += scalex * total_width * x0;
-  } else if (width * scalex > ps_cPageWidth - ps_cLeftMargin) {
+  }
+  else if (width * scalex > ps_cPageWidth - ps_cLeftMargin)
+  {
     x = ps_cPageWidth - width * scalex;
-    if (x < 50) {
+    if (x < 50)
+    {
       double scale_factor = (ps_cPageWidth - 50) / (width * scalex);
       x = 50;
       scalex = scalex * scale_factor;
@@ -2599,12 +2641,14 @@ int GlowDrawGtk::print(char* filename, double x0, double x1, int end)
   if ((feq(x0, 0.0) && feq(x1, 0.0)) || feq(x1, 1.0))
     ps->y -= scaley * height;
 
-  if (new_file) {
+  if (new_file)
+  {
     ps->fp << "%!PS-Adobe-2.0 EPSF-1.2" << endl
            << "%%Creator: Proview Glow" << endl
            << "%%EndComments" << endl
            << endl;
-  } else
+  }
+  else
     ps->fp << "restore" << endl;
 
   ps->fp << "1.000000 1.000000 scale" << endl
@@ -2612,31 +2656,34 @@ int GlowDrawGtk::print(char* filename, double x0, double x1, int end)
          << scalex * width << " " << scaley * height << " scale" << endl
          << "/oneline " << width << " string def" << endl
          << "/drawimage {" << endl
-         << " " << width << " " << height << " 8 [" << width << " 0 0 -"
-         << height << " 0 " << height << "]" << endl
+         << " " << width << " " << height << " 8 [" << width << " 0 0 -" << height << " 0 " << height << "]"
+         << endl
          << " { currentfile oneline readhexstring pop }" << endl;
-  if (colorimage) {
+  if (colorimage)
+  {
     ps->fp << "false 3" << endl << "colorimage" << endl;
-  } else
+  }
+  else
     ps->fp << "image" << endl;
 
   ps->fp << "} def" << endl
-         << x / scalex / width << " " << (y - height * scaley) / scaley / height
-         << " translate" << endl
+         << x / scalex / width << " " << (y - height * scaley) / scaley / height << " translate" << endl
          << "drawimage" << endl;
 
-  ps->fp.flags(
-      (ps->fp.flags() & ~ios_base::dec) | ios_base::hex | ios_base::uppercase);
+  ps->fp.flags((ps->fp.flags() & ~ios_base::dec) | ios_base::hex | ios_base::uppercase);
   ps->fp.fill('0');
   rgb = gdk_pixbuf_get_pixels(image);
   rowstride = gdk_pixbuf_get_rowstride(image);
   n_channels = gdk_pixbuf_get_n_channels(image);
   j = 0;
   rgb_row = rgb;
-  for (k = 0; k < height; k++) {
+  for (k = 0; k < height; k++)
+  {
     rgb = rgb_row;
-    for (i = 0; i < width; i++) {
-      if (!colorimage) {
+    for (i = 0; i < width; i++)
+    {
+      if (!colorimage)
+      {
         if (n_channels >= 4 && *(rgb + 3) == 0)
           grey = 255;
         else
@@ -2645,14 +2692,18 @@ int GlowDrawGtk::print(char* filename, double x0, double x1, int end)
         rgb += n_channels;
         ps->fp.width(2);
         ps->fp << grey;
-        if (++j >= 40) {
+        if (++j >= 40)
+        {
           j = 0;
           ps->fp << endl;
         }
-      } else {
+      }
+      else
+      {
         if (n_channels >= 4 && *(rgb + 3) == 0)
           red = blue = green = 255;
-        else {
+        else
+        {
           red = *rgb;
           green = *(rgb + 1);
           blue = *(rgb + 2);
@@ -2664,7 +2715,8 @@ int GlowDrawGtk::print(char* filename, double x0, double x1, int end)
         ps->fp << green;
         ps->fp.width(2);
         ps->fp << blue;
-        if (++j >= 20) {
+        if (++j >= 20)
+        {
           j = 0;
           ps->fp << endl;
         }
@@ -2673,13 +2725,15 @@ int GlowDrawGtk::print(char* filename, double x0, double x1, int end)
     rgb_row += rowstride;
   }
 
-  if (end) {
+  if (end)
+  {
     ps->fp << endl << "restore" << endl << "showpage" << endl;
     delete ps;
     ps = 0;
-  } else {
-    ps->fp.flags(((ps->fp.flags() & ~ios_base::hex) & ~ios_base::uppercase)
-        | ios_base::dec);
+  }
+  else
+  {
+    ps->fp.flags(((ps->fp.flags() & ~ios_base::hex) & ~ios_base::uppercase) | ios_base::dec);
   }
   g_object_unref(image);
 
@@ -2689,7 +2743,8 @@ int GlowDrawGtk::print(char* filename, double x0, double x1, int end)
 GdkPoint* GlowDrawGtk::points_to_gdk_points(glow_sPointX* points, int point_cnt)
 {
   GdkPoint* gpoints = (GdkPoint*)malloc(point_cnt * sizeof(GdkPoint));
-  for (int i = 0; i < point_cnt; i++) {
+  for (int i = 0; i < point_cnt; i++)
+  {
     gpoints[i].x = points[i].x;
     gpoints[i].y = points[i].y;
   }
@@ -2699,23 +2754,22 @@ GdkPoint* GlowDrawGtk::points_to_gdk_points(glow_sPointX* points, int point_cnt)
 //
 // Points outside window in x direction excluded
 //
-GdkPoint* GlowDrawGtk::points_to_gdk_points_curve(
-    GlowWind* w, glow_sPointX* points, int point_cnt, int* cnt)
+GdkPoint* GlowDrawGtk::points_to_gdk_points_curve(GlowWind* w, glow_sPointX* points, int point_cnt, int* cnt)
 {
   GdkPoint* gpoints = (GdkPoint*)malloc(point_cnt * sizeof(GdkPoint));
   int idx = 0;
   int last_idx = 0;
-  for (int i = 0; i < point_cnt; i++) {
-    if (idx == 0 && i != point_cnt - 1
-        && ((points[i].x < w->subwindow_x && points[i + 1].x < w->subwindow_x)
-               || (points[i].x > w->subwindow_x + w->window_width
-                      && points[i + 1].x > w->subwindow_x + w->window_width)))
+  for (int i = 0; i < point_cnt; i++)
+  {
+    if (idx == 0 && i != point_cnt - 1 &&
+        ((points[i].x < w->subwindow_x && points[i + 1].x < w->subwindow_x) ||
+         (points[i].x > w->subwindow_x + w->window_width &&
+          points[i + 1].x > w->subwindow_x + w->window_width)))
 
       continue;
-    if (idx != 0
-        && !((points[i].x < w->subwindow_x && points[i - 1].x < w->subwindow_x)
-               || (points[i].x > w->subwindow_x + w->window_width
-                      && points[i - 1].x > w->subwindow_x + w->window_width)))
+    if (idx != 0 && !((points[i].x < w->subwindow_x && points[i - 1].x < w->subwindow_x) ||
+                      (points[i].x > w->subwindow_x + w->window_width &&
+                       points[i - 1].x > w->subwindow_x + w->window_width)))
       last_idx = idx;
     gpoints[idx].x = points[i].x;
     gpoints[idx].y = points[i].y;
@@ -2729,7 +2783,8 @@ GdkPoint* GlowDrawGtk::points_to_gdk_points_curve(
 
 glow_eFontType GlowDrawGtk::drawtype_to_fonttype(glow_eDrawType gc_type)
 {
-  switch (gc_type) {
+  switch (gc_type)
+  {
   case glow_eDrawType_TextHelveticaBold:
   case glow_eDrawType_TextHelveticaEraseBold:
     return glow_eFontType_Bold;
@@ -2741,19 +2796,21 @@ glow_eFontType GlowDrawGtk::drawtype_to_fonttype(glow_eDrawType gc_type)
 cairo_font_face_t* GlowDrawGtk::get_font_face(glow_eFont font, glow_eFontType font_type)
 {
   if (!font_face[font][font_type])
-    font_face[font][font_type] = cairo_toy_font_face_create(font_names[font], 
-	 CAIRO_FONT_SLANT_NORMAL,
-	 font_type == glow_eFontType_Bold ? CAIRO_FONT_WEIGHT_BOLD : CAIRO_FONT_WEIGHT_NORMAL);
+    font_face[font][font_type] = cairo_toy_font_face_create(
+        font_names[font], CAIRO_FONT_SLANT_NORMAL,
+        font_type == glow_eFontType_Bold ? CAIRO_FONT_WEIGHT_BOLD : CAIRO_FONT_WEIGHT_NORMAL);
 
   return font_face[font][font_type];
 }
 
 void GlowDrawGtk::free_font_face()
 {
-  for (int i = 0; i < glow_eFont__; i++) {
-    for (int j = 0; j < glow_eFontType__; j++) {
+  for (int i = 0; i < glow_eFont__; i++)
+  {
+    for (int j = 0; j < glow_eFontType__; j++)
+    {
       if (font_face[i][j])
-	cairo_font_face_destroy(font_face[i][j]);
+        cairo_font_face_destroy(font_face[i][j]);
     }
   }
 }
@@ -2762,7 +2819,8 @@ int GlowDrawGtk::get_font_type(int gc_type)
 {
   int font_type;
 
-  switch (gc_type) {
+  switch (gc_type)
+  {
   case glow_eDrawType_TextHelveticaBold:
   case glow_eDrawType_TextHelveticaEraseBold:
     font_type = glow_eFontType_Bold;
@@ -2776,15 +2834,9 @@ int GlowDrawGtk::get_font_type(int gc_type)
 }
 
 // Image functions
-int GlowDrawGtk::image_get_width(glow_tImImage image)
-{
-  return gdk_pixbuf_get_width((GdkPixbuf*)image);
-}
+int GlowDrawGtk::image_get_width(glow_tImImage image) { return gdk_pixbuf_get_width((GdkPixbuf*)image); }
 
-int GlowDrawGtk::image_get_height(glow_tImImage image)
-{
-  return gdk_pixbuf_get_height((GdkPixbuf*)image);
-}
+int GlowDrawGtk::image_get_height(glow_tImImage image) { return gdk_pixbuf_get_height((GdkPixbuf*)image); }
 
 int GlowDrawGtk::image_get_rowstride(glow_tImImage image)
 {
@@ -2804,8 +2856,7 @@ void GlowDrawGtk::image_copy(glow_tImImage orig_image, glow_tImImage* image)
   *(GdkPixbuf**)image = gdk_pixbuf_copy((GdkPixbuf*)orig_image);
 }
 
-void GlowDrawGtk::image_rotate(
-    glow_tImImage* image, int to_rotation, int from_rotation)
+void GlowDrawGtk::image_rotate(glow_tImImage* image, int to_rotation, int from_rotation)
 {
 #if GDK_PIXBUF_MAJOR == 2 && GDK_PIXBUF_MINOR < 8
   return;
@@ -2813,7 +2864,8 @@ void GlowDrawGtk::image_rotate(
   int grot;
   int drot = to_rotation - from_rotation;
   drot = int((float(drot) / 360 - floor(float(drot) / 360)) * 360);
-  switch (drot) {
+  switch (drot)
+  {
   case 90:
     grot = GDK_PIXBUF_ROTATE_CLOCKWISE;
     break;
@@ -2826,8 +2878,7 @@ void GlowDrawGtk::image_rotate(
   default:
     return;
   }
-  GdkPixbuf* im
-      = gdk_pixbuf_rotate_simple((GdkPixbuf*)*image, (GdkPixbufRotation)grot);
+  GdkPixbuf* im = gdk_pixbuf_rotate_simple((GdkPixbuf*)*image, (GdkPixbufRotation)grot);
   g_object_unref((GdkPixbuf*)*image);
   *image = (glow_tImImage)im;
 #endif
@@ -2855,34 +2906,36 @@ void GlowDrawGtk::image_flip_horizontal(glow_tImImage* image)
 #endif
 }
 
-int GlowDrawGtk::image_scale(int width, int height, glow_tImImage orig_im,
-    glow_tImImage* im, glow_tImData* im_data, glow_tPixmap* im_pixmap,
-    glow_tPixmap* im_mask)
+int GlowDrawGtk::image_scale(int width, int height, glow_tImImage orig_im, glow_tImImage* im,
+                             glow_tImData* im_data, glow_tPixmap* im_pixmap, glow_tPixmap* im_mask)
 {
-  if (width == gdk_pixbuf_get_width((GdkPixbuf*)*im)
-      && height == gdk_pixbuf_get_height((GdkPixbuf*)*im))
+  if (width == gdk_pixbuf_get_width((GdkPixbuf*)*im) && height == gdk_pixbuf_get_height((GdkPixbuf*)*im))
     return 0;
-  if (width == 0 && height == 0) {
+  if (width == 0 && height == 0)
+  {
     width = gdk_pixbuf_get_width((GdkPixbuf*)*im);
     height = gdk_pixbuf_get_height((GdkPixbuf*)*im);
   }
 
-  if (!orig_im) {
+  if (!orig_im)
+  {
     // Scale from im
     if (!*im)
       return 0;
 
     GdkPixbuf* im_old = (GdkPixbuf*)*im;
-    *im = gdk_pixbuf_scale_simple(
-        (GdkPixbuf*)*im, width, height, GDK_INTERP_NEAREST);
+    *im = gdk_pixbuf_scale_simple((GdkPixbuf*)*im, width, height, GDK_INTERP_NEAREST);
     g_object_unref((GdkPixbuf*)im_old);
-  } else {
-// Scale from orig_im
+  }
+  else
+  {
+    // Scale from orig_im
 
 #if defined PWRE_CONF_RSVG
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-    if (im_data && *im_data && *im) {
+    if (im_data && *im_data && *im)
+    {
       RsvgHandle* handle;
       const char* imagefile;
 
@@ -2891,21 +2944,20 @@ int GlowDrawGtk::image_scale(int width, int height, glow_tImImage orig_im,
       handle = (RsvgHandle*)*im_data;
       imagefile = rsvg_handle_get_base_uri(handle);
       *im = rsvg_pixbuf_from_file_at_size(imagefile, width, height, NULL);
-    } else
+    }
+    else
 #pragma GCC diagnostic pop
 #endif
     {
       if (*im)
         g_object_unref((GdkPixbuf*)*im);
-      *im = gdk_pixbuf_scale_simple(
-          (GdkPixbuf*)orig_im, width, height, GDK_INTERP_NEAREST);
+      *im = gdk_pixbuf_scale_simple((GdkPixbuf*)orig_im, width, height, GDK_INTERP_NEAREST);
     }
   }
   return 1;
 }
 
-int GlowDrawGtk::image_load(char* imagefile, glow_tImImage* orig_im,
-    glow_tImImage* im, glow_tImData* im_data)
+int GlowDrawGtk::image_load(char* imagefile, glow_tImImage* orig_im, glow_tImImage* im, glow_tImData* im_data)
 {
   if (im && *im)
     g_object_unref((GdkPixbuf*)*im);
@@ -2914,47 +2966,45 @@ int GlowDrawGtk::image_load(char* imagefile, glow_tImImage* orig_im,
 #if defined PWRE_CONF_RSVG
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-  if (im_data && streq(strchr(imagefile, '.'), ".svg")) {
+  if (im_data && streq(strchr(imagefile, '.'), ".svg"))
+  {
     RsvgHandle* handle;
 
     handle = rsvg_handle_new_from_file(imagefile, NULL);
     *im_data = (glow_tImImage*)handle;
     *orig_im = (glow_tImImage*)rsvg_pixbuf_from_file(imagefile, NULL);
-  } else
+  }
+  else
 #pragma GCC diagnostic pop
 #endif
   {
     *orig_im = (glow_tImImage*)gdk_pixbuf_new_from_file(imagefile, 0);
-    if (!*orig_im) {
+    if (!*orig_im)
+    {
       if (im)
         *im = 0;
       return 0;
     }
   }
-  if (im) {
+  if (im)
+  {
     *im = (glow_tImImage*)gdk_pixbuf_copy((GdkPixbuf*)*orig_im);
   }
   return 1;
 }
 
-int GlowDrawGtk::image_render(int width, int height, glow_tImImage orig_im,
-    glow_tImImage* im, glow_tPixmap* im_pixmap, glow_tPixmap* im_mask)
+int GlowDrawGtk::image_render(int width, int height, glow_tImImage orig_im, glow_tImImage* im,
+                              glow_tPixmap* im_pixmap, glow_tPixmap* im_mask)
 {
   return 1;
 }
 
-void GlowDrawGtk::image_free(glow_tImImage image)
-{
-  g_object_unref((GdkPixbuf*)image);
-}
+void GlowDrawGtk::image_free(glow_tImImage image) { g_object_unref((GdkPixbuf*)image); }
 
-void GlowDrawGtk::pixmap_free(glow_tPixmap pixmap)
-{
-}
+void GlowDrawGtk::pixmap_free(glow_tPixmap pixmap) {}
 
-void GlowDrawGtk::image_pixel_iter(glow_tImImage orig_image,
-    glow_tImImage* image, void (*pixel_cb)(void*, unsigned char*),
-    void* userdata)
+void GlowDrawGtk::image_pixel_iter(glow_tImImage orig_image, glow_tImImage* image,
+                                   void (*pixel_cb)(void*, unsigned char*), void* userdata)
 {
   unsigned char *rgb, *rgb_row;
   int rgb_height;
@@ -2962,11 +3012,13 @@ void GlowDrawGtk::image_pixel_iter(glow_tImImage orig_image,
   int rowstride;
   int n_channels;
 
-  if (orig_image) {
+  if (orig_image)
+  {
     if (image && *image != orig_image)
       g_object_unref((GdkPixbuf*)*image);
     *image = (glow_tImImage*)gdk_pixbuf_copy((GdkPixbuf*)orig_image);
-  } else if (!*image)
+  }
+  else if (!*image)
     return;
 
   rgb = gdk_pixbuf_get_pixels((GdkPixbuf*)*image);
@@ -2976,9 +3028,11 @@ void GlowDrawGtk::image_pixel_iter(glow_tImImage orig_image,
   n_channels = gdk_pixbuf_get_n_channels((GdkPixbuf*)*image);
 
   rgb_row = rgb;
-  for (int j = 0; j < rgb_height; j++) {
+  for (int j = 0; j < rgb_height; j++)
+  {
     rgb = rgb_row;
-    for (int i = 0; i < rgb_width; i++) {
+    for (int i = 0; i < rgb_width; i++)
+    {
       if (n_channels >= 4 && *(rgb + 3))
         (pixel_cb)(userdata, rgb);
       rgb += n_channels;
@@ -2990,21 +3044,16 @@ void GlowDrawGtk::image_pixel_iter(glow_tImImage orig_image,
 void GlowDrawGtk::set_cairo_clip(DrawWind* wind, cairo_t* cr)
 {
   DrawWindGtk* w = (DrawWindGtk*)wind;
-  cairo_rectangle(cr, w->clip_rectangle[w->clip_cnt - 1].x,
-      w->clip_rectangle[w->clip_cnt - 1].y,
-      w->clip_rectangle[w->clip_cnt - 1].width,
-      w->clip_rectangle[w->clip_cnt - 1].height);
+  cairo_rectangle(cr, w->clip_rectangle[w->clip_cnt - 1].x, w->clip_rectangle[w->clip_cnt - 1].y,
+                  w->clip_rectangle[w->clip_cnt - 1].width, w->clip_rectangle[w->clip_cnt - 1].height);
   cairo_clip(cr);
 }
 
-void GlowDrawGtk::reset_cairo_clip(DrawWind* wind, cairo_t* cr)
-{
-  cairo_reset_clip(cr);
-}
+void GlowDrawGtk::reset_cairo_clip(DrawWind* wind, cairo_t* cr) { cairo_reset_clip(cr); }
 
-int GlowDrawGtk::gradient_create_pattern(int x, int y, int w, int h,
-    glow_eDrawType d0, glow_eDrawType d1, glow_eDrawType d2,
-    glow_eGradient gradient, double transparency, cairo_pattern_t** pat)
+int GlowDrawGtk::gradient_create_pattern(int x, int y, int w, int h, glow_eDrawType d0, glow_eDrawType d1,
+                                         glow_eDrawType d2, glow_eGradient gradient, double transparency,
+                                         cairo_pattern_t** pat)
 {
   double r1, g1, b1, r2, g2, b2;
   int a = 15;
@@ -3013,49 +3062,63 @@ int GlowDrawGtk::gradient_create_pattern(int x, int y, int w, int h,
   GlowColor::rgb_color(d1, &r1, &g1, &b1, get_customcolors());
   GlowColor::rgb_color(d2, &r2, &g2, &b2, get_customcolors());
 
-  switch (gradient) {
+  switch (gradient)
+  {
   case glow_eGradient_HorizontalUp:
     *pat = cairo_pattern_create_linear(x, y, x, y + h);
-    if (notransp) {
+    if (notransp)
+    {
       cairo_pattern_add_color_stop_rgb(*pat, 0.1, r2, g2, b2);
       cairo_pattern_add_color_stop_rgb(*pat, 0.9, r1, g1, b1);
-    } else {
+    }
+    else
+    {
       cairo_pattern_add_color_stop_rgba(*pat, 0.1, r2, g2, b2, 1.0 - transparency);
       cairo_pattern_add_color_stop_rgba(*pat, 0.9, r1, g1, b1, 1.0 - transparency);
     }
     break;
   case glow_eGradient_HorizontalDown:
     *pat = cairo_pattern_create_linear(x, y, x, y + h);
-    if (notransp) {
+    if (notransp)
+    {
       cairo_pattern_add_color_stop_rgb(*pat, 0.1, r1, g1, b1);
       cairo_pattern_add_color_stop_rgb(*pat, 0.9, r2, g2, b2);
-    } else {
+    }
+    else
+    {
       cairo_pattern_add_color_stop_rgba(*pat, 0.1, r1, g1, b1, 1.0 - transparency);
       cairo_pattern_add_color_stop_rgba(*pat, 0.9, r2, g2, b2, 1.0 - transparency);
     }
     break;
   case glow_eGradient_HorizontalTube1:
     *pat = cairo_pattern_create_linear(x, y, x, y + h);
-    if (notransp) {
+    if (notransp)
+    {
       cairo_pattern_add_color_stop_rgb(*pat, 0, r1, g1, b1);
       cairo_pattern_add_color_stop_rgb(*pat, 0.5, r2, g2, b2);
       cairo_pattern_add_color_stop_rgb(*pat, 1, r1, g1, b1);
-    } else {
+    }
+    else
+    {
       cairo_pattern_add_color_stop_rgba(*pat, 0, r1, g1, b1, 1.0 - transparency);
       cairo_pattern_add_color_stop_rgba(*pat, 0.5, r2, g2, b2, 1.0 - transparency);
       cairo_pattern_add_color_stop_rgba(*pat, 1, r1, g1, b1, 1.0 - transparency);
     }
     break;
-  case glow_eGradient_HorizontalTube2: {
+  case glow_eGradient_HorizontalTube2:
+  {
     double r0, g0, b0;
 
     *pat = cairo_pattern_create_linear(x, y, x, y + h);
     GlowColor::rgb_color(d0, &r0, &g0, &b0, get_customcolors());
-    if (notransp) {
+    if (notransp)
+    {
       cairo_pattern_add_color_stop_rgb(*pat, 0, r0, g0, b0);
       cairo_pattern_add_color_stop_rgb(*pat, 0.3, r2, g2, b2);
       cairo_pattern_add_color_stop_rgb(*pat, .95, r1, g1, b1);
-    } else {
+    }
+    else
+    {
       cairo_pattern_add_color_stop_rgba(*pat, 0, r0, g0, b0, 1.0 - transparency);
       cairo_pattern_add_color_stop_rgba(*pat, 0.3, r2, g2, b2, 1.0 - transparency);
       cairo_pattern_add_color_stop_rgba(*pat, .95, r1, g1, b1, 1.0 - transparency);
@@ -3064,194 +3127,249 @@ int GlowDrawGtk::gradient_create_pattern(int x, int y, int w, int h,
   }
   case glow_eGradient_VerticalRight:
     *pat = cairo_pattern_create_linear(x, y, x + w, y);
-    if (notransp) {
+    if (notransp)
+    {
       cairo_pattern_add_color_stop_rgb(*pat, 0.1, r1, g1, b1);
       cairo_pattern_add_color_stop_rgb(*pat, 0.9, r2, g2, b2);
-    } else {
+    }
+    else
+    {
       cairo_pattern_add_color_stop_rgba(*pat, 0.1, r1, g1, b1, 1.0 - transparency);
       cairo_pattern_add_color_stop_rgba(*pat, 0.9, r2, g2, b2, 1.0 - transparency);
     }
     break;
   case glow_eGradient_VerticalLeft:
     *pat = cairo_pattern_create_linear(x, y, x + w, y);
-    if (notransp) {
+    if (notransp)
+    {
       cairo_pattern_add_color_stop_rgb(*pat, 0.1, r2, g2, b2);
       cairo_pattern_add_color_stop_rgb(*pat, 0.9, r1, g1, b1);
-    } else {
+    }
+    else
+    {
       cairo_pattern_add_color_stop_rgba(*pat, 0.1, r2, g2, b2, 1.0 - transparency);
       cairo_pattern_add_color_stop_rgba(*pat, 0.9, r1, g1, b1, 1.0 - transparency);
     }
     break;
   case glow_eGradient_VerticalTube1:
     *pat = cairo_pattern_create_linear(x, y, x + w, y);
-    if (notransp) {
+    if (notransp)
+    {
       cairo_pattern_add_color_stop_rgb(*pat, 0, r1, g1, b1);
       cairo_pattern_add_color_stop_rgb(*pat, 0.5, r2, g2, b2);
       cairo_pattern_add_color_stop_rgb(*pat, 1, r1, g1, b1);
-    } else {
+    }
+    else
+    {
       cairo_pattern_add_color_stop_rgba(*pat, 0, r1, g1, b1, 1.0 - transparency);
       cairo_pattern_add_color_stop_rgba(*pat, 0.5, r2, g2, b2, 1.0 - transparency);
       cairo_pattern_add_color_stop_rgba(*pat, 1, r1, g1, b1, 1.0 - transparency);
     }
     break;
-  case glow_eGradient_VerticalTube2: {
+  case glow_eGradient_VerticalTube2:
+  {
     double r0, g0, b0;
 
     GlowColor::rgb_color(d0, &r0, &g0, &b0, get_customcolors());
     *pat = cairo_pattern_create_linear(x, y, x + w, y);
-    if (notransp) {
+    if (notransp)
+    {
       cairo_pattern_add_color_stop_rgb(*pat, 0, r0, g0, b0);
       cairo_pattern_add_color_stop_rgb(*pat, 0.3, r2, g2, b2);
       cairo_pattern_add_color_stop_rgb(*pat, 0.95, r1, g1, b1);
-    } else {
+    }
+    else
+    {
       cairo_pattern_add_color_stop_rgba(*pat, 0, r0, g0, b0, 1.0 - transparency);
       cairo_pattern_add_color_stop_rgba(*pat, 0.3, r2, g2, b2, 1.0 - transparency);
       cairo_pattern_add_color_stop_rgba(*pat, 0.95, r1, g1, b1, 1.0 - transparency);
     }
     break;
   }
-  case glow_eGradient_DiagonalUpperLeft: {
+  case glow_eGradient_DiagonalUpperLeft:
+  {
     double x0, x1, y0, y1;
 
-    if (w > h) {
+    if (w > h)
+    {
       x0 = x + w / 2 - h / 2;
       y0 = y - (w - h) / a;
       x1 = x + w / 2 + h / 2;
       y1 = y + h + (w - h) / a;
-    } else {
+    }
+    else
+    {
       y0 = y + h / 2 - w / 2;
       x0 = x - (h - w) / a;
       y1 = y + h / 2 + w / 2;
       x1 = x + w + (h - w) / a;
     }
     *pat = cairo_pattern_create_linear(x0, y0, x1, y1);
-    if (notransp) {
+    if (notransp)
+    {
       cairo_pattern_add_color_stop_rgb(*pat, 0.1, r2, g2, b2);
       cairo_pattern_add_color_stop_rgb(*pat, 0.9, r1, g1, b1);
-    } else {
+    }
+    else
+    {
       cairo_pattern_add_color_stop_rgba(*pat, 0.1, r2, g2, b2, 1.0 - transparency);
       cairo_pattern_add_color_stop_rgba(*pat, 0.9, r1, g1, b1, 1.0 - transparency);
     }
     break;
   }
-  case glow_eGradient_DiagonalLowerLeft: {
+  case glow_eGradient_DiagonalLowerLeft:
+  {
     double x0, x1, y0, y1;
     // *pat = cairo_pattern_create_linear( x, y, x+w, y+h);
-    if (w > h) {
+    if (w > h)
+    {
       x0 = x + w / 2 - h / 2;
       y0 = y + h + (w - h) / a;
       x1 = x + w / 2 + h / 2;
       y1 = y - (w - h) / a;
-    } else {
+    }
+    else
+    {
       y1 = y + h / 2 - w / 2;
       x1 = x + w + (h - w) / a;
       y0 = y + h / 2 + w / 2;
       x0 = x - (h - w) / a;
     }
     *pat = cairo_pattern_create_linear(x0, y0, x1, y1);
-    if (notransp) {
+    if (notransp)
+    {
       cairo_pattern_add_color_stop_rgb(*pat, 0.1, r2, g2, b2);
       cairo_pattern_add_color_stop_rgb(*pat, 0.9, r1, g1, b1);
-    } else {
+    }
+    else
+    {
       cairo_pattern_add_color_stop_rgba(*pat, 0.1, r2, g2, b2, 1.0 - transparency);
       cairo_pattern_add_color_stop_rgba(*pat, 0.9, r1, g1, b1, 1.0 - transparency);
     }
     break;
   }
-  case glow_eGradient_DiagonalUpperRight: {
+  case glow_eGradient_DiagonalUpperRight:
+  {
     double x0, x1, y0, y1;
     // *pat = cairo_pattern_create_linear( x, y, x+w, y+h);
-    if (w > h) {
+    if (w > h)
+    {
       x0 = x + w / 2 - h / 2;
       y0 = y + h + (w - h) / a;
       x1 = x + w / 2 + h / 2;
       y1 = y - (w - h) / a;
-    } else {
+    }
+    else
+    {
       y1 = y + h / 2 - w / 2;
       x1 = x + w + (h - w) / a;
       y0 = y + h / 2 + w / 2;
       x0 = x - (h - w) / a;
     }
     *pat = cairo_pattern_create_linear(x0, y0, x1, y1);
-    if (notransp) {
+    if (notransp)
+    {
       cairo_pattern_add_color_stop_rgb(*pat, 0.1, r1, g1, b1);
       cairo_pattern_add_color_stop_rgb(*pat, 0.9, r2, g2, b2);
-    } else {
+    }
+    else
+    {
       cairo_pattern_add_color_stop_rgba(*pat, 0.1, r1, g1, b1, 1.0 - transparency);
       cairo_pattern_add_color_stop_rgba(*pat, 0.9, r2, g2, b2, 1.0 - transparency);
     }
     break;
   }
-  case glow_eGradient_DiagonalLowerRight: {
+  case glow_eGradient_DiagonalLowerRight:
+  {
     double x0, x1, y0, y1;
 
-    if (w > h) {
+    if (w > h)
+    {
       x0 = x + w / 2 - h / 2;
       y0 = y - (w - h) / a;
       x1 = x + w / 2 + h / 2;
       y1 = y + h + (w - h) / a;
-    } else {
+    }
+    else
+    {
       y0 = y + h / 2 - w / 2;
       x0 = x - (h - w) / a;
       y1 = y + h / 2 + w / 2;
       x1 = x + w + (h - w) / a;
     }
     *pat = cairo_pattern_create_linear(x0, y0, x1, y1);
-    if (notransp) {
+    if (notransp)
+    {
       cairo_pattern_add_color_stop_rgb(*pat, 0.1, r1, g1, b1);
       cairo_pattern_add_color_stop_rgb(*pat, 0.9, r2, g2, b2);
-    } else {
+    }
+    else
+    {
       cairo_pattern_add_color_stop_rgba(*pat, 0.1, r1, g1, b1, 1.0 - transparency);
       cairo_pattern_add_color_stop_rgba(*pat, 0.9, r2, g2, b2, 1.0 - transparency);
     }
     break;
   }
-  case glow_eGradient_DiagonalUpTube: {
+  case glow_eGradient_DiagonalUpTube:
+  {
     double x0, x1, y0, y1;
 
-    if (w > h) {
+    if (w > h)
+    {
       x0 = x + w / 2 - h / 2;
       y0 = y - (w - h) / a;
       x1 = x + w / 2 + h / 2;
       y1 = y + h + (w - h) / a;
-    } else {
+    }
+    else
+    {
       y0 = y + h / 2 - w / 2;
       x0 = x - (h - w) / a;
       y1 = y + h / 2 + w / 2;
       x1 = x + w + (h - w) / a;
     }
     *pat = cairo_pattern_create_linear(x0, y0, x1, y1);
-    if (notransp) {
+    if (notransp)
+    {
       cairo_pattern_add_color_stop_rgb(*pat, 0.1, r1, g1, b1);
       cairo_pattern_add_color_stop_rgb(*pat, 0.5, r2, g2, b2);
       cairo_pattern_add_color_stop_rgb(*pat, 0.9, r1, g1, b1);
-    } else {
+    }
+    else
+    {
       cairo_pattern_add_color_stop_rgba(*pat, 0.1, r1, g1, b1, 1.0 - transparency);
       cairo_pattern_add_color_stop_rgba(*pat, 0.5, r2, g2, b2, 1.0 - transparency);
       cairo_pattern_add_color_stop_rgba(*pat, 0.9, r1, g1, b1, 1.0 - transparency);
     }
     break;
   }
-  case glow_eGradient_DiagonalDownTube: {
+  case glow_eGradient_DiagonalDownTube:
+  {
     double x0, x1, y0, y1;
     // *pat = cairo_pattern_create_linear( x, y, x+w, y+h);
-    if (w > h) {
+    if (w > h)
+    {
       x0 = x + w / 2 - h / 2;
       y0 = y + h + (w - h) / a;
       x1 = x + w / 2 + h / 2;
       y1 = y - (w - h) / a;
-    } else {
+    }
+    else
+    {
       y1 = y + h / 2 - w / 2;
       x1 = x + w + (h - w) / a;
       y0 = y + h / 2 + w / 2;
       x0 = x - (h - w) / a;
     }
     *pat = cairo_pattern_create_linear(x0, y0, x1, y1);
-    if (notransp) {
+    if (notransp)
+    {
       cairo_pattern_add_color_stop_rgb(*pat, 0.1, r1, g1, b1);
       cairo_pattern_add_color_stop_rgb(*pat, 0.5, r2, g2, b2);
       cairo_pattern_add_color_stop_rgb(*pat, 0.9, r1, g1, b1);
-    } else {
+    }
+    else
+    {
       cairo_pattern_add_color_stop_rgba(*pat, 0.1, r1, g1, b1, 1.0 - transparency);
       cairo_pattern_add_color_stop_rgba(*pat, 0.5, r2, g2, b2, 1.0 - transparency);
       cairo_pattern_add_color_stop_rgba(*pat, 0.9, r1, g1, b1, 1.0 - transparency);
@@ -3259,66 +3377,81 @@ int GlowDrawGtk::gradient_create_pattern(int x, int y, int w, int h,
     break;
   }
   case glow_eGradient_Globe:
-    *pat = cairo_pattern_create_radial(x + w / 3, y + h / 3, 0, x + w / 3,
-        y + h / 3, sqrt(w * w / 4 + h * h / 4));
-    if (notransp) {
+    *pat = cairo_pattern_create_radial(x + w / 3, y + h / 3, 0, x + w / 3, y + h / 3,
+                                       sqrt(w * w / 4 + h * h / 4));
+    if (notransp)
+    {
       cairo_pattern_add_color_stop_rgb(*pat, 0.9, r1, g1, b1);
       cairo_pattern_add_color_stop_rgb(*pat, 0.1, r2, g2, b2);
-    } else {
+    }
+    else
+    {
       cairo_pattern_add_color_stop_rgba(*pat, 0.9, r1, g1, b1, 1.0 - transparency);
       cairo_pattern_add_color_stop_rgba(*pat, 0.1, r2, g2, b2, 1.0 - transparency);
     }
     break;
   case glow_eGradient_RadialCenter:
-    *pat = cairo_pattern_create_radial(x + w / 2, y + h / 2, 0, x + w / 2,
-        y + h / 2, sqrt(w * w / 4 + h * h / 4));
-    if (notransp) {
+    *pat = cairo_pattern_create_radial(x + w / 2, y + h / 2, 0, x + w / 2, y + h / 2,
+                                       sqrt(w * w / 4 + h * h / 4));
+    if (notransp)
+    {
       cairo_pattern_add_color_stop_rgb(*pat, 0.9, r1, g1, b1);
       cairo_pattern_add_color_stop_rgb(*pat, 0.1, r2, g2, b2);
-    } else {
+    }
+    else
+    {
       cairo_pattern_add_color_stop_rgba(*pat, 0.9, r1, g1, b1, 1.0 - transparency);
       cairo_pattern_add_color_stop_rgba(*pat, 0.1, r2, g2, b2, 1.0 - transparency);
     }
     break;
   case glow_eGradient_RadialUpperLeft:
     *pat = cairo_pattern_create_radial(x, y, 0, x, y, sqrt(w * w + h * h));
-    if (notransp) {
+    if (notransp)
+    {
       cairo_pattern_add_color_stop_rgb(*pat, 0.9, r1, g1, b1);
       cairo_pattern_add_color_stop_rgb(*pat, 0.1, r2, g2, b2);
-    } else {
+    }
+    else
+    {
       cairo_pattern_add_color_stop_rgba(*pat, 0.9, r1, g1, b1, 1.0 - transparency);
       cairo_pattern_add_color_stop_rgba(*pat, 0.1, r2, g2, b2, 1.0 - transparency);
     }
     break;
   case glow_eGradient_RadialLowerLeft:
-    *pat = cairo_pattern_create_radial(
-        x, y + h, 0, x, y + h, sqrt(w * w + h * h));
-    if (notransp) {
+    *pat = cairo_pattern_create_radial(x, y + h, 0, x, y + h, sqrt(w * w + h * h));
+    if (notransp)
+    {
       cairo_pattern_add_color_stop_rgb(*pat, 0.9, r1, g1, b1);
       cairo_pattern_add_color_stop_rgb(*pat, 0.1, r2, g2, b2);
-    } else {
+    }
+    else
+    {
       cairo_pattern_add_color_stop_rgba(*pat, 0.9, r1, g1, b1, 1.0 - transparency);
       cairo_pattern_add_color_stop_rgba(*pat, 0.1, r2, g2, b2, 1.0 - transparency);
     }
     break;
   case glow_eGradient_RadialUpperRight:
-    *pat = cairo_pattern_create_radial(
-        x + w, y, 0, x + w, y, sqrt(w * w + h * h));
-    if (notransp) {
+    *pat = cairo_pattern_create_radial(x + w, y, 0, x + w, y, sqrt(w * w + h * h));
+    if (notransp)
+    {
       cairo_pattern_add_color_stop_rgb(*pat, 0.9, r1, g1, b1);
       cairo_pattern_add_color_stop_rgb(*pat, 0.1, r2, g2, b2);
-    } else {
+    }
+    else
+    {
       cairo_pattern_add_color_stop_rgba(*pat, 0.9, r1, g1, b1, 1.0 - transparency);
       cairo_pattern_add_color_stop_rgba(*pat, 0.1, r2, g2, b2, 1.0 - transparency);
     }
     break;
   case glow_eGradient_RadialLowerRight:
-    *pat = cairo_pattern_create_radial(
-        x + w, y + h, 0, x + w, y + h, sqrt(w * w + h * h));
-    if (notransp) {
+    *pat = cairo_pattern_create_radial(x + w, y + h, 0, x + w, y + h, sqrt(w * w + h * h));
+    if (notransp)
+    {
       cairo_pattern_add_color_stop_rgb(*pat, 0.9, r1, g1, b1);
       cairo_pattern_add_color_stop_rgb(*pat, 0.1, r2, g2, b2);
-    } else {
+    }
+    else
+    {
       cairo_pattern_add_color_stop_rgba(*pat, 0.9, r1, g1, b1, 1.0 - transparency);
       cairo_pattern_add_color_stop_rgba(*pat, 0.1, r2, g2, b2, 1.0 - transparency);
     }
@@ -3334,10 +3467,14 @@ glow_eGradient GlowDrawGtk::gradient_rotate(double rot, glow_eGradient gradient)
   glow_eGradient g;
   double rotation = (rot / 360 - floor(rot / 360)) * 360;
 
-  if (45 >= rotation || rotation > 315) {
+  if (45 >= rotation || rotation > 315)
+  {
     g = gradient;
-  } else if (45 < rotation && rotation <= 135) {
-    switch (gradient) {
+  }
+  else if (45 < rotation && rotation <= 135)
+  {
+    switch (gradient)
+    {
     case glow_eGradient_HorizontalUp:
       g = glow_eGradient_VerticalRight;
       break;
@@ -3395,8 +3532,11 @@ glow_eGradient GlowDrawGtk::gradient_rotate(double rot, glow_eGradient gradient)
     default:
       g = gradient;
     }
-  } else if (135 < rotation && rotation <= 225) {
-    switch (gradient) {
+  }
+  else if (135 < rotation && rotation <= 225)
+  {
+    switch (gradient)
+    {
     case glow_eGradient_HorizontalUp:
       g = glow_eGradient_HorizontalDown;
       break;
@@ -3436,8 +3576,11 @@ glow_eGradient GlowDrawGtk::gradient_rotate(double rot, glow_eGradient gradient)
     default:
       g = gradient;
     }
-  } else { // if ( 225 < rotation && rotation <= 315)
-    switch (gradient) {
+  }
+  else
+  { // if ( 225 < rotation && rotation <= 315)
+    switch (gradient)
+    {
     case glow_eGradient_HorizontalUp:
       g = glow_eGradient_VerticalLeft;
       break;
@@ -3499,15 +3642,15 @@ glow_eGradient GlowDrawGtk::gradient_rotate(double rot, glow_eGradient gradient)
   return g;
 }
 
-int GlowDrawGtk::gradient_fill_rect(GlowWind* wind, int x, int y, int w, int h,
-    glow_eDrawType d0, glow_eDrawType d1, glow_eDrawType d2,
-    glow_eGradient gradient, double transparency)
+int GlowDrawGtk::gradient_fill_rect(GlowWind* wind, int x, int y, int w, int h, glow_eDrawType d0,
+                                    glow_eDrawType d1, glow_eDrawType d2, glow_eGradient gradient,
+                                    double transparency)
 {
   DrawWindGtk* ww = (DrawWindGtk*)wind->window;
   if (ctx->nodraw)
     return 1;
 
-  cairo_t *cr = get_cairo(wind);
+  cairo_t* cr = get_cairo(wind);
 
   if (ww->clip_on)
     set_cairo_clip(ww, cr);
@@ -3515,7 +3658,7 @@ int GlowDrawGtk::gradient_fill_rect(GlowWind* wind, int x, int y, int w, int h,
   cairo_pattern_t* pat;
   if (!gradient_create_pattern(x, y, w, h, d0, d1, d2, gradient, transparency, &pat))
     return 0;
-  cairo_rectangle(cr, x-1, y-1, w, h);
+  cairo_rectangle(cr, x - 1, y - 1, w, h);
   cairo_set_source(cr, pat);
   cairo_fill(cr);
 
@@ -3527,9 +3670,9 @@ int GlowDrawGtk::gradient_fill_rect(GlowWind* wind, int x, int y, int w, int h,
   return 1;
 }
 
-int GlowDrawGtk::gradient_fill_rectrounded(GlowWind* wind, int x, int y, int w,
-    int h, int roundamount, glow_eDrawType d0, glow_eDrawType d1,
-    glow_eDrawType d2, glow_eGradient gradient, double transparency)
+int GlowDrawGtk::gradient_fill_rectrounded(GlowWind* wind, int x, int y, int w, int h, int roundamount,
+                                           glow_eDrawType d0, glow_eDrawType d1, glow_eDrawType d2,
+                                           glow_eGradient gradient, double transparency)
 {
   DrawWindGtk* ww = (DrawWindGtk*)wind->window;
   if (ctx->nodraw)
@@ -3544,21 +3687,19 @@ int GlowDrawGtk::gradient_fill_rectrounded(GlowWind* wind, int x, int y, int w,
   if (!gradient_create_pattern(x, y, w, h, d0, d1, d2, gradient, transparency, &pat))
     return 0;
 
-  if (roundamount >= 0) {
+  if (roundamount >= 0)
+  {
     cairo_move_to(cr, x + roundamount, y);
     cairo_line_to(cr, x + w - roundamount, y);
-    cairo_arc(
-        cr, x + w - roundamount, y + roundamount, roundamount, -M_PI / 2, 0);
+    cairo_arc(cr, x + w - roundamount, y + roundamount, roundamount, -M_PI / 2, 0);
     cairo_line_to(cr, x + w, y + h - roundamount);
-    cairo_arc(cr, x + w - roundamount, y + h - roundamount, roundamount, 0,
-        M_PI / 2);
+    cairo_arc(cr, x + w - roundamount, y + h - roundamount, roundamount, 0, M_PI / 2);
     cairo_line_to(cr, x + roundamount, y + h);
-    cairo_arc(cr, x + roundamount, y + h - roundamount, roundamount, M_PI / 2,
-        M_PI);
+    cairo_arc(cr, x + roundamount, y + h - roundamount, roundamount, M_PI / 2, M_PI);
     cairo_line_to(cr, x, y + roundamount);
-    cairo_arc(cr, x + roundamount, y + roundamount, roundamount, M_PI,
-        M_PI * 3 / 2);
-  } else
+    cairo_arc(cr, x + roundamount, y + roundamount, roundamount, M_PI, M_PI * 3 / 2);
+  }
+  else
     cairo_rectangle(cr, x, y, w, h);
 
   cairo_set_source(cr, pat);
@@ -3572,9 +3713,9 @@ int GlowDrawGtk::gradient_fill_rectrounded(GlowWind* wind, int x, int y, int w,
   return 1;
 }
 
-int GlowDrawGtk::gradient_fill_arc(GlowWind* wind, int x, int y, int w, int h,
-    int angle1, int angle2, glow_eDrawType d0, glow_eDrawType d1,
-    glow_eDrawType d2, glow_eGradient gradient, double transparency)
+int GlowDrawGtk::gradient_fill_arc(GlowWind* wind, int x, int y, int w, int h, int angle1, int angle2,
+                                   glow_eDrawType d0, glow_eDrawType d1, glow_eDrawType d2,
+                                   glow_eGradient gradient, double transparency)
 {
   DrawWindGtk* ww = (DrawWindGtk*)wind->window;
   if (ctx->nodraw)
@@ -3599,8 +3740,7 @@ int GlowDrawGtk::gradient_fill_arc(GlowWind* wind, int x, int y, int w, int h,
   cairo_scale(cr, double(w) / 2, double(h) / 2);
   if (!(angle2 == 360 || angle2 == 180))
     cairo_move_to(cr, 0, 0);
-  cairo_arc(cr, 0, 0, 1, -double(angle1 + angle2) / 180 * M_PI,
-      -double(angle1) / 180 * M_PI);
+  cairo_arc(cr, 0, 0, 1, -double(angle1 + angle2) / 180 * M_PI, -double(angle1) / 180 * M_PI);
   if (!(angle2 == 360 || angle2 == 180))
     cairo_move_to(cr, 0, 0);
   cairo_restore(cr);
@@ -3615,9 +3755,9 @@ int GlowDrawGtk::gradient_fill_arc(GlowWind* wind, int x, int y, int w, int h,
   return 1;
 }
 
-int GlowDrawGtk::gradient_fill_polyline(GlowWind* wind, glow_sPointX* points,
-    int point_cnt, glow_eDrawType d0, glow_eDrawType d1, glow_eDrawType d2,
-    glow_eGradient gradient, double transparency)
+int GlowDrawGtk::gradient_fill_polyline(GlowWind* wind, glow_sPointX* points, int point_cnt,
+                                        glow_eDrawType d0, glow_eDrawType d1, glow_eDrawType d2,
+                                        glow_eGradient gradient, double transparency)
 {
   DrawWindGtk* ww = (DrawWindGtk*)wind->window;
   if (ctx->nodraw)
@@ -3627,11 +3767,12 @@ int GlowDrawGtk::gradient_fill_polyline(GlowWind* wind, glow_sPointX* points,
   double x0, y0, x1, y1;
 
   if (ww->clip_on)
-      set_cairo_clip(ww, cr);
+    set_cairo_clip(ww, cr);
 
   x0 = y0 = 1e37;
   x1 = y1 = 1e-37;
-  for (int j = 0; j < point_cnt; j++) {
+  for (int j = 0; j < point_cnt; j++)
+  {
     if (points[j].x < x0)
       x0 = points[j].x;
     if (points[j].y < y0)
@@ -3640,7 +3781,7 @@ int GlowDrawGtk::gradient_fill_polyline(GlowWind* wind, glow_sPointX* points,
       x1 = points[j].x;
     if (points[j].y > y1)
       y1 = points[j].y;
-    
+
     if (j == 0)
       cairo_move_to(cr, points[j].x, points[j].y);
     else
@@ -3648,8 +3789,8 @@ int GlowDrawGtk::gradient_fill_polyline(GlowWind* wind, glow_sPointX* points,
   }
 
   cairo_pattern_t* pat;
-  if (!gradient_create_pattern((int)x0, (int)y0, (int)(x1 - x0),
-      (int)(y1 - y0), d0, d1, d2, gradient, transparency, &pat))
+  if (!gradient_create_pattern((int)x0, (int)y0, (int)(x1 - x0), (int)(y1 - y0), d0, d1, d2, gradient,
+                               transparency, &pat))
     return 0;
   cairo_set_source(cr, pat);
   cairo_fill(cr);
@@ -3664,33 +3805,38 @@ int GlowDrawGtk::gradient_fill_polyline(GlowWind* wind, glow_sPointX* points,
 
 void GlowDrawGtk::log_event(GdkEvent* event)
 {
-  if (ctx->eventlog_callback) {
+  if (ctx->eventlog_callback)
+  {
     GdkEvent e;
 
     memcpy(&e, event, sizeof(e));
 
-    switch (e.type) {
+    switch (e.type)
+    {
     case GDK_KEY_PRESS:
       *(gchar*)&e.key.string = e.key.string[0];
       break;
-    case GDK_MOTION_NOTIFY: {
+    case GDK_MOTION_NOTIFY:
+    {
       int x, y;
 
-      if (e.motion.is_hint) {
-        gdk_window_get_device_position(e.any.window, 
-	    gdk_seat_get_pointer(gdk_display_get_default_seat(display)), 
-	    &x, &y, NULL);
+      if (e.motion.is_hint)
+      {
+        gdk_window_get_device_position(
+            e.any.window, gdk_seat_get_pointer(gdk_display_get_default_seat(display)), &x, &y, NULL);
         e.button.x = x;
         e.button.y = y;
         e.motion.is_hint = 0;
       }
       break;
     }
-    case GDK_EXPOSE: {
+    case GDK_EXPOSE:
+    {
       int width, height;
 
       get_window_size(&ctx->mw, &width, &height);
-      if (e.expose.area.x == 0 && e.expose.area.y == 0) {
+      if (e.expose.area.x == 0 && e.expose.area.y == 0)
+      {
         e.expose.area.x = -999;
         e.expose.area.y = -999;
         e.expose.area.width = width;
@@ -3715,24 +3861,27 @@ void GlowDrawGtk::event_exec(void* event, unsigned int size)
   memcpy(&e, event, size);
   e.any.window = m_wind.window;
 
-  switch (e.type) {
-  case GDK_KEY_PRESS: {
+  switch (e.type)
+  {
+  case GDK_KEY_PRESS:
+  {
     gchar* p = (gchar*)malloc(1);
 
     *p = *(gchar*)&e.key.string;
     e.key.string = p;
     break;
   }
-  case GDK_EXPOSE: {
-    if (e.expose.area.x == -999 && e.expose.area.y == -999) {
+  case GDK_EXPOSE:
+  {
+    if (e.expose.area.x == -999 && e.expose.area.y == -999)
+    {
       GtkWidget* parent;
 
       parent = gtk_widget_get_parent(m_wind.toplevel);
       while (!GTK_IS_WINDOW(parent))
         parent = gtk_widget_get_parent(parent);
 
-      gtk_window_resize(
-          GTK_WINDOW(parent), e.expose.area.width, e.expose.area.height);
+      gtk_window_resize(GTK_WINDOW(parent), e.expose.area.width, e.expose.area.height);
       // set_window_size( &ctx->mw, e.expose.area.width, e.expose.area.height);
       e.expose.area.x = 0;
       e.expose.area.y = 0;
@@ -3744,8 +3893,10 @@ void GlowDrawGtk::event_exec(void* event, unsigned int size)
 
   event_handler(e);
 
-  switch (e.type) {
-  case GDK_KEY_PRESS: {
+  switch (e.type)
+  {
+  case GDK_KEY_PRESS:
+  {
     free(e.key.string);
     break;
   }
@@ -3757,7 +3908,7 @@ int GlowDrawGtk::open_color_selection(double* r, double* g, double* b)
 {
   int sts;
   GdkRGBA color;
-  GtkWidget *p;
+  GtkWidget* p;
 
   p = m_wind.toplevel;
   while (p && !GTK_IS_WINDOW(p))
@@ -3770,13 +3921,15 @@ int GlowDrawGtk::open_color_selection(double* r, double* g, double* b)
   color.alpha = 1.0;
   gtk_color_chooser_set_rgba(GTK_COLOR_CHOOSER(csel), &color);
   gint response = gtk_dialog_run(GTK_DIALOG(csel));
-  if (response == GTK_RESPONSE_OK) {
+  if (response == GTK_RESPONSE_OK)
+  {
     gtk_color_chooser_get_rgba(GTK_COLOR_CHOOSER(csel), &color);
     *r = color.red;
     *g = color.green;
     *b = color.blue;
     sts = 1;
-  } else
+  }
+  else
     sts = 0;
   gtk_widget_destroy(csel);
   return sts;
@@ -3784,35 +3937,44 @@ int GlowDrawGtk::open_color_selection(double* r, double* g, double* b)
 
 void GlowDrawGtk::update_color(glow_eDrawType color)
 {
-  if (!GlowColor::is_custom(color)) {
-    if (gcs[color]) {
-      //printf("X Regular: %4d %llu %d\n", color, (unsigned long long)gcs[color]);
+  if (!GlowColor::is_custom(color))
+  {
+    if (gcs[color])
+    {
+      // printf("X Regular: %4d %llu %d\n", color, (unsigned long long)gcs[color]);
       cairo_pattern_destroy(gcs[color]);
       gcs[color] = 0;
     }
-  } else if (get_customcolors()) {
+  }
+  else if (get_customcolors())
+  {
     // A customcolor
-    if (get_customcolors()->gcs[color - glow_eDrawType_CustomColor1]) {
-      //printf("X Custom: %4d %llu\n", color - glow_eDrawType_CustomColor1, (unsigned long long)get_customcolors()->gcs[color - glow_eDrawType_CustomColor1]);
+    if (get_customcolors()->gcs[color - glow_eDrawType_CustomColor1])
+    {
+      // printf("X Custom: %4d %llu\n", color - glow_eDrawType_CustomColor1, (unsigned long
+      // long)get_customcolors()->gcs[color - glow_eDrawType_CustomColor1]);
       cairo_pattern_destroy(get_customcolors()->gcs[color - glow_eDrawType_CustomColor1]);
       get_customcolors()->gcs[color - glow_eDrawType_CustomColor1] = 0;
     }
-    if (get_customcolors()->gcs[color - glow_eDrawType_CustomColor1 + 1]) {
-      cairo_pattern_destroy(get_customcolors()
-                         ->gcs[color - glow_eDrawType_CustomColor1 + 1]);
-      //printf("X Custom:  %4d %llu\n", color - glow_eDrawType_CustomColor1 + 1, (unsigned long long)get_customcolors()->gcs[color - glow_eDrawType_CustomColor1 + 1]);
+    if (get_customcolors()->gcs[color - glow_eDrawType_CustomColor1 + 1])
+    {
+      cairo_pattern_destroy(get_customcolors()->gcs[color - glow_eDrawType_CustomColor1 + 1]);
+      // printf("X Custom:  %4d %llu\n", color - glow_eDrawType_CustomColor1 + 1, (unsigned long
+      // long)get_customcolors()->gcs[color - glow_eDrawType_CustomColor1 + 1]);
       get_customcolors()->gcs[color - glow_eDrawType_CustomColor1 + 1] = 0;
     }
-    if (get_customcolors()->gcs[color - glow_eDrawType_CustomColor1 + 2]) {
-      cairo_pattern_destroy(get_customcolors()
-                         ->gcs[color - glow_eDrawType_CustomColor1 + 2]);
-      //printf("X Custom:  %4d %llu\n", color - glow_eDrawType_CustomColor1 + 2, (unsigned long long)get_customcolors()->gcs[color - glow_eDrawType_CustomColor1 + 2]);
+    if (get_customcolors()->gcs[color - glow_eDrawType_CustomColor1 + 2])
+    {
+      cairo_pattern_destroy(get_customcolors()->gcs[color - glow_eDrawType_CustomColor1 + 2]);
+      // printf("X Custom:  %4d %llu\n", color - glow_eDrawType_CustomColor1 + 2, (unsigned long
+      // long)get_customcolors()->gcs[color - glow_eDrawType_CustomColor1 + 2]);
       get_customcolors()->gcs[color - glow_eDrawType_CustomColor1 + 2] = 0;
     }
-    if (get_customcolors()->gcs[color - glow_eDrawType_CustomColor1 + 3]) {
-      cairo_pattern_destroy(get_customcolors()
-                         ->gcs[color - glow_eDrawType_CustomColor1 + 3]);
-      //printf("X Custom:  %4d %llu\n", color - glow_eDrawType_CustomColor1 + 3, (unsigned long long)get_customcolors()->gcs[color - glow_eDrawType_CustomColor1 + 3]);
+    if (get_customcolors()->gcs[color - glow_eDrawType_CustomColor1 + 3])
+    {
+      cairo_pattern_destroy(get_customcolors()->gcs[color - glow_eDrawType_CustomColor1 + 3]);
+      // printf("X Custom:  %4d %llu\n", color - glow_eDrawType_CustomColor1 + 3, (unsigned long
+      // long)get_customcolors()->gcs[color - glow_eDrawType_CustomColor1 + 3]);
       get_customcolors()->gcs[color - glow_eDrawType_CustomColor1 + 3] = 0;
     }
   }
@@ -3820,7 +3982,8 @@ void GlowDrawGtk::update_color(glow_eDrawType color)
 
 void GlowDrawGtk::push_customcolors(GlowCustomColors* cc)
 {
-  if (customcolors_cnt > CUSTOMCOLORS_STACK_SIZE) {
+  if (customcolors_cnt > CUSTOMCOLORS_STACK_SIZE)
+  {
     printf("** Max number custom colors exceede\n");
     return;
   }
@@ -3839,7 +4002,8 @@ void GlowDrawGtk::set_customcolors(GlowCustomColors* cc)
 
 void GlowDrawGtk::pop_customcolors()
 {
-  if (customcolors_cnt <= 0) {
+  if (customcolors_cnt <= 0)
+  {
     printf("** Customcolor stack disorder\n");
     return;
   }
@@ -3859,17 +4023,16 @@ GlowCustomColorsGtk* GlowDrawGtk::get_customcolors()
   return customcolors[0];
 }
 
-GlowCustomColors* GlowDrawGtk::create_customcolors()
-{
-  return new GlowCustomColorsGtk();
-}
+GlowCustomColors* GlowDrawGtk::create_customcolors() { return new GlowCustomColorsGtk(); }
 
 void GlowDrawGtk::remove_customcolors(GlowCustomColors* cc)
 {
-  for (int i = 0; i < customcolors_cnt; i++) {
-    if (customcolors[i] == cc) {
+  for (int i = 0; i < customcolors_cnt; i++)
+  {
+    if (customcolors[i] == cc)
+    {
       for (int j = i; j < customcolors_cnt - 1; j++)
-	customcolors[j] = customcolors[j+1];
+        customcolors[j] = customcolors[j + 1];
       customcolors_cnt--;
       break;
     }
@@ -3878,15 +4041,15 @@ void GlowDrawGtk::remove_customcolors(GlowCustomColors* cc)
 
 void GlowDrawGtk::reset_customcolors(GlowCustomColors* cc)
 {
-  for (int i = 0; i < cc->colors_size; i++) {
-    if (((GlowCustomColorsGtk*)cc)->gcs[i]) {
+  for (int i = 0; i < cc->colors_size; i++)
+  {
+    if (((GlowCustomColorsGtk*)cc)->gcs[i])
+    {
       cairo_pattern_destroy(((GlowCustomColorsGtk*)cc)->gcs[i]);
-      //printf("X Custom:  %4d %llu\n", i, (unsigned long long)((GlowCustomColorsGtk*)cc)->gcs[i]);
+      // printf("X Custom:  %4d %llu\n", i, (unsigned long long)((GlowCustomColorsGtk*)cc)->gcs[i]);
     }
   }
-  memset(((GlowCustomColorsGtk*)cc)->gcs, 0,
-      sizeof(((GlowCustomColorsGtk*)cc)->gcs));
+  memset(((GlowCustomColorsGtk*)cc)->gcs, 0, sizeof(((GlowCustomColorsGtk*)cc)->gcs));
 
-  memset(((GlowCustomColorsGtk*)cc)->color_vect, 0,
-      sizeof(((GlowCustomColorsGtk*)cc)->color_vect));
+  memset(((GlowCustomColorsGtk*)cc)->color_vect, 0, sizeof(((GlowCustomColorsGtk*)cc)->color_vect));
 }

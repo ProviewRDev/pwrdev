@@ -206,5 +206,45 @@ SObject pwrb:Type
        Attr Value = 15
      EndBody
     EndObject
+    !/**
+    !  BitField 8 bits
+    !*/
+    Object BitField8 $Value
+     Body SysBody
+       Attr PgmName = "BitField8"
+       Attr Text = "BitField8"
+       Attr Value = 16
+     EndBody
+    EndObject
+    !/**
+    !  BitField 16 bits (No byteswap)
+    !*/
+    Object BitField16 $Value
+     Body SysBody
+       Attr PgmName = "BitField16"
+       Attr Text = "BitField16"
+       Attr Value = 17
+     EndBody
+    EndObject
+    !/**
+    !  BitField 32 bits (No byteswap)
+    !*/
+    Object BitField32 $Value
+     Body SysBody
+       Attr PgmName = "BitField32"
+       Attr Text = "BitField32"
+       Attr Value = 18
+     EndBody
+    EndObject 
+    !/**
+    !  BitField 64 bits (No byteswap)
+    !*/
+    Object BitField64 $Value
+     Body SysBody
+       Attr PgmName = "BitField64"
+       Attr Text = "BitField64"
+       Attr Value = 19
+     EndBody
+    EndObject  
   EndObject
 EndSObject

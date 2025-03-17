@@ -62,6 +62,7 @@ static pwr_tStatus IoCardInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp,
 
   op = (pwr_sClass_Pb_Ao*)cp->op;
   local = (io_sCardLocal*)cp->Local;
+  (void)local; // Do nothing
 
   if (rp->Class != pwr_cClass_Pb_DP_Slave)
   {
@@ -153,7 +154,7 @@ static pwr_tStatus IoCardWrite(io_tCtx ctx, io_sAgent* ap, io_sRack* rp,
       else
         rawvalue = rawvalue - 0.5;
 
-      // We don´t use RawValue in Profibus I/O
+      // We donï¿½t use RawValue in Profibus I/O
       sop->RawValue = 0;
 
       // Calculate signal value

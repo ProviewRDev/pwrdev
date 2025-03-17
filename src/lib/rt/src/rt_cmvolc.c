@@ -43,18 +43,17 @@
 #include "rt_cmvolc.h"
 #include "rt_qdb.h"
 
-static gdb_sObject* createObject(pwr_tStatus* status, gdb_sVolume* vp,
-    const net_sGobject* nop, const pwr_tTime* time, pwr_tBitMask dbsFlags,
-    const void* bodyData, int bodySize, pwr_tObjid poid);
+static gdb_sObject* createObject(pwr_tStatus* status, gdb_sVolume* vp, const net_sGobject* nop,
+                                 const pwr_tTime* time, pwr_tBitMask dbsFlags, const void* bodyData,
+                                 int bodySize, pwr_tObjid poid);
 
-static gdb_sVolume* createVolume(
-    pwr_tStatus* sts, const char* vname, pwr_tVolumeId cvid);
+static gdb_sVolume* createVolume(pwr_tStatus* sts, const char* vname, pwr_tVolumeId cvid);
 
 static void deleteCclass(gdb_sCclass* ccp);
 
 static gdb_sCclass* linkCclass(pwr_tStatus* sts, /**< Status */
-    gdb_sCclass* ccp /**< The cached class which shall be linked */
-    );
+                               gdb_sCclass* ccp  /**< The cached class which shall be linked */
+);
 
 static void trimQ(gdb_sTouchQ* tqp);
 
@@ -63,16 +62,15 @@ static void trimQ(gdb_sTouchQ* tqp);
  *
  *  @return NULL if an error or classes are equal else a pointer to the class
  */
-gdb_sCclass* cmvolc_GetCachedClass(pwr_tStatus* sts, const gdb_sNode* np,
-    const gdb_sVolume* vp, mvol_sAttribute* ap,
-    pwr_tBoolean* equal, /**< set if classes are equal then NULL is returned */
-    pwr_tBoolean*
-        fetched, /**< true if the class has been fected from the remote node */
-    gdb_sClass* cp)
+gdb_sCclass*
+cmvolc_GetCachedClass(pwr_tStatus* sts, const gdb_sNode* np, const gdb_sVolume* vp, mvol_sAttribute* ap,
+                      pwr_tBoolean* equal,   /**< set if classes are equal then NULL is returned */
+                      pwr_tBoolean* fetched, /**< true if the class has been fected from the remote node */
+                      gdb_sClass* cp)
 {
   qcom_sQid tgt;
   qcom_sPut put;
-  net_sGetCclass* smp; /* Send message.  */
+  net_sGetCclass* smp;         /* Send message.  */
   net_sGetCclassR* rmp = NULL; /* Receive message.  */
   gdb_sCcVolKey ccvKey;
   gdb_sCclassKey ccKey;
@@ -91,9 +89,11 @@ gdb_sCclass* cmvolc_GetCachedClass(pwr_tStatus* sts, const gdb_sNode* np,
   *fetched = 0;
 
   /* Handle nodes that don't support cached classes */
-  if (!np->cclassSupport) {
+  if (!np->cclassSupport)
+  {
     *equal = 1;
-    if (cp == NULL) {
+    if (cp == NULL)
+    {
       ap->op->u.c.flags.b.classChecked = 1;
       ap->op->u.c.flags.b.classEqual = 1;
     }
@@ -109,41 +109,51 @@ gdb_sCclass* cmvolc_GetCachedClass(pwr_tStatus* sts, const gdb_sNode* np,
     ccvKey.vid = cp->cid >> 16;
 
   ccvp = hash_Search(sts, gdbroot->ccvol_ht, &ccvKey);
-  if (ccvp == NULL) {
+  if (ccvp == NULL)
+  {
     errh_Bugcheck(GDH__WEIRD, "Cached Class volume doesn't exist");
     /** @todo Verify that this bugcheck is valid */
   }
 
   /* If cp is not NULL then we always fetch the class */
 
-  if (ccvp->equalClasses && cp == NULL) {
+  if (ccvp->equalClasses && cp == NULL)
+  {
     *equal = 1;
     ap->op->u.c.flags.b.classChecked = 1;
     ap->op->u.c.flags.b.classEqual = 1;
     pwr_Return(NULL, sts, GDH__SUCCESS);
   }
 
-  if (cp != NULL) {
+  if (cp != NULL)
+  {
     ccKey.cid = cp->cid;
     cop = pool_Address(NULL, gdbroot->pool, cp->cor);
     time = cop->u.n.time;
-  } else {
+  }
+  else
+  {
     ccKey.cid = ap->op->g.cid;
     time = ap->cop->u.n.time;
   }
   ccKey.ccvoltime = ccvp->time;
 
   ccp = hash_Search(sts, gdbroot->cclass_ht, &ccKey);
-  if (ccp != NULL) {
+  if (ccp != NULL)
+  {
     cmvolc_TouchClass(ccp);
 
-    if (time_Acomp(&time, &ccp->time) == 0 && cp == NULL) {
+    if (time_Acomp(&time, &ccp->time) == 0 && cp == NULL)
+    {
       *equal = 1;
       ap->op->u.c.flags.b.classChecked = 1;
       ap->op->u.c.flags.b.classEqual = 1;
       pwr_Return(NULL, sts, GDH__SUCCESS);
-    } else {
-      if (cp == NULL) {
+    }
+    else
+    {
+      if (cp == NULL)
+      {
         ap->op->u.c.flags.b.classChecked = 1;
         ap->op->u.c.flags.b.classEqual = 0;
       }
@@ -157,11 +167,13 @@ gdb_sCclass* cmvolc_GetCachedClass(pwr_tStatus* sts, const gdb_sNode* np,
 
   /* If classes equal, create cached class */
 
-  if (ccvp->equalClasses && cp != NULL) {
+  if (ccvp->equalClasses && cp != NULL)
+  {
     *fetched = 0;
     size = sizeof(*ccp) + (cp->acount - 1) * sizeof(ccp->attr[0]);
     ccp = pool_Alloc(sts, gdbroot->pool, size);
-    if (ccp == NULL) {
+    if (ccp == NULL)
+    {
       return NULL;
     }
 
@@ -170,7 +182,8 @@ gdb_sCclass* cmvolc_GetCachedClass(pwr_tStatus* sts, const gdb_sNode* np,
     ccp->size = cp->size;
     ccp->time = time;
 
-    for (i = 0; i < cp->acount; i++) {
+    for (i = 0; i < cp->acount; i++)
+    {
       ccp->attr[i].aix = cp->attr[i].aix;
       ccp->attr[i].flags = cp->attr[i].flags;
       ccp->attr[i].type = cp->attr[i].type;
@@ -181,9 +194,11 @@ gdb_sCclass* cmvolc_GetCachedClass(pwr_tStatus* sts, const gdb_sNode* np,
     }
 
     ccp->acount = cp->acount;
-
-  } else {
-    do {
+  }
+  else
+  {
+    do
+    {
       gdb_Unlock;
 
       smp = net_Alloc(sts, &put, sizeof(*smp), net_eMsg_getCclass);
@@ -203,7 +218,8 @@ gdb_sCclass* cmvolc_GetCachedClass(pwr_tStatus* sts, const gdb_sNode* np,
 
       gdb_Lock;
 
-      if (ccp == NULL) {
+      if (ccp == NULL)
+      {
         if (rmp->equal && cp == NULL)
           size = sizeof(*ccp);
         else if (rmp->equal && cp != NULL)
@@ -212,30 +228,40 @@ gdb_sCclass* cmvolc_GetCachedClass(pwr_tStatus* sts, const gdb_sNode* np,
           size = sizeof(*ccp) + (rmp->cclass.acount - 1) * sizeof(ccp->attr[0]);
 
         ccp = pool_Alloc(sts, gdbroot->pool, size);
-        if (ccp == NULL) {
+        if (ccp == NULL)
+        {
           net_Free(NULL, rmp);
           return NULL;
         }
 
-        if (rmp->equal && cp == NULL) {
+        if (rmp->equal && cp == NULL)
+        {
           ccp->size = 0;
           ccp->time = time;
-        } else if (rmp->equal && cp != NULL) {
+        }
+        else if (rmp->equal && cp != NULL)
+        {
           ccp->size = cp->size;
           ccp->time = time;
-        } else {
+        }
+        else
+        {
           ccp->size = rmp->cclass.size;
           ccp->time = net_NetTimeToTime(&rmp->cclass.time);
         }
       }
 
-      if (rmp->equal && cp == NULL) {
+      if (rmp->equal && cp == NULL)
+      {
         *equal = 1;
         ccp->acount = 0;
-      } else if (rmp->equal && cp != NULL) {
+      }
+      else if (rmp->equal && cp != NULL)
+      {
         *equal = 1;
 
-        for (i = 0; i < cp->acount; i++) {
+        for (i = 0; i < cp->acount; i++)
+        {
           ccp->attr[i].aix = cp->attr[i].aix;
           ccp->attr[i].flags = cp->attr[i].flags;
           ccp->attr[i].type = cp->attr[i].type;
@@ -246,8 +272,9 @@ gdb_sCclass* cmvolc_GetCachedClass(pwr_tStatus* sts, const gdb_sNode* np,
         }
 
         ccp->acount = cp->acount;
-
-      } else {
+      }
+      else
+      {
         nextIdx = rmp->naidx;
         stopIdx = nextIdx != UINT_MAX ? nextIdx : rmp->cclass.acount;
 
@@ -277,7 +304,8 @@ gdb_sCclass* cmvolc_GetCachedClass(pwr_tStatus* sts, const gdb_sNode* np,
   return ccp;
 
 netError:
-  if (rmp != NULL) {
+  if (rmp != NULL)
+  {
     if (sts != NULL)
       *sts = rmp->sts;
     net_Free(NULL, rmp);
@@ -305,7 +333,7 @@ void cmvolc_GetNonExistingClass(pwr_tStatus* sts, gdb_sObject* op, pwr_tCid cid)
 
   qcom_sQid tgt;
   qcom_sPut put;
-  net_sGetGclass* smp; /* Send message.  */
+  net_sGetGclass* smp;         /* Send message.  */
   net_sGetGclassR* rmp = NULL; /* Receive message.  */
   int i, j;
   pwr_tUInt32 nextIdx = 0;
@@ -333,14 +361,16 @@ void cmvolc_GetNonExistingClass(pwr_tStatus* sts, gdb_sObject* op, pwr_tCid cid)
 
   vp = pool_Address(NULL, gdbroot->pool, op->l.vr);
   np = pool_Address(NULL, gdbroot->pool, vp->l.nr);
-  if (!np->cclassSupport) {
+  if (!np->cclassSupport)
+  {
     *sts = GDH__NOCCLASSSUP;
     return;
   }
 
   gdb_Unlock;
 
-  do {
+  do
+  {
     smp = net_Alloc(sts, &put, sizeof(*smp), net_eMsg_getGclass);
     if (smp == NULL)
       goto netError;
@@ -351,8 +381,7 @@ void cmvolc_GetNonExistingClass(pwr_tStatus* sts, gdb_sObject* op, pwr_tCid cid)
     smp->cid = cid;
     smp->aidx = nextIdx;
 
-    rmp = net_Request(
-        sts, &tgt, &put, NULL, net_eMsg_getGclassR, qdb_mGet_multipleGet, 0);
+    rmp = net_Request(sts, &tgt, &put, NULL, net_eMsg_getGclassR, qdb_mGet_multipleGet, 0);
     if (rmp == NULL || EVEN(rmp->sts))
       goto netError;
 
@@ -368,12 +397,14 @@ void cmvolc_GetNonExistingClass(pwr_tStatus* sts, gdb_sObject* op, pwr_tCid cid)
   /* Check if someone else has loaded the class while gdb was unlocked */
 
   cp = hash_Search(NULL, gdbroot->cid_ht, &cid);
-  if (cp == NULL) {
+  if (cp == NULL)
+  {
     cvid = cid >> 16;
 
     /* Create the volume if it doesn't exist */
     vp = hash_Search(NULL, gdbroot->vid_ht, &cvid);
-    if (vp == NULL) {
+    if (vp == NULL)
+    {
       vp = createVolume(sts, msgs[0]->vname, cvid);
       if (vp == NULL)
         goto cleanup;
@@ -393,8 +424,7 @@ void cmvolc_GetNonExistingClass(pwr_tStatus* sts, gdb_sObject* op, pwr_tCid cid)
     classdef.PopEditor = gcp->cb.PopEditor;
 
     gcp_time = net_NetTimeToTime(&gcp->time);
-    cop = createObject(sts, vp, &gcp->co, &gcp_time, gcp->dbsFlags, &classdef,
-        sizeof(classdef), poid);
+    cop = createObject(sts, vp, &gcp->co, &gcp_time, gcp->dbsFlags, &classdef, sizeof(classdef), poid);
     if (cop == NULL)
       goto cleanup;
 
@@ -405,12 +435,12 @@ void cmvolc_GetNonExistingClass(pwr_tStatus* sts, gdb_sObject* op, pwr_tCid cid)
     objbodydef.NextAix = gcp->bb.NextAix;
     objbodydef.Flags = gcp->bb.Flags;
 
-    bop = createObject(&lsts, vp, &gcp->bo, &gcp_time, 0, &objbodydef,
-        sizeof(objbodydef), cop->g.oid);
+    bop = createObject(&lsts, vp, &gcp->bo, &gcp_time, 0, &objbodydef, sizeof(objbodydef), cop->g.oid);
     if (bop == NULL)
       errh_Bugcheck(lsts, "cmvolc_GetNonExistingClass, load sys body failed");
 
-    for (i = j = 0, gap = msgs[0]->attr; i < gcp->acount; i++, gap++) {
+    for (i = j = 0, gap = msgs[0]->attr; i < gcp->acount; i++, gap++)
+    {
       strcpy(attrdef.Info.PgmName, gap->ab.Info.PgmName);
       attrdef.Info.Type = gap->ab.Info.Type;
       attrdef.Info.Offset = gap->ab.Info.Offset;
@@ -420,13 +450,12 @@ void cmvolc_GetNonExistingClass(pwr_tStatus* sts, gdb_sObject* op, pwr_tCid cid)
       attrdef.Info.ParamIndex = gap->ab.Info.ParamIndex;
       attrdef.TypeRef = gap->ab.TypeRef;
 
-      aop = createObject(&lsts, vp, &gap->ao, &gcp_time, 0, &attrdef,
-          sizeof(gap->ab), bop->g.oid);
+      aop = createObject(&lsts, vp, &gap->ao, &gcp_time, 0, &attrdef, sizeof(gap->ab), bop->g.oid);
       if (aop == NULL)
-        errh_Bugcheck(
-            lsts, "cmvolc_GetNonExistingClass, load attribute failed");
+        errh_Bugcheck(lsts, "cmvolc_GetNonExistingClass, load attribute failed");
 
-      if (i + 1 == msgs[j]->naidx) {
+      if (i + 1 == msgs[j]->naidx)
+      {
         j++;
         pwr_Assert(j < msgcnt);
         gap = msgs[j]->attr;
@@ -436,15 +465,13 @@ void cmvolc_GetNonExistingClass(pwr_tStatus* sts, gdb_sObject* op, pwr_tCid cid)
 
     cp = hash_Search(NULL, gdbroot->cid_ht, &cid);
     if (cp == NULL)
-      errh_Bugcheck(
-          GDH__WEIRD, "cmvolc_GetNonExistingClass, can't find created class");
+      errh_Bugcheck(GDH__WEIRD, "cmvolc_GetNonExistingClass, can't find created class");
 
     cp = mvol_LinkClass(sts, cp, gdb_mAdd__);
     if (cp == NULL)
-      errh_Bugcheck(
-          GDH__WEIRD, "cmvolc_GetNonExistingClass, couldn't link class");
-
-  } else if (sts != NULL)
+      errh_Bugcheck(GDH__WEIRD, "cmvolc_GetNonExistingClass, couldn't link class");
+  }
+  else if (sts != NULL)
     *sts = GDH__SUCCESS;
 
 cleanup:
@@ -456,7 +483,8 @@ cleanup:
 netError:
   for (i = 0; i < msgcnt; i++)
     net_Free(NULL, msgs[i]);
-  if (rmp != NULL) {
+  if (rmp != NULL)
+  {
     if (sts != NULL)
       *sts = rmp->sts;
     net_Free(NULL, rmp);
@@ -474,7 +502,8 @@ void cmvolc_LockClass(pwr_tStatus* sts, gdb_sCclass* ccp)
   if (sts != NULL)
     *sts = GDH__SUCCESS;
 
-  if (ccp->flags.b.cacheLock) {
+  if (ccp->flags.b.cacheLock)
+  {
     ccp->lockCnt++;
     return;
   }
@@ -499,8 +528,7 @@ void cmvolc_TouchClass(gdb_sCclass* ccp)
     return;
 
   pool_Qremove(NULL, gdbroot->pool, &ccp->cache_ll);
-  pool_QinsertSucc(
-      NULL, gdbroot->pool, &ccp->cache_ll, &gdbroot->db->cacheCclass.lh);
+  pool_QinsertSucc(NULL, gdbroot->pool, &ccp->cache_ll, &gdbroot->db->cacheCclass.lh);
 }
 
 void cmvolc_UnlockClass(pwr_tStatus* sts, gdb_sCclass* ccp)
@@ -514,7 +542,8 @@ void cmvolc_UnlockClass(pwr_tStatus* sts, gdb_sCclass* ccp)
   if (sts != NULL)
     *sts = GDH__SUCCESS;
 
-  if (--ccp->lockCnt == 0) {
+  if (--ccp->lockCnt == 0)
+  {
     pwr_Assert(pool_QisEmpty(sts, gdbroot->pool, &ccp->subc_lh));
 
     ccp->flags.b.cacheLock = 0;
@@ -522,9 +551,9 @@ void cmvolc_UnlockClass(pwr_tStatus* sts, gdb_sCclass* ccp)
   }
 }
 
-static gdb_sObject* createObject(pwr_tStatus* status, gdb_sVolume* vp,
-    const net_sGobject* nop, const pwr_tTime* time, pwr_tBitMask dbsFlags,
-    const void* bodyData, int bodySize, pwr_tObjid poid)
+static gdb_sObject* createObject(pwr_tStatus* status, gdb_sVolume* vp, const net_sGobject* nop,
+                                 const pwr_tTime* time, pwr_tBitMask dbsFlags, const void* bodyData,
+                                 int bodySize, pwr_tObjid poid)
 {
   gdb_sObject* op;
   net_mGo flags;
@@ -537,8 +566,7 @@ static gdb_sObject* createObject(pwr_tStatus* status, gdb_sVolume* vp,
 
   flags.m = 0;
 
-  op = gdb_AddObject(sts, nop->f.name.orig, nop->oid, nop->cid, nop->size, poid,
-      flags.m, soid);
+  op = gdb_AddObject(sts, nop->f.name.orig, nop->oid, nop->cid, nop->size, poid, flags.m, soid);
   if (op == NULL)
     return NULL;
   if (vol_LinkObject(sts, vp, op, vol_mLink_load) == NULL)
@@ -551,8 +579,7 @@ static gdb_sObject* createObject(pwr_tStatus* status, gdb_sVolume* vp,
   if (body == NULL && bodySize > 0)
     return NULL;
 
-  if (bodySize != 0
-      && op->g.size < bodySize - 4) // Allow missing alignment for 4.6
+  if (bodySize != 0 && op->g.size < bodySize - 4) // Allow missing alignment for 4.6
     return NULL;
 
   if (bodySize > 0)
@@ -565,8 +592,7 @@ static gdb_sObject* createObject(pwr_tStatus* status, gdb_sVolume* vp,
   return op;
 }
 
-static gdb_sVolume* createVolume(
-    pwr_tStatus* sts, const char* vname, pwr_tVolumeId cvid)
+static gdb_sVolume* createVolume(pwr_tStatus* sts, const char* vname, pwr_tVolumeId cvid)
 {
   gdb_sVolume* vp;
   gdb_sObject* op;
@@ -581,8 +607,8 @@ static gdb_sVolume* createVolume(
     return NULL;
 
   time_GetTime(&time);
-  vp = gdb_LoadVolume(&lsts, cvid, vname, pwr_eClass_ClassVolume,
-      gdbroot->my_node->nid, time, gdb_mLoad_build, &gdbroot->my_node->fm);
+  vp = gdb_LoadVolume(&lsts, cvid, vname, pwr_eClass_ClassVolume, gdbroot->my_node->nid, time,
+                      gdb_mLoad_build, &gdbroot->my_node->fm);
 
   if (vp == NULL)
     errh_Bugcheck(lsts, "createVolume, gdb_LoadVolume failed");
@@ -647,8 +673,8 @@ static void deleteCclass(gdb_sCclass* ccp)
  */
 
 static gdb_sCclass* linkCclass(pwr_tStatus* sts, /**< Status */
-    gdb_sCclass* ccp /**< The cached class that shall be linked */
-    )
+                               gdb_sCclass* ccp  /**< The cached class that shall be linked */
+)
 {
   gdb_sCclass* ccp2;
   gdb_sTouchQ* tqp = &gdbroot->db->cacheCclass;
@@ -656,8 +682,10 @@ static gdb_sCclass* linkCclass(pwr_tStatus* sts, /**< Status */
   gdb_AssumeLocked;
 
   ccp2 = hash_Insert(sts, gdbroot->cclass_ht, ccp);
-  if (ccp2 == NULL) {
-    if (*sts == HASH__DUPLICATE) {
+  if (ccp2 == NULL)
+  {
+    if (*sts == HASH__DUPLICATE)
+    {
       /* It's OK, someone else has inserted the class while gdb was unlocked */
       ccp2 = hash_Search(sts, gdbroot->cclass_ht, &ccp->key);
       if (ccp2 == NULL)
@@ -667,7 +695,8 @@ static gdb_sCclass* linkCclass(pwr_tStatus* sts, /**< Status */
       cmvolc_TouchClass(ccp2);
       *sts = GDH__SUCCESS;
       return ccp2;
-    } else
+    }
+    else
       errh_Bugcheck(GDH__WEIRD, "inserting cached class");
   }
 
@@ -682,7 +711,7 @@ static gdb_sCclass* linkCclass(pwr_tStatus* sts, /**< Status */
   if (tqp->lc > tqp->lc_max)
     trimQ(tqp);
 
-  errh_Info("Class cached, %d %d", ccp->key.cid, (int)ccp->key.ccvoltime.tv_sec);
+  errh_Info("Class cached, %u %d", ccp->key.cid, (int)ccp->key.ccvoltime.tv_sec);
 
   return ccp;
 }
@@ -694,7 +723,8 @@ static void trimQ(gdb_sTouchQ* tqp)
   pool_sQlink* ccl;
 
   for (ccl = pool_Qpred(NULL, gdbroot->pool, &tqp->lh); tqp->lc > tqp->lc_max;
-       ccl = pool_Qpred(NULL, gdbroot->pool, &ccp->cache_ll)) {
+       ccl = pool_Qpred(NULL, gdbroot->pool, &ccp->cache_ll))
+  {
     if (ccl == &tqp->lh)
       break;
 
@@ -705,14 +735,17 @@ static void trimQ(gdb_sTouchQ* tqp)
     if (ccp->flags.b.cacheLock)
       continue;
 
-    if (tqp->lc > tqp->lc_max + 1) {
+    if (tqp->lc > tqp->lc_max + 1)
+    {
       ccp2 = ccp;
       ccl = pool_Qsucc(NULL, gdbroot->pool, &ccp->cache_ll);
       ccp = pool_Qitem(ccl, gdb_sCclass, cache_ll);
       if (ccp == NULL)
         errh_Bugcheck(GDH__WEIRD, "trimQ, pool_Qitem failed");
       deleteCclass(ccp2);
-    } else {
+    }
+    else
+    {
       deleteCclass(ccp);
       break;
     }

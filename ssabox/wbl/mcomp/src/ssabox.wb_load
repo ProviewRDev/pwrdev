@@ -7475,6 +7475,9 @@ Volume SsabOx $ClassVolume 0.0.250.5
         !  31  -- PID  Proportional Integral Derivative
         !              Controller. Both the P- and D-term are
         !              based on the control error.
+        !
+        !  If WindupMask is selected to I or BI, then PidAlg I+P 
+        !  and I+PD will be treated as PI and PI+D, respectively.
         !*/
         Object PidAlg $Intern 18 12-JAN-2006 07:30:19.53
           Body SysBody 31-MAR-2009 14:29:29.84

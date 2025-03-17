@@ -54,6 +54,7 @@
 #include <regex>
 #include <iomanip>
 #include <stdexcept>
+#include <algorithm>
 
 #include "co_cdh.h"
 #include "co_dcli.h"
@@ -218,7 +219,7 @@ void create_parameter_value_class(GsdmlAttrNav* attrnav, const char* name, std::
   {
     // For this type we create as many uint8 input fields as required.
     uint8_t* byte_data = (uint8_t*)data;
-    for (int byte = 0; byte < ref->_Length; byte++)
+    for (std::size_t byte = 0; byte < ref->_Length; byte++)
     {
       std::ostringstream byte_name(name, std::ios_base::ate);
 
@@ -768,7 +769,7 @@ void GsdmlAttrNav::device_change_reset_ok(void* ctx, void* data)
 {
   GsdmlAttrNav* attrnav = (GsdmlAttrNav*)ctx;
 
-  attrnav->pn_runtime_data->m_PnDevice->m_slot_list.clear();
+  attrnav->pn_runtime_data->m_PnDevice->m_slot_map.clear();
   device_changed_ok(ctx, (void*)0);
 }
 
@@ -794,6 +795,26 @@ void GsdmlAttrNav::device_changed_ok(void* ctx, void* data)
   attrnav->set_modified(true);
 }
 
+void resize_slot_map(std::map<uint, ProfinetSlot>& slot_map, size_t new_size, uint start_slot_index)
+{
+  if (new_size < slot_map.size())
+  {
+    // Remove elements from the end
+    auto it = slot_map.begin();
+    std::advance(it, new_size);
+    slot_map.erase(it, slot_map.end());
+  }
+  else if (new_size > slot_map.size())
+  {
+    // Add default elements
+    uint key = slot_map.empty() ? start_slot_index : slot_map.rbegin()->first + 1;
+    while (slot_map.size() < new_size)
+    {
+      slot_map[key++] = ProfinetSlot();
+    }
+  }
+}
+
 /*
   Update the device data upon a change of DAP
 */
@@ -810,24 +831,27 @@ void GsdmlAttrNav::device_update_change(void* ctx)
 
   // The number of physical slots are not always the same in each DAP so we need
   // to adjust the slot count. If the new size is smaller the slots will be
-  // removed from the end. If it's bigger they will be default constructed. The
-  // PhysicalSlots starts at zero, hence the max() + 1.
-  attrnav->pn_runtime_data->m_PnDevice->m_slot_list.resize(
-      attrnav->m_selected_device_item->_PhysicalSlots.max() + 1);
+  // removed from the end. If it's bigger they will be default constructed.
 
-  for (auto& slot : attrnav->pn_runtime_data->m_PnDevice->m_slot_list)
+  slot_index = attrnav->m_selected_device_item->_PhysicalSlots.min();
+  resize_slot_map(attrnav->pn_runtime_data->m_PnDevice->m_slot_map,
+                  attrnav->m_selected_device_item->_PhysicalSlots.size(), slot_index);
+
+  for (auto& slot : attrnav->pn_runtime_data->m_PnDevice->m_slot_map)
   {
     // Since we might come from a resize (they might be default constructed with
     // slot number of 0) of the slot list we give them all their respective slot
     // number again :)
-    slot.m_slot_number = slot_index++;
+    slot.second.m_slot_number = slot_index++;
+    // slot.m_slot_number = slot_index++;
 
     // The DAP
-    if (slot.m_is_dap)
+    if (slot.second.m_is_dap)
     {
-      slot.m_subslot_map.clear();
-      slot.m_module_ident_number = attrnav->m_selected_device_item->_ModuleIdentNumber;
-      slot.m_module_ID = new_dap_id;
+      slot.second.m_is_modified = true;
+      slot.second.m_subslot_map.clear();
+      slot.second.m_module_ident_number = attrnav->m_selected_device_item->_ModuleIdentNumber;
+      slot.second.m_module_ID = new_dap_id;
       continue;
     }
   }
@@ -847,19 +871,24 @@ pwr_tBoolean GsdmlAttrNav::device_check_change_ok(void* ctx)
   // Get a reference to the new selected device
   auto const new_dap = attrnav->gsdml->getDeviceAccessPointMap()[new_dap_id];
 
+  // If the starting index of our slots are not the same we have incompatibilities
+  if (new_dap->_PhysicalSlots.min() != attrnav->m_selected_device_item->_PhysicalSlots.min())
+    return false;
+
   // So we are to check if the modules already selected are valid on this new
   // DAP We will check if the module ID is allowed to be in the respective slot.
   // Start looping through all slots of the previously selected DAP (since these
   // slots aren't updated yet)
-  for (auto const& slot : attrnav->pn_runtime_data->m_PnDevice->m_slot_list)
+  for (auto const& slot : attrnav->pn_runtime_data->m_PnDevice->m_slot_map)
   {
+
     // Skip the DAP itself and any "unconfigured" slots i.e. module ident number
     // is 0
-    if (slot.m_is_dap || slot.m_module_ident_number == 0)
+    if (slot.second.m_is_dap || slot.second.m_module_ident_number == 0)
       continue;
 
     // If we have no ID the slot is unused...
-    if (slot.m_module_ID == "")
+    if (slot.second.m_module_ID == "")
       continue;
 
     // Check if the module is allowed. This also makes sure that we notify of
@@ -867,8 +896,8 @@ pwr_tBoolean GsdmlAttrNav::device_check_change_ok(void* ctx)
     // available in the new DAP
     try
     {
-      auto module_item_ref = new_dap->_UseableModules.at(slot.m_module_ID);
-      if (!module_item_ref->_AllowedInSlots.inList(slot.m_slot_number))
+      auto module_item_ref = new_dap->_UseableModules.at(slot.second.m_module_ID);
+      if (!module_item_ref->_AllowedInSlots.inList(slot.second.m_slot_number))
         return false;
     }
     catch (std::out_of_range& oor)
@@ -1060,7 +1089,7 @@ int GsdmlAttrNav::object_attr()
         "just to be sure.");
 
     m_wow->DisplayText("New GSDML file detected", msg.c_str());
-    pn_runtime_data->m_gsdml_mismatch = false; // Reset this since we've made the use aware :)
+    pn_runtime_data->m_gsdml_mismatch = false; // Reset this since we've made the user aware :)
   }
 
   brow_SetNodraw(brow->ctx);
@@ -1081,46 +1110,46 @@ int GsdmlAttrNav::object_attr()
   {
     bool dap_inserted = false;
     // Loop through all physical slots
-    for (auto& slot : pn_runtime_data->m_PnDevice->m_slot_list)
+    for (auto& slot : pn_runtime_data->m_PnDevice->m_slot_map)
     {
       // Create a super awesome name for the slot.
       std::ostringstream slot_string("Slot ", std::ios_base::ate);
-      slot_string << slot.m_slot_number;
+      slot_string << slot.second.m_slot_number;
 
       // Check where to put the DAP. Default is slot 0. But if the DAP does say otherwise we follow that...
-      if (slot.m_slot_number == DAP_DEFAULT_SLOT &&
+      if (slot.second.m_slot_number == DAP_DEFAULT_SLOT &&
           (m_selected_device_item->_FixedInSlots.empty() ||
            m_selected_device_item->_FixedInSlots.inList(DAP_DEFAULT_SLOT)))
       {
         // Default placement
-        slot.m_is_dap = true;
+        slot.second.m_is_dap = true;
       }
-      else if (m_selected_device_item->_FixedInSlots.inList(slot.m_slot_number))
+      else if (m_selected_device_item->_FixedInSlots.inList(slot.second.m_slot_number))
       {
         // Fixed position
         // NOTE (TODO) When support for redundancy is added the DAP may appear in more than one slot. But we
         // have no such support :/ But we need to be sure to only add the DAP once. The redundancy DAP is
         // placed in a slot "higher" than the main one.
-        slot.m_is_dap = true;
+        slot.second.m_is_dap = true;
       }
 
-      if (slot.m_is_dap && !dap_inserted)
+      if (slot.second.m_is_dap && !dap_inserted)
       {
         dap_inserted = true;
         slot_string << " (DAP)";
-        new ItemPnDAP(this, slot_string.str().c_str(), &slot, NULL, flow_eDest_IntoLast,
+        new ItemPnDAP(this, slot_string.str().c_str(), &slot.second, NULL, flow_eDest_IntoLast,
                       "Configure the DAP here. Some DAPs may let you select "
                       "what submodules goes where. Be sure to select according "
                       "to your hardware specification.");
         continue;
       }
-      else if (slot.m_is_dap && dap_inserted)
+      else if (slot.second.m_is_dap && dap_inserted)
       {
         std::cerr << "Redundancy DAP not supported" << std::endl;
       }
 
-      slot.m_is_dap = false;
-      new ItemPnSlot(this, slot_string.str().c_str(), &slot, NULL, flow_eDest_IntoLast,
+      slot.second.m_is_dap = false;
+      new ItemPnSlot(this, slot_string.str().c_str(), &slot.second, NULL, flow_eDest_IntoLast,
                      "Select a module for this slot. Remember that some modules can only "
                      "go in specific slots. It all depends on the hardware device and how "
                      "the manufacturer have planned the device.");
@@ -1172,7 +1201,6 @@ int GsdmlAttrNav::init_brow_cb(FlowCtx* fctx, void* client_data)
 {
   GsdmlAttrNav* attrnav = (GsdmlAttrNav*)client_data;
   BrowCtx* ctx = (BrowCtx*)fctx;
-  int sts;
 
   attrnav->brow = new GsdmlAttrNavBrow(ctx, (void*)attrnav);
 
@@ -1182,7 +1210,7 @@ int GsdmlAttrNav::init_brow_cb(FlowCtx* fctx, void* client_data)
   // Create the root item
   attrnav->object_attr();
 
-  sts = brow_TraceInit(ctx, trace_connect_bc, trace_disconnect_bc, trace_scan_bc);
+  brow_TraceInit(ctx, trace_connect_bc, trace_disconnect_bc, trace_scan_bc); // TODO Check return value?
   attrnav->trace_started = 1;
 
   trace_scan(attrnav);
@@ -1257,9 +1285,9 @@ int GsdmlAttrNav::save()
   // Find all APIs involved and populate a map with indexes to each
   pn_runtime_data->m_PnDevice->m_API_map.clear();
   int api_index = 0;
-  for (auto const& slot : pn_runtime_data->m_PnDevice->m_slot_list)
+  for (auto const& slot : pn_runtime_data->m_PnDevice->m_slot_map)
   {
-    for (auto const& subslot : slot.m_subslot_map)
+    for (auto const& subslot : slot.second.m_subslot_map)
     {
       // Add new API
       if (!pn_runtime_data->m_PnDevice->m_API_map.count(subslot.second.m_api))
@@ -1271,12 +1299,12 @@ int GsdmlAttrNav::save()
 
       // Add the module to the api index
       auto& api_ref_index = pn_runtime_data->m_PnDevice->m_API_map.at(subslot.second.m_api).m_module_ref;
-      auto slot_linked = std::find(api_ref_index.begin(), api_ref_index.end(), slot.m_slot_number);
+      auto slot_linked = std::find(api_ref_index.begin(), api_ref_index.end(), slot.second.m_slot_number);
       if (slot_linked == api_ref_index.end() && subslot.second.m_submodule_ID != "")
       {
         // std::cout << "Adding reference to module " << slot.m_slot_number
         //           << " for API: " << subslot.second.m_api << std::endl;
-        api_ref_index.push_back(slot.m_slot_number);
+        api_ref_index.push_back(slot.second.m_slot_number);
       }
     }
   }
@@ -1292,6 +1320,38 @@ int GsdmlAttrNav::save()
   // Make sure we copy INPUT_CR to OUTPUT_CR
   pn_runtime_data->m_PnDevice->m_IOCR_map[PROFINET_IO_CR_TYPE_OUTPUT] =
       pn_runtime_data->m_PnDevice->m_IOCR_map.at(PROFINET_IO_CR_TYPE_INPUT);
+
+  // Lastly do some sanity checks and controls for the DAP
+  // During some upgrades of pwr_pn xml files there has been reports of spurious submodules for the DAP
+  // popping up that are not listed. Why this happens is unclear but most probably due to how things were
+  // mapped prior to the changes in the configurator and the gsdml files used might have different ordering of
+  // the DAPs since the configurator looked up DAPs using their "index" in the gsdml file and not the ID. We
+  // remove these. The configuration will still work with these empty submodules since they are ignored with
+  // the current implementation anyways.
+  for (auto& slot : pn_runtime_data->m_PnDevice->m_slot_map)
+  {
+    if (slot.second.m_is_dap)
+    {
+      for (auto it = slot.second.m_subslot_map.begin(); it != slot.second.m_subslot_map.end();)
+      {
+        auto gsdml_it = std::find_if(m_selected_device_item->_SubslotList.begin(),
+                                     m_selected_device_item->_SubslotList.end(),
+                                     [&it](auto const& subslot)
+                                     {
+                                       return it->second.m_subslot_number == 1 ||
+                                              subslot._SubslotNumber == it->second.m_subslot_number;
+                                     });
+        if (gsdml_it == m_selected_device_item->_SubslotList.end())
+        {
+          it = slot.second.m_subslot_map.erase(it); // Remove the element and get the next iterator
+        }
+        else
+        {
+          ++it; // Move to the next element
+        }
+      }
+    }
+  }
 
   if (!pn_runtime_data->save())
     m_wow->DisplayError("Error saving", "An error occured while saving the runtime configuration file.");
@@ -1737,23 +1797,42 @@ int ItemPnSlot::open_children_impl()
     new ItemPnModuleInfo(m_attrnav, "ModuleInfo", &module->_ModuleInfo, m_node, flow_eDest_IntoLast,
                          "Module information.");
 
-    // First we create the virtual submodules if any (usually at least one...)
-    // The virtual submodules start at subslot 1. And ISO 15745-4 says that
-    // there must not be more than 1 virtual submodule item. But standards
-    // change so we might as well loop through it since the name does imply a
-    // list :) Who knows...
-    size_t subslot_number = 1;
-    for (auto const& virtual_submodule_item : module->_VirtualSubmoduleList)
+    // Extract the items into a vector of pairs (key, value)
+    std::vector<std::pair<std::string, std::shared_ptr<GSDML::SubmoduleItem>>> virtual_submodule_items(
+        module->_VirtualSubmoduleList.begin(), module->_VirtualSubmoduleList.end());
+
+    // Sort the vector based on the the minimum starting subslot in which this virtual submodule item is fixed
+    std::sort(virtual_submodule_items.begin(), virtual_submodule_items.end(), [](const auto& a, const auto& b)
+              { return a.second->_FixedInSubslots.min() < b.second->_FixedInSubslots.min(); });
+
+    // Iterate over the sorted vector and add the virtual submodule items to all "fixed" subslots
+    for (auto const& virtual_submodule_item : virtual_submodule_items)
     {
       std::ostringstream subslot_name("Subslot ", std::ios_base::ate);
-      subslot_name << subslot_number << " (" << *virtual_submodule_item.second->_ModuleInfo._Name << ")";
-
-      new ItemPnSubslot(m_attrnav, subslot_name.str().c_str(), m_slot_data,
-                        &m_slot_data->m_subslot_map[subslot_number], module, subslot_number,
-                        virtual_submodule_item.second, m_node, flow_eDest_IntoLast,
-                        "Virtual submodule of this module/DAP.");
-
-      subslot_number++;
+      // FixedInSubslots are mandatory if more than one virtual submodule item is present.
+      // Specs does not however state that it aint allowed to be present even if there's only one virtual
+      // submodule item. If we have an empty list the default according to spec is 1
+      if (!virtual_submodule_item.second->_FixedInSubslots.empty())
+      {
+        for (auto const& fixed_subslot_index : virtual_submodule_item.second->_FixedInSubslots.getList())
+        {
+          subslot_name << fixed_subslot_index.second << " ("
+                       << *virtual_submodule_item.second->_ModuleInfo._Name << ")";
+          new ItemPnSubslot(m_attrnav, subslot_name.str().c_str(), m_slot_data,
+                            &m_slot_data->m_subslot_map[fixed_subslot_index.second], module,
+                            fixed_subslot_index.second, virtual_submodule_item.second, m_node,
+                            flow_eDest_IntoLast, "Virtual submodule of this module/DAP.");
+        }
+      }
+      else
+      {
+        // If FixedInSubslots is empty it's implied byt eh spec that there's only one Virtual Submodule Item
+        // present and it should then be in the default subslot 1
+        subslot_name << "1 (" << *virtual_submodule_item.second->_ModuleInfo._Name << ")";
+        new ItemPnSubslot(m_attrnav, subslot_name.str().c_str(), m_slot_data, &m_slot_data->m_subslot_map[1],
+                          module, 1, virtual_submodule_item.second, m_node, flow_eDest_IntoLast,
+                          "Virtual submodule of this module/DAP.");
+      }
     }
 
     // If we have physical subslots add those extra subslots. This is schema

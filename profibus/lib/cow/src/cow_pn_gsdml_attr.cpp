@@ -88,10 +88,8 @@ void GsdmlAttr::activate_ordermoduletype(attr_eOrderModuleType type) { attrnav->
 
 void GsdmlAttr::activate_help()
 {
-  int sts;
-
   if (help_cb)
-    sts = (help_cb)(parent_ctx, "pn_device_editor /helpfile=\"$pwr_exe/profibus_xtthelp.dat\"");
+    (help_cb)(parent_ctx, "pn_device_editor /helpfile=\"$pwr_exe/profibus_xtthelp.dat\"");
 }
 
 void GsdmlAttr::activate_copy()
@@ -138,7 +136,7 @@ void GsdmlAttr::activate_paste()
   {
     // Copy assignment constructor of ProfinetSlot will invoke ProfinetSubslot copy constructor to deep copy
     // the data
-    attrnav->pn_runtime_data->m_PnDevice->m_slot_list[item->m_slot_data->m_slot_number] =
+    attrnav->pn_runtime_data->m_PnDevice->m_slot_map[item->m_slot_data->m_slot_number] =
         *ProfinetRuntimeData::m_paste_slotdata;
   }
   else
@@ -184,13 +182,12 @@ void GsdmlAttr::activate_print()
 {
   char filename[80] = "pwrp_tmp:wnav.ps";
   char cmd[200];
-  int sts;
 
   dcli_translate_filename(filename, filename);
   attrnav->print(filename);
 
   sprintf(cmd, "wb_gre_print.sh %s", filename);
-  sts = system(cmd);
+  system(cmd);
 }
 
 void GsdmlAttr::activate_cmd_ok()

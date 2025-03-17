@@ -1815,8 +1815,8 @@ Ingenjörsenhet för SigValue , t.ex. Volt.
 Konfigurerar analog utgångskanal oberoende av det fysiska Ao-kortets typ. 
 
 Figuren nedan visar stegen i omvandlingen av en Ao-signal. ActualValue,
-SigValue och RawValue tillhär Ao objektet.
-@image orm_en1-33.gif
+SigValue och RawValue tillhör Ao objektet.
+@image orm_en1-33.png
 
 Om EmergBreakTrue = TRUE och EmergBreakSelect = 2 kommer utsignalen 
 att baseras på FixedOutValue . Annars avgör TestOn vilket attribut utsignalen 
@@ -2418,7 +2418,7 @@ Jämför analog storhet mot övre gräns (COMPare High).
 
 Både insignalen och gränsen kan antingen vara konstanter, definierade med 
 hjälp av Objekts Editorn, eller vanliga analoga signaler. 
-@image orm_en1-37.gif
+@image orm_en1-37.png
 
 Utsignalen är TRUE när insignalen är större än gränsvärdet, dvs Lim . 
 Hysteresen beaktas då utsignalen åter ska bli FALSE. Utsignalen blir FALSE 
@@ -2484,7 +2484,7 @@ Jämför analog storhet mot undre gräns (COMPare Low).
 
 Både insignalen och gränsen kan antingen vara konstanter, definierade med 
 hjälp av Objekts Editorn, eller vanliga analoga signaler. 
-@image orm_en1-39.gif
+@image orm_en1-39.png
 
 Utsignalen är TRUE när insignalen är mindre än gränsvärdet, dvs Lim . 
 Hysteresen beaktas då utsignalen åter ska bli FALSE. Utsignalen blir FALSE 
@@ -10480,7 +10480,7 @@ a Pump).
   1 gång / 10 min eller direkt av operatör. 
 - Börja med styrsignalen 0 vid pumpstart. 
  
-@image orm_en1-151.gif
+@image orm_en1-151.png
 Speed Control of a Pump 
 
 En principlösning för styrning av den varvtalsreglerade pumpen visas i figuren
@@ -10532,7 +10532,7 @@ bestämer aktuellt driftfall.
 
 @h2 Alternativa regulatorer med följning 
  
-@image orm_en1-155.gif
+@image orm_en1-155.png
 Shunt Control 
 
 Genom shuntreglering över värmeväxlaren, skall TT1-temperaturen hållas 
@@ -10588,7 +10588,7 @@ för förbränningsluftregleringen, visas i figuren nedan. TT avser en temperatur
 transmitter, FT flödes transmittrar och FIC flödesregulatorer. TIC är en 
 temperatur regulator 
  
-@image orm_en1-157.gif
+@image orm_en1-157.png
 Block Diagram for Temperature Control 
 
 Alla Pid-objekt har Inverse satt till TRUE. Lösningen bör kompletteras med 
@@ -10613,7 +10613,7 @@ Figuren nedan (Addition of a Reagent) visar tillsats av en reagens.
 Blandningsförhållandet ska hållas konstant oberoende av FT2-flödet. FT är 
 flödestransmittern och FIC flödesregulatorn. 
 
-@image orm_en1-160.gif 
+@image orm_en1-160.png
 Addition of a Reagent 
 
 En realisering visas i figuren nedan (Ratio Control). Regleringen kan ske i 
@@ -10731,6 +10731,9 @@ Både P- och D-termen baseras på reglerfelet.
 31 -- PID PID-regulator. Regulator som ger proportionell
 integrerande och deriverande reglerverkan. Både P- och
 D-termen baseras på reglerfelet.
+
+Om WindupMask är vald till I eller BI, så kommer PidAlg I+P 
+respektive I+PD att behandlas som PI respektive PI+D.
 </attr>
 
 <attr>Gain 
@@ -14473,7 +14476,7 @@ ActVal t = ActVal t-1 +  · In t · ScanTime
 där  är integreringstiden. 
 
 Med 'z'-ingången kan integratorn nollställas. 
-@image orm_en1-235.gif
+@image orm_en1-235.png
 
 @b Exempel 
 

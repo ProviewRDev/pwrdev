@@ -64,6 +64,7 @@
 
 // Static variables
 Xtt* Xtt::hot_xtt = 0;
+volatile sig_atomic_t g_xtt_exit_process = 0;
 
 xnav_sStartMenu Xtt::alarm_menu[]
     = { { "Alarm List", xnav_eItemType_Command, menu_ePixmap_List,
@@ -150,6 +151,11 @@ xnav_sStartMenu Xtt::root_menu[] = { { "Database", xnav_eItemType_Command,
   { "System", xnav_eItemType_Menu, menu_ePixmap_Map, (void*)&Xtt::system_menu },
   { "Close", xnav_eItemType_Command, menu_ePixmap_Leaf, (void*)"exit" },
   { "", 0, 0, NULL } };
+
+void signal_handler(int signal)
+{
+  g_xtt_exit_process = 1;
+}
 
 static void usage()
 {
@@ -638,7 +644,7 @@ Xtt::Xtt(int* argc, char** argv[], int* return_sts)
   pwr_sClass_OpPlace* opp = NULL;
   static char display[80];
   static char display_opt[20] = "--display";
-
+  
   if (*argc > 1 && streq((*argv)[1], "-m")) {
     XNav::print_methods();
     exit(0);
@@ -654,11 +660,13 @@ Xtt::Xtt(int* argc, char** argv[], int* return_sts)
 
   sts = gdh_Init("rt_xtt");
   if (EVEN(sts)) {
+    printf("rt_xtt was unable to initialize a full (gdh) connection to ProviewR. Is it running?\n");
     *return_sts = sts;
     return;
   }
 
   if (!qcom_Init(&sts, 0, "rt_xtt")) {
+    printf("rt_xtt was unable to initialize a qcom connection to ProviewR. Is it running?\n");    
     *return_sts = sts;
     return;
   }
