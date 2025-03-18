@@ -1321,38 +1321,6 @@ int GsdmlAttrNav::save()
   pn_runtime_data->m_PnDevice->m_IOCR_map[PROFINET_IO_CR_TYPE_OUTPUT] =
       pn_runtime_data->m_PnDevice->m_IOCR_map.at(PROFINET_IO_CR_TYPE_INPUT);
 
-  // Lastly do some sanity checks and controls for the DAP
-  // During some upgrades of pwr_pn xml files there has been reports of spurious submodules for the DAP
-  // popping up that are not listed. Why this happens is unclear but most probably due to how things were
-  // mapped prior to the changes in the configurator and the gsdml files used might have different ordering of
-  // the DAPs since the configurator looked up DAPs using their "index" in the gsdml file and not the ID. We
-  // remove these. The configuration will still work with these empty submodules since they are ignored with
-  // the current implementation anyways.
-  for (auto& slot : pn_runtime_data->m_PnDevice->m_slot_map)
-  {
-    if (slot.second.m_is_dap)
-    {
-      for (auto it = slot.second.m_subslot_map.begin(); it != slot.second.m_subslot_map.end();)
-      {
-        auto gsdml_it = std::find_if(m_selected_device_item->_SubslotList.begin(),
-                                     m_selected_device_item->_SubslotList.end(),
-                                     [&it](auto const& subslot)
-                                     {
-                                       return it->second.m_subslot_number == 1 ||
-                                              subslot._SubslotNumber == it->second.m_subslot_number;
-                                     });
-        if (gsdml_it == m_selected_device_item->_SubslotList.end())
-        {
-          it = slot.second.m_subslot_map.erase(it); // Remove the element and get the next iterator
-        }
-        else
-        {
-          ++it; // Move to the next element
-        }
-      }
-    }
-  }
-
   if (!pn_runtime_data->save())
     m_wow->DisplayError("Error saving", "An error occured while saving the runtime configuration file.");
 
