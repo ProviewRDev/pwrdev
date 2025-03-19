@@ -103,10 +103,19 @@ int CnvWblToH::init(char* first)
       << '\n'
       << "#ifndef pwr_class_h\n"
       << "#include \"pwr_class.h\"\n"
-      << "#endif\n"
+      << "#endif\n";
+  if (ctx->hpp) {
+    fp_struct
+      << "#ifndef pwr_systemclasses_hpp\n"
+      << "#include \"pwr_systemclasses.hpp\"\n"
+      << "#endif\n";
+  } else {
+    fp_struct
       << "#ifndef pwr_systemclasses_h\n"
       << "#include \"pwr_systemclasses.h\"\n"
-      << "#endif\n"
+      << "#endif\n";
+  }
+  fp_struct
       << '\n'
       << '\n';
 
