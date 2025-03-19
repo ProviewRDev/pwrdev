@@ -495,8 +495,10 @@ else
     pwre_config_check_lib librsvg   LIBRSVG  lib librsvg 1 "/usr/lib/librsvg-2.so:/usr/lib/$hwpl-linux-$gnu/librsvg-2.so"
     pwre_config_check_include gst   GST   1 "/usr/include/gstreamer-1.0/gst/gst.h:/opt/gstreamer-sdk/include/gstreamer-1.0/gst/gst.h"
     pwre_config_check_lib gst    	  GST      gst gst 0 "/usr/lib/$hwpl-linux-$gnu/libgstreamer-1.0.so:/opt/gstreamer-sdk/lib/libgstreamer-1.0.so:/usr/lib/libgstreamer-1.0.so:/usr/lib/$hwpl-linux-$gnu/libgstreamer-1.0.so:/opt/gstreamer-sdk/lib/libgstreamer-0.10.so:/usr/lib/libgstreamer-0.10.so"
-    pwre_config_check_lib libpcurl   LIBCURL  lib libcurl 1 "/usr/lib/libcurl.so:/usr/lib/$hwpl-linux-$gnu/libcurl.so"
-    pwre_config_check_lib libpcrypto   LIBCRYPTO  lib libcrypto 1 "/usr/lib/libcrypto.so:/usr/lib/$hwpl-linux-$gnu/libcrypto.so"
+    pwre_config_check_include curl   CURL   1 "/usr/include/$hwpl-linux-$gnu/curl/curl.h"
+    pwre_config_check_lib libcurl   LIBCURL  lib libcurl 1 "/usr/lib/libcurl.so:/usr/lib/$hwpl-linux-$gnu/libcurl.so"
+    pwre_config_check_lib libcrypto   LIBCRYPTO  lib libcrypto 1 "/usr/lib/libcrypto.so:/usr/lib/$hwpl-linux-$gnu/libcrypto.so"
+    pwre_config_check_include ssl   SSL   1 "/usr/include/openssl/ssl.h"
     pwre_config_check_lib libssl   LIBSSL  lib libssl 1 "/usr/lib/libssl.so:/usr/lib/$hwpl-linux-$gnu/libssl.so"
     if [ $pwre_hw == "hw_arm" ]; then
         pwre_config_check_lib libpiface LIBPIFACE lib libpiface 1 "/usr/local/lib/libpiface-1.0.a"
@@ -529,7 +531,7 @@ else
         i=$((i+1))
     done
 
-    if [[ "$conf_cc_define" =~ "PWRE_CONF_LIBCURL=1" ]] && [[ "$conf_cc_define" =~ "PWRE_CONF_LIBCRYPTO=1" ]] && [[ "$conf_cc_define" =~ "PWRE_CONF_LIBSSL=1" ]]; then
+    if [[ "$conf_cc_define" =~ "PWRE_CONF_LIBCURL=1" ]] && [[ "$conf_cc_define" =~ "PWRE_CONF_CURL=1" ]] && [[ "$conf_cc_define" =~ "PWRE_CONF_LIBCRYPTO=1" ]] && [[ "$conf_cc_define" =~ "PWRE_CONF_LIBSSL=1" ]] && [[ "$conf_cc_define" =~ "PWRE_CONF_SSL=1" ]]; then
       conf_cc_define=$conf_cc_define" -DPWRE_CONF_ONVIF=1"
     fi
 
