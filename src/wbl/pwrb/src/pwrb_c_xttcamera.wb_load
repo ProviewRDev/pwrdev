@@ -64,9 +64,19 @@ SObject pwrb:Class
         EndBody
       EndObject
       !/**
-      ! URL to the camera image.
+      ! URL to the camera image stream without user/password, eg
+      ! 'rtsp://192.168.0.123:554/stream1'
       !*/
       Object URL $Attribute 2
+        Body SysBody
+          Attr TypeRef = "pwrs:Type-$URL"
+        EndBody
+      EndObject
+      !/**
+      ! URL to the camera control without user/password, eg
+      ! 'http://192.168.0.123:2020/onvif/device_service'
+      !*/
+      Object ControlURL $Attribute 19
         Body SysBody
           Attr TypeRef = "pwrs:Type-$URL"
         EndBody

@@ -78,11 +78,13 @@ public:
   void* overlay;
   CoWowTimer* reconnect_timerid;
   int no_uri;
+  GstElement* gtkglsink;
 
   static int gst_initialized;
 
   XttStreamGtk(GtkWidget* parent_wid, void* parent_ctx, const char* name,
-      const char* uri, int width, int height, int x, int y, double scan_time,
+      const char* uri, const char* controluri, int width, 
+      int height, int x, int y, double scan_time,
       unsigned int options, int embedded, pwr_tAttrRef* arp, pwr_tStatus* sts);
   ~XttStreamGtk();
 

@@ -410,7 +410,8 @@ public:
   {
     return 0;
   }
-  virtual XttStream* stream_new(const char* name, const char* uri, int width,
+  virtual XttStream* stream_new(const char* name, const char* uri, 
+      const char* controluri, int width,
       int height, int x, int y, double scan_time, unsigned int options,
       int embedded, pwr_tAttrRef* arp, pwr_tStatus* sts)
   {

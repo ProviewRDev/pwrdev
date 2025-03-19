@@ -235,7 +235,7 @@ dcli_tCmdTable xnav_command_table[] = {
           "/PINSTANCE", "/BYPASS", "/CLOSEBUTTON", "/TARGET", "/TRIGGER",
           "/TYPE", "/FTYPE", "/FULLSCREEN", "/MAXIMIZE", "/FULLMAXIMIZE",
           "/ICONIFY", "/HIDE", "/XPOSITION", "/YPOSITION", "/X0", "/Y0", "/X1",
-          "/Y1", "/URL", "/CONTINOUS", "/CAMERAPOSITION", "/CAMERACONTROLPANEL",
+	  "/Y1", "/URL", "/CONTROLURL", "/CONTINOUS", "/CAMERAPOSITION", "/CAMERACONTROLPANEL",
           "/VIDEOCONTROLPANEL", "/VIDEOPROGRESSBAR", "/SCANTIME", "/KEYMAP",
 	  "/RESIZEFREE", "" } },
   { "CLOSE", &xnav_close_func,
@@ -3599,6 +3599,7 @@ static int xnav_open_func(void* client_data, void* client_flag)
     int nr;
     pwr_tStatus sts;
     pwr_tURL url_str;
+    pwr_tURL controlurl_str;
     pwr_tAName object_str;
     pwr_tAName camerapos_str;
     int camerapos_found = 0;
@@ -3659,6 +3660,7 @@ static int xnav_open_func(void* client_data, void* client_flag)
 
       strncpy(name_str, xttcamera.Title, sizeof(name_str));
       strncpy(url_str, xttcamera.URL, sizeof(url_str));
+      strncpy(controlurl_str, xttcamera.ControlURL, sizeof(controlurl_str));
       width = xttcamera.Width;
       height = xttcamera.Height;
       x = xttcamera.X;
@@ -3692,7 +3694,8 @@ static int xnav_open_func(void* client_data, void* client_flag)
         strmctx->pop();
       } else {
         strmctx = xnav->stream_new(
-            name_str, url_str, width, height, x, y, 0, options, 0, &aref, &sts);
+	    name_str, url_str, controlurl_str, width, height, x, y, 0, 
+	    options, 0, &aref, &sts);
         if (EVEN(sts)) {
           xnav->message(' ', XNav::get_message(sts));
           return sts;
@@ -3713,6 +3716,8 @@ static int xnav_open_func(void* client_data, void* client_flag)
         xnav->message('E', "Url is missing");
         return XNAV__SUCCESS;
       }
+      if (EVEN(dcli_get_qualifier("/CONTROLURL", controlurl_str, sizeof(controlurl_str))))
+	strcpy(controlurl_str, "");
 
       if (ODD(dcli_get_qualifier("/FULLSCREEN", 0, 0)))
         options |= strm_mOptions_FullScreen;
@@ -3783,8 +3788,8 @@ static int xnav_open_func(void* client_data, void* client_flag)
               applist_eType_Stream, name_str, url_str, (void**)&strmctx)) {
         strmctx->pop();
       } else {
-        strmctx = xnav->stream_new(name_str, url_str, width, height, x, y,
-            scantime, options, 0, 0, &sts);
+        strmctx = xnav->stream_new(name_str, url_str, controlurl_str, 
+            width, height, x, y, scantime, options, 0, 0, &sts);
         if (EVEN(sts)) {
           xnav->message(' ', XNav::get_message(sts));
           return sts;

@@ -74,6 +74,7 @@ static GstBusSyncReply bus_sync_handler(
  * and pass it to GStreamer through the XOverlay interface. */
 void XttStreamGtk::realize_cb(GtkWidget* widget, void* data)
 {
+#if 0
   XttStreamGtk* strm = (XttStreamGtk*)data;
   guintptr window_handle;
 
@@ -85,12 +86,15 @@ void XttStreamGtk::realize_cb(GtkWidget* widget, void* data)
   // if (!gdk_window_ensure_native (window))
   //   g_error ("Couldn't create native window needed for GstXOverlay!");
 
-  window_handle = GDK_WINDOW_XID(window);
+  //window_handle = GDK_WINDOW_XID(window);
+  window_handle = gdk_x11_window_get_xid(window);
+
 #if GST_CHECK_VERSION(1, 0, 0)
   gst_video_overlay_set_window_handle(
       GST_VIDEO_OVERLAY(videosink), window_handle);
 #else
   gst_x_overlay_set_xwindow_id(GST_X_OVERLAY(videosink), window_handle);
+#endif
 #endif
 }
 
@@ -107,6 +111,7 @@ void XttStreamGtk::source_setup_cb(
   g_object_set(source, "timeout", tmo, NULL);
 
   // If the connections has been down, overlay has to be set again
+#if 0
   GstElement* videosink;
   guintptr window_handle;
   g_object_get(strm->playbin2, "video-sink", &videosink, NULL);
@@ -121,6 +126,7 @@ void XttStreamGtk::source_setup_cb(
     gst_x_overlay_set_xwindow_id(GST_X_OVERLAY(videosink), window_handle);
 #endif
   }
+ #endif
 }
 
 /* This function is called when the PLAY button is clicked */
@@ -290,25 +296,8 @@ void XttStreamGtk::reconnect(void* data)
     printf("Reconnect no URI\n");
     strm->no_uri = 0;
     char luri[250];
-    char* s;
-    if (strm->options & strm_mOptions_HttpBasicAuthentication) {
-      if (!streq(strm->user, "") && !streq(strm->password, "")
-          && (s = strstr(strm->uri, "://"))) {
-        unsigned long int offs = s - (char*)strm->uri + 3;
-        strncpy(luri, strm->uri, offs);
-        luri[offs] = 0;
-        strcat(luri, strm->user);
-        strcat(luri, ":");
-        strcat(luri, strm->password);
-        strcat(luri, "@");
-        strcat(luri, &strm->uri[offs]);
-      } else
-        strcpy(luri, strm->uri);
-    } else if (strm->options & strm_mOptions_CgiParameterAuthentication)
-      snprintf(luri, sizeof(luri), "%s?user=%s&pwd=%s", strm->uri, strm->user,
-          strm->password);
-    else
-      strcpy(luri, strm->uri);
+
+    strm->get_uri(strm->uri, luri, sizeof(luri));
 
     g_object_set(strm->playbin2, "uri", luri, NULL);
   } else
@@ -356,7 +345,7 @@ void XttStreamGtk::error_cb(GstBus* bus, GstMessage* msg, void* data)
     gst_element_set_state(strm->playbin2, GST_STATE_READY);
 
     // Erase window
-    strm->erase_window();
+    // strm->erase_window();
 
     // Try to reconnect
     strm->reconnect_timerid->remove();
@@ -417,7 +406,7 @@ void XttStreamGtk::state_changed_cb(GstBus* bus, GstMessage* msg, void* data)
  * GUI */
 static void analyze_streams(void* data)
 {
-  printf("Analyze stream\n");
+  // printf("Analyze stream\n");
 }
 
 /* This function is called when an "application" message is posted on the bus.
@@ -572,11 +561,12 @@ void XttStreamGtk::scroll_cb(void* data)
 }
 
 XttStreamGtk::XttStreamGtk(GtkWidget* st_parent_wid, void* st_parent_ctx,
-    const char* name, const char* st_uri, int width, int height, int x, int y,
+    const char* name, const char* st_uri, const char* st_controluri,
+    int width, int height, int x, int y,
     double scan_time, unsigned int st_options, int st_embedded,
     pwr_tAttrRef* st_arp, pwr_tStatus* sts)
-    : XttStream(st_parent_ctx, name, st_uri, width, height, x, y, scan_time,
-          st_options, st_embedded, st_arp),
+  : XttStream(st_parent_ctx, name, st_uri, st_controluri, width, 
+      height, x, y, scan_time, st_options, st_embedded, st_arp),
       scroll_cnt(0), ptz_box_displayed(0), is_live(0), buftime(pwr_cNTime),
       parent_wid(st_parent_wid), ptz_box(0), reconnect_timerid(0), no_uri(0)
 {
@@ -603,7 +593,7 @@ XttStreamGtk::XttStreamGtk(GtkWidget* st_parent_wid, void* st_parent_ctx,
 #if GST_CHECK_VERSION(1, 0, 0)
   playbin2 = gst_element_factory_make("playbin", "playbin");
 #else
-  playbin2 = gst_element_factory_make("playbin2", "playbin2");
+  playbin2 = gst_element_factory_make("playbin", "playbin");
 #endif
 
   if (!playbin2) {
@@ -614,24 +604,8 @@ XttStreamGtk::XttStreamGtk(GtkWidget* st_parent_wid, void* st_parent_ctx,
 
   /* Set the URI to play, eg "http://192.168.67.248/mjpg/video.mjpg" */
   char luri[250];
-  char* s;
-  if (options & strm_mOptions_HttpBasicAuthentication) {
-    if (!streq(user, "") && !streq(password, "")
-        && (s = strstr(uri, "://"))) {
-      unsigned long int offs = s - (char*)uri + 3;
-      strncpy(luri, uri, offs);
-      luri[offs] = 0;
-      strcat(luri, user);
-      strcat(luri, ":");
-      strcat(luri, password);
-      strcat(luri, "@");
-      strcat(luri, &uri[offs]);
-    } else
-      strcpy(luri, uri);
-  } else if (options & strm_mOptions_CgiParameterAuthentication)
-    snprintf(luri, sizeof(luri), "%s?user=%s&pwd=%s", uri, user, password);
-  else
-    strcpy(luri, uri);
+
+  get_uri(uri, luri, sizeof(luri));
 
   g_object_set(playbin2, "uri", luri, NULL);
 
@@ -662,13 +636,18 @@ XttStreamGtk::XttStreamGtk(GtkWidget* st_parent_wid, void* st_parent_ctx,
   } else
     toplevel = parent_wid;
 
-  GstElement* x_overlay = gst_element_factory_make("xvimagesink", "videosink");
-  g_object_set(G_OBJECT(playbin2), "video-sink", x_overlay, NULL);
+  // Note, glsinkbin and gtkglsink will crash at resize
+  // GstElement* videosink = gst_element_factory_make("glsinkbin", "glsinkbin");
+  // gtkglsink = gst_element_factory_make("gtkglsink", "gtkglsink");
+  // g_object_set(videosink, "sink", gtkglsink, NULL);
+  // g_object_get(gtkglsink, "widget", &video_form, NULL);
 
-  video_form = gtk_drawing_area_new();
-  //gtk_widget_set_double_buffered(video_form, FALSE);
+  GstElement* videosink = gst_element_factory_make("gtksink", "gtksink");
+  g_object_get(videosink, "widget", &video_form, NULL);
+  g_object_set(G_OBJECT(playbin2), "video-sink", videosink, NULL);
+
   g_signal_connect(video_form, "realize", G_CALLBACK(realize_cb), this);
-  g_signal_connect(video_form, "expose_event", G_CALLBACK(expose_cb), this);
+  //g_signal_connect(video_form, "expose_event", G_CALLBACK(expose_cb), this);
   g_signal_connect(
       video_form, "button_press_event", G_CALLBACK(mousebutton_cb), this);
   g_signal_connect(
@@ -878,7 +857,7 @@ XttStreamGtk::XttStreamGtk(GtkWidget* st_parent_wid, void* st_parent_ctx,
 
     gtk_toolbar_insert(GTK_TOOLBAR(tools), gtk_separator_tool_item_new(), -1);
 
-    wutl_tools_item(GTK_TOOLBAR(tools), "$pwr_exe/ge_get_pos.png", G_CALLBACK(activate_get_position), 
+    wutl_tools_item(GTK_TOOLBAR(tools), "$pwr_exe/xtt_get_pos.png", G_CALLBACK(activate_get_position), 
       "Get position", this, 0, 1);
 
     GtkWidget* ptz_pan_label = gtk_label_new("Pan");
@@ -962,15 +941,17 @@ XttStreamGtk::XttStreamGtk(GtkWidget* st_parent_wid, void* st_parent_ctx,
 #endif
   gst_object_unref(bus);
 
-  /* Start playing */
-  ret = gst_element_set_state(playbin2, GST_STATE_PLAYING);
-  if (ret == GST_STATE_CHANGE_FAILURE) {
-    g_printerr("Unable to set the pipeline to the playing state.\n");
-    gst_object_unref(playbin2);
-    *sts = 0;
-    return;
-  } else if (ret == GST_STATE_CHANGE_NO_PREROLL) {
-    is_live = 1;
+  /* Start playing, if embedded start playing is done in setup */
+  if (!embedded) {
+    ret = gst_element_set_state(playbin2, GST_STATE_PLAYING);
+    if (ret == GST_STATE_CHANGE_FAILURE) {
+      g_printerr("Unable to set the pipeline to the playing state.\n");
+      gst_object_unref(playbin2);
+      *sts = 0;
+      return;
+    } else if (ret == GST_STATE_CHANGE_NO_PREROLL) {
+      is_live = 1;
+    }
   }
 
   wow = new CoWowGtk(toplevel);
@@ -1014,6 +995,17 @@ void XttStreamGtk::setup()
     g_object_set(ptz_box, "visible", FALSE, NULL);
   if (!(options & strm_mOptions_CameraControlPanel))
     g_object_set(tools, "visible", FALSE, NULL);
+
+  if (embedded) {
+    int ret = gst_element_set_state(playbin2, GST_STATE_PLAYING);
+    if (ret == GST_STATE_CHANGE_FAILURE) {
+      g_printerr("Unable to set the pipeline to the playing state.\n");
+      gst_object_unref(playbin2);
+      return;
+    } else if (ret == GST_STATE_CHANGE_NO_PREROLL) {
+      is_live = 1;
+    }
+  }
 }
 
 void XttStreamGtk::create_popup_menu(int x, int y)
@@ -1497,7 +1489,7 @@ void XttStreamGtk::activate_get_position(GtkWidget* w, gpointer data)
   XttStreamGtk* strm = (XttStreamGtk*)data;
   double pan, tilt, zoom;
   int sts;
-  char pan_str[20], tilt_str[20], zoom_str[20];
+  char pan_str[40], tilt_str[40], zoom_str[40];
 
   if (!strm->camera_control)
     return;
@@ -1506,9 +1498,9 @@ void XttStreamGtk::activate_get_position(GtkWidget* w, gpointer data)
   if (EVEN(sts))
     return;
 
-  sprintf(pan_str, "%6.2f", pan);
-  sprintf(tilt_str, "%6.2f", tilt);
-  sprintf(zoom_str, "%6.2f", zoom);
+  sprintf(pan_str, "%7.3f", pan);
+  sprintf(tilt_str, "%7.3f", tilt);
+  sprintf(zoom_str, "%7.3f", zoom);
   gtk_label_set_text(GTK_LABEL(strm->ptz_pan), pan_str);
   gtk_label_set_text(GTK_LABEL(strm->ptz_tilt), tilt_str);
   gtk_label_set_text(GTK_LABEL(strm->ptz_zoom), zoom_str);

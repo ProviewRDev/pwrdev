@@ -52,8 +52,9 @@
 static int debug = 0;
 
 XttStream::XttStream(void* st_parent_ctx, const char* name, const char* st_uri,
-    int st_width, int st_height, int x, int y, double st_scan_time,
-    unsigned int st_options, int st_embedded, pwr_tAttrRef* st_arp)
+    const char* st_controluri, int st_width, int st_height, int x, 
+    int y, double st_scan_time, unsigned int st_options, int st_embedded, 
+    pwr_tAttrRef* st_arp)
     : parent_ctx(st_parent_ctx), options(st_options), embedded(st_embedded),
       timerid(0), scroll_timerid(0), x_offset(0), y_offset(0), width(st_width),
       height(st_height), stream_width(0), stream_height(0), close_cb(0),
@@ -62,6 +63,7 @@ XttStream::XttStream(void* st_parent_ctx, const char* name, const char* st_uri,
   pwr_tStatus sts;
 
   strncpy(uri, st_uri, sizeof(uri));
+  strncpy(controluri, st_controluri, sizeof(controluri));
   if (st_scan_time < 0.02)
     scan_time = 250;
   else
@@ -138,9 +140,10 @@ XttStream::XttStream(void* st_parent_ctx, const char* name, const char* st_uri,
     case pwr_eCameraControlEnum_VAPIX:
       camera_control = new XttCameraControlVapix(uri, user, password);
       break;
-    case pwr_eCameraControlEnum_ONVIF:
-      // Not yet implemented...
+    case pwr_eCameraControlEnum_ONVIF: {
+      camera_control = new XttCameraControlONVIF(controluri, user, password);
       break;
+    }
     default:;
     }
   }
@@ -162,6 +165,40 @@ XttStream::XttStream(void* st_parent_ctx, const char* name, const char* st_uri,
 XttStream::~XttStream()
 {
   delete camera_control;
+}
+
+void XttStream::get_uri(char *suri, char *luri, int size)
+{
+  char *s;
+
+  if (options & strm_mOptions_HttpBasicAuthentication) {
+    if (!streq(user, "") && !streq(password, "")
+	&& (s = strstr(suri, "://"))) {
+      if (size < strlen(uri) + strlen(user) + strlen(password) + 2)
+	return;
+      unsigned long int offs = s - (char*)suri + 3;
+      strncpy(luri, suri, offs);
+      luri[offs] = 0;
+      strcat(luri, user);
+      strcat(luri, ":");
+      strcat(luri, password);
+      strcat(luri, "@");
+      strcat(luri, &suri[offs]);
+    } else {
+      if (size < strlen(suri))
+	return;
+      strcpy(luri, suri);
+    }
+  } else if (options & strm_mOptions_CgiParameterAuthentication) {
+    if (size < strlen(suri) + strlen(user) + strlen(password) + 10)
+	return;
+    sprintf(luri, "%s?user=%s&pwd=%s", suri, user, password);
+  }
+  else {
+    if (size < strlen(suri))
+      return;
+    strcpy(luri, suri);
+  }
 }
 
 void XttStream::position(double pan, double tilt, double zoom)
@@ -354,11 +391,11 @@ int XttCameraControl::get_position(double* pan, double* tilt, double* zoom)
 }
 
 XttCameraControlVapix::XttCameraControlVapix(
-    char* x_url, char* x_user, char* x_password)
-    : XttCameraControl(x_url)
+    char* x_uri, char* x_user, char* x_password)
+    : XttCameraControl(x_uri)
 {
-  strncpy(url, x_url, sizeof(url));
-  char* s = strchr(url, '/');
+  strncpy(uri, x_uri, sizeof(uri));
+  char* s = strchr(uri, '/');
   if (s)
     s = strchr(++s, '/');
   if (s)
@@ -393,7 +430,7 @@ void XttCameraControlVapix::zoom_relative(double factor)
 
   sprintf(cmd,
       "wget --ignore-length %s %s %s/axis-cgi/com/ptz.cgi?camera=1\\&rzoom=%d",
-      authstr, outstr, url, zoom);
+      authstr, outstr, uri, zoom);
   int sts = system(cmd);
   if (sts != 0)
     printf("** Error from wget: %d\n", sts >> 8);
@@ -411,7 +448,7 @@ void XttCameraControlVapix::zoom_absolute(double factor)
 
   sprintf(cmd,
       "wget --ignore-length %s %s %s/axis-cgi/com/ptz.cgi?camera=1\\&zoom=%d",
-      authstr, outstr, url, zoom);
+      authstr, outstr, uri, zoom);
   int sts = system(cmd);
   if (sts != 0)
     printf("** Error from wget: %d\n", sts >> 8);
@@ -429,7 +466,7 @@ void XttCameraControlVapix::pan_relative(double value)
 
   sprintf(cmd,
       "wget --ignore-length %s %s %s/axis-cgi/com/ptz.cgi?camera=1\\&rpan=%d",
-      authstr, outstr, url, pan);
+      authstr, outstr, uri, pan);
   int sts = system(cmd);
   if (sts != 0)
     printf("** Error from wget: %d\n", sts >> 8);
@@ -447,7 +484,7 @@ void XttCameraControlVapix::pan_absolute(double value)
 
   sprintf(cmd,
       "wget --ignore-length %s %s %s/axis-cgi/com/ptz.cgi?camera=1\\&rpan=%d",
-      authstr, outstr, url, pan);
+      authstr, outstr, uri, pan);
   int sts = system(cmd);
   if (sts != 0)
     printf("** Error from wget: %d\n", sts >> 8);
@@ -465,7 +502,7 @@ void XttCameraControlVapix::tilt_relative(double value)
 
   sprintf(cmd,
       "wget --ignore-length %s %s %s/axis-cgi/com/ptz.cgi?camera=1\\&rtilt=%d",
-      authstr, outstr, url, tilt);
+      authstr, outstr, uri, tilt);
   int sts = system(cmd);
   if (sts != 0)
     printf("** Error from wget: %d\n", sts >> 8);
@@ -483,7 +520,7 @@ void XttCameraControlVapix::tilt_absolute(double value)
 
   sprintf(cmd,
       "wget --ignore-length %s %s %s/axis-cgi/com/ptz.cgi?camera=1\\&rtilt=%d",
-      authstr, outstr, url, tilt);
+      authstr, outstr, uri, tilt);
   int sts = system(cmd);
   if (sts != 0)
     printf("** Error from wget: %d\n", sts >> 8);
@@ -515,7 +552,7 @@ void XttCameraControlVapix::pan_tilt_zoom_absolute(
   sprintf(cmd, "wget --ignore-length %s %s "
                "%s/axis-cgi/com/"
                "ptz.cgi?camera=1\\&pan=%.2f\\&tilt=%.2f\\&zoom=%d",
-      authstr, outstr, url, ipan, itilt, izoom);
+      authstr, outstr, uri, ipan, itilt, izoom);
   int sts = system(cmd);
   if (sts != 0)
     printf("** Error from wget: %d\n", sts >> 8);
@@ -537,10 +574,10 @@ void XttCameraControlVapix::center(
 
   // sprintf( cmd, "wget --ignore-length %s %s
   // %s/axis-cgi/com/ptz.cgi?camera=1\\&center=%d,%d\\&imagewidth=%d",
-  //	   authstr, outstr, url, x, y, width);
+  //	   authstr, outstr, uri, x, y, width);
   sprintf(cmd, "wget --ignore-length %s %s "
                "%s/axis-cgi/com/ptz.cgi?camera=1\\&center=%d,%d",
-      authstr, outstr, url, x, y);
+      authstr, outstr, uri, x, y);
   int sts = system(cmd);
   if (sts != 0)
     printf("** Error from wget: %d\n", sts >> 8);
@@ -568,7 +605,7 @@ void XttCameraControlVapix::area_zoom(int x, int y, int width, int height,
 
   sprintf(cmd, "wget --ignore-length %s %s "
                "%s/axis-cgi/com/ptz.cgi?camera=1\\&areazoom=%d,%d,%d",
-      authstr, outstr, url, x, y, zoom);
+      authstr, outstr, uri, x, y, zoom);
   int sts = system(cmd);
   if (sts != 0)
     printf("** Error from wget: %d\n", sts >> 8);
@@ -598,7 +635,7 @@ int XttCameraControlVapix::get_position(double* pan, double* tilt, double* zoom)
   sprintf(cmd, "wget --ignore-length %s %s "
                "%s/axis-cgi/com/ptz.cgi?camera=1\\&query=position "
                "--output-document=%s",
-      authstr, outstr, url, fname);
+      authstr, outstr, uri, fname);
   sts = system(cmd);
   if (sts != 0)
     printf("** Error from wget: %d\n", sts >> 8);
@@ -653,5 +690,98 @@ int XttCameraControlVapix::get_position(double* pan, double* tilt, double* zoom)
   *tilt = (ctilt + 180) / 360 * 100;
   *zoom = czoom / 100;
 
+  return 1;
+}
+
+
+XttCameraControlONVIF::XttCameraControlONVIF(char* x_uri, char* x_user, char* x_passwd)
+  : XttCameraControl(x_uri), onvif(0)
+{
+  pwr_tStatus sts;
+
+  if (debug)
+    strcpy(outstr, "");
+  else
+    strcpy(outstr, "-o /dev/null");
+
+  onvif = new onvif_api(x_uri, x_user, x_passwd, &sts);
+  if (EVEN(sts))
+    onvif = 0;
+}
+
+XttCameraControlONVIF::~XttCameraControlONVIF()
+{
+  if (onvif)
+    delete onvif;
+}
+
+// Relative zoom, factor is -100 - 100, - zoom out, + zoom in.
+void XttCameraControlONVIF::zoom_relative(double factor)
+{
+  if (onvif)
+    onvif->move_relative(0, 0, (factor + 100)/200 * (onvif->zoom_range_max - onvif->zoom_range_min), onvif_mPTZ_zoom); 
+}
+
+// Absolute zoom, 0 - 100, 0 is max out, 100 is max in.
+void XttCameraControlONVIF::zoom_absolute(double factor)
+{
+  if (onvif)
+    onvif->move_absolute(0, 0, factor/100 * (onvif->zoom_range_max - onvif->zoom_range_min), onvif_mPTZ_zoom);
+}
+
+// Relative pan, value is -100 - 100.
+void XttCameraControlONVIF::pan_relative(double value)
+{
+  if (onvif)
+    onvif->move_relative(value/200, 0, 0, onvif_mPTZ_pan);
+}
+
+// Absolute pan, value is 0 - 100.
+void XttCameraControlONVIF::pan_absolute(double value)
+{
+  if (onvif)
+    onvif->move_absolute(value/100, 0, 0, onvif_mPTZ_pan);
+}
+
+// Relative tilt, value is -100 - 100.
+void XttCameraControlONVIF::tilt_relative(double value)
+{
+  if (onvif)
+    onvif->move_relative(0, value/200 * (onvif->y_range_max - onvif->y_range_min), 0, onvif_mPTZ_tilt);
+}
+
+// Absolute tilt, value is 0 - 100.
+void XttCameraControlONVIF::tilt_absolute(double value)
+{
+  if (onvif)
+    onvif->move_absolute(0, value/100 * (onvif->y_range_max - onvif->y_range_min), 0, onvif_mPTZ_tilt);
+}
+
+// Absolute pan, tilt and zoom.
+void XttCameraControlONVIF::pan_tilt_zoom_absolute(
+    double pan, double tilt, double zoom)
+{
+  if (!onvif)
+    return;
+
+  onvif->move_absolute(pan, tilt, zoom, onvif_mPTZ_pan | onvif_mPTZ_tilt | onvif_mPTZ_zoom);
+}
+
+// Center coordinates. Coordinates in current camera window size.
+void XttCameraControlONVIF::center(
+    int x, int y, int width, int height, int stream_width, int stream_height)
+{
+}
+
+void XttCameraControlONVIF::area_zoom(int x, int y, int width, int height,
+    int window_width, int window_height, int stream_width, int stream_height)
+{
+}
+
+// Get current pan, tilt and zoom.
+int XttCameraControlONVIF::get_position(double* pan, double* tilt, double* zoom)
+{
+  if (onvif)
+    onvif->get_ptz(pan, tilt, zoom);
   return 1;
 }

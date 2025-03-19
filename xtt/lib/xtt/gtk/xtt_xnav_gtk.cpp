@@ -351,12 +351,13 @@ XttMultiView* XNavGtk::multiview_new(const char* name, pwr_tAttrRef* aref,
       is_authorized_cb, keyboard_cb);
 }
 
-XttStream* XNavGtk::stream_new(const char* name, const char* uri, int width,
+XttStream* XNavGtk::stream_new(const char* name, const char* uri, 
+    const char* controluri, int width,
     int height, int x, int y, double scan_time, unsigned int options,
     int embedded, pwr_tAttrRef* arp, pwr_tStatus* sts)
 {
-  return new XttStreamGtk(parent_wid, this, name, uri, width, height, x, y,
-      scan_time, options, embedded, arp, sts);
+  return new XttStreamGtk(parent_wid, this, name, uri, controluri, 
+      width, height, x, y, scan_time, options, embedded, arp, sts);
 }
 
 GeCurve* XNavGtk::gecurve_new(char* name, char* filename, GeCurveData* data,

@@ -99,7 +99,8 @@ public:
       int (*get_current_objects_cb)(void*, pwr_sAttrRef**, int**),
       int (*is_authorized_cb)(void*, unsigned int),
       void (*keyboard_cb)(void*, void*, int, int));
-  XttStream* stream_new(const char* name, const char* uri, int width,
+  XttStream* stream_new(const char* name, const char* uri, 
+      const char *controluri, int width,
       int height, int x, int y, double scan_time, unsigned int options,
       int embedded, pwr_tAttrRef* arp, pwr_tStatus* sts);
   GeCurve* gecurve_new(char* name, char* filename, GeCurveData* data,

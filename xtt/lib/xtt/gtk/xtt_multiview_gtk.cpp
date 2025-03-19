@@ -798,7 +798,7 @@ XttMultiViewGtk::XttMultiViewGtk(GtkWidget* mv_parent_wid, void* mv_parent_ctx,
             options |= strm_mOptions_CgiParameterAuthentication;
 
           strmctx[i * rows + j] = new XttStreamGtk(toplevel, this, "No title",
-              xttcamera.URL, mv.Action[i * rows + j].Width,
+	      xttcamera.URL, xttcamera.ControlURL, mv.Action[i * rows + j].Width,
               mv.Action[i * rows + j].Height, 0, 0, 0, options, 1, &aref, sts);
 
           strmctx[i * rows + j]->close_cb = multiview_strm_close_cb;
@@ -1414,7 +1414,8 @@ int XttMultiViewGtk::set_subwindow_source(const char* name, char* source,
               break;
 
             XttStreamGtk* ctx
-                = new XttStreamGtk(toplevel, this, "No title", xttcamera.URL, w,
+                = new XttStreamGtk(toplevel, this, "No title", xttcamera.URL, 
+		    xttcamera.ControlURL, w,
                     h, 0, 0, 0, xttcamera.Options, 1, &object_aref, &lsts);
 
             GtkWidget* comp_w = (GtkWidget*)ctx->get_widget();

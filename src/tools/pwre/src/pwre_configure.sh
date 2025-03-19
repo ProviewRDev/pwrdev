@@ -390,6 +390,7 @@ if [ $is_arm -eq 1 ] && [ $ebuild -eq 1 ]; then
         i=$((i+1))
     done
 
+
     echo "export pwre_conf_cc_define=\"$conf_cc_define\"" >> $cfile
     echo "export pwre_conf_libpwrco=\"-lpwr_co\"" >> $cfile
     echo "export pwre_conf_libpwrrt=\"-lpwr_rt -lpwr_statussrv -lpwr_co -lpwr_msg_dummy\"" >> $cfile
@@ -494,6 +495,9 @@ else
     pwre_config_check_lib librsvg   LIBRSVG  lib librsvg 1 "/usr/lib/librsvg-2.so:/usr/lib/$hwpl-linux-$gnu/librsvg-2.so"
     pwre_config_check_include gst   GST   1 "/usr/include/gstreamer-1.0/gst/gst.h:/opt/gstreamer-sdk/include/gstreamer-1.0/gst/gst.h"
     pwre_config_check_lib gst    	  GST      gst gst 0 "/usr/lib/$hwpl-linux-$gnu/libgstreamer-1.0.so:/opt/gstreamer-sdk/lib/libgstreamer-1.0.so:/usr/lib/libgstreamer-1.0.so:/usr/lib/$hwpl-linux-$gnu/libgstreamer-1.0.so:/opt/gstreamer-sdk/lib/libgstreamer-0.10.so:/usr/lib/libgstreamer-0.10.so"
+    pwre_config_check_lib libpcurl   LIBCURL  lib libcurl 1 "/usr/lib/libcurl.so:/usr/lib/$hwpl-linux-$gnu/libcurl.so"
+    pwre_config_check_lib libpcrypto   LIBCRYPTO  lib libcrypto 1 "/usr/lib/libcrypto.so:/usr/lib/$hwpl-linux-$gnu/libcrypto.so"
+    pwre_config_check_lib libssl   LIBSSL  lib libssl 1 "/usr/lib/libssl.so:/usr/lib/$hwpl-linux-$gnu/libssl.so"
     if [ $pwre_hw == "hw_arm" ]; then
         pwre_config_check_lib libpiface LIBPIFACE lib libpiface 1 "/usr/local/lib/libpiface-1.0.a"
         pwre_config_check_include piface  PIFACE  1 "/usr/local/include/libpiface-1.0/pfio.h"
@@ -525,6 +529,10 @@ else
         i=$((i+1))
     done
 
+    if [[ "$conf_cc_define" =~ "PWRE_CONF_LIBCURL=1" ]] && [[ "$conf_cc_define" =~ "PWRE_CONF_LIBCRYPTO=1" ]] && [[ "$conf_cc_define" =~ "PWRE_CONF_LIBSSL=1" ]]; then
+      conf_cc_define=$conf_cc_define" -DPWRE_CONF_ONVIF=1"
+    fi
+
     echo "export pwre_conf_cc_define=\"$conf_cc_define\"" >> $cfile
     echo "export pwre_conf_libpwrco=\"-lpwr_co\"" >> $cfile
     echo "export pwre_conf_libpwrrt=\"-lpwr_rt -lpwr_statussrv -lpwr_co -lpwr_msg_dummy\"" >> $cfile
@@ -533,7 +541,7 @@ else
     echo "export pwre_conf_libpwrprofibus=\"-lpwr_pnak_dummy\"" >> $cfile
     echo "export pwre_conf_libpwrpowerlink=\"$conf_libpowerlink\"" >> $cfile
     echo "export pwre_conf_libpwrpowerlinkcn=\"$conf_libpowerlinkcn\"" >> $cfile
-    echo "export pwre_conf_libpwrxtt=\"-lpwr_xtt -lpwr_ge -lpwr_cow -lpwr_flow -lpwr_glow\"" >> $cfile
+    echo "export pwre_conf_libpwrxtt=\"-lpwr_xtt -lpwr_ge -lpwr_cow -lpwr_flow -lpwr_glow -lpwr_onvif\"" >> $cfile
     echo "export pwre_conf_libpwrxttgtk=\" -lpwr_xtt_gtk -lpwr_ge_gtk -lpwr_cow_gtk -lpwr_flow_gtk -lpwr_glow_gtk\"" >> $cfile
     echo "export pwre_conf_libpwrxttqt=\" -lpwr_xtt_qt -lpwr_ge_qt -lpwr_cow_qt -lpwr_flow_qt -lpwr_glow_qt\"" >> $cfile
     echo "export pwre_conf_libpwrxttmotif=\" -lpwr_xtt_motif -lpwr_ge_motif -lpwr_cow_motif -lpwr_flow_motif -lpwr_glow_motif\"" >> $cfile

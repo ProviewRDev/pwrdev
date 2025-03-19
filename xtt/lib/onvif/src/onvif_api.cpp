@@ -1,0 +1,314 @@
+#if defined (PWRE_CONF_ONVIF)
+
+#include "pwr.h"
+#include "rt_xnav_msg.h"
+
+#include "onvif_soapDeviceBindingProxy.h"
+#include "onvif_soapMediaBindingProxy.h"
+#include "onvif_soapImagingBindingProxy.h"
+#include "onvif_soapPTZBindingProxy.h"
+
+#include "onvif_wsseapi.h" //WS-Sercurity
+#include "onvif_wsdd.nsmap"       //Namespaces
+#include "onvif_api.h"
+
+#define USERNAME "claess"
+#define PASSWORD "colgate"
+#define HOSTNAME "http://192.168.0.195:2020/onvif/device_service"
+
+// to report an error
+void onvif_api::report_error()
+{
+  struct soap *soap = (struct soap *)gsoap;
+  std::cerr << "Oops, something went wrong:" << std::endl;
+  soap_stream_fault(soap, std::cerr);
+}
+
+// to set the timestamp and authentication credentials in a request message
+void onvif_api::set_credentials()
+{
+  struct soap *soap = (struct soap *)gsoap;
+  soap_wsse_delete_Security(soap);
+  //Access with username, password and lifetime
+  if (soap_wsse_add_Timestamp(soap, "Time", 10)
+   || soap_wsse_add_UsernameTokenDigest(soap, "Auth", username, passwd))
+    report_error();
+}
+
+onvif_api::onvif_api(char *o_uri, char *o_username, char *o_passwd, 
+   pwr_tStatus *rsts) : gsoap(0),
+   has_pantilt(0), has_zoom(0), x_range_min(0), x_range_max(0), y_range_min(0), y_range_max(0),
+   zoom_range_min(0), zoom_range_max(0)								      
+{
+  strncpy(uri, o_uri, sizeof(uri));
+  strncpy(username, o_username, sizeof(username));
+  strncpy(passwd, o_passwd, sizeof(passwd));
+  strcpy(manufacturer, "");
+  strcpy(model, "");
+  strcpy(firmware_version, "");
+
+  *rsts = XNAV__SUCCESS;
+
+  struct soap *soap = soap_new();
+  gsoap = (void *)soap;
+
+  soap->connect_timeout = soap->recv_timeout = soap->send_timeout = 10; // 10 sec
+  soap_register_plugin(soap, soap_wsse);
+
+  // create the proxies to access the ONVIF service API at HOSTNAME
+  DeviceBindingProxy proxyDevice(soap);
+  MediaBindingProxy proxyMedia(soap);
+  ImagingBindingProxy proxyImaging(soap);
+  PTZ_proxy = (void *) new PTZBindingProxy(soap);
+
+  // get device info and print
+  proxyDevice.soap_endpoint = HOSTNAME;
+  _tds__GetDeviceInformation GetDeviceInformation;
+  _tds__GetDeviceInformationResponse GetDeviceInformationResponse;
+  GetDeviceInformation.soap = soap;
+  GetDeviceInformationResponse.soap = soap;
+  set_credentials();
+  if (proxyDevice.GetDeviceInformation(&GetDeviceInformation, GetDeviceInformationResponse))
+    report_error();
+  strncpy(manufacturer, GetDeviceInformationResponse.Manufacturer.c_str(), sizeof(manufacturer));
+  strncpy(model, GetDeviceInformationResponse.Model.c_str(), sizeof(model));
+  strncpy(firmware_version, GetDeviceInformationResponse.FirmwareVersion.c_str(), sizeof(firmware_version));
+  //std::cout << "SerialNumber:    " << GetDeviceInformationResponse.SerialNumber << std::endl;
+  //std::cout << "HardwareId:      " << GetDeviceInformationResponse.HardwareId << std::endl;
+
+  // get device capabilities and print media
+  _tds__GetCapabilities GetCapabilities;
+  _tds__GetCapabilitiesResponse GetCapabilitiesResponse;
+  GetCapabilities.soap = soap;
+  GetCapabilitiesResponse.soap = soap;
+  set_credentials();
+  if (proxyDevice.GetCapabilities(&GetCapabilities, GetCapabilitiesResponse)) 
+    report_error();
+  if (!GetCapabilitiesResponse.Capabilities || !GetCapabilitiesResponse.Capabilities->Media || !GetCapabilitiesResponse.Capabilities->Imaging) {
+    *rsts = XNAV__CAMCAP;
+    return;
+  }
+  std::cout << "Media XAddr:  " << GetCapabilitiesResponse.Capabilities->Media->XAddr << std::endl;
+  std::cout << "Imaging XAddr:" << GetCapabilitiesResponse.Capabilities->Imaging->XAddr << std::endl;
+  std::cout << "PTZ XAddr:" << GetCapabilitiesResponse.Capabilities->PTZ->XAddr << std::endl;
+
+  // set the Media proxy endpoint to XAddr
+  proxyMedia.soap_endpoint = GetCapabilitiesResponse.Capabilities->Media->XAddr.c_str();
+  proxyImaging.soap_endpoint = GetCapabilitiesResponse.Capabilities->Imaging->XAddr.c_str();
+  ((PTZBindingProxy *)PTZ_proxy)->soap_endpoint = GetCapabilitiesResponse.Capabilities->PTZ->XAddr.c_str();
+
+  _trt__GetVideoSources GetVideoSources;
+  _trt__GetVideoSourcesResponse GetVideoSourcesResponse;
+  set_credentials();
+  if (proxyMedia.GetVideoSources(&GetVideoSources, GetVideoSourcesResponse))
+     report_error();
+  std::string strVideoToken = GetVideoSourcesResponse.VideoSources[0]->token;
+
+  std::cout << "Video Token:" << strVideoToken << std::endl;
+
+  // get ptz status
+  _tptz__GetStatus GetStatus;
+  _tptz__GetStatusResponse GetStatusResponse;
+  GetStatus.soap = soap;
+  GetStatusResponse.soap = soap;
+  set_credentials();
+  if (((PTZBindingProxy *)PTZ_proxy)->GetStatus(&GetStatus, GetStatusResponse))
+    report_error();
+  if (!GetStatusResponse.PTZStatus) {
+    std::cerr << "Missing PTZ status info" << std::endl;
+    exit(EXIT_FAILURE);
+  }
+  if (GetStatusResponse.PTZStatus->Position->PanTilt) {
+    std::cout << "PTZ Pos x:" << GetStatusResponse.PTZStatus->Position->PanTilt->x << std::endl;
+    std::cout << "PTZ Pos y:" << GetStatusResponse.PTZStatus->Position->PanTilt->y << std::endl;
+    has_pantilt = 1;
+  }
+
+  if (GetStatusResponse.PTZStatus->Position->Zoom) {
+    std::cout << "PTZ Zoom:" << GetStatusResponse.PTZStatus->Position->Zoom->x << std::endl;
+    has_zoom = 1;
+  }
+  else
+    std::cout << "PTZ Zoom: not supported" << std::endl;
+
+  // get node
+  _tptz__GetNode GetNode;
+  _tptz__GetNodeResponse GetNodeResponse;
+  GetNode.soap = soap;
+  GetNodeResponse.soap = soap;
+  set_credentials();
+  if (((PTZBindingProxy *)PTZ_proxy)->GetNode(&GetNode, GetNodeResponse))
+    report_error();
+  if (!GetNodeResponse.PTZNode)
+  {
+    std::cerr << "Missing device spaces info" << std::endl;
+    exit(EXIT_FAILURE);
+  }
+  if (has_pantilt && GetNodeResponse.PTZNode->SupportedPTZSpaces->AbsolutePanTiltPositionSpace[0]) {
+    x_range_min = GetNodeResponse.PTZNode->SupportedPTZSpaces->AbsolutePanTiltPositionSpace[0]->XRange->Min;
+    x_range_max = GetNodeResponse.PTZNode->SupportedPTZSpaces->AbsolutePanTiltPositionSpace[0]->XRange->Max;
+    y_range_min = GetNodeResponse.PTZNode->SupportedPTZSpaces->AbsolutePanTiltPositionSpace[0]->YRange->Min;
+    y_range_max =  GetNodeResponse.PTZNode->SupportedPTZSpaces->AbsolutePanTiltPositionSpace[0]->YRange->Max;
+  }
+  else 
+    std::cout << "PTZ Abolute PanTilt not supported" << std::endl;
+
+  if (has_zoom) {
+    zoom_range_min = GetNodeResponse.PTZNode->SupportedPTZSpaces->AbsoluteZoomPositionSpace[0]->XRange->Min;
+    zoom_range_max = GetNodeResponse.PTZNode->SupportedPTZSpaces->AbsoluteZoomPositionSpace[0]->XRange->Max;
+  }
+
+}
+
+void onvif_api::move_absolute(double x, double y, double zoom, unsigned int mask)
+{
+  struct soap *soap = (struct soap *)gsoap;
+
+  if (mask == onvif_mPTZ_zoom && !has_zoom)
+    return;
+
+  _tptz__AbsoluteMove *AbsoluteMove = soap_new__tptz__AbsoluteMove(soap, -1);
+  _tptz__AbsoluteMoveResponse AbsoluteMoveResponse;
+  AbsoluteMove->Position = soap_new_tt__PTZVector(soap, -1);
+
+  if (has_pantilt && (mask & onvif_mPTZ_tilt || mask & onvif_mPTZ_pan)) {
+    if (x < x_range_min)
+      x = x_range_min;
+    if (x > x_range_max)
+      x = x_range_max;
+    if (y < y_range_min)
+      y = y_range_min;
+    if (y > y_range_max)
+      y = y_range_max;
+
+    AbsoluteMove->Position->PanTilt = soap_new_tt__Vector2D(soap, -1);
+
+    AbsoluteMove->Position->PanTilt->x = x;
+    AbsoluteMove->Position->PanTilt->y = y;
+  }
+
+  if (has_zoom && mask & onvif_mPTZ_zoom) {
+    if (zoom < zoom_range_min)
+      zoom = zoom_range_min;
+    if (zoom > zoom_range_max)
+      zoom = zoom_range_max;
+
+    AbsoluteMove->Position->Zoom = soap_new_tt__Vector1D(soap, -1);
+
+    AbsoluteMove->Position->Zoom->x = zoom;
+  }      
+
+  set_credentials();
+
+  if (((PTZBindingProxy *)PTZ_proxy)->AbsoluteMove(AbsoluteMove, AbsoluteMoveResponse)) {
+    report_error();
+  }
+}
+
+void onvif_api::move_relative(double x, double y, double zoom, unsigned int mask)
+{
+  struct soap *soap = (struct soap *)gsoap;
+
+  if (mask == onvif_mPTZ_zoom && !has_zoom)
+    return;
+
+  _tptz__RelativeMove *RelativeMove = soap_new__tptz__RelativeMove(soap, -1);
+  _tptz__RelativeMoveResponse RelativeMoveResponse;
+
+  RelativeMove->Translation = soap_new_tt__PTZVector(soap, -1);
+
+  if (has_pantilt && (mask & onvif_mPTZ_tilt || mask & onvif_mPTZ_pan)) {
+    RelativeMove->Translation->PanTilt = soap_new_tt__Vector2D(soap, -1);
+
+    RelativeMove->Translation->PanTilt->x = x;
+    RelativeMove->Translation->PanTilt->y = y;
+  }
+  if (has_zoom && mask & onvif_mPTZ_zoom) {
+    RelativeMove->Translation->Zoom = soap_new_tt__Vector1D(soap, -1);
+
+    RelativeMove->Translation->Zoom->x = zoom;
+  }
+
+  set_credentials();
+
+  if (((PTZBindingProxy *)PTZ_proxy)->RelativeMove(RelativeMove, RelativeMoveResponse)) {
+    report_error();
+  }
+}
+
+void onvif_api::get_ptz(double *x, double *y, double *zoom)
+{
+  struct soap *soap = (struct soap *)gsoap;
+
+  // get ptz status
+  _tptz__GetStatus GetStatus;
+  _tptz__GetStatusResponse GetStatusResponse;
+  GetStatus.soap = soap;
+  GetStatusResponse.soap = soap;
+  set_credentials();
+  if (((PTZBindingProxy *)PTZ_proxy)->GetStatus(&GetStatus, GetStatusResponse))
+    report_error();
+  if (!GetStatusResponse.PTZStatus) {
+    std::cerr << "Missing PTZ status info" << std::endl;
+    exit(EXIT_FAILURE);
+  }
+  if (has_pantilt && GetStatusResponse.PTZStatus->Position->PanTilt) {
+    *x = GetStatusResponse.PTZStatus->Position->PanTilt->x;
+    *y = GetStatusResponse.PTZStatus->Position->PanTilt->y;
+  } else {
+    *x = 0;
+    *y = 0;
+  }
+
+  if (has_zoom && GetStatusResponse.PTZStatus->Position->Zoom)
+    *zoom = GetStatusResponse.PTZStatus->Position->Zoom->x;
+  else
+    *zoom = 0;
+}
+
+onvif_api::~onvif_api()
+{
+  struct soap *soap = (struct soap *)gsoap;
+
+  if (PTZ_proxy)
+    delete (PTZBindingProxy *)PTZ_proxy;
+
+  // free all deserialized and managed data,
+  // we can still reuse the context and proxies after this
+  soap_destroy(soap);
+  soap_end(soap);
+
+  // free the shared context, proxy classes must terminate as well after this
+  soap_free(soap);
+}
+
+#else
+#include <string.h>
+#include <stdio.h>
+#include "pwr.h"
+#include "onvif_api.h"
+#include "rt_xnav_msg.h"
+
+void onvif_api::report_error() {}
+void onvif_api::set_credentials() {}
+onvif_api::onvif_api(char *o_uri, char *o_username, char *o_passwd, 
+   pwr_tStatus *rsts) : gsoap(0),
+   has_pantilt(0), has_zoom(0), x_range_min(0), x_range_max(0), y_range_min(0), y_range_max(0),
+   zoom_range_min(0), zoom_range_max(0)								      
+{
+  strncpy(uri, o_uri, sizeof(uri));
+  strncpy(username, o_username, sizeof(username));
+  strncpy(passwd, o_passwd, sizeof(passwd));
+  strcpy(manufacturer, "");
+  strcpy(model, "");
+  strcpy(firmware_version, "");
+
+  *rsts = XNAV__NOONVIF;
+  printf("** Not built with ONVIF\n");
+}
+void onvif_api::move_absolute(double x, double y, double zoom, unsigned int mask) {}
+void onvif_api::move_relative(double x, double y, double zoom, unsigned int mask) {}
+void onvif_api::get_ptz(double *x, double *y, double *zoom) {}
+onvif_api::~onvif_api() {}
+
+#endif

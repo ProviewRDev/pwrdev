@@ -77,3 +77,5 @@ novalidcurve    <No valid curve found>				/error
 nosuchvolume    <No such volume>				/error
 invalidobject   <Invalid object for this operation>		/error
 emptylist   	<List is empty>					/info
+camcap		<Missing camera device capabilities into>	/error
+noonvif		<Release is not built with onvif>		/error
