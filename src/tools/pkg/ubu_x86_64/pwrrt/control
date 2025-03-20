@@ -16,7 +16,7 @@ Depends: libc6 (>= 2.35-0ubuntu3.1),
  libgstreamer1.0-0 (>=1.24.2-1ubuntu0.1),
  libgstreamer-plugins-base1.0-0 (>=1.24.2-1ubuntu0.2),
  libcrypto++8t64 (>= 8.9.0-1.1build1),
- libssl3t64 (>= 3.0.13-0ubutu3.5),
+ libssl3t64 (>= 3.0.13-0ubuntu3.5),
  libcurl4t64 (>= 8.5.0-2ubuntu10.6),
  xterm,
  xfonts-100dpi
