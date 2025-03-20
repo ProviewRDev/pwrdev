@@ -24,7 +24,7 @@ Depends: libc6 (>= 2.39-0ubuntu8.1),
  xterm,
  xfonts-100dpi,
  libcrypto++8t64 (>= 8.9.0-1.1build1),
- libssl3t64 (>= 3.0.13-0ubutu3.4),
+ libssl3t64 (>= 3.0.13-0ubutu3.5),
  libcurl4t64 (>= 8.5.0-2ubuntu10.6),
  util-linux
 Replaces: pwr50,pwr51,pwr52,pwr54,pwr55,pwr56,pwr57,pwr58,pwr59,pwr60
