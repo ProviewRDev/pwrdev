@@ -10,7 +10,7 @@
 
 <hr>
 2025-02-21
-Version 6.1.4
+Version 6.1.5
 <hr>
 </topic>
 
@@ -53,7 +53,7 @@ Architecture: amd64
 
 <h1> Development environment pwr61
 
-1. Download pwr61_6.1.4-1_amd64.deb from the ProviewR download page.
+1. Download pwr61_6.1.5-1_amd64.deb from the ProviewR download page.
 
 2. Open a terminal window and install dependency packages
 
@@ -70,7 +70,7 @@ Architecture: amd64
 
 4. Install the ProviewR package
 
-<c>> sudo dpkg -i pwr61_6.1.4-1_amd64.deb
+<c>> sudo dpkg -i pwr61_6.1.5-1_amd64.deb
 
 5. Logout and login as user 'pwrp' with the same password. Start ProviewR from the
 desktop icon, or from a terminal window with 
@@ -85,7 +85,7 @@ desktop icon, or from a terminal window with
 
 1. Install the pwr61 package.
 
-2. Download pwrdemo61_6.1.4-1_amd64.deb from the ProviewR download page.
+2. Download pwrdemo61_6.1.5-1_amd64.deb from the ProviewR download page.
 
 3. Go to the download directory.
 
@@ -93,7 +93,7 @@ desktop icon, or from a terminal window with
 
 4. Install the ProviewR demo package
 
-<c>> sudo dpkg -i pwrdemo61_6.1.4-1_amd64.deb
+<c>> sudo dpkg -i pwrdemo61_6.1.5-1_amd64.deb
 
 5. Attach the project from the desktop icon, or from a terminal window with
 
@@ -107,7 +107,7 @@ desktop icon, or from a terminal window with
 
 <h1> Runtime environment pwrrt
 
-1. Download pwrrt_6.1.4-1_amd64.deb from the ProviewR download page.
+1. Download pwrrt_6.1.5-1_amd64.deb from the ProviewR download page.
 
 2. Open a terminal window and install dependency packages
 
@@ -126,7 +126,7 @@ desktop icon, or from a terminal window with
 
 4. Install the ProviewR package
 
-<c>> sudo dpkg -i pwrrt_6.1.4-1_amd64.deb
+<c>> sudo dpkg -i pwrrt_6.1.5-1_amd64.deb
 
 5. Configure, build and distribute a node from the development environment.
 
@@ -144,7 +144,7 @@ desktop icon, or from a terminal window with
 
 1. Install the pwr61 package.
 
-2. Download pwrrpi6461_6.1.4-1_amd64.deb from the ProviewR download page.
+2. Download pwrrpi6461_6.1.5-1_amd64.deb from the ProviewR download page.
 
 3. Go to the download directory.
 
@@ -152,7 +152,7 @@ desktop icon, or from a terminal window with
 
 4. Install the ProviewR pwrrpi package
 
-<c>> sudo dpkg -i pwrrpi6461_6.1.4-1_amd64.deb
+<c>> sudo dpkg -i pwrrpi6461_6.1.5-1_amd64.deb
 
 </topic>
 </chapter>
@@ -168,7 +168,7 @@ Architecture: amd64
 
 <h1> Development environment pwr61
 
-1. Download pwr61_6.1.4-1_amd64.deb from the ProviewR download page.
+1. Download pwr61_6.1.5-1_amd64.deb from the ProviewR download page.
 
 2. Open a terminal window and install dependency packages
 
@@ -185,7 +185,7 @@ Architecture: amd64
 
 4. Install the ProviewR package
 
-<c>> sudo dpkg -i pwr61_6.1.4-1_amd64.deb
+<c>> sudo dpkg -i pwr61_6.1.5-1_amd64.deb
 
 5. Logout and login as user 'pwrp' with the same password. Start ProviewR from the
 desktop icon, or from a terminal window with 
@@ -200,7 +200,7 @@ desktop icon, or from a terminal window with
 
 1. Install the pwr61 package.
 
-2. Download pwrdemo61_6.1.4-1_amd64.deb from the ProviewR download page.
+2. Download pwrdemo61_6.1.5-1_amd64.deb from the ProviewR download page.
 
 3. Go to the download directory.
 
@@ -208,7 +208,7 @@ desktop icon, or from a terminal window with
 
 4. Install the ProviewR demo package
 
-<c>> sudo dpkg -i pwrdemo61_6.1.4-1_amd64.deb
+<c>> sudo dpkg -i pwrdemo61_6.1.5-1_amd64.deb
 
 5. Attach the project from the desktop icon, or from a terminal window with
 
@@ -222,7 +222,7 @@ desktop icon, or from a terminal window with
 
 <h1> Runtime environment pwrrt
 
-1. Download pwrrt_6.1.4-1_amd64.deb from the ProviewR download page.
+1. Download pwrrt_6.1.5-1_amd64.deb from the ProviewR download page.
 
 2. Open a terminal window and install 
 
@@ -241,7 +241,7 @@ desktop icon, or from a terminal window with
 
 4. Install the ProviewR package
 
-<c>> sudo dpkg -i pwrrt_6.1.4-1_amd64.deb
+<c>> sudo dpkg -i pwrrt_6.1.5-1_amd64.deb
 
 5. Configure, build and distribute a node from the development environment.
 
@@ -253,7 +253,7 @@ desktop icon, or from a terminal window with
 
 1. Install the pwr61 package.
 
-2. Download pwrrpi6461_6.1.4-1_amd64.deb from the ProviewR download page.
+2. Download pwrrpi6461_6.1.5-1_amd64.deb from the ProviewR download page.
 
 3. Go to the download directory.
 
@@ -261,7 +261,7 @@ desktop icon, or from a terminal window with
 
 4. Install the ProviewR pwrrpi64 package
 
-<c>> sudo dpkg -i pwrrpi6461_6.1.4-1_amd64.deb
+<c>> sudo dpkg -i pwrrpi6461_6.1.5-1_amd64.deb
 </topic>
 </chapter>
 
@@ -275,7 +275,7 @@ Architecture: arm64
 
 <h1> Development environment pwr61
 
-1. Download pwr61_6.1.4-1_arm64.deb from the ProviewR download page.
+1. Download pwr61_6.1.5-1_arm64.deb from the ProviewR download page.
 
 2. Open a terminal window and install dependency packages
 
@@ -292,7 +292,7 @@ Architecture: arm64
 
 4. Install the ProviewR package
 
-<c>> sudo dpkg -i pwr61_6.1.4-1_arm64.deb
+<c>> sudo dpkg -i pwr61_6.1.5-1_arm64.deb
 
 5. Logout and login as user 'pwrp' with the same password. Start ProviewR from the
 desktop icon, or from a terminal window with 
@@ -307,7 +307,7 @@ desktop icon, or from a terminal window with
 
 1. Install the pwr61 package.
 
-2. Download pwrdemo61_6.1.4-1_arm64.deb from the ProviewR download page.
+2. Download pwrdemo61_6.1.5-1_arm64.deb from the ProviewR download page.
 
 3. Go to the download directory.
 
@@ -315,7 +315,7 @@ desktop icon, or from a terminal window with
 
 4. Install the ProviewR demo package
 
-<c>> sudo dpkg -i pwrdemo61_6.1.4-1_arm64.deb
+<c>> sudo dpkg -i pwrdemo61_6.1.5-1_arm64.deb
 
 5. Attach the project from the desktop icon, or from a terminal window with
 
@@ -329,7 +329,7 @@ desktop icon, or from a terminal window with
 
 <h1> Runtime environment pwrrt
 
-1. Download pwrrt_6.1.4-1_arm64.deb from the ProviewR download page.
+1. Download pwrrt_6.1.5-1_arm64.deb from the ProviewR download page.
 
 2. Open a terminal window and install 
 
@@ -348,7 +348,7 @@ desktop icon, or from a terminal window with
 
 4. Install the ProviewR package
 
-<c>> sudo dpkg -i pwrrt_6.1.4-1_arm64.deb
+<c>> sudo dpkg -i pwrrt_6.1.5-1_arm64.deb
 
 5. Configure, build and distribute a node from the development environment.
 
@@ -400,15 +400,15 @@ In this example the development environment and demo project is installed.
 
 3. Dowload the development environment and demo project
 
-<c>> wget http://downloads.sourceforge.net/project/proview/proview/proviewr_6.1.4-1/\
-debian12/pwr61_6.1.4-1_amd64.deb
-<c>> wget http://downloads.sourceforge.net/project/proview/proview/proviewr_6.1.4-1/\
-debian12/pwrdemo61_6.1.4-1_amd64.deb
+<c>> wget http://downloads.sourceforge.net/project/proview/proview/proviewr_6.1.5-1/\
+debian12/pwr61_6.1.5-1_amd64.deb
+<c>> wget http://downloads.sourceforge.net/project/proview/proview/proviewr_6.1.5-1/\
+debian12/pwrdemo61_6.1.5-1_amd64.deb
 
 4. Install pwr61 and pwrdemo61
 
-<c>> dpkg -i pwr61_6.1.4-1_amd64.deb
-<c>> dpkg -i pwrdemo61_6.1.4-1_amd64.deb
+<c>> dpkg -i pwr61_6.1.5-1_amd64.deb
+<c>> dpkg -i pwrdemo61_6.1.5-1_amd64.deb
 
 5. Login as user 'pwrp'
 
@@ -457,16 +457,16 @@ In the XQuartz terminal, allow access from local host
 
 4. Download pwr61 and pwrdemo61 packages
 
-<c>> wget http://downloads.sourceforge.net/project/proview/proview/proviewr_6.1.4-1/\
-<c>debian12/pwr61_6.1.4-1_amd64.deb
+<c>> wget http://downloads.sourceforge.net/project/proview/proview/proviewr_6.1.5-1/\
+<c>debian12/pwr61_6.1.5-1_amd64.deb
 
-<c>> wget http://downloads.sourceforge.net/project/proview/proview/proviewr_6.1.4-1/\
-<c>debian12/pwrdemo61_6.1.4-1_amd64.deb
+<c>> wget http://downloads.sourceforge.net/project/proview/proview/proviewr_6.1.5-1/\
+<c>debian12/pwrdemo61_6.1.5-1_amd64.deb
 
 5. Install pwr61 and pwrdemo61
 
-<c>> dpkg -i pwr61_6.1.4-1_amd64.deb
-<c>> dpkg -i pwrdemo61_6.1.4-1_amd64.deb
+<c>> dpkg -i pwr61_6.1.5-1_amd64.deb
+<c>> dpkg -i pwrdemo61_6.1.5-1_amd64.deb
 
 6. Login as user 'pwrp'
 <c>> su - pwrp

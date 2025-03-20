@@ -1,5 +1,5 @@
 Package: pwrrt
-Version: 6.1.4-2
+Version: 6.1.5-1
 Section: base
 Priority: optional
 Architecture: arm64
@@ -15,11 +15,6 @@ Depends: libc6 (>= 2.31-13+rpt2+rpi1+deb11u4),
  libhdf5-openmpi-103 (>= 1.10.6+repack-4+deb11u1), 
  libusb-1.0-0 (>= 2:1.0.24-3)
 Replaces: pwr50,pwr51,pwr52,pwr53,pwr54,pwr55,pwr56,pwr57,pwr58,pwr59,pwr60
-Maintainer: Proview <postmaster@proview.se>
+Maintainer: Proview <postmaster@proviewr.se>
 Description:
- 6.1.4-1 Base release
- 6.1.4-2
-   - Bugfix in Ge axis for enumerations.
-   - Zigbee module common structfile fix.
-   - Javascript bugfix for Ge rounded rectangle.
-   - Javascript bugfix for animation dynamics.
+ 6.1.5-1 Base release

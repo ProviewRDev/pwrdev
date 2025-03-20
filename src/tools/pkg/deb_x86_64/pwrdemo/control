@@ -1,9 +1,9 @@
 Package: pwrdemo61
-Version: 6.1.4-2
+Version: 6.1.5-1
 Section: base
 Priority: optional
 Architecture: amd64
-Depends: sudo, pwr61 (>= 6.1.4-2)
-Maintainer: Proview <postmaster@proview.se>
+Depends: sudo, pwr61 (>= 6.1.5-1)
+Maintainer: Proview <postmaster@proviewr.se>
 Description: Proview Demo Project package
- 6.1.4-1 Base release
+ 6.1.5-1 Base release

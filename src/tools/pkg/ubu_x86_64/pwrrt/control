@@ -1,5 +1,5 @@
 Package: pwrrt
-Version: 6.1.4-2
+Version: 6.1.5-1
 Section: base
 Priority: optional
 Architecture: amd64
@@ -15,16 +15,14 @@ Depends: libc6 (>= 2.35-0ubuntu3.1),
  libtirpc3t64 (>= 1.3.4+ds-1.1build1),
  libgstreamer1.0-0 (>=1.24.2-1ubuntu0.1),
  libgstreamer-plugins-base1.0-0 (>=1.24.2-1ubuntu0.2),
+ libcrypto++8t64 (>= 8.9.0-1.1build1),
+ libssl3t64 (>= 3.0.13-0ubutu3.4),
+ libcurl4t64 (>= 8.5.0-2ubuntu10.6),
  xterm,
  xfonts-100dpi
 Replaces: pwr50,pwr51,pwr52,pwr53,pwr54,pwr55,pwr56,pwr57,pwr58,pwr59,pwr60
-Maintainer: ProviewR <postmaster@proview.se>
+Maintainer: ProviewR <postmaster@proviewr.se>
 Homepage: http://www.proview.se
 Installed-Size: 955344
 Description:
- 6.1.4-1 Base release
- 6.1.4-2
-   - Bugfix in Ge axis for enumerations.
-   - Zigbee module common structfile fix.
-   - Javascript bugfix for Ge rounded rectangle.
-   - Javascript bugfix for animation dynamics.
+ 6.1.5-1 Base release
