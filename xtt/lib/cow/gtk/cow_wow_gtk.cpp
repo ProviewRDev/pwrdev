@@ -49,7 +49,8 @@
 #include "flow_api.h"
 #include "flow_browapi.h"
 
-typedef struct {
+typedef struct
+{
   char str[200];
   int len;
   int received;
@@ -58,7 +59,8 @@ typedef struct {
   int new_main;
 } wow_sSelection;
 
-typedef struct {
+typedef struct
+{
   char title[80];
   flow_tCtx flow_ctx;
   flow_eOrientation orientation;
@@ -100,16 +102,16 @@ static gint question_delete_event(GtkWidget* w, GdkEvent* event, gpointer data)
 }
 
 /************************************************************************
-*
-* Name: DisplayQuestion
-*
-* Description:	Displays an question box widget
-*
-*************************************************************************/
+ *
+ * Name: DisplayQuestion
+ *
+ * Description:	Displays an question box widget
+ *
+ *************************************************************************/
 
 void CoWowGtk::DisplayQuestion(void* ctx, const char* title, const char* text,
-    void (*questionbox_ok)(void*, void*),
-    void (*questionbox_cancel)(void*, void*), void* data)
+                               void (*questionbox_ok)(void*, void*), void (*questionbox_cancel)(void*, void*),
+                               void* data)
 {
   GtkWidget* question_widget;
   GtkWidget* question_label;
@@ -124,12 +126,11 @@ void CoWowGtk::DisplayQuestion(void* ctx, const char* title, const char* text,
   cbdata->data = data;
 
   // Create a question window
-  question_widget = (GtkWidget*)g_object_new(GTK_TYPE_DIALOG, "default-height",
-      150, "default-width", 400, "title", translate_utf8(title),
-      "window-position", GTK_WIN_POS_CENTER, NULL);
+  question_widget =
+      (GtkWidget*)g_object_new(GTK_TYPE_DIALOG, "default-height", 150, "default-width", 400, "title",
+                               translate_utf8(title), "window-position", GTK_WIN_POS_CENTER, NULL);
   cbdata->question_widget = question_widget;
-  g_signal_connect(question_widget, "delete_event",
-      G_CALLBACK(question_delete_event), cbdata);
+  g_signal_connect(question_widget, "delete_event", G_CALLBACK(question_delete_event), cbdata);
 
   question_label = gtk_label_new(translate_utf8(text));
 
@@ -142,32 +143,24 @@ void CoWowGtk::DisplayQuestion(void* ctx, const char* title, const char* text,
 
   GtkWidget* question_no = gtk_button_new_with_label(translate_utf8("No"));
   gtk_widget_set_size_request(question_no, 70, 28);
-  g_signal_connect(
-      question_no, "clicked", G_CALLBACK(question_cancel_cb), cbdata);
+  g_signal_connect(question_no, "clicked", G_CALLBACK(question_cancel_cb), cbdata);
 
   GtkWidget* question_hboxtext = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-  gtk_box_pack_start(
-      GTK_BOX(question_hboxtext), question_image, FALSE, FALSE, 15);
-  gtk_box_pack_start(
-      GTK_BOX(question_hboxtext), question_label, TRUE, TRUE, 15);
+  gtk_box_pack_start(GTK_BOX(question_hboxtext), question_image, FALSE, FALSE, 15);
+  gtk_box_pack_start(GTK_BOX(question_hboxtext), question_label, TRUE, TRUE, 15);
 
   GtkWidget* question_hboxbuttons = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 40);
-  gtk_box_pack_start(
-      GTK_BOX(question_hboxbuttons), question_ok, FALSE, FALSE, 40);
+  gtk_box_pack_start(GTK_BOX(question_hboxbuttons), question_ok, FALSE, FALSE, 40);
   gtk_box_pack_end(GTK_BOX(question_hboxbuttons), question_no, FALSE, FALSE, 40);
 
-  GtkWidget* question_vbox
-      = gtk_dialog_get_content_area(GTK_DIALOG(question_widget));
+  GtkWidget* question_vbox = gtk_dialog_get_content_area(GTK_DIALOG(question_widget));
   gtk_box_pack_start(GTK_BOX(question_vbox), question_hboxtext, TRUE, TRUE, 30);
-  gtk_box_pack_start(
-      GTK_BOX(question_vbox), gtk_separator_new(GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 0);
-  gtk_box_pack_end(
-      GTK_BOX(question_vbox), question_hboxbuttons, FALSE, FALSE, 15);
+  gtk_box_pack_start(GTK_BOX(question_vbox), gtk_separator_new(GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 0);
+  gtk_box_pack_end(GTK_BOX(question_vbox), question_hboxbuttons, FALSE, FALSE, 15);
   gtk_widget_show_all(question_widget);
 
   if (m_transient_wid)
-    gtk_window_set_transient_for(
-        GTK_WINDOW(question_widget), GTK_WINDOW(m_transient_wid));
+    gtk_window_set_transient_for(GTK_WINDOW(question_widget), GTK_WINDOW(m_transient_wid));
 }
 
 void CoWowGtk::inputdialog_ok_cb(GtkWidget* w, gpointer data)
@@ -175,8 +168,7 @@ void CoWowGtk::inputdialog_ok_cb(GtkWidget* w, gpointer data)
   wow_t_inputdialog_cb* cbdata = (wow_t_inputdialog_cb*)data;
   char* text;
 
-  gchar* textutf8
-      = gtk_editable_get_chars(GTK_EDITABLE(cbdata->input_widget), 0, -1);
+  gchar* textutf8 = gtk_editable_get_chars(GTK_EDITABLE(cbdata->input_widget), 0, -1);
   text = g_convert(textutf8, -1, "ISO8859-1", "UTF-8", NULL, NULL, NULL);
   g_free(textutf8);
 
@@ -199,25 +191,24 @@ void CoWowGtk::inputdialog_cancel_cb(GtkWidget* w, gpointer data)
   free((char*)cbdata);
 }
 
-static gint inputdialog_delete_event(
-    GtkWidget* w, GdkEvent* event, gpointer data)
+static gint inputdialog_delete_event(GtkWidget* w, GdkEvent* event, gpointer data)
 {
   CoWowGtk::inputdialog_cancel_cb(w, data);
   return TRUE;
 }
 
 /************************************************************************
-*
-* Name: CreateInputDialog
-*
-* Description:	Create an input dialog widget
-*
-*************************************************************************/
+ *
+ * Name: CreateInputDialog
+ *
+ * Description:	Create an input dialog widget
+ *
+ *************************************************************************/
 
 void CoWowGtk::CreateInputDialog(void* ctx, const char* title, const char* text,
-    void (*inputdialogbox_ok)(void*, void*, char*),
-    void (*inputdialogbox_cancel)(void*, void*), int input_length,
-    char* init_text, void* data)
+                                 void (*inputdialogbox_ok)(void*, void*, char*),
+                                 void (*inputdialogbox_cancel)(void*, void*), int input_length,
+                                 char* init_text, void* data)
 {
   GtkWidget* inputdialog_widget;
   GtkWidget* inputdialog_label;
@@ -232,12 +223,11 @@ void CoWowGtk::CreateInputDialog(void* ctx, const char* title, const char* text,
   cbdata->data = data;
 
   // Create a inputdialog window
-  inputdialog_widget = (GtkWidget*)g_object_new(GTK_TYPE_DIALOG,
-      "default-height", 150, "default-width", 400, "title",
-      translate_utf8(title), "window-position", GTK_WIN_POS_CENTER, NULL);
+  inputdialog_widget =
+      (GtkWidget*)g_object_new(GTK_TYPE_DIALOG, "default-height", 150, "default-width", 400, "title",
+                               translate_utf8(title), "window-position", GTK_WIN_POS_CENTER, NULL);
   cbdata->inputdialog_widget = inputdialog_widget;
-  g_signal_connect(inputdialog_widget, "delete_event",
-      G_CALLBACK(inputdialog_delete_event), cbdata);
+  g_signal_connect(inputdialog_widget, "delete_event", G_CALLBACK(inputdialog_delete_event), cbdata);
 
   inputdialog_label = gtk_label_new(translate_utf8(text));
 
@@ -246,71 +236,55 @@ void CoWowGtk::CreateInputDialog(void* ctx, const char* title, const char* text,
 
   GtkWidget* inputdialog_ok = gtk_button_new_with_label(translate_utf8("Yes"));
   gtk_widget_set_size_request(inputdialog_ok, 70, 28);
-  g_signal_connect(
-      inputdialog_ok, "clicked", G_CALLBACK(inputdialog_ok_cb), cbdata);
+  g_signal_connect(inputdialog_ok, "clicked", G_CALLBACK(inputdialog_ok_cb), cbdata);
 
   GtkWidget* inputdialog_no = gtk_button_new_with_label(translate_utf8("No"));
   gtk_widget_set_size_request(inputdialog_no, 70, 28);
-  g_signal_connect(
-      inputdialog_no, "clicked", G_CALLBACK(inputdialog_cancel_cb), cbdata);
+  g_signal_connect(inputdialog_no, "clicked", G_CALLBACK(inputdialog_cancel_cb), cbdata);
 
   GtkWidget* textinput = gtk_entry_new();
   gtk_entry_set_max_length(GTK_ENTRY(textinput), input_length);
   cbdata->input_widget = textinput;
-  g_signal_connect(
-      textinput, "activate", G_CALLBACK(inputdialog_ok_cb), cbdata);
+  g_signal_connect(textinput, "activate", G_CALLBACK(inputdialog_ok_cb), cbdata);
 
   GtkWidget* inputdialog_hboxtext = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-  gtk_box_pack_start(
-      GTK_BOX(inputdialog_hboxtext), inputdialog_image, FALSE, FALSE, 15);
-  gtk_box_pack_start(
-      GTK_BOX(inputdialog_hboxtext), inputdialog_label, TRUE, TRUE, 15);
+  gtk_box_pack_start(GTK_BOX(inputdialog_hboxtext), inputdialog_image, FALSE, FALSE, 15);
+  gtk_box_pack_start(GTK_BOX(inputdialog_hboxtext), inputdialog_label, TRUE, TRUE, 15);
 
   GtkWidget* inputdialog_hboxinput = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   gtk_box_pack_start(GTK_BOX(inputdialog_hboxinput), textinput, TRUE, TRUE, 15);
 
   GtkWidget* inputdialog_hboxbuttons = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 40);
-  gtk_box_pack_start(
-      GTK_BOX(inputdialog_hboxbuttons), inputdialog_ok, FALSE, FALSE, 0);
-  gtk_box_pack_end(
-      GTK_BOX(inputdialog_hboxbuttons), inputdialog_no, FALSE, FALSE, 0);
+  gtk_box_pack_start(GTK_BOX(inputdialog_hboxbuttons), inputdialog_ok, FALSE, FALSE, 0);
+  gtk_box_pack_end(GTK_BOX(inputdialog_hboxbuttons), inputdialog_no, FALSE, FALSE, 0);
 
-  GtkWidget* inputdialog_vbox
-      = gtk_dialog_get_content_area(GTK_DIALOG(inputdialog_widget));
-  gtk_box_pack_start(
-      GTK_BOX(inputdialog_vbox), inputdialog_hboxtext, TRUE, TRUE, 20);
-  gtk_box_pack_start(
-      GTK_BOX(inputdialog_vbox), inputdialog_hboxinput, FALSE, FALSE, 5);
-  gtk_box_pack_start(
-      GTK_BOX(inputdialog_vbox), gtk_separator_new(GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 0);
-  gtk_box_pack_end(
-      GTK_BOX(inputdialog_vbox), inputdialog_hboxbuttons, FALSE, FALSE, 15);
+  GtkWidget* inputdialog_vbox = gtk_dialog_get_content_area(GTK_DIALOG(inputdialog_widget));
+  gtk_box_pack_start(GTK_BOX(inputdialog_vbox), inputdialog_hboxtext, TRUE, TRUE, 20);
+  gtk_box_pack_start(GTK_BOX(inputdialog_vbox), inputdialog_hboxinput, FALSE, FALSE, 5);
+  gtk_box_pack_start(GTK_BOX(inputdialog_vbox), gtk_separator_new(GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE,
+                     0);
+  gtk_box_pack_end(GTK_BOX(inputdialog_vbox), inputdialog_hboxbuttons, FALSE, FALSE, 15);
   gtk_widget_show_all(inputdialog_widget);
 
   gint pos = 0;
-  if (init_text && !streq(init_text, "")) {
-    char* textutf8
-        = g_convert(init_text, -1, "UTF-8", "ISO8859-1", NULL, NULL, NULL);
-    gtk_editable_insert_text(
-        GTK_EDITABLE(textinput), textutf8, strlen(textutf8), &pos);
+  if (init_text && !streq(init_text, ""))
+  {
+    char* textutf8 = g_convert(init_text, -1, "UTF-8", "ISO8859-1", NULL, NULL, NULL);
+    gtk_editable_insert_text(GTK_EDITABLE(textinput), textutf8, strlen(textutf8), &pos);
     g_free(textutf8);
   }
 
   if (m_transient_wid)
-    gtk_window_set_transient_for(
-        GTK_WINDOW(inputdialog_widget), GTK_WINDOW(m_transient_wid));
+    gtk_window_set_transient_for(GTK_WINDOW(inputdialog_widget), GTK_WINDOW(m_transient_wid));
 }
 
 /************************************************************************
-*
-* Description: Create an Error message dialog.
-*
-*************************************************************************/
+ *
+ * Description: Create an Error message dialog.
+ *
+ *************************************************************************/
 
-static void displayerror_ok_cb(GtkWidget* w, gint arg1, gpointer data)
-{
-  gtk_widget_destroy(w);
-}
+static void displayerror_ok_cb(GtkWidget* w, gint arg1, gpointer data) { gtk_widget_destroy(w); }
 
 static gboolean displayerror_remove_cb(void* data)
 {
@@ -318,11 +292,10 @@ static gboolean displayerror_remove_cb(void* data)
   return FALSE;
 }
 
-void CoWowGtk::DisplayError(
-    const char* title, const char* text, lng_eCoding coding, int modal)
+void CoWowGtk::DisplayError(const char* title, const char* text, lng_eCoding coding, int modal)
 {
   GtkWindow* parent;
-  GtkWidget *dialog;
+  GtkWidget* dialog;
 
   if (m_parent)
     parent = GTK_WINDOW(gtk_widget_get_toplevel(m_parent));
@@ -330,21 +303,22 @@ void CoWowGtk::DisplayError(
     parent = 0;
 
   char* ctext;
-  if (coding != lng_eCoding_UTF_8) {
+  if (coding != lng_eCoding_UTF_8)
+  {
     ctext = g_convert(text, -1, "UTF-8", "ISO8859-1", NULL, NULL, NULL);
     if (ctext[0] == '%')
       ctext[0] = ' ';
-  } else
+  }
+  else
     ctext = (char*)text;
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat-security"
   if (modal)
-    dialog = gtk_message_dialog_new(
-        parent, GTK_DIALOG_MODAL, GTK_MESSAGE_ERROR, GTK_BUTTONS_OK, ctext);
+    dialog = gtk_message_dialog_new(parent, GTK_DIALOG_MODAL, GTK_MESSAGE_ERROR, GTK_BUTTONS_OK, ctext);
   else
-    dialog = gtk_message_dialog_new(
-        parent, GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_ERROR, GTK_BUTTONS_OK, ctext);
+    dialog = gtk_message_dialog_new(parent, GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_ERROR, GTK_BUTTONS_OK,
+                                    ctext);
 #pragma GCC diagnostic pop
   if (coding != lng_eCoding_UTF_8)
     g_free(ctext);
@@ -357,10 +331,10 @@ void CoWowGtk::DisplayError(
 }
 
 /************************************************************************
-*
-* Description: Create a text window.
-*
-*************************************************************************/
+ *
+ * Description: Create a text window.
+ *
+ *************************************************************************/
 
 static void displaytext_close_cb(GtkWidget* w, gint arg1, gpointer data)
 {
@@ -369,13 +343,12 @@ static void displaytext_close_cb(GtkWidget* w, gint arg1, gpointer data)
   gtk_widget_destroy(w);
 }
 
-void CoWowGtk::DisplayText(
-      const char* title, const char* text, int width, int height,
-      wow_eImage image)
+void CoWowGtk::DisplayText(const char* title, const char* text, int width, int height, wow_eImage image)
 {
   pwr_tFileName fname;
   GtkWidget* parent = m_parent;
-  if (parent) {
+  if (parent)
+  {
     while (!GTK_IS_WINDOW(parent))
       parent = gtk_widget_get_parent(parent);
   }
@@ -386,18 +359,17 @@ void CoWowGtk::DisplayText(
     height = 150;
 
   // Create a displaytext window
-  GtkWidget* dialog
-      = (GtkWidget*)g_object_new(GTK_TYPE_DIALOG, "default-height", height,
-          "default-width", width, "title", CoWowGtk::translate_utf8(title),
-          +"window-position", GTK_WIN_POS_CENTER, NULL);
-  g_signal_connect(
-      dialog, "delete_event", G_CALLBACK(displaytext_close_cb), dialog);
+  GtkWidget* dialog =
+      (GtkWidget*)g_object_new(GTK_TYPE_DIALOG, "default-height", height, "default-width", width, "title",
+                               CoWowGtk::translate_utf8(title), "window-position", GTK_WIN_POS_CENTER, NULL);
+  g_signal_connect(dialog, "delete_event", G_CALLBACK(displaytext_close_cb), dialog);
 
   char* textutf8 = g_convert(text, -1, "UTF-8", "ISO8859-1", NULL, NULL, NULL);
   GtkWidget* displaytext_label = gtk_label_new(textutf8);
   g_free(textutf8);
 
-  switch(image) {
+  switch (image)
+  {
   case wow_eImage_Question:
     dcli_translate_filename(fname, "$pwr_exe/pwr_gtk_question.png");
     break;
@@ -416,48 +388,39 @@ void CoWowGtk::DisplayText(
   }
   GtkWidget* displaytext_image = gtk_image_new_from_file(fname);
 
-  GtkWidget* displaytext_close
-      = gtk_button_new_with_label(CoWowGtk::translate_utf8("Close"));
+  GtkWidget* displaytext_close = gtk_button_new_with_label(CoWowGtk::translate_utf8("Close"));
   gtk_widget_set_size_request(displaytext_close, 70, 25);
-  g_signal_connect(
-      displaytext_close, "clicked", G_CALLBACK(displaytext_close_cb), dialog);
+  g_signal_connect(displaytext_close, "clicked", G_CALLBACK(displaytext_close_cb), dialog);
 
   GtkWidget* displaytext_hboxtext = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-  gtk_box_pack_start(
-      GTK_BOX(displaytext_hboxtext), displaytext_image, FALSE, FALSE, 15);
-  gtk_box_pack_start(
-      GTK_BOX(displaytext_hboxtext), displaytext_label, TRUE, TRUE, 15);
+  gtk_box_pack_start(GTK_BOX(displaytext_hboxtext), displaytext_image, FALSE, FALSE, 15);
+  gtk_box_pack_start(GTK_BOX(displaytext_hboxtext), displaytext_label, TRUE, TRUE, 15);
 
   GtkWidget* displaytext_hboxbuttons = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 40);
-  gtk_box_pack_end(
-      GTK_BOX(displaytext_hboxbuttons), displaytext_close, FALSE, FALSE, 0);
+  gtk_box_pack_end(GTK_BOX(displaytext_hboxbuttons), displaytext_close, FALSE, FALSE, 0);
 
   GtkWidget* displaytext_vbox = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
-  gtk_box_pack_start(
-      GTK_BOX(displaytext_vbox), displaytext_hboxtext, TRUE, TRUE, 30);
-  gtk_box_pack_start(
-      GTK_BOX(displaytext_vbox), gtk_separator_new(GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 0);
-  gtk_box_pack_end(
-      GTK_BOX(displaytext_vbox), displaytext_hboxbuttons, FALSE, FALSE, 15);
+  gtk_box_pack_start(GTK_BOX(displaytext_vbox), displaytext_hboxtext, TRUE, TRUE, 30);
+  gtk_box_pack_start(GTK_BOX(displaytext_vbox), gtk_separator_new(GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE,
+                     0);
+  gtk_box_pack_end(GTK_BOX(displaytext_vbox), displaytext_hboxbuttons, FALSE, FALSE, 15);
   gtk_widget_show_all(dialog);
 
   if (m_transient_wid)
-    gtk_window_set_transient_for(
-        GTK_WINDOW(dialog), GTK_WINDOW(m_transient_wid));
+    gtk_window_set_transient_for(GTK_WINDOW(dialog), GTK_WINDOW(m_transient_wid));
 }
 
 /************************************************************************
-*
-* Description: Create a window with a scrolled list and Ok and Cancel
-*              buttons.
-*
-*************************************************************************/
+ *
+ * Description: Create a window with a scrolled list and Ok and Cancel
+ *              buttons.
+ *
+ *************************************************************************/
 
-class WowListCtx {
+class WowListCtx
+{
 public:
-  WowListCtx() : texts(0), textsize(0), ok_pressed(0)
-  {
-  }
+  WowListCtx() : texts(0), textsize(0), ok_pressed(0) {}
   GtkWidget* toplevel;
   GtkWidget* list;
   char* texts;
@@ -468,8 +431,8 @@ public:
   int ok_pressed;
 };
 
-void CoWowGtk::list_row_activated_cb(GtkTreeView* tree_view, GtkTreePath* path,
-    GtkTreeViewColumn* column, gpointer data)
+void CoWowGtk::list_row_activated_cb(GtkTreeView* tree_view, GtkTreePath* path, GtkTreeViewColumn* column,
+                                     gpointer data)
 {
   list_ok_cb(0, data);
 }
@@ -484,15 +447,15 @@ void CoWowGtk::list_apply_cb(GtkWidget* w, gpointer data)
 
   g_object_get(ctx->list, "model", &store, NULL);
 
-  GtkTreeSelection* selection
-      = gtk_tree_view_get_selection(GTK_TREE_VIEW(ctx->list));
-  if (gtk_tree_selection_get_selected(selection, NULL, &iter)) {
+  GtkTreeSelection* selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(ctx->list));
+  if (gtk_tree_selection_get_selected(selection, NULL, &iter))
+  {
     gtk_tree_model_get(GTK_TREE_MODEL(store), &iter, 0, &text, -1);
     strcpy(selected_text, text);
   }
-  if (ctx->action_cb) {
-    char* textiso
-        = g_convert(selected_text, -1, "ISO8859-1", "UTF-8", NULL, NULL, NULL);
+  if (ctx->action_cb)
+  {
+    char* textiso = g_convert(selected_text, -1, "ISO8859-1", "UTF-8", NULL, NULL, NULL);
     strcpy(selected_text, textiso);
     g_free(textiso);
 
@@ -524,8 +487,7 @@ void CoWowGtk::list_cancel_cb(GtkWidget* w, gpointer data)
   delete ctx;
 }
 
-static gboolean list_action_inputfocus(
-    GtkWidget* w, GdkEvent* event, gpointer data)
+static gboolean list_action_inputfocus(GtkWidget* w, GdkEvent* event, gpointer data)
 {
   gtk_window_present(GTK_WINDOW(w));
   return FALSE;
@@ -554,8 +516,8 @@ void CoWowGtk::DeleteList(void* data)
 }
 
 void* CoWowGtk::CreateList(const char* title, const char* texts, int textsize,
-    void(action_cb)(void*, char*, int), void(cancel_cb)(void*),
-    void* parent_ctx, int show_apply_button)
+                           void(action_cb)(void*, char*, int), void(cancel_cb)(void*), void* parent_ctx,
+                           int show_apply_button)
 {
   char* name_p;
   int i;
@@ -570,21 +532,19 @@ void* CoWowGtk::CreateList(const char* title, const char* texts, int textsize,
   ctx->cancel_cb = cancel_cb;
   ctx->parent_ctx = parent_ctx;
 
-  ctx->toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height",
-      400, "default-width", 200, "title", translate_utf8(title),
-      "window-position", GTK_WIN_POS_CENTER, NULL);
+  ctx->toplevel =
+      (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", 400, "default-width", 200, "title",
+                               translate_utf8(title), "window-position", GTK_WIN_POS_CENTER, NULL);
 
-  g_signal_connect(
-      ctx->toplevel, "focus-in-event", G_CALLBACK(list_action_inputfocus), ctx);
-  g_signal_connect(
-      ctx->toplevel, "delete_event", G_CALLBACK(list_delete_event), ctx);
+  g_signal_connect(ctx->toplevel, "focus-in-event", G_CALLBACK(list_action_inputfocus), ctx);
+  g_signal_connect(ctx->toplevel, "delete_event", G_CALLBACK(list_delete_event), ctx);
 
   store = gtk_list_store_new(1, G_TYPE_STRING);
   name_p = (char*)texts;
   i = 0;
-  while (!streq(name_p, "")) {
-    char* nameutf8
-        = g_convert(name_p, -1, "UTF-8", "ISO8859-1", NULL, NULL, NULL);
+  while (!streq(name_p, ""))
+  {
+    char* nameutf8 = g_convert(name_p, -1, "UTF-8", "ISO8859-1", NULL, NULL, NULL);
 
     gtk_list_store_append(store, &iter);
     gtk_list_store_set(store, &iter, 0, nameutf8, -1);
@@ -593,35 +553,31 @@ void* CoWowGtk::CreateList(const char* title, const char* texts, int textsize,
     g_free(nameutf8);
   }
 
-  ctx->list = (GtkWidget*)g_object_new(GTK_TYPE_TREE_VIEW, "model", store,
-      "rules-hint", TRUE, "headers-visible", FALSE, "reorderable", TRUE,
-      "enable-search", TRUE, "search-column", 0, NULL);
+  ctx->list =
+      (GtkWidget*)g_object_new(GTK_TYPE_TREE_VIEW, "model", store, "rules-hint", TRUE, "headers-visible",
+                               FALSE, "reorderable", TRUE, "enable-search", TRUE, "search-column", 0, NULL);
 
   text_renderer = gtk_cell_renderer_text_new();
-  name_column = gtk_tree_view_column_new_with_attributes(
-      "", text_renderer, "text", 0, NULL);
+  name_column = gtk_tree_view_column_new_with_attributes("", text_renderer, "text", 0, NULL);
   g_object_set(name_column, "resizable", TRUE, "clickable", TRUE, NULL);
 
   gtk_tree_view_append_column(GTK_TREE_VIEW(ctx->list), name_column);
-  g_signal_connect(ctx->list, "row-activated",
-      G_CALLBACK(CoWowGtk::list_row_activated_cb), ctx);
+  g_signal_connect(ctx->list, "row-activated", G_CALLBACK(CoWowGtk::list_row_activated_cb), ctx);
 
   GtkWidget* ok_button = gtk_button_new_with_label(translate_utf8("Ok"));
   gtk_widget_set_size_request(ok_button, 70, 28);
   g_signal_connect(ok_button, "clicked", G_CALLBACK(CoWowGtk::list_ok_cb), ctx);
 
   GtkWidget* apply_button = NULL;
-  if (show_apply_button) {
+  if (show_apply_button)
+  {
     apply_button = gtk_button_new_with_label(translate_utf8("Apply"));
     gtk_widget_set_size_request(apply_button, 70, 28);
-    g_signal_connect(
-        apply_button, "clicked", G_CALLBACK(CoWowGtk::list_apply_cb), ctx);
+    g_signal_connect(apply_button, "clicked", G_CALLBACK(CoWowGtk::list_apply_cb), ctx);
   }
-  GtkWidget* cancel_button
-      = gtk_button_new_with_label(translate_utf8("Cancel"));
+  GtkWidget* cancel_button = gtk_button_new_with_label(translate_utf8("Cancel"));
   gtk_widget_set_size_request(cancel_button, 70, 28);
-  g_signal_connect(
-      cancel_button, "clicked", G_CALLBACK(CoWowGtk::list_cancel_cb), ctx);
+  g_signal_connect(cancel_button, "clicked", G_CALLBACK(CoWowGtk::list_cancel_cb), ctx);
 
   GtkWidget* hboxbuttons = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 40);
   gtk_box_pack_start(GTK_BOX(hboxbuttons), ok_button, FALSE, FALSE, 20);
@@ -651,8 +607,7 @@ void* CoWowGtk::CreateList(const char* title, const char* texts, int textsize,
   gtk_widget_grab_focus(ctx->list);
 
   if (m_transient_wid)
-    gtk_window_set_transient_for(
-        GTK_WINDOW(ctx->toplevel), GTK_WINDOW(m_transient_wid));
+    gtk_window_set_transient_for(GTK_WINDOW(ctx->toplevel), GTK_WINDOW(m_transient_wid));
 
   return ctx;
 }
@@ -661,7 +616,8 @@ void CoWowGtk::warranty_cb(GtkWidget* w, gint response, gpointer data)
 {
   wow_t_question_cb* cbdata = (wow_t_question_cb*)data;
 
-  switch (response) {
+  switch (response)
+  {
   case GTK_RESPONSE_ACCEPT:
     ((CoWowGtk*)cbdata->ctx)->DisplayLicense();
     break;
@@ -699,7 +655,8 @@ int CoWowGtk::DisplayWarranty()
   dcli_translate_filename(fname, fname);
 
   fp = fopen(fname, "r");
-  if (!fp) {
+  if (!fp)
+  {
     strcpy(fname, "$pwr_exe/en_us/acceptlicense.txt");
     dcli_translate_filename(fname, fname);
     fp = fopen(fname, "r");
@@ -707,7 +664,8 @@ int CoWowGtk::DisplayWarranty()
       return 1;
   }
 
-  for (i = 0; i < (int)sizeof(text) - 1; i++) {
+  for (i = 0; i < (int)sizeof(text) - 1; i++)
+  {
     c = fgetc(fp);
     if (c == EOF)
       break;
@@ -718,9 +676,11 @@ int CoWowGtk::DisplayWarranty()
 
   if (str_StartsWith(text, "Coding:UTF-8"))
     str_Strcpy(text, &text[13]);
-  else {
+  else
+  {
     gchar* s = g_convert(text, -1, "UTF-8", "ISO8859-1", NULL, NULL, NULL);
-    if (s) {
+    if (s)
+    {
       strncpy(text, s, sizeof(text));
       g_free(s);
     }
@@ -733,17 +693,15 @@ int CoWowGtk::DisplayWarranty()
   strcpy(show_license_str, translate_utf8("Show License"));
   strcpy(i_accept_str, translate_utf8("I Accept"));
 
-  GtkDialog* dialog = (GtkDialog*)gtk_dialog_new_with_buttons(title,
-      GTK_WINDOW(m_parent), GTK_DIALOG_MODAL, translate_utf8("Quit"),
-      GTK_RESPONSE_REJECT, show_license_str, GTK_RESPONSE_ACCEPT, i_accept_str,
-      GTK_RESPONSE_HELP, NULL);
+  GtkDialog* dialog = (GtkDialog*)gtk_dialog_new_with_buttons(
+      title, GTK_WINDOW(m_parent), GTK_DIALOG_MODAL, translate_utf8("Quit"), GTK_RESPONSE_REJECT,
+      show_license_str, GTK_RESPONSE_ACCEPT, i_accept_str, GTK_RESPONSE_HELP, NULL);
 
   cbdata = (wow_t_question_cb*)calloc(1, sizeof(*cbdata));
   cbdata->ctx = this;
   cbdata->data = dialog;
 
-  g_signal_connect(
-      dialog, "delete_event", G_CALLBACK(warranty_delete_event), cbdata);
+  g_signal_connect(dialog, "delete_event", G_CALLBACK(warranty_delete_event), cbdata);
   g_signal_connect(dialog, "response", G_CALLBACK(warranty_cb), cbdata);
 
   GtkWidget* dialog_label = gtk_label_new(text);
@@ -784,7 +742,8 @@ void CoWowGtk::DisplayLicense()
   dcli_translate_filename(fname, fname);
 
   fp = fopen(fname, "r");
-  if (!fp) {
+  if (!fp)
+  {
     strcpy(fname, "$pwr_exe/en_us/lincense.txt");
     dcli_translate_filename(fname, fname);
     fp = fopen(fname, "r");
@@ -792,7 +751,8 @@ void CoWowGtk::DisplayLicense()
       return;
   }
 
-  for (i = 0; i < (int)sizeof(text) - 1; i++) {
+  for (i = 0; i < (int)sizeof(text) - 1; i++)
+  {
     c = fgetc(fp);
     if (c == EOF)
       break;
@@ -803,17 +763,18 @@ void CoWowGtk::DisplayLicense()
 
   if (str_StartsWith(text, "Coding:UTF-8"))
     str_Strcpy(text, &text[13]);
-  else {
+  else
+  {
     gchar* s = g_convert(text, -1, "UTF-8", "ISO8859-1", NULL, NULL, NULL);
-    if (s) {
+    if (s)
+    {
       strncpy(text, s, sizeof(text));
       g_free(s);
     }
   }
 
-  GtkDialog* dialog
-      = (GtkDialog*)gtk_dialog_new_with_buttons(title, GTK_WINDOW(m_parent),
-          GTK_DIALOG_MODAL, translate_utf8("Close"), GTK_RESPONSE_REJECT, NULL);
+  GtkDialog* dialog = (GtkDialog*)gtk_dialog_new_with_buttons(
+      title, GTK_WINDOW(m_parent), GTK_DIALOG_MODAL, translate_utf8("Close"), GTK_RESPONSE_REJECT, NULL);
   g_object_set(dialog, "default-height", 600, "default-width", 600, NULL);
   g_signal_connect(dialog, "response", G_CALLBACK(license_cb), dialog);
 
@@ -830,8 +791,7 @@ void CoWowGtk::DisplayLicense()
   gtk_widget_show_all(GTK_WIDGET(dialog));
 }
 
-void CoWowGtk::GetAtoms(
-    GdkAtom* graph_atom, GdkAtom* objid_atom, GdkAtom* attrref_atom)
+void CoWowGtk::GetAtoms(GdkAtom* graph_atom, GdkAtom* objid_atom, GdkAtom* attrref_atom)
 {
   if (graph_atom)
     *graph_atom = gdk_atom_intern("PWR_GRAPH", FALSE);
@@ -841,21 +801,24 @@ void CoWowGtk::GetAtoms(
     *attrref_atom = gdk_atom_intern("PWR_ATTRREF", FALSE);
 }
 
-static void wow_get_selection_cb(GtkWidget* w, GtkSelectionData* selection_data,
-    guint time, gpointer clientdata)
+static void wow_get_selection_cb(GtkWidget* w, GtkSelectionData* selection_data, guint time,
+                                 gpointer clientdata)
 {
   wow_sSelection* data = (wow_sSelection*)clientdata;
   int length;
   GdkAtom target;
-  const guchar *sdata;
+  const guchar* sdata;
 
   length = gtk_selection_data_get_length(selection_data);
-  if (length > 0) {
+  if (length > 0)
+  {
     target = gtk_selection_data_get_target(selection_data);
-    if (target == data->atom) {
-      if (length > int(sizeof(data->str) - 1)) {
-	data->sts = 0;
-	return;
+    if (target == data->atom)
+    {
+      if (length > int(sizeof(data->str) - 1))
+      {
+        data->sts = 0;
+        return;
       }
       sdata = gtk_selection_data_get_data(selection_data);
       strncpy(data->str, (char*)sdata, length);
@@ -865,7 +828,8 @@ static void wow_get_selection_cb(GtkWidget* w, GtkSelectionData* selection_data,
     }
     else
       data->sts = 0;
-  } else
+  }
+  else
     data->sts = 0;
   data->received = 1;
   if (data->new_main)
@@ -881,11 +845,11 @@ int CoWowGtk::GetSelection(GtkWidget* w, char* str, int size, GdkAtom atom)
   data.atom = atom;
   data.new_main = 0;
 
-  gulong id = g_signal_connect(
-      w, "selection_received", G_CALLBACK(wow_get_selection_cb), &data);
+  gulong id = g_signal_connect(w, "selection_received", G_CALLBACK(wow_get_selection_cb), &data);
   gtk_selection_convert(w, GDK_SELECTION_PRIMARY, atom, GDK_CURRENT_TIME);
 
-  while (!data.received) {
+  while (!data.received)
+  {
     // From other application
     data.new_main = 1;
     gtk_main();
@@ -898,8 +862,8 @@ int CoWowGtk::GetSelection(GtkWidget* w, char* str, int size, GdkAtom atom)
 }
 
 void CoWowGtk::CreateFileSelDia(const char* title, void* parent_ctx,
-    void (*file_selected_cb)(void*, char*, wow_eFileSelType),
-    wow_eFileSelType file_type, wow_eFileSelAction action)
+                                void (*file_selected_cb)(void*, char*, wow_eFileSelType),
+                                wow_eFileSelType file_type, wow_eFileSelAction action)
 {
   GtkWidget* dialog;
   pwr_tFileName fname;
@@ -910,11 +874,11 @@ void CoWowGtk::CreateFileSelDia(const char* title, void* parent_ctx,
   else
     gaction = GTK_FILE_CHOOSER_ACTION_SAVE;
 
-  dialog = gtk_file_chooser_dialog_new(title, NULL,
-      gaction, "_Cancel", GTK_RESPONSE_CANCEL,
-      "_Open", GTK_RESPONSE_ACCEPT, NULL);
+  dialog = gtk_file_chooser_dialog_new(title, NULL, gaction, "_Cancel", GTK_RESPONSE_CANCEL, "_Open",
+                                       GTK_RESPONSE_ACCEPT, NULL);
 
-  if (file_type == wow_eFileSelType_Dbs) {
+  if (file_type == wow_eFileSelType_Dbs)
+  {
     pwr_tFileName folder;
     dcli_translate_filename(folder, "$pwrp_load");
     gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dialog), folder);
@@ -923,7 +887,9 @@ void CoWowGtk::CreateFileSelDia(const char* title, void* parent_ctx,
     gtk_file_filter_set_name(filter, "*.dbs");
     gtk_file_filter_add_pattern(filter, "*.dbs");
     gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(dialog), filter);
-  } else if (file_type == wow_eFileSelType_Wbl) {
+  }
+  else if (file_type == wow_eFileSelType_Wbl)
+  {
     pwr_tFileName folder;
     dcli_translate_filename(folder, "$pwrp_db");
     gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dialog), folder);
@@ -938,7 +904,9 @@ void CoWowGtk::CreateFileSelDia(const char* title, void* parent_ctx,
     gtk_file_filter_set_name(filter, "All Files");
     gtk_file_filter_add_pattern(filter, "*");
     gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(dialog), filter);
-  } else if (file_type == wow_eFileSelType_Graph) {
+  }
+  else if (file_type == wow_eFileSelType_Graph)
+  {
     pwr_tFileName folder;
     dcli_translate_filename(folder, "$pwrp_pop");
     gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dialog), folder);
@@ -947,7 +915,9 @@ void CoWowGtk::CreateFileSelDia(const char* title, void* parent_ctx,
     gtk_file_filter_set_name(filter, "*.pwg");
     gtk_file_filter_add_pattern(filter, "*.pwg");
     gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(dialog), filter);
-  } else if (file_type == wow_eFileSelType_ColorTheme) {
+  }
+  else if (file_type == wow_eFileSelType_ColorTheme)
+  {
     pwr_tFileName folder;
     dcli_translate_filename(folder, "$pwrp_pop");
     gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dialog), folder);
@@ -956,7 +926,9 @@ void CoWowGtk::CreateFileSelDia(const char* title, void* parent_ctx,
     gtk_file_filter_set_name(filter, "*.pwgc");
     gtk_file_filter_add_pattern(filter, "*.pwgc");
     gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(dialog), filter);
-  } else if (file_type == wow_eFileSelType_Image) {
+  }
+  else if (file_type == wow_eFileSelType_Image)
+  {
     pwr_tFileName folder;
     dcli_translate_filename(folder, "$pwrp_pop");
     gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dialog), folder);
@@ -973,7 +945,9 @@ void CoWowGtk::CreateFileSelDia(const char* title, void* parent_ctx,
     gtk_file_filter_set_name(filter, "All Files");
     gtk_file_filter_add_pattern(filter, "*");
     gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(dialog), filter);
-  } else if (file_type == wow_eFileSelType_History) {
+  }
+  else if (file_type == wow_eFileSelType_History)
+  {
     pwr_tFileName folder;
     dcli_translate_filename(folder, "~");
     gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dialog), folder);
@@ -989,7 +963,9 @@ void CoWowGtk::CreateFileSelDia(const char* title, void* parent_ctx,
     gtk_file_filter_set_name(filter, "All Files");
     gtk_file_filter_add_pattern(filter, "*");
     gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(dialog), filter);
-  } else if (file_type == wow_eFileSelType_Backup) {
+  }
+  else if (file_type == wow_eFileSelType_Backup)
+  {
     pwr_tFileName folder;
     dcli_translate_filename(folder, "$pwrp_load");
     gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dialog), folder);
@@ -1003,13 +979,16 @@ void CoWowGtk::CreateFileSelDia(const char* title, void* parent_ctx,
     gtk_file_filter_set_name(filter, "All Files");
     gtk_file_filter_add_pattern(filter, "*");
     gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(dialog), filter);
-  } else if (file_type == wow_eFileSelType_Tmp) {
+  }
+  else if (file_type == wow_eFileSelType_Tmp)
+  {
     pwr_tFileName folder;
     dcli_translate_filename(folder, "$pwrp_tmp");
     gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dialog), folder);
   }
 
-  if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT) {
+  if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT)
+  {
     char* filename;
 
     filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
@@ -1023,10 +1002,7 @@ void CoWowGtk::CreateFileSelDia(const char* title, void* parent_ctx,
   gtk_widget_destroy(dialog);
 }
 
-CoWowTimer* CoWowGtk::timer_new()
-{
-  return new CoWowTimerGtk();
-}
+CoWowTimer* CoWowGtk::timer_new() { return new CoWowTimerGtk(); }
 
 CoWowTimerGtk::~CoWowTimerGtk()
 {
@@ -1043,7 +1019,8 @@ void CoWowTimerGtk::add(int time, void (*callback)(void* data), void* data)
 
 void CoWowTimerGtk::remove()
 {
-  if (m_timerid) {
+  if (m_timerid)
+  {
     g_source_remove(m_timerid);
     m_timerid = 0;
   }
@@ -1060,8 +1037,7 @@ gboolean CoWowTimerGtk::timer_cb(void* data)
 //
 // Calculate position for a popup menu
 //
-void CoWowGtk::PopupPosition(
-    GtkWidget* parent, int x_event, int y_event, int* x, int* y)
+void CoWowGtk::PopupPosition(GtkWidget* parent, int x_event, int y_event, int* x, int* y)
 {
   gint x0, y0, x1, y1;
   GtkWidget* grandparent;
@@ -1072,9 +1048,11 @@ void CoWowGtk::PopupPosition(
   y0 = (gint)y_event;
 
   grandparent = gtk_widget_get_parent(parent);
-  while (!GTK_IS_WINDOW(grandparent)) {
+  while (!GTK_IS_WINDOW(grandparent))
+  {
     gtk_widget_get_allocation(parent, &allocation);
-    if (!x1 && !y1 && (allocation.x || allocation.y)) {
+    if (!x1 && !y1 && (allocation.x || allocation.y))
+    {
       // Add first widget with nonzero position
       x1 = allocation.x;
       y1 = allocation.y;
@@ -1084,7 +1062,8 @@ void CoWowGtk::PopupPosition(
     parent = grandparent;
     grandparent = gtk_widget_get_parent(parent);
   }
-  if (grandparent) {
+  if (grandparent)
+  {
     // Add window widget position
     gtk_window_get_position(GTK_WINDOW(grandparent), &x1, &y1);
     x0 += x1;
@@ -1128,7 +1107,8 @@ CoWowFocusTimerGtk::~CoWowFocusTimerGtk()
 
 CoWowEntryGtk::CoWowEntryGtk(CoWowRecall* re) : m_re(re), m_re_alloc(false)
 {
-  if (!m_re) {
+  if (!m_re)
+  {
     m_re = new CoWowRecall();
     m_re_alloc = true;
   }
@@ -1150,18 +1130,22 @@ gboolean CoWowEntryGtk::event_cb(GtkWidget* w, GdkEvent* event, gpointer data)
 
   gchar* text = gtk_editable_get_chars(GTK_EDITABLE(w), 0, -1);
 
-  switch (event->key.keyval) {
+  switch (event->key.keyval)
+  {
   case GDK_KEY_Return:
   case GDK_KEY_KP_Enter:
-  case GDK_KEY_Linefeed: {
+  case GDK_KEY_Linefeed:
+  {
     // Insert in recall buffer
-    if (!streq(text, "")) {
+    if (!streq(text, ""))
+    {
       en->m_re->push(text);
     }
     break;
   }
-  case GDK_KEY_Up: {
-    const char *prev = en->m_re->popUp(text);
+  case GDK_KEY_Up:
+  {
+    const char* prev = en->m_re->popUp(text);
     gint pos = 0;
     gtk_editable_delete_text(GTK_EDITABLE(w), 0, -1);
     gtk_editable_insert_text(GTK_EDITABLE(w), prev, strlen(prev), &pos);
@@ -1169,8 +1153,9 @@ gboolean CoWowEntryGtk::event_cb(GtkWidget* w, GdkEvent* event, gpointer data)
     sts = TRUE;
     break;
   }
-  case GDK_KEY_Down: {
-    const char *next = en->m_re->popDown(text);
+  case GDK_KEY_Down:
+  {
+    const char* next = en->m_re->popDown(text);
     gint pos = 0;
     gtk_editable_delete_text(GTK_EDITABLE(w), 0, -1);
     gtk_editable_insert_text(GTK_EDITABLE(w), next, strlen(next), &pos);
@@ -1195,8 +1180,10 @@ void CoWowGtk::SetWindowIcon(GtkWidget* w)
   pwr_tFileName fname;
   static GdkPixbuf* icon = 0;
 
-  if (!icon) {
-    switch (m_icon_type) {
+  if (!icon)
+  {
+    switch (m_icon_type)
+    {
     case wow_eIconType_Rt:
       dcli_translate_filename(fname, "$pwr_exe/pwr_icon16y.png");
       break;
@@ -1215,13 +1202,15 @@ char* CoWowGtk::translate_utf8(const char* str)
 
   if (Lng::translatefile_coding() == lng_eCoding_UTF_8)
     strncpy(result, Lng::translate(str), sizeof(result));
-  else {
-    s = g_convert(
-        Lng::translate(str), -1, "UTF-8", "ISO8859-1", NULL, NULL, NULL);
-    if (s) {
+  else
+  {
+    s = g_convert(Lng::translate(str), -1, "UTF-8", "ISO8859-1", NULL, NULL, NULL);
+    if (s)
+    {
       strncpy(result, s, sizeof(result));
       g_free(s);
-    } else
+    }
+    else
       strcpy(result, "");
   }
   return result;
@@ -1234,12 +1223,15 @@ char* CoWowGtk::convert_utf8(const char* str)
 
   if (Lng::translatefile_coding() == lng_eCoding_UTF_8)
     strncpy(result, str, sizeof(result));
-  else {
+  else
+  {
     s = g_convert(str, -1, "UTF-8", "ISO8859-1", NULL, NULL, NULL);
-    if (s) {
+    if (s)
+    {
       strncpy(result, s, sizeof(result));
       g_free(s);
-    } else
+    }
+    else
       strcpy(result, "");
   }
   return result;
@@ -1263,8 +1255,7 @@ static void modaldia_button3_cb(GtkWidget* w, gpointer data)
   *(int*)data = wow_eModalDialogReturn_Button3;
   gtk_main_quit();
 }
-static gboolean modaldia_delete_event(
-    GtkWidget* w, GdkEvent* event, gpointer data)
+static gboolean modaldia_delete_event(GtkWidget* w, GdkEvent* event, gpointer data)
 {
   *(int*)data = wow_eModalDialogReturn_Deleted;
   gtk_main_quit();
@@ -1272,29 +1263,28 @@ static gboolean modaldia_delete_event(
   return TRUE;
 }
 
-int CoWowGtk::CreateModalDialog(const char* title, const char* text,
-    const char* button1, const char* button2, const char* button3,
-    const char* image)
+int CoWowGtk::CreateModalDialog(const char* title, const char* text, const char* button1, const char* button2,
+                                const char* button3, const char* image)
 {
   int status = 0;
   GtkWidget* image_w = NULL;
   pwr_tFileName fname;
 
   // Create a question window
-  GtkWidget* dialog_w = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW,
-      "default-height", 150, "default-width", 400, "title", title,
-      "window-position", GTK_WIN_POS_CENTER, NULL);
+  GtkWidget* dialog_w = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", 150, "default-width", 400,
+                                                 "title", title, "window-position", GTK_WIN_POS_CENTER, NULL);
 
-  g_signal_connect(
-      dialog_w, "delete_event", G_CALLBACK(modaldia_delete_event), &status);
+  g_signal_connect(dialog_w, "delete_event", G_CALLBACK(modaldia_delete_event), &status);
   gtk_widget_set_name(dialog_w, "modaldialog");
   GtkWidget* text_w = gtk_label_new(text);
 
-  if (image) {
+  if (image)
+  {
     dcli_translate_filename(fname, image);
     image_w = gtk_image_new_from_file(fname);
   }
-  if (!image) {
+  if (!image)
+  {
     dcli_translate_filename(fname, "$pwr_exe/xtt_question.png");
     image_w = gtk_image_new_from_file(fname);
   }
@@ -1307,25 +1297,25 @@ int CoWowGtk::CreateModalDialog(const char* title, const char* text,
 
   GtkWidget* hboxbuttons = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 40);
 
-  if (button1) {
+  if (button1)
+  {
     GtkWidget* button1_w = gtk_button_new_with_label(translate_utf8(button1));
     gtk_widget_set_size_request(button1_w, -1, 28);
-    g_signal_connect(
-        button1_w, "clicked", G_CALLBACK(modaldia_button1_cb), &status);
+    g_signal_connect(button1_w, "clicked", G_CALLBACK(modaldia_button1_cb), &status);
     gtk_box_pack_start(GTK_BOX(hboxbuttons), button1_w, FALSE, FALSE, 30);
   }
-  if (button2) {
+  if (button2)
+  {
     GtkWidget* button2_w = gtk_button_new_with_label(translate_utf8(button2));
     gtk_widget_set_size_request(button2_w, -1, 28);
-    g_signal_connect(
-        button2_w, "clicked", G_CALLBACK(modaldia_button2_cb), &status);
+    g_signal_connect(button2_w, "clicked", G_CALLBACK(modaldia_button2_cb), &status);
     gtk_box_pack_start(GTK_BOX(hboxbuttons), button2_w, FALSE, FALSE, 30);
   }
-  if (button3) {
+  if (button3)
+  {
     GtkWidget* button3_w = gtk_button_new_with_label(translate_utf8(button3));
     gtk_widget_set_size_request(button3_w, -1, 28);
-    g_signal_connect(
-        button3_w, "clicked", G_CALLBACK(modaldia_button3_cb), &status);
+    g_signal_connect(button3_w, "clicked", G_CALLBACK(modaldia_button3_cb), &status);
     gtk_box_pack_end(GTK_BOX(hboxbuttons), button3_w, FALSE, FALSE, 30);
   }
 
@@ -1347,17 +1337,18 @@ int CoWowGtk::CreateModalDialog(const char* title, const char* text,
 //  The returned data should be freed with free().
 //
 
-static gboolean modaldia_keypress_cb(
-    GtkWidget* w, GdkEvent* event, gpointer data)
+static gboolean modaldia_keypress_cb(GtkWidget* w, GdkEvent* event, gpointer data)
 {
   gboolean sts;
   guint keysym = event->key.keyval;
   gchar* text = gtk_editable_get_chars(GTK_EDITABLE(w), 0, -1);
 
-  switch (keysym) {
+  switch (keysym)
+  {
   case GDK_KEY_Return:
   case GDK_KEY_KP_Enter:
-  case GDK_KEY_Linefeed: {
+  case GDK_KEY_Linefeed:
+  {
     // Terminate
     *(int*)data = wow_eModalDialogReturn_ReturnPressed;
     gtk_main_quit();
@@ -1379,44 +1370,45 @@ static gboolean modaldia_activate_cb(GtkWidget* w, gpointer data)
   return FALSE;
 }
 
-wow_sModalInputDialog* CoWowGtk::CreateModalInputDialog(const char* title,
-    const char* text, const char* button1, const char* button2,
-    const char* button3, const char* image, int input_length,
-    CoWowRecall* recall)
+wow_sModalInputDialog* CoWowGtk::CreateModalInputDialog(const char* title, const char* text,
+                                                        const char* button1, const char* button2,
+                                                        const char* button3, const char* image,
+                                                        int input_length, CoWowRecall* recall)
 {
   int status = 0;
   GtkWidget* image_w = NULL;
   pwr_tFileName fname;
 
   // Create a question window
-  GtkWidget* dialog_w = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW,
-      "default-height", 150, "default-width", 800, "title", title,
-      "window-position", GTK_WIN_POS_CENTER, NULL);
+  GtkWidget* dialog_w = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", 150, "default-width", 800,
+                                                 "title", title, "window-position", GTK_WIN_POS_CENTER, NULL);
 
-  g_signal_connect(
-      dialog_w, "delete_event", G_CALLBACK(modaldia_delete_event), &status);
+  g_signal_connect(dialog_w, "delete_event", G_CALLBACK(modaldia_delete_event), &status);
   GtkWidget* text_w = gtk_label_new(text);
 
-  if (image) {
+  if (image)
+  {
     dcli_translate_filename(fname, image);
     image_w = gtk_image_new_from_file(fname);
   }
-  if (!image) {
+  if (!image)
+  {
     dcli_translate_filename(fname, "$pwr_exe/xtt_question.png");
     image_w = gtk_image_new_from_file(fname);
   }
 
   GtkWidget* textinput;
-  if (!recall) {
+  if (!recall)
+  {
     textinput = gtk_entry_new();
     gtk_entry_set_max_length(GTK_ENTRY(textinput), input_length);
-    g_signal_connect(textinput, "key-press-event",
-        G_CALLBACK(modaldia_keypress_cb), &status);
-  } else {
+    g_signal_connect(textinput, "key-press-event", G_CALLBACK(modaldia_keypress_cb), &status);
+  }
+  else
+  {
     CoWowEntryGtk* entry = new CoWowEntryGtk(recall);
     textinput = entry->widget();
-    g_signal_connect(
-        textinput, "activate", G_CALLBACK(modaldia_activate_cb), &status);
+    g_signal_connect(textinput, "activate", G_CALLBACK(modaldia_activate_cb), &status);
   }
 
   GtkWidget* hboxtext = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
@@ -1426,25 +1418,25 @@ wow_sModalInputDialog* CoWowGtk::CreateModalInputDialog(const char* title,
 
   GtkWidget* hboxbuttons = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 40);
 
-  if (button1) {
+  if (button1)
+  {
     GtkWidget* button1_w = gtk_button_new_with_label(translate_utf8(button1));
     gtk_widget_set_size_request(button1_w, 90, 28);
-    g_signal_connect(
-        button1_w, "clicked", G_CALLBACK(modaldia_button1_cb), &status);
+    g_signal_connect(button1_w, "clicked", G_CALLBACK(modaldia_button1_cb), &status);
     gtk_box_pack_start(GTK_BOX(hboxbuttons), button1_w, FALSE, FALSE, 30);
   }
-  if (button2) {
+  if (button2)
+  {
     GtkWidget* button2_w = gtk_button_new_with_label(translate_utf8(button2));
     gtk_widget_set_size_request(button2_w, 90, 28);
-    g_signal_connect(
-        button2_w, "clicked", G_CALLBACK(modaldia_button2_cb), &status);
+    g_signal_connect(button2_w, "clicked", G_CALLBACK(modaldia_button2_cb), &status);
     gtk_box_pack_start(GTK_BOX(hboxbuttons), button2_w, FALSE, FALSE, 30);
   }
-  if (button3) {
+  if (button3)
+  {
     GtkWidget* button3_w = gtk_button_new_with_label(translate_utf8(button3));
     gtk_widget_set_size_request(button3_w, 90, 28);
-    g_signal_connect(
-        button3_w, "clicked", G_CALLBACK(modaldia_button3_cb), &status);
+    g_signal_connect(button3_w, "clicked", G_CALLBACK(modaldia_button3_cb), &status);
     gtk_box_pack_end(GTK_BOX(hboxbuttons), button3_w, FALSE, FALSE, 30);
   }
 
@@ -1461,8 +1453,7 @@ wow_sModalInputDialog* CoWowGtk::CreateModalInputDialog(const char* title,
   ret->status = status;
 
   char* valueutf8 = gtk_editable_get_chars(GTK_EDITABLE(textinput), 0, -1);
-  char* value
-      = g_convert(valueutf8, -1, "ISO8859-1", "UTF-8", NULL, NULL, NULL);
+  char* value = g_convert(valueutf8, -1, "ISO8859-1", "UTF-8", NULL, NULL, NULL);
   strncpy(ret->input_str, value, sizeof(ret->input_str));
   g_free(valueutf8);
   g_free(value);
@@ -1472,42 +1463,44 @@ wow_sModalInputDialog* CoWowGtk::CreateModalInputDialog(const char* title,
   return ret;
 }
 
-pwr_tStatus CoWowGtk::CreateMenuItem(
-    const char* name, void* menu, int pixmap, int append, void* w)
+pwr_tStatus CoWowGtk::CreateMenuItem(const char* name, void* menu, int pixmap, int append, void* w)
 {
   char name_array[10][40];
   int name_cnt;
   char label[80];
   GtkWidget* child = NULL;
 
-  name_cnt = dcli_parse(name, "-", "", (char*)name_array,
-      sizeof(name_array) / sizeof(name_array[0]), sizeof(name_array[0]), 0);
+  name_cnt = dcli_parse(name, "-", "", (char*)name_array, sizeof(name_array) / sizeof(name_array[0]),
+                        sizeof(name_array[0]), 0);
   if (!name_cnt)
     return 0;
 
-  if (name_cnt == 1) {
-    *(GtkWidget**)w
-          = gtk_menu_item_new_with_label(translate_utf8(name_array[0]));
+  if (name_cnt == 1)
+  {
+    *(GtkWidget**)w = gtk_menu_item_new_with_label(translate_utf8(name_array[0]));
     if (append)
       gtk_menu_shell_append(GTK_MENU_SHELL(menu), *(GtkWidget**)w);
     else
       gtk_menu_shell_prepend(GTK_MENU_SHELL(menu), *(GtkWidget**)w);
     gtk_widget_show(GTK_WIDGET(*(GtkWidget**)w));
-  } else {
+  }
+  else
+  {
     // Find or create the parent menues
     GtkContainer* parent = (GtkContainer*)menu;
 
-    for (int i = 0; i < name_cnt; i++) {
+    for (int i = 0; i < name_cnt; i++)
+    {
       GList* chlist = gtk_container_get_children(GTK_CONTAINER(parent));
 
       int found = 0;
-      for (GList* ch = chlist; ch; ch = ch->next) {
+      for (GList* ch = chlist; ch; ch = ch->next)
+      {
         GtkWidget* labelw = gtk_bin_get_child(GTK_BIN(ch->data));
-        strncpy(
-            label, (char*)gtk_label_get_text(GTK_LABEL(labelw)), sizeof(label));
-        char* label_iso
-            = g_convert(label, -1, "ISO8859-1", "UTF-8", NULL, NULL, NULL);
-        if (str_NoCaseStrcmp(label_iso, name_array[i]) == 0) {
+        strncpy(label, (char*)gtk_label_get_text(GTK_LABEL(labelw)), sizeof(label));
+        char* label_iso = g_convert(label, -1, "ISO8859-1", "UTF-8", NULL, NULL, NULL);
+        if (str_NoCaseStrcmp(label_iso, name_array[i]) == 0)
+        {
           child = GTK_WIDGET(ch->data);
           found = 1;
           g_free(label_iso);
@@ -1515,24 +1508,28 @@ pwr_tStatus CoWowGtk::CreateMenuItem(
         }
         g_free(label_iso);
       }
-      if (!found) {
+      if (!found)
+      {
         // Create the menu item
         GtkWidget* item;
-	item = gtk_menu_item_new_with_label(translate_utf8(name_array[i]));
+        item = gtk_menu_item_new_with_label(translate_utf8(name_array[i]));
 
         if (append)
           gtk_menu_shell_append(GTK_MENU_SHELL(parent), item);
         else
           gtk_menu_shell_prepend(GTK_MENU_SHELL(parent), item);
         gtk_widget_show(GTK_WIDGET(item));
-        if (i != name_cnt - 1) {
+        if (i != name_cnt - 1)
+        {
           GtkMenu* submenu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
           gtk_menu_item_set_submenu(GTK_MENU_ITEM(item), GTK_WIDGET(submenu));
           parent = GTK_CONTAINER(submenu);
           gtk_widget_show(GTK_WIDGET(submenu));
-        } else
+        }
+        else
           parent = (GtkContainer*)item;
-      } else
+      }
+      else
         parent = (GtkContainer*)gtk_menu_item_get_submenu(GTK_MENU_ITEM(child));
 
       if (!parent)
@@ -1552,23 +1549,25 @@ pwr_tStatus CoWowGtk::DeleteMenuItem(const char* name, void* menu)
   char label[80];
   GtkWidget* child = NULL;
 
-  name_cnt = dcli_parse(name, "-", "", (char*)name_array,
-      sizeof(name_array) / sizeof(name_array[0]), sizeof(name_array[0]), 0);
+  name_cnt = dcli_parse(name, "-", "", (char*)name_array, sizeof(name_array) / sizeof(name_array[0]),
+                        sizeof(name_array[0]), 0);
   if (!name_cnt)
     return 0;
 
   // Find the parent menues
   GtkContainer* parent = (GtkContainer*)menu;
 
-  for (int i = 0; i < name_cnt; i++) {
+  for (int i = 0; i < name_cnt; i++)
+  {
     GList* chlist = gtk_container_get_children(GTK_CONTAINER(parent));
 
     int found = 0;
-    for (GList* ch = chlist; ch; ch = ch->next) {
+    for (GList* ch = chlist; ch; ch = ch->next)
+    {
       GtkWidget* labelw = gtk_bin_get_child(GTK_BIN(ch->data));
-      strncpy(
-          label, (char*)gtk_label_get_text(GTK_LABEL(labelw)), sizeof(label));
-      if (str_NoCaseStrcmp(label, name_array[i]) == 0) {
+      strncpy(label, (char*)gtk_label_get_text(GTK_LABEL(labelw)), sizeof(label));
+      if (str_NoCaseStrcmp(label, name_array[i]) == 0)
+      {
         child = GTK_WIDGET(ch->data);
         found = 1;
         break;
@@ -1604,36 +1603,32 @@ void CoWowGtk::Wait(float time)
   gtk_main();
 }
 
-static void browprint_begin_print(
-    GtkPrintOperation* operation, GtkPrintContext* context, gpointer user_data)
+static void browprint_begin_print(GtkPrintOperation* operation, GtkPrintContext* context, gpointer user_data)
 {
   wow_sPrintData* print_data = (wow_sPrintData*)user_data;
   int pages;
 
-  brow_PrintGetPages((brow_tCtx)print_data->flow_ctx, print_data->orientation,
-      print_data->scale, &pages);
+  brow_PrintGetPages((brow_tCtx)print_data->flow_ctx, print_data->orientation, print_data->scale, &pages);
   gtk_print_operation_set_n_pages(operation, pages);
 }
 
-static void browprint_end_print(
-    GtkPrintOperation* operation, GtkPrintContext* context, gpointer user_data)
+static void browprint_end_print(GtkPrintOperation* operation, GtkPrintContext* context, gpointer user_data)
 {
   wow_sPrintData* print_data = (wow_sPrintData*)user_data;
   free(print_data);
 }
 
-static void browprint_draw_page(GtkPrintOperation* operation,
-    GtkPrintContext* context, gint page_nr, gpointer user_data)
+static void browprint_draw_page(GtkPrintOperation* operation, GtkPrintContext* context, gint page_nr,
+                                gpointer user_data)
 {
   wow_sPrintData* print_data = (wow_sPrintData*)user_data;
 
-  brow_PrintDrawPage((brow_tCtx)print_data->flow_ctx, context,
-      print_data->title, page_nr, print_data->orientation, print_data->scale);
+  brow_PrintDrawPage((brow_tCtx)print_data->flow_ctx, context, print_data->title, page_nr,
+                     print_data->orientation, print_data->scale);
 }
 
-static void browprint_request_page_setup(GtkPrintOperation* operation,
-    GtkPrintContext* context, gint page_nr, GtkPageSetup* setup,
-    gpointer user_data)
+static void browprint_request_page_setup(GtkPrintOperation* operation, GtkPrintContext* context, gint page_nr,
+                                         GtkPageSetup* setup, gpointer user_data)
 {
   wow_sPrintData* print_data = (wow_sPrintData*)user_data;
 
@@ -1643,21 +1638,21 @@ static void browprint_request_page_setup(GtkPrintOperation* operation,
     gtk_page_setup_set_orientation(setup, GTK_PAGE_ORIENTATION_PORTRAIT);
 }
 
-void CoWowGtk::CreateBrowPrintDialogGtk(const char* title, void* brow_ctx,
-    int orientation, double scale, void* parent_widget, pwr_tStatus* sts)
+void CoWowGtk::CreateBrowPrintDialogGtk(const char* title, void* brow_ctx, int orientation, double scale,
+                                        void* parent_widget, pwr_tStatus* sts)
 {
   static GtkPrintSettings* settings = 0;
   GtkPrintOperation* print;
   GtkPrintOperationResult result;
   GtkPrintOperationAction action = GTK_PRINT_OPERATION_ACTION_PRINT_DIALOG;
 
-  if (m_printdialog_disable && streq(m_default_printer, "")) {
+  if (m_printdialog_disable && streq(m_default_printer, ""))
+  {
     *sts = WOW__PRINTDIALOGDISABLED;
     return;
   }
 
-  wow_sPrintData* print_data
-      = (wow_sPrintData*)calloc(1, sizeof(wow_sPrintData));
+  wow_sPrintData* print_data = (wow_sPrintData*)calloc(1, sizeof(wow_sPrintData));
   print_data->flow_ctx = (flow_tCtx)brow_ctx;
   print_data->orientation = (flow_eOrientation)orientation;
   print_data->scale = scale;
@@ -1669,65 +1664,58 @@ void CoWowGtk::CreateBrowPrintDialogGtk(const char* title, void* brow_ctx,
   else
     settings = gtk_print_settings_new();
 
-  if (!streq(m_default_printer, "")) {
+  if (!streq(m_default_printer, ""))
+  {
     gtk_print_settings_set_printer(settings, m_default_printer);
     gtk_print_operation_set_print_settings(print, settings);
   }
   if (m_printdialog_disable)
     action = GTK_PRINT_OPERATION_ACTION_PRINT;
 
-  g_signal_connect(
-      print, "begin_print", G_CALLBACK(browprint_begin_print), print_data);
-  g_signal_connect(
-      print, "draw_page", G_CALLBACK(browprint_draw_page), print_data);
-  g_signal_connect(print, "request_page_setup",
-      G_CALLBACK(browprint_request_page_setup), print_data);
-  g_signal_connect(
-      print, "end_print", G_CALLBACK(browprint_end_print), print_data);
+  g_signal_connect(print, "begin_print", G_CALLBACK(browprint_begin_print), print_data);
+  g_signal_connect(print, "draw_page", G_CALLBACK(browprint_draw_page), print_data);
+  g_signal_connect(print, "request_page_setup", G_CALLBACK(browprint_request_page_setup), print_data);
+  g_signal_connect(print, "end_print", G_CALLBACK(browprint_end_print), print_data);
 
   gtk_print_operation_set_allow_async(print, TRUE);
   result = gtk_print_operation_run(print, action, GTK_WINDOW(parent_widget), 0);
-  if (result == GTK_PRINT_OPERATION_RESULT_APPLY) {
+  if (result == GTK_PRINT_OPERATION_RESULT_APPLY)
+  {
     if (settings)
       g_object_unref(settings);
-    settings = (GtkPrintSettings*)g_object_ref(
-        gtk_print_operation_get_print_settings(print));
+    settings = (GtkPrintSettings*)g_object_ref(gtk_print_operation_get_print_settings(print));
   }
   g_object_unref(print);
 
   *sts = WOW__SUCCESS;
 }
 
-static void flowprint_begin_print(
-    GtkPrintOperation* operation, GtkPrintContext* context, gpointer user_data)
+static void flowprint_begin_print(GtkPrintOperation* operation, GtkPrintContext* context, gpointer user_data)
 {
   wow_sPrintData* print_data = (wow_sPrintData*)user_data;
   int pages;
 
-  flow_PrintGetPages(
-      print_data->flow_ctx, print_data->orientation, print_data->scale, &pages);
+  flow_PrintGetPages(print_data->flow_ctx, print_data->orientation, print_data->scale, &pages);
   gtk_print_operation_set_n_pages(operation, pages);
 }
 
-static void flowprint_end_print(
-    GtkPrintOperation* operation, GtkPrintContext* context, gpointer user_data)
+static void flowprint_end_print(GtkPrintOperation* operation, GtkPrintContext* context, gpointer user_data)
 {
   wow_sPrintData* print_data = (wow_sPrintData*)user_data;
   free(print_data);
 }
 
-static void flowprint_draw_page(GtkPrintOperation* operation,
-    GtkPrintContext* context, gint page_nr, gpointer user_data)
+static void flowprint_draw_page(GtkPrintOperation* operation, GtkPrintContext* context, gint page_nr,
+                                gpointer user_data)
 {
   wow_sPrintData* print_data = (wow_sPrintData*)user_data;
 
-  flow_PrintDrawPage(print_data->flow_ctx, context, print_data->title, page_nr,
-      print_data->orientation, print_data->scale);
+  flow_PrintDrawPage(print_data->flow_ctx, context, print_data->title, page_nr, print_data->orientation,
+                     print_data->scale);
 }
 
-static void flowprint_request_page_setup(GtkPrintOperation* operation,
-    GtkPrintContext* context, gint page_nr, GtkPageSetup* setup,
-    gpointer user_data)
+static void flowprint_request_page_setup(GtkPrintOperation* operation, GtkPrintContext* context, gint page_nr,
+                                         GtkPageSetup* setup, gpointer user_data)
 {
   wow_sPrintData* print_data = (wow_sPrintData*)user_data;
   flow_eOrientation orientation;
@@ -1739,21 +1727,21 @@ static void flowprint_request_page_setup(GtkPrintOperation* operation,
     gtk_page_setup_set_orientation(setup, GTK_PAGE_ORIENTATION_PORTRAIT);
 }
 
-void CoWowGtk::CreateFlowPrintDialogGtk(const char* title, void* flow_ctx,
-    int orientation, double scale, void* parent_widget, pwr_tStatus* sts)
+void CoWowGtk::CreateFlowPrintDialogGtk(const char* title, void* flow_ctx, int orientation, double scale,
+                                        void* parent_widget, pwr_tStatus* sts)
 {
   static GtkPrintSettings* settings = 0;
   GtkPrintOperation* print;
   GtkPrintOperationResult result;
   GtkPrintOperationAction action = GTK_PRINT_OPERATION_ACTION_PRINT_DIALOG;
 
-  if (m_printdialog_disable && streq(m_default_printer, "")) {
+  if (m_printdialog_disable && streq(m_default_printer, ""))
+  {
     *sts = WOW__PRINTDIALOGDISABLED;
     return;
   }
 
-  wow_sPrintData* print_data
-      = (wow_sPrintData*)calloc(1, sizeof(wow_sPrintData));
+  wow_sPrintData* print_data = (wow_sPrintData*)calloc(1, sizeof(wow_sPrintData));
   print_data->flow_ctx = (flow_tCtx)flow_ctx;
   print_data->orientation = (flow_eOrientation)orientation;
   print_data->scale = scale;
@@ -1765,29 +1753,26 @@ void CoWowGtk::CreateFlowPrintDialogGtk(const char* title, void* flow_ctx,
   else
     settings = gtk_print_settings_new();
 
-  if (!streq(m_default_printer, "")) {
+  if (!streq(m_default_printer, ""))
+  {
     gtk_print_settings_set_printer(settings, m_default_printer);
     gtk_print_operation_set_print_settings(print, settings);
   }
   if (m_printdialog_disable)
     action = GTK_PRINT_OPERATION_ACTION_PRINT;
 
-  g_signal_connect(
-      print, "begin_print", G_CALLBACK(flowprint_begin_print), print_data);
-  g_signal_connect(
-      print, "draw_page", G_CALLBACK(flowprint_draw_page), print_data);
-  g_signal_connect(print, "request_page_setup",
-      G_CALLBACK(flowprint_request_page_setup), print_data);
-  g_signal_connect(
-      print, "end_print", G_CALLBACK(flowprint_end_print), print_data);
+  g_signal_connect(print, "begin_print", G_CALLBACK(flowprint_begin_print), print_data);
+  g_signal_connect(print, "draw_page", G_CALLBACK(flowprint_draw_page), print_data);
+  g_signal_connect(print, "request_page_setup", G_CALLBACK(flowprint_request_page_setup), print_data);
+  g_signal_connect(print, "end_print", G_CALLBACK(flowprint_end_print), print_data);
 
   gtk_print_operation_set_allow_async(print, TRUE);
   result = gtk_print_operation_run(print, action, GTK_WINDOW(parent_widget), 0);
-  if (result == GTK_PRINT_OPERATION_RESULT_APPLY) {
+  if (result == GTK_PRINT_OPERATION_RESULT_APPLY)
+  {
     if (settings)
       g_object_unref(settings);
-    settings = (GtkPrintSettings*)g_object_ref(
-        gtk_print_operation_get_print_settings(print));
+    settings = (GtkPrintSettings*)g_object_ref(gtk_print_operation_get_print_settings(print));
   }
   g_object_unref(print);
   *sts = WOW__SUCCESS;
@@ -1799,27 +1784,33 @@ void CoWowGtk::update_title(GtkWidget* w, int editmode)
   char new_title[512];
 
   g_object_get(w, "title", &title, NULL);
-  if (editmode) {
-    if (!str_StartsWith(title, "*** ")) {
+  if (editmode)
+  {
+    if (!str_StartsWith(title, "*** "))
+    {
       strcpy(new_title, "*** ");
       strcat(new_title, title);
       g_object_set(w, "title", new_title, NULL);
     }
-  } else {
-    if (str_StartsWith(title, "*** ")) {
+  }
+  else
+  {
+    if (str_StartsWith(title, "*** "))
+    {
       strcpy(new_title, &title[4]);
       g_object_set(w, "title", new_title, NULL);
     }
   }
 }
 
-int CoWowGtk::GetDarkTheme(GtkWidget *w)
+int CoWowGtk::GetDarkTheme(GtkWidget* w)
 {
-  if (m_dark_theme == -1) {
+  if (m_dark_theme == -1)
+  {
     GdkRGBA color;
     GtkStyleContext* style_context = gtk_widget_get_style_context(w);
     gtk_style_context_get_color(style_context, GTK_STATE_FLAG_NORMAL, &color);
-    if ( (color.red + color.blue + color.green)/3 > 0.5)
+    if ((color.red + color.blue + color.green) / 3 > 0.5)
       m_dark_theme = 1;
     else
       m_dark_theme = 0;
