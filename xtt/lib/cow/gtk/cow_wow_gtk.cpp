@@ -298,9 +298,13 @@ void CoWowGtk::DisplayError(const char* title, const char* text, lng_eCoding cod
   GtkWidget* dialog;
 
   if (m_parent)
+  {
     parent = GTK_WINDOW(gtk_widget_get_toplevel(m_parent));
+  }
   else
+  {
     parent = 0;
+  }
 
   char* ctext;
   if (coding != lng_eCoding_UTF_8)
@@ -324,6 +328,7 @@ void CoWowGtk::DisplayError(const char* title, const char* text, lng_eCoding cod
     g_free(ctext);
   g_signal_connect(dialog, "response", G_CALLBACK(displayerror_ok_cb), NULL);
   gtk_window_set_title(GTK_WINDOW(dialog), title);
+
   gtk_widget_show_all(dialog);
 
   if (m_autoremove)
