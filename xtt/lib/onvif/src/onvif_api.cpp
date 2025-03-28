@@ -50,10 +50,6 @@
 #include "onvif_wsdd.nsmap"       //Namespaces
 #include "onvif_api.h"
 
-#define USERNAME "claess"
-#define PASSWORD "colgate"
-#define HOSTNAME "http://192.168.0.195:2020/onvif/device_service"
-
 // to report an error
 void onvif_api::report_error()
 {
@@ -93,14 +89,14 @@ onvif_api::onvif_api(char *o_uri, char *o_username, char *o_passwd,
   soap->connect_timeout = soap->recv_timeout = soap->send_timeout = 10; // 10 sec
   soap_register_plugin(soap, soap_wsse);
 
-  // create the proxies to access the ONVIF service API at HOSTNAME
+  // create the proxies to access the ONVIF service API
   DeviceBindingProxy proxyDevice(soap);
   MediaBindingProxy proxyMedia(soap);
   ImagingBindingProxy proxyImaging(soap);
   PTZ_proxy = (void *) new PTZBindingProxy(soap);
 
   // get device info and print
-  proxyDevice.soap_endpoint = HOSTNAME;
+  proxyDevice.soap_endpoint = uri;
   _tds__GetDeviceInformation GetDeviceInformation;
   _tds__GetDeviceInformationResponse GetDeviceInformationResponse;
   GetDeviceInformation.soap = soap;
