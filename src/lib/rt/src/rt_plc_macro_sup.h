@@ -50,13 +50,13 @@
 #define Sup_init(o) ;
 
 /*
-* Name:
-*   ASup_init(object, In, con)
-*
-* Description:
-*   Initialize analog supervisor object.
-*   This macro is not used.
-*/
+ * Name:
+ *   ASup_init(object, In, con)
+ *
+ * Description:
+ *   Initialize analog supervisor object.
+ *   This macro is not used.
+ */
 #define ASup_init(o, In, con) ;
 
 /*_*
@@ -68,61 +68,71 @@
 
   @aref asup ASup
 */
-#define ASup_exec(o, In, con)                                                  \
-  timer2_scan(tp, o);                                                          \
-  if ((o->High && In <= o->CtrlLimit - o->Hysteres)                            \
-      || (!o->High && In >= o->CtrlLimit + o->Hysteres)) {                     \
-    if (o->Action)                                                             \
-      o->Action = FALSE;                                                       \
-    if (o->ReturnCheck) {                                                      \
-      time_GetTime(&o->ReturnTime);                                            \
-      o->ReturnCheck = FALSE;                                                  \
-      o->ReturnSend = TRUE;                                                    \
-    }                                                                          \
-    if (o->AlarmCheck && !o->DetectCheck) {                                    \
-      o->TimerCount = 0;                                                       \
-      o->DetectCheck = TRUE;                                                   \
-    }                                                                          \
-  } else if (con && ((o->High && In > o->CtrlLimit)                            \
-                        || (!o->High && In < o->CtrlLimit))) {                 \
-    if (!o->Action)                                                            \
-      o->Action = TRUE;                                                        \
-    if (o->Suppressed) {                                                       \
-      if (o->ReturnCheck) {                                                    \
-        time_GetTime(&o->ReturnTime);                                          \
-        o->ReturnCheck = FALSE;                                                \
-        o->ReturnSend = TRUE;                                                  \
-      } else if (o->DetectSend)                                                \
-        o->DetectSend = FALSE;                                                 \
-    }                                                                          \
-    if (o->AlarmCheck && o->DetectOn && !o->Blocked && !o->Suppressed) {       \
-      if (o->DetectCheck) {                                                    \
-        o->ActualValue = In;                                                   \
-        timer2_in(tp, o);                                                      \
-        time_GetTime(&o->DetectTime);                                          \
-        o->DetectCheck = FALSE;                                                \
-      }                                                                        \
-      if (!o->TimerFlag) {                                                     \
-        o->DetectSend = TRUE;                                                  \
-        o->ReturnCheck = TRUE;                                                 \
-        o->Acked = FALSE;                                                      \
-        o->AlarmCheck = FALSE;                                                 \
-      }                                                                        \
-    }                                                                          \
-  }                                                                            \
-  if (o->Blocked || o->Suppressed) {                                           \
-    o->TimerCount = 0;                                                         \
-    o->DetectCheck = TRUE;                                                     \
+#define ASup_exec(o, In, con)                                                                                \
+  timer2_scan(tp, o);                                                                                        \
+  if ((o->High && In <= o->CtrlLimit - o->Hysteres) || (!o->High && In >= o->CtrlLimit + o->Hysteres))       \
+  {                                                                                                          \
+    if (o->Action)                                                                                           \
+      o->Action = FALSE;                                                                                     \
+    if (o->ReturnCheck)                                                                                      \
+    {                                                                                                        \
+      time_GetTime(&o->ReturnTime);                                                                          \
+      o->ReturnCheck = FALSE;                                                                                \
+      o->ReturnSend = TRUE;                                                                                  \
+    }                                                                                                        \
+    if (o->AlarmCheck && !o->DetectCheck)                                                                    \
+    {                                                                                                        \
+      o->TimerCount = 0;                                                                                     \
+      o->DetectCheck = TRUE;                                                                                 \
+    }                                                                                                        \
+  }                                                                                                          \
+  else if (con && ((o->High && In > o->CtrlLimit) || (!o->High && In < o->CtrlLimit)))                       \
+  {                                                                                                          \
+    if (!o->Action)                                                                                          \
+      o->Action = TRUE;                                                                                      \
+    if (o->Suppressed)                                                                                       \
+    {                                                                                                        \
+      if (o->ReturnCheck)                                                                                    \
+      {                                                                                                      \
+        time_GetTime(&o->ReturnTime);                                                                        \
+        o->ReturnCheck = FALSE;                                                                              \
+        o->ReturnSend = TRUE;                                                                                \
+      }                                                                                                      \
+      else if (o->DetectSend)                                                                                \
+        o->DetectSend = FALSE;                                                                               \
+    }                                                                                                        \
+    if (o->AlarmCheck && o->DetectOn && !o->Blocked && !o->Suppressed)                                       \
+    {                                                                                                        \
+      if (o->DetectCheck)                                                                                    \
+      {                                                                                                      \
+        o->ActualValue = In;                                                                                 \
+        timer2_in(tp, o);                                                                                    \
+        time_GetTime(&o->DetectTime);                                                                        \
+        o->DetectCheck = FALSE;                                                                              \
+      }                                                                                                      \
+      if (!o->TimerFlag)                                                                                     \
+      {                                                                                                      \
+        o->DetectSend = TRUE;                                                                                \
+        o->ReturnCheck = TRUE;                                                                               \
+        o->Acked = FALSE;                                                                                    \
+        o->AlarmCheck = FALSE;                                                                               \
+      }                                                                                                      \
+    }                                                                                                        \
+  }                                                                                                          \
+  if (o->Blocked || o->Suppressed)                                                                           \
+  {                                                                                                          \
+    o->TimerCount = 0;                                                                                       \
+    o->DetectCheck = TRUE;                                                                                   \
   }
 
 /*
-* Name:
-*   DSup_init(object, In, con)
-*
-* Description:
-*   Initialize digital supervisor object
-*   This macro is not used.
-*/
+ * Name:
+ *   DSup_init(object, In, con)
+ *
+ * Description:
+ *   Initialize digital supervisor object
+ *   This macro is not used.
+ */
 #define DSup_init(o, In, con) ;
 /*_*
   Name:
@@ -133,50 +143,63 @@
 
   @aref dsup DSup
 */
-#define DSup_exec(o, In, con)                                                  \
-  timer2_scan(tp, o);                                                          \
-  if ((In) != o->CtrlPosition) {					\
-    if (o->Action)                                                             \
-      o->Action = FALSE;                                                       \
-    if (o->ReturnCheck) {                                                      \
-      time_GetTime(&o->ReturnTime);                                            \
-      o->ReturnCheck = FALSE;                                                  \
-      o->ReturnSend = TRUE;                                                    \
-    }                                                                          \
-    if (o->AlarmCheck && !o->DetectCheck) {                                    \
-      o->TimerCount = 0;                                                       \
-      o->DetectCheck = TRUE;                                                   \
-    }                                                                          \
-  } else if (con) {                                                            \
-    if (!o->Action)                                                            \
-      o->Action = TRUE;                                                        \
-    if (o->Suppressed) {                                                       \
-      if (o->ReturnCheck) {                                                    \
-        time_GetTime(&o->ReturnTime);                                          \
-        o->ReturnCheck = FALSE;                                                \
-        o->ReturnSend = TRUE;                                                  \
-      } else if (o->DetectSend)                                                \
-        o->DetectSend = FALSE;                                                 \
-    }                                                                          \
-    if (o->AlarmCheck && o->DetectOn && !o->Blocked && !o->Suppressed) {       \
-      if (o->DetectCheck) {                                                    \
-        o->ActualValue = In;                                                   \
-        timer2_in(tp, o);                                                      \
-        time_GetTime(&o->DetectTime);                                          \
-        o->DetectCheck = FALSE;                                                \
-      }                                                                        \
-      if (!o->TimerFlag) {                                                     \
-        o->DetectSend = TRUE;                                                  \
-        o->ReturnCheck = TRUE;                                                 \
-        o->Acked = FALSE;                                                      \
-        o->AlarmCheck = FALSE;                                                 \
-      }                                                                        \
-    }                                                                          \
-  }                                                                            \
-  if (o->Blocked || o->Suppressed) {                                           \
-    o->TimerCount = 0;                                                         \
-    o->DetectCheck = TRUE;                                                     \
-  }
+#define DSup_exec(o, In, con)                                                                                \
+  timer2_scan(tp, o);                                                                                        \
+  if ((In) != o->CtrlPosition)                                                                               \
+  {                                                                                                          \
+    if (o->Action)                                                                                           \
+      o->Action = FALSE;                                                                                     \
+    if (o->ReturnCheck)                                                                                      \
+    {                                                                                                        \
+      time_GetTime(&o->ReturnTime);                                                                          \
+      o->ReturnCheck = FALSE;                                                                                \
+      o->ReturnSend = TRUE;                                                                                  \
+    }                                                                                                        \
+    if (o->AlarmCheck && !o->DetectCheck)                                                                    \
+    {                                                                                                        \
+      o->TimerCount = 0;                                                                                     \
+      o->DetectCheck = TRUE;                                                                                 \
+    }                                                                                                        \
+  }                                                                                                          \
+  else if (con)                                                                                              \
+  {                                                                                                          \
+    if (!o->Action)                                                                                          \
+      o->Action = TRUE;                                                                                      \
+    if (o->Suppressed)                                                                                       \
+    {                                                                                                        \
+      if (o->ReturnCheck)                                                                                    \
+      {                                                                                                      \
+        time_GetTime(&o->ReturnTime);                                                                        \
+        o->ReturnCheck = FALSE;                                                                              \
+        o->ReturnSend = TRUE;                                                                                \
+      }                                                                                                      \
+      else if (o->DetectSend)                                                                                \
+        o->DetectSend = FALSE;                                                                               \
+    }                                                                                                        \
+    if (o->AlarmCheck && o->DetectOn && !o->Blocked && !o->Suppressed)                                       \
+    {                                                                                                        \
+      if (o->DetectCheck)                                                                                    \
+      {                                                                                                      \
+        o->ActualValue = In;                                                                                 \
+        timer2_in(tp, o);                                                                                    \
+        time_GetTime(&o->DetectTime);                                                                        \
+        o->DetectCheck = FALSE;                                                                              \
+      }                                                                                                      \
+      if (!o->TimerFlag)                                                                                     \
+      {                                                                                                      \
+        o->DetectSend = TRUE;                                                                                \
+        o->ReturnCheck = TRUE;                                                                               \
+        o->Acked = FALSE;                                                                                    \
+        o->AlarmCheck = FALSE;                                                                               \
+      }                                                                                                      \
+    }                                                                                                        \
+  }                                                                                                          \
+  if (o->Blocked || o->Suppressed)                                                                           \
+  {                                                                                                          \
+    o->TimerCount = 0;                                                                                       \
+    o->DetectCheck = TRUE;                                                                                   \
+  }                                                                                                          \
+  o->ActiveNotAcked = (o->Action && !o->Acked);
 
 /*_*
   Name:
@@ -187,71 +210,82 @@
 
   @aref dsupcompfo DSupCompFo
 */
-#define DSupCompFo_init(o)                                                     \
-  {                                                                            \
-    pwr_tDlid dlid;                                                            \
-    pwr_tStatus sts;                                                           \
-    sts = gdh_DLRefObjectInfoAttrref(                                          \
-        &o->PlcConnect, (void**)&o->PlcConnectP, &dlid);                       \
-    if (EVEN(sts))                                                             \
-      o->PlcConnectP = 0;                                                      \
-    else                                                                       \
-      ((pwr_sClass_DSupComp*)o->PlcConnectP)->TimerDO                          \
-          = &(((pwr_sClass_DSupComp*)o->PlcConnectP)->TimerDODum);             \
+#define DSupCompFo_init(o)                                                                                   \
+  {                                                                                                          \
+    pwr_tDlid dlid;                                                                                          \
+    pwr_tStatus sts;                                                                                         \
+    sts = gdh_DLRefObjectInfoAttrref(&o->PlcConnect, (void**)&o->PlcConnectP, &dlid);                        \
+    if (EVEN(sts))                                                                                           \
+      o->PlcConnectP = 0;                                                                                    \
+    else                                                                                                     \
+      ((pwr_sClass_DSupComp*)o->PlcConnectP)->TimerDO =                                                      \
+          &(((pwr_sClass_DSupComp*)o->PlcConnectP)->TimerDODum);                                             \
   }
 
-#define DSupCompFo_exec(o, In, con)                                            \
-  {                                                                            \
-    pwr_sClass_DSupComp* co = (pwr_sClass_DSupComp*)o->PlcConnectP;            \
-    if (!co)                                                                   \
-      return;                                                                  \
-    co->Control = con;                                                         \
-    timer2_scan(tp, co);                                                       \
-    if ((In) != co->CtrlPosition) {                                            \
-      if (co->Action)                                                          \
-        co->Action = FALSE;                                                    \
-      if (co->ReturnCheck) {                                                   \
-        time_GetTime(&co->ReturnTime);                                         \
-        co->ReturnCheck = FALSE;                                               \
-        co->ReturnSend = TRUE;                                                 \
-      }                                                                        \
-      if (co->AlarmCheck && !co->DetectCheck) {                                \
-        co->TimerCount = 0;                                                    \
-        co->DetectCheck = TRUE;                                                \
-      }                                                                        \
-    } else if (con) {                                                          \
-      if (!co->Action)                                                         \
-        co->Action = TRUE;                                                     \
-      if (co->Suppressed) {                                                    \
-        if (co->ReturnCheck) {                                                 \
-          time_GetTime(&co->ReturnTime);                                       \
-          co->ReturnCheck = FALSE;                                             \
-          co->ReturnSend = TRUE;                                               \
-        } else if (co->DetectSend)                                             \
-          co->DetectSend = FALSE;                                              \
-      }                                                                        \
-      if (co->AlarmCheck && co->DetectOn && !co->Blocked && !co->Suppressed) { \
-        if (co->DetectCheck) {                                                 \
-          co->ActualValue = In;                                                \
-          timer2_in(tp, co);                                                   \
-          time_GetTime(&co->DetectTime);                                       \
-          co->DetectCheck = FALSE;                                             \
-        }                                                                      \
-        if (!co->TimerFlag) {                                                  \
-          co->DetectSend = TRUE;                                               \
-          co->ReturnCheck = TRUE;                                              \
-          co->Acked = FALSE;                                                   \
-          co->AlarmCheck = FALSE;                                              \
-        }                                                                      \
-      }                                                                        \
-    }                                                                          \
-    if (co->Blocked || co->Suppressed) {                                       \
-      co->TimerCount = 0;                                                      \
-      co->DetectCheck = TRUE;                                                  \
-    }                                                                          \
-    o->Action = co->Action;                                                    \
-    o->Acked = co->Acked;                                                      \
-    o->Blocked = co->Blocked;                                                  \
+#define DSupCompFo_exec(o, In, con)                                                                          \
+  {                                                                                                          \
+    pwr_sClass_DSupComp* co = (pwr_sClass_DSupComp*)o->PlcConnectP;                                          \
+    if (!co)                                                                                                 \
+      return;                                                                                                \
+    co->Control = con;                                                                                       \
+    timer2_scan(tp, co);                                                                                     \
+    if ((In) != co->CtrlPosition)                                                                            \
+    {                                                                                                        \
+      if (co->Action)                                                                                        \
+        co->Action = FALSE;                                                                                  \
+      if (co->ReturnCheck)                                                                                   \
+      {                                                                                                      \
+        time_GetTime(&co->ReturnTime);                                                                       \
+        co->ReturnCheck = FALSE;                                                                             \
+        co->ReturnSend = TRUE;                                                                               \
+      }                                                                                                      \
+      if (co->AlarmCheck && !co->DetectCheck)                                                                \
+      {                                                                                                      \
+        co->TimerCount = 0;                                                                                  \
+        co->DetectCheck = TRUE;                                                                              \
+      }                                                                                                      \
+    }                                                                                                        \
+    else if (con)                                                                                            \
+    {                                                                                                        \
+      if (!co->Action)                                                                                       \
+        co->Action = TRUE;                                                                                   \
+      if (co->Suppressed)                                                                                    \
+      {                                                                                                      \
+        if (co->ReturnCheck)                                                                                 \
+        {                                                                                                    \
+          time_GetTime(&co->ReturnTime);                                                                     \
+          co->ReturnCheck = FALSE;                                                                           \
+          co->ReturnSend = TRUE;                                                                             \
+        }                                                                                                    \
+        else if (co->DetectSend)                                                                             \
+          co->DetectSend = FALSE;                                                                            \
+      }                                                                                                      \
+      if (co->AlarmCheck && co->DetectOn && !co->Blocked && !co->Suppressed)                                 \
+      {                                                                                                      \
+        if (co->DetectCheck)                                                                                 \
+        {                                                                                                    \
+          co->ActualValue = In;                                                                              \
+          timer2_in(tp, co);                                                                                 \
+          time_GetTime(&co->DetectTime);                                                                     \
+          co->DetectCheck = FALSE;                                                                           \
+        }                                                                                                    \
+        if (!co->TimerFlag)                                                                                  \
+        {                                                                                                    \
+          co->DetectSend = TRUE;                                                                             \
+          co->ReturnCheck = TRUE;                                                                            \
+          co->Acked = FALSE;                                                                                 \
+          co->AlarmCheck = FALSE;                                                                            \
+        }                                                                                                    \
+      }                                                                                                      \
+    }                                                                                                        \
+    if (co->Blocked || co->Suppressed)                                                                       \
+    {                                                                                                        \
+      co->TimerCount = 0;                                                                                    \
+      co->DetectCheck = TRUE;                                                                                \
+    }                                                                                                        \
+    o->Action = co->Action;                                                                                  \
+    o->Acked = co->Acked;                                                                                    \
+    o->Blocked = co->Blocked;                                                                                \
   }
 
 /*_*
@@ -263,71 +297,81 @@
 
   @aref asupcompfo ASupCompFo
 */
-#define ASupCompFo_init(o)                                                     \
-  {                                                                            \
-    pwr_tDlid dlid;                                                            \
-    pwr_tStatus sts;                                                           \
-    sts = gdh_DLRefObjectInfoAttrref(                                          \
-        &o->PlcConnect, (void**)&o->PlcConnectP, &dlid);                       \
-    if (EVEN(sts))                                                             \
-      o->PlcConnectP = 0;                                                      \
-    else                                                                       \
-      ((pwr_sClass_ASupComp*)o->PlcConnectP)->TimerDO                          \
-          = &(((pwr_sClass_ASupComp*)o->PlcConnectP)->TimerDODum);             \
+#define ASupCompFo_init(o)                                                                                   \
+  {                                                                                                          \
+    pwr_tDlid dlid;                                                                                          \
+    pwr_tStatus sts;                                                                                         \
+    sts = gdh_DLRefObjectInfoAttrref(&o->PlcConnect, (void**)&o->PlcConnectP, &dlid);                        \
+    if (EVEN(sts))                                                                                           \
+      o->PlcConnectP = 0;                                                                                    \
+    else                                                                                                     \
+      ((pwr_sClass_ASupComp*)o->PlcConnectP)->TimerDO =                                                      \
+          &(((pwr_sClass_ASupComp*)o->PlcConnectP)->TimerDODum);                                             \
   }
 
-#define ASupCompFo_exec(o, In, con)                                            \
-  {                                                                            \
-    pwr_sClass_ASupComp* co = (pwr_sClass_ASupComp*)o->PlcConnectP;            \
-    if (!co)                                                                   \
-      return;                                                                  \
-    co->Control = con;                                                         \
-    timer2_scan(tp, co);                                                       \
-    if ((co->High && In <= co->CtrlLimit - co->Hysteres)                       \
-        || (!co->High && In >= co->CtrlLimit + co->Hysteres)) {                \
-      if (co->Action)                                                          \
-        co->Action = FALSE;                                                    \
-      if (co->ReturnCheck) {                                                   \
-        time_GetTime(&co->ReturnTime);                                         \
-        co->ReturnCheck = FALSE;                                               \
-        co->ReturnSend = TRUE;                                                 \
-      }                                                                        \
-      if (co->AlarmCheck && !co->DetectCheck) {                                \
-        co->TimerCount = 0;                                                    \
-        co->DetectCheck = TRUE;                                                \
-      }                                                                        \
-    } else if (con && ((co->High && In > co->CtrlLimit)                        \
-                          || (!co->High && In < co->CtrlLimit))) {             \
-      if (!co->Action)                                                         \
-        co->Action = TRUE;                                                     \
-      if (co->Suppressed) {                                                    \
-        if (co->ReturnCheck) {                                                 \
-          time_GetTime(&co->ReturnTime);                                       \
-          co->ReturnCheck = FALSE;                                             \
-          co->ReturnSend = TRUE;                                               \
-        } else if (co->DetectSend)                                             \
-          co->DetectSend = FALSE;                                              \
-      }                                                                        \
-      if (co->AlarmCheck && co->DetectOn && !co->Blocked && !co->Suppressed) { \
-        if (co->DetectCheck) {                                                 \
-          co->ActualValue = In;                                                \
-          timer2_in(tp, co);                                                   \
-          time_GetTime(&co->DetectTime);                                       \
-          co->DetectCheck = FALSE;                                             \
-        }                                                                      \
-        if (!co->TimerFlag) {                                                  \
-          co->DetectSend = TRUE;                                               \
-          co->ReturnCheck = TRUE;                                              \
-          co->Acked = FALSE;                                                   \
-          co->AlarmCheck = FALSE;                                              \
-        }                                                                      \
-      }                                                                        \
-    }                                                                          \
-    if (co->Blocked || co->Suppressed) {                                       \
-      co->TimerCount = 0;                                                      \
-      co->DetectCheck = TRUE;                                                  \
-    }                                                                          \
-    o->Action = co->Action;                                                    \
-    o->Acked = co->Acked;                                                      \
-    o->Blocked = co->Blocked;                                                  \
+#define ASupCompFo_exec(o, In, con)                                                                          \
+  {                                                                                                          \
+    pwr_sClass_ASupComp* co = (pwr_sClass_ASupComp*)o->PlcConnectP;                                          \
+    if (!co)                                                                                                 \
+      return;                                                                                                \
+    co->Control = con;                                                                                       \
+    timer2_scan(tp, co);                                                                                     \
+    if ((co->High && In <= co->CtrlLimit - co->Hysteres) ||                                                  \
+        (!co->High && In >= co->CtrlLimit + co->Hysteres))                                                   \
+    {                                                                                                        \
+      if (co->Action)                                                                                        \
+        co->Action = FALSE;                                                                                  \
+      if (co->ReturnCheck)                                                                                   \
+      {                                                                                                      \
+        time_GetTime(&co->ReturnTime);                                                                       \
+        co->ReturnCheck = FALSE;                                                                             \
+        co->ReturnSend = TRUE;                                                                               \
+      }                                                                                                      \
+      if (co->AlarmCheck && !co->DetectCheck)                                                                \
+      {                                                                                                      \
+        co->TimerCount = 0;                                                                                  \
+        co->DetectCheck = TRUE;                                                                              \
+      }                                                                                                      \
+    }                                                                                                        \
+    else if (con && ((co->High && In > co->CtrlLimit) || (!co->High && In < co->CtrlLimit)))                 \
+    {                                                                                                        \
+      if (!co->Action)                                                                                       \
+        co->Action = TRUE;                                                                                   \
+      if (co->Suppressed)                                                                                    \
+      {                                                                                                      \
+        if (co->ReturnCheck)                                                                                 \
+        {                                                                                                    \
+          time_GetTime(&co->ReturnTime);                                                                     \
+          co->ReturnCheck = FALSE;                                                                           \
+          co->ReturnSend = TRUE;                                                                             \
+        }                                                                                                    \
+        else if (co->DetectSend)                                                                             \
+          co->DetectSend = FALSE;                                                                            \
+      }                                                                                                      \
+      if (co->AlarmCheck && co->DetectOn && !co->Blocked && !co->Suppressed)                                 \
+      {                                                                                                      \
+        if (co->DetectCheck)                                                                                 \
+        {                                                                                                    \
+          co->ActualValue = In;                                                                              \
+          timer2_in(tp, co);                                                                                 \
+          time_GetTime(&co->DetectTime);                                                                     \
+          co->DetectCheck = FALSE;                                                                           \
+        }                                                                                                    \
+        if (!co->TimerFlag)                                                                                  \
+        {                                                                                                    \
+          co->DetectSend = TRUE;                                                                             \
+          co->ReturnCheck = TRUE;                                                                            \
+          co->Acked = FALSE;                                                                                 \
+          co->AlarmCheck = FALSE;                                                                            \
+        }                                                                                                    \
+      }                                                                                                      \
+    }                                                                                                        \
+    if (co->Blocked || co->Suppressed)                                                                       \
+    {                                                                                                        \
+      co->TimerCount = 0;                                                                                    \
+      co->DetectCheck = TRUE;                                                                                \
+    }                                                                                                        \
+    o->Action = co->Action;                                                                                  \
+    o->Acked = co->Acked;                                                                                    \
+    o->Blocked = co->Blocked;                                                                                \
   }

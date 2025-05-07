@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a new help error window that can display up to 20 error messages.
 - Add contextual error messages within the help window (e.g., via XTT, WTT), providing relevant user feedback.
 - Provide error details, including the file and line number where the issue occurred.
+- Added BitField8/16/32/64 data representation. These represent bitfields that are not byte-swapped, in accordance with their definition.
+- New pin for DSup, ActiveNotAcked for when the DSup is active but has not yet been ackknowledged.
 
 ### Fixed
 
@@ -33,6 +35,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Signal handling is removed in QCom leaving it up to the user to handle application specifics in regards to signals, as it should be.
   - Signal handling was added to the most common utilities used such as rt_xtt and rt_rtt where signals will be handled in an application specific manner and exit accordingly without deadlocks.
 - Fix error handling for help-related issues, ensuring that "file not found" and "topic not found" errors are properly managed.
+- DsFastCurve could crash because of an uninitialized variable used for the TriggIndex. It is now fixed.
+- The Event Log would not convert Event Name to the correct coding resulting in garbled text in the Event Name and no results in the search.
+- PROFINET: The configurator was unprepared for unpopulated slot 0. It is now well prepared for this.
+- PROFINET: The configurator could show some inconsistencies in slots when changing DAP when the starting index of the physical slots did not start at 0.
+- PROFINET: The configurator will now truncate strings to 79 characters before writing attributes using cdh-functions that doesn't add null termination.
 
 ### Changed
 
@@ -42,6 +49,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - pwr_stop.sh has been updated to remove the POSIX log message queue.
 - profibus: The PROFINET configurator was not prepared for multiple fixed Virtual Submodule Items, it is now.
 - profibus: PROFINET startup sequence now waits StartupTime seconds before checking IOCS status from devices
+- Updated the documentation for the PID controller.
+- PROFINET: The configurator will now rename modules and change the description if you change them. For instance, when changing DAP.
+- PROFINET: The configurator will now do a sanity check on the modules configured for the DAP and remove submodules not in the submodules list for the DAP
+  - This could happen during an upgrade when inconsistency in the GSDML files used as source would imply that a submodule should exists. This is due to the way things were implemented in the old configurator using simple indexes to map DAPs.
+- Threads checking in on CycleSup objects will now tell you which CycleSup object triggered the EmergencyBreak.
 
 ### Removed
 

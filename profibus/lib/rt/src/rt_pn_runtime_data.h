@@ -44,6 +44,7 @@
 #include <memory>
 #include <map>
 #include <iostream>
+#include <functional>
 
 #include "pwr.h"
 #include "co_pugixml.hpp"
@@ -300,7 +301,7 @@ public:
 
   // Elements
   ProfinetNetworkSettings m_NetworkSettings;
-  std::vector<ProfinetSlot> m_slot_list;
+  std::map<uint, ProfinetSlot> m_slot_map;
   std::map<uint, ProfinetAPI> m_API_map;                            // <api, ProfinetAPI>
   std::map<uint, ProfinetIOCR> m_IOCR_map;                          // <iocr type, ProfinetIOCR>
   std::unordered_map<uint, ProfinetChannelDiag> m_channel_diag_map; // <ErrorType, xxxxxxxxxxxxxxxxxxx>
@@ -308,6 +309,8 @@ public:
       m_unit_diag_type_map; // <UserStructureIdentifier, xxxxxxxxxxxxxxxxxx>
 
   // Runtime specifics
+  std::map<uint, std::reference_wrapper<ProfinetSlot>>
+      m_rt_plugged_slots_map; // This is a map of references (slots with modules plugged into them)
   unsigned short m_rt_device_state;
   unsigned short m_rt_device_ref;
   unsigned short m_rt_alarm_ref;

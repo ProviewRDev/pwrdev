@@ -52,10 +52,7 @@
 #include "xtt_sevhist_gtk.h"
 #include "xtt_tbl_gtk.h"
 
-void XttTblGtk::message(char severity, char* message)
-{
-  gtk_label_set_text(GTK_LABEL(msg_label), message);
-}
+void XttTblGtk::message(char severity, char* message) { gtk_label_set_text(GTK_LABEL(msg_label), message); }
 
 static gint delete_event(GtkWidget* w, GdkEvent* event, gpointer data)
 {
@@ -75,8 +72,7 @@ static void destroy_event(GtkWidget* w, gpointer data)
   // delete xtttbl;
 }
 
-static gboolean xtttbl_focus_in_event(
-    GtkWidget* w, GdkEvent* event, gpointer data)
+static gboolean xtttbl_focus_in_event(GtkWidget* w, GdkEvent* event, gpointer data)
 {
   XttTblGtk* xtttbl = (XttTblGtk*)data;
 
@@ -210,21 +206,19 @@ void XttTblGtk::activate_list_layout(GtkWidget* w, gpointer data)
   xtt->tblnav->show_list();
 }
 
-XttSevHist* XttTblGtk::sevhist_new(pwr_tOid* oidv, pwr_tOName* anamev,
-    pwr_tOName* onamev, bool* sevhistobjectv, pwr_tStatus* sts)
+XttSevHist* XttTblGtk::sevhist_new(pwr_tOid* oidv, pwr_tOName* anamev, pwr_tOName* onamev,
+                                   bool* sevhistobjectv, pwr_tStatus* sts)
 {
   GtkWidget* w;
 
-  return new XttSevHistGtk((void*)this, toplevel, "Process History", &w, oidv,
-      anamev, onamev, sevhistobjectv, sevcli, 0, 0, 0, 0, time_ePeriod_LastHour,
-      0, sts);
+  return new XttSevHistGtk((void*)this, toplevel, "Process History", &w, oidv, anamev, onamev, sevhistobjectv,
+                           sevcli, 0, 0, 0, 0, time_ePeriod_LastHour, 0, sts);
 }
 
-CoLogin* XttTblGtk::login_new(const char* name, const char* groupname,
-    void (*bc_success)(void*), void (*bc_cancel)(void*), pwr_tStatus* status)
+CoLogin* XttTblGtk::login_new(const char* name, const char* groupname, void (*bc_success)(void*),
+                              void (*bc_cancel)(void*), pwr_tStatus* status)
 {
-  return new CoLoginGtk(
-      this, toplevel, name, groupname, bc_success, bc_cancel, 0, status);
+  return new CoLoginGtk(this, toplevel, name, groupname, bc_success, bc_cancel, 0, status);
 }
 
 void XttTblGtk::activate_command(GtkWidget* w, gpointer data)
@@ -234,7 +228,8 @@ void XttTblGtk::activate_command(GtkWidget* w, gpointer data)
   if (!xtt->is_authorized())
     return;
 
-  if (xtt->command_open) {
+  if (xtt->command_open)
+  {
     g_object_set(((XttTblGtk*)xtt)->cmd_input, "visible", FALSE, NULL);
     xtt->set_prompt("");
     xtt->command_open = 0;
@@ -253,12 +248,14 @@ void XttTblGtk::activate_command(GtkWidget* w, gpointer data)
 
 void XttTblGtk::set_prompt(const char* prompt)
 {
-  if (streq(prompt, "")) {
+  if (streq(prompt, ""))
+  {
     g_object_set(cmd_prompt, "visible", FALSE, NULL);
     g_object_set(msg_label, "visible", TRUE, NULL);
-  } else {
-    char* promptutf8
-        = g_convert(prompt, -1, "UTF-8", "ISO8859-1", NULL, NULL, NULL);
+  }
+  else
+  {
+    char* promptutf8 = g_convert(prompt, -1, "UTF-8", "ISO8859-1", NULL, NULL, NULL);
 
     g_object_set(msg_label, "visible", FALSE, NULL);
     g_object_set(cmd_prompt, "visible", TRUE, "label", promptutf8, NULL);
@@ -283,19 +280,18 @@ void XttTblGtk::valchanged_cmd_input(GtkWidget* w, gpointer data)
   xtt->tblnav->set_inputfocus();
 }
 
-XttTblGtk::XttTblGtk(GtkWidget* a_parent_wid, void* a_parent_ctx,
-    sevcli_tCtx a_sevcli, sevcli_sHistItem* itemlist, int item_cnt)
+XttTblGtk::XttTblGtk(GtkWidget* a_parent_wid, void* a_parent_ctx, sevcli_tCtx a_sevcli,
+                     sevcli_sHistItem* itemlist, int item_cnt)
     : XttTbl(a_parent_ctx, a_sevcli), parent_wid(a_parent_wid)
 {
   int sts;
 
-  toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", 700,
-      "default-width", 500, "title", "SevXtt Navigator", NULL);
+  toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", 700, "default-width", 500, "title",
+                                      "SevXtt Navigator", NULL);
 
   g_signal_connect(toplevel, "delete_event", G_CALLBACK(delete_event), this);
   g_signal_connect(toplevel, "destroy", G_CALLBACK(destroy_event), this);
-  g_signal_connect(
-      toplevel, "focus-in-event", G_CALLBACK(xtttbl_focus_in_event), this);
+  g_signal_connect(toplevel, "focus-in-event", G_CALLBACK(xtttbl_focus_in_event), this);
 
   CoWowGtk::SetWindowIcon(toplevel);
 
@@ -303,30 +299,25 @@ XttTblGtk::XttTblGtk(GtkWidget* a_parent_wid, void* a_parent_ctx,
 
   // Menu
   // Accelerators
-  GtkAccelGroup* accel_g
-      = (GtkAccelGroup*)g_object_new(GTK_TYPE_ACCEL_GROUP, NULL);
+  GtkAccelGroup* accel_g = (GtkAccelGroup*)g_object_new(GTK_TYPE_ACCEL_GROUP, NULL);
   gtk_window_add_accel_group(GTK_WINDOW(toplevel), accel_g);
 
   GtkMenuBar* menu_bar = (GtkMenuBar*)g_object_new(GTK_TYPE_MENU_BAR, NULL);
 
   // File entry
-  GtkWidget* file_print = gtk_menu_item_new_with_mnemonic(
-      CoWowGtk::translate_utf8("_Print"));
+  GtkWidget* file_print = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Print"));
   g_signal_connect(file_print, "activate", G_CALLBACK(activate_print), this);
 
-  GtkWidget* file_login
-      = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Login"));
+  GtkWidget* file_login = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Login"));
   g_signal_connect(file_login, "activate", G_CALLBACK(activate_login), this);
 
-  GtkWidget* file_logout
-      = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("Log_Out"));
+  GtkWidget* file_logout = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("Log_Out"));
   g_signal_connect(file_logout, "activate", G_CALLBACK(activate_logout), this);
 
-  GtkWidget* file_close
-      = gtk_menu_item_new_with_mnemonic("_Close");
+  GtkWidget* file_close = gtk_menu_item_new_with_mnemonic("_Close");
   g_signal_connect(file_close, "activate", G_CALLBACK(activate_close), this);
-  gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w',
-      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+  gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w', GdkModifierType(GDK_CONTROL_MASK),
+                             GTK_ACCEL_VISIBLE);
 
   GtkMenu* file_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_print);
@@ -339,65 +330,47 @@ XttTblGtk::XttTblGtk(GtkWidget* a_parent_wid, void* a_parent_ctx,
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(file), GTK_WIDGET(file_menu));
 
   // Functions entry
-  GtkWidget* functions_opensevhist = gtk_menu_item_new_with_mnemonic(
-      CoWowGtk::translate_utf8("_Open Process History"));
-  g_signal_connect(functions_opensevhist, "activate",
-      G_CALLBACK(activate_opensevhist), this);
+  GtkWidget* functions_opensevhist =
+      gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Open Process History"));
+  g_signal_connect(functions_opensevhist, "activate", G_CALLBACK(activate_opensevhist), this);
   gtk_widget_add_accelerator(functions_opensevhist, "activate", accel_g, 'g',
-      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+                             GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
 
-  GtkWidget* functions_command
-      = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("Co_mmand"));
-  g_signal_connect(
-      functions_command, "activate", G_CALLBACK(activate_command), this);
-  gtk_widget_add_accelerator(functions_command, "activate", accel_g, 'b',
-      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+  GtkWidget* functions_command = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("Co_mmand"));
+  g_signal_connect(functions_command, "activate", G_CALLBACK(activate_command), this);
+  gtk_widget_add_accelerator(functions_command, "activate", accel_g, 'b', GdkModifierType(GDK_CONTROL_MASK),
+                             GTK_ACCEL_VISIBLE);
 
-  GtkWidget* functions_delete_item = gtk_menu_item_new_with_mnemonic(
-      CoWowGtk::translate_utf8("_Delete Item"));
-  g_signal_connect(functions_delete_item, "activate",
-      G_CALLBACK(activate_delete_item), this);
+  GtkWidget* functions_delete_item =
+      gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Delete Item"));
+  g_signal_connect(functions_delete_item, "activate", G_CALLBACK(activate_delete_item), this);
 
   GtkMenu* functions_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(functions_menu), functions_opensevhist);
   gtk_menu_shell_append(GTK_MENU_SHELL(functions_menu), functions_command);
   gtk_menu_shell_append(GTK_MENU_SHELL(functions_menu), functions_delete_item);
 
-  GtkWidget* functions
-      = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Functions"));
+  GtkWidget* functions = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Functions"));
   gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), functions);
-  gtk_menu_item_set_submenu(
-      GTK_MENU_ITEM(functions), GTK_WIDGET(functions_menu));
+  gtk_menu_item_set_submenu(GTK_MENU_ITEM(functions), GTK_WIDGET(functions_menu));
 
   // View menu
-  GtkWidget* view_tree_layout = gtk_menu_item_new_with_mnemonic(
-      CoWowGtk::translate_utf8("_Tree Layout"));
-  g_signal_connect(
-      view_tree_layout, "activate", G_CALLBACK(activate_tree_layout), this);
+  GtkWidget* view_tree_layout = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Tree Layout"));
+  g_signal_connect(view_tree_layout, "activate", G_CALLBACK(activate_tree_layout), this);
 
-  GtkWidget* view_list_layout = gtk_menu_item_new_with_mnemonic(
-      CoWowGtk::translate_utf8("_List Layout"));
-  g_signal_connect(
-      view_list_layout, "activate", G_CALLBACK(activate_list_layout), this);
+  GtkWidget* view_list_layout = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_List Layout"));
+  g_signal_connect(view_list_layout, "activate", G_CALLBACK(activate_list_layout), this);
 
-  GtkWidget* view_zoom_in = gtk_menu_item_new_with_mnemonic(
-      CoWowGtk::translate_utf8("Zoom _In"));
-  g_signal_connect(
-      view_zoom_in, "activate", G_CALLBACK(activate_zoom_in), this);
-  gtk_widget_add_accelerator(view_zoom_in, "activate", accel_g, 'i',
-      GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+  GtkWidget* view_zoom_in = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("Zoom _In"));
+  g_signal_connect(view_zoom_in, "activate", G_CALLBACK(activate_zoom_in), this);
+  gtk_widget_add_accelerator(view_zoom_in, "activate", accel_g, 'i', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
-  GtkWidget* view_zoom_out = gtk_menu_item_new_with_mnemonic(
-      CoWowGtk::translate_utf8("Zoom _Out"));
-  g_signal_connect(
-      view_zoom_out, "activate", G_CALLBACK(activate_zoom_out), this);
-  gtk_widget_add_accelerator(view_zoom_out, "activate", accel_g, 'o',
-      GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+  GtkWidget* view_zoom_out = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("Zoom _Out"));
+  g_signal_connect(view_zoom_out, "activate", G_CALLBACK(activate_zoom_out), this);
+  gtk_widget_add_accelerator(view_zoom_out, "activate", accel_g, 'o', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
-  GtkWidget* view_zoom_reset = gtk_menu_item_new_with_mnemonic(
-      CoWowGtk::translate_utf8("Zoom _Reset"));
-  g_signal_connect(
-      view_zoom_reset, "activate", G_CALLBACK(activate_zoom_reset), this);
+  GtkWidget* view_zoom_reset = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("Zoom _Reset"));
+  g_signal_connect(view_zoom_reset, "activate", G_CALLBACK(activate_zoom_reset), this);
 
   GtkMenu* view_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(view_menu), view_tree_layout);
@@ -406,53 +379,42 @@ XttTblGtk::XttTblGtk(GtkWidget* a_parent_wid, void* a_parent_ctx,
   gtk_menu_shell_append(GTK_MENU_SHELL(view_menu), view_zoom_out);
   gtk_menu_shell_append(GTK_MENU_SHELL(view_menu), view_zoom_reset);
 
-  GtkWidget* view
-      = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_View"));
+  GtkWidget* view = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_View"));
   gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), view);
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(view), GTK_WIDGET(view_menu));
 
   // Help entry
-  GtkWidget* help_overview = gtk_menu_item_new_with_mnemonic(
-      CoWowGtk::translate_utf8("_Overview"));
+  GtkWidget* help_overview = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Overview"));
   g_signal_connect(help_overview, "activate", G_CALLBACK(activate_help), this);
-  gtk_widget_add_accelerator(help_overview, "activate", accel_g, 'h',
-      GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+  gtk_widget_add_accelerator(help_overview, "activate", accel_g, 'h', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
-  GtkWidget* help_project
-      = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Project"));
-  g_signal_connect(
-      help_project, "activate", G_CALLBACK(activate_help_project), this);
+  GtkWidget* help_project = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Project"));
+  g_signal_connect(help_project, "activate", G_CALLBACK(activate_help_project), this);
 
-  GtkWidget* help_proview = gtk_menu_item_new_with_mnemonic(
-      CoWowGtk::translate_utf8("_About Proview"));
-  g_signal_connect(
-      help_proview, "activate", G_CALLBACK(activate_help_proview), this);
+  GtkWidget* help_proview = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_About Proview"));
+  g_signal_connect(help_proview, "activate", G_CALLBACK(activate_help_proview), this);
 
   GtkMenu* help_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(help_menu), help_overview);
   gtk_menu_shell_append(GTK_MENU_SHELL(help_menu), help_project);
   gtk_menu_shell_append(GTK_MENU_SHELL(help_menu), help_proview);
 
-  GtkWidget* help
-      = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Help"));
+  GtkWidget* help = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Help"));
   gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), help);
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(help), GTK_WIDGET(help_menu));
 
   // Toolbar
   GtkToolbar* tools = (GtkToolbar*)g_object_new(GTK_TYPE_TOOLBAR, NULL);
 
-  wutl_tools_item(tools, "$pwr_exe/xtt_meth_trend.png", G_CALLBACK(activate_opensevhist), 
-      "Open history item", this, 0, 1);
+  wutl_tools_item(tools, "$pwr_exe/xtt_meth_trend.png", G_CALLBACK(activate_opensevhist), "Open history item",
+                  this, 0, 1);
 
-  wutl_tools_item(tools, "$pwr_exe/ge_zoom_in.png", G_CALLBACK(activate_zoom_in), 
-      "Zoom in", this, 0, 1);
+  wutl_tools_item(tools, "$pwr_exe/ge_zoom_in.png", G_CALLBACK(activate_zoom_in), "Zoom in", this, 0, 1);
 
-  wutl_tools_item(tools, "$pwr_exe/ge_zoom_out.png", G_CALLBACK(activate_zoom_out), 
-      "Zoom out", this, 0, 1);
+  wutl_tools_item(tools, "$pwr_exe/ge_zoom_out.png", G_CALLBACK(activate_zoom_out), "Zoom out", this, 0, 1);
 
-  wutl_tools_item(tools, "$pwr_exe/ge_zoom_reset.png", G_CALLBACK(activate_zoom_reset), 
-      "Zoom reset", this, 0, 1);
-
+  wutl_tools_item(tools, "$pwr_exe/ge_zoom_reset.png", G_CALLBACK(activate_zoom_reset), "Zoom reset", this, 0,
+                  1);
 
   // Statusbar and cmd input
   GtkWidget* statusbar = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
@@ -465,16 +427,14 @@ XttTblGtk::XttTblGtk(GtkWidget* a_parent_wid, void* a_parent_ctx,
   cmd_entry = new CoWowEntryGtk(cmd_recall);
   cmd_input = cmd_entry->widget();
   gtk_widget_set_size_request(cmd_input, -1, 25);
-  g_signal_connect(
-      cmd_input, "activate", G_CALLBACK(valchanged_cmd_input), this);
+  g_signal_connect(cmd_input, "activate", G_CALLBACK(valchanged_cmd_input), this);
 
   gtk_box_pack_start(GTK_BOX(statusbar), msg_label, FALSE, FALSE, 20);
   gtk_box_pack_start(GTK_BOX(statusbar), cmd_prompt, FALSE, FALSE, 20);
   gtk_box_pack_start(GTK_BOX(statusbar), cmd_input, TRUE, TRUE, 20);
   gtk_widget_show_all(statusbar);
 
-  tblnav
-      = new TblNavGtk(this, toplevel, itemlist, item_cnt, &brow_widget, &sts);
+  tblnav = new TblNavGtk(this, toplevel, itemlist, item_cnt, &brow_widget, &sts);
   tblnav->message_cb = &XttTbl::message;
   tblnav->is_authorized_cb = &XttTbl::is_authorized;
   tblnav->command_cb = &XttTbl::command_cb;
@@ -500,7 +460,8 @@ XttTblGtk::XttTblGtk(GtkWidget* a_parent_wid, void* a_parent_ctx,
   if (!is_authorized(pwr_mAccess_AllSev, 0))
     open_login();
 
-  if (!quiet) {
+  if (!quiet)
+  {
     if (cologin)
       // Set login window as parent to warranty as focus is left to parent.
       ((CoWowGtk*)wow)->SetParent(((CoLoginGtk*)cologin)->widgets.toplevel);

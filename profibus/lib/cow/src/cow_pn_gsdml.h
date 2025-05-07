@@ -48,7 +48,7 @@ namespace pugi
 class xml_document;
 class xml_node;
 class xpath_node_set;
-}
+} // namespace pugi
 
 typedef struct
 {
@@ -57,30 +57,28 @@ typedef struct
 } gsdml_sModuleClass;
 
 class pn_gsdml
-{  
+{
 public:
-  pn_gsdml(); 
+  pn_gsdml();
   ~pn_gsdml();
 
   gsdml_sModuleClass* module_classlist;
   pwr_tFileName m_gsdml_file;
-  
-  int read(const char* filename);    
+
+  int read(const char* filename);
   void set_classes(gsdml_sModuleClass* mclist) { module_classlist = mclist; }
 
-  static int ostring_to_data(unsigned char** data, const char* str, int size,
-                             int* rsize);
-  static int data_to_ostring(unsigned char* data, int size, char* str,
-                             int strsize);    
-  
+  static int ostring_to_data(unsigned char** data, const char* str, int size, int* rsize);
+  static int data_to_ostring(unsigned char* data, int size, char* str, int strsize);
+
   // Our compiled lists
   std::unordered_map<ushort, GSDML::ChannelDiagItem>& getChannelDiagMap();
   std::unordered_map<ushort, GSDML::UnitDiagTypeItem>& getUnitDiagTypeMap();
   std::unordered_map<std::string, std::shared_ptr<GSDML::ModuleItem>>& getModuleMap();
   std::unordered_map<std::string, std::shared_ptr<GSDML::SubmoduleItem>>& getSubmoduleMap();
   std::unordered_map<std::string, std::shared_ptr<GSDML::ValueItem>>& getValueMap();
-  std::unordered_map<std::string, std::shared_ptr<std::string>>& getTextIdMap();  
-  std::unordered_map<std::string, std::shared_ptr<GSDML::DeviceAccessPointItem>>& getDeviceAccessPointMap();  
+  std::unordered_map<std::string, std::shared_ptr<std::string>>& getTextIdMap();
+  std::unordered_map<std::string, std::shared_ptr<GSDML::DeviceAccessPointItem>>& getDeviceAccessPointMap();
 
   /*
     Utility functions for finding references
@@ -95,7 +93,7 @@ public:
   std::unique_ptr<GSDML::DeviceIdentity> m_DeviceIdentity;
   std::unique_ptr<GSDML::DeviceFunction> m_DeviceFunction;
 
-private:  
+private:
   /*
     Builders that generates "dereferenced" xml object structure
   */
@@ -107,17 +105,15 @@ private:
   void _build_valueList();
   void _build_textIdList();
 
-  //pwr_tFileName _filename;
-
   std::unique_ptr<pugi::xml_document> _doc;
-  
+
   // Pointers for faster reference to all the lists
   std::shared_ptr<pugi::xml_node> _xmlTextIds;
   std::shared_ptr<pugi::xml_node> _xmlDeviceAccessPointList;
   std::shared_ptr<pugi::xml_node> _xmlCategoryList;
   /*
     ModuleList - List of ModuleItem
-    Uses attribute ModuleItemTarget to point out what ID attribute of ModuleItem to use 
+    Uses attribute ModuleItemTarget to point out what ID attribute of ModuleItem to use
   */
   std::shared_ptr<pugi::xml_node> _xmlModuleList;
   std::shared_ptr<pugi::xml_node> _xmlSubmoduleList;
@@ -132,7 +128,7 @@ private:
   std::unordered_map<std::string, std::shared_ptr<GSDML::SubmoduleItem>> _submoduleMap;
   std::unordered_map<std::string, std::shared_ptr<GSDML::ValueItem>> _valueMap;
   std::unordered_map<std::string, std::shared_ptr<std::string>> _textIdMap;
-  std::unordered_map<std::string, std::shared_ptr<GSDML::DeviceAccessPointItem>> _deviceAccessPointMap;  
+  std::unordered_map<std::string, std::shared_ptr<GSDML::DeviceAccessPointItem>> _deviceAccessPointMap;
 };
 
 #endif

@@ -81,12 +81,13 @@ static pwr_tStatus plc_redu_init(plc_sThread* tp)
   void* p;
   pwr_tCid cid;
 
-  for (sts = gdh_GetChild(tp->aref.Objid, &child); ODD(sts);
-       sts = gdh_GetNextSibling(child, &child)) {
+  for (sts = gdh_GetChild(tp->aref.Objid, &child); ODD(sts); sts = gdh_GetNextSibling(child, &child))
+  {
     sts = gdh_GetObjectClass(child, &cid);
     if (EVEN(sts))
       continue;
-    if (cid == pwr_cClass_RedcomPacket) {
+    if (cid == pwr_cClass_RedcomPacket)
+    {
       sts = gdh_ObjidToPointer(child, &p);
       if (EVEN(sts))
         return sts;
@@ -113,17 +114,20 @@ static pwr_tStatus plc_redu_receive(plc_sThread* tp, unsigned int timeout)
   else if (EVEN(sts))
     return sts;
 
-  switch (((redu_sHeader*)msg)->type) {
+  switch (((redu_sHeader*)msg)->type)
+  {
   case redu_eMsgType_Table:
     if (tp->redu->t)
       redu_free_table(tp->redu);
 
     sts = redu_receive_table(tp->redu, msg);
-    if (tp->redu->packetp) {
+    if (tp->redu->packetp)
+    {
       tp->redu->packetp->TableStatus = sts;
       tp->redu->packetp->TableVersion = tp->redu->table_version;
     }
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       qcom_Free(&sts, msg);
       return sts;
     }
@@ -133,22 +137,26 @@ static pwr_tStatus plc_redu_receive(plc_sThread* tp, unsigned int timeout)
     if (tp->redu->packetp)
       tp->redu->packetp->PacketSize = size;
     sts = redu_unpack_message(tp->redu, msg);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       qcom_Free(&sts, msg);
       return sts;
     }
     break;
-  case redu_eMsgType_TableRequest: {
+  case redu_eMsgType_TableRequest:
+  {
     sts = plc_redu_send_table(tp);
     if (ODD(sts))
       tp->redu->table_sent = 1;
     break;
   }
-  case redu_eMsgType_TableVersionRequest: {
+  case redu_eMsgType_TableVersionRequest:
+  {
     sts = redu_send_table_version(tp->redu);
     break;
   }
-  case redu_eMsgType_TableVersion: {
+  case redu_eMsgType_TableVersion:
+  {
     int tsts;
     pwr_tTime table_version;
 
@@ -158,13 +166,14 @@ static pwr_tStatus plc_redu_receive(plc_sThread* tp, unsigned int timeout)
     else
       table_version = tp->redu->table_version;
 
-    tsts = time_Acomp_NE(
-        &table_version, &((redu_sMsgTableVersion*)msg)->version);
+    tsts = time_Acomp_NE(&table_version, &((redu_sMsgTableVersion*)msg)->version);
     if (tsts == 0)
       sts = redu_send_table_request(tp->redu);
-    else {
+    else
+    {
       sts = plc_redu_send_table(tp);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         qcom_Free(&sts, msg);
         return sts;
       }
@@ -189,17 +198,20 @@ static pwr_tStatus plc_redu_receive_active(plc_sThread* tp)
   if (EVEN(sts))
     return sts;
 
-  switch (((redu_sHeader*)msg)->type) {
+  switch (((redu_sHeader*)msg)->type)
+  {
   case redu_eMsgType_Table:
     if (tp->redu->t)
       redu_free_table(tp->redu);
 
     sts = redu_receive_table(tp->redu, msg);
-    if (tp->redu->packetp) {
+    if (tp->redu->packetp)
+    {
       tp->redu->packetp->TableStatus = sts;
       tp->redu->packetp->TableVersion = tp->redu->table_version;
     }
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       qcom_Free(&sts, msg);
       return sts;
     }
@@ -207,18 +219,21 @@ static pwr_tStatus plc_redu_receive_active(plc_sThread* tp)
     break;
   case redu_eMsgType_Cyclic:
     break;
-  case redu_eMsgType_TableRequest: {
+  case redu_eMsgType_TableRequest:
+  {
     sts = plc_redu_send_table(tp);
     if (EVEN(sts))
       return sts;
     tp->redu->table_sent = 1;
     break;
   }
-  case redu_eMsgType_TableVersionRequest: {
+  case redu_eMsgType_TableVersionRequest:
+  {
     sts = redu_send_table_version(tp->redu);
     break;
   }
-  case redu_eMsgType_TableVersion: {
+  case redu_eMsgType_TableVersion:
+  {
     int tsts;
     pwr_tTime table_version;
 
@@ -227,11 +242,11 @@ static pwr_tStatus plc_redu_receive_active(plc_sThread* tp)
     else
       table_version = tp->redu->table_version;
 
-    tsts = time_Acomp_NE(
-        &table_version, &((redu_sMsgTableVersion*)msg)->version);
+    tsts = time_Acomp_NE(&table_version, &((redu_sMsgTableVersion*)msg)->version);
     if (tsts == 0)
       sts = redu_send_table_request(tp->redu);
-    else {
+    else
+    {
       sts = plc_redu_send_table(tp);
       if (ODD(sts))
         tp->redu->table_sent = 1;
@@ -250,9 +265,11 @@ static pwr_tStatus plc_redu_send_table(plc_sThread* tp)
   void* table_msg;
   pwr_tStatus sts;
 
-  if (!tp->redu->table_created) {
+  if (!tp->redu->table_created)
+  {
     sts = redu_create_table(tp->redu);
-    if (tp->redu->packetp) {
+    if (tp->redu->packetp)
+    {
       tp->redu->packetp->TableStatus = sts;
       tp->redu->packetp->TableVersion = tp->redu->table_version;
     }
@@ -267,9 +284,9 @@ static pwr_tStatus plc_redu_send_table(plc_sThread* tp)
   if (EVEN(sts))
     return sts;
 
-  sts = redu_send(tp->redu, table_msg,
-      ((redu_sTableMsgHeader*)table_msg)->size + sizeof(redu_sTableMsgHeader),
-      tp->redu->msgid_table);
+  sts =
+      redu_send(tp->redu, table_msg, ((redu_sTableMsgHeader*)table_msg)->size + sizeof(redu_sTableMsgHeader),
+                tp->redu->msgid_table);
   free(table_msg);
   return sts;
 }
@@ -279,7 +296,8 @@ static pwr_tStatus plc_redu_send(plc_sThread* tp)
   pwr_tStatus sts;
   void* msg;
 
-  if (!tp->redu->table_sent) {
+  if (!tp->redu->table_sent)
+  {
     sts = plc_redu_send_table(tp);
     if (EVEN(sts))
       return sts;
@@ -290,12 +308,10 @@ static pwr_tStatus plc_redu_send(plc_sThread* tp)
   if (EVEN(sts))
     return sts;
 
-  tp->redu->packetp->PacketSize
-      = ((redu_sMsgHeader*)msg)->size + sizeof(redu_sMsgHeader);
+  tp->redu->packetp->PacketSize = ((redu_sMsgHeader*)msg)->size + sizeof(redu_sMsgHeader);
 
-  sts = redu_send(tp->redu, msg,
-      ((redu_sMsgHeader*)msg)->size + sizeof(redu_sMsgHeader),
-      tp->redu->msgid_cyclic);
+  sts = redu_send(tp->redu, msg, ((redu_sMsgHeader*)msg)->size + sizeof(redu_sMsgHeader),
+                  tp->redu->msgid_cyclic);
 
   free(msg);
 
@@ -314,17 +330,22 @@ void plc_thread(plc_sThread* tp)
 
   tp->init(1, tp);
 
-  if (tp->PlcThread->Deadline > FLT_EPSILON) {
+  if (tp->PlcThread->Deadline > FLT_EPSILON)
+  {
     sts = thread_SetDeadline(tp->PlcThread);
-  } else {
+  }
+  else
+  {
     sts = thread_SetPrio(&tp->tid, tp->prio);
   }
-  if (EVEN(sts)) {
-    errh_Error("Failed to set priority, plc thread %d ms, prio %d",
-        (int)(tp->PlcThread->ScanTime * 1000), tp->prio);
-  } else {
-    errh_Info("Priority set, plc thread %d ms, prio %d",
-        (int)(tp->PlcThread->ScanTime * 1000), tp->prio);
+  if (EVEN(sts))
+  {
+    errh_Error("Failed to set priority, plc thread %d ms, prio %d", (int)(tp->PlcThread->ScanTime * 1000),
+               tp->prio);
+  }
+  else
+  {
+    errh_Info("Priority set, plc thread %d ms, prio %d", (int)(tp->PlcThread->ScanTime * 1000), tp->prio);
   }
 
   que_Put(&sts, &tp->q_out, &tp->event, (void*)1);
@@ -342,42 +363,49 @@ void plc_thread(plc_sThread* tp)
   /* Phase 3.  */
 
   rel_vec = ((tp->pp->PlcProcess->ChgCount - 1) % 2) + 1;
-  sts = io_init(tp->PlcThread->IoProcess, tp->aref.Objid, &tp->plc_io_ctx,
-      rel_vec, tp->f_scan_time);
-  if (EVEN(sts)) {
+  sts = io_init(tp->PlcThread->IoProcess, tp->aref.Objid, &tp->plc_io_ctx, rel_vec, tp->f_scan_time);
+  if (EVEN(sts))
+  {
     pp->IOHandler->IOReadWriteFlag = FALSE;
     errh_Error("Failed to inititalize io, %m", sts);
     errh_SetStatus(PLC__ERRINITIO);
   }
 
-/* Once thread's has set it's priority don't run as root */
+  /* Once thread's has set it's priority don't run as root */
 
   struct passwd* pwd;
 
   ruid = getuid();
 
-  if (ruid == 0) {
+  if (ruid == 0)
+  {
     pwd = getpwnam("pwrp");
-    if (pwd != NULL) {
+    if (pwd != NULL)
+    {
       setreuid(pwd->pw_uid, pwd->pw_uid);
     }
-  } else
+  }
+  else
     setreuid(ruid, ruid);
 
   tp->init(0, tp);
 
-  if (tp->pp->IOHandler->IOReadWriteFlag) {
+  if (tp->pp->IOHandler->IOReadWriteFlag)
+  {
     sts = io_read(tp->plc_io_ctx);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       tp->pp->IOHandler->IOReadWriteFlag = FALSE;
       errh_Error("IO read, %m", sts);
       errh_SetStatus(PLC__IOREAD);
     }
   }
 
-  if (tp->pp->Node->RedundancyState != pwr_eRedundancyState_Off) {
+  if (tp->pp->Node->RedundancyState != pwr_eRedundancyState_Off)
+  {
     sts = plc_redu_init(tp);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       errh_Error("Redundance init, %m", sts);
       tp->redu = 0;
     }
@@ -399,13 +427,15 @@ void plc_thread(plc_sThread* tp)
   memcpy(tp->copy.bo_a.p, tp->pp->base.bo_a.p, tp->copy.bo_a.size);
   thread_MutexUnlock(&tp->pp->io_copy_mutex);
 
-  if (tp->tim_copy_lock) {
+  if (tp->tim_copy_lock)
+  {
     lck_LockTime;
     memcpy(tp->copy.atv_a.p, tp->pp->base.atv_a.p, tp->copy.atv_a.size);
     memcpy(tp->copy.dtv_a.p, tp->pp->base.dtv_a.p, tp->copy.dtv_a.size);
     lck_UnlockTime;
   }
-  if (tp->str_copy_lock) {
+  if (tp->str_copy_lock)
+  {
     lck_LockStr;
     memcpy(tp->copy.sv_a.p, tp->pp->base.sv_a.p, tp->copy.sv_a.size);
     lck_UnlockStr;
@@ -425,7 +455,8 @@ void plc_thread(plc_sThread* tp)
 
   tp->ActualScanTime = tp->f_scan_time;
 
-  while (!tp->exit) {
+  while (!tp->exit)
+  {
     scan(tp);
   }
 
@@ -441,13 +472,15 @@ static int sim_scan(plc_sThread* tp)
   unsigned int i;
   int select_thread_cnt;
 
-  if (!tp->sim_initdone_old && sp->InitDone) {
+  if (!tp->sim_initdone_old && sp->InitDone)
+  {
     /* Identify index in simulate configuration */
-    for (i = 0; i < sizeof(sp->PlcThreads) / sizeof(sp->PlcThreads[0]); i++) {
-      if (cdh_ObjidIsEqual(tp->aref.Objid, sp->PlcThreads[i])) {
+    for (i = 0; i < sizeof(sp->PlcThreads) / sizeof(sp->PlcThreads[0]); i++)
+    {
+      if (cdh_ObjidIsEqual(tp->aref.Objid, sp->PlcThreads[i]))
+      {
         tp->sim_idx = i;
-        sp->ThreadStatus[i]
-            = tp->sim_halted ? SIM__THREAD_HALT : SIM__THREAD_RUNNING;
+        sp->ThreadStatus[i] = tp->sim_halted ? SIM__THREAD_HALT : SIM__THREAD_RUNNING;
         break;
       }
     }
@@ -455,7 +488,8 @@ static int sim_scan(plc_sThread* tp)
   }
   tp->sim_initdone_old = sp->InitDone;
 
-  if (!tp->sim_disable_old && sp->Disable) {
+  if (!tp->sim_disable_old && sp->Disable)
+  {
     pwr_tTime current;
 
     /* Use nominal scantime as time since last scan */
@@ -469,15 +503,19 @@ static int sim_scan(plc_sThread* tp)
   }
   tp->sim_disable_old = sp->Disable;
 
-  if (sp->PlcHaltOrder && sp->ThreadSelected[tp->sim_idx]) {
-    if (!tp->sim_halted) {
+  if (sp->PlcHaltOrder && sp->ThreadSelected[tp->sim_idx])
+  {
+    if (!tp->sim_halted)
+    {
       tp->sim_halted = 1;
       sp->ThreadStatus[tp->sim_idx] = SIM__THREAD_HALT;
       sp->PlcHaltOrder--;
     }
   }
-  if (sp->PlcContinueOrder && sp->ThreadSelected[tp->sim_idx]) {
-    if (tp->sim_halted) {
+  if (sp->PlcContinueOrder && sp->ThreadSelected[tp->sim_idx])
+  {
+    if (tp->sim_halted)
+    {
       pwr_tTime current;
 
       tp->sim_halted = 0;
@@ -493,20 +531,22 @@ static int sim_scan(plc_sThread* tp)
   }
 
   select_thread_cnt = 0;
-  for (i = 0; i < sizeof(sp->ThreadSelected) / sizeof(sp->ThreadSelected[0]);
-       i++) {
+  for (i = 0; i < sizeof(sp->ThreadSelected) / sizeof(sp->ThreadSelected[0]); i++)
+  {
     if (sp->ThreadSelected[i] && sp->ThreadStatus[i] == SIM__THREAD_HALT)
       select_thread_cnt++;
   }
 
-  if (tp->sim_singlestep && (sp->PlcStepOrder <= select_thread_cnt)) {
+  if (tp->sim_singlestep && (sp->PlcStepOrder <= select_thread_cnt))
+  {
     tp->sim_singlestep = 0;
     sp->PlcStepOrder--;
   }
 
-  if (sp->PlcStepOrder > select_thread_cnt && sp->ThreadSelected[tp->sim_idx]
-      && !tp->sim_singlestep) {
-    if (tp->sim_halted) {
+  if (sp->PlcStepOrder > select_thread_cnt && sp->ThreadSelected[tp->sim_idx] && !tp->sim_singlestep)
+  {
+    if (tp->sim_halted)
+    {
       pwr_tTime current;
 
       sp->PlcStepOrder--;
@@ -523,7 +563,8 @@ static int sim_scan(plc_sThread* tp)
       return 0;
     }
   }
-  if (sp->PlcLoadOrder && tp->sim_halted) {
+  if (sp->PlcLoadOrder && tp->sim_halted)
+  {
     sp->PlcLoadOrder--;
   }
   return tp->sim_halted;
@@ -534,12 +575,16 @@ static void scan(plc_sThread* tp)
   pwr_tStatus sts;
   plc_sProcess* pp = tp->pp;
   int delay_action = 0;
+  pwr_tObjid delayed_cyclesup_objid;
+  pwr_tOName delayed_cyclesup_name;
 
-  if ( tp->ext_retry_connect_cnt > (int)(5.0/tp->f_scan_time)) {
+  if (tp->ext_retry_connect_cnt > (int)(5.0 / tp->f_scan_time))
+  {
     tp->ext_retry_connect = 1;
     tp->ext_retry_connect_cnt = 0;
   }
-  else {
+  else
+  {
     tp->ext_retry_connect = 0;
     tp->ext_retry_connect_cnt++;
   }
@@ -549,15 +594,19 @@ static void scan(plc_sThread* tp)
   time_GetTime(&tp->before_scan_abs);
   pp->Node->SystemTime = tp->before_scan_abs;
 
-  if (pp->IOHandler->IOSimulFlag && pp->SimConfig) {
-    if (!pp->SimConfig->Disable || !tp->sim_disable_old) {
-      if (sim_scan(tp)) {
+  if (pp->IOHandler->IOSimulFlag && pp->SimConfig)
+  {
+    if (!pp->SimConfig->Disable || !tp->sim_disable_old)
+    {
+      if (sim_scan(tp))
+      {
         pwr_tDeltaTime delta;
 
         time_GetTimeMonotonic(&tp->after_scan);
         time_Aadd(NULL, &tp->sync_time, &tp->scan_time);
         time_Adiff(&delta, &tp->sync_time, &tp->after_scan);
-        if (time_Dcomp(&delta, NULL) > 0) {
+        if (time_Dcomp(&delta, NULL) > 0)
+        {
 #if defined OS_MACOS || defined OS_FREEBSD || OS_OPENBSD || OS_CYGWIN
           struct timespec ts;
           ts.tv_sec = delta.tv_sec;
@@ -576,11 +625,13 @@ static void scan(plc_sThread* tp)
         }
         return;
       }
-    } else
+    }
+    else
       tp->sim_halted = 0;
   }
 
-  if (tp->loops > 0) {
+  if (tp->loops > 0)
+  {
     /*    if (sts == TIME__CLKCHANGE) {
           time_Dadd(&tp->before_scan, &tp->one_before_scan, &tp->scan_time);
         } */
@@ -590,13 +641,14 @@ static void scan(plc_sThread* tp)
       tp->ActualScanTime = MIN_SCANTIME;
   }
 
-  if (tp->redu
-      && tp->pp->Node->RedundancyState == pwr_eRedundancyState_Passive) {
-    if (tp->redu_state_old == pwr_eRedundancyState_Off
-        || tp->redu_state_old == pwr_eRedundancyState_Init) {
+  if (tp->redu && tp->pp->Node->RedundancyState == pwr_eRedundancyState_Passive)
+  {
+    if (tp->redu_state_old == pwr_eRedundancyState_Off || tp->redu_state_old == pwr_eRedundancyState_Init)
+    {
       /* Send table version request to see if table should be requested or sent
        */
-      if (!tp->redu_table_version_req_sent) {
+      if (!tp->redu_table_version_req_sent)
+      {
         sts = redu_send_table_version_request(tp->redu);
         if (ODD(sts))
           tp->redu_table_version_req_sent = 1;
@@ -606,10 +658,12 @@ static void scan(plc_sThread* tp)
     time_GetTime(&tp->before_scan_abs);
 
     sts = plc_redu_receive(tp, tp->i_scan_time);
-    if (EVEN(sts)) {
-      if (!(tp->redu_state_old == pwr_eRedundancyState_Init)) {
-	tp->redu_state_old = tp->pp->Node->RedundancyState;
-	return;
+    if (EVEN(sts))
+    {
+      if (!(tp->redu_state_old == pwr_eRedundancyState_Init))
+      {
+        tp->redu_state_old = tp->pp->Node->RedundancyState;
+        return;
       }
     }
     else
@@ -621,15 +675,15 @@ static void scan(plc_sThread* tp)
     if (tp->log)
       pwrb_PlcThread_Exec(tp);
 
-    if (tp->csup_lh != NULL) {
+    if (tp->csup_lh != NULL)
+    {
       pwr_tTime now;
       time_GetTime(&now);
-      csup_Exec(&sts, tp->csup_lh, (pwr_tDeltaTime*)&tp->sync_time,
-          (pwr_tDeltaTime*)&tp->after_scan, &now);
+      csup_Exec(&sts, tp->csup_lh, (pwr_tDeltaTime*)&tp->sync_time, (pwr_tDeltaTime*)&tp->after_scan, &now,
+                &delayed_cyclesup_objid);
     }
     tp->one_before_scan = tp->before_scan;
     tp->ActualScanTime = tp->f_scan_time;
-
 
     tp->one_before_scan = tp->before_scan;
     tp->one_before_scan_abs = tp->before_scan_abs;
@@ -640,12 +694,13 @@ static void scan(plc_sThread* tp)
     return;
   }
 
-  if (!tp->redu
-      || (tp->pp->Node->RedundancyState != pwr_eRedundancyState_Passive)) {
+  if (!tp->redu || (tp->pp->Node->RedundancyState != pwr_eRedundancyState_Passive))
+  {
     if (tp->redu_state_old == pwr_eRedundancyState_Passive && tp->redu)
       sts = plc_redu_receive(tp, 0);
 
-    if (pp->IOHandler->IOReadWriteFlag) {
+    if (pp->IOHandler->IOReadWriteFlag)
+    {
       if (tp->redu_state_old == pwr_eRedundancyState_Passive)
         tp->plc_io_ctx->read_reset = 1;
 
@@ -653,7 +708,8 @@ static void scan(plc_sThread* tp)
 
       if (tp->redu_state_old == pwr_eRedundancyState_Passive)
         tp->plc_io_ctx->read_reset = 0;
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         pp->IOHandler->IOReadWriteFlag = FALSE;
         errh_Error("IO read, %m", sts);
         errh_SetStatus(PLC__IOREAD);
@@ -681,14 +737,16 @@ static void scan(plc_sThread* tp)
     memcpy(tp->copy.bo_a.p, pp->base.bo_a.p, tp->copy.bo_a.size);
     thread_MutexUnlock(&pp->io_copy_mutex);
 
-    if (tp->tim_copy_lock) {
+    if (tp->tim_copy_lock)
+    {
       lck_LockTime;
       *pp->system_time = tp->before_scan_abs;
       memcpy(tp->copy.atv_a.p, pp->base.atv_a.p, tp->copy.atv_a.size);
       memcpy(tp->copy.dtv_a.p, pp->base.dtv_a.p, tp->copy.dtv_a.size);
       lck_UnlockTime;
     }
-    if (tp->str_copy_lock) {
+    if (tp->str_copy_lock)
+    {
       lck_LockStr;
       memcpy(tp->copy.sv_a.p, pp->base.sv_a.p, tp->copy.sv_a.size);
       lck_UnlockStr;
@@ -698,17 +756,18 @@ static void scan(plc_sThread* tp)
     tp->exec(0, tp);
 
     if (pp->IOHandler->IOReadWriteFlag &&
-	(!tp->redu || 
-	 tp->pp->Node->RedundancyState == pwr_eRedundancyState_Active)) {
+        (!tp->redu || tp->pp->Node->RedundancyState == pwr_eRedundancyState_Active))
+    {
       sts = io_write(tp->plc_io_ctx);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         pp->IOHandler->IOReadWriteFlag = FALSE;
         errh_Error("IO write, %m", sts);
         errh_SetStatus(PLC__IOWRITE);
       }
     }
-    if (tp->redu
-        && tp->pp->Node->RedundancyState == pwr_eRedundancyState_Active) {
+    if (tp->redu && tp->pp->Node->RedundancyState == pwr_eRedundancyState_Active)
+    {
       sts = plc_redu_receive_active(tp);
       sts = plc_redu_send(tp);
     }
@@ -725,31 +784,39 @@ static void scan(plc_sThread* tp)
   if (tp->log)
     pwrb_PlcThread_Exec(tp);
 
-  do {
+  do
+  {
     pwr_tDeltaTime delta;
 
     plc_timerhandler(tp);
     time_Aadd(NULL, &tp->sync_time, &tp->scan_time);
     time_Adiff(&delta, &tp->sync_time, &tp->after_scan);
-    if (time_Dcomp(&delta, NULL) > 0) {
+    if (time_Dcomp(&delta, NULL) > 0)
+    {
       pwr_tStatus sts;
       int phase = 0;
       tp->skip_count = 0;
 
-      if (tp->csup_lh != NULL) {
+      if (tp->csup_lh != NULL)
+      {
         pwr_tTime now;
         time_GetTime(&now);
-        delay_action =
-            csup_Exec(&sts, tp->csup_lh, (pwr_tDeltaTime*)&tp->sync_time,
-                      (pwr_tDeltaTime*)&tp->after_scan, &now);
+        delay_action = csup_Exec(&sts, tp->csup_lh, (pwr_tDeltaTime*)&tp->sync_time,
+                                 (pwr_tDeltaTime*)&tp->after_scan, &now, &delayed_cyclesup_objid);
         if (delay_action == pwr_eSupDelayActionEnum_EmergencyBreak)
         {
           int prev_rwflag = pp->IOHandler->IOReadWriteFlag;
           pp->IOHandler->IOReadWriteFlag = FALSE;
           pp->Node->EmergBreakTrue = TRUE;
-          errh_SetStatus(PLC__IOSTALLED);
           if (prev_rwflag)
-            errh_Fatal("Delay detected in a CycleSup with action Emergency Break!");
+          {
+            errh_SetStatus(PLC__IOSTALLED);
+            gdh_ObjidToName(delayed_cyclesup_objid, delayed_cyclesup_name, sizeof(delayed_cyclesup_name),
+                            cdh_mName_pathStrict);
+            errh_Fatal(
+                "Delay detected in %s, with action EmergencyBreak! This thread will now set EmergencyBreak!",
+                delayed_cyclesup_name);
+          }
         }
       }
 
@@ -775,25 +842,25 @@ static void scan(plc_sThread* tp)
       struct timespec ts;
       ts.tv_sec = tp->sync_time.tv_sec;
       ts.tv_nsec = tp->sync_time.tv_nsec;
-      sts = clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &ts, NULL);
-      while (sts == EINTR)
-        /* The wait was interruped, continue to sleep */
-        sts = clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &ts, NULL);
-
+      // sleep and continue if interrupted
+      while (clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &ts, NULL) == EINTR)
+        ;
 #endif
-      if (phase > 0) {
+      if (phase > 0)
+      {
         tp->exit = TRUE;
       }
       break;
-
-    } else {
+    }
+    else
+    {
       tp->sliped++;
-      if (tp->PlcThread->Options & pwr_mThreadOptionsMask_OverExecScanSingle
-          && tp->skip_count < 10) {
+      if (tp->PlcThread->Options & pwr_mThreadOptionsMask_OverExecScanSingle && tp->skip_count < 10)
+      {
         tp->skip_count++;
         break;
-      } else if (tp->PlcThread->Options
-          & pwr_mThreadOptionsMask_OverExecScanAlways)
+      }
+      else if (tp->PlcThread->Options & pwr_mThreadOptionsMask_OverExecScanAlways)
         break;
     }
 
