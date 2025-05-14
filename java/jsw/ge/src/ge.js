@@ -4483,10 +4483,14 @@ function DynValue( dyn) {
       self.dyn.repaintNow = true;
     }
     else {
+      var self = data[0];
+      var object = data[1];
       if ( self.a.typeid === Pwr.eType_Enum)
 	object.setAnnotation( annot_num, "");
       else
 	object.setAnnotation( annot_num, "Unknown message");
+      if (typeof this.dyn === 'undefined')
+	return;
       this.dyn.repaintNow = true;
     }
   }
@@ -18745,6 +18749,269 @@ function DynEmitSignal( dyn) {
 	break;
       default:
 	console.log( "Syntax error in DynEmitSignal");
+	break;
+      }
+      
+      if ( end)
+	break;
+    }
+    
+    return i;
+  };  
+}
+
+function DynDigCommand( dyn) {
+  this.dyn = dyn;
+  this.dyn_type1 = DynC.mDynType1_DigCommand;
+  this.dyn_type2 = 0;
+  this.action_type1 = 0;
+  this.action_type2 = 0;
+  this.prio = DynC.eDynPrio_DigCommand;
+  this.instance_mask = 0;
+  this.instance = 0;
+
+  this.attribute;
+  this.command;
+  this.level;
+
+  this.setAttribute = function(o, name, value) {
+    if (name === "DigCommand.Attribute") {
+      this.attribute = value;
+      return 1;
+    }
+    else if (name === "DigCommand.Command") {
+      this.command = value;
+      return 1;
+    }
+    else if (name === "DigCommand.Level") {
+      this.level = value;
+      return 1;
+    }
+    return 0;
+  }
+  this.getAttribute = function(o, name, value) {
+    var ret = new ge_tValueReturn();
+    if (name === "DigCommand.Attribute") {
+      ret.value = this.attribute;
+      ret.decl = CcmC.K_DECL_STRING;
+      return ret;
+    }
+    else if (name === "DigCommand.Command") {
+      ret.value = this.command;
+      ret.decl = CcmC.K_DECL_STRING;
+      return ret;
+    }
+    else if (name === "DigCommand.Level") {
+      ret.value = this.level;
+      ret.decl = CcmC.K_DECL_INT;
+      return ret;
+    }
+    ret.sts = 0;
+    return ret;
+  }
+
+  this.connect = function( o) {
+    return 1;
+  };
+  this.disconnect = function() {
+  };
+  this.scan = function( o) {
+    return 1;
+  };
+  this.action = function( object, e) {
+    return 1;
+  };
+
+  this.open = function( lines, row) {
+    var end = false;
+    var i;
+    var elem;
+
+    for ( i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(' ');
+      var key = parseInt(tokens[0], 10);
+
+      if ( this.dyn.debug) console.log( "DynDigCommand : " + lines[i]);
+
+      elem = null;
+
+      switch ( key) {
+      case DynC.eSave_DigCommand: 
+	break;
+      case DynC.eSave_DigCommand_attribute:
+	if ( tokens.length > 1)
+	  this.attribute = tokens[1];
+	break;
+      case DynC.eSave_DigCommand_command:
+	if ( tokens.length > 1)
+	  this.command = tokens[1];
+	break;
+      case DynC.eSave_DigCommand_level:
+	this.level = parseInt(tokens[1], 10);
+	break;
+      case DynC.eSave_DigCommand_instance: 
+	this.instance = parseInt(tokens[1], 10);
+	break;
+      case DynC.eSave_DigCommand_instance_mask: 
+	this.instance_mask = parseInt(tokens[1], 10);
+	break;
+      case DynC.eSave_End:
+	end = true;
+	break;
+      default:
+	console.log( "Syntax error in DynDigCommand");
+	break;
+      }
+      
+      if ( end)
+	break;
+    }
+    
+    return i;
+  };  
+}
+
+function DynDigScript( dyn) {
+  this.dyn = dyn;
+  this.dyn_type1 = 0;
+  this.dyn_type2 = DynC.mDynType2_DigScript;
+  this.action_type1 = 0;
+  this.action_type2 = 0;
+  this.prio = DynC.eDynPrio_DigScript;
+  this.instance_mask = 0;
+  this.instance = 0;
+
+  this.attribute;
+  this.script;
+  this.script_len;
+  this.level;
+  this.script_arguments;
+
+  this.setAttribute = function(o, name, value) {
+    if (name === "DigScript.Attribute") {
+      this.attribute = value;
+      return 1;
+    }
+    else if (name === "DigScript.Script") {
+      this.script = value;
+      return 1;
+    }
+    else if (name === "DigScript.Arguments") {
+      this.arguments = value;
+      return 1;
+    }
+    else if (name === "DigScript.Level") {
+      this.level = value;
+      return 1;
+    }
+    return 0;
+  }
+  this.getAttribute = function(o, name, value) {
+    var ret = new ge_tValueReturn();
+    if (name === "DigScript.Attribute") {
+      ret.value = this.attribute;
+      ret.decl = CcmC.K_DECL_STRING;
+      return ret;
+    }
+    else if (name === "DigScript.Script") {
+      ret.value = this.script;
+      ret.decl = CcmC.K_DECL_STRING;
+      return ret;
+    }
+    else if (name === "DigScript.Arguments") {
+      ret.value = this.arguments;
+      ret.decl = CcmC.K_DECL_STRING;
+      return ret;
+    }
+    else if (name === "DigScript.Level") {
+      ret.value = this.level;
+      ret.decl = CcmC.K_DECL_INT;
+      return ret;
+    }
+    ret.sts = 0;
+    return ret;
+  }
+
+  this.connect = function( o) {
+    return 1;
+  };
+  this.disconnect = function() {
+  };
+  this.scan = function( o) {
+    return 1;
+  };
+  this.action = function( object, e) {
+    return 1;
+  };
+
+  this.open = function( lines, row) {
+    var end = false;
+    var i;
+    var elem;
+
+    for ( i = row; i < lines.length; i++) {
+      var tokens = lines[i].split(' ');
+      var key = parseInt(tokens[0], 10);
+
+      if ( this.dyn.debug) console.log( "DynDigScript : " + lines[i]);
+
+      elem = null;
+
+      switch ( key) {
+      case DynC.eSave_DigScript: 
+	break;
+      case DynC.eSave_DigScript_attribute:
+	if ( tokens.length > 1)
+	  this.attribute = tokens[1];
+	break;
+      case DynC.eSave_DigScript_script:
+	var idx;
+	var send = false;
+	this.script = "";
+	i++;
+	var line = lines[i].trim().substring(1);
+
+	idx = 0;
+	while ( line != null) {			    
+	  while ( (idx = line.indexOf('"', idx)) != -1) {
+	    if ( idx > 0 && (line.charAt(idx-1) == '\\')) {
+	      line = line.substring(0, idx-1) + line.substring(idx);
+	    }
+	    else {				
+	      if ( idx > 0)
+		line = line.substring( 0, idx - 1);
+	      else
+		line = "";
+	      this.script += line;
+	      send = true;
+	      break;
+	    }
+	  }
+	  if ( send)
+	    break;
+	  this.script += line + "\n";
+	  i++;
+	  if ( i >= lines.length)
+	    break;
+	  
+	  line = lines[i];
+	}			
+	break;
+      case DynC.eSave_DigScript_arguments:
+	if ( tokens.length > 1)
+	  this.arguments = tokens[1];
+	break;
+      case DynC.eSave_DigScript_script_len:
+	this.script_len = parseInt(tokens[1], 10);
+	break;
+      case DynC.eSave_DigScript_level:
+	this.level = parseInt(tokens[1], 10);
+	break;
+      case DynC.eSave_End:
+	end = true;
+	break;
+      default:
+	console.log( "Syntax error in DynDigScript");
 	break;
       }
       
