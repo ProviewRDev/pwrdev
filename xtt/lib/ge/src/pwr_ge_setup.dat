@@ -794,6 +794,7 @@ menu ColorTheme
     subgraph 	IndBusyAnim	 	pwr_exe:pwrct_indbusyanim.pwsg 		254
     subgraph 	IndRunningAnim	 	pwr_exe:pwrct_indrunninganim.pwsg 	255
     subgraph 	IndOk	 		pwr_exe:pwrct_indok.pwsg 		256
+    subgraph 	IndOkError	 		pwr_exe:pwrct_indokerror.pwsg 		256
     subgraph 	IndWarning	 	pwr_exe:pwrct_indwarning.pwsg 		258
     subgraph 	IndError	 	pwr_exe:pwrct_inderror.pwsg 		257
     subgraph 	IndState	 	pwr_exe:pwrct_indstate.pwsg 		256
