@@ -69,8 +69,7 @@
 #include "glow_msg.h"
 #include "co_cdh.h"
 
-GlowArray::GlowArray(int allocate, int incr)
-    : allocated(allocate), alloc_incr(incr), a_size(0)
+GlowArray::GlowArray(int allocate, int incr) : allocated(allocate), alloc_incr(incr), a_size(0)
 {
   a = (GlowArrayElem**)calloc(allocated, sizeof(GlowArrayElem*));
 }
@@ -92,7 +91,8 @@ void GlowArray::move_from(GlowArray& array)
   a_size = 0;
   allocated = alloc_incr;
   a = (GlowArrayElem**)calloc(allocated, sizeof(GlowArrayElem*));
-  for (i = 0; i < array.a_size; i++) {
+  for (i = 0; i < array.a_size; i++)
+  {
     insert(array.a[i]);
     array.remove(array.a[i]);
     i--;
@@ -107,7 +107,8 @@ void GlowArray::copy_from_common_objects(GlowArray& array)
   free(a);
   allocated = alloc_incr;
   a = (GlowArrayElem**)calloc(allocated, sizeof(GlowArrayElem*));
-  for (i = 0; i < array.a_size; i++) {
+  for (i = 0; i < array.a_size; i++)
+  {
     insert(array.a[i]);
   }
 }
@@ -120,7 +121,8 @@ void GlowArray::merge(GlowArray& array)
   GlowArrayElem** a_tmp;
 
   array.set_rootnode(0);
-  if (allocated <= a_size + array.a_size) {
+  if (allocated <= a_size + array.a_size)
+  {
     allocated = a_size + array.a_size + alloc_incr;
     a_tmp = (GlowArrayElem**)calloc(allocated, sizeof(GlowArrayElem*));
     memcpy(a_tmp, a, a_size * sizeof(GlowArrayElem*));
@@ -137,9 +139,12 @@ void GlowArray::copy_from(const GlowArray& array)
   int i;
 
   a_size = 0;
-  for (i = 0; i < array.a_size; i++) {
-    switch (array.a[i]->type()) {
-    case glow_eObjectType_GrowNode: {
+  for (i = 0; i < array.a_size; i++)
+  {
+    switch (array.a[i]->type())
+    {
+    case glow_eObjectType_GrowNode:
+    {
       GrowNode* n = new GrowNode();
       n->copy_from(*(GrowNode*)array.a[i]);
       n->highlight = 0;
@@ -147,7 +152,8 @@ void GlowArray::copy_from(const GlowArray& array)
       insert(n);
       break;
     }
-    case glow_eObjectType_GrowGroup: {
+    case glow_eObjectType_GrowGroup:
+    {
       GrowGroup* n = new GrowGroup();
       n->copy_from(*(GrowGroup*)array.a[i]);
       n->highlight = 0;
@@ -155,7 +161,8 @@ void GlowArray::copy_from(const GlowArray& array)
       insert(n);
       break;
     }
-    case glow_eObjectType_GrowLayer: {
+    case glow_eObjectType_GrowLayer:
+    {
       GrowLayer* n = new GrowLayer();
       n->copy_from(*(GrowLayer*)array.a[i]);
       n->highlight = 0;
@@ -163,7 +170,8 @@ void GlowArray::copy_from(const GlowArray& array)
       insert(n);
       break;
     }
-    case glow_eObjectType_GrowSlider: {
+    case glow_eObjectType_GrowSlider:
+    {
       GrowSlider* n = new GrowSlider();
       n->copy_from(*(GrowSlider*)array.a[i]);
       n->highlight = 0;
@@ -171,56 +179,66 @@ void GlowArray::copy_from(const GlowArray& array)
       insert(n);
       break;
     }
-    case glow_eObjectType_Point: {
+    case glow_eObjectType_Point:
+    {
       GlowPoint* n = new GlowPoint(*(GlowPoint*)array.a[i]);
       insert(n);
       break;
     }
-    case glow_eObjectType_Line: {
+    case glow_eObjectType_Line:
+    {
       GlowLine* n = new GlowLine(*(GlowLine*)array.a[i]);
       insert(n);
       break;
     }
-    case glow_eObjectType_PolyLine: {
+    case glow_eObjectType_PolyLine:
+    {
       GlowPolyLine* n = new GlowPolyLine(*(GlowPolyLine*)array.a[i]);
       insert(n);
       break;
     }
-    case glow_eObjectType_Arc: {
+    case glow_eObjectType_Arc:
+    {
       GlowArc* n = new GlowArc(*(GlowArc*)array.a[i]);
       insert(n);
       break;
     }
-    case glow_eObjectType_Arrow: {
+    case glow_eObjectType_Arrow:
+    {
       GlowArrow* n = new GlowArrow(*(GlowArrow*)array.a[i]);
       insert(n);
       break;
     }
-    case glow_eObjectType_Rect: {
+    case glow_eObjectType_Rect:
+    {
       GlowRect* n = new GlowRect(*(GlowRect*)array.a[i]);
       insert(n);
       break;
     }
-    case glow_eObjectType_Text: {
+    case glow_eObjectType_Text:
+    {
       GlowText* n = new GlowText(*(GlowText*)array.a[i]);
       insert(n);
       break;
     }
-    case glow_eObjectType_GrowRect: {
+    case glow_eObjectType_GrowRect:
+    {
       GrowRect* n = new GrowRect(*(GrowRect*)array.a[i]);
       n->highlight = 0;
       n->hot = 0;
       insert(n);
       break;
     }
-    case glow_eObjectType_GrowRectRounded: {
+    case glow_eObjectType_GrowRectRounded:
+    {
       GrowRectRounded* n = new GrowRectRounded(*(GrowRectRounded*)array.a[i]);
       n->highlight = 0;
       n->hot = 0;
       insert(n);
       break;
     }
-    case glow_eObjectType_GrowImage: {
+    case glow_eObjectType_GrowImage:
+    {
       GrowImage* n = new GrowImage();
       n->copy_from(*(GrowImage*)array.a[i]);
       n->highlight = 0;
@@ -228,54 +246,58 @@ void GlowArray::copy_from(const GlowArray& array)
       insert(n);
       break;
     }
-    case glow_eObjectType_GrowAxis: {
+    case glow_eObjectType_GrowAxis:
+    {
       GrowAxis* n = new GrowAxis(*(GrowAxis*)array.a[i]);
       n->highlight = 0;
       n->hot = 0;
       if (n->ctx->userdata_copy_callback)
-        (n->ctx->userdata_copy_callback)(n,
-            ((GrowAxis*)(array.a[i]))->user_data, &n->user_data,
-            glow_eUserdataCbType_Node);
+        (n->ctx->userdata_copy_callback)(n, ((GrowAxis*)(array.a[i]))->user_data, &n->user_data,
+                                         glow_eUserdataCbType_Node);
       insert(n);
       break;
     }
-    case glow_eObjectType_GrowAnnot: {
+    case glow_eObjectType_GrowAnnot:
+    {
       GrowAnnot* n = new GrowAnnot(*(GrowAnnot*)array.a[i]);
       insert(n);
       break;
     }
-    case glow_eObjectType_GrowAxisArc: {
+    case glow_eObjectType_GrowAxisArc:
+    {
       GrowAxisArc* n = new GrowAxisArc(*(GrowAxisArc*)array.a[i]);
       n->highlight = 0;
       n->hot = 0;
       if (n->ctx->userdata_copy_callback)
-        (n->ctx->userdata_copy_callback)(n,
-            ((GrowAxisArc*)(array.a[i]))->user_data, &n->user_data,
-            glow_eUserdataCbType_Node);
+        (n->ctx->userdata_copy_callback)(n, ((GrowAxisArc*)(array.a[i]))->user_data, &n->user_data,
+                                         glow_eUserdataCbType_Node);
       insert(n);
       break;
     }
-    case glow_eObjectType_GrowPie: {
+    case glow_eObjectType_GrowPie:
+    {
       GrowPie* n = new GrowPie(*(GrowPie*)array.a[i]);
       n->highlight = 0;
       n->hot = 0;
       if (n->ctx->userdata_copy_callback)
-        (n->ctx->userdata_copy_callback)(n, ((GrowPie*)array.a[i])->user_data,
-            &n->user_data, glow_eUserdataCbType_Node);
+        (n->ctx->userdata_copy_callback)(n, ((GrowPie*)array.a[i])->user_data, &n->user_data,
+                                         glow_eUserdataCbType_Node);
       insert(n);
       break;
     }
-    case glow_eObjectType_GrowBarChart: {
+    case glow_eObjectType_GrowBarChart:
+    {
       GrowBarChart* n = new GrowBarChart(*(GrowBarChart*)array.a[i]);
       n->highlight = 0;
       n->hot = 0;
       if (n->ctx->userdata_copy_callback)
-        (n->ctx->userdata_copy_callback)(n, ((GrowBarChart*)array.a[i])->user_data,
-            &n->user_data, glow_eUserdataCbType_Node);
+        (n->ctx->userdata_copy_callback)(n, ((GrowBarChart*)array.a[i])->user_data, &n->user_data,
+                                         glow_eUserdataCbType_Node);
       insert(n);
       break;
     }
-    case glow_eObjectType_GrowToolbar: {
+    case glow_eObjectType_GrowToolbar:
+    {
       GrowToolbar* n = new GrowToolbar();
       n->copy_from(*(GrowToolbar*)array.a[i]);
       n->highlight = 0;
@@ -283,81 +305,90 @@ void GlowArray::copy_from(const GlowArray& array)
       insert(n);
       break;
     }
-    case glow_eObjectType_GrowConGlue: {
+    case glow_eObjectType_GrowConGlue:
+    {
       GrowConGlue* n = new GrowConGlue(*(GrowConGlue*)array.a[i]);
       n->highlight = 0;
       n->hot = 0;
       // Fix, This should be done in the copy constructor !!!
-      sprintf(
-          n->n_name, "O%d", ((GrowCtx*)(n->ctx))->get_next_objectname_num());
+      sprintf(n->n_name, "O%d", ((GrowCtx*)(n->ctx))->get_next_objectname_num());
       insert(n);
       break;
     }
-    case glow_eObjectType_GrowLine: {
+    case glow_eObjectType_GrowLine:
+    {
       GrowLine* n = new GrowLine(*(GrowLine*)array.a[i]);
       n->highlight = 0;
       n->hot = 0;
       insert(n);
       break;
     }
-    case glow_eObjectType_GrowPolyLine: {
+    case glow_eObjectType_GrowPolyLine:
+    {
       GrowPolyLine* n = new GrowPolyLine(*(GrowPolyLine*)array.a[i]);
       n->highlight = 0;
       n->hot = 0;
       insert(n);
       break;
     }
-    case glow_eObjectType_GrowArc: {
+    case glow_eObjectType_GrowArc:
+    {
       GrowArc* n = new GrowArc(*(GrowArc*)array.a[i]);
       n->highlight = 0;
       n->hot = 0;
       insert(n);
       break;
     }
-    case glow_eObjectType_GrowConPoint: {
+    case glow_eObjectType_GrowConPoint:
+    {
       GrowConPoint* n = new GrowConPoint(*(GrowConPoint*)array.a[i]);
       n->highlight = 0;
       n->hot = 0;
       insert(n);
       break;
     }
-    case glow_eObjectType_GrowSubAnnot: {
+    case glow_eObjectType_GrowSubAnnot:
+    {
       GrowSubAnnot* n = new GrowSubAnnot(*(GrowSubAnnot*)array.a[i]);
       n->highlight = 0;
       n->hot = 0;
       insert(n);
       break;
     }
-    case glow_eObjectType_GrowText: {
+    case glow_eObjectType_GrowText:
+    {
       GrowText* n = new GrowText(*(GrowText*)array.a[i]);
       n->highlight = 0;
       n->hot = 0;
       insert(n);
       break;
     }
-    case glow_eObjectType_GrowBar: {
+    case glow_eObjectType_GrowBar:
+    {
       GrowBar* n = new GrowBar(*(GrowBar*)array.a[i]);
       n->highlight = 0;
       n->hot = 0;
       // Fix, This should be done in the copy constructor !!!
       if (n->ctx->userdata_copy_callback)
-        (n->ctx->userdata_copy_callback)(n, ((GrowBar*)array.a[i])->user_data,
-            &n->user_data, glow_eUserdataCbType_Node);
+        (n->ctx->userdata_copy_callback)(n, ((GrowBar*)array.a[i])->user_data, &n->user_data,
+                                         glow_eUserdataCbType_Node);
       insert(n);
       break;
     }
-    case glow_eObjectType_GrowBarArc: {
+    case glow_eObjectType_GrowBarArc:
+    {
       GrowBarArc* n = new GrowBarArc(*(GrowBarArc*)array.a[i]);
       n->highlight = 0;
       n->hot = 0;
       // Fix, This should be done in the copy constructor !!!
       if (n->ctx->userdata_copy_callback)
-        (n->ctx->userdata_copy_callback)(n, ((GrowBarArc*)array.a[i])->user_data,
-            &n->user_data, glow_eUserdataCbType_Node);
+        (n->ctx->userdata_copy_callback)(n, ((GrowBarArc*)array.a[i])->user_data, &n->user_data,
+                                         glow_eUserdataCbType_Node);
       insert(n);
       break;
     }
-    case glow_eObjectType_GrowTrend: {
+    case glow_eObjectType_GrowTrend:
+    {
       GrowTrend* n = new GrowTrend(*(GrowTrend*)array.a[i]);
       n->highlight = 0;
       n->hot = 0;
@@ -366,21 +397,20 @@ void GlowArray::copy_from(const GlowArray& array)
       n->curve[1] = NULL;
       n->configure_curves();
       if (n->ctx->userdata_copy_callback)
-        (n->ctx->userdata_copy_callback)(n,
-            ((GrowTrend*)(array.a[i]))->user_data, &n->user_data,
-            glow_eUserdataCbType_Node);
+        (n->ctx->userdata_copy_callback)(n, ((GrowTrend*)(array.a[i]))->user_data, &n->user_data,
+                                         glow_eUserdataCbType_Node);
       insert(n);
       break;
     }
-    case glow_eObjectType_GrowWindow: {
+    case glow_eObjectType_GrowWindow:
+    {
       GrowWindow* n = new GrowWindow(*(GrowWindow*)array.a[i]);
       n->highlight = 0;
       n->hot = 0;
       // Fix, This should be done in the copy constructor !!!
       if (n->ctx->userdata_copy_callback)
-        (n->ctx->userdata_copy_callback)(n,
-            ((GrowWindow*)array.a[i])->user_data, &n->user_data,
-            glow_eUserdataCbType_Node);
+        (n->ctx->userdata_copy_callback)(n, ((GrowWindow*)array.a[i])->user_data, &n->user_data,
+                                         glow_eUserdataCbType_Node);
       n->window_ctx = 0;
       n->v_scrollbar = 0;
       n->h_scrollbar = 0;
@@ -389,15 +419,15 @@ void GlowArray::copy_from(const GlowArray& array)
       insert(n);
       break;
     }
-    case glow_eObjectType_GrowFolder: {
+    case glow_eObjectType_GrowFolder:
+    {
       GrowFolder* n = new GrowFolder(*(GrowFolder*)array.a[i]);
       n->highlight = 0;
       n->hot = 0;
       // Fix, This should be done in the copy constructor !!!
       if (n->ctx->userdata_copy_callback)
-        (n->ctx->userdata_copy_callback)(n,
-            ((GrowFolder*)array.a[i])->user_data, &n->user_data,
-            glow_eUserdataCbType_Node);
+        (n->ctx->userdata_copy_callback)(n, ((GrowFolder*)array.a[i])->user_data, &n->user_data,
+                                         glow_eUserdataCbType_Node);
       n->window_ctx = 0;
       n->v_scrollbar = 0;
       n->h_scrollbar = 0;
@@ -406,14 +436,15 @@ void GlowArray::copy_from(const GlowArray& array)
       insert(n);
       break;
     }
-    case glow_eObjectType_GrowTable: {
+    case glow_eObjectType_GrowTable:
+    {
       GrowTable* n = new GrowTable(*(GrowTable*)array.a[i]);
       n->highlight = 0;
       n->hot = 0;
       // Fix, This should be done in the copy constructor !!!
       if (n->ctx->userdata_copy_callback)
-        (n->ctx->userdata_copy_callback)(n, ((GrowTable*)array.a[i])->user_data,
-            &n->user_data, glow_eUserdataCbType_Node);
+        (n->ctx->userdata_copy_callback)(n, ((GrowTable*)array.a[i])->user_data, &n->user_data,
+                                         glow_eUserdataCbType_Node);
       n->v_scrollbar = 0;
       n->h_scrollbar = 0;
       n->cell_value = 0;
@@ -422,7 +453,8 @@ void GlowArray::copy_from(const GlowArray& array)
       insert(n);
       break;
     }
-    case glow_eObjectType_GrowXYCurve: {
+    case glow_eObjectType_GrowXYCurve:
+    {
       GrowXYCurve* n = new GrowXYCurve(*(GrowXYCurve*)array.a[i]);
       n->highlight = 0;
       n->hot = 0;
@@ -431,13 +463,13 @@ void GlowArray::copy_from(const GlowArray& array)
       n->curve[1] = NULL;
       n->configure_curves();
       if (n->ctx->userdata_copy_callback)
-        (n->ctx->userdata_copy_callback)(n,
-            ((GrowXYCurve*)(array.a[i]))->user_data, &n->user_data,
-            glow_eUserdataCbType_Node);
+        (n->ctx->userdata_copy_callback)(n, ((GrowXYCurve*)(array.a[i]))->user_data, &n->user_data,
+                                         glow_eUserdataCbType_Node);
       insert(n);
       break;
     }
-    case glow_eObjectType_GrowDashCell: {
+    case glow_eObjectType_GrowDashCell:
+    {
       GrowDashCell* n = new GrowDashCell();
       n->copy_from(*(GrowDashCell*)array.a[i]);
       n->highlight = 0;
@@ -451,7 +483,8 @@ void GlowArray::copy_from(const GlowArray& array)
       insert(n);
       break;
     }
-    case glow_eObjectType_GrowScriptModule: {
+    case glow_eObjectType_GrowScriptModule:
+    {
       GrowScriptModule* n = new GrowScriptModule(*(GrowScriptModule*)array.a[i]);
       n->highlight = 0;
       n->hot = 0;
@@ -461,18 +494,24 @@ void GlowArray::copy_from(const GlowArray& array)
     default:;
     }
   }
-  for (i = 0; i < array.a_size; i++) {
-    switch (array.a[i]->type()) {
-    case glow_eObjectType_Con: {
+  for (i = 0; i < array.a_size; i++)
+  {
+    switch (array.a[i]->type())
+    {
+    case glow_eObjectType_Con:
+    {
       /* Both source and destination has to be members */
       GlowNode* dest_node = 0;
       GlowNode* source_node = 0;
-      for (int j = 0, k = 0; j < array.a_size; j++) {
-        switch (array.a[j]->type()) {
+      for (int j = 0, k = 0; j < array.a_size; j++)
+      {
+        switch (array.a[j]->type())
+        {
         case glow_eObjectType_Node:
         case glow_eObjectType_GrowNode:
         case glow_eObjectType_GrowSlider:
-        case glow_eObjectType_GrowConGlue: {
+        case glow_eObjectType_GrowConGlue:
+        {
           if (array.a[j] == ((GlowCon*)array.a[i])->destination())
             dest_node = (GlowNode*)a[k];
           if (array.a[j] == ((GlowCon*)array.a[i])->source())
@@ -485,7 +524,8 @@ void GlowArray::copy_from(const GlowArray& array)
             k++;
         }
       }
-      if (dest_node && source_node) {
+      if (dest_node && source_node)
+      {
         GlowCon* n = new GlowCon(*(GlowCon*)array.a[i], source_node, dest_node);
         n->highlight = 0;
         n->hot = 0;
@@ -500,7 +540,8 @@ void GlowArray::copy_from(const GlowArray& array)
 
 void GlowArray::delete_all()
 {
-  for (int i = 0; i < a_size; i++) {
+  for (int i = 0; i < a_size; i++)
+  {
     delete a[i];
   }
   a_size = 0;
@@ -510,16 +551,14 @@ GlowArray::~GlowArray()
 {
   int i;
 
-  for (i = 0; i < a_size; i++) {
+  for (i = 0; i < a_size; i++)
+  {
     delete a[i];
   }
   free(a);
 }
 
-GlowArrayElem* GlowArray::operator[](int idx)
-{
-  return *(a + idx);
-}
+GlowArrayElem* GlowArray::operator[](int idx) { return *(a + idx); }
 
 int GlowArray::insert(GlowArrayElem* element)
 {
@@ -528,7 +567,8 @@ int GlowArray::insert(GlowArrayElem* element)
   if (find(element, 0))
     return 0;
 
-  if (allocated <= a_size) {
+  if (allocated <= a_size)
+  {
     allocated += alloc_incr;
     a_tmp = (GlowArrayElem**)calloc(allocated, sizeof(GlowArrayElem*));
     memcpy(a_tmp, a, a_size * sizeof(GlowArrayElem*));
@@ -540,8 +580,7 @@ int GlowArray::insert(GlowArrayElem* element)
   return 1;
 }
 
-int GlowArray::brow_insert(
-    GlowArrayElem* element, GlowArrayElem* destination, glow_eDest code)
+int GlowArray::brow_insert(GlowArrayElem* element, GlowArrayElem* destination, glow_eDest code)
 {
   GlowArrayElem** a_tmp;
   int idx, i, j, found;
@@ -550,8 +589,10 @@ int GlowArray::brow_insert(
   if (find(element, 0))
     return 0;
 
-  if (!destination) {
-    switch (code) {
+  if (!destination)
+  {
+    switch (code)
+    {
     case glow_eDest_IntoLast:
       idx = a_size;
       break;
@@ -559,10 +600,14 @@ int GlowArray::brow_insert(
       idx = 0;
     }
     destination_level = 0;
-  } else {
+  }
+  else
+  {
     found = 0;
-    for (idx = 0; idx < a_size; idx++) {
-      if (a[idx] == destination) {
+    for (idx = 0; idx < a_size; idx++)
+    {
+      if (a[idx] == destination)
+      {
         found = 1;
         destination_level = ((GlowNode*)a[idx])->get_level();
         idx++;
@@ -573,7 +618,8 @@ int GlowArray::brow_insert(
       return 0;
   }
 
-  if (allocated <= a_size) {
+  if (allocated <= a_size)
+  {
     allocated += alloc_incr;
     a_tmp = (GlowArrayElem**)calloc(allocated, sizeof(GlowArrayElem*));
     memcpy(a_tmp, a, a_size * sizeof(GlowArrayElem*));
@@ -581,7 +627,8 @@ int GlowArray::brow_insert(
     a = a_tmp;
   }
 
-  switch (code) {
+  switch (code)
+  {
   case glow_eDest_IntoFirst:
     for (j = a_size - 1; j >= idx; j--)
       a[j + 1] = a[j];
@@ -593,7 +640,8 @@ int GlowArray::brow_insert(
     a_size++;
     break;
   case glow_eDest_IntoLast:
-    for (i = idx; i < a_size; i++) {
+    for (i = idx; i < a_size; i++)
+    {
       if (((GlowNode*)a[i])->get_level() <= destination_level)
         break;
     }
@@ -608,7 +656,8 @@ int GlowArray::brow_insert(
     a_size++;
     break;
   case glow_eDest_After:
-    for (i = idx; i < a_size; i++) {
+    for (i = idx; i < a_size; i++)
+    {
       if (((GlowNode*)a[i])->get_level() >= destination_level)
         break;
     }
@@ -632,33 +681,39 @@ int GlowArray::brow_insert(
   return 1;
 }
 
-int GlowArray::move(
-    GlowArrayElem* element, GlowArrayElem* destination, glow_eDest code)
+int GlowArray::move(GlowArrayElem* element, GlowArrayElem* destination, glow_eDest code)
 {
   int elem_idx, dest_idx, i, found;
   int sts;
 
   found = 0;
-  for (elem_idx = 0; elem_idx < a_size; elem_idx++) {
-    if (a[elem_idx] == element) {
+  for (elem_idx = 0; elem_idx < a_size; elem_idx++)
+  {
+    if (a[elem_idx] == element)
+    {
       found = 1;
       break;
     }
   }
-  if (!found) {
-    for (elem_idx = 0; elem_idx < a_size; elem_idx++) {
-      if (a[elem_idx]->type() == glow_eObjectType_GrowLayer) {
-	sts = ((GrowLayer*)a[elem_idx])->move(element, destination, code);
-	if (ODD(sts))
-	  return sts;
+  if (!found)
+  {
+    for (elem_idx = 0; elem_idx < a_size; elem_idx++)
+    {
+      if (a[elem_idx]->type() == glow_eObjectType_GrowLayer)
+      {
+        sts = ((GrowLayer*)a[elem_idx])->move(element, destination, code);
+        if (ODD(sts))
+          return sts;
       }
-    }    
+    }
     return 0;
   }
 
-  if (!destination) {
+  if (!destination)
+  {
     // If no destination, move to first or last
-    switch (code) {
+    switch (code)
+    {
     case glow_eDest_After:
       dest_idx = a_size - 1;
       if (elem_idx == a_size - 1)
@@ -669,10 +724,14 @@ int GlowArray::move(
       if (elem_idx == 0)
         return 1;
     }
-  } else {
+  }
+  else
+  {
     found = 0;
-    for (dest_idx = 0; dest_idx < a_size; dest_idx++) {
-      if (a[dest_idx] == destination) {
+    for (dest_idx = 0; dest_idx < a_size; dest_idx++)
+    {
+      if (a[dest_idx] == destination)
+      {
         found = 1;
         break;
       }
@@ -681,15 +740,19 @@ int GlowArray::move(
       return 0;
   }
 
-  switch (code) {
+  switch (code)
+  {
   case glow_eDest_After:
     if (elem_idx == dest_idx + 1)
       return 1;
-    if (elem_idx < dest_idx + 1) {
+    if (elem_idx < dest_idx + 1)
+    {
       for (i = elem_idx + 1; i <= dest_idx; i++)
         a[i - 1] = a[i];
       a[dest_idx] = element;
-    } else {
+    }
+    else
+    {
       for (i = elem_idx; i > dest_idx; i--)
         a[i] = a[i - 1];
       a[dest_idx + 1] = element;
@@ -698,11 +761,14 @@ int GlowArray::move(
   case glow_eDest_Before:
     if (elem_idx == dest_idx - 1)
       return 1;
-    if (elem_idx < dest_idx - 1) {
+    if (elem_idx < dest_idx - 1)
+    {
       for (i = elem_idx + 1; i < dest_idx; i++)
         a[i - 1] = a[i];
       a[dest_idx - 1] = element;
-    } else {
+    }
+    else
+    {
       for (i = elem_idx; i >= dest_idx; i--)
         a[i] = a[i - 1];
       a[dest_idx] = element;
@@ -717,9 +783,12 @@ int GlowArray::remove(GlowArrayElem* element)
 {
   int i;
 
-  for (i = 0; i < a_size; i++) {
-    if (*(a + i) == element) {
-      if (a_size - i - 1 > 0) {
+  for (i = 0; i < a_size; i++)
+  {
+    if (*(a + i) == element)
+    {
+      if (a_size - i - 1 > 0)
+      {
         void* tmp = malloc((a_size - i - 1) * sizeof(*a));
         memcpy(tmp, a + i + 1, (a_size - i - 1) * sizeof(*a));
         memcpy(a + i, tmp, (a_size - i - 1) * sizeof(*a));
@@ -729,9 +798,10 @@ int GlowArray::remove(GlowArrayElem* element)
       a_size--;
       return 1;
     }
-    if (a[i]->type() == glow_eObjectType_GrowLayer) {
+    if (a[i]->type() == glow_eObjectType_GrowLayer)
+    {
       if (((GrowLayer*)a[i])->remove(element))
-	return 1;
+        return 1;
     }
   }
   return 0;
@@ -752,8 +822,10 @@ void GlowArray::brow_close(void* ctx, GlowArrayElem* element)
   GlowArrayElem* e;
 
   found = 0;
-  for (i = 0; i < a_size; i++) {
-    if (*(a + i) == element) {
+  for (i = 0; i < a_size; i++)
+  {
+    if (*(a + i) == element)
+    {
       idx = i;
       found = 1;
     }
@@ -763,7 +835,8 @@ void GlowArray::brow_close(void* ctx, GlowArrayElem* element)
 
   // Find next element with the same level
   level = ((GlowNode*)a[idx])->get_level();
-  for (i = idx + 1; i < a_size; i++) {
+  for (i = idx + 1; i < a_size; i++)
+  {
     if (((GlowNode*)a[i])->get_level() <= level)
       break;
   }
@@ -771,7 +844,8 @@ void GlowArray::brow_close(void* ctx, GlowArrayElem* element)
   if (next_idx == idx + 1)
     return;
 
-  for (i = idx + 1; i < next_idx; i++) {
+  for (i = idx + 1; i < next_idx; i++)
+  {
     e = a[i];
     ((GlowCtx*)ctx)->delete_object(a[i]);
     i--;
@@ -787,8 +861,10 @@ int GlowArray::brow_get_parent(GlowArrayElem* element, GlowArrayElem** parent)
   int level;
 
   found = 0;
-  for (i = 0; i < a_size; i++) {
-    if (*(a + i) == element) {
+  for (i = 0; i < a_size; i++)
+  {
+    if (*(a + i) == element)
+    {
       idx = i;
       found = 1;
       break;
@@ -800,8 +876,10 @@ int GlowArray::brow_get_parent(GlowArrayElem* element, GlowArrayElem** parent)
   // Find previous element with lower level
   found = 0;
   level = ((GlowNode*)a[idx])->get_level();
-  for (i = idx - 1; i >= 0; i--) {
-    if (((GlowNode*)a[i])->get_level() < level) {
+  for (i = idx - 1; i >= 0; i--)
+  {
+    if (((GlowNode*)a[i])->get_level() < level)
+    {
       found = 1;
       break;
     }
@@ -816,7 +894,8 @@ void GlowArray::zoom()
 {
   int i;
 
-  for (i = 0; i < a_size; i++) {
+  for (i = 0; i < a_size; i++)
+  {
     a[i]->zoom();
   }
 }
@@ -825,7 +904,8 @@ void GlowArray::nav_zoom()
 {
   int i;
 
-  for (i = 0; i < a_size; i++) {
+  for (i = 0; i < a_size; i++)
+  {
     a[i]->nav_zoom();
   }
 }
@@ -834,7 +914,8 @@ void GlowArray::print_zoom()
 {
   int i;
 
-  for (i = 0; i < a_size; i++) {
+  for (i = 0; i < a_size; i++)
+  {
     a[i]->print_zoom();
   }
 }
@@ -843,27 +924,29 @@ void GlowArray::traverse(int x, int y)
 {
   int i;
 
-  for (i = 0; i < a_size; i++) {
+  for (i = 0; i < a_size; i++)
+  {
     a[i]->traverse(x, y);
   }
 }
 
-void GlowArray::conpoint_select(
-    void* pos, int x, int y, double* distance, void** cp)
+void GlowArray::conpoint_select(void* pos, int x, int y, double* distance, void** cp)
 {
   int i;
 
-  for (i = 0; i < a_size; i++) {
+  for (i = 0; i < a_size; i++)
+  {
     a[i]->conpoint_select(pos, x, y, distance, cp);
   }
 }
 
-void GlowArray::conpoint_select(GlowTransform* t, int x, int y,
-    double* distance, void** cp, int* pix_x, int* pix_y)
+void GlowArray::conpoint_select(GlowTransform* t, int x, int y, double* distance, void** cp, int* pix_x,
+                                int* pix_y)
 {
   int i;
 
-  for (i = 0; i < a_size; i++) {
+  for (i = 0; i < a_size; i++)
+  {
     a[i]->conpoint_select(t, x, y, distance, cp, pix_x, pix_y);
   }
 }
@@ -872,7 +955,8 @@ void GlowArray::print(void* pos, void* node)
 {
   int i;
 
-  for (i = 0; i < a_size; i++) {
+  for (i = 0; i < a_size; i++)
+  {
     a[i]->print(pos, node);
   }
 }
@@ -882,11 +966,13 @@ void GlowArray::save(std::ofstream& fp, glow_eSaveMode mode)
   int i;
 
   fp << int(glow_eSave_Array) << '\n';
-  for (i = 0; i < a_size; i++) {
+  for (i = 0; i < a_size; i++)
+  {
     if (a[i]->type() != glow_eObjectType_Con)
       a[i]->save(fp, mode);
   }
-  for (i = 0; i < a_size; i++) {
+  for (i = 0; i < a_size; i++)
+  {
     if (a[i]->type() == glow_eObjectType_Con)
       a[i]->save(fp, mode);
   }
@@ -900,48 +986,57 @@ void GlowArray::open(GrowCtx* ctx, std::ifstream& fp)
   char dummy[40];
   int errcnt = 0;
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GlowArray: \"%d %s\"\n", type, dummy);
     }
 
     fp >> type;
-    switch (type) {
+    switch (type)
+    {
     case glow_eSave_Array:
       break;
-    case glow_eSave_Rect: {
+    case glow_eSave_Rect:
+    {
       GlowRect* n = new GlowRect(ctx);
       n->open(fp);
       insert(n);
       break;
     }
-    case glow_eSave_Line: {
+    case glow_eSave_Line:
+    {
       GlowLine* n = new GlowLine(ctx);
       n->open(fp);
       insert(n);
       break;
     }
-    case glow_eSave_PolyLine: {
+    case glow_eSave_PolyLine:
+    {
       GlowPolyLine* n = new GlowPolyLine(ctx, (glow_sPoint*)NULL, 0);
       n->open(fp);
       insert(n);
       break;
     }
-    case glow_eSave_Arc: {
+    case glow_eSave_Arc:
+    {
       GlowArc* n = new GlowArc((GrowCtx*)ctx);
       n->open(fp);
       insert(n);
       break;
     }
-    case glow_eSave_Text: {
+    case glow_eSave_Text:
+    {
       GlowText* n = new GlowText(ctx, "");
       n->open(fp);
       insert(n);
       break;
     }
-    case glow_eSave_NodeClass: {
+    case glow_eSave_NodeClass:
+    {
       char name[80];
       GlowArrayElem* element;
 
@@ -956,12 +1051,13 @@ void GlowArray::open(GrowCtx* ctx, std::ifstream& fp)
         insert(n);
       break;
     }
-    case glow_eSave_ConClass: {
+    case glow_eSave_ConClass:
+    {
       char name[80];
       GlowArrayElem* element;
 
-      GlowConClass* n = new GlowConClass(ctx, "", glow_eConType_Straight,
-          glow_eCorner_Right, glow_eDrawType_Line, 1);
+      GlowConClass* n =
+          new GlowConClass(ctx, "", glow_eConType_Straight, glow_eCorner_Right, glow_eDrawType_Line, 1);
       n->open(fp);
 
       //  Check if this ConClass already is loaded
@@ -972,25 +1068,29 @@ void GlowArray::open(GrowCtx* ctx, std::ifstream& fp)
         insert(n);
       break;
     }
-    case glow_eSave_ConPoint: {
+    case glow_eSave_ConPoint:
+    {
       GlowConPoint* n = new GlowConPoint(ctx);
       n->open(fp);
       insert(n);
       break;
     }
-    case glow_eSave_Annot: {
+    case glow_eSave_Annot:
+    {
       GlowAnnot* n = new GlowAnnot(ctx);
       n->open(fp);
       insert(n);
       break;
     }
-    case glow_eSave_Arrow: {
+    case glow_eSave_Arrow:
+    {
       GlowArrow* n = new GlowArrow(ctx, 0, 0, 0, 0, 0, 0, glow_eDrawType_Line);
       n->open(fp);
       insert(n);
       break;
     }
-    case glow_eSave_Node: {
+    case glow_eSave_Node:
+    {
       GlowNode* n = new GlowNode(ctx, "", 0, 0, 0);
       n->open(fp);
       if (n->nc)
@@ -999,153 +1099,177 @@ void GlowArray::open(GrowCtx* ctx, std::ifstream& fp)
         delete n;
       break;
     }
-    case glow_eSave_Con: {
-      GlowCon* n = new GlowCon(
-          ctx, "", (GlowConClass*)0, (GlowNode*)0, (GlowNode*)0, 0, 0);
+    case glow_eSave_Con:
+    {
+      GlowCon* n = new GlowCon(ctx, "", (GlowConClass*)0, (GlowNode*)0, (GlowNode*)0, 0, 0);
       n->open(fp);
       insert(n);
       break;
     }
-    case glow_eSave_Point: {
+    case glow_eSave_Point:
+    {
       GlowPoint* n = new GlowPoint(ctx);
       n->open(fp);
       insert(n);
       break;
     }
-    case glow_eSave_GrowRect: {
+    case glow_eSave_GrowRect:
+    {
       GrowRect* r = new GrowRect(ctx, "");
       r->open(fp);
       insert(r);
       break;
     }
-    case glow_eSave_GrowRectRounded: {
+    case glow_eSave_GrowRectRounded:
+    {
       GrowRectRounded* r = new GrowRectRounded(ctx, "");
       r->open(fp);
       insert(r);
       break;
     }
-    case glow_eSave_GrowImage: {
+    case glow_eSave_GrowImage:
+    {
       GrowImage* r = new GrowImage(ctx, "");
       r->open(fp);
       insert(r);
       break;
     }
-    case glow_eSave_GrowAxis: {
+    case glow_eSave_GrowAxis:
+    {
       GrowAxis* r = new GrowAxis(ctx, "");
       r->open(fp);
       insert(r);
       break;
     }
-    case glow_eSave_GrowAxisArc: {
+    case glow_eSave_GrowAxisArc:
+    {
       GrowAxisArc* r = new GrowAxisArc(ctx, "");
       r->open(fp);
       insert(r);
       break;
     }
-    case glow_eSave_GrowPie: {
+    case glow_eSave_GrowPie:
+    {
       GrowPie* r = new GrowPie(ctx, "");
       r->open(fp);
       insert(r);
       break;
     }
-    case glow_eSave_GrowBarChart: {
+    case glow_eSave_GrowBarChart:
+    {
       GrowBarChart* r = new GrowBarChart(ctx, "");
       r->open(fp);
       insert(r);
       break;
     }
-    case glow_eSave_GrowToolbar: {
+    case glow_eSave_GrowToolbar:
+    {
       GrowToolbar* r = new GrowToolbar(ctx, "", "", 0, 0, 0, 0, 0, 0, 0);
       r->open(fp);
       insert(r);
       break;
     }
-    case glow_eSave_GrowConGlue: {
+    case glow_eSave_GrowConGlue:
+    {
       GrowConGlue* r = new GrowConGlue(ctx, "");
       r->open(fp);
       insert(r);
       break;
     }
-    case glow_eSave_GrowLine: {
+    case glow_eSave_GrowLine:
+    {
       GrowLine* l = new GrowLine(ctx, "");
       l->open(fp);
       insert(l);
       break;
     }
-    case glow_eSave_GrowPolyLine: {
+    case glow_eSave_GrowPolyLine:
+    {
       GrowPolyLine* l = new GrowPolyLine(ctx, "", (glow_sPoint*)NULL, 0);
       l->open(fp);
       insert(l);
       break;
     }
-    case glow_eSave_GrowArc: {
+    case glow_eSave_GrowArc:
+    {
       GrowArc* a = new GrowArc((GrowCtx*)ctx, "");
       a->open(fp);
       insert(a);
       break;
     }
-    case glow_eSave_GrowConPoint: {
+    case glow_eSave_GrowConPoint:
+    {
       GrowConPoint* n = new GrowConPoint(ctx, "");
       n->open(fp);
       insert(n);
       break;
     }
-    case glow_eSave_GrowAnnot: {
+    case glow_eSave_GrowAnnot:
+    {
       GrowAnnot* n = new GrowAnnot(ctx);
       n->open(fp);
       insert(n);
       break;
     }
-    case glow_eSave_GrowSubAnnot: {
+    case glow_eSave_GrowSubAnnot:
+    {
       GrowSubAnnot* n = new GrowSubAnnot(ctx, "");
       n->open(fp);
       insert(n);
       break;
     }
-    case glow_eSave_GrowText: {
+    case glow_eSave_GrowText:
+    {
       GrowText* n = new GrowText(ctx, "", "");
       n->open(fp);
       insert(n);
       break;
     }
-    case glow_eSave_GrowBar: {
+    case glow_eSave_GrowBar:
+    {
       GrowBar* n = new GrowBar(ctx, "");
       n->open(fp);
       insert(n);
       break;
     }
-    case glow_eSave_GrowBarArc: {
+    case glow_eSave_GrowBarArc:
+    {
       GrowBarArc* n = new GrowBarArc(ctx, "");
       n->open(fp);
       insert(n);
       break;
     }
-    case glow_eSave_GrowTrend: {
-      GrowTrend* n = new GrowTrend(ctx, "", 0, 0, 0, 0, glow_eDrawType_Line, 1,
-          glow_mDisplayLevel_1, 0, 1, glow_eDrawType_Line, 1);
+    case glow_eSave_GrowTrend:
+    {
+      GrowTrend* n = new GrowTrend(ctx, "", 0, 0, 0, 0, glow_eDrawType_Line, 1, glow_mDisplayLevel_1, 0, 1,
+                                   glow_eDrawType_Line, 1);
       n->open(fp);
       insert(n);
       break;
     }
-    case glow_eSave_GrowWindow: {
+    case glow_eSave_GrowWindow:
+    {
       GrowWindow* n = new GrowWindow(ctx, "");
       n->open(fp);
       insert(n);
       break;
     }
-    case glow_eSave_GrowTable: {
+    case glow_eSave_GrowTable:
+    {
       GrowTable* n = new GrowTable(ctx, "");
       n->open(fp);
       insert(n);
       break;
     }
-    case glow_eSave_GrowFolder: {
+    case glow_eSave_GrowFolder:
+    {
       GrowFolder* n = new GrowFolder(ctx, "");
       n->open(fp);
       insert(n);
       break;
     }
-    case glow_eSave_GrowNode: {
+    case glow_eSave_GrowNode:
+    {
       GrowNode* n = new GrowNode(ctx, "", 0, 0, 0);
       n->open(fp);
       if (n->nc)
@@ -1154,19 +1278,22 @@ void GlowArray::open(GrowCtx* ctx, std::ifstream& fp)
         delete n;
       break;
     }
-    case glow_eSave_GrowGroup: {
+    case glow_eSave_GrowGroup:
+    {
       GrowGroup* n = new GrowGroup(ctx, "");
       n->open(fp);
       insert(n);
       break;
     }
-    case glow_eSave_GrowLayer: {
+    case glow_eSave_GrowLayer:
+    {
       GrowLayer* n = new GrowLayer(ctx, "");
       n->open(fp);
       insert(n);
       break;
     }
-    case glow_eSave_GrowSlider: {
+    case glow_eSave_GrowSlider:
+    {
       GrowSlider* n = new GrowSlider(ctx, "", 0, 0, 0);
       n->open(fp);
       if (n->nc)
@@ -1175,19 +1302,22 @@ void GlowArray::open(GrowCtx* ctx, std::ifstream& fp)
         delete n;
       break;
     }
-    case glow_eSave_GrowXYCurve: {
+    case glow_eSave_GrowXYCurve:
+    {
       GrowXYCurve* n = new GrowXYCurve(ctx, "");
       n->open(fp);
       insert(n);
       break;
     }
-    case glow_eSave_GrowDashCell: {
+    case glow_eSave_GrowDashCell:
+    {
       GrowDashCell* n = new GrowDashCell(ctx, "");
       n->open(fp);
       insert(n);
       break;
     }
-    case glow_eSave_GrowScriptModule: {
+    case glow_eSave_GrowScriptModule:
+    {
       GrowScriptModule* n = new GrowScriptModule(ctx, "");
       n->open(fp);
       insert(n);
@@ -1218,17 +1348,19 @@ void GlowArray::draw(GlowWind* w, void* pos, int highlight, int hot, void* node)
 {
   int i;
 
-  for (i = 0; i < a_size; i++) {
+  for (i = 0; i < a_size; i++)
+  {
     a[i]->draw(w, pos, highlight, hot, node);
   }
 }
 
-void GlowArray::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
-    void* node, void* colornode, void *transpnode)
+void GlowArray::draw(GlowWind* w, GlowTransform* t, int highlight, int hot, void* node, void* colornode,
+                     void* transpnode)
 {
   int i;
 
-  for (i = 0; i < a_size; i++) {
+  for (i = 0; i < a_size; i++)
+  {
     a[i]->draw(w, t, highlight, hot, node, colornode, transpnode);
   }
 }
@@ -1237,7 +1369,8 @@ void GlowArray::draw_inverse(void* pos, int hot, void* node)
 {
   int i;
 
-  for (i = 0; i < a_size; i++) {
+  for (i = 0; i < a_size; i++)
+  {
     a[i]->draw_inverse(pos, hot, node);
   }
 }
@@ -1266,17 +1399,18 @@ void GlowArray::nav_draw(void* pos, int highlight, void* node)
 {
   int i;
 
-  for (i = 0; i < a_size; i++) {
+  for (i = 0; i < a_size; i++)
+  {
     a[i]->nav_draw(pos, highlight, node);
   }
 }
 
-void GlowArray::nav_draw(
-    GlowTransform* t, int highlight, void* node, void* colornode)
+void GlowArray::nav_draw(GlowTransform* t, int highlight, void* node, void* colornode)
 {
   int i;
 
-  for (i = 0; i < a_size; i++) {
+  for (i = 0; i < a_size; i++)
+  {
     a[i]->nav_draw(t, highlight, node, colornode);
   }
 }
@@ -1285,7 +1419,8 @@ void GlowArray::nav_erase(void* pos, void* node)
 {
   int i;
 
-  for (i = 0; i < a_size; i++) {
+  for (i = 0; i < a_size; i++)
+  {
     a[i]->nav_erase(pos, node);
   }
 }
@@ -1294,7 +1429,8 @@ void GlowArray::nav_erase(GlowTransform* t, void* node)
 {
   int i;
 
-  for (i = 0; i < a_size; i++) {
+  for (i = 0; i < a_size; i++)
+  {
     a[i]->nav_erase(t, node);
   }
 }
@@ -1303,14 +1439,17 @@ int GlowArray::find(GlowArrayElem* element, int deep)
 {
   int i;
 
-  for (i = 0; i < a_size; i++) {
+  for (i = 0; i < a_size; i++)
+  {
     if (a[i] == element)
       return 1;
 
-    if (deep) {
-      if (a[i]->type() == glow_eObjectType_GrowLayer) {
-	if (((GrowLayer*)a[i])->find(element))
-	  return 1; 	  
+    if (deep)
+    {
+      if (a[i]->type() == glow_eObjectType_GrowLayer)
+      {
+        if (((GrowLayer*)a[i])->find(element))
+          return 1;
       }
     }
   }
@@ -1323,7 +1462,8 @@ int GlowArray::find_by_name(const char* name, GlowArrayElem** element)
   char object_name[80];
   char* s;
 
-  if ((s = strchr((char*)name, '-')) != 0) {
+  if ((s = strchr((char*)name, '-')) != 0)
+  {
     GlowArrayElem* group = NULL;
     int len;
     char gname[80];
@@ -1334,10 +1474,11 @@ int GlowArray::find_by_name(const char* name, GlowArrayElem** element)
     gname[len] = 0;
 
     found = 0;
-    for (i = 0; i < a_size; i++) {
-      a[i]->get_object_name(
-          object_name, sizeof(object_name), glow_eName_Object);
-      if (str_NoCaseStrcmp(gname, object_name) == 0) {
+    for (i = 0; i < a_size; i++)
+    {
+      a[i]->get_object_name(object_name, sizeof(object_name), glow_eName_Object);
+      if (str_NoCaseStrcmp(gname, object_name) == 0)
+      {
         group = a[i];
         found = 1;
         break;
@@ -1350,20 +1491,25 @@ int GlowArray::find_by_name(const char* name, GlowArrayElem** element)
       return ((GrowGroup*)group)->find_by_name(&name[len + 1], element);
     else if (group->type() == glow_eObjectType_GrowLayer)
       return ((GrowLayer*)group)->find_by_name(&name[len + 1], element);
-  } else {
-    for (i = 0; i < a_size; i++) {
-      a[i]->get_object_name(
-          object_name, sizeof(object_name), glow_eName_Object);
-      if (str_NoCaseStrcmp(name, object_name) == 0) {
+  }
+  else
+  {
+    for (i = 0; i < a_size; i++)
+    {
+      a[i]->get_object_name(object_name, sizeof(object_name), glow_eName_Object);
+      if (str_NoCaseStrcmp(name, object_name) == 0)
+      {
         *element = a[i];
         return 1;
       }
     }
     // Search in layers
-    for (i = 0; i < a_size; i++) {
-      if (a[i]->type() == glow_eObjectType_GrowLayer) {
-	if (ODD(((GrowLayer*)a[i])->find_by_name(name, element)))
-	  return 1;
+    for (i = 0; i < a_size; i++)
+    {
+      if (a[i]->type() == glow_eObjectType_GrowLayer)
+      {
+        if (ODD(((GrowLayer*)a[i])->find_by_name(name, element)))
+          return 1;
       }
     }
   }
@@ -1374,7 +1520,8 @@ void GlowArray::set_highlight(int on)
 {
   int i;
 
-  for (i = 0; i < a_size; i++) {
+  for (i = 0; i < a_size; i++)
+  {
     a[i]->set_highlight(on);
   }
 }
@@ -1383,47 +1530,50 @@ void GlowArray::set_hot(int on)
 {
   int i;
 
-  for (i = 0; i < a_size; i++) {
+  for (i = 0; i < a_size; i++)
+  {
     a[i]->set_hot(on);
   }
 }
 
-void GlowArray::select_region_insert(double ll_x, double ll_y, double ur_x,
-    double ur_y, glow_eSelectPolicy select_policy)
+void GlowArray::select_region_insert(double ll_x, double ll_y, double ur_x, double ur_y,
+                                     glow_eSelectPolicy select_policy)
 {
   int i;
 
-  for (i = 0; i < a_size; i++) {
+  for (i = 0; i < a_size; i++)
+  {
     a[i]->select_region_insert(ll_x, ll_y, ur_x, ur_y, select_policy);
   }
 }
 
-void GlowArray::get_borders(
-    double* x_right, double* x_left, double* y_high, double* y_low)
+void GlowArray::get_borders(double* x_right, double* x_left, double* y_high, double* y_low)
 {
   int i;
 
-  for (i = 0; i < a_size; i++) {
+  for (i = 0; i < a_size; i++)
+  {
     a[i]->get_borders(x_right, x_left, y_high, y_low);
   }
 }
 
-void GlowArray::get_borders(double pos_x, double pos_y, double* x_right,
-    double* x_left, double* y_high, double* y_low, void* node)
+void GlowArray::get_borders(double pos_x, double pos_y, double* x_right, double* x_left, double* y_high,
+                            double* y_low, void* node)
 {
   int i;
 
-  for (i = 0; i < a_size; i++) {
+  for (i = 0; i < a_size; i++)
+  {
     a[i]->get_borders(pos_x, pos_y, x_right, x_left, y_high, y_low, node);
   }
 }
 
-void GlowArray::get_borders(GlowTransform* t, double* x_right, double* x_left,
-    double* y_high, double* y_low)
+void GlowArray::get_borders(GlowTransform* t, double* x_right, double* x_left, double* y_high, double* y_low)
 {
   int i;
 
-  for (i = 0; i < a_size; i++) {
+  for (i = 0; i < a_size; i++)
+  {
     a[i]->get_borders(t, x_right, x_left, y_high, y_low);
   }
 }
@@ -1432,17 +1582,18 @@ void GlowArray::move(double delta_x, double delta_y, int grid)
 {
   int i;
 
-  for (i = 0; i < a_size; i++) {
+  for (i = 0; i < a_size; i++)
+  {
     a[i]->move(delta_x, delta_y, grid);
   }
 }
 
-void GlowArray::shift(
-    void* pos, double delta_x, double delta_y, int highlight, int hot)
+void GlowArray::shift(void* pos, double delta_x, double delta_y, int highlight, int hot)
 {
   int i;
 
-  for (i = 0; i < a_size; i++) {
+  for (i = 0; i < a_size; i++)
+  {
     a[i]->shift(pos, delta_x, delta_y, highlight, hot);
   }
 }
@@ -1451,7 +1602,8 @@ void GlowArray::move_noerase(int delta_x, int delta_y, int grid)
 {
   int i;
 
-  for (i = 0; i < a_size; i++) {
+  for (i = 0; i < a_size; i++)
+  {
     a[i]->move_noerase(delta_x, delta_y, grid);
   }
 }
@@ -1460,7 +1612,8 @@ void GlowArray::conpoint_refcon_redraw(void* node, int conpoint)
 {
   int i;
 
-  for (i = 0; i < a_size; i++) {
+  for (i = 0; i < a_size; i++)
+  {
     a[i]->conpoint_refcon_redraw(node, conpoint);
   }
 }
@@ -1469,7 +1622,8 @@ void GlowArray::conpoint_refcon_erase(void* node, int conpoint)
 {
   int i;
 
-  for (i = 0; i < a_size; i++) {
+  for (i = 0; i < a_size; i++)
+  {
     a[i]->conpoint_refcon_redraw(node, conpoint);
   }
 }
@@ -1478,7 +1632,8 @@ void GlowArray::set_inverse(int on)
 {
   int i;
 
-  for (i = 0; i < a_size; i++) {
+  for (i = 0; i < a_size; i++)
+  {
     a[i]->set_inverse(on);
   }
 }
@@ -1488,7 +1643,8 @@ int GlowArray::event_handler(GlowWind* w, glow_eEvent event, int x, int y)
   int i;
   int sts;
 
-  for (i = 0; i < a_size; i++) {
+  for (i = 0; i < a_size; i++)
+  {
     sts = a[i]->event_handler(w, event, x, y);
     if (sts)
       return sts;
@@ -1496,13 +1652,13 @@ int GlowArray::event_handler(GlowWind* w, glow_eEvent event, int x, int y)
   return 0;
 }
 
-int GlowArray::event_handler(
-    GlowWind* w, glow_eEvent event, int x, int y, double fx, double fy)
+int GlowArray::event_handler(GlowWind* w, glow_eEvent event, int x, int y, double fx, double fy)
 {
   int i;
   int sts;
 
-  for (i = a_size - 1; i >= 0; i--) {
+  for (i = a_size - 1; i >= 0; i--)
+  {
     sts = a[i]->event_handler(w, event, x, y, fx, fy);
     if (sts)
       return sts;
@@ -1510,13 +1666,13 @@ int GlowArray::event_handler(
   return 0;
 }
 
-int GlowArray::event_handler(
-    GlowWind* w, glow_eEvent event, double fx, double fy)
+int GlowArray::event_handler(GlowWind* w, glow_eEvent event, double fx, double fy)
 {
   int i;
   int sts;
 
-  for (i = a_size - 1; i >= 0; i--) {
+  for (i = a_size - 1; i >= 0; i--)
+  {
     sts = a[i]->event_handler(w, event, fx, fy);
     if (sts)
       return sts;
@@ -1524,13 +1680,13 @@ int GlowArray::event_handler(
   return 0;
 }
 
-int GlowArray::event_handler(
-    GlowWind* w, void* pos, glow_eEvent event, int x, int y, void* node)
+int GlowArray::event_handler(GlowWind* w, void* pos, glow_eEvent event, int x, int y, void* node)
 {
   int i;
   int sts;
 
-  for (i = 0; i < a_size; i++) {
+  for (i = 0; i < a_size; i++)
+  {
     sts = a[i]->event_handler(w, pos, event, x, y, node);
     if (sts)
       return sts;
@@ -1540,13 +1696,13 @@ int GlowArray::event_handler(
 
 // Special eventhandler for connection lines...
 
-int GlowArray::event_handler(
-    GlowWind* w, void* pos, glow_eEvent event, int x, int y, int num)
+int GlowArray::event_handler(GlowWind* w, void* pos, glow_eEvent event, int x, int y, int num)
 {
   int i;
   int sts;
 
-  for (i = 0; i < num; i++) {
+  for (i = 0; i < num; i++)
+  {
     sts = a[i]->event_handler(w, pos, event, x, y, NULL);
     if (sts)
       return sts;
@@ -1558,7 +1714,8 @@ void GlowArray::configure()
 {
   int i;
 
-  for (i = 0; i < a_size; i++) {
+  for (i = 0; i < a_size; i++)
+  {
     if (i == 0)
       a[i]->configure(NULL);
     else
@@ -1570,7 +1727,8 @@ void GlowArray::move_widgets(int x, int y)
 {
   int i;
 
-  for (i = 0; i < a_size; i++) {
+  for (i = 0; i < a_size; i++)
+  {
     a[i]->move_widgets(x, y);
   }
 }
@@ -1579,8 +1737,10 @@ int GlowArray::get_next(GlowArrayElem* element, GlowArrayElem** next)
 {
   int i;
 
-  for (i = 0; i < a_size; i++) {
-    if (a[i] == element) {
+  for (i = 0; i < a_size; i++)
+  {
+    if (a[i] == element)
+    {
       if (i == a_size - 1)
         return GLOW__NONEXT;
       *next = a[i + 1];
@@ -1589,10 +1749,12 @@ int GlowArray::get_next(GlowArrayElem* element, GlowArrayElem** next)
   }
 
   // Search in layers
-  for (i = 0; i < a_size; i++) {
-    if (a[i]->type() == glow_eObjectType_GrowLayer) {
+  for (i = 0; i < a_size; i++)
+  {
+    if (a[i]->type() == glow_eObjectType_GrowLayer)
+    {
       if (ODD(((GrowLayer*)a[i])->get_next(element, next)))
-	return 1;
+        return 1;
     }
   }
 
@@ -1603,8 +1765,10 @@ int GlowArray::get_previous(GlowArrayElem* element, GlowArrayElem** prev)
 {
   int i;
 
-  for (i = 0; i < a_size; i++) {
-    if (a[i] == element) {
+  for (i = 0; i < a_size; i++)
+  {
+    if (a[i] == element)
+    {
       if (i == 0)
         return GLOW__NOPREVIOUS;
       *prev = a[i - 1];
@@ -1613,13 +1777,15 @@ int GlowArray::get_previous(GlowArrayElem* element, GlowArrayElem** prev)
   }
 
   // Search in layers
-  for (i = 0; i < a_size; i++) {
-    if (a[i]->type() == glow_eObjectType_GrowLayer) {
+  for (i = 0; i < a_size; i++)
+  {
+    if (a[i]->type() == glow_eObjectType_GrowLayer)
+    {
       if (ODD(((GrowLayer*)a[i])->get_previous(element, prev)))
-	return 1;
+        return 1;
     }
   }
-  
+
   return GLOW__NOELEM;
 }
 
@@ -1851,7 +2017,8 @@ void GlowArray::pop(GlowArrayElem* element)
 
 void GlowArray::push(GlowArrayElem* element)
 {
-  if (remove(element)) {
+  if (remove(element))
+  {
     for (int j = a_size - 1; j >= 0; j--)
       a[j + 1] = a[j];
     a[0] = element;
@@ -1873,15 +2040,18 @@ void GlowArray::align(double x, double y, glow_eAlignDirection direction)
 
 int GlowArray::find_nc(GlowArrayElem* nc)
 {
-  for (int i = 0; i < a_size; i++) {
+  for (int i = 0; i < a_size; i++)
+  {
     if (a[i]->find_nc(nc))
       return 1;
   }
   // Search in layers
-  for (int i = 0; i < a_size; i++) {
-    if (a[i]->type() == glow_eObjectType_GrowLayer) {
+  for (int i = 0; i < a_size; i++)
+  {
+    if (a[i]->type() == glow_eObjectType_GrowLayer)
+    {
       if (ODD(((GrowLayer*)a[i])->find_nc(nc)))
-	return 1;
+        return 1;
     }
   }
 
@@ -1890,15 +2060,18 @@ int GlowArray::find_nc(GlowArrayElem* nc)
 
 int GlowArray::find_cc(GlowArrayElem* cc)
 {
-  for (int i = 0; i < a_size; i++) {
+  for (int i = 0; i < a_size; i++)
+  {
     if (a[i]->find_cc(cc))
       return 1;
   }
   // Search in layers
-  for (int i = 0; i < a_size; i++) {
-    if (a[i]->type() == glow_eObjectType_GrowLayer) {
+  for (int i = 0; i < a_size; i++)
+  {
+    if (a[i]->type() == glow_eObjectType_GrowLayer)
+    {
       if (ODD(((GrowLayer*)a[i])->find_cc(cc)))
-	return 1;
+        return 1;
     }
   }
   return 0;
@@ -1908,10 +2081,10 @@ int GlowArray::trace_scan()
 {
   int sts;
 
-  for (int i = 0; i < a_size; i++) {
+  for (int i = 0; i < a_size; i++)
+  {
     sts = a[i]->trace_scan();
-    if (sts == GLOW__TERMINATED || sts == GLOW__SUBTERMINATED
-        || sts == GLOW__SWAPTERMINATED)
+    if (sts == GLOW__TERMINATED || sts == GLOW__SUBTERMINATED || sts == GLOW__SWAPTERMINATED)
       return sts;
   }
   return 1;
@@ -1957,19 +2130,24 @@ char* GlowArray::get_last_group()
   memset(member_cnt, 0, sizeof(member_cnt));
   group_cnt = 0;
 
-  for (i = 0; i < a_size; i++) {
+  for (i = 0; i < a_size; i++)
+  {
     name = a[i]->get_last_group();
-    if (!streq(name, "")) {
+    if (!streq(name, ""))
+    {
       // Find group and increment member count
       found = 0;
-      for (j = 0; j < group_cnt; j++) {
-        if (streq(groups[j], name)) {
+      for (j = 0; j < group_cnt; j++)
+      {
+        if (streq(groups[j], name))
+        {
           member_cnt[j]++;
           found = 1;
           break;
         }
       }
-      if (!found && group_cnt <= 10) {
+      if (!found && group_cnt <= 10)
+      {
         strcpy(groups[group_cnt], name);
         member_cnt[group_cnt]++;
         group_cnt++;
@@ -1979,8 +2157,10 @@ char* GlowArray::get_last_group()
 
   // Analyse result
   max_members = 0;
-  for (i = 0; i < group_cnt; i++) {
-    if (member_cnt[i] > max_members) {
+  for (i = 0; i < group_cnt; i++)
+  {
+    if (member_cnt[i] > max_members)
+    {
       max_members = member_cnt[i];
       max_idx = i;
     }
@@ -1997,15 +2177,15 @@ void GlowArray::set_parent(GlowArrayElem* parent)
     a[i]->set_parent(parent);
 }
 
-int GlowArray::get_background_object_limits(GlowTransform* t,
-    glow_eTraceType type, double x, double y, GlowArrayElem** background,
-    double* min, double* max, glow_eDirection* direction)
+int GlowArray::get_background_object_limits(GlowTransform* t, glow_eTraceType type, double x, double y,
+                                            GlowArrayElem** background, double* min, double* max,
+                                            glow_eDirection* direction)
 {
   int sts = 0;
 
-  for (int i = 0; i < a_size; i++) {
-    sts = a[i]->get_background_object_limits(
-        t, type, x, y, background, min, max, direction);
+  for (int i = 0; i < a_size; i++)
+  {
+    sts = a[i]->get_background_object_limits(t, type, x, y, background, min, max, direction);
     if (ODD(sts))
       break;
   }
@@ -2036,32 +2216,28 @@ void GlowArray::set_linetype(glow_eLineType type)
     a[i]->set_linetype(type);
 }
 
-void GlowArray::export_flow(GlowExportFlow* ef)
-{
-  ef->array(this);
-}
+void GlowArray::export_flow(GlowExportFlow* ef) { ef->array(this); }
 
-int GlowArray::export_script(GlowExportScript* es, void* o, void* m)
-{
-  return es->array(this, o, m);
-}
+int GlowArray::export_script(GlowExportScript* es, void* o, void* m) { return es->array(this, o, m); }
 
 GlowArrayElem* GlowArray::get_node_from_name(char* name)
 {
   int i;
 
-  for (i = 0; i < a_size; i++) {
-    if ((a[i]->type() == glow_eObjectType_Node
-	 || a[i]->type() == glow_eObjectType_GrowNode
-	 || a[i]->type() == glow_eObjectType_GrowConGlue)
-        && streq(((GlowNode*)a[i])->n_name, name))
+  for (i = 0; i < a_size; i++)
+  {
+    if ((a[i]->type() == glow_eObjectType_Node || a[i]->type() == glow_eObjectType_GrowNode ||
+         a[i]->type() == glow_eObjectType_GrowConGlue) &&
+        streq(((GlowNode*)a[i])->n_name, name))
       return a[i];
-    else if (a[i]->type() == glow_eObjectType_GrowGroup) {
+    else if (a[i]->type() == glow_eObjectType_GrowGroup)
+    {
       GlowArrayElem* n = ((GrowGroup*)a[i])->get_node_from_name(name);
       if (n)
         return n;
     }
-    else if (a[i]->type() == glow_eObjectType_GrowLayer) {
+    else if (a[i]->type() == glow_eObjectType_GrowLayer)
+    {
       GlowArrayElem* n = ((GrowLayer*)a[i])->get_node_from_name(name);
       if (n)
         return n;
@@ -2069,4 +2245,3 @@ GlowArrayElem* GlowArray::get_node_from_name(char* name)
   }
   return 0;
 }
-
