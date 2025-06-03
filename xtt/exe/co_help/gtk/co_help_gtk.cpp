@@ -50,10 +50,7 @@ void CoHelpGtk::close_cb(void* ctx, void* xhelp)
   exit(0);
 }
 
-void CoHelpGtk::cohelp_mainloop()
-{
-  gtk_main();
-}
+void CoHelpGtk::cohelp_mainloop() { gtk_main(); }
 
 int main(int argc, char* argv[])
 {
@@ -68,17 +65,13 @@ int main(int argc, char* argv[])
   exit(sts);
 }
 
-CoHelpGtk::~CoHelpGtk()
-{
-}
+CoHelpGtk::~CoHelpGtk() {}
 
-CoHelpGtk::CoHelpGtk(int argc, char* argv[], int* return_sts)
-    : CoHelpMain(argc, argv, return_sts)
+CoHelpGtk::CoHelpGtk(int argc, char* argv[], int* return_sts) : CoHelpMain(argc, argv, return_sts)
 {
   pwr_tStatus sts;
   // Create help window
-  CoXHelp* xhelp
-      = new CoXHelpGtk(0 /*toplevel*/, this, xhelp_eUtility_Xtt, &sts);
+  CoXHelp* xhelp = new CoXHelpGtk(0 /*toplevel*/, this, xhelp_eUtility_Xtt, &sts);
   // xhelp->open_URL_cb = open_URL_cb;
   CoXHelp::set_default(xhelp);
   xhelp->close_cb = close_cb;

@@ -14,6 +14,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added some ABB classes to the workbench palette for quick access.
 - Added the cJSON library to the project.
 - Added this changelog.
+- Add a new help error window that can display up to 20 error messages.
+- Add contextual error messages within the help window (e.g., via XTT, WTT), providing relevant user feedback.
+- Provide error details, including the file and line number where the issue occurred.
 - Added BitField8/16/32/64 data representation. These represent bitfields that are not byte-swapped, in accordance with their definition.
 - New pin for DSup, ActiveNotAcked for when the DSup is active but has not yet been ackknowledged.
 
@@ -31,6 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - QCom had a high chance of deadlocking the entire QCom library on a node due to incorrect signal handling, causing communication outage.
   - Signal handling is removed in QCom leaving it up to the user to handle application specifics in regards to signals, as it should be.
   - Signal handling was added to the most common utilities used such as rt_xtt and rt_rtt where signals will be handled in an application specific manner and exit accordingly without deadlocks.
+- Fix error handling for help-related issues, ensuring that "file not found" and "topic not found" errors are properly managed.
 - DsFastCurve could crash because of an uninitialized variable used for the TriggIndex. It is now fixed.
 - The Event Log would not convert Event Name to the correct coding resulting in garbled text in the Event Name and no results in the search.
 - PROFINET: The configurator was unprepared for unpopulated slot 0. It is now well prepared for this.

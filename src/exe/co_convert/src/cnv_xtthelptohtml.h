@@ -37,38 +37,24 @@
 #ifndef cnv_xtthelptohtml_h
 #define cnv_xtthelptohtml_h
 
-#if defined __cplusplus
-extern "C" {
-#endif
-
 #include "cnv_xtthelpto.h"
 
 class CnvCtx;
 
-class CnvXtthelpToHtml : public CnvXtthelpTo {
-  public:
-  CnvXtthelpToHtml(CnvCtx* cnv_ctx) : ctx(cnv_ctx)
-  {
-  }
-  virtual ~CnvXtthelpToHtml()
-  {
-  }
+class CnvXtthelpToHtml : public CnvXtthelpTo
+{
+public:
+  CnvXtthelpToHtml(CnvCtx* cnv_ctx) : ctx(cnv_ctx) {}
+  virtual ~CnvXtthelpToHtml() {}
 
-  Cnv_eXtthelpToType type()
-  {
-    return Cnv_eXtthelpToType_Html;
-  }
-  void* insert(navh_eItemType item_type, const char* text1, const char* text2,
-      const char* text3, const char* link, const char* link_bookmark,
-      const char* file_name, navh_eHelpFile file_type, int help_index,
-      const char* bookmark, int coding);
+  Cnv_eXtthelpToType type() { return Cnv_eXtthelpToType_Html; }
+  void* insert(navh_eItemType item_type, const char* text1, const char* text2, const char* text3,
+               const char* link, const char* link_bookmark, const char* file_name, navh_eHelpFile file_type,
+               int help_index, const char* bookmark, int coding);
   void subject_to_fname(char* fname, const char* subject, int path);
 
   CnvCtx* ctx;
   std::ofstream fp;
 };
 
-#if defined __cplusplus
-}
-#endif
 #endif
