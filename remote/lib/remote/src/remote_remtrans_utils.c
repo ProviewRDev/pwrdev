@@ -469,6 +469,7 @@ pwr_tInt32 RemTrans_Receive(remtrans_item* remtrans, char* buffer, int size)
   if ((unsigned int)size > RemTransP->MaxLength) { /* Too big trans */
     RemTransP->ErrCount++;
     RemTransP->LastSts = STATUS_LENGTH;
+    RemTransP->DataLength = size;
     RemTrans_Logg(remtrans); /* Logg */
     return STATUS_LENGTH;
   } /* END Too big trans */
