@@ -96,6 +96,7 @@ int main(int argc, char** argv)
   pwr_tOName oname = "";
   int i;
   float cycletime = 0;
+  pwr_tObjid delayed_cyclesup_objid;
 
   for (i = 1; i < argc; i++) {
     if (streq(argv[i], "-m")) {
@@ -213,7 +214,7 @@ int main(int argc, char** argv)
       next = after;
       time_Aadd(NULL, &next, &cycle);
       delay_action = csup_Exec(
-          &sts, csup_lh, (pwr_tDeltaTime*)&next, (pwr_tDeltaTime*)&after, &now);
+          &sts, csup_lh, (pwr_tDeltaTime*)&next, (pwr_tDeltaTime*)&after, &now, &delayed_cyclesup_objid);
       if (delay_action == 2)
         ihp->IOReadWriteFlag = FALSE;
 
