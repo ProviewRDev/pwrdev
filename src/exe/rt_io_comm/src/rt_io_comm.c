@@ -215,7 +215,7 @@ int main(int argc, char** argv)
       time_Aadd(NULL, &next, &cycle);
       delay_action = csup_Exec(
           &sts, csup_lh, (pwr_tDeltaTime*)&next, (pwr_tDeltaTime*)&after, &now, &delayed_cyclesup_objid);
-      if (delay_action == 2)
+      if (delay_action == pwr_eSupDelayActionEnum_EmergencyBreak)
         ihp->IOReadWriteFlag = FALSE;
 
       aproc_TimeStamp(cycletime, 5);
