@@ -2072,7 +2072,7 @@ void* handle_events(void* ptr)
 
   pn_controller->m_rt_interface_name = std::string(op->EthernetDevice);
   pn_controller->m_vendor_id = 279; // Softing vendor id
-  pn_controller->m_device_id = 0;
+  pn_controller->m_device_id = 81;  // Softing device id (81)
   pn_controller->m_rt_version = "1.0";
 
   local->device_list.push_back(pn_controller);
