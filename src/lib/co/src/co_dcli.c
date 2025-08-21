@@ -974,12 +974,12 @@ int dcli_toupper(char* str_upper, char* str)
     if (convert)
     {
       *t = (char)toupper(namechar);
-      if (*t == 'ï¿½')
-        *t = (char)'ï¿½';
-      else if (*t == 'ï¿½')
-        *t = (char)'ï¿½';
-      else if (*t == 'ï¿½')
-        *t = (char)'ï¿½';
+      if (*t == 'ö')
+        *t = (char)'Ö';
+      else if (*t == 'ä')
+        *t = (char)'Ä';
+      else if (*t == 'å')
+        *t = (char)'Å';
     }
     else
       *t = namechar;
@@ -1111,7 +1111,6 @@ int dcli_read_line(char* line, int maxsize, FILE* file)
   return 1;
 }
 
-
 int checkTargetLocation(const char* line, const char* target_word)
 {
   size_t length = strlen(line);
@@ -1170,7 +1169,6 @@ int dcli_search_line_in_file(FILE* file, const char* target_line, const char* lo
         error_line[strlen(line)] = '\0';
 
         *error_line_number = line_number;
-
 
         return 1;
       }
