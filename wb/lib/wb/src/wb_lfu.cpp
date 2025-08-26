@@ -2651,7 +2651,7 @@ pwr_tStatus lfu_SaveDirectoryVolume(
               sprintf(&str[strlen(str)], "-lpwr_rt ");
 
               if (bop->SystemModules & pwr_mBuildOptionsMask_SoftingPNAK)
-                sprintf(&str[strlen(str)], "-lprofinet ");
+                sprintf(&str[strlen(str)], "-lprofinet -lsnmp -lnetsnmpagent -lnetsnmpmibs -lnetsnmphelpers -lnetsnmptrapd ");
               else
                 sprintf(&str[strlen(str)], "-lpwr_pnak_dummy ");
 
