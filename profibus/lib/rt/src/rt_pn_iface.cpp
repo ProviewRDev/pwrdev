@@ -2387,6 +2387,7 @@ void* handle_events(void* ptr)
     {
       errh_Fatal("PROFINET: Fatal exception occured. Stopping PROFINET!");
       pnak_stop_stack(0);
+      break;
     }
   }
   pnak_term();
