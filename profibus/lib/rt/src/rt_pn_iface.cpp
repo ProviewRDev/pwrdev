@@ -2059,6 +2059,22 @@ void* handle_events(void* ptr)
     pn_controller->m_NetworkSettings.m_subnet_mask =
         inet_ntoa(((struct sockaddr_in*)&ifr.ifr_netmask)->sin_addr);
   }
+  if (ioctl(s, SIOCGIFHWADDR, &ifr) == 0)
+  {
+    char mac[6];
+    memcpy(mac, ifr.ifr_hwaddr.sa_data, 6);
+    std::ostringstream mac_stream;
+    mac_stream << std::hex << std::setfill('0') << std::setw(2) << (unsigned int)(unsigned char)mac[0] << ":"
+               << std::setw(2) << (unsigned int)(unsigned char)mac[1] << ":" << std::setw(2)
+               << (unsigned int)(unsigned char)mac[2] << ":" << std::setw(2)
+               << (unsigned int)(unsigned char)mac[3] << ":" << std::setw(2)
+               << (unsigned int)(unsigned char)mac[4] << ":" << std::setw(2)
+               << (unsigned int)(unsigned char)mac[5];
+
+    pn_controller->m_NetworkSettings.m_mac_address = mac_stream.str();
+
+    errh_Info("PROFINET: Using MAC address %s", pn_controller->m_NetworkSettings.m_mac_address.c_str());
+  }
 
   sscanf(pn_controller->m_NetworkSettings.m_ip_address.c_str(), "%hhu.%hhu.%hhu.%hhu",
          &pn_controller->m_rt_ipaddress[3], &pn_controller->m_rt_ipaddress[2],
