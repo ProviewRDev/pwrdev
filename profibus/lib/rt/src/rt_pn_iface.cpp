@@ -58,7 +58,7 @@
 #include "rt_io_msg.h"
 #include "rt_io_pnak_locals.h"
 #include "rt_pb_msg.h"
-#include "rt_profinet.h"
+#include "profinet.h"
 #include "rt_pn_iface.h"
 
 #include "rt_mh_appl.h"
@@ -1810,7 +1810,7 @@ int handle_service_con(io_sAgentLocal* local, io_sAgent* ap)
         }
         }
       }
-      else if (pSdb->Instance == PN_SUPERVISOR) // Profinet Viewer
+      else if (pSdb->Instance == PN_SUPERVISOR) // Profinet Viewer is a supervisor for instance
       {
         switch (pSdb->Service)
         {

@@ -63,7 +63,7 @@
 #include "co_fs_util.h"
 
 #include "rt_pb_msg.h"
-#include "rt_profinet.h"
+#include "profinet.h"
 
 #include "cow_wow.h"
 

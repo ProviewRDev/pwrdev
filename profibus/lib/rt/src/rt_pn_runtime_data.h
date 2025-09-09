@@ -48,7 +48,7 @@
 
 #include "pwr.h"
 #include "co_pugixml.hpp"
-#include "rt_profinet.h"
+#include "profinet.h"
 
 // Increment this whenever the runtime xml changes (pwr_pn_XXXXXXXXXXXXXXX.xml files that is)
 #define PWR_SCHEMA_VERSION 1

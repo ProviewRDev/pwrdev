@@ -44,8 +44,8 @@
 
 #include "rt_io_base.h"
 #include "rt_pn_runtime_data.h"
-#include "rt_profinet.h"
-#include "rt_pnak.h"
+#include "profinet.h"
+#include "pnak.h"
 
 /* rt_io_pnak_locals.h -- Profinet io handling locals. */
 
