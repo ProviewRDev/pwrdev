@@ -97,7 +97,7 @@ PnViewerPNAK::PnViewerPNAK(pwr_tStatus* sts, const char* interface_name)
          &m_controller.m_rt_subnetmask[3], &m_controller.m_rt_subnetmask[2], &m_controller.m_rt_subnetmask[1],
          &m_controller.m_rt_subnetmask[0]);
 
-  m_controller.m_NetworkSettings.m_device_name = std::string("dumle");
+  m_controller.m_NetworkSettings.m_device_name = std::string("proviewr");
   // strcpy(dev_data.device_name, "dumle");
   m_controller.m_rt_device_ref = PN_DEVICE_REFERENCE_THIS_STATION;
   // dev_data.device_num = PN_DEVICE_REFERENCE_THIS_STATION;
