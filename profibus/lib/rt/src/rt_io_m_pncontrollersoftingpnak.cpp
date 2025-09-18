@@ -154,14 +154,36 @@ static pwr_tStatus IoAgentRead(io_tCtx ctx, io_sAgent* ap)
     if (pn_device->m_rt_device_state & PNAK_DEVICE_STATE_CONNECTED)
     {
       auto& iocr = pn_device->m_IOCR_map.at(PROFINET_IO_CR_TYPE_INPUT);
-      //  TODO Implement iocrstate propagation to pn device. But as of now
-      //  the status_data doesn't change according to what the data frames says
-      //  in other words. It's showing normal operation even with all modules
-      //  pulled from an IO...The "problem" bit is not present at all :/
+
       data_length = iocr.m_rt_io_data_length;
       sts = pnak_get_iocr_data(0, iocr.m_rt_identifier, iocr.m_rt_io_data, &data_length, &ioxs, &status_data);
       if (sts == PNAK_OK)
       {
+        // Update the pwr enum reflecting this status for the device
+        temp_status = 0;
+        status_data = status_data & CYCLIC_DATA_STATUS_MASK;
+        if (status_data & CYCLIC_DATA_STATUS_DATA_VALID)
+          temp_status |= pwr_mPnIOCRStatus_DATA_VALID;
+        else
+          temp_status |= pwr_mPnIOCRStatus_DATA_INVALID;
+
+        if (status_data & CYCLIC_DATA_STATUS_STATE_PRIMARY)
+          temp_status |= pwr_mPnIOCRStatus_STATE_PRIMARY;
+        else
+          temp_status |= pwr_mPnIOCRStatus_STATE_BACKUP;
+
+        if (status_data & CYCLIC_DATA_STATUS_STATE_RUN)
+          temp_status |= pwr_mPnIOCRStatus_STATE_RUN;
+        else
+          temp_status |= pwr_mPnIOCRStatus_STATE_STOP;
+
+        if (status_data & CYCLIC_DATA_STATUS_NORMAL_OPERATION)
+          temp_status |= pwr_mPnIOCRStatus_NORMAL_OPERATION;
+        else
+          temp_status |= pwr_mPnIOCRStatus_PROBLEM_DETECTED;
+
+        pwr_device->CyclicDataStatus = temp_status;
+
         // Set the iocs status. If we have bad data, the stack will give us zeroed inputs and
         // the error counter will start increasing
         // Some converters have shown troubles during startup of the stack and if we disable these when they
