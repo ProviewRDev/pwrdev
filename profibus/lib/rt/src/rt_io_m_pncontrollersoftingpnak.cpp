@@ -95,29 +95,23 @@ static pwr_tStatus IoAgentInit(io_tCtx ctx, io_sAgent* ap)
 
   /* Active supervision thread */
 
-  pthread_attr_t attr;
+  pthread_attr_t pthread_attr;
 
   local->args.local = local;
   local->args.ap = ap;
 
   op->Status = PB__NOTINIT;
 
-  pthread_mutexattr_t mutexattr;
-  pthread_condattr_t condattr;
-
-  pthread_mutexattr_init(&mutexattr);
-  pthread_mutex_init(&local->mutex, &mutexattr);
-  pthread_mutexattr_destroy(&mutexattr);
-
-  pthread_condattr_init(&condattr);
-  pthread_cond_init(&local->cond, &condattr);
-  pthread_condattr_destroy(&condattr);
+  pthread_mutex_init(&local->mutex, NULL);
+  pthread_cond_init(&local->cond, NULL);
 
   pthread_mutex_lock(&local->mutex);
 
-  pthread_attr_init(&attr);
-  pthread_attr_setinheritsched(&attr, PTHREAD_INHERIT_SCHED);
-  pthread_create(&local->handle_events, &attr, handle_events, &local->args);
+  pthread_attr_init(&pthread_attr);
+  pthread_attr_setinheritsched(&pthread_attr, PTHREAD_INHERIT_SCHED);
+
+  pthread_create(&local->handle_events, &pthread_attr, handle_events, &local->args);
+  pthread_attr_destroy(&pthread_attr);
 
   pthread_cond_wait(&local->cond, &local->mutex);
   pthread_mutex_unlock(&local->mutex);
