@@ -39,61 +39,62 @@
 #include <stdarg.h>
 #include <string.h>
 #include <time.h>
+#include <sys/time.h>
 
 static int LEVEL = 0;
 static FILE* FP = NULL;
 static int QUIET = 1;
 
-void log_setLevel(int level)
+void log_setLevel(int level) { LEVEL = level; }
+
+void log_setFile(FILE* fp) { FP = fp; }
+
+void log_setQuiet(int quiet) { QUIET = quiet; }
+
+static const char* level_names[] = {"TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL"};
+
+static const char* level_colors[] = {"\x1b[94m", "\x1b[36m", "\x1b[32m", "\x1b[33m", "\x1b[31m", "\x1b[35m"};
+
+void print_time(FILE* stream)
 {
-  LEVEL = level;
-}
+  char iso_datetime[40];
+  struct timeval tv;
+  gettimeofday(&tv, NULL);
+  struct tm* lt = localtime(&tv.tv_sec);
 
-void log_setFile(FILE* fp)
-{
-  FP = fp;
-}
+  int ms = tv.tv_usec / 1000;
 
-void log_setQuiet(int quiet)
-{
-  QUIET = quiet;
-}
-
-static const char *level_names[] = {
-  "TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL"
-};
-
-static const char *level_colors[] = {
-  "\x1b[94m", "\x1b[36m", "\x1b[32m", "\x1b[33m", "\x1b[31m", "\x1b[35m"
-};
-
-void print_time(FILE* stream, int fulldate)
-{
-  char Date[11], Time[11];
-  time_t t = time(NULL);
-  struct tm* lt = localtime(&t);
-  if (fulldate) {
-    strftime(Date, 11, "%Y-%m-%d", lt);
-    fprintf(stream, "%s ", Date);
+  strftime(iso_datetime, sizeof(iso_datetime), "%Y-%m-%dT%H:%M:%S", lt);
+  // Timezone offset
+  char tz[8];
+  strftime(tz, sizeof(tz), "%z", lt);
+  // Insert colon in timezone offset for ISO 8601 compliance
+  size_t tzlen = strlen(tz);
+  if (tzlen == 5)
+  { // e.g. +0200
+    tz[6] = '\0';
+    tz[5] = tz[3];
+    tz[4] = tz[2];
+    tz[3] = ':';
   }
-  strftime(Time, 11, "%H:%M:%S", lt);
-  fprintf(stream, "%s", Time);
+  fprintf(stream, "%s.%03d%s ", iso_datetime, ms, tz);
 }
 
 void log_print(int level, const char* file, int line, const char* fmt, ...)
 {
-  if (level < LEVEL) {
+  if (level < LEVEL)
+  {
     return;
   }
 
-  if (!QUIET) {
+  if (!QUIET)
+  {
     // 1. print timestamp
     print_time(stderr);
     // 2. print filename only, without path
     const char* file2 = strrchr(file, '/');
     file2 = file2 ? (file2 + 1) : file;
-    fprintf(stderr, " %s%-5s\x1b[0m %s:%d: ",
-            level_colors[level], level_names[level], file2, line);
+    fprintf(stderr, " %s%-5s\x1b[0m %s:%d: ", level_colors[level], level_names[level], file2, line);
     // 3. print the actual debug message
     va_list args;
     va_start(args, fmt);
@@ -101,7 +102,8 @@ void log_print(int level, const char* file, int line, const char* fmt, ...)
     va_end(args);
   }
 
-  if (FP) {
+  if (FP)
+  {
     // 1. print timestamp
     print_time(FP);
     // 2. print filename only, without path
