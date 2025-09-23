@@ -490,8 +490,7 @@ static pwr_tStatus redu_node_init()
   char s_seg_size[20];
   char* s;
   int errors = 0;
-  struct in_addr naddr;
-  struct arpreq arpreq;
+  struct in_addr naddr;  
   int n, n2;
   int sts;
   int nid = 1;
@@ -566,11 +565,7 @@ static pwr_tStatus redu_node_init()
 
       np->get.timer_max = 30;
       np->put.timer_max = 10;
-
-      memset(&arpreq, 0, sizeof(arpreq));
-      memcpy(&arpreq.arp_pa.sa_data, &naddr, sizeof(naddr));
-      inet_GetArpEntry(&sts, 0, &arpreq);
-
+      
       l.redu_nodes++;
       nid++;
       if (nid - 1 > sizeof(l.redu_node) / sizeof(l.redu_node[0]))

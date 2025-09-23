@@ -149,8 +149,7 @@ int qini_ParseFile(
   char alias_naddr[80];
   pwr_tNodeId nid;
   struct in_addr naddr;
-  qini_sNode* nep;
-  struct arpreq arpreq;
+  qini_sNode* nep;  
 
   while ((s = fgets(buffer, sizeof(buffer) - 1, f)) != NULL) {
     if (*s == '#' || *s == '!') {
@@ -245,9 +244,6 @@ int qini_ParseFile(
       }
     }
 
-    memset(&arpreq, 0, sizeof(arpreq));
-    memcpy(&arpreq.arp_pa.sa_data, &naddr, sizeof(naddr));
-    inet_GetArpEntry(&sts, 0, &arpreq);
   }
 
   return error;
