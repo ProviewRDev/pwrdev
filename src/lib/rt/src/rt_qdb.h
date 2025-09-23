@@ -530,7 +530,6 @@ typedef struct
   qdb_sBuffer* bp;
 
   pwr_tBoolean in_arp;
-  struct arpreq arp;
 
   void* mon;                       /* Monitor private data. */
   qcom_eNodeConnection connection; /* Type of connection */
