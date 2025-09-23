@@ -35,9 +35,9 @@
  */
 
 /************************************************************************
-* Description:
-*	Example of an application function in rtt.
-**************************************************************************/
+ * Description:
+ *	Example of an application function in rtt.
+ **************************************************************************/
 
 /*_Include files_________________________________________________________*/
 
@@ -67,28 +67,32 @@ RTT_RTTSYSDB_CONTINUE
 #include "dtt_appl_rttsys_m.rdb2"
 RTT_RTTSYSDB_END
 
-#define IF_NOGDH_RETURN                                                        \
-  if (!rtt_gdh_started) {                                                      \
-    rtt_message('E', "Rtt is not connected to nethandler");                    \
-    return RTT__NOPICTURE;                                                     \
+#define IF_NOGDH_RETURN                                                                                      \
+  if (!rtt_gdh_started)                                                                                      \
+  {                                                                                                          \
+    rtt_message('E', "Rtt is not connected to nethandler");                                                  \
+    return RTT__NOPICTURE;                                                                                   \
   }
 
-#define IF_NOQCOM_RETURN                                                       \
-  if (!(rtt_gdh_started || rtt_qcom_started)) {                                \
-    rtt_message('E', "Rtt is not connected to qcom or nethandler");            \
-    return RTT__NOPICTURE;                                                     \
+#define IF_NOQCOM_RETURN                                                                                     \
+  if (!(rtt_gdh_started || rtt_qcom_started))                                                                \
+  {                                                                                                          \
+    rtt_message('E', "Rtt is not connected to qcom or nethandler");                                          \
+    return RTT__NOPICTURE;                                                                                   \
   }
 
 /* Type definitions */
 /* RTTSYS_GRAFCET ***/
-typedef struct {
+typedef struct
+{
   pwr_tObjid objid;
   char name[80];
   pwr_tBoolean* value_ptr;
   gdh_tDlid subid;
 } rttsys_t_step_list;
 
-typedef struct {
+typedef struct
+{
   pwr_tObjid objid;
   char name[80];
   char selected;
@@ -104,7 +108,8 @@ typedef struct {
 } rttsys_t_plcpgm_list;
 
 /* RTTSYS_NMPSCELL ***/
-typedef struct {
+typedef struct
+{
   pwr_tObjid objid;
   pwr_tClassId class;
   char name[80];
@@ -113,7 +118,8 @@ typedef struct {
   int expand;
 } rttsys_t_cell_list;
 
-typedef struct {
+typedef struct
+{
   pwr_tDataRef DataP pwr_dAlignLW;
   pwr_tBoolean Data_Front pwr_dAlignW;
   pwr_tBoolean Data_Back pwr_dAlignW;
@@ -122,12 +128,14 @@ typedef struct {
   pwr_tBoolean Data_OldSelect pwr_dAlignW;
 } plc_t_DataInfo;
 
-typedef struct {
+typedef struct
+{
   pwr_tDataRef DataP pwr_dAlignLW;
   gdh_tDlid Data_Dlid pwr_dAlignW;
 } plc_t_DataInfoMirCell;
 
-typedef struct {
+typedef struct
+{
   pwr_tObjid chan_objid;
   char channame[80];
   int conv_on;
@@ -147,7 +155,8 @@ typedef struct {
   char chan_ident[80];
 } rttsys_t_chan_list;
 
-typedef struct {
+typedef struct
+{
   pwr_tObjid device_objid;
   pwr_tClassId device_class;
   pwr_tObjid device_class_objid;
@@ -160,21 +169,24 @@ typedef struct {
   gdh_tDlid device_subid;
 } rttsys_t_device_list;
 
-typedef struct {
+typedef struct
+{
   pwr_tObjid remnode_objid;
   pwr_sClass_RemNode* remnode_ptr;
   char remnodename[80];
   gdh_tDlid remnode_subid;
 } rttsys_t_remnode_list;
 
-typedef struct {
+typedef struct
+{
   pwr_tObjid remtrans_objid;
   pwr_sClass_RemTrans* remtrans_ptr;
   char remtransname[80];
   gdh_tDlid remtrans_subid;
 } rttsys_t_remtrans_list;
 
-typedef struct {
+typedef struct
+{
   pwr_tObjid runningtime_objid;
   pwr_sClass_RunningTime* runningtime_ptr;
   char runningtimename[80];
@@ -192,117 +204,89 @@ static int logging_page = 0;
 
 static int rttsys_get_nodename(pwr_tNodeId nid, char* nodename);
 static int rttsys_get_plcpgm(pwr_tObjid initstep_objid, pwr_tObjid* plc_objid);
-static int rttsys_plclist_add(pwr_tObjid plc_objid,
-    rttsys_t_plcpgm_list** plclist, int* plclist_count, int* alloc);
-static int rttsys_initsteplist_add(pwr_tObjid initstep_objid,
-    rttsys_t_step_list** initsteplist, int* initsteplist_count);
-static int rttsys_grafcet_select(menu_ctx ctx, pwr_tObjid dummyoi, void* dummy1,
-    void* dummy2, void* dummy3, void* dummy4);
-static int rttsys_steplist_add(pwr_tObjid step_objid,
-    rttsys_t_step_list** steplist, int* steplist_count, int* alloc,
-    pwr_tClassId class, int dummy2);
-static int rttsys_orderlist_add(pwr_tObjid order_objid,
-    rttsys_t_step_list** orderlist, int* orderlist_count, int* alloc,
-    pwr_tClassId class, int dummy2);
-static int rttsys_objectlist_add(pwr_tObjid object_objid, pwr_tClassId class,
-    rttsys_t_step_list** objectlist, int* objectlist_count, int* alloc,
-    char* attrstr, int attrsize);
-static int rttsys_object_add(pwr_tClassId class,
-    rttsys_t_step_list** objectlist, int* objectlist_count, int* object_alloc,
-    char* attrstr, int attrsize);
-static int rttsys_threadobject_add(pwr_tClassId class,
-    rttsys_t_step_list** objectlist, int* objectlist_count, int* object_alloc,
-    char* attrstr, int attrsize);
-static int rttsys_thread_update(menu_ctx ctx, rttsys_t_step_list* objectlist,
-    int objectlist_count, int page);
-static int rttsys_objectlist_modname(
-    rttsys_t_step_list* objectlist, int objectlist_count);
-static int rttsys_pid_object_start(menu_ctx ctx, pwr_tObjid objid, void* arg1,
-    void* arg2, void* arg3, void* arg4);
-static int rttsys_pid_update(menu_ctx ctx, rttsys_t_step_list* objectlist,
-    int objectlist_count, int page);
-static int rttsys_objectlist_modname_plc(
-    rttsys_t_step_list* objectlist, int objectlist_count);
-static int rttsys_pidobject_add(pwr_tClassId class,
-    rttsys_t_step_list** objectlist, int* objectlist_count, int* object_alloc,
-    char* attrstr, int attrsize);
+static int rttsys_plclist_add(pwr_tObjid plc_objid, rttsys_t_plcpgm_list** plclist, int* plclist_count,
+                              int* alloc);
+static int rttsys_initsteplist_add(pwr_tObjid initstep_objid, rttsys_t_step_list** initsteplist,
+                                   int* initsteplist_count);
+static int rttsys_grafcet_select(menu_ctx ctx, pwr_tObjid dummyoi, void* dummy1, void* dummy2, void* dummy3,
+                                 void* dummy4);
+static int rttsys_steplist_add(pwr_tObjid step_objid, rttsys_t_step_list** steplist, int* steplist_count,
+                               int* alloc, pwr_tClassId class, int dummy2);
+static int rttsys_orderlist_add(pwr_tObjid order_objid, rttsys_t_step_list** orderlist, int* orderlist_count,
+                                int* alloc, pwr_tClassId class, int dummy2);
+static int rttsys_objectlist_add(pwr_tObjid object_objid, pwr_tClassId class, rttsys_t_step_list** objectlist,
+                                 int* objectlist_count, int* alloc, char* attrstr, int attrsize);
+static int rttsys_object_add(pwr_tClassId class, rttsys_t_step_list** objectlist, int* objectlist_count,
+                             int* object_alloc, char* attrstr, int attrsize);
+static int rttsys_threadobject_add(pwr_tClassId class, rttsys_t_step_list** objectlist, int* objectlist_count,
+                                   int* object_alloc, char* attrstr, int attrsize);
+static int rttsys_thread_update(menu_ctx ctx, rttsys_t_step_list* objectlist, int objectlist_count, int page);
+static int rttsys_objectlist_modname(rttsys_t_step_list* objectlist, int objectlist_count);
+static int rttsys_pid_object_start(menu_ctx ctx, pwr_tObjid objid, void* arg1, void* arg2, void* arg3,
+                                   void* arg4);
+static int rttsys_pid_update(menu_ctx ctx, rttsys_t_step_list* objectlist, int objectlist_count, int page);
+static int rttsys_objectlist_modname_plc(rttsys_t_step_list* objectlist, int objectlist_count);
+static int rttsys_pidobject_add(pwr_tClassId class, rttsys_t_step_list** objectlist, int* objectlist_count,
+                                int* object_alloc, char* attrstr, int attrsize);
 
-static int rttsys_cell_object_start(menu_ctx ctx, pwr_tObjid objid, void* arg1,
-    void* arg2, void* arg3, void* arg4);
-static int rttsys_cellist_add(pwr_tObjid object_objid, pwr_tClassId class,
-    rttsys_t_cell_list** objectlist, int* objectlist_count, int* alloc);
-static int rttsys_cell_add(pwr_tClassId class, rttsys_t_cell_list** objectlist,
-    int* objectlist_count, int* object_alloc);
-static int rttsys_cell_expand(menu_ctx ctx, pwr_tObjid objid, void* arg1,
-    void* arg2, void* arg3, void* arg4);
-static int rttsys_cell_dataobject(menu_ctx ctx, pwr_tObjid cell_objid,
-    pwr_tObjid* data_objid, void* arg2, void* arg3, void* arg4);
-static int rttsys_dichanlist_add(pwr_tObjid chan_objid,
-    rttsys_t_chan_list** objectlist, int* objectlist_count, int* alloc,
-    int local);
-static int rttsys_get_conversion(pwr_tUInt16 convmask1, pwr_tUInt16 convmask2,
-    int chan_number, int* conversion);
-static int rttsys_chan_start(menu_ctx ctx, pwr_tObjid objid, void* arg1,
-    void* arg2, void* arg3, void* arg4);
-static int rttsys_dochanlist_add(pwr_tObjid chan_objid,
-    rttsys_t_chan_list** objectlist, int* objectlist_count, int* alloc,
-    int local);
-static int rttsys_aichanlist_add(pwr_tObjid chan_objid,
-    rttsys_t_chan_list** objectlist, int* objectlist_count, int* alloc,
-    int local);
-static int rttsys_aochanlist_add(pwr_tObjid chan_objid,
-    rttsys_t_chan_list** objectlist, int* objectlist_count, int* alloc,
-    int local, int signal_test_mode);
-static int rttsys_cochanlist_add(pwr_tObjid chan_objid,
-    rttsys_t_chan_list** objectlist, int* objectlist_count, int* alloc,
-    int local);
-static int rttsys_remtrans_start(menu_ctx ctx, pwr_tObjid objid, void* arg1,
-    void* arg2, void* arg3, void* arg4);
-static int rttsys_remtrans_buffer(menu_ctx ctx, pwr_tObjid objid, void* arg1,
-    void* arg2, void* arg3, void* arg4);
-static int rttsys_remnodelist_add(pwr_tObjid remnode_objid,
-    rttsys_t_remnode_list** objectlist, int* objectlist_count, int* alloc);
-static int rttsys_remtranslist_add(pwr_tObjid remtrans_objid,
-    rttsys_t_remtrans_list** objectlist, int* objectlist_count, int* alloc);
-static int rttsys_runningtimelist_add(pwr_tObjid runningtime_objid,
-    rttsys_t_runningtime_list** objectlist, int* objectlist_count, int* alloc);
+static int rttsys_cell_object_start(menu_ctx ctx, pwr_tObjid objid, void* arg1, void* arg2, void* arg3,
+                                    void* arg4);
+static int rttsys_cellist_add(pwr_tObjid object_objid, pwr_tClassId class, rttsys_t_cell_list** objectlist,
+                              int* objectlist_count, int* alloc);
+static int rttsys_cell_add(pwr_tClassId class, rttsys_t_cell_list** objectlist, int* objectlist_count,
+                           int* object_alloc);
+static int rttsys_cell_expand(menu_ctx ctx, pwr_tObjid objid, void* arg1, void* arg2, void* arg3, void* arg4);
+static int rttsys_cell_dataobject(menu_ctx ctx, pwr_tObjid cell_objid, pwr_tObjid* data_objid, void* arg2,
+                                  void* arg3, void* arg4);
+static int rttsys_dichanlist_add(pwr_tObjid chan_objid, rttsys_t_chan_list** objectlist,
+                                 int* objectlist_count, int* alloc, int local);
+static int rttsys_get_conversion(pwr_tUInt16 convmask1, pwr_tUInt16 convmask2, int chan_number,
+                                 int* conversion);
+static int rttsys_chan_start(menu_ctx ctx, pwr_tObjid objid, void* arg1, void* arg2, void* arg3, void* arg4);
+static int rttsys_dochanlist_add(pwr_tObjid chan_objid, rttsys_t_chan_list** objectlist,
+                                 int* objectlist_count, int* alloc, int local);
+static int rttsys_aichanlist_add(pwr_tObjid chan_objid, rttsys_t_chan_list** objectlist,
+                                 int* objectlist_count, int* alloc, int local);
+static int rttsys_aochanlist_add(pwr_tObjid chan_objid, rttsys_t_chan_list** objectlist,
+                                 int* objectlist_count, int* alloc, int local, int signal_test_mode);
+static int rttsys_cochanlist_add(pwr_tObjid chan_objid, rttsys_t_chan_list** objectlist,
+                                 int* objectlist_count, int* alloc, int local);
+static int rttsys_remtrans_start(menu_ctx ctx, pwr_tObjid objid, void* arg1, void* arg2, void* arg3,
+                                 void* arg4);
+static int rttsys_remtrans_buffer(menu_ctx ctx, pwr_tObjid objid, void* arg1, void* arg2, void* arg3,
+                                  void* arg4);
+static int rttsys_remnodelist_add(pwr_tObjid remnode_objid, rttsys_t_remnode_list** objectlist,
+                                  int* objectlist_count, int* alloc);
+static int rttsys_remtranslist_add(pwr_tObjid remtrans_objid, rttsys_t_remtrans_list** objectlist,
+                                   int* objectlist_count, int* alloc);
+static int rttsys_runningtimelist_add(pwr_tObjid runningtime_objid, rttsys_t_runningtime_list** objectlist,
+                                      int* objectlist_count, int* alloc);
 
-static int rttsys_node_start(menu_ctx ctx, pwr_tObjid objid, void* arg1,
-    void* arg2, void* arg3, void* arg4);
+static int rttsys_node_start(menu_ctx ctx, pwr_tObjid objid, void* arg1, void* arg2, void* arg3, void* arg4);
 
-int RTTSYS_REMTRANS(menu_ctx ctx, int event, char* parameter_ptr,
-    char* objectname, char** picture);
-int RTTSYS_RUNNINGTIME(menu_ctx ctx, int event, char* parameter_ptr,
-    char* objectname, char** picture);
+int RTTSYS_REMTRANS(menu_ctx ctx, int event, char* parameter_ptr, char* objectname, char** picture);
+int RTTSYS_RUNNINGTIME(menu_ctx ctx, int event, char* parameter_ptr, char* objectname, char** picture);
 int RTTSYS_NMPSCELL();
 int RTTSYS_OBJECT_CELL();
 int rttsys_cell_dataobject();
-int RTTSYS_QCOM_APPL(menu_ctx ctx, int event, char* parameter_ptr,
-    char* objectname, char** picture);
-int RTTSYS_QCOM_QUEUE(menu_ctx ctx, int event, char* parameter_ptr,
-    char* objectname, char** picture);
-static int rttsys_qcom_queue_start(menu_ctx ctx, pwr_tObjid objid, void* arg1,
-    void* arg2, void* arg3, void* arg4);
-int RTTSYS_QCOM_ALLQUEUES(menu_ctx ctx, int event, char* parameter_ptr,
-    char* objectname, char** picture);
-static int rttsys_qcom_messages_start(menu_ctx ctx, pwr_tObjid objid,
-    void* arg1, void* arg2, void* arg3, void* arg4);
-int RTTSYS_QCOM_MESSAGES(menu_ctx ctx, int event, char* parameter_ptr,
-    char* objectname, char** picture);
-int RTTSYS_QCOM_NODES(menu_ctx ctx, int event, char* parameter_ptr,
-    char* objectname, char** picture);
-static int rttsys_pool_segs_start(menu_ctx ctx, pwr_tObjid objid, void* arg1,
-    void* arg2, void* arg3, void* arg4);
-int RTTSYS_POOL_SEGS(menu_ctx ctx, int event, char* parameter_ptr,
-    char* objectname, char** picture);
-static int rttsys_pool_segment_start(menu_ctx ctx, pwr_tObjid objid, void* arg1,
-    void* arg2, void* arg3, void* arg4);
-int RTTSYS_POOL_SEGMENT(menu_ctx ctx, int event, char* parameter_ptr,
-    char* objectname, char** picture);
-static int rttsys_qcom_node_start(menu_ctx ctx, pwr_tObjid objid, void* arg1,
-    void* arg2, void* arg3, void* arg4);
-int RTTSYS_QCOM_NODE(menu_ctx ctx, int event, char* parameter_ptr,
-    char* objectname, char** picture);
+int RTTSYS_QCOM_APPL(menu_ctx ctx, int event, char* parameter_ptr, char* objectname, char** picture);
+int RTTSYS_QCOM_QUEUE(menu_ctx ctx, int event, char* parameter_ptr, char* objectname, char** picture);
+static int rttsys_qcom_queue_start(menu_ctx ctx, pwr_tObjid objid, void* arg1, void* arg2, void* arg3,
+                                   void* arg4);
+int RTTSYS_QCOM_ALLQUEUES(menu_ctx ctx, int event, char* parameter_ptr, char* objectname, char** picture);
+static int rttsys_qcom_messages_start(menu_ctx ctx, pwr_tObjid objid, void* arg1, void* arg2, void* arg3,
+                                      void* arg4);
+int RTTSYS_QCOM_MESSAGES(menu_ctx ctx, int event, char* parameter_ptr, char* objectname, char** picture);
+int RTTSYS_QCOM_NODES(menu_ctx ctx, int event, char* parameter_ptr, char* objectname, char** picture);
+static int rttsys_pool_segs_start(menu_ctx ctx, pwr_tObjid objid, void* arg1, void* arg2, void* arg3,
+                                  void* arg4);
+int RTTSYS_POOL_SEGS(menu_ctx ctx, int event, char* parameter_ptr, char* objectname, char** picture);
+static int rttsys_pool_segment_start(menu_ctx ctx, pwr_tObjid objid, void* arg1, void* arg2, void* arg3,
+                                     void* arg4);
+int RTTSYS_POOL_SEGMENT(menu_ctx ctx, int event, char* parameter_ptr, char* objectname, char** picture);
+static int rttsys_qcom_node_start(menu_ctx ctx, pwr_tObjid objid, void* arg1, void* arg2, void* arg3,
+                                  void* arg4);
+int RTTSYS_QCOM_NODE(menu_ctx ctx, int event, char* parameter_ptr, char* objectname, char** picture);
 
 #define RTTSYS_ALLOC 50
 #define RTTSYS_CHANALLOC 32
@@ -310,21 +294,21 @@ int RTTSYS_QCOM_NODE(menu_ctx ctx, int event, char* parameter_ptr,
 #define POOL_SSIZE 8
 
 /*************************************************************************
-*
-* Name:		RTTSYS_SHOW_SUBSRV()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	context of the picture.
-* int		event		I 	type of event.
-* char		*parameter_ptr	I	pointer to the parameter which value
-*					has been changed.
-*
-* Description:
-*	Show nethandler subsrv.
-*
-**************************************************************************/
+ *
+ * Name:		RTTSYS_SHOW_SUBSRV()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	context of the picture.
+ * int		event		I 	type of event.
+ * char		*parameter_ptr	I	pointer to the parameter which value
+ *					has been changed.
+ *
+ * Description:
+ *	Show nethandler subsrv.
+ *
+ **************************************************************************/
 
 static int rttsys_get_nodename(pwr_tNodeId nid, char* nodename)
 {
@@ -339,7 +323,8 @@ static int rttsys_get_nodename(pwr_tNodeId nid, char* nodename)
   return sts;
 }
 
-typedef struct {
+typedef struct
+{
   int subid;
   int count;
   pwr_tNid nid;
@@ -363,24 +348,23 @@ void print_subsrv()
   if (!fp)
     return;
 
-  fprintf(fp, "%5s %5s %8s %4s %4s %s\n", "Subid", "Count", "Node", "Size",
-      "Offs", "Object");
+  fprintf(fp, "%5s %5s %8s %4s %4s %s\n", "Subid", "Count", "Node", "Size", "Offs", "Object");
 
   gdb_ScopeLock
   {
     subcnt = 0;
-    for (sl = pool_Qsucc(&sts, gdbroot->pool, &gdbroot->db->subs_lh);
-         sl != &gdbroot->db->subs_lh;
-         sl = pool_Qsucc(&sts, gdbroot->pool, sl)) {
+    for (sl = pool_Qsucc(&sts, gdbroot->pool, &gdbroot->db->subs_lh); sl != &gdbroot->db->subs_lh;
+         sl = pool_Qsucc(&sts, gdbroot->pool, sl))
+    {
       subcnt++;
     }
 
     data = (subsrv_tData*)calloc(subcnt, sizeof(subsrv_tData));
 
     subcnt = 0;
-    for (sl = pool_Qsucc(&sts, gdbroot->pool, &gdbroot->db->subs_lh);
-         sl != &gdbroot->db->subs_lh;
-         sl = pool_Qsucc(&sts, gdbroot->pool, sl)) {
+    for (sl = pool_Qsucc(&sts, gdbroot->pool, &gdbroot->db->subs_lh); sl != &gdbroot->db->subs_lh;
+         sl = pool_Qsucc(&sts, gdbroot->pool, sl))
+    {
       ssrvp = pool_Qitem(sl, sub_sServer, subs_ll);
 
       data[subcnt].nid = ssrvp->nid;
@@ -392,16 +376,16 @@ void print_subsrv()
   }
   gdb_ScopeUnlock;
 
-  for (i = 0; i < subcnt; i++) {
+  for (i = 0; i < subcnt; i++)
+  {
     rttsys_get_nodename(data[i].nid, nodename);
 
     sts = gdh_AttrrefToName(&data[i].aref, astr, sizeof(astr), cdh_mNName);
     if (EVEN(sts))
       cdh_ArefToString(astr, sizeof(astr), &data[i].aref, 1);
 
-    fprintf(fp, "%5d %5d %8s %4d %4d %s%s\n", data[i].subid, data[i].count,
-        nodename, data[i].aref.Size, data[i].aref.Offset,
-        data[i].aref.Flags.b.Indirect ? "@" : "", astr);
+    fprintf(fp, "%5d %5d %8s %4d %4d %s%s\n", data[i].subid, data[i].count, nodename, data[i].aref.Size,
+            data[i].aref.Offset, data[i].aref.Flags.b.Indirect ? "@" : "", astr);
   }
   free(data);
   fclose(fp);
@@ -411,8 +395,7 @@ void print_subsrv()
   rtt_message('I', msg);
 }
 
-int RTTSYS_SHOW_SUBSRV(menu_ctx ctx, int event, char* parameter_ptr,
-    char* objectname, char** picture)
+int RTTSYS_SHOW_SUBSRV(menu_ctx ctx, int event, char* parameter_ptr, char* objectname, char** picture)
 {
 #define SHOW_SUBSRV_PAGESIZE 16
   int sts;
@@ -427,9 +410,10 @@ int RTTSYS_SHOW_SUBSRV(menu_ctx ctx, int event, char* parameter_ptr,
   IF_NOGDH_RETURN;
 
   /**********************************************************
-  *	The value of a parameter is changed.
-  ***********************************************************/
-  switch (event) {
+   *	The value of a parameter is changed.
+   ***********************************************************/
+  switch (event)
+  {
   case RTT_APPL_UPDATE:
 
     menulist = (rtt_t_menu_upd*)ctx->menu;
@@ -439,13 +423,13 @@ int RTTSYS_SHOW_SUBSRV(menu_ctx ctx, int event, char* parameter_ptr,
     l = 0;
     gdb_ScopeLock
     {
-      for (sl = pool_Qsucc(&sts, gdbroot->pool, &gdbroot->db->subs_lh);
-           sl != &gdbroot->db->subs_lh;
-           sl = pool_Qsucc(&sts, gdbroot->pool, sl)) {
+      for (sl = pool_Qsucc(&sts, gdbroot->pool, &gdbroot->db->subs_lh); sl != &gdbroot->db->subs_lh;
+           sl = pool_Qsucc(&sts, gdbroot->pool, sl))
+      {
         ssrvp = pool_Qitem(sl, sub_sServer, subs_ll);
 
-        if ((k >= page * SHOW_SUBSRV_PAGESIZE)
-            && (k < (page + 1) * SHOW_SUBSRV_PAGESIZE)) {
+        if ((k >= page * SHOW_SUBSRV_PAGESIZE) && (k < (page + 1) * SHOW_SUBSRV_PAGESIZE))
+        {
           /* Subid */
           menu_ptr->value_ptr = (char*)&ssrvp->sid;
           menu_ptr++;
@@ -476,7 +460,8 @@ int RTTSYS_SHOW_SUBSRV(menu_ctx ctx, int event, char* parameter_ptr,
     }
     gdb_ScopeUnlock;
 
-    for (i = l; i < SHOW_SUBSRV_PAGESIZE; i++) {
+    for (i = l; i < SHOW_SUBSRV_PAGESIZE; i++)
+    {
       /* subid */
       menu_ptr->value_ptr = (char*)RTT_ERASE;
       menu_ptr++;
@@ -495,7 +480,8 @@ int RTTSYS_SHOW_SUBSRV(menu_ctx ctx, int event, char* parameter_ptr,
 
     SHOW_SUBSRV_COUNTER = k;
 
-    if (SHOW_SUBSRV_PRINT) {
+    if (SHOW_SUBSRV_PRINT)
+    {
       print_subsrv();
       SHOW_SUBSRV_PRINT = 0;
     }
@@ -503,38 +489,42 @@ int RTTSYS_SHOW_SUBSRV(menu_ctx ctx, int event, char* parameter_ptr,
     return RTT__SUCCESS;
 
   /**********************************************************
-  *	Return address of menu
-  ***********************************************************/
+   *	Return address of menu
+   ***********************************************************/
   case RTT_APPL_PICTURE:
     *picture = (char*)&dtt_systempicture_p26_bg;
     return RTT__SUCCESS;
 
   /**********************************************************
-  *	Previous page
-  ***********************************************************/
+   *	Previous page
+   ***********************************************************/
   case RTT_APPL_MENU:
     *picture = (char*)&dtt_systempicture_p26_eu;
     return RTT__SUCCESS;
 
   /**********************************************************
-  *	Initialization of the picture
-  ***********************************************************/
+   *	Initialization of the picture
+   ***********************************************************/
   /**********************************************************
-  *	Next page
-  ***********************************************************/
+   *	Next page
+   ***********************************************************/
   /**********************************************************
-  *	Previous page
-  ***********************************************************/
+   *	Previous page
+   ***********************************************************/
   case RTT_APPL_INIT:
   case RTT_APPL_NEXTPAGE:
   case RTT_APPL_PREVPAGE:
-    if (event == RTT_APPL_PREVPAGE) {
+    if (event == RTT_APPL_PREVPAGE)
+    {
       page--;
       page = MAX(page, 0);
-    } else if (event == RTT_APPL_NEXTPAGE) {
+    }
+    else if (event == RTT_APPL_NEXTPAGE)
+    {
       page++;
       page = MIN(page, SHOW_SUBSRV_MAXPAGE - 1);
-    } else if (event == RTT_APPL_INIT)
+    }
+    else if (event == RTT_APPL_INIT)
       page = 0;
 
     SHOW_SUBSRV_PAGE = page + 1;
@@ -545,13 +535,13 @@ int RTTSYS_SHOW_SUBSRV(menu_ctx ctx, int event, char* parameter_ptr,
     l = 0;
     gdb_ScopeLock
     {
-      for (sl = pool_Qsucc(&sts, gdbroot->pool, &gdbroot->db->subs_lh);
-           sl != &gdbroot->db->subs_lh;
-           sl = pool_Qsucc(&sts, gdbroot->pool, sl)) {
+      for (sl = pool_Qsucc(&sts, gdbroot->pool, &gdbroot->db->subs_lh); sl != &gdbroot->db->subs_lh;
+           sl = pool_Qsucc(&sts, gdbroot->pool, sl))
+      {
         ssrvp = pool_Qitem(sl, sub_sServer, subs_ll);
 
-        if ((k >= page * SHOW_SUBSRV_PAGESIZE)
-            && (k < (page + 1) * SHOW_SUBSRV_PAGESIZE)) {
+        if ((k >= page * SHOW_SUBSRV_PAGESIZE) && (k < (page + 1) * SHOW_SUBSRV_PAGESIZE))
+        {
           /* Subid */
           menu_ptr->value_ptr = (char*)&ssrvp->sid;
           menu_ptr++;
@@ -582,7 +572,8 @@ int RTTSYS_SHOW_SUBSRV(menu_ctx ctx, int event, char* parameter_ptr,
     }
     gdb_ScopeUnlock;
 
-    for (i = l; i < SHOW_SUBSRV_PAGESIZE; i++) {
+    for (i = l; i < SHOW_SUBSRV_PAGESIZE; i++)
+    {
       /* subid */
       menu_ptr->value_ptr = (char*)RTT_ERASE;
       menu_ptr++;
@@ -604,8 +595,8 @@ int RTTSYS_SHOW_SUBSRV(menu_ctx ctx, int event, char* parameter_ptr,
     break;
 
   /**********************************************************
-  *	Exit of the picture
-  ***********************************************************/
+   *	Exit of the picture
+   ***********************************************************/
   case RTT_APPL_EXIT:
     break;
   }
@@ -614,24 +605,23 @@ int RTTSYS_SHOW_SUBSRV(menu_ctx ctx, int event, char* parameter_ptr,
 }
 
 /*************************************************************************
-*
-* Name:		RTTSYS_SHOW_SUBCLI()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	context of the picture.
-* int		event		I 	type of event.
-* char		*parameter_ptr	I	pointer to the parameter which value
-*					has been changed.
-*
-* Description:
-*	Show nethandler subcli.
-*
-**************************************************************************/
+ *
+ * Name:		RTTSYS_SHOW_SUBCLI()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	context of the picture.
+ * int		event		I 	type of event.
+ * char		*parameter_ptr	I	pointer to the parameter which value
+ *					has been changed.
+ *
+ * Description:
+ *	Show nethandler subcli.
+ *
+ **************************************************************************/
 
-int RTTSYS_SHOW_SUBCLI(menu_ctx ctx, int event, char* parameter_ptr,
-    char* objectname, char** picture)
+int RTTSYS_SHOW_SUBCLI(menu_ctx ctx, int event, char* parameter_ptr, char* objectname, char** picture)
 {
 #define SHOW_SUBCLI_PAGESIZE 16
   int sts;
@@ -651,9 +641,10 @@ int RTTSYS_SHOW_SUBCLI(menu_ctx ctx, int event, char* parameter_ptr,
   IF_NOGDH_RETURN;
 
   /**********************************************************
-  *	The value of a parameter is changed.
-  ***********************************************************/
-  switch (event) {
+   *	The value of a parameter is changed.
+   ***********************************************************/
+  switch (event)
+  {
   case RTT_APPL_UPDATE:
 
     menulist = (rtt_t_menu_upd*)ctx->menu;
@@ -664,21 +655,21 @@ int RTTSYS_SHOW_SUBCLI(menu_ctx ctx, int event, char* parameter_ptr,
     remote_cnt = 0;
     gdb_ScopeLock
     {
-      for (nl = pool_Qsucc(&sts, gdbroot->pool, &gdbroot->db->nod_lh);
-           nl != &gdbroot->db->nod_lh;
-           nl = pool_Qsucc(&sts, gdbroot->pool, nl)) {
+      for (nl = pool_Qsucc(&sts, gdbroot->pool, &gdbroot->db->nod_lh); nl != &gdbroot->db->nod_lh;
+           nl = pool_Qsucc(&sts, gdbroot->pool, nl))
+      {
         np = pool_Qitem(nl, gdb_sNode, nod_ll);
-        for (sl = pool_Qsucc(&sts, gdbroot->pool, &np->subc_lh);
-             sl != &np->subc_lh; sl = pool_Qsucc(&sts, gdbroot->pool, sl)) {
+        for (sl = pool_Qsucc(&sts, gdbroot->pool, &np->subc_lh); sl != &np->subc_lh;
+             sl = pool_Qsucc(&sts, gdbroot->pool, sl))
+        {
           sclip = pool_Qitem(sl, sub_sClient, subc_ll);
 
-          if ((k >= page * SHOW_SUBCLI_PAGESIZE)
-              && (k < (page + 1) * SHOW_SUBCLI_PAGESIZE)) {
+          if ((k >= page * SHOW_SUBCLI_PAGESIZE) && (k < (page + 1) * SHOW_SUBCLI_PAGESIZE))
+          {
             /* Subid */
             menu_ptr->value_ptr = (char*)&sclip->sid;
             menu_ptr++;
-            time_AtoAscii(
-                &sclip->lastupdate, time_eFormat_Time, timbuf, sizeof(timbuf));
+            time_AtoAscii(&sclip->lastupdate, time_eFormat_Time, timbuf, sizeof(timbuf));
             strcpy(menu_ptr->value_ptr, timbuf);
             menu_ptr++;
             menu_ptr->value_ptr = (char*)&sclip->count;
@@ -696,11 +687,14 @@ int RTTSYS_SHOW_SUBCLI(menu_ctx ctx, int event, char* parameter_ptr,
             menu_ptr++;
             if (sclip->sub_by_name)
               strcpy(menu_ptr->value_ptr, sclip->name);
-            else {
-              if (sclip->aref.Flags.b.Indirect) {
+            else
+            {
+              if (sclip->aref.Flags.b.Indirect)
+              {
                 strcpy(astr, "@");
                 cdh_ArefToString(&astr[1], sizeof(astr) - 1, &sclip->aref, 1);
-              } else
+              }
+              else
                 cdh_ArefToString(astr, sizeof(astr), &sclip->aref, 1);
               strcpy(menu_ptr->value_ptr, astr);
             }
@@ -715,7 +709,8 @@ int RTTSYS_SHOW_SUBCLI(menu_ctx ctx, int event, char* parameter_ptr,
     }
     gdb_ScopeUnlock;
 
-    for (i = l; i < SHOW_SUBCLI_PAGESIZE; i++) {
+    for (i = l; i < SHOW_SUBCLI_PAGESIZE; i++)
+    {
       /* subid */
       menu_ptr->value_ptr = (char*)RTT_ERASE;
       menu_ptr++;
@@ -739,38 +734,42 @@ int RTTSYS_SHOW_SUBCLI(menu_ctx ctx, int event, char* parameter_ptr,
     return RTT__SUCCESS;
 
   /**********************************************************
-  *	Return address of menu
-  ***********************************************************/
+   *	Return address of menu
+   ***********************************************************/
   case RTT_APPL_PICTURE:
     *picture = (char*)&dtt_systempicture_p25_bg;
     return RTT__SUCCESS;
 
   /**********************************************************
-  *	Previous page
-  ***********************************************************/
+   *	Previous page
+   ***********************************************************/
   case RTT_APPL_MENU:
     *picture = (char*)&dtt_systempicture_p25_eu;
     return RTT__SUCCESS;
 
   /**********************************************************
-  *	Initialization of the picture
-  ***********************************************************/
+   *	Initialization of the picture
+   ***********************************************************/
   /**********************************************************
-  *	Next page
-  ***********************************************************/
+   *	Next page
+   ***********************************************************/
   /**********************************************************
-  *	Previous page
-  ***********************************************************/
+   *	Previous page
+   ***********************************************************/
   case RTT_APPL_INIT:
   case RTT_APPL_NEXTPAGE:
   case RTT_APPL_PREVPAGE:
-    if (event == RTT_APPL_PREVPAGE) {
+    if (event == RTT_APPL_PREVPAGE)
+    {
       page--;
       page = MAX(page, 0);
-    } else if (event == RTT_APPL_NEXTPAGE) {
+    }
+    else if (event == RTT_APPL_NEXTPAGE)
+    {
       page++;
       page = MIN(page, SHOW_SUBCLI_MAXPAGE - 1);
-    } else if (event == RTT_APPL_INIT)
+    }
+    else if (event == RTT_APPL_INIT)
       page = 0;
 
     SHOW_SUBCLI_PAGE = page + 1;
@@ -781,21 +780,21 @@ int RTTSYS_SHOW_SUBCLI(menu_ctx ctx, int event, char* parameter_ptr,
     l = 0;
     gdb_ScopeLock
     {
-      for (nl = pool_Qsucc(&sts, gdbroot->pool, &gdbroot->db->nod_lh);
-           nl != &gdbroot->db->nod_lh;
-           nl = pool_Qsucc(&sts, gdbroot->pool, nl)) {
+      for (nl = pool_Qsucc(&sts, gdbroot->pool, &gdbroot->db->nod_lh); nl != &gdbroot->db->nod_lh;
+           nl = pool_Qsucc(&sts, gdbroot->pool, nl))
+      {
         np = pool_Qitem(nl, gdb_sNode, nod_ll);
-        for (sl = pool_Qsucc(&sts, gdbroot->pool, &np->subc_lh);
-             sl != &np->subc_lh; sl = pool_Qsucc(&sts, gdbroot->pool, sl)) {
+        for (sl = pool_Qsucc(&sts, gdbroot->pool, &np->subc_lh); sl != &np->subc_lh;
+             sl = pool_Qsucc(&sts, gdbroot->pool, sl))
+        {
           sclip = pool_Qitem(sl, sub_sClient, subc_ll);
 
-          if ((k >= page * SHOW_SUBCLI_PAGESIZE)
-              && (k < (page + 1) * SHOW_SUBCLI_PAGESIZE)) {
+          if ((k >= page * SHOW_SUBCLI_PAGESIZE) && (k < (page + 1) * SHOW_SUBCLI_PAGESIZE))
+          {
             /* Subid */
             menu_ptr->value_ptr = (char*)&sclip->sid;
             menu_ptr++;
-            time_AtoAscii(
-                &sclip->lastupdate, time_eFormat_Time, timbuf, sizeof(timbuf));
+            time_AtoAscii(&sclip->lastupdate, time_eFormat_Time, timbuf, sizeof(timbuf));
             strcpy(menu_ptr->value_ptr, timbuf);
             menu_ptr++;
             menu_ptr->value_ptr = (char*)&sclip->count;
@@ -813,11 +812,14 @@ int RTTSYS_SHOW_SUBCLI(menu_ctx ctx, int event, char* parameter_ptr,
             menu_ptr++;
             if (sclip->sub_by_name)
               strcpy(menu_ptr->value_ptr, sclip->name);
-            else {
-              if (sclip->aref.Flags.b.Indirect) {
+            else
+            {
+              if (sclip->aref.Flags.b.Indirect)
+              {
                 strcpy(astr, "@");
                 cdh_ArefToString(&astr[1], sizeof(astr) - 1, &sclip->aref, 1);
-              } else
+              }
+              else
                 cdh_ArefToString(astr, sizeof(astr), &sclip->aref, 1);
               strcpy(menu_ptr->value_ptr, astr);
             }
@@ -830,7 +832,8 @@ int RTTSYS_SHOW_SUBCLI(menu_ctx ctx, int event, char* parameter_ptr,
     }
     gdb_ScopeUnlock;
 
-    for (i = l; i < SHOW_SUBCLI_PAGESIZE; i++) {
+    for (i = l; i < SHOW_SUBCLI_PAGESIZE; i++)
+    {
       /* subid */
       menu_ptr->value_ptr = (char*)RTT_ERASE;
       menu_ptr++;
@@ -850,8 +853,8 @@ int RTTSYS_SHOW_SUBCLI(menu_ctx ctx, int event, char* parameter_ptr,
     break;
 
   /**********************************************************
-  *	Exit of the picture
-  ***********************************************************/
+   *	Exit of the picture
+   ***********************************************************/
   case RTT_APPL_EXIT:
     break;
   }
@@ -860,23 +863,22 @@ int RTTSYS_SHOW_SUBCLI(menu_ctx ctx, int event, char* parameter_ptr,
 }
 
 /*************************************************************************
-*
-* Name:		RTTSYS_SHOW_NODES()
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	context of the picture.
-* int		event		I 	type of event.
-* char		*parameter_ptr	I	pointer to the parameter which value
-*					has been changed.
-*
-* Description:
-*	Show nethandler info.
-*
-**************************************************************************/
+ *
+ * Name:		RTTSYS_SHOW_NODES()
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	context of the picture.
+ * int		event		I 	type of event.
+ * char		*parameter_ptr	I	pointer to the parameter which value
+ *					has been changed.
+ *
+ * Description:
+ *	Show nethandler info.
+ *
+ **************************************************************************/
 
-int RTTSYS_SHOW_NODES(menu_ctx ctx, int event, char* parameter_ptr,
-    char* objectname, char** picture)
+int RTTSYS_SHOW_NODES(menu_ctx ctx, int event, char* parameter_ptr, char* objectname, char** picture)
 {
 #define SHOW_NODES_PAGESIZE 15
   int sts;
@@ -891,9 +893,10 @@ int RTTSYS_SHOW_NODES(menu_ctx ctx, int event, char* parameter_ptr,
   IF_NOGDH_RETURN;
 
   /**********************************************************
-  *	The value of a parameter is changed.
-  ***********************************************************/
-  switch (event) {
+   *	The value of a parameter is changed.
+   ***********************************************************/
+  switch (event)
+  {
   case RTT_APPL_UPDATE:
 
     menulist = (rtt_t_menu_upd*)ctx->menu;
@@ -904,11 +907,11 @@ int RTTSYS_SHOW_NODES(menu_ctx ctx, int event, char* parameter_ptr,
 
     gdb_ScopeLock
     {
-      for (nl = pool_Qsucc(&sts, gdbroot->pool, &gdbroot->db->nod_lh);
-           nl != &gdbroot->db->nod_lh;
-           nl = pool_Qsucc(&sts, gdbroot->pool, nl)) {
-        if ((k >= page * SHOW_NODES_PAGESIZE)
-            && (k < (page + 1) * SHOW_NODES_PAGESIZE)) {
+      for (nl = pool_Qsucc(&sts, gdbroot->pool, &gdbroot->db->nod_lh); nl != &gdbroot->db->nod_lh;
+           nl = pool_Qsucc(&sts, gdbroot->pool, nl))
+      {
+        if ((k >= page * SHOW_NODES_PAGESIZE) && (k < (page + 1) * SHOW_NODES_PAGESIZE))
+        {
           np = pool_Qitem(nl, gdb_sNode, nod_ll);
 
           if (streq(np->name, "******"))
@@ -921,7 +924,8 @@ int RTTSYS_SHOW_NODES(menu_ctx ctx, int event, char* parameter_ptr,
           menu_ptr++;
 
           /* Os */
-          switch (np->os) {
+          switch (np->os)
+          {
           case co_eOS_Lynx:
             strcpy(menu_ptr->value_ptr, "Lynx");
             break;
@@ -945,7 +949,8 @@ int RTTSYS_SHOW_NODES(menu_ctx ctx, int event, char* parameter_ptr,
           }
           menu_ptr++;
           /* Hw */
-          switch (np->hw) {
+          switch (np->hw)
+          {
           case co_eHW_x86:
             strcpy(menu_ptr->value_ptr, "x86");
             break;
@@ -972,7 +977,8 @@ int RTTSYS_SHOW_NODES(menu_ctx ctx, int event, char* parameter_ptr,
           if (np == gdbroot->my_node)
             /* Local node */
             strcpy(menu_ptr->value_ptr, "Local");
-          else {
+          else
+          {
             if (np->flags.b.up)
               strcpy(menu_ptr->value_ptr, "Up");
             else if (np->flags.b.active)
@@ -987,22 +993,25 @@ int RTTSYS_SHOW_NODES(menu_ctx ctx, int event, char* parameter_ptr,
           menu_ptr->value_ptr = (char*)&np->upcnt;
           menu_ptr++;
           /* Timeup */
-          if (np->timeup.tv_sec != 0 || np->timeup.tv_nsec != 0) {
-            time_AtoAscii(
-                &np->timeup, time_eFormat_DateAndTime, timbuf, sizeof(timbuf));
-          } else
+          if (np->timeup.tv_sec != 0 || np->timeup.tv_nsec != 0)
+          {
+            time_AtoAscii(&np->timeup, time_eFormat_DateAndTime, timbuf, sizeof(timbuf));
+          }
+          else
             timbuf[0] = '\0';
           strcpy(menu_ptr->value_ptr, timbuf);
           menu_ptr++;
           /* Sent */
           *(pwr_tInt32*)(menu_ptr->value_ptr) = 0;
-          for (j = 0; j < net_eMsg_; j++) {
+          for (j = 0; j < net_eMsg_; j++)
+          {
             *(pwr_tInt32*)(menu_ptr->value_ptr) += np->txmsg[j];
           }
           menu_ptr++;
           /* Rcvd */
           *(pwr_tInt32*)(menu_ptr->value_ptr) = 0;
-          for (j = 0; j < net_eMsg_; j++) {
+          for (j = 0; j < net_eMsg_; j++)
+          {
             *(pwr_tInt32*)(menu_ptr->value_ptr) += np->rxmsg[j];
           }
           menu_ptr++;
@@ -1013,7 +1022,8 @@ int RTTSYS_SHOW_NODES(menu_ctx ctx, int event, char* parameter_ptr,
     }
     gdb_ScopeUnlock;
 
-    for (i = l; i < SHOW_NODES_PAGESIZE; i++) {
+    for (i = l; i < SHOW_NODES_PAGESIZE; i++)
+    {
       /* Name */
       menu_ptr->value_ptr = (char*)RTT_ERASE;
       menu_ptr++;
@@ -1044,38 +1054,42 @@ int RTTSYS_SHOW_NODES(menu_ctx ctx, int event, char* parameter_ptr,
     return RTT__SUCCESS;
 
   /**********************************************************
-  *	Return address of menu
-  ***********************************************************/
+   *	Return address of menu
+   ***********************************************************/
   case RTT_APPL_PICTURE:
     *picture = (char*)&dtt_systempicture_p4_bg;
     return RTT__SUCCESS;
 
   /**********************************************************
-  *	Previous page
-  ***********************************************************/
+   *	Previous page
+   ***********************************************************/
   case RTT_APPL_MENU:
     *picture = (char*)&dtt_systempicture_p4_eu;
     return RTT__SUCCESS;
 
   /**********************************************************
-  *	Initialization of the picture
-  ***********************************************************/
+   *	Initialization of the picture
+   ***********************************************************/
   /**********************************************************
-  *	Next page
-  ***********************************************************/
+   *	Next page
+   ***********************************************************/
   /**********************************************************
-  *	Previous page
-  ***********************************************************/
+   *	Previous page
+   ***********************************************************/
   case RTT_APPL_INIT:
   case RTT_APPL_NEXTPAGE:
   case RTT_APPL_PREVPAGE:
-    if (event == RTT_APPL_PREVPAGE) {
+    if (event == RTT_APPL_PREVPAGE)
+    {
       page--;
       page = MAX(page, 0);
-    } else if (event == RTT_APPL_NEXTPAGE) {
+    }
+    else if (event == RTT_APPL_NEXTPAGE)
+    {
       page++;
       page = MIN(page, SHOW_NODES_MAXPAGE - 1);
-    } else if (event == RTT_APPL_INIT)
+    }
+    else if (event == RTT_APPL_INIT)
       page = 0;
 
     SHOW_NODES_PAGE = page + 1;
@@ -1088,11 +1102,11 @@ int RTTSYS_SHOW_NODES(menu_ctx ctx, int event, char* parameter_ptr,
 
     gdb_ScopeLock
     {
-      for (nl = pool_Qsucc(&sts, gdbroot->pool, &gdbroot->db->nod_lh);
-           nl != &gdbroot->db->nod_lh;
-           nl = pool_Qsucc(&sts, gdbroot->pool, nl)) {
-        if ((k >= page * SHOW_NODES_PAGESIZE)
-            && (k < (page + 1) * SHOW_NODES_PAGESIZE)) {
+      for (nl = pool_Qsucc(&sts, gdbroot->pool, &gdbroot->db->nod_lh); nl != &gdbroot->db->nod_lh;
+           nl = pool_Qsucc(&sts, gdbroot->pool, nl))
+      {
+        if ((k >= page * SHOW_NODES_PAGESIZE) && (k < (page + 1) * SHOW_NODES_PAGESIZE))
+        {
           np = pool_Qitem(nl, gdb_sNode, nod_ll);
 
           /* Name */
@@ -1102,7 +1116,8 @@ int RTTSYS_SHOW_NODES(menu_ctx ctx, int event, char* parameter_ptr,
           menu_ptr++;
 
           /* Os */
-          switch (np->os) {
+          switch (np->os)
+          {
           case co_eOS_Lynx:
             strcpy(menu_ptr->value_ptr, "Lynx");
             break;
@@ -1126,7 +1141,8 @@ int RTTSYS_SHOW_NODES(menu_ctx ctx, int event, char* parameter_ptr,
           }
           menu_ptr++;
           /* Hw */
-          switch (np->hw) {
+          switch (np->hw)
+          {
           case co_eHW_x86:
             strcpy(menu_ptr->value_ptr, "x86");
             break;
@@ -1153,7 +1169,8 @@ int RTTSYS_SHOW_NODES(menu_ctx ctx, int event, char* parameter_ptr,
           if (np == gdbroot->my_node)
             /* Local node */
             strcpy(menu_ptr->value_ptr, "Local");
-          else {
+          else
+          {
             if (np->flags.b.up)
               strcpy(menu_ptr->value_ptr, "Up");
             else if (np->flags.b.active)
@@ -1168,22 +1185,25 @@ int RTTSYS_SHOW_NODES(menu_ctx ctx, int event, char* parameter_ptr,
           menu_ptr->value_ptr = (char*)&np->upcnt;
           menu_ptr++;
           /* Timeup */
-          if (np->timeup.tv_sec != 0 || np->timeup.tv_nsec != 0) {
-            time_AtoAscii(
-                &np->timeup, time_eFormat_DateAndTime, timbuf, sizeof(timbuf));
-          } else
+          if (np->timeup.tv_sec != 0 || np->timeup.tv_nsec != 0)
+          {
+            time_AtoAscii(&np->timeup, time_eFormat_DateAndTime, timbuf, sizeof(timbuf));
+          }
+          else
             timbuf[0] = '\0';
           strcpy(menu_ptr->value_ptr, timbuf);
           menu_ptr++;
           /* Sent */
           *(pwr_tInt32*)(menu_ptr->value_ptr) = 0;
-          for (j = 0; j < net_eMsg_; j++) {
+          for (j = 0; j < net_eMsg_; j++)
+          {
             *(pwr_tInt32*)(menu_ptr->value_ptr) += np->txmsg[j];
           }
           menu_ptr++;
           /* Rcvd */
           *(pwr_tInt32*)(menu_ptr->value_ptr) = 0;
-          for (j = 0; j < net_eMsg_; j++) {
+          for (j = 0; j < net_eMsg_; j++)
+          {
             *(pwr_tInt32*)(menu_ptr->value_ptr) += np->rxmsg[j];
           }
           menu_ptr++;
@@ -1194,7 +1214,8 @@ int RTTSYS_SHOW_NODES(menu_ctx ctx, int event, char* parameter_ptr,
     }
     gdb_ScopeUnlock;
 
-    for (i = l; i < SHOW_NODES_PAGESIZE; i++) {
+    for (i = l; i < SHOW_NODES_PAGESIZE; i++)
+    {
       /* Name */
       menu_ptr->value_ptr = (char*)RTT_ERASE;
       menu_ptr++;
@@ -1235,8 +1256,8 @@ int RTTSYS_SHOW_NODES(menu_ctx ctx, int event, char* parameter_ptr,
     break;
 
   /**********************************************************
-  *	Exit of the picture
-  ***********************************************************/
+   *	Exit of the picture
+   ***********************************************************/
   case RTT_APPL_EXIT:
     break;
   }
@@ -1245,34 +1266,31 @@ int RTTSYS_SHOW_NODES(menu_ctx ctx, int event, char* parameter_ptr,
 }
 
 /*************************************************************************
-*
-* Name:		RTTSYS_NODE()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	context of the picture.
-* int		event		I 	type of event.
-* char		*parameter_ptr	I	pointer to the parameter which value
-*					has been changed.
-*
-* Description:
-*	Show node info.
-*
-**************************************************************************/
+ *
+ * Name:		RTTSYS_NODE()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	context of the picture.
+ * int		event		I 	type of event.
+ * char		*parameter_ptr	I	pointer to the parameter which value
+ *					has been changed.
+ *
+ * Description:
+ *	Show node info.
+ *
+ **************************************************************************/
 
-static int rttsys_node_start(menu_ctx ctx, pwr_tObjid objid, void* arg1,
-    void* arg2, void* arg3, void* arg4)
+static int rttsys_node_start(menu_ctx ctx, pwr_tObjid objid, void* arg1, void* arg2, void* arg3, void* arg4)
 {
   int sts;
 
-  sts = rtt_menu_new_sysedit(
-      ctx, pwr_cNObjid, (char*)arg1, "", 0, &RTTSYS_NODE);
+  sts = rtt_menu_new_sysedit(ctx, pwr_cNObjid, (char*)arg1, "", 0, &RTTSYS_NODE);
   return sts;
 }
 
-int RTTSYS_NODE(menu_ctx ctx, int event, char* parameter_ptr, char* objectname,
-    char** picture)
+int RTTSYS_NODE(menu_ctx ctx, int event, char* parameter_ptr, char* objectname, char** picture)
 {
   rtt_t_menu_upd* menu_ptr;
   rtt_t_menu_upd* menulist;
@@ -1282,30 +1300,31 @@ int RTTSYS_NODE(menu_ctx ctx, int event, char* parameter_ptr, char* objectname,
   IF_NOGDH_RETURN;
 
   /**********************************************************
-  *	The value of a parameter is changed.
-  ***********************************************************/
-  switch (event) {
+   *	The value of a parameter is changed.
+   ***********************************************************/
+  switch (event)
+  {
   case RTT_APPL_UPDATE:
 
     return RTT__SUCCESS;
 
   /**********************************************************
-  *	Return address of menu
-  ***********************************************************/
+   *	Return address of menu
+   ***********************************************************/
   case RTT_APPL_PICTURE:
     *picture = (char*)&dtt_systempicture_p37_bg;
     return RTT__SUCCESS;
 
   /**********************************************************
-  *	Previous page
-  ***********************************************************/
+   *	Previous page
+   ***********************************************************/
   case RTT_APPL_MENU:
     *picture = (char*)&dtt_systempicture_p37_eu;
     return RTT__SUCCESS;
 
   /**********************************************************
-  *	Initialization of the picture
-  ***********************************************************/
+   *	Initialization of the picture
+   ***********************************************************/
   case RTT_APPL_INIT:
 
     menulist = (rtt_t_menu_upd*)ctx->menu;
@@ -1336,21 +1355,23 @@ int RTTSYS_NODE(menu_ctx ctx, int event, char* parameter_ptr, char* objectname,
     menu_ptr++;
 
     /* rxmsg */
-    for (i = net_eMsg_error; i < net_eMsg_error + 30; i++) {
+    for (i = net_eMsg_error; i < net_eMsg_error + 30; i++)
+    {
       menu_ptr->value_ptr = (char*)&nodep->rxmsg[i];
       menu_ptr++;
     }
 
     /* txmsg */
-    for (i = net_eMsg_error; i < net_eMsg_error + 30; i++) {
+    for (i = net_eMsg_error; i < net_eMsg_error + 30; i++)
+    {
       menu_ptr->value_ptr = (char*)&nodep->txmsg[i];
       menu_ptr++;
     }
     break;
 
   /**********************************************************
-  *	Exit of the picture
-  ***********************************************************/
+   *	Exit of the picture
+   ***********************************************************/
   case RTT_APPL_EXIT:
     break;
   }
@@ -1359,24 +1380,23 @@ int RTTSYS_NODE(menu_ctx ctx, int event, char* parameter_ptr, char* objectname,
 }
 
 /*************************************************************************
-*
-* Name:		RTTSYS_CACHE()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	context of the picture.
-* int		event		I 	type of event.
-* char		*parameter_ptr	I	pointer to the parameter which value
-*					has been changed.
-*
-* Description:
-*	Show cache info.
-*
-**************************************************************************/
+ *
+ * Name:		RTTSYS_CACHE()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	context of the picture.
+ * int		event		I 	type of event.
+ * char		*parameter_ptr	I	pointer to the parameter which value
+ *					has been changed.
+ *
+ * Description:
+ *	Show cache info.
+ *
+ **************************************************************************/
 
-int RTTSYS_CACHE(menu_ctx ctx, int event, char* parameter_ptr, char* objectname,
-    char** picture)
+int RTTSYS_CACHE(menu_ctx ctx, int event, char* parameter_ptr, char* objectname, char** picture)
 {
   rtt_t_menu_upd* menu_ptr;
   rtt_t_menu_upd* menulist;
@@ -1384,30 +1404,31 @@ int RTTSYS_CACHE(menu_ctx ctx, int event, char* parameter_ptr, char* objectname,
   IF_NOGDH_RETURN;
 
   /**********************************************************
-  *	The value of a parameter is changed.
-  ***********************************************************/
-  switch (event) {
+   *	The value of a parameter is changed.
+   ***********************************************************/
+  switch (event)
+  {
   case RTT_APPL_UPDATE:
 
     return RTT__SUCCESS;
 
   /**********************************************************
-  *	Return address of menu
-  ***********************************************************/
+   *	Return address of menu
+   ***********************************************************/
   case RTT_APPL_PICTURE:
     *picture = (char*)&dtt_systempicture_p50_bg;
     return RTT__SUCCESS;
 
   /**********************************************************
-  *	Previous page
-  ***********************************************************/
+   *	Previous page
+   ***********************************************************/
   case RTT_APPL_MENU:
     *picture = (char*)&dtt_systempicture_p50_eu;
     return RTT__SUCCESS;
 
   /**********************************************************
-  *	Initialization of the picture
-  ***********************************************************/
+   *	Initialization of the picture
+   ***********************************************************/
   case RTT_APPL_INIT:
 
     menulist = (rtt_t_menu_upd*)ctx->menu;
@@ -1464,8 +1485,8 @@ int RTTSYS_CACHE(menu_ctx ctx, int event, char* parameter_ptr, char* objectname,
     break;
 
   /**********************************************************
-  *	Exit of the picture
-  ***********************************************************/
+   *	Exit of the picture
+   ***********************************************************/
   case RTT_APPL_EXIT:
     break;
   }
@@ -1474,24 +1495,23 @@ int RTTSYS_CACHE(menu_ctx ctx, int event, char* parameter_ptr, char* objectname,
 }
 
 /*************************************************************************
-*
-* Name:		RTTSYS_PID()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	context of the picture.
-* int		event		I 	type of event.
-* char		*parameter_ptr	I	pointer to the parameter which value
-*					has been changed.
-*
-* Description:
-*	Object picture for a Pid.
-*
-**************************************************************************/
+ *
+ * Name:		RTTSYS_PID()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	context of the picture.
+ * int		event		I 	type of event.
+ * char		*parameter_ptr	I	pointer to the parameter which value
+ *					has been changed.
+ *
+ * Description:
+ *	Object picture for a Pid.
+ *
+ **************************************************************************/
 
-int RTTSYS_OBJECT_PID(menu_ctx ctx, int event, char* parameter_ptr,
-    char* objectname, char** picture)
+int RTTSYS_OBJECT_PID(menu_ctx ctx, int event, char* parameter_ptr, char* objectname, char** picture)
 {
   int sts;
   rtt_t_menu_upd* menu_ptr;
@@ -1511,12 +1531,14 @@ int RTTSYS_OBJECT_PID(menu_ctx ctx, int event, char* parameter_ptr,
   IF_NOGDH_RETURN;
 
   /**********************************************************
-  *	Return address to menu
-  ***********************************************************/
-  if (event == RTT_APPL_MENU) {
+   *	Return address to menu
+   ***********************************************************/
+  if (event == RTT_APPL_MENU)
+  {
     /* Check object first */
     sts = gdh_NameToObjid(objectname, &objid);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       rtt_message('E', "Node is down");
       return RTT__NOPICTURE;
     }
@@ -1528,28 +1550,32 @@ int RTTSYS_OBJECT_PID(menu_ctx ctx, int event, char* parameter_ptr,
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Return address of background
-  ***********************************************************/
-  if (event == RTT_APPL_PICTURE) {
+   *	Return address of background
+   ***********************************************************/
+  if (event == RTT_APPL_PICTURE)
+  {
     *picture = (char*)&dtt_systempicture_p8_bg;
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Previous page
-  ***********************************************************/
-  if (event == RTT_APPL_PREVPAGE) {
+   *	Previous page
+   ***********************************************************/
+  if (event == RTT_APPL_PREVPAGE)
+  {
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Next page
-  ***********************************************************/
-  if (event == RTT_APPL_NEXTPAGE) {
+   *	Next page
+   ***********************************************************/
+  if (event == RTT_APPL_NEXTPAGE)
+  {
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Initialization of the picture
-  ***********************************************************/
-  if (event == RTT_APPL_INIT) {
+   *	Initialization of the picture
+   ***********************************************************/
+  if (event == RTT_APPL_INIT)
+  {
     /* Get the object */
     sts = gdh_NameToObjid(objectname, &objid);
     if (EVEN(sts))
@@ -1558,27 +1584,31 @@ int RTTSYS_OBJECT_PID(menu_ctx ctx, int event, char* parameter_ptr,
     if (EVEN(sts))
       return sts;
 
-    sts = gdh_RefObjectInfo(objectname, (pwr_tAddress*)&object_ptr, &pid_subid,
-        sizeof(pwr_sClass_pid));
+    sts = gdh_RefObjectInfo(objectname, (pwr_tAddress*)&object_ptr, &pid_subid, sizeof(pwr_sClass_pid));
     if (EVEN(sts))
       return sts;
 
     strcpy(parametername, objectname);
     strcat(parametername, ".ModeObjDId");
     sts = gdh_GetObjectInfo(parametername, &mode_objid, sizeof(mode_objid));
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       sts = gdh_ObjidToName(mode_objid, modename, sizeof(modename), cdh_mNName);
-      if (ODD(sts)) {
+      if (ODD(sts))
+      {
         mode_found = 1;
-        sts = gdh_RefObjectInfo(modename, (pwr_tAddress*)&mode_ptr, &mode_subid,
-            sizeof(pwr_sClass_mode));
+        sts = gdh_RefObjectInfo(modename, (pwr_tAddress*)&mode_ptr, &mode_subid, sizeof(pwr_sClass_mode));
         if (EVEN(sts))
           return sts;
-      } else {
+      }
+      else
+      {
         mode_found = 0;
         mode_subid = pwr_cNDlid;
       }
-    } else {
+    }
+    else
+    {
       mode_found = 0;
       mode_subid = pwr_cNDlid;
     }
@@ -1613,25 +1643,29 @@ int RTTSYS_OBJECT_PID(menu_ctx ctx, int event, char* parameter_ptr,
     menu_ptr++;
 
     /* Op SetVal */
-    if (mode_found) {
+    if (mode_found)
+    {
       strcpy(menu_ptr->parameter_name, modename);
       strcat(menu_ptr->parameter_name, ".SetVal");
       menu_ptr->value_ptr = (char*)&mode_ptr->SetVal;
       menu_ptr->database = RTT_DATABASE_GDH;
       menu_ptr->minlimit = mode_ptr->MinSet;
       menu_ptr->maxlimit = mode_ptr->MaxSet;
-    } else
+    }
+    else
       menu_ptr->value_ptr = (char*)RTT_ERASE;
     menu_ptr++;
     /* Op OutVal */
-    if (mode_found) {
+    if (mode_found)
+    {
       strcpy(menu_ptr->parameter_name, modename);
       strcat(menu_ptr->parameter_name, ".ForcVal");
       menu_ptr->value_ptr = (char*)&mode_ptr->ForcVal;
       menu_ptr->database = RTT_DATABASE_GDH;
       menu_ptr->minlimit = mode_ptr->MinOut;
       menu_ptr->maxlimit = mode_ptr->MaxOut;
-    } else
+    }
+    else
       menu_ptr->value_ptr = (char*)RTT_ERASE;
     menu_ptr++;
     /* Bias */
@@ -1642,14 +1676,16 @@ int RTTSYS_OBJECT_PID(menu_ctx ctx, int event, char* parameter_ptr,
     menu_ptr++;
 
     /* OpMode in the mode object */
-    if (mode_found) {
+    if (mode_found)
+    {
       if (mode_ptr->AutMode)
         strcpy(menu_ptr->value_ptr, "Auto");
       else if (mode_ptr->CascMod)
         strcpy(menu_ptr->value_ptr, "Casc");
       else
         strcpy(menu_ptr->value_ptr, "Man ");
-    } else
+    }
+    else
       strcpy(menu_ptr->value_ptr, "");
     menu_ptr++;
 
@@ -1741,7 +1777,8 @@ int RTTSYS_OBJECT_PID(menu_ctx ctx, int event, char* parameter_ptr,
     menu_ptr->value_ptr = (char*)&object_ptr->Force;
     menu_ptr++;
     /* PidAlg */
-    switch (object_ptr->PidAlg) {
+    switch (object_ptr->PidAlg)
+    {
     case 1:
       strcpy(menu_ptr->value_ptr, "I");
       break;
@@ -1781,84 +1818,109 @@ int RTTSYS_OBJECT_PID(menu_ctx ctx, int event, char* parameter_ptr,
     menu_ptr++;
     /* Object Name */
     strcpy(menu_ptr->value_ptr, namebuf);
-
   }
   /**********************************************************
-  *	Exit of the picture
-  ***********************************************************/
-  else if (event == RTT_APPL_EXIT) {
+   *	Exit of the picture
+   ***********************************************************/
+  else if (event == RTT_APPL_EXIT)
+  {
     sts = gdh_UnrefObjectInfo(pid_subid);
-    if (memcmp(&mode_subid, &pwr_cNDlid, sizeof(pwr_cNDlid))) {
+    if (memcmp(&mode_subid, &pwr_cNDlid, sizeof(pwr_cNDlid)))
+    {
       sts = gdh_UnrefObjectInfo(mode_subid);
     }
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	The value of a parameter is changed.
-  ***********************************************************/
-  else if (event == RTT_APPL_VALUECHANGED) {
-    if (parameter_ptr == (char*)&PID_OBJECT_SETMAN) {
-      if (mode_ptr->AccMod & 1) {
+   *	The value of a parameter is changed.
+   ***********************************************************/
+  else if (event == RTT_APPL_VALUECHANGED)
+  {
+    if (parameter_ptr == (char*)&PID_OBJECT_SETMAN)
+    {
+      if (mode_ptr->AccMod & 1)
+      {
         menu_ptr = (rtt_t_menu_upd*)ctx->menu;
-        while (menu_ptr->text[0] != '\0') {
-          if (menu_ptr->value_ptr == parameter_ptr) {
+        while (menu_ptr->text[0] != '\0')
+        {
+          if (menu_ptr->value_ptr == parameter_ptr)
+          {
             value = 1;
-            sts = gdh_SetObjectInfo(
-                menu_ptr->parameter_name, &value, sizeof(value));
+            sts = gdh_SetObjectInfo(menu_ptr->parameter_name, &value, sizeof(value));
             if (EVEN(sts))
               rtt_message('E', "Unable to set mode");
             break;
           }
           menu_ptr++;
         }
-      } else
+      }
+      else
         rtt_message('E', "Man is not defined for this PID");
-    } else if (parameter_ptr == (char*)&PID_OBJECT_SETAUTO) {
-      if (mode_ptr->AccMod & 2) {
+    }
+    else if (parameter_ptr == (char*)&PID_OBJECT_SETAUTO)
+    {
+      if (mode_ptr->AccMod & 2)
+      {
         menu_ptr = (rtt_t_menu_upd*)ctx->menu;
-        while (menu_ptr->text[0] != '\0') {
-          if (menu_ptr->value_ptr == parameter_ptr) {
+        while (menu_ptr->text[0] != '\0')
+        {
+          if (menu_ptr->value_ptr == parameter_ptr)
+          {
             value = 2;
-            sts = gdh_SetObjectInfo(
-                menu_ptr->parameter_name, &value, sizeof(value));
+            sts = gdh_SetObjectInfo(menu_ptr->parameter_name, &value, sizeof(value));
             if (EVEN(sts))
               rtt_message('E', "Unable to set mode");
             break;
           }
           menu_ptr++;
         }
-      } else
+      }
+      else
         rtt_message('E', "Auto is not defined for this PID");
-    } else if (parameter_ptr == (char*)&PID_OBJECT_SETCASC) {
-      if (mode_ptr->AccMod & 4) {
+    }
+    else if (parameter_ptr == (char*)&PID_OBJECT_SETCASC)
+    {
+      if (mode_ptr->AccMod & 4)
+      {
         menu_ptr = (rtt_t_menu_upd*)ctx->menu;
-        while (menu_ptr->text[0] != '\0') {
-          if (menu_ptr->value_ptr == parameter_ptr) {
+        while (menu_ptr->text[0] != '\0')
+        {
+          if (menu_ptr->value_ptr == parameter_ptr)
+          {
             value = 4;
-            sts = gdh_SetObjectInfo(
-                menu_ptr->parameter_name, &value, sizeof(value));
+            sts = gdh_SetObjectInfo(menu_ptr->parameter_name, &value, sizeof(value));
             if (EVEN(sts))
               rtt_message('E', "Unable to set mode");
             break;
           }
           menu_ptr++;
         }
-      } else
+      }
+      else
         rtt_message('E', "Casc is not defined for this PID");
-    } else if (parameter_ptr == (char*)&object_ptr->SetMinShow) {
+    }
+    else if (parameter_ptr == (char*)&object_ptr->SetMinShow)
+    {
       ctx->update_init = 1;
-    } else if (parameter_ptr == (char*)&object_ptr->SetMaxShow) {
+    }
+    else if (parameter_ptr == (char*)&object_ptr->SetMaxShow)
+    {
       ctx->update_init = 1;
-    } else if (parameter_ptr == (char*)&object_ptr->OutMinShow) {
+    }
+    else if (parameter_ptr == (char*)&object_ptr->OutMinShow)
+    {
       ctx->update_init = 1;
-    } else if (parameter_ptr == (char*)&object_ptr->OutMaxShow) {
+    }
+    else if (parameter_ptr == (char*)&object_ptr->OutMaxShow)
+    {
       ctx->update_init = 1;
     }
   }
   /**********************************************************
-  *	The value of a parameter is changed.
-  ***********************************************************/
-  else if (event == RTT_APPL_UPDATE) {
+   *	The value of a parameter is changed.
+   ***********************************************************/
+  else if (event == RTT_APPL_UPDATE)
+  {
     menulist = (rtt_t_menu_upd*)ctx->menu;
     menu_ptr = menulist;
 
@@ -1883,33 +1945,38 @@ int RTTSYS_OBJECT_PID(menu_ctx ctx, int event, char* parameter_ptr,
       menu_ptr->maxlimit = 100;
     menu_ptr++;
     /* Op SetVal */
-    if (mode_found) {
+    if (mode_found)
+    {
       menu_ptr->minlimit = mode_ptr->MinSet;
       menu_ptr->maxlimit = mode_ptr->MaxSet;
     }
     menu_ptr++;
     /* Op OutVal */
-    if (mode_found) {
+    if (mode_found)
+    {
       menu_ptr->minlimit = mode_ptr->MinOut;
       menu_ptr->maxlimit = mode_ptr->MaxOut;
     }
     menu_ptr++;
     menu_ptr++;
     /* OpMode in the mode object */
-    if (mode_found) {
+    if (mode_found)
+    {
       if (mode_ptr->AutMode)
         strcpy(menu_ptr->value_ptr, "Auto");
       else if (mode_ptr->CascMod)
         strcpy(menu_ptr->value_ptr, "Casc");
       else
         strcpy(menu_ptr->value_ptr, "Man ");
-    } else
+    }
+    else
       strcpy(menu_ptr->value_ptr, "");
     menu_ptr++;
 
     menu_ptr += 17;
     /* PidAlg */
-    switch (object_ptr->PidAlg) {
+    switch (object_ptr->PidAlg)
+    {
     case 1:
       strcpy(menu_ptr->value_ptr, "I");
       break;
@@ -1952,24 +2019,23 @@ int RTTSYS_OBJECT_PID(menu_ctx ctx, int event, char* parameter_ptr,
 }
 
 /*************************************************************************
-*
-* Name:		RTTSYS_OBJECT_AV()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	context of the picture.
-* int		event		I 	type of event.
-* char		*parameter_ptr	I	pointer to the parameter which value
-*					has been changed.
-*
-* Description:
-*	Object picture for a Av.
-*
-**************************************************************************/
+ *
+ * Name:		RTTSYS_OBJECT_AV()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	context of the picture.
+ * int		event		I 	type of event.
+ * char		*parameter_ptr	I	pointer to the parameter which value
+ *					has been changed.
+ *
+ * Description:
+ *	Object picture for a Av.
+ *
+ **************************************************************************/
 
-int RTTSYS_OBJECT_AV(menu_ctx ctx, int event, char* parameter_ptr,
-    char* objectname, char** picture)
+int RTTSYS_OBJECT_AV(menu_ctx ctx, int event, char* parameter_ptr, char* objectname, char** picture)
 {
   int sts;
   rtt_t_menu_upd* menu_ptr;
@@ -1983,12 +2049,14 @@ int RTTSYS_OBJECT_AV(menu_ctx ctx, int event, char* parameter_ptr,
   pwr_tFloat32* actval_ptr;
 
   /**********************************************************
-  *	Return address to menu
-  ***********************************************************/
-  if (event == RTT_APPL_MENU) {
+   *	Return address to menu
+   ***********************************************************/
+  if (event == RTT_APPL_MENU)
+  {
     /* Check object first */
     sts = gdh_NameToObjid(objectname, &objid);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       rtt_message('E', "Node is down");
       return RTT__NOPICTURE;
     }
@@ -2000,28 +2068,32 @@ int RTTSYS_OBJECT_AV(menu_ctx ctx, int event, char* parameter_ptr,
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Return address of background
-  ***********************************************************/
-  if (event == RTT_APPL_PICTURE) {
+   *	Return address of background
+   ***********************************************************/
+  if (event == RTT_APPL_PICTURE)
+  {
     *picture = (char*)&dtt_systempicture_p10_bg;
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Previous page
-  ***********************************************************/
-  if (event == RTT_APPL_PREVPAGE) {
+   *	Previous page
+   ***********************************************************/
+  if (event == RTT_APPL_PREVPAGE)
+  {
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Next page
-  ***********************************************************/
-  if (event == RTT_APPL_NEXTPAGE) {
+   *	Next page
+   ***********************************************************/
+  if (event == RTT_APPL_NEXTPAGE)
+  {
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Initialization of the picture
-  ***********************************************************/
-  if (event == RTT_APPL_INIT) {
+   *	Initialization of the picture
+   ***********************************************************/
+  if (event == RTT_APPL_INIT)
+  {
     /* Get the object */
     sts = gdh_NameToObjid(objectname, &objid);
     if (EVEN(sts))
@@ -2030,14 +2102,13 @@ int RTTSYS_OBJECT_AV(menu_ctx ctx, int event, char* parameter_ptr,
     if (EVEN(sts))
       return sts;
 
-    sts = gdh_RefObjectInfo(objectname, (pwr_tAddress*)&object_ptr, &av_subid,
-        sizeof(pwr_sClass_Av));
+    sts = gdh_RefObjectInfo(objectname, (pwr_tAddress*)&object_ptr, &av_subid, sizeof(pwr_sClass_Av));
     if (EVEN(sts))
       return sts;
     strcpy(parameter_name, namebuf);
     strcat(parameter_name, ".ActualValue");
-    sts = gdh_RefObjectInfo(parameter_name, (pwr_tAddress*)&actval_ptr,
-        &av_actval_subid, sizeof(*actval_ptr));
+    sts =
+        gdh_RefObjectInfo(parameter_name, (pwr_tAddress*)&actval_ptr, &av_actval_subid, sizeof(*actval_ptr));
     if (EVEN(sts))
       return sts;
 
@@ -2061,48 +2132,49 @@ int RTTSYS_OBJECT_AV(menu_ctx ctx, int event, char* parameter_ptr,
     menu_ptr->value_ptr = object_ptr->Unit;
     strcpy(menu_ptr->parameter_name, namebuf);
     strcat(menu_ptr->parameter_name, ".Unit");
-
   }
   /**********************************************************
-  *	Exit of the picture
-  ***********************************************************/
-  else if (event == RTT_APPL_EXIT) {
+   *	Exit of the picture
+   ***********************************************************/
+  else if (event == RTT_APPL_EXIT)
+  {
     sts = gdh_UnrefObjectInfo(av_subid);
     sts = gdh_UnrefObjectInfo(av_actval_subid);
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	The value of a parameter is changed.
-  ***********************************************************/
-  else if (event == RTT_APPL_UPDATE) {
+   *	The value of a parameter is changed.
+   ***********************************************************/
+  else if (event == RTT_APPL_UPDATE)
+  {
   }
 
   return RTT__SUCCESS;
 }
 
 /*************************************************************************
-*
-* Name:		RTTSYS_GRAFCET()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	context of the picture.
-* int		event		I 	type of event.
-* char		*parameter_ptr	I	pointer to the parameter which value
-*					has been changed.
-*
-* Description:
-*	Show nethandler info.
-*
-**************************************************************************/
+ *
+ * Name:		RTTSYS_GRAFCET()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	context of the picture.
+ * int		event		I 	type of event.
+ * char		*parameter_ptr	I	pointer to the parameter which value
+ *					has been changed.
+ *
+ * Description:
+ *	Show nethandler info.
+ *
+ **************************************************************************/
 
 #define GRAFCET_PAGESIZE 20
 
 static int rttsys_plclist_cmp(const void* p1, const void* p2)
 {
-  char* str1 = ((rttsys_t_plcpgm_list*) p1)->name;
-  char* str2 = ((rttsys_t_plcpgm_list*) p2)->name;
+  char* str1 = ((rttsys_t_plcpgm_list*)p1)->name;
+  char* str2 = ((rttsys_t_plcpgm_list*)p2)->name;
   if (*str2 == 0)
     return 0;
   return strcmp(str1, str2);
@@ -2110,8 +2182,8 @@ static int rttsys_plclist_cmp(const void* p1, const void* p2)
 
 static int rttsys_steplist_cmp(const void* p1, const void* p2)
 {
-  char* str1 = ((rttsys_t_step_list*) p1)->name;
-  char* str2 = ((rttsys_t_step_list*) p2)->name;
+  char* str1 = ((rttsys_t_step_list*)p1)->name;
+  char* str2 = ((rttsys_t_step_list*)p2)->name;
   if (*str2 == 0)
     return 0;
   return strcmp(str1, str2);
@@ -2125,7 +2197,8 @@ static int rttsys_get_plcpgm(pwr_tObjid initstep_objid, pwr_tObjid* plc_objid)
 
   parent_class = 0;
   parent_objid = initstep_objid;
-  while (parent_class != pwr_cClass_plc) {
+  while (parent_class != pwr_cClass_plc)
+  {
     sts = gdh_GetParent(parent_objid, &parent_objid);
     if (EVEN(sts))
       return sts;
@@ -2138,24 +2211,25 @@ static int rttsys_get_plcpgm(pwr_tObjid initstep_objid, pwr_tObjid* plc_objid)
   return RTT__SUCCESS;
 }
 
-static int rttsys_plclist_add(pwr_tObjid plc_objid,
-    rttsys_t_plcpgm_list** plclist, int* plclist_count, int* alloc)
+static int rttsys_plclist_add(pwr_tObjid plc_objid, rttsys_t_plcpgm_list** plclist, int* plclist_count,
+                              int* alloc)
 {
   rttsys_t_plcpgm_list* plclist_ptr;
   rttsys_t_plcpgm_list* new_plclist;
 
-  if (*plclist_count == 0) {
+  if (*plclist_count == 0)
+  {
     *plclist = calloc(RTTSYS_PLCALLOC, sizeof(rttsys_t_plcpgm_list));
     if (*plclist == 0)
       return RTT__NOMEMORY;
     *alloc = RTTSYS_PLCALLOC;
-  } else if (*alloc <= *plclist_count) {
-    new_plclist
-        = calloc(*alloc + RTTSYS_PLCALLOC, sizeof(rttsys_t_plcpgm_list));
+  }
+  else if (*alloc <= *plclist_count)
+  {
+    new_plclist = calloc(*alloc + RTTSYS_PLCALLOC, sizeof(rttsys_t_plcpgm_list));
     if (new_plclist == 0)
       return RTT__NOMEMORY;
-    memcpy(
-        new_plclist, *plclist, *plclist_count * sizeof(rttsys_t_plcpgm_list));
+    memcpy(new_plclist, *plclist, *plclist_count * sizeof(rttsys_t_plcpgm_list));
     free(*plclist);
     *plclist = new_plclist;
     (*alloc) += RTTSYS_PLCALLOC;
@@ -2166,25 +2240,26 @@ static int rttsys_plclist_add(pwr_tObjid plc_objid,
   return RTT__SUCCESS;
 }
 
-static int rttsys_initsteplist_add(pwr_tObjid initstep_objid,
-    rttsys_t_step_list** initsteplist, int* initsteplist_count)
+static int rttsys_initsteplist_add(pwr_tObjid initstep_objid, rttsys_t_step_list** initsteplist,
+                                   int* initsteplist_count)
 {
   rttsys_t_step_list* initsteplist_ptr;
   rttsys_t_step_list* new_initsteplist;
 
-  if (*initsteplist_count == 0) {
+  if (*initsteplist_count == 0)
+  {
     *initsteplist = calloc(1, sizeof(rttsys_t_step_list));
     if (*initsteplist == 0)
       return RTT__NOMEMORY;
-  } else {
+  }
+  else
+  {
     /*	    *menulist = realloc( *menulist, (index + 2) * sizeof(rtt_t_menu));
-    */
-    new_initsteplist
-        = calloc(*initsteplist_count + 1, sizeof(rttsys_t_step_list));
+     */
+    new_initsteplist = calloc(*initsteplist_count + 1, sizeof(rttsys_t_step_list));
     if (new_initsteplist == 0)
       return RTT__NOMEMORY;
-    memcpy(new_initsteplist, *initsteplist,
-        *initsteplist_count * sizeof(rttsys_t_step_list));
+    memcpy(new_initsteplist, *initsteplist, *initsteplist_count * sizeof(rttsys_t_step_list));
     free(*initsteplist);
     *initsteplist = new_initsteplist;
   }
@@ -2194,24 +2269,26 @@ static int rttsys_initsteplist_add(pwr_tObjid initstep_objid,
   return RTT__SUCCESS;
 }
 
-static int rttsys_grafcet_select(menu_ctx ctx, pwr_tObjid dummyoi, void* dummy1,
-    void* dummy2, void* dummy3, void* dummy4)
+static int rttsys_grafcet_select(menu_ctx ctx, pwr_tObjid dummyoi, void* dummy1, void* dummy2, void* dummy3,
+                                 void* dummy4)
 {
   rttsys_t_plcpgm_list* plclist_ptr;
   rtt_t_menu_upd* menu_ptr;
 
   /* Get the selected object */
-  if (ctx->current_item + (GRAFCET_PAGE - 1) * GRAFCET_PAGESIZE
-      > plclist_count - 1)
+  if (ctx->current_item + (GRAFCET_PAGE - 1) * GRAFCET_PAGESIZE > plclist_count - 1)
     return RTT__NOPICTURE;
 
   menu_ptr = (rtt_t_menu_upd*)ctx->menu;
   menu_ptr += ctx->current_item;
   plclist_ptr = plclist + grafcet_page * GRAFCET_PAGESIZE + ctx->current_item;
-  if (plclist_ptr->selected) {
+  if (plclist_ptr->selected)
+  {
     plclist_ptr->selected = 0;
     strcpy(menu_ptr->output_text, "");
-  } else {
+  }
+  else
+  {
     plclist_ptr->selected = 1;
     strcpy(menu_ptr->output_text, "!");
   }
@@ -2221,8 +2298,7 @@ static int rttsys_grafcet_select(menu_ctx ctx, pwr_tObjid dummyoi, void* dummy1,
   return RTT__NOPICTURE;
 }
 
-int RTTSYS_GRAFCET(menu_ctx ctx, int event, char* parameter_ptr,
-    char* objectname, char** picture)
+int RTTSYS_GRAFCET(menu_ctx ctx, int event, char* parameter_ptr, char* objectname, char** picture)
 {
   int sts;
   rtt_t_menu_upd* menu_ptr;
@@ -2243,23 +2319,26 @@ int RTTSYS_GRAFCET(menu_ctx ctx, int event, char* parameter_ptr,
   IF_NOGDH_RETURN;
 
   /**********************************************************
-  *	Return address of menu
-  ***********************************************************/
-  if (event == RTT_APPL_PICTURE) {
+   *	Return address of menu
+   ***********************************************************/
+  if (event == RTT_APPL_PICTURE)
+  {
     *picture = (char*)&dtt_systempicture_p11_bg;
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Previous page
-  ***********************************************************/
-  if (event == RTT_APPL_MENU) {
+   *	Previous page
+   ***********************************************************/
+  if (event == RTT_APPL_MENU)
+  {
     *picture = (char*)&dtt_systempicture_p11_eu;
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Previous page
-  ***********************************************************/
-  if (event == RTT_APPL_PREVPAGE) {
+   *	Previous page
+   ***********************************************************/
+  if (event == RTT_APPL_PREVPAGE)
+  {
     grafcet_page--;
     grafcet_page = MAX(grafcet_page, 0);
     GRAFCET_PAGE = grafcet_page + 1;
@@ -2267,14 +2346,20 @@ int RTTSYS_GRAFCET(menu_ctx ctx, int event, char* parameter_ptr,
     menu_ptr = menulist;
     plclist_ptr = plclist + grafcet_page * GRAFCET_PAGESIZE;
     plccount = grafcet_page * GRAFCET_PAGESIZE;
-    for (i = 0; i < GRAFCET_PAGESIZE; i++) {
-      if (plccount < plclist_count) {
-        if (plclist_ptr->selected) {
+    for (i = 0; i < GRAFCET_PAGESIZE; i++)
+    {
+      if (plccount < plclist_count)
+      {
+        if (plclist_ptr->selected)
+        {
           strcpy(menu_ptr->output_text, "!");
-        } else {
+        }
+        else
+        {
           strcpy(menu_ptr->output_text, "");
         }
-      } else
+      }
+      else
         strcpy(menu_ptr->output_text, "");
       menu_ptr++;
       plclist_ptr++;
@@ -2288,9 +2373,10 @@ int RTTSYS_GRAFCET(menu_ctx ctx, int event, char* parameter_ptr,
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Next page
-  ***********************************************************/
-  if (event == RTT_APPL_NEXTPAGE) {
+   *	Next page
+   ***********************************************************/
+  if (event == RTT_APPL_NEXTPAGE)
+  {
     grafcet_page++;
     grafcet_page = MIN(grafcet_page, GRAFCET_MAXPAGE - 1);
     GRAFCET_PAGE = grafcet_page + 1;
@@ -2298,14 +2384,20 @@ int RTTSYS_GRAFCET(menu_ctx ctx, int event, char* parameter_ptr,
     menu_ptr = menulist;
     plclist_ptr = plclist + grafcet_page * GRAFCET_PAGESIZE;
     plccount = grafcet_page * GRAFCET_PAGESIZE;
-    for (i = 0; i < GRAFCET_PAGESIZE; i++) {
-      if (plccount < plclist_count) {
-        if (plclist_ptr->selected) {
+    for (i = 0; i < GRAFCET_PAGESIZE; i++)
+    {
+      if (plccount < plclist_count)
+      {
+        if (plclist_ptr->selected)
+        {
           strcpy(menu_ptr->output_text, "!");
-        } else {
+        }
+        else
+        {
           strcpy(menu_ptr->output_text, "");
         }
-      } else
+      }
+      else
         strcpy(menu_ptr->output_text, "");
       menu_ptr++;
       plclist_ptr++;
@@ -2319,16 +2411,18 @@ int RTTSYS_GRAFCET(menu_ctx ctx, int event, char* parameter_ptr,
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Initialization of the picture
-  ***********************************************************/
-  if (event == RTT_APPL_INIT) {
+   *	Initialization of the picture
+   ***********************************************************/
+  if (event == RTT_APPL_INIT)
+  {
     plclist_count = 0;
     grafcet_page = 0;
     GRAFCET_PAGE = grafcet_page + 1;
 
     /* Get all initsteps of this node */
     sts = gdh_GetClassList(pwr_cClass_initstep, &initstep_objid);
-    while (ODD(sts)) {
+    while (ODD(sts))
+    {
       /* Get the plcpgm of this step */
       sts = rttsys_get_plcpgm(initstep_objid, &plc_objid);
       if (EVEN(sts))
@@ -2336,33 +2430,32 @@ int RTTSYS_GRAFCET(menu_ctx ctx, int event, char* parameter_ptr,
 
       plclist_ptr = plclist;
       found = 0;
-      for (i = 0; i < plclist_count; i++) {
-        if (cdh_ObjidIsEqual(plclist_ptr->objid, plc_objid)) {
+      for (i = 0; i < plclist_count; i++)
+      {
+        if (cdh_ObjidIsEqual(plclist_ptr->objid, plc_objid))
+        {
           found = 1;
           break;
         }
       }
 
-      if (!found) {
+      if (!found)
+      {
         /* Store this plc */
         rttsys_plclist_add(plc_objid, &plclist, &plclist_count, &plc_alloc);
         plclist_ptr = plclist + plclist_count - 1;
       }
 
-      sts = gdh_ObjidToName(
-          plclist_ptr->objid, namebuf, sizeof(namebuf), cdh_mNName);
+      sts = gdh_ObjidToName(plclist_ptr->objid, namebuf, sizeof(namebuf), cdh_mNName);
       if (EVEN(sts))
         return sts;
       strcpy(plclist_ptr->name, namebuf);
 
       /* Store and direct link the initstep */
-      rttsys_initsteplist_add(initstep_objid, &plclist_ptr->initsteps,
-          &plclist_ptr->initstep_count);
-      initsteplist_ptr
-          = plclist_ptr->initsteps + plclist_ptr->initstep_count - 1;
+      rttsys_initsteplist_add(initstep_objid, &plclist_ptr->initsteps, &plclist_ptr->initstep_count);
+      initsteplist_ptr = plclist_ptr->initsteps + plclist_ptr->initstep_count - 1;
 
-      sts = gdh_ObjidToName(
-          initstep_objid, namebuf, sizeof(namebuf), cdh_mNName);
+      sts = gdh_ObjidToName(initstep_objid, namebuf, sizeof(namebuf), cdh_mNName);
       if (EVEN(sts))
         return sts;
 
@@ -2373,9 +2466,8 @@ int RTTSYS_GRAFCET(menu_ctx ctx, int event, char* parameter_ptr,
         return sts;
 
       attrref.Objid = initstep_objid;
-      sts = gdh_DLRefObjectInfoAttrref(&attrref,
-          (pwr_tAddress*)&initsteplist_ptr->value_ptr,
-          &initsteplist_ptr->subid);
+      sts = gdh_DLRefObjectInfoAttrref(&attrref, (pwr_tAddress*)&initsteplist_ptr->value_ptr,
+                                       &initsteplist_ptr->subid);
       if (EVEN(sts))
         return sts;
 
@@ -2385,8 +2477,9 @@ int RTTSYS_GRAFCET(menu_ctx ctx, int event, char* parameter_ptr,
     qsort(plclist, plclist_count, sizeof(rttsys_t_plcpgm_list), rttsys_plclist_cmp);
     menulist = (rtt_t_menu_upd*)ctx->menu;
     menu_ptr = menulist;
-    for (i = grafcet_page * GRAFCET_PAGESIZE;
-         i < MIN(plclist_count, (grafcet_page + 1) * GRAFCET_PAGESIZE); i++) {
+    for (i = grafcet_page * GRAFCET_PAGESIZE; i < MIN(plclist_count, (grafcet_page + 1) * GRAFCET_PAGESIZE);
+         i++)
+    {
       /* Start RTTSYS_GRAFCET_PLC with PF2 */
       plclist_ptr = plclist + i;
       menu_ptr->func = &rttsys_grafcet_select;
@@ -2402,15 +2495,19 @@ int RTTSYS_GRAFCET(menu_ctx ctx, int event, char* parameter_ptr,
     GRAFCET_MAXPAGE = MAX(1, (plclist_count - 1) / GRAFCET_PAGESIZE + 1);
   }
   /**********************************************************
-  *	Exit of the picture
-  ***********************************************************/
-  else if (event == RTT_APPL_EXIT) {
+   *	Exit of the picture
+   ***********************************************************/
+  else if (event == RTT_APPL_EXIT)
+  {
     /* Free the steplists and the plclist */
     plclist_ptr = plclist;
-    for (i = 0; i < plclist_count; i++) {
-      if (plclist_ptr->initstep_count > 0) {
+    for (i = 0; i < plclist_count; i++)
+    {
+      if (plclist_ptr->initstep_count > 0)
+      {
         initsteplist_ptr = plclist_ptr->initsteps;
-        for (j = 0; j < plclist_ptr->initstep_count; j++) {
+        for (j = 0; j < plclist_ptr->initstep_count; j++)
+        {
           sts = gdh_DLUnrefObjectInfo(initsteplist_ptr->subid);
           if (EVEN(sts))
             return sts;
@@ -2423,17 +2520,20 @@ int RTTSYS_GRAFCET(menu_ctx ctx, int event, char* parameter_ptr,
     free(plclist);
   }
   /**********************************************************
-  *	Update the picture.
-  ***********************************************************/
-  else if (event == RTT_APPL_UPDATE) {
+   *	Update the picture.
+   ***********************************************************/
+  else if (event == RTT_APPL_UPDATE)
+  {
     menulist = (rtt_t_menu_upd*)ctx->menu;
     menu_ptr = menulist;
     plclist_ptr = plclist + grafcet_page * GRAFCET_PAGESIZE;
-    for (i = grafcet_page * GRAFCET_PAGESIZE;
-         i < MIN(plclist_count, (grafcet_page + 1) * GRAFCET_PAGESIZE); i++) {
+    for (i = grafcet_page * GRAFCET_PAGESIZE; i < MIN(plclist_count, (grafcet_page + 1) * GRAFCET_PAGESIZE);
+         i++)
+    {
       initsteplist_ptr = plclist_ptr->initsteps;
       active = 1;
-      for (j = 0; j < plclist_ptr->initstep_count; j++) {
+      for (j = 0; j < plclist_ptr->initstep_count; j++)
+      {
         if (*(initsteplist_ptr->value_ptr))
           active = 0;
         initsteplist_ptr++;
@@ -2447,7 +2547,8 @@ int RTTSYS_GRAFCET(menu_ctx ctx, int event, char* parameter_ptr,
       plclist_ptr++;
       menu_ptr++;
     }
-    for (; i < (grafcet_page + 1) * GRAFCET_PAGESIZE; i++) {
+    for (; i < (grafcet_page + 1) * GRAFCET_PAGESIZE; i++)
+    {
       strcpy(menu_ptr->value_ptr, "");
       menu_ptr->func2 = 0;
       menu_ptr->func3 = &rtt_menu_new_sysedit;
@@ -2464,25 +2565,24 @@ int RTTSYS_GRAFCET(menu_ctx ctx, int event, char* parameter_ptr,
 }
 
 /*************************************************************************
-*
-* Name:		RTTSYS_GRAFCET_PLC()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	context of the picture.
-* int		event		I 	type of event.
-* char		*parameter_ptr	I	pointer to the parameter which value
-*					has been changed.
-*
-* Description:
-*	Show grafcet activity in one or more plcprograms.
-*
-**************************************************************************/
+ *
+ * Name:		RTTSYS_GRAFCET_PLC()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	context of the picture.
+ * int		event		I 	type of event.
+ * char		*parameter_ptr	I	pointer to the parameter which value
+ *					has been changed.
+ *
+ * Description:
+ *	Show grafcet activity in one or more plcprograms.
+ *
+ **************************************************************************/
 
-static int rttsys_steplist_add(pwr_tObjid step_objid,
-    rttsys_t_step_list** steplist, int* steplist_count, int* alloc,
-    pwr_tClassId class, int dummy2)
+static int rttsys_steplist_add(pwr_tObjid step_objid, rttsys_t_step_list** steplist, int* steplist_count,
+                               int* alloc, pwr_tClassId class, int dummy2)
 {
   rttsys_t_step_list* steplist_ptr;
   rttsys_t_step_list* new_steplist;
@@ -2490,17 +2590,19 @@ static int rttsys_steplist_add(pwr_tObjid step_objid,
   int sts;
   pwr_sAttrRef attrref;
 
-  if (*steplist_count == 0) {
+  if (*steplist_count == 0)
+  {
     *steplist = calloc(RTTSYS_ALLOC, sizeof(rttsys_t_step_list));
     if (*steplist == 0)
       return RTT__NOMEMORY;
     *alloc = RTTSYS_ALLOC;
-  } else if (*alloc <= *steplist_count) {
+  }
+  else if (*alloc <= *steplist_count)
+  {
     new_steplist = calloc(*alloc + RTTSYS_ALLOC, sizeof(rttsys_t_step_list));
     if (new_steplist == 0)
       return RTT__NOMEMORY;
-    memcpy(
-        new_steplist, *steplist, *steplist_count * sizeof(rttsys_t_step_list));
+    memcpy(new_steplist, *steplist, *steplist_count * sizeof(rttsys_t_step_list));
     free(*steplist);
     *steplist = new_steplist;
     (*alloc) += RTTSYS_ALLOC;
@@ -2518,8 +2620,7 @@ static int rttsys_steplist_add(pwr_tObjid step_objid,
     return sts;
 
   attrref.Objid = step_objid;
-  sts = gdh_DLRefObjectInfoAttrref(
-      &attrref, (pwr_tAddress*)&steplist_ptr->value_ptr, &steplist_ptr->subid);
+  sts = gdh_DLRefObjectInfoAttrref(&attrref, (pwr_tAddress*)&steplist_ptr->value_ptr, &steplist_ptr->subid);
   if (EVEN(sts))
     return sts;
 
@@ -2527,9 +2628,8 @@ static int rttsys_steplist_add(pwr_tObjid step_objid,
   return RTT__SUCCESS;
 }
 
-static int rttsys_orderlist_add(pwr_tObjid order_objid,
-    rttsys_t_step_list** orderlist, int* orderlist_count, int* alloc,
-    pwr_tClassId class, int dummy2)
+static int rttsys_orderlist_add(pwr_tObjid order_objid, rttsys_t_step_list** orderlist, int* orderlist_count,
+                                int* alloc, pwr_tClassId class, int dummy2)
 {
   rttsys_t_step_list* orderlist_ptr;
   rttsys_t_step_list* new_orderlist;
@@ -2537,17 +2637,19 @@ static int rttsys_orderlist_add(pwr_tObjid order_objid,
   int sts;
   pwr_sAttrRef attrref;
 
-  if (*orderlist_count == 0) {
+  if (*orderlist_count == 0)
+  {
     *orderlist = calloc(RTTSYS_ALLOC, sizeof(rttsys_t_step_list));
     if (*orderlist == 0)
       return RTT__NOMEMORY;
     *alloc = RTTSYS_ALLOC;
-  } else if (*alloc <= *orderlist_count) {
+  }
+  else if (*alloc <= *orderlist_count)
+  {
     new_orderlist = calloc(*alloc + RTTSYS_ALLOC, sizeof(rttsys_t_step_list));
     if (new_orderlist == 0)
       return RTT__NOMEMORY;
-    memcpy(new_orderlist, *orderlist,
-        *orderlist_count * sizeof(rttsys_t_step_list));
+    memcpy(new_orderlist, *orderlist, *orderlist_count * sizeof(rttsys_t_step_list));
     free(*orderlist);
     *orderlist = new_orderlist;
     (*alloc) += RTTSYS_ALLOC;
@@ -2565,8 +2667,7 @@ static int rttsys_orderlist_add(pwr_tObjid order_objid,
     return sts;
 
   attrref.Objid = order_objid;
-  sts = gdh_DLRefObjectInfoAttrref(&attrref,
-      (pwr_tAddress*)&orderlist_ptr->value_ptr, &orderlist_ptr->subid);
+  sts = gdh_DLRefObjectInfoAttrref(&attrref, (pwr_tAddress*)&orderlist_ptr->value_ptr, &orderlist_ptr->subid);
   if (EVEN(sts))
     return sts;
 
@@ -2574,8 +2675,7 @@ static int rttsys_orderlist_add(pwr_tObjid order_objid,
   return RTT__SUCCESS;
 }
 
-int RTTSYS_GRAFCET_PLC(menu_ctx ctx, int event, char* parameter_ptr,
-    char* objectname, char** picture)
+int RTTSYS_GRAFCET_PLC(menu_ctx ctx, int event, char* parameter_ptr, char* objectname, char** picture)
 {
 #define GRAFCET_PLC_PAGESIZE 20
   menu_ctx parent_ctx;
@@ -2595,32 +2695,36 @@ int RTTSYS_GRAFCET_PLC(menu_ctx ctx, int event, char* parameter_ptr,
   int alloc;
 
   /**********************************************************
-  *	Return address of menu
-  ***********************************************************/
-  if (event == RTT_APPL_PICTURE) {
+   *	Return address of menu
+   ***********************************************************/
+  if (event == RTT_APPL_PICTURE)
+  {
     *picture = (char*)&dtt_systempicture_p12_bg;
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Previous page
-  ***********************************************************/
-  if (event == RTT_APPL_MENU) {
+   *	Previous page
+   ***********************************************************/
+  if (event == RTT_APPL_MENU)
+  {
     *picture = (char*)&dtt_systempicture_p12_eu;
 
     /* Get the selected plcprogram */
     sel_plclist_count = 0;
     plclist_ptr = plclist;
-    for (i = 0; i < plclist_count; i++) {
-      if (plclist_ptr->selected) {
+    for (i = 0; i < plclist_count; i++)
+    {
+      if (plclist_ptr->selected)
+      {
         /* Add this plc in the selected plclist */
-        rttsys_plclist_add(
-            plclist_ptr->objid, &sel_plclist, &sel_plclist_count, &alloc);
+        rttsys_plclist_add(plclist_ptr->objid, &sel_plclist, &sel_plclist_count, &alloc);
         sel_plclist_ptr = sel_plclist + sel_plclist_count - 1;
         memcpy(sel_plclist_ptr, plclist_ptr, sizeof(rttsys_t_plcpgm_list));
       }
       plclist_ptr++;
     }
-    if (sel_plclist_count > 4) {
+    if (sel_plclist_count > 4)
+    {
       /* To many plcpgms is selected */
       rtt_message('E', "Max amount of selected plcpgms is 4");
       return RTT__NOPICTURE;
@@ -2629,43 +2733,47 @@ int RTTSYS_GRAFCET_PLC(menu_ctx ctx, int event, char* parameter_ptr,
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Previous page
-  ***********************************************************/
-  if (event == RTT_APPL_PREVPAGE) {
+   *	Previous page
+   ***********************************************************/
+  if (event == RTT_APPL_PREVPAGE)
+  {
     page--;
     page = MAX(page, 0);
     GRAFCET_PLC_PAGE = page + 1;
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Next page
-  ***********************************************************/
-  if (event == RTT_APPL_NEXTPAGE) {
+   *	Next page
+   ***********************************************************/
+  if (event == RTT_APPL_NEXTPAGE)
+  {
     page++;
     page = MIN(page, GRAFCET_PLC_MAXPAGE - 1);
     GRAFCET_PLC_PAGE = page + 1;
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Initialization of the picture
-  ***********************************************************/
-  if (event == RTT_APPL_INIT) {
+   *	Initialization of the picture
+   ***********************************************************/
+  if (event == RTT_APPL_INIT)
+  {
     page = 0;
     GRAFCET_PLC_PAGE = page + 1;
     GRAFCET_PLC_MAXPAGE = 1;
 
-    if (sel_plclist_count == 0) {
+    if (sel_plclist_count == 0)
+    {
       /* No plcpgms is selected, take the selected plcpgm */
       parent_ctx = (menu_ctx)ctx->parent_ctx;
-      if (parent_ctx->current_item + (GRAFCET_PAGE - 1) * GRAFCET_PAGESIZE
-          > plclist_count - 1) {
+      if (parent_ctx->current_item + (GRAFCET_PAGE - 1) * GRAFCET_PAGESIZE > plclist_count - 1)
+      {
         rtt_message('E', "Select a plcpgm");
-      } else {
-        plclist_ptr = plclist + parent_ctx->current_item
-            + (GRAFCET_PAGE - 1) * GRAFCET_PAGESIZE;
+      }
+      else
+      {
+        plclist_ptr = plclist + parent_ctx->current_item + (GRAFCET_PAGE - 1) * GRAFCET_PAGESIZE;
         /* Add this plc in the selected plclist */
-        rttsys_plclist_add(
-            plclist_ptr->objid, &sel_plclist, &sel_plclist_count, &alloc);
+        rttsys_plclist_add(plclist_ptr->objid, &sel_plclist, &sel_plclist_count, &alloc);
         sel_plclist_ptr = sel_plclist + sel_plclist_count - 1;
         memcpy(sel_plclist_ptr, plclist_ptr, sizeof(rttsys_t_plcpgm_list));
       }
@@ -2674,7 +2782,8 @@ int RTTSYS_GRAFCET_PLC(menu_ctx ctx, int event, char* parameter_ptr,
     /* Reset output */
     menulist = (rtt_t_menu_upd*)ctx->menu;
     menu_ptr = menulist;
-    for (i = 0; i < 80; i++) {
+    for (i = 0; i < 80; i++)
+    {
       strcpy(menu_ptr->value_ptr, "");
       menu_ptr++;
     }
@@ -2683,36 +2792,35 @@ int RTTSYS_GRAFCET_PLC(menu_ctx ctx, int event, char* parameter_ptr,
     menu_ptr = menulist;
 
     plclist_ptr = sel_plclist;
-    for (k = 0; k < sel_plclist_count; k++) {
+    for (k = 0; k < sel_plclist_count; k++)
+    {
       /* Get all steps of this plcpgm */
-      sts = rtt_get_objects_hier_class_name(ctx, plclist_ptr->objid,
-          pwr_cClass_step, NULL, 500, 0, &rttsys_steplist_add,
-          &plclist_ptr->steps, &plclist_ptr->step_count,
-          &plclist_ptr->step_alloc, (void*)pwr_cClass_step, 0);
+      sts = rtt_get_objects_hier_class_name(
+          ctx, plclist_ptr->objid, pwr_cClass_step, NULL, 500, 0, &rttsys_steplist_add, &plclist_ptr->steps,
+          &plclist_ptr->step_count, &plclist_ptr->step_alloc, (void*)pwr_cClass_step, 0);
       if (EVEN(sts))
         return sts;
-      sts = rtt_get_objects_hier_class_name(ctx, plclist_ptr->objid,
-          pwr_cClass_substep, NULL, 500, 0, &rttsys_steplist_add,
-          &plclist_ptr->steps, &plclist_ptr->step_count,
-          &plclist_ptr->step_alloc, (void*)pwr_cClass_substep, 0);
+      sts =
+          rtt_get_objects_hier_class_name(ctx, plclist_ptr->objid, pwr_cClass_substep, NULL, 500, 0,
+                                          &rttsys_steplist_add, &plclist_ptr->steps, &plclist_ptr->step_count,
+                                          &plclist_ptr->step_alloc, (void*)pwr_cClass_substep, 0);
       if (EVEN(sts))
         return sts;
-      sts = rtt_get_objects_hier_class_name(ctx, plclist_ptr->objid,
-          pwr_cClass_ssbegin, NULL, 500, 0, &rttsys_steplist_add,
-          &plclist_ptr->steps, &plclist_ptr->step_count,
-          &plclist_ptr->step_alloc, (void*)pwr_cClass_ssbegin, 0);
+      sts =
+          rtt_get_objects_hier_class_name(ctx, plclist_ptr->objid, pwr_cClass_ssbegin, NULL, 500, 0,
+                                          &rttsys_steplist_add, &plclist_ptr->steps, &plclist_ptr->step_count,
+                                          &plclist_ptr->step_alloc, (void*)pwr_cClass_ssbegin, 0);
       if (EVEN(sts))
         return sts;
-      sts = rtt_get_objects_hier_class_name(ctx, plclist_ptr->objid,
-          pwr_cClass_ssend, NULL, 500, 0, &rttsys_steplist_add,
-          &plclist_ptr->steps, &plclist_ptr->step_count,
-          &plclist_ptr->step_alloc, (void*)pwr_cClass_ssend, 0);
+      sts = rtt_get_objects_hier_class_name(
+          ctx, plclist_ptr->objid, pwr_cClass_ssend, NULL, 500, 0, &rttsys_steplist_add, &plclist_ptr->steps,
+          &plclist_ptr->step_count, &plclist_ptr->step_alloc, (void*)pwr_cClass_ssend, 0);
       if (EVEN(sts))
         return sts;
-      sts = rtt_get_objects_hier_class_name(ctx, plclist_ptr->objid,
-          pwr_cClass_order, NULL, 500, 0, &rttsys_orderlist_add,
-          &plclist_ptr->orders, &plclist_ptr->order_count,
-          &plclist_ptr->order_alloc, (void*)pwr_cClass_order, 0);
+      sts = rtt_get_objects_hier_class_name(ctx, plclist_ptr->objid, pwr_cClass_order, NULL, 500, 0,
+                                            &rttsys_orderlist_add, &plclist_ptr->orders,
+                                            &plclist_ptr->order_count, &plclist_ptr->order_alloc,
+                                            (void*)pwr_cClass_order, 0);
       if (EVEN(sts))
         return sts;
       qsort(plclist_ptr->steps, plclist_ptr->step_count, sizeof(rttsys_t_step_list), rttsys_steplist_cmp);
@@ -2729,12 +2837,14 @@ int RTTSYS_GRAFCET_PLC(menu_ctx ctx, int event, char* parameter_ptr,
       menu_ptr++;
       i++;
       initsteplist_ptr = plclist_ptr->initsteps;
-      for (j = 0; j < plclist_ptr->initstep_count; j++) {
-        if (*(initsteplist_ptr->value_ptr)) {
-          if ((i > 0) && (i < GRAFCET_PLC_PAGESIZE)) {
-            strncpy(menu_ptr->value_ptr,
-                &initsteplist_ptr->name[strlen(plclist_ptr->name) + 3],
-                sizeof(GRAFCET_PLC_LINE1));
+      for (j = 0; j < plclist_ptr->initstep_count; j++)
+      {
+        if (*(initsteplist_ptr->value_ptr))
+        {
+          if ((i > 0) && (i < GRAFCET_PLC_PAGESIZE))
+          {
+            strncpy(menu_ptr->value_ptr, &initsteplist_ptr->name[strlen(plclist_ptr->name) + 3],
+                    sizeof(GRAFCET_PLC_LINE1));
             menu_ptr++;
           }
           i++;
@@ -2742,12 +2852,14 @@ int RTTSYS_GRAFCET_PLC(menu_ctx ctx, int event, char* parameter_ptr,
         initsteplist_ptr++;
       }
       steplist_ptr = plclist_ptr->steps;
-      for (j = 0; j < plclist_ptr->step_count; j++) {
-        if (*(steplist_ptr->value_ptr)) {
-          if ((i > 0) && (i < GRAFCET_PLC_PAGESIZE)) {
-            strncpy(menu_ptr->value_ptr,
-                &steplist_ptr->name[strlen(plclist_ptr->name) + 3],
-                sizeof(GRAFCET_PLC_LINE1));
+      for (j = 0; j < plclist_ptr->step_count; j++)
+      {
+        if (*(steplist_ptr->value_ptr))
+        {
+          if ((i > 0) && (i < GRAFCET_PLC_PAGESIZE))
+          {
+            strncpy(menu_ptr->value_ptr, &steplist_ptr->name[strlen(plclist_ptr->name) + 3],
+                    sizeof(GRAFCET_PLC_LINE1));
             menu_ptr++;
           }
           i++;
@@ -2755,12 +2867,14 @@ int RTTSYS_GRAFCET_PLC(menu_ctx ctx, int event, char* parameter_ptr,
         steplist_ptr++;
       }
       orderlist_ptr = plclist_ptr->orders;
-      for (j = 0; j < plclist_ptr->order_count; j++) {
-        if (*(orderlist_ptr->value_ptr)) {
-          if ((i > 0) && (i < GRAFCET_PLC_PAGESIZE)) {
-            strncpy(menu_ptr->value_ptr,
-                &orderlist_ptr->name[strlen(plclist_ptr->name) + 3],
-                sizeof(GRAFCET_PLC_LINE1));
+      for (j = 0; j < plclist_ptr->order_count; j++)
+      {
+        if (*(orderlist_ptr->value_ptr))
+        {
+          if ((i > 0) && (i < GRAFCET_PLC_PAGESIZE))
+          {
+            strncpy(menu_ptr->value_ptr, &orderlist_ptr->name[strlen(plclist_ptr->name) + 3],
+                    sizeof(GRAFCET_PLC_LINE1));
             menu_ptr++;
           }
           i++;
@@ -2768,7 +2882,8 @@ int RTTSYS_GRAFCET_PLC(menu_ctx ctx, int event, char* parameter_ptr,
         orderlist_ptr++;
       }
 
-      for (j = i; j < (page + 1) * GRAFCET_PLC_PAGESIZE; j++) {
+      for (j = i; j < (page + 1) * GRAFCET_PLC_PAGESIZE; j++)
+      {
         strcpy(menu_ptr->value_ptr, "");
         menu_ptr++;
       }
@@ -2777,23 +2892,29 @@ int RTTSYS_GRAFCET_PLC(menu_ctx ctx, int event, char* parameter_ptr,
   }
 
   /**********************************************************
-  *	Exit of the picture
-  ***********************************************************/
-  else if (event == RTT_APPL_EXIT) {
+   *	Exit of the picture
+   ***********************************************************/
+  else if (event == RTT_APPL_EXIT)
+  {
     /* Free the steplists and the sel_plclist */
     plclist_ptr = sel_plclist;
-    for (i = 0; i < sel_plclist_count; i++) {
-      if (plclist_ptr->step_count > 0) {
+    for (i = 0; i < sel_plclist_count; i++)
+    {
+      if (plclist_ptr->step_count > 0)
+      {
         steplist_ptr = plclist_ptr->steps;
-        for (j = 0; j < plclist_ptr->step_count; j++) {
+        for (j = 0; j < plclist_ptr->step_count; j++)
+        {
           sts = gdh_DLUnrefObjectInfo(steplist_ptr->subid);
           steplist_ptr++;
         }
         free(plclist_ptr->steps);
       }
-      if (plclist_ptr->order_count > 0) {
+      if (plclist_ptr->order_count > 0)
+      {
         orderlist_ptr = plclist_ptr->orders;
-        for (j = 0; j < plclist_ptr->order_count; j++) {
+        for (j = 0; j < plclist_ptr->order_count; j++)
+        {
           sts = gdh_DLUnrefObjectInfo(orderlist_ptr->subid);
           orderlist_ptr++;
         }
@@ -2805,25 +2926,28 @@ int RTTSYS_GRAFCET_PLC(menu_ctx ctx, int event, char* parameter_ptr,
     sel_plclist_count = 0;
   }
   /**********************************************************
-  *	Update the picture.
-  ***********************************************************/
-  else if (event == RTT_APPL_UPDATE) {
+   *	Update the picture.
+   ***********************************************************/
+  else if (event == RTT_APPL_UPDATE)
+  {
     plclist_ptr = sel_plclist;
     menulist = (rtt_t_menu_upd*)ctx->menu;
     menu_ptr = menulist;
 
-    for (k = 0; k < sel_plclist_count; k++) {
+    for (k = 0; k < sel_plclist_count; k++)
+    {
       i = 0;
       l = 1;
       menu_ptr++;
       initsteplist_ptr = plclist_ptr->initsteps;
-      for (j = 0; j < plclist_ptr->initstep_count; j++) {
-        if (*(initsteplist_ptr->value_ptr)) {
-          if ((i >= page * (GRAFCET_PLC_PAGESIZE - 1))
-              && (i < (page + 1) * (GRAFCET_PLC_PAGESIZE - 1))) {
-            strncpy(menu_ptr->value_ptr,
-                &initsteplist_ptr->name[strlen(plclist_ptr->name) + 3],
-                sizeof(GRAFCET_PLC_LINE1));
+      for (j = 0; j < plclist_ptr->initstep_count; j++)
+      {
+        if (*(initsteplist_ptr->value_ptr))
+        {
+          if ((i >= page * (GRAFCET_PLC_PAGESIZE - 1)) && (i < (page + 1) * (GRAFCET_PLC_PAGESIZE - 1)))
+          {
+            strncpy(menu_ptr->value_ptr, &initsteplist_ptr->name[strlen(plclist_ptr->name) + 3],
+                    sizeof(GRAFCET_PLC_LINE1));
             menu_ptr++;
             l++;
           }
@@ -2832,13 +2956,14 @@ int RTTSYS_GRAFCET_PLC(menu_ctx ctx, int event, char* parameter_ptr,
         initsteplist_ptr++;
       }
       steplist_ptr = plclist_ptr->steps;
-      for (j = 0; j < plclist_ptr->step_count; j++) {
-        if (*(steplist_ptr->value_ptr)) {
-          if ((i >= page * (GRAFCET_PLC_PAGESIZE - 1))
-              && (i < (page + 1) * (GRAFCET_PLC_PAGESIZE - 1))) {
-            strncpy(menu_ptr->value_ptr,
-                &steplist_ptr->name[strlen(plclist_ptr->name) + 3],
-                sizeof(GRAFCET_PLC_LINE1));
+      for (j = 0; j < plclist_ptr->step_count; j++)
+      {
+        if (*(steplist_ptr->value_ptr))
+        {
+          if ((i >= page * (GRAFCET_PLC_PAGESIZE - 1)) && (i < (page + 1) * (GRAFCET_PLC_PAGESIZE - 1)))
+          {
+            strncpy(menu_ptr->value_ptr, &steplist_ptr->name[strlen(plclist_ptr->name) + 3],
+                    sizeof(GRAFCET_PLC_LINE1));
             menu_ptr++;
             l++;
           }
@@ -2847,13 +2972,14 @@ int RTTSYS_GRAFCET_PLC(menu_ctx ctx, int event, char* parameter_ptr,
         steplist_ptr++;
       }
       orderlist_ptr = plclist_ptr->orders;
-      for (j = 0; j < plclist_ptr->order_count; j++) {
-        if (*(orderlist_ptr->value_ptr)) {
-          if ((i >= page * (GRAFCET_PLC_PAGESIZE - 1))
-              && (i < (page + 1) * (GRAFCET_PLC_PAGESIZE - 1))) {
-            strncpy(menu_ptr->value_ptr,
-                &orderlist_ptr->name[strlen(plclist_ptr->name) + 3],
-                sizeof(GRAFCET_PLC_LINE1));
+      for (j = 0; j < plclist_ptr->order_count; j++)
+      {
+        if (*(orderlist_ptr->value_ptr))
+        {
+          if ((i >= page * (GRAFCET_PLC_PAGESIZE - 1)) && (i < (page + 1) * (GRAFCET_PLC_PAGESIZE - 1)))
+          {
+            strncpy(menu_ptr->value_ptr, &orderlist_ptr->name[strlen(plclist_ptr->name) + 3],
+                    sizeof(GRAFCET_PLC_LINE1));
             menu_ptr++;
             l++;
           }
@@ -2861,13 +2987,13 @@ int RTTSYS_GRAFCET_PLC(menu_ctx ctx, int event, char* parameter_ptr,
         }
         orderlist_ptr++;
       }
-      for (j = l; j < GRAFCET_PLC_PAGESIZE; j++) {
+      for (j = l; j < GRAFCET_PLC_PAGESIZE; j++)
+      {
         strcpy(menu_ptr->value_ptr, "");
         menu_ptr++;
       }
       plclist_ptr++;
-      GRAFCET_PLC_MAXPAGE = MAX(
-          GRAFCET_PLC_MAXPAGE, MAX(1, i / (GRAFCET_PLC_PAGESIZE - 1) + 1));
+      GRAFCET_PLC_MAXPAGE = MAX(GRAFCET_PLC_MAXPAGE, MAX(1, i / (GRAFCET_PLC_PAGESIZE - 1) + 1));
     }
   }
 
@@ -2875,26 +3001,25 @@ int RTTSYS_GRAFCET_PLC(menu_ctx ctx, int event, char* parameter_ptr,
 }
 
 /*************************************************************************
-*
-* Name:		RTTSYS_PLCPGM()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	context of the picture.
-* int		event		I 	type of event.
-* char		*parameter_ptr	I	pointer to the parameter which value
-*					has been changed.
-*
-* Description:
-*	Shows plcpgms.
-*
-**************************************************************************/
+ *
+ * Name:		RTTSYS_PLCPGM()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	context of the picture.
+ * int		event		I 	type of event.
+ * char		*parameter_ptr	I	pointer to the parameter which value
+ *					has been changed.
+ *
+ * Description:
+ *	Shows plcpgms.
+ *
+ **************************************************************************/
 
 #define PLCPGM_PAGESIZE 20
 
-int RTTSYS_PLCPGM(menu_ctx ctx, int event, char* parameter_ptr,
-    char* objectname, char** picture)
+int RTTSYS_PLCPGM(menu_ctx ctx, int event, char* parameter_ptr, char* objectname, char** picture)
 {
   int sts;
   rtt_t_menu_upd* menu_ptr;
@@ -2909,47 +3034,51 @@ int RTTSYS_PLCPGM(menu_ctx ctx, int event, char* parameter_ptr,
 
   IF_NOGDH_RETURN;
   /**********************************************************
-  *	Return address of menu
-  ***********************************************************/
-  if (event == RTT_APPL_PICTURE) {
+   *	Return address of menu
+   ***********************************************************/
+  if (event == RTT_APPL_PICTURE)
+  {
     *picture = (char*)&dtt_systempicture_p13_bg;
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Previous page
-  ***********************************************************/
-  if (event == RTT_APPL_MENU) {
+   *	Previous page
+   ***********************************************************/
+  if (event == RTT_APPL_MENU)
+  {
     *picture = (char*)&dtt_systempicture_p13_eu;
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Previous page
-  ***********************************************************/
-  if (event == RTT_APPL_PREVPAGE) {
+   *	Previous page
+   ***********************************************************/
+  if (event == RTT_APPL_PREVPAGE)
+  {
     page--;
     page = MAX(page, 0);
     PLCPGM_PAGE = page + 1;
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Next page
-  ***********************************************************/
-  if (event == RTT_APPL_NEXTPAGE) {
+   *	Next page
+   ***********************************************************/
+  if (event == RTT_APPL_NEXTPAGE)
+  {
     page++;
     page = MIN(page, PLCPGM_MAXPAGE - 1);
     PLCPGM_PAGE = page + 1;
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Initialization of the picture
-  ***********************************************************/
-  if (event == RTT_APPL_INIT) {
+   *	Initialization of the picture
+   ***********************************************************/
+  if (event == RTT_APPL_INIT)
+  {
     plclist_count = 0;
     page = 0;
     PLCPGM_PAGE = page + 1;
 
-    sts = rttsys_object_add(pwr_cClass_plc, &plclist, &plclist_count,
-        &plc_alloc, ".Description", 40);
+    sts = rttsys_object_add(pwr_cClass_plc, &plclist, &plclist_count, &plc_alloc, ".Description", 40);
     if (EVEN(sts))
       return sts;
 
@@ -2957,8 +3086,8 @@ int RTTSYS_PLCPGM(menu_ctx ctx, int event, char* parameter_ptr,
     menulist = (rtt_t_menu_upd*)ctx->menu;
     menu_ptr = menulist;
     plclist_ptr = plclist;
-    for (i = page * PLCPGM_PAGESIZE;
-         i < MIN(plclist_count, (page + 1) * PLCPGM_PAGESIZE); i++) {
+    for (i = page * PLCPGM_PAGESIZE; i < MIN(plclist_count, (page + 1) * PLCPGM_PAGESIZE); i++)
+    {
       /* Define PF buttons and Return */
       menu_ptr->func = &rtt_hierarchy_child;
       menu_ptr->func2 = &rtt_edit_debug_signals;
@@ -2975,21 +3104,23 @@ int RTTSYS_PLCPGM(menu_ctx ctx, int event, char* parameter_ptr,
     PLCPGM_MAXPAGE = MAX(1, (plclist_count - 1) / PLCPGM_PAGESIZE + 1);
   }
   /**********************************************************
-  *	Exit of the picture
-  ***********************************************************/
-  else if (event == RTT_APPL_EXIT) {
+   *	Exit of the picture
+   ***********************************************************/
+  else if (event == RTT_APPL_EXIT)
+  {
     /* Free the steplists and the plclist */
     free(plclist);
   }
   /**********************************************************
-  *	Update the picture.
-  ***********************************************************/
-  else if (event == RTT_APPL_UPDATE) {
+   *	Update the picture.
+   ***********************************************************/
+  else if (event == RTT_APPL_UPDATE)
+  {
     menulist = (rtt_t_menu_upd*)ctx->menu;
     menu_ptr = menulist;
     plclist_ptr = plclist + page * PLCPGM_PAGESIZE;
-    for (i = page * PLCPGM_PAGESIZE;
-         i < MIN(plclist_count, (page + 1) * PLCPGM_PAGESIZE); i++) {
+    for (i = page * PLCPGM_PAGESIZE; i < MIN(plclist_count, (page + 1) * PLCPGM_PAGESIZE); i++)
+    {
       menu_ptr->func = &rtt_hierarchy_child;
       menu_ptr->func2 = &rtt_edit_debug_signals;
       menu_ptr->func3 = &rtt_debug_child;
@@ -3004,7 +3135,8 @@ int RTTSYS_PLCPGM(menu_ctx ctx, int event, char* parameter_ptr,
       menu_ptr++;
       plclist_ptr++;
     }
-    for (; i < (page + 1) * PLCPGM_PAGESIZE; i++) {
+    for (; i < (page + 1) * PLCPGM_PAGESIZE; i++)
+    {
       strcpy(menu_ptr->value_ptr, "");
       menu_ptr->func2 = 0;
       menu_ptr->func3 = 0;
@@ -3023,25 +3155,24 @@ int RTTSYS_PLCPGM(menu_ctx ctx, int event, char* parameter_ptr,
 }
 
 /*************************************************************************
-*
-* Name:		RTTSYS_ERROR()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	context of the picture.
-* int		event		I 	type of event.
-* char		*parameter_ptr	I	pointer to the parameter which value
-*					has been changed.
-*
-* Description:
-*	Shows errorcounts on device objects.
-*
-**************************************************************************/
+ *
+ * Name:		RTTSYS_ERROR()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	context of the picture.
+ * int		event		I 	type of event.
+ * char		*parameter_ptr	I	pointer to the parameter which value
+ *					has been changed.
+ *
+ * Description:
+ *	Shows errorcounts on device objects.
+ *
+ **************************************************************************/
 
-static int rttsys_objectlist_add(pwr_tObjid object_objid, pwr_tClassId class,
-    rttsys_t_step_list** objectlist, int* objectlist_count, int* alloc,
-    char* attrstr, int attrsize)
+static int rttsys_objectlist_add(pwr_tObjid object_objid, pwr_tClassId class, rttsys_t_step_list** objectlist,
+                                 int* objectlist_count, int* alloc, char* attrstr, int attrsize)
 {
   rttsys_t_step_list* objectlist_ptr;
   rttsys_t_step_list* new_objectlist;
@@ -3049,17 +3180,19 @@ static int rttsys_objectlist_add(pwr_tObjid object_objid, pwr_tClassId class,
   int sts;
   pwr_sAttrRef attrref;
 
-  if (*objectlist_count == 0) {
+  if (*objectlist_count == 0)
+  {
     *objectlist = calloc(RTTSYS_ALLOC, sizeof(rttsys_t_step_list));
     if (*objectlist == 0)
       return RTT__NOMEMORY;
     *alloc = RTTSYS_ALLOC;
-  } else if (*alloc <= *objectlist_count) {
+  }
+  else if (*alloc <= *objectlist_count)
+  {
     new_objectlist = calloc(*alloc + RTTSYS_ALLOC, sizeof(rttsys_t_step_list));
     if (new_objectlist == 0)
       return RTT__NOMEMORY;
-    memcpy(new_objectlist, *objectlist,
-        *objectlist_count * sizeof(rttsys_t_step_list));
+    memcpy(new_objectlist, *objectlist, *objectlist_count * sizeof(rttsys_t_step_list));
     free(*objectlist);
     *objectlist = new_objectlist;
     (*alloc) += RTTSYS_ALLOC;
@@ -3074,16 +3207,18 @@ static int rttsys_objectlist_add(pwr_tObjid object_objid, pwr_tClassId class,
   strcpy(objectlist_ptr->name, namebuf);
 
   /****  !!! DLUnrefObjectInfo !!!  *******/
-  if (*attrstr != 0) {
+  if (*attrstr != 0)
+  {
     sts = gdh_ClassAttrToAttrref(class, attrstr, &attrref);
     if (EVEN(sts))
       return sts;
     attrref.Objid = object_objid;
-  } else
+  }
+  else
     attrref = cdh_ObjidToAref(object_objid);
 
-  sts = gdh_DLRefObjectInfoAttrref(&attrref,
-      (pwr_tAddress*)&objectlist_ptr->value_ptr, &objectlist_ptr->subid);
+  sts =
+      gdh_DLRefObjectInfoAttrref(&attrref, (pwr_tAddress*)&objectlist_ptr->value_ptr, &objectlist_ptr->subid);
   if (EVEN(sts))
     return sts;
 
@@ -3097,19 +3232,19 @@ static int rttsys_objectlist_add(pwr_tObjid object_objid, pwr_tClassId class,
   return RTT__SUCCESS;
 }
 
-static int rttsys_object_add(pwr_tClassId class,
-    rttsys_t_step_list** objectlist, int* objectlist_count, int* object_alloc,
-    char* attrstr, int attrsize)
+static int rttsys_object_add(pwr_tClassId class, rttsys_t_step_list** objectlist, int* objectlist_count,
+                             int* object_alloc, char* attrstr, int attrsize)
 {
   pwr_tObjid object_objid;
   int sts;
 
   /* Get all initsteps of this node */
   sts = gdh_GetClassList(class, &object_objid);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     /* Store and direct link the initstep */
-    sts = rttsys_objectlist_add(object_objid, class, objectlist,
-        objectlist_count, object_alloc, attrstr, attrsize);
+    sts = rttsys_objectlist_add(object_objid, class, objectlist, objectlist_count, object_alloc, attrstr,
+                                attrsize);
     if (EVEN(sts))
       return sts;
 
@@ -3120,27 +3255,26 @@ static int rttsys_object_add(pwr_tClassId class,
 }
 
 /*************************************************************************
-*
-* Name:		RTTSYS_PLCTHREAD()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	context of the picture.
-* int		event		I 	type of event.
-* char		*parameter_ptr	I	pointer to the parameter which value
-*					has been changed.
-*
-* Description:
-*	Shows errorcounts on device objects.
-*
-**************************************************************************/
+ *
+ * Name:		RTTSYS_PLCTHREAD()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	context of the picture.
+ * int		event		I 	type of event.
+ * char		*parameter_ptr	I	pointer to the parameter which value
+ *					has been changed.
+ *
+ * Description:
+ *	Shows errorcounts on device objects.
+ *
+ **************************************************************************/
 
 #define THREAD_PAGESIZE 16
 
-static int rttsys_threadobject_add(pwr_tClassId class,
-    rttsys_t_step_list** objectlist, int* objectlist_count, int* object_alloc,
-    char* attrstr, int attrsize)
+static int rttsys_threadobject_add(pwr_tClassId class, rttsys_t_step_list** objectlist, int* objectlist_count,
+                                   int* object_alloc, char* attrstr, int attrsize)
 {
   pwr_tObjid object_objid;
   int sts;
@@ -3148,10 +3282,11 @@ static int rttsys_threadobject_add(pwr_tClassId class,
 
   /* Get all initsteps of this node */
   sts = gdh_GetClassList(class, &object_objid);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     /* Store and direct link the initstep */
-    sts = rttsys_objectlist_add(object_objid, class, objectlist,
-        objectlist_count, object_alloc, attrstr, attrsize);
+    sts = rttsys_objectlist_add(object_objid, class, objectlist, objectlist_count, object_alloc, attrstr,
+                                attrsize);
     if (EVEN(sts))
       return sts;
 
@@ -3164,8 +3299,7 @@ static int rttsys_threadobject_add(pwr_tClassId class,
   return RTT__SUCCESS;
 }
 
-static int rttsys_thread_update(menu_ctx ctx, rttsys_t_step_list* objectlist,
-    int objectlist_count, int page)
+static int rttsys_thread_update(menu_ctx ctx, rttsys_t_step_list* objectlist, int objectlist_count, int page)
 {
   rtt_t_menu_upd* menu_ptr;
   rtt_t_menu_upd* menulist;
@@ -3175,8 +3309,8 @@ static int rttsys_thread_update(menu_ctx ctx, rttsys_t_step_list* objectlist,
   menulist = (rtt_t_menu_upd*)ctx->menu;
   menu_ptr = menulist;
   objectlist_ptr = objectlist + page * THREAD_PAGESIZE;
-  for (i = page * THREAD_PAGESIZE;
-       i < MIN(objectlist_count, (page + 1) * THREAD_PAGESIZE); i++) {
+  for (i = page * THREAD_PAGESIZE; i < MIN(objectlist_count, (page + 1) * THREAD_PAGESIZE); i++)
+  {
     strncpy(menu_ptr->value_ptr, objectlist_ptr->name, sizeof(Thread_Line1));
 
     /* Define PF buttons and Return */
@@ -3185,35 +3319,24 @@ static int rttsys_thread_update(menu_ctx ctx, rttsys_t_step_list* objectlist,
     menu_ptr->func3 = &rtt_debug_child;
     menu_ptr->argoi = objectlist_ptr->objid;
     menu_ptr++;
-    menu_ptr->value_ptr
-        = (char*)&((pwr_sClass_PlcThread*)(objectlist_ptr->value_ptr))->Prio;
+    menu_ptr->value_ptr = (char*)&((pwr_sClass_PlcThread*)(objectlist_ptr->value_ptr))->Prio;
     menu_ptr++;
-    menu_ptr->value_ptr
-        = (char*)&((pwr_sClass_PlcThread*)(objectlist_ptr->value_ptr))->Count;
+    menu_ptr->value_ptr = (char*)&((pwr_sClass_PlcThread*)(objectlist_ptr->value_ptr))->Count;
     menu_ptr++;
-    menu_ptr->value_ptr
-        = (char*)&((pwr_sClass_PlcThread*)(objectlist_ptr->value_ptr))
-              ->ScanTime;
+    menu_ptr->value_ptr = (char*)&((pwr_sClass_PlcThread*)(objectlist_ptr->value_ptr))->ScanTime;
     menu_ptr++;
-    menu_ptr->value_ptr
-        = (char*)&((pwr_sClass_PlcThread*)(objectlist_ptr->value_ptr))
-              ->ScanTimeMean;
+    menu_ptr->value_ptr = (char*)&((pwr_sClass_PlcThread*)(objectlist_ptr->value_ptr))->ScanTimeMean;
     menu_ptr++;
-    menu_ptr->value_ptr
-        = (char*)&((pwr_sClass_PlcThread*)(objectlist_ptr->value_ptr))
-              ->Coverage;
+    menu_ptr->value_ptr = (char*)&((pwr_sClass_PlcThread*)(objectlist_ptr->value_ptr))->Coverage;
     menu_ptr++;
-    menu_ptr->value_ptr
-        = (char*)&((pwr_sClass_PlcThread*)(objectlist_ptr->value_ptr))
-              ->Count_1_8;
+    menu_ptr->value_ptr = (char*)&((pwr_sClass_PlcThread*)(objectlist_ptr->value_ptr))->Count_1_8;
     menu_ptr++;
-    menu_ptr->value_ptr
-        = (char*)&((pwr_sClass_PlcThread*)(objectlist_ptr->value_ptr))
-              ->Count_1_4;
+    menu_ptr->value_ptr = (char*)&((pwr_sClass_PlcThread*)(objectlist_ptr->value_ptr))->Count_1_4;
     menu_ptr++;
     objectlist_ptr++;
   }
-  for (; i < (page + 1) * THREAD_PAGESIZE; i++) {
+  for (; i < (page + 1) * THREAD_PAGESIZE; i++)
+  {
     strcpy(menu_ptr->value_ptr, "");
     menu_ptr->func2 = 0;
     menu_ptr->func3 = 0;
@@ -3237,17 +3360,18 @@ static int rttsys_thread_update(menu_ctx ctx, rttsys_t_step_list* objectlist,
   return RTT__SUCCESS;
 }
 
-static int rttsys_objectlist_modname(
-    rttsys_t_step_list* objectlist, int objectlist_count)
+static int rttsys_objectlist_modname(rttsys_t_step_list* objectlist, int objectlist_count)
 {
   rttsys_t_step_list* objectlist_ptr;
   int i;
   char* s;
 
   objectlist_ptr = objectlist;
-  for (i = 0; i < objectlist_count; i++) {
+  for (i = 0; i < objectlist_count; i++)
+  {
     s = strrchr(objectlist_ptr->name, '-');
-    if (s != 0) {
+    if (s != 0)
+    {
       s++;
       strcpy(objectlist_ptr->name, s);
     }
@@ -3256,8 +3380,7 @@ static int rttsys_objectlist_modname(
   return RTT__SUCCESS;
 }
 
-int RTTSYS_PLCTHREAD(menu_ctx ctx, int event, char* parameter_ptr,
-    char* objectname, char** picture)
+int RTTSYS_PLCTHREAD(menu_ctx ctx, int event, char* parameter_ptr, char* objectname, char** picture)
 {
   int i;
   int sts;
@@ -3269,23 +3392,26 @@ int RTTSYS_PLCTHREAD(menu_ctx ctx, int event, char* parameter_ptr,
 
   IF_NOGDH_RETURN;
   /**********************************************************
-  *	Return address of menu
-  ***********************************************************/
-  if (event == RTT_APPL_PICTURE) {
+   *	Return address of menu
+   ***********************************************************/
+  if (event == RTT_APPL_PICTURE)
+  {
     *picture = (char*)&dtt_systempicture_p16_bg;
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Previous page
-  ***********************************************************/
-  if (event == RTT_APPL_MENU) {
+   *	Previous page
+   ***********************************************************/
+  if (event == RTT_APPL_MENU)
+  {
     *picture = (char*)&dtt_systempicture_p16_eu;
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Previous page
-  ***********************************************************/
-  if (event == RTT_APPL_PREVPAGE) {
+   *	Previous page
+   ***********************************************************/
+  if (event == RTT_APPL_PREVPAGE)
+  {
     page--;
     page = MAX(page, 0);
     THREAD_PAGE = page + 1;
@@ -3293,9 +3419,10 @@ int RTTSYS_PLCTHREAD(menu_ctx ctx, int event, char* parameter_ptr,
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Next page
-  ***********************************************************/
-  if (event == RTT_APPL_NEXTPAGE) {
+   *	Next page
+   ***********************************************************/
+  if (event == RTT_APPL_NEXTPAGE)
+  {
     page++;
     page = MIN(page, THREAD_MAXPAGE - 1);
     THREAD_PAGE = page + 1;
@@ -3303,15 +3430,16 @@ int RTTSYS_PLCTHREAD(menu_ctx ctx, int event, char* parameter_ptr,
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Initialization of the picture
-  ***********************************************************/
-  if (event == RTT_APPL_INIT) {
+   *	Initialization of the picture
+   ***********************************************************/
+  if (event == RTT_APPL_INIT)
+  {
     objectlist_count = 0;
     page = 0;
     THREAD_PAGE = page + 1;
 
-    sts = rttsys_threadobject_add(pwr_cClass_PlcThread, &objectlist,
-        &objectlist_count, &object_alloc, "", sizeof(pwr_sClass_PlcThread));
+    sts = rttsys_threadobject_add(pwr_cClass_PlcThread, &objectlist, &objectlist_count, &object_alloc, "",
+                                  sizeof(pwr_sClass_PlcThread));
     if (EVEN(sts))
       return sts;
     rttsys_objectlist_modname(objectlist, objectlist_count);
@@ -3322,46 +3450,49 @@ int RTTSYS_PLCTHREAD(menu_ctx ctx, int event, char* parameter_ptr,
     THREAD_MAXPAGE = MAX(1, (objectlist_count - 1) / THREAD_PAGESIZE + 1);
   }
   /**********************************************************
-  *	Exit of the picture
-  ***********************************************************/
-  else if (event == RTT_APPL_EXIT) {
+   *	Exit of the picture
+   ***********************************************************/
+  else if (event == RTT_APPL_EXIT)
+  {
     /* Free the objectlist */
     objectlist_ptr = objectlist;
-    for (i = 0; i < objectlist_count; i++) {
+    for (i = 0; i < objectlist_count; i++)
+    {
       sts = gdh_DLUnrefObjectInfo(objectlist_ptr->subid);
       objectlist_ptr++;
     }
     free(objectlist);
   }
   /**********************************************************
-  *	Update the picture.
-  ***********************************************************/
-  else if (event == RTT_APPL_UPDATE) {
+   *	Update the picture.
+   ***********************************************************/
+  else if (event == RTT_APPL_UPDATE)
+  {
   }
   return RTT__SUCCESS;
 }
 
 /*************************************************************************
-*
-* Name:		RTTSYS_PID()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	context of the picture.
-* int		event		I 	type of event.
-* char		*parameter_ptr	I	pointer to the parameter which value
-*					has been changed.
-*
-* Description:
-*	Show PID objects.
-*
-**************************************************************************/
+ *
+ * Name:		RTTSYS_PID()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	context of the picture.
+ * int		event		I 	type of event.
+ * char		*parameter_ptr	I	pointer to the parameter which value
+ *					has been changed.
+ *
+ * Description:
+ *	Show PID objects.
+ *
+ **************************************************************************/
 
 #define PID_PAGESIZE 18
 
-static int rttsys_pid_object_start(menu_ctx ctx, pwr_tObjid objid, void* arg1,
-    void* arg2, void* arg3, void* arg4)
+static int rttsys_pid_object_start(menu_ctx ctx, pwr_tObjid objid, void* arg1, void* arg2, void* arg3,
+                                   void* arg4)
 {
   pwr_tOName objectname;
   int sts;
@@ -3370,13 +3501,11 @@ static int rttsys_pid_object_start(menu_ctx ctx, pwr_tObjid objid, void* arg1,
   if (EVEN(sts))
     return sts;
 
-  sts = rtt_menu_new_sysedit(
-      ctx, pwr_cNObjid, objectname, objectname, 0, &RTTSYS_OBJECT_PID);
+  sts = rtt_menu_new_sysedit(ctx, pwr_cNObjid, objectname, objectname, 0, &RTTSYS_OBJECT_PID);
   return sts;
 }
 
-static int rttsys_pid_update(menu_ctx ctx, rttsys_t_step_list* objectlist,
-    int objectlist_count, int page)
+static int rttsys_pid_update(menu_ctx ctx, rttsys_t_step_list* objectlist, int objectlist_count, int page)
 {
   rtt_t_menu_upd* menu_ptr;
   rtt_t_menu_upd* menulist;
@@ -3386,8 +3515,8 @@ static int rttsys_pid_update(menu_ctx ctx, rttsys_t_step_list* objectlist,
   menulist = (rtt_t_menu_upd*)ctx->menu;
   menu_ptr = menulist;
   objectlist_ptr = objectlist + page * PID_PAGESIZE * 2;
-  for (i = page * PID_PAGESIZE;
-       i < MIN(objectlist_count, (page + 1) * PID_PAGESIZE); i++) {
+  for (i = page * PID_PAGESIZE; i < MIN(objectlist_count, (page + 1) * PID_PAGESIZE); i++)
+  {
     strncpy(menu_ptr->value_ptr, objectlist_ptr->name, sizeof(PID_LINE1));
 
     /* Define PF buttons and Return */
@@ -3398,7 +3527,8 @@ static int rttsys_pid_update(menu_ctx ctx, rttsys_t_step_list* objectlist,
     menu_ptr++;
     /* OpMode in the mode object */
     objectlist_ptr++;
-    if (objectlist_ptr->value_ptr != 0) {
+    if (objectlist_ptr->value_ptr != 0)
+    {
       if (((pwr_sClass_mode*)(objectlist_ptr->value_ptr))->OpMod == 1)
         strcpy(menu_ptr->value_ptr, "Man ");
       else if (((pwr_sClass_mode*)(objectlist_ptr->value_ptr))->OpMod == 2)
@@ -3407,27 +3537,25 @@ static int rttsys_pid_update(menu_ctx ctx, rttsys_t_step_list* objectlist,
         strcpy(menu_ptr->value_ptr, "Casc");
       else
         strcpy(menu_ptr->value_ptr, "");
-    } else
+    }
+    else
       strcpy(menu_ptr->value_ptr, "");
 
     objectlist_ptr--;
     menu_ptr++;
-    menu_ptr->value_ptr
-        = (char*)&((pwr_sClass_pid*)(objectlist_ptr->value_ptr))->Force;
+    menu_ptr->value_ptr = (char*)&((pwr_sClass_pid*)(objectlist_ptr->value_ptr))->Force;
     menu_ptr++;
-    menu_ptr->value_ptr
-        = (char*)&((pwr_sClass_pid*)(objectlist_ptr->value_ptr))->ProcVal;
+    menu_ptr->value_ptr = (char*)&((pwr_sClass_pid*)(objectlist_ptr->value_ptr))->ProcVal;
     menu_ptr++;
-    menu_ptr->value_ptr
-        = (char*)&((pwr_sClass_pid*)(objectlist_ptr->value_ptr))->SetVal;
+    menu_ptr->value_ptr = (char*)&((pwr_sClass_pid*)(objectlist_ptr->value_ptr))->SetVal;
     menu_ptr++;
-    menu_ptr->value_ptr
-        = (char*)&((pwr_sClass_pid*)(objectlist_ptr->value_ptr))->OutVal;
+    menu_ptr->value_ptr = (char*)&((pwr_sClass_pid*)(objectlist_ptr->value_ptr))->OutVal;
     menu_ptr++;
     objectlist_ptr++;
     objectlist_ptr++;
   }
-  for (; i < (page + 1) * PID_PAGESIZE; i++) {
+  for (; i < (page + 1) * PID_PAGESIZE; i++)
+  {
     strcpy(menu_ptr->value_ptr, "");
     menu_ptr->func2 = 0;
     menu_ptr->func3 = 0;
@@ -3447,8 +3575,7 @@ static int rttsys_pid_update(menu_ctx ctx, rttsys_t_step_list* objectlist,
   return RTT__SUCCESS;
 }
 
-static int rttsys_objectlist_modname_plc(
-    rttsys_t_step_list* objectlist, int objectlist_count)
+static int rttsys_objectlist_modname_plc(rttsys_t_step_list* objectlist, int objectlist_count)
 {
   rttsys_t_step_list* objectlist_ptr;
   int i;
@@ -3459,15 +3586,18 @@ static int rttsys_objectlist_modname_plc(
   int sts;
 
   objectlist_ptr = objectlist;
-  for (i = 0; i < objectlist_count; i++) {
+  for (i = 0; i < objectlist_count; i++)
+  {
     rttsys_get_plcpgm(objectlist_ptr->objid, &plc_objid);
     sts = gdh_ObjidToName(plc_objid, namebuf, sizeof(namebuf), cdh_mNName);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       objectlist_ptr++;
       continue;
     }
     s = strrchr(namebuf, '-');
-    if (s != 0) {
+    if (s != 0)
+    {
       s++;
       offs = s - namebuf;
       s = objectlist_ptr->name + offs;
@@ -3479,9 +3609,8 @@ static int rttsys_objectlist_modname_plc(
   return RTT__SUCCESS;
 }
 
-static int rttsys_pidobject_add(pwr_tClassId class,
-    rttsys_t_step_list** objectlist, int* objectlist_count, int* object_alloc,
-    char* attrstr, int attrsize)
+static int rttsys_pidobject_add(pwr_tClassId class, rttsys_t_step_list** objectlist, int* objectlist_count,
+                                int* object_alloc, char* attrstr, int attrsize)
 {
   pwr_tObjid object_objid;
   int sts;
@@ -3489,21 +3618,21 @@ static int rttsys_pidobject_add(pwr_tClassId class,
 
   /* Get all initsteps of this node */
   sts = gdh_GetClassList(class, &object_objid);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     /* Store and direct link the pidobject */
-    sts = rttsys_objectlist_add(object_objid, class, objectlist,
-        objectlist_count, object_alloc, attrstr, attrsize);
+    sts = rttsys_objectlist_add(object_objid, class, objectlist, objectlist_count, object_alloc, attrstr,
+                                attrsize);
     if (EVEN(sts))
       return sts;
     objectlist_ptr = *objectlist;
     objectlist_ptr += *objectlist_count - 1;
 
     /* Store the mode object also */
-    sts = rttsys_objectlist_add(
-        ((pwr_sClass_pid*)(objectlist_ptr->value_ptr))->ModeObjDId,
-        pwr_cClass_mode, objectlist, objectlist_count, object_alloc, "",
-        sizeof(pwr_sClass_mode));
-    if (EVEN(sts)) {
+    sts = rttsys_objectlist_add(((pwr_sClass_pid*)(objectlist_ptr->value_ptr))->ModeObjDId, pwr_cClass_mode,
+                                objectlist, objectlist_count, object_alloc, "", sizeof(pwr_sClass_mode));
+    if (EVEN(sts))
+    {
       /* rttsys_objectlist_add has allocated memory.. mark that
          the mode object did not exist by setting value_ptr to zero */
       (*objectlist_count)++;
@@ -3516,8 +3645,7 @@ static int rttsys_pidobject_add(pwr_tClassId class,
   return RTT__SUCCESS;
 }
 
-int RTTSYS_PID(menu_ctx ctx, int event, char* parameter_ptr, char* objectname,
-    char** picture)
+int RTTSYS_PID(menu_ctx ctx, int event, char* parameter_ptr, char* objectname, char** picture)
 {
   int i;
   int sts;
@@ -3530,23 +3658,26 @@ int RTTSYS_PID(menu_ctx ctx, int event, char* parameter_ptr, char* objectname,
   IF_NOGDH_RETURN;
 
   /**********************************************************
-  *	Return address of menu
-  ***********************************************************/
-  if (event == RTT_APPL_PICTURE) {
+   *	Return address of menu
+   ***********************************************************/
+  if (event == RTT_APPL_PICTURE)
+  {
     *picture = (char*)&dtt_systempicture_p17_bg;
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Previous page
-  ***********************************************************/
-  if (event == RTT_APPL_MENU) {
+   *	Previous page
+   ***********************************************************/
+  if (event == RTT_APPL_MENU)
+  {
     *picture = (char*)&dtt_systempicture_p17_eu;
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Previous page
-  ***********************************************************/
-  if (event == RTT_APPL_PREVPAGE) {
+   *	Previous page
+   ***********************************************************/
+  if (event == RTT_APPL_PREVPAGE)
+  {
     page--;
     page = MAX(page, 0);
     PID_PAGE = page + 1;
@@ -3554,9 +3685,10 @@ int RTTSYS_PID(menu_ctx ctx, int event, char* parameter_ptr, char* objectname,
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Next page
-  ***********************************************************/
-  if (event == RTT_APPL_NEXTPAGE) {
+   *	Next page
+   ***********************************************************/
+  if (event == RTT_APPL_NEXTPAGE)
+  {
     page++;
     page = MIN(page, PID_MAXPAGE - 1);
     PID_PAGE = page + 1;
@@ -3564,15 +3696,16 @@ int RTTSYS_PID(menu_ctx ctx, int event, char* parameter_ptr, char* objectname,
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Initialization of the picture
-  ***********************************************************/
-  if (event == RTT_APPL_INIT) {
+   *	Initialization of the picture
+   ***********************************************************/
+  if (event == RTT_APPL_INIT)
+  {
     objectlist_count = 0;
     page = 0;
     PID_PAGE = page + 1;
 
-    sts = rttsys_pidobject_add(pwr_cClass_pid, &objectlist, &objectlist_count,
-        &object_alloc, "", sizeof(pwr_sClass_pid));
+    sts = rttsys_pidobject_add(pwr_cClass_pid, &objectlist, &objectlist_count, &object_alloc, "",
+                               sizeof(pwr_sClass_pid));
     if (EVEN(sts))
       return sts;
     objectlist_count /= 2;
@@ -3582,12 +3715,14 @@ int RTTSYS_PID(menu_ctx ctx, int event, char* parameter_ptr, char* objectname,
     PID_MAXPAGE = MAX(1, (objectlist_count - 1) / PID_PAGESIZE + 1);
   }
   /**********************************************************
-  *	Exit of the picture
-  ***********************************************************/
-  else if (event == RTT_APPL_EXIT) {
+   *	Exit of the picture
+   ***********************************************************/
+  else if (event == RTT_APPL_EXIT)
+  {
     /* Free the objectlist */
     objectlist_ptr = objectlist;
-    for (i = 0; i < objectlist_count; i++) {
+    for (i = 0; i < objectlist_count; i++)
+    {
       if (objectlist_ptr->value_ptr != 0)
         sts = gdh_DLUnrefObjectInfo(objectlist_ptr->subid);
       objectlist_ptr++;
@@ -3595,30 +3730,31 @@ int RTTSYS_PID(menu_ctx ctx, int event, char* parameter_ptr, char* objectname,
     free(objectlist);
   }
   /**********************************************************
-  *	Update the picture.
-  ***********************************************************/
-  else if (event == RTT_APPL_UPDATE) {
+   *	Update the picture.
+   ***********************************************************/
+  else if (event == RTT_APPL_UPDATE)
+  {
   }
 
   return RTT__SUCCESS;
 }
 
 /*************************************************************************
-*
-* Name:		RTTSYS_LOGGING()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	context of the picture.
-* int		event		I 	type of event.
-* char		*parameter_ptr	I	pointer to the parameter which value
-*					has been changed.
-*
-* Description:
-*	Show logging info.
-*
-**************************************************************************/
+ *
+ * Name:		RTTSYS_LOGGING()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	context of the picture.
+ * int		event		I 	type of event.
+ * char		*parameter_ptr	I	pointer to the parameter which value
+ *					has been changed.
+ *
+ * Description:
+ *	Show logging info.
+ *
+ **************************************************************************/
 
 int rttsys_get_current_logg_entry(int* entry)
 {
@@ -3626,8 +3762,7 @@ int rttsys_get_current_logg_entry(int* entry)
   return RTT__SUCCESS;
 }
 
-int RTTSYS_LOGGING(menu_ctx ctx, int event, char* parameter_ptr,
-    char* objectname, char** picture)
+int RTTSYS_LOGGING(menu_ctx ctx, int event, char* parameter_ptr, char* objectname, char** picture)
 {
   int sts;
   rtt_t_menu_upd* menu_ptr;
@@ -3639,49 +3774,53 @@ int RTTSYS_LOGGING(menu_ctx ctx, int event, char* parameter_ptr,
   IF_NOGDH_RETURN;
 
   /**********************************************************
-  *	Return address of menu
-  ***********************************************************/
-  if (event == RTT_APPL_PICTURE) {
+   *	Return address of menu
+   ***********************************************************/
+  if (event == RTT_APPL_PICTURE)
+  {
     *picture = (char*)&dtt_systempicture_p18_bg;
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Previous page
-  ***********************************************************/
-  if (event == RTT_APPL_MENU) {
+   *	Previous page
+   ***********************************************************/
+  if (event == RTT_APPL_MENU)
+  {
     *picture = (char*)&dtt_systempicture_p18_eu;
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Previous page
-  ***********************************************************/
-  if (event == RTT_APPL_PREVPAGE) {
+   *	Previous page
+   ***********************************************************/
+  if (event == RTT_APPL_PREVPAGE)
+  {
     logging_page--;
     logging_page = MAX(logging_page, 0);
   }
   /**********************************************************
-  *	Next page
-  ***********************************************************/
-  if (event == RTT_APPL_NEXTPAGE) {
+   *	Next page
+   ***********************************************************/
+  if (event == RTT_APPL_NEXTPAGE)
+  {
     logging_page++;
     logging_page = MIN(logging_page, 9);
   }
   /**********************************************************
-  *	Initialization of the picture
-  ***********************************************************/
-  if (event == RTT_APPL_INIT) {
+   *	Initialization of the picture
+   ***********************************************************/
+  if (event == RTT_APPL_INIT)
+  {
     logging_page = 0;
   }
 
-  if ((event == RTT_APPL_INIT) || (event == RTT_APPL_NEXTPAGE)
-      || (event == RTT_APPL_PREVPAGE)) {
+  if ((event == RTT_APPL_INIT) || (event == RTT_APPL_NEXTPAGE) || (event == RTT_APPL_PREVPAGE))
+  {
     LOGGING_ENTRY = logging_page + 1;
     menulist = (rtt_t_menu_upd*)ctx->menu;
     menu_ptr = menulist;
 
     if (rtt_loggtable[logging_page].occupied == 0)
-      sts = rtt_logging_create(
-          ctx, logging_page + 1, 0, NULL, NULL, NULL, 0, 0, 0, -1, -1, 0, -1);
+      sts = rtt_logging_create(ctx, logging_page + 1, 0, NULL, NULL, NULL, 0, 0, 0, -1, -1, 0, -1);
 
     rtt_edit_unselect(ctx);
     if (rtt_loggtable[logging_page].active)
@@ -3779,17 +3918,18 @@ int RTTSYS_LOGGING(menu_ctx ctx, int event, char* parameter_ptr,
     strcpy(LOGGING_ATTR9, rtt_loggtable[logging_page].parameterstr[8]);
     strcpy(LOGGING_ATTR10, rtt_loggtable[logging_page].parameterstr[9]);
     strcpy(LOGGING_COND, rtt_loggtable[logging_page].conditionstr);
-
   }
   /**********************************************************
-  *	Exit of the picture
-  ***********************************************************/
-  else if (event == RTT_APPL_EXIT) {
+   *	Exit of the picture
+   ***********************************************************/
+  else if (event == RTT_APPL_EXIT)
+  {
   }
   /**********************************************************
-  *	The value of a parameter is changed.
-  ***********************************************************/
-  else if (event == RTT_APPL_UPDATE) {
+   *	The value of a parameter is changed.
+   ***********************************************************/
+  else if (event == RTT_APPL_UPDATE)
+  {
     /* Type */
     if (rtt_loggtable[logging_page].logg_type == RTT_LOGG_MOD)
       strcpy(LOGGING_TYPE, "Event");
@@ -3798,12 +3938,14 @@ int RTTSYS_LOGGING(menu_ctx ctx, int event, char* parameter_ptr,
     else
       strcpy(LOGGING_TYPE, "");
 
-    if (rtt_loggtable[logging_page].active) {
+    if (rtt_loggtable[logging_page].active)
+    {
       if (LOGGING_ACTIVE[0] == ' ')
         strcpy(LOGGING_ACTIVE, "*** ACTIVE ***");
       else
         strcpy(LOGGING_ACTIVE, "    ******    ");
-    } else
+    }
+    else
       strcpy(LOGGING_ACTIVE, " Not active");
 
     strcpy(LOGGING_ATTR1, rtt_loggtable[logging_page].parameterstr[0]);
@@ -3817,135 +3959,187 @@ int RTTSYS_LOGGING(menu_ctx ctx, int event, char* parameter_ptr,
     strcpy(LOGGING_ATTR9, rtt_loggtable[logging_page].parameterstr[8]);
     strcpy(LOGGING_ATTR10, rtt_loggtable[logging_page].parameterstr[9]);
     strcpy(LOGGING_COND, rtt_loggtable[logging_page].conditionstr);
-
   }
   /**********************************************************
-  *	The value of a parameter is changed.
-  ***********************************************************/
-  else if (event == RTT_APPL_VALUECHANGED) {
-    if (parameter_ptr == (char*)&LOGGING_TYPE) {
+   *	The value of a parameter is changed.
+   ***********************************************************/
+  else if (event == RTT_APPL_VALUECHANGED)
+  {
+    if (parameter_ptr == (char*)&LOGGING_TYPE)
+    {
       rtt_toupper(LOGGING_TYPE, LOGGING_TYPE);
-      if (str_NoCaseStrcmp(LOGGING_TYPE, "EVENT") == 0) {
+      if (str_NoCaseStrcmp(LOGGING_TYPE, "EVENT") == 0)
+      {
         strcpy(LOGGING_TYPE, "Event");
         rtt_loggtable[logging_page].logg_type = RTT_LOGG_MOD;
-      } else if (str_NoCaseStrcmp(LOGGING_TYPE, "CONT") == 0) {
+      }
+      else if (str_NoCaseStrcmp(LOGGING_TYPE, "CONT") == 0)
+      {
         strcpy(LOGGING_TYPE, "Cont");
         rtt_loggtable[logging_page].logg_type = RTT_LOGG_CONT;
-      } else
+      }
+      else
         rtt_message('E', "Unknown type, type can be event or cont");
-    } else if (parameter_ptr == (char*)&LOGGING_INSERT) {
-      sts = rtt_logging_set(ctx, logging_page + 1, 0, NULL, NULL, NULL, 0, 1, 0,
-          -1, -1, 0, 0, -1);
-    } else if (parameter_ptr == (char*)&LOGGING_START) {
+    }
+    else if (parameter_ptr == (char*)&LOGGING_INSERT)
+    {
+      sts = rtt_logging_set(ctx, logging_page + 1, 0, NULL, NULL, NULL, 0, 1, 0, -1, -1, 0, 0, -1);
+    }
+    else if (parameter_ptr == (char*)&LOGGING_START)
+    {
       /* Set buffersize to be sure to allocate space for buffer */
       sts = rtt_logging_set(ctx, logging_page + 1, 0, NULL, NULL, NULL, 0, 0,
-          rtt_loggtable[logging_page].buffer_size, -1, -1, 0, 0, -1);
+                            rtt_loggtable[logging_page].buffer_size, -1, -1, 0, 0, -1);
       sts = rtt_logging_start(ctx, logging_page + 1);
-    } else if (parameter_ptr == (char*)&LOGGING_STOP) {
+    }
+    else if (parameter_ptr == (char*)&LOGGING_STOP)
+    {
       sts = rtt_logging_stop(ctx, logging_page + 1);
-    } else if (parameter_ptr == (char*)&LOGGING_SHOW_FILE) {
-      sts = rtt_view(ctx, rtt_loggtable[logging_page].logg_filename, 0, 0,
-          RTT_VIEWTYPE_FILE);
+    }
+    else if (parameter_ptr == (char*)&LOGGING_SHOW_FILE)
+    {
+      sts = rtt_view(ctx, rtt_loggtable[logging_page].logg_filename, 0, 0, RTT_VIEWTYPE_FILE);
       if (EVEN(sts))
         return sts;
-      if (sts != RTT__NOPICTURE) {
+      if (sts != RTT__NOPICTURE)
+      {
         rtt_edit_draw(ctx, (rtt_t_backgr*)&dtt_systempicture_p18_bg);
         rtt_edit_select(ctx);
         ctx->update_init = 1;
         rtt_menu_edit_update(ctx);
       }
-    } else if (parameter_ptr == (char*)&LOGGING_STORE) {
+    }
+    else if (parameter_ptr == (char*)&LOGGING_STORE)
+    {
       sprintf(filename, "rtt_store_logg%d", logging_page + 1);
       sts = rtt_logging_store_entry(logging_page + 1, filename);
       return RTT__NOPICTURE;
-    } else if (parameter_ptr == (char*)&LOGGING_RESTORE) {
+    }
+    else if (parameter_ptr == (char*)&LOGGING_RESTORE)
+    {
       sprintf(command, "@rtt_store_logg%d", logging_page + 1);
       sts = rtt_menu_command(ctx, pwr_cNObjid, command, 0, 0, 0);
       if (EVEN(sts))
         return RTT__NOPICTURE;
-    } else if (parameter_ptr == (char*)&LOGGING_MORE) {
+    }
+    else if (parameter_ptr == (char*)&LOGGING_MORE)
+    {
       sts = rtt_logging_show(ctx, logging_page + 1);
       if (EVEN(sts))
         return sts;
-      if (sts != RTT__NOPICTURE) {
+      if (sts != RTT__NOPICTURE)
+      {
         rtt_edit_draw(ctx, (rtt_t_backgr*)&dtt_systempicture_p18_bg);
         rtt_edit_select(ctx);
         ctx->update_init = 1;
         rtt_menu_edit_update(ctx);
       }
-    } else if (parameter_ptr == (char*)&LOGGING_ATTR1) {
+    }
+    else if (parameter_ptr == (char*)&LOGGING_ATTR1)
+    {
       sts = gdh_GetObjectInfo(parameter_ptr, &buffer, sizeof(buffer));
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         rtt_message('E', "Parameter doesn't exist");
         return RTT__NOPICTURE;
       }
       strcpy(rtt_loggtable[logging_page].parameterstr[0], parameter_ptr);
-    } else if (parameter_ptr == (char*)&LOGGING_ATTR2) {
+    }
+    else if (parameter_ptr == (char*)&LOGGING_ATTR2)
+    {
       sts = gdh_GetObjectInfo(parameter_ptr, &buffer, sizeof(buffer));
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         rtt_message('E', "Parameter doesn't exist");
         return RTT__NOPICTURE;
       }
       strcpy(rtt_loggtable[logging_page].parameterstr[1], parameter_ptr);
-    } else if (parameter_ptr == (char*)&LOGGING_ATTR3) {
+    }
+    else if (parameter_ptr == (char*)&LOGGING_ATTR3)
+    {
       sts = gdh_GetObjectInfo(parameter_ptr, &buffer, sizeof(buffer));
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         rtt_message('E', "Parameter doesn't exist");
         return RTT__NOPICTURE;
       }
       strcpy(rtt_loggtable[logging_page].parameterstr[2], parameter_ptr);
-    } else if (parameter_ptr == (char*)&LOGGING_ATTR4) {
+    }
+    else if (parameter_ptr == (char*)&LOGGING_ATTR4)
+    {
       sts = gdh_GetObjectInfo(parameter_ptr, &buffer, sizeof(buffer));
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         rtt_message('E', "Parameter doesn't exist");
         return RTT__NOPICTURE;
       }
       strcpy(rtt_loggtable[logging_page].parameterstr[3], parameter_ptr);
-    } else if (parameter_ptr == (char*)&LOGGING_ATTR5) {
+    }
+    else if (parameter_ptr == (char*)&LOGGING_ATTR5)
+    {
       sts = gdh_GetObjectInfo(parameter_ptr, &buffer, sizeof(buffer));
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         rtt_message('E', "Parameter doesn't exist");
         return RTT__NOPICTURE;
       }
       strcpy(rtt_loggtable[logging_page].parameterstr[4], parameter_ptr);
-    } else if (parameter_ptr == (char*)&LOGGING_ATTR6) {
+    }
+    else if (parameter_ptr == (char*)&LOGGING_ATTR6)
+    {
       sts = gdh_GetObjectInfo(parameter_ptr, &buffer, sizeof(buffer));
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         rtt_message('E', "Parameter doesn't exist");
         return RTT__NOPICTURE;
       }
       strcpy(rtt_loggtable[logging_page].parameterstr[5], parameter_ptr);
-    } else if (parameter_ptr == (char*)&LOGGING_ATTR7) {
+    }
+    else if (parameter_ptr == (char*)&LOGGING_ATTR7)
+    {
       sts = gdh_GetObjectInfo(parameter_ptr, &buffer, sizeof(buffer));
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         rtt_message('E', "Parameter doesn't exist");
         return RTT__NOPICTURE;
       }
       strcpy(rtt_loggtable[logging_page].parameterstr[6], parameter_ptr);
-    } else if (parameter_ptr == (char*)&LOGGING_ATTR8) {
+    }
+    else if (parameter_ptr == (char*)&LOGGING_ATTR8)
+    {
       sts = gdh_GetObjectInfo(parameter_ptr, &buffer, sizeof(buffer));
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         rtt_message('E', "Parameter doesn't exist");
         return RTT__NOPICTURE;
       }
       strcpy(rtt_loggtable[logging_page].parameterstr[7], parameter_ptr);
-    } else if (parameter_ptr == (char*)&LOGGING_ATTR9) {
+    }
+    else if (parameter_ptr == (char*)&LOGGING_ATTR9)
+    {
       sts = gdh_GetObjectInfo(parameter_ptr, &buffer, sizeof(buffer));
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         rtt_message('E', "Parameter doesn't exist");
         return RTT__NOPICTURE;
       }
       strcpy(rtt_loggtable[logging_page].parameterstr[8], parameter_ptr);
-    } else if (parameter_ptr == (char*)&LOGGING_ATTR10) {
+    }
+    else if (parameter_ptr == (char*)&LOGGING_ATTR10)
+    {
       sts = gdh_GetObjectInfo(parameter_ptr, &buffer, sizeof(buffer));
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         rtt_message('E', "Parameter doesn't exist");
         return RTT__NOPICTURE;
       }
       strcpy(rtt_loggtable[logging_page].parameterstr[9], parameter_ptr);
-    } else if (parameter_ptr == (char*)&LOGGING_COND) {
+    }
+    else if (parameter_ptr == (char*)&LOGGING_COND)
+    {
       sts = gdh_GetObjectInfo(parameter_ptr, &buffer, sizeof(buffer));
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         rtt_message('E', "Condition doesn't exist");
         return RTT__NOPICTURE;
       }
@@ -3957,65 +4151,63 @@ int RTTSYS_LOGGING(menu_ctx ctx, int event, char* parameter_ptr,
 }
 
 /*************************************************************************
-*
-* Name:		RTTSYS_SHOW_SYS()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	context of the picture.
-* int		event		I 	type of event.
-* char		*parameter_ptr	I	pointer to the parameter which value
-*					has been changed.
-*
-* Description:
-*	Show proview processes.
-*
-**************************************************************************/
+ *
+ * Name:		RTTSYS_SHOW_SYS()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	context of the picture.
+ * int		event		I 	type of event.
+ * char		*parameter_ptr	I	pointer to the parameter which value
+ *					has been changed.
+ *
+ * Description:
+ *	Show proview processes.
+ *
+ **************************************************************************/
 
-int RTTSYS_SHOW_SYS(menu_ctx ctx, int event, char* parameter_ptr,
-    char* objectname, char** picture)
+int RTTSYS_SHOW_SYS(menu_ctx ctx, int event, char* parameter_ptr, char* objectname, char** picture)
 {
   rtt_message('E', "Not yet implemented");
   return RTT__NOPICTURE;
 }
 
 /*************************************************************************
-*
-* Name:		RTTSYS_ELNPROC()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	context of the picture.
-* int		event		I 	type of event.
-* char		*parameter_ptr	I	pointer to the parameter which value
-*					has been changed.
-*
-* Description:
-*	Show proview ELN processes.
-*
-**************************************************************************/
+ *
+ * Name:		RTTSYS_ELNPROC()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	context of the picture.
+ * int		event		I 	type of event.
+ * char		*parameter_ptr	I	pointer to the parameter which value
+ *					has been changed.
+ *
+ * Description:
+ *	Show proview ELN processes.
+ *
+ **************************************************************************/
 
-int RTTSYS_ELNPROC(menu_ctx ctx, int event, char* parameter_ptr,
-    char* objectname, char** picture)
+int RTTSYS_ELNPROC(menu_ctx ctx, int event, char* parameter_ptr, char* objectname, char** picture)
 {
   rtt_message('E', "Picture is not implemented for this platform");
   return RTT__NOPICTURE;
 }
 
 /*************************************************************************
-*
-* Name:		rttsys_start_grafcet_monitor
-*
-* Typ		int
-*
-* Typ		Parameter	IOGF	Beskrivning
-*
-* Function: 	Start of grafcet monitor from command.
-*
-*
-**************************************************************************/
+ *
+ * Name:		rttsys_start_grafcet_monitor
+ *
+ * Typ		int
+ *
+ * Typ		Parameter	IOGF	Beskrivning
+ *
+ * Function: 	Start of grafcet monitor from command.
+ *
+ *
+ **************************************************************************/
 
 int rttsys_start_grafcet_monitor(menu_ctx ctx, pwr_tObjid plc_objid)
 {
@@ -4038,23 +4230,24 @@ int rttsys_start_grafcet_monitor(menu_ctx ctx, pwr_tObjid plc_objid)
   strcpy(plclist->name, plc_name);
 
   /* Get the initsteps */
-  sts = rtt_get_objects_hier_class_name(ctx, plclist->objid,
-      pwr_cClass_initstep, NULL, 500, 0, &rttsys_steplist_add,
-      &plclist->initsteps, &plclist->initstep_count, &plclist->initstep_alloc,
-      (void*)pwr_cClass_initstep, 0);
+  sts = rtt_get_objects_hier_class_name(ctx, plclist->objid, pwr_cClass_initstep, NULL, 500, 0,
+                                        &rttsys_steplist_add, &plclist->initsteps, &plclist->initstep_count,
+                                        &plclist->initstep_alloc, (void*)pwr_cClass_initstep, 0);
   if (EVEN(sts))
     return sts;
 
   /* Start the grafcet monitor */
-  return_sts = rtt_menu_new_sysedit(
-      ctx, pwr_cNObjid, plc_name, plc_name, 0, &RTTSYS_GRAFCET_PLC);
+  return_sts = rtt_menu_new_sysedit(ctx, pwr_cNObjid, plc_name, plc_name, 0, &RTTSYS_GRAFCET_PLC);
 
   /* Free the steplists and the plclist */
   plclist_ptr = plclist;
-  for (i = 0; i < plclist_count; i++) {
-    if (plclist_ptr->initstep_count > 0) {
+  for (i = 0; i < plclist_count; i++)
+  {
+    if (plclist_ptr->initstep_count > 0)
+    {
       initsteplist_ptr = plclist_ptr->initsteps;
-      for (j = 0; j < plclist_ptr->initstep_count; j++) {
+      for (j = 0; j < plclist_ptr->initstep_count; j++)
+      {
         sts = gdh_DLUnrefObjectInfo(initsteplist_ptr->subid);
         if (EVEN(sts))
           return sts;
@@ -4070,125 +4263,126 @@ int rttsys_start_grafcet_monitor(menu_ctx ctx, pwr_tObjid plc_objid)
 }
 
 /*************************************************************************
-*
-* Name:		rttsys_start_system_picture
-*
-* Typ		int
-*
-* Typ		Parameter	IOGF	Beskrivning
-*
-* Function: 	Start of system picture from command.
-*
-*
-**************************************************************************/
+ *
+ * Name:		rttsys_start_system_picture
+ *
+ * Typ		int
+ *
+ * Typ		Parameter	IOGF	Beskrivning
+ *
+ * Function: 	Start of system picture from command.
+ *
+ *
+ **************************************************************************/
 
 int rttsys_start_system_picture(menu_ctx ctx, char* picture_name)
 {
   int sts;
 
   /* Start the system picture */
-  if (str_NoCaseStrncmp(picture_name, "SYSTEM", strlen(picture_name)) == 0) {
-    sts = rtt_menu_new_sysedit(
-        ctx, pwr_cNObjid, "SYSTEM", "SYSTEM", 0, &RTTSYS_SHOW_SYS);
+  if (str_NoCaseStrncmp(picture_name, "SYSTEM", strlen(picture_name)) == 0)
+  {
+    sts = rtt_menu_new_sysedit(ctx, pwr_cNObjid, "SYSTEM", "SYSTEM", 0, &RTTSYS_SHOW_SYS);
     return sts;
-  } else if (str_NoCaseStrncmp(picture_name, "PLCPGM", strlen(picture_name))
-      == 0) {
-    sts = rtt_menu_new_sysedit(
-        ctx, pwr_cNObjid, "PLCPGM", "PLCPGM", 0, &RTTSYS_PLCPGM);
+  }
+  else if (str_NoCaseStrncmp(picture_name, "PLCPGM", strlen(picture_name)) == 0)
+  {
+    sts = rtt_menu_new_sysedit(ctx, pwr_cNObjid, "PLCPGM", "PLCPGM", 0, &RTTSYS_PLCPGM);
     return sts;
-  } else if (str_NoCaseStrncmp(picture_name, "GRAFCET", strlen(picture_name))
-      == 0) {
-    sts = rtt_menu_new_sysedit(
-        ctx, pwr_cNObjid, "GRAFCET", "GRAFCET", 0, &RTTSYS_GRAFCET);
+  }
+  else if (str_NoCaseStrncmp(picture_name, "GRAFCET", strlen(picture_name)) == 0)
+  {
+    sts = rtt_menu_new_sysedit(ctx, pwr_cNObjid, "GRAFCET", "GRAFCET", 0, &RTTSYS_GRAFCET);
     return sts;
-  } else if (str_NoCaseStrncmp(picture_name, "DEVICE", strlen(picture_name))
-      == 0) {
-    sts = rtt_menu_new_sysedit(
-        ctx, pwr_cNObjid, "DEVICE", "DEVICE", 0, &RTTSYS_DEVICE);
+  }
+  else if (str_NoCaseStrncmp(picture_name, "DEVICE", strlen(picture_name)) == 0)
+  {
+    sts = rtt_menu_new_sysedit(ctx, pwr_cNObjid, "DEVICE", "DEVICE", 0, &RTTSYS_DEVICE);
     return sts;
-  } else if (str_NoCaseStrncmp(picture_name, "PLCTHREAD", strlen(picture_name))
-      == 0) {
-    sts = rtt_menu_new_sysedit(
-        ctx, pwr_cNObjid, "PLCTHREAD", "PLCTHREAD", 0, &RTTSYS_PLCTHREAD);
+  }
+  else if (str_NoCaseStrncmp(picture_name, "PLCTHREAD", strlen(picture_name)) == 0)
+  {
+    sts = rtt_menu_new_sysedit(ctx, pwr_cNObjid, "PLCTHREAD", "PLCTHREAD", 0, &RTTSYS_PLCTHREAD);
     return sts;
-  } else if (str_NoCaseStrncmp(picture_name, "PID", strlen(picture_name))
-      == 0) {
+  }
+  else if (str_NoCaseStrncmp(picture_name, "PID", strlen(picture_name)) == 0)
+  {
     sts = rtt_menu_new_sysedit(ctx, pwr_cNObjid, "PID", "PID", 0, &RTTSYS_PID);
     return sts;
-  } else if (str_NoCaseStrncmp(picture_name, "LOGGING", strlen(picture_name))
-      == 0) {
-    sts = rtt_menu_new_sysedit(
-        ctx, pwr_cNObjid, "LOGGING", "LOGGING", 0, &RTTSYS_LOGGING);
+  }
+  else if (str_NoCaseStrncmp(picture_name, "LOGGING", strlen(picture_name)) == 0)
+  {
+    sts = rtt_menu_new_sysedit(ctx, pwr_cNObjid, "LOGGING", "LOGGING", 0, &RTTSYS_LOGGING);
     return sts;
-  } else if (str_NoCaseStrncmp(picture_name, "NODES", strlen(picture_name))
-      == 0) {
-    sts = rtt_menu_new_sysedit(
-        ctx, pwr_cNObjid, "NODES", "NODES", 0, &RTTSYS_SHOW_NODES);
+  }
+  else if (str_NoCaseStrncmp(picture_name, "NODES", strlen(picture_name)) == 0)
+  {
+    sts = rtt_menu_new_sysedit(ctx, pwr_cNObjid, "NODES", "NODES", 0, &RTTSYS_SHOW_NODES);
     return sts;
-  } else if (str_NoCaseStrncmp(picture_name, "SUBCLI", strlen(picture_name))
-      == 0) {
-    sts = rtt_menu_new_sysedit(
-        ctx, pwr_cNObjid, "SUBCLI", "SUBCLI", 0, &RTTSYS_SHOW_SUBCLI);
+  }
+  else if (str_NoCaseStrncmp(picture_name, "SUBCLI", strlen(picture_name)) == 0)
+  {
+    sts = rtt_menu_new_sysedit(ctx, pwr_cNObjid, "SUBCLI", "SUBCLI", 0, &RTTSYS_SHOW_SUBCLI);
     return sts;
-  } else if (str_NoCaseStrncmp(picture_name, "SUBSRV", strlen(picture_name))
-      == 0) {
-    sts = rtt_menu_new_sysedit(
-        ctx, pwr_cNObjid, "SUBSRV", "SUBSRV", 0, &RTTSYS_SHOW_SUBSRV);
+  }
+  else if (str_NoCaseStrncmp(picture_name, "SUBSRV", strlen(picture_name)) == 0)
+  {
+    sts = rtt_menu_new_sysedit(ctx, pwr_cNObjid, "SUBSRV", "SUBSRV", 0, &RTTSYS_SHOW_SUBSRV);
     return sts;
-  } else if (str_NoCaseStrncmp(picture_name, "NMPSCELL", strlen(picture_name))
-      == 0) {
-    sts = rtt_menu_new_sysedit(
-        ctx, pwr_cNObjid, "NMPSCELL", "NMPSCELL", 0, &RTTSYS_NMPSCELL);
+  }
+  else if (str_NoCaseStrncmp(picture_name, "NMPSCELL", strlen(picture_name)) == 0)
+  {
+    sts = rtt_menu_new_sysedit(ctx, pwr_cNObjid, "NMPSCELL", "NMPSCELL", 0, &RTTSYS_NMPSCELL);
     return sts;
-  } else if (str_NoCaseStrncmp(picture_name, "REMNODE", strlen(picture_name))
-      == 0) {
-    sts = rtt_menu_new_sysedit(
-        ctx, pwr_cNObjid, "REMNODE", "REMNODE", 0, &RTTSYS_REMNODE);
+  }
+  else if (str_NoCaseStrncmp(picture_name, "REMNODE", strlen(picture_name)) == 0)
+  {
+    sts = rtt_menu_new_sysedit(ctx, pwr_cNObjid, "REMNODE", "REMNODE", 0, &RTTSYS_REMNODE);
     return sts;
-  } else if (str_NoCaseStrncmp(picture_name, "REMTRANS", strlen(picture_name))
-      == 0) {
-    sts = rtt_menu_new_sysedit(
-        ctx, pwr_cNObjid, "REMTRANS", "REMTRANS", 0, &RTTSYS_REMTRANS);
+  }
+  else if (str_NoCaseStrncmp(picture_name, "REMTRANS", strlen(picture_name)) == 0)
+  {
+    sts = rtt_menu_new_sysedit(ctx, pwr_cNObjid, "REMTRANS", "REMTRANS", 0, &RTTSYS_REMTRANS);
     return sts;
-  } else if (str_NoCaseStrncmp(
-                 picture_name, "RUNNINGTIME", strlen(picture_name))
-      == 0) {
-    sts = rtt_menu_new_sysedit(
-        ctx, pwr_cNObjid, "RUNNINGTIME", "RUNNINGTIME", 0, &RTTSYS_RUNNINGTIME);
+  }
+  else if (str_NoCaseStrncmp(picture_name, "RUNNINGTIME", strlen(picture_name)) == 0)
+  {
+    sts = rtt_menu_new_sysedit(ctx, pwr_cNObjid, "RUNNINGTIME", "RUNNINGTIME", 0, &RTTSYS_RUNNINGTIME);
     return sts;
-  } else if (str_NoCaseStrncmp(
-                 picture_name, "QAPPLICATIONS", strlen(picture_name))
-      == 0) {
-    sts = rtt_menu_new_sysedit(ctx, pwr_cNObjid, "QCOM APPLICATIONS",
-        "QCOM APPLICATIONS", 0, &RTTSYS_QCOM_APPL);
+  }
+  else if (str_NoCaseStrncmp(picture_name, "QAPPLICATIONS", strlen(picture_name)) == 0)
+  {
+    sts = rtt_menu_new_sysedit(ctx, pwr_cNObjid, "QCOM APPLICATIONS", "QCOM APPLICATIONS", 0,
+                               &RTTSYS_QCOM_APPL);
     return sts;
-  } else if (str_NoCaseStrncmp(picture_name, "QQUEUES", strlen(picture_name))
-      == 0) {
-    sts = rtt_menu_new_sysedit(ctx, pwr_cNObjid, "QCOM QUEUES", "QCOM QUEUES",
-        0, &RTTSYS_QCOM_ALLQUEUES);
+  }
+  else if (str_NoCaseStrncmp(picture_name, "QQUEUES", strlen(picture_name)) == 0)
+  {
+    sts = rtt_menu_new_sysedit(ctx, pwr_cNObjid, "QCOM QUEUES", "QCOM QUEUES", 0, &RTTSYS_QCOM_ALLQUEUES);
     return sts;
-  } else if (str_NoCaseStrncmp(picture_name, "QNODES", strlen(picture_name))
-      == 0) {
-    sts = rtt_menu_new_sysedit(
-        ctx, pwr_cNObjid, "QCOM NODES", "QCOM NODES", 0, &RTTSYS_QCOM_NODES);
+  }
+  else if (str_NoCaseStrncmp(picture_name, "QNODES", strlen(picture_name)) == 0)
+  {
+    sts = rtt_menu_new_sysedit(ctx, pwr_cNObjid, "QCOM NODES", "QCOM NODES", 0, &RTTSYS_QCOM_NODES);
     return sts;
-  } else if (str_NoCaseStrncmp(picture_name, "QLINKS", strlen(picture_name))
-      == 0) {
-    sts = rtt_menu_new_sysedit(
-        ctx, pwr_cNObjid, "QCOM LINKS", "QCOM LINKS", 0, &RTTSYS_QCOM_LINKS);
+  }
+  else if (str_NoCaseStrncmp(picture_name, "QLINKS", strlen(picture_name)) == 0)
+  {
+    sts = rtt_menu_new_sysedit(ctx, pwr_cNObjid, "QCOM LINKS", "QCOM LINKS", 0, &RTTSYS_QCOM_LINKS);
     return sts;
-  } else if (str_NoCaseStrncmp(picture_name, "POOLS", strlen(picture_name))
-      == 0) {
-    sts = rtt_menu_new_sysedit(
-        ctx, pwr_cNObjid, "POOLS", "POOLS", 0, &RTTSYS_POOLS);
+  }
+  else if (str_NoCaseStrncmp(picture_name, "POOLS", strlen(picture_name)) == 0)
+  {
+    sts = rtt_menu_new_sysedit(ctx, pwr_cNObjid, "POOLS", "POOLS", 0, &RTTSYS_POOLS);
     return sts;
-  } else if (str_NoCaseStrncmp(picture_name, "CACHE", strlen(picture_name))
-      == 0) {
-    sts = rtt_menu_new_sysedit(
-        ctx, pwr_cNObjid, "CACHE", "CACHE", 0, &RTTSYS_CACHE);
+  }
+  else if (str_NoCaseStrncmp(picture_name, "CACHE", strlen(picture_name)) == 0)
+  {
+    sts = rtt_menu_new_sysedit(ctx, pwr_cNObjid, "CACHE", "CACHE", 0, &RTTSYS_CACHE);
     return sts;
-  } else if (str_NoCaseStrncmp(picture_name, "ERROR", strlen(picture_name))
-      == 0) {
+  }
+  else if (str_NoCaseStrncmp(picture_name, "ERROR", strlen(picture_name)) == 0)
+  {
     rtt_message('I', "Obsolete command, use \"show device\"");
     return RTT__NOPICTURE;
   }
@@ -4196,22 +4390,22 @@ int rttsys_start_system_picture(menu_ctx ctx, char* picture_name)
 }
 
 /*************************************************************************
-*
-* Name:		RTTSYS_OBJECT_CELL
-*
-* Typ		int
-*
-* Typ		Parameter	IOGF	Beskrivning
-*
-* Function: 	Start of system picture from command.
-*
-*
-**************************************************************************/
+ *
+ * Name:		RTTSYS_OBJECT_CELL
+ *
+ * Typ		int
+ *
+ * Typ		Parameter	IOGF	Beskrivning
+ *
+ * Function: 	Start of system picture from command.
+ *
+ *
+ **************************************************************************/
 
 #define CELLOBJ_PAGESIZE 15
 
-static int rttsys_cell_object_start(menu_ctx ctx, pwr_tObjid objid, void* arg1,
-    void* arg2, void* arg3, void* arg4)
+static int rttsys_cell_object_start(menu_ctx ctx, pwr_tObjid objid, void* arg1, void* arg2, void* arg3,
+                                    void* arg4)
 {
   pwr_tOName objectname;
   int sts;
@@ -4220,13 +4414,11 @@ static int rttsys_cell_object_start(menu_ctx ctx, pwr_tObjid objid, void* arg1,
   if (EVEN(sts))
     return sts;
 
-  sts = rtt_menu_new_sysedit(
-      ctx, pwr_cNObjid, objectname, objectname, 0, &RTTSYS_OBJECT_CELL);
+  sts = rtt_menu_new_sysedit(ctx, pwr_cNObjid, objectname, objectname, 0, &RTTSYS_OBJECT_CELL);
   return sts;
 }
 
-int RTTSYS_OBJECT_CELL(menu_ctx ctx, int event, char* parameter_ptr,
-    char* objectname, char** picture)
+int RTTSYS_OBJECT_CELL(menu_ctx ctx, int event, char* parameter_ptr, char* objectname, char** picture)
 {
   int sts;
   rtt_t_menu_upd* menu_ptr;
@@ -4243,19 +4435,22 @@ int RTTSYS_OBJECT_CELL(menu_ctx ctx, int event, char* parameter_ptr,
   IF_NOGDH_RETURN;
 
   /**********************************************************
-  *	Return address of menu
-  ***********************************************************/
-  if (event == RTT_APPL_PICTURE) {
+   *	Return address of menu
+   ***********************************************************/
+  if (event == RTT_APPL_PICTURE)
+  {
     *picture = (char*)&dtt_systempicture_p29_bg;
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Previous page
-  ***********************************************************/
-  if (event == RTT_APPL_MENU) {
+   *	Previous page
+   ***********************************************************/
+  if (event == RTT_APPL_MENU)
+  {
     /* Check object first */
     sts = gdh_NameToObjid(objectname, &cell_objid);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       rtt_message('E', "Node is down");
       return RTT__NOPICTURE;
     }
@@ -4267,27 +4462,30 @@ int RTTSYS_OBJECT_CELL(menu_ctx ctx, int event, char* parameter_ptr,
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Previous page
-  ***********************************************************/
-  if (event == RTT_APPL_PREVPAGE) {
+   *	Previous page
+   ***********************************************************/
+  if (event == RTT_APPL_PREVPAGE)
+  {
     page--;
     page = MAX(page, 0);
     CELLOBJ_PAGE = page + 1;
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Next page
-  ***********************************************************/
-  if (event == RTT_APPL_NEXTPAGE) {
+   *	Next page
+   ***********************************************************/
+  if (event == RTT_APPL_NEXTPAGE)
+  {
     page++;
     page = MIN(page, CELLOBJ_MAXPAGE - 1);
     CELLOBJ_PAGE = page + 1;
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Initialization of the picture
-  ***********************************************************/
-  if (event == RTT_APPL_INIT) {
+   *	Initialization of the picture
+   ***********************************************************/
+  if (event == RTT_APPL_INIT)
+  {
     page = 0;
     CELLOBJ_PAGE = page + 1;
 
@@ -4305,31 +4503,35 @@ int RTTSYS_OBJECT_CELL(menu_ctx ctx, int event, char* parameter_ptr,
       return sts;
     cell_class_objid = cdh_ClassIdToObjid(cell_class);
 
-    switch (cell_class) {
-    case pwr_cClass_NMpsCell: {
-      sts = gdh_RefObjectInfo(objectname, (pwr_tAddress*)&cell_ptr, &cell_subid,
-          sizeof(pwr_sClass_NMpsCell));
+    switch (cell_class)
+    {
+    case pwr_cClass_NMpsCell:
+    {
+      sts = gdh_RefObjectInfo(objectname, (pwr_tAddress*)&cell_ptr, &cell_subid, sizeof(pwr_sClass_NMpsCell));
       if (EVEN(sts))
         return sts;
       break;
     }
-    case pwr_cClass_NMpsStoreCell: {
+    case pwr_cClass_NMpsStoreCell:
+    {
       sts = gdh_RefObjectInfo(objectname, (pwr_tAddress*)&cell_ptr, &cell_subid,
-          sizeof(pwr_sClass_NMpsStoreCell));
+                              sizeof(pwr_sClass_NMpsStoreCell));
       if (EVEN(sts))
         return sts;
       break;
     }
-    case pwr_cClass_NMpsOutCell: {
+    case pwr_cClass_NMpsOutCell:
+    {
       sts = gdh_RefObjectInfo(objectname, (pwr_tAddress*)&cell_ptr, &cell_subid,
-          sizeof(pwr_sClass_NMpsOutCell));
+                              sizeof(pwr_sClass_NMpsOutCell));
       if (EVEN(sts))
         return sts;
       break;
     }
-    case pwr_cClass_NMpsMirrorCell: {
+    case pwr_cClass_NMpsMirrorCell:
+    {
       sts = gdh_RefObjectInfo(objectname, (pwr_tAddress*)&cell_ptr, &cell_subid,
-          sizeof(pwr_sClass_NMpsMirrorCell));
+                              sizeof(pwr_sClass_NMpsMirrorCell));
       if (EVEN(sts))
         return sts;
       break;
@@ -4339,49 +4541,40 @@ int RTTSYS_OBJECT_CELL(menu_ctx ctx, int event, char* parameter_ptr,
     menulist = (rtt_t_menu_upd*)ctx->menu;
     menu_ptr = menulist;
     menu_ptr += 5 * (CELLOBJ_PAGESIZE);
-    switch (cell_class) {
+    switch (cell_class)
+    {
     case pwr_cClass_NMpsCell:
     case pwr_cClass_NMpsStoreCell:
-    case pwr_cClass_NMpsOutCell: {
+    case pwr_cClass_NMpsOutCell:
+    {
       if (cell_class == pwr_cClass_NMpsStoreCell)
-        menu_ptr->value_ptr
-            = (char*)&((pwr_sClass_NMpsCell*)(cell_ptr))->SelectIndex;
+        menu_ptr->value_ptr = (char*)&((pwr_sClass_NMpsCell*)(cell_ptr))->SelectIndex;
       else
-        menu_ptr->value_ptr
-            = (char*)&((pwr_sClass_NMpsCell*)(cell_ptr))->LastIndex;
+        menu_ptr->value_ptr = (char*)&((pwr_sClass_NMpsCell*)(cell_ptr))->LastIndex;
       menu_ptr++;
-      menu_ptr->value_ptr
-          = (char*)&((pwr_sClass_NMpsCell*)(cell_ptr))->DataLastP.Aref.Objid;
+      menu_ptr->value_ptr = (char*)&((pwr_sClass_NMpsCell*)(cell_ptr))->DataLastP.Aref.Objid;
       menu_ptr++;
-      *(pwr_tBoolean*)(menu_ptr->value_ptr)
-          = ((pwr_sClass_NMpsCell*)(cell_ptr))->DataLast_Front;
+      *(pwr_tBoolean*)(menu_ptr->value_ptr) = ((pwr_sClass_NMpsCell*)(cell_ptr))->DataLast_Front;
       menu_ptr++;
-      *(pwr_tBoolean*)(menu_ptr->value_ptr)
-          = ((pwr_sClass_NMpsCell*)(cell_ptr))->DataLast_Back;
+      *(pwr_tBoolean*)(menu_ptr->value_ptr) = ((pwr_sClass_NMpsCell*)(cell_ptr))->DataLast_Back;
       menu_ptr++;
-      *(pwr_tBoolean*)(menu_ptr->value_ptr)
-          = ((pwr_sClass_NMpsCell*)(cell_ptr))->DataLast_Select;
+      *(pwr_tBoolean*)(menu_ptr->value_ptr) = ((pwr_sClass_NMpsCell*)(cell_ptr))->DataLast_Select;
       menu_ptr++;
-      menu_ptr->value_ptr
-          = (char*)&((pwr_sClass_NMpsCell*)(cell_ptr))->ExternStatus;
+      menu_ptr->value_ptr = (char*)&((pwr_sClass_NMpsCell*)(cell_ptr))->ExternStatus;
       menu_ptr++;
-      menu_ptr->value_ptr
-          = (char*)&((pwr_sClass_NMpsCell*)(cell_ptr))->ExternIndex;
+      menu_ptr->value_ptr = (char*)&((pwr_sClass_NMpsCell*)(cell_ptr))->ExternIndex;
       menu_ptr->func3 = &rtt_object_parameters;
       menu_ptr->argoi = cell_objid;
       menu_ptr++;
-      menu_ptr->value_ptr
-          = (char*)&((pwr_sClass_NMpsCell*)(cell_ptr))->ExternOpType;
+      menu_ptr->value_ptr = (char*)&((pwr_sClass_NMpsCell*)(cell_ptr))->ExternOpType;
       menu_ptr->func3 = &rtt_object_parameters;
       menu_ptr->argoi = cell_objid;
       menu_ptr++;
-      menu_ptr->value_ptr
-          = (char*)&((pwr_sClass_NMpsCell*)(cell_ptr))->ExternFlag;
+      menu_ptr->value_ptr = (char*)&((pwr_sClass_NMpsCell*)(cell_ptr))->ExternFlag;
       menu_ptr->func3 = &rtt_object_parameters;
       menu_ptr->argoi = cell_objid;
       menu_ptr++;
-      menu_ptr->value_ptr
-          = (char*)&((pwr_sClass_NMpsCell*)(cell_ptr))->ExternObjId;
+      menu_ptr->value_ptr = (char*)&((pwr_sClass_NMpsCell*)(cell_ptr))->ExternObjId;
       menu_ptr->func3 = &rtt_object_parameters;
       menu_ptr->argoi = cell_objid;
       menu_ptr++;
@@ -4389,28 +4582,23 @@ int RTTSYS_OBJECT_CELL(menu_ctx ctx, int event, char* parameter_ptr,
       menu_ptr++;
       menu_ptr->value_ptr = (char*)&((pwr_sClass_NMpsCell*)(cell_ptr))->MaxSize;
       menu_ptr++;
-      menu_ptr->value_ptr
-          = (char*)&((pwr_sClass_NMpsCell*)(cell_ptr))->LastIndex;
+      menu_ptr->value_ptr = (char*)&((pwr_sClass_NMpsCell*)(cell_ptr))->LastIndex;
       menu_ptr++;
-      menu_ptr->value_ptr
-          = (char*)&((pwr_sClass_NMpsCell*)(cell_ptr))->CellFull;
+      menu_ptr->value_ptr = (char*)&((pwr_sClass_NMpsCell*)(cell_ptr))->CellFull;
       menu_ptr++;
-      menu_ptr->value_ptr
-          = (char*)&((pwr_sClass_NMpsCell*)(cell_ptr))->ResetObject;
+      menu_ptr->value_ptr = (char*)&((pwr_sClass_NMpsCell*)(cell_ptr))->ResetObject;
       menu_ptr++;
-      menu_ptr->value_ptr
-          = (char*)&((pwr_sClass_NMpsCell*)(cell_ptr))->Function;
+      menu_ptr->value_ptr = (char*)&((pwr_sClass_NMpsCell*)(cell_ptr))->Function;
       menu_ptr++;
       *(pwr_tObjid*)(menu_ptr->value_ptr) = cell_objid;
       menu_ptr++;
       break;
     }
-    case pwr_cClass_NMpsMirrorCell: {
-      menu_ptr->value_ptr
-          = (char*)&((pwr_sClass_NMpsMirrorCell*)(cell_ptr))->LastIndex;
+    case pwr_cClass_NMpsMirrorCell:
+    {
+      menu_ptr->value_ptr = (char*)&((pwr_sClass_NMpsMirrorCell*)(cell_ptr))->LastIndex;
       menu_ptr++;
-      menu_ptr->value_ptr = (char*)&((pwr_sClass_NMpsMirrorCell*)(cell_ptr))
-                                ->DataLastP.Aref.Objid;
+      menu_ptr->value_ptr = (char*)&((pwr_sClass_NMpsMirrorCell*)(cell_ptr))->DataLastP.Aref.Objid;
       menu_ptr++;
       menu_ptr->value_ptr = (char*)RTT_ERASE;
       menu_ptr++;
@@ -4432,14 +4620,11 @@ int RTTSYS_OBJECT_CELL(menu_ctx ctx, int event, char* parameter_ptr,
       menu_ptr++;
       menu_ptr->value_ptr = (char*)&((pwr_sClass_NMpsCell*)(cell_ptr))->MaxSize;
       menu_ptr++;
-      menu_ptr->value_ptr
-          = (char*)&((pwr_sClass_NMpsCell*)(cell_ptr))->LastIndex;
+      menu_ptr->value_ptr = (char*)&((pwr_sClass_NMpsCell*)(cell_ptr))->LastIndex;
       menu_ptr++;
-      menu_ptr->value_ptr
-          = (char*)&((pwr_sClass_NMpsCell*)(cell_ptr))->CellFull;
+      menu_ptr->value_ptr = (char*)&((pwr_sClass_NMpsCell*)(cell_ptr))->CellFull;
       menu_ptr++;
-      menu_ptr->value_ptr
-          = (char*)&((pwr_sClass_NMpsCell*)(cell_ptr))->Function;
+      menu_ptr->value_ptr = (char*)&((pwr_sClass_NMpsCell*)(cell_ptr))->Function;
       menu_ptr++;
       menu_ptr->value_ptr = (char*)RTT_ERASE;
       menu_ptr++;
@@ -4450,32 +4635,37 @@ int RTTSYS_OBJECT_CELL(menu_ctx ctx, int event, char* parameter_ptr,
     }
   }
   /**********************************************************
-  *	Exit of the picture
-  ***********************************************************/
-  else if (event == RTT_APPL_EXIT) {
+   *	Exit of the picture
+   ***********************************************************/
+  else if (event == RTT_APPL_EXIT)
+  {
     sts = gdh_UnrefObjectInfo(cell_subid);
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Update the picture.
-  ***********************************************************/
-  else if (event == RTT_APPL_UPDATE) {
+   *	Update the picture.
+   ***********************************************************/
+  else if (event == RTT_APPL_UPDATE)
+  {
     menulist = (rtt_t_menu_upd*)ctx->menu;
     menu_ptr = menulist;
     j = 0;
     k = 0;
 
-    switch (cell_class) {
+    switch (cell_class)
+    {
     case pwr_cClass_NMpsCell:
     case pwr_cClass_NMpsStoreCell:
-    case pwr_cClass_NMpsOutCell: {
+    case pwr_cClass_NMpsOutCell:
+    {
       plc_t_DataInfo* data_info;
 
       data_info = (plc_t_DataInfo*)&((pwr_sClass_NMpsCell*)(cell_ptr))->Data1P;
       /* Display all the data objects */
-      for (l = 0; l < ((pwr_sClass_NMpsCell*)(cell_ptr))->LastIndex; l++) {
-        if ((k >= page * CELLOBJ_PAGESIZE)
-            && (k < (page + 1) * CELLOBJ_PAGESIZE)) {
+      for (l = 0; l < ((pwr_sClass_NMpsCell*)(cell_ptr))->LastIndex; l++)
+      {
+        if ((k >= page * CELLOBJ_PAGESIZE) && (k < (page + 1) * CELLOBJ_PAGESIZE))
+        {
           *(pwr_tInt32*)(menu_ptr->value_ptr) = l + 1;
           menu_ptr++;
           menu_ptr->func2 = &rttsys_cell_dataobject;
@@ -4497,18 +4687,17 @@ int RTTSYS_OBJECT_CELL(menu_ctx ctx, int event, char* parameter_ptr,
       }
       break;
     }
-    case pwr_cClass_NMpsMirrorCell: {
+    case pwr_cClass_NMpsMirrorCell:
+    {
       plc_t_DataInfoMirCell* data_info;
 
-      data_info
-          = (plc_t_DataInfoMirCell*)&((pwr_sClass_NMpsMirrorCell*)(cell_ptr))
-                ->Data1P;
+      data_info = (plc_t_DataInfoMirCell*)&((pwr_sClass_NMpsMirrorCell*)(cell_ptr))->Data1P;
 
       /* Display all the data objects */
-      for (l = 0; l < ((pwr_sClass_NMpsMirrorCell*)(cell_ptr))->LastIndex;
-           l++) {
-        if ((k >= page * CELLOBJ_PAGESIZE)
-            && (k < (page + 1) * CELLOBJ_PAGESIZE)) {
+      for (l = 0; l < ((pwr_sClass_NMpsMirrorCell*)(cell_ptr))->LastIndex; l++)
+      {
+        if ((k >= page * CELLOBJ_PAGESIZE) && (k < (page + 1) * CELLOBJ_PAGESIZE))
+        {
           *(pwr_tInt32*)(menu_ptr->value_ptr) = l + 1;
           menu_ptr++;
           menu_ptr->func2 = &rttsys_cell_dataobject;
@@ -4532,7 +4721,8 @@ int RTTSYS_OBJECT_CELL(menu_ctx ctx, int event, char* parameter_ptr,
     }
     }
 
-    for (i = j; i < CELLOBJ_PAGESIZE; i++) {
+    for (i = j; i < CELLOBJ_PAGESIZE; i++)
+    {
       *(pwr_tInt32*)(menu_ptr->value_ptr) = 0;
       menu_ptr++;
       menu_ptr->func3 = &rtt_object_parameters;
@@ -4554,20 +4744,20 @@ int RTTSYS_OBJECT_CELL(menu_ctx ctx, int event, char* parameter_ptr,
 }
 
 /*************************************************************************
-*
-* Name:		RTTSYS_NMPSCELL
-*
-* Typ		int
-*
-* Typ		Parameter	IOGF	Beskrivning
-*
-* Function: 	Start of system picture from command.
-*
-*
-**************************************************************************/
+ *
+ * Name:		RTTSYS_NMPSCELL
+ *
+ * Typ		int
+ *
+ * Typ		Parameter	IOGF	Beskrivning
+ *
+ * Function: 	Start of system picture from command.
+ *
+ *
+ **************************************************************************/
 
-static int rttsys_cellist_add(pwr_tObjid object_objid, pwr_tClassId class,
-    rttsys_t_cell_list** objectlist, int* objectlist_count, int* alloc)
+static int rttsys_cellist_add(pwr_tObjid object_objid, pwr_tClassId class, rttsys_t_cell_list** objectlist,
+                              int* objectlist_count, int* alloc)
 {
   rttsys_t_cell_list* objectlist_ptr;
   rttsys_t_cell_list* new_objectlist;
@@ -4575,17 +4765,19 @@ static int rttsys_cellist_add(pwr_tObjid object_objid, pwr_tClassId class,
   int sts;
   pwr_sAttrRef attrref;
 
-  if (*objectlist_count == 0) {
+  if (*objectlist_count == 0)
+  {
     *objectlist = calloc(RTTSYS_ALLOC, sizeof(rttsys_t_cell_list));
     if (*objectlist == 0)
       return RTT__NOMEMORY;
     *alloc = RTTSYS_ALLOC;
-  } else if (*alloc <= *objectlist_count) {
+  }
+  else if (*alloc <= *objectlist_count)
+  {
     new_objectlist = calloc(*alloc + RTTSYS_ALLOC, sizeof(rttsys_t_cell_list));
     if (new_objectlist == 0)
       return RTT__NOMEMORY;
-    memcpy(new_objectlist, *objectlist,
-        *objectlist_count * sizeof(rttsys_t_cell_list));
+    memcpy(new_objectlist, *objectlist, *objectlist_count * sizeof(rttsys_t_cell_list));
     free(*objectlist);
     *objectlist = new_objectlist;
     (*alloc) += RTTSYS_ALLOC;
@@ -4601,8 +4793,8 @@ static int rttsys_cellist_add(pwr_tObjid object_objid, pwr_tClassId class,
   strcpy(objectlist_ptr->name, namebuf);
 
   attrref = cdh_ObjidToAref(object_objid);
-  sts = gdh_DLRefObjectInfoAttrref(&attrref,
-      (pwr_tAddress*)&objectlist_ptr->value_ptr, &objectlist_ptr->subid);
+  sts =
+      gdh_DLRefObjectInfoAttrref(&attrref, (pwr_tAddress*)&objectlist_ptr->value_ptr, &objectlist_ptr->subid);
   if (EVEN(sts))
     return sts;
 
@@ -4610,18 +4802,18 @@ static int rttsys_cellist_add(pwr_tObjid object_objid, pwr_tClassId class,
   return RTT__SUCCESS;
 }
 
-static int rttsys_cell_add(pwr_tClassId class, rttsys_t_cell_list** objectlist,
-    int* objectlist_count, int* object_alloc)
+static int rttsys_cell_add(pwr_tClassId class, rttsys_t_cell_list** objectlist, int* objectlist_count,
+                           int* object_alloc)
 {
   pwr_tObjid object_objid;
   int sts;
 
   /* Get all initsteps of this node */
   sts = gdh_GetClassList(class, &object_objid);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     /* Store and direct link the initstep */
-    sts = rttsys_cellist_add(
-        object_objid, class, objectlist, objectlist_count, object_alloc);
+    sts = rttsys_cellist_add(object_objid, class, objectlist, objectlist_count, object_alloc);
     if (EVEN(sts))
       return sts;
 
@@ -4634,15 +4826,16 @@ static int rttsys_cell_add(pwr_tClassId class, rttsys_t_cell_list** objectlist,
 static rttsys_t_cell_list* cellist;
 static int cellist_count;
 
-static int rttsys_cell_expand(menu_ctx ctx, pwr_tObjid objid, void* arg1,
-    void* arg2, void* arg3, void* arg4)
+static int rttsys_cell_expand(menu_ctx ctx, pwr_tObjid objid, void* arg1, void* arg2, void* arg3, void* arg4)
 {
   rttsys_t_cell_list* cellist_ptr;
   int i;
 
   cellist_ptr = cellist;
-  for (i = 0; i < cellist_count; i++) {
-    if (cdh_ObjidIsEqual(cellist_ptr->objid, objid)) {
+  for (i = 0; i < cellist_count; i++)
+  {
+    if (cdh_ObjidIsEqual(cellist_ptr->objid, objid))
+    {
       cellist_ptr->expand = !cellist_ptr->expand;
       break;
     }
@@ -4651,13 +4844,14 @@ static int rttsys_cell_expand(menu_ctx ctx, pwr_tObjid objid, void* arg1,
   return RTT__SUCCESS;
 }
 
-static int rttsys_cell_dataobject(menu_ctx ctx, pwr_tObjid cell_objid,
-    pwr_tObjid* data_objid, void* arg2, void* arg3, void* arg4)
+static int rttsys_cell_dataobject(menu_ctx ctx, pwr_tObjid cell_objid, pwr_tObjid* data_objid, void* arg2,
+                                  void* arg3, void* arg4)
 {
   int sts;
 
   sts = rtt_object_parameters(ctx, *data_objid, 0, 0, 0, 0);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     rtt_message('E', "Unable to open object");
     return RTT__NOPICTURE;
   }
@@ -4666,8 +4860,8 @@ static int rttsys_cell_dataobject(menu_ctx ctx, pwr_tObjid cell_objid,
 
 static int rttsys_cellist_cmp(const void* p1, const void* p2)
 {
-  char* str1 = ((rttsys_t_cell_list*) p1)->name;
-  char* str2 = ((rttsys_t_cell_list*) p2)->name;
+  char* str1 = ((rttsys_t_cell_list*)p1)->name;
+  char* str2 = ((rttsys_t_cell_list*)p2)->name;
   if (*str2 == 0)
     return 0;
   return strcmp(str1, str2);
@@ -4675,8 +4869,7 @@ static int rttsys_cellist_cmp(const void* p1, const void* p2)
 
 #define NMPSCELL_PAGESIZE 19
 
-int RTTSYS_NMPSCELL(menu_ctx ctx, int event, char* parameter_ptr,
-    char* objectname, char** picture)
+int RTTSYS_NMPSCELL(menu_ctx ctx, int event, char* parameter_ptr, char* objectname, char** picture)
 {
   int sts;
   rtt_t_menu_upd* menu_ptr;
@@ -4688,88 +4881,93 @@ int RTTSYS_NMPSCELL(menu_ctx ctx, int event, char* parameter_ptr,
   int cell_alloc;
 
   /**********************************************************
-  *	Return address of menu
-  ***********************************************************/
-  if (event == RTT_APPL_PICTURE) {
+   *	Return address of menu
+   ***********************************************************/
+  if (event == RTT_APPL_PICTURE)
+  {
     *picture = (char*)&dtt_systempicture_p28_bg;
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Previous page
-  ***********************************************************/
-  if (event == RTT_APPL_MENU) {
+   *	Previous page
+   ***********************************************************/
+  if (event == RTT_APPL_MENU)
+  {
     *picture = (char*)&dtt_systempicture_p28_eu;
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Previous page
-  ***********************************************************/
-  if (event == RTT_APPL_PREVPAGE) {
+   *	Previous page
+   ***********************************************************/
+  if (event == RTT_APPL_PREVPAGE)
+  {
     page--;
     page = MAX(page, 0);
     NMPSCELL_PAGE = page + 1;
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Next page
-  ***********************************************************/
-  if (event == RTT_APPL_NEXTPAGE) {
+   *	Next page
+   ***********************************************************/
+  if (event == RTT_APPL_NEXTPAGE)
+  {
     page++;
     page = MIN(page, NMPSCELL_MAXPAGE - 1);
     NMPSCELL_PAGE = page + 1;
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Initialization of the picture
-  ***********************************************************/
-  if (event == RTT_APPL_INIT) {
+   *	Initialization of the picture
+   ***********************************************************/
+  if (event == RTT_APPL_INIT)
+  {
     cellist_count = 0;
     page = 0;
     NMPSCELL_PAGE = page + 1;
 
-    sts = rttsys_cell_add(
-        pwr_cClass_NMpsCell, &cellist, &cellist_count, &cell_alloc);
+    sts = rttsys_cell_add(pwr_cClass_NMpsCell, &cellist, &cellist_count, &cell_alloc);
     if (EVEN(sts))
       return sts;
-    sts = rttsys_cell_add(
-        pwr_cClass_NMpsStoreCell, &cellist, &cellist_count, &cell_alloc);
+    sts = rttsys_cell_add(pwr_cClass_NMpsStoreCell, &cellist, &cellist_count, &cell_alloc);
     if (EVEN(sts))
       return sts;
-    sts = rttsys_cell_add(
-        pwr_cClass_NMpsMirrorCell, &cellist, &cellist_count, &cell_alloc);
+    sts = rttsys_cell_add(pwr_cClass_NMpsMirrorCell, &cellist, &cellist_count, &cell_alloc);
     if (EVEN(sts))
       return sts;
-    sts = rttsys_cell_add(
-        pwr_cClass_NMpsOutCell, &cellist, &cellist_count, &cell_alloc);
+    sts = rttsys_cell_add(pwr_cClass_NMpsOutCell, &cellist, &cellist_count, &cell_alloc);
     if (EVEN(sts))
       return sts;
 
     qsort(cellist, cellist_count, sizeof(rttsys_t_cell_list), rttsys_cellist_cmp);
   }
   /**********************************************************
-  *	Exit of the picture
-  ***********************************************************/
-  else if (event == RTT_APPL_EXIT) {
+   *	Exit of the picture
+   ***********************************************************/
+  else if (event == RTT_APPL_EXIT)
+  {
     /* Free the cellist */
     cellist_ptr = cellist;
-    for (i = 0; i < cellist_count; i++) {
+    for (i = 0; i < cellist_count; i++)
+    {
       sts = gdh_DLUnrefObjectInfo(cellist_ptr->subid);
       cellist_ptr++;
     }
     free(cellist);
   }
   /**********************************************************
-  *	Update the picture.
-  ***********************************************************/
-  else if (event == RTT_APPL_UPDATE) {
+   *	Update the picture.
+   ***********************************************************/
+  else if (event == RTT_APPL_UPDATE)
+  {
     menulist = (rtt_t_menu_upd*)ctx->menu;
     menu_ptr = menulist;
     cellist_ptr = cellist;
     j = 0;
     k = 0;
-    for (i = 0; i < cellist_count; i++) {
-      if ((k >= page * NMPSCELL_PAGESIZE)
-          && (k < (page + 1) * NMPSCELL_PAGESIZE)) {
+    for (i = 0; i < cellist_count; i++)
+    {
+      if ((k >= page * NMPSCELL_PAGESIZE) && (k < (page + 1) * NMPSCELL_PAGESIZE))
+      {
         strcpy(menu_ptr->value_ptr, cellist_ptr->name);
 
         /* Define PF buttons and Return */
@@ -4780,27 +4978,24 @@ int RTTSYS_NMPSCELL(menu_ctx ctx, int event, char* parameter_ptr,
 
         cell_menu_ptr = menu_ptr;
         menu_ptr++;
-        switch (cellist_ptr->class) {
+        switch (cellist_ptr->class)
+        {
         case pwr_cClass_NMpsCell:
         case pwr_cClass_NMpsStoreCell:
-        case pwr_cClass_NMpsOutCell: {
+        case pwr_cClass_NMpsOutCell:
+        {
           plc_t_DataInfo* data_info;
 
-          *(pwr_tInt32*)(menu_ptr->value_ptr)
-              = ((pwr_sClass_NMpsCell*)(cellist_ptr->value_ptr))->Function;
+          *(pwr_tInt32*)(menu_ptr->value_ptr) = ((pwr_sClass_NMpsCell*)(cellist_ptr->value_ptr))->Function;
           menu_ptr++;
-          *(pwr_tInt32*)(menu_ptr->value_ptr)
-              = ((pwr_sClass_NMpsCell*)(cellist_ptr->value_ptr))->MaxSize;
+          *(pwr_tInt32*)(menu_ptr->value_ptr) = ((pwr_sClass_NMpsCell*)(cellist_ptr->value_ptr))->MaxSize;
           menu_ptr++;
-          *(pwr_tInt32*)(menu_ptr->value_ptr)
-              = ((pwr_sClass_NMpsCell*)(cellist_ptr->value_ptr))->LastIndex;
+          *(pwr_tInt32*)(menu_ptr->value_ptr) = ((pwr_sClass_NMpsCell*)(cellist_ptr->value_ptr))->LastIndex;
           menu_ptr++;
           *(pwr_tInt32*)(menu_ptr->value_ptr) = 1;
           menu_ptr++;
 
-          data_info = (plc_t_DataInfo*)&(
-              (pwr_sClass_NMpsCell*)(cellist_ptr->value_ptr))
-                          ->Data1P;
+          data_info = (plc_t_DataInfo*)&((pwr_sClass_NMpsCell*)(cellist_ptr->value_ptr))->Data1P;
           cell_menu_ptr->arg1 = &data_info->DataP.Aref.Objid;
 
           *(pwr_tObjid*)(menu_ptr->value_ptr) = data_info->DataP.Aref.Objid;
@@ -4814,26 +5009,23 @@ int RTTSYS_NMPSCELL(menu_ctx ctx, int event, char* parameter_ptr,
           j++;
           break;
         }
-        case pwr_cClass_NMpsMirrorCell: {
+        case pwr_cClass_NMpsMirrorCell:
+        {
           plc_t_DataInfoMirCell* data_info;
 
-          *(pwr_tInt32*)(menu_ptr->value_ptr)
-              = ((pwr_sClass_NMpsMirrorCell*)(cellist_ptr->value_ptr))
-                    ->Function;
+          *(pwr_tInt32*)(menu_ptr->value_ptr) =
+              ((pwr_sClass_NMpsMirrorCell*)(cellist_ptr->value_ptr))->Function;
           menu_ptr++;
-          *(pwr_tInt32*)(menu_ptr->value_ptr)
-              = ((pwr_sClass_NMpsMirrorCell*)(cellist_ptr->value_ptr))->MaxSize;
+          *(pwr_tInt32*)(menu_ptr->value_ptr) =
+              ((pwr_sClass_NMpsMirrorCell*)(cellist_ptr->value_ptr))->MaxSize;
           menu_ptr++;
-          *(pwr_tInt32*)(menu_ptr->value_ptr)
-              = ((pwr_sClass_NMpsMirrorCell*)(cellist_ptr->value_ptr))
-                    ->LastIndex;
+          *(pwr_tInt32*)(menu_ptr->value_ptr) =
+              ((pwr_sClass_NMpsMirrorCell*)(cellist_ptr->value_ptr))->LastIndex;
           menu_ptr++;
           *(pwr_tInt32*)(menu_ptr->value_ptr) = 1;
           menu_ptr++;
 
-          data_info = (plc_t_DataInfoMirCell*)&(
-              (pwr_sClass_NMpsMirrorCell*)(cellist_ptr->value_ptr))
-                          ->Data1P;
+          data_info = (plc_t_DataInfoMirCell*)&((pwr_sClass_NMpsMirrorCell*)(cellist_ptr->value_ptr))->Data1P;
           cell_menu_ptr->arg1 = &data_info->DataP.Aref.Objid;
 
           *(pwr_tObjid*)(menu_ptr->value_ptr) = data_info->DataP.Aref.Objid;
@@ -4850,22 +5042,22 @@ int RTTSYS_NMPSCELL(menu_ctx ctx, int event, char* parameter_ptr,
         }
       }
       k++;
-      if (cellist_ptr->expand) {
-        switch (cellist_ptr->class) {
+      if (cellist_ptr->expand)
+      {
+        switch (cellist_ptr->class)
+        {
         case pwr_cClass_NMpsCell:
         case pwr_cClass_NMpsStoreCell:
-        case pwr_cClass_NMpsOutCell: {
+        case pwr_cClass_NMpsOutCell:
+        {
           plc_t_DataInfo* data_info;
 
-          data_info = (plc_t_DataInfo*)&(
-              (pwr_sClass_NMpsCell*)(cellist_ptr->value_ptr))
-                          ->Data1P;
+          data_info = (plc_t_DataInfo*)&((pwr_sClass_NMpsCell*)(cellist_ptr->value_ptr))->Data1P;
           /* Display all the data objects */
-          for (l = 1;
-               l < ((pwr_sClass_NMpsCell*)(cellist_ptr->value_ptr))->LastIndex;
-               l++) {
-            if ((k >= page * NMPSCELL_PAGESIZE)
-                && (k < (page + 1) * NMPSCELL_PAGESIZE)) {
+          for (l = 1; l < ((pwr_sClass_NMpsCell*)(cellist_ptr->value_ptr))->LastIndex; l++)
+          {
+            if ((k >= page * NMPSCELL_PAGESIZE) && (k < (page + 1) * NMPSCELL_PAGESIZE))
+            {
               data_info++;
               strcpy(menu_ptr->value_ptr, "");
               menu_ptr->func = 0;
@@ -4897,19 +5089,17 @@ int RTTSYS_NMPSCELL(menu_ctx ctx, int event, char* parameter_ptr,
           }
           break;
         }
-        case pwr_cClass_NMpsMirrorCell: {
+        case pwr_cClass_NMpsMirrorCell:
+        {
           plc_t_DataInfoMirCell* data_info;
 
-          data_info = (plc_t_DataInfoMirCell*)&(
-              (pwr_sClass_NMpsMirrorCell*)(cellist_ptr->value_ptr))
-                          ->Data1P;
+          data_info = (plc_t_DataInfoMirCell*)&((pwr_sClass_NMpsMirrorCell*)(cellist_ptr->value_ptr))->Data1P;
 
           /* Display all the data objects */
-          for (l = 1; l < ((pwr_sClass_NMpsMirrorCell*)(cellist_ptr->value_ptr))
-                              ->LastIndex;
-               l++) {
-            if ((k >= page * NMPSCELL_PAGESIZE)
-                && (k < (page + 1) * NMPSCELL_PAGESIZE)) {
+          for (l = 1; l < ((pwr_sClass_NMpsMirrorCell*)(cellist_ptr->value_ptr))->LastIndex; l++)
+          {
+            if ((k >= page * NMPSCELL_PAGESIZE) && (k < (page + 1) * NMPSCELL_PAGESIZE))
+            {
               data_info++;
               strcpy(menu_ptr->value_ptr, "");
               menu_ptr->func = 0;
@@ -4945,7 +5135,8 @@ int RTTSYS_NMPSCELL(menu_ctx ctx, int event, char* parameter_ptr,
       }
       cellist_ptr++;
     }
-    for (i = j; i < NMPSCELL_PAGESIZE; i++) {
+    for (i = j; i < NMPSCELL_PAGESIZE; i++)
+    {
       strcpy(menu_ptr->value_ptr, "");
       menu_ptr->func = 0;
       menu_ptr->func2 = 0;
@@ -4975,42 +5166,43 @@ int RTTSYS_NMPSCELL(menu_ctx ctx, int event, char* parameter_ptr,
 }
 
 /*************************************************************************
-*
-* Name:		RTTSYS_CHANDI()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	context of the picture.
-* int		event		I 	type of event.
-* char		*parameter_ptr	I	pointer to the parameter which value
-*					has been changed.
-*
-* Description:
-*	Show the ChanDi objects of a di card.
-*
-**************************************************************************/
+ *
+ * Name:		RTTSYS_CHANDI()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	context of the picture.
+ * int		event		I 	type of event.
+ * char		*parameter_ptr	I	pointer to the parameter which value
+ *					has been changed.
+ *
+ * Description:
+ *	Show the ChanDi objects of a di card.
+ *
+ **************************************************************************/
 
-int rttsys_show_signal_from_chan(menu_ctx ctx, pwr_tObjid objid, void* arg1,
-    void* arg2, void* arg3, void* arg4)
+int rttsys_show_signal_from_chan(menu_ctx ctx, pwr_tObjid objid, void* arg1, void* arg2, void* arg3,
+                                 void* arg4)
 {
   pwr_tOName hiername;
   int sts;
   pwr_tObjid signal_objid;
 
   sts = gdh_ObjidToName(objid, hiername, sizeof(hiername), cdh_mNName);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     rtt_message('E', "Signal not found");
     return RTT__NOPICTURE;
   }
   strcat(hiername, ".SigChanCon");
-  sts = gdh_GetObjectInfo(
-      hiername, (pwr_tAddress)&signal_objid, sizeof(signal_objid));
+  sts = gdh_GetObjectInfo(hiername, (pwr_tAddress)&signal_objid, sizeof(signal_objid));
   if (EVEN(sts))
     return sts;
 
   sts = gdh_ObjidToName(signal_objid, hiername, sizeof(hiername), cdh_mNName);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     rtt_message('E', "Signal not found");
     return RTT__NOPICTURE;
   }
@@ -5019,8 +5211,7 @@ int rttsys_show_signal_from_chan(menu_ctx ctx, pwr_tObjid objid, void* arg1,
   return sts;
 }
 
-static int rttsys_chan_start(menu_ctx ctx, pwr_tObjid objid, void* arg1,
-    void* arg2, void* arg3, void* arg4)
+static int rttsys_chan_start(menu_ctx ctx, pwr_tObjid objid, void* arg1, void* arg2, void* arg3, void* arg4)
 {
   pwr_tOName objectname;
   int sts;
@@ -5033,7 +5224,8 @@ static int rttsys_chan_start(menu_ctx ctx, pwr_tObjid objid, void* arg1,
 
   /* Get the class of the channels */
   sts = gdh_GetChild(objid, &chan_objid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     rtt_message('E', "Card is not configured");
     return RTT__NOPICTURE;
   }
@@ -5041,27 +5233,23 @@ static int rttsys_chan_start(menu_ctx ctx, pwr_tObjid objid, void* arg1,
   if (EVEN(sts))
     return sts;
 
-  switch (class) {
+  switch (class)
+  {
   case pwr_cClass_ChanDi:
-    sts = rtt_menu_new_sysedit(
-        ctx, pwr_cNObjid, objectname, objectname, 0, &RTTSYS_CHANDI);
+    sts = rtt_menu_new_sysedit(ctx, pwr_cNObjid, objectname, objectname, 0, &RTTSYS_CHANDI);
     return sts;
   case pwr_cClass_ChanDo:
-    sts = rtt_menu_new_sysedit(
-        ctx, pwr_cNObjid, objectname, objectname, 0, &RTTSYS_CHANDO);
+    sts = rtt_menu_new_sysedit(ctx, pwr_cNObjid, objectname, objectname, 0, &RTTSYS_CHANDO);
     return sts;
   case pwr_cClass_ChanAi:
   case pwr_cClass_ChanAit:
-    sts = rtt_menu_new_sysedit(
-        ctx, pwr_cNObjid, objectname, objectname, 0, &RTTSYS_CHANAI);
+    sts = rtt_menu_new_sysedit(ctx, pwr_cNObjid, objectname, objectname, 0, &RTTSYS_CHANAI);
     return sts;
   case pwr_cClass_ChanAo:
-    sts = rtt_menu_new_sysedit(
-        ctx, pwr_cNObjid, objectname, objectname, 0, &RTTSYS_CHANAO);
+    sts = rtt_menu_new_sysedit(ctx, pwr_cNObjid, objectname, objectname, 0, &RTTSYS_CHANAO);
     return sts;
   case pwr_cClass_ChanCo:
-    sts = rtt_menu_new_sysedit(
-        ctx, pwr_cNObjid, objectname, objectname, 0, &RTTSYS_CHANCO);
+    sts = rtt_menu_new_sysedit(ctx, pwr_cNObjid, objectname, objectname, 0, &RTTSYS_CHANCO);
     return sts;
   default:
     rtt_message('E', "Error in channel class");
@@ -5069,21 +5257,22 @@ static int rttsys_chan_start(menu_ctx ctx, pwr_tObjid objid, void* arg1,
   }
 }
 
-static int rttsys_get_conversion(pwr_tUInt16 convmask1, pwr_tUInt16 convmask2,
-    int chan_number, int* conversion)
+static int rttsys_get_conversion(pwr_tUInt16 convmask1, pwr_tUInt16 convmask2, int chan_number,
+                                 int* conversion)
 {
-  if (chan_number >= 16) {
+  if (chan_number >= 16)
+  {
     chan_number -= 16;
     *conversion = (convmask2 & 1 << chan_number) != 0;
-  } else
+  }
+  else
     *conversion = (convmask1 & 1 << chan_number) != 0;
 
   return RTT__SUCCESS;
 }
 
-static int rttsys_dichanlist_add(pwr_tObjid chan_objid,
-    rttsys_t_chan_list** objectlist, int* objectlist_count, int* alloc,
-    int local)
+static int rttsys_dichanlist_add(pwr_tObjid chan_objid, rttsys_t_chan_list** objectlist,
+                                 int* objectlist_count, int* alloc, int local)
 {
   rttsys_t_chan_list* chanlist_ptr;
   rttsys_t_chan_list* new_objectlist;
@@ -5093,18 +5282,19 @@ static int rttsys_dichanlist_add(pwr_tObjid chan_objid,
   pwr_sAttrRef attrref;
   int signame_characters;
 
-  if (*objectlist_count == 0) {
+  if (*objectlist_count == 0)
+  {
     *objectlist = calloc(RTTSYS_ALLOC, sizeof(rttsys_t_chan_list));
     if (*objectlist == 0)
       return RTT__NOMEMORY;
     *alloc = RTTSYS_CHANALLOC;
-  } else if (*alloc <= *objectlist_count) {
-    new_objectlist
-        = calloc(*alloc + RTTSYS_CHANALLOC, sizeof(rttsys_t_chan_list));
+  }
+  else if (*alloc <= *objectlist_count)
+  {
+    new_objectlist = calloc(*alloc + RTTSYS_CHANALLOC, sizeof(rttsys_t_chan_list));
     if (new_objectlist == 0)
       return RTT__NOMEMORY;
-    memcpy(new_objectlist, *objectlist,
-        *objectlist_count * sizeof(rttsys_t_chan_list));
+    memcpy(new_objectlist, *objectlist, *objectlist_count * sizeof(rttsys_t_chan_list));
     free(*objectlist);
     *objectlist = new_objectlist;
     (*alloc) += RTTSYS_CHANALLOC;
@@ -5121,49 +5311,51 @@ static int rttsys_dichanlist_add(pwr_tObjid chan_objid,
     rtt_cut_segments(chanlist_ptr->channame, namebuf, 1);
 
   attrref = cdh_ObjidToAref(chan_objid);
-  if (local) {
+  if (local)
+  {
     /* Get a direct link to channel object */
-    sts = gdh_DLRefObjectInfoAttrref(&attrref,
-        (pwr_tAddress*)&chanlist_ptr->chan_ptr, &chanlist_ptr->chan_subid);
+    sts = gdh_DLRefObjectInfoAttrref(&attrref, (pwr_tAddress*)&chanlist_ptr->chan_ptr,
+                                     &chanlist_ptr->chan_subid);
     if (EVEN(sts))
       return sts;
-  } else {
+  }
+  else
+  {
     /* Get a subscription to the original object */
     sts = gdh_SubRefObjectInfoAttrref(&attrref, &chanlist_ptr->chan_subid);
     if (EVEN(sts))
       return sts;
 
-    sts = gdh_SubAssociateBuffer(chanlist_ptr->chan_subid,
-        (pwr_tAddress*)&chanlist_ptr->chan_ptr, attrref.Size);
+    sts = gdh_SubAssociateBuffer(chanlist_ptr->chan_subid, (pwr_tAddress*)&chanlist_ptr->chan_ptr,
+                                 attrref.Size);
     if (EVEN(sts))
       return sts;
   }
   chanlist_ptr->chan_objid = chan_objid;
-  chanlist_ptr->invert_on
-      = &((pwr_sClass_ChanDi*)(chanlist_ptr->chan_ptr))->InvertOn;
-  chanlist_ptr->chan_number
-      = ((pwr_sClass_ChanDi*)(chanlist_ptr->chan_ptr))->Number;
-  strcpy(chanlist_ptr->chan_descript,
-      ((pwr_sClass_ChanDi*)(chanlist_ptr->chan_ptr))->Description);
-  strcpy(chanlist_ptr->chan_ident,
-      ((pwr_sClass_ChanDi*)(chanlist_ptr->chan_ptr))->Identity);
+  chanlist_ptr->invert_on = &((pwr_sClass_ChanDi*)(chanlist_ptr->chan_ptr))->InvertOn;
+  chanlist_ptr->chan_number = ((pwr_sClass_ChanDi*)(chanlist_ptr->chan_ptr))->Number;
+  strcpy(chanlist_ptr->chan_descript, ((pwr_sClass_ChanDi*)(chanlist_ptr->chan_ptr))->Description);
+  strcpy(chanlist_ptr->chan_ident, ((pwr_sClass_ChanDi*)(chanlist_ptr->chan_ptr))->Identity);
 
   /* Get signal */
-  sts = gdh_AttrrefToName(
-      &((pwr_sClass_ChanDi*)(chanlist_ptr->chan_ptr))->SigChanCon, namebuf,
-      sizeof(namebuf), cdh_mNName);
-  if (EVEN(sts)) {
+  sts = gdh_AttrrefToName(&((pwr_sClass_ChanDi*)(chanlist_ptr->chan_ptr))->SigChanCon, namebuf,
+                          sizeof(namebuf), cdh_mNName);
+  if (EVEN(sts))
+  {
     chanlist_ptr->connected = 0;
     strcpy(chanlist_ptr->signame, "-");
-  } else {
+  }
+  else
+  {
     chanlist_ptr->connected = 1;
     signame_characters = 53; /* Should be fetched from menu entry... */
-    if ((int)strlen(namebuf) > signame_characters) {
+    if ((int)strlen(namebuf) > signame_characters)
+    {
       /* Show the last part of the name */
       strcpy(chanlist_ptr->signame, ".");
-      strcat(chanlist_ptr->signame,
-          &namebuf[strlen(namebuf) - signame_characters + 1]);
-    } else
+      strcat(chanlist_ptr->signame, &namebuf[strlen(namebuf) - signame_characters + 1]);
+    }
+    else
       strcpy(chanlist_ptr->signame, namebuf);
 
     /* Get a pointer to the value */
@@ -5172,27 +5364,30 @@ static int rttsys_dichanlist_add(pwr_tObjid chan_objid,
     sts = gdh_NameToAttrref(pwr_cNObjid, aname, &attrref);
     if (EVEN(sts))
       return sts;
-    if (local) {
+    if (local)
+    {
       /* Get a direct link to the original object */
-      sts = gdh_DLRefObjectInfoAttrref(&attrref,
-          (pwr_tAddress*)&chanlist_ptr->value_ptr, &chanlist_ptr->value_subid);
+      sts = gdh_DLRefObjectInfoAttrref(&attrref, (pwr_tAddress*)&chanlist_ptr->value_ptr,
+                                       &chanlist_ptr->value_subid);
       if (EVEN(sts))
         return sts;
-    } else {
+    }
+    else
+    {
       /* Get a subscription to the original object */
       sts = gdh_SubRefObjectInfoAttrref(&attrref, &chanlist_ptr->value_subid);
       if (EVEN(sts))
         return sts;
 
-      sts = gdh_SubAssociateBuffer(chanlist_ptr->value_subid,
-          (pwr_tAddress*)&chanlist_ptr->value_ptr, attrref.Size);
+      sts = gdh_SubAssociateBuffer(chanlist_ptr->value_subid, (pwr_tAddress*)&chanlist_ptr->value_ptr,
+                                   attrref.Size);
       if (EVEN(sts))
         return sts;
     }
     /* Get the signal description */
     strcat(namebuf, ".Description");
     sts = gdh_GetObjectInfo(namebuf, (pwr_tAddress*)chanlist_ptr->sig_descript,
-        sizeof(chanlist_ptr->sig_descript));
+                            sizeof(chanlist_ptr->sig_descript));
     if (EVEN(sts))
       strcpy(chanlist_ptr->sig_descript, "");
   }
@@ -5201,8 +5396,7 @@ static int rttsys_dichanlist_add(pwr_tObjid chan_objid,
   return RTT__SUCCESS;
 }
 
-int RTTSYS_CHANDI(menu_ctx ctx, int event, char* parameter_ptr,
-    char* objectname, char** picture)
+int RTTSYS_CHANDI(menu_ctx ctx, int event, char* parameter_ptr, char* objectname, char** picture)
 {
   int sts;
   rtt_t_menu_upd* menu_ptr;
@@ -5235,12 +5429,14 @@ int RTTSYS_CHANDI(menu_ctx ctx, int event, char* parameter_ptr,
   IF_NOGDH_RETURN;
 
   /**********************************************************
-  *	Return address to menu
-  ***********************************************************/
-  if (event == RTT_APPL_MENU) {
+   *	Return address to menu
+   ***********************************************************/
+  if (event == RTT_APPL_MENU)
+  {
     /* Check object first */
     sts = gdh_NameToObjid(objectname, &objid);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       rtt_message('E', "Node is down");
       return RTT__NOPICTURE;
     }
@@ -5252,20 +5448,25 @@ int RTTSYS_CHANDI(menu_ctx ctx, int event, char* parameter_ptr,
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Return address of background
-  ***********************************************************/
-  if (event == RTT_APPL_PICTURE) {
+   *	Return address of background
+   ***********************************************************/
+  if (event == RTT_APPL_PICTURE)
+  {
     *picture = (char*)&dtt_systempicture_p30_bg;
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Next and Previous page
-  ***********************************************************/
-  if (event == RTT_APPL_PREVPAGE || event == RTT_APPL_NEXTPAGE) {
-    if (event == RTT_APPL_PREVPAGE) {
+   *	Next and Previous page
+   ***********************************************************/
+  if (event == RTT_APPL_PREVPAGE || event == RTT_APPL_NEXTPAGE)
+  {
+    if (event == RTT_APPL_PREVPAGE)
+    {
       page--;
       page = MAX(page, 0);
-    } else {
+    }
+    else
+    {
       page++;
       page = MIN(page, CHANDI_MAXPAGE - 1);
     }
@@ -5275,8 +5476,10 @@ int RTTSYS_CHANDI(menu_ctx ctx, int event, char* parameter_ptr,
     menu_ptr = menulist;
     chanlist_ptr = chanlist;
     j = 0;
-    for (i = 0; i < chanlist_count; i++) {
-      if ((i >= page * CHANDI_PAGESIZE) && (i < (page + 1) * CHANDI_PAGESIZE)) {
+    for (i = 0; i < chanlist_count; i++)
+    {
+      if ((i >= page * CHANDI_PAGESIZE) && (i < (page + 1) * CHANDI_PAGESIZE))
+      {
         strcpy(menu_ptr->value_ptr, chanlist_ptr->channame);
 
         /* Define PF buttons and Return */
@@ -5286,16 +5489,18 @@ int RTTSYS_CHANDI(menu_ctx ctx, int event, char* parameter_ptr,
         menu_ptr->argoi = chanlist_ptr->chan_objid;
         strcpy(menu_ptr->value_ptr, chanlist_ptr->channame);
         menu_ptr++;
-        if (chanlist_ptr->connected) {
+        if (chanlist_ptr->connected)
+        {
           menu_ptr->value_ptr = (char*)chanlist_ptr->value_ptr;
           menu_ptr++;
-          sts = rttsys_get_conversion(*convmask1, *convmask2,
-              chanlist_ptr->chan_number, &chanlist_ptr->conv_on);
+          sts = rttsys_get_conversion(*convmask1, *convmask2, chanlist_ptr->chan_number,
+                                      &chanlist_ptr->conv_on);
           menu_ptr->value_ptr = (char*)&chanlist_ptr->conv_on;
           menu_ptr++;
           menu_ptr->value_ptr = (char*)chanlist_ptr->invert_on;
           menu_ptr++;
-          switch (display_mode) {
+          switch (display_mode)
+          {
           case CHAN_DISPLAYMODE_SIGNAL:
             strcpy(menu_ptr->value_ptr, chanlist_ptr->signame);
             break;
@@ -5310,7 +5515,9 @@ int RTTSYS_CHANDI(menu_ctx ctx, int event, char* parameter_ptr,
             break;
           }
           menu_ptr++;
-        } else {
+        }
+        else
+        {
           menu_ptr->value_ptr = (char*)RTT_ERASE;
           menu_ptr++;
           menu_ptr->value_ptr = (char*)RTT_ERASE;
@@ -5324,7 +5531,8 @@ int RTTSYS_CHANDI(menu_ctx ctx, int event, char* parameter_ptr,
       }
       chanlist_ptr++;
     }
-    for (i = j; i < CHANDI_PAGESIZE; i++) {
+    for (i = j; i < CHANDI_PAGESIZE; i++)
+    {
       strcpy(menu_ptr->value_ptr, "");
       menu_ptr->func = 0;
       menu_ptr->func2 = 0;
@@ -5343,9 +5551,10 @@ int RTTSYS_CHANDI(menu_ctx ctx, int event, char* parameter_ptr,
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Initialization of the picture
-  ***********************************************************/
-  if (event == RTT_APPL_INIT) {
+   *	Initialization of the picture
+   ***********************************************************/
+  if (event == RTT_APPL_INIT)
+  {
     display_mode = 0;
     strcpy(CHANDI_DISPLAY_TITLE, "Signal");
     page = 0;
@@ -5366,9 +5575,9 @@ int RTTSYS_CHANDI(menu_ctx ctx, int event, char* parameter_ptr,
     chan_alloc = 0;
     chanlist_count = 0;
     sts = gdh_GetChild(objid, &chan_objid);
-    while (ODD(sts)) {
-      sts = rttsys_dichanlist_add(
-          chan_objid, &chanlist, &chanlist_count, &chan_alloc, (int)local);
+    while (ODD(sts))
+    {
+      sts = rttsys_dichanlist_add(chan_objid, &chanlist, &chanlist_count, &chan_alloc, (int)local);
       if (EVEN(sts))
         return sts;
 
@@ -5378,14 +5587,12 @@ int RTTSYS_CHANDI(menu_ctx ctx, int event, char* parameter_ptr,
     /* Get a pointer to the conversion mask in the card object */
     strcpy(namebuf, card_name);
     strcat(namebuf, ".ConvMask1");
-    sts = gdh_RefObjectInfo(namebuf, (pwr_tAddress*)&convmask1,
-        &convmask1_subid, sizeof(*convmask1));
+    sts = gdh_RefObjectInfo(namebuf, (pwr_tAddress*)&convmask1, &convmask1_subid, sizeof(*convmask1));
     if (EVEN(sts))
       return sts;
     strcpy(namebuf, card_name);
     strcat(namebuf, ".ConvMask2");
-    sts = gdh_RefObjectInfo(namebuf, (pwr_tAddress*)&convmask2,
-        &convmask2_subid, sizeof(*convmask2));
+    sts = gdh_RefObjectInfo(namebuf, (pwr_tAddress*)&convmask2, &convmask2_subid, sizeof(*convmask2));
     if (EVEN(sts))
       return sts;
 
@@ -5393,8 +5600,10 @@ int RTTSYS_CHANDI(menu_ctx ctx, int event, char* parameter_ptr,
     menu_ptr = menulist;
     chanlist_ptr = chanlist;
     j = 0;
-    for (i = 0; i < chanlist_count; i++) {
-      if ((i >= page * CHANDI_PAGESIZE) && (i < (page + 1) * CHANDI_PAGESIZE)) {
+    for (i = 0; i < chanlist_count; i++)
+    {
+      if ((i >= page * CHANDI_PAGESIZE) && (i < (page + 1) * CHANDI_PAGESIZE))
+      {
         strcpy(menu_ptr->value_ptr, chanlist_ptr->channame);
 
         /* Define PF buttons and Return */
@@ -5404,16 +5613,18 @@ int RTTSYS_CHANDI(menu_ctx ctx, int event, char* parameter_ptr,
         menu_ptr->argoi = chanlist_ptr->chan_objid;
         strcpy(menu_ptr->value_ptr, chanlist_ptr->channame);
         menu_ptr++;
-        if (chanlist_ptr->connected) {
+        if (chanlist_ptr->connected)
+        {
           menu_ptr->value_ptr = (char*)chanlist_ptr->value_ptr;
           menu_ptr++;
-          sts = rttsys_get_conversion(*convmask1, *convmask2,
-              chanlist_ptr->chan_number, &chanlist_ptr->conv_on);
+          sts = rttsys_get_conversion(*convmask1, *convmask2, chanlist_ptr->chan_number,
+                                      &chanlist_ptr->conv_on);
           menu_ptr->value_ptr = (char*)&chanlist_ptr->conv_on;
           menu_ptr++;
           menu_ptr->value_ptr = (char*)chanlist_ptr->invert_on;
           menu_ptr++;
-          switch (display_mode) {
+          switch (display_mode)
+          {
           case CHAN_DISPLAYMODE_SIGNAL:
             strcpy(menu_ptr->value_ptr, chanlist_ptr->signame);
             break;
@@ -5428,7 +5639,9 @@ int RTTSYS_CHANDI(menu_ctx ctx, int event, char* parameter_ptr,
             break;
           }
           menu_ptr++;
-        } else {
+        }
+        else
+        {
           menu_ptr->value_ptr = (char*)RTT_ERASE;
           menu_ptr++;
           menu_ptr->value_ptr = (char*)RTT_ERASE;
@@ -5442,7 +5655,8 @@ int RTTSYS_CHANDI(menu_ctx ctx, int event, char* parameter_ptr,
       }
       chanlist_ptr++;
     }
-    for (i = j; i < CHANDI_PAGESIZE; i++) {
+    for (i = j; i < CHANDI_PAGESIZE; i++)
+    {
       strcpy(menu_ptr->value_ptr, "");
       menu_ptr->func = 0;
       menu_ptr->func2 = 0;
@@ -5464,11 +5678,13 @@ int RTTSYS_CHANDI(menu_ctx ctx, int event, char* parameter_ptr,
     menu_ptr++;
   }
   /**********************************************************
-  *	Exit of the picture
-  ***********************************************************/
-  else if (event == RTT_APPL_EXIT) {
+   *	Exit of the picture
+   ***********************************************************/
+  else if (event == RTT_APPL_EXIT)
+  {
     chanlist_ptr = chanlist;
-    for (i = 0; i < chanlist_count; i++) {
+    for (i = 0; i < chanlist_count; i++)
+    {
       sts = gdh_UnrefObjectInfo(chanlist_ptr->chan_subid);
       if (chanlist_ptr->connected)
         sts = gdh_UnrefObjectInfo(chanlist_ptr->value_subid);
@@ -5481,10 +5697,12 @@ int RTTSYS_CHANDI(menu_ctx ctx, int event, char* parameter_ptr,
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	The value of a parameter is changed.
-  ***********************************************************/
-  else if (event == RTT_APPL_VALUECHANGED) {
-    if (parameter_ptr == (char*)&CHANDI_DISPLAY_MODE) {
+   *	The value of a parameter is changed.
+   ***********************************************************/
+  else if (event == RTT_APPL_VALUECHANGED)
+  {
+    if (parameter_ptr == (char*)&CHANDI_DISPLAY_MODE)
+    {
       if (CHANDI_DISPLAY_MODE)
         display_mode++;
       else
@@ -5494,7 +5712,8 @@ int RTTSYS_CHANDI(menu_ctx ctx, int event, char* parameter_ptr,
       if (display_mode < 0)
         display_mode = CHAN_DISPLAYMODE_MAX;
 
-      switch (display_mode) {
+      switch (display_mode)
+      {
       case CHAN_DISPLAYMODE_SIGNAL:
         strcpy(CHANDI_DISPLAY_TITLE, "Signal");
         break;
@@ -5513,15 +5732,18 @@ int RTTSYS_CHANDI(menu_ctx ctx, int event, char* parameter_ptr,
       menu_ptr = menulist;
       chanlist_ptr = chanlist;
       j = 0;
-      for (i = 0; i < chanlist_count; i++) {
-        if ((i >= page * CHANDI_PAGESIZE)
-            && (i < (page + 1) * CHANDI_PAGESIZE)) {
+      for (i = 0; i < chanlist_count; i++)
+      {
+        if ((i >= page * CHANDI_PAGESIZE) && (i < (page + 1) * CHANDI_PAGESIZE))
+        {
           menu_ptr++;
           menu_ptr++;
           menu_ptr++;
           menu_ptr++;
-          if (chanlist_ptr->connected) {
-            switch (display_mode) {
+          if (chanlist_ptr->connected)
+          {
+            switch (display_mode)
+            {
             case CHAN_DISPLAYMODE_SIGNAL:
               strcpy(menu_ptr->value_ptr, chanlist_ptr->signame);
               break;
@@ -5536,7 +5758,9 @@ int RTTSYS_CHANDI(menu_ctx ctx, int event, char* parameter_ptr,
               break;
             }
             menu_ptr++;
-          } else {
+          }
+          else
+          {
             strcpy(menu_ptr->value_ptr, "");
             menu_ptr++;
           }
@@ -5547,15 +5771,19 @@ int RTTSYS_CHANDI(menu_ctx ctx, int event, char* parameter_ptr,
     }
   }
   /**********************************************************
-  *	Update the picture.
-  ***********************************************************/
-  else if (event == RTT_APPL_UPDATE) {
+   *	Update the picture.
+   ***********************************************************/
+  else if (event == RTT_APPL_UPDATE)
+  {
     chanlist_ptr = chanlist;
-    for (i = 0; i < chanlist_count; i++) {
-      if ((i >= page * CHANDI_PAGESIZE) && (i < (page + 1) * CHANDI_PAGESIZE)) {
-        if (chanlist_ptr->connected) {
-          sts = rttsys_get_conversion(*convmask1, *convmask2,
-              chanlist_ptr->chan_number, &chanlist_ptr->conv_on);
+    for (i = 0; i < chanlist_count; i++)
+    {
+      if ((i >= page * CHANDI_PAGESIZE) && (i < (page + 1) * CHANDI_PAGESIZE))
+      {
+        if (chanlist_ptr->connected)
+        {
+          sts = rttsys_get_conversion(*convmask1, *convmask2, chanlist_ptr->chan_number,
+                                      &chanlist_ptr->conv_on);
         }
       }
       chanlist_ptr++;
@@ -5565,24 +5793,24 @@ int RTTSYS_CHANDI(menu_ctx ctx, int event, char* parameter_ptr,
 }
 
 /*************************************************************************
-*
-* Name:		RTTSYS_CHANDO()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	context of the picture.
-* int		event		I 	type of event.
-* char		*parameter_ptr	I	pointer to the parameter which value
-*					has been changed.
-*
-* Description:
-*	Show the ChanDo objects of a do card.
-*
-**************************************************************************/
+ *
+ * Name:		RTTSYS_CHANDO()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	context of the picture.
+ * int		event		I 	type of event.
+ * char		*parameter_ptr	I	pointer to the parameter which value
+ *					has been changed.
+ *
+ * Description:
+ *	Show the ChanDo objects of a do card.
+ *
+ **************************************************************************/
 
-static int rttsys_chando_change_testmode(menu_ctx ctx, pwr_tObjid objid,
-    void* arg1, void* arg2, void* arg3, void* arg4)
+static int rttsys_chando_change_testmode(menu_ctx ctx, pwr_tObjid objid, void* arg1, void* arg2, void* arg3,
+                                         void* arg4)
 {
   int on;
   int sts;
@@ -5595,8 +5823,8 @@ static int rttsys_chando_change_testmode(menu_ctx ctx, pwr_tObjid objid,
   return sts;
 }
 
-static int rttsys_chando_change_testvalue(menu_ctx ctx, pwr_tObjid objid,
-    void* arg1, void* arg2, void* arg3, void* arg4)
+static int rttsys_chando_change_testvalue(menu_ctx ctx, pwr_tObjid objid, void* arg1, void* arg2, void* arg3,
+                                          void* arg4)
 {
   int on;
   int sts;
@@ -5609,9 +5837,8 @@ static int rttsys_chando_change_testvalue(menu_ctx ctx, pwr_tObjid objid,
   return sts;
 }
 
-static int rttsys_dochanlist_add(pwr_tObjid chan_objid,
-    rttsys_t_chan_list** objectlist, int* objectlist_count, int* alloc,
-    int local)
+static int rttsys_dochanlist_add(pwr_tObjid chan_objid, rttsys_t_chan_list** objectlist,
+                                 int* objectlist_count, int* alloc, int local)
 {
   rttsys_t_chan_list* chanlist_ptr;
   rttsys_t_chan_list* new_objectlist;
@@ -5621,18 +5848,19 @@ static int rttsys_dochanlist_add(pwr_tObjid chan_objid,
   pwr_sAttrRef attrref;
   int signame_characters;
 
-  if (*objectlist_count == 0) {
+  if (*objectlist_count == 0)
+  {
     *objectlist = calloc(RTTSYS_ALLOC, sizeof(rttsys_t_chan_list));
     if (*objectlist == 0)
       return RTT__NOMEMORY;
     *alloc = RTTSYS_CHANALLOC;
-  } else if (*alloc <= *objectlist_count) {
-    new_objectlist
-        = calloc(*alloc + RTTSYS_CHANALLOC, sizeof(rttsys_t_chan_list));
+  }
+  else if (*alloc <= *objectlist_count)
+  {
+    new_objectlist = calloc(*alloc + RTTSYS_CHANALLOC, sizeof(rttsys_t_chan_list));
     if (new_objectlist == 0)
       return RTT__NOMEMORY;
-    memcpy(new_objectlist, *objectlist,
-        *objectlist_count * sizeof(rttsys_t_chan_list));
+    memcpy(new_objectlist, *objectlist, *objectlist_count * sizeof(rttsys_t_chan_list));
     free(*objectlist);
     *objectlist = new_objectlist;
     (*alloc) += RTTSYS_CHANALLOC;
@@ -5649,53 +5877,53 @@ static int rttsys_dochanlist_add(pwr_tObjid chan_objid,
     rtt_cut_segments(chanlist_ptr->channame, namebuf, 1);
 
   attrref = cdh_ObjidToAref(chan_objid);
-  if (local) {
+  if (local)
+  {
     /* Get a direct link to channel object */
-    sts = gdh_DLRefObjectInfoAttrref(&attrref,
-        (pwr_tAddress*)&chanlist_ptr->chan_ptr, &chanlist_ptr->chan_subid);
+    sts = gdh_DLRefObjectInfoAttrref(&attrref, (pwr_tAddress*)&chanlist_ptr->chan_ptr,
+                                     &chanlist_ptr->chan_subid);
     if (EVEN(sts))
       return sts;
-  } else {
+  }
+  else
+  {
     /* Get a subscription to the original object */
     sts = gdh_SubRefObjectInfoAttrref(&attrref, &chanlist_ptr->chan_subid);
     if (EVEN(sts))
       return sts;
 
-    sts = gdh_SubAssociateBuffer(chanlist_ptr->chan_subid,
-        (pwr_tAddress*)&chanlist_ptr->chan_ptr, attrref.Size);
+    sts = gdh_SubAssociateBuffer(chanlist_ptr->chan_subid, (pwr_tAddress*)&chanlist_ptr->chan_ptr,
+                                 attrref.Size);
     if (EVEN(sts))
       return sts;
   }
   chanlist_ptr->chan_objid = chan_objid;
-  chanlist_ptr->invert_on
-      = &((pwr_sClass_ChanDo*)(chanlist_ptr->chan_ptr))->InvertOn;
-  chanlist_ptr->test_on
-      = &((pwr_sClass_ChanDo*)(chanlist_ptr->chan_ptr))->TestOn;
-  chanlist_ptr->test_value
-      = &((pwr_sClass_ChanDo*)(chanlist_ptr->chan_ptr))->TestValue;
-  chanlist_ptr->chan_number
-      = ((pwr_sClass_ChanDo*)(chanlist_ptr->chan_ptr))->Number;
-  strcpy(chanlist_ptr->chan_descript,
-      ((pwr_sClass_ChanDi*)(chanlist_ptr->chan_ptr))->Description);
-  strcpy(chanlist_ptr->chan_ident,
-      ((pwr_sClass_ChanDi*)(chanlist_ptr->chan_ptr))->Identity);
+  chanlist_ptr->invert_on = &((pwr_sClass_ChanDo*)(chanlist_ptr->chan_ptr))->InvertOn;
+  chanlist_ptr->test_on = &((pwr_sClass_ChanDo*)(chanlist_ptr->chan_ptr))->TestOn;
+  chanlist_ptr->test_value = &((pwr_sClass_ChanDo*)(chanlist_ptr->chan_ptr))->TestValue;
+  chanlist_ptr->chan_number = ((pwr_sClass_ChanDo*)(chanlist_ptr->chan_ptr))->Number;
+  strcpy(chanlist_ptr->chan_descript, ((pwr_sClass_ChanDi*)(chanlist_ptr->chan_ptr))->Description);
+  strcpy(chanlist_ptr->chan_ident, ((pwr_sClass_ChanDi*)(chanlist_ptr->chan_ptr))->Identity);
 
   /* Get signal */
-  sts = gdh_AttrrefToName(
-      &((pwr_sClass_ChanDo*)(chanlist_ptr->chan_ptr))->SigChanCon, namebuf,
-      sizeof(namebuf), cdh_mNName);
-  if (EVEN(sts)) {
+  sts = gdh_AttrrefToName(&((pwr_sClass_ChanDo*)(chanlist_ptr->chan_ptr))->SigChanCon, namebuf,
+                          sizeof(namebuf), cdh_mNName);
+  if (EVEN(sts))
+  {
     chanlist_ptr->connected = 0;
     strcpy(chanlist_ptr->signame, "-");
-  } else {
+  }
+  else
+  {
     chanlist_ptr->connected = 1;
     signame_characters = 53; /* Should be fetched from menu entry... */
-    if ((int)strlen(namebuf) > signame_characters) {
+    if ((int)strlen(namebuf) > signame_characters)
+    {
       /* Show the last part of the name */
       strcpy(chanlist_ptr->signame, ".");
-      strcat(chanlist_ptr->signame,
-          &namebuf[strlen(namebuf) - signame_characters + 1]);
-    } else
+      strcat(chanlist_ptr->signame, &namebuf[strlen(namebuf) - signame_characters + 1]);
+    }
+    else
       strcpy(chanlist_ptr->signame, namebuf);
 
     /* Get a pointer to the value */
@@ -5704,27 +5932,30 @@ static int rttsys_dochanlist_add(pwr_tObjid chan_objid,
     sts = gdh_NameToAttrref(pwr_cNObjid, aname, &attrref);
     if (EVEN(sts))
       return sts;
-    if (local) {
+    if (local)
+    {
       /* Get a direct link to the original object */
-      sts = gdh_DLRefObjectInfoAttrref(&attrref,
-          (pwr_tAddress*)&chanlist_ptr->value_ptr, &chanlist_ptr->value_subid);
+      sts = gdh_DLRefObjectInfoAttrref(&attrref, (pwr_tAddress*)&chanlist_ptr->value_ptr,
+                                       &chanlist_ptr->value_subid);
       if (EVEN(sts))
         return sts;
-    } else {
+    }
+    else
+    {
       /* Get a subscription to the original object */
       sts = gdh_SubRefObjectInfoAttrref(&attrref, &chanlist_ptr->value_subid);
       if (EVEN(sts))
         return sts;
 
-      sts = gdh_SubAssociateBuffer(chanlist_ptr->value_subid,
-          (pwr_tAddress*)&chanlist_ptr->value_ptr, attrref.Size);
+      sts = gdh_SubAssociateBuffer(chanlist_ptr->value_subid, (pwr_tAddress*)&chanlist_ptr->value_ptr,
+                                   attrref.Size);
       if (EVEN(sts))
         return sts;
     }
     /* Get the signal description */
     strcat(namebuf, ".Description");
     sts = gdh_GetObjectInfo(namebuf, (pwr_tAddress*)chanlist_ptr->sig_descript,
-        sizeof(chanlist_ptr->sig_descript));
+                            sizeof(chanlist_ptr->sig_descript));
     if (EVEN(sts))
       strcpy(chanlist_ptr->sig_descript, "");
   }
@@ -5733,8 +5964,7 @@ static int rttsys_dochanlist_add(pwr_tObjid chan_objid,
   return RTT__SUCCESS;
 }
 
-int RTTSYS_CHANDO(menu_ctx ctx, int event, char* parameter_ptr,
-    char* objectname, char** picture)
+int RTTSYS_CHANDO(menu_ctx ctx, int event, char* parameter_ptr, char* objectname, char** picture)
 {
   int sts;
   rtt_t_menu_upd* menu_ptr;
@@ -5760,12 +5990,14 @@ int RTTSYS_CHANDO(menu_ctx ctx, int event, char* parameter_ptr,
   IF_NOGDH_RETURN;
 
   /**********************************************************
-  *	Return address to menu
-  ***********************************************************/
-  if (event == RTT_APPL_MENU) {
+   *	Return address to menu
+   ***********************************************************/
+  if (event == RTT_APPL_MENU)
+  {
     /* Check object first */
     sts = gdh_NameToObjid(objectname, &objid);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       rtt_message('E', "Node is down");
       return RTT__NOPICTURE;
     }
@@ -5777,20 +6009,25 @@ int RTTSYS_CHANDO(menu_ctx ctx, int event, char* parameter_ptr,
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Return address of background
-  ***********************************************************/
-  if (event == RTT_APPL_PICTURE) {
+   *	Return address of background
+   ***********************************************************/
+  if (event == RTT_APPL_PICTURE)
+  {
     *picture = (char*)&dtt_systempicture_p31_bg;
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Next and Previous page
-  ***********************************************************/
-  if (event == RTT_APPL_PREVPAGE || event == RTT_APPL_NEXTPAGE) {
-    if (event == RTT_APPL_PREVPAGE) {
+   *	Next and Previous page
+   ***********************************************************/
+  if (event == RTT_APPL_PREVPAGE || event == RTT_APPL_NEXTPAGE)
+  {
+    if (event == RTT_APPL_PREVPAGE)
+    {
       page--;
       page = MAX(page, 0);
-    } else {
+    }
+    else
+    {
       page++;
       page = MIN(page, CHANDO_MAXPAGE - 1);
     }
@@ -5800,23 +6037,29 @@ int RTTSYS_CHANDO(menu_ctx ctx, int event, char* parameter_ptr,
     menu_ptr = menulist;
     chanlist_ptr = chanlist;
     j = 0;
-    for (i = 0; i < chanlist_count; i++) {
-      if ((i >= page * CHANDO_PAGESIZE) && (i < (page + 1) * CHANDO_PAGESIZE)) {
+    for (i = 0; i < chanlist_count; i++)
+    {
+      if ((i >= page * CHANDO_PAGESIZE) && (i < (page + 1) * CHANDO_PAGESIZE))
+      {
         strcpy(menu_ptr->value_ptr, chanlist_ptr->channame);
 
         /* Define PF buttons and Return */
         menu_ptr->func = &rttsys_show_signal_from_chan;
-        if (signal_test_mode) {
+        if (signal_test_mode)
+        {
           menu_ptr->func2 = &rttsys_chando_change_testvalue;
           menu_ptr->func3 = &rttsys_chando_change_testmode;
-        } else {
+        }
+        else
+        {
           menu_ptr->func2 = &rtt_object_parameters;
           menu_ptr->func3 = &rtt_crossref_channel;
         }
         menu_ptr->argoi = chanlist_ptr->chan_objid;
         strcpy(menu_ptr->value_ptr, chanlist_ptr->channame);
         menu_ptr++;
-        if (chanlist_ptr->connected) {
+        if (chanlist_ptr->connected)
+        {
           menu_ptr->value_ptr = (char*)chanlist_ptr->value_ptr;
           menu_ptr++;
           menu_ptr->value_ptr = (char*)chanlist_ptr->test_on;
@@ -5825,7 +6068,8 @@ int RTTSYS_CHANDO(menu_ctx ctx, int event, char* parameter_ptr,
           menu_ptr++;
           menu_ptr->value_ptr = (char*)chanlist_ptr->invert_on;
           menu_ptr++;
-          switch (display_mode) {
+          switch (display_mode)
+          {
           case CHAN_DISPLAYMODE_SIGNAL:
             strcpy(menu_ptr->value_ptr, chanlist_ptr->signame);
             break;
@@ -5840,7 +6084,9 @@ int RTTSYS_CHANDO(menu_ctx ctx, int event, char* parameter_ptr,
             break;
           }
           menu_ptr++;
-        } else {
+        }
+        else
+        {
           menu_ptr->value_ptr = (char*)RTT_ERASE;
           menu_ptr++;
           menu_ptr->value_ptr = (char*)RTT_ERASE;
@@ -5856,7 +6102,8 @@ int RTTSYS_CHANDO(menu_ctx ctx, int event, char* parameter_ptr,
       }
       chanlist_ptr++;
     }
-    for (i = j; i < CHANDO_PAGESIZE; i++) {
+    for (i = j; i < CHANDO_PAGESIZE; i++)
+    {
       strcpy(menu_ptr->value_ptr, "");
       menu_ptr->func = 0;
       menu_ptr->func2 = 0;
@@ -5877,9 +6124,10 @@ int RTTSYS_CHANDO(menu_ctx ctx, int event, char* parameter_ptr,
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Initialization of the picture
-  ***********************************************************/
-  if (event == RTT_APPL_INIT) {
+   *	Initialization of the picture
+   ***********************************************************/
+  if (event == RTT_APPL_INIT)
+  {
     display_mode = 0;
     signal_test_mode = rtt_signal_test_mode;
     strcpy(CHANDO_DISPLAY_TITLE, "Signal");
@@ -5901,9 +6149,9 @@ int RTTSYS_CHANDO(menu_ctx ctx, int event, char* parameter_ptr,
     chan_alloc = 0;
     chanlist_count = 0;
     sts = gdh_GetChild(objid, &chan_objid);
-    while (ODD(sts)) {
-      sts = rttsys_dochanlist_add(
-          chan_objid, &chanlist, &chanlist_count, &chan_alloc, (int)local);
+    while (ODD(sts))
+    {
+      sts = rttsys_dochanlist_add(chan_objid, &chanlist, &chanlist_count, &chan_alloc, (int)local);
       if (EVEN(sts))
         return sts;
 
@@ -5914,23 +6162,29 @@ int RTTSYS_CHANDO(menu_ctx ctx, int event, char* parameter_ptr,
     menu_ptr = menulist;
     chanlist_ptr = chanlist;
     j = 0;
-    for (i = 0; i < chanlist_count; i++) {
-      if ((i >= page * CHANDO_PAGESIZE) && (i < (page + 1) * CHANDO_PAGESIZE)) {
+    for (i = 0; i < chanlist_count; i++)
+    {
+      if ((i >= page * CHANDO_PAGESIZE) && (i < (page + 1) * CHANDO_PAGESIZE))
+      {
         strcpy(menu_ptr->value_ptr, chanlist_ptr->channame);
 
         /* Define PF buttons and Return */
         menu_ptr->func = &rttsys_show_signal_from_chan;
-        if (signal_test_mode) {
+        if (signal_test_mode)
+        {
           menu_ptr->func2 = &rttsys_chando_change_testvalue;
           menu_ptr->func3 = &rttsys_chando_change_testmode;
-        } else {
+        }
+        else
+        {
           menu_ptr->func2 = &rtt_object_parameters;
           menu_ptr->func3 = &rtt_crossref_channel;
         }
         menu_ptr->argoi = chanlist_ptr->chan_objid;
         strcpy(menu_ptr->value_ptr, chanlist_ptr->channame);
         menu_ptr++;
-        if (chanlist_ptr->connected) {
+        if (chanlist_ptr->connected)
+        {
           menu_ptr->value_ptr = (char*)chanlist_ptr->value_ptr;
           menu_ptr++;
           menu_ptr->value_ptr = (char*)chanlist_ptr->test_on;
@@ -5939,7 +6193,8 @@ int RTTSYS_CHANDO(menu_ctx ctx, int event, char* parameter_ptr,
           menu_ptr++;
           menu_ptr->value_ptr = (char*)chanlist_ptr->invert_on;
           menu_ptr++;
-          switch (display_mode) {
+          switch (display_mode)
+          {
           case CHAN_DISPLAYMODE_SIGNAL:
             strcpy(menu_ptr->value_ptr, chanlist_ptr->signame);
             break;
@@ -5954,7 +6209,9 @@ int RTTSYS_CHANDO(menu_ctx ctx, int event, char* parameter_ptr,
             break;
           }
           menu_ptr++;
-        } else {
+        }
+        else
+        {
           menu_ptr->value_ptr = (char*)RTT_ERASE;
           menu_ptr++;
           menu_ptr->value_ptr = (char*)RTT_ERASE;
@@ -5970,7 +6227,8 @@ int RTTSYS_CHANDO(menu_ctx ctx, int event, char* parameter_ptr,
       }
       chanlist_ptr++;
     }
-    for (i = j; i < CHANDO_PAGESIZE; i++) {
+    for (i = j; i < CHANDO_PAGESIZE; i++)
+    {
       strcpy(menu_ptr->value_ptr, "");
       menu_ptr->func = 0;
       menu_ptr->func2 = 0;
@@ -6002,11 +6260,13 @@ int RTTSYS_CHANDO(menu_ctx ctx, int event, char* parameter_ptr,
     strcpy(CHANDO_TST, "Tst");
   }
   /**********************************************************
-  *	Exit of the picture
-  ***********************************************************/
-  else if (event == RTT_APPL_EXIT) {
+   *	Exit of the picture
+   ***********************************************************/
+  else if (event == RTT_APPL_EXIT)
+  {
     chanlist_ptr = chanlist;
-    for (i = 0; i < chanlist_count; i++) {
+    for (i = 0; i < chanlist_count; i++)
+    {
       sts = gdh_UnrefObjectInfo(chanlist_ptr->chan_subid);
       if (chanlist_ptr->connected)
         sts = gdh_UnrefObjectInfo(chanlist_ptr->value_subid);
@@ -6017,10 +6277,12 @@ int RTTSYS_CHANDO(menu_ctx ctx, int event, char* parameter_ptr,
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	The value of a parameter is changed.
-  ***********************************************************/
-  else if (event == RTT_APPL_VALUECHANGED) {
-    if (parameter_ptr == (char*)&CHANDO_DISPLAY_MODE) {
+   *	The value of a parameter is changed.
+   ***********************************************************/
+  else if (event == RTT_APPL_VALUECHANGED)
+  {
+    if (parameter_ptr == (char*)&CHANDO_DISPLAY_MODE)
+    {
       if (CHANDO_DISPLAY_MODE)
         display_mode++;
       else
@@ -6030,7 +6292,8 @@ int RTTSYS_CHANDO(menu_ctx ctx, int event, char* parameter_ptr,
       if (display_mode < 0)
         display_mode = CHAN_DISPLAYMODE_MAX;
 
-      switch (display_mode) {
+      switch (display_mode)
+      {
       case CHAN_DISPLAYMODE_SIGNAL:
         strcpy(CHANDO_DISPLAY_TITLE, "Signal");
         break;
@@ -6049,16 +6312,19 @@ int RTTSYS_CHANDO(menu_ctx ctx, int event, char* parameter_ptr,
       menu_ptr = menulist;
       chanlist_ptr = chanlist;
       j = 0;
-      for (i = 0; i < chanlist_count; i++) {
-        if ((i >= page * CHANDO_PAGESIZE)
-            && (i < (page + 1) * CHANDO_PAGESIZE)) {
+      for (i = 0; i < chanlist_count; i++)
+      {
+        if ((i >= page * CHANDO_PAGESIZE) && (i < (page + 1) * CHANDO_PAGESIZE))
+        {
           menu_ptr++;
           menu_ptr++;
           menu_ptr++;
           menu_ptr++;
           menu_ptr++;
-          if (chanlist_ptr->connected) {
-            switch (display_mode) {
+          if (chanlist_ptr->connected)
+          {
+            switch (display_mode)
+            {
             case CHAN_DISPLAYMODE_SIGNAL:
               strcpy(menu_ptr->value_ptr, chanlist_ptr->signame);
               break;
@@ -6073,7 +6339,9 @@ int RTTSYS_CHANDO(menu_ctx ctx, int event, char* parameter_ptr,
               break;
             }
             menu_ptr++;
-          } else {
+          }
+          else
+          {
             strcpy(menu_ptr->value_ptr, "");
             menu_ptr++;
           }
@@ -6084,14 +6352,19 @@ int RTTSYS_CHANDO(menu_ctx ctx, int event, char* parameter_ptr,
     }
   }
   /**********************************************************
-  *	Update the picture.
-  ***********************************************************/
-  else if (event == RTT_APPL_UPDATE) {
-    if (signal_test_mode) {
-      if (toggle) {
+   *	Update the picture.
+   ***********************************************************/
+  else if (event == RTT_APPL_UPDATE)
+  {
+    if (signal_test_mode)
+    {
+      if (toggle)
+      {
         strcpy(CHANDO_TST, "Tst");
         toggle = 0;
-      } else {
+      }
+      else
+      {
         strcpy(CHANDO_TST, "   ");
         toggle = 1;
       }
@@ -6101,25 +6374,24 @@ int RTTSYS_CHANDO(menu_ctx ctx, int event, char* parameter_ptr,
 }
 
 /*************************************************************************
-*
-* Name:		RTTSYS_CHANAI()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	context of the picture.
-* int		event		I 	type of event.
-* char		*parameter_ptr	I	pointer to the parameter which value
-*					has been changed.
-*
-* Description:
-*	Show the ChanAi objects of a ai card.
-*
-**************************************************************************/
+ *
+ * Name:		RTTSYS_CHANAI()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	context of the picture.
+ * int		event		I 	type of event.
+ * char		*parameter_ptr	I	pointer to the parameter which value
+ *					has been changed.
+ *
+ * Description:
+ *	Show the ChanAi objects of a ai card.
+ *
+ **************************************************************************/
 
-static int rttsys_aichanlist_add(pwr_tObjid chan_objid,
-    rttsys_t_chan_list** objectlist, int* objectlist_count, int* alloc,
-    int local)
+static int rttsys_aichanlist_add(pwr_tObjid chan_objid, rttsys_t_chan_list** objectlist,
+                                 int* objectlist_count, int* alloc, int local)
 {
   rttsys_t_chan_list* chanlist_ptr;
   rttsys_t_chan_list* new_objectlist;
@@ -6129,18 +6401,19 @@ static int rttsys_aichanlist_add(pwr_tObjid chan_objid,
   pwr_sAttrRef attrref;
   int signame_characters;
 
-  if (*objectlist_count == 0) {
+  if (*objectlist_count == 0)
+  {
     *objectlist = calloc(RTTSYS_ALLOC, sizeof(rttsys_t_chan_list));
     if (*objectlist == 0)
       return RTT__NOMEMORY;
     *alloc = RTTSYS_CHANALLOC;
-  } else if (*alloc <= *objectlist_count) {
-    new_objectlist
-        = calloc(*alloc + RTTSYS_CHANALLOC, sizeof(rttsys_t_chan_list));
+  }
+  else if (*alloc <= *objectlist_count)
+  {
+    new_objectlist = calloc(*alloc + RTTSYS_CHANALLOC, sizeof(rttsys_t_chan_list));
     if (new_objectlist == 0)
       return RTT__NOMEMORY;
-    memcpy(new_objectlist, *objectlist,
-        *objectlist_count * sizeof(rttsys_t_chan_list));
+    memcpy(new_objectlist, *objectlist, *objectlist_count * sizeof(rttsys_t_chan_list));
     free(*objectlist);
     *objectlist = new_objectlist;
     (*alloc) += RTTSYS_CHANALLOC;
@@ -6157,49 +6430,51 @@ static int rttsys_aichanlist_add(pwr_tObjid chan_objid,
     rtt_cut_segments(chanlist_ptr->channame, namebuf, 1);
 
   attrref = cdh_ObjidToAref(chan_objid);
-  if (local) {
+  if (local)
+  {
     /* Get a direct link to channel object */
-    sts = gdh_DLRefObjectInfoAttrref(&attrref,
-        (pwr_tAddress*)&chanlist_ptr->chan_ptr, &chanlist_ptr->chan_subid);
+    sts = gdh_DLRefObjectInfoAttrref(&attrref, (pwr_tAddress*)&chanlist_ptr->chan_ptr,
+                                     &chanlist_ptr->chan_subid);
     if (EVEN(sts))
       return sts;
-  } else {
+  }
+  else
+  {
     /* Get a subscription to the original object */
     sts = gdh_SubRefObjectInfoAttrref(&attrref, &chanlist_ptr->chan_subid);
     if (EVEN(sts))
       return sts;
 
-    sts = gdh_SubAssociateBuffer(chanlist_ptr->chan_subid,
-        (pwr_tAddress*)&chanlist_ptr->chan_ptr, attrref.Size);
+    sts = gdh_SubAssociateBuffer(chanlist_ptr->chan_subid, (pwr_tAddress*)&chanlist_ptr->chan_ptr,
+                                 attrref.Size);
     if (EVEN(sts))
       return sts;
   }
   chanlist_ptr->chan_objid = chan_objid;
-  chanlist_ptr->conversion_on
-      = &((pwr_sClass_ChanAi*)(chanlist_ptr->chan_ptr))->ConversionOn;
-  chanlist_ptr->chan_number
-      = ((pwr_sClass_ChanAi*)(chanlist_ptr->chan_ptr))->Number;
-  strcpy(chanlist_ptr->chan_descript,
-      ((pwr_sClass_ChanAi*)(chanlist_ptr->chan_ptr))->Description);
-  strcpy(chanlist_ptr->chan_ident,
-      ((pwr_sClass_ChanAi*)(chanlist_ptr->chan_ptr))->Identity);
+  chanlist_ptr->conversion_on = &((pwr_sClass_ChanAi*)(chanlist_ptr->chan_ptr))->ConversionOn;
+  chanlist_ptr->chan_number = ((pwr_sClass_ChanAi*)(chanlist_ptr->chan_ptr))->Number;
+  strcpy(chanlist_ptr->chan_descript, ((pwr_sClass_ChanAi*)(chanlist_ptr->chan_ptr))->Description);
+  strcpy(chanlist_ptr->chan_ident, ((pwr_sClass_ChanAi*)(chanlist_ptr->chan_ptr))->Identity);
 
   /* Get signal */
-  sts = gdh_AttrrefToName(
-      &((pwr_sClass_ChanAi*)(chanlist_ptr->chan_ptr))->SigChanCon, namebuf,
-      sizeof(namebuf), cdh_mNName);
-  if (EVEN(sts)) {
+  sts = gdh_AttrrefToName(&((pwr_sClass_ChanAi*)(chanlist_ptr->chan_ptr))->SigChanCon, namebuf,
+                          sizeof(namebuf), cdh_mNName);
+  if (EVEN(sts))
+  {
     chanlist_ptr->connected = 0;
     strcpy(chanlist_ptr->signame, "-");
-  } else {
+  }
+  else
+  {
     chanlist_ptr->connected = 1;
     signame_characters = 51; /* Should be fetched from menu entry... */
-    if ((int)strlen(namebuf) > signame_characters) {
+    if ((int)strlen(namebuf) > signame_characters)
+    {
       /* Show the last part of the name */
       strcpy(chanlist_ptr->signame, ".");
-      strcat(chanlist_ptr->signame,
-          &namebuf[strlen(namebuf) - signame_characters + 1]);
-    } else
+      strcat(chanlist_ptr->signame, &namebuf[strlen(namebuf) - signame_characters + 1]);
+    }
+    else
       strcpy(chanlist_ptr->signame, namebuf);
 
     /* Get a pointer to the value */
@@ -6208,27 +6483,30 @@ static int rttsys_aichanlist_add(pwr_tObjid chan_objid,
     sts = gdh_NameToAttrref(pwr_cNObjid, aname, &attrref);
     if (EVEN(sts))
       return sts;
-    if (local) {
+    if (local)
+    {
       /* Get a direct link to the original object */
-      sts = gdh_DLRefObjectInfoAttrref(&attrref,
-          (pwr_tAddress*)&chanlist_ptr->value_ptr, &chanlist_ptr->value_subid);
+      sts = gdh_DLRefObjectInfoAttrref(&attrref, (pwr_tAddress*)&chanlist_ptr->value_ptr,
+                                       &chanlist_ptr->value_subid);
       if (EVEN(sts))
         return sts;
-    } else {
+    }
+    else
+    {
       /* Get a subscription to the original object */
       sts = gdh_SubRefObjectInfoAttrref(&attrref, &chanlist_ptr->value_subid);
       if (EVEN(sts))
         return sts;
 
-      sts = gdh_SubAssociateBuffer(chanlist_ptr->value_subid,
-          (pwr_tAddress*)&chanlist_ptr->value_ptr, attrref.Size);
+      sts = gdh_SubAssociateBuffer(chanlist_ptr->value_subid, (pwr_tAddress*)&chanlist_ptr->value_ptr,
+                                   attrref.Size);
       if (EVEN(sts))
         return sts;
     }
     /* Get the signal description */
     strcat(namebuf, ".Description");
     sts = gdh_GetObjectInfo(namebuf, (pwr_tAddress*)chanlist_ptr->sig_descript,
-        sizeof(chanlist_ptr->sig_descript));
+                            sizeof(chanlist_ptr->sig_descript));
     if (EVEN(sts))
       strcpy(chanlist_ptr->sig_descript, "");
   }
@@ -6237,8 +6515,7 @@ static int rttsys_aichanlist_add(pwr_tObjid chan_objid,
   return RTT__SUCCESS;
 }
 
-int RTTSYS_CHANAI(menu_ctx ctx, int event, char* parameter_ptr,
-    char* objectname, char** picture)
+int RTTSYS_CHANAI(menu_ctx ctx, int event, char* parameter_ptr, char* objectname, char** picture)
 {
   int sts;
   rtt_t_menu_upd* menu_ptr;
@@ -6262,12 +6539,14 @@ int RTTSYS_CHANAI(menu_ctx ctx, int event, char* parameter_ptr,
   IF_NOGDH_RETURN;
 
   /**********************************************************
-  *	Return address to menu
-  ***********************************************************/
-  if (event == RTT_APPL_MENU) {
+   *	Return address to menu
+   ***********************************************************/
+  if (event == RTT_APPL_MENU)
+  {
     /* Check object first */
     sts = gdh_NameToObjid(objectname, &objid);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       rtt_message('E', "Node is down");
       return RTT__NOPICTURE;
     }
@@ -6279,20 +6558,25 @@ int RTTSYS_CHANAI(menu_ctx ctx, int event, char* parameter_ptr,
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Return address of background
-  ***********************************************************/
-  if (event == RTT_APPL_PICTURE) {
+   *	Return address of background
+   ***********************************************************/
+  if (event == RTT_APPL_PICTURE)
+  {
     *picture = (char*)&dtt_systempicture_p32_bg;
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Next and Previous page
-  ***********************************************************/
-  if (event == RTT_APPL_PREVPAGE || event == RTT_APPL_NEXTPAGE) {
-    if (event == RTT_APPL_PREVPAGE) {
+   *	Next and Previous page
+   ***********************************************************/
+  if (event == RTT_APPL_PREVPAGE || event == RTT_APPL_NEXTPAGE)
+  {
+    if (event == RTT_APPL_PREVPAGE)
+    {
       page--;
       page = MAX(page, 0);
-    } else {
+    }
+    else
+    {
       page++;
       page = MIN(page, CHANAI_MAXPAGE - 1);
     }
@@ -6302,8 +6586,10 @@ int RTTSYS_CHANAI(menu_ctx ctx, int event, char* parameter_ptr,
     menu_ptr = menulist;
     chanlist_ptr = chanlist;
     j = 0;
-    for (i = 0; i < chanlist_count; i++) {
-      if ((i >= page * CHANAI_PAGESIZE) && (i < (page + 1) * CHANAI_PAGESIZE)) {
+    for (i = 0; i < chanlist_count; i++)
+    {
+      if ((i >= page * CHANAI_PAGESIZE) && (i < (page + 1) * CHANAI_PAGESIZE))
+      {
         strcpy(menu_ptr->value_ptr, chanlist_ptr->channame);
 
         /* Define PF buttons and Return */
@@ -6313,15 +6599,16 @@ int RTTSYS_CHANAI(menu_ctx ctx, int event, char* parameter_ptr,
         menu_ptr->argoi = chanlist_ptr->chan_objid;
         strcpy(menu_ptr->value_ptr, chanlist_ptr->channame);
         menu_ptr++;
-        if (chanlist_ptr->connected) {
-          *(float*)menu_ptr->value_ptr
-              = ((pwr_sClass_ChanAi*)chanlist_ptr->chan_ptr)->SigValPolyCoef0
-              + ((pwr_sClass_ChanAi*)chanlist_ptr->chan_ptr)->SigValPolyCoef1
-                  * *(pwr_tInt16*)chanlist_ptr->value_ptr;
+        if (chanlist_ptr->connected)
+        {
+          *(float*)menu_ptr->value_ptr = ((pwr_sClass_ChanAi*)chanlist_ptr->chan_ptr)->SigValPolyCoef0 +
+                                         ((pwr_sClass_ChanAi*)chanlist_ptr->chan_ptr)->SigValPolyCoef1 *
+                                             *(pwr_tInt16*)chanlist_ptr->value_ptr;
           menu_ptr++;
           menu_ptr->value_ptr = (char*)chanlist_ptr->conversion_on;
           menu_ptr++;
-          switch (display_mode) {
+          switch (display_mode)
+          {
           case CHAN_DISPLAYMODE_SIGNAL:
             strcpy(menu_ptr->value_ptr, chanlist_ptr->signame);
             break;
@@ -6336,7 +6623,9 @@ int RTTSYS_CHANAI(menu_ctx ctx, int event, char* parameter_ptr,
             break;
           }
           menu_ptr++;
-        } else {
+        }
+        else
+        {
           *(float*)menu_ptr->value_ptr = 0;
           menu_ptr++;
           menu_ptr->value_ptr = (char*)RTT_ERASE;
@@ -6348,7 +6637,8 @@ int RTTSYS_CHANAI(menu_ctx ctx, int event, char* parameter_ptr,
       }
       chanlist_ptr++;
     }
-    for (i = j; i < CHANAI_PAGESIZE; i++) {
+    for (i = j; i < CHANAI_PAGESIZE; i++)
+    {
       strcpy(menu_ptr->value_ptr, "");
       menu_ptr->func = 0;
       menu_ptr->func2 = 0;
@@ -6365,9 +6655,10 @@ int RTTSYS_CHANAI(menu_ctx ctx, int event, char* parameter_ptr,
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Initialization of the picture
-  ***********************************************************/
-  if (event == RTT_APPL_INIT) {
+   *	Initialization of the picture
+   ***********************************************************/
+  if (event == RTT_APPL_INIT)
+  {
     display_mode = 0;
     strcpy(CHANAI_DISPLAY_TITLE, "Signal");
     page = 0;
@@ -6388,9 +6679,9 @@ int RTTSYS_CHANAI(menu_ctx ctx, int event, char* parameter_ptr,
     chan_alloc = 0;
     chanlist_count = 0;
     sts = gdh_GetChild(objid, &chan_objid);
-    while (ODD(sts)) {
-      sts = rttsys_aichanlist_add(
-          chan_objid, &chanlist, &chanlist_count, &chan_alloc, (int)local);
+    while (ODD(sts))
+    {
+      sts = rttsys_aichanlist_add(chan_objid, &chanlist, &chanlist_count, &chan_alloc, (int)local);
       if (EVEN(sts))
         return sts;
 
@@ -6401,8 +6692,10 @@ int RTTSYS_CHANAI(menu_ctx ctx, int event, char* parameter_ptr,
     menu_ptr = menulist;
     chanlist_ptr = chanlist;
     j = 0;
-    for (i = 0; i < chanlist_count; i++) {
-      if ((i >= page * CHANAI_PAGESIZE) && (i < (page + 1) * CHANAI_PAGESIZE)) {
+    for (i = 0; i < chanlist_count; i++)
+    {
+      if ((i >= page * CHANAI_PAGESIZE) && (i < (page + 1) * CHANAI_PAGESIZE))
+      {
         strcpy(menu_ptr->value_ptr, chanlist_ptr->channame);
 
         /* Define PF buttons and Return */
@@ -6412,15 +6705,16 @@ int RTTSYS_CHANAI(menu_ctx ctx, int event, char* parameter_ptr,
         menu_ptr->argoi = chanlist_ptr->chan_objid;
         strcpy(menu_ptr->value_ptr, chanlist_ptr->channame);
         menu_ptr++;
-        if (chanlist_ptr->connected) {
-          *(float*)menu_ptr->value_ptr
-              = ((pwr_sClass_ChanAi*)chanlist_ptr->chan_ptr)->SigValPolyCoef0
-              + ((pwr_sClass_ChanAi*)chanlist_ptr->chan_ptr)->SigValPolyCoef1
-                  * *(pwr_tInt16*)chanlist_ptr->value_ptr;
+        if (chanlist_ptr->connected)
+        {
+          *(float*)menu_ptr->value_ptr = ((pwr_sClass_ChanAi*)chanlist_ptr->chan_ptr)->SigValPolyCoef0 +
+                                         ((pwr_sClass_ChanAi*)chanlist_ptr->chan_ptr)->SigValPolyCoef1 *
+                                             *(pwr_tInt16*)chanlist_ptr->value_ptr;
           menu_ptr++;
           menu_ptr->value_ptr = (char*)chanlist_ptr->conversion_on;
           menu_ptr++;
-          switch (display_mode) {
+          switch (display_mode)
+          {
           case CHAN_DISPLAYMODE_SIGNAL:
             strcpy(menu_ptr->value_ptr, chanlist_ptr->signame);
             break;
@@ -6435,7 +6729,9 @@ int RTTSYS_CHANAI(menu_ctx ctx, int event, char* parameter_ptr,
             break;
           }
           menu_ptr++;
-        } else {
+        }
+        else
+        {
           *(float*)menu_ptr->value_ptr = 0;
           menu_ptr++;
           menu_ptr->value_ptr = (char*)RTT_ERASE;
@@ -6447,7 +6743,8 @@ int RTTSYS_CHANAI(menu_ctx ctx, int event, char* parameter_ptr,
       }
       chanlist_ptr++;
     }
-    for (i = j; i < CHANAI_PAGESIZE; i++) {
+    for (i = j; i < CHANAI_PAGESIZE; i++)
+    {
       strcpy(menu_ptr->value_ptr, "");
       menu_ptr->func = 0;
       menu_ptr->func2 = 0;
@@ -6467,11 +6764,13 @@ int RTTSYS_CHANAI(menu_ctx ctx, int event, char* parameter_ptr,
     menu_ptr++;
   }
   /**********************************************************
-  *	Exit of the picture
-  ***********************************************************/
-  else if (event == RTT_APPL_EXIT) {
+   *	Exit of the picture
+   ***********************************************************/
+  else if (event == RTT_APPL_EXIT)
+  {
     chanlist_ptr = chanlist;
-    for (i = 0; i < chanlist_count; i++) {
+    for (i = 0; i < chanlist_count; i++)
+    {
       sts = gdh_UnrefObjectInfo(chanlist_ptr->chan_subid);
       if (chanlist_ptr->connected)
         sts = gdh_UnrefObjectInfo(chanlist_ptr->value_subid);
@@ -6482,10 +6781,12 @@ int RTTSYS_CHANAI(menu_ctx ctx, int event, char* parameter_ptr,
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	The value of a parameter is changed.
-  ***********************************************************/
-  else if (event == RTT_APPL_VALUECHANGED) {
-    if (parameter_ptr == (char*)&CHANAI_DISPLAY_MODE) {
+   *	The value of a parameter is changed.
+   ***********************************************************/
+  else if (event == RTT_APPL_VALUECHANGED)
+  {
+    if (parameter_ptr == (char*)&CHANAI_DISPLAY_MODE)
+    {
       if (CHANAI_DISPLAY_MODE)
         display_mode++;
       else
@@ -6495,7 +6796,8 @@ int RTTSYS_CHANAI(menu_ctx ctx, int event, char* parameter_ptr,
       if (display_mode < 0)
         display_mode = CHAN_DISPLAYMODE_MAX;
 
-      switch (display_mode) {
+      switch (display_mode)
+      {
       case CHAN_DISPLAYMODE_SIGNAL:
         strcpy(CHANAI_DISPLAY_TITLE, "Signal");
         break;
@@ -6514,14 +6816,17 @@ int RTTSYS_CHANAI(menu_ctx ctx, int event, char* parameter_ptr,
       menu_ptr = menulist;
       chanlist_ptr = chanlist;
       j = 0;
-      for (i = 0; i < chanlist_count; i++) {
-        if ((i >= page * CHANAI_PAGESIZE)
-            && (i < (page + 1) * CHANAI_PAGESIZE)) {
+      for (i = 0; i < chanlist_count; i++)
+      {
+        if ((i >= page * CHANAI_PAGESIZE) && (i < (page + 1) * CHANAI_PAGESIZE))
+        {
           menu_ptr++;
           menu_ptr++;
           menu_ptr++;
-          if (chanlist_ptr->connected) {
-            switch (display_mode) {
+          if (chanlist_ptr->connected)
+          {
+            switch (display_mode)
+            {
             case CHAN_DISPLAYMODE_SIGNAL:
               strcpy(menu_ptr->value_ptr, chanlist_ptr->signame);
               break;
@@ -6536,7 +6841,9 @@ int RTTSYS_CHANAI(menu_ctx ctx, int event, char* parameter_ptr,
               break;
             }
             menu_ptr++;
-          } else {
+          }
+          else
+          {
             strcpy(menu_ptr->value_ptr, "");
             menu_ptr++;
           }
@@ -6547,22 +6854,24 @@ int RTTSYS_CHANAI(menu_ctx ctx, int event, char* parameter_ptr,
     }
   }
   /**********************************************************
-  *	Update the picture.
-  ***********************************************************/
-  else if (event == RTT_APPL_UPDATE) {
+   *	Update the picture.
+   ***********************************************************/
+  else if (event == RTT_APPL_UPDATE)
+  {
     menulist = (rtt_t_menu_upd*)ctx->menu;
     menu_ptr = menulist;
     chanlist_ptr = chanlist;
     j = 0;
-    for (i = 0; i < chanlist_count; i++) {
-      if ((i >= page * CHANAI_PAGESIZE) && (i < (page + 1) * CHANAI_PAGESIZE)) {
+    for (i = 0; i < chanlist_count; i++)
+    {
+      if ((i >= page * CHANAI_PAGESIZE) && (i < (page + 1) * CHANAI_PAGESIZE))
+      {
         menu_ptr++;
         if (chanlist_ptr->connected)
           /* Calculate signal value */
-          *(float*)menu_ptr->value_ptr
-              = ((pwr_sClass_ChanAi*)chanlist_ptr->chan_ptr)->SigValPolyCoef0
-              + ((pwr_sClass_ChanAi*)chanlist_ptr->chan_ptr)->SigValPolyCoef1
-                  * *(pwr_tInt16*)chanlist_ptr->value_ptr;
+          *(float*)menu_ptr->value_ptr = ((pwr_sClass_ChanAi*)chanlist_ptr->chan_ptr)->SigValPolyCoef0 +
+                                         ((pwr_sClass_ChanAi*)chanlist_ptr->chan_ptr)->SigValPolyCoef1 *
+                                             *(pwr_tInt16*)chanlist_ptr->value_ptr;
         menu_ptr++;
         menu_ptr++;
         menu_ptr++;
@@ -6575,24 +6884,24 @@ int RTTSYS_CHANAI(menu_ctx ctx, int event, char* parameter_ptr,
 }
 
 /*************************************************************************
-*
-* Name:		RTTSYS_CHANAO()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	context of the picture.
-* int		event		I 	type of event.
-* char		*parameter_ptr	I	pointer to the parameter which value
-*					has been changed.
-*
-* Description:
-*	Show the ChanAo objects of a ao card.
-*
-**************************************************************************/
+ *
+ * Name:		RTTSYS_CHANAO()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	context of the picture.
+ * int		event		I 	type of event.
+ * char		*parameter_ptr	I	pointer to the parameter which value
+ *					has been changed.
+ *
+ * Description:
+ *	Show the ChanAo objects of a ao card.
+ *
+ **************************************************************************/
 
-static int rttsys_chanao_change_testmode(menu_ctx ctx, pwr_tObjid objid,
-    void* arg1, void* arg2, void* arg3, void* arg4)
+static int rttsys_chanao_change_testmode(menu_ctx ctx, pwr_tObjid objid, void* arg1, void* arg2, void* arg3,
+                                         void* arg4)
 {
   int sts;
   pwr_tBoolean test_on;
@@ -6616,9 +6925,8 @@ static int rttsys_chanao_change_testmode(menu_ctx ctx, pwr_tObjid objid,
   return RTT__NOPICTURE;
 }
 
-static int rttsys_aochanlist_add(pwr_tObjid chan_objid,
-    rttsys_t_chan_list** objectlist, int* objectlist_count, int* alloc,
-    int local, int signal_test_mode)
+static int rttsys_aochanlist_add(pwr_tObjid chan_objid, rttsys_t_chan_list** objectlist,
+                                 int* objectlist_count, int* alloc, int local, int signal_test_mode)
 {
   rttsys_t_chan_list* chanlist_ptr;
   rttsys_t_chan_list* new_objectlist;
@@ -6628,18 +6936,19 @@ static int rttsys_aochanlist_add(pwr_tObjid chan_objid,
   pwr_sAttrRef attrref;
   int signame_characters;
 
-  if (*objectlist_count == 0) {
+  if (*objectlist_count == 0)
+  {
     *objectlist = calloc(RTTSYS_ALLOC, sizeof(rttsys_t_chan_list));
     if (*objectlist == 0)
       return RTT__NOMEMORY;
     *alloc = RTTSYS_CHANALLOC;
-  } else if (*alloc <= *objectlist_count) {
-    new_objectlist
-        = calloc(*alloc + RTTSYS_CHANALLOC, sizeof(rttsys_t_chan_list));
+  }
+  else if (*alloc <= *objectlist_count)
+  {
+    new_objectlist = calloc(*alloc + RTTSYS_CHANALLOC, sizeof(rttsys_t_chan_list));
     if (new_objectlist == 0)
       return RTT__NOMEMORY;
-    memcpy(new_objectlist, *objectlist,
-        *objectlist_count * sizeof(rttsys_t_chan_list));
+    memcpy(new_objectlist, *objectlist, *objectlist_count * sizeof(rttsys_t_chan_list));
     free(*objectlist);
     *objectlist = new_objectlist;
     (*alloc) += RTTSYS_CHANALLOC;
@@ -6656,86 +6965,91 @@ static int rttsys_aochanlist_add(pwr_tObjid chan_objid,
     rtt_cut_segments(chanlist_ptr->channame, namebuf, 1);
 
   attrref = cdh_ObjidToAref(chan_objid);
-  if (local) {
+  if (local)
+  {
     /* Get a direct link to channel object */
-    sts = gdh_DLRefObjectInfoAttrref(&attrref,
-        (pwr_tAddress*)&chanlist_ptr->chan_ptr, &chanlist_ptr->chan_subid);
+    sts = gdh_DLRefObjectInfoAttrref(&attrref, (pwr_tAddress*)&chanlist_ptr->chan_ptr,
+                                     &chanlist_ptr->chan_subid);
     if (EVEN(sts))
       return sts;
-  } else {
+  }
+  else
+  {
     /* Get a subscription to the original object */
     sts = gdh_SubRefObjectInfoAttrref(&attrref, &chanlist_ptr->chan_subid);
     if (EVEN(sts))
       return sts;
 
-    sts = gdh_SubAssociateBuffer(chanlist_ptr->chan_subid,
-        (pwr_tAddress*)&chanlist_ptr->chan_ptr, attrref.Size);
+    sts = gdh_SubAssociateBuffer(chanlist_ptr->chan_subid, (pwr_tAddress*)&chanlist_ptr->chan_ptr,
+                                 attrref.Size);
     if (EVEN(sts))
       return sts;
   }
   chanlist_ptr->chan_objid = chan_objid;
-  chanlist_ptr->test_on
-      = &((pwr_sClass_ChanAo*)(chanlist_ptr->chan_ptr))->TestOn;
-  chanlist_ptr->chan_number
-      = ((pwr_sClass_ChanAo*)(chanlist_ptr->chan_ptr))->Number;
-  strcpy(chanlist_ptr->chan_descript,
-      ((pwr_sClass_ChanAo*)(chanlist_ptr->chan_ptr))->Description);
-  strcpy(chanlist_ptr->chan_ident,
-      ((pwr_sClass_ChanAo*)(chanlist_ptr->chan_ptr))->Identity);
+  chanlist_ptr->test_on = &((pwr_sClass_ChanAo*)(chanlist_ptr->chan_ptr))->TestOn;
+  chanlist_ptr->chan_number = ((pwr_sClass_ChanAo*)(chanlist_ptr->chan_ptr))->Number;
+  strcpy(chanlist_ptr->chan_descript, ((pwr_sClass_ChanAo*)(chanlist_ptr->chan_ptr))->Description);
+  strcpy(chanlist_ptr->chan_ident, ((pwr_sClass_ChanAo*)(chanlist_ptr->chan_ptr))->Identity);
 
   /* Get signal */
-  sts = gdh_AttrrefToName(
-      &((pwr_sClass_ChanAo*)(chanlist_ptr->chan_ptr))->SigChanCon, namebuf,
-      sizeof(namebuf), cdh_mNName);
-  if (EVEN(sts)) {
+  sts = gdh_AttrrefToName(&((pwr_sClass_ChanAo*)(chanlist_ptr->chan_ptr))->SigChanCon, namebuf,
+                          sizeof(namebuf), cdh_mNName);
+  if (EVEN(sts))
+  {
     chanlist_ptr->connected = 0;
     strcpy(chanlist_ptr->signame, "-");
-  } else {
+  }
+  else
+  {
     chanlist_ptr->connected = 1;
     signame_characters = 51; /* Should be fetched from menu entry... */
-    if ((int)strlen(namebuf) > signame_characters) {
+    if ((int)strlen(namebuf) > signame_characters)
+    {
       /* Show the last part of the name */
       strcpy(chanlist_ptr->signame, ".");
-      strcat(chanlist_ptr->signame,
-          &namebuf[strlen(namebuf) - signame_characters + 1]);
-    } else
+      strcat(chanlist_ptr->signame, &namebuf[strlen(namebuf) - signame_characters + 1]);
+    }
+    else
       strcpy(chanlist_ptr->signame, namebuf);
 
-    if (!signal_test_mode) {
+    if (!signal_test_mode)
+    {
       /* Get a pointer to the value */
       strcpy(aname, namebuf);
       strcat(aname, ".ActualValue");
       sts = gdh_NameToAttrref(pwr_cNObjid, aname, &attrref);
       if (EVEN(sts))
         return sts;
-      if (local) {
+      if (local)
+      {
         /* Get a direct link to the original object */
-        sts = gdh_DLRefObjectInfoAttrref(&attrref,
-            (pwr_tAddress*)&chanlist_ptr->value_ptr,
-            &chanlist_ptr->value_subid);
+        sts = gdh_DLRefObjectInfoAttrref(&attrref, (pwr_tAddress*)&chanlist_ptr->value_ptr,
+                                         &chanlist_ptr->value_subid);
         if (EVEN(sts))
           return sts;
-      } else {
+      }
+      else
+      {
         /* Get a subscription to the original object */
         sts = gdh_SubRefObjectInfoAttrref(&attrref, &chanlist_ptr->value_subid);
         if (EVEN(sts))
           return sts;
 
-        sts = gdh_SubAssociateBuffer(chanlist_ptr->value_subid,
-            (pwr_tAddress*)&chanlist_ptr->value_ptr, attrref.Size);
+        sts = gdh_SubAssociateBuffer(chanlist_ptr->value_subid, (pwr_tAddress*)&chanlist_ptr->value_ptr,
+                                     attrref.Size);
         if (EVEN(sts))
           return sts;
       }
-    } else {
+    }
+    else
+    {
       /* Display testvalue instead of sigvalue */
-      chanlist_ptr->value_ptr
-          = (pwr_tBoolean*)(&((pwr_sClass_ChanAo*)(chanlist_ptr->chan_ptr))
-                                 ->TestValue);
+      chanlist_ptr->value_ptr = (pwr_tBoolean*)(&((pwr_sClass_ChanAo*)(chanlist_ptr->chan_ptr))->TestValue);
     }
     /* Get the signal description */
     strcat(namebuf, ".Description");
     sts = gdh_GetObjectInfo(namebuf, (pwr_tAddress*)chanlist_ptr->sig_descript,
-        sizeof(chanlist_ptr->sig_descript));
+                            sizeof(chanlist_ptr->sig_descript));
     if (EVEN(sts))
       strcpy(chanlist_ptr->sig_descript, "");
   }
@@ -6744,8 +7058,7 @@ static int rttsys_aochanlist_add(pwr_tObjid chan_objid,
   return RTT__SUCCESS;
 }
 
-int RTTSYS_CHANAO(menu_ctx ctx, int event, char* parameter_ptr,
-    char* objectname, char** picture)
+int RTTSYS_CHANAO(menu_ctx ctx, int event, char* parameter_ptr, char* objectname, char** picture)
 {
   int sts;
   rtt_t_menu_upd* menu_ptr;
@@ -6771,12 +7084,14 @@ int RTTSYS_CHANAO(menu_ctx ctx, int event, char* parameter_ptr,
   IF_NOGDH_RETURN;
 
   /**********************************************************
-  *	Return address to menu
-  ***********************************************************/
-  if (event == RTT_APPL_MENU) {
+   *	Return address to menu
+   ***********************************************************/
+  if (event == RTT_APPL_MENU)
+  {
     /* Check object first */
     sts = gdh_NameToObjid(objectname, &objid);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       rtt_message('E', "Node is down");
       return RTT__NOPICTURE;
     }
@@ -6788,20 +7103,25 @@ int RTTSYS_CHANAO(menu_ctx ctx, int event, char* parameter_ptr,
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Return address of background
-  ***********************************************************/
-  if (event == RTT_APPL_PICTURE) {
+   *	Return address of background
+   ***********************************************************/
+  if (event == RTT_APPL_PICTURE)
+  {
     *picture = (char*)&dtt_systempicture_p33_bg;
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Next and Previous page
-  ***********************************************************/
-  if (event == RTT_APPL_PREVPAGE || event == RTT_APPL_NEXTPAGE) {
-    if (event == RTT_APPL_PREVPAGE) {
+   *	Next and Previous page
+   ***********************************************************/
+  if (event == RTT_APPL_PREVPAGE || event == RTT_APPL_NEXTPAGE)
+  {
+    if (event == RTT_APPL_PREVPAGE)
+    {
       page--;
       page = MAX(page, 0);
-    } else {
+    }
+    else
+    {
       page++;
       page = MIN(page, CHANAO_MAXPAGE - 1);
     }
@@ -6811,8 +7131,10 @@ int RTTSYS_CHANAO(menu_ctx ctx, int event, char* parameter_ptr,
     menu_ptr = menulist;
     chanlist_ptr = chanlist;
     j = 0;
-    for (i = 0; i < chanlist_count; i++) {
-      if ((i >= page * CHANAO_PAGESIZE) && (i < (page + 1) * CHANAO_PAGESIZE)) {
+    for (i = 0; i < chanlist_count; i++)
+    {
+      if ((i >= page * CHANAO_PAGESIZE) && (i < (page + 1) * CHANAO_PAGESIZE))
+      {
         /* Define PF buttons and Return */
         menu_ptr->func = &rttsys_show_signal_from_chan;
         menu_ptr->func2 = &rtt_object_parameters;
@@ -6827,18 +7149,19 @@ int RTTSYS_CHANAO(menu_ctx ctx, int event, char* parameter_ptr,
         menu_ptr++;
         strcpy(menu_ptr->value_ptr, chanlist_ptr->channame);
         menu_ptr++;
-        if (chanlist_ptr->connected) {
+        if (chanlist_ptr->connected)
+        {
           if (!signal_test_mode)
-            *(float*)menu_ptr->value_ptr
-                = ((pwr_sClass_ChanAo*)chanlist_ptr->chan_ptr)->SigValPolyCoef0
-                + ((pwr_sClass_ChanAo*)chanlist_ptr->chan_ptr)->SigValPolyCoef1
-                    * *(pwr_tFloat32*)chanlist_ptr->value_ptr;
+            *(float*)menu_ptr->value_ptr = ((pwr_sClass_ChanAo*)chanlist_ptr->chan_ptr)->SigValPolyCoef0 +
+                                           ((pwr_sClass_ChanAo*)chanlist_ptr->chan_ptr)->SigValPolyCoef1 *
+                                               *(pwr_tFloat32*)chanlist_ptr->value_ptr;
           else
             menu_ptr->value_ptr = (char*)chanlist_ptr->value_ptr;
           menu_ptr++;
           menu_ptr->value_ptr = (char*)chanlist_ptr->test_on;
           menu_ptr++;
-          switch (display_mode) {
+          switch (display_mode)
+          {
           case CHAN_DISPLAYMODE_SIGNAL:
             strcpy(menu_ptr->value_ptr, chanlist_ptr->signame);
             break;
@@ -6853,7 +7176,9 @@ int RTTSYS_CHANAO(menu_ctx ctx, int event, char* parameter_ptr,
             break;
           }
           menu_ptr++;
-        } else {
+        }
+        else
+        {
           *(float*)menu_ptr->value_ptr = 0;
           menu_ptr++;
           menu_ptr->value_ptr = (char*)RTT_ERASE;
@@ -6865,7 +7190,8 @@ int RTTSYS_CHANAO(menu_ctx ctx, int event, char* parameter_ptr,
       }
       chanlist_ptr++;
     }
-    for (i = j; i < CHANAO_PAGESIZE; i++) {
+    for (i = j; i < CHANAO_PAGESIZE; i++)
+    {
       menu_ptr->func = 0;
       menu_ptr->func2 = 0;
       menu_ptr->func3 = 0;
@@ -6884,9 +7210,10 @@ int RTTSYS_CHANAO(menu_ctx ctx, int event, char* parameter_ptr,
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Initialization of the picture
-  ***********************************************************/
-  if (event == RTT_APPL_INIT) {
+   *	Initialization of the picture
+   ***********************************************************/
+  if (event == RTT_APPL_INIT)
+  {
     signal_test_mode = rtt_signal_test_mode;
     display_mode = 0;
     strcpy(CHANAO_DISPLAY_TITLE, "Signal");
@@ -6908,9 +7235,10 @@ int RTTSYS_CHANAO(menu_ctx ctx, int event, char* parameter_ptr,
     chan_alloc = 0;
     chanlist_count = 0;
     sts = gdh_GetChild(objid, &chan_objid);
-    while (ODD(sts)) {
-      sts = rttsys_aochanlist_add(chan_objid, &chanlist, &chanlist_count,
-          &chan_alloc, (int)local, signal_test_mode);
+    while (ODD(sts))
+    {
+      sts = rttsys_aochanlist_add(chan_objid, &chanlist, &chanlist_count, &chan_alloc, (int)local,
+                                  signal_test_mode);
       if (EVEN(sts))
         return sts;
 
@@ -6921,8 +7249,10 @@ int RTTSYS_CHANAO(menu_ctx ctx, int event, char* parameter_ptr,
     menu_ptr = menulist;
     chanlist_ptr = chanlist;
     j = 0;
-    for (i = 0; i < chanlist_count; i++) {
-      if ((i >= page * CHANAO_PAGESIZE) && (i < (page + 1) * CHANAO_PAGESIZE)) {
+    for (i = 0; i < chanlist_count; i++)
+    {
+      if ((i >= page * CHANAO_PAGESIZE) && (i < (page + 1) * CHANAO_PAGESIZE))
+      {
         /* Define PF buttons and Return */
         menu_ptr->func = &rttsys_show_signal_from_chan;
         menu_ptr->func2 = &rtt_object_parameters;
@@ -6937,18 +7267,19 @@ int RTTSYS_CHANAO(menu_ctx ctx, int event, char* parameter_ptr,
         menu_ptr++;
         strcpy(menu_ptr->value_ptr, chanlist_ptr->channame);
         menu_ptr++;
-        if (chanlist_ptr->connected) {
+        if (chanlist_ptr->connected)
+        {
           if (!signal_test_mode)
-            *(float*)menu_ptr->value_ptr
-                = ((pwr_sClass_ChanAo*)chanlist_ptr->chan_ptr)->SigValPolyCoef0
-                + ((pwr_sClass_ChanAo*)chanlist_ptr->chan_ptr)->SigValPolyCoef1
-                    * *(pwr_tFloat32*)chanlist_ptr->value_ptr;
+            *(float*)menu_ptr->value_ptr = ((pwr_sClass_ChanAo*)chanlist_ptr->chan_ptr)->SigValPolyCoef0 +
+                                           ((pwr_sClass_ChanAo*)chanlist_ptr->chan_ptr)->SigValPolyCoef1 *
+                                               *(pwr_tFloat32*)chanlist_ptr->value_ptr;
           else
             menu_ptr->value_ptr = (char*)chanlist_ptr->value_ptr;
           menu_ptr++;
           menu_ptr->value_ptr = (char*)chanlist_ptr->test_on;
           menu_ptr++;
-          switch (display_mode) {
+          switch (display_mode)
+          {
           case CHAN_DISPLAYMODE_SIGNAL:
             strcpy(menu_ptr->value_ptr, chanlist_ptr->signame);
             break;
@@ -6963,7 +7294,9 @@ int RTTSYS_CHANAO(menu_ctx ctx, int event, char* parameter_ptr,
             break;
           }
           menu_ptr++;
-        } else {
+        }
+        else
+        {
           *(float*)menu_ptr->value_ptr = 0;
           menu_ptr++;
           menu_ptr->value_ptr = (char*)RTT_ERASE;
@@ -6975,7 +7308,8 @@ int RTTSYS_CHANAO(menu_ctx ctx, int event, char* parameter_ptr,
       }
       chanlist_ptr++;
     }
-    for (i = j; i < CHANAO_PAGESIZE; i++) {
+    for (i = j; i < CHANAO_PAGESIZE; i++)
+    {
       menu_ptr->func = 0;
       menu_ptr->func2 = 0;
       menu_ptr->func3 = 0;
@@ -6996,11 +7330,14 @@ int RTTSYS_CHANAO(menu_ctx ctx, int event, char* parameter_ptr,
     rtt_cut_segments(menu_ptr->value_ptr, card_name, 2);
     menu_ptr++;
 
-    if (signal_test_mode) {
+    if (signal_test_mode)
+    {
       strcpy(CHANAO_INFO, "RETURN show signal |PF1 show chan |PF2 test on/off "
                           "|PF3 change testvalue");
       strcpy(CHANAO_TESTVALUE, "TestValue");
-    } else {
+    }
+    else
+    {
       strcpy(CHANAO_INFO, " RETURN show signal | c/A show channel | c/T show "
                           "cross | c/R back      ");
       strcpy(CHANAO_TESTVALUE, " SigValue");
@@ -7008,11 +7345,13 @@ int RTTSYS_CHANAO(menu_ctx ctx, int event, char* parameter_ptr,
     strcpy(CHANAO_TST, "Tst");
   }
   /**********************************************************
-  *	Exit of the picture
-  ***********************************************************/
-  else if (event == RTT_APPL_EXIT) {
+   *	Exit of the picture
+   ***********************************************************/
+  else if (event == RTT_APPL_EXIT)
+  {
     chanlist_ptr = chanlist;
-    for (i = 0; i < chanlist_count; i++) {
+    for (i = 0; i < chanlist_count; i++)
+    {
       sts = gdh_UnrefObjectInfo(chanlist_ptr->chan_subid);
       if (chanlist_ptr->connected)
         sts = gdh_UnrefObjectInfo(chanlist_ptr->value_subid);
@@ -7023,10 +7362,12 @@ int RTTSYS_CHANAO(menu_ctx ctx, int event, char* parameter_ptr,
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	The value of a parameter is changed.
-  ***********************************************************/
-  else if (event == RTT_APPL_VALUECHANGED) {
-    if (parameter_ptr == (char*)&CHANAO_DISPLAY_MODE) {
+   *	The value of a parameter is changed.
+   ***********************************************************/
+  else if (event == RTT_APPL_VALUECHANGED)
+  {
+    if (parameter_ptr == (char*)&CHANAO_DISPLAY_MODE)
+    {
       if (CHANAO_DISPLAY_MODE)
         display_mode++;
       else
@@ -7036,7 +7377,8 @@ int RTTSYS_CHANAO(menu_ctx ctx, int event, char* parameter_ptr,
       if (display_mode < 0)
         display_mode = CHAN_DISPLAYMODE_MAX;
 
-      switch (display_mode) {
+      switch (display_mode)
+      {
       case CHAN_DISPLAYMODE_SIGNAL:
         strcpy(CHANAO_DISPLAY_TITLE, "Signal");
         break;
@@ -7055,15 +7397,18 @@ int RTTSYS_CHANAO(menu_ctx ctx, int event, char* parameter_ptr,
       menu_ptr = menulist;
       chanlist_ptr = chanlist;
       j = 0;
-      for (i = 0; i < chanlist_count; i++) {
-        if ((i >= page * CHANAO_PAGESIZE)
-            && (i < (page + 1) * CHANAO_PAGESIZE)) {
+      for (i = 0; i < chanlist_count; i++)
+      {
+        if ((i >= page * CHANAO_PAGESIZE) && (i < (page + 1) * CHANAO_PAGESIZE))
+        {
           menu_ptr++;
           menu_ptr++;
           menu_ptr++;
           menu_ptr++;
-          if (chanlist_ptr->connected) {
-            switch (display_mode) {
+          if (chanlist_ptr->connected)
+          {
+            switch (display_mode)
+            {
             case CHAN_DISPLAYMODE_SIGNAL:
               strcpy(menu_ptr->value_ptr, chanlist_ptr->signame);
               break;
@@ -7078,7 +7423,9 @@ int RTTSYS_CHANAO(menu_ctx ctx, int event, char* parameter_ptr,
               break;
             }
             menu_ptr++;
-          } else {
+          }
+          else
+          {
             strcpy(menu_ptr->value_ptr, "");
             menu_ptr++;
           }
@@ -7089,15 +7436,20 @@ int RTTSYS_CHANAO(menu_ctx ctx, int event, char* parameter_ptr,
     }
   }
   /**********************************************************
-  *	Update the picture.
-  ***********************************************************/
-  else if (event == RTT_APPL_UPDATE) {
-    if (signal_test_mode) {
-      if (toggle) {
+   *	Update the picture.
+   ***********************************************************/
+  else if (event == RTT_APPL_UPDATE)
+  {
+    if (signal_test_mode)
+    {
+      if (toggle)
+      {
         strcpy(CHANAO_TST, "Tst");
         strcpy(CHANAO_TESTVALUE, "TestValue");
         toggle = 0;
-      } else {
+      }
+      else
+      {
         strcpy(CHANAO_TST, "   ");
         strcpy(CHANAO_TESTVALUE, "         ");
         toggle = 1;
@@ -7108,17 +7460,19 @@ int RTTSYS_CHANAO(menu_ctx ctx, int event, char* parameter_ptr,
     menu_ptr = menulist;
     chanlist_ptr = chanlist;
     j = 0;
-    for (i = 0; i < chanlist_count; i++) {
-      if ((i >= page * CHANAO_PAGESIZE) && (i < (page + 1) * CHANAO_PAGESIZE)) {
+    for (i = 0; i < chanlist_count; i++)
+    {
+      if ((i >= page * CHANAO_PAGESIZE) && (i < (page + 1) * CHANAO_PAGESIZE))
+      {
         /* Define PF buttons and Return */
         menu_ptr++;
         menu_ptr++;
-        if (chanlist_ptr->connected) {
+        if (chanlist_ptr->connected)
+        {
           if (!signal_test_mode)
-            *(float*)menu_ptr->value_ptr
-                = ((pwr_sClass_ChanAo*)chanlist_ptr->chan_ptr)->SigValPolyCoef0
-                + ((pwr_sClass_ChanAo*)chanlist_ptr->chan_ptr)->SigValPolyCoef1
-                    * *(pwr_tFloat32*)chanlist_ptr->value_ptr;
+            *(float*)menu_ptr->value_ptr = ((pwr_sClass_ChanAo*)chanlist_ptr->chan_ptr)->SigValPolyCoef0 +
+                                           ((pwr_sClass_ChanAo*)chanlist_ptr->chan_ptr)->SigValPolyCoef1 *
+                                               *(pwr_tFloat32*)chanlist_ptr->value_ptr;
         }
         menu_ptr++;
         menu_ptr++;
@@ -7132,25 +7486,24 @@ int RTTSYS_CHANAO(menu_ctx ctx, int event, char* parameter_ptr,
 }
 
 /*************************************************************************
-*
-* Name:		RTTSYS_CHANCO()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	context of the picture.
-* int		event		I 	type of event.
-* char		*parameter_ptr	I	pointer to the parameter which value
-*					has been changed.
-*
-* Description:
-*	Show the ChanCo objects of a co card.
-*
-**************************************************************************/
+ *
+ * Name:		RTTSYS_CHANCO()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	context of the picture.
+ * int		event		I 	type of event.
+ * char		*parameter_ptr	I	pointer to the parameter which value
+ *					has been changed.
+ *
+ * Description:
+ *	Show the ChanCo objects of a co card.
+ *
+ **************************************************************************/
 
-static int rttsys_cochanlist_add(pwr_tObjid chan_objid,
-    rttsys_t_chan_list** objectlist, int* objectlist_count, int* alloc,
-    int local)
+static int rttsys_cochanlist_add(pwr_tObjid chan_objid, rttsys_t_chan_list** objectlist,
+                                 int* objectlist_count, int* alloc, int local)
 {
   rttsys_t_chan_list* chanlist_ptr;
   rttsys_t_chan_list* new_objectlist;
@@ -7160,18 +7513,19 @@ static int rttsys_cochanlist_add(pwr_tObjid chan_objid,
   pwr_sAttrRef attrref;
   int signame_characters;
 
-  if (*objectlist_count == 0) {
+  if (*objectlist_count == 0)
+  {
     *objectlist = calloc(RTTSYS_ALLOC, sizeof(rttsys_t_chan_list));
     if (*objectlist == 0)
       return RTT__NOMEMORY;
     *alloc = RTTSYS_CHANALLOC;
-  } else if (*alloc <= *objectlist_count) {
-    new_objectlist
-        = calloc(*alloc + RTTSYS_CHANALLOC, sizeof(rttsys_t_chan_list));
+  }
+  else if (*alloc <= *objectlist_count)
+  {
+    new_objectlist = calloc(*alloc + RTTSYS_CHANALLOC, sizeof(rttsys_t_chan_list));
     if (new_objectlist == 0)
       return RTT__NOMEMORY;
-    memcpy(new_objectlist, *objectlist,
-        *objectlist_count * sizeof(rttsys_t_chan_list));
+    memcpy(new_objectlist, *objectlist, *objectlist_count * sizeof(rttsys_t_chan_list));
     free(*objectlist);
     *objectlist = new_objectlist;
     (*alloc) += RTTSYS_CHANALLOC;
@@ -7188,49 +7542,51 @@ static int rttsys_cochanlist_add(pwr_tObjid chan_objid,
     rtt_cut_segments(chanlist_ptr->channame, namebuf, 1);
 
   attrref = cdh_ObjidToAref(chan_objid);
-  if (local) {
+  if (local)
+  {
     /* Get a direct link to channel object */
-    sts = gdh_DLRefObjectInfoAttrref(&attrref,
-        (pwr_tAddress*)&chanlist_ptr->chan_ptr, &chanlist_ptr->chan_subid);
+    sts = gdh_DLRefObjectInfoAttrref(&attrref, (pwr_tAddress*)&chanlist_ptr->chan_ptr,
+                                     &chanlist_ptr->chan_subid);
     if (EVEN(sts))
       return sts;
-  } else {
+  }
+  else
+  {
     /* Get a subscription to the original object */
     sts = gdh_SubRefObjectInfoAttrref(&attrref, &chanlist_ptr->chan_subid);
     if (EVEN(sts))
       return sts;
 
-    sts = gdh_SubAssociateBuffer(chanlist_ptr->chan_subid,
-        (pwr_tAddress*)&chanlist_ptr->chan_ptr, attrref.Size);
+    sts = gdh_SubAssociateBuffer(chanlist_ptr->chan_subid, (pwr_tAddress*)&chanlist_ptr->chan_ptr,
+                                 attrref.Size);
     if (EVEN(sts))
       return sts;
   }
   chanlist_ptr->chan_objid = chan_objid;
-  chanlist_ptr->conversion_on
-      = &((pwr_sClass_ChanCo*)(chanlist_ptr->chan_ptr))->ConversionOn;
-  chanlist_ptr->chan_number
-      = ((pwr_sClass_ChanCo*)(chanlist_ptr->chan_ptr))->Number;
-  strcpy(chanlist_ptr->chan_descript,
-      ((pwr_sClass_ChanCo*)(chanlist_ptr->chan_ptr))->Description);
-  strcpy(chanlist_ptr->chan_ident,
-      ((pwr_sClass_ChanCo*)(chanlist_ptr->chan_ptr))->Identity);
+  chanlist_ptr->conversion_on = &((pwr_sClass_ChanCo*)(chanlist_ptr->chan_ptr))->ConversionOn;
+  chanlist_ptr->chan_number = ((pwr_sClass_ChanCo*)(chanlist_ptr->chan_ptr))->Number;
+  strcpy(chanlist_ptr->chan_descript, ((pwr_sClass_ChanCo*)(chanlist_ptr->chan_ptr))->Description);
+  strcpy(chanlist_ptr->chan_ident, ((pwr_sClass_ChanCo*)(chanlist_ptr->chan_ptr))->Identity);
 
   /* Get signal */
-  sts = gdh_AttrrefToName(
-      &((pwr_sClass_ChanCo*)(chanlist_ptr->chan_ptr))->SigChanCon, namebuf,
-      sizeof(namebuf), cdh_mNName);
-  if (EVEN(sts)) {
+  sts = gdh_AttrrefToName(&((pwr_sClass_ChanCo*)(chanlist_ptr->chan_ptr))->SigChanCon, namebuf,
+                          sizeof(namebuf), cdh_mNName);
+  if (EVEN(sts))
+  {
     chanlist_ptr->connected = 0;
     strcpy(chanlist_ptr->signame, "-");
-  } else {
+  }
+  else
+  {
     chanlist_ptr->connected = 1;
     signame_characters = 51; /* Should be fetched from menu entry... */
-    if ((int)strlen(namebuf) > signame_characters) {
+    if ((int)strlen(namebuf) > signame_characters)
+    {
       /* Show the last part of the name */
       strcpy(chanlist_ptr->signame, ".");
-      strcat(chanlist_ptr->signame,
-          &namebuf[strlen(namebuf) - signame_characters + 1]);
-    } else
+      strcat(chanlist_ptr->signame, &namebuf[strlen(namebuf) - signame_characters + 1]);
+    }
+    else
       strcpy(chanlist_ptr->signame, namebuf);
 
     /* Get a pointer to the value */
@@ -7239,27 +7595,30 @@ static int rttsys_cochanlist_add(pwr_tObjid chan_objid,
     sts = gdh_NameToAttrref(pwr_cNObjid, aname, &attrref);
     if (EVEN(sts))
       return sts;
-    if (local) {
+    if (local)
+    {
       /* Get a direct link to the original object */
-      sts = gdh_DLRefObjectInfoAttrref(&attrref,
-          (pwr_tAddress*)&chanlist_ptr->value_ptr, &chanlist_ptr->value_subid);
+      sts = gdh_DLRefObjectInfoAttrref(&attrref, (pwr_tAddress*)&chanlist_ptr->value_ptr,
+                                       &chanlist_ptr->value_subid);
       if (EVEN(sts))
         return sts;
-    } else {
+    }
+    else
+    {
       /* Get a subscription to the original object */
       sts = gdh_SubRefObjectInfoAttrref(&attrref, &chanlist_ptr->value_subid);
       if (EVEN(sts))
         return sts;
 
-      sts = gdh_SubAssociateBuffer(chanlist_ptr->value_subid,
-          (pwr_tAddress*)&chanlist_ptr->value_ptr, attrref.Size);
+      sts = gdh_SubAssociateBuffer(chanlist_ptr->value_subid, (pwr_tAddress*)&chanlist_ptr->value_ptr,
+                                   attrref.Size);
       if (EVEN(sts))
         return sts;
     }
     /* Get the signal description */
     strcat(namebuf, ".Description");
     sts = gdh_GetObjectInfo(namebuf, (pwr_tAddress*)chanlist_ptr->sig_descript,
-        sizeof(chanlist_ptr->sig_descript));
+                            sizeof(chanlist_ptr->sig_descript));
     if (EVEN(sts))
       strcpy(chanlist_ptr->sig_descript, "");
   }
@@ -7268,8 +7627,7 @@ static int rttsys_cochanlist_add(pwr_tObjid chan_objid,
   return RTT__SUCCESS;
 }
 
-int RTTSYS_CHANCO(menu_ctx ctx, int event, char* parameter_ptr,
-    char* objectname, char** picture)
+int RTTSYS_CHANCO(menu_ctx ctx, int event, char* parameter_ptr, char* objectname, char** picture)
 {
   int sts;
   rtt_t_menu_upd* menu_ptr;
@@ -7293,12 +7651,14 @@ int RTTSYS_CHANCO(menu_ctx ctx, int event, char* parameter_ptr,
   IF_NOGDH_RETURN;
 
   /**********************************************************
-  *	Return address to menu
-  ***********************************************************/
-  if (event == RTT_APPL_MENU) {
+   *	Return address to menu
+   ***********************************************************/
+  if (event == RTT_APPL_MENU)
+  {
     /* Check object first */
     sts = gdh_NameToObjid(objectname, &objid);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       rtt_message('E', "Node is down");
       return RTT__NOPICTURE;
     }
@@ -7310,20 +7670,25 @@ int RTTSYS_CHANCO(menu_ctx ctx, int event, char* parameter_ptr,
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Return address of background
-  ***********************************************************/
-  if (event == RTT_APPL_PICTURE) {
+   *	Return address of background
+   ***********************************************************/
+  if (event == RTT_APPL_PICTURE)
+  {
     *picture = (char*)&dtt_systempicture_p34_bg;
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Next and Previous page
-  ***********************************************************/
-  if (event == RTT_APPL_PREVPAGE || event == RTT_APPL_NEXTPAGE) {
-    if (event == RTT_APPL_PREVPAGE) {
+   *	Next and Previous page
+   ***********************************************************/
+  if (event == RTT_APPL_PREVPAGE || event == RTT_APPL_NEXTPAGE)
+  {
+    if (event == RTT_APPL_PREVPAGE)
+    {
       page--;
       page = MAX(page, 0);
-    } else {
+    }
+    else
+    {
       page++;
       page = MIN(page, CHANCO_MAXPAGE - 1);
     }
@@ -7333,8 +7698,10 @@ int RTTSYS_CHANCO(menu_ctx ctx, int event, char* parameter_ptr,
     menu_ptr = menulist;
     chanlist_ptr = chanlist;
     j = 0;
-    for (i = 0; i < chanlist_count; i++) {
-      if ((i >= page * CHANCO_PAGESIZE) && (i < (page + 1) * CHANCO_PAGESIZE)) {
+    for (i = 0; i < chanlist_count; i++)
+    {
+      if ((i >= page * CHANCO_PAGESIZE) && (i < (page + 1) * CHANCO_PAGESIZE))
+      {
         strcpy(menu_ptr->value_ptr, chanlist_ptr->channame);
 
         /* Define PF buttons and Return */
@@ -7344,12 +7711,14 @@ int RTTSYS_CHANCO(menu_ctx ctx, int event, char* parameter_ptr,
         menu_ptr->argoi = chanlist_ptr->chan_objid;
         strcpy(menu_ptr->value_ptr, chanlist_ptr->channame);
         menu_ptr++;
-        if (chanlist_ptr->connected) {
+        if (chanlist_ptr->connected)
+        {
           menu_ptr->value_ptr = (char*)chanlist_ptr->value_ptr;
           menu_ptr++;
           menu_ptr->value_ptr = (char*)chanlist_ptr->conversion_on;
           menu_ptr++;
-          switch (display_mode) {
+          switch (display_mode)
+          {
           case CHAN_DISPLAYMODE_SIGNAL:
             strcpy(menu_ptr->value_ptr, chanlist_ptr->signame);
             break;
@@ -7364,7 +7733,9 @@ int RTTSYS_CHANCO(menu_ctx ctx, int event, char* parameter_ptr,
             break;
           }
           menu_ptr++;
-        } else {
+        }
+        else
+        {
           menu_ptr->value_ptr = (char*)RTT_ERASE;
           menu_ptr++;
           menu_ptr->value_ptr = (char*)RTT_ERASE;
@@ -7376,7 +7747,8 @@ int RTTSYS_CHANCO(menu_ctx ctx, int event, char* parameter_ptr,
       }
       chanlist_ptr++;
     }
-    for (i = j; i < CHANCO_PAGESIZE; i++) {
+    for (i = j; i < CHANCO_PAGESIZE; i++)
+    {
       strcpy(menu_ptr->value_ptr, "");
       menu_ptr->func = 0;
       menu_ptr->func2 = 0;
@@ -7393,9 +7765,10 @@ int RTTSYS_CHANCO(menu_ctx ctx, int event, char* parameter_ptr,
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Initialization of the picture
-  ***********************************************************/
-  if (event == RTT_APPL_INIT) {
+   *	Initialization of the picture
+   ***********************************************************/
+  if (event == RTT_APPL_INIT)
+  {
     display_mode = 0;
     strcpy(CHANCO_DISPLAY_TITLE, "Signal");
     page = 0;
@@ -7416,9 +7789,9 @@ int RTTSYS_CHANCO(menu_ctx ctx, int event, char* parameter_ptr,
     chan_alloc = 0;
     chanlist_count = 0;
     sts = gdh_GetChild(objid, &chan_objid);
-    while (ODD(sts)) {
-      sts = rttsys_cochanlist_add(
-          chan_objid, &chanlist, &chanlist_count, &chan_alloc, (int)local);
+    while (ODD(sts))
+    {
+      sts = rttsys_cochanlist_add(chan_objid, &chanlist, &chanlist_count, &chan_alloc, (int)local);
       if (EVEN(sts))
         return sts;
 
@@ -7429,8 +7802,10 @@ int RTTSYS_CHANCO(menu_ctx ctx, int event, char* parameter_ptr,
     menu_ptr = menulist;
     chanlist_ptr = chanlist;
     j = 0;
-    for (i = 0; i < chanlist_count; i++) {
-      if ((i >= page * CHANCO_PAGESIZE) && (i < (page + 1) * CHANCO_PAGESIZE)) {
+    for (i = 0; i < chanlist_count; i++)
+    {
+      if ((i >= page * CHANCO_PAGESIZE) && (i < (page + 1) * CHANCO_PAGESIZE))
+      {
         strcpy(menu_ptr->value_ptr, chanlist_ptr->channame);
 
         /* Define PF buttons and Return */
@@ -7440,12 +7815,14 @@ int RTTSYS_CHANCO(menu_ctx ctx, int event, char* parameter_ptr,
         menu_ptr->argoi = chanlist_ptr->chan_objid;
         strcpy(menu_ptr->value_ptr, chanlist_ptr->channame);
         menu_ptr++;
-        if (chanlist_ptr->connected) {
+        if (chanlist_ptr->connected)
+        {
           menu_ptr->value_ptr = (char*)chanlist_ptr->value_ptr;
           menu_ptr++;
           menu_ptr->value_ptr = (char*)chanlist_ptr->conversion_on;
           menu_ptr++;
-          switch (display_mode) {
+          switch (display_mode)
+          {
           case CHAN_DISPLAYMODE_SIGNAL:
             strcpy(menu_ptr->value_ptr, chanlist_ptr->signame);
             break;
@@ -7460,7 +7837,9 @@ int RTTSYS_CHANCO(menu_ctx ctx, int event, char* parameter_ptr,
             break;
           }
           menu_ptr++;
-        } else {
+        }
+        else
+        {
           menu_ptr->value_ptr = (char*)RTT_ERASE;
           menu_ptr++;
           menu_ptr->value_ptr = (char*)RTT_ERASE;
@@ -7472,7 +7851,8 @@ int RTTSYS_CHANCO(menu_ctx ctx, int event, char* parameter_ptr,
       }
       chanlist_ptr++;
     }
-    for (i = j; i < CHANCO_PAGESIZE; i++) {
+    for (i = j; i < CHANCO_PAGESIZE; i++)
+    {
       strcpy(menu_ptr->value_ptr, "");
       menu_ptr->func = 0;
       menu_ptr->func2 = 0;
@@ -7492,11 +7872,13 @@ int RTTSYS_CHANCO(menu_ctx ctx, int event, char* parameter_ptr,
     menu_ptr++;
   }
   /**********************************************************
-  *	Exit of the picture
-  ***********************************************************/
-  else if (event == RTT_APPL_EXIT) {
+   *	Exit of the picture
+   ***********************************************************/
+  else if (event == RTT_APPL_EXIT)
+  {
     chanlist_ptr = chanlist;
-    for (i = 0; i < chanlist_count; i++) {
+    for (i = 0; i < chanlist_count; i++)
+    {
       sts = gdh_UnrefObjectInfo(chanlist_ptr->chan_subid);
       if (chanlist_ptr->connected)
         sts = gdh_UnrefObjectInfo(chanlist_ptr->value_subid);
@@ -7507,10 +7889,12 @@ int RTTSYS_CHANCO(menu_ctx ctx, int event, char* parameter_ptr,
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	The value of a parameter is changed.
-  ***********************************************************/
-  else if (event == RTT_APPL_VALUECHANGED) {
-    if (parameter_ptr == (char*)&CHANCO_DISPLAY_MODE) {
+   *	The value of a parameter is changed.
+   ***********************************************************/
+  else if (event == RTT_APPL_VALUECHANGED)
+  {
+    if (parameter_ptr == (char*)&CHANCO_DISPLAY_MODE)
+    {
       if (CHANCO_DISPLAY_MODE)
         display_mode++;
       else
@@ -7520,7 +7904,8 @@ int RTTSYS_CHANCO(menu_ctx ctx, int event, char* parameter_ptr,
       if (display_mode < 0)
         display_mode = CHAN_DISPLAYMODE_MAX;
 
-      switch (display_mode) {
+      switch (display_mode)
+      {
       case CHAN_DISPLAYMODE_SIGNAL:
         strcpy(CHANCO_DISPLAY_TITLE, "Signal");
         break;
@@ -7539,14 +7924,17 @@ int RTTSYS_CHANCO(menu_ctx ctx, int event, char* parameter_ptr,
       menu_ptr = menulist;
       chanlist_ptr = chanlist;
       j = 0;
-      for (i = 0; i < chanlist_count; i++) {
-        if ((i >= page * CHANCO_PAGESIZE)
-            && (i < (page + 1) * CHANCO_PAGESIZE)) {
+      for (i = 0; i < chanlist_count; i++)
+      {
+        if ((i >= page * CHANCO_PAGESIZE) && (i < (page + 1) * CHANCO_PAGESIZE))
+        {
           menu_ptr++;
           menu_ptr++;
           menu_ptr++;
-          if (chanlist_ptr->connected) {
-            switch (display_mode) {
+          if (chanlist_ptr->connected)
+          {
+            switch (display_mode)
+            {
             case CHAN_DISPLAYMODE_SIGNAL:
               strcpy(menu_ptr->value_ptr, chanlist_ptr->signame);
               break;
@@ -7561,7 +7949,9 @@ int RTTSYS_CHANCO(menu_ctx ctx, int event, char* parameter_ptr,
               break;
             }
             menu_ptr++;
-          } else {
+          }
+          else
+          {
             strcpy(menu_ptr->value_ptr, "");
             menu_ptr++;
           }
@@ -7572,32 +7962,33 @@ int RTTSYS_CHANCO(menu_ctx ctx, int event, char* parameter_ptr,
     }
   }
   /**********************************************************
-  *	Update the picture.
-  ***********************************************************/
-  else if (event == RTT_APPL_UPDATE) {
+   *	Update the picture.
+   ***********************************************************/
+  else if (event == RTT_APPL_UPDATE)
+  {
   }
   return RTT__SUCCESS;
 }
 
 /*************************************************************************
-*
-* Name:		RTTSYS_DEVICE()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	context of the picture.
-* int		event		I 	type of event.
-* char		*parameter_ptr	I	pointer to the parameter which value
-*					has been changed.
-*
-* Description:
-*	Show the Device objects of the system.
-*
-**************************************************************************/
+ *
+ * Name:		RTTSYS_DEVICE()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	context of the picture.
+ * int		event		I 	type of event.
+ * char		*parameter_ptr	I	pointer to the parameter which value
+ *					has been changed.
+ *
+ * Description:
+ *	Show the Device objects of the system.
+ *
+ **************************************************************************/
 
-static int rttsys_devicelist_add(pwr_tObjid device_objid,
-    rttsys_t_device_list** objectlist, int* objectlist_count, int* alloc)
+static int rttsys_devicelist_add(pwr_tObjid device_objid, rttsys_t_device_list** objectlist,
+                                 int* objectlist_count, int* alloc)
 {
   rttsys_t_device_list* devicelist_ptr;
   rttsys_t_device_list* new_objectlist;
@@ -7607,18 +7998,19 @@ static int rttsys_devicelist_add(pwr_tObjid device_objid,
   pwr_tClassId class;
   int local;
 
-  if (*objectlist_count == 0) {
+  if (*objectlist_count == 0)
+  {
     *objectlist = calloc(RTTSYS_ALLOC, sizeof(rttsys_t_device_list));
     if (*objectlist == 0)
       return RTT__NOMEMORY;
     *alloc = RTTSYS_ALLOC;
-  } else if (*alloc <= *objectlist_count) {
-    new_objectlist
-        = calloc(*alloc + RTTSYS_ALLOC, sizeof(rttsys_t_device_list));
+  }
+  else if (*alloc <= *objectlist_count)
+  {
+    new_objectlist = calloc(*alloc + RTTSYS_ALLOC, sizeof(rttsys_t_device_list));
     if (new_objectlist == 0)
       return RTT__NOMEMORY;
-    memcpy(new_objectlist, *objectlist,
-        *objectlist_count * sizeof(rttsys_t_device_list));
+    memcpy(new_objectlist, *objectlist, *objectlist_count * sizeof(rttsys_t_device_list));
     free(*objectlist);
     *objectlist = new_objectlist;
     (*alloc) += RTTSYS_ALLOC;
@@ -7634,21 +8026,23 @@ static int rttsys_devicelist_add(pwr_tObjid device_objid,
 
   attrref = cdh_ObjidToAref(device_objid);
   local = 1; /* Only local object implemented so far */
-  if (local) {
+  if (local)
+  {
     /* Get a direct link to device object */
-    sts = gdh_DLRefObjectInfoAttrref(&attrref,
-        (pwr_tAddress*)&devicelist_ptr->device_ptr,
-        &devicelist_ptr->device_subid);
+    sts = gdh_DLRefObjectInfoAttrref(&attrref, (pwr_tAddress*)&devicelist_ptr->device_ptr,
+                                     &devicelist_ptr->device_subid);
     if (EVEN(sts))
       return sts;
-  } else {
+  }
+  else
+  {
     /* Get a subscription to the original object */
     sts = gdh_SubRefObjectInfoAttrref(&attrref, &devicelist_ptr->device_subid);
     if (EVEN(sts))
       return sts;
 
-    sts = gdh_SubAssociateBuffer(devicelist_ptr->device_subid,
-        (pwr_tAddress*)&devicelist_ptr->device_ptr, attrref.Size);
+    sts = gdh_SubAssociateBuffer(devicelist_ptr->device_subid, (pwr_tAddress*)&devicelist_ptr->device_ptr,
+                                 attrref.Size);
     if (EVEN(sts))
       return sts;
   }
@@ -7661,34 +8055,40 @@ static int rttsys_devicelist_add(pwr_tObjid device_objid,
 
   memset(&attrref, 0, sizeof(attrref));
   sts = gdh_ClassAttrToAttrref(class, ".ErrorCount", &attrref);
-  if (ODD(sts)) {
-    devicelist_ptr->error_count
-        = (pwr_tUInt32*)((char*)(devicelist_ptr->device_ptr) + attrref.Offset);
-  } else
+  if (ODD(sts))
+  {
+    devicelist_ptr->error_count = (pwr_tUInt32*)((char*)(devicelist_ptr->device_ptr) + attrref.Offset);
+  }
+  else
     devicelist_ptr->error_count = (pwr_tUInt32*)RTT_ERASE;
   sts = gdh_ClassAttrToAttrref(class, ".Process", &attrref);
-  if (ODD(sts)) {
-    devicelist_ptr->process
-        = (pwr_tUInt32*)((char*)(devicelist_ptr->device_ptr) + attrref.Offset);
-  } else
+  if (ODD(sts))
+  {
+    devicelist_ptr->process = (pwr_tUInt32*)((char*)(devicelist_ptr->device_ptr) + attrref.Offset);
+  }
+  else
     devicelist_ptr->process = (pwr_tUInt32*)RTT_ERASE;
   sts = gdh_ClassAttrToAttrref(class, ".ThreadObject", &attrref);
-  if (ODD(sts)) {
-    devicelist_ptr->thread_object
-        = (pwr_tObjid*)((char*)(devicelist_ptr->device_ptr) + attrref.Offset);
-  } else
+  if (ODD(sts))
+  {
+    devicelist_ptr->thread_object = (pwr_tObjid*)((char*)(devicelist_ptr->device_ptr) + attrref.Offset);
+  }
+  else
     devicelist_ptr->thread_object = (pwr_tObjid*)RTT_ERASE;
   sts = gdh_ClassAttrToAttrref(class, ".RegAddress", &attrref);
-  if (ODD(sts)) {
-    devicelist_ptr->reg_address
-        = (pwr_tUInt32*)((char*)(devicelist_ptr->device_ptr) + attrref.Offset);
-  } else {
+  if (ODD(sts))
+  {
+    devicelist_ptr->reg_address = (pwr_tUInt32*)((char*)(devicelist_ptr->device_ptr) + attrref.Offset);
+  }
+  else
+  {
     sts = gdh_ClassAttrToAttrref(class, ".CardAddress", &attrref);
-    if (ODD(sts)) {
-      devicelist_ptr->reg_address
-          = (pwr_tUInt32*)((char*)(devicelist_ptr->device_ptr)
-              + attrref.Offset);
-    } else {
+    if (ODD(sts))
+    {
+      devicelist_ptr->reg_address = (pwr_tUInt32*)((char*)(devicelist_ptr->device_ptr) + attrref.Offset);
+    }
+    else
+    {
       devicelist_ptr->reg_address = (pwr_tUInt32*)RTT_ERASE;
     }
   }
@@ -7697,8 +8097,7 @@ static int rttsys_devicelist_add(pwr_tObjid device_objid,
   return RTT__SUCCESS;
 }
 
-int RTTSYS_DEVICE(menu_ctx ctx, int event, char* parameter_ptr,
-    char* objectname, char** picture)
+int RTTSYS_DEVICE(menu_ctx ctx, int event, char* parameter_ptr, char* objectname, char** picture)
 {
   int sts;
   rtt_t_menu_upd* menu_ptr;
@@ -7720,27 +8119,33 @@ int RTTSYS_DEVICE(menu_ctx ctx, int event, char* parameter_ptr,
   IF_NOGDH_RETURN;
 
   /**********************************************************
-  *	Return address to menu
-  ***********************************************************/
-  if (event == RTT_APPL_MENU) {
+   *	Return address to menu
+   ***********************************************************/
+  if (event == RTT_APPL_MENU)
+  {
     *picture = (char*)&dtt_systempicture_p15_eu;
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Return address of background
-  ***********************************************************/
-  if (event == RTT_APPL_PICTURE) {
+   *	Return address of background
+   ***********************************************************/
+  if (event == RTT_APPL_PICTURE)
+  {
     *picture = (char*)&dtt_systempicture_p15_bg;
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Next and Previous page
-  ***********************************************************/
-  if (event == RTT_APPL_PREVPAGE || event == RTT_APPL_NEXTPAGE) {
-    if (event == RTT_APPL_PREVPAGE) {
+   *	Next and Previous page
+   ***********************************************************/
+  if (event == RTT_APPL_PREVPAGE || event == RTT_APPL_NEXTPAGE)
+  {
+    if (event == RTT_APPL_PREVPAGE)
+    {
       page--;
       page = MAX(page, 0);
-    } else {
+    }
+    else
+    {
       page++;
       page = MIN(page, DEVICE_MAXPAGE - 1);
     }
@@ -7750,8 +8155,10 @@ int RTTSYS_DEVICE(menu_ctx ctx, int event, char* parameter_ptr,
     menu_ptr = menulist;
     devicelist_ptr = devicelist;
     j = 0;
-    for (i = 0; i < devicelist_count; i++) {
-      if ((i >= page * DEVICE_PAGESIZE) && (i < (page + 1) * DEVICE_PAGESIZE)) {
+    for (i = 0; i < devicelist_count; i++)
+    {
+      if ((i >= page * DEVICE_PAGESIZE) && (i < (page + 1) * DEVICE_PAGESIZE))
+      {
         strcpy(menu_ptr->value_ptr, devicelist_ptr->devicename);
 
         /* Define PF buttons and Return */
@@ -7773,7 +8180,8 @@ int RTTSYS_DEVICE(menu_ctx ctx, int event, char* parameter_ptr,
       }
       devicelist_ptr++;
     }
-    for (i = j; i < DEVICE_PAGESIZE; i++) {
+    for (i = j; i < DEVICE_PAGESIZE; i++)
+    {
       strcpy(menu_ptr->value_ptr, "");
       menu_ptr->func = 0;
       menu_ptr->func2 = 0;
@@ -7793,9 +8201,10 @@ int RTTSYS_DEVICE(menu_ctx ctx, int event, char* parameter_ptr,
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Initialization of the picture
-  ***********************************************************/
-  if (event == RTT_APPL_INIT) {
+   *	Initialization of the picture
+   ***********************************************************/
+  if (event == RTT_APPL_INIT)
+  {
     page = 0;
     DEVICE_PAGE = page + 1;
 
@@ -7806,14 +8215,16 @@ int RTTSYS_DEVICE(menu_ctx ctx, int event, char* parameter_ptr,
 
     device_alloc = 0;
     devicelist_count = 0;
-    for (i = 0; i < rack_class_cnt; i++) {
+    for (i = 0; i < rack_class_cnt; i++)
+    {
       sts = gdh_GetClassList(rack_class[i], &rack_objid);
-      while (ODD(sts)) {
+      while (ODD(sts))
+      {
         /* Get all children */
         sts = gdh_GetChild(rack_objid, &device_objid);
-        while (ODD(sts)) {
-          sts = rttsys_devicelist_add(
-              device_objid, &devicelist, &devicelist_count, &device_alloc);
+        while (ODD(sts))
+        {
+          sts = rttsys_devicelist_add(device_objid, &devicelist, &devicelist_count, &device_alloc);
           if (EVEN(sts))
             return sts;
 
@@ -7828,8 +8239,10 @@ int RTTSYS_DEVICE(menu_ctx ctx, int event, char* parameter_ptr,
     menu_ptr = menulist;
     devicelist_ptr = devicelist;
     j = 0;
-    for (i = 0; i < devicelist_count; i++) {
-      if ((i >= page * DEVICE_PAGESIZE) && (i < (page + 1) * DEVICE_PAGESIZE)) {
+    for (i = 0; i < devicelist_count; i++)
+    {
+      if ((i >= page * DEVICE_PAGESIZE) && (i < (page + 1) * DEVICE_PAGESIZE))
+      {
         strcpy(menu_ptr->value_ptr, devicelist_ptr->devicename);
 
         /* Define PF buttons and Return */
@@ -7851,7 +8264,8 @@ int RTTSYS_DEVICE(menu_ctx ctx, int event, char* parameter_ptr,
       }
       devicelist_ptr++;
     }
-    for (i = j; i < DEVICE_PAGESIZE; i++) {
+    for (i = j; i < DEVICE_PAGESIZE; i++)
+    {
       strcpy(menu_ptr->value_ptr, "");
       menu_ptr->func = 0;
       menu_ptr->func2 = 0;
@@ -7872,11 +8286,13 @@ int RTTSYS_DEVICE(menu_ctx ctx, int event, char* parameter_ptr,
     DEVICE_MAXPAGE = MAX(1, (devicelist_count - 1) / DEVICE_PAGESIZE + 1);
   }
   /**********************************************************
-  *	Exit of the picture
-  ***********************************************************/
-  else if (event == RTT_APPL_EXIT) {
+   *	Exit of the picture
+   ***********************************************************/
+  else if (event == RTT_APPL_EXIT)
+  {
     devicelist_ptr = devicelist;
-    for (i = 0; i < devicelist_count; i++) {
+    for (i = 0; i < devicelist_count; i++)
+    {
       sts = gdh_UnrefObjectInfo(devicelist_ptr->device_subid);
       devicelist_ptr++;
     }
@@ -7885,37 +8301,39 @@ int RTTSYS_DEVICE(menu_ctx ctx, int event, char* parameter_ptr,
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	The value of a parameter is changed.
-  ***********************************************************/
-  else if (event == RTT_APPL_VALUECHANGED) {
+   *	The value of a parameter is changed.
+   ***********************************************************/
+  else if (event == RTT_APPL_VALUECHANGED)
+  {
   }
   /**********************************************************
-  *	Update the picture.
-  ***********************************************************/
-  else if (event == RTT_APPL_UPDATE) {
+   *	Update the picture.
+   ***********************************************************/
+  else if (event == RTT_APPL_UPDATE)
+  {
   }
   return RTT__SUCCESS;
 }
 
 /*************************************************************************
-*
-* Name:		RTTSYS_REMNODE()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	context of the picture.
-* int		event		I 	type of event.
-* char		*parameter_ptr	I	pointer to the parameter which value
-*					has been changed.
-*
-* Description:
-*	Show the Remnode objects of the system.
-*
-**************************************************************************/
+ *
+ * Name:		RTTSYS_REMNODE()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	context of the picture.
+ * int		event		I 	type of event.
+ * char		*parameter_ptr	I	pointer to the parameter which value
+ *					has been changed.
+ *
+ * Description:
+ *	Show the Remnode objects of the system.
+ *
+ **************************************************************************/
 
-static int rttsys_remnodelist_add(pwr_tObjid remnode_objid,
-    rttsys_t_remnode_list** objectlist, int* objectlist_count, int* alloc)
+static int rttsys_remnodelist_add(pwr_tObjid remnode_objid, rttsys_t_remnode_list** objectlist,
+                                  int* objectlist_count, int* alloc)
 {
   rttsys_t_remnode_list* remnodelist_ptr;
   rttsys_t_remnode_list* new_objectlist;
@@ -7924,18 +8342,19 @@ static int rttsys_remnodelist_add(pwr_tObjid remnode_objid,
   pwr_sAttrRef attrref;
   int local;
 
-  if (*objectlist_count == 0) {
+  if (*objectlist_count == 0)
+  {
     *objectlist = calloc(RTTSYS_ALLOC, sizeof(rttsys_t_remnode_list));
     if (*objectlist == 0)
       return RTT__NOMEMORY;
     *alloc = RTTSYS_ALLOC;
-  } else if (*alloc <= *objectlist_count) {
-    new_objectlist
-        = calloc(*alloc + RTTSYS_ALLOC, sizeof(rttsys_t_remnode_list));
+  }
+  else if (*alloc <= *objectlist_count)
+  {
+    new_objectlist = calloc(*alloc + RTTSYS_ALLOC, sizeof(rttsys_t_remnode_list));
     if (new_objectlist == 0)
       return RTT__NOMEMORY;
-    memcpy(new_objectlist, *objectlist,
-        *objectlist_count * sizeof(rttsys_t_remnode_list));
+    memcpy(new_objectlist, *objectlist, *objectlist_count * sizeof(rttsys_t_remnode_list));
     free(*objectlist);
     *objectlist = new_objectlist;
     (*alloc) += RTTSYS_ALLOC;
@@ -7951,22 +8370,23 @@ static int rttsys_remnodelist_add(pwr_tObjid remnode_objid,
 
   attrref = cdh_ObjidToAref(remnode_objid);
   local = 1; /* Only local object implemented so far */
-  if (local) {
+  if (local)
+  {
     /* Get a direct link to remnode object */
-    sts = gdh_DLRefObjectInfoAttrref(&attrref,
-        (pwr_tAddress*)&remnodelist_ptr->remnode_ptr,
-        &remnodelist_ptr->remnode_subid);
+    sts = gdh_DLRefObjectInfoAttrref(&attrref, (pwr_tAddress*)&remnodelist_ptr->remnode_ptr,
+                                     &remnodelist_ptr->remnode_subid);
     if (EVEN(sts))
       return sts;
-  } else {
+  }
+  else
+  {
     /* Get a subscription to the original object */
-    sts = gdh_SubRefObjectInfoAttrref(
-        &attrref, &remnodelist_ptr->remnode_subid);
+    sts = gdh_SubRefObjectInfoAttrref(&attrref, &remnodelist_ptr->remnode_subid);
     if (EVEN(sts))
       return sts;
 
-    sts = gdh_SubAssociateBuffer(remnodelist_ptr->remnode_subid,
-        (pwr_tAddress*)&remnodelist_ptr->remnode_ptr, attrref.Size);
+    sts = gdh_SubAssociateBuffer(remnodelist_ptr->remnode_subid, (pwr_tAddress*)&remnodelist_ptr->remnode_ptr,
+                                 attrref.Size);
     if (EVEN(sts))
       return sts;
   }
@@ -7976,8 +8396,7 @@ static int rttsys_remnodelist_add(pwr_tObjid remnode_objid,
   return RTT__SUCCESS;
 }
 
-int RTTSYS_REMNODE(menu_ctx ctx, int event, char* parameter_ptr,
-    char* objectname, char** picture)
+int RTTSYS_REMNODE(menu_ctx ctx, int event, char* parameter_ptr, char* objectname, char** picture)
 {
   int sts;
   rtt_t_menu_upd* menu_ptr;
@@ -8000,27 +8419,33 @@ int RTTSYS_REMNODE(menu_ctx ctx, int event, char* parameter_ptr,
   IF_NOGDH_RETURN;
 
   /**********************************************************
-  *	Return address to menu
-  ***********************************************************/
-  if (event == RTT_APPL_MENU) {
+   *	Return address to menu
+   ***********************************************************/
+  if (event == RTT_APPL_MENU)
+  {
     *picture = (char*)&dtt_systempicture_p35_eu;
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Return address of background
-  ***********************************************************/
-  if (event == RTT_APPL_PICTURE) {
+   *	Return address of background
+   ***********************************************************/
+  if (event == RTT_APPL_PICTURE)
+  {
     *picture = (char*)&dtt_systempicture_p35_bg;
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Next and Previous page
-  ***********************************************************/
-  if (event == RTT_APPL_PREVPAGE || event == RTT_APPL_NEXTPAGE) {
-    if (event == RTT_APPL_PREVPAGE) {
+   *	Next and Previous page
+   ***********************************************************/
+  if (event == RTT_APPL_PREVPAGE || event == RTT_APPL_NEXTPAGE)
+  {
+    if (event == RTT_APPL_PREVPAGE)
+    {
       page--;
       page = MAX(page, 0);
-    } else {
+    }
+    else
+    {
       page++;
       page = MIN(page, REMNODE_MAXPAGE - 1);
     }
@@ -8030,9 +8455,10 @@ int RTTSYS_REMNODE(menu_ctx ctx, int event, char* parameter_ptr,
     menu_ptr = menulist;
     remnodelist_ptr = remnodelist;
     j = 0;
-    for (i = 0; i < remnodelist_count; i++) {
-      if ((i >= page * REMNODE_PAGESIZE)
-          && (i < (page + 1) * REMNODE_PAGESIZE)) {
+    for (i = 0; i < remnodelist_count; i++)
+    {
+      if ((i >= page * REMNODE_PAGESIZE) && (i < (page + 1) * REMNODE_PAGESIZE))
+      {
         strcpy(menu_ptr->value_ptr, remnodelist_ptr->remnodename);
 
         /* Define PF buttons and Return */
@@ -8040,20 +8466,20 @@ int RTTSYS_REMNODE(menu_ctx ctx, int event, char* parameter_ptr,
         menu_ptr->func2 = &rtt_object_parameters;
         menu_ptr->argoi = remnodelist_ptr->remnode_objid;
         menu_ptr++;
-        switch (remnodelist_ptr->remnode_ptr->TransportType) {
+        switch (remnodelist_ptr->remnode_ptr->TransportType)
+        {
         case 1:
           /* ALCM */
           strcpy(menu_ptr->value_ptr, "ALCM");
           menu_ptr++;
-          switch (display_mode) {
+          switch (display_mode)
+          {
           case REMNODE_DISPLAYMODE_DESCRIPT:
-            strcpy(
-                menu_ptr->value_ptr, remnodelist_ptr->remnode_ptr->Description);
+            strcpy(menu_ptr->value_ptr, remnodelist_ptr->remnode_ptr->Description);
             break;
           case REMNODE_DISPLAYMODE_ADDRESS:
-            sprintf(menu_ptr->value_ptr, "%5d (Area)  %5d (Node)",
-                remnodelist_ptr->remnode_ptr->Address[0],
-                remnodelist_ptr->remnode_ptr->Address[1]);
+            sprintf(menu_ptr->value_ptr, "%5d (Area)  %5d (Node)", remnodelist_ptr->remnode_ptr->Address[0],
+                    remnodelist_ptr->remnode_ptr->Address[1]);
             break;
           }
           break;
@@ -8061,15 +8487,14 @@ int RTTSYS_REMNODE(menu_ctx ctx, int event, char* parameter_ptr,
           /* PAMS/DMQ */
           strcpy(menu_ptr->value_ptr, "PAMS/DMQ");
           menu_ptr++;
-          switch (display_mode) {
+          switch (display_mode)
+          {
           case REMNODE_DISPLAYMODE_DESCRIPT:
-            strcpy(
-                menu_ptr->value_ptr, remnodelist_ptr->remnode_ptr->Description);
+            strcpy(menu_ptr->value_ptr, remnodelist_ptr->remnode_ptr->Description);
             break;
           case REMNODE_DISPLAYMODE_ADDRESS:
             sprintf(menu_ptr->value_ptr, "%5d (Group) %5d (Host Proc)",
-                remnodelist_ptr->remnode_ptr->Address[0],
-                remnodelist_ptr->remnode_ptr->Address[1]);
+                    remnodelist_ptr->remnode_ptr->Address[0], remnodelist_ptr->remnode_ptr->Address[1]);
             break;
           }
           break;
@@ -8077,10 +8502,10 @@ int RTTSYS_REMNODE(menu_ctx ctx, int event, char* parameter_ptr,
           /* 3964R VNET */
           strcpy(menu_ptr->value_ptr, "3964R VNET");
           menu_ptr++;
-          switch (display_mode) {
+          switch (display_mode)
+          {
           case REMNODE_DISPLAYMODE_DESCRIPT:
-            strcpy(
-                menu_ptr->value_ptr, remnodelist_ptr->remnode_ptr->Description);
+            strcpy(menu_ptr->value_ptr, remnodelist_ptr->remnode_ptr->Description);
             break;
           case REMNODE_DISPLAYMODE_ADDRESS:
             strcpy(menu_ptr->value_ptr, "");
@@ -8091,10 +8516,10 @@ int RTTSYS_REMNODE(menu_ctx ctx, int event, char* parameter_ptr,
           /* RK512 */
           strcpy(menu_ptr->value_ptr, "RK512");
           menu_ptr++;
-          switch (display_mode) {
+          switch (display_mode)
+          {
           case REMNODE_DISPLAYMODE_DESCRIPT:
-            strcpy(
-                menu_ptr->value_ptr, remnodelist_ptr->remnode_ptr->Description);
+            strcpy(menu_ptr->value_ptr, remnodelist_ptr->remnode_ptr->Description);
             break;
           case REMNODE_DISPLAYMODE_ADDRESS:
             strcpy(menu_ptr->value_ptr, "");
@@ -8105,15 +8530,14 @@ int RTTSYS_REMNODE(menu_ctx ctx, int event, char* parameter_ptr,
           /* TCP/IP Client */
           strcpy(menu_ptr->value_ptr, "TCP/IP Cli");
           menu_ptr++;
-          switch (display_mode) {
+          switch (display_mode)
+          {
           case REMNODE_DISPLAYMODE_DESCRIPT:
-            strcpy(
-                menu_ptr->value_ptr, remnodelist_ptr->remnode_ptr->Description);
+            strcpy(menu_ptr->value_ptr, remnodelist_ptr->remnode_ptr->Description);
             break;
           case REMNODE_DISPLAYMODE_ADDRESS:
             sprintf(menu_ptr->value_ptr, "%5d (Remote)%5d (Host Port)",
-                remnodelist_ptr->remnode_ptr->Address[0],
-                remnodelist_ptr->remnode_ptr->Address[1]);
+                    remnodelist_ptr->remnode_ptr->Address[0], remnodelist_ptr->remnode_ptr->Address[1]);
             break;
           }
           break;
@@ -8121,25 +8545,24 @@ int RTTSYS_REMNODE(menu_ctx ctx, int event, char* parameter_ptr,
           /* TCP/IP Server */
           strcpy(menu_ptr->value_ptr, "TCP/IP Srv");
           menu_ptr++;
-          switch (display_mode) {
+          switch (display_mode)
+          {
           case REMNODE_DISPLAYMODE_DESCRIPT:
-            strcpy(
-                menu_ptr->value_ptr, remnodelist_ptr->remnode_ptr->Description);
+            strcpy(menu_ptr->value_ptr, remnodelist_ptr->remnode_ptr->Description);
             break;
           case REMNODE_DISPLAYMODE_ADDRESS:
             sprintf(menu_ptr->value_ptr, "%5d (Remote)%5d (Host Port)",
-                remnodelist_ptr->remnode_ptr->Address[0],
-                remnodelist_ptr->remnode_ptr->Address[1]);
+                    remnodelist_ptr->remnode_ptr->Address[0], remnodelist_ptr->remnode_ptr->Address[1]);
             break;
           }
           break;
         default:
           strcpy(menu_ptr->value_ptr, "Unknown");
           menu_ptr++;
-          switch (display_mode) {
+          switch (display_mode)
+          {
           case REMNODE_DISPLAYMODE_DESCRIPT:
-            strcpy(
-                menu_ptr->value_ptr, remnodelist_ptr->remnode_ptr->Description);
+            strcpy(menu_ptr->value_ptr, remnodelist_ptr->remnode_ptr->Description);
             break;
           case REMNODE_DISPLAYMODE_ADDRESS:
             strcpy(menu_ptr->value_ptr, "");
@@ -8151,7 +8574,8 @@ int RTTSYS_REMNODE(menu_ctx ctx, int event, char* parameter_ptr,
       }
       remnodelist_ptr++;
     }
-    for (i = j; i < REMNODE_PAGESIZE; i++) {
+    for (i = j; i < REMNODE_PAGESIZE; i++)
+    {
       strcpy(menu_ptr->value_ptr, "");
       menu_ptr->func = 0;
       menu_ptr->func2 = 0;
@@ -8165,9 +8589,10 @@ int RTTSYS_REMNODE(menu_ctx ctx, int event, char* parameter_ptr,
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Initialization of the picture
-  ***********************************************************/
-  if (event == RTT_APPL_INIT) {
+   *	Initialization of the picture
+   ***********************************************************/
+  if (event == RTT_APPL_INIT)
+  {
     display_mode = 0;
     strcpy(REMNODE_DISPLAY_TITLE, "Description");
     page = 0;
@@ -8177,9 +8602,9 @@ int RTTSYS_REMNODE(menu_ctx ctx, int event, char* parameter_ptr,
     remnode_alloc = 0;
     remnodelist_count = 0;
     sts = gdh_GetClassList(pwr_cClass_RemNode, &remnode_objid);
-    while (ODD(sts)) {
-      sts = rttsys_remnodelist_add(
-          remnode_objid, &remnodelist, &remnodelist_count, &remnode_alloc);
+    while (ODD(sts))
+    {
+      sts = rttsys_remnodelist_add(remnode_objid, &remnodelist, &remnodelist_count, &remnode_alloc);
       if (EVEN(sts))
         return sts;
       sts = gdh_GetNextObject(remnode_objid, &remnode_objid);
@@ -8189,9 +8614,10 @@ int RTTSYS_REMNODE(menu_ctx ctx, int event, char* parameter_ptr,
     menu_ptr = menulist;
     remnodelist_ptr = remnodelist;
     j = 0;
-    for (i = 0; i < remnodelist_count; i++) {
-      if ((i >= page * REMNODE_PAGESIZE)
-          && (i < (page + 1) * REMNODE_PAGESIZE)) {
+    for (i = 0; i < remnodelist_count; i++)
+    {
+      if ((i >= page * REMNODE_PAGESIZE) && (i < (page + 1) * REMNODE_PAGESIZE))
+      {
         strcpy(menu_ptr->value_ptr, remnodelist_ptr->remnodename);
 
         /* Define PF buttons and Return */
@@ -8199,20 +8625,20 @@ int RTTSYS_REMNODE(menu_ctx ctx, int event, char* parameter_ptr,
         menu_ptr->func2 = &rtt_object_parameters;
         menu_ptr->argoi = remnodelist_ptr->remnode_objid;
         menu_ptr++;
-        switch (remnodelist_ptr->remnode_ptr->TransportType) {
+        switch (remnodelist_ptr->remnode_ptr->TransportType)
+        {
         case 1:
           /* ALCM */
           strcpy(menu_ptr->value_ptr, "ALCM");
           menu_ptr++;
-          switch (display_mode) {
+          switch (display_mode)
+          {
           case REMNODE_DISPLAYMODE_DESCRIPT:
-            strcpy(
-                menu_ptr->value_ptr, remnodelist_ptr->remnode_ptr->Description);
+            strcpy(menu_ptr->value_ptr, remnodelist_ptr->remnode_ptr->Description);
             break;
           case REMNODE_DISPLAYMODE_ADDRESS:
-            sprintf(menu_ptr->value_ptr, "%5d (Area)  %5d (Node)",
-                remnodelist_ptr->remnode_ptr->Address[0],
-                remnodelist_ptr->remnode_ptr->Address[1]);
+            sprintf(menu_ptr->value_ptr, "%5d (Area)  %5d (Node)", remnodelist_ptr->remnode_ptr->Address[0],
+                    remnodelist_ptr->remnode_ptr->Address[1]);
             break;
           }
           break;
@@ -8220,15 +8646,14 @@ int RTTSYS_REMNODE(menu_ctx ctx, int event, char* parameter_ptr,
           /* PAMS/DMQ */
           strcpy(menu_ptr->value_ptr, "PAMS/DMQ");
           menu_ptr++;
-          switch (display_mode) {
+          switch (display_mode)
+          {
           case REMNODE_DISPLAYMODE_DESCRIPT:
-            strcpy(
-                menu_ptr->value_ptr, remnodelist_ptr->remnode_ptr->Description);
+            strcpy(menu_ptr->value_ptr, remnodelist_ptr->remnode_ptr->Description);
             break;
           case REMNODE_DISPLAYMODE_ADDRESS:
             sprintf(menu_ptr->value_ptr, "%5d (Group) %5d (Host Process)",
-                remnodelist_ptr->remnode_ptr->Address[0],
-                remnodelist_ptr->remnode_ptr->Address[1]);
+                    remnodelist_ptr->remnode_ptr->Address[0], remnodelist_ptr->remnode_ptr->Address[1]);
             break;
           }
           break;
@@ -8236,10 +8661,10 @@ int RTTSYS_REMNODE(menu_ctx ctx, int event, char* parameter_ptr,
           /* 3964R VNET */
           strcpy(menu_ptr->value_ptr, "3964R VNET");
           menu_ptr++;
-          switch (display_mode) {
+          switch (display_mode)
+          {
           case REMNODE_DISPLAYMODE_DESCRIPT:
-            strcpy(
-                menu_ptr->value_ptr, remnodelist_ptr->remnode_ptr->Description);
+            strcpy(menu_ptr->value_ptr, remnodelist_ptr->remnode_ptr->Description);
             break;
           case REMNODE_DISPLAYMODE_ADDRESS:
             strcpy(menu_ptr->value_ptr, "");
@@ -8250,10 +8675,10 @@ int RTTSYS_REMNODE(menu_ctx ctx, int event, char* parameter_ptr,
           /* RK512 */
           strcpy(menu_ptr->value_ptr, "RK512");
           menu_ptr++;
-          switch (display_mode) {
+          switch (display_mode)
+          {
           case REMNODE_DISPLAYMODE_DESCRIPT:
-            strcpy(
-                menu_ptr->value_ptr, remnodelist_ptr->remnode_ptr->Description);
+            strcpy(menu_ptr->value_ptr, remnodelist_ptr->remnode_ptr->Description);
             break;
           case REMNODE_DISPLAYMODE_ADDRESS:
             strcpy(menu_ptr->value_ptr, "");
@@ -8264,15 +8689,14 @@ int RTTSYS_REMNODE(menu_ctx ctx, int event, char* parameter_ptr,
           /* TCP/IP Client */
           strcpy(menu_ptr->value_ptr, "TCP/IP Cli");
           menu_ptr++;
-          switch (display_mode) {
+          switch (display_mode)
+          {
           case REMNODE_DISPLAYMODE_DESCRIPT:
-            strcpy(
-                menu_ptr->value_ptr, remnodelist_ptr->remnode_ptr->Description);
+            strcpy(menu_ptr->value_ptr, remnodelist_ptr->remnode_ptr->Description);
             break;
           case REMNODE_DISPLAYMODE_ADDRESS:
             sprintf(menu_ptr->value_ptr, "%5d (Remote)%5d (Host Port)",
-                remnodelist_ptr->remnode_ptr->Address[0],
-                remnodelist_ptr->remnode_ptr->Address[1]);
+                    remnodelist_ptr->remnode_ptr->Address[0], remnodelist_ptr->remnode_ptr->Address[1]);
             break;
           }
           break;
@@ -8280,25 +8704,24 @@ int RTTSYS_REMNODE(menu_ctx ctx, int event, char* parameter_ptr,
           /* TCP/IP Server */
           strcpy(menu_ptr->value_ptr, "TCP/IP Srv");
           menu_ptr++;
-          switch (display_mode) {
+          switch (display_mode)
+          {
           case REMNODE_DISPLAYMODE_DESCRIPT:
-            strcpy(
-                menu_ptr->value_ptr, remnodelist_ptr->remnode_ptr->Description);
+            strcpy(menu_ptr->value_ptr, remnodelist_ptr->remnode_ptr->Description);
             break;
           case REMNODE_DISPLAYMODE_ADDRESS:
             sprintf(menu_ptr->value_ptr, "%5d (Remote)%5d (Host Port)",
-                remnodelist_ptr->remnode_ptr->Address[0],
-                remnodelist_ptr->remnode_ptr->Address[1]);
+                    remnodelist_ptr->remnode_ptr->Address[0], remnodelist_ptr->remnode_ptr->Address[1]);
             break;
           }
           break;
         default:
           strcpy(menu_ptr->value_ptr, "Unknown");
           menu_ptr++;
-          switch (display_mode) {
+          switch (display_mode)
+          {
           case REMNODE_DISPLAYMODE_DESCRIPT:
-            strcpy(
-                menu_ptr->value_ptr, remnodelist_ptr->remnode_ptr->Description);
+            strcpy(menu_ptr->value_ptr, remnodelist_ptr->remnode_ptr->Description);
             break;
           case REMNODE_DISPLAYMODE_ADDRESS:
             strcpy(menu_ptr->value_ptr, "");
@@ -8310,7 +8733,8 @@ int RTTSYS_REMNODE(menu_ctx ctx, int event, char* parameter_ptr,
       }
       remnodelist_ptr++;
     }
-    for (i = j; i < REMNODE_PAGESIZE; i++) {
+    for (i = j; i < REMNODE_PAGESIZE; i++)
+    {
       strcpy(menu_ptr->value_ptr, "");
       menu_ptr->func = 0;
       menu_ptr->func2 = 0;
@@ -8325,11 +8749,13 @@ int RTTSYS_REMNODE(menu_ctx ctx, int event, char* parameter_ptr,
     REMNODE_MAXPAGE = MAX(1, (remnodelist_count - 1) / REMNODE_PAGESIZE + 1);
   }
   /**********************************************************
-  *	Exit of the picture
-  ***********************************************************/
-  else if (event == RTT_APPL_EXIT) {
+   *	Exit of the picture
+   ***********************************************************/
+  else if (event == RTT_APPL_EXIT)
+  {
     remnodelist_ptr = remnodelist;
-    for (i = 0; i < remnodelist_count; i++) {
+    for (i = 0; i < remnodelist_count; i++)
+    {
       sts = gdh_UnrefObjectInfo(remnodelist_ptr->remnode_subid);
       remnodelist_ptr++;
     }
@@ -8338,10 +8764,12 @@ int RTTSYS_REMNODE(menu_ctx ctx, int event, char* parameter_ptr,
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	The value of a parameter is changed.
-  ***********************************************************/
-  else if (event == RTT_APPL_VALUECHANGED) {
-    if (parameter_ptr == (char*)&REMNODE_DISPLAY_MODE) {
+   *	The value of a parameter is changed.
+   ***********************************************************/
+  else if (event == RTT_APPL_VALUECHANGED)
+  {
+    if (parameter_ptr == (char*)&REMNODE_DISPLAY_MODE)
+    {
       if (REMNODE_DISPLAY_MODE)
         display_mode++;
       else
@@ -8351,7 +8779,8 @@ int RTTSYS_REMNODE(menu_ctx ctx, int event, char* parameter_ptr,
       if (display_mode < 0)
         display_mode = REMNODE_DISPLAYMODE_MAX;
 
-      switch (display_mode) {
+      switch (display_mode)
+      {
       case REMNODE_DISPLAYMODE_DESCRIPT:
         strcpy(REMNODE_DISPLAY_TITLE, "Description");
         break;
@@ -8364,72 +8793,63 @@ int RTTSYS_REMNODE(menu_ctx ctx, int event, char* parameter_ptr,
       menu_ptr = menulist;
       remnodelist_ptr = remnodelist;
       j = 0;
-      for (i = 0; i < remnodelist_count; i++) {
-        if ((i >= page * REMNODE_PAGESIZE)
-            && (i < (page + 1) * REMNODE_PAGESIZE)) {
+      for (i = 0; i < remnodelist_count; i++)
+      {
+        if ((i >= page * REMNODE_PAGESIZE) && (i < (page + 1) * REMNODE_PAGESIZE))
+        {
           menu_ptr++;
           menu_ptr++;
-          switch (remnodelist_ptr->remnode_ptr->TransportType) {
+          switch (remnodelist_ptr->remnode_ptr->TransportType)
+          {
           case 1:
             /* ALCM */
             if (display_mode == REMNODE_DISPLAYMODE_DESCRIPT)
-              strcpy(menu_ptr->value_ptr,
-                  remnodelist_ptr->remnode_ptr->Description);
+              strcpy(menu_ptr->value_ptr, remnodelist_ptr->remnode_ptr->Description);
             else
-              sprintf(menu_ptr->value_ptr, "%5d (Area)  %5d (Node)",
-                  remnodelist_ptr->remnode_ptr->Address[0],
-                  remnodelist_ptr->remnode_ptr->Address[1]);
+              sprintf(menu_ptr->value_ptr, "%5d (Area)  %5d (Node)", remnodelist_ptr->remnode_ptr->Address[0],
+                      remnodelist_ptr->remnode_ptr->Address[1]);
             break;
           case 2:
             /* PAMS/DMQ */
             if (display_mode == REMNODE_DISPLAYMODE_DESCRIPT)
-              strcpy(menu_ptr->value_ptr,
-                  remnodelist_ptr->remnode_ptr->Description);
+              strcpy(menu_ptr->value_ptr, remnodelist_ptr->remnode_ptr->Description);
             else
               sprintf(menu_ptr->value_ptr, "%5d (Group) %5d (Host Process)",
-                  remnodelist_ptr->remnode_ptr->Address[0],
-                  remnodelist_ptr->remnode_ptr->Address[1]);
+                      remnodelist_ptr->remnode_ptr->Address[0], remnodelist_ptr->remnode_ptr->Address[1]);
             break;
           case 3:
             /* 3964R VNET */
             if (display_mode == REMNODE_DISPLAYMODE_DESCRIPT)
-              strcpy(menu_ptr->value_ptr,
-                  remnodelist_ptr->remnode_ptr->Description);
+              strcpy(menu_ptr->value_ptr, remnodelist_ptr->remnode_ptr->Description);
             else
               strcpy(menu_ptr->value_ptr, "");
             break;
           case 5:
             /* RK512 */
             if (display_mode == REMNODE_DISPLAYMODE_DESCRIPT)
-              strcpy(menu_ptr->value_ptr,
-                  remnodelist_ptr->remnode_ptr->Description);
+              strcpy(menu_ptr->value_ptr, remnodelist_ptr->remnode_ptr->Description);
             else
               strcpy(menu_ptr->value_ptr, "");
             break;
           case 6:
             /* TCP/IP Client */
             if (display_mode == REMNODE_DISPLAYMODE_DESCRIPT)
-              strcpy(menu_ptr->value_ptr,
-                  remnodelist_ptr->remnode_ptr->Description);
+              strcpy(menu_ptr->value_ptr, remnodelist_ptr->remnode_ptr->Description);
             else
               sprintf(menu_ptr->value_ptr, "%5d (Remote)%5d (Host Port)",
-                  remnodelist_ptr->remnode_ptr->Address[0],
-                  remnodelist_ptr->remnode_ptr->Address[1]);
+                      remnodelist_ptr->remnode_ptr->Address[0], remnodelist_ptr->remnode_ptr->Address[1]);
             break;
           case 7:
             /* TCP/IP Server */
             if (display_mode == REMNODE_DISPLAYMODE_DESCRIPT)
-              strcpy(menu_ptr->value_ptr,
-                  remnodelist_ptr->remnode_ptr->Description);
+              strcpy(menu_ptr->value_ptr, remnodelist_ptr->remnode_ptr->Description);
             else
               sprintf(menu_ptr->value_ptr, "%5d (Remote)%5d (Host Port)",
-                  remnodelist_ptr->remnode_ptr->Address[0],
-                  remnodelist_ptr->remnode_ptr->Address[1]);
+                      remnodelist_ptr->remnode_ptr->Address[0], remnodelist_ptr->remnode_ptr->Address[1]);
             break;
           default:
             if (display_mode == REMNODE_DISPLAYMODE_DESCRIPT)
-              strcpy(menu_ptr->value_ptr,
-                  remnodelist_ptr->remnode_ptr->Description);
+              strcpy(menu_ptr->value_ptr, remnodelist_ptr->remnode_ptr->Description);
             else
               strcpy(menu_ptr->value_ptr, "");
           }
@@ -8441,32 +8861,33 @@ int RTTSYS_REMNODE(menu_ctx ctx, int event, char* parameter_ptr,
     }
   }
   /**********************************************************
-  *	Update the picture.
-  ***********************************************************/
-  else if (event == RTT_APPL_UPDATE) {
+   *	Update the picture.
+   ***********************************************************/
+  else if (event == RTT_APPL_UPDATE)
+  {
   }
   return RTT__SUCCESS;
 }
 
 /*************************************************************************
-*
-* Name:		RTTSYS_REMTRANS()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	context of the picture.
-* int		event		I 	type of event.
-* char		*parameter_ptr	I	pointer to the parameter which value
-*					has been changed.
-*
-* Description:
-*	Show the Remtrans objects of the system.
-*
-**************************************************************************/
+ *
+ * Name:		RTTSYS_REMTRANS()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	context of the picture.
+ * int		event		I 	type of event.
+ * char		*parameter_ptr	I	pointer to the parameter which value
+ *					has been changed.
+ *
+ * Description:
+ *	Show the Remtrans objects of the system.
+ *
+ **************************************************************************/
 
-static int rttsys_remtrans_start(menu_ctx ctx, pwr_tObjid objid, void* arg1,
-    void* arg2, void* arg3, void* arg4)
+static int rttsys_remtrans_start(menu_ctx ctx, pwr_tObjid objid, void* arg1, void* arg2, void* arg3,
+                                 void* arg4)
 {
   pwr_tOName objectname;
   int sts;
@@ -8478,18 +8899,18 @@ static int rttsys_remtrans_start(menu_ctx ctx, pwr_tObjid objid, void* arg1,
 
   /* Get the class of the channels */
   sts = gdh_GetChild(objid, &chan_objid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     rtt_message('E', "RemTrans objects not found");
     return RTT__NOPICTURE;
   }
 
-  sts = rtt_menu_new_sysedit(
-      ctx, pwr_cNObjid, objectname, objectname, 0, &RTTSYS_REMTRANS);
+  sts = rtt_menu_new_sysedit(ctx, pwr_cNObjid, objectname, objectname, 0, &RTTSYS_REMTRANS);
   return sts;
 }
 
-static int rttsys_remtranslist_add(pwr_tObjid remtrans_objid,
-    rttsys_t_remtrans_list** objectlist, int* objectlist_count, int* alloc)
+static int rttsys_remtranslist_add(pwr_tObjid remtrans_objid, rttsys_t_remtrans_list** objectlist,
+                                   int* objectlist_count, int* alloc)
 {
   rttsys_t_remtrans_list* remtranslist_ptr;
   rttsys_t_remtrans_list* new_objectlist;
@@ -8498,18 +8919,19 @@ static int rttsys_remtranslist_add(pwr_tObjid remtrans_objid,
   pwr_sAttrRef attrref;
   int local;
 
-  if (*objectlist_count == 0) {
+  if (*objectlist_count == 0)
+  {
     *objectlist = calloc(RTTSYS_ALLOC, sizeof(rttsys_t_remtrans_list));
     if (*objectlist == 0)
       return RTT__NOMEMORY;
     *alloc = RTTSYS_ALLOC;
-  } else if (*alloc <= *objectlist_count) {
-    new_objectlist
-        = calloc(*alloc + RTTSYS_ALLOC, sizeof(rttsys_t_remtrans_list));
+  }
+  else if (*alloc <= *objectlist_count)
+  {
+    new_objectlist = calloc(*alloc + RTTSYS_ALLOC, sizeof(rttsys_t_remtrans_list));
     if (new_objectlist == 0)
       return RTT__NOMEMORY;
-    memcpy(new_objectlist, *objectlist,
-        *objectlist_count * sizeof(rttsys_t_remtrans_list));
+    memcpy(new_objectlist, *objectlist, *objectlist_count * sizeof(rttsys_t_remtrans_list));
     free(*objectlist);
     *objectlist = new_objectlist;
     (*alloc) += RTTSYS_ALLOC;
@@ -8525,22 +8947,23 @@ static int rttsys_remtranslist_add(pwr_tObjid remtrans_objid,
 
   attrref = cdh_ObjidToAref(remtrans_objid);
   local = 1; /* Only local object implemented so far */
-  if (local) {
+  if (local)
+  {
     /* Get a direct link to remtrans object */
-    sts = gdh_DLRefObjectInfoAttrref(&attrref,
-        (pwr_tAddress*)&remtranslist_ptr->remtrans_ptr,
-        &remtranslist_ptr->remtrans_subid);
+    sts = gdh_DLRefObjectInfoAttrref(&attrref, (pwr_tAddress*)&remtranslist_ptr->remtrans_ptr,
+                                     &remtranslist_ptr->remtrans_subid);
     if (EVEN(sts))
       return sts;
-  } else {
+  }
+  else
+  {
     /* Get a subscription to the original object */
-    sts = gdh_SubRefObjectInfoAttrref(
-        &attrref, &remtranslist_ptr->remtrans_subid);
+    sts = gdh_SubRefObjectInfoAttrref(&attrref, &remtranslist_ptr->remtrans_subid);
     if (EVEN(sts))
       return sts;
 
     sts = gdh_SubAssociateBuffer(remtranslist_ptr->remtrans_subid,
-        (pwr_tAddress*)&remtranslist_ptr->remtrans_ptr, attrref.Size);
+                                 (pwr_tAddress*)&remtranslist_ptr->remtrans_ptr, attrref.Size);
     if (EVEN(sts))
       return sts;
   }
@@ -8550,8 +8973,8 @@ static int rttsys_remtranslist_add(pwr_tObjid remtrans_objid,
   return RTT__SUCCESS;
 }
 
-static int rttsys_remtrans_buffer(menu_ctx ctx, pwr_tObjid objid, void* arg1,
-    void* arg2, void* arg3, void* arg4)
+static int rttsys_remtrans_buffer(menu_ctx ctx, pwr_tObjid objid, void* arg1, void* arg2, void* arg3,
+                                  void* arg4)
 {
   int sts;
   pwr_tObjid buff_objid;
@@ -8562,28 +8985,28 @@ static int rttsys_remtrans_buffer(menu_ctx ctx, pwr_tObjid objid, void* arg1,
 
   /* Show attributes of first child */
   sts = gdh_GetChild(objid, &buff_objid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     rtt_message('E', "No buffer object found");
     return RTT__NOPICTURE;
   }
 
   /* Try to find structfile and structname i RemTrans-object */
 
-  sts = gdh_ObjidToName(
-      objid, remtrans_name, sizeof(remtrans_name), cdh_mNName);
+  sts = gdh_ObjidToName(objid, remtrans_name, sizeof(remtrans_name), cdh_mNName);
   if (EVEN(sts))
     return sts;
 
   strcpy(namebuf, remtrans_name);
   strcat(namebuf, ".StructName");
-  sts = gdh_GetObjectInfo(
-      namebuf, (pwr_tAddress*)structname, sizeof(structname));
-  if (ODD(sts) && (!streq(structname, ""))) {
+  sts = gdh_GetObjectInfo(namebuf, (pwr_tAddress*)structname, sizeof(structname));
+  if (ODD(sts) && (!streq(structname, "")))
+  {
     strcpy(namebuf, remtrans_name);
     strcat(namebuf, ".StructFile");
-    sts = gdh_GetObjectInfo(
-        namebuf, (pwr_tAddress*)structfile, sizeof(structfile));
-    if (ODD(sts) && (!streq(structfile, ""))) {
+    sts = gdh_GetObjectInfo(namebuf, (pwr_tAddress*)structfile, sizeof(structfile));
+    if (ODD(sts) && (!streq(structfile, "")))
+    {
       sts = rtt_show_object_as_struct(ctx, buff_objid, structname, structfile);
       if (sts == RTT__SUCCESS)
         return sts;
@@ -8592,15 +9015,15 @@ static int rttsys_remtrans_buffer(menu_ctx ctx, pwr_tObjid objid, void* arg1,
 
   /* Search for structfile was not successful, show as buffer object */
   sts = rtt_object_parameters(ctx, buff_objid, 0, 0, 0, 0);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     rtt_message('E', "Unable to open object");
     return RTT__NOPICTURE;
   }
   return RTT__SUCCESS;
 }
 
-int RTTSYS_REMTRANS(menu_ctx ctx, int event, char* parameter_ptr,
-    char* objectname, char** picture)
+int RTTSYS_REMTRANS(menu_ctx ctx, int event, char* parameter_ptr, char* objectname, char** picture)
 {
   int sts;
   rtt_t_menu_upd* menu_ptr;
@@ -8622,27 +9045,33 @@ int RTTSYS_REMTRANS(menu_ctx ctx, int event, char* parameter_ptr,
   IF_NOGDH_RETURN;
 
   /**********************************************************
-  *	Return address to menu
-  ***********************************************************/
-  if (event == RTT_APPL_MENU) {
+   *	Return address to menu
+   ***********************************************************/
+  if (event == RTT_APPL_MENU)
+  {
     *picture = (char*)&dtt_systempicture_p36_eu;
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Return address of background
-  ***********************************************************/
-  if (event == RTT_APPL_PICTURE) {
+   *	Return address of background
+   ***********************************************************/
+  if (event == RTT_APPL_PICTURE)
+  {
     *picture = (char*)&dtt_systempicture_p36_bg;
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Next and Previous page
-  ***********************************************************/
-  if (event == RTT_APPL_PREVPAGE || event == RTT_APPL_NEXTPAGE) {
-    if (event == RTT_APPL_PREVPAGE) {
+   *	Next and Previous page
+   ***********************************************************/
+  if (event == RTT_APPL_PREVPAGE || event == RTT_APPL_NEXTPAGE)
+  {
+    if (event == RTT_APPL_PREVPAGE)
+    {
       page--;
       page = MAX(page, 0);
-    } else {
+    }
+    else
+    {
       page++;
       page = MIN(page, REMTRANS_MAXPAGE - 1);
     }
@@ -8652,9 +9081,10 @@ int RTTSYS_REMTRANS(menu_ctx ctx, int event, char* parameter_ptr,
     menu_ptr = menulist;
     remtranslist_ptr = remtranslist;
     j = 0;
-    for (i = 0; i < remtranslist_count; i++) {
-      if ((i >= page * REMTRANS_PAGESIZE)
-          && (i < (page + 1) * REMTRANS_PAGESIZE)) {
+    for (i = 0; i < remtranslist_count; i++)
+    {
+      if ((i >= page * REMTRANS_PAGESIZE) && (i < (page + 1) * REMTRANS_PAGESIZE))
+      {
         strcpy(menu_ptr->value_ptr, remtranslist_ptr->remtransname);
 
         /* Define PF buttons and Return */
@@ -8670,8 +9100,7 @@ int RTTSYS_REMTRANS(menu_ctx ctx, int event, char* parameter_ptr,
           strcpy(menu_ptr->value_ptr, "Snd");
         menu_ptr++;
 
-        menu_ptr->value_ptr
-            = (char*)&remtranslist_ptr->remtrans_ptr->TransCount;
+        menu_ptr->value_ptr = (char*)&remtranslist_ptr->remtrans_ptr->TransCount;
         menu_ptr++;
         menu_ptr->value_ptr = (char*)&remtranslist_ptr->remtrans_ptr->TransTime;
         menu_ptr++;
@@ -8683,7 +9112,8 @@ int RTTSYS_REMTRANS(menu_ctx ctx, int event, char* parameter_ptr,
       }
       remtranslist_ptr++;
     }
-    for (i = j; i < REMTRANS_PAGESIZE; i++) {
+    for (i = j; i < REMTRANS_PAGESIZE; i++)
+    {
       strcpy(menu_ptr->value_ptr, "");
       menu_ptr->func = 0;
       menu_ptr->func2 = 0;
@@ -8706,20 +9136,26 @@ int RTTSYS_REMTRANS(menu_ctx ctx, int event, char* parameter_ptr,
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Initialization of the picture
-  ***********************************************************/
-  if (event == RTT_APPL_INIT) {
+   *	Initialization of the picture
+   ***********************************************************/
+  if (event == RTT_APPL_INIT)
+  {
     page = 0;
     REMTRANS_PAGE = page + 1;
 
     /* Get the RemNode object */
-    if (objectname == NULL) {
+    if (objectname == NULL)
+    {
       /* Call from system menu, show all objects */
       all = 1;
-    } else if (!str_NoCaseStrcmp(objectname, "REMTRANS")) {
+    }
+    else if (!str_NoCaseStrcmp(objectname, "REMTRANS"))
+    {
       /* Call from "show remtrans", show all objects */
       all = 1;
-    } else {
+    }
+    else
+    {
       /* Call from "show remnode", show children to remnode object */
       sts = gdh_NameToObjid(objectname, &remnode_objid);
       if (EVEN(sts))
@@ -8730,26 +9166,30 @@ int RTTSYS_REMTRANS(menu_ctx ctx, int event, char* parameter_ptr,
     /* Get the rack objects */
     remtrans_alloc = 0;
     remtranslist_count = 0;
-    if (all) {
+    if (all)
+    {
       /* Get all RemTrans objects */
       sts = gdh_GetClassList(pwr_cClass_RemTrans, &remtrans_objid);
-      while (ODD(sts)) {
-        sts = rttsys_remtranslist_add(remtrans_objid, &remtranslist,
-            &remtranslist_count, &remtrans_alloc);
+      while (ODD(sts))
+      {
+        sts = rttsys_remtranslist_add(remtrans_objid, &remtranslist, &remtranslist_count, &remtrans_alloc);
         if (EVEN(sts))
           return sts;
         sts = gdh_GetNextObject(remtrans_objid, &remtrans_objid);
       }
-    } else {
+    }
+    else
+    {
       /* Get all children */
       sts = gdh_GetChild(remnode_objid, &remtrans_objid);
-      while (ODD(sts)) {
+      while (ODD(sts))
+      {
         sts = gdh_GetObjectClass(remtrans_objid, &class);
         if (EVEN(sts))
           return sts;
-        if (class == pwr_cClass_RemTrans) {
-          sts = rttsys_remtranslist_add(remtrans_objid, &remtranslist,
-              &remtranslist_count, &remtrans_alloc);
+        if (class == pwr_cClass_RemTrans)
+        {
+          sts = rttsys_remtranslist_add(remtrans_objid, &remtranslist, &remtranslist_count, &remtrans_alloc);
           if (EVEN(sts))
             return sts;
         }
@@ -8761,9 +9201,10 @@ int RTTSYS_REMTRANS(menu_ctx ctx, int event, char* parameter_ptr,
     menu_ptr = menulist;
     remtranslist_ptr = remtranslist;
     j = 0;
-    for (i = 0; i < remtranslist_count; i++) {
-      if ((i >= page * REMTRANS_PAGESIZE)
-          && (i < (page + 1) * REMTRANS_PAGESIZE)) {
+    for (i = 0; i < remtranslist_count; i++)
+    {
+      if ((i >= page * REMTRANS_PAGESIZE) && (i < (page + 1) * REMTRANS_PAGESIZE))
+      {
         strcpy(menu_ptr->value_ptr, remtranslist_ptr->remtransname);
 
         /* Define PF buttons and Return */
@@ -8779,8 +9220,7 @@ int RTTSYS_REMTRANS(menu_ctx ctx, int event, char* parameter_ptr,
           strcpy(menu_ptr->value_ptr, "Snd");
         menu_ptr++;
 
-        menu_ptr->value_ptr
-            = (char*)&remtranslist_ptr->remtrans_ptr->TransCount;
+        menu_ptr->value_ptr = (char*)&remtranslist_ptr->remtrans_ptr->TransCount;
         menu_ptr++;
         menu_ptr->value_ptr = (char*)&remtranslist_ptr->remtrans_ptr->TransTime;
         menu_ptr++;
@@ -8792,7 +9232,8 @@ int RTTSYS_REMTRANS(menu_ctx ctx, int event, char* parameter_ptr,
       }
       remtranslist_ptr++;
     }
-    for (i = j; i < REMTRANS_PAGESIZE; i++) {
+    for (i = j; i < REMTRANS_PAGESIZE; i++)
+    {
       strcpy(menu_ptr->value_ptr, "");
       menu_ptr->func = 0;
       menu_ptr->func2 = 0;
@@ -8815,11 +9256,13 @@ int RTTSYS_REMTRANS(menu_ctx ctx, int event, char* parameter_ptr,
     REMTRANS_MAXPAGE = MAX(1, (remtranslist_count - 1) / REMTRANS_PAGESIZE + 1);
   }
   /**********************************************************
-  *	Exit of the picture
-  ***********************************************************/
-  else if (event == RTT_APPL_EXIT) {
+   *	Exit of the picture
+   ***********************************************************/
+  else if (event == RTT_APPL_EXIT)
+  {
     remtranslist_ptr = remtranslist;
-    for (i = 0; i < remtranslist_count; i++) {
+    for (i = 0; i < remtranslist_count; i++)
+    {
       sts = gdh_UnrefObjectInfo(remtranslist_ptr->remtrans_subid);
       remtranslist_ptr++;
     }
@@ -8828,37 +9271,39 @@ int RTTSYS_REMTRANS(menu_ctx ctx, int event, char* parameter_ptr,
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	The value of a parameter is changed.
-  ***********************************************************/
-  else if (event == RTT_APPL_VALUECHANGED) {
+   *	The value of a parameter is changed.
+   ***********************************************************/
+  else if (event == RTT_APPL_VALUECHANGED)
+  {
   }
   /**********************************************************
-  *	Update the picture.
-  ***********************************************************/
-  else if (event == RTT_APPL_UPDATE) {
+   *	Update the picture.
+   ***********************************************************/
+  else if (event == RTT_APPL_UPDATE)
+  {
   }
   return RTT__SUCCESS;
 }
 
 /*************************************************************************
-*
-* Name:		RTTSYS_RUNNINGTIME()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	context of the picture.
-* int		event		I 	type of event.
-* char		*parameter_ptr	I	pointer to the parameter which value
-*					has been changed.
-*
-* Description:
-*	Show the RunningTime objects of the system.
-*
-**************************************************************************/
+ *
+ * Name:		RTTSYS_RUNNINGTIME()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	context of the picture.
+ * int		event		I 	type of event.
+ * char		*parameter_ptr	I	pointer to the parameter which value
+ *					has been changed.
+ *
+ * Description:
+ *	Show the RunningTime objects of the system.
+ *
+ **************************************************************************/
 
-static int rttsys_runningtimelist_add(pwr_tObjid runningtime_objid,
-    rttsys_t_runningtime_list** objectlist, int* objectlist_count, int* alloc)
+static int rttsys_runningtimelist_add(pwr_tObjid runningtime_objid, rttsys_t_runningtime_list** objectlist,
+                                      int* objectlist_count, int* alloc)
 {
   rttsys_t_runningtime_list* runningtimelist_ptr;
   rttsys_t_runningtime_list* new_objectlist;
@@ -8867,26 +9312,26 @@ static int rttsys_runningtimelist_add(pwr_tObjid runningtime_objid,
   pwr_sAttrRef attrref;
   int local;
 
-  if (*objectlist_count == 0) {
+  if (*objectlist_count == 0)
+  {
     *objectlist = calloc(RTTSYS_ALLOC, sizeof(rttsys_t_runningtime_list));
     if (*objectlist == 0)
       return RTT__NOMEMORY;
     *alloc = RTTSYS_ALLOC;
-  } else if (*alloc <= *objectlist_count) {
-    new_objectlist
-        = calloc(*alloc + RTTSYS_ALLOC, sizeof(rttsys_t_runningtime_list));
+  }
+  else if (*alloc <= *objectlist_count)
+  {
+    new_objectlist = calloc(*alloc + RTTSYS_ALLOC, sizeof(rttsys_t_runningtime_list));
     if (new_objectlist == 0)
       return RTT__NOMEMORY;
-    memcpy(new_objectlist, *objectlist,
-        *objectlist_count * sizeof(rttsys_t_runningtime_list));
+    memcpy(new_objectlist, *objectlist, *objectlist_count * sizeof(rttsys_t_runningtime_list));
     free(*objectlist);
     *objectlist = new_objectlist;
     (*alloc) += RTTSYS_ALLOC;
   }
   runningtimelist_ptr = *objectlist + *objectlist_count;
 
-  sts = gdh_ObjidToName(
-      runningtime_objid, namebuf, sizeof(namebuf), cdh_mNName);
+  sts = gdh_ObjidToName(runningtime_objid, namebuf, sizeof(namebuf), cdh_mNName);
   if (EVEN(sts))
     return sts;
 
@@ -8895,22 +9340,23 @@ static int rttsys_runningtimelist_add(pwr_tObjid runningtime_objid,
 
   attrref = cdh_ObjidToAref(runningtime_objid);
   local = 1; /* Only local object implemented so far */
-  if (local) {
+  if (local)
+  {
     /* Get a direct link to runningtime object */
-    sts = gdh_DLRefObjectInfoAttrref(&attrref,
-        (pwr_tAddress*)&runningtimelist_ptr->runningtime_ptr,
-        &runningtimelist_ptr->runningtime_subid);
+    sts = gdh_DLRefObjectInfoAttrref(&attrref, (pwr_tAddress*)&runningtimelist_ptr->runningtime_ptr,
+                                     &runningtimelist_ptr->runningtime_subid);
     if (EVEN(sts))
       return sts;
-  } else {
+  }
+  else
+  {
     /* Get a subscription to the original object */
-    sts = gdh_SubRefObjectInfoAttrref(
-        &attrref, &runningtimelist_ptr->runningtime_subid);
+    sts = gdh_SubRefObjectInfoAttrref(&attrref, &runningtimelist_ptr->runningtime_subid);
     if (EVEN(sts))
       return sts;
 
     sts = gdh_SubAssociateBuffer(runningtimelist_ptr->runningtime_subid,
-        (pwr_tAddress*)&runningtimelist_ptr->runningtime_ptr, attrref.Size);
+                                 (pwr_tAddress*)&runningtimelist_ptr->runningtime_ptr, attrref.Size);
     if (EVEN(sts))
       return sts;
   }
@@ -8920,8 +9366,7 @@ static int rttsys_runningtimelist_add(pwr_tObjid runningtime_objid,
   return RTT__SUCCESS;
 }
 
-int RTTSYS_RUNNINGTIME(menu_ctx ctx, int event, char* parameter_ptr,
-    char* objectname, char** picture)
+int RTTSYS_RUNNINGTIME(menu_ctx ctx, int event, char* parameter_ptr, char* objectname, char** picture)
 {
   int sts;
   rtt_t_menu_upd* menu_ptr;
@@ -8940,27 +9385,33 @@ int RTTSYS_RUNNINGTIME(menu_ctx ctx, int event, char* parameter_ptr,
   IF_NOGDH_RETURN;
 
   /**********************************************************
-  *	Return address to menu
-  ***********************************************************/
-  if (event == RTT_APPL_MENU) {
+   *	Return address to menu
+   ***********************************************************/
+  if (event == RTT_APPL_MENU)
+  {
     *picture = (char*)&dtt_systempicture_p39_eu;
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Return address of background
-  ***********************************************************/
-  if (event == RTT_APPL_PICTURE) {
+   *	Return address of background
+   ***********************************************************/
+  if (event == RTT_APPL_PICTURE)
+  {
     *picture = (char*)&dtt_systempicture_p39_bg;
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Next and Previous page
-  ***********************************************************/
-  if (event == RTT_APPL_PREVPAGE || event == RTT_APPL_NEXTPAGE) {
-    if (event == RTT_APPL_PREVPAGE) {
+   *	Next and Previous page
+   ***********************************************************/
+  if (event == RTT_APPL_PREVPAGE || event == RTT_APPL_NEXTPAGE)
+  {
+    if (event == RTT_APPL_PREVPAGE)
+    {
       page--;
       page = MAX(page, 0);
-    } else {
+    }
+    else
+    {
       page++;
       page = MIN(page, RUNNINGTIME_MAXPAGE - 1);
     }
@@ -8970,9 +9421,10 @@ int RTTSYS_RUNNINGTIME(menu_ctx ctx, int event, char* parameter_ptr,
     menu_ptr = menulist;
     runningtimelist_ptr = runningtimelist;
     j = 0;
-    for (i = 0; i < runningtimelist_count; i++) {
-      if ((i >= page * RUNNINGTIME_PAGESIZE)
-          && (i < (page + 1) * RUNNINGTIME_PAGESIZE)) {
+    for (i = 0; i < runningtimelist_count; i++)
+    {
+      if ((i >= page * RUNNINGTIME_PAGESIZE) && (i < (page + 1) * RUNNINGTIME_PAGESIZE))
+      {
         strcpy(menu_ptr->value_ptr, runningtimelist_ptr->runningtimename);
 
         /* Define PF buttons and Return */
@@ -8980,32 +9432,26 @@ int RTTSYS_RUNNINGTIME(menu_ctx ctx, int event, char* parameter_ptr,
         menu_ptr->func3 = 0;
         menu_ptr->argoi = runningtimelist_ptr->runningtime_objid;
         menu_ptr++;
-        menu_ptr->value_ptr
-            = (char*)&runningtimelist_ptr->runningtime_ptr->TotalNOfStarts;
+        menu_ptr->value_ptr = (char*)&runningtimelist_ptr->runningtime_ptr->TotalNOfStarts;
         menu_ptr++;
-        menu_ptr->value_ptr
-            = (char*)&runningtimelist_ptr->runningtime_ptr->TotalRunHours;
+        menu_ptr->value_ptr = (char*)&runningtimelist_ptr->runningtime_ptr->TotalRunHours;
         menu_ptr++;
-        menu_ptr->value_ptr
-            = (char*)&runningtimelist_ptr->runningtime_ptr->TotalRunSeconds;
+        menu_ptr->value_ptr = (char*)&runningtimelist_ptr->runningtime_ptr->TotalRunSeconds;
         menu_ptr++;
-        menu_ptr->value_ptr
-            = (char*)&runningtimelist_ptr->runningtime_ptr->TripNOfStarts;
+        menu_ptr->value_ptr = (char*)&runningtimelist_ptr->runningtime_ptr->TripNOfStarts;
         menu_ptr++;
-        menu_ptr->value_ptr
-            = (char*)&runningtimelist_ptr->runningtime_ptr->TripRunHours;
+        menu_ptr->value_ptr = (char*)&runningtimelist_ptr->runningtime_ptr->TripRunHours;
         menu_ptr++;
-        menu_ptr->value_ptr
-            = (char*)&runningtimelist_ptr->runningtime_ptr->TripRunSeconds;
+        menu_ptr->value_ptr = (char*)&runningtimelist_ptr->runningtime_ptr->TripRunSeconds;
         menu_ptr++;
-        menu_ptr->value_ptr
-            = (char*)&runningtimelist_ptr->runningtime_ptr->Description;
+        menu_ptr->value_ptr = (char*)&runningtimelist_ptr->runningtime_ptr->Description;
         menu_ptr++;
         j++;
       }
       runningtimelist_ptr++;
     }
-    for (i = j; i < RUNNINGTIME_PAGESIZE; i++) {
+    for (i = j; i < RUNNINGTIME_PAGESIZE; i++)
+    {
       strcpy(menu_ptr->value_ptr, "");
       menu_ptr->func = 0;
       menu_ptr->func2 = 0;
@@ -9030,9 +9476,10 @@ int RTTSYS_RUNNINGTIME(menu_ctx ctx, int event, char* parameter_ptr,
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	Initialization of the picture
-  ***********************************************************/
-  if (event == RTT_APPL_INIT) {
+   *	Initialization of the picture
+   ***********************************************************/
+  if (event == RTT_APPL_INIT)
+  {
     page = 0;
     RUNNINGTIME_PAGE = page + 1;
 
@@ -9041,9 +9488,10 @@ int RTTSYS_RUNNINGTIME(menu_ctx ctx, int event, char* parameter_ptr,
     runningtimelist_count = 0;
     /* Get all RunningTime objects */
     sts = gdh_GetClassList(pwr_cClass_RunningTime, &runningtime_objid);
-    while (ODD(sts)) {
-      sts = rttsys_runningtimelist_add(runningtime_objid, &runningtimelist,
-          &runningtimelist_count, &runningtime_alloc);
+    while (ODD(sts))
+    {
+      sts = rttsys_runningtimelist_add(runningtime_objid, &runningtimelist, &runningtimelist_count,
+                                       &runningtime_alloc);
       if (EVEN(sts))
         return sts;
       sts = gdh_GetNextObject(runningtime_objid, &runningtime_objid);
@@ -9053,9 +9501,10 @@ int RTTSYS_RUNNINGTIME(menu_ctx ctx, int event, char* parameter_ptr,
     menu_ptr = menulist;
     runningtimelist_ptr = runningtimelist;
     j = 0;
-    for (i = 0; i < runningtimelist_count; i++) {
-      if ((i >= page * RUNNINGTIME_PAGESIZE)
-          && (i < (page + 1) * RUNNINGTIME_PAGESIZE)) {
+    for (i = 0; i < runningtimelist_count; i++)
+    {
+      if ((i >= page * RUNNINGTIME_PAGESIZE) && (i < (page + 1) * RUNNINGTIME_PAGESIZE))
+      {
         strcpy(menu_ptr->value_ptr, runningtimelist_ptr->runningtimename);
 
         /* Define PF buttons and Return */
@@ -9063,32 +9512,26 @@ int RTTSYS_RUNNINGTIME(menu_ctx ctx, int event, char* parameter_ptr,
         menu_ptr->func3 = 0;
         menu_ptr->argoi = runningtimelist_ptr->runningtime_objid;
         menu_ptr++;
-        menu_ptr->value_ptr
-            = (char*)&runningtimelist_ptr->runningtime_ptr->TotalNOfStarts;
+        menu_ptr->value_ptr = (char*)&runningtimelist_ptr->runningtime_ptr->TotalNOfStarts;
         menu_ptr++;
-        menu_ptr->value_ptr
-            = (char*)&runningtimelist_ptr->runningtime_ptr->TotalRunHours;
+        menu_ptr->value_ptr = (char*)&runningtimelist_ptr->runningtime_ptr->TotalRunHours;
         menu_ptr++;
-        menu_ptr->value_ptr
-            = (char*)&runningtimelist_ptr->runningtime_ptr->TotalRunSeconds;
+        menu_ptr->value_ptr = (char*)&runningtimelist_ptr->runningtime_ptr->TotalRunSeconds;
         menu_ptr++;
-        menu_ptr->value_ptr
-            = (char*)&runningtimelist_ptr->runningtime_ptr->TripNOfStarts;
+        menu_ptr->value_ptr = (char*)&runningtimelist_ptr->runningtime_ptr->TripNOfStarts;
         menu_ptr++;
-        menu_ptr->value_ptr
-            = (char*)&runningtimelist_ptr->runningtime_ptr->TripRunHours;
+        menu_ptr->value_ptr = (char*)&runningtimelist_ptr->runningtime_ptr->TripRunHours;
         menu_ptr++;
-        menu_ptr->value_ptr
-            = (char*)&runningtimelist_ptr->runningtime_ptr->TripRunSeconds;
+        menu_ptr->value_ptr = (char*)&runningtimelist_ptr->runningtime_ptr->TripRunSeconds;
         menu_ptr++;
-        menu_ptr->value_ptr
-            = (char*)&runningtimelist_ptr->runningtime_ptr->Description;
+        menu_ptr->value_ptr = (char*)&runningtimelist_ptr->runningtime_ptr->Description;
         menu_ptr++;
         j++;
       }
       runningtimelist_ptr++;
     }
-    for (i = j; i < RUNNINGTIME_PAGESIZE; i++) {
+    for (i = j; i < RUNNINGTIME_PAGESIZE; i++)
+    {
       strcpy(menu_ptr->value_ptr, "");
       menu_ptr->func = 0;
       menu_ptr->func2 = 0;
@@ -9110,15 +9553,16 @@ int RTTSYS_RUNNINGTIME(menu_ctx ctx, int event, char* parameter_ptr,
       menu_ptr->value_ptr = (char*)RTT_ERASE;
       menu_ptr++;
     }
-    RUNNINGTIME_MAXPAGE
-        = MAX(1, (runningtimelist_count - 1) / RUNNINGTIME_PAGESIZE + 1);
+    RUNNINGTIME_MAXPAGE = MAX(1, (runningtimelist_count - 1) / RUNNINGTIME_PAGESIZE + 1);
   }
   /**********************************************************
-  *	Exit of the picture
-  ***********************************************************/
-  else if (event == RTT_APPL_EXIT) {
+   *	Exit of the picture
+   ***********************************************************/
+  else if (event == RTT_APPL_EXIT)
+  {
     runningtimelist_ptr = runningtimelist;
-    for (i = 0; i < runningtimelist_count; i++) {
+    for (i = 0; i < runningtimelist_count; i++)
+    {
       sts = gdh_UnrefObjectInfo(runningtimelist_ptr->runningtime_subid);
       runningtimelist_ptr++;
     }
@@ -9127,37 +9571,38 @@ int RTTSYS_RUNNINGTIME(menu_ctx ctx, int event, char* parameter_ptr,
     return RTT__SUCCESS;
   }
   /**********************************************************
-  *	The value of a parameter is changed.
-  ***********************************************************/
-  else if (event == RTT_APPL_VALUECHANGED) {
+   *	The value of a parameter is changed.
+   ***********************************************************/
+  else if (event == RTT_APPL_VALUECHANGED)
+  {
   }
   /**********************************************************
-  *	Update the picture.
-  ***********************************************************/
-  else if (event == RTT_APPL_UPDATE) {
+   *	Update the picture.
+   ***********************************************************/
+  else if (event == RTT_APPL_UPDATE)
+  {
   }
   return RTT__SUCCESS;
 }
 
 /*************************************************************************
-*
-* Name:		RTTSYS_QCOM_APPL()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	context of the picture.
-* int		event		I 	type of event.
-* char		*parameter_ptr	I	pointer to the parameter which value
-*					has been changed.
-*
-* Description:
-*	Show QCOM applications.
-*
-**************************************************************************/
+ *
+ * Name:		RTTSYS_QCOM_APPL()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	context of the picture.
+ * int		event		I 	type of event.
+ * char		*parameter_ptr	I	pointer to the parameter which value
+ *					has been changed.
+ *
+ * Description:
+ *	Show QCOM applications.
+ *
+ **************************************************************************/
 
-int RTTSYS_QCOM_APPL(menu_ctx ctx, int event, char* parameter_ptr,
-    char* objectname, char** picture)
+int RTTSYS_QCOM_APPL(menu_ctx ctx, int event, char* parameter_ptr, char* objectname, char** picture)
 {
 #define QCOM_APPL_PAGESIZE 17
   int sts;
@@ -9171,9 +9616,10 @@ int RTTSYS_QCOM_APPL(menu_ctx ctx, int event, char* parameter_ptr,
   IF_NOQCOM_RETURN;
 
   /**********************************************************
-  *	The value of a parameter is changed.
-  ***********************************************************/
-  switch (event) {
+   *	The value of a parameter is changed.
+   ***********************************************************/
+  switch (event)
+  {
   case RTT_APPL_UPDATE:
 
     menulist = (rtt_t_menu_upd*)ctx->menu;
@@ -9184,10 +9630,11 @@ int RTTSYS_QCOM_APPL(menu_ctx ctx, int event, char* parameter_ptr,
 
     qdb_ScopeLock
     {
-      for (al = pool_Qsucc(&sts, &qdb->pool, &qdb->g->appl_lh);
-           al != &qdb->g->appl_lh; al = pool_Qsucc(&sts, &qdb->pool, al)) {
-        if ((k >= page * QCOM_APPL_PAGESIZE)
-            && (k < (page + 1) * QCOM_APPL_PAGESIZE)) {
+      for (al = pool_Qsucc(&sts, &qdb->pool, &qdb->g->appl_lh); al != &qdb->g->appl_lh;
+           al = pool_Qsucc(&sts, &qdb->pool, al))
+      {
+        if ((k >= page * QCOM_APPL_PAGESIZE) && (k < (page + 1) * QCOM_APPL_PAGESIZE))
+        {
           ap = pool_Qitem(al, qdb_sAppl, appl_ll);
 
           /* Name */
@@ -9205,8 +9652,7 @@ int RTTSYS_QCOM_APPL(menu_ctx ctx, int event, char* parameter_ptr,
           menu_ptr->value_ptr = (char*)&ap->rid;
           menu_ptr++;
           /* Buf */
-          *(int*)menu_ptr->value_ptr
-              = !pool_QisEmpty(&sts, &qdb->pool, &ap->out_lh);
+          *(int*)menu_ptr->value_ptr = !pool_QisEmpty(&sts, &qdb->pool, &ap->out_lh);
           menu_ptr++;
           /* AllocCount */
           menu_ptr->value_ptr = (char*)&ap->alloc_count;
@@ -9221,7 +9667,8 @@ int RTTSYS_QCOM_APPL(menu_ctx ctx, int event, char* parameter_ptr,
     }
     qdb_ScopeUnlock;
 
-    for (i = l; i < QCOM_APPL_PAGESIZE; i++) {
+    for (i = l; i < QCOM_APPL_PAGESIZE; i++)
+    {
       /* Name */
       menu_ptr->value_ptr = (char*)RTT_ERASE;
       menu_ptr->func = 0;
@@ -9250,38 +9697,42 @@ int RTTSYS_QCOM_APPL(menu_ctx ctx, int event, char* parameter_ptr,
     return RTT__SUCCESS;
 
   /**********************************************************
-  *	Return address of menu
-  ***********************************************************/
+   *	Return address of menu
+   ***********************************************************/
   case RTT_APPL_PICTURE:
     *picture = (char*)&dtt_systempicture_p43_bg;
     return RTT__SUCCESS;
 
   /**********************************************************
-  *	Previous page
-  ***********************************************************/
+   *	Previous page
+   ***********************************************************/
   case RTT_APPL_MENU:
     *picture = (char*)&dtt_systempicture_p43_eu;
     return RTT__SUCCESS;
 
   /**********************************************************
-  *	Initialization of the picture
-  ***********************************************************/
+   *	Initialization of the picture
+   ***********************************************************/
   /**********************************************************
-  *	Next page
-  ***********************************************************/
+   *	Next page
+   ***********************************************************/
   /**********************************************************
-  *	Previous page
-  ***********************************************************/
+   *	Previous page
+   ***********************************************************/
   case RTT_APPL_INIT:
   case RTT_APPL_NEXTPAGE:
   case RTT_APPL_PREVPAGE:
-    if (event == RTT_APPL_PREVPAGE) {
+    if (event == RTT_APPL_PREVPAGE)
+    {
       page--;
       page = MAX(page, 0);
-    } else if (event == RTT_APPL_NEXTPAGE) {
+    }
+    else if (event == RTT_APPL_NEXTPAGE)
+    {
       page++;
       page = MIN(page, QCOM_APPL_MAXPAGE - 1);
-    } else if (event == RTT_APPL_INIT)
+    }
+    else if (event == RTT_APPL_INIT)
       page = 0;
 
     QCOM_APPL_PAGE = page + 1;
@@ -9294,10 +9745,11 @@ int RTTSYS_QCOM_APPL(menu_ctx ctx, int event, char* parameter_ptr,
 
     qdb_ScopeLock
     {
-      for (al = pool_Qsucc(&sts, &qdb->pool, &qdb->g->appl_lh);
-           al != &qdb->g->appl_lh; al = pool_Qsucc(&sts, &qdb->pool, al)) {
-        if ((k >= page * QCOM_APPL_PAGESIZE)
-            && (k < (page + 1) * QCOM_APPL_PAGESIZE)) {
+      for (al = pool_Qsucc(&sts, &qdb->pool, &qdb->g->appl_lh); al != &qdb->g->appl_lh;
+           al = pool_Qsucc(&sts, &qdb->pool, al))
+      {
+        if ((k >= page * QCOM_APPL_PAGESIZE) && (k < (page + 1) * QCOM_APPL_PAGESIZE))
+        {
           ap = pool_Qitem(al, qdb_sAppl, appl_ll);
 
           /* Name */
@@ -9315,8 +9767,7 @@ int RTTSYS_QCOM_APPL(menu_ctx ctx, int event, char* parameter_ptr,
           menu_ptr->value_ptr = (char*)&ap->rid;
           menu_ptr++;
           /* Buf */
-          *(int*)menu_ptr->value_ptr
-              = !pool_QisEmpty(&sts, &qdb->pool, &ap->out_lh);
+          *(int*)menu_ptr->value_ptr = !pool_QisEmpty(&sts, &qdb->pool, &ap->out_lh);
           menu_ptr++;
           /* AllocCount */
           menu_ptr->value_ptr = (char*)&ap->alloc_count;
@@ -9331,7 +9782,8 @@ int RTTSYS_QCOM_APPL(menu_ctx ctx, int event, char* parameter_ptr,
     }
     qdb_ScopeUnlock;
 
-    for (i = l; i < QCOM_APPL_PAGESIZE; i++) {
+    for (i = l; i < QCOM_APPL_PAGESIZE; i++)
+    {
       /* Name */
       menu_ptr->value_ptr = (char*)RTT_ERASE;
       menu_ptr->func = 0;
@@ -9360,8 +9812,8 @@ int RTTSYS_QCOM_APPL(menu_ctx ctx, int event, char* parameter_ptr,
     break;
 
   /**********************************************************
-  *	Exit of the picture
-  ***********************************************************/
+   *	Exit of the picture
+   ***********************************************************/
   case RTT_APPL_EXIT:
     break;
   }
@@ -9370,34 +9822,32 @@ int RTTSYS_QCOM_APPL(menu_ctx ctx, int event, char* parameter_ptr,
 }
 
 /*************************************************************************
-*
-* Name:		RTTSYS_QCOM_QUEUE()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	context of the picture.
-* int		event		I 	type of event.
-* char		*parameter_ptr	I	pointer to the parameter which value
-*					has been changed.
-*
-* Description:
-*	Show QCOM applications.
-*
-**************************************************************************/
+ *
+ * Name:		RTTSYS_QCOM_QUEUE()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	context of the picture.
+ * int		event		I 	type of event.
+ * char		*parameter_ptr	I	pointer to the parameter which value
+ *					has been changed.
+ *
+ * Description:
+ *	Show QCOM applications.
+ *
+ **************************************************************************/
 
-static int rttsys_qcom_queue_start(menu_ctx ctx, pwr_tObjid objid, void* arg1,
-    void* arg2, void* arg3, void* arg4)
+static int rttsys_qcom_queue_start(menu_ctx ctx, pwr_tObjid objid, void* arg1, void* arg2, void* arg3,
+                                   void* arg4)
 {
   int sts;
 
-  sts = rtt_menu_new_sysedit(
-      ctx, pwr_cNObjid, (char*)arg1, "", 0, &RTTSYS_QCOM_QUEUE);
+  sts = rtt_menu_new_sysedit(ctx, pwr_cNObjid, (char*)arg1, "", 0, &RTTSYS_QCOM_QUEUE);
   return sts;
 }
 
-int RTTSYS_QCOM_QUEUE(menu_ctx ctx, int event, char* parameter_ptr,
-    char* objectname, char** picture)
+int RTTSYS_QCOM_QUEUE(menu_ctx ctx, int event, char* parameter_ptr, char* objectname, char** picture)
 {
 #define QCOM_QUE_PAGESIZE 13
   int sts;
@@ -9414,9 +9864,10 @@ int RTTSYS_QCOM_QUEUE(menu_ctx ctx, int event, char* parameter_ptr,
   IF_NOGDH_RETURN;
 
   /**********************************************************
-  *	The value of a parameter is changed.
-  ***********************************************************/
-  switch (event) {
+   *	The value of a parameter is changed.
+   ***********************************************************/
+  switch (event)
+  {
   case RTT_APPL_UPDATE:
 
     menulist = (rtt_t_menu_upd*)ctx->menu;
@@ -9428,15 +9879,18 @@ int RTTSYS_QCOM_QUEUE(menu_ctx ctx, int event, char* parameter_ptr,
 
     qdb_ScopeLock
     {
-      for (al = pool_Qsucc(&sts, &qdb->pool, &qdb->g->appl_lh);
-           al != &qdb->g->appl_lh; al = pool_Qsucc(&sts, &qdb->pool, al)) {
+      for (al = pool_Qsucc(&sts, &qdb->pool, &qdb->g->appl_lh); al != &qdb->g->appl_lh;
+           al = pool_Qsucc(&sts, &qdb->pool, al))
+      {
         ap = pool_Qitem(al, qdb_sAppl, appl_ll);
-        if (ap->aid.aix == aix) {
+        if (ap->aid.aix == aix)
+        {
           found = 1;
-          for (ql = pool_Qsucc(&sts, &qdb->pool, &ap->que_lh);
-               ql != &ap->que_lh; ql = pool_Qsucc(&sts, &qdb->pool, ql)) {
-            if ((k >= page * QCOM_QUE_PAGESIZE)
-                && (k < (page + 1) * QCOM_QUE_PAGESIZE)) {
+          for (ql = pool_Qsucc(&sts, &qdb->pool, &ap->que_lh); ql != &ap->que_lh;
+               ql = pool_Qsucc(&sts, &qdb->pool, ql))
+          {
+            if ((k >= page * QCOM_QUE_PAGESIZE) && (k < (page + 1) * QCOM_QUE_PAGESIZE))
+            {
               qp = pool_Qitem(ql, qdb_sQue, que_ll);
 
               /* Name */
@@ -9484,7 +9938,8 @@ int RTTSYS_QCOM_QUEUE(menu_ctx ctx, int event, char* parameter_ptr,
         }
       }
 
-      for (i = l; i < QCOM_QUE_PAGESIZE; i++) {
+      for (i = l; i < QCOM_QUE_PAGESIZE; i++)
+      {
         /* Name */
         menu_ptr->value_ptr = (char*)RTT_ERASE;
         menu_ptr->func = 0;
@@ -9509,7 +9964,8 @@ int RTTSYS_QCOM_QUEUE(menu_ctx ctx, int event, char* parameter_ptr,
         menu_ptr++;
       }
 
-      if (!found) {
+      if (!found)
+      {
         /* Application call_count */
         menu_ptr->value_ptr = (char*)RTT_ERASE;
         menu_ptr++;
@@ -9554,38 +10010,42 @@ int RTTSYS_QCOM_QUEUE(menu_ctx ctx, int event, char* parameter_ptr,
     return RTT__SUCCESS;
 
   /**********************************************************
-  *	Return address of menu
-  ***********************************************************/
+   *	Return address of menu
+   ***********************************************************/
   case RTT_APPL_PICTURE:
     *picture = (char*)&dtt_systempicture_p44_bg;
     return RTT__SUCCESS;
 
   /**********************************************************
-  *	Previous page
-  ***********************************************************/
+   *	Previous page
+   ***********************************************************/
   case RTT_APPL_MENU:
     *picture = (char*)&dtt_systempicture_p44_eu;
     return RTT__SUCCESS;
 
   /**********************************************************
-  *	Initialization of the picture
-  ***********************************************************/
+   *	Initialization of the picture
+   ***********************************************************/
   /**********************************************************
-  *	Next page
-  ***********************************************************/
+   *	Next page
+   ***********************************************************/
   /**********************************************************
-  *	Previous page
-  ***********************************************************/
+   *	Previous page
+   ***********************************************************/
   case RTT_APPL_INIT:
   case RTT_APPL_NEXTPAGE:
   case RTT_APPL_PREVPAGE:
-    if (event == RTT_APPL_PREVPAGE) {
+    if (event == RTT_APPL_PREVPAGE)
+    {
       page--;
       page = MAX(page, 0);
-    } else if (event == RTT_APPL_NEXTPAGE) {
+    }
+    else if (event == RTT_APPL_NEXTPAGE)
+    {
       page++;
       page = MIN(page, QCOM_QUE_MAXPAGE - 1);
-    } else if (event == RTT_APPL_INIT)
+    }
+    else if (event == RTT_APPL_INIT)
       page = 0;
 
     QCOM_QUE_PAGE = page + 1;
@@ -9600,14 +10060,17 @@ int RTTSYS_QCOM_QUEUE(menu_ctx ctx, int event, char* parameter_ptr,
 
     qdb_ScopeLock
     {
-      for (al = pool_Qsucc(&sts, &qdb->pool, &qdb->g->appl_lh);
-           al != &qdb->g->appl_lh; al = pool_Qsucc(&sts, &qdb->pool, al)) {
+      for (al = pool_Qsucc(&sts, &qdb->pool, &qdb->g->appl_lh); al != &qdb->g->appl_lh;
+           al = pool_Qsucc(&sts, &qdb->pool, al))
+      {
         ap = pool_Qitem(al, qdb_sAppl, appl_ll);
-        if (ap->aid.aix == aix) {
-          for (ql = pool_Qsucc(&sts, &qdb->pool, &ap->que_lh);
-               ql != &ap->que_lh; ql = pool_Qsucc(&sts, &qdb->pool, ql)) {
-            if ((k >= page * QCOM_QUE_PAGESIZE)
-                && (k < (page + 1) * QCOM_QUE_PAGESIZE)) {
+        if (ap->aid.aix == aix)
+        {
+          for (ql = pool_Qsucc(&sts, &qdb->pool, &ap->que_lh); ql != &ap->que_lh;
+               ql = pool_Qsucc(&sts, &qdb->pool, ql))
+          {
+            if ((k >= page * QCOM_QUE_PAGESIZE) && (k < (page + 1) * QCOM_QUE_PAGESIZE))
+            {
               qp = pool_Qitem(ql, qdb_sQue, que_ll);
 
               /* Name */
@@ -9658,7 +10121,8 @@ int RTTSYS_QCOM_QUEUE(menu_ctx ctx, int event, char* parameter_ptr,
     }
     qdb_ScopeUnlock;
 
-    for (i = l; i < QCOM_QUE_PAGESIZE; i++) {
+    for (i = l; i < QCOM_QUE_PAGESIZE; i++)
+    {
       /* Name */
       menu_ptr->value_ptr = (char*)RTT_ERASE;
       menu_ptr->func = 0;
@@ -9724,8 +10188,8 @@ int RTTSYS_QCOM_QUEUE(menu_ctx ctx, int event, char* parameter_ptr,
     break;
 
   /**********************************************************
-  *	Exit of the picture
-  ***********************************************************/
+   *	Exit of the picture
+   ***********************************************************/
   case RTT_APPL_EXIT:
     break;
   }
@@ -9734,24 +10198,23 @@ int RTTSYS_QCOM_QUEUE(menu_ctx ctx, int event, char* parameter_ptr,
 }
 
 /*************************************************************************
-*
-* Name:		RTTSYS_QCOM_ALLQUEUES()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	context of the picture.
-* int		event		I 	type of event.
-* char		*parameter_ptr	I	pointer to the parameter which value
-*					has been changed.
-*
-* Description:
-*	Show QCOM queues.
-*
-**************************************************************************/
+ *
+ * Name:		RTTSYS_QCOM_ALLQUEUES()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	context of the picture.
+ * int		event		I 	type of event.
+ * char		*parameter_ptr	I	pointer to the parameter which value
+ *					has been changed.
+ *
+ * Description:
+ *	Show QCOM queues.
+ *
+ **************************************************************************/
 
-int RTTSYS_QCOM_ALLQUEUES(menu_ctx ctx, int event, char* parameter_ptr,
-    char* objectname, char** picture)
+int RTTSYS_QCOM_ALLQUEUES(menu_ctx ctx, int event, char* parameter_ptr, char* objectname, char** picture)
 {
 #define QCOM_AQUE_PAGESIZE 18
   int sts;
@@ -9768,9 +10231,10 @@ int RTTSYS_QCOM_ALLQUEUES(menu_ctx ctx, int event, char* parameter_ptr,
   IF_NOGDH_RETURN;
 
   /**********************************************************
-  *	The value of a parameter is changed.
-  ***********************************************************/
-  switch (event) {
+   *	The value of a parameter is changed.
+   ***********************************************************/
+  switch (event)
+  {
   case RTT_APPL_UPDATE:
 
     menulist = (rtt_t_menu_upd*)ctx->menu;
@@ -9782,14 +10246,16 @@ int RTTSYS_QCOM_ALLQUEUES(menu_ctx ctx, int event, char* parameter_ptr,
 
     qdb_ScopeLock
     {
-      for (al = pool_Qsucc(&sts, &qdb->pool, &qdb->g->appl_lh);
-           al != &qdb->g->appl_lh; al = pool_Qsucc(&sts, &qdb->pool, al)) {
+      for (al = pool_Qsucc(&sts, &qdb->pool, &qdb->g->appl_lh); al != &qdb->g->appl_lh;
+           al = pool_Qsucc(&sts, &qdb->pool, al))
+      {
         ap = pool_Qitem(al, qdb_sAppl, appl_ll);
 
         for (ql = pool_Qsucc(&sts, &qdb->pool, &ap->que_lh); ql != &ap->que_lh;
-             ql = pool_Qsucc(&sts, &qdb->pool, ql)) {
-          if ((k >= page * QCOM_AQUE_PAGESIZE)
-              && (k < (page + 1) * QCOM_AQUE_PAGESIZE)) {
+             ql = pool_Qsucc(&sts, &qdb->pool, ql))
+        {
+          if ((k >= page * QCOM_AQUE_PAGESIZE) && (k < (page + 1) * QCOM_AQUE_PAGESIZE))
+          {
             qp = pool_Qitem(ql, qdb_sQue, que_ll);
 
             /* Aix */
@@ -9838,7 +10304,8 @@ int RTTSYS_QCOM_ALLQUEUES(menu_ctx ctx, int event, char* parameter_ptr,
         }
       }
 
-      for (i = l; i < QCOM_AQUE_PAGESIZE; i++) {
+      for (i = l; i < QCOM_AQUE_PAGESIZE; i++)
+      {
         /* Aix */
         menu_ptr->value_ptr = (char*)RTT_ERASE;
         menu_ptr->func = 0;
@@ -9873,38 +10340,42 @@ int RTTSYS_QCOM_ALLQUEUES(menu_ctx ctx, int event, char* parameter_ptr,
     return RTT__SUCCESS;
 
   /**********************************************************
-  *	Return address of menu
-  ***********************************************************/
+   *	Return address of menu
+   ***********************************************************/
   case RTT_APPL_PICTURE:
     *picture = (char*)&dtt_systempicture_p51_bg;
     return RTT__SUCCESS;
 
   /**********************************************************
-  *	Previous page
-  ***********************************************************/
+   *	Previous page
+   ***********************************************************/
   case RTT_APPL_MENU:
     *picture = (char*)&dtt_systempicture_p51_eu;
     return RTT__SUCCESS;
 
   /**********************************************************
-  *	Initialization of the picture
-  ***********************************************************/
+   *	Initialization of the picture
+   ***********************************************************/
   /**********************************************************
-  *	Next page
-  ***********************************************************/
+   *	Next page
+   ***********************************************************/
   /**********************************************************
-  *	Previous page
-  ***********************************************************/
+   *	Previous page
+   ***********************************************************/
   case RTT_APPL_INIT:
   case RTT_APPL_NEXTPAGE:
   case RTT_APPL_PREVPAGE:
-    if (event == RTT_APPL_PREVPAGE) {
+    if (event == RTT_APPL_PREVPAGE)
+    {
       page--;
       page = MAX(page, 0);
-    } else if (event == RTT_APPL_NEXTPAGE) {
+    }
+    else if (event == RTT_APPL_NEXTPAGE)
+    {
       page++;
       page = MIN(page, QCOM_AQUE_MAXPAGE - 1);
-    } else if (event == RTT_APPL_INIT)
+    }
+    else if (event == RTT_APPL_INIT)
       page = 0;
 
     QCOM_AQUE_PAGE = page + 1;
@@ -9919,13 +10390,15 @@ int RTTSYS_QCOM_ALLQUEUES(menu_ctx ctx, int event, char* parameter_ptr,
 
     qdb_ScopeLock
     {
-      for (al = pool_Qsucc(&sts, &qdb->pool, &qdb->g->appl_lh);
-           al != &qdb->g->appl_lh; al = pool_Qsucc(&sts, &qdb->pool, al)) {
+      for (al = pool_Qsucc(&sts, &qdb->pool, &qdb->g->appl_lh); al != &qdb->g->appl_lh;
+           al = pool_Qsucc(&sts, &qdb->pool, al))
+      {
         ap = pool_Qitem(al, qdb_sAppl, appl_ll);
         for (ql = pool_Qsucc(&sts, &qdb->pool, &ap->que_lh); ql != &ap->que_lh;
-             ql = pool_Qsucc(&sts, &qdb->pool, ql)) {
-          if ((k >= page * QCOM_AQUE_PAGESIZE)
-              && (k < (page + 1) * QCOM_AQUE_PAGESIZE)) {
+             ql = pool_Qsucc(&sts, &qdb->pool, ql))
+        {
+          if ((k >= page * QCOM_AQUE_PAGESIZE) && (k < (page + 1) * QCOM_AQUE_PAGESIZE))
+          {
             qp = pool_Qitem(ql, qdb_sQue, que_ll);
 
             /* Aix */
@@ -9977,7 +10450,8 @@ int RTTSYS_QCOM_ALLQUEUES(menu_ctx ctx, int event, char* parameter_ptr,
     }
     qdb_ScopeUnlock;
 
-    for (i = l; i < QCOM_AQUE_PAGESIZE; i++) {
+    for (i = l; i < QCOM_AQUE_PAGESIZE; i++)
+    {
       /* Aix */
       menu_ptr->value_ptr = (char*)RTT_ERASE;
       menu_ptr->func = 0;
@@ -10010,8 +10484,8 @@ int RTTSYS_QCOM_ALLQUEUES(menu_ctx ctx, int event, char* parameter_ptr,
     break;
 
   /**********************************************************
-  *	Exit of the picture
-  ***********************************************************/
+   *	Exit of the picture
+   ***********************************************************/
   case RTT_APPL_EXIT:
     break;
   }
@@ -10020,34 +10494,32 @@ int RTTSYS_QCOM_ALLQUEUES(menu_ctx ctx, int event, char* parameter_ptr,
 }
 
 /*************************************************************************
-*
-* Name:		RTTSYS_QCOM_MESSAGES()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	context of the picture.
-* int		event		I 	type of event.
-* char		*parameter_ptr	I	pointer to the parameter which value
-*					has been changed.
-*
-* Description:
-*	Show QCOM messages.
-*
-**************************************************************************/
+ *
+ * Name:		RTTSYS_QCOM_MESSAGES()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	context of the picture.
+ * int		event		I 	type of event.
+ * char		*parameter_ptr	I	pointer to the parameter which value
+ *					has been changed.
+ *
+ * Description:
+ *	Show QCOM messages.
+ *
+ **************************************************************************/
 
-static int rttsys_qcom_messages_start(menu_ctx ctx, pwr_tObjid objid,
-    void* arg1, void* arg2, void* arg3, void* arg4)
+static int rttsys_qcom_messages_start(menu_ctx ctx, pwr_tObjid objid, void* arg1, void* arg2, void* arg3,
+                                      void* arg4)
 {
   int sts;
 
-  sts = rtt_menu_new_sysedit(
-      ctx, pwr_cNObjid, (char*)arg1, "", 0, &RTTSYS_QCOM_MESSAGES);
+  sts = rtt_menu_new_sysedit(ctx, pwr_cNObjid, (char*)arg1, "", 0, &RTTSYS_QCOM_MESSAGES);
   return sts;
 }
 
-int RTTSYS_QCOM_MESSAGES(menu_ctx ctx, int event, char* parameter_ptr,
-    char* objectname, char** picture)
+int RTTSYS_QCOM_MESSAGES(menu_ctx ctx, int event, char* parameter_ptr, char* objectname, char** picture)
 {
 #define QCOM_QMESS_PAGESIZE 18
   int sts;
@@ -10064,9 +10536,10 @@ int RTTSYS_QCOM_MESSAGES(menu_ctx ctx, int event, char* parameter_ptr,
   IF_NOGDH_RETURN;
 
   /**********************************************************
-  *	The value of a parameter is changed.
-  ***********************************************************/
-  switch (event) {
+   *	The value of a parameter is changed.
+   ***********************************************************/
+  switch (event)
+  {
   case RTT_APPL_UPDATE:
 
     menulist = (rtt_t_menu_upd*)ctx->menu;
@@ -10082,27 +10555,27 @@ int RTTSYS_QCOM_MESSAGES(menu_ctx ctx, int event, char* parameter_ptr,
       if (qp == NULL)
         return sts;
 
-      for (bl = pool_Qsucc(NULL, &qdb->pool, &qp->in_lh); bl != &qp->in_lh;) {
+      for (bl = pool_Qsucc(NULL, &qdb->pool, &qp->in_lh); bl != &qp->in_lh;)
+      {
         bp = pool_Qitem(bl, qdb_sBuffer, c.ll);
         bl = pool_Qsucc(NULL, &qdb->pool, bl);
 
-        if ((k >= page * QCOM_QMESS_PAGESIZE)
-            && (k < (page + 1) * QCOM_QMESS_PAGESIZE)) {
-          switch (bp->c.type) {
+        if ((k >= page * QCOM_QMESS_PAGESIZE) && (k < (page + 1) * QCOM_QMESS_PAGESIZE))
+        {
+          switch (bp->c.type)
+          {
           case qdb_eBuffer_base:
             /* Type */
             strcpy(menu_ptr->value_ptr, "Base");
             menu_ptr++;
             /* Source nid */
-            strcpy(menu_ptr->value_ptr,
-                cdh_NodeIdToString(0, bp->b.info.sender.nid, 0, 0));
+            strcpy(menu_ptr->value_ptr, cdh_NodeIdToString(0, bp->b.info.sender.nid, 0, 0));
             menu_ptr++;
             /* Source aix */
             *(int*)menu_ptr->value_ptr = bp->b.info.sender.aix;
             menu_ptr++;
             /* Target nid */
-            strcpy(menu_ptr->value_ptr,
-                cdh_NodeIdToString(0, bp->b.info.receiver.nid, 0, 0));
+            strcpy(menu_ptr->value_ptr, cdh_NodeIdToString(0, bp->b.info.receiver.nid, 0, 0));
             menu_ptr++;
             /* Target qix */
             *(int*)menu_ptr->value_ptr = bp->b.info.receiver.qix;
@@ -10120,8 +10593,7 @@ int RTTSYS_QCOM_MESSAGES(menu_ctx ctx, int event, char* parameter_ptr,
           case qdb_eBuffer_segment:
           case qdb_eBuffer_reference:
             /* Type */
-            strcpy(menu_ptr->value_ptr,
-                bp->c.type == qdb_eBuffer_segment ? "Segm" : "Ref");
+            strcpy(menu_ptr->value_ptr, bp->c.type == qdb_eBuffer_segment ? "Segm" : "Ref");
             menu_ptr++;
             /* Source nid */
             strcpy(menu_ptr->value_ptr, "");
@@ -10154,7 +10626,8 @@ int RTTSYS_QCOM_MESSAGES(menu_ctx ctx, int event, char* parameter_ptr,
           break;
       }
 
-      for (i = l; i < QCOM_QMESS_PAGESIZE; i++) {
+      for (i = l; i < QCOM_QMESS_PAGESIZE; i++)
+      {
         /* Type */
         strcpy(menu_ptr->value_ptr, "");
         menu_ptr++;
@@ -10188,38 +10661,42 @@ int RTTSYS_QCOM_MESSAGES(menu_ctx ctx, int event, char* parameter_ptr,
     return RTT__SUCCESS;
 
   /**********************************************************
-  *	Return address of menu
-  ***********************************************************/
+   *	Return address of menu
+   ***********************************************************/
   case RTT_APPL_PICTURE:
     *picture = (char*)&dtt_systempicture_p52_bg;
     return RTT__SUCCESS;
 
   /**********************************************************
-  *	Previous page
-  ***********************************************************/
+   *	Previous page
+   ***********************************************************/
   case RTT_APPL_MENU:
     *picture = (char*)&dtt_systempicture_p52_eu;
     return RTT__SUCCESS;
 
   /**********************************************************
-  *	Initialization of the picture
-  ***********************************************************/
+   *	Initialization of the picture
+   ***********************************************************/
   /**********************************************************
-  *	Next page
-  ***********************************************************/
+   *	Next page
+   ***********************************************************/
   /**********************************************************
-  *	Previous page
-  ***********************************************************/
+   *	Previous page
+   ***********************************************************/
   case RTT_APPL_INIT:
   case RTT_APPL_NEXTPAGE:
   case RTT_APPL_PREVPAGE:
-    if (event == RTT_APPL_PREVPAGE) {
+    if (event == RTT_APPL_PREVPAGE)
+    {
       page--;
       page = MAX(page, 0);
-    } else if (event == RTT_APPL_NEXTPAGE) {
+    }
+    else if (event == RTT_APPL_NEXTPAGE)
+    {
       page++;
       page = MIN(page, QCOM_QMESS_MAXPAGE - 1);
-    } else if (event == RTT_APPL_INIT)
+    }
+    else if (event == RTT_APPL_INIT)
       page = 0;
 
     QCOM_QMESS_PAGE = page + 1;
@@ -10239,27 +10716,27 @@ int RTTSYS_QCOM_MESSAGES(menu_ctx ctx, int event, char* parameter_ptr,
       if (qp == NULL)
         return sts;
 
-      for (bl = pool_Qsucc(NULL, &qdb->pool, &qp->in_lh); bl != &qp->in_lh;) {
+      for (bl = pool_Qsucc(NULL, &qdb->pool, &qp->in_lh); bl != &qp->in_lh;)
+      {
         bp = pool_Qitem(bl, qdb_sBuffer, c.ll);
         bl = pool_Qsucc(NULL, &qdb->pool, bl);
 
-        if ((k >= page * QCOM_QMESS_PAGESIZE)
-            && (k < (page + 1) * QCOM_QMESS_PAGESIZE)) {
-          switch (bp->c.type) {
+        if ((k >= page * QCOM_QMESS_PAGESIZE) && (k < (page + 1) * QCOM_QMESS_PAGESIZE))
+        {
+          switch (bp->c.type)
+          {
           case qdb_eBuffer_base:
             /* Type */
             strcpy(menu_ptr->value_ptr, "Base");
             menu_ptr++;
             /* Source nid */
-            strcpy(menu_ptr->value_ptr,
-                cdh_NodeIdToString(0, bp->b.info.sender.nid, 0, 0));
+            strcpy(menu_ptr->value_ptr, cdh_NodeIdToString(0, bp->b.info.sender.nid, 0, 0));
             menu_ptr++;
             /* Source aix */
             *(int*)menu_ptr->value_ptr = bp->b.info.sender.aix;
             menu_ptr++;
             /* Target nid */
-            strcpy(menu_ptr->value_ptr,
-                cdh_NodeIdToString(0, bp->b.info.receiver.nid, 0, 0));
+            strcpy(menu_ptr->value_ptr, cdh_NodeIdToString(0, bp->b.info.receiver.nid, 0, 0));
             menu_ptr++;
             /* Target qix */
             *(int*)menu_ptr->value_ptr = bp->b.info.receiver.qix;
@@ -10277,8 +10754,7 @@ int RTTSYS_QCOM_MESSAGES(menu_ctx ctx, int event, char* parameter_ptr,
           case qdb_eBuffer_segment:
           case qdb_eBuffer_reference:
             /* Type */
-            strcpy(menu_ptr->value_ptr,
-                bp->c.type == qdb_eBuffer_segment ? "Segm" : "Ref");
+            strcpy(menu_ptr->value_ptr, bp->c.type == qdb_eBuffer_segment ? "Segm" : "Ref");
             menu_ptr++;
             /* Source nid */
             strcpy(menu_ptr->value_ptr, "");
@@ -10311,7 +10787,8 @@ int RTTSYS_QCOM_MESSAGES(menu_ctx ctx, int event, char* parameter_ptr,
           break;
       }
 
-      for (i = l; i < QCOM_QMESS_PAGESIZE; i++) {
+      for (i = l; i < QCOM_QMESS_PAGESIZE; i++)
+      {
         /* Type */
         strcpy(menu_ptr->value_ptr, "");
         menu_ptr++;
@@ -10345,8 +10822,8 @@ int RTTSYS_QCOM_MESSAGES(menu_ctx ctx, int event, char* parameter_ptr,
     break;
 
   /**********************************************************
-  *	Exit of the picture
-  ***********************************************************/
+   *	Exit of the picture
+   ***********************************************************/
   case RTT_APPL_EXIT:
     break;
   }
@@ -10355,23 +10832,22 @@ int RTTSYS_QCOM_MESSAGES(menu_ctx ctx, int event, char* parameter_ptr,
 }
 
 /*************************************************************************
-*
-* Name:		RTTSYS_SHOW_LINKS()
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	context of the picture.
-* int		event		I 	type of event.
-* char		*parameter_ptr	I	pointer to the parameter which value
-*					has been changed.
-*
-* Description:
-*	Show nethandler info.
-*
-**************************************************************************/
+ *
+ * Name:		RTTSYS_SHOW_LINKS()
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	context of the picture.
+ * int		event		I 	type of event.
+ * char		*parameter_ptr	I	pointer to the parameter which value
+ *					has been changed.
+ *
+ * Description:
+ *	Show nethandler info.
+ *
+ **************************************************************************/
 
-int RTTSYS_QCOM_LINKS(menu_ctx ctx, int event, char* parameter_ptr,
-    char* objectname, char** picture)
+int RTTSYS_QCOM_LINKS(menu_ctx ctx, int event, char* parameter_ptr, char* objectname, char** picture)
 {
 #define QCOM_LINKS_PAGESIZE 18
   int sts;
@@ -10385,9 +10861,10 @@ int RTTSYS_QCOM_LINKS(menu_ctx ctx, int event, char* parameter_ptr,
   IF_NOQCOM_RETURN;
 
   /**********************************************************
-  *	The value of a parameter is changed.
-  ***********************************************************/
-  switch (event) {
+   *	The value of a parameter is changed.
+   ***********************************************************/
+  switch (event)
+  {
   case RTT_APPL_UPDATE:
 
     menulist = (rtt_t_menu_upd*)ctx->menu;
@@ -10398,14 +10875,17 @@ int RTTSYS_QCOM_LINKS(menu_ctx ctx, int event, char* parameter_ptr,
 
     qdb_ScopeLock
     {
-      for (nl = pool_Qsucc(&sts, &qdb->pool, &qdb->g->node_lh);
-           nl != &qdb->g->node_lh; nl = pool_Qsucc(&sts, &qdb->pool, nl)) {
-        for (m = 0; m < 2; m++) {
-          if ((k >= page * QCOM_LINKS_PAGESIZE)
-              && (k < (page + 1) * QCOM_LINKS_PAGESIZE)) {
+      for (nl = pool_Qsucc(&sts, &qdb->pool, &qdb->g->node_lh); nl != &qdb->g->node_lh;
+           nl = pool_Qsucc(&sts, &qdb->pool, nl))
+      {
+        for (m = 0; m < 2; m++)
+        {
+          if ((k >= page * QCOM_LINKS_PAGESIZE) && (k < (page + 1) * QCOM_LINKS_PAGESIZE))
+          {
             np = pool_Qitem(nl, qdb_sNode, node_ll);
 
-            if (str_StartsWith(np->link[m].name, "***")) {
+            if (str_StartsWith(np->link[m].name, "***"))
+            {
               m++;
               continue;
             }
@@ -10425,15 +10905,18 @@ int RTTSYS_QCOM_LINKS(menu_ctx ctx, int event, char* parameter_ptr,
             if (np == qdb->my_node)
               /* Local node */
               strcpy(menu_ptr->value_ptr, "Local");
-            else {
+            else
+            {
               if (np->link[m].qflags.b.initiated)
                 strcpy(menu_ptr->value_ptr, "Initiated");
-              else if (np->link[m].qflags.b.active) {
+              else if (np->link[m].qflags.b.active)
+              {
                 if (m == np->clx)
                   strcpy(menu_ptr->value_ptr, "Active");
                 else
                   strcpy(menu_ptr->value_ptr, "Passive");
-              } else if (np->link[m].qflags.b.connected)
+              }
+              else if (np->link[m].qflags.b.connected)
                 strcpy(menu_ptr->value_ptr, "Connected");
               else
                 strcpy(menu_ptr->value_ptr, "Down");
@@ -10472,7 +10955,8 @@ int RTTSYS_QCOM_LINKS(menu_ctx ctx, int event, char* parameter_ptr,
     }
     qdb_ScopeUnlock;
 
-    for (i = l; i < QCOM_LINKS_PAGESIZE; i++) {
+    for (i = l; i < QCOM_LINKS_PAGESIZE; i++)
+    {
       /* Name */
       menu_ptr->value_ptr = (char*)RTT_ERASE;
       menu_ptr++;
@@ -10503,38 +10987,42 @@ int RTTSYS_QCOM_LINKS(menu_ctx ctx, int event, char* parameter_ptr,
     return RTT__SUCCESS;
 
   /**********************************************************
-  *	Return address of menu
-  ***********************************************************/
+   *	Return address of menu
+   ***********************************************************/
   case RTT_APPL_PICTURE:
     *picture = (char*)&dtt_systempicture_p53_bg;
     return RTT__SUCCESS;
 
   /**********************************************************
-  *	Previous page
-  ***********************************************************/
+   *	Previous page
+   ***********************************************************/
   case RTT_APPL_MENU:
     *picture = (char*)&dtt_systempicture_p53_eu;
     return RTT__SUCCESS;
 
   /**********************************************************
-  *	Initialization of the picture
-  ***********************************************************/
+   *	Initialization of the picture
+   ***********************************************************/
   /**********************************************************
-  *	Next page
-  ***********************************************************/
+   *	Next page
+   ***********************************************************/
   /**********************************************************
-  *	Previous page
-  ***********************************************************/
+   *	Previous page
+   ***********************************************************/
   case RTT_APPL_INIT:
   case RTT_APPL_NEXTPAGE:
   case RTT_APPL_PREVPAGE:
-    if (event == RTT_APPL_PREVPAGE) {
+    if (event == RTT_APPL_PREVPAGE)
+    {
       page--;
       page = MAX(page, 0);
-    } else if (event == RTT_APPL_NEXTPAGE) {
+    }
+    else if (event == RTT_APPL_NEXTPAGE)
+    {
       page++;
       page = MIN(page, QCOM_LINKS_MAXPAGE - 1);
-    } else if (event == RTT_APPL_INIT)
+    }
+    else if (event == RTT_APPL_INIT)
       page = 0;
 
     QCOM_LINKS_PAGE = page + 1;
@@ -10547,14 +11035,17 @@ int RTTSYS_QCOM_LINKS(menu_ctx ctx, int event, char* parameter_ptr,
 
     qdb_ScopeLock
     {
-      for (nl = pool_Qsucc(&sts, &qdb->pool, &qdb->g->node_lh);
-           nl != &qdb->g->node_lh; nl = pool_Qsucc(&sts, &qdb->pool, nl)) {
-        for (m = 0; m < 2; m++) {
-          if ((k >= page * QCOM_LINKS_PAGESIZE)
-              && (k < (page + 1) * QCOM_LINKS_PAGESIZE)) {
+      for (nl = pool_Qsucc(&sts, &qdb->pool, &qdb->g->node_lh); nl != &qdb->g->node_lh;
+           nl = pool_Qsucc(&sts, &qdb->pool, nl))
+      {
+        for (m = 0; m < 2; m++)
+        {
+          if ((k >= page * QCOM_LINKS_PAGESIZE) && (k < (page + 1) * QCOM_LINKS_PAGESIZE))
+          {
             np = pool_Qitem(nl, qdb_sNode, node_ll);
 
-            if (str_StartsWith(np->link[m].name, "***")) {
+            if (str_StartsWith(np->link[m].name, "***"))
+            {
               m++;
               continue;
             }
@@ -10574,15 +11065,18 @@ int RTTSYS_QCOM_LINKS(menu_ctx ctx, int event, char* parameter_ptr,
             if (np == qdb->my_node)
               /* Local node */
               strcpy(menu_ptr->value_ptr, "Local");
-            else {
+            else
+            {
               if (np->link[m].qflags.b.initiated)
                 strcpy(menu_ptr->value_ptr, "Initiated");
-              else if (np->link[m].qflags.b.active) {
+              else if (np->link[m].qflags.b.active)
+              {
                 if (m == np->clx)
                   strcpy(menu_ptr->value_ptr, "Active");
                 else
                   strcpy(menu_ptr->value_ptr, "Passive");
-              } else if (np->link[m].qflags.b.connected)
+              }
+              else if (np->link[m].qflags.b.connected)
                 strcpy(menu_ptr->value_ptr, "Connected");
               else
                 strcpy(menu_ptr->value_ptr, "Down");
@@ -10620,7 +11114,8 @@ int RTTSYS_QCOM_LINKS(menu_ctx ctx, int event, char* parameter_ptr,
     }
     qdb_ScopeUnlock;
 
-    for (i = l; i < QCOM_LINKS_PAGESIZE; i++) {
+    for (i = l; i < QCOM_LINKS_PAGESIZE; i++)
+    {
       /* Name */
       menu_ptr->value_ptr = (char*)RTT_ERASE;
       menu_ptr++;
@@ -10651,8 +11146,8 @@ int RTTSYS_QCOM_LINKS(menu_ctx ctx, int event, char* parameter_ptr,
     break;
 
   /**********************************************************
-  *	Exit of the picture
-  ***********************************************************/
+   *	Exit of the picture
+   ***********************************************************/
   case RTT_APPL_EXIT:
     break;
   }
@@ -10661,23 +11156,22 @@ int RTTSYS_QCOM_LINKS(menu_ctx ctx, int event, char* parameter_ptr,
 }
 
 /*************************************************************************
-*
-* Name:		RTTSYS_SHOW_NODES()
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	context of the picture.
-* int		event		I 	type of event.
-* char		*parameter_ptr	I	pointer to the parameter which value
-*					has been changed.
-*
-* Description:
-*	Show nethandler info.
-*
-**************************************************************************/
+ *
+ * Name:		RTTSYS_SHOW_NODES()
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	context of the picture.
+ * int		event		I 	type of event.
+ * char		*parameter_ptr	I	pointer to the parameter which value
+ *					has been changed.
+ *
+ * Description:
+ *	Show nethandler info.
+ *
+ **************************************************************************/
 
-int RTTSYS_QCOM_NODES(menu_ctx ctx, int event, char* parameter_ptr,
-    char* objectname, char** picture)
+int RTTSYS_QCOM_NODES(menu_ctx ctx, int event, char* parameter_ptr, char* objectname, char** picture)
 {
 #define QCOM_NODES_PAGESIZE 18
   int sts;
@@ -10692,9 +11186,10 @@ int RTTSYS_QCOM_NODES(menu_ctx ctx, int event, char* parameter_ptr,
   IF_NOQCOM_RETURN;
 
   /**********************************************************
-  *	The value of a parameter is changed.
-  ***********************************************************/
-  switch (event) {
+   *	The value of a parameter is changed.
+   ***********************************************************/
+  switch (event)
+  {
   case RTT_APPL_UPDATE:
 
     menulist = (rtt_t_menu_upd*)ctx->menu;
@@ -10705,14 +11200,17 @@ int RTTSYS_QCOM_NODES(menu_ctx ctx, int event, char* parameter_ptr,
 
     qdb_ScopeLock
     {
-      for (nl = pool_Qsucc(&sts, &qdb->pool, &qdb->g->node_lh);
-           nl != &qdb->g->node_lh; nl = pool_Qsucc(&sts, &qdb->pool, nl)) {
-        for (m = 0; m < 2; m++) {
-          if ((k >= page * QCOM_NODES_PAGESIZE)
-              && (k < (page + 1) * QCOM_NODES_PAGESIZE)) {
+      for (nl = pool_Qsucc(&sts, &qdb->pool, &qdb->g->node_lh); nl != &qdb->g->node_lh;
+           nl = pool_Qsucc(&sts, &qdb->pool, nl))
+      {
+        for (m = 0; m < 2; m++)
+        {
+          if ((k >= page * QCOM_NODES_PAGESIZE) && (k < (page + 1) * QCOM_NODES_PAGESIZE))
+          {
             np = pool_Qitem(nl, qdb_sNode, node_ll);
 
-            if (str_StartsWith(np->link[m].name, "***")) {
+            if (str_StartsWith(np->link[m].name, "***"))
+            {
               m++;
               continue;
             }
@@ -10729,7 +11227,8 @@ int RTTSYS_QCOM_NODES(menu_ctx ctx, int event, char* parameter_ptr,
             menu_ptr++;
 
             /* Os */
-            switch (np->os) {
+            switch (np->os)
+            {
             case co_eOS_Lynx:
               strcpy(menu_ptr->value_ptr, "Lynx");
               break;
@@ -10753,7 +11252,8 @@ int RTTSYS_QCOM_NODES(menu_ctx ctx, int event, char* parameter_ptr,
             }
             menu_ptr++;
             /* Hw */
-            switch (np->hw) {
+            switch (np->hw)
+            {
             case co_eHW_x86:
               strcpy(menu_ptr->value_ptr, "x86");
               break;
@@ -10780,15 +11280,18 @@ int RTTSYS_QCOM_NODES(menu_ctx ctx, int event, char* parameter_ptr,
             if (np == qdb->my_node)
               /* Local node */
               strcpy(menu_ptr->value_ptr, "Local");
-            else {
+            else
+            {
               if (np->link[m].qflags.b.initiated)
                 strcpy(menu_ptr->value_ptr, "Initiated");
-              else if (np->link[m].qflags.b.active) {
+              else if (np->link[m].qflags.b.active)
+              {
                 if (m == np->clx)
                   strcpy(menu_ptr->value_ptr, "Active");
                 else
                   strcpy(menu_ptr->value_ptr, "Passive");
-              } else if (np->link[m].qflags.b.connected)
+              }
+              else if (np->link[m].qflags.b.connected)
                 strcpy(menu_ptr->value_ptr, "Connected");
               else
                 strcpy(menu_ptr->value_ptr, "Down");
@@ -10798,11 +11301,11 @@ int RTTSYS_QCOM_NODES(menu_ctx ctx, int event, char* parameter_ptr,
             menu_ptr->value_ptr = (char*)&np->link[m].upcnt;
             menu_ptr++;
             /* Timeup */
-            if (np->link[m].timeup.tv_sec != 0
-                || np->link[m].timeup.tv_nsec != 0) {
-              time_AtoAscii(&np->link[m].timeup, time_eFormat_DateAndTime,
-                  timbuf, sizeof(timbuf));
-            } else
+            if (np->link[m].timeup.tv_sec != 0 || np->link[m].timeup.tv_nsec != 0)
+            {
+              time_AtoAscii(&np->link[m].timeup, time_eFormat_DateAndTime, timbuf, sizeof(timbuf));
+            }
+            else
               timbuf[0] = '\0';
             strcpy(menu_ptr->value_ptr, timbuf);
             menu_ptr++;
@@ -10820,7 +11323,8 @@ int RTTSYS_QCOM_NODES(menu_ctx ctx, int event, char* parameter_ptr,
     }
     qdb_ScopeUnlock;
 
-    for (i = l; i < QCOM_NODES_PAGESIZE; i++) {
+    for (i = l; i < QCOM_NODES_PAGESIZE; i++)
+    {
       /* Name */
       menu_ptr->value_ptr = (char*)RTT_ERASE;
       menu_ptr++;
@@ -10851,38 +11355,42 @@ int RTTSYS_QCOM_NODES(menu_ctx ctx, int event, char* parameter_ptr,
     return RTT__SUCCESS;
 
   /**********************************************************
-  *	Return address of menu
-  ***********************************************************/
+   *	Return address of menu
+   ***********************************************************/
   case RTT_APPL_PICTURE:
     *picture = (char*)&dtt_systempicture_p45_bg;
     return RTT__SUCCESS;
 
   /**********************************************************
-  *	Previous page
-  ***********************************************************/
+   *	Previous page
+   ***********************************************************/
   case RTT_APPL_MENU:
     *picture = (char*)&dtt_systempicture_p45_eu;
     return RTT__SUCCESS;
 
   /**********************************************************
-  *	Initialization of the picture
-  ***********************************************************/
+   *	Initialization of the picture
+   ***********************************************************/
   /**********************************************************
-  *	Next page
-  ***********************************************************/
+   *	Next page
+   ***********************************************************/
   /**********************************************************
-  *	Previous page
-  ***********************************************************/
+   *	Previous page
+   ***********************************************************/
   case RTT_APPL_INIT:
   case RTT_APPL_NEXTPAGE:
   case RTT_APPL_PREVPAGE:
-    if (event == RTT_APPL_PREVPAGE) {
+    if (event == RTT_APPL_PREVPAGE)
+    {
       page--;
       page = MAX(page, 0);
-    } else if (event == RTT_APPL_NEXTPAGE) {
+    }
+    else if (event == RTT_APPL_NEXTPAGE)
+    {
       page++;
       page = MIN(page, QCOM_NODES_MAXPAGE - 1);
-    } else if (event == RTT_APPL_INIT)
+    }
+    else if (event == RTT_APPL_INIT)
       page = 0;
 
     QCOM_NODES_PAGE = page + 1;
@@ -10895,14 +11403,17 @@ int RTTSYS_QCOM_NODES(menu_ctx ctx, int event, char* parameter_ptr,
 
     qdb_ScopeLock
     {
-      for (nl = pool_Qsucc(&sts, &qdb->pool, &qdb->g->node_lh);
-           nl != &qdb->g->node_lh; nl = pool_Qsucc(&sts, &qdb->pool, nl)) {
-        for (m = 0; m < 2; m++) {
-          if ((k >= page * QCOM_NODES_PAGESIZE)
-              && (k < (page + 1) * QCOM_NODES_PAGESIZE)) {
+      for (nl = pool_Qsucc(&sts, &qdb->pool, &qdb->g->node_lh); nl != &qdb->g->node_lh;
+           nl = pool_Qsucc(&sts, &qdb->pool, nl))
+      {
+        for (m = 0; m < 2; m++)
+        {
+          if ((k >= page * QCOM_NODES_PAGESIZE) && (k < (page + 1) * QCOM_NODES_PAGESIZE))
+          {
             np = pool_Qitem(nl, qdb_sNode, node_ll);
 
-            if (str_StartsWith(np->link[m].name, "***")) {
+            if (str_StartsWith(np->link[m].name, "***"))
+            {
               m++;
               continue;
             }
@@ -10916,7 +11427,8 @@ int RTTSYS_QCOM_NODES(menu_ctx ctx, int event, char* parameter_ptr,
             menu_ptr++;
 
             /* Os */
-            switch (np->os) {
+            switch (np->os)
+            {
             case co_eOS_Lynx:
               strcpy(menu_ptr->value_ptr, "Lynx");
               break;
@@ -10940,7 +11452,8 @@ int RTTSYS_QCOM_NODES(menu_ctx ctx, int event, char* parameter_ptr,
             }
             menu_ptr++;
             /* Hw */
-            switch (np->hw) {
+            switch (np->hw)
+            {
             case co_eHW_x86:
               strcpy(menu_ptr->value_ptr, "x86");
               break;
@@ -10967,7 +11480,8 @@ int RTTSYS_QCOM_NODES(menu_ctx ctx, int event, char* parameter_ptr,
             if (np == qdb->my_node)
               /* Local node */
               strcpy(menu_ptr->value_ptr, "Local");
-            else {
+            else
+            {
               if (np->link[m].qflags.b.initiated)
                 strcpy(menu_ptr->value_ptr, "Initiated");
               else if (np->link[m].qflags.b.active)
@@ -10982,11 +11496,11 @@ int RTTSYS_QCOM_NODES(menu_ctx ctx, int event, char* parameter_ptr,
             menu_ptr->value_ptr = (char*)&np->link[m].upcnt;
             menu_ptr++;
             /* Timeup */
-            if (np->link[m].timeup.tv_sec != 0
-                || np->link[m].timeup.tv_nsec != 0) {
-              time_AtoAscii(&np->link[m].timeup, time_eFormat_DateAndTime,
-                  timbuf, sizeof(timbuf));
-            } else
+            if (np->link[m].timeup.tv_sec != 0 || np->link[m].timeup.tv_nsec != 0)
+            {
+              time_AtoAscii(&np->link[m].timeup, time_eFormat_DateAndTime, timbuf, sizeof(timbuf));
+            }
+            else
               timbuf[0] = '\0';
             strcpy(menu_ptr->value_ptr, timbuf);
             menu_ptr++;
@@ -11004,7 +11518,8 @@ int RTTSYS_QCOM_NODES(menu_ctx ctx, int event, char* parameter_ptr,
     }
     qdb_ScopeUnlock;
 
-    for (i = l; i < QCOM_NODES_PAGESIZE; i++) {
+    for (i = l; i < QCOM_NODES_PAGESIZE; i++)
+    {
       /* Name */
       menu_ptr->value_ptr = (char*)RTT_ERASE;
       menu_ptr++;
@@ -11035,8 +11550,8 @@ int RTTSYS_QCOM_NODES(menu_ctx ctx, int event, char* parameter_ptr,
     break;
 
   /**********************************************************
-  *	Exit of the picture
-  ***********************************************************/
+   *	Exit of the picture
+   ***********************************************************/
   case RTT_APPL_EXIT:
     break;
   }
@@ -11045,24 +11560,23 @@ int RTTSYS_QCOM_NODES(menu_ctx ctx, int event, char* parameter_ptr,
 }
 
 /*************************************************************************
-*
-* Name:		RTTSYS_POOLS()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	context of the picture.
-* int		event		I 	type of event.
-* char		*parameter_ptr	I	pointer to the parameter which value
-*					has been changed.
-*
-* Description:
-*	Show the qdb, gdb and rtdb pools.
-*
-**************************************************************************/
+ *
+ * Name:		RTTSYS_POOLS()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	context of the picture.
+ * int		event		I 	type of event.
+ * char		*parameter_ptr	I	pointer to the parameter which value
+ *					has been changed.
+ *
+ * Description:
+ *	Show the qdb, gdb and rtdb pools.
+ *
+ **************************************************************************/
 
-int RTTSYS_POOLS(menu_ctx ctx, int event, char* parameter_ptr, char* objectname,
-    char** picture)
+int RTTSYS_POOLS(menu_ctx ctx, int event, char* parameter_ptr, char* objectname, char** picture)
 {
   rtt_t_menu_upd* menu_ptr;
   rtt_t_menu_upd* menulist;
@@ -11080,14 +11594,16 @@ int RTTSYS_POOLS(menu_ctx ctx, int event, char* parameter_ptr, char* objectname,
     num = 1;
 
   /**********************************************************
-  *	The value of a parameter is changed.
-  ***********************************************************/
-  switch (event) {
+   *	The value of a parameter is changed.
+   ***********************************************************/
+  switch (event)
+  {
   case RTT_APPL_UPDATE:
     menulist = (rtt_t_menu_upd*)ctx->menu;
     menu_ptr = menulist;
 
-    for (j = 0; j < num; j++) {
+    for (j = 0; j < num; j++)
+    {
       if (j == 0)
         /* qdb pool */
         pool = qdb->pool.gphp;
@@ -11111,7 +11627,8 @@ int RTTSYS_POOLS(menu_ctx ctx, int event, char* parameter_ptr, char* objectname,
 
       /* Total size */
       total_size = pool->initsize * POOL_SSIZE;
-      for (i = 1; i < pool_cSegs; i++) {
+      for (i = 1; i < pool_cSegs; i++)
+      {
         if (pool->seg[i].generation == 0)
           break;
         total_size += pool->extendsize * POOL_SSIZE;
@@ -11127,7 +11644,8 @@ int RTTSYS_POOLS(menu_ctx ctx, int event, char* parameter_ptr, char* objectname,
 
       /* Free size */
       free_size = 0;
-      for (i = 0; i < pool_cSegs; i++) {
+      for (i = 0; i < pool_cSegs; i++)
+      {
         if (pool->seg[i].generation == 0)
           break;
         free_size += pool->seg[i].fragsize * POOL_SSIZE;
@@ -11142,28 +11660,28 @@ int RTTSYS_POOLS(menu_ctx ctx, int event, char* parameter_ptr, char* objectname,
     return RTT__SUCCESS;
 
   /**********************************************************
-  *	Return address of menu
-  ***********************************************************/
+   *	Return address of menu
+   ***********************************************************/
   case RTT_APPL_PICTURE:
     *picture = (char*)&dtt_systempicture_p46_bg;
     return RTT__SUCCESS;
 
   /**********************************************************
-  *	Previous page
-  ***********************************************************/
+   *	Previous page
+   ***********************************************************/
   case RTT_APPL_MENU:
     *picture = (char*)&dtt_systempicture_p46_eu;
     return RTT__SUCCESS;
 
   /**********************************************************
-  *	Initialization of the picture
-  ***********************************************************/
+   *	Initialization of the picture
+   ***********************************************************/
   /**********************************************************
-  *	Next page
-  ***********************************************************/
+   *	Next page
+   ***********************************************************/
   /**********************************************************
-  *	Previous page
-  ***********************************************************/
+   *	Previous page
+   ***********************************************************/
   case RTT_APPL_NEXTPAGE:
   case RTT_APPL_PREVPAGE:
     break;
@@ -11173,7 +11691,8 @@ int RTTSYS_POOLS(menu_ctx ctx, int event, char* parameter_ptr, char* objectname,
     menulist = (rtt_t_menu_upd*)ctx->menu;
     menu_ptr = menulist;
 
-    for (j = 0; j < num; j++) {
+    for (j = 0; j < num; j++)
+    {
       if (j == 0)
         /* qdb pool */
         pool = qdb->pool.gphp;
@@ -11200,7 +11719,8 @@ int RTTSYS_POOLS(menu_ctx ctx, int event, char* parameter_ptr, char* objectname,
 
       /* Total size */
       total_size = pool->initsize * POOL_SSIZE;
-      for (i = 1; i < pool_cSegs; i++) {
+      for (i = 1; i < pool_cSegs; i++)
+      {
         if (pool->seg[i].generation == 0)
           break;
         total_size += pool->extendsize * POOL_SSIZE;
@@ -11218,7 +11738,8 @@ int RTTSYS_POOLS(menu_ctx ctx, int event, char* parameter_ptr, char* objectname,
 
       /* Free size */
       free_size = 0;
-      for (i = 0; i < pool_cSegs; i++) {
+      for (i = 0; i < pool_cSegs; i++)
+      {
         if (pool->seg[i].generation == 0)
           break;
         free_size += pool->seg[i].fragsize * POOL_SSIZE;
@@ -11233,8 +11754,8 @@ int RTTSYS_POOLS(menu_ctx ctx, int event, char* parameter_ptr, char* objectname,
     break;
 
   /**********************************************************
-  *	Exit of the picture
-  ***********************************************************/
+   *	Exit of the picture
+   ***********************************************************/
   case RTT_APPL_EXIT:
     break;
   }
@@ -11243,34 +11764,32 @@ int RTTSYS_POOLS(menu_ctx ctx, int event, char* parameter_ptr, char* objectname,
 }
 
 /*************************************************************************
-*
-* Name:		RTTSYS_POOL_SEGS()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	context of the picture.
-* int		event		I 	type of event.
-* char		*parameter_ptr	I	pointer to the parameter which value
-*					has been changed.
-*
-* Description:
-*	Show pool segments.
-*
-**************************************************************************/
+ *
+ * Name:		RTTSYS_POOL_SEGS()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	context of the picture.
+ * int		event		I 	type of event.
+ * char		*parameter_ptr	I	pointer to the parameter which value
+ *					has been changed.
+ *
+ * Description:
+ *	Show pool segments.
+ *
+ **************************************************************************/
 
-static int rttsys_pool_segs_start(menu_ctx ctx, pwr_tObjid objid, void* arg1,
-    void* arg2, void* arg3, void* arg4)
+static int rttsys_pool_segs_start(menu_ctx ctx, pwr_tObjid objid, void* arg1, void* arg2, void* arg3,
+                                  void* arg4)
 {
   int sts;
 
-  sts = rtt_menu_new_sysedit(
-      ctx, pwr_cNObjid, (char*)arg1, "", 0, &RTTSYS_POOL_SEGS);
+  sts = rtt_menu_new_sysedit(ctx, pwr_cNObjid, (char*)arg1, "", 0, &RTTSYS_POOL_SEGS);
   return sts;
 }
 
-int RTTSYS_POOL_SEGS(menu_ctx ctx, int event, char* parameter_ptr,
-    char* objectname, char** picture)
+int RTTSYS_POOL_SEGS(menu_ctx ctx, int event, char* parameter_ptr, char* objectname, char** picture)
 {
 #define POOLSEGS_PAGESIZE 17
   rtt_t_menu_upd* menu_ptr;
@@ -11282,9 +11801,10 @@ int RTTSYS_POOL_SEGS(menu_ctx ctx, int event, char* parameter_ptr,
   IF_NOQCOM_RETURN;
 
   /**********************************************************
-  *	The value of a parameter is changed.
-  ***********************************************************/
-  switch (event) {
+   *	The value of a parameter is changed.
+   ***********************************************************/
+  switch (event)
+  {
   case RTT_APPL_UPDATE:
 
     menulist = (rtt_t_menu_upd*)ctx->menu;
@@ -11292,12 +11812,13 @@ int RTTSYS_POOL_SEGS(menu_ctx ctx, int event, char* parameter_ptr,
 
     l = 0;
 
-    for (k = 0; k < pool_cSegs; k++) {
+    for (k = 0; k < pool_cSegs; k++)
+    {
       if (pool->seg[k].generation == 0)
         break;
 
-      if ((k >= page * POOLSEGS_PAGESIZE)
-          && (k < (page + 1) * POOLSEGS_PAGESIZE)) {
+      if ((k >= page * POOLSEGS_PAGESIZE) && (k < (page + 1) * POOLSEGS_PAGESIZE))
+      {
         /* Name */
         menu_ptr->value_ptr = pool->seg[k].name;
         menu_ptr->func = &rttsys_pool_segment_start;
@@ -11339,7 +11860,8 @@ int RTTSYS_POOL_SEGS(menu_ctx ctx, int event, char* parameter_ptr,
       }
     }
 
-    for (i = l; i < POOLSEGS_PAGESIZE; i++) {
+    for (i = l; i < POOLSEGS_PAGESIZE; i++)
+    {
       /* Name */
       menu_ptr->value_ptr = (char*)RTT_ERASE;
       menu_ptr->func = 0;
@@ -11368,38 +11890,42 @@ int RTTSYS_POOL_SEGS(menu_ctx ctx, int event, char* parameter_ptr,
     return RTT__SUCCESS;
 
   /**********************************************************
-  *	Return address of menu
-  ***********************************************************/
+   *	Return address of menu
+   ***********************************************************/
   case RTT_APPL_PICTURE:
     *picture = (char*)&dtt_systempicture_p47_bg;
     return RTT__SUCCESS;
 
   /**********************************************************
-  *	Previous page
-  ***********************************************************/
+   *	Previous page
+   ***********************************************************/
   case RTT_APPL_MENU:
     *picture = (char*)&dtt_systempicture_p47_eu;
     return RTT__SUCCESS;
 
   /**********************************************************
-  *	Initialization of the picture
-  ***********************************************************/
+   *	Initialization of the picture
+   ***********************************************************/
   /**********************************************************
-  *	Next page
-  ***********************************************************/
+   *	Next page
+   ***********************************************************/
   /**********************************************************
-  *	Previous page
-  ***********************************************************/
+   *	Previous page
+   ***********************************************************/
   case RTT_APPL_INIT:
   case RTT_APPL_NEXTPAGE:
   case RTT_APPL_PREVPAGE:
-    if (event == RTT_APPL_PREVPAGE) {
+    if (event == RTT_APPL_PREVPAGE)
+    {
       page--;
       page = MAX(page, 0);
-    } else if (event == RTT_APPL_NEXTPAGE) {
+    }
+    else if (event == RTT_APPL_NEXTPAGE)
+    {
       page++;
       page = MIN(page, POOLSEGS_MAXPAGE - 1);
-    } else if (event == RTT_APPL_INIT)
+    }
+    else if (event == RTT_APPL_INIT)
       page = 0;
 
     POOLSEGS_PAGE = page + 1;
@@ -11412,12 +11938,13 @@ int RTTSYS_POOL_SEGS(menu_ctx ctx, int event, char* parameter_ptr,
 
     l = 0;
 
-    for (k = 0; k < pool_cSegs; k++) {
+    for (k = 0; k < pool_cSegs; k++)
+    {
       if (pool->seg[k].generation == 0)
         break;
 
-      if ((k >= page * POOLSEGS_PAGESIZE)
-          && (k < (page + 1) * POOLSEGS_PAGESIZE)) {
+      if ((k >= page * POOLSEGS_PAGESIZE) && (k < (page + 1) * POOLSEGS_PAGESIZE))
+      {
         /* Name */
         menu_ptr->value_ptr = pool->seg[k].name;
         menu_ptr->func = &rttsys_pool_segment_start;
@@ -11459,7 +11986,8 @@ int RTTSYS_POOL_SEGS(menu_ctx ctx, int event, char* parameter_ptr,
       }
     }
 
-    for (i = l; i < POOLSEGS_PAGESIZE; i++) {
+    for (i = l; i < POOLSEGS_PAGESIZE; i++)
+    {
       /* Name */
       menu_ptr->value_ptr = (char*)RTT_ERASE;
       menu_ptr->func = 0;
@@ -11488,8 +12016,8 @@ int RTTSYS_POOL_SEGS(menu_ctx ctx, int event, char* parameter_ptr,
     break;
 
   /**********************************************************
-  *	Exit of the picture
-  ***********************************************************/
+   *	Exit of the picture
+   ***********************************************************/
   case RTT_APPL_EXIT:
     break;
   }
@@ -11498,34 +12026,32 @@ int RTTSYS_POOL_SEGS(menu_ctx ctx, int event, char* parameter_ptr,
 }
 
 /*************************************************************************
-*
-* Name:		RTTSYS_POOL_SEGS()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	context of the picture.
-* int		event		I 	type of event.
-* char		*parameter_ptr	I	pointer to the parameter which value
-*					has been changed.
-*
-* Description:
-*	Show pool segments.
-*
-**************************************************************************/
+ *
+ * Name:		RTTSYS_POOL_SEGS()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	context of the picture.
+ * int		event		I 	type of event.
+ * char		*parameter_ptr	I	pointer to the parameter which value
+ *					has been changed.
+ *
+ * Description:
+ *	Show pool segments.
+ *
+ **************************************************************************/
 
-static int rttsys_pool_segment_start(menu_ctx ctx, pwr_tObjid objid, void* arg1,
-    void* arg2, void* arg3, void* arg4)
+static int rttsys_pool_segment_start(menu_ctx ctx, pwr_tObjid objid, void* arg1, void* arg2, void* arg3,
+                                     void* arg4)
 {
   int sts;
 
-  sts = rtt_menu_new_sysedit(
-      ctx, pwr_cNObjid, (char*)arg1, "", 0, &RTTSYS_POOL_SEGMENT);
+  sts = rtt_menu_new_sysedit(ctx, pwr_cNObjid, (char*)arg1, "", 0, &RTTSYS_POOL_SEGMENT);
   return sts;
 }
 
-int RTTSYS_POOL_SEGMENT(menu_ctx ctx, int event, char* parameter_ptr,
-    char* objectname, char** picture)
+int RTTSYS_POOL_SEGMENT(menu_ctx ctx, int event, char* parameter_ptr, char* objectname, char** picture)
 {
   rtt_t_menu_upd* menu_ptr;
   rtt_t_menu_upd* menulist;
@@ -11534,9 +12060,10 @@ int RTTSYS_POOL_SEGMENT(menu_ctx ctx, int event, char* parameter_ptr,
   IF_NOGDH_RETURN;
 
   /**********************************************************
-  *	The value of a parameter is changed.
-  ***********************************************************/
-  switch (event) {
+   *	The value of a parameter is changed.
+   ***********************************************************/
+  switch (event)
+  {
   case RTT_APPL_UPDATE:
 
     menulist = (rtt_t_menu_upd*)ctx->menu;
@@ -11572,28 +12099,28 @@ int RTTSYS_POOL_SEGMENT(menu_ctx ctx, int event, char* parameter_ptr,
     return RTT__SUCCESS;
 
   /**********************************************************
-  *	Return address of menu
-  ***********************************************************/
+   *	Return address of menu
+   ***********************************************************/
   case RTT_APPL_PICTURE:
     *picture = (char*)&dtt_systempicture_p48_bg;
     return RTT__SUCCESS;
 
   /**********************************************************
-  *	Previous page
-  ***********************************************************/
+   *	Previous page
+   ***********************************************************/
   case RTT_APPL_MENU:
     *picture = (char*)&dtt_systempicture_p48_eu;
     return RTT__SUCCESS;
 
   /**********************************************************
-  *	Initialization of the picture
-  ***********************************************************/
+   *	Initialization of the picture
+   ***********************************************************/
   /**********************************************************
-  *	Next page
-  ***********************************************************/
+   *	Next page
+   ***********************************************************/
   /**********************************************************
-  *	Previous page
-  ***********************************************************/
+   *	Previous page
+   ***********************************************************/
   case RTT_APPL_NEXTPAGE:
   case RTT_APPL_PREVPAGE:
     break;
@@ -11666,8 +12193,8 @@ int RTTSYS_POOL_SEGMENT(menu_ctx ctx, int event, char* parameter_ptr,
     break;
 
   /**********************************************************
-  *	Exit of the picture
-  ***********************************************************/
+   *	Exit of the picture
+   ***********************************************************/
   case RTT_APPL_EXIT:
     break;
   }
@@ -11676,34 +12203,32 @@ int RTTSYS_POOL_SEGMENT(menu_ctx ctx, int event, char* parameter_ptr,
 }
 
 /*************************************************************************
-*
-* Name:		RTTSYS_QCOM_NODE()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	context of the picture.
-* int		event		I 	type of event.
-* char		*parameter_ptr	I	pointer to the parameter which value
-*					has been changed.
-*
-* Description:
-*	Show pool segments.
-*
-**************************************************************************/
+ *
+ * Name:		RTTSYS_QCOM_NODE()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	context of the picture.
+ * int		event		I 	type of event.
+ * char		*parameter_ptr	I	pointer to the parameter which value
+ *					has been changed.
+ *
+ * Description:
+ *	Show pool segments.
+ *
+ **************************************************************************/
 
-static int rttsys_qcom_node_start(menu_ctx ctx, pwr_tObjid objid, void* arg1,
-    void* arg2, void* arg3, void* arg4)
+static int rttsys_qcom_node_start(menu_ctx ctx, pwr_tObjid objid, void* arg1, void* arg2, void* arg3,
+                                  void* arg4)
 {
   int sts;
 
-  sts = rtt_menu_new_sysedit(
-      ctx, pwr_cNObjid, (char*)arg1, "", 0, &RTTSYS_QCOM_NODE);
+  sts = rtt_menu_new_sysedit(ctx, pwr_cNObjid, (char*)arg1, "", 0, &RTTSYS_QCOM_NODE);
   return sts;
 }
 
-int RTTSYS_QCOM_NODE(menu_ctx ctx, int event, char* parameter_ptr,
-    char* objectname, char** picture)
+int RTTSYS_QCOM_NODE(menu_ctx ctx, int event, char* parameter_ptr, char* objectname, char** picture)
 {
   int sts;
   rtt_t_menu_upd* menu_ptr;
@@ -11716,9 +12241,10 @@ int RTTSYS_QCOM_NODE(menu_ctx ctx, int event, char* parameter_ptr,
   IF_NOQCOM_RETURN;
 
   /**********************************************************
-  *	The value of a parameter is changed.
-  ***********************************************************/
-  switch (event) {
+   *	The value of a parameter is changed.
+   ***********************************************************/
+  switch (event)
+  {
   case RTT_APPL_UPDATE:
 
     menulist = (rtt_t_menu_upd*)ctx->menu;
@@ -11726,16 +12252,19 @@ int RTTSYS_QCOM_NODE(menu_ctx ctx, int event, char* parameter_ptr,
 
     qdb_ScopeLock
     {
-      for (nl = pool_Qsucc(&sts, &qdb->pool, &qdb->g->node_lh);
-           nl != &qdb->g->node_lh; nl = pool_Qsucc(&sts, &qdb->pool, nl)) {
+      for (nl = pool_Qsucc(&sts, &qdb->pool, &qdb->g->node_lh); nl != &qdb->g->node_lh;
+           nl = pool_Qsucc(&sts, &qdb->pool, nl))
+      {
         np = pool_Qitem(nl, qdb_sNode, node_ll);
 
-        if (np->nid == nid) {
+        if (np->nid == nid)
+        {
           /* Flags */
           if (np == qdb->my_node)
             /* Local node */
             strcpy(menu_ptr->value_ptr, "Local");
-          else {
+          else
+          {
             if (np->link[lix].flags.m & qdb_mLink_active)
               strcpy(menu_ptr->value_ptr, "Active");
             else if (np->link[lix].flags.m & qdb_mLink_connected)
@@ -11810,12 +12339,14 @@ int RTTSYS_QCOM_NODE(menu_ctx ctx, int event, char* parameter_ptr,
           menu_ptr++;
 
           /* Port */
-          if (pwr_dHost_byteOrder == pwr_dLittleEndian) {
+          if (pwr_dHost_byteOrder == pwr_dLittleEndian)
+          {
             unsigned short tmp;
             tmp = np->link[lix].sa.sin_port;
             ENDIAN_SWAP_SHORTP(&tmp);
             *(int*)menu_ptr->value_ptr = tmp;
-          } else
+          }
+          else
             *(int*)menu_ptr->value_ptr = np->link[lix].sa.sin_port;
           menu_ptr++;
 
@@ -11868,38 +12399,40 @@ int RTTSYS_QCOM_NODE(menu_ctx ctx, int event, char* parameter_ptr,
     return RTT__SUCCESS;
 
   /**********************************************************
-  *	Return address of menu
-  ***********************************************************/
+   *	Return address of menu
+   ***********************************************************/
   case RTT_APPL_PICTURE:
     *picture = (char*)&dtt_systempicture_p49_bg;
     return RTT__SUCCESS;
 
   /**********************************************************
-  *	Previous page
-  ***********************************************************/
+   *	Previous page
+   ***********************************************************/
   case RTT_APPL_MENU:
     *picture = (char*)&dtt_systempicture_p49_eu;
     return RTT__SUCCESS;
 
   /**********************************************************
-  *	Initialization of the picture
-  ***********************************************************/
+   *	Initialization of the picture
+   ***********************************************************/
   /**********************************************************
-  *	Next page
-  ***********************************************************/
+   *	Next page
+   ***********************************************************/
   /**********************************************************
-  *	Previous page
-  ***********************************************************/
+   *	Previous page
+   ***********************************************************/
   case RTT_APPL_PREVPAGE:
   case RTT_APPL_NEXTPAGE:
     break;
   case RTT_APPL_INIT:
 
     nid = (pwr_tNodeId)(unsigned long)objectname;
-    if (nid & 0x80000000) {
+    if (nid & 0x80000000)
+    {
       lix = 1;
       nid &= 0x7fffffff;
-    } else
+    }
+    else
       lix = 0;
 
     menulist = (rtt_t_menu_upd*)ctx->menu;
@@ -11907,16 +12440,19 @@ int RTTSYS_QCOM_NODE(menu_ctx ctx, int event, char* parameter_ptr,
 
     qdb_ScopeLock
     {
-      for (nl = pool_Qsucc(&sts, &qdb->pool, &qdb->g->node_lh);
-           nl != &qdb->g->node_lh; nl = pool_Qsucc(&sts, &qdb->pool, nl)) {
+      for (nl = pool_Qsucc(&sts, &qdb->pool, &qdb->g->node_lh); nl != &qdb->g->node_lh;
+           nl = pool_Qsucc(&sts, &qdb->pool, nl))
+      {
         np = pool_Qitem(nl, qdb_sNode, node_ll);
 
-        if (np->nid == nid) {
+        if (np->nid == nid)
+        {
           /* Flags */
           if (np == qdb->my_node)
             /* Local node */
             strcpy(menu_ptr->value_ptr, "Local");
-          else {
+          else
+          {
             if (np->link[lix].flags.m & qdb_mLink_active)
               strcpy(menu_ptr->value_ptr, "Active");
             else if (np->link[lix].flags.m & qdb_mLink_connected)
@@ -11991,12 +12527,14 @@ int RTTSYS_QCOM_NODE(menu_ctx ctx, int event, char* parameter_ptr,
           menu_ptr++;
 
           /* Port */
-          if (pwr_dHost_byteOrder == pwr_dLittleEndian) {
+          if (pwr_dHost_byteOrder == pwr_dLittleEndian)
+          {
             unsigned short tmp;
             tmp = np->link[lix].sa.sin_port;
             ENDIAN_SWAP_SHORTP(&tmp);
             *(int*)menu_ptr->value_ptr = tmp;
-          } else
+          }
+          else
             *(int*)menu_ptr->value_ptr = np->link[lix].sa.sin_port;
           menu_ptr++;
 
@@ -12029,8 +12567,8 @@ int RTTSYS_QCOM_NODE(menu_ctx ctx, int event, char* parameter_ptr,
     break;
 
   /**********************************************************
-  *	Exit of the picture
-  ***********************************************************/
+   *	Exit of the picture
+   ***********************************************************/
   case RTT_APPL_EXIT:
     break;
   }
