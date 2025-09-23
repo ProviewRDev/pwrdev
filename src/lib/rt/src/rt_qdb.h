@@ -52,7 +52,6 @@
 #include "co_time.h"
 #include "rt_hash.h"
 #include "rt_qcom.h"
-#include "rt_inet.h"
 #include "rt_sync.h"
 
 /* Version of the runtime database datastructures. Changing this
