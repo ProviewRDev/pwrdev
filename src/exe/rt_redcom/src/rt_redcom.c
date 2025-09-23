@@ -137,9 +137,6 @@ typedef struct
 
   qdb_sBuffer* bp;
 
-  pwr_tBoolean in_arp;
-  struct arpreq arp;
-
   struct sockaddr_in sa;
 
   void* mon; /* Monitor private data. */

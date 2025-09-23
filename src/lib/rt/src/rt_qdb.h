@@ -529,8 +529,6 @@ typedef struct
 
   qdb_sBuffer* bp;
 
-  pwr_tBoolean in_arp;
-
   void* mon;                       /* Monitor private data. */
   qcom_eNodeConnection connection; /* Type of connection */
   pwr_tUInt32 min_resend_time;
