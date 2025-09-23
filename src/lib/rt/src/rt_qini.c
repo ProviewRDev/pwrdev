@@ -62,10 +62,7 @@ static qdb_sNode* addNode(qini_sNode* nep)
   if (nep->flags.b.port)
     np->sa.sin_port = htons(nep->port);
   else
-    np->sa.sin_port = htons(55000 + qdb->g->bus);
-
-  memcpy(&np->link[0].arp.arp_pa.sa_data, &np->link[0].sa.sin_addr.s_addr,
-      sizeof(np->link[0].sa.sin_addr.s_addr));
+    np->sa.sin_port = htons(55000 + qdb->g->bus);  
 
   np->link[0].sa.sin_family = AF_INET;
   if (nep->port)
