@@ -157,6 +157,15 @@ static char anix_name[40][32] = {
     "rt_mqttserver",
 };
 
+/**
+ * @brief Get the name of an application index.
+ *
+ * Copies the name corresponding to the given application index (anix) into the provided buffer.
+ * If the index is out of range, an empty string is copied.
+ *
+ * @param anix Application index.
+ * @param name Buffer to copy the name into.
+ */
 void errh_AnixName(errh_eAnix anix, char* name)
 {
   if (anix > 0 && anix <= 40)
@@ -165,6 +174,12 @@ void errh_AnixName(errh_eAnix anix, char* name)
     strcpy(name, "");
 }
 
+/**
+ * @brief Enable interactive mode for error logging.
+ *
+ * When interactive mode is enabled, log messages are printed to stdout instead of being sent to the log
+ * queue.
+ */
 void errh_Interactive(void) { interactive = 1; }
 
 /**
@@ -226,22 +241,40 @@ void errh_SetAnix(errh_eAnix anix) { errh_anix = anix; }
  */
 void errh_SetName(char* name) { set_name(name); }
 
-/* Check if a given messagenumber exists,
-   return string representation if valid.  */
-
+/**
+ * @brief Get a formatted message string for a given status code.
+ *
+ * Returns a string representation of the message corresponding to the status code.
+ *
+ * @param sts Status code.
+ * @param buf Buffer to store the message string.
+ * @param bufSize Size of the buffer.
+ * @return Pointer to the buffer containing the message string.
+ */
 char* errh_GetMsg(const int sts, char* buf, int bufSize) { return get_message(sts, 0xf, buf, bufSize); }
 
-/* Check if a given messagenumber exists,
-   return string representation if valid.  */
+/**
+ * @brief Get the error name for a given status code.
+ *
+ * Returns the error name string for the specified status code.
+ *
+ * @param sts Status code.
+ * @param buf Buffer to store the error name.
+ * @param bufSize Size of the buffer.
+ * @return Pointer to the buffer containing the error name.
+ */
+char* errh_GetError(const int sts, char* buf, int bufSize) { return get_message(sts, 0x2, buf, bufSize); }
 
-char* errh_GetError(const int sts, char* buf, int bufSize)
-{
-  return get_message(sts, 0x2, buf, bufSize);
-}
-
-/* Checks if a given messagenumber exists,
-  return string representation if valid.  */
-
+/**
+ * @brief Get the message text for a given status code.
+ *
+ * Returns the message text string for the specified status code.
+ *
+ * @param sts Status code.
+ * @param buf Buffer to store the message text.
+ * @param bufSize Size of the buffer.
+ * @return Pointer to the buffer containing the message text.
+ */
 char* errh_GetText(const int sts, char* buf, int bufSize) { return get_message(sts, 1, buf, bufSize); }
 
 /* Log a message.  */
@@ -418,8 +451,15 @@ void errh_LogSuccess(errh_sLog* lp, const char* msg, ...)
   va_end(args);
 }
 
-/* Insert a status message in a message.  */
-
+/**
+ * @brief Create a status argument for error message formatting.
+ *
+ * Allocates and returns a pointer to a status argument structure for use in error message formatting.
+ * Caller is responsible for freeing the returned pointer.
+ *
+ * @param sts Status code to include as an argument.
+ * @return Pointer to the allocated status argument structure.
+ */
 void* errh_ErrArgMsg(pwr_tStatus sts)
 {
   sArg* eap;
@@ -431,8 +471,15 @@ void* errh_ErrArgMsg(pwr_tStatus sts)
   return eap;
 }
 
-/* Insert a string argument in a message.  */
-
+/**
+ * @brief Create a string argument for error message formatting.
+ *
+ * Allocates and returns a pointer to a string argument structure for use in error message formatting.
+ * Caller is responsible for freeing the returned pointer.
+ *
+ * @param str String to include as an argument.
+ * @return Pointer to the allocated string argument structure.
+ */
 void* errh_ErrArgAF(char* str)
 {
   sArg* eap;
@@ -445,8 +492,15 @@ void* errh_ErrArgAF(char* str)
   return eap;
 }
 
-/* Insert a integer value in a message.  */
-
+/**
+ * @brief Create an integer argument for error message formatting.
+ *
+ * Allocates and returns a pointer to an integer argument structure for use in error message formatting.
+ * Caller is responsible for freeing the returned pointer.
+ *
+ * @param val Integer value to include as an argument.
+ * @return Pointer to the allocated integer argument structure.
+ */
 void* errh_ErrArgL(int val)
 {
   sArg* eap;
@@ -459,6 +513,16 @@ void* errh_ErrArgL(int val)
   return eap;
 }
 
+/**
+ * @brief Log a complex error message with multiple arguments.
+ *
+ * Formats and logs an error message using a status code and a variable list of arguments.
+ * Each argument should be created using errh_ErrArgMsg, errh_ErrArgAF, or errh_ErrArgL.
+ * The message is sent to the error log system.
+ *
+ * @param sts Status code for the error message.
+ * @param ... Variable list of argument pointers (terminated by NULL).
+ */
 void errh_CErrLog(pwr_tStatus sts, ...)
 {
   va_list ap;
@@ -500,8 +564,25 @@ void errh_CErrLog(pwr_tStatus sts, ...)
   errh_send(string, get_severity(sts), sts, errh_eMsgType_Log);
 }
 
-/* Format a string.  */
-
+/**
+ * @brief Formats a log message with severity and variable arguments.
+ *
+ * This function builds a log message string in the provided buffer, starting with a formatted header
+ * (including severity, program name, PID, timestamp), followed by the formatted message using the
+ * supplied format string and arguments. The resulting string is suitable for logging or display.
+ *
+ * Unlike errh_Log, this function does not send or print the message; it only formats it.
+ *
+ * @param string   Buffer where the formatted message will be written.
+ * @param severity Severity character ('E' for error, 'W' for warning, etc.).
+ * @param msg      Format string for the log message (like printf).
+ * @param ...      Variable arguments for formatting the message.
+ * @return         Pointer to the buffer containing the formatted message.
+ *
+ * Example usage:
+ *   char buf[256];
+ *   errh_Message(buf, 'I', "Started process %s (pid %d)", name, pid);
+ */
 char* errh_Message(char* string, char severity, char* msg, ...)
 {
   char* s;
@@ -528,17 +609,40 @@ char* errh_Message(char* string, char severity, char* msg, ...)
 
     any other	gives a combination of above excluding %  */
 
+/**
+ * @brief Internal: Get a message string for a status code and flags.
+ *
+ * Returns a formatted message string for the given status code and flags.
+ *
+ * @param sts Status code.
+ * @param flags Message formatting flags.
+ * @param buf Buffer to store the message string.
+ * @param bufSize Size of the buffer.
+ * @return Pointer to the buffer containing the message string.
+ */
 static char* get_message(const pwr_tStatus sts, unsigned int flags, char* buf, int bufSize)
 {
   return msg_GetMessage(sts, flags, buf, bufSize);
 }
 
+/**
+ * @brief Internal: Set the program name for logging.
+ *
+ * Copies the given name into the programName buffer, truncating if necessary.
+ *
+ * @param name Program name string.
+ */
 static void set_name(const char* name)
 {
   strncpy(programName, name, sizeof(programName) - 1);
   programName[sizeof(programName) - 1] = '\0';
 }
 
+/**
+ * @brief Internal: Open the log message queue for error logging.
+ *
+ * Initializes the message queue used for logging errors, depending on the operating system.
+ */
 static void openLog()
 {
 #if defined OS_LINUX || defined OS_CYGWIN
@@ -592,6 +696,15 @@ static void openLog()
 #endif
 }
 
+/**
+ * @brief Internal: Get the default program name.
+ *
+ * Copies the default program name into the provided buffer, truncating if necessary.
+ *
+ * @param name Buffer to copy the name into.
+ * @param size Size of the buffer.
+ * @return Pointer to the buffer containing the name.
+ */
 static char* get_name(char* name, int size)
 {
   int len = strlen(UNKNOWN_PROGRAM_NAME);
@@ -602,6 +715,14 @@ static char* get_name(char* name, int size)
 
   return name;
 }
+/**
+ * @brief Internal: Get the current process ID.
+ *
+ * Stores the current process ID in the provided pointer.
+ *
+ * @param pid Pointer to store the process ID.
+ * @return Pointer to the pid argument.
+ */
 static sPid* get_pid(sPid* pid)
 {
   *pid = getpid();
@@ -609,6 +730,23 @@ static sPid* get_pid(sPid* pid)
   return pid;
 }
 
+/**
+ * @brief Formats the log message header for error logging.
+ *
+ * This function writes a formatted header string into the provided buffer.
+ * The header includes severity, program name, process ID, and timestamp.
+ * If running in interactive mode, only the severity character is written.
+ *
+ * @param severity The severity character (e.g., 'E' for error, 'W' for warning).
+ * @param s Pointer to the buffer where the header will be written.
+ * @return Pointer to the end of the written header string (for appending the log message).
+ *
+ * Example header format (non-interactive):
+ *   E programName   12345678 25-09-23 14:32:01.00
+ *
+ * Example header format (interactive):
+ *   E
+ */
 static char* get_header(char severity, char* s)
 {
   sPid pid;
@@ -641,8 +779,23 @@ static char* get_header(char severity, char* s)
   return s;
 }
 
-/* Format a string and write it to log devices.  */
-
+/**
+ * @brief Formats and logs a message with severity, optional log structure, and variable arguments.
+ *
+ * This function builds a log message header (including severity, program name, PID, timestamp),
+ * formats the message using the provided format string and arguments, and sends it to the error log system.
+ * If interactive mode is enabled, the message is printed to stdout instead of being sent to the log queue.
+ * If a log structure pointer (lp) is provided and lp->send is true, the message is also sent to a custom log
+ * queue.
+ *
+ * @param lp       Optional pointer to a log structure (errh_sLog) for custom logging. Can be NULL.
+ * @param severity Severity character ('E' for error, 'W' for warning, etc.).
+ * @param msg      Format string for the log message (like printf).
+ * @param ap       Variable argument list for formatting the message.
+ *
+ * Example usage:
+ *   log_message(NULL, 'E', "Error: %s", args);
+ */
 static void log_message(errh_sLog* lp, char severity, const char* msg, va_list ap)
 {
   char* s;
