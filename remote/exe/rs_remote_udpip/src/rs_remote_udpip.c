@@ -322,7 +322,7 @@ short int Receive()
     {
       /* Weird header */
       rn_udp->ErrCount++;
-      errh_Info("UDP receive weird header %s, %02x %02x %04x %04x %04x", rn_udp->RemoteHostname,
+      errh_Info("UDP receive weird header %s (wrong size?), %02x %02x %04x %04x %04x", rn_udp->RemoteHostname,
                 header.protocol_id[0], header.protocol_id[1], header.msg_size, header.msg_id[0],
                 header.msg_id[1]);
     }
