@@ -66,6 +66,8 @@
 #include "rt_pwr_msg.h"
 
 #define UNKNOWN_PROGRAM_NAME "Unknown name   "
+#define ERRH_MAX_ANIX 40
+#define ERRH_MAX_ANIX_NAME_LEN 32
 
 typedef void* aa_list[];
 #define aa_arg(ap, vap, type) (ap ? ((type) * ap++) : va_arg(vap, type))
@@ -124,7 +126,7 @@ static unsigned int do_div(int*, unsigned int);
 static int skip_atoi(const char**);
 static char* number(char*, int, int, int, int, int);
 
-static char anix_name[40][32] = {
+static char anix_name[ERRH_MAX_ANIX][ERRH_MAX_ANIX_NAME_LEN] = {
     "rt_init",
     "rt_qmon",
     "rt_neth",
@@ -168,7 +170,7 @@ static char anix_name[40][32] = {
  */
 void errh_AnixName(errh_eAnix anix, char* name)
 {
-  if (anix > 0 && anix <= 40)
+  if (anix > 0 && anix <= ERRH_MAX_ANIX)
     strcpy(name, anix_name[anix - 1]);
   else
     strcpy(name, "");
