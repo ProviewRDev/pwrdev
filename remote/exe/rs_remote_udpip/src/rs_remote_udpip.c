@@ -84,7 +84,7 @@
 #define ETB 15
 #define ENQ 5
 #define ACK 6
-#define UDP_MAX_SIZE 32768
+#define UDP_MAX_SIZE 65507
 #define TIME_INCR 0.02
 
 fd_set fds; /* For select call */

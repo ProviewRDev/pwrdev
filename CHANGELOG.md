@@ -54,6 +54,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - PROFINET: The configurator will now do a sanity check on the modules configured for the DAP and remove submodules not in the submodules list for the DAP
   - This could happen during an upgrade when inconsistency in the GSDML files used as source would imply that a submodule should exists. This is due to the way things were implemented in the old configurator using simple indexes to map DAPs.
 - Threads checking in on CycleSup objects will now tell you which CycleSup object triggered the EmergencyBreak.
+- UDP (rs_remote_udpip) have had it's buffer increased to 65507 bytes. But do try to keep UDP packets small.
 
 ### Removed
 
