@@ -124,6 +124,7 @@ public:
   virtual pwr_tTime get_timestamp() const = 0;
   virtual std::string get_hostname() const = 0;
   virtual std::string get_app_name() const = 0;
+  virtual std::string get_proc_id() const = 0;
   virtual std::string get_message() const = 0;
 };
 
@@ -156,6 +157,7 @@ public:
   pwr_tTime get_timestamp() const override { return timestamp; }
   std::string get_hostname() const override { return hostname; }
   std::string get_app_name() const override { return app_name; }
+  std::string get_proc_id() const override { return proc_id; }
   std::string get_message() const override { return message; }
 
   // RFC5424 specific methods
@@ -203,6 +205,7 @@ public:
   pwr_tTime get_timestamp() const override { return timestamp; }
   std::string get_hostname() const override { return hostname; }
   std::string get_app_name() const override { return program_name; }
+  std::string get_proc_id() const override { return std::to_string(pid); }
   std::string get_message() const override { return message_text; }
 
 private:

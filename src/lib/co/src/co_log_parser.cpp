@@ -40,6 +40,8 @@
 #include <iomanip>
 
 #include "co_log_parser.h"
+#include "co_time.h"
+#include "pwr.h"
 
 std::unique_ptr<LogMessage> LogMessage::create_message(const std::string& line)
 {
@@ -706,41 +708,36 @@ bool PwrLogMessage::parse_pid(const std::string& line, size_t& pos)
 bool PwrLogMessage::parse_timestamp(const std::string& line, size_t& pos)
 {
   // Parse: "25-09-23 14:32:01.00"
-  if (pos + 17 > line.length())
+  if (pos + 20 > line.length())
     return false;
 
-  std::string timestamp_str = line.substr(pos, 17);
-  pos += 17;
+  std::string timestamp_str = line.substr(pos, 20);
+  pos += 20;
 
   // Simple parsing: YY-MM-DD HH:MM:SS.CC
-  if (timestamp_str.length() != 17 || timestamp_str[2] != '-' || timestamp_str[5] != '-' ||
+  if (timestamp_str.length() != 20 || timestamp_str[2] != '-' || timestamp_str[5] != '-' ||
       timestamp_str[8] != ' ' || timestamp_str[11] != ':' || timestamp_str[14] != ':' ||
-      timestamp_str[16] != '.')
+      timestamp_str[17] != '.')
   {
     return false;
   }
 
   try
   {
+    // Convert YY-MM-DD to YYYY-MM-DD format for time_FormAsciiToA
     int year = std::stoi(timestamp_str.substr(0, 2)) + 2000;
-    int month = std::stoi(timestamp_str.substr(3, 2));
-    int day = std::stoi(timestamp_str.substr(6, 2));
-    int hour = std::stoi(timestamp_str.substr(9, 2));
-    int minute = std::stoi(timestamp_str.substr(12, 2));
-    int second = std::stoi(timestamp_str.substr(15, 2));
-    int centisec = std::stoi(timestamp_str.substr(17, 2));
+    std::string full_timestamp = "20" + timestamp_str; // Convert YY to 20YY
 
-    struct tm tm_time = {0};
-    tm_time.tm_year = year - 1900;
-    tm_time.tm_mon = month - 1;
-    tm_time.tm_mday = day;
-    tm_time.tm_hour = hour;
-    tm_time.tm_min = minute;
-    tm_time.tm_sec = second;
+    // Replace the first two digits with full year
+    full_timestamp = std::to_string(year) + timestamp_str.substr(2);
 
-    time_t unix_time = mktime(&tm_time);
-    timestamp.tv_sec = unix_time;
-    timestamp.tv_nsec = centisec * 10000000; // Convert centiseconds to nanoseconds
+    // Use ProviewR time function to handle timezone correctly (like original code)
+    pwr_tStatus sts = time_FormAsciiToA(full_timestamp.c_str(), HUNDRED, GB, &timestamp);
+
+    if (EVEN(sts))
+    {
+      return false;
+    }
 
     skip_whitespace(line, pos);
     return true;
