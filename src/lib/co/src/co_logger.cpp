@@ -122,10 +122,10 @@ void CoLogger::loggingThreadFunc()
           {CoLogLevel::WARNING, "WARNING"},     {CoLogLevel::NOTICE, "NOTICE"},
           {CoLogLevel::INFO, "INFO"},           {CoLogLevel::DEBUG, "DEBUG"}};
 
-      // Write log entry to file
-      m_logfile << '<' << pri << '>' << std::put_time(&local_tm, "%Y-%m-%dT%H:%M:%S") << '.' << std::setw(3)
-                << std::setfill('0') << ms << tz_buf << ' ' << hostname << ' ' << entry.module_name << ' '
-                << getpid() << " - "
+      // Write log entry to file in RFC5424 format
+      m_logfile << '<' << pri << '>' << RFC5424_VERSION << ' '
+                << std::put_time(&local_tm, "%Y-%m-%dT%H:%M:%S") << '.' << std::setw(3) << std::setfill('0')
+                << ms << tz_buf << ' ' << hostname << ' ' << entry.module_name << ' ' << getpid() << " - "
                 << "[" << entry.structured_prefix << " log_type=\"" << entry.type << "\" log_subtype=\""
                 << entry.subtype << "\"] " << level_names.at(entry.level) << " " << entry.message
                 << std::endl;

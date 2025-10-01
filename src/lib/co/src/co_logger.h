@@ -47,6 +47,24 @@ enum class CoLogFacility : int
   Local7 = 23  ///< Development/testing/debugging
 };
 
+/**
+ * @brief RFC5424 protocol version constant.
+ *
+ * RFC5424 specifies that the VERSION field should be "1" for compliant messages.
+ */
+constexpr int RFC5424_VERSION = 1;
+
+/**
+ * @class CoLogger
+ * @brief Thread-safe RFC5424 compliant logger for ProviewR.
+ *
+ * Provides asynchronous logging with RFC5424 syslog format:
+ * <PRI>VERSION TIMESTAMP HOSTNAME APP-NAME PROCID MSGID STRUCTURED-DATA MSG
+ *
+ * Example output:
+ * <134>1 2023-10-01T12:34:56.123+0200 myhost myapp 12345 - [type="process" subtype="proviewr"] INFO Hello
+ * World
+ */
 class CoLogger
 {
 public:

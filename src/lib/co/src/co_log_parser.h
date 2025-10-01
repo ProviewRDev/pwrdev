@@ -45,6 +45,13 @@
 #include "co_time.h"
 #include "co_log_severity.h"
 
+/**
+ * @brief RFC5424 protocol version constant.
+ *
+ * RFC5424 specifies that the VERSION field should be "1" for compliant messages.
+ */
+constexpr int RFC5424_VERSION = 1;
+
 enum class LogFormat
 {
   RFC5424,
@@ -128,6 +135,7 @@ public:
   ~RFC5424Message() override = default;
 
   int priority;         // PRI part
+  int version;          // VERSION (should be 1 for RFC5424)
   pwr_tTime timestamp;  // TIMESTAMP
   std::string hostname; // HOSTNAME
   std::string app_name; // APP-NAME
@@ -158,6 +166,7 @@ private:
 
   // Internal parsing helpers
   bool parse_priority(const std::string& line, size_t& pos);
+  bool parse_version(const std::string& line, size_t& pos);
   bool parse_timestamp(const std::string& line, size_t& pos);
   bool parse_hostname(const std::string& line, size_t& pos);
   bool parse_app_name(const std::string& line, size_t& pos);

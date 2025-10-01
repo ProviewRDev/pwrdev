@@ -69,15 +69,9 @@ LogFormat LogParser::detect_format(const std::string& line)
   if (line.empty())
     return LogFormat::UNKNOWN;
 
-  // RFC5424 format detection: starts with <priority>
-  if (line[0] == '<')
-  {
-    size_t pos = 1;
-    while (pos < line.length() && std::isdigit(line[pos]))
-      pos++;
-    if (pos > 1 && pos < line.length() && line[pos] == '>')
-      return LogFormat::RFC5424;
-  }
+  // RFC5424 format detection: use the dedicated function
+  if (RFC5424Parser::is_rfc5424_format(line))
+    return LogFormat::RFC5424;
 
   // PWR log format detection: severity character followed by space and program name
   if (line.length() > 2 &&
@@ -109,7 +103,10 @@ std::unique_ptr<LogParser> LogParser::create_parser(const std::string& line)
 // RFC5424Message Implementation
 // ============================================================================
 
-RFC5424Message::RFC5424Message() : priority(0), valid_(false) { time_GetTime(&timestamp); }
+RFC5424Message::RFC5424Message() : priority(0), version(RFC5424_VERSION), valid_(false)
+{
+  time_GetTime(&timestamp);
+}
 
 RFC5424Facility RFC5424Message::facility() const { return static_cast<RFC5424Facility>(priority >> 3); }
 
@@ -126,6 +123,8 @@ bool RFC5424Message::parse_from_string(const std::string& line)
   valid_ = false;
 
   if (!parse_priority(line, pos))
+    return false;
+  if (!parse_version(line, pos))
     return false;
   if (!parse_timestamp(line, pos))
     return false;
@@ -158,6 +157,24 @@ bool RFC5424Message::parse_priority(const std::string& line, size_t& pos)
     priority = std::stoi(line.substr(pos + 1, end - pos - 1));
     pos = end + 1;
     return priority >= 0 && priority <= 191;
+  }
+  catch (...)
+  {
+    return false;
+  }
+}
+
+bool RFC5424Message::parse_version(const std::string& line, size_t& pos)
+{
+  auto version_field = parse_field(line, pos);
+  if (!version_field)
+    return false;
+
+  try
+  {
+    version = std::stoi(*version_field);
+    // RFC5424 specifies version should be RFC5424_VERSION
+    return version == RFC5424_VERSION;
   }
   catch (...)
   {
@@ -401,7 +418,7 @@ std::string RFC5424Message::get_structured_data_param(const std::string& element
 std::string RFC5424Message::to_string() const
 {
   std::ostringstream oss;
-  oss << "<" << priority << ">";
+  oss << "<" << priority << ">" << version << " ";
 
   if (!structured_data.empty())
   {
@@ -446,11 +463,22 @@ bool RFC5424Parser::is_rfc5424_format(const std::string& line)
   if (line.empty() || line[0] != '<')
     return false;
 
+  // Find the end of priority
   size_t pos = 1;
   while (pos < line.length() && std::isdigit(line[pos]))
     pos++;
 
-  return pos > 1 && pos < line.length() && line[pos] == '>';
+  if (pos <= 1 || pos >= line.length() || line[pos] != '>')
+    return false;
+
+  pos++; // Skip '>'
+
+  // Check for version field (should be RFC5424_VERSION followed by space)
+  if (pos >= line.length() || line[pos] != ('0' + RFC5424_VERSION))
+    return false;
+  pos++;
+
+  return pos < line.length() && line[pos] == ' ';
 }
 
 std::string RFC5424Parser::facility_to_string(RFC5424Facility facility)
