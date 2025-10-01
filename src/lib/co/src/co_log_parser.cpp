@@ -358,9 +358,9 @@ void RFC5424Message::skip_whitespace(const std::string& line, size_t& pos)
 
 bool RFC5424Message::parse_rfc3339_timestamp(const std::string& timestamp_str)
 {
-  // Simple RFC3339 parsing
+  // RFC3339 parsing with support for Z and timezone offsets
   std::regex rfc3339_regex(
-      R"((\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d+))?(?:Z|[+-]\d{2}:\d{2}))");
+      R"((\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d+))?(Z|[+-](\d{2}):(\d{2})))");
 
   std::smatch matches;
   if (!std::regex_match(timestamp_str, matches, rfc3339_regex))
@@ -377,7 +377,41 @@ bool RFC5424Message::parse_rfc3339_timestamp(const std::string& timestamp_str)
     int minute = std::stoi(matches[5]);
     int second = std::stoi(matches[6]);
 
-    // Convert to ProviewR time format
+    // Handle fractional seconds (group 7 if present)
+    long nanoseconds = 0;
+    if (matches[7].matched)
+    {
+      std::string frac_str = matches[7].str();
+      long frac = std::stol(frac_str);
+      // Convert to nanoseconds based on number of digits
+      int digits = frac_str.length();
+      for (int i = digits; i < 9; i++)
+      {
+        frac *= 10;
+      }
+      for (int i = digits; i > 9; i--)
+      {
+        frac /= 10;
+      }
+      nanoseconds = frac;
+    }
+
+    // Parse timezone (group 8)
+    std::string tz = matches[8].str();
+    int tz_offset_seconds = 0;
+    if (tz != "Z")
+    {
+      // Parse timezone offset like "+02:00" or "-05:00"
+      int tz_hours = std::stoi(matches[9].str());
+      int tz_minutes = std::stoi(matches[10].str());
+      tz_offset_seconds = (tz_hours * 3600) + (tz_minutes * 60);
+      if (tz[0] == '-')
+      {
+        tz_offset_seconds = -tz_offset_seconds;
+      }
+    }
+
+    // Convert to UTC time
     struct tm tm_time = {0};
     tm_time.tm_year = year - 1900;
     tm_time.tm_mon = month - 1;
@@ -386,9 +420,23 @@ bool RFC5424Message::parse_rfc3339_timestamp(const std::string& timestamp_str)
     tm_time.tm_min = minute;
     tm_time.tm_sec = second;
 
+// Use timegm to get UTC time (or mktime and adjust)
+#ifdef __USE_MISC
+    time_t unix_time = timegm(&tm_time);
+#else
+    // Fallback: use mktime and adjust for timezone
     time_t unix_time = mktime(&tm_time);
+    // mktime assumes local time, so we need to adjust
+    struct tm utc_tm;
+    gmtime_r(&unix_time, &utc_tm);
+    unix_time = mktime(&utc_tm);
+#endif
+
+    // Apply timezone offset (subtract because we want UTC)
+    unix_time -= tz_offset_seconds;
+
     timestamp.tv_sec = unix_time;
-    timestamp.tv_nsec = 0;
+    timestamp.tv_nsec = nanoseconds;
 
     return true;
   }
