@@ -39,6 +39,7 @@
 
 #include "rt_qcom.h"
 #include "rt_errl.h"
+#include "co_log_severity.h"
 
 #if defined __cplusplus
 extern "C"
@@ -75,17 +76,17 @@ extern "C"
 #define errh_SeverityFatal(sts) (((sts) & 7) == 4)
 
   /**
-   * Severity enumeration
+   * Severity enumeration - now using common ProviewR severity
    */
-  typedef enum
-  {
-    errh_eSeverity_Null,
-    errh_eSeverity_Success,
-    errh_eSeverity_Info,
-    errh_eSeverity_Warning,
-    errh_eSeverity_Error,
-    errh_eSeverity_Fatal
-  } errh_eSeverity;
+  typedef pwr_eSeverity errh_eSeverity;
+
+/* Compatibility definitions for existing code */
+#define errh_eSeverity_Null pwr_eSeverity_Null
+#define errh_eSeverity_Success pwr_eSeverity_Success
+#define errh_eSeverity_Info pwr_eSeverity_Info
+#define errh_eSeverity_Warning pwr_eSeverity_Warning
+#define errh_eSeverity_Error pwr_eSeverity_Error
+#define errh_eSeverity_Fatal pwr_eSeverity_Fatal
 
 #define errh_cAnix_SrvSize 40
 #define errh_cAnix_PlcSize 20
