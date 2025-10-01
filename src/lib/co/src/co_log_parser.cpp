@@ -358,9 +358,9 @@ void RFC5424Message::skip_whitespace(const std::string& line, size_t& pos)
 
 bool RFC5424Message::parse_rfc3339_timestamp(const std::string& timestamp_str)
 {
-  // RFC3339 parsing with support for Z and timezone offsets
+  // RFC3339 parsing with support for Z and timezone offsets (both +02:00 and +0200 formats)
   std::regex rfc3339_regex(
-      R"((\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d+))?(Z|[+-](\d{2}):(\d{2})))");
+      R"((\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d+))?(Z|[+-](\d{2})(?::?(\d{2}))))");
 
   std::smatch matches;
   if (!std::regex_match(timestamp_str, matches, rfc3339_regex))
