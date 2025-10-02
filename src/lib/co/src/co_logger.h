@@ -174,8 +174,6 @@ private:
   explicit CoLogger(const std::string& module_name);
 
   std::ofstream m_logfile;
-  mqd_t m_mqueue;
-  bool m_use_mqueue;
   std::mutex m_mutex;
   std::string m_module_name;
   CoLogLevel m_log_level;
@@ -184,6 +182,8 @@ private:
   std::string m_subtype;
   std::string m_structured_prefix =
       "ot-standard"; // SSAB Oxelösund Operational Technology standard, can be changed
+  mqd_t m_mqueue;
+  bool m_use_mqueue;
 
   struct LogEntry
   {

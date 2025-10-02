@@ -23,12 +23,12 @@ CoLogger::CoLogger(const std::string& module_name)
     // Set up message queue attributes
     struct mq_attr attr;
     attr.mq_flags = 0;
-    attr.mq_maxmsg = 10;    // Maximum number of messages
+    attr.mq_maxmsg = 100;   // Maximum number of messages
     attr.mq_msgsize = 8192; // Maximum message size (8KB for log messages)
     attr.mq_curmsgs = 0;
 
-    // Create or open message queue
-    m_mqueue = mq_open(module_name.c_str(), O_CREAT | O_WRONLY, 0644, &attr);
+    // Create and/or open message queue
+    m_mqueue = mq_open(module_name.c_str(), O_CREAT | O_WRONLY, 0664, &attr);
     if (m_mqueue == (mqd_t)-1)
     {
       // Fallback to file logging if mqueue fails
