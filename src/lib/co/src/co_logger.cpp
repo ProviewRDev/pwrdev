@@ -1,26 +1,57 @@
 #include <chrono>
 #include <ctime>
 #include <iomanip>
+#include <sstream>
 #include <unistd.h>
 #include <sys/types.h>
+#include <mqueue.h>
+#include <fcntl.h>
+#include <cerrno>
+#include <cstring>
 
 #include "co_logger.h"
 
 CoLogger::CoLogger(const std::string& module_name)
     : m_module_name(module_name), m_log_level(CoLogLevel::INFO), m_facility(CoLogFacility::Local0),
-      m_type("process"), m_subtype("proviewr")
+      m_type("process"), m_subtype("proviewr"), m_mqueue(-1), m_use_mqueue(false)
 {
-  const char* logdir = std::getenv("pwrp_log");
-  std::string filepath;
-  if (logdir && logdir[0] != '\0')
+  // Check if module name starts with '/' to use POSIX message queue
+  if (!module_name.empty() && module_name[0] == '/')
   {
-    filepath = std::string(logdir) + "/" + m_module_name + ".log";
+    m_use_mqueue = true;
+
+    // Set up message queue attributes
+    struct mq_attr attr;
+    attr.mq_flags = 0;
+    attr.mq_maxmsg = 10;    // Maximum number of messages
+    attr.mq_msgsize = 8192; // Maximum message size (8KB for log messages)
+    attr.mq_curmsgs = 0;
+
+    // Create or open message queue
+    m_mqueue = mq_open(module_name.c_str(), O_CREAT | O_WRONLY, 0644, &attr);
+    if (m_mqueue == (mqd_t)-1)
+    {
+      // Fallback to file logging if mqueue fails
+      m_use_mqueue = false;
+      // Log error but continue with file logging
+    }
   }
-  else
+
+  if (!m_use_mqueue)
   {
-    filepath = m_module_name + ".log";
+    // Traditional file logging
+    const char* logdir = std::getenv("pwrp_log");
+    std::string filepath;
+    if (logdir && logdir[0] != '\0')
+    {
+      filepath = std::string(logdir) + "/" + m_module_name + ".log";
+    }
+    else
+    {
+      filepath = m_module_name + ".log";
+    }
+    m_logfile.open(filepath, std::ios::app);
   }
-  m_logfile.open(filepath, std::ios::app);
 
   m_stop_thread = false;
   m_logging_thread = std::thread(&CoLogger::loggingThreadFunc, this);
@@ -48,8 +79,14 @@ CoLogger::~CoLogger()
   if (m_logging_thread.joinable())
     m_logging_thread.join();
 
-  if (m_logfile.is_open())
+  if (m_use_mqueue && m_mqueue != (mqd_t)-1)
+  {
+    mq_close(m_mqueue);
+  }
+  else if (m_logfile.is_open())
+  {
     m_logfile.close();
+  }
 }
 
 void CoLogger::log(const std::string& message, CoLogLevel level, CoLogFacility facility)
@@ -122,13 +159,30 @@ void CoLogger::loggingThreadFunc()
           {CoLogLevel::WARNING, "WARNING"},     {CoLogLevel::NOTICE, "NOTICE"},
           {CoLogLevel::INFO, "INFO"},           {CoLogLevel::DEBUG, "DEBUG"}};
 
-      // Write log entry to file in RFC5424 format
-      m_logfile << '<' << pri << '>' << RFC5424_VERSION << ' '
-                << std::put_time(&local_tm, "%Y-%m-%dT%H:%M:%S") << '.' << std::setw(3) << std::setfill('0')
-                << ms << tz_buf << ' ' << hostname << ' ' << entry.module_name << ' ' << getpid() << " - "
-                << "[" << entry.structured_prefix << " log_type=\"" << entry.type << "\" log_subtype=\""
-                << entry.subtype << "\"] " << level_names.at(entry.level) << " " << entry.message
-                << std::endl;
+      // Format RFC5424 log message
+      std::ostringstream log_stream;
+      log_stream << '<' << pri << '>' << RFC5424_VERSION << ' '
+                 << std::put_time(&local_tm, "%Y-%m-%dT%H:%M:%S") << '.' << std::setw(3) << std::setfill('0')
+                 << ms << tz_buf << ' ' << hostname << ' ' << entry.module_name << ' ' << getpid() << " - "
+                 << "[" << entry.structured_prefix << " log_type=\"" << entry.type << "\" log_subtype=\""
+                 << entry.subtype << "\"] " << level_names.at(entry.level) << " " << entry.message;
+
+      std::string formatted_message = log_stream.str();
+
+      if (m_use_mqueue && m_mqueue != (mqd_t)-1)
+      {
+        // Write to POSIX message queue
+        if (mq_send(m_mqueue, formatted_message.c_str(), formatted_message.length(), 0) == -1)
+        {
+          // If message queue send fails, could fallback to stderr or ignore
+          // For now, silently ignore the error to avoid blocking
+        }
+      }
+      else
+      {
+        // Write to file
+        m_logfile << formatted_message << std::endl;
+      }
       lock.lock();
     }
   }

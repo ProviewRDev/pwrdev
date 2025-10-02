@@ -10,6 +10,7 @@
 #include <thread>
 #include <condition_variable>
 #include <atomic>
+#include <mqueue.h>
 
 /**
  * @enum CoLogLevel
@@ -61,9 +62,16 @@ constexpr int RFC5424_VERSION = 1;
  * Provides asynchronous logging with RFC5424 syslog format:
  * <PRI>VERSION TIMESTAMP HOSTNAME APP-NAME PROCID MSGID STRUCTURED-DATA MSG
  *
+ * Supports two output modes:
+ * 1. File logging: When module_name doesn't start with '/', logs to files in pwrp_log directory
+ * 2. POSIX Message Queue: When module_name starts with '/', logs to POSIX message queue
+ *
  * Example output:
  * <134>1 2023-10-01T12:34:56.123+0200 myhost myapp 12345 - [type="process" subtype="proviewr"] INFO Hello
  * World
+ *
+ * Message Queue Usage:
+ * CoLogger::instance("/my_queue").log("Test message");
  */
 class CoLogger
 {
@@ -73,7 +81,8 @@ public:
    *
    * Returns a reference to a logger for the given module name. Each module gets its own logger instance.
    * Thread-safe.
-   * @param module_name Name of the module (used for log file naming).
+   * @param module_name Name of the module (used for log file naming, or POSIX mqueue name if prefixed with
+   * '/').
    * @return Reference to the logger instance for the module.
    */
   static CoLogger& instance(const std::string& module_name);
@@ -159,12 +168,14 @@ private:
   /**
    * @brief Constructor for CoLogger.
    *
-   * Opens the log file and starts the logging thread.
-   * @param module_name Name of the module (used for log file naming).
+   * Opens the log file or message queue and starts the logging thread.
+   * @param module_name Name of the module (used for log file naming or mqueue name if prefixed with '/').
    */
   explicit CoLogger(const std::string& module_name);
 
   std::ofstream m_logfile;
+  mqd_t m_mqueue;
+  bool m_use_mqueue;
   std::mutex m_mutex;
   std::string m_module_name;
   CoLogLevel m_log_level;
