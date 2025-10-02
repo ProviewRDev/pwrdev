@@ -435,21 +435,7 @@ void CLogNav::draw()
 {
   ItemMsgBase* item;
   brow_tNode dest = 0;
-  brow_tObject last_visible_before = 0;
-  bool was_at_bottom = false;
-
-  // Check if we're currently at the bottom before filtering
-  brow_tObject last_object;
-  int sts = brow_GetLast(brow->ctx, &last_object);
-  if (ODD(sts))
-  {
-    was_at_bottom = brow_IsVisible(brow->ctx, last_object, flow_eVisible_Partial);
-    if (!was_at_bottom)
-    {
-      // Store the last visible item for repositioning
-      brow_GetLastVisible(brow->ctx, &last_visible_before);
-    }
-  }
+  brow_tNode selected_node = 0;
 
   brow_SetNodraw(brow->ctx);
   brow_DeleteAll(brow->ctx);
@@ -507,29 +493,12 @@ void CLogNav::draw()
 
   brow_ResetNodraw(brow->ctx);
 
-  // Handle viewport positioning after filtering
+  // Simple viewport positioning: center on last (newest) object
   if (dest != 0)
-  { // Only if we have content to display
-    if (was_at_bottom)
-    {
-      // User was at bottom - keep them at the new bottom
-      brow_CenterObject(brow->ctx, dest, 0.9); // Position last item near bottom
-    }
-    else if (last_visible_before != 0)
-    {
-      // Try to maintain relative position by finding similar content
-      // If the previously visible item is still there, center on it
-      flow_eObjectType obj_type = brow_GetObjectType(last_visible_before);
-      if (obj_type != flow_eObjectType_NoObject)
-      {
-        brow_CenterObject(brow->ctx, last_visible_before, 0.5);
-      }
-      else
-      {
-        // Previously visible item was filtered out, center on last available
-        brow_CenterObject(brow->ctx, dest, 0.5);
-      }
-    }
+  {
+    // Only if we have content to display
+    // Simply center on the last (newest) object
+    brow_CenterObject(brow->ctx, dest, 0.9);
   }
 
   brow_Redraw(brow->ctx, 0);

@@ -41,6 +41,7 @@
 #include "pwr_baseclasses.h"
 
 #include "co_cdh.h"
+#include "co_log_severity.h"
 #include "co_string.h"
 #include "co_syi.h"
 #include "co_time.h"
@@ -63,9 +64,9 @@ static void destroy_event(GtkWidget* w, gpointer data) {}
 
 CLogGtk::CLogGtk(void* clog_parent_ctx, GtkWidget* clog_parent_wid, const char* clog_name,
                  pwr_tStatus* status)
-    : CLog(clog_parent_ctx, clog_name, status), parent_wid(clog_parent_wid), filter_form(0), clock_cursor(0)
+    : CLog(clog_parent_ctx, clog_name, status), parent_wid(clog_parent_wid), clock_cursor(0)
 {
-  toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", 800, "default-width", 1000, "title",
+  toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", 800, "default-width", 1200, "title",
                                       CoWowGtk::translate_utf8(clog_name), NULL);
 
   g_signal_connect(toplevel, "delete_event", G_CALLBACK(delete_event), this);
@@ -84,8 +85,6 @@ CLogGtk::CLogGtk(void* clog_parent_ctx, GtkWidget* clog_parent_wid, const char* 
   GtkMenuBar* menu_bar = (GtkMenuBar*)g_object_new(GTK_TYPE_MENU_BAR, NULL);
 
   // File entry
-  GtkWidget* file_filter = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Filter"));
-  g_signal_connect(file_filter, "activate", G_CALLBACK(activate_filter), this);
 
   GtkWidget* file_select_file = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Select File"));
   g_signal_connect(file_select_file, "activate", G_CALLBACK(activate_select_file), this);
@@ -113,7 +112,6 @@ CLogGtk::CLogGtk(void* clog_parent_ctx, GtkWidget* clog_parent_wid, const char* 
   gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
   GtkMenu* file_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
-  gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_filter);
   gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_select_file);
   gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_next_file);
   gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_prev_file);
@@ -164,9 +162,118 @@ CLogGtk::CLogGtk(void* clog_parent_ctx, GtkWidget* clog_parent_wid, const char* 
   gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), help);
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(help), GTK_WIDGET(help_menu));
 
+  // Create toolbar with filtering controls
+  toolbar = gtk_toolbar_new();
+  gtk_toolbar_set_style(GTK_TOOLBAR(toolbar), GTK_TOOLBAR_BOTH_HORIZ);
+  gtk_toolbar_set_icon_size(GTK_TOOLBAR(toolbar), GTK_ICON_SIZE_SMALL_TOOLBAR);
+
+  // Text Filter Section
+  GtkWidget* filter_label = gtk_label_new("Text Filter:");
+  gtk_widget_set_margin_start(filter_label, 8);
+  gtk_widget_set_margin_end(filter_label, 4);
+  GtkToolItem* label_item = gtk_tool_item_new();
+  gtk_container_add(GTK_CONTAINER(label_item), filter_label);
+  gtk_toolbar_insert(GTK_TOOLBAR(toolbar), label_item, -1);
+
+  filter_entry = gtk_entry_new();
+  gtk_entry_set_placeholder_text(GTK_ENTRY(filter_entry), "Search messages...");
+  gtk_widget_set_size_request(filter_entry, 250, 32);
+  gtk_widget_set_margin_end(filter_entry, 8);
+  g_signal_connect(filter_entry, "activate", G_CALLBACK(toolbar_filter_entry_activate), this);
+  GtkToolItem* entry_item = gtk_tool_item_new();
+  gtk_container_add(GTK_CONTAINER(entry_item), filter_entry);
+  gtk_toolbar_insert(GTK_TOOLBAR(toolbar), entry_item, -1);
+
+  // Checkboxes without separators or extra labels
+  success_toggle = gtk_check_button_new_with_label("Success");
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(success_toggle), TRUE);
+  gtk_widget_set_margin_start(success_toggle, 4);
+  gtk_widget_set_margin_end(success_toggle, 4);
+  GtkToolItem* success_item = gtk_tool_item_new();
+  gtk_container_add(GTK_CONTAINER(success_item), success_toggle);
+  gtk_toolbar_insert(GTK_TOOLBAR(toolbar), success_item, -1);
+
+  info_toggle = gtk_check_button_new_with_label("Info");
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(info_toggle), TRUE);
+  gtk_widget_set_margin_start(info_toggle, 4);
+  gtk_widget_set_margin_end(info_toggle, 4);
+  GtkToolItem* info_item = gtk_tool_item_new();
+  gtk_container_add(GTK_CONTAINER(info_item), info_toggle);
+  gtk_toolbar_insert(GTK_TOOLBAR(toolbar), info_item, -1);
+
+  warning_toggle = gtk_check_button_new_with_label("Warning");
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(warning_toggle), TRUE);
+  gtk_widget_set_margin_start(warning_toggle, 4);
+  gtk_widget_set_margin_end(warning_toggle, 4);
+  GtkToolItem* warning_item = gtk_tool_item_new();
+  gtk_container_add(GTK_CONTAINER(warning_item), warning_toggle);
+  gtk_toolbar_insert(GTK_TOOLBAR(toolbar), warning_item, -1);
+
+  error_toggle = gtk_check_button_new_with_label("Error");
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(error_toggle), TRUE);
+  gtk_widget_set_margin_start(error_toggle, 4);
+  gtk_widget_set_margin_end(error_toggle, 4);
+  GtkToolItem* error_item = gtk_tool_item_new();
+  gtk_container_add(GTK_CONTAINER(error_item), error_toggle);
+  gtk_toolbar_insert(GTK_TOOLBAR(toolbar), error_item, -1);
+
+  fatal_toggle = gtk_check_button_new_with_label("Fatal");
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fatal_toggle), TRUE);
+  gtk_widget_set_margin_start(fatal_toggle, 4);
+  gtk_widget_set_margin_end(fatal_toggle, 4);
+  GtkToolItem* fatal_item = gtk_tool_item_new();
+  gtk_container_add(GTK_CONTAINER(fatal_item), fatal_toggle);
+  gtk_toolbar_insert(GTK_TOOLBAR(toolbar), fatal_item, -1);
+
+  text_toggle = gtk_check_button_new_with_label("Text");
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(text_toggle), TRUE);
+  gtk_widget_set_margin_start(text_toggle, 4);
+  gtk_widget_set_margin_end(text_toggle, 4);
+  GtkToolItem* text_item = gtk_tool_item_new();
+  gtk_container_add(GTK_CONTAINER(text_item), text_toggle);
+  gtk_toolbar_insert(GTK_TOOLBAR(toolbar), text_item, -1);
+
+  // Clear button without separator
+  GtkWidget* clear_button = gtk_button_new_with_label("Clear All");
+  gtk_widget_set_size_request(clear_button, 80, 28);
+  gtk_widget_set_margin_start(clear_button, 12);
+  gtk_widget_set_margin_end(clear_button, 8);
+  g_signal_connect(clear_button, "clicked", G_CALLBACK(toolbar_clear_filter), this);
+
+  // Style the clear button to stand out
+  GtkStyleContext* clear_context = gtk_widget_get_style_context(clear_button);
+  gtk_style_context_add_class(clear_context, "destructive-action");
+
+  GtkToolItem* clear_item = gtk_tool_item_new();
+  gtk_container_add(GTK_CONTAINER(clear_item), clear_button);
+  gtk_toolbar_insert(GTK_TOOLBAR(toolbar), clear_item, -1); // Apply button
+  GtkWidget* apply_button = gtk_button_new_with_label("Apply Filter");
+  gtk_widget_set_size_request(apply_button, 100, 28);
+  gtk_widget_set_margin_start(apply_button, 8);
+  gtk_widget_set_margin_end(apply_button, 12);
+  g_signal_connect(apply_button, "clicked", G_CALLBACK(toolbar_apply_filter), this);
+
+  // Style the apply button as a primary action
+  GtkStyleContext* apply_context = gtk_widget_get_style_context(apply_button);
+  gtk_style_context_add_class(apply_context, "suggested-action");
+
+  GtkToolItem* apply_item = gtk_tool_item_new();
+  gtk_container_add(GTK_CONTAINER(apply_item), apply_button);
+  gtk_toolbar_insert(GTK_TOOLBAR(toolbar), apply_item, -1);
   clognav = new CLogNavGtk(this, vbox, &clognav_widget);
 
+  // Initialize toolbar with current filter settings
+  bool success, info, warning, error, fatal, text;
+  clognav->get_filter(&success, &info, &warning, &error, &fatal, &text);
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(success_toggle), success);
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(info_toggle), info);
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(warning_toggle), warning);
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(error_toggle), error);
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fatal_toggle), fatal);
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(text_toggle), text);
+
   gtk_box_pack_start(GTK_BOX(vbox), GTK_WIDGET(menu_bar), FALSE, FALSE, 0);
+  gtk_box_pack_start(GTK_BOX(vbox), toolbar, FALSE, FALSE, 0);
   gtk_box_pack_end(GTK_BOX(vbox), GTK_WIDGET(clognav_widget), TRUE, TRUE, 0);
 
   gtk_container_add(GTK_CONTAINER(toplevel), vbox);
@@ -184,8 +291,6 @@ CLogGtk::~CLogGtk()
 {
   free_cursor();
   delete clognav;
-  if (filter_form)
-    gtk_widget_destroy(filter_form);
   gtk_widget_destroy(toplevel);
 }
 
@@ -247,22 +352,6 @@ void CLogGtk::activate_zoom_reset(GtkWidget* w, gpointer data)
   CLog* clog = (CLog*)data;
 
   clog->clognav->unzoom();
-}
-
-void CLogGtk::activate_filter(GtkWidget* w, gpointer data)
-{
-  CLog* clog = (CLog*)data;
-  bool success, info, warning, error, fatal, text;
-
-  ((CLogGtk*)clog)->create_filter_dialog();
-
-  clog->clognav->get_filter(&success, &info, &warning, &error, &fatal, &text);
-  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(((CLogGtk*)clog)->show_success_w), success);
-  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(((CLogGtk*)clog)->show_info_w), info);
-  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(((CLogGtk*)clog)->show_warning_w), warning);
-  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(((CLogGtk*)clog)->show_error_w), error);
-  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(((CLogGtk*)clog)->show_fatal_w), fatal);
-  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(((CLogGtk*)clog)->show_text_w), text);
 }
 
 void CLogGtk::activate_select_file(GtkWidget* w, gpointer data)
@@ -355,116 +444,6 @@ void CLogGtk::activate_help(GtkWidget* w, gpointer data)
 
 void CLogGtk::activate_helpmsg(GtkWidget* w, gpointer data) {}
 
-void CLogGtk::filter_ok_cb(GtkWidget* w, gpointer data)
-{
-  CLog* clog = (CLog*)data;
-
-  filter_apply_cb(w, data);
-  g_object_set(((CLogGtk*)clog)->filter_form, "visible", FALSE, NULL);
-}
-
-void CLogGtk::filter_cancel_cb(GtkWidget* w, gpointer data)
-{
-  CLog* clog = (CLog*)data;
-
-  g_object_set(((CLogGtk*)clog)->filter_form, "visible", FALSE, NULL);
-}
-
-void CLogGtk::filter_apply_cb(GtkWidget* w, gpointer data)
-{
-  CLog* clog = (CLog*)data;
-  char* str;
-
-  bool success = (bool)gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(((CLogGtk*)clog)->show_success_w));
-  bool info = (bool)gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(((CLogGtk*)clog)->show_info_w));
-  bool warning = (bool)gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(((CLogGtk*)clog)->show_warning_w));
-  bool error = (bool)gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(((CLogGtk*)clog)->show_error_w));
-  bool fatal = (bool)gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(((CLogGtk*)clog)->show_fatal_w));
-  bool text = (bool)gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(((CLogGtk*)clog)->show_text_w));
-
-  str = gtk_editable_get_chars(GTK_EDITABLE(((CLogGtk*)clog)->filter_string_w), 0, -1);
-
-  clog->set_clock_cursor();
-  clog->clognav->set_filter(success, info, warning, error, fatal, text, str);
-  clog->reset_cursor();
-
-  g_free(str);
-}
-
-static gboolean filter_delete_event(GtkWidget* w, GdkEvent* event, gpointer clog)
-{
-  g_object_set(((CLogGtk*)clog)->filter_form, "visible", FALSE, NULL);
-  return TRUE;
-}
-
-void CLogGtk::create_filter_dialog()
-{
-  if (filter_form)
-  {
-    g_object_set(filter_form, "visible", TRUE, NULL);
-    return;
-  }
-
-  // Create the options dialog
-  filter_form = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", 300, "default-width", 450,
-                                         "title", "Filter Messages", NULL);
-  g_signal_connect(filter_form, "delete_event", G_CALLBACK(filter_delete_event), this);
-
-  GtkWidget* severity_label = gtk_label_new("Message Severity");
-  // gtk_misc_set_alignment(GTK_MISC(severity_label), 0.0, 0.05);
-  gtk_widget_set_size_request(severity_label, 140, -1);
-  GtkWidget* string_label = gtk_label_new("String");
-  // gtk_misc_set_alignment(GTK_MISC(string_label), 0.0, 0.5);
-  gtk_widget_set_size_request(string_label, 140, -1);
-  filter_string_w = gtk_entry_new();
-
-  show_success_w = gtk_check_button_new_with_label("Success");
-  show_info_w = gtk_check_button_new_with_label("Info");
-  show_warning_w = gtk_check_button_new_with_label("Warning");
-  show_error_w = gtk_check_button_new_with_label("Error");
-  show_fatal_w = gtk_check_button_new_with_label("Fatal");
-  show_text_w = gtk_check_button_new_with_label("Text");
-
-  GtkWidget* severity_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-  gtk_box_pack_start(GTK_BOX(severity_vbox), show_success_w, FALSE, FALSE, 7);
-  gtk_box_pack_start(GTK_BOX(severity_vbox), show_info_w, FALSE, FALSE, 7);
-  gtk_box_pack_start(GTK_BOX(severity_vbox), show_warning_w, FALSE, FALSE, 7);
-  gtk_box_pack_start(GTK_BOX(severity_vbox), show_error_w, FALSE, FALSE, 7);
-  gtk_box_pack_start(GTK_BOX(severity_vbox), show_fatal_w, FALSE, FALSE, 7);
-  gtk_box_pack_start(GTK_BOX(severity_vbox), show_text_w, FALSE, FALSE, 7);
-
-  GtkWidget* severity_hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-  gtk_box_pack_start(GTK_BOX(severity_hbox), severity_label, FALSE, FALSE, 7);
-  gtk_box_pack_start(GTK_BOX(severity_hbox), severity_vbox, FALSE, FALSE, 7);
-
-  GtkWidget* string_hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-  gtk_box_pack_start(GTK_BOX(string_hbox), string_label, FALSE, FALSE, 7);
-  gtk_box_pack_start(GTK_BOX(string_hbox), filter_string_w, TRUE, TRUE, 7);
-
-  GtkWidget* filter_ok = gtk_button_new_with_label("Ok");
-  gtk_widget_set_size_request(filter_ok, 70, 25);
-  g_signal_connect(filter_ok, "clicked", G_CALLBACK(filter_ok_cb), this);
-  GtkWidget* filter_apply = gtk_button_new_with_label("Apply");
-  gtk_widget_set_size_request(filter_apply, 70, 25);
-  g_signal_connect(filter_apply, "clicked", G_CALLBACK(filter_apply_cb), this);
-  GtkWidget* filter_cancel = gtk_button_new_with_label("Cancel");
-  gtk_widget_set_size_request(filter_cancel, 70, 25);
-  g_signal_connect(filter_cancel, "clicked", G_CALLBACK(filter_cancel_cb), this);
-
-  GtkWidget* filter_hboxbuttons = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 40);
-  gtk_box_pack_start(GTK_BOX(filter_hboxbuttons), filter_ok, FALSE, FALSE, 0);
-  gtk_box_pack_start(GTK_BOX(filter_hboxbuttons), filter_apply, FALSE, FALSE, 0);
-  gtk_box_pack_end(GTK_BOX(filter_hboxbuttons), filter_cancel, FALSE, FALSE, 0);
-
-  GtkWidget* filter_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-  gtk_box_pack_start(GTK_BOX(filter_vbox), severity_hbox, FALSE, FALSE, 15);
-  gtk_box_pack_start(GTK_BOX(filter_vbox), string_hbox, TRUE, TRUE, 15);
-  gtk_box_pack_start(GTK_BOX(filter_vbox), gtk_separator_new(GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 0);
-  gtk_box_pack_end(GTK_BOX(filter_vbox), filter_hboxbuttons, FALSE, FALSE, 15);
-  gtk_container_add(GTK_CONTAINER(filter_form), filter_vbox);
-  gtk_widget_show_all(filter_form);
-}
-
 void CLogGtk::print()
 {
   char nodename[80];
@@ -482,4 +461,50 @@ void CLogGtk::print()
   wow->CreateBrowPrintDialog(title, clognav->brow->ctx, flow_eOrientation_Landscape, 1.0, parent_wid, &sts);
   if (sts == WOW__PRINTDIALOGDISABLED)
     wow->DisplayError("Disabled", "Print Dialog is disabled");
+}
+
+void CLogGtk::toolbar_apply_filter(GtkWidget* w, gpointer data)
+{
+  CLogGtk* clog = (CLogGtk*)data;
+
+  // Get filter text
+  const char* filter_text = gtk_entry_get_text(GTK_ENTRY(clog->filter_entry));
+
+  // Get severity filter settings from toolbar toggles
+  bool success = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(clog->success_toggle));
+  bool info = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(clog->info_toggle));
+  bool warning = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(clog->warning_toggle));
+  bool error = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(clog->error_toggle));
+  bool fatal = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(clog->fatal_toggle));
+  bool text = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(clog->text_toggle));
+
+  // Apply filter using existing CLogNav method
+  clog->set_clock_cursor();
+  clog->clognav->set_filter(success, info, warning, error, fatal, text, filter_text);
+  clog->reset_cursor();
+}
+void CLogGtk::toolbar_clear_filter(GtkWidget* w, gpointer data)
+{
+  CLogGtk* clog = (CLogGtk*)data;
+
+  // Clear filter text entry
+  gtk_entry_set_text(GTK_ENTRY(clog->filter_entry), "");
+
+  // Reset all severity toggles to active
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(clog->success_toggle), TRUE);
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(clog->info_toggle), TRUE);
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(clog->warning_toggle), TRUE);
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(clog->error_toggle), TRUE);
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(clog->fatal_toggle), TRUE);
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(clog->text_toggle), TRUE);
+
+  // Clear filter using existing CLogNav method
+  clog->set_clock_cursor();
+  clog->clognav->set_filter(true, true, true, true, true, true, "");
+  clog->reset_cursor();
+}
+void CLogGtk::toolbar_filter_entry_activate(GtkWidget* w, gpointer data)
+{
+  // When user presses Enter in filter entry, apply the filter
+  toolbar_apply_filter(w, data);
 }
