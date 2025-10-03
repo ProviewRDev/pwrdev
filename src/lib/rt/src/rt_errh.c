@@ -522,6 +522,10 @@ void* errh_ErrArgL(int val)
  * Each argument should be created using errh_ErrArgMsg, errh_ErrArgAF, or errh_ErrArgL.
  * The message is sent to the error log system.
  *
+ * Warning: Violates principle of least surprise as it takes ownership and arguments are freed by this
+ * function. So do not use arguments after calling this function. Use errh_ErrArg* functions inline to create
+ * arguments as stated above.
+ *
  * @param sts Status code for the error message.
  * @param ... Variable list of argument pointers (terminated by NULL).
  */
