@@ -56,23 +56,23 @@
 #define MAX_NO_MSG 100
 #define DEF_MAX_NO_MSG 10
 
-static pthread_mutex_t fileMutex;
-static pthread_mutex_t termMutex;
+static pthread_mutex_t g_file_mutex;
+static pthread_mutex_t g_term_mutex;
 #if defined(OS_MACOS) || defined(OS_FREEBSD) || defined(OS_OPENBSD)
-static int mqid = -1;
+static int g_mqid = -1;
 #else
-static mqd_t mqid = (mqd_t)-1;
+static mqd_t g_mqid = (mqd_t)-1;
 #endif
-static int logFile = -1;
-static int newLogFile = 1;
-static int term = -1;
-static pthread_t tid = 0;
-static int yday = -1;
-static pwr_tBoolean logToStdout = FALSE;
-static void (*errl_log_cb)(void*, char*, char, pwr_tStatus, int, int) = 0;
-static void* errl_log_userdata = 0;
+static int g_log_file = -1;
+static int g_new_log_file = 1;
+static int g_term = -1;
+static pthread_t g_tid = 0;
+static int g_yday = -1;
+static pwr_tBoolean g_log_to_stdout = FALSE;
+static void (*g_errl_log_cb)(void*, char*, char, pwr_tStatus, int, int) = 0;
+static void* g_errl_log_userdata = 0;
 
-static void CheckTimeStamp(int force);
+static void check_time_stamp(int force);
 static void* log_thread(void* arg);
 
 void errl_Init(const char* termName, void (*log_cb)(void*, char*, char, pwr_tStatus, int, int),
@@ -97,8 +97,8 @@ void errl_Init(const char* termName, void (*log_cb)(void*, char*, char, pwr_tSta
   mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP;
 #endif
 
-  errl_log_cb = log_cb;
-  errl_log_userdata = userdata;
+  g_errl_log_cb = log_cb;
+  g_errl_log_userdata = userdata;
 
   if (initDone)
     return;
@@ -110,15 +110,15 @@ void errl_Init(const char* termName, void (*log_cb)(void*, char*, char, pwr_tSta
   }
 
   pthread_mutexattr_init(&mutexattr);
-  if (pthread_mutex_init(&fileMutex, &mutexattr) == -1)
+  if (pthread_mutex_init(&g_file_mutex, &mutexattr) == -1)
   {
-    perror("rt_logmod: pthread_mutex_init(&fileMutex, mutexattr) ");
+    perror("rt_logmod: pthread_mutex_init(&g_file_mutex, mutexattr) ");
     return;
   }
 
-  if (pthread_mutex_init(&termMutex, &mutexattr) == -1)
+  if (pthread_mutex_init(&g_term_mutex, &mutexattr) == -1)
   {
-    perror("rt_logmod: pthread_mutex_init(&termMutex, mutexattr) ");
+    perror("rt_logmod: pthread_mutex_init(&g_term_mutex, mutexattr) ");
     return;
   }
   pthread_mutexattr_destroy(&mutexattr);
@@ -154,14 +154,14 @@ void errl_Init(const char* termName, void (*log_cb)(void*, char*, char, pwr_tSta
     return;
   }
 #else
-  mqid = mq_open(name, oflags, mode, &mqattr);
-  if (mqid == (mqd_t)-1)
+  g_mqid = mq_open(name, oflags, mode, &mqattr);
+  if (g_mqid == (mqd_t)-1)
   {
     if (errno == EINVAL)
     {
       mqattr.mq_maxmsg = DEF_MAX_NO_MSG; /* Try with smaller queue */
-      mqid = mq_open(name, oflags, mode, &mqattr);
-      if (mqid == (mqd_t)-1)
+      g_mqid = mq_open(name, oflags, mode, &mqattr);
+      if (g_mqid == (mqd_t)-1)
       {
         perror("rt_logmod: mq_open ");
         return;
@@ -176,7 +176,7 @@ void errl_Init(const char* termName, void (*log_cb)(void*, char*, char, pwr_tSta
 #endif
 
   pthread_attr_init(&pthreadattr);
-  if (pthread_create(&tid, &pthreadattr, log_thread, NULL) == -1)
+  if (pthread_create(&g_tid, &pthreadattr, log_thread, NULL) == -1)
   {
     perror("rt_logmod: pthread_create ");
     pthread_attr_destroy(&pthreadattr);
@@ -185,12 +185,12 @@ void errl_Init(const char* termName, void (*log_cb)(void*, char*, char, pwr_tSta
   pthread_attr_destroy(&pthreadattr);
 
   param.sched_priority -= 1;
-  pthread_setschedparam(tid, policy, &param);
+  pthread_setschedparam(g_tid, policy, &param);
 
   if (termName && *termName)
     errl_SetTerm(termName);
 
-  logToStdout = getenv("PWR_LOG_TO_STDOUT") != NULL;
+  g_log_to_stdout = getenv("PWR_LOG_TO_STDOUT") != NULL;
 
   initDone = 1;
 
@@ -203,7 +203,7 @@ void errl_Unlink(void)
   char* busid = getenv(pwr_dEnvBusId);
 #endif
 
-  pthread_cancel(tid);
+  pthread_cancel(g_tid);
 
 #if defined(OS_MACOS) || defined(OS_FREEBSD) || defined(OS_OPENBSD)
   msgctl(mqid, IPC_RMID, 0);
@@ -220,14 +220,14 @@ void errl_SetFile(const char* logFileName)
   int oflags = O_CREAT | O_APPEND | O_WRONLY;
   int mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH;
 
-  pthread_mutex_lock(&fileMutex);
-  if (logFile != -1)
+  pthread_mutex_lock(&g_file_mutex);
+  if (g_log_file != -1)
   {
-    close(logFile);
-    logFile = -1;
+    close(g_log_file);
+    g_log_file = -1;
   }
 
-  if ((logFile = open(logFileName, oflags, mode)) == -1)
+  if ((g_log_file = open(logFileName, oflags, mode)) == -1)
   {
     errh_Error("Cannot open log file: %s", logFileName);
     sts = 2;
@@ -235,33 +235,33 @@ void errl_SetFile(const char* logFileName)
   else
   {
     //    errh_Info("Logging to %s", logFileName);
-    newLogFile = 1;
+    g_new_log_file = 1;
   }
-  pthread_mutex_unlock(&fileMutex);
+  pthread_mutex_unlock(&g_file_mutex);
 }
 
 void errl_SetTerm(const char* termName)
 {
   int oflags = O_APPEND | O_WRONLY;
 
-  pthread_mutex_lock(&termMutex);
-  if (term != -1)
+  pthread_mutex_lock(&g_term_mutex);
+  if (g_term != -1)
   {
-    close(term);
-    term = -1;
+    close(g_term);
+    g_term = -1;
   }
 
   if (termName && *termName)
   {
-    if ((term = open(termName, oflags)) == -1)
+    if ((g_term = open(termName, oflags)) == -1)
     {
       errh_Error("Cannot open terminal: %s", termName);
     }
   }
-  pthread_mutex_unlock(&termMutex);
+  pthread_mutex_unlock(&g_term_mutex);
 }
 
-static void CheckTimeStamp(int force)
+static void check_time_stamp(int force)
 {
   time_t t;
   struct tm tmpTm;
@@ -269,24 +269,24 @@ static void CheckTimeStamp(int force)
   t = time(NULL);
   localtime_r(&t, &tmpTm);
 
-  if (force || (yday != tmpTm.tm_yday))
+  if (force || (g_yday != tmpTm.tm_yday))
   {
     char buf[64];
 #define STAMP "DATE STAMP:  "
 
-    write(logFile, STAMP, strlen(STAMP));
+    write(g_log_file, STAMP, strlen(STAMP));
     strftime(buf, sizeof(buf), "%e-%b-%Y\n", &tmpTm);
-    write(logFile, buf, strlen(buf));
+    write(g_log_file, buf, strlen(buf));
 
-    pthread_mutex_lock(&termMutex);
-    if (term != -1)
-      write(term, buf, strlen(buf));
-    pthread_mutex_unlock(&termMutex);
+    pthread_mutex_lock(&g_term_mutex);
+    if (g_term != -1)
+      write(g_term, buf, strlen(buf));
+    pthread_mutex_unlock(&g_term_mutex);
 
-    if (logToStdout)
+    if (g_log_to_stdout)
       printf("%.*s", (int)strlen(buf), buf);
 
-    yday = tmpTm.tm_yday;
+    g_yday = tmpTm.tm_yday;
   }
 }
 
@@ -300,7 +300,7 @@ static void* log_thread(void* arg)
 #if defined(OS_MACOS) || defined(OS_FREEBSD) || defined(OS_OPENBSD)
     len = msgrcv(mqid, (char*)&buf, LOG_MAX_MSG_SIZE, 0, 0);
 #else
-    len = mq_receive(mqid, (char*)&buf, LOG_MAX_MSG_SIZE, NULL);
+    len = mq_receive(g_mqid, (char*)&buf, LOG_MAX_MSG_SIZE, NULL);
 #endif
     if (len == -1)
     {
@@ -314,34 +314,34 @@ static void* log_thread(void* arg)
       case errh_eMsgType_Log:
         len -= (sizeof(buf) - sizeof(buf.str) - sizeof(buf.message_type) + 1);
         buf.str[len] = 0;
-        pthread_mutex_lock(&fileMutex);
-        if (logFile != -1)
+        pthread_mutex_lock(&g_file_mutex);
+        if (g_log_file != -1)
         {
           /* Set up a timer if you want better performance, ML */
-          CheckTimeStamp(newLogFile);
-          newLogFile = 0;
-          write(logFile, buf.str, len);
-          write(logFile, "\n", 1);
+          check_time_stamp(g_new_log_file);
+          g_new_log_file = 0;
+          write(g_log_file, buf.str, len);
+          write(g_log_file, "\n", 1);
         }
-        pthread_mutex_unlock(&fileMutex);
+        pthread_mutex_unlock(&g_file_mutex);
 
-        pthread_mutex_lock(&termMutex);
-        if (term != -1)
+        pthread_mutex_lock(&g_term_mutex);
+        if (g_term != -1)
         {
-          write(term, buf.str, len);
-          write(term, "\n", 1);
+          write(g_term, buf.str, len);
+          write(g_term, "\n", 1);
         }
-        pthread_mutex_unlock(&termMutex);
+        pthread_mutex_unlock(&g_term_mutex);
 
-        if (logToStdout)
+        if (g_log_to_stdout)
           printf("%.*s\n", len, buf.str);
 
-        if (errl_log_cb)
-          (errl_log_cb)(errl_log_userdata, buf.str, buf.severity, buf.sts, buf.anix, buf.message_type);
+        if (g_errl_log_cb)
+          (g_errl_log_cb)(g_errl_log_userdata, buf.str, buf.severity, buf.sts, buf.anix, buf.message_type);
         break;
       case errh_eMsgType_Status:
-        if (errl_log_cb)
-          (errl_log_cb)(errl_log_userdata, 0, 0, buf.sts, buf.anix, buf.message_type);
+        if (g_errl_log_cb)
+          (g_errl_log_cb)(g_errl_log_userdata, 0, 0, buf.sts, buf.anix, buf.message_type);
       }
     }
   }

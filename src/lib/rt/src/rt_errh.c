@@ -93,28 +93,28 @@ typedef struct
 #if defined OS_LINUX || defined OS_CYGWIN
 typedef pid_t sPid;
 
-static mqd_t mqid = (mqd_t)-1;
-static unsigned int prio = 0;
-static int mq_send_errno = 0;
+static mqd_t g_mqid = (mqd_t)-1;
+static unsigned int g_prio = 0;
+static int g_mq_send_errno = 0;
 #elif defined OS_MACOS || defined OS_FREEBSD || defined OS_OPENBSD
 typedef pid_t sPid;
 
-static int mqid = -1;
-// static unsigned int prio = 0;
-static int mq_send_errno = 0;
+static int g_mqid = -1;
+// static unsigned int g_prio = 0;
+static int g_mq_send_errno = 0;
 #endif
 
-static const char* indentStr = "  ";
-static char programName[16];
-static int interactive = 0;
-static int initDone = 0;
-static errh_eAnix errh_anix = errh_eNAnix;
+static const char* g_indent_str = "  ";
+static char g_program_name[16];
+static int g_interactive = 0;
+static int g_init_done = 0;
+static errh_eAnix g_errh_anix = errh_eNAnix;
 
 static char* get_header(char, char*);
 static char* get_message(const int, unsigned int, char*, int);
 static char* get_name(char*, int);
 static char get_severity(pwr_tStatus);
-static void openLog();
+static void open_log();
 static void set_name(const char*);
 static void errh_send(char*, char, pwr_tStatus, errh_eMsgType);
 static void log_message(errh_sLog*, char, const char*, va_list);
@@ -182,7 +182,7 @@ void errh_AnixName(errh_eAnix anix, char* name)
  * When interactive mode is enabled, log messages are printed to stdout instead of being sent to the log
  * queue.
  */
-void errh_Interactive(void) { interactive = 1; }
+void errh_Interactive(void) { g_interactive = 1; }
 
 /**
  * @brief Initialize errh.
@@ -198,15 +198,15 @@ void errh_Interactive(void) { interactive = 1; }
  */
 pwr_tStatus errh_Init(const char* name, errh_eAnix anix)
 {
-  get_name(programName, sizeof(programName) - 1);
+  get_name(g_program_name, sizeof(g_program_name) - 1);
   if (name != NULL && name[0] != '\0')
     set_name(name);
-  errh_anix = anix;
+  g_errh_anix = anix;
 
-  if (!initDone)
+  if (!g_init_done)
   {
-    initDone = 1;
-    openLog();
+    g_init_done = 1;
+    open_log();
   }
 
   return 1;
@@ -231,12 +231,12 @@ void errh_SetStatus(pwr_tStatus sts)
  * @brief Get application index for the process.
  *    \return  Application index.
  */
-errh_eAnix errh_Anix(void) { return errh_anix; }
+errh_eAnix errh_Anix(void) { return g_errh_anix; }
 
 /**
  * @brief Set application index for the process.
  */
-void errh_SetAnix(errh_eAnix anix) { errh_anix = anix; }
+void errh_SetAnix(errh_eAnix anix) { g_errh_anix = anix; }
 
 /**
  * @brief Set application name for the process.
@@ -290,7 +290,7 @@ char* errh_Log(char* buff, char severity, const char* msg, ...)
   msg_vsprintf(s, msg, NULL, ap);
   va_end(ap);
 
-  if (interactive)
+  if (g_interactive)
     printf("%s\n", buff);
   else
     errh_send(buff, severity, 0, errh_eMsgType_Log);
@@ -636,8 +636,8 @@ static char* get_message(const pwr_tStatus sts, unsigned int flags, char* buf, i
  */
 static void set_name(const char* name)
 {
-  strncpy(programName, name, sizeof(programName) - 1);
-  programName[sizeof(programName) - 1] = '\0';
+  strncpy(g_program_name, name, sizeof(g_program_name) - 1);
+  g_program_name[sizeof(g_program_name) - 1] = '\0';
 }
 
 /**
@@ -645,17 +645,17 @@ static void set_name(const char* name)
  *
  * Initializes the message queue used for logging errors, depending on the operating system.
  */
-static void openLog()
+static void open_log()
 {
 #if defined OS_LINUX || defined OS_CYGWIN
-  if (mqid == (mqd_t)-1)
+  if (g_mqid == (mqd_t)-1)
   {
     char name[64];
     char* busid = getenv(pwr_dEnvBusId);
 
     sprintf(name, "%s_%s", LOG_QUEUE_NAME, busid ? busid : "");
-    mqid = mq_open(name, O_WRONLY | O_NONBLOCK, 0, 0);
-    if (mqid == (mqd_t)-1)
+    g_mqid = mq_open(name, O_WRONLY | O_NONBLOCK, 0, 0);
+    if (g_mqid == (mqd_t)-1)
     {
       char string[256];
       char* s;
@@ -755,10 +755,10 @@ static char* get_header(char severity, char* s)
   pwr_tTime time;
   struct tm tp, *t;
 
-  if (!initDone)
+  if (!g_init_done)
     errh_Init(NULL, 0);
 
-  if (interactive)
+  if (g_interactive)
   {
     s += sprintf(s, "%c ", severity);
     return s;
@@ -768,7 +768,8 @@ static char* get_header(char severity, char* s)
 
   get_pid(&pid);
 
-  s += sprintf(s, "%c %-*.*s", severity, (int)sizeof(programName), (int)sizeof(programName), programName);
+  s += sprintf(s, "%c %-*.*s", severity, (int)sizeof(g_program_name), (int)sizeof(g_program_name),
+               g_program_name);
 
   time_t sec = time.tv_sec;
   localtime_r(&sec, &tp);
@@ -805,7 +806,7 @@ static void log_message(errh_sLog* lp, char severity, const char* msg, va_list a
 
   s = get_header(severity, string);
   msg_vsprintf(s, msg, NULL, ap);
-  if (interactive)
+  if (g_interactive)
     printf("%s\n", string);
   else
     errh_send(string, severity, 0, errh_eMsgType_Log);
@@ -882,7 +883,7 @@ static int msg_vsprintf(char* buf, const char* fmt, aa_list ap, va_list vap)
       {
         /* I hope we are not running a Fu.. PC */
         /* *str++ ='\r'; */
-        cs = indentStr;
+        cs = g_indent_str;
         while (*cs != '\0')
           *str++ = *cs++;
       }
@@ -1176,7 +1177,7 @@ static void errh_send(char* s, char severity, pwr_tStatus sts, errh_eMsgType mes
 #if defined OS_LINUX || defined OS_CYGWIN
 
   int len;
-  if (mqid != (mqd_t)-1)
+  if (g_mqid != (mqd_t)-1)
   {
     errh_sMsg msg;
 
@@ -1188,23 +1189,22 @@ static void errh_send(char* s, char severity, pwr_tStatus sts, errh_eMsgType mes
       msg.message_type = message_type;
       msg.severity = severity;
       msg.sts = sts;
-      msg.anix = errh_anix;
+      msg.anix = g_errh_anix;
       len = sizeof(msg) - sizeof(msg.message_type) - sizeof(msg.str) + strlen(msg.str) + 1;
       break;
     case errh_eMsgType_Status:
       msg.message_type = message_type;
       msg.sts = sts;
-      msg.anix = errh_anix;
+      msg.anix = g_errh_anix;
       len = sizeof(msg) - sizeof(msg.message_type) - sizeof(msg.str);
       break;
     }
-    if (prio == 0)
-      prio = sysconf(_SC_MQ_PRIO_MAX) - 1;
-    if (mq_send(mqid, (char*)&msg, MIN(len, LOG_MAX_MSG_SIZE - 1), prio) == -1)
+
+    if (mq_send(g_mqid, (char*)&msg, MIN(len, LOG_MAX_MSG_SIZE - 1), 0) == -1)
     {
-      if (mq_send_errno != errno)
+      if (g_mq_send_errno != errno)
       {
-        mq_send_errno = errno;
+        g_mq_send_errno = errno;
         perror("mq_send");
       }
     }
