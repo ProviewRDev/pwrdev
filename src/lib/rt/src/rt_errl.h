@@ -39,19 +39,17 @@
 
 #include "pwr.h"
 
-#if defined OS_FREEBSD || defined OS_MACOS
-#define LOG_QUEUE_NAME "/tmp/pwrlogqueue"
-#elif defined _POSIX_MESSAGE_PASSING
+#if defined _POSIX_MESSAGE_PASSING
 #define LOG_QUEUE_NAME "/pwrlogqueue"
 #else
 #define LOG_QUEUE_NAME "/tmp/pwrlogqueue"
 #endif
 
-#define LOG_MAX_MSG_SIZE 256 /* length of logstring */
+#define LOG_MAX_MSG_SIZE 8192 /* 8kb length of logstring */
 
 pwr_tStatus errl_Exit(void);
-void errl_Init(const char* termname,
-    void (*log_cb)(void*, char*, char, pwr_tStatus, int, int), void* userdata);
+void errl_Init(const char* termname, void (*log_cb)(void*, char*, char, pwr_tStatus, int, int),
+               void* userdata);
 void errl_SetTerm(const char* termname);
 void errl_SetFile(const char* filename);
 
