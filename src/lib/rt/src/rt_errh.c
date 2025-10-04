@@ -94,13 +94,11 @@ typedef struct
 typedef pid_t sPid;
 
 static mqd_t g_mqid = (mqd_t)-1;
-static unsigned int g_prio = 0;
 static int g_mq_send_errno = 0;
 #elif defined OS_MACOS || defined OS_FREEBSD || defined OS_OPENBSD
 typedef pid_t sPid;
 
 static int g_mqid = -1;
-// static unsigned int g_prio = 0;
 static int g_mq_send_errno = 0;
 #endif
 
@@ -786,6 +784,39 @@ static char* get_header(char severity, char* s)
   return s;
 }
 
+static char* get_header_rfc5424(char severity, char* s)
+{
+  sPid pid;
+  pwr_tTime time;
+  struct tm tp, *t;
+
+  if (!g_init_done)
+    errh_Init(NULL, 0);
+
+  if (g_interactive)
+  {
+    s += sprintf(s, "%c ", severity);
+    return s;
+  }
+
+  time_GetTime(&time);
+
+  get_pid(&pid);
+
+  s += sprintf(s, "%c %-*.*s", severity, (int)sizeof(g_program_name), (int)sizeof(g_program_name),
+               g_program_name);
+
+  time_t sec = time.tv_sec;
+  localtime_r(&sec, &tp);
+  t = &tp;
+  s += sprintf(s, " %8d ", pid);
+
+  s += sprintf(s, "%02d-%02d-%02d %02d:%02d:%02d.%02d ", t->tm_year % 100, t->tm_mon + 1, t->tm_mday,
+               t->tm_hour, t->tm_min, t->tm_sec, (int)(time.tv_nsec / 10000000));
+
+  return s;
+}
+
 /**
  * @brief Formats and logs a message with severity, optional log structure, and variable arguments.
  *
@@ -807,6 +838,44 @@ static void log_message(errh_sLog* lp, char severity, const char* msg, va_list a
 {
   char* s;
   char string[1000];
+
+  s = get_header(severity, string);
+  msg_vsprintf(s, msg, NULL, ap);
+  if (g_interactive)
+    printf("%s\n", string);
+  else
+    errh_send(string, severity, 0, errh_eMsgType_Log);
+
+  if (lp != NULL && lp->send)
+  {
+    lp->put.data = string;
+    lp->put.size = strlen(string) + 1;
+    lp->put.allocate = 1;
+    qcom_Put(NULL, &lp->logQ, &lp->put);
+  }
+}
+
+/**
+ * @brief Formats and logs a message with severity, optional log structure, and variable arguments.
+ *
+ * This function builds a log message header (including severity, program name, PID, timestamp),
+ * formats the message using the provided format string and arguments, and sends it to the error log system.
+ * If interactive mode is enabled, the message is printed to stdout instead of being sent to the log queue.
+ * If a log structure pointer (lp) is provided and lp->send is true, the message is also sent to a custom log
+ * queue.
+ *
+ * @param lp       Optional pointer to a log structure (errh_sLog) for custom logging. Can be NULL.
+ * @param severity Severity character ('E' for error, 'W' for warning, etc.).
+ * @param msg      Format string for the log message (like printf).
+ * @param ap       Variable argument list for formatting the message.
+ *
+ * Example usage:
+ *   log_message(NULL, 'E', "Error: %s", args);
+ */
+static void log_message_rfc5424(errh_sLog* lp, char severity, const char* msg, va_list ap)
+{
+  char* s;
+  char string[LOG_MAX_MSG_SIZE];
 
   s = get_header(severity, string);
   msg_vsprintf(s, msg, NULL, ap);
@@ -1204,7 +1273,7 @@ static void errh_send(char* s, char severity, pwr_tStatus sts, errh_eMsgType mes
       break;
     }
 
-    if (mq_send(g_mqid, (char*)&msg, MIN(len, LOG_MAX_MSG_SIZE - 1), 0) == -1)
+    if (mq_send(g_mqid, (char*)&msg, MIN(len, LOG_QUEUE_MAX_MSG_SIZE - 1), 0) == -1)
     {
       if (g_mq_send_errno != errno)
       {
@@ -1246,7 +1315,7 @@ static void errh_send(char* s, char severity, pwr_tStatus sts, errh_eMsgType mes
     }
     // if ( prio == 0)
     //  prio = sysconf(_SC_MQ_PRIO_MAX) - 1;
-    if (msgsnd(mqid, (char*)&msg, MIN(len, LOG_MAX_MSG_SIZE - 1), 0) == -1)
+    if (msgsnd(mqid, (char*)&msg, MIN(len, LOG_QUEUE_MAX_MSG_SIZE - 1), 0) == -1)
     {
       if (mq_send_errno != errno)
       {

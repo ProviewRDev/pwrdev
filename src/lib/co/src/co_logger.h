@@ -71,21 +71,19 @@ constexpr int RFC5424_VERSION = 1;
  * World
  *
  * Message Queue Usage:
- * CoLogger::instance("/my_queue").log("Test message");
+ * CoLogger::instance("module", "queue").log("Test message");
  */
 class CoLogger
 {
 public:
   /**
    * @brief Get a named logger instance (multiton pattern).
-   *
-   * Returns a reference to a logger for the given module name. Each module gets its own logger instance.
-   * Thread-safe.
-   * @param module_name Name of the module (used for log file naming, or POSIX mqueue name if prefixed with
-   * '/').
+   * @return Reference to a logger for the given module name. Each module gets its own logger instance.
+   * @param module_name Name of the module (used for log file naming and message identification).
+   * @param queue_name Optional POSIX message queue name. If provided, logs to queue instead of file.
    * @return Reference to the logger instance for the module.
    */
-  static CoLogger& instance(const std::string& module_name);
+  static CoLogger& instance(const std::string& module_name, const std::string& queue_name = "");
 
   /**
    * @brief Log a message asynchronously (thread-safe).
@@ -169,13 +167,14 @@ private:
    * @brief Constructor for CoLogger.
    *
    * Opens the log file or message queue and starts the logging thread.
-   * @param module_name Name of the module (used for log file naming or mqueue name if prefixed with '/').
+   * @param module_name Name of the module (used for log file naming and message identification).
+   * @param queue_name Optional POSIX message queue name. If empty, uses file logging.
    */
-  explicit CoLogger(const std::string& module_name);
-
+  explicit CoLogger(const std::string& module_name, const std::string& queue_name = "");
   std::ofstream m_logfile;
   std::mutex m_mutex;
   std::string m_module_name;
+  std::string m_queue_name;
   CoLogLevel m_log_level;
   CoLogFacility m_facility;
   std::string m_type;

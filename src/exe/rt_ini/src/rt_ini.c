@@ -87,8 +87,8 @@ static pwr_tStatus restart(ini_sContext* cp);
 static pwr_tStatus terminate();
 static pwr_tStatus start(ini_sContext* cp);
 static void usage(char*);
-static void ini_errl_cb(void* userdata, char* str, char severity, pwr_tStatus sts, int anix,
-                        int message_type);
+static void ini_errl_cb(void* userdata, char* str, char severity, pwr_tStatus sts, errh_eAnix anix,
+                        errh_eMsgType message_type);
 
 static int pid_fd = -1;
 static char* pid_filename = NULL;
@@ -1759,9 +1759,10 @@ error:
     free(rscoa);
 }
 
-static void ini_errl_cb(void* userdata, char* str, char severity, pwr_tStatus sts, int anix, int message_type)
+static void ini_errl_cb(void* ctx, char* str, char severity, pwr_tStatus sts, errh_eAnix anix,
+                        errh_eMsgType message_type)
 {
-  ini_sContext* cp = (ini_sContext*)userdata;
+  ini_sContext* cp = (ini_sContext*)ctx;
 
   if (anix == 0 || !cp->np)
     return;

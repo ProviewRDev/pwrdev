@@ -8,17 +8,30 @@
 #include <fcntl.h>
 #include <cerrno>
 #include <cstring>
+#include <iostream>
 
 #include "co_logger.h"
 
-CoLogger::CoLogger(const std::string& module_name)
-    : m_module_name(module_name), m_log_level(CoLogLevel::INFO), m_facility(CoLogFacility::Local0),
-      m_type("process"), m_subtype("proviewr"), m_mqueue(-1), m_use_mqueue(false)
+CoLogger::CoLogger(const std::string& module_name, const std::string& queue_name)
+    : m_module_name(module_name), m_queue_name(queue_name), m_log_level(CoLogLevel::INFO),
+      m_facility(CoLogFacility::Local0), m_type("process"), m_subtype("proviewr"), m_mqueue(-1),
+      m_use_mqueue(false)
 {
-  // Check if module name starts with '/' to use POSIX message queue
-  if (!module_name.empty() && module_name[0] == '/')
+  std::cout << "CoLogger constructor called with module_name='" << module_name << "', queue_name='"
+            << queue_name << "'" << std::endl;
+  // Check if queue_name is provided to use POSIX message queue
+  if (!queue_name.empty())
   {
     m_use_mqueue = true;
+
+    // Append PWR_BUS_ID to queue name
+    std::string full_queue_name = queue_name;
+    const char* bus_id = std::getenv("PWR_BUS_ID");
+    if (bus_id && bus_id[0] != '\0')
+    {
+      full_queue_name += "_";
+      full_queue_name += bus_id;
+    }
 
     // Set up message queue attributes
     struct mq_attr attr;
@@ -27,13 +40,24 @@ CoLogger::CoLogger(const std::string& module_name)
     attr.mq_msgsize = 8192; // Maximum message size (8KB for log messages)
     attr.mq_curmsgs = 0;
 
-    // Create and/or open message queue
-    m_mqueue = mq_open(module_name.c_str(), O_CREAT | O_WRONLY, 0664, &attr);
+    // Create and/or open message queue with bus_id appended
+    m_mqueue = mq_open(full_queue_name.c_str(), O_CREAT | O_WRONLY, 0664, &attr);
     if (m_mqueue == (mqd_t)-1)
     {
+      std::cerr << "mq_open failed for '" << full_queue_name << "': " << strerror(errno)
+                << " (errno=" << errno << ")" << std::endl;
+
       // Fallback to file logging if mqueue fails
       m_use_mqueue = false;
       // Log error but continue with file logging
+    }
+    if (m_use_mqueue)
+    {
+      std::cout << "CoLogger using message queue: " << full_queue_name << std::endl;
+    }
+    else
+    {
+      std::cout << "CoLogger using file logging for module: " << m_module_name << std::endl;
     }
   }
 
@@ -57,13 +81,20 @@ CoLogger::CoLogger(const std::string& module_name)
   m_logging_thread = std::thread(&CoLogger::loggingThreadFunc, this);
 }
 
-CoLogger& CoLogger::instance(const std::string& module_name)
+CoLogger& CoLogger::instance(const std::string& module_name, const std::string& queue_name)
 {
+  static std::mutex instance_mutex;
   static std::map<std::string, std::unique_ptr<CoLogger>> loggers;
-  auto it = loggers.find(module_name);
+
+  std::lock_guard<std::mutex> lock(instance_mutex);
+
+  // Create unique key combining module_name and queue_name
+  std::string key = module_name + "|" + queue_name;
+
+  auto it = loggers.find(key);
   if (it == loggers.end())
   {
-    it = loggers.emplace(module_name, std::unique_ptr<CoLogger>(new CoLogger(module_name))).first;
+    it = loggers.emplace(key, std::unique_ptr<CoLogger>(new CoLogger(module_name, queue_name))).first;
   }
   return *it->second;
 }
@@ -174,8 +205,7 @@ void CoLogger::loggingThreadFunc()
         // Write to POSIX message queue
         if (mq_send(m_mqueue, formatted_message.c_str(), formatted_message.length(), 0) == -1)
         {
-          // If message queue send fails, could fallback to stderr or ignore
-          // For now, silently ignore the error to avoid blocking
+          std::cerr << "mq_send failed: " << strerror(errno) << " (errno=" << errno << ")" << std::endl;
         }
       }
       else

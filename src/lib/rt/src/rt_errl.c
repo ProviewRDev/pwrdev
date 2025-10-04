@@ -50,6 +50,7 @@
 #include <unistd.h>
 #include <sys/stat.h>
 
+#include "rt_errl.h"
 #include "rt_errh.h"
 #include "co_syi.h"
 
@@ -69,14 +70,14 @@ static int g_term = -1;
 static pthread_t g_tid = 0;
 static int g_yday = -1;
 static pwr_tBoolean g_log_to_stdout = FALSE;
-static void (*g_errl_log_cb)(void*, char*, char, pwr_tStatus, int, int) = 0;
-static void* g_errl_log_userdata = 0;
+static void (*g_errl_log_cb)(void*, char*, char, pwr_tStatus, errh_eAnix, errh_eMsgType) = 0;
+static void* g_errl_log_ctx = 0;
 
 static void check_time_stamp(int force);
 static void* log_thread(void* arg);
 
-void errl_Init(const char* termName, void (*log_cb)(void*, char*, char, pwr_tStatus, int, int),
-               void* userdata)
+void errl_Init(const char* termName,
+               void (*log_cb)(void*, char*, char, pwr_tStatus, errh_eAnix, errh_eMsgType), void* ctx)
 {
   pthread_mutexattr_t mutexattr;
   pthread_attr_t pthreadattr;
@@ -98,7 +99,7 @@ void errl_Init(const char* termName, void (*log_cb)(void*, char*, char, pwr_tSta
 #endif
 
   g_errl_log_cb = log_cb;
-  g_errl_log_userdata = userdata;
+  g_errl_log_ctx = ctx;
 
   if (initDone)
     return;
@@ -132,8 +133,8 @@ void errl_Init(const char* termName, void (*log_cb)(void*, char*, char, pwr_tSta
   else
     mqattr.mq_maxmsg = MAX_NO_MSG; /* max no of msg in this queue */
 
-  mqattr.mq_msgsize = LOG_MAX_MSG_SIZE; /* max mess size */
-  mqattr.mq_flags = 0;                  // O_NONBLOCK;
+  mqattr.mq_msgsize = LOG_QUEUE_MAX_MSG_SIZE; /* max mess size */
+  mqattr.mq_flags = 0;                        // O_NONBLOCK;
   oflags = O_CREAT | O_RDWR;
   mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH;
 #endif
@@ -298,9 +299,9 @@ static void* log_thread(void* arg)
   while (1)
   {
 #if defined(OS_MACOS) || defined(OS_FREEBSD) || defined(OS_OPENBSD)
-    len = msgrcv(mqid, (char*)&buf, LOG_MAX_MSG_SIZE, 0, 0);
+    len = msgrcv(mqid, (char*)&buf, LOG_QUEUE_MAX_MSG_SIZE, 0, 0);
 #else
-    len = mq_receive(g_mqid, (char*)&buf, LOG_MAX_MSG_SIZE, NULL);
+    len = mq_receive(g_mqid, (char*)&buf, LOG_QUEUE_MAX_MSG_SIZE, NULL);
 #endif
     if (len == -1)
     {
@@ -337,11 +338,11 @@ static void* log_thread(void* arg)
           printf("%.*s\n", len, buf.str);
 
         if (g_errl_log_cb)
-          (g_errl_log_cb)(g_errl_log_userdata, buf.str, buf.severity, buf.sts, buf.anix, buf.message_type);
+          (g_errl_log_cb)(g_errl_log_ctx, buf.str, buf.severity, buf.sts, buf.anix, buf.message_type);
         break;
       case errh_eMsgType_Status:
         if (g_errl_log_cb)
-          (g_errl_log_cb)(g_errl_log_userdata, 0, 0, buf.sts, buf.anix, buf.message_type);
+          (g_errl_log_cb)(g_errl_log_ctx, 0, 0, buf.sts, buf.anix, buf.message_type);
       }
     }
   }
