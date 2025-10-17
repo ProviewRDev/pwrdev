@@ -139,6 +139,22 @@ public:
   void setStructuredPrefix(const std::string& prefix);
 
   /**
+   * @brief Static RFC5424 header formatter for use by other ProviewR components.
+   *
+   * Generates RFC5424 compliant syslog header without the message content:
+   * <PRI>VERSION TIMESTAMP HOSTNAME APP-NAME PROCID MSGID STRUCTURED-DATA
+   *
+   * @param severity_char Character representing severity ('E', 'W', 'I', etc.)
+   * @param app_name Application/module name
+   * @param facility Log facility (default: Local0)
+   * @param structured_data Optional structured data string (default: "[ot-standard]")
+   * @return RFC5424 formatted header string
+   */
+  static std::string formatRFC5424Header(char severity_char, const std::string& app_name,
+                                         CoLogFacility facility = CoLogFacility::Local0,
+                                         const std::string& structured_data = "[ot-standard]");
+
+  /**
    * @brief Destructor for CoLogger.
    *
    * Shuts down the logging thread and closes the log file.

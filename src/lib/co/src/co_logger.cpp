@@ -248,3 +248,68 @@ void CoLogger::setSubtype(const std::string& subtype)
   std::lock_guard<std::mutex> lock(m_mutex);
   m_subtype = subtype;
 }
+
+std::string CoLogger::formatRFC5424Header(char severity_char, const std::string& app_name,
+                                          CoLogFacility facility, const std::string& structured_data)
+{
+  // Map severity character to RFC5424 numeric level
+  CoLogLevel level;
+  switch (severity_char)
+  {
+  case 'E':
+  case 'e':
+    level = CoLogLevel::ERROR;
+    break;
+  case 'W':
+  case 'w':
+    level = CoLogLevel::WARNING;
+    break;
+  case 'I':
+  case 'i':
+    level = CoLogLevel::INFO;
+    break;
+  case 'S':
+  case 's':
+    level = CoLogLevel::NOTICE;
+    break; // Success as Notice
+  case 'F':
+  case 'f':
+    level = CoLogLevel::CRITICAL;
+    break; // Fatal as Critical
+  case 'D':
+  case 'd':
+    level = CoLogLevel::DEBUG;
+    break;
+  default:
+    level = CoLogLevel::INFO;
+    break;
+  }
+
+  // Calculate PRI value: facility * 8 + severity
+  int pri = static_cast<int>(facility) * 8 + static_cast<int>(level);
+
+  // Get current timestamp
+  auto now = std::chrono::system_clock::now();
+  auto time_t_now = std::chrono::system_clock::to_time_t(now);
+  auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()) % 1000;
+
+  // Format timestamp with timezone
+  struct tm local_tm;
+  localtime_r(&time_t_now, &local_tm);
+
+  char tz_buf[16];
+  strftime(tz_buf, sizeof(tz_buf), "%z", &local_tm);
+
+  // Get hostname
+  char hostname[128] = "localhost";
+  gethostname(hostname, sizeof(hostname));
+
+  // Build RFC5424 header
+  std::ostringstream header_stream;
+  header_stream << '<' << pri << '>' << RFC5424_VERSION << ' '
+                << std::put_time(&local_tm, "%Y-%m-%dT%H:%M:%S") << '.' << std::setw(3) << std::setfill('0')
+                << ms.count() << tz_buf << ' ' << hostname << ' ' << app_name << ' ' << getpid() << " - "
+                << structured_data;
+
+  return header_stream.str();
+}
