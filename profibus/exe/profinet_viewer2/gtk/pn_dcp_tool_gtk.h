@@ -166,6 +166,23 @@ public:
   void loadConfiguredDevices();
   void populateConfiguredDeviceList();
   void clearConfiguredDeviceList();
+  
+  // Helper method to check if device is configured
+  bool isDeviceConfigured(const std::string& device_name) const;
+  
+  // Get configured device IP address
+  std::string getConfiguredDeviceIP(const std::string& device_name) const;
+  
+  // Refresh coloring of DCP device list
+  void refreshDCPDeviceColoring();
+  
+  // Selection synchronization between device lists
+  void syncSelectionToConfiguredList(const std::string& device_name);
+  void syncSelectionToDCPList(const std::string& device_name);
+  
+  // Getter methods for list stores
+  GtkListStore* getDeviceListStore() const { return m_device_list_store; }
+  GtkListStore* getConfiguredDeviceListStore() const { return m_configured_device_list_store; }
 
   // Device details
   void updateDeviceDetails(const DCPDeviceInfo* device);
