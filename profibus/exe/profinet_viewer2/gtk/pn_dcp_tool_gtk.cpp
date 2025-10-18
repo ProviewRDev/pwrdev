@@ -260,7 +260,8 @@ ProfinetDCPGUI::ProfinetDCPGUI(GtkWidget* parent_window)
     : m_parent_window(parent_window), m_main_widget(nullptr), m_toolbar(nullptr), m_interface_combo(nullptr),
       m_connect_button(nullptr), m_disconnect_button(nullptr), m_discover_button(nullptr),
       m_topology_button(nullptr), m_device_tree_view(nullptr), m_device_list_store(nullptr),
-      m_device_selection(nullptr), m_details_frame(nullptr), m_details_container(nullptr),
+      m_device_selection(nullptr), m_configured_device_tree_view(nullptr), m_configured_device_list_store(nullptr),
+      m_configured_device_selection(nullptr), m_details_frame(nullptr), m_details_container(nullptr),
       m_status_bar(nullptr), m_status_context_id(0), m_log_text_view(nullptr), m_log_buffer(nullptr),
       m_progress_bar(nullptr), m_log_scrolled_window(nullptr), m_dcp_tool(nullptr), m_is_connected(false),
       m_discovery_in_progress(false)
@@ -272,6 +273,15 @@ ProfinetDCPGUI::~ProfinetDCPGUI() { shutdown(); }
 bool ProfinetDCPGUI::initialize()
 {
   m_dcp_tool = std::make_unique<ProfinetDCPTool>();
+  m_configured_device_reader = std::make_unique<ConfiguredDeviceReader>();
+  
+  // Set up activity log callback for configured device reader
+  m_configured_device_reader->setActivityLogCallback([this](const std::string& message) {
+    if (g_main_window) {
+      g_main_window->addLogMessage(message);
+    }
+  });
+  
   return true;
 }
 
@@ -301,13 +311,21 @@ GtkWidget* ProfinetDCPGUI::createMainWidget()
   GtkWidget* vpaned = gtk_paned_new(GTK_ORIENTATION_VERTICAL);
   gtk_box_pack_start(GTK_BOX(m_main_widget), vpaned, TRUE, TRUE, 0);
 
-  // Create horizontal paned container for device list and details
+  // Create horizontal paned container for device lists and details
   GtkWidget* hpaned = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
   gtk_paned_pack1(GTK_PANED(vpaned), hpaned, TRUE, TRUE);
 
-  // Create device list
+  // Create vertical paned container for both device lists
+  GtkWidget* device_lists_paned = gtk_paned_new(GTK_ORIENTATION_VERTICAL);
+  gtk_paned_pack1(GTK_PANED(hpaned), device_lists_paned, TRUE, TRUE);
+
+  // Create discovered device list (DCP)
   GtkWidget* device_list = createDeviceList();
-  gtk_paned_pack1(GTK_PANED(hpaned), device_list, TRUE, TRUE); // Allow reasonable shrinking
+  gtk_paned_pack1(GTK_PANED(device_lists_paned), device_list, TRUE, TRUE);
+
+  // Create configured device list
+  GtkWidget* configured_device_list = createConfiguredDeviceList();
+  gtk_paned_pack2(GTK_PANED(device_lists_paned), configured_device_list, TRUE, TRUE);
 
   // Create details panel
   GtkWidget* details = createDetailsPanel();
@@ -443,6 +461,10 @@ GtkWidget* ProfinetDCPGUI::createToolbar()
 
 GtkWidget* ProfinetDCPGUI::createDeviceList()
 {
+  // Create frame with title
+  GtkWidget* frame = gtk_frame_new("Discovered Devices (DCP)");
+  gtk_style_context_add_class(gtk_widget_get_style_context(frame), "device-list-frame");
+
   // Create scrolled window
   GtkWidget* scrolled = gtk_scrolled_window_new(nullptr, nullptr);
   gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolled), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
@@ -525,8 +547,93 @@ GtkWidget* ProfinetDCPGUI::createDeviceList()
   g_signal_connect(m_device_tree_view, "button-press-event", G_CALLBACK(onDeviceRightClick), this);
 
   gtk_container_add(GTK_CONTAINER(scrolled), m_device_tree_view);
+  gtk_container_add(GTK_CONTAINER(frame), scrolled);
 
-  return scrolled;
+  return frame;
+}
+
+GtkWidget* ProfinetDCPGUI::createConfiguredDeviceList()
+{
+  // Create frame with title
+  GtkWidget* frame = gtk_frame_new("Configured Devices");
+  gtk_style_context_add_class(gtk_widget_get_style_context(frame), "configured-device-list-frame");
+
+  // Create scrolled window
+  GtkWidget* scrolled = gtk_scrolled_window_new(nullptr, nullptr);
+  gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolled), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+  gtk_scrolled_window_set_shadow_type(GTK_SCROLLED_WINDOW(scrolled), GTK_SHADOW_IN);
+
+  // Create list store - using same columns as DCP device list for consistency
+  m_configured_device_list_store = gtk_list_store_new(NUM_COLUMNS,
+                                                      G_TYPE_STRING,   // COL_MAC_ADDRESS
+                                                      G_TYPE_STRING,   // COL_DEVICE_NAME
+                                                      G_TYPE_STRING,   // COL_IP_ADDRESS
+                                                      G_TYPE_STRING,   // COL_VENDOR
+                                                      G_TYPE_STRING,   // COL_DEVICE_ID
+                                                      G_TYPE_POINTER); // COL_DEVICE_PTR (will be xml_node)
+
+  // Create tree view
+  m_configured_device_tree_view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(m_configured_device_list_store));
+
+  // Headers visible and clickable
+  gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(m_configured_device_tree_view), TRUE);
+  gtk_tree_view_set_headers_clickable(GTK_TREE_VIEW(m_configured_device_tree_view), TRUE);
+
+  // Add columns - same as DCP device list
+  GtkCellRenderer* renderer;
+  GtkTreeViewColumn* column;
+
+  // MAC Address column
+  renderer = gtk_cell_renderer_text_new();
+  column = gtk_tree_view_column_new_with_attributes("MAC Address", renderer, "text", COL_MAC_ADDRESS, nullptr);
+  gtk_tree_view_column_set_resizable(column, TRUE);
+  gtk_tree_view_column_set_sort_column_id(column, COL_MAC_ADDRESS);
+  gtk_tree_view_append_column(GTK_TREE_VIEW(m_configured_device_tree_view), column);
+
+  // Device Name column
+  renderer = gtk_cell_renderer_text_new();
+  column = gtk_tree_view_column_new_with_attributes("Device Name", renderer, "text", COL_DEVICE_NAME, nullptr);
+  gtk_tree_view_column_set_resizable(column, TRUE);
+  gtk_tree_view_column_set_sort_column_id(column, COL_DEVICE_NAME);
+  gtk_tree_view_append_column(GTK_TREE_VIEW(m_configured_device_tree_view), column);
+
+  // IP Address column
+  renderer = gtk_cell_renderer_text_new();
+  column = gtk_tree_view_column_new_with_attributes("IP Address", renderer, "text", COL_IP_ADDRESS, nullptr);
+  gtk_tree_view_column_set_resizable(column, TRUE);
+  gtk_tree_view_column_set_sort_column_id(column, COL_IP_ADDRESS);
+  gtk_tree_view_append_column(GTK_TREE_VIEW(m_configured_device_tree_view), column);
+
+  // Vendor column
+  renderer = gtk_cell_renderer_text_new();
+  column = gtk_tree_view_column_new_with_attributes("Vendor", renderer, "text", COL_VENDOR, nullptr);
+  gtk_tree_view_column_set_resizable(column, TRUE);
+  gtk_tree_view_column_set_sort_column_id(column, COL_VENDOR);
+  gtk_tree_view_append_column(GTK_TREE_VIEW(m_configured_device_tree_view), column);
+
+  // Device Type column
+  renderer = gtk_cell_renderer_text_new();
+  column = gtk_tree_view_column_new_with_attributes("Device Type", renderer, "text", COL_DEVICE_ID, nullptr);
+  gtk_tree_view_column_set_resizable(column, TRUE);
+  gtk_tree_view_column_set_sort_column_id(column, COL_DEVICE_ID);
+  gtk_tree_view_append_column(GTK_TREE_VIEW(m_configured_device_tree_view), column);
+
+  // Tree view behavior
+  gtk_tree_view_set_fixed_height_mode(GTK_TREE_VIEW(m_configured_device_tree_view), FALSE);
+  gtk_tree_view_set_enable_search(GTK_TREE_VIEW(m_configured_device_tree_view), TRUE);
+
+  // Selection
+  m_configured_device_selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_configured_device_tree_view));
+  gtk_tree_selection_set_mode(m_configured_device_selection, GTK_SELECTION_SINGLE);
+  g_signal_connect(m_configured_device_selection, "changed", G_CALLBACK(onConfiguredDeviceSelectionChanged), this);
+
+  // Right-click context menu
+  g_signal_connect(m_configured_device_tree_view, "button-press-event", G_CALLBACK(onConfiguredDeviceRightClick), this);
+
+  gtk_container_add(GTK_CONTAINER(scrolled), m_configured_device_tree_view);
+  gtk_container_add(GTK_CONTAINER(frame), scrolled);
+
+  return frame;
 }
 
 GtkWidget* ProfinetDCPGUI::createDetailsPanel()
@@ -771,7 +878,8 @@ void ProfinetDCPGUI::onInterfaceChanged(GtkComboBox* combo, gpointer data)
   std::string selected_interface = gui->getSelectedInterface();
   if (!selected_interface.empty())
   {
-    // Interface change logging removed as requested
+    // Load configured devices for the selected interface
+    gui->loadConfiguredDevices();
   }
 }
 
@@ -1012,6 +1120,9 @@ void ProfinetDCPGUI::onDeviceSelectionChanged(GtkTreeSelection* selection, gpoin
 {
   auto* gui = static_cast<ProfinetDCPGUI*>(data);
 
+  // Clear configured device selection when DCP device is selected
+  gtk_tree_selection_unselect_all(gui->m_configured_device_selection);
+
   DCPDeviceInfo* device = gui->getSelectedDevice();
   if (device)
   {
@@ -1036,6 +1147,14 @@ void ProfinetDCPGUI::onDeviceDoubleClick(GtkTreeView* tree_view, GtkTreePath* pa
     dialog.setDCPTool(gui->m_dcp_tool.get());
     dialog.show();
   }
+}
+
+void ProfinetDCPGUI::onConfiguredDeviceSelectionChanged(GtkTreeSelection* selection, gpointer data)
+{
+  auto* gui = static_cast<ProfinetDCPGUI*>(data);
+  
+  // Clear DCP device selection when configured device is selected
+  gtk_tree_selection_unselect_all(gui->m_device_selection);
 }
 
 gboolean ProfinetDCPGUI::onDeviceRightClick(GtkWidget* widget, GdkEventButton* event, gpointer data)
@@ -1098,10 +1217,11 @@ static void onMenuConfigureActivate(GtkMenuItem* item, gpointer data)
 
 static void onMenuCopyMacActivate(GtkMenuItem* item, gpointer data)
 {
+  // Check if we have a DCPDeviceInfo object (for discovered devices)
   auto* info = static_cast<const ProfinetDCP::DCPDeviceInfo*>(g_object_get_data(G_OBJECT(item), "device"));
-  auto* gui = static_cast<ProfinetDCP::ProfinetDCPGUI*>(g_object_get_data(G_OBJECT(item), "gui"));
   if (info)
   {
+    auto* gui = static_cast<ProfinetDCP::ProfinetDCPGUI*>(g_object_get_data(G_OBJECT(item), "gui"));
     GtkClipboard* clipboard = gtk_clipboard_get(GDK_SELECTION_CLIPBOARD);
     gtk_clipboard_set_text(clipboard, info->mac_address.toString().c_str(), -1);
     if (gui)
@@ -1109,20 +1229,51 @@ static void onMenuCopyMacActivate(GtkMenuItem* item, gpointer data)
       gui->addLogMessageWithTimestamp("Copied MAC address: " + info->mac_address.toString());
     }
   }
+  else
+  {
+    // Check if we have a simple text string (for configured devices)
+    const char* text = static_cast<const char*>(g_object_get_data(G_OBJECT(item), "text"));
+    if (text)
+    {
+      GtkClipboard* clipboard = gtk_clipboard_get(GDK_SELECTION_CLIPBOARD);
+      gtk_clipboard_set_text(clipboard, text, -1);
+    }
+  }
 }
 
 static void onMenuCopyIpActivate(GtkMenuItem* item, gpointer data)
 {
+  // Check if we have a DCPDeviceInfo object (for discovered devices)
   auto* info = static_cast<const ProfinetDCP::DCPDeviceInfo*>(g_object_get_data(G_OBJECT(item), "device"));
-  auto* gui = static_cast<ProfinetDCP::ProfinetDCPGUI*>(g_object_get_data(G_OBJECT(item), "gui"));
   if (info)
   {
+    auto* gui = static_cast<ProfinetDCP::ProfinetDCPGUI*>(g_object_get_data(G_OBJECT(item), "gui"));
     GtkClipboard* clipboard = gtk_clipboard_get(GDK_SELECTION_CLIPBOARD);
     gtk_clipboard_set_text(clipboard, info->ip_address.toString().c_str(), -1);
     if (gui)
     {
       gui->addLogMessageWithTimestamp("Copied IP address: " + info->ip_address.toString());
     }
+  }
+  else
+  {
+    // Check if we have a simple text string (for configured devices)
+    const char* text = static_cast<const char*>(g_object_get_data(G_OBJECT(item), "text"));
+    if (text)
+    {
+      GtkClipboard* clipboard = gtk_clipboard_get(GDK_SELECTION_CLIPBOARD);
+      gtk_clipboard_set_text(clipboard, text, -1);
+    }
+  }
+}
+
+static void onMenuCopyTextActivate(GtkMenuItem* item, gpointer data)
+{
+  const char* text = static_cast<const char*>(g_object_get_data(G_OBJECT(item), "text"));
+  if (text)
+  {
+    GtkClipboard* clipboard = gtk_clipboard_get(GDK_SELECTION_CLIPBOARD);
+    gtk_clipboard_set_text(clipboard, text, -1);
   }
 }
 
@@ -1174,12 +1325,151 @@ void ProfinetDCPGUI::showDeviceContextMenu(GdkEventButton* event, const DCPDevic
   gtk_menu_popup_at_pointer(GTK_MENU(menu), reinterpret_cast<GdkEvent*>(event));
 }
 
+gboolean ProfinetDCPGUI::onConfiguredDeviceRightClick(GtkWidget* widget, GdkEventButton* event, gpointer data)
+{
+  if (event->type == GDK_BUTTON_PRESS && event->button == 3)
+  {
+    auto* gui = static_cast<ProfinetDCPGUI*>(data);
+
+    // Select row under cursor
+    GtkTreePath* path;
+    if (gtk_tree_view_get_path_at_pos(GTK_TREE_VIEW(widget), event->x, event->y, &path, nullptr, nullptr,
+                                      nullptr))
+    {
+      gtk_tree_selection_select_path(gui->m_configured_device_selection, path);
+      gtk_tree_path_free(path);
+
+      // Get the selected item
+      GtkTreeIter iter;
+      if (gtk_tree_selection_get_selected(gui->m_configured_device_selection, nullptr, &iter))
+      {
+        gui->showConfiguredDeviceContextMenu(event, &iter);
+      }
+    }
+    return TRUE;
+  }
+  return FALSE;
+}
+
+void ProfinetDCPGUI::showConfiguredDeviceContextMenu(GdkEventButton* event, GtkTreeIter* iter)
+{
+  GtkWidget* menu = gtk_menu_new();
+
+  // Get device data from the tree model
+  char* mac_address;
+  char* ip_address;
+  char* device_name;
+  char* device_type;
+  char* vendor_id;
+
+  gtk_tree_model_get(GTK_TREE_MODEL(m_configured_device_list_store), iter,
+                     COL_MAC_ADDRESS, &mac_address,
+                     COL_IP_ADDRESS, &ip_address,
+                     COL_DEVICE_NAME, &device_name,
+                     COL_DEVICE_ID, &device_type,
+                     COL_VENDOR, &vendor_id,
+                     -1);
+
+  // Copy MAC Address menu item
+  if (mac_address && strlen(mac_address) > 0) {
+    GtkWidget* copy_mac_item = gtk_menu_item_new_with_label("Copy MAC Address");
+    g_signal_connect(copy_mac_item, "activate", G_CALLBACK(onMenuCopyMacActivate), nullptr);
+    g_object_set_data_full(G_OBJECT(copy_mac_item), "text", g_strdup(mac_address), g_free);
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu), copy_mac_item);
+  }
+
+  // Copy IP Address menu item
+  if (ip_address && strlen(ip_address) > 0) {
+    GtkWidget* copy_ip_item = gtk_menu_item_new_with_label("Copy IP Address");
+    g_signal_connect(copy_ip_item, "activate", G_CALLBACK(onMenuCopyIpActivate), nullptr);
+    g_object_set_data_full(G_OBJECT(copy_ip_item), "text", g_strdup(ip_address), g_free);
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu), copy_ip_item);
+  }
+
+  // Copy Device Name menu item
+  if (device_name && strlen(device_name) > 0) {
+    GtkWidget* copy_name_item = gtk_menu_item_new_with_label("Copy Device Name");
+    g_signal_connect(copy_name_item, "activate", G_CALLBACK(onMenuCopyTextActivate), nullptr);
+    g_object_set_data_full(G_OBJECT(copy_name_item), "text", g_strdup(device_name), g_free);
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu), copy_name_item);
+  }
+
+  // Free the strings
+  g_free(mac_address);
+  g_free(ip_address);
+  g_free(device_name);
+  g_free(device_type);
+  g_free(vendor_id);
+
+  gtk_widget_show_all(menu);
+  gtk_menu_popup_at_pointer(GTK_MENU(menu), reinterpret_cast<GdkEvent*>(event));
+}
+
 void ProfinetDCPGUI::addDeviceToList(const DCPDeviceInfo& device)
 {
   GTKUtils::addDeviceToStore(m_device_list_store, device);
 }
 
 void ProfinetDCPGUI::clearDeviceList() { gtk_list_store_clear(m_device_list_store); }
+
+// Configured device list management
+
+void ProfinetDCPGUI::loadConfiguredDevices()
+{
+  std::string interface_name = getSelectedInterface();
+  if (interface_name.empty()) {
+    clearConfiguredDeviceList();
+    return;
+  }
+
+  clearConfiguredDeviceList();
+
+  if (m_configured_device_reader->loadConfiguredDevices(interface_name)) {
+    populateConfiguredDeviceList();
+  }
+}
+
+void ProfinetDCPGUI::populateConfiguredDeviceList()
+{
+  if (!m_configured_device_reader->hasLoadedDevices()) {
+    return;
+  }
+
+  const pugi::xml_document& doc = m_configured_device_reader->getXMLDocument();
+  pugi::xml_node devices_node = doc.child("ProfinetDevices");
+  
+  if (!devices_node) {
+    return;
+  }
+
+  for (pugi::xml_node device : devices_node.children("Device")) {
+    GtkTreeIter iter;
+    gtk_list_store_append(m_configured_device_list_store, &iter);
+    
+    // Get attributes from XML
+    std::string name = device.attribute("name").as_string();
+    std::string type = device.attribute("type").as_string();
+    std::string ip_address = device.attribute("ip_address").as_string();
+    std::string mac_address = device.attribute("mac_address").as_string();
+    std::string vendor_id_str = device.attribute("vendor_id").as_string();
+    std::string device_id_str = device.attribute("device_id").as_string();
+
+    // Set values in the list store
+    gtk_list_store_set(m_configured_device_list_store, &iter,
+                       COL_MAC_ADDRESS, mac_address.c_str(),
+                       COL_DEVICE_NAME, name.c_str(),
+                       COL_IP_ADDRESS, ip_address.c_str(),
+                       COL_VENDOR, vendor_id_str.c_str(),
+                       COL_DEVICE_ID, type.c_str(),
+                       COL_DEVICE_PTR, nullptr, // Could store xml_node if needed later
+                       -1);
+  }
+}
+
+void ProfinetDCPGUI::clearConfiguredDeviceList() 
+{ 
+  gtk_list_store_clear(m_configured_device_list_store); 
+}
 
 DCPDeviceInfo* ProfinetDCPGUI::getSelectedDevice()
 {

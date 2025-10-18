@@ -43,6 +43,7 @@
 #include <chrono>
 
 #include "../src/pn_dcp_tool.h"
+#include "../src/configured_devices.h"
 
 namespace ProfinetDCP
 {
@@ -108,6 +109,11 @@ private:
   GtkListStore* m_device_list_store;
   GtkTreeSelection* m_device_selection;
 
+  // Configured device list
+  GtkWidget* m_configured_device_tree_view;
+  GtkListStore* m_configured_device_list_store;
+  GtkTreeSelection* m_configured_device_selection;
+
   // Device details panel
   GtkWidget* m_details_frame;
   GtkWidget* m_details_container;
@@ -127,6 +133,9 @@ private:
   bool m_is_connected;
   bool m_discovery_in_progress;
 
+  // Configured device reader
+  std::unique_ptr<ConfiguredDeviceReader> m_configured_device_reader;
+
   // Device tracking
   std::vector<DCPDeviceInfo> m_current_devices;
   std::chrono::steady_clock::time_point m_last_discovery;
@@ -135,6 +144,7 @@ public:
   // UI Creation methods
   GtkWidget* createToolbar();
   GtkWidget* createDeviceList();
+  GtkWidget* createConfiguredDeviceList();
   GtkWidget* createDetailsPanel();
   GtkWidget* createStatusBar();
   GtkWidget* createLogAndProgressPanel();
@@ -151,6 +161,11 @@ public:
   void addDeviceToList(const DCPDeviceInfo& device);
   void clearDeviceList();
   GtkTreeIter* findDeviceInList(const MacAddress& mac);
+
+  // Configured device list management
+  void loadConfiguredDevices();
+  void populateConfiguredDeviceList();
+  void clearConfiguredDeviceList();
 
   // Device details
   void updateDeviceDetails(const DCPDeviceInfo* device);
@@ -170,10 +185,13 @@ public:
   static void onDeviceSelectionChanged(GtkTreeSelection* selection, gpointer data);
   static void onDeviceDoubleClick(GtkTreeView* tree_view, GtkTreePath* path, GtkTreeViewColumn* column,
                                   gpointer data);
+  static void onConfiguredDeviceSelectionChanged(GtkTreeSelection* selection, gpointer data);
 
   // Context menu
   static gboolean onDeviceRightClick(GtkWidget* widget, GdkEventButton* event, gpointer data);
   void showDeviceContextMenu(GdkEventButton* event, const DCPDeviceInfo* device);
+  static gboolean onConfiguredDeviceRightClick(GtkWidget* widget, GdkEventButton* event, gpointer data);
+  void showConfiguredDeviceContextMenu(GdkEventButton* event, GtkTreeIter* iter);
 
   // Helper methods
   void populateInterfaceCombo();

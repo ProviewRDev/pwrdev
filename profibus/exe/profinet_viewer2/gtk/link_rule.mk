@@ -8,6 +8,7 @@ link = $(ldxx) -L$(pwr_elib) $(elinkflags) $(domap) -o $(pwr_exe)/profinet_viewe
 	$(bld_dir)/pn_dcp_tool.o \
 	$(bld_dir)/topology-crawler.o \
 	$(bld_dir)/dcp_protocol.o \
+	$(bld_dir)/configured_devices.o \
 	$(wb_msg_eobjs) $(rt_msg_eobjs) \
 	$(pwr_eobj)/rt_io_user.o \
 	$(pwre_conf_libdir) $(pwre_conf_libpwrxttgtk) $(pwre_conf_libpwrxtt) $(pwre_conf_libgtk) \
