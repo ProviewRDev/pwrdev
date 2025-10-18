@@ -555,7 +555,7 @@ GtkWidget* ProfinetDCPGUI::createDeviceList()
 GtkWidget* ProfinetDCPGUI::createConfiguredDeviceList()
 {
   // Create frame with title
-  GtkWidget* frame = gtk_frame_new("Configured Devices");
+  GtkWidget* frame = gtk_frame_new("Configured Devices in ProviewR");
   gtk_style_context_add_class(gtk_widget_get_style_context(frame), "configured-device-list-frame");
 
   // Create scrolled window
