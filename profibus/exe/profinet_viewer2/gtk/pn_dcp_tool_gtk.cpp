@@ -1630,6 +1630,7 @@ void ProfinetDCPGUI::syncSelectionToConfiguredList(const std::string& device_nam
   // Find matching device in configured list
   GtkTreeIter iter;
   gboolean valid = gtk_tree_model_get_iter_first(GTK_TREE_MODEL(m_configured_device_list_store), &iter);
+  bool found = false;
   
   while (valid) {
     char* configured_name = nullptr;
@@ -1637,12 +1638,18 @@ void ProfinetDCPGUI::syncSelectionToConfiguredList(const std::string& device_nam
     
     if (configured_name && device_name == configured_name) {
       gtk_tree_selection_select_iter(m_configured_device_selection, &iter);
+      found = true;
       g_free(configured_name);
       break;
     }
     
     g_free(configured_name);
     valid = gtk_tree_model_iter_next(GTK_TREE_MODEL(m_configured_device_list_store), &iter);
+  }
+  
+  // If no matching device found, clear the configured selection
+  if (!found) {
+    gtk_tree_selection_unselect_all(m_configured_device_selection);
   }
   
   // Unblock the signal
@@ -1661,6 +1668,7 @@ void ProfinetDCPGUI::syncSelectionToDCPList(const std::string& device_name)
   // Find matching device in DCP list
   GtkTreeIter iter;
   gboolean valid = gtk_tree_model_get_iter_first(GTK_TREE_MODEL(m_device_list_store), &iter);
+  bool found = false;
   
   while (valid) {
     char* dcp_name = nullptr;
@@ -1668,12 +1676,18 @@ void ProfinetDCPGUI::syncSelectionToDCPList(const std::string& device_name)
     
     if (dcp_name && device_name == dcp_name) {
       gtk_tree_selection_select_iter(m_device_selection, &iter);
+      found = true;
       g_free(dcp_name);
       break;
     }
     
     g_free(dcp_name);
     valid = gtk_tree_model_iter_next(GTK_TREE_MODEL(m_device_list_store), &iter);
+  }
+  
+  // If no matching device found, clear the DCP selection
+  if (!found) {
+    gtk_tree_selection_unselect_all(m_device_selection);
   }
   
   // Unblock the signal
