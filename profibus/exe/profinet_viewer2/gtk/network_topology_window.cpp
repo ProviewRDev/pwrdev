@@ -180,9 +180,9 @@ void NetworkTopologyWindow::createToolbar()
   gtk_toolbar_insert(GTK_TOOLBAR(m_toolbar), zoom_out_item, -1);
   g_signal_connect(zoom_out_item, "clicked", G_CALLBACK(onZoomOutClicked), this);
 
-  // Reset view
+  // Fit view
   GtkToolItem* reset_item = gtk_tool_button_new(
-      gtk_image_new_from_icon_name("zoom-fit-best", GTK_ICON_SIZE_LARGE_TOOLBAR), "Reset View");
+      gtk_image_new_from_icon_name("zoom-fit-best", GTK_ICON_SIZE_LARGE_TOOLBAR), "Fit View");
   gtk_toolbar_insert(GTK_TOOLBAR(m_toolbar), reset_item, -1);
   g_signal_connect(reset_item, "clicked", G_CALLBACK(onResetViewClicked), this);
 
@@ -873,7 +873,6 @@ void NetworkTopologyWindow::onResetViewClicked(GtkButton* button, gpointer user_
 {
   NetworkTopologyWindow* window = static_cast<NetworkTopologyWindow*>(user_data);
   window->resetView();
-  gtk_widget_queue_draw(window->m_drawing_area);
 }
 
 void NetworkTopologyWindow::onApplyLayoutClicked(GtkButton* button, gpointer user_data)
@@ -1011,7 +1010,19 @@ void NetworkTopologyWindow::resetView()
     m_zoom_factor = 1.0;
     m_pan_x = 0.0;
     m_pan_y = 0.0;
+    gtk_widget_queue_draw(m_drawing_area);
     return;
+  }
+
+  // Get current widget size for viewport
+  GtkAllocation allocation;
+  gtk_widget_get_allocation(m_drawing_area, &allocation);
+  double viewport_width = allocation.width;
+  double viewport_height = allocation.height;
+  
+  // Account for widget position offset in viewport height calculation
+  if (allocation.y < 0) {
+    viewport_height = std::max(100.0, viewport_height + allocation.y);
   }
 
   // Calculate bounding box of all nodes
@@ -1033,15 +1044,13 @@ void NetworkTopologyWindow::resetView()
   double nodes_center_x = (min_x + max_x) / 2.0;
   double nodes_center_y = (min_y + max_y) / 2.0;
 
-  // Get current widget size for viewport
-  GtkAllocation allocation;
-  gtk_widget_get_allocation(m_drawing_area, &allocation);
-  double viewport_width = allocation.width;
-  double viewport_height = allocation.height;
-
   // Calculate bounding box dimensions
   double nodes_width = max_x - min_x;
   double nodes_height = max_y - min_y;
+  
+  // Ensure we have reasonable node dimensions
+  if (nodes_width <= 0) nodes_width = 120.0; // Default node width
+  if (nodes_height <= 0) nodes_height = 120.0; // Default node height
 
   // Calculate zoom to fit all nodes with some padding
   double zoom_x = viewport_width / (nodes_width * 1.2);   // 20% padding
@@ -1051,9 +1060,21 @@ void NetworkTopologyWindow::resetView()
   // Clamp zoom to reasonable range
   m_zoom_factor = std::max(0.1, std::min(3.0, fit_zoom));
 
-  // Center the view on the nodes
-  m_pan_x = (viewport_width / 2.0) - (nodes_center_x * m_zoom_factor);
-  m_pan_y = (viewport_height / 2.0) - (nodes_center_y * m_zoom_factor);
+  // Calculate the effective visible area center
+  double effective_center_x = viewport_width / 2.0;
+  double effective_center_y = viewport_height / 2.0;
+  
+  // Adjust for toolbar offset - shift the effective center down by full offset
+  if (allocation.y < 0) {
+    effective_center_y += (-allocation.y);
+  }
+  
+  // Center the view on the nodes within the effective visible area
+  m_pan_x = effective_center_x - (nodes_center_x * m_zoom_factor);
+  m_pan_y = effective_center_y - (nodes_center_y * m_zoom_factor);
+  
+  // Force a redraw
+  gtk_widget_queue_draw(m_drawing_area);
 }
 
 void NetworkTopologyWindow::addLogMessage(const std::string& message)
