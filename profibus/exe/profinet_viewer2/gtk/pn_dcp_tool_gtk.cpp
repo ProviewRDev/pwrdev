@@ -1394,6 +1394,22 @@ void ProfinetDCPGUI::showConfiguredDeviceContextMenu(GdkEventButton* event, GtkT
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), copy_name_item);
   }
 
+  // Copy Vendor menu item
+  if (vendor_id && strlen(vendor_id) > 0) {
+    GtkWidget* copy_vendor_item = gtk_menu_item_new_with_label("Copy Vendor");
+    g_signal_connect(copy_vendor_item, "activate", G_CALLBACK(onMenuCopyTextActivate), nullptr);
+    g_object_set_data_full(G_OBJECT(copy_vendor_item), "text", g_strdup(vendor_id), g_free);
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu), copy_vendor_item);
+  }
+
+  // Copy Device Type menu item
+  if (device_type && strlen(device_type) > 0) {
+    GtkWidget* copy_type_item = gtk_menu_item_new_with_label("Copy Device Type");
+    g_signal_connect(copy_type_item, "activate", G_CALLBACK(onMenuCopyTextActivate), nullptr);
+    g_object_set_data_full(G_OBJECT(copy_type_item), "text", g_strdup(device_type), g_free);
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu), copy_type_item);
+  }
+
   // Free the strings
   g_free(mac_address);
   g_free(ip_address);
@@ -1451,16 +1467,22 @@ void ProfinetDCPGUI::populateConfiguredDeviceList()
     std::string type = device.attribute("type").as_string();
     std::string ip_address = device.attribute("ip_address").as_string();
     std::string mac_address = device.attribute("mac_address").as_string();
-    std::string vendor_id_str = device.attribute("vendor_id").as_string();
-    std::string device_id_str = device.attribute("device_id").as_string();
+    
+    // Read vendor_id and device_id as integers directly from XML
+    uint16_t vendor_id = device.attribute("vendor_id").as_uint();
+    uint16_t device_id = device.attribute("device_id").as_uint();
+    
+    // Use the same conversion functions as the DCP device list
+    std::string vendor_text = ProfinetDCPTool::vendorIdToString(vendor_id);
+    std::string device_text = ProfinetDCPTool::deviceIdToString(vendor_id, device_id);
 
     // Set values in the list store
     gtk_list_store_set(m_configured_device_list_store, &iter,
                        COL_MAC_ADDRESS, mac_address.c_str(),
                        COL_DEVICE_NAME, name.c_str(),
                        COL_IP_ADDRESS, ip_address.c_str(),
-                       COL_VENDOR, vendor_id_str.c_str(),
-                       COL_DEVICE_ID, type.c_str(),
+                       COL_VENDOR, vendor_text.c_str(),
+                       COL_DEVICE_ID, device_text.c_str(),
                        COL_DEVICE_PTR, nullptr, // Could store xml_node if needed later
                        -1);
   }
