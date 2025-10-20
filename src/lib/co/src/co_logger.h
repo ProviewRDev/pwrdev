@@ -63,15 +63,37 @@ constexpr int RFC5424_VERSION = 1;
  * <PRI>VERSION TIMESTAMP HOSTNAME APP-NAME PROCID MSGID STRUCTURED-DATA MSG
  *
  * Supports two output modes:
- * 1. File logging: When module_name doesn't start with '/', logs to files in pwrp_log directory
- * 2. POSIX Message Queue: When module_name starts with '/', logs to POSIX message queue
+ * 1. File logging: Logs to files in pwrp_log directory (or current directory if not set)
+ * 2. POSIX Message Queue: When queue_name is provided, logs to POSIX message queue
  *
- * Example output:
- * <134>1 2023-10-01T12:34:56.123+0200 myhost myapp 12345 - [type="process" subtype="proviewr"] INFO Hello
- * World
+ * Structured Data Features:
+ * - Uses "-" when no structured data is present (RFC5424 compliant)
+ * - Supports flexible key-value pairs via addStructuredData()
+ * - Default behavior replaces all data for an SD ID (predictable)
+ * - Optional merge behavior when explicitly requested
+ * - Removes hardcoded SSAB-specific defaults for worldwide compatibility
  *
- * Message Queue Usage:
- * CoLogger::instance("module", "queue").log("Test message");
+ * Example outputs:
+ * - No structured data: <134>1 2023-10-01T12:34:56.123+0200 myhost myapp 12345 - - INFO Hello World
+ * - With structured data: <134>1 2023-10-01T12:34:56.123+0200 myhost myapp 12345 - [process@32473 pid="1234"
+ * name="app"] INFO Hello World
+ *
+ * Usage examples:
+ * @code
+ * // Get logger instance
+ * CoLogger& logger = CoLogger::instance("mymodule");
+ *
+ * // Simple logging
+ * logger.log("Simple message");
+ *
+ * // Add structured data
+ * logger.addStructuredData("process@32473", {{"pid", "1234"}, {"name", "myapp"}});
+ * logger.log("Message with structured data");
+ *
+ * // Message queue usage
+ * CoLogger& mq_logger = CoLogger::instance("module", "/myqueue");
+ * mq_logger.log("Message to queue");
+ * @endcode
  */
 class CoLogger
 {
@@ -115,28 +137,37 @@ public:
   void setFacility(CoLogFacility facility);
 
   /**
-   * @brief Set the log type string for structured data.
+   * @brief Add a structured data element with key-value pairs using initializer list.
    *
-   * Thread-safe.
-   * @param type The log type string.
+   * Thread-safe. Adds structured data in RFC5424 format.
+   * By default, replaces all key-value pairs for the given sd_id. Set merge=true to update/add keys.
+   * Can be used for single or multiple pairs:
+   * - Single: addStructuredData("id", {{"key", "value"}})
+   * - Multiple: addStructuredData("id", {{"k1", "v1"}, {"k2", "v2"}})
+   * - Replace (default): addStructuredData("id", {{"key", "new_value"}}) // Replaces all keys
+   * - Merge: addStructuredData("id", {{"new_key", "value"}}, true) // Merges with existing keys
+   * @param sd_id Structured Data ID (e.g., "exampleSDID@32473")
+   * @param pairs Initializer list of key-value pairs
+   * @param merge If true, merge with existing keys; if false (default), replace all keys for this sd_id
    */
-  void setType(const std::string& type);
+  void addStructuredData(const std::string& sd_id,
+                         std::initializer_list<std::pair<std::string, std::string>> pairs,
+                         bool merge = false);
 
   /**
-   * @brief Set the log subtype string for structured data.
+   * @brief Clear all structured data.
    *
-   * Thread-safe.
-   * @param subtype The log subtype string.
+   * Thread-safe. Resets structured data to empty state (will use "-" in logs).
    */
-  void setSubtype(const std::string& subtype);
+  void clearStructuredData();
 
   /**
-   * @brief Set the structured data prefix for log messages.
+   * @brief Check if structured data is present.
    *
    * Thread-safe.
-   * @param prefix The structured data prefix string.
+   * @return true if structured data has been added, false otherwise
    */
-  void setStructuredPrefix(const std::string& prefix);
+  bool hasStructuredData() const;
 
   /**
    * @brief Static RFC5424 header formatter for use by other ProviewR components.
@@ -147,12 +178,12 @@ public:
    * @param severity_char Character representing severity ('E', 'W', 'I', etc.)
    * @param app_name Application/module name
    * @param facility Log facility (default: Local0)
-   * @param structured_data Optional structured data string (default: "[ot-standard]")
+   * @param structured_data Optional structured data string (default: "-")
    * @return RFC5424 formatted header string
    */
   static std::string formatRFC5424Header(char severity_char, const std::string& app_name,
                                          CoLogFacility facility = CoLogFacility::Local0,
-                                         const std::string& structured_data = "[ot-standard]");
+                                         const std::string& structured_data = "-");
 
   /**
    * @brief Destructor for CoLogger.
@@ -188,15 +219,12 @@ private:
    */
   explicit CoLogger(const std::string& module_name, const std::string& queue_name = "");
   std::ofstream m_logfile;
-  std::mutex m_mutex;
+  mutable std::mutex m_mutex;
   std::string m_module_name;
   std::string m_queue_name;
   CoLogLevel m_log_level;
   CoLogFacility m_facility;
-  std::string m_type;
-  std::string m_subtype;
-  std::string m_structured_prefix =
-      "ot-standard"; // SSAB Oxelösund Operational Technology standard, can be changed
+  std::map<std::string, std::map<std::string, std::string>> m_structured_data;
   mqd_t m_mqueue;
   bool m_use_mqueue;
 
@@ -207,9 +235,7 @@ private:
     CoLogFacility facility;
     std::string message;
     std::string module_name;
-    std::string type;
-    std::string subtype;
-    std::string structured_prefix;
+    std::map<std::string, std::map<std::string, std::string>> structured_data;
   };
 
   std::queue<LogEntry> m_mailbox;

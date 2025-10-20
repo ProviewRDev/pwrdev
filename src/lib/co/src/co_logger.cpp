@@ -9,13 +9,13 @@
 #include <cerrno>
 #include <cstring>
 #include <iostream>
+#include <map>
 
 #include "co_logger.h"
 
 CoLogger::CoLogger(const std::string& module_name, const std::string& queue_name)
     : m_module_name(module_name), m_queue_name(queue_name), m_log_level(CoLogLevel::INFO),
-      m_facility(CoLogFacility::Local0), m_type("process"), m_subtype("proviewr"), m_mqueue(-1),
-      m_use_mqueue(false)
+      m_facility(CoLogFacility::Local0), m_mqueue(-1), m_use_mqueue(false)
 {
   std::cout << "CoLogger constructor called with module_name='" << module_name << "', queue_name='"
             << queue_name << "'" << std::endl;
@@ -133,9 +133,7 @@ void CoLogger::log(const std::string& message, CoLogLevel level, CoLogFacility f
   entry.facility = facility;
   entry.message = message;
   entry.module_name = m_module_name;
-  entry.type = m_type;
-  entry.subtype = m_subtype;
-  entry.structured_prefix = m_structured_prefix;
+  entry.structured_data = m_structured_data;
 
   // Enqueue log entry
   {
@@ -190,13 +188,29 @@ void CoLogger::loggingThreadFunc()
           {CoLogLevel::WARNING, "WARNING"},     {CoLogLevel::NOTICE, "NOTICE"},
           {CoLogLevel::INFO, "INFO"},           {CoLogLevel::DEBUG, "DEBUG"}};
 
+      // Format structured data
+      std::string structured_data_str = "-";
+      if (!entry.structured_data.empty())
+      {
+        std::ostringstream sd_stream;
+        for (const auto& sd_element : entry.structured_data)
+        {
+          sd_stream << "[" << sd_element.first;
+          for (const auto& pair : sd_element.second)
+          {
+            sd_stream << " " << pair.first << "=\"" << pair.second << "\"";
+          }
+          sd_stream << "]";
+        }
+        structured_data_str = sd_stream.str();
+      }
+
       // Format RFC5424 log message
       std::ostringstream log_stream;
       log_stream << '<' << pri << '>' << RFC5424_VERSION << ' '
                  << std::put_time(&local_tm, "%Y-%m-%dT%H:%M:%S") << '.' << std::setw(3) << std::setfill('0')
                  << ms << tz_buf << ' ' << hostname << ' ' << entry.module_name << ' ' << getpid() << " - "
-                 << "[" << entry.structured_prefix << " log_type=\"" << entry.type << "\" log_subtype=\""
-                 << entry.subtype << "\"] " << level_names.at(entry.level) << " " << entry.message;
+                 << structured_data_str << " " << level_names.at(entry.level) << " " << entry.message;
 
       std::string formatted_message = log_stream.str();
 
@@ -218,13 +232,6 @@ void CoLogger::loggingThreadFunc()
   }
 }
 
-// Set structured data prefix (customizable)
-void CoLogger::setStructuredPrefix(const std::string& prefix)
-{
-  std::lock_guard<std::mutex> lock(m_mutex);
-  m_structured_prefix = prefix;
-}
-
 void CoLogger::setLogLevel(CoLogLevel level)
 {
   std::lock_guard<std::mutex> lock(m_mutex);
@@ -237,16 +244,42 @@ void CoLogger::setFacility(CoLogFacility facility)
   m_facility = facility;
 }
 
-void CoLogger::setType(const std::string& type)
+void CoLogger::addStructuredData(const std::string& sd_id,
+                                 std::initializer_list<std::pair<std::string, std::string>> pairs, bool merge)
 {
   std::lock_guard<std::mutex> lock(m_mutex);
-  m_type = type;
+
+  if (merge)
+  {
+    // Merge behavior: Get or create the map for this SD ID, then update/merge the key-value pairs
+    auto& sd_map = m_structured_data[sd_id];
+    for (const auto& pair : pairs)
+    {
+      sd_map[pair.first] = pair.second; // This will update existing keys or add new ones
+    }
+  }
+  else
+  {
+    // Replace behavior (default): Replace all key-value pairs for this SD ID
+    std::map<std::string, std::string> pair_map;
+    for (const auto& pair : pairs)
+    {
+      pair_map[pair.first] = pair.second;
+    }
+    m_structured_data[sd_id] = pair_map;
+  }
 }
 
-void CoLogger::setSubtype(const std::string& subtype)
+void CoLogger::clearStructuredData()
 {
   std::lock_guard<std::mutex> lock(m_mutex);
-  m_subtype = subtype;
+  m_structured_data.clear();
+}
+
+bool CoLogger::hasStructuredData() const
+{
+  std::lock_guard<std::mutex> lock(m_mutex);
+  return !m_structured_data.empty();
 }
 
 std::string CoLogger::formatRFC5424Header(char severity_char, const std::string& app_name,
