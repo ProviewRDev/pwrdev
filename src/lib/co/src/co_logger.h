@@ -11,49 +11,7 @@
 #include <condition_variable>
 #include <atomic>
 #include <mqueue.h>
-
-/**
- * @enum CoLogLevel
- * @brief Log severity levels for CoLogger.
- *
- * Used to specify the importance of log messages.
- */
-enum class CoLogLevel : int
-{
-  EMERGENCY = 0, ///< System unusable
-  ALERT = 1,     ///< Immediate action required
-  CRITICAL = 2,  ///< Critical conditions
-  ERROR = 3,     ///< Error conditions
-  WARNING = 4,   ///< Warning conditions
-  NOTICE = 5,    ///< Normal but significant condition
-  INFO = 6,      ///< Informational messages
-  DEBUG = 7      ///< Debug-level messages
-};
-
-/**
- * @enum CoLogFacility
- * @brief Log facility codes for CoLogger.
- *
- * Used to categorize the source of log messages.
- */
-enum class CoLogFacility : int
-{
-  Local0 = 16, ///< Custom applications
-  Local1 = 17, ///< Message queue systems
-  Local2 = 18, ///< Database systems
-  Local3 = 19, ///< Authentication services
-  Local4 = 20, ///< Monitoring systems
-  Local5 = 21, ///< Security systems
-  Local6 = 22, ///< Network services
-  Local7 = 23  ///< Development/testing/debugging
-};
-
-/**
- * @brief RFC5424 protocol version constant.
- *
- * RFC5424 specifies that the VERSION field should be "1" for compliant messages.
- */
-constexpr int RFC5424_VERSION = 1;
+#include "co_rfc5424.h"
 
 /**
  * @class CoLogger
@@ -170,22 +128,6 @@ public:
   bool hasStructuredData() const;
 
   /**
-   * @brief Static RFC5424 header formatter for use by other ProviewR components.
-   *
-   * Generates RFC5424 compliant syslog header without the message content:
-   * <PRI>VERSION TIMESTAMP HOSTNAME APP-NAME PROCID MSGID STRUCTURED-DATA
-   *
-   * @param severity_char Character representing severity ('E', 'W', 'I', etc.)
-   * @param app_name Application/module name
-   * @param facility Log facility (default: Local0)
-   * @param structured_data Optional structured data string (default: "-")
-   * @return RFC5424 formatted header string
-   */
-  static std::string formatRFC5424Header(char severity_char, const std::string& app_name,
-                                         CoLogFacility facility = CoLogFacility::Local0,
-                                         const std::string& structured_data = "-");
-
-  /**
    * @brief Destructor for CoLogger.
    *
    * Shuts down the logging thread and closes the log file.
@@ -230,7 +172,7 @@ private:
 
   struct LogEntry
   {
-    int64_t ms_since_epoch;
+    int64_t us_since_epoch;
     CoLogLevel level;
     CoLogFacility facility;
     std::string message;

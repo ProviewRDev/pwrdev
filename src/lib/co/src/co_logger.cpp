@@ -12,6 +12,7 @@
 #include <map>
 
 #include "co_logger.h"
+#include "co_rfc5424.h"
 
 CoLogger::CoLogger(const std::string& module_name, const std::string& queue_name)
     : m_module_name(module_name), m_queue_name(queue_name), m_log_level(CoLogLevel::INFO),
@@ -127,8 +128,8 @@ void CoLogger::log(const std::string& message, CoLogLevel level, CoLogFacility f
   // Prepare log entry
   auto now = std::chrono::system_clock::now();
   LogEntry entry;
-  entry.ms_since_epoch =
-      std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
+  entry.us_since_epoch =
+      std::chrono::duration_cast<std::chrono::microseconds>(now.time_since_epoch()).count();
   entry.level = level;
   entry.facility = facility;
   entry.message = message;
@@ -164,31 +165,7 @@ void CoLogger::loggingThreadFunc()
       // Release lock while doing IO so other threads can enqueue log messages
       lock.unlock();
 
-      // Format and write log entry
-      int used_facility = static_cast<int>(entry.facility);
-      int pri = (used_facility * 8) + static_cast<int>(entry.level);
-
-      // Construct time point
-      std::chrono::system_clock::time_point tp(std::chrono::milliseconds(entry.ms_since_epoch));
-      auto in_time_t = std::chrono::system_clock::to_time_t(tp);
-      std::tm local_tm;
-      localtime_r(&in_time_t, &local_tm);
-      int ms = entry.ms_since_epoch % 1000;
-      char tz_buf[8];
-      strftime(tz_buf, sizeof(tz_buf), "%z", &local_tm);
-
-      // Get hostname
-      char hostname[128] = "localhost";
-      gethostname(hostname, sizeof(hostname));
-
-      // Map log levels to strings
-      static const std::map<CoLogLevel, std::string> level_names = {
-          {CoLogLevel::EMERGENCY, "EMERGENCY"}, {CoLogLevel::ALERT, "ALERT"},
-          {CoLogLevel::CRITICAL, "CRITICAL"},   {CoLogLevel::ERROR, "ERROR"},
-          {CoLogLevel::WARNING, "WARNING"},     {CoLogLevel::NOTICE, "NOTICE"},
-          {CoLogLevel::INFO, "INFO"},           {CoLogLevel::DEBUG, "DEBUG"}};
-
-      // Format structured data
+      // Convert structured data to RFC5424 string format
       std::string structured_data_str = "-";
       if (!entry.structured_data.empty())
       {
@@ -205,12 +182,20 @@ void CoLogger::loggingThreadFunc()
         structured_data_str = sd_stream.str();
       }
 
-      // Format RFC5424 log message
+      // Use RFC5424 utilities to format header with entry timestamp
+      std::string rfc5424_header = RFC5424::formatHeader(entry.level, entry.facility, entry.module_name,
+                                                         structured_data_str, entry.us_since_epoch);
+
+      // Map log levels to strings for the message content
+      static const std::map<CoLogLevel, std::string> level_names = {
+          {CoLogLevel::EMERGENCY, "EMERGENCY"}, {CoLogLevel::ALERT, "ALERT"},
+          {CoLogLevel::CRITICAL, "CRITICAL"},   {CoLogLevel::ERROR, "ERROR"},
+          {CoLogLevel::WARNING, "WARNING"},     {CoLogLevel::NOTICE, "NOTICE"},
+          {CoLogLevel::INFO, "INFO"},           {CoLogLevel::DEBUG, "DEBUG"}};
+
+      // Format complete RFC5424 log message
       std::ostringstream log_stream;
-      log_stream << '<' << pri << '>' << RFC5424_VERSION << ' '
-                 << std::put_time(&local_tm, "%Y-%m-%dT%H:%M:%S") << '.' << std::setw(3) << std::setfill('0')
-                 << ms << tz_buf << ' ' << hostname << ' ' << entry.module_name << ' ' << getpid() << " - "
-                 << structured_data_str << " " << level_names.at(entry.level) << " " << entry.message;
+      log_stream << rfc5424_header << " " << level_names.at(entry.level) << " " << entry.message;
 
       std::string formatted_message = log_stream.str();
 
@@ -280,69 +265,4 @@ bool CoLogger::hasStructuredData() const
 {
   std::lock_guard<std::mutex> lock(m_mutex);
   return !m_structured_data.empty();
-}
-
-std::string CoLogger::formatRFC5424Header(char severity_char, const std::string& app_name,
-                                          CoLogFacility facility, const std::string& structured_data)
-{
-  // Map severity character to RFC5424 numeric level
-  CoLogLevel level;
-  switch (severity_char)
-  {
-  case 'E':
-  case 'e':
-    level = CoLogLevel::ERROR;
-    break;
-  case 'W':
-  case 'w':
-    level = CoLogLevel::WARNING;
-    break;
-  case 'I':
-  case 'i':
-    level = CoLogLevel::INFO;
-    break;
-  case 'S':
-  case 's':
-    level = CoLogLevel::NOTICE;
-    break; // Success as Notice
-  case 'F':
-  case 'f':
-    level = CoLogLevel::CRITICAL;
-    break; // Fatal as Critical
-  case 'D':
-  case 'd':
-    level = CoLogLevel::DEBUG;
-    break;
-  default:
-    level = CoLogLevel::INFO;
-    break;
-  }
-
-  // Calculate PRI value: facility * 8 + severity
-  int pri = static_cast<int>(facility) * 8 + static_cast<int>(level);
-
-  // Get current timestamp
-  auto now = std::chrono::system_clock::now();
-  auto time_t_now = std::chrono::system_clock::to_time_t(now);
-  auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()) % 1000;
-
-  // Format timestamp with timezone
-  struct tm local_tm;
-  localtime_r(&time_t_now, &local_tm);
-
-  char tz_buf[16];
-  strftime(tz_buf, sizeof(tz_buf), "%z", &local_tm);
-
-  // Get hostname
-  char hostname[128] = "localhost";
-  gethostname(hostname, sizeof(hostname));
-
-  // Build RFC5424 header
-  std::ostringstream header_stream;
-  header_stream << '<' << pri << '>' << RFC5424_VERSION << ' '
-                << std::put_time(&local_tm, "%Y-%m-%dT%H:%M:%S") << '.' << std::setw(3) << std::setfill('0')
-                << ms.count() << tz_buf << ' ' << hostname << ' ' << app_name << ' ' << getpid() << " - "
-                << structured_data;
-
-  return header_stream.str();
 }
