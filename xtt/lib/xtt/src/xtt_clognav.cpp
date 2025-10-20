@@ -435,7 +435,6 @@ void CLogNav::draw()
 {
   ItemMsgBase* item;
   brow_tNode dest = 0;
-  brow_tNode selected_node = 0;
 
   brow_SetNodraw(brow->ctx);
   brow_DeleteAll(brow->ctx);
