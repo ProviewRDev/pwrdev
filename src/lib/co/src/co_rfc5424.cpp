@@ -1,5 +1,6 @@
 #include "co_rfc5424.h"
 #include <chrono>
+#include <cstring>
 #include <ctime>
 #include <iomanip>
 #include <sstream>
