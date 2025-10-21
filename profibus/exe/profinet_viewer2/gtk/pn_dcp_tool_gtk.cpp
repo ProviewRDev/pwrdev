@@ -151,36 +151,36 @@ void showErrorDialog(GtkWidget* parent, const std::string& title, const std::str
 } // namespace GTKUtils
 
 // Cell data function for conditional coloring of DCP devices
-static void dcpDeviceCellDataFunc(GtkTreeViewColumn* column,
-                                 GtkCellRenderer* cell,
-                                 GtkTreeModel* model,
-                                 GtkTreeIter* iter,
-                                 gpointer user_data)
+static void dcpDeviceCellDataFunc(GtkTreeViewColumn* column, GtkCellRenderer* cell, GtkTreeModel* model,
+                                  GtkTreeIter* iter, gpointer user_data)
 {
   auto* gui = static_cast<ProfinetDCP::ProfinetDCPGUI*>(user_data);
-  
+
   char* device_name = nullptr;
   char* device_ip = nullptr;
-  gtk_tree_model_get(model, iter, 
-                     COL_DEVICE_NAME, &device_name,
-                     COL_IP_ADDRESS, &device_ip,
-                     -1);
-  
-  if (device_name) {
+  gtk_tree_model_get(model, iter, COL_DEVICE_NAME, &device_name, COL_IP_ADDRESS, &device_ip, -1);
+
+  if (device_name)
+  {
     std::string configured_ip = gui->getConfiguredDeviceIP(device_name);
-    
-    if (!configured_ip.empty() && device_ip && configured_ip == device_ip) {
+
+    if (!configured_ip.empty() && device_ip && configured_ip == device_ip)
+    {
       // Device name and IP match - subtle dark green background with white text
       g_object_set(cell, "background", "#2d5a2d", "foreground", "#ffffff", nullptr);
-    } else {
+    }
+    else
+    {
       // Device not configured or IP doesn't match - use default appearance
       g_object_set(cell, "background", nullptr, "foreground", nullptr, nullptr);
     }
-  } else {
+  }
+  else
+  {
     // No device name - use default appearance
     g_object_set(cell, "background", nullptr, "foreground", nullptr, nullptr);
   }
-  
+
   g_free(device_name);
   g_free(device_ip);
 }
@@ -189,13 +189,15 @@ static void dcpDeviceCellDataFunc(GtkTreeViewColumn* column,
 static void onDCPDeviceSelectionChangedForSync(GtkTreeSelection* selection, gpointer data)
 {
   auto* gui = static_cast<ProfinetDCP::ProfinetDCPGUI*>(data);
-  
+
   GtkTreeIter iter;
-  if (gtk_tree_selection_get_selected(selection, nullptr, &iter)) {
+  if (gtk_tree_selection_get_selected(selection, nullptr, &iter))
+  {
     char* device_name = nullptr;
     gtk_tree_model_get(GTK_TREE_MODEL(gui->getDeviceListStore()), &iter, COL_DEVICE_NAME, &device_name, -1);
-    
-    if (device_name) {
+
+    if (device_name)
+    {
       gui->syncSelectionToConfiguredList(device_name);
       g_free(device_name);
     }
@@ -205,13 +207,16 @@ static void onDCPDeviceSelectionChangedForSync(GtkTreeSelection* selection, gpoi
 static void onConfiguredDeviceSelectionChangedForSync(GtkTreeSelection* selection, gpointer data)
 {
   auto* gui = static_cast<ProfinetDCP::ProfinetDCPGUI*>(data);
-  
+
   GtkTreeIter iter;
-  if (gtk_tree_selection_get_selected(selection, nullptr, &iter)) {
+  if (gtk_tree_selection_get_selected(selection, nullptr, &iter))
+  {
     char* device_name = nullptr;
-    gtk_tree_model_get(GTK_TREE_MODEL(gui->getConfiguredDeviceListStore()), &iter, COL_DEVICE_NAME, &device_name, -1);
-    
-    if (device_name) {
+    gtk_tree_model_get(GTK_TREE_MODEL(gui->getConfiguredDeviceListStore()), &iter, COL_DEVICE_NAME,
+                       &device_name, -1);
+
+    if (device_name)
+    {
       gui->syncSelectionToDCPList(device_name);
       g_free(device_name);
     }
@@ -328,10 +333,11 @@ ProfinetDCPGUI::ProfinetDCPGUI(GtkWidget* parent_window)
     : m_parent_window(parent_window), m_main_widget(nullptr), m_toolbar(nullptr), m_interface_combo(nullptr),
       m_connect_button(nullptr), m_disconnect_button(nullptr), m_discover_button(nullptr),
       m_topology_button(nullptr), m_device_tree_view(nullptr), m_device_list_store(nullptr),
-      m_device_selection(nullptr), m_configured_device_tree_view(nullptr), m_configured_device_list_store(nullptr),
-      m_configured_device_selection(nullptr), m_details_frame(nullptr), m_details_container(nullptr),
-      m_status_bar(nullptr), m_status_context_id(0), m_log_text_view(nullptr), m_log_buffer(nullptr),
-      m_progress_bar(nullptr), m_log_scrolled_window(nullptr), m_dcp_tool(nullptr), m_is_connected(false),
+      m_device_selection(nullptr), m_configured_device_tree_view(nullptr),
+      m_configured_device_list_store(nullptr), m_configured_device_selection(nullptr),
+      m_details_frame(nullptr), m_details_container(nullptr), m_status_bar(nullptr), m_status_context_id(0),
+      m_log_text_view(nullptr), m_log_buffer(nullptr), m_progress_bar(nullptr),
+      m_log_scrolled_window(nullptr), m_dcp_tool(nullptr), m_is_connected(false),
       m_discovery_in_progress(false)
 {
 }
@@ -342,14 +348,17 @@ bool ProfinetDCPGUI::initialize()
 {
   m_dcp_tool = std::make_unique<ProfinetDCPTool>();
   m_configured_device_reader = std::make_unique<ConfiguredDeviceReader>();
-  
+
   // Set up activity log callback for configured device reader
-  m_configured_device_reader->setActivityLogCallback([this](const std::string& message) {
-    if (g_main_window) {
-      g_main_window->addLogMessage(message);
-    }
-  });
-  
+  m_configured_device_reader->setActivityLogCallback(
+      [this](const std::string& message)
+      {
+        if (g_main_window)
+        {
+          g_main_window->addLogMessage(message);
+        }
+      });
+
   return true;
 }
 
@@ -652,7 +661,8 @@ GtkWidget* ProfinetDCPGUI::createConfiguredDeviceList()
                                                       G_TYPE_POINTER); // COL_DEVICE_PTR (will be xml_node)
 
   // Create tree view
-  m_configured_device_tree_view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(m_configured_device_list_store));
+  m_configured_device_tree_view =
+      gtk_tree_view_new_with_model(GTK_TREE_MODEL(m_configured_device_list_store));
 
   // Headers visible and clickable
   gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(m_configured_device_tree_view), TRUE);
@@ -664,14 +674,16 @@ GtkWidget* ProfinetDCPGUI::createConfiguredDeviceList()
 
   // MAC Address column
   renderer = gtk_cell_renderer_text_new();
-  column = gtk_tree_view_column_new_with_attributes("MAC Address", renderer, "text", COL_MAC_ADDRESS, nullptr);
+  column =
+      gtk_tree_view_column_new_with_attributes("MAC Address", renderer, "text", COL_MAC_ADDRESS, nullptr);
   gtk_tree_view_column_set_resizable(column, TRUE);
   gtk_tree_view_column_set_sort_column_id(column, COL_MAC_ADDRESS);
   gtk_tree_view_append_column(GTK_TREE_VIEW(m_configured_device_tree_view), column);
 
   // Device Name column
   renderer = gtk_cell_renderer_text_new();
-  column = gtk_tree_view_column_new_with_attributes("Device Name", renderer, "text", COL_DEVICE_NAME, nullptr);
+  column =
+      gtk_tree_view_column_new_with_attributes("Device Name", renderer, "text", COL_DEVICE_NAME, nullptr);
   gtk_tree_view_column_set_resizable(column, TRUE);
   gtk_tree_view_column_set_sort_column_id(column, COL_DEVICE_NAME);
   gtk_tree_view_append_column(GTK_TREE_VIEW(m_configured_device_tree_view), column);
@@ -704,10 +716,12 @@ GtkWidget* ProfinetDCPGUI::createConfiguredDeviceList()
   // Selection
   m_configured_device_selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_configured_device_tree_view));
   gtk_tree_selection_set_mode(m_configured_device_selection, GTK_SELECTION_SINGLE);
-  g_signal_connect(m_configured_device_selection, "changed", G_CALLBACK(onConfiguredDeviceSelectionChangedForSync), this);
+  g_signal_connect(m_configured_device_selection, "changed",
+                   G_CALLBACK(onConfiguredDeviceSelectionChangedForSync), this);
 
   // Right-click context menu
-  g_signal_connect(m_configured_device_tree_view, "button-press-event", G_CALLBACK(onConfiguredDeviceRightClick), this);
+  g_signal_connect(m_configured_device_tree_view, "button-press-event",
+                   G_CALLBACK(onConfiguredDeviceRightClick), this);
 
   gtk_container_add(GTK_CONTAINER(scrolled), m_configured_device_tree_view);
   gtk_container_add(GTK_CONTAINER(frame), scrolled);
@@ -842,15 +856,6 @@ void ProfinetDCPGUI::updateTopologyButtonState()
   }
 }
 
-// Status bar removed - using log window instead
-/*
-void ProfinetDCPGUI::updateStatus(const std::string& message)
-{
-  gtk_statusbar_pop(GTK_STATUSBAR(m_status_bar), m_status_context_id);
-  gtk_statusbar_push(GTK_STATUSBAR(m_status_bar), m_status_context_id, message.c_str());
-}
-*/
-
 void ProfinetDCPGUI::addLogMessage(const std::string& message)
 {
   if (!m_log_buffer)
@@ -959,7 +964,7 @@ void ProfinetDCPGUI::onInterfaceChanged(GtkComboBox* combo, gpointer data)
   {
     // Load configured devices for the selected interface
     gui->loadConfiguredDevices();
-    
+
     // Refresh DCP device list coloring based on new configured device list
     gui->refreshDCPDeviceColoring();
   }
@@ -1237,7 +1242,7 @@ void ProfinetDCPGUI::onDeviceDoubleClick(GtkTreeView* tree_view, GtkTreePath* pa
 void ProfinetDCPGUI::onConfiguredDeviceSelectionChanged(GtkTreeSelection* selection, gpointer data)
 {
   auto* gui = static_cast<ProfinetDCPGUI*>(data);
-  
+
   // Clear DCP device selection when configured device is selected
   gtk_tree_selection_unselect_all(gui->m_device_selection);
 }
@@ -1447,16 +1452,13 @@ void ProfinetDCPGUI::showConfiguredDeviceContextMenu(GdkEventButton* event, GtkT
   char* device_type;
   char* vendor_id;
 
-  gtk_tree_model_get(GTK_TREE_MODEL(m_configured_device_list_store), iter,
-                     COL_MAC_ADDRESS, &mac_address,
-                     COL_IP_ADDRESS, &ip_address,
-                     COL_DEVICE_NAME, &device_name,
-                     COL_DEVICE_ID, &device_type,
-                     COL_VENDOR, &vendor_id,
-                     -1);
+  gtk_tree_model_get(GTK_TREE_MODEL(m_configured_device_list_store), iter, COL_MAC_ADDRESS, &mac_address,
+                     COL_IP_ADDRESS, &ip_address, COL_DEVICE_NAME, &device_name, COL_DEVICE_ID, &device_type,
+                     COL_VENDOR, &vendor_id, -1);
 
   // Copy MAC Address menu item
-  if (mac_address && strlen(mac_address) > 0) {
+  if (mac_address && strlen(mac_address) > 0)
+  {
     GtkWidget* copy_mac_item = gtk_menu_item_new_with_label("Copy MAC Address");
     g_signal_connect(copy_mac_item, "activate", G_CALLBACK(onMenuCopyMacActivate), nullptr);
     g_object_set_data_full(G_OBJECT(copy_mac_item), "text", g_strdup(mac_address), g_free);
@@ -1464,7 +1466,8 @@ void ProfinetDCPGUI::showConfiguredDeviceContextMenu(GdkEventButton* event, GtkT
   }
 
   // Copy IP Address menu item
-  if (ip_address && strlen(ip_address) > 0) {
+  if (ip_address && strlen(ip_address) > 0)
+  {
     GtkWidget* copy_ip_item = gtk_menu_item_new_with_label("Copy IP Address");
     g_signal_connect(copy_ip_item, "activate", G_CALLBACK(onMenuCopyIpActivate), nullptr);
     g_object_set_data_full(G_OBJECT(copy_ip_item), "text", g_strdup(ip_address), g_free);
@@ -1472,7 +1475,8 @@ void ProfinetDCPGUI::showConfiguredDeviceContextMenu(GdkEventButton* event, GtkT
   }
 
   // Copy Device Name menu item
-  if (device_name && strlen(device_name) > 0) {
+  if (device_name && strlen(device_name) > 0)
+  {
     GtkWidget* copy_name_item = gtk_menu_item_new_with_label("Copy Device Name");
     g_signal_connect(copy_name_item, "activate", G_CALLBACK(onMenuCopyTextActivate), nullptr);
     g_object_set_data_full(G_OBJECT(copy_name_item), "text", g_strdup(device_name), g_free);
@@ -1502,117 +1506,125 @@ void ProfinetDCPGUI::clearDeviceList() { gtk_list_store_clear(m_device_list_stor
 void ProfinetDCPGUI::loadConfiguredDevices()
 {
   std::string interface_name = getSelectedInterface();
-  if (interface_name.empty()) {
+  if (interface_name.empty())
+  {
     clearConfiguredDeviceList();
     return;
   }
 
   clearConfiguredDeviceList();
 
-  if (m_configured_device_reader->loadConfiguredDevices(interface_name)) {
+  if (m_configured_device_reader->loadConfiguredDevices(interface_name))
+  {
     populateConfiguredDeviceList();
   }
 }
 
 void ProfinetDCPGUI::populateConfiguredDeviceList()
 {
-  if (!m_configured_device_reader->hasLoadedDevices()) {
+  if (!m_configured_device_reader->hasLoadedDevices())
+  {
     return;
   }
 
   const pugi::xml_document& doc = m_configured_device_reader->getXMLDocument();
   pugi::xml_node devices_node = doc.child("ProfinetDevices");
-  
-  if (!devices_node) {
+
+  if (!devices_node)
+  {
     return;
   }
 
-  for (pugi::xml_node device : devices_node.children("Device")) {
+  for (pugi::xml_node device : devices_node.children("Device"))
+  {
     GtkTreeIter iter;
     gtk_list_store_append(m_configured_device_list_store, &iter);
-    
+
     // Get attributes from XML
     std::string name = device.attribute("name").as_string();
     std::string type = device.attribute("type").as_string();
     std::string ip_address = device.attribute("ip_address").as_string();
     std::string mac_address = device.attribute("mac_address").as_string();
-    
+
     // Read vendor_id and device_id as integers directly from XML
     uint16_t vendor_id = device.attribute("vendor_id").as_uint();
     uint16_t device_id = device.attribute("device_id").as_uint();
-    
+
     // Use the same conversion functions as the DCP device list
     std::string vendor_text = ProfinetDCPTool::vendorIdToString(vendor_id);
     std::string device_text = ProfinetDCPTool::deviceIdToString(vendor_id, device_id);
 
     // Set values in the list store
-    gtk_list_store_set(m_configured_device_list_store, &iter,
-                       COL_MAC_ADDRESS, mac_address.c_str(),
-                       COL_DEVICE_NAME, name.c_str(),
-                       COL_IP_ADDRESS, ip_address.c_str(),
-                       COL_VENDOR, vendor_text.c_str(),
-                       COL_DEVICE_ID, device_text.c_str(),
-                       COL_DEVICE_PTR, nullptr, // Could store xml_node if needed later
+    gtk_list_store_set(m_configured_device_list_store, &iter, COL_MAC_ADDRESS, mac_address.c_str(),
+                       COL_DEVICE_NAME, name.c_str(), COL_IP_ADDRESS, ip_address.c_str(), COL_VENDOR,
+                       vendor_text.c_str(), COL_DEVICE_ID, device_text.c_str(), COL_DEVICE_PTR,
+                       nullptr, // Could store xml_node if needed later
                        -1);
   }
 }
 
-void ProfinetDCPGUI::clearConfiguredDeviceList() 
-{ 
-  gtk_list_store_clear(m_configured_device_list_store); 
-}
+void ProfinetDCPGUI::clearConfiguredDeviceList() { gtk_list_store_clear(m_configured_device_list_store); }
 
 bool ProfinetDCPGUI::isDeviceConfigured(const std::string& device_name) const
 {
-  if (!m_configured_device_reader || !m_configured_device_reader->hasLoadedDevices()) {
+  if (!m_configured_device_reader || !m_configured_device_reader->hasLoadedDevices())
+  {
     return false;
   }
 
   const pugi::xml_document& doc = m_configured_device_reader->getXMLDocument();
   pugi::xml_node devices_node = doc.child("ProfinetDevices");
-  
-  if (!devices_node) {
+
+  if (!devices_node)
+  {
     return false;
   }
 
   // Search for device name in configured devices
-  for (pugi::xml_node device : devices_node.children("Device")) {
+  for (pugi::xml_node device : devices_node.children("Device"))
+  {
     std::string configured_name = device.attribute("name").as_string();
-    if (configured_name == device_name) {
+    if (configured_name == device_name)
+    {
       return true;
     }
   }
-  
+
   return false;
 }
 
 std::string ProfinetDCPGUI::getConfiguredDeviceIP(const std::string& device_name) const
 {
-  if (!m_configured_device_reader || !m_configured_device_reader->hasLoadedDevices()) {
+  if (!m_configured_device_reader || !m_configured_device_reader->hasLoadedDevices())
+  {
     return "";
   }
 
   const pugi::xml_document& doc = m_configured_device_reader->getXMLDocument();
   pugi::xml_node devices_node = doc.child("ProfinetDevices");
-  
-  if (!devices_node) {
+
+  if (!devices_node)
+  {
     return "";
   }
 
   // Search for device name and return its IP address
-  for (pugi::xml_node device : devices_node.children("Device")) {
+  for (pugi::xml_node device : devices_node.children("Device"))
+  {
     std::string configured_name = device.attribute("name").as_string();
-    if (configured_name == device_name) {
+    if (configured_name == device_name)
+    {
       return device.attribute("ip_address").as_string();
     }
   }
-  
+
   return "";
 }
 
 void ProfinetDCPGUI::refreshDCPDeviceColoring()
 {
-  if (m_device_tree_view) {
+  if (m_device_tree_view)
+  {
     // Force tree view to redraw with updated coloring
     gtk_widget_queue_draw(m_device_tree_view);
   }
@@ -1620,76 +1632,87 @@ void ProfinetDCPGUI::refreshDCPDeviceColoring()
 
 void ProfinetDCPGUI::syncSelectionToConfiguredList(const std::string& device_name)
 {
-  if (!m_configured_device_list_store || !m_configured_device_selection) {
+  if (!m_configured_device_list_store || !m_configured_device_selection)
+  {
     return;
   }
-  
+
   // Temporarily block the selection changed signal to avoid infinite recursion
-  g_signal_handlers_block_by_func(m_configured_device_selection, (gpointer)onConfiguredDeviceSelectionChangedForSync, this);
-  
+  g_signal_handlers_block_by_func(m_configured_device_selection,
+                                  (gpointer)onConfiguredDeviceSelectionChangedForSync, this);
+
   // Find matching device in configured list
   GtkTreeIter iter;
   gboolean valid = gtk_tree_model_get_iter_first(GTK_TREE_MODEL(m_configured_device_list_store), &iter);
   bool found = false;
-  
-  while (valid) {
+
+  while (valid)
+  {
     char* configured_name = nullptr;
-    gtk_tree_model_get(GTK_TREE_MODEL(m_configured_device_list_store), &iter, COL_DEVICE_NAME, &configured_name, -1);
-    
-    if (configured_name && device_name == configured_name) {
+    gtk_tree_model_get(GTK_TREE_MODEL(m_configured_device_list_store), &iter, COL_DEVICE_NAME,
+                       &configured_name, -1);
+
+    if (configured_name && device_name == configured_name)
+    {
       gtk_tree_selection_select_iter(m_configured_device_selection, &iter);
       found = true;
       g_free(configured_name);
       break;
     }
-    
+
     g_free(configured_name);
     valid = gtk_tree_model_iter_next(GTK_TREE_MODEL(m_configured_device_list_store), &iter);
   }
-  
+
   // If no matching device found, clear the configured selection
-  if (!found) {
+  if (!found)
+  {
     gtk_tree_selection_unselect_all(m_configured_device_selection);
   }
-  
+
   // Unblock the signal
-  g_signal_handlers_unblock_by_func(m_configured_device_selection, (gpointer)onConfiguredDeviceSelectionChangedForSync, this);
+  g_signal_handlers_unblock_by_func(m_configured_device_selection,
+                                    (gpointer)onConfiguredDeviceSelectionChangedForSync, this);
 }
 
 void ProfinetDCPGUI::syncSelectionToDCPList(const std::string& device_name)
 {
-  if (!m_device_list_store || !m_device_selection) {
+  if (!m_device_list_store || !m_device_selection)
+  {
     return;
   }
-  
+
   // Temporarily block the selection changed signal to avoid infinite recursion
   g_signal_handlers_block_by_func(m_device_selection, (gpointer)onDCPDeviceSelectionChangedForSync, this);
-  
+
   // Find matching device in DCP list
   GtkTreeIter iter;
   gboolean valid = gtk_tree_model_get_iter_first(GTK_TREE_MODEL(m_device_list_store), &iter);
   bool found = false;
-  
-  while (valid) {
+
+  while (valid)
+  {
     char* dcp_name = nullptr;
     gtk_tree_model_get(GTK_TREE_MODEL(m_device_list_store), &iter, COL_DEVICE_NAME, &dcp_name, -1);
-    
-    if (dcp_name && device_name == dcp_name) {
+
+    if (dcp_name && device_name == dcp_name)
+    {
       gtk_tree_selection_select_iter(m_device_selection, &iter);
       found = true;
       g_free(dcp_name);
       break;
     }
-    
+
     g_free(dcp_name);
     valid = gtk_tree_model_iter_next(GTK_TREE_MODEL(m_device_list_store), &iter);
   }
-  
+
   // If no matching device found, clear the DCP selection
-  if (!found) {
+  if (!found)
+  {
     gtk_tree_selection_unselect_all(m_device_selection);
   }
-  
+
   // Unblock the signal
   g_signal_handlers_unblock_by_func(m_device_selection, (gpointer)onDCPDeviceSelectionChangedForSync, this);
 }
