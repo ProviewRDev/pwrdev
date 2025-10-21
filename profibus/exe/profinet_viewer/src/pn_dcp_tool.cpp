@@ -435,7 +435,7 @@ DCPResult NetworkInterface::setupSocket()
   // m_socket_fd = socket(AF_PACKET, SOCK_DGRAM, htons(ETH_P_ALL));
   if (m_socket_fd < 0)
   {
-    std::cerr << "Failed to create raw socket: " << strerror(errno) << std::endl;
+    logMessage("Failed to create raw socket: " + std::string(strerror(errno)));
     return DCPResult::NetworkError;
   }
 
